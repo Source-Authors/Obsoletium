@@ -381,7 +381,7 @@ void TransferToInteger( CWnd *pWnd, int &nValue )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CFaceEditMaterialPage::ClickFace( CMapSolid *pSolid, int faceIndex, int cmd, int clickMode )
+void CFaceEditMaterialPage::ClickFace( CMapSolid *pSolid, short faceIndex, int cmd, int clickMode )
 {
 	// get the face
 	CMapFace	*pFace = pSolid->GetFace( faceIndex );

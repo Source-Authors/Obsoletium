@@ -372,7 +372,7 @@ int CMapFace::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 		//
 		// Reverse the slashes -- thank you id.
 		//
-		for (int i = strlen(pszTexture) - 1; i >= 0; i--)
+		for (intp i = V_strlen(pszTexture) - 1; i >= 0; i--)
 		{
 			if (pszTexture[i] == '\\')
 				pszTexture[i] = '/';
@@ -583,7 +583,7 @@ int CMapFace::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 		if (g_pGameConfig->GetTextureFormat() != tfVMT)
 		{
 			// reverse the slashes -- thank you id
-			for (int i = strlen(szTexName) - 1; i >= 0; i--)
+			for (intp i = V_strlen(szTexName) - 1; i >= 0; i--)
 			{
 				if (szTexName[i] == '/')
 					szTexName[i] = '\\';
@@ -674,8 +674,8 @@ int CMapSolid::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 		file << "{" << ENDLINE;
 
 		// serialize the Faces
-		int nFaces = Faces.GetCount();
-		for(int i = 0; i < nFaces; i++)
+		short nFaces{Faces.GetCount()};
+		for(short i = 0; i < nFaces; i++)
 		{
 			if(!Faces[i].Points)
 				continue;
@@ -692,7 +692,7 @@ int CMapSolid::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 		Faces.SetCount(0);
 
 		// read Faces
-		for(int i = 0; ; i++)
+		for(short i = 0; ; i++)
 		{
 			// extract plane
 			if (Faces[i].SerializeMAP(file, fIsStoring) == fileDone)
@@ -903,8 +903,8 @@ int CEditGameClass::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 			//
 			// For each variable from the base class...
 			//
-			int nVariableCount = pGameDataClass->GetVariableCount();
-			for (int i = 0; i < nVariableCount; i++)
+			intp nVariableCount = pGameDataClass->GetVariableCount();
+			for (intp i = 0; i < nVariableCount; i++)
 			{
 				GDinputvariable *pVar = pGameDataClass->GetVariableAt(i);
 				Assert(pVar != NULL);

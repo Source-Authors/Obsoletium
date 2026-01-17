@@ -248,8 +248,8 @@ void CEditGroups::UpdateGroupList()
 	CMapDoc *pDoc = CMapDoc::GetActiveMapDoc();
 	if (pDoc != NULL)
 	{
-		int nCount = pDoc->VisGroups_GetCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = pDoc->VisGroups_GetCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			CVisGroup *pGroup = pDoc->VisGroups_GetVisGroup(i);
 			if (!pGroup->GetParent())

@@ -63,9 +63,9 @@ class CEditGameClass
 		inline LPCTSTR GetKeyValue(LPCTSTR pszKey, intp *piIndex = NULL) const { return(m_KeyValues.GetValue(pszKey, piIndex)); }
 		
 		// Iterate the list of keyvalues.
-		inline int GetFirstKeyValue() const			{ return m_KeyValues.GetFirst(); }
-		inline int GetNextKeyValue( unsigned short i ) const	{ return m_KeyValues.GetNext( i ); }
-		static inline int GetInvalidKeyValue()		{ return WCKeyValues::GetInvalidIndex(); }
+		inline unsigned short GetFirstKeyValue() const			{ return m_KeyValues.GetFirst(); }
+		inline unsigned short GetNextKeyValue( unsigned short i ) const	{ return m_KeyValues.GetNext( i ); }
+		static inline unsigned short GetInvalidKeyValue()		{ return WCKeyValues::GetInvalidIndex(); }
 
 		//
 		// Interface to spawnflags.

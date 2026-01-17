@@ -90,15 +90,15 @@ void COP_Model::UpdateData( int Mode, PVOID pData, bool bCanEdit )
 			// we tell it the list of suggestions.
 			char txt[512];
 			txt[0] = 0;
-			int iSequence = pModel->GetSequence();
+			intp iSequence = pModel->GetSequence();
 			if ( iSequence )
 				pModel->GetSequenceName( iSequence, txt );
 
 			// Set the list of suggestions.
 			CUtlVector<CString> suggestions;
 	
-			int nCount = pModel->GetSequenceCount();
-			for ( int i = 0; i < nCount; i++ )
+			intp nCount = pModel->GetSequenceCount();
+			for ( intp i = 0; i < nCount; i++ )
 			{
 				char szName[MAX_PATH];
 				pModel->GetSequenceName(i, szName);
@@ -247,7 +247,7 @@ void COP_Model::OnTextChanged( const char *pText )
 	CMapStudioModel *pModel = GetModelHelper();
 	if (pModel != NULL)
 	{
-		int iSequence = pModel->GetSequenceIndex( pText );
+		intp iSequence = pModel->GetSequenceIndex( pText );
 		if ( iSequence != -1 )
 			pModel->SetSequence( iSequence );
 

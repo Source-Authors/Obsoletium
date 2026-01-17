@@ -562,7 +562,7 @@ IPositionInterpolator* CMapKeyFrame::SetupPositionInterpolator( int iInterpolato
 		CMapEntity *pEnt = GetParentEntity();
 		if( pEnt )
 		{
-			for ( int i=pEnt->GetFirstKeyValue(); i != pEnt->GetInvalidKeyValue(); i=pEnt->GetNextKeyValue( i ) )
+			for ( auto i=pEnt->GetFirstKeyValue(); i != pEnt->GetInvalidKeyValue(); i=pEnt->GetNextKeyValue( i ) )
 			{
 				m_pPositionInterpolator->ProcessKey( 
 					pEnt->GetKey( i ),

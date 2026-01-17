@@ -56,8 +56,8 @@ BOOL CEditPathDlg::OnInitDialog()
 	m_cClass.ResetContent();
 
 	CString str;
-	int nCount = pGD->GetClassCount();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = pGD->GetClassCount();
+	for (intp i = 0; i < nCount; i++)
 	{
 		GDclass *pc = pGD->GetClass(i);
 		if (!pc->IsBaseClass())

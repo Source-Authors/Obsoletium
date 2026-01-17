@@ -2495,7 +2495,7 @@ bool CSculptCarveOptions::CalculateQueuePoint( Vector2D &vPoint, Vector2D &vNorm
 	Vector2D	vInitialDir;
 	bool		bInitialDirSet = false;
 
-	int PointIndex = m_PointQueue.Count() - 1;
+	intp PointIndex = m_PointQueue.Count() - 1;
 	if ( PointIndex <= 1 )
 	{
 		return false;
@@ -2504,10 +2504,10 @@ bool CSculptCarveOptions::CalculateQueuePoint( Vector2D &vPoint, Vector2D &vNorm
 	vPoint = m_PointQueue[ PointIndex ];
 
 	// keep going back from the current point until you get a total distance
-	for( int j = PointIndex - 1; j >= 0; j-- )
+	for( intp j = PointIndex - 1; j >= 0; j-- )
 	{
-		int index = j;
-		int index2 = PointIndex;
+		intp index = j;
+		intp index2 = PointIndex;
 
 		Vector2D	vDiff( m_PointQueue[ index2 ].x - m_PointQueue[ index ].x, m_PointQueue[ index2 ].y - m_PointQueue[ index ].y );
 		float		Length = Vector2DNormalize( vDiff );
@@ -3082,7 +3082,7 @@ void CSculptCarveOptions::DoPaintOperation( CMapView3D *pView, const Vector2D &v
 	float		flDistance = 0.0f;
 	Vector		vPaintAxis;
 
-	int nTestPoint = m_DrawPoints.Count() - 1;
+	intp nTestPoint = m_DrawPoints.Count() - 1;
 	if ( nTestPoint < 2 )
 	{
 		return;

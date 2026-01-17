@@ -60,7 +60,7 @@ CMapClassManager::~CMapClassManager(void)
 CMapClass *CMapClassManager::CreateObject(MAPCLASSTYPE Type)
 {
 	size_t uLen = strlen(Type)+1;
-	for (int i = s_Classes.Count() - 1; i >= 0; i--)
+	for (intp i = s_Classes.Count() - 1; i >= 0; i--)
 	{
 		MCMSTRUCT &mcms = s_Classes[i];
 		if (!memcmp(mcms.Type, Type, uLen))
@@ -171,7 +171,7 @@ void CMapClass::AddDependent(CMapClass *pDependent)
 	//
 	// Don't add the same dependent twice.
 	//
-	int nIndex = m_Dependents.Find(pDependent);
+	intp nIndex = m_Dependents.Find(pDependent);
 	if (nIndex != -1)
 		return;
 
@@ -225,8 +225,8 @@ CMapClass *CMapClass::CopyFrom(CMapClass *pFrom, bool bUpdateDependencies)
 	//
 	// Copy CMapClass stuff.
 	//
-	int nVisGroupCount = pFrom->GetVisGroupCount();
-	for (int nVisGroup = 0; nVisGroup < nVisGroupCount; nVisGroup++)
+	intp nVisGroupCount = pFrom->GetVisGroupCount();
+	for (intp nVisGroup = 0; nVisGroup < nVisGroupCount; nVisGroup++)
 	{
 		CVisGroup *pVisGroup = pFrom->GetVisGroup(nVisGroup);
 		if (!pVisGroup->IsAutoVisGroup())
@@ -363,7 +363,7 @@ void CMapClass::GetRender2DBox(Vector &mins, Vector &maxs)
 //			section of the VMF. These keys are held until they are handled, then
 //			the memory is freed.
 //-----------------------------------------------------------------------------
-int CMapClass::GetEditorKeyCount(void)
+intp CMapClass::GetEditorKeyCount(void)
 {
 	if (m_pEditorKeys == NULL)
 	{
@@ -377,7 +377,7 @@ int CMapClass::GetEditorKeyCount(void)
 //-----------------------------------------------------------------------------
 // Purpose: Returns the key name for the given editor key index.
 //-----------------------------------------------------------------------------
-const char *CMapClass::GetEditorKey(int nIndex)
+const char *CMapClass::GetEditorKey(intp nIndex)
 {
 	if (m_pEditorKeys == NULL)
 	{
@@ -391,7 +391,7 @@ const char *CMapClass::GetEditorKey(int nIndex)
 //-----------------------------------------------------------------------------
 // Purpose: Returns the value for the given editor key index.
 //-----------------------------------------------------------------------------
-const char *CMapClass::GetEditorKeyValue(int nIndex)
+const char *CMapClass::GetEditorKeyValue(intp nIndex)
 {
 	if (m_pEditorKeys == NULL)
 	{
@@ -621,7 +621,7 @@ void CMapClass::AddVisGroup(CVisGroup *pVisGroup)
 //-----------------------------------------------------------------------------
 void CMapClass::RemoveVisGroup(CVisGroup *pVisGroup)
 {
-	int nIndex = m_VisGroups.Find(pVisGroup);
+	intp nIndex = m_VisGroups.Find(pVisGroup);
 	
 	if (nIndex != -1 )
 	{
@@ -634,7 +634,7 @@ void CMapClass::RemoveVisGroup(CVisGroup *pVisGroup)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CMapClass::GetVisGroupCount(void)
+intp CMapClass::GetVisGroupCount(void)
 {
 	return m_VisGroups.Count();
 }
@@ -643,7 +643,7 @@ int CMapClass::GetVisGroupCount(void)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CVisGroup *CMapClass::GetVisGroup(int nIndex)
+CVisGroup *CMapClass::GetVisGroup(intp nIndex)
 {
 	return m_VisGroups.Element(nIndex);
 }
@@ -732,7 +732,7 @@ void CMapClass::RemoveAllChildren(void)
 //-----------------------------------------------------------------------------
 void CMapClass::RemoveChild(CMapClass *pChild, bool bUpdateBounds)
 {
-	int index = m_Children.Find(pChild);
+	intp index = m_Children.Find(pChild);
 
 	if (index == -1)
 	{
@@ -1454,7 +1454,7 @@ ChunkFileResult_t CMapClass::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 //-----------------------------------------------------------------------------
 void CMapClass::RemoveDependent(CMapClass *pDependent)
 {
-	int nIndex = m_Dependents.Find(pDependent);
+	intp nIndex = m_Dependents.Find(pDependent);
 	if (nIndex != -1)
 	{
 		m_Dependents.FastRemove(nIndex);
@@ -1694,11 +1694,11 @@ bool CMapClass::CheckVisibility( bool bLoading )
 	CVisGroup* pVisGroup;
 	bool bInUser = false;
 	bool bInAuto = false;
-	int nVisGroupCount = m_VisGroups.Count();
+	intp nVisGroupCount = m_VisGroups.Count();
 	bool bFoundOrphans = false;
 	CMapDoc *pDoc = CMapDoc::GetActiveMapDoc();
 	
-	for ( int i = 0; i < nVisGroupCount; i++ )
+	for ( intp i = 0; i < nVisGroupCount; i++ )
 	{
 		pVisGroup = m_VisGroups.Element( i );
 		if ( pVisGroup->IsAutoVisGroup() )

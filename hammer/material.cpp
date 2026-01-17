@@ -73,7 +73,7 @@ public:
 	//-----------------------------------------------------------------------------
 	static PreviewImageRetVal_t GetPreviewImageProperties( IMaterial *pMaterial, int *width, int *height, ImageFormat *imageFormat, bool* isTranslucent )
 	{
-		int i = s_PreviewImagePropertiesCache.Find( pMaterial );
+		auto i = s_PreviewImagePropertiesCache.Find( pMaterial );
 		if ( i == s_PreviewImagePropertiesCache.InvalidIndex() )
 		{
 			// Add an entry to the cache.
@@ -426,7 +426,7 @@ CMaterial::~CMaterial(void)
 //-----------------------------------------------------------------------------
 // Finds all .VMT files in a particular directory
 //-----------------------------------------------------------------------------
-bool CMaterial::LoadMaterialsInDirectory( char const* pDirectoryName, int nDirectoryNameLen,
+bool CMaterial::LoadMaterialsInDirectory( char const* pDirectoryName, intp nDirectoryNameLen,
 						IMaterialEnumerator *pEnum, intp nContext, int nFlags )
 {
 	//Assert( Q_strnicmp( pDirectoryName, "materials", 9 ) == 0 );
@@ -455,7 +455,7 @@ bool CMaterial::LoadMaterialsInDirectory( char const* pDirectoryName, int nDirec
 		{
 			// Strip off the 'materials/' part of the material name.
 			char *pFileNameWithPath;
-			int nAllocSize = nDirectoryNameLen + Q_strlen(pFileName) + 2;
+			intp nAllocSize = nDirectoryNameLen + Q_strlen(pFileName) + 2;
 			pFileNameWithPath = (char *)stackalloc( nAllocSize );
 			Q_snprintf(	pFileNameWithPath, nAllocSize, "%s/%s", &pDirectoryName[MATERIAL_PREFIX_LEN], pFileName ); 
 			Q_strnlwr( pFileNameWithPath, nAllocSize );
@@ -884,7 +884,7 @@ void CMaterial::DrawBitmap( CDC *pDC, RECT& srcRect, RECT& dstRect )
 	if (!bInit)
 	{
 		bInit = true;
-		for (int i = 0; i < 256; i++)
+		for (unsigned short i = 0; i < 256; i++)
 		{
 			bmi.colorindex[i] = i;
 		}

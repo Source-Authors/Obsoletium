@@ -127,8 +127,19 @@ class CMapWorld : public CMapClass, public CEditGameClass
 		CMapFace *FaceID_FaceForID(int nFaceID);
 		void FaceID_StringToFaceIDLists(CMapFaceIDList *pFullFaceList, CMapFaceIDList *pPartialFaceList, const char *pszValue);
 		void FaceID_StringToFaceLists(CMapFaceList *pFullFaceList, CMapFaceList *pPartialFaceList, const char *pszValue);
-		static bool FaceID_FaceIDListsToString(char *pszList, int nSize, CMapFaceIDList *pFullFaceIDList, CMapFaceIDList *pPartialFaceIDList);
-		static bool FaceID_FaceListsToString(char *pszValue, int nSize, CMapFaceList *pFullFaceList, CMapFaceList *pPartialFaceList);
+		static bool FaceID_FaceIDListsToString(OUT_Z_CAP(nSize) char *pszList, intp nSize, CMapFaceIDList *pFullFaceIDList, CMapFaceIDList *pPartialFaceIDList);
+		template<intp nSize>
+		static bool FaceID_FaceIDListsToString(OUT_Z_ARRAY char (&pszList)[nSize], CMapFaceIDList *pFullFaceIDList, CMapFaceIDList *pPartialFaceIDList)
+		{
+			return FaceID_FaceIDListsToString( pszList, nSize, pFullFaceIDList, pPartialFaceIDList );
+		}
+		
+		static bool FaceID_FaceListsToString(OUT_Z_CAP(nSize) char *pszValue, intp nSize, CMapFaceList *pFullFaceList, CMapFaceList *pPartialFaceList);
+		template<intp nSize>
+		static bool FaceID_FaceListsToString(OUT_Z_ARRAY char (&pszValue)[nSize], CMapFaceList *pFullFaceList, CMapFaceList *pPartialFaceList)
+		{
+			return FaceID_FaceListsToString( pszValue, nSize, pFullFaceList, pPartialFaceList );
+		}
 
 		void GetUsedTextures(CUsedTextureList &List);
 		void Subtract(CMapObjectList &Results, CMapClass *pSubtractWith, CMapClass *pSubtractFrom);
@@ -151,7 +162,7 @@ class CMapWorld : public CMapClass, public CEditGameClass
 		// displacement management
 		inline IWorldEditDispMgr *GetWorldEditDispManager( void ) { return m_pWorldDispMgr; }
 
-		int GetGroupList(CUtlVector<CMapGroup *> &GroupList);
+		intp GetGroupList(CUtlVector<CMapGroup *> &GroupList);
 
 	protected:
 

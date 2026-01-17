@@ -302,7 +302,7 @@ int CSSolid::GetVertexIndex(const Vector &Point, float fLeniency)
 }
 
 
-int CSSolid::GetFaceIndex(const Vector &Point, float fLeniency)
+short CSSolid::GetFaceIndex(const Vector &Point, float fLeniency)
 {
 	return -1;
 }
@@ -683,8 +683,8 @@ void CSSolid::FromMapSolid(CMapSolid *p, bool bSkipDisplacementFaces)
 	m_nVertices = 0;
 
 	// Create vertices, edges, faces.
-	int nSolidFaces = pSolid->GetFaceCount();
-	for(int i = 0; i < nSolidFaces; i++)
+	short nSolidFaces = pSolid->GetFaceCount();
+	for(short i = 0; i < nSolidFaces; i++)
 	{
 		CMapFace *pSolidFace = pSolid->GetFace(i);
 

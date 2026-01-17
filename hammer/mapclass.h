@@ -199,8 +199,8 @@ public:
 	// Can belong to one or more visgroups:
 	//
 	virtual void AddVisGroup(CVisGroup *pVisGroup);
-	int GetVisGroupCount(void);
-	CVisGroup *GetVisGroup(int nIndex);
+	intp GetVisGroupCount(void);
+	CVisGroup *GetVisGroup(intp nIndex);
 	void RemoveAllVisGroups(void);
 	void RemoveVisGroup(CVisGroup *pVisGroup);
 	int  IsInVisGroup(CVisGroup *pVisGroup);
@@ -477,9 +477,9 @@ public:
 	// Has a set of editor-specific properties that are loaded from the VMF file.
 	// The keys are freed after being handled by the map post-load code.
 	//
-	int GetEditorKeyCount(void);
-	const char *GetEditorKey(int nIndex);
-	const char *GetEditorKeyValue(int nIndex);
+	intp GetEditorKeyCount(void);
+	const char *GetEditorKey(intp nIndex);
+	const char *GetEditorKeyValue(intp nIndex);
 	const char *GetEditorKeyValue(const char *szKey);
 	void RemoveEditorKeys(void);
 	void SetEditorKeyValue(const char *szKey, const char *szValue);

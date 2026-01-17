@@ -436,7 +436,7 @@ void CToolPickEntity::AddToList(CMapEntity *pEntity, EntityState_t eState)
 // Purpose: 
 // Input  : nIndex - 
 //-----------------------------------------------------------------------------
-void CToolPickEntity::RemoveFromList(int nIndex)
+void CToolPickEntity::RemoveFromList(intp nIndex)
 {
 	Assert(m_Entities.IsValidIndex(nIndex));
 

@@ -55,8 +55,8 @@ CMapClass *CMapAlignedBox::Create(CHelperInfo *pHelperInfo, CMapEntity *pParent)
 		Vector Maxs;
 		int nParam = 0;
 
-		int nCount = pHelperInfo->GetParameterCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = pHelperInfo->GetParameterCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			const char *pszParam = pHelperInfo->GetParameter(i);
 

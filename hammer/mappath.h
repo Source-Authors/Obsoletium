@@ -57,8 +57,8 @@ class CMapPath
 		DWORD AddNode(DWORD dwAfterID, const Vector &vecPos);
 		void DeleteNode(DWORD dwID);
 		void SetNodePosition(DWORD dwID, Vector& pt);
-		CMapPathNode * NodeForID(DWORD dwID, int* piIndex = NULL);
-		void GetNodeName(int iIndex, int iName, CString& str);
+		CMapPathNode * NodeForID(DWORD dwID, intp* piIndex = NULL);
+		void GetNodeName(intp iIndex, int iName, CString& str);
 
 		// set name/class
 		void SetName(LPCTSTR pszName) { V_strcpy_safe(m_szName, pszName); }

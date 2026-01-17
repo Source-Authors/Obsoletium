@@ -183,7 +183,7 @@ class CMapDoc : public CDocument
 			PFPPrev = -1
 		};
 
-		int m_iCurPFPoint;
+		intp m_iCurPFPoint;
 		CUtlVector<Vector> m_PFPoints;
 		CString m_strLastPointFile;
 		portalfile_t *m_pPortalFile;
@@ -279,7 +279,7 @@ class CMapDoc : public CDocument
 		//
 		// Face selection for face editing.
 		//
-		void SelectFace(CMapSolid *pSolid, int iFace, int cmd);
+		void SelectFace(CMapSolid *pSolid, short iFace, int cmd);
 		void UpdateForApplicator(BOOL bApplicator);
 
 		
@@ -361,8 +361,8 @@ class CMapDoc : public CDocument
 		inline int GetNextNodeID(void);
 		inline void SetNextNodeID(int nID);
 
-		static int GetDocumentCount();
-		static CMapDoc *GetDocument(int index);
+		static intp GetDocumentCount();
+		static CMapDoc *GetDocument(intp index);
 
 		void SetMRU(CMapView2D *pView);
 		void RemoveMRU(CMapView2D *pView);
@@ -425,10 +425,10 @@ class CMapDoc : public CDocument
 		bool VisGroups_ObjectCanBelongToVisGroup(CMapClass *pObject);
 		CVisGroup *VisGroups_AddGroup(LPCTSTR pszName, bool bAuto = false);
 		static BOOL VisGroups_CheckForGroupCallback(CMapClass *pObject, CVisGroup *pGroup);
-		int VisGroups_GetCount();
-		CVisGroup *VisGroups_GetVisGroup(int nIndex);
-		int VisGroups_GetRootCount();
-		CVisGroup *VisGroups_GetRootVisGroup(int nIndex);
+		intp VisGroups_GetCount();
+		CVisGroup *VisGroups_GetVisGroup(intp nIndex);
+		intp VisGroups_GetRootCount();
+		CVisGroup *VisGroups_GetRootVisGroup(intp nIndex);
 		CVisGroup *VisGroups_GroupForID(DWORD id);
 		CVisGroup *VisGroups_GroupForName( const char *pszName, bool bIsAuto );
 		void VisGroups_PurgeGroups();
@@ -497,7 +497,7 @@ class CMapDoc : public CDocument
 		bool			IsSelectionEditable( void );
 		bool			CreateNewManifest( void );
 		CMapWorld		*GetCurrentWorld( void );
-		int				GetClipboardCount( void );
+		intp			GetClipboardCount( void );
 		void			ManifestPaste( CMapWorld *pDestWorld, Vector vecOffset, QAngle vecRotate, CMapClass *pParent, bool bMakeEntityNamesUnique, const char *pszEntityNamePrefix );
 		virtual void	UpdateInstanceMap( CMapDoc *pInstanceMapDoc );
 		void			CollapseInstances( bool bOnlySelected );

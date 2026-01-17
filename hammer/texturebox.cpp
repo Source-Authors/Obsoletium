@@ -123,7 +123,7 @@ void CTextureBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		else
 		{
 			char szName[MAX_PATH];
-			int iLen = pTex->GetShortName(szName);
+			intp iLen = pTex->GetShortName(szName);
 
 			// when we get here, we are drawing a regular graphic. we
 			//  check the size of the rectangle - if it's > 32 (just

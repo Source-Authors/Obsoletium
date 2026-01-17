@@ -102,10 +102,10 @@ void CMapInfoDlg::CountSolid(CMapSolid *pSolid)
 {
 	m_uSolidCount++;
 
-	UINT uFaceCount = pSolid->GetFaceCount();
+	short uFaceCount = pSolid->GetFaceCount();
 	m_uFaceCount += uFaceCount;
 
-	for (UINT uFace = 0; uFace < uFaceCount; uFace++)
+	for (short uFace = 0; uFace < uFaceCount; uFace++)
 	{
 		CMapFace *pFace = pSolid->GetFace(uFace);
 		if (pFace != NULL)

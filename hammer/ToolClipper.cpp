@@ -579,8 +579,8 @@ void Clipper3D::RenderTool2D(CRender2D *pRender)
         //
         if( pClipBack )
         {
-            int faceCount = pClipBack->GetFaceCount();
-            for( int i = 0; i < faceCount; i++ )
+            short faceCount = pClipBack->GetFaceCount();
+            for( short i = 0; i < faceCount; i++ )
             {
                 CMapFace *pFace = pClipBack->GetFace( i );
 
@@ -601,8 +601,8 @@ void Clipper3D::RenderTool2D(CRender2D *pRender)
 
         if( pClipFront )
         {
-            int faceCount = pClipFront->GetFaceCount();
-            for( int i = 0; i < faceCount; i++ )
+            short faceCount = pClipFront->GetFaceCount();
+            for( short i = 0; i < faceCount; i++ )
             {
                 CMapFace *pFace = pClipFront->GetFace( i );
 

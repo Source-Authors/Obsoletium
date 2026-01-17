@@ -92,8 +92,8 @@ bool COP_Groups::SaveData(void)
 		return false;
 	}
 
-	int nCount = m_cGroups.GetVisGroupCount();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = m_cGroups.GetVisGroupCount();
+	for (intp i = 0; i < nCount; i++)
 	{
 		CVisGroup *pVisGroup = m_cGroups.GetVisGroup(i);
 
@@ -151,8 +151,8 @@ void COP_Groups::UpdateData( int Mode, void *pData, bool bCanEdit )
 			//
 			// Loading the first object. check each group this object is in.
 			//
-			int nCount = m_cGroups.GetVisGroupCount();
-			for (int i = 0; i < nCount; i++)
+			intp nCount = m_cGroups.GetVisGroupCount();
+			for (intp i = 0; i < nCount; i++)
 			{
 				CVisGroup *pVisGroup = m_cGroups.GetVisGroup(i);
 				s_checkState[i] = pObject->IsInVisGroup(pVisGroup);
@@ -163,8 +163,8 @@ void COP_Groups::UpdateData( int Mode, void *pData, bool bCanEdit )
 			//
 			// Loading subsequent objects. 
 			//
-			int nCount = m_cGroups.GetVisGroupCount();
-			for (int i = 0; i < nCount; i++)
+			intp nCount = m_cGroups.GetVisGroupCount();
+			for (intp i = 0; i < nCount; i++)
 			{
 				if ( s_checkState[i] != -1)
 				{
@@ -180,8 +180,8 @@ void COP_Groups::UpdateData( int Mode, void *pData, bool bCanEdit )
 	}
 	else if ( Mode == LoadFinished )
 	{
-		int nCount = m_cGroups.GetVisGroupCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = m_cGroups.GetVisGroupCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			CVisGroup *pVisGroup = m_cGroups.GetVisGroup(i);
 			m_cGroups.SetCheck(pVisGroup, s_checkState[i]);
@@ -209,8 +209,8 @@ void COP_Groups::UpdateGroupList(void)
 	CMapDoc *pDoc = CMapDoc::GetActiveMapDoc();
 	if (pDoc != NULL)
 	{
-		int nCount = pDoc->VisGroups_GetCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = pDoc->VisGroups_GetCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			CVisGroup *pGroup = pDoc->VisGroups_GetVisGroup(i);
 			if (!pGroup->GetParent())

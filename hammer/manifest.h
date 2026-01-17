@@ -98,8 +98,8 @@ public:
 	}
 
 	void			SetManifestPrefsModifiedFlag( bool bModified = true );
-	int				GetNumMaps( void ) { return m_Maps.Count(); }
-	CManifestMap	*GetMap( int index ) { return m_Maps[ index ]; }
+	intp			GetNumMaps( void ) { return m_Maps.Count(); }
+	CManifestMap	*GetMap( intp index ) { return m_Maps[ index ]; }
 	CManifestMap	*FindMap( CMapDoc *pMap );
 	CManifestMap	*FindMapByID( int InternalID );
 	void			SetPrimaryMap( CManifestMap	*pManifestMap );

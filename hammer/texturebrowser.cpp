@@ -361,7 +361,7 @@ BOOL CTextureBrowser::OnInitDialog()
 	m_szNameFilter[0] = '\0';
 
 	// Add the global list of keywords to the keywords combo.
-	for( int i=0; i< g_Textures.GetNumKeywords(); i++ )
+	for( intp i=0; i< g_Textures.GetNumKeywords(); i++ )
 	{
 		m_cKeywords.AddString( g_Textures.GetKeyword(i) );
 	}

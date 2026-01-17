@@ -73,8 +73,8 @@ void CMapOverlayTransition::CalcBounds( BOOL bFullUpdate )
 		m_Render2DBox.ResetBounds();
 		m_CullBox.ResetBounds();
 
-		int nSegmentCount = pShoreline->m_aSegments.Count();
-		for ( int iSegment = 0; iSegment < nSegmentCount; ++iSegment )
+		intp nSegmentCount = pShoreline->m_aSegments.Count();
+		for ( intp iSegment = 0; iSegment < nSegmentCount; ++iSegment )
 		{
 			for ( int iAxis = 0; iAxis < 3; ++iAxis )
 			{
@@ -375,8 +375,8 @@ ChunkFileResult_t CMapOverlayTransition::SaveVMF( CChunkFile *pFile, CSaveInfo *
 	Shoreline_t *pShoreline = GetShoreManager()->GetShoreline( m_nShorelineId );
 	if ( pShoreline )
 	{
-		int nOverlayCount = pShoreline->m_aOverlays.Count();
-		for ( int iOverlay = 0; iOverlay < nOverlayCount; ++iOverlay )
+		intp nOverlayCount = pShoreline->m_aOverlays.Count();
+		for ( intp iOverlay = 0; iOverlay < nOverlayCount; ++iOverlay )
 		{
 			CMapOverlay *pOverlay = &pShoreline->m_aOverlays[iOverlay];
 			if ( pOverlay )

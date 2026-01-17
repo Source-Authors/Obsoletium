@@ -152,7 +152,7 @@ void CScenePreviewDlg::OnIdle()
 		const char *pSoundName = pChoreoEvent->GetParameters();
 		
 		SoundType_t soundType;
-		int nIndex;
+		intp nIndex;
 		if ( g_Sounds.FindSoundByName( pSoundName, &soundType, &nIndex ) )
 		{
 			bool bRet = g_Sounds.Play( soundType, nIndex );

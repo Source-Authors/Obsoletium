@@ -29,33 +29,33 @@ enum SoundType_t
 class CSoundSystem
 {
 public:
-	CSoundSystem(void);
-	virtual ~CSoundSystem(void);
+	CSoundSystem();
+	virtual ~CSoundSystem();
 
-	bool Initialize( );
-	void ShutDown(void);
+	bool Initialize();
+	void ShutDown();
 
 	// Build the list of sounds
 	bool BuildSoundList( SoundType_t type );
 
 	// Sound list iteration
-	int SoundCount( SoundType_t type );
-	const char *SoundName( SoundType_t type, int nIndex );
-	const char *SoundFile( SoundType_t type, int nIndex );
-	const char *SoundSourceFile( SoundType_t type, int nIndex );
+	intp SoundCount( SoundType_t type );
+	const char *SoundName( SoundType_t type, intp nIndex );
+	const char *SoundFile( SoundType_t type, intp nIndex );
+	const char *SoundSourceFile( SoundType_t type, intp nIndex );
 
 	// Search through all the sounds for the specified one.
-	bool FindSoundByName( const char *pFilename, SoundType_t *type, int *nIndex );
+	bool FindSoundByName( const char *pFilename, SoundType_t *type, intp *nIndex );
 
 	// Plays a sound
-	bool Play( SoundType_t type, int nIndex );
+	bool Play( SoundType_t type, intp nIndex );
 	bool PlayScene( const char *pFileName );	// Play the first sound in the specified scene.
 	
 	// Stops any playing sound.
 	void StopSound();
 
 	// Opens the source file associated with a sound
-	void OpenSource( SoundType_t type, int nIndex );
+	void OpenSource( SoundType_t type, intp nIndex );
 
 private:
 	struct SoundInfo_t
@@ -73,7 +73,7 @@ private:
 		};
 
 		char m_pBuf[STRING_CACHE_SIZE];
-		int m_nTailIndex;	// Next address to fill
+		intp m_nTailIndex;	// Next address to fill
 		StringCache_t *m_pNext;
 	};
 
@@ -127,22 +127,22 @@ private:
 //-----------------------------------------------------------------------------
 // Sound list iteration
 //-----------------------------------------------------------------------------
-inline int CSoundSystem::SoundCount( SoundType_t type )
+inline intp CSoundSystem::SoundCount( SoundType_t type )
 {
 	return m_SoundList[type].m_Sounds.Count();
 }
 
-inline const char *CSoundSystem::SoundName( SoundType_t type, int nIndex )
+inline const char *CSoundSystem::SoundName( SoundType_t type, intp nIndex )
 {
 	return m_SoundList[type].m_Sounds[nIndex].m_pSoundName;
 }
 
-inline const char *CSoundSystem::SoundFile( SoundType_t type, int nIndex )
+inline const char *CSoundSystem::SoundFile( SoundType_t type, intp nIndex )
 {
 	return m_SoundList[type].m_Sounds[nIndex].m_pSoundFile;
 }
 
-inline const char *CSoundSystem::SoundSourceFile( SoundType_t type, int nIndex )
+inline const char *CSoundSystem::SoundSourceFile( SoundType_t type, intp nIndex )
 {
 	return m_SoundList[type].m_Sounds[nIndex].m_pSourceFile;
 }

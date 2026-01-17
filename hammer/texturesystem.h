@@ -170,8 +170,8 @@ public:
 	//
 	// Exposes a list of all unique keywords found in the master texture list.
 	//
-	int GetNumKeywords();
-	const char *GetKeyword(int index);
+	intp GetNumKeywords();
+	const char *GetKeyword(intp index);
 
 	//
 	// Holds a list of placeholder textures used when a map refers to missing textures.

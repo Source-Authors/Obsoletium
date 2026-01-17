@@ -40,11 +40,7 @@ protected:
 	UINT GetSmoothingGroup( UINT uCmd );
 	int GetActiveSmoothingGroup( void );
 
-	void CheckGroupButtons( int *pGroupCounts, int nFaceCount );
-
-	float GetEditBoxSmoothingAngle( void );
-	void SetEditBoxSmoothingAngle( float flAngle );
-	void UpdateSmoothingAngle( int *pGroupCounts, int nFaceCount );
+	void CheckGroupButtons( int *pGroupCounts, intp nFaceCount );
 
 	//{{AFX_MSG( CFaceSmoothingDlg )
 	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);

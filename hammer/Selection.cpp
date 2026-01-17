@@ -93,7 +93,7 @@ void CSelection::GetBoundsForTranslation( Vector &vecMins, Vector &vecMaxs )
 	vecMins.Init( COORD_NOTINIT, COORD_NOTINIT, 0 );
 	vecMaxs.Init( -COORD_NOTINIT, -COORD_NOTINIT, 0 );
 
-	for (int i = 0; i < m_SelectionList.Count(); i++)
+	for (intp i = 0; i < m_SelectionList.Count(); i++)
 	{
 		CMapClass *pobj = m_SelectionList[i];
 
@@ -123,7 +123,7 @@ void CSelection::UpdateSelectionBounds( void )
 	m_vecLogicalMins[0] = m_vecLogicalMins[1] = COORD_NOTINIT;
 	m_vecLogicalMaxs[0] = m_vecLogicalMaxs[1] = -COORD_NOTINIT;
 	
-	for (int i = 0; i < m_SelectionList.Count(); i++)
+	for (intp i = 0; i < m_SelectionList.Count(); i++)
 	{
 		CMapClass *pobj = m_SelectionList[i];
 
@@ -189,7 +189,7 @@ const CMapObjectList* CSelection::GetHitList()
 	return &m_HitList;
 }
 
-int CSelection::GetCount()
+intp CSelection::GetCount()
 {
 	return m_SelectionList.Count();
 }
@@ -207,7 +207,7 @@ SelectMode_t CSelection::GetMode()
 
 void CSelection::SetSelectionState(SelectionState_t eSelectionState)
 {
-	for ( int i=0; i<m_SelectionList.Count(); i++ )
+	for ( intp i=0; i<m_SelectionList.Count(); i++ )
 	{
 		CMapEntity *pObject = (CMapEntity *)m_SelectionList.Element(i);
 		pObject->SetSelectionState( eSelectionState );
@@ -221,8 +221,8 @@ bool CSelection::IsAnEntitySelected(void)
 {
 	if (m_SelectionList.Count() > 0)
 	{
-		int nSelCount = m_SelectionList.Count();
-		for (int i = 0; i < nSelCount; i++)
+		intp nSelCount = m_SelectionList.Count();
+		for (intp i = 0; i < nSelCount; i++)
 		{
 			CMapClass *pObject = m_SelectionList.Element(i);
 			CMapEntity *pEntity = dynamic_cast <CMapEntity *> (pObject);
@@ -245,8 +245,8 @@ bool CSelection::IsEditable()
 {
 	if ( m_SelectionList.Count() > 0 )
 	{
-		int nSelCount = m_SelectionList.Count();
-		for (int i = 0; i < nSelCount; i++)
+		intp nSelCount = m_SelectionList.Count();
+		for (intp i = 0; i < nSelCount; i++)
 		{
 			CMapClass *pObject = m_SelectionList.Element(i);
 
@@ -269,8 +269,8 @@ bool CSelection::IsCopyable()
 {
 	if ( m_SelectionList.Count() > 0 )
 	{
-		int nSelCount = m_SelectionList.Count();
-		for (int i = 0; i < nSelCount; i++)
+		intp nSelCount = m_SelectionList.Count();
+		for (intp i = 0; i < nSelCount; i++)
 		{
 			CMapClass *pObject = m_SelectionList.Element(i);
 
@@ -309,8 +309,8 @@ void CSelection::SetMode(SelectMode_t eNewSelectMode)
 		// Put all the children of the selected objects in a list, along with their children.
 		//
 		CMapObjectList NewList;
-		int nSelCount = m_SelectionList.Count();
-		for (int i = 0; i < nSelCount; i++)
+		intp nSelCount = m_SelectionList.Count();
+		for (intp i = 0; i < nSelCount; i++)
 		{
 			CMapClass *pObject = m_SelectionList[i];
 			AddAllLeavesToListCallback(pObject, &NewList);
@@ -358,7 +358,7 @@ void CSelection::ClearHitList(void)
 
 bool CSelection::RemoveAll(void)
 {
-	for ( int i=0;i<m_SelectionList.Count(); i++ )
+	for ( intp i=0;i<m_SelectionList.Count(); i++ )
 	{
 		CMapClass *pObject = m_SelectionList.Element(i);
 		pObject->SetSelectionState(SELECT_NONE);
@@ -374,7 +374,7 @@ bool CSelection::RemoveDead(void)
 {
 	bool bFoundOne = false;
 	
-	for ( int i=m_SelectionList.Count()-1; i>=0; i-- )
+	for ( intp i=m_SelectionList.Count()-1; i>=0; i-- )
 	{
 		CMapClass *pObject = m_SelectionList.Element(i);
 		if (!pObject->GetParent())
@@ -398,7 +398,7 @@ bool CSelection::RemoveInvisibles(void)
 {
 	bool bFoundOne = false;
 
-	for ( int i=m_SelectionList.Count()-1; i>=0; i-- )
+	for ( intp i=m_SelectionList.Count()-1; i>=0; i-- )
 	{
 		CMapClass *pObject = m_SelectionList.Element(i);
 		if ( !pObject->IsVisible() )

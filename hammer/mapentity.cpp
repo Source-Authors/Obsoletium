@@ -140,8 +140,8 @@ static void ReplaceNodeIDRecursive(CMapClass *pRoot, int nOldNodeID, int nNewNod
 		if (!pClass)
 			return;
 		
-		int nVarCount = pClass->GetVariableCount();
-		for (int i = 0; i < nVarCount; i++)
+		intp nVarCount = pClass->GetVariableCount();
+		for (intp i = 0; i < nVarCount; i++)
 		{
 			GDinputvariable *pVar = pClass->GetVariableAt(i);
 			if (pVar->GetType() == ivNodeDest)
@@ -272,7 +272,7 @@ void CMapEntity::AddChild(CMapClass *pChild)
 	//
 	if (dynamic_cast<CMapSolid*>(pChild) == NULL)
 	{
-		for ( int i=GetFirstKeyValue(); i != GetInvalidKeyValue(); i=GetNextKeyValue( i ) )
+		for ( auto i=GetFirstKeyValue(); i != GetInvalidKeyValue(); i=GetNextKeyValue( i ) )
 		{
 			MDkeyvalue KeyValue = m_KeyValues.GetKeyValue(i); 
 			pChild->OnParentKeyChanged( KeyValue.szKey, KeyValue.szValue );
@@ -383,8 +383,8 @@ void CMapEntity::AddHelpersForClass(GDclass *pClass, bool bLoading)
 		//
 		// For every helper in the class definition...
 		//
-		int nHelperCount = pClassLocal->GetHelperCount();
-		for (int i = 0; i < nHelperCount; i++)
+		intp nHelperCount = pClassLocal->GetHelperCount();
+		for (intp i = 0; i < nHelperCount; i++)
 		{
 			CHelperInfo *pHelperInfo = pClassLocal->GetHelper(i);
 
@@ -407,8 +407,8 @@ void CMapEntity::AddHelpersForClass(GDclass *pClass, bool bLoading)
 		//
 		// FIXME: make this totally data driven like the helper factory, or better
 		//		  yet, like the LINK_ENTITY_TO_CLASS stuff in the game DLL
-		int nVarCount = pClassLocal->GetVariableCount();
-		for (int i = 0; i < nVarCount; i++)
+		intp nVarCount = pClassLocal->GetVariableCount();
+		for (intp i = 0; i < nVarCount; i++)
 		{
 			GDinputvariable *pVar = pClassLocal->GetVariableAt(i);
 			GDIV_TYPE eType = pVar->GetType();
@@ -586,7 +586,7 @@ void CMapEntity::CalcBounds(BOOL bFullUpdate)
 //-----------------------------------------------------------------------------
 void CMapEntity::Debug(void)
 {
-	int i = m_KeyValues.GetFirst();
+	auto i = m_KeyValues.GetFirst();
 	[[maybe_unused]] MDkeyvalue &KeyValue = m_KeyValues.GetKeyValue(i);
 }
 
@@ -826,7 +826,7 @@ void CMapEntity::SetOrigin(const Vector& o)
 //-----------------------------------------------------------------------------
 void CMapEntity::RemoveHelpers(bool bRemoveSolids)
 {
-	for( int pos=m_Children.Count()-1; pos>=0; pos-- )
+	for( intp pos=m_Children.Count()-1; pos>=0; pos-- )
 	{
 		CMapClass *pChild = m_Children[pos];
 		if (bRemoveSolids || ((dynamic_cast <CMapSolid *> (pChild)) == NULL))
@@ -876,7 +876,7 @@ void CMapEntity::ReplaceTargetname(const char *szOldName, const char *szNewName)
 	//
 	// Replace any keys whose value matches the old name.
 	//
-	for ( int i=GetFirstKeyValue(); i != GetInvalidKeyValue(); i=GetNextKeyValue( i ) )
+	for ( auto i=GetFirstKeyValue(); i != GetInvalidKeyValue(); i=GetNextKeyValue( i ) )
 	{
 		MDkeyvalue KeyValue = m_KeyValues.GetKeyValue(i);
 		if (!CompareEntityNames(KeyValue.szValue, szOldName))

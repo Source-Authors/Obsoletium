@@ -164,9 +164,9 @@ void CFilterControl::UpdateGroupList(void)
 	m_cGroupBox.SetRedraw(false);
 	m_cGroupBox.DeleteAllItems();
 
-	int nCount = pDoc->VisGroups_GetRootCount();
+	intp nCount = pDoc->VisGroups_GetRootCount();
 
-	for (int i = 0; i < nCount; i++)
+	for (intp i = 0; i < nCount; i++)
 	{
 		CVisGroup *pGroup = pDoc->VisGroups_GetRootVisGroup(i);
 		int compareValue = strcmp( pGroup->GetName(), "Auto" );
@@ -588,8 +588,8 @@ BOOL CFilterControl::OnInitDialog(void)
 //-----------------------------------------------------------------------------
 void CFilterControl::UpdateGroupListChecks(void)
 {
-	int nCount = m_cGroupBox.GetVisGroupCount();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = m_cGroupBox.GetVisGroupCount();
+	for (intp i = 0; i < nCount; i++)
 	{
 		CVisGroup *pVisGroup = m_cGroupBox.GetVisGroup(i);
 		if (pVisGroup->GetVisible() == VISGROUP_HIDDEN)

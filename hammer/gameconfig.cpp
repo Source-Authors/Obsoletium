@@ -213,7 +213,7 @@ bool CGameConfig::Load(KeyValues *pkv)
 	//
 	nGDFiles = 0;
 	bool bAdded = true;
-	do
+	do //-V1044
 	{
 		V_sprintf_safe(szKey, "GameData%d", nGDFiles);
 		const char *pszGameData = pkvHammer->GetString(szKey);
@@ -461,7 +461,7 @@ void CGameConfig::LoadGDFiles(void)
 	// All the class pointers have changed - now we have to
 	// reset all the class pointers in each map doc that 
 	// uses this game.
-	for ( int i=0; i<CMapDoc::GetDocumentCount(); i++ )
+	for ( intp i=0; i<CMapDoc::GetDocumentCount(); i++ )
 	{
 		CMapDoc *pDoc = CMapDoc::GetDocument(i);
 

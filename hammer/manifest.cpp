@@ -424,7 +424,7 @@ bool CManifest::LoadVMFManifest( const char *pszFileName )
 
 	bool bSetIDs = false;
 
-	for( int i = 0; i < GetNumMaps(); i++ )
+	for( intp i = 0; i < GetNumMaps(); i++ )
 	{
 		CManifestMap	*pManifestMap = GetMap( i );
 
@@ -445,7 +445,7 @@ bool CManifest::LoadVMFManifest( const char *pszFileName )
 
 	LoadVMFManifestUserPrefs( pszFileName );
 
-	for( int i = 0; i < GetNumMaps(); i++ )
+	for( intp i = 0; i < GetNumMaps(); i++ )
 	{
 		CManifestMap	*pManifestMap = GetMap( i );
 
@@ -638,7 +638,7 @@ bool CManifest::SaveVMFManifest( const char *pszFileName )
 		// dimhotepus: Check result.
 		if (eResult == ChunkFile_Ok)
 		{
-			for( int i = 0; i < GetNumMaps(); i++ )
+			for( intp i = 0; i < GetNumMaps(); i++ )
 			{
 				// dimhotepus: Check result.
 				if (eResult == ChunkFile_Ok)
@@ -711,7 +711,7 @@ bool CManifest::SaveVMFManifestMaps( const char *pszFileName )
 {
 	bool	bSaved = true;
 
-	for( int i = 0; i < GetNumMaps(); i++ )
+	for( intp i = 0; i < GetNumMaps(); i++ )
 	{
 		CManifestMap	*pManifestMap = GetMap( i );
 
@@ -775,7 +775,7 @@ bool CManifest::SaveVMFManifestUserPrefs( const char *pszFileName )
 		eResult = File.BeginChunk( "Maps" );
 		if (eResult == ChunkFile_Ok)
 		{
-			for( int i = 0; i < GetNumMaps(); i++ )
+			for( intp i = 0; i < GetNumMaps(); i++ )
 			{
 				// dimhotepus: Check result.
 				if (eResult == ChunkFile_Ok)
@@ -883,7 +883,7 @@ void CManifest::Update( void )
 {
 	__super::Update();
 
-	for( int i = 0; i < GetNumMaps(); i++ )
+	for( intp i = 0; i < GetNumMaps(); i++ )
 	{
 		CManifestMap	*pManifestMap = GetMap( i );
 
@@ -915,7 +915,7 @@ void CManifest::SetModifiedFlag( BOOL bModified )
 	
 	if ( bModified == false )
 	{
-		for( int i = 0; i < GetNumMaps(); i++ )
+		for( intp i = 0; i < GetNumMaps(); i++ )
 		{
 			CManifestMap	*pManifestMap = GetMap( i );
 
@@ -955,7 +955,7 @@ void CManifest::GetFullMapPath( const char *pManifestMapFileName, OUT_Z_CAP(outS
 //-----------------------------------------------------------------------------
 CManifestMap *CManifest::FindMap( CMapDoc *pMap )
 {
-	for( int i = 0; i < GetNumMaps(); i++ )
+	for( intp i = 0; i < GetNumMaps(); i++ )
 	{
 		CManifestMap	*pManifestMap = GetMap( i );
 
@@ -976,7 +976,7 @@ CManifestMap *CManifest::FindMap( CMapDoc *pMap )
 //-----------------------------------------------------------------------------
 CManifestMap *CManifest::FindMapByID( int InternalID )
 {
-	for( int i = 0; i < GetNumMaps(); i++ )
+	for( intp i = 0; i < GetNumMaps(); i++ )
 	{
 		CManifestMap	*pManifestMap = GetMap( i );
 
@@ -1469,7 +1469,7 @@ void CManifest::CheckFileStatus( void )
 	// 	}
 	// }
 	// 
-	// for( int i = 0; i < GetNumMaps(); i++ )
+	// for( intp i = 0; i < GetNumMaps(); i++ )
 	// {
 	// 	CManifestMap	*pManifestMap = GetMap( i );
 	// 

@@ -551,7 +551,7 @@ void CManifestListBox::OnVersionControlCheckIn()
 	CManifest		*pManifest = activeDoc->GetManifest();
 
 	pManifest->m_bDefaultCheckin = false;
-	for( int i = 0; i < pManifest->GetNumMaps(); i++ )
+	for( intp i = 0; i < pManifest->GetNumMaps(); i++ )
 	{
 		CManifestMap	*pManifestMap = pManifest->GetMap( i );
 		pManifestMap->m_bDefaultCheckin = false;
@@ -771,7 +771,7 @@ void CManifestFilter::UpdateManifestList( void )
 	{
 		CManifest *pManifest = activeDoc->GetManifest();
 
-		for( int i = 0; i < pManifest->GetNumMaps(); i++ )
+		for( intp i = 0; i < pManifest->GetNumMaps(); i++ )
 		{
 			CManifestMap	*pManifestMap = pManifest->GetMap( i );
 			
@@ -1075,7 +1075,7 @@ BOOL CManifestCheckin::OnInitDialog()
 			// }
 		}
 
-		for( int i = 0; i < pManifest->GetNumMaps(); i++ )
+		for( intp i = 0; i < pManifest->GetNumMaps(); i++ )
 		{
 			CManifestMap	*pManifestMap = pManifest->GetMap( i );
 

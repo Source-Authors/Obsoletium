@@ -199,7 +199,7 @@ intp CTextureSystem::AddTexture(IEditorTexture *pTexture)
 //-----------------------------------------------------------------------------
 // Purpose: Begins iterating the list of texture/material keywords.
 //-----------------------------------------------------------------------------
-int CTextureSystem::GetNumKeywords(void)
+intp CTextureSystem::GetNumKeywords(void)
 {
 	return(m_Keywords.Count());
 }
@@ -208,7 +208,7 @@ int CTextureSystem::GetNumKeywords(void)
 //-----------------------------------------------------------------------------
 // Purpose: Continues iterating the list of texture/material keywords.
 //-----------------------------------------------------------------------------
-const char *CTextureSystem::GetKeyword(int pos)
+const char *CTextureSystem::GetKeyword(intp pos)
 {
 	return(m_Keywords.Element(pos));
 }
@@ -1328,7 +1328,7 @@ IEditorTexture *CTextureGroup::GetTexture( char const* pName )
 //-----------------------------------------------------------------------------
 IEditorTexture* CTextureGroup::FindTextureByName( const char *pName, int *piIndex, TEXTUREFORMAT eDesiredFormat )
 {
-	int iMapEntry = m_TextureNameMap.Find( pName );
+	auto iMapEntry = m_TextureNameMap.Find( pName );
 	if ( iMapEntry == m_TextureNameMap.InvalidIndex() )
 	{
 		return NULL;

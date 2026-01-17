@@ -105,7 +105,7 @@ protected:
 	void SelectEntity(CMapEntity *pEntity);
 
 	void AddToList(CMapEntity *pEntity, EntityState_t eState);
-	void RemoveFromList(int nIndex);
+	void RemoveFromList(intp nIndex);
 
 	void SetEyedropperCursor(void);
 

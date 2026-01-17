@@ -77,7 +77,7 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 static int FindSolidType( const char *pName )
 {
-	for ( int i=0; i < ARRAYSIZE( SolidTypes ); i++ )
+	for ( int i=0; i < ssize( SolidTypes ); i++ )
 	{
 		if ( Q_stricmp( pName, SolidTypes[i].pszName ) == 0 )
 			return i;
@@ -89,7 +89,7 @@ static int FindSolidType( const char *pName )
 //-----------------------------------------------------------------------------
 // Purpose: Get the index of the specified GDClass.
 //-----------------------------------------------------------------------------
-static int FindGameDataClass( const char *pName )
+static intp FindGameDataClass( const char *pName )
 {
 	extern GameData *pGD;
 	if( pGD != NULL )

@@ -86,9 +86,9 @@ CMapPathNode &CMapPathNode::operator=(const CMapPathNode &src)
 //			piIndex - 
 // Output : CMapPathNode *
 //-----------------------------------------------------------------------------
-CMapPathNode *CMapPath::NodeForID(DWORD dwID, int* piIndex)
+CMapPathNode *CMapPath::NodeForID(DWORD dwID, intp* piIndex)
 {
-	for(int iNode = 0; iNode < m_Nodes.Count(); iNode++)
+	for(intp iNode = 0; iNode < m_Nodes.Count(); iNode++)
 	{
 		if(m_Nodes[iNode].dwID == dwID)
 		{
@@ -134,7 +134,7 @@ DWORD CMapPath::GetNewNodeID(void)
 //-----------------------------------------------------------------------------
 DWORD CMapPath::AddNode(DWORD dwAfterID, const Vector &vecPos)
 {
-	int iPos;
+	intp iPos;
 
 	if(dwAfterID == ADD_START)
 		iPos = 0;
@@ -169,7 +169,7 @@ DWORD CMapPath::AddNode(DWORD dwAfterID, const Vector &vecPos)
 //-----------------------------------------------------------------------------
 void CMapPath::SetNodePosition(DWORD dwID, Vector& pt)
 {
-	int iIndex;
+	intp iIndex;
 	NodeForID(dwID, &iIndex);
 
 	m_Nodes[iIndex].pos = pt;
@@ -182,7 +182,7 @@ void CMapPath::SetNodePosition(DWORD dwID, Vector& pt)
 //-----------------------------------------------------------------------------
 void CMapPath::DeleteNode(DWORD dwID)
 {
-	int iIndex;
+	intp iIndex;
 	if ( NodeForID(dwID, &iIndex) )
 	{
 		m_Nodes.Remove(iIndex);
@@ -284,7 +284,7 @@ void CMapPath::SerializeRMF(std::fstream& file, BOOL fIsStoring)
 //			iName - 
 //			str - 
 //-----------------------------------------------------------------------------
-void CMapPath::GetNodeName(int iIndex, int iName, CString& str)
+void CMapPath::GetNodeName(intp iIndex, int iName, CString& str)
 {
 	if(m_Nodes[iIndex].szName[0])
 		str = m_Nodes[iIndex].szName;
@@ -313,7 +313,7 @@ void CMapPath::SerializeMAP(std::fstream& file, BOOL fIsStoring, BoundBox *pInte
 	//  fit within that box. if not, don't save ANY of the path.
 	if(pIntersecting)
 	{
-		for(int i = 0; i < m_Nodes.Count(); i++)
+		for(intp i = 0; i < m_Nodes.Count(); i++)
 		{
 			if (!pIntersecting->ContainsPoint(m_Nodes[i].pos))
 			{
@@ -329,18 +329,18 @@ void CMapPath::SerializeMAP(std::fstream& file, BOOL fIsStoring, BoundBox *pInte
 	MDkeyvalue kvTemp;
 
 	// initialize nodes for saving
-	for(int i = 0; i < m_Nodes.Count(); i++)
+	for(intp i = 0; i < m_Nodes.Count(); i++)
 	{
 		m_Nodes[i].nTargets = 0;
 	}
 
 	int iDirec = 1;
-	int iCurNode = 0;
-	int iMax = m_Nodes.Count()-1;
+	intp iCurNode = 0;
+	intp iMax = m_Nodes.Count()-1;
 	int iName = 0;
 
 	// resolve targets 
-	int iLastNodeIndex = -1;
+	intp iLastNodeIndex = -1;
 	BOOL bFirstPass = TRUE;
 
 ResolveNamesAgain:
@@ -479,7 +479,7 @@ void CMapPath::EditInfo()
 //-----------------------------------------------------------------------------
 CMapEntity *CMapPath::CreateEntityForNode(DWORD dwNodeID)
 {
-	int iIndex;
+	intp iIndex;
 	CMapPathNode *pNode = NodeForID(dwNodeID, &iIndex);
 	if (pNode == NULL)
 	{
@@ -495,13 +495,13 @@ CMapEntity *CMapPath::CreateEntityForNode(DWORD dwNodeID)
 	
 	// store target/targetname properties:
 	CString str;
-	str.Format("%s%02d", m_szName, iIndex);
+	str.Format("%s%02zd", m_szName, iIndex);
 	pEntity->SetKeyValue("targetname", str);
 
-	int iNext = iIndex + 1;
+	intp iNext = iIndex + 1;
 	if(iNext != -1)
 	{
-		str.Format("%s%02d", m_szName, iNext);
+		str.Format("%s%02zd", m_szName, iNext);
 		pEntity->SetKeyValue("target", str);
 	}
 

@@ -90,7 +90,7 @@ private:
 	int GetPrevSelIndex(DWORD dwGameID, int *piNewIndex = NULL);
 	BOOL EnableFaceControl(CWnd *pWnd, BOOL bModifyWnd);
 	
-	int iEntitySel;
+	intp iEntitySel;
 	int iBlockSel;
 	
 	// previous selections:

@@ -761,9 +761,9 @@ static BOOL _CheckMixedFaces(CMapSolid *pSolid, CListBox *pList)
 		return TRUE;
 
 	// run thru faces..
-	int iFaces = pSolid->GetFaceCount();
+	short iFaces = pSolid->GetFaceCount();
 	int iSolid = 2;	// start off ambivalent
-	int i;
+	short i;
 	for(i = 0; i < iFaces; i++)
 	{
 		CMapFace *pFace = pSolid->GetFace(i);
@@ -856,13 +856,13 @@ static void CheckDuplicateNodeIDs(CListBox *pList, CMapWorld *pWorld)
 //-----------------------------------------------------------------------------
 BOOL DoesContainDuplicates(CMapSolid *pSolid)
 {
-	int iFaces = pSolid->GetFaceCount();
-	for (int i = 0; i < iFaces; i++)
+	short iFaces = pSolid->GetFaceCount();
+	for (short i = 0; i < iFaces; i++)
 	{
 		CMapFace *pFace = pSolid->GetFace(i);
 		Vector& pts1 = pFace->plane.normal;
 
-		for (int j = 0; j < iFaces; j++)
+		for (short j = 0; j < iFaces; j++)
 		{
 			// Don't check self.
 			if (j == i)
@@ -928,8 +928,8 @@ static BOOL _CheckDuplicateFaceIDs(CMapSolid *pSolid, FindDuplicateFaceIDs_t *pD
 	if ( !IsCheckVisible( pSolid ) )
 		return TRUE;
 
-	int nFaceCount = pSolid->GetFaceCount();
-	for (int i = 0; i < nFaceCount; i++)
+	short nFaceCount = pSolid->GetFaceCount();
+	for (short i = 0; i < nFaceCount; i++)
 	{
 		CMapFace *pFace = pSolid->GetFace(i);
 		if (pData->All.FindFaceID(pFace->GetFaceID()) != -1)
@@ -1056,8 +1056,8 @@ static BOOL _CheckSolidIntegrity(CMapSolid *pSolid, CListBox *pList)
 		return TRUE;
 
 	CCheckFaceInfo cfi;
-	int nFaces = pSolid->GetFaceCount();
-	for (int i = 0; i < nFaces; i++)
+	short nFaces = pSolid->GetFaceCount();
+	for (short i = 0; i < nFaces; i++)
 	{
 		CMapFace *pFace = pSolid->GetFace(i);
 
@@ -1098,11 +1098,11 @@ static BOOL _CheckSolidContents(CMapSolid *pSolid, CListBox *pList)
 		return TRUE;
 
 	CCheckFaceInfo cfi;
-	int nFaces = pSolid->GetFaceCount();
+	short nFaces = pSolid->GetFaceCount();
 	CMapFace *pFace = pSolid->GetFace(0);
 	DWORD dwContents = pFace->texture.q2contents;
 
-	for (int i = 1; i < nFaces; i++)
+	for (short i = 1; i < nFaces; i++)
 	{
 		pFace = pSolid->GetFace(i);
 		if (pFace->texture.q2contents == dwContents)
@@ -1138,8 +1138,8 @@ static BOOL _CheckInvalidTextures(CMapSolid *pSolid, CListBox *pList)
 	if ( !IsCheckVisible( pSolid ) )
 		return TRUE;
 
-	int nFaces = pSolid->GetFaceCount();
-	for(int i = 0; i < nFaces; i++)
+	short nFaces = pSolid->GetFaceCount();
+	for(short i = 0; i < nFaces; i++)
 	{
 		const CMapFace *pFace = pSolid->GetFace(i);
 
@@ -1185,7 +1185,7 @@ static BOOL _CheckUnusedKeyvalues(CMapEntity *pEntity, CListBox *pList)
 
 	GDclass *pClass = pEntity->GetClass();
 
-	for (int i = pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
+	for (auto i = pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
 	{
 		if (pClass->VarForName(pEntity->GetKey(i)) == NULL)
 		{
@@ -1405,12 +1405,12 @@ static void FixDuplicatePlanes(MapError *pError)
 	CMapSolid *pSolid = (CMapSolid*) pError->pObjects[0];
 
 ReStart:
-	int iFaces = pSolid->GetFaceCount();
-	for(int i = 0; i < iFaces; i++)
+	short iFaces = pSolid->GetFaceCount();
+	for(short i = 0; i < iFaces; i++)
 	{
 		CMapFace *pFace = pSolid->GetFace(i);
 		Vector& pts1 = pFace->plane.normal;
-		for (int j = 0; j < iFaces; j++)
+		for (short j = 0; j < iFaces; j++)
 		{
 			// Don't check self
 			if (j == i)
@@ -1441,8 +1441,8 @@ static void FixSolidStructure(MapError *pError)
 	//
 	// First make sure all the faces are good.
 	//
-	int nFaces = pSolid->GetFaceCount();
-	for (int i = nFaces - 1; i >= 0; i--)
+	short nFaces = pSolid->GetFaceCount();
+	for (short i = nFaces - 1; i >= 0; i--)
 	{
 		CMapFace *pFace = pSolid->GetFace(i);
 		if (!pFace->CheckFace(NULL))
@@ -1477,8 +1477,8 @@ static void FixInvalidTexture(MapError *pError)
 {
 	CMapSolid *pSolid = (CMapSolid *)pError->pObjects[0];
 
-	int nFaces = pSolid->GetFaceCount();
-	for (int i = 0; i < nFaces; i++)
+	short nFaces = pSolid->GetFaceCount();
+	for (short i = 0; i < nFaces; i++)
 	{
 		CMapFace *pFace = pSolid->GetFace(i);
 		if (pFace != NULL)
@@ -1500,8 +1500,8 @@ static void FixInvalidTextureAxes(MapError *pError)
 {
 	CMapSolid *pSolid = (CMapSolid *)pError->pObjects[0];
 
-	int nFaces = pSolid->GetFaceCount();
-	for (int i = 0; i < nFaces; i++)
+	short nFaces = pSolid->GetFaceCount();
+	for (short i = 0; i < nFaces; i++)
 	{
 		CMapFace *pFace = pSolid->GetFace(i);
 		if (!pFace->IsTextureAxisValid())
@@ -1519,8 +1519,8 @@ static void FixInvalidContents(MapError *pError)
 	CMapFace *pFace = pSolid->GetFace(0);
 	DWORD dwContents = pFace->texture.q2contents;
 
-	int nFaces = pSolid->GetFaceCount();
-	for (int i = 1; i < nFaces; i++)
+	short nFaces = pSolid->GetFaceCount();
+	for (short i = 1; i < nFaces; i++)
 	{
 		pFace = pSolid->GetFace(i);
 		pFace->texture.q2contents = dwContents;
@@ -1555,8 +1555,8 @@ static void FixUnusedKeyvalues(MapError *pError)
 		return;
 	}
 
-	int iNext;
-	for ( int i=pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i = iNext )
+	unsigned short iNext;
+	for ( auto i=pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i = iNext )
 	{
 		iNext = pEntity->GetNextKeyValue( i );
 		if (pClass->VarForName(pEntity->GetKey(i)) == NULL)

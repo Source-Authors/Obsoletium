@@ -232,7 +232,7 @@ int CMapFace::SerializeRMF(std::fstream& file, BOOL fIsStoring)
 		//
 		if (g_pGameConfig->GetTextureFormat() != tfVMT)
 		{
-			for (int i = strlen(texture.texture) - 1; i >= 0; i--)
+			for (intp i = V_strlen(texture.texture) - 1; i >= 0; i--)
 			{
 				if (texture.texture[i] == '/')
 				{
@@ -482,7 +482,7 @@ int CEditGameClass::SerializeRMF(std::fstream& file, BOOL fIsStoring)
 		// Write the number of keyvalues.
 		//
 		iSize = 0;
-		for ( int z=m_KeyValues.GetFirst(); z != m_KeyValues.GetInvalidIndex(); z=m_KeyValues.GetNext( z ) )
+		for ( auto z=m_KeyValues.GetFirst(); z != m_KeyValues.GetInvalidIndex(); z=m_KeyValues.GetNext( z ) )
 		{
 			iSize++;
 		}
@@ -758,7 +758,7 @@ int CMapEntity::SerializeRMF(std::fstream &file, BOOL fIsStoring)
 
 int CMapWorld::SerializeRMF(std::fstream &file, BOOL fIsStoring)
 {
-    float fVersion = 3.7f;
+	float fVersion = 3.7f;
 	float fLastCompat = 0.3f;
 	
 	int nSolids = 0;

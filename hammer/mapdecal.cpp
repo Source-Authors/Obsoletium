@@ -149,9 +149,9 @@ int CMapDecal::CanDecalSolid(CMapSolid *pSolid, CMapFace **ppFaces)
 	//
 	int nDecalFaces = 0;
 
-	int nFaces = pSolid->GetFaceCount();
+	short nFaces = pSolid->GetFaceCount();
 	Assert(nFaces <= MAPSOLID_MAX_FACES);
-	for (int i = 0; i < nFaces; i++)
+	for (short i = 0; i < nFaces; i++)
 	{
 		CMapFace *pFace = pSolid->GetFace(i);
 		float fDistance = pFace->GetNormalDistance(m_Origin);
@@ -405,7 +405,7 @@ void CMapDecal::OnNotifyDependent(CMapClass *pObject, Notify_Dependent_t eNotify
 		// rebuilt if we can still decal the solid.
 		//
 		
-		for( int pos = m_Faces.Count()-1; pos>=0; pos-- )
+		for( intp pos = m_Faces.Count()-1; pos>=0; pos-- )
 		{
 			DecalFace_t *pDecalFace = m_Faces.Element(pos);
 			if ((pDecalFace != NULL) && (pDecalFace->pSolid == pSolid))
@@ -432,7 +432,7 @@ void CMapDecal::OnNotifyDependent(CMapClass *pObject, Notify_Dependent_t eNotify
 		// We could not re-attach to the solid because it was moved out of range or deleted. If we are
 		// no longer attached to any solids, remove our entity from the world.
 		//
-		int index = m_Solids.Find(pSolid);
+		intp index = m_Solids.Find(pSolid);
 		if (index != -1)
 		{
 			m_Solids.Remove(index);

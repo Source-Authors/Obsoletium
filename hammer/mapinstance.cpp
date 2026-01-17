@@ -219,9 +219,9 @@ GDIV_TYPE CMapInstance::GetFieldType( const char *pInstanceValue )
 	{
 		return ivBadType;
 	}
-	int		len = InstancePos - pInstanceValue;
+	intp len = InstancePos - pInstanceValue;
 
-	for ( int i = pInstanceParmsEntity->GetFirstKeyValue(); i != pInstanceParmsEntity->GetInvalidKeyValue(); i = pInstanceParmsEntity->GetNextKeyValue( i ) )
+	for ( auto i = pInstanceParmsEntity->GetFirstKeyValue(); i != pInstanceParmsEntity->GetInvalidKeyValue(); i = pInstanceParmsEntity->GetNextKeyValue( i ) )
 	{
 		LPCTSTR	pKey = pInstanceParmsEntity->GetKey( i );
 		LPCTSTR	pValue = pInstanceParmsEntity->GetKeyValue( i );
@@ -249,7 +249,7 @@ void CMapInstance::FindTargetNames( CUtlVector< const char * > &Names )
 {
 	CMapEntity *pEntity = dynamic_cast< CMapEntity * >( GetParent() );
 
-	for ( int j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
+	for ( auto j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
 	{
 		LPCTSTR	pInstanceKey = pEntity->GetKey( j );
 		LPCTSTR	pInstanceValue = pEntity->GetKeyValue( j );
@@ -282,7 +282,7 @@ void CMapInstance::ReplaceTargetname( const char *szOldName, const char *szNewNa
 
 	CMapEntity *pEntity = dynamic_cast< CMapEntity * >( GetParent() );
 
-	for ( int j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
+	for ( auto j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
 	{
 		LPCTSTR	pInstanceKey = pEntity->GetKey( j );
 		LPCTSTR	pInstanceValue = pEntity->GetKeyValue( j );
@@ -294,7 +294,7 @@ void CMapInstance::ReplaceTargetname( const char *szOldName, const char *szNewNa
 				continue;
 			}
 
-			int	nLen = InstancePos - pInstanceValue;
+			intp nLen = InstancePos - pInstanceValue;
 
 			if ( strcmp( szOldName, InstancePos + 1 ) == 0 )
 			{

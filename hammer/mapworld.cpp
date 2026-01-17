@@ -54,11 +54,11 @@ static BOOL AddUsedTextures(CMapSolid *pSolid, CUsedTextureList *pList)
 	if (!pSolid->IsVisible())
 		return TRUE;
 
-	int nFaces = pSolid->GetFaceCount();
+	short nFaces = pSolid->GetFaceCount();
 	IEditorTexture *pLastTex = NULL;
-	int nLastElement = 0;
+	intp nLastElement = 0;
 
-	for (int i = 0; i < nFaces; i++)
+	for (short i = 0; i < nFaces; i++)
 	{
 		CMapFace *pFace = pSolid->GetFace(i);
 
@@ -829,7 +829,7 @@ void CMapWorld::CullTree_Build(void)
 //-----------------------------------------------------------------------------
 // Purpose: Returns a list of all the groups in the world.
 //-----------------------------------------------------------------------------
-int CMapWorld::GetGroupList(CUtlVector<CMapGroup *> &GroupList)
+intp CMapWorld::GetGroupList(CUtlVector<CMapGroup *> &GroupList)
 {
 	GroupList.RemoveAll();
 	EnumChildrenPos_t pos;
@@ -1182,9 +1182,9 @@ ChunkFileResult_t CMapWorld::SaveObjectListVMF(CChunkFile *pFile, CSaveInfo *pSa
 //			nSize - Size of buffer pointer to by psz.
 // Output : Returns true if there was enough space in the dest buffer, false if not.
 //-----------------------------------------------------------------------------
-static bool EnsureTrailingChar(char *psz, char ch, int nSize)
+static bool EnsureTrailingChar(char *psz, char ch, intp nSize)
 {
-	int nLen = strlen(psz);
+	intp nLen = V_strlen(psz);
 	if ((psz[0] != '\0') && (psz[nLen - 1] != ch))
 	{
 		if (nLen < (nSize - 1))
@@ -1217,8 +1217,8 @@ CMapFace *CMapWorld::FaceID_FaceForID(int nFaceID)
 		CMapSolid *pSolid = dynamic_cast <CMapSolid *>(pChild);
 		if (pSolid != NULL)
 		{
-			int nFaceCount = pSolid->GetFaceCount();
-			for (int nFace = 0; nFace < nFaceCount; nFace++)
+			short nFaceCount = pSolid->GetFaceCount();
+			for (short nFace = 0; nFace < nFaceCount; nFace++)
 			{
 				CMapFace *pFace = pSolid->GetFace(nFace);
 				if (pFace->GetFaceID() == nFaceID)
@@ -1242,10 +1242,10 @@ CMapFace *CMapWorld::FaceID_FaceForID(int nFaceID)
 //			nDestSize - 
 // Output : Returns true if all chars were copied, false if we ran out of room.
 //-----------------------------------------------------------------------------
-static bool AppendString(char *szDest, char const *szSrc, int nDestSize)
+static bool AppendString(char *szDest, char const *szSrc, intp nDestSize)
 {
-	int nDestLen = strlen(szDest);
-	int nDestAvail = nDestSize - nDestLen - 1;
+	intp nDestLen = V_strlen(szDest);
+	intp nDestAvail = nDestSize - nDestLen - 1;
 
 	char *pszStart = szDest + nDestLen;
 	char *psz = pszStart;
@@ -1278,7 +1278,7 @@ static bool AppendString(char *szDest, char const *szSrc, int nDestSize)
 //			pFullFaceList - the list of faces that are considered fully in the list
 //			pPartialFaceList - the list of faces that are partially in the list
 //-----------------------------------------------------------------------------
-bool CMapWorld::FaceID_FaceIDListsToString(char *pszList, int nSize, CMapFaceIDList *pFullFaceIDList, CMapFaceIDList *pPartialFaceIDList)
+bool CMapWorld::FaceID_FaceIDListsToString(OUT_Z_CAP(nSize) char *pszList, intp nSize, CMapFaceIDList *pFullFaceIDList, CMapFaceIDList *pPartialFaceIDList)
 {
 	if (pszList == NULL)
 	{
@@ -1292,7 +1292,7 @@ bool CMapWorld::FaceID_FaceIDListsToString(char *pszList, int nSize, CMapFaceIDL
 	//
 	if (pFullFaceIDList != NULL)
 	{
-		for (int i = 0; i < pFullFaceIDList->Count(); i++)
+		for (intp i = 0; i < pFullFaceIDList->Count(); i++)
 		{
 			int nFace = pFullFaceIDList->Element(i);
 
@@ -1319,7 +1319,7 @@ bool CMapWorld::FaceID_FaceIDListsToString(char *pszList, int nSize, CMapFaceIDL
 
 			bool bFirst = true;
 			
-			for (int i = 0; i < pPartialFaceIDList->Count(); i++)
+			for (intp i = 0; i < pPartialFaceIDList->Count(); i++)
 			{
 				int nFace = pPartialFaceIDList->Element(i);
 
@@ -1357,7 +1357,7 @@ bool CMapWorld::FaceID_FaceIDListsToString(char *pszList, int nSize, CMapFaceIDL
 //			pFullFaceList - the list of faces that are considered fully in the list
 //			pPartialFaceList - the list of faces that are partially in the list
 //-----------------------------------------------------------------------------
-bool CMapWorld::FaceID_FaceListsToString(char *pszList, int nSize, CMapFaceList *pFullFaceList, CMapFaceList *pPartialFaceList)
+bool CMapWorld::FaceID_FaceListsToString(OUT_Z_CAP(nSize) char *pszList, intp nSize, CMapFaceList *pFullFaceList, CMapFaceList *pPartialFaceList)
 {
 	if (pszList == NULL)
 	{
@@ -1371,7 +1371,7 @@ bool CMapWorld::FaceID_FaceListsToString(char *pszList, int nSize, CMapFaceList 
 	//
 	if (pFullFaceList != NULL)
 	{
-		for (int i = 0; i < pFullFaceList->Count(); i++)
+		for (intp i = 0; i < pFullFaceList->Count(); i++)
 		{
 			CMapFace *pFace = pFullFaceList->Element(i);
 
@@ -1585,11 +1585,11 @@ void CMapWorld::FaceID_StringToFaceLists(CMapFaceList *pFullFaceList, CMapFaceLi
 //			appends 0 if no numerals exist
 // Input  : newName - 
 //-----------------------------------------------------------------------------
-static void IncrementStringName( char *str, int nMaxLength )
+static void IncrementStringName( char *str, intp nMaxLength )
 {
 	// walk backwards through the string looking for where the digits stop
-	int orgLen = Q_strlen(str);
-	int pos = orgLen;
+	intp orgLen = Q_strlen(str);
+	intp pos = orgLen;
 	while ( (pos > 0) && V_isdigit(str[pos-1]) )
 	{
 		pos--;
@@ -1736,8 +1736,8 @@ CMapEntity *CMapWorld::FindEntityByName( const char *pszName, bool bVisiblesOnly
 		pList = &m_EntityListByName[nBucket];
 	}
 	
-	int nCount = pList->Count();
-	for ( int i = 0; i < nCount; i++ )
+	intp nCount = pList->Count();
+	for ( intp i = 0; i < nCount; i++ )
 	{
 		CMapEntity *pEntity = pList->Element( i );
 		
@@ -1868,8 +1868,8 @@ bool CMapWorld::FindEntitiesByName( CMapEntityList &Found, const char *pszName, 
 		pList = &m_EntityListByName[nBucket];
 	}
 	
-	int nCount = pList->Count();
-	for ( int i = 0; i < nCount; i++ )
+	intp nCount = pList->Count();
+	for ( intp i = 0; i < nCount; i++ )
 	{
 		CMapEntity *pEntity = pList->Element( i );
 		

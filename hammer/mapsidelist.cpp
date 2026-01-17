@@ -109,7 +109,7 @@ void CMapSideList::BuildFaceListForValue(char const *pszValue, CMapWorld *pWorld
 	//
 	if (m_Faces.Count() > 0)
 	{
-		for (int i = m_Faces.Count() - 1; i >= 0; i--)
+		for (intp i = m_Faces.Count() - 1; i >= 0; i--)
 		{
 			CMapFace *pFace = m_Faces.Element(i);
 			Assert(pFace != NULL);
@@ -376,7 +376,7 @@ void CMapSideList::OnNotifyDependent(CMapClass *pObject, Notify_Dependent_t eNot
 			// the face IDs to our list of lost IDs so that we can reacquire
 			// the face in our list if the solid comes back later.
 			//
-			for (int i = m_Faces.Count() - 1; i >= 0; i--)
+			for (intp i = m_Faces.Count() - 1; i >= 0; i--)
 			{
 				CMapFace *pFace = m_Faces.Element(i);
 				if (pFace != NULL)
@@ -452,7 +452,7 @@ void CMapSideList::RemoveFacesNotInList(const CMapObjectList &List)
 {
 	if (m_Faces.Count() > 0)
 	{
-		for (int i = m_Faces.Count() - 1; i >= 0; i--)
+		for (intp i = m_Faces.Count() - 1; i >= 0; i--)
 		{
 			CMapFace *pFace = m_Faces.Element(i);
 
@@ -568,7 +568,7 @@ void CMapSideList::Render3D(CRender3D *pRender)
 
 	meshBuilder.Begin(pMesh, MATERIAL_LINES, size_cast<int>(m_Faces.Count()));
 
-	for (int i = 0; i < m_Faces.Count(); i++)
+	for (intp i = 0; i < m_Faces.Count(); i++)
 	{
 		CMapFace *pFace = m_Faces.Element(i);
 
@@ -607,7 +607,7 @@ void CMapSideList::Render3D(CRender3D *pRender)
 bool CMapSideList::ReplaceSolidFaces(CMapSolid *pOrigSolid, CMapSolid *pNewSolid)
 {
 	bool bDidSomething = false;
-	for (int i = 0; i < pOrigSolid->GetFaceCount(); i++)
+	for (short i = 0; i < pOrigSolid->GetFaceCount(); i++)
 	{
 		CMapFace *pFace = pOrigSolid->GetFace(i);
 
@@ -646,7 +646,7 @@ void CMapSideList::UpdateDependencies(CMapWorld *pWorld, CMapClass *pObject)
 		//
 		// Walk the list backwards so we can remove as we go.
 		//
-		for (int i = m_LostFaceIDs.Count() - 1; i >= 0; i--)
+		for (intp i = m_LostFaceIDs.Count() - 1; i >= 0; i--)
 		{
 			int nFaceID = m_LostFaceIDs.Element(i);
 

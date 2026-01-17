@@ -118,7 +118,7 @@ void CHistory::Undo(CMapObjectList *pNewSelection)
 	//
 	// Track entries are consumed LIFO.
 	//
-	int pos = Tracks.Count()-1;
+	intp pos = Tracks.Count()-1;
 	Tracks.Remove(pos);
 
 	//
@@ -188,7 +188,7 @@ void CHistory::MarkUndoPosition( const CMapObjectList *pSelection, LPCTSTR pszNa
 	if(Tracks.Count() > Options.general.iUndoLevels)
 	{
 		// remove some.
-		int i, i2;
+		intp i, i2;
 		i = i2 = Tracks.Count() - Options.general.iUndoLevels;
 		int pos = 0;
 		while(i--)
@@ -660,9 +660,9 @@ CHistoryTrack::CHistoryTrack(CHistory *pParent, const CMapObjectList *pSelected)
 //-----------------------------------------------------------------------------
 CHistoryTrack::~CHistoryTrack()
 {
-	for (int i = 0; i < Data.Count(); i++)
+	for (auto &d : Data)
 	{
-		Data[i].m_bAutoDestruct = m_bAutoDestruct;
+		d.m_bAutoDestruct = m_bAutoDestruct;
 	}
 }
 
@@ -713,9 +713,9 @@ BOOL CHistoryTrack::CheckObjectFlag(CMapClass *pObject, int iFlag)
 //-----------------------------------------------------------------------------
 void CHistoryTrack::OnRemoveVisGroup(CVisGroup *pVisGroup)
 {
-	for (int i = 0; i < Data.Count(); i++)
+	for (auto &d : Data)
 	{
-		Data[i].OnRemoveVisGroup(pVisGroup);
+		d.OnRemoveVisGroup(pVisGroup);
 	}
 }
 
@@ -795,7 +795,7 @@ void CHistoryTrack::KeepNew(CMapClass *pObject)
 //-----------------------------------------------------------------------------
 void CHistoryTrack::Undo()
 {
-	for (int i = Data.Count() - 1; i >= 0; i--)
+	for (intp i = Data.Count() - 1; i >= 0; i--)
 	{
 		Data[i].Undo(Parent->Opposite);
 	}
@@ -804,7 +804,7 @@ void CHistoryTrack::Undo()
 	// Do notification separately so that objects are dealing with the
 	// correct data set when they calculate bounds, etc.
 	//
-	for (int i = Data.Count() - 1; i >= 0; i--)
+	for (intp i = Data.Count() - 1; i >= 0; i--)
 	{
 		Data[i].DispatchUndoNotify();
 	}

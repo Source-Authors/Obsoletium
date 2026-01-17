@@ -47,7 +47,7 @@ public:
 		sncPrev = 1
 	};
 
-	int GetActiveCamera(void) { return m_iActiveCamera; }
+	intp GetActiveCamera(void) const { return m_iActiveCamera; }
 	void GetCameraPos(Vector &vViewPos, Vector &vLookAt);
 	void UpdateActiveCamera(Vector &vViewPos, Vector &vLookAt);
 

@@ -113,7 +113,6 @@ bool CMapSolid::AddPlane(const CMapFace *p)
 //-----------------------------------------------------------------------------
 bool CMapSolid::Carve(CMapObjectList *pInside, CMapObjectList *pOutside, CMapSolid *pCarver)
 {
-	int	i;
 	CMapSolid *front = NULL;
 	CMapSolid *back = NULL;
 	Vector bmins, bmaxs;
@@ -126,7 +125,7 @@ bool CMapSolid::Carve(CMapObjectList *pInside, CMapObjectList *pOutside, CMapSol
 	// If this solid doesn't intersect the carving solid at all, add a copy
 	// to the outside list and exit.
 	//
-	for (i=0 ; i<3 ; i++)
+	for (int i=0 ; i<3 ; i++)
 	{
 		if ((bmins[i] >= carvemaxs[i]) || (bmaxs[i] <= carvemins[i]))
 		{
@@ -148,7 +147,7 @@ bool CMapSolid::Carve(CMapObjectList *pInside, CMapObjectList *pOutside, CMapSol
 	//
 	// Carve the solid by the faces in the carving solid.
 	//
-	for (i = 0; i < pCarver->GetFaceCount(); i++)
+	for (short i = 0; i < pCarver->GetFaceCount(); i++)
 	{
 		const CMapFace *pFace = pCarver->GetFace(i);
 
@@ -270,8 +269,8 @@ void CMapSolid::ClipByFace(const CMapFace *fa, CMapSolid **fsolid, CMapSolid **b
 //-----------------------------------------------------------------------------
 CMapFace *CMapSolid::FindFaceID(int nFaceID)
 {
-	int nFaceCount = GetFaceCount();
-	for (int nFace = 0; nFace < nFaceCount; nFace++)
+	short nFaceCount = GetFaceCount();
+	for (short nFace = 0; nFace < nFaceCount; nFace++)
 	{	
 		CMapFace *pFace = GetFace(nFace);
 		if (pFace->GetFaceID() == nFaceID)
@@ -290,8 +289,8 @@ CMapFace *CMapSolid::FindFaceID(int nFaceID)
 //-----------------------------------------------------------------------------
 void CMapSolid::GenerateNewFaceIDs(CMapWorld *pWorld)
 {
-	int nFaceCount = GetFaceCount();
-	for (int nFace = 0; nFace < nFaceCount; nFace++)
+	short nFaceCount = GetFaceCount();
+	for (short nFace = 0; nFace < nFaceCount; nFace++)
 	{
 		CMapFace *pFace = GetFace(nFace);
 		pFace->SetFaceID(pWorld->FaceID_GetNext());
@@ -363,8 +362,8 @@ int CMapSolid::Split( PLANE *pPlane, CMapSolid **pFront, CMapSolid **pBack )
     int   frontCount = 0;
     int   backCount = 0;
     
-    int faceCount = GetFaceCount();
-    for( int i = 0; i < faceCount; i++ )
+    short faceCount = GetFaceCount();
+    for( short i = 0; i < faceCount; i++ )
     {
         CMapFace *pFace = GetFace( i );
 
@@ -499,9 +498,9 @@ int CMapSolid::Split( PLANE *pPlane, CMapSolid **pFront, CMapSolid **pBack )
 //-----------------------------------------------------------------------------
 // Purpose: Returns the index (you could use it with GetFace) or -1 if the face doesn't exist in this solid.
 //-----------------------------------------------------------------------------
-int CMapSolid::GetFaceIndex( CMapFace *pFace )
+short CMapSolid::GetFaceIndex( CMapFace *pFace )
 {
-	for ( int i=0; i < Faces.GetCount(); i++ )
+	for ( short i=0; i < Faces.GetCount(); i++ )
 	{
 		if ( pFace == &Faces[i] )
 			return i;
@@ -517,7 +516,7 @@ int CMapSolid::GetFaceIndex( CMapFace *pFace )
 //-----------------------------------------------------------------------------
 void CMapSolid::AddFace(CMapFace *pFace)
 {
-	int nFaces = Faces.GetCount();
+	short nFaces = Faces.GetCount();
 	Faces.SetCount(nFaces + 1);
 	CMapFace *pNewFace = &Faces[nFaces];
 
@@ -555,14 +554,14 @@ CMapClass *CMapSolid::CopyFrom(CMapClass *pobj, bool bUpdateDependencies)
 
 	m_bIsCordonBrush = pFrom->m_bIsCordonBrush;
 	
-	int nFaces = pFrom->Faces.GetCount();
+	short nFaces = pFrom->Faces.GetCount();
 	Faces.SetCount(nFaces);
 	
 	// copy faces
 	CMapFace *pFromFace;
 	CMapFace *pToFace;
 
-	for (int i = nFaces - 1; i >= 0; i--)
+	for (short i = nFaces - 1; i >= 0; i--)
 	{
 		
 		pToFace = &Faces[i];
@@ -588,8 +587,8 @@ CMapClass *CMapSolid::CopyFrom(CMapClass *pobj, bool bUpdateDependencies)
 #ifdef _DEBUG
 void CMapSolid::DebugSolid(void)
 {
-	int nFaceCount = Faces.GetCount();
-	for (int nFace = 0; nFace < nFaceCount; nFace++)
+	short nFaceCount = Faces.GetCount();
+	for (short nFace = 0; nFace < nFaceCount; nFace++)
 	{
 		[[maybe_unused]] CMapFace *pFace = GetFace(nFace);
 	}
@@ -601,11 +600,11 @@ void CMapSolid::DebugSolid(void)
 // Purpose: 
 // Input  : iIndex - 
 //-----------------------------------------------------------------------------
-void CMapSolid::DeleteFace(int iIndex)
+void CMapSolid::DeleteFace(short iIndex)
 {
 	// shifts 'em down.
-	int nFaces = Faces.GetCount();
-	for(int j = iIndex; j < nFaces-1; j++)
+	short nFaces = Faces.GetCount();
+	for(short j = iIndex; j < nFaces-1; j++)
 	{
 		Faces[j].CopyFrom(&Faces[j+1]);
 	}
@@ -635,8 +634,8 @@ void CMapSolid::CalcBounds(BOOL bFullUpdate)
 	//
 	// Update mins/maxes based on our faces.
 	//
-	int nFaces = Faces.GetCount();
-	for( int i = 0; i < nFaces; i++ )
+	short nFaces = Faces.GetCount();
+	for( short i = 0; i < nFaces; i++ )
 	{
 		// check for valid face
 		if (!Faces[i].Points)
@@ -676,8 +675,8 @@ void CMapSolid::CalcBounds(BOOL bFullUpdate)
 void CMapSolid::DoTransform(const VMatrix &matrix)
 {
 	// get all points, transform them
-	int nFaces = Faces.GetCount();
-	for (int i = 0; i < nFaces; i++)
+	short nFaces = Faces.GetCount();
+	for (short i = 0; i < nFaces; i++)
 	{
 		Faces[i].DoTransform( matrix );
 	}
@@ -692,8 +691,8 @@ void CMapSolid::SetRenderColor(color32 rgbColor)
 {
 	CMapClass::SetRenderColor(rgbColor);
 
-	int nFaces = Faces.GetCount();
-	for (int i = 0; i < nFaces; i++)
+	short nFaces = Faces.GetCount();
+	for (short i = 0; i < nFaces; i++)
 	{
 		Faces[i].SetRenderColor(rgbColor);
 	}
@@ -707,8 +706,8 @@ void CMapSolid::SetRenderColor(unsigned char uchRed, unsigned char uchGreen, uns
 {
 	CMapClass::SetRenderColor(uchRed, uchGreen, uchBlue);
 
-	int nFaces = Faces.GetCount();
-	for (int i = 0; i < nFaces; i++)
+	short nFaces = Faces.GetCount();
+	for (short i = 0; i < nFaces; i++)
 	{
 		Faces[i].SetRenderColor(uchRed, uchGreen, uchBlue);
 	}
@@ -725,8 +724,8 @@ size_t CMapSolid::GetSize(void)
 	size_t size = CMapClass::GetSize();
 	size += sizeof *this;
 
-	int nFaces = Faces.GetCount();
-	for( int i = 0; i < nFaces; i++ )
+	short nFaces = Faces.GetCount();
+	for( short i = 0; i < nFaces; i++ )
 	{
 		size += Faces[i].GetDataSize();
 	}
@@ -740,12 +739,12 @@ size_t CMapSolid::GetSize(void)
 // Input  : pszTex - Texture name.
 //			iFace - Index of face for which to set texture.
 //-----------------------------------------------------------------------------
-void CMapSolid::SetTexture(LPCTSTR pszTex, int iFace)
+void CMapSolid::SetTexture(LPCTSTR pszTex, short iFace)
 {
 	if(iFace == -1)
 	{
-		int nFaces = Faces.GetCount();
-		for(int i = 0 ; i < nFaces; i++)
+		short nFaces = Faces.GetCount();
+		for(short i = 0 ; i < nFaces; i++)
 		{
 			Faces[i].SetTexture(pszTex);
 		}
@@ -767,7 +766,7 @@ void CMapSolid::SetTexture(LPCTSTR pszTex, int iFace)
 // Input  : iFace - Index of face. If -1, returns the texture of face 0.
 // Output : Returns the texture name.
 //-----------------------------------------------------------------------------
-LPCTSTR CMapSolid::GetTexture(int iFace)
+LPCTSTR CMapSolid::GetTexture(short iFace)
 {
 	return Faces[iFace == -1 ? 0 : iFace].texture.texture;
 }
@@ -791,7 +790,6 @@ LPCTSTR CMapSolid::GetTexture(int iFace)
 //-----------------------------------------------------------------------------
 int CMapSolid::CreateFromPlanes( DWORD dwFlags )
 {
-	int i, j, k;
     BOOL useplane[MAPSOLID_MAX_FACES];
 
 	m_Render2DBox.SetBounds(Vector(COORD_NOTINIT, COORD_NOTINIT, COORD_NOTINIT), 
@@ -802,9 +800,9 @@ int CMapSolid::CreateFromPlanes( DWORD dwFlags )
 	//
 	// Free all points from all faces and assign parentage.
 	//
-	int nFaces = GetFaceCount();
+	short nFaces = GetFaceCount();
 
-	for (i = 0; i < nFaces; i++)
+	for (short i = 0; i < nFaces; i++)
 	{
 		CMapFace *pFace = GetFace(i);
 
@@ -820,7 +818,7 @@ int CMapSolid::CreateFromPlanes( DWORD dwFlags )
 	// it is unique. We mark each plane that we intend to keep with a TRUE in the
 	// 'useplane' array.
 	//
-	for (i = 0; i < nFaces; i++)
+	for (short i = 0; i < nFaces; i++)
 	{
 		CMapFace *pFace = GetFace(i);
 		PLANE *f = &pFace->plane;
@@ -839,7 +837,7 @@ int CMapSolid::CreateFromPlanes( DWORD dwFlags )
 		// being edited that will be fixed).
 		//
 		useplane[i] = TRUE;
-		for (j = 0; j < i; j++)
+		for (short j = 0; j < i; j++)
 		{
 			CMapFace *pFaceCheck = GetFace(j);
 
@@ -863,7 +861,7 @@ int CMapSolid::CreateFromPlanes( DWORD dwFlags )
 	//
 	BOOL bGotFaces = FALSE;
 
-	for (i = 0; i < nFaces; i++)
+	for (short i = 0; i < nFaces; i++)
 	{
 		CMapFace *pFace = GetFace(i);
 
@@ -875,7 +873,7 @@ int CMapSolid::CreateFromPlanes( DWORD dwFlags )
 		// face planes.
 		//
 		winding_t *w = CreateWindingFromPlane(&pFace->plane);
-		for (j = 0; j < nFaces && w; j++)
+		for (short j = 0; j < nFaces && w; j++)
 		{
 			CMapFace *pFaceClip = GetFace(j);
 
@@ -903,9 +901,9 @@ int CMapSolid::CreateFromPlanes( DWORD dwFlags )
 			// Round all points in the winding that are within ROUND_VERTEX_EPSILON of
 			// integer values.
 			//
-			for (j = 0; j < w->numpoints; j++)
+			for (int j = 0; j < w->numpoints; j++)
 			{
-				for (k = 0; k < 3; k++)
+				for (int k = 0; k < 3; k++)
 				{
 					float v = w->p[j][k];
 					float v1 = V_rint(v);
@@ -953,7 +951,7 @@ int CMapSolid::CreateFromPlanes( DWORD dwFlags )
 		//
 		// Remove faces that don't contribute to this solid.
 		//
-		int nFace = GetFaceCount();
+		short nFace = GetFaceCount();
 		while (nFace > 0)
 		{
 			nFace--;
@@ -974,7 +972,7 @@ int CMapSolid::CreateFromPlanes( DWORD dwFlags )
 	// calculate the plane normals, distances, and texture coordinates.
 	//
 	nFaces = GetFaceCount();
-	for (i = 0; i < nFaces; i++)
+	for (short i = 0; i < nFaces; i++)
 	{
 		CMapFace *pFace = GetFace(i);
 
@@ -1001,8 +999,8 @@ int CMapSolid::CreateFromPlanes( DWORD dwFlags )
     // 
     // remove faces that do not contribute -- not just "unused or ignored" faces
     //
-	int faceCount = Faces.GetCount();
-    for( i = 0; i < faceCount; i++ )
+	short faceCount = Faces.GetCount();
+    for( short i = 0; i < faceCount; i++ )
     {
         if( Faces[i].nPoints == 0 )
         {
@@ -1023,8 +1021,8 @@ int CMapSolid::CreateFromPlanes( DWORD dwFlags )
 //-----------------------------------------------------------------------------
 void CMapSolid::InitializeTextureAxes(TextureAlignment_t eAlignment, DWORD dwFlags)
 {
-	int nFaces = Faces.GetCount();
-	for (int i = 0; i < nFaces; i++)
+	short nFaces = Faces.GetCount();
+	for (short i = 0; i < nFaces; i++)
 	{
 		Faces[i].InitializeTextureAxes(eAlignment, dwFlags);
 	}
@@ -1044,7 +1042,7 @@ ChunkFileResult_t CMapSolid::LoadSideCallback(CChunkFile *pFile, CMapSolid *pSol
 	//
 	// this is hear in place of the AddFace -- may want to handle this better later!!!
 	//
-	int faceCount = pSolid->Faces.GetCount();
+	short faceCount = pSolid->Faces.GetCount();
 	pSolid->Faces.SetCount( faceCount + 1 );
 	CMapFace *pFace = &pSolid->Faces[faceCount];
 
@@ -1104,8 +1102,8 @@ ChunkFileResult_t CMapSolid::LoadVMF(CChunkFile *pFile, bool &bValid)
 			//
 			// create all of the displacement surfaces for faces with the displacement property
 			//
-			int faceCount = GetFaceCount();
-			for( int i = 0; i < faceCount; i++ )
+			short faceCount = GetFaceCount();
+			for( short i = 0; i < faceCount; i++ )
 			{
 				CMapFace *pFace = GetFace( i );
 				if( !pFace->HasDisp() )
@@ -1181,8 +1179,8 @@ void CMapSolid::OnAddToWorld(CMapWorld *pWorld)
 	// the world for uniqueness.
 	//
 	CMapFaceList CheckList;
-	int nFaceCount = GetFaceCount();
-	for (int i = 0; i < nFaceCount; i++)
+	short nFaceCount = GetFaceCount();
+	for (short i = 0; i < nFaceCount; i++)
 	{
 		CMapFace *pFace = GetFace(i);
 		if (pFace->GetFaceID() == 0)
@@ -1213,7 +1211,7 @@ void CMapSolid::OnAddToWorld(CMapWorld *pWorld)
 				SetDefLessFunc( faceIDs );
 
 				nFaceCount = GetFaceCount();
-				for (int nFace = 0; nFace < nFaceCount; nFace++)
+				for (short nFace = 0; nFace < nFaceCount; nFace++)
 				{	
 					CMapFace *pFace = GetFace(nFace);
 					faceIDs.Insert( pFace->GetFaceID() );
@@ -1247,7 +1245,7 @@ void CMapSolid::OnAddToWorld(CMapWorld *pWorld)
 	//
 	// Notify all faces that we are being added to the world.
 	//
-	for (int i = 0; i < nFaceCount; i++)
+	for (short i = 0; i < nFaceCount; i++)
 	{
 		CMapFace *pFace = GetFace(i);
 		pFace->OnAddToWorld(pWorld);
@@ -1269,8 +1267,8 @@ void CMapSolid::PostloadWorld(CMapWorld *pWorld)
 	// Make sure all our faces have nonzero IDs. They might if the map was created
 	// before unique IDs were added.
 	//
-	int nFaces = GetFaceCount();
-	for (int i = 0; i < nFaces; i++)
+	short nFaces = GetFaceCount();
+	for (short i = 0; i < nFaces; i++)
 	{
 		CMapFace *pFace = GetFace(i);
 		if (pFace->GetFaceID() == 0)
@@ -1322,8 +1320,8 @@ void CMapSolid::OnRemoveFromWorld(CMapWorld *pWorld, bool bNotifyChildren)
 	//
 	// Notify all faces that we are being removed from the world.
 	//
-	int nFaces = GetFaceCount();
-	for (int i = 0; i < nFaces; i++)
+	short nFaces = GetFaceCount();
+	for (short i = 0; i < nFaces; i++)
 	{
 		CMapFace *pFace = GetFace(i);
 		pFace->OnRemoveFromWorld();
@@ -1336,9 +1334,9 @@ void CMapSolid::OnRemoveFromWorld(CMapWorld *pWorld, bool bNotifyChildren)
 //-----------------------------------------------------------------------------
 void CMapSolid::RemoveEmptyFaces(void)
 {
-	int nFaces = GetFaceCount();
+	short nFaces = GetFaceCount();
 
-	for (int i = 0; i < nFaces; i++)
+	for (short i = 0; i < nFaces; i++)
 	{
 		//
 		// If this face has no points, delete it.
@@ -1355,7 +1353,7 @@ void CMapSolid::RemoveEmptyFaces(void)
 	if (nFaces >= 4)
 	{
 		// dvs: test to verify that the SetFaceCount below is unnecessary
-		int nTest = GetFaceCount();
+		short nTest = GetFaceCount();
 		Assert(nTest == nFaces);
 		SetFaceCount(nFaces);
 	}
@@ -1368,7 +1366,7 @@ void CMapSolid::RemoveEmptyFaces(void)
 
 bool CMapSolid::ShouldRenderLast()
 {
-	for (int nFace = 0; nFace < GetFaceCount(); nFace++)
+	for (short nFace = 0; nFace < GetFaceCount(); nFace++)
 	{
 		CMapFace *pFace = GetFace(nFace);
 		if (pFace->ShouldRenderLast())
@@ -1379,7 +1377,7 @@ bool CMapSolid::ShouldRenderLast()
 
 void CMapSolid::AddShadowingTriangles( CUtlVector<Vector> &tri_list )
 {
-	for (int nFace = 0; nFace < GetFaceCount(); nFace++)
+	for (short nFace = 0; nFace < GetFaceCount(); nFace++)
 	{
 		CMapFace *pFace = GetFace(nFace);
 		pFace->AddShadowingTriangles( tri_list );
@@ -1446,7 +1444,7 @@ void CMapSolid::Render3D(CRender3D *pRender)
 			pRender->PushRenderMode(RENDER_MODE_WIREFRAME);
 		}
 
-		for (int nFace = 0; nFace < GetFaceCount(); nFace++)
+		for (short nFace = 0; nFace < GetFaceCount(); nFace++)
 		{
 			CMapFace *pFace = GetFace(nFace);
 
@@ -1488,7 +1486,7 @@ void CMapSolid::Render3D(CRender3D *pRender)
 //-----------------------------------------------------------------------------
 bool CMapSolid::HasDisp( void )
 {
-	for( int ndxFace = 0; ndxFace < GetFaceCount(); ndxFace++ )
+	for( short ndxFace = 0; ndxFace < GetFaceCount(); ndxFace++ )
 	{
 		CMapFace *pFace = GetFace( ndxFace );
 		if( pFace->HasDisp() )
@@ -1577,8 +1575,8 @@ ChunkFileResult_t CMapSolid::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 			//
 			// Save all the brush faces.
 			//
-			int nFaceCount = GetFaceCount();
-			for (int nFace = 0; nFace < nFaceCount; nFace++)
+			short nFaceCount = GetFaceCount();
+			for (short nFace = 0; nFace < nFaceCount; nFace++)
 			{
 				CMapFace *pFace = GetFace(nFace);
 				eResult = pFace->SaveVMF(pFile, pSaveInfo);
@@ -1651,7 +1649,7 @@ void CMapSolid::SetCordonBrush(bool bSet)
 {
 	m_bIsCordonBrush = bSet;
 
-	for ( int i = 0; i < GetFaceCount(); i++ )
+	for ( short i = 0; i < GetFaceCount(); i++ )
 	{
 		CMapFace *pFace = GetFace( i );
 		pFace->SetCordonFace( bSet );
@@ -1830,8 +1828,8 @@ void CMapSolid::Render2D(CRender2D *pRender)
 
 	// check if we should draw handles & vertices
 	
-	bool bIsSmall  = sizex < (HANDLE_RADIUS*2) || sizey < (HANDLE_RADIUS*2);
-	bool bIsTiny = sizex < 2 || sizey < 2;
+	bool bIsSmall = sizex < (HANDLE_RADIUS*2) || sizey < (HANDLE_RADIUS*2);
+	bool bIsTiny  = sizex < 2 || sizey < 2;
 	bool bDrawHandles  = pRender->IsActiveView() && !bIsSmall && IsEditable();
 	bool bDrawVertices = Options.view2d.bDrawVertices && !bIsTiny;
 
@@ -1862,9 +1860,9 @@ void CMapSolid::Render2D(CRender2D *pRender)
 	}
 	else
 	{
-		int nFaces = GetFaceCount();
+		short nFaces = GetFaceCount();
 
-		for ( int i = 0; i < nFaces; i++)
+		for ( short i = 0; i < nFaces; i++)
 		{
 			CMapFace *pFace = GetFace(i);
 			pFace->Render2D( pRender );
@@ -1874,7 +1872,7 @@ void CMapSolid::Render2D(CRender2D *pRender)
 		{
 			bool bPop = pRender->BeginClientSpace();
 
-			for ( int i = 0; i < nFaces; i++)
+			for ( short i = 0; i < nFaces; i++)
 			{
 				CMapFace *pFace = GetFace(i);
 				pFace->RenderVertices( pRender );
@@ -1928,8 +1926,8 @@ bool CMapSolid::HitTest2D(CMapView2D *pView, const Vector2D &point, HitInfo_t &H
 		int y1 = point.y - iSelUnits;
 		int y2 = point.y + iSelUnits;
 
-		int nFaces = GetFaceCount();
-		for (int i = 0; i < nFaces; i++)
+		short nFaces = GetFaceCount();
+		for (short i = 0; i < nFaces; i++)
 		{
 			CMapFace *pFace = GetFace(i);
 			int nPoints = pFace->nPoints;
@@ -1980,7 +1978,7 @@ bool CMapSolid::SaveDXF(ExportDXFInfo_s *pInfo)
 	delete pStrucSolid;
 
 	// Serialize displacements
-	for (int i = 0; i < GetFaceCount(); ++i)
+	for (short i = 0; i < GetFaceCount(); ++i)
 	{
 		CMapFace *pMapFace = GetFace( i );
 		if (pMapFace->HasDisp())
@@ -2000,8 +1998,8 @@ bool CMapSolid::SaveDXF(ExportDXFInfo_s *pInfo)
 //-----------------------------------------------------------------------------
 void CMapSolid::OnUndoRedo()
 {
-	int nFaces = GetFaceCount();
-	for (int i = 0; i < nFaces; i++)
+	short nFaces = GetFaceCount();
+	for (short i = 0; i < nFaces; i++)
 	{
 		CMapFace *pFace = GetFace(i);
 		pFace->OnUndoRedo();

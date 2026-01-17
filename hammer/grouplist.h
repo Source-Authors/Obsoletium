@@ -62,12 +62,12 @@ public:
 
 	CVisGroup *GetSelectedVisGroup();
 	
-	int GetVisGroupCount(void);
-	CVisGroup *GetVisGroup(int nIndex);
+	intp GetVisGroupCount(void);
+	CVisGroup *GetVisGroup(intp nIndex);
 	void SetCheck(CVisGroup *pVisGroup, int nCheckState);
 	int GetCheck(CVisGroup *pVisGroup);
 
-	int GetGroupPairCount(void);
+	intp GetGroupPairCount(void);
 	void SaveVisGroupExpandStates();
 	void RestoreVisGroupExpandStates();
 

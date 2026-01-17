@@ -179,7 +179,7 @@ void CSoundBrowser::PopulateSoundList()
 	ClearSoundList();
 
 	SoundType_t type = GetSoundType();
-	for ( int i = g_Sounds.SoundCount( type ); --i >= 0; )
+	for ( intp i = g_Sounds.SoundCount( type ); --i >= 0; )
 	{
 		const char *pSoundName = g_Sounds.SoundName( type, i );
 		if ( ShowSoundInList( pSoundName ) )

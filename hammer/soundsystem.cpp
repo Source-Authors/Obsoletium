@@ -24,7 +24,7 @@
 // FIXME: Put gamesounds parsing into shared code somewhere
 #define MANIFEST_FILE			"scripts/game_sounds_manifest.txt"
 #define SOUNDGENDER_MACRO		"$gender"
-constexpr inline int SOUNDGENDER_MACRO_LENGTH = ssize(SOUNDGENDER_MACRO) - 1;		// Length of above including $
+constexpr inline intp SOUNDGENDER_MACRO_LENGTH = ssize(SOUNDGENDER_MACRO) - 1;		// Length of above including $
 
 
 // Sounds we're playing are loaded into here for Windows to access while playing them.
@@ -294,14 +294,14 @@ bool CSoundSystem::ProcessDirectory_SceneFileList( char const* pDirectoryName )
 //-----------------------------------------------------------------------------
 // Splits a name into 2
 //-----------------------------------------------------------------------------
-static void SplitName( char const *input, int splitchar, int splitlen, char *before, int beforelen, char *after, int afterlen )
+static void SplitName( char const *input, intp splitchar, intp splitlen, char *before, intp beforelen, char *after, intp afterlen )
 {
 	char const *in = input;
 	char *out = before;
 
-	int c = 0;
-	int l = 0;
-	int maxl = beforelen;
+	intp c = 0;
+	intp l = 0;
+	intp maxl = beforelen;
 	while ( *in )
 	{
 		if ( c == splitchar )
@@ -348,7 +348,7 @@ void CSoundSystem::AddGameSoundToList( const char *pGameSound, char const *pFile
 
 	ptrdiff_t offset = p - pFileName;
 	Assert( offset >= 0 );
-	constexpr int duration = SOUNDGENDER_MACRO_LENGTH;
+	constexpr intp duration = SOUNDGENDER_MACRO_LENGTH;
 
 	// Create a "male" version of the sound	only for browsing
 	char before[ 256 ], after[ 256 ];
@@ -434,7 +434,7 @@ bool CSoundSystem::BuildGameSoundList()
 // Plays a sound
 //-----------------------------------------------------------------------------
 
-bool CSoundSystem::FindSoundByName( const char *pFilename, SoundType_t *type, int *nIndex )
+bool CSoundSystem::FindSoundByName( const char *pFilename, SoundType_t *type, intp *nIndex )
 {
 	char searchStr[MAX_PATH];
 	V_strncpy( searchStr, pFilename, sizeof( searchStr ) );
@@ -442,7 +442,7 @@ bool CSoundSystem::FindSoundByName( const char *pFilename, SoundType_t *type, in
 	
 	for ( int i = SOUND_TYPE_COUNT; --i >= 0; )
 	{
-		for ( int j = SoundCount( (SoundType_t)i ); --j >= 0; )
+		for ( intp j = SoundCount( (SoundType_t)i ); --j >= 0; )
 		{
 			if ( Q_stristr( searchStr, SoundName( (SoundType_t)i, j ) ) )
 			{
@@ -475,7 +475,7 @@ bool CSoundSystem::PlayScene( const char *pFileName )
 // Plays a sound
 //-----------------------------------------------------------------------------
 
-bool CSoundSystem::Play( SoundType_t type, int nIndex )
+bool CSoundSystem::Play( SoundType_t type, intp nIndex )
 {
  	const char *pFileName = SoundFile( type, nIndex );
 	if ( !pFileName )
@@ -526,7 +526,7 @@ void CSoundSystem::StopSound()
 //-----------------------------------------------------------------------------
 // Opens the source file associated with a sound
 //-----------------------------------------------------------------------------
-void CSoundSystem::OpenSource( SoundType_t type, int nIndex )
+void CSoundSystem::OpenSource( SoundType_t type, intp nIndex )
 {
 	if ( type == SOUND_TYPE_RAW )
 		return;

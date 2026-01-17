@@ -183,7 +183,7 @@ intp CFaceEditSheet::FindFaceInList( CMapFace *pFace )
 // specifies the "mode" (material specific) of the click -- LAME!!!!  This will
 // be a problem spot if/when we make face selection general.  cab
 //-----------------------------------------------------------------------------
-void CFaceEditSheet::ClickFace( CMapSolid *pSolid, int faceIndex, int cmd, int clickMode )
+void CFaceEditSheet::ClickFace( CMapSolid *pSolid, short faceIndex, int cmd, int clickMode )
 {
 	//
 	// set the click mode (either to new mode or previously used)

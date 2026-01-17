@@ -996,7 +996,7 @@ void CMapOverlay::ClipFace_ResolveBarycentricClip( CMapDisp *pDisp, ClipFace_t *
 	// Check for points - set to a point.
 	if ( nZeroCount == 2 )
 	{
-		for ( int iVert = 0; iVert < 3; ++iVert )
+		for ( short iVert = 0; iVert < 3; ++iVert )
 		{
 			if ( !bZeroPoint[iVert] )
 			{
@@ -1010,7 +1010,7 @@ void CMapOverlay::ClipFace_ResolveBarycentricClip( CMapDisp *pDisp, ClipFace_t *
 	// Check for edges - setup edge blend.
 	if ( nZeroCount == 1 )
 	{
-		for ( int iVert = 0; iVert < 3; ++iVert )
+		for ( short iVert = 0; iVert < 3; ++iVert )
 		{
 			if ( bZeroPoint[iVert] )
 			{
@@ -1788,7 +1788,7 @@ void CMapOverlay::OnNotifyDependent( CMapClass *pObject, Notify_Dependent_t eNot
 //-----------------------------------------------------------------------------
 void CMapOverlay::Render3D( CRender3D *pRender )
 {
-	int nFaceCount = m_aRenderFaces.Count();
+	intp nFaceCount = m_aRenderFaces.Count();
 
 	if ( nFaceCount != 0 )
 	{
@@ -1810,7 +1810,7 @@ void CMapOverlay::Render3D( CRender3D *pRender )
 				pRender->PushRenderMode( RENDER_MODE_FLAT );
 			}
 			
-			for ( int iFace = 0; iFace < nFaceCount; iFace++ )
+			for ( intp iFace = 0; iFace < nFaceCount; iFace++ )
 			{
 				ClipFace_t *pRenderFace = m_aRenderFaces.Element( iFace );
 				if( !pRenderFace )
@@ -1851,7 +1851,7 @@ void CMapOverlay::Render3D( CRender3D *pRender )
 		if ( GetSelectionState() != SELECT_NONE )
 		{
 			pRender->PushRenderMode( RENDER_MODE_WIREFRAME );
-			for ( int iFace = 0; iFace < nFaceCount; iFace++ )
+			for ( intp iFace = 0; iFace < nFaceCount; iFace++ )
 			{
 				ClipFace_t *pRenderFace = m_aRenderFaces.Element( iFace );
 				if( !pRenderFace )
@@ -1893,7 +1893,7 @@ void CMapOverlay::Render3D( CRender3D *pRender )
 void CMapOverlay::DoClip( void )
 {
 	// Check to see if we have any faces to clip against.
-	int nFaceCount = m_Faces.Count();
+	intp nFaceCount = m_Faces.Count();
 	if( nFaceCount == 0 )
 		return;
 
@@ -1901,7 +1901,7 @@ void CMapOverlay::DoClip( void )
 	m_aRenderFaces.Purge();
 
 	// clip the overlay against all faces in the sidelist
-	for ( int iFace = 0; iFace < nFaceCount; iFace++ )
+	for ( intp iFace = 0; iFace < nFaceCount; iFace++ )
 	{
 		CMapFace *pFace = m_Faces.Element( iFace );
 		if ( pFace )
@@ -2160,8 +2160,8 @@ void CMapOverlay::Disp_DoClip( CMapDisp *pDisp, ClipFaces_t &aDispFragments,
 		aDispFragments.Purge();
 
 		// Clip in V.
-		int nFragCount = aClippedFragments.Count();
-		for ( int iFrag = 0; iFrag < nFragCount; iFrag++ )
+		intp nFragCount = aClippedFragments.Count();
+		for ( intp iFrag = 0; iFrag < nFragCount; iFrag++ )
 		{
 			ClipFace_t *pClipFrag = aClippedFragments[iFrag];
 			if ( pClipFrag )
@@ -2209,8 +2209,8 @@ void CMapOverlay::DoClipDisp( CMapFace *pFace, ClipFace_t *pClippedFace )
 	//
 	// Project points back onto the displacement surface.
 	//
-	int nFaceCount = aCurrentFaces.Count();
-	for( int iFace = 0; iFace < nFaceCount; iFace++ )
+	intp nFaceCount = aCurrentFaces.Count();
+	for( intp iFace = 0; iFace < nFaceCount; iFace++ )
 	{	
 		ClipFace_t *pClipFace = aCurrentFaces[iFace];
 		if ( pClipFace )
@@ -2315,8 +2315,8 @@ void CMapOverlay::UpdateDispBarycentric( void )
 	//
 	// Project points back onto the displacement surface.
 	//
-	int nFaceCount = m_aRenderFaces.Count();
-	for ( int iFace = 0; iFace < nFaceCount; iFace++ )
+	intp nFaceCount = m_aRenderFaces.Count();
+	for ( intp iFace = 0; iFace < nFaceCount; iFace++ )
 	{
 		// Get the current face and remove it from the list.
 		ClipFace_t *pClipFace = m_aRenderFaces[iFace];

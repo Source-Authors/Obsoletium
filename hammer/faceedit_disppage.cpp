@@ -100,7 +100,7 @@ inline void CFaceEditDispPage::PostToolUpdate( void )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CFaceEditDispPage::ClickFace( CMapSolid *pSolid, int faceIndex, int cmd, int clickMode )
+void CFaceEditDispPage::ClickFace( CMapSolid *pSolid, short faceIndex, int cmd, int clickMode )
 {
 	m_bIsEditable = ( pSolid ? pSolid->IsEditable() : true );
 
@@ -1270,7 +1270,7 @@ void CFaceEditDispPage::OnSelectAdjacent()
 				continue;
 
 			// The function we use to select a face wants the face's index into its CMapSolid, so we need that.
-			int iFaceIndex = pSolid->GetFaceIndex( pFace );
+			short iFaceIndex = pSolid->GetFaceIndex( pFace );
 			if ( iFaceIndex == -1 )
 				continue;
 

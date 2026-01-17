@@ -368,8 +368,8 @@ void COP_Output::UpdateValidityButton(void)
 //------------------------------------------------------------------------------
 bool COP_Output::ValidateConnections(COutputConnection *pOutputConn, bool bVisibilityCheck)
 {
-	int nCount = pOutputConn->m_pConnList->Count();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = pOutputConn->m_pConnList->Count();
+	for (intp i = 0; i < nCount; i++)
 	{
 		CEntityConnection *pConnection = pOutputConn->m_pConnList->Element(i);
 		if (pConnection != NULL)
@@ -666,8 +666,8 @@ void COP_Output::OnAdd(void)
 void COP_Output::EmptyCopyBuffer(void)
 {
 	// Delete any old connections
-	int nConnCount = m_pConnectionBuffer->Count();
-	for (int i = 0; i < nConnCount; i++)
+	intp nConnCount = m_pConnectionBuffer->Count();
+	for (intp i = 0; i < nConnCount; i++)
 	{
 		CEntityConnection *pConnection = m_pConnectionBuffer->Element(i);
 		delete pConnection;
@@ -735,8 +735,8 @@ void COP_Output::OnPaste(void)
 		CMapEntity *pEntity = m_EntityList.Element(pos);
 		if (pEntity != NULL)
 		{
-			int nConnCount = m_pConnectionBuffer->Count();
-			for (int i = 0; i < nConnCount; i++)
+			intp nConnCount = m_pConnectionBuffer->Count();
+			for (intp i = 0; i < nConnCount; i++)
 			{
 				CEntityConnection *pConnection = m_pConnectionBuffer->Element(i);
 				if (pConnection != NULL)
@@ -844,8 +844,8 @@ void COP_Output::OnDelete(void)
 
 					if (pConnList != NULL)
 					{
-						int nConnCount = pConnList->Count();
-						for (int nConn = 0; nConn < nConnCount; nConn++)
+						intp nConnCount = pConnList->Count();
+						for (intp nConn = 0; nConn < nConnCount; nConn++)
 						{
 							CEntityConnection *pConnection = pConnList->Element(nConn);
 							if (pConnection != NULL)
@@ -1453,7 +1453,7 @@ void COP_Output::SetSelectedConnections(CEntityConnectionList &List)
 {
 	m_ListCtrl.SetRedraw(FALSE);
 
-	int nConnCount = List.Count();
+	intp nConnCount = List.Count();
 
 	int nItemCount = m_ListCtrl.GetItemCount();
 	for (int nItem = 0; nItem < nItemCount; nItem++)
@@ -1463,7 +1463,7 @@ void COP_Output::SetSelectedConnections(CEntityConnectionList &List)
 
 		// See if this row's list holds any of the connections in the given list.
 		bool bFound = false;
-		for (int nConn = 0; nConn < nConnCount; nConn++)
+		for (intp nConn = 0; nConn < nConnCount; nConn++)
 		{
 			CEntityConnection *pConn = List.Element(nConn);
 			if (pConnList->Find(pConn) != -1)
@@ -1556,8 +1556,8 @@ void COP_Output::UpdateEditedFireOnce(void)
 		int nChecked = (pButton->GetState()&0x0003);  // Checked state
 
 		// Update the connections
-		int nConnCount = m_EditList.Count();
-		for (int nConn = 0; nConn < nConnCount; nConn++)
+		intp nConnCount = m_EditList.Count();
+		for (intp nConn = 0; nConn < nConnCount; nConn++)
 		{
 			CEntityConnection *pConnection = m_EditList.Element(nConn);
 			if (pConnection != NULL)
@@ -1595,8 +1595,8 @@ void COP_Output::UpdateEditedDelays(void)
 		float flDelay = V_atof(strDelay);
 
 		// Update the connections
-		int nConnCount = m_EditList.Count();
-		for (int nConn = 0; nConn < nConnCount; nConn++)
+		intp nConnCount = m_EditList.Count();
+		for (intp nConn = 0; nConn < nConnCount; nConn++)
 		{
 			CEntityConnection *pConnection = m_EditList.Element(nConn);
 			if (pConnection != NULL)
@@ -1635,8 +1635,8 @@ void COP_Output::UpdateEditedParams(void)
 		}
 
 		// Update the connections
-		int nConnCount = m_EditList.Count();
-		for (int nConn = 0; nConn < nConnCount; nConn++)
+		intp nConnCount = m_EditList.Count();
+		for (intp nConn = 0; nConn < nConnCount; nConn++)
 		{
 			CEntityConnection *pConnection = m_EditList.Element(nConn);
 			if (pConnection != NULL)
@@ -1668,8 +1668,8 @@ void COP_Output::UpdateEditedInputs(void)
 	GetInput(strInput, sizeof(strInput));
 
 	// Update the connections
-	int nConnCount = m_EditList.Count();
-	for (int nConn = 0; nConn < nConnCount; nConn++)
+	intp nConnCount = m_EditList.Count();
+	for (intp nConn = 0; nConn < nConnCount; nConn++)
 	{
 		CEntityConnection *pConnection = m_EditList.Element(nConn);
 		if (pConnection != NULL)
@@ -1702,8 +1702,8 @@ void COP_Output::UpdateEditedOutputs()
 	GetOutput(strOutput, sizeof(strOutput));
 
 	// Update the connections
-	int nConnCount = m_EditList.Count();
-	for (int nConn = 0; nConn < nConnCount; nConn++)
+	intp nConnCount = m_EditList.Count();
+	for (intp nConn = 0; nConn < nConnCount; nConn++)
 	{
 		CEntityConnection *pConnection = m_EditList.Element(nConn);
 		if (pConnection != NULL)
@@ -1736,8 +1736,8 @@ void COP_Output::UpdateEditedTargets(void)
 	GetTarget(strTarget, sizeof(strTarget));
 
 	// Update the connections
-	int nConnCount = m_EditList.Count();
-	for (int nConn = 0; nConn < nConnCount; nConn++)
+	intp nConnCount = m_EditList.Count();
+	for (intp nConn = 0; nConn < nConnCount; nConn++)
 	{
 		CEntityConnection *pConnection = m_EditList.Element(nConn);
 		if (pConnection != NULL)
@@ -1793,8 +1793,8 @@ void COP_Output::SetConnection(CEntityConnectionList *pConnectionList)
 	GetDlgItem(IDC_PICK_ENTITY_PARAM)->EnableWindow( false );
 	m_bEntityParamTarget = false;
 
-	int nConnCount = pConnectionList->Count();
-	for (int nConn = 0; nConn < nConnCount; nConn++)
+	intp nConnCount = pConnectionList->Count();
+	for (intp nConn = 0; nConn < nConnCount; nConn++)
 	{
 		CEntityConnection *pConnection = (CEntityConnection *)pConnectionList->Element(nConn);
 		if (pConnection == NULL)
@@ -2404,7 +2404,7 @@ void COP_Output::UpdateCombosForSelectedInput(CClassInput *pInput)
 	if (!m_bNoParamEdit)
 	{
 		CComboBox *pParamCombo = (CComboBox *)GetDlgItem(IDC_EDIT_CONN_PARAM);
-		bool bEnable = ((!pInput) || (pInput && (pInput->GetType() != iotVoid)));
+		bool bEnable = ((!pInput) || ((pInput->GetType() != iotVoid)));
 		if (!bEnable)
 		{
 			// Save the param so we can restore it if they switch right back.

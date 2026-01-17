@@ -369,7 +369,7 @@ struct ReplaceTexInfo_t
 	char szReplace[128];
 	int iAction;
 	int nReplaced;
-	int iFindLen;	// strlen(szFind) - for speed
+	intp iFindLen;	// strlen(szFind) - for speed
 	CMapWorld *pWorld;
 	CMapDoc *pDoc;
 	BOOL bMarkOnly;
@@ -612,7 +612,7 @@ void CMapDoc::AssignToGroups()
 	// Get a list of all the groups.
 	//
  	CUtlVector<CMapGroup *> GroupList;
-	int nGroupCount = m_pWorld->GetGroupList(GroupList);
+	intp nGroupCount = m_pWorld->GetGroupList(GroupList);
 
 	//
 	// Assign all loaded objects to their proper groups.
@@ -633,7 +633,7 @@ void CMapDoc::AssignToGroups()
 			CChunkFile::ReadKeyValueInt(pszGroupID, nID);
 
 			MapObjectPair_t pair;
-			for (int i = 0; i < nGroupCount; i++)
+			for (intp i = 0; i < nGroupCount; i++)
 			{
 				CMapGroup *pGroup = GroupList.Element(i);
 				if (pGroup->GetID() == nID)
@@ -653,8 +653,8 @@ void CMapDoc::AssignToGroups()
 	// Remove all the objects that were added to groups from the world, since they are
 	// now children of CMapGroup objects that are already in the world.
 	//
-	int nPairCount = GroupedObjects.Count();
-	for (int i = 0; i < nPairCount; i++)
+	intp nPairCount = GroupedObjects.Count();
+	for (intp i = 0; i < nPairCount; i++)
 	{
 		m_pWorld->RemoveChild(GroupedObjects.Element(i).pObject1);
 		GroupedObjects.Element(i).pObject2->AddChild(GroupedObjects.Element(i).pObject1);
@@ -692,8 +692,8 @@ void CMapDoc::AssignToVisGroups(void)
 		// Assign the object to its visgroups, if any. Visgroup IDs are held
 		// in a temporary keyvalue list that was loaded from the VMF.
 		//
-		int nKeyCount = pChild->GetEditorKeyCount();
-		for (int i = 0; i < nKeyCount; i++)
+		intp nKeyCount = pChild->GetEditorKeyCount();
+		for (intp i = 0; i < nKeyCount; i++)
 		{
 			const char *pszKey = pChild->GetEditorKey(i);
 			if (!stricmp(pszKey, "visgroupid"))
@@ -764,7 +764,7 @@ void CMapDoc::VisGroups_Validate()
 		if (((g_nFileFormatVersion < 100) && (!IsWorldObject(pParent))) ||
 			!VisGroups_ObjectCanBelongToVisGroup(pChild))
 		{
-			int nCount = pChild->GetVisGroupCount();
+			intp nCount = pChild->GetVisGroupCount();
 			if (nCount != 0)
 			{
 				Msg(mwWarning, "'%s', child of '%s', was in visgroups illegally. Removed from visgroups.", pChild->GetDescription(), pParent->GetDescription());
@@ -931,7 +931,7 @@ void CMapDoc::CountGUIDs(void)
 			CMapSolid *pSolid = dynamic_cast<CMapSolid *>(pChild);
 			if (pSolid != NULL)
 			{
-				for (int nFace = 0; nFace < pSolid->GetFaceCount(); nFace++)
+				for (short nFace = 0; nFace < pSolid->GetFaceCount(); nFace++)
 				{
 					CMapFace *pFace = pSolid->GetFace(nFace);
 					int nFaceID = pFace->GetFaceID();
@@ -1169,7 +1169,7 @@ bool CMapDoc::FindEntitiesByNameOrClassName(CMapEntityList &Found, const char *p
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CMapDoc::GetDocumentCount(void)
+intp CMapDoc::GetDocumentCount(void)
 {
 	return s_ActiveDocs.Count();
 }
@@ -1178,7 +1178,7 @@ int CMapDoc::GetDocumentCount(void)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CMapDoc *CMapDoc::GetDocument(int index)
+CMapDoc *CMapDoc::GetDocument(intp index)
 {
 	return s_ActiveDocs.Element(index);
 }
@@ -1591,8 +1591,8 @@ void CMapDoc::BuildAllDetailObjects()
 		CMapSolid *pSolid = dynamic_cast <CMapSolid *> (pChild);
 		if (pSolid != NULL)
 		{
-			int nFaces = pSolid->GetFaceCount();
-			for(int i = 0; i < nFaces; i++)
+			short nFaces = pSolid->GetFaceCount();
+			for(short i = 0; i < nFaces; i++)
 			{
 				CMapFace *pFace = pSolid->GetFace( i );
 				if ( pFace )
@@ -1891,8 +1891,8 @@ bool CMapDoc::IsSelectionEditable( void )
 {
 	bool bResult = true;
 
-	int nCount = m_pSelection->GetCount();
-	for( int i = 0; i < nCount; i++ )
+	intp nCount = m_pSelection->GetCount();
+	for( intp i = 0; i < nCount; i++ )
 	{
 		CMapClass *pObj = m_pSelection->GetList()->Element( i );
 		if ( !pObj->IsEditable() )
@@ -1951,7 +1951,7 @@ bool CMapDoc::CreateNewManifest( void )
 }
 
 
-int CMapDoc::GetClipboardCount( void )
+intp CMapDoc::GetClipboardCount( void )
 {
 	return GetHammerClipboard()->Objects.Count();
 }
@@ -2182,10 +2182,10 @@ void CMapDoc::PopulateInstanceParms( CMapEntity *pEntity )
 
 	PopulateInstanceParms_r( pEntity, m_pWorld->GetChildren(), ParmList );
 
-	for( int i = 0; i < ParmList.Count(); i++ )
+	for( intp i = 0; i < ParmList.Count(); i++ )
 	{
 		bool	bFound = false;
-		for ( int j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
+		for ( auto j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
 		{
 			LPCTSTR	pValue = pEntity->GetKeyValue( j );
 			if ( strnicmp( pValue, ParmList[ i ], strlen( ParmList[ i ] ) ) == 0 )
@@ -2197,12 +2197,12 @@ void CMapDoc::PopulateInstanceParms( CMapEntity *pEntity )
 
 		if ( bFound == false )
 		{
-			int j = 1;
+			intp j = 1;
 			while( 1 )
 			{
 				char tempKey[ 128 ];
 
-				V_sprintf_safe( tempKey, "parm%d", j );
+				V_sprintf_safe( tempKey, "parm%zd", j );
 				if ( pEntity->GetKeyValue( tempKey ) == NULL )
 				{
 					char	tempValue[ MAX_KEYVALUE_LEN ];
@@ -2244,7 +2244,9 @@ void CMapDoc::PopulateInstance( CMapEntity *pEntity )
 
 	CMapEntity *pInstanceParmsEntity = entityList.Element( 0 );
 
-	for ( int i = pInstanceParmsEntity->GetFirstKeyValue(); i != pInstanceParmsEntity->GetInvalidKeyValue(); i = pInstanceParmsEntity->GetNextKeyValue( i ) )
+	for ( auto i = pInstanceParmsEntity->GetFirstKeyValue();
+		  i != pInstanceParmsEntity->GetInvalidKeyValue();
+		  i = pInstanceParmsEntity->GetNextKeyValue( i ) )
 	{
 		LPCTSTR	pKey = pInstanceParmsEntity->GetKey( i );
 		LPCTSTR	pValue = pInstanceParmsEntity->GetKeyValue( i );
@@ -2257,10 +2259,10 @@ void CMapDoc::PopulateInstance( CMapEntity *pEntity )
 				continue;
 			}
 
-			int		len = pos - pValue;
+			intp	len = pos - pValue;
 			bool	bFound = false;
 
-			for ( int j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
+			for ( auto j = pEntity->GetFirstKeyValue(); j != pEntity->GetInvalidKeyValue(); j = pEntity->GetNextKeyValue( j ) )
 			{
 				LPCTSTR	pInstanceKey = pEntity->GetKey( j );
 				LPCTSTR	pInstanceValue = pEntity->GetKeyValue( j );
@@ -2274,12 +2276,12 @@ void CMapDoc::PopulateInstance( CMapEntity *pEntity )
 
 			if ( bFound == false )
 			{
-				int j = 1;
+				intp j = 1;
 				while( 1 )
 				{
 					char tempKey[ MAX_KEYVALUE_LEN ];
 
-					V_sprintf_safe( tempKey, "replace%02d", j );
+					V_sprintf_safe( tempKey, "replace%02zd", j );
 					if ( pEntity->GetKeyValue( tempKey ) == NULL )
 					{
 						char	tempValue[ MAX_KEYVALUE_LEN ];
@@ -2664,8 +2666,8 @@ void CMapDoc::DeleteContents(void)
 //-----------------------------------------------------------------------------
 CVisGroup *CMapDoc::VisGroups_GroupForID(DWORD id)
 {
-	int nCount = m_VisGroups->Count();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = m_VisGroups->Count();
+	for (intp i = 0; i < nCount; i++)
 	{
 		CVisGroup *pGroup = m_VisGroups->Element(i);
 		if (pGroup->GetID() == id)
@@ -2678,8 +2680,8 @@ CVisGroup *CMapDoc::VisGroups_GroupForID(DWORD id)
 
 CVisGroup *CMapDoc::VisGroups_GroupForName( const char *pszName, bool bIsAuto )
 {
-	int nCount = m_VisGroups->Count();
-	for ( int i = 0; i < nCount; i++ )
+	intp nCount = m_VisGroups->Count();
+	for ( intp i = 0; i < nCount; i++ )
 	{
 		CVisGroup *pGroup = m_VisGroups->Element(i);
 		if ( !Q_stricmp( pGroup->GetName(), pszName ) && ( pGroup->IsAutoVisGroup() == bIsAuto )  )
@@ -2697,7 +2699,7 @@ CVisGroup *CMapDoc::VisGroups_GroupForName( const char *pszName, bool bIsAuto )
 //-----------------------------------------------------------------------------
 void CMapDoc::ShowNewVisGroupsDialog(CMapObjectList &Objects, bool bUnselectObjects)
 {
-	int nCount = Objects.Count();
+	intp nCount = Objects.Count();
 	if (!nCount)
 	{
 		return;
@@ -2707,7 +2709,7 @@ void CMapDoc::ShowNewVisGroupsDialog(CMapObjectList &Objects, bool bUnselectObje
 	// Let the user input a name for the new visgroup.
 	//
 	CString str;
-	str.Format("%d object%s", nCount, nCount == 1 ? "" : "s");
+	str.Format("%zd object%s", nCount, nCount == 1 ? "" : "s");
 	CNewVisGroupDlg dlg(str);
 	if (dlg.DoModal() == IDCANCEL)
 	{
@@ -2844,7 +2846,7 @@ void CMapDoc::VisGroups_SetParent(CVisGroup *pVisGroup, CVisGroup *pNewParent)
 		}
 		else
 		{
-			int nIndex = m_RootVisGroups->Find(pVisGroup);
+			intp nIndex = m_RootVisGroups->Find(pVisGroup);
 			if (nIndex != -1)
 			{
 				 m_RootVisGroups->Remove(nIndex);
@@ -2875,8 +2877,8 @@ void CMapDoc::VisGroups_SetParent(CVisGroup *pVisGroup, CVisGroup *pNewParent)
 void CMapDoc::VisGroups_UpdateForObject(CMapClass *pObject)
 {
 	//Msg("Object: 0x%X is ", pObject);
-	int nVisGroupCount = pObject->GetVisGroupCount();
-	for (int i = 0; i < nVisGroupCount; i++)
+	intp nVisGroupCount = pObject->GetVisGroupCount();
+	for (intp i = 0; i < nVisGroupCount; i++)
 	{
 		CVisGroup *pGroup = pObject->GetVisGroup(i);
 		VisGroupState_t eVisState = pGroup->GetVisible();
@@ -2929,8 +2931,8 @@ void CMapDoc::VisGroups_UpdateForObject(CMapClass *pObject)
 //-----------------------------------------------------------------------------
 void CMapDoc::VisGroups_UpdateParents(void)
 {
-	int nVisGroupCount = VisGroups_GetCount();
-	for (int i = 0; i < nVisGroupCount; i++)
+	intp nVisGroupCount = VisGroups_GetCount();
+	for (intp i = 0; i < nVisGroupCount; i++)
 	{
 		CVisGroup *pTempGroup = VisGroups_GetVisGroup(i);
 		if ( pTempGroup->GetVisible() != VISGROUP_UNDEFINED && pTempGroup->GetParent() != NULL )
@@ -2954,8 +2956,8 @@ void CMapDoc::VisGroups_UpdateAll(void)
 	// can update the visibility state of all visgroups while we
 	// hide and show the member objects.
 	//
-	int nVisGroupCount = VisGroups_GetCount();
-	for (int i = 0; i < nVisGroupCount; i++)
+	intp nVisGroupCount = VisGroups_GetCount();
+	for (intp i = 0; i < nVisGroupCount; i++)
 	{
 		CVisGroup *pTempGroup = VisGroups_GetVisGroup(i);
 		pTempGroup->SetVisible(VISGROUP_UNDEFINED);
@@ -2982,7 +2984,7 @@ void CMapDoc::VisGroups_UpdateAll(void)
 	//
 	// Look for visgroups still set as undefined -- these are empty.
 	//
-	for (int i = nVisGroupCount - 1; i >= 0; i--)
+	for (intp i = nVisGroupCount - 1; i >= 0; i--)
 	{
 		CVisGroup *pTempGroup = VisGroups_GetVisGroup(i);
 		Assert(pTempGroup->GetVisible() != VISGROUP_UNDEFINED);
@@ -3694,7 +3696,7 @@ void CMapDoc::UpdateStatusbar(void)
 	CString str;
 	if ( m_pSelection )
 	{
-		int nCount = m_pSelection->GetCount();
+		intp nCount = m_pSelection->GetCount();
 		switch (nCount)
 		{
 		case 0:
@@ -3738,7 +3740,7 @@ void CMapDoc::UpdateStatusbar(void)
 
 		default:
 			{
-				str.Format("%d objects selected.", nCount);
+				str.Format("%zd objects selected.", nCount);
 				break;
 			}
 		}
@@ -4289,8 +4291,8 @@ void CMapDoc::OnEditToEntity(void)
 			//
 			// Add visgroups from the solid to the new entity.
 			//
-			int nVisGroupCount = pObject->GetVisGroupCount();
-			for (int nVisGroup = 0; nVisGroup < nVisGroupCount; nVisGroup++)
+			intp nVisGroupCount = pObject->GetVisGroupCount();
+			for (intp nVisGroup = 0; nVisGroup < nVisGroupCount; nVisGroup++)
 			{
 				CVisGroup *pVisGroup = pObject->GetVisGroup(nVisGroup);
 
@@ -4395,14 +4397,14 @@ void CMapDoc::OnEditToWorld(void)
 				//
 				// Move the entity's former solid children to the world.
 				//
-				int nChildCount = ChildList.Count();
-				for (int i = 0; i < nChildCount; i++)
+				intp nChildCount = ChildList.Count();
+				for (intp i = 0; i < nChildCount; i++)
 				{
 					CMapClass *pChild = ChildList.Element(i);
 
 					m_pWorld->AddChild(pChild);
-					int nVisGroupCount = pEntity->GetVisGroupCount();
-					for (int nVisGroup = 0; nVisGroup < nVisGroupCount; nVisGroup++)
+					intp nVisGroupCount = pEntity->GetVisGroupCount();
+					for (intp nVisGroup = 0; nVisGroup < nVisGroupCount; nVisGroup++)
 					{
 						CVisGroup *pVisGroup = pEntity->GetVisGroup(nVisGroup);
 
@@ -5287,15 +5289,15 @@ void CMapDoc::OnToolsUngroup(void)
 		//
 		// Move the group's former children to the group's parent.
 		//
-		int nChildCount = ChildList.Count();
-		for (int i = 0; i < nChildCount; i++)
+		intp nChildCount = ChildList.Count();
+		for (intp i = 0; i < nChildCount; i++)
 		{		
 			CMapClass *pChild = ChildList.Element(i);
 
 			pobj->GetParent()->AddChild(pChild);
 			
-			int nVisGroupCount = pobj->GetVisGroupCount();
-			for (int nVisGroup = 0; nVisGroup < nVisGroupCount; nVisGroup++)
+			intp nVisGroupCount = pobj->GetVisGroupCount();
+			for (intp nVisGroup = 0; nVisGroup < nVisGroupCount; nVisGroup++)
 			{
 				CVisGroup *pVisGroup = pobj->GetVisGroup(nVisGroup);
 				pChild->AddVisGroup(pVisGroup);
@@ -6255,7 +6257,7 @@ void CMapDoc::UpdateForApplicator(BOOL bApplicator)
 //			iFace - 
 //			cmd - 
 //-----------------------------------------------------------------------------
-void CMapDoc::SelectFace(CMapSolid *pSolid, int iFace, int cmd)
+void CMapDoc::SelectFace(CMapSolid *pSolid, short iFace, int cmd)
 {
 	bool bFirst = true;
 	if(iFace == -1 && pSolid)
@@ -6264,8 +6266,8 @@ void CMapDoc::SelectFace(CMapSolid *pSolid, int iFace, int cmd)
 		bool bDispSolidMask = CMapDoc::GetActiveMapDoc()->IsDispSolidDrawMask() && pSolid->HasDisp();
 
 		// select entire object
-		int nFaces = pSolid->GetFaceCount();
-		for(int i = 0; i < nFaces; i++)
+		short nFaces = pSolid->GetFaceCount();
+		for(short i = 0; i < nFaces; i++)
 		{
 			if ( bDispSolidMask )
 			{
@@ -7216,7 +7218,7 @@ void CMapDoc::OnLogicalMoveBlock(void)
 	GetHistory()->Keep( pSelList );
 
 	// Lay out in a squarish region that has the same center as the current one
-	int nCount = pSelList->Count();
+	intp nCount = pSelList->Count();
 	int nDim = sqrt( (float)nCount );
 	if ( nDim * nDim < nCount )
 	{
@@ -7377,20 +7379,20 @@ void CMapDoc::AddConnectedNodes( CMapClass *pObject, CUtlRBTree< CMapClass*, uns
 void CMapDoc::OnLogicalSelectAllConnected(void)
 {
 	const CMapObjectList *pSelList = m_pSelection->GetList();
-	int nSelected = pSelList->Count();
+	intp nSelected = pSelList->Count();
 	if ( nSelected )
 	{
 		GetHistory()->MarkUndoPosition( pSelList, "Select All Connected" );
 
 		CUtlRBTree< CMapClass*, unsigned short > visited( 0, 0, DefLessFunc( CMapClass* ) );
 
-		for ( int i = 0; i < nSelected; ++i )
+		for ( intp i = 0; i < nSelected; ++i )
 		{
 			CMapClass *pMapClass = pSelList->Element(i);
 			AddConnectedNodes( pMapClass, visited );
 		}
 
-		for ( unsigned short h = visited.FirstInorder(); h != visited.InvalidIndex(); h = visited.NextInorder(h) )
+		for ( auto h = visited.FirstInorder(); h != visited.InvalidIndex(); h = visited.NextInorder(h) )
 		{
 			SelectObject( visited[h], scSelect );
 		}
@@ -7416,8 +7418,8 @@ BOOL CMapDoc::OnViewHideObjects(UINT nID)
 	CMapObjectList Objects;
 	GetChildrenToHide(m_pWorld, bSelected, Objects);
 	
-	int nOriginalCount = Objects.Count();
-	for (int pos = Objects.Count()-1; pos>=0; pos --)
+	intp nOriginalCount = Objects.Count();
+	for (intp pos = Objects.Count()-1; pos>=0; pos --)
 	{
 		CMapClass *pObject = Objects.Element(pos);
 		if (!VisGroups_ObjectCanBelongToVisGroup(pObject))
@@ -7425,7 +7427,7 @@ BOOL CMapDoc::OnViewHideObjects(UINT nID)
 			Objects.Remove(pos);
 		}
 	}
-	int nFinalCount = Objects.Count();
+	intp nFinalCount = Objects.Count();
 
 	//
 	// If no eligible selected objects were found, exit.
@@ -7668,8 +7670,8 @@ void CMapDoc::OnMapEntityGallery(void)
 
 		CString str;
 
-		int nCount = pGD->GetClassCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = pGD->GetClassCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			GDclass *pc = pGD->GetClass(i);
 			if (!pc->IsBaseClass())
@@ -7925,9 +7927,9 @@ void CMapDoc::OnInsertprefabOriginal(void)
 static char * FindInString(char *pszSub, char *pszMain)
 {
 	char *p = pszMain;
-	int nSub = strlen(pszSub);
+	size_t nSub = strlen(pszSub);
 	
-	char ch1 = toupper(pszSub[0]);
+	int ch1 = toupper(pszSub[0]);
 
 	while(p[0])
 	{
@@ -7957,11 +7959,11 @@ static BOOL ReplaceTexFunc(CMapSolid *pSolid, ReplaceTexInfo_t *pInfo)
 		return TRUE;
 	}
 
-	int nFaces = pSolid->GetFaceCount();
+	short nFaces = pSolid->GetFaceCount();
 	char *p;
 	BOOL bSaved = FALSE;
 	BOOL bMarkOnly = pInfo->bMarkOnly;
-	for(int i = 0; i < nFaces; i++)
+	for(short i = 0; i < nFaces; i++)
 	{
 		CMapFace *pFace = pSolid->GetFace(i);
 		char *pszFaceTex = pFace->texture.texture;
@@ -8174,8 +8176,8 @@ static BOOL BatchReplaceTextureCallback( CMapSolid *solid, BatchReplaceTextures_
 { 
 	char szCurrentTexture[MAX_PATH];
 
-	const int numFaces = solid->GetFaceCount();
-	for( int i = 0; i < numFaces; i++ )
+	const short numFaces = solid->GetFaceCount();
+	for( short i = 0; i < numFaces; i++ )
 	{
 		CMapFace *face = solid->GetFace( i );
 		face->GetTextureName( szCurrentTexture );
@@ -9241,8 +9243,8 @@ CVisGroup *CMapDoc::GetRootAutoVisGroup()
 {
 	// Find the 'auto' visgroup
 	CVisGroup *pFoundVisGroup = NULL;
-	int nVisGroupCount = VisGroups_GetRootCount();
-	for ( int i = 0; i < nVisGroupCount; ++i )
+	intp nVisGroupCount = VisGroups_GetRootCount();
+	for ( intp i = 0; i < nVisGroupCount; ++i )
 	{
 		CVisGroup *pVisGroup = VisGroups_GetRootVisGroup(i);
 		if ( !Q_stricmp( "Auto", pVisGroup->GetName() ) )
@@ -9350,7 +9352,7 @@ void CMapDoc::AddToAutoVisGroup( CMapClass *pObject )
 
 		bool bWaterAdded = false;
 	
-		for ( int i = 0; i < pMapSolid->GetFaceCount(); i++ )
+		for ( short i = 0; i < pMapSolid->GetFaceCount(); i++ )
 		{
 			//this check will ensure that an object with a water material on multiple faces will only be added once
 			if ( !bWaterAdded )
@@ -9578,8 +9580,8 @@ void CMapDoc::RemoveFromAutoVisGroups( CMapClass *pObject )
 		return;
 
 	bool bChanged = false;
-	int nVisGroupCount = pObject->GetVisGroupCount();
-	for (int nVisGroup = nVisGroupCount - 1; nVisGroup >= 0; nVisGroup--)
+	intp nVisGroupCount = pObject->GetVisGroupCount();
+	for (intp nVisGroup = nVisGroupCount - 1; nVisGroup >= 0; nVisGroup--)
 	{
 		CVisGroup *pVisGroup = pObject->GetVisGroup(nVisGroup);
 
@@ -10472,7 +10474,7 @@ bool CMapDoc::VisGroups_CanMoveDown(CVisGroup *pGroup)
 	}
 	else
 	{
-		int nIndex = m_RootVisGroups->Find(pGroup);
+		intp nIndex = m_RootVisGroups->Find(pGroup);
 		return (nIndex >= 0) && (nIndex < m_RootVisGroups->Count() - 1);
 	}
 }
@@ -10499,7 +10501,7 @@ BOOL CMapDoc::VisGroups_CheckForGroupCallback(CMapClass *pObject, CVisGroup *pGr
 //-----------------------------------------------------------------------------
 // Purpose: Returns the number of visgroups in this document.
 //-----------------------------------------------------------------------------
-int CMapDoc::VisGroups_GetCount(void)
+intp CMapDoc::VisGroups_GetCount(void)
 {
 	return(m_VisGroups->Count());
 }
@@ -10508,7 +10510,7 @@ int CMapDoc::VisGroups_GetCount(void)
 //-----------------------------------------------------------------------------
 // Purpose: Returns a visgroup by index.
 //-----------------------------------------------------------------------------
-CVisGroup *CMapDoc::VisGroups_GetVisGroup(int nIndex)
+CVisGroup *CMapDoc::VisGroups_GetVisGroup(intp nIndex)
 {
 	return(m_VisGroups->Element(nIndex));
 }
@@ -10517,7 +10519,7 @@ CVisGroup *CMapDoc::VisGroups_GetVisGroup(int nIndex)
 //-----------------------------------------------------------------------------
 // Purpose: Returns the number of root-level visgroups in this document.
 //-----------------------------------------------------------------------------
-int CMapDoc::VisGroups_GetRootCount(void)
+intp CMapDoc::VisGroups_GetRootCount(void)
 {
 	if ( m_RootVisGroups )
 	{
@@ -10531,7 +10533,7 @@ int CMapDoc::VisGroups_GetRootCount(void)
 //-----------------------------------------------------------------------------
 // Purpose: Returns a root-level visgroup by index.
 //-----------------------------------------------------------------------------
-CVisGroup *CMapDoc::VisGroups_GetRootVisGroup(int nIndex)
+CVisGroup *CMapDoc::VisGroups_GetRootVisGroup(intp nIndex)
 {
 	return(m_RootVisGroups->Element(nIndex));
 }
@@ -10550,7 +10552,7 @@ void CMapDoc::VisGroups_MoveUp(CVisGroup *pGroup)
 	}
 	else
 	{
-		int nIndex = m_RootVisGroups->Find(pGroup);
+		intp nIndex = m_RootVisGroups->Find(pGroup);
 		if (nIndex > 0)
 		{
 			m_RootVisGroups->Remove(nIndex);
@@ -10573,7 +10575,7 @@ void CMapDoc::VisGroups_MoveDown(CVisGroup *pGroup)
 	}
 	else
 	{
-		int nIndex = m_RootVisGroups->Find(pGroup);
+		intp nIndex = m_RootVisGroups->Find(pGroup);
 		if (nIndex < (m_RootVisGroups->Count() - 1))
 		{
 			m_RootVisGroups->Remove(nIndex);
@@ -10590,8 +10592,8 @@ void CMapDoc::VisGroups_PurgeGroups(void)
 {
 	bool bUpdate = false;
 
-	int nCount = VisGroups_GetCount();
-	for (int i = nCount - 1; i >= 0; i--)
+	intp nCount = VisGroups_GetCount();
+	for (intp i = nCount - 1; i >= 0; i--)
 	{
 		CVisGroup *pGroup = VisGroups_GetVisGroup(i);
 
@@ -10754,8 +10756,8 @@ ChunkFileResult_t CMapDoc::VisGroups_SaveVMF(CChunkFile *pFile, CSaveInfo *pSave
 	if (eResult == ChunkFile_Ok)
 	{
 		// Save the root level visgroups; children are saved recursively.
-		int nCount = VisGroups_GetRootCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = VisGroups_GetRootCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			CVisGroup *pVisGroup = this->VisGroups_GetRootVisGroup(i);
 			if ( pVisGroup != NULL && !pVisGroup->IsAutoVisGroup() && strcmp( pVisGroup->GetName(), "Auto" ) )
@@ -11056,8 +11058,8 @@ void CMapDoc::OnAbortLightCalculation()
 //-----------------------------------------------------------------------------
 bool CMapDoc::FindNotification(CMapClass *pObject, Notify_Dependent_t eNotifyType)
 {
-	int nCount = m_NotifyList.Count();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = m_NotifyList.Count();
+	for (intp i = 0; i < nCount; i++)
 	{
 		if ((m_NotifyList.Element(i).pObject->m_pObject == pObject) &&
 			(m_NotifyList.Element(i).eNotifyType == eNotifyType))
@@ -11072,8 +11074,8 @@ bool CMapDoc::FindNotification(CMapClass *pObject, Notify_Dependent_t eNotifyTyp
 
 bool CMapDoc::AnyNotificationsForObject(CMapClass *pObject)
 {
-	int nCount = m_NotifyList.Count();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = m_NotifyList.Count();
+	for (intp i = 0; i < nCount; i++)
 	{
 		if ( m_NotifyList.Element(i).pObject->m_pObject == pObject )
 			return true;
@@ -11126,10 +11128,10 @@ void CMapDoc::ProcessNotifyList()
 {
 	s_bDispatchingNotifications = true;
 
-	int nCount = m_NotifyList.Count();
+	intp nCount = m_NotifyList.Count();
 	if (nCount)
 	{
-		for (int i = 0; i < nCount; i++)
+		for (intp i = 0; i < nCount; i++)
 		{
 			NotifyListEntry_t entry = m_NotifyList.Element(i);
 			if ( entry.pObject->m_pObject )
@@ -11695,7 +11697,7 @@ void CMapDoc::OnInstancingCheckinAll( )
 	CManifest		*pManifest = activeDoc->GetManifest();
 
 	pManifest->m_bDefaultCheckin = true;
-	for( int i = 0; i < pManifest->GetNumMaps(); i++ )
+	for( intp i = 0; i < pManifest->GetNumMaps(); i++ )
 	{
 		CManifestMap	*pManifestMap = pManifest->GetMap( i );
 		pManifestMap->m_bDefaultCheckin = true;
@@ -11805,7 +11807,7 @@ void CMapDoc::OnUpdateInstancingCheckinAll( CCmdUI *pCmdUI )
 		return;
 	}
 
-	for( int i = 0; i < pManifest->GetNumMaps(); i++ )
+	for( intp i = 0; i < pManifest->GetNumMaps(); i++ )
 	{
 		CManifestMap	*pManifestMap = pManifest->GetMap( i );
 		if ( pManifestMap->m_bCheckedOut == true )
@@ -12101,12 +12103,12 @@ bool CMapDoc::QuickHide_IsObjectHidden( CMapClass *pObject )
 //-----------------------------------------------------------------------------
 void CMapDoc::OnQuickHide_CreateVisGroupFromHidden( void )
 {
-	int iQuickHideObjects = m_QuickHideGroup.Count();
+	intp iQuickHideObjects = m_QuickHideGroup.Count();
 
 	if ( iQuickHideObjects > 0 )
 	{
 		CString str;
-		str.Format( "_FromQuickHide(%d)", iQuickHideObjects );
+		str.Format( "_FromQuickHide(%zd)", iQuickHideObjects );
 		VisGroups_CreateNamedVisGroup( m_QuickHideGroup, str, true, false );
 	}
 

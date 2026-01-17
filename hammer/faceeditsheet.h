@@ -87,7 +87,7 @@ public:
 		cfEdgeAlign = 0x10			// align face texture coordinates to 3d view alignment - should be here???
 	};
 
-	void ClickFace( CMapSolid *pSolid, int faceIndex, int cmd, int clickMode = -1 );
+	void ClickFace( CMapSolid *pSolid, short faceIndex, int cmd, int clickMode = -1 );
 	inline void SetClickMode( int mode );
 	inline int GetClickMode( void );
 

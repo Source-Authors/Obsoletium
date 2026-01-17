@@ -366,7 +366,8 @@ class COP_Entity : public CObjectPage, CFilteredComboBox::ICallbacks, public CCo
 										// until the user hits Apply.
 		GDinputvariable *m_pInstanceVar;
 
-		short m_VarMap[GD_MAX_VARIABLES];
+		// dimhotepus: short -> intp.
+		intp m_VarMap[GD_MAX_VARIABLES];
 		
 		CWnd *m_pSmartControl;			// current smartedit control
 		CButton *m_pSmartBrowseButton;

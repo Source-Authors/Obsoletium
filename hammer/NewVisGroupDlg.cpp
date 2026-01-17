@@ -149,8 +149,8 @@ void CNewVisGroupDlg::UpdateGroupList(void)
 	CMapDoc *pDoc = CMapDoc::GetActiveMapDoc();
 	if (pDoc != NULL)
 	{
-		int nCount = pDoc->VisGroups_GetRootCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = pDoc->VisGroups_GetRootCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			CVisGroup *pGroup = pDoc->VisGroups_GetRootVisGroup(i);
 			m_cGroupList.AddVisGroup(pGroup);

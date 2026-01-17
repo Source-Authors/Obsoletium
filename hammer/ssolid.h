@@ -212,7 +212,7 @@ class CSSolid
 		int GetEdgeIndex(const Vector &Point, float fLeniency = 0.0f);
 		int GetEdgeIndex(SSHANDLE v1, SSHANDLE v2);
 		// ditto for face
-		int GetFaceIndex(const Vector &Point, float fLeniency = 0.0f);
+		short GetFaceIndex(const Vector &Point, float fLeniency = 0.0f);
 
 		SSHANDLE GetNewID();
 		void CalcEdgeCenter(CSSEdge *pEdge);

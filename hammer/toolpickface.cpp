@@ -139,8 +139,8 @@ bool CToolPickFace::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2
 				// Only deselect if all the faces in the solid were selected.
 				//
 				bool bAllSelected = true;
-				int nFaceCount = pSolid->GetFaceCount();
-				for (int nFace = 0; nFace < nFaceCount; nFace++)
+				short nFaceCount = pSolid->GetFaceCount();
+				for (short nFace = 0; nFace < nFaceCount; nFace++)
 				{
 					CMapFace *pFace = pSolid->GetFace(nFace);
 					intp nIndex = FindFace(pFace);
@@ -157,7 +157,7 @@ bool CToolPickFace::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2
 				}
 
 				nFaceCount = pSolid->GetFaceCount();
-				for (int nFace = 0; nFace < nFaceCount; nFace++)
+				for (short nFace = 0; nFace < nFaceCount; nFace++)
 				{
 					CMapFace *pFace = pSolid->GetFace(nFace);
 					if (bAllSelected)
@@ -447,7 +447,7 @@ void CToolPickFace::AddToList(CMapFace *pFace, FaceState_t eState)
 // Purpose: 
 // Input  : nIndex - 
 //-----------------------------------------------------------------------------
-void CToolPickFace::RemoveFromList(int nIndex)
+void CToolPickFace::RemoveFromList(intp nIndex)
 {
 	Assert(m_Faces.IsValidIndex(nIndex));
 

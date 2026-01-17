@@ -389,7 +389,7 @@ void CRender3D::RenderFrustum( )
 	CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
 	IMesh* pMesh = pRenderContext->GetDynamicMesh();
 
-	constexpr int numIndices = ssize(indices);
+	constexpr intp numIndices = ssize(indices);
 	CMeshBuilder meshBuilder3D;
 	meshBuilder3D.Begin( pMesh, MATERIAL_LINES, 8, numIndices );
 
@@ -400,7 +400,7 @@ void CRender3D::RenderFrustum( )
 		meshBuilder3D.AdvanceVertex();
 	}
 
-	for ( int i = 0; i < numIndices; ++i )
+	for ( intp i = 0; i < numIndices; ++i )
 	{
 		meshBuilder3D.Index( indices[i] );
 		meshBuilder3D.AdvanceIndex();
@@ -2110,7 +2110,7 @@ void CRender3D::RenderCone( Vector const &vBasePt, Vector const &vTipPt, float f
 	//
 	// delete the faces in the list
 	//
-	for ( int i = 0; i < m_Faces.Count(); i++ )
+	for ( intp i = 0; i < m_Faces.Count(); i++ )
 	{
 		CMapFace *pFace = m_Faces.Element( i );
 		delete pFace;
@@ -2308,14 +2308,14 @@ void CRender3D::RenderPointsAndPortals(void)
 	{
 		PushRenderMode(RENDER_MODE_WIREFRAME);
 
-		int nPFPoints = pDoc->m_PFPoints.Count();
+		intp nPFPoints = pDoc->m_PFPoints.Count();
 		Vector* pPFPoints = pDoc->m_PFPoints.Base();
 		CMeshBuilder meshBuilder3D;
 		CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
 		IMesh* pMesh = pRenderContext->GetDynamicMesh( );
 		meshBuilder3D.Begin( pMesh, MATERIAL_LINE_STRIP, size_cast<int>( nPFPoints - 1 ) );
 
-		for (int i = 0; i < nPFPoints; i++)
+		for (intp i = 0; i < nPFPoints; i++)
 		{
 			meshBuilder3D.Position3f(pPFPoints[i][0], pPFPoints[i][1], pPFPoints[i][2]);
 			meshBuilder3D.Color3ub(255, 0, 0);

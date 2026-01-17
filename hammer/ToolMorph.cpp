@@ -328,9 +328,9 @@ bool CompareMorphHandles(const MORPHHANDLE &mh1, const MORPHHANDLE &mh2)
 //-----------------------------------------------------------------------------
 bool Morph3D::IsSelected(MORPHHANDLE &mh)
 {
-	for (intp i = 0; i < m_SelectedHandles.Count(); i++)
+	for (auto &h : m_SelectedHandles)
 	{
-		if (CompareMorphHandles(m_SelectedHandles[i], mh))
+		if (CompareMorphHandles(h, mh))
 		{
 			return true;
 		}
@@ -1336,8 +1336,8 @@ void Morph3D::RenderSolid3D(CRender3D *pRender, CSSolid *pSolid)
 		IMesh* pMesh = pRenderContext->GetDynamicMesh();
 		CMeshBuilder meshBuilder;
 
-		int nFaceCount = pSolid->GetFaceCount();
-		for (int nFace = 0; nFace < nFaceCount; nFace++)
+		short nFaceCount = pSolid->GetFaceCount();
+		for (short nFace = 0; nFace < nFaceCount; nFace++)
 		{
 			CSSFace *pFace = pSolid->GetFace(nFace);
 

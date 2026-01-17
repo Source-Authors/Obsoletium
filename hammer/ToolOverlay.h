@@ -53,7 +53,7 @@ private:
 	bool		HandleSelection( CMapView *pView, const Vector2D &vPoint );
 	void		OverlaySelection( CMapView3D *pView, UINT nFlags, const Vector2D &vPoint );
 
-	bool		CreateOverlay( CMapSolid *pSolid, ULONG iFace, CMapView3D *pView, Vector2D point );
+	bool		CreateOverlay( CMapSolid *pSolid, short iFace, CMapView3D *pView, Vector2D point );
 	void		InitOverlay( CMapEntity *pEntity, CMapFace *pFace );
 
 	void		OnDrag( Vector const &vecRayStart, Vector const &vecRayEnd, bool bShift );

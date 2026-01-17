@@ -124,7 +124,7 @@ bool CToolOverlay::OnMouseMove3D( CMapView3D *pView, UINT nFlags, const Vector2D
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool CToolOverlay::CreateOverlay( CMapSolid *pSolid, ULONG iFace, CMapView3D *pView, Vector2D point )
+bool CToolOverlay::CreateOverlay( CMapSolid *pSolid, short iFace, CMapView3D *pView, Vector2D point )
 {
 	// Build a ray to trace against the face that they clicked on to
 	// find the point of intersection.
@@ -463,8 +463,8 @@ void CToolOverlay::OnDrag( Vector const &vecRayStart, Vector const &vecRayEnd, b
 	Vector vecImpactNormal( 0.0f, 0.0f, 0.0f );
 	CMapFace *pFace = NULL;
 		
-	int nFaceCount = pOverlay->GetFaceCount();
-	int iFace;
+	intp nFaceCount = pOverlay->GetFaceCount();
+	intp iFace;
 	for ( iFace = 0; iFace < nFaceCount; iFace++ )
 	{
 		pFace = pOverlay->GetFace( iFace );

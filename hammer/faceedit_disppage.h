@@ -46,7 +46,7 @@ public:
 	CFaceEditDispPage();
 	~CFaceEditDispPage();
 
-	void ClickFace( CMapSolid *pSolid, int faceIndex, int cmd, int clickMode = -1 );	// primary interface update call
+	void ClickFace( CMapSolid *pSolid, short faceIndex, int cmd, int clickMode = -1 );	// primary interface update call
 	void Apply( void );
 
 	void UpdateDialogData( void );

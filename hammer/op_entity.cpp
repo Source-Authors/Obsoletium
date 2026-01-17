@@ -1601,7 +1601,7 @@ void COP_Entity::UpdateAnchors()
 	CUtlVector<CAnchorDef> defs;
 	defs.CopyArray( anchorDefs, ARRAYSIZE( anchorDefs ) );
 	
-	for ( int i=0; i < m_SmartControls.Count(); i++ )
+	for ( intp i=0; i < m_SmartControls.Count(); i++ )
 	{
 		defs.AddToTail( CAnchorDef( m_SmartControls[i]->GetSafeHwnd(), k_eSimpleAnchorRightSide ) );
 	}
@@ -3452,7 +3452,7 @@ void COP_Entity::OnPlaySound(void)
 
 	// Now play the sound..
 	SoundType_t type;
-	int nIndex;
+	intp nIndex;
 	if ( g_Sounds.FindSoundByName( filename, &type, &nIndex ) )
 		g_Sounds.Play( type, nIndex );
 }
@@ -4619,7 +4619,7 @@ void COP_Entity::OnCameraDistance(void)
 
 		Vector objectPos;
 		const CMapObjectList *pSelection = pDoc->GetSelection()->GetList();
-		int iSelectionCount = pSelection->Count();
+		intp iSelectionCount = pSelection->Count();
 		if ( iSelectionCount == 1 )
 		{
 			// Only 1 entity selected.. we can just set our SmartControl text and the change will get applied 

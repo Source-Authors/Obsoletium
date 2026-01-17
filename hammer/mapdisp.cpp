@@ -2182,8 +2182,8 @@ void CMapDisp::RenderWalkableSurface( CRender3D *pRender, bool bIsSelected, Sele
 			CalcColor( pRender, false, faceSelectionState, color );
 		}
 		
-		int nVertCount = m_aWalkableVerts.Count();
-		int nIndexCount = m_aWalkableIndices.Count();
+		intp nVertCount = m_aWalkableVerts.Count();
+		intp nIndexCount = m_aWalkableIndices.Count();
 
 		CMeshBuilder meshBuilder;
 		CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
@@ -2191,7 +2191,7 @@ void CMapDisp::RenderWalkableSurface( CRender3D *pRender, bool bIsSelected, Sele
 		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, size_cast<int>(nVertCount), size_cast<int>(nIndexCount) );
 		
 		CoreDispVert_t **ppVerts = m_aWalkableVerts.Base();
-		for (int i = 0; i < nVertCount; ++i )
+		for (intp i = 0; i < nVertCount; ++i )
 		{
 			CoreDispVert_t *pVert = ppVerts[i];
 			
@@ -2202,7 +2202,7 @@ void CMapDisp::RenderWalkableSurface( CRender3D *pRender, bool bIsSelected, Sele
 		}
 		
 		unsigned short *pIndex = m_aWalkableIndices.Base();
-		for ( int i = 0; i < nIndexCount; ++i )
+		for ( intp i = 0; i < nIndexCount; ++i )
 		{
 			meshBuilder.Index( pIndex[i] );
 			meshBuilder.AdvanceIndex();
@@ -2231,8 +2231,8 @@ void CMapDisp::RenderWalkableSurface( CRender3D *pRender, bool bIsSelected, Sele
 			CalcColor( pRender, false, faceSelectionState, color );
 		}
 		
-		int nVertCount = m_aWalkableVerts.Count();
-		int nIndexCount = m_aForcedWalkableIndices.Count();
+		intp nVertCount = m_aWalkableVerts.Count();
+		intp nIndexCount = m_aForcedWalkableIndices.Count();
 
 		CMeshBuilder meshBuilder;
 		CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
@@ -2240,7 +2240,7 @@ void CMapDisp::RenderWalkableSurface( CRender3D *pRender, bool bIsSelected, Sele
 		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, size_cast<int>(nVertCount), size_cast<int>(nIndexCount) );
 		
 		CoreDispVert_t **ppVerts = m_aWalkableVerts.Base();
-		for (int i = 0; i < nVertCount; ++i )
+		for (intp i = 0; i < nVertCount; ++i )
 		{
 			CoreDispVert_t *pVert = ppVerts[i];
 			
@@ -2251,7 +2251,7 @@ void CMapDisp::RenderWalkableSurface( CRender3D *pRender, bool bIsSelected, Sele
 		}
 		
 		unsigned short *pIndex = m_aForcedWalkableIndices.Base();
-		for ( int i = 0; i < nIndexCount; ++i )
+		for ( intp i = 0; i < nIndexCount; ++i )
 		{
 			meshBuilder.Index( pIndex[i] );
 			meshBuilder.AdvanceIndex();
@@ -2286,8 +2286,8 @@ void CMapDisp::RenderBuildableSurface( CRender3D *pRender, bool bIsSelected, Sel
 			CalcColor( pRender, false, faceSelectionState, color );
 		}
 		
-		int nVertCount = m_aBuildableVerts.Count();
-		int nIndexCount = m_aBuildableIndices.Count();
+		intp nVertCount = m_aBuildableVerts.Count();
+		intp nIndexCount = m_aBuildableIndices.Count();
 
 		CMeshBuilder meshBuilder;
 		CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
@@ -2295,7 +2295,7 @@ void CMapDisp::RenderBuildableSurface( CRender3D *pRender, bool bIsSelected, Sel
 		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, size_cast<int>(nVertCount), size_cast<int>(nIndexCount) );
 		
 		CoreDispVert_t **ppVerts = m_aBuildableVerts.Base();
-		for (int i = 0; i < nVertCount; ++i )
+		for (intp i = 0; i < nVertCount; ++i )
 		{
 			CoreDispVert_t *pVert = ppVerts[i];
 			
@@ -2306,7 +2306,7 @@ void CMapDisp::RenderBuildableSurface( CRender3D *pRender, bool bIsSelected, Sel
 		}
 		
 		unsigned short *pIndex = m_aBuildableIndices.Base();
-		for ( int i = 0; i < nIndexCount; ++i )
+		for ( intp i = 0; i < nIndexCount; ++i )
 		{
 			meshBuilder.Index( pIndex[i] );
 			meshBuilder.AdvanceIndex();
@@ -2335,8 +2335,8 @@ void CMapDisp::RenderBuildableSurface( CRender3D *pRender, bool bIsSelected, Sel
 			CalcColor( pRender, false, faceSelectionState, color );
 		}
 		
-		int nVertCount = m_aBuildableVerts.Count();
-		int nIndexCount = m_aForcedBuildableIndices.Count();
+		intp nVertCount = m_aBuildableVerts.Count();
+		intp nIndexCount = m_aForcedBuildableIndices.Count();
 
 		CMeshBuilder meshBuilder;
 		CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
@@ -2344,7 +2344,7 @@ void CMapDisp::RenderBuildableSurface( CRender3D *pRender, bool bIsSelected, Sel
 		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, size_cast<int>(nVertCount), size_cast<int>(nIndexCount) );
 		
 		CoreDispVert_t **ppVerts = m_aBuildableVerts.Base();
-		for (int i = 0; i < nVertCount; ++i )
+		for (intp i = 0; i < nVertCount; ++i )
 		{
 			CoreDispVert_t *pVert = ppVerts[i];
 			
@@ -2355,7 +2355,7 @@ void CMapDisp::RenderBuildableSurface( CRender3D *pRender, bool bIsSelected, Sel
 		}
 		
 		unsigned short *pIndex = m_aForcedBuildableIndices.Base();
-		for ( int i = 0; i < nIndexCount; ++i )
+		for ( intp i = 0; i < nIndexCount; ++i )
 		{
 			meshBuilder.Index( pIndex[i] );
 			meshBuilder.AdvanceIndex();
@@ -2390,8 +2390,8 @@ void CMapDisp::RenderRemoveSurface( CRender3D *pRender, bool bIsSelected, Select
 			CalcColor( pRender, false, faceSelectionState, color );
 		}
 
-		int nVertCount = m_aRemoveVerts.Count();
-		int nIndexCount = m_aRemoveIndices.Count();
+		intp nVertCount = m_aRemoveVerts.Count();
+		intp nIndexCount = m_aRemoveIndices.Count();
 
 		CMeshBuilder meshBuilder;
 		CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
@@ -2399,7 +2399,7 @@ void CMapDisp::RenderRemoveSurface( CRender3D *pRender, bool bIsSelected, Select
 		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, size_cast<int>(nVertCount), size_cast<int>(nIndexCount) );
 
 		CoreDispVert_t **ppVerts = m_aRemoveVerts.Base();
-		for (int i = 0; i < nVertCount; ++i )
+		for (intp i = 0; i < nVertCount; ++i )
 		{
 			CoreDispVert_t *pVert = ppVerts[i];
 
@@ -2410,7 +2410,7 @@ void CMapDisp::RenderRemoveSurface( CRender3D *pRender, bool bIsSelected, Select
 		}
 
 		unsigned short *pIndex = m_aRemoveIndices.Base();
-		for ( int i = 0; i < nIndexCount; ++i )
+		for ( intp i = 0; i < nIndexCount; ++i )
 		{
 			meshBuilder.Index( pIndex[i] );
 			meshBuilder.AdvanceIndex();

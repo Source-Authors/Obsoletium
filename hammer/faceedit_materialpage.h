@@ -56,7 +56,7 @@ public:
 	//
 	// Update
 	//
-	void ClickFace( CMapSolid *pSolid, int faceIndex, int cmd, int clickMode = -1 );	// primary interface update call
+	void ClickFace( CMapSolid *pSolid, short faceIndex, int cmd, int clickMode = -1 );	// primary interface update call
 	void Apply( CMapFace *pOnlyFace, int flags );
 
 	void NotifyGraphicsChanged( void );

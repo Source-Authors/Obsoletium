@@ -25,7 +25,7 @@
 #include <tier0/memdbgon.h>
 
 
-CReplaceTexDlg::CReplaceTexDlg(int nSelected, CWnd* pParent /*=NULL*/)
+CReplaceTexDlg::CReplaceTexDlg(intp nSelected, CWnd* pParent /*=NULL*/)
 	: CBaseDlg(CReplaceTexDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CReplaceTexDlg)

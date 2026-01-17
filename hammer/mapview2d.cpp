@@ -157,12 +157,12 @@ void CMapView2D::DrawPointFile( CRender2D *pRender )
 {
 	pRender->SetDrawColor( 255,0,0 );
 
-	int nPFPoints = GetMapDoc()->m_PFPoints.Count();
+	intp nPFPoints = GetMapDoc()->m_PFPoints.Count();
 	Vector* pPFPoints = GetMapDoc()->m_PFPoints.Base();
 
 	pRender->MoveTo( pPFPoints[0] );
 
-	for(int i = 1; i < nPFPoints; i++)
+	for(intp i = 1; i < nPFPoints; i++)
 	{
 		pRender->DrawLineTo( pPFPoints[i] );
 	}

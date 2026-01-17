@@ -209,7 +209,7 @@ void CMapAnimationDlg::OnCreateKeyFrame( void )
 
 	const CMapObjectList *pSelection = pDoc->GetSelection()->GetList();
 	
-	for (int i = 0; i < pSelection->Count(); i++)
+	for (intp i = 0; i < pSelection->Count(); i++)
 	{
 		CMapEntity *ent = dynamic_cast<CMapEntity*>( pSelection->Element( i ) );
 

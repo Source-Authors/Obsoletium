@@ -275,7 +275,7 @@ void CFaceSmoothingDlg::UpdateControls( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CFaceSmoothingDlg::CheckGroupButtons( int *pGroupCounts, int nFaceCount )
+void CFaceSmoothingDlg::CheckGroupButtons( int *pGroupCounts, intp nFaceCount )
 {
 	m_bColorOverride = true;
 

@@ -99,8 +99,8 @@ public:
 	const char* GetDescription() const override;
 	inline bool IsValid( void ) { return( m_bValid ); }
 	inline void SetValid( bool bValid ) { m_bValid = bValid; }
-	void SetTexture( LPCTSTR pszTex, int iFace = -1 );
-	LPCTSTR GetTexture( int iFace = -1 );
+	void SetTexture( LPCTSTR pszTex, short iFace = -1 );
+	LPCTSTR GetTexture( short iFace = -1 );
 	bool HasDisp( void );
 	virtual bool IsSolid( ) { return true; }
 
@@ -121,12 +121,12 @@ public:
 	//
 	// face info
 	//
-	inline int GetFaceCount( void ) { return( Faces.GetCount() ); }
-	inline void SetFaceCount( int nFaceCount ) { Faces.SetCount( nFaceCount ); }
-	inline CMapFace *GetFace( int nFace ) { return( &Faces[nFace] ); }		
-	int GetFaceIndex( CMapFace *pFace );	// Returns the index (you could use it with GetFace) or -1 if the face doesn't exist in this solid.
+	inline short GetFaceCount( void ) { return( Faces.GetCount() ); }
+	inline void SetFaceCount( short nFaceCount ) { Faces.SetCount( nFaceCount ); }
+	inline CMapFace *GetFace( short nFace ) { return( &Faces[nFace] ); }		
+	short GetFaceIndex( CMapFace *pFace );	// Returns the index (you could use it with GetFace) or -1 if the face doesn't exist in this solid.
 	void AddFace( CMapFace *pFace );
-	void DeleteFace( int iIndex );
+	void DeleteFace( short iIndex );
 	CMapFace *FindFaceID(int nFaceID);
 
 	//

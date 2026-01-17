@@ -154,7 +154,7 @@ protected:
 	static bool ShouldSkipMaterial(const char *pszName, int nFlags);
 
 	// Finds all .VMT files in a particular directory
-	static bool LoadMaterialsInDirectory( char const* pDirectoryName, int nDirectoryNameLen, 
+	static bool LoadMaterialsInDirectory( char const* pDirectoryName, intp nDirectoryNameLen, 
 						IMaterialEnumerator *pEnum, intp nContext, int nFlags );
 
 	// Discovers all .VMT files lying under a particular directory recursively

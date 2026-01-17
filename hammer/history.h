@@ -40,7 +40,8 @@ class CTrackEntry
 
 		void SetKeptChildren(bool bSet);
 
-		inline int GetSize(void) { return(m_nDataSize); }
+		// dimhotepus: int -> size_T
+		inline size_t GetSize(void) const { return(m_nDataSize); }
 
 		void OnRemoveVisGroup(CVisGroup *pGroup);
 	

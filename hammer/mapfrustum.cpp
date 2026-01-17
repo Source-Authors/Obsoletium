@@ -97,7 +97,7 @@ CMapFrustum::CMapFrustum(void)
 //-----------------------------------------------------------------------------
 CMapFrustum::~CMapFrustum(void)
 {
-	for (int i = 0; i < m_Faces.Count(); i++)
+	for (intp i = 0; i < m_Faces.Count(); i++)
 	{
 		CMapFace *pFace = m_Faces.Element(i);
 		delete pFace;

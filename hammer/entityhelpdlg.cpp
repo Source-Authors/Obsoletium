@@ -137,8 +137,8 @@ int CEntityHelpDlg::GetMaxVariableWidth(GDclass *pClass)
 
 	int nWidthMax = 0;
 
-	int nCount = m_pClass->GetVariableCount();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = m_pClass->GetVariableCount();
+	for (intp i = 0; i < nCount; i++)
 	{
 		GDinputvariable *pVar = m_pClass->GetVariableAt(i);
 		int nWidth = GetTextWidth(pVar->GetName(), pDC);
@@ -223,7 +223,7 @@ void CEntityHelpDlg::UpdateHelp(void)
 		//
 		// Keys section.
 		//
-		int nCount = m_pClass->GetVariableCount();
+		intp nCount = m_pClass->GetVariableCount();
 		if (nCount > 0)
 		{
 			//
@@ -268,7 +268,7 @@ void CEntityHelpDlg::UpdateHelp(void)
 		//
 		// Inputs section.
 		//
-		int nInputCount = m_pClass->GetInputCount();
+		intp nInputCount = m_pClass->GetInputCount();
 		if (nInputCount > 0)
 		{
 			//
@@ -312,7 +312,7 @@ void CEntityHelpDlg::UpdateHelp(void)
 		//
 		// Outputs section.
 		//
-		int nOutputCount = m_pClass->GetOutputCount();
+		intp nOutputCount = m_pClass->GetOutputCount();
 		if (nOutputCount > 0)
 		{
 			//
@@ -331,7 +331,7 @@ void CEntityHelpDlg::UpdateHelp(void)
 			//
 			b << size(20);
 
-			for (int i = 0; i < nOutputCount; i++)
+			for (intp i = 0; i < nOutputCount; i++)
 			{
 				CClassOutput *pOutput = m_pClass->GetOutput(i);
 

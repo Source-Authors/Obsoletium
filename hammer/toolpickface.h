@@ -94,7 +94,7 @@ protected:
 	void SelectFace(CMapFace *pFace);
 
 	void AddToList(CMapFace *pFace, FaceState_t eState);
-	void RemoveFromList(int nIndex);
+	void RemoveFromList(intp nIndex);
 
 	void SetEyedropperCursor(void);
 

@@ -80,9 +80,9 @@ void CMapQuadBounds::PresaveWorld(void)
 
 	if (pSolid)
 	{
-		int		nFaces = pSolid->GetFaceCount();
+		short	nFaces = pSolid->GetFaceCount();
 		bool	bFound = false;
-		for (int i = 0; i < nFaces; i++)
+		for (short i = 0; i < nFaces; i++)
 		{
 			//
 			// Look for face with 4 points that isn't no draw

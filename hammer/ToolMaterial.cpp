@@ -151,8 +151,8 @@ bool CToolMaterial::OnRMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2
 			// If they are holding down the shift key, apply to the entire solid.
 			if (bShift)
 			{
-				int nFaces = pSolid->GetFaceCount();
-				for(int i = 0; i < nFaces; i++)
+				short nFaces = pSolid->GetFaceCount();
+				for(short i = 0; i < nFaces; i++)
 				{
 					GetMainWnd()->m_pFaceEditSheet->ClickFace(pSolid, i, cmdFlags, eMode);
 				}

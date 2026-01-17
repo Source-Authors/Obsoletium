@@ -299,14 +299,14 @@ void CRTFBuilder::pop()
 
 void CRTFBuilder::color(COLORREF c)
 {
-	int n (m_colorList.find(c) );
+	intp n (m_colorList.find(c) );
 	m_attr.m_nColorFground= n<0 ? m_colorList.add(c) : n;
 }
 
 
 void CRTFBuilder::backColor(COLORREF c)
 {
-	int n (m_colorList.find(c) )	;
+	intp n (m_colorList.find(c) )	;
 	m_attr.m_nColorBground= n<0 ? m_colorList.add(c) : n;
 }
 

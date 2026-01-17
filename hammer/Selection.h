@@ -54,7 +54,7 @@ public:
 	bool	RemoveInvisibles(); // true if any elements were removed
 	bool	RemoveDead();		// true if any elements were removed
 
-	int		GetCount();
+	intp	GetCount();
 	bool	IsEmpty();
 	bool	IsSelected(CMapClass *pObject);
 	bool	IsAnEntitySelected();
@@ -106,7 +106,7 @@ protected:
 
 	// Hit selection.
 	CMapObjectList	m_HitList; // list of 'hit' object (potential selected object)
-	int				m_iCurHit; // current hit or -1
+	intp			m_iCurHit; // current hit or -1
 
 	
 	

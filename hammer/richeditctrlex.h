@@ -86,8 +86,8 @@ class CTextAttributes
 		CBoolString m_bsStrike;
 
 		int m_nFontNumber;
-		int m_nColorFground;
-		int m_nColorBground;
+		intp m_nColorFground;
+		intp m_nColorBground;
 
 	public:
 
@@ -151,15 +151,15 @@ class CColorList : public list<COLORREF>
 {
 	public:
 
-		int add(COLORREF c)
+		intp add(COLORREF c)
 		{ 
 			push_back(c); 
 			return size() - 1;
 		}
 
-		int find(COLORREF c)
+		intp find(COLORREF c)
 		{
-			int n = 0;
+			intp n = 0;
 			for (iterator i = begin(); i != end(); ++i, ++n)
 			{
 				COLORREF cComp(*i);
@@ -350,7 +350,8 @@ class RICHED_DECL CRTFBuilder
 
 		void write(CRichEditCtrl &);
 
-		int colorCount() const
+		// dimhotepus: int -> size_t
+		size_t colorCount() const
 		{
 			return m_colorList.size();
 		}

@@ -701,7 +701,7 @@ void CMainFrame::OnEditProperties(void)
 //-----------------------------------------------------------------------------
 void CMainFrame::UpdateAllDocViews(DWORD dwCmd)
 {
-	for ( int i=0; i<CMapDoc::GetDocumentCount(); i++ )
+	for ( intp i=0; i<CMapDoc::GetDocumentCount(); i++ )
 	{
 		CMapDoc *pDoc = CMapDoc::GetDocument(i);
 

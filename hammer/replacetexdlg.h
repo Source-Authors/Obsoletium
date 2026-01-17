@@ -21,7 +21,7 @@ class CReplaceTexDlg : public CBaseDlg
 {
 // Construction
 public:
-	CReplaceTexDlg(int, CWnd* pParent = NULL);   // standard constructor
+	CReplaceTexDlg(intp, CWnd* pParent = NULL);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CReplaceTexDlg)
@@ -39,7 +39,7 @@ public:
 	BOOL	m_bRescaleTextureCoordinates;
 	//}}AFX_DATA
 
-	int m_nSelected;
+	intp m_nSelected;
 
 	void DoReplaceTextures();
 

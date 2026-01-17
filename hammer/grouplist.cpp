@@ -764,7 +764,7 @@ int CGroupList::GetCheck(HTREEITEM hItem)
 //-----------------------------------------------------------------------------
 // Purpose: Returns the number of visgroups in the whole tree.
 //-----------------------------------------------------------------------------
-int CGroupList::GetVisGroupCount()
+intp CGroupList::GetVisGroupCount()
 {
 	return m_VisGroups.Count();
 }
@@ -773,7 +773,7 @@ int CGroupList::GetVisGroupCount()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CVisGroup *CGroupList::GetVisGroup(int nIndex)
+CVisGroup *CGroupList::GetVisGroup(intp nIndex)
 {
 	return m_VisGroups.Element(nIndex);
 }
@@ -791,18 +791,18 @@ void CGroupList::UpdateVisGroup(CVisGroup *pVisGroup)
 	}
 }
 
-int CGroupList::GetGroupPairCount(void)
+intp CGroupList::GetGroupPairCount(void)
 {
 	return m_GroupPairs.Count();
 }
 
 void CGroupList::SaveVisGroupExpandStates()
 {
-	for ( int i = 0; i < GetVisGroupCount(); i++ )
+	for ( intp i = 0; i < GetVisGroupCount(); i++ )
 	{
 		CVisGroup *thisGroup = GetVisGroup(i);
 		GroupListPair newPair;
-		for ( int j = 0; j < GetGroupPairCount(); j++ )
+		for ( intp j = 0; j < GetGroupPairCount(); j++ )
 		{
 			GroupListPair thisPair = m_GroupPairs.Element( j );
 			if ( thisGroup == thisPair.pVisGroup )
@@ -826,7 +826,7 @@ void CGroupList::SaveVisGroupExpandStates()
 void CGroupList::RestoreVisGroupExpandStates()
 {
 	ExpandAll();
-	for ( int i = 0; i <  GetGroupPairCount(); i++ )
+	for ( intp i = 0; i <  GetGroupPairCount(); i++ )
 	{
 		GroupListPair thisPair = m_GroupPairs.Element( i );
 		HTREEITEM thisItem = FindVisGroupItem( thisPair.pVisGroup );
