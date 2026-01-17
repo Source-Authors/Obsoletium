@@ -1296,8 +1296,8 @@ bool CMapWorld::FaceID_FaceIDListsToString(OUT_Z_CAP(nSize) char *pszList, intp 
 		{
 			int nFace = pFullFaceIDList->Element(i);
 
-			char szID[64];
-			itoa(nFace, szID, 10);
+			char szID[16];
+			V_to_chars(szID, nFace);
 			if (!EnsureTrailingChar(pszList, ' ', nSize) || !AppendString(pszList, szID, nSize))
 			{
 				return(false);
@@ -1323,8 +1323,8 @@ bool CMapWorld::FaceID_FaceIDListsToString(OUT_Z_CAP(nSize) char *pszList, intp 
 			{
 				int nFace = pPartialFaceIDList->Element(i);
 
-				char szID[64];
-				itoa(nFace, szID, 10);
+				char szID[16];
+				V_to_chars(szID, nFace);
 				if (!bFirst)
 				{
 					if (!EnsureTrailingChar(pszList, ' ', nSize))
@@ -1375,8 +1375,8 @@ bool CMapWorld::FaceID_FaceListsToString(OUT_Z_CAP(nSize) char *pszList, intp nS
 		{
 			CMapFace *pFace = pFullFaceList->Element(i);
 
-			char szID[64];
-			itoa(pFace->GetFaceID(), szID, 10);
+			char szID[16];
+			V_to_chars(szID, pFace->GetFaceID());
 			if (!EnsureTrailingChar(pszList, ' ', nSize) || !AppendString(pszList, szID, nSize))
 			{
 				return(false);
@@ -1402,8 +1402,8 @@ bool CMapWorld::FaceID_FaceListsToString(OUT_Z_CAP(nSize) char *pszList, intp nS
 			{
 				CMapFace *pFace = pPartialFaceList->Element(i);
 
-				char szID[64];
-				itoa(pFace->GetFaceID(), szID, 10);
+				char szID[16];
+				V_to_chars(szID, pFace->GetFaceID());
 				if (!bFirst)
 				{
 					if (!EnsureTrailingChar(pszList, ' ', nSize))

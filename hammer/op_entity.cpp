@@ -3522,7 +3522,8 @@ void COP_Entity::OnBrowse(void)
 		{
 			// model was changed
 			m_pSmartControl->SetWindowText( szCurrentModel );
-			UpdateKeyValue("skin", itoa( nSkin, szCurrentSkin, 10 ));			
+			V_to_chars(szCurrentSkin, nSkin);
+			UpdateKeyValue("skin", szCurrentSkin);
 		}
 		return;
 	}
@@ -4627,8 +4628,8 @@ void COP_Entity::OnCameraDistance(void)
 			CMapClass *selectedObject = pSelection->Element(iSelectionCount - 1);
 			selectedObject->GetOrigin( objectPos );
 			int distance = VectorLength( cameraPos - objectPos );	
-			char buf[255];
-			itoa( distance, buf, 10 );			
+			char buf[16];
+			V_to_chars( buf, distance );
 			m_pSmartControl->SetWindowText(buf);	
 		}
 		else
@@ -4668,8 +4669,8 @@ void COP_Entity::OnCameraDistance(void)
 
 					pObject->GetOrigin( objectPos );
 					int distance = VectorLength( cameraPos - objectPos );	
-					char buf[255];
-					itoa( distance, buf, 10 );			
+					char buf[16];
+					V_to_chars( buf, distance );
 
 					pEdit->SetKeyValue( pVar->GetName(), buf );
 				}

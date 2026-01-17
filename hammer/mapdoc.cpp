@@ -682,8 +682,8 @@ void CMapDoc::AssignToVisGroups(void)
 			if (pEntity->IsNodeClass() && (pEntity->GetNodeID() == 0))
 			{
 				int nID = GetNextNodeID();
-				char szID[80];
-				itoa(nID, szID, 10);
+				char szID[16];
+				V_to_chars(szID, nID);
 				pEntity->SetKeyValue("nodeid", szID);
 			}
 		}
@@ -6592,7 +6592,7 @@ void CMapDoc::OnToolsHollow(void)
 	//
 	static int iWallWidth = 32;
 	char szBuf[128];
-	itoa(iWallWidth, szBuf, 10);
+	V_to_chars(szBuf, iWallWidth);
 	CStrDlg dlg(CStrDlg::Spin, szBuf, "How thick do you want the walls? Use a negative number to hollow outward.", "Hammer");
 	dlg.SetRange(-1024, 1024, 4);
 	if (dlg.DoModal() == IDCANCEL)

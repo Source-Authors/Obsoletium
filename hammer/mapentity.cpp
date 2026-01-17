@@ -149,8 +149,8 @@ static void ReplaceNodeIDRecursive(CMapClass *pRoot, int nOldNodeID, int nNewNod
 				const char *pszValue = pEntity->GetKeyValue(pVar->GetName());
 				if (pszValue && (atoi(pszValue) == nOldNodeID))
 				{
-					char szValue[100];
-					itoa(nNewNodeID, szValue, 10);
+					char szValue[16];
+					V_to_chars(szValue, nNewNodeID);
 					pEntity->SetKeyValue(pVar->GetName(), szValue);
 				}
 			}
@@ -994,9 +994,9 @@ void CMapEntity::SetClass(LPCTSTR pszClass, bool bLoading)
 //-----------------------------------------------------------------------------
 void CMapEntity::AssignNodeID(void)
 {
-	char szID[80];
+	char szID[16];
 	CMapDoc *pDoc = CMapDoc::GetActiveMapDoc();
-	itoa(pDoc->GetNextNodeID(), szID, 10);
+	V_to_chars(szID, pDoc->GetNextNodeID());
 	SetKeyValue("nodeid", szID);
 }
 

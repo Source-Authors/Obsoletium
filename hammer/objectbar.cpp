@@ -862,7 +862,7 @@ void CObjectBar::OnTextChanged( const char *pSelection )
 	m_FacesSpin.SetRange(size_cast<short>(SolidTypes[nSolidIndex].nFacesMin), size_cast<short>(SolidTypes[nSolidIndex].nFacesMax));
 	m_FacesSpin.SetPos(SolidTypes[nSolidIndex].nFaces);
 	
-	itoa(SolidTypes[nSolidIndex].nFaces, szBuf, 10);
+	V_to_chars(szBuf, SolidTypes[nSolidIndex].nFaces);
 	m_Faces.SetWindowText(szBuf);
 }
 
