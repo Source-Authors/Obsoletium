@@ -39,7 +39,12 @@ public:
 	inline void SetEditControl(CAngleCombo *pEdit);
 
 	// dimhotepus: Add buffer size arg to prevent overflows.
-	char *GetAngleEditText(char *szBuf, ptrdiff_t len);
+	char *GetAngleEditText(OUT_Z_CAP(len) char *szBuf, std::ptrdiff_t len);
+	template<std::ptrdiff_t len>
+	char *GetAngleEditText(OUT_Z_ARRAY char (&szBuf)[len])
+	{
+		return GetAngleEditText(szBuf, len);
+	}
 
 	void Enable(bool bEnable);
 	void Show(bool bShow);

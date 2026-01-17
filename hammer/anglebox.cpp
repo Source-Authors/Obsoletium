@@ -198,7 +198,7 @@ char *CAngleBox::GetAngles(char *szAngles, intp size)
 //			This is used for setting the text in the companion edit control.
 // Input  : szBuf - Buffer to receive string.
 //-----------------------------------------------------------------------------
-char *CAngleBox::GetAngleEditText(char *szBuf, ptrdiff_t len)
+char *CAngleBox::GetAngleEditText(OUT_Z_CAP(len) char *szBuf, ptrdiff_t len)
 {
 	if (len > 0)
 		szBuf[0] = '\0';
@@ -489,7 +489,7 @@ void CAngleBox::UpdateAngleEditText(void)
 	if (m_pEdit)
 	{
 		char szBuf[20];
-		GetAngleEditText(szBuf, ssize(szBuf));
+		GetAngleEditText(szBuf);
 		m_pEdit->SetAnglesInternal(szBuf);
 	}
 }
