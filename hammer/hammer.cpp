@@ -1266,7 +1266,7 @@ int CHammer::StaticInternalMainLoop( void *pParam )
 
 
 int CHammer::InternalMainLoop()
-{	
+{
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	MSG msg;
@@ -1778,16 +1778,16 @@ CDocument* CHammer::OpenDocumentFile(LPCTSTR lpszFileName)
 	}
 
 	if ( pMapDoc->IsAutosave() )
-	{			
+	{
 		char szRenameMessage[MAX_PATH+MAX_PATH+MAX_PATH];
 		CString newMapPath = *pMapDoc->AutosavedFrom();
 
 		V_sprintf_safe( szRenameMessage, "This map was loaded from an autosave file.\n\nWould you like to rename it from \"%s\" to \"%s\"?\n\nNOTE: This will not save the file with the new name; it will only rename it.", lpszFileName, (const char*)newMapPath );
 
 		if ( AfxMessageBox( szRenameMessage, MB_YESNO | MB_ICONQUESTION ) == IDYES )
-		{			
+		{
 			pMapDoc->SetPathName( newMapPath );
-		}			
+		}
 	}
 
 	return pDoc;
@@ -1854,7 +1854,7 @@ void CHammer::LoadSequences(void)
 	char szRootDir[MAX_PATH];
 	char szFullPath[MAX_PATH];
 	APP()->GetDirectory(DIR_PROGRAM, szRootDir);
-	V_MakeAbsolutePath( szFullPath, "CmdSeq.wc", szRootDir ); 
+	V_MakeAbsolutePath( szFullPath, "CmdSeq.wc", szRootDir );
 	std::ifstream file(szFullPath, std::ios::in | std::ios::binary);
 	
 	if(!file.is_open())
@@ -1911,7 +1911,7 @@ void CHammer::SaveSequences(void)
 	char szRootDir[MAX_PATH];
 	char szFullPath[MAX_PATH];
 	APP()->GetDirectory(DIR_PROGRAM, szRootDir);
-	V_MakeAbsolutePath( szFullPath, "CmdSeq.wc", szRootDir ); 
+	V_MakeAbsolutePath( szFullPath, "CmdSeq.wc", szRootDir );
 	std::ofstream file( szFullPath, std::ios::out | std::ios::binary );
 
 	// write header
@@ -2172,7 +2172,7 @@ int CHammer::GetNextAutosaveNumber( CUtlMap<FILETIME, WIN32_FIND_DATA, int> *pFi
 	char szRootDir[MAX_PATH];
 	APP()->GetDirectory(DIR_AUTOSAVE, szRootDir);
 	CString strAutosaveDirectory( szRootDir );
-   
+
 	int nNumberActualAutosaves = 0;
 	int nCurrentAutosaveNumber = 1;
 	int nOldestAutosaveNumber = 1;
@@ -2182,7 +2182,7 @@ int CHammer::GetNextAutosaveNumber( CUtlMap<FILETIME, WIN32_FIND_DATA, int> *pFi
 
 	WIN32_FIND_DATA fileData;
 	DWORD dwTotalAutosaveDirectorySize = 0;
-			
+
 	if ( HANDLE hFile = FindFirstFile( strAutosaveDirectory + "*.vmf_autosave", &fileData );
 		 hFile != INVALID_HANDLE_VALUE )
 	{
