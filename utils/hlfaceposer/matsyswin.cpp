@@ -5,37 +5,37 @@
 //=============================================================================//
 
 #include "MatSysWin.h"
+
 #include <mxtk/mx.h>
 #include <mxtk/mxMessageBox.h>
 #include <mxtk/mxTga.h>
 #include <mxtk/mxPcx.h>
 #include <mxtk/mxBmp.h>
 #include <mxtk/mxMatSysWindow.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <string.h>
+
 #include "MDLViewer.h"
 #include "StudioModel.h"
 #include "ControlPanel.h"
 #include "ViewerSettings.h"
-#include "materialsystem/imaterialsystem.h"
-#include "materialsystem/imaterialproxyfactory.h"
-#include "filesystem.h"
-#include <keyvalues.h>
-#include "materialsystem/imesh.h"
 #include "expressions.h"
 #include "hlfaceposer.h"
 #include "ifaceposersound.h"
-#include "materialsystem/IMaterialSystemHardwareConfig.h"
-#include "materialsystem/itexture.h"
-#include "materialsystem/MaterialSystem_Config.h"
 #include "istudiorender.h"
 #include "choreowidgetdrawhelper.h"
 #include "faceposer_models.h"
+
+#include "materialsystem/IMaterialSystemHardwareConfig.h"
+#include "materialsystem/itexture.h"
+#include "materialsystem/MaterialSystem_Config.h"
+#include "materialsystem/imaterialsystem.h"
+#include "materialsystem/imaterialproxyfactory.h"
+#include "materialsystem/imesh.h"
+
 #include "tier0/icommandline.h"
+#include "tier1/KeyValues.h"
 #include "mathlib/vmatrix.h"
 #include "vstdlib/cvar.h"
+#include "filesystem.h"
 
 IFileSystem *filesystem = NULL;
 
