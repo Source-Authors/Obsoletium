@@ -287,12 +287,12 @@ bool CManifest::LoadSubMaps( CMapFile *pMapFile, const char *pszFileName )
 	pEPair->next = InstanceEntity->epairs;
 	InstanceEntity->epairs = pEPair;
 
-	for( int i = 0; i < m_Maps.Count(); i++ )
+	for( auto *map : m_Maps )
 	{
-		//		if ( m_Maps[ i ]->m_bTopLevelMap == false )
+		//		if ( map->m_bTopLevelMap == false )
 		{
 			char		FileName[ MAX_PATH ];
-			V_sprintf_safe( FileName, "%s%s", m_InstancePath, m_Maps[ i ]->m_RelativeMapFileName );
+			V_sprintf_safe( FileName, "%s%s", m_InstancePath, map->m_RelativeMapFileName );
 
 			InstanceEntity = &pMapFile->entities[ pMapFile->num_entities ];
 			pMapFile->num_entities++;
@@ -315,11 +315,11 @@ bool CManifest::LoadSubMaps( CMapFile *pMapFile, const char *pszFileName )
 			pEPair->next = InstanceEntity->epairs;
 			InstanceEntity->epairs = pEPair;
 
-			pEPair = CreateEPair( "file", m_Maps[ i ]->m_RelativeMapFileName );
+			pEPair = CreateEPair( "file", map->m_RelativeMapFileName );
 			pEPair->next = InstanceEntity->epairs;
 			InstanceEntity->epairs = pEPair;
 
-			if ( m_Maps[ i ]->m_bTopLevelMap == true )
+			if ( map->m_bTopLevelMap == true )
 			{
 				pEPair = CreateEPair( "toplevel", "1" );
 				pEPair->next = InstanceEntity->epairs;
