@@ -188,7 +188,7 @@ static void SetupModelFlexcontrollerLinks( StudioModel *model )
 	if ( hdr->pFlexcontroller( LocalFlexController_t(0) )->localToGlobal != -1 )
 		return;
 
-	for (LocalFlexController_t i = LocalFlexController_t(0); i < hdr->numflexcontrollers(); i++)
+	for (auto i = LocalFlexController_t(0); i < hdr->numflexcontrollers(); i++)
 	{
 		auto j = AddGlobalFlexController( model, hdr->pFlexcontroller( i )->pszName() );
 		hdr->pFlexcontroller( i )->localToGlobal = size_cast<int>( j );
@@ -565,7 +565,7 @@ LocalFlexController_t StudioModel::LookupFlexController( char *szName )
 	if (!pStudioHdr)
 		return LocalFlexController_t(0);
 
-	for (LocalFlexController_t iFlex = LocalFlexController_t(0); iFlex < pStudioHdr->numflexcontrollers(); iFlex++)
+	for (auto iFlex = LocalFlexController_t(0); iFlex < pStudioHdr->numflexcontrollers(); iFlex++)
 	{
 		if (stricmp( szName, pStudioHdr->pFlexcontroller( iFlex )->pszName() ) == 0)
 		{
