@@ -373,7 +373,7 @@ intp StudioModel::SetSequence( intp iSequence )
 	m_prevsequence = m_sequence;
 	m_sequence = iSequence;
 	m_cycle = 0;
-	m_sequencetime = 0.0;
+	m_sequencetime = 0.0f;
 
 	return m_sequence;
 }
