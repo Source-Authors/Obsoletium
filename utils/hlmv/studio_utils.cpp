@@ -16,7 +16,8 @@
 #include "materialsystem/imaterial.h"
 #include "ViewerSettings.h"
 #include "bone_setup.h"
-#include "UtlMemory.h"
+#include "tier1/utldict.h"
+#include "tier1/utlmemory.h"
 #include "mxtk/mx.h"
 #include "filesystem.h"
 #include "IStudioRender.h"
@@ -151,6 +152,58 @@ void StudioModel::operator delete( void *pMem, int nBlockUse, const char *pFileN
 	free( pMem );
 }
 
+static CUtlVector<CUtlSymbol> g_GlobalFlexControllers;
+static CUtlDict<intp, intp> g_GlobalFlexControllerLookup;
+
+//-----------------------------------------------------------------------------
+// Purpose: Accumulates throughout runtime session, oh well
+// Input  : *szName - 
+// Output : int
+//-----------------------------------------------------------------------------
+static intp AddGlobalFlexController( StudioModel *model, const char *szName )
+{
+	auto idx = g_GlobalFlexControllerLookup.Find( szName );
+	if ( idx != g_GlobalFlexControllerLookup.InvalidIndex() )
+	{
+		return g_GlobalFlexControllerLookup[ idx ];
+	}
+
+	CUtlSymbol sym;
+	sym = szName;
+	idx = g_GlobalFlexControllers.AddToTail( sym );
+	g_GlobalFlexControllerLookup.Insert( szName, idx );
+	// Con_Printf( "Added global flex controller %i %s from %s\n", idx, szName, model->GetStudioHdr()->name );
+	return idx;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *model - 
+//-----------------------------------------------------------------------------
+static void SetupModelFlexcontrollerLinks( StudioModel *model )
+{
+	if ( !model )
+		return;
+
+	CStudioHdr *hdr = model->GetStudioHdr();
+	if ( !hdr )
+		return;
+
+	if ( hdr->numflexcontrollers() <= 0 )
+		return;
+
+	// Already set up!!!
+	if ( hdr->pFlexcontroller( LocalFlexController_t(0) )->localToGlobal != -1 )
+		return;
+
+	for (LocalFlexController_t i = LocalFlexController_t(0); i < hdr->numflexcontrollers(); i++)
+	{
+		auto j = AddGlobalFlexController( model, hdr->pFlexcontroller( i )->pszName() );
+		hdr->pFlexcontroller( i )->localToGlobal = size_cast<int>( j );
+		model->SetFlexController( i, 0.0f );
+	}
+}
+
 bool StudioModel::LoadModel( const char *pModelName )
 {
 	MDLCACHE_CRITICAL_SECTION_( g_pMDLCache );
@@ -253,6 +306,8 @@ bool StudioModel::LoadModel( const char *pModelName )
 			}
 		}
 	}
+
+	SetupModelFlexcontrollerLinks(this);
 
 	return true;
 }
@@ -1100,18 +1155,18 @@ void StudioModel::scaleBones (float scale)
 	}	
 }
 
-int	StudioModel::Physics_GetBoneCount( void )
+intp StudioModel::Physics_GetBoneCount( void )
 {
 	return m_pPhysics->Count();
 }
 
 
-const char *StudioModel::Physics_GetBoneName( int index ) 
+const char *StudioModel::Physics_GetBoneName( intp index ) 
 { 
 	CPhysmesh *pmesh = m_pPhysics->GetMesh( index );
 
 	if ( !pmesh )
-		return NULL;
+		return nullptr;
 
 	return pmesh->m_boneName;
 }

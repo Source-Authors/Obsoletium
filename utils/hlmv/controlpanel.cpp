@@ -93,7 +93,7 @@ static bool PopulatePhysicsBoneList( mxChoice* pChoice )
 
 	if ( g_pStudioModel->Physics_GetBoneCount() )
 	{
-		for ( int i = 0; i < g_pStudioModel->Physics_GetBoneCount(); i++ )
+		for ( intp i = 0; i < g_pStudioModel->Physics_GetBoneCount(); i++ )
 		{
 			pChoice->add (g_pStudioModel->Physics_GetBoneName( i ) );
 		}
@@ -3310,7 +3310,7 @@ ControlPanel::initPhysicsBones()
 {
 	cHighlightBone->removeAll();
 	cHighlightBone->add( "None" );
-	for ( int i = 0; i < g_pStudioModel->Physics_GetBoneCount(); i++ )
+	for ( intp i = 0; i < g_pStudioModel->Physics_GetBoneCount(); i++ )
 	{
 		cHighlightBone->add (g_pStudioModel->Physics_GetBoneName( i ) );
 	}

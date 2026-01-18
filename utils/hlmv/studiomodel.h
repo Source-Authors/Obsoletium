@@ -227,8 +227,8 @@ public:
 
 	// Physics
 	void							OverrideBones( bool *override );
-	int								Physics_GetBoneCount( void );
-	const char *					Physics_GetBoneName( int index );
+	intp							Physics_GetBoneCount( void );
+	const char *					Physics_GetBoneName( intp index );
 	int								Physics_GetBoneIndex( const char *pName );
 	void							Physics_GetData( int boneIndex, hlmvsolid_t *psolid, constraint_ragdollparams_t *pConstraint ) const;
 	void							Physics_SetData( int boneIndex, const hlmvsolid_t *psolid, constraint_ragdollparams_t const *pConstraint );
