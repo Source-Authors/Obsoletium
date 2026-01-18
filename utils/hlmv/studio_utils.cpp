@@ -214,10 +214,7 @@ bool StudioModel::LoadModel( const char *pModelName )
 	m_MDLHandle = g_pMDLCache->FindMDL( pModelName );
 
 	// allocate a pool for a studiohdr cache
-	if (m_pStudioHdr != NULL)
-	{
 		delete m_pStudioHdr;
-	}
 	m_pStudioHdr = new CStudioHdr( g_pMDLCache->GetStudioHdr( m_MDLHandle ), g_pMDLCache );
 
 	// manadatory to access correct verts
