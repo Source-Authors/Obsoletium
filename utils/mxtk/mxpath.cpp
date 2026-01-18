@@ -13,13 +13,10 @@
 //
 #include "mxtk/mxpath.h"
 #ifdef WIN32
-#include <windows.h>
+#include "winlite.h"
 #else
-#include <unistd.h"
+#include <unistd.h>
 #endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "tier1/strtools.h"
 

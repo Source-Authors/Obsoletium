@@ -12,17 +12,16 @@
 //                 implied.
 //
 #include "mxtk/mx.h"
+
+#include <commctrl.h>
+#include <shellapi.h>
+
+#include "tier1/utlvector.h"
+#include "tier1/strtools.h"
+
 #include "mxtk/mxwindow.h"
 #include "mxtk/mxevent.h"
 #include "mxtk/mxlinkedlist.h"
-#include <windows.h>
-#include <shellapi.h>
-#include <commctrl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "tier1/utlvector.h"
-#include "tier1/strtools.h"
 
 
 #define WM_MOUSEWHEEL                   0x020A

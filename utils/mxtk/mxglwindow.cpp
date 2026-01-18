@@ -12,8 +12,7 @@
 //                 implied.
 //
 #include "mxtk/mxglwindow.h"
-#include <windows.h>
-//#include <ostream.h"
+#include "winlite.h"
 
 
 

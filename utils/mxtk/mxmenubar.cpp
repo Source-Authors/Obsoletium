@@ -12,8 +12,7 @@
 //                 implied.
 //
 #include "mxtk/mxmenubar.h"
-#include <windows.h>
-#include <string.h>
+#include "winlite.h"
 
 
 

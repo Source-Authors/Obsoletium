@@ -13,7 +13,7 @@
 //
 #include "mxtk/mxtooltip.h"
 #include "mxtk/mxwidget.h"
-#include <windows.h>
+#include "winlite.h"
 #include <commctrl.h>
 
 

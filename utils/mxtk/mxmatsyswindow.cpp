@@ -12,7 +12,7 @@
 //                 implied.
 //
 #include "mxtk/mxmatsyswindow.h"
-#include <windows.h>
+#include "winlite.h"
 
 class mxMatSysWindow_i
 {

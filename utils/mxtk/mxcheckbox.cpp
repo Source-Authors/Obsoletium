@@ -12,7 +12,7 @@
 //                 implied.
 //
 #include "mxtk/mxcheckbox.h"
-#include <windows.h>
+#include "winlite.h"
 
 
 

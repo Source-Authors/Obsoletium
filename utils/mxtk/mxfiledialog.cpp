@@ -13,9 +13,9 @@
 //
 #include "mxtk/mxfiledialog.h"
 #include "mxtk/mxwindow.h"
-#include <windows.h>
+
+#include "winlite.h"
 #include <commdlg.h>
-#include <string.h>
 
 #include "tier1/strtools.h"
 

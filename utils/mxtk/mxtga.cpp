@@ -12,8 +12,8 @@
 //                 implied.
 //
 #include "mxtk/mxtga.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 
 

@@ -12,10 +12,24 @@
 //                 implied.
 //
 #include "mxtk/mxtab.h"
+
+// Prevent tons of unused windows definitions
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
+// Strict types mode.
+#ifndef STRICT
+#define STRICT
+#endif
+
+// Access to Windows 10 features.
+#define _WIN32_WINNT 0x0A00
+
 #include <windows.h>
 #include <commctrl.h>
 
-#include <stdio.h>
+#include <cstdio>
 
 class mxTab_i
 {

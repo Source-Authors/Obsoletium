@@ -12,12 +12,9 @@
 //                 implied.
 //
 #include "mxtk/mxwidget.h"
-#include "tier0/dbg.h"
-#include <windows.h>
+#include "winlite.h"
 #include <commctrl.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include "tier0/dbg.h"
 #include "tier1/strtools.h"
 
 void mxTab_resizeChild (HWND hwnd);

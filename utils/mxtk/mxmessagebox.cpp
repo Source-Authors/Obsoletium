@@ -13,9 +13,8 @@
 //
 #include "mxtk/mxmessagebox.h"
 #include "mxtk/mxwindow.h"
-#include <windows.h>
+#include "winlite.h"
 #include <commdlg.h>
-#include <string.h>
 
 
 

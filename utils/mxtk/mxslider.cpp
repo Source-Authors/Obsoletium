@@ -12,7 +12,7 @@
 //                 implied.
 //
 #include "mxtk/mxslider.h"
-#include <windows.h>
+#include "winlite.h"
 #include <commctrl.h>
 
 

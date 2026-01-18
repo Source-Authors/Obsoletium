@@ -12,7 +12,7 @@
 //                 implied.
 //
 #include "mxtk/mxradiobutton.h"
-#include <windows.h>
+#include "winlite.h"
 
 
 

@@ -12,7 +12,7 @@
 //                 implied.
 //
 #include "mxtk/mxchoice.h"
-#include <windows.h>
+#include "winlite.h"
 
 
 

@@ -12,7 +12,7 @@
 //                 implied.
 //
 #include "mxtk/mxgroupbox.h"
-#include <windows.h>
+#include "winlite.h"
 
 
 
