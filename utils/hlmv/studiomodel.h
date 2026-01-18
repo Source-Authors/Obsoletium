@@ -152,8 +152,8 @@ public:
 	void							ExtractBbox( Vector &mins, Vector &maxs );
 
 	void							SetBlendTime( float blendtime );
-	intp							LookupSequence( const char *szSequence );
-	intp							LookupActivity( const char *szActivity );
+	intp							LookupSequence( const char *szSequence ) const;
+	intp							LookupActivity( const char *szActivity ) const;
 	intp							SetSequence( intp iSequence );
 	intp							SetSequence( const char *szSequence );
 	const char*						GetSequenceName( intp iSequence );

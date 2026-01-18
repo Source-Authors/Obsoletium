@@ -508,7 +508,7 @@ float StudioModel::GetOverlaySequenceWeight( int iLayer )
 }
 
 
-intp StudioModel::LookupSequence( const char *szSequence )
+intp StudioModel::LookupSequence( const char *szSequence ) const
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -524,7 +524,7 @@ intp StudioModel::LookupSequence( const char *szSequence )
 	return -1;
 }
 
-intp StudioModel::LookupActivity( const char *szActivity )
+intp StudioModel::LookupActivity( const char *szActivity ) const
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
