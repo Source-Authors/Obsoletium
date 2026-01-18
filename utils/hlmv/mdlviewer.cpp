@@ -1510,7 +1510,10 @@ void CHLModelViewerApp::PostShutdown()
 int CHLModelViewerApp::Main()
 {
 	g_pMaterialSystem->ModInit();
+	RunCodeAtScopeExit(g_pMaterialSystem->ModShutdown());
+
 	g_pSoundEmitterBase->ModInit();
+	RunCodeAtScopeExit(g_pSoundEmitterBase->ModShutdown());
 
 	// dimhotepus: Double cache size on x86-64.
 #ifdef PLATFORM_64BITS
@@ -1523,6 +1526,8 @@ int CHLModelViewerApp::Main()
 	g_MDLViewer->setMenuBar (g_MDLViewer->getMenuBar ());
 
 	g_pStudioModel->Init();
+	RunCodeAtScopeExit(g_pStudioModel->Shutdown());
+
 	g_pStudioModel->ModelInit();
 	g_pStudioModel->ClearLookTargets( );
 
@@ -1553,9 +1558,6 @@ int CHLModelViewerApp::Main()
 	}
 
 	int nRetVal = mx::run ();
-
-	g_pStudioModel->Shutdown();
-	g_pMaterialSystem->ModShutdown();
 
 	return nRetVal;
 }
