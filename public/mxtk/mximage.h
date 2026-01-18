@@ -104,10 +104,8 @@ public:
 		width = height = bpp = 0;
 	}
 
-private:
-	// NOT IMPLEMENTED
-	mxImage (const mxImage&);
-	mxImage& operator= (const mxImage&);
+	mxImage (const mxImage&) = delete;
+	mxImage& operator= (const mxImage&) = delete;
 };
 
 

@@ -42,10 +42,8 @@ public:
 	// ACCESSORS
 	bool isChecked () const;
 
-private:
-	// NOT IMPLEMENTED
-	mxRadioButton (const mxRadioButton&);
-	mxRadioButton& operator= (const mxRadioButton&);
+	mxRadioButton (const mxRadioButton&) = delete;
+	mxRadioButton& operator= (const mxRadioButton&) = delete;
 };
 
 

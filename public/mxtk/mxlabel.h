@@ -36,10 +36,8 @@ public:
 	mxLabel (mxWindow *parent, int x, int y, int w, int h, const char *label = 0);
 	virtual ~mxLabel ();
 
-private:
-	// NOT IMPLEMENTED
-	mxLabel (const mxLabel&);
-	mxLabel& operator= (const mxLabel&);
+	mxLabel (const mxLabel&) = delete;
+	mxLabel& operator= (const mxLabel&) = delete;
 };
 
 

@@ -101,10 +101,8 @@ public:
 	int getId () const;
 	void *getUserData () const;
 
-private:
-	// NOT IMPLEMENTED
-	mxWidget (const mxWidget&);
-	mxWidget& operator= (const mxWidget&);
+	mxWidget (const mxWidget&) = delete;
+	mxWidget& operator= (const mxWidget&) = delete;
 };
 
 

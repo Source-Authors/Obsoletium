@@ -49,10 +49,8 @@ public:
 	// MANIPULATORS
 	void setDrawFunc (void (*func) (void));
 
-private:
-	// NOT IMPLEMENTED
-	mxMatSysWindow (const mxMatSysWindow&);
-	mxMatSysWindow& operator= (const mxMatSysWindow&);
+	mxMatSysWindow (const mxMatSysWindow&) = delete;
+	mxMatSysWindow& operator= (const mxMatSysWindow&) = delete;
 };
 
 

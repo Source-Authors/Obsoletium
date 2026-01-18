@@ -72,10 +72,8 @@ public:
 
 	static void createAccleratorTable( int numentries, const Accel_t *entries );
 
-private:
-	// NOT IMPLEMENTED
-	mx (const mx&);
-	mx& operator= (const mx&);
+	mx (const mx&) = delete;
+	mx& operator= (const mx&) = delete;
 };
 
 

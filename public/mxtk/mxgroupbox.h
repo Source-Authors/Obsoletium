@@ -36,10 +36,8 @@ public:
 	mxGroupBox (mxWindow *parent, int x, int y, int w, int h, const char *label = 0);
 	virtual ~mxGroupBox ();
 
-private:
-	// NOT IMPLEMENTED
-	mxGroupBox (const mxGroupBox&);
-	mxGroupBox& operator= (const mxGroupBox&);
+	mxGroupBox (const mxGroupBox&) = delete;
+	mxGroupBox& operator= (const mxGroupBox&) = delete;
 };
 
 

@@ -49,10 +49,8 @@ public:
 	// dimhotepus: CS:GO
 	const char *getItemText (int index) const;
 
-private:
-	// NOT IMPLEMENTED
-	mxChoice (const mxChoice&);
-	mxChoice& operator= (const mxChoice&);
+	mxChoice (const mxChoice&) = delete;
+	mxChoice& operator= (const mxChoice&) = delete;
 };
 
 

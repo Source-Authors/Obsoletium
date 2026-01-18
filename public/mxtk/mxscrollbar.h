@@ -50,10 +50,8 @@ public:
 	int getMaxValue () const;
 	int getPagesize () const;
 
-private:
-	// NOT IMPLEMENTED
-	mxScrollbar (const mxScrollbar&);
-	mxScrollbar& operator= (const mxScrollbar&);
+	mxScrollbar (const mxScrollbar&) = delete;
+	mxScrollbar& operator= (const mxScrollbar&) = delete;
 };
 
 

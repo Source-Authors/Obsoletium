@@ -63,10 +63,8 @@ public:
 	void setTimer (int milliSeconds);
 	void setMenuBar (mxMenuBar *menuBar);
 
-private:
-	// NOT IMPLEMENTED
-	mxWindow (const mxWindow&);
-	mxWindow& operator= (const mxWindow&);
+	mxWindow (const mxWindow&) = delete;
+	mxWindow& operator= (const mxWindow&) = delete;
 };
 
 

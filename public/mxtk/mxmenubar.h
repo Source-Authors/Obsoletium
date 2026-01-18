@@ -48,10 +48,8 @@ public:
 	bool isChecked (int id) const;
 	int getHeight () const;
 
-private:
-	// NOT IMPLEMENTED
-	mxMenuBar (const mxMenuBar&);
-	mxMenuBar& operator= (const mxMenuBar&);
+	mxMenuBar (const mxMenuBar&) = delete;
+	mxMenuBar& operator= (const mxMenuBar&) = delete;
 };
 
 

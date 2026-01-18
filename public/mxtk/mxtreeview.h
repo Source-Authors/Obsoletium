@@ -66,11 +66,8 @@ public:
 	bool isSelected (mxTreeViewItem *item) const;
 	mxTreeViewItem *getParent (mxTreeViewItem *item) const;
 
-
-private:
-	// NOT IMPLEMENTED
-	mxTreeView (const mxTreeView&);
-	mxTreeView& operator= (const mxTreeView&);
+	mxTreeView (const mxTreeView&) = delete;
+	mxTreeView& operator= (const mxTreeView&) = delete;
 };
 
 

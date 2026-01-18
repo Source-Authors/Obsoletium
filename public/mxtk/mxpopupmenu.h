@@ -44,10 +44,8 @@ public:
 	bool isEnabled (int id) const;
 	bool isChecked (int id) const;
 
-private:
-	// NOT IMPLEMENTED
-	mxPopupMenu (const mxPopupMenu&);
-	mxPopupMenu& operator= (const mxPopupMenu&);
+	mxPopupMenu (const mxPopupMenu&) = delete;
+	mxPopupMenu& operator= (const mxPopupMenu&) = delete;
 };
 
 

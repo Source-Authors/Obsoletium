@@ -50,10 +50,8 @@ public:
 	// STATIC MANIPULATORS
 	static void setFormat (int mode, unsigned char colorBits, unsigned char depthBits);
 
-private:
-	// NOT IMPLEMENTED
-	mxGlWindow (const mxGlWindow&);
-	mxGlWindow& operator= (const mxGlWindow&);
+	mxGlWindow (const mxGlWindow&) = delete;
+	mxGlWindow& operator= (const mxGlWindow&) = delete;
 };
 
 

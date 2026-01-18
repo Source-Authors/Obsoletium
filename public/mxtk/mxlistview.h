@@ -56,11 +56,8 @@ public:
 
 	void setDrawingEnabled( bool draw );
 
-
-private:
-	// NOT IMPLEMENTED
-	mxListView (const mxListView&);
-	mxListView& operator= (const mxListView&);
+	mxListView (const mxListView&) = delete;
+	mxListView& operator= (const mxListView&) = delete;
 };
 
 #endif // MXLISTVIEW_H

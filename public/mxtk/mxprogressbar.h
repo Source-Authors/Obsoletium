@@ -47,10 +47,8 @@ public:
 	int getValue () const;
 	int getTotalSteps () const;
 
-private:
-	// NOT IMPLEMENTED
-	mxProgressBar (const mxProgressBar&);
-	mxProgressBar& operator= (const mxProgressBar&);
+	mxProgressBar (const mxProgressBar&) = delete;
+	mxProgressBar& operator= (const mxProgressBar&) = delete;
 };
 
 

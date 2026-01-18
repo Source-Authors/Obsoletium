@@ -72,10 +72,8 @@ public:
 	mxEvent () : event (0), widget (0), action (0), width (0), height (0), x (0), y (0), buttons (0), key (0), modifiers (0), flags (0) { szChars[0] = '\0'; }
 	virtual ~mxEvent () {}
 
-private:
-	// NOT IMPLEMENTED
-	mxEvent (const mxEvent&);
-	mxEvent& operator= (const mxEvent&);
+	mxEvent (const mxEvent&) = delete;
+	mxEvent& operator= (const mxEvent&) = delete;
 };
 
 

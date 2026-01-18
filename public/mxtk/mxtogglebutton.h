@@ -42,10 +42,8 @@ public:
 	// ACCESSORS
 	bool isChecked () const;
 
-private:
-	// NOT IMPLEMENTED
-	mxToggleButton (const mxToggleButton&);
-	mxToggleButton& operator= (const mxToggleButton&);
+	mxToggleButton (const mxToggleButton&) = delete;
+	mxToggleButton& operator= (const mxToggleButton&) = delete;
 };
 
 

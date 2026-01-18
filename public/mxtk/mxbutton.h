@@ -38,10 +38,8 @@ public:
 
 	virtual ~mxButton ();
 
-private:
-	// NOT IMPLEMENTED
-	mxButton (const mxButton&);
-	mxButton& operator= (const mxButton&);
+	mxButton (const mxButton&) = delete;
+	mxButton& operator= (const mxButton&) = delete;
 };
 
 

@@ -56,10 +56,8 @@ public:
 	int getLineStep () const;
 	int getPageStep () const;
 
-private:
-	// NOT IMPLEMENTED
-	mxSlider (const mxSlider&);
-	mxSlider& operator= (const mxSlider&);
+	mxSlider (const mxSlider&) = delete;
+	mxSlider& operator= (const mxSlider&) = delete;
 };
 
 

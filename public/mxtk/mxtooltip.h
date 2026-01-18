@@ -30,10 +30,8 @@ public:
 	// MANIPULATORS
 	static void add (mxWidget *widget, const char *text);
 
-private:
-	// NOT IMPLEMENTED
-	mxToolTip (const mxToolTip&);
-	mxToolTip& operator= (const mxToolTip&);
+	mxToolTip (const mxToolTip&) = delete;
+	mxToolTip& operator= (const mxToolTip&) = delete;
 };
 
 

@@ -48,10 +48,9 @@ public:
 	void	clear();
 	void	getText( char *buf, size_t bufsize );
 	void setText( const char *pText );
-private:
-	// NOT IMPLEMENTED
-	mxLineEdit (const mxLineEdit&);
-	mxLineEdit& operator= (const mxLineEdit&);
+
+	mxLineEdit (const mxLineEdit&) = delete;
+	mxLineEdit& operator= (const mxLineEdit&) = delete;
 };
 
 

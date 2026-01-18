@@ -44,10 +44,8 @@ public:
 	// ACCESSORS
 	int getSelectedIndex () const;
 
-private:
-	// NOT IMPLEMENTED
-	mxTab (const mxTab&);
-	mxTab& operator= (const mxTab&);
+	mxTab (const mxTab&) = delete;
+	mxTab& operator= (const mxTab&) = delete;
 };
 
 

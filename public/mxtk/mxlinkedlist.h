@@ -31,9 +31,8 @@ class mxLinkedList
 	mxListNode *d_tail;
 	int d_nodeCount;
 
-	// NOT IMPLEMENTED
-	mxLinkedList (const mxLinkedList&);
-	mxLinkedList& operator= (const mxLinkedList&);
+	mxLinkedList (const mxLinkedList&) = delete;
+	mxLinkedList& operator= (const mxLinkedList&) = delete;
 
 public:
 	//CREATORS

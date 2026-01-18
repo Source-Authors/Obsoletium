@@ -42,10 +42,8 @@ public:
 	// ACCESSORS
 	bool isChecked () const;
 
-private:
-	// NOT IMPLEMENTED
-	mxCheckBox (const mxCheckBox&);
-	mxCheckBox& operator= (const mxCheckBox&);
+	mxCheckBox (const mxCheckBox&) = delete;
+	mxCheckBox& operator= (const mxCheckBox&) = delete;
 };
 
 

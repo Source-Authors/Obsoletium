@@ -57,10 +57,8 @@ public:
 	// dimhotepus: CS:GO
 	int getTopIndex () const;
 
-private:
-	// NOT IMPLEMENTED
-	mxListBox (const mxListBox&);
-	mxListBox& operator= (const mxListBox&);
+	mxListBox (const mxListBox&) = delete;
+	mxListBox& operator= (const mxListBox&) = delete;
 };
 
 
