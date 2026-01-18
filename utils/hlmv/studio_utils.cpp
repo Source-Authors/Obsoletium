@@ -217,7 +217,7 @@ bool StudioModel::LoadModel( const char *pModelName )
 		delete m_pStudioHdr;
 	m_pStudioHdr = new CStudioHdr( g_pMDLCache->GetStudioHdr( m_MDLHandle ), g_pMDLCache );
 
-	// manadatory to access correct verts
+	// mandatory to access correct verts
 	SetCurrentModel();
 
 	m_pPhysics = LoadPhysics( m_MDLHandle );
@@ -325,12 +325,6 @@ bool StudioModel::PostLoadModel( const char *modelname )
 
 	SetSkin (0);
 
-/*
-	Vector mins, maxs;
-	ExtractBbox (mins, maxs);
-	if (mins[2] < 5.0f)
-		m_origin[2] = -mins[2];
-*/
 	return true;
 }
 
@@ -1119,7 +1113,7 @@ void StudioModel::scaleMeshes (float scale)
 		seqdesc.bbmax = tmpmin;
 	}
 
-	// maybe scale exeposition, pivots, attachments
+	// maybe scale exposition, pivots, attachments
 }
 
 
