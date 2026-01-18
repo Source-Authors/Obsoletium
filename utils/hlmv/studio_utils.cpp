@@ -794,7 +794,7 @@ void StudioModel::GetMovement( float prevcycle[5], Vector &vecPos, QAngle &vecAn
   	// assume that changes < -0.5 are loops....
   	if (m_cycle - prevcycle[0] < -0.5f)
   	{
-  		prevcycle[0] = prevcycle[0] - 1.0f;
+		prevcycle[0] -= 1.0f;
   	}
 
 	Studio_SeqMovement( pStudioHdr, m_sequence, prevcycle[0], m_cycle, m_poseparameter, vecPos, vecAngles );
@@ -807,7 +807,7 @@ void StudioModel::GetMovement( float prevcycle[5], Vector &vecPos, QAngle &vecAn
 	{
   		if (m_Layer[i].m_cycle - prevcycle[i+1] < -0.5f)
   		{
-  			prevcycle[i+1] = prevcycle[i+1] - 1.0f;
+			prevcycle[i+1] -= 1.0f;
   		}
 
 		if (m_Layer[i].m_weight > 0.0)
