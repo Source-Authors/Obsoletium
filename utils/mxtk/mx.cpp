@@ -1084,10 +1084,7 @@ mx::quit ()
 			node = g_widgetList->getPrev (node);
 
 			// remove it!
-			if ( widget )
-			{
-				delete widget;
-			}
+			delete widget;
 		}
 
 		delete g_widgetList;

@@ -147,8 +147,7 @@ mxBmpRead (const char *filename)
 	success = true;
 
 GetOut:
-	if (pfile) 
-		fclose (pfile);
+	fclose (pfile);
 
 	// dimhotepus: CS:GO
 	if ( !success )
