@@ -171,23 +171,24 @@ void CVGuiWnd::DrawVGuiPanel()
 
 	pRenderContext->ClearBuffers( true, m_bClearZBuffer );
 
-	g_pMaterialSystem->BeginFrame( 0 );
-
-	// draw from the main panel down
-
-	m_pMainPanel->GetSize( w , h );
-
-	if ( w != rect.right || h != rect.bottom )
 	{
-		m_pMainPanel->SetBounds( 2 + rect.left, 2 + rect.top, rect.right - rect.left - 4, rect.bottom - rect.top - 4 );
-		m_pMainPanel->Repaint();
+		g_pMaterialSystem->BeginFrame( 0 );
+		RunCodeAtScopeExit(g_pMaterialSystem->EndFrame());
+
+		// draw from the main panel down
+
+		m_pMainPanel->GetSize( w , h );
+
+		if ( w != rect.right || h != rect.bottom )
+		{
+			m_pMainPanel->SetBounds( 2 + rect.left, 2 + rect.top, rect.right - rect.left - 4, rect.bottom - rect.top - 4 );
+			m_pMainPanel->Repaint();
+		}
+
+		FaceposerVGui()->Simulate(); 
+
+		vgui::surface()->PaintTraverseEx( m_pMainPanel->GetVPanel(), true );
 	}
-
-	FaceposerVGui()->Simulate(); 
-
-	vgui::surface()->PaintTraverseEx( m_pMainPanel->GetVPanel(), true );
-
-	g_pMaterialSystem->EndFrame();
 
 	g_pMaterialSystem->SwapBuffers();
 

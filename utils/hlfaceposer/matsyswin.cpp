@@ -514,79 +514,83 @@ void MatSysWindow::SuppressBufferSwap( bool bSuppress )
 
 void MatSysWindow::draw ()
 {
-	int i;
-
 	g_pMaterialSystem->BeginFrame( 0 );
-	CUtlVector< StudioModel * > modellist;
-
-	modellist.AddToTail( models->GetActiveStudioModel() );
-
-	if ( models->CountVisibleModels() > 0 )
 	{
-		modellist.RemoveAll();
-		for ( i = 0; i < models->Count(); i++ )
+		RunCodeAtScopeExit(g_pMaterialSystem->EndFrame());
+
+		CUtlVector< StudioModel * > modellist;
+		modellist.AddToTail( models->GetActiveStudioModel() );
+
+		if ( models->CountVisibleModels() > 0 )
 		{
-			if ( models->IsModelShownIn3DView( i ) )
+			modellist.RemoveAll();
+			for ( intp i = 0; i < models->Count(); i++ )
 			{
-				modellist.AddToTail( models->GetStudioModel( i ) );
+				if ( models->IsModelShownIn3DView( i ) )
+				{
+					modellist.AddToTail( models->GetStudioModel( i ) );
+				}
 			}
 		}
-	}
 
-	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
-	pRenderContext->ClearBuffers(true, true);
+		CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
+		pRenderContext->ClearBuffers(true, true);
 
-	int captiony = GetCaptionHeight();
-	int viewh = h2() - captiony;
+		int captiony = GetCaptionHeight();
+		int viewh = h2() - captiony;
 
-	g_pMaterialSystem->SetView( (HWND)getHandle() );
+		g_pMaterialSystem->SetView( (HWND)getHandle() );
 
-	pRenderContext->Viewport( 0, captiony, w2(), viewh );
+		pRenderContext->Viewport( 0, captiony, w2(), viewh );
 
-	pRenderContext->MatrixMode( MATERIAL_PROJECTION );
-	pRenderContext->LoadIdentity( );
-	pRenderContext->PerspectiveX(20.0f, (float)w2() / (float)viewh, 1.0f, 20000.0f);
+		pRenderContext->MatrixMode( MATERIAL_PROJECTION );
+		pRenderContext->LoadIdentity( );
+		pRenderContext->PerspectiveX(20.0f, (float)w2() / (float)viewh, 1.0f, 20000.0f);
 	
-	pRenderContext->MatrixMode( MATERIAL_VIEW );
-	pRenderContext->LoadIdentity( );
-	// FIXME: why is this needed?  Doesn't SetView() override this?
-	pRenderContext->Rotate( -90,  1, 0, 0 );	    // put Z going up
-	pRenderContext->Rotate( -90,  0, 0, 1 );
+		pRenderContext->MatrixMode( MATERIAL_VIEW );
+		pRenderContext->LoadIdentity( );
+		// FIXME: why is this needed?  Doesn't SetView() override this?
+		pRenderContext->Rotate( -90,  1, 0, 0 );	    // put Z going up
+		pRenderContext->Rotate( -90,  0, 0, 1 );
 
-	intp modelcount = modellist.Count();
-	intp countover2 = modelcount / 2;
-	int ydelta = g_pControlPanel->GetModelGap();
-	intp yoffset = -countover2 * ydelta;
-	for ( i = 0 ; i < modelcount; i++ )
-	{
-		modellist[ i ]->IncrementFramecounter( );
+		intp modelcount = modellist.Count();
+		intp countover2 = modelcount / 2;
+		// dimhotepus: int -> float.
+		const float ydelta = g_pControlPanel->GetModelGap();
+		// dimhotepus: int -> float.
+		float yoffset = -countover2 * ydelta;
+		for ( auto *model : modellist )
+		{
+			model->IncrementFramecounter( );
 
-		Vector oldtrans = modellist[ i ]->m_origin;
+			const Vector oldtrans = model->m_origin;
 
-		modellist[ i ]->m_origin[ 1 ] = oldtrans[ 1 ] + yoffset;
-		yoffset += ydelta;
+			model->m_origin[ 1 ] = oldtrans[ 1 ] + yoffset;
+			yoffset += ydelta;
 
-		modellist[ i ]->GetStudioRender()->BeginFrame();
-		modellist[ i ]->DrawModel();
-		modellist[ i ]->GetStudioRender()->EndFrame();
+			{
+				model->GetStudioRender()->BeginFrame();
+				RunCodeAtScopeExit(model->GetStudioRender()->EndFrame());
 
-		modellist[ i ]->m_origin = oldtrans;
-	}
+				model->DrawModel();
+			}
 
-	//
-	// draw ground
-	//
-	if (g_viewerSettings.showGround)
-	{
-		drawFloor ();
+			model->m_origin = oldtrans;
+		}
+
+		//
+		// draw ground
+		//
+		if (g_viewerSettings.showGround)
+		{
+			drawFloor ();
+		}
 	}
 
 	if (!m_bSuppressSwap)
 	{
 		g_pMaterialSystem->SwapBuffers();
 	}
-
-	g_pMaterialSystem->EndFrame();
 }
 
 void MatSysWindow::EnableStickySnapshotMode( )
