@@ -669,13 +669,13 @@ void StudioModel::ExtractBbox( Vector &mins, Vector &maxs )
 		return;
 
 	// look for hull
-	if ( ((Vector)pStudioHdr->hull_min).Length() != 0 )
+	if ( pStudioHdr->hull_min.Length() != 0 )
 	{
 		mins = pStudioHdr->hull_min;
 		maxs = pStudioHdr->hull_max;
 	}
 	// look for view clip
-	else if (((Vector)pStudioHdr->view_bbmin).Length() != 0)
+	else if (pStudioHdr->view_bbmin.Length() != 0)
 	{
 		mins = pStudioHdr->view_bbmin;
 		maxs = pStudioHdr->view_bbmax;
