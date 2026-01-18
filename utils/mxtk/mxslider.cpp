@@ -38,6 +38,8 @@ mxSlider::mxSlider (mxWindow *parent, int x, int y, int w, int h, int id, int st
 		dwStyle = WS_CHILD | WS_VISIBLE | TBS_HORZ;
 	else if (style == Vertical)
 		dwStyle = WS_CHILD | WS_VISIBLE | TBS_VERT;
+	else
+		dwStyle = WS_CHILD | WS_VISIBLE;
 
 	void *handle = (void *) CreateWindowEx (0, TRACKBAR_CLASS, "", dwStyle,
 				x, y, w, h, hwndParent,
