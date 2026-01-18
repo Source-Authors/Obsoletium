@@ -162,9 +162,7 @@ static intp AddGlobalFlexController( StudioModel *model, const char *szName )
 		return g_GlobalFlexControllerLookup[ idx ];
 	}
 
-	CUtlSymbol sym;
-	sym = szName;
-	idx = g_GlobalFlexControllers.AddToTail( sym );
+	idx = g_GlobalFlexControllers.AddToTail( CUtlSymbol{szName} );
 	g_GlobalFlexControllerLookup.Insert( szName, idx );
 	// Con_Printf( "Added global flex controller %i %s from %s\n", idx, szName, model->GetStudioHdr()->name );
 	return idx;
