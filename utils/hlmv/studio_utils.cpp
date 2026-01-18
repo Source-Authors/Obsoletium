@@ -545,8 +545,7 @@ float StudioModel::GetTransitionAmount( void )
 	if ( g_viewerSettings.blendSequenceChanges &&
 		m_sequencetime < m_blendtime && m_prevsequence != m_sequence )
 	{
-		float s;
-		s = ( m_sequencetime / m_blendtime );
+		float s = m_sequencetime / m_blendtime;
 		return s;
 	}
 
