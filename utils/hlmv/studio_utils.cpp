@@ -85,8 +85,8 @@ void StudioModel::RestoreStudioModel()
 //-----------------------------------------------------------------------------
 void StudioModel::FreeModel( bool bReleasing )
 {
-		delete m_pStudioHdr;
-		m_pStudioHdr = NULL;
+	delete m_pStudioHdr;
+	m_pStudioHdr = NULL;
 
 	if ( m_MDLHandle != MDLHANDLE_INVALID )
 	{
@@ -96,9 +96,9 @@ void StudioModel::FreeModel( bool bReleasing )
 
 	if ( !bReleasing )
 	{
-			delete[] m_pModelName;
-			m_pModelName = NULL;
-		}
+		delete[] m_pModelName;
+		m_pModelName = NULL;
+	}
 
 	m_SurfaceProps.Purge();
 
@@ -214,7 +214,7 @@ bool StudioModel::LoadModel( const char *pModelName )
 	m_MDLHandle = g_pMDLCache->FindMDL( pModelName );
 
 	// allocate a pool for a studiohdr cache
-		delete m_pStudioHdr;
+	delete m_pStudioHdr;
 	m_pStudioHdr = new CStudioHdr( g_pMDLCache->GetStudioHdr( m_MDLHandle ), g_pMDLCache );
 
 	// mandatory to access correct verts
@@ -588,7 +588,16 @@ void StudioModel::SetFlexController( LocalFlexController_t iFlex, float flValue 
 		{
 			flValue = (flValue - pflex->min) / (pflex->max - pflex->min);
 		}
-		m_flexweight[iFlex] = clamp( flValue, 0.0f, 1.0f );
+
+		// dimhotepus: Check bounds.
+		if (iFlex < ssize(m_flexweight))
+		{
+			m_flexweight[iFlex] = clamp( flValue, 0.0f, 1.0f );
+		}
+		else
+		{
+			Assert(to_underlying(iFlex) < ssize(m_flexweight));
+		}
 	}
 }
 
@@ -601,8 +610,16 @@ void StudioModel::SetFlexControllerRaw( LocalFlexController_t iFlex, float flVal
 
 	if (iFlex >= 0 && iFlex < pStudioHdr->numflexcontrollers())
 	{
-//		mstudioflexcontroller_t *pflex = pStudioHdr->pFlexcontroller(iFlex);
-		m_flexweight[iFlex] = clamp( flValue, 0.0f, 1.0f );
+		
+		// dimhotepus: Check bounds.
+		if (iFlex < ssize(m_flexweight))
+		{
+			m_flexweight[to_underlying(iFlex)] = clamp( flValue, 0.0f, 1.0f );
+		}
+		else
+		{
+			Assert(to_underlying(iFlex) < ssize(m_flexweight));
+		}
 	}
 }
 
@@ -620,14 +637,22 @@ float StudioModel::GetFlexController( LocalFlexController_t iFlex )
 	if (iFlex >= 0 && iFlex < pStudioHdr->numflexcontrollers())
 	{
 		mstudioflexcontroller_t *pflex = pStudioHdr->pFlexcontroller(iFlex);
-
-		float flValue = m_flexweight[iFlex];
-
-		if (pflex->min != pflex->max)
+		
+		// dimhotepus: Check bounds.
+		if (iFlex < ssize(m_flexweight))
 		{
-			flValue = flValue * (pflex->max - pflex->min) + pflex->min;
+			float flValue = m_flexweight[to_underlying(iFlex)];
+
+			if (pflex->min != pflex->max)
+			{
+				flValue = flValue * (pflex->max - pflex->min) + pflex->min;
+			}
+			return flValue;
 		}
-		return flValue;
+		else
+		{
+			Assert(to_underlying(iFlex) < ssize(m_flexweight));
+		}
 	}
 	return 0.0;
 }
@@ -641,8 +666,15 @@ float StudioModel::GetFlexControllerRaw( LocalFlexController_t iFlex )
 
 	if (iFlex >= 0 && iFlex < pStudioHdr->numflexcontrollers())
 	{
-//		mstudioflexcontroller_t *pflex = pStudioHdr->pFlexcontroller(iFlex);
-		return m_flexweight[iFlex];
+		// dimhotepus: Check bounds.
+		if (iFlex < ssize(m_flexweight))
+		{
+			return m_flexweight[to_underlying(iFlex)];
+		}
+		else
+		{
+			Assert(to_underlying(iFlex) < ssize(m_flexweight));
+		}
 	}
 	return 0.0;
 }
@@ -791,24 +823,24 @@ void StudioModel::GetMovement( float prevcycle[5], Vector &vecPos, QAngle &vecAn
 	if ( !pStudioHdr )
 		return;
 
-  	// assume that changes < -0.5 are loops....
-  	if (m_cycle - prevcycle[0] < -0.5f)
-  	{
+	// assume that changes < -0.5 are loops....
+	if (m_cycle - prevcycle[0] < -0.5f)
+	{
 		prevcycle[0] -= 1.0f;
-  	}
+	}
 
 	Studio_SeqMovement( pStudioHdr, m_sequence, prevcycle[0], m_cycle, m_poseparameter, vecPos, vecAngles );
 	prevcycle[0] = m_cycle;
 
-		Vector vecTmp;
-		QAngle angTmp;
+	Vector vecTmp;
+	QAngle angTmp;
 
 	for (int i = 0; i < 4; i++)
 	{
-  		if (m_Layer[i].m_cycle - prevcycle[i+1] < -0.5f)
-  		{
+		if (m_Layer[i].m_cycle - prevcycle[i+1] < -0.5f)
+		{
 			prevcycle[i+1] -= 1.0f;
-  		}
+		}
 
 		if (m_Layer[i].m_weight > 0.0)
 		{
@@ -1128,7 +1160,7 @@ void StudioModel::scaleBones (float scale)
 	{
 		pbones[i].pos *= scale;
 		pbones[i].posscale *= scale;
-	}	
+	}
 }
 
 intp StudioModel::Physics_GetBoneCount( void )
