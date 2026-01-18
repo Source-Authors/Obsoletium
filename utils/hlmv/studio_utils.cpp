@@ -415,7 +415,7 @@ const char* StudioModel::GetSequenceName( intp iSequence )
 void StudioModel::ClearOverlaysSequences( void )
 {
 	ClearAnimationLayers( );
-	memset( m_Layer, 0, sizeof( m_Layer ) );
+	BitwiseClear( m_Layer );
 }
 
 void StudioModel::ClearAnimationLayers( void )
