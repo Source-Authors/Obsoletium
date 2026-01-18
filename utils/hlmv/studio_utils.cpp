@@ -85,11 +85,8 @@ void StudioModel::RestoreStudioModel()
 //-----------------------------------------------------------------------------
 void StudioModel::FreeModel( bool bReleasing )
 {
-	if ( m_pStudioHdr )
-	{
 		delete m_pStudioHdr;
 		m_pStudioHdr = NULL;
-	}
 
 	if ( m_MDLHandle != MDLHANDLE_INVALID )
 	{
@@ -99,12 +96,9 @@ void StudioModel::FreeModel( bool bReleasing )
 
 	if ( !bReleasing )
 	{
-		if (m_pModelName)
-		{
 			delete[] m_pModelName;
 			m_pModelName = NULL;
 		}
-	}
 
 	m_SurfaceProps.Purge();
 
