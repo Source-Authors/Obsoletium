@@ -40,9 +40,9 @@ public:
 	{
 	}
 
-	mxImage (int w, int h, int bpp)
+	mxImage (int w, int h, int bpps)
 	{
-		create (w, h, bpp);
+		create (w, h, bpps);
 	}
 
 	virtual ~mxImage ()
