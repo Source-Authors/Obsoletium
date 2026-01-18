@@ -227,7 +227,6 @@ bool StudioModel::LoadModel( const char *pModelName )
 
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 
-	int i;
 	for ( int s = 0; s < pStudioHdr->numhitboxsets(); s++ )
 	{
 		mstudiohitboxset_t *pSrcSet = pStudioHdr->pHitboxSet( s );
@@ -238,7 +237,7 @@ bool StudioModel::LoadModel( const char *pModelName )
 		HitboxSet_t &set = m_HitboxSets[j];
 		set.m_Name = pSrcSet->pszName();
 
-		for ( i = 0; i < pSrcSet->numhitboxes; ++i )
+		for ( int i = 0; i < pSrcSet->numhitboxes; ++i )
 		{
 			mstudiobbox_t *pHit = pSrcSet->pHitbox(i);
 			auto nIndex = set.m_Hitboxes.AddToTail( );
@@ -253,7 +252,7 @@ bool StudioModel::LoadModel( const char *pModelName )
 	}
 
 	// Copy over all of the surface props; we may change them...
-	for ( i = 0; i < pStudioHdr->numbones(); ++i )
+	for ( int i = 0; i < pStudioHdr->numbones(); ++i )
 	{
 		mstudiobone_t* pBone = pStudioHdr->pBone(i);
 
@@ -278,7 +277,7 @@ bool StudioModel::LoadModel( const char *pModelName )
 	for( int lodID = pHardwareData->m_RootLOD; lodID < pHardwareData->m_NumLODs; lodID++ )
 	{
 		studioloddata_t *pLODData = &pHardwareData->m_pLODs[lodID];
-		for ( i = 0; i < pLODData->numMaterials; ++i )
+		for ( int i = 0; i < pLODData->numMaterials; ++i )
 		{
 			if (pLODData->ppMaterials[i]->IsVertexLit())
 			{
@@ -319,8 +318,7 @@ bool StudioModel::PostLoadModel( const char *modelname )
 	SetBlendTime( DEFAULT_BLEND_TIME );
 	// SetHeadTurn( 1.0f );  // FIXME:!!!
 
-	int n;
-	for (n = 0; n < pStudioHdr->numbodyparts(); n++)
+	for (int n = 0; n < pStudioHdr->numbodyparts(); n++)
 	{
 		SetBodygroup (n, 0);
 	}
@@ -809,12 +807,11 @@ void StudioModel::GetMovement( float prevcycle[5], Vector &vecPos, QAngle &vecAn
 	Studio_SeqMovement( pStudioHdr, m_sequence, prevcycle[0], m_cycle, m_poseparameter, vecPos, vecAngles );
 	prevcycle[0] = m_cycle;
 
-	int i;
-	for (i = 0; i < 4; i++)
-	{
 		Vector vecTmp;
 		QAngle angTmp;
 
+	for (int i = 0; i < 4; i++)
+	{
   		if (m_Layer[i].m_cycle - prevcycle[i+1] < -0.5f)
   		{
   			prevcycle[i+1] = prevcycle[i+1] - 1.0f;
@@ -946,7 +943,7 @@ int	StudioModel::LookupPoseParameter( char const *szName )
 	if (!pStudioHdr)
 		return false;
 
-	for (int iParameter = 0; iParameter < pStudioHdr->GetNumPoseParameters(); iParameter++)
+	for (intp iParameter = 0; iParameter < pStudioHdr->GetNumPoseParameters(); iParameter++)
 	{
 		if (stricmp( szName, pStudioHdr->pPoseParameter( iParameter ).pszName() ) == 0)
 		{
@@ -1074,17 +1071,15 @@ void StudioModel::scaleMeshes (float scale)
 	if (!pStudioHdr)
 		return;
 
-	int i, j, k;
-
 	// manadatory to access correct verts
 	SetCurrentModel();
 
 	// scale verts
 	int tmp = m_bodynum;
-	for (i = 0; i < pStudioHdr->numbodyparts(); i++)
+	for (int i = 0; i < pStudioHdr->numbodyparts(); i++)
 	{
 		mstudiobodyparts_t *pbodypart = pStudioHdr->pBodypart( i );
-		for (j = 0; j < pbodypart->nummodels; j++)
+		for (int j = 0; j < pbodypart->nummodels; j++)
 		{
 			SetBodygroup (i, j);
 			SetupModel (i);
@@ -1092,7 +1087,7 @@ void StudioModel::scaleMeshes (float scale)
 			const mstudio_modelvertexdata_t *vertData = m_pmodel->GetVertexData();
 			Assert( vertData ); // This can only return NULL on X360 for now
 
-			for (k = 0; k < m_pmodel->numvertices; k++)
+			for (int k = 0; k < m_pmodel->numvertices; k++)
 			{
 				*vertData->Position(k) *= scale;
 			}
@@ -1105,14 +1100,14 @@ void StudioModel::scaleMeshes (float scale)
 	int hitboxset = g_MDLViewer->GetCurrentHitboxSet();
 
 	mstudiobbox_t *pbboxes = pStudioHdr->pHitbox( 0, hitboxset );
-	for (i = 0; i < pStudioHdr->iHitboxCount( hitboxset ); i++)
+	for (int i = 0; i < pStudioHdr->iHitboxCount( hitboxset ); i++)
 	{
 		VectorScale (pbboxes[i].bbmin, scale, pbboxes[i].bbmin);
 		VectorScale (pbboxes[i].bbmax, scale, pbboxes[i].bbmax);
 	}
 
 	// scale bounding boxes
-	for (i = 0; i < pStudioHdr->GetNumSeq(); i++)
+	for (intp i = 0; i < pStudioHdr->GetNumSeq(); i++)
 	{
 		mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( i );
 		Vector tmpmin = seqdesc.bbmin;
@@ -1122,7 +1117,6 @@ void StudioModel::scaleMeshes (float scale)
 		tmpmin = seqdesc.bbmax;
 		VectorScale( tmpmin, scale, tmpmin );
 		seqdesc.bbmax = tmpmin;
-
 	}
 
 	// maybe scale exeposition, pivots, attachments
