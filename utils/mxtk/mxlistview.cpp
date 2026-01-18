@@ -43,7 +43,7 @@ mxListView::mxListView (mxWindow *parent, int x, int y, int w, int h, int id)
 	SendMessage (d_this->d_hwnd, WM_SETFONT, (WPARAM) (HFONT) GetStockObject (ANSI_VAR_FONT), MAKELPARAM (TRUE, 0));
 	SetWindowLongPtr (d_this->d_hwnd, GWLP_USERDATA, (LONG_PTR) this);
 
-	setHandle ((void *) d_this->d_hwnd);
+	setHandle (d_this->d_hwnd);
 	setType (MX_LISTVIEW);
 	setParent (parent);
 	setId (id);

@@ -192,7 +192,7 @@ mxWidget::setUserData (void *userData)
 void*
 mxWidget:: getHandle () const
 {
-	return (void *) d_this->d_hwnd;
+	return d_this->d_hwnd;
 }
 
 

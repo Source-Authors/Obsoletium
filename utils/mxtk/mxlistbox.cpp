@@ -36,7 +36,7 @@ mxListBox::mxListBox (mxWindow *parent, int x, int y, int w, int h, int id, int 
 	if (style == MultiSelection)
 		dwStyle |= LBS_MULTIPLESEL | LBS_EXTENDEDSEL;
 
-	void *handle = (void *) CreateWindowEx (WS_EX_CLIENTEDGE, "LISTBOX", "", dwStyle,
+	void *handle = CreateWindowEx (WS_EX_CLIENTEDGE, "LISTBOX", "", dwStyle,
 				x, y, w, h, hwndParent,
 				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
 	

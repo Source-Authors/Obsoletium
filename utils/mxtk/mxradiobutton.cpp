@@ -36,7 +36,7 @@ mxRadioButton::mxRadioButton (mxWindow *parent, int x, int y, int w, int h, cons
 	if (newGroup)
 		dwStyle |= WS_GROUP;
 
-	void *handle = (void *) CreateWindowEx (0, "BUTTON", label, dwStyle,
+	void *handle = CreateWindowEx (0, "BUTTON", label, dwStyle,
 				x, y, w, h, hwndParent,
 				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
 	

@@ -69,7 +69,7 @@ public:
 		++d_nodeCount;
 	}
 
-	void remove (void *data)
+	void remove (const void *data)
 	{
 		mxListNode *node = d_head->d_next;
 		while (node != d_tail)

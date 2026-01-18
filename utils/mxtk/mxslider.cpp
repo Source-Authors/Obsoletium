@@ -41,7 +41,7 @@ mxSlider::mxSlider (mxWindow *parent, int x, int y, int w, int h, int id, int st
 	else
 		dwStyle = WS_CHILD | WS_VISIBLE;
 
-	void *handle = (void *) CreateWindowEx (0, TRACKBAR_CLASS, "", dwStyle,
+	void *handle = CreateWindowEx (0, TRACKBAR_CLASS, "", dwStyle,
 				x, y, w, h, hwndParent,
 				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
 	

@@ -43,7 +43,7 @@ static HWND g_hwndToolTipControl = 0;
 static bool isClosing = false;
 static HACCEL g_hAcceleratorTable = NULL;
 
-void mx::createAccleratorTable( int numentries, Accel_t *entries )
+void mx::createAccleratorTable( int numentries, const Accel_t *entries )
 {
 	CUtlVector< ACCEL > accelentries;
 

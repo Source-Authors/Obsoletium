@@ -27,7 +27,7 @@ public:
 mxPopupMenu::mxPopupMenu ()
 : mxWidget (0, 0, 0, 0, 0)
 {
-	void *handle = (void *) CreatePopupMenu ();
+	void *handle = CreatePopupMenu ();
 	setHandle (handle);
 	setType (MX_POPUPMENU);
 }

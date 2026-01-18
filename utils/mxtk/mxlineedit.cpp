@@ -96,7 +96,7 @@ mxLineEdit::mxLineEdit (mxWindow *parent, int x, int y, int w, int h, const char
 		RegisterClassEx( &editClass ); 
 	}
 
-	void *handle = (void *) CreateWindowEx (WS_EX_CLIENTEDGE, "mx_edit", label, dwStyle, //WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL,
+	void *handle = CreateWindowEx (WS_EX_CLIENTEDGE, "mx_edit", label, dwStyle, //WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL,
 				x, y, w, h, hwndParent,
 				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
 	

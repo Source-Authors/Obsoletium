@@ -32,7 +32,7 @@ mxCheckBox::mxCheckBox (mxWindow *parent, int x, int y, int w, int h, const char
 
 	HWND hwndParent = (HWND) ((mxWidget *) parent)->getHandle ();
 
-	void *handle = (void *) CreateWindowEx (0, "BUTTON", label, WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX,
+	void *handle = CreateWindowEx (0, "BUTTON", label, WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX,
 				x, y, w, h, hwndParent,
 				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
 	

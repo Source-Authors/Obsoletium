@@ -37,7 +37,7 @@ mxProgressBar::mxProgressBar (mxWindow *parent, int x, int y, int w, int h, int 
 	if (style == Smooth)
 		dwStyle |= PBS_SMOOTH;
 
-	void *handle = (void *) CreateWindowEx (0, PROGRESS_CLASS, "", dwStyle,
+	void *handle = CreateWindowEx (0, PROGRESS_CLASS, "", dwStyle,
 				x, y, w, h, hwndParent,
 				(HMENU) NULL, (HINSTANCE) GetModuleHandle (NULL), NULL);
 	

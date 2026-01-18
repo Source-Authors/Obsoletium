@@ -70,7 +70,7 @@ public:
 		unsigned short command; // Specifies the accelerator identifier. This value is placed in the low-order word of the wParam parameter of the WM_COMMAND or WM_SYSCOMMAND message when the accelerator is pressed. 
 	};
 
-	static void createAccleratorTable( int numentries, Accel_t *entries );
+	static void createAccleratorTable( int numentries, const Accel_t *entries );
 
 private:
 	// NOT IMPLEMENTED

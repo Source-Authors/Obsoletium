@@ -15,7 +15,6 @@
 #include "winlite.h"
 
 
-
 class mxButton_i
 {
 public:
@@ -33,7 +32,7 @@ mxButton::mxButton (mxWindow *parent, int x, int y, int w, int h, const char *la
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD;
 	HWND hwndParent = (HWND) ((mxWidget *) parent)->getHandle ();
 
-	void *handle = (void *) CreateWindowEx (0, "BUTTON", label, dwStyle,
+	void *handle = CreateWindowEx (0, "BUTTON", label, dwStyle,
 				x, y, w, h, hwndParent,
 				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
 	

@@ -39,7 +39,7 @@ mxScrollbar::mxScrollbar (mxWindow *parent, int x, int y, int w, int h, int id, 
 	else if (style == Vertical)
 		dwStyle = WS_CHILD | WS_VISIBLE | SBS_VERT | SBS_RIGHTALIGN; // WS_VSCROLL;
 
-	void *handle = (void *) CreateWindowEx (0, "SCROLLBAR", "", dwStyle,
+	void *handle = CreateWindowEx (0, "SCROLLBAR", "", dwStyle,
 				x, y, w, h, hwndParent,
 				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
 	

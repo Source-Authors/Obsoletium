@@ -32,7 +32,7 @@ mxChoice::mxChoice (mxWindow *parent, int x, int y, int w, int h, int id)
 
 	HWND hwndParent = (HWND) ((mxWidget *) parent)->getHandle ();
 
-	void *handle = (void *) CreateWindowEx (0, "COMBOBOX", "", WS_VISIBLE | WS_CHILD | WS_VSCROLL | CBS_DROPDOWNLIST,
+	void *handle = CreateWindowEx (0, "COMBOBOX", "", WS_VISIBLE | WS_CHILD | WS_VSCROLL | CBS_DROPDOWNLIST,
 				x, y, w, h + 500, hwndParent,
 				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
 	

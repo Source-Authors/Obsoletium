@@ -49,7 +49,7 @@ mxWindow::mxWindow (mxWindow *parent, int x, int y, int w, int h, const char *la
 		dwStyle = WS_CHILD | WS_VISIBLE;
 	}
 
-	void *handle = (void *) CreateWindowEx (0, "mx_class", label, dwStyle,
+	void *handle = CreateWindowEx (0, "mx_class", label, dwStyle,
 					x, y, w, h, (HWND) parentHandle,
 					(HMENU) NULL, (HINSTANCE) GetModuleHandle (NULL), NULL);
 

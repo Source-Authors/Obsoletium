@@ -33,7 +33,7 @@ mxLabel::mxLabel (mxWindow *parent, int x, int y, int w, int h, const char *labe
 
 	HWND hwndParent = (HWND) ((mxWidget *) parent)->getHandle ();
 
-	void *handle = (void *) CreateWindowEx (0, "STATIC", label, WS_VISIBLE | WS_CHILD,
+	void *handle = CreateWindowEx (0, "STATIC", label, WS_VISIBLE | WS_CHILD,
 				x, y, w, h, hwndParent,
 				(HMENU) NULL, (HINSTANCE) GetModuleHandle (NULL), NULL);
 	

@@ -86,7 +86,7 @@ mxTab::mxTab (mxWindow *parent, int x, int y, int w, int h, int id)
 	DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS;
 	HWND hwndParent = (HWND) ((mxWidget *) parent)->getHandle ();
 
-	void *handle = (void *) CreateWindowEx (0, WC_TABCONTROL, "", dwStyle,
+	void *handle = CreateWindowEx (0, WC_TABCONTROL, "", dwStyle,
 				x, y, w, h, hwndParent,
 				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
 

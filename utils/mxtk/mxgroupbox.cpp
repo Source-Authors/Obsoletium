@@ -32,7 +32,7 @@ mxGroupBox::mxGroupBox (mxWindow *parent, int x, int y, int w, int h, const char
 
 	HWND hwndParent = (HWND) ((mxWidget *) parent)->getHandle ();
 
-	void *handle = (void *) CreateWindowEx (0, "BUTTON", label, WS_VISIBLE | WS_CHILD | BS_GROUPBOX,
+	void *handle = CreateWindowEx (0, "BUTTON", label, WS_VISIBLE | WS_CHILD | BS_GROUPBOX,
 				x, y, w, h, hwndParent,
 				(HMENU) NULL, (HINSTANCE) GetModuleHandle (NULL), NULL);
 	
