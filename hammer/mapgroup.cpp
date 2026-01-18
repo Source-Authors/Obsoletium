@@ -114,13 +114,12 @@ void CMapGroup::GetRenderLogicalBox( Vector2D &mins, Vector2D &maxs )
 ChunkFileResult_t CMapGroup::LoadVMF(CChunkFile *pFile)
 {
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler("editor", (ChunkHandler_t)CMapClass::LoadEditorCallback, this);
+	Handlers.AddHandler("editor", CMapClass::LoadEditorCallback, static_cast<CMapClass*>(this));
 
 	pFile->PushHandlers(&Handlers);
-	ChunkFileResult_t eResult = pFile->ReadChunk((KeyHandler_t)CMapClass::LoadEditorKeyCallback, this);
-	pFile->PopHandlers();
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
-	return(eResult);
+	return pFile->ReadChunk(CMapClass::LoadEditorKeyCallback, static_cast<CMapClass*>(this));
 }
 
 

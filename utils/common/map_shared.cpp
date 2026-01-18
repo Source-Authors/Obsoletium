@@ -61,7 +61,8 @@ ChunkFileResult_t LoadEntityKeyCallback(const char *szKey, const char *szValue, 
 }
 
 
-static ChunkFileResult_t LoadEntityCallback( CChunkFile *pFile, int nParam )
+// dimhotepus: int -> void*
+static ChunkFileResult_t LoadEntityCallback( CChunkFile *pFile, void* nParam )
 {
 	if (num_entities == MAX_MAP_ENTITIES)
 	{
@@ -74,9 +75,8 @@ static ChunkFileResult_t LoadEntityCallback( CChunkFile *pFile, int nParam )
 	memset(mapent, 0, sizeof(*mapent));
 	mapent->numbrushes = 0;
 
-	LoadEntity_t LoadEntity;
+	LoadEntity_t LoadEntity = {};
 	LoadEntity.pEntity = mapent;
-
 	// No default flags/contents
 	LoadEntity.nBaseFlags = 0;
 	LoadEntity.nBaseContents = 0;
@@ -84,9 +84,7 @@ static ChunkFileResult_t LoadEntityCallback( CChunkFile *pFile, int nParam )
 	//
 	// Read the entity chunk.
 	//
-	ChunkFileResult_t eResult = pFile->ReadChunk((KeyHandler_t)LoadEntityKeyCallback, &LoadEntity);
-
-	return eResult;
+	return pFile->ReadChunk(LoadEntityKeyCallback, &LoadEntity);
 }
 
 
@@ -112,9 +110,10 @@ bool LoadEntsFromMapFile( char const *pFilename )
 		// Set up handlers for the subchunks that we are interested in.
 		//
 		CChunkHandlerMap Handlers;
-		Handlers.AddHandler("entity", (ChunkHandler_t)LoadEntityCallback, 0);
+		Handlers.AddHandler("entity", LoadEntityCallback, nullptr);
 
 		File.PushHandlers(&Handlers);
+		RunCodeAtScopeExit(File.PopHandlers());
 
 		//
 		// Read the sub-chunks. We ignore keys in the root of the file.
@@ -124,7 +123,6 @@ bool LoadEntsFromMapFile( char const *pFilename )
 			eResult = File.ReadChunk();
 		}
 
-		File.PopHandlers();
 		return true;
 	}
 	else

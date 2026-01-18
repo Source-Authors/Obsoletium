@@ -620,7 +620,7 @@ ChunkFileResult_t CEditGameClass::LoadKeyCallback(const char *szKey, const char 
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CEditGameClass::LoadConnectionsCallback(CChunkFile *pFile, CEditGameClass *pEditGameClass)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadKeyCallback, pEditGameClass));
+	return pFile->ReadChunk(LoadKeyCallback, pEditGameClass);
 }
 
 

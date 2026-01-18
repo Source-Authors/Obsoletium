@@ -266,7 +266,7 @@ ChunkFileResult_t Camera3D::LoadCameraCallback(CChunkFile *pFile, Camera3D *pCam
 	CAMSTRUCT Cam;
 	memset(&Cam, 0, sizeof(Cam));
 
-	ChunkFileResult_t eResult = pFile->ReadChunk((KeyHandler_t)LoadCameraKeyCallback, &Cam);
+	ChunkFileResult_t eResult = pFile->ReadChunk(LoadCameraKeyCallback, &Cam);
 
 	if (eResult == ChunkFile_Ok)
 	{
@@ -288,12 +288,12 @@ ChunkFileResult_t Camera3D::LoadVMF(CChunkFile *pFile)
 	// Set up handlers for the subchunks that we are interested in.
 	//
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler("camera", (ChunkHandler_t)LoadCameraCallback, this);
+	Handlers.AddHandler("camera", LoadCameraCallback, this);
 
 	pFile->PushHandlers(&Handlers);
-	ChunkFileResult_t eResult = pFile->ReadChunk((KeyHandler_t)LoadCamerasKeyCallback, this);
-	pFile->PopHandlers();
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
+	ChunkFileResult_t eResult = pFile->ReadChunk(LoadCamerasKeyCallback, this);
 	if (eResult == ChunkFile_Ok)
 	{
 		//

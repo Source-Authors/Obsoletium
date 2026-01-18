@@ -1425,13 +1425,12 @@ ChunkFileResult_t CMapDoc::LoadEntityCallback(CChunkFile *pFile, CMapDoc *pDoc)
 ChunkFileResult_t CMapDoc::LoadHiddenCallback(CChunkFile *pFile, CMapDoc *pDoc)
 {
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler("entity", (ChunkHandler_t)CMapDoc::LoadEntityCallback, pDoc);
+	Handlers.AddHandler("entity", CMapDoc::LoadEntityCallback, pDoc);
 
 	pFile->PushHandlers(&Handlers);
-	ChunkFileResult_t eResult = pFile->ReadChunk();
-	pFile->PopHandlers();
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
-	return(eResult);
+	return pFile->ReadChunk();
 }
 
 
@@ -1442,7 +1441,7 @@ ChunkFileResult_t CMapDoc::LoadHiddenCallback(CChunkFile *pFile, CMapDoc *pDoc)
 //			eError - 
 // Output : Returns true to continue loading, false to stop loading.
 //-----------------------------------------------------------------------------
-bool CMapDoc::HandleLoadError(CChunkFile *pFile, const char *szChunkName, ChunkFileResult_t eError, CMapDoc *pDoc)
+bool CMapDoc::HandleLoadError(CChunkFile *pFile, const char *szChunkName, CMapDoc *pDoc)
 {
 	return(false);
 }
@@ -1504,20 +1503,21 @@ bool CMapDoc::LoadVMF( const char *pszFileName, int LoadFlags )
 		// Set up handlers for the subchunks that we are interested in.
 		//
 		CChunkHandlerMap Handlers;
-		Handlers.AddHandler("world", (ChunkHandler_t)CMapDoc::LoadWorldCallback, this);
-		Handlers.AddHandler("hidden", (ChunkHandler_t)CMapDoc::LoadHiddenCallback, this);
-		Handlers.AddHandler("entity", (ChunkHandler_t)CMapDoc::LoadEntityCallback, this);
-		Handlers.AddHandler("versioninfo", (ChunkHandler_t)CMapDoc::LoadVersionInfoCallback, this);
-		Handlers.AddHandler("autosave", (ChunkHandler_t)CMapDoc::LoadAutosaveCallback, this);
-		Handlers.AddHandler("visgroups", (ChunkHandler_t)CVisGroup::LoadVisGroupsCallback, this);
-		Handlers.AddHandler("viewsettings", (ChunkHandler_t)CMapDoc::LoadViewSettingsCallback, this);
-		Handlers.AddHandler("cordon", (ChunkHandler_t)CMapDoc::LoadCordonCallback, this);
+		Handlers.AddHandler("world", CMapDoc::LoadWorldCallback, this);
+		Handlers.AddHandler("hidden", CMapDoc::LoadHiddenCallback, this);
+		Handlers.AddHandler("entity", CMapDoc::LoadEntityCallback, this);
+		Handlers.AddHandler("versioninfo", CMapDoc::LoadVersionInfoCallback, this);
+		Handlers.AddHandler("autosave", CMapDoc::LoadAutosaveCallback, this);
+		Handlers.AddHandler("visgroups", CVisGroup::LoadVisGroupsCallback, this);
+		Handlers.AddHandler("viewsettings", CMapDoc::LoadViewSettingsCallback, this);
+		Handlers.AddHandler("cordon", CMapDoc::LoadCordonCallback, this);
 
 		m_pToolManager->AddToolHandlers( &Handlers );
 
-		Handlers.SetErrorHandler((ChunkErrorHandler_t)CMapDoc::HandleLoadError, this);
+		Handlers.SetErrorHandler(CMapDoc::HandleLoadError, this);
 
 		File.PushHandlers(&Handlers);
+		RunCodeAtScopeExit(File.PopHandlers());
 
 		if ( ( LoadFlags & VMF_LOAD_ACTIVATE ) )
 		{
@@ -1542,10 +1542,7 @@ bool CMapDoc::LoadVMF( const char *pszFileName, int LoadFlags )
 		{
 			eResult = ChunkFile_Ok;
 		}
-
-		File.PopHandlers();
 	}
-
 
 	if (eResult == ChunkFile_Ok)
 	{
@@ -1612,7 +1609,7 @@ void CMapDoc::BuildAllDetailObjects()
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CMapDoc::LoadVersionInfoCallback(CChunkFile *pFile, CMapDoc *pDoc)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadVersionInfoKeyCallback, pDoc));
+	return pFile->ReadChunk(LoadVersionInfoKeyCallback, pDoc);
 }
 
 
@@ -1634,7 +1631,7 @@ ChunkFileResult_t CMapDoc::LoadVersionInfoKeyCallback(const char *szKey, const c
 
 ChunkFileResult_t CMapDoc::LoadAutosaveCallback( CChunkFile *pFile, CMapDoc *pDoc)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadAutosaveKeyCallback, pDoc));
+	return pFile->ReadChunk(LoadAutosaveKeyCallback, pDoc);
 }
 
 ChunkFileResult_t CMapDoc::LoadAutosaveKeyCallback(const char *szKey, const char *szValue, CMapDoc *pDoc)
@@ -1654,7 +1651,7 @@ ChunkFileResult_t CMapDoc::LoadAutosaveKeyCallback(const char *szKey, const char
 
 ChunkFileResult_t CMapDoc::LoadCordonCallback(CChunkFile *pFile, CMapDoc *pDoc)
 {
-	return pFile->ReadChunk((KeyHandler_t)LoadCordonKeyCallback, pDoc);
+	return pFile->ReadChunk(LoadCordonKeyCallback, pDoc);
 }
 
 ChunkFileResult_t CMapDoc::LoadCordonKeyCallback(const char *szKey, const char *szValue, CMapDoc *pDoc)
@@ -1701,7 +1698,7 @@ ChunkFileResult_t CMapDoc::LoadViewSettingsKeyCallback(const char *szKey, const 
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CMapDoc::LoadViewSettingsCallback(CChunkFile *pFile, CMapDoc *pDoc)
 {
-	ChunkFileResult_t eResult = pFile->ReadChunk((KeyHandler_t)LoadViewSettingsKeyCallback, pDoc);
+	ChunkFileResult_t eResult = pFile->ReadChunk(LoadViewSettingsKeyCallback, pDoc);
 	if (eResult == ChunkFile_Ok)
 	{	
 		pDoc->UpdateStatusBarSnap();

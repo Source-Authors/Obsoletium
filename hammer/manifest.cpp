@@ -157,9 +157,7 @@ ChunkFileResult_t CManifest::LoadKeyInfoCallback( const char *szKey, const char 
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CManifest::LoadManifestInfoCallback( CChunkFile *pFile, CManifest *pDoc )
 {
-	ChunkFileResult_t eResult = pFile->ReadChunk( ( KeyHandler_t )LoadKeyInfoCallback, pDoc );
-
-	return( eResult );
+	return pFile->ReadChunk( LoadKeyInfoCallback, pDoc );
 }
 
 
@@ -209,19 +207,19 @@ ChunkFileResult_t CManifest::LoadKeyCallback( const char *szKey, const char *szV
 ChunkFileResult_t CManifest::LoadManifestVMFCallback( CChunkFile *pFile, CManifest *pDoc )
 {
 	char FileName[ MAX_PATH ];
-
 	V_strcpy_safe( FileName, pDoc->m_ManifestDir );
 
 	CManifestMap	*pManifestMap = pDoc->CreateNewMap( FileName, "", false );
-	SetActiveMapDoc( pManifestMap->m_Map );
 
-	ChunkFileResult_t eResult = pFile->ReadChunk( ( KeyHandler_t )LoadKeyCallback, pManifestMap );
+	SetActiveMapDoc( pManifestMap->m_Map );
+	RunCodeAtScopeExit(SetActiveMapDoc( pDoc ));
+
+	ChunkFileResult_t eResult = pFile->ReadChunk( LoadKeyCallback, pManifestMap );
 
 	if ( pManifestMap->m_Map )
 	{
 		pManifestMap->m_Map->SetEditable( false );
 	}
-	SetActiveMapDoc( pDoc );
 
 	return( eResult );
 }
@@ -236,16 +234,12 @@ ChunkFileResult_t CManifest::LoadManifestVMFCallback( CChunkFile *pFile, CManife
 ChunkFileResult_t CManifest::LoadManifestMapsCallback( CChunkFile *pFile, CManifest *pDoc )
 {
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler( "VMF", ( ChunkHandler_t )LoadManifestVMFCallback, pDoc );
+	Handlers.AddHandler( "VMF", LoadManifestVMFCallback, pDoc );
+
 	pFile->PushHandlers(&Handlers);
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
-	ChunkFileResult_t eResult = ChunkFile_Ok;
-
-	eResult = pFile->ReadChunk();
-
-	pFile->PopHandlers();
-
-	return( eResult );
+	return pFile->ReadChunk();
 }
 
 
@@ -303,14 +297,11 @@ ChunkFileResult_t CManifest::LoadKeyPrefsCallback( const char *szKey, const char
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CManifest::LoadManifestVMFPrefsCallback( CChunkFile *pFile, CManifest *pDoc )
 {
-	TManifestLoadPrefs	ManifestLoadPrefs;
-	
+	TManifestLoadPrefs	ManifestLoadPrefs = {};
 	ManifestLoadPrefs.pDoc = pDoc;
 	ManifestLoadPrefs.pManifestMap = NULL;
 
-	ChunkFileResult_t eResult = pFile->ReadChunk( ( KeyHandler_t )LoadKeyPrefsCallback, &ManifestLoadPrefs );
-
-	return( eResult );
+	return pFile->ReadChunk( LoadKeyPrefsCallback, &ManifestLoadPrefs );
 }
 
 
@@ -323,16 +314,12 @@ ChunkFileResult_t CManifest::LoadManifestVMFPrefsCallback( CChunkFile *pFile, CM
 ChunkFileResult_t CManifest::LoadManifestMapsPrefsCallback( CChunkFile *pFile, CManifest *pDoc )
 {
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler( "VMF", ( ChunkHandler_t )LoadManifestVMFPrefsCallback, pDoc );
+	Handlers.AddHandler( "VMF", LoadManifestVMFPrefsCallback, pDoc );
+
 	pFile->PushHandlers(&Handlers);
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
-	ChunkFileResult_t eResult = ChunkFile_Ok;
-
-	eResult = pFile->ReadChunk();
-
-	pFile->PopHandlers();
-
-	return( eResult );
+	return pFile->ReadChunk();
 }
 
 
@@ -344,16 +331,19 @@ ChunkFileResult_t CManifest::LoadManifestMapsPrefsCallback( CChunkFile *pFile, C
 ChunkFileResult_t CManifest::LoadManifestCordoningPrefsCallback( CChunkFile *pFile, CManifest *pDoc )
 {
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler( "cordons", ( ChunkHandler_t )CMapDoc::LoadCordonCallback, pDoc );
+	Handlers.AddHandler( "cordons", CMapDoc::LoadCordonCallback, static_cast<CMapDoc*>(pDoc) );
+
 	pFile->PushHandlers(&Handlers);
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
-	ChunkFileResult_t eResult = ChunkFile_Ok;
+	return pFile->ReadChunk();
+}
 
-	eResult = pFile->ReadChunk();
 
-	pFile->PopHandlers();
-
-	return( eResult );
+// dimhotepus: Add function with correct signature as same body as CMapDoc::HandleLoadError.
+static bool HandleVMFLoadError(CChunkFile *pFile, const char *szChunkName, CManifest *manifest)
+{
+	return false;
 }
 
 
@@ -382,12 +372,13 @@ bool CManifest::LoadVMFManifest( const char *pszFileName )
 		// Set up handlers for the subchunks that we are interested in.
 		//
 		CChunkHandlerMap Handlers;
-		Handlers.AddHandler( "Info", ( ChunkHandler_t )CManifest::LoadManifestInfoCallback, this );
-		Handlers.AddHandler( "Maps", ( ChunkHandler_t )CManifest::LoadManifestMapsCallback, this );
+		Handlers.AddHandler( "Info", CManifest::LoadManifestInfoCallback, this );
+		Handlers.AddHandler( "Maps", CManifest::LoadManifestMapsCallback, this );
 
-		Handlers.SetErrorHandler( ( ChunkErrorHandler_t )CMapDoc::HandleLoadError, this);
+		Handlers.SetErrorHandler( HandleVMFLoadError, this );
 
 		File.PushHandlers(&Handlers);
+		RunCodeAtScopeExit(File.PopHandlers());
 
 		while (eResult == ChunkFile_Ok)
 		{
@@ -398,8 +389,6 @@ bool CManifest::LoadVMFManifest( const char *pszFileName )
 		{
 			eResult = ChunkFile_Ok;
 		}
-
-		File.PopHandlers();
 	}
 
 	if (eResult == ChunkFile_Ok)
@@ -468,7 +457,6 @@ bool CManifest::LoadVMFManifest( const char *pszFileName )
 	return true;
 }
 
-
 //-----------------------------------------------------------------------------
 // Purpose: this function will load the user prefs for the manifest file.
 // Input  : pszFileName - the manifest file name.
@@ -506,12 +494,13 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 		// Set up handlers for the subchunks that we are interested in.
 		//
 		CChunkHandlerMap Handlers;
-		Handlers.AddHandler( "Maps", ( ChunkHandler_t )CManifest::LoadManifestMapsPrefsCallback, this );
-		Handlers.AddHandler( "cordoning", ( ChunkHandler_t )CManifest::LoadManifestCordoningPrefsCallback, this );
+		Handlers.AddHandler( "Maps", CManifest::LoadManifestMapsPrefsCallback, this );
+		Handlers.AddHandler( "cordoning", CManifest::LoadManifestCordoningPrefsCallback, this );
 
-		Handlers.SetErrorHandler( ( ChunkErrorHandler_t )CMapDoc::HandleLoadError, this);
+		Handlers.SetErrorHandler( HandleVMFLoadError, this );
 
 		File.PushHandlers(&Handlers);
+		RunCodeAtScopeExit(File.PopHandlers());
 
 		while( eResult == ChunkFile_Ok )
 		{
@@ -522,8 +511,6 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 		{
 			eResult = ChunkFile_Ok;
 		}
-
-		File.PopHandlers();
 	}
 
 	if ( eResult == ChunkFile_Ok )

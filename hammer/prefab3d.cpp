@@ -475,11 +475,12 @@ int CPrefabVMF::Load(DWORD dwFlags)
 		// Set up handlers for the subchunks that we are interested in.
 		//
 		CChunkHandlerMap Handlers;
-		Handlers.AddHandler("world", (ChunkHandler_t)CPrefabVMF::LoadWorldCallback, this);
-		Handlers.AddHandler("entity", (ChunkHandler_t)CPrefabVMF::LoadEntityCallback, this);
-		// dvs: Handlers.SetErrorHandler((ChunkErrorHandler_t)CPrefabVMF::HandleLoadError, this);
+		Handlers.AddHandler("world", CPrefabVMF::LoadWorldCallback, this);
+		Handlers.AddHandler("entity", CPrefabVMF::LoadEntityCallback, this);
+		// dvs: Handlers.SetErrorHandler(CPrefabVMF::HandleLoadError, this);
 
 		File.PushHandlers(&Handlers);
+		RunCodeAtScopeExit(File.PopHandlers());
 
 		//CMapDoc::SetLoadingMapDoc( this );  dvs: fix - without this, no displacements in prefabs
 
@@ -498,8 +499,6 @@ int CPrefabVMF::Load(DWORD dwFlags)
 		}
 
 		//CMapDoc::SetLoadingMapDoc( NULL );
-
-		File.PopHandlers();
 	}
 
 	if (eResult == ChunkFile_Ok)

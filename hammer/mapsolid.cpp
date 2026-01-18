@@ -1075,11 +1075,11 @@ ChunkFileResult_t CMapSolid::LoadVMF(CChunkFile *pFile, bool &bValid)
 	// Set up handlers for the subchunks that we are interested in.
 	//
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler("side", (ChunkHandler_t)LoadSideCallback, this);
-	Handlers.AddHandler("editor", (ChunkHandler_t)LoadEditorCallback, this);
+	Handlers.AddHandler("side", LoadSideCallback, this);
+	Handlers.AddHandler("editor", LoadEditorCallback, static_cast<CMapClass*>(this));
 
 	pFile->PushHandlers(&Handlers);
-	ChunkFileResult_t eResult = pFile->ReadChunk((KeyHandler_t)LoadEditorKeyCallback, this);
+	ChunkFileResult_t eResult = pFile->ReadChunk(LoadEditorKeyCallback, static_cast<CMapClass*>(this));
 	pFile->PopHandlers();
 
 	bValid = false;

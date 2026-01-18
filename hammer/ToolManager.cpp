@@ -284,11 +284,11 @@ ChunkFileResult_t CToolManager::LoadCallback(CChunkFile *pFile, CBaseTool *pTool
 
 void CToolManager::AddToolHandlers( CChunkHandlerMap *pHandlersMap )
 {
-	for (intp i=0;i<m_Tools.Count(); i++)
+	for (auto *tool : m_Tools)
 	{
-		if ( m_Tools[i]->GetVMFChunkName() != NULL  )
+		if ( const char *chunkName = tool->GetVMFChunkName(); chunkName )
 		{
-			pHandlersMap->AddHandler( m_Tools[i]->GetVMFChunkName(), (ChunkHandler_t)LoadCallback, m_Tools[i] );
+			pHandlersMap->AddHandler( chunkName, LoadCallback, tool );
 		}
 	}
 }

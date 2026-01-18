@@ -934,13 +934,12 @@ ChunkFileResult_t CMapWorld::LoadHiddenCallback(CChunkFile *pFile, CMapWorld *pW
 	// Set up handlers for the subchunks that we are interested in.
 	//
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler("solid", (ChunkHandler_t)LoadSolidCallback, pWorld);
+	Handlers.AddHandler("solid", LoadSolidCallback, pWorld);
 	
 	pFile->PushHandlers(&Handlers);
-	ChunkFileResult_t eResult = pFile->ReadChunk();
-	pFile->PopHandlers();
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
-	return(eResult);
+	return pFile->ReadChunk();
 }
 
 
@@ -977,16 +976,15 @@ ChunkFileResult_t CMapWorld::LoadVMF(CChunkFile *pFile)
 	// Set up handlers for the subchunks that we are interested in.
 	//
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler("solid", (ChunkHandler_t)LoadSolidCallback, this);
-	Handlers.AddHandler("hidden", (ChunkHandler_t)LoadHiddenCallback, this);
-	Handlers.AddHandler("group", (ChunkHandler_t)LoadGroupCallback, this);
-	Handlers.AddHandler("connections", (ChunkHandler_t)LoadConnectionsCallback, (CEditGameClass *)this);
+	Handlers.AddHandler("solid", LoadSolidCallback, this);
+	Handlers.AddHandler("hidden", LoadHiddenCallback, this);
+	Handlers.AddHandler("group", LoadGroupCallback, this);
+	Handlers.AddHandler("connections", LoadConnectionsCallback, static_cast<CEditGameClass *>(this));
 
 	pFile->PushHandlers(&Handlers);
-	ChunkFileResult_t eResult = pFile->ReadChunk((KeyHandler_t)LoadKeyCallback, this);
-	pFile->PopHandlers();
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
-	return(eResult);
+	return pFile->ReadChunk(LoadKeyCallback, this);
 }
 
 

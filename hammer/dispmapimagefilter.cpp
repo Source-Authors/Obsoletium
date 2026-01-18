@@ -85,7 +85,7 @@ int CDispMapImageFilter::GetFilterType( CString type )
 ChunkFileResult_t CDispMapImageFilter::LoadImageCallback( CChunkFile *pFile, 
 														  CDispMapImageFilter *pFilter )
 {
-	return( pFile->ReadChunk( ( KeyHandler_t )LoadImageKeyCallback, pFilter ) );
+	return pFile->ReadChunk( LoadImageKeyCallback, pFilter );
 }
 
 static bool bInitMemory = true;
@@ -189,13 +189,12 @@ ChunkFileResult_t CDispMapImageFilter::LoadFilter( CChunkFile *pFile )
 	bInitMemory = true;
 
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler( "Image", ( ChunkHandler_t )LoadImageCallback, this );
+	Handlers.AddHandler( "Image", LoadImageCallback, this );
 
 	pFile->PushHandlers( &Handlers );
-	ChunkFileResult_t eResult = pFile->ReadChunk( ( KeyHandler_t )LoadFilterKeyCallback, this );
-	pFile->PopHandlers();
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
-	return( eResult );
+	return pFile->ReadChunk( LoadFilterKeyCallback, this );
 }
 
 

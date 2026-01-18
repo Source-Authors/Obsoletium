@@ -61,12 +61,22 @@ enum ChunkType_t
 };
 
 
-typedef ChunkFileResult_t (*DefaultChunkHandler_t)(CChunkFile *pFile, void *pData, char const *pChunkName);
+using DefaultChunkHandler_t = ChunkFileResult_t (*)(CChunkFile *pFile, void *pData, char const *pChunkName);
 
-typedef ChunkFileResult_t (*ChunkHandler_t)(CChunkFile *pFile, void *pData);
-typedef ChunkFileResult_t (*KeyHandler_t)(const char *szKey, const char *szValue, void *pData);
-typedef bool (*ChunkErrorHandler_t)(CChunkFile *pFile, const char *szChunkName, void *pData);
+using ChunkHandler_t = ChunkFileResult_t (*)(CChunkFile *pFile, void *pData);
+// dimhotepus: Type-safe interface.
+template<typename TData>
+using ChunkHandlerT_t = ChunkFileResult_t (*)(CChunkFile *pFile, TData *pData);
 
+using KeyHandler_t = ChunkFileResult_t (*)(const char *szKey, const char *szValue, void *pData);
+// dimhotepus: Type-safe interface.
+template<typename TData>
+using KeyHandlerT_t = ChunkFileResult_t (*)(const char *szKey, const char *szValue, TData *pData);
+
+using ChunkErrorHandler_t = bool (*)(CChunkFile *pFile, const char *szChunkName, void *pData);
+// dimhotepus: Type-safe interface.
+template<typename TData>
+using ChunkErrorHandlerT_t = bool (*)(CChunkFile *pFile, const char *szChunkName, TData *pData);
 
 struct ChunkHandlerInfo_t
 {
@@ -98,13 +108,27 @@ class CChunkHandlerMap
 {
 	public:
 
-		CChunkHandlerMap(void);
-		~CChunkHandlerMap(void);
+		CChunkHandlerMap();
+		~CChunkHandlerMap();
 
 		void AddHandler(const char *pszChunkName, ChunkHandler_t pfnHandler, void *pData);
+		// dimhotepus: Type-safe interface.
+		template<typename TData>
+		void AddHandler(const char *pszChunkName, ChunkHandlerT_t<TData> pfnHandler, TData *pData)
+		{
+			AddHandler(pszChunkName, (ChunkHandler_t)pfnHandler, pData);
+		}
+
 		ChunkHandler_t GetHandler(const char *pszChunkName, void **pData);
 
 		void SetErrorHandler(ChunkErrorHandler_t pfnHandler, void *pData);
+		// dimhotepus: Type-safe interface.
+		template<typename TData>
+		void SetErrorHandler(ChunkErrorHandlerT_t<TData> pfnHandler, TData *pData)
+		{
+			SetErrorHandler((ChunkErrorHandler_t)pfnHandler, pData);
+		}
+
 		ChunkErrorHandler_t GetErrorHandler(void **pData);
 
 	protected:
@@ -148,6 +172,13 @@ class CChunkFile
 		// Functions for reading chunk files.
 		//
 		[[nodiscard]] ChunkFileResult_t ReadChunk(KeyHandler_t pfnKeyHandler = NULL, void *pData = NULL);
+		// dimhotepus: Type-safe interface.
+		template<typename TData>
+		[[nodiscard]] ChunkFileResult_t ReadChunk(KeyHandlerT_t<TData> pfnKeyHandler = NULL, TData *pData = NULL)
+		{
+			return ReadChunk((KeyHandler_t)pfnKeyHandler, pData);
+		}
+
 		[[nodiscard]] ChunkFileResult_t ReadNext(OUT_Z_CAP(nNameSize) char *szName, intp nNameSize,
 			OUT_Z_CAP(nValueSize) char *szValue, intp nValueSize, ChunkType_t &eChunkType);
 		template<intp nKeySize, intp nValueSize>

@@ -119,13 +119,12 @@ ChunkFileResult_t CVisGroup::LoadVMF(CChunkFile *pFile, CMapDoc *pDoc)
 	LoadData.pParent = this;
 
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler("visgroup", (ChunkHandler_t)LoadVisGroupCallback, &LoadData);
+	Handlers.AddHandler("visgroup", LoadVisGroupCallback, &LoadData);
+
 	pFile->PushHandlers(&Handlers);
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
-	ChunkFileResult_t eResult = pFile->ReadChunk((KeyHandler_t)LoadKeyCallback, this);
-	pFile->PopHandlers();
-
-	return(eResult);
+	return pFile->ReadChunk(LoadKeyCallback, this);
 }
 
 
@@ -176,13 +175,12 @@ ChunkFileResult_t CVisGroup::LoadVisGroupsCallback(CChunkFile *pFile, CMapDoc *p
 	// Set up handlers for the subchunks that we are interested in.
 	//
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler("visgroup", (ChunkHandler_t)LoadVisGroupCallback, &LoadData);
+	Handlers.AddHandler("visgroup", LoadVisGroupCallback, &LoadData);
 	
 	pFile->PushHandlers(&Handlers);
-	ChunkFileResult_t eResult = pFile->ReadChunk();
-	pFile->PopHandlers();
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
-	return(eResult);
+	return pFile->ReadChunk();
 }
 
 

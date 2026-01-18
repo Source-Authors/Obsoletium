@@ -563,7 +563,8 @@ class CMapDoc : public CDocument
 		[[nodiscard]] ChunkFileResult_t VisGroups_SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
 		[[nodiscard]] ChunkFileResult_t SaveViewSettingsVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
 
-		static bool HandleLoadError(CChunkFile *pFile, const char *szChunkName, ChunkFileResult_t eError, CMapDoc *pDoc);
+		// dimhotepus: Fix signature to match expected one.
+		static bool HandleLoadError(CChunkFile *pFile, const char *szChunkName, CMapDoc *pDoc);
 		[[nodiscard]] static ChunkFileResult_t LoadCordonCallback(CChunkFile *pFile, CMapDoc *pDoc);
 		[[nodiscard]] static ChunkFileResult_t LoadCordonKeyCallback(const char *pszKey, const char *pszValue, CMapDoc *pDoc);
 		[[nodiscard]] static ChunkFileResult_t LoadEntityCallback(CChunkFile *pFile, CMapDoc *pDoc);

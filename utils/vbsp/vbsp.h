@@ -265,7 +265,8 @@ public:
 	void				RemoveContentsDetailFromEntity( entity_t *mapent );
 	int					SideIDToIndex( int brushSideID );
 	void				AddLadderKeys( entity_t *mapent );
-	ChunkFileResult_t	LoadEntityCallback(CChunkFile *pFile, int nParam);
+	// dimhotepus: int -> void*
+	ChunkFileResult_t	LoadEntityCallback(CChunkFile *pFile, void* nParam);
 	void				ForceFuncAreaPortalWindowContents();
 	ChunkFileResult_t	LoadSideCallback(CChunkFile *pFile, LoadSide_t *pSideInfo);
 	ChunkFileResult_t	LoadConnectionsKeyCallback(const char *szKey, const char *szValue, LoadEntity_t *pLoadEntity);

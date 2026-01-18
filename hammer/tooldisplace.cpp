@@ -1334,8 +1334,10 @@ bool CToolDisplace::LoadFilters( const char *filename )
 		// Set up handlers for the subchunks that we are interested in.
 		//
 		CChunkHandlerMap Handlers;
-		Handlers.AddHandler( "Filter", ( ChunkHandler_t )CToolDisplace::LoadFiltersCallback, this );
+		Handlers.AddHandler( "Filter", CToolDisplace::LoadFiltersCallback, this );
+
 		File.PushHandlers( &Handlers );
+		RunCodeAtScopeExit(	File.PopHandlers() );
 
 		//
 		// Read the sub-chunks. We ignore keys in the root of the file, so we don't pass a
@@ -1350,8 +1352,6 @@ bool CToolDisplace::LoadFilters( const char *filename )
 		{
 			eResult = ChunkFile_Ok;
 		}
-
-		File.PopHandlers();
 	}
 
 	return( eResult == ChunkFile_Ok );

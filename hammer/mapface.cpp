@@ -2673,7 +2673,7 @@ ChunkFileResult_t CMapFace::LoadVMF(CChunkFile *pFile)
 	// Set up handlers for the subchunks that we are interested in.
 	//
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler("dispinfo", (ChunkHandler_t)LoadDispInfoCallback, this);
+	Handlers.AddHandler("dispinfo", LoadDispInfoCallback, this);
 
 	//
 	// Read the keys and sub-chunks.
@@ -2682,9 +2682,15 @@ ChunkFileResult_t CMapFace::LoadVMF(CChunkFile *pFile)
 	memset(&LoadFace, 0, sizeof(LoadFace));
 	LoadFace.pFace = this;
 
+	ChunkFileResult_t eResult;
+
 	pFile->PushHandlers(&Handlers);
-	ChunkFileResult_t eResult = pFile->ReadChunk((KeyHandler_t)LoadKeyCallback, &LoadFace);
-	pFile->PopHandlers();
+
+	{
+		RunCodeAtScopeExit(pFile->PopHandlers());
+
+		eResult = pFile->ReadChunk(LoadKeyCallback, &LoadFace);
+	}
 
 	if (eResult == ChunkFile_Ok)
 	{

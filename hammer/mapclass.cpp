@@ -1245,7 +1245,7 @@ bool CMapClass::GetTransformMatrix( VMatrix& matrix )
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CMapClass::LoadEditorCallback(CChunkFile *pFile, CMapClass *pObject)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadEditorKeyCallback, pObject));
+	return pFile->ReadChunk(LoadEditorKeyCallback, pObject);
 }
 
 

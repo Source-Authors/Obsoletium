@@ -2767,7 +2767,7 @@ void CMapDisp::PostLoad( void )
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CMapDisp::LoadDispDistancesCallback(CChunkFile *pFile, CMapDisp *pDisp)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadDispDistancesKeyCallback, pDisp));
+	return pFile->ReadChunk(LoadDispDistancesKeyCallback, pDisp);
 }
 
 
@@ -2815,7 +2815,7 @@ ChunkFileResult_t CMapDisp::LoadDispDistancesKeyCallback(const char *szKey, cons
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CMapDisp::LoadDispOffsetsCallback(CChunkFile *pFile, CMapDisp *pDisp)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadDispOffsetsKeyCallback, pDisp));
+	return pFile->ReadChunk(LoadDispOffsetsKeyCallback, pDisp);
 }
 
 
@@ -2873,7 +2873,7 @@ ChunkFileResult_t CMapDisp::LoadDispOffsetsKeyCallback(const char *szKey, const 
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CMapDisp::LoadDispOffsetNormalsCallback(CChunkFile *pFile, CMapDisp *pDisp)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadDispOffsetNormalsKeyCallback, pDisp ));
+	return pFile->ReadChunk(LoadDispOffsetNormalsKeyCallback, pDisp );
 }
 
 
@@ -3016,7 +3016,7 @@ ChunkFileResult_t CMapDisp::LoadDispKeyCallback(const char *szKey, const char *s
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CMapDisp::LoadDispAlphasCallback(CChunkFile *pFile, CMapDisp *pDisp)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadDispAlphasKeyCallback, pDisp));
+	return pFile->ReadChunk(LoadDispAlphasKeyCallback, pDisp);
 }
 
 
@@ -3062,7 +3062,7 @@ ChunkFileResult_t CMapDisp::LoadDispAlphasKeyCallback(const char *szKey, const c
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CMapDisp::LoadDispTriangleTagsCallback(CChunkFile *pFile, CMapDisp *pDisp)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadDispTriangleTagsKeyCallback, pDisp));
+	return pFile->ReadChunk(LoadDispTriangleTagsKeyCallback, pDisp);
 }
 
 //-----------------------------------------------------------------------------
@@ -3100,7 +3100,7 @@ ChunkFileResult_t CMapDisp::LoadDispTriangleTagsKeyCallback(const char *szKey, c
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CMapDisp::LoadDispAllowedVertsCallback( CChunkFile *pFile, CMapDisp *pDisp )
 {
-	return( pFile->ReadChunk( ( KeyHandler_t )LoadDispAllowedVertsKeyCallback, pDisp ) );
+	return pFile->ReadChunk(LoadDispAllowedVertsKeyCallback, pDisp);
 }
 
 //-----------------------------------------------------------------------------
@@ -3136,7 +3136,7 @@ ChunkFileResult_t CMapDisp::LoadDispAllowedVertsKeyCallback( const char *szKey, 
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CMapDisp::LoadDispNormalsCallback(CChunkFile *pFile, CMapDisp *pDisp)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadDispNormalsKeyCallback, pDisp));
+	return pFile->ReadChunk(LoadDispNormalsKeyCallback, pDisp);
 }
 
 //-----------------------------------------------------------------------------
@@ -3195,19 +3195,18 @@ ChunkFileResult_t CMapDisp::LoadVMF(CChunkFile *pFile)
 	// Set up handlers for the subchunks that we are interested in.
 	//
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler("normals", (ChunkHandler_t)LoadDispNormalsCallback, this);
-	Handlers.AddHandler("distances", (ChunkHandler_t)LoadDispDistancesCallback, this);
-	Handlers.AddHandler("offsets", (ChunkHandler_t)LoadDispOffsetsCallback, this);
-	Handlers.AddHandler("offset_normals", (ChunkHandler_t)LoadDispOffsetNormalsCallback, this);
-	Handlers.AddHandler("alphas", (ChunkHandler_t)LoadDispAlphasCallback, this);
-	Handlers.AddHandler("triangle_tags", (ChunkHandler_t)LoadDispTriangleTagsCallback, this );
-	Handlers.AddHandler("allowed_verts", (ChunkHandler_t)LoadDispAllowedVertsCallback, this );
+	Handlers.AddHandler("normals", LoadDispNormalsCallback, this);
+	Handlers.AddHandler("distances", LoadDispDistancesCallback, this);
+	Handlers.AddHandler("offsets", LoadDispOffsetsCallback, this);
+	Handlers.AddHandler("offset_normals", LoadDispOffsetNormalsCallback, this);
+	Handlers.AddHandler("alphas", LoadDispAlphasCallback, this);
+	Handlers.AddHandler("triangle_tags", LoadDispTriangleTagsCallback, this );
+	Handlers.AddHandler("allowed_verts", LoadDispAllowedVertsCallback, this );
 
 	pFile->PushHandlers(&Handlers);
-	ChunkFileResult_t eResult = pFile->ReadChunk((KeyHandler_t)LoadDispKeyCallback, this);
-	pFile->PopHandlers();
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
-	return(eResult);
+	return pFile->ReadChunk(LoadDispKeyCallback, this);
 }
 
 

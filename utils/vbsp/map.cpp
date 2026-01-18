@@ -815,7 +815,7 @@ void CMapFile::RemoveContentsDetailFromEntity( entity_t *mapent )
 //-----------------------------------------------------------------------------
 ChunkFileResult_t LoadDispDistancesCallback(CChunkFile *pFile, mapdispinfo_t *pMapDispInfo)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadDispDistancesKeyCallback, pMapDispInfo));
+	return pFile->ReadChunk(LoadDispDistancesKeyCallback, pMapDispInfo);
 }
 
 
@@ -875,23 +875,23 @@ ChunkFileResult_t LoadDispInfoCallback(CChunkFile *pFile, mapdispinfo_t **ppMapD
 	// Set up handlers for the subchunks that we are interested in.
 	//
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler("normals", (ChunkHandler_t)LoadDispNormalsCallback, pMapDispInfo);
-	Handlers.AddHandler("distances", (ChunkHandler_t)LoadDispDistancesCallback, pMapDispInfo);
-	Handlers.AddHandler("offsets", (ChunkHandler_t)LoadDispOffsetsCallback, pMapDispInfo);
-	Handlers.AddHandler("alphas", (ChunkHandler_t)LoadDispAlphasCallback, pMapDispInfo);
-	Handlers.AddHandler("triangle_tags", (ChunkHandler_t)LoadDispTriangleTagsCallback, pMapDispInfo);
+	Handlers.AddHandler("normals", LoadDispNormalsCallback, pMapDispInfo);
+	Handlers.AddHandler("distances", LoadDispDistancesCallback, pMapDispInfo);
+	Handlers.AddHandler("offsets", LoadDispOffsetsCallback, pMapDispInfo);
+	Handlers.AddHandler("alphas", LoadDispAlphasCallback, pMapDispInfo);
+	Handlers.AddHandler("triangle_tags", LoadDispTriangleTagsCallback, pMapDispInfo);
 
 #ifdef VSVMFIO
-	Handlers.AddHandler("offset_normals", (ChunkHandler_t)LoadDispOffsetNormalsCallback, pMapDispInfo);
+	Handlers.AddHandler("offset_normals", LoadDispOffsetNormalsCallback, pMapDispInfo);
 #endif // VSVMFIO
 
 	//
 	// Read the displacement chunk.
 	//
 	pFile->PushHandlers(&Handlers);
-	ChunkFileResult_t eResult = pFile->ReadChunk((KeyHandler_t)LoadDispInfoKeyCallback, pMapDispInfo);
-	pFile->PopHandlers();
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
+	ChunkFileResult_t eResult = pFile->ReadChunk(LoadDispInfoKeyCallback, pMapDispInfo);
 	if (eResult == ChunkFile_Ok)
 	{
 		// return a pointer to the displacement info
@@ -964,7 +964,7 @@ ChunkFileResult_t LoadDispInfoKeyCallback(const char *szKey, const char *szValue
 //-----------------------------------------------------------------------------
 ChunkFileResult_t LoadDispNormalsCallback(CChunkFile *pFile, mapdispinfo_t *pMapDispInfo)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadDispNormalsKeyCallback, pMapDispInfo));
+	return pFile->ReadChunk(LoadDispNormalsKeyCallback, pMapDispInfo);
 }
 
 
@@ -1019,7 +1019,7 @@ ChunkFileResult_t LoadDispNormalsKeyCallback(const char *szKey, const char *szVa
 //-----------------------------------------------------------------------------
 ChunkFileResult_t LoadDispOffsetsCallback(CChunkFile *pFile, mapdispinfo_t *pMapDispInfo)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadDispOffsetsKeyCallback, pMapDispInfo));
+	return pFile->ReadChunk(LoadDispOffsetsKeyCallback, pMapDispInfo);
 }
 
 
@@ -1068,7 +1068,7 @@ ChunkFileResult_t LoadDispOffsetsKeyCallback(const char *szKey, const char *szVa
 #ifdef VSVMFIO
 ChunkFileResult_t LoadDispOffsetNormalsCallback(CChunkFile *pFile, mapdispinfo_t *pMapDispInfo)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadDispOffsetNormalsKeyCallback, pMapDispInfo));
+	return pFile->ReadChunk(LoadDispOffsetNormalsKeyCallback, pMapDispInfo);
 }
 
 
@@ -1117,7 +1117,7 @@ ChunkFileResult_t LoadDispOffsetNormalsKeyCallback(const char *szKey, const char
 //-----------------------------------------------------------------------------
 ChunkFileResult_t LoadDispAlphasCallback(CChunkFile *pFile, mapdispinfo_t *pMapDispInfo)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadDispAlphasKeyCallback, pMapDispInfo));
+	return pFile->ReadChunk(LoadDispAlphasKeyCallback, pMapDispInfo);
 }
 
 
@@ -1158,7 +1158,7 @@ ChunkFileResult_t LoadDispAlphasKeyCallback(const char *szKey, const char *szVal
 //-----------------------------------------------------------------------------
 ChunkFileResult_t LoadDispTriangleTagsCallback(CChunkFile *pFile, mapdispinfo_t *pMapDispInfo)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadDispTriangleTagsKeyCallback, pMapDispInfo));
+	return pFile->ReadChunk(LoadDispTriangleTagsKeyCallback, pMapDispInfo);
 }
 
 //-----------------------------------------------------------------------------
@@ -1413,7 +1413,8 @@ static ChunkFileResult_t LoadOverlayDataTransitionKeyCallback( const char *szKey
 	return ChunkFile_Ok;
 }
 
-static ChunkFileResult_t LoadOverlayDataTransitionCallback( CChunkFile *pFile, int nParam )
+// dimhotepus: int -> void*
+static ChunkFileResult_t LoadOverlayDataTransitionCallback( CChunkFile *pFile, void *nParam )
 {
 	intp iOverlay = g_aMapWaterOverlays.AddToTail();
 	mapoverlay_t *pOverlay = &g_aMapWaterOverlays[iOverlay];
@@ -1421,21 +1422,18 @@ static ChunkFileResult_t LoadOverlayDataTransitionCallback( CChunkFile *pFile, i
 	pOverlay->nId = ( MAX_MAP_OVERLAYS + 1 ) + g_aMapWaterOverlays.Count() - 1;
 	pOverlay->m_nRenderOrder = 0;
 
-	ChunkFileResult_t eResult = pFile->ReadChunk( ( KeyHandler_t )LoadOverlayDataTransitionKeyCallback, pOverlay );
-	return eResult;
+	return pFile->ReadChunk( LoadOverlayDataTransitionKeyCallback, pOverlay );
 }
 
-static ChunkFileResult_t LoadOverlayTransitionCallback( CChunkFile *pFile, int nParam )
+static ChunkFileResult_t LoadOverlayTransitionCallback( CChunkFile *pFile, void *nParam )
 {
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler( "overlaydata", ( ChunkHandler_t )LoadOverlayDataTransitionCallback, 0 );
+	Handlers.AddHandler( "overlaydata", LoadOverlayDataTransitionCallback, nullptr );
+
 	pFile->PushHandlers( &Handlers );
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
-	ChunkFileResult_t eResult = pFile->ReadChunk( NULL, NULL );
-
-	pFile->PopHandlers();
-
-	return eResult;
+	return pFile->ReadChunk( NULL, NULL );
 }
 
 //-----------------------------------------------------------------------------
@@ -1479,7 +1477,8 @@ void CMapFile::AddLadderKeys( entity_t *mapent )
 	SetKeyValue( mapent, "maxs.z", buf );
 }
 
-ChunkFileResult_t LoadEntityCallback(CChunkFile *pFile, int nParam)
+// dimhotepus: int -> void*
+ChunkFileResult_t LoadEntityCallback(CChunkFile *pFile, void* nParam)
 {
 	return g_LoadingMap->LoadEntityCallback( pFile, nParam );
 }
@@ -1490,7 +1489,8 @@ ChunkFileResult_t LoadEntityCallback(CChunkFile *pFile, int nParam)
 //			ulParam - 
 // Output : ChunkFileResult_t
 //-----------------------------------------------------------------------------
-ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, int nParam)
+// dimhotepus: int -> void*
+ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, void* nParam)
 {
 	if (num_entities == MAX_MAP_ENTITIES)
 	{
@@ -1517,15 +1517,15 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, int nParam)
 	// Set up handlers for the subchunks that we are interested in.
 	//
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler("solid", (ChunkHandler_t)::LoadSolidCallback, &LoadEntity);
-	Handlers.AddHandler("connections", (ChunkHandler_t)LoadConnectionsCallback, &LoadEntity);
-	Handlers.AddHandler( "overlaytransition", ( ChunkHandler_t )LoadOverlayTransitionCallback, 0 );
+	Handlers.AddHandler("solid", ::LoadSolidCallback, &LoadEntity);
+	Handlers.AddHandler("connections", LoadConnectionsCallback, &LoadEntity);
+	Handlers.AddHandler( "overlaytransition", LoadOverlayTransitionCallback, nullptr );
 
 	//
 	// Read the entity chunk.
 	//
 	pFile->PushHandlers(&Handlers);
-	ChunkFileResult_t eResult = pFile->ReadChunk((KeyHandler_t)LoadEntityKeyCallback, &LoadEntity);
+	ChunkFileResult_t eResult = pFile->ReadChunk(LoadEntityKeyCallback, &LoadEntity);
 	pFile->PopHandlers();
 
 	if (eResult == ChunkFile_Ok)
@@ -2604,10 +2604,11 @@ bool LoadMapFile( const char *pszFileName )
 			// Set up handlers for the subchunks that we are interested in.
 			//
 			CChunkHandlerMap Handlers;
-			Handlers.AddHandler("world", (ChunkHandler_t)LoadEntityCallback, 0);
-			Handlers.AddHandler("entity", (ChunkHandler_t)LoadEntityCallback, 0);
+			Handlers.AddHandler("world", LoadEntityCallback, nullptr);
+			Handlers.AddHandler("entity", LoadEntityCallback, nullptr);
 
 			File.PushHandlers(&Handlers);
+			RunCodeAtScopeExit(File.PopHandlers());
 
 			//
 			// Read the sub-chunks. We ignore keys in the root of the file.
@@ -2616,8 +2617,6 @@ bool LoadMapFile( const char *pszFileName )
 			{
 				eResult = File.ReadChunk();
 			}
-
-			File.PopHandlers();
 		}
 		else
 		{
@@ -2709,13 +2708,13 @@ ChunkFileResult_t CMapFile::LoadSideCallback(CChunkFile *pFile, LoadSide_t *pSid
 	// Set up handlers for the subchunks that we are interested in.
 	//
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler( "dispinfo", ( ChunkHandler_t )LoadDispInfoCallback, &side->pMapDisp );
+	Handlers.AddHandler( "dispinfo", LoadDispInfoCallback, &side->pMapDisp );
 
 	//
 	// Read the side chunk.
 	//
 	pFile->PushHandlers(&Handlers);
-	ChunkFileResult_t eResult = pFile->ReadChunk((KeyHandler_t)LoadSideKeyCallback, pSideInfo);
+	ChunkFileResult_t eResult = pFile->ReadChunk(LoadSideKeyCallback, pSideInfo);
 	pFile->PopHandlers();
 
 	if (eResult == ChunkFile_Ok)
@@ -2914,7 +2913,7 @@ ChunkFileResult_t LoadSideKeyCallback(const char *szKey, const char *szValue, Lo
 //-----------------------------------------------------------------------------
 ChunkFileResult_t LoadConnectionsCallback(CChunkFile *pFile, LoadEntity_t *pLoadEntity)
 {
-	return(pFile->ReadChunk((KeyHandler_t)LoadConnectionsKeyCallback, pLoadEntity));
+	return pFile->ReadChunk(LoadConnectionsKeyCallback, pLoadEntity);
 }
 
 
@@ -2998,13 +2997,13 @@ ChunkFileResult_t CMapFile::LoadSolidCallback(CChunkFile *pFile, LoadEntity_t *p
 	// Set up handlers for the subchunks that we are interested in.
 	//
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler("side", (ChunkHandler_t)::LoadSideCallback, &SideInfo);
+	Handlers.AddHandler("side", ::LoadSideCallback, &SideInfo);
 
 	//
 	// Read the solid chunk.
 	//
 	pFile->PushHandlers(&Handlers);
-	ChunkFileResult_t eResult = pFile->ReadChunk((KeyHandler_t)LoadSolidKeyCallback, b);
+	ChunkFileResult_t eResult = pFile->ReadChunk(LoadSolidKeyCallback, b);
 	pFile->PopHandlers();
 
 	if (eResult == ChunkFile_Ok)

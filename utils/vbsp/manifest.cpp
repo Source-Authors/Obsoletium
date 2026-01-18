@@ -69,13 +69,11 @@ ChunkFileResult_t CManifest::LoadManifestMapKeyCallback( const char *szKey, cons
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CManifest::LoadManifestVMFCallback( CChunkFile *pFile, CManifest *pManifest )
 {
-	CManifestMap	*pManifestMap = new CManifestMap();
+	auto *pManifestMap = new CManifestMap();
 
 	pManifest->m_Maps.AddToTail( pManifestMap );
 
-	ChunkFileResult_t eResult = pFile->ReadChunk( ( KeyHandler_t )LoadManifestMapKeyCallback, pManifestMap );
-
-	return( eResult );
+	return pFile->ReadChunk( LoadManifestMapKeyCallback, pManifestMap );
 }
 
 
@@ -88,16 +86,12 @@ ChunkFileResult_t CManifest::LoadManifestVMFCallback( CChunkFile *pFile, CManife
 ChunkFileResult_t CManifest::LoadManifestMapsCallback( CChunkFile *pFile, CManifest *pManifest )
 {
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler( "VMF", ( ChunkHandler_t )LoadManifestVMFCallback, pManifest );
+	Handlers.AddHandler( "VMF", LoadManifestVMFCallback, pManifest );
+
 	pFile->PushHandlers(&Handlers);
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
-	ChunkFileResult_t eResult = ChunkFile_Ok;
-
-	eResult = pFile->ReadChunk();
-
-	pFile->PopHandlers();
-
-	return( eResult );
+	return pFile->ReadChunk();
 }
 
 
@@ -113,7 +107,7 @@ ChunkFileResult_t CManifest::LoadCordonBoxCallback( CChunkFile *pFile, Cordon_t 
 	BoundBox &box = pCordon->m_Boxes.Tail();
 
 	// Fill it in with the data from the VMF.
-	return pFile->ReadChunk( (KeyHandler_t)LoadCordonBoxKeyCallback, (void *)&box );
+	return pFile->ReadChunk( LoadCordonBoxKeyCallback, &box );
 }
 
 
@@ -170,13 +164,12 @@ ChunkFileResult_t CManifest::LoadCordonCallback( CChunkFile *pFile, CManifest *p
 	Cordon_t &cordon = pManifest->m_Cordons.Tail();
 
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler( "box", (ChunkHandler_t)CManifest::LoadCordonBoxCallback, (void *)&cordon );
+	Handlers.AddHandler( "box", CManifest::LoadCordonBoxCallback, &cordon );
 
 	pFile->PushHandlers(&Handlers);
-	ChunkFileResult_t eResult = pFile->ReadChunk( (KeyHandler_t)LoadCordonKeyCallback, (void *)&cordon );
-	pFile->PopHandlers();
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
-	return(eResult);
+	return pFile->ReadChunk( LoadCordonKeyCallback, &cordon );
 }
 
 
@@ -218,13 +211,12 @@ ChunkFileResult_t CManifest::LoadCordonsKeyCallback( const char *szKey, const ch
 ChunkFileResult_t CManifest::LoadCordonsCallback( CChunkFile *pFile, CManifest *pManifest )
 {
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler( "cordon", (ChunkHandler_t)CManifest::LoadCordonCallback, pManifest );
+	Handlers.AddHandler( "cordon", CManifest::LoadCordonCallback, pManifest );
 
 	pFile->PushHandlers(&Handlers);
-	ChunkFileResult_t eResult = pFile->ReadChunk( (KeyHandler_t)LoadCordonsKeyCallback, pManifest );
-	pFile->PopHandlers();
-
-	return(eResult);
+	RunCodeAtScopeExit(pFile->PopHandlers());
+	
+	return pFile->ReadChunk( LoadCordonsKeyCallback, pManifest );
 }
 
 extern ChunkFileResult_t LoadSolidCallback(CChunkFile *pFile, LoadEntity_t *pLoadEntity);
@@ -237,9 +229,8 @@ ChunkFileResult_t CManifest::LoadManifestCordoningPrefsCallback( CChunkFile *pFi
 	pDoc->m_CordoningMapEnt->firstbrush = g_MainMap->nummapbrushes;
 	pDoc->m_CordoningMapEnt->numbrushes = 0;
 
-	LoadEntity_t LoadEntity;
+	LoadEntity_t LoadEntity = {};
 	LoadEntity.pEntity = pDoc->m_CordoningMapEnt;
-
 	// No default flags/contents
 	LoadEntity.nBaseFlags = 0;
 	LoadEntity.nBaseContents = 0;
@@ -248,17 +239,13 @@ ChunkFileResult_t CManifest::LoadManifestCordoningPrefsCallback( CChunkFile *pFi
 	// Set up handlers for the subchunks that we are interested in.
 	//
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler( "cordons", ( ChunkHandler_t )CManifest::LoadCordonsCallback, pDoc );
-	Handlers.AddHandler("solid", (ChunkHandler_t)::LoadSolidCallback, &LoadEntity);
+	Handlers.AddHandler( "cordons", CManifest::LoadCordonsCallback, pDoc );
+	Handlers.AddHandler( "solid", ::LoadSolidCallback, &LoadEntity );
+
 	pFile->PushHandlers(&Handlers);
+	RunCodeAtScopeExit(pFile->PopHandlers());
 
-	ChunkFileResult_t eResult = ChunkFile_Ok;
-
-	eResult = pFile->ReadChunk();
-
-	pFile->PopHandlers();
-
-	return( eResult );
+	return pFile->ReadChunk();
 }
 
 
@@ -305,7 +292,6 @@ bool CManifest::LoadSubMaps( CMapFile *pMapFile, const char *pszFileName )
 		//		if ( m_Maps[ i ]->m_bTopLevelMap == false )
 		{
 			char		FileName[ MAX_PATH ];
-
 			V_sprintf_safe( FileName, "%s%s", m_InstancePath, m_Maps[ i ]->m_RelativeMapFileName );
 
 			InstanceEntity = &pMapFile->entities[ pMapFile->num_entities ];
@@ -382,11 +368,12 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 		// Set up handlers for the subchunks that we are interested in.
 		//
 		CChunkHandlerMap Handlers;
-		Handlers.AddHandler( "cordoning", ( ChunkHandler_t )CManifest::LoadManifestCordoningPrefsCallback, this );
+		Handlers.AddHandler( "cordoning", CManifest::LoadManifestCordoningPrefsCallback, this );
 
-		//		Handlers.SetErrorHandler( ( ChunkErrorHandler_t )CMapDoc::HandleLoadError, this);
+		// Handlers.SetErrorHandler( CMapDoc::HandleLoadError, this);
 
 		File.PushHandlers(&Handlers);
+		RunCodeAtScopeExit(File.PopHandlers());
 
 		while( eResult == ChunkFile_Ok )
 		{
@@ -397,8 +384,6 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 		{
 			eResult = ChunkFile_Ok;
 		}
-
-		File.PopHandlers();
 	}
 
 	if ( eResult == ChunkFile_Ok )
@@ -430,21 +415,22 @@ bool CManifest::LoadVMFManifest( const char *pszFileName )
 	}
 
 	CChunkHandlerMap Handlers;
-	Handlers.AddHandler( "Maps", ( ChunkHandler_t )LoadManifestMapsCallback, this );
+	Handlers.AddHandler( "Maps", LoadManifestMapsCallback, this );
 
-	File.PushHandlers(&Handlers);
-
-	while (eResult == ChunkFile_Ok)
 	{
-		eResult = File.ReadChunk();
-	}
+		File.PushHandlers(&Handlers);
+		RunCodeAtScopeExit(File.PopHandlers());
 
-	if (eResult == ChunkFile_EOF)
-	{
-		eResult = ChunkFile_Ok;
-	}
+		while (eResult == ChunkFile_Ok)
+		{
+			eResult = File.ReadChunk();
+		}
 
-	File.PopHandlers();
+		if (eResult == ChunkFile_EOF)
+		{
+			eResult = ChunkFile_Ok;
+		}
+	}
 
 	if ( eResult == ChunkFile_Ok )
 	{
