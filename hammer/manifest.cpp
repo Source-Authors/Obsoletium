@@ -364,17 +364,15 @@ ChunkFileResult_t CManifest::LoadManifestCordoningPrefsCallback( CChunkFile *pFi
 //-----------------------------------------------------------------------------
 bool CManifest::LoadVMFManifest( const char *pszFileName )
 {
-	FILE *fp = fopen( pszFileName, "rb" );
-	if ( !fp )
+	CChunkFile File;
+	ChunkFileResult_t eResult = File.Open( pszFileName, ChunkFile_Read );
+	if (eResult != ChunkFile_Ok)
 	{
 		return false;
 	}
 
 	V_StripExtension( pszFileName, m_ManifestDir );
 	V_strcat_safe( m_ManifestDir, "\\" );
-
-	CChunkFile File;
-	ChunkFileResult_t eResult = File.Open( pszFileName, ChunkFile_Read );
 
 	m_bLoading = true;
 
@@ -493,14 +491,12 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 	V_sprintf_safe( UserPrefsFileName, "%s.vmm_prefs", UserName );
 	V_strcat_safe( FileName, UserPrefsFileName );
 
-	FILE *fp = fopen( FileName, "rb" );
-	if ( !fp )
+	CChunkFile File;
+	ChunkFileResult_t eResult = File.Open( FileName, ChunkFile_Read );
+	if ( eResult != ChunkFile_Ok )
 	{
 		return false;
 	}
-
-	CChunkFile File;
-	ChunkFileResult_t eResult = File.Open( FileName, ChunkFile_Read );
 
 	m_bLoading = true;
 
