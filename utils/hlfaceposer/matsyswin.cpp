@@ -43,11 +43,11 @@ extern char g_appTitle[];
 
 // FIXME: move all this to mxMatSysWin
 
-class DummyMaterialProxyFactory : public IMaterialProxyFactory
+class DummyMaterialProxyFactory final : public IMaterialProxyFactory
 {
 public:
-	virtual IMaterialProxy *CreateProxy( const char *proxyName )	{return NULL;}
-	virtual void DeleteProxy( IMaterialProxy *pProxy )				{}
+	IMaterialProxy *CreateProxy( const char *proxyName ) override	{return NULL;}
+	void DeleteProxy( IMaterialProxy *pProxy ) override	{}
 };
 DummyMaterialProxyFactory	g_DummyMaterialProxyFactory;
 
