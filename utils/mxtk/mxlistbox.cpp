@@ -11,6 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
+#include "stdafx.h"
 #include "mxtk/mxlistbox.h"
 #include "winlite.h"
 
@@ -38,9 +39,10 @@ mxListBox::mxListBox (mxWindow *parent, int x, int y, int w, int h, int id, int 
 
 	void *handle = CreateWindowEx (WS_EX_CLIENTEDGE, "LISTBOX", "", dwStyle,
 				x, y, w, h, hwndParent,
-				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
+				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), this);
 	
-	SendMessage ((HWND) handle, WM_SETFONT, (WPARAM) (HFONT) GetStockObject (ANSI_VAR_FONT), MAKELPARAM (TRUE, 0));
+	// dimhotepus: Breaks DPI scaling.
+	// SendMessage ((HWND) handle, WM_SETFONT, (WPARAM) (HFONT) GetStockObject (ANSI_VAR_FONT), MAKELPARAM (TRUE, 0));
 	SetWindowLongPtr ((HWND) handle, GWLP_USERDATA, (LONG_PTR) this);
 
 	setHandle (handle);

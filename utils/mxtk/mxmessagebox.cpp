@@ -11,6 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
+#include "stdafx.h"
 #include "mxtk/mxmessagebox.h"
 #include "mxtk/mxwindow.h"
 #include "winlite.h"

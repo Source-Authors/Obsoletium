@@ -11,6 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
+#include "stdafx.h"
 #include "mxtk/mxlabel.h"
 #include "winlite.h"
 
@@ -35,9 +36,10 @@ mxLabel::mxLabel (mxWindow *parent, int x, int y, int w, int h, const char *labe
 
 	void *handle = CreateWindowEx (0, "STATIC", label, WS_VISIBLE | WS_CHILD,
 				x, y, w, h, hwndParent,
-				(HMENU) NULL, (HINSTANCE) GetModuleHandle (NULL), NULL);
+				(HMENU) NULL, (HINSTANCE) GetModuleHandle (NULL), this);
 	
-	SendMessage ((HWND) handle, WM_SETFONT, (WPARAM) (HFONT) GetStockObject (ANSI_VAR_FONT), MAKELPARAM (TRUE, 0));
+	// dimhotepus: Breaks DPI scaling.
+	// SendMessage ((HWND) handle, WM_SETFONT, (WPARAM) (HFONT) GetStockObject (ANSI_VAR_FONT), MAKELPARAM (TRUE, 0));
 
 	setHandle (handle);
 	setType (MX_LABEL);

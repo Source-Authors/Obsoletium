@@ -11,6 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
+#include "stdafx.h"
 #include "mxtk/mxprogressbar.h"
 #include "winlite.h"
 #include <commctrl.h>
@@ -39,9 +40,10 @@ mxProgressBar::mxProgressBar (mxWindow *parent, int x, int y, int w, int h, int 
 
 	void *handle = CreateWindowEx (0, PROGRESS_CLASS, "", dwStyle,
 				x, y, w, h, hwndParent,
-				(HMENU) NULL, (HINSTANCE) GetModuleHandle (NULL), NULL);
+				(HMENU) NULL, (HINSTANCE) GetModuleHandle (NULL), this);
 	
-	SendMessage ((HWND) handle, WM_SETFONT, (WPARAM) (HFONT) GetStockObject (ANSI_VAR_FONT), MAKELPARAM (TRUE, 0));
+	// dimhotepus: Breaks DPI scaling.
+	// SendMessage ((HWND) handle, WM_SETFONT, (WPARAM) (HFONT) GetStockObject (ANSI_VAR_FONT), MAKELPARAM (TRUE, 0));
 
 	setHandle (handle);
 	setType (MX_PROGRESSBAR);

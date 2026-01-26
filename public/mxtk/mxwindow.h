@@ -24,7 +24,19 @@
 #include "mxtk/mxevent.h"
 #endif
 
+#include <basetsd.h>
+#include <memory>
 
+
+/* Types use for passing & returning polymorphic values */
+using WPARAM = UINT_PTR;
+using LPARAM = LONG_PTR;
+using LRESULT = LONG_PTR;
+
+namespace se::windows::ui
+{
+class CDpiWindowBehavior;
+}
 
 class mxMenuBar;
 
@@ -34,6 +46,12 @@ class mxWindow_i;
 class mxWindow : public mxWidget
 {
 	mxWindow_i *d_this;
+
+protected:
+
+	std::unique_ptr<se::windows::ui::CDpiWindowBehavior> d_dpiWindowBehavior;
+
+	int quickUIScale(int value);
 
 public:
 	// ENUMS
@@ -65,6 +83,10 @@ public:
 
 	mxWindow (const mxWindow&) = delete;
 	mxWindow& operator= (const mxWindow&) = delete;
+
+	int onCreate( void *hwnd );
+	void onDestroy();
+	int onDpiChanged(WPARAM wParam, LPARAM lParam);
 };
 
 

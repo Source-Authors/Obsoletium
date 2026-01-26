@@ -11,6 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
+#include "stdafx.h"
 #include "mxtk/mxmenubar.h"
 #include "winlite.h"
 
@@ -19,7 +20,7 @@
 class mxMenuBar_i
 {
 public:
-	int dummy;
+	HWND d_hwnd;
 };
 
 
@@ -27,6 +28,9 @@ public:
 mxMenuBar::mxMenuBar (mxWindow *parent)
 : mxWidget (0, 0, 0, 0, 0)
 {
+	// dimhotepus: Store parent window to compute DPI.
+	d_this = new mxMenuBar_i;
+
 	void *handle = CreateMenu ();
 	setHandle (handle);
 	setType (MX_MENUBAR);
@@ -35,7 +39,10 @@ mxMenuBar::mxMenuBar (mxWindow *parent)
 	if (parent)
 	{
 		mxWidget *w = (mxWidget *) parent;
-		SetMenu ((HWND) w->getHandle (), (HMENU) handle);
+		
+		d_this->d_hwnd = (HWND) w->getHandle ();
+
+		SetMenu (d_this->d_hwnd, (HMENU) handle);
 	}
 }
 
@@ -43,6 +50,7 @@ mxMenuBar::mxMenuBar (mxWindow *parent)
 
 mxMenuBar::~mxMenuBar ()
 {
+	delete d_this;
 }
 
 
@@ -116,5 +124,7 @@ mxMenuBar::isChecked (int id) const
 int
 mxMenuBar::getHeight () const
 {
-	return 0;
+	const unsigned dpi{d_this->d_hwnd ? GetDpiForWindow( d_this->d_hwnd ) : USER_DEFAULT_SCREEN_DPI};
+	// dimhotepus: Get real height of menu bar.
+	return GetSystemMetricsForDpi( SM_CYMENU, dpi );
 }

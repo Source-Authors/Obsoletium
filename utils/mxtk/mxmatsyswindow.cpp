@@ -11,6 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
+#include "stdafx.h"
 #include "mxtk/mxmatsyswindow.h"
 #include "winlite.h"
 
@@ -18,7 +19,6 @@ class mxMatSysWindow_i
 {
 public:
 	HDC hdc;
-	HGLRC hglrc;
 };
 
 
@@ -28,19 +28,12 @@ mxMatSysWindow::mxMatSysWindow (mxWindow *parent, int x, int y, int w, int h, co
 {
 	d_this = new mxMatSysWindow_i;
 
-	bool error = false;
-
 	if ((d_this->hdc = GetDC ((HWND) getHandle ())) == NULL)
 	{
-		error = true;
-		goto done;
+		return;
 	}
 
 	setDrawFunc (0);
-
-done:
-	if (error)
-		delete this;
 }
 
 

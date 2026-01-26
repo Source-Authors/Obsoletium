@@ -15,6 +15,9 @@ $Configuration
 	{
 		$AdditionalIncludeDirectories		"$BASE,..\..\public"
 		$PreprocessorDefinitions		"$BASE;_CRT_SECURE_NO_DEPRECATE"
+		$Create/UsePrecompiledHeader	"Use Precompiled Header (/Yu)"
+		$Create/UsePCHThroughFile		"stdafx.h"
+		$PrecompiledHeaderFile			"$(IntDir)/mxtoolkitwin32.pch"
 	}
 }
 
@@ -53,6 +56,18 @@ $Project "mxtoolkitwin32"
 		$File	"mxTreeView.cpp"
 		$File	"mxWidget.cpp"
 		$File	"mxWindow.cpp"
+		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.cpp"
+
+		$File	"stdafx.cpp"
+		{
+			$Configuration
+			{
+				$Compiler
+				{
+					$Create/UsePrecompiledHeader	"Create Precompiled Header (/Yc)"
+				}
+			}
+		}
 	}
 
 	$Folder	"Header Files"
@@ -94,5 +109,6 @@ $Project "mxtoolkitwin32"
 		$File	"..\..\public\mxtk\mxTreeView.h"
 		$File	"..\..\public\mxtk\mxWidget.h"
 		$File	"..\..\public\mxtk\mxWindow.h"
+		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.h"
 	}
 }

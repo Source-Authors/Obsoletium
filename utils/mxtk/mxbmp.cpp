@@ -13,6 +13,7 @@
 
 // lbmlib.c
 
+#include "stdafx.h"
 #include "mxtk/mxbmp.h"
 #include <cstdio>
 #include <cstdlib>

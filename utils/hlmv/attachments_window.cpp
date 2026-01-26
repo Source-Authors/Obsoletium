@@ -27,20 +27,20 @@ CAttachmentsWindow::CAttachmentsWindow( ControlPanel* pParent )	: mxWindow( pPar
 
 void CAttachmentsWindow::Init( )
 {
-	int left, top;
-	left = 5;
-	top = 0;
+	int left = 5;
+	int top = 0;
 
 	// Attachment selection list
-	new mxLabel( this, left + 3, top + 4, 60, 18, "Attachment" );
-	m_cAttachmentList = new mxListBox( this, left, top + 20, 260, 100, IDC_ATTACHMENT_LIST );
+	new mxLabel( this, quickUIScale( left + 3 ), quickUIScale( top + 4 ), quickUIScale( 60 ), quickUIScale( 18 ), "Attachment" );
+	m_cAttachmentList = new mxListBox( this, quickUIScale( left ), quickUIScale( top + 20 ), quickUIScale( 260 ), quickUIScale( 100 ), IDC_ATTACHMENT_LIST );
 	m_cAttachmentList->add ("None");
 	m_cAttachmentList->select (0);
 	mxToolTip::add (m_cAttachmentList, "Select an attachment to modify");
 
 	left = 280;
-	new mxLabel( this, left + 3, top + 4, 60, 18, "Attach To Bone" );
-	m_cBoneList = new mxListBox( this, left, top + 20, 260, 100, IDC_ATTACHMENT_LIST_BONES );
+	// dimhotepus: width 60 -> 65 to fit.
+	new mxLabel( this, quickUIScale( left + 3 ), quickUIScale( top + 4 ), quickUIScale( 65 ), quickUIScale( 18 ), "Attach To Bone" );
+	m_cBoneList = new mxListBox( this, quickUIScale( left ), quickUIScale( top + 20 ), quickUIScale( 260 ), quickUIScale( 100 ), IDC_ATTACHMENT_LIST_BONES );
 	m_cBoneList->add ("None");
 	m_cBoneList->select( 0 );
 	mxToolTip::add( m_cBoneList, "Select a bone to attach to" );
@@ -48,20 +48,20 @@ void CAttachmentsWindow::Init( )
 	
 	left = 5;
 	top = 120;
-	new mxLabel( this, left + 3, top + 4, 60, 18, "Translation" );
-	m_cTranslation = new mxLineEdit2( this, left + 70, top, 90, 25, "10 20 30", IDC_ATTACHMENT_TRANSLATION );
+	new mxLabel( this, quickUIScale( left + 3 ), quickUIScale( top + 4 ), quickUIScale( 60 ), quickUIScale( 18 ), "Translation" );
+	m_cTranslation = new mxLineEdit2( this, quickUIScale( left + 70 ), quickUIScale( top ), quickUIScale( 90 ), quickUIScale( 25 ), "10 20 30", IDC_ATTACHMENT_TRANSLATION );
 
 	
 	left = 170;
 	top = 120;
-	new mxLabel( this, left + 3, top + 4, 60, 18, "Rotation" );
-	m_cRotation = new mxLineEdit2( this, left + 70, top, 90, 25, "0 90 180", IDC_ATTACHMENT_ROTATION );
+	new mxLabel( this, quickUIScale( left + 3 ), quickUIScale( top + 4 ), quickUIScale( 60 ), quickUIScale( 18 ), "Rotation" );
+	m_cRotation = new mxLineEdit2( this, quickUIScale( left + 70 ), quickUIScale( top ), quickUIScale( 90 ), quickUIScale( 25 ), "0 90 180", IDC_ATTACHMENT_ROTATION );
 
 	
 	top = 145;
 	left = 5;
-	new mxLabel( this, left, top, 60, 18, "QC String" );
-	m_cQCString = new mxLineEdit2( this, left + 70, top, 400, 25, "$attachment \"controlpanel0_ur\" \"Vgui\" -22 -15 4 rotate 0 0 0", IDC_ATTACHMENT_QC_STRING );
+	new mxLabel( this, quickUIScale( left ), quickUIScale( top ), quickUIScale( 60 ), quickUIScale( 18 ), "QC String" );
+	m_cQCString = new mxLineEdit2( this, quickUIScale( left + 70 ), quickUIScale( top ), quickUIScale( 400 ), quickUIScale( 25 ), "$attachment \"controlpanel0_ur\" \"Vgui\" -22 -15 4 rotate 0 0 0", IDC_ATTACHMENT_QC_STRING );
 }
 
 

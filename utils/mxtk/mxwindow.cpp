@@ -11,9 +11,11 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
+#include "stdafx.h"
 #include "mxtk/mxwindow.h"
 #include "winlite.h"
 
+#include "windows/dpi_wnd_behavior.h"
 
 
 extern mxWindow *g_mainWindow;
@@ -29,7 +31,8 @@ public:
 
 
 mxWindow::mxWindow (mxWindow *parent, int x, int y, int w, int h, const char *label, int style)
-: mxWidget (parent, x, y, w, h, label)
+: mxWidget (parent, x, y, w, h, label),
+  d_dpiWindowBehavior{std::make_unique<se::windows::ui::CDpiWindowBehavior>()}
 {
 	d_this = new mxWindow_i;
 	d_this->d_uTimer = 0;
@@ -51,7 +54,7 @@ mxWindow::mxWindow (mxWindow *parent, int x, int y, int w, int h, const char *la
 
 	void *handle = CreateWindowEx (0, "mx_class", label, dwStyle,
 					x, y, w, h, (HWND) parentHandle,
-					(HMENU) NULL, (HINSTANCE) GetModuleHandle (NULL), NULL);
+					(HMENU) NULL, (HINSTANCE) GetModuleHandle (NULL), this);
 
 	SetWindowLongPtr ((HWND) handle, GWLP_USERDATA, (LONG_PTR) this );
 
@@ -110,4 +113,28 @@ void
 mxWindow::setMenuBar (mxMenuBar *menuBar)
 {
 	SetMenu ((HWND) getHandle (), (HMENU) ((mxWidget *) menuBar)->getHandle ());
+}
+
+
+int mxWindow::onCreate( void *hwnd )
+{
+	return d_dpiWindowBehavior->OnCreateWindow((HWND) hwnd) ? 0 : 1;
+}
+
+
+void mxWindow::onDestroy()
+{
+	d_dpiWindowBehavior->OnDestroyWindow();
+}
+
+
+int mxWindow::onDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+	return static_cast<int>(d_dpiWindowBehavior->OnWindowDpiChanged(wParam, lParam));
+}
+
+int mxWindow::quickUIScale(int value)
+{
+	// dimhotepus: Support DPI scaling.
+	return d_dpiWindowBehavior->ScaleOnX(value);
 }

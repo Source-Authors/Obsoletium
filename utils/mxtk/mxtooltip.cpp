@@ -11,6 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
+#include "stdafx.h"
 #include "mxtk/mxtooltip.h"
 #include "mxtk/mxwidget.h"
 #include "winlite.h"

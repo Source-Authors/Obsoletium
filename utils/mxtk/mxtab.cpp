@@ -11,6 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
+#include "stdafx.h"
 #include "mxtk/mxtab.h"
 
 // Prevent tons of unused windows definitions
@@ -60,7 +61,7 @@ void mxTab_resizeChild (HWND hwnd)
 			TabCtrl_GetItemRect (hwnd, index, &rc2);
 
 			// dimhotepus: Support DPI.
-			unsigned dpi = GetDpiForWindow(hwnd);
+			unsigned dpi = GetDpiForWindow (hwnd);
 			int ex = GetSystemMetricsForDpi (SM_CXEDGE, dpi);
 			int ey = GetSystemMetricsForDpi (SM_CYEDGE, dpi);
 			rc.top += (rc2.bottom - rc2.top) + 3 * ey;
@@ -88,9 +89,10 @@ mxTab::mxTab (mxWindow *parent, int x, int y, int w, int h, int id)
 
 	void *handle = CreateWindowEx (0, WC_TABCONTROL, "", dwStyle,
 				x, y, w, h, hwndParent,
-				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
+				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), this);
 
-	SendMessage ((HWND) handle, WM_SETFONT, (WPARAM) (HFONT) GetStockObject (ANSI_VAR_FONT), MAKELPARAM (TRUE, 0));
+	// dimhotepus: Breaks DPI scaling.
+	// SendMessage ((HWND) handle, WM_SETFONT, (WPARAM) (HFONT) GetStockObject (ANSI_VAR_FONT), MAKELPARAM (TRUE, 0));
 	SetWindowLongPtr ((HWND) handle, GWLP_USERDATA, (LONG_PTR) this);
 
 	setHandle (handle);

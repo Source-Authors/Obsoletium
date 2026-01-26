@@ -63,6 +63,7 @@
 
 #ifdef WIN32
 #include "windows/scoped_timer_resolution.h"
+#include "windows/dpi_wnd_behavior.h"
 
 #include <shellapi.h>
 #endif
@@ -1016,16 +1017,17 @@ MDLViewer::handleEvent (mxEvent *event)
 
 		int w = event->width;
 		int h = event->height;
-		int y = mb->getHeight ();
+
 #ifdef WIN32
-#define HEIGHT 240
+		const int HEIGHT{d_dpiWindowBehavior->ScaleOnY( 240 )};
 #else
-#define HEIGHT 140
+		constexpr int HEIGHT{140};
+
 		h -= 40;
 #endif
 
-		d_MatSysWindow->setBounds (0, y, w, h - HEIGHT); // !!
-		d_cpl->setBounds (0, y + h - HEIGHT, w, HEIGHT);
+		d_MatSysWindow->setBounds (0, 0, w, h - HEIGHT); // !!
+		d_cpl->setBounds (0, h - HEIGHT, w, HEIGHT);
 	}
 	break;
 

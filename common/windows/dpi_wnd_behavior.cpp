@@ -17,11 +17,13 @@
 namespace {
 
 HFONT ScaleFontByDpi(HFONT old_font, unsigned previousDpiY, unsigned newDpiY) {
+  using se::windows::ui::CDpiWindowBehavior;
+
   if (LOGFONT font_settings = {};
       ::GetObject(old_font, sizeof(font_settings), &font_settings)) {
     // Scale font.
-    font_settings.lfHeight =
-        ::MulDiv(font_settings.lfHeight, newDpiY, previousDpiY);
+    font_settings.lfHeight = CDpiWindowBehavior::ScaleByDpi(
+        previousDpiY, font_settings.lfHeight, newDpiY);
 
     return ::CreateFontIndirect(&font_settings);
   }
@@ -36,6 +38,10 @@ HFONT ScaleFontByDpi(HFONT old_font, unsigned previousDpiY, unsigned newDpiY) {
   if (LOGFONTW font_settings = {}; ::SystemParametersInfoForDpi(
           SPI_GETICONTITLELOGFONT, sizeof(font_settings), &font_settings, FALSE,
           newDpiY)) {
+    // Scale font.
+    font_settings.lfHeight = CDpiWindowBehavior::ScaleByDpi(
+        previousDpiY, font_settings.lfHeight, newDpiY);
+
     return ::CreateFontIndirectW(&font_settings);
   }
 
@@ -110,12 +116,16 @@ void ApplyDpiToWindow(HWND parentWnd, unsigned previousDpiX,
         POINT child_pos{rc_child.left, rc_child.top};
         ::ScreenToClient(parent_window, &child_pos);
 
-        const int scaled_x{::MulDiv(child_pos.x, new_x_dpi, old_dpi_x)};
-        const int scaled_y{::MulDiv(child_pos.y, new_y_dpi, old_dpi_y)};
-        const int scaled_width{
-            ::MulDiv(rc_child.right - rc_child.left, new_x_dpi, old_dpi_x)};
-        const int scaled_height{
-            ::MulDiv(rc_child.bottom - rc_child.top, new_y_dpi, old_dpi_y)};
+        using se::windows::ui::CDpiWindowBehavior;
+
+        const int scaled_x{
+            CDpiWindowBehavior::ScaleByDpi(old_dpi_x, child_pos.x, new_x_dpi)};
+        const int scaled_y{
+            CDpiWindowBehavior::ScaleByDpi(old_dpi_y, child_pos.y, new_y_dpi)};
+        const int scaled_width{CDpiWindowBehavior::ScaleByDpi(
+            old_dpi_x, rc_child.right - rc_child.left, new_x_dpi)};
+        const int scaled_height{CDpiWindowBehavior::ScaleByDpi(
+            old_dpi_y, rc_child.bottom - rc_child.top, new_y_dpi)};
 
         ::SetWindowPos(child_window, nullptr, scaled_x, scaled_y, scaled_width,
                        scaled_height, SWP_NOZORDER | SWP_NOACTIVATE);

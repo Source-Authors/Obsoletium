@@ -11,23 +11,16 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
+#include "stdafx.h"
 #include "mxtk/mx.h"
+#include "mxtk/mxwindow.h"
+#include "mxtk/mxevent.h"
+#include "mxtk/mxlinkedlist.h"
 
 #include <commctrl.h>
 #include <shellapi.h>
 
 #include "tier1/utlvector.h"
-#include "tier1/strtools.h"
-
-#include "mxtk/mxwindow.h"
-#include "mxtk/mxevent.h"
-#include "mxtk/mxlinkedlist.h"
-
-
-#define WM_MOUSEWHEEL                   0x020A
-
-//#include <ostream.h"
-
 
 
 void mxTab_resizeChild (HWND hwnd);
@@ -185,7 +178,7 @@ char const *translatecode( unsigned code )
 }
 static LRESULT CALLBACK WndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam)
 {
-	static bool bDragging = FALSE;
+	static bool bDragging = false;
 
 	switch (uMessage)
 	{
@@ -422,11 +415,10 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM
 
 	case WM_SIZE:
 	{
-		mxEvent event;
-
 		mxWindow *window = (mxWindow *) GetWindowLongPtr (hwnd, GWLP_USERDATA);
 		if (window)
 		{
+			mxEvent event;
 			event.event = mxEvent::Size;
 			event.width = (int) LOWORD (lParam);
 			event.height = (int) HIWORD (lParam);
@@ -434,14 +426,22 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM
 		}
 	}
 	break;
-	case WM_WINDOWPOSCHANGED:
-	{
-		mxEvent event;
 
-		
+	case WM_GETMINMAXINFO:
+	{
+		// dimhotepus: Restrict min sizes.
+		MINMAXINFO *minmax = reinterpret_cast<MINMAXINFO*>(lParam);
+		minmax->ptMinTrackSize.x = 640;
+		minmax->ptMinTrackSize.y = 480;
+	}
+	break;
+
+	case WM_WINDOWPOSCHANGED:
+	{		
 		mxWindow *window = (mxWindow *) GetWindowLongPtr (hwnd, GWLP_USERDATA);
 		if (window)
 		{
+			mxEvent event;
 			event.event = mxEvent::PosChanged;
 
 			WINDOWPOS *wp = ( WINDOWPOS * )lParam;
@@ -882,6 +882,13 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM
 	case WM_CLOSE:
 		if (g_mainWindow)
 		{
+			// dimhotepus: High DPI support.
+			mxWindow *window = (mxWindow *) GetWindowLongPtr (hwnd, GWLP_USERDATA);
+			if (window)
+			{
+				window->onDestroy();
+			}
+
 			if ((void *) hwnd == g_mainWindow->getHandle ())
 			{
 				mx::quit ();
@@ -902,6 +909,18 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM
 		//else // shouldn't happen
 			//DestroyWindow (hwnd);
 		return 0;
+
+	case WM_CREATE:
+	{
+		// dimhotepus: High DPI support.
+		CREATESTRUCT *createStruct = reinterpret_cast<CREATESTRUCT *>(lParam);
+		if ( createStruct && createStruct->lpCreateParams ) 
+		{
+			mxWindow *window = (mxWindow *) createStruct->lpCreateParams;
+			return window->onCreate( hwnd );
+		}
+	}
+	break;
 /*
 	case WM_DESTROY:
 		if (g_mainWindow)
@@ -911,6 +930,17 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM
 		}
 		break;
 */
+
+	case WM_DPICHANGED:
+	{
+		// dimhotepus: High DPI support.
+		mxWindow *window = (mxWindow *) GetWindowLongPtr (hwnd, GWLP_USERDATA);
+		if (window)
+		{
+			return window->onDpiChanged(wParam, lParam);
+		}
+	}
+	break;
 	}
 
 	return DefWindowProc (hwnd, uMessage, wParam, lParam);

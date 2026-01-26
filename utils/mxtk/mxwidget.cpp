@@ -11,6 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
+#include "stdafx.h"
 #include "mxtk/mxwidget.h"
 #include "winlite.h"
 #include <commctrl.h>
@@ -112,7 +113,8 @@ mxWidget::setBounds (int x, int y, int w, int h)
 	GetClassName (d_this->d_hwnd, str, 128);
 
 	if (!strcmp (str, "COMBOBOX"))
-		MoveWindow (d_this->d_hwnd, x, y, w, h + 100, TRUE);
+		// dimhotepus: Support DPI scaling.
+		MoveWindow (d_this->d_hwnd, x, y, w, h + ::MulDiv(100, ::GetDpiForWindow( d_this->d_hwnd ), USER_DEFAULT_SCREEN_DPI), TRUE);
 	else
 		MoveWindow (d_this->d_hwnd, x, y, w, h, TRUE);
 
