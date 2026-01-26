@@ -1901,27 +1901,25 @@ void DrawModelDebugOverlay( const DrawModelInfo_t& info, const DrawModelResults_
 
 	char buf[1024];
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, info.m_pStudioHdr->pszName() );
-	Q_snprintf( buf, sizeof( buf ), "lod: %d/%d\n", results.m_nLODUsed+1, ( int )info.m_pHardwareData->m_NumLODs );
+	V_sprintf_safe( buf, "lod: %d/%d\n", results.m_nLODUsed+1, ( int )info.m_pHardwareData->m_NumLODs );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );
-	Q_snprintf( buf, sizeof( buf ), "tris: %zd\n",  results.m_ActualTriCount );
+	V_sprintf_safe( buf, "tris: %zd\n",  results.m_ActualTriCount );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );
-	Q_snprintf( buf, sizeof( buf ), "hardware bones: %d\n",  results.m_NumHardwareBones );
+	V_sprintf_safe( buf, "hardware bones: %d\n",  results.m_NumHardwareBones );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );		
-	Q_snprintf( buf, sizeof( buf ), "num batches: %d\n",  results.m_NumBatches );
+	V_sprintf_safe( buf, "num batches: %d\n",  results.m_NumBatches );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );		
-	Q_snprintf( buf, sizeof( buf ), "has shadow lod: %s\n", ( info.m_pStudioHdr->flags & STUDIOHDR_FLAGS_HASSHADOWLOD ) ? "true" : "false" );
+	V_sprintf_safe( buf, "has shadow lod: %s\n", ( info.m_pStudioHdr->flags & STUDIOHDR_FLAGS_HASSHADOWLOD ) ? "true" : "false" );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );		
-	Q_snprintf( buf, sizeof( buf ), "num materials: %d\n", results.m_NumMaterials );
+	V_sprintf_safe( buf, "num materials: %d\n", results.m_NumMaterials );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );		
 
-	int i;
-	for( i = 0; i < results.m_Materials.Count(); i++ )
+	for( auto *pMaterial : results.m_Materials )
 	{
-		IMaterial *pMaterial = results.m_Materials[i];
 		if( pMaterial )
 		{
-			int numPasses = pMaterial->GetNumPasses();
-			Q_snprintf( buf, sizeof( buf ), "\t%s (%d %s)\n", results.m_Materials[i]->GetName(), numPasses, numPasses > 1 ? "passes" : "pass" );
+			const int numPasses = pMaterial->GetNumPasses();
+			V_sprintf_safe( buf, "\t%s (%d %s)\n", pMaterial->GetName(), numPasses, numPasses > 1 ? "passes" : "pass" );
 			CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );		
 		}
 	}
@@ -1931,11 +1929,11 @@ void DrawModelDebugOverlay( const DrawModelInfo_t& info, const DrawModelResults_
 	}
 	if( r_drawmodelstatsoverlay.GetInt() == 2 )
 	{
-		Q_snprintf( buf, sizeof( buf ), "Render Time: %0.1f ms\n", results.m_RenderTime.GetDuration().GetMillisecondsF());
+		V_sprintf_safe( buf, "Render Time: %0.1f ms\n", results.m_RenderTime.GetDuration().GetMillisecondsF());
 		CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );
 	}
 
-	//Q_snprintf( buf, sizeof( buf ), "Render Time: %0.1f ms\n", info.m_pClientEntity 
+	//V_sprintf_safe( buf, "Render Time: %0.1f ms\n", info.m_pClientEntity 
 #endif
 }
 
