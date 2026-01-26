@@ -163,7 +163,8 @@ enum
 };
 
 // beyond this number of materials, you won't get info back from DrawModel
-#define MAX_DRAW_MODEL_INFO_MATERIALS 8
+// dimhotepus: 8 -> 12
+#define MAX_DRAW_MODEL_INFO_MATERIALS 12
 
 struct DrawModelResults_t
 {
