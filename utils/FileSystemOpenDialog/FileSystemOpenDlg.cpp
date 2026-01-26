@@ -535,7 +535,7 @@ int CFileSystemOpenDlg::SetupLabelImage( CFileInfo *pInfo, CString name, bool bI
 	}
 	else
 	{
-		return (extension == ".mdl") ? m_iLabel_Mdl : m_iLabel_File;
+		return (extension.Right( 4 ) == ".mdl") ? m_iLabel_Mdl : m_iLabel_File;
 	}
 }
 
