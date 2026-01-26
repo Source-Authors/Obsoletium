@@ -1492,7 +1492,8 @@ bool CHLModelViewerApp::PreInit( )
 	}
 
 	g_pMaterialSystem->SetAdapter( nAdapter, nAdapterFlags );
-	g_bOldFileDialogs = !CommandLine()->FindParm( "-NoSteamdDialog" );
+	// dimhotepus: Fix typo.
+	g_bOldFileDialogs = !CommandLine()->FindParm( "-NoSteamDialog" );
 	
 	LoadFileSystemDialogModule();
 
