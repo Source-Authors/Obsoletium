@@ -16,10 +16,6 @@
 
 
 
-#ifdef WIN32
-#include "winlite.h"
-#endif
-
 
 
 class mxWindow;
