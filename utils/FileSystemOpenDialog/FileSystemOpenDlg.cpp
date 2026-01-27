@@ -619,7 +619,7 @@ void CFileSystemOpenDlg::PopulateListControl()
 		if ( directories[i] == "." || directories[i] == ".." )
 			continue;
 
-		LVITEM item;
+		LVITEM item = {};
 		item.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
 		item.iItem = iItem++;
 		item.iSubItem = 0;
@@ -645,7 +645,7 @@ void CFileSystemOpenDlg::PopulateListControl()
 
 	for ( intp i=0; i < files.Count(); i++ )
 	{
-		LVITEM item;
+		LVITEM item = {};
 		item.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
 		item.iItem = iItem++;
 		item.iSubItem = 0;
