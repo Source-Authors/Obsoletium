@@ -1042,12 +1042,16 @@ LRESULT WINAPI WCam_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
     case WM_DESTROY: {
       /* release and free the device context and rendering context */
       HGLRC hRC = wglGetCurrentContext();
+      RunCodeAtScopeExit({
+        if (hRC) wglDeleteContext(hRC);
+      });
+
       HDC hDC = wglGetCurrentDC();
+      RunCodeAtScopeExit({
+        if (hDC) ReleaseDC(hWnd, hDC);
+      });
 
       wglMakeCurrent(NULL, NULL);
-
-      if (hRC) wglDeleteContext(hRC);
-      if (hDC) ReleaseDC(hWnd, hDC);
 
       PostQuitMessage(0);
     } break;
