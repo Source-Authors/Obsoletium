@@ -1633,7 +1633,7 @@ void MDLViewer::LoadModel_Steam()
 	{
 		char str[512];
 		V_sprintf_safe( str, "Can't create %s interface.", FILESYSTEMOPENDIALOG_VERSION );
-		::MessageBox( NULL, str, "HLFacePoser - Interface Create Error", MB_OK | MB_ICONERROR );
+		mxMessageBox( nullptr, str, "HLFacePoser - Interface Create Error", MX_MB_OK & MX_MB_ERROR );
 		return;
 	}
 	pDlg->Init( g_Factory, NULL );
