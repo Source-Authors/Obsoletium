@@ -3460,7 +3460,7 @@ void COP_Entity::OnPlaySound(void)
 
 // Filesystem dialog module wrappers.
 CSysModule *g_pFSDialogModule = 0;
-CreateInterfaceFn g_FSDialogFactory = 0;
+CreateInterfaceFnT<IFileSystemOpenDialog> g_FSDialogFactory = 0;
 
 void LoadFileSystemDialogModule()
 {
@@ -3470,7 +3470,7 @@ void LoadFileSystemDialogModule()
 	const char *pDLLName = "filesystemopendialog" DLL_EXT_STRING;
 	g_pFSDialogModule = Sys_LoadModule( pDLLName );
 	if ( !g_pFSDialogModule || 
-		 (g_FSDialogFactory = Sys_GetFactory( g_pFSDialogModule )) == NULL
+		 (g_FSDialogFactory = Sys_GetFactory<IFileSystemOpenDialog>( g_pFSDialogModule )) == NULL
 		 )
 	{
 		if ( g_pFSDialogModule )
@@ -3558,16 +3558,16 @@ void COP_Entity::OnBrowse(void)
 	if ( !g_FSDialogFactory )
 		return;
 
-	IFileSystemOpenDialog *pDlg;
-	pDlg = (IFileSystemOpenDialog*)g_FSDialogFactory( FILESYSTEMOPENDIALOG_VERSION, NULL );
+	IFileSystemOpenDialog *pDlg = g_FSDialogFactory( FILESYSTEMOPENDIALOG_VERSION, NULL );
 	if ( !pDlg )
 	{
 		char str[512];
-		Q_snprintf( str, sizeof( str ), "Can't create %s interface.", FILESYSTEMOPENDIALOG_VERSION );
-		AfxMessageBox( str, MB_OK );
+		V_sprintf_safe( str, "Can't create %s interface.", FILESYSTEMOPENDIALOG_VERSION );
+		AfxMessageBox( str, MB_OK | MB_ICONERROR );
 		return;
 	}
 	pDlg->Init( g_Factory, NULL );
+	RunCodeAtScopeExit(pDlg->Release());
 	
 	static char szInitialDir[MAX_PATH] = "";
 	const char *pPathID = "GAME";
@@ -3603,7 +3603,7 @@ void COP_Entity::OnBrowse(void)
 			{
 				m_pSmartControl->SetWindowText(soundDlg.GetSelectedSound());
 			}
-			goto Cleanup;
+			break;
 		}
 
 		case ivScene:
@@ -3619,7 +3619,7 @@ void COP_Entity::OnBrowse(void)
 			{
 				m_pSmartControl->SetWindowText(CString("scenes\\") + soundDlg.GetSelectedSound());
 			}
-			goto Cleanup;
+			break;
 		}
 
 		default:
@@ -3670,9 +3670,6 @@ void COP_Entity::OnBrowse(void)
 			m_pSmartControl->SetWindowText(szTemp);
 		}
 	}
-
-Cleanup:;
-	pDlg->Release();
 }
 
 
