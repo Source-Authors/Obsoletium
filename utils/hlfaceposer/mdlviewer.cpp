@@ -111,7 +111,7 @@ static char gamedirsimple[MAX_PATH];  // just short name:  ep2
 
 // Filesystem dialog module wrappers.
 CSysModule *g_pFSDialogModule = 0;
-CreateInterfaceFn g_FSDialogFactory = 0;
+CreateInterfaceFnT<IFileSystemOpenDialog> g_FSDialogFactory = 0;
 
 #include "vgui_controls/TextEntry.h"
 #include "vgui_controls/Button.h"
@@ -326,7 +326,7 @@ void LoadFileSystemDialogModule()
 	g_pFSDialogModule = Sys_LoadModule( pDLLName );
 	if ( g_pFSDialogModule )
 	{
-		g_FSDialogFactory = Sys_GetFactory( g_pFSDialogModule );
+		g_FSDialogFactory = Sys_GetFactory<IFileSystemOpenDialog>( g_pFSDialogModule );
 	}
 
 	if ( !g_pFSDialogModule || !g_FSDialogFactory )
@@ -1628,29 +1628,28 @@ void MDLViewer::LoadModel_Steam()
 	if ( !g_FSDialogFactory )
 		return;
 
-	IFileSystemOpenDialog *pDlg;
-	pDlg = (IFileSystemOpenDialog*)g_FSDialogFactory( FILESYSTEMOPENDIALOG_VERSION, NULL );
+	IFileSystemOpenDialog *pDlg = g_FSDialogFactory( FILESYSTEMOPENDIALOG_VERSION, NULL );
 	if ( !pDlg )
 	{
 		char str[512];
-		Q_snprintf( str, sizeof( str ), "Can't create %s interface.", FILESYSTEMOPENDIALOG_VERSION );
+		V_sprintf_safe( str, "Can't create %s interface.", FILESYSTEMOPENDIALOG_VERSION );
 		::MessageBox( NULL, str, "HLFacePoser - Interface Create Error", MB_OK | MB_ICONERROR );
 		return;
 	}
 	pDlg->Init( g_Factory, NULL );
 	pDlg->AddFileMask( "*.jpg" );
+	pDlg->AddFileMask( "*.jpeg" );
 	pDlg->AddFileMask( "*.mdl" );
 	pDlg->SetInitialDir( "models", "game" );
 	pDlg->SetFilterMdlAndJpgFiles( true );
+	RunCodeAtScopeExit(pDlg->Release());
 
 	if (pDlg->DoModal() == IDOK)
 	{
 		char filename[MAX_PATH];
-		pDlg->GetFilename( filename, sizeof( filename ) );
+		pDlg->GetFilename( filename );
 		LoadModelFile( filename );
 	}
-
-	pDlg->Release();
 }
 
 
