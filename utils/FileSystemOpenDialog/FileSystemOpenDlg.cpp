@@ -2,10 +2,14 @@
 
 #include "stdafx.h"
 #include "FileSystemOpenDlg.h"
-#include "libjpeg-turbo/src/jpeglib.h"
+
 #include "tier1/utldict.h"
-#include "resource.h"
 #include "ifilesystemopendialog.h"
+
+#include "resource.h"
+
+#include "libjpeg-turbo/src/jpeglib.h"
+#include "windows/bitmap_scale.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -243,16 +247,34 @@ BOOL CFileSystemOpenDlg::OnInitDialog()
 
 
 		// Setup our image list.
-		m_ImageList.Create( PREVIEW_IMAGE_SIZE, PREVIEW_IMAGE_SIZE, ILC_COLOR32, 0, 512 );
+		m_ImageList.Create( m_dpi_behavior.ScaleOnX( PREVIEW_IMAGE_SIZE ), m_dpi_behavior.ScaleOnY( PREVIEW_IMAGE_SIZE ), ILC_COLOR32, 0, 512 );
 	
 		m_BitmapFolder.LoadBitmap( IDB_LABEL_FOLDER );
-		m_iLabel_Folder = m_ImageList.Add( &m_BitmapFolder, (CBitmap*)NULL );
+		HBITMAP bitmap = se::windows::ui::ScaleBitmapForDpi( static_cast<HBITMAP>( m_BitmapFolder ),
+			m_dpi_behavior.GetPreviousDpiX(), m_dpi_behavior.GetPreviousDpiY(),
+			m_dpi_behavior.GetCurrentDpiX(), m_dpi_behavior.GetCurrentDpiY() );
+		m_BitmapFolder.DeleteObject();
+		m_BitmapFolder.Attach( bitmap );
+
+		m_iLabel_Folder = m_ImageList.Add( &m_BitmapFolder, nullptr );
 
 		m_BitmapMdl.LoadBitmap( IDB_LABEL_MDL );
-		m_iLabel_Mdl = m_ImageList.Add( &m_BitmapMdl, (CBitmap*)NULL );
+		bitmap = se::windows::ui::ScaleBitmapForDpi( static_cast<HBITMAP>( m_BitmapMdl ),
+			m_dpi_behavior.GetPreviousDpiX(), m_dpi_behavior.GetPreviousDpiY(),
+			m_dpi_behavior.GetCurrentDpiX(), m_dpi_behavior.GetCurrentDpiY() );
+		m_BitmapMdl.DeleteObject();
+		m_BitmapMdl.Attach( bitmap );
+
+		m_iLabel_Mdl = m_ImageList.Add( &m_BitmapMdl, nullptr );
 
 		m_BitmapFile.LoadBitmap( IDB_LABEL_FILE );
-		m_iLabel_File = m_ImageList.Add( &m_BitmapFile, (CBitmap*)NULL );
+		bitmap = se::windows::ui::ScaleBitmapForDpi( static_cast<HBITMAP>( m_BitmapFile ),
+			m_dpi_behavior.GetPreviousDpiX(), m_dpi_behavior.GetPreviousDpiY(),
+			m_dpi_behavior.GetCurrentDpiX(), m_dpi_behavior.GetCurrentDpiY() );
+		m_BitmapFile.DeleteObject();
+		m_BitmapFile.Attach( bitmap );
+
+		m_iLabel_File = m_ImageList.Add( &m_BitmapFile, nullptr );
 
 		m_FileList.SetImageList( &m_ImageList, LVSIL_NORMAL );
 
@@ -508,9 +530,9 @@ CBitmap* SetupJpegLabel( IFileSystem *pFileSystem, CString filename, int labelSi
 		return pBitmap;
 	}
 
-		delete pBitmap;
-		return NULL;
-	}
+	delete pBitmap;
+	return NULL;
+}
 
 int CFileSystemOpenDlg::SetupLabelImage( CFileInfo *pInfo, CString name, bool bIsDir )
 {
@@ -526,8 +548,8 @@ int CFileSystemOpenDlg::SetupLabelImage( CFileInfo *pInfo, CString name, bool bI
 		return pInfo->m_pBitmap ? m_ImageList.Add( pInfo->m_pBitmap, nullptr ) : m_iLabel_File;
 	}
 
-		return (extension.Right( 4 ) == ".mdl") ? m_iLabel_Mdl : m_iLabel_File;
-	}
+	return (extension.Right( 4 ) == ".mdl") ? m_iLabel_Mdl : m_iLabel_File;
+}
 
 void FilterMdlAndJpgFiles( CUtlVector<CString> &files )
 {
@@ -591,7 +613,7 @@ static void RemoveDuplicates( CUtlVector<CString> &files )
 			--i;
 		}
 	}
-}	
+}
 
 
 void CFileSystemOpenDlg::PopulateListControl()
