@@ -1873,6 +1873,7 @@ ControlPanel::handleEvent (mxEvent *event)
 
 		switch (event->key)
 		{
+			// esc
 			case 27:
 				if (!getParent ()) // fullscreen mode ?
 					mx::quit ();
