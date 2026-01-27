@@ -371,10 +371,10 @@ static bool ReadJpeg( IFileSystem *pFileSystem, const char *pFilename, CUtlVecto
 
 	// Load the jpeg.
 	jpeg_decompress_struct jpegInfo;
-	jpeg_error_mgr jerr;
-
 	memset( &jpegInfo, 0, sizeof( jpegInfo ) );
 	jpegInfo.client_data = &sourceMgr;
+
+	jpeg_error_mgr jerr;
 	jpegInfo.err = jpeg_std_error(&jerr);
 	jerr.error_exit = &CJpegSourceMgr::error_exit;
 
@@ -507,12 +507,10 @@ CBitmap* SetupJpegLabel( IFileSystem *pFileSystem, CString filename, int labelSi
 		g_BitmapCache.AddToCache( pBitmap, filename, downsampled.Count(), true );
 		return pBitmap;
 	}
-	else
-	{
+
 		delete pBitmap;
 		return NULL;
 	}
-}
 
 int CFileSystemOpenDlg::SetupLabelImage( CFileInfo *pInfo, CString name, bool bIsDir )
 {
