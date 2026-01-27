@@ -613,18 +613,14 @@ const char* MDLViewer::SteamGetOpenFilename()
 	// dimhotepus: Drop "GAME" path id as we want to go to inner directories.
 	pDlg->SetInitialDir( "models", nullptr ); // "game" );
 	pDlg->SetFilterMdlAndJpgFiles( true );
+	RunCodeAtScopeExit(pDlg->Release());
 
 	if (pDlg->DoModal() == IDOK)
 	{
-		pDlg->GetFilename( filename, sizeof( filename ) );
-		pDlg->Release();
+		pDlg->GetFilename( filename );
 		return filename;
 	}
-	else
-	{
-		pDlg->Release();
-		return NULL;
-	}
+	return nullptr;
 }
 
 
