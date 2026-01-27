@@ -187,7 +187,8 @@ void CFileSystemOpenDlg::OnOK()
 	{
 		// No file or directory here.
 		CString str;
-		str.FormatMessage( "File %1!s! doesn't exist.", (const char*)fullFilename );
+		// dimhotepus: File or directory.
+		str.FormatMessage( "File or directory %1!s! doesn't exist.", (const char*)fullFilename );
 		AfxMessageBox( str, MB_OK | MB_ICONEXCLAMATION );
 	}
 }
