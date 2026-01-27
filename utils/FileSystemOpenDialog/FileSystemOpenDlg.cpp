@@ -524,17 +524,12 @@ int CFileSystemOpenDlg::SetupLabelImage( CFileInfo *pInfo, CString name, bool bI
 	extension.MakeLower();
 	if ( extension.Right( 4 ) == ".jpg" || extension == ".jpeg" )
 	{
-		pInfo->m_pBitmap = SetupJpegLabel( m_pFileSystem, m_CurrentDir + "\\" + name, PREVIEW_IMAGE_SIZE, GetPathID() );
-		if ( pInfo->m_pBitmap )
-			return m_ImageList.Add( pInfo->m_pBitmap, (CBitmap*)NULL );
-		else
-			return m_iLabel_File;
+		pInfo->m_pBitmap = SetupJpegLabel( m_pFileSystem, m_CurrentDir + "\\" + name, m_dpi_behavior.ScaleOnX( PREVIEW_IMAGE_SIZE ), GetPathID() );
+		return pInfo->m_pBitmap ? m_ImageList.Add( pInfo->m_pBitmap, nullptr ) : m_iLabel_File;
 	}
-	else
-	{
+
 		return (extension.Right( 4 ) == ".mdl") ? m_iLabel_Mdl : m_iLabel_File;
 	}
-}
 
 void FilterMdlAndJpgFiles( CUtlVector<CString> &files )
 {
