@@ -617,7 +617,7 @@ void CFileSystemOpenDlg::PopulateListControl()
 	GetEntries( "*.*", directories, GETENTRIES_DIRECTORIES_ONLY );
 	RemoveDuplicates( directories );
 
-	for ( int i=0; i < directories.Count(); i++ )
+	for ( intp i=0; i < directories.Count(); i++ )
 	{
 		if ( directories[i] == "." || directories[i] == ".." )
 			continue;
@@ -637,7 +637,7 @@ void CFileSystemOpenDlg::PopulateListControl()
 	}
 
 	CUtlVector<CString> files;
-	for ( int iMask=0; iMask < m_FileMasks.Count(); iMask++ )
+	for ( intp iMask=0; iMask < m_FileMasks.Count(); iMask++ )
 	{
 		GetEntries( m_FileMasks[iMask], files, GETENTRIES_FILES_ONLY );
 	}
@@ -646,7 +646,7 @@ void CFileSystemOpenDlg::PopulateListControl()
 	if ( m_bFilterMdlAndJpgFiles )
 		FilterMdlAndJpgFiles( files );
 
-	for ( int i=0; i < files.Count(); i++ )
+	for ( intp i=0; i < files.Count(); i++ )
 	{
 		LVITEM item;
 		item.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
@@ -739,7 +739,7 @@ void CFileSystemOpenDlg::OnSize(UINT nType, int cx, int cy)
 {
 	__super::OnSize(nType, cx, cy);
 	
-	for ( int i=0; i < m_Anchors.Count(); i++ )
+	for ( intp i=0; i < m_Anchors.Count(); i++ )
 		ProcessAnchor( &m_Anchors[i] );	
 
 	if ( m_FileList.GetSafeHwnd() )
