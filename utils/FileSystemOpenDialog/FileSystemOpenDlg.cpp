@@ -44,11 +44,7 @@ public:
 		Assert( m_Bitmaps.Find( pName ) == -1 );
 		m_CurMemoryUsage += memoryUsage;
 
-		CBitmapCacheEntry newEntry;
-		newEntry.m_pBitmap = pBitmap;
-		newEntry.m_MemoryUsage = memoryUsage;
-		newEntry.m_bLocked = bLock;
-		m_Bitmaps.Insert( pName, newEntry );
+		m_Bitmaps.Insert( pName, CBitmapCacheEntry{pBitmap, memoryUsage, bLock} );
 
 		EnsureMemoryUsage();
 	}
