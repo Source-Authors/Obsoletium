@@ -2169,7 +2169,7 @@ ControlPanel::handleEvent (mxEvent *event)
 		case IDC_BLENDTIME:
 			{
 				char sz[ 256 ];
-				V_sprintf_safe( sz, "%.2f s", (float)((mxSlider *) event->widget)->getValue() );
+				V_sprintf_safe( sz, "%.2f s", ((mxSlider *) event->widget)->getValue() );
 
 				g_pStudioModel->SetBlendTime( ((mxSlider *) event->widget)->getValue() );
 				laBlendTime->setLabel( sz );
