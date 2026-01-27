@@ -369,13 +369,12 @@ MDLViewer::MDLViewer ()
 	loadRecentFiles ();
 	initRecentFiles ();
 
+	const int displayWidth = mx::getDisplayWidth();
+	const int displayHeight = mx::getDisplayHeight();
+
 	if ( !LoadViewerRootSettings( ) )
 	{
 		// dimhotepus: Center window when no settings.
-		
-		const int displayWidth = mx::getDisplayWidth();
-		const int displayHeight = mx::getDisplayHeight();
-		
 		g_viewerSettings.width  = max( 1024, displayWidth / 2 );
 		g_viewerSettings.height = max( 768, displayHeight / 2 );
 		g_viewerSettings.xpos   = max( ( displayWidth - g_viewerSettings.width ) / 2, 0 );
@@ -385,8 +384,8 @@ MDLViewer::MDLViewer ()
 	{
 		g_viewerSettings.xpos  = max( 0, g_viewerSettings.xpos );
 		g_viewerSettings.ypos  = max( 0, g_viewerSettings.ypos );
-		g_viewerSettings.width = max( 1024, g_viewerSettings.width );
-		g_viewerSettings.height = max( 768, g_viewerSettings.height );
+		g_viewerSettings.width = min( displayWidth, max( 1024, g_viewerSettings.width ) );
+		g_viewerSettings.height = min( displayHeight, max( 768, g_viewerSettings.height ) );
 	}
 
 	setBounds( g_viewerSettings.xpos, g_viewerSettings.ypos, g_viewerSettings.width, g_viewerSettings.height );
