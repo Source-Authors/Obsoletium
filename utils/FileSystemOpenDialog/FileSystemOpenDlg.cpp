@@ -350,7 +350,7 @@ public:
 };
 
 
-bool ReadJpeg( IFileSystem *pFileSystem, const char *pFilename, CUtlVector<unsigned char> &buf, int &width, int &height, const char *pPathID )
+static bool ReadJpeg( IFileSystem *pFileSystem, const char *pFilename, CUtlVector<unsigned char> &buf, int &width, int &height, const char *pPathID )
 {
 	width = height = 0;
 
@@ -582,7 +582,7 @@ int CALLBACK FileListSortCallback( LPARAM lParam1, LPARAM lParam2, LPARAM lParam
 }
 
 
-void RemoveDuplicates( CUtlVector<CString> &files )
+static void RemoveDuplicates( CUtlVector<CString> &files )
 {
 	CUtlDict<intp,intp> uniqueFilenames;
 	for ( intp i=0; i < files.Count(); i++ )
@@ -683,7 +683,7 @@ int CFileSystemOpenDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 }
 
 
-LONG& GetSideCoord( RECT &rect, int iSide )
+static LONG& GetSideCoord( RECT &rect, int iSide )
 {
 	if ( iSide == 0 )
 		return rect.left;
@@ -696,7 +696,7 @@ LONG& GetSideCoord( RECT &rect, int iSide )
 }
 
 
-LONG GetSideScreenCoord( CWnd *pWnd, int iSide )
+static LONG GetSideScreenCoord( CWnd *pWnd, int iSide )
 {
 	RECT rect;
 	pWnd->GetWindowRect( &rect );
