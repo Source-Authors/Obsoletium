@@ -106,7 +106,7 @@ void InitViewerSettings ( const char *subkey )
 }
 
 
-bool RegReadVector( HKEY hKey, const char *szSubKey, Vector& value )
+static bool RegReadVector( HKEY hKey, const char *szSubKey, Vector& value )
 {
 	char szBuff[128];       // Temp. buffer
 	DWORD dwType;           // Type of key
@@ -129,7 +129,7 @@ bool RegReadVector( HKEY hKey, const char *szSubKey, Vector& value )
 	return true;
 }
 
-bool RegReadQAngle( HKEY hKey, const char *szSubKey, QAngle& value )
+static bool RegReadQAngle( HKEY hKey, const char *szSubKey, QAngle& value )
 {
 	Vector tmp;
 	if (RegReadVector( hKey, szSubKey, tmp ))
@@ -141,7 +141,7 @@ bool RegReadQAngle( HKEY hKey, const char *szSubKey, QAngle& value )
 }
 
 
-bool RegReadColor( HKEY hKey, const char *szSubKey, float value[4] )
+static bool RegReadColor( HKEY hKey, const char *szSubKey, float value[4] )
 {
 	char szBuff[128];       // Temp. buffer
 	DWORD dwType;           // Type of key
@@ -166,7 +166,7 @@ bool RegReadColor( HKEY hKey, const char *szSubKey, float value[4] )
 }
 
 
-bool RegWriteVector( HKEY hKey, const char *szSubKey, Vector& value )
+static bool RegWriteVector( HKEY hKey, const char *szSubKey, Vector& value )
 {
 	char szBuff[128];       // Temp. buffer
 
@@ -187,7 +187,7 @@ bool RegWriteVector( HKEY hKey, const char *szSubKey, Vector& value )
 	return true;
 }
 
-bool RegWriteQAngle( HKEY hKey, const char *szSubKey, QAngle& value )
+static bool RegWriteQAngle( HKEY hKey, const char *szSubKey, QAngle& value )
 {
 	Vector tmp;
 	tmp.Init( value.x, value.y, value.z );
@@ -195,7 +195,7 @@ bool RegWriteQAngle( HKEY hKey, const char *szSubKey, QAngle& value )
 }
 
 
-bool RegWriteColor( HKEY hKey, const char *szSubKey, float value[4] )
+static bool RegWriteColor( HKEY hKey, const char *szSubKey, float value[4] )
 {
 	char szBuff[128];       // Temp. buffer
 	V_sprintf_safe( szBuff, "(%f %f %f %f)", value[0], value[1], value[2], value[3] );
@@ -216,7 +216,7 @@ bool RegWriteColor( HKEY hKey, const char *szSubKey, float value[4] )
 	return true;
 }
 
-bool RegReadBool( HKEY hKey, const char *szSubKey, bool *value )
+static bool RegReadBool( HKEY hKey, const char *szSubKey, bool *value )
 {
 	DWORD dwType;           // Type of key
 	DWORD dwTemp;
@@ -242,7 +242,7 @@ bool RegReadBool( HKEY hKey, const char *szSubKey, bool *value )
 	return true;
 }
 
-bool RegReadInt( HKEY hKey, const char *szSubKey, int *value )
+static bool RegReadInt( HKEY hKey, const char *szSubKey, int *value )
 {
 	DWORD dwType;           // Type of key
 	DWORD dwSize = sizeof( DWORD );
@@ -265,7 +265,7 @@ bool RegReadInt( HKEY hKey, const char *szSubKey, int *value )
 }
 
 
-bool RegWriteInt( HKEY hKey, const char *szSubKey, int value )
+static bool RegWriteInt( HKEY hKey, const char *szSubKey, int value )
 {
 	DWORD dwSize = sizeof( DWORD );
 
@@ -286,7 +286,7 @@ bool RegWriteInt( HKEY hKey, const char *szSubKey, int value )
 
 
 
-bool RegReadFloat( HKEY hKey, const char *szSubKey, float *value )
+static bool RegReadFloat( HKEY hKey, const char *szSubKey, float *value )
 {
 	char szBuff[128];       // Temp. buffer
 
@@ -311,7 +311,7 @@ bool RegReadFloat( HKEY hKey, const char *szSubKey, float *value )
 }
 
 
-bool RegWriteFloat( HKEY hKey, const char *szSubKey, float value )
+static bool RegWriteFloat( HKEY hKey, const char *szSubKey, float value )
 {
 	char szBuff[128];       // Temp. buffer
 
@@ -334,7 +334,7 @@ bool RegWriteFloat( HKEY hKey, const char *szSubKey, float value )
 
 
 
-bool RegReadString( HKEY hKey, const char *szSubKey, char *string, int size )
+static bool RegReadString( HKEY hKey, const char *szSubKey, char *string, int size )
 {
 	DWORD dwType;           // Type of key
 	DWORD dwSize = size;
@@ -356,7 +356,7 @@ bool RegReadString( HKEY hKey, const char *szSubKey, char *string, int size )
 }
 
 
-bool RegWriteString( HKEY hKey, const char *szSubKey, const char *string )
+static bool RegWriteString( HKEY hKey, const char *szSubKey, const char *string )
 {
 	DWORD dwSize = size_cast<DWORD>( strlen( string ) );
 
@@ -381,7 +381,7 @@ bool RegWriteString( HKEY hKey, const char *szSubKey, const char *string )
 
 
 
-LONG RegViewerSettingsKey( const char *filename, PHKEY phKey, LPDWORD lpdwDisposition )
+static LONG RegViewerSettingsKey( const char *filename, PHKEY phKey, LPDWORD lpdwDisposition )
 {
 	if (Q_isempty( filename ))
 		return ERROR_KEY_DELETED;
@@ -412,7 +412,7 @@ LONG RegViewerSettingsKey( const char *filename, PHKEY phKey, LPDWORD lpdwDispos
 }
 
 
-LONG RegViewerRootKey( PHKEY phKey, LPDWORD lpdwDisposition )
+static LONG RegViewerRootKey( PHKEY phKey, LPDWORD lpdwDisposition )
 {
 	char szRootKey[1024];
 	V_sprintf_safe( szRootKey, "Software\\Valve\\%s", g_viewerSettings.registrysubkey );
