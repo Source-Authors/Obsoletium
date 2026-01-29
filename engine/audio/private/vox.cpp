@@ -1470,10 +1470,9 @@ void VOX_Precache( IEngineSound *pSoundSystem, int sentenceIndex, const char *pP
 
 			VOX_BuildVirtualNameList( pWords[i], list );
 
-			int c = list.Count();
-			for ( int j = 0 ; j < c; ++j )
+			for ( auto &e : list )
 			{
-				Q_snprintf( pathbuffer, sizeof( pathbuffer ), "%s%s.wav", szpath, list[j].word );
+				V_sprintf_safe( pathbuffer, "%s%s.wav", szpath, e.word );
 				pSoundSystem->PrecacheSound( pathbuffer, false );
 			}
 		}
@@ -2024,8 +2023,8 @@ void VOX_TouchSound( const char *pszin, CUtlDict< int, int >& filelist, CUtlRBTr
 
 				VOX_BuildVirtualNameList( rgpparseword[i], list );
 				
-				int c = list.Count();
-				for ( int j = 0 ; j < c; ++j )
+				intp c = list.Count();
+				for ( intp j = 0 ; j < c; ++j )
 				{
 					char name[ 256 ];
 					Q_snprintf( name, sizeof( name ), "%s", list[ j ].word );
@@ -2346,19 +2345,17 @@ void VOX_LRUInit( sentencegroup_t *pGroup )
 //-----------------------------------------------------------------------------
 void VOX_GroupInitAllLRUs( void )
 {
-	int i;
-
-	int totalCount = 0;
-	for ( i = 0; i < g_SentenceGroups.Count(); i++ )
+	intp totalCount = 0;
+	for ( auto &g : g_SentenceGroups )
 	{
-		g_SentenceGroups[i].lru = totalCount;
-		totalCount += g_SentenceGroups[i].count;
+		g.lru = totalCount;
+		totalCount += g.count;
 	}
 	g_GroupLRU.Purge();
 	g_GroupLRU.EnsureCount( totalCount );
-	for ( i = 0; i < g_SentenceGroups.Count(); i++ )
+	for ( auto &g : g_SentenceGroups )
 	{
-		VOX_LRUInit( &g_SentenceGroups[i] );
+		VOX_LRUInit( &g );
 	}
 }
 
@@ -2423,7 +2420,7 @@ int VOX_GroupIndexFromName( const char *pGroupName )
 	{
 		// search rgsentenceg for match on szgroupname
 		CUtlSymbol symGroupName = sentencegroup_t::GetSymbol( pGroupName );
-		for ( i = 0; i < g_SentenceGroups.Count(); i++ )
+		for ( intp i = 0; i < g_SentenceGroups.Count(); i++ )
 		{
 			if ( symGroupName == g_SentenceGroups[i].GroupNameSymbol() )
 				return i;
