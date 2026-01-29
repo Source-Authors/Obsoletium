@@ -87,14 +87,7 @@ enum VisGroupSelection
 #define FOR_EACH_OBJ( listName, iteratorName ) \
 	for( int iteratorName=0; iteratorName<(listName).Count(); iteratorName++)
 
-
-#if defined(_WIN64)
-typedef unsigned __int64 ULONG_PTR, *PULONG_PTR;
-#else
-typedef _W64 unsigned long ULONG_PTR, *PULONG_PTR;
-#endif
-
-typedef ULONG_PTR DWORD_PTR;
+#include <basetsd.h>
 
 typedef const char * MAPCLASSTYPE;
 
