@@ -2746,7 +2746,7 @@ ChunkFileResult_t CMapOverlay::SaveDataToVMF( CChunkFile *pFile, CSaveInfo *pSav
 	if ( eResult == ChunkFile_Ok )
 	{
 		char szSetValue[KEYVALUE_MAX_VALUE_LENGTH];
-		CMapWorld::FaceID_FaceListsToString( szSetValue, sizeof( szSetValue ), &m_Faces, NULL );
+		CMapWorld::FaceID_FaceListsToString( szSetValue, &m_Faces, NULL );
 		eResult = pFile->WriteKeyValue( "sides", szSetValue );
 	}
 

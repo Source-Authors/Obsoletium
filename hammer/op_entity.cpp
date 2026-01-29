@@ -703,7 +703,7 @@ void COP_Entity::MergeKeyValue(char const *pszKey)
 					GetFaceIDListsForKey(FaceIDListFull, FaceIDListPartial, pszKey);
 
 					char szValue[KEYVALUE_MAX_VALUE_LENGTH];
-					CMapWorld::FaceID_FaceIDListsToString(szValue, sizeof(szValue), &FaceIDListFull, &FaceIDListPartial);
+					CMapWorld::FaceID_FaceIDListsToString(szValue, &FaceIDListFull, &FaceIDListPartial);
 					m_kv.SetValue(pszKey, szValue);
 			
 					bHandled = true;
@@ -1014,7 +1014,7 @@ void COP_Entity::ApplyKeyValueToObject(CEditGameClass *pObject, const char *pszK
 				FullFaceList.AddVectorToTail(KeepFaceList);
 
 				char szSetValue[KEYVALUE_MAX_VALUE_LENGTH];
-				CMapWorld::FaceID_FaceIDListsToString(szSetValue, sizeof(szSetValue), &FullFaceList, NULL);
+				CMapWorld::FaceID_FaceIDListsToString(szSetValue, &FullFaceList, NULL);
 
 				pObject->SetKeyValue(pszKey, szSetValue);
 				return;
@@ -4514,7 +4514,7 @@ void COP_Entity::UpdatePickFaceText(CToolPickFace *pTool)
 	CMapFaceList FaceListPartial;
 
 	pTool->GetSelectedFaces(FaceListFull, FaceListPartial);
-	if (!CMapWorld::FaceID_FaceListsToString(szList, sizeof(szList), &FaceListFull, &FaceListPartial))
+	if (!CMapWorld::FaceID_FaceListsToString(szList, &FaceListFull, &FaceListPartial))
 	{
 		MessageBox("Too many faces selected for this keyvalue to hold. Deselect some faces.", "Hammer - Too Many Faces Warning", MB_OK | MB_ICONEXCLAMATION);
 	}

@@ -678,7 +678,7 @@ void CMapSideList::UpdateDependencies(CMapWorld *pWorld, CMapClass *pObject)
 void CMapSideList::UpdateParentKey(void)
 {
 	char szValue[KEYVALUE_MAX_VALUE_LENGTH];
-	CMapWorld::FaceID_FaceListsToString(szValue, sizeof(szValue), &m_Faces, NULL);
+	CMapWorld::FaceID_FaceListsToString(szValue, &m_Faces, NULL);
 
 	CMapEntity *pEntity = dynamic_cast<CMapEntity *>(m_pParent);
 	if (pEntity != NULL)
