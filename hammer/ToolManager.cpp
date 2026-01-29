@@ -243,7 +243,7 @@ void CToolManager::SetTool(ToolID_t eNewTool)
 	//		  CFaceEditDispPage::OnSetActive() calls SetTool(TOOL_FACEEDIT_DISP). This
 	//		  behavior is rather nonsensical during startup.
 	CMainFrame *pwndMain = GetMainWnd();
-	if (pwndMain != NULL)
+	if (pwndMain)
 	{
 		pwndMain->m_ObjectBar.UpdateListForTool(eNewTool);
 	}
@@ -256,9 +256,9 @@ ChunkFileResult_t CToolManager::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 {
 	for (auto *t : m_Tools)
 	{
-		if ( t->GetVMFChunkName() != NULL  )
+		if ( t->GetVMFChunkName() )
 		{
-            ChunkFileResult_t eResult = t->SaveVMF(pFile, pSaveInfo);
+			ChunkFileResult_t eResult = t->SaveVMF(pFile, pSaveInfo);
 			// dimhotepus: Check result.
 			if (eResult != ChunkFile_Ok)
 				return eResult;
