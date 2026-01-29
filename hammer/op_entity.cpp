@@ -3634,13 +3634,14 @@ void COP_Entity::OnBrowse(void)
 	// If they picked a file and hit OK, put everything after the last backslash
 	// into the SmartEdit control. If there is no backslash, put the whole filename.
 	//
-	int ret;
+	// dimhotepus: int -> bool.
+	bool ret;
 	if ( 1/*g_pFullFileSystem->IsSteam()*/ || CommandLine()->FindParm( "-NewDialogs" ) )
 		ret = pDlg->DoModal();
 	else
 		ret = pDlg->DoModal_WindowsDialog();
 
-	if ( ret == IDOK )
+	if ( ret )
 	{
 		//
 		// Save the default folder for next time.
