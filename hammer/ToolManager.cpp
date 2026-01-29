@@ -29,8 +29,6 @@
 #include "ToolMorph.h"
 #include "ToolOverlay.h"
 #include "ToolSelection.h"
-#include "ToolMagnify.h"
-#include "ToolMaterial.h"
 #include "ChunkFile.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
