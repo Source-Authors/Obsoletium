@@ -21,17 +21,19 @@ class CObjectPage : public CPropertyPage
 
 public:
 
-	CObjectPage(void)
+	CObjectPage(void) : m_pObjectList{nullptr}
 	{
 		m_bMultiEdit = false;
 		m_bFirstTimeActive = true;
 		m_bHasUpdatedData = false;
+		m_pEditObjectRuntimeClass = nullptr;
 	}
 
-	CObjectPage(UINT nResourceID) : CPropertyPage(nResourceID) 
+	CObjectPage(UINT nResourceID) : CPropertyPage(nResourceID), m_pObjectList{nullptr}
 	{
 		m_bMultiEdit = false;
 		m_bFirstTimeActive = false;
+		m_pEditObjectRuntimeClass = nullptr;
 	}
 
 	~CObjectPage() {}
