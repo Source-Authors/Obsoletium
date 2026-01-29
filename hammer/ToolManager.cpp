@@ -1,8 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
-//
-//			TODO: add an autoregistration system for tools a la LINK_ENTITY_TO_CLASS
+// TODO: add an auto registration system for tools a la LINK_ENTITY_TO_CLASS
 //=============================================================================//
 
 #include "stdafx.h"
