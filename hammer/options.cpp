@@ -537,7 +537,7 @@ bool COptions::Read(void)
 	{
 		// SetDefaults() added 'textures.wad' to the list
 	}
-	textures.fBrightness = float(APP()->GetProfileInt(pszGeneral, "Brightness", 10)) / 10.0;
+	textures.fBrightness = float(APP()->GetProfileInt(pszGeneral, "Brightness", 10)) / 10.0f;
 
 	// load general info
 	general.nMaxCameras = APP()->GetProfileInt(pszGeneral, "Max Cameras", 100);
