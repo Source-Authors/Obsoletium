@@ -94,7 +94,7 @@ public:
 class CManifestFilter : public CHammerBar
 {
 public:
-	CManifestFilter() : CHammerBar() { bInitialized = FALSE; }
+	CManifestFilter() : CHammerBar() { bInitialized = FALSE; m_pBkBrush = nullptr; }
 	BOOL Create(CWnd *pParentWnd);
 
 	virtual ~CManifestFilter();
