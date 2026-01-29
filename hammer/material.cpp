@@ -1044,10 +1044,7 @@ intp CMaterial::GetKeywords(OUT_Z_CAP(keywordsSize) char *pszKeywords, intp keyw
 
 	// To access keywords, we have to have the header loaded
 	const_cast<CMaterial*>(this)->Load();
-	if (pszKeywords != NULL)
-	{
-		V_strncpy(pszKeywords, m_szKeywords, keywordsSize);
-	}
+	V_strncpy(pszKeywords, m_szKeywords, keywordsSize);
 
 	return V_strlen(m_szKeywords);
 }
@@ -1063,10 +1060,7 @@ intp CMaterial::GetShortName(OUT_Z_CAP(nameSize) char *pszName, intp nameSize) c
 	if (nameSize > 0)
 		pszName[0] = '\0';
 
-	if (pszName != NULL)
-	{
-		V_strncpy(pszName, m_szName, nameSize);
-	}
+	V_strncpy(pszName, m_szName, nameSize);
 
 	return V_strlen(m_szName);
 }
