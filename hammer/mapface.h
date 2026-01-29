@@ -78,11 +78,11 @@ struct PLANE
 };
 
 
-typedef struct
+struct winding_t
 {
 	int		numpoints;
 	Vector	*p;			// variable sized
-} winding_t;
+};
 
 
 enum FaceOrientation_t
