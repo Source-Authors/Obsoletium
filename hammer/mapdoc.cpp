@@ -1700,7 +1700,7 @@ ChunkFileResult_t CMapDoc::LoadViewSettingsCallback(CChunkFile *pFile, CMapDoc *
 {
 	ChunkFileResult_t eResult = pFile->ReadChunk(LoadViewSettingsKeyCallback, pDoc);
 	if (eResult == ChunkFile_Ok)
-	{	
+	{
 		pDoc->UpdateStatusBarSnap();
 	}
 
@@ -8960,7 +8960,7 @@ void CMapDoc::OnFileExporttodxf(void)
 	str = dlg.GetPathName();
 	if(str.ReverseFind('.') == -1)
 		str += ".dxf";
-	
+
 	// export solids
 	BeginWaitCursor();
 	RunCodeAtScopeExit(EndWaitCursor());
@@ -9839,7 +9839,7 @@ ChunkFileResult_t CMapDoc::CordonSaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo
 //-----------------------------------------------------------------------------
 bool CMapDoc::SaveVMF(const char *pszFileName, int saveFlags )
 {
-	CChunkFile File;	
+	CChunkFile File;
 
 	ChunkFileResult_t eResult = File.Open(pszFileName, ChunkFile_Write);
 	BeginWaitCursor();
@@ -9847,7 +9847,7 @@ bool CMapDoc::SaveVMF(const char *pszFileName, int saveFlags )
 	
 	char title[MAX_PATH + 32];
 	V_sprintf_safe(title, "Saving %s...", pszFileName);
-	
+
 	// Change the main title bar.
 	GetMainWnd()->SetWindowText( title );
 	RunCodeAtScopeExit(GetMainWnd()->OnUpdateFrameTitle( true ));
@@ -9970,7 +9970,7 @@ bool CMapDoc::SaveVMF(const char *pszFileName, int saveFlags )
 		//save filename into registry for last known good file for crash recovery purposes.
 		AfxGetApp()->WriteProfileString("General", "Last Good Save", pszFileName);		
 	}
-	
+
 	return( eResult == ChunkFile_Ok );
 }
 
