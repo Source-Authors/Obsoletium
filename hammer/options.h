@@ -220,7 +220,8 @@ public:
 	bool IsVGUIModelBrowserEnabled();
 
 	// Attributes:
-	UINT uDaysSinceInstalled;
+	// dimhotepus: UINT -> LONGLONG.
+	LONGLONG uDaysSinceInstalled;
 
 	// Flags for PerformChanges:
 	enum

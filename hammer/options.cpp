@@ -492,9 +492,21 @@ bool COptions::Read(void)
 		return false;
 	}
 
+#ifdef PLATFORM_64BITS
+	// dimhotepus: Correctly handle 64 bit time_t.
+	byte *tm;
+	unsigned size;
+
+	if (APP()->GetProfileBinary("Configured", "Installed", &tm, &size) && size == sizeof(time_t))
+	{
+		CTimeSpan ts(time(NULL) - *reinterpret_cast<time_t*>(tm));
+		uDaysSinceInstalled = ts.GetDays();
+	}
+#else
 	DWORD dwTime = APP()->GetProfileInt("Configured", "Installed", time(NULL));
 	CTimeSpan ts(time(NULL) - dwTime);
 	uDaysSinceInstalled = ts.GetDays();
+#endif
 
 	int i, iSize;
 	CString str;
@@ -851,10 +863,24 @@ void COptions::SetDefaults(void)
 		bWrite = TRUE;
 	}
 
+
+#ifdef PLATFORM_64BITS
+	// dimhotepus: Correctly handle 64 bit time_t.
+	byte *tm;
+	unsigned size;
+
+	if (!APP()->GetProfileBinary("Configured", "Installed", &tm, &size))
+	{
+		time_t installTime = time(NULL);
+		APP()->WriteProfileBinary("Configured", "Installed",
+			reinterpret_cast<byte*>(&installTime), sizeof(installTime));
+	}
+#else
 	if (APP()->GetProfileInt("Configured", "Installed", 42151) == 42151)
 	{
 		APP()->WriteProfileInt("Configured", "Installed", time(NULL));
 	}
+#endif
 
 	uDaysSinceInstalled = 0;
 
