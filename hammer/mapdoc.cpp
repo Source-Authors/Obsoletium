@@ -3207,6 +3207,10 @@ BOOL CMapDoc::OnSaveDocument(LPCTSTR lpszPathName)
 	// UNDONE: prefab serialization must be redone
 	if (m_bEditingPrefab)
 	{
+		// dimhotepus: Prefab save takes time.
+		BeginWaitCursor();
+		RunCodeAtScopeExit(EndWaitCursor());
+
 		std::fstream file;
 		Serialize(file, 0, 0);
 		SetModifiedFlag(FALSE);
@@ -3281,13 +3285,13 @@ BOOL CMapDoc::OnSaveDocument(LPCTSTR lpszPathName)
 	}
 
 	{
-	BeginWaitCursor();
+		BeginWaitCursor();
 		RunCodeAtScopeExit(EndWaitCursor());
 
-	if (!Serialize(file, TRUE, bRMF))
-	{
-		return(FALSE);
-	}
+		if (!Serialize(file, TRUE, bRMF))
+		{
+			return(FALSE);
+		}
 	}
 
 	SetModifiedFlag(FALSE);
@@ -5726,6 +5730,10 @@ void CMapDoc::OnEditMapproperties(void)
 //-----------------------------------------------------------------------------
 void CMapDoc::OnFileConvertWAD( void )
 {
+	// dimhotepus: Conversion takes time.
+	BeginWaitCursor();
+	RunCodeAtScopeExit(EndWaitCursor());
+
 	CTextureConverter::ConvertWorldTextures( m_pWorld );
 }
 
