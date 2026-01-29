@@ -2367,7 +2367,7 @@ bool CMapEntity::HitTestLogical( CMapViewLogical *pView, const Vector2D &vecPoin
 	{
 		hitData.pObject = this;
 		hitData.uData = 0;
-		hitData.nDepth = 0.0f;
+		hitData.nDepth = 0;
 		return true;
 	}
 
