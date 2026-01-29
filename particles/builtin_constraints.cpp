@@ -504,16 +504,8 @@ void CWorldCollideContextData::CalculatePlanes( CParticleCollection *pParticles,
 			m_nNumFixedPlanes = nIndexOut;
 			m_nActivePlanes = nIndexOut;
 		}
-		// Long missing break. Added to Source2 in change 700053.
-		// It's a bug, but changing it now could cause regressions, so
-		// leaving it for now until someone decides it's worth fixing.
-#ifdef FP_EXCEPTIONS_ENABLED
-		// This break is necessary when exceptions are enabled because otherwise
-		// m_bPlaneActive[21] is set even though that plane is filled with
-		// NaNs. We should perhaps put this break in, but we need to do
-		// careful particle testing.
+		// dimhotepus: Always break here. It is in Source2.
 		break;
-#endif
 
 		case COLLISION_MODE_USE_NEAREST_TRACE:
 		{
