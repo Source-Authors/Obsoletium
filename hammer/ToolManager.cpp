@@ -170,10 +170,7 @@ CBaseTool *CToolManager::GetToolForID(ToolID_t eToolID)
 //-----------------------------------------------------------------------------
 ToolID_t CToolManager::GetActiveToolID()
 {
-	if ( m_pActiveTool )
-		return m_pActiveTool->GetToolID();
-	else
-        return TOOL_NONE;
+	return m_pActiveTool ? m_pActiveTool->GetToolID() : TOOL_NONE;
 }
 
 
