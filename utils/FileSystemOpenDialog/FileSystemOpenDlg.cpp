@@ -18,13 +18,6 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 
-CFileInfo::CFileInfo()
-{
-	m_bIsDir = false;
-	m_pBitmap = NULL;
-}
-
-
 /////////////////////////////////////////////////////////////////////////////
 // This caches the thumbnail bitmaps we generate to speed up browsing.
 /////////////////////////////////////////////////////////////////////////////
@@ -840,7 +833,7 @@ const char* CFileSystemOpenDlg::GetPathID()
 // ------------------------------------------------------------------------------------------------ //
 
 // IFileSystemOpenDialog implementation.
-class CFileSystemOpenDialogWrapper : public IFileSystemOpenDialog
+class CFileSystemOpenDialogWrapper final : public IFileSystemOpenDialog
 {
 public:
 	CFileSystemOpenDialogWrapper()
