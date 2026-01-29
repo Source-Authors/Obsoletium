@@ -509,9 +509,10 @@ CMapClass *CMapInstance::Copy(bool bUpdateDependencies)
 CMapClass *CMapInstance::CopyFrom(CMapClass *pObject, bool bUpdateDependencies)
 {
 	CMapInstance *pFrom = dynamic_cast<CMapInstance *>(pObject);
-	Assert(pObject != NULL);
+	Assert(pFrom != NULL);
 
-	if (pObject != NULL)
+	// dimhotepus: Check correct object.
+	if (pFrom != NULL)
 	{
 		CMapClass::CopyFrom(pObject, bUpdateDependencies);
 
