@@ -8969,8 +8969,15 @@ void CMapDoc::OnFileExporttodxf(void)
 
 	BoundBox box;
 	m_pWorld->GetRender2DBox(box.bmins, box.bmaxs);
-
+	
 	FILE *fp = fopen(str, "wb");
+	if (!fp)
+	{
+		Msg(mwError, "Unable to open DXF %s to export to: %s",
+			str.GetString(), std::generic_category().message(errno).c_str() );
+		return;
+	}
+
 	RunCodeAtScopeExit(fclose(fp));
 
 	fprintf(fp,"0\nSECTION\n2\nHEADER\n");
