@@ -2680,7 +2680,7 @@ ChunkFileResult_t CMapFace::LoadVMF(CChunkFile *pFile)
 	// Read the keys and sub-chunks.
 	//
 	LoadFace_t LoadFace;
-	memset(&LoadFace, 0, sizeof(LoadFace));
+	BitwiseClear(LoadFace);
 	LoadFace.pFace = this;
 
 	ChunkFileResult_t eResult;
