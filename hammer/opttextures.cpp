@@ -221,7 +221,8 @@ void COPTTextures::OnAddtexfile2()
 	bi.pidlRoot = NULL;
 	bi.pszDisplayName = szDisplayName;
 	bi.lpszTitle = "Select your Quake II directory.";
-	bi.ulFlags = BIF_RETURNONLYFSDIRS;
+	// dimhotepus: Use new UI.
+	bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_USENEWUI;
 	bi.lpfn = NULL;
 	bi.lParam = 0;
 	
@@ -334,7 +335,8 @@ BOOL COPTTextures::BrowseForFolder( char *pszTitle, char *pszDirectory )
 	bi.hwndOwner = m_hWnd;
 	bi.pszDisplayName = szTmp;
 	bi.lpszTitle = pszTitle;
-	bi.ulFlags = BIF_RETURNONLYFSDIRS /*| BIF_NEWDIALOGSTYLE*/;
+	// dimhotepus: Use new UI.
+	bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_USENEWUI;
 	bi.lpfn = BrowseCallbackProc;
 	bi.lParam = TRUE;
 

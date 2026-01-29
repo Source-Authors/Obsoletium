@@ -278,7 +278,8 @@ BOOL COPTGeneral::BrowseForFolder(char *pszTitle, char *pszDirectory)
 	bi.hwndOwner = m_hWnd;
 	bi.pszDisplayName = szTmp;
 	bi.lpszTitle = pszTitle;
-	bi.ulFlags = BIF_RETURNONLYFSDIRS;
+	// dimhotepus: Use new UI.
+	bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_USENEWUI;
 
 	LPITEMIDLIST idl = SHBrowseForFolder(&bi);
 	if (idl == NULL)
