@@ -1256,7 +1256,7 @@ void CMapOverlay::Material_TexCoordInit( void )
 	m_Material.m_vecTextureU.Init( 0.0f, 1.0f );
 	m_Material.m_vecTextureV.Init( 1.0f, 0.0f );
 
-	if ( ( bUPos && !bVPos ) || ( !bUPos && bVPos ) )
+	if ( bUPos != bVPos )
 	{
 		m_Material.m_vecTextureU.Init( 1.0f, 0.0f );
 		m_Material.m_vecTextureV.Init( 0.0f, 1.0f );
