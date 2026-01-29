@@ -1638,6 +1638,7 @@ void MDLViewer::LoadModel_Steam()
 	}
 	pDlg->Init( g_Factory, NULL );
 	pDlg->AddFileMask( "*.jpg" );
+	// dimhotepus: Support jpeg, too.
 	pDlg->AddFileMask( "*.jpeg" );
 	pDlg->AddFileMask( "*.mdl" );
 	pDlg->SetInitialDir( "models", "game" );

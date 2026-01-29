@@ -3583,6 +3583,8 @@ void COP_Entity::OnBrowse(void)
 			V_strcpy_safe( szInitialDir, "models" );
 
 			pDlg->AddFileMask( "*.jpg" );
+			// dimhotepus: Support jpeg, too.
+			pDlg->AddFileMask( "*.jpeg" );
 			pDlg->AddFileMask( "*.mdl" );
 			pDlg->SetInitialDir( szInitialDir, pPathID );
 			pDlg->SetFilterMdlAndJpgFiles( true );
