@@ -1309,7 +1309,7 @@ bool CManifest::AddExistingMap( void )
 
 	CFileDialog dlg( TRUE, NULL, NULL, OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_NOCHANGEDIR, "Valve Map Files (*.vmf)|*.vmf||" );
 	dlg.m_ofn.lpstrInitialDir = szInitialDir;
-	int iRvl = dlg.DoModal();
+	INT_PTR iRvl = dlg.DoModal();
 
 	if ( iRvl == IDCANCEL )
 	{
