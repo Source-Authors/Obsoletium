@@ -1323,6 +1323,8 @@ bool CToolDisplace::LoadFilters( const char *filename )
 	if( eResult != ChunkFile_Ok )
 	{
 		Msg( mwError, "Couldn't load filter file %s!\n", filename );
+		// dimhotepus: Signal failure early.
+		return false;
 	}
 
 	//
