@@ -2374,7 +2374,7 @@ bool CMapEntity::HitTestLogical( CMapViewLogical *pView, const Vector2D &vecPoin
 	return false;
 }
 
-		
+
 //-----------------------------------------------------------------------------
 // Is this logical?
 //-----------------------------------------------------------------------------
