@@ -4595,17 +4595,15 @@ LRESULT COP_Entity::OnChangeAngleBox(WPARAM nID, LPARAM)
 void COP_Entity::OnCameraDistance(void)
 {
 	CMapDoc *pDoc = CMapDoc::GetActiveMapDoc();
+	Assert(pDoc != NULL);
+	if (!pDoc)
+		return;
 	CMapView3D *pView = pDoc->GetFirst3DView();
 	if ( !pView )
 		return;
 	const CCamera *camera = pView->GetCamera();
 	Vector cameraPos;
 	camera->GetViewPoint( cameraPos );
-	Assert(pDoc != NULL);
-	if (pDoc == NULL)
-	{
-		return;
-	}
 
 	int nSel = GetCurVarListSelection();
 	Assert(nSel != LB_ERR);
