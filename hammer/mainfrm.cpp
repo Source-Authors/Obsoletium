@@ -1167,7 +1167,7 @@ void CMainFrame::OnHelpFinder(void)
 //-----------------------------------------------------------------------------
 BOOL CMainFrame::OnHelpInfo(HELPINFO *pHelpInfo)
 {
-	return(Default());
+	return Default() ? TRUE : FALSE;
 }
 
 
