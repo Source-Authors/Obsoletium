@@ -1326,14 +1326,15 @@ void CMapFace::SetTexture(IEditorTexture *pTexture, bool bRescaleTextureCoordina
 
 	m_pTexture = pTexture;
 
-	// Copy other things from m_pTexture.
-	m_pTexture->GetShortName(texture.texture);
-	texture.q2surface = m_pTexture->GetSurfaceAttributes();
-	texture.q2contents = m_pTexture->GetSurfaceContents();
-
 	BOOL bTexValid = FALSE;
 	if (m_pTexture != NULL)
 	{
+		// dimhotepus: Move copying after m_pTexture nullptr check.
+		// Copy other things from m_pTexture.
+		m_pTexture->GetShortName(texture.texture);
+		texture.q2surface = m_pTexture->GetSurfaceAttributes();
+		texture.q2contents = m_pTexture->GetSurfaceContents();
+
 		// Insure that the texture is loaded.
 		m_pTexture->Load();
 
