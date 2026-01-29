@@ -1009,11 +1009,7 @@ void CMapView2DBase::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		case '9':
 		case '0':
 		{
-			int iZoom = nChar - '1';
-			if (nChar == '0')
-			{
-				iZoom = 9;
-			}
+			int iZoom = nChar != '0' ? nChar - '1' : 9;
 			SetZoom(m_flMinZoom * (1 << iZoom));
 			break;
 		}
