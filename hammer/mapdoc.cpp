@@ -5425,7 +5425,7 @@ void CMapDoc::OnFileSaveAs(void)
 
 		CFileDialog dlg(FALSE, NULL, str, OFN_LONGNAMES | OFN_NOCHANGEDIR |	OFN_HIDEREADONLY, pszFilter);
 		dlg.m_ofn.lpstrInitialDir = szBaseDir;
-		int rvl = dlg.DoModal();
+		INT_PTR rvl = dlg.DoModal();
 
 		if (rvl == IDCANCEL)
 		{
@@ -7711,7 +7711,7 @@ bool GetSaveAsFilename(const char *pszBaseDir, char *pszFileName, int nSize)
 	CString str;
 	CFileDialog dlg(FALSE, NULL, str, OFN_LONGNAMES | OFN_NOCHANGEDIR |	OFN_HIDEREADONLY, "Valve Map Files (*.vmf)|*.vmf||");
 	dlg.m_ofn.lpstrInitialDir = pszBaseDir;
-	int nRet = dlg.DoModal();
+	INT_PTR nRet = dlg.DoModal();
 
 	if (nRet != IDCANCEL)
 	{
