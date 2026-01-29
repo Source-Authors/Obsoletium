@@ -8205,7 +8205,7 @@ void CMapDoc::BatchReplaceTextures( FileHandle_t fp )
 	char buf[MAX_REPLACE_LINE_LENGTH];
 	BatchReplaceTextures_t Info;
 
-	while( g_pFullFileSystem->ReadLine( buf, sizeof( buf ), fp ) )
+	while( g_pFullFileSystem->ReadLine( buf, fp ) )
 	{
 		scan = buf;
 
