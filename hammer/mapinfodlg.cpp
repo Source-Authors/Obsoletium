@@ -144,8 +144,9 @@ void CMapInfoDlg::CountTexture(IEditorTexture *pTex)
 	//
 	// Calculate memory used by this texture.
 	//
-	short nWidth = pTex->GetWidth();
-	short nHeight = pTex->GetHeight();
+	// dimhotepus: short -> int.
+	int nWidth = pTex->GetWidth();
+	int nHeight = pTex->GetHeight();
 
 	m_uTextureMemory += nWidth * nHeight * 3;
 
