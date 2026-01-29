@@ -11017,7 +11017,7 @@ void CMapDoc::OnUpdateLightPreview()
 	fread( fileData.Base(), 1, fileData.Count(), fp );
 
 	// Null-terminate it.
-	fileData[ fileData.Count() - 1 ] = 0;
+	fileData[ fileData.Count() - 1 ] = '\0';
 
 	// Tell the incremental lighting manager to relight.
 	m_pBSPLighting->StartLighting( fileData.Base() );
