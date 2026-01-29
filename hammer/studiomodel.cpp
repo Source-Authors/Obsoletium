@@ -971,8 +971,7 @@ void StudioModel::GetSequenceInfo( float *pflFrameRate, float *pflGroundSpeed )
 	if (t > 0)
 	{
 		*pflFrameRate = 1.0f / t;
-		*pflGroundSpeed = 0; // sqrt( pseqdesc->linearmovement[0]*pseqdesc->linearmovement[0]+ pseqdesc->linearmovement[1]*pseqdesc->linearmovement[1]+ pseqdesc->linearmovement[2]*pseqdesc->linearmovement[2] );
-		// *pflGroundSpeed = *pflGroundSpeed * pseqdesc->fps / (pseqdesc->numframes - 1);
+		*pflGroundSpeed = 0;
 	}
 	else
 	{
@@ -1051,108 +1050,6 @@ int StudioModel::SetSkin( int iValue )
 }
 
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : pRender - 
-//-----------------------------------------------------------------------------
-
-/*void StudioModel::DrawModel2D(CRender2D *pRender)
-{
-	studiohdr_t *pStudioHdr = GetStudioRenderHdr();
-	CMapView2D *pView = (CMapView2D*) pRender->GetView();
-
-	DrawModelInfo_t info;
-	ZeroMemory(&info, sizeof(info));
-
-	info.m_pStudioHdr = pStudioHdr;
-	info.m_pHardwareData = GetHardwareData();
-
-	info.m_Decals = STUDIORENDER_DECAL_INVALID;
-	info.m_Skin = m_skinnum;
-	info.m_Body = m_bodynum;
-	info.m_HitboxSet = 0;
-
-	info.m_pClientEntity = NULL;
-	info.m_Lod = -1;
-	info.m_ppColorMeshes = NULL;
-
-	if ( pView->m_fZoom < 3 )
-		info.m_Lod = 3;
-
-	matrix3x4_t *pBoneToWorld = SetUpBones( g_bUpdateBones2D );
-
-	GetTriangles_Output_t tris;
-	g_pStudioRender->GetTriangles( info, tris );
-
-    for ( int batchID = 0; batchID < tris.m_MaterialBatches.Count(); batchID++ )
-	{
-		GetTriangles_MaterialBatch_t &materialBatch = tris.m_MaterialBatches[batchID];
-
-		intp numStrips = materialBatch.m_TriListIndices.Count() / 3;
-		intp numVertices = materialBatch.m_Verts.Count();
-	
-		POINT *points = (POINT*)_alloca( sizeof(POINT) * numVertices );
-		
-		//	translate all vertices
-		for ( int vertID = 0; vertID < numVertices; vertID++)
-		{
-			GetTriangles_Vertex_t &vert = materialBatch.m_Verts[vertID];
-			const Vector &pos = vert.m_Position;
-
-			Vector newPos(0,0,0);
-			
-			for ( int k = 0; k < vert.m_NumBones; k++ )
-			{
-				const matrix3x4_t &poseToWorld = tris.m_PoseToWorld[ vert.m_BoneIndex[k] ];
-				Vector tmp;
-				VectorTransform( pos, poseToWorld, tmp );
-				newPos += vert.m_BoneWeight[k] * tmp;
-			}
-
-			pView->WorldToClient( points[vertID], newPos );
-//			pRender->TransformPoint3D( points[vertID], newPos );
-		}
-
-		// Send the vertices down to the hardware.
-
-		int stripIndex = 0;
-
-		for ( int strip = 0; strip < numStrips; strip++ )
-		{
-			int ptx[3];
-			int pty[3];
-
-			int numPoints = 0;
-			POINT lastPt; lastPt.x = lastPt.y = -99999;
-					
- 			for ( int i = 0; i<3; i++ )
-			{
-				POINT pt = points[ materialBatch.m_TriListIndices[stripIndex++] ];
-
-				if ( pt.x == lastPt.x && pt.y == lastPt.y )
-					continue;
-
-				ptx[numPoints] = pt.x;
-				pty[numPoints] = pt.y;
-				lastPt = pt;
-				numPoints++;
-			}
-
-			// for performance sake bypass the renderer interface, buuuhhh
-
-			if ( numPoints == 2 )
-			{
-				g_pMatSystemSurface->DrawLine( ptx[0], pty[0], ptx[1], pty[1] );
-			}
-			else if ( numPoints == 3 )
-			{
-				g_pMatSystemSurface->DrawPolyLine( ptx, pty, 3 );
-			}
-		}
-	}
-} */
-
-
 void InitStudioFileChangeWatcher()
 {
 	g_StudioFileChangeWatcher.Init();
@@ -1163,6 +1060,3 @@ void UpdateStudioFileChangeWatcher()
 {
 	g_StudioFileChangeWatcher.Update();
 }
-
-
-
