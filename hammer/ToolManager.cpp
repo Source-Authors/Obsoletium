@@ -161,7 +161,7 @@ CBaseTool *CToolManager::GetToolForID(ToolID_t eToolID)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
