@@ -854,14 +854,14 @@ void CRender3D::SendShadowTriangles( void )
 
 static bool LightForString( char const *pLight, Vector& intensity )
 {
-	double r, g, b, scaler;
+	float r, g, b, scaler;
 
 	VectorFill( intensity, 0 );
 
-	// scanf into doubles, then assign, so it is vec_t size independent
 	r = g = b = scaler = 0;
-	double r_hdr,g_hdr,b_hdr,scaler_hdr;
-	int argCnt = sscanf ( pLight, "%lf %lf %lf %lf %lf %lf %lf %lf", 
+	float r_hdr,g_hdr,b_hdr,scaler_hdr;
+	// dimhotepus: double -> float.
+	int argCnt = sscanf ( pLight, "%f %f %f %f %f %f %f %f", 
 						  &r, &g, &b, &scaler, &r_hdr,&g_hdr,&b_hdr,&scaler_hdr );
 	
 	// This is a special case for HDR lights.  If we have a vector of [-1, -1, -1, 1], then we
