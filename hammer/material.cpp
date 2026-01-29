@@ -1197,7 +1197,8 @@ int CMaterial::GetImageDataRGBA(void *pImageRGBA)
 		src = (unsigned char *)m_pData;
 		dst = (unsigned char *)pImageRGBA;
 
-		while (src < (unsigned char *)m_pData + m_nWidth * m_nHeight * 4);	
+		// dimhotepus: Drop after ; while causing no iterations.
+		while (src < (unsigned char *)m_pData + m_nWidth * m_nHeight * 4)
 		{
 			dst[0] = src[2];
 			dst[1] = src[1];
