@@ -43,7 +43,8 @@ inline int fsign( float x) { if(x==0) return 0; else if (x>0) return 1; else ret
 inline bool fequal( float value, float target, float delta) { return ( (value<(target+delta))&&(value>(target-delta)) ); }
 
 void RoundVector( Vector2D &v );
-bool IsLineInside(const Vector2D &pt1, const Vector2D &pt2, int x1, int y1, int x2, int y2);
+// dimhotepus: int -> float.
+bool IsLineInside(const Vector2D &pt1, const Vector2D &pt2, float x1, float y1, float x2, float y2);
 bool IsPointInside(const Vector2D &pt, const Vector2D &mins, const Vector2D &maxs );
 
 bool IsValidBox( Vector &mins, Vector &maxs );
