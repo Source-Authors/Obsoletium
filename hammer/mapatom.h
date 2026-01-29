@@ -65,7 +65,7 @@ public:
 	//-----------------------------------------------------------------------------
 	virtual SelectionState_t GetSelectionState(void) const
 	{
-		return(m_eSelectionState);
+		return m_eSelectionState;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -73,9 +73,7 @@ public:
 	//-----------------------------------------------------------------------------
 	virtual SelectionState_t SetSelectionState(SelectionState_t eSelectionState)
 	{
-		SelectionState_t ePrevState = m_eSelectionState;
-		m_eSelectionState = eSelectionState;
-		return ePrevState;
+		return std::exchange( m_eSelectionState, eSelectionState );
 	}
 		
 	//-----------------------------------------------------------------------------
