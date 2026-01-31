@@ -11,6 +11,8 @@
 #include "tier1/checksum_crc.h"
 #include "tier1/checksum_md5.h"
 #include "tier1/utldict.h"
+// dimhotepus: To not duplicate directories in list.
+#include "tier1/utlhashtable.h"
 #include "tier2/fileutils.h"
 #include "tier1/utlbuffer.h"
 
@@ -1856,6 +1858,12 @@ intp CPackedStore::GetFileAndDirLists( CUtlStringList &outDirnames, CUtlStringLi
 	return GetFileAndDirLists( NULL, outDirnames, outFilenames, bSortedOutput );
 }
 
+// dimhotepus: To correctly compare strings in hash table.
+struct StringEqual
+{
+	[[nodiscard]] bool operator()( const char *a, const char *b) const { return V_strcmp(a, b) == 0; }
+};
+
 void CPackedStore::BuildFindFirstCache()
 {
 	char szLastDirFound[MAX_PATH] = "$$$$$$$HighlyUnlikelyPathForInitializationPurposes#######";
@@ -1866,12 +1874,17 @@ void CPackedStore::BuildFindFirstCache()
 	CUtlStringList allVPKFiles;
 	// Get all files in the VPK
 	GetFileList( allVPKFiles, false, true );
+	
+	char szFilePath[MAX_PATH];
+	intp directoryIndex = -1;
+
+	AssertMsg(m_directoryList.Count() == 0, "BuildFindFirstCache must be called only once, or you should move directory indexes into CPackedStore member");
+	// dimhotepus: Fast lookup for directory in directory list.
+    CUtlHashtable<const char *, intp, DefaultHashFunctor<const char *>, StringEqual> directoryIndexes;
 
 	// Add directories to directory list and files into map
 	FOR_EACH_VEC( allVPKFiles, i )
 	{
-		char szFilePath[MAX_PATH];
-
 		V_ExtractFilePath( allVPKFiles[i], szFilePath );
 		Q_StripTrailingSlash( szFilePath );
 		
@@ -1879,14 +1892,30 @@ void CPackedStore::BuildFindFirstCache()
 		if ( V_strnicmp( szFilePath, szLastDirFound, sizeof( szLastDirFound ) ) )
 		{
 			// Mark the new one as the last one encountered
-			V_strncpy( szLastDirFound, szFilePath, sizeof( szFilePath ) );
+			V_strcpy_safe( szLastDirFound, szFilePath );
 
-			// Add it
-			m_directoryList.CopyAndAddToTail( szFilePath );
-			m_dirContents.Insert( m_directoryList.Count(), new CUtlStringList() ); // Freed in destructor
+			// dimhotepus: Check we already have this directory to append files to it.
+			const auto dirHandle = directoryIndexes.Find( szFilePath );
+			if ( dirHandle == decltype(directoryIndexes)::InvalidHandle() )
+			{
+				char *szFilePathCopy = V_strdup( szFilePath );
+
+				directoryIndex = m_directoryList.Count() + 1;
+
+				// Stores reference to file path stored in m_directoryList.
+				directoryIndexes.Insert( szFilePathCopy, directoryIndex );
+				// Add it
+				m_directoryList.AddToTail( szFilePathCopy );
+				m_dirContents.Insert( directoryIndex, new CUtlStringList() ); // Freed in destructor
+			}
+			else
+			{
+				// dimhotepus: If directory already found, we should use it.
+				directoryIndex = directoryIndexes.Element( dirHandle );
+			}
 		}
 		
-		auto nIndex = m_dirContents.Find( m_directoryList.Count() );
+		auto nIndex = m_dirContents.Find( directoryIndex );
 		CUtlStringList *pList = m_dirContents.Element( nIndex );
 
 		pList->CopyAndAddToTail( V_UnqualifiedFileName( allVPKFiles[i] ) );
@@ -2001,6 +2030,7 @@ intp CPackedStore::GetFileAndDirLists( const char *pWildCard, CUtlStringList &ou
 
 					V_strncpy( szFullPathToDir, szWildCardPath, nLenWildcardPath );
 					V_strcat_safe( szFullPathToDir, "/" );
+					// V_strcat_safe( szFullPathToDir, CORRECT_PATH_SEPARATOR_S );
 					V_strcat_safe( szFullPathToDir, szSubDir );
 		
 					// Add the subdirectory to the list if it isn't already there
@@ -2077,8 +2107,11 @@ intp CPackedStore::GetFileAndDirLists( const char *pWildCard, CUtlStringList &ou
 		// Add all the files as well
 		FOR_EACH_VEC( m_directoryList, i )
 		{
+			// char *dirName = V_strdup( m_directoryList[i] );
+			// V_FixSlashes( dirName );
 			// Add all directories
 			outDirnames.CopyAndAddToTail( m_directoryList[i] );
+			// outDirnames.AddToTail( dirName );
 
 			// Now add all files
 			CUtlStringList &filesInDirectory = *(m_dirContents.Element( i ));
