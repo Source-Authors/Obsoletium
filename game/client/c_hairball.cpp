@@ -20,8 +20,8 @@ private:
 	class CHairballDelegate : public CSimplePhysics::IHelper
 	{
 	public:
-		virtual void	GetNodeForces( CSimplePhysics::CNode *pNodes, int iNode, Vector *pAccel );
-		virtual void	ApplyConstraints( CSimplePhysics::CNode *pNodes, int nNodes );
+		void	GetNodeForces( CSimplePhysics::CNode *pNodes, intp iNode, Vector *pAccel ) override;
+		void	ApplyConstraints( CSimplePhysics::CNode *pNodes, intp nNodes ) override;
 	
 		C_Hairball		*m_pParent;
 	};
@@ -77,13 +77,13 @@ public:
 };
 
 
-void C_Hairball::CHairballDelegate::GetNodeForces( CSimplePhysics::CNode *pNodes, int iNode, Vector *pAccel )
+void C_Hairball::CHairballDelegate::GetNodeForces( CSimplePhysics::CNode *pNodes, intp iNode, Vector *pAccel )
 {
 	pAccel->Init( 0, 0, -1500 );
 }
 
 
-void C_Hairball::CHairballDelegate::ApplyConstraints( CSimplePhysics::CNode *pNodes, int nNodes )
+void C_Hairball::CHairballDelegate::ApplyConstraints( CSimplePhysics::CNode *pNodes, intp nNodes )
 {
 	int nSegments = m_pParent->m_nNodesPerHair - 1;
 	float flSpringDistSqr = m_pParent->m_flSpringDist * m_pParent->m_flSpringDist;

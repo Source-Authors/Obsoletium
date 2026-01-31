@@ -918,7 +918,7 @@ DECLARE_CLIENT_EFFECT( "ShakeRopes", ShakeRopesCallback );
 // ------------------------------------------------------------------------------------ //
 #define WIND_FORCE_FACTOR 10
 
-void C_RopeKeyframe::CPhysicsDelegate::GetNodeForces( CSimplePhysics::CNode *pNodes, int iNode, Vector *pAccel )
+void C_RopeKeyframe::CPhysicsDelegate::GetNodeForces( CSimplePhysics::CNode *pNodes, intp iNode, Vector *pAccel )
 {
 	// Gravity.
 	if ( !( m_pKeyframe->GetRopeFlags() & ROPE_NO_GRAVITY ) )
@@ -962,12 +962,12 @@ void C_RopeKeyframe::CPhysicsDelegate::GetNodeForces( CSimplePhysics::CNode *pNo
 void LockNodeDirection( 
 	CSimplePhysics::CNode *pNodes, 
 	int parity, 
-	int nFalloffNodes,
+	intp nFalloffNodes,
 	float flLockAmount,
 	float flLockFalloff,
 	const Vector &vIdealDir ) 
 {
-	for ( int i=0; i < nFalloffNodes; i++ )
+	for ( intp i=0; i < nFalloffNodes; i++ )
 	{
 		Vector &v0 = pNodes[i*parity].m_vPos;
 		Vector &v1 = pNodes[(i+1)*parity].m_vPos;
@@ -988,7 +988,7 @@ void LockNodeDirection(
 }
 
 
-void C_RopeKeyframe::CPhysicsDelegate::ApplyConstraints( CSimplePhysics::CNode *pNodes, int nNodes )
+void C_RopeKeyframe::CPhysicsDelegate::ApplyConstraints( CSimplePhysics::CNode *pNodes, intp nNodes )
 {
 	VPROF( "CPhysicsDelegate::ApplyConstraints" );
 
@@ -1001,7 +1001,7 @@ void C_RopeKeyframe::CPhysicsDelegate::ApplyConstraints( CSimplePhysics::CNode *
 	{
 		CTimeAdder adder( &g_RopeCollideTicks );
 
-		for( int i=0; i < nNodes; i++ )
+		for( intp i=0; i < nNodes; i++ )
 		{
 			CSimplePhysics::CNode *pNode = &pNodes[i];
 
@@ -1049,7 +1049,7 @@ void C_RopeKeyframe::CPhysicsDelegate::ApplyConstraints( CSimplePhysics::CNode *
 			AngleVectors( angles, &forward );
 
 			int parity = 1;
-			int nFalloffNodes = MIN( 2, nNodes - 2 );
+			intp nFalloffNodes = MIN( 2, nNodes - 2 );
 			LockNodeDirection( pNodes, parity, nFalloffNodes, g_flLockAmount, g_flLockFalloff, forward );
 		}
 	}
@@ -1063,7 +1063,7 @@ void C_RopeKeyframe::CPhysicsDelegate::ApplyConstraints( CSimplePhysics::CNode *
 			AngleVectors( angles, &forward );
 			
 			int parity = -1;
-			int nFalloffNodes = MIN( 2, nNodes - 2 );
+			intp nFalloffNodes = MIN( 2, nNodes - 2 );
 			LockNodeDirection( &pNodes[nNodes-1], parity, nFalloffNodes, g_flLockAmount, g_flLockFalloff, forward );
 		}
 	}

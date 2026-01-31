@@ -39,8 +39,8 @@ private:
 	class CPhysicsDelegate : public CSimplePhysics::IHelper
 	{
 	public:
-		virtual void	GetNodeForces( CSimplePhysics::CNode *pNodes, int iNode, Vector *pAccel );
-		virtual void	ApplyConstraints( CSimplePhysics::CNode *pNodes, int nNodes );
+		void	GetNodeForces( CSimplePhysics::CNode *pNodes, intp iNode, Vector *pAccel ) override;
+		void	ApplyConstraints( CSimplePhysics::CNode *pNodes, intp nNodes ) override;
 	
 		C_RopeKeyframe	*m_pKeyframe;
 	};
