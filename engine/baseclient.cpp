@@ -617,7 +617,7 @@ void CBaseClient::Disconnect( PRINTF_FORMAT_STRING const char *fmt, ... )
 	m_Server->UserInfoChanged( m_nClientSlot );
 
 	va_start (argptr,fmt); //-V2019 //-V2018
-	V_sprintf_safe (string,fmt,argptr);
+	V_vsprintf_safe (string,fmt,argptr);
 	va_end (argptr);
 
 	ConMsg("Dropped %s from server (%s)\n", GetClientName(), string );
