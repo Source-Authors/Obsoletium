@@ -1858,13 +1858,12 @@ intp CPackedStore::GetFileAndDirLists( CUtlStringList &outDirnames, CUtlStringLi
 
 void CPackedStore::BuildFindFirstCache()
 {
-	CUtlStringList allVPKFiles;
-	char szLastDirFound[MAX_PATH];
+	char szLastDirFound[MAX_PATH] = "$$$$$$$HighlyUnlikelyPathForInitializationPurposes#######";
 
 	// Init
-	V_strncpy( szLastDirFound, "$$$$$$$HighlyUnlikelyPathForInitializationPurposes#######", sizeof( szLastDirFound ) );
 	m_dirContents.SetLessFunc( DefLessFunc( intp ) );
-
+	
+	CUtlStringList allVPKFiles;
 	// Get all files in the VPK
 	GetFileList( allVPKFiles, false, true );
 
