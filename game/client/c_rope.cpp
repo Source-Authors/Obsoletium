@@ -170,7 +170,7 @@ public:
 		m_QueuedRopeMemory[1].FreeAll( true );
 		for( int i = 0; i != 2; ++i )
 		{
-			for( int j = m_DeleteOnSwitch[i].Count(); --j >= 0; )
+			for( intp j = m_DeleteOnSwitch[i].Count(); --j >= 0; )
 			{
 				free( m_DeleteOnSwitch[i].Element(j) );
 			}
@@ -184,7 +184,7 @@ public:
 		m_nCurrentStack = 1 - m_nCurrentStack;
 		m_QueuedRopeMemory[m_nCurrentStack].FreeAll( false );
 
-		for( int i = m_DeleteOnSwitch[m_nCurrentStack].Count(); --i >= 0; )
+		for( intp i = m_DeleteOnSwitch[m_nCurrentStack].Count(); --i >= 0; )
 		{
 			free( m_DeleteOnSwitch[m_nCurrentStack].Element(i) );
 		}
@@ -197,8 +197,8 @@ public:
 		void *pReturn = m_QueuedRopeMemory[m_nCurrentStack].Alloc( bytes, false );
 		if( pReturn == NULL )
 		{
-			int iMaxSize = m_QueuedRopeMemory[m_nCurrentStack].GetMaxSize();
-			Warning( "Overflowed rope queued rendering memory stack. Needed %zu, have %zd/%d\n",
+			intp iMaxSize = m_QueuedRopeMemory[m_nCurrentStack].GetMaxSize();
+			Warning( "Overflowed rope queued rendering memory stack. Needed %zu, have %zd/%zd\n",
 				bytes, iMaxSize - m_QueuedRopeMemory[m_nCurrentStack].GetUsed(), iMaxSize );
 			pReturn = malloc( bytes );
 			m_DeleteOnSwitch[m_nCurrentStack].AddToTail( pReturn );
@@ -568,7 +568,7 @@ void CRopeManager::DrawRenderCache_NonQueued( bool bShadowDepth, RopeRenderData_
 //-----------------------------------------------------------------------------
 void CRopeManager::DrawRenderCache( bool bShadowDepth )
 {
-	int iRenderCacheCount = m_aRenderCache.Count();
+	intp iRenderCacheCount = m_aRenderCache.Count();
 
 	if( iRenderCacheCount == 0 )
 		return;
