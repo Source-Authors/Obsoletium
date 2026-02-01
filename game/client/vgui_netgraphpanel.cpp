@@ -51,6 +51,8 @@ static ConVar	net_graphproportionalfont( "net_graphproportionalfont", "1", FCVAR
 
 // Number of values to track (must be power of 2) b/c of masking
 constexpr inline int TIMINGS{1024};
+static_assert(IsPowerOfTwo(TIMINGS), "Timings must be power of 2.");
+
 constexpr inline float FRAMERATE_AVG_FRAC{0.9f};
 
 constexpr inline byte GRAPH_RED = static_cast<byte>(0.9 * 255);
@@ -59,7 +61,7 @@ constexpr inline byte GRAPH_BLUE = static_cast<byte>(0.7 * 255);
 
 constexpr inline int LERP_HEIGHT{24};
 
-enum ColorIndex
+enum class ColorIndex
 {
   COLOR_DROPPED = 0,
   COLOR_INVALID,
@@ -90,7 +92,7 @@ private:
 
 	struct cmdinfo_t
 	{
-		 float		cmd_lerp;
+		float		cmd_lerp;
 		int			size;
 		bool		sent;
 	};
@@ -157,31 +159,32 @@ public:
 
 	CUtlVector<CLineSegment> m_Rects;
 
-	void				DrawLine( vrect_t *rect, const byte *color, byte alpha );
-	void				DrawLine2( vrect_t *rect, const byte *color, const byte *color2, byte alpha, byte alpha2 );
+	void				DrawLine( const vrect_t &rect, const byte (&color)[3], byte alpha );
+	void				DrawLine2( const vrect_t &rect, const byte (&color)[3], const byte (&color2)[3], byte alpha, byte alpha2 );
 
 	void				ResetLineSegments();
 	void				DrawLineSegments();
 
-	int					DrawDataSegment( vrect_t *rcFill, int bytes, byte r, byte g, byte b, byte alpha = 255);
+	int					DrawDataSegment( vrect_t &rcFill, int bytes, byte r, byte g, byte b, byte alpha = 255);
 	void				DrawUpdateRate( int xright, int y );
 	void				DrawCmdRate( int xright, int y );
 	void				DrawHatches( int x, int y, int maxmsgbytes );
 	void				DrawStreamProgress( int x, int y, int width );
-	void				DrawTimes( vrect_t vrect, cmdinfo_t *cmdinfo, int x, int w, int graphtype );
-	void				DrawTextFields( int graphvalue, int x, int y, int w, netbandwidthgraph_t *graph, cmdinfo_t *cmdinfo );
-	void				GraphGetXY( vrect_t *rect, int width, int *x, int *y );
-	void				GetCommandInfo( INetChannelInfo *netchannel, cmdinfo_t *cmdinfo );
-	void				GetFrameData( INetChannelInfo *netchannel, int *biggest_message, float *avg_message, float *f95thpercentile );
-	void				ColorForHeight( packet_latency_t *packet, byte *color, int *ping, byte *alpha );
-	void				GetColorValues( ColorIndex color, byte *cv, byte *alpha );
+	void				DrawTimes( const vrect_t &vrect, const cmdinfo_t (&cmdinfo)[TIMINGS], int x, int w, int graphtype );
+	void				DrawTextFields( int graphvalue, int x, int y, int w, const netbandwidthgraph_t (&graph)[TIMINGS], cmdinfo_t (&cmdinfo)[TIMINGS] );
+	void				GraphGetXY( const vrect_t &rect, int width, int *x, int *y );
+	void				GetCommandInfo( const INetChannelInfo *netchannel, cmdinfo_t (&cmdinfo)[TIMINGS] ) const;
+	void				GetFrameData( const INetChannelInfo *netchannel, int &biggest_message, float &avg_message, float &f95thpercentile );
+	void				ColorForHeight( const packet_latency_t &packet, byte (&color)[3], int &ping, byte &alpha ) const;
+	template<ColorIndex color>
+	void				GetColorValues( byte (&cv)[3], byte &alpha ) const;
 
 	void				OnFontChanged();
 
 private:
 
 	void				PaintLineArt( int x, int y, int w, int graphtype, int maxmsgbytes );
-	void				DrawLargePacketSizes( int x, int w, int graphtype, float warning_threshold );
+	void				DrawLargePacketSizes( int x, int w, float warning_threshold );
 
 	HFont				GetNetgraphFont() const
 	{
@@ -221,8 +224,9 @@ CNetGraphPanel::CNetGraphPanel( VPANEL parent )
 	m_hFont = INVALID_FONT;
 	m_hFontProportional = INVALID_FONT;
 	m_hFontSmall = INVALID_FONT;
-	m_EstimatedWidth = 1;
-	m_nNetGraphHeight = 100;
+	// dimhotepus: Scale UI.
+	m_EstimatedWidth = QuickPropScale( 1 );
+	m_nNetGraphHeight = QuickPropScale( 100 );
 
 	SetFgColor( Color( 0, 0, 0, 255 ) );
 	SetPaintBackgroundEnabled( false );
@@ -257,11 +261,11 @@ CNetGraphPanel::CNetGraphPanel( VPANEL parent )
 	m_flServerFramerate = 0;
 	m_flServerFramerateStdDeviation = 0;
 
-	netcolors[COLOR_DROPPED] = {{255, 0, 0}, 255};
-	netcolors[COLOR_INVALID] = {{0, 0, 255}, 255};
-	netcolors[COLOR_SKIPPED] = {{240, 127, 63}, 255};
-	netcolors[COLOR_CHOKED] = {{225, 225, 0}, 255};
-	netcolors[COLOR_NORMAL] = {{63, 255, 63}, 232};
+	netcolors[to_underlying(ColorIndex::COLOR_DROPPED)] = {{255, 0, 0}, 255};
+	netcolors[to_underlying(ColorIndex::COLOR_INVALID)] = {{0, 0, 255}, 255};
+	netcolors[to_underlying(ColorIndex::COLOR_SKIPPED)] = {{240, 127, 63}, 255};
+	netcolors[to_underlying(ColorIndex::COLOR_CHOKED)] = {{225, 225, 0}, 255};
+	netcolors[to_underlying(ColorIndex::COLOR_NORMAL)] = {{63, 255, 63}, 232};
 
 	ivgui()->AddTickSignal( GetVPanel(), 500 );
 
@@ -314,7 +318,7 @@ void CNetGraphPanel::ApplySchemeSettings(IScheme *pScheme)
 
 	m_hFont = pScheme->GetFont( "DefaultFixedOutline", false );
 	m_hFontProportional = pScheme->GetFont( "DefaultFixedOutline", true );
-	m_hFontSmall = pScheme->GetFont( "DefaultVerySmall", false );
+	m_hFontSmall = pScheme->GetFont( "DefaultVerySmall", true );
 
 	OnFontChanged();
 }
@@ -335,43 +339,53 @@ void CNetGraphPanel::ComputeNetgraphHeight()
 	{
 		lines = 4;
 	}
+
 	m_nNetGraphHeight = MAX( lines * tall, m_nNetGraphHeight );
 }
 
 // Purpose: Copies data from netcolor_t array into fields passed in
-void CNetGraphPanel::GetColorValues( ColorIndex color, byte *cv, byte *alpha )
+template <ColorIndex color>
+void CNetGraphPanel::GetColorValues( byte (&cv)[3], byte &alpha ) const
 {
-	netcolor_t *pc = &netcolors[ color ];
-	for ( int i = 0; i < 3; i++ )
-	{
-		cv[ i ] = pc->color[ i ];
-	}
-	*alpha = pc->alpha;
+	const netcolor_t &pc = netcolors[ to_underlying( color ) ];
+
+	cv[ 0 ] = pc.color[ 0 ];
+	cv[ 1 ] = pc.color[ 1 ];
+	cv[ 2 ] = pc.color[ 2 ];
+
+	alpha = pc.alpha;
 }
 
 // Purpose: Sets appropriate color values
-void CNetGraphPanel::ColorForHeight( packet_latency_t *packet, byte *color, int *ping, byte *alpha )
+void CNetGraphPanel::ColorForHeight( const packet_latency_t &packet, byte (&color)[3], int &ping, byte &alpha ) const
 {
-	*ping = 0;
-	switch ( packet->latency )
+	ping = 0;
+	switch ( packet.latency )
 	{
 	case 9999:
-		GetColorValues( COLOR_DROPPED, color, alpha );
+		GetColorValues<ColorIndex::COLOR_DROPPED>( color, alpha );
 		break;
 	case 9998:
-		GetColorValues( COLOR_INVALID, color, alpha );
+		GetColorValues<ColorIndex::COLOR_INVALID>( color, alpha );
 		break;
 	case 9997:
-		GetColorValues( COLOR_SKIPPED, color, alpha );
+		GetColorValues<ColorIndex::COLOR_SKIPPED>( color, alpha );
 		break;
 	default:
-		*ping = 1;
-		GetColorValues( packet->choked ? COLOR_CHOKED : COLOR_NORMAL, color, alpha );
+		ping = 1;
+		if ( packet.choked )
+		{
+			GetColorValues<ColorIndex::COLOR_CHOKED>( color, alpha );
+		}
+		else
+		{
+			GetColorValues<ColorIndex::COLOR_NORMAL>( color, alpha );
+		}
 		break;
 	}
 }
 
-// Purpose: Set up blend colors for comman/client-frame/interpolation graph
+// Purpose: Set up blend colors for common/client-frame/interpolation graph
 void CNetGraphPanel::InitColors()
 {
 	constexpr byte mincolor[2][3] = {{63, 0, 100}, {255, 127, 0}};
@@ -406,63 +420,64 @@ void CNetGraphPanel::InitColors()
 	}
 }
 
+template<typename T, int size>
+[[nodiscard]] static T& GetAtIndex( T (&array)[size], intp index ) noexcept
+{
+	static_assert(IsPowerOfTwo(size));
+
+	constexpr int mask{size - 1};
+
+	return array[index & mask];
+}
+
 // Purpose: Draw client framerate / usercommand graph
-void CNetGraphPanel::DrawTimes( vrect_t vrect, cmdinfo_t *cmdinfo, int x, int w, int graphtype )
+void CNetGraphPanel::DrawTimes( const vrect_t &vrect, const cmdinfo_t (&cmdinfo)[TIMINGS], int x, int w, int graphtype )
 {
 	if ( !net_graphshowinterp.GetBool() || graphtype <= 1 )
 		return;
 
-	int i;
-	int j;
-	int	extrap_point;
-	int a, h;
-	vrect_t  rcFill;
-
 	ResetLineSegments();
 
-	extrap_point = LERP_HEIGHT / 3;
+	constexpr int extrap_point = LERP_HEIGHT / 3;
 
-	for (a=0 ; a<w ; a++)
+	for (int a = 0; a < w; a++)
 	{
-		i = ( m_OutgoingSequence - a ) & ( TIMINGS - 1 );
-		h = MIN( ( cmdinfo[i].cmd_lerp / 3.0 ) * LERP_HEIGHT, LERP_HEIGHT );
+		const auto &info = GetAtIndex( cmdinfo, m_OutgoingSequence - a );
+		int h = MIN( ( info.cmd_lerp / 3.0f ) * LERP_HEIGHT, LERP_HEIGHT );
 		if ( h < 0 )
 		{
 			h = LERP_HEIGHT;
 		}
 
-		rcFill.x		= x + w -a - 1;
-		rcFill.width	= 1;
-		rcFill.height	= 1;
-
-		rcFill.y = vrect.y + vrect.height - 4;
+		// dimhotepus: Scale UI.
+		vrect_t rcFill{x + w - a - 1, vrect.y + vrect.height - QuickPropScale( 4 ), 1, 1};
 		
 		if ( h >= extrap_point )
 		{
 			int start = 0;
 
 			h -= extrap_point;
-			rcFill.y -= extrap_point;
+			rcFill.y -= QuickPropScale( extrap_point );
 
 			if ( !net_graphsolid.GetInt() )
 			{
-				rcFill.y -= (h - 1);
+				rcFill.y -= QuickPropScale( h - 1 );
 				start = (h - 1);
 			}
 
-			for ( j = start; j < h; j++ )
+			for ( int j = start; j < h; j++ )
 			{
 				int index = j + extrap_point;
-				Assert( (size_t)index < std::size( colors ) );
-				DrawLine(&rcFill, colors[ index ], 255 );	
+				Assert( index < static_cast<int>( std::size( colors ) ) );
+				DrawLine( rcFill, colors[ index ], 255 );
 				rcFill.y--;
 			}
 		}
 		else
 		{
-			int oldh;
-			oldh = h;
-			rcFill.y -= h;
+			const int oldh = h;
+
+			rcFill.y -= QuickPropScale( h );
 			h = extrap_point - h;
 
 			if ( !net_graphsolid.GetInt() )
@@ -470,28 +485,28 @@ void CNetGraphPanel::DrawTimes( vrect_t vrect, cmdinfo_t *cmdinfo, int x, int w,
 				h = 1;
 			}
 
-			for ( j = 0; j < h; j++ )
+			for ( int j = 0; j < h; j++ )
 			{
 				int index = j + oldh;
-				Assert( (size_t)index < std::size( colors ) );
-				DrawLine(&rcFill, colors[ index ], 255 );	
+				Assert( index < static_cast<int>( std::size( colors ) ) );
+				DrawLine( rcFill, colors[ index ], 255 );
 				rcFill.y--;
 			}
 		}
 
-		rcFill.y = vrect.y + vrect.height - 4 - extrap_point;
+		rcFill.y = vrect.y + vrect.height - QuickPropScale( 4 ) - extrap_point;
 
-		DrawLine( &rcFill, extrap_base_color, 255 );
+		DrawLine( rcFill, extrap_base_color, 255 );
 
-		rcFill.y = vrect.y + vrect.height - 3;
+		rcFill.y = vrect.y + vrect.height - QuickPropScale( 3 );
 
-		if ( cmdinfo[ i ].sent )
+		if ( info.sent )
 		{
-			DrawLine( &rcFill, sendcolor, 255 );
+			DrawLine( rcFill, sendcolor, 255 );
 		}
 		else
 		{
-			DrawLine( &rcFill, holdcolor, 200 );
+			DrawLine( rcFill, holdcolor, 200 );
 		}
 	}
 
@@ -508,14 +523,13 @@ void CNetGraphPanel::DrawTimes( vrect_t vrect, cmdinfo_t *cmdinfo, int x, int w,
 //			*biggest_message - 
 //			1 - 
 //-----------------------------------------------------------------------------
-void CNetGraphPanel::GetFrameData( 	INetChannelInfo *netchannel, int *biggest_message, float *avg_message, float *f95thpercentile )
+void CNetGraphPanel::GetFrameData( const INetChannelInfo *netchannel, int &biggest_message, float &avg_message, float &f95thpercentile )
 {
-	float	frame_received_time;
+	biggest_message	= 0;
+	avg_message		= 0.0f;
+	f95thpercentile	= 0.0f;
 
-	*biggest_message	= 0;
-	*avg_message		= 0.0f;
-	*f95thpercentile	= 0.0f;
-
+	float frame_received_time;
 	int msg_count = 0;
 
 	m_IncomingSequence = netchannel->GetSequenceNr( FLOW_INCOMING );
@@ -553,39 +567,38 @@ void CNetGraphPanel::GetFrameData( 	INetChannelInfo *netchannel, int *biggest_me
 	{
 		frame_received_time = netchannel->GetPacketTime( FLOW_INCOMING, seqnr );
 
-		netbandwidthgraph_t *nbwg = &m_Graph[ seqnr & ( TIMINGS - 1 )];
-		packet_latency_t *lat = &m_PacketLatency[ seqnr & ( TIMINGS - 1 ) ];
+		netbandwidthgraph_t *nbwg = &GetAtIndex( m_Graph, seqnr );
+		packet_latency_t *lat = &GetAtIndex( m_PacketLatency, seqnr );
 
 		netchannel->GetPacketResponseLatency( FLOW_INCOMING, seqnr, &lat->latency, &lat->choked );
 
 		if ( lat->latency < 9995 )
 		{
-			lat->latency += flAdjust;
-			lat->latency = MAX( lat->latency, 0 );
-		}		
+			lat->latency = MAX( lat->latency + flAdjust, 0 );
+		}
 
 		for ( int i=0; i<=INetChannelInfo::TOTAL; i++ )
 		{
 			nbwg->msgbytes[i] = netchannel->GetPacketBytes( FLOW_INCOMING, seqnr, i );
 		}
 
-		if ( nbwg->msgbytes[INetChannelInfo::TOTAL] > *biggest_message )
+		if ( nbwg->msgbytes[INetChannelInfo::TOTAL] > biggest_message )
 		{
-			*biggest_message = nbwg->msgbytes[INetChannelInfo::TOTAL];
+			biggest_message = nbwg->msgbytes[INetChannelInfo::TOTAL];
 		}
 
-		*avg_message += (float)( nbwg->msgbytes[INetChannelInfo::TOTAL] );
+		avg_message += (float)( nbwg->msgbytes[INetChannelInfo::TOTAL] );
 		msg_count++;
 	}
 
-	if ( *biggest_message > 1000 )
+	if ( biggest_message > 1000 )
 	{
-		*biggest_message = 1000;
+		biggest_message = 1000;
 	}
 
 	if ( msg_count >= 1 )
 	{
-		*avg_message /= msg_count;
+		avg_message /= msg_count;
 
 		int deviationsquared = 0;
 
@@ -595,7 +608,7 @@ void CNetGraphPanel::GetFrameData( 	INetChannelInfo *netchannel, int *biggest_me
 			; seqnr <= m_IncomingSequence
 			; seqnr++)
 		{
-			int bytes = m_Graph[ seqnr & ( TIMINGS - 1 )].msgbytes[INetChannelInfo::TOTAL] - ( *avg_message );
+			int bytes = GetAtIndex( m_Graph, seqnr ).msgbytes[INetChannelInfo::TOTAL] - ( avg_message );
 
 			deviationsquared += ( bytes * bytes );
 		}
@@ -603,19 +616,19 @@ void CNetGraphPanel::GetFrameData( 	INetChannelInfo *netchannel, int *biggest_me
 		float var = ( float )( deviationsquared ) / (float)( msg_count - 1 );
 		float stddev = sqrt( var );
 
-		*f95thpercentile = *avg_message + 2.0f * stddev;
+		f95thpercentile = avg_message + 2.0f * stddev;
 	}
 }
 
 // Purpose: Fills in command interpolation/holdback & message size data
-void CNetGraphPanel::GetCommandInfo( INetChannelInfo *netchannel, cmdinfo_t *cmdinfo )
+void CNetGraphPanel::GetCommandInfo( const INetChannelInfo *netchannel, cmdinfo_t (&cmdinfo)[TIMINGS] ) const
 {
 	for ( int seqnr = m_OutgoingSequence - m_UpdateWindowSize + 1
 		; seqnr <= m_OutgoingSequence
 		; seqnr++)
 	{
 		// Also set up the lerp point.
-		cmdinfo_t *ci = &cmdinfo[ seqnr & ( TIMINGS - 1 ) ];
+		cmdinfo_t *ci = &GetAtIndex( cmdinfo, seqnr );
 
 		ci->cmd_lerp = netchannel->GetCommandInterpolationAmount( FLOW_OUTGOING, seqnr );
 		ci->sent =	netchannel->IsValidPacket( FLOW_OUTGOING, seqnr );
@@ -625,15 +638,12 @@ void CNetGraphPanel::GetCommandInfo( INetChannelInfo *netchannel, cmdinfo_t *cmd
 
 // Purpose: Draws overlay text fields showing framerate, latency, bandwidth breakdowns, and,
 // optionally, packet loss and choked packet percentages
-void CNetGraphPanel::DrawTextFields( int graphvalue, int x, int y, int w, netbandwidthgraph_t *graph, cmdinfo_t *cmdinfo )
+void CNetGraphPanel::DrawTextFields( int graphvalue, int x, int y, int w, const netbandwidthgraph_t (&graph)[TIMINGS], cmdinfo_t (&cmdinfo)[TIMINGS] )
 {
 	if ( !net_graphtext.GetBool() )
 		return;
 
 	static int lastout;
-
-	char sz[ 256 ];
-	int out;
 
 	HFont font = GetNetgraphFont();
 
@@ -652,8 +662,9 @@ void CNetGraphPanel::DrawTextFields( int graphvalue, int x, int y, int w, netban
 		m_AvgLatency = 0.0f;
 
 	int textTall = surface()->GetFontTall( font );
-
-	Q_snprintf( sz, sizeof( sz ), "fps:%4i   ping: %i ms", (int)(1.0f / m_Framerate), (int)(m_AvgLatency*1000.0f) );
+	
+	char sz[ 256 ];
+	V_sprintf_safe( sz, "fps:%4i   ping: %i ms", (int)(1.0f / m_Framerate), (int)(m_AvgLatency * 1000.0f) );
 	
 	g_pMatSystemSurface->DrawColoredText( font, x, y, GRAPH_RED, GRAPH_GREEN, GRAPH_BLUE, 255, "%s", sz );
 
@@ -662,7 +673,7 @@ void CNetGraphPanel::DrawTextFields( int graphvalue, int x, int y, int w, netban
 
 	y += textTall;
 
-	out = cmdinfo[ ( ( m_OutgoingSequence - 1 ) & ( TIMINGS - 1 ) ) ].size;
+	int out = GetAtIndex( cmdinfo, m_OutgoingSequence - 1 ).size;
 	if ( !out )
 	{
 		out = lastout;
@@ -672,9 +683,8 @@ void CNetGraphPanel::DrawTextFields( int graphvalue, int x, int y, int w, netban
 		lastout = out;
 	}
 
-	int totalsize = graph[ ( m_IncomingSequence & ( TIMINGS - 1 ) ) ].msgbytes[INetChannelInfo::TOTAL];
-	
-	Q_snprintf( sz, sizeof( sz ), "in :%4i   %2.2f k/s ", totalsize, m_IncomingData );
+	int totalsize = GetAtIndex( graph, m_IncomingSequence ).msgbytes[INetChannelInfo::TOTAL];
+	V_sprintf_safe( sz, "in :%4i   %2.2f k/s ", totalsize, m_IncomingData );
 
 	int textWidth = g_pMatSystemSurface->DrawTextLen( font, "%s", sz );
 
@@ -682,9 +692,9 @@ void CNetGraphPanel::DrawTextFields( int graphvalue, int x, int y, int w, netban
 	
 	// dimhotepus: Round lerp to ticks as game actually does.
 	const float flInterp = ROUND_TO_TICKS( GetClientInterpAmount() );
-	Q_snprintf( sz, sizeof( sz ), "lerp: %5.1f ms", flInterp * 1000.0f );
+	V_sprintf_safe( sz, "lerp: %5.1f ms", flInterp * 1000.0f );
 
-	int interpcolor[ 3 ] = { (int)GRAPH_RED, (int)GRAPH_GREEN, (int)GRAPH_BLUE }; 
+	int interpcolor[ 3 ] = { GRAPH_RED, GRAPH_GREEN, GRAPH_BLUE }; 
 	if ( flInterp > 0.001f )
 	{
 		// Server framerate is lower than interp can possibly deal with
@@ -705,18 +715,17 @@ void CNetGraphPanel::DrawTextFields( int graphvalue, int x, int y, int w, netban
 
 	g_pMatSystemSurface->DrawColoredText( font, x + textWidth, y, interpcolor[ 0 ], interpcolor[ 1 ], interpcolor[ 2 ], 255, "%s", sz );
 
-	Q_snprintf( sz, sizeof( sz ), "%3.1f/s", m_AvgPacketIn );
+	V_sprintf_safe( sz, "%3.1f/s", m_AvgPacketIn );
 	textWidth = g_pMatSystemSurface->DrawTextLen( font, "%s", sz );
 
 	g_pMatSystemSurface->DrawColoredText( font, x + w - textWidth - 1, y, GRAPH_RED, GRAPH_GREEN, GRAPH_BLUE, 255, "%s", sz );
 
 	y += textTall;
 
-	Q_snprintf( sz, sizeof( sz ), "out:%4i   %2.2f k/s", out, m_OutgoingData );
-
+	V_sprintf_safe( sz, "out:%4i   %2.2f k/s", out, m_OutgoingData );
 	g_pMatSystemSurface->DrawColoredText( font, x, y, GRAPH_RED, GRAPH_GREEN, GRAPH_BLUE, 255, "%s", sz );
 
-	Q_snprintf( sz, sizeof( sz ), "%3.1f/s", m_AvgPacketOut );
+	V_sprintf_safe( sz, "%3.1f/s", m_AvgPacketOut );
 	textWidth = g_pMatSystemSurface->DrawTextLen( font, "%s", sz );
 
 	g_pMatSystemSurface->DrawColoredText( font, x + w - textWidth - 1, y, GRAPH_RED, GRAPH_GREEN, GRAPH_BLUE, 255, "%s", sz );
@@ -727,7 +736,7 @@ void CNetGraphPanel::DrawTextFields( int graphvalue, int x, int y, int w, netban
 
 	if ( graphvalue > 2 )
 	{
-		Q_snprintf( sz, sizeof( sz ), "loss:%3i    choke: %2i ", (int)(m_AvgPacketLoss*100.0f), (int)(m_AvgPacketChoke*100.0f) );
+		V_sprintf_safe( sz, "loss:%3i    choke: %2i ", (int)(m_AvgPacketLoss*100.0f), (int)(m_AvgPacketChoke*100.0f) );
 
 		textWidth = g_pMatSystemSurface->DrawTextLen( font, "%s", sz );
 
@@ -737,7 +746,7 @@ void CNetGraphPanel::DrawTextFields( int graphvalue, int x, int y, int w, netban
 
 		if ( graphvalue > 3 )
 		{
-			Q_snprintf( sz, sizeof( sz ), "sv  : %5.1f   var: %4.2f msec", m_flServerFramerate, m_flServerFramerateStdDeviation * 1000.0f );
+			V_sprintf_safe( sz, "sv  : %5.1f   var: %4.2f msec", m_flServerFramerate, m_flServerFramerateStdDeviation * 1000.0f );
 
 			int servercolor[ 3 ] = { (int)GRAPH_RED, (int)GRAPH_GREEN, (int)GRAPH_BLUE };
 
@@ -765,12 +774,12 @@ void CNetGraphPanel::DrawTextFields( int graphvalue, int x, int y, int w, netban
 	{
 		textTall = g_pMatSystemSurface->GetFontTall( m_hFontSmall );
 
-		y = saveY - textTall - 5;
+		y = saveY - textTall - QuickPropScale( 5 );
 		int cw, ch;
 		g_pMatSystemSurface->GetTextSize( m_hFontSmall, L"otherplayersWWW", cw, ch );
 		if ( x - cw < 0 )
 		{
-			x += w + 5;
+			x += w + QuickPropScale( 5 );
 		}
 		else
 		{
@@ -824,7 +833,7 @@ void CNetGraphPanel::DrawTextFields( int graphvalue, int x, int y, int w, netban
 			//float age = currentTime - frequency.m_timeStamp;
 			//cpuColor.a *= ( displayTime - age ) / displayTime;
 			g_pMatSystemSurface->DrawColoredText( font, x, y, cpuColor[0], cpuColor[1], cpuColor[2], cpuColor[3],
-						"CPU freq: %3.1f%%   Min: %3.1f%%", frequency.m_percentage, frequency.m_lowestPercentage );
+				"CPU freq: %3.1f%%   Min: %3.1f%%", frequency.m_percentage, frequency.m_lowestPercentage );
 		}
 	}
 }
@@ -846,49 +855,49 @@ int CNetGraphPanel::GraphValue()
 }
 
 // Purpose: Figure out x and y position for graph based on net_graphpos value.
-void CNetGraphPanel::GraphGetXY( vrect_t *rect, int width, int *x, int *y )
+void CNetGraphPanel::GraphGetXY( const vrect_t &rect, int width, int *x, int *y )
 {
-	*x = rect->x + 5;
+	// dimhotepus: Scale UI.
+	*x = rect.x + QuickPropScale( 5 );
 
 	switch ( net_graphpos.GetInt() )
 	{
 	case 0:
 		break;
 	case 1:
-		*x = rect->x + rect->width - 5 - width;
+		*x = rect.x + rect.width - QuickPropScale( 5 ) - width;
 		break;
 	case 2:
-		*x = rect->x + ( rect->width - 10 - width ) / 2;
+		*x = rect.x + ( rect.width - QuickPropScale( 10 ) - width ) / 2;
 		break;
 	default:
-		*x = rect->x + clamp( (int) XRES( net_graphpos.GetInt() ), 5, rect->width - width - 5 );
+		*x = rect.x + clamp( (int) XRES( net_graphpos.GetInt() ), QuickPropScale( 5 ), rect.width - width - QuickPropScale( 5 ) );
 	}
 
-	*y = rect->y+rect->height - LERP_HEIGHT - 5;
+	*y = rect.y + rect.height - QuickPropScale( LERP_HEIGHT + 5 );
 }
 
 // Purpose: drawing stream progress (file download etc) as green bars ( under in/out)
 void CNetGraphPanel::DrawStreamProgress( int x, int y, int width )
 {
-	vrect_t rcLine;
-
-	rcLine.height	= 1;
-	rcLine.x		= x;
+	vrect_t rcLine{x,0,0,1};
 	
 	constexpr byte color[3] = {0, 200, 0};
 
 	if ( m_StreamTotal[FLOW_INCOMING] > 0 )
 	{
-		rcLine.y = y - m_nNetGraphHeight + 15 + 14;
+		// dimhotepus: Scale UI.
+		rcLine.y = y - m_nNetGraphHeight + QuickPropScale( 15 + 14 );
 		rcLine.width = (m_StreamRecv[FLOW_INCOMING]*width)/m_StreamTotal[FLOW_INCOMING];
-		DrawLine( &rcLine, color, 255 );
+		DrawLine( rcLine, color, 255 );
 	}
 
 	if ( m_StreamTotal[FLOW_OUTGOING] > 0 )
 	{
-		rcLine.y = y - m_nNetGraphHeight + 2*15 + 14;
+		// dimhotepus: Scale UI.
+		rcLine.y = y - m_nNetGraphHeight + QuickPropScale( 2 * 15 + 14 );
 		rcLine.width = (m_StreamRecv[FLOW_OUTGOING]*width)/m_StreamTotal[FLOW_OUTGOING];
-		DrawLine( &rcLine, color, 255 );
+		DrawLine( rcLine, color, 255 );
 	}
 }
 
@@ -896,38 +905,23 @@ void CNetGraphPanel::DrawStreamProgress( int x, int y, int width )
 // Purpose: If showing bandwidth data, draw hatches big enough for largest message
 void CNetGraphPanel::DrawHatches( int x, int y, int maxmsgbytes )
 {
-	int starty;
-	int ystep;
-	vrect_t rcHatch;
+	constexpr byte colorminor[3]{63, 63, 0};
+	constexpr byte color[3]{0, 200, 0};
 
-	byte colorminor[3];
-	byte color[3];
+	const float scale = net_scale.GetFloat();
+	const int ystep = max( (int)( 10.0 / scale ), 1 );
+	// dimhotepus: Scale UI.
+	vrect_t rcHatch{x, y, QuickPropScale( 4 ), 1};
 
-	ystep = (int)( 10.0 / net_scale.GetFloat() );
-	ystep = MAX( ystep, 1 );
-
-	rcHatch.y		= y;
-	rcHatch.height	= 1;
-	rcHatch.x		= x;
-	rcHatch.width	= 4;
-
-	color[0] = 0;
-	color[1] = 200;
-	color[2] = 0;
-
-	colorminor[0] = 63;
-	colorminor[1] = 63;
-	colorminor[2] = 0;
-
-	for ( starty = rcHatch.y; rcHatch.y > 0 && ((starty - rcHatch.y)*net_scale.GetFloat() < ( maxmsgbytes + 50 ) ); rcHatch.y -= ystep )
+	for ( int starty = rcHatch.y; rcHatch.y > 0 && ((starty - rcHatch.y)*scale < ( maxmsgbytes + 50 ) ); rcHatch.y -= ystep )
 	{
-		if ( !((int)((starty - rcHatch.y)*net_scale.GetFloat() ) % 50 ) )
+		if ( !((int)((starty - rcHatch.y)*scale ) % 50 ) )
 		{
-			DrawLine( &rcHatch, color, 255 );
+			DrawLine( rcHatch, color, 255 );
 		}
 		else if ( ystep > 5 )
 		{
-			DrawLine( &rcHatch, colorminor, 200 );
+			DrawLine( rcHatch, colorminor, 200 );
 		}
 	}
 }
@@ -965,15 +959,16 @@ void CNetGraphPanel::DrawCmdRate( int xright, int y )
 }
 
 // Purpose: Draws bandwidth breakdown data
-int CNetGraphPanel::DrawDataSegment( vrect_t *rcFill, int bytes, byte r, byte g, byte b, byte alpha )
+int CNetGraphPanel::DrawDataSegment( vrect_t &rcFill, int bytes, byte r, byte g, byte b, byte alpha )
 {
 	byte color[3] = {r, g, b};
 	int h = bytes / net_scale.GetFloat();
 
-	rcFill->height = h;
-	rcFill->y -= h;
-
-	if ( rcFill->y < 2 )
+	rcFill.height = h;
+	rcFill.y -= h;
+	
+	// dimhotepus: Scale UI.
+	if ( rcFill.y < QuickPropScale( 2 ) )
 		return 0;
 
 	DrawLine( rcFill, color, alpha );
@@ -998,36 +993,27 @@ bool CNetGraphPanel::ShouldDraw()
 	return false;
 }
 
-void CNetGraphPanel::DrawLargePacketSizes( int x, int w, int graphtype, float warning_threshold )
+void CNetGraphPanel::DrawLargePacketSizes( int x, int w, float warning_threshold )
 {
-	vrect_t		rcFill = {0,0,0,0,nullptr};
-	int a, i;
-
-	for (a=0 ; a<w ; a++)
+	for (int a = 0; a < w; a++)
 	{
-		i = (m_IncomingSequence-a) & ( TIMINGS - 1 );
+		const auto &graph = GetAtIndex( m_Graph, m_IncomingSequence - a );
 		
-		rcFill.x			= x + w -a -1;
-		rcFill.width		= 1;
-		rcFill.y			= m_Graph[i].sampleY;
-		rcFill.height		= m_Graph[i].sampleHeight;
+		const vrect_t rcFill{x + w - a - 1, graph.sampleY, 1, graph.sampleHeight};
+		const int nTotalBytes = graph.msgbytes[ INetChannelInfo::TOTAL ];
 
-		int nTotalBytes = m_Graph[ i ].msgbytes[ INetChannelInfo::TOTAL ];
-
-		if ( warning_threshold != 0.0f &&
-			nTotalBytes > MAX( 300, warning_threshold ) )
+		if ( nTotalBytes > MAX( 300, warning_threshold ) )
 		{
 			char sz[ 32 ];
 			V_to_chars( sz, nTotalBytes );
 
-			int len = g_pMatSystemSurface->DrawTextLen( m_hFont, "%s", sz );
+			const int len = g_pMatSystemSurface->DrawTextLen( GetNetgraphFont(), "%s", sz );
 
-			int textx, texty;
+			const int textx = rcFill.x - len / 2;
+			// dimhotepus: Scale UI.
+			const int texty = MAX( 0, rcFill.y - ( net_graphproportionalfont.GetBool() ? QuickPropScale( 11 ) : 11 ) );
 
-			textx = rcFill.x - len / 2;
-			texty = MAX( 0, rcFill.y - 11 );
-
-			g_pMatSystemSurface->DrawColoredText( m_hFont, textx, texty, 255, 255, 255, 255, "%s", sz );
+			g_pMatSystemSurface->DrawColoredText( GetNetgraphFont(), textx, texty, 255, 255, 255, 255, "%s", sz );
 		}
 	}
 }
@@ -1050,18 +1036,8 @@ void CNetGraphPanel::Paint()
 	extern ConVar hud_freezecamhide;
 	if ( hud_freezecamhide.GetBool() && IsTakingAFreezecamScreenshot() )
 		return;
-
-	int			graphtype;
-
-	int			x, y;
-	int			w;
-	vrect_t		vrect;
-
-	int			maxmsgbytes = 0;
-
-	float		avg_message = 0.0f;
-	float		warning_threshold = 0.0f;
-
+	
+	int graphtype;
 	if ( ( graphtype = GraphValue() ) == 0 )
 		return;
 
@@ -1070,44 +1046,49 @@ void CNetGraphPanel::Paint()
 	{
 		net_scale.SetValue( 0.1f );
 	}
-
-	int sw, sh;
-	surface()->GetScreenSize( sw, sh );
-
-	// Get screen rectangle
-	vrect.x			= 0;
-	vrect.y			= 0;
-	vrect.width		= sw;
-	vrect.height	= sh;
-
-
-	w = MIN( (int)TIMINGS, m_EstimatedWidth );
-	if ( vrect.width < w + 10 )
-	{
-		w = vrect.width - 10;
-	}
+	
+	int maxmsgbytes = 0;
+	float warning_threshold = 0.0f;
 
 	// get current client netchannel INetChannelInfo interface
 	INetChannelInfo *nci = engine->GetNetChannelInfo();
-
 	if ( nci )
 	{
+		float avg_message = 0.0f;
+
 		// update incoming data
-		GetFrameData( nci, &maxmsgbytes, &avg_message, &warning_threshold );
+		GetFrameData( nci, maxmsgbytes, avg_message, warning_threshold );
 
 		// update outgoing data
 		GetCommandInfo( nci, m_Cmdinfo );
 
 		UpdateEstimatedServerFramerate( nci );
 	}
+	
+	int sw, sh;
+	surface()->GetScreenSize( sw, sh );
+	
+	// Get screen rectangle
+	vrect_t	vrect{0, 0, sw, sh};
 
-	GraphGetXY( &vrect, w, &x, &y );
+	int w = min( TIMINGS, m_EstimatedWidth );
+	// dimhotepus: Scale UI.
+	if ( vrect.width < w + QuickPropScale( 10 ) )
+	{
+		w = vrect.width - QuickPropScale( 10 );
+	}
+
+	int	x, y;
+	GraphGetXY( vrect, w, &x, &y );
 
 	if ( graphtype > 1 )
 	{
 		PaintLineArt( x, y, w, graphtype, maxmsgbytes );
 
-		DrawLargePacketSizes( x, w, graphtype, warning_threshold );
+		if ( warning_threshold != 0.0f )
+		{
+			DrawLargePacketSizes( x, w, warning_threshold );
+		}
 	}
 
 	// Draw client frame timing info
@@ -1121,40 +1102,38 @@ void CNetGraphPanel::PaintLineArt( int x, int y, int w, int graphtype, int maxms
 	VPROF( "CNetGraphPanel::PaintLineArt" );
 
 	ResetLineSegments();
-
-	int lastvalidh = 0;
-
-	byte		color[3];
-	int			ping;
-	byte		alpha;
-	vrect_t		rcFill = {0,0,0,0,nullptr};
-
-	int			pingheight = m_nNetGraphHeight - LERP_HEIGHT - 2;
-
+	
 	if (net_graphmsecs.GetInt() < 50 )
 	{
 		net_graphmsecs.SetValue( 50 );
 	}
 
-	bool bShowLatency = net_graphshowlatency.GetBool() && graphtype >= 2;
+	int lastvalidh = 0;
+	
+	// dimhotepus: Scale UI.
+	const int pingheight = m_nNetGraphHeight - QuickPropScale( LERP_HEIGHT + 2 );
+	const bool bShowLatency = net_graphshowlatency.GetBool() && graphtype >= 2;
 
-	for (int a=0 ; a<w ; a++)
+	for (int a = 0; a < w; a++)
 	{
-		int i = (m_IncomingSequence-a) & ( TIMINGS - 1 );
-		int h = bShowLatency ? m_PacketLatency[i].latency : 0;
-		
-		packet_latency_t *pl = &m_PacketLatency[ i ];
-		ColorForHeight( pl, color, &ping, &alpha );
+		const packet_latency_t &pl = GetAtIndex( m_PacketLatency, m_IncomingSequence - a );
+
+		int h = bShowLatency ? pl.latency : 0;
+
+		byte color[3];
+		int ping;
+		byte alpha;
+		ColorForHeight( pl, color, ping, alpha );
 
 		// Skipped
-		if ( !ping ) 
+		if ( !ping )
 		{
 			// Re-use the last latency
-			h = lastvalidh;  
+			h = lastvalidh;
 		}
 		else
 		{
-			h = pingheight * (float)h/net_graphmsecs.GetFloat();
+			h = pingheight * (float)h / net_graphmsecs.GetFloat();
 			lastvalidh = h;
 		}
 
@@ -1162,23 +1141,22 @@ void CNetGraphPanel::PaintLineArt( int x, int y, int w, int graphtype, int maxms
 		{
 			h = pingheight;
 		}
+		
+		vrect_t rcFill{x + w - a - 1, y - h, 1, h};
 
-		rcFill.x		= x + w -a -1;
-		rcFill.y		= y - h;
-		rcFill.width	= 1;
-		rcFill.height	= h;
 		if ( ping )
 		{
-			rcFill.height = pl->choked ? 2 : 1;
+			// dimhotepus: Scale UI.
+			rcFill.height = pl.choked ? QuickPropScale( 2 ) : 1;
 		}
 
 		if ( !ping )
 		{
-			DrawLine2( &rcFill, color, color, alpha, 31 );
+			DrawLine2( rcFill, color, color, alpha, 31 );
 		}
 		else
 		{
-			DrawLine( &rcFill, color, alpha );
+			DrawLine( rcFill, color, alpha );
 		}
 
 		rcFill.y		= y;
@@ -1188,7 +1166,7 @@ void CNetGraphPanel::PaintLineArt( int x, int y, int w, int graphtype, int maxms
 		color[1] = 255;
 		color[2] = 0;
 
-		DrawLine( &rcFill, color, 160 );
+		DrawLine( rcFill, color, 160 );
 
 		if ( graphtype < 2 )
 			continue;
@@ -1201,61 +1179,64 @@ void CNetGraphPanel::PaintLineArt( int x, int y, int w, int graphtype, int maxms
 		color[1] = 255;
 		color[2] = 255;
 
-		DrawLine( &rcFill, color, 255 );
+		DrawLine( rcFill, color, 255 );
 
-		// Move up for begining of data
+		// Move up for beginning of data
 		rcFill.y -= 1;
 
 		// Packet didn't have any real data...
-		if ( m_PacketLatency[i].latency > 9995 )
+		if ( pl.latency > 9995 )
 			continue;
 
-		if ( !DrawDataSegment( &rcFill, m_Graph[ i ].msgbytes[INetChannelInfo::LOCALPLAYER], 0, 0, 255 ) )
+		auto &graph = GetAtIndex( m_Graph, m_IncomingSequence - a );
+
+		if ( !DrawDataSegment( rcFill, graph.msgbytes[INetChannelInfo::LOCALPLAYER], 0, 0, 255 ) )
 			continue;
 
-		if ( !DrawDataSegment( &rcFill, m_Graph[ i ].msgbytes[INetChannelInfo::OTHERPLAYERS], 0, 255, 0 ) )
+		if ( !DrawDataSegment( rcFill, graph.msgbytes[INetChannelInfo::OTHERPLAYERS], 0, 255, 0 ) )
 			continue;
 
-		if ( !DrawDataSegment( &rcFill, m_Graph[ i ].msgbytes[INetChannelInfo::ENTITIES], 255, 0, 0 ) )
+		if ( !DrawDataSegment( rcFill, graph.msgbytes[INetChannelInfo::ENTITIES], 255, 0, 0 ) )
 			continue;
 
-		if ( !DrawDataSegment( &rcFill, m_Graph[ i ].msgbytes[INetChannelInfo::SOUNDS], 255, 255, 0) )
+		if ( !DrawDataSegment( rcFill, graph.msgbytes[INetChannelInfo::SOUNDS], 255, 255, 0) )
 			continue;
 
-		if ( !DrawDataSegment( &rcFill, m_Graph[ i ].msgbytes[INetChannelInfo::EVENTS], 0, 255, 255 ) )
+		if ( !DrawDataSegment( rcFill, graph.msgbytes[INetChannelInfo::EVENTS], 0, 255, 255 ) )
 			continue;
 		
-		if ( !DrawDataSegment( &rcFill, m_Graph[ i ].msgbytes[INetChannelInfo::USERMESSAGES], 128, 128, 0 ) )
+		if ( !DrawDataSegment( rcFill, graph.msgbytes[INetChannelInfo::USERMESSAGES], 128, 128, 0 ) )
 			continue;
 
-		if ( !DrawDataSegment( &rcFill, m_Graph[ i ].msgbytes[INetChannelInfo::ENTMESSAGES], 0, 128, 128 ) )
+		if ( !DrawDataSegment( rcFill, graph.msgbytes[INetChannelInfo::ENTMESSAGES], 0, 128, 128 ) )
 			continue;
 
-		if ( !DrawDataSegment( &rcFill, m_Graph[ i ].msgbytes[INetChannelInfo::STRINGCMD], 128, 0, 0) )
+		if ( !DrawDataSegment( rcFill, graph.msgbytes[INetChannelInfo::STRINGCMD], 128, 0, 0) )
 			continue;
 
-		if ( !DrawDataSegment( &rcFill, m_Graph[ i ].msgbytes[INetChannelInfo::STRINGTABLE], 0, 128, 0) )
+		if ( !DrawDataSegment( rcFill, graph.msgbytes[INetChannelInfo::STRINGTABLE], 0, 128, 0) )
 			continue;
 
-		if ( !DrawDataSegment( &rcFill, m_Graph[ i ].msgbytes[INetChannelInfo::VOICE], 0, 0, 128  ) )
+		if ( !DrawDataSegment( rcFill, graph.msgbytes[INetChannelInfo::VOICE], 0, 0, 128  ) )
 			continue;
 
 		// Final data chunk is total size, don't use solid line routine for this
-		h = m_Graph[i].msgbytes[INetChannelInfo::TOTAL] / net_scale.GetFloat();
+		h = graph.msgbytes[INetChannelInfo::TOTAL] / net_scale.GetFloat();
 
 		color[ 0 ] = color[ 1 ] = color[ 2 ] = 240;
 
 		rcFill.height = 1;
 		rcFill.y = y - m_nNetGraphHeight - 1 - h;
 
-		if ( rcFill.y < 2 )
+		// dimhotepus: Scale UI.
+		if ( rcFill.y < QuickPropScale( 2 ) )
 			continue;
 
-		DrawLine(&rcFill, color, 128 );		
+		DrawLine( rcFill, color, 128 );
 
 		// Cache off height
-		m_Graph[i].sampleY = rcFill.y;
-		m_Graph[i].sampleHeight = rcFill.height;
+		graph.sampleY = rcFill.y;
+		graph.sampleHeight = rcFill.height;
 	}
 
 	if ( graphtype >= 2 )
@@ -1278,13 +1259,17 @@ void CNetGraphPanel::ResetLineSegments()
 void CNetGraphPanel::DrawLineSegments()
 {
 	const intp c = m_Rects.Count();
-	if ( c <= 0 )
+	if ( c == 0 )
 		return;
 
 	CMatRenderContextPtr pRenderContext( materials );
-	IMesh* m_pMesh = pRenderContext->GetDynamicMesh( true, nullptr, nullptr, m_WhiteMaterial );
+
+	IMesh* pMesh = pRenderContext->GetDynamicMesh( true, nullptr, nullptr, m_WhiteMaterial );
+	RunCodeAtScopeExit( pMesh->Draw() );
+
 	CMeshBuilder meshBuilder;
-	meshBuilder.Begin( m_pMesh, MATERIAL_LINES, c );
+	meshBuilder.Begin( pMesh, MATERIAL_LINES, c );
+	RunCodeAtScopeExit( meshBuilder.End() );
 
 	for ( const auto &seg : m_Rects )
 	{
@@ -1298,20 +1283,16 @@ void CNetGraphPanel::DrawLineSegments()
 		meshBuilder.Position3f( seg.x2, seg.y2, 0 );
 		meshBuilder.AdvanceVertex();
 	}
-
-	meshBuilder.End();
-
-	m_pMesh->Draw();
 }
 
 // Purpose: Draws a colored, filled rectangle
-void CNetGraphPanel::DrawLine( vrect_t *rect, const byte *color, byte alpha )
+void CNetGraphPanel::DrawLine( const vrect_t &rect, const byte (&color)[3], byte alpha )
 {
 	DrawLine2( rect, color, color, alpha, alpha );
 }
 
 // Purpose: Draws a colored, filled rectangle
-void CNetGraphPanel::DrawLine2( vrect_t *rect, const byte *color, const byte *color2, byte alpha, byte alpha2 )
+void CNetGraphPanel::DrawLine2( const vrect_t &rect, const byte (&color)[3], const byte (&color2)[3], byte alpha, byte alpha2 )
 {
 	VPROF( "CNetGraphPanel::DrawLine2" );
 
@@ -1328,19 +1309,19 @@ void CNetGraphPanel::DrawLine2( vrect_t *rect, const byte *color, const byte *co
 	seg.color2[2] = color2[2];
 	seg.color2[3] = alpha2;
 
-	if ( rect->width == 1 )
+	if ( rect.width == 1 )
 	{
-		seg.x1 = rect->x;
-		seg.y1 = rect->y;
-		seg.x2 = rect->x;
-		seg.y2 = rect->y + rect->height;
+		seg.x1 = rect.x;
+		seg.y1 = rect.y;
+		seg.x2 = rect.x;
+		seg.y2 = rect.y + rect.height;
 	}
-	else if ( rect->height == 1 )
+	else if ( rect.height == 1 )
 	{
-		seg.x1 = rect->x;
-		seg.y1 = rect->y;
-		seg.x2 = rect->x + rect->width;
-		seg.y2 = rect->y;
+		seg.x1 = rect.x;
+		seg.y1 = rect.y;
+		seg.x2 = rect.x + rect.width;
+		seg.y2 = rect.y;
 	}
 	else
 	{

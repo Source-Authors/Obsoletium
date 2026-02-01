@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <!-- tier0/basetypes.h -->
+
+  <Type Name="vrect_t">
+    <DisplayString>{width} x {height}, [{x}, {y}]</DisplayString>
+  </Type>
+
+  <Type Name="Rect_t">
+    <DisplayString>{width} x {height}, [{x}, {y}]</DisplayString>
+  </Type>
+
+  <Type Name="interval_t">
+    <DisplayString>[{start}...{start + range}]</DisplayString>
+  </Type>
+
   <!-- tier0/cpumonitoring.h -->
 
   <Type Name="CPUFrequencyResults">
