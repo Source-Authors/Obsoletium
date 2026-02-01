@@ -4069,7 +4069,7 @@ bool CBaseFileSystem::FixUpPath( const char *pFileName, OUT_Z_CAP(sizeFixedUpFil
 	}
 	else 
 	{
-		// raphael: BASE_PATH already in m_pBaseDir as quering it here wastes performance.
+		// raphael: BASE_PATH already in m_pBaseDir as querying it here wastes performance.
 		// If the first part of the pFixedUpFilename is pBaseDir
 		// then lowercase the part after that.
 		if ( !Q_isempty(m_pBaseDir) && m_iBaseLength > 0 &&
