@@ -13,8 +13,9 @@
 #include "networkstringtabledefs.h"
 #include "networkstringtableitem.h"
 
-#include <utldict.h>
-#include <utlbuffer.h>
+#include "tier0/basetypes.h"
+#include "tier1/utldict.h"
+#include "tier1/utlbuffer.h"
 #include "tier1/bitbuf.h"
 
 class SVC_CreateStringTable;
