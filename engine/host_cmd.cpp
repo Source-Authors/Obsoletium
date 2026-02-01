@@ -70,6 +70,7 @@ extern IXboxSystem *g_pXboxSystem;
 
 #include <sys/stat.h>
 #include <stdio.h>
+#include <csignal>
 #ifdef POSIX
 // sigh, microsoft put _ in front of its type defines for stat
 #define _stat stat
@@ -2057,8 +2058,8 @@ CON_COMMAND( crash, "[ sys_error | hang | purecall | segfault | minidump ]: Caus
 	else
 	{
 		Msg( "Segfault...\n" );
-		char *p = 0;
-		*p = 0;
+		// dimhotepus: Raise SIGSEGV instead of UB.
+		raise(SIGSEGV);
 	}
 }
 

@@ -153,7 +153,7 @@ CON_COMMAND( hud_reloadscheme, "Reloads hud layout and animation scripts." )
 }
 
 #ifdef _DEBUG
-CON_COMMAND_F( crash, "Crash the client. Optional parameter -- type of crash:\n 0: read from NULL\n 1: write to NULL\n 2: DmCrashDump() (xbox360 only)", FCVAR_CHEAT )
+CON_COMMAND_F( crash, "Crash the client. Optional parameter -- type of crash:\n 0: read from 0x0\n 1: write to 0x0", FCVAR_CHEAT )
 {
 	int crashtype = 0;
 	int dummy;
