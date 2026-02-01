@@ -368,6 +368,8 @@ void CGameClient::Connect( const char * szName, int nUserID, INetChannel *pNetCh
 				
 	// fire global game event - server only
 	IGameEvent *event = g_GameEventManager.CreateEvent( "player_connect" );
+	// dimhotepus: Check for nullptr.
+	if ( event )
 	{
 		event->SetInt( "userid", m_UserID );
 		event->SetInt( "index", m_nClientSlot );
