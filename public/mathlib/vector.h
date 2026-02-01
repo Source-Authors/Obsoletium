@@ -2645,11 +2645,13 @@ FORCEINLINE DirectX::XMVECTOR XM_CALLCONV VectorNormalize( DirectX::XMVECTOR& va
 {
 	DirectX::XMVECTOR len = DirectX::XMVector3Length( val );
 
+	constexpr DirectX::XMVECTORF32 epsilon = { { { 1.0e-10f, 1.0e-10f, 1.0e-10f, 1.0e-10f } } };
+
 	// Prevent division on zero.
 	DirectX::XMVECTOR den = DirectX::XMVectorDivide
 	(
 		DirectX::g_XMOne,
-		DirectX::XMVectorAdd( len, DirectX::g_XMEpsilon )
+		DirectX::XMVectorAdd( len, epsilon )
 	);
 
 	val = DirectX::XMVectorMultiply( val, den );
