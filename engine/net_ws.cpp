@@ -1122,12 +1122,11 @@ CSplitPacketEntry *NET_FindOrCreateSplitPacketEntry( const intp sock, netadr_t *
 	
 	if ( i >= count )
 	{
-		CSplitPacketEntry newentry;
-		newentry.from = *from;
+		// RaphaelIT7: Use AddToTailGetPtr to avoid stack allocating CSplitPacketEntry as it was allocated either way & this way won't hit a stack overflow.
+		CSplitPacketEntry* newentry = splitPacketEntries.AddToTailGetPtr();
+		newentry->from = *from;
 
-		splitPacketEntries.AddToTail( newentry );
-
-		entry = &splitPacketEntries[ splitPacketEntries.Count() - 1 ];
+		entry = newentry;
 	}
 
 	Assert( entry );
