@@ -1165,7 +1165,13 @@ static char const *DescribeSocket( intp sock )
 //-----------------------------------------------------------------------------
 bool NET_GetLong( const intp sock, netpacket_t *packet )
 {
-	int				packetNumber, packetCount, sequenceNumber, offset;
+	// RaphaelIT7:
+	// previous source engine exploit???
+	// if someone sent a malformed packet with a negative packetNumber, it would cause memcpy further below to crash as the calculated offset would be negative!
+	// This seems to have been fixed in GMod atleast.
+	// None of these should be negative at any point, so let's ensure they never can be.
+	unsigned int	packetNumber, packetCount, offset;
+	int				sequenceNumber;
 	short			packetID;
 	SPLITPACKET		*pHeader;
 	
