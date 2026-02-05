@@ -1155,7 +1155,7 @@ void CBaseClient::SendSnapshot( CClientFrame *pFrame )
 	bool bFailedOnce = false;
 write_again:
 	// RaphaelIT7: Were deep in networking and the stack can easily get close to an overflow
-	static thread_local std::unique_ptr<unsigned int> pSnapshotScratchBuffer(new unsigned int[g_nScratchBufferSizeAsInt]);
+	static thread_local std::unique_ptr<unsigned int[]> pSnapshotScratchBuffer(new unsigned int[g_nScratchBufferSizeAsInt]);
 	bf_write msg( "CBaseClient::SendSnapshot", pSnapshotScratchBuffer.get(), SNAPSHOT_SCRATCH_BUFFER_SIZE );
 
 	TRACE_PACKET( ( "SendSnapshot(%d)\n", pFrame->tick_count ) );
