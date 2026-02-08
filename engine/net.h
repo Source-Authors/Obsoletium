@@ -12,7 +12,7 @@
 #include "proto_version.h"
 
 // Flow control bytes per second limits
-#define MAX_RATE		(1024*1024)				
+#define MAX_RATE		(1024*1024)
 #define MIN_RATE		1000
 #define DEFAULT_RATE	80000
 
@@ -73,7 +73,7 @@ static_assert((MAX_ROUTABLE_PAYLOAD & 3) == 0,
 // Pad this to next higher 16 byte boundary
 // This is the largest packet that can come in/out over the wire, before processing the header
 //  bytes will be stripped by the networking channel layer
-#define	NET_MAX_MESSAGE	PAD_NUMBER( ( NET_MAX_PAYLOAD + HEADER_BYTES ), 16 )
+constexpr inline int NET_MAX_MESSAGE{PAD_NUMBER( ( NET_MAX_PAYLOAD + HEADER_BYTES ), 16 )};
 
 // Even connectionless packets require int32 value (-1) + 1 byte content
 #define NET_MIN_MESSAGE 5
