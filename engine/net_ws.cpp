@@ -1177,6 +1177,16 @@ bool NET_GetLong( const intp sock, netpacket_t *packet )
 	// pHeader is network endian correct
 	const int sequenceNumber	= LittleLong( pHeader->sequenceNumber );
 	const short packetID		= LittleShort( (short)pHeader->packetID );
+	// RaphaelIT7: Do not accept negative packet IDs due to out-of-buffer access and related exploit.
+	if ( packetID < 0 )
+	{
+		Msg( "NET_GetLong:  Split packet from %s with invalid packetID %hd out of allowed range [%hd, %hd].\n", 
+			packet->from.ToString(),
+			packetID,
+			0,
+			std::numeric_limits<decltype(packetID)>::max() );
+		return false;
+	}
 	// High byte is packet number
 	const int packetNumber		= ( packetID >> 8 );
 	// Low byte is number of total packets
