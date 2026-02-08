@@ -118,8 +118,8 @@ struct SPLITPACKET
 #define MAX_USER_MAXROUTABLE_SIZE	MAX_ROUTABLE_PAYLOAD
 
 
-#define MAX_SPLIT_SIZE	(MAX_USER_MAXROUTABLE_SIZE - static_cast<int>(sizeof( SPLITPACKET )))
-#define MIN_SPLIT_SIZE	(MIN_USER_MAXROUTABLE_SIZE - static_cast<int>(sizeof( SPLITPACKET )))
+constexpr inline int MAX_SPLIT_SIZE{MAX_USER_MAXROUTABLE_SIZE - static_cast<int>(sizeof( SPLITPACKET ))};
+constexpr inline int MIN_SPLIT_SIZE{MIN_USER_MAXROUTABLE_SIZE - static_cast<int>(sizeof( SPLITPACKET ))};
 
 // For metering out splitpackets, don't do them too fast as remote UDP socket will drop some payloads causing them to always fail to be reconstituted
 // This problem is largely solved by increasing the buffer sizes for UDP sockets on Windows
