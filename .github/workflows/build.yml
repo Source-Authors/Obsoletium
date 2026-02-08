@@ -19,7 +19,7 @@ permissions:
 jobs:
   build_hl2:
     name: 'Build Half-Life 2'
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     strategy:
       matrix:
         platform: [x86, x64]
@@ -41,7 +41,7 @@ jobs:
 
   build_hl2_loastcoast:
     name: 'Build Half-Life 2: Loast Coast'
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     strategy:
       matrix:
         platform: [x86, x64]
@@ -63,7 +63,7 @@ jobs:
 
   build_hl2_episodic:
     name: 'Build Half-Life 2: Episode 1 & 2'
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     strategy:
       matrix:
         platform: [x86, x64]
@@ -85,7 +85,7 @@ jobs:
 
   build_hl2_deathmatch:
     name: 'Build Half-Life 2: Deathmatch'
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     strategy:
       matrix:
         platform: [x86, x64]
@@ -107,7 +107,7 @@ jobs:
 
   build_portal:
     name: 'Build Portal'
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     strategy:
       matrix:
         platform: [x86, x64]
