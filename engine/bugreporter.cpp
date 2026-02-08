@@ -914,9 +914,9 @@ void CBugUIPanel::Shutdown()
 	if ( m_pBugReporter )
 	{
 		m_pBugReporter->Shutdown();
+		m_pBugReporter = NULL;
 	}
 
-	m_pBugReporter = NULL;
 	if ( m_hBugReporter )
 	{
 		Sys_UnloadModule( m_hBugReporter );
