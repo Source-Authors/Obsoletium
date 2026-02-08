@@ -300,6 +300,8 @@ bool CBugReporter::Init( CreateInterfaceFn engineFactory )
 
 void CBugReporter::Shutdown()
 {
+	// dimhotepus: Cleanup filesystem pointer.
+	g_pFileSystem = nullptr;
 }
 
 char const *CBugReporter::GetUserName()
