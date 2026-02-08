@@ -232,6 +232,7 @@ void BootAppSystemGroup::PostShutdown() {
   // FIXME: Logfiles is mod-specific, needs to move into the engine.
   g_pFullFileSystem->RemoveLoggingFunc(&LogAccessCallback);
   file_logger_->Shutdown();
+  file_logger_ = nullptr;
 
   DisconnectTier3Libraries();
   DisconnectTier2Libraries();
