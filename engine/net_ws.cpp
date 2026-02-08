@@ -1108,15 +1108,18 @@ CSplitPacketEntry *NET_FindOrCreateSplitPacketEntry( const intp sock, netadr_t *
 {
 	vecSplitPacketEntries_t &splitPacketEntries = net_splitpackets[sock];
 	intp i = 0, count = splitPacketEntries.Count();
-	for ( auto &entry : splitPacketEntries )
+	
+	CSplitPacketEntry *entry = nullptr;
+	for ( auto &it : splitPacketEntries )
 	{
-		if ( from->CompareAdr(entry.from) )
+		entry = &it;
+
+		if ( from->CompareAdr(it.from) )
 			break;
 
 		++i;
 	}
 	
-	CSplitPacketEntry *entry = NULL;
 	if ( i >= count )
 	{
 		CSplitPacketEntry newentry;
