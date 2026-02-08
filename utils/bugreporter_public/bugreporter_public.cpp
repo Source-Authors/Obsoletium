@@ -292,7 +292,7 @@ bool CBugReporter::Init( CreateInterfaceFn engineFactory )
 	g_pFileSystem = (IFileSystem *)engineFactory( FILESYSTEM_INTERFACE_VERSION, NULL );
 	if ( !g_pFileSystem )
 	{
-		AssertMsg( 0, "Failed to create/get IFileSystem" );
+		Warning( "Failed to create/get IFileSystem interface %s.\n", FILESYSTEM_INTERFACE_VERSION );
 		return false;
 	}
 	return true;
