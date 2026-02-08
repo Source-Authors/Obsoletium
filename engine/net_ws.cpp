@@ -1167,24 +1167,20 @@ static char const *DescribeSocket( intp sock )
 //-----------------------------------------------------------------------------
 bool NET_GetLong( const intp sock, netpacket_t *packet )
 {
-	int				packetNumber, packetCount, sequenceNumber, offset;
-	short			packetID;
-	SPLITPACKET		*pHeader;
-	
-	if ( packet->size < static_cast<int>(sizeof(SPLITPACKET)) ) 
+	if ( packet->size < static_cast<int>(sizeof(SPLITPACKET)) )
 	{
 		Msg( "Invalid split packet length %i\n", packet->size );
 		return false;
 	}
 
-	pHeader = ( SPLITPACKET * )packet->data;
+	const auto *pHeader = reinterpret_cast<SPLITPACKET *>( packet->data );
 	// pHeader is network endian correct
-	sequenceNumber	= LittleLong( pHeader->sequenceNumber );
-	packetID		= LittleShort( (short)pHeader->packetID );
+	const int sequenceNumber	= LittleLong( pHeader->sequenceNumber );
+	const short packetID		= LittleShort( (short)pHeader->packetID );
 	// High byte is packet number
-	packetNumber	= ( packetID >> 8 );	
+	const int packetNumber		= ( packetID >> 8 );
 	// Low byte is number of total packets
-	packetCount		= ( packetID & 0xff );	
+	const int packetCount		= ( packetID & 0xff );
 
 	int nSplitSizeMinusHeader = (int)LittleShort( (short)pHeader->nSplitSize );
 	if ( nSplitSizeMinusHeader < MIN_SPLIT_SIZE ||
@@ -1273,7 +1269,7 @@ bool NET_GetLong( const intp sock, netpacket_t *packet )
 
 
 	// Copy the incoming data to the appropriate place in the buffer
-	offset = (packetNumber * nSplitSizeMinusHeader);
+	int offset = (packetNumber * nSplitSizeMinusHeader);
 	memcpy( entry->netsplit.buffer + offset, packet->data + sizeof(SPLITPACKET), size );
 	
 	// Have we received all of the pieces to the packet?
