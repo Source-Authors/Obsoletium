@@ -1054,7 +1054,7 @@ public:
 			f = -1;
 		}
 
-		memset( &netsplit, 0, sizeof( netsplit ) );
+		BitwiseClear( netsplit );
 		lastactivetime = 0.0;
 	}
 
