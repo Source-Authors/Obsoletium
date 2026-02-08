@@ -1049,9 +1049,9 @@ public:
 	{
 		memset( &from, 0, sizeof( from ) );
 
-		for ( int i = 0; i < MAX_SPLITPACKET_SPLITS; i++ )
+		for ( auto &f : splitflags )
 		{
-			splitflags[ i ] = -1;
+			f = -1;
 		}
 
 		memset( &netsplit, 0, sizeof( netsplit ) );
