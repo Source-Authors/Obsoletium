@@ -746,14 +746,12 @@ void CEngineVGui::Init()
 	staticFocusOverlayPanel->MoveToFront();
 
 	// Create engine vgui panels
-	if ( IsPC() )
-	{
-		Con_CreateConsolePanel( staticEngineToolsPanel );
-		CL_CreateEntityReportPanel( staticEngineToolsPanel );
-		VGui_CreateDrawTreePanel( staticEngineToolsPanel );
-		CL_CreateTextureListPanel( staticEngineToolsPanel );
-		CreateVProfPanels( staticEngineToolsPanel );
-	}
+	Con_CreateConsolePanel( staticEngineToolsPanel );
+	CL_CreateEntityReportPanel( staticEngineToolsPanel );
+	VGui_CreateDrawTreePanel( staticEngineToolsPanel );
+	CL_CreateTextureListPanel( staticEngineToolsPanel );
+	CreateVProfPanels( staticEngineToolsPanel );
+
 	staticEngineToolsPanel->LoadControlSettings( "scripts/EngineVGuiLayout.res" );
 
 	COM_TimestampedLog( "materials->CacheUsedMaterials()" );
