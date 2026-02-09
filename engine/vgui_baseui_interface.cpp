@@ -800,6 +800,9 @@ void CEngineVGui::Init()
 	}
 
 	m_bNoShaderAPI = CommandLine()->FindParm( "-noshaderapi" );
+
+	// dimhotepus: Added explicit init.
+	demoaction->Init();
 }
 
 void CEngineVGui::PostInit()
