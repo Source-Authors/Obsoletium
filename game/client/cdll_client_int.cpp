@@ -1149,8 +1149,7 @@ void CHLClient::Shutdown( void )
 
 	// dimhotepus: Shutdown in reverse order to Init.
 #ifdef WIN32
-	// NVNT Disconnect haptics system.
-	// It unhooks messages autmoatically.
+	// NVNT Disconnect haptics system. It unhooks messages automatically.
 	DisconnectHaptics();
 #endif
 
