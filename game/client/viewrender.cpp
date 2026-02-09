@@ -2014,7 +2014,7 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 			if ( bFirstTime )
 			{
 				bFirstTime = false;
-			Msg( "This game has a minimum GPU requirement of DirectX 9.0 Shader Model 2 to run properly.\n" );
+				Msg( "This game has a minimum GPU requirement of DirectX 9.0 Shader Model 2 to run properly.\n" );
 			}
 			return;
 		}
@@ -2044,7 +2044,7 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 			( ( whatToDraw & RENDERVIEW_SUPPRESSMONITORRENDERING ) == 0 ) )
 		{
 			CViewSetup viewMiddle = GetView( STEREO_EYE_MONO );
-			DrawMonitors( viewMiddle );	
+			DrawMonitors( viewMiddle );
 		}
 	#endif
 
