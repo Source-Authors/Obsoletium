@@ -147,8 +147,12 @@ class Panel : public IClientPanel, virtual public IForceVirtualInheritancePanel
 
 public:
 	// For property mapping
-	static void InitPropertyConverters( void );
+	static void InitPropertyConverters();
+	// dimhotepus: Pair with Init.
+	static void ShutdownPropertyConverters();
 	static void AddPropertyConverter( char const *typeName, IPanelAnimationPropertyConverter *converter );
+	// dimhotepus: Pair with Add.
+	static void RemovePropertyConverter( char const *typeName );
 
 	//-----------------------------------------------------------------------------
 	// CONSTRUCTORS

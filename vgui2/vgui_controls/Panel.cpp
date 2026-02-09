@@ -263,7 +263,7 @@ public:
 
 	void AddPanelToContext( KeyBindingContextHandle_t handle, Panel *panel )
 	{
-		if ( !panel->GetName() || !panel->GetName()[ 0 ] )
+		if ( Q_isempty( panel->GetName() ) )
 		{
 			Warning( "Can't add Keybindings Context for unnamed panels\n" );
 			return;
@@ -6289,15 +6289,30 @@ void Panel::AddPropertyConverter( char const *typeName, IPanelAnimationPropertyC
 	g_AnimationPropertyConverters.Insert( typeName, converter );
 }
 
+// dimhotepus: Pair with Add.
+void Panel::RemovePropertyConverter( char const *typeName )
+{
+	const auto lookup = g_AnimationPropertyConverters.Find( typeName );
+	if ( lookup != g_AnimationPropertyConverters.InvalidIndex() )
+	{
+		g_AnimationPropertyConverters.RemoveAt( lookup );
+		return;
+	}
+
+	AssertMsg( false, "Missed expected %s property converter when try to remove.", typeName );
+}
+
+static bool g_PanelPropertyConvertersInitialized = false;
+
 //-----------------------------------------------------------------------------
 // Purpose: Static method to initialize all needed converters
 //-----------------------------------------------------------------------------
-void Panel::InitPropertyConverters( void )
+void Panel::InitPropertyConverters()
 {
-	static bool initialized = false;
-	if ( initialized )
+	if ( g_PanelPropertyConvertersInitialized )
 		return;
-	initialized = true;
+
+	g_PanelPropertyConvertersInitialized = true;
 
 	AddPropertyConverter( "float", &floatconverter );
 	AddPropertyConverter( "int", &intconverter );
@@ -6320,6 +6335,34 @@ void Panel::InitPropertyConverters( void )
 	AddPropertyConverter( "proportional_height", &proportional_height_converter );
 
 	AddPropertyConverter( "textureid", &textureidconverter );
+}
+
+// dimhotepus: Pair with Init.
+void Panel::ShutdownPropertyConverters()
+{
+	RemovePropertyConverter( "textureid" );
+
+	RemovePropertyConverter( "proportional_height" );
+	RemovePropertyConverter( "proportional_width" );
+
+	RemovePropertyConverter( "proportional_ypos" );
+	RemovePropertyConverter( "proportional_xpos" );
+
+	// This is an aliased type for proportional float
+	RemovePropertyConverter( "proportional_int" );
+	RemovePropertyConverter( "proportional_float" );
+	
+	RemovePropertyConverter( "vgui::HFont" );
+	RemovePropertyConverter( "HFont" );
+	RemovePropertyConverter( "string" );
+	RemovePropertyConverter( "char" );
+	RemovePropertyConverter( "bool" );
+	//RemovePropertyConverter( "vgui::Color" );
+	RemovePropertyConverter( "Color" );
+	RemovePropertyConverter( "int" );
+	RemovePropertyConverter( "float" );
+
+	g_PanelPropertyConvertersInitialized = false;
 }
 
 bool Panel::InternalRequestInfo( PanelAnimationMap *map, KeyValues *outputData )

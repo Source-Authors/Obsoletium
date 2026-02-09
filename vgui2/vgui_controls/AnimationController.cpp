@@ -1720,6 +1720,9 @@ public:
 
 	~CPanelAnimationDictionary()
 	{
+		// dimhotepus: Cleanup.
+		Panel::ShutdownPropertyConverters();
+
 		m_PanelAnimationMapPool.Clear();
 	}
 
