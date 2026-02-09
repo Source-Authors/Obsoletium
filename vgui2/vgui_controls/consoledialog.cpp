@@ -343,9 +343,9 @@ CConsolePanel::CConsolePanel( vgui::Panel *pParent, const char *pName, bool bSta
 //-----------------------------------------------------------------------------
 CConsolePanel::~CConsolePanel()
 {
+	g_pCVar->RemoveConsoleDisplayFunc( this );
 	ClearCompletionList();
 	m_CommandHistory.Purge();
-	g_pCVar->RemoveConsoleDisplayFunc( this );
 }
 
 
