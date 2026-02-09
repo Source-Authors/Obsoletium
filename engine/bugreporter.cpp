@@ -2777,7 +2777,6 @@ void CEngineBugReporter::InstallBugReportingUI( vgui::Panel *parent, IEngineBugR
 
 	// dimhotepus: Always public bug reporter.
 	g_pBugUI = new CBugUIPanel( parent );
-	Assert( g_pBugUI );
 
 	m_ParentPanel = parent;
 }
