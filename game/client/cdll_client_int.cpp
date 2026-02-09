@@ -927,7 +927,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	if ( CommandLine()->CheckParm( "-vr" ) )
 		g_pSourceVR = (ISourceVirtualReality *)appSystemFactory(SOURCE_VIRTUAL_REALITY_INTERFACE_VERSION, NULL);
 
-	factorylist_t factories;
+	factorylist_t factories = {};
 	factories.appSystemFactory = appSystemFactory;
 	factories.physicsFactory = physicsFactory;
 	FactoryList_Store( factories );
