@@ -2093,6 +2093,12 @@ CBaseClient *CBaseServer::CreateFakeClient( const char *name )
 
 void CBaseServer::Shutdown( void )
 {
+	// dimhotepus: Cleanup itself.
+	g_pCVar->RemoveGlobalChangeCallback( ServerNotifyVarChangeCallback );
+
+	// dimhotepus: Reset debug name.
+	m_Signon.SetDebugName( nullptr );
+
 	if ( !IsActive() )
 		return;
 
