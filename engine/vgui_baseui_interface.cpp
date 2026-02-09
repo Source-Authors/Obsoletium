@@ -731,6 +731,8 @@ void CEngineVGui::Init()
 		// Create a performance toolkit system
 		perftools->InstallPerformanceToolsUI( staticEngineToolsPanel );
 		perftools->Init();
+		// Add time stamped log for color correction UI. 
+		COM_TimestampedLog( "Install color correction UI" );
 
 		// Create a color correction UI
 		colorcorrectiontools->InstallColorCorrectionUI( staticEngineToolsPanel );
