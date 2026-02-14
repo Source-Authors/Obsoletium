@@ -93,6 +93,18 @@ bool VGui_InitMatSysInterfacesList( const char *moduleName, CreateInterfaceFn *f
 	return ( g_pMaterialSystem && g_pMatSystemSurface && g_pMaterialSystemHardwareConfig );
 }
 
+// dimhotepus: Pair with init.
+void VGui_ShutdownMatSysInterfacesList( const char *moduleName )
+{
+	g_pMaterialSystem = nullptr;
+	g_pMatSystemSurface = nullptr;
+	g_pMDLCache = nullptr;
+	g_pStudioRender = nullptr;
+	g_pMaterialSystemHardwareConfig = nullptr;
+
+	vgui::VGui_ShutdownInterfacesList( moduleName );
+}
+
 
 } // namespace vgui
 

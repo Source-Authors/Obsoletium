@@ -1171,7 +1171,7 @@ void CHLClient::Shutdown( void )
 
 	TermSmokeFogOverlay();
 
-	VGui_Shutdown();
+	VGui_DestroyGlobalPanels();
 
 	input->Shutdown_All();
 
@@ -1190,11 +1190,11 @@ void CHLClient::Shutdown( void )
 	
 	gHUD.Shutdown();
 	
-	g_pClientMode->VGui_Shutdown();
-
 	modemanager->Shutdown( );
 
 	IGameSystem::RemoveAll();
+
+	vgui::VGui_ShutdownMatSysInterfacesList( "ClientDLL" );
 
 	VGui_Shutdown();
 
@@ -1208,9 +1208,15 @@ void CHLClient::Shutdown( void )
 
 	ConVar_Unregister();
 
+	// dimhotepus: Unhook the gaussian random number generator
+	s_GaussianRandomStream.AttachToStream( nullptr );
+
 	materials_stub = nullptr;
 
 	soundemitterbase->Disconnect();
+
+	factorylist_t factories = {};
+	FactoryList_Store( factories );
 	
 	g_pSourceVR = nullptr;
 	scriptmanager = nullptr;
@@ -1221,44 +1227,44 @@ void CHLClient::Shutdown( void )
 	DisconnectDataModel();
 #endif
 
-	engine = nullptr;
-	modelrender = nullptr;
-	effects = nullptr;
-	enginetrace = nullptr;
-	render = nullptr;
-	debugoverlay = nullptr;
-	datacache = nullptr;
-	mdlcache = nullptr;
-	modelinfo = nullptr;
-	enginevgui = nullptr;
-	networkstringtable = nullptr;
-	partition = nullptr;
-	shadowmgr = nullptr;
-	staticpropmgr = nullptr;
-	enginesound = nullptr;
-	filesystem = nullptr;
-	random = nullptr;
-	gameuifuncs = nullptr;
-	gameeventmanager = nullptr;
-	soundemitterbase = nullptr;
-	inputsystem = nullptr;
-	scenefilecache = nullptr;
-	xboxsystem = nullptr;
-	matchmaking = nullptr;
-
-#ifndef _XBOX
-	gamestatsuploader = nullptr;
-#endif
-
 #if defined( REPLAY_ENABLED )
 	g_pEngineReplay = nullptr;
 	g_pEngineClientReplay = nullptr;
 #endif
 
+#ifndef _XBOX
+	gamestatsuploader = nullptr;
+#endif
+
+	matchmaking = nullptr;
+	xboxsystem = nullptr;
+	scenefilecache = nullptr;
+	inputsystem = nullptr;
+	soundemitterbase = nullptr;
+	gameeventmanager = nullptr;
+	gameuifuncs = nullptr;
+	random = nullptr;
+	filesystem = nullptr;
+	enginesound = nullptr;
+	staticpropmgr = nullptr;
+	shadowmgr = nullptr;
+	partition = nullptr;
+	networkstringtable = nullptr;
+	enginevgui = nullptr;
+	modelinfo = nullptr;
+	mdlcache = nullptr;
+	datacache = nullptr;
+	debugoverlay = nullptr;
+	render = nullptr;
+	enginetrace = nullptr;
+	effects = nullptr;
+	modelrender = nullptr;
+	engine = nullptr;
+	
 #ifndef NO_STEAM
 	ClientSteamContext().Shutdown();
 #endif
-
+	
 	DisconnectTier3Libraries();
 	DisconnectTier2Libraries();
 	DisconnectTier1Libraries();

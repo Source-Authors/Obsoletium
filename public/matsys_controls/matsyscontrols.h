@@ -34,6 +34,8 @@ namespace vgui
 // moduleName should be the name of the module that this instance of the vgui_controls has been compiled into
 //-----------------------------------------------------------------------------
 bool VGui_InitMatSysInterfacesList( const char *moduleName, CreateInterfaceFn *factoryList, int numFactories );
+// dimhotepus: Pair with init.
+void VGui_ShutdownMatSysInterfacesList( const char *moduleName );
 
 
 //-----------------------------------------------------------------------------

@@ -149,17 +149,27 @@ static void VGui_VideoMode_AdjustForModeChange( void )
 	debugoverlaypanel->Create( gameToolParent );
 }
 
+static bool vgui_oneTimeInitialized = false;
 static void VGui_OneTimeInit()
 {
-	static bool initialized = false;
-	if ( initialized )
+	if ( vgui_oneTimeInitialized )
 		return;
-	initialized = true;
+
+	vgui_oneTimeInitialized = true;
 
 	vgui::Panel::AddPropertyConverter( "CHudTextureHandle", &textureHandleConverter );
 
+	g_pMaterialSystem->AddModeChangeCallBack( &VGui_VideoMode_AdjustForModeChange );
+}
 
-    g_pMaterialSystem->AddModeChangeCallBack( &VGui_VideoMode_AdjustForModeChange );
+// dimhotepus: Pair with init.
+static void VGui_OneTimeShutdown()
+{
+	g_pMaterialSystem->RemoveModeChangeCallBack( &VGui_VideoMode_AdjustForModeChange );
+
+	vgui::Panel::RemovePropertyConverter( "CHudTextureHandle" );
+
+	vgui_oneTimeInitialized = false;
 }
 
 bool VGui_Startup( CreateInterfaceFn appSystemFactory )
@@ -170,7 +180,7 @@ bool VGui_Startup( CreateInterfaceFn appSystemFactory )
 	if ( !vgui::VGui_InitMatSysInterfacesList( "CLIENT", &appSystemFactory, 1 ) )
 		return false;
 
-	g_InputInternal = (IInputInternal *)appSystemFactory( VGUI_INPUTINTERNAL_INTERFACE_VERSION,  NULL );
+	g_InputInternal = (IInputInternal *)appSystemFactory( VGUI_INPUTINTERNAL_INTERFACE_VERSION, NULL );
 	if ( !g_InputInternal )
 	{
 		return false; // c_vguiscreen.cpp needs this!
@@ -182,18 +192,13 @@ bool VGui_Startup( CreateInterfaceFn appSystemFactory )
 	VGUI_CreateClientDLLRootPanel();
 
 	// Make sure we have a panel
-	VPANEL root = VGui_GetClientDLLRootPanel();
-	if ( !root )
-	{
-		return false;
-	}
-	return true;
+	return !!VGui_GetClientDLLRootPanel();
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void VGui_CreateGlobalPanels( void )
+void VGui_CreateGlobalPanels()
 {
 	VPANEL gameToolParent = enginevgui->GetPanel( PANEL_CLIENTDLL_TOOLS );
 	VPANEL toolParent = enginevgui->GetPanel( PANEL_TOOLS );
@@ -222,16 +227,16 @@ void VGui_CreateGlobalPanels( void )
 #endif
 }
 
-void VGui_Shutdown()
+// dimhotepus: Pair with VGui_CreateGlobalPanels.
+void VGui_DestroyGlobalPanels()
 {
-	VGUI_DestroyClientDLLRootPanel();
-
+	// dimhotepus: In a reverse to VGui_CreateGlobalPanels order.
 #ifndef _X360
 	MP3Player_Destroy();
 #endif
 
-	netgraphpanel->Destroy();
 	debugoverlaypanel->Destroy();
+	netgraphpanel->Destroy();
 #if defined( TRACK_BLOCKING_IO )
 	iopanel->Destroy();
 #endif
@@ -240,11 +245,24 @@ void VGui_Shutdown()
 	messagechars->Destroy();
 	loadingdisc->Destroy();
 	internalCenterPrint->Destroy();
+}
 
+void VGui_Shutdown()
+{
+	// dimhotepus: In reverse order to VGui_Startup().
+	VGUI_DestroyClientDLLRootPanel();
+
+	VGui_OneTimeShutdown();
+	
 	// dimhotepus: Move g_pClientMode->VGui_Shutdown(); upper.
 	// Make sure anything "marked for deletion"
 	//  actually gets deleted before this dll goes away
 	vgui::ivgui()->RunFrame();
+
+	g_InputInternal = nullptr;
+
+	vgui::VGui_ShutdownMatSysInterfacesList( "CLIENT" );
+	vgui::VGui_ShutdownInterfacesList( "CLIENT" );
 }
 
 static ConVar cl_showpausedimage( "cl_showpausedimage", "1", 0, "Show the 'Paused' image when game is paused." );

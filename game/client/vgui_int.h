@@ -20,11 +20,13 @@ namespace vgui
 }
 
 bool VGui_Startup( CreateInterfaceFn appSystemFactory );
-void VGui_Shutdown( void );
-void VGui_CreateGlobalPanels( void );
-vgui::VPANEL VGui_GetClientDLLRootPanel( void );
-void VGUI_CreateClientDLLRootPanel( void );
-void VGUI_DestroyClientDLLRootPanel( void );
+void VGui_Shutdown();
+void VGui_CreateGlobalPanels();
+// dimhotepus: Pair with VGui_CreateGlobalPanels.
+void VGui_DestroyGlobalPanels();
+vgui::VPANEL VGui_GetClientDLLRootPanel();
+void VGUI_CreateClientDLLRootPanel();
+void VGUI_DestroyClientDLLRootPanel();
 void VGui_PreRender();
 void VGui_PostRender();
 

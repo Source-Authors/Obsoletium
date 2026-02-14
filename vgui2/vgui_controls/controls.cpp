@@ -63,6 +63,14 @@ bool VGui_InitInterfacesList( const char *moduleName, CreateInterfaceFn *, intp 
 	return true;
 }
 
+// dimhotepus: Pair with init.
+void VGui_ShutdownInterfacesList( const char *moduleName )
+{
+	g_szControlsModuleName[0] = '\0';
+
+	g_nYou_Must_Add_Public_Vgui_Controls_Vgui_ControlsCpp_To_Your_Project = 0;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: returns the name of the module this has been compiled into
 //-----------------------------------------------------------------------------

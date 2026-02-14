@@ -29,6 +29,8 @@ namespace vgui
 // interfaces (listed below) are first attempted to be loaded from primaryProvider, then secondaryProvider
 // moduleName should be the name of the module that this instance of the vgui_controls has been compiled into
 bool VGui_InitInterfacesList( const char *moduleName, CreateInterfaceFn *factoryList, intp numFactories );
+// dimhotepus: Pair with init.
+void VGui_ShutdownInterfacesList( const char *moduleName );
 
 // returns the name of the module as specified above
 const char *GetControlsModuleName();
