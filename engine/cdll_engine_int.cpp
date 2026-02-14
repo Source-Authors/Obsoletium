@@ -1790,7 +1790,8 @@ void InitExtraClientCmdCanExecuteVars()
 	Cmd_AddClientCmdCanExecuteVar( "overview_locked" );
 	Cmd_AddClientCmdCanExecuteVar( "overview_alpha" );
 
-	Cmd_AddClientCmdCanExecuteVar( "playgamesound" );
+	// dimhotepus: Drop duplicated.
+	// Cmd_AddClientCmdCanExecuteVar( "playgamesound" );
 }
 
 //-----------------------------------------------------------------------------
