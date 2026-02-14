@@ -1766,7 +1766,7 @@ bool ClientDLL_Load()
 	return true;
 }
 
-void InitExtraClientCmdCanExecuteVars()
+static void InitExtraClientCmdCanExecuteVars()
 {	
 	// This can go away when we ship a client DLL with the FCVAR_CLIENTCMD_CAN_EXECUTE flag set on these cvars/concommands.
 	Cmd_AddClientCmdCanExecuteVar( "cancelselect" );
