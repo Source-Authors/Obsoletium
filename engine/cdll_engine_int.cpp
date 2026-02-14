@@ -1838,7 +1838,7 @@ void ClientDLL_Init( void )
 			centerprint = ( ICenterPrint * )g_ClientFactory( VCENTERPRINT_INTERFACE_VERSION, NULL );
 			if ( !centerprint )
 			{
-				Sys_Error( "Could not get centerprint interface from library client" );
+				Sys_Error( "Could not get center print interface from library client" );
 			}
 
 			clientleafsystem = ( IClientLeafSystemEngine *)g_ClientFactory( CLIENTLEAFSYSTEM_INTERFACE_VERSION, NULL );
