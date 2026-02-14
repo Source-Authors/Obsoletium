@@ -158,9 +158,9 @@ bool netadr_t::IsLoopback() const
 
 void netadr_t::Clear()
 {
+	type = NA_NULL;
 	ip[0] = ip[1] = ip[2] = ip[3] = 0;
 	port = 0;
-	type = NA_NULL;
 }
 
 void netadr_t::SetIP(uint8 b1, uint8 b2, uint8 b3, uint8 b4)
