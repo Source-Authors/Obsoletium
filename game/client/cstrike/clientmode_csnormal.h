@@ -23,6 +23,8 @@ private:
 public:
 
 					ClientModeCSNormal();
+					// dimhotepus: Correctly shut down.
+					~ClientModeCSNormal();
 
 	virtual void	Init();
 	virtual void	InitViewport();

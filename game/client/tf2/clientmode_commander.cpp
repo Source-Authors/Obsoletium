@@ -168,7 +168,9 @@ CClientModeCommander::CClientModeCommander() : BaseClass()
 //-----------------------------------------------------------------------------
 CClientModeCommander::~CClientModeCommander()
 {
-
+	// dimhotepus: Pair with constructor.
+	delete m_pViewport;
+	m_pViewport = nullptr;
 }
 
 CCommanderViewportPanel *CClientModeCommander::GetCommanderViewport()

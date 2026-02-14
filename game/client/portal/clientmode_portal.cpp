@@ -201,6 +201,9 @@ ClientModePortalNormal::ClientModePortalNormal()
 //-----------------------------------------------------------------------------
 ClientModePortalNormal::~ClientModePortalNormal()
 {
+	// dimhotepus: Pair with constructor.
+	delete m_pViewport;
+	m_pViewport = nullptr;
 }
 
 void ClientModePortalNormal::Init()

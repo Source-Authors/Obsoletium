@@ -446,6 +446,9 @@ ClientModeTFNormal::ClientModeTFNormal()
 //-----------------------------------------------------------------------------
 ClientModeTFNormal::~ClientModeTFNormal()
 {
+	// dimhotepus: Pair with constructor.
+	delete m_pViewport;
+	m_pViewport = nullptr;
 }
 
 // See interface.h/.cpp for specifics:  basically this ensures that we actually Sys_UnloadModule the dll and that we don't call Sys_LoadModule 

@@ -89,6 +89,9 @@ ClientModeTFCNormal::ClientModeTFCNormal()
 //-----------------------------------------------------------------------------
 ClientModeTFCNormal::~ClientModeTFCNormal()
 {
+	// dimhotepus: Pair with constructor.
+	delete m_pViewport;
+	m_pViewport = nullptr;
 }
 
 

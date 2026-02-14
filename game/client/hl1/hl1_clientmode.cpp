@@ -108,6 +108,9 @@ ClientModeHL1Normal::ClientModeHL1Normal()
 //-----------------------------------------------------------------------------
 ClientModeHL1Normal::~ClientModeHL1Normal()
 {
+	// dimhotepus: Pair with constructor.
+	delete m_pViewport;
+	m_pViewport = nullptr;
 }
 
 void ClientModeHL1Normal::InitViewport()

@@ -25,6 +25,8 @@ private:
 public:
 
 					ClientModeDODNormal();
+					// dimhotepus: Correctly shutdown.
+					~ClientModeDODNormal();
 
 	virtual void	Init();
 	virtual void	InitViewport();

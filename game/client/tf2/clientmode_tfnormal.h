@@ -59,6 +59,8 @@ public:
 	virtual vgui::Panel *GetMinimapParent( void );
 
 	ClientModeTFNormal();
+	// dimhotepus: Correctly shutdown.
+	~ClientModeTFNormal();
 };
 
 extern IClientMode *GetClientModeNormal();

@@ -140,6 +140,14 @@ ClientModeDODNormal::ClientModeDODNormal()
 	m_pFreezePanel = NULL;
 }
 
+// dimhotepus: Correctly shut down.
+ClientModeDODNormal::~ClientModeDODNormal()
+{
+	// dimhotepus: Pair with constructor.
+	delete m_pViewport;
+	m_pViewport = nullptr;
+}
+
 void ClientModeDODNormal::Init()
 {
 	BaseClass::Init();

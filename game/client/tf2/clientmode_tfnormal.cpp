@@ -42,6 +42,14 @@ ClientModeTFNormal::ClientModeTFNormal()
 	m_pViewport->Start( gameuifuncs, gameeventmanager );
 }
 
+// dimhotepus: Correctly shut down.
+ClientModeTFNormal::~ClientModeTFNormal()
+{
+	// dimhotepus: Pair with constructor.
+	delete m_pViewport;
+	m_pViewport = nullptr;
+}
+
 ClientModeTFNormal::Viewport::Viewport()
 {
 	// use a custom scheme for the hud

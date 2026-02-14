@@ -88,6 +88,9 @@ ClientModeSDKNormal::ClientModeSDKNormal()
 //-----------------------------------------------------------------------------
 ClientModeSDKNormal::~ClientModeSDKNormal()
 {
+	// dimhotepus: Pair with constructor.
+	delete m_pViewport;
+	m_pViewport = nullptr;
 }
 
 

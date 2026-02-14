@@ -287,6 +287,14 @@ ClientModeCSNormal::ClientModeCSNormal()
 	HOOK_MESSAGE( MatchEndConditions );
 }
 
+// dimhotepus: Correctly shut down.
+ClientModeCSNormal::~ClientModeCSNormal()
+{
+	// dimhotepus: Pair with constructor.
+	delete m_pViewport;
+	m_pViewport = nullptr;
+}
+
 void ClientModeCSNormal::Init()
 {
 	BaseClass::Init();

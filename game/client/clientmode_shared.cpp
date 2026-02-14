@@ -295,7 +295,6 @@ ClientModeShared::ClientModeShared()
 //-----------------------------------------------------------------------------
 ClientModeShared::~ClientModeShared()
 {
-	delete m_pViewport; 
 }
 
 void ClientModeShared::ReloadScheme( bool flushLowLevel )
@@ -389,8 +388,7 @@ void ClientModeShared::InitViewport()
 
 void ClientModeShared::VGui_Shutdown()
 {
-	delete m_pViewport;
-	m_pViewport = NULL;
+	// dimhotepus: Drop view port deletion, owner must do it.
 }
 
 
