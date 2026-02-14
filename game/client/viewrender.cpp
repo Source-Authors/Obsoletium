@@ -2154,13 +2154,13 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 			pRenderContext.GetFrom( materials );
 			RunCodeAtScopeExit(pRenderContext.SafeRelease());
 
-				PIXEVENT( pRenderContext, "DoEnginePostProcessing" );
+			PIXEVENT( pRenderContext, "DoEnginePostProcessing" );
 
 			const C_BasePlayer *pLocal = C_BasePlayer::GetLocalPlayer();
 			const bool bFlashlightIsOn = pLocal && pLocal->IsEffectActive( EF_DIMLIGHT );
 
-				DoEnginePostProcessing( viewRender.x, viewRender.y, viewRender.width, viewRender.height, bFlashlightIsOn );
-			}
+			DoEnginePostProcessing( viewRender.x, viewRender.y, viewRender.width, viewRender.height, bFlashlightIsOn );
+		}
 
 		// And here are the screen-space effects
 		{
@@ -2183,11 +2183,7 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 
 		if ( m_rbTakeFreezeFrame[viewRender.m_eStereoEye ] )
 		{
-			Rect_t rect;
-			rect.x = viewRender.x;
-			rect.y = viewRender.y;
-			rect.width = viewRender.width;
-			rect.height = viewRender.height;
+			Rect_t rect{viewRender.x, viewRender.y, viewRender.width, viewRender.height};
 
 			pRenderContext = materials->GetRenderContext();
 			RunCodeAtScopeExit(pRenderContext.SafeRelease());
@@ -2202,7 +2198,7 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 
 		// Draw the overlay
 		if ( m_bDrawOverlay )
-		{	   
+		{
 			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "DrawOverlay" );
 
 			// This allows us to be ok if there are nested overlay views
@@ -2214,7 +2210,6 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 			RenderView( tempView, m_OverlayClearFlags, m_OverlayDrawFlags );
 			m_CurrentView = currentView;
 		}
-
 	}
 
 	if ( mat_viewportupscale.GetBool() && mat_viewportscale.GetFloat() < 1.0f ) 
