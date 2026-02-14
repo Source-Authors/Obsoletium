@@ -536,7 +536,7 @@ InitReturnVal_t CSDLMgr::Init()
 			
 	m_flPrevGLSwapWindowTime = 0.0f;
 		
-	memset(m_pixelFormatAttribs, '\0', sizeof (m_pixelFormatAttribs));
+	BitwiseClear(m_pixelFormatAttribs);
 
 	int *attCursor = m_pixelFormatAttribs;
 
