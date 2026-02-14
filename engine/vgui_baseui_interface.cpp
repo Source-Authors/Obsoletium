@@ -703,7 +703,6 @@ void CEngineVGui::Init()
 
 	staticGameDLLPanel->SetVisible( CommandLine()->CheckParm( "-tools" ) != NULL );
 
-	if ( IsPC() )
 	{
 		COM_TimestampedLog( "Building Panels (staticDebugSystemPanel)" );
 
