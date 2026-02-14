@@ -2156,12 +2156,9 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 
 				PIXEVENT( pRenderContext, "DoEnginePostProcessing" );
 
-				bool bFlashlightIsOn = false;
-				C_BasePlayer *pLocal = C_BasePlayer::GetLocalPlayer();
-				if ( pLocal )
-				{
-					bFlashlightIsOn = pLocal->IsEffectActive( EF_DIMLIGHT );
-				}
+			const C_BasePlayer *pLocal = C_BasePlayer::GetLocalPlayer();
+			const bool bFlashlightIsOn = pLocal && pLocal->IsEffectActive( EF_DIMLIGHT );
+
 				DoEnginePostProcessing( viewRender.x, viewRender.y, viewRender.width, viewRender.height, bFlashlightIsOn );
 			}
 
