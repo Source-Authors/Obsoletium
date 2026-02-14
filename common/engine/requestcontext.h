@@ -30,7 +30,7 @@ struct RequestContext_t
 {
 	inline RequestContext_t()
 	{
-		memset( this, 0, sizeof( RequestContext_t ) );
+		memset( this, 0, sizeof( *this ) );
 	}
 
 	/**

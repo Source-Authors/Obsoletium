@@ -77,7 +77,7 @@ struct FileJob_t
 {
 	FileJob_t()
 	{
-		Q_memset( this, 0, sizeof( FileJob_t ) );
+		Q_memset( this, 0, sizeof( *this ) );
 	}
 
 	FileNameHandle_t		m_hFilename;
@@ -297,7 +297,7 @@ CQueuedLoader::CQueuedLoader() : BaseClass( false )
 	m_szMapNameToCompareSame[0] = '\0';
 
 	m_pProgress = &s_DummyProgress;
-	V_memset( m_pLoaders, 0, sizeof( m_pLoaders ) );
+	BitwiseClear( m_pLoaders );
 
 	// set resource dictionaries sort context
 	for ( int i = 0; i < RESOURCEPRELOAD_COUNT; i++ )

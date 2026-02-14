@@ -77,7 +77,7 @@ CDataCacheSection::CDataCacheSection( CDataCache *pSharedCache, IDataCacheClient
 	m_pSharedCache( pSharedCache ),
 	m_mutex( pSharedCache->m_mutex )
 {
-	memset( &m_status, 0, sizeof(m_status) );
+	BitwiseClear( m_status );
 	AssertMsg1( strlen(pszName) <= DC_MAX_CLIENT_NAME, "Cache client name too long \"%s\"", pszName );
 	V_strcpy_safe( szName, pszName );
 
@@ -1032,7 +1032,7 @@ void *CDataCache::QueryInterface( const char *pInterfaceName )
 CDataCache::CDataCache()
 	: m_mutex( m_LRU.AccessMutex() )
 {
-	memset( &m_status, 0, sizeof(m_status) );
+	BitwiseClear( m_status );
 	m_bInFlush = false;
 }
 

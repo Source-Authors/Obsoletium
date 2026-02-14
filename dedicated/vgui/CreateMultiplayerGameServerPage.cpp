@@ -100,7 +100,7 @@ CCreateMultiplayerGameServerPage::CCreateMultiplayerGameServerPage(
     : Frame(parent, name) {
   memset(&m_iServer, 0x0, sizeof(serveritem_t));
   // dimhotepus: Ensure no UB on uninitialized mod read.
-  memset(m_szMod, 0x0, sizeof(m_szMod));
+  BitwiseClear(m_szMod);
 
   // as we are a popup frame we need to store this seperately
   m_MainPanel = parent;
@@ -427,9 +427,7 @@ bool CCreateMultiplayerGameServerPage::LaunchOldDedicatedServer(
 
         // Feed it all the parameters chosen in the UI so it doesn't redisplay
         // the UI.
-        STARTUPINFO si;
-        memset(&si, 0, sizeof(si));
-        si.cb = sizeof(si);
+        STARTUPINFO si = {sizeof(si)};
 
         PROCESS_INFORMATION pi;
         if (!CreateProcess(NULL, commandLine, NULL, NULL, false, 0, NULL,

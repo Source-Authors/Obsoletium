@@ -37,7 +37,7 @@ unsigned CFileTracker2::ThreadedProcessMD5Requests()
 			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ ); 
 
 			MD5Context_t ctx;
-			memset( &ctx, 0, sizeof(MD5Context_t) );
+			BitwiseClear( ctx );
 			MD5Init( &ctx );
 			MD5Update( &ctx, stuff.m_pubBuffer, stuff.m_cubBuffer );
 			MD5Final( stuff.m_md5Value.bits, &ctx);

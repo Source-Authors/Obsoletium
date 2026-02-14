@@ -73,7 +73,7 @@ void CUndoManager::Trace( PRINTF_FORMAT_STRING const char *fmt, ... )
 	va_end( argptr );
 
 	char spaces[ 128 ];
-	Q_memset( spaces, 0, sizeof( spaces ) );
+	BitwiseClear( spaces );
 	for ( int i = 0; i < ( m_nNesting * 3 ); ++i )
 	{
 		if ( i >= 127 )

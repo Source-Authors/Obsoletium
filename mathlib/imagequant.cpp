@@ -64,7 +64,7 @@ void ColorQuantize(uint8 const *Image,
 			for(c=0;c<3;c++)
 				out_palette[p*3+c]=v->Mean[c];
 	}
-	memset(Error,0,sizeof(Error));
+	BitwiseClear(Error);
 	for(y=0;y<Height;y++)
 	{
 		int ErrorUse=y & 1;

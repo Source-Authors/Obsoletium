@@ -176,7 +176,7 @@ static void UpdateStats(QuantizedValue *v)
 	double WorstError[MAXDIMS];
 	int i,j;
   
-	memset(Means,0,sizeof(Means));
+	BitwiseClear(Means);
 	int N=0;
 	for(i=0;i<v->NSamples;i++)
 	{

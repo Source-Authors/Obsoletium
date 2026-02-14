@@ -327,7 +327,7 @@ void CDataModel::DisplayMemoryStats( )
 			j = typeHistogram.Insert( pElement->GetType() );
 			typeHistogram[j].m_nCount = 0;
 			typeHistogram[j].m_nSize = 0;
-			memset( typeHistogram[j].m_pCategories, 0, sizeof(typeHistogram[j].m_pCategories) );
+			BitwiseClear( typeHistogram[j].m_pCategories );
 		}
 
 		intp nMemory = CDmeElementAccessor::EstimateMemoryUsage( pElement, visited, TD_NONE, typeHistogram[j].m_pCategories );
@@ -351,7 +351,7 @@ void CDataModel::DisplayMemoryStats( )
 	intp nTotalSize = 0;
 	intp nTotalCount = 0;
 	intp nTotalData = 0;
-	memset( pTotals, 0, sizeof(pTotals) );
+	BitwiseClear( pTotals );
 	ConMsg( "Dm Memory usage: type\t\t\t\tcount\ttotalsize\twastage %%\touter\t\tinner\t\tdatamodel\trefs\t\ttree\t\tatts\t\tdata\t(att count)\n" );
 	for ( decltype(nCount) i = 0; i < nCount; ++i )
 	{

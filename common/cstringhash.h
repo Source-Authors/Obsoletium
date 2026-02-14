@@ -10,15 +10,16 @@
 #pragma once
 
 #include <cstring>
+#include "tier0/commonmacros.h"
 
-#define STRING_HASH_TABLE_SIZE 701
+constexpr inline int STRING_HASH_TABLE_SIZE{701};
 
 template <class T> class CStringHash
 {
 public:
 	CStringHash() 
 	{
-		memset( m_HashTable, 0, sizeof( StringHashNode_t * ) * STRING_HASH_TABLE_SIZE );
+		BitwiseClear( m_HashTable );
 	}
 	~CStringHash()
 	{

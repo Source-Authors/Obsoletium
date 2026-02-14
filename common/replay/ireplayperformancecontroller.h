@@ -27,7 +27,7 @@ class CReplayPerformance;
 
 struct SetViewParams_t 
 {
-	SetViewParams_t() { V_memset( this, 0, sizeof( SetViewParams_t ) ); }
+	SetViewParams_t() { V_memset( this, 0, sizeof( *this ) ); }
 	SetViewParams_t( float flTime, Vector *pOrigin, QAngle *pAngles, float flFov, float flAccel,
 					 float flSpeed, float flRotFilter )
 	:	m_flTime( flTime ),

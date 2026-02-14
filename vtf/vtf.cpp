@@ -240,7 +240,7 @@ CVTFTexture::CVTFTexture()
 	Assert( m_arrResourcesData.Count() == 0 );
 	Assert( m_arrResourcesData_ForReuse.Count() == 0 );
 
-	memset( &m_Options, 0, sizeof( m_Options ) );
+	BitwiseClear( m_Options );
 	m_Options.cbSize = sizeof( m_Options );
 
 	m_nFinestMipmapLevel = 0;
@@ -907,7 +907,7 @@ static bool ReadHeaderFromBufferPastBaseHeader( CUtlBuffer &buf, VTFFileHeader_t
 
 bool CVTFTexture::ReadHeader( CUtlBuffer &buf, VTFFileHeader_t &header )
 {
-	memset( &header, 0, sizeof(VTFFileHeader_t) );
+	BitwiseClear( header );
 	buf.Get( &header, sizeof(VTFFileBaseHeader_t) );
 	if ( !buf.IsValid() )
 	{
@@ -1238,7 +1238,7 @@ ResourceEntryInfo * CVTFTexture::FindOrCreateResourceEntryInfo( uint32 eType )
 	}
 
 	ResourceEntryInfo rei;
-	memset( &rei, 0, sizeof( rei ) );
+	BitwiseClear( rei );
 	rei.eType = eType;
 
 	// Inserting before "k"
@@ -1327,7 +1327,7 @@ bool CVTFTexture::Serialize( CUtlBuffer &buf )
 	}
 
 	VTFFileHeader_t header;
-	memset( &header, 0, sizeof( header ) );
+	BitwiseClear( header );
 	V_strcpy_safe( header.fileTypeString, "VTF" );
 	header.version[0] = VTF_MAJOR_VERSION;
 	header.version[1] = VTF_MINOR_VERSION;
@@ -2735,7 +2735,7 @@ void CVTFTexture::PostProcess( bool bGenerateSpheremap, LookDir_t lookDir, bool 
 
 void CVTFTexture::SetPostProcessingSettings( VtfProcessingOptions const *pOptions )
 {
-	memset( &m_Options, 0, sizeof( m_Options ) );
+	BitwiseClear( m_Options );
 	memcpy( &m_Options, pOptions, min( (uint32)sizeof( m_Options ), pOptions->cbSize ) );
 	m_Options.cbSize = sizeof( m_Options );
 

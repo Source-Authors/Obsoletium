@@ -493,7 +493,7 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	int image_width;
 
 	jpeg_decompress_struct jpegInfo;
-	memset( &jpegInfo, 0, sizeof( jpegInfo ) );
+	BitwiseClear( jpegInfo );
 
 	// open the jpeg image file.
 	FILE *infile = fopen(jpegPath, "rb");
@@ -796,11 +796,14 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 	if (bitmap.bmBitsPixel == 24 || bitmap.bmBitsPixel == 32)
 	{
 		bitmapInfo = (BITMAPINFO *)malloc(sizeof(BITMAPINFO));
+		BitwiseClear(*bitmapInfo);
 	}
 	else if (bitmap.bmBitsPixel == 8 || bitmap.bmBitsPixel == 4 || bitmap.bmBitsPixel == 1)
 	{
 		int colorsUsed = 1 << bitmap.bmBitsPixel;
-		bitmapInfo = (BITMAPINFO *)malloc(colorsUsed * sizeof(RGBQUAD) + sizeof(BITMAPINFO));
+		intp size = colorsUsed * sizeof(RGBQUAD) + sizeof(BITMAPINFO);
+		bitmapInfo = (BITMAPINFO *)malloc(size);
+		BitwiseClear(bitmapInfo, size);
 		bUseColorTable = true;
 	}
 	else
@@ -811,7 +814,6 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 
 	RunCodeAtScopeExit(free( bitmapInfo ));
 
-	memset(bitmapInfo, 0, sizeof(BITMAPINFO));
 	bitmapInfo->bmiHeader.biSize = sizeof(bitmapInfo->bmiHeader);
 	if (bUseColorTable)
 	{

@@ -55,7 +55,7 @@ INetAPI *net = &g_NetAPI;
 //-----------------------------------------------------------------------------
 void CNetAPI::NetAdrToSockAddr (netadr_t *a, struct sockaddr *s)
 {
-	memset (s, 0, sizeof(*s));
+	BitwiseClear(*s);
 
 	if (a->type == NA_BROADCAST)
 	{
@@ -93,9 +93,8 @@ void CNetAPI::SockAddrToNetAdr( struct sockaddr *s, netadr_t *a )
 //-----------------------------------------------------------------------------
 char *CNetAPI::AdrToString( netadr_t *a )
 {
-	static	char	s[64];
-
-	memset(s, 0, 64);
+	static char s[64];
+	BitwiseClear(s);
 
 	if ( a )
 	{
@@ -124,7 +123,7 @@ static bool StringToSockaddr( const char *s, struct sockaddr *sadr )
 	char	copy[128];
 	struct sockaddr_in *p;
 	
-	memset (sadr, 0, sizeof(*sadr));
+	BitwiseClear(*sadr);
 	
 	p = ( struct sockaddr_in * )sadr;
 	p->sin_family = AF_INET;
@@ -175,7 +174,7 @@ bool CNetAPI::StringToAdr( const char *s, netadr_t *a )
 	
 	if ( !strcmp ( s, "localhost" ) )
 	{
-		memset ( a, 0, sizeof( *a ) );
+		a->Clear ();
 		a->type = NA_LOOPBACK;
 		return true;
 	}
@@ -201,7 +200,7 @@ void CNetAPI::GetSocketAddress( socket_handle socket, netadr_t *a )
 	struct sockaddr_in	address;
 	int		namelen;
 
-	memset( a, 0, sizeof( *a ) );
+	a->Clear();
 	gethostname(buff, 512);
 	// Ensure that it doesn't overrun the buffer
 	buff[512-1] = 0;

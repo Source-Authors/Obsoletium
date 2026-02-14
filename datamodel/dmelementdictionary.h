@@ -90,7 +90,7 @@ private:
 		DmIdPair_t( const DmObjectId_t &id )
 		{
 			CopyUniqueId( id, &m_oldId );
-			std::memset( &m_newId, 0, sizeof(m_newId) );
+			BitwiseClear( m_newId );
 		}
 		DmIdPair_t( const DmObjectId_t &oldId, const DmObjectId_t &newId )
 		{

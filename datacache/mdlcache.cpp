@@ -771,9 +771,9 @@ void CMDLCache::InitStudioData( MDLHandle_t handle )
 {
 	Assert( m_MDLDict[handle] == NULL );
 
-	studiodata_t *pStudioData = new studiodata_t;
-	m_MDLDict[handle] = pStudioData;
+	auto *pStudioData = new studiodata_t;
 	memset( pStudioData, 0, sizeof( studiodata_t ) );
+	m_MDLDict[handle] = pStudioData;
 }
 
 void CMDLCache::ShutdownStudioData( MDLHandle_t handle )
@@ -939,7 +939,7 @@ void CMDLCache::UnserializeVCollide( MDLHandle_t handle, bool synchronousLoad )
 	{
 		// clear existing data
 		pStudioData->m_nFlags &= ~STUDIODATA_FLAGS_VCOLLISION_LOADED;
-		memset( &pStudioData->m_VCollisionData, 0, sizeof( pStudioData->m_VCollisionData ) );
+		BitwiseClear( pStudioData->m_VCollisionData );
 
 #if 0
 		// FIXME:  ywb
@@ -1605,7 +1605,7 @@ void CMDLCache::UnloadHardwareData( MDLHandle_t handle, [[maybe_unused]] bool bC
 		MdlCacheMsg("MDLCache: Unload studiomdl %s\n", GetModelName( handle ) );
 
 		g_pStudioRender->UnloadModel( &pStudioData->m_HardwareData );
-		memset( &pStudioData->m_HardwareData, 0, sizeof( pStudioData->m_HardwareData ) );
+		BitwiseClear( pStudioData->m_HardwareData );
 		pStudioData->m_nFlags &= ~STUDIODATA_FLAGS_STUDIOMESH_LOADED;
 
 		NotifyFileUnloaded( handle, ".mdl" );

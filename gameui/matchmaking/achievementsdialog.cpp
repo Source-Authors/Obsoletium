@@ -187,7 +187,7 @@ CAchievementsDialog::CAchievementsDialog(vgui::Panel *parent) : BaseClass(parent
 	int iHighestAchievementIDSeen = -1;
 	int iNextGroupBoundary = 1000;
 
-	Q_memset( m_AchievementGroups, 0, sizeof(m_AchievementGroups) );
+	BitwiseClear( m_AchievementGroups );
 	m_iNumAchievementGroups = 0;
 
 	// Base groups

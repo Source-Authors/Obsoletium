@@ -479,6 +479,92 @@ constexpr T ClampedArrayElement(const T (&buffer)[N], size_t index) noexcept {
   return buffer[index];
 }
 
+/**
+ * @brief Type-safe copying for trivial types.  Note source and destination
+ * sizes in T's should be >= size.
+ * @tparam T Type to copy
+ * @param src Source.
+ * @param dest Destination.
+ * @param size Size in T's to copy from source to destination.
+ * @return void
+ */
+template <typename T>
+std::enable_if_t<std::is_trivially_copyable_v<T>> BitwiseCopy(
+    const T* src, T* dest, size_t size) noexcept {
+  static_assert(sizeof(*src) == sizeof(*dest));
+  assert(sizeof(*src) >= size);
+  std::memcpy(dest, src, sizeof(T) * size);
+}
+
+/**
+ * @brief Type-safe copying for arrays of trivial types.
+ * @tparam T Type of array element to copy
+ * @param src Source array.
+ * @param dest Destination array.
+ * @return void
+ */
+template <typename T, size_t size>
+std::enable_if_t<std::is_trivially_copyable_v<T>> BitwiseCopy(
+    const T (&src)[size], T (&dest)[size]) noexcept {
+  std::memcpy(dest, src, sizeof(T) * size);
+}
+
+/**
+ * @brief Type-safe copying for non-trivial types.  Note source and destination
+ * sizes in T's should be >= size.
+ * @tparam T Type to copy
+ * @param src Source.
+ * @param dest Destination.
+ * @return void
+ */
+template <typename T>
+std::enable_if_t<!std::is_trivially_copyable_v<T>> constexpr BitwiseCopy(
+    const T* src, T* dest, size_t size = 1) noexcept {
+  std::copy_n(src, size, dest);
+}
+
+/**
+ * @brief Type-safe memory clear.
+ * @tparam T Type.
+ * @param src Source to clear.
+ * @return void.
+ */
+template <typename T>
+std::enable_if_t<std::is_trivially_copyable_v<T> &&
+                 std::is_trivially_constructible_v<T>>
+BitwiseClear(T& src) noexcept {
+  std::memset(&src, 0, sizeof(T));
+}
+
+/**
+ * @brief Type-safe memory clear for array.
+ * @tparam T Type of array element.
+ * @tparam size Array size.
+ * @param src Source to clear.
+ * @return void.
+ */
+template <typename T, size_t size>
+std::enable_if_t<std::is_trivially_copyable_v<T> &&
+                 std::is_trivially_constructible_v<T>>
+BitwiseClear(T (&src)[size]) noexcept {
+  std::memset(src, 0, sizeof(src));
+}
+
+/**
+ * @brief Type-safe memory clear.  Note src size should be >= size.
+ * @tparam T Type.
+ * @param src Source.
+ * @param size Source size to clear.
+ * @return void.
+ */
+template <typename T>
+std::enable_if_t<std::is_trivially_copyable_v<T> &&
+                 std::is_trivially_constructible_v<T>>
+BitwiseClear(T* src, size_t size) noexcept {
+  assert(sizeof(*src) >= size);
+  std::memset(src, 0, size);
+}
+
 // MSVC specific.
 #ifdef COMPILER_MSVC
 /*

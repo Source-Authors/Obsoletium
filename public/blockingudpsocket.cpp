@@ -98,7 +98,7 @@ bool CBlockingUDPSocket::WaitForMessage( float timeOutInSeconds )
 
 unsigned int CBlockingUDPSocket::ReceiveSocketMessage( sockaddr_in *packet_from, unsigned char *buf, size_t bufsize )
 {
-	memset( packet_from, 0, sizeof( *packet_from ) );
+	BitwiseClear( *packet_from );
 
 	sockaddr fromaddress;
 	int	fromlen = sizeof( fromaddress );

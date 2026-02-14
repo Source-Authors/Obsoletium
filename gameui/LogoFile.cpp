@@ -239,7 +239,7 @@ void UpdateLogoWAD( void *phdib, int r, int g, int b )
 		length++;
 
 	// Write Header
-	wadinfo_t	header;
+	wadinfo_t	header = {};
 	header.identification[0] = 'W';
 	header.identification[1] = 'A';
 	header.identification[2] = 'D';
@@ -251,8 +251,8 @@ void UpdateLogoWAD( void *phdib, int r, int g, int b )
 
 	// Fill Ino info table
 	lumpinfo_t	info;
-	Q_memset (&info, 0, sizeof(info));
-	Q_strncpy(info.name, pszName, sizeof( info.name ) );
+	BitwiseClear (info);
+	V_strcpy_safe( info.name, pszName );
 	info.filepos = (int)sizeof(wadinfo_t);
 	info.size = info.disksize = length;
 	info.type = TYP_LUMPY;

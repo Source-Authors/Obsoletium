@@ -344,7 +344,7 @@ public:
 	FloatImagePyramid_t()
 	{
 		m_nLevels=0;
-		memset(m_pLevels,0,sizeof(m_pLevels));
+		BitwiseClear(m_pLevels);
 	}
 
 	// build one. clones data from src for level 0.

@@ -22,7 +22,7 @@ using MovieHandle_t = unsigned int;
 
 struct RenderMovieParams_t
 {
-	inline RenderMovieParams_t()  { V_memset( this, 0, sizeof( RenderMovieParams_t ) ); m_Settings.m_FPS.SetFPS( 0, false ); }
+	inline RenderMovieParams_t()  { V_memset( this, 0, sizeof( *this ) ); m_Settings.m_FPS.SetFPS( 0, false ); }
 
 	ReplayHandle_t		m_hReplay;
 	int					m_iPerformance{ -1 };		// -1 for default view, otherwise this is an index into the replay's m_vecPerformances vector.

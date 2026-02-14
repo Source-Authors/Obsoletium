@@ -71,7 +71,7 @@ class ScopedDll {
   ScopedDll(ScopedDll &&d) noexcept : dll_{d.dll_} {
     d.dll_ = nullptr;
 #ifndef _WIN32
-    std::memset(d.dll_path_, 0, sizeoof(d.dll_path_));
+    BitwiseClear(d.dll_path_);
 #endif
   }
   ScopedDll &operator=(ScopedDll &) = delete;

@@ -1103,7 +1103,7 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 	
 		// Get the .bsp file header
 		dheader_t header;
-		memset( &header, 0, sizeof(dheader_t) );
+		BitwiseClear( header );
 		m_Stats.nBytesRead += FS_fread( &header, sizeof( header ), fp );
 		++m_Stats.nReads;
 	
@@ -3325,11 +3325,11 @@ bool CBaseFileSystem::CheckVPKFileHash( int PackFileID, int nPackFileNumber, int
 			pVPK->GetPackFileName( fhandle, szFileName );
 
 			char hex[ 34 ];
-			Q_memset( hex, 0, sizeof( hex ) );
+			BitwiseClear( hex );
 			V_binarytohex( md5Value.bits, hex );
 
 			char hex2[ 34 ];
-			Q_memset( hex2, 0, sizeof( hex2 ) );
+			BitwiseClear( hex2 );
 			V_binarytohex( fileHashFraction.m_md5contents.bits, hex2 );
 
 			if ( Q_memcmp( fileHashFraction.m_md5contents.bits, md5Value.bits, sizeof(md5Value.bits) ) != 0 )

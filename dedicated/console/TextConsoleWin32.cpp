@@ -52,14 +52,14 @@ bool CTextConsoleWin32::Init() {
   SetWindowPos(GetConsoleWindow(), HWND_TOP, 0, 0, 0, 0,
                SWP_NOSIZE | SWP_NOMOVE | SWP_SHOWWINDOW);
 
-  memset(m_szConsoleText, 0, sizeof(m_szConsoleText));
+  BitwiseClear(m_szConsoleText);
   m_nConsoleTextLen = 0;
   m_nCursorPosition = 0;
 
-  memset(m_szSavedConsoleText, 0, sizeof(m_szSavedConsoleText));
+  BitwiseClear(m_szSavedConsoleText);
   m_nSavedConsoleTextLen = 0;
 
-  memset(m_aszLineBuffer, 0, sizeof(m_aszLineBuffer));
+  BitwiseClear(m_aszLineBuffer);
   m_nTotalLines = 0;
   m_nInputLine = 0;
   m_nBrowseLine = 0;
