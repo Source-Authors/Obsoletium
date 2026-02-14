@@ -2166,8 +2166,6 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 			}
 
 		// And here are the screen-space effects
-
-		if ( IsPC() )
 		{
 			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "GrabPreColorCorrectedFrame" );
 
