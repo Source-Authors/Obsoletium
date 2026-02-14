@@ -1969,9 +1969,9 @@ void ClientDLL_Unload()
 	g_pClientVR = NULL;
 	g_ClientDLL = NULL;
 	g_ClientFactory = NULL;
-	g_ClientDLLModule = NULL;
 
-	FileSystem_UnloadModule( g_ClientDLLModule );
+	FileSystem_UnloadModule(g_ClientDLLModule);
+	g_ClientDLLModule = NULL;
 }
 
 //-----------------------------------------------------------------------------
