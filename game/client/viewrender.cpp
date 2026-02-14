@@ -2050,56 +2050,60 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 
 		g_bRenderingView = true;
 
-		// Must be first 
-		render->SceneBegin();
-
-		pRenderContext.GetFrom( materials );
-		pRenderContext->TurnOnToneMapping();
-		pRenderContext.SafeRelease();
-
-		// clear happens here probably
-		SetupMain3DView( viewRender, nClearFlags );
-			 	  
-		bool bDrew3dSkybox = false;
-		SkyboxVisibility_t nSkyboxVisible = SKYBOX_NOT_VISIBLE;
-
-		// if the 3d skybox world is drawn, then don't draw the normal skybox
-		CSkyboxView *pSkyView = new CSkyboxView( this );
-		if ( ( bDrew3dSkybox = pSkyView->Setup( viewRender, &nClearFlags, &nSkyboxVisible ) ) != false )
 		{
-			AddViewToScene( pSkyView );
-		}
-		SafeRelease( pSkyView );
+			// Must be first 
+			render->SceneBegin();
+			// Finish scene
+			RunCodeAtScopeExit(render->SceneEnd());
 
-		// Force it to clear the framebuffer if they're in solid space.
-		if ( ( nClearFlags & VIEW_CLEAR_COLOR ) == 0 )
-		{
-			if ( enginetrace->GetPointContents( viewRender.origin ) == CONTENTS_SOLID )
+			pRenderContext.GetFrom( materials );
+			pRenderContext->TurnOnToneMapping();
+			pRenderContext.SafeRelease();
+
+			// clear happens here probably
+			SetupMain3DView( viewRender, nClearFlags );
+
+			bool bDrew3dSkybox = false;
+			SkyboxVisibility_t nSkyboxVisible = SKYBOX_NOT_VISIBLE;
+
 			{
-				nClearFlags |= VIEW_CLEAR_COLOR;
+				// if the 3d skybox world is drawn, then don't draw the normal skybox
+				auto *pSkyView = new CSkyboxView( this );
+				RunCodeAtScopeExit(SafeRelease( pSkyView ));
+
+				if ( ( bDrew3dSkybox = pSkyView->Setup( viewRender, &nClearFlags, &nSkyboxVisible ) ) != false )
+				{
+					AddViewToScene( pSkyView );
+				}
 			}
+
+			// Force it to clear the framebuffer if they're in solid space.
+			if ( ( nClearFlags & VIEW_CLEAR_COLOR ) == 0 )
+			{
+				if ( enginetrace->GetPointContents( viewRender.origin ) == CONTENTS_SOLID )
+				{
+					nClearFlags |= VIEW_CLEAR_COLOR;
+				}
+			}
+
+			// Render world and all entities, particles, etc.
+			if( !g_pIntroData )
+			{
+				ViewDrawScene( bDrew3dSkybox, nSkyboxVisible, viewRender, nClearFlags, VIEW_MAIN, whatToDraw & RENDERVIEW_DRAWVIEWMODEL );
+			}
+			else
+			{
+				ViewDrawScene_Intro( viewRender, nClearFlags, *g_pIntroData );
+			}
+
+			// We can still use the 'current view' stuff set up in ViewDrawScene
+			s_bCanAccessCurrentView = true;
+
+
+			engine->DrawPortals();
+
+			DisableFog();
 		}
-
-		// Render world and all entities, particles, etc.
-		if( !g_pIntroData )
-		{
-			ViewDrawScene( bDrew3dSkybox, nSkyboxVisible, viewRender, nClearFlags, VIEW_MAIN, whatToDraw & RENDERVIEW_DRAWVIEWMODEL );
-		}
-		else
-		{
-			ViewDrawScene_Intro( viewRender, nClearFlags, *g_pIntroData );
-		}
-
-		// We can still use the 'current view' stuff set up in ViewDrawScene
-		s_bCanAccessCurrentView = true;
-
-
-		engine->DrawPortals();
-
-		DisableFog();
-
-		// Finish scene
-		render->SceneEnd();
 
 		// Draw lightsources if enabled
 		render->DrawLights();
@@ -2113,11 +2117,10 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 			if ( ( mat_motion_blur_enabled.GetInt() ) && ( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 90 ) )
 			{
 				pRenderContext.GetFrom( materials );
-				{
-					PIXEVENT( pRenderContext, "DoImageSpaceMotionBlur" );
-					DoImageSpaceMotionBlur( viewRender, viewRender.x, viewRender.y, viewRender.width, viewRender.height );
-				}
-				pRenderContext.SafeRelease();
+				RunCodeAtScopeExit(pRenderContext.SafeRelease());
+
+				PIXEVENT( pRenderContext, "DoImageSpaceMotionBlur" );
+				DoImageSpaceMotionBlur( viewRender, viewRender.x, viewRender.y, viewRender.width, viewRender.height );
 			}
 		}
 
@@ -2149,7 +2152,8 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 		if ( !building_cubemaps.GetBool() && viewRender.m_bDoBloomAndToneMapping )
 		{
 			pRenderContext.GetFrom( materials );
-			{
+			RunCodeAtScopeExit(pRenderContext.SafeRelease());
+
 				PIXEVENT( pRenderContext, "DoEnginePostProcessing" );
 
 				bool bFlashlightIsOn = false;
@@ -2160,8 +2164,6 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 				}
 				DoEnginePostProcessing( viewRender.x, viewRender.y, viewRender.width, viewRender.height, bFlashlightIsOn );
 			}
-			pRenderContext.SafeRelease();
-		}
 
 		// And here are the screen-space effects
 
@@ -2193,8 +2195,9 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 			rect.height = viewRender.height;
 
 			pRenderContext = materials->GetRenderContext();
-				pRenderContext->CopyRenderTargetToTextureEx( GetFullscreenTexture(), 0, &rect, &rect );
-			pRenderContext.SafeRelease();
+			RunCodeAtScopeExit(pRenderContext.SafeRelease());
+
+			pRenderContext->CopyRenderTargetToTextureEx( GetFullscreenTexture(), 0, &rect, &rect );
 			m_rbTakeFreezeFrame[viewRender.m_eStereoEye ] = false;
 		}
 
@@ -2337,35 +2340,35 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "VGui_DrawHud", __FUNCTION__ );
 
-		// paint the vgui screen
-		VGui_PreRender();
-
-		// Make sure the client .dll root panel is at the proper point before doing the "SolveTraverse" calls
-		vgui::VPANEL root = enginevgui->GetPanel( PANEL_CLIENTDLL );
-		if ( root != 0 )
 		{
-			vgui::ipanel()->SetSize( root, viewWidth, viewHeight );
+			// paint the vgui screen
+			VGui_PreRender();
+			RunCodeAtScopeExit(VGui_PostRender());
+
+			// Make sure the client .dll root panel is at the proper point before doing the "SolveTraverse" calls
+			vgui::VPANEL root = enginevgui->GetPanel( PANEL_CLIENTDLL );
+			if ( root != 0 )
+			{
+				vgui::ipanel()->SetSize( root, viewWidth, viewHeight );
+			}
+			// Same for client .dll tools
+			root = enginevgui->GetPanel( PANEL_CLIENTDLL_TOOLS );
+			if ( root != 0 )
+			{
+				vgui::ipanel()->SetSize( root, viewWidth, viewHeight );
+			}
+
+			// The crosshair, etc. needs to get at the current setup stuff
+			AllowCurrentViewAccess( true );
+			RunCodeAtScopeExit(AllowCurrentViewAccess( false ));
+
+			// Draw the in-game stuff based on the actual viewport being used
+			render->VGui_Paint( PAINT_INGAMEPANELS );
+
+			// maybe paint the main menu and cursor too if we're in stereo hud mode
+			if( bPaintMainMenu )
+				render->VGui_Paint( PAINT_UIPANELS | PAINT_CURSOR );
 		}
-		// Same for client .dll tools
-		root = enginevgui->GetPanel( PANEL_CLIENTDLL_TOOLS );
-		if ( root != 0 )
-		{
-			vgui::ipanel()->SetSize( root, viewWidth, viewHeight );
-		}
-
-		// The crosshair, etc. needs to get at the current setup stuff
-		AllowCurrentViewAccess( true );
-
-		// Draw the in-game stuff based on the actual viewport being used
-		render->VGui_Paint( PAINT_INGAMEPANELS );
-
-		// maybe paint the main menu and cursor too if we're in stereo hud mode
-		if( bPaintMainMenu )
-			render->VGui_Paint( PAINT_UIPANELS | PAINT_CURSOR );
-
-		AllowCurrentViewAccess( false );
-
-		VGui_PostRender();
 
 		g_pClientMode->PostRenderVGui();
 		pRenderContext = materials->GetRenderContext();
@@ -2409,10 +2412,7 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 	// We can no longer use the 'current view' stuff set up in ViewDrawScene
 	s_bCanAccessCurrentView = false;
 
-	if ( IsPC() )
-	{
-		CDebugViewRender::GenerateOverdrawForTesting();
-	}
+	CDebugViewRender::GenerateOverdrawForTesting();
 
 	render->PopView( GetFrustum() );
 	g_WorldListCache.Flush();
