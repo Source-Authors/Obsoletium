@@ -66,7 +66,7 @@ ALLOC_CALL FloatBitMap_t *FloatBitMap_t::QuarterSizeWithGaussian() const
 
 FloatImagePyramid_t::FloatImagePyramid_t(FloatBitMap_t const &src, [[maybe_unused]] ImagePyramidMode_t mode)
 {
-	memset(m_pLevels,0,sizeof(m_pLevels));
+	BitwiseClear(m_pLevels);
 
 	m_nLevels = 1;
 

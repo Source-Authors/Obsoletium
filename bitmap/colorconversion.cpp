@@ -852,10 +852,8 @@ bool ConvertToDXTLegacy(  [[maybe_unused]] const uint8 *src, [[maybe_unused]] Im
 	if( srcStride != 0 || dstStride != 0 )
 		return false;
 
-	DDSURFACEDESC descIn;
-	DDSURFACEDESC descOut;
-	memset( &descIn, 0, sizeof(descIn) );
-	memset( &descOut, 0, sizeof(descOut) );
+	DDSURFACEDESC descIn = {};
+	DDSURFACEDESC descOut = {};
 	float weight[3] = {0.3086f, 0.6094f, 0.0820f};
 	dword dwEncodeType = GetDXTCEncodeType( dstImageFormat );
 	

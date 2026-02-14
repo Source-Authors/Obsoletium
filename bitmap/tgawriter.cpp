@@ -155,7 +155,7 @@ bool WriteDummyFileNoAlloc( const char *fileName, int width, int height, enum Im
 		return false;
 	}
 
-    memset( &tgaHeader, 0, sizeof(tgaHeader) );
+    BitwiseClear( tgaHeader );
     tgaHeader.id_length  = 0;
     tgaHeader.image_type = (unsigned char) nImageType;
     tgaHeader.width      = (unsigned short) width;
@@ -215,7 +215,7 @@ bool WriteTGAFile( const char *fileName, int width, int height, enum ImageFormat
 		return false;
 	}
 
-    memset( &tgaHeader, 0, sizeof(tgaHeader) );
+    BitwiseClear( tgaHeader );
     tgaHeader.id_length  = 0;
     tgaHeader.image_type = (unsigned char) nImageType;
     tgaHeader.width      = (unsigned short) width;

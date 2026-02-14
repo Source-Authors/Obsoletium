@@ -539,7 +539,7 @@ PSDImageResources::ResElement PSDImageResources::FindElement( Resource eType ) c
 PSDResFileInfo::ResFileInfoElement PSDResFileInfo::FindElement( ResFileInfo eType ) const
 {
 	ResFileInfoElement res;
-	memset( &res, 0, sizeof( res ) );
+	BitwiseClear( res );
 
 	unsigned char const *pvBuffer = m_res.m_pvData, * const pvBufferEnd = pvBuffer + m_res.m_numBytes;
 	while ( pvBuffer < pvBufferEnd )
