@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void VGUI_CreateClientDLLRootPanel( void )
+void VGUI_CreateClientDLLRootPanel()
 {
 	// Just using PANEL_ROOT in HL2 right now
 }
@@ -22,7 +22,7 @@ void VGUI_CreateClientDLLRootPanel( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void VGUI_DestroyClientDLLRootPanel( void )
+void VGUI_DestroyClientDLLRootPanel()
 {
 }
 
@@ -30,7 +30,7 @@ void VGUI_DestroyClientDLLRootPanel( void )
 // Purpose: Game specific root panel
 // Output : vgui::Panel
 //-----------------------------------------------------------------------------
-vgui::VPANEL VGui_GetClientDLLRootPanel( void )
+vgui::VPANEL VGui_GetClientDLLRootPanel()
 {
 	vgui::VPANEL root = enginevgui->GetPanel( PANEL_CLIENTDLL );
 	return root;
