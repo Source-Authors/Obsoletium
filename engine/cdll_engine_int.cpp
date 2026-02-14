@@ -1846,7 +1846,7 @@ void ClientDLL_Init( void )
 			{
 				g_bClientLeafSystemV1 = false;
 			}
-			else if ( !clientleafsystem )
+			else
 			{
 				clientleafsystem = ( IClientLeafSystemEngine *)g_ClientFactory( CLIENTLEAFSYSTEM_INTERFACE_VERSION_1, NULL );
 				if ( !clientleafsystem )
