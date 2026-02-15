@@ -127,7 +127,7 @@ bool UniqueIdFromString( UniqueId_t *pDest, IN_CAP(nMaxLen) const char *pBuf, in
 void InvalidateUniqueId( UniqueId_t *pDest )
 {
 	Assert( pDest );
-	memset( pDest, 0, sizeof( UniqueId_t ) );
+	BitwiseClear( *pDest );
 }
 
 bool IsUniqueIdValid( const UniqueId_t &id )
