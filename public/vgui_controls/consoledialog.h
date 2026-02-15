@@ -129,7 +129,6 @@ protected:
 	char m_szPartialText[256];
 	char m_szPreviousPartialText[256];
 	bool m_bAutoCompleteMode;	// true if the user is currently tabbing through completion options
-	bool m_bWasBackspacing;
 	bool m_bStatusVersion;
 
 	CUtlVector< CompletionItem * > m_CompletionList;
