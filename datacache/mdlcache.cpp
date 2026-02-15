@@ -266,8 +266,8 @@ struct ModelParts_t
 	int				nExpectedParts;
 
 private:
-	ModelParts_t(const ModelParts_t&); // no impl
-	ModelParts_t& operator=(const ModelParts_t&); // no impl
+	ModelParts_t(const ModelParts_t&) = delete;
+	ModelParts_t& operator=(const ModelParts_t&) = delete;
 };
 
 struct CleanupModelParts_t
