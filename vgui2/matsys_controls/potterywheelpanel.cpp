@@ -315,12 +315,12 @@ CPotteryWheelPanel::~CPotteryWheelPanel()
 
 void CPotteryWheelPanel::CreateDefaultLights()
 {
-	for ( int i = 0; i < 6; ++i )
+	for ( auto &v : m_vecAmbientCube )
 	{
-		m_vecAmbientCube[i].Init( 0.4f, 0.4f, 0.4f, 1.0f );
+		v.Init( 0.4f, 0.4f, 0.4f, 1.0f );
 	}
 
-	memset( &m_Lights[0].m_Desc, 0, sizeof(LightDesc_t) );
+	BitwiseClear( m_Lights[0].m_Desc );
 	SetIdentityMatrix( m_Lights[0].m_LightToWorld );
 	m_Lights[0].m_Desc.m_Type = MATERIAL_LIGHT_DIRECTIONAL;
 	m_Lights[0].m_Desc.m_Color.Init( 1.0f, 1.0f, 1.0f );

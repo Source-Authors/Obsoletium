@@ -202,15 +202,15 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 	// use the correct file based on the chosen language
 	const char LANGUAGE_STRING[] = "%language%";
 	const char ENGLISH_STRING[] = "english";
-	constexpr int MAX_LANGUAGE_NAME_LENGTH = 64;
-	char language[MAX_LANGUAGE_NAME_LENGTH];
-	char fileName[MAX_PATH];
 	intp offs = 0;
 	bool success = false;
-
-	memset( language, 0, sizeof(language) );
-
-	Q_strncpy( fileName, szFileName, sizeof( fileName ) );
+	
+	constexpr int MAX_LANGUAGE_NAME_LENGTH = 64;
+	char language[MAX_LANGUAGE_NAME_LENGTH];
+	BitwiseClear( language );
+	
+	char fileName[MAX_PATH];
+	V_strcpy_safe( fileName, szFileName );
 
 	// Lowercase the *relative* portion of the filename,
 	// in case people look for "Resource/file.txt" etc.  We always

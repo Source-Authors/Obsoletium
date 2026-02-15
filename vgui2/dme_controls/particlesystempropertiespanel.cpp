@@ -110,7 +110,7 @@ void CParticleFunctionPickerFrame::RefreshParticleFunctions( CDmeParticleSystemD
 
 	// Build a list of used operator IDs
 	bool pUsedIDs[OPERATOR_ID_COUNT];
-	memset( pUsedIDs, 0, sizeof(pUsedIDs) );
+	BitwiseClear( pUsedIDs );
 
 	int nFunctionCount = pParticleSystem->GetParticleFunctionCount( type );
 	for ( int i = 0; i < nFunctionCount; ++i )

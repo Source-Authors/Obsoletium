@@ -32,7 +32,7 @@ Border::Border()
 	_name = NULL;
 	m_eBackgroundType = IBorder::BACKGROUND_FILLED;
 
-	memset(_sides, 0, sizeof(_sides));
+	BitwiseClear(_sides);
 }
 
 //-----------------------------------------------------------------------------

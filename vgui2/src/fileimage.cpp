@@ -172,7 +172,7 @@ void Save32BitTGA(
 	unsigned char *pLine;
 
 
-	memset(&hdr, 0, sizeof(hdr));
+	BitwiseClear(hdr);
 	hdr.m_PixelDepth = 32;
 	hdr.m_ImageType = 10;	// Run-length encoded RGB.
 	hdr.m_Width = pImage->m_Width;

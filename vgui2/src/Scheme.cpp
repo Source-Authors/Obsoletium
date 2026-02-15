@@ -673,13 +673,13 @@ void CScheme::SetFontRange( const char *fontname, int nMin, int nMax )
 void CScheme::LoadFonts()
 {
 	char language[64];
-	memset( language, 0, sizeof( language ) );
+	BitwiseClear( language );
 
 	// get our language
 	bool bValid = vgui::g_pSystem->GetRegistryString( "HKEY_CURRENT_USER\\Software\\Valve\\Source\\Language", language, sizeof( language ) - 1 );
 	if ( !bValid )
 	{
-		Q_strncpy( language, "english", sizeof( language ) );
+		V_strcpy_safe( language, "english" );
 	}
 
 	// add our custom fonts

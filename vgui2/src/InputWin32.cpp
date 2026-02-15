@@ -459,16 +459,16 @@ void CInputSystem::InitInputContext( InputContext_t *pContext )
 	pContext->m_bSetCursorExplicitly = false;
 
 	// zero mouse and keys
-	memset(pContext->_mousePressed, 0, sizeof(pContext->_mousePressed));
-	memset(pContext->_mouseDoublePressed, 0, sizeof(pContext->_mouseDoublePressed));
-	memset(pContext->_mouseDown, 0, sizeof(pContext->_mouseDown));
-	memset(pContext->_mouseReleased, 0, sizeof(pContext->_mouseReleased));
-	memset(pContext->_keyPressed, 0, sizeof(pContext->_keyPressed));
-	memset(pContext->_keyTyped, 0, sizeof(pContext->_keyTyped));
-	memset(pContext->_keyDown, 0, sizeof(pContext->_keyDown));
-	memset(pContext->_keyReleased, 0, sizeof(pContext->_keyReleased));
+	BitwiseClear(pContext->_mousePressed);
+	BitwiseClear(pContext->_mouseDoublePressed);
+	BitwiseClear(pContext->_mouseDown);
+	BitwiseClear(pContext->_mouseReleased);
+	BitwiseClear(pContext->_keyPressed);
+	BitwiseClear(pContext->_keyTyped);
+	BitwiseClear(pContext->_keyDown);
+	BitwiseClear(pContext->_keyReleased);
 
-	pContext->m_MouseCaptureStartCode = (MouseCode)-1;
+	pContext->m_MouseCaptureStartCode = BUTTON_CODE_INVALID;
 
 	pContext->m_KeyCodeUnhandledListeners.RemoveAll();
 

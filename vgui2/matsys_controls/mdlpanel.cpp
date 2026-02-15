@@ -272,7 +272,7 @@ static StudioRenderConfig_t s_StudioRenderConfig;
 
 void CMDLPanel::UpdateStudioRenderConfig( void )
 {
-	memset( &s_StudioRenderConfig, 0, sizeof(s_StudioRenderConfig) );
+	BitwiseClear( s_StudioRenderConfig );
 
 	s_StudioRenderConfig.bEyeMove = !!r_eyemove.GetInt();
 	s_StudioRenderConfig.fEyeShiftX = r_eyeshift_x.GetFloat();

@@ -86,7 +86,7 @@ void CVMTPreviewPanel::DrawIn3DMode( bool b3DMode )
 void CVMTPreviewPanel::SetupLightingState()
 {
 	LightDesc_t desc;
-	memset( &desc, 0, sizeof(desc) );
+	BitwiseClear( desc );
 
 	desc.m_Type = MATERIAL_LIGHT_DIRECTIONAL;
 

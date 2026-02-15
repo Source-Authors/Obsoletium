@@ -738,7 +738,7 @@ static void staticGenerateIconForTexture(Texture *texture, HDC hdc)
 	}
 	*/
 
-	memset(planeAND, 0x00, sizeof(planeAND));
+	BitwiseClear(planeAND);
 	HBITMAP mask = ::CreateBitmap(texture->_wide, texture->_tall, 1, 1, planeAND);
 	RunCodeAtScopeExit(::DeleteObject(mask));
 
@@ -1794,7 +1794,7 @@ typedef struct
 HBITMAP staticCreateBitmapHandle(int wide, int tall, HDC hdc, unsigned short bpp, void **dib)
 {
 	BITMAPINFOHEADER bitmapInfoHeader;
-	memset(&bitmapInfoHeader, 0, sizeof(bitmapInfoHeader));
+	BitwiseClear(bitmapInfoHeader);
 	bitmapInfoHeader.biSize = sizeof(bitmapInfoHeader);
 	bitmapInfoHeader.biWidth = wide;
 	bitmapInfoHeader.biHeight = -tall;
@@ -1802,8 +1802,7 @@ HBITMAP staticCreateBitmapHandle(int wide, int tall, HDC hdc, unsigned short bpp
 	bitmapInfoHeader.biBitCount = bpp;
 	bitmapInfoHeader.biCompression = BI_RGB;
 
-	HBITMAP hRet;
-	hRet = CreateDIBSection(hdc, (BITMAPINFO*)&bitmapInfoHeader, DIB_RGB_COLORS, dib, 0, 0);
+	HBITMAP hRet = CreateDIBSection(hdc, (BITMAPINFO*)&bitmapInfoHeader, DIB_RGB_COLORS, dib, 0, 0);
 	if ( !hRet )
 		Error( "staticCreateBitmapHandle: can't create DIB" );
 
@@ -3597,7 +3596,7 @@ void CWin32Surface::initStaticData()
 	staticDefaultCursor[dc_hand]     =(HICON)LoadCursor(nullptr,(LPCTSTR)32649);
 
 	// make and register a very simple Window Class
-	memset( &staticWndclass,0,sizeof(staticWndclass) );
+	BitwiseClear( staticWndclass );
 	staticWndclass.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
 	staticWndclass.lpfnWndProc = staticProc;
 	staticWndclass.hInstance = GetModuleHandle(NULL);

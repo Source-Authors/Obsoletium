@@ -84,19 +84,15 @@ static BOOL CALLBACK GetMainApplicationWindowHWND_EnumProc( HWND hWnd, LPARAM lP
 
 static HWND GetMainApplicationWindowHWND()
 {
-	HWND hWnd = NULL;
-
 	//
 	// Pass 1: calling on a GUI thread
 	//
 	DWORD dwThreadId = GetCurrentThreadId();
 
-	GUITHREADINFO gti;
-	memset( &gti, 0, sizeof( gti ) );
-	gti.cbSize = sizeof( gti );
+	GUITHREADINFO gti = {sizeof(gti)};
 	GetGUIThreadInfo( dwThreadId, &gti );
 
-	hWnd = gti.hwndActive;
+	HWND hWnd = gti.hwndActive;
 	for ( HWND hParent = hWnd ? GetParent( hWnd ) : hWnd;
 		hParent; hWnd = hParent, hParent = GetParent( hWnd ) )
 		continue;
@@ -105,7 +101,7 @@ static HWND GetMainApplicationWindowHWND()
 		return hWnd;
 
 	//
-	// Pass 2: non-GUI thread requiring the main winow
+	// Pass 2: non-GUI thread requiring the main window
 	//
 	EnumWindows( GetMainApplicationWindowHWND_EnumProc, ( LPARAM ) &hWnd );
 	if ( hWnd )

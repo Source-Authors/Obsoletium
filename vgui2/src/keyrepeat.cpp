@@ -81,7 +81,7 @@ void CKeyRepeatHandler::Reset()
 { 
 	DbgRepeat( "KeyRepeat: Reset\n" );
 
-	memset( m_bAliasDown, 0, sizeof( m_bAliasDown ) ); 
+	BitwiseClear( m_bAliasDown ); 
 	m_bHaveKeyDown = false; 
 }
 
