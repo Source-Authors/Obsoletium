@@ -342,9 +342,8 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindOrAddFileName( const char *pFileNa
 	char fn[ MAX_PATH ];
 	V_strcpy_safe( fn, pFileName );
 	V_RemoveDotSlashes( fn );
-#ifdef _WIN32
+	// dimhotepus: Do on all platforms.  See https://github.com/ValveSoftware/source-sdk-2013/issues/865
 	V_strlower( fn );
-#endif
 
 	// Split the filename into constituent parts
 	char basepath[ MAX_PATH ];
@@ -376,9 +375,8 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindFileName( const char *pFileName )
 	char fn[ MAX_PATH ];
 	V_strcpy_safe( fn, pFileName );
 	V_RemoveDotSlashes( fn );
-#ifdef _WIN32
+	// dimhotepus: Do on all platforms.  See https://github.com/ValveSoftware/source-sdk-2013/issues/865
 	V_strlower( fn );
-#endif
 
 	// Split the filename into constituent parts
 	char basepath[ MAX_PATH ];
