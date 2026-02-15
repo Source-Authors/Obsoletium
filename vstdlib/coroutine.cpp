@@ -265,9 +265,9 @@ public:
 		m_hCoroutine = -1;
 #endif
 #ifdef _M_X64
-		memset( m_rgubRegisters, 0, sizeof(m_rgubRegisters) );
+		BitwiseClear( m_rgubRegisters );
 		m_nAlignmentBytes = CalcAlignOffset( m_rgubRegisters );
-#endif	
+#endif
 #if defined( VPROF_ENABLED )
 		m_pVProfNodeScope = nullptr;
 #endif

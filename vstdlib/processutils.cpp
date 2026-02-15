@@ -122,9 +122,7 @@ void CProcessUtils::Shutdown()
 
 ProcessHandle_t CProcessUtils::CreateProcess( ProcessInfo_t &info, bool bConnectStdPipes )
 {
-	STARTUPINFO si;
-	memset(&si, 0, sizeof si);
-	si.cb = sizeof(si);
+	STARTUPINFO si = {sizeof(si)};
 	if ( bConnectStdPipes )
 	{
 		si.dwFlags = STARTF_USESTDHANDLES | STARTF_UNTRUSTEDSOURCE;
