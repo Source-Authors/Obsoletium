@@ -261,7 +261,7 @@ public:
 	// (skipping whitespace that leads + trails both delimiters).
 	// If successful, the get index is advanced and the function returns true,
 	// otherwise the index is not advanced and the function returns false.
-	[[nodiscard]] bool			ParseToken( const char *pStartingDelim, const char *pEndingDelim, char* pString, intp nMaxLen );
+	[[nodiscard]] bool			ParseToken( const char *pStartingDelim, const char *pEndingDelim, OUT_Z_CAP(nMaxLen) char* pString, intp nMaxLen );
 
 	// (For text buffers only)
 	// Parse a token from the buffer:
@@ -270,7 +270,7 @@ public:
 	// If successful, the get index is advanced and the function returns true,
 	// otherwise the index is not advanced and the function returns false.
 	template<intp size>
-	[[nodiscard]] bool ParseToken( const char *pStartingDelim, const char *pEndingDelim, char (&pString)[size] )
+	[[nodiscard]] bool ParseToken( const char *pStartingDelim, const char *pEndingDelim, OUT_Z_ARRAY char (&pString)[size] )
 	{
 		return ParseToken( pStartingDelim, pEndingDelim, pString, size );
 	}
@@ -282,12 +282,12 @@ public:
 
 	// Parses the next token, given a set of character breaks to stop at
 	// Returns the length of the token parsed in bytes (-1 if none parsed)
-	[[nodiscard]] intp			ParseToken( const characterset_t *pBreaks, char *pTokenBuf, intp nMaxLen, bool bParseComments = true );
+	[[nodiscard]] intp			ParseToken( const characterset_t *pBreaks, OUT_Z_CAP(nMaxLen) char *pTokenBuf, intp nMaxLen, bool bParseComments = true );
 
 	// Parses the next token, given a set of character breaks to stop at
 	// Returns the length of the token parsed in bytes (-1 if none parsed)
 	template<intp size>
-	[[nodiscard]] intp ParseToken( const characterset_t *pBreaks, char (&pTokenBuf)[size], bool bParseComments = true )
+	[[nodiscard]] intp ParseToken( const characterset_t *pBreaks, OUT_Z_ARRAY char (&pTokenBuf)[size], bool bParseComments = true )
 	{
 		return ParseToken( pBreaks, pTokenBuf, size, bParseComments );
 	}

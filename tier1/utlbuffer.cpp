@@ -1359,8 +1359,12 @@ bool CUtlBuffer::GetToken( const char *pToken )
 // If successful, the get index is advanced and the function returns true,
 // otherwise the index is not advanced and the function returns false.
 //-----------------------------------------------------------------------------
-bool CUtlBuffer::ParseToken( const char *pStartingDelim, const char *pEndingDelim, char* pString, intp nMaxLen )
+bool CUtlBuffer::ParseToken( const char *pStartingDelim, const char *pEndingDelim, OUT_Z_CAP(nMaxLen) char* pString, intp nMaxLen )
 {
+	Assert( nMaxLen > 0 );
+	if ( nMaxLen > 0 )
+		pString[0] = '\0';
+
 	intp nCharsToCopy = 0;
 	intp nCurrentGet = 0;
 
@@ -1438,9 +1442,10 @@ parseFailed:
 //-----------------------------------------------------------------------------
 // Parses the next token, given a set of character breaks to stop at
 //-----------------------------------------------------------------------------
-intp CUtlBuffer::ParseToken( const characterset_t *pBreaks, char *pTokenBuf, intp nMaxLen, bool bParseComments )
+intp CUtlBuffer::ParseToken( const characterset_t *pBreaks, OUT_Z_CAP(nMaxLen) char *pTokenBuf, intp nMaxLen, bool bParseComments )
 {
 	Assert( nMaxLen > 0 );
+	if ( nMaxLen > 0 )
 	pTokenBuf[0] = 0;
 
 	// skip whitespace + comments
