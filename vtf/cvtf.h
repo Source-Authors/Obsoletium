@@ -382,7 +382,7 @@ private:
 	// Used while fixing mipmap edges.
 	CUtlVector<S3RGBA> m_OriginalData;
 
-	// Alpha threshholds
+	// Alpha thresholds
 	float			m_flAlphaThreshhold;
 	float			m_flAlphaHiFreqThreshhold;
 
@@ -395,11 +395,9 @@ private:
 
 	struct ResourceMemorySection
 	{
-		ResourceMemorySection() { memset( this, 0, sizeof( *this ) ); }
-
-		intp				m_nDataAllocSize;
-		intp				m_nDataLength;
-		unsigned char	*m_pData;
+		intp				m_nDataAllocSize = 0;
+		intp				m_nDataLength = 0;
+		unsigned char		*m_pData = nullptr;
 
 		bool AllocateData( intp nMemorySize );
 		bool LoadData( CUtlBuffer &buf, CByteswap &byteSwap );
