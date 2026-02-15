@@ -342,7 +342,7 @@ virtualmeshhull_t *CVPhysicsVirtualMeshWriter::CreatePackedHullFromLedges( const
 	if ( 1 )
 	{
 		virtualmeshhull_t tmp;
-		Q_memset( &tmp, 0, sizeof(tmp) );
+		BitwiseClear( tmp );
 		tmp.hullCount = ledgeCount;
 		buf.Put(&tmp, sizeof(tmp));
 	}
