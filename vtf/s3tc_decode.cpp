@@ -234,9 +234,9 @@ static void GenerateRepresentativePalette(
 	}
 	
 	DDSURFACEDESC descIn;
+	BitwiseClear( descIn );
 	DDSURFACEDESC descOut;
-	memset( &descIn, 0, sizeof(descIn) );
-	memset( &descOut, 0, sizeof(descOut) );
+	BitwiseClear( descOut );
 
 	descIn.dwSize = sizeof(descIn);
 	descIn.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_LPSURFACE | DDSD_PIXELFORMAT;
