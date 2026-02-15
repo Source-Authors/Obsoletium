@@ -1245,7 +1245,7 @@ bool CPackedStore::HashEntirePackFile( CPackedStoreFileHandle &handle, int64 &nF
 #endif
 	nFileSize = fileLength;
 	MD5Context_t ctx;
-	memset(&ctx, 0, sizeof(MD5Context_t));
+	BitwiseClear(ctx);
 	MD5Init(&ctx);
 
 	int nDesiredPos = nFileFraction;
@@ -1366,7 +1366,7 @@ void CPackedStore::HashAllChunkFiles()
 void CPackedStore::ComputeDirectoryHash( MD5Value_t &md5Directory )
 {
 	MD5Context_t ctx;
-	memset(&ctx, 0, sizeof(MD5Context_t));
+	BitwiseClear(ctx);
 	MD5Init(&ctx);
 	MD5Update(&ctx, m_DirectoryData.Base(), m_DirectoryData.Count() );
 	MD5Final( md5Directory.bits, &ctx);
@@ -1376,7 +1376,7 @@ void CPackedStore::ComputeDirectoryHash( MD5Value_t &md5Directory )
 void CPackedStore::ComputeChunkHash( MD5Value_t &md5ChunkHashes )
 {
 	MD5Context_t ctx;
-	memset(&ctx, 0, sizeof(MD5Context_t));
+	BitwiseClear(ctx);
 	MD5Init(&ctx);
 	MD5Update(&ctx, m_vecChunkHashFraction.Base(), size_cast<unsigned>(m_vecChunkHashFraction.Count()*sizeof(m_vecChunkHashFraction[0])) );
 	MD5Final( md5ChunkHashes.bits, &ctx);
