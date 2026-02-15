@@ -101,10 +101,6 @@ public:
 	// create from an RGBA float bitmap. alpha ignored.
 	void CreateFromRGBA_FloatImageData(int srcwidth, int srcheight, float const *srcdata );
 
-	// create from 3 fields in a csoa
-	void CreateFromCSOAAttributes( CSOAContainer const *pSrc,
-								   int nAttrIdx0, int nAttrIdx1, int nAttrIdx2 );
-
 	// Element access. If you are calling this a lot, you don't want to use this class, because
 	// you're not getting the sse advantage
 	[[nodiscard]] Vector Element(int x, int y) const
