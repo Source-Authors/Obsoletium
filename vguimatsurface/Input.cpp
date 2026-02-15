@@ -89,7 +89,7 @@ static LRESULT CALLBACK MatSurfaceWindowProc( HWND hwnd, UINT uMsg, WPARAM wPara
 		goto chainWndProc;
 
 	InputEvent_t event;
-	memset( &event, 0, sizeof(event) );
+	BitwiseClear( event );
 	event.m_nTick = g_pInputSystem->GetPollTick();
 
 	if ( hwnd != s_hLastHWnd )

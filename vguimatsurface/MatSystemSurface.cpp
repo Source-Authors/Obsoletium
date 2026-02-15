@@ -4238,8 +4238,8 @@ static bool GetIconBits( HDC hdc, ICONINFO& iconInfo, int& w, int& h, unsigned c
 	DWORD *output = (DWORD *)rgba;
 
 	BITMAPINFO bmInfo;
+	BitwiseClear( bmInfo );
 
-	memset( &bmInfo, 0, sizeof( bmInfo ) );
 	bmInfo.bmiHeader.biSize = sizeof( bmInfo.bmiHeader );
 	bmInfo.bmiHeader.biWidth = w; 
     bmInfo.bmiHeader.biHeight = h; 

@@ -221,7 +221,9 @@ void InitSoftwareCursors()
 	if( s_bSoftwareCursorsInitialized )
 		return;
 
-	memset( s_rfSoftwareCursorOffset, 0, sizeof( s_rfSoftwareCursorOffset ) );
+	// dimhotepus: 0.0f is 0 byte.
+	static_assert(std::numeric_limits<float>::is_iec559);
+	BitwiseClear( s_rfSoftwareCursorOffset );
 
 	s_rnSoftwareCursorID[dc_none]     = -1;
 	s_rnSoftwareCursorID[dc_arrow]    =InitSoftwareCursorTexture( "vgui/cursors/arrow" );
