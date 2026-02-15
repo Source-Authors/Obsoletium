@@ -446,7 +446,7 @@ void CVTFTexture::SetReflectivity( const Vector &vecReflectivity )
 	VectorCopy( vecReflectivity, m_vecReflectivity );
 }
 
-// Sets threshhold values for alphatest mipmapping
+// Sets threshold values for alpha test mipmapping
 void CVTFTexture::SetAlphaTestThreshholds( float flBase, float flHighFreq )
 {
 	m_flAlphaThreshhold = flBase;
@@ -836,7 +836,7 @@ bool CVTFTexture::ResourceMemorySection::LoadData( CUtlBuffer &buf, CByteswap &b
 bool CVTFTexture::ResourceMemorySection::WriteData( CUtlBuffer &buf ) const
 {
 	Assert( m_nDataLength && m_pData );
-	// dimhotepus(x64): Oh, unable to bump to size_t as data will not be interchangable between x86 & x64.
+	// dimhotepus(x64): Oh, unable to bump to size_t as data will not be interchangeable between x86 & x64.
 	int iBufSize = static_cast<int>(m_nDataLength);
 	
 	buf.Put( &iBufSize, sizeof( iBufSize ) );
@@ -2587,7 +2587,7 @@ void CVTFTexture::PutOneOverMipLevelInAlpha()
 //-----------------------------------------------------------------------------
 void CVTFTexture::ComputeReflectivity( )
 {
-	// HDRFIXME: fix this when we ahve a new intermediate format
+	// HDRFIXME: fix this when we have a new intermediate format
 	if( m_Format != IMAGE_FORMAT_RGBA8888 )
 	{
 		m_vecReflectivity.Init( 0.2f, 0.2f, 0.2f );
