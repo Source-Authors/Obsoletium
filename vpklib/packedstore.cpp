@@ -386,9 +386,9 @@ CPackedStore::CPackedStore( char const *pFileBasename, char *pszFName, intp fnam
 #endif
 
 			// now read the self hashes
-			V_memset( m_DirectoryMD5.bits, 0, sizeof(m_DirectoryMD5.bits) );
-			V_memset( m_ChunkHashesMD5.bits, 0, sizeof(m_ChunkHashesMD5.bits) );
-			V_memset( m_TotalFileMD5.bits, 0, sizeof(m_TotalFileMD5.bits) );
+			BitwiseClear( m_DirectoryMD5.bits );
+			BitwiseClear( m_ChunkHashesMD5.bits );
+			BitwiseClear( m_TotalFileMD5.bits );
 			if ( dirHeader.m_nSelfHashesSize == 3*sizeof(m_DirectoryMD5.bits) )
 			{
 				// first is an MD5 of directory data
