@@ -126,7 +126,7 @@ SQInteger attribute(HSQUIRRELVM v) {
 }
 
 SQDbgServer::SQDbgServer(HSQUIRRELVM v) {
-  memset(&xmlstate, 0, sizeof(xmlstate));
+  BitwiseClear(xmlstate);
   _xmlcurrentement = 0;
   _ready = false;
   _nestedcalls = 0;

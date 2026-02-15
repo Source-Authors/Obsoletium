@@ -36,7 +36,7 @@ HSQREMOTEDBG sq_rdbg_init(HSQUIRRELVM v, unsigned short port,
   rdbg->_accept = socket(AF_INET, SOCK_STREAM, 0);
 
   sockaddr_in bindaddr;
-  memset(&bindaddr, 0, sizeof(bindaddr));
+  BitwiseClear(bindaddr);
   bindaddr.sin_family = AF_INET;
   bindaddr.sin_port = htons(port);
   bindaddr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -114,7 +114,7 @@ SQRESULT sq_rdbg_update(HSQREMOTEDBG rdbg) {
     char c, prev = '\0';
 
     char temp[1024];
-    memset(&temp, 0, sizeof(temp));
+    BitwiseClear(temp);
 
     int res;
     FD_CLR(rdbg->_endpoint, &read_flags);
