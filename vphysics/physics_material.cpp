@@ -416,7 +416,7 @@ intp CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *
 		if ( !strcmp(value, "{") )
 		{
 			CSurface prop;
-			memset( &prop.data, 0, sizeof(prop.data) );
+			BitwiseClear( prop.data );
 			prop.m_name = m_strings.AddString( key );
 			intp baseMaterial = GetSurfaceIndex( key );
 			if ( baseMaterial < 0 )
@@ -574,7 +574,7 @@ intp CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *
 		CSurface prop;
 		
 		int baseMaterial = GetSurfaceIndex( "default" );
-		memset( &prop.data, 0, sizeof(prop.data) );
+		BitwiseClear( prop.data );
 		prop.m_name = m_strings.AddString( GetReservedMaterialName(MATERIAL_INDEX_SHADOW) );
 		CopyPhysicsProperties( &prop, baseMaterial );
 		prop.data.physics.elasticity = 1e-3f;

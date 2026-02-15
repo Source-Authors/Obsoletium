@@ -46,7 +46,7 @@ class CPhysicsCollision final : public IPhysicsCollision
 public:
 	CPhysicsCollision()
 	{
-		memset(m_bboxVertMap, 0, sizeof(m_bboxVertMap));
+		BitwiseClear(m_bboxVertMap);
 	}
 	CPhysConvex	*ConvexFromVerts( Vector **pVerts, int vertCount ) override;
 	CPhysConvex	*ConvexFromVertsFast( Vector **pVerts, int vertCount );
@@ -1620,7 +1620,7 @@ float CPhysicsCollision::CollideSurfaceArea( CPhysCollide *pCollide )
 // loads a set of solids into a vcollide_t
 void CPhysicsCollision::VCollideLoad( vcollide_t *pOutput, int solidCount, const char *pBuffer, int bufferSize, bool swap )
 {
-	memset( pOutput, 0, sizeof(*pOutput) );
+	BitwiseClear( *pOutput );
 	int position = 0;
 
 	pOutput->solidCount = solidCount;
@@ -1686,7 +1686,7 @@ void CPhysicsCollision::VCollideUnload( vcollide_t *pVCollide )
 	}
 	delete[] pVCollide->solids;
 	delete[] pVCollide->pKeyValues;
-	memset( pVCollide, 0, sizeof(*pVCollide) );
+	BitwiseClear( *pVCollide );
 }
 
 // begins parsing a vcollide.  NOTE: This keeps pointers to the vcollide_t

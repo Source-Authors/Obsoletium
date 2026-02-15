@@ -373,7 +373,7 @@ CVehicleController::CVehicleController()
 	// dimhotepus: Use safe defaults.
 	m_pEnv = nullptr;
 	m_pGameTrace = nullptr;
-	memset( &m_vehicleData, 0, sizeof(m_vehicleData) );
+	BitwiseClear( m_vehicleData );
 	// dimhotepus: Unknown vehicle type.
 	m_nVehicleType = 0;
 
@@ -385,15 +385,12 @@ void CVehicleController::ResetState()
 {
 	m_pCarSystem = NULL;
 	m_flVelocity[0] = m_flVelocity[1]= m_flVelocity[2] = 0.0f;
-	for ( int i = 0; i < VEHICLE_MAX_WHEEL_COUNT; i++ )
-	{
-		m_pWheels[i] = NULL;
-	}
+	BitwiseClear( m_pWheels );
 	m_pCarBody = NULL;
 	m_torqueScale = 1;
 	m_wheelCount = 0;
 	m_wheelRadius = 0;
-	memset( &m_currentState, 0, sizeof(m_currentState) );
+	BitwiseClear( m_currentState );
 	m_bodyMass = 0;
 	// dimhotepus: Need to reset total wheel mass, too.
 	m_totalWheelMass = 0;
@@ -520,7 +517,7 @@ IVP_Real_Object *CVehicleController::CreateWheel( int wheelIndex, vehicle_axlepa
 	}
 
 	objectparams_t params;
-	memset( &params, 0, sizeof(params) );
+	BitwiseClear( params );
 
 	Vector bodyPosition;
 	QAngle bodyAngles;
@@ -591,7 +588,7 @@ void CVehicleController::CreateTraceData( int wheelIndex, vehicle_axleparams_t &
 		return;
 
 	objectparams_t params;
-	memset( &params, 0, sizeof( params ) );
+	BitwiseClear( params );
 
 	Vector bodyPosition;
 	QAngle bodyAngles;
@@ -1364,7 +1361,7 @@ void CVehicleController::CalcEngine( float throttle, float brake_val, bool handb
 void CVehicleController::GetCarSystemDebugData( vehicle_debugcarsystem_t &debugCarSystem )
 {
 	IVP_CarSystemDebugData_t carSystemDebugData;
-	memset(&carSystemDebugData,0,sizeof(carSystemDebugData));
+	memset( &carSystemDebugData,0,sizeof(carSystemDebugData) );
 	m_pCarSystem->GetCarSystemDebugData( carSystemDebugData );
 
 	// Raycast car wheel trace data.

@@ -2439,5 +2439,5 @@ CVisitHash::CVisitHash()
 {
 	m_vertVisitID = 1;
 	m_isInUse = 0;
-	memset( m_vertVisit, 0, sizeof(m_vertVisit) );
+	BitwiseClear( m_vertVisit );
 }

@@ -69,9 +69,8 @@ static void ReadVector4D( const char *pString, Vector4D& out )
 class CVPhysicsParse final : public IVPhysicsKeyParser
 {
 public:
-				~CVPhysicsParse() {}
-
 				CVPhysicsParse( const char *pKeyData );
+				~CVPhysicsParse() = default;
 	void		NextBlock( void );
 
 	const char *GetCurrentBlockName( void ) override;
@@ -145,6 +144,7 @@ void CVPhysicsParse::ParseSolid( solid_t *pSolid, IVPhysicsKeyHandler *unknownKe
 {
 	char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
 	key[0] = 0;
+	value[0] = 0;
 
 	if ( unknownKeyHandler )
 	{
@@ -237,6 +237,8 @@ void CVPhysicsParse::ParseRagdollConstraint( constraint_ragdollparams_t *pConstr
 	char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
 
 	key[0] = 0;
+	value[0] = 0;
+
 	if ( unknownKeyHandler )
 	{
 		unknownKeyHandler->SetDefaults( pConstraint );
@@ -329,6 +331,8 @@ void CVPhysicsParse::ParseFluid( fluid_t *pFluid, IVPhysicsKeyHandler *unknownKe
 	char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
 
 	key[0] = 0;
+	value[0] = 0;
+
 	pFluid->index = -1;
 	if ( unknownKeyHandler )
 	{
@@ -394,6 +398,8 @@ void CVPhysicsParse::ParseSurfaceTable( intp *table, IVPhysicsKeyHandler *unknow
 	char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
 
 	key[0] = 0;
+	value[0] = 0;
+
 	while ( m_pText )
 	{
 		m_pText = ParseKeyvalue( m_pText, key, value );
@@ -417,6 +423,8 @@ void CVPhysicsParse::ParseSurfaceTablePacked( CUtlVector<char> &out )
 	char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
 
 	key[0] = 0;
+	value[0] = 0;
+
 	int lastIndex = 0;
 	while ( m_pText )
 	{
@@ -440,8 +448,11 @@ void CVPhysicsParse::ParseVehicleAxle( vehicle_axleparams_t &axle )
 {
 	char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
 
-	memset( &axle, 0, sizeof(axle) );
+	BitwiseClear( axle );
+
 	key[0] = 0;
+	value[0] = 0;
+
 	while ( m_pText )
 	{
 		m_pText = ParseKeyvalue( m_pText, key, value );
@@ -493,6 +504,8 @@ void CVPhysicsParse::ParseVehicleWheel( vehicle_wheelparams_t &wheel )
 	char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
 
 	key[0] = 0;
+	value[0] = 0;
+
 	while ( m_pText )
 	{
 		m_pText = ParseKeyvalue( m_pText, key, value );
@@ -548,6 +561,8 @@ void CVPhysicsParse::ParseVehicleSuspension( vehicle_suspensionparams_t &suspens
 	char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
 
 	key[0] = 0;
+	value[0] = 0;
+
 	while ( m_pText )
 	{
 		m_pText = ParseKeyvalue( m_pText, key, value );
@@ -587,6 +602,8 @@ void CVPhysicsParse::ParseVehicleBody( vehicle_bodyparams_t &body )
 	char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
 
 	key[0] = 0;
+	value[0] = 0;
+
 	while ( m_pText )
 	{
 		m_pText = ParseKeyvalue( m_pText, key, value );
@@ -638,6 +655,8 @@ void CVPhysicsParse::ParseVehicleEngineBoost( vehicle_engineparams_t &engine )
 	char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
 
 	key[0] = 0;
+	value[0] = 0;
+
 	while ( m_pText )
 	{
 		m_pText = ParseKeyvalue( m_pText, key, value );
@@ -677,6 +696,8 @@ void CVPhysicsParse::ParseVehicleEngine( vehicle_engineparams_t &engine )
 	char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
 
 	key[0] = 0;
+	value[0] = 0;
+
 	while ( m_pText )
 	{
 		m_pText = ParseKeyvalue( m_pText, key, value );
@@ -768,6 +789,8 @@ void CVPhysicsParse::ParseVehicleSteering( vehicle_steeringparams_t &steering )
 	char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
 
 	key[0] = 0;
+	value[0] = 0;
+
 	while ( m_pText )
 	{
 		m_pText = ParseKeyvalue( m_pText, key, value );
@@ -863,13 +886,15 @@ void CVPhysicsParse::ParseVehicle( vehicleparams_t *pVehicle, IVPhysicsKeyHandle
 	char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
 
 	key[0] = 0;
+	value[0] = 0;
+
 	if ( unknownKeyHandler )
 	{
 		unknownKeyHandler->SetDefaults( pVehicle );
 	}
 	else
 	{
-		memset( pVehicle, 0, sizeof(*pVehicle) );
+		BitwiseClear( *pVehicle );
 	}
 
 	while ( m_pText )
@@ -930,6 +955,8 @@ void CVPhysicsParse::ParseCustom( void *pCustom, IVPhysicsKeyHandler *unknownKey
 	char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
 
 	key[0] = 0;
+	value[0] = 0;
+
 	int indent = 0;
 	if ( unknownKeyHandler )
 	{

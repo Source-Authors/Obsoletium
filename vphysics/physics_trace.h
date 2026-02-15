@@ -232,7 +232,7 @@ inline void CVisitHash::NewVisit( void )
 	m_vertVisitID++;
 	if ( m_vertVisitID == 0 )
 	{
-		memset( m_vertVisit, 0, sizeof(m_vertVisit) );
+		BitwiseClear( m_vertVisit );
 	}
 }
 

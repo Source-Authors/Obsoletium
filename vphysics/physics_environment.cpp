@@ -1388,7 +1388,7 @@ bool CPhysicsEnvironment::TransferObject( IPhysicsObject *pObject, IPhysicsEnvir
 
 	//templatize the object
 	vphysics_save_cphysicsobject_t objectTemplate;
-	memset( &objectTemplate, 0, sizeof( vphysics_save_cphysicsobject_t ) );	
+	BitwiseClear( objectTemplate );	
 	pPhysics->WriteToTemplate( objectTemplate );
 
 	//these should be detached already
