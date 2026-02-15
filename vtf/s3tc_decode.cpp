@@ -47,7 +47,7 @@ struct S3TCBlock_DXT5
 // ------------------------------------------------------------------------------------------ //
 
 template<typename T>
-T ReadBitInt( const char *pBits, T iBaseBit, T nBits )
+static [[nodiscard]] T ReadBitInt( const char *pBits, T iBaseBit, T nBits )
 {
 	T ret = 0;
 	for ( T i=0; i < nBits; i++ )
@@ -60,7 +60,7 @@ T ReadBitInt( const char *pBits, T iBaseBit, T nBits )
 	return ret;
 }
 
-void WriteBitInt( char *pBits, int iBaseBit, int nBits, int val )
+static void WriteBitInt( char *pBits, int iBaseBit, int nBits, int val )
 {
 	for ( int i=0; i < nBits; i++ )
 	{
@@ -71,7 +71,7 @@ void WriteBitInt( char *pBits, int iBaseBit, int nBits, int val )
 	}
 }
 
-int S3TC_BytesPerBlock( ImageFormat format )
+static int S3TC_BytesPerBlock( ImageFormat format )
 {
 	if ( format == IMAGE_FORMAT_DXT1 || format == IMAGE_FORMAT_ATI1N )
 	{
@@ -205,7 +205,7 @@ char* S3TC_GetBlock(
 }
 
 
-void GenerateRepresentativePalette(
+static void GenerateRepresentativePalette(
 	[[maybe_unused]] ImageFormat format,
 	[[maybe_unused]] S3RGBA **pOriginals,	// Original RGBA colors in the texture. This allows it to avoid doubly compressing.
 	[[maybe_unused]] int nBlocks,

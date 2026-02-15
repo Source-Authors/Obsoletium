@@ -314,7 +314,8 @@ bool CVTFTexture::AllocateLowResImageData( intp nMemorySize )
 	return GenericAllocateReusableData( &m_pLowResImageData, &m_nLowResImageAllocSize, nMemorySize );
 }
 
-inline bool IsMultipleOf4( int value )
+[[nodiscard]]
+static constexpr inline bool IsMultipleOf4( int value )
 {
 	// NOTE: This catches powers of 2 less than 4 also
 	return ( value <= 2 ) || ( (value & 0x3) == 0 );
@@ -2844,7 +2845,7 @@ void CVTFTexture::SetupTextureEdgeIncrements(
 	SetupEdgeIncrement( incs->iFace2Start, incs->iFace2End, incs->iFace2Inc );
 }
 
-void BlendTexels( unsigned char **texels, int nTexels )
+static void BlendTexels( unsigned char **texels, int nTexels )
 {
 	int sum[4] = { 0, 0, 0, 0 };
 	int i;
