@@ -2107,21 +2107,20 @@ void CInputSystem::OnChangeIME( bool forward )
 	ASSERT_IF_IME_NYI();
 
 #ifdef DO_IME
-	HKL currentKb = GetKeyboardLayout( 0 );
+	HKL currentKb = ::GetKeyboardLayout( 0 );
 
-	int numKBs = GetKeyboardLayoutList( 0, NULL );
+	int numKBs = ::GetKeyboardLayoutList( 0, NULL );
 	if ( numKBs > 0 )
 	{
-		HKL *list = new HKL[ numKBs ];
-
-		GetKeyboardLayoutList( numKBs, list );
+		std::unique_ptr<HKL[]> list = std::make_unique<HKL[]>( numKBs );
+		::GetKeyboardLayoutList( numKBs, list.get() );
 
 		intp oldKb = 0;
-		CUtlVector< HKL >	selections;
+		CUtlVector< HKL > selections;
 
 		for ( int i = 0; i < numKBs; ++i )
 		{
-			bool first = !IsIDInList( LOWORD( list[ i ] ), i, list );
+			bool first = !IsIDInList( LOWORD( list[ i ] ), i, list.get() );
 			if ( !first )
 				continue;
 
@@ -2146,8 +2145,6 @@ void CInputSystem::OnChangeIME( bool forward )
 
 		unsigned short langid = LOWORD( selections[ oldKb ] );
 		SpewIMEInfo( langid );
-
-		delete[] list;
 	}
 #endif
 }
@@ -2227,18 +2224,17 @@ int CInputSystem::GetIMELanguageList( LanguageItem *dest, int destcount )
 #ifdef DO_IME
 	int iret = 0;
 
-	int numKBs = GetKeyboardLayoutList( 0, NULL );
+	int numKBs = ::GetKeyboardLayoutList( 0, NULL );
 	if ( numKBs > 0 )
 	{
-		HKL *list = new HKL[ numKBs ];
-
-		GetKeyboardLayoutList( numKBs, list );
+		std::unique_ptr<HKL[]> list = std::make_unique<HKL[]>( numKBs );
+		::GetKeyboardLayoutList( numKBs, list.get() );
 
 		CUtlVector< HKL >	selections;
 
 		for ( int i = 0; i < numKBs; ++i )
 		{
-			bool first = !IsIDInList( LOWORD( list[ i ] ), i, list );
+			bool first = !IsIDInList( LOWORD( list[ i ] ), i, list.get() );
 			if ( !first )
 				continue;
 
@@ -2265,8 +2261,6 @@ int CInputSystem::GetIMELanguageList( LanguageItem *dest, int destcount )
 				p->active = hkl == GetKeyboardLayout( 0 );
 			}
 		}
-
-		delete[] list;
 	}
 	return iret;
 #else
