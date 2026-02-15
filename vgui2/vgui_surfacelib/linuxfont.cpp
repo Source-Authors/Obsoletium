@@ -295,7 +295,7 @@ bool CLinuxFont::CreateFromMemory(const char *windowsFontName, void *data, int d
 
 				FT_Size_RequestRec req;
 
-				Q_memset( &req, 0, sizeof( req ) );
+				BitwiseClear( req );
 				req.type           = FT_SIZE_REQUEST_TYPE_REAL_DIM;
 				req.width          = INT_2FIXED6( width );
 				req.height         = INT_2FIXED6( m_iHeightRequested );
