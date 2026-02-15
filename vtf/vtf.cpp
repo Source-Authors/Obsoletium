@@ -99,7 +99,7 @@ S3PaletteIndex S3TC_GetPaletteIndex(
         int y )
 {
 	S3PaletteIndex nullPalette;
-	memset(&nullPalette, 0x0, sizeof(nullPalette));
+	BitwiseClear(nullPalette);
 	return nullPalette;
 }
 
