@@ -1361,7 +1361,7 @@ void CVehicleController::CalcEngine( float throttle, float brake_val, bool handb
 void CVehicleController::GetCarSystemDebugData( vehicle_debugcarsystem_t &debugCarSystem )
 {
 	IVP_CarSystemDebugData_t carSystemDebugData;
-	memset( &carSystemDebugData,0,sizeof(carSystemDebugData) );
+	memset( &carSystemDebugData, 0, sizeof(carSystemDebugData) );
 	m_pCarSystem->GetCarSystemDebugData( carSystemDebugData );
 
 	// Raycast car wheel trace data.
