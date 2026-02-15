@@ -208,7 +208,7 @@ void UpdateLogoWAD( void *phdib, int r, int g, int b )
 		return;
 	// Generate lump
 
-	unsigned char *buf = (unsigned char *)_alloca( 16384 );
+	unsigned char *buf = stackallocT( unsigned char, 16384 );
 
 	CUtlBuffer buffer( (intp)0, 16384 );
 
