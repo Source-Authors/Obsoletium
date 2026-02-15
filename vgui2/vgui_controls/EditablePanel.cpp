@@ -387,8 +387,8 @@ void AddSolidToTree(leaf_t *leaf, int x, int y, int wide, int tall)
 			// create 2 new leaves
 			leaf_t *left = AllocLeaf();
 			leaf_t *right = AllocLeaf();
-			memset(left, 0, sizeof(leaf_t));
-			memset(right, 0, sizeof(leaf_t));
+			BitwiseClear(*left);
+			BitwiseClear(*right);
 			leaf->left = left;
 			leaf->right = right;
 
@@ -414,8 +414,8 @@ void AddSolidToTree(leaf_t *leaf, int x, int y, int wide, int tall)
 			// create 2 new leaves (facing to the east)
 			leaf_t *left = AllocLeaf();
 			leaf_t *right = AllocLeaf();
-			memset(left, 0, sizeof(leaf_t));
-			memset(right, 0, sizeof(leaf_t));
+			BitwiseClear(*left);
+			BitwiseClear(*right);
 			leaf->left = left;
 			leaf->right = right;
 
@@ -441,8 +441,8 @@ void AddSolidToTree(leaf_t *leaf, int x, int y, int wide, int tall)
 			// create 2 new leaves
 			leaf_t *left = AllocLeaf();
 			leaf_t *right = AllocLeaf();
-			memset(left, 0, sizeof(leaf_t));
-			memset(right, 0, sizeof(leaf_t));
+			BitwiseClear(*left);
+			BitwiseClear(*right);
 			leaf->left = left;
 			leaf->right = right;
 
@@ -468,8 +468,8 @@ void AddSolidToTree(leaf_t *leaf, int x, int y, int wide, int tall)
 			// create 2 new leaves (facing to the east)
 			leaf_t *left = AllocLeaf();
 			leaf_t *right = AllocLeaf();
-			memset(left, 0, sizeof(leaf_t));
-			memset(right, 0, sizeof(leaf_t));
+			BitwiseClear(*left);
+			BitwiseClear(*right);
 			leaf->left = left;
 			leaf->right = right;
 

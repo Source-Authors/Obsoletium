@@ -350,7 +350,7 @@ bool AnimationController::ParseScriptFile(char *pMem, intp length)
 			// create a new command
 			intp cmdIndex = seq.cmdList.AddToTail();
 			AnimCommand_t &animCmd = seq.cmdList[cmdIndex];
-			memset(&animCmd, 0, sizeof(animCmd));
+			BitwiseClear(animCmd);
 			if (!stricmp(token, "animate"))
 			{
 				animCmd.commandType = CMD_ANIMATE;
@@ -1147,7 +1147,7 @@ void AnimationController::RunAnimationCommand(vgui::Panel *panel,
 
 	// build a new animation
 	AnimCmdAnimate_t animateCmd;
-	memset(&animateCmd, 0, sizeof(animateCmd));
+	BitwiseClear(animateCmd);
 	animateCmd.panel = 0;
 	animateCmd.variable = var;
 	animateCmd.target.a = targetValue;
@@ -1184,7 +1184,7 @@ void AnimationController::RunAnimationCommand(vgui::Panel *panel,
 
 	// build a new animation
 	AnimCmdAnimate_t animateCmd;
-	memset(&animateCmd, 0, sizeof(animateCmd));
+	BitwiseClear(animateCmd);
 	animateCmd.panel = 0;
 	animateCmd.variable = var;
 	animateCmd.target.a = targetValue[0];
