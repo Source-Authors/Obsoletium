@@ -772,7 +772,7 @@ void CMDLCache::InitStudioData( MDLHandle_t handle )
 	Assert( m_MDLDict[handle] == NULL );
 
 	auto *pStudioData = new studiodata_t;
-	memset( pStudioData, 0, sizeof( studiodata_t ) );
+	memset( pStudioData, 0, sizeof( *pStudioData ) );
 	m_MDLDict[handle] = pStudioData;
 }
 

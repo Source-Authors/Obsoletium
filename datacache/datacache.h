@@ -48,7 +48,7 @@ struct DataCacheItem_t : DataCacheItemData_t
 	  : DataCacheItemData_t( data ),
 		hLRU( INVALID_MEMHANDLE )
 	{
-		memset( pNextFrameLocked, 0xff, sizeof(pNextFrameLocked) );
+		BitwiseSet( pNextFrameLocked, 0xFF );
 	}
 
 	static DataCacheItem_t *CreateResource( const DataCacheItemData_t &data )	{ return new DataCacheItem_t(data); }
