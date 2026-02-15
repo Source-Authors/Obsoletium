@@ -413,7 +413,7 @@ private:
 	{
 		DmObjectId_t m_id;
 		DmElementReference_t m_ref;
-		ElementIdHandlePair_t() = default;
+		ElementIdHandlePair_t() { BitwiseClear(m_id); }
 		explicit ElementIdHandlePair_t( const DmObjectId_t &id ) : m_ref()
 		{
 			CopyUniqueId( id, &m_id );
