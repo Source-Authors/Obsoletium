@@ -219,7 +219,7 @@ static void GenerateRepresentativePalette(
 	Assert( nBlocks == 2 || nBlocks == 3 );
 
 	S3RGBA values[12*4];
-	memset( values, 0xFF, sizeof( values ) );
+	BitwiseSet( values, 0xFF );
 	int width = nBlocks * 4;
 	for ( int i=0; i < nBlocks; i++ )
 	{
