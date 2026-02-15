@@ -60,14 +60,6 @@ void CBinkMaterialRGBTextureRegenerator::RegenerateTextureBits( ITexture *, IVTF
 		return;
 	}
 
-	// Make sure we have a valid video image source	
-/*	if ( m_SrcGWorld == nullptr )
-	{
-		WarningAssert( "Video texture source not set" );
-		memset( pVTFTexture->ImageData(), 0xCC, pVTFTexture->ComputeTotalSize() );
-		return;
-	}*/
-
 	// Verify the destination texture is set up correctly
 	Assert( pVTFTexture->Format() == IMAGE_FORMAT_RGB888 );
 	Assert( pVTFTexture->RowSizeInBytes( 0 ) >= pVTFTexture->Width() * 4 );
@@ -109,8 +101,8 @@ CBinkMaterial::CBinkMaterial() :
 	m_pFileName( nullptr ),
 	m_bInitCalled( false )
 {
-	memset( m_AVVideoData, 0, sizeof(m_AVVideoData) );
-	memset( m_AVVideoLinesize, 0, sizeof(m_AVVideoLinesize) );
+	BitwiseClear( m_AVVideoData );
+	BitwiseClear( m_AVVideoLinesize );
 
 	Reset();
 }
