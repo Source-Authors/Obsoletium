@@ -1172,42 +1172,32 @@ ResourceEntryInfo const *CVTFTexture::FindResourceEntryInfo( uint32 eType ) cons
 {
 	Assert( ( eType & RSRCF_MASK ) == 0 );
 
-	ResourceEntryInfo const *pRange[2];
-	pRange[0] = m_arrResourcesInfo.Base();
-	pRange[1] = pRange[0] + m_arrResourcesInfo.Count();
-
-	if ( IsPC() )
+	// dimhotepus: Ensure range is initialized.
+	const auto *base = m_arrResourcesInfo.Base(); 
+	ResourceEntryInfo const* pRange[2]
 	{
-		// Quick-search in a sorted array
-		ResourceEntryInfo const *pMid;
+		base,
+		base + m_arrResourcesInfo.Count()
+	};
+
+	// Quick-search in a sorted array
 find_routine:
-		if ( pRange[0] != pRange[1] )
+	if ( pRange[0] != pRange[1] )
+	{
+		ResourceEntryInfo const *pMid = pRange[0] + ( pRange[1] - pRange[0] ) / 2;
+		if ( int diff = int( pMid->eType & ~RSRCF_MASK ) - int( eType ) )
 		{
-			pMid = pRange[0] + ( pRange[1] - pRange[0] ) / 2;
-			if ( int diff = int( pMid->eType & ~RSRCF_MASK ) - int( eType ) )
-			{
-				int off = !( diff > 0 );
-				pRange[ !off ] = pMid + off;
-				goto find_routine;
-			}
-			else
-				return pMid;
+			int off = !( diff > 0 );
+			pRange[ !off ] = pMid + off;
+			goto find_routine;
 		}
 		else
-			return NULL;
-	}
-	else
-	{
-		// 360 eschews a sorted format due to endian issues
-		// use a linear search for compatibility with reading pc formats
-		for ( ; pRange[0] < pRange[1]; ++pRange[0] )
 		{
-			if ( ( pRange[0]->eType & ~RSRCF_MASK ) == eType )
-				return pRange[0];
+			return pMid;
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 ResourceEntryInfo * CVTFTexture::FindResourceEntryInfo( uint32 eType )
