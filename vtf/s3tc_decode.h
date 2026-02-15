@@ -82,10 +82,10 @@ void S3TC_MergeBlocks(
 inline S3RGBA S3TC_RGBAFrom565( unsigned short color, unsigned char alphaValue=255 )
 {
 	S3RGBA ret;
-	ret.a = alphaValue;
-	ret.r = (unsigned char)( (color >> 11) << 3 );
-	ret.g = (unsigned char)( ((color >> 5) & 0x3F) << 2 );
 	ret.b = (unsigned char)( (color & 0x1F) << 3 );
+	ret.g = (unsigned char)( ((color >> 5) & 0x3F) << 2 );
+	ret.r = (unsigned char)( (color >> 11) << 3 );
+	ret.a = alphaValue;
 	return ret;
 }
 
@@ -93,9 +93,9 @@ inline S3RGBA S3TC_RGBAFrom565( unsigned short color, unsigned char alphaValue=2
 inline S3RGBA S3TC_RGBABlend( const S3RGBA &a, const S3RGBA &b, int aMul, int bMul, int div )
 {
 	S3RGBA ret;
-	ret.r = (unsigned char)(( (int)a.r * aMul + (int)b.r * bMul ) / div );
-	ret.g = (unsigned char)(( (int)a.g * aMul + (int)b.g * bMul ) / div );
 	ret.b = (unsigned char)(( (int)a.b * aMul + (int)b.b * bMul ) / div );
+	ret.g = (unsigned char)(( (int)a.g * aMul + (int)b.g * bMul ) / div );
+	ret.r = (unsigned char)(( (int)a.r * aMul + (int)b.r * bMul ) / div );
 	ret.a = (unsigned char)(( (int)a.a * aMul + (int)b.a * bMul ) / div );
 	return ret;
 }

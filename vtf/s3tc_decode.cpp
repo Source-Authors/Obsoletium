@@ -230,7 +230,7 @@ static void GenerateRepresentativePalette(
 				int outIndex = y*width+(i*4+x);
 				values[outIndex] = pOriginals[i][y * (lPitch/4) + x];
 			}
-		}			
+		}
 	}
 	
 	DDSURFACEDESC descIn;
@@ -335,8 +335,8 @@ void S3TC_MergeBlocks(
 					int iBasePixel = (y*nBlocks*4 + x + iBlock*4); //-V112
 					
 					S3PaletteIndex index;
-					index.m_ColorIndex = ReadBitInt<unsigned>( pColorBits, iBasePixel * 2, 2 );
 					index.m_AlphaIndex = ReadBitInt<unsigned>( pAlphaBits, iBasePixel * 3, 3 );
+					index.m_ColorIndex = ReadBitInt<unsigned>( pColorBits, iBasePixel * 2, 2 );
 					
 					S3TC_SetPixelPaletteIndex( format, (char*)pBlock, x, y, index );
 				}
