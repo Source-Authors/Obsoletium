@@ -94,7 +94,7 @@ CMDL::CMDL()
 	m_flTime = 0.0f;
 	m_vecViewTarget.Init( 0, 0, 0 );
 	m_bWorldSpaceViewTarget = false;
-	memset( m_pFlexControls, 0, sizeof(m_pFlexControls) );
+	BitwiseClear( m_pFlexControls );
 	m_pProxyData = nullptr;
 }
 
