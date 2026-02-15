@@ -198,7 +198,7 @@ void UpdateLogoWAD( void *phdib, int r, int g, int b )
 {
 	char logoname[ 32 ];
 	char *pszName;
-	Q_strncpy( logoname, "LOGO", sizeof( logoname ) );
+	V_strcpy_safe( logoname, "LOGO" );
 	pszName = &logoname[ 0 ];
 
 	HANDLE hdib = (HANDLE)phdib;
