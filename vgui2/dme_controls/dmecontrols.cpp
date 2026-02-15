@@ -95,6 +95,16 @@ bool VGui_InitDmeInterfacesList( const char *moduleName, CreateInterfaceFn *fact
 	return true;
 }
 
+// dimhotepus: Pair with init.
+void VGui_ShutdownDmeInterfacesList( const char *moduleName )
+{
+	g_pPhysicsCollision = nullptr;
+	enginetools = nullptr;
+	g_pSoundEmitterSystem = nullptr;
+
+	vgui::VGui_ShutdownMatSysInterfacesList( moduleName );
+}
+
 
 } // namespace vgui
 

@@ -64,4 +64,7 @@ void VGui_Shutdown()
 	// Make sure anything "marked for deletion"
 	//  actually gets deleted before this dll goes away
 	vgui::ivgui()->RunFrame();
+
+	// dimhotepus: Pair with startup.
+	vgui::VGui_ShutdownDmeInterfacesList( GetVGuiControlsModuleName() );
 }
