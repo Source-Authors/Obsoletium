@@ -175,7 +175,7 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 
 	// get info about the font
 	::TEXTMETRIC tm;
-	memset( &tm, 0, sizeof( tm ) );
+	BitwiseClear( tm );
 	if ( !GetTextMetrics(m_hDC, &tm) )
 	{
 		m_szName = UTL_INVAL_SYMBOL;
