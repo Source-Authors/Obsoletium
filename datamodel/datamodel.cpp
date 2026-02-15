@@ -353,7 +353,7 @@ void CDataModel::DisplayMemoryStats( )
 		float flPercentOverhead = 1.0f - ( ( info.m_nSize != 0 ) ? ( (float)info.m_pCategories[MEMORY_CATEGORY_ATTRIBUTE_DATA] / (float)info.m_nSize ) : 0.0f );
 		flPercentOverhead *= 100.0f;
 		 
-		ConMsg( "%-40s\t%6d\t%9d\t\t%5.2f", GetString( typeHistogram.Key( pSortInfo[i].m_nIndex ) ), 
+		ConMsg( "%-40s\t%6zd\t%9zd\t\t%5.2f", GetString( typeHistogram.Key( pSortInfo[i].m_nIndex ) ), 
 			info.m_nCount, info.m_nSize, flPercentOverhead );
 		intp nTotal = 0;
 		for ( int j = 0; j < MEMORY_CATEGORY_COUNT; ++j )
