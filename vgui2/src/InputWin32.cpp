@@ -2256,13 +2256,10 @@ int CInputSystem::GetIMELanguageList( LanguageItem *dest, int destcount )
 
 				LanguageIds *info = GetLanguageInfo( LOWORD( hkl ) );
 
-				memset( p, 0, sizeof( IInput::LanguageItem ) );
+				BitwiseClear( *p );
 
-				wcsncpy( p->shortname, info->shortcode, std::size( p->shortname ) );
-				p->shortname[ std::size( p->shortname ) - 1 ] = L'\0';
-
-				wcsncpy( p->menuname, info->displayname, std::size( p->menuname ) );
-				p->menuname[ std::size( p->menuname ) - 1 ] = L'\0';
+				V_wcscpy_safe( p->shortname, info->shortcode );
+				V_wcscpy_safe( p->menuname, info->displayname );
 
 				p->handleValue = (intp)hkl;
 				p->active = hkl == GetKeyboardLayout( 0 );
