@@ -16,7 +16,7 @@
 #ifndef CIRCULARBUFFER_H
 #define CIRCULARBUFFER_H
 
-#pragma once
+#include "tier0/commonmacros.h"
 
 class CCircularBuffer
 {
@@ -89,7 +89,7 @@ class CSizedCircularBuffer : public CCircularBuffer
 public:
 	CSizedCircularBuffer() : CCircularBuffer(size)
 	{
-		memset(myData, 0, sizeof(myData));
+		BitwiseClear(myData);
 	}
 
 private:

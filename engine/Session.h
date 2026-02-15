@@ -67,8 +67,8 @@ public:
 	}
 	void Clear()
 	{
-		Q_memset( this, 0, sizeof( CClientInfo ) );
-		Q_memset( &m_iTeam, -1, sizeof( m_iTeam ) );
+		Q_memset( this, 0, sizeof( *this ) );
+		BitwiseSet( m_iTeam, 0xFF );
 	}
 };
 

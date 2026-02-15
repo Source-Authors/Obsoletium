@@ -194,7 +194,7 @@ bool VoiceRecord_DSound::Init(int sampleRate)
 		goto HandleError;
 
 	// Create the capture buffer.
-	memset(&dscDesc, 0, sizeof(dscDesc));
+	BitwiseClear(dscDesc);
 	dscDesc.dwSize = sizeof(dscDesc);
 	dscDesc.dwFlags = 0;
 	dscDesc.dwBufferBytes = recordFormat.nAvgBytesPerSec;
@@ -213,7 +213,7 @@ bool VoiceRecord_DSound::Init(int sampleRate)
 
 	// Figure out how many bytes we got in our capture buffer.
 	DSCBCAPS caps;
-	memset(&caps, 0, sizeof(caps));
+	BitwiseClear(caps);
 	caps.dwSize = sizeof(caps);
 
 	hr = m_pCaptureBuffer->GetCaps(&caps);

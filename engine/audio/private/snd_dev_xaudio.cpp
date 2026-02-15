@@ -318,7 +318,7 @@ class ScopedPropVariant {
   ScopedPropVariant(ScopedPropVariant &) = delete;
   ScopedPropVariant(ScopedPropVariant &&v) noexcept
       : prop_{std::move(v.prop_)} {
-    memset(&v, 0, sizeof(v));
+    BitwiseClear(v.prop_);
   }
   ScopedPropVariant &operator=(ScopedPropVariant &) = delete;
   ScopedPropVariant &operator=(ScopedPropVariant &&v) noexcept {

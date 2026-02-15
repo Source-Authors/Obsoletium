@@ -53,7 +53,7 @@ public:
 		m_nMaxOutProps( -1 ),
 		m_nOutProps( 0 )
 	{
-		memset(m_NewProxyProps, 0, sizeof(m_NewProxyProps));
+		BitwiseClear(m_NewProxyProps);
 		m_nNewProxyProps = 0;
 	}
 

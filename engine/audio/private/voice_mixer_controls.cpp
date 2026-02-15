@@ -321,7 +321,7 @@ bool CMixerControls::SelectMicrophoneForWaveInput()
 void CMixerControls::Clear()
 { 
 	m_hMixer = 0;
-	memset(m_ControlInfos, 0, sizeof(m_ControlInfos));
+	BitwiseClear(m_ControlInfos);
 }
 
 bool CMixerControls::GetControlOption_Bool(DWORD dwControlID, DWORD cMultipleItems, bool &bValue)

@@ -232,7 +232,7 @@ void CAudioDeviceSDLAudio::OpenWaveOut( void )
 	//  !!! FIXME: let user specify a device?
 	// !!! FIXME: we can handle quad, 5.1, 7.1, etc here.
 	SDL_AudioSpec desired, obtained;
-	memset(&desired, '\0', sizeof (desired));
+	BitwiseClear(desired);
 	desired.freq = SOUND_DMA_SPEED;
 	desired.format = AUDIO_S16SYS;
 	desired.channels = 2;

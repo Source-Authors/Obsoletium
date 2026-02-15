@@ -344,7 +344,7 @@ CSfxTable::CSfxTable()
 	m_bMixGroupsCached = false;
 	m_pDebugName = NULL;
 	m_mixGroupCount = 0;
-	memset(m_mixGroupList, 0, sizeof(m_mixGroupList));
+	BitwiseClear(m_mixGroupList);
 }
 
 
@@ -5783,7 +5783,7 @@ void S_StopAllSounds( bool bClear )
 	}
 
 	// Clear any remaining soundfade
-	memset( &soundfade, 0, sizeof( soundfade ) );
+	BitwiseClear( soundfade );
 
 	g_AudioDevice->StopAllSounds();
 	Assert( g_ActiveChannels.GetActiveCount() == 0 );

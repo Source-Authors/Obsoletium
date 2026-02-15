@@ -525,9 +525,9 @@ void CL_ClearState ( void )
 	if ( g_pLocalNetworkBackdoor )
 		g_pLocalNetworkBackdoor->ClearState();
 
-	// clear other arrays	
-	memset (cl_dlights, 0, sizeof(cl_dlights));
-	memset (cl_elights, 0, sizeof(cl_elights));
+	// clear other arrays
+	BitwiseClear (cl_dlights);
+	BitwiseClear (cl_elights);
 
 	// Wipe the hunk ( unless the server is active )
 	Host_FreeStateAndWorld( false );
@@ -1799,7 +1799,7 @@ dlight_t *CL_AllocDlight (int key)
 	int i = CL_AllocLightFromArray( cl_dlights, MAX_DLIGHTS, key );
 	dlight_t *dl = &cl_dlights[i];
 	R_MarkDLightNotVisible( i );
-	memset (dl, 0, sizeof(*dl));
+	BitwiseClear (*dl);
 	dl->key = key;
 	r_dlightchanged |= (1 << i);
 	r_dlightactive |= (1 << i);
@@ -1818,7 +1818,7 @@ dlight_t *CL_AllocElight (int key)
 {
 	int i = CL_AllocLightFromArray( cl_elights, MAX_ELIGHTS, key );
 	dlight_t *el = &cl_elights[i];
-	memset (el, 0, sizeof(*el));
+	BitwiseClear (*el);
 	el->key = key;
 	g_bActiveElights = true;
 	return el;

@@ -1357,7 +1357,7 @@ bool CAudioDirectSound::SNDDMA_InitSurround(LPDIRECTSOUND8 lpDS, WAVEFORMATEX* l
 	wvex.nBlockAlign = wvex.nChannels * wvex.wBitsPerSample / 8;
 	wvex.nAvgBytesPerSec = wvex.nSamplesPerSec	* wvex.nBlockAlign; 
 
-	memset (&dsbuf, 0, sizeof(dsbuf));
+	BitwiseClear(dsbuf);
 	dsbuf.dwSize = sizeof(DSBUFFERDESC);
 														 // NOTE: LOCHARDWARE causes SB AWE64 to crash in it's DSOUND driver
 	dsbuf.dwFlags = DSBCAPS_CTRL3D;						 // don't use CTRLFREQUENCY (slow)
@@ -1522,7 +1522,7 @@ bool CAudioDirectSound::SNDDMA_InitSurround(LPDIRECTSOUND8 lpDS, WAVEFORMATEX* l
 	m_deviceSampleBits = lpFormat->wBitsPerSample;
 	m_deviceDmaSpeed = lpFormat->nSamplesPerSec;
 
-	memset(lpdsbc, 0, sizeof(DSBCAPS));
+	BitwiseClear(*lpdsbc);
 	lpdsbc->dwSize = sizeof(DSBCAPS);
 
 	if (DS_OK != pDSBufFL->GetCaps (lpdsbc))

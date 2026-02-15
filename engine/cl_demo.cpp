@@ -205,7 +205,7 @@ void DemoOverlay::DrawOverlay( float fSetting )
 		 OVR_NONE != m_maskDrawnOverlay )
 	{
 		con_nprint_s xprn;
-		memset( &xprn, 0, sizeof( xprn ) );
+		BitwiseClear( xprn );
 		xprn.index = idx;
 		xprn.time_to_live = -1;
 		Con_NXPrintf( &xprn, "" );
@@ -214,7 +214,7 @@ void DemoOverlay::DrawOverlay( float fSetting )
 	if ( OVR_PLAY & maskDrawnOverlay )
 	{
 		con_nprint_s xprn;
-		memset( &xprn, 0, sizeof( xprn ) );
+		BitwiseClear( xprn );
 		xprn.index = idx;
 		xprn.color[0] = 0.f;
 		xprn.color[1] = 1.f;
@@ -227,7 +227,7 @@ void DemoOverlay::DrawOverlay( float fSetting )
 	if ( OVR_REC & maskDrawnOverlay )
 	{
 		con_nprint_s xprn;
-		memset( &xprn, 0, sizeof( xprn ) );
+		BitwiseClear( xprn );
 		xprn.index = idx;
 		xprn.color[0] = 1.f;
 		xprn.color[1] = 0.f;

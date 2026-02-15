@@ -239,11 +239,11 @@ void CDemoSmootherPanel::Reset( void )
 	m_nPreviewLastFrame = 0;
 
 	m_bHasSelection = false;
-	memset( m_nSelection, 0, sizeof( m_nSelection ) );
+	BitwiseClear( m_nSelection );
 	m_iSelectionTicksSpan = 0;
 	
 	m_bInputActive = false;
-	memset( m_nOldCursor, 0, sizeof( m_nOldCursor ) );
+	BitwiseClear( m_nOldCursor );
 
 	WipeUndo();
 	WipeRedo();
@@ -945,7 +945,7 @@ void CDemoSmootherPanel::OnSelect()
 
 	m_bHasSelection = false;
 	m_iSelectionTicksSpan = 0;
-	memset( m_nSelection, 0, sizeof( m_nSelection ) );
+	BitwiseClear( m_nSelection );
 
 	intp start = GetStartFrame();
 	intp end = GetEndFrame();

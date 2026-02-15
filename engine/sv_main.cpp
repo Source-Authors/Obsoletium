@@ -2491,7 +2491,7 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 		EngineVGui()->UpdateProgressBar(PROGRESS_CRCMAP);
 #endif
 		// Server map CRC check.
-		V_memset( worldmapMD5.bits, 0, MD5_DIGEST_LENGTH );
+		BitwiseClear( worldmapMD5.bits );
 		if ( !MD5_MapFile( &worldmapMD5, szMapFile ) )
 		{
 			ConMsg( "Couldn't CRC server map: %s\n", szMapFile );
@@ -2506,7 +2506,7 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 	}
 	else
 	{
-		V_memset( worldmapMD5.bits, 0, MD5_DIGEST_LENGTH );
+		BitwiseClear( worldmapMD5.bits );
 	}
 
 	m_StringTables = networkStringTableContainerServer;

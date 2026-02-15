@@ -984,7 +984,8 @@ void R_RedownloadAllLightmaps()
 	static bool initializedBlockLights = false;
 	if (!initializedBlockLights)
 	{
-		memset( &blocklights[0][0][0], 0, MAX_LIGHTMAP_DIM_INCLUDING_BORDER * MAX_LIGHTMAP_DIM_INCLUDING_BORDER * (NUM_BUMP_VECTS + 1) * sizeof( Vector ) );
+		// !!!
+		memset( &blocklights[0][0][0], 0, sizeof(blocklights) );
 		initializedBlockLights = true;
 	}
 #endif

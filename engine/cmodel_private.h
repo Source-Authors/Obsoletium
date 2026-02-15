@@ -237,7 +237,7 @@ public:
 	{
 		m_nCount = 0;
 		m_nOffset = -1;
-		memset( m_pFilename, 0, sizeof( m_pFilename ) );
+		m_pFilename[0] = '\0';
 	}
 
 	~CDiscardableArray() = default;

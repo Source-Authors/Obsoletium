@@ -895,7 +895,7 @@ void RunDataTableTest()
 
 	memset(&dtServer, 0, sizeof(dtServer));
 	memset(&dtClient, 0, sizeof(dtClient));
-	memset(prevEncoded, 0, sizeof(prevEncoded));
+	BitwiseClear(prevEncoded);
 
 	SetGuardBytes( &dtClient );
 

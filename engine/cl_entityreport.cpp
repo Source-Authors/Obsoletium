@@ -141,7 +141,7 @@ int CompareEntityBits(const void* pIndexA, const void* pIndexB )
 //-----------------------------------------------------------------------------
 void CL_ResetEntityBits( void )
 {
-	memset( s_EntityBits, 0, sizeof( s_EntityBits ) );
+	BitwiseClear( s_EntityBits );
 }
 
 //-----------------------------------------------------------------------------

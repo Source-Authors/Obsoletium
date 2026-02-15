@@ -160,15 +160,17 @@ const char *CClientState::GetCDKeyHash( void )
 		return "";
 	}
 	
-	MD5Context_t ctx;
 	unsigned char digest[16]; // The MD5 Hash
+	BitwiseClear( digest );
+
+	MD5Context_t ctx;
 	// Now get the md5 hash of the key
-	memset( &ctx, 0, sizeof( ctx ) );
-	memset( digest, 0, sizeof( digest ) );
+	BitwiseClear( ctx );
 
 	MD5Init(&ctx);
 	MD5Update(&ctx, szKeyBuffer, nKeyLength);
 	MD5Final(digest, &ctx);
+
 	V_strcpy_safe( szHashedKeyBuffer, MD5_Print ( digest ) );
 	return szHashedKeyBuffer;
 }
@@ -1964,12 +1966,12 @@ void CClientState::UpdateAreaBits_BackwardsCompatible()
 	{
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
-		memcpy( m_chAreaBits, m_pAreaBits, sizeof( m_chAreaBits ) );
-		
+		BitwiseCopy( m_pAreaBits, m_chAreaBits, ssize( m_chAreaBits ) );
+
 		// The whole point of adding this array was that the client could react to closed portals.
 		// If they're using the old interface to set area portal bits, then we use the old 
 		// behavior of assuming all portals are open on the clent.
-		memset( m_chAreaPortalBits, 0xFF, sizeof( m_chAreaPortalBits ) );
+		BitwiseSet( m_chAreaPortalBits, 0xFF );
 
 		m_bAreaBitsValid = true;
 	}

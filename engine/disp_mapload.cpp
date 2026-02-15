@@ -500,7 +500,7 @@ void SetupMeshReaders( model_t *pWorld, int nDisplacements )
 		CDispInfo *pDisp = GetModelDisp( pWorld, iDisp );
 		
 		MeshDesc_t desc;
-		memset( &desc, 0, sizeof( desc ) );
+		BitwiseClear( desc );
 		
 		desc.m_VertexSize_Position = sizeof( CDispRenderVert );
 		desc.m_VertexSize_TexCoord[0] = sizeof( CDispRenderVert );
