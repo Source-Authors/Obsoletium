@@ -360,7 +360,6 @@ public:
 	int GetLocalPlayer( void ) override;
 	float GetLastTimeStamp( void ) override;
 	const model_t *LoadModel( const char *pName, bool bProp ) override;
-	void UnloadModel( const model_t *model, bool bProp );
 	CSentence *GetSentence( CAudioSource *pAudioSource ) override;
 	float GetSentenceLength( CAudioSource *pAudioSource ) override;
 	bool IsStreaming( CAudioSource *pAudioSource ) const override;
@@ -370,7 +369,6 @@ public:
 	void GetViewAngles( QAngle& va ) override;
 	void SetViewAngles( QAngle& va ) override;
 	int GetMaxClients( void ) override;
-	void Key_Event( ButtonCode_t key, int down );
 	const char *Key_LookupBinding( const char *pBinding ) override;
 	const char *Key_LookupBindingExact( const char *pBinding ) override;
 	const char *Key_BindingForKey( ButtonCode_t code ) override;
