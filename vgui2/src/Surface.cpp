@@ -1605,7 +1605,7 @@ void CWin32Surface::DrawSetTextureRGBAEx(int id,const unsigned char* rgba,int wi
 	{
 		// allocate a new texture
 		texture = AllocTextureForId(id);
-		memset(texture, 0, sizeof(Texture));
+		BitwiseClear(*texture);
 	}
 
 	{
@@ -1675,7 +1675,7 @@ void CWin32Surface::DrawSetTextureFile(int id, const char *filename, int, bool f
 		{
 			// allocate a new texture
 			texture = AllocTextureForId(id);
-			memset(texture, 0, sizeof(Texture));
+			BitwiseClear(*texture);
 		}
 		if (texture)
 		{
