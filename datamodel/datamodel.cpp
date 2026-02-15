@@ -294,15 +294,9 @@ struct DmMemorySortInfo_t
 	intp m_nTotalSize;
 };
 
-int DmMemorySortFunc( const void * lhs, const void * rhs )
+static bool DmMemorySortFunc( const DmMemorySortInfo_t &info1, const DmMemorySortInfo_t &info2 )
 {
-	DmMemorySortInfo_t &info1 = *(DmMemorySortInfo_t*)lhs;
-	DmMemorySortInfo_t &info2 = *(DmMemorySortInfo_t*)rhs;
-	return info1.m_nTotalSize > info2.m_nTotalSize
-		? 1
-		: info1.m_nTotalSize == info2.m_nTotalSize
-			? 0
-			: -1;
+	return info1.m_nTotalSize < info2.m_nTotalSize;
 }
 
 void CDataModel::DisplayMemoryStats( )
@@ -345,7 +339,7 @@ void CDataModel::DisplayMemoryStats( )
 		pSortInfo[nCount].m_nTotalSize = typeHistogram.Element( i ).m_nSize;
 		++nCount;
 	}
-	qsort( pSortInfo, nCount, sizeof(DmMemorySortInfo_t), DmMemorySortFunc );
+	std::sort( pSortInfo, pSortInfo + nCount, DmMemorySortFunc );
 	     
 	intp pTotals[ MEMORY_CATEGORY_COUNT ];
 	intp nTotalSize = 0;
