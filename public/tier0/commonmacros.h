@@ -113,11 +113,11 @@
 // This form of __declspec can be applied to any class declaration, but should
 // only be applied to pure interface classes, that is, classes that will never
 // be instantiated on their own.  The __declspec stops the compiler from
-// generating code to initialize the vfptr in the constructor(s) and destructor
-// of the class.  In many cases, this removes the only references to the vtable
-// that are associated with the class and, thus, the linker will remove it.
-// Using this form of __declspec can result in a significant reduction in code
-// size.
+// generating code to initialize the virtual ptr in the constructor(s) and
+// destructor of the class.  In many cases, this removes the only references to
+// the vtable that are associated with the class and, thus, the linker will
+// remove it. Using this form of __declspec can result in a significant
+// reduction in code size.
 //
 // If you attempt to instantiate a class marked with novtable and then access a
 // class member, you will receive an access violation(AV).
@@ -379,7 +379,7 @@ inline
 // pointer_to_array_of_char RtlpNumberOf(reference_to_array_of_T);
 //
 // We never even call RtlpNumberOf, we just take the size of dereferencing its
-// return type. We do not even implement RtlpNumberOf, we just decare it.
+// return type. We do not even implement RtlpNumberOf, we just declare it.
 //
 // Attempts to pass pointers instead of arrays to this macro result in compile
 // time errors. That is the point.
@@ -524,6 +524,20 @@ std::enable_if_t<!std::is_trivially_copyable_v<T>> constexpr BitwiseCopy(
 }
 
 /**
+ * @brief Type-safe memory set.
+ * @tparam T Type.
+ * @param src Source to clear.
+ * @param byte Byte to fill src.
+ * @return void.
+ */
+template <typename T>
+std::enable_if_t<std::is_trivially_copyable_v<T> &&
+                 std::is_trivially_constructible_v<T>>
+BitwiseSet(T& src, unsigned char byte) noexcept {
+  std::memset(&src, byte, sizeof(T));
+}
+
+/**
  * @brief Type-safe memory clear.
  * @tparam T Type.
  * @param src Source to clear.
@@ -533,7 +547,22 @@ template <typename T>
 std::enable_if_t<std::is_trivially_copyable_v<T> &&
                  std::is_trivially_constructible_v<T>>
 BitwiseClear(T& src) noexcept {
-  std::memset(&src, 0, sizeof(T));
+  BitwiseSet(src, 0);
+}
+
+/**
+ * @brief Type-safe memory set for array.
+ * @tparam T Type of array element.
+ * @tparam size Array size.
+ * @param src Source to set.
+ * @param byte Byte to fill src.
+ * @return void.
+ */
+template <typename T, size_t size>
+std::enable_if_t<std::is_trivially_copyable_v<T> &&
+                 std::is_trivially_constructible_v<T>>
+BitwiseSet(T (&src)[size], unsigned char byte) noexcept {
+  std::memset(src, byte, sizeof(src));
 }
 
 /**
@@ -547,7 +576,7 @@ template <typename T, size_t size>
 std::enable_if_t<std::is_trivially_copyable_v<T> &&
                  std::is_trivially_constructible_v<T>>
 BitwiseClear(T (&src)[size]) noexcept {
-  std::memset(src, 0, sizeof(src));
+  BitwiseSet(src, 0);
 }
 
 /**
