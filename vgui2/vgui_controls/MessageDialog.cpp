@@ -54,8 +54,8 @@ CMessageDialog::CMessageDialog( vgui::Panel *pParent, const uint nType, const ch
  		}
 	}
 
-	Q_memset( m_pCommands, 0, sizeof( m_pCommands ) );
-	Q_memset( m_Buttons, 0, sizeof( m_Buttons ) );
+	BitwiseClear( m_pCommands );
+	BitwiseClear( m_Buttons );
 
 	if ( pCmdA )
 	{
