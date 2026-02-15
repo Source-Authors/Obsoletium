@@ -69,7 +69,7 @@ void ComputeProjectionMatrix( VMatrix *pCameraToProjection, const Camera_t &came
 	float halfHeight = tan( flFOV * M_PI_F / 360.0f );
 	float halfWidth = flApsectRatio * halfHeight;
 #endif
-	memset( pCameraToProjection, 0, sizeof( VMatrix ) );
+	memset( pCameraToProjection, 0, sizeof( *pCameraToProjection ) );
 	pCameraToProjection->m[0][0]  = 1.0f / halfWidth;
 	pCameraToProjection->m[1][1]  = 1.0f / halfHeight;
 	pCameraToProjection->m[2][2] = flZFar / ( flZNear - flZFar );
