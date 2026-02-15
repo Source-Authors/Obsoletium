@@ -92,6 +92,13 @@ public:
 		CreateInterfaceFn factory = GetFactory();
 		return vgui::VGui_InitInterfacesList( "CVguiSteamApp", &factory, 1 );
 	}
+
+	void PostShutdown() override
+	{
+		vgui::VGui_ShutdownInterfacesList( "CVguiSteamApp" );
+
+		BaseClass::PostShutdown();
+	}
 };
 
 
@@ -111,6 +118,13 @@ public:
 
 		CreateInterfaceFn factory = GetFactory();
 		return vgui::VGui_InitInterfacesList( "CVguiSteamApp", &factory, 1 );
+	}
+	
+	void PostShutdown() override
+	{
+		vgui::VGui_ShutdownInterfacesList( "CVguiSteamApp" );
+
+		BaseClass::PostShutdown();
 	}
 };
 
