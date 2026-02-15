@@ -98,7 +98,7 @@ namespace se::dedicated {
 CCreateMultiplayerGameServerPage::CCreateMultiplayerGameServerPage(
     vgui::Panel *parent, const char *name)
     : Frame(parent, name) {
-  memset(&m_iServer, 0x0, sizeof(serveritem_t));
+  memset(&m_iServer, 0x0, sizeof(m_iServer));
   // dimhotepus: Ensure no UB on uninitialized mod read.
   BitwiseClear(m_szMod);
 
