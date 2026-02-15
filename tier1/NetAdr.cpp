@@ -86,7 +86,7 @@ bool netadr_t::CompareClassCAdr (const netadr_t &a) const
 
 	return false;
 }
-// reserved addresses are not routeable, so they can all be used in a LAN game
+// reserved addresses are not routable, so they can all be used in a LAN game
 bool netadr_t::IsReservedAdr () const
 {
 	if ( type == NA_LOOPBACK )
@@ -152,7 +152,7 @@ bool netadr_t::IsLocalhost() const
 
 bool netadr_t::IsLoopback() const
 {
-	// are we useding engine loopback buffers
+	// are we using engine loopback buffers
 	return type == NA_LOOPBACK;
 }
 

@@ -457,7 +457,7 @@ intp	CUtlBuffer::PeekStringLength()
 	if ( !IsValid() )
 		return 0;
 
-	// Eat preceeding whitespace
+	// Eat preceding whitespace
 	intp nOffset = 0;
 	if ( IsText() )
 	{
@@ -566,7 +566,7 @@ intp CUtlBuffer::PeekDelimitedStringLength( CUtlCharConversion *pConv, bool bAct
 	if ( !IsText() || !pConv )
 		return PeekStringLength();
 
-	// Eat preceeding whitespace
+	// Eat preceding whitespace
 	intp nOffset = 0;
 	if ( IsText() )
 	{
@@ -1491,7 +1491,7 @@ intp CUtlBuffer::ParseToken( const characterset_t *pBreaks, OUT_Z_CAP(nMaxLen) c
 			}
 		}
 
-		// In this case, we hit the end of the buffer before hitting the end qoute
+		// In this case, we hit the end of the buffer before hitting the end quote
 		pTokenBuf[nLen] = 0;
 		return nLen;
 	}
