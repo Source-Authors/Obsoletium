@@ -532,7 +532,7 @@ std::enable_if_t<!std::is_trivially_copyable_v<T>> constexpr BitwiseCopy(
  */
 template <typename T>
 std::enable_if_t<std::is_trivially_copyable_v<T> &&
-                 std::is_trivially_constructible_v<T>>
+                 std::is_trivially_constructible_v<T> && !std::is_pointer_v<T>>
 BitwiseSet(T& src, unsigned char byte) noexcept {
   std::memset(&src, byte, sizeof(T));
 }
@@ -545,7 +545,7 @@ BitwiseSet(T& src, unsigned char byte) noexcept {
  */
 template <typename T>
 std::enable_if_t<std::is_trivially_copyable_v<T> &&
-                 std::is_trivially_constructible_v<T>>
+                 std::is_trivially_constructible_v<T> && !std::is_pointer_v<T>>
 BitwiseClear(T& src) noexcept {
   BitwiseSet(src, 0);
 }
