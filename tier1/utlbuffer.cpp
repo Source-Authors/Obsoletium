@@ -1446,7 +1446,7 @@ intp CUtlBuffer::ParseToken( const characterset_t *pBreaks, OUT_Z_CAP(nMaxLen) c
 {
 	Assert( nMaxLen > 0 );
 	if ( nMaxLen > 0 )
-	pTokenBuf[0] = 0;
+		pTokenBuf[0] = 0;
 
 	// skip whitespace + comments
 	while ( true )
@@ -1499,9 +1499,19 @@ intp CUtlBuffer::ParseToken( const characterset_t *pBreaks, OUT_Z_CAP(nMaxLen) c
 	// parse single characters
 	if ( pBreaks->HasChar( c ) )
 	{
-		pTokenBuf[0] = c;
-		pTokenBuf[1] = 0;
-		return 1;
+		// dimhotepus: Do not overflow buffer of 1 length.
+		if ( nMaxLen > 1 )
+		{
+			pTokenBuf[0] = c;
+			pTokenBuf[1] = 0;
+			return 1;
+		}
+
+		if ( nMaxLen > 0 )
+			pTokenBuf[0] = 0;
+
+		AssertMsg( nMaxLen > 1, "Unable to parse single char token. Max length %zd should be at least 1", nMaxLen );
+		return -1;
 	}
 
 	// parse a regular word
