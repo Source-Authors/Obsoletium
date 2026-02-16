@@ -63,9 +63,9 @@ struct DecalClipState_t
 
 	DecalClipState_t() : m_VertCount{-1}, m_Pass{false}, m_ClipVertCount{-1}
 	{
-		memset( m_Indices, 0, sizeof(m_Indices) );
+		BitwiseClear( m_Indices );
 		memset( m_ClipVerts, 0, sizeof(m_ClipVerts) );
-		memset( m_ClipFlags, 0, sizeof(m_ClipFlags) );
+		BitwiseClear( m_ClipFlags );
 	}
 
 private:

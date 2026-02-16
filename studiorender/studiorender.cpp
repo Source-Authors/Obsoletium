@@ -49,7 +49,7 @@ static ConVar r_flexstats( "r_flexstats", "0", FCVAR_CHEAT );
 //-----------------------------------------------------------------------------
 CStudioRender::CStudioRender()
 {
-  R_LightEffectsWorld3 = NULL;
+	R_LightEffectsWorld3 = NULL;
 	m_pRC = NULL;
 	m_pBoneToWorld = NULL;
 
@@ -80,8 +80,8 @@ CStudioRender::CStudioRender()
 	m_pMaterialWorldWireframe = NULL;
 	m_pMaterialModelEnvCubemap = NULL;
 
-	memset( m_pDepthWrite, 0, sizeof(m_pDepthWrite) );
-	memset( m_pSSAODepthWrite, 0, sizeof(m_pSSAODepthWrite) );
+	BitwiseClear( m_pDepthWrite );
+	BitwiseClear( m_pSSAODepthWrite );
 
 	m_pGlintTexture = NULL;
 	m_pGlintLODTexture = NULL;
@@ -630,16 +630,6 @@ void CStudioRender::DrawModelArray( const DrawModelInfo_t &drawInfo, const Studi
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d", __FUNCTION__, arrayCount );
 
 #ifndef SWDS												// no drawing on dedicated server
-#if 0
-	FlexWeights_t flex;
-	memset(&flex, 0, sizeof(flex));
-	for ( int i = 0; i < arrayCount; i++ )
-	{
-		DrawModel( drawInfo, rc, &pInstanceData[i].modelToWorld, flex, flags );
-	}
-	return;
-#endif
-
 	m_pRC = const_cast< StudioRenderContext_t* >( &rc );
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 
