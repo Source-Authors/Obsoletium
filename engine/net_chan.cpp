@@ -59,8 +59,6 @@ extern int  NET_ReceiveStream( socket_handle nSock, char * buf, int len, int fla
 
 #define BYTES2FRAGMENTS(i) (((i)+FRAGMENT_SIZE-1)/FRAGMENT_SIZE)
 
-#define FLIPBIT(v,b) if (v&b) v &= ~b; else v |= b;
-
 // We only need to checksum packets on the PC and only when we're actually sending them over the network.
 static bool ShouldChecksumPackets()
 {
@@ -105,9 +103,7 @@ void CNetChan::Clear()
 	{
 		if ( m_SubChannels[i].state == SUBCHANNEL_TOSEND )
 		{
-			int bit = 1<<i; // flip bit back since data was send yet
-			
-			FLIPBIT(m_nOutReliableState, bit);
+			m_nOutReliableState.Flip(i);
 
 			m_SubChannels[i].Free(); 
 		}
@@ -438,8 +434,8 @@ CNetChan::CNetChan()
 	m_nOutSequenceNr = 1;	// otherwise it looks like a 	
 	m_nInSequenceNr = 0;
 	m_nOutSequenceNrAck = 0;
-	m_nOutReliableState = 0; // our current reliable state
-	m_nInReliableState = 0;	// last remote reliable state
+	m_nOutReliableState.ClearAll(); // our current reliable state
+	m_nInReliableState.ClearAll();	// last remote reliable state
 	// m_nLostPackets = 0;
 
 	m_ChallengeNr = 0;
@@ -525,8 +521,8 @@ void CNetChan::Setup(intp sock, netadr_t *adr, const char * name, INetChannelHan
 	m_nOutSequenceNr = 1;	// otherwise it looks like a 	
 	m_nInSequenceNr = 0;
 	m_nOutSequenceNrAck = 0;
-	m_nOutReliableState = 0; // our current reliable state
-	m_nInReliableState = 0;	// last remote reliable state
+	m_nOutReliableState.ClearAll(); // our current reliable state
+	m_nInReliableState.ClearAll();	// last remote reliable state
 	m_nChokedPackets = 0;
 	m_fClearTime = 0.0;
 	
@@ -1182,7 +1178,7 @@ bool CNetChan::SendSubChannelData( bf_write &buf )
 		return false; // no data to send in any subchannel
 
 	// first write subchannel index
-	buf.WriteUBitLong( i, 3 );
+	buf.WriteUBitLong( i, SUBCHANNEL_BITS );
 
 	// write fragemnts for both streams
 	for ( i=0; i<MAX_STREAMS; i++ )
@@ -1493,9 +1489,7 @@ void CNetChan::UpdateSubChannels()
 	if ( bSendData )
 	{
 		// flip channel bit 
-		int bit = 1<<freeSubChan->index;
-
-		FLIPBIT(m_nOutReliableState, bit);
+		m_nOutReliableState.Flip(freeSubChan->index);
 
 		freeSubChan->state = SUBCHANNEL_TOSEND;
 		freeSubChan->sendSeqNr = 0;
@@ -1631,7 +1625,7 @@ int CNetChan::SendDatagram(bf_write *datagram)
 	// Note, this only matters on the PC
 	int nCheckSumStart = send.GetNumBytesWritten();
 
-	send.WriteByte ( m_nInReliableState );
+	send.WriteBits( m_nInReliableState.Base(), MAX_SUBCHANNELS ); // RaphaelIT7: Originally used WriteByte- was changed to support easy changing of MAX_SUBCHANNELS
 
 	if ( m_nChokedPackets > 0 )
 	{
@@ -2240,7 +2234,8 @@ int CNetChan::ProcessPacketHeader( netpacket_t * packet )
 		}
 	}
 
-	int relState	= packet->message.ReadByte();	// reliable state of 8 subchannels
+	CBitVec<MAX_SUBCHANNELS> relState; // RaphaelIT7: Added to allow easy changing of MAX_SUBCHANNELS
+	packet->message.ReadBits( relState.Base(), MAX_SUBCHANNELS );	// reliable state of all subchannels (RaphaelIT7: Previously ued ReadByte though was changed)
 	int nChoked		= 0;	// read later if choked flag is set
 	int i,j;
 
@@ -2309,14 +2304,12 @@ int CNetChan::ProcessPacketHeader( netpacket_t * packet )
 
 	for ( i = 0; i<MAX_SUBCHANNELS; i++ )
 	{
-		int bitmask = (1<<i);
-
 		// data of channel i has been acknowledged
 		subChannel_s * subchan = &m_SubChannels[i];
 
-		Assert( subchan->index == i);
+		Assert( subchan->index == i );
 
-		if ( (m_nOutReliableState & bitmask) == (relState & bitmask) )
+		if ( m_nOutReliableState.CompareBit(relState, i) )
 		{
 			if ( subchan->state == SUBCHANNEL_DIRTY )
 			{
@@ -2366,9 +2359,7 @@ int CNetChan::ProcessPacketHeader( netpacket_t * packet )
 				else if ( subchan->state == SUBCHANNEL_DIRTY )
 				{
 					// remote host lost dirty channel data, flip bit back
-					int bit = 1<<subchan->index; // flip bit back since data was send yet
-			
-					FLIPBIT(m_nOutReliableState, bit);
+					m_nOutReliableState.Flip(subchan->index);
 
 					subchan->Free(); 
 				}
@@ -2447,9 +2438,8 @@ void CNetChan::ProcessPacket( netpacket_t * packet, bool bHasHeader )
 
 	if ( flags & PACKET_FLAG_RELIABLE )
 	{
-		int i, bit = 1<<msg.ReadUBitLong( 3 );
-
-		for ( i=0; i<MAX_STREAMS; i++ )
+		int subChannelIndex = msg.ReadUBitLong( SUBCHANNEL_BITS );
+		for ( int i=0; i<MAX_STREAMS; i++ )
 		{
 			if ( msg.ReadOneBit() != 0 )
 			{
@@ -2459,9 +2449,9 @@ void CNetChan::ProcessPacket( netpacket_t * packet, bool bHasHeader )
 		}
 
 		// flip subChannel bit to signal successful receiving
-		FLIPBIT(m_nInReliableState, bit);
+		m_nInReliableState.Flip(subChannelIndex);
 		
-		for ( i=0; i<MAX_STREAMS; i++ )
+		for ( int i=0; i<MAX_STREAMS; i++ )
 		{
 			if ( !CheckReceivingList( i ) )
 				return; // error while processing 

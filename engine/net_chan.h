@@ -20,6 +20,7 @@
 #include "tier1/utlbuffer.h"
 #include "const.h"
 #include "inetchannel.h"
+#include "bitvec.h"
 
 // How fast to converge flow estimates
 #define FLOW_AVG ( 3.0F / 4.0F )
@@ -29,7 +30,8 @@
 
 #define NET_FRAMES_BACKUP	64		// must be power of 2
 #define NET_FRAMES_MASK		(NET_FRAMES_BACKUP-1)
-#define MAX_SUBCHANNELS		8		// we have 8 alternative send&wait bits
+constexpr int MAX_SUBCHANNELS = 8;	// we have x alternative send&wait channels
+constexpr int SUBCHANNEL_BITS = RequiredBits(MAX_SUBCHANNELS);
 
 #define SUBCHANNEL_FREE		0	// subchannel is free to use
 #define SUBCHANNEL_TOSEND	1	// subchannel has data, but not send yet
@@ -266,9 +268,9 @@ public:
 	int			m_nOutSequenceNrAck;
 	
 	// state of outgoing reliable data (0/1) flip flop used for loss detection
-	int			m_nOutReliableState;
+	CBitVec<MAX_SUBCHANNELS> m_nOutReliableState; // RaphaelIT7: Changed to use a CBitVec to allow easy changing of MAX_SUBCHANNELS
 	// state of incoming reliable data
-	int			m_nInReliableState;
+	CBitVec<MAX_SUBCHANNELS> m_nInReliableState; // RaphaelIT7: Changed to use a CBitVec to allow easy changing of MAX_SUBCHANNELS
 
 	int			m_nChokedPackets;	//number of choked packets
 	
