@@ -14,24 +14,25 @@
 #include "snd_mix_buf.h"
 
 // sound engine rate defines
-#define SOUND_DMA_SPEED		44100		// hardware playback rate
+constexpr inline int SOUND_DMA_SPEED{44100};  // hardware playback rate
 
-#define SOUND_11k			11025		// 11khz sample rate
-#define SOUND_22k			22050		// 22khz sample rate
-#define SOUND_44k			44100		// 44khz sample rate
-#define SOUND_ALL_RATES		1			// mix all sample rates
- 
-#define SOUND_MIX_WET		0			// mix only samples that don't have channel set to 'dry' or 'speaker' (default)
-#define SOUND_MIX_DRY		1			// mix only samples with channel set to 'dry' (ie: music)
-#define SOUND_MIX_SPEAKER	2			// mix only samples with channel set to 'speaker'
-#define SOUND_MIX_SPECIAL_DSP	3			// mix only samples with channel set to 'special dsp'
+// dimhotepus: Use enum for strong types.
+enum SoundSampleRate
+{
+	SOUND_11k = 11025,		// 11khz sample rate
+	SOUND_22k = 22050,		// 22khz sample rate
+	SOUND_44k =	44100,		// 44khz sample rate
+	SOUND_ALL_RATES	= 1		// mix all sample rates
+};
 
-#define	SOUND_BUSS_ROOM			(1<<0)		// mix samples using channel dspmix value (based on distance from player)
-#define SOUND_BUSS_FACING		(1<<1)		// mix samples using channel dspface value (source facing)
-#define	SOUND_BUSS_FACINGAWAY	(1<<2)		// mix samples using 1-dspface
-#define SOUND_BUSS_SPEAKER		(1<<3)		// mix ch->bspeaker samples in mono to speaker buffer
-#define SOUND_BUSS_DRY			(1<<4)		// mix ch->bdry samples into dry buffer
-#define SOUND_BUSS_SPECIAL_DSP	(1<<5)		// mix ch->bspecialdsp samples into special dsp buffer
+// dimhotepus: Use enum for strong types.
+enum SoundMixType
+{
+	SOUND_MIX_WET = 0,			// mix only samples that don't have channel set to 'dry' or 'speaker' (default)
+	SOUND_MIX_DRY = 1,			// mix only samples with channel set to 'dry' (ie: music)
+	SOUND_MIX_SPEAKER = 2,		// mix only samples with channel set to 'speaker'
+	SOUND_MIX_SPECIAL_DSP = 3	// mix only samples with channel set to 'special dsp'
+};
 
 class Vector;
 struct channel_t;

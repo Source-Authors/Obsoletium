@@ -429,7 +429,9 @@ void S_FreeChannel(channel_t *ch)
 //		 this routine will fill the paintbuffer to endtime.  Otherwise, fewer samples are mixed.
 //		 if (endtime - paintedtime) is not aligned on boundaries of 4, 
 //		 we'll miss data if outputRate < SOUND_DMA_SPEED!
-void MIX_MixChannelsToPaintbuffer( CChannelList &list, int endtime, int flags, int rate, int outputRate )
+// dimhotepus: Template version for better inlining.
+template <SoundMixType flags, SoundSampleRate rate, SoundSampleRate outputRate>
+void MIX_MixChannelsToPaintbuffer( CChannelList &list, int endtime )
 {
 	VPROF( "MixChannelsToPaintbuffer" );
 	int		i;
@@ -439,8 +441,8 @@ void MIX_MixChannelsToPaintbuffer( CChannelList &list, int endtime, int flags, i
 
 	// mix each channel into paintbuffer
 	// validate parameters
-	Assert( outputRate <= SOUND_DMA_SPEED );
-	Assert( !((endtime - g_paintedtime) & 0x3) || (outputRate == SOUND_DMA_SPEED) ); // make sure we're not discarding data
+	static_assert( outputRate <= SOUND_44k );
+	Assert( !((endtime - g_paintedtime) & 0x3) || (outputRate == SOUND_44k) ); // make sure we're not discarding data
 											  
 	// 44k: try to mix this many samples at outputRate
 	sampleCount = ( endtime - g_paintedtime ) / ( SOUND_DMA_SPEED / outputRate );
@@ -467,28 +469,28 @@ void MIX_MixChannelsToPaintbuffer( CChannelList &list, int endtime, int flags, i
 		Assert ( !( ( ch->flags.bdry && ch->flags.bSpeaker ) || ( ch->flags.bdry && ch->special_dsp != 0 ) ) );	
 
 		// if mixing with SOUND_MIX_DRY flag, ignore (don't even load) all channels not flagged as 'dry'
-		if ( flags == SOUND_MIX_DRY )
+		if constexpr ( flags == SOUND_MIX_DRY )
 		{
 			if ( !ch->flags.bdry )
 				continue;
 		}
 		
 		// if mixing with SOUND_MIX_WET flag, ignore (don't even load) all channels flagged as 'dry' or 'speaker'
-		if ( flags == SOUND_MIX_WET )
+		if constexpr ( flags == SOUND_MIX_WET )
 		{
 			if ( ch->flags.bdry || ch->flags.bSpeaker || ch->special_dsp != 0 )
 				continue;
 		}
 
 		// if mixing with SOUND_MIX_SPEAKER flag, ignore (don't even load) all channels not flagged as 'speaker'
-		if ( flags == SOUND_MIX_SPEAKER )
+		if constexpr ( flags == SOUND_MIX_SPEAKER )
 		{
 			if ( !ch->flags.bSpeaker )
 				continue;
 		}
 
 		// if mixing with SOUND_MIX_SPEAKER flag, ignore (don't even load) all channels not flagged as 'speaker'
-		if ( flags == SOUND_MIX_SPECIAL_DSP )
+		if constexpr ( flags == SOUND_MIX_SPECIAL_DSP )
 		{
 			if ( ch->special_dsp == 0 )
 				continue;
@@ -1023,15 +1025,6 @@ inline void MIX_ResetPaintbufferFilterCounter( intp ipaintbuffer )
 	Assert ( ipaintbuffer < g_paintBuffers.Count() );
 	g_paintBuffers[ipaintbuffer].ifilter = 0;
 }
-
-// Change paintbuffer's flags
-
-inline void MIX_SetPaintbufferFlags(intp ipaintbuffer, int flags)
-{
-	Assert( ipaintbuffer < g_paintBuffers.Count() );
-	g_paintBuffers[ipaintbuffer].flags = flags;
-}
-
 
 // zero out all paintbuffers
 
@@ -1736,8 +1729,9 @@ void MIX_CompressPaintbuffer(int ipaint, int count)
 // and that will not be mixed until the next mix pass! otherwise, MIX_MixChannelsToPaintbuffer
 // will advance any internal pointers on mixed channels; subsequent calls will be at 
 // incorrect offset.
-
-void MIX_MixUpsampleBuffer( CChannelList &list, intp ipaintbuffer, int end, int count, int flags )
+// dimhotepus: Template version for better inline.
+template<SoundMixType flags>
+static void MIX_MixUpsampleBuffer( CChannelList &list, intp ipaintbuffer, int end, int count )
 {
 	VPROF("MixUpsampleBuffer");
 	intp ipaintcur = MIX_GetCurrentPaintbufferIndex(); // save current paintbuffer
@@ -1754,7 +1748,7 @@ void MIX_MixUpsampleBuffer( CChannelList &list, intp ipaintbuffer, int end, int 
 	// mix 11khz channels to buffer
 	if ( list.m_has11kChannels )
 	{
-		MIX_MixChannelsToPaintbuffer( list, end, flags, SOUND_11k, SOUND_11k );
+		MIX_MixChannelsToPaintbuffer<flags, SOUND_11k, SOUND_11k>( list, end );
 
 		// upsample 11khz buffer by 2x
 		g_AudioDevice->MixUpsample( count / (SOUND_DMA_SPEED / SOUND_11k), FILTERTYPE_LINEAR ); 
@@ -1763,7 +1757,7 @@ void MIX_MixUpsampleBuffer( CChannelList &list, intp ipaintbuffer, int end, int 
 	if ( list.m_has22kChannels || list.m_has11kChannels )
 	{
 		// mix 22khz channels to buffer
-		MIX_MixChannelsToPaintbuffer( list, end, flags, SOUND_22k, SOUND_22k );
+		MIX_MixChannelsToPaintbuffer<flags, SOUND_22k, SOUND_22k>( list, end );
 
 #if (SOUND_DMA_SPEED > SOUND_22k)
 		// upsample 22khz buffer by 2x
@@ -1772,7 +1766,7 @@ void MIX_MixUpsampleBuffer( CChannelList &list, intp ipaintbuffer, int end, int 
 	}
 
 	// mix 44khz channels to buffer
-	MIX_MixChannelsToPaintbuffer( list, end, flags, SOUND_44k, SOUND_DMA_SPEED);
+	MIX_MixChannelsToPaintbuffer<flags, SOUND_44k, SOUND_44k>( list, end );
 
 	MIX_DeactivateAllPaintbuffers();
 	
@@ -1794,12 +1788,12 @@ void MIX_UpsampleAllPaintbuffers( CChannelList &list, int end, int count )
 	// mix and upsample all 'dry' sounds (channels) to 44khz SOUND_BUFFER_DRY paintbuffer
 
 	if ( list.m_hasDryChannels )
-		MIX_MixUpsampleBuffer( list, SOUND_BUFFER_DRY, end, count, SOUND_MIX_DRY );
+		MIX_MixUpsampleBuffer<SOUND_MIX_DRY>( list, SOUND_BUFFER_DRY, end, count );
 
 	// mix and upsample all 'speaker' sounds (channels) to 44khz SOUND_BUFFER_SPEAKER paintbuffer
 	
 	if ( list.m_hasSpeakerChannels )
-		MIX_MixUpsampleBuffer( list, SOUND_BUFFER_SPEAKER, end, count, SOUND_MIX_SPEAKER );
+		MIX_MixUpsampleBuffer<SOUND_MIX_SPEAKER>( list, SOUND_BUFFER_SPEAKER, end, count );
 
 	// mix and upsample all 'special dsp' sounds (channels) to 44khz SOUND_BUFFER_SPECIALs paintbuffer
 
@@ -1810,7 +1804,7 @@ void MIX_UpsampleAllPaintbuffers( CChannelList &list, int end, int count )
 			paintbuffer_t *pSpecialBuffer = MIX_GetPPaintFromIPaint( i );
 			if ( pSpecialBuffer->nSpecialDSP == list.m_nSpecialDSPs[ iDSP ] && pSpecialBuffer->idsp_specialdsp != -1 )
 			{
-				MIX_MixUpsampleBuffer( list, i, end, count, SOUND_MIX_SPECIAL_DSP );
+				MIX_MixUpsampleBuffer<SOUND_MIX_SPECIAL_DSP>( list, i, end, count );
 				break;
 			}
 		}
@@ -1849,7 +1843,7 @@ void MIX_UpsampleAllPaintbuffers( CChannelList &list, int end, int count )
 	// mix 11khz sounds: 
 	// pan sounds between 3 busses: facing, facingaway and room buffers
 	
-	MIX_MixChannelsToPaintbuffer( list, end, SOUND_MIX_WET, SOUND_11k, SOUND_11k);
+	MIX_MixChannelsToPaintbuffer<SOUND_MIX_WET, SOUND_11k, SOUND_11k>( list, end );
 
 	// upsample all 11khz buffers by 2x
 	if ( !g_bDspOff )
@@ -1870,7 +1864,7 @@ void MIX_UpsampleAllPaintbuffers( CChannelList &list, int end, int count )
 
 	// mix 22khz sounds: 
 	// pan sounds between 3 busses: facing, facingaway and room buffers
-	MIX_MixChannelsToPaintbuffer( list, end, SOUND_MIX_WET, SOUND_22k, SOUND_22k);
+	MIX_MixChannelsToPaintbuffer<SOUND_MIX_WET, SOUND_22k, SOUND_22k>( list, end );
 
 	// upsample all 22khz buffers by 2x
 #if ( SOUND_DMA_SPEED > SOUND_22k )
@@ -1893,7 +1887,7 @@ void MIX_UpsampleAllPaintbuffers( CChannelList &list, int end, int count )
 #endif
 
 	// mix all 44khz sounds to all active paintbuffers
-	MIX_MixChannelsToPaintbuffer( list, end, SOUND_MIX_WET, SOUND_44k, SOUND_DMA_SPEED);
+	MIX_MixChannelsToPaintbuffer<SOUND_MIX_WET, SOUND_44k, SOUND_44k>( list, end );
 
 	MIX_DeactivateAllPaintbuffers();
 
@@ -2474,7 +2468,7 @@ void MIX_PaintChannels( int endtime, bool bIsUnderwater )
 bool MIX_ScaleChannelVolume( paintbuffer_t *ppaint, channel_t *pChannel, int volume[CCHANVOLUMES], int mixchans )
 {
 	int i;
-	int	mixflag = ppaint->flags;
+	SoundBussType mixflag = ppaint->flags;
 	float scale;
 	char wavtype = pChannel->wavtype;
 	float dspmix;
