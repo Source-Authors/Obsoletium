@@ -1689,7 +1689,7 @@ bool V_hextobinary( IN_Z_CAP(numchars) char const *in, intp numchars, OUT_BYTECA
 	Assert( numchars >= 2 );
 	if ( numchars < 2) return false;
 
-	BitwiseClear( out, maxoutputbytes );
+	memset( out, 0, maxoutputbytes );
 	
 	unsigned char nibble1, nibble2;
 

@@ -69,8 +69,7 @@ struct FS_LocalToGlobal_t
 		Assert( count > 0 );
 		m_nCount = count;
 		m_Mapping = new int[ m_nCount ];
-		// dimhotepus: Type-safe clear.
-		BitwiseClear( m_Mapping, m_nCount * sizeof( int ) );
+		memset( m_Mapping, 0, m_nCount * sizeof( int ) );
 	}
 
 	FS_LocalToGlobal_t( const FS_LocalToGlobal_t& src )

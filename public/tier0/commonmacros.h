@@ -492,7 +492,6 @@ template <typename T>
 std::enable_if_t<std::is_trivially_copyable_v<T>> BitwiseCopy(
     const T* src, T* dest, size_t size) noexcept {
   static_assert(sizeof(*src) == sizeof(*dest));
-  assert(sizeof(*src) >= size);
   std::memcpy(dest, src, sizeof(T) * size);
 }
 
