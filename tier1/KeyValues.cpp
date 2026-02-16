@@ -53,8 +53,9 @@ constexpr inline int MAX_ERROR_STACK = 64;
 class CKeyValuesErrorStack
 {
 public:
-	CKeyValuesErrorStack() {
-		memset( m_errorStack, 0, sizeof(m_errorStack) );
+	CKeyValuesErrorStack()
+	{
+		BitwiseClear( m_errorStack );
 	}
 
 	void SetFilename( const char *pFilename )
@@ -525,7 +526,7 @@ void KeyValues::Init()
 	m_bEvaluateConditionals = true;
 
 	// for future proof
-	memset( unused, 0, sizeof(unused) );
+	BitwiseClear( unused );
 }
 
 //-----------------------------------------------------------------------------

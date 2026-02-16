@@ -317,7 +317,7 @@ int FindDiffs(uint8 const *NewBlock, uint8 const *OldBlock,
     ret=1;
   // first, build the hash table
   BlockPtr *HashedMatches[65536];
-  memset(HashedMatches,0,sizeof(HashedMatches));
+  BitwiseClear(HashedMatches);
   BlockPtr *Blocks=nullptr;
   if (OldSize)
     Blocks=new BlockPtr[OldSize];
@@ -444,7 +444,7 @@ int FindDiffsLowMemory(uint8 const *NewBlock, uint8 const *OldBlock,
   if (OldSize!=NewSize)
     ret=1;
   uint8 const *old_data_hash[256];
-  memset(old_data_hash,0,sizeof(old_data_hash));
+  BitwiseClear(old_data_hash);
   intp pending_raw_len=0;
   uint8 const *walk=NewBlock;
   uint8 const *oldptr=OldBlock;

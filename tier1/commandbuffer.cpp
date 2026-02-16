@@ -31,7 +31,7 @@ struct cmdalias_t
 //-----------------------------------------------------------------------------
 CCommandBuffer::CCommandBuffer( ) : m_Commands( 32, 32 )
 {
-	memset(m_pArgSBuffer, 0, sizeof(m_pArgSBuffer));
+	BitwiseClear(m_pArgSBuffer);
 	m_nLastUsedArgSSize = 0;
 	m_nArgSBufferSize = 0;
 	m_nCurrentTick = 0;

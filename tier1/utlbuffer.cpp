@@ -88,7 +88,7 @@ CUtlCharConversion *GetNoEscCharConversion()
 CUtlCStringConversion::CUtlCStringConversion( char nEscapeChar, const char *pDelimiter, intp nCount, ConversionArray_t *pArray ) : 
 	CUtlCharConversion( nEscapeChar, pDelimiter, nCount, pArray )
 {
-	memset( m_pConversion, 0x0, sizeof(m_pConversion) );
+	BitwiseClear( m_pConversion );
 	for ( intp i = 0; i < nCount; ++i )
 	{
 		m_pConversion[ (unsigned char) pArray[i].m_pReplacementString[0] ] = pArray[i].m_nActualChar;
@@ -116,7 +116,7 @@ CUtlCharConversion::CUtlCharConversion( char nEscapeChar, const char *pDelimiter
 	m_nDelimiterLength = Q_strlen( pDelimiter );
 	m_nMaxConversionLength = 0;
 
-	memset( m_pReplacements, 0, sizeof(m_pReplacements) );
+	BitwiseClear( m_pReplacements );
 
 	for ( intp i = 0; i < nCount; ++i )
 	{

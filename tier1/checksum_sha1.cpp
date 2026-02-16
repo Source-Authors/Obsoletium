@@ -246,8 +246,8 @@ void CSHA1::Final()
 	}
 
 	// Wipe variables for security reasons
-	memset(m_buffer, 0, sizeof(m_buffer) );
-	memset(m_state, 0, sizeof(m_state) );
+	BitwiseClear(m_buffer);
+	BitwiseClear(m_state);
 	// dimhotepus: Ensure compiler do not remove trailing memset.
 	SecureMemset(m_count, 0, sizeof(m_count) );
 	SecureMemset(finalcount, 0, sizeof(finalcount));

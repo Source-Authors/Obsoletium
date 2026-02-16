@@ -4,8 +4,7 @@
 
 #include "tier1/characterset.h"
 
-#include <cstring>  // memset.
-
+#include "tier0/commonmacros.h"
 #include "tier0/dbg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -15,7 +14,7 @@
 void CharacterSetBuild(characterset_t *set, const char *source) {
   if (!set || !source) return;
 
-  memset(set->set, 0, sizeof(set->set));
+  BitwiseClear(set->set);
 
   intp i{0};
 

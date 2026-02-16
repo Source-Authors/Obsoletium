@@ -3235,8 +3235,8 @@ void V_LogMultiline( bool input, char const *label, const char *data, size_t len
 	char hex_line[LINE_SIZE * 9 / 4 + 2], asc_line[LINE_SIZE + 1];
 	while (len > 0) 
 	{
-		V_memset(asc_line, ' ', sizeof(asc_line));
-		V_memset(hex_line, ' ', sizeof(hex_line));
+		BitwiseSet(asc_line, ' ');
+		BitwiseSet(hex_line, ' ');
 		size_t line_len = MIN(len, LINE_SIZE);
 		for (size_t i=0; i<line_len; ++i) {
 			auto ch = static_cast<unsigned char>(data[i]);
@@ -3244,8 +3244,8 @@ void V_LogMultiline( bool input, char const *label, const char *data, size_t len
 			hex_line[i*2 + i/4] = HEX[ch >> 4];
 			hex_line[i*2 + i/4 + 1] = HEX[ch & 0xf];
 		}
-		asc_line[sizeof(asc_line)-1] = 0;
-		hex_line[sizeof(hex_line)-1] = 0;
+		asc_line[ssize(asc_line)-1] = 0;
+		hex_line[ssize(hex_line)-1] = 0;
 		output += CFmtStr( "%s %s %s %s\n", label, direction, asc_line, hex_line );
 		data += line_len;
 		len -= line_len;

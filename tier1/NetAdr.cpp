@@ -203,7 +203,7 @@ unsigned int netadr_t::GetIPHostByteOrder() const
 
 void netadr_t::ToSockadr (sockaddr * s) const
 {
-	Q_memset ( s, 0, sizeof(sockaddr));
+	BitwiseClear ( *s );
 
 	if (type == NA_BROADCAST)
 	{

@@ -190,6 +190,10 @@ void MD5Update(MD5Context_t *ctx, IN_BYTECAP(len) const void *buf, unsigned int 
     memcpy(ctx->in, in, len);
 }
 
+// dimhotepus: Prevent compiler from inlining memset and further
+// removal if SecureMemset buffer is not accessed later.
+static volatile auto SecureMemset = memset;
+
 //-----------------------------------------------------------------------------
 // Purpose: Final wrapup - pad to 64-byte boundary with the bit pattern 
 // 1 0* (64-bit count of bits processed, MSB-first)
@@ -237,7 +241,7 @@ void MD5Final( OUT_BYTECAP_C(MD5_DIGEST_LENGTH) unsigned char digest[MD5_DIGEST_
     MD5Transform(ctx->buf, (unsigned int *) ctx->in);
     //byteReverse((unsigned char *) ctx->buf, 4);
     memcpy(digest, ctx->buf, MD5_DIGEST_LENGTH);
-    memset(ctx, 0, sizeof(*ctx));        /* In case it's sensitive */
+    SecureMemset(ctx, 0, sizeof(*ctx)); /* In case it's sensitive */
 }
 
 //-----------------------------------------------------------------------------
@@ -262,11 +266,11 @@ char *MD5_Print( IN_BYTECAP(hashlen) unsigned char *hash, intp hashlen )
 //-----------------------------------------------------------------------------
 unsigned int MD5_PseudoRandom(unsigned int nSeed)
 {
-	MD5Context_t ctx;
 	alignas(unsigned int) unsigned char digest[MD5_DIGEST_LENGTH]; // The MD5 Hash
 
-	memset( &ctx, 0, sizeof( ctx ) );
-		
+	MD5Context_t ctx;
+	BitwiseClear( ctx );
+
 	MD5Init(&ctx);
 	MD5Update(&ctx, nSeed );
 	MD5Final(digest, &ctx);
@@ -277,7 +281,7 @@ unsigned int MD5_PseudoRandom(unsigned int nSeed)
 //-----------------------------------------------------------------------------
 void MD5Value_t::Zero()
 {
-	V_memset( bits, 0, sizeof( bits ) );
+	BitwiseClear( bits );
 }
 
 //-----------------------------------------------------------------------------
