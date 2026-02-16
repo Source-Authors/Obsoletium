@@ -1740,8 +1740,8 @@ int CMDLPicker::UpdatePropDataList( const char* pszPropData, bool &bIsStatic )
 			}
 			KeyValuesAD pkv( new KeyValues("node", "key", keyText, "value", valueText ) );
 			m_pPropDataList->AddItem( pkv, 0, false, false );
-			Q_memset( keyText, 0, 255 );
-			Q_memset( valueText, 0, 255 );
+			BitwiseClear( keyText );
+			BitwiseClear( valueText );
 			iCount++;
 			beginChunk = endChunk + 1;
 			beginChunk = strchr( beginChunk, '\"' );

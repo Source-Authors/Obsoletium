@@ -592,7 +592,7 @@ void CMDLPanel::SetSequenceLayers( const MDLSquenceLayer_t *pSequenceLayers, int
 	else
 	{
 		m_nNumSequenceLayers = 0;
-		V_memset( m_SequenceLayers, 0, sizeof( m_SequenceLayers ) );
+		BitwiseClear( m_SequenceLayers );
 	}
 }
 
