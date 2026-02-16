@@ -35,6 +35,7 @@ public:
 		{
 			t = 0.16;
 		}
+		m_flNextKeyRepeat = 0.0;
 	}
 
 	void		Reset( void ) { BitwiseClear( m_bAliasDown ); m_bHaveKeyDown = false; }
