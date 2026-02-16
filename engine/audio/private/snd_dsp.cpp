@@ -17,15 +17,28 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define SIGN(d)				((d)<0?-1:1)
+template<typename T>
+[[nodiscard]] constexpr inline int SIGN(T d) noexcept
+{
+	return d < 0 ? -1 : 1;
+}
 
+template<typename T>
+[[nodiscard]] constexpr inline T SEC_TO_SAMPS(T a) noexcept
+{
+	return a * SOUND_DMA_SPEED;				// convert seconds to # samples in equivalent time
+}
 
-#define MSEC_TO_SAMPS(a)	(((a)*SOUND_DMA_SPEED) / 1000)		// convert milliseconds to # samples in equivalent time
-#define SEC_TO_SAMPS(a)		((a)*SOUND_DMA_SPEED)				// convert seconds to # samples in equivalent time
+template<typename T>
+[[nodicard]] constexpr inline T MSEC_TO_SAMPS(T a) noexcept
+{
+	return SEC_TO_SAMPS( a ) / 1000;		// convert milliseconds to # samples in equivalent time
+}
 
 // Suppress the noisy warnings caused by CLIP_DSP
 template<typename T>
-[[nodiscard]] constexpr inline T CLIP_DSP(T x) {
+[[nodiscard]] constexpr inline T CLIP_DSP(T x) noexcept
+{
   return x;
 }
 
