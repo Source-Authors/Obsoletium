@@ -1755,7 +1755,7 @@ static void SetTextureLodData( IVTFTexture *pTexture, VTexConfigInfo_t const &in
 		)
 	{
 		TextureLODControlSettings_t lodChunk;
-		memset( &lodChunk, 0, sizeof( lodChunk ) );
+		BitwiseClear( lodChunk );
 		lodChunk.m_ResolutionClampX = GetClampingValue( info.m_nMaxDimensionX );
 		lodChunk.m_ResolutionClampY = GetClampingValue( info.m_nMaxDimensionY );
 		lodChunk.m_ResolutionClampX_360 = GetClampingValue( info.m_nMaxDimensionX_360 );
