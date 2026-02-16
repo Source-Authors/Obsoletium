@@ -450,7 +450,7 @@ void ButtonCode_InitKeyTranslationTable()
 	COMPILE_TIME_ASSERT( sizeof(s_pAnalogCodeName) / sizeof( const char * ) == ANALOG_CODE_LAST );
 
 	// set virtual key translation table
-	memset( s_pVirtualKeyToButtonCode, KEY_NONE, sizeof(s_pVirtualKeyToButtonCode) );
+	BitwiseSet( s_pVirtualKeyToButtonCode, KEY_NONE );
 
 	s_pVirtualKeyToButtonCode['0']			=KEY_0;
 	s_pVirtualKeyToButtonCode['1']			=KEY_1;

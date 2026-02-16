@@ -187,7 +187,7 @@ void CInputSystem::InitializeJoysticks( void )
 
 	// assume no joystick
 	m_nJoystickCount = 0;
-	memset( m_pJoystickInfo, 0, sizeof( m_pJoystickInfo ) );
+	BitwiseClear( m_pJoystickInfo );
 	for ( auto &joy : m_pJoystickInfo )
 	{
 		joy.m_nDeviceId = std::numeric_limits<unsigned>::max();

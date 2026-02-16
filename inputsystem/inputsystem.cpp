@@ -50,7 +50,7 @@ CInputSystem::CInputSystem()
 	m_bEnabled = true;
 	m_bPumpEnabled = true;
 	m_bIsPolling = false;
-	memset( m_currentActionSet, 0, sizeof(m_currentActionSet) );
+	BitwiseClear( m_currentActionSet );
 	m_StartupTimeTick = 0;
 	m_nLastPollTick = 0;
 	m_nLastSampleTick = 0;
@@ -60,14 +60,14 @@ CInputSystem::CInputSystem()
 	m_nJoystickCount = 0;
 	m_bJoystickInitialized = false;
 	m_bXController = false;
-	memset( m_pJoystickInfo, 0, sizeof(m_pJoystickInfo) );
+	BitwiseClear( m_pJoystickInfo );
 
-	memset( m_pRadialMenuStickVal, 0, sizeof(m_pRadialMenuStickVal) );
+	BitwiseClear( m_pRadialMenuStickVal );
 	memset( m_Device, 0, sizeof(m_Device) );
 	m_unNumConnected = 0;
 	m_flLastSteamControllerInput = 0.0F;
 	m_nJoystickBaseline = 0;
-	memset( m_nControllerType, 0, sizeof(m_nControllerType) );
+	BitwiseClear( m_nControllerType );
 
 	m_bSteamController = false;
 	m_bSteamControllerActionsInitialized = false;
@@ -79,8 +79,8 @@ CInputSystem::CInputSystem()
 	m_bNovintDevices = false;
 #endif
 
-	memset( m_appXKeys, 0, sizeof(m_appXKeys) );
-	memset( m_XDevices, 0, sizeof(m_XDevices) );
+	BitwiseClear( m_appXKeys );
+	BitwiseClear( m_XDevices );
 	m_PrimaryUserId = INVALID_USER_ID;
 
 	m_bRawInputSupported = false;
@@ -364,14 +364,14 @@ void CInputSystem::ClearInputState()
 	{
 		InputState_t& state = m_InputState[i];
 		state.m_ButtonState.ClearAll();
-		memset( state.m_pAnalogDelta, 0, ANALOG_CODE_LAST * sizeof(int) );
-		memset( state.m_pAnalogValue, 0, ANALOG_CODE_LAST * sizeof(int) );
-		memset( state.m_ButtonPressedTick, 0, BUTTON_CODE_LAST * sizeof(int) );
-		memset( state.m_ButtonReleasedTick, 0, BUTTON_CODE_LAST * sizeof(int) );
+		BitwiseClear( state.m_pAnalogDelta );
+		BitwiseClear( state.m_pAnalogValue );
+		BitwiseClear( state.m_ButtonPressedTick );
+		BitwiseClear( state.m_ButtonReleasedTick );
 		state.m_Events.Purge();
 		state.m_bDirty = false;
 	}
-	memset( m_appXKeys, 0, XUSER_MAX_COUNT * XK_MAX_KEYS * sizeof(appKey_t) );
+	BitwiseClear( m_appXKeys );
 }
 
 //-----------------------------------------------------------------------------
@@ -381,7 +381,7 @@ void CInputSystem::ResetInputState()
 {
 	ReleaseAllButtons();
 	ZeroAnalogState( 0, ANALOG_CODE_LAST - 1 );
-	memset( m_appXKeys, 0, XUSER_MAX_COUNT * XK_MAX_KEYS * sizeof(appKey_t) );
+	BitwiseClear( m_appXKeys );
 
 	m_mouseRawAccumX = m_mouseRawAccumY = 0;
 }
