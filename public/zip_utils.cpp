@@ -1313,8 +1313,8 @@ unsigned short CZipFile::MakeXZipCommentString( char *pCommentString )
 {
 	char tempString[XZIP_COMMENT_LENGTH];
 
-	memset( tempString, 0, sizeof( tempString ) );
-	V_snprintf( tempString, sizeof( tempString ), "XZP%c %d", m_bCompatibleFormat ? '1' : '2', m_AlignmentSize );
+	BitwiseClear( tempString );
+	V_sprintf_safe( tempString, "XZP%c %d", m_bCompatibleFormat ? '1' : '2', m_AlignmentSize );
 	if ( pCommentString )
 	{
 		memcpy( pCommentString, tempString, sizeof( tempString ) );

@@ -119,7 +119,7 @@ private:
 //-----------------------------------------------------------------------------
 inline CMorphBuilder::CMorphBuilder()
 {
-	memset(&m_Info, 0, sizeof(m_Info));
+	BitwiseClear(m_Info);
 	m_pMorph = NULL;
 }
 

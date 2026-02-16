@@ -184,7 +184,7 @@ struct VPKContentFileInfo_t
 		m_iPreloadSize = 0;
 		m_crc = 0;
 		m_pPreloadData = NULL;
-		//memset( m_md5Source.bits, 0, sizeof( m_md5Source.bits ) );
+		// BitwiseClear( m_md5Source.bits );
 	}
 };
 
@@ -202,7 +202,7 @@ struct CachedVPKRead_t
 		m_idxLRU = -1;
 		m_hMD5RequestHandle= 0;
 		m_cFailedHashes = 0;
-		memset(&m_md5Value, 0, sizeof(m_md5Value));
+		BitwiseClear(m_md5Value);
 	}
 	int m_nPackFileNumber;	// identifier
 	int m_nFileFraction;	// identifier

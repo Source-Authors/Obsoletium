@@ -64,7 +64,7 @@ public:
 		fraction{FLOAT32_NAN}, contents{0}, dispFlags{0},
 		allsolid{false}, startsolid{false}
 	{
-		memset( &plane, 0, sizeof(plane) );
+		BitwiseClear( plane );
 	}
 
 	// No copy constructors allowed

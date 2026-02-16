@@ -14,8 +14,8 @@ CBoneList::CBoneList()
 {
 	m_bShouldDelete = false;
 	m_nBones = 0;
-	Q_memset( m_vecPos, 0, sizeof( m_vecPos ) );
-	Q_memset( m_quatRot, 0, sizeof( m_quatRot ) );
+	BitwiseClear( m_vecPos );
+	BitwiseClear( m_quatRot );
 }
 
 void CBoneList::Release()
@@ -45,7 +45,7 @@ CFlexList::CFlexList()
 {
 	m_bShouldDelete = false;
 	m_nNumFlexes = 0;
-	Q_memset( m_flexWeights, 0, sizeof( m_flexWeights ) );
+	BitwiseClear( m_flexWeights );
 }
 
 void CFlexList::Release()

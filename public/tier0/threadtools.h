@@ -695,6 +695,8 @@ class PLATFORM_CLASS CThreadMutex
 {
 public:
 	CThreadMutex();
+	// dimhotepus: Ctor with spin count.
+	CThreadMutex(unsigned int spinCount);
 	~CThreadMutex();
 
 	//------------------------------------------------------
@@ -1747,6 +1749,11 @@ inline CThreadMutex::CThreadMutex()
 	pthread_mutexattr_init( &m_Attr );
 	pthread_mutexattr_settype( &m_Attr, PTHREAD_MUTEX_RECURSIVE );
 	pthread_mutex_init( &m_Mutex, &m_Attr );
+}
+
+// dimhotepus: Ctor with spin count.
+inline CThreadMutex::CThreadMutex(unsigned int spinCount) : CThreadMutex{}
+{
 }
 
 //---------------------------------------------------------

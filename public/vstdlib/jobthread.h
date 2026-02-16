@@ -122,7 +122,7 @@ struct ThreadPoolStartParams_t
 		else
 		{
 			// dimhotepus: Ensure all affinities are used if smb breaks pool affinities logic.
-			memset(iAffinityTable, 0xFF, sizeof(iAffinityTable));
+			BitwiseSet(iAffinityTable, 0xFF);
 		}
 	}
 

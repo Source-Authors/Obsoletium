@@ -2159,7 +2159,7 @@ inline CParticleSystemDefinition::CParticleSystemDefinition( void )
 	m_bViewModelEffect = false;
 
 	m_nContextDataSize = 0;
-	memset( &m_Id, 0, sizeof(m_Id) );
+	BitwiseClear( m_Id );
 
 	m_flMaxDrawDistance = 0.0f;
 	m_flNoDrawTimeToGoToSleep = 0.0f;

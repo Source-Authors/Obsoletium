@@ -37,7 +37,7 @@ public:
 		}
 	}
 
-	void		Reset( void ) { memset( m_bAliasDown, 0, sizeof(bool) * FM_NUM_KEYREPEAT_ALIASES ); m_bHaveKeyDown = false; }
+	void		Reset( void ) { BitwiseClear( m_bAliasDown ); m_bHaveKeyDown = false; }
 	void		KeyDown( vgui::KeyCode code );
 	void		KeyUp( vgui::KeyCode code );
 	vgui::KeyCode	KeyRepeated( void );

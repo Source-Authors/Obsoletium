@@ -42,7 +42,7 @@ struct JobStats_t
 
 	JobStats_t()
 	{
-		memset( this, 0, sizeof(JobStats_t) );
+		memset( this, 0, sizeof(*this) );
 	}
 };
 
@@ -50,7 +50,7 @@ struct JobStatsBucket_t
 {
 	JobStatsBucket_t()
 	{
-		memset( this, 0, sizeof(JobStatsBucket_t) );
+		memset( this, 0, sizeof(*this) );
 	}
 	char m_rgchName[64];
 	uint64 m_cCompletes;

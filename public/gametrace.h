@@ -76,7 +76,7 @@ public:
 		: fractionleftsolid{FLOAT32_NAN}, hitgroup{-1},
 		physicsbone{-1}, m_pEnt{nullptr}, hitbox{-1}
 	{
-		memset( &surface, 0, sizeof(surface) );
+		BitwiseClear( surface );
 	}
 
 	// No copy constructors allowed

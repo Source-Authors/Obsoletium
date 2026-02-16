@@ -1247,14 +1247,20 @@ MAP_THREAD_PROFILER_CALL( ThreadNotifySyncReleasing, __itt_notify_sync_releasing
 //-----------------------------------------------------------------------------
 
 #ifndef POSIX
-CThreadMutex::CThreadMutex()
+CThreadMutex::CThreadMutex() : CThreadMutex{4000}
+{
+}
+
+// dimhotepus: Ctor with spin count.
+CThreadMutex::CThreadMutex(unsigned int spinCount)
 {
 #ifdef THREAD_MUTEX_TRACING_ENABLED
 	memset( &m_CriticalSection, 0, sizeof(m_CriticalSection) );
 #endif
+	static_assert(sizeof(m_CriticalSection) == sizeof(CRITICAL_SECTION));
 	// This function always succeeds and returns a nonzero value on XP+.
 	// See https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-initializecriticalsectionandspincount
-	(void)InitializeCriticalSectionAndSpinCount((CRITICAL_SECTION *)&m_CriticalSection, 4000);
+	(void)InitializeCriticalSectionAndSpinCount((CRITICAL_SECTION *)&m_CriticalSection, spinCount);
 #ifdef THREAD_MUTEX_TRACING_SUPPORTED
 	// These need to be initialized unconditionally in case mixing release & debug object modules
 	// Lock and unlock may be emitted as COMDATs, in which case may get spurious output

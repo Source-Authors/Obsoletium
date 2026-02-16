@@ -37,7 +37,7 @@ class CBeamSegDraw
 public:
 	CBeamSegDraw() :  m_vNormalLast() 
 	{
-		memset( &m_Seg, 0, sizeof(m_Seg) );
+		BitwiseClear( m_Seg );
 	}
 	// Pass null for pMaterial if you have already set the material you want.
 	void			Start( IMatRenderContext *pRenderContext, int nSegs, IMaterial *pMaterial=nullptr, CMeshBuilder *pMeshBuilder = nullptr, int nMeshVertCount = 0 );
