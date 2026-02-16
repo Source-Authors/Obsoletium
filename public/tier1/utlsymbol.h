@@ -110,6 +110,9 @@ public:
 	}
 
 protected:
+	static constexpr inline unsigned short kInvalidPool = 0xFFFF;
+	static constexpr inline unsigned short kInvalidOffset = 0xFFFF;
+
 	class CStringPoolIndex
 	{
 	public:
@@ -129,6 +132,18 @@ protected:
 		unsigned short m_iOffset;	// Index into the string pool.
 	};
 
+	// Helper to store search string on the stack for safe thread access
+	class CStringPoolIndexSearch : public CStringPoolIndex
+	{
+	public:
+		constexpr CStringPoolIndexSearch( const char* pString )
+			: CStringPoolIndex( kInvalidPool, kInvalidOffset ),
+			m_pUserSearchString{ pString }
+		{
+		}
+		const char* m_pUserSearchString;
+	};
+
 	class CLess
 	{
 	public:
@@ -137,32 +152,13 @@ protected:
 		bool operator()( const CStringPoolIndex &left, const CStringPoolIndex &right ) const;
 	};
 
-	struct CLessForFind
-	{
-		CLessForFind( [[maybe_unused]] int ignored = 0 ) {} // permits default initialization to NULL in CUtlRBTree
-		bool operator!() const { return false; }
-		bool operator()( const CStringPoolIndex &left, const CStringPoolIndex &right, const char *searchString ) const;
-	};
-
 	// Stores the symbol lookup
-	class CTree : public CUtlRBTree<
-		CStringPoolIndex,
-		unsigned short,
-		CLess,
-		CUtlMemory< UtlRBTreeNode_t< CStringPoolIndex, unsigned short >, unsigned short >,
-		const char *,
-		CLessForFind>
+	class CTree : public CUtlRBTree<CStringPoolIndex, unsigned short, CLess>
 	{
 	public:
-		CTree( intp growSize, intp initSize ) : CUtlRBTree<
-			CStringPoolIndex,
-			unsigned short,
-			CLess,
-			CUtlMemory< UtlRBTreeNode_t< CStringPoolIndex, unsigned short >, unsigned short >,
-			const char *,
-			CLessForFind>( growSize, initSize ) {}
+		CTree( intp growSize, intp initSize )
+			: CUtlRBTree<CStringPoolIndex, unsigned short, CLess>( growSize, initSize ) {}
 		friend class CUtlSymbolTable::CLess; // Needed to allow CLess to calculate pointer to symbol table
-		friend struct CUtlSymbolTable::CLessForFind; // Needed to allow CLess to calculate pointer to symbol table
 	};
 
 	struct StringPool_t

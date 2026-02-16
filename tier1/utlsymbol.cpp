@@ -18,8 +18,8 @@
 #include "tier0/memdbgon.h"
 
 #define DEFINE_INVALID_STRING_INDEX                                  \
-  constexpr CUtlSymbolTable::CStringPoolIndex INVALID_STRING_INDEX( \
-    (unsigned short)0xFFFFU, (unsigned short)0xFFFFU)
+  constexpr CUtlSymbolTable::CStringPoolIndex INVALID_STRING_INDEX(  \
+    CUtlSymbolTable::kInvalidOffset, CUtlSymbolTable::kInvalidPool)
 
 constexpr inline intp MIN_STRING_POOL_SIZE{2048};
 
@@ -122,39 +122,16 @@ inline const char* CUtlSymbolTable::StringFromIndex( const CStringPoolIndex &ind
 
 bool CUtlSymbolTable::CLess::operator()( const CStringPoolIndex &i1, const CStringPoolIndex &i2 ) const
 {
-	// Need to do pointer math because CUtlSymbolTable is used in CUtlVectors, and hence
-	// can be arbitrarily moved in memory on a realloc. Yes, this is portable. In reality,
-	// right now at least, because m_LessFunc is the first member of CUtlRBTree, and m_Lookup
-	// is the first member of CUtlSymbolTable, this == pTable
-	CUtlSymbolTable *pTable = (CUtlSymbolTable *)( (byte *)GET_OUTER( CUtlSymbolTable::CTree, m_LessFunc ) - offsetof(CUtlSymbolTable, m_Lookup ) );
-	const char* str1 = pTable->StringFromIndex( i1 );
-	const char* str2 = pTable->StringFromIndex( i2 );
-
-	if ( !str1 && str2 )
-		return false;
-	if ( !str2 && str1 )
-		return true;
-	if ( !str1 && !str2 )
-		return false;
-	if ( !pTable->m_bInsensitive )
-		return V_strcmp( str1, str2 ) < 0;
-	else
-		return V_stricmp( str1, str2 ) < 0;
-}
-
-
-bool CUtlSymbolTable::CLessForFind::operator()( const CStringPoolIndex &i1, const CStringPoolIndex &i2, const char *searchString ) const
-{
 	DEFINE_INVALID_STRING_INDEX;
 
 	// Need to do pointer math because CUtlSymbolTable is used in CUtlVectors, and hence
 	// can be arbitrarily moved in memory on a realloc. Yes, this is portable. In reality,
 	// right now at least, because m_LessFunc is the first member of CUtlRBTree, and m_Lookup
 	// is the first member of CUtlSymbolTable, this == pTable
-	CUtlSymbolTable *pTable = (CUtlSymbolTable *)( (byte*)GET_OUTER( CUtlSymbolTable::CTree, m_LessFindFunc ) - offsetof(CUtlSymbolTable, m_Lookup ) );
-	const char* str1 = (i1 == INVALID_STRING_INDEX) ? searchString :
+	CUtlSymbolTable *pTable = (CUtlSymbolTable *)( (byte *)GET_OUTER( CUtlSymbolTable::CTree, m_LessFunc ) - offsetof(CUtlSymbolTable, m_Lookup ) );
+	const char* str1 = (i1 == INVALID_STRING_INDEX) ? static_cast< const CUtlSymbolTable::CStringPoolIndexSearch& >( i1 ).m_pUserSearchString :
 													  pTable->StringFromIndex( i1 );
-	const char* str2 = (i2 == INVALID_STRING_INDEX) ? searchString :
+	const char* str2 = (i2 == INVALID_STRING_INDEX) ? static_cast< const CUtlSymbolTable::CStringPoolIndexSearch& >( i2 ).m_pUserSearchString :
 													  pTable->StringFromIndex( i2 );
 
 	if ( !str1 && str2 )
@@ -188,14 +165,14 @@ CUtlSymbolTable::~CUtlSymbolTable()
 
 CUtlSymbol CUtlSymbolTable::Find( const char* pString ) const
 {
-	DEFINE_INVALID_STRING_INDEX;
-
 	if (!pString)
 		return {};
 
+	CStringPoolIndexSearch search{ pString };
+
 	// Passing this special invalid symbol makes the comparison function
 	// use the string passed in the context
-	UtlSymId_t idx = m_Lookup.Find( INVALID_STRING_INDEX, pString );
+	UtlSymId_t idx = m_Lookup.Find( search );
 
 	return { idx };
 }
