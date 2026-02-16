@@ -908,7 +908,7 @@ sndinitstat CAudioDirectSound::SNDDMA_InitDirect( void )
 		if ( !primary_format_set || !CommandLine()->CheckParm ("-primarysound") )
 		{
 			// create the secondary buffer we'll actually work with
-			Q_memset( &buffer_desc, 0, sizeof(buffer_desc) );
+			BitwiseClear( buffer_desc );
 			buffer_desc.dwSize = sizeof(DSBUFFERDESC);
 			buffer_desc.dwFlags = DSBCAPS_LOCSOFTWARE;		// NOTE: don't use CTRLFREQUENCY (slow)
 			buffer_desc.dwBufferBytes = SECONDARY_BUFFER_SIZE;
@@ -928,7 +928,7 @@ sndinitstat CAudioDirectSound::SNDDMA_InitDirect( void )
 			m_deviceSampleBits = primary_format.wBitsPerSample;
 			m_deviceDmaSpeed   = primary_format.nSamplesPerSec;
 
-			Q_memset(&buffer_caps, 0, sizeof(buffer_caps));
+			BitwiseClear( buffer_caps );
 			buffer_caps.dwSize = sizeof(buffer_caps);
 
 			if (DS_OK != pDSBuf->GetCaps( &buffer_caps ))
@@ -950,7 +950,7 @@ sndinitstat CAudioDirectSound::SNDDMA_InitDirect( void )
 				return SIS_FAILURE;
 			}
 
-			Q_memset(&buffer_caps, 0, sizeof(buffer_caps));
+			BitwiseClear( buffer_caps );
 			buffer_caps.dwSize = sizeof(buffer_caps);
 			if (FAILED(pDSPBuf->GetCaps(&buffer_caps)))
 			{

@@ -783,7 +783,7 @@ bool CAudioXAudio2::Init() {
 
   ClearBuffer();
 
-  V_memset(audio_buffers_, 0, sizeof(audio_buffers_));
+  BitwiseClear(audio_buffers_);
   for (size_t i = 0; i < kMaxXAudio2DeviceBuffersCount; i++) {
     audio_buffers_[i].pAudioData = all_audio_buffers_ + i * audio_buffer_size_;
     audio_buffers_[i].pContext = reinterpret_cast<void *>(i);

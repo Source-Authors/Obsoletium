@@ -2331,7 +2331,7 @@ void SND_SetSpatialDelays()
 
 	if ( !g_ssp_init )
 	{
-		Q_memset(&g_ssp, 0, sizeof(snd_spatial_t));
+		BitwiseClear(g_ssp);
 		g_ssp_init = true;
 	}
 
@@ -2638,7 +2638,7 @@ Vector g_das_vec3[DAS_CWALLS];	// trace vectors to walls, ceiling, floor
 
 void DAS_InitNodes( void )
 {
-	Q_memset(g_das_nodes, 0, sizeof(das_node_t) * DAS_CNODES);
+	BitwiseClear(g_das_nodes);
 	g_das_check_next = 0;
 	g_das_store_next = 0;
 	g_das_all_checked = 0;
@@ -2691,7 +2691,7 @@ void DAS_InitNodes( void )
 
 void DAS_InitAutoRoom( das_room_t *proom)
 {
-		Q_memset(proom, 0, sizeof (das_room_t));
+	BitwiseClear(*proom);
 }
 
 // reset all nodes for next round of visibility checks between player & nodes
@@ -5775,7 +5775,7 @@ void S_StopAllSounds( bool bClear )
 		++i;
 	}
 
-	Q_memset( channels, 0, sizeof(channels) );
+	BitwiseClear( channels );
 
 	if ( bClear )
 	{
@@ -6480,7 +6480,7 @@ void S_DspParms( const CCommand &args )
 	int cparam = min( args.ArgC() - 4, 16);
 
 	float params[16];
-	Q_memset( params, 0, sizeof(float) * 16 );
+	BitwiseClear( params );
 
 	// get preset & proc
 	// dimhotepus: Q_atof -> Q_atoi
@@ -7297,7 +7297,7 @@ void MXR_DebugGraphMixVolumes( debug_showvols_t *groupvols, int cgroups)
 			//flXposBar = flXpos + MXR_DEBUG_GREENSTART;
 
 			rb = 0; gb= 255; bb = 0;		// green bar
-			Q_memset(bartext, 0, sizeof(bartext));
+			BitwiseClear(bartext);
 
 			cbars = (int)((float)vol1 * (float)MXR_DEBUG_VOLSCALE);
 			cbars = clamp(cbars, 0, MXR_DEBUG_VOLSCALE*3-1);
@@ -7311,7 +7311,7 @@ void MXR_DebugGraphMixVolumes( debug_showvols_t *groupvols, int cgroups)
 		if (vol2 > MXR_DEBUG_YELLOWLIMIT)	
 		{
 			rb = 255; gb = 255; bb = 0;	
-			Q_memset(bartext, 0, sizeof(bartext));
+			BitwiseClear(bartext);
 
 			cbars = (int)((float)vol2 * (float)MXR_DEBUG_VOLSCALE);
 			cbars = clamp(cbars, 0, MXR_DEBUG_VOLSCALE*3-1);
@@ -7325,7 +7325,7 @@ void MXR_DebugGraphMixVolumes( debug_showvols_t *groupvols, int cgroups)
 		{
 			//flXposBar = flXpos + MXR_DEBUG_REDSTART;
 			rb = 255; gb = 0; bb = 0;
-			Q_memset(bartext, 0, sizeof(bartext));
+			BitwiseClear(bartext);
 
 			cbars = (int)((float)vol3 * (float)MXR_DEBUG_VOLSCALE);
 			cbars = clamp(cbars, 0, MXR_DEBUG_VOLSCALE*3-1);
@@ -7774,8 +7774,8 @@ bool MXR_LoadAllSoundMixers( void )
 	g_csoundmixers	= 0;					// total number of soundmixers found
 	g_cgrouprules	= 0;					// total number of group rules found
 
-	Q_memset(g_soundmixers, 0, sizeof(g_soundmixers));
-	Q_memset(g_grouprules, 0, sizeof(g_grouprules));
+	BitwiseClear(g_soundmixers);
+	BitwiseClear(g_grouprules);
 
 	// load file
 
