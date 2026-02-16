@@ -321,7 +321,7 @@ public:
 		m_nHeaderSize( 0 )
 	{
 		m_szOutFilename[ 0 ] = 0;
-		V_memset( m_aHash, 0, sizeof( m_aHash ) );
+		BitwiseClear( m_aHash );
 	}
 
 	virtual PublishStatus_t	GetStatus() const

@@ -64,7 +64,7 @@ CON_COMMAND( save_replay, "Save a replay of the current life if possible." )
 	if ( !pReplayForCurrentLife->GetScreenshotCount() )
 	{
 		CaptureScreenshotParams_t params;
-		V_memset( &params, 0, sizeof( params ) );
+		BitwiseClear( params );
 		params.m_flDelay = 0.0f;
 		params.m_bPrimary = true;
 		CL_GetScreenshotManager()->CaptureScreenshot( params );

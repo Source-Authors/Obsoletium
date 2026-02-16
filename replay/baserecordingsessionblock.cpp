@@ -28,7 +28,7 @@ CBaseRecordingSessionBlock::CBaseRecordingSessionBlock( IReplayContext *pContext
 	m_pContext( pContext )
 {
 	m_szFullFilename[ 0 ] = '\0';
-	V_memset( m_aHash, 0, sizeof( m_aHash ) );
+	BitwiseClear( m_aHash );
 }
 
 const char *CBaseRecordingSessionBlock::GetSubKeyTitle() const

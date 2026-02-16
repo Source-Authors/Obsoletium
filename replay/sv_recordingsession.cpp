@@ -113,7 +113,7 @@ void CServerRecordingSession::VerifyLocks()
 double CServerRecordingSession::GetSecondsToExpiration() const
 {
 	tm recordtime_tm;
-	V_memset( &recordtime_tm, 0, sizeof( recordtime_tm ) );
+	BitwiseClear( recordtime_tm );
 
 	int nDay, nMonth, nYear;
 	m_RecordTime.GetDate( nDay, nMonth, nYear );

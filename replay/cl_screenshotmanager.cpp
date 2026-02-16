@@ -176,7 +176,7 @@ void CScreenshotManager::DoCaptureScreenshot()
 
 	// Setup parameters for screenshot
 	WriteReplayScreenshotParams_t params;
-	V_memset( &params, 0, sizeof( params ) );
+	BitwiseClear( params );
 
 	// Setup the camera
 	Vector origin;

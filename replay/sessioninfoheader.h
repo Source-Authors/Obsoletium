@@ -24,7 +24,7 @@ struct SessionInfoHeader_t
 {
 	inline SessionInfoHeader_t()
 	{
-		V_memset( this, 0, sizeof( SessionInfoHeader_t ) );
+		V_memset( this, 0, sizeof( *this ) );
 		m_nCompressorType = COMPRESSORTYPE_INVALID;
 		m_uVersion = SESSION_INFO_VERSION;
 	}

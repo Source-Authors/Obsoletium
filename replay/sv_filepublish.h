@@ -35,7 +35,7 @@ struct PublishFileParams_t
 {
 	inline PublishFileParams_t()
 	{
-		V_memset( this, 0, sizeof( PublishFileParams_t ) );
+		V_memset( this, 0, sizeof( *this ) );
 		m_nCompressorType = COMPRESSORTYPE_BZ2;
 	}
 
