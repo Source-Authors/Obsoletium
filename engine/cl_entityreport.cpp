@@ -251,7 +251,7 @@ private:
 	vgui::HFont		m_hFont;
 };
 
-static CEntityReportPanel *g_pEntityReportPanel = NULL;
+static CEntityReportPanel *g_pEntityReportPanel = nullptr;
 
 //-----------------------------------------------------------------------------
 // Purpose: Creates the CEntityReportPanel VGUI panel
