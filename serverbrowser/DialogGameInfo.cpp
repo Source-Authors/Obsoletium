@@ -79,7 +79,7 @@ CDialogGameInfo::CDialogGameInfo( vgui::Panel *parent, int serverIP, int queryPo
 	m_iRequestRetry = 0;
 
 	// create a new server to watch
-	memset(&m_Server, 0, sizeof(m_Server) );
+	memset( &m_Server, 0, sizeof(m_Server) );
 	m_Server.m_NetAdr.Init( serverIP, queryPort, connectionPort );
 
 	// refresh immediately

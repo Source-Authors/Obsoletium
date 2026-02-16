@@ -186,7 +186,7 @@ void CDialogAddServer::OnOK()
 	if ( AllowInvalidIPs() || netaddr.IsValid() )
 	{
 		gameserveritem_t server;
-		memset(&server, 0, sizeof(server));
+		memset( &server, 0, sizeof(server) );
 		server.SetName( address );
 
 		// We assume here that the query and connection ports are the same. This is why it's much
