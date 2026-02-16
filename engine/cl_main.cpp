@@ -515,12 +515,6 @@ void CL_ClearState ( void )
 	}
 
 	R_LevelShutdown();
-	if ( IsX360() )
-	{
-		// Reset material system temporary memory (frees up memory for map loading)
-		bool bOnLevelShutdown = true;
-		materials->ResetTempHWMemory( bOnLevelShutdown );
-	}
 	
 	if ( g_pLocalNetworkBackdoor )
 		g_pLocalNetworkBackdoor->ClearState();
