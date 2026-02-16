@@ -60,37 +60,37 @@ public:
 
 	void Clear()
 	{
-		Q_memset( title, 0, sizeof( title ) );
-		Q_memset( desc, 0, sizeof( desc ) );
-		Q_memset( submitter, 0, sizeof( submitter ) );
-		Q_memset( owner, 0, sizeof( owner ) );
-		Q_memset( severity, 0, sizeof( severity ) );
-		Q_memset( priority, 0, sizeof( priority ) );
-		Q_memset( area, 0, sizeof( area ) );
-		Q_memset( mapnumber, 0, sizeof( mapnumber) );
-		Q_memset( reporttype, 0, sizeof( reporttype ) );
-		Q_memset( level, 0, sizeof( level ) );
-		Q_memset( build, 0, sizeof( build ) );
-		Q_memset( position, 0, sizeof( position ) );
-		Q_memset( orientation, 0, sizeof( orientation ) );
-		Q_memset( screenshot_unc, 0, sizeof( screenshot_unc ) );
-		Q_memset( savegame_unc, 0, sizeof( savegame_unc ) );
-		Q_memset( bsp_unc, 0, sizeof( bsp_unc ) );
-		Q_memset( vmf_unc, 0, sizeof( vmf_unc ) );
-		Q_memset( driverinfo, 0, sizeof( driverinfo ) );
-		Q_memset( misc, 0, sizeof( misc ) );
-		Q_memset( zip, 0, sizeof( zip ) );
+		title[0] = '\0';
+		desc[0] = '\0';
+		submitter[0] = '\0';
+		owner[0] = '\0';
+		severity[0] = '\0';
+		priority[0] = '\0';
+		area[0] = '\0';
+		mapnumber[0] = '\0';
+		reporttype[0] = '\0';
+		level[0] = '\0';
+		build[0] = '\0';
+		position[0] = '\0';
+		orientation[0] = '\0';
+		screenshot_unc[0] = '\0';
+		savegame_unc[0] = '\0';
+		bsp_unc[0] = '\0';
+		vmf_unc[0] = '\0';
+		driverinfo[0] = '\0';
+		misc[0] = '\0';
+		zip[0] = '\0';
 
-		Q_memset( exename, 0, sizeof( exename ) );
-		Q_memset( gamedir, 0, sizeof( gamedir ) );
+		exename[0] = '\0';
+		gamedir[0] = '\0';
 		ram = 0;
 		cpu = 0;
-		Q_memset( processor, 0, sizeof( processor ) );
+		processor[0] = '\0';
 		dxversionhigh = 0;
 		dxversionlow = 0;
 		dxvendor = 0;
 		dxdevice = 0;
-		Q_memset( osversion, 0, sizeof( osversion ) );
+		osversion[0] = '\0';
 
 		includedfiles.Purge();
 	}
@@ -252,7 +252,7 @@ private:
 
 CBugReporter::CBugReporter()
 {
-	Q_memset( &m_cserIP, 0, sizeof( m_cserIP ) );
+	m_cserIP.Clear();
 	m_pBug = nullptr;
 
 	m_Severity.AddToTail( m_BugStrings.AddString( "Zero" ) );
