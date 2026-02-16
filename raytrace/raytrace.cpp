@@ -354,7 +354,7 @@ void RayTracingEnvironment::Trace4Rays(const FourRays &rays, fltx4 TMin, fltx4 T
 {
 	rays.Check();
 
-	memset(rslt_out->HitIds,0xff,sizeof(rslt_out->HitIds));
+	BitwiseSet(rslt_out->HitIds,0xff);
 
 	rslt_out->HitDistance=ReplicateX4(1.0e23f);
 
@@ -377,7 +377,7 @@ void RayTracingEnvironment::Trace4Rays(const FourRays &rays, fltx4 TMin, fltx4 T
 		return;												// missed bounding box
 
 	int32 mailboxids[MAILBOX_HASH_SIZE];					// used to avoid redundant triangle tests
-	memset(mailboxids,0xff,sizeof(mailboxids));				// !!speed!! keep around?
+	BitwiseSet(mailboxids,0xff);				// !!speed!! keep around?
 
 	int front_idx[3],back_idx[3];							// based on ray direction, whether to
 															// visit left or right node first
