@@ -1826,7 +1826,7 @@ static void SwapVisibilityLump( byte *pDest, byte *pSrc, int count )
 //=============================================================================
 void Lumps_Init( void )
 {
-	memset( &g_Lumps, 0, sizeof(g_Lumps) );
+	BitwiseClear( g_Lumps );
 }
 
 int LumpVersion( const dheader_t *header, int lump )
@@ -2133,8 +2133,8 @@ void LoadLeafAmbientLighting( dheader_t *header, int numLeafs )
 			g_LeafAmbientIndexHDR[i].ambientSampleCount = 1;
 			g_LeafAmbientIndexHDR[i].firstAmbientSample = i;
 
-			Q_memset( &g_LeafAmbientLightingLDR[i], 0, sizeof(g_LeafAmbientLightingLDR[i]) );
-			Q_memset( &g_LeafAmbientLightingHDR[i], 0, sizeof(g_LeafAmbientLightingHDR[i]) );
+			BitwiseClear( g_LeafAmbientLightingLDR[i] );
+			BitwiseClear( g_LeafAmbientLightingHDR[i] );
 
 			if ( pSrc )
 			{
@@ -2302,7 +2302,7 @@ bool LoadBSPFile( const char *filename )
 	if ( HasLump( header, LUMP_MAP_FLAGS ) )
 		CopyLump ( header, LUMP_MAP_FLAGS, &flags_lump );
 	else
-		memset( &flags_lump, 0, sizeof( flags_lump ) );			// default flags to 0
+		BitwiseClear( flags_lump );			// default flags to 0
 
 	g_LevelFlags = flags_lump.m_LevelFlags;
 
@@ -3042,10 +3042,8 @@ ParseEpair
 */
 epair_t *ParseEpair (void)
 {
-	epair_t	*e;
-
-	e = (epair_t*)malloc (sizeof(epair_t));
-	memset (e, 0, sizeof(epair_t));
+	epair_t	*e = (epair_t*)malloc (sizeof(epair_t));
+	memset (e, 0, sizeof(*e));
 	
 	if (strlen(token) >= MAX_KEY-1)
 		Error ("ParseEpar: token key too long (%zu > %u)", strlen(token), MAX_KEY);
