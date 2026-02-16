@@ -85,7 +85,7 @@ const char* GetProcessorVendorId()
 	
 #ifndef OSX
 	unsigned int unused, regs[3];
-	memset( vendorId, 0, sizeof(vendorId) );
+	BitwiseClear( vendorId );
 
 	if ( !cpuid(0,unused, regs[0], regs[2], regs[1] ) )
 	{

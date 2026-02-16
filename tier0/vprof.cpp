@@ -686,7 +686,7 @@ CVProfile::CVProfile()
 	m_pCurNode = &m_Root;
 
 #ifdef VPROF_VTUNE_GROUP
-	memset(m_GroupIDStack, 0, sizeof(m_GroupIDStack));
+	BitwiseClear( m_GroupIDStack );
 #endif
 	
 	// Go ahead and allocate 32 slots for budget group names
@@ -730,9 +730,9 @@ CVProfile::CVProfile()
 	BudgetGroupNameToBudgetGroupID( VPROF_BUDGETGROUP_REPLAY,					BUDGETFLAG_SERVER );
 //	BudgetGroupNameToBudgetGroupID( VPROF_BUDGETGROUP_DISP_HULLTRACES );
 
-	memset( m_Counters, 0, sizeof(m_Counters) );
-	memset( m_CounterGroups, 0, sizeof(m_CounterGroups) );
-	memset( m_CounterNames, 0, sizeof(m_CounterNames) );
+	BitwiseClear( m_Counters );
+	BitwiseClear( m_CounterGroups );
+	BitwiseClear( m_CounterNames );
 }
 
 
@@ -1183,7 +1183,7 @@ static void TelemetryShutdown( bool InDtor = false )
 			tmClose( g_tmContext );
 
 		// Discontinue new usage of the context before shutting it down (multithreading).
-		memset( g_Telemetry.tmContext, 0, sizeof( g_Telemetry.tmContext ) );
+		BitwiseClear( g_Telemetry.tmContext );
 		HTELEMETRY hShutdown = g_tmContext;
 		g_tmContext = NULL;
 
@@ -1290,7 +1290,7 @@ PLATFORM_INTERFACE void TelemetryTick()
 	if( g_fTelemetryLevelChanged )
 	{
 		g_fTelemetryLevelChanged = false;
-		memset( g_Telemetry.tmContext, 0, sizeof( g_Telemetry.tmContext ) );
+		BitwiseClear( g_Telemetry.tmContext );
 
 		if( g_Telemetry.Level == 0 )
 		{

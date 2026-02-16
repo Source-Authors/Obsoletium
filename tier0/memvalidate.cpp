@@ -136,8 +136,8 @@ IMemAlloc *g_pMemAlloc = &s_ValidateAlloc;
 CValidateAlloc::CValidateAlloc()
 {
 	m_pFirstAllocation = 0;
-	memset( m_pPrefixImage, 0xBE, HEAP_PREFIX_BUFFER_SIZE );
-	memset( m_pSuffixImage, 0xAF, HEAP_SUFFIX_BUFFER_SIZE );
+	BitwiseSet( m_pPrefixImage, 0xBE );
+	BitwiseSet( m_pSuffixImage, 0xAF );
 }
 
 

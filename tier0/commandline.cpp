@@ -93,7 +93,7 @@ CCommandLine::CCommandLine( )
 {
 	m_pszCmdLine = nullptr;
 	m_nParmCount = 0;
-	memset(m_ppParms, 0, sizeof(m_ppParms));
+	BitwiseClear(m_ppParms);
 }
 
 //-----------------------------------------------------------------------------

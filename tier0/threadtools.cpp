@@ -1255,7 +1255,7 @@ CThreadMutex::CThreadMutex() : CThreadMutex{4000}
 CThreadMutex::CThreadMutex(unsigned int spinCount)
 {
 #ifdef THREAD_MUTEX_TRACING_ENABLED
-	memset( &m_CriticalSection, 0, sizeof(m_CriticalSection) );
+	BitwiseClear( m_CriticalSection );
 #endif
 	static_assert(sizeof(m_CriticalSection) == sizeof(CRITICAL_SECTION));
 	// This function always succeeds and returns a nonzero value on XP+.

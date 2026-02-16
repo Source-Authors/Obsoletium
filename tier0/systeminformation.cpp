@@ -20,7 +20,7 @@ unsigned long Plat_GetMemPageSize()
 //
 SYSTEM_CALL_RESULT_t Plat_GetPagedPoolInfo( PAGED_POOL_INFO_t *pPPI )
 {
-	memset( pPPI, 0, sizeof( *pPPI ) );
+	BitwiseClear( *pPPI );
 	return SYSCALL_UNSUPPORTED;
 }
 
@@ -43,7 +43,7 @@ unsigned long Plat_GetMemPageSize()
 //
 SYSTEM_CALL_RESULT_t Plat_GetPagedPoolInfo( PAGED_POOL_INFO_t *pPPI )
 {
-	memset( pPPI, 0, sizeof( *pPPI ) );
+	BitwiseClear( *pPPI );
 	return SYSCALL_UNSUPPORTED;
 }
 

@@ -147,7 +147,7 @@ bool WriteMiniDumpUsingExceptionInfo(
 			// Do we have a comment?
 			MINIDUMP_USER_STREAM_INFORMATION StreamInformationHeader;
 			MINIDUMP_USER_STREAM UserStreams[1] = {};
-			memset( &StreamInformationHeader, 0, sizeof(StreamInformationHeader) );
+			BitwiseClear( StreamInformationHeader );
 			StreamInformationHeader.UserStreamArray = UserStreams;
 
 			if ( g_rgchMinidumpComment[0] != '\0' )

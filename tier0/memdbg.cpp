@@ -75,7 +75,7 @@ int WalkStack( void **ppAddresses, int nMaxAddresses, int nSkip = 0 )
 
 	STACKFRAME64 frame;
 
-	memset(&frame, 0, sizeof(frame));
+	BitwiseClear(frame);
 	DWORD valEsp, valEbp;
 	__asm
 	{

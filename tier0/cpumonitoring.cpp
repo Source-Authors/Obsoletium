@@ -281,7 +281,7 @@ PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
 	if ( nDelayMilliseconds && s_nDelayMs == 0 )
 	{
 		// If we are enabling/re-enabling then reset the stats.
-		memset( &s_results, 0, sizeof(s_results) );
+		BitwiseClear( s_results );
 	}
 	// Set the specified delay time or 5,000 if it is disabled.
 	s_nDelayMs = nDelayMilliseconds ? nDelayMilliseconds : kDelayMsWhenDisabled;
