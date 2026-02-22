@@ -1140,7 +1140,7 @@ void Coroutine_ValidateGlobals( [[maybe_unused]] class CValidator &validator )
 #ifdef DBGFLAG_VALIDATE
 	AUTO_LOCK( g_ThreadMutexCoroutineMgr );
 
-	for ( auto m : g_VecPCoroutineMgr )
+	for ( auto *m : g_VecPCoroutineMgr )
 	{
 		ValidatePtr( m );
 	}
