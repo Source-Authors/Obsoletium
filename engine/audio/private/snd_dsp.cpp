@@ -8980,7 +8980,7 @@ bool DSP_LoadPresetFile( void )
 	float duration;
 	float fadeout;
 
-	Q_snprintf( szFile, sizeof( szFile ), "scripts/dsp_presets.txt" );
+	V_sprintf_safe( szFile, "scripts/dsp_presets.txt" );
 
 	MEM_ALLOC_CREDIT();
 
