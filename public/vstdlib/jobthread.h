@@ -729,7 +729,7 @@ public:
 
 	~CJobSet()
 	{
-		for ( auto j : m_jobs )
+		for ( auto *j : m_jobs )
 		{
 			j->Release();
 		}
@@ -747,7 +747,7 @@ public:
 
 	void Execute( bool bRelease = true )
 	{
-		for ( auto j : m_jobs )
+		for ( auto *j : m_jobs )
 		{
 			j->Execute();
 			if ( bRelease )
@@ -762,7 +762,7 @@ public:
 
 	void Abort( bool bRelease = true )
 	{
-		for ( auto j : m_jobs )
+		for ( auto *j : m_jobs )
 		{
 			j->Abort();
 			if ( bRelease )
@@ -777,7 +777,7 @@ public:
 
 	void WaitForFinish( bool bRelease = true )
 	{
-		for ( auto j : m_jobs )
+		for ( auto *j : m_jobs )
 		{
 			j->WaitForFinish();
 			if ( bRelease )
@@ -797,7 +797,7 @@ public:
 
 		if ( bRelease )
 		{
-			for ( auto j : m_jobs )
+			for ( auto *j : m_jobs )
 			{
 				j->Release();
 			}
