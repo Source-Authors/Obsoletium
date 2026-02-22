@@ -516,9 +516,7 @@ const char *CMDLPicker::CaptureModel( int nModIndex, const char *AssetName, cons
 //	pRenderContext->ClearColor4ub( 0, 0, 0, 0 ); 
 //	pRenderContext->ClearBuffers( true, true );
 
-	Color NewPanelColor;
-	
-	NewPanelColor.SetColor( 0, 0, 0, 0 );
+	Color NewPanelColor( 0, 0, 0, 0 );
 	m_pMDLPreview->SetBackgroundColor( NewPanelColor );
 
 	g_pVGuiSurface->PaintTraverseEx( m_pMDLPreview->GetVPanel(), false );

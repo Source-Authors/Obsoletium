@@ -383,6 +383,7 @@ void CVTFPreviewPanel::Paint( void )
 	int w, h;
 	GetSize( w, h );
 	vgui::MatSystemSurface()->Begin3DPaint( 0, 0, w, h );
+	RunCodeAtScopeExit(vgui::MatSystemSurface()->End3DPaint( ));
 
 	pRenderContext->ClearColor4ub( 76, 88, 68, 255 ); 
 	pRenderContext->ClearBuffers( true, true );
@@ -401,6 +402,4 @@ void CVTFPreviewPanel::Paint( void )
 	{
 		PaintVolumeTexture();
 	}
-
-	vgui::MatSystemSurface()->End3DPaint( );
 }

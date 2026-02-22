@@ -599,6 +599,7 @@ void CVMTPreviewPanel::Paint( void )
 	int w, h;
 	GetSize( w, h );
 	vgui::MatSystemSurface()->Begin3DPaint( 0, 0, w, h );
+	RunCodeAtScopeExit(vgui::MatSystemSurface()->End3DPaint( ));
 
 	// Deal with refraction
 	if ( m_Material->NeedsPowerOfTwoFrameBufferTexture() )
@@ -628,6 +629,4 @@ void CVMTPreviewPanel::Paint( void )
 	{
 		DrawRectangle();
 	}
-
-	vgui::MatSystemSurface()->End3DPaint( );
 }

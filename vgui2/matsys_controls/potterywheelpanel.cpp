@@ -878,6 +878,7 @@ void CPotteryWheelPanel::Paint()
 	int w, h;
 	GetSize( w, h );
 	vgui::MatSystemSurface()->Begin3DPaint( 0, 0, w, h, m_bRenderToTexture );
+	RunCodeAtScopeExit(vgui::MatSystemSurface()->End3DPaint( ));
 
 	if ( m_pCurrentManip )
 	{
@@ -915,8 +916,6 @@ void CPotteryWheelPanel::Paint()
 	OnPaint3D();
 
 	pRenderContext->CullMode( MATERIAL_CULLMODE_CW );
-
-	vgui::MatSystemSurface()->End3DPaint( );
 }
 
 
