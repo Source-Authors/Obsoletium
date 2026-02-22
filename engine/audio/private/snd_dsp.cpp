@@ -2915,11 +2915,11 @@ void DFR_Free( dfr_t *pdfr )
 {
 	if ( pdfr )
 	{
-	// free all delays
+		// free all delays
 
 		for (auto *p : pdfr->pdlys)
 			DLY_Free ( p );
-	
+		
 		BitwiseClear( *pdfr );
 	}
 }
@@ -3175,7 +3175,7 @@ void LFOWAV_Free( lfowav_t *plw )
 	{
 		DLY_Free( plw->pdly );
 		BitwiseClear( *plw );
-}
+	}
 }
 
 // deallocate all lfo wave tables. Called only when sound engine exits.
@@ -8928,9 +8928,9 @@ float DSP_LookupStringToken( char *psz, int ipset )
 	int i;	
 	float fipset = (float)ipset;
 
-	// dimhotepus: atof -> strtof
+	// dimhotepus: atof -> V_atof
 	if (isnumber(psz[0]))
-		return strtof(psz, nullptr);
+		return V_atof(psz);
 
 	for (i = 0; i < gcdsp_stringmap; i++)
 	{
