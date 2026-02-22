@@ -664,6 +664,9 @@ void CGameUI::Shutdown()
 
 	ModInfo().FreeModInfo();
 	
+	vgui::VGui_ShutdownMatSysInterfacesList( "gameui" );
+	vgui::VGui_ShutdownInterfacesList( "gameui" );
+	
 	steamapicontext->Clear();
 	
 	engine = nullptr;
