@@ -8913,7 +8913,13 @@ constexpr dsp_stringmap_t gdsp_stringmap[] =
 
 constexpr inline int gcdsp_stringmap = ssize(gdsp_stringmap);
 
-#define isnumber(c) (c == '+' || c == '-' || c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7'|| c == '8' || c == '9')\
+[[nodiscard]] static constexpr inline bool isnumber(char c) noexcept
+{
+	return (c == '+' || c == '-' || c == '0' ||
+		c == '1' || c == '2' || c == '3' ||
+		c == '4' || c == '5' ||	c == '6' ||
+		c == '7' || c == '8' || c == '9');
+}
 
 // given ptr to null term. string, return integer or float value from g_dsp_stringmap
 
