@@ -1459,17 +1459,6 @@ static ConVar sv_maxuptimelimit(  "sv_maxuptimelimit", "0", 0,
 	"If set, whenever a game ends, if the server uptime exceeds "
 	"this number of hours, the server will exit."	);
 
-#if 0
-static void sv_WasteMemory( void )
-{
-	uint8 *pWastedRam = new uint8[ 100 * 1024 * 1024 ];
-	memset( pWastedRam, 0xff, 100 * 1024 * 1024 );			// make sure it gets committed
-	Msg( "waste 100mb. using %zuMB with an sv_memory_limit of %dMB\n", ApproximateProcessMemoryUsage() / ( 1024 * 1024 ), sv_memlimit.GetInt() );
-}
-
-static ConCommand sv_wastememory( "sv_wastememory", sv_WasteMemory, "Causes the server to allocate 100MB of ram and never free it", FCVAR_CHEAT );
-#endif
-
 
 static void sv_ShutDownCancel( void )
 {

@@ -1264,7 +1264,7 @@ void CConPanel::PaintBackground()
 //-----------------------------------------------------------------------------
 // Purpose: Creates the Console VGUI object
 //-----------------------------------------------------------------------------
-static CConPanel *conPanel = NULL;
+static CConPanel *conPanel = nullptr;
 
 void Con_CreateConsolePanel( vgui::Panel *parent )
 {

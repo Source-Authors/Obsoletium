@@ -11,7 +11,7 @@
 
 //----------------------------------------------------------------------------------------
 
-IClientReplayContext *g_pClientReplayContext = NULL;
+IClientReplayContext *g_pClientReplayContext = nullptr;
 
 //----------------------------------------------------------------------------------------
 
@@ -22,6 +22,14 @@ bool ReplayLib_Init( const char *pGameDir, IClientReplayContext *pClientReplayCo
 	g_pClientReplayContext = pClientReplayContext;
 
 	return true;
+}
+
+// dimhotepus: Pair init.
+void ReplayLib_Shutdown()
+{
+	g_pClientReplayContext = nullptr;
+
+	Replay_SetGameDir( "" );
 }
 
 //----------------------------------------------------------------------------------------

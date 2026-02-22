@@ -159,6 +159,8 @@ void Cmd_ForwardToServer( const CCommand &args, bool bReliable = true );
 // In order to avoid patching the client DLL, we setup this list. Whenever the client DLL has gone out with the
 // FCVAR_CLIENTCMD_CAN_EXECUTE flag set, we can get rid of this list.
 void Cmd_AddClientCmdCanExecuteVar( const char *pName );
+// dimhotepus: Pair add.
+void Cmd_RemoveClientCmdCanExecuteVar( const char *pName );
 
 // Used to allow cheats even if cheats aren't theoretically allowed
 void Cmd_SetRptActive( bool bActive );

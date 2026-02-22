@@ -91,6 +91,13 @@ void Cmd_AddClientCmdCanExecuteVar( const char *pName )
 		g_ExtraClientCmdCanExecuteCvars.Insert( pName );
 }
 
+// dimhotepus: Pair add.
+void Cmd_RemoveClientCmdCanExecuteVar( const char *pName )
+{
+	const auto index = g_ExtraClientCmdCanExecuteCvars.Find( pName );
+	Assert( index != g_ExtraClientCmdCanExecuteCvars.InvalidIndex() );
+	g_ExtraClientCmdCanExecuteCvars.RemoveAt( index );
+}
 
 //=============================================================================
 // These functions manage a list of execution markers that we use to verify

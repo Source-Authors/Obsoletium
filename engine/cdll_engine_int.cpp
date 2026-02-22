@@ -1765,7 +1765,7 @@ bool ClientDLL_Load()
 }
 
 static void InitExtraClientCmdCanExecuteVars()
-{	
+{
 	// This can go away when we ship a client DLL with the FCVAR_CLIENTCMD_CAN_EXECUTE flag set on these cvars/concommands.
 	Cmd_AddClientCmdCanExecuteVar( "cancelselect" );
 	Cmd_AddClientCmdCanExecuteVar( "menuselect" );
@@ -1790,6 +1790,35 @@ static void InitExtraClientCmdCanExecuteVars()
 
 	// dimhotepus: Drop duplicated.
 	// Cmd_AddClientCmdCanExecuteVar( "playgamesound" );
+}
+
+// dimhotepus: Pair init.
+static void ShutdownExtraClientCmdCanExecuteVars()
+{
+	// This can go away when we ship a client DLL with the FCVAR_CLIENTCMD_CAN_EXECUTE flag set on these cvars/concommands.
+	// dimhotepus: Drop duplicated.
+	// Cmd_RemoveClientCmdCanExecuteVar( "playgamesound" );
+
+	Cmd_RemoveClientCmdCanExecuteVar( "overview_alpha" );
+	Cmd_RemoveClientCmdCanExecuteVar( "overview_locked" );
+	Cmd_RemoveClientCmdCanExecuteVar( "overview_tracks" );
+	Cmd_RemoveClientCmdCanExecuteVar( "overview_names" );
+	Cmd_RemoveClientCmdCanExecuteVar( "overview_health" );
+	Cmd_RemoveClientCmdCanExecuteVar( "overview_mode" );
+	Cmd_RemoveClientCmdCanExecuteVar( "overview_zoom" );
+	Cmd_RemoveClientCmdCanExecuteVar( "spec_autodirector" );
+	Cmd_RemoveClientCmdCanExecuteVar( "spec_menu" );
+	Cmd_RemoveClientCmdCanExecuteVar( "spec_mode" );
+	Cmd_RemoveClientCmdCanExecuteVar( "spec_prev" );
+	Cmd_RemoveClientCmdCanExecuteVar( "spec_next" );
+	
+	Cmd_RemoveClientCmdCanExecuteVar( "togglescores" );
+	Cmd_RemoveClientCmdCanExecuteVar( "voice_modenable" );
+	Cmd_RemoveClientCmdCanExecuteVar( "cl_buy_favorite" );
+	Cmd_RemoveClientCmdCanExecuteVar( "_cl_classmenuopen" );
+	Cmd_RemoveClientCmdCanExecuteVar( "playgamesound" );
+	Cmd_RemoveClientCmdCanExecuteVar( "menuselect" );
+	Cmd_RemoveClientCmdCanExecuteVar( "cancelselect" );
 }
 
 //-----------------------------------------------------------------------------
@@ -1929,29 +1958,54 @@ void ClientDLL_Init( void )
 //-----------------------------------------------------------------------------
 void ClientDLL_Shutdown( void )
 {
-#if defined( REPLAY_ENABLED )
-	if ( g_pReplay )
-	{
-		g_pReplay->CL_Shutdown();
-	}
-#endif
+	// dimhotepus: In reverse order.
 
-	toolframework->ClientShutdown();
+	ShutdownExtraClientCmdCanExecuteVars();
 
 	ClientDLL_ShutdownRecvTableMgr();
 
+	toolframework->ClientShutdown();
+
+#if defined( REPLAY_ENABLED )
+	if ( Replay_IsSupportedModAndPlatform() )
+	{
+#if !defined(DEDICATED)
+		extern CGameServer sv;
+		if ( !sv.IsDedicated() )
+		{
+			ReplayLib_Shutdown();
+			
+			g_pReplayPerformanceController = nullptr;
+			g_pReplayPerformanceManager = nullptr;
+			g_pReplayMovieRenderer = nullptr;
+			g_pReplayMovieManager = nullptr;
+			g_pReplayManager = nullptr;
+			g_pClientReplayContext = nullptr;
+		}
+#endif
+
+		if ( g_pReplay )
+		{
+			g_pReplay->CL_Shutdown();
+		}
+
+		g_pClientReplay = nullptr;
+	}
+#endif
+
+	clientleafsystem = nullptr;
+	centerprint = nullptr;
+	entitylist = nullptr;
+
+	g_pClientSidePrediction->Shutdown();
+	g_pClientSidePrediction = nullptr;
+
+
 	vgui::ivgui()->RunFrame();
-	
+
 	materials->UncacheAllMaterials();
 
 	vgui::ivgui()->RunFrame();
-
-	g_pClientSidePrediction->Shutdown();
-
-	entitylist = NULL;
-	g_pClientSidePrediction = NULL;
-	g_ClientFactory = NULL;
-	centerprint = NULL;
 
 	g_ClientDLL->Shutdown();
 }

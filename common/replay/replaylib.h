@@ -15,6 +15,8 @@ class IClientReplayContext;
 //----------------------------------------------------------------------------------------
 
 bool ReplayLib_Init( const char *pGameDir, IClientReplayContext *pClientReplayContext );
+// dimhotepus: Pair init.
+void ReplayLib_Shutdown();
 
 //----------------------------------------------------------------------------------------
 
