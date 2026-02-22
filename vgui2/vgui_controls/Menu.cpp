@@ -709,7 +709,7 @@ int Menu::ComputeFullMenuHeightWithInsets()
 	// add up the size of all the child panels
 	// move the child panels to the correct place in the menu
 	int totalTall = itop + ibottom;
-	for ( auto itemId: m_SortedItems )		// use sortedItems instead of MenuItems due to SetPos()
+	for ( auto itemId : m_SortedItems )		// use sortedItems instead of MenuItems due to SetPos()
 	{
 		MenuItem *child = m_MenuItems[ itemId ];
 		Assert( child );
@@ -775,13 +775,13 @@ void Menu::PerformLayout()
 		RemoveScrollBar();
 		// Make everything visible
 		m_VisibleSortedItems.RemoveAll();
-		for ( auto itemID : m_SortedItems )
+		for ( auto itemId : m_SortedItems )
 		{
-			MenuItem *child = m_MenuItems[ itemID ];
+			MenuItem *child = m_MenuItems[ itemId ];
 			if ( !child || !child->IsVisible() )
 				continue;
 
-			m_VisibleSortedItems.AddToTail( itemID );
+			m_VisibleSortedItems.AddToTail( itemId );
 		}
 
 		// Hide the separators, the needed ones will be readded below
