@@ -366,7 +366,7 @@ void CBaseBudgetPanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 
 	for( auto *l : m_TimeLabels )
 	{
-		int red, green, blue, alpha;
+		byte red, green, blue, alpha;
 		red = green = blue = alpha = 255;
 		l->SetFgColor( Color( red, green, blue, alpha ) );
 		l->SetBgColor( Color( 0, 0, 0, 255 ) );
@@ -380,7 +380,7 @@ void CBaseBudgetPanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 
 	for( auto *l : m_HistoryLabels )
 	{
-		int red, green, blue, alpha;
+		byte red, green, blue, alpha;
 		red = green = blue = alpha = 255;
 		l->SetFgColor( Color( red, green, blue, alpha ) );
 		l->SetBgColor( Color( 0, 0, 0, 255 ) );
