@@ -802,27 +802,27 @@ struct flt_t
 
 flt_t flts[CFLTS];
 
-void FLT_Init ( flt_t *pf ) { if ( pf ) Q_memset ( pf, 0, sizeof (flt_t) ); }
-void FLT_InitAll ( void ) {	for ( int i = 0 ; i < CFLTS; i++ ) FLT_Init ( &flts[i] ); }
+void FLT_Init ( flt_t *pf ) { if ( pf ) BitwiseClear ( *pf ); }
+void FLT_InitAll ( void ) {	for ( auto &f : flts ) FLT_Init ( &f ); }
 
 void FLT_Free ( flt_t *pf ) 
 {
 	if ( pf )	
 	{
 		if (pf->pf1)
-			Q_memset ( pf->pf1, 0, sizeof (flt_t) );	
+			BitwiseClear ( *pf->pf1 );	
 		
 		if (pf->pf2)
-			Q_memset ( pf->pf2, 0, sizeof (flt_t) );	
+			BitwiseClear ( *pf->pf2 );	
 		
 		if (pf->pf3)
-			Q_memset ( pf->pf3, 0, sizeof (flt_t) );	
+			BitwiseClear ( *pf->pf3 );	
 		
-		Q_memset ( pf, 0, sizeof (flt_t) );	
+		BitwiseClear ( *pf );	
 	}
 }
 
-void FLT_FreeAll ( void ) {	for (int i = 0 ; i < CFLTS; i++) FLT_Free ( &flts[i] ); }
+void FLT_FreeAll ( void ) {	for (auto &f : flts) FLT_Free ( &f ); }
 
 
 // find a free filter from the filter pool
@@ -1323,8 +1323,8 @@ struct dly_t
 
 dly_t dlys[CDLYS];					// delay lines
 
-void DLY_Init ( dly_t *pdly ) {	if ( pdly )	Q_memset( pdly, 0, sizeof (dly_t)); }
-void DLY_InitAll ( void ) {	for (int i = 0 ; i < CDLYS; i++) DLY_Init ( &dlys[i] ); }
+void DLY_Init ( dly_t *pdly ) {	if ( pdly )	BitwiseClear( *pdly ); }
+void DLY_InitAll ( void ) {	for (auto &d : dlys) DLY_Init ( &d ); }
 void DLY_Free ( dly_t *pdly )
 {
 	// free memory buffer
@@ -1337,12 +1337,12 @@ void DLY_Free ( dly_t *pdly )
 		
 		// free dly slot
 
-		Q_memset ( pdly, 0, sizeof (dly_t) );
+		BitwiseClear ( *pdly );
 	}
 }
 
 
-void DLY_FreeAll ( void ) {	for (int i = 0; i < CDLYS; i++ ) DLY_Free ( &dlys[i] ); }
+void DLY_FreeAll ( void ) {	for (auto &d : dlys) DLY_Free ( &d ); }
 
 // return adjusted feedback value for given dly
 // such that decay time is same as that for dmin and fbmin
@@ -1807,7 +1807,7 @@ void DLY_ChangeVal ( dly_t *pdly, int t )
 
 // ignored - use MDY_ for modulatable delay
 
-inline void DLY_Mod ( void *p, float v ) { return; }
+inline void DLY_Mod ( void *p, float v ) {}
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1844,7 +1844,7 @@ void RMP_Init( rmp_t *prmp, float ramptime, int initval, int targetval, bool bEn
 	int run;
 
 	if (prmp)
-		Q_memset( prmp, 0, sizeof (rmp_t) ); 
+		BitwiseClear( *prmp ); 
 	else
 		return;
 			
@@ -1966,10 +1966,10 @@ struct mdy_t
 
 mdy_t mdys[CMDYS];
 
-void MDY_Init( mdy_t *pmdy ) { if (pmdy) Q_memset( pmdy, 0, sizeof (mdy_t) ); };
-void MDY_Free( mdy_t *pmdy ) { if (pmdy) { DLY_Free (pmdy->pdly); Q_memset( pmdy, 0, sizeof (mdy_t) ); } };
-void MDY_InitAll() { for (int i = 0; i < CMDYS; i++) MDY_Init( &mdys[i] ); };
-void MDY_FreeAll() { for (int i = 0; i < CMDYS; i++) MDY_Free( &mdys[i] ); };
+void MDY_Init( mdy_t *pmdy ) { if (pmdy) BitwiseClear( *pmdy ); };
+void MDY_Free( mdy_t *pmdy ) { if (pmdy) { DLY_Free (pmdy->pdly); BitwiseClear( *pmdy ); } };
+void MDY_InitAll() { for (auto &m : mdys) MDY_Init( &m ); };
+void MDY_FreeAll() { for (auto &m : mdys) MDY_Free( &m ); };
 
 
 // allocate mod delay, given previously allocated dly (NOTE: mod delay only sweeps tap 0, not t1,t2 or t3)
@@ -2303,40 +2303,38 @@ struct rva_t
 
 rva_t rvas[CRVAS];
 
-void RVA_Init ( rva_t *prva ) {	if ( prva )	Q_memset (prva, 0, sizeof (rva_t)); }
-void RVA_InitAll( void ) { for (int i = 0; i < CRVAS; i++) RVA_Init ( &rvas[i] ); }
+void RVA_Init ( rva_t *prva ) {	if ( prva )	BitwiseClear ( *prva ); }
+void RVA_InitAll( void ) { for (auto &r : rvas) RVA_Init ( &r ); }
 
 // free parallel series reverb
 
 void RVA_Free( rva_t *prva )
 {
-	int i;
-
 	if ( prva )
 	{
 		// free all delays
-		for (i = 0; i < CRVA_DLYS; i++)
-			DLY_Free ( prva->pdlys[i] );
+		for ( auto *d : prva->pdlys )
+			DLY_Free ( d );
 		
 		// zero all ptrs to delays in mdy array
-		for (i = 0; i < CRVA_DLYS; i++)
+		for ( auto *m : prva->pmdlys )
 		{
-			if ( prva->pmdlys[i] )
-				prva->pmdlys[i]->pdly = NULL;
+			if ( m )
+				m->pdly = NULL;
 		}
 
 		// free all mod delays
-		for (i = 0; i < CRVA_DLYS; i++)
-			MDY_Free ( prva->pmdlys[i] );
+		for ( auto *m : prva->pmdlys )
+			MDY_Free ( m );
 		
 		FLT_Free( prva->pflt );
 		
-		Q_memset( prva, 0, sizeof (rva_t) );
+		BitwiseClear( *prva );
 	}
 }
 
 
-void RVA_FreeAll( void ) { for (int i = 0; i < CRVAS; i++) RVA_Free( &rvas[i] ); }
+void RVA_FreeAll( void ) { for (auto &r : rvas) RVA_Free( &r ); }
 
 // create parallel reverb - m parallel reverbs summed 
 
@@ -2908,8 +2906,8 @@ struct dfr_t
 
 dfr_t dfrs[CDFRS];
 
-void DFR_Init ( dfr_t *pdfr ) {	if ( pdfr )	Q_memset (pdfr, 0, sizeof (dfr_t)); }
-void DFR_InitAll( void ) { for (int i = 0; i < CDFRS; i++) DFR_Init ( &dfrs[i] ); }
+void DFR_Init ( dfr_t *pdfr ) {	if ( pdfr )	BitwiseClear (*pdfr); }
+void DFR_InitAll( void ) { for (auto &d : dfrs) DFR_Init ( &d ); }
 
 // free parallel series reverb
 
@@ -2919,15 +2917,15 @@ void DFR_Free( dfr_t *pdfr )
 	{
 	// free all delays
 
-	for (int i = 0; i < CDFR_DLYS; i++)
-		DLY_Free ( pdfr->pdlys[i] );
+		for (auto *p : pdfr->pdlys)
+			DLY_Free ( p );
 	
-	Q_memset( pdfr, 0, sizeof (dfr_t) );
+		BitwiseClear( *pdfr );
 	}
 }
 
 
-void DFR_FreeAll( void ) { for (int i = 0; i < CDFRS; i++) DFR_Free( &dfrs[i] ); }
+void DFR_FreeAll( void ) { for (auto &d : dfrs) DFR_Free( &d ); }
 
 // create n series allpass reverbs
 
@@ -3174,17 +3172,18 @@ void LFOWAV_Free( lfowav_t *plw )
 	// free delay
 
 	if ( plw )
+	{
 		DLY_Free( plw->pdly );
-
-	Q_memset( plw, 0, sizeof (lfowav_t) );
+		BitwiseClear( *plw );
+}
 }
 
 // deallocate all lfo wave tables. Called only when sound engine exits.
 
 void LFOWAV_FreeAll( void )
 {
-	for ( int i = 0; i < CLFOWAV; i++ )
-		LFOWAV_Free( &lfowavs[i] );
+	for ( auto &l : lfowavs )
+		LFOWAV_Free( &l );
 }
 
 // fill lfo array w with count samples of lfo type 'type'
@@ -3250,7 +3249,7 @@ void LFOWAV_InitAll()
 	int i;
 	dly_t *pdly;
 
-	Q_memset( lfowavs, 0, sizeof( lfowavs ) );
+	BitwiseClear( lfowavs );
 
 	// alloc space for each lfo wav type
 	
@@ -3298,10 +3297,10 @@ struct lfo_t
 
 lfo_t lfos[CLFO];
 
-void LFO_Init( lfo_t *plfo ) { if ( plfo ) Q_memset( plfo, 0, sizeof (lfo_t) ); }
-void LFO_InitAll( void ) { for (int i = 0; i < CLFO; i++) LFO_Init(&lfos[i]); }
-void LFO_Free( lfo_t *plfo ) { if ( plfo ) Q_memset( plfo, 0, sizeof (lfo_t) ); }
-void LFO_FreeAll( void ) { for (int i = 0; i < CLFO; i++) LFO_Free(&lfos[i]); }
+void LFO_Init( lfo_t *plfo ) { if ( plfo ) BitwiseClear( *plfo ); }
+void LFO_InitAll( void ) { for (auto &l : lfos) LFO_Init(&l); }
+void LFO_Free( lfo_t *plfo ) { if ( plfo ) BitwiseClear( *plfo ); }
+void LFO_FreeAll( void ) { for (auto &l : lfos) LFO_Free(&l); }
 
 
 // get step value given desired playback frequency
@@ -3528,7 +3527,7 @@ struct ptc_t
 
 ptc_t ptcs[CPTCS];
 
-void PTC_Init( ptc_t *pptc ) { if (pptc) Q_memset( pptc, 0, sizeof (ptc_t) ); };
+void PTC_Init( ptc_t *pptc ) { if (pptc) BitwiseClear( *pptc ); };
 void PTC_Free( ptc_t *pptc ) 
 {
 	if (pptc)
@@ -3536,11 +3535,11 @@ void PTC_Free( ptc_t *pptc )
 		DLY_Free (pptc->pdly_in);
 		DLY_Free (pptc->pdly_out);
 
-		Q_memset( pptc, 0, sizeof (ptc_t) ); 
+		BitwiseClear( *pptc ); 
 	}
 };
-void PTC_InitAll() { for (int i = 0; i < CPTCS; i++) PTC_Init( &ptcs[i] ); };
-void PTC_FreeAll() { for (int i = 0; i < CPTCS; i++) PTC_Free( &ptcs[i] ); };
+void PTC_InitAll() { for (auto &p : ptcs) PTC_Init( &p ); };
+void PTC_FreeAll() { for (auto &p : ptcs) PTC_Free( &p ); };
 
 
 
@@ -3985,10 +3984,10 @@ struct env_t
 
 env_t envs[CENVS];
 
-void ENV_Init( env_t *penv ) { if (penv) Q_memset( penv, 0, sizeof (env_t) ); };
-void ENV_Free( env_t *penv ) { if (penv) Q_memset( penv, 0, sizeof (env_t) ); };
-void ENV_InitAll() { for (int i = 0; i < CENVS; i++) ENV_Init( &envs[i] ); };
-void ENV_FreeAll() { for (int i = 0; i < CENVS; i++) ENV_Free( &envs[i] ); };
+void ENV_Init( env_t *penv ) { if (penv) BitwiseClear( *penv ); };
+void ENV_Free( env_t *penv ) { if (penv) BitwiseClear( *penv ); };
+void ENV_InitAll() { for (auto &e : envs) ENV_Init( &e ); };
+void ENV_FreeAll() { for (auto &e : envs) ENV_Free( &e ); };
 
 
 // allocate ADSR envelope
@@ -4199,10 +4198,10 @@ struct efo_t
 
 efo_t efos[CEFOS];
 
-void EFO_Init( efo_t *pefo ) { if (pefo) Q_memset( pefo, 0, sizeof (efo_t) ); };
-void EFO_Free( efo_t *pefo ) { if (pefo) Q_memset( pefo, 0, sizeof (efo_t) ); };
-void EFO_InitAll() { for (int i = 0; i < CEFOS; i++) EFO_Init( &efos[i] ); };
-void EFO_FreeAll() { for (int i = 0; i < CEFOS; i++) EFO_Free( &efos[i] ); };
+void EFO_Init( efo_t *pefo ) { if (pefo) BitwiseClear( *pefo ); };
+void EFO_Free( efo_t *pefo ) { if (pefo) BitwiseClear( *pefo ); };
+void EFO_InitAll() { for (auto &e : efos) EFO_Init( &e ); };
+void EFO_FreeAll() { for (auto &e : efos) EFO_Free( &e ); };
 
 // return true when gate is off AND decay ramp has hit end
 
@@ -4528,20 +4527,20 @@ struct crs_t
 
 crs_t crss[CCRSS];
 
-void CRS_Init( crs_t *pcrs ) { if (pcrs) Q_memset( pcrs, 0, sizeof (crs_t) ); };
+void CRS_Init( crs_t *pcrs ) { if (pcrs) BitwiseClear( *pcrs ); };
 void CRS_Free( crs_t *pcrs ) 
 {
 	if (pcrs)
 	{
 		MDY_Free ( pcrs->pmdy );
 		LFO_Free ( pcrs->plfo );
-		Q_memset( pcrs, 0, sizeof (crs_t) ); 
+		BitwiseClear( *pcrs ); 
 	}
 }
 
 
-void CRS_InitAll() { for (int i = 0; i < CCRSS; i++) CRS_Init( &crss[i] ); }
-void CRS_FreeAll() { for (int i = 0; i < CCRSS; i++) CRS_Free( &crss[i] ); }
+void CRS_InitAll() { for (auto &c : crss) CRS_Init( &c ); }
+void CRS_FreeAll() { for (auto &c : crss) CRS_Free( &c ); }
 
 // fstep is base pitch shift, ie: floating point step value, where 1.0 = +1 octave, 0.5 = -1 octave 
 // lfotype is LFO_SIN, LFO_RND, LFO_TRI etc (LFO_RND for chorus, LFO_SIN for flange)
@@ -4758,18 +4757,18 @@ struct amp_t
 
 amp_t amps[CAMPS];
 
-void AMP_Init( amp_t *pamp ) { if (pamp) Q_memset( pamp, 0, sizeof (amp_t) ); };
+void AMP_Init( amp_t *pamp ) { if (pamp) BitwiseClear( *pamp ); };
 void AMP_Free( amp_t *pamp ) 
 {
 	if (pamp)
 	{
-		Q_memset( pamp, 0, sizeof (amp_t) ); 
+		BitwiseClear( *pamp ); 
 	}
 }
 
 
-void AMP_InitAll() { for (int i = 0; i < CAMPS; i++) AMP_Init( &amps[i] ); }
-void AMP_FreeAll() { for (int i = 0; i < CAMPS; i++) AMP_Free( &amps[i] ); }
+void AMP_InitAll() { for (auto &a : amps) AMP_Init( &a ); }
+void AMP_FreeAll() { for (auto &a : amps) AMP_Free( &a ); }
 
 
 amp_t * AMP_Alloc( float gain, float vthresh, float distmix, float vfeed, float ramptime, float modtime, float depth, bool brand ) 
@@ -5381,15 +5380,15 @@ void PSET_Init( pset_t *ppset )
 	// clear state array
 
 	if (ppset)
-		Q_memset( ppset->w, 0, sizeof (int) * (CPSET_STATES) ); 
+		BitwiseClear( ppset->w ); 
 }
 
 // clear runtime slots
 
 void PSET_InitAll( void )
 {
-	for (int i = 0; i < CPSETS; i++)
-		Q_memset( &psets[i], 0, sizeof(pset_t));
+	for (auto &p : psets)
+		BitwiseClear( p );
 }
 
 // free the preset - free all processors
@@ -5404,11 +5403,11 @@ void PSET_Free( pset_t *ppset )
 
 		// clear
 
-		Q_memset( ppset, 0, sizeof (pset_t));
+		BitwiseClear( *ppset );
 	}
 }
 
-void PSET_FreeAll() { for (int i = 0; i < CPSETS; i++) PSET_Free( &psets[i] ); };
+void PSET_FreeAll() { for (auto &p : psets) PSET_Free( &p ); };
 
 // return preset struct, given index into preset template array
 // NOTE: should not ever be more than 2 or 3 of these active simultaneously
@@ -5450,7 +5449,7 @@ pset_t * PSET_Alloc ( int ipsettemplate )
 	
 	// clear preset
 	
-	Q_memset(ppset, 0, sizeof(pset_t));
+	BitwiseClear( *ppset );
 
 	// copy template into preset
 
@@ -5924,7 +5923,7 @@ void DSP_Init( int idsp )
 	
 	pdsp = &dsps[idsp];
 
-	Q_memset( pdsp, 0, sizeof (dsp_t) ); 
+	BitwiseClear( *pdsp ); 
 }
 
 void DSP_Free( int idsp ) 
@@ -5947,7 +5946,7 @@ void DSP_Free( int idsp )
 			PSET_Free( pdsp->ppsetprev[i] );
 	}
 
-	Q_memset( pdsp, 0, sizeof (dsp_t) ); 
+	BitwiseClear( *pdsp ); 
 }
 
 // Init all dsp processors - called once, during engine startup
