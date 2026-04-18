@@ -1467,11 +1467,6 @@ $Project "vstoverlap_maya2012"
 	"sdktools\maya\vstoverlap\vstoverlap_maya2012.vpc"	[$WINDOWS]
 }
 
-$Project "vtaexp"
-{
-	"utils\vtaexp\vtaexp.vpc" [$WINDOWS]
-}
-
 $Project "vtex_dll"
 {
 	"utils\vtex_dll\vtex_dll.vpc" [$WINDOWS || $POSIX]
@@ -1510,11 +1505,6 @@ $Project "vvis_dll"
 $Project "vvis_launcher"
 {
 	"utils\vvis_launcher\vvis_launcher.vpc" [$WINDOWS]
-}
-
-$Project "vweightexp"
-{
-	"utils\vweightexp\vweightexp.vpc" [$WINDOWS]
 }
 
 $Project "WaitAndRestart"
