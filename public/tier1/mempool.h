@@ -150,6 +150,30 @@ public:
 	void	Clear();
 };
 
+template< class T >
+class CClassMemoryPoolMT : private CClassMemoryPool< T >
+{
+public:
+	// dimhotepus: Alignment should derive from class.
+	CClassMemoryPoolMT( intp numElements, int growMode = GROW_FAST, unsigned short nAlignment = alignof(T) ) :
+		CClassMemoryPool<T>( numElements, growMode, nAlignment ) {
+			#ifdef PLATFORM_64BITS 
+				COMPILE_TIME_ASSERT( sizeof(CUtlMemoryPool) == 96 );
+			#else
+				COMPILE_TIME_ASSERT( sizeof(CUtlMemoryPool) == 48 );
+			#endif
+		}
+
+	[[nodiscard]] T*		Alloc() { AUTO_LOCK(m_lock); return CClassMemoryPool::Alloc(); };
+	[[nodiscard]] T*		AllocZero() { AUTO_LOCK(m_lock); return CClassMemoryPool::AllocZero(); };
+	void	Free( T *pMem ) { AUTO_LOCK(m_lock); CClassMemoryPool::Free( pMem ); };
+
+	void	Clear() { AUTO_LOCK(m_lock); CClassMemoryPool::Clear(); };
+
+private:
+	CThreadMutex m_lock;
+};
+
 
 //-----------------------------------------------------------------------------
 // Specialized pool for aligned data management (e.g., Xbox cubemaps)
