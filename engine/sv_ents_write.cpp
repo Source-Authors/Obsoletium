@@ -854,7 +854,8 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 	bf_write savepos = *u.m_pBuf;
 
 	// Save room for number of headers to parse, too
-	u.m_pBuf->WriteUBitLong ( 0, MAX_EDICT_BITS+DELTASIZE_BITS+1 );	
+	CBitVec<MAX_EDICT_BITS+DELTASIZE_BITS+1> pHeaderBits; // RaphaelIT7: Exists just to pass nothing to WriteBits (all bits are 0 soo it'll be fine)
+	u.m_pBuf->WriteBits( pHeaderBits.Base(), pHeaderBits.GetNumBits() ); // RaphaelIT7: kept it as it should be faster than 3 WriteUBitLong calls
 		
 	intp startbit = u.m_pBuf->GetNumBitsWritten();
 
