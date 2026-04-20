@@ -246,6 +246,7 @@ public:
 	void	CopyTo(CBitVecT *out) const;
 	void	Copy( const CBitVecT<BASE_OPS> &other, int nBits=-1 );
 	bool	Compare( const CBitVecT<BASE_OPS> &other, int nBits=-1 ) const;
+	bool	CompareBit( const CBitVecT<BASE_OPS> &other, int nBit ) const;
 
 	bool	IsAllClear(void) const;		// Are all bits zero?
 	bool	IsAllSet(void) const;		// Are all bits one?
@@ -254,7 +255,8 @@ public:
 	bool 	IsBitSet( int bitNum ) const;
 	void 	Set( int bitNum );
 	void 	Set( int bitNum, bool bNewVal );
-	void 	Clear(int bitNum);
+	void 	Clear( int bitNum );
+	void 	Flip( int bitNum );
 
 	bool	TestAndSet(int bitNum);
 
@@ -664,6 +666,14 @@ inline void CBitVecT<BASE_OPS>::Clear(int bitNum)
 	*pInt &= ~BitVec_Bit( bitNum );
 }
 
+template <class BASE_OPS>
+inline void CBitVecT<BASE_OPS>::Flip(int bitNum)
+{
+	Assert( bitNum >= 0 && bitNum < this->GetNumBits() );
+	uint32 *pInt = this->Base() + BitVec_Int( bitNum );
+	*pInt ^= BitVec_Bit(bitNum);
+}
+
 //-----------------------------------------------------------------------------
 
 template <class BASE_OPS>
@@ -915,6 +925,15 @@ inline bool CBitVecT<BASE_OPS>::Compare( const CBitVecT<BASE_OPS> &other, int nB
 	int nBytes = PAD_NUMBER( nBits, 8 ) >> 3;
 
 	return ( memcmp( this->Base(), other.Base(), nBytes ) == 0 );
+}
+
+template <class BASE_OPS>
+inline bool CBitVecT<BASE_OPS>::CompareBit(const CBitVecT<BASE_OPS> &other, int bitNum) const
+{
+    Assert(bitNum >= 0 && bitNum < this->GetNumBits());
+
+    return (this->Base()[BitVec_Int(bitNum)] & BitVec_Bit(bitNum)) ==
+           (other.Base()[BitVec_Int(bitNum)] & BitVec_Bit(bitNum));
 }
 
 //-----------------------------------------------------------------------------
