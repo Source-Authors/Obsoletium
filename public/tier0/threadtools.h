@@ -1238,6 +1238,53 @@ private:
 	int m_nPendingReaders{ 0 };
 };
 
+template <class RWLOCK_TYPE>
+class CAutoReadLockT
+{
+public:
+    FORCEINLINE CAutoReadLockT(RWLOCK_TYPE &lock)
+        : m_lock(lock)
+    {
+        m_lock.LockForRead();
+    }
+
+    FORCEINLINE ~CAutoReadLockT()
+    {
+        m_lock.UnlockRead();
+    }
+
+private:
+    RWLOCK_TYPE &m_lock;
+
+    CAutoReadLockT(const CAutoReadLockT &) = delete;
+    CAutoReadLockT &operator=(const CAutoReadLockT &) = delete;
+};
+
+template <class RWLOCK_TYPE>
+class CAutoWriteLockT
+{
+public:
+    FORCEINLINE CAutoWriteLockT(RWLOCK_TYPE &lock)
+        : m_lock(lock)
+    {
+        m_lock.LockForWrite();
+    }
+
+    FORCEINLINE ~CAutoWriteLockT()
+    {
+        m_lock.UnlockWrite();
+    }
+
+private:
+    RWLOCK_TYPE &m_lock;
+
+    CAutoWriteLockT(const CAutoWriteLockT &) = delete;
+    CAutoWriteLockT &operator=(const CAutoWriteLockT &) = delete;
+};
+
+#define AUTO_LOCK_READ(rwlock)  CAutoReadLockT<decltype(rwlock)> UNIQUE_ID(rwlock)
+#define AUTO_LOCK_WRITE(rwlock) CAutoWriteLockT<decltype(rwlock)> UNIQUE_ID(rwlock)
+
 //-----------------------------------------------------------------------------
 //
 // CThreadSpinRWLock
