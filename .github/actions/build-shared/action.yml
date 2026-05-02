@@ -26,7 +26,7 @@ runs:
       vs-architecture: ${{inputs.platform-name}}
 
   - name: Add cmake / nmake to PATH
-    uses: ilammy/msvc-dev-cmd@v1
+    uses: Source-Authors/msvc-dev-cmd@v2
     with:
       arch: ${{inputs.platform-name}}
 
