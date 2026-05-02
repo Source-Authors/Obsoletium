@@ -58,7 +58,7 @@ $Configuration
 	$PreBuildEvent
 	{
 		$CommandLine		"IF EXIST $QUOTE$OUTBINDIR\$(TargetFileName)$QUOTE (" "\n" \
-							"	FOR /f $QUOTEdelims=$QUOTE %%A IN ('ATTRIB $QUOTE$OUTBINDIR\$(TargetFileName)$QUOTE') DO SET valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
+							"	FOR /f $QUOTEdelims=$QUOTE %%A IN ('$QUOTE%SystemRoot%\system32\attrib.exe$QUOTE $QUOTE$OUTBINDIR\$(TargetFileName)$QUOTE') DO SET valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
 							")" "\n" \
 							"SET valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%" "\n" \
 							"IF $QUOTE%valveTmpIsReadOnlyLetter%$QUOTE==$QUOTER$QUOTE (" "\n" \

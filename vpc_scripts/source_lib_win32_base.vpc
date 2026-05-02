@@ -41,7 +41,7 @@ $Configuration
 	$PreBuildEvent
 	{
 		$CommandLine		"IF EXIST $OUTLIBDIR\$(TargetName).lib (" "\n" \
-							"    FOR /f $QUOTEdelims=$QUOTE %%A IN ('ATTRIB $QUOTE$OUTLIBDIR\$(TargetName).lib$QUOTE') DO SET valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
+							"    FOR /f $QUOTEdelims=$QUOTE %%A IN ('$QUOTE%SystemRoot%\system32\attrib.exe$QUOTE $QUOTE$OUTLIBDIR\$(TargetName).lib$QUOTE') DO SET valveTmpIsReadOnly=$QUOTE%%A$QUOTE" "\n" \
 							") else ( " "\n" \
 							"    IF NOT EXIST $OUTLIBDIR (" "\n" \
 							"        MKDIR $OUTLIBDIR" "\n" \
@@ -52,13 +52,13 @@ $Configuration
 							")" "\n" \
 							"SET valveTmpIsReadOnlyLetter=%valveTmpIsReadOnly:~6,1%" "\n" \
 							"IF $QUOTE%valveTmpIsReadOnlyLetter%$QUOTE==$QUOTER$QUOTE (" "\n" \
-							"    ATTRIB -r $OUTLIBDIR\$(TargetName).lib" "\n" \
+							"    $QUOTE%SystemRoot%\system32\attrib.exe$QUOTE -r $OUTLIBDIR\$(TargetName).lib" "\n" \
 							"    IF ERRORLEVEL 1 (" "\n" \
-							"        ECHO *** ERROR! Unable to ATTRIB -r $OUTLIBDIR $OUTLIBDIR\$(TargetName).lib" "\n" \
+							"        ECHO *** ERROR! Unable to $QUOTE%SystemRoot%\system32\attrib.exe$QUOTE -r $OUTLIBDIR $OUTLIBDIR\$(TargetName).lib" "\n" \
 							"    )" "\n" \
-							"    ATTRIB +r $OUTLIBDIR\$(TargetName).lib" "\n" \
+							"    $QUOTE%SystemRoot%\system32\attrib.exe$QUOTE +r $OUTLIBDIR\$(TargetName).lib" "\n" \
 							"    IF ERRORLEVEL 1 (" "\n" \
-							"        ECHO *** ERROR! Unable to ATTRIB +r $OUTLIBDIR $OUTLIBDIR\$(TargetName).lib" "\n" \
+							"        ECHO *** ERROR! Unable to $QUOTE%SystemRoot%\system32\attrib.exe$QUOTE +r $OUTLIBDIR $OUTLIBDIR\$(TargetName).lib" "\n" \
 							"    )" "\n" \
 							")" "\n" \
 							"$CRCCHECK" "\n"
