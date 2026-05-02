@@ -96,7 +96,7 @@ POPD
 REM Build zlib.
 MKDIR thirdparty\zlib\out
 PUSHD thirdparty\zlib\out
-cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% ..
+cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DZLIB_INSTALL=ON -DCMAKE_INSTALL_PREFIX=. ..
 if ERRORLEVEL 1 (
   ECHO cmake generation for thirdparty\zlib failed.
   EXIT /B 1
@@ -107,6 +107,8 @@ if ERRORLEVEL 1 (
   ECHO cmake --build for thirdparty\zlib failed.
   EXIT /B 1
 )
+
+cmake --install .
 POPD
 
 
@@ -116,7 +118,7 @@ SET ZLIB_SOURCE_DIR="%cd%\thirdparty\zlib"
 REM Build libpng.
 MKDIR thirdparty\libpng\out
 PUSHD thirdparty\libpng\out
-cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DPNG_SHARED=OFF -DPNG_STATIC=ON -DPNG_TOOLS=OFF -DPNG_TESTS=OFF -DPNG_BUILD_ZLIB=ON -DZLIB_INCLUDE_DIRS='"%ZLIB_SOURCE_DIR%";"%ZLIB_SOURCE_DIR%"\out' -DZLIB_LIBRARIES="%ZLIB_SOURCE_DIR%\out\zlibstatic.lib" ..
+cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DPNG_SHARED=OFF -DPNG_STATIC=ON -DPNG_TOOLS=OFF -DPNG_TESTS=OFF -DZLIB_ROOT="%ZLIB_SOURCE_DIR%\out" ..
 if ERRORLEVEL 1 (
   ECHO cmake generation for thirdparty\libpng failed.
   EXIT /B 1
@@ -133,7 +135,7 @@ POPD
 REM Build lua.
 MKDIR thirdparty\lua\out
 PUSHD thirdparty\lua\out
-cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DLUA_ENABLE_TESTING=OFF -DLUA_BUILD_COMPILER=OFF -DLUA_BUILD_AS_CXX=ON ..
+cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DLUA_ENABLE_TESTING=OFF -DLUA_BUILD_BINARY=OFF -DLUA_BUILD_COMPILER=OFF -DLUA_BUILD_AS_CXX=ON ..
 if ERRORLEVEL 1 (
   ECHO cmake generation for thirdparty\lua failed.
   EXIT /B 1

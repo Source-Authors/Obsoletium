@@ -209,7 +209,7 @@ $Project "replay"
 		$Libexternal	"$LIBBZOUTDIR/libbz2"
 		$Libexternal	"$LIBPNGOUTDIR/libpng16_static" [!$DEDICATED]
 		$Libexternal	"$LIBJPEGOUTDIR/jpeg-static" [!$DEDICATED]
-		$Libexternal	"$ZLIBOUTDIR/zlibstatic" [!$DEDICATED]
+		$Libexternal	"$ZLIBOUTDIR/zs" [!$DEDICATED]
 
 		$Libexternal	"$LIBCOMMON/libcrypto" [$OSXALL]
 		$Libexternal 	"$SRCDIR/lib/common/$(CRYPTOPPDIR)/libcrypto" [$LINUXALL]

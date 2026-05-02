@@ -1245,7 +1245,7 @@ $Project
 		
 		$Libexternal $LIBCOMMON/libcrypto [$OSXALL]
 		$Libexternal "$SRCDIR\lib\common\$(CRYPTOPPDIR)\libcrypto" [$LINUXALL]
-		$Libexternal	"$ZLIBOUTDIR/zlibstatic"
+		$Libexternal	"$ZLIBOUTDIR/zs"
  	}
 
 }

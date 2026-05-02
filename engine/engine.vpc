@@ -1185,7 +1185,7 @@ $Project "engine"
 		$Libexternal	"$SNAPPYOUTDIRRELEASE/snappy" [!$WINDOWS]
 		$Libexternal	"$ZIPUTILSOUTDIRRELEASE/zip-utils" [!$WINDOWS]
 		$Libexternal	"$MPAHEADERINFOOUTDIRRELEASE/mpaheaderinfo" [!$WINDOWS&&!$DEDICATED]
-		$Libexternal	"$ZLIBOUTDIR/zlibstatic"
+		$Libexternal	"$ZLIBOUTDIR/zs"
 		$Libexternal 	"$SRCDIR\lib\common\$(CRYPTOPPDIR)\libcrypto" [$LINUXALL&&!$DEDICATED]
 
 		// Link with the google profiler.

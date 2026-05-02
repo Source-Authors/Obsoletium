@@ -259,6 +259,6 @@ $Project "gameui"
 		$Libexternal	"$LIBPNGOUTDIR/libpng16_static" [!$DEDICATED]
 		$Libexternal	"$LIBJPEGOUTDIR/jpeg-static" [!$DEDICATED]
 		$Libexternal	"$SDL3OUTDIR/SDL3" [$SDL]
-		$Libexternal	"$ZLIBOUTDIR/zlibstatic" [!$DEDICATED]
+		$Libexternal	"$ZLIBOUTDIR/zs" [!$DEDICATED]
 	}
 }

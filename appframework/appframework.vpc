@@ -56,6 +56,6 @@ $Project "appframework"
 	$Folder	"Link Libraries"
 	{
 		$ImpLib togl [!$IS_LIB_PROJECT && $GL]
-		$Libexternal	"$ZLIBOUTDIR/zlibstatic" [!$IS_LIB_PROJECT && $SDL]
+		$Libexternal	"$ZLIBOUTDIR/zs" [!$IS_LIB_PROJECT && $SDL]
 	}
 }

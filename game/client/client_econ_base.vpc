@@ -180,6 +180,6 @@ $Project
 	{
 		$Libexternal	"$LIBCOMMON/jpeg-static"
 		$Libexternal	"$LIBCOMMON/libpng16"
-		$Libexternal	"$LIBCOMMON/zlibstatic"
+		$Libexternal	"$LIBCOMMON/zs"
 	}
 }

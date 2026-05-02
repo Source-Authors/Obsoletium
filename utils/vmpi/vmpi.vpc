@@ -63,6 +63,6 @@ $Project "vmpi"
 
 	$Folder "Link Libraries"
 	{
-		$Libexternal	"$ZLIBOUTDIR/zlibstatic"
+		$Libexternal	"$ZLIBOUTDIR/zs"
 	}
 }

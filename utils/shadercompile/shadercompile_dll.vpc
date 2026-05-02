@@ -68,6 +68,6 @@ $Project "shader-compiler-core"
 	{
 		$Lib tier2
 		$Lib $LIBCOMMON\lzma
-		$Libexternal "$ZLIBOUTDIR/zlibstatic"
+		$Libexternal "$ZLIBOUTDIR/zs"
 	}
 }
