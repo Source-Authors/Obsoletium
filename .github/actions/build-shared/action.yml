@@ -16,12 +16,12 @@ runs:
   using: "composite"
   steps:
   - name: Add MSBuild ${{inputs.platform-name}} to PATH
-    uses: microsoft/setup-msbuild@v2
+    uses: microsoft/setup-msbuild@v3
     with:
       msbuild-architecture: ${{inputs.platform-name}}
 
   - name: Add MASM ${{inputs.platform-name}} to PATH
-    uses: Source-Authors/setup-masm@v1.3
+    uses: Source-Authors/setup-masm@v1.4
     with:
       vs-architecture: ${{inputs.platform-name}}
 
@@ -32,7 +32,7 @@ runs:
 
   - name: Cache VPC output
     id: cache-vpc
-    uses: actions/cache@v4
+    uses: actions/cache@v5
     with:
       path: |
         .\external\vpc\out
@@ -55,7 +55,7 @@ runs:
 
   - name: 'Cache dependencies output for ${{inputs.solution-name}}_${{inputs.platform-name}}.slnx'
     id: cache-dependencies
-    uses: actions/cache@v4
+    uses: actions/cache@v5
     with:
       path: |
         .\thirdparty\**\out
@@ -116,7 +116,7 @@ runs:
     shell: cmd
 
   - name: 'Upload ${{inputs.solution-name}}_${{inputs.platform-name}}_${{inputs.configuration-name}} build artifacts'
-    uses: actions/upload-artifact@v4
+    uses: actions/upload-artifact@v6
     with:
       name: '${{inputs.solution-name}}-${{runner.os}}-${{inputs.platform-name}}-${{inputs.configuration-name}}-${{steps.get-build-version.outputs.BUILD_VERSION}}'
       path: '${{steps.get-build-artifacts-path.outputs.BUILD_ARTIFACTS_PATH}}'
