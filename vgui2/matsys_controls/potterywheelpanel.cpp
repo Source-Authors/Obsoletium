@@ -721,7 +721,7 @@ void CPotteryWheelPanel::SetupRenderState( int nDisplayWidth, int nDisplayHeight
 	pRenderContext->MatrixMode( MATERIAL_PROJECTION );
 	pRenderContext->LoadMatrix( projection );
 
-	LightDesc_t *pDesc = (LightDesc_t*)stackalloc( m_nLightCount * sizeof(LightDesc_t) );
+	LightDesc_t *pDesc = stackallocT( LightDesc_t, m_nLightCount );
 	for ( int i = 0; i < m_nLightCount; ++i )
 	{
 		pDesc[i] = m_Lights[i].m_Desc;
