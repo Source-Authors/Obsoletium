@@ -2414,8 +2414,6 @@ void VOX_AddSentenceWavesToResList( void )
 //-----------------------------------------------------------------------------
 int VOX_GroupIndexFromName( const char *pGroupName )
 {
-	int i;
-
 	if ( pGroupName )
 	{
 		// search rgsentenceg for match on szgroupname
