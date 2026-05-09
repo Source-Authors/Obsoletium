@@ -2375,30 +2375,24 @@ void VOX_AddSentenceWavesToResList( void )
 	CUtlDict< int, int > list;
 	CUtlRBTree< ccpair, int > ccpairs( 0, 0, CCPairLessFunc );
 
-	int i;
-	int sentencecount = g_Sentences.Count();
-
-	for ( i = 0; i < sentencecount; i++ )
+	for ( auto &s : g_Sentences )
 	{
 		// Walk through all nonvirtual sentences and touch the referenced sounds...
-		sentence_t *pSentence = &g_Sentences[i];
-
-		if ( !Q_strnicmp( pSentence->pName, "V_", 2 ) )
+		if ( !Q_strnicmp( s.pName, "V_", 2 ) )
 		{
 			continue;
 		}
 
 		if ( spewsentences )
 		{
-			const char *psz = VOX_LookupString(pSentence->pName, NULL);
+			const char *psz = VOX_LookupString(s.pName, nullptr);
 			if ( psz )
 			{
-				Msg( "%s : %s\n", pSentence->pName, psz );
+				Msg( "%s : %s\n", s.pName, psz );
 			}
 		}
 
-		VOX_TouchSound( pSentence->pName, list, ccpairs, spewsentences );
-
+		VOX_TouchSound( s.pName, list, ccpairs, spewsentences );
 	}
 
 	VOX_TouchSounds( list, ccpairs, spewsentences );
