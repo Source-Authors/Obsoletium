@@ -780,7 +780,7 @@ void ConVar::ChangeStringValue( const char *tempVal, float flOldValue )
 {
 	Assert( !( m_nFlags & FCVAR_NEVER_AS_STRING ) );
 
- 	char* pszOldValue = (char*)stackalloc( m_StringLength );
+ 	char* pszOldValue = stackallocT( char, m_StringLength );
 	memcpy( pszOldValue, m_pszString, m_StringLength );
 	
 	if ( tempVal )

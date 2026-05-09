@@ -3290,7 +3290,7 @@ bool IKeyValuesDumpContextAsText::KvWriteValue( KeyValues *val, int nIndentLevel
 		/*break;
 		{
 			int n = val->GetDataType();
-			char *chBuffer = ( char * ) stackalloc( 128 );
+			char *chBuffer = stackallocT( char, 128 );
 			V_snprintf( chBuffer, 128, "??kvtype[%d]", n );
 			if ( !KvWriteText( chBuffer ) )
 				return false;

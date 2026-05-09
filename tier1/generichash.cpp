@@ -364,7 +364,7 @@ uint32 MurmurHash2( const void * key, int len, uint32 seed )
 uint32 MurmurHash2LowerCase( char const *pString, uint32 nSeed )
 {
 	size_t nLen = strlen( pString );
-	char *p = ( char * ) stackalloc( nLen + 1 );
+	char *p = stackallocT( char, nLen + 1 );
 	for( size_t i = 0; i < nLen ; i++ )
 	{
 		p[i] = TOLOWERU( pString[i] );
