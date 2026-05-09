@@ -1263,7 +1263,7 @@ void CSentence::Append( float starttime, const CSentence& src )
 	// Combine
 	for ( const auto *word : src.m_Words )
 	{
-		CWordTag *newWord = new CWordTag( *word );
+		auto *newWord = new CWordTag( *word );
 
 		newWord->m_flStartTime += starttime;
 		newWord->m_flEndTime += starttime;
@@ -1278,16 +1278,16 @@ void CSentence::Append( float starttime, const CSentence& src )
 		AddWordTag( newWord );
 	}
 
-	if ( src.GetText()[ 0 ] )
+	if ( !Q_isempty( src.GetText() ) )
 	{
 		char fulltext[ 4096 ];
 		if ( GetText()[ 0 ] )
 		{
-			Q_snprintf( fulltext, sizeof( fulltext ), "%s %s", GetText(), src.GetText() );
+			V_sprintf_safe( fulltext, "%s %s", GetText(), src.GetText() );
 		}
 		else
 		{
-			Q_strncpy( fulltext, src.GetText(), sizeof( fulltext ) );
+			V_strcpy_safe( fulltext, src.GetText() );
 		}
 		SetText( fulltext );
 	}
