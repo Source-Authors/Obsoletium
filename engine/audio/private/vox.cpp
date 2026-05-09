@@ -2370,7 +2370,7 @@ void VOX_AddSentenceWavesToResList( void )
 		return;
 	}
 
-	bool spewsentences = CommandLine()->FindParm( "-spewsentences" ) != 0 ? true : false;
+	bool spewsentences = CommandLine()->HasParm( "-spewsentences" );
 
 	CUtlDict< int, int > list;
 	CUtlRBTree< ccpair, int > ccpairs( 0, 0, CCPairLessFunc );
