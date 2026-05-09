@@ -553,9 +553,7 @@ int VOX_GetNextEntnameIndex( void )
 
 int VOX_LookupEntIndex( int type, SoundSource soundsource, bool fallocnew) 
 {
-	int i;
-
-	for (i = 0; i < CENTNAMESMAX; i++)
+	for (int i = 0; i < CENTNAMESMAX; i++)
 	{
 		if ((g_entnames[i].type == type) && (g_entnames[i].soundsource == soundsource))
 		{
@@ -570,21 +568,23 @@ int VOX_LookupEntIndex( int type, SoundSource soundsource, bool fallocnew)
 	// new index slot - init
 
 	int inew = VOX_GetNextEntnameIndex();
+	// dimhotepus: Ref once and reuse.
+	auto &entname = g_entnames[inew];
 
-	g_entnames[inew].type = type;
-	g_entnames[inew].soundsource = soundsource;
-	g_entnames[inew].timedied = 0;
-	g_entnames[inew].fdied = 0;
-	g_entnames[inew].pszname = nullptr;
-	g_entnames[inew].psznum = nullptr;
+	entname.type = type;
+	entname.soundsource = soundsource;
+	entname.timedied = 0;
+	entname.fdied = 0;
+	entname.pszname = nullptr;
+	entname.psznum = nullptr;
 
-	for (i = 0; i < CVOXGLOBMAX; i++)
+	for (int i = 0; i < CVOXGLOBMAX; i++)
 	{
-		g_entnames[inew].pszglobal[i] = nullptr;
-		g_entnames[inew].timestamp[i] = 0;
-		g_entnames[inew].iseq[i] = 0;
-		g_entnames[inew].timestampseq[i] = 0;
-		g_entnames[inew].pszglobalseq[i] = nullptr;
+		entname.pszglobal[i] = nullptr;
+		entname.timestamp[i] = 0;
+		entname.iseq[i] = 0;
+		entname.timestampseq[i] = 0;
+		entname.pszglobalseq[i] = nullptr;
 	}
 
 	return inew;
