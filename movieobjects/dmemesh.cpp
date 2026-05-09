@@ -1269,7 +1269,7 @@ const char *SortDeltaName( const char *pInDeltaName, char *pOutDeltaName, int nO
 	if ( !pInDeltaName || !strchr( pInDeltaName, '_' ) )
 		return pInDeltaName;
 
-	char **ppDeltaNames = reinterpret_cast< char ** >( stackalloc( nOutDeltaNameBufLen * sizeof( char * ) ) );
+	char **ppDeltaNames = stackallocT( char*, nOutDeltaNameBufLen );
 	memset( ppDeltaNames, 0, nOutDeltaNameBufLen * sizeof( char * ) );
 
 	const char *pStart = pInDeltaName;
@@ -1281,7 +1281,7 @@ const char *SortDeltaName( const char *pInDeltaName, char *pOutDeltaName, int nO
 
 		if ( nControlNameBufLen )
 		{
-			ppDeltaNames[ nDimensionCount ] = reinterpret_cast< char * >( stackalloc( nControlNameBufLen * sizeof( char ) ) );
+			ppDeltaNames[ nDimensionCount ] = stackallocT( char, nControlNameBufLen );
 			Q_strncpy( ppDeltaNames[ nDimensionCount ], pStart, nControlNameBufLen );
 			++nDimensionCount;
 		}
@@ -1329,7 +1329,7 @@ CDmeVertexDeltaData *CDmeMesh::FindOrCreateDeltaState( const char *pInDeltaName 
 		return pDeltaState;
 
 	const intp nDeltaNameBufLen = Q_strlen( pInDeltaName ) + 1;
-	char *pDeltaNameBuf = reinterpret_cast< char * >( stackalloc( nDeltaNameBufLen * sizeof( char ) ) );
+	char *pDeltaNameBuf = stackallocT( char, nDeltaNameBufLen );
 	const char *pDeltaName = SortDeltaName( pInDeltaName, pDeltaNameBuf, nDeltaNameBufLen );
 
 	pDeltaState = CreateElement< CDmeVertexDeltaData >( pDeltaName, GetFileId() );
@@ -1353,7 +1353,7 @@ intp CDmeMesh::FindDeltaStateIndex( const char *pInDeltaName ) const
 	if ( strchr( pInDeltaName, '_' ) )
 	{
 		const intp nDeltaNameBufLen = Q_strlen( pInDeltaName ) + 1;
-		char *pDeltaNameBuf = reinterpret_cast< char * >( stackalloc( nDeltaNameBufLen * sizeof( char ) ) );
+		char *pDeltaNameBuf = stackallocT( char, nDeltaNameBufLen );
 		pDeltaName = SortDeltaName( pInDeltaName, pDeltaNameBuf, nDeltaNameBufLen );
 	}
 

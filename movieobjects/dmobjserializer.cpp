@@ -281,7 +281,7 @@ CDmeVertexDeltaData *CVertexData::AddDelta( CDmeMesh *pMesh, bool bAbsolute, con
 					m_normals[ i ] -= bindNormalData[ i ];
 				}
 
-				intp *pNormalIndices = reinterpret_cast< intp * >( stackalloc( nNormalCount * sizeof( intp ) ) );
+				intp *pNormalIndices = stackallocT( intp, nNormalCount );
 				intp nNormalDeltaCount = 0;
 				constexpr float coeff = 1 / 4096.0f;
 				for ( intp i = 0; i < nNormalCount; ++i )
