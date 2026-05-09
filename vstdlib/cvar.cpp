@@ -564,7 +564,7 @@ ConCommand *CCvar::FindCommand( const char *pCommandName )
 const char* CCvar::GetCommandLineValue( const char *pVariableName )
 {
 	intp nLen = Q_strlen(pVariableName);
-	char *pSearch = (char*)stackalloc( nLen + 2 );
+	char *pSearch = stackallocT( char, nLen + 2 );
 	pSearch[0] = '+';
 	memcpy( &pSearch[1], pVariableName, nLen + 1 );
 	return CommandLine()->ParmValue( pSearch );

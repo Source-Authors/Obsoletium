@@ -333,7 +333,7 @@ public:
 			// use an existing coroutine pointer that is already on the stack from the previous function (does so on the PS3), and will be overwritten
 			// when we memcpy below. Any allocations here should be ok, as the caller should have advanced the stack past the stack area where the
 			// new stack will be copied
-			auto *pThis = (CCoroutine*)stackalloc( sizeof( CCoroutine* ) );
+			auto *pThis = (CCoroutine*)stackallocT( CCoroutine*, 1 );
 			pThis = this;
 			
 			RW_MEMORY_BARRIER;
@@ -709,7 +709,7 @@ bool Internal_Coroutine_Continue( HCoroutine hCoroutine, const char *pchDebugMsg
 				{
 					// push ourselves down
 					intp cubPush = pStackSavePoint - coroutine.m_pStackLow + 512;
-					volatile byte *pvStackGap = (byte*)stackalloc( cubPush );
+					volatile byte *pvStackGap = stackallocT( byte, cubPush );
 					pvStackGap[ cubPush-1 ] = 0xF;
 					CoroutineDbgMsg( g_fmtstr.sprintf( "Adjusting stack point by %zd (%x <- %x)\n", cubPush, pvStackGap, &pvStackGap[cubPush] ) );
 				}
@@ -749,7 +749,7 @@ bool Internal_Coroutine_Continue( HCoroutine hCoroutine, const char *pchDebugMsg
 			// jump a long way forward on the stack
 			// this needs to be a stackalloc() instead of a static buffer, so it won't get optimized out in release build
 			int cubGap = bInCoroutineAlready ? k_cubCoroutineStackGapSmall : k_cubCoroutineStackGap;
-			volatile byte *pvStackGap = (byte*)stackalloc( cubGap );
+			volatile byte *pvStackGap = stackallocT( byte, cubGap );
 			pvStackGap[ cubGap-1 ] = 0xF;
 
 			// hasn't started yet, so launch
@@ -948,7 +948,7 @@ void Coroutine_YieldToMain()
 		if ( pStackPtr >= (coroutinePrev.m_pStackHigh - coroutinePrev.m_cubSavedStack) && ( pStackPtr - 2048 ) <= coroutinePrev.m_pStackHigh )
 		{
 			intp cubPush = coroutinePrev.m_cubSavedStack + 512;
-			volatile byte *pvStackGap = (byte*)stackalloc( cubPush );
+			volatile byte *pvStackGap = stackallocT( byte, cubPush );
 			pvStackGap[ cubPush - 1 ] = 0xF;
 			CoroutineDbgMsg( g_fmtstr.sprintf( "Adjusting stack point by %zd (%x <- %x)\n", cubPush, pvStackGap, &pvStackGap[cubPush] ) );
 		}
@@ -977,7 +977,7 @@ void Coroutine_Finish()
 	CoroutineDbgMsg( g_fmtstr.sprintf( "Coroutine_Finish() %s#%x -> %s#%x\n", GCoroutineMgr().GetActiveCoroutine().m_pchName, GCoroutineMgr().GetActiveCoroutineHandle(), GCoroutineMgr().GetPreviouslyActiveCoroutine().m_pchName, &GCoroutineMgr().GetPreviouslyActiveCoroutine() ) );
 
 	// allocate a bunch of stack padding so we don't kill ourselves while in stack restoration
-	volatile byte *pvStackGap = (byte*)stackalloc( GCoroutineMgr().GetPreviouslyActiveCoroutine().m_cubSavedStack + 512 );
+	volatile byte *pvStackGap = stackallocT( byte, GCoroutineMgr().GetPreviouslyActiveCoroutine().m_cubSavedStack + 512 );
 	pvStackGap[ GCoroutineMgr().GetPreviouslyActiveCoroutine().m_cubSavedStack + 511 ] = 0xf;
 
 	GCoroutineMgr().GetPreviouslyActiveCoroutine().RestoreStack();
@@ -1085,7 +1085,7 @@ bool Coroutine_Test()
 	{
 		// pop our stack up so it collides with the coroutine stack position
 		Coroutine_Continue( hCoroutine, nullptr );
-		volatile byte *pvAlloca = (byte*)stackalloc( k_cubCoroutineStackGapSmall );
+		volatile byte *pvAlloca = stackallocT( byte, k_cubCoroutineStackGapSmall );
 		pvAlloca[ k_cubCoroutineStackGapSmall-1 ] = 0xF;
 		
 		Coroutine_Continue( hCoroutine, nullptr );
