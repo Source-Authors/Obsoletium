@@ -976,21 +976,23 @@ char *VOX_LookupSectorVirtual( char *pGroupname )
 
 char *VOX_LookupGlobalVirtual( int type, SoundSource soundsource, char *pGroupName, int iglobal )
 {
-	int i;
 	float curtime = g_pSoundServices->GetClientTime();
 
 	// look for ent of this type with un-expired global
 	
-	for (i = 0; i < CENTNAMESMAX; i++)
+	for (int i = 0; i < CENTNAMESMAX; i++)
 	{
-		if (g_entnames[i].type == type)
+		// dimhotepus: Ref to speedup.
+		auto &entname = g_entnames[i];
+
+		if (entname.type == type)
 		{
-			if (curtime - g_entnames[i].timestamp[iglobal] <= snd_vox_globaltimeout.GetInt())
+			if (curtime - entname.timestamp[iglobal] <= snd_vox_globaltimeout.GetInt())
 			{
 				// if this ent has an un-expired global, return it, otherwise break
 
-				if (g_entnames[i].pszglobal[iglobal])
-					return g_entnames[i].pszglobal[iglobal];
+				if (entname.pszglobal[iglobal])
+					return entname.pszglobal[iglobal];
 				else
 					break;
 			}
@@ -1118,17 +1120,13 @@ void VOX_DeleteWord( int iword )
 void VOX_LookupMapnames( void )
 {
 	// get group V_MAPNAMES
-
-	int i;
-	char *psz;
 	int inext = 0;
 
-	for (i = 0; i < CVOXMAPNAMESMAX; i++)
+	for (int i = 0; i < CVOXMAPNAMESMAX; i++)
 	{
 		// step sequentially through group - return ptr to 1st word in each group (map name)
 
-		psz = VOX_LookupSentenceByIndex( "V_MAPNAME", i, &inext );
-
+		char *psz = VOX_LookupSentenceByIndex("V_MAPNAME", i, &inext);
 		if (!psz)
 			return;
 
