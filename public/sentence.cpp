@@ -1292,6 +1292,7 @@ void CSentence::Append( float starttime, const CSentence& src )
 		SetText( fulltext );
 	}
 
+	// copying.
 	for ( auto s : src.m_EmphasisSamples )
 	{
 		s.time += starttime;

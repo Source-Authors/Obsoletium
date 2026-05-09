@@ -1194,12 +1194,14 @@ CChoreoEvent& CChoreoEvent::operator=( const CChoreoEvent& src )
 		ClearAllAbsoluteTags( (AbsTagType)t );
 	}
 
+	// copying.
 	for ( auto newtag : src.m_RelativeTags )
 	{	
 		newtag.SetOwner( this );
 		m_RelativeTags.AddToTail( newtag );
 	}
 
+	// copying.
 	for ( auto newtag : src.m_TimingTags )
 	{	
 		newtag.SetOwner( this );
@@ -1207,6 +1209,7 @@ CChoreoEvent& CChoreoEvent::operator=( const CChoreoEvent& src )
 	}
 	for ( t = 0; t < NUM_ABS_TAG_TYPES; t++ )
 	{
+		// copying.
 		for ( auto newtag : src.m_AbsoluteTags[ t ] )
 		{
 			newtag.SetOwner( this );
