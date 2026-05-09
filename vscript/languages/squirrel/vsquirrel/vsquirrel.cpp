@@ -3094,7 +3094,7 @@ void AnotherFunction()
 	g_pScriptVM->RegisterInstance( &derivedInstance, "theInstance" );
 }
 
-int main( int argc, const char **argv)
+int main( int argc, char **argv)
 {
 	if ( argc < 2 )
 	{
