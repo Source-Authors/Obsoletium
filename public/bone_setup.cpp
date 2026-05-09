@@ -1437,7 +1437,7 @@ void SlerpBones(
 
 	// Build weightlist for all bones
 	int nBoneCount = pStudioHdr->numbones();
-	float *pS2 = (float*)stackalloc( nBoneCount * sizeof(float) );
+	float *pS2 = stackallocT( float, nBoneCount );
 	for (i = 0; i < nBoneCount; i++)
 	{
 		// skip unused bones
