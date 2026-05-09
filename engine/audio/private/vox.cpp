@@ -2815,11 +2815,10 @@ char *VOX_LookupString(const char *pSentenceName, int *psentencenum, bool *pbEmi
 		*pflDuration = 0.0f;
 	}
 
-	int i;
-	int c = g_Sentences.Count();
-	for (i = 0; i < c; i++)
+	intp i = 0;
+	for (auto &s : g_Sentences)
 	{
-		char const *name = g_Sentences[i].pName;
+		char const *name = s.pName;
 
 		if (!stricmp(pSentenceName, name))
 		{
@@ -2830,21 +2829,23 @@ char *VOX_LookupString(const char *pSentenceName, int *psentencenum, bool *pbEmi
 
 			if ( pbEmitCaption )
 			{
-				*pbEmitCaption = g_Sentences[ i ].closecaption;
+				*pbEmitCaption = s.closecaption;
 			}
 
 			if ( pCaptionSymbol )
 			{
-				*pCaptionSymbol = g_Sentences[ i ].caption;
+				*pCaptionSymbol = s.caption;
 			}
 		
 			if ( pflDuration )
 			{
-				*pflDuration = g_Sentences[ i ].length;
+				*pflDuration = s.length;
 			}
 
 			return (char *)(name + Q_strlen(name) + 1);
 		}
+
+		++i;
 	}
 	return nullptr;
 }
