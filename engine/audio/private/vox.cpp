@@ -920,9 +920,8 @@ int VOX_LookupLastDeadIndex( int type )
 {
 	float timemax = -1;
 	int ifound = -1;
-	int i;
 
-	for (i = 0; i < CENTNAMESMAX; i++)
+	for (int i = 0; i < CENTNAMESMAX; i++)
 	{
 		if (g_entnames[i].type == type && g_entnames[i].fdied)
 		{
