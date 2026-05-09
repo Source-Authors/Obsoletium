@@ -2857,6 +2857,3 @@ const char *VOX_SentenceNameFromIndex( int sentencenum )
 		return g_Sentences[sentencenum].pName;
 	return NULL;
 }
-
-
-
