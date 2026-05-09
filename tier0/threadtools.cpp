@@ -417,6 +417,8 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 			id != INVALID_THREAD_ID ? id : GetThreadId( GetCurrentThread() ) );
 		if ( handle )
 		{
+			RunCodeAtScopeExit( ::CloseHandle( handle ) );
+
 			const size_t wcharsNeeded = mbstowcs( nullptr, pszName, INT_MAX );
 			const size_t descriptionSize = (wcharsNeeded + 1) * sizeof(wchar_t);
 			auto *description = static_cast<wchar_t*>( stackalloc( descriptionSize ) );
@@ -426,8 +428,6 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 			description[descriptionSize / sizeof(wchar_t) - 1] = L'\0';
 
 			::SetThreadDescription( handle, description );
-
-			::CloseHandle( handle );
 		}
 	}
 #elif defined( _LINUX )
