@@ -449,11 +449,11 @@ bool CDmxSerializer::Unserialize( CUtlBuffer &buf, int nEncodingVersion, CDmxEle
 		nStrings = buf.GetShort();
 		if ( nStrings > 0 )
 		{
-			offsetTable = ( intp* )stackalloc( nStrings * sizeof( intp ) );
+			offsetTable = stackallocT( intp, nStrings );
 
 			// this causes entire string table to be mapped in memory at once
 			intp nStringMemoryUsage = GetStringOffsetTable( buf, offsetTable, nStrings );
-			stringTable = ( char* )stackalloc( nStringMemoryUsage * sizeof( char ) );
+			stringTable = stackallocT( char, nStringMemoryUsage );
 			buf.Get( stringTable, nStringMemoryUsage );
 		}
 	}
