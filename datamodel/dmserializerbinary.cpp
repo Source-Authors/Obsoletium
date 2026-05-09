@@ -246,15 +246,14 @@ bool CDmSerializerBinary::Serialize( CUtlBuffer &outBuf, CDmElement *pRoot )
 	// TODO - consider allowing dmxconvert to skip the collection step, since the only datamodel symbols will be the ones from the file
 
 	unsigned short nTotalSymbols = g_pDataModelImp->GetSymbolCount();
-	UtlSymId_t     *indexToSymbolMap = ( UtlSymId_t    * )stackalloc( nTotalSymbols * sizeof( UtlSymId_t ) );
-	unsigned short *symbolToIndexMap = ( unsigned short* )stackalloc( nTotalSymbols * sizeof( unsigned short ) );
+	UtlSymId_t     *indexToSymbolMap = stackallocT( UtlSymId_t, nTotalSymbols );
+	unsigned short *symbolToIndexMap = stackallocT( unsigned short, nTotalSymbols );
 	V_memset( indexToSymbolMap, 0xff, nTotalSymbols * sizeof( UtlSymId_t ) );
 	V_memset( symbolToIndexMap, 0xff, nTotalSymbols * sizeof( unsigned short ) );
 
 	// collect list of attribute names and element types into string table
 	unsigned short nUsedSymbols = 0;
-	DmElementDictHandle_t i;
-	for ( i = dict.FirstRootElement(); i != ELEMENT_DICT_HANDLE_INVALID; i = dict.NextRootElement(i) )
+	for ( auto i = dict.FirstRootElement(); i != ELEMENT_DICT_HANDLE_INVALID; i = dict.NextRootElement(i) )
 	{
 		MarkSymbols( indexToSymbolMap, symbolToIndexMap, nUsedSymbols, dict.GetRootElement( i ) );
 	}
@@ -273,13 +272,13 @@ bool CDmSerializerBinary::Serialize( CUtlBuffer &outBuf, CDmElement *pRoot )
 
 	// First write out the dictionary of all elements (to avoid later stitching up in unserialize)
 	outBuf.PutInt( dict.RootElementCount() );
-	for ( i = dict.FirstRootElement(); i != ELEMENT_DICT_HANDLE_INVALID; i = dict.NextRootElement(i) )
+	for ( auto i = dict.FirstRootElement(); i != ELEMENT_DICT_HANDLE_INVALID; i = dict.NextRootElement(i) )
 	{
 		ok = SaveElementDict( outBuf, symbolToIndexMap, dict.GetRootElement( i ) ) && ok;
 	}
 
 	// Now write out the attributes of each of those elements
-	for ( i = dict.FirstRootElement(); i != ELEMENT_DICT_HANDLE_INVALID; i = dict.NextRootElement(i) )
+	for ( auto i = dict.FirstRootElement(); i != ELEMENT_DICT_HANDLE_INVALID; i = dict.NextRootElement(i) )
 	{
 		ok = SaveElement( outBuf, dict, symbolToIndexMap, dict.GetRootElement( i ) ) && ok;
 	}
@@ -478,7 +477,7 @@ bool CDmSerializerBinary::Unserialize( CUtlBuffer &buf, const char *pEncodingNam
 		char stringBuf[ 256 ];
 
 		nStrings = buf.GetShort();
-		symbolTable = ( UtlSymId_t* )stackalloc( nStrings * sizeof( UtlSymId_t ) );
+		symbolTable = stackallocT( UtlSymId_t, nStrings );
 		for ( unsigned short i = 0; i < nStrings; ++i )
 		{
 			buf.GetString( stringBuf );

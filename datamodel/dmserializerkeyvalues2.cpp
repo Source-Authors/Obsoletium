@@ -774,7 +774,7 @@ bool CDmSerializerKeyValues2::UnserializeElementArrayAttribute( CUtlBuffer &buf,
 		// Get the element type out
 		pConv = GetCStringCharConversion();
 		intp nLength = tokenBuf.PeekDelimitedStringLength( pConv );
-		char *pElementType = (char*)stackalloc( nLength * sizeof(char) );
+		char *pElementType = stackallocT( char, nLength * sizeof(char) );
 		tokenBuf.GetDelimitedString( pConv, pElementType, nLength );
 
 		// Use the element type to figure out if we're using a element reference or an inlined element
@@ -792,7 +792,7 @@ bool CDmSerializerKeyValues2::UnserializeElementArrayAttribute( CUtlBuffer &buf,
 			// Get the element type out
 			pConv = GetCStringCharConversion();
 			nLength = tokenBuf.PeekDelimitedStringLength( pConv );
-			char *pElementId = (char*)stackalloc( nLength  * sizeof(char) );
+			char *pElementId = stackallocT( char, nLength  * sizeof(char) );
 			tokenBuf.GetDelimitedString( pConv, pElementId, nLength );
 
 			DmObjectId_t id;
@@ -832,7 +832,7 @@ bool CDmSerializerKeyValues2::UnserializeAttributeValueFromToken( CDmAttribute *
 	// non-delimited buffers. Sucky. There must be a better way of doing this
 	const char *pBuf = tokenBuf.Base<const char>();
 	intp nLength = tokenBuf.TellMaxPut();
-	char *pTemp = (char*)stackalloc( nLength + 1 );
+	char *pTemp = stackallocT( char, nLength + 1 );
 
 	bool bIsString = ( pAttribute->GetType() == AT_STRING ) || ( pAttribute->GetType() == AT_STRING_ARRAY );
 	if ( !bIsString )
@@ -959,7 +959,7 @@ bool CDmSerializerKeyValues2::UnserializeAttribute( CUtlBuffer &buf,
 	{
 		CUtlCharConversion *pConv = GetCStringCharConversion();
 		intp nLength = tokenBuf.PeekDelimitedStringLength( pConv );
-		char *pElementId = (char*)stackalloc( nLength * sizeof(char) );
+		char *pElementId = stackallocT( char, nLength * sizeof(char) );
 		tokenBuf.GetDelimitedString( pConv, pElementId, nLength );
 
 		DmObjectId_t id;
@@ -990,7 +990,7 @@ bool CDmSerializerKeyValues2::UnserializeAttribute( CUtlBuffer &buf,
 			// Get the attribute value out
 			CUtlCharConversion *pConv = GetCStringCharConversion();
 			intp nLength = tokenBuf.PeekDelimitedStringLength( pConv );
-			char *pAttributeValue = (char*)stackalloc( nLength * sizeof(char) );
+			char *pAttributeValue = stackallocT( char, nLength * sizeof(char) );
 			tokenBuf.GetDelimitedString( pConv, pAttributeValue, nLength );
 
 			// No string? that's ok, it means we have a NULL pointer
@@ -1234,7 +1234,7 @@ bool CDmSerializerKeyValues2::UnserializeElement( CUtlBuffer &buf, const char *p
 		// First, read an attribute name
 		pConv = GetCStringCharConversion();
 		nLength = tokenBuf.PeekDelimitedStringLength( pConv );
-		char *pAttributeName = (char*)stackalloc( nLength * sizeof(char) );
+		char *pAttributeName = stackallocT( char, nLength * sizeof(char) );
 		tokenBuf.GetDelimitedString( pConv, pAttributeName, nLength );
 
 		// Next, read an attribute type
@@ -1247,7 +1247,7 @@ bool CDmSerializerKeyValues2::UnserializeElement( CUtlBuffer &buf, const char *p
 
 		pConv = GetCStringCharConversion();
 		nLength = tokenBuf.PeekDelimitedStringLength( pConv );
-		char *pAttributeType = (char*)stackalloc( nLength * sizeof(char) );
+		char *pAttributeType = stackallocT( char, nLength * sizeof(char) );
 		tokenBuf.GetDelimitedString( pConv, pAttributeType, nLength );
 		DmAttributeType_t nAttrType = g_pDataModel->GetAttributeTypeForName( pAttributeType );
 
@@ -1311,7 +1311,7 @@ bool CDmSerializerKeyValues2::UnserializeElement( CUtlBuffer &buf, DmElementDict
 
 	pConv = GetCStringCharConversion();
 	intp nLength = tokenBuf.PeekDelimitedStringLength( pConv );
-	char *pTypeName = (char*)stackalloc( nLength * sizeof(char) );
+	char *pTypeName = stackallocT( char, nLength * sizeof(char) );
 	tokenBuf.GetDelimitedString( pConv, pTypeName, nLength );
 
 	return UnserializeElement( buf, pTypeName, pHandle );
