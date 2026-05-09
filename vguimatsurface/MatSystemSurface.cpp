@@ -2380,7 +2380,7 @@ void CMatSystemSurface::DrawPrintText(const wchar_t *text, int iTextLen, FontDra
 	int iLastTexId = -1;
 
 	int iCount = 0;
-	vgui::Vertex_t *pQuads = (vgui::Vertex_t*)stackalloc((2 * iTextLen) * sizeof(vgui::Vertex_t) );
+	vgui::Vertex_t *pQuads = stackallocT( vgui::Vertex_t, 2 * iTextLen );
 	bool bUnderlined = FontManager().GetFontUnderlined( m_hCurrentFont );
 
 	int iTotalWidth = 0;
