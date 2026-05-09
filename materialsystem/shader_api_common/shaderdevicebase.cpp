@@ -902,7 +902,7 @@ void CShaderDeviceBase::SetCurrentThreadAsOwner()
 
 void CShaderDeviceBase::RemoveThreadOwner()
 {
-	m_dwThreadId.store( std::numeric_limits<ThreadId_t>::max(), std::memory_order::memory_order_relaxed );
+	m_dwThreadId.store( INVALID_THREAD_ID, std::memory_order::memory_order_relaxed );
 }
 
 bool CShaderDeviceBase::ThreadOwnsDevice() const

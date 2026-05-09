@@ -1453,7 +1453,7 @@ CShaderDeviceDx8::CShaderDeviceDx8()
 	m_iStencilBufferBits = 0;
 	m_numReleaseResourcesRefCount = 0;
 #ifdef DEBUG
-	m_createDeviceThreadId = std::numeric_limits<ThreadId_t>::max();
+	m_createDeviceThreadId = INVALID_THREAD_ID;
 #endif
 }
 

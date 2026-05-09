@@ -1098,7 +1098,7 @@ private:
 
 		s_TextureManager.m_nAsyncLoadThread.store( ThreadGetCurrentId(), std::memory_order::memory_order_seq_cst );
 		( ( AsyncLoader* )_this )->ThreadLoader_Main();
-		s_TextureManager.m_nAsyncLoadThread.store( std::numeric_limits<ThreadId_t>::max(), std::memory_order::memory_order_release );
+		s_TextureManager.m_nAsyncLoadThread.store( INVALID_THREAD_ID, std::memory_order::memory_order_release );
 		return 0;
 	}
 
@@ -1399,7 +1399,7 @@ private:
 
 		s_TextureManager.m_nAsyncReadThread.store( ThreadGetCurrentId(), std::memory_order::memory_order_seq_cst );
 		( ( AsyncReader* ) _this )->ThreadReader_Main();
-		s_TextureManager.m_nAsyncReadThread.store( std::numeric_limits<ThreadId_t>::max(), std::memory_order::memory_order_release );
+		s_TextureManager.m_nAsyncReadThread.store( INVALID_THREAD_ID, std::memory_order::memory_order_release );
 		return 0;
 	}
 
@@ -1424,8 +1424,8 @@ CTextureManager::CTextureManager( void )
 , m_TextureExcludes( true )
 , m_PendingAsyncLoads( true ) 
 , m_textureStreamingRequests( DefLessFunc( ITextureInternal* ) )
-, m_nAsyncLoadThread( std::numeric_limits<ThreadId_t>::max() )
-, m_nAsyncReadThread( std::numeric_limits<ThreadId_t>::max() )
+, m_nAsyncLoadThread( INVALID_THREAD_ID )
+, m_nAsyncReadThread( INVALID_THREAD_ID )
 {
 	m_iNextTexID = 0;
 	m_nFlags = 0;

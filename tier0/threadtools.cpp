@@ -414,7 +414,7 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 	{
 		HANDLE handle = OpenThread( STANDARD_RIGHTS_READ | THREAD_SET_INFORMATION,
 			FALSE,
-			id != std::numeric_limits<ThreadId_t>::max() ? id : GetThreadId( GetCurrentThread() ) );
+			id != INVALID_THREAD_ID ? id : GetThreadId( GetCurrentThread() ) );
 		if ( handle )
 		{
 			const size_t wcharsNeeded = mbstowcs( nullptr, pszName, INT_MAX );
@@ -432,7 +432,7 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 	}
 #elif defined( _LINUX )
 	// As of glibc v2.12, we can use pthread_setname_np.
-	if ( id == std::numeric_limits<ThreadId_t>::max() )
+	if ( id == INVALID_THREAD_ID )
 		id = pthread_self();
 
 	// The thread name is a meaningful C language string, whose length is
@@ -444,7 +444,7 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 	pthread_setname_np( id, szThreadName );
 #elif defined( OSX )
 	// dimhotepus: MacOS only supports set name for current thread.
-	if ( id == ThreadGetCurrentId() || id == std::numeric_limits<ThreadId_t>::max() )
+	if ( id == ThreadGetCurrentId() || id == INVALID_THREAD_ID )
 	{
 		// The thread name is a meaningful C language string, whose length is
 		// restricted to 64 characters, including the terminating null byte ('\0').
