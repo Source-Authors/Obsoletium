@@ -2317,24 +2317,25 @@ void VOX_GroupClear( void )
 
 void VOX_LRUInit( sentencegroup_t *pGroup )
 {
-	int i, n1, n2, temp;
-
 	if ( pGroup->count )
 	{
 		unsigned char *pLRU = &g_GroupLRU[pGroup->lru];
-		for (i = 0; i < pGroup->count; i++)
+		for (int i = 0; i < pGroup->count; i++)
 			pLRU[i] = (unsigned char) i;
 
 		// randomize array by swapping random elements
-		for (i = 0; i < (pGroup->count * 4); i++)
+		for (int i = 0; i < (pGroup->count * 4); i++)
 		{
 			// FIXME: This should probably call through g_pSoundServices
 			// or some other such call?
-			n1 = RandomInt(0,pGroup->count-1);
-			n2 = RandomInt(0,pGroup->count-1);
-			temp = pLRU[n1];
-			pLRU[n1] = pLRU[n2];
-			pLRU[n2] = temp;
+			const int n1 = RandomInt(0,pGroup->count-1);
+			const int n2 = RandomInt(0,pGroup->count-1);
+			
+			// dimhotepus: Exchange only if needed.
+			if (n1 != n2)
+			{
+				std::swap(pLRU[n1], pLRU[n2]);
+			}
 		}
 	}
 }
