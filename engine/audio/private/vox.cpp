@@ -1482,7 +1482,7 @@ void VOX_Precache( IEngineSound *pSoundSystem, int sentenceIndex, const char *pP
 			if (VOX_ParseWordParams(pWords[i], &rgvoxword[cword], i == 0))
 			{
 				// this is a valid word (as opposed to a parameter block)
-				Q_snprintf( pathbuffer, sizeof( pathbuffer ), "%s%s.wav", szpath, pWords[i] );
+				V_sprintf_safe( pathbuffer, "%s%s.wav", szpath, pWords[i] );
 				// find name, if already in cache, mark voxword
 				// so we don't discard when word is done playing
 				pSoundSystem->PrecacheSound( pathbuffer, false );
