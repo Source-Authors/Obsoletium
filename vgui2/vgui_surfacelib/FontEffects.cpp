@@ -166,7 +166,7 @@ void ApplyGaussianBlurToTexture( int rgbaWide, int rgbaTall, unsigned char *rgba
 		return;
 
 	// generate the gaussian field
-	float *pGaussianDistribution = (float*) stackalloc( (nBlur*2+1) * sizeof(float) );
+	float *pGaussianDistribution = stackallocT( float, nBlur*2+1 );
 	float sigma = 0.683F * nBlur;
 	for (int x = 0; x <= (nBlur * 2); x++)
 	{
@@ -175,7 +175,7 @@ void ApplyGaussianBlurToTexture( int rgbaWide, int rgbaTall, unsigned char *rgba
 	}
 
 	// alloc a new buffer
-	unsigned char *src = (unsigned char *) stackalloc( rgbaWide * rgbaTall * 4);
+	unsigned char *src = stackallocT( unsigned char, rgbaWide * rgbaTall * 4);
 
 	// copy in
 	memcpy(src, rgba, rgbaWide * rgbaTall * 4);
