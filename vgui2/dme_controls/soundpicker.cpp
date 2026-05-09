@@ -424,7 +424,7 @@ void CSoundPicker::OnItemSelected( KeyValues *kv )
 		if ( pGameSoundName && bPlaySounds )
 		{
 			intp len = V_strlen( pGameSoundName );
-			char *soundname = ( char* )stackalloc( len + 2 );
+			char *soundname = stackallocT( char, len + 2 );
 			soundname[ 0 ] = '#'; // mark sound to bypass the dsp
 			V_strncpy( soundname + 1, pGameSoundName, len + 1 );
 
@@ -543,7 +543,7 @@ void CSoundPickerFrame::OnCommand( const char *pCommand )
 			const char *pSoundName = pPicker->GetSelectedSoundName();
 
 			intp len = V_strlen( pSoundName );
-			char *soundname = ( char* )stackalloc( len + 2 );
+			char *soundname = stackallocT( char, len + 2 );
 			soundname[ 0 ] = '#'; // mark sound to bypass the dsp
 			V_strncpy( soundname + 1, pSoundName, len + 1 );
 
