@@ -14,7 +14,7 @@
 CClientThinkList g_ClientThinkList;
 
 
-CClientThinkList::CClientThinkList()
+CClientThinkList::CClientThinkList() : m_nIterEnum( 0 ), m_bInThinkLoop( false )
 {
 }
 
