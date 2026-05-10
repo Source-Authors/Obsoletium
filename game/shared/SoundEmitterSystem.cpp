@@ -102,7 +102,7 @@ void Hack_FixEscapeChars( char *str )
 {
 	intp len = Q_strlen( str ) + 1;
 	char *i = str;
-	char *o = (char *)_alloca( len );
+	char *o = stackallocT( char, len );
 	char *osave = o;
 	while ( *i )
 	{

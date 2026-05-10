@@ -1007,7 +1007,7 @@ void UTIL_DecodeICE( unsigned char * buffer, int size, const unsigned char *key)
 
 	int blockSize = ice.blockSize();
 
-	unsigned char *temp = (unsigned char *)_alloca( PAD_NUMBER( size, blockSize ) );
+	unsigned char *temp = stackallocT( unsigned char, PAD_NUMBER( size, blockSize ) );
 	unsigned char *p1 = buffer;
 	unsigned char *p2 = temp;
 				
