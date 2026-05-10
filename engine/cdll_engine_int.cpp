@@ -123,7 +123,7 @@ void AddIntersectingLeafSurfaces( mleaf_t *pLeaf, GetIntersectingSurfaces_Struct
 	for ( int iSurf=0; iSurf < pLeaf->nummarksurfaces; iSurf++ )
 	{
 		SurfaceHandle_t surfID = pHandle[iSurf];
-		ASSERT_SURF_VALID( surfID );
+		(void)ASSERT_SURF_VALID( surfID );
 		
 		if ( MSurf_Flags(surfID) & SURFDRAW_SKY )
 			continue;

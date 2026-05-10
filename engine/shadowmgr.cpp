@@ -1162,7 +1162,7 @@ void CShadowMgr::RemoveSurfaceFromShadow( ShadowHandle_t handle, SurfaceHandle_t
 	// Luckily the search is probably over only a couple items at most
 	// Linear searching over the shadow surfaces so we can remove the entry
 	// in the shadow surface list if we find a match
-	ASSERT_SURF_VALID( surfID );
+	(void)ASSERT_SURF_VALID( surfID );
 	ShadowSurfaceIndex_t i = m_Shadows[handle].m_FirstDecal;
 	while ( i != m_ShadowSurfaces.InvalidIndex() )
 	{
