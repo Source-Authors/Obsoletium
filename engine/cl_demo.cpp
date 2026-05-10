@@ -1510,10 +1510,7 @@ void CDemoPlayer::InterpolateViewpoint( void )
 		if ( dt > 0.0f )
 		{
 			vel = distmoved / dt;
-		}
 
-		if ( dt > 0.0f )
-		{
 			QAngle startang = prev.info.GetLocalViewAngles();
 			QAngle destang = next.info.GetLocalViewAngles();
 	
