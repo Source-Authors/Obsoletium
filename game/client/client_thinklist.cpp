@@ -288,17 +288,16 @@ void CClientThinkList::PerformThinkFunctions()
 	m_bInThinkLoop = true;
 
 	// Perform thinks on all entities that need it
-	int i;
-	for ( i = 0; i < nThinkCount; ++i )
+	for ( int i = 0; i < nThinkCount; ++i )
 	{
-		PerformThinkFunction( ppThinkEntryList[i], gpGlobals->curtime );		
+		PerformThinkFunction( ppThinkEntryList[i], gpGlobals->curtime );
 	}
 
 	m_bInThinkLoop = false;
 
 	// Apply changes to the think list
 	intp nCount = m_aChangeList.Count();
-	for ( i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		ClientThinkHandle_t hThink = m_aChangeList[i].m_hThink;
 		if ( hThink != INVALID_THINK_HANDLE )
@@ -359,8 +358,8 @@ void CClientThinkList::RemoveFromDeleteList( ClientEntityHandle_t hEnt )
 	if ( hEnt == ClientEntityList().InvalidHandle() )
 		return;
 
-	int nSize = m_aDeleteList.Count();
-	for ( int iHandle = 0; iHandle < nSize; ++iHandle )
+	intp nSize = m_aDeleteList.Count();
+	for ( intp iHandle = 0; iHandle < nSize; ++iHandle )
 	{
 		if ( m_aDeleteList[iHandle] == hEnt )
 		{
@@ -377,8 +376,8 @@ void CClientThinkList::RemoveFromDeleteList( ClientEntityHandle_t hEnt )
 
 void CClientThinkList::CleanUpDeleteList()
 {
-	int nThinkCount = m_aDeleteList.Count();
-	for ( int iThink = 0; iThink < nThinkCount; ++iThink )
+	intp nThinkCount = m_aDeleteList.Count();
+	for ( intp iThink = 0; iThink < nThinkCount; ++iThink )
 	{
 		ClientEntityHandle_t handle = m_aDeleteList[iThink];
 		if ( handle != ClientEntityList().InvalidHandle() )
