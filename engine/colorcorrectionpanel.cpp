@@ -1210,6 +1210,8 @@ CLevelsColorOperation::CLevelsColorOperation()
 	UpdateOutputLevelArray();
 
 	V_strcpy_safe( m_pName, "Levels" );
+
+	m_pOpList = nullptr;
 }
 
 
