@@ -249,7 +249,7 @@ struct CSmoothingContext
 			return *this;
 
 		active = src.active;
-		Q_strncpy( filename, src.filename, sizeof( filename ) );
+		V_strcpy_safe( filename, src.filename );
 
 		smooth.RemoveAll();
 		for ( const auto &s : src.smooth )
