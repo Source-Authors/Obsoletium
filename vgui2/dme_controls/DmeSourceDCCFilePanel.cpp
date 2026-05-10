@@ -388,15 +388,15 @@ static int IntCompare( const void *pSrc1, const void *pSrc2 )
 //-----------------------------------------------------------------------------
 void CDmeSourceDCCFilePanel::OnRemoveDCCObject( )
 {
-	int nCount = m_pRootDCCObjects->GetSelectedItemsCount();
+	intp nCount = m_pRootDCCObjects->GetSelectedItemsCount();
 	if ( nCount == 0 || !m_hSourceDCCFile.Get() )
 		return;
 
-	int nSelectedCount = 0;
-	int *pDCCObjectIndex = (int*)alloca( nCount*sizeof(int) );
-	for ( int i = 0; i < nCount; ++i )
+	intp nSelectedCount = 0;
+	int *pDCCObjectIndex = stackallocT( int, nCount );
+	for ( intp i = 0; i < nCount; ++i )
 	{
-		int nItemID = m_pRootDCCObjects->GetSelectedItem( i );
+		intp nItemID = m_pRootDCCObjects->GetSelectedItem( i );
 		KeyValues *pKeyValues = m_pRootDCCObjects->GetItem( nItemID );
 		int nDCCObjectIndex = pKeyValues->GetInt( "dccObjectIndex", -1 );
 		if ( nDCCObjectIndex < 0 )
@@ -411,14 +411,14 @@ void CDmeSourceDCCFilePanel::OnRemoveDCCObject( )
 	qsort( pDCCObjectIndex, nSelectedCount, sizeof(int), IntCompare );
 
 	// Update the selection to be reasonable after deletion
-	int nItemID = m_pRootDCCObjects->GetSelectedItem( 0 );
-	int nRow = m_pRootDCCObjects->GetItemCurrentRow( nItemID );
+	intp nItemID = m_pRootDCCObjects->GetSelectedItem( 0 );
+	intp nRow = m_pRootDCCObjects->GetItemCurrentRow( nItemID );
 	Assert( nRow >= 0 );
 
 	{
 		CDisableUndoScopeGuard guard;
 		// Because we sorted it above, removes will occur properly
-		for ( int i = nSelectedCount; --i >= 0; )
+		for ( intp i = nSelectedCount; --i >= 0; )
 		{
 			m_hSourceDCCFile->m_RootDCCObjects.Remove( pDCCObjectIndex[i] );
 		}
@@ -426,7 +426,7 @@ void CDmeSourceDCCFilePanel::OnRemoveDCCObject( )
 	}
 	RefreshDCCObjectList();
 
-	int nVisibleRowCount = m_pRootDCCObjects->GetItemCount();
+	intp nVisibleRowCount = m_pRootDCCObjects->GetItemCount();
 	if ( nVisibleRowCount == 0 )
 		return;
 
@@ -435,7 +435,7 @@ void CDmeSourceDCCFilePanel::OnRemoveDCCObject( )
 		nRow = nVisibleRowCount - 1;
 	}
 
-	int nNewItemID = m_pRootDCCObjects->GetItemIDFromRow( nRow );
+	intp nNewItemID = m_pRootDCCObjects->GetItemIDFromRow( nRow );
 	m_pRootDCCObjects->SetSingleSelectedItem( nNewItemID );
 }
 
