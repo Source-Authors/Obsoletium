@@ -1721,6 +1721,12 @@ CWaveDataStreamAsync::CWaveDataStreamAsync
 	if ( m_dataSize <= 0 )
 	{
 		DevMsg(1, "Can't find streaming wav file: sound\\%s\n", GetFileName() );
+
+		// dimhotepus: Init to deafult when early exit.
+		m_sampleSize = 0;
+		m_bufferSize = 0;
+		m_waveSize = 0;
+
 		return;
 	}
 

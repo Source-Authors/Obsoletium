@@ -79,6 +79,13 @@ CAudioMixerWaveADPCM::CAudioMixerWaveADPCM( IWaveData *data ) : CAudioMixerWave(
 
 		m_totalBytes = source.DataSize();
 	}
+	else
+	{
+		// dimhotepus: Ensure always init even on early exit.
+		m_pCoefficients = nullptr;
+		m_blockSize = 0;
+		m_totalBytes = 0;
+	}
 }
 
 
