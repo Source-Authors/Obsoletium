@@ -294,7 +294,7 @@ int CStudioRender::R_StudioRenderModel( IMatRenderContext *pRenderContext, int s
 	}
 
 	// Build list of submodels
-	BodyPartInfo_t *pBodyPartInfo = (BodyPartInfo_t*)_alloca( m_pStudioHdr->numbodyparts * sizeof(BodyPartInfo_t) );
+	BodyPartInfo_t *pBodyPartInfo = stackallocT( BodyPartInfo_t, m_pStudioHdr->numbodyparts );
 	for ( int i=0 ; i < m_pStudioHdr->numbodyparts; ++i ) 
 	{
 		pBodyPartInfo[i].m_nSubModelIndex = R_StudioSetupModel( i, body, &pBodyPartInfo[i].m_pSubModel, m_pStudioHdr );
@@ -377,7 +377,7 @@ void CStudioRender::GenerateMorphAccumulator( mstudiomodel_t *pSubModel )
 		studiomeshdata_t *pMeshData = &m_pStudioMeshes[pMesh->meshid];
 
 		int nFlexCount = pMesh->numflexes;
-		MorphWeight_t *pWeights = (MorphWeight_t*)_alloca( nFlexCount * sizeof(MorphWeight_t) );
+		MorphWeight_t *pWeights = stackallocT( MorphWeight_t, nFlexCount );
 		ComputeFlexWeights( nFlexCount, pMesh->pFlex(0), pWeights );
 
 		for ( int j = 0; j < pMeshData->m_NumGroup; ++j )
@@ -2639,7 +2639,7 @@ int CStudioRender::SortMeshes( int* pIndices, IMaterial **ppMaterials,
 	}
 	else
 	{
-		IMaterial** ppMat = (IMaterial**)_alloca( m_pSubModel->nummeshes * sizeof(IMaterial*) );
+		IMaterial** ppMat = stackallocT( IMaterial*, m_pSubModel->nummeshes );
 
 		// Sort by material type
 		for (int i = 0; i < m_pSubModel->nummeshes; ++i)
@@ -2701,7 +2701,7 @@ int CStudioRender::R_StudioDrawPoints( IMatRenderContext *pRenderContext, int sk
 	}
 
 	// FIXME: Activate sorting on a mesh level
-//	int* pIndices = (int*)_alloca( m_pSubModel->nummeshes * sizeof(int) ); 
+//	int* pIndices = stackallocT( int, m_pSubModel->nummeshes ); 
 //	int numMeshes = SortMeshes( pIndices, ppMaterials, pskinref, vforward, r_origin );
 
 	// draw each mesh

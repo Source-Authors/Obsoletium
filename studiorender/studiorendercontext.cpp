@@ -379,7 +379,7 @@ int CStudioRenderContext::CountFlexedVertices( mstudiomesh_t* pMesh, OptimizedMo
 		return 0;
 
 	// an inverse mapping from mesh index to strip group index
-	unsigned short *pMeshIndexToGroupIndex = (unsigned short*)_alloca( pMesh->pModel()->numvertices * sizeof(unsigned short) );
+	unsigned short *pMeshIndexToGroupIndex = stackallocT( unsigned short, pMesh->pModel()->numvertices );
 	memset( pMeshIndexToGroupIndex, 0xFF, pMesh->pModel()->numvertices * sizeof(unsigned short) );
 	for ( int i = 0; i < pStripGroup->numVerts; ++i )
 	{
@@ -818,7 +818,7 @@ void CStudioRenderContext::R_StudioBuildMorph( studiohdr_t *pStudioHdr,
 	}
 
 	// Build an inverse mapping from mesh index to strip group index
-	unsigned short *pMeshIndexToGroupIndex = (unsigned short*)_alloca( pMesh->pModel()->numvertices * sizeof(unsigned short) );
+	unsigned short *pMeshIndexToGroupIndex = stackallocT( unsigned short, pMesh->pModel()->numvertices );
 	memset( pMeshIndexToGroupIndex, 0xFF, pMesh->pModel()->numvertices * sizeof(unsigned short) );
 	for ( int i = 0; i < pStripGroup->numVerts; ++i )
 	{
@@ -2115,7 +2115,7 @@ void CStudioRenderContext::GenerateRandomFlexWeights( int nWeightCount, float* p
 		nRandomFlex = nWeightCount;
 	}
 
-	int *pIndices = (int*)_alloca( nWeightCount * sizeof(int) );
+	int *pIndices = stackallocT( int, nWeightCount );
 	for ( int i = 0; i < nWeightCount; ++i )
 	{
 		pIndices[i] = i;
