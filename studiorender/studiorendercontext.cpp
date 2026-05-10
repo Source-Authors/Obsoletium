@@ -2205,9 +2205,8 @@ void CStudioRenderContext::InvokeBindProxies( const DrawModelInfo_t &info )
 	}
 
 	// This is used to ensure proxies are only called once
-	int nBufSize = info.m_pStudioHdr->numtextures * sizeof(bool);
-	bool *pProxyCalled = (bool*)stackalloc( nBufSize );
-	memset( pProxyCalled, 0, nBufSize );
+	bool *pProxyCalled = stackallocT( bool, info.m_pStudioHdr->numtextures );
+	memset( pProxyCalled, 0, info.m_pStudioHdr->numtextures * sizeof(bool) );
 
 	IMaterial **ppMaterials = info.m_pHardwareData->m_pLODs[ info.m_Lod ].ppMaterials;
 	mstudiomodel_t *pModel;
