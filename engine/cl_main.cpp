@@ -1327,7 +1327,7 @@ void CL_TakeSnapshotAndSwap()
 						break;
 				}
 
-				if ( iNumber > 0 && g_pFileSystem->GetFileTime( filename ) )
+				if ( g_pFileSystem->GetFileTime( filename ) )
 				{
 					g_pFileSystem->RenameFile(filename, renamedfile);
 				}
