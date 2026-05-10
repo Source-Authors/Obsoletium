@@ -4006,9 +4006,9 @@ void CTexture::SwapContents( ITexture *pOther )
 	// vtable pointer, thus ruining polymorphism. Use with care.
 	// The unnecessary casts to (void*) hint to clang that we know what we
 	// are doing.
-	memcpy( (void*)pTemp, (const void*)this, sizeof( CTexture ) );
-	memcpy( (void*)this, (const void*)pOtherAsCTexture, sizeof( CTexture ) );
-	memcpy( (void*)pOtherAsCTexture, (const void*)pTemp, sizeof( CTexture ) );
+	memcpy( pTemp, this, sizeof( CTexture ) );
+	memcpy( this, pOtherAsCTexture, sizeof( CTexture ) );
+	memcpy( pOtherAsCTexture, pTemp, sizeof( CTexture ) );
 
 	//we have the other's name, give it back
 	memcpy( &pOtherAsCTexture->m_Name, &m_Name, sizeof( m_Name ) );
