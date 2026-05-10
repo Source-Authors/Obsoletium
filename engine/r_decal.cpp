@@ -2298,7 +2298,7 @@ inline void R_DrawDecalMeshList( DecalMeshList_t &meshList )
 	}
 }
 
-#define DECALMARKERS_SWITCHSORTTREE ((decal_t *)nullptr)
+constexpr inline decal_t *DECALMARKERS_SWITCHSORTTREE{nullptr};
 #define DECALMARKERS_SWITCHBUCKET	((decal_t *)-1)
 //-----------------------------------------------------------------------------
 //
@@ -2485,7 +2485,7 @@ void R_DrawDecalsAll_Gathered( IMatRenderContext *pRenderContext, decal_t **ppDe
 			else
 			{
 				Assert( pDecalHead );
-				// dimhotepus: Do not derefence nullptr head.
+				// dimhotepus: Do not dereference nullptr head.
 				if ( pDecalHead )
 				{
 					meshList.m_pMesh = pRenderContext->GetDynamicMesh( false, NULL, NULL, pDecalHead->material );
@@ -2522,6 +2522,7 @@ void R_DrawDecalsAll_Gathered( IMatRenderContext *pRenderContext, decal_t **ppDe
 			}
 			else
 			{
+				Assert( pDecalHead );
 				pBatch->m_pMaterial = pDecalHead->material;
 				pBatch->m_pProxy = pDecalHead->userdata;
 				pBatch->m_iLightmapPage = materialSortInfoArray[MSurf_MaterialSortID( pDecalHead->surfID )].lightmapPageID;
