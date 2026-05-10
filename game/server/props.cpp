@@ -5984,7 +5984,7 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 
 		// Create a container to hold all the convexes we'll create
 		const int nNumConvex = pQuery->ConvexCount();
-		CPhysConvex **pConvexes = (CPhysConvex **) stackalloc( sizeof(CPhysConvex *) * nNumConvex );
+		CPhysConvex **pConvexes = stackallocT( CPhysConvex *, nNumConvex );
 
 		// For each convex, collect the verts and create a convex from it we'll retain for later
 		for ( int i = 0; i < nNumConvex; i++ )
@@ -5992,8 +5992,8 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 			int nNumTris = pQuery->TriangleCount( i );
 			int nNumVerts = nNumTris * 3;
 			// FIXME: Really?  stackalloc?
-			Vector *pVerts = (Vector *) stackalloc( sizeof(Vector) * nNumVerts );
-			Vector **ppVerts = (Vector **) stackalloc( sizeof(Vector *) * nNumVerts );
+			Vector *pVerts = stackallocT( Vector, nNumVerts );
+			Vector **ppVerts = stackallocT( Vector *, nNumVerts );
 			for ( int j = 0; j < nNumTris; j++ )
 			{
 				// Get all the verts for this triangle and scale them up

@@ -265,7 +265,7 @@ CBaseEntity	*CPointTemplate::GetTemplateEntity( int iTemplateNumber )
 void CPointTemplate::PerformPrecache()
 {
 	// Go through all our templated map data and precache all the entities in it
-	int iTemplates = m_hTemplates.Count();
+	intp iTemplates = m_hTemplates.Count();
 	if ( !iTemplates )
 	{
 		Msg("Precache called on a point_template that has no templates: %s\n", STRING(GetEntityName()) );
@@ -275,18 +275,13 @@ void CPointTemplate::PerformPrecache()
 	// Tell the template system we're about to start a new template
 	Templates_StartUniqueInstance();
 
-	//HierarchicalSpawn_t *pSpawnList = (HierarchicalSpawn_t*)stackalloc( iTemplates * sizeof(HierarchicalSpawn_t) );
-
-	int i;
-	for ( i = 0; i < iTemplates; i++ )
+	for ( intp i = 0; i < iTemplates; i++ )
 	{
-		//CBaseEntity *pEntity = NULL;
 		const char *pMapData;
 		int iTemplateIndex = m_hTemplates[i].iTemplateIndex;
 
 		// Some templates have Entity I/O connecting the entities within the template.
 		// Unique versions of these templates need to be created whenever they're instanced.
-		int nStringSize;
 		if ( AllowNameFixup() && Templates_IndexRequiresEntityIOFixup( iTemplateIndex ) )
 		{
 			// This template requires instancing. 
@@ -301,7 +296,7 @@ void CPointTemplate::PerformPrecache()
 			pMapData = STRING( Templates_FindByIndex( iTemplateIndex ) );
 		}
 
-		nStringSize = Templates_GetStringSize( iTemplateIndex );
+		int nStringSize = Templates_GetStringSize( iTemplateIndex );
 
 		// Create the entity from the mapdata
 		MapEntity_PrecacheEntity( pMapData, nStringSize );
@@ -318,7 +313,7 @@ void CPointTemplate::PerformPrecache()
 bool CPointTemplate::CreateInstance( const Vector &vecOrigin, const QAngle &vecAngles, CUtlVector<CBaseEntity*> *pEntities )
 {
 	// Go through all our templated map data and spawn all the entities in it
-	int iTemplates = m_hTemplates.Count();
+	intp iTemplates = m_hTemplates.Count();
 	if ( !iTemplates )
 	{
 		Msg("CreateInstance called on a point_template that has no templates: %s\n", STRING(GetEntityName()) );
@@ -328,10 +323,9 @@ bool CPointTemplate::CreateInstance( const Vector &vecOrigin, const QAngle &vecA
 	// Tell the template system we're about to start a new template
 	Templates_StartUniqueInstance();
 
-	HierarchicalSpawn_t *pSpawnList = (HierarchicalSpawn_t*)stackalloc( iTemplates * sizeof(HierarchicalSpawn_t) );
+	HierarchicalSpawn_t *pSpawnList = stackallocT( HierarchicalSpawn_t, iTemplates );
 
-	int i;
-	for ( i = 0; i < iTemplates; i++ )
+	for ( intp i = 0; i < iTemplates; i++ )
 	{
 		CBaseEntity *pEntity = NULL;
 		const char *pMapData;
@@ -382,7 +376,7 @@ bool CPointTemplate::CreateInstance( const Vector &vecOrigin, const QAngle &vecA
 
 	SpawnHierarchicalList( iTemplates, pSpawnList, true );
 
-	for ( i = 0; i < iTemplates; ++i )
+	for ( intp i = 0; i < iTemplates; ++i )
 	{
 		if ( pSpawnList[i].m_hEntity )
 		{

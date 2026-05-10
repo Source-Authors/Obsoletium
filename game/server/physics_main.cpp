@@ -214,7 +214,7 @@ bool CPhysicsPushedEntities::SpeculativelyCheckPush( PhysicsPushedInfo_t &info, 
 	CBaseEntity *pBlocker = info.m_pEntity;
 
 	// See if it's possible to move the entity, but disable all pushers in the hierarchy first
-	int *pPusherHandles = (int*)stackalloc( m_rgPusher.Count() * sizeof(int) );
+	int *pPusherHandles = stackallocT( int, m_rgPusher.Count() );
 	UnlinkPusherList( pPusherHandles );
 	CTraceFilterPushMove pushFilter(pBlocker, pBlocker->GetCollisionGroup() );
 

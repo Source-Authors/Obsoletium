@@ -307,7 +307,7 @@ int	CAI_Network::NearestNodeToPoint( CAI_BaseNPC *pNPC, const Vector &vecOrigin,
 		m_nPerfStatNN++;
 #endif
 
-	AI_NearNode_t *pBuffer = (AI_NearNode_t *)stackalloc( sizeof(AI_NearNode_t) * MAX_NEAR_NODES );
+	AI_NearNode_t *pBuffer = stackallocT( AI_NearNode_t, MAX_NEAR_NODES );
 	CNodeList list( pBuffer, MAX_NEAR_NODES );
 
 	// OPTIMIZE: If not flying, this box should be smaller in Z (2 * height?)

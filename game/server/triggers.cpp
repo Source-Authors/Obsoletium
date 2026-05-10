@@ -2089,7 +2089,7 @@ int CChangeLevel::AddDependentEntities( int nCount, CBaseEntity **ppEntList, int
 		if ( !nDepCount )
 			continue;
 
-		CBaseEntity **ppDependentEntities = (CBaseEntity**)stackalloc( nDepCount * sizeof(CBaseEntity*) );
+		CBaseEntity **ppDependentEntities = stackallocT( CBaseEntity*, nDepCount );
 		pSaveUtils->GetEntityDependencies( pEntity, nDepCount, ppDependentEntities );
 		for ( int j = 0; j < nDepCount; ++j )
 		{

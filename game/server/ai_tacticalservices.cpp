@@ -373,7 +373,7 @@ int CAI_TacticalServices::FindCoverNode(const Vector &vNearPos, const Vector &vT
 	// We're going to search for a cover node by expanding to our current node's neighbors
 	// and then their neighbors, until cover is found, or all nodes are beyond MaxDist
 	// ------------------------------------------------------------------------------------
-	AI_NearNode_t *pBuffer = (AI_NearNode_t *)stackalloc( sizeof(AI_NearNode_t) * GetNetwork()->NumNodes() );
+	AI_NearNode_t *pBuffer = stackallocT( AI_NearNode_t, GetNetwork()->NumNodes() );
 	CNodeList list( pBuffer, GetNetwork()->NumNodes() );
 	CVarBitVec wasVisited(GetNetwork()->NumNodes());	// Nodes visited
 
@@ -521,7 +521,7 @@ int CAI_TacticalServices::FindLosNode(const Vector &vThreatPos, const Vector &vT
 	// We're going to search for a shoot node by expanding to our current node's neighbors
 	// and then their neighbors, until a shooting position is found, or all nodes are beyond MaxDist
 	// ------------------------------------------------------------------------------------
-	AI_NearNode_t *pBuffer = (AI_NearNode_t *)stackalloc( sizeof(AI_NearNode_t) * GetNetwork()->NumNodes() );
+	AI_NearNode_t *pBuffer = stackallocT( AI_NearNode_t, GetNetwork()->NumNodes() );
 	CNodeList list( pBuffer, GetNetwork()->NumNodes() );
 	CVarBitVec wasVisited(GetNetwork()->NumNodes());	// Nodes visited
 
