@@ -2374,8 +2374,8 @@ bool CMaterialSystem::IsMaterialLoaded( char const *pMaterialName )
 {
 	// We need lower-case symbols for this to work
 	intp nLen = Q_strlen( pMaterialName ) + 1;
-	char *pFixedNameTemp = (char*)stackalloc( nLen );
-	char *pTemp = (char*)stackalloc( nLen );
+	char *pFixedNameTemp = stackallocT( char, nLen );
+	char *pTemp = stackallocT( char, nLen );
 	Q_strncpy( pFixedNameTemp, pMaterialName, nLen );
 	Q_strlower( pFixedNameTemp );
 #ifdef POSIX

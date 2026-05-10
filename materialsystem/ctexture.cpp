@@ -1976,15 +1976,13 @@ void CTexture::MigrateShaderAPITextures()
 {
 	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
 
-	const int cBytes = m_nFrameCount * sizeof ( ShaderAPITextureHandle_t );
-
-	ShaderAPITextureHandle_t *pTextureHandles =	( ShaderAPITextureHandle_t * ) stackalloc( cBytes );
+	ShaderAPITextureHandle_t *pTextureHandles =	stackallocT( ShaderAPITextureHandle_t, m_nFrameCount );
 
 	Assert( pTextureHandles );
 	if ( !pTextureHandles )
 		return;
 
-	V_memcpy( pTextureHandles, m_pTextureHandles, cBytes );
+	V_memcpy( pTextureHandles, m_pTextureHandles, m_nFrameCount * sizeof(ShaderAPITextureHandle_t) );
 
 	// Pretend we haven't been allocated yet.
 	m_nInternalFlags &= ~TEXTUREFLAGSINTERNAL_ALLOCATED;
@@ -2765,7 +2763,7 @@ void CTexture::Precache()
 	Q_snprintf( pCacheFileName, sizeof( pCacheFileName ), "materials/%s" TEXTURE_FNAME_EXTENSION, m_Name.String() );
 
 	constexpr unsigned short nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
-	unsigned char *pMem = (unsigned char *)stackalloc( nHeaderSize );
+	unsigned char *pMem = stackallocT( unsigned char, nHeaderSize );
 	CUtlBuffer buf( pMem, nHeaderSize );
 	if ( !g_pFullFileSystem->ReadFile( pCacheFileName, NULL, buf, nHeaderSize ) )	
 	{
@@ -4002,7 +4000,7 @@ void CTexture::SwapContents( ITexture *pOther )
 
 	CTexture *pOtherAsCTexture = (CTexture *)pOther;
 
-	CTexture *pTemp = (CTexture *)stackalloc( sizeof( CTexture ) );
+	CTexture *pTemp = stackallocT( CTexture, 1 );
 	
 	//swap everything. Note that this copies the entire object including the
 	// vtable pointer, thus ruining polymorphism. Use with care.

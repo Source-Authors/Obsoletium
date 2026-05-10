@@ -1357,8 +1357,7 @@ bool CShaderSystem::ComputeVertexFormatFromSnapshot( IMaterialVar **params, Shad
 		numSnapshots += pRenderState->m_pSnapshots[SHADER_USING_EDITOR].m_nPassCount;
 	}
 
-	StateSnapshot_t* pSnapshots = (StateSnapshot_t*)stackalloc( 
-		numSnapshots * sizeof(StateSnapshot_t) ); 
+	StateSnapshot_t* pSnapshots = stackallocT( StateSnapshot_t,	numSnapshots ); 
 
 	int snapshotID = 0;
 	AddSnapshotsToList( &pRenderState->m_pSnapshots[0], snapshotID, pSnapshots );
