@@ -70,7 +70,7 @@ static CUtlVector<Ray_t> s_BenchmarkRays;
 abstract_class CEngineTrace : public IEngineTrace
 {
 public:
-	CEngineTrace() { m_pRootMoveParent = NULL; }
+	CEngineTrace() { m_pRootMoveParent = NULL; BitwiseClear( m_traceStatCounters ); }
 	// Returns the contents mask at a particular world-space position
 	virtual int		GetPointContents( const Vector &vecAbsPosition, IHandleEntity** ppEntity );
 
