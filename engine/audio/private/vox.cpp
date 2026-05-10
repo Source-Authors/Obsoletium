@@ -144,6 +144,13 @@ struct WordBuf
 		V_strcpy_safe( word, src.word );
 	}
 
+	// dimhotepus: Add operator =
+	WordBuf& operator=( const WordBuf& src )
+	{
+		V_strcpy_safe( word, src.word );
+		return *this;
+	}
+
 	void Set( char const *w )
 	{
 		if ( !w )
