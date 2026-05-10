@@ -1047,14 +1047,11 @@ class CSplitPacketEntry
 public:
 	CSplitPacketEntry()
 	{
-		memset( &from, 0, sizeof( from ) );
+		from.Clear();
 
-		for ( auto &f : splitflags )
-		{
-			f = -1;
-		}
-
+		BitwiseSet( splitflags, 0xFF );
 		BitwiseClear( netsplit );
+
 		lastactivetime = 0.0;
 	}
 
