@@ -2314,7 +2314,7 @@ bool CShadowMgr::ComputeShadowVertices( ShadowDecal_t& decal,
 {
 	VPROF( "CShadowMgr::ComputeShadowVertices" );
 	// Prepare for the clipping
-	Vector **ppVec = (Vector**)stackalloc( MSurf_VertCount( decal.m_SurfID ) * sizeof(Vector*) );
+	Vector **ppVec = stackallocT( Vector*, MSurf_VertCount( decal.m_SurfID ) );
 	for (int i = 0; i < MSurf_VertCount( decal.m_SurfID ); ++i )
 	{
 		int vertIndex = host_state.worldbrush->vertindices[MSurf_FirstVertIndex( decal.m_SurfID )+i];

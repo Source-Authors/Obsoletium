@@ -2861,7 +2861,7 @@ void ComputeLighting( const Vector& pt, const Vector* pNormal, bool bClamp, Vect
 	int i;
 	if ( pNormal )
 	{
-		LightDesc_t* pLightDesc = (LightDesc_t*)stackalloc( lightingState.numlights * sizeof(LightDesc_t) );
+		LightDesc_t* pLightDesc = stackallocT( LightDesc_t, lightingState.numlights );
 		
 		for ( i=0; i < lightingState.numlights; ++i )
 		{

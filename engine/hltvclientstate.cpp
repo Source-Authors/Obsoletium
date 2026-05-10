@@ -34,7 +34,7 @@
 // copy message data from in to out buffer
 #define CopyDataInToOut(msg)									\
 	int	 size = PAD_NUMBER( Bits2Bytes(msg->m_nLength), 4);		\
-	byte *buffer = (byte*) stackalloc( size );					\
+	byte *buffer = stackallocT( byte, size );					\
 	msg->m_DataIn.ReadBits( buffer, msg->m_nLength );			\
 	msg->m_DataOut.StartWriting( buffer, size, msg->m_nLength );\
 	
@@ -484,7 +484,7 @@ bool CHLTVClientState::ProcessVoiceInit( SVC_VoiceInit *msg )
 bool CHLTVClientState::ProcessVoiceData( SVC_VoiceData *msg )
 {
 	int	 size = PAD_NUMBER( Bits2Bytes(msg->m_nLength), 4);
-	byte *buffer = (byte*) stackalloc( size );
+	byte *buffer = stackallocT( byte, size );
 	msg->m_DataIn.ReadBits( buffer, msg->m_nLength );
 	msg->m_DataOut = buffer;
 

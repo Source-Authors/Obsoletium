@@ -221,8 +221,8 @@ void CHLTVDemoRecorder::RecordServerClasses( ServerClass *pClasses )
 {
 	CUtlBuffer bigBuff;
 
-	intp buffSize = 256*1024;
-	char *pBigBuffer = (char*)stackalloc( buffSize );
+	constexpr intp buffSize = 256*1024;
+	char *pBigBuffer = stackallocT( char, buffSize );
 
 	bf_write buf( pBigBuffer, buffSize );
 

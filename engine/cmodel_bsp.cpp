@@ -1154,9 +1154,8 @@ void CollisionBSPData_LoadDispInfo( CCollisionBSPData *pBSPData )
 	g_pDispBounds = Hunk_Alloc<alignedbbox_t>( g_DispCollTreeCount, false );
 
 	// Build the inverse mapping from disp index to face
-	int nMemSize = coreDispCount * sizeof(unsigned short);
-	unsigned short *pDispIndexToFaceIndex = (unsigned short*)stackalloc( nMemSize );
-	memset( pDispIndexToFaceIndex, 0xFF, nMemSize );
+	unsigned short *pDispIndexToFaceIndex = stackallocT( unsigned short, coreDispCount );
+	memset( pDispIndexToFaceIndex, 0xFF, coreDispCount * sizeof(unsigned short) );
 	
 	int i;
     for ( i = 0; i < faceCount; ++i, ++pFaces )

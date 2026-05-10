@@ -244,7 +244,7 @@ void CReplayDemoRecorder::RecordServerClasses( ServerClass *pClasses )
 	CUtlBuffer bigBuff;
 
 	intp buffSize = 256*1024;
-	char *pBigBuffer = (char*)stackalloc( buffSize );
+	char *pBigBuffer = stackallocT( char, buffSize );
 
 	bf_write buf( pBigBuffer, buffSize );
 

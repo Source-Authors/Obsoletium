@@ -813,7 +813,7 @@ void WriteRemoteVProfGroupData( VProfListenInfo_t &info )
 
 	// Build list of unsent groups to send
 	int nSendCount = 0;
-	int *pIndex = (int*)stackalloc( nGroupCount * sizeof(int) ); 
+	int *pIndex = stackallocT( int, nGroupCount ); 
 	for ( int i = 0; i < nGroupCount; ++i )
 	{
 		const char *pName = g_pVProfileForDisplay->GetBudgetGroupName( i );
@@ -872,8 +872,7 @@ void WriteRemoteVProfData()
 		return;
 
 	int nGroupCount = g_pVProfileForDisplay->GetNumBudgetGroups();
-	int nBufSize = nGroupCount * sizeof(float);
-	float *pTimes = (float*)stackalloc( nBufSize );
+	float *pTimes = stackallocT( float, nGroupCount );
 	g_VProfExport.GetAllBudgetGroupTimes( pTimes );
 
 	for( int i = 0; i < nListenerCount; i++ )
@@ -885,9 +884,9 @@ void WriteRemoteVProfData()
 		s_VProfListeners[i].m_flLastSentVProfDataTime = flTime;
 
 		// Re-order send times to match send group order
-		int nSentSize = s_VProfListeners[i].m_SentGroups.Count() * static_cast<intp>(sizeof(float));
-		float *pSentTimes = (float*)stackalloc( nSentSize );
-		memset( pSentTimes, 0, nSentSize );
+		intp nSentSize = s_VProfListeners[i].m_SentGroups.Count();
+		float *pSentTimes = stackallocT( float, nSentSize );
+		memset( pSentTimes, 0, nSentSize * sizeof(float) );
 		for ( int j = 0; j < nGroupCount; ++j )
 		{
 			int nIndex = FindSentGroupIndex( s_VProfListeners[i], g_pVProfileForDisplay->GetBudgetGroupName( j ) );

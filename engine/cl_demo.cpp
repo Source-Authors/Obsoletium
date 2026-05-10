@@ -383,7 +383,7 @@ void CDemoRecorder::RecordServerClasses( ServerClass *pClasses )
 	int buffSize = 256*1024;
 	if ( !IsX360() )
 	{
-		pBigBuffer = (char*)stackalloc( buffSize );
+		pBigBuffer = stackallocT( char, buffSize );
 	}
 	else
 	{

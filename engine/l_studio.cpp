@@ -3478,7 +3478,7 @@ void CModelRender::ComputeModelVertexLighting( IHandleEntity *pProp,
 		return;
 
 	int i;
-	unsigned char *pInSolid = (unsigned char*)stackalloc( ((pModel->numvertices + 7) >> 3) * sizeof(unsigned char) );
+	unsigned char *pInSolid = stackallocT( unsigned char, ((pModel->numvertices + 7) >> 3) );
 	Vector worldPos, worldNormal;
 
 	const mstudio_modelvertexdata_t *vertData = pModel->GetVertexData();
