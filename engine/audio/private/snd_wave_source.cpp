@@ -102,6 +102,9 @@ CAudioSourceWave::CAudioSourceWave( CSfxTable *pSfx )
 #ifdef _DEBUG
 	if ( m_pSfx )
 		m_pDebugName = strdup( m_pSfx->getname() );
+	else
+		// dimhotepus: Ensure always initialized.
+		m_pDebugName = nullptr;
 #endif
 
 	m_pTempSentence = NULL;
@@ -120,6 +123,9 @@ CAudioSourceWave::CAudioSourceWave( CSfxTable *pSfx, CAudioSourceCachedInfo *inf
 #ifdef _DEBUG
 	if ( m_pSfx )
 		m_pDebugName = strdup( m_pSfx->getname() );
+	else
+		// dimhotepus: Ensure always initialized.
+		m_pDebugName = nullptr;
 #endif
 
 	m_refCount = 0;
