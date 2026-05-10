@@ -160,7 +160,7 @@ struct OverlayBase_t
 
 struct OverlayBox_t : public OverlayBase_t
 {
-	OverlayBox_t() { m_Type = OVERLAY_BOX; }
+	OverlayBox_t() { m_Type = OVERLAY_BOX; r = g = b = a = 0; }
 
 	Vector			origin;
 	Vector			mins;
@@ -186,7 +186,7 @@ struct OverlayBox2_t : public OverlayBase_t
 
 struct OverlaySphere_t : public OverlayBase_t
 {
-	OverlaySphere_t() { m_Type = OVERLAY_SPHERE; }
+	OverlaySphere_t() { m_Type = OVERLAY_SPHERE; flRadius = nTheta = nPhi = r = g = b = a = 0; }
 
 	Vector			vOrigin;
 	float			flRadius;
@@ -200,7 +200,7 @@ struct OverlaySphere_t : public OverlayBase_t
 
 struct OverlayLine_t : public OverlayBase_t 
 {
-	OverlayLine_t() { m_Type = OVERLAY_LINE; }
+	OverlayLine_t() { m_Type = OVERLAY_LINE; r = g = b = a = 0; noDepthTest = false; }
 
 	Vector			origin;
 	Vector			dest;
@@ -213,7 +213,7 @@ struct OverlayLine_t : public OverlayBase_t
 
 struct OverlayTriangle_t : public OverlayBase_t 
 {
-	OverlayTriangle_t() { m_Type = OVERLAY_TRIANGLE; }
+	OverlayTriangle_t() { m_Type = OVERLAY_TRIANGLE; r = g = b = a = 0; noDepthTest = false; }
 
 	Vector			p1;
 	Vector			p2;
@@ -227,7 +227,7 @@ struct OverlayTriangle_t : public OverlayBase_t
 
 struct OverlaySweptBox_t : public OverlayBase_t 
 {
-	OverlaySweptBox_t() { m_Type = OVERLAY_SWEPT_BOX; }
+	OverlaySweptBox_t() { m_Type = OVERLAY_SWEPT_BOX; r = g = b = a = 0; }
 
 	Vector			start;
 	Vector			end;
