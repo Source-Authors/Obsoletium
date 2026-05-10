@@ -74,10 +74,22 @@ class Vector;
 // Macros for construction..
 //-----------------------------------------------------------------------------
 // dimhotepus: Correctly compute bone weights (64 bit).
-#define VERTEX_BONEWEIGHT( _n )				((uint64)(_n) << VERTEX_BONE_WEIGHT_BIT)
+template<typename T>
+constexpr inline uint64 VERTEX_BONEWEIGHT( T n )
+{
+	return (uint64)n << VERTEX_BONE_WEIGHT_BIT;
+}
 // dimhotepus: Correctly compute bone weights (64 bit).
-#define VERTEX_USERDATA_SIZE( _n )			((uint64)(_n) << USER_DATA_SIZE_BIT)
-#define VERTEX_TEXCOORD_MASK( _coord )		(( 0x7ULL ) << ( TEX_COORD_SIZE_BIT + 3 * (_coord) ))
+template<typename T>
+constexpr inline uint64 VERTEX_USERDATA_SIZE( T n )
+{
+	return (uint64)n << USER_DATA_SIZE_BIT;
+}
+template<typename T>
+constexpr inline uint64 VERTEX_TEXCOORD_MASK( T coord )
+{
+	return 0x7ULL << ( TEX_COORD_SIZE_BIT + 3 * coord );
+}
 
 inline VertexFormat_t VERTEX_TEXCOORD_SIZE( int nIndex, int nNumCoords )
 {
