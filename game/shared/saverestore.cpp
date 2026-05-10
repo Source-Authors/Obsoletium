@@ -2036,7 +2036,7 @@ void CRestore::ReadGameField( const SaveRestoreRecordHeader_t &header, void *pDe
 		case FIELD_MODELINDEX:
 		{
 			int *pModelIndex = (int*)pDest;
-			string_t *pModelName = (string_t *)stackalloc( pField->fieldSize * sizeof(string_t) );
+			string_t *pModelName = stackallocT( string_t, pField->fieldSize );
 			int nRead = ReadString( pModelName, pField->fieldSize, header.size );
 
 			for ( int i = 0; i < nRead; i++ )
@@ -2062,7 +2062,7 @@ void CRestore::ReadGameField( const SaveRestoreRecordHeader_t &header, void *pDe
 		case FIELD_MATERIALINDEX:
 		{
 			int *pMaterialIndex = (int*)pDest;
-			string_t *pMaterialName = (string_t *)stackalloc( pField->fieldSize * sizeof(string_t) );
+			string_t *pMaterialName = stackallocT( string_t, pField->fieldSize );
 			int nRead = ReadString( pMaterialName, pField->fieldSize, header.size );
 
 			for ( int i = 0; i < nRead; i++ )

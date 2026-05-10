@@ -43,7 +43,7 @@ public:
 	{
 		int *pStringIndex = (int *)fieldInfo.pField;
 		int nLen = pRestore->ReadInt();
-		char *pTemp = (char *)stackalloc( nLen );
+		char *pTemp = stackallocT( char, nLen );
 		pRestore->ReadString( pTemp, nLen, nLen );
 		*pStringIndex = m_pStringTable->AddString( CBaseEntity::IsServer(), pTemp );
 	}

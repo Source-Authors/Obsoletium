@@ -1200,7 +1200,7 @@ CChoreoEvent& CChoreoEvent::operator=( const CChoreoEvent& src )
 		newtag.SetOwner( this );
 		m_RelativeTags.AddToTail( newtag );
 	}
-
+	
 	// copying.
 	for ( auto newtag : src.m_TimingTags )
 	{	
