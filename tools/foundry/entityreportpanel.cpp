@@ -336,7 +336,7 @@ void CEntityReportPanel::OnTextChanged( KeyValues *kv )
 	TextEntry *pPanel = (TextEntry*)kv->GetPtr( "panel", NULL );
 
 	intp nLength = pPanel->GetTextLength();
-	char *pBuf = (char*)_alloca( nLength + 1 );
+	char *pBuf = stackallocT( char, nLength + 1 );
 	pPanel->GetText( pBuf, nLength+1 );
 
 	if ( pPanel == m_pFilterClass )

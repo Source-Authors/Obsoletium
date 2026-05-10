@@ -133,7 +133,7 @@ CCommentaryPropertiesPanel::CCommentaryPropertiesPanel( CCommEditDoc *pDoc, vgui
 void CCommentaryPropertiesPanel::TextEntryToAttribute( vgui::TextEntry *pEntry, const char *pAttributeName )
 {
 	intp nLen = pEntry->GetTextLength();
-	char *pBuf = (char*)_alloca( nLen+1 );
+	char *pBuf = stackallocT( char, nLen+1 );
 	pEntry->GetText( pBuf, nLen+1 );
 	m_hEntity->SetValue( pAttributeName, pBuf );
 }
