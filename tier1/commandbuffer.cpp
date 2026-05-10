@@ -225,7 +225,7 @@ bool CCommandBuffer::AddText( const char *pText, int nTickDelay )
 			continue;
 
 		const char *pArgS;
-		char *pArgV0 = (char*)_alloca( nCommandLength+1 );
+		char *pArgV0 = stackallocT( char, nCommandLength+1 );
 		CUtlBuffer bufParse( pCurrentCommand, nCommandLength, CUtlBuffer::TEXT_BUFFER | CUtlBuffer::READ_ONLY ); 
 		ParseArgV0( bufParse, pArgV0, nCommandLength+1, &pArgS );
 		if ( pArgV0[0] == 0 )

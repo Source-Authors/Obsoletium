@@ -8,7 +8,6 @@
 
 #if defined(POSIX)
 #include <wchar.h> // wcslen()
-#define _alloca alloca
 #define _wtoi(arg) wcstol(arg, NULL, 10)
 #define _wtoi64(arg) wcstoll(arg, NULL, 10)
 #endif
