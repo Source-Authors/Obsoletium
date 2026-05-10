@@ -682,7 +682,7 @@ int CAI_HintManager::GetFlags( const char *token )
 		return bits_HINT_NODE_NONE;
 	}
 
-	char *lowercase = (char *)_alloca( len + 1 );
+	char *lowercase = stackallocT( char, len + 1 );
 	Q_strncpy( lowercase, token, len+1 );
 	strlwr( lowercase );
 
