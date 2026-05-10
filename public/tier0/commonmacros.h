@@ -312,7 +312,7 @@ __forceinline
 #else
 inline
 #endif
-    void unreachable() noexcept {
+    void unreachable() noexcept { //-V1082 It is UB by design
 #ifdef COMPILER_MSVC
   __assume(false);
 #else
