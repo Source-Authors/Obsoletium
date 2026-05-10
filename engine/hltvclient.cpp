@@ -371,7 +371,7 @@ bool CHLTVClient::ProcessSetConVar(NET_SetConVar *msg)
 			// if the connecting client is a TV relay, check the password
 			checkpwd = tv_relaypassword.GetString();
 
-			if ( checkpwd && checkpwd[0] && Q_stricmp( checkpwd, "none") )
+			if ( !Q_isempty( checkpwd ) && Q_stricmp( checkpwd, "none") )
 			{
 				if ( Q_stricmp( m_szPassword, checkpwd ) )
 				{

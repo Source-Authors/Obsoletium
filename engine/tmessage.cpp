@@ -236,7 +236,7 @@ static void TrimSpace( const char *source, char *dest )
 template<intp size>
 [[nodiscard]] static int IsToken( const char *pText, const char (&pTokenName)[size] )
 {
-	if ( !pText || !pTokenName )
+	if ( !pText )
 		return 0;
 
 	if ( !Q_strnicmp( pText+1, pTokenName, size - 1 ) )

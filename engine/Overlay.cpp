@@ -1030,7 +1030,7 @@ void COverlayMgr::CreateFragments( void )
 					mtexinfo_t *pTexInfo = &host_state.worldbrush->texinfo[pOverlay->m_nTexInfo];
 					DevMsg( 1, "Bad overlay vert - %d at (%f, %f, %f) with material '%s'\n", iOverlay,
 						pOverlay->m_vecOrigin.x, pOverlay->m_vecOrigin.y, pOverlay->m_vecOrigin.z,
-						( pTexInfo && pTexInfo->material ) ? pTexInfo->material->GetName() : ""	);
+						pTexInfo->material ? pTexInfo->material->GetName() : ""	);
 				}
 
 				if ( !pVert->normal.IsValid() )
@@ -1039,7 +1039,7 @@ void COverlayMgr::CreateFragments( void )
 					mtexinfo_t *pTexInfo = &host_state.worldbrush->texinfo[pOverlay->m_nTexInfo];
 					DevMsg( 1, "Bad overlay normal - %d at (%f, %f, %f) with material '%s'\n", iOverlay,
 						pOverlay->m_vecOrigin.x, pOverlay->m_vecOrigin.y, pOverlay->m_vecOrigin.z,
-						( pTexInfo && pTexInfo->material ) ? pTexInfo->material->GetName() : ""	);
+						pTexInfo->material ? pTexInfo->material->GetName() : ""	);
 				}
 
 				if ( !pVert->texCoord[0].IsValid() || !pVert->texCoord[1].IsValid() )
@@ -1048,7 +1048,7 @@ void COverlayMgr::CreateFragments( void )
 					mtexinfo_t *pTexInfo = &host_state.worldbrush->texinfo[pOverlay->m_nTexInfo];
 					DevMsg( 1, "Bad overlay texture coords - %d at (%f, %f, %f) with material '%s'\n", iOverlay,
 						pOverlay->m_vecOrigin.x, pOverlay->m_vecOrigin.y, pOverlay->m_vecOrigin.z,
-						( pTexInfo && pTexInfo->material ) ? pTexInfo->material->GetName() : ""	);
+						pTexInfo->material ? pTexInfo->material->GetName() : ""	);
 				}
 			}
 			hFrag = m_OverlayFragments.Next( hFrag );
@@ -1338,7 +1338,7 @@ bool COverlayMgr::Disp_PreClipFragment( moverlay_t *pOverlay, OverlayFragmentVec
 		{
 			mtexinfo_t *pTexInfo = &host_state.worldbrush->texinfo[pOverlay->m_nTexInfo];
 			DevWarning( 1, "Bad overlay geometry at %s with material '%s'\n", VecToString(pOverlay->m_vecOrigin), 
-				( pTexInfo && pTexInfo->material ) ? pTexInfo->material->GetName() : ""	);
+				pTexInfo->material ? pTexInfo->material->GetName() : ""	);
 			return false;
 		}
 

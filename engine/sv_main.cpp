@@ -1889,10 +1889,10 @@ void SV_BroadcastVoiceData(IClient * pClient, intp nBytes, char * data, int64 xu
 		bool bHearsPlayer = pDestClient->IsHearingClient( voiceData.m_nFromClient );
 		voiceData.m_bProximity = pDestClient->IsProximityHearingClient( voiceData.m_nFromClient );
 
-		if ( bSelf == true )			
+		if ( bSelf == true )
 			continue;
 			
-		if ( !bHearsPlayer && !bSelf )
+		if ( !bHearsPlayer )
 			continue;	
 
 		voiceData.m_nLength = nBytes * CHAR_BIT;

@@ -585,7 +585,7 @@ void CGameServer::DumpPrecacheStats( INetworkStringTable *table )
 			("CGameServer::DumpPrecacheStats: invalid CPrecacheUserData length (%zd)", testLength)
 		);
 
-		if ( !name || !slot || !p )
+		if ( !name || !p )
 			continue;
 
 		ConMsg( "%03i:  %s (%s):   ",

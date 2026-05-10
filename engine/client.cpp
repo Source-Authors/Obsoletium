@@ -1285,7 +1285,7 @@ void CClientState::DumpPrecacheStats( const char * name )
 		CPrecacheItem *slot = &items[ i ];
 		const CPrecacheUserData *p = CL_GetPrecacheUserData( table, i );
 
-		if ( !pchName || !slot || !p )
+		if ( !pchName || !p )
 			continue;
 
 		ConMsg( "%03i:  %s (%s):   ",

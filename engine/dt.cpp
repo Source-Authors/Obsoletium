@@ -512,7 +512,7 @@ bool ShouldWatchThisProp( const SendTable *pTable, int objectID, const char *pPr
 		g_CV_DTWatchEnt.GetInt() == objectID)
 	{
 		const char *pStr = g_CV_DTWatchVar.GetString();
-		if ( pStr && pStr[0] != 0 )
+		if ( !Q_isempty( pStr ) )
 		{
 			return stricmp( pStr, pPropName ) == 0;
 		}

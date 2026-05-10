@@ -1270,7 +1270,7 @@ CON_COMMAND( kick, "Kick a player by name." )
 	pszName = name;
 
 	// safety check
-	if ( pszName && pszName[0] != 0 )
+	if ( !Q_isempty( pszName ) )
 	{
 		//HACK-HACK
 		// check for the name surrounded by quotes (comes in this way from rcon)

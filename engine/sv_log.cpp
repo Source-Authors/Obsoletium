@@ -656,7 +656,7 @@ static bool CreateTempFilename( TempFilename_t &info, const char *filenameBase, 
 {
 	// Check if a logfilename format has been specified - if it has, kick in new behavior.
 	const char *logfilename_format = sv_logfilename_format.GetString();
-	bool bHaveLogfilenameFormat = logfilename_format && logfilename_format[ 0 ];
+	bool bHaveLogfilenameFormat = !Q_isempty( logfilename_format );
 
 	info.fh.file = NULL;
 	info.fh.gzfile = 0;
@@ -856,7 +856,7 @@ void CLog::Open( void )
 	szLogFilename[ 0 ] = 0;
 
 	const char *logfilename_format = sv_logfilename_format.GetString();
-	if ( logfilename_format && logfilename_format[ 0 ] )
+	if ( !Q_isempty( logfilename_format ) )
 	{
 		// Call strftime with the logfilename format.
 		strftime( szLogFilename, sizeof( szLogFilename ), logfilename_format, &today );

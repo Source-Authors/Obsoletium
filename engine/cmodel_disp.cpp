@@ -69,7 +69,7 @@ public:
 	{
 		// get tree and see if it is real (power != 0)
 		CDispCollTree *pDispTree = &g_pDispCollTrees[index];
-		if( !pDispTree || ( pDispTree->GetPower() == 0 ) )
+		if( pDispTree->GetPower() == 0 )
 			return;
 		m_firstIndex[index] = m_dispList.Count();
 		m_leafCount[index] = 0;
@@ -365,7 +365,7 @@ void CM_CreateDispPhysCollide( dphysdisp_t *pDispLump, int dispLumpSize )
 	{
 		// Don't create a physics collision model for displacements that have been tagged as such.
 		CDispCollTree *pDispTree = &g_pDispCollTrees[i];
-		if ( pDispTree && pDispTree->CheckFlags( CCoreDispInfo::SURF_NOPHYSICS_COLL ) )
+		if ( pDispTree->CheckFlags( CCoreDispInfo::SURF_NOPHYSICS_COLL ) )
 		{
 			g_TerrainList[i] = NULL;
 			continue;
