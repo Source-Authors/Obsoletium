@@ -163,7 +163,7 @@ bool CImportVMF::SerializeOther( CUtlBuffer &buf, CDmAttribute *pOther, const ch
 		}
 
 		intp nLen = Q_strlen( pElementName ) + 1;
-		char *pTemp = (char*)_alloca( nLen );
+		char *pTemp = stackallocT( char, nLen );
 		Q_strncpy( pTemp, pElementName, nLen );
 		Q_strlower( pTemp );
 		buf.Printf( "%s\n", pTemp );
