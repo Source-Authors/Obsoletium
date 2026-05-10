@@ -187,10 +187,7 @@ void CAudioSourceMP3::SetSentence( CSentence *pSentence )
 {
 	CAudioSourceCachedInfo *info = m_AudioCacheHandle.FastGet();
 
-	if ( !info )
-		return;
-
-	if ( info && info->Sentence() )
+	if ( !info || info->Sentence() )
 		return;
 
 	CSentence *pNewSentence = new CSentence;
