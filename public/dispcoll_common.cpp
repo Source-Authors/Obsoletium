@@ -350,13 +350,15 @@ void CDispCollTree::AABBTree_CopyDispData( CCoreDispInfo *pDisp )
 
 	// Setup size.
 	m_nSize = sizeof( this );
+	// m_aVerts
 	m_nSize += sizeof( Vector ) * GetSize();
+	// m_aTris
 	m_nSize += sizeof( CDispCollTri ) * GetTriSize();
-#if OLD_DISP_AABB
-	m_nSize += sizeof( CDispCollAABBNode ) * Nodes_CalcCount( m_nPower );
-#endif
-	m_nSize += sizeof(m_nodes[0]) * m_nodes.Count();
-	m_nSize += sizeof(m_leaves[0]) * m_leaves.Count();
+	// m_nodes
+	m_nSize += sizeof( m_nodes[0] ) * m_nodes.Count();
+	// m_leaves
+	m_nSize += sizeof( m_leaves[0] ) * m_leaves.Count();
+	// m_aTrisCache
 	m_nSize += sizeof( CDispCollTri* ) * DISPCOLL_TREETRI_SIZE;
 
 	// Copy vertex data.
