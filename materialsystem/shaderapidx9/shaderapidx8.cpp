@@ -6539,7 +6539,7 @@ void CShaderAPIDx8::CreateTextures(
 
 	// Create a set of texture handles
 	CreateTextureHandles( pHandles, count );
-	Texture_t **arrTxp = ( Texture_t ** ) stackalloc( count * sizeof( Texture_t * ) );
+	Texture_t **arrTxp = stackallocT( Texture_t *, count );
 
 	unsigned short usSetFlags = 0;
 	usSetFlags |= ( IsPosix() || ( creationFlags & (TEXTURE_CREATE_DYNAMIC | TEXTURE_CREATE_MANAGED) ) ) ? Texture_t::IS_LOCKABLE : 0;
