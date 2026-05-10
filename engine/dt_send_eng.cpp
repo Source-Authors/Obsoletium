@@ -865,7 +865,7 @@ void SendTable_PrintStats( void )
 
 		for ( int j=0; j < st->GetNumProps(); j++ )
 		{
-			SendProp* sp = st->GetProp( j );
+			const SendProp* sp = st->GetProp( j );
 
 			if ( sp->IsExcludeProp() )
 			{

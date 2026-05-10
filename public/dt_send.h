@@ -450,6 +450,8 @@ public:
 	const char*	GetName() const;
 	
 	int			GetNumProps() const;
+	// dimhotepus: Const version.
+	const SendProp*	GetProp( int i ) const;
 	SendProp*	GetProp( int i );
 
 	// Used by the engine.
@@ -490,6 +492,14 @@ inline const char* SendTable::GetName() const
 inline int SendTable::GetNumProps() const
 {
 	return m_nProps;
+}
+
+
+// dimhotepus: Const version.
+inline const SendProp *SendTable::GetProp( int i ) const
+{
+	Assert( i >= 0 && i < m_nProps );
+	return &m_pProps[i];
 }
 
 

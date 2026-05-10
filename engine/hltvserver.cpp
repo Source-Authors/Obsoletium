@@ -239,7 +239,7 @@ static RecvTable* AddRecvTableR( SendTable *sendt, RecvTable **pRecvTables, int 
 		{
 			// copy property data
 
-			SendProp * sp = sendt->GetProp( i );
+			const SendProp * sp = sendt->GetProp( i );
 			RecvProp * rp = &receiveProps[i];
 
 			rp->m_pVarName	= sp->m_pVarName;
