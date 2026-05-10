@@ -61,7 +61,7 @@ IMaterialProxy *CMaterialProxyFactory::LookupProxy( const char *proxyName, Creat
 	char *proxyVersionedName;
 	intp buflen = Q_strlen( proxyName ) + ssize( IMATERIAL_PROXY_INTERFACE_VERSION );
 
-	proxyVersionedName = ( char * )_alloca( buflen );
+	proxyVersionedName = stackallocT( char, buflen );
 	Q_strncpy( proxyVersionedName, proxyName, buflen );
 	Q_strncat( proxyVersionedName, IMATERIAL_PROXY_INTERFACE_VERSION, buflen, COPY_ALL_CHARACTERS );
 	return ( IMaterialProxy * )factory( proxyVersionedName, NULL );

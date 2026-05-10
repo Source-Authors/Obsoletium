@@ -272,10 +272,9 @@ bool CMixerControls::SelectMicrophoneForWaveInput()
 	if( m_dwMicSelectControlID == 0xFFFFFFFF )
 		return false;
 
-	MIXERCONTROLDETAILS_BOOLEAN *pmxcdSelectValue = 
-		(MIXERCONTROLDETAILS_BOOLEAN*)_alloca( sizeof(MIXERCONTROLDETAILS_BOOLEAN) * m_dwMicSelectMultipleItems );
+	auto *pmxcdSelectValue = stackallocT( MIXERCONTROLDETAILS_BOOLEAN, m_dwMicSelectMultipleItems );
 
-	MIXERCONTROLDETAILS mxcd;
+	MIXERCONTROLDETAILS mxcd = {};
 	mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
 	mxcd.dwControlID = m_dwMicSelectControlID;
 	mxcd.cChannels = 1;
@@ -428,7 +427,7 @@ void CMixerControls::FindMicSelectControl( DWORD dwLineID, DWORD nControls )
 {
 	m_dwMicSelectControlID = 0xFFFFFFFF;
 
-	MIXERCONTROL *recControls = (MIXERCONTROL*)_alloca( sizeof(MIXERCONTROL) * nControls );
+	MIXERCONTROL *recControls = stackallocT( MIXERCONTROL, nControls );
 	if( !GetLineControls( dwLineID, recControls, nControls ) )
 		return;
 
@@ -443,10 +442,9 @@ void CMixerControls::FindMicSelectControl( DWORD dwLineID, DWORD nControls )
 			m_dwMicSelectIndex = iRecControl;
 
 			// Get the index of the one that selects the mic.
-			MIXERCONTROLDETAILS_LISTTEXT *pmxcdSelectText =
-				(MIXERCONTROLDETAILS_LISTTEXT*)_alloca( sizeof(MIXERCONTROLDETAILS_LISTTEXT) * m_dwMicSelectMultipleItems );
+			auto *pmxcdSelectText = stackallocT( MIXERCONTROLDETAILS_LISTTEXT, m_dwMicSelectMultipleItems );
 
-			MIXERCONTROLDETAILS mxcd;
+			MIXERCONTROLDETAILS mxcd = {};
 			mxcd.cbStruct = sizeof(MIXERCONTROLDETAILS);
 			mxcd.dwControlID = m_dwMicSelectControlID;
 			mxcd.cChannels = 1;

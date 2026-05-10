@@ -1940,7 +1940,7 @@ void WorldStaticMeshCreate( void )
 
 	CMSurfaceSortList matSortArray;
 	matSortArray.Init( nSortIDs, 512 );
-	intp *sortIndex = (intp *)_alloca( sizeof(intp) * g_WorldStaticMeshes.Count() );
+	intp *sortIndex = stackallocT( intp, g_WorldStaticMeshes.Count() );
 
 	bool bTools = CommandLine()->CheckParm( "-tools" ) != NULL;
 

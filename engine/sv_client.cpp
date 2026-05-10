@@ -1180,7 +1180,7 @@ void CGameClient::SendSnapshot( CClientFrame * pFrame )
 		networkStringTableContainerServer->DirectUpdate( GetMaxAckTickCount() );
 #endif
 		
-		char *buf = (char *)_alloca( NET_MAX_PAYLOAD );
+		char *buf = stackallocT( char, NET_MAX_PAYLOAD );
 
 		// pack sounds to one message
 		if ( m_Sounds.Count() > 0 )
@@ -1214,7 +1214,7 @@ void CGameClient::SendSnapshot( CClientFrame * pFrame )
 		// copy string updates from server to replay stringtable
 		networkStringTableContainerServer->DirectUpdate( GetMaxAckTickCount() );
 #endif
-		char *buf = (char *)_alloca( NET_MAX_PAYLOAD );
+		char *buf = stackallocT( char, NET_MAX_PAYLOAD );
 
 		// pack sounds to one message
 		if ( m_Sounds.Count() > 0 )
@@ -1532,7 +1532,7 @@ void CTestSoundInfoNetworking::RunTest()
 
 	SVC_Sounds	msg;
 
-	char *buf = (char *)_alloca( NET_MAX_PAYLOAD );
+	char *buf = stackallocT( char, NET_MAX_PAYLOAD );
 
 	msg.m_DataOut.StartWriting( buf, NET_MAX_PAYLOAD );
 

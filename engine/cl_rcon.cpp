@@ -554,7 +554,7 @@ void CRConClient::RunFrame()
 	// Read data into a utlbuffer
 	m_RecvBuffer.EnsureCapacity( m_RecvBuffer.TellPut() + readLen + 1 );
 	const size_t recvbufferLen = min( 1024ul, readLen + 1 );
-	char *recvbuffer = (char *)_alloca( recvbufferLen );
+	char *recvbuffer = stackallocT( char, recvbufferLen );
 	unsigned int len = 0;
 	while ( len < readLen )
 	{
