@@ -3319,7 +3319,7 @@ bool IKeyValuesDumpContextAsText::KvWriteIndent( int nIndentLevel )
 {
 	int numIndentBytes = ( nIndentLevel * 2 + 1 );
 	char *pchIndent = stackallocT( char, numIndentBytes );
-	memset( pchIndent, ' ', numIndentBytes - 1 );
+	memset( pchIndent, ' ', sizeof(char) * ( numIndentBytes - 1 ) );
 	pchIndent[ numIndentBytes - 1 ] = '\0';
 	return KvWriteText( pchIndent );
 }
