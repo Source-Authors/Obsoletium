@@ -1482,7 +1482,7 @@ void CGame::PlayStartupVideos( void )
 	COM_OpenFile( HealthFile, &hFile );	
 		
 	//There is no access to steam at this point so we are checking for the presence of an empty file that will only exist in the chinese depot
-	if ( hFile != FILESYSTEM_INVALID_HANDLE )
+	if ( hFile )
 	{
 		bNeedHealthWarning = true;
 		COM_CloseFile( hFile );
