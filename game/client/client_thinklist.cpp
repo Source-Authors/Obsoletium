@@ -276,7 +276,7 @@ void CClientThinkList::PerformThinkFunctions()
 	// Build a list of entities to think this frame, in order of hierarchy.
 	// Do this because the list may be modified during the thinking and also to
 	// prevent bad situations where an entity can think more than once in a frame.
-	ThinkEntry_t **ppThinkEntryList = (ThinkEntry_t**)stackalloc( nMaxList * sizeof(ThinkEntry_t*) );
+	ThinkEntry_t **ppThinkEntryList = stackallocT( ThinkEntry_t*, nMaxList );
 	int nThinkCount = 0;
 	for ( auto iCur=m_ThinkEntries.Head(); iCur != m_ThinkEntries.InvalidIndex(); iCur = m_ThinkEntries.Next( iCur ) )
 	{

@@ -4508,7 +4508,7 @@ void CRendering3dView::DrawTranslucentRenderables( bool bInSkybox, bool bShadowD
 	VPROF_BUDGET( "CViewRender::DrawTranslucentRenderables", "DrawTranslucentRenderables" );
 	int iPrevLeaf = info.m_LeafCount - 1;
 	int nDetailLeafCount = 0;
-	LeafIndex_t *pDetailLeafList = (LeafIndex_t*)stackalloc( info.m_LeafCount * sizeof(LeafIndex_t) );
+	LeafIndex_t *pDetailLeafList = stackallocT( LeafIndex_t, info.m_LeafCount );
 
 // 	bool bDrawUnderWater = (nFlags & DF_RENDER_UNDERWATER) != 0;
 // 	bool bDrawAboveWater = (nFlags & DF_RENDER_ABOVEWATER) != 0;

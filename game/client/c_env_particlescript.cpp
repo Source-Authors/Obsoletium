@@ -184,7 +184,7 @@ void C_EnvParticleScript::DestroyAllParticles( const char *pAttachmentName )
 		return;
 
 	int nCount = m_ParticleEffect.GetNumActiveParticles();
-	Particle** ppParticles = (Particle**)stackalloc( nCount * sizeof(Particle*) );
+	Particle** ppParticles = stackallocT( Particle*, nCount );
 	int nActualCount = m_ParticleEffect.GetActiveParticleList( nCount, ppParticles );
 	Assert( nActualCount == nCount );
 
@@ -202,7 +202,7 @@ void C_EnvParticleScript::DestroyAllParticles( const char *pAttachmentName )
 void C_EnvParticleScript::DestroyAllParticles( )
 {
 	int nCount = m_ParticleEffect.GetNumActiveParticles();
-	Particle** ppParticles = (Particle**)stackalloc( nCount * sizeof(Particle*) );
+	Particle** ppParticles = stackallocT( Particle*, nCount );
 	int nActualCount = m_ParticleEffect.GetActiveParticleList( nCount, ppParticles );
 	Assert( nActualCount == nCount );
 
