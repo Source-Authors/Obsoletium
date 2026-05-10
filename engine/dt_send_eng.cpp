@@ -843,22 +843,24 @@ CRC32_t SendTable_CRCTable( CRC32_t &crc, SendTable *pTable )
 
 void SendTable_PrintStats( void )
 {
-	int numTables = 0;
-	int numFloats = 0;
-	int numStrings = 0;
-	int numArrays = 0;
-	int numInts = 0;
-	int numVecs = 0;
-	int numVecXYs = 0;
-	int numSubTables = 0;
-	int numSendProps = 0;
-	int numFlatProps = 0;
-	int numExcludeProps = 0;
+	intp numTables = 0;
+	intp numFloats = 0;
+	intp numStrings = 0;
+	intp numArrays = 0;
+	intp numInts = 0;
+	// dimhotepus: Count int64.
+#ifdef SUPPORTS_INT64
+	intp numInt64s = 0;
+#endif
+	intp numVecs = 0;
+	intp numVecXYs = 0;
+	intp numSubTables = 0;
+	intp numSendProps = 0;
+	intp numFlatProps = 0;
+	intp numExcludeProps = 0;
 
-	for ( int i=0; i < g_SendTables.Count(); i++ )
+	for ( const auto *st : g_SendTables )
 	{
-		SendTable *st =  g_SendTables[i];
-		
 		numTables++;
 		numSendProps += st->GetNumProps();
 		numFlatProps += st->m_pPrecalc->GetNumProps();
@@ -885,22 +887,30 @@ void SendTable_PrintStats( void )
 				case DPT_String : numStrings++; break;
 				case DPT_Array	: numArrays++; break;
 				case DPT_DataTable : numSubTables++; break;
+				// dimhotepus: Count int64.
+#ifdef SUPPORTS_INT64
+				case DPT_Int64: numInt64s++; break;
+#endif
 			}
 		}
 	}
 
 	Msg("Total Send Table stats\n");
-	Msg("Send Tables   : %i\n", numTables );
-	Msg("Send Props    : %i\n", numSendProps );
-	Msg("Flat Props    : %i\n", numFlatProps );
-	Msg("Int Props     : %i\n", numInts );
-	Msg("Float Props   : %i\n", numFloats );
-	Msg("Vector Props  : %i\n", numVecs );
-	Msg("VectorXY Props: %i\n", numVecXYs );
-	Msg("String Props  : %i\n", numStrings );
-	Msg("Array Props   : %i\n", numArrays );
-	Msg("Table Props   : %i\n", numSubTables );
-	Msg("Exclu Props   : %i\n", numExcludeProps );
+	Msg("Send Tables   : %zd\n", numTables );
+	Msg("Send Props    : %zd\n", numSendProps );
+	Msg("Flat Props    : %zd\n", numFlatProps );
+	Msg("Int Props     : %zd\n", numInts );
+	// dimhotepus: Count int64.
+#ifdef SUPPORTS_INT64
+	Msg("Int64 Props   : %zd\n", numInt64s );
+#endif
+	Msg("Float Props   : %zd\n", numFloats );
+	Msg("Vector Props  : %zd\n", numVecs );
+	Msg("VectorXY Props: %zd\n", numVecXYs );
+	Msg("String Props  : %zd\n", numStrings );
+	Msg("Array Props   : %zd\n", numArrays );
+	Msg("Table Props   : %zd\n", numSubTables );
+	Msg("Exclu Props   : %zd\n", numExcludeProps );
 }
 
 
