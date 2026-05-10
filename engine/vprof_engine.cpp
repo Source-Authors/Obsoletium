@@ -704,7 +704,7 @@ public:
 
 		memset( m_Times.Base(), 0, sizeof( m_Times[0] ) * GetActiveVProfile()->GetNumBudgetGroups() );
 		CVProfNode *pNode = GetActiveVProfile()->GetRoot();
-		if( pNode && pNode->GetChild() )
+		if( pNode->GetChild() )
 		{
 			CalculateBudgetGroupTimes_Recursive( pNode->GetChild() );
 		}
