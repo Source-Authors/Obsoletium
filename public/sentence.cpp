@@ -1214,6 +1214,9 @@ CWordTag *CSentence::GetWordForPhoneme( CPhonemeTag *phoneme )
 //-----------------------------------------------------------------------------
 CSentence& CSentence::operator=( const CSentence& src )
 {
+	// dimhotepus: Protect against self-assignment
+	if ( &src == this ) return *this;
+
 	// Clear current stuff
 	Reset();
 
