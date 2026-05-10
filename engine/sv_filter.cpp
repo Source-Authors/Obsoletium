@@ -881,7 +881,8 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 	IGameEvent *event = g_GameEventManager.CreateEvent( "server_addban" );
 	if ( event )
 	{
-		if ( bPlaying )
+		// dimhotepus: Check client before dereference.
+		if ( bPlaying && client )
 		{
 			event->SetString( "name", client->m_Name );
 			event->SetInt( "userid", client->GetUserID() );
