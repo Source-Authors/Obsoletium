@@ -36,6 +36,11 @@ extern CNetworkStringTableContainer *networkStringTableContainerServer;
 CHLTVDemoRecorder::CHLTVDemoRecorder()
 {
 	m_bIsRecording = false;
+	m_nFrameCount = 0;
+	m_nStartTick = 0;
+	m_SequenceInfo = 0;
+	m_nDeltaTick = 0;
+	m_nSignonTick = 0;
 }
 
 CHLTVDemoRecorder::~CHLTVDemoRecorder()
