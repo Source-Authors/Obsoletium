@@ -220,7 +220,7 @@ BEGIN_VS_SHADER_FLAGS( screenspace_general_dx9, "Help for screenspace_general", 
 				if( (iLength > 5) && (Q_stricmp( &szPixelShader[iLength - 5], "_ps20" ) == 0) ) //detect if it's trying to load a ps20 shader
 				{
 					//replace it with the ps20b shader
-					char *szNewName = (char *)stackalloc( sizeof( char ) * (iLength + 2) );
+					char *szNewName = stackallocT( char, iLength + 2 );
 					memcpy( szNewName, szPixelShader, sizeof( char ) * iLength );
 					szNewName[iLength] = 'b';
 					szNewName[iLength + 1] = '\0';
