@@ -461,6 +461,11 @@ static void WriteLightProbe( const char *pBasePath, const LightingState_t& state
 			pLight->SetValue( "name", "Directional" );
 			pLight->SetValue( "direction", wl.normal );
 			break;
+
+		// dimhotepus: Dump unexpected world light types.
+		default:
+			AssertMsg( false, "Unexpected world light type %d", wl.type );
+			DevWarning( "Unexpected world light type %d", wl.type );
 		}
 	}
 
