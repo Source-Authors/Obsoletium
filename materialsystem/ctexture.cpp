@@ -3260,7 +3260,7 @@ IVTFTexture *CTexture::LoadTextureBitsFromFile( char *pCacheFileName, char **ppR
 	// Load the resources
 	if ( uintp uiRsrcCount = pVTFTexture->GetResourceTypes( NULL, 0 ) )
 	{
-		uint32 *arrRsrcTypes = ( uint32 * )_alloca( uiRsrcCount * sizeof( unsigned int ) );
+		uint32 *arrRsrcTypes = stackallocT( uint32, uiRsrcCount );
 		pVTFTexture->GetResourceTypes( arrRsrcTypes, uiRsrcCount );
 
 		m_arrDataChunks.EnsureCapacity( uiRsrcCount );

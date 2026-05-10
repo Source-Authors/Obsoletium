@@ -1556,7 +1556,7 @@ bool CMorph::RenderMorphWeights( IMatRenderContext *pRenderContext, int nRenderI
 		memset( &m_pRenderMorphWeight[nCountToCopy], 0, nCountToClear * sizeof(MorphWeight_t) );
 	}
 
-	int *pWeightIndices = (int*)_alloca( nCountToCopy * sizeof(int) );
+	int *pWeightIndices = stackallocT( int, nCountToCopy );
 	int nIndexCount = BuildNonZeroMorphList( pWeightIndices, nCountToCopy, pWeights ); 
 	if ( nIndexCount == 0 )
 		return false;
@@ -1605,7 +1605,7 @@ void CMorph::AccumulateMorph( int nRenderId )
 	VPROF_BUDGET( "CMorph::AccumulateMorph", _T("HW Morphing") );
 
 	// Build a non-zero weight list and a total quad count
-	int *pTargets = (int*)_alloca( m_nMaxMorphTargetCount * sizeof(int) );
+	int *pTargets = stackallocT( int, m_nMaxMorphTargetCount );
 	int nTargetCount = BuildNonZeroMorphList( pTargets, m_nMaxMorphTargetCount, m_pRenderMorphWeight ); 
 
 	// Count the total number of quads to draw

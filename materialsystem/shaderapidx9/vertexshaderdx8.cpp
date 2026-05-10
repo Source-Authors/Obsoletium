@@ -2046,8 +2046,8 @@ bool CShaderManager::CreateDynamicCombos_Ver4( void *pContext, uint8 *pComboBuff
 	if ( nReferenceComboSizeForDiffs )
 	{
 		// reference combo is *always* the largest combo, so safe worst case size for uncompression buffer
-		pReferenceShader = (uint8 *)pFileCache->m_ReferenceCombo.Base();
-		pDiffOutputBuffer = (uint8 *)_alloca( nReferenceComboSizeForDiffs ); 
+		pReferenceShader = pFileCache->m_ReferenceCombo.Base<uint8>();
+		pDiffOutputBuffer = stackallocT( uint8, nReferenceComboSizeForDiffs ); 
 	}
 
 	// build this shader's dynamic combos

@@ -321,7 +321,7 @@ CMaterialSubRect::CMaterialSubRect( const char *pMaterialName, const char *pText
 
 	// Name with extension stripped off.
 	intp len = Q_strlen( pMaterialName );
-	char* pTemp = ( char* )_alloca( len + 1 );
+	char* pTemp = stackallocT( char, len + 1 );
 	Q_strncpy( pTemp, pMaterialName, len + 1 );
 	Q_strlower( pTemp );
 	pTemp[ len - 4 ] = '\0';
