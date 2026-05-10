@@ -43,87 +43,87 @@ public:
 
 public:
 	// Level init, shutdown
-	virtual void	ClientLevelInitPreEntityAllTools();
+	void	ClientLevelInitPreEntityAllTools();
 	// entities are created / spawned / precached here
-	virtual void	ClientLevelInitPostEntityAllTools();
+	void	ClientLevelInitPostEntityAllTools();
 
-	virtual void	ClientLevelShutdownPreEntityAllTools();
+	void	ClientLevelShutdownPreEntityAllTools();
 	// Entities are deleted / released here...
-	virtual void	ClientLevelShutdownPostEntityAllTools();
+	void	ClientLevelShutdownPostEntityAllTools();
 
-	virtual void	ClientPreRenderAllTools();
-	virtual void	ClientPostRenderAllTools();
+	void	ClientPreRenderAllTools();
+	void	ClientPostRenderAllTools();
 
-	virtual bool	IsThirdPersonCamera();
+	bool	IsThirdPersonCamera();
 
-	virtual bool	IsToolRecording();
+	bool	IsToolRecording();
 
 	// Level init, shutdown
-	virtual void	ServerLevelInitPreEntityAllTools();
+	void	ServerLevelInitPreEntityAllTools();
 	// entities are created / spawned / precached here
-	virtual void	ServerLevelInitPostEntityAllTools();
+	void	ServerLevelInitPostEntityAllTools();
 
-	virtual void	ServerLevelShutdownPreEntityAllTools();
+	void	ServerLevelShutdownPreEntityAllTools();
 	// Entities are deleted / released here...
-	virtual void	ServerLevelShutdownPostEntityAllTools();
+	void	ServerLevelShutdownPostEntityAllTools();
 	// end of level shutdown
 
 	// Called each frame before entities think
-	virtual void	ServerFrameUpdatePreEntityThinkAllTools();
+	void	ServerFrameUpdatePreEntityThinkAllTools();
 	// called after entities think
-	virtual void	ServerFrameUpdatePostEntityThinkAllTools();
-	virtual void	ServerPreClientUpdateAllTools();
+	void	ServerFrameUpdatePostEntityThinkAllTools();
+	void	ServerPreClientUpdateAllTools();
 	const char*		GetEntityData( const char *pActualEntityData );
-	virtual void	ServerPreSetupVisibilityAllTools();
+	void	ServerPreSetupVisibilityAllTools();
 
-	virtual bool	PostInit();
+	bool	PostInit();
 
-	virtual bool	ServerInit( CreateInterfaceFn serverFactory ); 
-	virtual bool	ClientInit( CreateInterfaceFn clientFactory ); 
+	bool	ServerInit( CreateInterfaceFn serverFactory ); 
+	bool	ClientInit( CreateInterfaceFn clientFactory ); 
 
-	virtual void	ServerShutdown();
-	virtual void	ClientShutdown();
+	void	ServerShutdown();
+	void	ClientShutdown();
 
-	virtual void	Think( bool finalTick );
+	void	Think( bool finalTick );
 
-	virtual void	PostToolMessage( HTOOLHANDLE hEntity, KeyValues *msg );
+	void	PostToolMessage( HTOOLHANDLE hEntity, KeyValues *msg );
 
-	virtual void	AdjustEngineViewport( int& x, int& y, int& width, int& height );
-	virtual bool	SetupEngineView( Vector &origin, QAngle &angles, float &fov );
-	virtual bool	SetupAudioState( AudioState_t &audioState );
+	void	AdjustEngineViewport( int& x, int& y, int& width, int& height );
+	bool	SetupEngineView( Vector &origin, QAngle &angles, float &fov );
+	bool	SetupAudioState( AudioState_t &audioState );
 
-	virtual int		GetToolCount();
-	virtual const char* GetToolName( int index );
-	virtual void	SwitchToTool( int index );
-	virtual IToolSystem* SwitchToTool( const char* pToolName );
+	int		GetToolCount();
+	const char* GetToolName( int index );
+	void	SwitchToTool( int index );
+	IToolSystem* SwitchToTool( const char* pToolName );
 
-	virtual bool	IsTopmostTool( const IToolSystem *sys );
-	virtual const IToolSystem *GetToolSystem( int index ) const;
-	virtual IToolSystem *GetTopmostTool();
+	bool	IsTopmostTool( const IToolSystem *sys );
+	const IToolSystem *GetToolSystem( int index ) const;
+	IToolSystem *GetTopmostTool();
 
-	virtual void	PostMessage( KeyValues *msg );
+	void	PostMessage( KeyValues *msg );
 
-	virtual bool	GetSoundSpatialization( int iUserData, int guid, SpatializationInfo_t& info );
+	bool	GetSoundSpatialization( int iUserData, int guid, SpatializationInfo_t& info );
 
-	virtual void	HostRunFrameBegin();
-	virtual void	HostRunFrameEnd();
+	void	HostRunFrameBegin();
+	void	HostRunFrameEnd();
 
-	virtual void	RenderFrameBegin();
-	virtual void	RenderFrameEnd();
+	void	RenderFrameBegin();
+	void	RenderFrameEnd();
 
-	virtual void	VGui_PreRenderAllTools( int paintMode );
-	virtual void	VGui_PostRenderAllTools( int paintMode );
+	void	VGui_PreRenderAllTools( int paintMode );
+	void	VGui_PostRenderAllTools( int paintMode );
 
-	virtual void	VGui_PreSimulateAllTools();
-	virtual void	VGui_PostSimulateAllTools();
+	void	VGui_PreSimulateAllTools();
+	void	VGui_PostSimulateAllTools();
 
 	// Are we using tools?
-	virtual bool	InToolMode();
+	bool	InToolMode();
 
 	// Should the game be allowed to render the world?
-	virtual bool	ShouldGameRenderView();
+	bool	ShouldGameRenderView();
 
-	virtual IMaterialProxy *LookupProxy( const char *proxyName );
+	IMaterialProxy *LookupProxy( const char *proxyName );
 
 private:
 	void			LoadTools();
