@@ -164,7 +164,7 @@ bool CDmSerializerBinary::SerializeElementArrayAttribute( CUtlBuffer& buf, CDmEl
 bool CDmSerializerBinary::SerializeAttributes( CUtlBuffer& buf, CDmElementSerializationDictionary& list, unsigned short *symbolToIndexMap, CDmElement *pElement )
 {
 	// Collect the attributes to be written
-	CDmAttribute **ppAttributes = ( CDmAttribute** )_alloca( pElement->AttributeCount() * sizeof( CDmAttribute* ) );
+	CDmAttribute **ppAttributes = stackallocT( CDmAttribute*, pElement->AttributeCount() );
 	intp nAttributes = 0;
 	for ( CDmAttribute *pAttribute = pElement->FirstAttribute(); pAttribute; pAttribute = pAttribute->NextAttribute() )
 	{

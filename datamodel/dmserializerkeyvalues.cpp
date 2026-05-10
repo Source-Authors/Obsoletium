@@ -119,7 +119,7 @@ void CDmSerializerKeyValues::SerializeSubKeys( CUtlBuffer& buf, CDmAttribute *pS
 bool CDmSerializerKeyValues::SerializeAttributes( CUtlBuffer& buf, CDmElement *pElement )
 {
 	// Collect the attributes to be written
-	CDmAttribute **ppAttributes = ( CDmAttribute** )_alloca( pElement->AttributeCount() * sizeof( CDmAttribute* ) );
+	CDmAttribute **ppAttributes = stackallocT( CDmAttribute*, pElement->AttributeCount() );
 	intp nAttributes = 0;
 	for ( CDmAttribute *pAttribute = pElement->FirstAttribute(); pAttribute; pAttribute = pAttribute->NextAttribute() )
 	{
