@@ -214,15 +214,15 @@ public:
 // ---------------------------------------------------------------------------------------------------- //
 [[nodiscard]] bool Q_getwd( OUT_Z_CAP(outSize) char *out, int outSize )
 {
-	const bool ok{!!_getcwd( out, outSize )};
-	if (ok)
+	const bool ok{!!_getcwd( out, outSize )}; //-V781
+	if ( ok )
 	{
 		V_strncat( out, CORRECT_PATH_SEPARATOR_S, outSize );
-		Q_FixSlashes( out );
+		V_FixSlashes( out );
 	}
 	else
 	{
-		if (outSize > 0)
+		if ( outSize > 0 )
 		{
 			out[0] = '\0';
 		}
