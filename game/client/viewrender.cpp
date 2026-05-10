@@ -4098,8 +4098,8 @@ void CRendering3dView::DrawOpaqueRenderables( ERenderDepthMode DepthMode )
 	for ( int bucket = 0; bucket < RENDER_GROUP_CFG_NUM_OPAQUE_ENT_BUCKETS; ++ bucket )
 		numOpaqueEnts += m_pRenderablesList->m_RenderGroupCounts[ RENDER_GROUP_OPAQUE_ENTITY_HUGE + 2 * bucket ];
 
-	CUtlVector< C_BaseAnimating * > arrBoneSetupNpcsLast( (C_BaseAnimating **)_alloca( numOpaqueEnts * sizeof( C_BaseAnimating * ) ), numOpaqueEnts, numOpaqueEnts );
-	CUtlVector< CClientRenderablesList::CEntry > arrRenderEntsNpcsFirst( (CClientRenderablesList::CEntry *)_alloca( numOpaqueEnts * sizeof( CClientRenderablesList::CEntry ) ), numOpaqueEnts, numOpaqueEnts );
+	CUtlVector< C_BaseAnimating * > arrBoneSetupNpcsLast( stackallocT( C_BaseAnimating *, numOpaqueEnts ), numOpaqueEnts, numOpaqueEnts );
+	CUtlVector< CClientRenderablesList::CEntry > arrRenderEntsNpcsFirst( stackallocT( CClientRenderablesList::CEntry, numOpaqueEnts ), numOpaqueEnts, numOpaqueEnts );
 	int numNpcs = 0, numNonNpcsAnimating = 0;
 
 	for ( int bucket = 0; bucket < RENDER_GROUP_CFG_NUM_OPAQUE_ENT_BUCKETS; ++ bucket )

@@ -472,7 +472,7 @@ void CHudMessage::MessageDrawScan( client_textmessage_t *pMessage, float time )
 		// strip off any trailing newlines
 		intp len = Q_strlen( pMessage->pMessage );
 		intp tempLen = len + 2;
-		char *localString = (char *)_alloca( tempLen );
+		char *localString = stackallocT( char, tempLen );
 		Q_strncpy( localString, pMessage->pMessage, tempLen );
 		if (V_iscntrl(localString[len - 1]))
 		{

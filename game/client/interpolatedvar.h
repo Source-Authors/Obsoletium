@@ -982,7 +982,7 @@ inline int CInterpolatedVarArrayBase<Type, IS_ARRAY>::Interpolate( float current
 
 
 #ifdef INTERPOLATEDVAR_PARANOID_MEASUREMENT
-	Type *backupValues = (Type*)_alloca( m_nMaxCount * sizeof(Type) );
+	Type *backupValues = stackallocT( Type, m_nMaxCount );
 	memcpy( backupValues, m_pValue, sizeof( Type ) * m_nMaxCount );
 #endif
 
@@ -1470,7 +1470,7 @@ inline void CInterpolatedVarArrayBase<Type, IS_ARRAY>::_Derivative_Hermite(
 	CDisableRangeChecks disableRangeChecks; 
 
 	CInterpolatedVarEntry fixup;
-	fixup.value = (Type*)_alloca( sizeof(Type) * m_nMaxCount );
+	fixup.value = stackallocT( Type, m_nMaxCount );
 	TimeFixup_Hermite( fixup, prev, start, end );
 
 	float divisor = 1.0f / (end->changetime - start->changetime);
