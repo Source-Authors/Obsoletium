@@ -672,20 +672,21 @@ byte *COM_LoadFile (IN_Z const char *path, int usehunk, int *pLength)
 {
 	FileHandle_t	hFile;
 	byte			*buf = NULL;
-	char			base[128];
-	int             len;
+	char			base[MAX_OSPATH];
 
 	if (pLength)
 	{
 		*pLength = 0;
 	}
 
-// look for it in the filesystem or pack files
-	len = COM_OpenFile( path, &hFile );
+	// look for it in the filesystem or pack files
+	int len = COM_OpenFile( path, &hFile );
 	if ( !hFile )
 	{
 		return NULL;
 	}
+
+	RunCodeAtScopeExit( COM_CloseFile( hFile ) );
 
 	// Extract the filename base name for hunk tag
 	Q_FileBase( path, base );
@@ -718,15 +719,13 @@ byte *COM_LoadFile (IN_Z const char *path, int usehunk, int *pLength)
 		Sys_Error ("COM_LoadFile: bad usehunk");
 	}
 
-	if ( !buf ) 
+	if ( !buf )
 	{
 		Sys_Error ("COM_LoadFile: not enough space for %s", path);
-		COM_CloseFile(hFile);	// exit here to prevent fault on oom (kdb)
-		return NULL;			
+		return NULL;
 	}
 		
 	g_pFileSystem->ReadEx( buf, bufSize, len, hFile );
-	COM_CloseFile( hFile );
 
 	((byte *)buf)[ len ] = 0;
 
