@@ -165,7 +165,7 @@ void CAvatarImage::LoadAvatarImage()
 				if ( steamapicontext->SteamUtils()->GetImageSize( iAvatar, &wide, &tall ) && wide > 0 && tall > 0 )
 				{
 					int destBufferSize = wide * tall * 4;
-					byte *rgbDest = (byte*)stackalloc( destBufferSize );
+					byte *rgbDest = stackallocT( byte, destBufferSize );
 					if ( steamapicontext->SteamUtils()->GetImageRGBA( iAvatar, rgbDest, destBufferSize ) )
 						InitFromRGBA( iAvatar, rgbDest, wide, tall );
 					

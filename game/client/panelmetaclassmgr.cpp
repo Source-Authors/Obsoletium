@@ -250,7 +250,7 @@ void CPanelMetaClassMgrImp::InstallPanelType( const char* pPanelName, IPanelFact
 	
 	// convert to lowercase
 	intp len = Q_strlen(pPanelName) + 1;
-	char* pTemp = (char*)stackalloc( len );
+	char* pTemp = stackallocT( char, len );
 	Q_strncpy( pTemp, pPanelName, len );
 	Q_strnlwr( pTemp, len );
 
