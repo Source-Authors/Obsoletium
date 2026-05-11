@@ -745,8 +745,12 @@ protected:
 		~COpenedFile();
 
 		COpenedFile( const COpenedFile& src );
+		// dimhotepus: Add =.
+		COpenedFile& operator=( COpenedFile src );
 
 		bool operator==( const COpenedFile& src ) const;
+		// dimhotepus: Add !=.
+		bool operator!=( const COpenedFile& src ) const;
 
 		void		SetName( char const *name );
 		// dimhotepus: Add const.

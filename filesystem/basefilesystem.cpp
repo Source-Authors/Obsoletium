@@ -4576,11 +4576,33 @@ CBaseFileSystem::COpenedFile::COpenedFile( const COpenedFile& src ) : m_pName{nu
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : src - 
+//-----------------------------------------------------------------------------
+CBaseFileSystem::COpenedFile& CBaseFileSystem::COpenedFile::operator=( COpenedFile src ) {
+	using std::swap;
+
+	swap( *this, src );
+
+	return *this;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : src - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
 bool CBaseFileSystem::COpenedFile::operator==( const CBaseFileSystem::COpenedFile& src ) const
 {
 	return src.m_pFile == m_pFile;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : src - 
+// Output : Returns true on success, false on failure.
+//-----------------------------------------------------------------------------
+bool CBaseFileSystem::COpenedFile::operator!=( const CBaseFileSystem::COpenedFile& src ) const
+{
+	return !(src == *this);
 }
 
 //-----------------------------------------------------------------------------
