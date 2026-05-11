@@ -289,6 +289,8 @@ CQueuedLoader::CQueuedLoader() : BaseClass( false )
 	m_bSameMap = false;
 
 	m_nSubmitCount = 0;
+	m_StartTime = 0;
+	m_EndTime = 0;
 
 	m_pfnDynamicCallback = NULL;
 	m_pDynamicContext = NULL;
@@ -296,6 +298,7 @@ CQueuedLoader::CQueuedLoader() : BaseClass( false )
 
 	m_szMapNameToCompareSame[0] = '\0';
 
+	BitwiseClear( m_LoaderTimes ); 
 	m_pProgress = &s_DummyProgress;
 	BitwiseClear( m_pLoaders );
 
