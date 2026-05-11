@@ -1759,10 +1759,11 @@ static void MIX_MixUpsampleBuffer( CChannelList &list, intp ipaintbuffer, int en
 		// mix 22khz channels to buffer
 		MIX_MixChannelsToPaintbuffer<flags, SOUND_22k, SOUND_22k>( list, end );
 
-#if (SOUND_DMA_SPEED > SOUND_22k)
-		// upsample 22khz buffer by 2x
-		g_AudioDevice->MixUpsample( count / (SOUND_DMA_SPEED / SOUND_22k), FILTERTYPE_LINEAR );
-#endif
+		if constexpr ( SOUND_DMA_SPEED > SOUND_22k )
+		{
+			// upsample 22khz buffer by 2x
+			g_AudioDevice->MixUpsample( count / (SOUND_DMA_SPEED / SOUND_22k), FILTERTYPE_LINEAR );
+		}
 	}
 
 	// mix 44khz channels to buffer
@@ -1867,24 +1868,25 @@ void MIX_UpsampleAllPaintbuffers( CChannelList &list, int end, int count )
 	MIX_MixChannelsToPaintbuffer<SOUND_MIX_WET, SOUND_22k, SOUND_22k>( list, end );
 
 	// upsample all 22khz buffers by 2x
-#if ( SOUND_DMA_SPEED > SOUND_22k )
-	if ( !g_bDspOff )
+	if constexpr ( SOUND_DMA_SPEED > SOUND_22k )
 	{
-		// only upsample roombuffer if dsp fx are on KDB: perf
+		if ( !g_bDspOff )
+		{
+			// only upsample roombuffer if dsp fx are on KDB: perf
 
-		MIX_SetCurrentPaintbuffer(SOUND_BUFFER_ROOM);
+			MIX_SetCurrentPaintbuffer(SOUND_BUFFER_ROOM);
+			g_AudioDevice->MixUpsample( count / (SOUND_DMA_SPEED / SOUND_22k), FILTERTYPE_LINEAR );
+		}
+
+		MIX_SetCurrentPaintbuffer(SOUND_BUFFER_FACING);
 		g_AudioDevice->MixUpsample( count / (SOUND_DMA_SPEED / SOUND_22k), FILTERTYPE_LINEAR );
-	}
 
-	MIX_SetCurrentPaintbuffer(SOUND_BUFFER_FACING);
-	g_AudioDevice->MixUpsample( count / (SOUND_DMA_SPEED / SOUND_22k), FILTERTYPE_LINEAR );
-
-	if ( g_bdirectionalfx )
-	{
-		MIX_SetCurrentPaintbuffer(SOUND_BUFFER_FACINGAWAY);
-		g_AudioDevice->MixUpsample( count / (SOUND_DMA_SPEED / SOUND_22k), FILTERTYPE_LINEAR );
+		if ( g_bdirectionalfx )
+		{
+			MIX_SetCurrentPaintbuffer(SOUND_BUFFER_FACINGAWAY);
+			g_AudioDevice->MixUpsample( count / (SOUND_DMA_SPEED / SOUND_22k), FILTERTYPE_LINEAR );
+		}
 	}
-#endif
 
 	// mix all 44khz sounds to all active paintbuffers
 	MIX_MixChannelsToPaintbuffer<SOUND_MIX_WET, SOUND_44k, SOUND_44k>( list, end );
