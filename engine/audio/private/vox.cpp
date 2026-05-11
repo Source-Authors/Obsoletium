@@ -1458,15 +1458,15 @@ void VOX_Precache( IEngineSound *pSoundSystem, int sentenceIndex, const char *pP
 	// parse sentence (also inserts null terminators between words)
 
 	VOX_ParseString(psz);
-	int i = 0, count = 0;
+	int count = 0;
 	// copy the parsed words out of the globals
-	for ( i = 0; rgpparseword[i]; i++ )
+	for ( int i = 0; rgpparseword[i]; i++ )
 	{
 		pWords[i] = rgpparseword[i];
 		count++;
 	}
-	int cword = 0;
-	for ( i = 0; i < count; i++ )
+	intp cword = 0;
+	for ( int i = 0; i < count; i++ )
 	{
 		if ( IsVirtualName(pWords[i]) )
 		{
@@ -1966,7 +1966,7 @@ void VOX_TouchSound( const char *pszin, CUtlDict< int, int >& filelist, CUtlRBTr
 {
 #ifndef SWDS
 	char		buffer[512];
-	int			i, cword;
+	int			cword;
 	char		pathbuffer[MAX_PATH];
 	char		szpath[MAX_PATH];
 	voxword_t	rgvoxword[CVOXWORDMAX];
@@ -2009,7 +2009,7 @@ void VOX_TouchSound( const char *pszin, CUtlDict< int, int >& filelist, CUtlRBTr
 	// for each word in the sentence, construct the filename,
 	// lookup the sfx and save each pointer in a temp array	
 
-	i = 0;
+	intp i = 0;
 	cword = 0;
 
 	CUtlVector< WordBuf > rep;
