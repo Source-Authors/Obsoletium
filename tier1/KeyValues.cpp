@@ -15,6 +15,7 @@
 #include "tier1/KeyValues.h"
 
 #include <cstdlib>
+#include <cinttypes>
 
 #include "filesystem.h"
 #include "vstdlib/IKeyValuesSystem.h"
@@ -991,11 +992,7 @@ void KeyValues::SaveKeyToFile( KeyValues *dat, IBaseFileSystem *filesystem, File
 
 				char buf[32];
 				// write "0x" + 16 char 0-padded hex encoded 64 bit value
-#ifdef WIN32
-				Q_snprintf( buf, sizeof( buf ), "0x%016I64X", *( (uint64 *)dat->m_sValue ) );
-#else
-				Q_snprintf( buf, sizeof( buf ), "0x%016llX", *( (uint64 *)dat->m_sValue ) );
-#endif
+				V_sprintf_safe( buf, "0x%016" PRIx64, *( (uint64 *)dat->m_sValue ) );
 
 				INTERNALWRITE(buf, Q_strlen(buf));
 				INTERNALWRITE("\"\n", 2);
@@ -3278,7 +3275,7 @@ bool IKeyValuesDumpContextAsText::KvWriteValue( KeyValues *val, int nIndentLevel
 		{
 			uint64 n = val->GetUint64();
 			char *chBuffer = stackallocT( char, 32 );
-			V_snprintf( chBuffer, 32, "u64( %lld = 0x%llX )", n, n );
+			V_snprintf( chBuffer, 32, "u64( %" PRIu64 " = 0x%" PRIX64 " )", n, n );
 			if ( !KvWriteText( chBuffer ) )
 				return false;
 		}
