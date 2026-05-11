@@ -4018,7 +4018,7 @@ bool CBaseFileSystem::FindIsDirectory( FileFindHandle_t handle )
 //-----------------------------------------------------------------------------
 void CBaseFileSystem::FindClose( FileFindHandle_t handle )
 {
-	if ( ( handle < 0 ) || ( !m_FindData.IsInList( handle ) ) )
+	if ( !m_FindData.IsInList( handle ) )
 		return;
 
 	FindData_t *pFindData = &m_FindData[handle];
