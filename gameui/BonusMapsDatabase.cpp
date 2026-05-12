@@ -292,6 +292,7 @@ CBonusMapsDatabase::CBonusMapsDatabase( void )
 		Warning( "Unable to load bonus maps db manifest '%s'.\n", bonusMapsManifest );
 	}
 
+	m_bSavedDataChanged = false;
 	m_iX360BonusesUnlocked = -1;	// Only used on X360
 	m_bHasLoadedSaveData = false;
 

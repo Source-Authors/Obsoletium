@@ -32,6 +32,7 @@ class CPropertyLabel : public vgui::Label
 public:
 	CPropertyLabel( Panel *parent, const char *panelName, const char *text ) : BaseClass( parent, panelName, text ) 
 	{
+		m_szPropertyString[0] = '\0';
 	}
 
 	void ApplySettings( KeyValues *pResourceData ) override
