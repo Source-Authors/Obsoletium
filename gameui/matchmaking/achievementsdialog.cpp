@@ -683,10 +683,7 @@ void CAchievementsDialog::CreateOrUpdateComboItems( bool bCreate )
 
 	if ( bCreate && ( m_iNumAchievementGroups > NUM_COMBO_BOX_LINES_DEFAULT ) )
 	{
-		if ( m_pAchievementPackCombo )
-		{
-			m_pAchievementPackCombo->SetNumberOfEditLines( ( m_iNumAchievementGroups <= NUM_COMBO_BOX_LINES_MAX ) ? m_iNumAchievementGroups : NUM_COMBO_BOX_LINES_MAX );
-		}
+		m_pAchievementPackCombo->SetNumberOfEditLines( ( m_iNumAchievementGroups <= NUM_COMBO_BOX_LINES_MAX ) ? m_iNumAchievementGroups : NUM_COMBO_BOX_LINES_MAX );
 	}
 }
 
