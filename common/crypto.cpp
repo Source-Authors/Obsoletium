@@ -1307,7 +1307,12 @@ bool CCrypto::Base64Encode( const uint8 *pubData, size_t cubData, char *pchEncod
 		
 		if ( nNextLineBreak == 0 )
 		{
-			memcpy( pchEncodedData, pszLineBreak, unLineBreakLen );
+			// dimhotepus: Ensure no nullptr deref.
+			if ( pszLineBreak )
+			{
+				memcpy( pchEncodedData, pszLineBreak, unLineBreakLen );
+			}
+
 			pchEncodedData += unLineBreakLen;
 			cchEncodedData -= unLineBreakLen;
 			nNextLineBreak = k_LineBreakEveryNGroups;
