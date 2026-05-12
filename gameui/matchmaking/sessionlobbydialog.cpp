@@ -259,7 +259,7 @@ void CSessionLobbyDialog::PositionTeamInfos()
 	m_pTeamInfos[0]->GetPos( x, y );
 	m_Menus[0].GetPos( menux, menuy );
 
-	for ( int i = 1; i < TOTAL_LOBBY_TEAMS; ++i )
+	for ( int i = 1; i < TOTAL_LOBBY_TEAMS; ++i ) //-V1008
 	{
 		y += m_pTeamInfos[i - 1]->GetTall() + m_nTeamspacing;
 		m_pTeamInfos[i]->SetPos( x, y );
