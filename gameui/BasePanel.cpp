@@ -574,12 +574,9 @@ CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
 	m_bXUIVisible = false;
 	m_bUseMatchmaking = false;
 	m_bRestartFromInvite = false;
-	m_bUserRefusedSignIn = false;
-	m_bUserRefusedStorageDevice = false;
 	m_bWaitingForUserSignIn = false;
 	m_bWaitingForStorageDeviceHandle = false;
 	m_bNeedStorageDeviceHandle = false;
-	m_bStorageBladeShown = false;
 	m_iStorageID = XBX_INVALID_STORAGE_ID;
 	m_pAsyncJob = NULL;
 	m_pStorageDeviceValidatedNotify = NULL;
@@ -1576,7 +1573,6 @@ void CBasePanel::RunMenuCommand(const char *command)
 	else if ( !Q_stricmp( command, "SignInDenied" ) )
 	{
 		// The user doesn't care, so re-send the command they wanted and mark that we want to skip checking
-		m_bUserRefusedSignIn = true;
 		if ( m_strPostPromptCommand.IsEmpty() == false )
 		{
 			OnCommand( m_strPostPromptCommand );		
@@ -1593,7 +1589,6 @@ void CBasePanel::RunMenuCommand(const char *command)
 	else if ( !Q_stricmp( command, "StorageDeviceDenied" ) )
 	{
 		// The user doesn't care, so re-send the command they wanted and mark that we want to skip checking
-		m_bUserRefusedStorageDevice = true;
 		IssuePostPromptCommand();
 
 		// Set us as declined
@@ -1683,40 +1678,6 @@ void CBasePanel::ClearQueuedCommands()
 	m_CommandQueue.Purge();
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: Whether this command should cause us to prompt the user if they're not signed in and do not have a storage device
-//-----------------------------------------------------------------------------
-bool CBasePanel::IsPromptableCommand( const char *command )
-{
-	// Blech!
-	if ( !Q_stricmp( command, "OpenNewGameDialog" ) ||
-		 !Q_stricmp( command, "OpenLoadGameDialog" ) ||
-		 !Q_stricmp( command, "OpenSaveGameDialog" ) ||
-		 !Q_stricmp( command, "OpenBonusMapsDialog" ) ||
-		 !Q_stricmp( command, "OpenOptionsDialog" ) ||
-		 !Q_stricmp( command, "OpenControllerDialog" ) ||
-		 !Q_stricmp( command, "OpenLoadCommentaryDialog" ) ||
-         !Q_stricmp( command, "OpenLoadSingleplayerCommentaryDialog" ) ||
-         !Q_stricmp( command, "OpenAchievementsDialog" ) ||
-
-         //=============================================================================
-         // HPE_BEGIN:
-         // [dwenger] Use cs-specific achievements dialog
-         //=============================================================================
-
-		 !Q_stricmp( command, "OpenCSAchievementsDialog" ) )
-
-         //=============================================================================
-         // HPE_END
-         //=============================================================================
-
-	{
-		 return true;
-	}
-
-	return false;
-}
-
 #ifdef _WIN32
 //-------------------------
 // Purpose: Job wrapper
@@ -1763,60 +1724,6 @@ void CBasePanel::ExecuteAsync( CAsyncJobContext *pAsync )
 #endif
 }
 
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Whether this command requires the user be signed in
-//-----------------------------------------------------------------------------
-bool CBasePanel::CommandRequiresSignIn( const char *command )
-{
-	// Blech again!
-	if ( !Q_stricmp( command, "OpenAchievementsDialog" ) ||
-
-        //=============================================================================
-        // HPE_BEGIN:
-        // [dwenger] Use cs-specific achievements dialog
-        //=============================================================================
-
-         !Q_stricmp( command, "OpenCSAchievementsDialog" ) ||
-
-         //=============================================================================
-         // HPE_END
-         //=============================================================================
-
-         !Q_stricmp( command, "OpenLoadGameDialog" ) ||
-		 !Q_stricmp( command, "OpenSaveGameDialog" ) ||
-		 !Q_stricmp( command, "OpenRankingsDialog" ) )
-		return true;
-
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Whether the command requires the user to have a valid storage device
-//-----------------------------------------------------------------------------
-bool CBasePanel::CommandRequiresStorageDevice( const char *command )
-{
-	// Anything which touches the storage device must prompt
-	if ( !Q_stricmp( command, "OpenSaveGameDialog" ) ||
-		 !Q_stricmp( command, "OpenLoadGameDialog" ) )
-		return true;
-
-	return false;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Whether the command requires the user to have a valid profile selected
-//-----------------------------------------------------------------------------
-bool CBasePanel::CommandRespectsSignInDenied( const char *command )
-{
-	// Anything which touches the user profile must prompt
-	if ( !Q_stricmp( command, "OpenOptionsDialog" ) ||
-		 !Q_stricmp( command, "OpenControllerDialog" ) )
-		return true;
-
-	return false;
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: A storage device has been connected, update our settings and anything else
@@ -1925,11 +1832,7 @@ bool CBasePanel::ValidateStorageDevice( int *pStorageDeviceValidated )
 
 	if ( pStorageDeviceValidated )
 	{
-		if ( HandleStorageDeviceRequest( "" ) )
-			return true;
-
-		m_pStorageDeviceValidatedNotify = pStorageDeviceValidated;
-		return false;
+		return true;
 	}
 
 	return false;
@@ -1942,60 +1845,6 @@ bool CBasePanel::ValidateStorageDevice( int *pStorageDeviceValidated )
 bool CBasePanel::HandleSignInRequest( const char *command )
 {
 	return true;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *command - 
-//-----------------------------------------------------------------------------
-bool CBasePanel::HandleStorageDeviceRequest( const char *command )
-{
-	// If we don't have a valid sign-in, then we do nothing!
-	if ( m_bUserRefusedSignIn )
-		return true;
-
-	// If we have a valid storage device, there's nothing to prompt for
-	if ( XBX_GetStorageDeviceId() != XBX_INVALID_STORAGE_ID && XBX_GetStorageDeviceId() != XBX_STORAGE_DECLINED )
-		return true;
-
-	// If we have a post-prompt command, we're coming back into the call from that prompt
-	bool bQueuedCall = ( m_strPostPromptCommand.IsEmpty() == false );
-	
-	// Are we returning from a prompt?
-	if ( bQueuedCall && m_bStorageBladeShown )
-	{
-		// User has declined
-		if ( m_bUserRefusedStorageDevice )
-			return true;
-
-		// Prompt them
-		ShowMessageDialog( MD_PROMPT_STORAGE_DEVICE );
-		m_strPostPromptCommand = command;
-		
-		// Do not run the command
-		return false;
-	}
-	else
-	{
-		// If the user refused the sign-in and we respect that on this command, we're done
-		if ( m_bUserRefusedStorageDevice && CommandRespectsSignInDenied( command ) )
-			return true;
-
-		// If the message is required first, then do that instead
-		if ( CommandRequiresStorageDevice( command ) )
-		{
-			ShowMessageDialog( MD_PROMPT_STORAGE_DEVICE_REQUIRED );
-			m_strPostPromptCommand = command;
-			return false;
-		}
-
-		// This is a misnomer of the first order!
-		OnChangeStorageDevice();
-		m_strPostPromptCommand = command;
-		m_bStorageBladeShown = true;
-		m_bUserRefusedStorageDevice = false;
-		return false;
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -2642,7 +2491,6 @@ void CBasePanel::SystemNotification( const int notification )
 					if ( xboxsystem->DeviceCapacityAdequate( m_iStorageID, COM_GetModDirectory() ) == false )
 					{
 						ShowMessageDialog( MD_STORAGE_DEVICES_TOO_FULL, this );
-						m_bStorageBladeShown = false; // Show the blade again next time
 						m_strPostPromptCommand = ""; // Clear the buffer, we can't return
 					}
 					else
@@ -2681,7 +2529,6 @@ void CBasePanel::SystemNotification( const int notification )
 		{
 			// Done waiting
 			m_bWaitingForUserSignIn = false;
-			m_bUserRefusedSignIn = false;
 
 			// The UI has closed, so go off and revalidate the state
 			if ( m_strPostPromptCommand.IsEmpty() == false )

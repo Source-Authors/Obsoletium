@@ -283,7 +283,6 @@ protected:
 public:
 	// FIXME: This should probably become a friend relationship between the classes
 	bool HandleSignInRequest( const char *command );
-	bool HandleStorageDeviceRequest( const char *command );
 	void ClearPostPromptCommand( const char *pCompletedCommand );
 
 private:
@@ -316,11 +315,6 @@ private:
 	void CheckBonusBlinkState();
 	void UpdateGameMenus();
 	CGameMenu *RecursiveLoadGameMenu(KeyValues *datafile);
-
-	bool IsPromptableCommand( const char *command );
-	bool CommandRequiresSignIn( const char *command );
-	bool CommandRequiresStorageDevice( const char *command );
-	bool CommandRespectsSignInDenied( const char *command );
 
 	void QueueCommand( const char *pCommand );
 	void RunQueuedCommands();
@@ -385,10 +379,7 @@ private:
 	bool						m_bRestartFromInvite;
 	
 	// Used for internal state dealing with blades
-	bool						m_bUserRefusedSignIn;
-	bool						m_bUserRefusedStorageDevice;
 	bool						m_bWaitingForUserSignIn;
-	bool						m_bStorageBladeShown;
 	CUtlString					m_strPostPromptCommand;
 
 	// Storage device changing vars
