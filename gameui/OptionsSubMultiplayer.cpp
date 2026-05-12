@@ -843,7 +843,7 @@ void CrosshairImagePanelAdvanced::Paint()
 				frame++;
 				if ( frame >= m_nNumFrames )
 				{
-					m_bAscending = !m_bAscending;
+					m_bAscending = false;
 					frame--;
 				}
 			}
@@ -852,7 +852,7 @@ void CrosshairImagePanelAdvanced::Paint()
 				frame--;
 				if ( frame < 0 )
 				{
-					m_bAscending = !m_bAscending;
+					m_bAscending = true;
 					frame++;
 				}
 			}
