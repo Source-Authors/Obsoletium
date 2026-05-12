@@ -1285,8 +1285,8 @@ size_t CWin32ReadOnlyFile::FS_fread( OUT_BYTECAP(destSize) void *dest, size_t de
 			// not properly aligned, snap to alignments
 			// attempt to perform single unbuffered operation using stack buffer
 			int64 alignedOffset = AlignValue( ( m_ReadPos - m_SectorSize ) + 1, m_SectorSize );
-			unsigned int alignedBytesToRead = AlignValue( ( m_ReadPos - alignedOffset ) + size, m_SectorSize );
-			if ( alignedBytesToRead <= sizeof( tempBuffer ) - destBaseAlign )
+			const unsigned int alignedBytesToRead = AlignValue( ( m_ReadPos - alignedOffset ) + size, m_SectorSize );
+			if ( alignedBytesToRead + destBaseAlign <= sizeof( tempBuffer ) )
 			{
 				// read operation can be performed as unbuffered follwed by a post fixup
 				nBytesToRead = alignedBytesToRead;
