@@ -339,7 +339,7 @@ bool CContentControlDialog::DisablePassword(const char *oldPW)
 	char digestedPW[ 128 ];
     HashPassword(oldPW, digestedPW, sizeof( digestedPW ) );
 
-    if( stricmp( m_szGorePW, digestedPW ) )
+    if( stricmp( m_szGorePW, digestedPW ) ) //-V526
     {
         Explain( "#GameUI_IncorrectPassword" );
         return false;

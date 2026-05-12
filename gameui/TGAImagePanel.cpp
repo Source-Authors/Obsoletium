@@ -18,7 +18,7 @@ CTGAImagePanel::CTGAImagePanel( vgui::Panel *parent, const char *name, int maxWi
 	m_iTextureID = -1;
 	m_iImageMaxWidth = maxWidth != -1 ? maxWidth : std::numeric_limits<int>::max();
 	m_iImageMaxHeight = maxHeight != -1 ? maxHeight : std::numeric_limits<int>::max();
-	m_iImageRealWidth = m_iImageRealHeight = 0;
+	m_iImageRealWidth = m_iImageRealHeight = 0; //-V537
 	m_bHasValidTexture = false;
 	m_bLoadedTexture = false;
 	m_szTGAName[0] = 0;
