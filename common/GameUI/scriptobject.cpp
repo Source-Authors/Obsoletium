@@ -548,7 +548,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 	case O_OBSOLETE:
 	case O_BOOL:
 		// Parse the next {
-		*pBuffer = engine->ParseFile( *pBuffer, token );
+		*pBuffer = engine->ParseFile( *pBuffer, token ); //-V1037
 		if ( Q_isempty( token ) )
 			return false;
 
