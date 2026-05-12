@@ -572,10 +572,13 @@ CDialogMenu::CDialogMenu() : BaseClass( NULL, "DialogMenu" )
 
 	m_pParent			= NULL;
 	m_pHeader			= NULL;
+	m_pScheme			= NULL;
+	m_szFilter[0]		= '\0';
 	m_bUseFilter		= false;
 	m_bHasHeader		= false;
 	m_nItemSpacing		= 0;
 	m_nMinWide			= 0;
+	m_bInitialized		= false;
 	m_nActive			= -1;
 	m_nActiveColumn		= -1;
 	m_nBaseRowIdx		= 0;
