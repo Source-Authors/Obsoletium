@@ -770,7 +770,7 @@ void CMatchmakingBasePanel::LoadSessionProperties()
 
 	// Cache off the map name
 	const char *pDiskName = NULL;
-	KeyValues *pName = m_pSessionKeys->FindKey( "MapDiskNames" );
+	KeyValues *pName = m_pSessionKeys ? m_pSessionKeys->FindKey( "MapDiskNames" ) : nullptr;
 	if ( pName )
 	{
 		KeyValues *pScenario = m_pSessionKeys->FindKey( "CONTEXT_SCENARIO" );
