@@ -930,7 +930,8 @@ void CNewGameDialog::AnimateSelectionPanels( void )
 	{
 		if ( m_PanelIndex[i] != INVALID_INDEX )
 		{
-			int nextIdx = i + idxOffset;
+			// dimhotepus: Clamp next idx to bounds.
+			int nextIdx = clamp( i + idxOffset, 0, NUM_SLOTS - 1 );
 			CGameChapterPanel *panel = m_ChapterPanels[ m_PanelIndex[i] ];
 			GetAnimationController()->RunAnimationCommand( panel, "xpos",  m_PanelXPos[nextIdx],  0, m_ScrollSpeed, vgui::AnimationController::INTERPOLATOR_LINEAR );
 			GetAnimationController()->RunAnimationCommand( panel, "ypos",  m_PanelYPos[nextIdx],  0, m_ScrollSpeed, vgui::AnimationController::INTERPOLATOR_LINEAR );

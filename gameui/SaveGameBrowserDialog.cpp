@@ -761,8 +761,9 @@ void CSaveGameBrowserDialog::AnimateSelectionPanels( void )
 		// Don't animate the special panel, just skip it
 		if ( m_PanelIndex[i] == m_nDeletedPanel )
 			continue;
-
-		int nNextIdx = i+idxOffset;
+		
+		// dimhotepus: Clamp next idx to bounds.
+		int nNextIdx = clamp( i + idxOffset, 0, NUM_SLOTS - 1 );
 		if ( m_PanelIndex[i] != INVALID_INDEX )
 		{
 			PerformSlideAction( i, nNextIdx );
