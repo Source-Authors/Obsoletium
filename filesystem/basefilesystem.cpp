@@ -1991,9 +1991,7 @@ public:
 		m_AbsolutePath[0] = '\0';
 	}
 	
-	~CFileOpenInfo()
-	{
-	}
+	~CFileOpenInfo() = default;
 	
 	void SetAbsolutePath( const char *pFormat, ... )
 	{
