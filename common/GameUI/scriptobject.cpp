@@ -465,7 +465,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 	if ( Q_isempty( token ) )
 		return false;
 
-	if ( strcmp( token, "{" ) )
+	if ( strcmp( token, "{" ) ) //-V526
 	{
 		Msg( "Expecting '{', got '%s'", token );
 		return false;
@@ -486,7 +486,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 		return false;
 
 	// If it's not a {, consider it the optional tooltip
-	if ( strcmp( token, "{" ) )
+	if ( strcmp( token, "{" ) ) //-V526
 	{
 		V_strcpy_safe( tooltip, token );
 
@@ -496,7 +496,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 			return false;
 	}
 
-	if ( strcmp( token, "{" ) )
+	if ( strcmp( token, "{" ) ) //-V526
 	{
 		Msg( "Expecting '{', got '%s'", token );
 		return false;
@@ -525,9 +525,9 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 		*pBuffer = engine->ParseFile( *pBuffer, token );
 		if ( Q_isempty( token ) )
 			return false;
-		if ( strcmp( token, "}" ) )
+		if ( strcmp( token, "}" ) ) //-V526
 		{
-			Msg( "Expecting '{', got '%s'", token );
+			Msg( "Expecting '}', got '%s'", token );
 			return false;
 		}
 
@@ -535,9 +535,9 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 		*pBuffer = engine->ParseFile( *pBuffer, token );
 		if ( Q_isempty( token ) )
 			return false;
-		if ( strcmp( token, "}" ) )
+		if ( strcmp( token, "}" ) ) //-V526
 		{
-			Msg( "Expecting '{', got '%s'", token );
+			Msg( "Expecting '}', got '%s'", token );
 			return false;
 		}
 		return true;
@@ -552,9 +552,9 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 		if ( Q_isempty( token ) )
 			return false;
 
-		if ( strcmp( token, "}" ) )
+		if ( strcmp( token, "}" ) ) //-V526
 		{
-			Msg( "Expecting '{', got '%s'", token );
+			Msg( "Expecting '}', got '%s'", token );
 			return false;
 		}
 		break;
@@ -587,9 +587,9 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 		if ( Q_isempty( token ) )
 			return false;
 
-		if ( strcmp( token, "}" ) )
+		if ( strcmp( token, "}" ) ) //-V526
 		{
-			Msg( "Expecting '{', got '%s'", token );
+			Msg( "Expecting '}', got '%s'", token );
 			return false;
 		}
 		break;
@@ -599,9 +599,9 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 		if ( Q_isempty( token ) )
 			return false;
 
-		if ( strcmp( token, "}" ) )
+		if ( strcmp( token, "}" ) ) //-V526
 		{
-			Msg( "Expecting '{', got '%s'", token );
+			Msg( "Expecting '}', got '%s'", token );
 			return false;
 		}
 		break;
@@ -652,7 +652,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 	if ( Q_isempty( token ) )
 		return false;
 
-	if ( strcmp( token, "{" ) )
+	if ( strcmp( token, "{" ) ) //-V526
 	{
 		Msg( "Expecting '{', got '%s'", token );
 		return false;
@@ -680,9 +680,9 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 	if ( Q_isempty( token ) )
 		return false;
 
-	if ( strcmp( token, "}" ) )
+	if ( strcmp( token, "}" ) ) //-V526
 	{
-		Msg( "Expecting '{', got '%s'", token );
+		Msg( "Expecting '}', got '%s'", token );
 		return false;
 	}
 
@@ -700,9 +700,9 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 			return false;
 	}
 
-	if ( strcmp( token, "}" ) )
+	if ( strcmp( token, "}" ) ) //-V526
 	{
-		Msg( "Expecting '{', got '%s'", token );
+		Msg( "Expecting '}', got '%s'", token );
 		return false;
 	}
 	
@@ -786,7 +786,7 @@ bool CDescription::ReadFromBuffer( const char **pBuffer, bool bAllowNewObject )
 		return false;
 
 	// Read VERSION #
-	if ( stricmp ( token, "VERSION" ) )
+	if ( stricmp ( token, "VERSION" ) ) //-V526
 	{
 		Msg( "Expecting 'VERSION', got '%s'", token );
 		return false;
@@ -816,7 +816,7 @@ bool CDescription::ReadFromBuffer( const char **pBuffer, bool bAllowNewObject )
 		return false;
 
 	// Read DESCRIPTION
-	if ( stricmp ( token, "DESCRIPTION" ) )
+	if ( stricmp ( token, "DESCRIPTION" ) ) //-V526
 	{
 		Msg( "Expecting 'DESCRIPTION', got '%s'", token );
 		return false;
@@ -830,7 +830,7 @@ bool CDescription::ReadFromBuffer( const char **pBuffer, bool bAllowNewObject )
 		return false;
 	}
 
-	if ( stricmp ( token, m_pszDescriptionType ) )
+	if ( stricmp ( token, m_pszDescriptionType ) ) //-V526
 	{
 		Msg( "Expecting %s, got %s", m_pszDescriptionType, token );
 		return false;
@@ -841,7 +841,7 @@ bool CDescription::ReadFromBuffer( const char **pBuffer, bool bAllowNewObject )
 	if ( Q_isempty( token ) )
 		return false;
 
-	if ( strcmp( token, "{" ) )
+	if ( strcmp( token, "{" ) ) //-V526
 	{
 		Msg( "Expecting '{', got '%s'", token );
 		return false;
