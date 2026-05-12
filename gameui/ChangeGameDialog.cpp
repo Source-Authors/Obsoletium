@@ -72,6 +72,8 @@ void CChangeGameDialog::LoadModList()
 	HANDLE hResult = FindFirstFile(szSearchPath, &wfd);
 	if (hResult != INVALID_HANDLE_VALUE)
 	{
+		RunCodeAtScopeExit( FindClose( hResult ));
+
 		while (true)
 		{
 			if ((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && (Q_strnicmp(wfd.cFileName, ".", 1)))
@@ -114,8 +116,6 @@ void CChangeGameDialog::LoadModList()
 			if (!FindNextFile(hResult, &wfd))
 				break;
 		}
-		
-		FindClose(hResult);
 	}
 }
 
