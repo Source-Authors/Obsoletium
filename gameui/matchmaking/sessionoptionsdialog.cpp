@@ -21,8 +21,11 @@ CSessionOptionsDialog::CSessionOptionsDialog( vgui::Panel *pParent ) : BaseClass
 {
 	SetDeleteSelfOnClose( true );
 
-	m_pDialogKeys = NULL;
+	m_szCommand[0] = '\0';
+	m_szGametype[0] = '\0';
 	m_bModifySession = false;
+	m_pDialogKeys = NULL;
+	m_pRecommendedLabel = NULL;
 }
 
 CSessionOptionsDialog::~CSessionOptionsDialog()
