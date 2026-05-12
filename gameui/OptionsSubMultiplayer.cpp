@@ -224,7 +224,8 @@ void CrosshairImagePanelSimple::Paint()
 	int centerY = tall / 2;
 	int iCrosshairDistance = m_barGap;
 
-	int iBarThickness = 1;
+	// dimhotepus: Scale UI.
+	int iBarThickness = QuickPropScale( 1 );
 	int iBarSize = m_barSize;
 
 	// draw horizontal crosshair lines
