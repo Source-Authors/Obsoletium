@@ -1578,11 +1578,12 @@ void COptionsSubMultiplayer::RemapModel()
 	if( pModelName == NULL )
 		return;
 
-	char texture[ 256 ];
-	Q_snprintf ( texture, sizeof( texture ), "vgui/playermodels/%s", pModelName );
-	texture[ strlen( texture ) - 4 ] = 0;
+	char texture[ 256 ], textureName[ 256 ];
+	V_sprintf_safe ( texture, "vgui/playermodels/%s", pModelName );
+	// dimhotepus: Correct way to strip extension.
+	V_StripExtension( texture, textureName );
 
-	m_pModelImage->setTexture( texture );
+	m_pModelImage->setTexture( textureName );
 }
 
 
