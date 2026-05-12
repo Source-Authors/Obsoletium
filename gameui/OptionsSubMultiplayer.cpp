@@ -909,7 +909,6 @@ void CrosshairImagePanelAdvanced::InitAdvCrosshairStyleList()
 {
 	// Find out images
 	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
-	char directory[ 512 ];
 
 	ConVarRef cl_crosshair_file( "cl_crosshair_file", true );
 	if ( !cl_crosshair_file.IsValid() )
@@ -923,30 +922,31 @@ void CrosshairImagePanelAdvanced::InitAdvCrosshairStyleList()
 	}
 
 	char crosshairfile[256];
-	Q_snprintf( crosshairfile, sizeof(crosshairfile), "materials/vgui/crosshairs/%s.vtf", cl_crosshair_file.GetString() );
-
-	Q_snprintf( directory, sizeof( directory ), "materials/vgui/crosshairs/*.vtf" );
+	V_sprintf_safe( crosshairfile, "materials/vgui/crosshairs/%s.vtf", cl_crosshair_file.GetString() );
+	
+	char directory[ 512 ];
+	V_sprintf_safe( directory, "materials/vgui/crosshairs/*.vtf" );
 	const char *fn = g_pFullFileSystem->FindFirst( directory, &fh );
 	int i = 0, initialItem = 0; 
 	while (fn)
 	{
 		char filename[ 512 ];
-		Q_snprintf( filename, sizeof(filename), "materials/vgui/crosshairs/%s", fn );
-		if ( strlen( filename ) >= 4 )
+		V_sprintf_safe( filename, "materials/vgui/crosshairs/%s", fn );
+		if ( size_t len = strlen( filename ); len >= 4 )
 		{
-			filename[ strlen( filename ) - 4 ] = 0;
-			Q_strncat( filename, ".vmt", sizeof( filename ), COPY_ALL_CHARACTERS );
+			filename[ len - 4 ] = '\0';
+			V_strcat_safe( filename, ".vmt", COPY_ALL_CHARACTERS );
 			if ( g_pFullFileSystem->FileExists( filename ) )
 			{
 				// strip off the extension
-				Q_strncpy( filename, fn, sizeof( filename ) );
+				V_strcpy_safe( filename, fn );
 				filename[ strlen( filename ) - 4 ] = 0;
 				m_pAdvCrosshairStyle->AddItem( filename, "" );
 
 				// check to see if this is the one we have set
-				if ( crosshairfile[0] )
+				if ( !Q_isempty( crosshairfile ) )
 				{
-					Q_snprintf( filename, sizeof(filename), "materials/vgui/crosshairs/%s", fn );
+					V_sprintf_safe( filename, "materials/vgui/crosshairs/%s", fn );
 					if (!stricmp(filename, crosshairfile))
 					{
 						if ( ModInfo().AdvCrosshairLevel() == 1 )
@@ -1350,9 +1350,9 @@ void COptionsSubMultiplayer::InitLogoList( CLabeledCommandComboBox *cb )
 	{
 		char filename[ 512 ];
 		Q_snprintf( filename, sizeof(filename), "materials/vgui/logos/%s", fn );
-		if ( strlen( filename ) >= 4 )
+		if ( size_t len = strlen( filename ); len >= 4 )
 		{
-			filename[ strlen( filename ) - 4 ] = 0;
+			filename[ len - 4 ] = 0;
 			Q_strncat( filename, ".vmt", sizeof( filename ), COPY_ALL_CHARACTERS );
 			if ( g_pFullFileSystem->FileExists( filename ) )
 			{
@@ -1471,9 +1471,9 @@ void FindVMTFilesInFolder( const char *pFolder, const char *pFolderName, CLabele
 
 		char filename[ 512 ];
 		Q_snprintf( filename, sizeof(filename), "%s/%s", pFolder, fn );
-		if ( strlen( filename ) >= 4 )
+		if ( size_t len = strlen( filename ); len >= 4 )
 		{
-			filename[ strlen( filename ) - 4 ] = 0;
+			filename[ len - 4 ] = 0;
 			Q_strncat( filename, ".vmt", sizeof( filename ), COPY_ALL_CHARACTERS );
 			if ( g_pFullFileSystem->FileExists( filename ) )
 			{
