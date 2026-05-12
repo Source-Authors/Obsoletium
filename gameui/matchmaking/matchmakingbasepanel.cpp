@@ -568,55 +568,13 @@ void CMatchmakingBasePanel::SystemNotification( const int notification )
 //-----------------------------------------------------------------------------
 bool CMatchmakingBasePanel::ValidateSigninAndStorage( bool bOnlineRequired, const char *pIssuingCommand )
 {
-	// Check the signin state of the primary user
-	bool bSignedIn = false;
-	bool bOnlineEnabled = false;
-	bool bOnlineSignedIn = false;
-
-#if defined( _X360 )
-	int userIdx = XBX_GetPrimaryUserId();
-	if ( userIdx != INVALID_USER_ID )
-	{
-		XUSER_SIGNIN_INFO info;
-		uint ret = XUserGetSigninInfo( userIdx, 0, &info );
-		if ( ret == ERROR_SUCCESS )
-		{
-			bSignedIn = true;
-			if ( info.dwInfoFlags & XUSER_INFO_FLAG_LIVE_ENABLED )
-			{
-				bOnlineEnabled = true;
-				uint state = XUserGetSigninState( XBX_GetPrimaryUserId() );
-				if ( state == eXUserSigninState_SignedInToLive )
-				{
-					bOnlineSignedIn = true;
-
-					// Check privileges
-					BOOL bPrivCheck = false;
-					DWORD dwPrivCheck = XUserCheckPrivilege( userIdx, XPRIVILEGE_MULTIPLAYER_SESSIONS, &bPrivCheck );
-					if ( ERROR_SUCCESS != dwPrivCheck ||
-						 !bPrivCheck )
-					{
-						bOnlineEnabled = false;
-					}
-				}
-			}
-		}
-	}
-#endif
-
-	if ( bOnlineRequired && !bOnlineEnabled )
+	if ( bOnlineRequired )
 	{
 		// Player must sign in an online account 
 		GameUI().ShowMessageDialog( MD_NOT_ONLINE_ENABLED );
 		return false;
 	}
-	else if ( bOnlineRequired && !bOnlineSignedIn )
-	{
-		// Player's live account isn't signed in to live 
-		GameUI().ShowMessageDialog( MD_NOT_ONLINE_SIGNEDIN );
-		return false;
-	}
-	else if ( !bSignedIn )
+	else
 	{
 		// Eat the input and make the user sign in
 		xboxsystem->ShowSigninUI( 1, 0 ); // One user, no special flags
