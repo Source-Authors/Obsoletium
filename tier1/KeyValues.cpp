@@ -1366,8 +1366,10 @@ int KeyValues::GetInt( const char *keyName, int defaultValue )
 			// can't convert, since it would lose data
 			Assert(0);
 			return 0;
-		case TYPE_INT:
+		// dimhotepus: Correctly read int from pointer.
 		case TYPE_PTR:
+			return static_cast<int>(reinterpret_cast<intp>(dat->m_pValue));
+		case TYPE_INT:
 		default:
 			return dat->m_iValue;
 		}
@@ -1399,8 +1401,10 @@ uint64 KeyValues::GetUint64( const char *keyName, uint64 defaultValue )
 			V_memcpy( &value, dat->m_sValue, sizeof(uint64) );
 			return value;
 		}
-		case TYPE_INT:
+		// dimhotepus: Correctly read uint64 from pointer.
 		case TYPE_PTR:
+			return static_cast<uint64>(reinterpret_cast<uintp>(dat->m_pValue));
+		case TYPE_INT:
 		default:
 			return dat->m_iValue;
 		}
