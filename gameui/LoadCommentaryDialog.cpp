@@ -202,7 +202,7 @@ void CLoadCommentaryDialog::OnCommand( const char *command )
 		if ( m_CommentaryItems.IsValidIndex(itemIndex) )
 		{
 			const char *mapName = m_CommentaryItems[itemIndex].szMapName;
-			if ( mapName && mapName[ 0 ] )
+			if ( !Q_isempty( mapName ) )
 			{
 				// Load the game, return to top and switch to engine
 				char sz[ 256 ];
