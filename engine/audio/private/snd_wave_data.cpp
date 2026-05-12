@@ -512,14 +512,21 @@ void CAsyncWaveData::StartAsyncLoading( const asyncwaveparams_t& params )
 	m_nReadSize = 0;
 	m_bPostProcessed = false;
 
-	// The async layer creates a copy of this string, ok to send a local reference
-	m_async.pszFilename	= szFilename;
+	// dimhotepus: The async layer creates a copy of this string, ok to send a local reference.
+	// dimhotepus: But to ensure correctness let's copy.
+	char *szFileNameStorage = strdup( szFilename );
+	m_async.pszFilename	= szFileNameStorage;
 
-	MEM_ALLOC_CREDIT();
-	
-	// Commence async I/O
-	Assert( !m_hAsyncControl );
-	g_pFileSystem->AsyncRead( m_async, &m_hAsyncControl );
+	{
+		MEM_ALLOC_CREDIT();
+
+		// Commence async I/O
+		Assert( !m_hAsyncControl );
+		g_pFileSystem->AsyncRead( m_async, &m_hAsyncControl );
+	}
+
+	free( szFileNameStorage );
+	m_async.pszFilename = nullptr;
 }
 
 //-----------------------------------------------------------------------------
