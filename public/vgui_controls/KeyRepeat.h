@@ -31,10 +31,8 @@ public:
 	CKeyRepeatHandler()
 	{
 		Reset();
-		for ( auto &t : m_flRepeatTimes )
-		{
-			t = 0.16;
-		}
+		static_assert(std::numeric_limits<double>::is_iec559);
+		BitwiseClear( m_flRepeatTimes );
 		m_flNextKeyRepeat = 0.0;
 	}
 
