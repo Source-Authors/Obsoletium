@@ -181,7 +181,7 @@ void CMultiplayerAdvancedDialog::GatherCurrentValues()
 			V_sprintf_safe( szValue, "%s", pBox->IsSelected() ? "1" : "0" );
 			break;
 		case O_NUMBER:
-			pEdit = ( TextEntry * )pList->pControl;
+			pEdit = ( TextEntry * )pList->pControl; //-V1037
 			pEdit->GetText( strValue );
 			V_sprintf_safe( szValue, "%s", strValue );
 			break;

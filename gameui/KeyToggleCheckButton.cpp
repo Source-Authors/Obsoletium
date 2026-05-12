@@ -23,7 +23,7 @@ CKeyToggleCheckButton::CKeyToggleCheckButton( Panel *parent, const char *panelNa
 	m_pszCmdName = cmdname ? strdup( cmdname ) : NULL;
 	m_bStartValue = false;
 
-	if (m_pszKeyName)
+	if (m_pszKeyName) //-V1051
 	{
 		Reset();
 	}
