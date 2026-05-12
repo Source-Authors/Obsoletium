@@ -255,7 +255,7 @@ void CCvarSlider::SetSliderValue(float fValue)
     // remember this slider value
     m_iLastSliderValue = GetValue();
 
-    if (m_fCurrentValue != fValue)
+    if (m_fCurrentValue != fValue) //-V1051
     {
         m_fCurrentValue = fValue;
         m_bModifiedOnce = true;
