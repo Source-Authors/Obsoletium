@@ -579,8 +579,6 @@ int SaveReadNameAndComment( FileHandle_t f,	OUT_Z_CAP(nameSize) char *name,	int 
 			while( *pData++ );				// Find next token (after next null)
 		}
 	}
-	else
-		pTokenList = NULL;
 
 	// short, short (size, index of field name)
 	nFieldSize = *(short *)pData;
