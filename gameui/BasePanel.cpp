@@ -1553,9 +1553,10 @@ void CBasePanel::RunMenuCommand(const char *command)
 	{
 		vgui::surface()->RestrictPaintToSinglePanel(NULL);
 	}
-	else if ( Q_stristr( command, "engine " ) )
+	else if ( const char *pszEngineCmd = V_stristr( command, "engine " ) )
 	{
-		const char *engineCMD = strstr( command, "engine " ) + std::size( "engine " ) - 1;
+		// dimhotepus: Correctly handle case-insensitive engine command.
+		const char *engineCMD = pszEngineCmd + std::size( "engine " ) - 1;
 		if ( engineCMD && engineCMD[0] )
 		{
 			engine->ClientCmd_Unrestricted( const_cast<char *>( engineCMD ) );
