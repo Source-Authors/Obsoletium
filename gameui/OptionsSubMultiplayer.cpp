@@ -168,19 +168,16 @@ void CrosshairImagePanelSimple::InitCrosshairSizeList()
 //-----------------------------------------------------------------------------
 void CrosshairImagePanelSimple::InitCrosshairColorEntries()
 {
-	if (m_pCrosshairColorCombo != NULL)
+	KeyValuesAD data("data");
+
+	// add in the "Default" selection
+	data->Clear();
+
+	// add in the colors for the color list
+	for ( int i = 0; i < NumCrosshairColors; i++ )
 	{
-		KeyValuesAD data("data");
-
-		// add in the "Default" selection
-		data->Clear();
-
-		// add in the colors for the color list
-		for ( int i = 0; i < NumCrosshairColors; i++ )
-		{
-			data->SetInt("color", i);
-			m_pCrosshairColorCombo->AddItem( s_crosshairColors[ i ].name, data);
-		}
+		data->SetInt("color", i);
+		m_pCrosshairColorCombo->AddItem( s_crosshairColors[ i ].name, data);
 	}
 }
 
@@ -263,12 +260,8 @@ void CrosshairImagePanelSimple::UpdateCrosshair()
 	int colorIndex = data->GetInt("color");
 	colorIndex = clamp( colorIndex, 0, NumCrosshairColors );
 
-	int selectedColor = 0;
 	int actualVal = 0;
-	if (m_pCrosshairColorCombo != NULL)
-	{
-		selectedColor = m_pCrosshairColorCombo->GetActiveItem();
-	}
+	int selectedColor = m_pCrosshairColorCombo->GetActiveItem();
 
 	ConVarRef cl_crosshaircolor( "cl_crosshaircolor", true );
 	if ( cl_crosshaircolor.IsValid() )
@@ -386,12 +379,9 @@ void CrosshairImagePanelSimple::ApplyChanges()
 	char cmd[256];
 	cmd[0] = 0;
 
-	if (m_pCrosshairColorCombo != NULL)
-	{
-		int val = m_pCrosshairColorCombo->GetActiveItem();
-		Q_snprintf( cmd, sizeof(cmd), "cl_crosshaircolor %d\n", val );
-		engine->ClientCmd_Unrestricted( cmd );
-	}
+	int val = m_pCrosshairColorCombo->GetActiveItem();
+	Q_snprintf( cmd, sizeof(cmd), "cl_crosshaircolor %d\n", val );
+	engine->ClientCmd_Unrestricted( cmd );
 }
 
 
