@@ -489,6 +489,7 @@ void CBonusMapsDialog::RefreshMedalDisplay( BonusMapDescription_t *pMap )
 	}
 
 	char szBuff[ 512 ];
+	szBuff[0] = '\0';
 
 	int iChallenge = GetSelectedChallenge();
 
