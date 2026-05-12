@@ -274,7 +274,8 @@ void COptionsSubAudio::OnApplyChanges()
 		Snd_PitchQuality.SetValue(false);
 		break;
 	default:
-		Assert("Undefined sound quality setting.");
+		Assert("Undefined sound quality setting. Fallback to high quality");
+		[[fallthrough]];
 	case SOUNDQUALITY_HIGH:
 		dsp_slow_cpu.SetValue(false);
 		Snd_PitchQuality.SetValue(true);
