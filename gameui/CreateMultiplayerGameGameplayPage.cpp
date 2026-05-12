@@ -114,7 +114,7 @@ const char *CCreateMultiplayerGameGameplayPage::GetValue(const char *cvarName, c
 		if (control && !stricmp(mp->GetName(), cvarName))
 		{
 			KeyValuesAD data("GetText");
-			if (control && control->RequestInfo(data))
+			if (control->RequestInfo(data))
 			{
 				V_strcpy_safe(buf, data->GetString("text", defaultValue));
 			}
