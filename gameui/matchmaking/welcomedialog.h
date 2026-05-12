@@ -25,9 +25,6 @@ public:
 	void	PerformLayout( void ) override;
 	void	OnCommand( const char *pCommand ) override;
 	void	OnKeyCodePressed( vgui::KeyCode code ) override;
-
-private:
-	bool	m_bOnlineEnabled;
 };
 
 
