@@ -67,18 +67,20 @@ public:
 	// which are about to be destroyed. It can also be explicitly invoked with
 	// std::move().
 	CUtlString( CUtlString&& rhs ) noexcept
+		: m_pString{std::move(rhs.m_pString)}
 	{
 		// Move the string pointer from the source to this -- be sure to
 		// zero out the source to avoid double frees.
-		m_pString = rhs.m_pString;
 		rhs.m_pString = nullptr;
 	}
 	CUtlString& operator=( CUtlString&& rhs ) noexcept
 	{
+		using std::swap;
+
 		// Move the string pointer from the source to this -- be sure to
 		// zero out the source to avoid double frees.
 		// dimhotepus: Current string should be disposed when source does.
-		std::swap( m_pString, rhs.m_pString );
+		swap( m_pString, rhs.m_pString );
 		return *this;
 	}
 

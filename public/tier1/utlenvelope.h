@@ -18,9 +18,13 @@ class CUtlDataEnvelope
 public:
 	CUtlDataEnvelope( const void *pData, intp nBytes );
 	CUtlDataEnvelope( const CUtlDataEnvelope &from );
+	// dimhotepus: Move support.
+	CUtlDataEnvelope( CUtlDataEnvelope &&from ) noexcept;
 	~CUtlDataEnvelope();
 
 	CUtlDataEnvelope &operator=( const CUtlDataEnvelope &from );
+	// dimhotepus: Move support.
+	CUtlDataEnvelope &operator=( CUtlDataEnvelope &&from ) noexcept;
 
 	[[nodiscard]] operator void *();
 	[[nodiscard]] operator void *() const;
@@ -48,8 +52,12 @@ class CUtlEnvelope : protected CUtlDataEnvelope
 public:
 	CUtlEnvelope( const T *pData, intp nElems = 1 );
 	CUtlEnvelope( const CUtlEnvelope<T> &from );
+	// dimhotepus: Move support.
+	CUtlEnvelope( CUtlEnvelope<T> &&from ) noexcept;
 
 	CUtlEnvelope<T> &operator=( const CUtlEnvelope<T> &from );
+	// dimhotepus: Move support.
+	CUtlEnvelope<T> &operator=( CUtlEnvelope<T> &&from ) noexcept;
 
 	[[nodiscard]] operator T *();
 	[[nodiscard]] operator T *() const;
@@ -70,11 +78,28 @@ public:
 	}
 
 	CUtlEnvelope( const CUtlEnvelope<const char *> &from )
+		: m_string{from.m_string}
 	{
-		m_string = from.m_string;
 	}
 
-	CUtlEnvelope<const char *> &operator=( const CUtlEnvelope<const char *> &from ) = default;
+	CUtlEnvelope( CUtlEnvelope<const char *> &&from ) noexcept
+		: m_string{std::move(from.m_string)}
+	{
+	}
+
+	CUtlEnvelope<const char *> &operator=( const CUtlEnvelope<const char *> &from )
+	{
+		m_string = from.m_string;
+		return *this;
+	}
+	
+	CUtlEnvelope<const char *> &operator=( CUtlEnvelope<const char *> &&from ) noexcept
+	{
+		using std::swap;
+
+		swap( m_string, from.m_string );
+		return *this;
+	}
 
 	[[nodiscard]] operator char *()
 	{
@@ -148,6 +173,13 @@ inline CUtlDataEnvelope::CUtlDataEnvelope( const CUtlDataEnvelope &from )
 	Assign( from );
 }
 
+inline CUtlDataEnvelope::CUtlDataEnvelope( CUtlDataEnvelope &&from ) noexcept
+	: m_pData{std::move(from.m_pData)}, m_nBytes{std::move(from.m_nBytes)}
+{
+	from.m_pData = nullptr;
+	from.m_nBytes = 0;
+}
+
 inline CUtlDataEnvelope::~CUtlDataEnvelope()
 {
 	Purge();
@@ -157,6 +189,15 @@ inline CUtlDataEnvelope &CUtlDataEnvelope::operator=( const CUtlDataEnvelope &fr
 {
 	Purge();
 	Assign( from );
+	return *this;
+}
+
+inline CUtlDataEnvelope &CUtlDataEnvelope::operator=( CUtlDataEnvelope &&from ) noexcept
+{
+	using std::swap;
+	
+	std::swap( m_pData, from.m_pData );
+	std::swap( m_nBytes, from.m_nBytes );
 	return *this;
 }
 
@@ -192,13 +233,26 @@ template <typename T>
 inline CUtlEnvelope<T>::CUtlEnvelope( const CUtlEnvelope<T> &from )
 	: CUtlDataEnvelope( from )
 {
-	
+}
+
+template <typename T>
+inline CUtlEnvelope<T>::CUtlEnvelope( CUtlEnvelope<T> &&from ) noexcept
+	: CUtlDataEnvelope( std::move( from ) )
+{
 }
 
 template <typename T>
 inline CUtlEnvelope<T> &CUtlEnvelope<T>::operator=( const CUtlEnvelope<T> &from )
 {
 	CUtlDataEnvelope::operator=( from );
+	return *this;
+}
+
+
+template <typename T>
+inline CUtlEnvelope<T> &CUtlEnvelope<T>::operator=( CUtlEnvelope<T> &&from ) noexcept
+{
+	CUtlDataEnvelope::operator=( std::move(from) );
 	return *this;
 }
 
