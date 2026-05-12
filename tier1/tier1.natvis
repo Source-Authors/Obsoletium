@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <!-- tier1/KeyValues.h -->
+
+  <Type Name="KeyValues">
+    <Intrinsic Name="type" Expression="(int)m_iDataType" />
+    <DisplayString Condition="type() == 0">{{empty}}</DisplayString>
+    <DisplayString Condition="type() == 1">{m_sValue}</DisplayString>
+    <DisplayString Condition="type() == 2">{m_iValue}</DisplayString>
+    <DisplayString Condition="type() == 3">{m_flValue}</DisplayString>
+    <DisplayString Condition="type() == 4">{m_pValue}</DisplayString>
+    <DisplayString Condition="type() == 5">{m_wsValue}</DisplayString>
+    <DisplayString Condition="type() == 6">({(int)m_Color[0]}, {(int)m_Color[1]}, {(int)m_Color[2]}, {(int)m_Color[3]})</DisplayString>
+    <DisplayString Condition="type() == 7">{GetUint64(nullptr, -1)}</DisplayString>
+    <Expand>
+      <Item Name="[key_name]">GetName()</Item>
+      <Item Condition="type() == 1" Name="[value]">m_sValue</Item>
+      <Item Condition="type() == 2" Name="[value]">m_iValue</Item>
+      <Item Condition="type() == 3" Name="[value]">m_flValue</Item>
+      <Item Condition="type() == 4" Name="[value]">m_pValue</Item>
+      <Item Condition="type() == 5" Name="[value]">m_wsValue</Item>
+      <Item Condition="type() == 6" Name="[value]">((int)m_Color[0], (int)m_Color[1], (int)m_Color[2], (int)m_Color[3])</Item>
+      <Item Condition="type() == 7" Name="[value]">GetUint64(nullptr, -1)</Item>
+      <Item Name="[has_escape_sequences]">(bool)m_bHasEscapeSequences</Item>
+      <Item Name="[evaluate_conditionals]">(bool)m_bEvaluateConditionals</Item>
+      <Item Condition="m_pPeer != nullptr" Name="[next]">m_pPeer</Item>
+      <Item Condition="m_pSub != nullptr" Name="[sub]">m_pSub</Item>
+      <Item Condition="m_pChain != nullptr" Name="[chain]">m_pChain</Item>
+    </Expand>
+  </Type>
+
   <!-- tier1/utlsymbollarge.h -->
 
   <Type Name="CUtlSymbolLarge">
