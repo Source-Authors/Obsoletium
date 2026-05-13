@@ -191,47 +191,14 @@ void CHistoryItem::SetText( const char *text, const char *extra )
 // Console page completion item starts here
 //
 //-----------------------------------------------------------------------------
-CConsolePanel::CompletionItem::CompletionItem( void )
+CConsolePanel::CompletionItem::CompletionItem()
+	: m_bIsCommand{true},
+	m_pCommand{nullptr},
+	m_pText{nullptr}
 {
-	m_bIsCommand = true;
-	m_pCommand = NULL;
-	m_pText = NULL;
 }
 
-CConsolePanel::CompletionItem::CompletionItem( const CompletionItem& src )
-{
-	m_bIsCommand = src.m_bIsCommand;
-	m_pCommand = src.m_pCommand;
-	if ( src.m_pText )
-	{
-		m_pText = new CHistoryItem( *src.m_pText );
-	}
-	else
-	{
-		m_pText = NULL;
-	}
-}
-
-CConsolePanel::CompletionItem& CConsolePanel::CompletionItem::operator =( const CompletionItem& src )
-{
-	if ( this == &src )
-		return *this;
-
-	m_bIsCommand = src.m_bIsCommand;
-	m_pCommand = src.m_pCommand;
-	if ( src.m_pText )
-	{
-		m_pText = new CHistoryItem( *src.m_pText );
-	}
-	else
-	{
-		m_pText = NULL;
-	}
-
-	return *this;
-}
-
-CConsolePanel::CompletionItem::~CompletionItem( void )
+CConsolePanel::CompletionItem::~CompletionItem()
 {
 	if ( m_pText )
 	{
@@ -247,7 +214,7 @@ const char *CConsolePanel::CompletionItem::GetName() const
 	return m_pCommand ? m_pCommand->GetName() : GetCommand();
 }
 
-const char *CConsolePanel::CompletionItem::GetItemText( void )
+const char *CConsolePanel::CompletionItem::GetItemText() const
 {
 	static char text[256];
 	text[0] = 0;
@@ -265,7 +232,7 @@ const char *CConsolePanel::CompletionItem::GetItemText( void )
 	return text;
 }	
 
-const char *CConsolePanel::CompletionItem::GetCommand( void ) const
+const char *CConsolePanel::CompletionItem::GetCommand() const
 {
 	static char text[256];
 	text[0] = 0;

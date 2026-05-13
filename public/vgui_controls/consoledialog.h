@@ -86,12 +86,14 @@ private:
 	class CompletionItem
 	{
 	public:
-		CompletionItem( void );
-		CompletionItem( const CompletionItem& src );
-		CompletionItem& operator =( const CompletionItem& src );
-		~CompletionItem( void );
-		const char *GetItemText( void );
-		const char *GetCommand( void ) const;
+		CompletionItem();
+		// dimhotepus: Drop generated copy ctor / assignment
+		CompletionItem( const CompletionItem& src ) = delete;
+		CompletionItem& operator =( CompletionItem src ) = delete;
+		~CompletionItem();
+		// dimhotepus: Add const.
+		const char *GetItemText() const;
+		const char *GetCommand() const;
 		const char *GetName() const;
 
 		bool			m_bIsCommand;
