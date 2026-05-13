@@ -113,9 +113,11 @@ void CGameConsole::SetParent( vgui::VPANEL parent )
 //-----------------------------------------------------------------------------
 void CGameConsole::OnCmdCondump()
 {
-#ifndef _XBOX
-	g_GameConsole.m_pConsole->DumpConsoleTextToFile();
-#endif
+	// dimhotepus: Ensure no nullptr dereference when console doesn't initialized yet.
+	if ( g_GameConsole.m_pConsole )
+	{
+		g_GameConsole.m_pConsole->DumpConsoleTextToFile();
+	}
 }
 
 //-----------------------------------------------------------------------------
