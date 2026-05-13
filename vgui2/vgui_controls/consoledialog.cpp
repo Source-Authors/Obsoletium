@@ -296,6 +296,7 @@ CConsolePanel::CConsolePanel( vgui::Panel *pParent, const char *pName, bool bSta
 
 	m_pEntry->SetTabPosition(1);
 
+	m_iNextCompletion = 0;
 	m_bAutoCompleteMode = false;
 	m_szPartialText[0] = 0;
 	m_szPreviousPartialText[0]=0;
