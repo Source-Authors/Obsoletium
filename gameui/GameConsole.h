@@ -21,8 +21,8 @@ class CGameConsoleDialog;
 class CGameConsole : public IGameConsole
 {
 public:
-	CGameConsole();
-	~CGameConsole();
+	CGameConsole() : m_pConsole{nullptr} {} 
+	~CGameConsole() = default;
 
 	// sets up the console for use
 	void Initialize() override;
@@ -49,7 +49,6 @@ public:
 	static void OnCmdCondump();
 private:
 
-	bool m_bInitialized;
 	CGameConsoleDialog *m_pConsole;
 };
 
