@@ -80,15 +80,16 @@ int StartVGUI(CreateInterfaceFn dedicatedFactory) {
   vgui::ivgui()->Start();
 
   // load the module
-  g_pFullFileSystem->GetLocalCopy(PLATFORM_BIN_DIR CORRECT_PATH_SEPARATOR_S "adminserver" DLL_EXT_STRING);
+  g_pFullFileSystem->GetLocalCopy(PLATFORM_BIN_DIR CORRECT_PATH_SEPARATOR_S
+                                  "adminserver" DLL_EXT_STRING);
 
   g_hAdminServerModule = g_pFullFileSystem->LoadModule("adminserver");
-  Assert(g_hAdminServerModule);
-
   if (!g_hAdminServerModule) {
+    Assert(g_hAdminServerModule);
+
     vgui::ivgui()->DPrintf2(
-        "Admin Error: module version (adminserver" DLL_EXT_STRING ", %s) invalid, not "
-        "loading\n",
+        "Admin Error: module version (adminserver" DLL_EXT_STRING
+        ", %s) invalid, not loading\n",
         IMANAGESERVER_INTERFACE_VERSION);
   } else {
     // make sure we get the right version
@@ -96,12 +97,13 @@ int StartVGUI(CreateInterfaceFn dedicatedFactory) {
 
     g_pAdminServer =
         (IAdminServer *)adminFactory(ADMINSERVER_INTERFACE_VERSION, nullptr);
-    Assert(g_pAdminServer);
     g_pAdminVGuiModule =
         (IVGuiModule *)adminFactory("VGuiModuleAdminServer001", nullptr);
-    Assert(g_pAdminVGuiModule);
 
     if (!g_pAdminServer || !g_pAdminVGuiModule) {
+      Assert(g_pAdminServer);
+      Assert(g_pAdminVGuiModule);
+
       vgui::ivgui()->DPrintf2(
           "Admin Error: module version (adminserver" DLL_EXT_STRING ", %s) invalid, not "
           "loading\n",
@@ -125,15 +127,35 @@ int StartVGUI(CreateInterfaceFn dedicatedFactory) {
 // Purpose: Shuts down the VGUI system
 //-----------------------------------------------------------------------------
 void StopVGUI() {
+  // dimhotepus: Reverse to startup order.
+
+  g_pMainPanel->Close();
+  g_pMainPanel->Shutdown();
+
+  if (g_pAdminVGuiModule) {
+    g_pAdminVGuiModule->SetParent(0);
+    g_pAdminVGuiModule->Shutdown();
+    g_pAdminVGuiModule = nullptr;
+  }
+
+  if (g_pAdminServer) {
+    g_pAdminServer = nullptr;
+  }
+
+  if (g_hAdminServerModule) {
+    g_pFullFileSystem->UnloadModule(g_hAdminServerModule);
+    g_hAdminServerModule = nullptr;
+  }
+
+  // dimhotepus: Stop vgui
+  vgui::ivgui()->Stop();
+
+  g_pMainPanel->SetVisible(false);
+
   SetEvent(g_pMainPanel->GetShutdownHandle());
 
   delete g_pMainPanel;
-  g_pMainPanel = NULL;
-
-  if (g_hAdminServerModule) {
-    g_pAdminVGuiModule->Shutdown();
-    Sys_UnloadModule(g_hAdminServerModule);
-  }
+  g_pMainPanel = nullptr;
 }
 
 //-----------------------------------------------------------------------------

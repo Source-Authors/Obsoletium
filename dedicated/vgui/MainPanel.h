@@ -27,9 +27,13 @@ class CMainPanel : public vgui::Panel {
   ~CMainPanel() override;
 
   virtual void Initialize();
+  // dimhotepus: Pair with Initialize.
+  virtual void Shutdown();
 
   // displays the dialog, moves it into focus, updates if it has to
   virtual void Open();
+  // dimhotepus: Pair with Open.
+  virtual void Close();
 
   // returns a pointer to a static instance of this dialog
   // valid for use only in sort functions
