@@ -425,11 +425,10 @@ void CConsolePanel::RebuildCompletionList(const char *text)
 		for ( const auto &item : m_CommandHistory )
 		{
 			auto *comp = new CompletionItem();
-			m_CompletionList.AddToTail( comp );
-
 			comp->m_bIsCommand = false;
 			comp->m_pCommand = nullptr;
 			comp->m_pText = new CHistoryItem( item );
+			m_CompletionList.AddToTail( comp );
 		}
 		return;
 	}
