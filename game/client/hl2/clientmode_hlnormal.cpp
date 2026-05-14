@@ -26,12 +26,12 @@ ConVar fov_desired( "fov_desired", "75", FCVAR_ARCHIVE | FCVAR_USERINFO, "Sets t
 //-----------------------------------------------------------------------------
 vgui::HScheme g_hVGuiCombineScheme = 0;
 
-
 // Instance the singleton and expose the interface to it.
 IClientMode *GetClientModeNormal()
 {
-	static ClientModeHLNormal g_ClientModeNormal;
-	return &g_ClientModeNormal;
+	// dimhotepus: Use dynamic allocation as need to delete in a correct place.
+	static auto *g_pClientModeNormal = new ClientModeHLNormal();
+	return g_pClientModeNormal;
 }
 
 

@@ -48,6 +48,12 @@ void TxViewPanel::Install( vgui::Panel *parent )
 	Assert( g_pTxViewPanel );
 }
 
+void TxViewPanel::Uninstall()
+{
+	g_pTxViewPanel->MarkForDeletion();
+	g_pTxViewPanel = nullptr;
+}
+
 TxViewPanel::TxViewPanel( vgui::Panel *parent ) : vgui::Frame( parent, "TxViewPanel" )
 {
 	m_pRefresh = new vgui::Button( this, "Refresh", "Refresh" );
@@ -87,11 +93,6 @@ void TxViewPanel::OnCommand( const char *command )
 	{
 		BaseClass::OnCommand( command );
 	}
-}
-
-void TxViewPanel::OnMessage( const KeyValues *params, vgui::VPANEL fromPanel )
-{
-	BaseClass::OnMessage( params, fromPanel );
 }
 
 void TxViewPanel::OnFileSelected( const char *fullpath )

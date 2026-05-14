@@ -1540,6 +1540,22 @@ void Panel::MoveToFront(void)
 }
 
 //-----------------------------------------------------------------------------
+// Purpose: Moves the panel to the back of the z-order
+//-----------------------------------------------------------------------------
+void Panel::MoveToBack(void)
+{
+	// FIXME: only use ipanel() as per src branch?
+	if (IsPopup())
+	{
+		surface()->BringToFront(GetParent()->GetVPanel());
+	}
+	else
+	{
+		ipanel()->MoveToBack(GetVPanel());
+	}
+}
+
+//-----------------------------------------------------------------------------
 // Purpose: Iterates up the hierarchy looking for a particular parent
 //-----------------------------------------------------------------------------
 bool Panel::HasParent(VPANEL potentialParent)

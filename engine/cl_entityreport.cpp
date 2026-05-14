@@ -262,6 +262,13 @@ void CL_CreateEntityReportPanel( vgui::Panel *parent )
 	g_pEntityReportPanel = new CEntityReportPanel( parent );
 }
 
+// dimhotepus: Pair with create.
+void CL_DestroyEntityReportPanel()
+{
+	g_pEntityReportPanel->MarkForDeletion();
+	g_pEntityReportPanel = nullptr;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Instances the entity report panel
 // Input  : *parent - 

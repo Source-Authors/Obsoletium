@@ -18,6 +18,8 @@ class Panel;
 
 
 void CL_CreateTextureListPanel( vgui::Panel *pPanel );
+// dimhotepus: Pair with create.
+void CL_DestroyTextureListPanel();
 
 void VGui_UpdateTextureListPanel();
 

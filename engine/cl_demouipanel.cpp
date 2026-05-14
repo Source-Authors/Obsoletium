@@ -56,6 +56,13 @@ void CDemoUIPanel::InstallDemoUI( vgui::Panel *parent )
 	Assert( g_pDemoUI );
 }
 
+// dimhotepus: Pair with install.
+void CDemoUIPanel::UninstallDemoUI()
+{
+	g_pDemoUI->MarkForDeletion();
+	g_pDemoUI = nullptr;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Basic help dialog
 //-----------------------------------------------------------------------------
@@ -279,12 +286,13 @@ void CDemoUIPanel::OnCommand(const char *command)
 
 void CDemoUIPanel::OnMessage(const KeyValues *params, VPANEL fromPanel)
 {
-	BaseClass::OnMessage( params, fromPanel );
-
 	if ( !Q_strcmp( "SliderMoved", params->GetName() ) )
 	{
 		demoplayer->SetPlaybackTimeScale( GetPlaybackScale() );
 	}
+
+	// dimhotepus: Delete destroys memory, need to postpone.
+	BaseClass::OnMessage( params, fromPanel );
 }
 
 void CDemoUIPanel::OnEdit()
@@ -610,6 +618,13 @@ void CDemoUIPanel2::Install( vgui::Panel *pParentBkgnd, vgui::Panel *pParentFgnd
 	Assert( g_pDemoUI2 );
 }
 
+// dimhotepus: Pair with install.
+void CDemoUIPanel2::Uninstall()
+{
+	g_pDemoUI2->MarkForDeletion();
+	g_pDemoUI2 = nullptr;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Basic help dialog
 //-----------------------------------------------------------------------------
@@ -801,7 +816,6 @@ void CDemoUIPanel2::OnCommand(const char *command)
 
 void CDemoUIPanel2::OnMessage(const KeyValues *params, VPANEL fromPanel)
 {
-	BaseClass::OnMessage( params, fromPanel );
 
 	//
 	// Speed scale
@@ -841,6 +855,9 @@ void CDemoUIPanel2::OnMessage(const KeyValues *params, VPANEL fromPanel)
 		{
 		}
 	}
+
+	// dimhotepus: Delete destroys memory, need to postpone.
+	BaseClass::OnMessage( params, fromPanel );
 }
 
 void CDemoUIPanel2::OnLoad()

@@ -12,6 +12,8 @@
 
 
 void VGui_CreateDrawTreePanel( vgui::Panel *parent );
+// dimhotepus: Pair with create.
+void VGui_DestroyDrawTreePanel();
 void VGui_MoveDrawTreePanelToFront();
 void VGui_UpdateDrawTreePanel();
 

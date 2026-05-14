@@ -426,8 +426,7 @@ void DestroyVProfGraphPanel()
 #ifdef VPROF_ENABLED
 	if ( s_pVProfGraphPanel )
 	{
-		s_pVProfGraphPanel->SetParent( (vgui::Panel *)NULL );
-		delete s_pVProfGraphPanel;
+		s_pVProfGraphPanel->MarkForDeletion();
 		s_pVProfGraphPanel = NULL;
 	}
 #endif

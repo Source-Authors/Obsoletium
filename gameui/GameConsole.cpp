@@ -125,6 +125,7 @@ void CGameConsole::OnCmdCondump()
 //-----------------------------------------------------------------------------
 void CGameConsole::Initialize( vgui::VPANEL parent, const char *panelModule )
 {
+	Assert(!m_pConsole);
 	m_pConsole = vgui::SETUP_PANEL( new CGameConsoleDialog( vgui::ipanel()->GetPanel( parent, panelModule ) ) ); // we add text before displaying this so set it up now!
 
 	// set the console to taking up most of the right-half of the screen
@@ -140,6 +141,15 @@ void CGameConsole::Initialize( vgui::VPANEL parent, const char *panelModule )
 		// dimhotepus: Console should take more space as scaled it is too small.
 		swide / 2 + offsetx - vgui::scheme()->GetProportionalScaledValue(8),
 		stall - (offsety * 2));
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: shutdowns the console
+//-----------------------------------------------------------------------------
+void CGameConsole::Shutdown()
+{
+	m_pConsole->MarkForDeletion();
+	m_pConsole = nullptr;
 }
 
 CON_COMMAND( condump, "dump the text currently in the console to condumpXX.log" )

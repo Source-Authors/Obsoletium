@@ -299,7 +299,8 @@ void CCenterPrint::Destroy( void )
 	if ( vguiCenterString )
 	{
 		vguiCenterString->SetParent( (vgui::Panel *)NULL );
-		delete vguiCenterString;
+		// dimhotepus: Delete when ready.
+		vguiCenterString->MarkForDeletion();
 		vguiCenterString = NULL;
 	}
 }

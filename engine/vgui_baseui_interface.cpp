@@ -117,7 +117,11 @@ bool s_bWindowsInputEnabled = true;
 ConVar r_drawvgui( "r_drawvgui", "1", FCVAR_CHEAT, "Enable the rendering of vgui panels", true, 0, true, 1 );
 
 void Con_CreateConsolePanel( vgui::Panel *parent );
+// dimhotepus: Pair with create.
+void Con_DestroyConsolePanel();
 void CL_CreateEntityReportPanel( vgui::Panel *parent );
+// dimhotepus: Pair with create.
+void CL_DestroyEntityReportPanel();
 void ClearIOStates( void );
 
 // turn this on if you're tuning progress bars
@@ -578,7 +582,7 @@ void CEngineVGui::Init()
 
 	vgui::VGui_InitMatSysInterfacesList( m_UiModuleName, &g_AppSystemFactory, 1 );
 
-	// Get our langauge string
+	// Get our language string
 	char lang[ 64 ];
 	lang[0] = '\0';
 	engineClient->GetUILanguage( lang, sizeof( lang ) );
@@ -838,7 +842,7 @@ void CEngineVGui::DestroyVProfPanels( )
 	// dimhotepus: Destroy in reverse to creation order.
 	if ( m_pTextureBudgetPanel )
 	{
-		delete m_pTextureBudgetPanel;
+		m_pTextureBudgetPanel->MarkForDeletion();
 		m_pTextureBudgetPanel = NULL;
 	}
 
@@ -846,13 +850,13 @@ void CEngineVGui::DestroyVProfPanels( )
 
 	if ( m_pBudgetPanel )
 	{
-		delete m_pBudgetPanel;
+		m_pBudgetPanel->MarkForDeletion();
 		m_pBudgetPanel = NULL;
 	}
 
 	if ( m_pVProfPanel )
 	{
-		delete m_pVProfPanel;
+		m_pVProfPanel->MarkForDeletion();
 		m_pVProfPanel = NULL;
 	}
 #endif
@@ -873,54 +877,92 @@ extern bool g_bUsingLegacyAppSystems;
 //-----------------------------------------------------------------------------
 void CEngineVGui::Shutdown()
 {
-	DestroyVProfPanels();
-	bugreporter->Shutdown();
-	colorcorrectiontools->Shutdown();
-	perftools->Shutdown();
-
-	demoaction->Shutdown();
-
+	// In PluginHelpers_Menu
 	if ( g_PluginManager )
 	{
 		g_PluginManager->Shutdown();
 	}
 
+	// From Connect.
+	m_pInputInternal = nullptr;
+
+	// dimhotepus: In reverse to Init order.
+	demoaction->Shutdown();
+
+	if ( staticGameConsole && 
+		!CommandLine()->CheckParm( "-forcestartupmenu" ) && 
+		!CommandLine()->CheckParm( "-hideconsole" ) &&
+		( CommandLine()->FindParm( "-toconsole" ) || CommandLine()->FindParm( "-console" ) || CommandLine()->FindParm( "-rpt" ) || CommandLine()->FindParm( "-allowdebug" ) ) )
+	{
+		// hide the console
+		staticGameConsole->Hide();
+	}
+
+	HideGameUI();
+
+	if ( staticGameConsole )
+	{
+		staticGameConsole->SetParent((vgui::VPANEL) 0);
+		staticGameConsole->Shutdown();
+	}
+
+	staticGameUIFuncs->Shutdown();
+
+	DestroyVProfPanels();
+	CL_DestroyTextureListPanel();
+	VGui_DestroyDrawTreePanel();
+	CL_DestroyEntityReportPanel();
+	Con_DestroyConsolePanel();
+
+	staticFocusOverlayPanel = NULL;
+	
+	colorcorrectiontools->Shutdown();
+	perftools->Shutdown();
+	bugreporter->Shutdown();
+
+	TxViewPanel::Uninstall();
+	CFogUIPanel::UninstallFogUI();
+	CDemoUIPanel2::Uninstall();
+	CDemoUIPanel::UninstallDemoUI();
+
+	// Give panels a chance to settle so things
+	//  Marked for deletion will actually get deleted
+	vgui::ivgui()->RunFrame();
+
+	staticDebugSystemPanel = NULL;
+	staticGameDLLPanel = NULL;
+	staticGameUIPanel = NULL;
+	staticEngineToolsPanel = NULL;
+	staticClientDLLToolsPanel = NULL;
 	// HACK HACK: There was a bug in the old versions of the viewport which would crash in the case where the client .dll hadn't been fully unloaded, so
 	//  we'll leak this panel here instead!!!
 	if ( g_bUsingLegacyAppSystems )
 	{
 		staticClientDLLPanel->SetParent( (vgui::VPANEL)0 );
 	}
+	staticClientDLLPanel = NULL;
 
-	// This will delete the engine subpanel since it's a child
+	// This will delete the subpanels since they are children.
 	delete staticPanel;
 	staticPanel = NULL;
-	staticClientDLLToolsPanel = NULL;
-	staticClientDLLPanel	= NULL;
-	staticEngineToolsPanel = NULL;
-	staticDebugSystemPanel = NULL;
-	staticFocusOverlayPanel = NULL;
-	staticGameDLLPanel = NULL;
 
 	// Give panels a chance to settle so things
 	//  Marked for deletion will actually get deleted
 	vgui::ivgui()->RunFrame();
-
-	// unload the gameUI
-	staticGameUIFuncs->Shutdown();
-
-	staticGameUIFuncs = NULL;
-	staticGameConsole = NULL;
-	staticGameUIPanel = NULL;
-
+	vgui::ivgui()->SetSleep(true);
 	// stop the App running
 	vgui::ivgui()->Stop();
 	
+	vgui::VGui_ShutdownMatSysInterfacesList( m_UiModuleName );
+
+	staticGameConsole = NULL;
+	// unload the gameUI
+	staticGameUIFuncs = NULL;
+	
+	m_GameUIFactory = NULL;
 	// unload the dll
 	Sys_UnloadModule(m_hStaticGameUIModule);
 	m_hStaticGameUIModule = NULL;
-	m_GameUIFactory = NULL;
-	m_pInputInternal = NULL;
 }
 
 

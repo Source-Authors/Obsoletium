@@ -653,6 +653,11 @@ void CGameUI::Shutdown()
 	
 	BonusMapsDatabase()->WriteSaveData();
 
+	// dimhotepus: Unbind from parent Game UI panel as we binded manually in Initialize.
+	staticPanel->SetParent(nullptr);
+	staticPanel->MarkForDeletion();
+	staticPanel = nullptr;
+
 	g_pSourceVR = nullptr;
 	
 	g_pEngineClientReplay = nullptr;
@@ -661,6 +666,10 @@ void CGameUI::Shutdown()
 	gameuifuncs = nullptr;
 	enginesurfacefuncs = nullptr;
 	enginevguifuncs = nullptr;
+
+	// Give panels a chance to settle so things
+	//  Marked for deletion will actually get deleted
+	vgui::ivgui()->RunFrame();
 
 	ModInfo().FreeModInfo();
 	

@@ -576,6 +576,14 @@ void VGui_CreateDrawTreePanel( vgui::Panel *parent )
 }
 
 
+// dimhotepus: Pair with create.
+void VGui_DestroyDrawTreePanel()
+{
+	g_pDrawTreeFrame->MarkForDeletion();
+	g_pDrawTreeFrame = nullptr;
+}
+
+
 void VGui_MoveDrawTreePanelToFront()
 {
 	if ( g_pDrawTreeFrame )

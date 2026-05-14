@@ -159,6 +159,9 @@ CServerBrowserDialog::~CServerBrowserDialog()
   	{
   		m_pSavedData->deleteThis();
   	}
+
+	// dimhotepus: Reset when become invalid.
+	s_InternetDlg = nullptr;
 }
 
 

@@ -1275,6 +1275,13 @@ void Con_CreateConsolePanel( vgui::Panel *parent )
 	}
 }
 
+// dimhotepus: Pair with create.
+void Con_DestroyConsolePanel()
+{
+	conPanel->MarkForDeletion();
+	conPanel = nullptr;
+}
+
 vgui::Panel* Con_GetConsolePanel()
 {
 	return conPanel;

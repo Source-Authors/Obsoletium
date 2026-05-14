@@ -273,6 +273,8 @@ public:
 	virtual bool   IsPopup();	// has a parent, but is in it's own space
 	void   GetClipRect(int &x0, int &y0, int &x1, int &y1) override;
 	virtual void   MoveToFront();
+	// dimhotepus: Pair with MoveToFront.
+	virtual void   MoveToBack();
 
 	// pin positions for auto-layout
 	enum PinCorner_e 

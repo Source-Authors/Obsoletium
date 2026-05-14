@@ -1032,8 +1032,6 @@ CColorCurvesUIPanel::~CColorCurvesUIPanel()
 //-----------------------------------------------------------------------------
 void CColorCurvesUIPanel::OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel)
 {
-	BaseClass::OnMessage( params, fromPanel );
-
 	if ( !Q_stricmp( "SliderMoved", params->GetName() ) )
 	{
 		vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(params)->GetPtr("panel") );
@@ -1046,6 +1044,9 @@ void CColorCurvesUIPanel::OnMessage(const KeyValues *params,  vgui::VPANEL fromP
 
 		PostMessage( GetParent(), new KeyValues( "command", "command", "BlendFactorUpdate" ) );
 	}
+
+	// dimhotepus: Delete destroys memory, need to postpone.
+	BaseClass::OnMessage( params, fromPanel );
 }
 
 
@@ -2017,8 +2018,6 @@ void CColorLevelsUIPanel::ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char 
 //-----------------------------------------------------------------------------
 void CColorLevelsUIPanel::OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel)
 {
-	BaseClass::OnMessage( params, fromPanel );
-
 	if ( !Q_stricmp( "SliderMoved", params->GetName() ) )
 	{
 		vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(params)->GetPtr("panel") );
@@ -2048,6 +2047,9 @@ void CColorLevelsUIPanel::OnMessage(const KeyValues *params,  vgui::VPANEL fromP
 			return;
 		}
 	}
+
+	// dimhotepus: Delete destroys memory, need to postpone.
+	BaseClass::OnMessage( params, fromPanel );
 }
 
 
@@ -3103,8 +3105,6 @@ void CSelectedHSVUIPanel::ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char 
 //-----------------------------------------------------------------------------
 void CSelectedHSVUIPanel::OnMessage(const KeyValues *params, VPANEL fromPanel)
 {
-	BaseClass::OnMessage( params, fromPanel );
-
 	if ( !Q_stricmp( "SliderMoved", params->GetName() ) )
 	{
 		vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(params)->GetPtr("panel") );
@@ -3138,6 +3138,8 @@ void CSelectedHSVUIPanel::OnMessage(const KeyValues *params, VPANEL fromPanel)
 		}
 	}
 
+	// dimhotepus: Delete destroys memory, need to postpone.
+	BaseClass::OnMessage( params, fromPanel );
 }
 
 
@@ -3480,8 +3482,6 @@ CColorLookupUIPanel::~CColorLookupUIPanel()
 //-----------------------------------------------------------------------------
 void CColorLookupUIPanel::OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel)
 {
-	BaseClass::OnMessage( params, fromPanel );
-
 	if ( !Q_stricmp( "SliderMoved", params->GetName() ) )
 	{
 		vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(params)->GetPtr("panel") );
@@ -3494,6 +3494,9 @@ void CColorLookupUIPanel::OnMessage(const KeyValues *params,  vgui::VPANEL fromP
 			return;
 		}
 	}
+
+	// dimhotepus: Delete destroys memory, need to postpone.
+	BaseClass::OnMessage( params, fromPanel );
 }
 
 
@@ -4025,8 +4028,6 @@ CColorBalanceUIPanel::~CColorBalanceUIPanel()
 //-----------------------------------------------------------------------------
 void CColorBalanceUIPanel::OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel)
 {
-	BaseClass::OnMessage( params, fromPanel );
-
 	if ( !Q_stricmp( "SliderMoved", params->GetName() ) )
 	{
 		vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(params)->GetPtr("panel") );
@@ -4063,6 +4064,9 @@ void CColorBalanceUIPanel::OnMessage(const KeyValues *params,  vgui::VPANEL from
 			return;
 		}
 	}
+
+	// dimhotepus: Delete destroys memory, need to postpone.
+	BaseClass::OnMessage( params, fromPanel );
 }
 
 

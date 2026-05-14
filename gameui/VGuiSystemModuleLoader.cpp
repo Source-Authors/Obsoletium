@@ -208,6 +208,10 @@ void CVGuiSystemModuleLoader::ShutdownPlatformModules()
 		vgui::ivgui()->PostMessage(m.moduleInterface->GetPanel(), new KeyValues("Command", "command", "Quit"), NULL);
 	}
 
+	// dimhotepus: Give panels a chance to settle so things
+	//  Marked for deletion will actually get deleted
+	vgui::ivgui()->RunFrame();
+
 	for ( auto &m : m_Modules )
 	{
 		m.moduleInterface->Shutdown();

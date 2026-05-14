@@ -40,8 +40,12 @@ public:
 	// dimhotepus: Use strict type.
 	void SetParent( vgui::VPANEL parent ) override;
 
+	// dimhotepus: Initialize with parent to scale UI.
 	// sets up the console for use
 	void Initialize( vgui::VPANEL parent, const char *panelModule ) override;
+
+	// dimhotepus: Pair with initialize.
+	void Shutdown() override;
 
 	// activates the console after a delay
 	void ActivateDelayed(float time);

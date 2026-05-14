@@ -3332,6 +3332,15 @@ void CL_CreateTextureListPanel( vgui::Panel *parent )
 	g_pTextureListPanel = new CTextureListPanel( parent );
 }
 
+
+// dimhotepus: Pair with create.
+void CL_DestroyTextureListPanel()
+{
+	g_pTextureListPanel->MarkForDeletion();
+	g_pTextureListPanel = nullptr;
+}
+
+
 CON_COMMAND( mat_texture_save_fonts, "Save all font textures" )
 {
 	// dimhotepus: This can take a while, put up a waiting cursor.

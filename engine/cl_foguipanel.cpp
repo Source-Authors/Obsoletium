@@ -46,6 +46,13 @@ void CFogUIPanel::InstallFogUI( vgui::Panel *parent )
 	Assert( g_pFogUI );
 }
 
+// dimhotepus: Pair with install.
+void CFogUIPanel::UninstallFogUI()
+{
+	g_pFogUI->MarkForDeletion();
+	g_pFogUI = nullptr;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
@@ -398,9 +405,7 @@ void CFogUIPanel::OnTextKillFocus( KeyValues *data )
 // Purpose: Messages
 //-----------------------------------------------------------------------------
 void CFogUIPanel::OnMessage( const KeyValues *params, VPANEL fromPanel )
-{
-	BaseClass::OnMessage( params, fromPanel );
-	
+{	
 	if ( !Q_strcmp( "SliderMoved", params->GetName() ) )
 	{
 		// World
@@ -462,6 +467,9 @@ void CFogUIPanel::OnMessage( const KeyValues *params, VPANEL fromPanel )
 			m_pFarZText->SetText( va( "%i", m_pFarZ->GetValue() ) );
 		}
 	}
+
+	// dimhotepus: Delete destroys memory, need to postpone.
+	BaseClass::OnMessage( params, fromPanel );
 }
 
 //-----------------------------------------------------------------------------

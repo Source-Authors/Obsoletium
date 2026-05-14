@@ -41,6 +41,8 @@ public:
 	void	OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel) override;
 
 	static	void	InstallFogUI( vgui::Panel *parent );
+	// dimhotepus: Pair with install.
+	static	void	UninstallFogUI();
 	
 	void			UpdateFogStartSlider();
 	void			UpdateFogEndSlider();

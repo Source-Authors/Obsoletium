@@ -50,6 +50,8 @@ public:
     virtual void	DrawDebuggingInfo();
 
 	static	void	InstallDemoUI( vgui::Panel *parent );
+	// dimhotepus: Pair with install.
+	static	void	UninstallDemoUI();
 
 			bool	IsInDriveMode();
 			void	SetDriveViewPoint( Vector &origin, QAngle &angle );
@@ -134,6 +136,8 @@ public:
 	virtual void	DrawDebuggingInfo();
 
 	static	void	Install( vgui::Panel *pParentBkgnd, vgui::Panel *pParentFgnd, bool bPutToForeground );
+	// dimhotepus: Pair with install.
+	static	void	Uninstall();
 
 	bool	IsInDriveMode();
 	void	SetDriveViewPoint( Vector &origin, QAngle &angle );

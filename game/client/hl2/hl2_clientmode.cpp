@@ -54,6 +54,8 @@ void CHLModeManager::Init( void )
 // dimhotepus: Support cleanup.
 void CHLModeManager::Shutdown( void )
 {
+	// dimhotepus: Crazy hack to pair Init.
+	delete g_pClientMode;
 	g_pClientMode = nullptr;
 }
 

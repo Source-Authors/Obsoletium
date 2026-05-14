@@ -46,6 +46,9 @@ public:
 
 	// dimhotepus: Initialize with parent to scale UI.
 	virtual void Initialize( vgui::VPANEL parent, const char *panelModule ) = 0;
+
+	// dimhotepus: Pair with initialize.
+	virtual void Shutdown() = 0;
 };
 
 // dimhotepus: Bump version.

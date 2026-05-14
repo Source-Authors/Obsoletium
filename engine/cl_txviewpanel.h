@@ -41,9 +41,10 @@ public:
 
 	// Command issued
 	void OnCommand( const char *command ) override;
-	void OnMessage( const KeyValues *params, vgui::VPANEL fromPanel ) override;
 
 	static	void	Install( vgui::Panel *parent );
+	// dimhotepus: Pair with install.
+	static	void	Uninstall();
 
 protected:
 	MESSAGE_FUNC_CHARPTR( OnFileSelected, "FileSelected", fullpath );
