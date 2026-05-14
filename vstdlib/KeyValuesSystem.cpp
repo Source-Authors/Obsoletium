@@ -244,7 +244,9 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString( const char *name, bool bCreate 
 	hash_item_t *item = &m_HashTable[hash];
 	while (true)
 	{
-		if (!stricmp(name, (char *)m_Strings.GetBase() + item->stringIndex ))
+		// dimhotepus: Precache in var for easy debugging.
+		const char *nameForIndex = static_cast<const char *>(m_Strings.GetBase()) + item->stringIndex;
+		if (!stricmp(name, nameForIndex))
 		{
 			return (HKeySymbol)item->stringIndex;
 		}
@@ -274,7 +276,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString( const char *name, bool bCreate 
 				Error( "Can't allocate %zd bytes. Out of keyvalue string space", stringSize );
 				return INVALID_KEY_SYMBOL;
 			}
-			item->stringIndex = pString - static_cast<char *>(m_Strings.GetBase());
+			item->stringIndex = pString - static_cast<const char *>(m_Strings.GetBase());
 			V_strncpy(pString, name, stringSize);
 			return item->stringIndex;
 		}
@@ -296,7 +298,7 @@ const char *CKeyValuesSystem::GetStringForSymbol(HKeySymbol symbol)
 	{
 		return "";
 	}
-	return ((char *)m_Strings.GetBase() + (size_t)symbol);
+	return static_cast<const char *>(m_Strings.GetBase()) + symbol;
 }
 
 //-----------------------------------------------------------------------------
