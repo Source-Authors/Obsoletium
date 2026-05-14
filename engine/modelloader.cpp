@@ -5302,6 +5302,11 @@ void CModelLoader::UnloadModel( model_t *pModel )
 	case mod_sprite:
 		Sprite_UnloadModel( pModel );
 		break;
+
+	// dimhotepus: Dump unexpected model types.
+	default:
+		AssertMsg( false, "Unexpected model type %d", pModel->type );
+		DevWarning( "Unexpected model type %d", pModel->type );
 	}
 }
 
