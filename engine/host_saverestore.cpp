@@ -268,10 +268,13 @@ public:
 	{
 		m_bClearSaveDir = false;
 		m_szSaveGameScreenshotFile[0] = '\0';
-		SetMostRecentElapsedMinutes( 0 );
-		SetMostRecentElapsedSeconds( 0 );
+		m_flClientSaveRestoreTime = 0;
 		m_szMostRecentSaveLoadGame[0] = '\0';
 		m_szSaveGameName[ 0 ] = '\0';
+		SetMostRecentElapsedMinutes( 0 );
+		SetMostRecentElapsedSeconds( 0 );
+		m_bWaitingForSafeDangerousSave = false;
+		m_nDeferredCommandFrames = 0;
 	}
 
 	void					Init( void ) override;
