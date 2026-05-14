@@ -287,7 +287,11 @@ private:
 			}
 
 			if (m >= 0x80000002)
+			{
 				brand = (tchar *)(d + 4);
+				// dimhotepus: Trim whitespace in the end.
+				brand.erase(brand.find_last_not_of(" \n\r\t") + 1);
+			}
 
 			// note the assignment to brand above does a copy, we need to delete
 			delete[] d;
