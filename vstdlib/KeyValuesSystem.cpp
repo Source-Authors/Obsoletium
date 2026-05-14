@@ -271,7 +271,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString( const char *name, bool bCreate 
 			char *pString = static_cast<char *>(m_Strings.Alloc( stringSize ));
 			if ( !pString )
 			{
-				Error( "Out of keyvalue string space" );
+				Error( "Can't allocate %zd bytes. Out of keyvalue string space", stringSize );
 				return INVALID_KEY_SYMBOL;
 			}
 			item->stringIndex = pString - static_cast<char *>(m_Strings.GetBase());
