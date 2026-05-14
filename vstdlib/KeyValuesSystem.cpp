@@ -235,7 +235,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString( const char *name, bool bCreate 
 {
 	if ( !name )
 	{
-		return (-1);
+		return INVALID_KEY_SYMBOL;
 	}
 
 	AUTO_LOCK( m_mutex );
@@ -254,7 +254,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString( const char *name, bool bCreate 
 			if ( !bCreate )
 			{
 				// not found
-				return -1;
+				return INVALID_KEY_SYMBOL;
 			}
 
 			// we're not in the table
@@ -272,7 +272,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString( const char *name, bool bCreate 
 			if ( !pString )
 			{
 				Error( "Out of keyvalue string space" );
-				return -1;
+				return INVALID_KEY_SYMBOL;
 			}
 			item->stringIndex = pString - static_cast<char *>(m_Strings.GetBase());
 			V_strncpy(pString, name, stringSize);
@@ -284,7 +284,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString( const char *name, bool bCreate 
 
 	// shouldn't be able to get here
 	Assert(0);
-	return (-1);
+	return INVALID_KEY_SYMBOL;
 }
 
 //-----------------------------------------------------------------------------
@@ -292,7 +292,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString( const char *name, bool bCreate 
 //-----------------------------------------------------------------------------
 const char *CKeyValuesSystem::GetStringForSymbol(HKeySymbol symbol)
 {
-	if ( symbol == -1 )
+	if ( symbol == INVALID_KEY_SYMBOL )
 	{
 		return "";
 	}
