@@ -136,7 +136,6 @@ public:
 	version_t version;
 	misc_t misc;
 	feature_t feature;
-	byte *cache;
 
 	ia32detect ()
 	{
@@ -144,9 +143,7 @@ public:
 		BitwiseClear(misc);
 		BitwiseClear(feature);
 
-		cache = nullptr;
-		uint32 m = init0();
-
+		const uint32 m = init0();
 		auto *d = new uint32[m * 4];
 
 		for (uint32 i = 1; i <= m; i++)
@@ -156,9 +153,6 @@ public:
 
 		if (m >= 1)
 			init1(d);
-
-		if (m >= 2)
-			init2(d[4] & 0xFF);
 
 		delete [] d;
 
@@ -271,46 +265,6 @@ private:
 		if ((d & 0x80000000) == 0)
 			for (int i = 0; i < 32; i += 8)
 				c[(d >> i) & 0xFF] = true;
-	}
-
-	void init2 (byte count)
-	{
-		uint32 d[4];
-		bool c[256];
-
-		for (bool & ci1 : c)
-			ci1 = false;
-
-		for (int i = 0; i < count; i++)
-		{
-			cpuid(d, 2);
-
-			if (i == 0)
-				d[0] &= 0xFFFFFF00;
-
-			process2(d[0], c);
-			process2(d[1], c);
-			process2(d[2], c);
-			process2(d[3], c);
-		}
-
-		int m = 0;
-
-		for (bool ci2 : c)
-			if (ci2)
-				m++;
-
-		cache = new byte[m];
-
-		m = 0;
-
-		for (byte ci3 = 1U; ci3 < std::numeric_limits<byte>::max(); ci3++)
-			if (c[ci3])
-				cache[m++] = ci3;
-
-		if (c[255]) cache[m++] = 255;
-
-		cache[m] = 0;
 	}
 
 	void init0x80000000 ()
