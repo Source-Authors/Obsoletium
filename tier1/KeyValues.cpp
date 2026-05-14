@@ -1147,7 +1147,8 @@ KeyValues *KeyValues::CreateNewKey()
 	for (KeyValues *dat = m_pSub; dat != nullptr; dat = dat->m_pPeer)
 	{
 		// case-insensitive string compare
-		int val = atoi(dat->GetName());
+		// dimhotepus: atoi -> V_atoi
+		int val = V_atoi(dat->GetName());
 		if (newID <= val)
 		{
 			newID = val + 1;
@@ -1357,7 +1358,8 @@ int KeyValues::GetInt( const char *keyName, int defaultValue )
 		switch ( dat->m_iDataType )
 		{
 		case TYPE_STRING:
-			return atoi(dat->m_sValue);
+			// dimhotepus: atoi -> V_atoi.
+			return V_atoi(dat->m_sValue);
 		case TYPE_WSTRING:
 			return _wtoi(dat->m_wsValue);
 		case TYPE_FLOAT:
