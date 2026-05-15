@@ -1054,8 +1054,7 @@ public:
 
     void do_simulation_controller(IVP_Event_Sim *event,IVP_U_Vector<IVP_Core> *core_list) override
 	{
-		int i;
-		for( i = core_list->len()-1; i >=0; i--) 
+		for( int i = core_list->len()-1; i >=0; i--) 
 		{
 			IVP_Core *pCore = core_list->element_at(i);
 
