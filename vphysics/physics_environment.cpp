@@ -927,7 +927,7 @@ public:
 		return IVP_TRUE;
 	}
 	// return number of additional checks to do this psi
-    virtual int max_collision_checks_exceeded( int totalChecks )
+    int max_collision_checks_exceeded( int totalChecks )
 	{
 		if ( m_pSolver )
 		{
@@ -1007,7 +1007,7 @@ public:
 	{
 		m_pCallback = nullptr;
 	}
-	virtual ~CPhysicsListenerConstraint() = default;
+	~CPhysicsListenerConstraint() = default;
 
 	void SetHandler( IPhysicsConstraintEvent *pHandler )
 	{
