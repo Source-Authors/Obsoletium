@@ -784,7 +784,7 @@ void GetObjectPosition_IVP( IVP_U_Point &origin, IVP_Real_Object *pivp )
 }
 
 
-bool IsZeroVector( const IVP_U_Point &vec )
+static bool IsZeroVector( const IVP_U_Point &vec )
 {
 	return (vec.k[0] == 0.0 && vec.k[1] == 0.0 && vec.k[2] == 0.0 ) ? true : false;
 }
@@ -885,7 +885,7 @@ float ComputeShadowControllerIVP( IVP_Real_Object *pivp, shadowcontrol_params_t 
 	return secondsToArrival;
 }
 
-void ConvertShadowControllerToIVP( const hlshadowcontrol_params_t &in, shadowcontrol_params_t &out )
+static void ConvertShadowControllerToIVP( const hlshadowcontrol_params_t &in, shadowcontrol_params_t &out )
 {
 	ConvertPositionToIVP( in.targetPosition, out.targetPosition );
 	ConvertRotationToIVP( in.targetRotation, out.targetRotation );
@@ -899,7 +899,7 @@ void ConvertShadowControllerToIVP( const hlshadowcontrol_params_t &in, shadowcon
 	out.dampFactor = in.dampFactor;
 }
 
-void ConvertShadowControllerToHL( const shadowcontrol_params_t &in, hlshadowcontrol_params_t &out )
+static void ConvertShadowControllerToHL( const shadowcontrol_params_t &in, hlshadowcontrol_params_t &out )
 {
 	ConvertPositionToHL( in.targetPosition, out.targetPosition );
 	ConvertRotationToHL( in.targetRotation, out.targetRotation );
