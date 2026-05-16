@@ -186,7 +186,7 @@ CPhysicsSurfaceProps::CPhysicsSurfaceProps() : m_strings( 0, 32, true ), m_fileL
 	m_ivpManager.Init( this );
 	// Force index 0 to be the empty string.  Allows game code to check for zero, but
 	// still resolve to a string
-	m_strings.AddString("");
+	(void)m_strings.AddString("");
 	m_init = false;
 	m_shadowFallback = 0;
 }
