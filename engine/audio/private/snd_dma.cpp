@@ -687,6 +687,9 @@ S_Init
 */
 void S_Init( void )
 {
+	// dimhotepus: Device can be restarted in runtime by different thread.
+	THREAD_LOCK_SOUND();
+
 	if ( sv.IsDedicated() && !CommandLine()->CheckParm( "-forcesound" ) )
 		return;
 
@@ -730,6 +733,9 @@ void S_Init( void )
 // =======================================================================
 void S_Shutdown(void)
 {
+	// dimhotepus: Device can be restarted in runtime by different thread.
+	THREAD_LOCK_SOUND();
+
 	if ( VoiceTweak_IsStillTweaking() )
 	{
 		VoiceTweak_EndVoiceTweakMode();
