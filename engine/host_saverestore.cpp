@@ -1001,7 +1001,6 @@ bool CSaveRestore::SaveFileExists( const char *pName )
 //-----------------------------------------------------------------------------
 bool CSaveRestore::LoadGame( const char *pName )
 {
-	FileHandle_t	pFile;
 	GAME_HEADER		gameHeader;
 	char			name[ MAX_PATH ];
 	bool			validload = false;
@@ -1030,7 +1029,7 @@ bool CSaveRestore::LoadGame( const char *pName )
 	int iElapsedSeconds = 0;
 	bool bOldSave = false;
 
-	pFile = g_pSaveRestoreFileSystem->Open( name, "rb", MOD_DIR );
+	FileHandle_t pFile = g_pSaveRestoreFileSystem->Open( name, "rb", MOD_DIR );
 	if ( pFile )
 	{
 		RunCodeAtScopeExit(g_pSaveRestoreFileSystem->Close(pFile));
@@ -2072,54 +2071,56 @@ int CSaveRestore::SaveReadNameAndComment( FileHandle_t f, OUT_Z_CAP(nameSize) ch
 //-----------------------------------------------------------------------------
 CSaveRestoreData *CSaveRestore::LoadSaveData( const char *level )
 {
-	char			name[MAX_OSPATH];
-	FileHandle_t	pFile;
-
-	Q_snprintf( name, sizeof( name ), "%s/%s.HL1", GetSaveDir(), level);// DON'T FixSlashes on this, it needs to be //MOD
-	ConMsg ("Loading game from %s...\n", name);
-
-	pFile = g_pSaveRestoreFileSystem->Open( name, "rb", MOD_DIR );
-	if (!pFile)
-	{
-		ConMsg ("ERROR: couldn't open.\n");
-		return NULL;
-	}
-
-	//---------------------------------
-	// Read the header
-	SaveFileHeaderTag_t tag;
-	if ( g_pSaveRestoreFileSystem->Read( &tag, sizeof(tag), pFile ) != sizeof(tag) )
-		return NULL;
-
-	// Is this a valid save?
-	if ( tag != CURRENT_SAVEFILE_HEADER_TAG )
-		return NULL;
-
-	//---------------------------------
-	// Read the sections info and the data
-	//
 	SaveFileSectionsInfo_t sectionsInfo;
-	
-	if ( g_pSaveRestoreFileSystem->Read( &sectionsInfo, sizeof(sectionsInfo), pFile ) != sizeof(sectionsInfo) )
-		return NULL;
+	CSaveRestoreData *pSaveData;
 
-	void *pSaveMemory = SaveAllocMemory( sizeof(CSaveRestoreData) + sectionsInfo.SumBytes(), sizeof(char) );
-	if ( !pSaveMemory )
 	{
-		return 0;
-	}
+		char name[MAX_OSPATH];
+		V_sprintf_safe( name, "%s/%s.HL1", GetSaveDir(), level);// DON'T FixSlashes on this, it needs to be //MOD
 
-	CSaveRestoreData *pSaveData = MakeSaveRestoreData( pSaveMemory );
-	Q_strncpy( pSaveData->levelInfo.szCurrentMapName, level, sizeof( pSaveData->levelInfo.szCurrentMapName ) );
+		ConMsg ("Loading game from %s...\n", name);
+
+		FileHandle_t pFile = g_pSaveRestoreFileSystem->Open( name, "rb", MOD_DIR );
+		if (!pFile)
+		{
+			ConMsg ("ERROR: couldn't open.\n");
+			return NULL;
+		}
+
+		RunCodeAtScopeExit( g_pSaveRestoreFileSystem->Close( pFile ) );
+
+		//---------------------------------
+		// Read the header
+		SaveFileHeaderTag_t tag;
+		if ( g_pSaveRestoreFileSystem->Read( &tag, sizeof(tag), pFile ) != sizeof(tag) )
+			return NULL;
+
+		// Is this a valid save?
+		if ( tag != CURRENT_SAVEFILE_HEADER_TAG )
+			return NULL;
+
+		//---------------------------------
+		// Read the sections info and the data
+		//	
+		if ( g_pSaveRestoreFileSystem->Read( &sectionsInfo, sizeof(sectionsInfo), pFile ) != sizeof(sectionsInfo) )
+			return NULL;
+
+		void *pSaveMemory = SaveAllocMemory( sizeof(CSaveRestoreData) + sectionsInfo.SumBytes(), sizeof(char) );
+		if ( !pSaveMemory )
+		{
+			return 0;
+		}
+
+		pSaveData = MakeSaveRestoreData( pSaveMemory );
+		Q_strncpy( pSaveData->levelInfo.szCurrentMapName, level, sizeof( pSaveData->levelInfo.szCurrentMapName ) );
 	
-	if ( g_pSaveRestoreFileSystem->Read( (char *)(pSaveData + 1), sectionsInfo.SumBytes(), pFile ) != sectionsInfo.SumBytes() )
-	{
-		// Free the memory and give up
-		Finish( pSaveData );
-		return NULL;
+		if ( g_pSaveRestoreFileSystem->Read( (char *)(pSaveData + 1), sectionsInfo.SumBytes(), pFile ) != sectionsInfo.SumBytes() )
+		{
+			// Free the memory and give up
+			Finish( pSaveData );
+			return NULL;
+		}
 	}
-
-	g_pSaveRestoreFileSystem->Close( pFile );
 	
 	//---------------------------------
 	// Parse the symbol table
@@ -2127,7 +2128,7 @@ CSaveRestoreData *CSaveRestore::LoadSaveData( const char *level )
 
 	if ( sectionsInfo.nBytesSymbols > 0 )
 	{
-		pSaveMemory = SaveAllocMemory( sectionsInfo.nSymbols, sizeof(char *), true );
+		void *pSaveMemory = SaveAllocMemory( sectionsInfo.nSymbols, sizeof(char *), true );
 		if ( !pSaveMemory )
 		{
 			SaveFreeMemory( pSaveData );
@@ -2265,23 +2266,22 @@ void CSaveRestore::EntityPatchWrite( CSaveRestoreData *pSaveData, const char *le
 //-----------------------------------------------------------------------------
 void CSaveRestore::EntityPatchRead( CSaveRestoreData *pSaveData, const char *level )
 {
-	char			name[MAX_OSPATH];
-	FileHandle_t	pFile;
-	int				i, size, entityId;
+	char name[MAX_OSPATH];
+	V_sprintf_safe(name, "%s/%s.HL3", GetSaveDir(), GetSaveGameMapName( level ) );// DON'T FixSlashes on this, it needs to be //MOD
 
-	Q_snprintf(name, sizeof( name ), "%s/%s.HL3", GetSaveDir(), GetSaveGameMapName( level ) );// DON'T FixSlashes on this, it needs to be //MOD
-
-	pFile = g_pSaveRestoreFileSystem->Open( name, "rb", MOD_DIR );
+	FileHandle_t pFile = g_pSaveRestoreFileSystem->Open( name, "rb", MOD_DIR );
 	if ( pFile )
 	{
+		RunCodeAtScopeExit( g_pSaveRestoreFileSystem->Close( pFile ) );
+
+		int	size, entityId;
 		// Patch count
 		g_pSaveRestoreFileSystem->Read( &size, sizeof(int), pFile );
-		for ( i = 0; i < size; i++ )
+		for ( int i = 0; i < size; i++ )
 		{
 			g_pSaveRestoreFileSystem->Read( &entityId, sizeof(int), pFile );
 			pSaveData->GetEntityInfo(entityId)->flags = FENTTABLE_REMOVED;
 		}
-		g_pSaveRestoreFileSystem->Close( pFile );
 	}
 }
 
@@ -2540,8 +2540,12 @@ void CSaveRestore::DirectoryCopy( const char *pPath, const char *pDestFileName )
 	FileHandle_t hFile = g_pSaveRestoreFileSystem->Open( pDestFileName, "ab+", MOD_DIR );
 	if ( hFile )
 	{
-		g_pSaveRestoreFileSystem->Write( &nMaps, sizeof(nMaps), hFile );
-		g_pSaveRestoreFileSystem->Close( hFile );
+		{
+			RunCodeAtScopeExit( g_pSaveRestoreFileSystem->Close( hFile ) );
+
+			g_pSaveRestoreFileSystem->Write( &nMaps, sizeof(nMaps), hFile );
+		}
+
 		g_pSaveRestoreFileSystem->DirectoryCopy( pPath, pDestFileName );
 	}
 	else
