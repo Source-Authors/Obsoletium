@@ -262,25 +262,18 @@ class CAudioXAudio2 : public CAudioDeviceBase, AudioXAudio2Callback {
   XAudio2VoiceCallback xaudio2_voice_callback_;
 };
 
-Singleton<CAudioXAudio2> g_xaudio2_device;
-
 }  // namespace se::engine::audio::xaudio2
 
 // Create XAudio Device
 IAudioDevice *Audio_CreateXAudioDevice() {
   MEM_ALLOC_CREDIT();
 
-  using se::engine::audio::xaudio2::g_xaudio2_device;
-
-  auto *device = g_xaudio2_device.GetInstance();
-
+  auto device = std::make_unique<se::engine::audio::xaudio2::CAudioXAudio2>();
   if (!device->Init()) {
-    g_xaudio2_device.Delete();
-
     return nullptr;
   }
 
-  return device;
+  return device.release();
 }
 
 namespace se::engine::audio::xaudio2 {
@@ -380,7 +373,7 @@ static bool GetDefaultAudioDeviceFormFactor(
     // May fail.
     if (device_physical_speakers.as_uint(physical_speakers_mask)) {
       if ((physical_speakers_mask & KSAUDIO_SPEAKER_7POINT1_SURROUND) ==
-              KSAUDIO_SPEAKER_7POINT1_SURROUND) {
+          KSAUDIO_SPEAKER_7POINT1_SURROUND) {
         form_factor = AudioDeviceFormFactor::Digital7Dot1Surround;
         return true;
       }
@@ -620,8 +613,8 @@ class DefaultAudioDeviceChangedNotificationClient
 // Updates windows settings based on snd_surround cvar changing.  This should
 // only happen if the user has changed it via the console or the UI.  Changes
 // won't take effect until the engine has restarted.
-void OnSndSurroundCvarChanged(IConVar *con_var, const char *old_string,
-                              float old_value) {
+static void OnSndSurroundCvarChanged(IConVar *con_var, const char *old_string,
+                                     float old_value) {
   // if the old value is -1, we're setting this from the detect routine for the
   // first time no need to reset the device.
   if (old_value == -1) return;
@@ -630,8 +623,8 @@ void OnSndSurroundCvarChanged(IConVar *con_var, const char *old_string,
   g_pSoundServices->RestartSoundSystem();
 }
 
-void OnSndVarChanged(IConVar *con_var, const char *old_string,
-                     float old_value) {
+static void OnSndVarChanged(IConVar *con_var, const char *old_string,
+                            float old_value) {
   ConVarRef var(con_var);
 
   // restart sound system so the change takes effect
@@ -850,6 +843,11 @@ void CAudioXAudio2::Shutdown() {
   }
 
   if (xaudio2_engine_) xaudio2_engine_.Release();
+
+  snd_mute_losefocus.InstallChangeCallback(nullptr);
+  snd_mute_losefocus.Revert();
+  snd_surround.InstallChangeCallback(nullptr);
+  snd_surround.Revert();
 }
 
 // XAudio2 has completed a packet.  Assuming they are sequential.

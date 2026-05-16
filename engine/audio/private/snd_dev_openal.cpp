@@ -124,15 +124,13 @@ bool CAudioDeviceOpenAL::Init( void )
 	m_buffersCompleted = 0;
 	m_pauseCount = 0;
 	m_bSoundsShutdown = false;
-	
-	static bool first = true;
-	if ( first )
-	{
-		snd_surround.SetValue( 2 );
-		snd_surround.InstallChangeCallback( &OnSndSurroundCvarChanged );
-		snd_legacy_surround.InstallChangeCallback( &OnSndSurroundLegacyChanged );
-		first = false;
-	}
+
+	// dimhotepus: Always reinitialize as device may be changed before sound
+    // subsystem restart.
+	snd_surround.SetValue( 2 );
+
+	snd_surround.InstallChangeCallback( &OnSndSurroundCvarChanged );
+	snd_legacy_surround.InstallChangeCallback( &OnSndSurroundLegacyChanged );
 	
 	OpenWaveOut();
 
@@ -146,6 +144,11 @@ bool CAudioDeviceOpenAL::Init( void )
 void CAudioDeviceOpenAL::Shutdown( void )
 {
 	CloseWaveOut();
+	
+	snd_legacy_surround.InstallChangeCallback( nullptr );
+	snd_legacy_surround.Revert();
+	snd_surround.InstallChangeCallback( nullptr );
+	snd_surround.Revert();
 }
 
 
