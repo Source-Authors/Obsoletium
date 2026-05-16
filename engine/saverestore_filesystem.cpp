@@ -228,7 +228,7 @@ public:
 	//-----------------------------------------------------------------------------
 	// Purpose: Extracts all the files contained within pFile
 	//-----------------------------------------------------------------------------
-	bool DirectoryExtract( FileHandle_t pFile, int fileCount, bool bIsXSave )
+	bool DirectoryExtract( FileHandle_t pFile, int fileCount )
 	{
 		int				fileSize;
 		char			szName[ MAX_PATH ], fileName[ MAX_PATH ];
@@ -246,15 +246,7 @@ public:
 			if ( !fileSize )
 				return false;
 
-			if ( !bIsXSave )
-			{
-				Q_snprintf( szName, sizeof( szName ), "%s/%s", saverestore->GetSaveDir(), fileName );
-			}
-			else
-			{
-				Q_snprintf( szName, sizeof( szName ), "%s:\\%s", GetCurrentMod(), fileName );
-			}
-
+			V_sprintf_safe( szName, "%s/%s", saverestore->GetSaveDir(), fileName );
 			Q_FixSlashes( szName );
 
 			FileHandle_t pCopy = g_pSaveRestoreFileSystem->Open( szName, "wb", "MOD" );

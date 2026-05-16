@@ -2555,7 +2555,7 @@ void CSaveRestore::DirectoryCopy( const char *pPath, const char *pDestFileName )
 //-----------------------------------------------------------------------------
 bool CSaveRestore::DirectoryExtract( FileHandle_t pFile, int fileCount )
 {
-	return g_pSaveRestoreFileSystem->DirectoryExtract( pFile, fileCount, false );
+	return g_pSaveRestoreFileSystem->DirectoryExtract( pFile, fileCount );
 }
 
 //-----------------------------------------------------------------------------

@@ -38,7 +38,7 @@ public:
 	virtual FSAsyncStatus_t	AsyncAppendFile( const char *pDestFileName, const char *pSrcFileName, FSAsyncControl_t *pControl = NULL ) = 0;
 
 	virtual void			DirectoryCopy( const char *pPath, const char *pDestFileName ) = 0;
-	virtual	bool			DirectoryExtract( FileHandle_t pFile, int fileCount, bool bIsXSave ) = 0;
+	virtual	bool			DirectoryExtract( FileHandle_t pFile, int fileCount ) = 0;
 	virtual int				DirectoryCount( const char *pPath ) = 0;
 	virtual void			DirectoryClear( const char *pPath, bool bIsXSave ) = 0;
 
