@@ -1048,7 +1048,8 @@ protected:
 	float				m_sweepObjectRadius;
 	float				m_epsilon;
 private:
-	CTraceSolver( const CTraceSolver & );
+	CTraceSolver( const CTraceSolver & ) = delete;
+	CTraceSolver& operator=( const CTraceSolver & ) = delete;
 };
 
 class CTraceSolverSweptObject final : public CTraceSolver
@@ -1075,7 +1076,8 @@ public:
 	float				m_rayLengthOS;
 
 private:
-	CTraceSolverSweptObject( const CTraceSolverSweptObject & ); // no implementation, quells compiler warning
+	CTraceSolverSweptObject( const CTraceSolverSweptObject & ) = delete;
+	CTraceSolverSweptObject& operator=( const CTraceSolverSweptObject & ) = delete;
 };
 
 CTraceSolverSweptObject::CTraceSolverSweptObject( trace_t *ptr, ITraceObject *sweepobject, CTraceRay *ray, CTraceIVP *obstacle, const Vector &axis, unsigned int contentsMask, IConvexInfo *pConvexInfo )
