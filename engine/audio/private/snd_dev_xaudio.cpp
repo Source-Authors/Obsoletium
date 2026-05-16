@@ -199,6 +199,8 @@ class CAudioXAudio2 : public CAudioDeviceBase, AudioXAudio2Callback {
   friend IAudioDevice * ::Audio_CreateXAudioDevice();
 
   CAudioXAudio2() : xaudio2_voice_callback_{this} {}
+  CAudioXAudio2(CAudioXAudio2 &) = delete;
+  CAudioXAudio2 &operator=(CAudioXAudio2 &) = delete;
   ~CAudioXAudio2() = default;
 
   bool IsActive() override { return true; }
