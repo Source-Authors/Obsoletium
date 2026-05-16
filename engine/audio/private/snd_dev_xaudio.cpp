@@ -891,12 +891,16 @@ void CAudioXAudio2::OnBufferEnd(size_t buffer_idx) {
 // Return the "write" cursor.  Used to clock the audio mixing.  The actual hw
 // write cursor and the number of samples it fetches is unknown.
 int CAudioXAudio2::GetOutputPosition() {
-  XAUDIO2_VOICE_STATE state = {};
-  state.SamplesPlayed = 0;
+  if (xaudio2_source_voice_) {
+    XAUDIO2_VOICE_STATE state = {};
+    state.SamplesPlayed = 0;
 
-  xaudio2_source_voice_->GetState(&state);
+    xaudio2_source_voice_->GetState(&state);
 
-  return state.SamplesPlayed % device_clock_divider_;
+    return state.SamplesPlayed % device_clock_divider_;
+  }
+
+  return 0;
 }
 
 // Pause playback
