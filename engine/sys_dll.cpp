@@ -997,8 +997,9 @@ void Sys_ShutdownGame( void )
 	TRACESHUTDOWN( Sys_Shutdown() );
 
 	// Remove debug spew output....
-	developer.InstallChangeCallback( 0 );
 	SpewOutputFunc( nullptr );
+	developer.InstallChangeCallback( nullptr );
+	developer.Revert();
 
 	// dimhotepus: Free spew memory, etc.
 	SpewDeactivate();
