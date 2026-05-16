@@ -793,7 +793,7 @@ float ComputeShadowControllerIVP( IVP_Real_Object *pivp, shadowcontrol_params_t 
 {
 	// resample fraction
 	// This allows us to arrive at the target at the requested time
-	float fraction = 1.0;
+	float fraction = 1.0f;
 	if ( secondsToArrival > 0 )
 	{
 		fraction = dt / secondsToArrival;
