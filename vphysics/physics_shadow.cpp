@@ -920,7 +920,7 @@ float ComputeShadowControllerHL( CPhysicsObject *pObject, const hlshadowcontrol_
 	return ComputeShadowControllerIVP( pObject->GetObject(), ivpParams, secondsToArrival, dt );
 }
 
-class CShadowController : public IVP_Controller_Independent, public IPhysicsShadowController, public CAlignedNewDelete<16>
+class CShadowController final : public IVP_Controller_Independent, public IPhysicsShadowController, public CAlignedNewDelete<16>
 {
 public:
 	CShadowController();
