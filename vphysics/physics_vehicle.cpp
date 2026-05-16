@@ -330,7 +330,7 @@ protected:
 	void CalcEngine( float throttle, float brake_val, bool handbrake, float steeringVal, bool torqueBoost );
 	void CalcEngineTransmission( float flThrottle );
 
-	virtual bool IsBoosting( void );
+	bool IsBoosting( void );
 
 private:
 	void ResetState();
