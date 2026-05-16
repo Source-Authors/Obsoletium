@@ -101,6 +101,7 @@ private:
 CVPhysicsParse::CVPhysicsParse( const char *pKeyData )
 {
 	m_pText = pKeyData;
+	m_blockName[0] = '\0';
 	NextBlock();
 }
 
