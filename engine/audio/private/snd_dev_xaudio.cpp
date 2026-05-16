@@ -534,6 +534,7 @@ class DefaultAudioDeviceChangedNotificationClient
                                             form_factor)
                 ? form_factor
                 : AudioDeviceFormFactor::StereoSpeakers};
+        snd_surround.SetValue(to_underlying(form_factor));
       } else {
         // TODO: reinit with null audio device as no audio in system.
       }
@@ -620,7 +621,12 @@ static void OnSndSurroundCvarChanged(IConVar *con_var, const char *old_string,
   if (old_value == -1) return;
 
   // restart sound system so it takes effect.
-  g_pSoundServices->RestartSoundSystem();
+  // dimhotepus: Can be invoked by mmsystem notification thread pool thread callback.
+  // In this case restart will deadlock as XAudio2 device wants such callback to complete.
+  // Just skip restart as XAudio2 support changing output devices on the fly by itself.
+  if (ThreadInMainThread()) {
+    g_pSoundServices->RestartSoundSystem();
+  }
 }
 
 static void OnSndVarChanged(IConVar *con_var, const char *old_string,
