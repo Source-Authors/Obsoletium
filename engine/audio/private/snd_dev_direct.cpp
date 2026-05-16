@@ -115,7 +115,7 @@ private:
 	void		S_TransferSurround16Interleaved_FullLock( const portable_samplepair_t *pfront, const portable_samplepair_t *prear, const portable_samplepair_t *pcenter, int lpaintedtime, int endtime);
 
 	int			m_deviceChannels;					// channels per hardware output buffer (1 for quad/5.1, 2 for stereo)
-	int			m_deviceSampleBits;					// bits per sample (16)
+	unsigned short	m_deviceSampleBits;				// bits per sample (16)
 	int			m_deviceSampleCount;				// count of mono samples in output buffer
 	int			m_deviceDmaSpeed;					// samples per second per output buffer
 	int			m_bufferSizeBytes;					// size of a single hardware output buffer, in bytes
