@@ -1148,7 +1148,8 @@ void CShadowController::do_simulation_controller( IVP_Event_Sim *es,IVP_U_Vector
 		IVP_Real_Object *pivp = m_pObject->GetObject();
 		Assert(!pivp->get_core()->pinned && !pivp->get_core()->physical_unmoveable);
 
-		ComputeShadowControllerIVP( pivp, m_shadow, m_secondsToArrival, es->delta_time );
+		// dimhotepus: Directly assign m_secondsToArrival as we recomputed it inside.
+		m_secondsToArrival = ComputeShadowControllerIVP( pivp, m_shadow, m_secondsToArrival, es->delta_time );
 		if ( m_allowsTranslation )
 		{
 			// UNDONE: Assumes gravity points down
@@ -1164,13 +1165,6 @@ void CShadowController::do_simulation_controller( IVP_Event_Sim *es,IVP_U_Vector
 					m_shadow.lastImpulse.k[1] += delta;
 				}
 			}
-		}
-
-		// if we have time left, subtract it off
-		m_secondsToArrival -= es->delta_time;
-		if ( m_secondsToArrival < 0 )
-		{
-			m_secondsToArrival = 0;
 		}
 	}
 	else
