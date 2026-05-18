@@ -65,10 +65,11 @@ bool LoadAchievementIcon( vgui::ImagePanel* pIconPanel, IAchievement *pAchieveme
 //-----------------------------------------------------------------------------
 Color LerpColors ( Color cStart, Color cEnd, float flPercent )
 {
-	float r = (float)((float)(cStart.r()) + (float)(cEnd.r() - cStart.r()) * Bias( flPercent, 0.75 ) );
-	float g = (float)((float)(cStart.g()) + (float)(cEnd.g() - cStart.g()) * Bias( flPercent, 0.75 ) );
-	float b = (float)((float)(cStart.b()) + (float)(cEnd.b() - cStart.b()) * Bias( flPercent, 0.75 ) );
-	float a = (float)((float)(cStart.a()) + (float)(cEnd.a() - cStart.a()) * Bias( flPercent, 0.75 ) );
+	const float flBias = Bias( flPercent, 0.75f );
+	float r = (float)((float)(cStart.r()) + (float)(cEnd.r() - cStart.r()) * flBias );
+	float g = (float)((float)(cStart.g()) + (float)(cEnd.g() - cStart.g()) * flBias );
+	float b = (float)((float)(cStart.b()) + (float)(cEnd.b() - cStart.b()) * flBias );
+	float a = (float)((float)(cStart.a()) + (float)(cEnd.a() - cStart.a()) * flBias );
 	return Color( r, g, b, a );
 }
 
