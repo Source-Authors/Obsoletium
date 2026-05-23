@@ -2260,8 +2260,6 @@ This is called at the start of each level
 */
 bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, const char *startspot )
 {
-	int		i;
-
 	Assert( serverGameClients );
 
 	if ( CommandLine()->FindParm( "-NoLoadPluginsForClient" ) != 0 )
@@ -2400,7 +2398,7 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 	COM_TimestampedLog( "Set up players" );
 
 	// allocate player data, and assign the values into the edicts
-	for ( i=0 ; i< GetClientCount() ; i++ )
+	for ( int i=0 ; i< GetClientCount() ; i++ )
 	{
 		CGameClient * pClient = Client(i);
 
@@ -2497,7 +2495,7 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 	COM_TimestampedLog( "Precache brush models" );
 
 	// Add world submodels to the model cache
-	for ( i = 1 ; i < host_state.worldbrush->numsubmodels ; i++ )
+	for ( int i = 1 ; i < host_state.worldbrush->numsubmodels ; i++ )
 	{
 		// Add in world brush models
 		char localmodel[5]; // inline model names "*1", "*2" etc
