@@ -671,6 +671,7 @@ bool CBaseClient::SendServerInfo( void )
 
 	// supporting smaller stack
 	byte *buffer = (byte *)MemAllocScratch( NET_MAX_PAYLOAD );
+	RunCodeAtScopeExit( MemFreeScratch() );
 
 	bf_write msg( "SV_SendServerinfo->msg", buffer, NET_MAX_PAYLOAD );
 
@@ -731,14 +732,11 @@ bool CBaseClient::SendServerInfo( void )
 	// send server info as one data block
 	if ( !m_NetChannel->SendData( msg ) )
 	{
-		MemFreeScratch();
 		Disconnect("Server info data overflow");
 		return false;
 	}
 		
 	COM_TimestampedLog( " CBaseClient::SendServerInfo(finished)" );
-
-	MemFreeScratch();
 
 	return true;
 }
