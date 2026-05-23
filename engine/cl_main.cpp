@@ -356,7 +356,7 @@ bool CL_CheckCRCs( const char *pszMap )
 		FileHandle_t fp = FILESYSTEM_INVALID_HANDLE;
 		int nSize = COM_OpenFile( pszMap, &fp );
 		if ( fp )
-			g_pFileSystem->Close( fp );
+			RunCodeAtScopeExit(g_pFileSystem->Close(fp));
 
 		if ( nSize != -1 )
 		{

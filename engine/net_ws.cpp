@@ -1784,7 +1784,7 @@ void NET_LogBadPacket(netpacket_t * packet)
 		}
 		else
 		{
-			g_pFileSystem->Close( fp );
+			RunCodeAtScopeExit(g_pFileSystem->Close( fp ));
 		}
 		i++;
 	}
