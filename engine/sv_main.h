@@ -114,8 +114,4 @@ void SV_AddOriginToPVS( const Vector& origin );
 
 extern CGlobalVars g_ServerGlobalVariables;
 
-void SV_FlushMemoryOnNextServer();
-
 #endif
-
-

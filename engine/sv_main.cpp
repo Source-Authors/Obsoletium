@@ -279,15 +279,6 @@ void SV_ForceSend()
 	s_bForceSend = true;
 }
 
-bool g_FlushMemoryOnNextServer;
-int g_FlushMemoryOnNextServerCounter;
-
-void SV_FlushMemoryOnNextServer()
-{
-	g_FlushMemoryOnNextServer = true;
-	g_FlushMemoryOnNextServerCounter++;
-}
-
 // Prints important entity creation/deletion events to console
 #if defined( _DEBUG )
 ConVar  sv_deltatrace( "sv_deltatrace", "0", 0, "For debugging, print entity creation/deletion info to console." );
@@ -2372,24 +2363,6 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 	else
 	{
 		m_szStartspot[0] = '\0';
-	}
-
-	if ( g_FlushMemoryOnNextServer )
-	{
-		g_FlushMemoryOnNextServer = false;
-		g_pDataCache->Flush();
-		g_pMaterialSystem->CompactMemory();
-		g_pFileSystem->AsyncFinishAll();
-
-#if !defined( SWDS )
-		extern CThreadMutex g_SndMutex;
-		AUTO_LOCK(g_SndMutex); // dimhotepus: Why?
-		g_pFileSystem->AsyncSuspend();
-		g_pThreadPool->SuspendExecution();
-		MemAlloc_CompactHeap();
-		g_pThreadPool->ResumeExecution();
-		g_pFileSystem->AsyncResume();
-#endif // SWDS
 	}
 
 	// Preload any necessary data from the xzps:
