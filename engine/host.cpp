@@ -454,7 +454,20 @@ ConVar telemetry_demostart( "telemetry_demostart", "0", 0, "When playing demo, s
 ConVar telemetry_demoend( "telemetry_demoend", "0", 0, "When playing demo, stop telemetry on tick #", OnChangeTelemetryDemoEnd );
 #endif
 
+#ifdef _WIN32
 static bool host_checkheap = false;
+
+static void CheckHeap( bool bEnabled, const char *pszFunction )
+{
+	if ( bEnabled )
+	{
+		if ( _heapchk() != _HEAPOK )
+		{
+			Sys_Error( "%s:  _heapchk() != _HEAPOK\n", pszFunction );
+		}
+	}
+}
+#endif
 
 CCommonHostState host_state;
 
@@ -2584,15 +2597,9 @@ static void _Host_RunFrame (float time)
 		// Profile scope specific to the top of this function, protect from setjmp() problems
 		VPROF( "_Host_RunFrame_Upto_MarkFrame" );
 
-		if ( host_checkheap )
-		{
 #if defined(_WIN32)
-			if ( _heapchk() != _HEAPOK )
-			{
-				Sys_Error( "_Host_RunFrame (top):  _heapchk() != _HEAPOK\n" );
-			}
+		CheckHeap( host_checkheap, __FUNCTION__ " (top)" );
 #endif
-		}
 
 		// When playing back a VCR file, don't do host_sleep. That way, if it was recorded with
 		// host_sleep on, it'll play back way Faster.
@@ -3079,16 +3086,10 @@ static void _Host_RunFrame (float time)
 		}
 
 		Host_PostFrameRate( host_frametime );
-
-		if ( host_checkheap )
-		{
+		
 #ifdef _WIN32
-			if ( _heapchk() != _HEAPOK )
-			{
-				Sys_Error( "_Host_RunFrame (bottom):  _heapchk() != _HEAPOK\n" );
-			}
+		CheckHeap( host_checkheap, __FUNCTION__ " (bottom)" );
 #endif
-		}
 
 		Host_CheckDumpMemoryStats();
 
@@ -3718,17 +3719,10 @@ void Host_Init( bool bDedicated )
 	// Finished initializing
 	host_initialized = true;
 
-	host_checkheap = CommandLine()->FindParm( "-heapcheck" ) ? true : false;
-
-	if ( host_checkheap )
-	{
-#if defined( _WIN32 )
-		if ( _heapchk() != _HEAPOK )
-		{
-			Sys_Error( "Host_Init:  _heapchk() != _HEAPOK\n" );
-		}
+#if defined(_WIN32)
+	host_checkheap = CommandLine()->HasParm( "-heapcheck" );
+	CheckHeap( host_checkheap, __FUNCTION__ );
 #endif
-	}
 
 	// go directly to run state with no active game
 	HostState_Init();
@@ -4192,15 +4186,9 @@ void Host_FreeToLowMark( bool server )
 //-----------------------------------------------------------------------------
 void Host_Shutdown(void)
 {
-	if ( host_checkheap )
-	{
 #ifdef _WIN32
-		if ( _heapchk() != _HEAPOK )
-		{
-			Sys_Error( "Host_Shutdown (top):  _heapchk() != _HEAPOK\n" );
-		}
+	CheckHeap( host_checkheap, __FUNCTION__  " (top)");
 #endif
-	}
 
 	// Check for recursive shutdown, should never happen
 	static bool shutting_down = false;
@@ -4343,16 +4331,10 @@ void Host_Shutdown(void)
 		ShutdownPME();
 	}
 #endif
-
-	if ( host_checkheap )
-	{
+	
 #ifdef _WIN32
-		if ( _heapchk() != _HEAPOK )
-		{
-			Sys_Error( "Host_Shutdown (bottom):  _heapchk() != _HEAPOK\n" );
-		}
+	CheckHeap( host_checkheap, __FUNCTION__ " (bottom)");
 #endif
-	}
 }
 
 //-----------------------------------------------------------------------------
