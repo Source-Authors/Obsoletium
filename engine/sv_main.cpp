@@ -300,7 +300,7 @@ void CGameServer::Clear( void )
 	
 	host_state.SetWorldModel( NULL );	
 
-	Q_memset( m_szStartspot, 0, sizeof( m_szStartspot ) );
+	BitwiseClear( m_szStartspot );
 	
 	num_edicts = 0;
 	max_edicts = 0;
@@ -2502,7 +2502,7 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 	{
 		// Add in world brush models
 		char localmodel[5]; // inline model names "*1", "*2" etc
-		Q_snprintf( localmodel, sizeof( localmodel ), "*%i", i );
+		V_sprintf_safe( localmodel, "*%i", i );
 
 		PrecacheModel( localmodel, RES_FATALIFMISSING | RES_PRELOAD, modelloader->GetModelForName( localmodel, IModelLoader::FMODELLOADER_SERVER ) );
 	}
