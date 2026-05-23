@@ -1543,6 +1543,16 @@ template<size_t size>
 template<size_t size>
 [[nodiscard]] constexpr inline bool Q_isempty(IN_Z_ARRAY wchar_t (&v)[size]) { return v[0] == L'\0'; }
 
+[[nodiscard]] inline bool Q_streq(IN_Z const char *l, IN_Z const char *r) 
+{
+	return V_strcmp(l, r) == 0;
+}
+
+[[nodiscard]] inline bool Q_strieq(IN_Z const char *l, IN_Z const char *r) 
+{
+	return V_stricmp(l, r) == 0;
+}
+
 // dimhotepus: Fast integral -> char conversion.
 template<size_t size, typename TIntegral>
 inline std::enable_if_t<std::is_integral_v<TIntegral>, std::errc>
