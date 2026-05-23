@@ -2445,7 +2445,7 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 
 	COM_TimestampedLog( "modelloader->GetModelForName(%s) -- Finished", szMapFile );
 
-	if ( IsMultiplayer() && !IsX360() )
+	if ( IsMultiplayer() )
 	{
 #ifndef SWDS
 		EngineVGui()->UpdateProgressBar(PROGRESS_CRCMAP);
