@@ -207,28 +207,27 @@ KeyValues* ReadEncryptedKVFile( IFileSystem *pFilesystem, const char *szFilename
 			V_sprintf_safe(szFullName, "%s.ctx", szFilenameWithoutExtension); // fall back to the .ctx file
 
 			FileHandle_t f = pFilesystem->Open( szFullName, "rb", pSearchPath );
-
 			if (!f)
 			{
 				pKV->deleteThis();
 				return NULL;
 			}
+
+			RunCodeAtScopeExit(pFilesystem->Close( f ));
+
 			// load file into a null-terminated buffer
 			int fileSize = pFilesystem->Size(f);
 			char *buffer = (char*)MemAllocScratch(fileSize + 1);
+			RunCodeAtScopeExit(MemFreeScratch());
 		
 			Assert(buffer);
 		
 			pFilesystem->Read(buffer, fileSize, f); // read into local buffer
 			buffer[fileSize] = 0; // null terminate file as EOF
-			pFilesystem->Close( f );	// close file after reading
 
 			UTIL_DecodeICE( (unsigned char*)buffer, fileSize, pICEKey );
 
 			bool retOK = pKV->LoadFromBuffer( szFullName, buffer, pFilesystem );
-
-			MemFreeScratch();
-
 			if ( !retOK )
 			{
 				pKV->deleteThis();
