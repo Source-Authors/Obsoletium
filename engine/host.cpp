@@ -3999,9 +3999,6 @@ bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const ch
 	VPROF( "Host_NewGame" );
 	COM_TimestampedLog( "Host_NewGame" );
 
-	char previousMapName[MAX_PATH];
-	V_strcpy_safe( previousMapName, host_map.GetString() );
-
 #ifndef SWDS
 	SCR_BeginLoadingPlaque();
 #endif
