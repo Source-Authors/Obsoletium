@@ -1558,7 +1558,7 @@ static bool AppearsNumeric( char const *in )
 {
 	char const *p = in;
 	int special[ 3 ];
-	Q_memset( special, 0, sizeof( special ) );
+	BitwiseClear( special );
 
 	for ( ; *p; p++ )
 	{
@@ -3189,7 +3189,7 @@ static bool IsLowViolence_Registry()
 	char szBuffer[128];
 	bool bReducedGore = false;
 
-	memset( szBuffer, 0, 128 );
+	BitwiseClear( szBuffer );
 
 	char const *appname = "Source";
 	V_sprintf_safe(szSubKey, "Software\\Valve\\%s\\Settings", appname );
