@@ -257,6 +257,7 @@ void CTeamMenu::LoadMapPage( const char *mapName )
 	}
 
 	FileHandle_t f = g_pFullFileSystem->Open( mapRES, "r" );
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(f));
 
 	// read into a memory block
 	int fileSize = g_pFullFileSystem->Size(f);
@@ -307,7 +308,6 @@ void CTeamMenu::LoadMapPage( const char *mapName )
 	// go back to the top of the text buffer
 	m_pMapInfo->GotoTextStart();
 
-	g_pFullFileSystem->Close( f );
 	free(memBlock);
 
 	InvalidateLayout();

@@ -239,6 +239,8 @@ void SixenseGestureBindings::WriteBindings( CUtlString filename_str )
 	{
 		return;
 	}
+
+	RunCodeAtScopeExit(filesystem->Close( hFile ));
 	
 	constexpr int strbuflen = 256;
 	char strbuf[strbuflen];
@@ -301,8 +303,6 @@ void SixenseGestureBindings::WriteBindings( CUtlString filename_str )
 		Q_snprintf( writebuf, strbuflen, "\n");
 		filesystem->Write( writebuf, strlen(writebuf), hFile );
 	}
-
-	filesystem->Close( hFile );
 }
 
 // Erase all the bindings. Right now this will cause code in in_sixense.cpp to detect the lack of bindings and immediately

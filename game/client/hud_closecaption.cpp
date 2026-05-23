@@ -2570,9 +2570,11 @@ void CHudCloseCaption::InitCaptionDictionary( const char *dbfile )
 			Q_strncpy( fullpath, fullpath360, sizeof( fullpath ) );
 		}
 
-        FileHandle_t fh = filesystem->Open( fullpath, "rb" );
-		if ( FILESYSTEM_INVALID_HANDLE != fh )
+		FileHandle_t fh = filesystem->Open( fullpath, "rb" );
+		if ( fh )
 		{
+			RunCodeAtScopeExit(filesystem->Close( fh ));
+
 			MEM_ALLOC_CREDIT();
 
 			CUtlBuffer dirbuffer;
@@ -2595,7 +2597,6 @@ void CHudCloseCaption::InitCaptionDictionary( const char *dbfile )
 			dirbuffer.EnsureCapacity( directoryBytes );
 			
 			filesystem->Read( dirbuffer.Base(), directoryBytes, fh );
-			filesystem->Close( fh );
 
 			entry.m_CaptionDirectory.CopyArray( (const CaptionLookup_t *)dirbuffer.PeekGet(), entry.m_Header.directorysize );
 			entry.m_CaptionDirectory.RedoSort( true );
@@ -2840,9 +2841,10 @@ void CHudCloseCaption::FindSound( char const *pchANSI )
 				nLoadedBlock = blockNum;
 
 				FileHandle_t fh = filesystem->Open( fn, "rb" );
+				RunCodeAtScopeExit(filesystem->Close( fh ));
+
 				filesystem->Seek( fh, params.blockoffset, FILESYSTEM_SEEK_CURRENT );
 				filesystem->Read( block, data.m_Header.blocksize, fh );
-				filesystem->Close( fh );
 			}
 
 			// Now we have the data
