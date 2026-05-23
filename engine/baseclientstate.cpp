@@ -1240,7 +1240,7 @@ bool CBaseClientState::ProcessServerInfo( SVC_ServerInfo *msg )
 	}
 
 	// Set default filename, but this is finalized by ClientState later, so it should not be depended on yet. See PrepareLevelResources call
-	Host_DefaultMapFileName( msg->m_szMapName, m_szLevelFileName, sizeof( m_szLevelFileName ) );
+	Host_DefaultMapFileName( msg->m_szMapName, m_szLevelFileName );
 
 	COM_TimestampedLog( " CBaseClient::ProcessServerInfo(done)" );
 

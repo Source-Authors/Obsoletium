@@ -430,7 +430,7 @@ static void OnChangeTelemetryDemoStart ( IConVar *var, const char *pOldValue, fl
 		char cmd[ 256 ]; 
 
 		// If we're far away from the start of the demo file, then jump to ~1000 ticks before.
-		Q_snprintf( cmd, sizeof( cmd ), "demo_gototick %d", g_Telemetry.DemoTickStart - 1000 ); 
+		V_sprintf_safe( cmd, "demo_gototick %d", g_Telemetry.DemoTickStart - 1000 ); 
 		Cbuf_AddText( cmd ); 
 	}
 	Msg( " TELEMETRY: Setting Telemetry DemoTickStart: '%d'\n", g_Telemetry.DemoTickStart );
@@ -641,7 +641,7 @@ void CCommonHostState::SetWorldModel( model_t *pModel )
 	}
 }
 
-void Host_DefaultMapFileName( const char *pFullMapName, /* out */ char *pDiskName, unsigned int nDiskNameSize )
+void Host_DefaultMapFileName( const char *pFullMapName, OUT_Z_CAP(nDiskNameSize) char *pDiskName, size_t nDiskNameSize )
 {
 	// pc names are as is
 	Q_snprintf( pDiskName, nDiskNameSize, "maps/%s.bsp", pFullMapName );
@@ -3804,7 +3804,7 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 	char szMapFile[MAX_PATH];
 	szMapFile[0] = '\0';
 	
-	Host_DefaultMapFileName( szMapName, szMapFile, sizeof( szMapFile ) );
+	Host_DefaultMapFileName( szMapName, szMapFile );
 
 	// Ask serverDLL to prepare this load
 	if ( g_iServerGameDLLVersion >= 10 )
@@ -3990,7 +3990,7 @@ bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const ch
 	// The file to load the map from.
 	char szMapFile[MAX_PATH];
 	szMapFile[0] = '\0';
-	Host_DefaultMapFileName( szMapName, szMapFile, sizeof( szMapFile ) );
+	Host_DefaultMapFileName( szMapName, szMapFile );
 
 	// Steam may not have been started yet, ensure it is available to the game DLL before we ask it to prepare level
 	// resources

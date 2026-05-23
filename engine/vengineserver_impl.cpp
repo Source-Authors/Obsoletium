@@ -543,7 +543,7 @@ public:
 
 		char szDiskName[MAX_PATH] = { 0 };
 		// Check if we can directly use this as a map
-		Host_DefaultMapFileName( pMapName, szDiskName, sizeof( szDiskName ) );
+		Host_DefaultMapFileName( pMapName, szDiskName );
 		if ( *szDiskName && modelloader->Map_IsValid( szDiskName, true ) )
 		{
 			return eFindMap_Found;
@@ -553,7 +553,7 @@ public:
 		char match[1][64] = { {0} };
 		if ( MapList_ListMaps( pMapName, false, false, 1, sizeof( match[0] ), match ) && *(match[0]) )
 		{
-			Host_DefaultMapFileName( match[0], szDiskName, sizeof( szDiskName ) );
+			Host_DefaultMapFileName( match[0], szDiskName );
 			if ( modelloader->Map_IsValid( szDiskName, true ) )
 			{
 				V_strncpy( pMapName, match[0], nMapNameMax );

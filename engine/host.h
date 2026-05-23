@@ -136,7 +136,12 @@ class NET_SetConVar;
 void		Host_BuildConVarUpdateMessage( NET_SetConVar *cvarMsg, int flags, bool nonDefault );
 char const *Host_CleanupConVarStringValue( char const *invalue );
 void		Host_SetAudioState( const AudioState_t &audioState );
-void		Host_DefaultMapFileName( const char *pFullMapName, /* out */ char *pDiskName, unsigned int nDiskNameSize );
+void		Host_DefaultMapFileName( const char *pFullMapName, OUT_Z_CAP(nDiskNameSize) char *pDiskName, size_t nDiskNameSize );
+template<size_t nDiskNameSize>
+void		Host_DefaultMapFileName( const char *pFullMapName, INOUT_Z_ARRAY char (&pDiskName)[nDiskNameSize] )
+{
+	Host_DefaultMapFileName( pFullMapName, pDiskName, nDiskNameSize );
+}
 
 bool CheckVarRange_Generic( ConVar *pVar, int minVal, int maxVal );
 
