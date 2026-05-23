@@ -779,7 +779,7 @@ CVGuiScreenPanel::CVGuiScreenPanel( vgui::Panel *parent, const char *panelName, 
 bool CVGuiScreenPanel::Init( KeyValues* pKeyValues, VGuiScreenInitData_t* pInitData )
 {
 	const char *pResFile = pKeyValues->GetString( "resfile" );
-	if (pResFile[0] != 0)
+	if (!Q_isempty( pResFile ))
 	{
 		LoadControlSettings( pResFile, NULL, NULL );
 	}
