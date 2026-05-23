@@ -2208,7 +2208,7 @@ void CMP3Player::SavePlayList( char const *filename )
 				{
 					bpr( 2, buf, "%s 1\n", song.flags == MP3File_t::FLAG_FROMFS ? "fromfs" : "fromgame" );
 
-					if ( dirname[0])
+					if ( !Q_isempty( dirname ) )
 					{
 						bpr( 2, buf, "directory \"%s\"\n", dirname );
 					}
