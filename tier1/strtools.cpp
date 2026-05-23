@@ -2045,7 +2045,7 @@ void V_FixDoubleSlashes( INOUT_Z char *pStr )
 //-----------------------------------------------------------------------------
 bool V_StripLastDir( INOUT_Z_CAP(maxlen) char *dirName, intp maxlen )
 {
-	if( dirName[0] == 0 || 
+	if( Q_isempty( dirName ) || 
 		!V_stricmp( dirName, "./" ) || 
 		!V_stricmp( dirName, ".\\" ) )
 		return false;

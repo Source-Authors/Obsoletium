@@ -306,7 +306,7 @@ inline intp CUtlString::Length() const
 
 inline bool CUtlString::IsEmpty() const
 {
-	return !m_pString || m_pString[0] == 0;
+	return Q_isempty( m_pString );
 }
 
 inline int __cdecl CUtlString::SortCaseInsensitive( const CUtlString *pString1, const CUtlString *pString2 )
