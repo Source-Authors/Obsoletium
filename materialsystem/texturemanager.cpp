@@ -2025,7 +2025,7 @@ ITextureInternal *CTextureManager::LoadTexture( const char *pTextureName, const 
 
 ITextureInternal *CTextureManager::FindTexture( const char *pTextureName )
 {
-	if ( !pTextureName || pTextureName[0] == 0 )
+	if ( Q_isempty( pTextureName ) )
 		return NULL;
 	
 	char szCleanName[MAX_PATH];
