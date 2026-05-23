@@ -790,7 +790,7 @@ void CMP3Player::RemoveTempSounds()
 	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
 
 	char path[ 512 ];
-	Q_strncpy( path, "sound/_mp3/*.mp3", sizeof( path ) );
+	V_strcpy_safe( path, "sound/_mp3/*.mp3" );
 
 	char const *fn = g_pFullFileSystem->FindFirstEx( path, "MOD", &fh );
 	if ( fn )
@@ -800,12 +800,12 @@ void CMP3Player::RemoveTempSounds()
 			if ( fn[0] != '.'  )
 			{
 				char ext[ 10 ];
-				Q_ExtractFileExtension( fn, ext, sizeof( ext ) );
+				V_ExtractFileExtension( fn, ext );
 
 				if ( !Q_stricmp( ext, "mp3" ) )
 				{
 					char killname[ 512 ];
-					Q_snprintf( killname, sizeof( killname ), "sound/_mp3/%s", fn );
+					V_sprintf_safe( killname, "sound/_mp3/%s", fn );
 					g_pFullFileSystem->RemoveFile( killname, "MOD" );
 				}
 			}
@@ -990,7 +990,7 @@ void CMP3Player::OnCommand( char const *cmd )
 void CMP3Player::SplitFile( CUtlVector< CUtlSymbol >& splitList, char const *relative )
 {
 	char work[ 512 ];
-	Q_strncpy( work, relative, sizeof( work ) );
+	V_strcpy_safe( work, relative );
 	char const *separators = "/\\";
 
 	char *token = strtok( work, separators );
@@ -1001,7 +1001,6 @@ void CMP3Player::SplitFile( CUtlVector< CUtlSymbol >& splitList, char const *rel
 
 		token = strtok( NULL, separators );
 	}
-
 }
 
 MP3Dir_t *CMP3Player::FindOrAddSubdirectory( MP3Dir_t *parent, char const *dirname )
@@ -1022,13 +1021,13 @@ MP3Dir_t *CMP3Player::FindOrAddSubdirectory( MP3Dir_t *parent, char const *dirna
 	MP3Dir_t *sub = new MP3Dir_t();
 	sub->m_DirName = dirname;
 	char fullpath[ 512 ];
-	if ( !parent->m_FullDirPath.String()[0] )
+	if ( Q_isempty( parent->m_FullDirPath.String() ) )
 	{
-		Q_snprintf( fullpath, sizeof( fullpath ), "%s", dirname );
+		V_sprintf_safe( fullpath, "%s", dirname );
 	}
 	else
 	{
-		Q_snprintf( fullpath, sizeof( fullpath ), "%s\\%s", parent->m_FullDirPath.String(), dirname );
+		V_sprintf_safe( fullpath, "%s\\%s", parent->m_FullDirPath.String(), dirname );
 	}
 	sub->m_FullDirPath = fullpath;
 	parent->AddSubDirectory( sub );
@@ -1079,16 +1078,16 @@ void CMP3Player::RecursiveFindMP3Files( SoundDirectory_t *root, char const *curr
 #endif
 
 	char path[ 512 ];
-	if ( current[ 0 ] )
+	if ( !Q_isempty( current ) )
 	{
-		Q_snprintf( path, sizeof( path ), "%s/*.*", current );
+		V_sprintf_safe( path, "%s/*.*", current );
 	}
 	else
 	{
-		Q_snprintf( path, sizeof( path ), "*.*" );
+		V_sprintf_safe( path, "*.*" );
 	}
 
-	Q_FixSlashes( path );
+	V_FixSlashes( path );
 	
 	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
 	char const *fn = g_pFullFileSystem->FindFirstEx( path, pathID, &fh );
@@ -1101,13 +1100,13 @@ void CMP3Player::RecursiveFindMP3Files( SoundDirectory_t *root, char const *curr
 				if ( g_pFullFileSystem->FindIsDirectory( fh ) )
 				{
 					char nextdir[ 512 ];
-					if ( current[ 0 ] )
+					if ( !Q_isempty( current ) )
 					{
-						Q_snprintf( nextdir, sizeof( nextdir ), "%s/%s", current, fn );
+						V_sprintf_safe( nextdir, "%s/%s", current, fn );
 					}
 					else
 					{
-						Q_snprintf( nextdir, sizeof( nextdir ), "%s", fn );
+						V_sprintf_safe( nextdir, "%s", fn );
 					}
 
 					RecursiveFindMP3Files( root, nextdir, pathID );
@@ -1115,29 +1114,29 @@ void CMP3Player::RecursiveFindMP3Files( SoundDirectory_t *root, char const *curr
 				else
 				{
 					char ext[ 10 ];
-					Q_ExtractFileExtension( fn, ext, sizeof( ext ) );
+					V_ExtractFileExtension( fn, ext );
 
 					if ( !Q_stricmp( ext, "mp3" ) )
 					{
 						char relative[ 512 ];
 						if ( root->m_bGameSound )
 						{
-							Q_snprintf( relative, sizeof( relative ), "%s/%s", current + ssize( SOUND_ROOT ), fn );
+							V_sprintf_safe( relative, "%s/%s", current + ssize( SOUND_ROOT ), fn );
 						}
 						else
 						{
-							if ( current[ 0 ] )
+							if ( !Q_isempty( current ) )
 							{
-								Q_snprintf( relative, sizeof( relative ), "%s/%s", current, fn );
+								V_sprintf_safe( relative, "%s/%s", current, fn );
 							}
 							else
 							{
-								Q_snprintf( relative, sizeof( relative ), "%s", fn );
+								V_sprintf_safe( relative, "%s", fn );
 							}
 						}
 						Msg( "Found '%s/%s'\n", current, fn );
 
-						Q_FixSlashes( relative );
+						V_FixSlashes( relative );
 						++m_nFilesAdded;
 						AddFileToDirectoryTree( root, relative );
 					}
@@ -1286,9 +1285,9 @@ extern "C"
 	extern int __stdcall CopyFileA( char *pszSource, char *pszDest, int bFailIfExists );
 };
 
-void CMP3Player::GetLocalCopyOfSong( const MP3File_t &f, char *outsong, size_t outlen )
+void CMP3Player::GetLocalCopyOfSong( const MP3File_t &f, OUT_Z_CAP(outlen) char *outsong, size_t outlen )
 {
-	outsong[ 0 ] = 0;
+	outsong[ 0 ] = '\0';
 	char fn[ 512 ];
 	if ( !g_pFullFileSystem->String( f.filename, fn ) )
 	{
@@ -1297,7 +1296,7 @@ void CMP3Player::GetLocalCopyOfSong( const MP3File_t &f, char *outsong, size_t o
 
 	if ( f.flags == MP3File_t::FLAG_FROMGAME )
 	{
-		Q_FixSlashes( fn );
+		V_FixSlashes( fn );
 		Q_strncpy( outsong, fn, outlen );
 		return;
 	}
@@ -1313,8 +1312,7 @@ void CMP3Player::GetLocalCopyOfSong( const MP3File_t &f, char *outsong, size_t o
 
 	char hexfilename[ 512 ];
 	V_sprintf_safe( hexfilename, "sound/_mp3/%s.mp3", hexname );
-
-	Q_FixSlashes( hexfilename );
+	V_FixSlashes( hexfilename );
 
 	if ( g_pFullFileSystem->FileExists( hexfilename, "MOD" ) )
 	{
@@ -1324,19 +1322,19 @@ void CMP3Player::GetLocalCopyOfSong( const MP3File_t &f, char *outsong, size_t o
 	{
 		// Make a local copy
 		char mp3_temp_path[ 512 ];
-		Q_snprintf( mp3_temp_path, sizeof( mp3_temp_path ), "sound/_mp3" );
+		V_sprintf_safe( mp3_temp_path, "sound/_mp3" );
 		g_pFullFileSystem->CreateDirHierarchy( mp3_temp_path, "MOD" );
 
 		char destpath[ 512 ];
-		Q_snprintf( destpath, sizeof( destpath ), "%s/%s", engine->GetGameDirectory(), hexfilename );
-		Q_FixSlashes( destpath );
+		V_sprintf_safe( destpath, "%s/%s", engine->GetGameDirectory(), hexfilename );
+		V_FixSlashes( destpath );
 
 		char sourcepath[ 512 ];
 
 		Assert( f.dirnum >= 0 && f.dirnum < m_SoundDirectories.Count() );
 		SoundDirectory_t *sdir = m_SoundDirectories[ f.dirnum ];
-		Q_snprintf( sourcepath, sizeof( sourcepath ), "%s/%s", sdir->m_Root.String(), fn );
-		Q_FixSlashes( sourcepath );
+		V_sprintf_safe( sourcepath, "%s/%s", sdir->m_Root.String(), fn );
+		V_FixSlashes( sourcepath );
 
 		// !!!HACK HACK:
 		// Total hack right now, using windows OS calls to copy file to full destination
@@ -1347,7 +1345,7 @@ void CMP3Player::GetLocalCopyOfSong( const MP3File_t &f, char *outsong, size_t o
 		}
 	}
 
-	Q_FixSlashes( outsong );
+	V_FixSlashes( outsong );
 }
 
 void CMP3Player::PlaySong( intp songIndex, float skipTime /*= 0.0f */ ) 
@@ -1361,7 +1359,7 @@ void CMP3Player::PlaySong( intp songIndex, float skipTime /*= 0.0f */ )
 
 	if ( song.playbackfilename == (FileNameHandle_t)0 )
 	{
-		GetLocalCopyOfSong( song, soundname, sizeof( soundname ) );
+		GetLocalCopyOfSong( song, soundname );
 		if ( !soundname[ 0 ] )
 		{
 			return;
@@ -1380,7 +1378,7 @@ void CMP3Player::PlaySong( intp songIndex, float skipTime /*= 0.0f */ )
 
 	// Msg( "Playing '%s'\n", soundname );
 
-	if ( !soundname[ 0 ] )
+	if ( Q_isempty( soundname ) )
 	{
 		return;
 	}
@@ -1391,7 +1389,7 @@ void CMP3Player::PlaySong( intp songIndex, float skipTime /*= 0.0f */ )
 	}
 
 	char drymix[ 512 ];
-	Q_snprintf( drymix, sizeof( drymix ), "#%s", soundname );
+	V_sprintf_safe( drymix, "#%s", soundname );
 
 	enginesound->EmitAmbientSound(
 		drymix, 
@@ -1414,7 +1412,7 @@ void CMP3Player::PlaySong( intp songIndex, float skipTime /*= 0.0f */ )
 	m_nSongSeconds = (int)( m_flSongDuration - (float)( m_nSongMinutes * 60 ) );
 
 	char durationstr[ 256 ];
-	Q_snprintf( durationstr, sizeof( durationstr ), "0:00 / %i:%02i", m_nSongMinutes, m_nSongSeconds );
+	V_sprintf_safe( durationstr, "0:00 / %i:%02i", m_nSongMinutes, m_nSongSeconds );
 
 	m_pDuration->SetText( durationstr );
 	
@@ -1539,7 +1537,7 @@ void CMP3Player::OnTick()
 			int minutes = ( int ) ( elapsed / 60.0f );
 			int seconds = (int)( elapsed - ( 60 * minutes ) );
 			char durationstr[ 256 ];
-			Q_snprintf( durationstr, sizeof( durationstr ), "%i:%02i / %i:%02i", minutes, seconds, m_nSongMinutes, m_nSongSeconds );
+			V_sprintf_safe( durationstr, "%i:%02i / %i:%02i", minutes, seconds, m_nSongMinutes, m_nSongSeconds );
 
 			m_pDuration->SetText( durationstr );
 		}
@@ -1806,10 +1804,10 @@ void CMP3Player::RestoreSongs( KeyValues *songs )
 		int subdir = song->GetInt( "subdirindex", 0 );
 
 		char shortname[ 512 ];
+		V_strcpy_safe( shortname, song->GetString( "short", "" ) );
+		
 		char filename[ 512 ];
-
-		Q_strncpy( shortname, song->GetString( "short", "" ), sizeof( shortname ) );
-		Q_strncpy( filename, song->GetString( "filename", "" ), sizeof( filename ) );
+		V_strcpy_safe( filename, song->GetString( "filename", "" ) );
 
 		MP3File_t file;
 		file.dirnum = subdir;
@@ -2173,12 +2171,12 @@ void CMP3Player::SavePlayList( char const *filename )
 			if ( g_pFullFileSystem->String( song.filename, fn ) )
 			{
 				char dirname[ 512 ];
-				dirname[0]=0;
+				dirname[0]='\0';
 				if ( song.dirnum >= 0 )
 				{
 					SoundDirectory_t *sd = m_SoundDirectories[ song.dirnum ];
 
-					Q_strncpy( dirname, sd->m_Root.String(), sizeof( dirname ) );
+					V_strcpy_safe( dirname, sd->m_Root.String() );
 				}
 
 				bpr( 1, buf, "song\n" );
@@ -2231,7 +2229,7 @@ void CMP3Player::LoadSettings()
 		for ( KeyValues *sub = dirs; sub ; sub = sub->GetNextKey() )
 		{
 			char const *dirname = sub->GetString( "dirname", "" );
-			if ( dirname && dirname[ 0 ] )
+			if ( !Q_isempty( dirname ) )
 			{
 				AddSoundDirectory( dirname, false ); 
 			}
@@ -2311,8 +2309,8 @@ void CMP3Player::OnDirectorySelected( KeyValues *params )
 	if ( fullpath && fullpath[ 0 ] )
 	{
 		char dir[ 512 ];
-		Q_strncpy( dir, fullpath, sizeof( dir ) );
-		Q_StripTrailingSlash( dir );
+		V_strcpy_safe( dir, fullpath );
+		V_StripTrailingSlash( dir );
 
 		AddSoundDirectory( dir, true );
 		PopulateTree();

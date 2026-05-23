@@ -244,7 +244,12 @@ protected:
 	intp					FindSong( char const *relative );
 
 	void					PlaySong( intp songIndex, float skipTime = 0.0f );
-	void					GetLocalCopyOfSong( const MP3File_t &mp3, char *outsong, size_t outlen );
+	void					GetLocalCopyOfSong( const MP3File_t &mp3, OUT_Z_CAP(outlen) char *outsong, size_t outlen );
+	template<size_t outlen>
+	void					GetLocalCopyOfSong( const MP3File_t &mp3, OUT_Z_ARRAY char (&outsong)[outlen] )
+	{
+		GetLocalCopyOfSong(mp3, outsong, outlen);
+	}
 	float					GetMP3Duration( char const *songname );
 	void					OnNextTrack();
 	void					OnPrevTrack();
