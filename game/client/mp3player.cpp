@@ -1991,7 +1991,7 @@ void CMP3Player::SaveDbDirectory( int level, CUtlBuffer& buf, SoundDirectory_t *
 void CMP3Player::SaveDb( char const *filename )
 {
 	// dimhotepus: This can take a while, put up a waiting cursor.
-    const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+	const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
 
 	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
