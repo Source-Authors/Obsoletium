@@ -77,5 +77,24 @@ public:
 //-----------------------------------------------------------------------------
 IStaticPropMgrEngine* StaticPropMgr();
 
+class IFileSystem;
+
+// dimhotepus: RAII for map access
+// If changing from the same map to the same map, optimize by not closing and reopening
+// the packfile which is embedded in the .bsp; we do this by incrementing the packfile's
+// refcount via BeginMapAccess()/EndMapAccess() through the base filesystem API.
+class LocalMapAccessScope
+{
+public:
+	LocalMapAccessScope( bool enabled, IFileSystem *fileSystem );
+	LocalMapAccessScope(LocalMapAccessScope &) = delete;
+	LocalMapAccessScope& operator=(LocalMapAccessScope &) = delete;
+
+	~LocalMapAccessScope();
+
+private:
+	IFileSystem *pFileSystem;
+	bool bEnabled;
+};
 
 #endif	// STATICPROPMGR_H

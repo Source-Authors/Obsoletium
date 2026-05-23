@@ -3832,22 +3832,8 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 		return false;
 	}
 
-	// If changing from the same map to the same map, optimize by not closing and reopening
-	// the packfile which is embedded in the .bsp; we do this by incrementing the packfile's
-	// refcount via BeginMapAccess()/EndMapAccess() through the base filesystem API.
-	struct LocalMapAccessScope
-	{
-		LocalMapAccessScope() : bEnabled( false ) { }
-		~LocalMapAccessScope() { if ( bEnabled ) g_pFileSystem->EndMapAccess(); }
-		bool bEnabled;
-	};
-
-	LocalMapAccessScope mapscope;
-	if ( V_strcmp( sv.GetMapName(), szMapName ) == 0 )
-	{
-		g_pFileSystem->BeginMapAccess();
-		mapscope.bEnabled = true;
-	}
+	const bool bEnableMapAccess = V_strcmp(sv.GetMapName(), szMapName) == 0;
+	const LocalMapAccessScope mapscope{ bEnableMapAccess, g_pFileSystem };
 
 	g_pFileSystem->AsyncFinishAll();
 

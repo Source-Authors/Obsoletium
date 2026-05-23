@@ -3446,11 +3446,15 @@ model_t	*CModelLoader::LoadModel( model_t *mod, REFERENCETYPE *pReferencetype )
 			}
 
 			BeginLoadingUpdates( MATERIAL_NON_INTERACTIVE_MODE_LEVEL_LOAD );
-			g_pFileSystem->BeginMapAccess();
-			Map_LoadModel( mod );
-			g_pFileSystem->EndMapAccess();
+
+			{
+				g_pFileSystem->BeginMapAccess();
+				RunCodeAtScopeExit(g_pFileSystem->EndMapAccess());
+
+				Map_LoadModel( mod );
+			}
 	
-			double t2 = Plat_FloatTime();
+			const double t2 = Plat_FloatTime();
 			g_flAccumulatedModelLoadTimeBrush += (t2 - t1);
 		}
 		break;

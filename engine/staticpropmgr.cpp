@@ -1496,11 +1496,8 @@ void CStaticPropMgr::LevelInitClient()
 
 	extern ConVar r_proplightingfromdisk;
 
-	bool bNeedsMapAccess = r_proplightingfromdisk.GetBool();
-	if ( bNeedsMapAccess )
-	{
-		g_pFileSystem->BeginMapAccess();
-	}
+	const bool bNeedsMapAccess = r_proplightingfromdisk.GetBool();
+	const LocalMapAccessScope mapscope{ bNeedsMapAccess, g_pFileSystem };
 
 	Assert( m_bLevelInitialized );
 	Assert( !m_bClientInitialized );
@@ -1531,11 +1528,6 @@ void CStaticPropMgr::LevelInitClient()
 	PrecacheLighting();
 
 	m_bClientInitialized = true;
-
-	if ( bNeedsMapAccess )
-	{
-		g_pFileSystem->EndMapAccess();
-	}
 #endif
 }
 
@@ -2320,3 +2312,15 @@ void Cmd_PropCrosshair_f (void)
 
 static ConCommand prop_crosshair( "prop_crosshair", Cmd_PropCrosshair_f, "Shows name for prop looking at", FCVAR_CHEAT );
 
+// dimhotepus: RAII for map access
+LocalMapAccessScope::LocalMapAccessScope( bool enabled, IFileSystem *fileSystem )
+	: bEnabled( enabled ),
+	pFileSystem{fileSystem}
+{
+	if ( enabled ) fileSystem->BeginMapAccess();
+}
+
+LocalMapAccessScope::~LocalMapAccessScope()
+{
+	if ( bEnabled ) pFileSystem->EndMapAccess();
+}

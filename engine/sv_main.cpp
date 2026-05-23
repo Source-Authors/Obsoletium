@@ -2425,6 +2425,7 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 	// Load the world model.
 	g_pFileSystem->AddSearchPath( szMapFile, "GAME", PATH_ADD_TO_HEAD );
 	g_pFileSystem->BeginMapAccess();
+	RunCodeAtScopeExit(g_pFileSystem->EndMapAccess());
 
 	if ( !CommandLine()->FindParm( "-allowstalezip" ) )
 	{
@@ -2441,7 +2442,6 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 	{
 		ConMsg( "Couldn't spawn server %s\n", szMapFile );
 		m_State = ss_dead;
-		g_pFileSystem->EndMapAccess();
 		return false;
 	}
 
@@ -2458,7 +2458,6 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 		{
 			ConMsg( "Couldn't CRC server map: %s\n", szMapFile );
 			m_State = ss_dead;
-			g_pFileSystem->EndMapAccess();
 			return false;
 		}
 
@@ -2568,7 +2567,6 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 
 	COM_TimestampedLog( "SV_SpawnServer -- Finished" );
 
-	g_pFileSystem->EndMapAccess();
 	return true;
 }
 
