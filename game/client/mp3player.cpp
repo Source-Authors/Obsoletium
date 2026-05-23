@@ -42,8 +42,8 @@ constexpr inline char SOUND_ROOT[]{"sound"};
 
 constexpr inline float MUTED_VOLUME{0.02f};
 
-#define TREE_TEXT_COLOR		Color( 200, 255, 200, 255 )
-#define LIST_TEXT_COLOR		TREE_TEXT_COLOR
+constexpr inline Color TREE_TEXT_COLOR{Color( 200, 255, 200, 255 )};
+const inline Color LIST_TEXT_COLOR{TREE_TEXT_COLOR};
 
 constexpr inline char DB_FILENAME[]{"resource/mp3player_db.txt"};
 constexpr inline char MP3_SETTINGS_FILE[]{"resource/mp3settings.txt"};
