@@ -452,7 +452,7 @@ const char* CObjectSapper::GetSapperModelName( SapperModel_t nModel, const char 
 		pchModelName = szModelName + 2;
 
 #ifdef STAGING_ONLY	
-		if (!V_strcmp(pchModelName, "sd_sapper"))
+		if (V_streq(pchModelName, "sd_sapper"))
 		{
 			V_snprintf(m_szPlacementModel, sizeof(m_szPlacementModel), "models/workshop_partner/buildables/%s%s", pchModelName, "_placement.mdl");
 			V_snprintf(m_szSapperModel, sizeof(m_szSapperModel), "models/workshop_partner/buildables/%s%s", pchModelName, "_placed.mdl");

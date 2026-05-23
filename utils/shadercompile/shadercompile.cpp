@@ -643,7 +643,7 @@ void WriteShaderFiles(
   ShaderInfo_t &shaderInfo = shader_info_map[shader_name];
   if (!shaderInfo.m_pShaderName) {
     for (const auto *pAnalyze = configs.get(); pAnalyze->m_szName; ++pAnalyze) {
-      if (!strcmp(pAnalyze->m_szName, shader_name)) {
+      if (V_streq(pAnalyze->m_szName, shader_name)) {
         ParseShaderInfoFromCompileCommands(pAnalyze, shaderInfo);
         shader_info_map[shader_name] = shaderInfo;
         break;

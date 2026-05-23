@@ -2625,7 +2625,7 @@ void LoadAndSpawnEntities_ParseEntKVBlockHelper( CBaseEntity *pNode, KeyValues *
 	while ( pkvNodeData )
 	{
 		// Handle the connections block
-		if ( !Q_strcmp(pkvNodeData->GetName(), "connections") )
+		if ( V_streq(pkvNodeData->GetName(), "connections") )
 		{
 			LoadAndSpawnEntities_ParseEntKVBlockHelper( pNode, pkvNodeData );
 		}

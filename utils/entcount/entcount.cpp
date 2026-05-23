@@ -238,7 +238,7 @@ void AddToTable( const char *name )
 	// search for it in the table
 	for ( int i = 0; i < NumEnts;  i++ )
 	{
-		if ( EntNames[i] && !strcmp(EntNames[i], name) )
+		if ( EntNames[i] && V_streq(EntNames[i], name) )
 		{
 			// it's already in the table
 			// increment the usage count

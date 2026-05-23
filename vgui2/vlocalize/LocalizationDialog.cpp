@@ -167,7 +167,7 @@ void CLocalizationDialog::OnTextChanged()
 	m_pLanguageEdit->GetText( buf1, sizeof( buf1 ) );
 	m_pEnglishEdit->GetText( buf2, sizeof( buf2 ) );
 
-	if (!strcmp(buf1, buf2))
+	if (V_streq(buf1, buf2))
 	{
 		m_pApplyButton->SetEnabled(false);
 	}

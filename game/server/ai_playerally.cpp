@@ -744,7 +744,7 @@ void CAI_PlayerAlly::PostSpeakDispatchResponse( AIConcept_t concept, AI_Response
 	ConceptInfo_t *pConceptInfo	= pSpeechManager->GetConceptInfo( concept );
 	if ( pConceptInfo && (pConceptInfo->flags & AICF_QUESTION) && GetSpeechTarget() )
 	{
-		bool bSaidHelloToNPC = !Q_strcmp(concept, "TLK_HELLO_NPC");
+		bool bSaidHelloToNPC = V_streq(concept, "TLK_HELLO_NPC");
 
 		float duration = GetExpresser()->GetSemaphoreAvailableTime(this) - gpGlobals->curtime;
 

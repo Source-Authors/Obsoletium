@@ -572,7 +572,7 @@ void CBaseEntity::ValidateDataDescription(void)
 		for (intp j = i - 1; --j >= 0; )
 		{
 			// dimhotepus: Case-sensitive compare as we have fields which differ by case only.
-			if (!Q_strcmp(names[i], names[j]))
+			if (V_streq(names[i], names[j]))
 			{
 				DevMsg( "%s has multiple data description entries for \"%s\"\n", STRING(m_iClassname), names[i]);
 				break;

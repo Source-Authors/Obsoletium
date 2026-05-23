@@ -211,7 +211,7 @@ bool CHLTVClient::ExecuteStringCommand( const char *pCommandString )
 		
 		return true;
 	}
-	else if ( !Q_strcmp( cmd, "tv_chatgroup" )  )
+	else if ( V_streq( cmd, "tv_chatgroup" )  )
 	{
 		if (  args.ArgC() > 1 )
 		{
@@ -223,7 +223,7 @@ bool CHLTVClient::ExecuteStringCommand( const char *pCommandString )
 		}
 		return true;
 	}
-	else if ( !Q_strcmp( cmd, "status" ) )
+	else if ( V_streq( cmd, "status" ) )
 	{
 		int		slots, proxies,	clients;
 		char	gd[MAX_OSPATH];

@@ -241,7 +241,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 	trtoken_t ttype = tr.NextToken(szToken);
 	if (ttype == OPERATOR)
 	{
-		if (!strcmp(szToken, "*"))
+		if (V_streq(szToken, "*"))
 		{
 			m_bReportable = true;
 		}

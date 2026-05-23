@@ -2560,7 +2560,7 @@ const CEconItemDefinition *GetPaintItemDefinitionForPaintedItem( const IEconItem
 
 		// ignore everything that is not a paint can tool
 		const IEconTool *pEconTool = pItemDef->GetEconTool();
-		if ( pEconTool && !V_strcmp( pEconTool->GetTypeName(), "paint_can" ) ) 
+		if ( pEconTool && V_streq( pEconTool->GetTypeName(), "paint_can" ) ) 
 		{
 			attrib_value_t unPaintRGBAttrCompareBits;
 			if ( FindAttribute( pItemDef, pAttribDef_Paint, &unPaintRGBAttrCompareBits ) && unPaintRGBAttrCompareBits == unPaintRGBAttrBits )
@@ -2681,7 +2681,7 @@ void CEconItemDescription::Generate_Uses( const CLocalizationProvider *pLocaliza
 		return;
 
 	int iQuantity = pEconItem->GetQuantity();
-	bool bIsTool = pItemDef->GetItemClass() && !Q_strcmp( pItemDef->GetItemClass(), "tool" );
+	bool bIsTool = pItemDef->GetItemClass() && V_streq( pItemDef->GetItemClass(), "tool" );
 	bool bIsConsumable = ( pItemDef->GetCapabilities() & ITEM_CAP_USABLE_GC ) != 0 && iQuantity != 0;	
 
 	if ( bIsTool || bIsConsumable )
@@ -3579,7 +3579,7 @@ void CEconItemDescription::Generate_DirectX8Warning( const CLocalizationProvider
 #ifdef CLIENT_DLL
 	static ConVarRef mat_dxlevel( "mat_dxlevel" );
 	const CEconItemDefinition *pEconItemDefinition = pEconItem->GetItemDefinition();
-	// If less than 90, we’re in DX8 mode. 
+	// If less than 90, we're in DX8 mode. 
 	// Display warning if you are looking at a painthit item or case
 	if ( mat_dxlevel.GetInt() < 90 && pEconItemDefinition && ( pEconItemDefinition->GetItemCollectionDefinition() || pEconItemDefinition->GetCollectionReference() ) )
 	{

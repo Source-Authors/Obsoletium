@@ -718,7 +718,7 @@ bool CTFTauntInfo::InitTauntInputRemap( KeyValues *pKV, CUtlVector<CUtlString> *
 		int iButton = 0;
 		for ( int i=0; i<ARRAYSIZE( s_pszAllowedTauntInputButtonNames ); i++ )
 		{
-			if ( !V_strcmp( pszButtonName, s_pszAllowedTauntInputButtonNames[i] ) )
+			if ( V_streq( pszButtonName, s_pszAllowedTauntInputButtonNames[i] ) )
 			{
 				iButton = s_iAllowedTauntInputButtons[i];
 				break;
@@ -758,85 +758,85 @@ bool CTFTauntInfo::BInitFromKV( KeyValues *pKV, CUtlVector<CUtlString> *pVecErro
 	FOR_EACH_SUBKEY( pKV, pSubKey )
 	{
 		const char *pszKeyName = pSubKey->GetName();
-		if ( !V_strcmp( pszKeyName, "custom_taunt_scene_per_class" ) )
+		if ( V_streq( pszKeyName, "custom_taunt_scene_per_class" ) )
 		{
 			if ( !InitPerClassStringVectorArray( pSubKey, m_vecIntroScenes, pVecErrors ) )
 				return false;
 		}
-		else if ( !V_strcmp( pszKeyName, "custom_taunt_outro_scene_per_class" ) )
+		else if ( V_streq( pszKeyName, "custom_taunt_outro_scene_per_class" ) )
 		{
 			if ( !InitPerClassStringVectorArray( pSubKey, m_vecOutroScenes, pVecErrors ) ) 
 				return false;
 		}
-		else if ( !V_strcmp( pszKeyName, "custom_partner_taunt_per_class" ) )
+		else if ( V_streq( pszKeyName, "custom_partner_taunt_per_class" ) )
 		{
 			if ( !InitPerClassStringVectorArray( pSubKey, m_vecPartnerTauntInitiatorScenes, pVecErrors ) ) 
 				return false;
 			if ( !InitPerClassStringVectorArray( pSubKey, m_vecPartnerTauntReceiverScenes, pVecErrors ) )
 				return false;
 		}
-		else if ( !V_strcmp( pszKeyName, "custom_partner_taunt_initiator_per_class" ) )
+		else if ( V_streq( pszKeyName, "custom_partner_taunt_initiator_per_class" ) )
 		{
 			if ( !InitPerClassStringVectorArray( pSubKey, m_vecPartnerTauntInitiatorScenes, pVecErrors ) )
 				return false;
 		}
-		else if ( !V_strcmp( pszKeyName, "custom_partner_taunt_receiver_per_class" ) )
+		else if ( V_streq( pszKeyName, "custom_partner_taunt_receiver_per_class" ) )
 		{
 			if ( !InitPerClassStringVectorArray( pSubKey, m_vecPartnerTauntReceiverScenes, pVecErrors ) )
 				return false;
 		}
-		else if ( !V_strcmp( pszKeyName, "custom_taunt_input_remap" ) )
+		else if ( V_streq( pszKeyName, "custom_taunt_input_remap" ) )
 		{
 			if ( !InitTauntInputRemap( pSubKey, pVecErrors ) )
 			{
 				return false;
 			}
 		}
-		else if ( !V_strcmp( pszKeyName, "custom_taunt_prop_per_class" ) )
+		else if ( V_streq( pszKeyName, "custom_taunt_prop_per_class" ) )
 		{
 			InitPerClassStringArray( pSubKey, m_pszProp );
 		}
-		else if ( !V_strcmp( pszKeyName, "custom_taunt_prop_scene_per_class" ) )
+		else if ( V_streq( pszKeyName, "custom_taunt_prop_scene_per_class" ) )
 		{
 			InitPerClassStringArray( pSubKey, m_pszPropIntroScene );
 		}
-		else if ( !V_strcmp( pszKeyName, "custom_taunt_prop_outro_scene_per_class" ) )
+		else if ( V_streq( pszKeyName, "custom_taunt_prop_outro_scene_per_class" ) )
 		{
 			InitPerClassStringArray( pSubKey, m_pszPropOutroScene );
 		}
-		else if ( !V_strcmp( pszKeyName, "taunt_separation_forward_distance" ) )
+		else if ( V_streq( pszKeyName, "taunt_separation_forward_distance" ) )
 		{
 			m_flTauntSeparationForwardDistance = pSubKey->GetFloat();
 		}
-		else if ( !V_strcmp( pszKeyName, "taunt_separation_right_distance" ) )
+		else if ( V_streq( pszKeyName, "taunt_separation_right_distance" ) )
 		{
 			m_flTauntSeparationRightDistance = pSubKey->GetFloat();
 		}
-		else if ( !V_strcmp( pszKeyName, "min_taunt_time" ) )
+		else if ( V_streq( pszKeyName, "min_taunt_time" ) )
 		{
 			m_flMinTauntTime = pSubKey->GetFloat();
 		}
-		else if ( !V_strcmp( pszKeyName, "is_partner_taunt" ) )
+		else if ( V_streq( pszKeyName, "is_partner_taunt" ) )
 		{
 			m_bIsPartnerTaunt = pSubKey->GetBool();
 		}
-		else if ( !V_strcmp( pszKeyName, "stop_taunt_if_moved" ) )
+		else if ( V_streq( pszKeyName, "stop_taunt_if_moved" ) )
 		{
 			m_bStopTauntIfMoved = pSubKey->GetBool();
 		}
-		else if ( !V_strcmp( pszKeyName, "fov" ) )
+		else if ( V_streq( pszKeyName, "fov" ) )
 		{
 			m_nFOV = pSubKey->GetInt();
 		}
-		else if ( !V_strcmp( pszKeyName, "camera_dist" ) )
+		else if ( V_streq( pszKeyName, "camera_dist" ) )
 		{
 			m_flCameraDist = pSubKey->GetFloat();
 		}
-		else if ( !V_strcmp( pszKeyName, "camera_dist_up" ) )
+		else if ( V_streq( pszKeyName, "camera_dist_up" ) )
 		{
 			m_flCameraDistUp = pSubKey->GetFloat();
 		}
-		else if ( !V_strcmp( pszKeyName, "particle_attachment" ) )
+		else if ( V_streq( pszKeyName, "particle_attachment" ) )
 		{
 			m_pszParticleAttachment = pSubKey->GetString();
 		}
@@ -1174,7 +1174,7 @@ bool CTFItemDefinition::BInitFromKV( KeyValues *pKVItem, CUtlVector<CUtlString> 
 	const char *pszLoadoutSlot = pKVInitValues->GetString("item_slot", "");
 	if ( *pszLoadoutSlot )
 	{
-		if ( !V_strcmp( pszLoadoutSlot, "head" ) )
+		if ( V_streq( pszLoadoutSlot, "head" ) )
 		{
 			pszLoadoutSlot = "misc";
 		}
@@ -2995,7 +2995,7 @@ int CTFItemSchema::CalculateNumberOfConcreteItems( const CEconItemDefinition *pI
 	if ( !pItemDef )
 		return 0;
 
-	if ( pItemDef->GetItemClass() && !Q_strcmp( pItemDef->GetItemClass(), "map_token" ) )
+	if ( pItemDef->GetItemClass() && V_streq( pItemDef->GetItemClass(), "map_token" ) )
 		return 0;
 
 	return CEconItemSchema::CalculateNumberOfConcreteItems( pItemDef );

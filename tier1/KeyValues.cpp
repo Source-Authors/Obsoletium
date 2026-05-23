@@ -2245,7 +2245,7 @@ void KeyValues::RecursiveMergeKeyValues( KeyValues *baseKV )
 		// If we have a child by the same name, merge those keys
 		for ( KeyValues *newChild = m_pSub; newChild != nullptr; newChild = newChild->m_pPeer )
 		{
-			if ( !Q_strcmp( baseChild->GetName(), newChild->GetName() ) )
+			if ( V_streq( baseChild->GetName(), newChild->GetName() ) )
 			{
 				newChild->RecursiveMergeKeyValues( baseChild );
 				bFoundMatch = true;

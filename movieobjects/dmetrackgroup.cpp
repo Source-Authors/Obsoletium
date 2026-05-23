@@ -194,7 +194,7 @@ void CDmeTrackGroup::RemoveTrack( const char *pTrackName )
 	intp c = m_Tracks.Count();
 	for ( intp i = c; --i >= 0; )
 	{
-		if ( !Q_strcmp( m_Tracks[i]->GetName(), pTrackName ) )
+		if ( V_streq( m_Tracks[i]->GetName(), pTrackName ) )
 		{
 			m_Tracks.Remove( i );
 			return;
@@ -220,7 +220,7 @@ CDmeTrack *CDmeTrackGroup::FindTrack( const char *pTrackName ) const
 		if ( !pTrack )
 			continue;
 
-		if ( !Q_strcmp( pTrack->GetName(), pTrackName ) )
+		if ( V_streq( pTrack->GetName(), pTrackName ) )
 			return pTrack;
 	}
 	return NULL;

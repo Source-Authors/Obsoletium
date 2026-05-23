@@ -234,7 +234,7 @@ void CMumbleSystem::FireGameEvent( IGameEvent *event )
 	if ( !eventname || !eventname[0] )
 		return;
 
-	if ( !Q_strcmp( "server_spawn", eventname ) )
+	if ( V_streq( "server_spawn", eventname ) )
 	{
 		V_strcpy_safe( m_szSteamIDCurrentServer, event->GetString( "steamid", "" ) );
 		m_cubSteamIDCurrentServer = strlen( m_szSteamIDCurrentServer ) + 1;

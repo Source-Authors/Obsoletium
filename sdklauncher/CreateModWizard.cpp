@@ -149,11 +149,11 @@ CCreateModWizard::CCreateModWizard( vgui::Panel *parent, const char *name, KeyVa
 	
 
 	// Tell the config manager which games to put in the config by default
-	if ( !V_strcmp( g_engineDir, "orangebox" ) )
+	if ( V_streq( g_engineDir, "orangebox" ) )
 	{
 		subPanel = new CModWizardSubPanel_CopyFiles_Source2009( this, "CModWizardSubPanel_CopyFiles" );
 	}
-	else if ( !V_strcmp( g_engineDir, "source2007" ) )
+	else if ( V_streq( g_engineDir, "source2007" ) )
 	{
 		subPanel = new CModWizardSubPanel_CopyFiles_Source2007( this, "CModWizardSubPanel_CopyFiles" );
 	}

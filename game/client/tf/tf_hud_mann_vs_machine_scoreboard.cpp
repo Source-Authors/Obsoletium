@@ -146,7 +146,7 @@ void CTFHudMannVsMachineScoreboard::FireGameEvent( IGameEvent * event )
 {
 	const char *pszEvent = event->GetName();
 
-	if ( !Q_strcmp( pszEvent, "mvm_wave_complete" ) )
+	if ( V_streq( pszEvent, "mvm_wave_complete" ) )
 	{
 		if ( !g_TF_PR )
 			return;
@@ -162,14 +162,14 @@ void CTFHudMannVsMachineScoreboard::FireGameEvent( IGameEvent * event )
 		// Adds current stats to "prev" containers (i.e. current wave's stats added to total of all previous wave stats)
 		g_TF_PR->UpdatePlayerScoreStats();
 	}
-	else if ( !Q_strcmp( pszEvent, "mvm_reset_stats" ) )
+	else if ( V_streq( pszEvent, "mvm_reset_stats" ) )
 	{
 		if ( !g_TF_PR )
 			return;
 
 		g_TF_PR->ResetPlayerScoreStats();
 	}
-	else if ( !Q_strcmp( pszEvent, "player_connect_client" ) )
+	else if ( V_streq( pszEvent, "player_connect_client" ) )
 	{
 		if ( !g_TF_PR )
 			return;

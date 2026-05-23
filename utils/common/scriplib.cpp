@@ -490,7 +490,7 @@ qboolean EndOfScript (qboolean crossline, char (&out)[MAXTOKEN])
 	if (!crossline)
 		Error ("Line %i is incomplete\n",scriptline);
 
-	if (!strcmp (script->filename, "memory buffer"))
+	if (V_streq (script->filename, "memory buffer"))
 	{
 		endofscript = true;
 		return false;

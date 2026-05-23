@@ -863,7 +863,7 @@ static inline void BuildNewTargetName( const char *pOldName, const char *pNewNam
 void CMapEntity::ReplaceTargetname(const char *szOldName, const char *szNewName)
 {
 	// NOTE: Case-sensitive compare because people might want to replace one case with another.
-	if ( !Q_strcmp( szOldName, szNewName ) )
+	if ( V_streq( szOldName, szNewName ) )
 	{
 		// The names already match. There is nothing to do!
 		return;
@@ -975,7 +975,7 @@ void CMapEntity::SetClass(LPCTSTR pszClass, bool bLoading)
 	//
 	// HACK: If we are now a decal, make sure we have a valid texture.
 	//
-	if (!strcmp(pszClass, "infodecal"))
+	if (V_streq(pszClass, "infodecal"))
 	{
 		if (!GetKeyValue("texture"))
 		{

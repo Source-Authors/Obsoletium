@@ -84,7 +84,7 @@ void CIntroMenu::Update( void )
 //-----------------------------------------------------------------------------
 void CIntroMenu::OnCommand( const char *command )
 {
-	if ( !Q_strcmp( command, "skip" ) )
+	if ( V_streq( command, "skip" ) )
 	{
 		engine->ClientCmd( "intro_skip" );
 		m_pViewPort->ShowPanel( this, false );

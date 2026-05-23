@@ -178,7 +178,7 @@ char CUtlCharConversion::FindConversion( const char *pString, intp *pLength ) co
 {
 	for ( intp i = 0; i < m_nCount; ++i )
 	{
-		if ( !Q_strcmp( pString, m_pReplacements[ (unsigned char) m_pList[i] ].m_pReplacementString ) )
+		if ( V_streq( pString, m_pReplacements[ (unsigned char) m_pList[i] ].m_pReplacementString ) )
 		{
 			*pLength = m_pReplacements[ (unsigned char) m_pList[i] ].m_nLength;
 			return m_pList[i];

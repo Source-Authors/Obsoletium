@@ -274,7 +274,7 @@ const char *CCreateMultiplayerGameServerPage::GetMapName()
 		return NULL;
 
 	const char *mapname = m_pMapList->GetActiveItemUserData()->GetString("mapname");
-	if (!strcmp( mapname, RANDOM_MAP ))
+	if (V_streq( mapname, RANDOM_MAP ))
 	{
 		int which = RandomInt( 1, count - 1 );
 		mapname = m_pMapList->GetItemUserData( which )->GetString("mapname");

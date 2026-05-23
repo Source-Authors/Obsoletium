@@ -602,7 +602,7 @@ void MenuItem::SetCurrentKeyBinding( char const *keyName )
 	{
 		char curtext[ 256 ];
 		m_pCurrentKeyBinding->GetText( curtext );
-		if ( !Q_strcmp( curtext, keyName ) )
+		if ( V_streq( curtext, keyName ) )
 			return;
 
 		m_pCurrentKeyBinding->SetText( keyName );

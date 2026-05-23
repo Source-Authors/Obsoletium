@@ -964,7 +964,7 @@ bool CNetChan::IsFileInWaitingList( const char *filename )
 		{
 			dataFragments_t * data = m_WaitingList[stream][i]; 
 
-			if ( !Q_strcmp( data->filename, filename ) )
+			if ( V_streq( data->filename, filename ) )
 				return true; // alread in list
 		}
 	}
@@ -1852,12 +1852,12 @@ bool CNetChan::ProcessMessages( bf_read &buf  )
 	const char * showmsgname = net_showmsg.GetString();
 	const char * blockmsgname = net_blockmsg.GetString();
 
-	if ( !Q_strcmp(showmsgname, "0") )
+	if ( V_streq(showmsgname, "0") )
 	{
 		showmsgname = NULL;	// dont do strcmp all the time
 	}
 
-	if ( !Q_strcmp(blockmsgname, "0") )
+	if ( V_streq(blockmsgname, "0") )
 	{
 		blockmsgname = NULL;	// dont do strcmp all the time
 	}

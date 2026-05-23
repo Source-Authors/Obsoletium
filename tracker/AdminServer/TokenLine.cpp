@@ -99,7 +99,7 @@ char* TokenLine::CheckToken(const char * parm) const
 	{
 		if (!m_token[i])
 			continue; 
-		if ( !strcmp (parm,m_token[i]) )
+		if ( V_streq (parm,m_token[i]) )
 		{
 			char * ret = m_token[i+1];	
 			// if this token doesn't exist, since index i was the last

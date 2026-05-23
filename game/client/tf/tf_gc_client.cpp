@@ -860,7 +860,7 @@ void CTFGCClientSystem::FireGameEvent( IGameEvent *event )
 
 	// Successfully connected to a gameserver. For MM purposes, we stay in state connecting until server spawn as that
 	// ensures there's no intermediate "loading into some server but we're not sure of its steamid yet" state.
-	if ( !Q_strcmp( pEventName, "server_spawn" ) )
+	if ( V_streq( pEventName, "server_spawn" ) )
 	{
 		GCMatchmakingDebugSpew( 4, "Client reached server_spawn.\n" );
 		switch ( m_eConnectState )

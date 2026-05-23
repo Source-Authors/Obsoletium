@@ -1956,7 +1956,7 @@ void AddBodyFlexRules( s_source_t *pSource )
 		{
 			for ( int j = 0; j < g_numflexcontrollers; ++j )
 			{
-				if ( !Q_strcmp( g_flexcontroller[ j ].name, remap.m_EyesUpDownFlexName.Get() ) )
+				if ( V_streq( g_flexcontroller[ j ].name, remap.m_EyesUpDownFlexName.Get() ) )
 				{
 					Assert( remap.m_EyesUpDownFlexController == -1 );
 					remap.m_EyesUpDownFlexController = j;

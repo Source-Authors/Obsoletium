@@ -1164,7 +1164,7 @@ bool CEconLootListDefinition::BInitFromKV( KeyValues *pKVLootList, CEconItemSche
 	{
 		const char *pszName = pKVListItem->GetName();
 		
-		if ( !Q_strcmp( pszName, "loot_list_header_desc" ) )
+		if ( V_streq( pszName, "loot_list_header_desc" ) )
 		{
 			// Make sure we didn't specify multiple entries.
 			SCHEMA_INIT_CHECK(
@@ -1179,7 +1179,7 @@ bool CEconLootListDefinition::BInitFromKV( KeyValues *pKVLootList, CEconItemSche
 
 			continue;
 		}
-		else if ( !Q_strcmp( pszName, "loot_list_footer_desc" ) )
+		else if ( V_streq( pszName, "loot_list_footer_desc" ) )
 		{
 			// Make sure we didn't specify multiple entries.
 			SCHEMA_INIT_CHECK(
@@ -1194,30 +1194,30 @@ bool CEconLootListDefinition::BInitFromKV( KeyValues *pKVLootList, CEconItemSche
 
 			continue;
 		}
-		else if ( !Q_strcmp( pszName, "loot_list_collection" ) )
+		else if ( V_streq( pszName, "loot_list_collection" ) )
 		{
 			// Set name as the collection lootlist name
 			pszName = pKVListItem->GetString();
 			m_pszCollectionReference = pszName;
 			bCollectionLootList = true;
 		}
-		else if ( !Q_strcmp( pszName, "hide_lootlist" ) )
+		else if ( V_streq( pszName, "hide_lootlist" ) )
 		{
 			m_bPublicListContents = !pKVListItem->GetBool( nullptr, true );
 			continue;
 		}
-		else if ( !Q_strcmp( pszName, "rarity" ) )
+		else if ( V_streq( pszName, "rarity" ) )
 		{
 			// already parsed up top
 			continue;
 		}
 #ifdef GC_DLL
-		else if ( !Q_strcmp( pszName, "random_attributes" ) )
+		else if ( V_streq( pszName, "random_attributes" ) )
 		{
 			AddRandomAtrributes( pKVListItem, pschema, pVecErrors );
 			continue;
 		}
-		else if ( !Q_strcmp( pszName, "attribute_templates" ) )
+		else if ( V_streq( pszName, "attribute_templates" ) )
 		{
 			FOR_EACH_SUBKEY( pKVListItem, pKVAttributeTemplate )
 			{
@@ -1230,7 +1230,7 @@ bool CEconLootListDefinition::BInitFromKV( KeyValues *pKVLootList, CEconItemSche
 
 			continue;
 		}
-		else if ( !Q_strcmp( pszName, "public_list_contents" ) )
+		else if ( V_streq( pszName, "public_list_contents" ) )
 		{
 			m_bPublicListContents = pKVListItem->GetBool( nullptr, true );
 			continue;
@@ -1240,7 +1240,7 @@ bool CEconLootListDefinition::BInitFromKV( KeyValues *pKVLootList, CEconItemSche
 			m_iNoDupesIterations = pKVListItem->GetInt( nullptr, -1 );
 			continue;
 		}
-		else if ( !Q_strcmp( pszName, "additional_drop" ) )
+		else if ( V_streq( pszName, "additional_drop" ) )
 		{
 			float		fChance			   = pKVListItem->GetFloat( "chance", 0.0f );
 			bool		bPremiumOnly	   = pKVListItem->GetBool( "premium_only", false );
@@ -1301,7 +1301,7 @@ bool CEconLootListDefinition::BInitFromKV( KeyValues *pKVLootList, CEconItemSche
 			}
 			continue;
 		}
-		else if ( !Q_strcmp( pszName, "property_generators" ) )
+		else if ( V_streq( pszName, "property_generators" ) )
 		{
 			SCHEMA_INIT_SUBSTEP( BCommonInitPropertyGeneratorsFromKV( m_pszName, &m_PropertyGenerators, pKVListItem, pVecErrors ) );
 			continue;
@@ -6024,11 +6024,11 @@ random_attrib_t	*CEconItemSchema::CreateRandomAttribute( const char *pszContext,
 	{
 		const char *pszName = pKVAttribute->GetName();
 
-		if ( !Q_strcmp( pszName, "chance" ) )
+		if ( V_streq( pszName, "chance" ) )
 			continue;
 
 		// Quick block list of attrs that have equal weight
-		if ( !Q_strcmp( pszName, "is_even_chance_attr" ) )
+		if ( V_streq( pszName, "is_even_chance_attr" ) )
 		{
 			FOR_EACH_VALUE( pKVAttribute, pKVListItem )
 			{
@@ -7656,7 +7656,7 @@ bool CEconItemSchema::BInitCollectionReferences( CUtlVector<CUtlString> *pVecErr
 			{
 				const char * pszTemp = m_mapItemCollections[iCollectionIndex]->m_pszName;
 
-				if ( !V_strcmp( pszTemp, pszCollectionName) )
+				if ( V_streq( pszTemp, pszCollectionName) )
 				{
 					bFound = true;
 					pItemDef->SetItemCollectionDefinition( m_mapItemCollections[iCollectionIndex] );
@@ -7678,7 +7678,7 @@ const CEconItemCollectionDefinition *CEconItemSchema::GetCollectionByName( const
 	FOR_EACH_MAP_FAST( m_mapItemCollections, iCollectionIndex )
 	{
 		const char * pszTemp = m_mapItemCollections[iCollectionIndex]->m_pszName;
-		if ( !V_strcmp( pszTemp, pCollectionName ) )
+		if ( V_streq( pszTemp, pCollectionName ) )
 		{
 			return m_mapItemCollections[iCollectionIndex];
 		}
@@ -8298,15 +8298,15 @@ bool CEconItemSchema::BInitAttributeControlledParticleSystems( KeyValues *pKVPar
 		FOR_EACH_TRUE_SUBKEY( pKVParticleSystems, pKVCategory )
 		{
 			// There is 3 Categories we want to track with additional info
-			if ( !V_strcmp( pKVCategory->GetName(), "cosmetic_unusual_effects" ) )
+			if ( V_streq( pKVCategory->GetName(), "cosmetic_unusual_effects" ) )
 			{
 				pVec = &m_vecAttributeControlledParticleSystemsCosmetics;
 			} 
-			else if ( !V_strcmp( pKVCategory->GetName(), "weapon_unusual_effects" ) )
+			else if ( V_streq( pKVCategory->GetName(), "weapon_unusual_effects" ) )
 			{
 				pVec = &m_vecAttributeControlledParticleSystemsWeapons;
 			}
-			else if ( !V_strcmp( pKVCategory->GetName(), "taunt_unusual_effects" ) )
+			else if ( V_streq( pKVCategory->GetName(), "taunt_unusual_effects" ) )
 			{
 				pVec = &m_vecAttributeControlledParticleSystemsTaunts;
 			}
@@ -8885,7 +8885,7 @@ const CEconItemRarityDefinition *CEconItemSchema::GetRarityDefinitionByName( con
 {
 	FOR_EACH_MAP_FAST( m_mapRarities, i )
 	{
-		if ( !strcmp( pszDefName, m_mapRarities[i].GetName() ) )
+		if ( V_streq( pszDefName, m_mapRarities[i].GetName() ) )
 			return &m_mapRarities[i];
 	}
 	return NULL;

@@ -17556,7 +17556,7 @@ void CTFGameRules::FireGameEvent( IGameEvent *event )
 	const char *eventName = event->GetName();
 
 #ifdef GAME_DLL
-	if ( !Q_strcmp( eventName, "teamplay_point_captured" ) )
+	if ( V_streq( eventName, "teamplay_point_captured" ) )
 	{
 		if ( IsMannVsMachineMode() )
 			return;
@@ -17602,7 +17602,7 @@ void CTFGameRules::FireGameEvent( IGameEvent *event )
 			BeginHaunting( 4, 25.f, 35.f );
 		}
 	}
-	else if ( !Q_strcmp( eventName, "teamplay_capture_blocked" ) )
+	else if ( V_streq( eventName, "teamplay_capture_blocked" ) )
 	{
 		int iPlayerIndex = event->GetInt( "blocker" );
 		CTFPlayer *pPlayer = ToTFPlayer( UTIL_PlayerByIndex( iPlayerIndex ) );
@@ -17610,7 +17610,7 @@ void CTFGameRules::FireGameEvent( IGameEvent *event )
 
 		pPlayer->m_Shared.CheckForAchievement( ACHIEVEMENT_TF_MEDIC_CHARGE_BLOCKER );
 	}	
-	else if ( !Q_strcmp( eventName, "teamplay_round_win" ) )
+	else if ( V_streq( eventName, "teamplay_round_win" ) )
 	{
 		int iWinningTeam = event->GetInt( "team" );
 		bool bFullRound = event->GetBool( "full_round" );
@@ -17618,14 +17618,14 @@ void CTFGameRules::FireGameEvent( IGameEvent *event )
 		bool bWasSuddenDeath = event->GetBool( "was_sudden_death" );
 		CTF_GameStats.Event_RoundEnd( iWinningTeam, bFullRound, flRoundTime, bWasSuddenDeath );
 	}
-	else if ( !Q_strcmp( eventName, "teamplay_setup_finished" ) )
+	else if ( V_streq( eventName, "teamplay_setup_finished" ) )
 	{
 		if ( IsHalloweenScenario( CTFGameRules::HALLOWEEN_SCENARIO_DOOMSDAY ) )
 		{
 			m_doomsdaySetupTimer.Start( 1 );
 		}
 	}
-	else if ( !Q_strcmp( eventName, "teamplay_flag_event" ) )
+	else if ( V_streq( eventName, "teamplay_flag_event" ) )
 	{
 		// if this is a capture event, remember the player who made the capture		
 		int iEventType = event->GetInt( "eventtype" );
@@ -17636,7 +17636,7 @@ void CTFGameRules::FireGameEvent( IGameEvent *event )
 			m_szMostRecentCappers[1] = 0;
 		}
 	}
-	else if ( !Q_strcmp( eventName, "player_escort_score" ) )
+	else if ( V_streq( eventName, "player_escort_score" ) )
 	{
 		int iPlayer = event->GetInt( "player", 0 );
 		int iPoints = event->GetInt( "points", 0 );
@@ -17667,7 +17667,7 @@ void CTFGameRules::FireGameEvent( IGameEvent *event )
 			}
 		}
 	}
-	else if ( !Q_strcmp( eventName, "player_disconnect" ) )
+	else if ( V_streq( eventName, "player_disconnect" ) )
 	{
 		CTFPlayer *pPlayer = ToTFPlayer( UTIL_PlayerByUserId( event->GetInt("userid") ) );
 
@@ -17681,7 +17681,7 @@ void CTFGameRules::FireGameEvent( IGameEvent *event )
 			}
 		}
 	}
-	else if ( !Q_strcmp( eventName, "teamplay_round_start" ) )
+	else if ( V_streq( eventName, "teamplay_round_start" ) )
 	{
 		if ( IsMannVsMachineMode() )
 		{
@@ -17700,16 +17700,16 @@ void CTFGameRules::FireGameEvent( IGameEvent *event )
 			}
 		}
 	}
-	else if ( !Q_strcmp( eventName, "recalculate_truce" ) )
+	else if ( V_streq( eventName, "recalculate_truce" ) )
 	{
 		RecalculateTruce();
 	}
 #else	// CLIENT_DLL
-	if ( !Q_strcmp( eventName, "overtime_nag" ) )
+	if ( V_streq( eventName, "overtime_nag" ) )
 	{
 		HandleOvertimeBegin();
 	}
-	else if ( !Q_strcmp( eventName, "recalculate_holidays" ) )
+	else if ( V_streq( eventName, "recalculate_holidays" ) )
 	{
 		UTIL_CalculateHolidays();
 	}
@@ -19178,9 +19178,9 @@ void CTFHolidayEntity::FireGameEvent( IGameEvent *event )
 	const char *eventName = event->GetName();
 
 #ifdef GAME_DLL
-	if ( !Q_strcmp( eventName, "player_turned_to_ghost" ) 
-		|| !Q_strcmp( eventName, "player_disconnect" )
-		|| !Q_strcmp( eventName, "player_team" ))
+	if ( V_streq( eventName, "player_turned_to_ghost" ) 
+		|| V_streq( eventName, "player_disconnect" )
+		|| V_streq( eventName, "player_team" ))
 	{
 		if ( TFGameRules()->ArePlayersInHell() )
 		{
@@ -21335,7 +21335,7 @@ bool CTFGameRules::IsUpgradeTierEnabled( CTFPlayer *pTFPlayer, int iItemSlot, in
 		CMannVsMachineUpgrades upgrade = g_MannVsMachineUpgrades.m_Upgrades[i];
 
 		// Same upgrade
-// 		if ( !V_strcmp( upgrade.szAttrib, g_MannVsMachineUpgrades.m_Upgrades[iUpgrade].szAttrib ) )
+// 		if ( V_streq( upgrade.szAttrib, g_MannVsMachineUpgrades.m_Upgrades[iUpgrade].szAttrib ) )
 // 			continue;
 
 		// Different tier

@@ -51,7 +51,7 @@ static void ConVarNetworkChangeCallback( IConVar *pConVar, const char *pOldValue
 	}
 	else
 	{
-		if ( !Q_strcmp( var.GetString(), pOldValue ) )
+		if ( V_streq( var.GetString(), pOldValue ) )
 			return;
 	}
 
@@ -1018,7 +1018,7 @@ void CCvarUtilities::CvarToggle( const CCommand &args )
 		// look for the current value in the command arguments
 		for( i = 2; i < c; i++ )
 		{
-			if ( !Q_strcmp( var->GetString(), args[ i ] ) )
+			if ( V_streq( var->GetString(), args[ i ] ) )
 				break;
 		}
 

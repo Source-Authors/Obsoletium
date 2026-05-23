@@ -217,7 +217,7 @@ static RecvTable* FindRecvTable( const char *pName, RecvTable **pRecvTables, int
 {
 	for ( int i=0; i< nRecvTables; i++ )
 	{
-		if ( !Q_strcmp( pName, pRecvTables[i]->GetName() ) )
+		if ( V_streq( pName, pRecvTables[i]->GetName() ) )
 			return pRecvTables[i];
 	}
 

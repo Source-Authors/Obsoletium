@@ -17,7 +17,7 @@ bool BStringsEqual( const char *pszA, const char *pszB )
 	if ( pszB == NULL )
 		return false;
 
-	return !V_strcmp( pszA, pszB );
+	return V_streq( pszA, pszB );
 }
 
 const unsigned int g_CapabilityApplicationMap[] =

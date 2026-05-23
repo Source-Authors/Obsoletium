@@ -743,7 +743,7 @@ void CTFGrenadePipebombProjectile::PipebombTouch( CBaseEntity *pOther )
 
 	// PASSTIME always explode when it hits the ball
 	// fixme find a non-strcmp way to do this
-	if ( !V_strcmp( pOther->GetClassname(), "passtime_ball" ) )
+	if ( V_streq( pOther->GetClassname(), "passtime_ball" ) )
 	{
 		Explode( &pTrace, GetDamageType() );
 		return;

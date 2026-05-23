@@ -29,7 +29,7 @@ bool MapEntity_ExtractValue( const char *pEntData, const char *keyName, char Val
 			break;												// must not have seen the classname
 
 		// is this the right key?
-		if ( !strcmp(token, keyName) )
+		if ( V_streq(token, keyName) )
 		{
 			inputData = MapEntity_ParseToken( inputData, token );	// get value and return it
 			Q_strncpy( Value, token, MAPKEY_MAXLENGTH );
@@ -296,7 +296,7 @@ bool CEntityMapData::SetValue( const char *keyName, char *NewValue, int nKeyInst
 			break;												// must not have seen the classname
 
 		// is this the right key?
-		if ( !strcmp(token, keyName) )
+		if ( V_streq(token, keyName) )
 		{
 			++nCurrKeyInstance;
 			if ( nCurrKeyInstance > nKeyInstance )

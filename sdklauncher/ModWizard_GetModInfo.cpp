@@ -74,7 +74,7 @@ CModWizardSubPanel_GetModInfo::CModWizardSubPanel_GetModInfo( Panel *parent, con
 WizardSubPanel *CModWizardSubPanel_GetModInfo::GetNextSubPanel()
 {
 	// In scratch/template, go to the template options panel - orange box only!
-	if ( m_ModType == ModType_FromScratch && !V_strcmp( g_engineDir, "source2007" ) )
+	if ( m_ModType == ModType_FromScratch && V_streq( g_engineDir, "source2007" ) )
 		return dynamic_cast<WizardSubPanel *>(GetWizardPanel()->FindChildByName("CModWizardSubPanel_TemplateOptions"));
 	else
 		return dynamic_cast<WizardSubPanel *>(GetWizardPanel()->FindChildByName("CModWizardSubPanel_CopyFiles"));

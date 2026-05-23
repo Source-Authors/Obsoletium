@@ -302,7 +302,7 @@ public:
 		while ( pkvNodeData )
 		{
 			// Handle the connections block
-			if ( !Q_strcmp(pkvNodeData->GetName(), "connections") )
+			if ( V_streq(pkvNodeData->GetName(), "connections") )
 			{
 				ParseEntKVBlock( pNode, pkvNodeData );
 			}

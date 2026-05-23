@@ -5209,15 +5209,15 @@ intp CChoreoView::GetMovetoSequence( CChoreoScene *scene, CChoreoEvent *event, S
 		pszAct = event->GetParameters2();
 	}
 
-	if ( !Q_strcmp( pszAct, "Walk" ) )
+	if ( V_streq( pszAct, "Walk" ) )
 	{
 		pszAct = "ACT_WALK";
 	}
-	else if ( !Q_strcmp( pszAct, "Run" ) )
+	else if ( V_streq( pszAct, "Run" ) )
 	{
 		pszAct = "ACT_RUN";
 	}
-	else if ( !Q_strcmp( pszAct, "CrouchWalk" ) )
+	else if ( V_streq( pszAct, "CrouchWalk" ) )
 	{
 		pszAct = "ACT_WALK_CROUCH";
 	}

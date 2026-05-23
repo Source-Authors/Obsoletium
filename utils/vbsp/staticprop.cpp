@@ -457,7 +457,7 @@ static bool ComputeLightingOrigin( StaticPropBuild_t const& build, Vector& light
 
 		// Check against all lighting info entities
 		char const* pTargetName = ValueForKey( &entities[entIndex], "targetname" );
-		if (!Q_strcmp(pTargetName, build.m_pLightingOrigin))
+		if (V_streq(pTargetName, build.m_pLightingOrigin))
 		{
 			GetVectorForKey( &entities[entIndex], "origin", lightingOrigin );
 			return true;
@@ -576,7 +576,7 @@ void EmitStaticProps()
 	for ( int i = 0; i < num_entities; ++i)
 	{
 		const char* pEntity = ValueForKey(&entities[i], "classname");
-		if (!Q_strcmp(pEntity, "info_lighting"))
+		if (V_streq(pEntity, "info_lighting"))
 		{
 			s_LightingInfo.AddToTail(i);
 		}
@@ -586,7 +586,7 @@ void EmitStaticProps()
 	for ( int i = 0; i < num_entities; ++i)
 	{
 		const char* pEntity = ValueForKey(&entities[i], "classname");
-		if (!strcmp(pEntity, "static_prop") || !strcmp(pEntity, "prop_static"))
+		if (V_streq(pEntity, "static_prop") || V_streq(pEntity, "prop_static"))
 		{
 			StaticPropBuild_t build;
 

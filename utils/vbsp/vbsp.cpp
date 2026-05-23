@@ -800,7 +800,7 @@ static void Compute3DSkyboxAreas( node_t *headnode, CUtlVector<int>& areas )
 	for (int i = 0; i < g_MainMap->num_entities; ++i)
 	{
 		const char* pEntity = ValueForKey(&entities[i], "classname");
-		if (!strcmp(pEntity, "sky_camera"))
+		if (V_streq(pEntity, "sky_camera"))
 		{
 			// Found a 3D skybox camera, get a leaf that lies in it
 			node_t *pLeaf = PointInLeaf( headnode, entities[i].origin );
@@ -1112,7 +1112,7 @@ int RunVBSP( int argc, char **argv )
 			Msg("--luxel-scale: %f\n", g_luxelScale );
 			i++;
 		}
-		else if( !strcmp( argv[i], "-minluxelscale" ) )
+		else if( V_streq( argv[i], "-minluxelscale" ) )
 		{
 			g_minLuxelScale = strtof( argv[i+1], nullptr );
 			if (g_minLuxelScale < 1)

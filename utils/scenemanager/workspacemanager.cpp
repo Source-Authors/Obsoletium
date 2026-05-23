@@ -1214,7 +1214,7 @@ void CWorkspaceManager::OnModifyProjectComments()
 	if ( !InputProperties( &params ) )
 		return;
 
-	if ( !Q_strcmp( params.m_szInputText, project->GetComments() ) )
+	if ( V_streq( params.m_szInputText, project->GetComments() ) )
 		return;
 
 	project->SetComments( params.m_szInputText );
@@ -1417,7 +1417,7 @@ void CWorkspaceManager::OnModifySceneComments()
 	if ( !InputProperties( &params ) )
 		return;
 
-	if ( !Q_strcmp( params.m_szInputText, scene->GetComments() ) )
+	if ( V_streq( params.m_szInputText, scene->GetComments() ) )
 		return;
 
 	scene->SetComments( params.m_szInputText );
@@ -1446,7 +1446,7 @@ void CWorkspaceManager::OnModifyVCDComments()
 	if ( !InputProperties( &params ) )
 		return;
 
-	if ( !Q_strcmp( params.m_szInputText, file->GetComments() ) )
+	if ( V_streq( params.m_szInputText, file->GetComments() ) )
 		return;
 
 	file->SetComments( params.m_szInputText );

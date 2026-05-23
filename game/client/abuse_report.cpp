@@ -227,20 +227,20 @@ void CAbuseReportManager::FireGameEvent( IGameEvent *event )
 		return;
 
 	if (
-		!Q_strcmp( "teamplay_round_win", eventname )
-		|| !Q_strcmp( "tf_game_over", eventname )
+		V_streq( "teamplay_round_win", eventname )
+		|| V_streq( "tf_game_over", eventname )
 	) {
 		// Periodically remind them that they have a report ready to file
 		CheckCreateReportReadyNotification( 60.0 * 5.0, true, 10.0f );
 	}
-	else if ( !Q_strcmp( "player_death", eventname ) )
+	else if ( V_streq( "player_death", eventname ) )
 	{
 		// In some maps, the round just never ends.
 		// So make sure we do remind them every now and then about this.
 		// Just not too often
 		CheckCreateReportReadyNotification( 60.0 * 20.0, true, 5.0f );
 	}
-	else if ( !Q_strcmp( "server_spawn", eventname ) )
+	else if ( V_streq( "server_spawn", eventname ) )
 	{
 		m_adrCurrentServer.Clear();
 		m_adrCurrentServer.SetFromString( event->GetString( "address", "" ), false );

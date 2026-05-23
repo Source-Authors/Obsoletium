@@ -13873,7 +13873,7 @@ void CTFPlayerShared::FireGameEvent( IGameEvent *event )
 #ifdef GAME_DLL
 	const char *eventName = event->GetName();
 
-	if ( !Q_strcmp( eventName, "player_disconnect" ) )
+	if ( V_streq( eventName, "player_disconnect" ) )
 	{
 		CBasePlayer *pPlayer = UTIL_PlayerByUserId( event->GetInt( "userid" ) );
 		if ( pPlayer )

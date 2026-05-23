@@ -587,14 +587,14 @@ bool CArmoryPanel::DefPassesFilter( const CTFItemDefinition *pDef, armory_filter
 
 	case ARMFILT_CRAFTITEMS:
 		{
-			bInList = pDef->GetItemClass() && ( !V_strcmp( pDef->GetItemClass(), "craft_item" ) || !V_strcmp( pDef->GetItemClass(), "class_token" ) || !V_strcmp( pDef->GetItemClass(), "slot_token" ) );
+			bInList = pDef->GetItemClass() && ( V_streq( pDef->GetItemClass(), "craft_item" ) || V_streq( pDef->GetItemClass(), "class_token" ) || V_streq( pDef->GetItemClass(), "slot_token" ) );
 			break;
 		}
 
 	case ARMFILT_TOOLS:
 		{
 			// For now, put the supply crates into the tool list, since it's the only item that shows up in no other lists
-			bInList = pDef->GetItemClass() && ( !V_strcmp( pDef->GetItemClass(), "tool" ) || !V_strcmp( pDef->GetItemClass(), "supply_crate" ) );
+			bInList = pDef->GetItemClass() && ( V_streq( pDef->GetItemClass(), "tool" ) || V_streq( pDef->GetItemClass(), "supply_crate" ) );
 			break;
 		}
 
@@ -615,7 +615,7 @@ bool CArmoryPanel::DefPassesFilter( const CTFItemDefinition *pDef, armory_filter
 	case ARMFILT_CLASS_ENGINEER:
 		{
 			// Don't show class/slot usage for class/slot tokens
-			if ( pDef->GetItemClass() && !V_strcmp( pDef->GetItemClass(), "class_token" ) )
+			if ( pDef->GetItemClass() && V_streq( pDef->GetItemClass(), "class_token" ) )
 				break;
 
 			bInList = ( !pDef->CanBeUsedByAllClasses() && pDef->CanBeUsedByClass( iFilter - ARMFILT_CLASS_SCOUT + 1 ) );
@@ -625,7 +625,7 @@ bool CArmoryPanel::DefPassesFilter( const CTFItemDefinition *pDef, armory_filter
 	case ARMFILT_DONATIONITEMS:
 		{
 			// Don't show class/slot usage for class/slot tokens
-			bInList = pDef->GetItemClass() && !V_strcmp( pDef->GetItemClass(), "map_token" );
+			bInList = pDef->GetItemClass() && V_streq( pDef->GetItemClass(), "map_token" );
 			break;
 		}
 	}

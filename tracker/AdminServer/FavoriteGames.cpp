@@ -547,7 +547,7 @@ void CFavoriteGames::ImportFavorites()
 //-----------------------------------------------------------------------------
 void CFavoriteGames::OnCommand(const char *command)
 {
-	if (!strcmp(command, "OnImportFavoritesFile"))
+	if (V_streq(command, "OnImportFavoritesFile"))
 	{
 		OnImportFavoritesFile();
 	}

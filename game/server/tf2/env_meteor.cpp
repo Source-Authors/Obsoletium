@@ -284,12 +284,12 @@ void CEnvMeteorSpawner::Activate( void )
 		if ( pEntity->GetFlags()& FL_STATICPROP ) 
 			continue;
 
-		if ( !Q_strcmp( pEntity->GetClassname(), "env_meteortarget" ) )
+		if ( V_streq( pEntity->GetClassname(), "env_meteortarget" ) )
 		{
 			CEnvMeteorTarget *pMeteorTarget = static_cast<CEnvMeteorTarget*>( pEntity );
 			if ( pMeteorTarget && pMeteorTarget->m_target != NULL_STRING )
 			{
-				if ( !Q_strcmp( STRING( pMeteorTarget->m_target ), STRING( GetEntityName() ) ) )
+				if ( V_streq( STRING( pMeteorTarget->m_target ), STRING( GetEntityName() ) ) )
 				{
 					m_SpawnerShared.AddToTargetList( pMeteorTarget->GetLocalOrigin(), pMeteorTarget->m_flRadius );
 				}

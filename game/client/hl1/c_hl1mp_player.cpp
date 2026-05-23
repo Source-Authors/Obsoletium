@@ -306,7 +306,7 @@ void C_HL1MPRagdoll::Interp_Copy( C_BaseAnimatingOverlay *pSourceEntity )
 		for ( int j=0; j < pSrc->m_Entries.Count(); j++ )
 		{
 			VarMapEntry_t *pSrcEntry = &pSrc->m_Entries[j];
-			if ( !Q_strcmp( pSrcEntry->watcher->GetDebugName(), pszName ) )
+			if ( V_streq( pSrcEntry->watcher->GetDebugName(), pszName ) )
 			{
 				pDestEntry->watcher->Copy( pSrcEntry->watcher );
 				break;

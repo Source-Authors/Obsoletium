@@ -10173,7 +10173,7 @@ bool CMapDoc::ShouldObjectBeVisible(CMapClass *pObject, UpdateVisibilityData_t *
 	if (pEntity)
 	{
 		LPCTSTR	pszTargetName = pEntity->GetKeyValue("targetname");
-		if ( pszTargetName && !strcmp(pszTargetName, "relay_cancelVCDs") )
+		if ( pszTargetName && V_streq(pszTargetName, "relay_cancelVCDs") )
 		{
 			// Set breakpoint here for debugging this entity's visiblity
 			int foo = 0;

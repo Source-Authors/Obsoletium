@@ -232,13 +232,13 @@ PAKViewer::handleEvent (mxEvent *event)
 #endif
 				if (mode == 2)
 				{
-					if (!strcmp (e, ".mdl"))
+					if (V_streq (e, ".mdl"))
 						OnLoadModel ();
 
-					else if (!strcmp (e, ".tga"))
+					else if (V_streq (e, ".tga"))
 						OnLoadTexture (0);
 
-					else if (!strcmp (e, ".wav"))
+					else if (V_streq (e, ".wav"))
 						OnPlaySound ();
 
 					return 1;

@@ -3153,7 +3153,7 @@ void CTextureListPanel::Paint()
 		if ( kv && iHint )
 		{
 			KeyValues *plv = ( m_pListPanel->IsValidItemID( iHint ) ? m_pListPanel->GetItem( iHint ) : nullptr );
-			if ( plv && !strcmp( plv->GetString( KEYNAME_NAME ), kv->GetString( KEYNAME_NAME ) ) )
+			if ( plv && V_streq( plv->GetString( KEYNAME_NAME ), kv->GetString( KEYNAME_NAME ) ) )
 			{
 				KeyValues *pValData = plv->GetFirstValue(), *pValRendered = kv->GetFirstValue();
 				for ( ; pValData && pValRendered; pValData = pValData->GetNextValue(), pValRendered = pValRendered->GetNextValue() )

@@ -49,47 +49,47 @@ void CMessageListener::Message( VPanel* pSender, VPanel* pReceiver, KeyValues* p
 	// FIXME: Make a bunch of filters here
 	
 	// filter out key focus messages
-	if (!strcmp (pKeyValues->GetName(), "KeyFocusTicked"))
+	if (V_streq (pKeyValues->GetName(), "KeyFocusTicked"))
 	{
 		return;
 	}
 	// filter out mousefocus messages		
-	else if (!strcmp (pKeyValues->GetName(), "MouseFocusTicked"))	
+	else if (V_streq (pKeyValues->GetName(), "MouseFocusTicked"))	
 	{
 		return;
 	}
 	// filter out cursor movement messages
-	else if (!strcmp (pKeyValues->GetName(), "CursorMoved"))
+	else if (V_streq (pKeyValues->GetName(), "CursorMoved"))
 	{
 		return;
 	}
 	// filter out cursor entered messages
-	else if (!strcmp (pKeyValues->GetName(), "CursorEntered"))
+	else if (V_streq (pKeyValues->GetName(), "CursorEntered"))
 	{
 		return;
 	}
 	// filter out cursor exited messages
-	else if (!strcmp (pKeyValues->GetName(), "CursorExited"))
+	else if (V_streq (pKeyValues->GetName(), "CursorExited"))
 	{
 		return;
 	}
 	// filter out MouseCaptureLost messages
-	else if (!strcmp (pKeyValues->GetName(), "MouseCaptureLost"))
+	else if (V_streq (pKeyValues->GetName(), "MouseCaptureLost"))
 	{
 		return;
 	}
 	// filter out MousePressed messages
-	else if (!strcmp (pKeyValues->GetName(), "MousePressed"))
+	else if (V_streq (pKeyValues->GetName(), "MousePressed"))
 	{
 		return;
 	}
 	// filter out MouseReleased messages
-	else if (!strcmp (pKeyValues->GetName(), "MouseReleased"))
+	else if (V_streq (pKeyValues->GetName(), "MouseReleased"))
 	{
 		return;
 	}
 	// filter out Tick messages
-	else if (!strcmp (pKeyValues->GetName(), "Tick"))
+	else if (V_streq (pKeyValues->GetName(), "Tick"))
 	{
 		return;
 	}

@@ -1983,7 +1983,7 @@ void CDmeCombinationOperator::Purge()
 				{
 					for ( intp l = 0; l < nDeltaCount; ++l )
 					{
-						if ( !Q_strcmp( GetRawControlName( j, k ), deltas[ l ]->GetName() ) )
+						if ( V_streq( GetRawControlName( j, k ), deltas[ l ]->GetName() ) )
 						{
 							bDelete = false;
 							break;

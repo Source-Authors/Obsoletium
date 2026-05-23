@@ -709,7 +709,7 @@ CON_COMMAND_F( tf_bot_debug_stuck_log, "Given a server logfile, visually display
 			if ( !first )
 				continue;
 
-			if ( !strcmp( first, "Loading" ) )
+			if ( V_streq( first, "Loading" ) )
 			{
 				// L 08/08/2012 - 15:10:47: Loading map "mvm_coaltown"
 				strtok( NULL, " " );
@@ -741,7 +741,7 @@ CON_COMMAND_F( tf_bot_debug_stuck_log, "Given a server logfile, visually display
 				int botID = atoi( botIDString );
 
 				char *second = strtok( NULL, " " );
-				if ( second && !strcmp( second, "stuck" ) )
+				if ( second && V_streq( second, "stuck" ) )
 				{
 					CStuckBot *stuckBot = TheTFBots().FindOrCreateStuckBot( botID, playerClassname );
 

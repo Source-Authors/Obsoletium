@@ -40,7 +40,7 @@ void CInfoBuildPoint::Spawn( void )
 	{
 		for ( int i = 0; i < OBJ_LAST; i++ )
 		{
-			if ( !Q_strcmp( STRING(m_iszAllowedObject), GetObjectInfo(i)->m_pClassName ) )
+			if ( V_streq( STRING(m_iszAllowedObject), GetObjectInfo(i)->m_pClassName ) )
 			{
 				m_iAllowedObjectType = i;
 				break;

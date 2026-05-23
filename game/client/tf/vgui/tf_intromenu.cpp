@@ -503,7 +503,7 @@ void CTFIntroMenu::OnIntroFinished( void )
 //-----------------------------------------------------------------------------
 void CTFIntroMenu::OnCommand( const char *command )
 {
-	if ( !Q_strcmp( command, "back" ) )
+	if ( V_streq( command, "back" ) )
 	{
 		float flTime = gpGlobals->curtime;
 
@@ -518,14 +518,14 @@ void CTFIntroMenu::OnCommand( const char *command )
 		// wait for the model sequence to finish before going back to the mapinfo menu
 		SetNextThink( flTime, INTRO_BACK );
 	}
-	else if ( !Q_strcmp( command, "skip" ) )
+	else if ( V_streq( command, "skip" ) )
 	{
 		Shutdown();
 
 		// continue right now
 		SetNextThink( gpGlobals->curtime, INTRO_CONTINUE );
 	}
-	else if ( !Q_strcmp( command, "replayVideo" ) )
+	else if ( V_streq( command, "replayVideo" ) )
 	{
 		ShutdownVideo();
 		SetNextThink( gpGlobals->curtime, INTRO_STARTVIDEO );

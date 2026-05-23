@@ -520,7 +520,7 @@ void COPTTextures::OnMaterialExcludeRemove( void )
 	//
 	for( int i = 0; i < m_pMaterialConfig->m_MaterialExcludeCount; i++ )
 	{
-		if( !strcmp( szTmp, m_pMaterialConfig->m_MaterialExclusions[i].szDirectory ) )
+		if( V_streq( szTmp, m_pMaterialConfig->m_MaterialExclusions[i].szDirectory ) )
 		{
 			// remove the directory
 			if( i != ( m_pMaterialConfig->m_MaterialExcludeCount - 1 ) )

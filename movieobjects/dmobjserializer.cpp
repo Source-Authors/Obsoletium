@@ -556,7 +556,7 @@ CDmElement *CDmObjSerializer::ReadOBJ( CUtlBuffer &buf,
 			{
 				// Remove any 'SG' suffix from the material
 				const size_t sLen = Q_strlen( tmpBuf1 );
-				if ( sLen && !Q_strcmp( tmpBuf1 + sLen - 2, "SG" ) )
+				if ( sLen && V_streq( tmpBuf1 + sLen - 2, "SG" ) )
 				{
 					tmpBuf1[ sLen - 2 ] = '\0';
 				}
@@ -1091,7 +1091,7 @@ bool CDmObjSerializer::WriteOBJ( const char *pFilename, CDmElement *pRoot, bool 
 			{
 				CDmeVertexDeltaData *pDelta( pDeltaMesh->GetDeltaState( j ) );
 
-				if ( !pDeltaName || !Q_strcmp( pDeltaName, pDelta->GetName() ) )
+				if ( !pDeltaName || V_streq( pDeltaName, pDelta->GetName() ) )
 				{
 					CUtlBuffer b( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
@@ -1156,7 +1156,7 @@ void CDmObjSerializer::ParseMtlLib( CUtlBuffer &buf )
 
 				// Remove any 'SG' suffix from the material
 				const size_t sLen = Q_strlen( mtlName );
-				if ( sLen > 2 && !Q_strcmp( mtlName + sLen - 2, "SG" ) )
+				if ( sLen > 2 && V_streq( mtlName + sLen - 2, "SG" ) )
 				{
 					mtlName[ sLen - 2 ] = '\0';
 				}

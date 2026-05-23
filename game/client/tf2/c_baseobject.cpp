@@ -349,7 +349,7 @@ void C_BaseObject::HighlightBuildPoints( int flags )
 					render->SetBlend( (175 + (int)( frac * 75.0f )) / 255.0 );
 
 					// HACK: Fixup angles on the HL2 model we're using
-					if ( !strcmp( modelinfo->GetModelName( pPlacementObj->GetModel() ), "models/items/HealthKit.mdl" ) )
+					if ( V_streq( modelinfo->GetModelName( pPlacementObj->GetModel() ), "models/items/HealthKit.mdl" ) )
 					{
 						vecBPAngles.x += 90;
 					}

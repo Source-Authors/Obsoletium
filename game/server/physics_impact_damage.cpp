@@ -477,7 +477,7 @@ float CalculateDefaultPhysicsDamage( int index, gamevcollisionevent_t *pEvent, f
 	{
 		for ( auto &&r : gDamageTableRegistry )
 		{
-			if ( !Q_strcmp( r.pszTableName, STRING(iszDamageTableName) ) )
+			if ( V_streq( r.pszTableName, STRING(iszDamageTableName) ) )
 				return CalculatePhysicsImpactDamage( index, pEvent, *r.pTable, energyScale, allowStaticDamage, damageType, bDamageFromHeldObjects );
 		}
 

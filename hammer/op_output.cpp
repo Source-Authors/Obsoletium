@@ -1629,7 +1629,7 @@ void COP_Output::UpdateEditedParams(void)
 	{
 		char strParam[MAX_IO_NAME_LEN];
 		pParamEdit->GetWindowText(strParam, sizeof(strParam));
-		if (!strcmp(strParam, PARAM_STRING_NONE))
+		if (V_streq(strParam, PARAM_STRING_NONE))
 		{
 			strParam[0] = '\0';
 		}

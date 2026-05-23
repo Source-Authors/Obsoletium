@@ -172,7 +172,7 @@ bool CNetAPI::StringToAdr( const char *s, netadr_t *a )
 {
 	struct sockaddr sadr;
 	
-	if ( !strcmp ( s, "localhost" ) )
+	if ( V_streq ( s, "localhost" ) )
 	{
 		a->Clear ();
 		a->type = NA_LOOPBACK;

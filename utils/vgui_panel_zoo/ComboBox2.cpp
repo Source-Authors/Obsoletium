@@ -106,7 +106,7 @@ void ComboBox2Demo::AddItemToComboBoxMenu()
 	m_pComboBox->GetText(boxText, sizeof( boxText ) );
 
 	// We won't add empty text strings to the menu.
-	if (!strcmp(boxText, ""))
+	if (Q_isempty(boxText))
 		return;
 
 	// Add this item to the combo box menu

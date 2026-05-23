@@ -255,7 +255,7 @@ const char *DetailObjects::FindDetailVBSPName( void )
 	for( int i = 0; i < num_entities; i++ )
 	{
 		char* pEntity = ValueForKey( &entities[i], "classname" );
-		if ( !strcmp( pEntity, "worldspawn" ) )
+		if ( V_streq( pEntity, "worldspawn" ) )
 		{
 			const char *pDetailVBSP = ValueForKey( &entities[i], "detailvbsp" );
 			if ( !pDetailVBSP || !pDetailVBSP[0] ) 

@@ -362,7 +362,7 @@ void CTFHudTimeStatus::FireGameEvent( IGameEvent *event )
 {
 	const char *eventName = event->GetName();
 
-	if ( !Q_strcmp( eventName, "teamplay_update_timer" ) )
+	if ( V_streq( eventName, "teamplay_update_timer" ) )
 	{
 		if ( TFGameRules() && TFGameRules()->IsInKothMode() )
 		{
@@ -371,14 +371,14 @@ void CTFHudTimeStatus::FireGameEvent( IGameEvent *event )
 
 		SetExtraTimePanels();
 	}
-	else if ( !Q_strcmp( eventName, "teamplay_timer_time_added" ) )
+	else if ( V_streq( eventName, "teamplay_timer_time_added" ) )
 	{
 		int iIndex = event->GetInt( "timer", -1 );
 		int nSeconds = event->GetInt( "seconds_added", 0 );
 
 		SetTimeAdded( iIndex, nSeconds );
 	}
-	else if ( !Q_strcmp( eventName, "localplayer_changeteam" ) )
+	else if ( V_streq( eventName, "localplayer_changeteam" ) )
 	{
 		SetTeamBackground();
 	}

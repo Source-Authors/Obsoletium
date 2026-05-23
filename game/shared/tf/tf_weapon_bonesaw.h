@@ -43,7 +43,7 @@ public:
 	virtual int			GetWeaponID( void ) const			
 	{ 
 		const CEconItemView *pEconItemView = GetAttributeContainer()->GetItem();
-		if ( !V_strcmp( pEconItemView->GetItemDefinition()->GetDefinitionName(), "Harvester" ) )
+		if ( V_streq( pEconItemView->GetItemDefinition()->GetDefinitionName(), "Harvester" ) )
 			return TF_WEAPON_HARVESTER_SAW;
 		return TF_WEAPON_BONESAW; 
 	}

@@ -698,7 +698,7 @@ void CNetworkStringTable::ParseUpdate( bf_read &buf, int entries )
 #ifdef _DEBUG
 			if ( pEntry )
 			{
-				Assert( !Q_strcmp( pEntry, GetString( entryIndex ) ) ); // make sure string didn't change
+				Assert( V_streq( pEntry, GetString( entryIndex ) ) ); // make sure string didn't change
 			}
 #endif
 			pEntry = GetString( entryIndex ); // string didn't change

@@ -5590,7 +5590,7 @@ bool CTFPlayer::SelectSpawnSpotByType( const char *pEntClassName, CBaseEntity* &
 	// don't collide with our team members, so we should be fine.
 	bool bIgnorePlayers = false;
 	// When dealing with a standard spawn ent, try to obey any class spawn flags
-	bool bRestrictByClass = !V_strcmp( pEntClassName, "info_player_teamspawn" );
+	bool bRestrictByClass = V_streq( pEntClassName, "info_player_teamspawn" );
 
 	CBaseEntity *pFirstSpot = pSpot;
 	do 

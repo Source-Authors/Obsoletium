@@ -921,7 +921,7 @@ void CPopulationManager::CycleMission ( void )
 						const char * pMap = pMission->GetString( "map", "" );
 						const char * pPopfile = pMission->GetString( "popfile", "" );
 						
-						if ( !Q_strcmp( pCurrentMap, pMap ) && !Q_strcmp( szCurrentPopfile, pPopfile ) )
+						if ( V_streq( pCurrentMap, pMap ) && V_streq( szCurrentPopfile, pPopfile ) )
 						{
 							// match, advance to the next entry and use those values
 							int nextMap = (iMap % iMapCount) + 1;
@@ -1931,7 +1931,7 @@ void CPopulationManager::EndlessRollEscalation( void )
 		bool bUpgradeFound = false;
 		FOR_EACH_VEC( m_EndlessActiveBotUpgrades, iUpgrade )
 		{
-			if ( !V_strcmp( m_EndlessActiveBotUpgrades[iUpgrade].szAttrib, upgrade.szAttrib) )
+			if ( V_streq( m_EndlessActiveBotUpgrades[iUpgrade].szAttrib, upgrade.szAttrib) )
 			{
 				bUpgradeFound = true;
 				// increment the value

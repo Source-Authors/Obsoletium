@@ -1356,24 +1356,24 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 	}
 #endif
 #if defined( REPLAY_ENABLED )
-	else if ( !V_strcmp( "replay_servererror", eventname ) )
+	else if ( V_streq( "replay_servererror", eventname ) )
 	{
 		DisplayReplayMessage( event->GetString( "error", "#Replay_DefaultServerError" ), replay_msgduration_error.GetFloat(), true, NULL, false );
 	}
-	else if ( !V_strcmp( "replay_startrecord", eventname ) )
+	else if ( V_streq( "replay_startrecord", eventname ) )
 	{
 		m_flReplayStartRecordTime = gpGlobals->curtime;
 	}
-	else if ( !V_strcmp( "replay_endrecord", eventname ) )
+	else if ( V_streq( "replay_endrecord", eventname ) )
 	{
 		m_flReplayStopRecordTime = gpGlobals->curtime;
 	}
-	else if ( !V_strcmp( "replay_replaysavailable", eventname ) )
+	else if ( V_streq( "replay_replaysavailable", eventname ) )
 	{
 		DisplayReplayMessage( "#Replay_ReplaysAvailable", replay_msgduration_replaysavailable.GetFloat(), false, NULL, false );
 	}
 
-	else if ( !V_strcmp( "game_newmap", eventname ) )
+	else if ( V_streq( "game_newmap", eventname ) )
 	{
 		// Make sure the instance count is reset to 0.  Sometimes the count stay in sync and we get replay messages displaying lower than they should.
 		CReplayMessagePanel::RemoveAll();

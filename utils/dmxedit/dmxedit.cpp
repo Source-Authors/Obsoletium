@@ -663,7 +663,7 @@ void CDmxEdit::ImportDominationRules( CDmeCombinationOperator *pDestComboOp, CDm
 //-----------------------------------------------------------------------------
 bool IsDefaultControl( CDmeCombinationOperator *pCombo, int nIndex )
 {
-	if ( pCombo->GetRawControlCount( nIndex ) == 1 && !Q_strcmp( pCombo->GetControlName( nIndex ), pCombo->GetRawControlName( nIndex, 0 ) ) )
+	if ( pCombo->GetRawControlCount( nIndex ) == 1 && V_streq( pCombo->GetControlName( nIndex ), pCombo->GetRawControlName( nIndex, 0 ) ) )
 		return true;
 
 	return false;
@@ -3646,7 +3646,7 @@ bool CDmxEdit::SetWrinkleScale( const char *pControlName, const char *pRawContro
 	bool bFoundRawControl = false;
 	for ( int nRawControlIndex = 0; nRawControlIndex < pDmeCombo->GetRawControlCount( nControlIndex ); ++nRawControlIndex )
 	{
-		if ( !Q_strcmp( pRawControlName, pDmeCombo->GetRawControlName( nControlIndex, nRawControlIndex ) ) )
+		if ( V_streq( pRawControlName, pDmeCombo->GetRawControlName( nControlIndex, nRawControlIndex ) ) )
 		{
 			bFoundRawControl = true;
 			break;

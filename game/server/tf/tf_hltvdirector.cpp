@@ -62,9 +62,9 @@ void CTFHLTVDirector::CreateShotFromEvent( CHLTVGameEvent *event )
 
 	int thera = RandomFloat()>0.5?20:-20;
 
-	if ( !Q_strcmp( "teamplay_point_startcapture", name ) || 
-		 !Q_strcmp( "teamplay_point_captured", name ) ||
-		 !Q_strcmp( "teamplay_capture_blocked", name ) )
+	if ( V_streq( "teamplay_point_startcapture", name ) || 
+		 V_streq( "teamplay_point_captured", name ) ||
+		 V_streq( "teamplay_capture_blocked", name ) )
 	{
 		CBaseEntity *pCapturePoint = GetCapturePointByIndex( event->m_Event->GetInt( "cp" ) );
 
@@ -100,7 +100,7 @@ void CTFHLTVDirector::CreateShotFromEvent( CHLTVGameEvent *event )
 
 		CBasePlayer *pPlayer = NULL;
 
-		if ( !Q_strcmp( "teamplay_point_captured", name ) )
+		if ( V_streq( "teamplay_point_captured", name ) )
 		{
 			const char *pszCappers = event->m_Event->GetString("cappers");
 			int nLength = Q_strlen(pszCappers);
@@ -111,7 +111,7 @@ void CTFHLTVDirector::CreateShotFromEvent( CHLTVGameEvent *event )
 				pPlayer = UTIL_PlayerByIndex( iRandomCapper );
 			}
 		}
-		else if ( !Q_strcmp( "teamplay_capture_blocked", name ) )
+		else if ( V_streq( "teamplay_capture_blocked", name ) )
 		{
 			int iBlocker = event->m_Event->GetInt("blocker");
 			pPlayer = UTIL_PlayerByIndex( iBlocker );
@@ -141,7 +141,7 @@ void CTFHLTVDirector::CreateShotFromEvent( CHLTVGameEvent *event )
 		// shot 2 seconds after event
 		m_nNextShotTick = MIN( m_nNextShotTick, (event->m_Tick+TIME_TO_TICKS(1.0)) );
 	}
-	else if ( !Q_strcmp( "object_destroyed", name ) )
+	else if ( V_streq( "object_destroyed", name ) )
 	{
 		CBasePlayer *attacker = UTIL_PlayerByUserId( event->m_Event->GetInt("attacker") );
 		if ( attacker )
@@ -150,7 +150,7 @@ void CTFHLTVDirector::CreateShotFromEvent( CHLTVGameEvent *event )
 			StartChaseCameraShot( attacker->entindex(), iObjectIndex, 96, 20, thera, false );
 		}
 	}
-	else if ( !Q_strcmp( "ctf_flag_captured", name ) )
+	else if ( V_streq( "ctf_flag_captured", name ) )
 	{
 		CBasePlayer *capper = UTIL_PlayerByUserId( event->m_Event->GetInt("capper") );
 		if ( capper )
@@ -158,7 +158,7 @@ void CTFHLTVDirector::CreateShotFromEvent( CHLTVGameEvent *event )
 			StartChaseCameraShot( capper->entindex(), 0, 96, 20, 0, false );
 		}
 	}
-	else if ( !Q_strcmp( "teamplay_flag_event", name ) )
+	else if ( V_streq( "teamplay_flag_event", name ) )
 	{
 		StartChaseCameraShot( event->m_Event->GetInt("player"), 0, 96, 20, 0, false );
 	}

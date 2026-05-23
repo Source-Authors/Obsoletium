@@ -198,7 +198,7 @@ void QCInfo::SyncToControls()
 	for( int i = 0; i < numItems; i++ )
 	{
 		((ComboBox *)pTargetField)->GetItemText( i, tempText );
-		if ( !Q_strcmp( tempText, pszSurfaceProperty ) )
+		if ( V_streq( tempText, pszSurfaceProperty ) )
 		{
 			((ComboBox *)pTargetField)->SetItemEnabled( i, true );
 			((ComboBox *)pTargetField)->SetText( tempText );
@@ -221,7 +221,7 @@ CBrowseButton::~CBrowseButton()
 
 void CBrowseButton::SetCharVar( char **pVar, const char *pszNewText )
 {
-	if ( *pVar && pszNewText && !Q_strcmp( *pVar, pszNewText ) )
+	if ( *pVar && pszNewText && V_streq( *pVar, pszNewText ) )
 	{
 		return;
 	}
@@ -266,7 +266,7 @@ static const char *ParseKeyvalue( const char *pBuffer, char (&key)[size], char (
 	Q_strlower( key );
 
 	// no value on a close brace
-	if ( !Q_strcmp( key, "}" ) )
+	if ( V_streq( key, "}" ) )
 	{
 		value[0] = 0;
 		return pBuffer;

@@ -171,7 +171,7 @@ void CContentControlDialog::OnCommand( const char *command )
             canclose = DisablePassword(pw1);
 //            canclose = CheckPassword( m_szGorePW, pw1, false );
         }
-        else if (!strcmp(pw1, pw2))
+        else if (V_streq(pw1, pw2))
         {
             canclose = EnablePassword(pw1);
 //            canclose = CheckPassword( NULL, pw1, true );

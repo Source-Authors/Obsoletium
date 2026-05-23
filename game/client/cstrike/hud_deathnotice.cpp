@@ -455,11 +455,11 @@ void CHudDeathNotice::FireGameEvent( IGameEvent *event )
 	// Record the death notice in the console
 	if ( deathMsg.iSuicide )
 	{
-		if ( !strcmp( fullkilledwith, "d_planted_c4" ) )
+		if ( V_streq( fullkilledwith, "d_planted_c4" ) )
 		{
 			Q_snprintf( sDeathMsg, sizeof( sDeathMsg ), "%s was a bit too close to the c4.\n", deathMsg.Victim.szName );
 		}
-		else if ( !strcmp( fullkilledwith, "d_worldspawn" ) )
+		else if ( V_streq( fullkilledwith, "d_worldspawn" ) )
 		{
 			Q_snprintf( sDeathMsg, sizeof( sDeathMsg ), "%s died.\n", deathMsg.Victim.szName );
 		}

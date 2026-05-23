@@ -840,7 +840,7 @@ void C_TFRagdoll::Interp_Copy( C_BaseAnimatingOverlay *pSourceEntity )
 		for ( int j=0; j < pSrc->m_Entries.Count(); j++ )
 		{
 			VarMapEntry_t *pSrcEntry = &pSrc->m_Entries[j];
-			if ( !Q_strcmp( pSrcEntry->watcher->GetDebugName(), pDestEntry->watcher->GetDebugName() ) )
+			if ( V_streq( pSrcEntry->watcher->GetDebugName(), pDestEntry->watcher->GetDebugName() ) )
 			{
 				pDestEntry->watcher->Copy( pSrcEntry->watcher );
 				break;
@@ -3873,7 +3873,7 @@ public:
 			const char *vArgs = VarArgs( "wear_level_%d", nWear );
 			FOR_EACH_SUBKEY( s_kvOverridePaintkit, wearKv )
 			{
-				if ( !V_strcmp( vArgs, wearKv->GetName() ) )
+				if ( V_streq( vArgs, wearKv->GetName() ) )
 				{
 					rootKV = wearKv;
 					break;
@@ -11630,7 +11630,7 @@ const char* C_TFPlayer::ModifyEventParticles( const char* token )
 {
 	if ( GetPlayerClass()->IsClass( TF_CLASS_SCOUT ) )
 	{
-		if ( !Q_strcmp( token, "doublejump_puff" ) )
+		if ( V_streq( token, "doublejump_puff" ) )
 		{
 			if ( m_Shared.GetAirDash() > 1 )
 			{

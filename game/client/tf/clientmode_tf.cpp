@@ -770,7 +770,7 @@ void ClientModeTFNormal::FireGameEvent( IGameEvent *event )
 	}
 	else if ( FStrEq( "server_cvar", eventname ) )
 	{		
-		if ( TFGameRules() && TFGameRules()->IsPVEModeActive() && !Q_strcmp( event->GetString("cvarname"), "tf_bot_count" ) )
+		if ( TFGameRules() && TFGameRules()->IsPVEModeActive() && V_streq( event->GetString("cvarname"), "tf_bot_count" ) )
 			return;
 	}
 	else if ( FStrEq( "player_buyback", eventname ) )

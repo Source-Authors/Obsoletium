@@ -2583,7 +2583,7 @@ int VOX_ListFileIsLoaded( const char *psentenceFileName )
 	filelist_t *pList = g_pSentenceFileList;
 	while ( pList )
 	{
-		if ( !strcmp( psentenceFileName, pList->pFileName ) )
+		if ( V_streq( psentenceFileName, pList->pFileName ) )
 			return true;
 
 		pList = pList->pNext;

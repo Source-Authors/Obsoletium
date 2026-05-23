@@ -276,7 +276,7 @@ public:
 		GetText( buf );
 
 		// Not actually changed...
-		if ( !Q_strcmp( buf, m_OriginalText.Get() ) )
+		if ( V_streq( buf, m_OriginalText.Get() ) )
 			return;
 
 		if ( revert )

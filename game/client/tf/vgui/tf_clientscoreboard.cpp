@@ -486,7 +486,7 @@ void CTFClientScoreBoardDialog::OnCommand( const char *command )
 	{
 		engine->ClientCmd( command );
 	}
-	else if ( !V_strcmp( command, "muteplayer" ) )
+	else if ( V_streq( command, "muteplayer" ) )
 	{
 		SectionedListPanel *pList = GetSelectedPlayerList();
 		if ( pList )
@@ -507,7 +507,7 @@ void CTFClientScoreBoardDialog::OnCommand( const char *command )
 			}
 		}
 	}
-	else if ( !V_strcmp( command, "specplayer" ) )
+	else if ( V_streq( command, "specplayer" ) )
 	{
 		SectionedListPanel *pList = GetSelectedPlayerList();
 		if ( pList )
@@ -527,7 +527,7 @@ void CTFClientScoreBoardDialog::OnCommand( const char *command )
 			}
 		}
 	}
-	else if ( !V_strcmp( command, "friendadd" ) )
+	else if ( V_streq( command, "friendadd" ) )
 	{
 		SectionedListPanel *pList = GetSelectedPlayerList();
 		if ( pList )
@@ -552,7 +552,7 @@ void CTFClientScoreBoardDialog::OnCommand( const char *command )
 			}
 		}
 	}
-	else if ( !V_strcmp( command, "jointrade" ) )
+	else if ( V_streq( command, "jointrade" ) )
 	{
 		SectionedListPanel *pList = GetSelectedPlayerList();
 		if ( pList )
@@ -580,7 +580,7 @@ void CTFClientScoreBoardDialog::OnCommand( const char *command )
 			}
 		}
 	}
-	else if ( !V_strcmp( command, "profile" ) )
+	else if ( V_streq( command, "profile" ) )
 	{
 		SectionedListPanel *pList = GetSelectedPlayerList();
 		if ( pList )

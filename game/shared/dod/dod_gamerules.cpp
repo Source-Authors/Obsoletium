@@ -190,7 +190,7 @@ static CDODViewVectors g_DODViewVectors(
 		while ( pkvNodeData )
 		{
 			// Handle the connections block
-			if ( !Q_strcmp(pkvNodeData->GetName(), "connections") )
+			if ( V_streq(pkvNodeData->GetName(), "connections") )
 			{
 				ParseEntKVBlock( pNode, pkvNodeData );
 			}
@@ -208,7 +208,7 @@ static CDODViewVectors g_DODViewVectors(
 	// for now only allow blocker walls to load this way
 	bool CanLoadEntityFromEntText( const char *clsName )
 	{
-		if ( !Q_strcmp( clsName, "func_team_wall" ) )
+		if ( V_streq( clsName, "func_team_wall" ) )
 		{
 			return true;
 		}

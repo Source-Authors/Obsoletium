@@ -1727,7 +1727,7 @@ int CMDLPicker::UpdatePropDataList( const char* pszPropData, bool &bIsStatic )
 			beginChunk = strchr( beginChunk, '\"' ) + 1;
 			endChunk = strchr( beginChunk, '\"' );
 			Q_memcpy( valueText, beginChunk, endChunk - beginChunk );		
-			if( !Q_strcmp( keyText, "allowstatic" ) && !Q_strcmp( valueText , "1" ) )
+			if( V_streq( keyText, "allowstatic" ) && V_streq( valueText , "1" ) )
 			{
 				if ( !bIsStatic )
 				{					

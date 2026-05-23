@@ -176,7 +176,7 @@ CFileHeaderFixedData *CPackedStore::FindFileEntry( char const *pDirname, char co
 			// now, march through all the files
 			while( *pData )									// until we're out of files to look at
 			{
-				if ( !V_strcmp( pData, pBaseName ) )		// found it?
+				if ( V_streq( pData, pBaseName ) )		// found it?
 				{
 					if ( pNameBaseOut )
 						*pNameBaseOut = (uint8 *) pData;

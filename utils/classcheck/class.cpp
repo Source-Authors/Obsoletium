@@ -64,7 +64,7 @@ CTypeDescriptionField *CClass::FindTD( const char *name )
 {
 	for ( int i = 0; i < m_nTDCount; i++ )
 	{
-		if ( !strcmp( m_TDFields[ i ]->m_szVariableName, name ) )
+		if ( V_streq( m_TDFields[ i ]->m_szVariableName, name ) )
 			return m_TDFields[ i ];
 	}
 	return NULL;
@@ -74,7 +74,7 @@ CTypeDescriptionField *CClass::FindPredTD( const char *name )
 {
 	for ( int i = 0; i < m_nPredTDCount; i++ )
 	{
-		if ( !strcmp( m_PredTDFields[ i ]->m_szVariableName, name ) )
+		if ( V_streq( m_PredTDFields[ i ]->m_szVariableName, name ) )
 			return m_PredTDFields[ i ];
 	}
 	return NULL;
@@ -87,7 +87,7 @@ CClassVariable	*CClass::FindVar( const char *name, bool checkbaseclasses /*= fal
 	{
 		for ( int i = 0; i < cl->m_nVarCount; i++ )
 		{
-			if ( !strcmp( cl->m_Variables[ i ]->m_szName, name ) )
+			if ( V_streq( cl->m_Variables[ i ]->m_szName, name ) )
 				return cl->m_Variables[ i ];
 		}
 
@@ -110,7 +110,7 @@ CClassMemberFunction *CClass::FindMember( const char *name )
 {
 	for ( int i = 0; i < m_nMemberCount; i++ )
 	{
-		if ( !strcmp( m_Members[ i ]->m_szName, name ) )
+		if ( V_streq( m_Members[ i ]->m_szName, name ) )
 			return m_Members[ i ];
 	}
 	return NULL;
@@ -330,39 +330,39 @@ void CClass::ReportTypeMismatches( CClassVariable *var, CTypeDescriptionField *t
 	if ( td->m_bCommentedOut )
 		return;
 
-	if ( !strcmp( td->m_szType, "FIELD_TIME" ) )
+	if ( V_streq( td->m_szType, "FIELD_TIME" ) )
 	{
-		if ( !strcmp( t, "FIELD_FLOAT" ) )
+		if ( V_streq( t, "FIELD_FLOAT" ) )
 			return;
 	}
 
-	if ( !strcmp( td->m_szType, "FIELD_TICK" ) )
+	if ( V_streq( td->m_szType, "FIELD_TICK" ) )
 	{
-		if ( !strcmp( t, "FIELD_INTEGER" ) )
+		if ( V_streq( t, "FIELD_INTEGER" ) )
 			return;
 	}
 
-	if ( !strcmp( td->m_szType, "FIELD_MODELNAME" ) || !strcmp( td->m_szType, "FIELD_SOUNDNAME" ) )
+	if ( V_streq( td->m_szType, "FIELD_MODELNAME" ) || V_streq( td->m_szType, "FIELD_SOUNDNAME" ) )
 	{
-		if ( !strcmp( t, "FIELD_STRING" ) )
+		if ( V_streq( t, "FIELD_STRING" ) )
 			return;
 	}
 
-	if ( !strcmp( td->m_szType, "FIELD_MODELINDEX" ) || !strcmp( td->m_szType, "FIELD_MATERIALINDEX" ) )
+	if ( V_streq( td->m_szType, "FIELD_MODELINDEX" ) || V_streq( td->m_szType, "FIELD_MATERIALINDEX" ) )
 	{
-		if ( !strcmp( t, "FIELD_INTEGER" ) )
+		if ( V_streq( t, "FIELD_INTEGER" ) )
 			return;
 	}
 
-	if ( !strcmp( td->m_szType, "FIELD_POSITION_VECTOR" ) )
+	if ( V_streq( td->m_szType, "FIELD_POSITION_VECTOR" ) )
 	{
-		if ( !strcmp( t, "FIELD_VECTOR" ) )
+		if ( V_streq( t, "FIELD_VECTOR" ) )
 			return;
 	}
 
-	if ( !strcmp( td->m_szType, "FIELD_VMATRIX_WORLDSPACE" ) )
+	if ( V_streq( td->m_szType, "FIELD_VMATRIX_WORLDSPACE" ) )
 	{
-		if ( !strcmp( t, "FIELD_VMATRIX" ) )
+		if ( V_streq( t, "FIELD_VMATRIX" ) )
 			return;
 	}
 
@@ -510,7 +510,7 @@ bool CClass::CheckForPredictionFieldsInRecvTableNotMarkedAsSuchCorrectly( int &m
 			continue;
 		
 		// These are implicitly ok
-		if ( !strcmp( td->m_szDefineType, "DEFINE_PRED_TYPEDESCRIPTION" ) )
+		if ( V_streq( td->m_szDefineType, "DEFINE_PRED_TYPEDESCRIPTION" ) )
 		{
 			CClass *cl2 = processor->FindClass( td->m_szType );
 			if ( cl2 )
@@ -760,7 +760,7 @@ static int GetTypeSize( CClass *cl, CClassVariable *var )
 	{
 		return sizeof( char );
 	}
-	else if ( !strcmp( input, "unsigned" ) )
+	else if ( V_streq( input, "unsigned" ) )
 	{
 		return sizeof(unsigned int);
 	}
@@ -826,12 +826,12 @@ void CClass::AddVariable( int protection, char *type, char *name, bool array, ch
 //-----------------------------------------------------------------------------
 bool CClass::ParseBaseClass( char *&input )
 {
-	if ( !strcmp( com_token, "DECLARE_CLASS" ) 
-			|| !strcmp( com_token, "DECLARE_CLASS_GAMEROOT" ) 
-			|| !strcmp( com_token, "DECLARE_CLASS_NOFRIEND" ) )
+	if ( V_streq( com_token, "DECLARE_CLASS" ) 
+			|| V_streq( com_token, "DECLARE_CLASS_GAMEROOT" ) 
+			|| V_streq( com_token, "DECLARE_CLASS_NOFRIEND" ) )
 	{
 		input = CC_ParseToken( input );
-		Assert( !strcmp( com_token, "(") );
+		Assert( V_streq( com_token, "(") );
 		input = CC_ParseToken( input );
 
 		do
@@ -848,10 +848,10 @@ bool CClass::ParseBaseClass( char *&input )
 		} while( strcmp( com_token, ")") );
 		return true;
 	}
-	else if ( !strcmp( com_token, "DECLARE_CLASS_NOBASE" ) )
+	else if ( V_streq( com_token, "DECLARE_CLASS_NOBASE" ) )
 	{
 		input = CC_ParseToken( input );
-		Assert( !strcmp( com_token, "(") );
+		Assert( V_streq( com_token, "(") );
 		input = CC_DiscardUntilMatchingCharIncludingNesting( input, "()" );
 		return true;
 	}
@@ -867,12 +867,12 @@ bool CClass::ParseNetworkVar( char *&input, int protection )
 {
 	MemberVarParse_t var;
 
-	if ( !strcmp( com_token, "CNetworkVar" ) || 
-		!strcmp( com_token, "CNetworkVarForDerived" ) || 
-		!strcmp( com_token, "CNetworkVarEmbedded" ) )
+	if ( V_streq( com_token, "CNetworkVar" ) || 
+		V_streq( com_token, "CNetworkVarForDerived" ) || 
+		V_streq( com_token, "CNetworkVarEmbedded" ) )
 	{
 		input = CC_ParseToken( input );
-		Assert( !strcmp( com_token, "(") );
+		Assert( V_streq( com_token, "(") );
 
 		input = CC_ParseToken( input );
 		do
@@ -893,10 +893,10 @@ bool CClass::ParseNetworkVar( char *&input, int protection )
 		return true;
 	}
 
-	if ( !strcmp( com_token, "CNetworkHandle" ) || !strcmp( com_token, "CNetworkHandleForDerived" ) )
+	if ( V_streq( com_token, "CNetworkHandle" ) || V_streq( com_token, "CNetworkHandleForDerived" ) )
 	{
 		input = CC_ParseToken( input );
-		Assert( !strcmp( com_token, "(") );
+		Assert( V_streq( com_token, "(") );
 
 		input = CC_ParseToken( input );
 		strcpy( var.m_pType, "CHandle<" );
@@ -919,12 +919,12 @@ bool CClass::ParseNetworkVar( char *&input, int protection )
 		return true;
 	}
 
-	if ( !strcmp( com_token, "CNetworkVector" ) || 
-		!strcmp( com_token, "CNetworkVectorForDerived" ) || 
-		!strcmp( com_token, "CNetworkQAngle" ) )
+	if ( V_streq( com_token, "CNetworkVector" ) || 
+		V_streq( com_token, "CNetworkVectorForDerived" ) || 
+		V_streq( com_token, "CNetworkQAngle" ) )
 	{
 		input = CC_ParseToken( input );
-		Assert( !strcmp( com_token, "(") );
+		Assert( V_streq( com_token, "(") );
 
 		input = CC_ParseToken( input );
 		do
@@ -937,10 +937,10 @@ bool CClass::ParseNetworkVar( char *&input, int protection )
 		return true;
 	}
 
-	if ( !strcmp( com_token, "CNetworkColor32" ) )
+	if ( V_streq( com_token, "CNetworkColor32" ) )
 	{
 		input = CC_ParseToken( input );
-		Assert( !strcmp( com_token, "(") );
+		Assert( V_streq( com_token, "(") );
 
 		input = CC_ParseToken( input );
 		do
@@ -953,10 +953,10 @@ bool CClass::ParseNetworkVar( char *&input, int protection )
 		return true;
 	}
 
-	if ( !strcmp( com_token, "CNetworkString" ) )
+	if ( V_streq( com_token, "CNetworkString" ) )
 	{
 		input = CC_ParseToken( input );
-		Assert( !strcmp( com_token, "(") );
+		Assert( V_streq( com_token, "(") );
 
 		input = CC_ParseToken( input );
 		do
@@ -976,10 +976,10 @@ bool CClass::ParseNetworkVar( char *&input, int protection )
 		return true;
 	}
 
-	if ( !strcmp( com_token, "CNetworkArray" ) || !strcmp( com_token, "CNetworkArrayForDerived" ) )
+	if ( V_streq( com_token, "CNetworkArray" ) || V_streq( com_token, "CNetworkArrayForDerived" ) )
 	{
 		input = CC_ParseToken( input );
-		Assert( !strcmp( com_token, "(") );
+		Assert( V_streq( com_token, "(") );
 
 		input = CC_ParseToken( input );
 		do
@@ -1195,23 +1195,23 @@ bool CClass::ParseClassMember( char *&input, int protection )
 	}
 
 	if ( var.m_pType[0]==0 && 
-		( !strcmp( var.m_pName, "CUSTOM_SCHEDULES" ) ||
-		  !strcmp( var.m_pName, "DEFINE_CUSTOM_SCHEDULE_PROVIDER" ) ||
-		  !strcmp( var.m_pName, "DEFINE_CUSTOM_AI" ) ||
-		  !strcmp( var.m_pName, "DECLARE_DATADESC" ) ||
-		  !strcmp( var.m_pName, "DECLARE_EMBEDDED_DATADESC" ) ||
-		  !strcmp( var.m_pName, "DECLARE_SERVERCLASS" ) ||
-		  !strcmp( var.m_pName, "DECLARE_CLIENTCLASS" ) ||
-		  !strcmp( var.m_pName, "DECLARE_ENTITY_PANEL" ) ||
-		  !strcmp( var.m_pName, "DECLARE_MINIMAP_PANEL" ) ||
-		  !strcmp( var.m_pName, "MANUALMODE_GETSET_PROP" ) ) )
+		( V_streq( var.m_pName, "CUSTOM_SCHEDULES" ) ||
+		  V_streq( var.m_pName, "DEFINE_CUSTOM_SCHEDULE_PROVIDER" ) ||
+		  V_streq( var.m_pName, "DEFINE_CUSTOM_AI" ) ||
+		  V_streq( var.m_pName, "DECLARE_DATADESC" ) ||
+		  V_streq( var.m_pName, "DECLARE_EMBEDDED_DATADESC" ) ||
+		  V_streq( var.m_pName, "DECLARE_SERVERCLASS" ) ||
+		  V_streq( var.m_pName, "DECLARE_CLIENTCLASS" ) ||
+		  V_streq( var.m_pName, "DECLARE_ENTITY_PANEL" ) ||
+		  V_streq( var.m_pName, "DECLARE_MINIMAP_PANEL" ) ||
+		  V_streq( var.m_pName, "MANUALMODE_GETSET_PROP" ) ) )
 	{
 		return true;
 	}
 
 	if ( var.m_pType[0]==0 && 
-		( !strcmp( var.m_pName, "DECLARE_PREDICTABLE" ) ||
-		 !strcmp( var.m_pName, "DECLARE_EMBEDDED_PREDDESC" ) ) )
+		( V_streq( var.m_pName, "DECLARE_PREDICTABLE" ) ||
+		 V_streq( var.m_pName, "DECLARE_EMBEDDED_PREDDESC" ) ) )
 	{
 		m_bHasPredictionData = true;
 		return true;

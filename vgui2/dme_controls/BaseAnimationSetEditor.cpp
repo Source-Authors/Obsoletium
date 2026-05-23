@@ -855,7 +855,7 @@ void CBaseAnimationSetEditor::SetupFileOpenDialog( vgui::FileOpenDialog *pDialog
 	Assert( !bOpenFile );
 	pDialog->SetTitle( "Save Facial Animation As", true );
 
-	Assert( !V_strcmp( pFileFormat, "facial_animation" ) );
+	Assert( V_streq( pFileFormat, "facial_animation" ) );
 	pDialog->SetStartDirectoryContext( "facial_animation_export", pStartingDir );
 	pDialog->AddFilter( "*.*", "All Files (*.*)", false );
 	pDialog->AddFilter( "*.dmx", "Facial animation file (*.dmx)", true, pFileFormat );

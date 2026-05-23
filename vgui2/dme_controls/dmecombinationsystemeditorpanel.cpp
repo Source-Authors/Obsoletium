@@ -464,7 +464,7 @@ void CDmeCombinationControlsPanel::RefreshCombinationOperator()
 		kv->SetColor( "cellcolor", bIsMultiControl ? Color( 192, 192, 0, 255 ) : Color( 255, 255, 255, 255 ) ); 
 		const int nItemId = m_pControlList->AddItem( kv, 0, false, false );
 
-		if ( !Q_strcmp( controlName.Get(), pName ) )
+		if ( V_streq( controlName.Get(), pName ) )
 		{
 			m_pControlList->SetSingleSelectedItem( nItemId );
 		}

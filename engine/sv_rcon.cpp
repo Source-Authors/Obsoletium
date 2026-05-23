@@ -513,7 +513,7 @@ bool CRConServer::HandleFailedRconAuth( const netadr_t & adr )
 {
 	if ( sv_rcon_whitelist_address.GetString()[0] )
 	{
-		if ( !V_strcmp( adr.ToString( true ), sv_rcon_whitelist_address.GetString() ) )
+		if ( V_streq( adr.ToString( true ), sv_rcon_whitelist_address.GetString() ) )
 		{
 			ConMsg( "Rcon auth failed from rcon whitelist address %s\n", adr.ToString() );
 			return false;

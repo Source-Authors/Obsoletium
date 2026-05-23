@@ -267,7 +267,7 @@ bool CBaseViewport::IsPanelVisible( const char* panel )
 		if ( p->IsVisible() )
 		{
 			const char* panel_name = p->GetName();
-			if ( !Q_strcmp( panel, panel_name ) )
+			if ( V_streq( panel, panel_name ) )
 			{
 				return true;
 			}

@@ -28,7 +28,7 @@ struct CheckListItem
 	int state;
 	inline bool operator==( const CheckListItem &first ) const
 	{
-		return ( ( first.nItemBit == nItemBit ) && ( !Q_strcmp( first.pszItemString, pszItemString ) ) );
+		return ( ( first.nItemBit == nItemBit ) && ( V_streq( first.pszItemString, pszItemString ) ) );
 	}
 };
 

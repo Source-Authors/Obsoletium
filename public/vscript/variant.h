@@ -898,12 +898,12 @@ inline bool CVariantBase<CValueAllocator>::AssignTo( bool *pDest ) const
 	case FIELD_BOOLEAN:		*pDest = m_bool; return true;
 
 	case FIELD_CSTRING:
-		if( !V_strcmp( m_pszString, "0" ) || !V_strcmp( m_pszString, "false" ) || !V_strcmp( m_pszString, "no" ) )
+		if( V_streq( m_pszString, "0" ) || V_streq( m_pszString, "false" ) || V_streq( m_pszString, "no" ) )
 		{
 			*pDest = false;
 			return true;
 		}
-		else if( !V_strcmp( m_pszString, "1" ) || !V_strcmp( m_pszString, "true" ) || !V_strcmp( m_pszString, "yes" ) )
+		else if( V_streq( m_pszString, "1" ) || V_streq( m_pszString, "true" ) || V_streq( m_pszString, "yes" ) )
 		{
 			*pDest = true;
 			return true;

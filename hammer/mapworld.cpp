@@ -1700,7 +1700,7 @@ void CMapWorld::PostloadVisGroups()
 		CMapEntity *pEntity = dynamic_cast< CMapEntity *>( (*pEntities)[pos] );
 #if	defined(_DEBUG) && 0
 		LPCTSTR	pszTargetName = pEntity->GetKeyValue("targetname");
-		if ( pszTargetName && !strcmp(pszTargetName, "relay_cancelVCDs") )
+		if ( pszTargetName && V_streq(pszTargetName, "relay_cancelVCDs") )
 		{
 			// Set breakpoint here for debugging this entity's visiblity
 			int foo = 0;

@@ -181,7 +181,7 @@ bool CDmMeshUtils::RemoveFacesWithMaterial( CDmeMesh *pMesh, const char *pMateri
 	for ( int i = 0; i < nFaceSets; ++i )
 	{
 		CDmeFaceSet *pFaceSet = pMesh->GetFaceSet( i );
-		if ( !Q_strcmp( pFaceSet->GetMaterial()->GetMaterialName(), pMaterialName ) )
+		if ( V_streq( pFaceSet->GetMaterial()->GetMaterialName(), pMaterialName ) )
 		{
 			emptyFaceSets.AddToTail( i );
 			bMeshChanged = true;
@@ -522,7 +522,7 @@ void RemoveUnusedData(
 	}
 
 	// TODO: Fix up "jointWeight & "jointIndices" if this is "position"
-	if ( !Q_strcmp( pFieldName, "position" ) )
+	if ( V_streq( pFieldName, "position" ) )
 	{
 		const int nFields = pVertexData->FieldCount();
 		for ( int i = 0; i < nFields; ++i )
@@ -543,7 +543,7 @@ void RemoveUnusedData(
 		const int nDeltaFieldCount = pDelta->FieldCount();
 		for ( int j = 0; j < nDeltaFieldCount; ++j )
 		{
-			if ( !Q_strcmp( pFieldName, pDelta->FieldName( j ) ) )
+			if ( V_streq( pFieldName, pDelta->FieldName( j ) ) )
 			{
 				CDmrArray< int > deltaIndices = pDelta->GetIndexData( j );
 				CDmrGenericArray deltaData = pDelta->GetVertexData( j );
@@ -581,14 +581,14 @@ void RemoveUnusedVerticesFromBaseState(
 	int *pNewVertexIndices = reinterpret_cast< int * >( alloca( nNewToOldIndexMapCount * sizeof( int ) ) );
 
 	// See if this is the bind state for the mesh
-	const bool bBind = !Q_strcmp( pVertexData->GetName(), "bind" );
+	const bool bBind = V_streq( pVertexData->GetName(), "bind" );
 
 	const int nFieldCount = pVertexData->FieldCount();
 	for ( int i = 0; i < nFieldCount; ++i )
 	{
 		const char *pFieldName = pVertexData->FieldName( i );
 		// TODO: Checking by name is lame... should be a lookup to map fieldIndex to a standard field index
-		if ( !Q_strcmp( pFieldName, "jointWeights" ) || !Q_strcmp( pFieldName, "jointIndices" ) )
+		if ( V_streq( pFieldName, "jointWeights" ) || V_streq( pFieldName, "jointIndices" ) )
 		{
 			// TODO: Handle when positions are Remapped
 			continue;
@@ -2397,7 +2397,7 @@ bool CreateExpressionFile( const char *pExpressionFile, const CUtlVector< CUtlSt
 			{
 				for ( int k = 0; k < pPurgeAllButThese->Count(); ++k )
 				{
-					if ( !Q_strcmp( pControlName, pPurgeAllButThese->Element( k ).Get() ) )
+					if ( V_streq( pControlName, pPurgeAllButThese->Element( k ).Get() ) )
 					{
 						bFound = true;
 						break;
@@ -2416,7 +2416,7 @@ bool CreateExpressionFile( const char *pExpressionFile, const CUtlVector< CUtlSt
 			const bool bStereo = pComboOp->IsStereoControl( j );
 			const bool bMulti = pComboOp->IsMultiControl( j );
 
-			if ( !Q_strcmp( pControlName, pPresetName ) )
+			if ( V_streq( pControlName, pPresetName ) )
 			{
 				pDstControlValue = pDstPreset->FindOrAddControlValue( pControlName );
 				pDstControlValue->SetValue( "value", 1.0f );
@@ -2438,7 +2438,7 @@ bool CreateExpressionFile( const char *pExpressionFile, const CUtlVector< CUtlSt
 			{
 				CDmElement *pControlPreset = controlValues[ k ];
 
-				if ( !Q_strcmp( pControlName, pControlPreset->GetName() ) )
+				if ( V_streq( pControlName, pControlPreset->GetName() ) )
 				{
 					pDstControlValue = pDstPreset->FindOrAddControlValue( pControlName );
 					pDstControlValue->SetValue( "value", pControlPreset->GetValue( "value", 0.0f ) );
@@ -2579,7 +2579,7 @@ bool CDmMeshUtils::CreateDeltasFromPresets(
 				const int nRawControls = pComboOp->GetRawControlCount( nControlIndex );
 				for ( int j = 0; j < nRawControls; ++j )
 				{
-					if ( !Q_strcmp( pComboOp->GetRawControlName( nControlIndex, j ), pPresetName ) )
+					if ( V_streq( pComboOp->GetRawControlName( nControlIndex, j ), pPresetName ) )
 					{
 						bFound = true;
 						break;
@@ -3180,7 +3180,7 @@ void CDmMeshUtils::CreateDeltasFromPresetGroup(
 			{
 				for ( int k = 0; k < pPurgeAllButThese->Count(); ++k )
 				{
-					if ( !Q_strcmp( pControlPreset->GetName(), pPurgeAllButThese->Element( k ).Get() ) )
+					if ( V_streq( pControlPreset->GetName(), pPurgeAllButThese->Element( k ).Get() ) )
 					{
 						bSkip = true;
 					}
@@ -3264,7 +3264,7 @@ void CDmMeshUtils::PurgeUnreferencedDeltas( CDmeMesh *pMesh, CUtlStringMap< CDme
 			{
 				for ( int j = 0; j < pPurgeAllButThese->Count(); ++j )
 				{
-					if ( !Q_strcmp( pDeltaStateName, pPurgeAllButThese->Element( j ).Get() ) )
+					if ( V_streq( pDeltaStateName, pPurgeAllButThese->Element( j ).Get() ) )
 					{
 						bDelete = false;
 						break;
@@ -3276,7 +3276,7 @@ void CDmMeshUtils::PurgeUnreferencedDeltas( CDmeMesh *pMesh, CUtlStringMap< CDme
 
 					for ( int k = 0; k < pComboOp->GetRawControlCount( nControlIndex ); ++k )
 					{
-						if ( !Q_strcmp( pDeltaStateName, pComboOp->GetRawControlName( nControlIndex, k ) ) )
+						if ( V_streq( pDeltaStateName, pComboOp->GetRawControlName( nControlIndex, k ) ) )
 						{
 							bDelete = false;
 							break;
@@ -3311,7 +3311,7 @@ void CDmMeshUtils::PurgeUnreferencedDeltas( CDmeMesh *pMesh, CUtlStringMap< CDme
 			{
 				for ( int j = 0; j < pPurgeAllButThese->Count(); ++j )
 				{
-					if ( !Q_strcmp( pControlName, pPurgeAllButThese->Element( j ) ) )
+					if ( V_streq( pControlName, pPurgeAllButThese->Element( j ) ) )
 					{
 						bDelete = false;
 						break;

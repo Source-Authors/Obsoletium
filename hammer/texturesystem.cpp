@@ -1023,7 +1023,7 @@ DWORD CTextureSystem::LoadGraphicsFile(const char *pFilename)
 	intp i = m_GraphicsFiles.Count() - 1;
 	while (i > -1)
 	{
-		if (!strcmp(m_GraphicsFiles[i].filename, pFilename))
+		if (V_streq(m_GraphicsFiles[i].filename, pFilename))
 		{
 			return(m_GraphicsFiles[i].id);
 		}
@@ -1315,7 +1315,7 @@ IEditorTexture *CTextureGroup::GetTexture( char const* pName )
 {
 	for (intp i = 0; i < m_Textures.Count(); i++)
 	{
-		if (!strcmp(pName, m_Textures[i]->GetName()))
+		if (V_streq(pName, m_Textures[i]->GetName()))
 			return m_Textures[i];
 	}
 

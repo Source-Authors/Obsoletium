@@ -96,13 +96,13 @@ void CBossBattleLogic::FireGameEvent( IGameEvent *event )
 {
 	const char *eventName = event->GetName();
 
-	if ( !Q_strcmp( eventName, "teamplay_round_win" ) )
+	if ( V_streq( eventName, "teamplay_round_win" ) )
 	{
 		if ( event->GetInt( "team" ) == TF_TEAM_RED )
 		{
 		}
 	}
-	else if ( !Q_strcmp( eventName, "teamplay_round_start" ) )
+	else if ( V_streq( eventName, "teamplay_round_start" ) )
 	{
 		OnRoundStart();
 	}

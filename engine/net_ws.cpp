@@ -569,7 +569,7 @@ socket_handle NET_OpenSocket ( const char *net_interface, int& port, int protoco
 		}
 	}
 
-	if (!net_interface || !net_interface[0] || !Q_strcmp(net_interface, "localhost"))
+	if (!net_interface || !net_interface[0] || V_streq(net_interface, "localhost"))
 	{
 		address.sin_addr.s_addr = INADDR_ANY;
 	}
@@ -2836,7 +2836,7 @@ void NET_ListenSocket( intp sock, bool bListen )
 
 		struct sockaddr_in	address;
 
-		if (!net_interface || !net_interface[0] || !Q_strcmp(net_interface, "localhost"))
+		if (!net_interface || !net_interface[0] || V_streq(net_interface, "localhost"))
 		{
 			address.sin_addr.s_addr = INADDR_ANY;
 		}

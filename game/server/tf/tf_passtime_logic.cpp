@@ -194,7 +194,7 @@ static CBaseEntityOutput *FindOutput( CBaseEntity *pEnt, const char *pOutputName
 			typedescription_t *dataDesc = &dmap->dataDesc[i];
 			if ( ( dataDesc->fieldType == FIELD_CUSTOM ) 
 				&& ( dataDesc->flags & FTYPEDESC_OUTPUT ) 
-				&& !strcmp( dataDesc->externalName, pOutputName ) )
+				&& V_streq( dataDesc->externalName, pOutputName ) )
 			{
 				return (CBaseEntityOutput *)((intptr_t)pEnt + (int)dataDesc->fieldOffset[0]);
 			}
@@ -561,14 +561,14 @@ float CTFPasstimeLogic::GetPackSpeed( CTFPlayer *pPlayer ) const
 void CTFPasstimeLogic::FireGameEvent( IGameEvent *pEvent ) 
 {
 	const char *pEventName = pEvent->GetName();
-	if ( !V_strcmp( pEventName, "teamplay_round_stalemate" ) )
+	if ( V_streq( pEventName, "teamplay_round_stalemate" ) )
 	{
 		// this only happens when mp_stalemate_enable is on
 		CTF_GameStats.m_passtimeStats.summary.nRoundMaxSec = 
 			TFGameRules()->GetActiveRoundTimer()->GetTimeRemaining();
 		RespawnBall();
 	}
-	else if ( !V_strcmp( pEventName, "teamplay_setup_finished" ) )
+	else if ( V_streq( pEventName, "teamplay_setup_finished" ) )
 	{
 		// respawn the ball even though it already exists so that it doesn't
 		// catch any rotation from any spawn box it might be sitting in that
@@ -2075,7 +2075,7 @@ static const SecretRoom_TriggerInfo &SecretRoom_GetSlotInfoForTrigger(
 {
 	for ( const auto &info : s_SecretRoom_TriggerInfo )
 	{
-		if ( !V_strcmp( info.pTriggerName, pTriggerName ) )
+		if ( V_streq( info.pTriggerName, pTriggerName ) )
 		{
 			return info;
 		}

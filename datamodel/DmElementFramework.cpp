@@ -41,7 +41,7 @@ void CDmElementFramework::Disconnect()
 
 void *CDmElementFramework::QueryInterface( const char *pInterfaceName )
 {
-	if ( !V_strcmp( pInterfaceName, VDMELEMENTFRAMEWORK_VERSION ) )
+	if ( V_streq( pInterfaceName, VDMELEMENTFRAMEWORK_VERSION ) )
 		return (IDmElementFramework*)this;
 
 	return NULL;

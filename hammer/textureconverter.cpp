@@ -274,7 +274,7 @@ void CTextureConverter::ConvertDecals( CMapWorld * pWorld )
 //-----------------------------------------------------------------------------
 BOOL CTextureConverter::CountMapDecals( CMapEntity * pEnt )
 {
-	if ( !strcmp( pEnt->GetClassName(), "infodecal" ) )
+	if ( V_streq( pEnt->GetClassName(), "infodecal" ) )
 		m_nDecalCount++;
 
 	return TRUE;	// return true to continue enumerating
@@ -460,7 +460,7 @@ IEditorTexture * CTextureConverter::FindWAD3Texture( const char * pszName )
 	// loop through all the WAD3 textures
 	while ( pTexture != NULL )
 	{
-		if ( !strcmp( pTexture->GetName(), pszName ) )		//check for exact match
+		if ( V_streq( pTexture->GetName(), pszName ) )		//check for exact match
 			return pTexture;
 
 		pTexture = g_Textures.EnumActiveTextures( &nIndex, tfWAD3 );

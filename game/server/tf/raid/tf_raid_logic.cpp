@@ -430,13 +430,13 @@ void CRaidLogic::FireGameEvent( IGameEvent *event )
 {
 	const char *eventName = event->GetName();
 
-	if ( !Q_strcmp( eventName, "teamplay_point_captured" ) )
+	if ( V_streq( eventName, "teamplay_point_captured" ) )
 	{
 		// they just capped - give them a break and reset the mob spawner
 		StartMobTimer( RandomFloat( tf_raid_mob_spawn_min_interval.GetFloat(), tf_raid_mob_spawn_max_interval.GetFloat() ) );
 		DevMsg( "RAID: %3.2f: Reset Mob timer after successful point capture\n", gpGlobals->curtime );
 	}
-	else if ( !Q_strcmp( eventName, "teamplay_round_win" ) )
+	else if ( V_streq( eventName, "teamplay_round_win" ) )
 	{
 		if ( event->GetInt( "team" ) == TF_TEAM_RED )
 		{
@@ -444,7 +444,7 @@ void CRaidLogic::FireGameEvent( IGameEvent *event )
 			m_didFailLastTime = true;
 		}
 	}
-	else if ( !Q_strcmp( eventName, "teamplay_round_start" ) )
+	else if ( V_streq( eventName, "teamplay_round_start" ) )
 	{
 		OnRoundStart();
 	}

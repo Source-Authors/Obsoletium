@@ -518,7 +518,7 @@ void CTFRoundInfo::ShowPanel( bool bShow )
 //-----------------------------------------------------------------------------
 void CTFRoundInfo::OnCommand( const char *command )
 {
-	if ( !Q_strcmp( command, "continue" ) )
+	if ( V_streq( command, "continue" ) )
 	{
 		m_pViewPort->ShowPanel( this, false );
 	}

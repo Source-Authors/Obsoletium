@@ -1200,7 +1200,7 @@ static CDmeFaceSet *FindOrCreateFaceSet(
 		if ( !pDmeMaterial )
 			continue;
 
-		if ( !V_strcmp( pDmeMaterial->GetMaterialName(), sMaterial.Get() ) )
+		if ( V_streq( pDmeMaterial->GetMaterialName(), sMaterial.Get() ) )
 			return pDmeFaceSet;
 	}
 

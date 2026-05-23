@@ -362,7 +362,7 @@ void CDmeClip::RemoveTrackGroup( const char *pTrackGroupName )
 	intp c = m_TrackGroups.Count();
 	for ( intp i = c; --i >= 0; )
 	{
-		if ( !Q_strcmp( m_TrackGroups[i]->GetName(), pTrackGroupName ) )
+		if ( V_streq( m_TrackGroups[i]->GetName(), pTrackGroupName ) )
 		{
 			m_TrackGroups.Remove( i );
 			return;
@@ -418,7 +418,7 @@ CDmeTrackGroup *CDmeClip::FindTrackGroup( const char *pTrackGroupName ) const
 		if ( !pTrackGroup )
 			continue;
 
-		if ( !Q_strcmp( pTrackGroup->GetName(), pTrackGroupName ) )
+		if ( V_streq( pTrackGroup->GetName(), pTrackGroupName ) )
 			return pTrackGroup;
 	}
 	return NULL;
@@ -1635,7 +1635,7 @@ void CDmeFilmClip::UpdateAssociatedClips( CUtlVector< ClipAssociation_t > &assoc
 	for ( i = c; --i >= 0; )
 	{
 		CDmeClip *pClip = pFilmTrack->GetClip(i);
-		if ( !Q_strcmp( pClip->GetName(), "__tempSlug__" ) )
+		if ( V_streq( pClip->GetName(), "__tempSlug__" ) )
 		{
 			pFilmTrack->RemoveClip( i );
 		}

@@ -291,7 +291,7 @@ void CPlayerPanel::OnBanButtonPressed()
 	const char *netAdr = kv->GetString("netAdr");
 
 	char buf[64];
-	if ( !strcmp( authid, "UNKNOWN" ) )
+	if ( V_streq( authid, "UNKNOWN" ) )
 	{
 		int s1, s2, s3, s4;
 		if (4 == sscanf(netAdr, "%d.%d.%d.%d", &s1, &s2, &s3, &s4)) //-V112

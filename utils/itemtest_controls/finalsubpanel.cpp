@@ -98,35 +98,35 @@ void CFinalSubPanel::UpdateGUI()
 //-----------------------------------------------------------------------------
 void CFinalSubPanel::OnCommand( const char *command )
 {
-	if ( !V_strcmp( command, "Gather" ) )
+	if ( V_streq( command, "Gather" ) )
 	{
 		OnGather();
 	}
-	else if ( !V_strcmp( command, "StudioMDL" ) )
+	else if ( V_streq( command, "StudioMDL" ) )
 	{
 		OnStudioMDL();
 	}
-	else if ( !V_strcmp( command, "Zip" ) )
+	else if ( V_streq( command, "Zip" ) )
 	{
 		OnZip();
 	}
-	else if ( !V_strcmp( command, "Hlmv" ) )
+	else if ( V_streq( command, "Hlmv" ) )
 	{
 		OnHlmv();
 	}
-	else if ( !V_strcmp( command, "ExploreMaterialContent" ) )
+	else if ( V_streq( command, "ExploreMaterialContent" ) )
 	{
 		OnExplore( true, true );
 	}
-	else if ( !V_strcmp( command, "ExploreModelContent" ) )
+	else if ( V_streq( command, "ExploreModelContent" ) )
 	{
 		OnExplore( false, true );
 	}
-	else if ( !V_strcmp( command, "ExploreMaterialGame" ) )
+	else if ( V_streq( command, "ExploreMaterialGame" ) )
 	{
 		OnExplore( true, false );
 	}
-	else if ( !V_strcmp( command, "ExploreModelGame" ) )
+	else if ( V_streq( command, "ExploreModelGame" ) )
 	{
 		OnExplore( false, false );
 	}

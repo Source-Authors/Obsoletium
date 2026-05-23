@@ -1121,7 +1121,7 @@ bool CMaterial::IsWater( void ) const
 	IMaterialVar *pVar = m_pMaterial->FindVar( "$surfaceprop", &bFound, false );
 	if ( bFound )
 	{
-		if ( !strcmp( "water", pVar->GetStringValue() ) )
+		if ( V_streq( "water", pVar->GetStringValue() ) )
 			return true;
 	}
 

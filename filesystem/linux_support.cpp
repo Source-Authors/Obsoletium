@@ -18,9 +18,9 @@ int FileSelect(const struct dirent *ent)
 
 	//printf("Test:%s %s\n",mask,name);
 
-	if(!strcmp(name,".") || !strcmp(name,"..") ) return 0;
+	if(V_streq(name,".") || V_streq(name,"..") ) return 0;
 
-	if(!strcmp(selectBuf,"*.*")) return 1;
+	if(V_streq(selectBuf,"*.*")) return 1;
 
 	while( *mask && *name )
 	{

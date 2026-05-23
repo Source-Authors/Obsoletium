@@ -286,7 +286,7 @@ void CDemoUIPanel::OnCommand(const char *command)
 
 void CDemoUIPanel::OnMessage(const KeyValues *params, VPANEL fromPanel)
 {
-	if ( !Q_strcmp( "SliderMoved", params->GetName() ) )
+	if ( V_streq( "SliderMoved", params->GetName() ) )
 	{
 		demoplayer->SetPlaybackTimeScale( GetPlaybackScale() );
 	}
@@ -822,7 +822,7 @@ void CDemoUIPanel2::OnMessage(const KeyValues *params, VPANEL fromPanel)
 	//
 	if ( fromPanel == m_pSpeedScale->GetVPanel() )
 	{
-		if ( !Q_strcmp( "SliderMoved", params->GetName() ) )
+		if ( V_streq( "SliderMoved", params->GetName() ) )
 		{
 			demoplayer->SetPlaybackTimeScale( GetPlaybackScale() );
 		}
@@ -833,7 +833,7 @@ void CDemoUIPanel2::OnMessage(const KeyValues *params, VPANEL fromPanel)
 	//
 	if ( fromPanel == m_pProgress->GetVPanel() )
 	{
-		if ( !Q_strcmp( "SliderDragStart", params->GetName() ) )
+		if ( V_streq( "SliderDragStart", params->GetName() ) )
 		{
 			// Pause the demo when starting dragging around
 			if ( demoplayer->IsPlayingBack() && !demoplayer->IsPlaybackPaused() )
@@ -842,7 +842,7 @@ void CDemoUIPanel2::OnMessage(const KeyValues *params, VPANEL fromPanel)
 			}
 		}
 
-		if ( !Q_strcmp( "SliderDragEnd", params->GetName() ) )
+		if ( V_streq( "SliderDragEnd", params->GetName() ) )
 		{
 			int iNewTickPos = m_pProgress->GetValue();
 			int iDemoCurrentTickPos = demoplayer->GetPlaybackTick();
@@ -851,7 +851,7 @@ void CDemoUIPanel2::OnMessage(const KeyValues *params, VPANEL fromPanel)
 				Cbuf_AddText( va( "demo_gototick %d 0 1\n", iNewTickPos ) );
 		}
 
-		if ( !Q_strcmp( "SliderMoved", params->GetName() ) )
+		if ( V_streq( "SliderMoved", params->GetName() ) )
 		{
 		}
 	}

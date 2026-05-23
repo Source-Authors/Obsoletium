@@ -394,15 +394,15 @@ void CTFTrainingComplete::OnThink()
 //-----------------------------------------------------------------------------
 void CTFTrainingComplete::OnCommand( const char *command )
 {
-	if ( !Q_strcmp( command, "next" ) )
+	if ( V_streq( command, "next" ) )
 	{
 		tf_training_client_message.SetValue( (int)TRAINING_CLIENT_MESSAGE_NEXT_MAP );
 	}
-	else if ( !Q_strcmp( command, "replay" ) )
+	else if ( V_streq( command, "replay" ) )
 	{
 		tf_training_client_message.SetValue( (int)TRAINING_CLIENT_MESSAGE_REPLAY );
 	}
-	else if ( !Q_strcmp( command, "quit" ) )
+	else if ( V_streq( command, "quit" ) )
 	{
 		engine->ExecuteClientCmd( "disconnect\n" );
 		IViewPortPanel *pMMOverride = ( gViewPortInterface->FindPanelByName( PANEL_MAINMENUOVERRIDE ) );

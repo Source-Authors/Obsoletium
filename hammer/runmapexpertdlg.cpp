@@ -597,7 +597,7 @@ void CRunMapExpertDlg::SaveCommandsToSequence()
 	{
 		PCCOMMAND pCommand = PCCOMMAND(m_cCommandList.GetItemDataPtr(i));
 		pCommand->bEnable = m_cCommandList.GetCheck(i);
-		if (!strcmp(pCommand->szRun, "$game_exe"))
+		if (V_streq(pCommand->szRun, "$game_exe"))
 			pCommand->bNoWait = TRUE;
 		m_pActiveSequence->m_Commands.Add(*pCommand);
 		// free the memory:

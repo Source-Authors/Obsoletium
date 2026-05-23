@@ -531,7 +531,7 @@ CON_COMMAND( user, "Show user data." )
 		if ( !pClient->IsConnected() )
 			continue;
 
-		if ( (pClient->GetPlayerSlot()== uid ) || !Q_strcmp( pClient->GetClientName(), args[1]) )
+		if ( (pClient->GetPlayerSlot()== uid ) || V_streq( pClient->GetClientName(), args[1]) )
 		{
 			ConMsg ("TODO: SV_User_f.\n");
 			return;
@@ -2238,7 +2238,7 @@ void CGameServer::ReloadWhitelist( const char *pMapName )
 	// There's a magic number we use in the steam.inf in P4 that we don't update.
 	// We can use this to detect if they are running out of P4, and if so, don't use the whitelist
 	constexpr char pszVersionInP4[]{"2000"};
-	if ( !Q_strcmp( GetSteamInfIDVersionInfo().szVersionString, pszVersionInP4 ) )
+	if ( V_streq( GetSteamInfIDVersionInfo().szVersionString, pszVersionInP4 ) )
 		return;
 
 	m_pPureServerWhitelist = CPureServerWhitelist::Create( g_pFileSystem );

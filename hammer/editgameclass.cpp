@@ -64,7 +64,7 @@ void CEditGameClass::Connections_Add(CEntityConnection *pConnection)
 {
 #if	defined(_DEBUG) && 0
 		LPCTSTR	pszTargetName = GetKeyValue("targetname");
-		if ( pszTargetName && !strcmp(pszTargetName, "zapperpod7_rotator") )
+		if ( pszTargetName && V_streq(pszTargetName, "zapperpod7_rotator") )
 		{
 			// Set breakpoint here for debugging this entity's visiblity
 			int foo = 0;
@@ -157,7 +157,7 @@ void CEditGameClass::Upstream_Add(CEntityConnection *pConnection)
 {
 #if	defined(_DEBUG) && 0
 		LPCTSTR	pszTargetName = GetKeyValue("targetname");
-		if ( pszTargetName && !strcmp(pszTargetName, "zapperpod7_rotator") )
+		if ( pszTargetName && V_streq(pszTargetName, "zapperpod7_rotator") )
 		{
 			// Set breakpoint here for debugging this entity's visiblity
 			int foo = 0;
@@ -227,7 +227,7 @@ void CEditGameClass::Upstream_FixBad()
 {
 #if	defined(_DEBUG) && 0
 		LPCTSTR	pszTargetName = GetKeyValue("targetname");
-		if ( pszTargetName && !strcmp(pszTargetName, "cave_guard_seq1") )
+		if ( pszTargetName && V_streq(pszTargetName, "cave_guard_seq1") )
 		{
 			// Set breakpoint here for debugging this entity
 			int foo = 0;

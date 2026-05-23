@@ -87,15 +87,15 @@ bool IsEntityVisibleToTactical( int iLocalTeamNumber, int iLocalTeamPlayers,
 	int iLocalTeamObjects, int entIndex, const char *pEntName, int iEntTeamNumber, const Vector &entOrigin )
 {
 	// Resource zones are always visible
-	if ( !strcmp( pEntName, "trigger_resourcezone") )
+	if ( V_streq( pEntName, "trigger_resourcezone") )
 		return true;
 
 	// Tunnels are always visible
-	if ( !strcmp( pEntName, "obj_tunnel") || !strcmp( pEntName, "obj_tunnel_prop") )
+	if ( V_streq( pEntName, "obj_tunnel") || V_streq( pEntName, "obj_tunnel_prop") )
 		return true;
 
 	// Fixed shields are never visible
-	if ( !strcmp( pEntName, "shield") )
+	if ( V_streq( pEntName, "shield") )
 		return false;
 
 	// NOTE: If you're looking for various object types, fix the ugly hack
@@ -111,7 +111,7 @@ bool IsEntityVisibleToTactical( int iLocalTeamNumber, int iLocalTeamPlayers,
 			return true;
 
 		// Resource collectors are always visible to their team
-		if ( !strcmp( pEntName, "npc_rescollector_aerial") )
+		if ( V_streq( pEntName, "npc_rescollector_aerial") )
 			return true;
 	}
 

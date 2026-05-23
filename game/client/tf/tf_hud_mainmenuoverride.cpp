@@ -1603,7 +1603,7 @@ void CHudMainMenuOverride::CheckUnclaimedItems()
 		CEconNotification* pNotification = NotificationQueue_Get( i );
 		if ( pNotification )
 		{
-			if ( !Q_strcmp( pNotification->GetUnlocalizedText(), "TF_HasNewItems") )
+			if ( V_streq( pNotification->GetUnlocalizedText(), "TF_HasNewItems") )
 			{
 				return;
 			}

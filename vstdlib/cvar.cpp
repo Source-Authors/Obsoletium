@@ -279,7 +279,7 @@ void CCvar::Shutdown()
 void *CCvar::QueryInterface( const char *pInterfaceName )
 {
 	// We implement the ICvar interface
-	if ( !V_strcmp( pInterfaceName, CVAR_INTERFACE_VERSION ) )
+	if ( V_streq( pInterfaceName, CVAR_INTERFACE_VERSION ) )
 		return (ICvar*)this;
 
 	return nullptr;

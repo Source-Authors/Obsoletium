@@ -171,7 +171,7 @@ void CTeamplayRules::InitHUD( CBasePlayer *pPlayer )
 
 	// update the current player of the team he is joining
 	char text[1024];
-	if ( !strcmp( mdls, pPlayer->TeamName() ) )
+	if ( V_streq( mdls, pPlayer->TeamName() ) )
 	{
 		Q_snprintf( text,sizeof(text), "You are on team \'%s\'\n", pPlayer->TeamName() );
 	}

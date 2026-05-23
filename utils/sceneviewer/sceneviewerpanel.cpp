@@ -481,7 +481,7 @@ void CSceneViewerPanel::SetupFileOpenDialog(
 
 	pDialog->SetStartDirectoryContext( "sceneviewer_browser", m_fileDirectory.Get() );
 
-	if ( !bOpenFile && !Q_strcmp( pContextKeyValues->GetName(), "SaveCurrentAs" ) )
+	if ( !bOpenFile && V_streq( pContextKeyValues->GetName(), "SaveCurrentAs" ) )
 	{
 		pDialog->AddFilter( "*.obj", "OBJ File (*.obj)", false, "obj" );
 		pDialog->AddFilter( "*.*", "All Files (*.*)", !bOpenFile, "obj" );
@@ -624,7 +624,7 @@ bool CSceneViewerPanel::OnWriteFileToDisk(
 	if ( !m_pRoot )
 		return false;
 
-	if ( !Q_strcmp( pContextKeyValues->GetName(), "SaveCurrentAs" ) )
+	if ( V_streq( pContextKeyValues->GetName(), "SaveCurrentAs" ) )
 		return SaveCurrentAs( pFilename );
 
 	if ( !Q_stricmp( pPassedFileFormat, "obj" ) )

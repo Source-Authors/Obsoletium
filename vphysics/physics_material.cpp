@@ -413,7 +413,7 @@ intp CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *
 		char key[MAX_KEYVALUE], value[MAX_KEYVALUE];
 
 		pText = ParseKeyvalue( pText, key, value );
-		if ( !strcmp(value, "{") )
+		if ( V_streq(value, "{") )
 		{
 			CSurface prop;
 			BitwiseClear( prop.data );
@@ -429,7 +429,7 @@ intp CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *
 			do
 			{
 				pText = ParseKeyvalue( pText, key, value );
-				if ( !strcmpi( key, "}" ) )
+				if ( V_streq( key, "}" ) )
 				{
 					// already in the database, don't add again, override values instead
 					const char *pOverride = m_strings.String(prop.m_name);

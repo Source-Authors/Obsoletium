@@ -1247,19 +1247,19 @@ void CClientState::DumpPrecacheStats( const char * name )
 
 	CPrecacheItem *items = NULL;
 	
-	if ( !Q_strcmp(MODEL_PRECACHE_TABLENAME, name ) )
+	if ( V_streq(MODEL_PRECACHE_TABLENAME, name ) )
 	{
 		items = model_precache;
 	}
-	else if ( !Q_strcmp(GENERIC_PRECACHE_TABLENAME, name ) )
+	else if ( V_streq(GENERIC_PRECACHE_TABLENAME, name ) )
 	{
 		items = generic_precache;
 	}
-	else if ( !Q_strcmp(SOUND_PRECACHE_TABLENAME, name ) )
+	else if ( V_streq(SOUND_PRECACHE_TABLENAME, name ) )
 	{
 		items = sound_precache;
 	}
-	else if ( !Q_strcmp(DECAL_PRECACHE_TABLENAME, name ) )
+	else if ( V_streq(DECAL_PRECACHE_TABLENAME, name ) )
 	{
 		items = decal_precache;
 	}

@@ -1131,7 +1131,7 @@ void MDLViewer::handleIpcCommand( char *szCommand )
 {
 	MDLCACHE_CRITICAL_SECTION_( g_pMDLCache );
 
-	if ( !strcmp( "reload", szCommand ) )
+	if ( V_streq( "reload", szCommand ) )
 	{
 		Refresh();
 

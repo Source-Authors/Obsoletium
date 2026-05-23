@@ -1002,33 +1002,33 @@ void BuyPreset::Parse( KeyValues *data )
 			if ( sscanf( tmpBuf, "%s %d", itemBuf, &intVal ) != 2 )
 				break;
 
-			if ( !strcmp( itemBuf, "vest" ) )
+			if ( V_streq( itemBuf, "vest" ) )
 			{
 				ws.m_armor = (intVal > 0) ? 100 : 0;
 				ws.m_helmet = false;
 			}
-			else if ( !strcmp( itemBuf, "vesthelm" ) )
+			else if ( V_streq( itemBuf, "vesthelm" ) )
 			{
 				ws.m_armor = (intVal > 0) ? 100 : 0;
 				ws.m_helmet = true;
 			}
-			else if ( !strcmp( itemBuf, "defuser" ) )
+			else if ( V_streq( itemBuf, "defuser" ) )
 			{
 				ws.m_defuser = (intVal > 0);
 			}
-			else if ( !strcmp( itemBuf, "nvgs" ) )
+			else if ( V_streq( itemBuf, "nvgs" ) )
 			{
 				ws.m_nightvision = (intVal > 0);
 			}
-			else if ( !strcmp( itemBuf, "sgren" ) )
+			else if ( V_streq( itemBuf, "sgren" ) )
 			{
 				ws.m_smokeGrenade = (intVal > 0);
 			}
-			else if ( !strcmp( itemBuf, "hegren" ) )
+			else if ( V_streq( itemBuf, "hegren" ) )
 			{
 				ws.m_HEGrenade = (intVal > 0);
 			}
-			else if ( !strcmp( itemBuf, "flash" ) )
+			else if ( V_streq( itemBuf, "flash" ) )
 			{
 				ws.m_flashbangs = MIN( 2, MAX( 0, intVal ) );
 			}

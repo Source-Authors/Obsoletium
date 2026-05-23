@@ -1041,7 +1041,7 @@ void CHudTournamentSetup::Init( void )
 //-----------------------------------------------------------------------------
 void CHudTournamentSetup::OnCommand( const char *command )
 {
-	if ( !Q_strcmp( command, "teamready" ) )
+	if ( V_streq( command, "teamready" ) )
 	{
 		char szText[64];
 		m_pNameEntry->GetText( szText, sizeof( szText ) );
@@ -1053,7 +1053,7 @@ void CHudTournamentSetup::OnCommand( const char *command )
 		engine->ClientCmd_Unrestricted( "tournament_readystate 1" );
 		DisableInput();
 	}
-	else if ( !Q_strcmp( command, "teamnotready" ) )
+	else if ( V_streq( command, "teamnotready" ) )
 	{
 		engine->ClientCmd_Unrestricted( "tournament_readystate 0" );
 		DisableInput();

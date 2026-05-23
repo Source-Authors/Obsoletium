@@ -657,7 +657,7 @@ void CTeamplayRoundBasedRules::FireGameEvent( IGameEvent * event )
 {
 #ifdef GAME_DLL
 	const char *eventName = event->GetName();
-	if ( g_fGameOver && !Q_strcmp( eventName, "server_changelevel_failed" ) )
+	if ( g_fGameOver && V_streq( eventName, "server_changelevel_failed" ) )
 	{
 		Warning( "In gameover, but failed to load the next map. Trying next map in cycle.\n" );
 		nextlevel.SetValue( "" );

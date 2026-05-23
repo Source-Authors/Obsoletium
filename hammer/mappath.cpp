@@ -531,7 +531,7 @@ void CMapPath::CopyNodeFromEntity(DWORD dwNodeID, CMapEntity *pEntity)
 	//
 	for ( auto i=pEntity->GetFirstKeyValue(); i != pEntity->GetInvalidKeyValue(); i=pEntity->GetNextKeyValue( i ) )
 	{
-		if (!strcmp(pEntity->GetKey(i), "target") || !strcmp(pEntity->GetKey(i), "targetname"))
+		if (V_streq(pEntity->GetKey(i), "target") || V_streq(pEntity->GetKey(i), "targetname"))
 		{
 			continue;
 		}

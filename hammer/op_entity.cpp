@@ -2161,7 +2161,7 @@ void COP_Entity::CreateSmartControls_BasicEditControl( GDinputvariable *pVar, CR
 
 	for ( int i = 0; i < pHelperType->Count(); i++ )
 	{
-		if ( !Q_strcmp( pHelperType->Element(i), "sphere" ) )
+		if ( V_streq( pHelperType->Element(i), "sphere" ) )
 		{
 			CRect ButtonRect = ctrlrect;
 			ButtonRect.top = ctrlrect.bottom + 4;
@@ -3954,7 +3954,7 @@ void COP_Entity::OnPaste(void)
 	// copy entity keyvalues
 	for (auto i = kvClipboard.GetFirst(); i != kvClipboard.GetInvalidIndex(); i=kvClipboard.GetNext( i ) )
 	{
-		if (!strcmp(kvClipboard.GetKey(i), "xxxClassxxx"))
+		if (V_streq(kvClipboard.GetKey(i), "xxxClassxxx"))
 		{
 			m_cClasses.SelectItem( kvClipboard.GetValue(i) );
 			UpdateEditClass(kvClipboard.GetValue(i), false);

@@ -609,7 +609,7 @@ const char *C_PhysPropClientside::ParseEntity( const char *pEntData )
 		Error( "classname missing from entity!\n" );
 	}
 
-	if ( !Q_strcmp( className, "prop_physics_multiplayer" ) )
+	if ( V_streq( className, "prop_physics_multiplayer" ) )
 	{
 		// always force clientside entitis placed in maps
 		C_PhysPropClientside *pEntity = C_PhysPropClientside::CreateNew( true ); 
@@ -625,7 +625,7 @@ const char *C_PhysPropClientside::ParseEntity( const char *pEntData )
 		}
 	}
 
-	if ( !Q_strcmp( className, "func_proprrespawnzone" ) )
+	if ( V_streq( className, "func_proprrespawnzone" ) )
 	{
 		C_FuncPhysicsRespawnZone *pEntity = new C_FuncPhysicsRespawnZone();
 

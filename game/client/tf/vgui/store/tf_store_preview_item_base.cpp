@@ -128,7 +128,7 @@ void CTFStorePreviewItemPanelBase::ApplySchemeSettings( vgui::IScheme *pScheme )
 
 		// ignore everything that is not a paint can tool
 		const IEconTool *pEconTool = pItemDef->GetEconTool();
-		if ( pEconTool && !V_strcmp( pEconTool->GetTypeName(), "paint_can" ) ) 
+		if ( pEconTool && V_streq( pEconTool->GetTypeName(), "paint_can" ) ) 
 		{
 			m_vecPaintCans.AddToTail( pItemDef->GetDefinitionIndex() );
 		}

@@ -198,7 +198,7 @@ static void Helper_ConfigureStreamInfoPreviewImages( CStreamInfo &info, CTFStrea
 				for ( char const *szFileName = g_pFullFileSystem->FindFirst( CFmtStr( "%s/*", s_pszCacheImagePath ), &hFind );
 					szFileName && *szFileName; szFileName = g_pFullFileSystem->FindNext( hFind ) )
 				{
-					if ( !Q_strcmp( ".", szFileName ) || !Q_strcmp( "..", szFileName ) ) continue;
+					if ( V_streq( ".", szFileName ) || V_streq( "..", szFileName ) ) continue;
 					CFmtStr fmtFilename( "%s/%s", s_pszCacheImagePath, szFileName );
 					long lFileTime = g_pFullFileSystem->GetFileTime( fmtFilename, "GAME" );
 					if ( ( lFileTime >= lDirectoryTime - 72*3600 ) && ( lFileTime <= lDirectoryTime + 72*3600 ) )
@@ -463,7 +463,7 @@ CStreamInfo* CTFStreamManager::GetStreamInfoByName( char const *szName )
 	
 	for ( int idx = 0; idx < m_streamInfoVec.Count(); ++ idx )
 	{
-		if ( !V_strcmp( szName, m_streamInfoVec[idx].m_sGlobalName.Get() ) )
+		if ( V_streq( szName, m_streamInfoVec[idx].m_sGlobalName.Get() ) )
 			return &m_streamInfoVec[idx];
 	}
 

@@ -942,7 +942,7 @@ entity_t *FindTargetEntity (const char *target)
 	for (i=0 ; i<num_entities ; i++)
 	{
 		n = ValueForKey (&entities[i], "targetname");
-		if (!strcmp (n, target))
+		if (V_streq (n, target))
 			return &entities[i];
 	}
 
@@ -1485,7 +1485,7 @@ static char *ValueForKeyWithDefault (entity_t *ent, char *key, char *default_val
 	epair_t	*ep;
 	
 	for (ep=ent->epairs ; ep ; ep=ep->next)
-		if (!strcmp (ep->key, key) )
+		if (V_streq (ep->key, key) )
 			return ep->value;
 	return default_value;
 }
@@ -1605,18 +1605,18 @@ void CreateDirectLights (void)
 			continue;
 
 		// Light_dynamic is actually a real entity; not to be included here...
-		if (!strcmp (name, "light_dynamic"))
+		if (V_streq (name, "light_dynamic"))
 			continue;
 
-		if (!strcmp (name, "light_spot"))
+		if (V_streq (name, "light_spot"))
 		{
 			ParseLightSpot( e, dl );
 		}
-		else if (!strcmp(name, "light_environment")) 
+		else if (V_streq(name, "light_environment")) 
 		{
 			ParseLightEnvironment( e, dl );
 		}
-		else if (!strcmp(name, "light")) 
+		else if (V_streq(name, "light")) 
 		{
 			ParseLightPoint( e, dl );
 		}

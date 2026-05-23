@@ -1130,7 +1130,7 @@ void CEconItemDetailsRichText::AddDataText( const char *pszText, bool bAddPostLi
 void CEconItemDetailsRichText::DataText_AppendUsageData( const CEconItemDefinition *pBaseDef )
 {
 	// Don't show class/slot usage for class/slot tokens
-	if ( pBaseDef->GetItemClass() && ( !V_strcmp( pBaseDef->GetItemClass(), "class_token" ) || !V_strcmp( pBaseDef->GetItemClass(), "slot_token" ) ) )
+	if ( pBaseDef->GetItemClass() && ( V_streq( pBaseDef->GetItemClass(), "class_token" ) || V_streq( pBaseDef->GetItemClass(), "slot_token" ) ) )
 		return;
 
 #if defined(TF_DLL) || defined(TF_CLIENT_DLL)
@@ -1575,7 +1575,7 @@ void CEconItemDetailsRichText::UpdateToolList( void )
 			const IEconTool *pOtherEconTool = pOtherDef->GetEconTool();
 			Assert( pOtherEconTool );
 				
-			bAlreadyFound = !V_strcmp( pEconTool->GetTypeName(), pOtherEconTool->GetTypeName() );
+			bAlreadyFound = V_streq( pEconTool->GetTypeName(), pOtherEconTool->GetTypeName() );
 			if ( bAlreadyFound )
 			{
 				break;

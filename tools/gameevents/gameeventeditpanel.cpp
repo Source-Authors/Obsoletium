@@ -149,7 +149,7 @@ void CGameEventEditPanel::OnTextChanged( KeyValues *params )
 
 				const char *type = subkey->GetString();
 
-				if ( !Q_strcmp( type, "string" ) )
+				if ( V_streq( type, "string" ) )
 				{
 					m_pParams[i]->SetAllowNumericInputOnly( false );
 				}

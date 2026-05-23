@@ -388,7 +388,7 @@ ControllerActionSetHandle_t CInputSystem::GetActionSetHandle( const char* szActi
 {
 	for ( const auto &set : g_GameActionSets )
 	{
-		if ( !Q_strcmp( szActionSet, set.strName ) )
+		if ( V_streq( szActionSet, set.strName ) )
 		{
 			return set.handle;
 		}

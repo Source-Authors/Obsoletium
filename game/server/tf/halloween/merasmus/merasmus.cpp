@@ -503,7 +503,7 @@ int CMerasmus::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 //---------------------------------------------------------------------------------------------
 void CMerasmus::FireGameEvent( IGameEvent *event)
 {
-	if ( !V_strcmp( event->GetName(), "player_death" ) )
+	if ( V_streq( event->GetName(), "player_death" ) )
 	{
 		// Collect Data
 		int nDmgType = event->GetInt( "customkill", -1 );

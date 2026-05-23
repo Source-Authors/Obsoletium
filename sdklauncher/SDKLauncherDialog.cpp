@@ -410,7 +410,7 @@ void CSDKLauncherDialog::Launch( int hActiveListItem, bool bForce )
 			if ( NULL != V_strstr( programName, "-tools" ) )
 			{	
 				// We can't run tools mode in engine versions earlier than OB 
-				if ( !V_strcmp( g_engineDir, "ep1" ) )
+				if ( V_streq( g_engineDir, "ep1" ) )
 				{
 					VGUIMessageBox( this, "Error", "Source Engine Tools is not compatible with the selected engine version." );
 					return;
@@ -582,7 +582,7 @@ void CSDKLauncherDialog::PopulateCurrentEngineCombo( bool bSelectLast )
 	kv->SetString( "EngineVer", "ep1" );
 	m_pCurrentEngineCombo->AddItem( "Source Engine 2006", kv );
 	kv->deleteThis();
-	if ( !V_strcmp( g_engineDir, "ep1" ) )
+	if ( V_streq( g_engineDir, "ep1" ) )
 	{
 		nActiveEngine = 0;
 	}
@@ -592,7 +592,7 @@ void CSDKLauncherDialog::PopulateCurrentEngineCombo( bool bSelectLast )
 	kv->SetString( "EngineVer", "source2007" );
 	m_pCurrentEngineCombo->AddItem( "Source Engine 2007", kv );
 	kv->deleteThis();
-	if ( !V_strcmp( g_engineDir, "source2007" ) )
+	if ( V_streq( g_engineDir, "source2007" ) )
 	{
 		nActiveEngine = 1;
 	}
@@ -602,7 +602,7 @@ void CSDKLauncherDialog::PopulateCurrentEngineCombo( bool bSelectLast )
 	kv->SetString( "EngineVer", "source2009" );
 	m_pCurrentEngineCombo->AddItem( "Source Engine 2009", kv );
 	kv->deleteThis();
-	if ( !V_strcmp( g_engineDir, "source2009" ) )
+	if ( V_streq( g_engineDir, "source2009" ) )
 	{
 		nActiveEngine = 2;
 	}
@@ -612,7 +612,7 @@ void CSDKLauncherDialog::PopulateCurrentEngineCombo( bool bSelectLast )
 	kv->SetString( "EngineVer", "orangebox" );
 	m_pCurrentEngineCombo->AddItem( "Source Engine MP", kv );
 	kv->deleteThis();
-	if ( !V_strcmp( g_engineDir, "orangebox" ) )
+	if ( V_streq( g_engineDir, "orangebox" ) )
 	{
 		nActiveEngine = 3;
 	}

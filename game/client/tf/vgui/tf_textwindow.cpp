@@ -222,7 +222,7 @@ void CTFTextWindow::OnCommand( const char *command )
 	BaseClass::OnCommand( command );
 
 	// Don't open up the mapinfo if it was a custom server html page
-	if ( !Q_strcmp( command, "okay" ) && !m_bCustomSvrPage )
+	if ( V_streq( command, "okay" ) && !m_bCustomSvrPage )
 	{
 		m_pViewPort->ShowPanel( PANEL_MAPINFO, true );
 	}

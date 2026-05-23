@@ -1199,7 +1199,7 @@ void CBugUIPanel::OnChooseArea(vgui::Panel *panel)
 	{
 		const char *level = m_pBugReporter->GetLevel(area_index, i );
 		int id = m_pMapNumber->AddItem( level, NULL );
-		if (!Q_strcmp(currentLevel, level))
+		if (V_streq(currentLevel, level))
 		{
 			item = id;
 		}
@@ -1358,7 +1358,7 @@ void CBugUIPanel::Activate()
 			int id = m_pMapNumber->GetItemIDFromRow(i);
 			char level[256];
 			m_pMapNumber->GetItemText(id, level);
-			if (!Q_strcmp(currentLevel, level))
+			if (V_streq(currentLevel, level))
 			{
 				item = id;
 			}
@@ -2875,7 +2875,7 @@ int CBugUIPanel::GetArea()
 
 		if ( pszAreaPrefix )
 		{
-			if ( !Q_strcmp( szDirectory, gamedir) 
+			if ( V_streq( szDirectory, gamedir) 
 				&& Q_strstr( mapname, pszAreaPrefix ) )
 			{
 				return i+1;
@@ -2883,7 +2883,7 @@ int CBugUIPanel::GetArea()
 		}
 		else if ( !pszAreaPrefix )
 		{
-			if ( !Q_strcmp( szDirectory, gamedir ) )
+			if ( V_streq( szDirectory, gamedir ) )
 			{
 				return i+1;
 			}

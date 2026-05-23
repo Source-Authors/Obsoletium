@@ -815,7 +815,7 @@ void Panel::SetName( const char *panelName )
 	// No change?
 	if ( _panelName && 
 		panelName && 
-		!Q_strcmp( _panelName, panelName ) )
+		V_streq( _panelName, panelName ) )
 	{
 		return;
 	}
@@ -971,7 +971,7 @@ Panel *Panel::GetParent()
 	    if (parent)
 	    {
 		    Panel *pParent = ipanel()->GetPanel(parent, GetControlsModuleName());
-		    Assert(!pParent || !strcmp(pParent->GetModuleName(), GetControlsModuleName()));
+		    Assert(!pParent || V_streq(pParent->GetModuleName(), GetControlsModuleName()));
 		    return pParent;
 	    }
 	}
@@ -1406,7 +1406,7 @@ void Panel::SetParent(Panel *newParent)
 {
 	// Assert that the parent is from the same module as the child
 	// FIXME: !!! work out how to handle this properly!
-	//	Assert(!newParent || !strcmp(newParent->GetModuleName(), GetControlsModuleName()));
+	//	Assert(!newParent || V_streq(newParent->GetModuleName(), GetControlsModuleName()));
 
 	Panel* pCurrentParent = GetParent();
 	if ( pCurrentParent )
@@ -4098,7 +4098,7 @@ void Panel::PinToSibling( const char *pszSibling, PinCorner_e pinOurCorner, PinC
 	_pinCornerToSibling = pinOurCorner;
 	_pinToSiblingCorner = pinSibling;
 
-	if ( m_pinSibling.Get() && _pinToSibling && pszSibling && !Q_strcmp( _pinToSibling, pszSibling ) )
+	if ( m_pinSibling.Get() && _pinToSibling && pszSibling && V_streq( _pinToSibling, pszSibling ) )
 		return;
 
 	if (_pinToSibling)

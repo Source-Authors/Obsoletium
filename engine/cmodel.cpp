@@ -335,7 +335,7 @@ cmodel_t *CM_LoadMap( const char *name, bool allowReusePrevious, unsigned *check
 		return &pBSPData->map_cmodels[0];			// cinematic servers won't have anything at all
 	}
 
-	if( !strcmp( pBSPData->map_name, name ) && allowReusePrevious )
+	if( V_streq( pBSPData->map_name, name ) && allowReusePrevious )
 	{
 		*checksum = last_checksum;
 		return &pBSPData->map_cmodels[0];		// still have the right version

@@ -241,7 +241,7 @@ void CHudDeathNotice::FireGameEvent( KeyValues * event)
 	if ( killer == victim || killer == 0 )
 		rgDeathNoticeList[i].iSuicide = true;
 
-	if ( !strcmp( killedwith, "d_teammate" ) )
+	if ( V_streq( killedwith, "d_teammate" ) )
 		rgDeathNoticeList[i].iTeamKill = true;
 
 	// try and find the death identifier in the icon list
@@ -261,7 +261,7 @@ void CHudDeathNotice::FireGameEvent( KeyValues * event)
 	{
 		Msg( "%s", rgDeathNoticeList[i].szVictim );
 
-		if ( !strcmp( killedwith, "d_world" ) )
+		if ( V_streq( killedwith, "d_world" ) )
 		{
 			Msg( " died" );
 		}
@@ -288,9 +288,9 @@ void CHudDeathNotice::FireGameEvent( KeyValues * event)
 		Msg( " with " );
 
 		// replace the code names with the 'real' names
-		if ( !strcmp( killedwith+2, "egon" ) )
+		if ( V_streq( killedwith+2, "egon" ) )
 			Q_strncpy( killedwith, "d_gluon gun", sizeof( killedwith ) );
-		if ( !strcmp( killedwith+2, "gauss" ) )
+		if ( V_streq( killedwith+2, "gauss" ) )
 			Q_strncpy( killedwith, "d_tau cannon", sizeof( killedwith ) );
 
 		Msg( "%s", killedwith+2 ); // skip over the "d_" part

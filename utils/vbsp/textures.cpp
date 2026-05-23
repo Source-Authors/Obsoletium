@@ -58,7 +58,7 @@ int	FindMiptex (const char *name)
 		
 	for (i=0 ; i<nummiptex ; i++)
 	{
-		if (!strcmp (name, textureref[i].name))
+		if (V_streq (name, textureref[i].name))
 		{
 			return i;
 		}
@@ -411,7 +411,7 @@ int FindAliasedTexData( const char *pName_, dtexdata_t *sourceTexture )
 
 	for ( i = 0; i < numtexdata; i++ )
 	{
-		if ( !strcmp( pName, TexDataStringTable_GetString( GetTexData( i )->nameStringTableID ) ) )
+		if ( V_streq( pName, TexDataStringTable_GetString( GetTexData( i )->nameStringTableID ) ) )
 			return i;
 	}
 

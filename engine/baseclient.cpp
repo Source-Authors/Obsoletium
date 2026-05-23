@@ -1448,7 +1448,7 @@ void CBaseClient::CheckFlushNameChange( bool bShowStatusMessage /*= false*/ )
 		return;
 
 	// Did they change it back to the original?
-	if ( !Q_strcmp( m_szPendingNameChange, m_Name ) )
+	if ( V_streq( m_szPendingNameChange, m_Name ) )
 	{
 		// Nothing really pending, they already changed it back
 		// we had a chance to apply the other one!

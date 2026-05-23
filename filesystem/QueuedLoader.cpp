@@ -394,7 +394,7 @@ void CQueuedLoader::BuildMaterialResources( IResourcePreload *pLoader, ResourceL
 		if ( numUnderscores == 0 )
 		{
 			*pEndFilename = '\0';
-			if ( !V_strcmp( szLastFilename, pFilename ) )
+			if ( V_streq( szLastFilename, pFilename ) )
 			{
 				// same cubemap material base already processed, skip it
 				continue;

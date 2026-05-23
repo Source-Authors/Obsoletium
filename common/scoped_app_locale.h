@@ -19,7 +19,7 @@ class ScopedAppLocale {
     setenv("LC_ALL", new_locale, 1);
 #endif
 
-    if (Q_strcmp(new_locale, old_locale_.c_str())) {
+    if (!V_streq(new_locale, old_locale_.c_str())) {
       std::setlocale(LC_ALL, new_locale);
     }
   }
@@ -31,7 +31,7 @@ class ScopedAppLocale {
 
   ~ScopedAppLocale() noexcept {
     const char *locale{GetCurrentLocale()};
-    if (!Q_strcmp(locale, new_locale_.c_str())) {
+    if (V_streq(locale, new_locale_.c_str())) {
       std::setlocale(LC_ALL, old_locale_.c_str());
     }
   }

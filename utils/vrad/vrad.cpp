@@ -699,7 +699,7 @@ entity_t *EntityForModel (int modnum)
 	for (int i=0 ; i<num_entities ; i++)
 	{
 		const char *s = ValueForKey (&entities[i], "model");
-		if (!strcmp (s, name))
+		if (V_streq (s, name))
 			return &entities[i];
 	}
 
@@ -2415,7 +2415,7 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 			Msg( "--texture-shadows: true\n");
 			g_bTextureShadows = true;
 		}
-		else if ( !strcmp( argv[i], "-dump" ) )
+		else if ( V_streq( argv[i], "-dump" ) )
 		{
 			Msg( "--dump-patches: true\n");
 			g_bDumpPatches = true;

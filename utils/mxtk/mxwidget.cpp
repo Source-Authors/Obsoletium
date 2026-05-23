@@ -112,13 +112,13 @@ mxWidget::setBounds (int x, int y, int w, int h)
 	char str[128];
 	GetClassName (d_this->d_hwnd, str, 128);
 
-	if (!strcmp (str, "COMBOBOX"))
+	if (V_streq (str, "COMBOBOX"))
 		// dimhotepus: Support DPI scaling.
 		MoveWindow (d_this->d_hwnd, x, y, w, h + ::MulDiv(100, ::GetDpiForWindow( d_this->d_hwnd ), USER_DEFAULT_SCREEN_DPI), TRUE);
 	else
 		MoveWindow (d_this->d_hwnd, x, y, w, h, TRUE);
 
-	if (!strcmp (str, WC_TABCONTROL))
+	if (V_streq (str, WC_TABCONTROL))
 		mxTab_resizeChild (d_this->d_hwnd);
 }
 

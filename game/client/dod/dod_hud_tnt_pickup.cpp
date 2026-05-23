@@ -95,7 +95,7 @@ void CDODHudTNTPickupPanel::FireGameEvent( IGameEvent *event )
 
 	C_DODPlayer *pPlayer = C_DODPlayer::GetLocalDODPlayer();
 
-	if ( !Q_strcmp( pszEventName, "dod_tnt_pickup" ) && pPlayer && pPlayer->ShouldShowHints() )
+	if ( V_streq( pszEventName, "dod_tnt_pickup" ) && pPlayer && pPlayer->ShouldShowHints() )
 	{
 		if ( hud_c4pickuppanel.GetBool() )
 		{

@@ -1079,7 +1079,7 @@ void CProtoSniper::InputSweepGroupRandomly( inputdata_t &inputdata )
 		// If the pointer is null, this isn't a sniper target.
 		if( pTarget )
 		{
-			if( !strcmp( inputdata.value.String(), STRING( pTarget->m_iszGroupName ) ) )
+			if( V_streq( inputdata.value.String(), STRING( pTarget->m_iszGroupName ) ) )
 			{
 				m_pGroupTarget[ m_iNumGroupTargets ] = pTarget;
 				m_iNumGroupTargets++;

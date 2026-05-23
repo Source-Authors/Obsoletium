@@ -47,7 +47,7 @@ static int FindParm( const char *pParam, int argc, char **argv )
 	// Start at 1 so as to not search the exe name
 	for ( int i = 1; i < argc; ++i )
 	{
-		if ( !strcmp( pParam, argv[i] ) )
+		if ( V_streq( pParam, argv[i] ) )
 			return i;
 	}
 	return 0;
@@ -306,7 +306,7 @@ bool CopyFilesRecursively( const char *pSrcPath, const char *pDestPath )
 	do
 	{
 		// Skip . and ..
-		if ( !strcmp( find.cFileName, "." ) || !strcmp( find.cFileName, ".." ) )
+		if ( V_streq( find.cFileName, "." ) || V_streq( find.cFileName, ".." ) )
 			continue;
 
 		char pSrcChildPath[MAX_PATH];

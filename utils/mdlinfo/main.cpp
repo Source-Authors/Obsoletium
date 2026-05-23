@@ -435,7 +435,7 @@ MDLHandle_t CMdlInfoApp::GetMDLHandle( const char *pszFilename )
 	{
 		studiohdr_t *pHdr = g_pMDLCache->GetStudioHdr( hMdl );
 
-		if ( !pHdr || !V_strcmp( "error.mdl", pHdr->pszName() ) )
+		if ( !pHdr || V_streq( "error.mdl", pHdr->pszName() ) )
 		{
 			Error( "Couldn't Load MDL %s via g_pMDLCache, got error model instead\n", pszFilename );
 			g_pMDLCache->Release( hMdl );

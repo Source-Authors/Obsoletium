@@ -1146,7 +1146,7 @@ int CElementPropertiesTreeInternal::OpenPath( const CUtlVector< TreeItem_t > &pa
 			if ( isArrayElement )
 			{
 				Assert( childTreeItem.m_pArrayElement );
-				Assert( !V_strcmp( childTreeItem.m_pAttributeName, pAttributeName ) );
+				Assert( V_streq( childTreeItem.m_pAttributeName, pAttributeName ) );
 				int nArrayIndex = childData->GetInt( "arrayIndex", -1 );
 				const CDmrElementArray<> array( pAttribute );
 				if ( nArrayIndex >= 0 && array[ nArrayIndex ] == childTreeItem.m_pArrayElement )
@@ -1159,7 +1159,7 @@ int CElementPropertiesTreeInternal::OpenPath( const CUtlVector< TreeItem_t > &pa
 			else
 			{
 				Assert( !childTreeItem.m_pArrayElement );
-				if ( !V_strcmp( childTreeItem.m_pAttributeName, pAttributeName ) )
+				if ( V_streq( childTreeItem.m_pAttributeName, pAttributeName ) )
 				{
 					bFound = true;
 					itemIndex = nChildIndex;

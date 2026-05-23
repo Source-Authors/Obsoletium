@@ -163,7 +163,7 @@ void CControlCatalog::OnTextChanged()
 
 	for (int i = 0; i < m_PanelList.Size(); i++)
 	{
-		if (!strcmp(buf, m_PanelList[i]->GetName()))
+		if (V_streq(buf, m_PanelList[i]->GetName()))
 		{
 			m_PanelList[i]->SetVisible(true);
 			m_pPrevPanel = m_PanelList[i];

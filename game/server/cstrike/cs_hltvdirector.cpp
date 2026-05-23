@@ -47,10 +47,10 @@ void CCSHLTVDirector::CreateShotFromEvent( CHLTVGameEvent *event )
 	const char *name = event->m_Event->GetName();
 	IGameEvent *shot = NULL;
 
-	if ( !Q_strcmp( "hostage_rescued", name ) ||
-		 !Q_strcmp( "hostage_hurt", name ) ||
-		 !Q_strcmp( "hostage_follows", name ) ||
-		 !Q_strcmp( "hostage_killed", name ) )
+	if ( V_streq( "hostage_rescued", name ) ||
+		 V_streq( "hostage_hurt", name ) ||
+		 V_streq( "hostage_follows", name ) ||
+		 V_streq( "hostage_killed", name ) )
 	{
 		CBaseEntity *player = UTIL_PlayerByUserId( event->m_Event->GetInt("userid") );
 		
@@ -70,10 +70,10 @@ void CCSHLTVDirector::CreateShotFromEvent( CHLTVGameEvent *event )
 		m_iPVSEntity = player->entindex();
 	}
 
-	else if ( !Q_strcmp( "bomb_pickup", name ) ||
-		!Q_strcmp( "bomb_dropped", name ) ||
-		!Q_strcmp( "bomb_planted", name ) ||
-		!Q_strcmp( "bomb_defused", name ) )
+	else if ( V_streq( "bomb_pickup", name ) ||
+		V_streq( "bomb_dropped", name ) ||
+		V_streq( "bomb_planted", name ) ||
+		V_streq( "bomb_defused", name ) )
 	{
 		CBaseEntity *player = UTIL_PlayerByUserId( event->m_Event->GetInt("userid") );
 

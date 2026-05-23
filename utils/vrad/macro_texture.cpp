@@ -86,7 +86,7 @@ void InitMacroTexture( const char *pBSPFilename )
 	for (i; i < num_entities; ++i)
 	{
 		const char* pEntity = ValueForKey(&entities[i], "classname");
-		if( !strcmp(pEntity, "worldspawn") )
+		if( V_streq(pEntity, "worldspawn") )
 		{
 			GetVectorForKey( &entities[i], "world_mins", g_MacroWorldMins );
 			GetVectorForKey( &entities[i], "world_maxs", g_MacroWorldMaxs );

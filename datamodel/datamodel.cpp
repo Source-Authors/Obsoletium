@@ -120,7 +120,7 @@ bool CDataModel::Connect( CreateInterfaceFn factory )
 
 void *CDataModel::QueryInterface( const char *pInterfaceName )
 {
-	if ( !V_strcmp( pInterfaceName, VDATAMODEL_INTERFACE_VERSION ) )
+	if ( V_streq( pInterfaceName, VDATAMODEL_INTERFACE_VERSION ) )
 		return (IDataModel*)this;
 
 	return NULL;
@@ -534,7 +534,7 @@ IDmSerializer* CDataModel::FindSerializer( const char *pEncodingName ) const
 		if ( !s )
 			continue;
 
-		if ( !V_strcmp( pEncodingName, s->GetName() ) )
+		if ( V_streq( pEncodingName, s->GetName() ) )
 			return s;
 	}
 
@@ -549,7 +549,7 @@ IDmLegacyUpdater* CDataModel::FindLegacyUpdater( const char *pLegacyFormatName )
 		if ( !u )
 			continue;
 
-		if ( !V_strcmp( pLegacyFormatName, u->GetName() ) )
+		if ( V_streq( pLegacyFormatName, u->GetName() ) )
 			return u;
 	}
 
@@ -564,7 +564,7 @@ IDmFormatUpdater* CDataModel::FindFormatUpdater( const char *pFormatName ) const
 		if ( !u )
 			continue;
 
-		if ( !V_strcmp( pFormatName, u->GetName() ) )
+		if ( V_streq( pFormatName, u->GetName() ) )
 			return u;
 	}
 

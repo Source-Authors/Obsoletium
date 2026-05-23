@@ -406,7 +406,7 @@ void CFogUIPanel::OnTextKillFocus( KeyValues *data )
 //-----------------------------------------------------------------------------
 void CFogUIPanel::OnMessage( const KeyValues *params, VPANEL fromPanel )
 {	
-	if ( !Q_strcmp( "SliderMoved", params->GetName() ) )
+	if ( V_streq( "SliderMoved", params->GetName() ) )
 	{
 		// World
 		if ( fromPanel == m_pFogStart->GetVPanel() )

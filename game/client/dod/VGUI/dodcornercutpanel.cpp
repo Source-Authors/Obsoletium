@@ -63,20 +63,20 @@ void CDoDCutEditablePanel::ApplySettings( KeyValues *inResourceData )
 	const char *pszCorner = inResourceData->GetString( "CornerToCut", "" );
 	if ( pszCorner )
 	{
-		if ( !Q_strcmp( pszCorner, "bottom_right" ) )
+		if ( V_streq( pszCorner, "bottom_right" ) )
 		{
 			m_nCornerToCut = DOD_CORNERCUT_PANEL_BOTTOMRIGHT;
 		}
-		else if ( !Q_strcmp( pszCorner, "bottom_left" ) )
+		else if ( V_streq( pszCorner, "bottom_left" ) )
 		{
 			m_nCornerToCut = DOD_CORNERCUT_PANEL_BOTTOMLEFT;
 		}
-		else if ( !Q_strcmp( pszCorner, "top_right" ) )
+		else if ( V_streq( pszCorner, "top_right" ) )
 		{
 			m_nCornerToCut = DOD_CORNERCUT_PANEL_TOPRIGHT;
 
 		}
-		else if ( !Q_strcmp( pszCorner, "top_left" ) )
+		else if ( V_streq( pszCorner, "top_left" ) )
 		{
 			m_nCornerToCut = DOD_CORNERCUT_PANEL_TOPLEFT;
 		}

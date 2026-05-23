@@ -78,7 +78,7 @@ void Key_SetBinding( ButtonCode_t keynum, const char *pBinding )
 	if ( s_pKeyInfo[keynum].m_pKeyBinding )
 	{
 		// Exactly the same, don't re-bind and fragment memory
-		if ( !Q_strcmp( s_pKeyInfo[keynum].m_pKeyBinding, pBinding ) )
+		if ( V_streq( s_pKeyInfo[keynum].m_pKeyBinding, pBinding ) )
 			return;
 
 		delete[] s_pKeyInfo[keynum].m_pKeyBinding;

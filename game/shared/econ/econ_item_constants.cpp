@@ -294,7 +294,7 @@ attrib_colors_t GetAttribColorIndexForName( const char* pszName )
 {
 	for ( int i = 0; i < NUM_ATTRIB_COLORS; ++i )
 	{
-		if ( !Q_strcmp( g_AttribColorDefs[i].GetName(), pszName ) )
+		if ( V_streq( g_AttribColorDefs[i].GetName(), pszName ) )
 			return (attrib_colors_t)i;
 	}
 
@@ -810,17 +810,17 @@ const char* GetHalloweenOfferingInvalidReason( const IEconItemInterface *pTestIt
 
 		const char *pToolType = pEconTool->GetTypeName();
 
-		if ( !V_strcmp( pToolType, "paint_can" ) ) 
+		if ( V_streq( pToolType, "paint_can" ) ) 
 			return NULL;
-		else if ( !V_strcmp( pToolType, "strange_part" ) ) 
+		else if ( V_streq( pToolType, "strange_part" ) ) 
 			return NULL;
-		else if ( !V_strcmp( pToolType, "name" ) ) 
+		else if ( V_streq( pToolType, "name" ) ) 
 			return NULL;
-		else if ( !V_strcmp( pToolType, "desc" ) ) 
+		else if ( V_streq( pToolType, "desc" ) ) 
 			return NULL;
-		else if ( !V_strcmp( pToolType, "killstreakifier" ) )
+		else if ( V_streq( pToolType, "killstreakifier" ) )
 			return NULL;
-		else if ( !V_strcmp( pToolType, "strangifier" ) )
+		else if ( V_streq( pToolType, "strangifier" ) )
 			return NULL;
 
 		// Not a tool we are allowing

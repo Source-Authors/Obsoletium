@@ -779,9 +779,9 @@ CON_COMMAND( alias, "Alias a command." )
 	// if the alias already exists, reuse it
 	for (a = cmd_alias ; a ; a=a->next)
 	{
-		if (!Q_strcmp(s, a->name))
+		if (V_streq(s, a->name))
 		{
-			if ( !Q_strcmp( a->value, cmd ) )		// Re-alias the same thing
+			if ( V_streq( a->value, cmd ) )		// Re-alias the same thing
 				return;
 
 			delete[] a->value;

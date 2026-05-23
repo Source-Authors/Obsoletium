@@ -1580,7 +1580,7 @@ intp SectionedListPanel::GetColumnIndexByName(int sectionID, char* name)
 
 	for ( intp columnIndex = 0; columnIndex < m_Sections[index].m_Columns.Count(); ++ columnIndex)
 	{
-		if( !V_strcmp( m_Sections[index].m_Columns[columnIndex].m_szColumnName, name ) )
+		if( V_streq( m_Sections[index].m_Columns[columnIndex].m_szColumnName, name ) )
 			return columnIndex;
 	}
 	

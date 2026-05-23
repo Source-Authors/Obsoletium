@@ -545,7 +545,7 @@ void CHudBaseDeathNotice::FireGameEvent( IGameEvent *event )
 		// Record the death notice in the console
 		if ( m_DeathNotices[iMsg].bSelfInflicted )
 		{
-			if ( !strcmp( m_DeathNotices[iMsg].szIcon, "d_worldspawn" ) )
+			if ( V_streq( m_DeathNotices[iMsg].szIcon, "d_worldspawn" ) )
 			{
 				Q_snprintf( sDeathMsg, sizeof( sDeathMsg ), "%s died.", m_DeathNotices[iMsg].Victim.szName );
 			}

@@ -1089,7 +1089,7 @@ bool CBaseAssetPicker::IsAssetVisible( intp nAssetIndex )
 
 	// Filter based on name
 	const char *pAssetName = info.m_AssetName;
-	if ( !Q_strcmp( pAssetName, m_SelectedAsset ) )
+	if ( V_streq( pAssetName, m_SelectedAsset ) )
 		return true;
 
 	if ( m_Filter.Length() && !Q_stristr( pAssetName, m_Filter.Get() ) )
@@ -1122,7 +1122,7 @@ void CBaseAssetPicker::AddAssetToList( intp nAssetIndex )
 	kv->SetInt( "root", bInRootDir );
 	intp nItemID = m_pAssetBrowser->AddItem( kv, 0, false, false );
 	
-	if ( m_pAssetBrowser->GetSelectedItemsCount() == 0 && !Q_strcmp( m_SelectedAsset, info.m_AssetName ) )
+	if ( m_pAssetBrowser->GetSelectedItemsCount() == 0 && V_streq( m_SelectedAsset, info.m_AssetName ) )
 	{
 		m_pAssetBrowser->SetSelectedCell( nItemID, 0 );
 	}

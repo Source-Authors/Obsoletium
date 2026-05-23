@@ -1530,7 +1530,7 @@ void CHudVote::MsgFunc_VoteSetup( bf_read &msg )
 			bool bAdd = true;
 			FOR_EACH_VEC( m_VoteSetupIssues, j )
 			{
-				if ( !V_strcmp( szIssue, m_VoteSetupIssues[j].szName ) )
+				if ( V_streq( szIssue, m_VoteSetupIssues[j].szName ) )
 				{
 					bAdd = false;
 					break;

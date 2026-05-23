@@ -505,7 +505,7 @@ GDclass *GameData::ClassForName(const char *pszName, intp *piIndex) const
 	for (intp i = 0; i < nCount; i++)
 	{
 		GDclass *mp = m_Classes.Element(i);
-		if(!strcmp(mp->GetName(), pszName))
+		if(V_streq(mp->GetName(), pszName))
 		{
 			if(piIndex)
 				piIndex[0] = i;

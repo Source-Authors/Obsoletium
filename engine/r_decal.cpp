@@ -1067,7 +1067,7 @@ static int DecalListAdd( decallist_t *pList, int count )
 	pdecal = pList + count;
 	for ( i = 0; i < count; i++ )
 	{
-		if ( !Q_strcmp( pdecal->name, pList[i].name ) && 
+		if ( V_streq( pdecal->name, pList[i].name ) && 
 			pdecal->entityIndex == pList[i].entityIndex )
 		{
 			VectorSubtract( pdecal->position, pList[i].position, tmp );	// Merge

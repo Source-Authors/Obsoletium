@@ -782,11 +782,11 @@ bool CGameEventManager::RegisterEvent( KeyValues * event)
 		// ok, check it's data type
 		const char * type = subkey->GetString();
 
-		if ( !Q_strcmp( "local", keyName) )
+		if ( V_streq( "local", keyName) )
 		{	
 			descriptor->local = Q_atoi( type ) != 0;
 		}
-		else if ( !Q_strcmp( "reliable", keyName) )
+		else if ( V_streq( "reliable", keyName) )
 		{
 			descriptor->reliable = Q_atoi( type ) != 0;
 		}
@@ -796,7 +796,7 @@ bool CGameEventManager::RegisterEvent( KeyValues * event)
 
 			for (i = TYPE_LOCAL; i <= TYPE_BOOL; i++  )
 			{
-				if ( !Q_strcmp( type, s_GameEnventTypeMap[i]) )
+				if ( V_streq( type, s_GameEnventTypeMap[i]) )
 				{
 					// set data type
 					descriptor->keys->SetInt( keyName, i );	// set data type

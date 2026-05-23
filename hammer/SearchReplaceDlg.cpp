@@ -59,7 +59,7 @@ bool MatchString(const char *pszString, FindObject_t &FindObject)
 	{
 		if (FindObject.bCaseSensitive)
 		{
-			return (!strcmp(pszString, FindObject.strFindText));
+			return (V_streq(pszString, FindObject.strFindText));
 		}
 
 		return (!stricmp(pszString, FindObject.strFindText));
@@ -91,7 +91,7 @@ static bool ReplaceString(OUT_Z_ARRAY char (&pszOut)[outSize], const char *pszIn
 	//
 	if (FindObject.bWholeWord)
 	{
-		if (FindObject.bCaseSensitive && (!strcmp(pszIn, FindObject.strFindText)))
+		if (FindObject.bCaseSensitive && (V_streq(pszIn, FindObject.strFindText)))
 		{
 			V_strcpy_safe(pszOut, pszReplace);
 			return true;

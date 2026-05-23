@@ -260,7 +260,7 @@ void CTFMapInfoMenu::OnCommand( const char *command )
 {
 	m_KeyRepeat.Reset();
 
-	if ( !Q_strcmp( command, "back" ) )
+	if ( V_streq( command, "back" ) )
 	{
 		 // only want to go back to the Welcome menu if we're not already on a team
 		if ( !IsX360() && ( GetLocalPlayerTeam() == TEAM_UNASSIGNED ) )
@@ -269,7 +269,7 @@ void CTFMapInfoMenu::OnCommand( const char *command )
 			m_pViewPort->ShowPanel( PANEL_INFO, true );
 		}
 	}
-	else if ( !Q_strcmp( command, "continue" ) )
+	else if ( V_streq( command, "continue" ) )
 	{
 		m_pViewPort->ShowPanel( this, false );
 
@@ -302,7 +302,7 @@ void CTFMapInfoMenu::OnCommand( const char *command )
 			UTIL_IncrementMapKey( "viewed" );
 		}
 	}
-	else if ( !Q_strcmp( command, "intro" ) )
+	else if ( V_streq( command, "intro" ) )
 	{
 		m_pViewPort->ShowPanel( this, false );
 

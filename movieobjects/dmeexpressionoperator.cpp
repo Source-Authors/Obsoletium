@@ -68,7 +68,7 @@ intp FindString( const CUtlVector< CUtlString > &strings, const char *str )
 	intp sn = strings.Count();
 	for ( intp si = 0; si < sn; ++si )
 	{
-		if ( !Q_strcmp( str, strings[ si ] ) )
+		if ( V_streq( str, strings[ si ] ) )
 			return si;
 	}
 	return -1;

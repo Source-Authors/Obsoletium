@@ -1967,7 +1967,7 @@ void ParseCollisionCommands( CJointedModel &joints )
 
 	while( GetToken( true ) )
 	{
-		if ( !strcmp( token, "}" ) )
+		if ( V_streq( token, "}" ) )
 			return;
 
 		V_strcpy_safe( command, token );
@@ -2132,14 +2132,14 @@ void Cmd_CollisionText( void )
 
 	while ( GetToken(true) )
 	{
-		if ( !strcmp( token, "}" ) )
+		if ( V_streq( token, "}" ) )
 		{
 			level--;
 			if ( level <= 0 )
 				break;
 			g_JointedModel.AddText( " }\n" );
 		}
-		else if ( !strcmp( token, "{" ) )
+		else if ( V_streq( token, "{" ) )
 		{
 			g_JointedModel.AddText( "{" );
 			level++;
@@ -2257,7 +2257,7 @@ int DoCollisionModel( bool separateJoints )
 	// If the next token is a { that means a data block for the collision model
 	if (GetToken(true))
 	{
-		if ( !strcmp( token, "{" ) )
+		if ( V_streq( token, "{" ) )
 		{
 			parseCommands = true;
 		}

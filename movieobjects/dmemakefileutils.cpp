@@ -48,7 +48,7 @@ CDmeMakefileUtils::~CDmeMakefileUtils()
 //-----------------------------------------------------------------------------
 void *CDmeMakefileUtils::QueryInterface( const char *pInterfaceName )
 {
-	if ( !V_strcmp( pInterfaceName, DMEMAKEFILE_UTILS_INTERFACE_VERSION ) )
+	if ( V_streq( pInterfaceName, DMEMAKEFILE_UTILS_INTERFACE_VERSION ) )
 		return (IDmeMakefileUtils*)this;
 
 	return NULL;

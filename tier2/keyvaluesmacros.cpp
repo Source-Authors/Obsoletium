@@ -295,7 +295,7 @@ static void UpdateKeyValuesBlock( KeyValues *pkvDst, KeyValues *pkvUpdate )
 		Assert( pkvNew );
 
 		// Do inserts right away
-		if ( !V_strcmp( pkvNew->GetName(), "#insert" ) )
+		if ( V_streq( pkvNew->GetName(), "#insert" ) )
 		{
 			while ( pkvNew )
 			{

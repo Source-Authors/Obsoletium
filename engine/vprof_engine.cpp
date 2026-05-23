@@ -793,7 +793,7 @@ static int FindSentGroupIndex( VProfListenInfo_t &info, const char *pGroupName )
 	int nCount = info.m_SentGroups.Count();
 	for ( int i = 0; i < nCount; ++i )
 	{
-		if ( !Q_strcmp( pGroupName, info.m_SentGroups[i].Get() ) )
+		if ( V_streq( pGroupName, info.m_SentGroups[i].Get() ) )
 			return i;
 	}
 	return -1;

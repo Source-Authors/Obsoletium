@@ -1589,7 +1589,7 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, void* nParam)
 		//
 		const char *pClassName = ValueForKey( mapent, "classname" );
 
-		if ( !strcmp( "func_detail", pClassName ) )
+		if ( V_streq( "func_detail", pClassName ) )
 		{
 			MoveBrushesToWorld (mapent);
 			mapent->numbrushes = 0;
@@ -1601,7 +1601,7 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, void* nParam)
 
 		// these get added to a list for processing the portal file
 		// but aren't necessary to emit to the BSP
-		if ( !strcmp( "func_viscluster", pClassName ) )
+		if ( V_streq( "func_viscluster", pClassName ) )
 		{
 			AddVisCluster(mapent);
 			return(ChunkFile_Ok);
@@ -1611,7 +1611,7 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, void* nParam)
 		// func_ladder brushes are moved into the world entity.  We convert the func_ladder to an info_ladder
 		// that holds the ladder's mins and maxs, and leave the entity.  This helps the bots figure out ladders.
 		//
-		if ( !strcmp( "func_ladder", pClassName ) )
+		if ( V_streq( "func_ladder", pClassName ) )
 		{
 			AddLadderKeys( mapent );
 
@@ -1623,7 +1623,7 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, void* nParam)
 			return(ChunkFile_Ok);
 		}
 
-		if( !strcmp( "env_cubemap", pClassName ) )
+		if( V_streq( "env_cubemap", pClassName ) )
 		{
 			if( ( g_nDXLevel == 0 ) || ( g_nDXLevel >= 70 ) )
 			{
@@ -1637,13 +1637,13 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, void* nParam)
 			return(ChunkFile_Ok);
 		}
 
-		if ( !strcmp( "test_sidelist", pClassName ) )
+		if ( V_streq( "test_sidelist", pClassName ) )
 		{
 			ConvertSideList(mapent, "sides");
 			return ChunkFile_Ok;
 		}
 
-		if ( !strcmp( "info_overlay", pClassName ) )
+		if ( V_streq( "info_overlay", pClassName ) )
 		{
 			int iAccessorID = Overlay_GetFromEntity( mapent );
 
@@ -1666,7 +1666,7 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, void* nParam)
 			return ( ChunkFile_Ok );
 		}
 
-		if ( !strcmp( "info_overlay_transition", pClassName ) )
+		if ( V_streq( "info_overlay_transition", pClassName ) )
 		{
 			// Clear out this entity.
 			mapent->epairs = NULL;
@@ -2027,7 +2027,7 @@ void CMapFile::CheckForInstances( const char *pszFileName )
 	for ( int i = 0; i < num_entities; i++ )
 	{
 		const char *pEntity = ValueForKey( &entities[ i ], "classname" );
-		if ( !strcmp( pEntity, "func_instance" ) )
+		if ( V_streq( pEntity, "func_instance" ) )
 		{
 			const char *pInstanceFile = ValueForKey( &entities[ i ], "file" );
 			if ( pInstanceFile[ 0 ] )

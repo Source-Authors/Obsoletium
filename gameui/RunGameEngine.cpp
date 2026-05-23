@@ -73,7 +73,7 @@ public:
 
 		// update the player's name if necessary
 		ConVarRef name( "name" );
-		if ( name.IsValid() && trackerName && *trackerName && !Q_strcmp( name.GetString(), "unnamed" ) )
+		if ( name.IsValid() && trackerName && *trackerName && V_streq( name.GetString(), "unnamed" ) )
 		{
 			name.SetValue(trackerName);
 		}

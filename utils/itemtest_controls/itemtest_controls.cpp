@@ -807,7 +807,7 @@ bool CGeometrySubPanel::OnReadFileFromDisk(
 		if ( !pTargetDMX )
 			continue;
 
-		if ( !V_strcmp( pTargetDMX->GetInputFile().Get(), szBuf1 ) )
+		if ( V_streq( pTargetDMX->GetInputFile().Get(), szBuf1 ) )
 		{
 			vgui::MessageBox *pMessageBox = new vgui::MessageBox( "#duplicate_file_title", "#duplicate_file_text", this );
 			if ( pMessageBox )
@@ -1057,23 +1057,23 @@ void CVmtEntry::OnTextChanged( vgui::Panel *pPanel )
 		KeyValues *pUserData = m_pMaterialType->GetActiveItemUserData();
 		if ( pUserData )
 		{
-			if ( !V_strcmp( "Invalid", pUserData->GetName() ) )
+			if ( V_streq( "Invalid", pUserData->GetName() ) )
 			{
 				pTargetVMT->SetMaterialType( CTargetVMT::kInvalidMaterialType );
 			}
-			else if ( !V_strcmp( "Primary", pUserData->GetName() ) )
+			else if ( V_streq( "Primary", pUserData->GetName() ) )
 			{
 				pTargetVMT->SetMaterialType( CTargetVMT::kPrimary );
 			}
-			else if ( !V_strcmp( "Secondary", pUserData->GetName() ) )
+			else if ( V_streq( "Secondary", pUserData->GetName() ) )
 			{
 				pTargetVMT->SetMaterialType( CTargetVMT::kSecondary );
 			}
-			else if ( !V_strcmp( "DuplicateOfPrimary", pUserData->GetName() ) )
+			else if ( V_streq( "DuplicateOfPrimary", pUserData->GetName() ) )
 			{
 				pTargetVMT->SetDuplicate( CTargetVMT::kPrimary );
 			}
-			else if ( !V_strcmp( "DuplicateOfSecondary", pUserData->GetName() ) )
+			else if ( V_streq( "DuplicateOfSecondary", pUserData->GetName() ) )
 			{
 				pTargetVMT->SetDuplicate( CTargetVMT::kSecondary );
 			}
@@ -1090,7 +1090,7 @@ void CVmtEntry::OnTextChanged( vgui::Panel *pPanel )
 		KeyValues *pUserData = m_pCommonRedBlue->GetActiveItemUserData();
 		if ( pUserData )
 		{
-			const bool bCommon = !V_strcmp( "Common", pUserData->GetName() );
+			const bool bCommon = V_streq( "Common", pUserData->GetName() );
 
 			pTargetVMT->SetColorMapCommon( bCommon );
 

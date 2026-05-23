@@ -876,13 +876,13 @@ void CBackpackPanel::FireGameEvent( IGameEvent *event )
 
 			// Paint can list
 			// Ignore the stock paintcan thats only for armory purposes
-			if ( !V_strcmp( pEconTool->GetTypeName(), "paint_can" ) && pItemDef_BasePaintCan != pItemDef ) 
+			if ( V_streq( pEconTool->GetTypeName(), "paint_can" ) && pItemDef_BasePaintCan != pItemDef ) 
 			{
 				// Paint Can
 				m_vecPaintCans.AddToTail( pItemDef->GetDefinitionIndex() );
 			}
 			// Strange Parts List
-			else if ( !V_strcmp( pEconTool->GetTypeName(), "strange_part" ) )
+			else if ( V_streq( pEconTool->GetTypeName(), "strange_part" ) )
 			{
 				m_vecStrangeParts.AddToTail( pItemDef->GetDefinitionIndex() );
 			}
@@ -935,7 +935,7 @@ void CBackpackPanel::CheckForQuickOpenKey()
 			if ( !pInvItem->GetStaticData()->GetEconTool() )
 				continue;
 
-			if ( !Q_strcmp( pInvItem->GetStaticData()->GetEconTool()->GetTypeName(), "decoder_ring" ) == 0 )
+			if ( V_streq( pInvItem->GetStaticData()->GetEconTool()->GetTypeName(), "decoder_ring" ) == 0 )
 				continue;
 
 			ApplyTool( this, pInvItem, m_hQuickOpenCrate );

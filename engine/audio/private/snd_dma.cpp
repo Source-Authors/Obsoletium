@@ -1462,7 +1462,7 @@ bool S_IsMusic( channel_t *pChannel )
 		if ( pChannel->mixgroups[i] != -1 )
 		{
 			char *pGroupName = MXR_GetGroupnameFromId( pChannel->mixgroups[i] );
-			if ( !Q_strcmp( pGroupName, "Music" ) )
+			if ( V_streq( pGroupName, "Music" ) )
 			{
 				return true;
 			}

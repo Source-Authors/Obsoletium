@@ -726,7 +726,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 		{
 			// skip comma
 			current = CC_ParseToken( current );
-			if (!strcmp( com_token, "[" ))
+			if (V_streq( com_token, "[" ))
 			{
 				// Read array...
 				current = CC_ParseToken( current );
@@ -825,9 +825,9 @@ char *CCodeProcessor::ParseReceiveTable( char *current )
 	strcpy( classname, com_token );
 	if ( classname[0]=='*' )
 		return current;
-	if ( !strcmp( classname, "className" ) )
+	if ( V_streq( classname, "className" ) )
 		return current;
-	if ( !strcmp( classname, "clientClassName" ) )
+	if ( V_streq( classname, "clientClassName" ) )
 		return current;
 
 	CClass *cl = FindClass( classname );
@@ -875,7 +875,7 @@ char *CCodeProcessor::ParseReceiveTable( char *current )
 			continue;
 		}
 
-		if ( !strcmp( recvproptype, "RecvPropArray" ) )
+		if ( V_streq( recvproptype, "RecvPropArray" ) )
 		{
 			current = CC_ParseToken( current );
 			if ( stricmp( com_token, "(" ) )
@@ -1388,7 +1388,7 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 
 			// parse the (
 			current = CC_ParseToken( current );
-			if ( !strcmp( com_token, "(" ) )
+			if ( V_streq( com_token, "(" ) )
 			{
 				// Now the classname
 				current = CC_ParseToken( current );
@@ -1454,34 +1454,34 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 				}
 			}
 		}
-		else if ( !strcmp( com_token, "TYPEDESCRIPTION" ) || 
-			    !strcmp( com_token, "typedescription_t" ) )
+		else if ( V_streq( com_token, "TYPEDESCRIPTION" ) || 
+			    V_streq( com_token, "typedescription_t" ) )
 		{
 			current = ParseTypeDescription( current, false );
 		}
-		else if ( !strcmp( com_token, "BEGIN_DATADESC" ) ||
-				  !strcmp( com_token, "BEGIN_DATADESC_NO_BASE" ) ||
-				  !strcmp( com_token, "BEGIN_SIMPLE_DATADESC" ) ||
-				  !strcmp( com_token, "BEGIN_BYTESWAP_DATADESC" ) )
+		else if ( V_streq( com_token, "BEGIN_DATADESC" ) ||
+				  V_streq( com_token, "BEGIN_DATADESC_NO_BASE" ) ||
+				  V_streq( com_token, "BEGIN_SIMPLE_DATADESC" ) ||
+				  V_streq( com_token, "BEGIN_BYTESWAP_DATADESC" ) )
 		{
 			current = ParseTypeDescription( current, true );
 		}
-		else if ( !strcmp( com_token, "BEGIN_PREDICTION_DATA" ) ||
-			!strcmp( com_token, "BEGIN_EMBEDDED_PREDDESC" ) )
+		else if ( V_streq( com_token, "BEGIN_PREDICTION_DATA" ) ||
+			V_streq( com_token, "BEGIN_EMBEDDED_PREDDESC" ) )
 		{
 			current = ParsePredictionTypeDescription( current );
 		}
-		else if (	!strcmp( com_token, "BEGIN_RECV_TABLE" ) ||
-					!strcmp( com_token, "BEGIN_RECV_TABLE_NOBASE" ) ||
-					!strcmp( com_token, "IMPLEMENT_CLIENTCLASS_DT" ) ||
-					!strcmp( com_token, "IMPLEMENT_CLIENTCLASS_DT_NOBASE" ) )
+		else if (	V_streq( com_token, "BEGIN_RECV_TABLE" ) ||
+					V_streq( com_token, "BEGIN_RECV_TABLE_NOBASE" ) ||
+					V_streq( com_token, "IMPLEMENT_CLIENTCLASS_DT" ) ||
+					V_streq( com_token, "IMPLEMENT_CLIENTCLASS_DT_NOBASE" ) )
 		{
 			current = ParseReceiveTable( current );
 		}
-		else if ( !strcmp( com_token, "IMPLEMENT_PREDICTABLE_NODATA" ) )
+		else if ( V_streq( com_token, "IMPLEMENT_PREDICTABLE_NODATA" ) )
 		{
 			current = CC_ParseToken( current );
-			if ( !strcmp( com_token, "(" ) )
+			if ( V_streq( com_token, "(" ) )
 			{
 				current = CC_ParseToken( current );
 

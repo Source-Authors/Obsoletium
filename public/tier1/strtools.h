@@ -184,6 +184,13 @@ void		V_qsort_s( INOUT_BYTECAP(num) void *base, size_t num, size_t width, int ( 
 [[nodiscard]] inline bool	StringHasPrefix             ( IN_Z const char *str, IN_Z const char *prefix ) { return StringAfterPrefix             ( str, prefix ) != nullptr; }
 [[nodiscard]] inline bool	StringHasPrefixCaseSensitive( IN_Z const char *str, IN_Z const char *prefix ) { return StringAfterPrefixCaseSensitive( str, prefix ) != nullptr; }
 
+[[nodiscard]] inline bool V_streq(IN_Z const char *l, IN_Z const char *r) {
+  return V_strcmp(l, r) == 0;
+}
+
+[[nodiscard]] inline bool V_strieq(IN_Z const char *l, IN_Z const char *r) {
+  return V_stricmp(l, r) == 0;
+}
 
 template< bool CASE_SENSITIVE >
 [[nodiscard]] inline bool _V_strEndsWithInner( IN_Z const char *pStr, IN_Z const char *pSuffix )
@@ -196,7 +203,7 @@ template< bool CASE_SENSITIVE >
 		return false;
 	pStr += nStringLen - nSuffixLen;
 	if ( CASE_SENSITIVE )
-		return !V_strcmp(  pStr, pSuffix );
+		return V_streq(  pStr, pSuffix );
 	else
 		return !V_stricmp( pStr, pSuffix );
 }
@@ -1542,16 +1549,6 @@ template<size_t size>
 
 template<size_t size>
 [[nodiscard]] constexpr inline bool Q_isempty(IN_Z_ARRAY wchar_t (&v)[size]) { return v[0] == L'\0'; }
-
-[[nodiscard]] inline bool Q_streq(IN_Z const char *l, IN_Z const char *r) 
-{
-	return V_strcmp(l, r) == 0;
-}
-
-[[nodiscard]] inline bool Q_strieq(IN_Z const char *l, IN_Z const char *r) 
-{
-	return V_stricmp(l, r) == 0;
-}
 
 // dimhotepus: Fast integral -> char conversion.
 template<size_t size, typename TIntegral>

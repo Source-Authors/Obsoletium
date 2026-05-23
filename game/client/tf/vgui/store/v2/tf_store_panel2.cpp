@@ -94,13 +94,13 @@ CStorePage *CTFStorePanel2::CreateStorePage( const CEconStoreCategoryManager::St
 {
 	if ( pPageData )
 	{
-		if ( !Q_strcmp( pPageData->m_pchPageClass, "CStorePage_SpecialPromo" ) )
+		if ( V_streq( pPageData->m_pchPageClass, "CStorePage_SpecialPromo" ) )
 			return new CTFStorePage_SpecialPromo( this, pPageData );
 
-		if ( !Q_strcmp( pPageData->m_pchPageClass, "CStorePage_Maps" ) )
+		if ( V_streq( pPageData->m_pchPageClass, "CStorePage_Maps" ) )
 			return new CTFStorePage_Maps2( this, pPageData );
 
-		if ( !Q_strcmp( pPageData->m_pchPageClass, "CStorePage_Popular" ) )
+		if ( V_streq( pPageData->m_pchPageClass, "CStorePage_Popular" ) )
 			return new CTFStorePage_Popular( this, pPageData );
 	}
 

@@ -753,7 +753,7 @@ qboolean FloodEntities (tree_t *tree)
 
 		// nudge playerstart around if needed so clipping hulls allways
 		// have a valid point
-		if (!strcmp (cl, "info_player_start"))
+		if (V_streq (cl, "info_player_start"))
 		{
 			int	x, y;
 

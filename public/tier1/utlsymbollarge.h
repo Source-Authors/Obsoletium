@@ -228,7 +228,7 @@ public:
 			return false;
 		if ( !CASEINSENSITIVE )
 		{
-			return !V_strcmp( lhs->String(), rhs->String() );
+			return V_streq( lhs->String(), rhs->String() );
 		}
 
 		return !V_stricmp( lhs->String(), rhs->String() );

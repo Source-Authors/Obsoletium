@@ -1331,7 +1331,7 @@ void C_BaseAnimating::DelayedInitModelEffects( void )
 					}
 #ifdef TF_CLIENT_DLL
 					// Halloween Hack for Sentry Rockets
-					if ( !V_strcmp( "sentry_rocket", pszParticleEffect ) )
+					if ( V_streq( "sentry_rocket", pszParticleEffect ) )
 					{
 						// Halloween Spell Effect Check
 						int iHalloweenSpell = 0;
@@ -3136,7 +3136,7 @@ void C_BaseAnimating::PopBoneAccess( char const *tagPop )
 	STAGING_ONLY_EXEC( ReentrancyVerifier rv( &dbg_bonestack_reentrant_count, dbg_bonestack_perturb.GetInt() ) );
 
 	// Validate that pop matches the push
-	Assert( ( g_BoneAcessBase.tag == tagPop ) || ( g_BoneAcessBase.tag && g_BoneAcessBase.tag != ( char const * ) 1 && tagPop && tagPop != ( char const * ) 1 && !strcmp( g_BoneAcessBase.tag, tagPop ) ) );
+	Assert( ( g_BoneAcessBase.tag == tagPop ) || ( g_BoneAcessBase.tag && g_BoneAcessBase.tag != ( char const * ) 1 && tagPop && tagPop != ( char const * ) 1 && V_streq( g_BoneAcessBase.tag, tagPop ) ) );
 	intp lastIndex = g_BoneAccessStack.Count() - 1;
 	if ( lastIndex < 0 )
 	{

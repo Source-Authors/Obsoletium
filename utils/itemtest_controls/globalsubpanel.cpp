@@ -159,7 +159,7 @@ void CGlobalSubPanel::OnTextChanged( vgui::Panel *pPanel )
 	{
 		m_pNameTextEntry->GetText( szBuf, ARRAYSIZE( szBuf ) );
 
-		if ( !V_strcmp( pItemUploadWizard->Asset().GetName(), szBuf ) )
+		if ( V_streq( pItemUploadWizard->Asset().GetName(), szBuf ) )
 			return;
 
 		pItemUploadWizard->Asset().SetName( szBuf );
@@ -170,7 +170,7 @@ void CGlobalSubPanel::OnTextChanged( vgui::Panel *pPanel )
 	{
 		m_pClassComboBox->GetText( szBuf, ARRAYSIZE( szBuf ) );
 
-		if ( !V_strcmp( pItemUploadWizard->Asset().GetClass(), szBuf ) )
+		if ( V_streq( pItemUploadWizard->Asset().GetClass(), szBuf ) )
 			return;
 
 		pItemUploadWizard->Asset().SetClass( szBuf );

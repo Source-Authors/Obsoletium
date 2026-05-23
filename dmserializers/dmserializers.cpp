@@ -113,7 +113,7 @@ bool CDmSerializers::Connect( CreateInterfaceFn factory )
 //-----------------------------------------------------------------------------
 void *CDmSerializers::QueryInterface( const char *pInterfaceName )
 {
-	if ( !V_strcmp( pInterfaceName, DMSERIALIZERS_INTERFACE_VERSION ) )
+	if ( V_streq( pInterfaceName, DMSERIALIZERS_INTERFACE_VERSION ) )
 		return (IDmSerializers*)this;
 
 	return NULL;

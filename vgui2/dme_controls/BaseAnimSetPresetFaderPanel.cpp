@@ -559,7 +559,7 @@ void CPresetSlider::OnRenameCompleted( const char *pText, KeyValues *pContextKey
 	}
 
 	// No change( case sensitive)
-	if ( !Q_strcmp( GetName(), pText ) )
+	if ( V_streq( GetName(), pText ) )
 		return;
 
 	CUndoScopeGuard guard( 0, NOTIFY_SETDIRTYFLAG, "Rename Preset" );

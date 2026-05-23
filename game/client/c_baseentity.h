@@ -1723,7 +1723,7 @@ inline bool FClassnameIs( C_BaseEntity *pEntity, const char *szClassname )
 	if ( pEntity == NULL )
 		return false;
 
-	return !strcmp( pEntity->GetClassname(), szClassname ) ? true : false; 
+	return V_streq( pEntity->GetClassname(), szClassname ); 
 }
 
 #define SetThink( a ) ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), 0, NULL )

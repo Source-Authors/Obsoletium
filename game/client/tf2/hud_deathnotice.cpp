@@ -323,7 +323,7 @@ void CHudDeathNotice::MsgFunc_DeathMsg(  bf_read &msg )
 	Q_strncpy( deathMsg.Victim.szName, victim_name, MAX_PLAYER_NAME_LENGTH );
 	deathMsg.flDisplayTime = gpGlobals->curtime + hud_deathnotice_time.GetFloat();
 	deathMsg.iSuicide = ( !killer || killer == victim );
-	deathMsg.iTeamKill = ( !strcmp( fullkilledwith, "d_teammate" ) );
+	deathMsg.iTeamKill = ( V_streq( fullkilledwith, "d_teammate" ) );
 
 	// Try and find the death identifier in the icon list
 	deathMsg.iconDeath = gHUD.GetIcon( fullkilledwith );
@@ -341,7 +341,7 @@ void CHudDeathNotice::MsgFunc_DeathMsg(  bf_read &msg )
 	// Record the death notice in the console
 	if ( deathMsg.iSuicide )
 	{
-		if ( !strcmp( fullkilledwith, "d_world" ) )
+		if ( V_streq( fullkilledwith, "d_world" ) )
 		{
 			Q_snprintf( sDeathMsg, sizeof( sDeathMsg ), "%s died.\n", deathMsg.Victim.szName );
 		}

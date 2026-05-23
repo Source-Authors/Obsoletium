@@ -779,12 +779,12 @@ void CModWizardSubPanel_CopyFiles::OnTick()
 			V_strncat( hl2dir, "source sdk base", sizeof( hl2dir ), COPY_ALL_CHARACTERS );
 
 			// If the engine version is 'orange box' then use the new 'source sdk base 2009' to launch the mods
-			if ( !V_strcmp( g_engineDir, "orangebox" ) )
+			if ( V_streq( g_engineDir, "orangebox" ) )
 			{
 				V_strncat( hl2dir, " 2009", sizeof( hl2dir ), COPY_ALL_CHARACTERS );
 			}
 			// If the engine version isn't 'source2007' then use the new 'source sdk base 2007' to launch the mods
-			else if ( !V_strcmp( g_engineDir, "source2007" ) )
+			else if ( V_streq( g_engineDir, "source2007" ) )
 			{
 				V_strncat( hl2dir, " 2007", sizeof( hl2dir ), COPY_ALL_CHARACTERS );
 			}

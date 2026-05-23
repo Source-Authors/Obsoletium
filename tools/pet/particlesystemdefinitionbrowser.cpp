@@ -182,7 +182,7 @@ CDmeParticleSystemDefinition* CParticleSystemDefinitionBrowser::CreateParticleFr
 	for ( intp i = 0; i < m_pParticleSystemsDefinitions->GetItemCount(); ++i )
 	{
 		KeyValues *kv = m_pParticleSystemsDefinitions->GetItem( i );
-		if ( !V_strcmp( kv->GetString( "name", "" ), pBaseParticleName ) )
+		if ( V_streq( kv->GetString( "name", "" ), pBaseParticleName ) )
 		{
 			// 
 			pBaseParticleDef = GetElementKeyValue< CDmeParticleSystemDefinition >( kv, "particleSystem" );

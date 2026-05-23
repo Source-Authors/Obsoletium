@@ -103,7 +103,7 @@ static void AddToStringTable( void *base, int *ptr, const char *string )
 {
 	for (int i = 0; i < numStrings; i++)
 	{
-		if (!string || !strcmp( string, strings[i].string ))
+		if (!string || V_streq( string, strings[i].string ))
 		{
 			strings[numStrings].base = (byte *)base;
 			strings[numStrings].ptr = ptr;
@@ -2222,7 +2222,7 @@ static void WriteModel( studiohdr_t *phdr )
 			if ( j < g_numflexcontrollers - 1 &&
 				StringAfterPrefixCaseSensitive( flexcontroller.name, "right_" ) &&
 				StringAfterPrefixCaseSensitive( g_flexcontroller[ j + 1 ].name, "left_" ) &&
-				!Q_strcmp( StringAfterPrefixCaseSensitive( flexcontroller.name, "right_" ), StringAfterPrefixCaseSensitive( g_flexcontroller[ j + 1 ].name, "left_" ) ) )
+				V_streq( StringAfterPrefixCaseSensitive( flexcontroller.name, "right_" ), StringAfterPrefixCaseSensitive( g_flexcontroller[ j + 1 ].name, "left_" ) ) )
 			{
 				AddToStringTable( pFlexControllerUI, &pFlexControllerUI->sznameindex, flexcontroller.name + 6 );
 
@@ -2243,7 +2243,7 @@ static void WriteModel( studiohdr_t *phdr )
 			else if ( j > 0 &&
 				StringAfterPrefixCaseSensitive( flexcontroller.name, "left_" ) &&
 				StringAfterPrefixCaseSensitive( g_flexcontroller[ j - 1 ].name, "right_" ) &&
-				!Q_strcmp( StringAfterPrefixCaseSensitive( flexcontroller.name, "left_" ), StringAfterPrefixCaseSensitive( g_flexcontroller[ j - 1 ].name, "right_" ) ) )
+				V_streq( StringAfterPrefixCaseSensitive( flexcontroller.name, "left_" ), StringAfterPrefixCaseSensitive( g_flexcontroller[ j - 1 ].name, "right_" ) ) )
 			{
 				AddToStringTable( pFlexControllerUI, &pFlexControllerUI->sznameindex, flexcontroller.name + 5 );
 

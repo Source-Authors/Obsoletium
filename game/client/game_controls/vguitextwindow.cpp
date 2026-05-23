@@ -316,7 +316,7 @@ void CTextWindow::Update( void )
 
 void CTextWindow::OnCommand( const char *command )
 {
-	if (!Q_strcmp(command, "okay"))
+	if (V_streq(command, "okay"))
 	{
 		//=============================================================================
 		// HPE_BEGIN:

@@ -37,8 +37,8 @@ void CDODHLTVDirector::CreateShotFromEvent( CHLTVGameEvent *event )
 	const char *name = event->m_Event->GetName();
 	IGameEvent *shot = NULL;
 
-	if ( !Q_strcmp( "dod_point_captured", name ) ||
-		 !Q_strcmp( "dod_capture_blocked", name ) )
+	if ( V_streq( "dod_point_captured", name ) ||
+		 V_streq( "dod_capture_blocked", name ) )
 	{
 		// try to find a capper or blocker
 		const char *text = event->m_Event->GetString("blocker");

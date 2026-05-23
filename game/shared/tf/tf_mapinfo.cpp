@@ -370,7 +370,7 @@ public:
 		FOR_EACH_VEC( m_vecLadderLeaderboards, i )
 		{
 			CLeaderboardInfo *pInfo = m_vecLadderLeaderboards[i];
-			if ( pszName && pInfo && !V_strcmp( pszName, pInfo->GetLeaderboardName() ) )
+			if ( pszName && pInfo && V_streq( pszName, pInfo->GetLeaderboardName() ) )
 			{
 				return pInfo;
 			}

@@ -47,7 +47,7 @@ CModWizardSubPanel_Intro::CModWizardSubPanel_Intro( Panel *parent, const char *p
 	LoadControlSettings( "ModWizardSubPanel_Intro.res");
 
 	// We presently don't support SDK scratch configuration using the "orangebox" codebase
-	if ( !V_strcmp( g_engineDir, "orangebox" ) )
+	if ( V_streq( g_engineDir, "orangebox" ) )
 	{
 		m_pModFromScratchButton->SetVisible( false );
 	}
@@ -55,7 +55,7 @@ CModWizardSubPanel_Intro::CModWizardSubPanel_Intro( Panel *parent, const char *p
 	//
 	// Enable and select the appropriate mod types 
 	//
-	if ( !V_strcmp( g_engineDir, "orangebox" ) || !V_strcmp( g_engineDir, "source2007" ) )
+	if ( V_streq( g_engineDir, "orangebox" ) || V_streq( g_engineDir, "source2007" ) )
 	   m_pModHL2Button->SetEnabled( IsGameSubscribed( GetAppSteamAppId( k_App_HL2_EP2 ) ) );
 	else
 	{
@@ -98,7 +98,7 @@ void CModWizardSubPanel_Intro::PerformLayout()
 	BaseClass::PerformLayout();
 
 	// Update the scratch button text - in orange box, the text is different, but it's the same button.
-	if ( !V_strcmp( g_engineDir, "source2007" ) )
+	if ( V_streq( g_engineDir, "source2007" ) )
 		SetDialogVariable( "ScratchLabel", g_pVGuiLocalize->Find( "#StartFromTemplate" ) );
 	else
 		SetDialogVariable( "ScratchLabel", g_pVGuiLocalize->Find( "#StartFromScratch" ) );

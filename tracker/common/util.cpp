@@ -45,7 +45,7 @@ const char *CUtil::InfoGetValue( const char *s, const char *key )
 		}
 		*o = 0;
 
-		if (!strcmp (key, pkey) )
+		if (V_streq (key, pkey) )
 			return value[valueindex];
 
 		if (!*s)

@@ -150,7 +150,7 @@ void CToolDictionary::Disconnect()
 
 void *CToolDictionary::QueryInterface( const char *pInterfaceName )
 {
-	if ( !V_strcmp( pInterfaceName, VTOOLDICTIONARY_INTERFACE_VERSION ) )
+	if ( V_streq( pInterfaceName, VTOOLDICTIONARY_INTERFACE_VERSION ) )
 		return static_cast<IToolDictionary*>(this);
 
 	return NULL;

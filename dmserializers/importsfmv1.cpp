@@ -72,21 +72,21 @@ bool CImportSFMV1::DoFixup( CDmElement *pElementInternal )
 	m_fixedElements.Insert( pElementInternal );
 
 	const char *pType = pElementInternal->GetTypeString();
-	if ( !Q_strcmp( pType, "DmeTimeFrame" ) )
+	if ( V_streq( pType, "DmeTimeFrame" ) )
 	{
 		FixupTimeframe( pElementInternal );
 	}
-	else if ( !Q_strcmp( pType, "DmeLog" ) ||
-			!Q_strcmp( pType, "DmeIntLog" ) ||
-			!Q_strcmp( pType, "DmeFloatLog" ) ||
-			!Q_strcmp( pType, "DmeBoolLog" ) ||
-			!Q_strcmp( pType, "DmeColorLog" ) ||
-			!Q_strcmp( pType, "DmeVector2Log" ) ||
-			!Q_strcmp( pType, "DmeVector3Log" ) ||
-			!Q_strcmp( pType, "DmeVector4Log" ) ||
-			!Q_strcmp( pType, "DmeQAngleLog" ) ||
-			!Q_strcmp( pType, "DmeQuaternionLog" ) ||
-			!Q_strcmp( pType, "DmeVMatrixLog" ) )
+	else if ( V_streq( pType, "DmeLog" ) ||
+			V_streq( pType, "DmeIntLog" ) ||
+			V_streq( pType, "DmeFloatLog" ) ||
+			V_streq( pType, "DmeBoolLog" ) ||
+			V_streq( pType, "DmeColorLog" ) ||
+			V_streq( pType, "DmeVector2Log" ) ||
+			V_streq( pType, "DmeVector3Log" ) ||
+			V_streq( pType, "DmeVector4Log" ) ||
+			V_streq( pType, "DmeQAngleLog" ) ||
+			V_streq( pType, "DmeQuaternionLog" ) ||
+			V_streq( pType, "DmeVMatrixLog" ) )
 	{
 		FixupLog( pElementInternal );
 	}

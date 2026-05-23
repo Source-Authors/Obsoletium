@@ -111,7 +111,7 @@ void CVPhysicsParse::NextBlock( void )
 	while ( m_pText )
 	{
 		m_pText = ParseKeyvalue( m_pText, key, value );
-		if ( !Q_strcmp(value, "{") )
+		if ( V_streq(value, "{") )
 		{
 			V_strcpy_safe( m_blockName, key );
 			return;

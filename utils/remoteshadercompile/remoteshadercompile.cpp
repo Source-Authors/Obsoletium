@@ -20,6 +20,7 @@
 
 #include "windows/com_error_category.h"
 #include "tier0/dbg.h"
+#include "tier1/strtools.h"
 
 #include "tier0/memdbgon.h"
 
@@ -780,7 +781,7 @@ int main(int argc, char *argv[]) {
 
   bool show_logo{true};
   for (int i{1}; i < argc; ++i) {
-    if (!strcmp(argv[i], "--base-path")) {
+    if (V_streq(argv[i], "--base-path")) {
       if (i + 1 < argc || strstr(argv[i + 1], "--") == argv[i + 1]) {
         strcpy_s(args.path_base, argv[i + 1]);
         ++i;
@@ -788,11 +789,11 @@ int main(int argc, char *argv[]) {
         PrintfUsage(argv[0]);
         return 1;
       }
-    } else if (!strcmp(argv[i], "--no-logo")) {
+    } else if (V_streq(argv[i], "--no-logo")) {
       show_logo = false;
-    } else if (!strcmp(argv[i], "--should-disassemble-shaders")) {
+    } else if (V_streq(argv[i], "--should-disassemble-shaders")) {
       args.should_disassemble_shaders = true;
-    } else if (!strcmp(argv[i], "--no-optimize-shaders")) {
+    } else if (V_streq(argv[i], "--no-optimize-shaders")) {
       args.should_optimize_shaders = false;
     } else {
       fprintf(stderr, "%s error: Unknown command line arg '%s'.", argv[0],

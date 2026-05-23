@@ -133,35 +133,35 @@ void CTFWeaponInfo::Parse( KeyValues *pKeyValuesData, const char *szWeaponName )
 
 	const char *pszWeaponType = pKeyValuesData->GetString( "WeaponType" );
 
-	if ( !Q_strcmp( pszWeaponType, "primary" ) )
+	if ( V_streq( pszWeaponType, "primary" ) )
 	{
 		m_iWeaponType = TF_WPN_TYPE_PRIMARY;
 	}
-	else if ( !Q_strcmp( pszWeaponType, "secondary" ) )
+	else if ( V_streq( pszWeaponType, "secondary" ) )
 	{
 		m_iWeaponType = TF_WPN_TYPE_SECONDARY;
 	}
-	else if ( !Q_strcmp( pszWeaponType, "melee" ) )
+	else if ( V_streq( pszWeaponType, "melee" ) )
 	{
 		m_iWeaponType = TF_WPN_TYPE_MELEE;
 	}
-	else if ( !Q_strcmp( pszWeaponType, "grenade" ) )
+	else if ( V_streq( pszWeaponType, "grenade" ) )
 	{
 		m_iWeaponType = TF_WPN_TYPE_GRENADE;
 	}
-	else if ( !Q_strcmp( pszWeaponType, "building" ) )
+	else if ( V_streq( pszWeaponType, "building" ) )
 	{
 		m_iWeaponType = TF_WPN_TYPE_BUILDING;
 	}
-	else if ( !Q_strcmp( pszWeaponType, "pda" ) )
+	else if ( V_streq( pszWeaponType, "pda" ) )
 	{
 		m_iWeaponType = TF_WPN_TYPE_PDA;
 	}
-	else if ( !Q_strcmp( pszWeaponType, "item1" ) )
+	else if ( V_streq( pszWeaponType, "item1" ) )
 	{
 		m_iWeaponType = TF_WPN_TYPE_ITEM1;
 	}
-	else if ( !Q_strcmp( pszWeaponType, "item2" ) )
+	else if ( V_streq( pszWeaponType, "item2" ) )
 	{
 		m_iWeaponType = TF_WPN_TYPE_ITEM2;
 	}

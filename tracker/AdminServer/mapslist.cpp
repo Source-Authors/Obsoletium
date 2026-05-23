@@ -164,7 +164,7 @@ void CMapsList::ServerResponded()
 					Maps_t map;
 					// this map wasn't found already
 					v_strncpy(map.name,tmpMap,strlen(tmpMap)+1);
-					if( !strcmp("(fs)",mapsLine.GetToken(0)) )
+					if( V_streq("(fs)",mapsLine.GetToken(0)) )
 					{ // name
 						map.type=FS;
 					}

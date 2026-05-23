@@ -615,7 +615,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 				return false;
 
 			// Done?
-			if ( !strcmp( token, "}" ) )
+			if ( V_streq( token, "}" ) )
 				break;
 
 			//

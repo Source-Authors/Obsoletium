@@ -1011,7 +1011,7 @@ void SetLightStyles (void)
 		
 		// find this targetname
 		for (j=0 ; j<stylenum ; j++)
-			if (!strcmp (lighttargets[j], t))
+			if (V_streq (lighttargets[j], t))
 				break;
 		if (j == stylenum)
 		{
@@ -1549,7 +1549,7 @@ void ComputeBoundsNoSkybox( )
 	for (int i = 0; i < num_entities; ++i)
 	{
 		const char* pEntity = ValueForKey(&entities[i], "classname");
-		if (!strcmp(pEntity, "worldspawn"))
+		if (V_streq(pEntity, "worldspawn"))
 		{
 			char	string[32];
 			V_sprintf_safe (string, "%i %i %i", (int)mins[0], (int)mins[1], (int)mins[2]);

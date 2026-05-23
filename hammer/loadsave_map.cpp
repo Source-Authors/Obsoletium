@@ -841,11 +841,11 @@ int CEditGameClass::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 					break;
 				}
 		
-				if (!strcmp(newkv.szKey, "classname"))
+				if (V_streq(newkv.szKey, "classname"))
 				{
 					m_KeyValues.SetValue(newkv.szKey, newkv.szValue);
 				}
-				else if (!strcmp(newkv.szKey, "angle"))
+				else if (V_streq(newkv.szKey, "angle"))
 				{
 					ImportAngle(atoi(newkv.szValue));
 				}

@@ -158,7 +158,7 @@ bool ParseTechnologyFile( CUtlVector< CBaseTechnology * > &pTechnologyList, IFil
 			// Find out if it's already in the list
 			for ( int i = 0; i < pTechnologyList.Size(); i++ )
 			{
-				if ( !strcmp(pTechnologyList[i]->GetName(), pTechnology->GetName() ) )
+				if ( V_streq(pTechnologyList[i]->GetName(), pTechnology->GetName() ) )
 				{
 					// Found it in the tree already, so delete and continue
 					delete pTechnology;

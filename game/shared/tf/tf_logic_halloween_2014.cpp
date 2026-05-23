@@ -135,11 +135,11 @@ void CTFMiniGame::FireGameEvent( IGameEvent * pEvent )
 
 	const char *pszEventName = pEvent->GetName();
 	
-	if ( !V_strcmp( pszEventName, "player_turned_to_ghost" ) 
-		|| !V_strcmp( pszEventName, "player_disconnect" )
-		|| !V_strcmp( pszEventName, "player_team" ) 
-		|| !V_strcmp( pszEventName, "player_death" )
-		|| !V_strcmp( pszEventName, "player_spawn" ) )
+	if ( V_streq( pszEventName, "player_turned_to_ghost" ) 
+		|| V_streq( pszEventName, "player_disconnect" )
+		|| V_streq( pszEventName, "player_team" ) 
+		|| V_streq( pszEventName, "player_death" )
+		|| V_streq( pszEventName, "player_spawn" ) )
 	{
 		bool bCanWin = true;
 		// Blue gets the chance to win first
@@ -689,7 +689,7 @@ void CTFHalloweenMinigame_FallingPlatforms::FireGameEvent( IGameEvent * pEvent )
 	// This hack sets the collision of ghosts to collide with triggers, but not with
 	// other players.  This should allow us to use the relative teleport trigger on the
 	// ghosts to prevent stuckage.
-	if ( m_bIsActive && !V_strcmp( pszEventName, "player_turned_to_ghost" )  )
+	if ( m_bIsActive && V_streq( pszEventName, "player_turned_to_ghost" )  )
 	{
 		CTFPlayer *pPlayer = ToTFPlayer( UTIL_PlayerByUserId( pEvent->GetInt( "userid" ) ) );
 		if ( pPlayer )

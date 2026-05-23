@@ -177,27 +177,27 @@ bool CActBusyAnimData::ParseActBusyFromKV( busyanim_t *pAnim, KeyValues *pSectio
 	pAnim->bUseAutomovement = pSection->GetInt( "use_automovement", 0 ) != 0;
 
 	const char *sInterrupt = pSection->GetString( "interrupts", "BA_INT_DANGER" );
-	if ( !strcmp( sInterrupt, "BA_INT_PLAYER" ) )
+	if ( V_streq( sInterrupt, "BA_INT_PLAYER" ) )
 	{
 		pAnim->iBusyInterruptType = BA_INT_PLAYER;
 	}
-	else if ( !strcmp( sInterrupt, "BA_INT_DANGER" ) )
+	else if ( V_streq( sInterrupt, "BA_INT_DANGER" ) )
 	{
 		pAnim->iBusyInterruptType = BA_INT_DANGER;
 	}
-	else if ( !strcmp( sInterrupt, "BA_INT_AMBUSH" ) )
+	else if ( V_streq( sInterrupt, "BA_INT_AMBUSH" ) )
 	{
 		pAnim->iBusyInterruptType = BA_INT_AMBUSH;
 	}
-	else if ( !strcmp( sInterrupt, "BA_INT_COMBAT" ) )
+	else if ( V_streq( sInterrupt, "BA_INT_COMBAT" ) )
 	{
 		pAnim->iBusyInterruptType = BA_INT_COMBAT;
 	}
-	else if ( !strcmp( sInterrupt, "BA_INT_ZOMBIESLUMP" ))
+	else if ( V_streq( sInterrupt, "BA_INT_ZOMBIESLUMP" ))
 	{
 		pAnim->iBusyInterruptType = BA_INT_ZOMBIESLUMP;
 	}
-	else if ( !strcmp( sInterrupt, "BA_INT_SIEGE_DEFENSE" ))
+	else if ( V_streq( sInterrupt, "BA_INT_SIEGE_DEFENSE" ))
 	{
 		pAnim->iBusyInterruptType = BA_INT_SIEGE_DEFENSE;
 	}

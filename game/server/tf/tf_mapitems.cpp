@@ -51,7 +51,7 @@ int GetTeamCheckTeam( const char *pTargetName )
 	CBaseEntity *pEntity = gEntList.FindEntityByName( NULL, pTargetName );
 	if ( pEntity )
 	{
-		if ( !strcmp( pEntity->GetClassname(), "info_tf_teamcheck" ) )
+		if ( V_streq( pEntity->GetClassname(), "info_tf_teamcheck" ) )
 			return pEntity->GetTeamNumber();
 	}
 
@@ -2969,7 +2969,7 @@ void CTFSpawn::Activate( void )
 
 	if ( pTarget )
 	{
-		if ( !strcmp( pTarget->GetClassname(), "info_tf_teamcheck" ) )
+		if ( V_streq( pTarget->GetClassname(), "info_tf_teamcheck" ) )
 			m_pTeamCheck = pTarget;
 	}		
 }

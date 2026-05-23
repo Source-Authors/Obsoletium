@@ -3824,19 +3824,19 @@ float	GLMKnob( char *knobname, float *setvalue )
 	uint mods = 0;
 #endif
 	// is it a special key name ?
-	if (!strcmp(knobname,"caps-key"))
+	if (V_streq(knobname,"caps-key"))
 	{
 		return (mods & (EalphaLock)) ? 1.0 : 0.0;
 	}
-	else if (!strcmp(knobname,"control-key"))
+	else if (V_streq(knobname,"control-key"))
 	{
 		return (mods & (EcontrolKey)) ? 1.0 : 0.0;
 	}
-	else if (!strcmp(knobname,"shift-key"))
+	else if (V_streq(knobname,"shift-key"))
 	{
 		return (mods & (EshiftKey)) ? 1.0 : 0.0;
 	}
-	else if (!strcmp(knobname,"option-key"))
+	else if (V_streq(knobname,"option-key"))
 	{
 		return (mods & (EoptionKey)) ? 1.0 : 0.0;
 	}
@@ -4170,7 +4170,7 @@ CGLMEditableTextItem::CGLMEditableTextItem( char *text, uint size, bool forceOve
 	GenMungedText( false );
 	GenBaseNameAndFullPath( prefix, suffix );	// figure out where the mirror will go
 	
-	if (!strcmp(m_mirrorBaseName, "96c7e9d2faf76b1148f7274afd684d4b.fsh"))
+	if (V_streq(m_mirrorBaseName, "96c7e9d2faf76b1148f7274afd684d4b.fsh"))
 	{
 		printf("\nhello there\n");
 	}

@@ -85,7 +85,7 @@ CReplayBrowserThumbnail::CReplayBrowserThumbnail( Panel *pParent, const char *pN
 	Panel *pTarget = GetParent();
 	while ( pTarget )
 	{
-		if ( !V_strcmp( "BasePage", pTarget->GetName() ) )
+		if ( V_streq( "BasePage", pTarget->GetName() ) )
 			break;
 		pTarget = pTarget->GetParent();
 	}

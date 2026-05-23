@@ -64,7 +64,7 @@ ButtonDemo2::~ButtonDemo2()
 //-----------------------------------------------------------------------------
 void ButtonDemo2::OnCommand(const char *command)
 {
-	if (!strcmp(command, "ButtonClicked") )
+	if (V_streq(command, "ButtonClicked") )
 	{
 		ivgui()->DPrintf("Button was clicked.\n");
 	}
