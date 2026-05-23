@@ -101,25 +101,6 @@ CON_COMMAND_F( hidepanel, "Hides a viewport panel <name>", FCVAR_CHEAT )
 	 gViewPortInterface->ShowPanel( args[ 1 ], false );
 }
 
-/* global helper functions
-
-bool Helper_LoadFile( IBaseFileSystem *pFileSystem, const char *pFilename, CUtlVector<char> &buf )
-{
-	FileHandle_t hFile = pFileSystem->Open( pFilename, "rt" );
-	if ( hFile == FILESYSTEM_INVALID_HANDLE )
-	{
-		Warning( "Helper_LoadFile: missing %s\n", pFilename );
-		return false;
-	}
-
-	unsigned len = pFileSystem->Size( hFile );
-	buf.SetSize( len );
-	pFileSystem->Read( buf.Base(), buf.Count(), hFile );
-	pFileSystem->Close( hFile );
-
-	return true;
-} */
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Output : Returns true on success, false on failure.
