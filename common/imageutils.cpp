@@ -1462,7 +1462,7 @@ static void DoDeleteFile( const char *filename )
 
 ConversionErrorType	ImgUtl_ConvertToVTFAndDumpVMT( const char *pInPath, const char *pMaterialsSubDir, int nMaxWidth/*=-1*/, int nMaxHeight/*=-1*/ )
 {
-	if ((pInPath == nullptr) || (pInPath[0] == 0))
+	if (Q_isempty(pInPath))
 	{
 		return CE_ERROR_PARSING_SOURCE;
 	}
