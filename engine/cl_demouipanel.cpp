@@ -179,10 +179,10 @@ void CDemoUIPanel::OnTick()
 	
 	// set filename text
 	m_pCurrentDemo->SetText( demoaction->GetCurrentDemoFile() );
-	bool bHasDemoFile = demoaction->GetCurrentDemoFile()[0] != 0;
+	bool bHasDemoFile = !Q_isempty( demoaction->GetCurrentDemoFile() );
 
 	// set play button text
-	if (  bIsPlaying )
+	if ( bIsPlaying )
 	{
 		m_pPlayPauseResume->SetText( demoplayer->IsPlaybackPaused() ? "Resume" : "Pause" );
 	}
@@ -726,7 +726,7 @@ void CDemoUIPanel2::OnTick()
 
 	// set filename text
 	SetTitle( va( "Demo Playback - %s", demoaction->GetCurrentDemoFile() ), true );
-	bool bHasDemoFile = demoaction->GetCurrentDemoFile()[0] != 0;
+	bool bHasDemoFile = !Q_isempty( demoaction->GetCurrentDemoFile() );
 
 	// set play button text
 	if (  bIsPlaying )

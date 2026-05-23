@@ -2097,7 +2097,7 @@ void CHLTVServer::ReplyInfo( const netadr_t &adr )
 	if ( GetUDPPort() != 0 )
 		nNewFlags |= S2A_EXTRA_DATA_HAS_SPECTATOR_DATA;
 
-	if ( pchTags && pchTags[0] != '\0' )
+	if ( !Q_isempty( pchTags ) )
 		nNewFlags |= S2A_EXTRA_DATA_HAS_GAMETAG_DATA;
 
 	nNewFlags |= S2A_EXTRA_DATA_GAMEID;

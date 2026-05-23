@@ -1055,7 +1055,7 @@ void CVProfPanel::UpdateProfile( float filteredtime )
 		m_pHierarchy->ExpandItem( m_RootItem, true );
 
 		const char *pScope = vprof_scope.GetString();
-		CVProfNode *pStartNode = ( pScope[0] == 0 ) ? m_pVProfile->GetRoot()  : m_pVProfile->FindNode(m_pVProfile->GetRoot(), pScope );
+		CVProfNode *pStartNode = Q_isempty( pScope ) ? m_pVProfile->GetRoot() : m_pVProfile->FindNode( m_pVProfile->GetRoot(), pScope );
 		
 		if ( pStartNode )
 		{

@@ -1100,9 +1100,9 @@ bool CSaveRestore::LoadGame( const char *pName )
 	deathmatch.SetValue( 0 );
 	coop.SetValue( 0 );
 
-	bool bIsTransitionSave = ( gameHeader.originMapName[0] != 0 );
+	bool bIsTransitionSave = !Q_isempty( gameHeader.originMapName );
 
-	bool retval = Host_NewGame( gameHeader.mapName, true, false, ( bIsTransitionSave ) ? gameHeader.originMapName : NULL, ( bIsTransitionSave ) ? gameHeader.landmark : NULL, bOldSave );
+	bool retval = Host_NewGame( gameHeader.mapName, true, false, bIsTransitionSave ? gameHeader.originMapName : NULL, bIsTransitionSave ? gameHeader.landmark : NULL, bOldSave );
 
 	SetMostRecentElapsedMinutes( iElapsedMinutes );
 	SetMostRecentElapsedSeconds( iElapsedSeconds );

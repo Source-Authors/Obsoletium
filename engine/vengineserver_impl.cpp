@@ -920,7 +920,7 @@ public:
 		V_vsprintf_safe(szOut, szFmt, argptr);
 		va_end(argptr);
 
-		if ( szOut[0] == 0 )
+		if ( Q_isempty( szOut ) )
 		{
 			Warning( "ClientCommand, 0 length string supplied.\n" );
 			return;

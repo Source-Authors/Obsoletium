@@ -350,7 +350,7 @@ void VGui_RecursivePrintTree(
 	// Bind data to pVal.
 	char name[1024];
 	const char *pInputName = ipanel->GetName( current );
-	if ( pInputName && pInputName[0] != 0 )
+	if ( !Q_isempty( pInputName ) )
 		V_sprintf_safe( name, "%s", pInputName );
 	else
 		V_sprintf_safe( name, "%s", "(no name)" );

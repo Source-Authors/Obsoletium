@@ -590,11 +590,11 @@ CPureServerWhitelist::CCommand* CPureServerWhitelist::GetBestEntry( const char *
 		CCommand *pBestEntry = NULL;
 		
 		pBestEntry = CheckEntry( m_FileCommands, relativeFilename, pBestEntry );
-		if ( relativeDir[0] != 0 )
+		if ( !Q_isempty( relativeDir ) )
 		{
 			pBestEntry = CheckEntry( m_NonRecursiveDirCommands, relativeDir, pBestEntry );
 
-			while ( relativeDir[0] != 0 )
+			while ( !Q_isempty( relativeDir ) )
 			{
 				// Check for this directory.
 				pBestEntry = CheckEntry( m_RecursiveDirCommands, relativeDir, pBestEntry );

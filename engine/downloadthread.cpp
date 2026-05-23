@@ -796,7 +796,7 @@ void SetProxiesForURL( CURL *hMasterCURL, const char *pszURL )
 #warning "CHTTPDownloadThread doesn't know how to set proxy config"
 #endif
 	
-	if ( rgchProxyHost[0] == '\0' || uProxyPort <= 0 )
+	if ( Q_isempty( rgchProxyHost ) || uProxyPort <= 0 )
 	{
 		if ( pszProxyExceptionList )
 			free( pszProxyExceptionList );

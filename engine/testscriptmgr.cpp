@@ -281,7 +281,7 @@ void CTestScriptMgr::RunCommands()
 		curCommand[iCurPos] = 0;
 		
 		// Did we hit the end of the file?
-		if ( curCommand[0] == 0 )
+		if ( Q_isempty( curCommand ) )
 		{
 			if ( g_pFileSystem->EndOfFile( m_hFile ) )
 			{

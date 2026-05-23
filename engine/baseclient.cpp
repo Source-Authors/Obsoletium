@@ -1432,7 +1432,7 @@ void CBaseClient::UpdateUserSettings()
 void CBaseClient::ClientRequestNameChange( const char *pszNewName )
 {
 	// This is called several times.  Only show a status message the first time.
-	bool bShowStatusMessage = ( m_szPendingNameChange[0] == '\0' );
+	bool bShowStatusMessage = Q_isempty( m_szPendingNameChange );
 	
 	V_strcpy_safe( m_szPendingNameChange, pszNewName );
 	CheckFlushNameChange( bShowStatusMessage );
@@ -1443,7 +1443,7 @@ void CBaseClient::CheckFlushNameChange( bool bShowStatusMessage /*= false*/ )
 	if ( !IsConnected() )
 		return;
 	
-	if ( m_szPendingNameChange[0] == '\0' )
+	if ( Q_isempty( m_szPendingNameChange ) )
 		return;
 	
 	if ( m_bPlayerNameLocked )
@@ -1452,7 +1452,6 @@ void CBaseClient::CheckFlushNameChange( bool bShowStatusMessage /*= false*/ )
 	// Did they change it back to the original?
 	if ( !Q_strcmp( m_szPendingNameChange, m_Name ) )
 	{
-
 		// Nothing really pending, they already changed it back
 		// we had a chance to apply the other one!
 		m_szPendingNameChange[0] = '\0';

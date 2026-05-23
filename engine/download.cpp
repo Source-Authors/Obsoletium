@@ -638,7 +638,7 @@ void CDownloadManager::QueueInternal( const char *pBaseURL, const char *pURLPath
 	}
 
 	// Otherwise, put it in the game dir
-	if ( szBasePath[0] == '\0' )
+	if ( Q_isempty( szBasePath ) )
 		V_strcpy_safe( szBasePath, com_gamedir );
 
 	// Setup game path

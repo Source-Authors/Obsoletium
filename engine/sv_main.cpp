@@ -821,7 +821,7 @@ void SV_InitGameDLL( void )
 	
 
 	// let's not have any servers with no name
-	if ( host_name.GetString()[0] == 0 )
+	if ( Q_isempty( host_name.GetString() ) )
 	{
 		host_name.SetValue( serverGameDLL->GetGameDescription() );
 	}

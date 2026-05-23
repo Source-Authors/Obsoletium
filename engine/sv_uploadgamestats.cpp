@@ -438,7 +438,7 @@ public:
 		}
 #endif
 
-		if ( ( buf[0] == 0 ) && sv.IsDedicated() )
+		if ( Q_isempty( buf ) && sv.IsDedicated() )
 		{
 			// For Linux dedicated servers, where we won't get a unique ID: set the ID to "unknown" so we have something.  (If there's no ID,
 			// stats don't get sent.)  This will later get altered to be a hash of IP&port, but this gets called early before IP is determined

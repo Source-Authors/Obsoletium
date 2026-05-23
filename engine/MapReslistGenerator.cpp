@@ -676,7 +676,7 @@ void CMapReslistGenerator::OnResourcePrecached(const char *relativePathFileName)
 		return;
 
 	// ignore empty string
-	if (relativePathFileName[0] == 0)
+	if (Q_isempty( relativePathFileName ))
 		return;
 
 	// ignore files that start with '*' since they signify special models

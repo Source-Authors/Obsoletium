@@ -2815,7 +2815,7 @@ void CTextureListPanel::PerformLayout()
 
 bool StripDirName( char *pFilename )
 {
-	if ( pFilename[0] == 0 )
+	if ( Q_isempty( pFilename ) )
 		return false;
 
 	char *pLastSlash = pFilename;

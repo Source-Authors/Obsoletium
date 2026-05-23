@@ -465,7 +465,7 @@ bool CClientState::ProcessSetPauseTimed( SVC_SetPauseTimed *msg )
 bool CClientState::ProcessVoiceInit( SVC_VoiceInit *msg )
 {
 #if !defined( NO_VOICE )//#ifndef _XBOX
-	if ( msg->m_szVoiceCodec[0] == 0 )
+	if ( Q_isempty( msg->m_szVoiceCodec ) )
 	{
 		Voice_Deinit();
 	}
