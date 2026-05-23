@@ -152,7 +152,8 @@ public:
 	{
 		BaseClass::ApplySchemeSettings( pScheme );
 
-		m_pList->SetFont( pScheme->GetFont( "DefaultVerySmall" ) );
+		// dimhotepus: Scale UI.
+		m_pList->SetFont( pScheme->GetFont( "DefaultVerySmall", IsProportional() ) );
 		m_pList->SetFgColor( LIST_TEXT_COLOR );
 	}
 
@@ -302,7 +303,8 @@ public:
 	{
 		BaseClass::ApplySchemeSettings( pScheme );
 
-		m_pList->SetFont( pScheme->GetFont( "DefaultVerySmall" ) );
+		// dimhotepus: Scale UI.
+		m_pList->SetFont( pScheme->GetFont( "DefaultVerySmall", IsProportional() ) );
 		m_pList->SetFgColor( LIST_TEXT_COLOR );
 	}
 
@@ -944,6 +946,36 @@ void CMP3Player::ApplySchemeSettings(IScheme *pScheme)
 
 	HFont treeFont = pScheme->GetFont( "DefaultVerySmall" );
 	m_pTree->SetFont( treeFont );
+	
+	// dimhotepus: Scale UI.
+	// make sure we're completely on screen
+	int iNewWide, iNewTall;
+	surface()->GetScreenSize( iNewWide, iNewTall );
+	iNewWide -= 40;
+	iNewTall -= 70;
+	
+	int x, y, wide, tall;
+	GetBounds(x, y, wide, tall);
+
+	SetSize( min( iNewWide, wide ), min( iNewTall, tall ) );
+	SetMinimumSize( min( iNewWide, wide ), min( iNewTall, tall ) );
+
+	// make sure the bottom-right corner is on the screen first
+	if (x + wide > iNewWide)
+	{
+		x = iNewWide - wide;
+	}
+	if (y + tall > iNewTall)
+	{
+		y = iNewTall - tall;
+	}
+
+	// make sure the top-left is visible
+	x = max( 0, x );
+	y = max( 0, y );
+
+	// apply
+	SetPos(x, y);
 }
 
 void CMP3Player::OnCommand( char const *cmd )
