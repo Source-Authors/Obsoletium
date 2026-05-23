@@ -389,6 +389,8 @@ void CAI_NetworkManager::SaveNetworkGraph( void )
 		return;
 	}
 
+	RunCodeAtScopeExit(filesystem->Close( file ));
+
 	// ---------------------------
 	// Save the version number
 	// ---------------------------
@@ -459,8 +461,6 @@ void CAI_NetworkManager::SaveNetworkGraph( void )
 	{
 		filesystem->FPrintf( file, "%4d\n",m_pNodeIndexTable[node]);
 	}
-
-	filesystem->Close(file);
 }
 */
 
