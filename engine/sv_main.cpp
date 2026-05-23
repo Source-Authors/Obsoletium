@@ -733,6 +733,7 @@ bool ServerDLL_Load( bool bIsServerOnly )
 {
 	// Load in the game .dll
 	LoadEntityDLLs( GetBaseDirectory(), bIsServerOnly );
+	// dimhotepus: Correctly report server game DLL loaded or not.
 	return serverGameDLL != nullptr;
 }
 
