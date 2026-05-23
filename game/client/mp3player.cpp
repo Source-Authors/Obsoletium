@@ -1072,11 +1072,6 @@ intp CMP3Player::AddFileToDirectoryTree( SoundDirectory_t *dir, char const *rela
 
 void CMP3Player::RecursiveFindMP3Files( SoundDirectory_t *root, char const *current, char const *pathID )
 {
-#if 0
-	if ( m_nFilesAdded >= 200 )
-		return;
-#endif
-
 	char path[ 512 ];
 	if ( !Q_isempty( current ) )
 	{
@@ -1174,11 +1169,6 @@ intp CMP3Player::AddSong( char const *relative, intp dirnum )
 	
 	if ( songIndex == -1 )
 	{
-#if 0
-		if ( m_Files.Count() >= 200 )
-			return -1;
-#endif
-
 		Assert( !Q_stristr( relative, "/" ) );
 
 		MP3File_t f;
