@@ -1180,12 +1180,24 @@ CLIENT SPAWNING
 
 CGameServer::CGameServer()
 {
+	m_szStartspot[0] = '\0';
+	edicts = nullptr;
+	edictchangeinfo = nullptr;
 	m_nMaxClientsLimit = 0;
-	m_pPureServerWhitelist = NULL;
-	m_bHibernating = false;
+	m_pPureServerWhitelist = nullptr;
 	m_bLoadedPlugins = false;
-	V_memset( m_szMapname, 0, sizeof( m_szMapname ) );
-	V_memset( m_szMapFilename, 0, sizeof( m_szMapFilename ) );
+	BitwiseClear( m_szMapname );
+	BitwiseClear( m_szMapFilename );
+	
+	m_pModelPrecacheTable = nullptr;
+	m_pSoundPrecacheTable = nullptr;
+	m_pGenericPrecacheTable = nullptr;
+	m_pDecalPrecacheTable = nullptr;
+
+	m_pDynamicModelsTable = nullptr;
+
+	m_pPureServerWhitelist = nullptr;
+	m_bHibernating = false;
 }
 
 
