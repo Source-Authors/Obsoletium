@@ -1083,7 +1083,7 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 
 						// write the current logo file
 						char szLogoFileName[MAX_PATH]; 
-						Q_strncpy( szLogoFileName, cl_logofile.GetString(), sizeof(szLogoFileName) ); // .vtf file
+						V_strcpy_safe( szLogoFileName, cl_logofile.GetString() ); // .vtf file
 
 						if ( g_pFileSystem->FileExists( szLogoFileName, "MOD" ) )
 						{
@@ -1611,7 +1611,7 @@ char const * Host_CleanupConVarStringValue( char const *invalue )
 {
 	static char clean[ 256 ];
 
-	Q_snprintf( clean, sizeof( clean ), "%s", invalue );
+	V_sprintf_safe( clean, "%s", invalue );
 
 	// Don't mess with empty string
 	// Otherwise, if it appears numeric and has a decimal, try to strip all zeroes after decimal
