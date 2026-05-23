@@ -31,7 +31,7 @@ public:
     void        ResetPassword();
     void        ApplyPassword();
     bool        IsPasswordEnabledInDialog();
-    bool        IsPasswordEnabled()             { return ( m_szGorePW[0] != 0 ); }
+    bool        IsPasswordEnabled()             { return !Q_isempty( m_szGorePW ); }
 
 protected:
 	void			WriteToken( const char *str );

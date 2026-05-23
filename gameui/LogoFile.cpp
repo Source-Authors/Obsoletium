@@ -197,14 +197,14 @@ int GrabMip ( HANDLE hdib, unsigned char *lump_p, char *lumpname, COLORREF crf, 
 void UpdateLogoWAD( void *phdib, int r, int g, int b )
 {
 	char logoname[ 32 ];
-	char *pszName;
 	V_strcpy_safe( logoname, "LOGO" );
-	pszName = &logoname[ 0 ];
+
+	char *pszName = &logoname[ 0 ];
 
 	HANDLE hdib = (HANDLE)phdib;
 	COLORREF crf = RGB( r, g, b );
 
-	if ((!pszName) || (pszName[0] == 0) || (hdib == NULL))
+	if ( Q_isempty(pszName) || hdib == NULL )
 		return;
 	// Generate lump
 

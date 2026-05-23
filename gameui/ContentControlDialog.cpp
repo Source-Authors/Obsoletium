@@ -163,7 +163,7 @@ void CContentControlDialog::OnCommand( const char *command )
 		m_pPassword2->GetText( pw2 );
 
         // Get text and check
-//        bool enabled = PasswordEnabled(); //( m_szGorePW[0]!=0 ) ? true : false;
+//        bool enabled = PasswordEnabled(); //( m_szGorePW[0] != 0 ) ? true : false;
 //		bool pwMatch = stricmp( pw1, pw2 ) == 0 ? true : false;
 
         if (IsPasswordEnabledInDialog())
@@ -377,7 +377,7 @@ bool CContentControlDialog::DisablePassword(const char *oldPW)
 //-----------------------------------------------------------------------------
 bool CContentControlDialog::IsPasswordEnabledInDialog()
 {
-    return m_szGorePW[0] != 0;
+    return !Q_isempty( m_szGorePW );
 }
 
 //-----------------------------------------------------------------------------
@@ -385,7 +385,7 @@ bool CContentControlDialog::IsPasswordEnabledInDialog()
 //-----------------------------------------------------------------------------
 void CContentControlDialog::UpdateContentControlStatus( void )
 {
-	bool enabled = IsPasswordEnabledInDialog(); //( m_szGorePW[0]!=0 ) ? true : false;
+	bool enabled = IsPasswordEnabledInDialog(); //( m_szGorePW[0] != 0 ) ? true : false;
 	m_pStatus->SetText( enabled ? "#GameUI_ContentStatusEnabled" : "#GameUI_ContentStatusDisabled" );
 
     if (enabled)
