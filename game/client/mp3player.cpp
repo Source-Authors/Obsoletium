@@ -86,13 +86,14 @@ static ConCommand mp3( "mp3", mp3_f, "Show/hide mp3 player UI." );
 
 
 // Purpose: This assumes artist/album/file.mp3!!!
-static bool SplitArtistAlbum( char const *relative, char *artist, size_t artistlen, char *album, size_t albumlen )
+template<size_t artistlen, size_t albumlen>
+static bool SplitArtistAlbum( char const *relative, OUT_Z_ARRAY char (&artist)[artistlen], OUT_Z_ARRAY char (&album)[albumlen] )
 {
-	artist[ 0 ] = 0;
-	album[ 0 ] = 0;
+	artist[ 0 ] = '\0';
+	album[ 0 ] = '\0';
 
 	char str[ 512 ];
-	Q_strncpy( str, relative, sizeof( str ) );
+	V_strcpy_safe( str, relative );
 
 	char seps[] = "/\\";
 	char *p = strtok( str, seps );
@@ -104,16 +105,16 @@ static bool SplitArtistAlbum( char const *relative, char *artist, size_t artistl
 		default:
 			break;
 		case 0:
-			Q_strncpy( artist, p, artistlen );
+			V_strcpy_safe( artist, p );
 			break;
 		case 1:
-			Q_strncpy( album, p, albumlen );
+			V_strcpy_safe( album, p );
 			break;
 		case 2:
 			if ( !Q_stristr( p, ".mp3" ) )
 			{
-				artist[ 0 ] = 0;
-				album[ 0 ] = 0;
+				artist[ 0 ] = '\0';
+				album[ 0 ] = '\0';
 				return false;
 			}
 			return true;
@@ -181,7 +182,7 @@ public:
 		{
 			char artist[ 256 ];
 			char album[ 256 ];
-			if ( SplitArtistAlbum( fn, artist, sizeof( artist ), album, sizeof( album ) ) )
+			if ( SplitArtistAlbum( fn, artist, album ) )
 			{
 				kv->SetString( "Artist", artist );
 				kv->SetString( "Album", album );
@@ -331,7 +332,7 @@ public:
 		{
 			char artist[ 256 ];
 			char album[ 256 ];
-			if ( SplitArtistAlbum( fn, artist, sizeof( artist ), album, sizeof( album ) ) )
+			if ( SplitArtistAlbum( fn, artist, album ) )
 			{
 				kv->SetString( "Artist", artist );
 				kv->SetString( "Album", album );
