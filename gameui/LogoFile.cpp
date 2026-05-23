@@ -78,7 +78,7 @@ filename MIP x y width height
 must be multiples of sixteen
 ==============
 */
-int GrabMip ( HANDLE hdib, unsigned char *lump_p, char *lumpname, COLORREF crf, int *width, int *height)
+static int GrabMip ( HANDLE hdib, unsigned char *lump_p, const char *lumpname, COLORREF crf, int *width, int *height)
 {
 	int             i,x,y,xl,yl,xh,yh,w,h;
 	unsigned char   *screen_p, *source;
@@ -264,7 +264,7 @@ void UpdateLogoWAD( void *phdib, int r, int g, int b )
 	// Write info table
 	buffer.Put( &info, sizeof( lumpinfo_t ) );
 
-	int savepos = buffer.TellPut();
+	intp savepos = buffer.TellPut();
 
 	buffer.SeekPut( CUtlBuffer::SEEK_HEAD, 0 );
 
