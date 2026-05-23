@@ -463,6 +463,8 @@ void CSlideshowDisplay::BuildSlideShowImagesList( void )
 			V_strcpy_safe( szMatFileName, pMatFileName );
 	}
 
+	RunCodeAtScopeExit( g_pFullFileSystem->FindClose( matHandle ) );
+
 	int iSlideIndex = 0;
 
 	while ( szMatFileName[ 0 ] )
@@ -547,6 +549,4 @@ void CSlideshowDisplay::BuildSlideShowImagesList( void )
 
 		++iSlideIndex;
 	}
-
-	g_pFullFileSystem->FindClose( matHandle );
 }
