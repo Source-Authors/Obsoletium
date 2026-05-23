@@ -1347,7 +1347,7 @@ void CMP3Player::PlaySong( intp songIndex, float skipTime /*= 0.0f */ )
 	char soundname[ 512 ];
 	soundname[ 0 ] = 0;
 
-	if ( song.playbackfilename == (FileNameHandle_t)0 )
+	if ( !song.playbackfilename )
 	{
 		GetLocalCopyOfSong( song, soundname );
 		if ( !soundname[ 0 ] )
