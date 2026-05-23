@@ -120,7 +120,7 @@ bool CCommEditDoc::LoadFromFile( const char *pFileName )
 	// If we loaded an existing commentary file, keep the same filename.
 	// If we loaded a .bsp, change the name & the extension.
 	// dimhotepus: Check file extension exists.
-	if ( pszFileExt && !V_stricmp( pszFileExt, "bsp" ) ) //-V1051
+	if ( pszFileExt && V_strieq( pszFileExt, "bsp" ) ) //-V1051
 	{
 		const char *pCommentaryAppend = "_commentary.txt";
 		Q_StripExtension( pFileName, m_pTXTFileName, sizeof(m_pTXTFileName)- strlen(pCommentaryAppend) - 1 );
@@ -380,7 +380,7 @@ bool CCommEditDoc::GetStringChoiceList( const char *pChoiceListType, [[maybe_unu
 			if ( !pNode )
 				continue;
 
-			if ( !V_stricmp( pNode->GetClassName(), "info_target" ) )
+			if ( V_strieq( pNode->GetClassName(), "info_target" ) )
 			{
 				sChoice.m_pValue = pNode->GetTargetName();
 				sChoice.m_pChoiceString = pNode->GetTargetName();
@@ -414,7 +414,7 @@ bool CCommEditDoc::GetElementChoiceList( const char *pChoiceListType, [[maybe_un
 		for ( intp i = 0; i < nCount; ++i )
 		{
 			CDmeCommentaryNodeEntity *pNode = entities[ i ];
-			if ( pNode && !V_stricmp( pNode->GetClassName(), "info_target" ) )
+			if ( pNode && V_strieq( pNode->GetClassName(), "info_target" ) )
 			{
 				bFound = true;
 				ElementChoice_t sChoice;

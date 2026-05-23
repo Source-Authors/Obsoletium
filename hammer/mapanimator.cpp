@@ -116,18 +116,18 @@ bool CMapAnimator::GetTransformMatrix( VMatrix& matrix )
 //-----------------------------------------------------------------------------
 void CMapAnimator::OnParentKeyChanged( const char* key, const char* value )
 {
-	if ( !stricmp(key, "TimeModifier") )
+	if ( V_strieq(key, "TimeModifier") )
 	{
 		m_iTimeModifier = atoi( value );
 	}
-	else if ( !stricmp(key, "PositionInterpolator") )
+	else if ( V_strieq(key, "PositionInterpolator") )
 	{
 		m_iPositionInterpolator = atoi( value );
 
 		// HACK: Force everything in the path to update. Better to follow our path and update only it.
 		UpdateAllDependencies(this);
 	}
-	else if ( !stricmp(key, "RotationInterpolator") )
+	else if ( V_strieq(key, "RotationInterpolator") )
 	{
 		m_iRotationInterpolator = atoi( value );
 	}

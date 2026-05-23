@@ -913,15 +913,15 @@ bool CEconTool_ItemDynamicRecipe::CDynamicRecipeComponentLootList::ParseKV( KeyV
 	// By default, outputs try to avoid rolling as input, and inputs dont try to avoid anything
 	m_eUniqueness = GetIsOutput() ? UNIQUE_AMONG_INPUTS : UNIQUE_AMONG_NOTHING;
 	const char* pszUniqueness = pKV->GetString( "uniqueness" );
-	if ( !V_stricmp( "unique_among_inputs", pszUniqueness ) )
+	if ( V_strieq( "unique_among_inputs", pszUniqueness ) )
 	{
 		m_eUniqueness = UNIQUE_AMONG_INPUTS;
 	}
-	else if ( !V_stricmp( "unique_among_outputs", pszUniqueness ) )
+	else if ( V_strieq( "unique_among_outputs", pszUniqueness ) )
 	{
 		m_eUniqueness = UNIQUE_AMONG_OUTPUTS;
 	}
-	else if ( !V_stricmp( "unique_among_everything", pszUniqueness ) )
+	else if ( V_strieq( "unique_among_everything", pszUniqueness ) )
 	{
 		m_eUniqueness = UNIQUE_AMONG_EVERYTHING;
 	}
@@ -1233,11 +1233,11 @@ bool CEconTool_ItemDynamicRecipe::CBaseRecipeComponent::ParseKV( KeyValues *pKV,
 	const char* pszAttributesMatchingType = pKV->GetString( "attributes_matching_type", NULL );
 	if ( pszAttributesMatchingType )
 	{
-		if ( !V_stricmp( pszAttributesMatchingType, "all" ) )
+		if ( V_strieq( pszAttributesMatchingType, "all" ) )
 		{
 			m_attributesMatchingType = ATTRIBUTES_MATCH_ALL;
 		}
-		else if ( !V_stricmp( pszAttributesMatchingType, "any" ) )
+		else if ( V_strieq( pszAttributesMatchingType, "any" ) )
 		{
 			m_attributesMatchingType = ATTRIBUTES_MATCH_ANY;
 		}

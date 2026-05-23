@@ -236,7 +236,7 @@ const char *GDclass::GetDescription(void) const
 bool GDclass::IsClass(const char *pszClass) const
 {
 	Assert(pszClass != NULL);
-	return(!stricmp(pszClass, m_szName));
+	return(V_strieq(pszClass, m_szName));
 }
 
 

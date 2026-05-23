@@ -60,7 +60,7 @@ CSaveGameDialog::~CSaveGameDialog()
 //-----------------------------------------------------------------------------
 void CSaveGameDialog::OnCommand( const char *command )
 {
-	if ( !stricmp( command, "loadsave" )  )
+	if ( V_strieq( command, "loadsave" )  )
 	{
 		intp saveIndex = GetSelectedItemSaveIndex();
 		if ( m_SaveGames.IsValidIndex(saveIndex) )
@@ -83,7 +83,7 @@ void CSaveGameDialog::OnCommand( const char *command )
 			}
 		}
 	}
-	else if ( !stricmp( command, "SaveOverwriteConfirmed" ) )
+	else if ( V_strieq( command, "SaveOverwriteConfirmed" ) )
 	{
 		// dimhotepus: This can take a while, put up a waiting cursor.
 		const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};

@@ -948,7 +948,7 @@ void CrosshairImagePanelAdvanced::InitAdvCrosshairStyleList()
 				if ( !Q_isempty( crosshairfile ) )
 				{
 					V_sprintf_safe( filename, "materials/vgui/crosshairs/%s", fn );
-					if (!stricmp(filename, crosshairfile))
+					if (V_strieq(filename, crosshairfile))
 					{
 						if ( ModInfo().AdvCrosshairLevel() == 1 )
 						{
@@ -1194,7 +1194,7 @@ COptionsSubMultiplayer::~COptionsSubMultiplayer()
 //-----------------------------------------------------------------------------
 void COptionsSubMultiplayer::OnCommand( const char *command )
 {
-	if ( !stricmp( command, "Advanced" ) )
+	if ( V_strieq( command, "Advanced" ) )
 	{
 #ifndef _XBOX
 		if (!m_hMultiplayerAdvancedDialog.Get())
@@ -1204,7 +1204,7 @@ void COptionsSubMultiplayer::OnCommand( const char *command )
 		m_hMultiplayerAdvancedDialog->Activate();
 #endif
 	}
-	else if (!stricmp( command, "ImportSprayImage" ) )
+	else if (V_strieq( command, "ImportSprayImage" ) )
 	{
 		if (m_hImportSprayDialog == NULL)
 		{
@@ -1226,7 +1226,7 @@ void COptionsSubMultiplayer::OnCommand( const char *command )
 		m_hImportSprayDialog->Activate();
 	}
 
-	else if ( !stricmp( command, "ResetStats" ) )
+	else if ( V_strieq( command, "ResetStats" ) )
 	{
 		QueryBox *box = new QueryBox("#GameUI_ConfirmResetStatsTitle", "#GameUI_ConfirmResetStatsText", this);
 		box->SetOKButtonText("#GameUI_Reset");
@@ -1236,7 +1236,7 @@ void COptionsSubMultiplayer::OnCommand( const char *command )
 		box->DoModal();
 	}
 
-	else if ( !stricmp( command, "ResetStats_NoConfirm" ) )
+	else if ( V_strieq( command, "ResetStats_NoConfirm" ) )
 	{
 		engine->ClientCmd_Unrestricted("stats_reset");
 	}
@@ -1446,7 +1446,7 @@ void FindVMTFilesInFolder( const char *pFolder, const char *pFolderName, CLabele
 
 	while ( fn )
 	{
-		if ( !stricmp( fn, ".") || !stricmp( fn, "..") )
+		if ( V_strieq( fn, ".") || V_strieq( fn, "..") )
 		{
 			fn = g_pFullFileSystem->FindNext( fh );
 			continue;
@@ -1496,7 +1496,7 @@ void FindVMTFilesInFolder( const char *pFolder, const char *pFolderName, CLabele
 				V_FileBase( modelfile, realname );
 				V_FileBase( filename, filename );
 				
-				if (!stricmp(filename, realname))
+				if (V_strieq(filename, realname))
 				{
 					iInitialItem = iCount;
 				}

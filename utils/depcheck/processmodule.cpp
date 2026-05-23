@@ -46,7 +46,7 @@ void CCodeProcessor::AddHeader( int depth, const char *filename, const char *roo
 	// Check header list
 	for ( int i = 0; i < m_nHeaderCount; i++ )
 	{
-		if ( !stricmp( m_Headers[ i ].name, filename ) )
+		if ( V_strieq( m_Headers[ i ].name, filename ) )
 		{
 			vprint( 0, "%s included twice in module %s\n", filename, rootmodule );
 			return;
@@ -202,7 +202,7 @@ retry:
 	// Check module list
 	for ( int i = 0; i < m_nModuleCount; i++ )
 	{
-		if ( !stricmp( m_Modules[ i ].name, filename ) )
+		if ( V_strieq( m_Modules[ i ].name, filename ) )
 		{
 			if ( forcequiet )
 			{
@@ -266,7 +266,7 @@ retry:
 		if ( strlen( com_token ) <= 0 )
 			break;
 
-		if ( !stricmp( com_token, "#include" ) )
+		if ( V_strieq( com_token, "#include" ) )
 		{
 			startofline = current - strlen( "#include" );
 
@@ -283,7 +283,7 @@ retry:
 				bool dobuild = true;
 				if ( firstheader )
 				{
-					if ( !stricmp( com_token, "cbase.h" ) )
+					if ( V_strieq( com_token, "cbase.h" ) )
 					{
 						dobuild = false;
 					}

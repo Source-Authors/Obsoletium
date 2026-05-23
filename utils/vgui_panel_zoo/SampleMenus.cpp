@@ -367,7 +367,7 @@ void SampleMenus::OnCommand( const char *command )
 {
 	// Hitting the button will toggle the checking and unchecking 
 	// of the first item of menu3
-	if (!stricmp(command, "Check"))
+	if (V_strieq(command, "Check"))
 	{
 		if (!m_pMenu3->GetMenuItem(0)->IsChecked())
 			// check the first menu item in the first menu

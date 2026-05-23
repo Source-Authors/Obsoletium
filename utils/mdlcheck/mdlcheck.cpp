@@ -106,7 +106,7 @@ void BuildFileList_R( CUtlVector< CUtlSymbol >& files, char const *dir, char con
 				if ( strstr( wfd.cFileName, ".360." ) )
 				{
 				}
-				else if ( !stricmp( &wfd.cFileName[ len - extlen ], extension ) )
+				else if ( V_strieq( &wfd.cFileName[ len - extlen ], extension ) )
 				{
 					char filename[ MAX_PATH ];
 					Q_snprintf( filename, sizeof( filename ), "%s\\%s", dir, wfd.cFileName );

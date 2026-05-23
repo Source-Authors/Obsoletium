@@ -57,7 +57,7 @@ BEGIN_VS_SHADER( Portal_DX90,
 				// prevent unused rt access
 				IMaterialVar* pNameVar = params[BASETEXTURE];
 				const char *pStringValue = pNameVar->GetStringValue();
-				if ( !V_stricmp( pStringValue, "_rt_portal1" ) || !V_stricmp( pStringValue, "_rt_portal2" ) )
+				if ( V_strieq( pStringValue, "_rt_portal1" ) || V_strieq( pStringValue, "_rt_portal2" ) )
 				{
 					pNameVar->SetStringValue( "white" );
 				}

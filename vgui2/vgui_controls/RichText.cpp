@@ -2262,7 +2262,7 @@ void RichText::OnSliderMoved()
 //-----------------------------------------------------------------------------
 bool RichText::RequestInfo(KeyValues *outputData)
 {
-	if (!stricmp(outputData->GetName(), "GetText"))
+	if (V_strieq(outputData->GetName(), "GetText"))
 	{
 		wchar_t wbuf[512];
 		GetText(0, wbuf);

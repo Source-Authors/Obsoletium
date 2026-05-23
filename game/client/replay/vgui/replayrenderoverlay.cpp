@@ -328,7 +328,7 @@ void CReplayRenderOverlay::OnKeyCodeTyped( vgui::KeyCode nCode )
 
 void CReplayRenderOverlay::OnCommand( const char *pCommand )
 {
-	if ( !V_stricmp( pCommand, "confirmcancel" ) )
+	if ( V_strieq( pCommand, "confirmcancel" ) )
 	{
 		ShowConfirmDialog( "#Replay_CancelRenderTitle", "#Replay_ConfirmCancelRender", "#Replay_YesCancel", "#Replay_No", OnRenderCancelDialogButtonPressed, this, NULL, "replay\\replaydialog_warn.wav" );
 		return;

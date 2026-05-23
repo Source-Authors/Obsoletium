@@ -55,7 +55,7 @@ CLoadGameDialog::~CLoadGameDialog()
 //-----------------------------------------------------------------------------
 void CLoadGameDialog::OnCommand( const char *command )
 {
-	if ( !stricmp( command, "loadsave" ) )
+	if ( V_strieq( command, "loadsave" ) )
 	{
 		intp saveIndex = GetSelectedItemSaveIndex();
 		if ( m_SaveGames.IsValidIndex(saveIndex) )
@@ -74,7 +74,7 @@ void CLoadGameDialog::OnCommand( const char *command )
 			}
 		}
 	}
-	else if ( !stricmp( command, "Delete" ) )
+	else if ( V_strieq( command, "Delete" ) )
 	{
 		intp saveIndex = GetSelectedItemSaveIndex();
 		if ( m_SaveGames.IsValidIndex(saveIndex) )
@@ -88,7 +88,7 @@ void CLoadGameDialog::OnCommand( const char *command )
 			box->DoModal();
 		}
 	}
-	else if ( !stricmp( command, "DeleteConfirmed" ) )
+	else if ( V_strieq( command, "DeleteConfirmed" ) )
 	{
 		intp saveIndex = GetSelectedItemSaveIndex();
 		if ( m_SaveGames.IsValidIndex(saveIndex) )

@@ -224,7 +224,7 @@ bool CReportPlayerDialog::IsValidPlayerSelected()
 //-----------------------------------------------------------------------------
 void CReportPlayerDialog::OnCommand( const char *command )
 {
-	if ( !stricmp( command, "Report" ) )
+	if ( V_strieq( command, "Report" ) )
 	{
 		ReportPlayer();
 	}

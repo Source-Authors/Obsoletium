@@ -193,7 +193,7 @@ bool CDmxEdit::Load( const char *pFilename, const CObjType &loadType /* = DIST_A
 			LuaWarning( "Cannot Find A DmeModel As Element Dme Root Object: %s in %s", m_pRoot->GetName(), pFilename );
 		}
 	}
-	else if ( sLen > 4 && !V_stricmp( pFilename + sLen - 4, ".smd" ) )
+	else if ( sLen > 4 && V_strieq( pFilename + sLen - 4, ".smd" ) )
 	{
 		m_pRoot = CDmSmdSerializer().ReadSMD( pFilename, &m_pMesh );
 

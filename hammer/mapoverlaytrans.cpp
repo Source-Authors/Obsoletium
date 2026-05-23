@@ -146,7 +146,7 @@ CMapClass *CMapOverlayTransition::CopyFrom( CMapClass *pObject, bool bUpdateDepe
 void CMapOverlayTransition::OnParentKeyChanged( const char* szKey, const char* szValue )
 {
 	// Material data.
-	if ( !stricmp( szKey, "material" ) )
+	if ( V_strieq( szKey, "material" ) )
 	{
 		IEditorTexture *pTex = g_Textures.FindActiveTexture( szValue );
 		if ( pTex )
@@ -156,41 +156,41 @@ void CMapOverlayTransition::OnParentKeyChanged( const char* szKey, const char* s
 	}
 
 	// Texture data.
-	if ( !stricmp( szKey, "LengthTexcoordStart" ) )	
+	if ( V_strieq( szKey, "LengthTexcoordStart" ) )	
 	{ 
 		// dimhotepus: atof -> V_atof
 		m_ShoreData.m_vecLengthTexcoord[0] = V_atof( szValue );
 	}
-	if ( !stricmp( szKey, "LengthTexcoordEnd" ) )	
+	if ( V_strieq( szKey, "LengthTexcoordEnd" ) )	
 	{ 
 		// dimhotepus: atof -> V_atof
 		m_ShoreData.m_vecLengthTexcoord[1] = V_atof( szValue );
 	}
-	if ( !stricmp( szKey, "WidthTexcoordStart" ) )	
+	if ( V_strieq( szKey, "WidthTexcoordStart" ) )	
 	{ 
 		// dimhotepus: atof -> V_atof
 		m_ShoreData.m_vecWidthTexcoord[0] = V_atof( szValue );
 	}
-	if ( !stricmp( szKey, "WidthTexcoordEnd" ) )	
+	if ( V_strieq( szKey, "WidthTexcoordEnd" ) )	
 	{ 
 		// dimhotepus: atof -> V_atof
 		m_ShoreData.m_vecWidthTexcoord[1] = V_atof( szValue );
 	}
 
 	// Width data.
-	if ( !stricmp( szKey, "Width1" ) )	
+	if ( V_strieq( szKey, "Width1" ) )	
 	{ 
 		// dimhotepus: atof -> V_atof
 		m_ShoreData.m_flWidths[0] = V_atof( szValue );
 	}
-	if ( !stricmp( szKey, "Width2" ) )	
+	if ( V_strieq( szKey, "Width2" ) )	
 	{ 
 		// dimhotepus: atof -> V_atof
 		m_ShoreData.m_flWidths[1] = V_atof( szValue );
 	}
 
 	// Debug data.
-	if ( !stricmp( szKey, "DebugDraw" ) )
+	if ( V_strieq( szKey, "DebugDraw" ) )
 	{
 		m_bDebugDraw = true;
 		if ( atoi( szValue ) == 0 )
@@ -279,7 +279,7 @@ bool CMapOverlayTransition::BuildFaceCaches( void )
 			if ( pSideList )
 			{
 				// Check name.
-				if ( !stricmp( "sides" ,pSideList->GetKeyName() ) )
+				if ( V_strieq( "sides" ,pSideList->GetKeyName() ) )
 				{
 					intp nFaceCount = pSideList->GetFaceCount();
 					for ( intp iFace = 0; iFace < nFaceCount; ++iFace )
@@ -287,7 +287,7 @@ bool CMapOverlayTransition::BuildFaceCaches( void )
 						m_aFaceCache1.AddToTail( pSideList->GetFace( iFace ) );
 					}
 				}
-				else if ( !stricmp( "sides2", pSideList->GetKeyName() ) )
+				else if ( V_strieq( "sides2", pSideList->GetKeyName() ) )
 				{
 					intp nFaceCount = pSideList->GetFaceCount();
 					for ( intp iFace = 0; iFace < nFaceCount; ++iFace )

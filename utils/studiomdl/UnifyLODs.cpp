@@ -519,7 +519,7 @@ static s_mesh_t *FindOrCullMesh( int nLodID, s_source_t *pSrc, int nMaterialID )
 		const char *pMeshRemovalName = g_ScriptLODs[nLodID].meshRemovals[i].GetSrcName();
 		Q_FileBase( pMeshRemovalName, baseRemovalName );
 
-		if (!stricmp( baseRemovalName, baseMeshName ))
+		if (V_strieq( baseRemovalName, baseMeshName ))
 		{
 			// mesh has been marked for removal
 			return NULL;

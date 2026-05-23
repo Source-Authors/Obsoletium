@@ -246,7 +246,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString( const char *name, bool bCreate 
 	{
 		// dimhotepus: Precache in var for easy debugging.
 		const char *nameForIndex = static_cast<const char *>(m_Strings.GetBase()) + item->stringIndex;
-		if (!stricmp(name, nameForIndex))
+		if (V_strieq(name, nameForIndex))
 		{
 			return (HKeySymbol)item->stringIndex;
 		}

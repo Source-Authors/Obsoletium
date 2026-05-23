@@ -398,7 +398,7 @@ int CSentence::LanguageForName( char const *name )
 	{
 		CCLanguage *entry = &g_CCLanguageLookup[ l ];
 		Assert( entry->type == l );
-		if ( !stricmp( entry->name, name ) )
+		if ( V_strieq( entry->name, name ) )
 			return l;
 	}
 	return -1;
@@ -587,7 +587,7 @@ void CSentence::ParseCloseCaption( CUtlBuffer& buf )
 			V_strcpy_safe( cc_type, token );
 
 			bool unicode = false;
-			if ( !stricmp( cc_type, "unicode" ) )
+			if ( V_strieq( cc_type, "unicode" ) )
 			{
 				unicode = true;
 			}
@@ -674,25 +674,25 @@ void CSentence::ParseDataVersionOnePointZero( CUtlBuffer& buf )
 		if ( token[0] != '{' )
 			break;
 
-		if ( !stricmp( section, "PLAINTEXT" ) )
+		if ( V_strieq( section, "PLAINTEXT" ) )
 		{
 			ParsePlaintext( buf );
 		}
-		else if ( !stricmp( section, "WORDS" ) )
+		else if ( V_strieq( section, "WORDS" ) )
 		{
 			ParseWords( buf );
 		}
-		else if ( !stricmp( section, "EMPHASIS" ) )
+		else if ( V_strieq( section, "EMPHASIS" ) )
 		{
 			ParseEmphasis( buf );
 		}		
-		else if ( !stricmp( section, "CLOSECAPTION" ) )
+		else if ( V_strieq( section, "CLOSECAPTION" ) )
 		{
 			// NOTE:  CLOSECAPTION IS NO LONGER VALID
 			// This just skips the section of data.
 			ParseCloseCaption( buf );
 		}
-		else if ( !stricmp( section, "OPTIONS" ) )
+		else if ( V_strieq( section, "OPTIONS" ) )
 		{
 			ParseOptions( buf );
 		}

@@ -86,14 +86,14 @@ public:
 
 	virtual void OnCommandSubmitted( const char *pszCommand )
 	{
-		if ( !V_stricmp( pszCommand, "quit" ) )
+		if ( V_strieq( pszCommand, "quit" ) )
 		{
 			if ( g_hMainFrame )
 				g_hMainFrame->Close();
 
 			Close();
 		}
-		else if ( !V_stricmp( pszCommand, "help" ) )
+		else if ( V_strieq( pszCommand, "help" ) )
 		{
 			__s_ApplicationObject.PrintHelp();
 		}
@@ -312,7 +312,7 @@ SpewRetval_t ConsoleDialogSpewFunc( SpewType_t spewType, const tchar *pMsg )
 	case SPEW_MESSAGE:
 		{
 			Color c = *GetSpewOutputColor();
-			if ( !V_stricmp( GetSpewOutputGroup(), "developer" ) )
+			if ( V_strieq( GetSpewOutputGroup(), "developer" ) )
 			{
 				pConsole->Print( pMsg );
 			}

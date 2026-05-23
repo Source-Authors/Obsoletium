@@ -55,7 +55,7 @@ const char *Info_ValueForKey ( const char *s, const char *key )
 		}
 		*o = 0;
 
-		if (!stricmp(key, pkey) )
+		if (V_strieq(key, pkey) )
 			return value[valueindex];
 
 		if (!*s)
@@ -100,7 +100,7 @@ void Info_RemoveKey ( char *s, const char *key )
 		}
 		*o = 0;
 
-		if (!stricmp (key, pkey) )
+		if (V_strieq (key, pkey) )
 		{
 			// This is safe because we're copying within the same string
 			Q_strcpy (start, s);	// remove this part
@@ -160,7 +160,7 @@ bool Info_IsKeyImportant( const char *key )
 {
 	if ( key[0] == '*' )
 		return true;
-	if ( !stricmp( key, "tracker" ) )
+	if ( V_strieq( key, "tracker" ) )
 		return true;
 
 	return false;

@@ -174,13 +174,13 @@ void CDmeEditorType::OnDestruction()
 const char *CDmeEditorType::GetActualAttributeName( const char *pAttributeName )
 {
 	// Fixup the names of the attribute info for the 3 standard fields (name, type, id)
-	if ( !V_stricmp( "name", pAttributeName ) )
+	if ( V_strieq( "name", pAttributeName ) )
 		return "__name";
 
-	if ( !V_stricmp( "id", pAttributeName ) )
+	if ( V_strieq( "id", pAttributeName ) )
 		return "__id";
 
-	if ( !V_stricmp( "type", pAttributeName ) )
+	if ( V_strieq( "type", pAttributeName ) )
 		return "__type";
 
 	return pAttributeName;

@@ -2478,7 +2478,7 @@ void UTIL_LoadActivityRemapFile( const char *filename, const char *section, CUtl
 					const char *pKeyName = pRemapKey->GetName();
 					const char *pKeyValue = pRemapKey->GetString();
 
-					if ( !stricmp( pKeyName, "remapactivity" ) )
+					if ( V_strieq( pKeyName, "remapactivity" ) )
 					{
 						Activity Act = (Activity)ActivityList_IndexForName( pKeyValue );
 
@@ -2491,7 +2491,7 @@ void UTIL_LoadActivityRemapFile( const char *filename, const char *section, CUtl
 							actMap.mappedActivity = Act;
 						}
 					}
-					else if ( !stricmp( pKeyName, "extra" ) )
+					else if ( V_strieq( pKeyName, "extra" ) )
 					{
 						actMap.SetExtraKeyValueBlock( pRemapKey->MakeCopy() );
 					}

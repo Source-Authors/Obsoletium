@@ -63,7 +63,7 @@ void CImportSFMV8::FixupElement( CDmElement *pElement )
 
 	const char *pType = pElement->GetTypeString();
 
-	if ( !V_stricmp( pType, "DmeAnimationSet" ) )
+	if ( V_strieq( pType, "DmeAnimationSet" ) )
 	{
 		// Remove 'midpoint' from all controls, and 
 		// Add 'defaultBalance' and 'defaultMultilevel' to all non-transform controls

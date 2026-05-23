@@ -449,7 +449,7 @@ ETFCond GetTFConditionFromName( const char *pszCondName )
 	for( uint i=0; i<TF_COND_LAST; i++ )
 	{ 
 		ETFCond eCond = (ETFCond)i;
-		if ( !V_stricmp( GetTFConditionName( eCond ), pszCondName ) ) 
+		if ( V_strieq( GetTFConditionName( eCond ), pszCondName ) ) 
 			return eCond;
 	} 
 
@@ -915,7 +915,7 @@ ETFDmgCustom GetCustomDamageFromName( const char *pszCustomDmgName )
 	for( uint i=0; i<TF_DMG_CUSTOM_END; i++ )
 	{ 
 		ETFDmgCustom eDmgCustom = (ETFDmgCustom)i;
-		if ( !V_stricmp( GetCustomDamageName( eDmgCustom ), pszCustomDmgName ) ) 
+		if ( V_strieq( GetCustomDamageName( eDmgCustom ), pszCustomDmgName ) ) 
 			return eDmgCustom;
 	} 
 
@@ -1066,7 +1066,7 @@ taunt_attack_t GetTauntAttackByName( const char* pszTauntAttackName )
 	{
 		for ( int i=0; i<ARRAYSIZE( taunt_attack_name ); ++i )
 		{
-			if ( !V_stricmp( pszTauntAttackName, taunt_attack_name[i] ) )
+			if ( V_strieq( pszTauntAttackName, taunt_attack_name[i] ) )
 			{
 				return (taunt_attack_t)i;
 			}
@@ -1467,7 +1467,7 @@ void LoadObjectInfos( IBaseFileSystem *pFileSystem )
 			// Does it make sense to call the below Steam API so it'll force a validation next startup time?
 			// Need to verify it's real corruption and not someone dorking around with their objects.txt file...
 			//
-			// From Martin Otten: If you have a file on disc and you’re 100% sure it’s
+			// From Martin Otten: If you have a file on disc and you're 100% sure it's
 			//  corrupt, call ISteamApps::MarkContentCorrupt( false ), before you shutdown
 			//  the game. This will cause a content validation in Steam.
 

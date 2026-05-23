@@ -290,7 +290,7 @@ void ProgressBox::OnTick()
 //-----------------------------------------------------------------------------
 void ProgressBox::OnCommand(const char *command)
 {
-	if (!stricmp(command, "Cancel"))
+	if (V_strieq(command, "Cancel"))
 	{
 		OnCancel();
 	}

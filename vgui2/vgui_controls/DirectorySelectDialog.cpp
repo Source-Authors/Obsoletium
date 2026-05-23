@@ -93,7 +93,7 @@ public:
 
 	void OnCommand(const char *command) override
 	{
-		if (!stricmp(command, "OK"))
+		if (V_strieq(command, "OK"))
 		{
 			PostActionSignal(new KeyValues("CreateDirectory", "dir", GetControlString("NameEntry")));
 			Close();
@@ -351,7 +351,7 @@ void DirectorySelectDialog::BuildDriveChoices()
 	{
 		kv->SetString("drive", pBuf);
 		int itemID = m_pDriveCombo->AddItem(pBuf, kv);
-		if (!stricmp(pBuf, m_szCurrentDrive))
+		if (V_strieq(pBuf, m_szCurrentDrive))
 		{
 			m_pDriveCombo->ActivateItem(itemID);
 		}
@@ -553,11 +553,11 @@ void DirectorySelectDialog::OnClose()
 //-----------------------------------------------------------------------------
 void DirectorySelectDialog::OnCommand(const char *command)
 {
-	if (!stricmp(command, "Cancel"))
+	if (V_strieq(command, "Cancel"))
 	{
 		Close();
 	}
-	else if (!stricmp(command, "Select"))
+	else if (V_strieq(command, "Select"))
 	{
 		// path selected
 		intp selectedIndex = m_pDirTree->GetFirstSelectedItem();
@@ -569,7 +569,7 @@ void DirectorySelectDialog::OnCommand(const char *command)
 			Close();
 		}
 	}
-	else if (!stricmp(command, "Create"))
+	else if (V_strieq(command, "Create"))
 	{
 		intp selectedIndex = m_pDirTree->GetFirstSelectedItem();
 		if (m_pDirTree->IsItemIDValid(selectedIndex))

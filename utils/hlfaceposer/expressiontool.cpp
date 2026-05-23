@@ -3286,14 +3286,14 @@ void ExpressionTool::OnNewExpression( void )
 		return;
 
 	if ( ( Q_isempty( params.m_szName ) ) ||
-		!stricmp( params.m_szName, "unnamed" ) )
+		V_strieq( params.m_szName, "unnamed" ) )
 	{
 		Con_ErrorPrintf( "You must type in a valid name\n" );
 		return;
 	}
 
 	if ( ( Q_isempty( params.m_szDescription ) ) ||
-   	   !stricmp( params.m_szDescription, "description" ) )
+   	   V_strieq( params.m_szDescription, "description" ) )
 	{
 		Con_ErrorPrintf( "You must type in a valid description\n" );
 		return;

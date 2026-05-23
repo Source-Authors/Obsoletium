@@ -288,7 +288,7 @@ bool CMapSphere::HitTest2D(CMapView2D *pView, const Vector2D &point, HitInfo_t &
 //-----------------------------------------------------------------------------
 void CMapSphere::OnParentKeyChanged(const char *szKey, const char *szValue)
 {
-	if (!stricmp(szKey, m_szKeyName))
+	if (V_strieq(szKey, m_szKeyName))
 	{
 		// dimhotepus: atof -> V_atof
 		m_flRadius = V_atof(szValue);

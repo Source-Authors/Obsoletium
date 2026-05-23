@@ -2390,7 +2390,7 @@ int EntryInTable( CSaveRestoreData *pSaveData, const char *pMapName, int index )
 	index++;
 	for ( int i = index; i < pSaveData->levelInfo.connectionCount; i++ )
 	{
-		if ( !stricmp( pSaveData->levelInfo.levelList[i].mapName, pMapName ) )
+		if ( V_strieq( pSaveData->levelInfo.levelList[i].mapName, pMapName ) )
 			return i;
 	}
 
@@ -2410,7 +2410,7 @@ void LandmarkOrigin( CSaveRestoreData *pSaveData, Vector& output, const char *pL
 
 	for ( i = 0; i < pSaveData->levelInfo.connectionCount; i++ )
 	{
-		if ( !stricmp( pSaveData->levelInfo.levelList[i].landmarkName, pLandmarkName ) )
+		if ( V_strieq( pSaveData->levelInfo.levelList[i].landmarkName, pLandmarkName ) )
 		{
 			VectorCopy( pSaveData->levelInfo.levelList[i].vecLandmarkOrigin, output );
 			return;
@@ -2457,7 +2457,7 @@ void CSaveRestore::LoadAdjacentEnts( const char *pOldLevel, const char *pLandmar
 		for ( test = 0; test < i; test++ )
 		{
 			// Only do maps once
-			if ( !stricmp( mapName, levelList[test].mapName ) )
+			if ( V_strieq( mapName, levelList[test].mapName ) )
 				break;
 		}
 		// Map was already in the list
@@ -2481,7 +2481,7 @@ void CSaveRestore::LoadAdjacentEnts( const char *pOldLevel, const char *pLandmar
 			LandmarkOrigin( pSaveData, pSaveData->levelInfo.vecLandmarkOffset, pLandmarkName );
 
 			VectorSubtract( landmarkOrigin, pSaveData->levelInfo.vecLandmarkOffset, pSaveData->levelInfo.vecLandmarkOffset );
-			if ( !stricmp( mapName, pOldLevel ) )
+			if ( V_strieq( mapName, pOldLevel ) )
 				flags |= FENTTABLE_PLAYER;
 
 			index = -1;

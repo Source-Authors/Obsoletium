@@ -472,7 +472,7 @@ void WeaponSet::GetCurrent( int& cost, WeaponSet& ws ) const
 		if ( !token || !*token )
 			return;
 
-		if ( !stricmp( token, "PrimaryAmmo" ) )
+		if ( V_strieq( token, "PrimaryAmmo" ) )
 		{
 			if ( primaryWeaponToBuy )
 			{
@@ -501,7 +501,7 @@ void WeaponSet::GetCurrent( int& cost, WeaponSet& ws ) const
 				}
 			}
 		}
-		else if ( !stricmp( token, "SecondaryAmmo" ) )
+		else if ( V_strieq( token, "SecondaryAmmo" ) )
 		{
 			if ( secondaryWeaponToBuy )
 			{

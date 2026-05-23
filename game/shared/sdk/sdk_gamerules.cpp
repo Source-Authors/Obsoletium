@@ -360,7 +360,7 @@ int CSDKGameRules::PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarge
 	if ( !pPlayer || !pTarget || !pTarget->IsPlayer() || IsTeamplay() == false )
 		return GR_NOTTEAMMATE;
 
-	if ( (*GetTeamID(pPlayer) != '\0') && (*GetTeamID(pTarget) != '\0') && !stricmp( GetTeamID(pPlayer), GetTeamID(pTarget) ) )
+	if ( (*GetTeamID(pPlayer) != '\0') && (*GetTeamID(pTarget) != '\0') && V_strieq( GetTeamID(pPlayer), GetTeamID(pTarget) ) )
 		return GR_TEAMMATE;
 
 #endif

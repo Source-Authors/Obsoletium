@@ -737,7 +737,7 @@ void BuildFileList_R( int depth, CUtlVector< FileEntry >& files, CUtlVector< Fil
 		}
 		else
 		{
-			if (!stricmp(wfd.cFileName, "vssver.scc"))
+			if (V_strieq(wfd.cFileName, "vssver.scc"))
 				continue;
 
 			char filename[ MAX_PATH ];

@@ -5240,15 +5240,15 @@ modtype_t CModelLoader::GetTypeFromName( const char *pModelName )
 	const char *pExt = V_GetFileExtension( pModelName );
 	if ( pExt )
 	{
-		if ( !V_stricmp( pExt, "spr" ) || !V_stricmp( pExt, "vmt" )  )
+		if ( V_strieq( pExt, "spr" ) || V_strieq( pExt, "vmt" )  )
 		{
 			return mod_sprite;
 		}
-		else if ( !V_stricmp( pExt, "bsp" ) )
+		else if ( V_strieq( pExt, "bsp" ) )
 		{
 			return mod_brush;
 		}
-		else if ( !V_stricmp( pExt, "mdl" ) )
+		else if ( V_strieq( pExt, "mdl" ) )
 		{
 			return mod_studio;
 		}

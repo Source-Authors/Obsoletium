@@ -1108,7 +1108,7 @@ CAudioSource *CFacePoserSound::FindOrAddSound( const char *filename )
 {
 	for ( auto &s : m_ActiveSounds )
 	{
-		if ( !stricmp( s.filename, filename ) )
+		if ( V_strieq( s.filename, filename ) )
 		{
 			time_t filetime = filesystem->GetFileTime( filename );
 			if ( filetime != s.filetime )

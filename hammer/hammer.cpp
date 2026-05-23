@@ -359,7 +359,7 @@ class CHammerCmdLine : public CCommandLineInfo
 
 		void ParseParam(LPCTSTR lpszParam, BOOL bFlag, BOOL bLast) override
 		{
-			if ((!m_bGame) && (bFlag && !stricmp(lpszParam, "game")))
+			if ((!m_bGame) && (bFlag && V_strieq(lpszParam, "game")))
 			{
 				m_bGame = true;	
 			}
@@ -384,7 +384,7 @@ class CHammerCmdLine : public CCommandLineInfo
 			{
 				MakePrefabLibrary(lpszParam);
 			}
-			else if ((!m_bConfigDir) && (bFlag && !stricmp(lpszParam, "configdir")))
+			else if ((!m_bConfigDir) && (bFlag && V_strieq(lpszParam, "configdir")))
 			{
 				m_bConfigDir = true;	
 			}
@@ -1835,7 +1835,7 @@ BOOL CHammer::PreTranslateMessage(MSG* pMsg)
 		::GetClassNameA( pMsg->hwnd, className, sizeof( className ) );
 
 		// The classname of dialog window in the VGUI model browser and particle browser is AfxWnd100sd in Debug and AfxWnd100s in Release
-		if ( !V_stricmp( className, "edit" ) || V_stristr( className, "AfxWnd" ) )
+		if ( V_strieq( className, "edit" ) || V_stristr( className, "AfxWnd" ) )
 		{
 			// Typing in an edit control. Don't pretranslate, just translate/dispatch.
 			return FALSE;

@@ -63,12 +63,12 @@ void CImportSFMV9::FixupElement( CDmElement *pElement )
 		return;
 
 	const char *pType = pElement->GetTypeString();
-	if ( !V_stricmp( pType, "DmeLight" ) ||
-		!V_stricmp( pType, "DmeDirectionalLight" ) ||
-		!V_stricmp( pType, "DmeProjectedLight" ) ||
-		!V_stricmp( pType, "DmePointLight" ) ||
-		!V_stricmp( pType, "DmeSpotLight" ) ||
-		!V_stricmp( pType, "DmeAmbientLight" ) )
+	if ( V_strieq( pType, "DmeLight" ) ||
+		V_strieq( pType, "DmeDirectionalLight" ) ||
+		V_strieq( pType, "DmeProjectedLight" ) ||
+		V_strieq( pType, "DmePointLight" ) ||
+		V_strieq( pType, "DmeSpotLight" ) ||
+		V_strieq( pType, "DmeAmbientLight" ) )
 	{
 		const CDmAttribute *pOldAttr = pElement->GetAttribute( "color", AT_VECTOR4 );
 		if ( !pOldAttr )

@@ -135,7 +135,7 @@ bool CShell::DoVersionCheck(const char *pszArguments)
 
 			int nDocVersion = m_pDoc->GetDocVersion();
 
-			if (!stricmp(szDocName, szEngineMapName) && (nDocVersion == nEngineMapVersion))
+			if (V_strieq(szDocName, szEngineMapName) && (nDocVersion == nEngineMapVersion))
 			{
 				return(true);
 			}
@@ -491,8 +491,8 @@ bool CShell::NodeLinkDelete(const char *pszCommand, const char *pszArguments)
 					const char *pszNode2 = pEntity->GetKeyValue("endnode");
 					if ((pszNode1 != NULL) && (pszNode2 != NULL))
 					{
-						if (((!stricmp(pszNode1, szIDStart)) && (!stricmp(pszNode2, szIDEnd))) ||
-							((!stricmp(pszNode1, szIDEnd)) && (!stricmp(pszNode2, szIDStart))))
+						if (((V_strieq(pszNode1, szIDStart)) && (V_strieq(pszNode2, szIDEnd))) ||
+							((V_strieq(pszNode1, szIDEnd)) && (V_strieq(pszNode2, szIDStart))))
 						{
 							m_pDoc->DeleteObject(pEntity);
 							bFound = true;

@@ -44,15 +44,15 @@ void CHintItemObjectBase::ParseItem( KeyValues *pKeyValues )
 //-----------------------------------------------------------------------------
 bool CHintItemObjectBase::IsObjectOfType( C_BaseEntity *object )
 {
-	if ( !stricmp( GetObjectType(), "Resource Zone" ) )
+	if ( V_strieq( GetObjectType(), "Resource Zone" ) )
 	{
 		return dynamic_cast< C_ResourceZone *>( object ) ? true : false;
 	}
-	else if ( !stricmp( GetObjectType(), "Resource Pump" ) )
+	else if ( V_strieq( GetObjectType(), "Resource Pump" ) )
 	{
 		return dynamic_cast< C_ObjectResourcePump * >( object) ? true : false;
 	}
-	else if ( !stricmp( GetObjectType(), "BaseObject" ) )
+	else if ( V_strieq( GetObjectType(), "BaseObject" ) )
 	{
 		return dynamic_cast< C_BaseObject * >( object) ? true : false;
 	}

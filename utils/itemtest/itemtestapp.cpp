@@ -245,7 +245,7 @@ bool CItemTestApp::ProcessCommandLine( CAsset *pAsset, bool bDoListMats )
 	for ( int i = 0; i < nParamCount; ++i )
 	{
 		const char *pszFlag = pCmdLine->GetParm( i );
-		if ( !V_stricmp( pszFlag, s_pszFlags[kLod][kShortFlag] ) || !V_stricmp( pszFlag, s_pszFlags[kLod][kLongFlag] ) )
+		if ( V_strieq( pszFlag, s_pszFlags[kLod][kShortFlag] ) || V_strieq( pszFlag, s_pszFlags[kLod][kLongFlag] ) )
 		{
 			if ( i + 1 < nParamCount )
 			{
@@ -299,7 +299,7 @@ bool CItemTestApp::ProcessCommandLine( CAsset *pAsset, bool bDoListMats )
 	for ( int i = 0; i < nParamCount; ++i )
 	{
 		const char *pszFlag = pCmdLine->GetParm( i );
-		if ( !V_stricmp( pszFlag, s_pszFlags[kMat][kShortFlag] ) || !V_stricmp( pszFlag, s_pszFlags[kMat][kLongFlag] ) )
+		if ( V_strieq( pszFlag, s_pszFlags[kMat][kShortFlag] ) || V_strieq( pszFlag, s_pszFlags[kMat][kLongFlag] ) )
 		{
 			if ( i + 1 < nParamCount )
 			{
@@ -313,7 +313,7 @@ bool CItemTestApp::ProcessCommandLine( CAsset *pAsset, bool bDoListMats )
 				Warning( "Error! Command line switch \"%s\" specified without parameter value\n", pszFlag );
 			}
 		}
-		else if ( !V_stricmp( pszFlag, s_pszFlags[kMatType][kShortFlag] ) || !V_stricmp( pszFlag, s_pszFlags[kMatType][kLongFlag] ) )
+		else if ( V_strieq( pszFlag, s_pszFlags[kMatType][kShortFlag] ) || V_strieq( pszFlag, s_pszFlags[kMatType][kLongFlag] ) )
 		{
 			if ( !pTargetVmt )
 			{
@@ -358,7 +358,7 @@ bool CItemTestApp::ProcessCommandLine( CAsset *pAsset, bool bDoListMats )
 				Warning( "Error! Invalid Parameter Value: \"%s\" \"%s\", expected one of primary, secondary, duplicate_primary, duplicate_secondary\n", pszFlag, pszMatType );
 			}
 		}
-		else if ( !V_stricmp( pszFlag, s_pszFlags[kTex][kShortFlag] ) || !V_stricmp( pszFlag, s_pszFlags[kTex][kLongFlag] ) )
+		else if ( V_strieq( pszFlag, s_pszFlags[kTex][kShortFlag] ) || V_strieq( pszFlag, s_pszFlags[kTex][kLongFlag] ) )
 		{
 			if ( !pTargetVmt )
 			{
@@ -381,7 +381,7 @@ bool CItemTestApp::ProcessCommandLine( CAsset *pAsset, bool bDoListMats )
 
 			nTexParmIndex = i + 1;
 		}
-		else if ( !V_stricmp( pszFlag, s_pszFlags[kTexType][kShortFlag] ) || !V_stricmp( pszFlag, s_pszFlags[kTexType][kLongFlag] ) )
+		else if ( V_strieq( pszFlag, s_pszFlags[kTexType][kShortFlag] ) || V_strieq( pszFlag, s_pszFlags[kTexType][kLongFlag] ) )
 		{
 			if ( !pTargetVmt )
 			{
@@ -427,7 +427,7 @@ bool CItemTestApp::ProcessCommandLine( CAsset *pAsset, bool bDoListMats )
 				pTargetVmt->SetTargetVTF( "_color", pszTex, CItemUpload::Manifest()->GetMaterialSkin( "blue" ) );	// Comes from texture_types in manifest
 			}
 		}
-		else if ( !V_stricmp( pszFlag, s_pszFlags[kAlphaType][kShortFlag] ) || !V_stricmp( pszFlag, s_pszFlags[kAlphaType][kLongFlag] ) )
+		else if ( V_strieq( pszFlag, s_pszFlags[kAlphaType][kShortFlag] ) || V_strieq( pszFlag, s_pszFlags[kAlphaType][kLongFlag] ) )
 		{
 			if ( !pTargetVmt )
 			{

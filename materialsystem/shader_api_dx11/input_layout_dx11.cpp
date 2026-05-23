@@ -140,7 +140,7 @@ bool CheckShaderSignatureExpectations(ID3D11ShaderReflection *reflection,
     }
 
     if (semantic_index == param_desc.SemanticIndex &&
-        !V_stricmp(semantic_string, param_desc.SemanticName)) {
+        V_strieq(semantic_string, param_desc.SemanticName)) {
       return true;
     }
   }

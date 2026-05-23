@@ -122,7 +122,7 @@ static const wchar_t * LocalizeFind( const char *identifier, const wchar_t *defa
 void CBanPanel::OnServerDataResponse(const char *value, const char *response)
 {
 	// build the list
-	if (!stricmp(value, "banlist"))
+	if (V_strieq(value, "banlist"))
 	{
 		// clear current list
 		m_pBanListPanel->DeleteAllItems();

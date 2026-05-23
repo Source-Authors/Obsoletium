@@ -200,16 +200,16 @@ void CHalfLife2Survival::ParseSurvivalSettings( KeyValues *pSubKey )
 
 	while ( pTestKey )
 	{
-		if ( !stricmp( pTestKey->GetName(), "weapons" ) )
+		if ( V_strieq( pTestKey->GetName(), "weapons" ) )
 		{
 			const char *pLoadout =  pTestKey->GetString();
 			Q_SplitString( pLoadout, ";", m_SurvivalSettings.m_Loadout );
 		}
-		else if ( !stricmp( pTestKey->GetName(), "spawnhealth" ) )
+		else if ( V_strieq( pTestKey->GetName(), "spawnhealth" ) )
 		{
 			m_SurvivalSettings.m_iSpawnHealth = pTestKey->GetInt( nullptr, 100 );
 		}
-		else if ( !stricmp( pTestKey->GetName(), "allowedpickups" ) )
+		else if ( V_strieq( pTestKey->GetName(), "allowedpickups" ) )
 		{
 			m_SurvivalSettings.m_szPickups = MAKE_STRING( pTestKey->GetString() );
 		}

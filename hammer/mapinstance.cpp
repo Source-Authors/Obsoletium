@@ -715,7 +715,7 @@ void CMapInstance::DoTransform(const VMatrix &matrix)
 //-----------------------------------------------------------------------------
 void CMapInstance::OnParentKeyChanged(const char* szKey, const char* szValue)
 {
-	if (!stricmp(szKey, "angles"))
+	if (V_strieq(szKey, "angles"))
 	{
 		sscanf(szValue, "%f %f %f", &m_Angles[PITCH], &m_Angles[YAW], &m_Angles[ROLL]);
 		PostUpdate(Notify_Changed);

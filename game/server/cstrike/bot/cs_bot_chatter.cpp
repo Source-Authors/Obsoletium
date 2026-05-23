@@ -559,7 +559,7 @@ bool BotPhraseManager::Initialize( const char *filename, int bankIndex )
 
 		char *token = SharedGetToken();
 
-		if ( !stricmp( token, "Output" ) )
+		if ( V_strieq( token, "Output" ) )
 		{
 			// get name of this output device
 			phraseData = SharedParse( phraseData );
@@ -576,12 +576,12 @@ bool BotPhraseManager::Initialize( const char *filename, int bankIndex )
 			}
 
 			char *token = SharedGetToken();
-			if ( !stricmp( token, "Voice" ) )
+			if ( V_strieq( token, "Voice" ) )
 			{
 				m_output[bankIndex] = BOT_CHATTER_VOICE;
 			}
 		}
-		else if ( !stricmp( token, "BaseDir" ) )
+		else if ( V_strieq( token, "BaseDir" ) )
 		{
 			// get name of this output device
 			phraseData = SharedParse( phraseData );
@@ -596,7 +596,7 @@ bool BotPhraseManager::Initialize( const char *filename, int bankIndex )
 			Q_strncat( baseDir, "\\", RadioPathLen, -1 );
 			baseDir[RadioPathLen-1] = 0;
 		}
-		else if (!stricmp( token, "Place" ) || !stricmp( token, "Chatter" ))
+		else if (V_strieq( token, "Place" ) || V_strieq( token, "Chatter" ))
 		{
 			bool isPlace = (stricmp( token, "Place" )) ? false : true;
 
@@ -660,7 +660,7 @@ bool BotPhraseManager::Initialize( const char *filename, int bankIndex )
 				token = SharedGetToken();
 
 				// check for Place criteria
-				if (!stricmp( token, "Place" ))
+				if (V_strieq( token, "Place" ))
 				{
 					phraseData = SharedParse( phraseData );
 					if (!phraseData)
@@ -675,9 +675,9 @@ bool BotPhraseManager::Initialize( const char *filename, int bankIndex )
 					// NOTE: this assumes places must be first in the chatter database
 
 					// check for special identifiers
-					if (!stricmp( "ANY", token ))
+					if (V_strieq( "ANY", token ))
 						placeCriteria = ANY_PLACE;
-					else if (!stricmp( "UNDEFINED", token ))
+					else if (V_strieq( "UNDEFINED", token ))
 						placeCriteria = UNDEFINED_PLACE;
 					else
 						placeCriteria = TheNavMesh->NameToPlace( token );
@@ -686,7 +686,7 @@ bool BotPhraseManager::Initialize( const char *filename, int bankIndex )
 				}
 
 				// check for Count criteria
-				if (!stricmp( token, "Count" ))
+				if (V_strieq( token, "Count" ))
 				{
 					phraseData = SharedParse( phraseData );
 					if (!phraseData)
@@ -698,7 +698,7 @@ bool BotPhraseManager::Initialize( const char *filename, int bankIndex )
 					token = SharedGetToken();
 
 					// update count criteria for subsequent speak lines
-					if (!stricmp( token, "Many" ))
+					if (V_strieq( token, "Many" ))
 						countCriteria = COUNT_MANY;
 					else 
 						countCriteria = atoi( token );
@@ -707,7 +707,7 @@ bool BotPhraseManager::Initialize( const char *filename, int bankIndex )
 				}
 
 				// check for radio equivalent
-				if (!stricmp( token, "Radio" ))
+				if (V_strieq( token, "Radio" ))
 				{
 					phraseData = SharedParse( phraseData );
 					if (!phraseData)
@@ -732,14 +732,14 @@ bool BotPhraseManager::Initialize( const char *filename, int bankIndex )
 				}
 
 				// check for "important" flag
-				if (!stricmp( token, "Important" ))
+				if (V_strieq( token, "Important" ))
 				{
 					isImportant = true;
 					continue;
 				}
 
 				// check for End delimiter
-				if (!stricmp( token, "End" ))
+				if (V_strieq( token, "End" ))
 					break;
 
 				// found a phrase - add it to the collection
@@ -811,7 +811,7 @@ const BotPhrase *BotPhraseManager::GetPhrase( const char *name ) const
 {
 	for( int i=0; i<m_list.Count(); ++i )
 	{
-		if (!stricmp( m_list[i]->m_name, name ))
+		if (V_strieq( m_list[i]->m_name, name ))
 			return m_list[i]; 
 	}
 
@@ -848,7 +848,7 @@ const BotPhrase *BotPhraseManager::GetPlace( const char *name ) const
 
 	for( int i=0; i<m_placeList.Count(); ++i )
 	{
-		if (!stricmp( m_placeList[i]->m_name, name ))
+		if (V_strieq( m_placeList[i]->m_name, name ))
 			return m_placeList[i];
 	}
 

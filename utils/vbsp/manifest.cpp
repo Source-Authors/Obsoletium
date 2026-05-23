@@ -36,23 +36,23 @@ CManifest::CManifest( void )
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CManifest::LoadManifestMapKeyCallback( const char *szKey, const char *szValue, CManifestMap *pManifestMap )
 {
-	if ( !stricmp( szKey, "Name" ) )
+	if ( V_strieq( szKey, "Name" ) )
 	{
 		//		pManifestMap->m_FriendlyName = szValue;
 	}
-	else if ( !stricmp( szKey, "File" ) )
+	else if ( V_strieq( szKey, "File" ) )
 	{
 		V_strcpy_safe( pManifestMap->m_RelativeMapFileName, szValue );
 	}
-	else if ( !stricmp( szKey, "IsPrimary" ) )
+	else if ( V_strieq( szKey, "IsPrimary" ) )
 	{
 		//		pManifestMap->m_bPrimaryMap = ( atoi( szValue ) == 1 );
 	}
-	else if ( !stricmp( szKey, "IsProtected" ) )
+	else if ( V_strieq( szKey, "IsProtected" ) )
 	{
 		//		pManifestMap->m_bCanBeModified = ( atoi( szValue ) != 1 );
 	}
-	else if ( !stricmp( szKey, "TopLevel" ) )
+	else if ( V_strieq( szKey, "TopLevel" ) )
 	{
 		pManifestMap->m_bTopLevelMap = ( atoi( szValue ) == 1 );
 	}
@@ -118,11 +118,11 @@ ChunkFileResult_t CManifest::LoadCordonBoxCallback( CChunkFile *pFile, Cordon_t 
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CManifest::LoadCordonBoxKeyCallback( const char *szKey, const char *szValue, BoundBox *pBox )
 {
-	if (!stricmp(szKey, "mins"))
+	if (V_strieq(szKey, "mins"))
 	{
 		CChunkFile::ReadKeyValuePoint(szValue, pBox->bmins);
 	}
-	else if (!stricmp(szKey, "maxs"))
+	else if (V_strieq(szKey, "maxs"))
 	{
 		CChunkFile::ReadKeyValuePoint(szValue, pBox->bmaxs);
 	}
@@ -138,12 +138,12 @@ ChunkFileResult_t CManifest::LoadCordonBoxKeyCallback( const char *szKey, const 
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CManifest::LoadCordonKeyCallback( const char *szKey, const char *szValue, Cordon_t *pCordon )
 {
-	if (!stricmp(szKey, "name"))
+	if (V_strieq(szKey, "name"))
 	{
 		pCordon->m_szName.Set( szValue );
 	}
 	// Whether this particular cordon volume is active.
-	else if (!stricmp(szKey, "active"))
+	else if (V_strieq(szKey, "active"))
 	{
 		CChunkFile::ReadKeyValueBool(szValue, pCordon->m_bActive);
 	}
@@ -179,7 +179,7 @@ ChunkFileResult_t CManifest::LoadCordonCallback( CChunkFile *pFile, CManifest *p
 ChunkFileResult_t CManifest::LoadCordonsKeyCallback( const char *szKey, const char *szValue, CManifest *pManifest )
 {
 	// Whether the cordoning system is enabled or disabled.
-	if ( !stricmp( szKey, "active" ) )
+	if ( V_strieq( szKey, "active" ) )
 	{
 		CChunkFile::ReadKeyValueBool( szValue, pManifest->m_bIsCordoning );
 	}

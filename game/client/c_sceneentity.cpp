@@ -139,7 +139,7 @@ bool C_SceneEntity::GetHWMorphSceneFileName( IN_Z const char *pFilename, OUT_Z_C
 	char *pszToken = strtok( szScene, "/\\" );
 	while ( pszToken != NULL )
 	{
-		if ( !V_stricmp( pszToken, "low" ) )
+		if ( V_strieq( pszToken, "low" ) )
 		{
 			V_strcat_safe( szSceneHWM, "high" );
 		}

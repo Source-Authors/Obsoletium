@@ -365,7 +365,7 @@ CQCGenerator::CQCGenerator( vgui::Panel *pParent, const char *pszPath, const cha
 				{
 					szSurfacePropContents = ParseKeyvalue( szSurfacePropContents, key, value );
 
-					if (!stricmp( key, "}" ) )
+					if (V_streq( key, "}" ) )
 					{
 						break;
 					}

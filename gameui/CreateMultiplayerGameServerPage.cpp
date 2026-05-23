@@ -210,7 +210,7 @@ void CCreateMultiplayerGameServerPage::LoadMaps( const char *pszPathID )
 
 		//!! hack: strip out single player HL maps
 		// this needs to be specified in a seperate file
-		if ( !stricmp( ModInfo().GetGameName(), "Half-Life" ) &&
+		if ( V_strieq( ModInfo().GetGameName(), "Half-Life" ) &&
 			( mapname[0] == 'c' || mapname[0] == 't') && mapname[2] == 'a' && mapname[1] >= '0' && mapname[1] <= '5' )
 		{
 			continue;
@@ -255,7 +255,7 @@ void CCreateMultiplayerGameServerPage::LoadMapList()
 bool CCreateMultiplayerGameServerPage::IsRandomMapSelected()
 {
 	const char *mapname = m_pMapList->GetActiveItemUserData()->GetString("mapname");
-	if (!stricmp( mapname, RANDOM_MAP ))
+	if (V_strieq( mapname, RANDOM_MAP ))
 	{
 		return true;
 	}
@@ -293,7 +293,7 @@ void CCreateMultiplayerGameServerPage::SetMap(const char *mapName)
 		if (!m_pMapList->IsItemIDValid(i))
 			continue;
 
-		if (!stricmp(m_pMapList->GetItemUserData(i)->GetString("mapname"), mapName))
+		if (V_strieq(m_pMapList->GetItemUserData(i)->GetString("mapname"), mapName))
 		{
 			m_pMapList->ActivateItem(i);
 			break;

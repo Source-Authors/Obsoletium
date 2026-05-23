@@ -664,23 +664,23 @@ void CWheelOfDoom::SpeakMagicConceptToAllPlayers( const char* pszEffect )
 {
 	int iConcept = -1;
 
-	if ( !V_stricmp( pszEffect, "Halloween.MerasmusWheelBigHead") )
+	if ( V_strieq( pszEffect, "Halloween.MerasmusWheelBigHead") )
 	{
 		iConcept = MP_CONCEPT_MAGIC_BIGHEAD;
 	}
-	else if ( !V_stricmp( pszEffect, "Halloween.MerasmusWheelShrunkHead") )
+	else if ( V_strieq( pszEffect, "Halloween.MerasmusWheelShrunkHead") )
 	{
 		iConcept = MP_CONCEPT_MAGIC_SMALLHEAD;
 	}
-	else if ( !V_stricmp( pszEffect, "Halloween.MerasmusWheelGravity") )
+	else if ( V_strieq( pszEffect, "Halloween.MerasmusWheelGravity") )
 	{
 		iConcept = MP_CONCEPT_MAGIC_GRAVITY;
 	}
-	else if ( (!V_stricmp( pszEffect, "Halloween.MerasmusWheelCrits")) || (!V_stricmp( pszEffect, "Halloween.MerasmusWheelUber")) || (!V_stricmp( pszEffect, "Halloween.MerasmusWheelSuperSpeed")))
+	else if ( (V_strieq( pszEffect, "Halloween.MerasmusWheelCrits")) || (V_strieq( pszEffect, "Halloween.MerasmusWheelUber")) || (V_strieq( pszEffect, "Halloween.MerasmusWheelSuperSpeed")))
 	{
 		iConcept = MP_CONCEPT_MAGIC_GOOD;
 	}
-	else if ( !V_stricmp( pszEffect, "Halloween.MerasmusWheelDance") )
+	else if ( V_strieq( pszEffect, "Halloween.MerasmusWheelDance") )
 	{
 		iConcept = MP_CONCEPT_MAGIC_DANCE;
 	}

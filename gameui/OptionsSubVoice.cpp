@@ -256,7 +256,7 @@ void COptionsSubVoice::EndTestMicrophone()
 //-----------------------------------------------------------------------------
 void COptionsSubVoice::OnCommand( const char *command)
 {
-    if (!stricmp(command, "TestMicrophone"))
+    if (V_strieq(command, "TestMicrophone"))
     {
         if (!m_bVoiceOn)
         {
@@ -267,7 +267,7 @@ void COptionsSubVoice::OnCommand( const char *command)
             EndTestMicrophone();
         }
     }
-	else if (!stricmp(command, "SteamVoiceSettings"))
+	else if (V_strieq(command, "SteamVoiceSettings"))
 	{
 		if ( steamapicontext && steamapicontext->SteamFriends() )
 		{

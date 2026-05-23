@@ -226,23 +226,23 @@ void CElementViewerPanel::NotifyDataChanged( const char *pReason, int nNotifySou
 
 void CElementViewerPanel::OnCommand( const char *cmd )
 {
-	if ( !V_stricmp( cmd, "OnOpen" ) )
+	if ( V_strieq( cmd, "OnOpen" ) )
 	{
 		OnOpen();
 	}
-	else if ( !V_stricmp( cmd, "OnSave" ) )
+	else if ( V_strieq( cmd, "OnSave" ) )
 	{
 		OnSave();
 	}
-	else if ( !V_stricmp( cmd, "OnSaveAs" ) )
+	else if ( V_strieq( cmd, "OnSaveAs" ) )
 	{
 		OnSaveAs();
 	}
-	else if ( !V_stricmp( cmd, "OnNew" ) )
+	else if ( V_strieq( cmd, "OnNew" ) )
 	{
 		OnNew();
 	}
-	else if ( !V_stricmp( cmd, "OnExit" ) )
+	else if ( V_strieq( cmd, "OnExit" ) )
 	{
 		// Throw up a "save" dialog?
 		vgui::ivgui()->Stop();

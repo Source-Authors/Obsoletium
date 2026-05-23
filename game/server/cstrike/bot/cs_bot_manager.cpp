@@ -504,7 +504,7 @@ void BotArgumentsFromArgv( const CCommand &args, const char **name, CSWeaponType
 
 		for( int i=0; i<NUM_DIFFICULTY_LEVELS && !found; ++i )
 		{
-			if (!stricmp( BotDifficultyName[i], token ))
+			if (V_strieq( BotDifficultyName[i], token ))
 			{
 				*difficulty = (BotDifficultyType)i;
 				found = true;
@@ -950,9 +950,9 @@ bool CCSBotManager::BotAddCommand( int team, bool isFromConsole, const char *pro
 		// if team not specified, check bot_join_team cvar for preference
 		if (team == TEAM_UNASSIGNED)
 		{
-			if (!stricmp( cv_bot_join_team.GetString(), "T" ))
+			if (V_strieq( cv_bot_join_team.GetString(), "T" ))
 				team = TEAM_TERRORIST;
-			else if (!stricmp( cv_bot_join_team.GetString(), "CT" ))
+			else if (V_strieq( cv_bot_join_team.GetString(), "CT" ))
 				team = TEAM_CT;
 			else
 				team = CSGameRules()->SelectDefaultTeam();
@@ -993,9 +993,9 @@ bool CCSBotManager::BotAddCommand( int team, bool isFromConsole, const char *pro
 		// if team not specified, check bot_join_team cvar for preference
 		if (team == TEAM_UNASSIGNED)
 		{
-			if (!stricmp( cv_bot_join_team.GetString(), "T" ))
+			if (V_strieq( cv_bot_join_team.GetString(), "T" ))
 				team = TEAM_TERRORIST;
-			else if (!stricmp( cv_bot_join_team.GetString(), "CT" ))
+			else if (V_strieq( cv_bot_join_team.GetString(), "CT" ))
 				team = TEAM_CT;
 			else
 				team = CSGameRules()->SelectDefaultTeam();

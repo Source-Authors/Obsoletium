@@ -4031,7 +4031,7 @@ void ConvertPakFileContents( const char *pInFilename )
 			continue;
 		}
 
-		if ( pExtension && !V_stricmp( pExtension, "vtf" ) )
+		if ( pExtension && V_strieq( pExtension, "vtf" ) )
 		{
 			bOK = g_pVTFConvertFunc( relativeName, sourceBuf, targetBuf, g_pCompressFunc );
 			if ( !bOK )
@@ -4043,7 +4043,7 @@ void ConvertPakFileContents( const char *pInFilename )
 			bConverted = true;
 			pExt = ".vtf";
 		}
-		else if ( pExtension && !V_stricmp( pExtension, "vhv" ) )
+		else if ( pExtension && V_strieq( pExtension, "vhv" ) )
 		{			
 			CUtlBuffer tempBuffer;
 			if ( g_pVHVFixupFunc )

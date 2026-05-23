@@ -3502,7 +3502,7 @@ bool BoneHasAttachments( char const *pname )
 {
 	for (int k = 0; k < g_numattachments; k++)
 	{
-		if ( !stricmp( g_attachment[k].bonename, pname ) )
+		if ( V_strieq( g_attachment[k].bonename, pname ) )
 		{
 			return true;
 		}
@@ -3557,7 +3557,7 @@ bool BoneIsIK( char const *pname )
 	// tag bones used by ikchains 
 	for (k = 0; k < g_numikchains; k++)
 	{
-		if ( !stricmp( g_ikchain[k].bonename, pname ) )
+		if ( V_strieq( g_ikchain[k].bonename, pname ) )
 		{
 			return true;
 		}
@@ -3986,7 +3986,7 @@ void TagUsedBones( )
 		{
 			for (j = 0; j < psource->numbones; j++)
 			{
-				if ( !stricmp( g_attachment[k].bonename, psource->localBone[j].name ) )
+				if ( V_strieq( g_attachment[k].bonename, psource->localBone[j].name ) )
 				{
 					// this bone is a keeper with or without associated vertices
 					// because an attachment point depends on it.
@@ -4013,7 +4013,7 @@ void TagUsedBones( )
 		{
 			for (j = 0; j < psource->numbones; j++)
 			{
-				if ( !stricmp( g_ikchain[k].bonename, psource->localBone[j].name ) )
+				if ( V_strieq( g_ikchain[k].bonename, psource->localBone[j].name ) )
 				{
 					// this bone is a keeper with or without associated vertices
 					// because a ikchain depends on it.
@@ -4026,7 +4026,7 @@ void TagUsedBones( )
 		{
 			for (j = 0; j < psource->numbones; j++)
 			{
-				if ( !stricmp( g_mouth[k].bonename, psource->localBone[j].name ) )
+				if ( V_strieq( g_mouth[k].bonename, psource->localBone[j].name ) )
 				{
 					// this bone is a keeper with or without associated vertices
 					// because a mouth shader depends on it.
@@ -4083,7 +4083,7 @@ void RenameBones( )
 		{
 			for (int k = 0; k < g_numrenamedbones; k++)
 			{
-				if (!stricmp( g_source[i]->localBone[j].name, g_renamedbone[k].from))
+				if (V_strieq( g_source[i]->localBone[j].name, g_renamedbone[k].from))
 				{
 					V_strcpy_safe( g_source[i]->localBone[j].name, g_renamedbone[k].to );
 					break;
@@ -6018,7 +6018,7 @@ static void LinkAttachments()
 		// search through known bones
 		for (k = 0; k < g_numbones; k++)
 		{
-			if ( !stricmp( g_attachment[i].bonename, g_bonetable[k].name ))
+			if ( V_strieq( g_attachment[i].bonename, g_bonetable[k].name ))
 			{
 				g_attachment[i].bone = k;
 				MatrixCopy( g_bonetable[k].boneToPose, boneToPose );
@@ -6036,7 +6036,7 @@ static void LinkAttachments()
 			{
 				for (k = 0; k < g_source[j]->numbones && !found; k++)
 				{
-					if ( !stricmp( g_attachment[i].bonename, g_source[j]->localBone[k].name ) )
+					if ( V_strieq( g_attachment[i].bonename, g_source[j]->localBone[k].name ) )
 					{
 						MatrixCopy( g_source[j]->boneToPose[k], boneToPose );
 

@@ -474,7 +474,7 @@ void CVoteSetupDialog::OnClose()
 void CVoteSetupDialog::OnCommand(const char *command)
 {
 	// We should have enough data to issue a CallVote command
-	if ( !V_stricmp( command, "CallVote" ) )
+	if ( V_strieq( command, "CallVote" ) )
 	{
 		int iSelectedItem = m_pVoteSetupList->GetSelectedItem();
 		if ( iSelectedItem >= 0 )
@@ -482,7 +482,7 @@ void CVoteSetupDialog::OnCommand(const char *command)
 			char szVoteCommand[k_MAX_VOTE_NAME_LENGTH];
 			KeyValues *pIssueKeyValues = m_pVoteSetupList->GetItemData( iSelectedItem );
 			const char *szIssueRaw = pIssueKeyValues->GetString( "IssueRaw" );
-			if ( !V_stricmp( "ChangeLevel", szIssueRaw ) || !V_stricmp( "NextLevel", szIssueRaw ) )
+			if ( V_strieq( "ChangeLevel", szIssueRaw ) || V_strieq( "NextLevel", szIssueRaw ) )
 			{
 				int nSelectedParam = m_pVoteParameterList->GetSelectedItem();
 				if ( nSelectedParam >= 0 )
@@ -502,7 +502,7 @@ void CVoteSetupDialog::OnCommand(const char *command)
 					}
 				}
 			}
-			else if ( !V_stricmp( "Kick", szIssueRaw ) )
+			else if ( V_strieq( "Kick", szIssueRaw ) )
 			{
 				// Get selected Player
 				int iSelectedParam = m_pVoteParameterList->GetSelectedItem();
@@ -537,7 +537,7 @@ void CVoteSetupDialog::OnCommand(const char *command)
 				}
 			}
 #ifdef TF_CLIENT_DLL
-			else if ( !V_stricmp( "ChangeMission", szIssueRaw ) )
+			else if ( V_strieq( "ChangeMission", szIssueRaw ) )
 			{
 				int nSelectedParam = m_pVoteParameterList->GetSelectedItem();
 				if ( nSelectedParam >= 0 )
@@ -609,7 +609,7 @@ void CVoteSetupDialog::OnItemSelected( vgui::Panel *panel )
 				m_bVoteButtonEnabled = false;
 			}
 			// CHANGELEVEL / NEXTLEVEL
-			else if ( !V_stricmp( "ChangeLevel", pszIssueRaw ) || !V_stricmp( "NextLevel", pszIssueRaw ) )
+			else if ( V_strieq( "ChangeLevel", pszIssueRaw ) || V_strieq( "NextLevel", pszIssueRaw ) )
 			{
 				// Feed the mapcycle to the parameters list
 				for ( int index = 0; index < m_VoteIssuesMapCycle.Count(); index++ )
@@ -641,7 +641,7 @@ void CVoteSetupDialog::OnItemSelected( vgui::Panel *panel )
 				}
 			}
 			// KICK
-			else if ( !V_stricmp( "Kick", pszIssueRaw ) )
+			else if ( V_strieq( "Kick", pszIssueRaw ) )
 			{
 				// Feed the player list to the parameters list
 				int nMaxClients = engine->GetMaxClients();
@@ -699,7 +699,7 @@ void CVoteSetupDialog::OnItemSelected( vgui::Panel *panel )
 			}
 #ifdef TF_CLIENT_DLL
 			// CHANGE POP FILE
-			else if ( !V_stricmp( "ChangeMission", pszIssueRaw ) )
+			else if ( V_strieq( "ChangeMission", pszIssueRaw ) )
 			{
 				// Feed the popfiles to the parameters list
 				for ( int index = 0; index < m_VoteIssuesPopFiles.Count(); index++ )
@@ -786,7 +786,7 @@ void CVoteSetupDialog::RefreshIssueParameters()
 	{
 		KeyValues *pIssueKeyValues = m_pVoteSetupList->GetItemData( iSelectedItem );
 		const char *pszIssueRaw = pIssueKeyValues->GetString( "IssueRaw" );
-		if ( !V_stricmp( "Kick", pszIssueRaw ) )
+		if ( V_strieq( "Kick", pszIssueRaw ) )
 		{
 			if ( m_pVoteParameterList->GetItemCount() > 0 )
 			{

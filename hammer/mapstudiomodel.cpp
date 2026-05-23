@@ -60,8 +60,8 @@ CMapClass *CMapStudioModel::CreateMapStudioModel(CHelperInfo *pHelperInfo, CMapE
 	//
 	if (pszModel != NULL)
 	{
-		bool bLightProp = !stricmp(pHelperInfo->GetName(), "lightprop");
-		bool bOrientedBounds = (bLightProp | !stricmp(pHelperInfo->GetName(), "studioprop"));
+		bool bLightProp = V_strieq(pHelperInfo->GetName(), "lightprop");
+		bool bOrientedBounds = (bLightProp | V_strieq(pHelperInfo->GetName(), "studioprop"));
 		return CreateMapStudioModel(pszModel, bOrientedBounds, bLightProp);
 	}
 
@@ -310,12 +310,12 @@ void CMapStudioModel::Initialize(void)
 //-----------------------------------------------------------------------------
 void CMapStudioModel::OnParentKeyChanged(const char* szKey, const char* szValue)
 {
-	if (!stricmp(szKey, "angles"))
+	if (V_strieq(szKey, "angles"))
 	{
 		sscanf(szValue, "%f %f %f", &m_Angles[PITCH], &m_Angles[YAW], &m_Angles[ROLL]);
 		PostUpdate(Notify_Changed);
 	}
-	else if (!stricmp(szKey, "pitch"))
+	else if (V_strieq(szKey, "pitch"))
 	{
 		// dimhotepus: atof -> V_atof
 		m_flPitch = V_atof(szValue);
@@ -323,29 +323,29 @@ void CMapStudioModel::OnParentKeyChanged(const char* szKey, const char* szValue)
 
 		PostUpdate(Notify_Changed);
 	}
-	else if (!stricmp(szKey, "skin"))
+	else if (V_strieq(szKey, "skin"))
 	{
 		m_Skin = atoi(szValue);
 		PostUpdate(Notify_Changed);
 	}
-	else if (!stricmp(szKey, "fademindist"))
+	else if (V_strieq(szKey, "fademindist"))
 	{
 		m_flFadeMinDist = atoi(szValue);
 	}
-	else if (!stricmp(szKey, "fademaxdist"))
+	else if (V_strieq(szKey, "fademaxdist"))
 	{
 		m_flFadeMaxDist = atoi(szValue);
 	}
-	else if (!stricmp(szKey, "screenspacefade"))
+	else if (V_strieq(szKey, "screenspacefade"))
 	{
 		m_bScreenSpaceFade = (atoi(szValue) != 0);
 	}
-	else if (!stricmp(szKey, "fadescale"))
+	else if (V_strieq(szKey, "fadescale"))
 	{
 		// dimhotepus: atof -> V_atof
 		m_flFadeScale = V_atof(szValue);
 	}
-	else if ( !stricmp( szKey, "solid") )
+	else if ( V_strieq( szKey, "solid") )
 	{
 		// dimhotepus: atof -> atoi
 		m_iSolid = atoi( szValue );

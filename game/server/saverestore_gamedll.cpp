@@ -40,7 +40,7 @@ bool ParseKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, c
 			}
 		}
 
-		if ( (pField->flags & FTYPEDESC_KEY) && !stricmp(pField->externalName, szKeyName) )
+		if ( (pField->flags & FTYPEDESC_KEY) && V_strieq(pField->externalName, szKeyName) )
 		{
 			switch( pField->fieldType )
 			{
@@ -180,7 +180,7 @@ bool ExtractKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields,
 			}
 		}
 
-		if ( (pField->flags & FTYPEDESC_KEY) && !stricmp(pField->externalName, szKeyName) )
+		if ( (pField->flags & FTYPEDESC_KEY) && V_strieq(pField->externalName, szKeyName) )
 		{
 			switch( pField->fieldType )
 			{

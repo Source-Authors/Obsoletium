@@ -77,7 +77,7 @@ void AddPhonemesFromFile( const char *pszFileName )
 			if ( Q_isempty( token ) )
 				break;
 
-			if ( !stricmp( token, "{" ) )
+			if ( V_streq( token, "{" ) )
 			{
 				pSentence->InitFromBuffer( buf );
 			}

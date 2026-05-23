@@ -56,7 +56,7 @@ void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, const KeyValues *
 	m_pRules = rules->MakeCopy();
 
 	const char *type = m_pRules->GetString("type");
-	if (!stricmp(type, "enumeration"))
+	if (V_strieq(type, "enumeration"))
 	{
 		LoadControlSettings("Admin/VarEditDialog_ComboBox.res", "PLATFORM");
 		m_pStringEdit->SetVisible(false);
@@ -73,7 +73,7 @@ void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, const KeyValues *
 		// activate the current item
 		m_pComboEdit->ActivateItemByRow(m_pRules->GetInt("enum"));
 	}
-	else if (!stricmp(type, "customlist"))
+	else if (V_strieq(type, "customlist"))
 	{
 		LoadControlSettings("Admin/VarEditDialog_ComboBox.res", "PLATFORM");
 		m_pStringEdit->SetVisible(false);
@@ -111,7 +111,7 @@ void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, const KeyValues *
 			int itemID = m_pComboEdit->AddItem(customString, NULL);
 
 			// activate the current item
-			if (!stricmp(customString, currentValue))
+			if (V_strieq(customString, currentValue))
 			{
 				m_pComboEdit->ActivateItem(itemID);
 			}
@@ -142,13 +142,13 @@ void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, const KeyValues *
 //-----------------------------------------------------------------------------
 void CVarEditDialog::OnCommand(const char *command)
 {
-	if (!stricmp(command, "OK"))
+	if (V_strieq(command, "OK"))
 	{
 		// change the value
 		ApplyChanges();
 		Close();
 	}
-	else if (!stricmp(command, "Cancel"))
+	else if (V_strieq(command, "Cancel"))
 	{
 		Close();
 	}
@@ -164,7 +164,7 @@ void CVarEditDialog::OnCommand(const char *command)
 void CVarEditDialog::ApplyChanges()
 {
 	const char *type = m_pRules->GetString("type");
-	if (!stricmp(type, "enumeration"))
+	if (V_strieq(type, "enumeration"))
 	{
 		// get the enumeration position from the combo box
 		int iVal = m_pComboEdit->GetActiveItem();
@@ -173,7 +173,7 @@ void CVarEditDialog::ApplyChanges()
 		RemoteServer().SetValue(m_pRules->GetName(), value);
 	
 	}
-	else if (!stricmp(type, "customlist"))
+	else if (V_strieq(type, "customlist"))
 	{
 		char value[512];
 		m_pComboEdit->GetText(value);

@@ -1858,19 +1858,19 @@ void Frame::OnCloseFrameButtonPressed()
 //-----------------------------------------------------------------------------
 void Frame::OnCommand(const char *command)
 {
-	if (!stricmp(command, "Close"))
+	if (V_strieq(command, "Close"))
 	{
 		Close();
 	}
-	else if (!stricmp(command, "CloseModal"))
+	else if (V_strieq(command, "CloseModal"))
 	{
 		CloseModal();
 	}
-	else if (!stricmp(command, "Minimize"))
+	else if (V_strieq(command, "Minimize"))
 	{
 		OnMinimize();
 	}
-	else if (!stricmp(command, "MinimizeToSysTray"))
+	else if (V_strieq(command, "MinimizeToSysTray"))
 	{
 		OnMinimizeToSysTray();
 	}

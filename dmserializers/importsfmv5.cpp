@@ -63,7 +63,7 @@ void CImportSFMV5::FixupElement( CDmElement *pElement )
 
 	const char *pType = pElement->GetTypeString();
 
-	if ( !V_stricmp( pType, "DmeSpotLight" ) )
+	if ( V_strieq( pType, "DmeSpotLight" ) )
 	{
 		pElement->SetType( "DmeProjectedLight" );
 	}

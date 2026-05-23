@@ -2819,7 +2819,7 @@ char *VOX_LookupString(const char *pSentenceName, int *psentencenum, bool *pbEmi
 	{
 		char const *name = s.pName;
 
-		if (!stricmp(pSentenceName, name))
+		if (V_strieq(pSentenceName, name))
 		{
 			if (psentencenum)
 			{

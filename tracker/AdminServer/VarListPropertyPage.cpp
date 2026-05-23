@@ -132,7 +132,7 @@ void CVarListPropertyPage::SetVarString(const char *varName, const char *value)
 
 	// parse the rule
 	const char *type = rule->GetString("type");
-	if (!stricmp(type, "enumeration"))
+	if (V_strieq(type, "enumeration"))
 	{
 		// look up the value in the enumeration
 		int iValue = atoi(value);

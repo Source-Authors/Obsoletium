@@ -88,7 +88,7 @@ void CClientRecordingSessionManager::FireGameEvent( IGameEvent *pEvent )
 	
 	const char *pEventName = pEvent->GetName();
 
-	if ( !V_stricmp( "replay_sessioninfo", pEventName ) )
+	if ( V_strieq( "replay_sessioninfo", pEventName ) )
 	{
 		DBG( "   replay_sessioninfo\n" );
 
@@ -144,7 +144,7 @@ void CClientRecordingSessionManager::FireGameEvent( IGameEvent *pEvent )
 		m_flNextBlockUpdateTime = g_pEngine->GetHostTime() + nDumpInterval;
 	}
 
-	else if ( !V_stricmp( "replay_endrecord", pEventName ) )
+	else if ( V_strieq( "replay_endrecord", pEventName ) )
 	{
 		DBG( "   replay_stoprecord\n" );
 
@@ -162,7 +162,7 @@ void CClientRecordingSessionManager::FireGameEvent( IGameEvent *pEvent )
 	}
 
 	// When the player dies, we fill out the rest of the data here
-	else if ( !V_stricmp( "player_death", pEventName ) &&
+	else if ( V_strieq( "player_death", pEventName ) &&
 			  pEvent->GetInt( "victim_entindex" ) == g_pEngineClient->GetPlayerSlot() + 1 &&
 			  g_pClient->ShouldCompletePendingReplay( pEvent ) )
 	{

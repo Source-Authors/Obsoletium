@@ -57,7 +57,7 @@ int FindCommand( const char *pCommand )
 {
 	for ( int i = 0; i < g_ArgC; i++ )
 	{
-		if ( !stricmp( pCommand, g_ppArgV[i] ) )
+		if ( V_strieq( pCommand, g_ppArgV[i] ) )
 			return i;
 	}
 	return -1;

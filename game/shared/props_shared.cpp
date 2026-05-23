@@ -400,7 +400,7 @@ int CPropData::ParsePropFromKV( CBaseEntity *pProp, KeyValues *pSection, KeyValu
 		if ( pkvCurrentInter )
 		{
 			char const *pszInterBase = pkvCurrentInter->GetString( pInteraction->pszKeyName );
-			if ( pszInterBase && pszInterBase[0] && !stricmp( pszInterBase, pInteraction->pszValue ) )
+			if ( pszInterBase && pszInterBase[0] && V_strieq( pszInterBase, pInteraction->pszValue ) )
 			{
 				pBreakableInterface->SetInteraction( (propdata_interactions_t)i );
 			}

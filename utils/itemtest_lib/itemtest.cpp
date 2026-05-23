@@ -594,7 +594,7 @@ int GetClassIndex( const char *pszClassString )
 
 	for ( int i = 0; i < GetClassCount(); ++i )
 	{
-		if ( !V_stricmp( pszCleanClassString, GetClassString( i ) ) )
+		if ( V_strieq( pszCleanClassString, GetClassString( i ) ) )
 		{
 			return i;
 		}
@@ -3697,7 +3697,7 @@ bool CTargetDMX::IsInputObj() const
 {
 	// TODO: Perhaps look at magic in the start of the file
 
-	return !V_stricmp( "obj", m_sExtension.String() );
+	return V_strieq( "obj", m_sExtension.String() );
 }
 
 
@@ -3708,7 +3708,7 @@ bool CTargetDMX::IsInputSmd() const
 {
 	// TODO: Perhaps look at magic in the start of the file
 
-	return !V_stricmp( "smd", m_sExtension.String() );
+	return V_strieq( "smd", m_sExtension.String() );
 }
 
 
@@ -3719,7 +3719,7 @@ bool CTargetDMX::IsInputDmx() const
 {
 	// TODO: Perhaps look at magic in the start of the file
 
-	return !V_stricmp( "dmx", m_sExtension.String() );
+	return V_strieq( "dmx", m_sExtension.String() );
 }
 
 
@@ -3730,7 +3730,7 @@ bool CTargetDMX::IsInputFbx() const
 {
 	// TODO: Perhaps look at magic in the start of the file
 
-	return !V_stricmp( "fbx", m_sExtension.String() );
+	return V_strieq( "fbx", m_sExtension.String() );
 }
 
 
@@ -6191,9 +6191,9 @@ const char* CAsset::CheckRedundantOutputFilePath( const char* pszInputFilePath, 
 	for ( int i=0; i<m_CompileOutputFiles.Count(); ++i )
 	{
 		const CompileOutputFile_t& tga = m_CompileOutputFiles[i];
-		if ( !V_stricmp( tga.m_strInputFilePath.String(), pszInputFilePath ) )
+		if ( V_strieq( tga.m_strInputFilePath.String(), pszInputFilePath ) )
 		{
-			if ( !V_stricmp( tga.m_strVTEXConfig.String(), pszLocalVTEXConfig ) )
+			if ( V_strieq( tga.m_strVTEXConfig.String(), pszLocalVTEXConfig ) )
 			{
 				return tga.m_strOutputFilePath.String();
 			}

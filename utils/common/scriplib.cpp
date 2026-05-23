@@ -700,7 +700,7 @@ skipspace:
 	*token_p = 0;
 
 	// check for other commands
-	if ( !stricmp( out, "$include" ) )
+	if ( V_strieq( out, "$include" ) )
 	{
 		GetToken( false, out );
 
@@ -737,13 +737,13 @@ skipspace:
 
 		return GetToken( crossline, out );
 	}
-	else if (!stricmp (out, "$definemacro"))
+	else if (V_strieq (out, "$definemacro"))
 	{
 		GetToken (false, out);
 		DefineMacro(out, out);
 		return GetToken( crossline, out );
 	}
-	else if (!stricmp (out, "$definevariable"))
+	else if (V_strieq (out, "$definevariable"))
 	{
 		GetToken (false, out);
 		DefineVariable(out, out);
@@ -862,7 +862,7 @@ skipspace:
 
 	*token_p = 0;
 
-	if (!stricmp (out, "$include"))
+	if (V_strieq (out, "$include"))
 	{
 		GetToken (false, out);
 		AddScriptToStack (out);
@@ -1183,10 +1183,10 @@ intp CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVe
 				continue;
 		}
 
-		if ( !stricmp( findData.name, "." ) )
+		if ( V_streq( findData.name, "." ) )
 			continue;
 
-		if ( !stricmp( findData.name, ".." ) )
+		if ( V_streq( findData.name, ".." ) )
 			continue;
 
 		char fileName[MAX_PATH];
@@ -1225,10 +1225,10 @@ intp CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVe
 				continue;
 		}
 
-		if ( !stricmp( findData.cFileName, "." ) )
+		if ( V_streq( findData.cFileName, "." ) )
 			continue;
 
-		if ( !stricmp( findData.cFileName, ".." ) )
+		if ( V_streq( findData.cFileName, ".." ) )
 			continue;
 
 		char fileName[MAX_PATH];

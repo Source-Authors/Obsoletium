@@ -82,12 +82,12 @@ void CCommentaryExplanationDialog::OnKeyCodePressed(KeyCode code)
 //-----------------------------------------------------------------------------
 void CCommentaryExplanationDialog::OnCommand( const char *command )
 {
-	if ( !stricmp( command, "ok" ) )
+	if ( V_strieq( command, "ok" ) )
 	{
 		Close();
 		BasePanel()->FadeToBlackAndRunEngineCommand( m_pszFinishCommand );
 	}
-	else if ( !stricmp( command, "cancel" ) || !stricmp( command, "close" ) )
+	else if ( V_strieq( command, "cancel" ) || V_strieq( command, "close" ) )
 	{
 		Close();
 	}

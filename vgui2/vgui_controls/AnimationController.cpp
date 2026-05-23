@@ -351,7 +351,7 @@ bool AnimationController::ParseScriptFile(char *pMem, intp length)
 			intp cmdIndex = seq.cmdList.AddToTail();
 			AnimCommand_t &animCmd = seq.cmdList[cmdIndex];
 			BitwiseClear(animCmd);
-			if (!stricmp(token, "animate"))
+			if (V_strieq(token, "animate"))
 			{
 				animCmd.commandType = CMD_ANIMATE;
 				// parse out the animation commands
@@ -443,47 +443,47 @@ bool AnimationController::ParseScriptFile(char *pMem, intp length)
 				
 				// interpolation function
 				pMem = ParseFile(pMem, token, NULL);
-				if (!stricmp(token, "Accel"))
+				if (V_strieq(token, "Accel"))
 				{
 					cmdAnimate.interpolationFunction = INTERPOLATOR_ACCEL;
 				}
-				else if (!stricmp(token, "Deaccel"))
+				else if (V_strieq(token, "Deaccel"))
 				{
 					cmdAnimate.interpolationFunction = INTERPOLATOR_DEACCEL;
 				}
-				else if ( !stricmp(token, "Spline"))
+				else if ( V_strieq(token, "Spline"))
 				{
 					cmdAnimate.interpolationFunction = INTERPOLATOR_SIMPLESPLINE;
 				}
-				else if (!stricmp(token,"Pulse"))
+				else if (V_strieq(token,"Pulse"))
 				{
 					cmdAnimate.interpolationFunction = INTERPOLATOR_PULSE;
 					// frequencey
 					pMem = ParseFile(pMem, token, NULL);
 					cmdAnimate.interpolationParameter = strtof(token, nullptr);
 				}
-				else if (!stricmp(token,"Bias"))
+				else if (V_strieq(token,"Bias"))
 				{
 					cmdAnimate.interpolationFunction = INTERPOLATOR_BIAS;
 					// bias
 					pMem = ParseFile(pMem, token, NULL);
 					cmdAnimate.interpolationParameter = strtof(token, nullptr);
 				}
-				else if (!stricmp(token,"Gain"))
+				else if (V_strieq(token,"Gain"))
 				{
 					cmdAnimate.interpolationFunction = INTERPOLATOR_GAIN;
 					// bias
 					pMem = ParseFile(pMem, token, NULL);
 					cmdAnimate.interpolationParameter = strtof(token, nullptr);
 				}
-				else if ( !stricmp( token, "Flicker"))
+				else if ( V_strieq( token, "Flicker"))
 				{
 					cmdAnimate.interpolationFunction = INTERPOLATOR_FLICKER;
 					// noiseamount
 					pMem = ParseFile(pMem, token, NULL);
 					cmdAnimate.interpolationParameter = strtof(token, nullptr);
 				}
-				else if (!stricmp(token, "Bounce"))
+				else if (V_strieq(token, "Bounce"))
 				{
 					cmdAnimate.interpolationFunction = INTERPOLATOR_BOUNCE;
 				}
@@ -503,7 +503,7 @@ bool AnimationController::ParseScriptFile(char *pMem, intp length)
 					seq.duration = cmdAnimate.startTime + cmdAnimate.duration;
 				}
 			}
-			else if (!stricmp(token, "runevent"))
+			else if (V_strieq(token, "runevent"))
 			{
 				animCmd.commandType = CMD_RUNEVENT;
 				pMem = ParseFile(pMem, token, NULL);
@@ -511,7 +511,7 @@ bool AnimationController::ParseScriptFile(char *pMem, intp length)
 				pMem = ParseFile(pMem, token, NULL);
 				animCmd.cmdData.runEvent.timeDelay = strtof(token, nullptr);
 			}
-			else if (!stricmp(token, "runeventchild"))
+			else if (V_strieq(token, "runeventchild"))
 			{
 				animCmd.commandType = CMD_RUNEVENTCHILD;
 				pMem = ParseFile(pMem, token, NULL);
@@ -521,7 +521,7 @@ bool AnimationController::ParseScriptFile(char *pMem, intp length)
 				pMem = ParseFile(pMem, token, NULL);
 				animCmd.cmdData.runEvent.timeDelay = strtof(token, nullptr);
 			}
-			else if (!stricmp(token, "firecommand"))
+			else if (V_strieq(token, "firecommand"))
 			{
 				animCmd.commandType = CMD_FIRECOMMAND;
 				pMem = ParseFile(pMem, token, NULL);
@@ -529,7 +529,7 @@ bool AnimationController::ParseScriptFile(char *pMem, intp length)
 				pMem = ParseFile(pMem, token, NULL);
 				animCmd.cmdData.runEvent.variable = g_ScriptSymbols.AddString(token);
 			}
-			else if ( !stricmp(token, "playsound") )
+			else if ( V_strieq(token, "playsound") )
 			{
 				animCmd.commandType = CMD_PLAYSOUND;
 				pMem = ParseFile(pMem, token, NULL);
@@ -537,7 +537,7 @@ bool AnimationController::ParseScriptFile(char *pMem, intp length)
 				pMem = ParseFile(pMem, token, NULL);
 				animCmd.cmdData.runEvent.variable = g_ScriptSymbols.AddString(token);
 			}
-			else if (!stricmp(token, "setvisible"))
+			else if (V_strieq(token, "setvisible"))
 			{
 				animCmd.commandType = CMD_SETVISIBLE;
 				pMem = ParseFile(pMem, token, NULL);
@@ -547,7 +547,7 @@ bool AnimationController::ParseScriptFile(char *pMem, intp length)
 				pMem = ParseFile(pMem, token, NULL);
 				animCmd.cmdData.runEvent.timeDelay = strtof(token, nullptr);
 			}
-			else if (!stricmp(token, "setinputenabled"))
+			else if (V_strieq(token, "setinputenabled"))
 			{
 				animCmd.commandType = CMD_SETINPUTENABLED;
 				pMem = ParseFile(pMem, token, NULL);
@@ -557,7 +557,7 @@ bool AnimationController::ParseScriptFile(char *pMem, intp length)
 				pMem = ParseFile(pMem, token, NULL);
 				animCmd.cmdData.runEvent.timeDelay = strtof(token, nullptr);
 			}
-			else if (!stricmp(token, "stopevent"))
+			else if (V_strieq(token, "stopevent"))
 			{
 				animCmd.commandType = CMD_STOPEVENT;
 				pMem = ParseFile(pMem, token, NULL);
@@ -565,7 +565,7 @@ bool AnimationController::ParseScriptFile(char *pMem, intp length)
 				pMem = ParseFile(pMem, token, NULL);
 				animCmd.cmdData.runEvent.timeDelay = strtof(token, nullptr);
 			}
-			else if (!stricmp(token, "StopPanelAnimations"))
+			else if (V_strieq(token, "StopPanelAnimations"))
 			{
 				animCmd.commandType = CMD_STOPPANELANIMATIONS;
 				pMem = ParseFile(pMem, token, NULL);
@@ -573,7 +573,7 @@ bool AnimationController::ParseScriptFile(char *pMem, intp length)
 				pMem = ParseFile(pMem, token, NULL);
 				animCmd.cmdData.runEvent.timeDelay = strtof(token, nullptr);
 			}
-			else if (!stricmp(token, "stopanimation"))
+			else if (V_strieq(token, "stopanimation"))
 			{
 				animCmd.commandType = CMD_STOPANIMATION;
 				pMem = ParseFile(pMem, token, NULL);
@@ -583,7 +583,7 @@ bool AnimationController::ParseScriptFile(char *pMem, intp length)
 				pMem = ParseFile(pMem, token, NULL);
 				animCmd.cmdData.runEvent.timeDelay = strtof(token, nullptr);
 			}
-			else if ( !stricmp( token, "SetFont" ))
+			else if ( V_strieq( token, "SetFont" ))
 			{
 				animCmd.commandType = CMD_SETFONT;
 				// Panel name
@@ -600,7 +600,7 @@ bool AnimationController::ParseScriptFile(char *pMem, intp length)
 				pMem = ParseFile(pMem, token, NULL);
 				animCmd.cmdData.runEvent.timeDelay = strtof(token, nullptr);
 			}
-			else if ( !stricmp( token, "SetTexture" ))
+			else if ( V_strieq( token, "SetTexture" ))
 			{
 				animCmd.commandType = CMD_SETTEXTURE;
 				// Panel name
@@ -617,7 +617,7 @@ bool AnimationController::ParseScriptFile(char *pMem, intp length)
 				pMem = ParseFile(pMem, token, NULL);
 				animCmd.cmdData.runEvent.timeDelay = strtof(token, nullptr);
 			}
-			else if ( !stricmp( token, "SetString" ))
+			else if ( V_strieq( token, "SetString" ))
 			{
 				animCmd.commandType = CMD_SETSTRING;
 				// Panel name

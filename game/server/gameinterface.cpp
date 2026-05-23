@@ -2062,7 +2062,7 @@ void CServerGameDLL::LoadSpecificMOTDMsg( const ConVar &convar, const char *pszS
 	}
 
 	// Still not found?  See if we can try the default.
-	if ( !bFound && !V_stricmp( convar.GetString(), convar.GetDefault() ) )
+	if ( !bFound && V_strieq( convar.GetString(), convar.GetDefault() ) )
 	{
 		V_strcpy_safe( szResolvedFilename, szPreferredFilename );
 		char *dotTxt = V_stristr( szResolvedFilename, ".txt" );

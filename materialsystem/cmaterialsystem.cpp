@@ -2536,7 +2536,7 @@ ITexture *CMaterialSystem::FindTexture( char const *pTextureName, const char *pT
 	{
 		for ( intp i=0; i<ssize( TextureAliases ); i+=2 )
 		{
-			if ( !V_stricmp( pTextureName, TextureAliases[i] ) )
+			if ( V_strieq( pTextureName, TextureAliases[i] ) )
 			{
 				return FindTexture( TextureAliases[i+1], pTextureGroupName, bComplain, nAdditionalCreationFlags );
 			}

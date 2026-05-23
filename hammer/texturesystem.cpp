@@ -293,7 +293,7 @@ IEditorTexture *CTextureSystem::FindActiveTexture(LPCSTR pszInputName, int *piIn
 	//
 	// Check the cache first.
 	//
-	if (m_pLastTex && !stricmp(pszName, m_pLastTex->GetName()))
+	if (m_pLastTex && V_strieq(pszName, m_pLastTex->GetName()))
 	{
 		if (piIndex)
 		{
@@ -1180,7 +1180,7 @@ void CTextureSystem::RegisterTextureKeywords( IEditorTexture *pTexture )
 			for( intp pos=0; pos < m_Keywords.Count(); pos++ )
 			{
 				const char *pszTest = m_Keywords.Element(pos);
-				if (!stricmp(pszTest, pch))
+				if (V_strieq(pszTest, pch))
 				{
 					bFound = true;
 					break;

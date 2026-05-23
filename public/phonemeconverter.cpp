@@ -7,6 +7,7 @@
 //===========================================================================//
 #include "phonemeconverter.h"
 #include "tier0/dbg.h"
+#include "tier1/strtools.h"
 
 struct PhonemeMap_t
 {
@@ -107,7 +108,7 @@ unsigned short TextToPhoneme( const char *text )
 {
 	for ( auto &&p : g_Phonemes )
 	{
-		if ( !stricmp( p.string, text ) )
+		if ( V_strieq( p.string, text ) )
 			return p.code;
 	}
 
@@ -141,7 +142,7 @@ float WeightForPhoneme( char *text )
 {
 	for ( auto &&p : g_Phonemes )
 	{
-		if ( !stricmp( p.string, text ) )
+		if ( V_strieq( p.string, text ) )
 			return p.weight;
 	}
 
@@ -170,7 +171,7 @@ int TextToPhonemeIndex( const char *text )
 	for ( int i = 0; i < static_cast<int>(std::size( g_Phonemes )); ++i )
 	{
 		const PhonemeMap_t *test = &g_Phonemes[ i ];
-		if ( !stricmp( test->string, text ) )
+		if ( V_strieq( test->string, text ) )
 			return i;
 	}
 

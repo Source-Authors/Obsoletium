@@ -420,14 +420,14 @@ void CTFAdvancedOptionsDialog::OnClose()
 //-----------------------------------------------------------------------------
 void CTFAdvancedOptionsDialog::OnCommand( const char *command )
 {
-	if ( !stricmp( command, "Ok" ) )
+	if ( V_strieq( command, "Ok" ) )
 	{
 		// OnApplyChanges();
 		SaveValues();
 		OnClose();
 		return;
 	}
-	else if ( !stricmp( command, "Close" ) )
+	else if ( V_strieq( command, "Close" ) )
 	{
 		OnClose();
 		return;

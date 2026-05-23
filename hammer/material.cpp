@@ -337,7 +337,7 @@ CMaterial *CMaterialCache::FindMaterial(const char *pszMaterialName)
 	{
 		for (int i = 0; i < m_nEntries; i++)
 		{
-			if (!stricmp(m_pCache[i].pMaterial->GetName(), pszMaterialName))
+			if (V_strieq(m_pCache[i].pMaterial->GetName(), pszMaterialName))
 			{
 				return(m_pCache[i].pMaterial);
 			}

@@ -7166,19 +7166,19 @@ void CAI_BaseNPC::AddRelationship( const char *pszRelationship, CBaseEntity *pAc
 		Disposition_t disposition = D_NU;
 		if ( dispositionString )
 		{
-			if (!stricmp(dispositionString,"D_HT"))
+			if (V_strieq(dispositionString,"D_HT"))
 			{
 				disposition = D_HT;
 			}
-			else if (!stricmp(dispositionString,"D_FR"))
+			else if (V_strieq(dispositionString,"D_FR"))
 			{
 				disposition = D_FR;
 			}
-			else if (!stricmp(dispositionString,"D_LI"))
+			else if (V_strieq(dispositionString,"D_LI"))
 			{
 				disposition = D_LI;
 			}
-			else if (!stricmp(dispositionString,"D_NU"))
+			else if (V_strieq(dispositionString,"D_NU"))
 			{
 				disposition = D_NU;
 			}
@@ -7216,7 +7216,7 @@ void CAI_BaseNPC::AddRelationship( const char *pszRelationship, CBaseEntity *pAc
 		if( !bFoundEntity )
 		{
 			// Need special condition for player as we can only have one
-			if (!stricmp("player", entityString) || !stricmp("!player", entityString))
+			if (V_strieq("player", entityString) || V_strieq("!player", entityString))
 			{
 				AddClassRelationship( CLASS_PLAYER, disposition, priority );
 			}
@@ -9904,26 +9904,26 @@ int CAI_BaseNPC::PlayScriptedSentence( const char *pszSentence, float delay, flo
 //-----------------------------------------------------------------------------
 CBaseEntity *CAI_BaseNPC::FindNamedEntity( const char *name, IEntityFindFilter *pFilter )
 {
-	if ( !stricmp( name, "!player" ))
+	if ( V_strieq( name, "!player" ))
 	{
 		return ( CBaseEntity * )AI_GetSinglePlayer();
 	}
-	else if ( !stricmp( name, "!enemy" ) )
+	else if ( V_strieq( name, "!enemy" ) )
 	{
 		if (GetEnemy() != NULL)
 			return GetEnemy();
 	}
-	else if ( !stricmp( name, "!self" ) || !stricmp( name, "!target1" ) )
+	else if ( V_strieq( name, "!self" ) || V_strieq( name, "!target1" ) )
 	{
 		return this;
 	}
-	else if ( !stricmp( name, "!nearestfriend" ) || !stricmp( name, "!friend" ) )
+	else if ( V_strieq( name, "!nearestfriend" ) || V_strieq( name, "!friend" ) )
 	{
 		// FIXME: look at CBaseEntity *CNPCSimpleTalker::FindNearestFriend(bool fPlayer)
 		// punt for now
 		return ( CBaseEntity * )AI_GetSinglePlayer();
 	}
-	else if (!stricmp( name, "self" ))
+	else if (V_strieq( name, "self" ))
 	{
 		static int selfwarningcount = 0;
 
@@ -9934,7 +9934,7 @@ CBaseEntity *CAI_BaseNPC::FindNamedEntity( const char *name, IEntityFindFilter *
 		}
 		return this;
 	}
-	else if ( !stricmp( name, "Player" ))
+	else if ( V_strieq( name, "Player" ))
 	{
 		static int playerwarningcount = 0;
 		if ( ++playerwarningcount < 5 )

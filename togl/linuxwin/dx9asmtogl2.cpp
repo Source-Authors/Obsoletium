@@ -166,15 +166,15 @@ const char* GetSwizzleDot( const char *pParam )
 int GetNumSwizzleComponents( const char *pParam )
 {
 	// Special scalar output which won't accept a swizzle
-	if ( !V_stricmp( pParam, "gl_FogFragCoord" ) )
+	if ( V_strieq( pParam, "gl_FogFragCoord" ) )
 		return 1;
 
 	// Special scalar output which won't accept a swizzle
-	if ( !V_stricmp( pParam, "gl_FragDepth" ) )
+	if ( V_strieq( pParam, "gl_FragDepth" ) )
 		return 1;	
 	
 	// Special scalar output which won't accept a swizzle
-	if ( !V_stricmp( pParam, "a0" ) )
+	if ( V_strieq( pParam, "a0" ) )
 		return 1;
 	
 	const char *pDot = GetSwizzleDot( pParam );

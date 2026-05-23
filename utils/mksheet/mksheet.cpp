@@ -154,7 +154,7 @@ void ApplyMacros(char *in_buf, intp buffer_size) {
   CUtlVector<char *> Words;
   V_SplitString(in_buf, " ", Words);
 
-  if ((Words.Count() == 4) && (!stricmp(Words[0], "ga_frame"))) {
+  if ((Words.Count() == 4) && (V_strieq(Words[0], "ga_frame"))) {
     // ga_frame frm1 frm2 n -> frame frm1{r=a},frm1{g=a},frm1{b=a},frm2{a=a} n
     V_snprintf(in_buf, buffer_size, "frame %s{r=0},%s{g=a},%s{b=0},%s{a=a} %s",
                Words[1], Words[1], Words[1], Words[2], Words[3]);
@@ -186,13 +186,13 @@ void ReadTextControlFile(char const *fname) {
       CUtlVector<char *> Words;
       V_SplitString(in_str, " ", Words);
 
-      if ((Words.Count() == 1) && (!stricmp(Words[0], "loop"))) {
+      if ((Words.Count() == 1) && (V_strieq(Words[0], "loop"))) {
         if (pCurSequence) pCurSequence->m_Clamp = false;
-      } else if ((Words.Count() == 2) && (!stricmp(Words[0], "packmode"))) {
+      } else if ((Words.Count() == 2) && (V_strieq(Words[0], "packmode"))) {
         PackingMode_t eRequestedMode = PackingMode_t::PCKM_INVALID;
-        if (!stricmp(Words[1], "flat") || !stricmp(Words[1], "rgba"))
+        if (V_strieq(Words[1], "flat") || V_strieq(Words[1], "rgba"))
           eRequestedMode = PackingMode_t::PCKM_FLAT;
-        else if (!stricmp(Words[1], "rgb+a"))
+        else if (V_strieq(Words[1], "rgb+a"))
           eRequestedMode = PackingMode_t::PCKM_RGB_A;
 
         if (eRequestedMode == PackingMode_t::PCKM_INVALID) {
@@ -227,11 +227,11 @@ void ReadTextControlFile(char const *fname) {
 
         // Figure out the sequence type
         char const *szSeqType = StringAfterPrefix(Words[0], "sequence");
-        if (!stricmp(szSeqType, "") || !stricmp(szSeqType, "-rgba"))
+        if (V_strieq(szSeqType, "") || V_strieq(szSeqType, "-rgba"))
           pCurSequence->m_eMode = Sequence::SQM_RGBA;
-        else if (!stricmp(szSeqType, "-rgb"))
+        else if (V_strieq(szSeqType, "-rgb"))
           pCurSequence->m_eMode = Sequence::SQM_RGB;
-        else if (!stricmp(szSeqType, "-a"))
+        else if (V_strieq(szSeqType, "-a"))
           pCurSequence->m_eMode = Sequence::SQM_ALPHA;
         else {
           fprintf(stderr,
@@ -273,7 +273,7 @@ void ReadTextControlFile(char const *fname) {
         }
 
         Sequences.AddToTail(pCurSequence);
-      } else if ((Words.Count() >= 3) && (!stricmp(Words[0], "frame"))) {
+      } else if ((Words.Count() >= 3) && (V_strieq(Words[0], "frame"))) {
         if (pCurSequence) {
           float ftime = strtof(Words[Words.Count() - 1], nullptr);
           SequenceEntry new_entry;

@@ -303,7 +303,7 @@ void CTFPasstimeLogic::PostSpawn()
 	BallPower_PackThink();
 
 	// secret room puzzle
-	if ( !V_stricmp( gpGlobals->mapname.ToCStr(), "pass_brickyard" ) )
+	if ( V_strieq( gpGlobals->mapname.ToCStr(), "pass_brickyard" ) )
 	{
 		SecretRoom_Spawn();
 	}
@@ -748,7 +748,7 @@ void CTFPasstimeLogic::Precache()
 	PrecacheScriptSound( "Passtime.AskForBall" );
 
 	// secret room stuff
-	if ( !V_stricmp( gpGlobals->mapname.ToCStr(), "pass_brickyard" ) )
+	if ( V_strieq( gpGlobals->mapname.ToCStr(), "pass_brickyard" ) )
 	{
 		PrecacheScriptSound( "Passtime.Tv1" );
 		PrecacheScriptSound( "Passtime.Tv2" );

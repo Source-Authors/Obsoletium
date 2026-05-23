@@ -1126,26 +1126,26 @@ void CNewGameDialog::OnCommand( const char *command )
 {
 	bool bReset = true;
 
-	if ( !stricmp( command, "Play" ) )
+	if ( V_strieq( command, "Play" ) )
 	{
 		StartGame();
 	}
-	else if ( !stricmp( command, "Next" ) )
+	else if ( V_strieq( command, "Next" ) )
 	{
 		ScrollSelectionPanels( SCROLL_LEFT );
 		bReset = false;
 	}
-	else if ( !stricmp( command, "Prev" ) )
+	else if ( V_strieq( command, "Prev" ) )
 	{
 		ScrollSelectionPanels( SCROLL_RIGHT );
 		bReset = false;
 	}
-	else if ( !stricmp( command, "Mode_Next" ) )
+	else if ( V_strieq( command, "Mode_Next" ) )
 	{
 		ScrollBonusSelection( SCROLL_LEFT );
 		bReset = false;
 	}
-	else if ( !stricmp( command, "Mode_Prev" ) )
+	else if ( V_strieq( command, "Mode_Prev" ) )
 	{
 		ScrollBonusSelection( SCROLL_RIGHT );
 		bReset = false;

@@ -1264,7 +1264,7 @@ static typedescription_t *FindFieldByName_R( const char *fieldname, datamap_t *d
 			}
 		}
 
-		if ( !V_stricmp( td->fieldName, fieldname ) )
+		if ( V_strieq( td->fieldName, fieldname ) )
 		{
 			return td;
 		}

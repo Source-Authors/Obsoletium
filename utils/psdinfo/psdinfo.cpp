@@ -255,17 +255,17 @@ int main( int argc, char **argv )
 	// Read out all the options
 	for ( int iArg = 1; iArg < argc - 1; ++ iArg )
 	{
-		if ( !stricmp( argv[iArg], "-read" ) )
+		if ( V_strieq( argv[iArg], "-read" ) )
 		{
 			s_opts.bWriteInfo = false;
 		}
-		else if ( !stricmp( argv[iArg], "-write" ) )
+		else if ( V_strieq( argv[iArg], "-write" ) )
 		{
 			s_opts.bWriteInfo = true;
 		}
 		else
 		{
-			printf( "Unknown option \"%s\"!\n", argv[iArg] );
+			fprintf( stderr, "Unknown option \"%s\"!\n", argv[iArg] );
 			return Usage();
 		}
 	}

@@ -495,7 +495,7 @@ CExpression *CExpClass::FindExpression( const char *name )
 	for ( intp i = 0 ; i < m_Expressions.Count(); i++ )
 	{
 		CExpression *exp = &m_Expressions[ i ];
-		if ( !stricmp( exp->name, name ) )
+		if ( V_strieq( exp->name, name ) )
 		{
 			return exp;
 		}
@@ -514,7 +514,7 @@ void CExpClass::DeleteExpression( const char *name )
 	for ( intp i = 0 ; i < m_Expressions.Count(); i++ )
 	{
 		CExpression *exp = &m_Expressions[ i ];
-		if ( !stricmp( exp->name, name ) )
+		if ( V_strieq( exp->name, name ) )
 		{
 			SetDirty( true );
 

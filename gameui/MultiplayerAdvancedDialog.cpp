@@ -110,7 +110,7 @@ void CMultiplayerAdvancedDialog::OnClose()
 //-----------------------------------------------------------------------------
 void CMultiplayerAdvancedDialog::OnCommand( const char *command )
 {
-	if ( !stricmp( command, "Ok" ) )
+	if ( V_strieq( command, "Ok" ) )
 	{
 		// OnApplyChanges();
 		SaveValues();

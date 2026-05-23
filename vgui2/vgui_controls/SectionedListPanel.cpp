@@ -1291,7 +1291,7 @@ bool SectionedListPanel::ModifyColumn(int sectionID, const char *columnName, con
 	intp columnIndex;
 	for (columnIndex = 0; columnIndex < section.m_Columns.Count(); columnIndex++)
 	{
-		if (!stricmp(section.m_Columns[columnIndex].m_szColumnName, columnName))
+		if (V_strieq(section.m_Columns[columnIndex].m_szColumnName, columnName))
 			break;
 	}
 	if (!section.m_Columns.IsValidIndex(columnIndex))
@@ -1554,7 +1554,7 @@ void SectionedListPanel::SetColumnWidthBySection(int sectionID, const char *colu
 	intp columnIndex;
 	for (columnIndex = 0; columnIndex < section.m_Columns.Count(); columnIndex++)
 	{
-		if (!stricmp(section.m_Columns[columnIndex].m_szColumnName, columnName))
+		if (V_strieq(section.m_Columns[columnIndex].m_szColumnName, columnName))
 			break;
 	}
 	if (!section.m_Columns.IsValidIndex(columnIndex))

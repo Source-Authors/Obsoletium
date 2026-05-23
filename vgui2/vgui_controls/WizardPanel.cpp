@@ -653,7 +653,7 @@ void WizardPanel::OnCancelButton()
 //-----------------------------------------------------------------------------
 void WizardPanel::OnCommand(const char *command)
 {
-	if (!stricmp(command, "Cancel"))
+	if (V_strieq(command, "Cancel"))
 	{
 		if (_cancelButton->IsEnabled())
 		{

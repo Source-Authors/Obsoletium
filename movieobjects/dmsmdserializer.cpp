@@ -396,7 +396,7 @@ bool CQcData::ParseQc(
 			if ( tokens.Count() < 1 )
 				continue;
 
-			if ( !V_stricmp( tokens[0], "$upaxis" ) )
+			if ( V_strieq( tokens[0], "$upaxis" ) )
 			{
 				if ( strchr( tokens[1].Get(), 'y' ) || strchr( tokens[1].Get(), 'Y' ) )
 				{
@@ -411,12 +411,12 @@ bool CQcData::ParseQc(
 					m_nUpAxis = CDmSmdSerializer::Z_AXIS;
 				}
 			}
-			else if ( !V_stricmp( tokens[0], "$scale" ) )
+			else if ( V_strieq( tokens[0], "$scale" ) )
 			{
 				// dimhotepus: strtod -> V_atof
 				m_scale = V_atof( tokens[1].Get() );
 			}
-			else if ( !V_stricmp( tokens[0], "$cdmaterials" ) )
+			else if ( V_strieq( tokens[0], "$cdmaterials" ) )
 			{
 				m_cdmaterials.push_back( tokens[1].Get() );
 			}
@@ -442,7 +442,7 @@ bool CQcData::ParseQc(
 		bool bJoin = false;
 		for ( intp i = 0; i < sPathArray.Count(); ++i )
 		{
-			if ( !bJoin && !V_stricmp( sPathArray[i], "models" ) )
+			if ( !bJoin && V_strieq( sPathArray[i], "models" ) )
 			{
 				bJoin = true;
 			}

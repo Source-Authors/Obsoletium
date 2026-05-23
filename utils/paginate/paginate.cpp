@@ -173,7 +173,7 @@ void BuildFileList_R( CUtlVector< CUtlSymbol >& files, char const *dir, char con
 			int len = strlen( wfd.cFileName );
 			if ( len > extlen )
 			{
-				if ( !extension || !stricmp( &wfd.cFileName[ len - extlen ], extension ) )
+				if ( !extension || V_strieq( &wfd.cFileName[ len - extlen ], extension ) )
 				{
 					char filename[ MAX_PATH ];
 					Q_snprintf( filename, sizeof( filename ), "%s\\%s", dir, wfd.cFileName );

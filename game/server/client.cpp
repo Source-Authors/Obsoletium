@@ -198,7 +198,7 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 	if ( args.ArgC() == 0 )
 		return;
 
-	if ( !stricmp( pcmd, cpSay) || !stricmp( pcmd, cpSayTeam ) )
+	if ( V_strieq( pcmd, cpSay) || V_strieq( pcmd, cpSayTeam ) )
 	{
 		if ( args.ArgC() >= 2 )
 		{

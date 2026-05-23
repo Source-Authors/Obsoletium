@@ -31,7 +31,7 @@ bool HasFalcon() {
 
 void COptionsSubHaptics::OnCommand(const char *command)
 {
-	if ( !stricmp( command, "DoDefaults" ) )
+	if ( V_strieq( command, "DoDefaults" ) )
 	{
 		engine->ClientCmd_Unrestricted("exec haptics_default.cfg");
 		OnResetData();

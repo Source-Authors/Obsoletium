@@ -143,7 +143,7 @@ void CInitTracker::Shutdown( const char *shutdown, int listnum )
 	{
 		f = m_Funcs[ listnum ][ i ];
 
-		if ( !stricmp( f->shutdownname, shutdown ) )
+		if ( V_strieq( f->shutdownname, shutdown ) )
 		{
 			Assert( f->referencecount );
 			//f->shutdowntime = Sys_FloatTime();

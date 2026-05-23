@@ -145,7 +145,7 @@ bool CCDKeyEntryDialog::IsValidWeakCDKeyInRegistry()
 //-----------------------------------------------------------------------------
 void CCDKeyEntryDialog::OnCommand(const char *command)
 {
-	if (!stricmp(command, "OK"))
+	if (V_strieq(command, "OK"))
 	{
 		if (IsEnteredKeyValid())
 		{
@@ -188,7 +188,7 @@ void CCDKeyEntryDialog::OnCommand(const char *command)
 			m_hErrorBox->ShowWindow( this );
 		}
 	}
-	else if (!stricmp(command, "Cancel") || !stricmp(command, "Close"))
+	else if (V_strieq(command, "Cancel") || V_strieq(command, "Close"))
 	{
 		Close();
 	}

@@ -79,7 +79,7 @@ bool IsPlayerClassname( const char *string )
 {
 	for ( int i = TF_CLASS_SCOUT; i < TF_CLASS_COUNT_ALL; ++i )
 	{
-		if ( !stricmp( string, GetPlayerClassData( i )->m_szClassName ) )
+		if ( V_strieq( string, GetPlayerClassData( i )->m_szClassName ) )
 		{
 			return true;
 		}
@@ -92,10 +92,10 @@ bool IsPlayerClassname( const char *string )
 //-----------------------------------------------------------------------------------------------------
 bool IsTeamName( const char *string )
 {
-	if ( !stricmp( string, "red" ) )
+	if ( V_strieq( string, "red" ) )
 		return true;
 
-	if ( !stricmp( string, "blue" ) )
+	if ( V_strieq( string, "blue" ) )
 		return true;
 
 	return false;
@@ -105,16 +105,16 @@ bool IsTeamName( const char *string )
 //-----------------------------------------------------------------------------------------------------
 CTFBot::DifficultyType StringToDifficultyLevel( const char *string )
 {
-	if ( !stricmp( string, "easy" ) )
+	if ( V_strieq( string, "easy" ) )
 		return CTFBot::EASY;
 
-	if ( !stricmp( string, "normal" ) )
+	if ( V_strieq( string, "normal" ) )
 		return CTFBot::NORMAL;
 
-	if ( !stricmp( string, "hard" ) )
+	if ( V_strieq( string, "hard" ) )
 		return CTFBot::HARD;
 
-	if ( !stricmp( string, "expert" ) )
+	if ( V_strieq( string, "expert" ) )
 		return CTFBot::EXPERT;
 
 	return CTFBot::UNDEFINED;
@@ -357,7 +357,7 @@ CON_COMMAND_F( tf_bot_add, "Add a bot.", FCVAR_GAMEDLL )
 		{
 			teamname = args.Arg(i);
 		}
-		else if ( !stricmp( args.Arg( i ), "noquota" ) )
+		else if ( V_strieq( args.Arg( i ), "noquota" ) )
 		{
 			bQuotaManaged = false;
 		}

@@ -2366,12 +2366,12 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 			Msg( "--static-prop-lighting: true\n");
 			g_bStaticPropLighting = true;
 		}
-		else if ( !stricmp( argv[i], "-StaticPropNormals" ) )
+		else if ( V_strieq( argv[i], "-StaticPropNormals" ) )
 		{
 			Msg( "--static-prop-normals: true\n");
 			g_bShowStaticPropNormals = true;
 		}
-		else if ( !stricmp( argv[i], "-OnlyStaticProps" ) )
+		else if ( V_strieq( argv[i], "-OnlyStaticProps" ) )
 		{
 			Msg( "--only-static-props: true\n");
 			g_bOnlyStaticProps = true;

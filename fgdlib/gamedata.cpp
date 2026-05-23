@@ -776,7 +776,7 @@ bool GameData::LoadFGDMaterialExclusions( TokenReader &tr )
 			// Make sure we haven't loaded this from another FGD
 			for ( int i = 0; i < m_FGDMaterialExclusions.Count(); i++ )
 			{
-				if ( !stricmp( szToken, m_FGDMaterialExclusions[i].szDirectory ) )
+				if ( V_strieq( szToken, m_FGDMaterialExclusions[i].szDirectory ) )
 				{			
 					bMatchFound = true;
 					break;

@@ -4714,7 +4714,7 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 	szCmd = args.Arg( 1 );
 	Msg( "mat_texture_list_txlod_sync %s...\n", szCmd );
 
-	if ( !stricmp( szCmd, "reset" ) )
+	if ( V_strieq( szCmd, "reset" ) )
 	{
 		for ( unsigned short k = 0; k < s_OverrideMap.GetNumStrings(); ++ k )
 		{
@@ -4733,7 +4733,7 @@ CON_COMMAND_F( mat_texture_list_txlod_sync, "'reset' - resets all run-time chang
 		return;
 	}
 	
-	if ( !stricmp( szCmd, "save" ) )
+	if ( V_strieq( szCmd, "save" ) )
 	{
 		CP4Requirement p4req;
 		if ( !p4 )

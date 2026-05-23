@@ -57,7 +57,7 @@ void SetVProject( const char *pProjectName )
 
 		for ( i=0; i<g_numProjects; i++ )
 		{
-			if ( !stricmp( g_projects[i].pName, project ) )
+			if ( V_strieq( g_projects[i].pName, project ) )
 			{
 				// found
 				break;
@@ -567,7 +567,7 @@ bool Startup()
 		Sys_NormalizePath( temp, false );
 		for ( i=0; i<g_numProjects; i++ )
 		{
-			if ( !stricmp( g_projects[i].pGamedir, temp ) )
+			if ( V_strieq( g_projects[i].pGamedir, temp ) )
 			{
 				// found
 				g_nActiveVProject = i+1;

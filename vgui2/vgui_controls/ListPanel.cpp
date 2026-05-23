@@ -833,7 +833,7 @@ int ListPanel::FindColumn(const char *columnName)
 {
 	for (int i = 0; i < m_CurrentColumns.Count(); i++)
 	{
-		if (!stricmp(columnName, m_ColumnsData[m_CurrentColumns[i]].m_pHeader->GetName()))
+		if (V_strieq(columnName, m_ColumnsData[m_CurrentColumns[i]].m_pHeader->GetName()))
 		{
 			return i;
 		}
@@ -920,7 +920,7 @@ intp ListPanel::GetItem(const char *itemName)
 {
 	FOR_EACH_LL( m_DataItems, i )
 	{
-		if (!stricmp(m_DataItems[i]->kv->GetName(), itemName))
+		if (V_strieq(m_DataItems[i]->kv->GetName(), itemName))
 		{
 			return i;
 		}

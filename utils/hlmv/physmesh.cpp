@@ -310,7 +310,7 @@ void CStudioPhysics::ParseKeydata( void )
 	while ( !pParser->Finished() )
 	{
 		const char *pBlock = pParser->GetCurrentBlockName();
-		if ( !stricmp( pBlock, "solid" ) )
+		if ( V_strieq( pBlock, "solid" ) )
 		{
 			hlmvsolid_t solid;
 			CSolidParse solidParse;
@@ -324,7 +324,7 @@ void CStudioPhysics::ParseKeydata( void )
 				memcpy( &m_pList[solid.index].m_solid, &solid, sizeof(solid) );
 			}
 		}
-		else if ( !stricmp( pBlock, "ragdollconstraint" ) )
+		else if ( V_strieq( pBlock, "ragdollconstraint" ) )
 		{
 			constraint_ragdollparams_t constraint;
 			pParser->ParseRagdollConstraint( &constraint, NULL );
@@ -337,7 +337,7 @@ void CStudioPhysics::ParseKeydata( void )
 				m_pList[constraint.childIndex].m_constraint = constraint;
 			}
 		}
-		else if ( !stricmp( pBlock, "editparams" ) )
+		else if ( V_strieq( pBlock, "editparams" ) )
 		{
 			CEditParse editParse;
 			pParser->ParseCustom( &m_edit, &editParse );

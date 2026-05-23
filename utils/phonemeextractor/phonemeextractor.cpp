@@ -1300,7 +1300,7 @@ static SR_RESULT SAPI_ExtractPhonemes(
 				const CWordTag *toTag = outwords.m_Words[ topos ];
 
 				// Words match, just skip ahead
-				if ( !stricmp( fromTag->GetWord(), toTag->GetWord() ) )
+				if ( V_strieq( fromTag->GetWord(), toTag->GetWord() ) )
 				{
 					frompos++;
 					topos++;
@@ -1315,7 +1315,7 @@ static SR_RESULT SAPI_ExtractPhonemes(
 				while ( skipAhead < inwords.m_Words.Count() )
 				{
 					const CWordTag *sourceWord = inwords.m_Words[ skipAhead ];
-					if ( !stricmp( sourceWord->GetWord(), toTag->GetWord() ) )
+					if ( V_strieq( sourceWord->GetWord(), toTag->GetWord() ) )
 					{
 						found = true;
 						break;

@@ -5809,7 +5809,7 @@ int Studio_FindAttachment( const CStudioHdr *pStudioHdr, const char *pAttachment
 		// Extract the bone index from the name
 		for (int i = 0; i < pStudioHdr->GetNumAttachments(); i++)
 		{
-			if (!V_stricmp(pAttachmentName,pStudioHdr->pAttachment(i).pszName( ))) 
+			if (V_strieq(pAttachmentName,pStudioHdr->pAttachment(i).pszName( ))) 
 			{
 				return i;
 			}

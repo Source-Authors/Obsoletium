@@ -772,7 +772,7 @@ void Button::FireActionSignal()
 	if (_actionMessage)
 	{
 		// see if it's a url
-		if (!stricmp(_actionMessage->GetName(), "command")
+		if (V_strieq(_actionMessage->GetName(), "command")
 			&& !strnicmp(_actionMessage->GetString("command", ""), "url ", ssize("url ") - 1)
 			&& strstr(_actionMessage->GetString("command", ""), "://"))
 		{
@@ -799,17 +799,17 @@ void Button::FireActionSignal()
 //-----------------------------------------------------------------------------
 bool Button::RequestInfo(KeyValues *outputData)
 {
-	if (!stricmp(outputData->GetName(), "CanBeDefaultButton"))
+	if (V_strieq(outputData->GetName(), "CanBeDefaultButton"))
 	{
 		outputData->SetInt("result", CanBeDefaultButton() ? 1 : 0);
 		return true;
 	}
-	else if (!stricmp(outputData->GetName(), "GetState"))
+	else if (V_strieq(outputData->GetName(), "GetState"))
 	{
 		outputData->SetInt("state", IsSelected());
 		return true;
 	}
-	else if ( !stricmp( outputData->GetName(), "GetCommand" ))
+	else if ( V_strieq( outputData->GetName(), "GetCommand" ))
 	{
 		if ( _actionMessage )
 		{

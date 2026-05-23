@@ -1283,7 +1283,7 @@ int CMaterial::ParseMaterialVars( IShader* pShader, KeyValues& keyValues,
 				for ( i = numParams; i < varCount; ++i)
 				{
 					Assert( ppVars[i] );
-					if (!stricmp( ppVars[i]->GetName(), pVar->GetName() ))
+					if (V_strieq( ppVars[i]->GetName(), pVar->GetName() ))
 						break;
 				}
 				if (i != varCount)

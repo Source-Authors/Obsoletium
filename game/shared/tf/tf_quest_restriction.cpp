@@ -1928,7 +1928,7 @@ private:
 		const char *pszMapName = gpGlobals->mapname.ToCStr();
 #endif
 		
-		return !V_stricmp( m_pszMapName, pszMapName );
+		return V_strieq( m_pszMapName, pszMapName );
 	}
 
 	const char *m_pszMapName;

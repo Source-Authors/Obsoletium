@@ -214,7 +214,7 @@ mxExpressionTray::mxETButton *mxExpressionTray::FindButton( const char *name )
 	mxETButton *p = m_pButtons;
 	while ( p )
 	{
-		if ( !stricmp( p->m_szName, name ) )
+		if ( V_strieq( p->m_szName, name ) )
 			return p;
 		p = p->next;
 	}

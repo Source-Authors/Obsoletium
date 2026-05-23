@@ -1461,7 +1461,7 @@ void CChoreoView::AssociateModel( void )
 
 		V_strcpy_safe( text.choice, modelname );
 
-		if ( !stricmp( a->GetName(), modelname ) )
+		if ( V_strieq( a->GetName(), modelname ) )
 		{
 			params.m_nSelected = i;
 			oldsel = -1;
@@ -4621,7 +4621,7 @@ void CChoreoView::ProcessFlexAnimation( CChoreoScene *scene, CChoreoEvent *event
 		if ( !actor )
 			continue;
 
-		if ( !stricmp( actor->GetActor()->GetName(), a->GetName() ) )
+		if ( V_strieq( actor->GetActor()->GetName(), a->GetName() ) )
 			break;
 	}
 
@@ -4743,12 +4743,12 @@ void CChoreoView::ProcessLookat( CChoreoScene *scene, CChoreoEvent *event )
 	flMaxIntensity = min( flMaxIntensity, flDuration < 0.3f ? SimpleSpline( flDuration / 0.3f ) : 1.0f );
 	flIntensity = clamp( flIntensity, 0.0f, flMaxIntensity );
 
-	if (!stricmp( event->GetParameters(), a->GetName() ) || !stricmp( event->GetParameters(), "!self" ))
+	if (V_strieq( event->GetParameters(), a->GetName() ) || V_strieq( event->GetParameters(), "!self" ))
 	{
 		model->AddLookTargetSelf( flIntensity );
 	}
-	else if ( !stricmp( event->GetParameters(), "player" ) || 
-		!stricmp( event->GetParameters(), "!player" ) )
+	else if ( V_strieq( event->GetParameters(), "player" ) || 
+		V_strieq( event->GetParameters(), "!player" ) )
 	{
 		Vector vecTarget = model->m_origin;
 		vecTarget.z = 0;
@@ -4854,13 +4854,13 @@ bool CChoreoView::GetTarget( CChoreoScene *scene, CChoreoEvent *event, Vector &v
 		return false;
 	}
 
-	if (!stricmp( event->GetParameters(), a->GetName() ))
+	if (V_strieq( event->GetParameters(), a->GetName() ))
 	{
 		vecTarget = vec3_origin;
 		return true;
 	}
-	else if ( !stricmp( event->GetParameters(), "player" ) || 
-		!stricmp( event->GetParameters(), "!player" ) )
+	else if ( V_strieq( event->GetParameters(), "player" ) || 
+		V_strieq( event->GetParameters(), "!player" ) )
 	{
 		vecTarget = model->m_origin;
 		vecTarget.z = 0;
@@ -5257,16 +5257,16 @@ void CChoreoView::ProcessPause( CChoreoScene *scene, CChoreoEvent *event )
 	if ( tokenprocessor->TokenAvailable() )
 	{
 		tokenprocessor->GetToken( false );
-		if ( !stricmp( tokenprocessor->CurrentToken(), "automate" ) )
+		if ( V_strieq( tokenprocessor->CurrentToken(), "automate" ) )
 		{
 			if ( tokenprocessor->TokenAvailable() )
 			{
 				tokenprocessor->GetToken( false );
-				if ( !stricmp( tokenprocessor->CurrentToken(), "Cancel" ) )
+				if ( V_strieq( tokenprocessor->CurrentToken(), "Cancel" ) )
 				{
 					m_nAutomatedAction = SCENE_ACTION_CANCEL;
 				}
-				else if ( !stricmp( tokenprocessor->CurrentToken(), "Resume" ) )
+				else if ( V_strieq( tokenprocessor->CurrentToken(), "Resume" ) )
 				{
 					m_nAutomatedAction = SCENE_ACTION_RESUME;
 				}
@@ -6126,7 +6126,7 @@ void CChoreoView::LoadNext( void )
 
 	for (intp i = 0; i < m_nextFileList.Count(); i++)
 	{
-		if (!stricmp( fileBase, m_nextFileList[i] ))
+		if (V_strieq( fileBase, m_nextFileList[i] ))
 		{
 			char fileName[512];
 			V_strcpy_safe( fileName, relativePath );

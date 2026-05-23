@@ -633,14 +633,14 @@ void EditablePanel::OnClose()
 //-----------------------------------------------------------------------------
 bool EditablePanel::RequestInfo(KeyValues *data)
 {
-	if (!stricmp(data->GetName(), "BuildDialog"))
+	if (V_strieq(data->GetName(), "BuildDialog"))
 	{
 		// a build dialog is being requested, give it one
 		// a bit hacky, but this is a case where vgui.dll needs to reach out
 		data->SetPtr("PanelPtr", new BuildModeDialog( (BuildGroup *)data->GetPtr("BuildGroupPtr")));
 		return true;
 	}
-	else if (!stricmp(data->GetName(), "ControlFactory"))
+	else if (V_strieq(data->GetName(), "ControlFactory"))
 	{
 		Panel *newPanel = CreateControlByName(data->GetString("ControlName"));
 		if (newPanel)

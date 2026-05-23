@@ -263,7 +263,7 @@ bool CEntityConnection::ValidateTarget( const CMapEntityList *pEntityList, bool 
 		return false;
 
 	// These procedural names are always assumed to exist.
-	if (!stricmp(pszTarget, "!activator") || !stricmp(pszTarget, "!caller") || !stricmp(pszTarget, "!player") || !stricmp(pszTarget, "!self"))
+	if (V_strieq(pszTarget, "!activator") || V_strieq(pszTarget, "!caller") || V_strieq(pszTarget, "!player") || V_strieq(pszTarget, "!self"))
 		return true;
 
 	FOR_EACH_OBJ( *pEntityList, pos )
@@ -288,7 +288,7 @@ bool CEntityConnection::ValidateInput(const char* pszTarget, const char *pszInpu
 {
 	// Allow any input into !activator and !player.
 	// dvs: TODO: pass in the entity to resolve !self and check input list
-	if (!stricmp(pszTarget, "!activator") || !stricmp(pszTarget, "!caller") || !stricmp(pszTarget, "!player") || !stricmp(pszTarget, "!self"))
+	if (V_strieq(pszTarget, "!activator") || V_strieq(pszTarget, "!caller") || V_strieq(pszTarget, "!player") || V_strieq(pszTarget, "!self"))
 	{
 		return true;
 	}

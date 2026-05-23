@@ -82,7 +82,7 @@ SpewRetval_t DefaultSpew(SpewType_t spew_type, const char *raw) {
       return SPEW_CONTINUE;
 
     case SPEW_WARNING:
-      if (!stricmp(GetSpewOutputGroup(), "init")) {
+      if (V_strieq(GetSpewOutputGroup(), "init")) {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING,
                                  "Source Launcher - Warning", message, nullptr);
       }

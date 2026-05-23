@@ -117,14 +117,14 @@ CAI_Schedule *CAI_SchedulesManager::CreateSchedule(char *name, int schedule_id)
 //-----------------------------------------------------------------------------
 int CAI_SchedulesManager::GetStateID(const char *state_name)
 {
-	if		(!stricmp(state_name,"NONE"))		{	return NPC_STATE_NONE;		}
-	else if (!stricmp(state_name,"IDLE"))		{	return NPC_STATE_IDLE;		}
-	else if (!stricmp(state_name,"COMBAT"))		{	return NPC_STATE_COMBAT;	}
-	else if (!stricmp(state_name,"PRONE"))		{	return NPC_STATE_PRONE;		}
-	else if (!stricmp(state_name,"ALERT"))		{	return NPC_STATE_ALERT;		}
-	else if (!stricmp(state_name,"SCRIPT"))		{	return NPC_STATE_SCRIPT;	}
-	else if (!stricmp(state_name,"PLAYDEAD"))	{	return NPC_STATE_PLAYDEAD;	}
-	else if (!stricmp(state_name,"DEAD"))		{	return NPC_STATE_DEAD;		}
+	if		(V_strieq(state_name,"NONE"))		{	return NPC_STATE_NONE;		}
+	else if (V_strieq(state_name,"IDLE"))		{	return NPC_STATE_IDLE;		}
+	else if (V_strieq(state_name,"COMBAT"))		{	return NPC_STATE_COMBAT;	}
+	else if (V_strieq(state_name,"PRONE"))		{	return NPC_STATE_PRONE;		}
+	else if (V_strieq(state_name,"ALERT"))		{	return NPC_STATE_ALERT;		}
+	else if (V_strieq(state_name,"SCRIPT"))		{	return NPC_STATE_SCRIPT;	}
+	else if (V_strieq(state_name,"PLAYDEAD"))	{	return NPC_STATE_PLAYDEAD;	}
+	else if (V_strieq(state_name,"DEAD"))		{	return NPC_STATE_DEAD;		}
 	else											return -1;
 }
 
@@ -135,19 +135,19 @@ int CAI_SchedulesManager::GetStateID(const char *state_name)
 //-----------------------------------------------------------------------------
 int CAI_SchedulesManager::GetMemoryID(const char *state_name)
 {
-	if		(!stricmp(state_name,"PROVOKED"))		{	return bits_MEMORY_PROVOKED;		}
-	else if (!stricmp(state_name,"INCOVER"))		{	return bits_MEMORY_INCOVER;			}
-	else if (!stricmp(state_name,"SUSPICIOUS"))		{	return bits_MEMORY_SUSPICIOUS;		}
-	else if (!stricmp(state_name,"PATH_FAILED"))	{	return bits_MEMORY_PATH_FAILED;		}
-	else if (!stricmp(state_name,"FLINCHED"))		{	return bits_MEMORY_FLINCHED;		}
-	else if (!stricmp(state_name,"TOURGUIDE"))		{	return bits_MEMORY_TOURGUIDE;		}
-	else if (!stricmp(state_name,"LOCKED_HINT"))	{	return bits_MEMORY_LOCKED_HINT;		}
-	else if (!stricmp(state_name,"TURNING"))		{	return bits_MEMORY_TURNING;			}
-	else if (!stricmp(state_name,"TURNHACK"))		{	return bits_MEMORY_TURNHACK;		}
-	else if (!stricmp(state_name,"CUSTOM4"))		{	return bits_MEMORY_CUSTOM4;			}
-	else if (!stricmp(state_name,"CUSTOM3"))		{	return bits_MEMORY_CUSTOM3;			}
-	else if (!stricmp(state_name,"CUSTOM2"))		{	return bits_MEMORY_CUSTOM2;			}
-	else if (!stricmp(state_name,"CUSTOM1"))		{	return bits_MEMORY_CUSTOM1;			}
+	if		(V_strieq(state_name,"PROVOKED"))		{	return bits_MEMORY_PROVOKED;		}
+	else if (V_strieq(state_name,"INCOVER"))		{	return bits_MEMORY_INCOVER;			}
+	else if (V_strieq(state_name,"SUSPICIOUS"))		{	return bits_MEMORY_SUSPICIOUS;		}
+	else if (V_strieq(state_name,"PATH_FAILED"))	{	return bits_MEMORY_PATH_FAILED;		}
+	else if (V_strieq(state_name,"FLINCHED"))		{	return bits_MEMORY_FLINCHED;		}
+	else if (V_strieq(state_name,"TOURGUIDE"))		{	return bits_MEMORY_TOURGUIDE;		}
+	else if (V_strieq(state_name,"LOCKED_HINT"))	{	return bits_MEMORY_LOCKED_HINT;		}
+	else if (V_strieq(state_name,"TURNING"))		{	return bits_MEMORY_TURNING;			}
+	else if (V_strieq(state_name,"TURNHACK"))		{	return bits_MEMORY_TURNHACK;		}
+	else if (V_strieq(state_name,"CUSTOM4"))		{	return bits_MEMORY_CUSTOM4;			}
+	else if (V_strieq(state_name,"CUSTOM3"))		{	return bits_MEMORY_CUSTOM3;			}
+	else if (V_strieq(state_name,"CUSTOM2"))		{	return bits_MEMORY_CUSTOM2;			}
+	else if (V_strieq(state_name,"CUSTOM1"))		{	return bits_MEMORY_CUSTOM1;			}
 	else												return -1;
 }
 
@@ -158,12 +158,12 @@ int CAI_SchedulesManager::GetMemoryID(const char *state_name)
 //-----------------------------------------------------------------------------
 int CAI_SchedulesManager::GetPathID( const char *token )
 {
-	if		( !stricmp( token, "TRAVEL" ) )	{	return PATH_TRAVEL;		}
-	else if ( !stricmp( token, "LOS" ) )		{	return PATH_LOS;		}
-//	else if ( !stricmp( token, "FLANK" ) )		{	return PATH_FLANK;		}
-//	else if ( !stricmp( token, "FLANK_LOS" ) )	{	return PATH_FLANK_LOS;	}
-	else if ( !stricmp( token, "COVER" ) )		{	return PATH_COVER;		}
-//	else if ( !stricmp( token, "COVER_LOS" ) )	{	return PATH_COVER_LOS;	}
+	if		( V_strieq( token, "TRAVEL" ) )		{	return PATH_TRAVEL;		}
+	else if ( V_strieq( token, "LOS" ) )		{	return PATH_LOS;		}
+//	else if ( V_strieq( token, "FLANK" ) )		{	return PATH_FLANK;		}
+//	else if ( V_strieq( token, "FLANK_LOS" ) )	{	return PATH_FLANK_LOS;	}
+	else if ( V_strieq( token, "COVER" ) )		{	return PATH_COVER;		}
+//	else if ( V_strieq( token, "COVER_LOS" ) )	{	return PATH_COVER_LOS;	}
 
 	return -1;
 }
@@ -175,10 +175,10 @@ int CAI_SchedulesManager::GetPathID( const char *token )
 //-----------------------------------------------------------------------------
 int CAI_SchedulesManager::GetGoalID( const char *token )
 {
-	if		( !stricmp( token, "ENEMY" ) )			{	return GOAL_ENEMY;			}
-	else if ( !stricmp( token, "ENEMY_LKP" ) )		{	return GOAL_ENEMY_LKP;		}
-	else if ( !stricmp( token, "TARGET" ) )			{	return GOAL_TARGET;			}
-	else if ( !stricmp( token, "SAVED_POSITION" ) )	{	return GOAL_SAVED_POSITION;	}
+	if		( V_strieq( token, "ENEMY" ) )			{	return GOAL_ENEMY;			}
+	else if ( V_strieq( token, "ENEMY_LKP" ) )		{	return GOAL_ENEMY_LKP;		}
+	else if ( V_strieq( token, "TARGET" ) )			{	return GOAL_TARGET;			}
+	else if ( V_strieq( token, "SAVED_POSITION" ) )	{	return GOAL_SAVED_POSITION;	}
 
 	return -1;
 }
@@ -196,7 +196,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 	char save_token[1024];
 	const char *pfile = engine->ParseFile(pStartFile, token );
 
-	while (!stricmp("Schedule",token))
+	while (V_strieq("Schedule",token))
 	{
 		pfile = engine->ParseFile(pfile, token );
 
@@ -258,7 +258,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 			// Read in the task argument
 			pfile = engine->ParseFile(pfile, token );
 
-			if (!stricmp("Activity",token))
+			if (V_strieq("Activity",token))
 			{
 				// Skip the ";", but make sure it's present
 				pfile = engine->ParseFile(pfile, token );
@@ -279,7 +279,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 					return false;
 				}
 			}
-			else if (!stricmp("Task",token))
+			else if (V_strieq("Task",token))
 			{
 				// Skip the ";", but make sure it's present
 				pfile = engine->ParseFile(pfile, token );
@@ -304,7 +304,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 					return false;
 				}
 			}
-			else if (!stricmp("Schedule",token))
+			else if (V_strieq("Schedule",token))
 			{
 				// Skip the ";", but make sure it's present
 				pfile = engine->ParseFile(pfile, token );
@@ -329,7 +329,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 					return false;
 				}
 			}
-			else if (!stricmp("State",token))
+			else if (V_strieq("State",token))
 			{
 				// Skip the ";", but make sure it's present
 				pfile = engine->ParseFile(pfile, token );
@@ -350,7 +350,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 					return false;
 				}
 			}
-			else if (!stricmp("Memory",token))
+			else if (V_strieq("Memory",token))
 			{
 
 				// Skip the ";", but make sure it's present
@@ -372,7 +372,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 					return false;
 				}
 			}
-			else if (!stricmp("Path",token))
+			else if (V_strieq("Path",token))
 			{
 				// Skip the ";", but make sure it's present
 				pfile = engine->ParseFile(pfile, token );
@@ -393,7 +393,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 					return false;
 				}
 			}
-			else if (!stricmp("Goal",token))
+			else if (V_strieq("Goal",token))
 			{
 				// Skip the ";", but make sure it's present
 				pfile = engine->ParseFile(pfile, token );
@@ -414,7 +414,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 					return false;
 				}
 			}
-			else if ( !stricmp( "HintFlags",token ) )
+			else if ( V_strieq( "HintFlags",token ) )
 			{
 				// Skip the ":", but make sure it's present
 				pfile = engine->ParseFile(pfile, token );
@@ -435,7 +435,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 					return false;
 				}
 			}
-			else if (!stricmp("Interrupts",token) || !strnicmp("TASK_",token,5) )
+			else if (V_strieq("Interrupts",token) || !strnicmp("TASK_",token,5) )
 			{
 				// a parse error.  Interrupts is the next section, TASK_ is probably the next task, missing task argument?
 				Warning( "ERROR: LoadSchd (%s): (%s) Bad syntax at task #%d (wasn't expecting %s)\n", prefix, new_schedule->GetName(), taskNum, token);
@@ -453,7 +453,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 			pfile = engine->ParseFile(pfile, token );
 
 			// Check for malformed task argument type
-			if (!stricmp(token,":"))
+			if (V_strieq(token,":"))
 			{
 				DevMsg( "ERROR: LoadSchd (%s): Schedule (%s),\n        Task (%d), has a malformed AI Task Argument = (%s)\n",
 						prefix,new_schedule->GetName(),taskID,save_token);

@@ -261,7 +261,7 @@ bool CBaseHudWeaponSelection::CanBeSelectedInHUD( C_BaseCombatWeapon *pWeapon )
 //-----------------------------------------------------------------------------
 int	CBaseHudWeaponSelection::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding ) 
 {
-	if (IsInSelectionMode() && pszCurrentBinding && !stricmp(pszCurrentBinding, "cancelselect"))
+	if (IsInSelectionMode() && pszCurrentBinding && V_strieq(pszCurrentBinding, "cancelselect"))
 	{
 		HideSelection();
 		// returning 0 indicates, we've handled it, no more action needs to be taken

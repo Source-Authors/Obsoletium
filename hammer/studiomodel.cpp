@@ -94,7 +94,7 @@ StudioModel *CStudioModelCache::FindModel(const char *pszModelPath)
 		V_strncpy( testPath2, m_Cache[i].pszPath, sizeof( testPath2 ) );
 		V_FixSlashes( testPath2 );
 		
-		if (!stricmp(testPath, testPath2))
+		if (V_strieq(testPath, testPath2))
 		{
 			m_Cache[i].nRefCount++;
 			return(m_Cache[i].pModel);

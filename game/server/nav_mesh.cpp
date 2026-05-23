@@ -1205,7 +1205,7 @@ Place CNavMesh::PartialNameToPlace( const char *name ) const
 		if (!strnicmp( m_placeName[i], name, strlen( name ) ))
 		{
 			// check for exact match in case of subsets of other strings
-			if (!stricmp( m_placeName[i], name ))
+			if (V_strieq( m_placeName[i], name ))
 			{
 				found = NameToPlace( m_placeName[i] );
 				isAmbiguous = false;

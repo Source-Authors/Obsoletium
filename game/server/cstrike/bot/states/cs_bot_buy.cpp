@@ -281,19 +281,19 @@ inline WeaponType GetWeaponType( const char *alias )
 	
 	for( i=0; i<PRIMARY_WEAPON_BUY_COUNT; ++i )
 	{
-		if (!stricmp( alias, primaryWeaponBuyInfoCT[i].buyAlias ))
+		if (V_strieq( alias, primaryWeaponBuyInfoCT[i].buyAlias ))
 			return primaryWeaponBuyInfoCT[i].type;
 
-		if (!stricmp( alias, primaryWeaponBuyInfoT[i].buyAlias ))
+		if (V_strieq( alias, primaryWeaponBuyInfoT[i].buyAlias ))
 			return primaryWeaponBuyInfoT[i].type;
 	}
 
 	for( i=0; i<SECONDARY_WEAPON_BUY_COUNT; ++i )
 	{
-		if (!stricmp( alias, secondaryWeaponBuyInfoCT[i].buyAlias ))
+		if (V_strieq( alias, secondaryWeaponBuyInfoCT[i].buyAlias ))
 			return secondaryWeaponBuyInfoCT[i].type;
 
-		if (!stricmp( alias, secondaryWeaponBuyInfoT[i].buyAlias ))
+		if (V_strieq( alias, secondaryWeaponBuyInfoT[i].buyAlias ))
 			return secondaryWeaponBuyInfoT[i].type;
 	}
 

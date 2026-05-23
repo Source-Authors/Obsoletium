@@ -952,7 +952,7 @@ ChunkFileResult_t CMapWorld::LoadHiddenCallback(CChunkFile *pFile, CMapWorld *pW
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CMapWorld::LoadKeyCallback(const char *szKey, const char *szValue, CMapWorld *pWorld)
 {
-	if (!stricmp(szKey, "id"))
+	if (V_strieq(szKey, "id"))
 	{
 		pWorld->SetID(atoi(szValue));
 	}
@@ -1831,7 +1831,7 @@ bool CMapWorld::FindEntitiesByKeyValue(CMapEntityList &Found, const char *pszKey
 
 			if ( pszThisValue != NULL )
 			{
-				if (( pszValue != NULL ) && ( !stricmp( pszValue, pszThisValue )))
+				if (( pszValue != NULL ) && ( V_strieq( pszValue, pszThisValue )))
 				{
 					Found.AddToTail( pEntity );
 				}

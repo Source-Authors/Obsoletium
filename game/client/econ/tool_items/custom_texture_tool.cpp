@@ -1636,7 +1636,7 @@ void CConfirmCustomizeTextureDialog::ActivateFileOpenDialog()
 
 void CConfirmCustomizeTextureDialog::OnCommand( const char *command )
 {
-	if (!stricmp( command, "pick_image" ) )
+	if (V_strieq( command, "pick_image" ) )
 	{
 		ActivateFileOpenDialog();
 		return;

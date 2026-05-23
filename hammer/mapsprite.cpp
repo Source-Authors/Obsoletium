@@ -75,7 +75,7 @@ CMapClass *CMapSprite::CreateMapSprite(CHelperInfo *pHelperInfo, CMapEntity *pPa
 			//
 			// Icons are alpha tested.
 			//
-			if (!stricmp(pHelperInfo->GetName(), "iconsprite"))
+			if (V_strieq(pHelperInfo->GetName(), "iconsprite"))
 			{
 				pSprite->SetRenderMode( kRenderTransAlpha );
 				pSprite->m_bIsIcon = true;
@@ -521,7 +521,7 @@ void CMapSprite::SpriteColor(unsigned char *pColor, int eRenderMode, colorVec Re
 //-----------------------------------------------------------------------------
 void CMapSprite::OnParentKeyChanged(const char* szKey, const char* szValue)
 {
-	if (!stricmp(szKey, "framerate"))
+	if (V_strieq(szKey, "framerate"))
 	{
 		float fFramesPerSecond = atof(szValue);
 		if (fabs(fFramesPerSecond) > 0.001)
@@ -530,7 +530,7 @@ void CMapSprite::OnParentKeyChanged(const char* szKey, const char* szValue)
 			m_fSecondsPerFrame = 1 / fFramesPerSecond;
 		}
 	}
-	else if (!stricmp(szKey, "scale"))
+	else if (V_strieq(szKey, "scale"))
 	{
 		// dimhotepus: atof -> V_atof
 		m_fScale = V_atof(szValue);
@@ -542,7 +542,7 @@ void CMapSprite::OnParentKeyChanged(const char* szKey, const char* szValue)
 
 		PostUpdate(Notify_Changed);
 	}
-	else if (!stricmp(szKey, "rendermode"))
+	else if (V_strieq(szKey, "rendermode"))
 	{
 		switch (atoi(szValue))
 		{
@@ -598,11 +598,11 @@ void CMapSprite::OnParentKeyChanged(const char* szKey, const char* szValue)
 	//
 	// If we are the child of a light entity and its color is changing, change our render color.
 	//
-	else if (!stricmp(szKey, "_light"))
+	else if (V_strieq(szKey, "_light"))
 	{
 		sscanf(szValue, "%d %d %d", &m_RenderColor.r, &m_RenderColor.g, &m_RenderColor.b);
 	}
-	else if (!stricmp(szKey, "angles"))
+	else if (V_strieq(szKey, "angles"))
 	{
 		sscanf(szValue, "%f %f %f", &m_Angles[PITCH], &m_Angles[YAW], &m_Angles[ROLL]);
 		PostUpdate(Notify_Changed);

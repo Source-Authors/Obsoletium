@@ -202,7 +202,7 @@ CBaseRecordingSession *CBaseRecordingSessionManager::FindSessionByName( const ch
 	FOR_EACH_OBJ( this, i )
 	{
 		CBaseRecordingSession *pCurSession = m_vecObjs[ i ];
-		if ( !V_stricmp( pSessionName, pCurSession->m_strName.Get() ) )
+		if ( V_strieq( pSessionName, pCurSession->m_strName.Get() ) )
 			return pCurSession;
 	}
 

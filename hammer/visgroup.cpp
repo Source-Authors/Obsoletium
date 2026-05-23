@@ -68,19 +68,19 @@ bool CVisGroup::IsConvertingOldVisGroups()
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CVisGroup::LoadKeyCallback(const char *szKey, const char *szValue, CVisGroup *pGroup)
 {
-	if (!stricmp(szKey, "name"))
+	if (V_strieq(szKey, "name"))
 	{
 		pGroup->SetName(szValue);
-		if ( !stricmp(szValue, "Auto" ) )
+		if ( V_strieq(szValue, "Auto" ) )
 		{
 			pGroup->SetAuto(true);
 		}
 	}
-	else if (!stricmp(szKey, "visgroupid"))
+	else if (V_strieq(szKey, "visgroupid"))
 	{
 		pGroup->SetID(atoi(szValue));
 	}
-	else if (!stricmp(szKey, "color"))
+	else if (V_strieq(szKey, "color"))
 	{
 		unsigned char r, g, b;
 
@@ -94,7 +94,7 @@ ChunkFileResult_t CVisGroup::LoadKeyCallback(const char *szKey, const char *szVa
 			return(ChunkFile_UnexpectedSymbol);
 		}
 	}
-	else if (!stricmp(szKey, "visible"))
+	else if (V_strieq(szKey, "visible"))
 	{
 		// This is a pre-hierarchical visgroups map -- mark this visgroup as hidden.
 		// We'll skip the code in CMapDoc::PostLoad that recalculates visibility.

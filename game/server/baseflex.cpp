@@ -565,11 +565,11 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 		// check in the tag indexes
 		for ( KeyValues *pkvFaceposer = pkvAllFaceposer->GetFirstSubKey(); pkvFaceposer; pkvFaceposer = pkvFaceposer->GetNextKey() )
 		{
-			if (!stricmp( pkvFaceposer->GetName(), "startloop" ))
+			if (V_strieq( pkvFaceposer->GetName(), "startloop" ))
 			{
 				V_strcpy_safe( szStartLoop, pkvFaceposer->GetString() );
 			}
-			else if (!stricmp( pkvFaceposer->GetName(), "endloop" ))
+			else if (V_strieq( pkvFaceposer->GetName(), "endloop" ))
 			{
 				V_strcpy_safe( szEndLoop, pkvFaceposer->GetString() );
 			}
@@ -606,7 +606,7 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 			// check in the tag indexes
 			for ( KeyValues *pkvFaceposer = pkvAllFaceposer->GetFirstSubKey(); pkvFaceposer; pkvFaceposer = pkvFaceposer->GetNextKey() )
 			{
-				if (!stricmp( pkvFaceposer->GetName(), "tags" ))
+				if (V_strieq( pkvFaceposer->GetName(), "tags" ))
 				{
 					KeyValues *pkvTags;
 					for ( pkvTags = pkvFaceposer->GetFirstSubKey(); pkvTags; pkvTags = pkvTags->GetNextKey() )
@@ -988,7 +988,7 @@ public:
 		// See if it's already loaded
 		for ( auto *file : m_FileList )
 		{
-			if ( file && !stricmp( file->filename, filename ) )
+			if ( file && V_strieq( file->filename, filename ) )
 			{
 				// Make sure translations (local to global flex controller) are set up for this instance
 				EnsureTranslations( instance, ( const flexsettinghdr_t * )file->buffer );
@@ -1599,7 +1599,7 @@ flexsetting_t const *CBaseFlex::FindNamedSetting( flexsettinghdr_t const *pSetti
 
 		const char *name = pSetting->pszName();
 
-		if ( !stricmp( name, expr ) )
+		if ( V_strieq( name, expr ) )
 			break;
 	}
 
@@ -1757,7 +1757,7 @@ void CBaseFlex::AddFlexSetting( const char *expr, float scale,
 
 		const char *name = pSetting->pszName();
 
-		if ( !stricmp( name, expr ) )
+		if ( V_strieq( name, expr ) )
 			break;
 	}
 

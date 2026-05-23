@@ -224,7 +224,7 @@ void CNPC_Alyx::HandleAnimEvent( animevent_t *pEvent )
 		m_hEmpTool->SetLocalOrigin( Vector( 0, 0, 0 ) );
 		m_hEmpTool->SetLocalAngles( QAngle( 0, 0, 0 ) );
 
-		if( !stricmp( pEvent->options, "Emp_Holster" ) )
+		if( V_strieq( pEvent->options, "Emp_Holster" ) )
 		{
 			SetEMPHolstered(true);
 		}

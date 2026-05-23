@@ -483,11 +483,11 @@ void CExpressionManager::LoadClass( const char *inpath )
 				numflexmaps++;
 			}
 		}
-		else if ( !stricmp( token, "$hasweighting" ) )
+		else if ( V_strieq( token, "$hasweighting" ) )
 		{
 			bHasWeighting = true;
 		}
-		else if ( !stricmp( token, "$normalized" ) )
+		else if ( V_strieq( token, "$normalized" ) )
 		{
 			bNormalized = true;
 		}

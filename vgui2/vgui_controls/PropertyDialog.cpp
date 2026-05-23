@@ -146,7 +146,7 @@ void PropertyDialog::PerformLayout()
 //-----------------------------------------------------------------------------
 void PropertyDialog::OnCommand(const char *command)
 {
-	if (!stricmp(command, "OK"))
+	if (V_strieq(command, "OK"))
 	{
 		if ( OnOK(false) )
 		{
@@ -154,12 +154,12 @@ void PropertyDialog::OnCommand(const char *command)
 		}
 		_applyButton->SetEnabled(false);
 	}
-	else if (!stricmp(command, "Cancel"))
+	else if (V_strieq(command, "Cancel"))
 	{
 		OnCancel();
 		Close();
 	}
-	else if (!stricmp(command, "Apply"))
+	else if (V_strieq(command, "Apply"))
 	{
 		OnOK(true);
 		_applyButton->SetEnabled(false);

@@ -158,22 +158,22 @@ void CDispMapImageFilter::ValidWidth( int width )
 ChunkFileResult_t CDispMapImageFilter::LoadFilterKeyCallback( const char *szKey, const char *szValue,
 															  CDispMapImageFilter *pFilter )
 {
-	if( !stricmp( szKey, "Height" ) )
+	if( V_strieq( szKey, "Height" ) )
 	{
 		CChunkFile::ReadKeyValueInt( szValue, pFilter->m_Height );
 		ValidHeight( pFilter->m_Height );
 	}
-	else if( !stricmp( szKey, "Width" ) )
+	else if( V_strieq( szKey, "Width" ) )
 	{
 		CChunkFile::ReadKeyValueInt( szValue, pFilter->m_Width );
 		ValidWidth( pFilter->m_Width );
 	}
-	else if( !stricmp( szKey, "FilterType" ) )
+	else if( V_strieq( szKey, "FilterType" ) )
 	{
 		CString strFilterType = szValue;
 		pFilter->m_Type = GetFilterType( strFilterType );
 	}
-	else if( !stricmp( szKey, "IconName" ) )
+	else if( V_strieq( szKey, "IconName" ) )
 	{
 		pFilter->m_Name = szValue;
 	}

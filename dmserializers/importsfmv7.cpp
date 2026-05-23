@@ -63,7 +63,7 @@ void CImportSFMV7::FixupElement( CDmElement *pElement )
 
 	const char *pType = pElement->GetTypeString();
 
-	if ( !V_stricmp( pType, "DmeAnimationSet" ) )
+	if ( V_strieq( pType, "DmeAnimationSet" ) )
 	{
 		// Add a level of indirection in animation sets
 		// Modify the type of all controls from DmElement to DmeAnimationSetControl

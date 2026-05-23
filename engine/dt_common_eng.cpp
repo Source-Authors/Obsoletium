@@ -45,7 +45,7 @@ RecvTable *DataTable_FindRenamedTable( const char *pOldTableName )
 	// someone finds this code and the list has grown to 10,000.
 	while ( pCur && pCur->m_pOldName && pCur->m_pNewName )
 	{
-		if ( !V_stricmp( pCur->m_pOldName, pOldTableName ) )
+		if ( V_strieq( pCur->m_pOldName, pOldTableName ) )
 		{
 			return FindRecvTable( pCur->m_pNewName );
 		}

@@ -211,7 +211,7 @@ void CClass::CheckChildOfBaseEntity( const char *baseentityclass )
 {
 	m_bDerivedFromCBaseEntity = false;
 
-	if ( !stricmp( m_szName, baseentityclass ) )
+	if ( V_strieq( m_szName, baseentityclass ) )
 	{
 		m_bDerivedFromCBaseEntity = true;
 		return;
@@ -228,7 +228,7 @@ void CClass::CheckChildOfBaseEntity( const char *baseentityclass )
 		}
 
 		// Check name
-		if ( !stricmp( base->m_szName, baseentityclass ) )
+		if ( V_strieq( base->m_szName, baseentityclass ) )
 		{
 			m_bDerivedFromCBaseEntity = true;
 			return;
@@ -393,7 +393,7 @@ bool CClass::CheckForMissingTypeDescriptionFields( int& missingcount, bool creat
 			p = CC_ParseToken( p );
 			if ( strlen( com_token ) <= 0 )
 				break;
-			if ( !stricmp( com_token, "static" ) )
+			if ( V_strieq( com_token, "static" ) )
 			{
 				isstatic = true;
 				break;
@@ -486,7 +486,7 @@ bool CClass::CheckForPredictionFieldsInRecvTableNotMarkedAsSuchCorrectly( int &m
 			p = CC_ParseToken( p );
 			if ( strlen( com_token ) <= 0 )
 				break;
-			if ( !stricmp( com_token, "static" ) )
+			if ( V_strieq( com_token, "static" ) )
 			{
 				isstatic = true;
 				break;
@@ -564,7 +564,7 @@ bool CClass::CheckForMissingPredictionFields( int& missingcount, bool createtds 
 			p = CC_ParseToken( p );
 			if ( strlen( com_token ) <= 0 )
 				break;
-			if ( !stricmp( com_token, "static" ) )
+			if ( V_strieq( com_token, "static" ) )
 			{
 				isstatic = true;
 				break;
@@ -1026,10 +1026,10 @@ bool CClass::ParseClassMember( char *&input, int protection )
 		return true;
 
 	strcpy( var.m_pName, com_token );
-	if ( !stricmp( var.m_pName, "SHARED_CLASSNAME" ) )
+	if ( V_strieq( var.m_pName, "SHARED_CLASSNAME" ) )
 	{
 		input = CC_ParseToken( input );
-		if ( !stricmp( com_token, "(" ) )
+		if ( V_streq( com_token, "(" ) )
 		{
 			char inside[ 256 ];
 			char *saveinput = input;
@@ -1050,7 +1050,7 @@ bool CClass::ParseClassMember( char *&input, int protection )
 		if ( strlen( com_token ) <= 0 )
 			break;
 
-		if ( !stricmp( com_token, "(" ) )
+		if ( V_streq( com_token, "(" ) )
 		{
 			char *saveinput = input;
 
@@ -1061,24 +1061,24 @@ bool CClass::ParseClassMember( char *&input, int protection )
 			// see if the function is being declared in line here
 			input = CC_ParseToken( input );
 
-			if ( !stricmp( com_token, "const" ) )
+			if ( V_strieq( com_token, "const" ) )
 			{
 				// Swallow const if we see it
 				input = CC_ParseToken( input );
 			}
 
-			if ( !stricmp( com_token, "{" ) )
+			if ( V_streq( com_token, "{" ) )
 			{
 				input = CC_DiscardUntilMatchingCharIncludingNesting( input, "{}" );
 			}
 			// pure virtual function?
-			else if ( !stricmp( com_token, "=" ) )
+			else if ( V_streq( com_token, "=" ) )
 			{
 				char ch;
 				input = CC_RawParseChar( input, ";", &ch );
 			}
 			// this was a pointer to a base function
-			else if ( !stricmp( com_token, "(" ) )
+			else if ( V_streq( com_token, "(" ) )
 			{
 				char *end = input - 2;
 				input = saveinput;
@@ -1117,7 +1117,7 @@ bool CClass::ParseClassMember( char *&input, int protection )
 
 			break;
 		}
-		else if ( !stricmp( com_token, "[" ) )
+		else if ( V_streq( com_token, "[" ) )
 		{
 			// It's an array
 			var.m_bArray = true;
@@ -1142,17 +1142,17 @@ bool CClass::ParseClassMember( char *&input, int protection )
 			var.m_pArraySize[ len ] = 0;
 			break;
 		}
-		else if ( !stricmp( com_token, ";" ) )
+		else if ( V_streq( com_token, ";" ) )
 		{
 			break;
 		}
-		else if ( !stricmp( com_token, ":" ) && !isfunction )
+		else if ( V_streq( com_token, ":" ) && !isfunction )
 		{
 			// Eliminate the length specification
 			input = CC_ParseToken( input );
 			continue;
 		}
-		else if ( !stricmp( com_token, "," ) )
+		else if ( V_streq( com_token, "," ) )
 		{
 			wascomma = true;
 			break;
@@ -1176,9 +1176,9 @@ bool CClass::ParseClassMember( char *&input, int protection )
 		}
 		else
 		{
-			if ( !stricmp( var.m_pName, "typedef" ) ||
-				 !stricmp( var.m_pName, "enum" ) ||
-				 !stricmp( var.m_pName, "friend" ) )
+			if ( V_strieq( var.m_pName, "typedef" ) ||
+				 V_strieq( var.m_pName, "enum" ) ||
+				 V_strieq( var.m_pName, "friend" ) )
 			{
 				skipvar = true;
 			}
@@ -1246,7 +1246,7 @@ bool CClass::ParseClassMember( char *&input, int protection )
 			{
 				AddVariable( protection, var.m_pType, var.m_pName, var.m_bArray, var.m_pArraySize );
 			}
-			else if ( !stricmp( var.m_pName, "BaseClass" ) )
+			else if ( V_strieq( var.m_pName, "BaseClass" ) )
 			{
 				if ( !m_szTypedefBaseClass[0] )
 				{
@@ -1265,18 +1265,18 @@ bool CClass::ParseClassMember( char *&input, int protection )
 				break;
 
 			// Remove length specifiers
-			if ( !stricmp( com_token, ":" ) )
+			if ( V_streq( com_token, ":" ) )
 			{
 				input = CC_ParseToken( input );
 				input = CC_ParseToken( input );
 			}
 
-			if ( !stricmp( com_token, "," ) )
+			if ( V_streq( com_token, "," ) )
 			{
 				input = CC_ParseToken( input );
 			}
 
-			if ( !stricmp( com_token, ";" ) )
+			if ( V_streq( com_token, ";" ) )
 				break;
 			
 			strcpy( var.m_pName, com_token );
@@ -1307,11 +1307,11 @@ bool CClass::ParseNestedClass( char *&input )
 
 		// Now see if there's a base class
 		input = CC_ParseToken( input );
-		if ( !stricmp( com_token, ":" ) )
+		if ( V_streq( com_token, ":" ) )
 		{
 			// Parse out public and then classname an
 			input = CC_ParseToken( input );
-			if ( !stricmp( com_token, "public" ) )
+			if ( V_strieq( com_token, "public" ) )
 			{
 				input = CC_ParseToken( input );
 				if ( strlen( com_token ) > 0 )
@@ -1323,14 +1323,14 @@ bool CClass::ParseNestedClass( char *&input )
 						input = CC_ParseToken( input );
 					} while ( strlen( com_token ) && stricmp( com_token, "{" ) );
 
-					if ( !stricmp( com_token, "{" ) )
+					if ( V_streq( com_token, "{" ) )
 					{
 						input = cl->ParseClassDeclaration( input );
 					}
 				}
 			}
 		}
-		else if ( !stricmp( com_token, "{" ) )
+		else if ( V_streq( com_token, "{" ) )
 		{
 			input = cl->ParseClassDeclaration( input );
 		}
@@ -1345,25 +1345,25 @@ bool CClass::ParseNestedClass( char *&input )
 //-----------------------------------------------------------------------------
 bool CClass::ParseProtection( char *&input, int &protection )
 {
-	if ( !stricmp( com_token, "public" ) )
+	if ( V_strieq( com_token, "public" ) )
 	{
 		protection = 0;
 		input = CC_ParseToken( input );
-		Assert( !stricmp( com_token, ":" ) );
+		Assert( V_streq( com_token, ":" ) );
 		return true;
 	}
-	else if ( !stricmp( com_token, "protected" ) )
+	else if ( V_strieq( com_token, "protected" ) )
 	{
 		protection = 1;
 		input = CC_ParseToken( input );
-		Assert( !stricmp( com_token, ":" ) );
+		Assert( V_streq( com_token, ":" ) );
 		return true;
 	}
-	else if ( !stricmp( com_token, "private" ) )
+	else if ( V_strieq( com_token, "private" ) )
 	{
 		protection = 2;
 		input = CC_ParseToken( input );
-		Assert( !stricmp( com_token, ":" ) );
+		Assert( V_streq( com_token, ":" ) );
 		return true;
 	}
 
@@ -1405,7 +1405,7 @@ char *CClass::ParseClassDeclaration( char *input )
 		if ( ParseProtection( input, protection ) )
 			continue;
 
-		if ( !stricmp( com_token, ";" ) )
+		if ( V_streq( com_token, ";" ) )
 			continue;
 
 		if ( com_token[0] == '#' )
@@ -1507,7 +1507,7 @@ void CClass::CheckForHungarianErrors( int& warnings )
 			p = CC_ParseToken( p );
 			if ( strlen( com_token ) <= 0 )
 				break;
-			if ( !stricmp( com_token, "static" ) )
+			if ( V_strieq( com_token, "static" ) )
 			{
 				isstatic = true;
 				break;

@@ -757,7 +757,7 @@ CON_COMMAND( alias, "Alias a command." )
 
 	for ( const auto *blacklistedCommand : g_pBlacklistedCommands )
 	{
-		if ( !V_stricmp( blacklistedCommand, s) )
+		if ( V_strieq( blacklistedCommand, s) )
 		{
 			ConMsg("Can't alias %s\n", blacklistedCommand );
 			return;

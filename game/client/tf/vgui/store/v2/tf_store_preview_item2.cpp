@@ -737,11 +737,11 @@ void CTFStorePreviewItemPanel2::OnCommand( const char *command )
 			  )
 	{
 #ifdef ENABLE_STORE_RENTAL_BACKEND
-		ECartItemType eCartItemType = !V_stricmp( command, "addrentaltocart_1day" )
+		ECartItemType eCartItemType = V_strieq( command, "addrentaltocart_1day" )
 									? kCartItem_Rental_1Day
-									: !V_stricmp( command, "addrentaltocart_3day" )
+									: V_strieq( command, "addrentaltocart_3day" )
 									? kCartItem_Rental_3Day
-									: !V_stricmp( command, "addrentaltocart_7day" )
+									: V_strieq( command, "addrentaltocart_7day" )
 									? kCartItem_Rental_7Day
 									: kCartItem_Purchase;
 #else

@@ -2712,7 +2712,7 @@ void CEconItemDescription::Generate_LootListDesc( const CLocalizationProvider *p
 	// Don't add this description if the item is a special crate type.
 	const IEconTool *pEconTool = pItemDef->GetEconTool();
 	const bool bIsRestrictedCrate = pEconTool && pEconTool->GetUsageRestriction()
-								  ? !V_stricmp( pEconTool->GetUsageRestriction(), "winter" ) || !V_stricmp( pEconTool->GetUsageRestriction(), "summer" )
+								  ? V_strieq( pEconTool->GetUsageRestriction(), "winter" ) || V_strieq( pEconTool->GetUsageRestriction(), "summer" )
 								  : false;
 
 	if ( bIsRestrictedCrate )

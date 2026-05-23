@@ -140,7 +140,7 @@ void CDialogAddBan::OnCommand(const char *command)
 {
 	bool bClose = false;
 
-	if (!stricmp(command, "Okay"))
+	if (V_strieq(command, "Okay"))
 	{
 		char buf[64], idbuf[64];
 		float time;
@@ -203,7 +203,7 @@ void CDialogAddBan::OnCommand(const char *command)
 		}
 		
 	}
-	else if (!stricmp(command, "Close"))
+	else if (V_strieq(command, "Close"))
 	{
 		bClose = true;
 	}

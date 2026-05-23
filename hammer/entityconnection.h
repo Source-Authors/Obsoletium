@@ -124,10 +124,10 @@ typedef CUtlVector<CEntityConnection *> CEntityConnectionList;
 bool CEntityConnection::CompareConnection(CEntityConnection *pConnection)
 {
 	// BUGBUG - Why not compare the GetSourceName() values too?  Why is this field not relevant?
-	return((!stricmp(GetOutputName(), pConnection->GetOutputName())) &&
-		   (!stricmp(GetTargetName(), pConnection->GetTargetName())) &&
-		   (!stricmp(GetInputName(), pConnection->GetInputName())) &&
-		   (!stricmp(GetParam(), pConnection->GetParam())) &&
+	return((V_strieq(GetOutputName(), pConnection->GetOutputName())) &&
+		   (V_strieq(GetTargetName(), pConnection->GetTargetName())) &&
+		   (V_strieq(GetInputName(), pConnection->GetInputName())) &&
+		   (V_strieq(GetParam(), pConnection->GetParam())) &&
 		   (GetDelay() == pConnection->GetDelay()) &&
 		   (GetTimesToFire() == pConnection->GetTimesToFire()));
 }

@@ -975,7 +975,7 @@ public:
 
 	void OnCommand( const char *command ) override
 	{
-		if ( !stricmp(command, "OK") )
+		if ( V_strieq(command, "OK") )
 		{
 			if ( RequiresRestart() )
 			{

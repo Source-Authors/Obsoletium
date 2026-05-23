@@ -242,7 +242,7 @@ void CCreateMultiplayerGameServerPage::LoadConfig() {
         for (int i = 0; i < m_pGameCombo->GetItemCount(); i++) {
           if (!m_pGameCombo->IsItemIDValid(i)) continue;
 
-          if (!stricmp(m_pGameCombo->GetItemUserData(i)->GetString("gamedir"),
+          if (V_strieq(m_pGameCombo->GetItemUserData(i)->GetString("gamedir"),
                        mod)) {
             // item found in list, activate
             m_pGameCombo->ActivateItem(i);
@@ -334,11 +334,11 @@ void CCreateMultiplayerGameServerPage::OnCommand(const char *cmd) {
   m_iPort = GetControlInt("PortEdit", 27015);
 
   // dimhotepus: Handle window close command.
-  if (!stricmp(cmd, "cancel") || !stricmp(cmd, "close")) {
+  if (V_strieq(cmd, "cancel") || V_strieq(cmd, "close")) {
     vgui::ivgui()->PostMessage(m_MainPanel->GetVPanel(), new KeyValues("Quit"),
                                NULL);
     Close();
-  } else if (!stricmp(cmd, "start")) {
+  } else if (V_strieq(cmd, "start")) {
     // save our current settings
     SetConfig(m_szHostName, m_szPassword, m_iMaxPlayers, m_szMod, GetMapName(),
               m_pNetworkCombo->GetActiveItem() != 0, secure, m_iPort);
@@ -729,7 +729,7 @@ void CCreateMultiplayerGameServerPage::OnTextChanged(Panel *panel) {
     char hostname[256];
     GetControlString("ServerNameEdit", m_szHostName, sizeof(m_szHostName));
     V_sprintf_safe(hostname, "%s dedicated server", m_szGameName);
-    if (!stricmp(m_szHostName, hostname)) {
+    if (V_strieq(m_szHostName, hostname)) {
       updateHostname = true;
     }
 

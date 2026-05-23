@@ -2304,7 +2304,7 @@ void CReplayPerformanceEditorPanel::OnCommand( const char *command )
 
 	g_bIsReplayRewinding = false;
 
-	if ( !V_stricmp( command, "toggle_menu" ) )
+	if ( V_strieq( command, "toggle_menu" ) )
 	{
 		ToggleMenu();
 	}
@@ -2312,31 +2312,31 @@ void CReplayPerformanceEditorPanel::OnCommand( const char *command )
 	{
 		const char *pMenuCommand = command + 5;
 
-		if ( !V_stricmp( pMenuCommand, "save" ) )
+		if ( V_strieq( pMenuCommand, "save" ) )
 		{
 			OnMenuCommand_Save();
 		}
-		else if ( !V_stricmp( pMenuCommand, "saveas" ) )
+		else if ( V_strieq( pMenuCommand, "saveas" ) )
 		{
 			OnMenuCommand_SaveAs();
 		}
-		else if ( !V_stricmp( pMenuCommand, "exit" ) )
+		else if ( V_strieq( pMenuCommand, "exit" ) )
 		{
 			OnMenuCommand_Exit();
 		}
 	}
-	else if ( !V_stricmp( command, "close" ) )
+	else if ( V_strieq( command, "close" ) )
 	{
 		ShowPanel( false );
 		MarkForDeletion();
 		return;
 	}
-	else if ( !V_stricmp( command, "play" ) )
+	else if ( V_strieq( command, "play" ) )
 	{
 		ShowPanel( false );
 		return;
 	}
-	else if ( !V_stricmp( command, "pause" ) )
+	else if ( V_strieq( command, "pause" ) )
 	{
 		ShowPanel( true );
 		return;
@@ -2344,7 +2344,7 @@ void CReplayPerformanceEditorPanel::OnCommand( const char *command )
 	else if ( !V_strnicmp( command, "timescale_", 10 ) )
 	{
 		const char *pTimeScaleCmd = command + 10;
-		if ( !V_stricmp( pTimeScaleCmd, "showpanel" ) )
+		if ( V_strieq( pTimeScaleCmd, "showpanel" ) )
 		{
 			// If we're playing back, pop up a dialog asking if the user is sure they want to nuke the
 			// rest of whatever is playing back.
@@ -2359,11 +2359,11 @@ void CReplayPerformanceEditorPanel::OnCommand( const char *command )
 		const char *pSetType = command + 8;
 		const int nCurTick = engine->GetDemoPlaybackTick();
 
-		if ( !V_stricmp( pSetType, "in" ) )
+		if ( V_strieq( pSetType, "in" ) )
 		{
 			SetOrRemoveInTick( nCurTick, true );
 		}
-		else if ( !V_stricmp( pSetType, "out" ) )
+		else if ( V_strieq( pSetType, "out" ) )
 		{
 			SetOrRemoveOutTick( nCurTick, true );
 		}
@@ -2402,12 +2402,12 @@ void CReplayPerformanceEditorPanel::OnCommand( const char *command )
 			int nGotoTick = 0;
 			bool bGoingBack = false;
 
-			if ( !V_stricmp( pGotoType, "start" ) )
+			if ( V_strieq( pGotoType, "start" ) )
 			{
 				bGoingBack = true;
 				nGotoTick = nStartTick;
 			}
-			else if ( !V_stricmp( pGotoType, "back" ) )
+			else if ( V_strieq( pGotoType, "back" ) )
 			{
 				// If this is the first time rewinding, display a message
 				if ( !replay_replayeditor_rewindmsgcounter.GetBool() )
@@ -2420,7 +2420,7 @@ void CReplayPerformanceEditorPanel::OnCommand( const char *command )
 				bGoingBack = true;
 				nGotoTick = nCurTick - TIME_TO_TICKS( 10.0f );
 			}
-			else if ( !V_stricmp( pGotoType, "end" ) )
+			else if ( V_strieq( pGotoType, "end" ) )
 			{
 				nGotoTick = nEndTick;	// Don't go back in time
 			}
@@ -2454,14 +2454,14 @@ void CReplayPerformanceEditorPanel::OnCommand( const char *command )
 
 		EnsureRecording();
 
-		if ( !V_stricmp( pCamType, "first" ) )
+		if ( V_strieq( pCamType, "first" ) )
 		{
 			ReplayCamera()->SetMode( OBS_MODE_IN_EYE );
 			UpdateCameraSelectionPosition( CAM_FIRST );
 			m_bCurrentTargetNeedsVisibilityUpdate = true;
 			g_pReplayPerformanceController->AddEvent_Camera_Change_FirstPerson( flCurTime, nEntIndex );
 		}
-		else if ( !V_stricmp( pCamType, "third" ) )
+		else if ( V_strieq( pCamType, "third" ) )
 		{
 			ReplayCamera()->SetMode( OBS_MODE_CHASE );
 			UpdateCameraSelectionPosition( CAM_THIRD );
@@ -2469,7 +2469,7 @@ void CReplayPerformanceEditorPanel::OnCommand( const char *command )
 			g_pReplayPerformanceController->AddEvent_Camera_Change_ThirdPerson( flCurTime, nEntIndex );
 			AddSetViewEvent();
 		}
-		else if ( !V_stricmp( pCamType, "free" ) )
+		else if ( V_strieq( pCamType, "free" ) )
 		{
 			ReplayCamera()->SetMode( OBS_MODE_ROAMING );
 			UpdateCameraSelectionPosition( CAM_FREE );

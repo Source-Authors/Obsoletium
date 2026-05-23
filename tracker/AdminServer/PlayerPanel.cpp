@@ -157,12 +157,12 @@ static const char *FormatSeconds( int seconds )
 //-----------------------------------------------------------------------------
 void CPlayerPanel::OnServerDataResponse(const char *value, const char *response)
 {
-	if (!stricmp(value, "UpdatePlayers"))
+	if (V_strieq(value, "UpdatePlayers"))
 	{
 		// server has indicated a change, force an update
 		m_flUpdateTime = 0.0;
 	}
-	else if (!stricmp(value, "playerlist"))
+	else if (V_strieq(value, "playerlist"))
 	{
 		// new list of players
 		m_pPlayerListPanel->DeleteAllItems();

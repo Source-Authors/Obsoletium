@@ -649,7 +649,7 @@ bool CZipPackFile::Prepare( int64 fileLen, int64 nFileOfs )
 	// Check for a preload section, expected to be the first file in the zip
 	zipDirBuff.GetObjects( &zipFileHeader );
 	zipDirBuff.Get( filename, Min( (size_t)zipFileHeader.fileNameLength, sizeof(filename) - 1 ) );
-	if ( !V_stricmp( filename, PRELOAD_SECTION_NAME ) )
+	if ( V_strieq( filename, PRELOAD_SECTION_NAME ) )
 	{
 		m_nPreloadSectionSize = zipFileHeader.uncompressedSize;
 		m_nPreloadSectionOffset = zipFileHeader.relativeOffsetOfLocalHeader +

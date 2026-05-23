@@ -1260,15 +1260,15 @@ ChunkFileResult_t CMapClass::LoadEditorCallback(CChunkFile *pFile, CMapClass *pO
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CMapClass::LoadEditorKeyCallback(const char *szKey, const char *szValue, CMapClass *pObject)
 {
-	if (!stricmp(szKey, "color"))
+	if (V_strieq(szKey, "color"))
 	{
 		CChunkFile::ReadKeyValueColor(szValue, pObject->r, pObject->g, pObject->b);
 	}
-	else if (!stricmp(szKey, "id"))
+	else if (V_strieq(szKey, "id"))
 	{
 		CChunkFile::ReadKeyValueInt(szValue, pObject->m_nID);
 	}
-	else  if (!stricmp(szKey, "comments"))
+	else  if (V_strieq(szKey, "comments"))
 	{
 		//
 		// Load the object comments.
@@ -1280,11 +1280,11 @@ ChunkFileResult_t CMapClass::LoadEditorKeyCallback(const char *szKey, const char
 			pEdit->SetComments(szValue);
 		}
 	}
-	else if (!stricmp(szKey, "visgroupshown"))
+	else if (V_strieq(szKey, "visgroupshown"))
 	{
 		CChunkFile::ReadKeyValueBool(szValue, pObject->m_bVisGroupShown);
 	}
-	else if ( !stricmp(szKey, "visgroupautoshown") )
+	else if ( V_strieq(szKey, "visgroupautoshown") )
 	{
 		CChunkFile::ReadKeyValueBool(szValue, pObject->m_bVisGroupAutoShown);
 	}

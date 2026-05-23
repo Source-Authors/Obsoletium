@@ -110,7 +110,7 @@ void QueryBox::PerformLayout()
 //-----------------------------------------------------------------------------
 void QueryBox::OnCommand(const char *command)
 {
-	if (!stricmp(command, "OK"))
+	if (V_strieq(command, "OK"))
 	{
 		OnCommand("Close");
 
@@ -119,7 +119,7 @@ void QueryBox::OnCommand(const char *command)
 			PostActionSignal(m_pOkCommand->MakeCopy());
 		}
 	}
-	else if (!stricmp(command, "Cancel"))
+	else if (V_strieq(command, "Cancel"))
 	{
 		OnCommand("Close");	
 

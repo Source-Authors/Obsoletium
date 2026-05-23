@@ -376,7 +376,7 @@ int CTeamplayRules::PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarg
 	if ( !pPlayer || !pTarget || !pTarget->IsPlayer() )
 		return GR_NOTTEAMMATE;
 
-	if ( (*GetTeamID(pPlayer) != '\0') && (*GetTeamID(pTarget) != '\0') && !stricmp( GetTeamID(pPlayer), GetTeamID(pTarget) ) )
+	if ( (*GetTeamID(pPlayer) != '\0') && (*GetTeamID(pTarget) != '\0') && V_strieq( GetTeamID(pPlayer), GetTeamID(pTarget) ) )
 	{
 		return GR_TEAMMATE;
 	}
@@ -445,7 +445,7 @@ int CTeamplayRules::GetTeamIndex( const char *pTeamName )
 		// try to find existing team
 		for ( int tm = 0; tm < num_teams; tm++ )
 		{
-			if ( !stricmp( team_names[tm], pTeamName ) )
+			if ( V_strieq( team_names[tm], pTeamName ) )
 				return tm;
 		}
 	}

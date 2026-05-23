@@ -701,7 +701,7 @@ ChunkFileResult_t CMapEntity::LoadVMF(CChunkFile *pFile)
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CMapEntity::LoadKeyCallback(const char *szKey, const char *szValue, CMapEntity *pEntity)
 {
-	if (!stricmp(szKey, "id"))
+	if (V_strieq(szKey, "id"))
 	{
 		pEntity->SetID(atoi(szValue));
 	}
@@ -743,7 +743,7 @@ ChunkFileResult_t CMapEntity::LoadHiddenCallback(CChunkFile *pFile, CMapEntity *
 
 ChunkFileResult_t CMapEntity::LoadEditorKeyCallback( const char *szKey, const char *szValue, CMapEntity *pMapEntity )
 {
-	if ( !stricmp( szKey, "logicalpos" ) )
+	if ( V_strieq( szKey, "logicalpos" ) )
 	{
 		CChunkFile::ReadKeyValueVector2(szValue, pMapEntity->m_vecLogicalPosition );
 		return ChunkFile_Ok;
@@ -1306,7 +1306,7 @@ void CMapEntity::OnPreClone(CMapClass *pClone, CMapWorld *pWorld, const CMapObje
 	{
 		// dvs: TODO: make this FGD-driven instead of hardcoded, see also MapKeyFrame.cpp
 		// dvs: TODO: use letters of the alphabet between adjacent numbers, ie path2a path2b, etc.
-		if (!stricmp(GetClassName(), "path_corner") || !stricmp(GetClassName(), "path_track"))
+		if (V_strieq(GetClassName(), "path_corner") || V_strieq(GetClassName(), "path_track"))
 		{
 			//
 			// Generate a new name for the clone.
@@ -1347,7 +1347,7 @@ void CMapEntity::OnClone(CMapClass *pClone, CMapWorld *pWorld, const CMapObjectL
 
 	if (OriginalList.Count() == 1)
 	{
-		if (!stricmp(GetClassName(), "path_corner") || !stricmp(GetClassName(), "path_track"))
+		if (V_strieq(GetClassName(), "path_corner") || V_strieq(GetClassName(), "path_track"))
 		{
 			// dvs: TODO: make this FGD-driven instead of hardcoded, see also MapKeyFrame.cpp
 			// dvs: TODO: use letters of the alphabet between adjacent numbers, ie path2a path2b, etc.
@@ -1438,7 +1438,7 @@ void CMapEntity::OnKeyValueChanged(const char *pszKey, const char *pszOldValue, 
 	// Changing our movement parent. Store a pointer to the movement parent
 	// for when we're playing animations.
 	//
-	if ( !stricmp(pszKey, "parentname") )
+	if ( V_strieq(pszKey, "parentname") )
 	{
 		CMapWorld *pWorld = (CMapWorld *)GetWorldObject( this );
 		if (pWorld != NULL)
@@ -1451,7 +1451,7 @@ void CMapEntity::OnKeyValueChanged(const char *pszKey, const char *pszOldValue, 
 	// Changing our model - rebuild the helpers from scratch.
 	// dvs: this could probably go away - move support into the helper code.
 	//
-	else if (!stricmp(pszKey, "model"))
+	else if (V_strieq(pszKey, "model"))
 	{
 		if (stricmp(pszOldValue, pszValue) != 0)
 		{
@@ -1463,7 +1463,7 @@ void CMapEntity::OnKeyValueChanged(const char *pszKey, const char *pszOldValue, 
 	// If our targetname has changed, we have to relink EVERYTHING, not
 	// just our dependents, because someone else may point to our new targetname.
 	//
-	else if (!stricmp(pszKey, "targetname") && (stricmp(pszOldValue, pszValue) != 0))
+	else if (V_strieq(pszKey, "targetname") && (stricmp(pszOldValue, pszValue) != 0))
 	{
 		UpdateAllDependencies(this);
 	}
@@ -1601,7 +1601,7 @@ CMapEntity *CMapEntity::FindChildByKeyValue( LPCSTR key, LPCSTR value, bool *bIs
 	intp index;
 	LPCSTR val = CEditGameClass::GetKeyValue(key, &index);
 
-	if ( val && value && !stricmp(value, val) )
+	if ( val && value && V_strieq(value, val) )
 	{
 		return this;
 	}

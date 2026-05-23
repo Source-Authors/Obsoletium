@@ -314,7 +314,7 @@ void BuyPresetEditPanel::ApplySchemeSettings(IScheme *pScheme)
 		if (!child)
 			continue;
 
-		if ( !stricmp( "button", child->GetClassName() ) )
+		if ( V_strieq( "button", child->GetClassName() ) )
 		{
 			Button *pButton = dynamic_cast<Button *>(child);
 			if ( pButton )
@@ -336,7 +336,7 @@ void BuyPresetEditPanel::ApplySchemeSettings(IScheme *pScheme)
 		if ( pPanel )
 		{
 			pPanel->SetBorder( pBorder );
-			if ( !stricmp( "button", pPanel->GetClassName() ) )
+			if ( V_strieq( "button", pPanel->GetClassName() ) )
 			{
 				Button *pButton = dynamic_cast<Button *>(pPanel);
 				if ( pButton )

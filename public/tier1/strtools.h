@@ -205,7 +205,7 @@ template< bool CASE_SENSITIVE >
 	if ( CASE_SENSITIVE )
 		return V_streq(  pStr, pSuffix );
 	else
-		return !V_stricmp( pStr, pSuffix );
+		return V_strieq( pStr, pSuffix );
 }
 
 // Does 'pStr' end with 'pSuffix'? (case sensitive/insensitive variants)

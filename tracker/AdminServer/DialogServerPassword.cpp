@@ -69,7 +69,7 @@ void CDialogServerPassword::OnCommand(const char *command)
 {
 	bool bClose = false;
 
-	if (!stricmp(command, "Connect"))
+	if (V_strieq(command, "Connect"))
 	{
 		KeyValues *msg = new KeyValues("JoinServerWithPassword");
 		char buf[64];
@@ -80,7 +80,7 @@ void CDialogServerPassword::OnCommand(const char *command)
 
 		bClose = true;
 	}
-	else if (!stricmp(command, "Close"))
+	else if (V_strieq(command, "Close"))
 	{
 		bClose = true;
 	}

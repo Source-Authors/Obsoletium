@@ -673,12 +673,12 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 
 						// Check for a common mistake
 						if (
-							!V_stricmp( pszFoundShortName, "materials" )
-							|| !V_stricmp( pszFoundShortName, "maps" )
-							|| !V_stricmp( pszFoundShortName, "resource" )
-							|| !V_stricmp( pszFoundShortName, "scripts" )
-							|| !V_stricmp( pszFoundShortName, "sound" )
-							|| !V_stricmp( pszFoundShortName, "models" ) )
+							V_strieq( pszFoundShortName, "materials" )
+							|| V_strieq( pszFoundShortName, "maps" )
+							|| V_strieq( pszFoundShortName, "resource" )
+							|| V_strieq( pszFoundShortName, "scripts" )
+							|| V_strieq( pszFoundShortName, "sound" )
+							|| V_strieq( pszFoundShortName, "models" ) )
 						{
 
 							char szReadme[MAX_PATH];

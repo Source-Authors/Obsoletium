@@ -926,7 +926,7 @@ void BuildGroup::LoadControlSettings(const char *controlResourceName, const char
 			bSuccess = rDat->LoadFromFile( g_pFullFileSystem, controlResourceName, "SKIN" );
 		}
 
-		if ( !V_stricmp( CommandLine()->ParmValue( "-game", "hl2" ), "tf" ) )
+		if ( V_strieq( CommandLine()->ParmValue( "-game", "hl2" ), "tf" ) )
 		{
 			if ( !bSuccess )
 			{
@@ -1401,7 +1401,7 @@ Panel *BuildGroup::FieldNameTaken(const char *fieldName)
 		if ( !panel )
 			continue;
 
-		if (!stricmp(panel->GetName(), fieldName) )
+		if (V_strieq(panel->GetName(), fieldName) )
 		{
 			return panel;
 		}
@@ -1441,7 +1441,7 @@ void BuildGroup::GetSettings( KeyValues *resourceData )
 		}
 
 		// Don't save the setting of the buildmodedialog
-		if (!stricmp(panel->GetName(), "BuildDialog"))
+		if (V_strieq(panel->GetName(), "BuildDialog"))
 			continue;
 
 		// get the keys section from the data file

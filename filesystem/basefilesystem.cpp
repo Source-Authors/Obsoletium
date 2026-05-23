@@ -3627,7 +3627,7 @@ bool CBaseFileSystem::IsDirectory( const char *pFileName, const char *pathID )
 
 			for ( auto *dir : outDir )
 			{
-				if ( !V_stricmp( dir, pFileName ) )
+				if ( V_strieq( dir, pFileName ) )
 					return true;
 			}
 		}

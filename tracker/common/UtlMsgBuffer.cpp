@@ -307,7 +307,7 @@ void *CUtlMsgBuffer::FindVar(const char *name, int &dataSize)
 				break;
 
 			// is this our variable?
-			if (!stricmp(varname, name))
+			if (V_strieq(varname, name))
 			{
 				dataSize = size;
 				void *data = &m_Memory[m_iReadPos];

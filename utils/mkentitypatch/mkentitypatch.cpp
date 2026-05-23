@@ -184,7 +184,7 @@ entity_t *FindEntity( KeyValues *pEntity )
 			const char *pMatchTargetName = ValueForKey( &entities[i], "targetname" );
 			if ( !pMatchTargetName || !pMatchTargetName[0] )
 				continue;
-			if ( !V_stricmp( pTargetName, pMatchTargetName ) )
+			if ( V_strieq( pTargetName, pMatchTargetName ) )
 			{
 				if ( nMatch >= 0 )
 				{
@@ -392,12 +392,12 @@ int CMkEntityPatchApp::Main()
 	for ( KeyValues *pKey = pKeyValues->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )
 	{
 		const char *pKeyName = pKey->GetName();
-		if ( !V_stricmp( pKeyName, "entity" ) )
+		if ( V_strieq( pKeyName, "entity" ) )
 		{
 			if ( !InsertEntity( pKey ) )
 				return 0;
 		}
-		else if ( !V_stricmp( pKeyName, "replace_entity" ) )
+		else if ( V_strieq( pKeyName, "replace_entity" ) )
 		{
 			if ( !ReplaceEntity( pKey ) )
 				return 0;

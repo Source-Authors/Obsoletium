@@ -459,7 +459,7 @@ bool CDmSerializerBinary::Unserialize( CUtlBuffer &buf, const char *pEncodingNam
 									   const char *pSourceFormatName, int nSourceFormatVersion,
 									   DmFileId_t fileid, DmConflictResolution_t idConflictResolution, CDmElement **ppRoot )
 {
-	Assert( !V_stricmp( pEncodingName, GetName() ) );
+	Assert( V_strieq( pEncodingName, GetName() ) );
 	if ( V_stricmp( pEncodingName, GetName() ) != 0 )
 		return false;
 

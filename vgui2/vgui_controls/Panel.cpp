@@ -1578,7 +1578,7 @@ int Panel::FindChildIndexByName(const char *childName)
 		if (!pChild)
 			continue;
 
-		if (!stricmp(pChild->GetName(), childName))
+		if (V_strieq(pChild->GetName(), childName))
 		{
 			return i;
 		}
@@ -1616,7 +1616,7 @@ Panel *Panel::FindChildByName(const char *childName, bool recurseDown)
 		if (!pChild)
 			continue;
 
-		if (!V_stricmp(pChild->GetName(), childName))
+		if (V_strieq(pChild->GetName(), childName))
 		{
 			idx = m_dictChidlren.Insert( childName );
 			m_dictChidlren[ idx ].Set( pChild->GetVPanel() );
@@ -1650,7 +1650,7 @@ Panel *Panel::FindSiblingByName(const char *siblingName)
 	{
 		VPANEL sibling = ipanel()->GetChild(GetVParent(), i);
 		Panel *panel = ipanel()->GetPanel(sibling, GetControlsModuleName());
-		if (!stricmp(panel->GetName(), siblingName))
+		if (V_strieq(panel->GetName(), siblingName))
 		{
 			return panel;
 		}
@@ -6132,7 +6132,7 @@ public:
 	{
 		void *data = ( void * )( (*entry->m_pfnLookup)( panel ) );
 		bool b = false;
-		if ( !stricmp( entry->defaultvalue(), "true" )||
+		if ( V_strieq( entry->defaultvalue(), "true" )||
 			atoi( entry->defaultvalue() )!= 0 )
 		{
 			b = true;
@@ -6440,7 +6440,7 @@ PanelAnimationMapEntry *Panel::FindPanelAnimationEntry( char const *scriptname, 
 	{
 		PanelAnimationMapEntry *e = &map->entries[ i ];
 
-		if ( !stricmp( e->name(), scriptname ) )
+		if ( V_strieq( e->name(), scriptname ) )
 		{
 			return e;
 		}

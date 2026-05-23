@@ -1259,7 +1259,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		}
 
 		// Nope?  Use the default.
-		if ( !V_stricmp( pszVar, "mapcycle.txt" ) )
+		if ( V_strieq( pszVar, "mapcycle.txt" ) )
 		{
 			V_strncpy( pszResult, "cfg/mapcycle_default.txt", nSizeResult );
 			if ( filesystem->FileExists( pszResult, "GAME" ) )

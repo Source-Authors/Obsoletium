@@ -164,7 +164,7 @@ void CMapEntities::CheckUpdateMap( char const *mapname )
 	if ( !mapname || !mapname[ 0 ] )
 		return;
 
-	if ( !stricmp( mapname, m_szCurrentMap ) )
+	if ( V_strieq( mapname, m_szCurrentMap ) )
 		return;
 
 	// Latch off the name of the map

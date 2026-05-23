@@ -160,7 +160,7 @@ void CPlayerListDialog::RefreshPlayerProperties()
 //-----------------------------------------------------------------------------
 void CPlayerListDialog::OnCommand(const char *command)
 {
-	if (!stricmp(command, "Mute"))
+	if (V_strieq(command, "Mute"))
 	{
 		ToggleMuteStateOfSelectedUser();
 	}

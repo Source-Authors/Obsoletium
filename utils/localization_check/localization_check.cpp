@@ -406,7 +406,7 @@ void BuildFileList_R( CUtlVector< CUtlSymbol >& files, char const *dir, char con
 			int len = strlen( wfd.cFileName );
 			if ( len > extlen )
 			{
-				if ( !stricmp( &wfd.cFileName[ len - extlen ], extension ) )
+				if ( V_strieq( &wfd.cFileName[ len - extlen ], extension ) )
 				{
 					Q_snprintf( filename, sizeof( filename ), "%s\\%s", dir, wfd.cFileName );
 					_strlwr( filename );
@@ -2839,7 +2839,7 @@ void BuildOrderedCaptionList( CUtlVector< OrderedCaption_t >& list )
 		
 		if (state == STATE_BASE)
 		{
-			if (!stricmp(key, "Language"))
+			if (V_strieq(key, "Language"))
 			{
 				// copy out our language setting
 				/*
@@ -2848,11 +2848,11 @@ void BuildOrderedCaptionList( CUtlVector< OrderedCaption_t >& list )
 				strncpy(m_szLanguage, value, sizeof(m_szLanguage) - 1);
 				*/
 			}
-			else if (!stricmp(key, "Tokens"))
+			else if (V_strieq(key, "Tokens"))
 			{
 				state = STATE_TOKENS;
 			}
-			else if (!stricmp(key, "}"))
+			else if (V_streq(key, "}"))
 			{
 				// we've hit the end
 				break;
@@ -2860,7 +2860,7 @@ void BuildOrderedCaptionList( CUtlVector< OrderedCaption_t >& list )
 		}
 		else if (state == STATE_TOKENS)
 		{
-			if (!stricmp(key, "}"))
+			if (V_streq(key, "}"))
 			{
 				// end of tokens
 				state = STATE_BASE;

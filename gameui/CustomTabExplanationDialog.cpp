@@ -73,7 +73,7 @@ void CCustomTabExplanationDialog::OnKeyCodePressed(KeyCode code)
 //-----------------------------------------------------------------------------
 void CCustomTabExplanationDialog::OnCommand( const char *command )
 {
-	if ( !stricmp( command, "ok" ) || !stricmp( command, "cancel" ) || !stricmp( command, "close" ) )
+	if ( V_strieq( command, "ok" ) || V_strieq( command, "cancel" ) || V_strieq( command, "close" ) )
 	{
 		Close();
 	}

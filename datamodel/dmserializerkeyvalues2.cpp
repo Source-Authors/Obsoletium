@@ -955,7 +955,7 @@ bool CDmSerializerKeyValues2::UnserializeAttribute( CUtlBuffer &buf,
 		return false;
 	}
 
-	if ( ( nAttrType == AT_OBJECTID ) && !V_stricmp( pAttributeName, "id" ) )
+	if ( ( nAttrType == AT_OBJECTID ) && V_strieq( pAttributeName, "id" ) )
 	{
 		CUtlCharConversion *pConv = GetCStringCharConversion();
 		intp nLength = tokenBuf.PeekDelimitedStringLength( pConv );

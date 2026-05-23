@@ -285,7 +285,7 @@ public:
 	{
 		m_KeyRepeat.Reset();
 
-		if (!stricmp(command, "Open"))
+		if (V_strieq(command, "Open"))
 		{
 			if ( m_hMainMenuOverridePanel )
 			{

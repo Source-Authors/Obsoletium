@@ -2933,53 +2933,53 @@ ChunkFileResult_t CMapDisp::LoadDispOffsetNormalsKeyCallback(const char *szKey, 
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CMapDisp::LoadDispKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp)
 {
-	if (!stricmp(szKey, "power"))
+	if (V_strieq(szKey, "power"))
 	{
 		int	power;
 		CChunkFile::ReadKeyValueInt( szValue, power );
 		pDisp->SetPower( power );
 	}
-	else if (!stricmp(szKey, "uaxis"))
+	else if (V_strieq(szKey, "uaxis"))
 	{
 		Vector mapAxis;
 		CChunkFile::ReadKeyValueVector3( szValue, mapAxis );
 		pDisp->SetHasMappingAxes( true );
 		pDisp->m_MapAxes[0] = mapAxis;
 	}
-	else if (!stricmp(szKey, "vaxis"))
+	else if (V_strieq(szKey, "vaxis"))
 	{
 		Vector mapAxis;
 		CChunkFile::ReadKeyValueVector3( szValue, mapAxis );
 		pDisp->SetHasMappingAxes( true );
 		pDisp->m_MapAxes[1] = mapAxis;
 	}
-	else if( !stricmp( szKey, "startposition" ) )
+	else if( V_strieq( szKey, "startposition" ) )
 	{
 		Vector startPosition;
 		CChunkFile::ReadKeyValueVector3( szValue, startPosition );
 		CCoreDispSurface *pSurf = pDisp->m_CoreDispInfo.GetSurface();
 		pSurf->SetPointStart( startPosition );
 	}
-	else if (!stricmp(szKey, "flags"))
+	else if (V_strieq(szKey, "flags"))
 	{
 		int	nFlags;
 		CChunkFile::ReadKeyValueInt( szValue, nFlags );
 		pDisp->SetFlags( nFlags );
 	}
 #if 0
-	else if (!stricmp(szKey, "mintess"))
+	else if (V_strieq(szKey, "mintess"))
 	{
 		int	minTess;
 		CChunkFile::ReadKeyValueInt( szValue, minTess );
 		pDisp->SetMinTess( minTess );
 	}
-	else if (!stricmp(szKey, "smooth"))
+	else if (V_strieq(szKey, "smooth"))
 	{
 		float smoothingAngle;
 		CChunkFile::ReadKeyValueFloat( szValue, smoothingAngle );
 		pDisp->SetSmoothingAngle( smoothingAngle );
 	}
-	else if( !stricmp( szKey, "alpha" ) )
+	else if( V_strieq( szKey, "alpha" ) )
 	{
 		Vector4D alphaValues;
 		CChunkFile::ReadKeyValueVector4( szValue, alphaValues );
@@ -2990,13 +2990,13 @@ ChunkFileResult_t CMapDisp::LoadDispKeyCallback(const char *szKey, const char *s
 		}
 	}
 #endif
-	else if( !stricmp( szKey, "elevation" ) )
+	else if( V_strieq( szKey, "elevation" ) )
 	{
 		float elevation;
 		CChunkFile::ReadKeyValueFloat( szValue, elevation );
 		pDisp->SetElevation( elevation );
 	}
-	else if( !stricmp( szKey, "subdiv" ) )
+	else if( V_strieq( szKey, "subdiv" ) )
 	{
 		int bSubdivided;
 		CChunkFile::ReadKeyValueInt( szValue, bSubdivided );

@@ -187,7 +187,7 @@ public:
 		{
 			BotProfile *profile = m_profileList[ it ];
 	
-			if ( !stricmp( name, profile->GetName() ) && profile->IsValidForTeam( team ) )
+			if ( V_strieq( name, profile->GetName() ) && profile->IsValidForTeam( team ) )
 				return profile;
 		}
 

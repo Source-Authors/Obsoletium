@@ -131,7 +131,7 @@ void CLinuxFont::CreateFontList()
         m_FriendlyNameCache.Insert( entry );
 
 		// substitute Vera Sans for Tahoma on X
-		if ( !V_stricmp( name, "Bitstream Vera Sans" ) )
+		if ( V_strieq( name, "Bitstream Vera Sans" ) )
 		{
 			name = "Tahoma";
 			entry.m_pchFile = (char *)malloc( Q_strlen(file) + 1 );

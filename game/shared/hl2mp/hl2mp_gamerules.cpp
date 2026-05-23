@@ -827,7 +827,7 @@ int CHL2MPRules::PlayerRelationship( CBaseEntity *pPlayer, CBaseEntity *pTarget 
 	if ( !pPlayer || !pTarget || !pTarget->IsPlayer() || IsTeamplay() == false )
 		return GR_NOTTEAMMATE;
 
-	if ( (*GetTeamID(pPlayer) != '\0') && (*GetTeamID(pTarget) != '\0') && !stricmp( GetTeamID(pPlayer), GetTeamID(pTarget) ) )
+	if ( (*GetTeamID(pPlayer) != '\0') && (*GetTeamID(pTarget) != '\0') && V_strieq( GetTeamID(pPlayer), GetTeamID(pTarget) ) )
 	{
 		return GR_TEAMMATE;
 	}

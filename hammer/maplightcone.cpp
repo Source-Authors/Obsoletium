@@ -475,11 +475,11 @@ void CMapLightCone::OnParentKeyChanged(const char *szKey, const char *szValue)
 {
 	bool bRebuild = true;
 
-	if (!stricmp(szKey, "angles"))
+	if (V_strieq(szKey, "angles"))
 	{
 		sscanf(szValue, "%f %f %f", &m_Angles[PITCH], &m_Angles[YAW], &m_Angles[ROLL]);
 	}
-	else if (!stricmp(szKey, m_szColorKeyName))
+	else if (V_strieq(szKey, m_szColorKeyName))
 	{
 		int nRed;
 		int nGreen;
@@ -492,59 +492,59 @@ void CMapLightCone::OnParentKeyChanged(const char *szKey, const char *szValue)
 		b = m_LightColor.z = nBlue;
 		m_fBrightness = nBrightness;
 	}
-	else if (!stricmp(szKey, "pitch"))
+	else if (V_strieq(szKey, "pitch"))
 	{
 		// Pitch
 		m_bPitchSet = true;
 		// dimhotepus: atof -> V_atof
 		m_fPitch = V_atof(szValue);
 	}
-	else if (!stricmp(szKey, "_constant_attn"))
+	else if (V_strieq(szKey, "_constant_attn"))
 	{
 		// Constant attenuation
 		// dimhotepus: atof -> V_atof
 		m_fConstantAttn = V_atof(szValue);
 	}
-	else if (!stricmp(szKey, "_linear_attn"))
+	else if (V_strieq(szKey, "_linear_attn"))
 	{
 		// Linear attenuation
 		// dimhotepus: atof -> V_atof
 		m_fLinearAttn = V_atof(szValue);
 	}
-	else if (!stricmp(szKey, "_quadratic_attn"))
+	else if (V_strieq(szKey, "_quadratic_attn"))
 	{
 		// Quadratic attenuation
 		// dimhotepus: atof -> V_atof
 		m_fQuadraticAttn = V_atof(szValue);
 	}
-	else if (!stricmp(szKey, "_exponent"))
+	else if (V_strieq(szKey, "_exponent"))
 	{
 		// Focus
 		// dimhotepus: atof -> V_atof
 		m_fFocus = V_atof(szValue);
 	}
-	else if (!stricmp(szKey, "_fifty_percent_distance"))
+	else if (V_strieq(szKey, "_fifty_percent_distance"))
 	{
 		// Focus
 		// dimhotepus: atof -> V_atof
 		m_fFiftyPercentDistance = V_atof(szValue);
 	}
-	else if (!stricmp(szKey, "_zero_percent_distance"))
+	else if (V_strieq(szKey, "_zero_percent_distance"))
 	{
 		// Focus
 		// dimhotepus: atof -> V_atof
 		m_fZeroPercentDistance = V_atof(szValue);
 	}
-	else if (!stricmp(szKey, m_szInnerConeKeyName) || !stricmp(szKey, m_szOuterConeKeyName))
+	else if (V_strieq(szKey, m_szInnerConeKeyName) || V_strieq(szKey, m_szOuterConeKeyName))
 	{
 		// check both of these together since they might be the same key.
-		if( !stricmp(szKey, m_szInnerConeKeyName ))
+		if( V_strieq(szKey, m_szInnerConeKeyName ))
 		{
 			// Inner Cone angle
 			// dimhotepus: atof -> V_atof
 			m_fInnerConeAngle = V_atof(szValue);
 		}
-		if( !stricmp(szKey, m_szOuterConeKeyName ))
+		if( V_strieq(szKey, m_szOuterConeKeyName ))
 		{
 			// Outer Cone angle
 			// dimhotepus: atof -> V_atof

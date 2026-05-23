@@ -141,51 +141,51 @@ bool CWeaponBox::PackAmmo( char *szName, int iCount )
 	}
 	
 	Q_snprintf( szConvertedName, sizeof( szConvertedName ), "%s", szName );
-	if ( !stricmp( szName, "bolts" ) )
+	if ( V_strieq( szName, "bolts" ) )
 	{
 		Q_snprintf( szConvertedName, sizeof( szConvertedName ), "XBowBolt" );
 	}
-	if ( !stricmp( szName, "uranium" ) )
+	if ( V_strieq( szName, "uranium" ) )
 	{
 		Q_snprintf( szConvertedName, sizeof( szConvertedName ), "Uranium" );
 	}
-	if ( !stricmp( szName, "9mm" ) )
+	if ( V_strieq( szName, "9mm" ) )
 	{
 		Q_snprintf( szConvertedName, sizeof( szConvertedName ), "9mmRound" );
 	}
-	if ( !stricmp( szName, "Hand Grenade" ) )
+	if ( V_strieq( szName, "Hand Grenade" ) )
 	{
 		Q_snprintf( szConvertedName, sizeof( szConvertedName ), "Grenade" );
 	}
-	if ( !stricmp( szName, "Hornets" ) )
+	if ( V_strieq( szName, "Hornets" ) )
 	{
 		Q_snprintf( szConvertedName, sizeof( szConvertedName ), "Hornet" );
 	}
-	if ( !stricmp( szName, "ARgrenades" ) )
+	if ( V_strieq( szName, "ARgrenades" ) )
 	{
 		Q_snprintf( szConvertedName, sizeof( szConvertedName ), "MP5_Grenade" );
 	}
-	if ( !stricmp( szName, "357" ) )
+	if ( V_strieq( szName, "357" ) )
 	{
 		Q_snprintf( szConvertedName, sizeof( szConvertedName ), "357Round" );
 	}
-	if ( !stricmp( szName, "rockets" ) )
+	if ( V_strieq( szName, "rockets" ) )
 	{
 		Q_snprintf( szConvertedName, sizeof( szConvertedName ), "RPG_Rocket" );
 	}
-	if ( !stricmp( szName, "Satchel Charge" ) )
+	if ( V_strieq( szName, "Satchel Charge" ) )
 	{
 		Q_snprintf( szConvertedName, sizeof( szConvertedName ), "Satchel" );
 	}
-	if ( !stricmp( szName, "buckshot" ) )
+	if ( V_strieq( szName, "buckshot" ) )
 	{
 		Q_snprintf( szConvertedName, sizeof( szConvertedName ), "Buckshot" );
 	}
-	if ( !stricmp( szName, "Snarks" ) )
+	if ( V_strieq( szName, "Snarks" ) )
 	{
 		Q_snprintf( szConvertedName, sizeof( szConvertedName ), "Snark" );
 	}
-	if ( !stricmp( szName, "Trip Mine" ) )
+	if ( V_strieq( szName, "Trip Mine" ) )
 	{
 		Q_snprintf( szConvertedName, sizeof( szConvertedName ), "TripMine" );
 	}

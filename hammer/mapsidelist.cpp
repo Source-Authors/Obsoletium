@@ -416,7 +416,7 @@ void CMapSideList::OnParentKeyChanged(char const *pszKey, char const *pszValue)
 	//
 	// Update our face list if the key we care about is changing.
 	//
-	if (!stricmp(pszKey, m_szKeyName))
+	if (V_strieq(pszKey, m_szKeyName))
 	{
 		BuildFaceListForValue(pszValue, pWorld);
 	}

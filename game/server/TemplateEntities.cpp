@@ -152,7 +152,7 @@ string_t Templates_FindByTargetName(const char *pszName)
 	for (int i = 0; i < nCount; i++)
 	{
 		TemplateEntityData_t *pTemplate = g_Templates.Element(i);
-		if ( !stricmp(pTemplate->pszName, pszName) )
+		if ( V_strieq(pTemplate->pszName, pszName) )
 			return Templates_FindByIndex( i );
 	}
 
@@ -211,7 +211,7 @@ void Templates_ReconnectIOForGroup( CPointTemplate *pGroup )
 			do 
 			{
 				// Ignore targetnames
-				if ( !stricmp( keyName, "targetname" ) )
+				if ( V_strieq( keyName, "targetname" ) )
 					continue;
 
 				// Add to the count for this 

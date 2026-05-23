@@ -1231,12 +1231,12 @@ CBaseEntity *CAI_PlayerAlly::EyeLookTarget( void )
 //-----------------------------------------------------------------------------
 CBaseEntity *CAI_PlayerAlly::FindNamedEntity( const char *pszName, IEntityFindFilter *pFilter )
 {
-	if ( !stricmp( pszName, "!speechtarget" ))
+	if ( V_strieq( pszName, "!speechtarget" ))
 	{
 		return GetSpeechTarget();
 	}
 
-	if ( !stricmp( pszName, "!friend" ))
+	if ( V_strieq( pszName, "!friend" ))
 	{
 		return FindSpeechTarget( AIST_NPCS );
 	}

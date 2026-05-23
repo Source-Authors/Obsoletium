@@ -530,7 +530,7 @@ bool CDownloadManager::HasMapBeenDownloadedFromServer( const char *serverMapName
 	for ( int i=0; i<m_downloadedMaps.Count(); ++i )
 	{
 		const char *oldServerMapName = m_downloadedMaps[i];
-		if ( oldServerMapName && !stricmp( serverMapName, oldServerMapName ) )
+		if ( oldServerMapName && V_strieq( serverMapName, oldServerMapName ) )
 		{
 			return true;
 		}

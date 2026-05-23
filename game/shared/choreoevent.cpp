@@ -2386,7 +2386,7 @@ void CChoreoEvent::RemoveRelativeTag( const char *tagname )
 	{
 		CEventRelativeTag &prt = m_RelativeTags[ i ];
 
-		if ( !stricmp( prt.GetName(), tagname ) )
+		if ( V_strieq( prt.GetName(), tagname ) )
 		{
 			m_RelativeTags.Remove( i );
 			return;
@@ -2403,7 +2403,7 @@ CEventRelativeTag * CChoreoEvent::FindRelativeTag( const char *tagname )
 {
 	for ( auto &prt : m_RelativeTags )
 	{
-		if ( !stricmp( prt.GetName(), tagname ) )
+		if ( V_strieq( prt.GetName(), tagname ) )
 		{
 			return &prt;
 		}
@@ -2532,7 +2532,7 @@ void CChoreoEvent::RemoveTimingTag( const char *tagname )
 	for ( intp i = 0; i < m_TimingTags.Count(); i++ )
 	{
 		CFlexTimingTag &ptt = m_TimingTags[ i ];
-		if ( !stricmp( ptt.GetName(), tagname ) )
+		if ( V_strieq( ptt.GetName(), tagname ) )
 		{
 			m_TimingTags.Remove( i );
 			return;
@@ -2549,7 +2549,7 @@ CFlexTimingTag * CChoreoEvent::FindTimingTag( const char *tagname )
 {
 	for ( auto &ptt : m_TimingTags )
 	{
-		if ( !stricmp( ptt.GetName(), tagname ) )
+		if ( V_strieq( ptt.GetName(), tagname ) )
 		{
 			return &ptt;
 		}
@@ -2645,7 +2645,7 @@ CFlexAnimationTrack *CChoreoEvent::FindTrack( const char *controllername )
 	for ( int i = 0; i < GetNumFlexAnimationTracks(); i++ )
 	{
 		CFlexAnimationTrack *t = GetFlexAnimationTrack( i );
-		if ( t && !stricmp( t->GetFlexControllerName(), controllername ) )
+		if ( t && V_strieq( t->GetFlexControllerName(), controllername ) )
 		{
 			return t;
 		}
@@ -2908,7 +2908,7 @@ CEventAbsoluteTag *CChoreoEvent::FindAbsoluteTag( AbsTagType type, const char *t
 {
 	for ( auto &ptag : m_AbsoluteTags[ type ] )
 	{
-		if ( !stricmp( ptag.GetName(), tagname ) )
+		if ( V_strieq( ptag.GetName(), tagname ) )
 		{
 			return &ptag;
 		}
@@ -2956,7 +2956,7 @@ void CChoreoEvent::RemoveAbsoluteTag( AbsTagType type, const char *tagname )
 	for ( intp i = 0; i < m_AbsoluteTags[ type ].Count(); i++ )
 	{
 		auto &ptag = m_AbsoluteTags[ type ][ i ];
-		if ( !stricmp( ptag.GetName(), tagname ) )
+		if ( V_strieq( ptag.GetName(), tagname ) )
 		{
 			m_AbsoluteTags[ type ].Remove( i );
 			return;

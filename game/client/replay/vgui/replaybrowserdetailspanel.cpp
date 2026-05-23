@@ -1086,11 +1086,11 @@ void CCutsPanel::OnCommand( const char *pCommand )
 		const int iButton = atoi( pCommand + 7 );
 		SelectButtonFromPerformance( ButtonToPerformance( iButton ) );
 	}
-	else if ( !V_stricmp( pCommand, "prevpage" ) )
+	else if ( V_strieq( pCommand, "prevpage" ) )
 	{
 		SetPage( m_iPage - 1 );
 	}
-	else if ( !V_stricmp( pCommand, "nextpage" ) )
+	else if ( V_strieq( pCommand, "nextpage" ) )
 	{
 		SetPage( m_iPage + 1 );
 	}

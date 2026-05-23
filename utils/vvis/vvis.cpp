@@ -911,7 +911,7 @@ float DetermineVisRadius( )
 	for (int i = 0; i < num_entities; ++i)
 	{
 		const char* pEntity = ValueForKey(&entities[i], "classname");
-		if (!stricmp(pEntity, "env_fog_controller"))
+		if (V_strieq(pEntity, "env_fog_controller"))
 		{
 			flRadius = FloatForKey (&entities[i], "farz");
 			if (flRadius == 0.0f)

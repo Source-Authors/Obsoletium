@@ -340,22 +340,22 @@ CMapKeyFrame *CMapKeyFrame::NextKeyFrame( void )
 //-----------------------------------------------------------------------------
 void CMapKeyFrame::OnParentKeyChanged( const char* key, const char* value )
 {
-	if ( !stricmp(key, "NextKey") )
+	if ( V_strieq(key, "NextKey") )
 	{
 		m_bRebuildPath = true;
 	}
-	else if ( !stricmp(key, "NextTime") )
+	else if ( V_strieq(key, "NextTime") )
 	{
 		// dimhotepus: atof -> V_atof
 		m_flMoveTime = V_atof( value );
 	}
-	else if ( !stricmp(key, "MoveSpeed") )
+	else if ( V_strieq(key, "MoveSpeed") )
 	{
 		// dimhotepus: atof -> V_atof
 		m_flSpeed = V_atof( value );
 		m_bRebuildPath = true;
 	}
-	else if (!stricmp(key, "angles"))
+	else if (V_strieq(key, "angles"))
 	{
 		sscanf(value, "%f %f %f", &m_Angles[PITCH], &m_Angles[YAW], &m_Angles[ROLL]);
 		AngleQuaternion(m_Angles, m_qAngles);

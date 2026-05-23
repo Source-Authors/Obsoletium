@@ -100,11 +100,11 @@ void CServerInfoPanel::OnResetData()
 //-----------------------------------------------------------------------------
 void CServerInfoPanel::OnServerDataResponse(const char *value, const char *response)
 {
-	if (!stricmp(value, "playercount"))
+	if (V_strieq(value, "playercount"))
 	{
 		m_iPlayerCount = atoi(response);
 	}
-	else if (!stricmp(value, "maxplayers"))
+	else if (V_strieq(value, "maxplayers"))
 	{
 		m_iMaxPlayers = atoi(response);
 
@@ -117,20 +117,20 @@ void CServerInfoPanel::OnServerDataResponse(const char *value, const char *respo
 		}
 		SetControlString("PlayersText", buf);
 	}
-	else if (!stricmp(value, "gamedescription"))
+	else if (V_strieq(value, "gamedescription"))
 	{
 		SetControlString("GameText", response);
 	}
-	else if (!stricmp(value, "hostname"))
+	else if (V_strieq(value, "hostname"))
 	{
 		PostActionSignal(new KeyValues("UpdateTitle"));
 	}
-	else if (!stricmp(value, "UpdateMap") || !stricmp(value, "UpdatePlayers"))
+	else if (V_strieq(value, "UpdateMap") || V_strieq(value, "UpdatePlayers"))
 	{
 		// server has indicated a change, force an update
 		m_flUpdateTime = 0.0;
 	}
-	else if (!stricmp(value, "maplist"))
+	else if (V_strieq(value, "maplist"))
 	{
 		SetCustomStringList("map", response);
 		// save off maplist for use in mapcycle editing
@@ -138,17 +138,17 @@ void CServerInfoPanel::OnServerDataResponse(const char *value, const char *respo
 		// don't chain through, not in varlist
 		return;
 	}
-	else if (!stricmp(value, "uptime"))
+	else if (V_strieq(value, "uptime"))
 	{
 		// record uptime for extrapolation
 		m_iLastUptimeReceived = atoi(response);
 		m_flLastUptimeReceiveTime = system()->GetFrameTime();
 	}
-	else if (!stricmp(value, "ipaddress"))
+	else if (V_strieq(value, "ipaddress"))
 	{
 		SetControlString("ServerIPText", response);
 	}
-	else if (!stricmp(value, "mapcycle"))
+	else if (V_strieq(value, "mapcycle"))
 	{
 		ParseIntoMapList(response, m_MapCycle);
 		UpdateMapCycleValue();
@@ -160,7 +160,7 @@ void CServerInfoPanel::OnServerDataResponse(const char *value, const char *respo
 	BaseClass::OnServerDataResponse(value, response);
 
 	// post update
-	if (!stricmp(value, "map"))
+	if (V_strieq(value, "map"))
 	{
 		// map has changed, update map cycle view
 		UpdateMapCycleValue();
@@ -172,7 +172,7 @@ void CServerInfoPanel::OnServerDataResponse(const char *value, const char *respo
 //-----------------------------------------------------------------------------
 void CServerInfoPanel::OnEditVariable(KeyValues *rule)
 {
-	if (!stricmp(rule->GetName(), "mapcycle"))
+	if (V_strieq(rule->GetName(), "mapcycle"))
 	{
 		CMapCycleEditDialog *dlg = new CMapCycleEditDialog(this, "MapCycleEditDialog");
 		dlg->Activate(this, m_AvailableMaps, m_MapCycle);
@@ -197,7 +197,7 @@ void CServerInfoPanel::UpdateMapCycleValue()
 	intp listPoint = -1;
 	for (intp i = 0; i < m_MapCycle.Count(); i++)
 	{
-		if (!stricmp(m_MapCycle[i].String(), currentMap.String()))
+		if (V_strieq(m_MapCycle[i].String(), currentMap.String()))
 		{
 			listPoint = i;
 		}

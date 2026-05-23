@@ -608,7 +608,7 @@ int LookupPoseParameter( char *name )
 	int i;
 	for ( i = 0; i < g_numposeparameters; i++)
 	{
-		if (!stricmp( name, g_pose[i].name))
+		if (V_strieq( name, g_pose[i].name))
 		{
 			return i;
 		}
@@ -759,19 +759,19 @@ void Cmd_CheckUV()
 
 	while ( TokenAvailable() && GetToken( false ) )
 	{
-		if ( !V_stricmp( token, "0to1" ) )
+		if ( V_strieq( token, "0to1" ) )
 		{
 			g_StudioMdlCheckUVCmd.SetCheck( CCheckUVCmd::CHECK_UV_FLAG_NORMALIZED );
 		}
-		else if ( !V_stricmp( token, "overlap" ) )
+		else if ( V_strieq( token, "overlap" ) )
 		{
 			g_StudioMdlCheckUVCmd.SetCheck( CCheckUVCmd::CHECK_UV_FLAG_OVERLAP );
 		}
-		else if ( !V_stricmp( token, "inverse" ) )
+		else if ( V_strieq( token, "inverse" ) )
 		{
 			g_StudioMdlCheckUVCmd.SetCheck( CCheckUVCmd::CHECK_UV_FLAG_INVERSE );
 		}
-		else if ( !V_stricmp( token, "gutter" ) )
+		else if ( V_strieq( token, "gutter" ) )
 		{
 			g_StudioMdlCheckUVCmd.SetCheck( CCheckUVCmd::CHECK_UV_FLAG_GUTTER );
 			if ( TokenAvailable() && GetToken( false ) )
@@ -6137,7 +6137,7 @@ void Cmd_Controller (void)
 {
 	if (GetToken (false))
 	{
-		if (!stricmp("mouth",token))
+		if (V_strieq("mouth",token))
 		{
 			g_bonecontroller[g_numbonecontrollers].inputfield = 4;
 		}
@@ -6188,11 +6188,11 @@ void Cmd_ScreenAlign ( void )
 
 		if( GetToken( false ) )
 		{
-			if( !stricmp( "sphere", token )  )
+			if( V_strieq( "sphere", token )  )
 			{
 				g_screenalignedbone[g_numscreenalignedbones].flags = BONE_SCREEN_ALIGN_SPHERE;				
 			}
-			else if( !stricmp( "cylinder", token ) )
+			else if( V_strieq( "cylinder", token ) )
 			{
 				g_screenalignedbone[g_numscreenalignedbones].flags = BONE_SCREEN_ALIGN_CYLINDER;				
 			}
@@ -6459,7 +6459,7 @@ void Cmd_JointSurfaceProp ()
 	intp i;
 	for ( i = s_JointSurfaceProp.Count(); --i >= 0; )
 	{
-		if (!stricmp(s_JointSurfaceProp[i].m_pJointName, token))
+		if (V_strieq(s_JointSurfaceProp[i].m_pJointName, token))
 		{
 			break;
 		}
@@ -6494,7 +6494,7 @@ static char* FindSurfaceProp ( const char* pJointName )
 {
 	for ( intp i = s_JointSurfaceProp.Count(); --i >= 0; )
 	{
-		if (!stricmp(s_JointSurfaceProp[i].m_pJointName, pJointName))
+		if (V_strieq(s_JointSurfaceProp[i].m_pJointName, pJointName))
 		{
 			return s_JointSurfaceProp[i].m_pSurfaceProp;
 		}
@@ -6579,24 +6579,24 @@ static void ParseContents( int *pAddFlags, int *pRemoveFlags )
 	{
 		GetToken (false);
 
-		if ( !stricmp( token, "grate" ) )
+		if ( V_strieq( token, "grate" ) )
 		{
 			*pAddFlags |= CONTENTS_GRATE;
 			*pRemoveFlags |= CONTENTS_SOLID;
 		}
-		else if ( !stricmp( token, "ladder" ) )
+		else if ( V_strieq( token, "ladder" ) )
 		{
 			*pAddFlags |= CONTENTS_LADDER;
 		}
-		else if ( !stricmp( token, "solid" ) )
+		else if ( V_strieq( token, "solid" ) )
 		{
 			*pAddFlags |= CONTENTS_SOLID;
 		}
-		else if ( !stricmp( token, "monster" ) )
+		else if ( V_strieq( token, "monster" ) )
 		{
 			*pAddFlags |= CONTENTS_MONSTER;
 		}
-		else if ( !stricmp( token, "notsolid" ) )
+		else if ( V_strieq( token, "notsolid" ) )
 		{
 			*pRemoveFlags |= CONTENTS_SOLID;
 		}
@@ -6628,7 +6628,7 @@ void Cmd_JointContents ()
 	intp i;
 	for ( i = s_JointContents.Count(); --i >= 0; )
 	{
-		if (!stricmp(s_JointContents[i].m_pJointName, token))
+		if (V_strieq(s_JointContents[i].m_pJointName, token))
 		{
 			break;
 		}
@@ -6665,7 +6665,7 @@ static int FindContents( const char* pJointName )
 {
 	for ( intp i = s_JointContents.Count(); --i >= 0; )
 	{
-		if (!stricmp(s_JointContents[i].m_pJointName, pJointName))
+		if (V_strieq(s_JointContents[i].m_pJointName, pJointName))
 		{
 			return s_JointContents[i].m_nContents;
 		}
@@ -6964,7 +6964,7 @@ static void Cmd_ReplaceModel( LodScriptData_t& lodData )
 
 	// If the LOD system tells us to replace "blank", let's forget
 	// we ever read this. Have to do it here so parsing works
-	if( !stricmp( newReplacement.GetSrcName(), "blank" ) )
+	if( V_strieq( newReplacement.GetSrcName(), "blank" ) )
 	{
 		lodData.modelReplacements.FastRemove( i );
 		return;
@@ -7005,7 +7005,7 @@ static void Cmd_RemoveModel( LodScriptData_t& lodData )
 
 	// If the LOD system tells us to replace "blank", let's forget
 	// we ever read this. Have to do it here so parsing works
-	if( !stricmp( newReplacement.GetSrcName(), "blank" ) )
+	if( V_strieq( newReplacement.GetSrcName(), "blank" ) )
 	{
 		lodData.modelReplacements.FastRemove( i );
 	}
@@ -7101,7 +7101,7 @@ void Cmd_LOD( const char *cmdname )
 	// which uniquely identifies a shadow lod
 	newLOD.switchValue = -1.0f;
 
-	bool isShadowCall = ( !stricmp( cmdname, "$shadowlod" ) ) ? true : false;
+	bool isShadowCall = ( V_strieq( cmdname, "$shadowlod" ) ) ? true : false;
 
 	if ( isShadowCall )
 	{
@@ -7391,14 +7391,14 @@ void Option_KeyValues( CUtlVector< char > *pKeyValue )
 
 	while ( GetToken(true) )
 	{
-		if ( !stricmp( token, "}" ) )
+		if ( V_strieq( token, "}" ) )
 		{
 			nLevel--;
 			if ( nLevel <= 0 )
 				break;
 			AppendKeyValueText( pKeyValue, " }\n" );
 		}
-		else if ( !stricmp( token, "{" ) )
+		else if ( V_strieq( token, "{" ) )
 		{
 			AppendKeyValueText( pKeyValue, "{\n" );
 			nLevel++;
@@ -7695,7 +7695,7 @@ bool ParseJigglePitchConstraint( s_jigglebone_t *jiggleInfo )
  */
 bool ParseCommonJiggle( s_jigglebone_t *jiggleInfo )
 {
-	if (!stricmp( token, "tip_mass" ))
+	if (V_strieq( token, "tip_mass" ))
 	{
 		if ( !GetToken( false ) )
 		{
@@ -7704,7 +7704,7 @@ bool ParseCommonJiggle( s_jigglebone_t *jiggleInfo )
 
 		jiggleInfo->data.tipMass = verify_atof( token );
 	}
-	else if (!stricmp( token, "length" ))
+	else if (V_strieq( token, "length" ))
 	{
 		if ( !GetToken( false ) )
 		{
@@ -7713,21 +7713,21 @@ bool ParseCommonJiggle( s_jigglebone_t *jiggleInfo )
 
 		jiggleInfo->data.length = verify_atof( token );
 	}
-	else if (!stricmp( token, "angle_constraint" ))
+	else if (V_strieq( token, "angle_constraint" ))
 	{
 		if (ParseJiggleAngleConstraint( jiggleInfo ) == false)
 		{
 			return false;
 		}
 	}
-	else if (!stricmp( token, "yaw_constraint" ))
+	else if (V_strieq( token, "yaw_constraint" ))
 	{
 		if (ParseJiggleYawConstraint( jiggleInfo ) == false)
 		{
 			return false;
 		}
 	}
-	else if (!stricmp( token, "yaw_friction" ))
+	else if (V_strieq( token, "yaw_friction" ))
 	{
 		if ( !GetToken( false ) )
 		{
@@ -7736,7 +7736,7 @@ bool ParseCommonJiggle( s_jigglebone_t *jiggleInfo )
 
 		jiggleInfo->data.yawFriction = verify_atof( token );
 	}
-	else if (!stricmp( token, "yaw_bounce" ))
+	else if (V_strieq( token, "yaw_bounce" ))
 	{
 		if ( !GetToken( false ) )
 		{
@@ -7745,14 +7745,14 @@ bool ParseCommonJiggle( s_jigglebone_t *jiggleInfo )
 
 		jiggleInfo->data.yawBounce = verify_atof( token );
 	}
-	else if (!stricmp( token, "pitch_constraint" ))
+	else if (V_strieq( token, "pitch_constraint" ))
 	{
 		if (ParseJigglePitchConstraint( jiggleInfo ) == false)
 		{
 			return false;
 		}
 	}
-	else if (!stricmp( token, "pitch_friction" ))
+	else if (V_strieq( token, "pitch_friction" ))
 	{
 		if ( !GetToken( false ) )
 		{
@@ -7761,7 +7761,7 @@ bool ParseCommonJiggle( s_jigglebone_t *jiggleInfo )
 
 		jiggleInfo->data.pitchFriction = verify_atof( token );
 	}
-	else if (!stricmp( token, "pitch_bounce" ))
+	else if (V_strieq( token, "pitch_bounce" ))
 	{
 		if ( !GetToken( false ) )
 		{
@@ -7798,7 +7798,7 @@ bool ParseFlexibleJiggle( s_jigglebone_t *jiggleInfo )
 			return false;
 		}
 
-		if (!stricmp( token, "{" ))
+		if (V_streq( token, "{" ))
 		{
 			gotOpenBracket = true;
 		}
@@ -7807,36 +7807,36 @@ bool ParseFlexibleJiggle( s_jigglebone_t *jiggleInfo )
 			MdlError( "$jigglebone:is_flexible: missing '{'\n" );
 			return false;
 		}
-		else if (!stricmp( token, "}" ))
+		else if (V_streq( token, "}" ))
 		{
 			// definition complete
 			break;
 		}
-		else if (!stricmp( token, "yaw_stiffness" ))
+		else if (V_strieq( token, "yaw_stiffness" ))
 		{
 			jiggleInfo->data.yawStiffness = ParseJiggleStiffness();
 		}
-		else if (!stricmp( token, "yaw_damping" ))
+		else if (V_strieq( token, "yaw_damping" ))
 		{
 			jiggleInfo->data.yawDamping = ParseJiggleStiffness();
 		}
-		else if (!stricmp( token, "pitch_stiffness" ))
+		else if (V_strieq( token, "pitch_stiffness" ))
 		{
 			jiggleInfo->data.pitchStiffness = ParseJiggleStiffness();
 		}
-		else if (!stricmp( token, "pitch_damping" ))
+		else if (V_strieq( token, "pitch_damping" ))
 		{
 			jiggleInfo->data.pitchDamping = ParseJiggleStiffness();
 		}
-		else if (!stricmp( token, "along_stiffness" ))
+		else if (V_strieq( token, "along_stiffness" ))
 		{
 			jiggleInfo->data.alongStiffness = ParseJiggleStiffness();
 		}
-		else if (!stricmp( token, "along_damping" ))
+		else if (V_strieq( token, "along_damping" ))
 		{
 			jiggleInfo->data.alongDamping = ParseJiggleStiffness();
 		}
-		else if (!stricmp( token, "allow_length_flex" ))
+		else if (V_strieq( token, "allow_length_flex" ))
 		{
 			jiggleInfo->data.flags &= ~JIGGLE_HAS_LENGTH_CONSTRAINT;
 		}
@@ -7868,7 +7868,7 @@ bool ParseRigidJiggle( s_jigglebone_t *jiggleInfo )
 			return false;
 		}
 
-		if (!stricmp( token, "{" ))
+		if (V_streq( token, "{" ))
 		{
 			gotOpenBracket = true;
 		}
@@ -7877,7 +7877,7 @@ bool ParseRigidJiggle( s_jigglebone_t *jiggleInfo )
 			MdlError( "$jigglebone:is_rigid: missing '{'\n" );
 			return false;
 		}
-		else if (!stricmp( token, "}" ))
+		else if (V_streq( token, "}" ))
 		{
 			// definition complete
 			break;
@@ -7910,7 +7910,7 @@ bool ParseBaseSpringJiggle( s_jigglebone_t *jiggleInfo )
 			return false;
 		}
 
-		if (!stricmp( token, "{" ))
+		if (V_streq( token, "{" ))
 		{
 			gotOpenBracket = true;
 		}
@@ -7919,20 +7919,20 @@ bool ParseBaseSpringJiggle( s_jigglebone_t *jiggleInfo )
 			MdlError( "$jigglebone:has_base_spring: missing '{'\n" );
 			return false;
 		}
-		else if (!stricmp( token, "}" ))
+		else if (V_streq( token, "}" ))
 		{
 			// definition complete
 			break;
 		}
-		else if (!stricmp( token, "stiffness" ))
+		else if (V_strieq( token, "stiffness" ))
 		{
 			jiggleInfo->data.baseStiffness = ParseJiggleStiffness();
 		}
-		else if (!stricmp( token, "damping" ))
+		else if (V_strieq( token, "damping" ))
 		{
 			jiggleInfo->data.baseDamping = ParseJiggleStiffness();
 		}
-		else if (!stricmp( token, "left_constraint" ))
+		else if (V_strieq( token, "left_constraint" ))
 		{
 			if ( !GetToken( false ) )
 			{
@@ -7948,7 +7948,7 @@ bool ParseBaseSpringJiggle( s_jigglebone_t *jiggleInfo )
 
 			jiggleInfo->data.baseMaxLeft = verify_atof( token );
 		}
-		else if (!stricmp( token, "left_friction" ))
+		else if (V_strieq( token, "left_friction" ))
 		{
 			if ( !GetToken( false ) )
 			{
@@ -7957,7 +7957,7 @@ bool ParseBaseSpringJiggle( s_jigglebone_t *jiggleInfo )
 
 			jiggleInfo->data.baseLeftFriction = verify_atof( token );
 		}
-		else if (!stricmp( token, "up_constraint" ))
+		else if (V_strieq( token, "up_constraint" ))
 		{
 			if ( !GetToken( false ) )
 			{
@@ -7973,7 +7973,7 @@ bool ParseBaseSpringJiggle( s_jigglebone_t *jiggleInfo )
 
 			jiggleInfo->data.baseMaxUp = verify_atof( token );
 		}
-		else if (!stricmp( token, "up_friction" ))
+		else if (V_strieq( token, "up_friction" ))
 		{
 			if ( !GetToken( false ) )
 			{
@@ -7982,7 +7982,7 @@ bool ParseBaseSpringJiggle( s_jigglebone_t *jiggleInfo )
 
 			jiggleInfo->data.baseUpFriction = verify_atof( token );
 		}
-		else if (!stricmp( token, "forward_constraint" ))
+		else if (V_strieq( token, "forward_constraint" ))
 		{
 			if ( !GetToken( false ) )
 			{
@@ -7998,7 +7998,7 @@ bool ParseBaseSpringJiggle( s_jigglebone_t *jiggleInfo )
 
 			jiggleInfo->data.baseMaxForward = verify_atof( token );
 		}
-		else if (!stricmp( token, "forward_friction" ))
+		else if (V_strieq( token, "forward_friction" ))
 		{
 			if ( !GetToken( false ) )
 			{
@@ -8007,7 +8007,7 @@ bool ParseBaseSpringJiggle( s_jigglebone_t *jiggleInfo )
 
 			jiggleInfo->data.baseForwardFriction = verify_atof( token );
 		}
-		else if (!stricmp( token, "base_mass" ))
+		else if (V_strieq( token, "base_mass" ))
 		{
 			if ( !GetToken( false ) )
 			{
@@ -8051,7 +8051,7 @@ bool ParseBoing( s_jigglebone_t *jiggleInfo )
 			return false;
 		}
 
-		if ( !stricmp( token, "{" ) )
+		if ( V_strieq( token, "{" ) )
 		{
 			gotOpenBracket = true;
 		}
@@ -8060,12 +8060,12 @@ bool ParseBoing( s_jigglebone_t *jiggleInfo )
 			MdlError( "$jigglebone:is_boing: missing '{'\n" );
 			return false;
 		}
-		else if ( !stricmp( token, "}" ) )
+		else if ( V_strieq( token, "}" ) )
 		{
 			// definition complete
 			break;
 		}
-		else if ( !stricmp( token, "impact_speed" ) )
+		else if ( V_strieq( token, "impact_speed" ) )
 		{
 			if ( !GetToken( false ) )
 			{
@@ -8074,7 +8074,7 @@ bool ParseBoing( s_jigglebone_t *jiggleInfo )
 
 			jiggleInfo->data.boingImpactSpeed = verify_atof( token );
 		}
-		else if ( !stricmp( token, "impact_angle" ) )
+		else if ( V_strieq( token, "impact_angle" ) )
 		{
 			if ( !GetToken( false ) )
 			{
@@ -8083,7 +8083,7 @@ bool ParseBoing( s_jigglebone_t *jiggleInfo )
 
 			jiggleInfo->data.boingImpactAngle = cos( DEG2RAD( verify_atof( token ) ) );
 		}
-		else if ( !stricmp( token, "damping_rate" ) )
+		else if ( V_strieq( token, "damping_rate" ) )
 		{
 			if ( !GetToken( false ) )
 			{
@@ -8092,7 +8092,7 @@ bool ParseBoing( s_jigglebone_t *jiggleInfo )
 
 			jiggleInfo->data.boingDampingRate = verify_atof( token );
 		}
-		else if ( !stricmp( token, "frequency" ) )
+		else if ( V_strieq( token, "frequency" ) )
 		{
 			if ( !GetToken( false ) )
 			{
@@ -8101,7 +8101,7 @@ bool ParseBoing( s_jigglebone_t *jiggleInfo )
 
 			jiggleInfo->data.boingFrequency = verify_atof( token );
 		}
-		else if ( !stricmp( token, "amplitude" ) )
+		else if ( V_strieq( token, "amplitude" ) )
 		{
 			if ( !GetToken( false ) )
 			{
@@ -8151,7 +8151,7 @@ void Cmd_JiggleBone( void )
 			return;
 		}
 		
-		if (!stricmp( token, "{" ))
+		if (V_streq( token, "{" ))
 		{
 			gotOpenBracket = true;
 		}
@@ -8160,33 +8160,33 @@ void Cmd_JiggleBone( void )
 			MdlError( "$jigglebone: missing '{'\n" );
 			return;				
 		}
-		else if (!stricmp( token, "}" ))
+		else if (V_strieq( token, "}" ))
 		{
 			// definition complete
 			break;
 		}
-		else if (!stricmp( token, "is_flexible" ))
+		else if (V_strieq( token, "is_flexible" ))
 		{
 			if (ParseFlexibleJiggle( jiggleInfo ) == false)
 			{
 				return;
 			}
 		}
-		else if (!stricmp( token, "is_rigid" ))
+		else if (V_strieq( token, "is_rigid" ))
 		{
 			if (ParseRigidJiggle( jiggleInfo ) == false)
 			{
 				return;
 			}
 		}
-		else if (!stricmp( token, "has_base_spring" ))
+		else if (V_strieq( token, "has_base_spring" ))
 		{
 			if (ParseBaseSpringJiggle( jiggleInfo ) == false)
 			{
 				return;
 			}
 		}	
-		else if ( !stricmp( token, "is_boing" ) )
+		else if ( V_strieq( token, "is_boing" ) )
 		{
 			if ( ParseBoing( jiggleInfo ) == false )
 			{
@@ -9146,7 +9146,7 @@ void ParseScript (void)
 		int i;
 		for ( i=0; i < ARRAYSIZE( g_Commands ); i++ )
 		{
-			if ( !stricmp( g_Commands[i].m_pName, token ) )
+			if ( V_strieq( g_Commands[i].m_pName, token ) )
 			{
 				g_Commands[i].m_pCmd();
 				break;

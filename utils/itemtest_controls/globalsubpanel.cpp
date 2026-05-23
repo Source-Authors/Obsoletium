@@ -104,7 +104,7 @@ void CGlobalSubPanel::UpdateGUI()
 			if ( !pMenuItem )
 				continue;
 
-			if ( !V_stricmp( pszClass, pMenuItem->GetName() ) )
+			if ( V_strieq( pszClass, pMenuItem->GetName() ) )
 			{
 				m_pClassComboBox->ActivateItemByRow( i );
 				bFound = true;

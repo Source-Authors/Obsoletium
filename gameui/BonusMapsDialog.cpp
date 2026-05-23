@@ -685,7 +685,7 @@ void CBonusMapsDialog::ApplySchemeSettings( IScheme *pScheme )
 //-----------------------------------------------------------------------------
 void CBonusMapsDialog::OnCommand( const char *command )
 {
-	if ( !stricmp( command, "loadbonusmap" ) )
+	if ( V_strieq( command, "loadbonusmap" ) )
 	{
 		intp mapIndex = GetSelectedItemBonusMapIndex();
 		if ( BonusMapsDatabase()->IsValidIndex( mapIndex ) )
@@ -757,7 +757,7 @@ void CBonusMapsDialog::OnCommand( const char *command )
 			}
 		}
 	}
-	else if ( !stricmp( command, "back" ) )
+	else if ( V_strieq( command, "back" ) )
 	{
 		BonusMapsDatabase()->BackPath();
 
@@ -771,7 +771,7 @@ void CBonusMapsDialog::OnCommand( const char *command )
 
 		m_pGameList->MoveScrollBarToTop();
 	}
-	else if ( !stricmp( command, "ImportBonusMaps" ) )
+	else if ( V_strieq( command, "ImportBonusMaps" ) )
 	{
 		if ( m_hImportBonusMapsDialog == NULL )
 		{

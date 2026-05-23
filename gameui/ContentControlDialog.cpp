@@ -152,7 +152,7 @@ void CContentControlDialog::Explain( char const *fmt, ... )
 //-----------------------------------------------------------------------------
 void CContentControlDialog::OnCommand( const char *command )
 {
-	if ( !stricmp( command, "Ok" ) )
+	if ( V_strieq( command, "Ok" ) )
 	{
 		bool canclose = false;
 
@@ -186,7 +186,7 @@ void CContentControlDialog::OnCommand( const char *command )
 			OnClose();
 		}
 	}
-	else if ( !stricmp( command, "Cancel" ) )
+	else if ( V_strieq( command, "Cancel" ) )
 	{
 		OnClose();
 	}

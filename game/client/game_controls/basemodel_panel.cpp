@@ -232,7 +232,7 @@ int CBaseModelPanel::FindSequenceFromActivity( CStudioHdr *pStudioHdr, const cha
 	for ( int iSeq = 0; iSeq < pStudioHdr->GetNumSeq(); ++iSeq )
 	{
 		mstudioseqdesc_t &seqDesc = pStudioHdr->pSeqdesc( iSeq );
-		if ( !V_stricmp( seqDesc.pszActivityName(), pszActivity ) )
+		if ( V_strieq( seqDesc.pszActivityName(), pszActivity ) )
 		{
 			return iSeq;
 		}

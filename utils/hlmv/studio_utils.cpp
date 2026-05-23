@@ -497,7 +497,7 @@ intp StudioModel::LookupSequence( const char *szSequence ) const
 
 	for (intp i = 0; i < pStudioHdr->GetNumSeq(); i++)
 	{
-		if (!stricmp( szSequence, pStudioHdr->pSeqdesc( i ).pszLabel() ))
+		if (V_strieq( szSequence, pStudioHdr->pSeqdesc( i ).pszLabel() ))
 		{
 			return i;
 		}
@@ -513,7 +513,7 @@ intp StudioModel::LookupActivity( const char *szActivity ) const
 
 	for (intp i = 0; i < pStudioHdr->GetNumSeq(); i++)
 	{
-		if (!stricmp( szActivity, pStudioHdr->pSeqdesc( i ).pszActivityName() ))
+		if (V_strieq( szActivity, pStudioHdr->pSeqdesc( i ).pszActivityName() ))
 		{
 			return i;
 		}

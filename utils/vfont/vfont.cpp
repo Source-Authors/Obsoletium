@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
   // Check if we are in decompiler mode
   //
 #if VFONT_DECOMPILER
-  bool bDecompiler = !stricmp(argv[iArg], "-d");
+  bool bDecompiler = V_strieq(argv[iArg], "-d");
   if (bDecompiler) ++iArg;
 #endif
 

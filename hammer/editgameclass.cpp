@@ -441,7 +441,7 @@ ChunkFileResult_t CEditGameClass::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInf
 		// Don't write keys that were already written above.
 		//
 		bool bAlreadyWritten = false;
-		if (!stricmp(KeyValue.szKey, "classname"))
+		if (V_strieq(KeyValue.szKey, "classname"))
 		{
 			bAlreadyWritten = true;
 		}

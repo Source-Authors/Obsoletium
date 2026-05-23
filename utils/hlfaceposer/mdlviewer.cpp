@@ -853,7 +853,7 @@ public:
 									
 									V_strcpy_safe( text.choice, a->GetName() );
 
-									if ( !stricmp( a->GetFacePoserModelName(), modelname ) )
+									if ( V_strieq( a->GetFacePoserModelName(), modelname ) )
 									{
 										params.m_nSelected = i;
 										oldsel = -1;

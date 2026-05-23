@@ -549,7 +549,7 @@ bool CRagdollProp::HasPhysgunInteraction( const char *pszKeyName, const char *ps
 		{
 			char const *pszBase = pkvPropData->GetString( pszKeyName );
 
-			if ( pszBase && pszBase[0] && !stricmp( pszBase, pszValue ) )
+			if ( pszBase && pszBase[0] && V_strieq( pszBase, pszValue ) )
 			{
 				return true;
 			}

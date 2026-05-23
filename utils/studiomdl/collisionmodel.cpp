@@ -146,7 +146,7 @@ int FindLocalBoneNamed( const s_source_t *pSource, const char *pName )
 		int i;
 		for ( i = 0; i < pSource->numbones; i++ )
 		{
-			if ( !stricmp( pName, pSource->localBone[i].name ) )
+			if ( V_strieq( pName, pSource->localBone[i].name ) )
 				return i;
 		}
 
@@ -154,7 +154,7 @@ int FindLocalBoneNamed( const s_source_t *pSource, const char *pName )
 
 		for ( i = 0; i < pSource->numbones; i++ )
 		{
-			if ( !stricmp( pName, pSource->localBone[i].name ) )
+			if ( V_strieq( pName, pSource->localBone[i].name ) )
 				return i;
 		}
 	}
@@ -366,7 +366,7 @@ int CJointedModel::BoneIndex( const char *pName )
 	pName = RenameBone( pName );
 	for ( int boneIndex = 0; boneIndex < m_pModel->numbones; boneIndex++ )
 	{
-		if ( !stricmp( m_pModel->localBone[boneIndex].name, pName ) )
+		if ( V_strieq( m_pModel->localBone[boneIndex].name, pName ) )
 			return boneIndex;
 	}
 
@@ -420,7 +420,7 @@ int CJointedModel::CollisionIndex( const char *pName )
 	int index = 0;
 	while ( pList )
 	{
-		if ( !stricmp( pName, pList->m_name ) )
+		if ( V_strieq( pName, pList->m_name ) )
 			return index;
 		
 		pList = pList->m_pNext;
@@ -479,7 +479,7 @@ void CJointedModel::SortCollisionList( void )
 				if ( j == i )
 					continue;
 
-				if ( !stricmp( pPhys->m_parent, pArray[j]->m_name ) )
+				if ( V_strieq( pPhys->m_parent, pArray[j]->m_name ) )
 					break;
 			}
 
@@ -553,7 +553,7 @@ CPhysCollisionModel *CJointedModel::GetCollisionModel( const char *pName )
 	CPhysCollisionModel *pList = m_pCollisionList;
 	while ( pList )
 	{
-		if ( !stricmp( pName, pList->m_name ) )
+		if ( V_strieq( pName, pList->m_name ) )
 			return pList;
 		
 		pList = pList->m_pNext;
@@ -1099,7 +1099,7 @@ CPhysCollisionModel *FindObjectInList( CPhysCollisionModel *pHead, const char *p
 {
 	while ( pHead )
 	{
-		if ( !stricmp( pName, pHead->m_name ) )
+		if ( V_strieq( pName, pHead->m_name ) )
 			break;
 		pHead = pHead->m_pNext;
 	}
@@ -1868,15 +1868,15 @@ void CCmd_JointConstrain( CJointedModel &joints, const char *pJointName, const c
 	}
 
 	jointlimit_t jointType = JOINT_FREE;
-	if ( !stricmp( pJointType, "free" ) )
+	if ( V_strieq( pJointType, "free" ) )
 	{
 		jointType = JOINT_FREE;
 	}
-	else if ( !stricmp( pJointType, "fixed" ) )
+	else if ( V_strieq( pJointType, "fixed" ) )
 	{
 		jointType = JOINT_FIXED;
 	}
-	else if ( !stricmp( pJointType, "limit" ) )
+	else if ( V_strieq( pJointType, "limit" ) )
 	{
 		jointType = JOINT_LIMIT;
 	}
@@ -1972,70 +1972,70 @@ void ParseCollisionCommands( CJointedModel &joints )
 
 		V_strcpy_safe( command, token );
 
-		if ( !stricmp( command, "$mass" ) )
+		if ( V_strieq( command, "$mass" ) )
 		{
 			argCount = ReadArgs( args, 1 );
 			CCmd_TotalMass( joints, args[0] );
 		}
 		// default properties
-		else if ( !stricmp( command, "$automass" ) )
+		else if ( V_strieq( command, "$automass" ) )
 		{
 			joints.SetAutoMass();
 		}
-		else if ( !stricmp( command, "$inertia" ) )
+		else if ( V_strieq( command, "$inertia" ) )
 		{
 			argCount = ReadArgs( args, 1 );
 			joints.DefaultInertia( Safe_atof( args[0] ) );
 		}
-		else if ( !stricmp( command, "$damping" ) )
+		else if ( V_strieq( command, "$damping" ) )
 		{
 			argCount = ReadArgs( args, 1 );
 			joints.DefaultDamping( Safe_atof( args[0] ) );
 		}
-		else if ( !stricmp( command, "$rotdamping" ) )
+		else if ( V_strieq( command, "$rotdamping" ) )
 		{
 			argCount = ReadArgs( args, 1 );
 			joints.DefaultRotdamping( Safe_atof( args[0] ) );
 		}
-		else if ( !stricmp( command, "$drag" ) )
+		else if ( V_strieq( command, "$drag" ) )
 		{
 			argCount = ReadArgs( args, 1 );
 			joints.DefaultDrag( Safe_atof( args[0] ) );
 		}
-		else if ( !stricmp( command, "$rollingDrag" ) )
+		else if ( V_strieq( command, "$rollingDrag" ) )
 		{
 			argCount = ReadArgs( args, 1 );
 			// JAY: Removed this in favor of heuristic/tuning approach
 			//joints.DefaultRollingDrag( Safe_atof( args[0] ) );
 		}
-		else if ( !stricmp( command, "$maxconvexpieces") )
+		else if ( V_strieq( command, "$maxconvexpieces") )
 		{
 			argCount = ReadArgs( args, 1 );
 			joints.SetMaxConvex( Safe_atoi(args[0]) );
 		}
-		else if ( !stricmp( command, "$remove2d") )
+		else if ( V_strieq( command, "$remove2d") )
 		{
 			joints.Remove2DConvex();
 		}
-		else if ( !stricmp( command, "$concaveperjoint") )
+		else if ( V_strieq( command, "$concaveperjoint") )
 		{
 			joints.AllowConcaveJoints();
 		}
-		else if ( !stricmp( command, "$weldposition") )
+		else if ( V_strieq( command, "$weldposition") )
 		{
 			argCount = ReadArgs(args,1);
 			g_WeldVertEpsilon = Safe_atof( args[0] );
 		}
-		else if ( !stricmp( command, "$weldnormal") )
+		else if ( V_strieq( command, "$weldnormal") )
 		{
 			argCount = ReadArgs(args,1);
 			g_WeldNormalEpsilon = Safe_atof( args[0] );
 		}
-		else if ( !stricmp( command, "$concave" ) )
+		else if ( V_strieq( command, "$concave" ) )
 		{
 			joints.AllowConcave();
 		}
-		else if ( !stricmp( command, "$masscenter" ) )
+		else if ( V_strieq( command, "$masscenter" ) )
 		{
 			argCount = ReadArgs( args, 3 );
 			Vector center;
@@ -2043,22 +2043,22 @@ void ParseCollisionCommands( CJointedModel &joints )
 			joints.ForceMassCenter( center );
 		}
 		// joint commands
-		else if ( !stricmp( command, "$jointskip" ) )
+		else if ( V_strieq( command, "$jointskip" ) )
 		{
 			argCount = ReadArgs( args, 1 );
 			CCmd_JointSkip( joints, args[0] );
 		}
-		else if ( !stricmp( command, "$jointmerge" ) )
+		else if ( V_strieq( command, "$jointmerge" ) )
 		{
 			argCount = ReadArgs( args, 2 );
 			CCmd_JointMerge( joints, args[0], args[1] );
 		}
-		else if ( !stricmp( command, "$rootbone" ) )
+		else if ( V_strieq( command, "$rootbone" ) )
 		{
 			argCount = ReadArgs( args, 1 );
 			CCmd_JointRoot( joints, args[0] );
 		}
-		else if ( !stricmp( command, "$jointconstrain" ) )
+		else if ( V_strieq( command, "$jointconstrain" ) )
 		{
 			argCount = ReadArgs( args, 6 );
 			char *pFriction = args[5];
@@ -2069,36 +2069,36 @@ void ParseCollisionCommands( CJointedModel &joints )
 			CCmd_JointConstrain( joints, args[0], args[1], args[2], args[3], args[4], pFriction );
 		}
 		// joint properties
-		else if ( !stricmp( command, "$jointinertia" ) )
+		else if ( V_strieq( command, "$jointinertia" ) )
 		{
 			argCount = ReadArgs( args, 2 );
 			joints.JointInertia( args[0], Safe_atof( args[1] ) );
 		}
-		else if ( !stricmp( command, "$jointdamping" ) )
+		else if ( V_strieq( command, "$jointdamping" ) )
 		{
 			argCount = ReadArgs( args, 2 );
 			joints.JointDamping( args[0], Safe_atof( args[1] ) );
 		}
-		else if ( !stricmp( command, "$jointrotdamping" ) )
+		else if ( V_strieq( command, "$jointrotdamping" ) )
 		{
 			argCount = ReadArgs( args, 2 );
 			joints.JointRotdamping( args[0], Safe_atof( args[1] ) );
 		}
-		else if ( !stricmp( command, "$jointmassbias" ) )
+		else if ( V_strieq( command, "$jointmassbias" ) )
 		{
 			argCount = ReadArgs( args, 2 );
 			joints.JointMassBias( args[0], Safe_atof( args[1] ) );
 		}
-		else if ( !stricmp( command, "$noselfcollisions" ) )
+		else if ( V_strieq( command, "$noselfcollisions" ) )
 		{
 			joints.SetNoSelfCollisions();
 		}
-		else if ( !stricmp( command, "$jointcollide" ) )
+		else if ( V_strieq( command, "$jointcollide" ) )
 		{
 			argCount = ReadArgs( args, 2 );
 			joints.AppendCollisionPair( args[0], args[1] );
 		}
-		else if ( !stricmp( command, "$animatedfriction" ) )
+		else if ( V_strieq( command, "$animatedfriction" ) )
 		{
 			argCount = ReadArgs( args, 5 );
 
@@ -2107,7 +2107,7 @@ void ParseCollisionCommands( CJointedModel &joints )
 				CCmd_JoinAnimatedFriction( joints, args[0], args[1], args[2], args[3], args[4] );
 			}
 		}
-		else if ( !stricmp( command, "$assumeworldspace") )
+		else if ( V_strieq( command, "$assumeworldspace") )
 		{
 			joints.m_bAssumeWorldspace = true;
 		}

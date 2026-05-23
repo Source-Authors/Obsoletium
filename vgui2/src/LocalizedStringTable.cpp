@@ -452,18 +452,18 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 			
 			if (state == STATE_BASE)
 			{
-				if (!stricmp(key, "Language"))
+				if (V_strieq(key, "Language"))
 				{
 					// copy out our language setting
 					char value[MAX_LOCALIZED_CHARS];
 					V_UCS2ToUTF8(valuetoken, value, sizeof(value));
 					V_strcpy_safe(m_szLanguage, value);
 				}
-				else if (!stricmp(key, "Tokens"))
+				else if (V_strieq(key, "Tokens"))
 				{
 					state = STATE_TOKENS;
 				}
-				else if (!stricmp(key, "}"))
+				else if (V_streq(key, "}"))
 				{
 					// we've hit the end
 					break;
@@ -471,7 +471,7 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 			}
 			else if (state == STATE_TOKENS)
 			{
-				if (!stricmp(key, "}"))
+				if (V_streq(key, "}"))
 				{
 					// end of tokens
 					state = STATE_BASE;
@@ -511,18 +511,18 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 							if ( pszKey && pszKey[0] )
 							{
 								pszKey[ V_strlen(pszKey)-1 ] = '\0';
-								if ( !V_stricmp( pszKey, "ENGLISH" ) ||
-									!V_stricmp( pszKey, "JAPANESE" ) ||
-									!V_stricmp( pszKey, "GERMAN" ) ||
-									!V_stricmp( pszKey, "FRENCH" ) ||
-									!V_stricmp( pszKey, "SPANISH" ) ||
-									!V_stricmp( pszKey, "ITALIAN" ) ||
-									!V_stricmp( pszKey, "KOREAN" ) ||
-									!V_stricmp( pszKey, "TCHINESE" ) ||
-									!V_stricmp( pszKey, "PORTUGUESE" ) ||
-									!V_stricmp( pszKey, "SCHINESE" ) ||
-									!V_stricmp( pszKey, "POLISH" ) ||
-									!V_stricmp( pszKey, "RUSSIAN" ) )
+								if ( V_strieq( pszKey, "ENGLISH" ) ||
+									V_strieq( pszKey, "JAPANESE" ) ||
+									V_strieq( pszKey, "GERMAN" ) ||
+									V_strieq( pszKey, "FRENCH" ) ||
+									V_strieq( pszKey, "SPANISH" ) ||
+									V_strieq( pszKey, "ITALIAN" ) ||
+									V_strieq( pszKey, "KOREAN" ) ||
+									V_strieq( pszKey, "TCHINESE" ) ||
+									V_strieq( pszKey, "PORTUGUESE" ) ||
+									V_strieq( pszKey, "SCHINESE" ) ||
+									V_strieq( pszKey, "POLISH" ) ||
+									V_strieq( pszKey, "RUSSIAN" ) )
 								{
 									// the language symbols are true if we are in that language
 									// english is assumed when no language is present
@@ -532,7 +532,7 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 									{
 										pLanguageString = "english";
 									}
-									bool bMatched = ( !V_stricmp( pszKey, pLanguageString ) );
+									bool bMatched = ( V_strieq( pszKey, pLanguageString ) );
 									bAccepted = (bMatched && !bNot) || (!bMatched && bNot);
 								}
 							}

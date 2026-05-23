@@ -99,7 +99,7 @@ bool CGameEventEditDoc::LoadFromFile( const char *pFileName )
 	// Set the txt file name. 
 	// If we loaded an existing commentary file, keep the same filename.
 	// If we loaded a .bsp, change the name & the extension.
-	if ( !V_stricmp( Q_GetFileExtension( pFileName ), "bsp" ) )
+	if ( V_strieq( Q_GetFileExtension( pFileName ), "bsp" ) )
 	{
 		const char *pCommentaryAppend = "_commentary.txt";
 		Q_StripExtension( pFileName, m_pTXTFileName, sizeof(m_pTXTFileName)- strlen(pCommentaryAppend) - 1 );

@@ -554,7 +554,7 @@ void CAI_NetworkManager::LoadNetworkGraph( void )
 		// hack for shipped ep1 and hl2 maps
 		// they were rebuilt a week after they were actually shipped so allow the slightly
 		// older node graphs to load for these maps
-		if ( !V_stricmp( szLoweredGameDir, "hl2" ) || !V_stricmp( szLoweredGameDir, "episodic" ) )
+		if ( V_strieq( szLoweredGameDir, "hl2" ) || V_strieq( szLoweredGameDir, "episodic" ) )
 		{
 			bOK = true;
 		}
@@ -952,7 +952,7 @@ bool CAI_NetworkManager::IsAIFileCurrent ( const char *szMapName )
 		Q_strncpy( szLoweredGameDir, pGameDir, sizeof( szLoweredGameDir ) );
 		Q_strlower( szLoweredGameDir );
 		
-		if ( !V_stricmp( szLoweredGameDir, "hl2" ) || !V_stricmp( szLoweredGameDir, "episodic" ) || !V_stricmp( szLoweredGameDir, "ep2" ) || !V_stricmp( szLoweredGameDir, "portal" ) || !V_stricmp( szLoweredGameDir, "lostcoast" )  || !V_stricmp( szLoweredGameDir, "hl1" ) )
+		if ( V_strieq( szLoweredGameDir, "hl2" ) || V_strieq( szLoweredGameDir, "episodic" ) || V_strieq( szLoweredGameDir, "ep2" ) || V_strieq( szLoweredGameDir, "portal" ) || V_strieq( szLoweredGameDir, "lostcoast" )  || V_strieq( szLoweredGameDir, "hl1" ) )
 		{
 			// we shipped good node graphs for our games
 			return true;

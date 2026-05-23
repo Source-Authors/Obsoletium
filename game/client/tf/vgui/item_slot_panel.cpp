@@ -163,7 +163,7 @@ void CItemSlotPanel::OnCancelSelection( void )
 //-----------------------------------------------------------------------------
 void CItemSlotPanel::OnCommand( const char *command )
 {
-	if ( !V_stricmp( command, "ok" ) )
+	if ( V_strieq( command, "ok" ) )
 	{
 		SetVisible( false );
 		return;

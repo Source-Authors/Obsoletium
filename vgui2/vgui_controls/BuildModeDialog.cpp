@@ -168,7 +168,7 @@ private:
 
 	void OnCommand(const char *command) override
 	{
-		if (!stricmp(command, "OK"))
+		if (V_strieq(command, "OK"))
 		{
 			//!! apply changes
 		}
@@ -684,23 +684,23 @@ void BuildModeDialog::SetActiveControl(Panel *controlToEdit)
 		// default the data type to a string
 		int datat = TYPE_STRING;
 
-		if (!stricmp(dataType, "int"))
+		if (V_strieq(dataType, "int"))
 		{
 			datat = TYPE_STRING; //!! just for now
 		}
-		else if (!stricmp(dataType, "alignment"))
+		else if (V_strieq(dataType, "alignment"))
 		{
 			datat = TYPE_ALIGNMENT;
 		}
-		else if (!stricmp(dataType, "autoresize"))
+		else if (V_strieq(dataType, "autoresize"))
 		{
 			datat = TYPE_AUTORESIZE;
 		}
-		else if (!stricmp(dataType, "corner"))
+		else if (V_strieq(dataType, "corner"))
 		{
 			datat = TYPE_CORNER;
 		}
-		else if (!stricmp(dataType, "localize"))
+		else if (V_strieq(dataType, "localize"))
 		{
 			datat = TYPE_LOCALIZEDSTRING;
 		}
@@ -899,7 +899,7 @@ void BuildModeDialog::UpdateEditControl(PanelItem_t &panelItem, const char *dats
 //-----------------------------------------------------------------------------
 void BuildModeDialog::OnCommand(const char *command)
 {
-	if (!stricmp(command, "Save"))
+	if (V_strieq(command, "Save"))
 	{
 		// apply the current data and save it to disk
 		ApplyDataToControls();
@@ -909,25 +909,25 @@ void BuildModeDialog::OnCommand(const char *command)
 			m_pSaveButton->SetEnabled(false);
 		}
 	}
-	else if (!stricmp(command, "Exit"))
+	else if (V_strieq(command, "Exit"))
 	{
 		// exit build mode
 		ExitBuildMode();
 	}
-	else if (!stricmp(command, "Apply"))
+	else if (V_strieq(command, "Apply"))
 	{
 		// apply data to controls
 		ApplyDataToControls();
 	}
-	else if (!stricmp(command, "DeletePanel"))
+	else if (V_strieq(command, "DeletePanel"))
 	{
 		OnDeletePanel();
 	}
-	else if (!stricmp(command, "RevertToSaved"))
+	else if (V_strieq(command, "RevertToSaved"))
 	{
 		RevertToSaved();
 	}
-	else if (!stricmp(command, "ShowHelp"))
+	else if (V_strieq(command, "ShowHelp"))
 	{
 		ShowHelp();
 	}

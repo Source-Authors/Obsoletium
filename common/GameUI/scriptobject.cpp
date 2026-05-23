@@ -440,7 +440,7 @@ objtype_t CScriptObject::GetType( char *pszType )
 {
 	for ( auto &&t : objtypes )
 	{
-		if ( !stricmp( t.szDescription, pszType ) )
+		if ( V_strieq( t.szDescription, pszType ) )
 			return t.type;
 	}
 
@@ -691,7 +691,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 	if ( Q_isempty( token ) )
 		return false;
 
-	if ( !stricmp( token, "SetInfo" ) )
+	if ( V_strieq( token, "SetInfo" ) )
 	{
 		bSetInfo = true;
 		// Parse the final }
@@ -748,7 +748,7 @@ CScriptObject * CDescription::FindObject( const char *pszObjectName )
 	p = pObjList;
 	while ( p )
 	{
-		if ( !stricmp( pszObjectName, p->cvarname ) )
+		if ( V_strieq( pszObjectName, p->cvarname ) )
 			return p;
 		p = p->pNext;
 	}
@@ -860,7 +860,7 @@ bool CDescription::ReadFromBuffer( const char **pBuffer, bool bAllowNewObject )
 			return false;
 
 		// Read "cvar name" or  } when done
-		if ( !stricmp ( token, "}" ) )
+		if ( V_streq ( token, "}" ) )
 			break;
 
 		// Unget the token

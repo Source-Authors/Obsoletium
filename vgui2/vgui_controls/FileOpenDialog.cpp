@@ -875,7 +875,7 @@ void FileOpenDialog::OnOpenInExplorer()
 //-----------------------------------------------------------------------------
 void FileOpenDialog::OnCommand(const char *command)
 {
-	if (!stricmp(command, "Cancel"))
+	if (V_strieq(command, "Cancel"))
 	{
 		Close();
 	}
@@ -1441,7 +1441,7 @@ void FileOpenDialog::OnSelectFolder()
 
 	Q_StripTrailingSlash( pFileName );
 
-	if ( !stricmp(pFileName, "..") )
+	if ( V_streq(pFileName, "..") )
 	{
 		MoveUpFolder();
 
@@ -1450,7 +1450,7 @@ void FileOpenDialog::OnSelectFolder()
 		return;
 	}
 
-	if ( !stricmp(pFileName, ".") )
+	if ( V_streq(pFileName, ".") )
 	{
 		// clear the name text
 		m_pFileNameEdit->SetText("");
@@ -1504,7 +1504,7 @@ void FileOpenDialog::OnOpen()
 	bool bSpecifiedDirectory = ( nLen > 0 && ( pFileName[nLen-1] == '/' || pFileName[nLen-1] == '\\' ) ) && (!IsOSX() || ( !Q_stristr( pFileName, ".app" ) ) );
 	V_StripTrailingSlash( pFileName );
 
-	if ( !stricmp(pFileName, "..") )
+	if ( V_streq(pFileName, "..") )
 	{
 		MoveUpFolder();
 		
@@ -1513,7 +1513,7 @@ void FileOpenDialog::OnOpen()
 		return;
 	}
 
-	if ( !stricmp(pFileName, ".") )
+	if ( V_streq(pFileName, ".") )
 	{
 		// clear the name text
 		m_pFileNameEdit->SetText("");

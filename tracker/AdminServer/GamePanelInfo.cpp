@@ -189,7 +189,7 @@ void CGamePanelInfo::OnTick()
 //-----------------------------------------------------------------------------
 void CGamePanelInfo::OnCommand(const char *command)
 {
-	if (!stricmp(command, "stop2")) 
+	if (V_strieq(command, "stop2")) 
 	{
 		RemoteServer().SendCommand("quit");
 		m_bShuttingDown = true;

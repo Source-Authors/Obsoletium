@@ -944,7 +944,7 @@ int RunVBSP( int argc, char **argv )
 	int i;
 	for (i = 1; i < argc; i++)
 	{
-		if (!stricmp(argv[i],"-threads"))
+		if (V_strieq(argv[i],"-threads"))
 		{
 			numthreads = atoi (argv[i+1]);
 			Msg("--threads: %d\n", numthreads);

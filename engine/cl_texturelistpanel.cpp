@@ -1166,7 +1166,7 @@ void CRenderTextureEditor::SetDispInfo( KeyValues *kv, intp iHint )
 				if ( !pTex || pTex->IsError() )
 					continue;
 
-				if ( !stricmp( pTex->GetName(), szTextureName ) )
+				if ( V_strieq( pTex->GetName(), szTextureName ) )
 				{
 					bool bRealMaterial = true;
 
@@ -1397,7 +1397,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 {
 	BaseClass::OnCommand( command );
 
-	if ( !stricmp( command, "Explore" ) && m_pInfo )
+	if ( V_strieq( command, "Explore" ) && m_pInfo )
 	{
 		char chResolveName[ 256 ] = {0}, chResolveNameArg[ 256 ] = {0};
 		V_sprintf_safe( chResolveNameArg, "materials/%s.vtf", m_pInfo->GetString( KEYNAME_NAME ) );
@@ -1408,7 +1408,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 		vgui::system()->ShellExecuteEx( "open", "explorer.exe", params );
 	}
 
-	if ( !stricmp( command, "Reload" ) && m_lstMaterials.Count() )
+	if ( V_strieq( command, "Reload" ) && m_lstMaterials.Count() )
 	{
 		CUtlBuffer bufCommand( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 		int idxMaterial = 0;
@@ -1448,7 +1448,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 		}
 	}
 
-	if ( !stricmp( command, "CopyTxt" ) )
+	if ( V_strieq( command, "CopyTxt" ) )
 	{
 		char const *szName = ( char const * ) m_bufInfoText.Base();
 		if ( !m_bufInfoText.TellPut() || !szName )
@@ -1456,7 +1456,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 		vgui::system()->SetClipboardText( szName, strlen( szName ) + 1 );
 	}
 
-	if ( !stricmp( command, "CopyImg" ) )
+	if ( V_strieq( command, "CopyImg" ) )
 	{
 		int x = 0, y = 0;
 		this->LocalToScreen( x, y );
@@ -1465,19 +1465,19 @@ void CRenderTextureEditor::OnCommand( const char *command )
 		vgui::system()->SetClipboardImage( pMainWnd, x, y, x + GetWide(), y + GetTall() );
 	}
 
-	if ( !stricmp( command, "SaveImg" ) && m_pInfo )
+	if ( V_strieq( command, "SaveImg" ) && m_pInfo )
 	{
 		SaveTextureImage( m_pInfo->GetString( KEYNAME_NAME ) );
 	}
 
-	if ( !stricmp( command, "FlashBtn" ) )
+	if ( V_strieq( command, "FlashBtn" ) )
 	{
 		MatViewOverride::RequestSelectNone();
 		MatViewOverride::RequestSelected( m_lstMaterials.Count(), m_lstMaterials.Base() );
 		mat_texture_list_off_f();
 	}
 
-	if ( ( !stricmp( command, "size-" ) || !stricmp( command, "size+" ) ) && m_pInfo )
+	if ( ( V_strieq( command, "size-" ) || V_strieq( command, "size+" ) ) && m_pInfo )
 	{
 		bool bSizeUp = ( command[4] == '+' );
 		bool bResult = AdjustTextureSize( m_pInfo->GetString( KEYNAME_NAME ), bSizeUp );
@@ -1490,7 +1490,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 		InvalidateLayout();
 	}
 
-	if ( !stricmp( command, "ToggleNoMip" ) && m_pInfo )
+	if ( V_strieq( command, "ToggleNoMip" ) && m_pInfo )
 	{
 #ifdef IS_WINDOWS_PC
 		CP4Requirement p4req;
@@ -1605,7 +1605,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 #endif // #ifdef IS_WINDOWS_PC
 	}
 	
-	if ( !stricmp( command, "RebuildVTF" ) && m_pInfo )
+	if ( V_strieq( command, "RebuildVTF" ) && m_pInfo )
 	{
 #ifdef IS_WINDOWS_PC
 		CP4Requirement p4req;
@@ -1889,7 +1889,7 @@ void CRenderTextureEditor::Paint()
 	y += QuickPropScale( TILE_TEXT + TILE_BORDER );
 
 	// Images placement
-	bool bHasAlpha = !!stricmp( szTxFormat, "DXT1" );
+	bool bHasAlpha = !V_strieq( szTxFormat, "DXT1" );
 
 	int extTxWidth = QuickPropScale( TILE_SIZE );
 	int extTxHeight = QuickPropScale( TILE_SIZE );
@@ -2858,11 +2858,11 @@ static void KeepSpecialKeys( KeyValues *textureList, bool bServiceKeys )
 		char const *szName = pCur->GetString( KEYNAME_NAME );
 		if ( StringHasPrefix( szName, "_" ) ||
 			 StringHasPrefix( szName, "[" ) ||
-			 !stricmp( szName, "backbuffer" ) ||
+			 V_strieq( szName, "backbuffer" ) ||
 			 StringHasPrefix( szName, "colorcorrection" ) ||
-			 !stricmp( szName, "depthbuffer" ) ||
-			 !stricmp( szName, "frontbuffer" ) ||
-			 !stricmp( szName, "normalize" ) ||
+			 V_strieq( szName, "depthbuffer" ) ||
+			 V_strieq( szName, "frontbuffer" ) ||
+			 V_strieq( szName, "normalize" ) ||
 			 !*szName )
 		{
 			bIsServiceKey = true;

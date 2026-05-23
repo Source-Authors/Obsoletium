@@ -104,7 +104,7 @@ bool GetHWMExpressionFileName( const char *pFilename, char (&pHWMFilename)[fileN
 	while ( pszToken != NULL )
 	{
 		V_strcat_safe( szExpressionHWM, pszToken );
-		if ( !V_stricmp( pszToken, "player" ) )
+		if ( V_strieq( pszToken, "player" ) )
 		{
 			V_strcat_safe( szExpressionHWM, "\\hwm" );
 		}
@@ -1391,7 +1391,7 @@ const flexsetting_t *C_BaseFlex::FindNamedSetting( const flexsettinghdr_t *pSett
 
 		const char *name = pSetting->pszName();
 
-		if ( !stricmp( name, expr ) )
+		if ( V_strieq( name, expr ) )
 			break;
 	}
 
@@ -1866,7 +1866,7 @@ void C_BaseFlex::AddFlexSetting( const char *expr, float scale,
 
 		const char *name = pSetting->pszName();
 
-		if ( !V_stricmp( name, expr ) )
+		if ( V_strieq( name, expr ) )
 			break;
 	}
 

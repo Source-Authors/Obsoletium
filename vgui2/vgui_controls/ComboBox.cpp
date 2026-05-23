@@ -506,7 +506,7 @@ void ComboBox::OnMouseDoublePressed(MouseCode code)
 //-----------------------------------------------------------------------------
 void ComboBox::OnCommand( const char *command )
 {
-	if (!stricmp(command, "ButtonClicked"))
+	if (V_strieq(command, "ButtonClicked"))
 	{
 		// hide / show the menu underneath
 		DoClick();

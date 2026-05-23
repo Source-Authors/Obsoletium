@@ -531,7 +531,7 @@ void VInternetDlg::OnManageServer(int serverID)
 	{
 
 		m_pTabPanel->GetTabTitle(i,tabName,20);
-		if(!stricmp(netString,tabName))
+		if(V_strieq(netString,tabName))
 		{
 			break;
 		}
@@ -571,7 +571,7 @@ void VInternetDlg::OnPlayerDialog(vgui::KeyValues *data)
 {
 	const char *type=data->GetString("type");
 	const char *playerName=data->GetString("player");
-	if(!stricmp(type,"rconpassword")) 
+	if(V_strieq(type,"rconpassword")) 
 	{
 		const char *value=data->GetString("value");
 		serveritem_t &server = m_pFavoriteGames->GetServer(atoi(playerName)); // we encode the serverid in the name field :)

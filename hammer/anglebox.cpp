@@ -574,7 +574,7 @@ void CAngleCombo::UpdateAngleBox(char *szText)
 			QAngle vecAngles(0, V_atof(szText), 0);
 			m_pBox->SetAnglesInternal(vecAngles, true);
 		}
-		else if (!stricmp(szText, "down"))
+		else if (V_strieq(szText, "down"))
 		{
 			m_pBox->SetAnglesInternal(QAngle(90, 0, 0), true);
 		}

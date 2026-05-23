@@ -191,7 +191,7 @@ bool CRemoteServer::ProcessServerResponse()
 				// find all the people watching for this message
 				for (intp i = m_MessageHandlers.Head(); m_MessageHandlers.IsValidIndex(i); i = m_MessageHandlers.Next(i))
 				{
-					if (!stricmp(m_MessageHandlers[i].messageName, variable))
+					if (V_strieq(m_MessageHandlers[i].messageName, variable))
 					{
 						// found, call
 						m_MessageHandlers[i].handler->OnServerDataResponse(variable, "");

@@ -1191,71 +1191,71 @@ void CNPC_PlayerCompanion::PrepareReadinessRemap( void )
 				const char *pKeyName = pKey->GetName();
 				const char *pKeyValue = pKey->GetString();
 
-				if ( !stricmp( pKeyName, "readiness" ) )
+				if ( V_strieq( pKeyName, "readiness" ) )
 				{
 					ActRemap.m_fUsageBits |= bits_REMAP_READINESS;
 
-					if ( !stricmp( pKeyValue, "AIRL_PANIC" ) )
+					if ( V_strieq( pKeyValue, "AIRL_PANIC" ) )
 					{
 						ActRemap.m_readiness = AIRL_PANIC;
 					}
-					else if ( !stricmp( pKeyValue, "AIRL_STEALTH" ) )
+					else if ( V_strieq( pKeyValue, "AIRL_STEALTH" ) )
 					{
 						ActRemap.m_readiness = AIRL_STEALTH;
 					}
-					else if ( !stricmp( pKeyValue, "AIRL_RELAXED" ) )
+					else if ( V_strieq( pKeyValue, "AIRL_RELAXED" ) )
 					{
 						ActRemap.m_readiness = AIRL_RELAXED;
 					}
-					else if ( !stricmp( pKeyValue, "AIRL_STIMULATED" ) )
+					else if ( V_strieq( pKeyValue, "AIRL_STIMULATED" ) )
 					{
 						ActRemap.m_readiness = AIRL_STIMULATED;
 					}
-					else if ( !stricmp( pKeyValue, "AIRL_AGITATED" ) )
+					else if ( V_strieq( pKeyValue, "AIRL_AGITATED" ) )
 					{
 						ActRemap.m_readiness = AIRL_AGITATED;
 					}
 				}
-				else if ( !stricmp( pKeyName, "aiming" ) )
+				else if ( V_strieq( pKeyName, "aiming" ) )
 				{
 					ActRemap.m_fUsageBits |= bits_REMAP_AIMING;
 
-					if ( !stricmp( pKeyValue, "TRS_NONE" ) )
+					if ( V_strieq( pKeyValue, "TRS_NONE" ) )
 					{
 						// This is the new way to say that we don't care, the tri-state was abandoned (jdw)
 						ActRemap.m_fUsageBits &= ~bits_REMAP_AIMING;
 					}
-					else if ( !stricmp( pKeyValue, "TRS_FALSE" ) || !stricmp( pKeyValue, "FALSE" ) )
+					else if ( V_strieq( pKeyValue, "TRS_FALSE" ) || V_strieq( pKeyValue, "FALSE" ) )
 					{
 						ActRemap.m_bAiming = false;
 					}
-					else if ( !stricmp( pKeyValue, "TRS_TRUE" ) || !stricmp( pKeyValue, "TRUE" ) )
+					else if ( V_strieq( pKeyValue, "TRS_TRUE" ) || V_strieq( pKeyValue, "TRUE" ) )
 					{
 						ActRemap.m_bAiming = true;
 					}
 				} 
-				else if ( !stricmp( pKeyName, "weaponrequired" ) )
+				else if ( V_strieq( pKeyName, "weaponrequired" ) )
 				{
 					ActRemap.m_fUsageBits |= bits_REMAP_WEAPON_REQUIRED;
 
-					if ( !stricmp( pKeyValue, "TRUE" ) )
+					if ( V_strieq( pKeyValue, "TRUE" ) )
 					{
 						ActRemap.m_bWeaponRequired = true;
 					}
-					else if ( !stricmp( pKeyValue, "FALSE" ) )
+					else if ( V_strieq( pKeyValue, "FALSE" ) )
 					{
 						ActRemap.m_bWeaponRequired = false;
 					}
 				}
-				else if ( !stricmp( pKeyName, "invehicle" ) )
+				else if ( V_strieq( pKeyName, "invehicle" ) )
 				{
 					ActRemap.m_fUsageBits |= bits_REMAP_IN_VEHICLE;
 
-					if ( !stricmp( pKeyValue, "TRUE" ) )
+					if ( V_strieq( pKeyValue, "TRUE" ) )
 					{
 						ActRemap.m_bInVehicle = true;
 					}
-					else if ( !stricmp( pKeyValue, "FALSE" ) )
+					else if ( V_strieq( pKeyValue, "FALSE" ) )
 					{
 						ActRemap.m_bInVehicle = false;
 					}

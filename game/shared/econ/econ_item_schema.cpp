@@ -3971,20 +3971,20 @@ bool CEconItemAttributeDefinition::BInitFromKV( KeyValues *pKVAttribute, CUtlVec
 	m_eAssetClassAttrExportRule = k_EAssetClassAttrExportRule_Default;
 	if ( char const *szRule = pKVAttribute->GetString( "asset_class_export", NULL ) )
 	{
-		if ( !V_stricmp( szRule, "skip" ) )
+		if ( V_strieq( szRule, "skip" ) )
 		{
 			m_eAssetClassAttrExportRule = k_EAssetClassAttrExportRule_Skip;
 		}
-		else if ( !V_stricmp( szRule, "gconly" ) )
+		else if ( V_strieq( szRule, "gconly" ) )
 		{
 			m_eAssetClassAttrExportRule = EAssetClassAttrExportRule_t( k_EAssetClassAttrExportRule_GCOnly | k_EAssetClassAttrExportRule_Skip );
 		}
-		else if ( !V_stricmp( szRule, "bucketed" ) )
+		else if ( V_strieq( szRule, "bucketed" ) )
 		{
 			SCHEMA_INIT_CHECK( m_unAssetClassBucket, "Attribute definition %s: Asset class export rule '%s' is incompatible", m_pszDefinitionName, szRule );
 			m_eAssetClassAttrExportRule = k_EAssetClassAttrExportRule_Bucketed;
 		}
-		else if ( !V_stricmp( szRule, "default" ) )
+		else if ( V_strieq( szRule, "default" ) )
 		{
 			m_eAssetClassAttrExportRule = k_EAssetClassAttrExportRule_Default;
 		}
@@ -4998,7 +4998,7 @@ bool CEconItemDefinition::BInitFromKV( KeyValues *pKVItem, CUtlVector<CUtlString
 	m_bFlipViewModel = m_pKVItem->GetInt( "flip_viewmodel", 0 ) != 0;
 	m_bActAsWearable = m_pKVItem->GetInt( "act_as_wearable", 0 ) != 0;
 	m_bActAsWeapon = m_pKVItem->GetInt( "act_as_weapon", 0 ) != 0;
-	m_bIsTool = m_pKVItem->GetBool( "is_tool", 0 ) || ( GetItemClass() && !V_stricmp( GetItemClass(), "tool" ) );
+	m_bIsTool = m_pKVItem->GetBool( "is_tool", 0 ) || ( GetItemClass() && V_strieq( GetItemClass(), "tool" ) );
 	m_iDropType = StringFieldToInt( m_pKVItem->GetString("drop_type"), g_szDropTypeStrings, ARRAYSIZE(g_szDropTypeStrings) );
 	m_pszCollectionReference = m_pKVItem->GetString( "collection_reference", NULL );
 
@@ -5762,7 +5762,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 {
 	if ( pszToolType )
 	{
-		if ( !V_stricmp( pszToolType, "duel_minigame" ) )
+		if ( V_strieq( pszToolType, "duel_minigame" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5772,7 +5772,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_DuelingMinigame( pszToolType, pszUseString );
 		}
 
-		if ( !V_stricmp( pszToolType, "noise_maker" ) )
+		if ( V_strieq( pszToolType, "noise_maker" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5782,7 +5782,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_Noisemaker( pszToolType, pszUseString );
 		}
 
-		if ( !V_stricmp( pszToolType, "wrapped_gift" ) )
+		if ( V_strieq( pszToolType, "wrapped_gift" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5790,7 +5790,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_WrappedGift( pszToolType, pszUseString, unCapabilities, pUsageKV );
 		}
 
-		if ( !V_stricmp( pszToolType, "backpack_expander" ) )
+		if ( V_strieq( pszToolType, "backpack_expander" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5799,7 +5799,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_BackpackExpander( pszToolType, pszUseString, pUsageKV );
 		}
 
-		if ( !V_stricmp( pszToolType, "account_upgrade_to_premium" ) )
+		if ( V_strieq( pszToolType, "account_upgrade_to_premium" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5809,7 +5809,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_AccountUpgradeToPremium( pszToolType, pszUseString );
 		}
 
-		if ( !V_stricmp( pszToolType, "claimcode" ) )
+		if ( V_strieq( pszToolType, "claimcode" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5818,7 +5818,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_ClaimCode( pszToolType, pszUseString, pUsageKV );
 		}
 
-		if ( !V_stricmp( pszToolType, "gift" ) )
+		if ( V_strieq( pszToolType, "gift" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5827,7 +5827,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_Gift( pszToolType, pszUseString, pUsageKV );
 		}
 
-		if ( !V_stricmp( pszToolType, "paint_can" ) )
+		if ( V_strieq( pszToolType, "paint_can" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5836,7 +5836,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_PaintCan( pszToolType, unCapabilities );
 		}
 
-		if ( !V_stricmp( pszToolType, "name" ) )
+		if ( V_strieq( pszToolType, "name" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5845,7 +5845,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_NameTag( pszToolType, unCapabilities );
 		}
 
-		if ( !V_stricmp( pszToolType, "desc" ) )
+		if ( V_strieq( pszToolType, "desc" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5854,7 +5854,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_DescTag( pszToolType, unCapabilities );
 		}
 
-		if ( !V_stricmp( pszToolType, "decoder_ring" ) )
+		if ( V_strieq( pszToolType, "decoder_ring" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pUsageKV )								return NULL;
@@ -5862,7 +5862,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_CrateKey( pszToolType, pszUsageRestriction, unCapabilities );
 		}
 
-		if ( !V_stricmp( pszToolType, "customize_texture_item" ) )
+		if ( V_strieq( pszToolType, "customize_texture_item" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5871,7 +5871,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_CustomizeTexture( pszToolType, unCapabilities );
 		}
 
-		if ( !V_stricmp( pszToolType, "gift_wrap" ) )
+		if ( V_strieq( pszToolType, "gift_wrap" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5879,7 +5879,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_GiftWrap( pszToolType, pszUseString, unCapabilities, pUsageKV );
 		}
 
-		if ( !V_stricmp( pszToolType, "wedding_ring" ) )
+		if ( V_strieq( pszToolType, "wedding_ring" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5888,7 +5888,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_WeddingRing( pszToolType, pszUseString, unCapabilities );
 		}
 
-		if ( !V_stricmp( pszToolType, "strange_part" ) )
+		if ( V_strieq( pszToolType, "strange_part" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5896,7 +5896,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_StrangePart( pszToolType, pszUseString, unCapabilities, pUsageKV );
 		}
 
-		if ( !V_stricmp( pszToolType, "strange_part_restriction" ) )
+		if ( V_strieq( pszToolType, "strange_part_restriction" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5905,7 +5905,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_StrangePartRestriction( pszToolType, pszUseString, unCapabilities, pUsageKV );
 		}
 
-		if ( !V_stricmp( pszToolType, "apply_custom_attrib" ) )
+		if ( V_strieq( pszToolType, "apply_custom_attrib" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5913,7 +5913,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_UpgradeCard( pszToolType, pszUseString, unCapabilities, pUsageKV );
 		}
 
-		if ( !V_stricmp( pszToolType, "strangifier" ) )
+		if ( V_strieq( pszToolType, "strangifier" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5921,7 +5921,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_Strangifier( pszToolType, pszUseString, unCapabilities, pUsageKV );
 		}
 
-		if ( !V_stricmp( pszToolType, "killstreakifier" ) )
+		if ( V_strieq( pszToolType, "killstreakifier" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5929,7 +5929,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_KillStreakifier( pszToolType, pszUseString, unCapabilities, pUsageKV );
 		}
 
-		if( !V_stricmp( pszToolType, "dynamic_recipe" ) )
+		if( V_strieq( pszToolType, "dynamic_recipe" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5937,7 +5937,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_ItemDynamicRecipe( pszToolType, pszUseString, unCapabilities, pUsageKV );
 		}
 
-		if ( !V_stricmp( pszToolType, "item_eater_recharger" ) )
+		if ( V_strieq( pszToolType, "item_eater_recharger" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5945,7 +5945,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_ItemEaterRecharger( pszToolType, pszUseString, unCapabilities, pUsageKV );
 		}
 
-		if ( !V_stricmp( pszToolType, "class_transmogrifier" ) )
+		if ( V_strieq( pszToolType, "class_transmogrifier" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5953,7 +5953,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_ClassTransmogrifier( pszToolType, pszUseString, unCapabilities, pUsageKV );
 		}
 
-		if ( !V_stricmp( pszToolType, "duck_token" ) )
+		if ( V_strieq( pszToolType, "duck_token" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5962,7 +5962,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_DuckToken( pszToolType, unCapabilities );
 		}
 
-		if ( !V_stricmp( pszToolType, "grant_operation_pass" ) )
+		if ( V_strieq( pszToolType, "grant_operation_pass" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5970,7 +5970,7 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_GrantOperationPass( pszToolType, pszUseString, unCapabilities, pUsageKV );
 		}
 
-		if ( !V_stricmp( pszToolType, "strange_count_transfer" ) )
+		if ( V_strieq( pszToolType, "strange_count_transfer" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -5979,12 +5979,12 @@ IEconTool *CEconItemSchema::CreateEconToolImpl( const char *pszToolType, const c
 			return new CEconTool_StrangeCountTransfer( pszToolType, unCapabilities );
 		}
 
-		if ( !V_stricmp( pszToolType, "paintkit_weapon_festivizer" ) )
+		if ( V_strieq( pszToolType, "paintkit_weapon_festivizer" ) )
 		{
 			return new CEconTool_Festivizer( pszToolType, pszUseString, unCapabilities, pUsageKV );
 		}
 
-		if ( !V_stricmp( pszToolType, "unusualifier" ) )
+		if ( V_strieq( pszToolType, "unusualifier" ) )
 		{
 			return new CEconTool_Unusualifier( pszToolType, pszUseString, unCapabilities, pUsageKV );
 		}
@@ -6867,12 +6867,12 @@ bool CEconItemSchema::BInitAttributeTypes( CUtlVector<CUtlString> *pVecErrors )
 
 		const CColumnInfo& Column0 = cs.GetColumnInfo( 0 );
 		SCHEMA_INIT_CHECK( Column0.GetType() == k_EGCSQLType_int64, "BInitAttributeTypes(): '%s' column 0 has invalid data type %u.\n", cs.GetRecordInfo()->GetName(), Column0.GetType() );
-		SCHEMA_INIT_CHECK( Column0.GetName() && !V_stricmp( Column0.GetName(), "ItemID" ), "BInitAttributeTypes(): '%s' has invalid name '%s'.\n", cs.GetRecordInfo()->GetName(), Column0.GetName() ? Column0.GetName() : "[null]" );
+		SCHEMA_INIT_CHECK( Column0.GetName() && V_strieq( Column0.GetName(), "ItemID" ), "BInitAttributeTypes(): '%s' has invalid name '%s'.\n", cs.GetRecordInfo()->GetName(), Column0.GetName() ? Column0.GetName() : "[null]" );
 		SCHEMA_INIT_CHECK( Column0.BIsPrimaryKey(), "BInitAttributeTypes(): '%s' has an item ID column that isn't in the PK.\n", cs.GetRecordInfo()->GetName() );
 
 		const CColumnInfo& Column1 = cs.GetColumnInfo( 1 );
 		SCHEMA_INIT_CHECK( Column1.GetType() == k_EGCSQLType_int16, "BInitAttributeTypes(): '%s' column 1 has invalid data type %u.\n", cs.GetRecordInfo()->GetName(), Column0.GetType() );
-		SCHEMA_INIT_CHECK( Column1.GetName() && !V_stricmp( Column1.GetName(), "AttrDefIndex" ), "BInitAttributeTypes(): '%s' has invalid name '%s'.\n", cs.GetRecordInfo()->GetName(), Column1.GetName() ? Column1.GetName() : "[null]" );
+		SCHEMA_INIT_CHECK( Column1.GetName() && V_strieq( Column1.GetName(), "AttrDefIndex" ), "BInitAttributeTypes(): '%s' has invalid name '%s'.\n", cs.GetRecordInfo()->GetName(), Column1.GetName() ? Column1.GetName() : "[null]" );
 
 		// Make sure two different attribute types don't point to the same DB table. There's nothing
 		// technically that would prevent this from working, but right now the way we load from the
@@ -6918,7 +6918,7 @@ static bool LookupValueFromString( const search_entry_type(&searchArray)[search_
 
 	for ( int i = 0; i < search_entry_array_size; i++ )
 	{
-		if ( !V_stricmp( pszSearch, searchArray[i].m_pszName ) )
+		if ( V_strieq( pszSearch, searchArray[i].m_pszName ) )
 		{
 			*out_pResult = searchArray[i];
 			return true;
@@ -7133,7 +7133,7 @@ int CEconItemSchema::GetEquipRegionIndexByName( const char *pRegionName ) const
 	FOR_EACH_VEC( m_vecEquipRegionsList, i )
 	{
 		const char *szEntryRegionName = m_vecEquipRegionsList[i].m_sName.Get();
-		if ( !V_stricmp( szEntryRegionName, pRegionName ) )
+		if ( V_strieq( szEntryRegionName, pRegionName ) )
 			return i;
 	}
 

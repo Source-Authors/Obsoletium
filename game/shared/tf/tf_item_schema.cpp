@@ -2857,7 +2857,7 @@ const CWarDefinition *CTFItemSchema::GetWarDefinitionByName( const char* pszDefN
 {
 	FOR_EACH_MAP_FAST( m_mapWars, i )
 	{
-		if ( !V_stricmp( pszDefName, m_mapWars[i]->GetDefName() ) )
+		if ( V_strieq( pszDefName, m_mapWars[i]->GetDefName() ) )
 		{
 			return m_mapWars[i];
 		}
@@ -2888,7 +2888,7 @@ int CTFItemSchema::FindMvmMissionByName( const char *pszMissionName ) const
 
 	FOR_EACH_VEC( m_vecMvMMissions, i )
 	{
-		if ( !V_stricmp( m_vecMvMMissions[i].m_sPop.Get(), pszMissionName ) )
+		if ( V_strieq( m_vecMvMMissions[i].m_sPop.Get(), pszMissionName ) )
 			return i;
 	}
 	return k_iMvmMissionIndex_NotInSchema;
@@ -2902,7 +2902,7 @@ int CTFItemSchema::FindMvmTourByName( const char *pszTourName ) const
 
 	FOR_EACH_VEC( m_vecMvMTours, i )
 	{
-		if ( !V_stricmp( m_vecMvMTours[i].m_sTourInternalName.Get(), pszTourName ) )
+		if ( V_strieq( m_vecMvMTours[i].m_sTourInternalName.Get(), pszTourName ) )
 			return i;
 	}
 	return k_iMvmTourIndex_NotInSchema;
@@ -2942,7 +2942,7 @@ const MapDef_t *CTFItemSchema::GetMasterMapDefByName( const char *pszSearchName 
 {
 	FOR_EACH_VEC( m_vecMasterListOfMaps, i )
 	{
-		if ( !V_stricmp( m_vecMasterListOfMaps[i]->pszMapName, pszSearchName ) )
+		if ( V_strieq( m_vecMasterListOfMaps[i]->pszMapName, pszSearchName ) )
 			return m_vecMasterListOfMaps[i];
 	}
 
@@ -3004,7 +3004,7 @@ int CTFItemSchema::CalculateNumberOfConcreteItems( const CEconItemDefinition *pI
 
 RTime32 CTFItemSchema::GetCustomExpirationDate( const char *pszExpirationDate ) const
 {
-	if ( !V_stricmp( pszExpirationDate, "end_of_halloween" ) )
+	if ( V_strieq( pszExpirationDate, "end_of_halloween" ) )
 		return EconHolidays_TerribleHack_GetHalloweenEndData();
 
 	return CEconItemSchema::GetCustomExpirationDate( pszExpirationDate );
@@ -3127,7 +3127,7 @@ IEconTool *CTFItemSchema::CreateEconToolImpl( const char *pszToolType, const cha
 {
 	if ( pszToolType )
 	{
-		if ( !V_stricmp( pszToolType, "tf_spellbook_page" ) )
+		if ( V_strieq( pszToolType, "tf_spellbook_page" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;
@@ -3135,7 +3135,7 @@ IEconTool *CTFItemSchema::CreateEconToolImpl( const char *pszToolType, const cha
 			return new CEconTool_TFSpellbookPage( pszToolType, unCapabilities );
 		}
 
-		if ( !V_stricmp( pszToolType, "tf_event_enable" ) )
+		if ( V_strieq( pszToolType, "tf_event_enable" ) )
 		{
 			// Error checking -- make sure we aren't setting properties in the schema that we don't support.
 			if ( pszUsageRestriction )					return NULL;

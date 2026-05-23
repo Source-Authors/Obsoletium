@@ -1514,7 +1514,7 @@ ConversionErrorType	ImgUtl_ConvertToVTFAndDumpVMT( const char *pInPath, const ch
 
 		//  jpeg files
 		//
-		if (!stricmp(extension, "jpg") || !stricmp(extension, "jpeg"))
+		if (V_strieq(extension, "jpg") || V_strieq(extension, "jpeg"))
 		{
 			// convert from the jpeg file format to the TGA file format
 			nErrorCode = ImgUtl_ConvertJPEGToTGA(pInPath, tgaPath, false);
@@ -1529,7 +1529,7 @@ ConversionErrorType	ImgUtl_ConvertToVTFAndDumpVMT( const char *pInPath, const ch
 		}
 		//  bmp files
 		//
-		else if (!stricmp(extension, "bmp"))
+		else if (V_strieq(extension, "bmp"))
 		{
 			// convert from the bmp file format to the TGA file format
 			nErrorCode = ImgUtl_ConvertBMPToTGA(pInPath, tgaPath);
@@ -1545,7 +1545,7 @@ ConversionErrorType	ImgUtl_ConvertToVTFAndDumpVMT( const char *pInPath, const ch
 		}
 		//  vtf files
 		//
-		else if (!stricmp(extension, "vtf"))
+		else if (V_strieq(extension, "vtf"))
 		{
 			// if the file is already in the vtf format there's no need to convert it.
 			convertTGAToVTF = false;

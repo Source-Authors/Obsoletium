@@ -270,7 +270,7 @@ char const *CLocalizationDialog::GetFileName() const
 //-----------------------------------------------------------------------------
 void CLocalizationDialog::OnCommand(const char *command)
 {
-	if (!stricmp(command, "CreateToken"))
+	if (V_strieq(command, "CreateToken"))
 	{
 		OnCreateToken();
 	}

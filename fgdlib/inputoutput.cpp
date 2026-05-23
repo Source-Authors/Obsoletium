@@ -101,7 +101,7 @@ InputOutputType_t CClassInputOutputBase::SetType(const char *szType)
 {
 	for (auto &tm : TypeMap)
 	{
-		if (!stricmp(tm.pszName, szType))
+		if (V_strieq(tm.pszName, szType))
 		{
 			m_eType = tm.eType;
 			return(m_eType);

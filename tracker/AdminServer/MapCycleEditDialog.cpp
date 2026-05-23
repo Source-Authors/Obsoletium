@@ -71,7 +71,7 @@ void CMapCycleEditDialog::Activate(vgui::Panel *updateTarget, CUtlVector<CUtlSym
 		bool inMapCycle = false;
 		for (intp j = 0; j < mapCycle.Count(); j++)
 		{
-			if (!stricmp(mapCycle[j].String(), availableMaps[i].String()))
+			if (V_strieq(mapCycle[j].String(), availableMaps[i].String()))
 			{
 				inMapCycle = true;
 				break;
@@ -152,7 +152,7 @@ void CMapCycleEditDialog::OnItemSelected(vgui::Panel *panel)
 //-----------------------------------------------------------------------------
 void CMapCycleEditDialog::OnCommand(const char *command)
 {
-	if (!stricmp(command, "ArrowLeft"))
+	if (V_strieq(command, "ArrowLeft"))
 	{
 		// move map from mapcycle to available list
 		while (m_pMapCycleList->GetSelectedItemsCount() > 0)
@@ -167,7 +167,7 @@ void CMapCycleEditDialog::OnCommand(const char *command)
 			m_pMapCycleList->RemoveItem(itemID);
 		}
 	}
-	else if (!stricmp(command, "ArrowRight"))
+	else if (V_strieq(command, "ArrowRight"))
 	{
 		// move map from available list to mapcycle 
 		while (m_pAvailableMapList->GetSelectedItemsCount() > 0)
@@ -182,7 +182,7 @@ void CMapCycleEditDialog::OnCommand(const char *command)
 			m_pAvailableMapList->RemoveItem(itemID);
 		}
 	}
-	else if (!stricmp(command, "ArrowUp"))
+	else if (V_strieq(command, "ArrowUp"))
 	{
 		intp itemID = m_pMapCycleList->GetSelectedItem(0);
 		intp row = m_pMapCycleList->GetItemCurrentRow(itemID);
@@ -206,7 +206,7 @@ void CMapCycleEditDialog::OnCommand(const char *command)
 		m_pMapCycleList->ApplyItemChanges(prevItemID);
 		PostMessage(m_pMapCycleList, new KeyValues("KeyCodePressed", "code", KEY_UP));
 	}
-	else if (!stricmp(command, "ArrowDown"))
+	else if (V_strieq(command, "ArrowDown"))
 	{
 		intp itemID = m_pMapCycleList->GetSelectedItem(0);
 		intp row = m_pMapCycleList->GetItemCurrentRow(itemID);
@@ -230,11 +230,11 @@ void CMapCycleEditDialog::OnCommand(const char *command)
 		m_pMapCycleList->ApplyItemChanges(nextItemID);
 		PostMessage(m_pMapCycleList, new KeyValues("KeyCodePressed", "code", KEY_DOWN));
 	}
-	else if (!stricmp(command, "Cancel"))
+	else if (V_strieq(command, "Cancel"))
 	{
 		Close();
 	}
-	else if (!stricmp(command, "OK"))
+	else if (V_strieq(command, "OK"))
 	{
 		// write out the data
 		CUtlBuffer msg((intp)0, (intp)1024, CUtlBuffer::TEXT_BUFFER);

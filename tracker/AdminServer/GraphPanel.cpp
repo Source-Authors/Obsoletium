@@ -172,7 +172,7 @@ void CGraphPanel::PerformLayout()
 //-----------------------------------------------------------------------------
 void CGraphPanel::OnServerDataResponse(const char *value, const char *response)
 {
-	if (!stricmp(value, "stats"))
+	if (V_strieq(value, "stats"))
 	{
 		// parse the stats out of the response
 		Points_t p;

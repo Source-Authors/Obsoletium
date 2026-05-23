@@ -2847,30 +2847,30 @@ int main(int argc, char **argv) {
   for (int i = 1; i < argc; i++) {
     // Switches
     if (argv[i][0] == '-') {
-      if (!stricmp(argv[i], "-allowdebug")) {
+      if (V_strieq(argv[i], "-allowdebug")) {
         // Ignore, used by interface system to catch debug builds checked into
         // release tree
         continue;
       }
 
-      if (!stricmp(argv[i], "-quiet")) {
+      if (V_strieq(argv[i], "-quiet")) {
         g_quiet = true;
         g_verbose = false;
         continue;
       }
 
-      if (!stricmp(argv[i], "-verbose")) {
+      if (V_strieq(argv[i], "-verbose")) {
         g_quiet = false;
         g_verbose = true;
         continue;
       }
 
-      if (!stricmp(argv[i], "-printTemplate")) {
+      if (V_strieq(argv[i], "-printTemplate")) {
         printf("%s\n", templates);
         exit(0);
       }
 
-      if (!stricmp(argv[i], "-templateFile")) {
+      if (V_strieq(argv[i], "-templateFile")) {
         if (i + 1 < argc) {
           V_strcpy_safe(templateFileName, argv[i + 1]);
           useTemplate = 1;

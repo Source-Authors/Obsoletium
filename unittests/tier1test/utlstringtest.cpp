@@ -13,7 +13,7 @@ static void ConstructorTests()
 
 	CUtlString string2( "shiz" );
 	Shipping_Assert( string2.Length() == 4 );
-	Shipping_Assert( !V_stricmp( string2.Get(), "shiz" ) );
+	Shipping_Assert( V_strieq( string2.Get(), "shiz" ) );
 
 	CUtlString string3( "thisstringismuchlongerthantwentywholehugecharacters", 20 );
 	Shipping_Assert( string3.Length() == 20 );
@@ -27,7 +27,7 @@ static void BasicFunctionalityTests()
 	V_memcpy( empty.GetForModify(), "blah", 4 );
 	empty.GetForModify()[ 4 ] = 0;
 	Assert( empty.Length() == 4 );
-	Shipping_Assert( !V_stricmp( empty.Get(), "blah" ) );
+	Shipping_Assert( V_strieq( empty.Get(), "blah" ) );
 
 	empty.Clear();
 	Shipping_Assert( empty.IsEmpty() );
@@ -47,18 +47,18 @@ static void BasicFunctionalityTests()
 	Shipping_Assert( empty != copy );
 
 	empty.Append( "271" );
-	Shipping_Assert( !V_stricmp( empty.Get(), "camelcase271" ) );
+	Shipping_Assert( V_strieq( empty.Get(), "camelcase271" ) );
 	empty.Append( "35123", 3 );
-	Shipping_Assert( !V_stricmp( empty.Get(), "camelcase271351" ) );
+	Shipping_Assert( V_strieq( empty.Get(), "camelcase271351" ) );
 	empty.Append( 'A' );
-	Shipping_Assert( !V_stricmp( empty.Get(), "camelcase271351A" ) );
+	Shipping_Assert( V_strieq( empty.Get(), "camelcase271351A" ) );
 
 	empty.Append( '/' );
 	empty.Append( '\\' );
-	Shipping_Assert( !V_stricmp( empty.Get(), "camelcase271351A/\\" ) );
+	Shipping_Assert( V_strieq( empty.Get(), "camelcase271351A/\\" ) );
 	empty.StripTrailingSlash();
 	empty.StripTrailingSlash();
-	Shipping_Assert( !V_stricmp( empty.Get(), "camelcase271351A" ) );
+	Shipping_Assert( V_strieq( empty.Get(), "camelcase271351A" ) );
 
 	empty = "sometext";
 	empty.SetLength( 4 );
@@ -75,23 +75,23 @@ static void TrimAPITests()
 	
 	s = orig;
 	s.TrimLeft( ' ' );
-	Shipping_Assert( !V_stricmp( s.Get(), "testy  " ) );
+	Shipping_Assert( V_strieq( s.Get(), "testy  " ) );
 
 	s = orig;
 	s.TrimRight( ' ' );
-	Shipping_Assert( !V_stricmp( s.Get(), "  testy" ) );
+	Shipping_Assert( V_strieq( s.Get(), "  testy" ) );
 
 	s = orig2;
 	s.TrimLeft();
 	s.TrimRight();
-	Shipping_Assert( !V_stricmp( s.Get(), "testy" ) );
+	Shipping_Assert( V_strieq( s.Get(), "testy" ) );
 
 	s = orig;
 	s.Trim( ' ' );
-	Shipping_Assert( !V_stricmp( s.Get(), "testy" ) );
+	Shipping_Assert( V_strieq( s.Get(), "testy" ) );
 	s = orig2;
 	s.Trim();
-	Shipping_Assert( !V_stricmp( s.Get(), "testy" ) );
+	Shipping_Assert( V_strieq( s.Get(), "testy" ) );
 }
 
 static void OperatorAPITests()
@@ -101,10 +101,10 @@ static void OperatorAPITests()
 
 	// operator = on CUtlString
 	orig = orig2;
-	Shipping_Assert( !V_stricmp( orig.Get(), "different" ) );
+	Shipping_Assert( V_strieq( orig.Get(), "different" ) );
 	// perator = on const char *
 	orig = "different2";
-	Shipping_Assert( !V_stricmp( orig.Get(), "different2" ) );
+	Shipping_Assert( V_strieq( orig.Get(), "different2" ) );
 	
 	orig = orig2;
 	// op ==
@@ -114,39 +114,39 @@ static void OperatorAPITests()
 	Shipping_Assert( orig != orig2 );
 
 	orig += "1";
-	Shipping_Assert( !V_stricmp( orig.Get(), "base1" ) );
+	Shipping_Assert( V_strieq( orig.Get(), "base1" ) );
 	orig2 = "2";
 	orig += orig2;
-	Shipping_Assert( !V_stricmp( orig.Get(), "base12" ) );
+	Shipping_Assert( V_strieq( orig.Get(), "base12" ) );
 	orig += '3';
-	Shipping_Assert( !V_stricmp( orig.Get(), "base123" ) );
+	Shipping_Assert( V_strieq( orig.Get(), "base123" ) );
 	// integer
 	orig += 123;
-	Shipping_Assert( !V_stricmp( orig.Get(), "base123123" ) );
+	Shipping_Assert( V_strieq( orig.Get(), "base123123" ) );
 	orig += 1.5f;
-	Shipping_Assert( !V_stricmp( orig.Get(), "base1231231.5" ) );
+	Shipping_Assert( V_strieq( orig.Get(), "base1231231.5" ) );
 
 	orig = "1";
 	orig2 = "2";
 	CUtlString newString = orig + orig2;
-	Shipping_Assert( !V_stricmp( newString.Get(), "12" ) );
+	Shipping_Assert( V_strieq( newString.Get(), "12" ) );
 	newString = orig + "3";
-	Shipping_Assert( !V_stricmp( newString.Get(), "13" ) );
+	Shipping_Assert( V_strieq( newString.Get(), "13" ) );
 	newString = orig + 42;
-	Shipping_Assert( !V_stricmp( newString.Get(), "142" ) );
+	Shipping_Assert( V_strieq( newString.Get(), "142" ) );
 
 	orig = "this is a long string";
 	newString = orig.Slice( 4 );
-	Shipping_Assert( !V_stricmp( newString.Get(), " is a long string" ) );
+	Shipping_Assert( V_strieq( newString.Get(), " is a long string" ) );
 	newString = orig.Slice( 5, 10 );
-	Shipping_Assert( !V_stricmp( newString.Get(), "is a " ) );
+	Shipping_Assert( V_strieq( newString.Get(), "is a " ) );
 
 	newString = orig.Left( 4 );
-	Shipping_Assert( !V_stricmp( newString.Get(), "this" ) );
+	Shipping_Assert( V_strieq( newString.Get(), "this" ) );
 	newString = orig.Right( 6 );
-	Shipping_Assert( !V_stricmp( newString.Get(), "string" ) );
+	Shipping_Assert( V_strieq( newString.Get(), "string" ) );
 	newString = orig.Replace( 's', 'q' );
-	Shipping_Assert( !V_stricmp( newString.Get(), "thiq iq a long qtring" ) );
+	Shipping_Assert( V_strieq( newString.Get(), "thiq iq a long qtring" ) );
 }
 
 static void PatternTests()
@@ -172,10 +172,10 @@ static void FormatTests()
 {
 	CUtlString str;
 	str.Format( "%s %s %i", "shiz", "baz", 1 );
-	Shipping_Assert( !V_stricmp( str.Get(), "shiz baz 1" ) );
+	Shipping_Assert( V_strieq( str.Get(), "shiz baz 1" ) );
 
 	FmtStr( str, "blah%i", 3 );
-	Shipping_Assert( !V_stricmp( str.Get(), "blah3" ) );
+	Shipping_Assert( V_strieq( str.Get(), "blah3" ) );
 }
 
 static void FileNameAPITests()
@@ -185,23 +185,23 @@ static void FileNameAPITests()
 	CUtlString absPath = path.AbsPath();
 	Shipping_Assert( absPath == path );
 	CUtlString file = path.UnqualifiedFilename();
-	Shipping_Assert( !V_stricmp( file.Get(), "somefile.ext" ) );
+	Shipping_Assert( V_strieq( file.Get(), "somefile.ext" ) );
 	CUtlString dir = path.DirName();
-	Shipping_Assert( !V_stricmp( dir.Get(), "c:\\source2\\game\\source2" ) );
+	Shipping_Assert( V_strieq( dir.Get(), "c:\\source2\\game\\source2" ) );
 	dir = dir.DirName();
-	Shipping_Assert( !V_stricmp( dir.Get(), "c:\\source2\\game" ) );
+	Shipping_Assert( V_strieq( dir.Get(), "c:\\source2\\game" ) );
 	CUtlString baseName = path.StripExtension();
-	Shipping_Assert( !V_stricmp( baseName.Get(), "c:\\source2\\game\\source2\\somefile" ) );
+	Shipping_Assert( V_strieq( baseName.Get(), "c:\\source2\\game\\source2\\somefile" ) );
 	dir = path.StripFilename();
-	Shipping_Assert( !V_stricmp( dir.Get(), "c:\\source2\\game\\source2" ) );
+	Shipping_Assert( V_strieq( dir.Get(), "c:\\source2\\game\\source2" ) );
 
 	file = path.GetBaseFilename();
-	Shipping_Assert( !V_stricmp( file.Get(), "somefile" ) );
+	Shipping_Assert( V_strieq( file.Get(), "somefile" ) );
 	CUtlString ext = path.GetExtension();
-	Shipping_Assert( !V_stricmp( ext.Get(), "ext" ) );
+	Shipping_Assert( V_strieq( ext.Get(), "ext" ) );
 
 	absPath = path.PathJoin( dir.Get(), file.Get() );
-	Shipping_Assert( !V_stricmp( absPath.Get(), "c:\\source2\\game\\source2\\somefile" ) );
+	Shipping_Assert( V_strieq( absPath.Get(), "c:\\source2\\game\\source2\\somefile" ) );
 }
 
 DEFINE_TESTCASE( UtlStringTest, UtlStringTestSuite )

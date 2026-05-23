@@ -126,19 +126,19 @@ bool CFontManager::SetFontGlyphSet(HFont font, const char *windowsFontName, int 
 	{
 		// discovered xbox only allows glyphs from these languages from the foreign fallback font
 		// prefer to have the entire range of chars from the font so UI doesn't suffer from glyph disparity
-		if ( !V_stricmp( windowsFontName, "toolbox" ) )
+		if ( V_strieq( windowsFontName, "toolbox" ) )
 		{
 			// only the toolbox font is allowed to pass
 		}
 		else
 		{
-			if ( !V_stricmp( m_szLanguage, "polish" ) || 
-				!V_stricmp( m_szLanguage, "russian" ) ||
-				!V_stricmp( m_szLanguage, "japanese" ) ||
-				!V_stricmp( m_szLanguage, "korean" ) ||
-				!V_stricmp( m_szLanguage, "portuguese" ) ||
-				!V_stricmp( m_szLanguage, "schinese" ) ||
-				!V_stricmp( m_szLanguage, "tchinese" ) )
+			if ( V_strieq( m_szLanguage, "polish" ) || 
+				V_strieq( m_szLanguage, "russian" ) ||
+				V_strieq( m_szLanguage, "japanese" ) ||
+				V_strieq( m_szLanguage, "korean" ) ||
+				V_strieq( m_szLanguage, "portuguese" ) ||
+				V_strieq( m_szLanguage, "schinese" ) ||
+				V_strieq( m_szLanguage, "tchinese" ) )
 			{
 				windowsFontName = GetForeignFallbackFontName();
 				bForceSingleFontForXbox = true;
@@ -166,7 +166,7 @@ bool CFontManager::SetFontGlyphSet(HFont font, const char *windowsFontName, int 
 			// font cannot provide glyphs and just supports the normal range
 			// redirect to a font that can supply glyps
 			const char *localizedFontName = GetForeignFallbackFontName();
-			if ( winFont && !stricmp( localizedFontName, windowsFontName ) )
+			if ( winFont && V_strieq( localizedFontName, windowsFontName ) )
 			{
 				// it's the same font and can support the full range
 				m_FontAmalgams[font].AddFont( winFont, 0x0000, 0xFFFF );
@@ -611,7 +611,7 @@ bool CFontManager::IsFontForeignLanguageCapable(const char *windowsFontName)
 
 	for (int i = 0; g_szValidAsianFonts[i] != NULL; i++)
 	{
-		if (!stricmp(g_szValidAsianFonts[i], windowsFontName))
+		if (V_strieq(g_szValidAsianFonts[i], windowsFontName))
 			return true;
 	}
 
@@ -627,7 +627,7 @@ const char *CFontManager::GetFallbackFontName(const char *windowsFontName)
 	int i;
 	for ( i = 0; g_FallbackFonts[i].font != NULL; i++ )
 	{
-		if (!stricmp(g_FallbackFonts[i].font, windowsFontName))
+		if (V_strieq(g_FallbackFonts[i].font, windowsFontName))
 			return g_FallbackFonts[i].fallbackFont;
 	}
 

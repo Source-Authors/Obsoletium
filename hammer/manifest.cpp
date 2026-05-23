@@ -140,7 +140,7 @@ CManifest::~CManifest( void )
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CManifest::LoadKeyInfoCallback( const char *szKey, const char *szValue, CManifest *pDoc )
 {
-	if ( !stricmp( szKey, "NextInternalID" ) )
+	if ( V_strieq( szKey, "NextInternalID" ) )
 	{
 		pDoc->m_NextInternalID = atoi( szValue );
 	}
@@ -170,15 +170,15 @@ ChunkFileResult_t CManifest::LoadManifestInfoCallback( CChunkFile *pFile, CManif
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CManifest::LoadKeyCallback( const char *szKey, const char *szValue, CManifestMap *pManifestMap )
 {
-	if ( !stricmp( szKey, "InternalID" ) )
+	if ( V_strieq( szKey, "InternalID" ) )
 	{
 		pManifestMap->m_InternalID = atoi( szValue );
 	}
-	else if ( !stricmp( szKey, "Name" ) )
+	else if ( V_strieq( szKey, "Name" ) )
 	{
 		pManifestMap->m_FriendlyName = szValue;
 	}
-	else if ( !stricmp( szKey, "File" ) )
+	else if ( V_strieq( szKey, "File" ) )
 	{
 		pManifestMap->m_RelativeMapFileName = szValue;
 		pManifestMap->m_AbsoluteMapFileName += szValue;
@@ -189,7 +189,7 @@ ChunkFileResult_t CManifest::LoadKeyCallback( const char *szKey, const char *szV
 		}
 		pManifestMap->m_bReadOnly = true;
 	}
-	else if ( !stricmp( szKey, "TopLevel" ) )
+	else if ( V_strieq( szKey, "TopLevel" ) )
 	{
 		pManifestMap->m_bTopLevelMap = ( atoi( szValue ) == 1 );
 	}
@@ -259,25 +259,25 @@ typedef struct SManifestLoadPrefs
 //-----------------------------------------------------------------------------
 ChunkFileResult_t CManifest::LoadKeyPrefsCallback( const char *szKey, const char *szValue, TManifestLoadPrefs *pManifestLoadPrefs )
 {
-	if ( !stricmp( szKey, "InternalID" ) )
+	if ( V_strieq( szKey, "InternalID" ) )
 	{
 		pManifestLoadPrefs->pManifestMap = pManifestLoadPrefs->pDoc->FindMapByID( atoi( szValue ) );
 	}
-	else if ( !stricmp( szKey, "IsPrimary" ) )
+	else if ( V_strieq( szKey, "IsPrimary" ) )
 	{
 		if ( pManifestLoadPrefs->pManifestMap )
 		{
 			pManifestLoadPrefs->pManifestMap->m_bPrimaryMap = ( atoi( szValue ) == 1 );
 		}
 	}
-	else if ( !stricmp( szKey, "IsProtected" ) )
+	else if ( V_strieq( szKey, "IsProtected" ) )
 	{
 		if ( pManifestLoadPrefs->pManifestMap )
 		{
 			pManifestLoadPrefs->pManifestMap->m_bProtected = ( atoi( szValue ) == 1 );
 		}
 	}
-	else if ( !stricmp( szKey, "IsVisible" ) )
+	else if ( V_strieq( szKey, "IsVisible" ) )
 	{
 		if ( pManifestLoadPrefs->pManifestMap )
 		{

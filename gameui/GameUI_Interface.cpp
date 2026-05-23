@@ -1036,7 +1036,7 @@ bool CGameUI::SetProgressBarStatusText(const char *statusText)
 	if (!statusText)
 		return false;
 
-	if (!stricmp(statusText, m_szPreviousStatusText))
+	if (V_strieq(statusText, m_szPreviousStatusText))
 		return false;
 
 	g_hLoadingDialog->SetStatusText(statusText);

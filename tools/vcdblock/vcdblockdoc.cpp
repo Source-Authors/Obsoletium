@@ -150,7 +150,7 @@ bool CVcdBlockDoc::LoadFromFile( const char *pFileName )
 	// If we loaded a .bsp, clear out what we're doing
 	// load the Edits file into memory, assign it as our "root"
 	CDmElement *pEdit = NULL;
-	if ( pszExt && !V_stricmp( pszExt, "vle" ) )
+	if ( pszExt && V_strieq( pszExt, "vle" ) )
 	{
 		if ( g_pDataModel->RestoreFromFile( m_pEditFileName, NULL, "vmf", &pEdit ) != DMFILEID_INVALID )
 		{
@@ -360,7 +360,7 @@ bool CVcdBlockDoc::GetStringChoiceList( const char *pChoiceListType, [[maybe_unu
 		for ( intp i = 0; i < nCount; ++i )
 		{
 			CDmeVMFEntity *pNode = CastElement< CDmeVMFEntity >( entities[ i ] );
-			if ( !V_stricmp( pNode->GetClassName(), "info_target" ) )
+			if ( V_strieq( pNode->GetClassName(), "info_target" ) )
 			{
 				StringChoice_t sChoiceChild;
 				sChoiceChild.m_pValue = pNode->GetTargetName();
@@ -395,7 +395,7 @@ bool CVcdBlockDoc::GetElementChoiceList( const char *pChoiceListType, [[maybe_un
 		for ( intp i = 0; i < nCount; ++i )
 		{
 			CDmeVMFEntity *pNode = CastElement< CDmeVMFEntity >( entities[ i ] );
-			if ( !V_stricmp( pNode->GetClassName(), "info_target" ) )
+			if ( V_strieq( pNode->GetClassName(), "info_target" ) )
 			{
 				bFound = true;
 				ElementChoice_t sChoice;

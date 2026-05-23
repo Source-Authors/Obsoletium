@@ -759,7 +759,7 @@ const char *GDinputvariable::ItemStringForValue(const char *szValue) const
 {
 	for (const auto &i : m_Items)
 	{
-		if (!stricmp(i.szValue, szValue))
+		if (V_strieq(i.szValue, szValue))
 		{
 			return(i.szCaption);
 		}

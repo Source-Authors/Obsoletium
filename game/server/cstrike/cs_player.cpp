@@ -3774,7 +3774,7 @@ const char *RadioEventName[ RADIO_NUM_EVENTS+1 ] =
 RadioType NameToRadioEvent( const char *name )
 {
 	for( int i=0; RadioEventName[i]; ++i )
-		if (!stricmp( RadioEventName[i], name ))
+		if (V_strieq( RadioEventName[i], name ))
 			return static_cast<RadioType>( i );
 
 	return RADIO_INVALID;

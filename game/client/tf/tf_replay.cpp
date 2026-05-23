@@ -366,10 +366,10 @@ void CTFReplay::Write( KeyValues *pOut )
 const char *CTFReplay::GetMaterialFriendlyPlayerClass() const
 {
 	const char *pPlayerClass = BaseClass::GetMaterialFriendlyPlayerClass();
-	if ( !V_stricmp( pPlayerClass, "heavyweapons" ) )
+	if ( V_strieq( pPlayerClass, "heavyweapons" ) )
 		return "heavy";
 
-	else if ( !V_stricmp( pPlayerClass, "demoman" ) )
+	else if ( V_strieq( pPlayerClass, "demoman" ) )
 		return "demo";
 
 	return pPlayerClass;

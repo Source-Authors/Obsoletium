@@ -103,12 +103,12 @@ void BaseInputDialog::PerformLayout()
 void BaseInputDialog::OnCommand(const char *command)
 {
 	KeyValues *kv = NULL;
-	if ( !stricmp( command, "OK" ) )
+	if ( V_strieq( command, "OK" ) )
 	{
 		kv = new KeyValues( "InputCompleted" );
 		kv->SetPtr( "dialog", this );
 	}
-	else if ( !stricmp( command, "Cancel" ) )
+	else if ( V_strieq( command, "Cancel" ) )
 	{
 		kv = new KeyValues( "InputCanceled" );
 	}
@@ -215,7 +215,7 @@ void InputDialog::OnCommand(const char *command)
 	// overriding OnCommand for backwards compatability
 	// it'd be nice at some point to find all uses of InputDialog and just use BaseInputDialog's OnCommand
 
-	if (!stricmp(command, "OK"))
+	if (V_strieq(command, "OK"))
 	{
 		intp nTextLength = m_pInput->GetTextLength() + 1;
 		char* txt = stackallocT( char, nTextLength );
@@ -229,7 +229,7 @@ void InputDialog::OnCommand(const char *command)
 		PostActionSignal( kv );
 		CloseModal();
 	}
-	else if (!stricmp(command, "Cancel"))
+	else if (V_strieq(command, "Cancel"))
 	{
 		KeyValues *kv = new KeyValues( "InputCanceled" );
 		if ( m_pContextKeyValues )

@@ -725,7 +725,7 @@ intp IFaceposerModels::FindModelByFilename( char const *filename )
 		if ( !m )
 			continue;
 
-		if ( !stricmp( m->GetModelFileName(), filename ) )
+		if ( V_strieq( m->GetModelFileName(), filename ) )
 			return i;
 	}
 
@@ -840,7 +840,7 @@ intp IFaceposerModels::GetModelIndexForActor( char const *actorname )
 		if ( !m )
 			continue;
 
-		if ( !stricmp( m->GetActorName(), actorname ) )
+		if ( V_strieq( m->GetActorName(), actorname ) )
 			return i;
 	}
 
@@ -856,7 +856,7 @@ StudioModel *IFaceposerModels::GetModelForActor( char const *actorname )
 		if ( !m )
 			continue;
 
-		if ( !stricmp( m->GetActorName(), actorname ) )
+		if ( V_strieq( m->GetActorName(), actorname ) )
 			return m->GetModel();
 	}
 

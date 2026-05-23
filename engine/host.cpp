@@ -863,7 +863,7 @@ static void SetupNewBindings()
 		if ( pOverrideIfCmd )
 		{
 			const char *pCurrentBindingForKey = ::Key_BindingForKey( g_pInputSystem->StringToButtonCode( pIdealKey ) );
-			if ( !pCurrentBindingForKey  || !V_stricmp( pOverrideIfCmd, pCurrentBindingForKey ) )
+			if ( !pCurrentBindingForKey  || V_strieq( pOverrideIfCmd, pCurrentBindingForKey ) )
 			{
 				V_sprintf_safe( szBindCmd, "bind \"%s\" \"%s\"", pIdealKey, pBinding );
 				Cbuf_AddText( szBindCmd );

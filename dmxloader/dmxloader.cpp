@@ -598,7 +598,7 @@ bool ReadDMXHeader( CUtlBuffer &buf, char *pEncodingName, int nEncodingNameLen, 
 		bOk = bOk && ( nAssigned == 4 );
 		if ( bOk )
 		{
-			bOk = !V_stricmp( pEncodingName, bBufIsText ? "keyvalues2" : "binary" );
+			bOk = V_strieq( pEncodingName, bBufIsText ? "keyvalues2" : "binary" );
 		}
 	}
 
@@ -612,12 +612,12 @@ bool ReadDMXHeader( CUtlBuffer &buf, char *pEncodingName, int nEncodingNameLen, 
 			nEncodingVersion = 0;
 			nFormatVersion = 0; // format version is encoded in the format name string
 
-			if ( !V_stricmp( pFormatName, "binary_v1" ) || !V_stricmp( pFormatName, "binary_v2" ) )
+			if ( V_strieq( pFormatName, "binary_v1" ) || V_strieq( pFormatName, "binary_v2" ) )
 			{
 				bOk = !bBufIsText;
 				V_strncpy( pEncodingName, "binary", nEncodingNameLen );
 			}
-			else if ( !V_stricmp( pFormatName, "keyvalues2_v1" ) || !V_stricmp( pFormatName, "keyvalues2_flat_v1" ) )
+			else if ( V_strieq( pFormatName, "keyvalues2_v1" ) || V_strieq( pFormatName, "keyvalues2_flat_v1" ) )
 			{
 				bOk = bBufIsText;
 				V_strncpy( pEncodingName, "keyvalues2", nEncodingNameLen );

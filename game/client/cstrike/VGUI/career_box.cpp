@@ -1012,7 +1012,7 @@ CSWeaponID CWeaponSelectBox::GetSelectedWeaponID()
 //--------------------------------------------------------------------------------------------------------------
 void CWeaponSelectBox::OnCommand(const char *command)
 {
-	if (!stricmp(command, "select_weapon"))
+	if (V_strieq(command, "select_weapon"))
 	{
 		CSWeaponID weaponID = GetSelectedWeaponID();
 		BuyPresetWeapon weapon( weaponID );
@@ -1029,7 +1029,7 @@ void CWeaponSelectBox::OnCommand(const char *command)
 		return;
 	}
 
-	if (!stricmp(command, "popup_ok"))
+	if (V_strieq(command, "popup_ok"))
 	{
 		if ( !m_pClips )
 			return;
@@ -1170,7 +1170,7 @@ void CGrenadeSelectBox::OnControlChanged()
 //--------------------------------------------------------------------------------------------------------------
 void CGrenadeSelectBox::OnCommand( const char *command )
 {
-	if (!stricmp(command, "popup_ok"))
+	if (V_strieq(command, "popup_ok"))
 	{
 		// stuff values back in m_pWeaponSet
 		m_pWeaponSet->m_HEGrenade    = m_pHEGrenade->GetActiveItem();
@@ -1282,7 +1282,7 @@ void CEquipmentSelectBox::OnControlChanged()
 //--------------------------------------------------------------------------------------------------------------
 void CEquipmentSelectBox::OnCommand( const char *command )
 {
-	if (!stricmp(command, "popup_ok"))
+	if (V_strieq(command, "popup_ok"))
 	{
 		// stuff values back in m_pWeaponSet
 		m_pWeaponSet->m_armor       = m_pKevlar->GetActiveItem() ? 100 : 0;

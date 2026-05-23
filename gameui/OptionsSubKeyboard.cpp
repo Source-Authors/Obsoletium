@@ -119,7 +119,7 @@ void COptionsSubKeyboard::OnKeyCodeTyped(vgui::KeyCode code)
 //-----------------------------------------------------------------------------
 void COptionsSubKeyboard::OnCommand( const char *command )
 {
-	if ( !stricmp( command, "Defaults" )  )
+	if ( V_strieq( command, "Defaults" )  )
 	{
 		// open a box asking if we want to restore defaults
 		// dimhotepus: Own query box to scale it.
@@ -128,22 +128,22 @@ void COptionsSubKeyboard::OnCommand( const char *command )
 		box->SetOKCommand(new KeyValues("Command", "command", "DefaultsOK"));
 		box->DoModal();
 	}
-	else if ( !stricmp(command, "DefaultsOK"))
+	else if ( V_strieq(command, "DefaultsOK"))
 	{
 		// Restore defaults from default keybindings file
 		FillInDefaultBindings();
 		m_pKeyBindList->RequestFocus();
 	}
-	else if ( !m_pKeyBindList->IsCapturing() && !stricmp( command, "ChangeKey" ) )
+	else if ( !m_pKeyBindList->IsCapturing() && V_strieq( command, "ChangeKey" ) )
 	{
 		m_pKeyBindList->StartCaptureMode(dc_blank);
 	}
-	else if ( !m_pKeyBindList->IsCapturing() && !stricmp( command, "ClearKey" ) )
+	else if ( !m_pKeyBindList->IsCapturing() && V_strieq( command, "ClearKey" ) )
 	{
 		OnKeyCodePressed(KEY_DELETE);
         m_pKeyBindList->RequestFocus();
 	}
-	else if ( !stricmp(command, "Advanced") )
+	else if ( V_strieq(command, "Advanced") )
 	{
 		OpenKeyboardAdvancedDialog();
 	}
@@ -214,7 +214,7 @@ void COptionsSubKeyboard::ParseActionDescriptions( void )
 		if ( szDescription[ 0 ] != '=' )
 		{
 			// Flag as special header row if binding is "blank"
-			if (!stricmp(szBinding, "blank"))
+			if (V_strieq(szBinding, "blank"))
 			{
 				// add header item
 				m_pKeyBindList->AddSection(++sectionIndex, szDescription);
@@ -259,7 +259,7 @@ KeyValues *COptionsSubKeyboard::GetItemForBinding( const char *binding )
 		const char *bindString = bindingItem->GetString();
 
 		// Check the "Binding" key
-		if (!stricmp(bindString, binding))
+		if (V_strieq(bindString, binding))
 			return item;
 	}
 	// Didn't find it
@@ -275,7 +275,7 @@ KeyValues *COptionsSubKeyboard::GetItemForBinding( const char *binding )
 void COptionsSubKeyboard::AddBinding( KeyValues *item, const char *keyname )
 {
 	// See if it's already there as a binding
-	if ( !stricmp( item->GetString( "Key", "" ), keyname ) )
+	if ( V_strieq( item->GetString( "Key", "" ), keyname ) )
 		return;
 
 	// Make sure it doesn't live anywhere
@@ -294,7 +294,7 @@ void COptionsSubKeyboard::AddBinding( KeyValues *item, const char *keyname )
 
 		const char *curbinding = curitem->GetString( "Binding", "" );
 
-		if (!stricmp(curbinding, binding))
+		if (V_strieq(curbinding, binding))
 		{
 			curitem->SetString( "Key", keyname );
 			m_pKeyBindList->InvalidateItem(i);
@@ -342,7 +342,7 @@ void COptionsSubKeyboard::RemoveKeyFromBindItems( KeyValues *org_item, const cha
 			continue;
 
 		// If it's bound to the primary: then remove it
-		if ( !stricmp( pszKey, item->GetString( "Key", "" ) ) )
+		if ( V_strieq( pszKey, item->GetString( "Key", "" ) ) )
 		{
 			bool bClearEntry = true;
 
@@ -353,7 +353,7 @@ void COptionsSubKeyboard::RemoveKeyFromBindItems( KeyValues *org_item, const cha
 				// if they point to the same command.
 				const char *org_binding = org_item->GetString( "Binding", "" );
 				const char *binding = item->GetString( "Binding", "" );
-				if ( !stricmp( org_binding, binding ) )
+				if ( V_strieq( org_binding, binding ) )
 				{
 					bClearEntry = false;
 				}
@@ -568,7 +568,7 @@ void COptionsSubKeyboard::FillInDefaultBindings( void )
 		if ( !cmd[0] )
 			break;
 
-		if ( !stricmp(cmd, "bind") )
+		if ( V_strieq(cmd, "bind") )
 		{
 			// Key name
 			char szKeyName[256];
@@ -788,7 +788,7 @@ public:
 
 	void OnCommand( const char *command ) override
 	{
-		if ( !stricmp(command, "OK") )
+		if ( V_strieq(command, "OK") )
 		{
 			// apply the data
 			OnApplyData();

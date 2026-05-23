@@ -140,7 +140,7 @@ CON_COMMAND( replay_testcompress, "Test compression" )
 
 	for ( int i = 0; i < (int)NUM_COMPRESSOR_TYPES; ++i )
 	{
-		if ( !V_stricmp( pCompressionTypeName, g_pCompressorTypes[ i ] ) )
+		if ( V_strieq( pCompressionTypeName, g_pCompressorTypes[ i ] ) )
 		{
 			nCompressorType = (CompressorType_t)i;
 			break;

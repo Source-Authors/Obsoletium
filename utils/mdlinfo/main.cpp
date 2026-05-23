@@ -338,7 +338,7 @@ bool CMdlInfoApp::CommandLineHasOpt( const char *pszOpt )
 {
 	for ( int ii = 0; ii < ARRAYSIZE( s_binaryOptions ); ++ii )
 	{
-		if ( !V_stricmp( pszOpt, s_binaryOptions[ii].m_pszShortName ) || !V_stricmp( pszOpt, s_binaryOptions[ii].m_pszLongName ) )
+		if ( V_strieq( pszOpt, s_binaryOptions[ii].m_pszShortName ) || V_strieq( pszOpt, s_binaryOptions[ii].m_pszLongName ) )
 		{
 			if ( CommandLine()->FindParm( s_binaryOptions[ii].m_pszShortName ) > 0 || CommandLine()->FindParm( s_binaryOptions[ii].m_pszLongName ) > 0 )
 				return true;

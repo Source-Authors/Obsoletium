@@ -124,7 +124,7 @@ void CChangeGameDialog::LoadModList()
 //-----------------------------------------------------------------------------
 void CChangeGameDialog::OnCommand(const char *command)
 {
-	if (!stricmp(command, "OK"))
+	if (V_strieq(command, "OK"))
 	{
 		if (m_pModList->GetSelectedItemsCount() > 0)
 		{
@@ -141,7 +141,7 @@ void CChangeGameDialog::OnCommand(const char *command)
 			}
 		}
 	}
-	else if (!stricmp(command, "Cancel"))
+	else if (V_strieq(command, "Cancel"))
 	{
 		Close();
 	}

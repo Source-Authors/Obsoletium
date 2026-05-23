@@ -273,7 +273,7 @@ void CGameEventTool::OnExit()
 //-----------------------------------------------------------------------------
 void CGameEventTool::OnCommand( const char *cmd )
 {
-	if ( !V_stricmp( cmd, "HideActionMenu" ) )
+	if ( V_strieq( cmd, "HideActionMenu" ) )
 	{
 		if ( GetActionMenu() )
 		{

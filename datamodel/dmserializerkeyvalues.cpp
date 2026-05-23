@@ -441,7 +441,7 @@ bool CDmSerializerKeyValues::Unserialize( CUtlBuffer &buf, const char *pEncoding
 										  const char *pSourceFormatName, int nSourceFormatVersion,
 										  DmFileId_t fileid, DmConflictResolution_t idConflictResolution, CDmElement **ppRoot )
 {
-	Assert( !V_stricmp( pEncodingName, "keyvalues" ) );
+	Assert( V_strieq( pEncodingName, "keyvalues" ) );
 
 	*ppRoot = NULL;
 

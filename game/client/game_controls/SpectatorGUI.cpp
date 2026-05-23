@@ -217,11 +217,11 @@ void CSpectatorMenu::OnTextChanged(KeyValues *data)
 
 void CSpectatorMenu::OnCommand( const char *command )
 {
-	if (!stricmp(command, "specnext") )
+	if (V_strieq(command, "specnext") )
 	{
 		engine->ClientCmd("spec_next");
 	}
-	else if (!stricmp(command, "specprev") )
+	else if (V_strieq(command, "specprev") )
 	{
 		engine->ClientCmd("spec_prev");
 	}

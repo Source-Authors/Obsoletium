@@ -257,11 +257,11 @@ void CMapFrustum::OnParentKeyChanged(const char *szKey, const char *szValue)
 {
 	bool bRebuild = true;
 
-	if (!stricmp(szKey, "angles"))
+	if (V_strieq(szKey, "angles"))
 	{
 		sscanf(szValue, "%f %f %f", &m_Angles[PITCH], &m_Angles[YAW], &m_Angles[ROLL]);
 	}
-	else if (!stricmp(szKey, m_szColorKeyName))
+	else if (V_strieq(szKey, m_szColorKeyName))
 	{
 		int nRed;
 		int nGreen;
@@ -272,17 +272,17 @@ void CMapFrustum::OnParentKeyChanged(const char *szKey, const char *szValue)
 		g = size_cast<byte>(nGreen);
 		b = size_cast<byte>(nBlue);
 	}
-	else if (!stricmp(szKey, m_szFOVKeyName))
+	else if (V_strieq(szKey, m_szFOVKeyName))
 	{
 		// dimhotepus: atof -> V_atof
 		m_flFOV = V_atof(szValue);
 	}
-	else if (!stricmp(szKey, m_szNearPlaneKeyName))
+	else if (V_strieq(szKey, m_szNearPlaneKeyName))
 	{
 		// dimhotepus: atof -> V_atof
 		m_flNearPlane = V_atof(szValue);
 	}
-	else if (!stricmp(szKey, m_szFarPlaneKeyName))
+	else if (V_strieq(szKey, m_szFarPlaneKeyName))
 	{
 		// dimhotepus: atof -> V_atof
 		m_flFarPlane = V_atof(szValue);

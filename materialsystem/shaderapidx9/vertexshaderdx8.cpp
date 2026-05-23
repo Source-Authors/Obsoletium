@@ -1134,16 +1134,16 @@ const CShaderManager::ShaderCombos_t *CShaderManager::FindOrCreateShaderCombos( 
 				}
 				else
 				{
-					if ( !stricmp( pszEndFilename - 6, "20.fxc" ) )
+					if ( V_strieq( pszEndFilename - 6, "20.fxc" ) )
 					{
 						pszEndFilename[ -5 ] = 'x';
 					}
-					else if ( !stricmp( pszEndFilename - 7, "20b.fxc" ) )
+					else if ( V_strieq( pszEndFilename - 7, "20b.fxc" ) )
 					{
 						strcpy( pszEndFilename - 7, "2x.fxc" );
 						--pszEndFilename;
 					}
-					else if ( !stricmp( pszEndFilename - 6, "11.fxc" ) )
+					else if ( V_strieq( pszEndFilename - 6, "11.fxc" ) )
 					{
 						strcpy( pszEndFilename - 6, "xx.fxc" );
 					}
@@ -1151,7 +1151,7 @@ const CShaderManager::ShaderCombos_t *CShaderManager::FindOrCreateShaderCombos( 
 					bOpenResult = g_pFullFileSystem->ReadFile( filename, NULL, bffr );
 					if ( !bOpenResult )
 					{
-						if ( !stricmp( pszEndFilename - 6, "2x.fxc" ) )
+						if ( V_strieq( pszEndFilename - 6, "2x.fxc" ) )
 						{
 							pszEndFilename[ -6 ] = 'x';
 							bOpenResult = g_pFullFileSystem->ReadFile( filename, NULL, bffr );
@@ -1666,7 +1666,7 @@ retry_compile:
 					strcpy( pszEndFilename - 7, "2x.fxc" );
 					fp = g_pFullFileSystem->Open( filename, "r" );
 				}
-				else if ( !stricmp( pszEndFilename - 6, "11.fxc" ) )
+				else if ( V_strieq( pszEndFilename - 6, "11.fxc" ) )
 				{
 					strcpy( pszEndFilename - 6, "xx.fxc" );
 					fp = g_pFullFileSystem->Open( filename, "r" );
@@ -1674,7 +1674,7 @@ retry_compile:
 
 				if ( fp == FILESYSTEM_INVALID_HANDLE )
 				{
-					if ( !stricmp( pszEndFilename - 6, "2x.fxc" ) )
+					if ( V_strieq( pszEndFilename - 6, "2x.fxc" ) )
 					{
 						pszEndFilename[ -6 ] = 'x';
 						fp = g_pFullFileSystem->Open( filename, "r" );

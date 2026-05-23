@@ -1561,12 +1561,12 @@ bool CSquadSpawner::Parse( KeyValues *values )
 			continue;
 		}
 
-		if ( !V_stricmp( name, "FormationSize" ) )
+		if ( V_strieq( name, "FormationSize" ) )
 		{
 			m_formationSize = data->GetFloat();
 			continue;
 		}
-		else if ( !V_stricmp( name, "ShouldPreserveSquad" ) )
+		else if ( V_strieq( name, "ShouldPreserveSquad" ) )
 		{
 			m_bShouldPreserveSquad = data->GetBool();
 			continue;

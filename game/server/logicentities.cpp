@@ -1384,7 +1384,7 @@ bool CMathCounter::KeyValue(const char *szKeyName, const char *szValue)
 	//
 	// Set the initial value of the counter.
 	//
-	if (!stricmp(szKeyName, "startvalue"))
+	if (V_strieq(szKeyName, "startvalue"))
 	{
 		m_OutValue.Init(atoi(szValue));
 		return(true);
@@ -1782,7 +1782,7 @@ void CLogicCase::InputValue( inputdata_t &inputdata )
 	const char *pszValue = inputdata.value.String();
 	for (int i = 0; i < MAX_LOGIC_CASES; i++)
 	{
-		if ((m_nCase[i] != NULL_STRING) && !stricmp(STRING(m_nCase[i]), pszValue))
+		if ((m_nCase[i] != NULL_STRING) && V_strieq(STRING(m_nCase[i]), pszValue))
 		{
 			m_OnCase[i].FireOutput( inputdata.pActivator, this );
 			return;

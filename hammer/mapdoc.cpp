@@ -696,7 +696,7 @@ void CMapDoc::AssignToVisGroups(void)
 		for (intp i = 0; i < nKeyCount; i++)
 		{
 			const char *pszKey = pChild->GetEditorKey(i);
-			if (!stricmp(pszKey, "visgroupid"))
+			if (V_strieq(pszKey, "visgroupid"))
 			{
 				const char *pszVisGroupID = pChild->GetEditorKeyValue(i);
 				Assert(pszVisGroupID != NULL);
@@ -717,7 +717,7 @@ void CMapDoc::AssignToVisGroups(void)
 					}
 				}
 			}
-			else if (!stricmp(pszKey, "colorvisgroupid"))
+			else if (V_strieq(pszKey, "colorvisgroupid"))
 			{
 				const char *pszVisGroupID = pChild->GetEditorKeyValue(i);
 				Assert(pszVisGroupID != NULL);
@@ -1636,7 +1636,7 @@ ChunkFileResult_t CMapDoc::LoadAutosaveCallback( CChunkFile *pFile, CMapDoc *pDo
 
 ChunkFileResult_t CMapDoc::LoadAutosaveKeyCallback(const char *szKey, const char *szValue, CMapDoc *pDoc)
 {
-	if (!stricmp(szKey, "originalname"))
+	if (V_strieq(szKey, "originalname"))
 	{
 		pDoc->m_bIsAutosave = true;
 		char szTempName[MAX_PATH];
@@ -1656,15 +1656,15 @@ ChunkFileResult_t CMapDoc::LoadCordonCallback(CChunkFile *pFile, CMapDoc *pDoc)
 
 ChunkFileResult_t CMapDoc::LoadCordonKeyCallback(const char *szKey, const char *szValue, CMapDoc *pDoc)
 {
-	if (!stricmp(szKey, "mins"))
+	if (V_strieq(szKey, "mins"))
 	{
 		CChunkFile::ReadKeyValuePoint(szValue, pDoc->m_vCordonMins);
 	}
-	else if (!stricmp(szKey, "maxs"))
+	else if (V_strieq(szKey, "maxs"))
 	{
 		CChunkFile::ReadKeyValuePoint(szValue, pDoc->m_vCordonMaxs);
 	}
-	else if (!stricmp(szKey, "active"))
+	else if (V_strieq(szKey, "active"))
 	{
 		bool bActive;
 		CChunkFile::ReadKeyValueBool(szValue, bActive );
@@ -3106,11 +3106,11 @@ BOOL CMapDoc::OnOpenDocument(LPCTSTR lpszPathName)
 	BOOL bRMF = FALSE;
 	BOOL bMAP = FALSE;
 
-	if (!stricmp(lpszPathName + strlen(lpszPathName) - 3, "rmf"))
+	if (V_strieq(lpszPathName + strlen(lpszPathName) - 3, "rmf"))
 	{
 		bRMF = TRUE;
 	}
-	else if (!stricmp(lpszPathName + strlen(lpszPathName) - 3, "map"))
+	else if (V_strieq(lpszPathName + strlen(lpszPathName) - 3, "map"))
 	{
 		bMAP = TRUE;
 	}
@@ -3243,11 +3243,11 @@ BOOL CMapDoc::OnSaveDocument(LPCTSTR lpszPathName)
 	//
 	BOOL bRMF = FALSE;
 	BOOL bMAP = FALSE;
-	if (!stricmp(lpszPathName + strlen(lpszPathName) - 3, "rmf"))
+	if (V_strieq(lpszPathName + strlen(lpszPathName) - 3, "rmf"))
 	{
 		bRMF = TRUE;
 	}
-	else if (!stricmp(lpszPathName + strlen(lpszPathName) - 3, "map"))
+	else if (V_strieq(lpszPathName + strlen(lpszPathName) - 3, "map"))
 	{
 		bMAP = TRUE;
 	}
@@ -11939,7 +11939,7 @@ void CMapDoc::AddToFGDAutoVisGroups( CMapClass *pObject )
 					for ( eindex = 0; eindex < pGD->m_FGDAutoVisGroups[gindex].m_Classes[cindex].szEntities.Count(); eindex++ )
 					{
 						// 
-						if ( !V_stricmp( pEntity->GetClassName(), pGD->m_FGDAutoVisGroups[gindex].m_Classes[cindex].szEntities[eindex] ) )
+						if ( V_strieq( pEntity->GetClassName(), pGD->m_FGDAutoVisGroups[gindex].m_Classes[cindex].szEntities[eindex] ) )
 						{			
 							AddChildGroupToAutoVisGroup( pEntity, pGD->m_FGDAutoVisGroups[gindex].m_Classes[cindex].szClass, pGD->m_FGDAutoVisGroups[gindex].szParent );
 						}

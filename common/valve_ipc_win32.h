@@ -350,7 +350,7 @@ VALVE_IPC_IMPL BOOL CValveIpcMgr::DiscoverServer( char const *szServerName, RPC_
 
 	for ( Iterator it( m_pMemory ); it.IsValid(); it = it.Next() )
 	{
-		if ( !stricmp( szServerName, it.m_szServerName ) )
+		if ( V_strieq( szServerName, it.m_szServerName ) )
 		{
 			if ( pszServerUID )
 			{
@@ -370,7 +370,7 @@ VALVE_IPC_IMPL BOOL CValveIpcMgr::RegisterServer( char const *szServerName, RPC_
 	Iterator it( m_pMemory );
 	for ( ; it.IsValid(); it = it.Next() )
 	{
-		if ( !stricmp( szServerName, it.m_szServerName ) )
+		if ( V_strieq( szServerName, it.m_szServerName ) )
 		{
 			// Server with same name already registered,
 			// check if it is alive

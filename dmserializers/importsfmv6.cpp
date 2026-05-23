@@ -80,7 +80,7 @@ void CImportSFMV6::FixupElement( CDmElement *pElement )
 
 	const char *pType = pElement->GetTypeString();
 
-	if ( !V_stricmp( pType, "DmeProjectedLight" ) )
+	if ( V_strieq( pType, "DmeProjectedLight" ) )
 	{
 		Vector vDir = pElement->GetValue<Vector>( "direction" );
 		pElement->RemoveAttribute( "direction" );

@@ -320,7 +320,7 @@ bool CVGuiSystemModuleLoader::ActivateModule(const char *moduleName)
 {
 	for (int i = 0; i < GetModuleCount(); i++)
 	{
-		if (!stricmp(GetModuleLabel(i), moduleName) || !stricmp(m_Modules[i].data->GetName(), moduleName))
+		if (V_strieq(GetModuleLabel(i), moduleName) || V_strieq(m_Modules[i].data->GetName(), moduleName))
 		{
 			ActivateModule(i);
 			return true;

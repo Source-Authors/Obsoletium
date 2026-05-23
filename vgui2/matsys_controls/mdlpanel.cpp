@@ -328,7 +328,7 @@ void CMDLPanel::DrawCollisionModel()
 	while ( !pParser->Finished() )
 	{
 		const char *pBlock = pParser->GetCurrentBlockName();
-		if ( !stricmp( pBlock, "solid" ) )
+		if ( V_strieq( pBlock, "solid" ) )
 		{
 			solid_t solid;
 

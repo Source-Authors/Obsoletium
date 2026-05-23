@@ -664,9 +664,9 @@ void OverrideMaterialSystemConfig( MaterialSystem_Config_t &config )
 	if ( mat_supportflashlight.GetInt() == -1 )
 	{
 		const char * gameName = COM_GetModDirectory();
-		if ( !V_stricmp( gameName, "portal" ) ||
-			 !V_stricmp( gameName, "tf" ) ||
-			 !V_stricmp( gameName, "tf_beta" ) )
+		if ( V_strieq( gameName, "portal" ) ||
+			 V_strieq( gameName, "tf" ) ||
+			 V_strieq( gameName, "tf_beta" ) )
 		{
 			mat_supportflashlight.SetValue( false );
 		}

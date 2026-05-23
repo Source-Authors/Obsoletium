@@ -308,7 +308,7 @@ void CSDKLauncherDialog::Launch( int hActiveListItem, bool bForce )
 	{
 		if ( Q_stricmp( pStr, "CreateMod" ) == 0 )
 		{
-			if ( !V_stricmp( g_engineDir, "ep1" ) || !V_stricmp( g_engineDir, "source2007" ) )
+			if ( V_strieq( g_engineDir, "ep1" ) || V_strieq( g_engineDir, "source2007" ) )
 			{
 				RunCreateModWizard( false );
 			}
@@ -762,15 +762,15 @@ void CSDKLauncherDialog::RefreshConfigs( void )
 	g_ConfigManager.SetBaseDirectory( szGameConfigDir );
 
 	// Tell the config manager which games to put in the config by default
-	if ( !stricmp( g_engineDir, "ep1" ) )
+	if ( V_strieq( g_engineDir, "ep1" ) )
 	{
 		g_ConfigManager.SetSDKEpoch( EP1 );
 	}
-	else if ( !stricmp( g_engineDir, "source2007" ) )
+	else if ( V_strieq( g_engineDir, "source2007" ) )
 	{
 		g_ConfigManager.SetSDKEpoch( EP2 );
 	}
-	else if ( !stricmp( g_engineDir, "source2009" ) )
+	else if ( V_strieq( g_engineDir, "source2009" ) )
 	{
 		g_ConfigManager.SetSDKEpoch( SP2009 );
 	}

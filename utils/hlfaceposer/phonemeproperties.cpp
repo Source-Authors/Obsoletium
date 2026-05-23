@@ -301,7 +301,7 @@ static bool ValidatePhonemeString( bool allowmultiple, char const *input, char (
 			if ( !exp )
 				continue;
 			
-			if ( !stricmp( exp->name, phoneme ) )
+			if ( V_strieq( exp->name, phoneme ) )
 			{
 				// Found it
 				if ( count != 1 )

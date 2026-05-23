@@ -152,8 +152,8 @@ void ModelPoseDebugInfo::AddInfoText( InfoText *x, ModelPoseDebugInfo *pOld )
 			{
 				InfoText &txt = o.m_arrTxt[k];
 				if ( ( txt.m_uiFlags & F_SEEN_THIS_FRAME ) &&
-					!stricmp( x->m_chActivity, txt.m_chActivity ) &&
-					!stricmp( x->m_chLabel, txt.m_chLabel ) &&
+					V_strieq( x->m_chActivity, txt.m_chActivity ) &&
+					V_strieq( x->m_chLabel, txt.m_chLabel ) &&
 					( x->m_iActivity == txt.m_iActivity ) )
 				{
 					x->m_flTimeAlive = txt.m_flTimeAlive;
@@ -227,8 +227,8 @@ ModelPoseDebugInfo::InfoText * ModelPoseDebugInfo::LookupInfoText( InfoText *x )
 		{
 			InfoText &txt = m_arrTxt[k];
 			if ( ( txt.m_uiFlags & F_SEEN_THIS_FRAME ) &&
-				!stricmp( x->m_chActivity, txt.m_chActivity ) &&
-				!stricmp( x->m_chLabel, txt.m_chLabel ) &&
+				V_strieq( x->m_chActivity, txt.m_chActivity ) &&
+				V_strieq( x->m_chLabel, txt.m_chLabel ) &&
 				( x->m_iActivity == txt.m_iActivity ) )
 			{
 				return &txt;

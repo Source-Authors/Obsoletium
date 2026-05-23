@@ -836,7 +836,7 @@ void CCommEditTool::OnExit()
 //-----------------------------------------------------------------------------
 void CCommEditTool::OnCommand( const char *cmd )
 {
-	if ( !V_stricmp( cmd, "HideActionMenu" ) )
+	if ( V_strieq( cmd, "HideActionMenu" ) )
 	{
 		if ( GetActionMenu() )
 		{
@@ -853,15 +853,15 @@ void CCommEditTool::OnCommand( const char *cmd )
 		int idx = Q_atoi( pSuffixTool );
 		enginetools->SwitchToTool( idx );
 	}
-	else if ( !V_stricmp( cmd, "OnUndo" ) )
+	else if ( V_strieq( cmd, "OnUndo" ) )
 	{
 		OnUndo();
 	}
-	else if ( !V_stricmp( cmd, "OnRedo" ) )
+	else if ( V_strieq( cmd, "OnRedo" ) )
 	{
 		OnRedo();
 	}
-	else if ( !V_stricmp( cmd, "OnDescribeUndo" ) )
+	else if ( V_strieq( cmd, "OnDescribeUndo" ) )
 	{
 		OnDescribeUndo();
 	}

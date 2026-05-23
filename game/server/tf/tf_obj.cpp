@@ -1684,7 +1684,7 @@ void Cmd_DamageDump_f(void)
 					// Fine to reuse idx since we are going to break anyways.
 					for( idx = g_DamageMap.First(); idx != g_DamageMap.InvalidIndex(); idx = g_DamageMap.Next(idx) )
 					{
-						if( !stricmp( g_DamageMap.GetElementName(idx), szRowNameCommaColumn ) )
+						if( V_strieq( g_DamageMap.GetElementName(idx), szRowNameCommaColumn ) )
 						{
 							nDamageAmount = g_DamageMap[idx];
 							break;

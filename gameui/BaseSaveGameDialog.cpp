@@ -609,12 +609,12 @@ int SaveReadNameAndComment( FileHandle_t f,	OUT_Z_CAP(nameSize) char *name,	int 
 		pFieldName = pTokenList[ *(short *)pData ];
 		pData += sizeof(short);
 
-		if (!stricmp(pFieldName, "comment"))
+		if (V_strieq(pFieldName, "comment"))
 		{
 			int copySize = MAX(commentSize, nFieldSize);
 			Q_strncpy(comment, pData, copySize);
 		}
-		else if (!stricmp(pFieldName, "mapName"))
+		else if (V_strieq(pFieldName, "mapName"))
 		{
 			int copySize = MAX(nameSize, nFieldSize);
 			Q_strncpy(name, pData, copySize);

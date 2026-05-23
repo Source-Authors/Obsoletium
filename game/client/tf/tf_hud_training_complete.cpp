@@ -138,11 +138,11 @@ void CTFTrainingComplete::SetUpResults( IGameEvent *event )
 
 	// record that the player has completed training with the current class
 	C_TFPlayer *pLocalPlayer = C_TFPlayer::GetLocalTFPlayer();
-	if ( pLocalPlayer && !V_stricmp(map, "tr_target" ) )
+	if ( pLocalPlayer && V_strieq(map, "tr_target" ) )
 	{
 		Training_MarkClassComplete( pLocalPlayer->GetPlayerClass()->GetClassIndex(), 1 );
 	}
-	else if ( !V_stricmp(map, "tr_dustbowl" ) )
+	else if ( V_strieq(map, "tr_dustbowl" ) )
 	{
 		Training_MarkClassComplete( TF_CLASS_SOLDIER, 2 );
 	}

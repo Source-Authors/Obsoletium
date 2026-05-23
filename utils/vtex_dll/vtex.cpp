@@ -309,7 +309,7 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 {
 	int iValue = atoi( pKeyValue ); // To properly have "clamps 0" and not enable the clamping
 
-	if ( !stricmp( pKeyName, "skybox" ) )
+	if ( V_strieq( pKeyName, "skybox" ) )
 	{
 		// We're going to treat it like a cubemap until the very end, so it'll load the other skybox faces and
 		// match their edges with the texture compression and mipmapping.
@@ -319,15 +319,15 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 		if ( !g_Quiet && iValue )
 			Msg( "'skybox' detected. Treating skybox like a cubemap for edge-matching purposes.\n" );
 	}
-	else if( !stricmp( pKeyName, "startframe" ) )
+	else if( V_strieq( pKeyName, "startframe" ) )
 	{
 		m_nStartFrame = atoi( pKeyValue );
 	}
-	else if( !stricmp( pKeyName, "endframe" ) )
+	else if( V_strieq( pKeyName, "endframe" ) )
 	{
 		m_nEndFrame = atoi( pKeyValue );
 	}
-	else if( !stricmp( pKeyName, "volumetexture" ) )
+	else if( V_strieq( pKeyName, "volumetexture" ) )
 	{
 		m_nVolumeTextureDepth = atoi( pKeyValue );
 
@@ -337,225 +337,225 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 		// FIXME: Volume textures don't currently support NICE filtering
 		m_vtfProcOptions.flags0 &= ~VtfProcessingOptions::OPT_FILTER_NICE;
 	}
-	else if( !stricmp( pKeyName, "spheremap_x" ) )
+	else if( V_strieq( pKeyName, "spheremap_x" ) )
 	{
 		if ( iValue )
 			m_LookDir = LOOK_DOWN_X;
 	}
-	else if( !stricmp( pKeyName, "spheremap_negx" ) )
+	else if( V_strieq( pKeyName, "spheremap_negx" ) )
 	{
 		if ( iValue )
 			m_LookDir = LOOK_DOWN_NEGX;
 	}
-	else if( !stricmp( pKeyName, "spheremap_y" ) )
+	else if( V_strieq( pKeyName, "spheremap_y" ) )
 	{
 		if ( iValue )
 			m_LookDir = LOOK_DOWN_Y;
 	}
-	else if( !stricmp( pKeyName, "spheremap_negy" ) )
+	else if( V_strieq( pKeyName, "spheremap_negy" ) )
 	{
 		if ( iValue )
 			m_LookDir = LOOK_DOWN_NEGY;
 	}
-	else if( !stricmp( pKeyName, "spheremap_z" ) )
+	else if( V_strieq( pKeyName, "spheremap_z" ) )
 	{
 		if ( iValue )
 			m_LookDir = LOOK_DOWN_Z;
 	}
-	else if( !stricmp( pKeyName, "spheremap_negz" ) )
+	else if( V_strieq( pKeyName, "spheremap_negz" ) )
 	{
 		if ( iValue )
 			m_LookDir = LOOK_DOWN_NEGZ;
 	}
-	else if( !stricmp( pKeyName, "bumpscale" ) )
+	else if( V_strieq( pKeyName, "bumpscale" ) )
 	{
 		// dimhotepus: atof -> strtof.
 		m_flBumpScale = strtof( pKeyValue, nullptr );
 	}
-	else if( !stricmp( pKeyName, "pointsample" ) )
+	else if( V_strieq( pKeyName, "pointsample" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_POINTSAMPLE, iValue );
 	}
-	else if( !stricmp( pKeyName, "trilinear" ) )
+	else if( V_strieq( pKeyName, "trilinear" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_TRILINEAR, iValue );
 	}
-	else if( !stricmp( pKeyName, "clamps" ) )
+	else if( V_strieq( pKeyName, "clamps" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_CLAMPS, iValue );
 	}
-	else if( !stricmp( pKeyName, "clampt" ) )
+	else if( V_strieq( pKeyName, "clampt" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_CLAMPT, iValue );
 	}
-	else if( !stricmp( pKeyName, "clampu" ) )
+	else if( V_strieq( pKeyName, "clampu" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_CLAMPU, iValue );
 	}
-	else if( !stricmp( pKeyName, "border" ) )
+	else if( V_strieq( pKeyName, "border" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_BORDER, iValue );
 		// Gets applied to s, t and u   We currently assume black border color
 	}
-	else if( !stricmp( pKeyName, "anisotropic" ) )
+	else if( V_strieq( pKeyName, "anisotropic" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_ANISOTROPIC, iValue );
 	}
-	else if( !stricmp( pKeyName, "dxt5" ) )
+	else if( V_strieq( pKeyName, "dxt5" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_HINT_DXT5, iValue );
 	}
-	else if( !stricmp( pKeyName, "nocompress" ) )
+	else if( V_strieq( pKeyName, "nocompress" ) )
 	{
 		SetFlagValue( m_vtfProcOptions.flags0, VtfProcessingOptions::OPT_NOCOMPRESS, iValue );
 	}
-	else if( !stricmp( pKeyName, "normal" ) )
+	else if( V_strieq( pKeyName, "normal" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_NORMAL, iValue );
 	}
-	else if( !stricmp( pKeyName, "ssbump" ) )
+	else if( V_strieq( pKeyName, "ssbump" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_SSBUMP, iValue );
 	}
-	else if( !stricmp( pKeyName, "nomip" ) )
+	else if( V_strieq( pKeyName, "nomip" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_NOMIP, iValue );
 	}
-	else if( !stricmp( pKeyName, "allmips" ) )
+	else if( V_strieq( pKeyName, "allmips" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_ALL_MIPS, iValue );
 	}
-	else if( !stricmp( pKeyName, "nonice" ) )
+	else if( V_strieq( pKeyName, "nonice" ) )
 	{
 		SetFlagValue( m_vtfProcOptions.flags0, VtfProcessingOptions::OPT_FILTER_NICE, !iValue );
 	}
-	else if( !stricmp( pKeyName, "nolod" ) )
+	else if( V_strieq( pKeyName, "nolod" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_NOLOD, iValue );
 	}
-	else if( !stricmp( pKeyName, "procedural" ) )
+	else if( V_strieq( pKeyName, "procedural" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_PROCEDURAL, iValue );
 	}
-	else if( !stricmp( pKeyName, "alphatest" ) )
+	else if( V_strieq( pKeyName, "alphatest" ) )
 	{
 		SetFlagValue( m_vtfProcOptions.flags0, VtfProcessingOptions::OPT_MIP_ALPHATEST, iValue );
 	}
-	else if( !stricmp( pKeyName, "alphatest_threshhold" ) )
+	else if( V_strieq( pKeyName, "alphatest_threshhold" ) )
 	{
 		// dimhotepus: atof -> strtof.
 		m_flAlphaThreshhold = strtof( pKeyValue, nullptr );
 	}
-	else if( !stricmp( pKeyName, "alphatest_hifreq_threshhold" ) )
+	else if( V_strieq( pKeyName, "alphatest_hifreq_threshhold" ) )
 	{
 		// dimhotepus: atof -> strtof.
 		m_flAlphaHiFreqThreshhold = strtof( pKeyValue, nullptr );
 	}
-	else if( !stricmp( pKeyName, "rendertarget" ) )
+	else if( V_strieq( pKeyName, "rendertarget" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_RENDERTARGET, iValue );
 	}
-	else if ( !stricmp( pKeyName, "numchannels" ) )
+	else if ( V_strieq( pKeyName, "numchannels" ) )
 	{
 		m_numChannelsMax = atoi( pKeyValue );
 	}
-	else if ( !stricmp( pKeyName, "nodebug" ) )
+	else if ( V_strieq( pKeyName, "nodebug" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_NODEBUGOVERRIDE, iValue );
 	}
-	else if ( !stricmp( pKeyName, "singlecopy" ) )
+	else if ( V_strieq( pKeyName, "singlecopy" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_SINGLECOPY, iValue );
 	}
-	else if( !stricmp( pKeyName, "oneovermiplevelinalpha" ) )
+	else if( V_strieq( pKeyName, "oneovermiplevelinalpha" ) )
 	{
 		SetFlagValue( m_vtfProcOptions.flags0, VtfProcessingOptions::OPT_SET_ALPHA_ONEOVERMIP, iValue );
 	}
-	else if( !stricmp( pKeyName, "premultcolorbyoneovermiplevel" ) )
+	else if( V_strieq( pKeyName, "premultcolorbyoneovermiplevel" ) )
 	{
 		SetFlagValue( m_vtfProcOptions.flags0, VtfProcessingOptions::OPT_PREMULT_COLOR_ONEOVERMIP, iValue );
 	}
-	else if ( !stricmp( pKeyName, "normaltodudv" ) )
+	else if ( V_strieq( pKeyName, "normaltodudv" ) )
 	{
 		m_bNormalToDuDv = iValue ? true : false;
 		SetFlagValue( m_vtfProcOptions.flags0, VtfProcessingOptions::OPT_NORMAL_DUDV, iValue );
 	}
-	else if ( !stricmp( pKeyName, "stripalphachannel" ) )
+	else if ( V_strieq( pKeyName, "stripalphachannel" ) )
 	{
 		m_bStripAlphaChannel = iValue ? true : false;
 	}
-	else if ( !stricmp( pKeyName, "stripcolorchannel" ) )
+	else if ( V_strieq( pKeyName, "stripcolorchannel" ) )
 	{
 		m_bStripColorChannel = iValue ? true : false;
 	}
-	else if ( !stricmp( pKeyName, "normalalphatodudvluminance" ) )
+	else if ( V_strieq( pKeyName, "normalalphatodudvluminance" ) )
 	{
 		m_bAlphaToLuminance = iValue ? true : false;
 	}
-	else if ( !stricmp( pKeyName, "dudv" ) )
+	else if ( V_strieq( pKeyName, "dudv" ) )
 	{
 		m_bDuDv = iValue ? true : false;
 	}
-	else if( !stricmp( pKeyName, "reduce" ) )
+	else if( V_strieq( pKeyName, "reduce" ) )
 	{
 		m_nReduceX = atoi(pKeyValue);
 		m_nReduceY = m_nReduceX;
 	}
-	else if( !stricmp( pKeyName, "reducex" ) )
+	else if( V_strieq( pKeyName, "reducex" ) )
 	{
 		m_nReduceX = atoi(pKeyValue);
 	}
-	else if( !stricmp( pKeyName, "reducey" ) )
+	else if( V_strieq( pKeyName, "reducey" ) )
 	{
 		m_nReduceY = atoi(pKeyValue);
 	}
-	else if( !stricmp( pKeyName, "maxwidth" ) )
+	else if( V_strieq( pKeyName, "maxwidth" ) )
 	{
 		m_nMaxDimensionX = atoi(pKeyValue);
 	}
-	else if( !stricmp( pKeyName, "maxwidth_360" ) )
+	else if( V_strieq( pKeyName, "maxwidth_360" ) )
 	{
 		m_nMaxDimensionX_360 = atoi(pKeyValue);
 	}
-	else if( !stricmp( pKeyName, "maxheight" ) )
+	else if( V_strieq( pKeyName, "maxheight" ) )
 	{
 		m_nMaxDimensionY = atoi(pKeyValue);
 	}
-	else if( !stricmp( pKeyName, "maxheight_360" ) )
+	else if( V_strieq( pKeyName, "maxheight_360" ) )
 	{
 		m_nMaxDimensionY_360 = atoi(pKeyValue);
 	}
-	else if( !stricmp( pKeyName, "alphatodistance" ) )
+	else if( V_strieq( pKeyName, "alphatodistance" ) )
 	{
 		m_bAlphaToDistance = iValue ? true : false;
 	}
-	else if( !stricmp( pKeyName, "distancespread" ) )
+	else if( V_strieq( pKeyName, "distancespread" ) )
 	{
 		// dimhotepus: atof -> strtof.
 		m_flDistanceSpread = strtof(pKeyValue, nullptr);
 	}
-	else if( !stricmp( pKeyName, "pfmscale" ) )
+	else if( V_strieq( pKeyName, "pfmscale" ) )
 	{
 		// dimhotepus: atof -> strtof.
 		m_pfmscale = strtof(pKeyValue, nullptr);
 		printf("******pfm scale=%f\n",m_pfmscale);
 	}
-	else if ( !stricmp( pKeyName, "pfm" ) )
+	else if ( V_strieq( pKeyName, "pfm" ) )
 	{
 		if ( iValue )
 			g_eMode = Mode::eModePFM;
 	}
-	else if ( !stricmp( pKeyName, "specvar" ) )
+	else if ( V_strieq( pKeyName, "specvar" ) )
 	{
 		int iDecayChannel = -1;
 
-		if ( !stricmp( pKeyValue, "red" ) || !stricmp( pKeyValue, "r" ) )
+		if ( V_strieq( pKeyValue, "red" ) || V_strieq( pKeyValue, "r" ) )
 			iDecayChannel = 0;
-		if ( !stricmp( pKeyValue, "green" ) || !stricmp( pKeyValue, "g" ) )
+		if ( V_strieq( pKeyValue, "green" ) || V_strieq( pKeyValue, "g" ) )
 			iDecayChannel = 1;
-		if ( !stricmp( pKeyValue, "blue" ) || !stricmp( pKeyValue, "b" ) )
+		if ( V_strieq( pKeyValue, "blue" ) || V_strieq( pKeyValue, "b" ) )
 			iDecayChannel = 2;
-		if ( !stricmp( pKeyValue, "alpha" ) || !stricmp( pKeyValue, "a" ) )
+		if ( V_strieq( pKeyValue, "alpha" ) || V_strieq( pKeyValue, "a" ) )
 			iDecayChannel = 3;
 
 		if ( iDecayChannel >= 0 )
@@ -567,12 +567,12 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 			SetFlagValue( m_nFlags, TEXTUREFLAGS_ALL_MIPS, 1 );
 		}
 	}
-	else if ( !stricmp( pKeyName, "mipblend" ) )
+	else if ( V_strieq( pKeyName, "mipblend" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_ALL_MIPS, 1 );
 
 		// Possible values
-		if ( !stricmp( pKeyValue, "detail" ) ) // Skip 2 mips and fade to gray -> (128, 128, 128, -)
+		if ( V_strieq( pKeyValue, "detail" ) ) // Skip 2 mips and fade to gray -> (128, 128, 128, -)
 		{
 			for( int ch = 0; ch < 3; ++ ch )
 			{
@@ -583,7 +583,7 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 			}
 		}
 		/*
-		else if ( !stricmp( pKeyValue, "additive" ) ) // Skip 2 mips and fade to black -> (0, 0, 0, -)
+		else if ( V_strieq( pKeyValue, "additive" ) ) // Skip 2 mips and fade to black -> (0, 0, 0, -)
 		{
 			for( int ch = 0; ch < 3; ++ ch )
 			{
@@ -593,7 +593,7 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 				m_vtfProcOptions.clrDecayGoal[ch] = 0;
 			}
 		}
-		else if ( !stricmp( pKeyValue, "alphablended" ) ) // Skip 2 mips and fade out alpha to 0
+		else if ( V_strieq( pKeyValue, "alphablended" ) ) // Skip 2 mips and fade out alpha to 0
 		{
 			for( int ch = 3; ch < 4; ++ ch )
 			{
@@ -656,7 +656,7 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 			}
 		}
 	}
-	else if( !stricmp( pKeyName, "srgb" ) )
+	else if( V_strieq( pKeyName, "srgb" ) )
 	{
 		SetFlagValue( m_nFlags, TEXTUREFLAGS_SRGB, iValue );
 	}

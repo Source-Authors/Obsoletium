@@ -1481,7 +1481,7 @@ bool CBaseTFPlayer::ClientCommand( const CCommand &args )
 		}
 	}
 
-	if ( !stricmp( cmd, "kd" ) )
+	if ( V_strieq( cmd, "kd" ) )
 	{
 		Vector force( 0, 0, 0 );
 		if ( args.ArgC() == 1 )
@@ -1505,38 +1505,38 @@ bool CBaseTFPlayer::ClientCommand( const CCommand &args )
 			Vector right;
 			AngleVectors( GetAbsAngles(), &fwd, &right, NULL );
 
-			if ( !stricmp( args[ 1 ], "f" ) )
+			if ( V_strieq( args[ 1 ], "f" ) )
 			{
 				force = fwd * -1.0f;
 			}
-			else if ( !stricmp( args[ 1 ], "b" ) )
+			else if ( V_strieq( args[ 1 ], "b" ) )
 			{
 				force = fwd;
 			}
-			else if ( !stricmp( args[ 1 ], "r" ) )
+			else if ( V_strieq( args[ 1 ], "r" ) )
 			{
 				force = right * -1.0f;
 			}			
-			else if ( !stricmp( args[ 1 ], "l" ) )
+			else if ( V_strieq( args[ 1 ], "l" ) )
 			{
 				force = right;
 			}
-			else if ( !stricmp( args[ 1 ], "fr" ) )
+			else if ( V_strieq( args[ 1 ], "fr" ) )
 			{
 				force = fwd * -1.0f;
 				force += right * -1.0f;
 			}
-			else if ( !stricmp( args[ 1 ], "br" ) )
+			else if ( V_strieq( args[ 1 ], "br" ) )
 			{
 				force = fwd;
 				force += right * -1.0f;
 			}
-			else if ( !stricmp( args[ 1 ], "fl" ) )
+			else if ( V_strieq( args[ 1 ], "fl" ) )
 			{
 				force = fwd * -1.0f;
 				force += right;
 			}			
-			else if ( !stricmp( args[ 1 ], "bl" ) )
+			else if ( V_strieq( args[ 1 ], "bl" ) )
 			{
 				force = fwd;
 				force += right;

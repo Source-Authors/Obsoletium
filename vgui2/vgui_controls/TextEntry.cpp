@@ -3691,14 +3691,14 @@ void TextEntry::OnSliderMoved()
 //-----------------------------------------------------------------------------
 bool TextEntry::RequestInfo(KeyValues *outputData)
 {
-	if (!stricmp(outputData->GetName(), "GetText"))
+	if (V_strieq(outputData->GetName(), "GetText"))
 	{
 		wchar_t wbuf[256];
 		GetText(wbuf);
 		outputData->SetWString("text", wbuf);
 		return true;
 	}
-	else if (!stricmp(outputData->GetName(), "GetState"))
+	else if (V_strieq(outputData->GetName(), "GetState"))
 	{
 		char buf[64];
 		GetText(buf);

@@ -179,7 +179,7 @@ void virtualmodel_t::AppendSequences( intp group, const studiohdr_t *pStudioHdr 
 				const auto &vseq = seq[k];
 				const studiohdr_t *hdr = m_group[ vseq.group ].GetStudioHdr();
 				const char *s2 = hdr->pLocalSeqdesc( vseq.index )->pszLabel();
-				if ( !stricmp( s1, s2 ) )
+				if ( V_strieq( s1, s2 ) )
 				{
 					break;
 				}

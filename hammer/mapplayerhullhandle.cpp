@@ -41,7 +41,7 @@ CMapClass *CMapPlayerHullHandle::Create(CHelperInfo *pHelperInfo, CMapEntity *pP
 {
 	static char *pszDefaultKeyName = "origin";
 
-	bool bDrawLineToParent = !stricmp(pHelperInfo->GetName(), "vecline");
+	bool bDrawLineToParent = V_strieq(pHelperInfo->GetName(), "vecline");
 
 	const char *pszKey = pHelperInfo->GetParameter(0);
 	if (pszKey == NULL)

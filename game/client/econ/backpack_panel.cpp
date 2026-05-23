@@ -135,7 +135,7 @@ static bool HasRemovableCustomName ( const CEconItemView *pEconItemView, const c
 	if ( !pEconItemView->GetItemDefinition() )
 		return false;
 
-	if ( pEconItemView->GetQuality() == AE_UNIQUE && pEconItemView->GetItemDefinition()->GetArmoryDescString() && !V_stricmp( pEconItemView->GetItemDefinition()->GetArmoryDescString(), "stockitem" ) )
+	if ( pEconItemView->GetQuality() == AE_UNIQUE && pEconItemView->GetItemDefinition()->GetArmoryDescString() && V_strieq( pEconItemView->GetItemDefinition()->GetArmoryDescString(), "stockitem" ) )
 		return false;
 
 	return pEconItemView->GetSOCData() && pEconItemView->GetSOCData()->GetCustomName();
@@ -146,7 +146,7 @@ static bool HasRemovableCustomDesc ( const CEconItemView *pEconItemView, const c
 	if ( !pEconItemView->GetItemDefinition() )
 		return false;
 
-	if ( pEconItemView->GetQuality() == AE_UNIQUE && pEconItemView->GetItemDefinition()->GetArmoryDescString() && !V_stricmp( pEconItemView->GetItemDefinition()->GetArmoryDescString(), "stockitem" ) )
+	if ( pEconItemView->GetQuality() == AE_UNIQUE && pEconItemView->GetItemDefinition()->GetArmoryDescString() && V_strieq( pEconItemView->GetItemDefinition()->GetArmoryDescString(), "stockitem" ) )
 		return false;
 
 	return pEconItemView->GetSOCData() && pEconItemView->GetSOCData()->GetCustomDesc();

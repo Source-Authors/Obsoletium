@@ -2296,7 +2296,7 @@ void CTFPlayerModelPanel::ProcessExpression( CChoreoScene *scene, CChoreoEvent *
 				if ( !pSetting )
 					continue;
 
-				if ( !V_stricmp( pSetting->pszName(), name ) )
+				if ( V_strieq( pSetting->pszName(), name ) )
 					break;
 			}
 
@@ -2371,7 +2371,7 @@ void CTFPlayerModelPanel::AddFlexSetting( const char *expr, float scale, const f
 
 		const char *name = pSetting->pszName();
 
-		if ( !V_stricmp( name, expr ) )
+		if ( V_strieq( name, expr ) )
 			break;
 	}
 

@@ -41,7 +41,7 @@ CON_COMMAND( replay_docleanup, "Deletes stale session data from the fileserver. 
 	bool bForceCleanAll = false;
 	if ( args.ArgC() == 2 )
 	{
-		if ( !V_stricmp( args[1], "force" ) )
+		if ( V_strieq( args[1], "force" ) )
 		{
 			bForceCleanAll = true;
 		}

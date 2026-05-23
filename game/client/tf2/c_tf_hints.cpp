@@ -323,7 +323,7 @@ const char *CHintDeployWeapon::GetKeyName( void )
 				if ( !weapon )
 					continue;
 				
-				if ( !stricmp( weapon->GetName(), GetWeaponType() ) )
+				if ( V_strieq( weapon->GetName(), GetWeaponType() ) )
 				{
 					Q_snprintf( keyname, sizeof( keyname ), GetKeyNameForBinding( VarArgs( "slot%i", slot + 1 ) ) );
 					break;
@@ -377,7 +377,7 @@ void CHintDeployWeapon::Think( void )
 	if ( !weapon )
 		return;
 	
-	if ( !stricmp( weapon->GetClientClass()->m_pNetworkName, "CWeaponBuilder" ) )
+	if ( V_strieq( weapon->GetClientClass()->m_pNetworkName, "CWeaponBuilder" ) )
 	{
 		m_bCompleted = true;
 	}
@@ -648,7 +648,7 @@ void CHintBuilderSelection::Think( void )
 	if ( !selection )
 		return;
 
-	if ( !stricmp( selection, GetSelection() ) )
+	if ( V_strieq( selection, GetSelection() ) )
 	{
 		m_bCompleted = true;
 	}
@@ -1054,7 +1054,7 @@ C_BaseCombatWeapon *CHintHudWeaponFlash::GetWeaponOfType( const char *type )
 				if ( !weapon )
 					continue;
 			
-				if ( !stricmp( weapon->GetName(), type ) )
+				if ( V_strieq( weapon->GetName(), type ) )
 				{
 					return weapon;
 				}
@@ -1074,13 +1074,13 @@ void CHintHudWeaponFlash::SetKeyValue( const char *key, const char *value )
 {
 	BaseClass::SetKeyValue( key, value );
 
-	if ( !stricmp( key, "weapon" ) )
+	if ( V_strieq( key, "weapon" ) )
 	{
 		SetWeaponName( value );
 
 		ComputeTitle();
 	}
-	else if ( !stricmp( key, "weapontype" ) )
+	else if ( V_strieq( key, "weapontype" ) )
 	{
 		// Find the weapon itself
 		C_BaseCombatWeapon *w = GetWeaponOfType( value );
@@ -1213,7 +1213,7 @@ HINTCOMPLETIONFUNCTION LookupCompletionFunction( const char *name )
 		if ( !f->name )
 			break;
 		
-		if ( !stricmp( f->name, name ) )
+		if ( V_strieq( f->name, name ) )
 		{
 			return f->pfn;
 		}
@@ -1261,7 +1261,7 @@ CHintItemBase *CreateHintItem( vgui::Panel *parent, const char *name )
 		if ( !hi->name )
 			break;
 		
-		if ( !stricmp( hi->name, name ) )
+		if ( V_strieq( hi->name, name ) )
 		{
 			if ( hi->pfn )
 			{
@@ -1375,7 +1375,7 @@ C_TFBaseHint *FactoryCreateHint( const char *name, int id, int entity )
 		if ( !hi->name )
 			break;
 		
-		if ( !stricmp( hi->name, name ) )
+		if ( V_strieq( hi->name, name ) )
 		{
 			if ( hi->pfn )
 			{
@@ -1451,7 +1451,7 @@ C_TFBaseHint *C_TFBaseHint::CreateHint( int id, const char *subsection, int enti
 			// Use classname string to construct hint
 			const char *defaultclass = "C_TFBaseHint";
 			const char *classname = pkvHint->GetString( "classname" );
-			if ( !classname || !classname[ 0 ] || !stricmp( classname, "default" ) )
+			if ( !classname || !classname[ 0 ] || V_strieq( classname, "default" ) )
 			{
 				classname = defaultclass;
 			}

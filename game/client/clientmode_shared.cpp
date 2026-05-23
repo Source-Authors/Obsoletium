@@ -225,7 +225,7 @@ static void __MsgFunc_VGUIMenu( bf_read &msg )
 
 		// !KLUDGE! Whitelist of URL protocols formats for MOTD
 		if (
-			!V_stricmp( panelname, PANEL_INFO ) // MOTD
+			V_strieq( panelname, PANEL_INFO ) // MOTD
 			&& keys->GetInt( "type", 0 ) == 2 // URL message type
 		) {
 			const char *pszURL = keys->GetString( "msg", "" );

@@ -990,7 +990,7 @@ int FindHitboxSetByName( CStudioHdr *pstudiohdr, const char *name )
 		if ( !set )
 			continue;
 
-		if ( !stricmp( set->pszName(), name ) )
+		if ( V_strieq( set->pszName(), name ) )
 			return i;
 	}
 

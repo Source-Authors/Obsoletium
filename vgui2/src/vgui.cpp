@@ -809,7 +809,7 @@ bool CVGui::DispatchMessages()
 					&& strcmp(paramsName, "KeyFocusTicked")
 					&& strcmp(paramsName, "CursorMoved"))
 				{
-					if (!stricmp(paramsName, "command"))
+					if (V_strieq(paramsName, "command"))
 					{
 						g_pIVgui->DPrintf2( "%s Queue dispatching command( %s, %s -- %i )\n", qname, paramsName, messageItem->_params->GetString("command"), messageItem->_messageID );
 					}

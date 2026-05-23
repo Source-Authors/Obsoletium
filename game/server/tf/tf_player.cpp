@@ -17156,12 +17156,12 @@ void CTFPlayer::Taunt( taunts_t iTauntIndex, int iTauntConcept )
 	// Setup taunt attacks. Hacky, but a lot easier to do than getting server side anim events working.
 	if ( IsPlayerClass(TF_CLASS_PYRO) )
 	{
-		if ( !V_stricmp( szResponse, "scenes/player/pyro/low/taunt02.vcd" ) )
+		if ( V_strieq( szResponse, "scenes/player/pyro/low/taunt02.vcd" ) )
 		{
 			m_flTauntAttackTime = gpGlobals->curtime + 2.1f;
 			m_iTauntAttack = TAUNTATK_PYRO_HADOUKEN;
 		}
-		else if ( !V_stricmp( szResponse, "scenes/player/pyro/low/taunt_bubbles.vcd" ) )
+		else if ( V_strieq( szResponse, "scenes/player/pyro/low/taunt_bubbles.vcd" ) )
 		{
 			m_flTauntAttackTime = gpGlobals->curtime + 3.0f;
 			m_iTauntAttack = TAUNTATK_PYRO_ARMAGEDDON;
@@ -17186,7 +17186,7 @@ void CTFPlayer::Taunt( taunts_t iTauntIndex, int iTauntConcept )
 
 			DispatchParticleEffect( "pyrotaunt_rainbow_norainbow", PATTACH_ABSORIGIN_FOLLOW, pTarget );
 		}
-		else if ( !V_stricmp( szResponse, "scenes/player/pyro/low/taunt_scorch_shot.vcd" ) )
+		else if ( V_strieq( szResponse, "scenes/player/pyro/low/taunt_scorch_shot.vcd" ) )
 		{
 			m_flTauntAttackTime = gpGlobals->curtime + 1.9f;
 			m_iTauntAttack = TAUNTATK_PYRO_SCORCHSHOT;
@@ -17194,7 +17194,7 @@ void CTFPlayer::Taunt( taunts_t iTauntIndex, int iTauntConcept )
 	}
 	else if ( IsPlayerClass(TF_CLASS_HEAVYWEAPONS) )
 	{
-		if ( !V_stricmp( szResponse, "scenes/player/heavy/low/taunt03_v1.vcd" ) )
+		if ( V_strieq( szResponse, "scenes/player/heavy/low/taunt03_v1.vcd" ) )
 		{
 			m_flTauntAttackTime = gpGlobals->curtime + 1.8;
 			m_iTauntAttack = TAUNTATK_HEAVY_HIGH_NOON;
@@ -17211,7 +17211,7 @@ void CTFPlayer::Taunt( taunts_t iTauntIndex, int iTauntConcept )
 	}
 	else if ( IsPlayerClass( TF_CLASS_SCOUT ) )
 	{
-		if ( !V_stricmp( szResponse, "scenes/player/scout/low/taunt05_v1.vcd" ) )
+		if ( V_strieq( szResponse, "scenes/player/scout/low/taunt05_v1.vcd" ) )
 		{
 			m_flTauntAttackTime = gpGlobals->curtime + 4.03f;
 			m_iTauntAttack = TAUNTATK_SCOUT_GRAND_SLAM;
@@ -17219,7 +17219,7 @@ void CTFPlayer::Taunt( taunts_t iTauntIndex, int iTauntConcept )
 	}
 	else if ( IsPlayerClass( TF_CLASS_MEDIC ) )
 	{
-		if ( !V_stricmp( szResponse, "scenes/player/medic/low/taunt06.vcd" ) )
+		if ( V_strieq( szResponse, "scenes/player/medic/low/taunt06.vcd" ) )
 		{
 			m_flTauntAttackTime = gpGlobals->curtime + 0.8f;
 			m_flTauntInhaleTime = gpGlobals->curtime + 1.8f;
@@ -17230,7 +17230,7 @@ void CTFPlayer::Taunt( taunts_t iTauntIndex, int iTauntConcept )
 
 			m_iTauntAttack = TAUNTATK_MEDIC_INHALE;
 		}
-		else if ( !V_stricmp( szResponse, "scenes/player/medic/low/taunt08.vcd" ) )
+		else if ( V_strieq( szResponse, "scenes/player/medic/low/taunt08.vcd" ) )
 		{
 			m_flTauntAttackTime = gpGlobals->curtime + 2.2f;
 			m_iTauntAttack = TAUNTATK_MEDIC_UBERSLICE_IMPALE;
@@ -17246,7 +17246,7 @@ void CTFPlayer::Taunt( taunts_t iTauntIndex, int iTauntConcept )
 	}
 	else if ( IsPlayerClass( TF_CLASS_SNIPER ) )
 	{
-		if ( !V_stricmp( szResponse, "scenes/player/sniper/low/taunt04.vcd" ) )
+		if ( V_strieq( szResponse, "scenes/player/sniper/low/taunt04.vcd" ) )
 		{
 			m_flTauntAttackTime = gpGlobals->curtime + 0.85f;
 			m_iTauntAttack = TAUNTATK_SNIPER_ARROW_STAB_IMPALE;
@@ -17254,7 +17254,7 @@ void CTFPlayer::Taunt( taunts_t iTauntIndex, int iTauntConcept )
 	}
 	else if ( IsPlayerClass( TF_CLASS_SOLDIER ) )
 	{
-		if ( !V_stricmp( szResponse, "scenes/player/soldier/low/taunt05.vcd" ) )
+		if ( V_strieq( szResponse, "scenes/player/soldier/low/taunt05.vcd" ) )
 		{
 			if ( IsWormsGearEquipped() )
 			{
@@ -17269,7 +17269,7 @@ void CTFPlayer::Taunt( taunts_t iTauntIndex, int iTauntConcept )
 	}
 	else if ( IsPlayerClass( TF_CLASS_DEMOMAN ) )
 	{
-		if ( !V_stricmp( szResponse, "scenes/player/demoman/low/taunt09.vcd" ) )
+		if ( V_strieq( szResponse, "scenes/player/demoman/low/taunt09.vcd" ) )
 		{
 			m_flTauntAttackTime = gpGlobals->curtime + 2.55f;
 			m_iTauntAttack = TAUNTATK_DEMOMAN_BARBARIAN_SWING;
@@ -17277,12 +17277,12 @@ void CTFPlayer::Taunt( taunts_t iTauntIndex, int iTauntConcept )
 	}
 	else if ( IsPlayerClass( TF_CLASS_ENGINEER ) )
 	{
-		if ( !V_stricmp( szResponse, "scenes/player/engineer/low/taunt07.vcd" ) )
+		if ( V_strieq( szResponse, "scenes/player/engineer/low/taunt07.vcd" ) )
 		{
 			m_flTauntAttackTime = gpGlobals->curtime + 3.695f;
 			m_iTauntAttack = TAUNTATK_ENGINEER_GUITAR_SMASH;
 		}
-		else if ( !V_stricmp( szResponse, "scenes/player/engineer/low/taunt09.vcd" ) )
+		else if ( V_strieq( szResponse, "scenes/player/engineer/low/taunt09.vcd" ) )
 		{
 			m_flTauntAttackTime = gpGlobals->curtime + 3.2f;
 			m_iTauntAttack = TAUNTATK_ENGINEER_ARM_IMPALE;

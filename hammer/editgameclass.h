@@ -197,7 +197,7 @@ inline bool CEditGameClass::IsClass(const char *pszClass) const
 	{
 		return(m_pClass != NULL);
 	}
-	return((m_pClass != NULL) && (!stricmp(pszClass, m_szClass)));
+	return((m_pClass != NULL) && (V_strieq(pszClass, m_szClass)));
 }
 
 

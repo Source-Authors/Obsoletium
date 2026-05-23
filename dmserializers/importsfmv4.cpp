@@ -61,7 +61,7 @@ void CImportSFMV4::FixupElement( CDmElement *pElement )
 
 	const char *pType = pElement->GetTypeString();
 
-	if ( !V_stricmp( pType, "DmeCamera" ) )
+	if ( V_strieq( pType, "DmeCamera" ) )
 	{
 		CDmAttribute *pOldToneMapScaleAttr = pElement->GetAttribute( "toneMapScale" );
 		float fNewBloomScale = pOldToneMapScaleAttr->GetValue<float>( );
