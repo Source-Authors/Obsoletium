@@ -1767,7 +1767,7 @@ void NET_LogBadPacket(netpacket_t * packet)
 	// dimhotepus: 1000 -> 1024.
 	while ( i < 1024 && !done )
 	{
-		Q_snprintf( filename, sizeof( filename ), "badpacket%03i.dat", i );
+		V_sprintf_safe( filename, "badpacket%03i.dat", i );
 		FileHandle_t fp = g_pFileSystem->Open( filename, "rb" );
 		if ( !fp )
 		{
