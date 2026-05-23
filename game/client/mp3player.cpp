@@ -795,6 +795,8 @@ void CMP3Player::RemoveTempSounds()
 	char const *fn = g_pFullFileSystem->FindFirstEx( path, "MOD", &fh );
 	if ( fn )
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->FindClose( fh ));
+
 		do
 		{
 			if ( fn[0] != '.'  )
@@ -813,8 +815,6 @@ void CMP3Player::RemoveTempSounds()
 			fn = g_pFullFileSystem->FindNext( fh );
 
 		} while ( fn );
-
-		g_pFullFileSystem->FindClose( fh );
 	}
 }
 
@@ -1093,6 +1093,8 @@ void CMP3Player::RecursiveFindMP3Files( SoundDirectory_t *root, char const *curr
 	char const *fn = g_pFullFileSystem->FindFirstEx( path, pathID, &fh );
 	if ( fn )
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->FindClose( fh ));
+
 		do
 		{
 			if ( fn[0] != '.' && Q_strnicmp( fn, "_mp3", 4 ) )
@@ -1146,8 +1148,6 @@ void CMP3Player::RecursiveFindMP3Files( SoundDirectory_t *root, char const *curr
 			fn = g_pFullFileSystem->FindNext( fh );
 
 		} while ( fn );
-
-		g_pFullFileSystem->FindClose( fh );
 	}
 }
 
@@ -2034,10 +2034,11 @@ void CMP3Player::SaveDb( char const *filename )
 	bpr( 0, buf, "}\n" );
 
 	FileHandle_t fh = g_pFullFileSystem->Open( filename, "wb" );
-	if ( FILESYSTEM_INVALID_HANDLE != fh )
+	if ( fh )
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close( fh ));
+
 		g_pFullFileSystem->Write( buf.Base(), buf.TellPut(), fh );
-		g_pFullFileSystem->Close( fh );
 		m_bDirty = false;
 	}
 	else
@@ -2153,8 +2154,10 @@ void CMP3Player::SavePlayList( char const *filename )
     const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
 
 	FileHandle_t fh = g_pFullFileSystem->Open( filename, "wb" );
-	if ( FILESYSTEM_INVALID_HANDLE != fh )
+	if ( fh )
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close( fh ));
+
 		m_PlayListFileName = filename;
 
 		CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
@@ -2194,8 +2197,6 @@ void CMP3Player::SavePlayList( char const *filename )
 		}
 
 		bpr( 0, buf, "}\n" );
-
-		g_pFullFileSystem->Close( fh );
 
 		SetMostRecentPlayList( filename );
 	}
@@ -2332,8 +2333,10 @@ void CMP3Player::SaveSettings()
 	const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
 
 	FileHandle_t fh = g_pFullFileSystem->Open( MP3_SETTINGS_FILE, "wb" );
-	if ( FILESYSTEM_INVALID_HANDLE != fh )
+	if ( fh )
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close( fh ));
+
 		CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 		buf.Printf( "// mp3 settings, automatically generated\n" );
@@ -2366,7 +2369,6 @@ void CMP3Player::SaveSettings()
 		bpr( 0, buf, "}\n" );
 
 		g_pFullFileSystem->Write( buf.Base(), buf.TellPut(), fh );
-		g_pFullFileSystem->Close( fh );
 	}
 }
 
