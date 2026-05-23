@@ -542,7 +542,7 @@ bool CBaseClient::SendSignonData( void )
 
 	if ( m_Server->m_Signon.IsOverflowed() )
 	{
-		Host_Error( "Signon buffer overflowed %i bytes!!!\n", m_Server->m_Signon.GetNumBytesWritten() );
+		Host_Error( "Signon buffer overflowed %zd bytes!!!\n", m_Server->m_Signon.GetNumBytesWritten() );
 		return false;
 	}
 
