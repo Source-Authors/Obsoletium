@@ -2390,7 +2390,7 @@ void CBaseFileSystem::ParsePathID( const char* &pFilename, const char* &pPathID,
 {
 	tempPathID[0] = 0;
 	
-	if ( !pFilename || pFilename[0] == 0 )
+	if ( Q_isempty( pFilename ) )
 		return;
 
 	// FIXME: Pain! Backslashes are used to denote network drives, forward to denote path ids
