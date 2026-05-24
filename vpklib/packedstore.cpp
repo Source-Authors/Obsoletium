@@ -1861,7 +1861,7 @@ intp CPackedStore::GetFileAndDirLists( CUtlStringList &outDirnames, CUtlStringLi
 // dimhotepus: To correctly compare strings in hash table.
 struct StringEqual
 {
-	[[nodiscard]] bool operator()( const char *a, const char *b) const { return V_strcmp(a, b) == 0; }
+	[[nodiscard]] bool operator()( const char *a, const char *b) const { return V_streq(a, b); }
 };
 
 void CPackedStore::BuildFindFirstCache()

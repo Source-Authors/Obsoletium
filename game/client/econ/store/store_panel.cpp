@@ -117,12 +117,12 @@ public:
 	virtual void OnCommand( const char *command ) OVERRIDE
 	{
 		int nSecondsVisible = gpGlobals->curtime - m_flCreationTime;
-		if ( V_strcmp( command, "add_stamp_to_cart" ) == 0 )
+		if ( V_streq( command, "add_stamp_to_cart" ) )
 		{
 			FinishUp();
 			CStorePanel::ConfirmUpsellStamps( true, hItemDef, nSecondsVisible );
 		}
-		else if ( V_strcmp( command, "nope" ) == 0 )
+		else if ( V_streq( command, "nope" ) )
 		{
 			FinishUp();
 			CStorePanel::ConfirmUpsellStamps( false, hItemDef, nSecondsVisible );

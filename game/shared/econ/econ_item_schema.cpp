@@ -3888,10 +3888,10 @@ CEconItemAttributeDefinition &CEconItemAttributeDefinition::operator=( const CEc
 		m_pszArmoryDesc = m_pKVAttribute->GetString( "armory_desc", NULL );
 		m_pszAttributeClass = m_pKVAttribute->GetString( "attribute_class", NULL );
 
-		Assert( V_strcmp( m_pszDefinitionName, rhs.m_pszDefinitionName ) == 0 );
-		Assert( V_strcmp( m_pszDescriptionString, rhs.m_pszDescriptionString ) == 0 );
-		Assert( V_strcmp( m_pszArmoryDesc, rhs.m_pszArmoryDesc ) == 0 );
-		Assert( V_strcmp( m_pszAttributeClass, rhs.m_pszAttributeClass ) == 0 );
+		Assert( V_streq( m_pszDefinitionName, rhs.m_pszDefinitionName ) );
+		Assert( V_streq( m_pszDescriptionString, rhs.m_pszDescriptionString ) );
+		Assert( V_streq( m_pszArmoryDesc, rhs.m_pszArmoryDesc ) );
+		Assert( V_streq( m_pszAttributeClass, rhs.m_pszAttributeClass ) );
 	}
 	else
 	{

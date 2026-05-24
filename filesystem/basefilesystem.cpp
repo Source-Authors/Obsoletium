@@ -1313,7 +1313,7 @@ void CBaseFileSystem::AddSearchPathInternal( const char *pPath, const char *path
 	}
 
 	// dimhotepus: As Raphael suggested, cache base path here.
-	if ( V_strcmp( pathID, "BASE_PATH" ) == 0 )
+	if ( V_streq( pathID, "BASE_PATH" ) )
 	{
 		V_strcpy_safe( m_pBaseDir, newPath );
 		m_iBaseLength = V_strlen( m_pBaseDir );

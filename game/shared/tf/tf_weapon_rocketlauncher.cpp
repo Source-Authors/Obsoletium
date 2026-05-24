@@ -202,8 +202,8 @@ void CTFRocketLauncher::Precache()
 
 void CTFRocketLauncher::ModifyEmitSoundParams( EmitSound_t &params )
 {
-	bool bBaseReloadSound = V_strcmp( params.m_pSoundName, "Weapon_RPG.Reload" ) == 0;
-	if ( AutoFiresFullClip() && ( bBaseReloadSound || V_strcmp( params.m_pSoundName, "Weapon_DumpsterRocket.Reload" ) == 0 ) )
+	bool bBaseReloadSound = V_streq( params.m_pSoundName, "Weapon_RPG.Reload" );
+	if ( AutoFiresFullClip() && ( bBaseReloadSound || V_streq( params.m_pSoundName, "Weapon_DumpsterRocket.Reload" ) ) )
 	{
 		float fMaxAmmoInClip = GetMaxClip1();
 		float fAmmoPercentage = static_cast< float >( m_nReloadPitchStep ) / fMaxAmmoInClip;

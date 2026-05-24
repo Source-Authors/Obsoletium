@@ -317,71 +317,71 @@ IViewPortPanel* TFViewport::CreatePanelByName(const char *szPanelName)
 
 	// overwrite MOD specific panel creation
 
-	if ( Q_strcmp( PANEL_SCOREBOARD, szPanelName ) == 0 )
+	if ( V_streq( PANEL_SCOREBOARD, szPanelName ) )
 	{
 		newpanel = new CTFClientScoreBoardDialog( this );
 	}
-	else if ( Q_strcmp( PANEL_SPECGUI, szPanelName ) == 0 )
+	else if ( V_streq( PANEL_SPECGUI, szPanelName ) )
 	{
 		newpanel = new CTFSpectatorGUI( this );	
 	}
-	else if ( Q_strcmp( PANEL_SPECMENU, szPanelName ) == 0 )
+	else if ( V_streq( PANEL_SPECMENU, szPanelName ) )
 	{
 //		newpanel = new CTFSpectatorGUI( this );	
 	}
-	else if ( Q_strcmp( PANEL_OVERVIEW, szPanelName ) == 0 )
+	else if ( V_streq( PANEL_OVERVIEW, szPanelName ) )
 	{
 //		newpanel = new CTFMapOverview( this );
 	}
-	else if ( Q_strcmp( PANEL_INFO, szPanelName ) == 0 )
+	else if ( V_streq( PANEL_INFO, szPanelName ) )
 	{
 		newpanel = new CTFTextWindow( this );
 	}
-	else if ( Q_strcmp( PANEL_MAPINFO, szPanelName ) == 0 )
+	else if ( V_streq( PANEL_MAPINFO, szPanelName ) )
 	{
 		newpanel = new CTFMapInfoMenu( this );
 	}
-	else if ( Q_strcmp( PANEL_ROUNDINFO, szPanelName ) == 0 )
+	else if ( V_streq( PANEL_ROUNDINFO, szPanelName ) )
 	{
 		newpanel = new CTFRoundInfo( this );
 	}
-	else if ( Q_strcmp( PANEL_TEAM, szPanelName ) == 0 )
+	else if ( V_streq( PANEL_TEAM, szPanelName ) )
 	{
 		newpanel = new CTFTeamMenu( this );	
 	}
-	else if ( Q_strcmp( PANEL_CLASS_RED, szPanelName ) == 0 )
+	else if ( V_streq( PANEL_CLASS_RED, szPanelName ) )
 	{
 		newpanel = new CTFClassMenu_Red( this );	
 	}
-	else if ( Q_strcmp( PANEL_CLASS_BLUE, szPanelName ) == 0 )
+	else if ( V_streq( PANEL_CLASS_BLUE, szPanelName ) )
 	{
 		newpanel = new CTFClassMenu_Blue( this );	
 	}
-	else if ( Q_strcmp( PANEL_INTRO, szPanelName ) == 0 )
+	else if ( V_streq( PANEL_INTRO, szPanelName ) )
 	{
 		newpanel = new CTFIntroMenu( this );
 	}
-	else if ( Q_strcmp( PANEL_ARENA_TEAM, szPanelName ) == 0 )
+	else if ( V_streq( PANEL_ARENA_TEAM, szPanelName ) )
 	{
 		newpanel = new CTFArenaTeamMenu( this );
 	}
-	else if ( Q_strcmp( PANEL_ARENA_WIN, szPanelName ) == 0 )
+	else if ( V_streq( PANEL_ARENA_WIN, szPanelName ) )
 	{
 		newpanel = new CTFArenaWinPanel( this );
 	}
-	else if ( Q_strcmp( PANEL_PVE_WIN, szPanelName ) == 0 )
+	else if ( V_streq( PANEL_PVE_WIN, szPanelName ) )
 	{
 		newpanel = new CTFPVEWinPanel( this );
 	}
-	else if ( Q_strcmp( PANEL_GIVEAWAY_ITEM, szPanelName ) == 0 )
+	else if ( V_streq( PANEL_GIVEAWAY_ITEM, szPanelName ) )
 	{
 		newpanel = new CTFGiveawayItemPanel( this );
 	}
-	else if ( Q_strcmp( PANEL_MAINMENUOVERRIDE, szPanelName ) == 0 )
+	else if ( V_streq( PANEL_MAINMENUOVERRIDE, szPanelName ) )
 	{
 		newpanel = new CHudMainMenuOverride( this );
 	}
-	else if ( V_strcmp( PANEL_QUEST_LOG, szPanelName ) == 0 )
+	else if ( V_streq( PANEL_QUEST_LOG, szPanelName ) )
 	{
 		newpanel = new CQuestLogPanel( this );
 	}

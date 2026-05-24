@@ -481,7 +481,7 @@ void CTFPlayerModelPanel::FireEvent( const char *pszEventName, const char *pszEv
 {
 	//Plat_DebugString( CFmtStr( "********* ANIM EVENT: %s\n", pszEventName ) );
 
-	if ( V_strcmp( pszEventName, "AE_WPN_HIDE" ) == 0 )
+	if ( V_streq( pszEventName, "AE_WPN_HIDE" ) )
 	{
 		int nWeaponIndex = GetMergeMDLIndex( static_cast<IClientRenderable*>(m_pHeldItem) );
 		if ( nWeaponIndex >= 0 )
@@ -489,7 +489,7 @@ void CTFPlayerModelPanel::FireEvent( const char *pszEventName, const char *pszEv
 			m_aMergeMDLs[nWeaponIndex].m_bDisabled = true;
 		}
 	}
-	else if ( V_strcmp( pszEventName, "AE_WPN_UNHIDE" ) == 0 )
+	else if ( V_streq( pszEventName, "AE_WPN_UNHIDE" ) )
 	{
 		int nWeaponIndex = GetMergeMDLIndex( static_cast<IClientRenderable*>(m_pHeldItem) );
 		if ( nWeaponIndex >= 0 )

@@ -535,7 +535,7 @@ public:
 		else if ( eCanGameDLLProvide == IServerGameDLL::eCanProvideLevel_CanProvide )
 		{
 			// See if the game dll fixed up the map name
-			return ( V_strcmp( szOriginalName, pMapName ) == 0 ) ? eFindMap_Found : eFindMap_NonCanonical;
+			return V_streq( szOriginalName, pMapName ) ? eFindMap_Found : eFindMap_NonCanonical;
 		}
 
 		AssertMsg( eCanGameDLLProvide == IServerGameDLL::eCanProvideLevel_CannotProvide,

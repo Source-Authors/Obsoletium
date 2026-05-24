@@ -344,7 +344,7 @@ void CPopulationManager::FireGameEvent( IGameEvent *event )
 {
 	const char *pEventName = event->GetName();
 
-	if ( V_strcmp( "pve_win_panel", pEventName ) == 0 )
+	if ( V_streq( "pve_win_panel", pEventName ) )
 	{
 		// Always release people even if the match isn't ending
 		// XXX(JohnS): This is just how the code was, but why wouldn't the match be ending?

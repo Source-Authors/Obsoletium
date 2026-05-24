@@ -396,12 +396,12 @@ public:
 	virtual bool BForceSquarePreviewImage( void ) { return true; }
 	virtual EWorkshopFileType WorkshipFileTypeForFile( const char *pszFileName ) {
 		const char *pExt = V_GetFileExtension( pszFileName );
-		if ( pExt && V_strcmp( pExt, "bsp" ) == 0 )
+		if ( pExt && V_streq( pExt, "bsp" ) )
 		{
 			return k_EWorkshopFileTypeCommunity;
 		}
 
-		AssertMsg( pExt && V_strcmp( pExt, "zip" ) == 0, "Unrecognized file type, defaulting to microtransaction\n" );
+		AssertMsg( pExt && V_streq( pExt, "zip" ), "Unrecognized file type, defaulting to microtransaction\n" );
 		return k_EWorkshopFileTypeMicrotransaction;
 	}
 	virtual const char *GetPreviewFileTypes( void )	{ return "*.tga,*.jpg,*.png"; }

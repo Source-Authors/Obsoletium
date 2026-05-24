@@ -2812,11 +2812,11 @@ void CElementPropertiesTreeInternal::OnFileSelected( KeyValues *params )
 	const char *pFullPath = params->GetString( "fullpath" );
 	KeyValues *pContext = params->FindKey( "context" );
 	const char *pCommand = pContext->GetString( "command" );
-	if ( V_strcmp( pCommand, "OnImportElement" ) == 0 )
+	if ( V_streq( pCommand, "OnImportElement" ) )
 	{
 		OnImportElement( pFullPath, pContext );
 	}
-	else if ( V_strcmp( pCommand, "OnExportElement" ) == 0 )
+	else if ( V_streq( pCommand, "OnExportElement" ) )
 	{
 		OnExportElement( pFullPath, pContext );
 	}

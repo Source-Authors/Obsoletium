@@ -2070,13 +2070,13 @@ void CHudUpgradePanel::OnCommand( const char *command )
 			}
 		}
 	}
-	else if ( V_strcmp( command, "quick_equip_bottle" ) == 0 )
+	else if ( V_streq( command, "quick_equip_bottle" ) )
 	{
 		QuickEquipBottle();
 
 		return;
 	}
-	else if ( V_strcmp( command, "open_charinfo_direct" ) == 0 )
+	else if ( V_streq( command, "open_charinfo_direct" ) )
 	{
 		m_bShowUpgradeMenu = false;
 		m_bCancelUpgrades = true;
@@ -2136,7 +2136,7 @@ void CHudUpgradePanel::OnCommand( const char *command )
 	{
 		UpdateTip();
 	}
-	else if ( V_strcmp( command, "respec" ) == 0 )
+	else if ( V_streq( command, "respec" ) )
 	{
 		if ( m_hPlayer )
 		{

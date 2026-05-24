@@ -173,7 +173,7 @@ struct SCSSDeathData : public BaseStatData
 		
 		if ( pszWeaponName )
 		{
-			if ( V_strcmp(pszWeaponName, "player") == 0 )
+			if ( V_streq(pszWeaponName, "player") )
 			{
 				// get the player's weapon
 				if ( pCSPlayer && pCSPlayer->GetActiveCSWeapon() )

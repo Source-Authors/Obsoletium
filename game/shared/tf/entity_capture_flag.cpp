@@ -722,12 +722,12 @@ void CCaptureFlag::PlaySound( IRecipientFilter& filter, const char *pszString, i
 
 		// Only play the reset sound in MVM
 		// Other flag announcements are too noisy
-		if ( V_strcmp( pszString, TF_MVM_AD_ENEMY_RETURNED ) == 0 )
+		if ( V_streq( pszString, TF_MVM_AD_ENEMY_RETURNED ) )
 		{
 			EmitSound( filter, entindex(), pszString );
 		}
 	}
-	else if ( TFGameRules()->IsPlayingSpecialDeliveryMode() && ( ( V_strcmp( pszString, TF_RESOURCE_TEAM_DROPPED ) == 0 ) || ( V_strcmp( pszString, TF_RESOURCE_EVENT_TEAM_DROPPED ) == 0 ) ) )
+	else if ( TFGameRules()->IsPlayingSpecialDeliveryMode() && ( ( V_streq( pszString, TF_RESOURCE_TEAM_DROPPED ) ) || ( V_streq( pszString, TF_RESOURCE_EVENT_TEAM_DROPPED ) ) ) )
 	{
 		// Rate limit certain flag sounds in Special Delivery
 		if ( iTeam == TEAM_ANY || gpGlobals->curtime >= m_flNextTeamSoundTime[iTeam]  )

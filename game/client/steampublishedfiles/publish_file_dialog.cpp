@@ -579,7 +579,7 @@ bool CFilePublishDialog::PublishFile()
 	ErrorCode_t errorCode = ValidateFile( g_MapFilename );
 #ifdef TF_CLIENT_DLL
 	const char *pExt = V_GetFileExtension( g_MapFilename );
-	if ( errorCode == kNoError && pExt && V_strcmp( pExt, "bsp" ) == 0 )
+	if ( errorCode == kNoError && pExt && V_streq( pExt, "bsp" ) )
 	{
 		if ( !CTFMapsWorkshop::IsValidOriginalFileNameForMap( CUtlString( V_GetFileName( g_MapFilename ) ) ) )
 		{

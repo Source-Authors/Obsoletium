@@ -76,7 +76,7 @@ int CheckOtherInstancesRunningWithSnapShot( const char *thisProcessNameShort )
 			{
 				V_FileBase( pe32.szExeFile, otherProcessNameShort );
 
-				if ( V_strcmp( thisProcessNameShort, otherProcessNameShort ) == 0 )
+				if ( V_streq( thisProcessNameShort, otherProcessNameShort ) )
 				{
 					//  We found an instance of this executable.
 					iSnapShotCount++;
@@ -219,7 +219,7 @@ int CheckOtherInstancesWithEnumProcess( const char *thisProcessNameShort )
 					//  We have the process name.  See if it is the same name as our process.
 					V_FileBase( otherProcessName, otherProcessNameShort );
 	
-					if ( V_strcmp( thisProcessNameShort, otherProcessNameShort ) == 0 )
+					if ( V_streq( thisProcessNameShort, otherProcessNameShort ) )
 					{
 						//  We found an instance of this executable.
 						iProcessCount++;

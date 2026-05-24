@@ -2001,7 +2001,7 @@ int main(int argc, char **argv) {
     mypack.GetFileList(fileNames, pszCommand[0] == 'L', true);
 
     for (auto *name : fileNames) printf("%s\n", name);
-  } else if (V_strcmp(pszCommand, "a") == 0) {
+  } else if (V_streq(pszCommand, "a")) {
     if (argc < 3) {
       fprintf(stderr, "Not enough arguments for '%s' command.\n", pszCommand);
       exit(EINVAL);
@@ -2026,7 +2026,7 @@ int main(int argc, char **argv) {
     }
     mypack.HashEverything();
     mypack.Write();
-  } else if (V_strcmp(pszCommand, "k") == 0) {
+  } else if (V_streq(pszCommand, "k")) {
     if (argc != 4) {
       fprintf(stderr, "Incorrect number of arguments for '%s' command.\n",
               pszCommand);
@@ -2041,7 +2041,7 @@ int main(int argc, char **argv) {
     VPKBuilder builder(mypack);
     builder.LoadInputKeys(argv[3]);
     builder.BuildFromInputKeys();
-  } else if (V_strcmp(pszCommand, "x") == 0) {
+  } else if (V_streq(pszCommand, "x")) {
     if (argc < 3) {
       fprintf(stderr, "Incorrect number of arguments for '%s' command.\n",
               pszCommand);
@@ -2075,7 +2075,7 @@ int main(int argc, char **argv) {
         break;
       }
     }
-  } else if (V_strcmp(pszCommand, "B") == 0) {
+  } else if (V_streq(pszCommand, "B")) {
     if (argc != 4) {
       fprintf(stderr, "Incorrect number of arguments for '%s' command.\n",
               pszCommand);
@@ -2094,7 +2094,7 @@ int main(int argc, char **argv) {
     // stime = Plat_FloatTime();
     // BenchMark( files );
     // printf( " time pack = %f\n", Plat_FloatTime() - stime );
-  } else if (V_strcmp(pszCommand, "rehash") == 0) {
+  } else if (V_streq(pszCommand, "rehash")) {
     if (argc != 3) {
       fprintf(stderr, "Incorrect number of arguments for '%s' command.\n",
               pszCommand);
@@ -2107,7 +2107,7 @@ int main(int argc, char **argv) {
     CheckLoadKeyFilesForSigning(mypack);
     mypack.HashEverything();
     mypack.Write();
-  } else if (V_strcmp(pszCommand, "checkhash") == 0) {
+  } else if (V_streq(pszCommand, "checkhash")) {
     if (argc != 3) {
       fprintf(stderr, "Incorrect number of arguments for '%s' command.\n",
               pszCommand);
@@ -2117,7 +2117,7 @@ int main(int argc, char **argv) {
     CheckHashes(argv[2]);
   }
 #ifdef VPK_ENABLE_SIGNING
-  else if (V_strcmp(pszCommand, "generate_keypair") == 0) {
+  else if (V_streq(pszCommand, "generate_keypair")) {
     if (argc != 3) {
       fprintf(stderr, "Incorrect number of arguments for '%s' command.\n",
               pszCommand);
@@ -2125,7 +2125,7 @@ int main(int argc, char **argv) {
     }
 
     GenerateKeyPair(argv[2]);
-  } else if (V_strcmp(pszCommand, "checksig") == 0) {
+  } else if (V_streq(pszCommand, "checksig")) {
     if (argc != 3) {
       fprintf(stderr, "Incorrect number of arguments for '%s' command.\n",
               pszCommand);
@@ -2133,7 +2133,7 @@ int main(int argc, char **argv) {
     }
 
     CheckSignature(argv[2]);
-  } else if (V_strcmp(pszCommand, "dumpsig") == 0) {
+  } else if (V_streq(pszCommand, "dumpsig")) {
     if (argc != 3) {
       fprintf(stderr, "Incorrect number of arguments for '%s' command.\n",
               pszCommand);

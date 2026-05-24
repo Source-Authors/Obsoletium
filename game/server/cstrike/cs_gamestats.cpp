@@ -1230,12 +1230,12 @@ void CCSGameStats::FireGameEvent( IGameEvent *event )
 {
 	const char *pEventName = event->GetName();
 
-	if ( V_strcmp(pEventName, "round_start") == 0 )
+	if ( V_streq(pEventName, "round_start") )
 	{
 		m_PlayerSnipedPosition.Purge();
 		m_bInRound = true;
 	}
-	else if ( V_strcmp(pEventName, "round_end") == 0 )
+	else if ( V_streq(pEventName, "round_end") )
 	{
 		const int reason = event->GetInt( "reason" );
 
@@ -1254,19 +1254,19 @@ void CCSGameStats::FireGameEvent( IGameEvent *event )
 		}
 		return;
 	}
-	else if ( V_strcmp(pEventName, "break_prop") == 0 )
+	else if ( V_streq(pEventName, "break_prop") )
 	{
 		int userid = event->GetInt("userid", 0);
 		int entindex = event->GetInt("entindex", 0);
  		CBreakableProp* pProp = static_cast<CBreakableProp*>(CBaseEntity::Instance(entindex));
  		Event_BreakProp(ToCSPlayer(UTIL_PlayerByUserId(userid)), pProp);
 	}
-	else if ( V_strcmp(pEventName, "player_decal") == 0 )
+	else if ( V_streq(pEventName, "player_decal") )
 	{
 		int userid = event->GetInt("userid", 0);
 		Event_PlayerSprayedDecal(ToCSPlayer(UTIL_PlayerByUserId(userid)));
 	}
-	else if ( V_strcmp(pEventName, "hegrenade_detonate") == 0 )
+	else if ( V_streq(pEventName, "hegrenade_detonate") )
 	{
 		int userid = event->GetInt("userid", 0);
 		IncrementStat( ToCSPlayer(UTIL_PlayerByUserId(userid)), CSSTAT_SHOTS_HEGRENADE, 1 );

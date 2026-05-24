@@ -614,11 +614,11 @@ static ConVar cl_connectmethod( "cl_connectmethod", "", FCVAR_USERINFO | FCVAR_H
 	// now, however, we just blacklist server browser / matchmaking connect methods from allowing
 	// redirects and allow it for other types.
 	const char *pConnectMethod = cl_connectmethod.GetString();
-	if ( V_strcmp( pConnectMethod, "serverbrowser_internet" ) == 0 ||
+	if ( V_streq( pConnectMethod, "serverbrowser_internet" ) ||
 		 V_strncmp( pConnectMethod, "quickpick", 9 ) == 0 ||
 		 V_strncmp( pConnectMethod, "quickplay", 9 ) == 0 ||
-		 V_strcmp( pConnectMethod, "matchmaking" ) == 0 ||
-		 V_strcmp( pConnectMethod, "coaching" ) == 0 )
+		 V_streq( pConnectMethod, "matchmaking" ) ||
+		 V_streq( pConnectMethod, "coaching" ) )
 	 {
 		 return false;
 	 }

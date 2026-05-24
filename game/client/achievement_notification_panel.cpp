@@ -256,17 +256,17 @@ CON_COMMAND_F( achievement_notification_test, "Test the hud notification UI", FC
 	if ( pPanel )
 	{
 		const char *pszGameName = CommandLine()->ParmValue( "-game", "hl2" );
-		if ( V_strcmp( pszGameName, "hl2" ) == 0 )
+		if ( V_streq( pszGameName, "hl2" ) )
 		{
 			pPanel->AddNotification( "HL2_KILL_ODESSAGUNSHIP", L"Achievement Progress", ( 0 == ( iCount % 2 ) ? L"Test Notification Message A (1/10)" :
 				L"Test Message B" ) );
 		}
-		else if ( V_strcmp( pszGameName, "episodic" ) == 0 )
+		else if ( V_streq( pszGameName, "episodic" ) )
 		{
 			pPanel->AddNotification( "EP1_KILL_ANTLIONS_WITHCARS", L"Achievement Progress", ( 0 == ( iCount % 2 ) ? L"Test Notification Message A (1/10)" :
 				L"Test Message B" ) );
 		}
-		else if ( V_strcmp( pszGameName, "portal" ) == 0 )
+		else if ( V_streq( pszGameName, "portal" ) )
 		{
 			pPanel->AddNotification( "PORTAL_DETACH_ALL_CAMERAS", L"Achievement Progress", ( 0 == ( iCount % 2 ) ? L"Test Notification Message A (1/10)" :
 				L"Test Message B" ) );
