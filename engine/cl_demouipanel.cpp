@@ -223,11 +223,11 @@ void CDemoUIPanel::OnTick()
 // Command issued
 void CDemoUIPanel::OnCommand(const char *command)
 {
-	if ( !Q_strcasecmp( command, "stop" ) )
+	if ( V_strieq( command, "stop" ) )
 	{
 		Cbuf_AddText( "disconnect\n" );
 	}
-	else if ( !Q_strcasecmp( command, "play" ) )
+	else if ( V_strieq( command, "play" ) )
 	{
 		if ( !demoplayer->IsPlayingBack() )
 		{
@@ -241,27 +241,27 @@ void CDemoUIPanel::OnCommand(const char *command)
 			Cbuf_AddText( !demoplayer->IsPlaybackPaused() ? "demo_pause\n" : "demo_resume\n" );
 		}
 	}
-	else if ( !Q_strcasecmp( command, "load" ) )
+	else if ( V_strieq( command, "load" ) )
 	{
 		OnLoad();
 	}
-	else if ( !Q_strcasecmp( command, "reload" ) )
+	else if ( V_strieq( command, "reload" ) )
 	{
 		Cbuf_AddText( "demo_gototick 0 0 1\n" );
 	}
-	else if ( !Q_strcasecmp( command, "edit" ) )
+	else if ( V_strieq( command, "edit" ) )
 	{
 		OnEdit();
 	}
-	else if ( !Q_strcasecmp( command, "smooth" ) )
+	else if ( V_strieq( command, "smooth" ) )
 	{
 		OnSmooth();
 	}
-	else if ( !Q_strcasecmp( command, "nextframe" ) )
+	else if ( V_strieq( command, "nextframe" ) )
 	{
 		demoplayer->SkipToTick( 1, true, true );
 	}
-	else if ( !Q_strcasecmp( command, "gototick" ) )
+	else if ( V_strieq( command, "gototick" ) )
 	{
 		char tick[ 32 ];
 		m_pGotoTick->GetText( tick );
@@ -274,7 +274,7 @@ void CDemoUIPanel::OnCommand(const char *command)
 		// demoplayer->PausePlayback( -1 );
 		// demoplayer->SkipToTick( Q_atoi(tick), false );
 	}
-	else if ( !Q_strcasecmp( command, "drive" ) )
+	else if ( V_strieq( command, "drive" ) )
 	{
 		GetCurrentView();
 	}
@@ -781,11 +781,11 @@ void CDemoUIPanel2::OnTick()
 // Command issued
 void CDemoUIPanel2::OnCommand(const char *command)
 {
-	if ( !Q_strcasecmp( command, "stop" ) )
+	if ( V_strieq( command, "stop" ) )
 	{
 		Cbuf_AddText( "disconnect\n" );
 	}
-	else if ( !Q_strcasecmp( command, "play" ) )
+	else if ( V_strieq( command, "play" ) )
 	{
 		if ( !demoplayer->IsPlayingBack() )
 		{
@@ -796,15 +796,15 @@ void CDemoUIPanel2::OnCommand(const char *command)
 			demoplayer->IsPlaybackPaused() ? demoplayer->ResumePlayback() : demoplayer->PausePlayback( -1.f );
 		}
 	}
-	else if ( !Q_strcasecmp( command, "load" ) )
+	else if ( V_strieq( command, "load" ) )
 	{
 		OnLoad();
 	}
-	else if ( !Q_strcasecmp( command, "reload" ) )
+	else if ( V_strieq( command, "reload" ) )
 	{
 		Cbuf_AddText( "demo_gototick 0 0 1\n" );
 	}
-	else if ( !Q_strcasecmp( command, "nextframe" ) )
+	else if ( V_strieq( command, "nextframe" ) )
 	{
 		Cbuf_AddText( "demo_gototick 1 1 1\n" );
 	}

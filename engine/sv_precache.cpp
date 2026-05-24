@@ -620,19 +620,19 @@ CON_COMMAND( sv_precacheinfo, "Show precache info." )
 		char const *table = args[ 1 ];
 
 		bool dumped = true;
-		if ( !Q_strcasecmp( table, "generic" ) )
+		if ( V_strieq( table, "generic" ) )
 		{
 			sv.DumpPrecacheStats( sv.GetGenericPrecacheTable() );
 		}
-		else if ( !Q_strcasecmp( table, "sound" ) )
+		else if ( V_strieq( table, "sound" ) )
 		{
 			sv.DumpPrecacheStats( sv.GetSoundPrecacheTable() );
 		}
-		else if ( !Q_strcasecmp( table, "decal" ) )
+		else if ( V_strieq( table, "decal" ) )
 		{
 			sv.DumpPrecacheStats( sv.GetDecalPrecacheTable() );
 		}
-		else if ( !Q_strcasecmp( table, "model" ) )
+		else if ( V_strieq( table, "model" ) )
 		{
 			sv.DumpPrecacheStats( sv.GetModelPrecacheTable() );
 		}

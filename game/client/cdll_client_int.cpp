@@ -1907,7 +1907,7 @@ void OnSceneStringTableChanged( void *object, INetworkStringTable *stringTable, 
 void CHLClient::InstallStringTableCallback( const char *tableName )
 {
 	// Here, cache off string table IDs
-	if (!Q_strcasecmp(tableName, "VguiScreen"))
+	if (V_strieq(tableName, "VguiScreen"))
 	{
 		// Look up the id 
 		g_StringTableVguiScreen = networkstringtable->FindTable( tableName );
@@ -1915,7 +1915,7 @@ void CHLClient::InstallStringTableCallback( const char *tableName )
 		// When the material list changes, we need to know immediately
 		g_StringTableVguiScreen->SetStringChangedCallback( NULL, OnVguiScreenTableChanged );
 	}
-	else if (!Q_strcasecmp(tableName, "Materials"))
+	else if (V_strieq(tableName, "Materials"))
 	{
 		// Look up the id 
 		g_pStringTableMaterials = networkstringtable->FindTable( tableName );
@@ -1923,36 +1923,36 @@ void CHLClient::InstallStringTableCallback( const char *tableName )
 		// When the material list changes, we need to know immediately
 		g_pStringTableMaterials->SetStringChangedCallback( NULL, OnMaterialStringTableChanged );
 	}
-	else if ( !Q_strcasecmp( tableName, "EffectDispatch" ) )
+	else if ( V_strieq( tableName, "EffectDispatch" ) )
 	{
 		g_StringTableEffectDispatch = networkstringtable->FindTable( tableName );
 	}
-	else if ( !Q_strcasecmp( tableName, "InfoPanel" ) )
+	else if ( V_strieq( tableName, "InfoPanel" ) )
 	{
 		g_pStringTableInfoPanel = networkstringtable->FindTable( tableName );
 	}
-	else if ( !Q_strcasecmp( tableName, "Scenes" ) )
+	else if ( V_strieq( tableName, "Scenes" ) )
 	{
 		g_pStringTableClientSideChoreoScenes = networkstringtable->FindTable( tableName );
 		g_pStringTableClientSideChoreoScenes->SetStringChangedCallback( NULL, OnSceneStringTableChanged );
 	}
-	else if ( !Q_strcasecmp( tableName, "ParticleEffectNames" ) )
+	else if ( V_strieq( tableName, "ParticleEffectNames" ) )
 	{
 		g_pStringTableParticleEffectNames = networkstringtable->FindTable( tableName );
 		networkstringtable->SetAllowClientSideAddString( g_pStringTableParticleEffectNames, true );
 		// When the particle system list changes, we need to know immediately
 		g_pStringTableParticleEffectNames->SetStringChangedCallback( NULL, OnParticleSystemStringTableChanged );
 	}
-	else if ( !Q_strcasecmp( tableName, "ServerMapCycle" ) )
+	else if ( V_strieq( tableName, "ServerMapCycle" ) )
 	{
 		g_pStringTableServerMapCycle = networkstringtable->FindTable( tableName );
 	}
 #ifdef TF_CLIENT_DLL
-	else if ( !Q_strcasecmp( tableName, "ServerPopFiles" ) )
+	else if ( V_strieq( tableName, "ServerPopFiles" ) )
 	{
 		g_pStringTableServerPopFiles = networkstringtable->FindTable( tableName );
 	}
-	else if ( !Q_strcasecmp( tableName, "ServerMapCycleMvM" ) )
+	else if ( V_strieq( tableName, "ServerMapCycleMvM" ) )
 	{
 		g_pStringTableServerMapCycleMvM = networkstringtable->FindTable( tableName );
 	}

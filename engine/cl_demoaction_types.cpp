@@ -357,7 +357,7 @@ void CDemoActionTextMessageStart::SetFontName( char const *font )
 //-----------------------------------------------------------------------------
 char const *CDemoActionTextMessageStart::GetFontName( void ) const
 {
-	if ( !Q_strcasecmp( "TextMessageDefault", m_szVguiFont ) )
+	if ( V_strieq( "TextMessageDefault", m_szVguiFont ) )
 	{
 		return "";
 	}

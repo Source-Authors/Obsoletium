@@ -914,7 +914,7 @@ int FindBodygroupByName( CStudioHdr *pstudiohdr, const char *name )
 	for ( group = 0; group < pstudiohdr->numbodyparts(); group++ )
 	{
 		mstudiobodyparts_t *pbodypart = pstudiohdr->pBodypart( group );
-		if ( !Q_strcasecmp( name, pbodypart->pszName() ) )
+		if ( V_strieq( name, pbodypart->pszName() ) )
 		{
 			return group;
 		}

@@ -811,13 +811,13 @@ void CCvarUtilities::CvarList( const CCommand &args )
 	iArgs = args.ArgC();		// Get count
 
 	// Print usage?
-	if ( iArgs == 2 && !Q_strcasecmp( args[1],"?" ) )
+	if ( iArgs == 2 && V_streq( args[1],"?" ) )
 	{
 		ConMsg( "cvarlist:  [log logfile] [ partial ]\n" );
 		return;         
 	}
 
-	if ( !Q_strcasecmp( args[1],"log" ) && iArgs >= 3 )
+	if ( V_strieq( args[1],"log" ) && iArgs >= 3 )
 	{
 		char fn[256];
 		Q_snprintf( fn, sizeof( fn ), "%s", args[2] );

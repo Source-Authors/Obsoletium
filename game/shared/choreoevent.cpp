@@ -2854,11 +2854,11 @@ const char *CChoreoEvent::NameForAbsoluteTagType( AbsTagType t )
 //-----------------------------------------------------------------------------
 CChoreoEvent::AbsTagType CChoreoEvent::TypeForAbsoluteTagName( const char *name )
 {
-	if ( !Q_strcasecmp( name, "playback_time" ) )
+	if ( V_strieq( name, "playback_time" ) )
 	{
 		return PLAYBACK;
 	}
-	else if ( !Q_strcasecmp( name, "shifted_time" ) )
+	else if ( V_strieq( name, "shifted_time" ) )
 	{
 		return ORIGINAL;
 	}

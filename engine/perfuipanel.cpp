@@ -612,11 +612,11 @@ void CPerfUIPanel::Activate()
 
 void CPerfUIPanel::OnCommand( char const *command )
 {
-	if ( !Q_strcasecmp( command, "submit" ) )
+	if ( V_strieq( command, "submit" ) )
 	{
 //		OnSubmit();
 	}
-	else if ( !Q_strcasecmp( command, "cancel" ) )
+	else if ( V_strieq( command, "cancel" ) )
 	{
 //		Close();
 	}

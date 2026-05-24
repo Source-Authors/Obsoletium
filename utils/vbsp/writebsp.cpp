@@ -1002,7 +1002,7 @@ void SetLightStyles (void)
 			continue;
 
 		// This is not true for dynamic lights
-		if (!Q_strcasecmp (t, "light_dynamic"))
+		if (V_strieq (t, "light_dynamic"))
 			continue;
 
 		t = ValueForKey (e, "targetname");

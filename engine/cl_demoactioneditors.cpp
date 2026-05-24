@@ -190,11 +190,11 @@ void CBaseActionEditDialog::OnCancel()
 //-----------------------------------------------------------------------------
 void CBaseActionEditDialog::OnCommand( char const *commands )
 {
-	if ( !Q_strcasecmp( commands, "OK" ) )
+	if ( V_strieq( commands, "OK" ) )
 	{
 		OnClose();
 	}
-	else if ( !Q_strcasecmp( commands, "Cancel" ) )
+	else if ( V_strieq( commands, "Cancel" ) )
 	{
 		OnCancel();
 	}
@@ -318,7 +318,7 @@ bool CBaseActionSkipAheadDialog::OnSaveChanges( void )
 	float fskip = V_atof( skipto );
 	int	 iskip = atoi( skipto );
 
-	if ( !Q_strcasecmp( skiptype, "TimeUseTick" ) )
+	if ( V_strieq( skiptype, "TimeUseTick" ) )
 	{
 		if ( GetAction()->m_nSkipToTick != iskip )
 		{
@@ -651,7 +651,7 @@ int CBaseActionTextMessageStartDialog::EffectTypeForName( char const *name )
 	int i;
 	for ( i = 0; i < c; i++ )
 	{
-		if ( !Q_strcasecmp( s_EffectTypes[ i ].name, name ) )
+		if ( V_strieq( s_EffectTypes[ i ].name, name ) )
 			return i;
 	}
 	Assert( 0 );
@@ -1080,7 +1080,7 @@ void CBaseActionPlaySoundStartDialog::OnFileSelected( char const *fullpath )
 
 void CBaseActionPlaySoundStartDialog::OnCommand( char const *command )
 {
-	if ( !Q_strcasecmp( command, "choosesound" ) )
+	if ( V_strieq( command, "choosesound" ) )
 	{
 		if ( !m_hFileOpenDialog.Get() )
 		{
@@ -1168,7 +1168,7 @@ bool CBaseActionWithStopTimeDialog::OnSaveChanges( void )
 	float fstop = V_atof( stop );
 	int	 istop = atoi( stop );
 
-	if ( !Q_strcasecmp( stoptype, "TimeUseTick" ) )
+	if ( V_strieq( stoptype, "TimeUseTick" ) )
 	{
 		if ( GetAction()->m_nStopTick != istop )
 		{

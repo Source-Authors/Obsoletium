@@ -623,40 +623,40 @@ void C_SoundscapeSystem::StartSubSoundscape( KeyValues *pSoundscape, subsoundsca
 	KeyValues *pKey = pSoundscape->GetFirstSubKey();
 	while ( pKey )
 	{
-		if ( !Q_strcasecmp( pKey->GetName(), "dsp" ) )
+		if ( V_strieq( pKey->GetName(), "dsp" ) )
 		{
 			if ( params.allowDSP )
 			{
 				ProcessDSP( pKey );
 			}
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "dsp_player" ) )
+		else if ( V_strieq( pKey->GetName(), "dsp_player" ) )
 		{
 			if ( params.allowDSP )
 			{
 				ProcessDSPPlayer( pKey );
 			}
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "playlooping" ) )
+		else if ( V_strieq( pKey->GetName(), "playlooping" ) )
 		{
 			ProcessPlayLooping( pKey, params );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "playrandom" ) )
+		else if ( V_strieq( pKey->GetName(), "playrandom" ) )
 		{
 			ProcessPlayRandom( pKey, params );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "playsoundscape" ) )
+		else if ( V_strieq( pKey->GetName(), "playsoundscape" ) )
 		{
 			ProcessPlaySoundscape( pKey, params );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "Soundmixer" ) )
+		else if ( V_strieq( pKey->GetName(), "Soundmixer" ) )
 		{
 			if ( params.allowDSP )
 			{
 				ProcessSoundMixer( pKey, params );
 			}
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "dsp_volume" ) )
+		else if ( V_strieq( pKey->GetName(), "dsp_volume" ) )
 		{
 			if ( params.allowDSP )
 			{
@@ -722,27 +722,27 @@ void C_SoundscapeSystem::ProcessPlayLooping( KeyValues *pAmbient, const subsound
 	KeyValues *pKey = pAmbient->GetFirstSubKey();
 	while ( pKey )
 	{
-		if ( !Q_strcasecmp( pKey->GetName(), "volume" ) )
+		if ( V_strieq( pKey->GetName(), "volume" ) )
 		{
 			volume = params.masterVolume * RandomInterval( ReadInterval( pKey->GetString() ) );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "pitch" ) )
+		else if ( V_strieq( pKey->GetName(), "pitch" ) )
 		{
 			pitch = RandomInterval( ReadInterval( pKey->GetString() ) );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "wave" ) )
+		else if ( V_strieq( pKey->GetName(), "wave" ) )
 		{
 			pSoundName = pKey->GetString();
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "position" ) )
+		else if ( V_strieq( pKey->GetName(), "position" ) )
 		{
 			positionIndex = params.startingPosition + pKey->GetInt();
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "attenuation" ) )
+		else if ( V_strieq( pKey->GetName(), "attenuation" ) )
 		{
 			soundlevel = ATTN_TO_SNDLVL( RandomInterval( ReadInterval( pKey->GetString() ) ) );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "soundlevel" ) )
+		else if ( V_strieq( pKey->GetName(), "soundlevel" ) )
 		{
 			if ( !Q_strncasecmp( pKey->GetString(), "SNDLVL_", std::size( "SNDLVL_" ) - 1 ) )
 			{
@@ -753,7 +753,7 @@ void C_SoundscapeSystem::ProcessPlayLooping( KeyValues *pAmbient, const subsound
 				soundlevel = (soundlevel_t)((int)RandomInterval( ReadInterval( pKey->GetString() ) ));
 			}
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "suppress_on_restore" ) )
+		else if ( V_strieq( pKey->GetName(), "suppress_on_restore" ) )
 		{
 			suppress = Q_atoi( pKey->GetString() ) != 0 ? true : false;
 		}
@@ -810,7 +810,7 @@ void C_SoundscapeSystem::TouchPlayLooping( KeyValues *pAmbient )
 	KeyValues *pKey = pAmbient->GetFirstSubKey();
 	while ( pKey )
 	{
-		if ( !Q_strcasecmp( pKey->GetName(), "wave" ) )
+		if ( V_strieq( pKey->GetName(), "wave" ) )
 		{
 			char const *pSoundName = pKey->GetString();
 
@@ -858,11 +858,11 @@ void C_SoundscapeSystem::TouchWaveFiles( KeyValues *pSoundScape )
 	KeyValues *pKey = pSoundScape->GetFirstSubKey();
 	while ( pKey )
 	{
-		if ( !Q_strcasecmp( pKey->GetName(), "playlooping" ) )
+		if ( V_strieq( pKey->GetName(), "playlooping" ) )
 		{
 			TouchPlayLooping( pKey );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "playrandom" ) )
+		else if ( V_strieq( pKey->GetName(), "playrandom" ) )
 		{
 			TouchPlayRandom( pKey );
 		}
@@ -878,7 +878,7 @@ void C_SoundscapeSystem::TouchPlayRandom( KeyValues *pPlayRandom )
 	KeyValues *pKey = pPlayRandom->GetFirstSubKey();
 	while ( pKey )
 	{
-		if ( !Q_strcasecmp( pKey->GetName(), "rndwave" ) )
+		if ( V_strieq( pKey->GetName(), "rndwave" ) )
 		{
 			KeyValues *pWaves = pKey->GetFirstSubKey();
 			while ( pWaves )
@@ -905,21 +905,21 @@ void C_SoundscapeSystem::ProcessPlayRandom( KeyValues *pPlayRandom, const subsou
 	KeyValues *pKey = pPlayRandom->GetFirstSubKey();
 	while ( pKey )
 	{
-		if ( !Q_strcasecmp( pKey->GetName(), "volume" ) )
+		if ( V_strieq( pKey->GetName(), "volume" ) )
 		{
 			sound.volume = ReadInterval( pKey->GetString() );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "pitch" ) )
+		else if ( V_strieq( pKey->GetName(), "pitch" ) )
 		{
 			sound.pitch = ReadInterval( pKey->GetString() );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "attenuation" ) )
+		else if ( V_strieq( pKey->GetName(), "attenuation" ) )
 		{
 			interval_t atten = ReadInterval( pKey->GetString() );
 			sound.soundlevel.start = ATTN_TO_SNDLVL( atten.start );
 			sound.soundlevel.range = ATTN_TO_SNDLVL( atten.start + atten.range ) - sound.soundlevel.start;
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "soundlevel" ) )
+		else if ( V_strieq( pKey->GetName(), "soundlevel" ) )
 		{
 			if ( !Q_strncasecmp( pKey->GetString(), "SNDLVL_", std::size( "SNDLVL_" ) - 1 ) )
 			{
@@ -931,11 +931,11 @@ void C_SoundscapeSystem::ProcessPlayRandom( KeyValues *pPlayRandom, const subsou
 				sound.soundlevel = ReadInterval( pKey->GetString() );
 			}
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "time" ) )
+		else if ( V_strieq( pKey->GetName(), "time" ) )
 		{
 			sound.time = ReadInterval( pKey->GetString() );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "rndwave" ) )
+		else if ( V_strieq( pKey->GetName(), "rndwave" ) )
 		{
 			KeyValues *pWaves = pKey->GetFirstSubKey();
 			sound.pWaves = pWaves;
@@ -946,9 +946,9 @@ void C_SoundscapeSystem::ProcessPlayRandom( KeyValues *pPlayRandom, const subsou
 				pWaves = pWaves->GetNextKey();
 			}
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "position" ) )
+		else if ( V_strieq( pKey->GetName(), "position" ) )
 		{
-			if ( !Q_strcasecmp( pKey->GetString(), "random" ) )
+			if ( V_strieq( pKey->GetString(), "random" ) )
 			{
 				randomPosition = true;
 			}
@@ -957,7 +957,7 @@ void C_SoundscapeSystem::ProcessPlayRandom( KeyValues *pPlayRandom, const subsou
 				positionIndex = params.startingPosition + pKey->GetInt();
 			}
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "suppress_on_restore" ) )
+		else if ( V_strieq( pKey->GetName(), "suppress_on_restore" ) )
 		{
 			suppress = Q_atoi( pKey->GetString() ) != 0 ? true : false;
 		}
@@ -1030,15 +1030,15 @@ void C_SoundscapeSystem::ProcessPlaySoundscape( KeyValues *pPlaySoundscape, subs
 	const char *pSoundscapeName = NULL;
 	while ( pKey )
 	{
-		if ( !Q_strcasecmp( pKey->GetName(), "volume" ) )
+		if ( V_strieq( pKey->GetName(), "volume" ) )
 		{
 			subParams.masterVolume = paramsIn.masterVolume * RandomInterval( ReadInterval( pKey->GetString() ) );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "position" ) )
+		else if ( V_strieq( pKey->GetName(), "position" ) )
 		{
 			subParams.startingPosition = paramsIn.startingPosition + pKey->GetInt();
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "positionoverride" ) )
+		else if ( V_strieq( pKey->GetName(), "positionoverride" ) )
 		{
 			if ( paramsIn.positionOverride < 0 )
 			{
@@ -1048,18 +1048,18 @@ void C_SoundscapeSystem::ProcessPlaySoundscape( KeyValues *pPlaySoundscape, subs
 				subParams.ambientPositionOverride = paramsIn.startingPosition + pKey->GetInt();
 			}
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "ambientpositionoverride" ) )
+		else if ( V_strieq( pKey->GetName(), "ambientpositionoverride" ) )
 		{
 			if ( paramsIn.ambientPositionOverride < 0 )
 			{
 				subParams.ambientPositionOverride = paramsIn.startingPosition + pKey->GetInt();
 			}
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "name" ) )
+		else if ( V_strieq( pKey->GetName(), "name" ) )
 		{
 			pSoundscapeName = pKey->GetString();
 		}
-		else if ( !Q_strcasecmp(pKey->GetName(), "soundlevel") )
+		else if ( V_strieq(pKey->GetName(), "soundlevel") )
 		{
 			DevMsg(1,"soundlevel not supported on sub-soundscapes\n");
 		}
@@ -1105,7 +1105,7 @@ intp C_SoundscapeSystem::AddLoopingSound( const char *pSoundName, bool isAmbient
 		// NOTE: Will always restart/crossfade positional sounds
 		if ( sound.id != m_loopingSoundId && 
 			sound.pitch == pitch && 
-			!Q_strcasecmp( pSoundName, sound.pWaveName ) )
+			V_strieq( pSoundName, sound.pWaveName ) )
 		{
 			// Ambient sounds can reuse the slots.
 			if ( isAmbient == true && 

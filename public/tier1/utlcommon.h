@@ -120,7 +120,7 @@ template <typename T> struct ArgumentTypeInfo;
 struct StringLessFunctor { bool operator()( const char *a, const char *b ) const { return Q_strcmp( a, b ) < 0; } };
 struct StringEqualFunctor { bool operator()( const char *a, const char *b ) const { return V_streq( a, b ); } };
 struct CaselessStringLessFunctor { bool operator()( const char *a, const char *b ) const { return Q_strcasecmp( a, b ) < 0; } };
-struct CaselessStringEqualFunctor { bool operator()( const char *a, const char *b ) const { return Q_strcasecmp( a, b ) == 0; } };
+struct CaselessStringEqualFunctor { bool operator()( const char *a, const char *b ) const { return V_strieq( a, b ); } };
 
 struct Mix32HashFunctor { [[nodiscard]] constexpr unsigned int operator()( uint32 s ) const; };
 struct Mix64HashFunctor { [[nodiscard]] constexpr unsigned int operator()( uint64 s ) const; };

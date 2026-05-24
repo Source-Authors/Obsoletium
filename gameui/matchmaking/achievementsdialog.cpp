@@ -690,7 +690,7 @@ void CAchievementsDialog::CreateOrUpdateComboItems( bool bCreate )
 
 void CAchievementsDialog::OnCommand( const char *command )
 {
-	if ( !Q_strcasecmp( command, "ongameuiactivated" ) )
+	if ( V_strieq( command, "ongameuiactivated" ) )
 	{
 		UpdateAchievementDialogInfo();
 	}

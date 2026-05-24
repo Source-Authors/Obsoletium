@@ -2250,7 +2250,7 @@ CON_COMMAND( vtune, "Controls VTune's sampling." )
 		return;
 	}
 	
-	if( !Q_strcasecmp( args[1], "pause" ) )
+	if( V_strieq( args[1], "pause" ) )
 	{
 		if(!vtune(false))
 		{
@@ -2261,7 +2261,7 @@ CON_COMMAND( vtune, "Controls VTune's sampling." )
 		ConMsg("VTune sampling paused.\n");
 	}
 
-	else if( !Q_strcasecmp( args[1], "resume" ) )
+	else if( V_strieq( args[1], "resume" ) )
 	{
 		if(!vtune(true))
 		{

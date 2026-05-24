@@ -58,7 +58,7 @@ IClassMap& GetClassMap( void )
 void CClassMap::Add( const char *mapname, const char *classname, int size, DISPATCHFUNCTION factory = 0 )
 {
 	const char *map = Lookup( classname );
-	if ( map && !Q_strcasecmp( mapname, map ) )
+	if ( map && V_strieq( mapname, map ) )
 		return;
 
 	if ( map )

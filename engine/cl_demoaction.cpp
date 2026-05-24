@@ -327,7 +327,7 @@ DEMOACTION CBaseDemoAction::TypeForName( char const *name )
 	for ( i= 0; i < c; i++ )
 	{
 		DemoActionDictionary *entry = &g_rgDemoTypeNames[ i ];
-		if ( !Q_strcasecmp( entry->name, name ) )
+		if ( V_strieq( entry->name, name ) )
 		{
 			return entry->actiontype;
 		}
@@ -368,7 +368,7 @@ DEMOACTIONTIMINGTYPE CBaseDemoAction::TimingTypeForName( char const *name )
 	for ( i= 0; i < c; i++ )
 	{
 		DemoTimingTagDictionary *entry = &g_rgDemoTimingTypeNames[ i ];
-		if ( !Q_strcasecmp( entry->name, name ) )
+		if ( V_strieq( entry->name, name ) )
 		{
 			return entry->timingtype;
 		}

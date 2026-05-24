@@ -85,7 +85,7 @@ void TxViewPanel::OnTick()
 
 void TxViewPanel::OnCommand( const char *command )
 {
-	if ( !Q_strcasecmp( command, "refresh" ) )
+	if ( V_strieq( command, "refresh" ) )
 	{
 		;
 	}

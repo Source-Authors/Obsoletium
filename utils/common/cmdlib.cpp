@@ -541,7 +541,7 @@ Returns the argument number (1 to argc-1) or 0 if not present
 */
 int CheckParm(char *check) {
   for (int i = 1; i < myargc; i++) {
-    if (!Q_strcasecmp(check, myargv[i])) return i;
+    if (V_strieq(check, myargv[i])) return i;
   }
 
   return 0;

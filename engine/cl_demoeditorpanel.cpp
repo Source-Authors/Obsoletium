@@ -211,31 +211,31 @@ void CDemoEditorPanel::CreateNewAction( char const *actiontype )
 //-----------------------------------------------------------------------------
 void CDemoEditorPanel::OnCommand(const char *command)
 {
-	if ( !Q_strcasecmp( command, "edit" ) )
+	if ( V_strieq( command, "edit" ) )
 	{
 		OnEdit();
 	}
-	else if ( !Q_strcasecmp( command, "delete" ) )
+	else if ( V_strieq( command, "delete" ) )
 	{
 		OnDelete();
 	}
-	else if ( !Q_strcasecmp( command, "save" ) )
+	else if ( V_strieq( command, "save" ) )
 	{
 		OnSave();
 	}
-	else if ( !Q_strcasecmp( command, "Close" ) )
+	else if ( V_strieq( command, "Close" ) )
 	{
 		OnSave();
 		MarkForDeletion();
 		OnClose();
 	}
-	else if ( !Q_strcasecmp( command, "cancel" ) )
+	else if ( V_strieq( command, "cancel" ) )
 	{
 		OnRevert();
 		MarkForDeletion();
 		OnClose();
 	}
-	else if ( !Q_strcasecmp( command, "revert" ) )
+	else if ( V_strieq( command, "revert" ) )
 	{
 		OnRevert();
 	}
@@ -371,7 +371,7 @@ CBaseDemoAction *CDemoEditorPanel::FindActionByName( char const *name )
 	{
 		CBaseDemoAction *action = demoaction->GetAction( i );
 		Assert( action );
-		if ( !Q_strcasecmp( name, action->GetActionName() ) )
+		if ( V_strieq( name, action->GetActionName() ) )
 			return action;
 	}
 	return NULL;

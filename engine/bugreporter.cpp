@@ -2355,20 +2355,20 @@ void CBugUIPanel::Close()
 
 void CBugUIPanel::OnCommand( char const *command )
 {
-	if ( !Q_strcasecmp( command, "submit" ) )
+	if ( V_strieq( command, "submit" ) )
 	{
 		OnSubmit();
 	}
-	else if ( !Q_strcasecmp( command, "cancel" ) )
+	else if ( V_strieq( command, "cancel" ) )
 	{
 		Close();
 		WipeData();
 	}
-	else if ( !Q_strcasecmp( command, "snapshot" ) )
+	else if ( V_strieq( command, "snapshot" ) )
 	{
 		OnTakeSnapshot();
 	}
-	else if ( !Q_strcasecmp( command, "savegame" ) )
+	else if ( V_strieq( command, "savegame" ) )
 	{
 		OnSaveGame();
 		
@@ -2381,23 +2381,23 @@ void CBugUIPanel::OnCommand( char const *command )
 		// 	OnSaveBSP();
 		// }
 	}
-	else if ( !Q_strcasecmp( command, "savebsp" ) )
+	else if ( V_strieq( command, "savebsp" ) )
 	{
 		OnSaveBSP();
 	}
-	else if ( !Q_strcasecmp( command, "savevmf" ) )
+	else if ( V_strieq( command, "savevmf" ) )
 	{
 		OnSaveVMF();
 	}
-	else if ( !Q_strcasecmp( command, "clearform" ) )
+	else if ( V_strieq( command, "clearform" ) )
 	{
 		OnClearForm();
 	}
-	else if ( !Q_strcasecmp( command, "addfile" ) )
+	else if ( V_strieq( command, "addfile" ) )
 	{
 		OnIncludeFile();
 	}
-	else if ( !Q_strcasecmp( command, "clearfiles" ) )
+	else if ( V_strieq( command, "clearfiles" ) )
 	{
 		OnClearIncludedFiles();
 	}
@@ -2447,7 +2447,7 @@ void CBugUIPanel::PopulateControls()
 	for ( i = 0; i < c; i++ )
 	{
 		char const  *name = m_pBugReporter->GetDisplayName( i );
-		if (!V_strcasecmp(name, "Triage"))
+		if (V_strieq(name, "Triage"))
 			defitem = i;
 		m_pAssignTo->AddItem(name , NULL );
 	}
@@ -2459,7 +2459,7 @@ void CBugUIPanel::PopulateControls()
 	for ( i = 0; i < c; i++ )
 	{
 		char const  *severity = m_pBugReporter->GetSeverity( i );
-		if (!V_strcasecmp(severity, "Zero"))
+		if (V_strieq(severity, "Zero"))
 			defitem = i;
 		m_pSeverity->AddItem( severity, NULL );
 	}

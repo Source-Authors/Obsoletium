@@ -469,7 +469,7 @@ void ClientModeCSNormal::FireGameEvent( IGameEvent *event )
 	if ( !eventname || !eventname[0] )
 		return;
 
-	if ( Q_strcmp( "round_start", eventname ) == 0 )
+	if ( V_streq( "round_start", eventname ) )
 	{
 		// recreate all client side physics props
 		C_PhysPropClientside::RecreateAll();

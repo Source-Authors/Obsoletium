@@ -675,23 +675,23 @@ bool CSoundEmitterSystemBase::InitSoundInternalParameters( const char *soundname
 	KeyValues *pKey = kv->GetFirstSubKey();
 	while ( pKey )
 	{
-		if ( !Q_strcasecmp( pKey->GetName(), "channel" ) )
+		if ( V_strieq( pKey->GetName(), "channel" ) )
 		{
 			params.ChannelFromString( pKey->GetString() );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "volume" ) )
+		else if ( V_strieq( pKey->GetName(), "volume" ) )
 		{
 			params.VolumeFromString( pKey->GetString() );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "pitch" ) )
+		else if ( V_strieq( pKey->GetName(), "pitch" ) )
 		{
 			params.PitchFromString( pKey->GetString() );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "wave" ) )
+		else if ( V_strieq( pKey->GetName(), "wave" ) )
 		{
 			ExpandSoundNameMacros( params, pKey->GetString() );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "rndwave" ) )
+		else if ( V_strieq( pKey->GetName(), "rndwave" ) )
 		{
 			KeyValues *pWaves = pKey->GetFirstSubKey();
 			while ( pWaves )
@@ -701,7 +701,7 @@ bool CSoundEmitterSystemBase::InitSoundInternalParameters( const char *soundname
 				pWaves = pWaves->GetNextKey();
 			}
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "attenuation" ) || !Q_strcasecmp( pKey->GetName(), "CompatibilityAttenuation" ) )
+		else if ( V_strieq( pKey->GetName(), "attenuation" ) || V_strieq( pKey->GetName(), "CompatibilityAttenuation" ) )
 		{
 			if ( !Q_strncasecmp( pKey->GetString(), "SNDLVL_", ssize( "SNDLVL_" ) - 1 ) )
 			{
@@ -727,7 +727,7 @@ bool CSoundEmitterSystemBase::InitSoundInternalParameters( const char *soundname
 
 			// Goldsrc compatibility mode.. feed the sndlevel value through the sound engine interface in such a way
 			// that it can reconstruct the original sndlevel value and flag the sound as using Goldsrc attenuation.
-			bool bCompatibilityAttenuation = !Q_strcasecmp( pKey->GetName(), "CompatibilityAttenuation" );
+			bool bCompatibilityAttenuation = V_strieq( pKey->GetName(), "CompatibilityAttenuation" );
 			if ( bCompatibilityAttenuation )
 			{
 				if ( params.GetSoundLevel().range != 0 )
@@ -738,7 +738,7 @@ bool CSoundEmitterSystemBase::InitSoundInternalParameters( const char *soundname
 				params.SetSoundLevel( SNDLEVEL_TO_COMPATIBILITY_MODE( params.GetSoundLevel().start ) );
 			}
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "soundlevel" ) )
+		else if ( V_strieq( pKey->GetName(), "soundlevel" ) )
 		{
 			if ( !Q_strncasecmp( pKey->GetString(), "ATTN_", ssize( "ATTN_" ) - 1 ) )
 			{
@@ -748,11 +748,11 @@ bool CSoundEmitterSystemBase::InitSoundInternalParameters( const char *soundname
 
 			params.SoundLevelFromString( pKey->GetString() );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "play_to_owner_only" ) )
+		else if ( V_strieq( pKey->GetName(), "play_to_owner_only" ) )
 		{
 			params.SetOnlyPlayToOwner( pKey->GetInt() ? true : false );
 		}
-		else if ( !Q_strcasecmp( pKey->GetName(), "delay_msec" ) )
+		else if ( V_strieq( pKey->GetName(), "delay_msec" ) )
 		{
 			// Don't allow negative delay
 			params.SetDelayMsec( max( 0, pKey->GetInt() ) );
@@ -1028,22 +1028,22 @@ float CSoundEmitterSystemBase::TranslateAttenuation( const char *key )
 		return ATTN_NORM;
 	}
 
-	if ( !Q_strcasecmp( key, "ATTN_NONE" ) )
+	if ( V_strieq( key, "ATTN_NONE" ) )
 		return ATTN_NONE;
 
-	if ( !Q_strcasecmp( key, "ATTN_NORM" ) )
+	if ( V_strieq( key, "ATTN_NORM" ) )
 		return ATTN_NORM;
 
-	if ( !Q_strcasecmp( key, "ATTN_IDLE" ) )
+	if ( V_strieq( key, "ATTN_IDLE" ) )
 		return ATTN_IDLE;
 
-	if ( !Q_strcasecmp( key, "ATTN_STATIC" ) )
+	if ( V_strieq( key, "ATTN_STATIC" ) )
 		return ATTN_STATIC;
 
-	if ( !Q_strcasecmp( key, "ATTN_RICOCHET" ) )
+	if ( V_strieq( key, "ATTN_RICOCHET" ) )
 		return ATTN_RICOCHET;
 
-	if ( !Q_strcasecmp( key, "ATTN_GUNFIRE" ) )
+	if ( V_strieq( key, "ATTN_GUNFIRE" ) )
 		return ATTN_GUNFIRE;
 
 	DevMsg( "CSoundEmitterSystem:  Unknown attenuation key %s\n", key );

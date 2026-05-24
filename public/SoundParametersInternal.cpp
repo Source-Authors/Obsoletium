@@ -168,7 +168,7 @@ soundlevel_t TextToSoundLevel( const char *key )
 
 	for ( auto &entry : g_pSoundLevels )
 	{
-		if ( !Q_strcasecmp( key, entry.name ) )
+		if ( V_strieq( key, entry.name ) )
 			return entry.level;
 	}
 
@@ -213,7 +213,7 @@ int TextToChannel( const char *name )
 
 	for ( const auto &channelName : g_pChannelNames )
 	{
-		if ( !Q_strcasecmp( trimmedName, channelName.name ) )
+		if ( V_strieq( trimmedName, channelName.name ) )
 		{
 			return channelName.channel;
 		}
@@ -454,7 +454,7 @@ const char *CSoundParametersInternal::PitchToString( void ) const
 
 void CSoundParametersInternal::VolumeFromString( const char *sz )
 {
-	if ( !Q_strcasecmp( sz, "VOL_NORM" ) )
+	if ( V_strieq( sz, "VOL_NORM" ) )
 	{
 		volume.start = VOL_NORM;
 		volume.range = 0.0f;
@@ -472,17 +472,17 @@ void CSoundParametersInternal::ChannelFromString( const char *sz )
 
 void CSoundParametersInternal::PitchFromString( const char *sz )
 {
-	if ( !Q_strcasecmp( sz, "PITCH_NORM" ) )
+	if ( V_strieq( sz, "PITCH_NORM" ) )
 	{
 		pitch.start	= PITCH_NORM;
 		pitch.range = 0;
 	}
-	else if ( !Q_strcasecmp( sz, "PITCH_LOW" ) )
+	else if ( V_strieq( sz, "PITCH_LOW" ) )
 	{
 		pitch.start	= PITCH_LOW;
 		pitch.range = 0;
 	}
-	else if ( !Q_strcasecmp( sz, "PITCH_HIGH" ) )
+	else if ( V_strieq( sz, "PITCH_HIGH" ) )
 	{
 		pitch.start	= PITCH_HIGH;
 		pitch.range = 0;

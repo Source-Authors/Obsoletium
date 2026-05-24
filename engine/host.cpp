@@ -1661,7 +1661,7 @@ static int Host_CountVariablesWithFlags( int flags, bool nonDefault )
 			continue;
 
 		// It's == to the default value, don't count
-		if ( nonDefault && !Q_strcasecmp( pCvar->GetDefault(), pCvar->GetString() ) )
+		if ( nonDefault && V_strieq( pCvar->GetDefault(), pCvar->GetString() ) )
 			continue;
 
 		i++;
@@ -1702,7 +1702,7 @@ void Host_BuildConVarUpdateMessage( NET_SetConVar *cvarMsg, int flags, bool nonD
 			continue;
 
 		// It's == to the default value, don't count
-		if ( nonDefault && !Q_strcasecmp( pCvar->GetDefault(), pCvar->GetString() ) )
+		if ( nonDefault && V_strieq( pCvar->GetDefault(), pCvar->GetString() ) )
 			continue;
 
 		NET_SetConVar::cvar_t acvar;

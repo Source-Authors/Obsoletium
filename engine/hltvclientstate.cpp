@@ -444,7 +444,7 @@ bool CHLTVClientState::HookClientStringTable( char const *tableName )
 		return false;
 
 	// Hook instance baseline table
-	if ( !Q_strcasecmp( tableName, INSTANCE_BASELINE_TABLENAME ) )
+	if ( V_strieq( tableName, INSTANCE_BASELINE_TABLENAME ) )
 	{
 		table->SetStringChangedCallback( m_pHLTV,  HLTV_Callback_InstanceBaseline );
 		return true;
@@ -461,7 +461,7 @@ void CHLTVClientState::InstallStringTableCallback( char const *tableName )
 		return;
 
 	// Hook instance baseline table
-	if ( !Q_strcasecmp( tableName, INSTANCE_BASELINE_TABLENAME ) )
+	if ( V_strieq( tableName, INSTANCE_BASELINE_TABLENAME ) )
 	{
 		table->SetStringChangedCallback( m_pHLTV,  HLTV_Callback_InstanceBaseline );
 		return;

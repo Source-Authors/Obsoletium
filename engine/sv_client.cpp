@@ -1089,7 +1089,7 @@ bool CGameClient::IsEngineClientCommand( const CCommand &args ) const
 
 	for ( int i = 0; s_clcommands[i] != NULL; ++i )
 	{
-		if ( !Q_strcasecmp( args[0], s_clcommands[i] ) )
+		if ( V_strieq( args[0], s_clcommands[i] ) )
 			return true;
 	}
 

@@ -268,13 +268,13 @@ public:
 		{
 			for (KeyValues *dat = kv->GetFirstSubKey(); dat != nullptr; dat = dat->GetNextKey())
 			{
-				if ( !Q_strcasecmp( dat->GetName(), "width" ) )
+				if ( V_strieq( dat->GetName(), "width" ) )
 				{
 					// dimhotepus: Scale UI.
 					SetWide( QuickPropScale( dat->GetInt() ) );
 					continue;
 				}
-				else if ( !Q_strcasecmp( dat->GetName(), "height" ) )
+				else if ( V_strieq( dat->GetName(), "height" ) )
 				{
 					// dimhotepus: Scale UI.
 					SetTall( QuickPropScale( dat->GetInt() ) );
@@ -364,7 +364,7 @@ void CDebugSystemPanel::SetVisible( bool state )
 
 void CDebugSystemPanel::OnCommand( const char *command )
 {
-	if ( !Q_strcasecmp( command, "toggledebugpanel" ) )
+	if ( V_strieq( command, "toggledebugpanel" ) )
 	{
 		if ( m_hDebugOptions )
 		{
@@ -372,7 +372,7 @@ void CDebugSystemPanel::OnCommand( const char *command )
 		}
 		return;
 	}
-	else if ( !Q_strcasecmp( command, "quit" ) )
+	else if ( V_strieq( command, "quit" ) )
 	{
 		Cbuf_AddText( "quit\n" );
 	}

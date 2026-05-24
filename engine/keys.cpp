@@ -341,12 +341,12 @@ const char *Key_NameForBinding( const char *pBinding )
 			{
 				if ( s_pKeyInfo[i].m_pKeyBinding[0] == '+' )
 				{
-					if ( !Q_strcasecmp( s_pKeyInfo[i].m_pKeyBinding+1, pBind ) )
+					if ( V_strieq( s_pKeyInfo[i].m_pKeyBinding+1, pBind ) )
 						return g_pInputSystem->ButtonCodeToString( (ButtonCode_t)i );
 				}
 				else
 				{
-					if ( !Q_strcasecmp( s_pKeyInfo[i].m_pKeyBinding, pBind ) )
+					if ( V_strieq( s_pKeyInfo[i].m_pKeyBinding, pBind ) )
 						return g_pInputSystem->ButtonCodeToString( (ButtonCode_t)i );
 				}
 
@@ -384,7 +384,7 @@ const char *Key_NameForBindingExact( const char *pBinding )
 		{
 			if (*s_pKeyInfo[i].m_pKeyBinding)
 			{
-				if ( !Q_strcasecmp( s_pKeyInfo[i].m_pKeyBinding, pBinding ) )
+				if ( V_strieq( s_pKeyInfo[i].m_pKeyBinding, pBinding ) )
 					return g_pInputSystem->ButtonCodeToString( (ButtonCode_t)i );
 			}
 		}

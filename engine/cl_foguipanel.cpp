@@ -250,7 +250,7 @@ void CFogUIPanel::OnTick()
 //-----------------------------------------------------------------------------
 void CFogUIPanel::OnCommand( const char *command )
 {
-	if ( !Q_strcasecmp( command, "FogOverride" ) )
+	if ( V_strieq( command, "FogOverride" ) )
 	{
 		if ( m_pFogOverride->IsSelected() == true )
 		{
@@ -261,7 +261,7 @@ void CFogUIPanel::OnCommand( const char *command )
 			Cbuf_AddText( "fog_override 0\n" );
 		}
 	}
-	else if ( !Q_strcasecmp( command, "FogEnable" ) )
+	else if ( V_strieq( command, "FogEnable" ) )
 	{
 		if ( m_pFogEnable->IsSelected() == true )
 		{
@@ -272,7 +272,7 @@ void CFogUIPanel::OnCommand( const char *command )
 			Cbuf_AddText( "fog_enable 0\n" );
 		}
 	}
-	else if ( !Q_strcasecmp( command, "FogEnableSky" ) )
+	else if ( V_strieq( command, "FogEnableSky" ) )
 	{
 		if ( m_pFogEnableSky->IsSelected() == true )
 		{
@@ -283,7 +283,7 @@ void CFogUIPanel::OnCommand( const char *command )
 			Cbuf_AddText( "fog_enableskybox 0\n" );
 		}
 	}
-	else if ( !Q_strcasecmp( command, "FarZOverride" ) )
+	else if ( V_strieq( command, "FarZOverride" ) )
 	{
 		if ( m_pFarZOverride->IsSelected() == true )
 		{

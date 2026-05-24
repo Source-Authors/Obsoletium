@@ -959,7 +959,7 @@ const ConCommandBase *Cmd_ExecuteCommand( const CCommand &command, cmd_source_t 
 	cmdalias_t *a;
 	for ( a=cmd_alias; a; a=a->next )
 	{
-		if ( !Q_strcasecmp( command[0], a->name ) )
+		if ( V_strieq( command[0], a->name ) )
 		{
 			Cbuf_InsertText( a->value );
 			return NULL;

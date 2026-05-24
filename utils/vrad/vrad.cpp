@@ -368,7 +368,7 @@ void LightForTexture( const char *name, Vector& result )
 
 	for (i=0 ; i<num_texlights ; i++)
 	{
-		if (!Q_strcasecmp (name, texlights[i].name))
+		if (V_strieq (name, texlights[i].name))
 		{
 			VectorCopy( texlights[i].value, result );
 			return;

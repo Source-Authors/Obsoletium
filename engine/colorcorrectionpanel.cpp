@@ -3502,7 +3502,7 @@ void CColorLookupUIPanel::OnMessage(const KeyValues *params,  vgui::VPANEL fromP
 
 void CColorLookupUIPanel::OnCommand( const char *command )
 {
-	if ( !Q_strcasecmp( command, "LoadLookup" ) )
+	if ( V_strieq( command, "LoadLookup" ) )
 	{
 		FileOpenDialog *open_dialog = new FileOpenDialog( this, "File Open", true );
 		open_dialog->AddActionSignalTarget( this );
