@@ -187,7 +187,7 @@ void CCSFreezePanel::FireGameEvent( IGameEvent * event )
 {
 	const char *pEventName = event->GetName();
 
-	if ( Q_strcmp( "player_death", pEventName ) == 0 )
+	if ( V_streq( "player_death", pEventName ) )
 	{
 		// see if the local player died
 		int iPlayerIndexVictim = engine->GetPlayerForUserID( event->GetInt( "userid" ) );
@@ -231,14 +231,14 @@ void CCSFreezePanel::FireGameEvent( IGameEvent * event )
 			}
 		}
 	}
-	else if ( Q_strcmp( "hide_freezepanel", pEventName ) == 0 )
+	else if ( V_streq( "hide_freezepanel", pEventName ) )
 	{
 		Hide();
 	}
-	else if ( Q_strcmp( "freezecam_started", pEventName ) == 0 )
+	else if ( V_streq( "freezecam_started", pEventName ) )
 	{
 	}
-	else if ( Q_strcmp( "show_freezepanel", pEventName ) == 0 )
+	else if ( V_streq( "show_freezepanel", pEventName ) )
 	{
 		C_CS_PlayerResource *cs_PR = dynamic_cast<C_CS_PlayerResource *>( g_PR );
 		if ( !cs_PR )

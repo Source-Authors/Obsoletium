@@ -4,7 +4,7 @@
 // Desc: 		Manages client side stat storage, accumulation, and access
 // Author: 		Peter Freese <peter@hiddenpath.com>
 // Date: 		2009/09/11
-// Copyright:	© 2009 Hidden Path Entertainment
+// Copyright:	c 2009 Hidden Path Entertainment
 //
 // Keywords: 	
 //-------------------------------------------------------------
@@ -105,7 +105,7 @@ void CCSClientGameStats::FireGameEvent( IGameEvent *event )
 	{
 		RetrieveSteamStats();
 	}
-	else if ( Q_strcmp( pEventName, "round_end" ) == 0 )
+	else if ( V_streq( pEventName, "round_end" ) )
 	{
 		// Store off the reason the round ended. Used with the OGS data.
 		m_RoundEndReason = event->GetInt( "reason", Invalid_Round_End_Reason );
@@ -122,7 +122,7 @@ void CCSClientGameStats::FireGameEvent( IGameEvent *event )
 
 	// The user stats for a round get sent piece meal, so we'll wait until a new round starts
 	// before sending the previous round stats.
-	else if ( Q_strcmp( pEventName, "round_start" ) == 0 && m_roundStats[CSSTAT_PLAYTIME] > 0 )
+	else if ( V_streq( pEventName, "round_start" ) && m_roundStats[CSSTAT_PLAYTIME] > 0 )
 	{
 		SRoundData *pRoundStatData = new SRoundData( &m_roundStats);
 		C_CSPlayer *pPlayer = ToCSPlayer( C_BasePlayer::GetLocalPlayer() );

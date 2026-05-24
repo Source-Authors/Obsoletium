@@ -533,27 +533,27 @@ void CLog::FireGameEvent( IGameEvent *event )
 	if ( !name || !name[0])
 		return;
 
-	if ( Q_strcmp(name, "server_spawn") == 0 )
+	if ( V_streq(name, "server_spawn") )
 	{
 		Printf( "Started map \"%s\" (CRC \"%s\")\n", sv.GetMapName(), MD5_Print( sv.worldmapMD5.bits ) );
 	}
 
-	else if ( Q_strcmp(name, "server_shutdown") == 0 )
+	else if ( V_streq(name, "server_shutdown") )
 	{
 		Printf( "server_message: \"%s\"\n", event->GetString("reason") );
 	}
 
-	else if ( Q_strcmp(name, "server_cvar") == 0 )
+	else if ( V_streq(name, "server_cvar") )
 	{
 		Printf( "server_cvar: \"%s\" \"%s\"\n", event->GetString("cvarname"), event->GetString("cvarvalue")  );
 	}
 
-	else if ( Q_strcmp(name, "server_message") == 0 )
+	else if ( V_streq(name, "server_message") )
 	{
 		Printf( "server_message: \"%s\"\n", event->GetString("text") );
 	}
 	
-	else if ( Q_strcmp(name, "server_addban") == 0 )
+	else if ( V_streq(name, "server_addban") )
 	{
 		if ( sv_logbans.GetInt() > 0 )
 		{
@@ -615,7 +615,7 @@ void CLog::FireGameEvent( IGameEvent *event )
 		}
 	}
 
-	else if ( Q_strcmp(name, "server_removeban") == 0 )
+	else if ( V_streq(name, "server_removeban") )
 	{
 		if ( sv_logbans.GetInt() > 0 )
 		{

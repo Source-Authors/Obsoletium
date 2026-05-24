@@ -134,7 +134,7 @@ void CCSAchievementAnnouncePanel::FireGameEvent( IGameEvent * event )
 
 	if ( cl_show_achievement_popups.GetBool() )
 	{
-		if ( Q_strcmp( "achievement_earned_local", pEventName ) == 0 )
+		if ( V_streq( "achievement_earned_local", pEventName ) )
 		{
 			//Add achievement to queue and show the UI (since the UI doesn't "Think()" until it is shown        
 			Show();

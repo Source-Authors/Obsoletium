@@ -66,7 +66,7 @@ void ReadCheatCommandsFromFile( const char *pchFileName )
 		for ( auto *pSubKey = pKey->GetFirstSubKey(); pSubKey; pSubKey = pSubKey->GetNextKey() )
 		{
 			const char *pchType = pSubKey->GetName();
-			if ( Q_strcmp( pchType, "code" ) == 0 )
+			if ( V_streq( pchType, "code" ) )
 			{
 				AssertMsg( ( pNewCheatCode->iCodeLength < CHEAT_NAME_MAX_LEN ), "Cheat code elements exceeded max!" );
 

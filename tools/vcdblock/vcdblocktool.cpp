@@ -1049,7 +1049,7 @@ void CVcdBlockTool::AttachAllEngineEntities()
 		HTOOLHANDLE handle = clienttools->AttachToEntity( sr );
 
 		const char *pClassName = clienttools->GetClassname( handle );
-		if ( Q_strcmp( pClassName, "class C_InfoTarget" ) == 0 )
+		if ( V_streq( pClassName, "class C_InfoTarget" ) )
 		{
 			Vector vecOrigin = clienttools->GetAbsOrigin( handle );
 			QAngle angAngles = clienttools->GetAbsAngles( handle );

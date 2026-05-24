@@ -668,7 +668,7 @@ void C_HLTVCamera::FireGameEvent( IGameEvent * event)
 
 	const char *type = event->GetName();
 
-	if ( Q_strcmp( "game_newmap", type ) == 0 )
+	if ( V_streq( "game_newmap", type ) )
 	{
 		Reset();	// reset all camera settings
 
@@ -692,7 +692,7 @@ void C_HLTVCamera::FireGameEvent( IGameEvent * event)
 		return;
 	}
 
-	if ( Q_strcmp( "hltv_message", type ) == 0 )
+	if ( V_streq( "hltv_message", type ) )
 	{
 		wchar_t outputBuf[1024];
 		const char *pszText = event->GetString( "text", "" );
@@ -715,13 +715,13 @@ void C_HLTVCamera::FireGameEvent( IGameEvent * event)
 		return ;
 	}
 
-	if ( Q_strcmp( "hltv_title", type ) == 0 )
+	if ( V_streq( "hltv_title", type ) )
 	{
 		Q_strncpy( m_szTitleText, event->GetString( "text", "" ), sizeof(m_szTitleText) );
 		return;
 	}
 
-	if ( Q_strcmp( "hltv_status", type ) == 0 )
+	if ( V_streq( "hltv_status", type ) )
 	{
 		int nNumProxies = event->GetInt( "proxies" );
 		m_nNumSpectators = event->GetInt( "clients" ) - nNumProxies;
@@ -733,7 +733,7 @@ void C_HLTVCamera::FireGameEvent( IGameEvent * event)
 	if ( !spec_autodirector.GetBool() && !IsPVSLocked() )
 		return;
 
-	if ( Q_strcmp( "hltv_cameraman", type ) == 0 )
+	if ( V_streq( "hltv_cameraman", type ) )
 	{
 		Reset();
 
@@ -743,7 +743,7 @@ void C_HLTVCamera::FireGameEvent( IGameEvent * event)
 		return;
 	}
 
-	if ( Q_strcmp( "hltv_fixed", type ) == 0 )
+	if ( V_streq( "hltv_fixed", type ) )
 	{
 		m_iCameraMan  = 0;
 		
@@ -773,7 +773,7 @@ void C_HLTVCamera::FireGameEvent( IGameEvent * event)
 		return;
 	}
 
-	if ( Q_strcmp( "hltv_chase", type ) == 0 )
+	if ( V_streq( "hltv_chase", type ) )
 	{
 		bool bInEye	= event->GetInt( "ineye" );
 

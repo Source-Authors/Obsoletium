@@ -1765,7 +1765,7 @@ void ControlPanel::BuildIKRuleQCString()
 	const char *pType = cIKType->getLabel();
 	V_strcat_safe( qcstr, pType );
 
-	if ( Q_strcmp( pType, "touch" ) == 0 )
+	if ( V_streq( pType, "touch" ) )
 	{
 		V_strcat_safe( qcstr, " \"" );
 		if ( cIKTouch->getSelectedIndex() > 0 )
@@ -1774,7 +1774,7 @@ void ControlPanel::BuildIKRuleQCString()
 		}
 		V_strcat_safe( qcstr, "\"" );
 	}
-	else if ( Q_strcmp( pType, "attachment" ) == 0 )
+	else if ( V_streq( pType, "attachment" ) )
 	{
 		V_strcat_safe( qcstr, " \"" );
 		V_strcat_safe( qcstr, leIKAttachment->getLabel() );
@@ -1827,8 +1827,8 @@ void ControlPanel::BuildIKRuleQCString()
 void ControlPanel::UpdateIKRuleWindow()
 {
 	const char *pIKType = cIKType->getLabel();
-	bool bIsTouch = Q_strcmp( pIKType, "touch" ) == 0;
-	bool bIsAttachment = Q_strcmp( pIKType, "attachment" ) == 0;
+	bool bIsTouch = V_streq( pIKType, "touch" );
+	bool bIsAttachment = V_streq( pIKType, "attachment" );
 
 	lIKTouch->setVisible( bIsTouch );
 	cIKTouch->setVisible( bIsTouch );

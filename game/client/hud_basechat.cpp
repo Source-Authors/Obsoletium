@@ -1796,7 +1796,7 @@ void CBaseHudChat::FireGameEvent( IGameEvent *event )
 #ifndef _XBOX
 	const char *eventname = event->GetName();
 
-	if ( Q_strcmp( "hltv_chat", eventname ) == 0 )
+	if ( V_streq( "hltv_chat", eventname ) )
 	{
 		C_BasePlayer *player = C_BasePlayer::GetLocalPlayer();
 

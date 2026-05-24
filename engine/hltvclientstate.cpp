@@ -530,7 +530,7 @@ bool CHLTVClientState::ProcessGameEvent( SVC_GameEvent *msg )
 
 		bool bDontForward = false;
 
-		if ( Q_strcmp( pszName, "hltv_status" ) == 0 )
+		if ( V_streq( pszName, "hltv_status" ) )
 		{
 			m_pHLTV->m_nGlobalSlots = event->GetInt("slots");
 			m_pHLTV->m_nGlobalProxies = event->GetInt("proxies");
@@ -541,7 +541,7 @@ bool CHLTVClientState::ProcessGameEvent( SVC_GameEvent *msg )
 			}
 			bDontForward = true;
 		}
-		else if ( Q_strcmp( pszName, "hltv_title" ) == 0 )
+		else if ( V_streq( pszName, "hltv_title" ) )
 		{
 			// ignore title messages
 			bDontForward = true;

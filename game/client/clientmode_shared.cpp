@@ -654,8 +654,8 @@ int	ClientModeShared::KeyInput( int down, ButtonCode_t keynum, const char *pszCu
 	
 	// Should we start typing a message?
 	if ( pszCurrentBinding &&
-		( Q_strcmp( pszCurrentBinding, "messagemode" ) == 0 ||
-		  Q_strcmp( pszCurrentBinding, "say" ) == 0 ) )
+		( V_streq( pszCurrentBinding, "messagemode" ) ||
+		  V_streq( pszCurrentBinding, "say" ) ) )
 	{
 		if ( down )
 		{
@@ -664,8 +664,8 @@ int	ClientModeShared::KeyInput( int down, ButtonCode_t keynum, const char *pszCu
 		return 0;
 	}
 	else if ( pszCurrentBinding &&
-				( Q_strcmp( pszCurrentBinding, "messagemode2" ) == 0 ||
-				  Q_strcmp( pszCurrentBinding, "say_team" ) == 0 ) )
+				( V_streq( pszCurrentBinding, "messagemode2" ) ||
+				  V_streq( pszCurrentBinding, "say_team" ) ) )
 	{
 		if ( down )
 		{
@@ -966,7 +966,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 
 	const char *eventname = event->GetName();
 
-	if ( Q_strcmp( "player_connect_client", eventname ) == 0 )
+	if ( V_streq( "player_connect_client", eventname ) )
 	{
 		if ( !hudChat )
 			return;
@@ -986,7 +986,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 			hudChat->Printf( CHAT_FILTER_JOINLEAVE, "%s", szLocalized );
 		}
 	}
-	else if ( Q_strcmp( "player_disconnect", eventname ) == 0 )
+	else if ( V_streq( "player_disconnect", eventname ) )
 	{
 		C_BasePlayer *pPlayer = USERID2PLAYER( event->GetInt("userid") );
 
@@ -1027,7 +1027,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 			hudChat->Printf( CHAT_FILTER_JOINLEAVE, "%s", szLocalized );
 		}
 	}
-	else if ( Q_strcmp( "player_team", eventname ) == 0 )
+	else if ( V_streq( "player_team", eventname ) )
 	{
 		C_BasePlayer *pPlayer = USERID2PLAYER( event->GetInt("userid") );
 		if ( !hudChat )
@@ -1094,7 +1094,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 			pPlayer->TeamChange( team );
 		}
 	}
-	else if ( Q_strcmp( "player_changename", eventname ) == 0 )
+	else if ( V_streq( "player_changename", eventname ) )
 	{
 		if ( !hudChat )
 			return;
@@ -1117,7 +1117,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 
 		hudChat->Printf( CHAT_FILTER_NAMECHANGE, "%s", szLocalized );
 	}
-	else if (Q_strcmp( "teamplay_broadcast_audio", eventname ) == 0 )
+	else if (V_streq( "teamplay_broadcast_audio", eventname ) )
 	{
 		int team = event->GetInt( "team" );
 
@@ -1162,7 +1162,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 			C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, et );
 		}
 	}
-	else if ( Q_strcmp( "server_cvar", eventname ) == 0 )
+	else if ( V_streq( "server_cvar", eventname ) )
 	{
 		if ( !IsInCommentaryMode() )
 		{
@@ -1181,7 +1181,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 			hudChat->Printf( CHAT_FILTER_SERVERMSG, "%s", szLocalized );
 		}
 	}
-	else if ( Q_strcmp( "achievement_earned", eventname ) == 0 )
+	else if ( V_streq( "achievement_earned", eventname ) )
 	{
 		int iPlayerIndex = event->GetInt( "player" );
 		C_BasePlayer *pPlayer = UTIL_PlayerByIndex( iPlayerIndex );
@@ -1234,7 +1234,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 		}
 	}
 #if defined( TF_CLIENT_DLL )
-	else if ( Q_strcmp( "item_found", eventname ) == 0 )
+	else if ( V_streq( "item_found", eventname ) )
 	{
 		int iPlayerIndex = event->GetInt( "player" );
 		entityquality_t iItemQuality = event->GetInt( "quality" );

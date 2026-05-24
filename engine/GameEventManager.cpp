@@ -856,7 +856,7 @@ CGameEventDescriptor *CGameEventManager::GetEventDescriptor(const char * name)
 
 	for ( auto &descriptor : m_GameEvents )
 	{
-		if ( Q_strcmp( descriptor.name, name ) == 0 )
+		if ( V_streq( descriptor.name, name ) )
 			return &descriptor;
 	}
 
