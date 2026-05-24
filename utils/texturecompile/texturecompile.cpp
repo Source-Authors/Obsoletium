@@ -618,7 +618,7 @@ void WriteTexture( const char *pTextureName )
 	FILE *fp = fopen( filename2, "wb" );
 	if( !fp )
 	{
-		printf( "Can't open %s\n", filename2 );
+		fprintf( stderr, "Can't open %s\n", filename2 );
 		return;
 	}
 	printf( "writing %s\n", filename );
@@ -745,7 +745,7 @@ int TextureCompile_Main( int argc, char* argv[] )
 		{
 			if( g_Master_TextureHadError.Defined( g_ByteCode.String( i ) ) )
 			{
-				printf( "FAILED: \"%s\"\n", g_ByteCode.String( i ) );
+				fprintf( stderr, "FAILED: \"%s\"\n", g_ByteCode.String( i ) );
 			}
 			else
 			{

@@ -17,11 +17,11 @@
 
 void Usage( void )
 {
-	printf( "Fuzzy compare of two tga files.\n\n" );
-	printf( "Usage: tgamse src1.tga src2.tga \n" );
-	printf( "Return: MSE\n\n" );
-	printf( "Usage: tgamse src1.tga src2.tga threshhold \n" );
-	printf( "Return: PASS\\FAIL\n" );
+	fprintf( stderr, "Fuzzy compare of two tga files.\n\n" );
+	fprintf( stderr, "Usage: tgamse src1.tga src2.tga \n" );
+	fprintf( stderr, "Return: MSE\n\n" );
+	fprintf( stderr, "Usage: tgamse src1.tga src2.tga threshhold \n" );
+	fprintf( stderr, "Return: PASS\\FAIL\n" );
 	exit( -1 );
 }
 
@@ -79,7 +79,7 @@ int main( int argc, char **argv )
 
 	if( !TGALoader::GetInfo( buf1, &width1, &height1, &imageFormat1, &gamma1 ) )
 	{
-		printf( "error loading %s\n", pFileName[0] );
+		fprintf( stderr, "error loading %s\n", pFileName[0] );
 		exit( -1 );
 	}
 
@@ -96,13 +96,13 @@ int main( int argc, char **argv )
 
 	if( !TGALoader::GetInfo( buf2, &width2, &height2, &imageFormat2, &gamma2 ) )
 	{
-		printf( "error loading %s\n", pFileName[1] );
+		fprintf( stderr, "error loading %s\n", pFileName[1] );
 		exit( -1 );
 	}
 
 	if( width1 != width2 || height1 != height2 )
 	{
-		printf( "image dimensions different (%dx%d!=%dx%d): can't do diff for %s\n", 
+		fprintf( stderr, "image dimensions different (%dx%d!=%dx%d): can't do diff for %s\n", 
 			width1, height1, width2, height2, pFileName[0] );
 		exit( -1 );
 	}
@@ -110,14 +110,14 @@ int main( int argc, char **argv )
 	// have to allow for different formats for now due to *.txt file screwup.
 	if( imageFormat1 != imageFormat2 )
 	{
-		printf( "image format different (%s!=%s). . can't do diff for %s\n", 
+		fprintf( stderr, "image format different (%s!=%s). . can't do diff for %s\n", 
 			ImageLoader::GetName( imageFormat1 ), ImageLoader::GetName( imageFormat2 ), pDstFileName );
 		exit( -1 );
 	}
 #endif
 	if( gamma1 != gamma2 )
 	{
-		printf( "image gamma different (%f!=%f). . can't do diff for %s\n", gamma1, gamma2, pFileName[0] );
+		fprintf( stderr, "image gamma different (%f!=%f). . can't do diff for %s\n", gamma1, gamma2, pFileName[0] );
 		exit( -1 );
 	}
 
@@ -127,14 +127,14 @@ int main( int argc, char **argv )
 	buf1.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
 	if( !TGALoader::Load( pImage1Tmp, buf1, width1, height1, imageFormat1, 2.2f, false ) )
 	{
-		printf( "error loading %s\n", pFileName[0] );
+		fprintf( stderr, "error loading %s\n", pFileName[0] );
 		exit( -1 );
 	}
 	
 	buf2.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
 	if( !TGALoader::Load( pImage2Tmp, buf2, width2, height2, imageFormat2, 2.2f, false ) )
 	{
-		printf( "error loading %s\n", pFileName[1] );
+		fprintf( stderr, "error loading %s\n", pFileName[1] );
 		exit( -1 );
 	}
 

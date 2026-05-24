@@ -30,13 +30,13 @@ namespace {
 //-----------------------------------------------------------------------------
 SpewRetval_t DMXConvertOutputFunc(SpewType_t spewType, char const *pMsg) {
   if (spewType == SPEW_WARNING || spewType == SPEW_ERROR) {
-    fprintf(stderr, pMsg);
+    fprintf(stderr, "%s", pMsg);
     return SPEW_ABORT;
   }
 
   Plat_DebugString(pMsg);
 
-  printf(pMsg);
+  printf("%s", pMsg);
   fflush(stdout);
 
   return (spewType == SPEW_ASSERT) ? SPEW_DEBUGGER : SPEW_CONTINUE;

@@ -9410,14 +9410,14 @@ bool HandleMdlReport( int &returnValue )
 			}
 			else
 			{
-				printf( "-mdlreport: '%s' is wrong version (%d should be %d).\n", 
+				fprintf( stderr, "-mdlreport: '%s' is wrong version (%d should be %d).\n", 
 					pFilename, pHdr->version, STUDIO_VERSION );
 				returnValue = 1;
 			}
 		}
 		else
 		{
-			printf( "-mdlreport: can't open '%s'\n", pFilename );
+			fprintf( stderr, "-mdlreport: can't open '%s'\n", pFilename );
 			returnValue = 1;
 		}
 
@@ -10021,7 +10021,7 @@ int CStudioMDLApp::Main()
 		if ( g_bMakeVsi )
 			return Main_MakeVsi();
 		
-		printf( "ERROR: .qc or .dmx file should be specified to build.\n" );
+		fprintf( stderr, "ERROR: .qc or .dmx file should be specified to build.\n" );
 		return 1;
 	}
 
@@ -10221,7 +10221,7 @@ int CStudioMDLApp::Main_StripVhv()
 
 	if ( !mdllib )
 	{
-		printf( "ERROR: mdllib is not available!\n" );
+		fprintf( stderr, "ERROR: mdllib is not available!\n" );
 		return 1;
 	}
 
@@ -10266,7 +10266,7 @@ int CStudioMDLApp::Main_StripVhv()
 
 	if ( !bResult )
 	{
-		printf( "ERROR: stripping failed!\n" );
+		fprintf( stderr, "ERROR: stripping failed!\n" );
 		return 1;
 	}
 
@@ -10277,7 +10277,7 @@ int CStudioMDLApp::Main_StripVhv()
 	// Save vhv
 	if ( !WriteBufferToFile( bufVHV, g_path, ".vhv.strip" ) )
 	{
-		printf( "ERROR: Failed to save '%s'!\n", g_path );
+		fprintf( stderr, "ERROR: Failed to save '%s'!\n", g_path );
 		return 1;
 	}
 
@@ -10288,7 +10288,7 @@ int CStudioMDLApp::Main_MakeVsi()
 {
 	if ( !mdllib )
 	{
-		printf( "ERROR: mdllib is not available!\n" );
+		fprintf( stderr, "ERROR: mdllib is not available!\n" );
 		return 1;
 	}
 
@@ -10330,7 +10330,7 @@ int CStudioMDLApp::Main_MakeVsi()
 
 	if ( !bResult )
 	{
-		printf( "ERROR: stripping failed!\n" );
+		fprintf( stderr, "ERROR: stripping failed!\n" );
 		return 1;
 	}
 
@@ -10344,7 +10344,7 @@ int CStudioMDLApp::Main_MakeVsi()
 	
 	if ( !WriteFileToDisk( g_path, NULL, bufMappingTable ) )
 	{
-		printf( "ERROR: Failed to save '%s'!\n", g_path );
+		fprintf( stderr, "ERROR: Failed to save '%s'!\n", g_path );
 		return 1;
 	}
 	else if ( !g_quiet )
@@ -10364,7 +10364,7 @@ int CStudioMDLApp::Main_StripModel()
 
 	if ( !mdllib )
 	{
-		printf( "ERROR: mdllib is not available!\n" );
+		fprintf( stderr, "ERROR: mdllib is not available!\n" );
 		return 1;
 	}
 
@@ -10400,7 +10400,7 @@ int CStudioMDLApp::Main_StripModel()
 
 	if ( !bResult )
 	{
-		printf( "ERROR: stripping failed!\n" );
+		fprintf( stderr, "ERROR: stripping failed!\n" );
 		return 1;
 	}
 
@@ -10412,7 +10412,7 @@ int CStudioMDLApp::Main_StripModel()
 	V_strcpy( pExt, ".mdl.strip" );
 	if ( !WriteFileToDisk( g_path, NULL, bufMDL ) )
 	{
-		printf( "ERROR: Failed to save '%s'!\n", g_path );
+		fprintf( stderr, "ERROR: Failed to save '%s'!\n", g_path );
 		return 1;
 	}
 
@@ -10420,7 +10420,7 @@ int CStudioMDLApp::Main_StripModel()
 	V_strcpy( pExt, ".vvd.strip" );
 	if ( !WriteFileToDisk( g_path, NULL, bufVVD ) )
 	{
-		printf( "ERROR: Failed to save '%s'!\n", g_path );
+		fprintf( stderr, "ERROR: Failed to save '%s'!\n", g_path );
 		return 1;
 	}
 
@@ -10428,7 +10428,7 @@ int CStudioMDLApp::Main_StripModel()
 	V_strcpy( pExt, ".vtx.strip" );
 	if ( !WriteFileToDisk( g_path, NULL, bufVTX ) )
 	{
-		printf( "ERROR: Failed to save '%s'!\n", g_path );
+		fprintf( stderr, "ERROR: Failed to save '%s'!\n", g_path );
 		return 1;
 	}
 
@@ -10436,7 +10436,7 @@ int CStudioMDLApp::Main_StripModel()
 	V_strcpy( pExt, ".info.strip" );
 	if ( !WriteFileToDisk( g_path, NULL, bufMappingTable ) )
 	{
-		printf( "ERROR: Failed to save '%s'!\n", g_path );
+		fprintf( stderr, "ERROR: Failed to save '%s'!\n", g_path );
 		return 1;
 	}
 

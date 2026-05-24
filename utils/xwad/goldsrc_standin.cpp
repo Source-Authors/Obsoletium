@@ -86,7 +86,7 @@ void Warning(const char *pMsg, ...) {
 
   va_list argptr;
 
-  printf("\n************ ERROR ************\n");
+  fprintf(stderr, "\n************ ERROR ************\n");
 
   va_start(argptr, error);
   vfprintf(stderr, error, argptr);

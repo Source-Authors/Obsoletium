@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
 	Q_snprintf( redirectFilename, sizeof( redirectFilename ), "%s\\%s", fullPath, "texturecompile.redirect" );
 
 	Pause();	
-	// First, look for vrad.redirect and load the dll specified in there if possible.
+	// First, look for texturecompile.redirect and load the dll specified in there if possible.
 	CSysModule *pModule = NULL;
 	FILE *fp = fopen( redirectFilename, "rt" );
 	if ( fp )
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 			if ( pModule )
 				printf( "Loaded alternate texturecompile DLL (%s) specified in texturecompile.redirect.\n", dllName );
 			else
-				printf( "Can't find '%s' specified in vrad.redirect.\n", dllName );
+				fprintf( stderr, "Can't find '%s' specified in texturecompile.redirect.\n", dllName );
 		}
 		
 		fclose( fp );
@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
 	Pause();	
 	if( !pModule )
 	{
-		printf( "texturecompile_launcher error: can't load %s\n%s", dllName, GetLastErrorString() );
+		fprintf( stderr, "texturecompile_launcher error: can't load %s\n%s", dllName, GetLastErrorString() );
 		Pause();	
 		return 1;
 	}
@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
 	CreateInterfaceFn fn = Sys_GetFactory( pModule );
 	if( !fn )
 	{
-		printf( "vrad_launcher error: can't get factory from texturecompile_dll.dll\n" );
+		fprintf( stderr, "texturecompile_launcher error: can't get factory from texturecompile_dll.dll\n" );
 		Sys_UnloadModule( pModule );
 		return 2;
 	}
@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
 	ILaunchableDLL *pDLL = (ILaunchableDLL*)fn( LAUNCHABLE_DLL_INTERFACE_VERSION, &retCode );
 	if( !pDLL )
 	{
-		printf( "texturecompile_launcher error: can't get ITextureCompileDLL interface from vrad_dll.dll\n" );
+		fprintf( stderr, "texturecompile_launcher error: can't get ITextureCompileDLL interface from texturecompile_dll.dll\n" );
 		Sys_UnloadModule( pModule );
 		return 3;
 	}

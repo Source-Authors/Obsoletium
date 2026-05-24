@@ -22,16 +22,17 @@ SpewRetval_t UnitTestSpew( SpewType_t type, char const *pMsg )
 	switch( type )
 	{
 	case 	SPEW_WARNING:
-		printf( "UnitTest Warning:\n" );
+		fprintf( stderr, "UnitTest Warning:\n%s", pMsg );
 		break;
 	case	SPEW_ASSERT:
-		printf( "UnitTest Assert:\n" );
+		fprintf( stderr, "UnitTest Assert:\n%s", pMsg );
 		break;
 	case	SPEW_ERROR:
-		printf( "UnitTest Error:\n" );
+		fprintf( stderr, "UnitTest Error:\n%s", pMsg );
 		break;
+	default:
+		printf( "%s", pMsg );
 	}
-	printf( "%s", pMsg );
 	OutputDebugString( pMsg );
 
 	if ( Sys_IsDebuggerPresent() )

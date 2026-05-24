@@ -49,8 +49,15 @@ static SpewRetval_t VcdImportOutputFunc( SpewType_t spewType, const char *pMsg )
 	OutputDebugString( pMsg );
 #endif
 
-	printf( pMsg );
-	fflush( stdout );
+	if ( spewType == SPEW_WARNING || spewType == SPEW_ERROR )
+	{
+		fprintf( stderr, "%s", pMsg );
+	}
+	else
+	{
+		printf( "%s", pMsg );
+		fflush( stdout );
+	}
 
 	if (spewType == SPEW_ERROR)
 		return SPEW_ABORT;

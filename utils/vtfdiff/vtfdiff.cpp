@@ -18,7 +18,7 @@
 
 void Usage( void )
 {
-	printf( "Usage: vtfdiff file1.vtf file2.vtf\n" );
+	fprintf( stderr, "Usage: vtfdiff file1.vtf file2.vtf\n" );
 }
 
 bool LoadFileIntoBuffer( const char *pFileName, CUtlBuffer &buf )
@@ -44,7 +44,7 @@ bool LoadFileIntoBuffer( const char *pFileName, CUtlBuffer &buf )
 	return true;
 
 error:
-	printf( "Can't find file %s\n", pFileName );
+	fprintf( stderr, "Can't find file %s\n", pFileName );
 	return false;
 }
 
@@ -149,12 +149,12 @@ int main( int argc, char **argv )
 
 	if( !pTexture1->Unserialize( file1 ) )
 	{
-		printf( "error loading %s\n", argv[1] );
+		fprintf( stderr, "error loading %s\n", argv[1] );
 		return 31;
 	}
 	if( !pTexture2->Unserialize( file2 ) )
 	{
-		printf( "error loading %s\n", argv[2] );
+		fprintf( stderr, "error loading %s\n", argv[2] );
 		return 32;
 	}
 

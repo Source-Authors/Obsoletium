@@ -18,14 +18,14 @@
 
 int Usage()
 {
-	printf( "psdinfo ver. " __DATE__ " " __TIME__ "\n" );
-	printf( "Usage: \n" );
-	printf( "      psdinfo [OPTIONS] psdfile.psd \n" );
-	printf( "Options: \n" );
-	printf( "      -read         read and print the info record (default) \n" );
-	printf( "      -write        update the info record with data from pipe \n" );
-	printf( "psdfile.psd         the PSD file to process. \n" );
-	printf( "\n" );
+	fprintf( stderr, "psdinfo ver. " __DATE__ " " __TIME__ "\n" );
+	fprintf( stderr, "Usage: \n" );
+	fprintf( stderr, "      psdinfo [OPTIONS] psdfile.psd \n" );
+	fprintf( stderr, "Options: \n" );
+	fprintf( stderr, "      -read         read and print the info record (default) \n" );
+	fprintf( stderr, "      -write        update the info record with data from pipe \n" );
+	fprintf( stderr, "psdfile.psd         the PSD file to process. \n" );
+	fprintf( stderr, "\n" );
 
 	return 1;
 }

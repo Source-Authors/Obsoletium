@@ -55,8 +55,15 @@ static SpewRetval_t SpewStdout( SpewType_t spewType, char const *pMsg )
 	OutputDebugString( pMsg );
 #endif
 
-	printf( pMsg );
-	fflush( stdout );
+	if ( spewType == SPEW_WARNING || spewType == SPEW_ERROR )
+	{
+		fprintf( stderr, "%s", pMsg );
+	}
+	else
+	{
+		printf( "%s", pMsg );
+		fflush( stdout );
+	}
 
 	return ( spewType == SPEW_ASSERT ) ? SPEW_DEBUGGER : SPEW_CONTINUE; 
 }

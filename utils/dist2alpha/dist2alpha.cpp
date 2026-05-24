@@ -41,7 +41,7 @@ int main( int argc, char ** argv )
 
 				
 			default:
-				printf("unrecogized option %s\n", argv[nCurArg] );
+				fprintf( stderr, "unrecogized option %s\n", argv[nCurArg] );
 				exit(1);
 		}
 		nCurArg++;
@@ -52,7 +52,7 @@ int main( int argc, char ** argv )
 
 	if ( argc != 5 )
 	{
-		printf( "format is dist2alpha src_bm.tga dest_bm.tga dest_width dest_height\n" );
+		fprintf( stderr, "format is dist2alpha src_bm.tga dest_bm.tga dest_width dest_height\n" );
 		exit( 1 );
 	}
 	FloatBitMap_t hires_image( argv[1] );

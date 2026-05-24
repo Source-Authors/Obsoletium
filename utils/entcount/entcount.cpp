@@ -29,7 +29,7 @@ int main( int argc, char *argv[] )
 {
 	if ( argc < 2 )
 	{
-		printf( g_UsageString );
+		fprintf( stderr, g_UsageString );
 		return 0;
 	}
 
@@ -74,8 +74,8 @@ int main( int argc, char *argv[] )
 		}
 		else
 		{
-			printf( "error: unknown parameter \"%s\"\n", argv[count] );
-			printf( g_UsageString );
+			fprintf( stderr, "error: unknown parameter \"%s\"\n", argv[count] );
+			fprintf( stderr, g_UsageString );
 			return 1;
 		}
 	}
@@ -89,7 +89,7 @@ int main( int argc, char *argv[] )
 		FILE *f = fopen( fgdFile, "rb" );
 		if ( !f )
 		{
-			printf( "error: could not open file %s\n", fgdFile );
+			fprintf( stderr, "error: could not open file %s\n", fgdFile );
 			return 2;
 		}
 
@@ -120,7 +120,7 @@ int main( int argc, char *argv[] )
 	
 	if ( FHandle == -1 )
 	{
-		printf( "error: no files found in current directory\n" );
+		fprintf( stderr, "error: no files found in current directory\n" );
 		return 1;
 	}
 
@@ -131,7 +131,7 @@ int main( int argc, char *argv[] )
 		FILE *f = fopen( fileinfo.name, "rb" );
 		if ( !f )
 		{
-			printf( "error: couldn't open file %s\n", fileinfo.name );
+			fprintf( stderr, "error: couldn't open file %s\n", fileinfo.name );
 			return 2;
 		}
 

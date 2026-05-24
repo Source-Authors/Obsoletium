@@ -25,7 +25,7 @@
 namespace {
 
 [[noreturn]] void Usage() {
-  printf("Usage: splitskybox blah.pfm\n");
+  fprintf(stderr, "Usage: splitskybox blah.pfm\n");
 
   exit(EINVAL);
 }

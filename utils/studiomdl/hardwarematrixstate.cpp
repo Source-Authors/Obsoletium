@@ -206,7 +206,7 @@ void CHardwareMatrixState::DumpState( void )
 				m_matrixState[i].lastUsageID,
 				m_matrixState[i].globalMatrixID );
 			// dimhotepus: OutputDebugString -> printf
-			printf( buf );
+			printf( "%s", buf );
 		}
 	}
 }

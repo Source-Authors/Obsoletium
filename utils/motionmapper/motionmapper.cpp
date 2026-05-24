@@ -1648,7 +1648,7 @@ int checkCommand(char *str, char *cmd, int numOptions, int numSplit) {
     if (numOptions <= numSplit)
       return 1;
     else {
-      printf(
+      fprintf(stderr,
           "Error: Number or argument mismatch in template file cmd %s, "
           "requires %i, found %i\n",
           cmd, numOptions, numSplit);
@@ -2379,7 +2379,7 @@ s_source_t *MotionMap(s_source_t *pSource, s_source_t *pTarget,
         // printf("-- broken plane: %f\n",
         // thisJointGlobalMat[3][thisSolve->axis]);
         if (parentJointGlobalMat[3][thisSolve->axis] < thisSolve->floor) {
-          printf(
+          fprintf(stderr,
               "Error: Constraint parent has broken the plane, this frame's "
               "plane constraint unsolvable!\n");
         } else {

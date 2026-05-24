@@ -293,7 +293,7 @@ public:
 		}
 		else
 		{
-			printf("Bad key %s!!\n", pKey);
+			fprintf(stderr,"Bad key %s!!\n", pKey);
 		}
 	}
 	virtual void SetDefaults( void *pCustom )

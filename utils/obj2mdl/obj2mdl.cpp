@@ -31,9 +31,9 @@ SpewRetval_t SpewFunc( SpewType_t type, char const *pMsg )
 //-----------------------------------------------------------------------------
 void printusage( )
 {
-	printf( "usage:  obj2mdl <modelname.obj file> \n\n" );
-	printf( "The directory containing the <modelname>.obj file must also contain a\n" );
-	printf( "<modelname>.mtl file.\n" );
+	fprintf( stderr, "usage:  obj2mdl <modelname.obj file> \n\n" );
+	fprintf( stderr, "The directory containing the <modelname>.obj file must also contain a\n" );
+	fprintf( stderr, "<modelname>.mtl file.\n" );
 }
 
 void CreateTemplateQC( const char *pcDirectory, const char *pcBaseName, const char *pcSteamName )
@@ -682,7 +682,7 @@ int main( int argc, char* argv[] )
 			printf( "--- OBJ to MDL file conversion helper ---\n" );
 			if ( !GetSteamUserName( szSteamName, sizeof( szSteamName ) ) )
 			{
-				printf( "--- Unable to get Steam user name. Exiting. ---\n" );
+				fprintf( stderr, "--- Unable to get Steam user name. Exiting. ---\n" );
 			}
 			printf( "--- Reading MTL file ---\n" );
 			ParseMTL( szDirectory, szOBJFile, szMTLFile, szTGAColorFile, sizeof( szTGAColorFile ), szTGASpecularFile, sizeof( szTGASpecularFile ) );

@@ -36,7 +36,15 @@ unsigned long g_CurLoadOrder = 0;
 SpewRetval_t VMFTweakSpewFunc( SpewType_t spewType, char const *pMsg )
 {
 	OutputDebugString( pMsg );
-	printf( pMsg );
+	if ( spewType == SPEW_WARNING || spewType == SPEW_ERROR )
+	{
+		fprintf( stderr, "%s", pMsg );
+	}
+	else
+	{
+		printf( "%s", pMsg );
+		fflush( stdout );
+	}
 	switch( spewType )
 	{
 	case SPEW_MESSAGE:

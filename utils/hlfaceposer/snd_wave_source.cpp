@@ -543,7 +543,7 @@ CAudioSource *CreateWave( const char *pName )
 	// UNDONE: Don't use printf to handle errors
 	if ( riff.RIFFName() != RIFF_WAVE )
 	{
-		printf("Bad RIFF file type %s\n", pName );
+		fprintf( stderr, "Bad RIFF file type %s\n", pName );
 		return NULL;
 	}
 

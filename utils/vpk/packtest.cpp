@@ -44,7 +44,7 @@ CUtlString s_sPublicKeyFile;
 [[noreturn]] void PrintArgSummaryAndExit(int rc = 1) {
   fflush(stderr);
 
-  printf(
+  fprintf(stderr,
       "Usage: vpk [options] <command> <command arguments ...>\n"
       "       vpk [options] <directory>\n"
       "       vpk [options] <vpkfile>\n"
@@ -125,7 +125,7 @@ CUtlString s_sPublicKeyFile;
       "         Align files within chunk on n-byte boundary.  Default is %d.\n",
       k_nVPKDefaultChunkAlign);
 #ifdef VPK_ENABLE_SIGNING
-  printf(
+  fprintf(stderr,
       "  -K <private keyfile>\n"
       "         With commands 'a' or 'k': Sign VPK with specified private "
       "key.\n"
@@ -1613,19 +1613,19 @@ static void CheckSignature(const char *pszFilename) {
     case CPackedStore::eSignatureCheckResult_Failed:
       fprintf(stderr, "ERROR: FAILED\n");
       fflush(stderr);
-      printf("IO error or other generic failure.");
+      fprintf(stderr, "IO error or other generic failure.");
       exit(-1);
 
     case CPackedStore::eSignatureCheckResult_NotSigned:
       fprintf(stderr, "ERROR: NOT SIGNED\n");
       fflush(stderr);
-      printf("The VPK does not contain a signature.");
+      fprintf(stderr, "The VPK does not contain a signature.");
       exit(1);
 
     case CPackedStore::eSignatureCheckResult_WrongKey:
       fprintf(stderr, "ERROR: KEY MISMATCH\n");
       fflush(stderr);
-      printf(
+      fprintf(stderr,
           "The public key provided does not match the public\n"
           "key contained in the VPK file.  The VPK was not\n"
           "signed using the private key corresponding to your\n"
@@ -1635,7 +1635,7 @@ static void CheckSignature(const char *pszFilename) {
     case CPackedStore::eSignatureCheckResult_InvalidSignature:
       fprintf(stderr, "ERROR: INVALID SIGNATURE\n");
       fflush(stderr);
-      printf("The VPK contains a signature, but it isn't valid.");
+      fprintf(stderr, "The VPK contains a signature, but it isn't valid.");
       exit(3);
 
     case CPackedStore::eSignatureCheckResult_ValidSignature:
