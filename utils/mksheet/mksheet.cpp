@@ -227,7 +227,7 @@ void ReadTextControlFile(char const *fname) {
 
         // Figure out the sequence type
         char const *szSeqType = StringAfterPrefix(Words[0], "sequence");
-        if (V_strieq(szSeqType, "") || V_strieq(szSeqType, "-rgba"))
+        if (Q_isempty(szSeqType) || V_strieq(szSeqType, "-rgba"))
           pCurSequence->m_eMode = Sequence::SQM_RGBA;
         else if (V_strieq(szSeqType, "-rgb"))
           pCurSequence->m_eMode = Sequence::SQM_RGB;

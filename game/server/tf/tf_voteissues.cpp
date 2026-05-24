@@ -622,7 +622,7 @@ bool CChangeLevelIssue::CanCallVote( int iEntIndex, const char *pszDetails, vote
 		return false;
 	}
 
-	if ( V_streq( pszDetails, "" ) )
+	if ( Q_isempty( pszDetails ) )
 	{
 		nFailCode = VOTE_FAILED_MAP_NAME_REQUIRED;
 		return false;
