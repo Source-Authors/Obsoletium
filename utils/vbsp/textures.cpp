@@ -37,11 +37,11 @@ dtexdata_t *GetTexData( int index )
 
 static qboolean StringIsTrue( const char *str )
 {
-	if( Q_strcasecmp( str, "true" ) == 0 )
+	if( V_strieq( str, "true" ) )
 	{
 		return true;
 	}
-	if( Q_strcasecmp( str, "1" ) == 0 )
+	if( V_strieq( str, "1" ) )
 	{
 		return true;
 	}

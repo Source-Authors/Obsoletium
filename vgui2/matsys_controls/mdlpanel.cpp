@@ -565,7 +565,7 @@ bool CMDLPanel::SetPoseParameterByName( const char *pszName, float fValue )
 	for ( intp i = 0; i < nPoseCount; ++i )
 	{
 		const mstudioposeparamdesc_t &Pose = studioHdr.pPoseParameter( i );
-		if ( V_strcasecmp( pszName, Pose.pszName() ) == 0 )
+		if ( V_strieq( pszName, Pose.pszName() ) )
 		{
 			m_PoseParameters[ i ] = fValue;
 			return true;

@@ -139,7 +139,7 @@ CON_COMMAND( bsp_repack, "Repack and output a (re)compressed version of a bsp fi
 	const char *szInFilename = NULL;
 	const char *szOutFilename = NULL;
 
-	if ( args.ArgC() == 4 && V_strcasecmp( args.Arg( 1 ), "-nocompress" ) == 0 )
+	if ( args.ArgC() == 4 && V_strieq( args.Arg( 1 ), "-nocompress" ) )
 	{
 		bCompress = false;
 		szInFilename = args.Arg( 2 );

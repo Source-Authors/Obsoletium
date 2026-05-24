@@ -358,7 +358,7 @@ public:
 	// Note that this function takes a character count, and does not guarantee null-termination.
 	static void		   Copy( OUT_CAP(iLengthInChars) char *out_pOut, const char *pIn, intp iLengthInChars ) { strncpy( out_pOut, pIn, iLengthInChars ); }
 	static int		   Compare( const char *pLhs, const char *pRhs ) { return strcmp( pLhs, pRhs ); }
-	static int		   CaselessCompare( const char *pLhs, const char *pRhs ) { return Q_strcasecmp( pLhs, pRhs ); }
+	static int		   CaselessCompare( const char *pLhs, const char *pRhs ) { return V_stricmp( pLhs, pRhs ); }
 	static intp		   Length( const char *pValue ) { return strlen( pValue ); }
 	static const char *FindChar( const char *pStr, const char cSearch ) { return strchr( pStr, cSearch ); }
 	static const char *EmptyString() { return ""; }

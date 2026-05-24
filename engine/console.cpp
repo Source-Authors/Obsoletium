@@ -77,7 +77,7 @@ void ConsoleLogFileCallback( IConVar *var, const char *pOldValue, float flOldVal
 	else
 	{
 		const char *extension = Q_GetFileExtension( logFile );
-		if ( !extension || ( Q_strcasecmp( extension, "log" ) && Q_strcasecmp( extension, "txt" ) ) )
+		if ( !extension || ( !V_strieq( extension, "log" ) && !V_strieq( extension, "txt" ) ) )
 		{
 			char szTemp[MAX_PATH];
 			V_sprintf_safe( szTemp, "%s.log", logFile );

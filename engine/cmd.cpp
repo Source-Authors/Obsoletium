@@ -1096,7 +1096,7 @@ void Cmd_ForwardToServer( const CCommand &args, bool bReliable )
 #endif
 
 	str[0] = 0;
-	if ( Q_strcasecmp( args[0], "cmd") != 0 )
+	if ( !V_strieq( args[0], "cmd" ) )
 	{
 		Q_strncat( str, args[0], sizeof( str ), COPY_ALL_CHARACTERS );
 		Q_strncat( str, " ", sizeof( str ), COPY_ALL_CHARACTERS );

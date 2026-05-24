@@ -542,7 +542,7 @@ bool CGameClient::ProcessIncomingLogo( const char *filename )
 	Q_snprintf( crcfilename, sizeof( crcfilename ), "materials/decals/downloads/%s.vtf", logohex );
 
 	// It's not a logo file?
-	if ( Q_strcasecmp( filename, crcfilename ) )
+	if ( !V_strieq( filename, crcfilename ) )
 	{
 		return false;
 	}

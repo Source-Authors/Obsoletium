@@ -185,7 +185,7 @@ void CDemoActionManager::StartPlaying( char const *demfilename )
 	// Clear anything currently pending
 	StopPlaying();
 
-	bool changedfile = Q_strcasecmp( demfilename, m_szCurrentFile ) != 0;
+	bool changedfile = !V_strieq( demfilename, m_szCurrentFile );
 
 	V_strcpy_safe( m_szCurrentFile, demfilename );
 

@@ -2306,7 +2306,7 @@ void CImportPreviewItemPanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 //-----------------------------------------------------------------------------
 void CImportPreviewItemPanel::OnCommand( const char *command )
 {
-	if ( V_strcasecmp( command, "show_explanations" ) == 0 )
+	if ( V_strieq( command, "show_explanations" ) )
 	{
 		CExplanationPopup *pPopup = dynamic_cast<CExplanationPopup*>( FindChildByName("StartExplanation") );
 		if ( pPopup )
@@ -2314,13 +2314,13 @@ void CImportPreviewItemPanel::OnCommand( const char *command )
 			pPopup->Popup();
 		}
 	}
-	else if ( V_strcasecmp( command, "action" ) == 0 )
+	else if ( V_strieq( command, "action" ) )
 	{
 		StartAction();
 	}
-	else if ( V_strcasecmp( command, "BuildPreview" ) == 0 ||
-			  V_strcasecmp( command, "EditQC" ) == 0 ||
-			  V_strcasecmp( command, "EditQCI" ) == 0 ||
+	else if ( V_strieq( command, "BuildPreview" ) ||
+			  V_strieq( command, "EditQC" ) ||
+			  V_strieq( command, "EditQCI" ) ||
 			  V_strncasecmp( command, "EditMaterial", V_strlen( "EditMaterial" ) ) == 0 )
 	{
 		// Dispatch directly to our parent because the base class tries to run the command through the console interpreter
@@ -2602,12 +2602,12 @@ int CImportPreviewItemPanel::GetSequence( const char *pszGesture )
 	CStudioHdr studioHdr( m_pPlayerModelPanel->GetStudioHdr(), g_pMDLCache );
 
 	// Look for the bind pose by label since it's not an activity
-	if ( !pszGesture && V_strcasecmp( m_sCurrentPose.Get(), "ref" ) == 0 )
+	if ( !pszGesture && V_strieq( m_sCurrentPose.Get(), "ref" ) )
 	{
 		for ( int iSeq = 0; iSeq < studioHdr.GetNumSeq(); ++iSeq )
 		{
 			mstudioseqdesc_t &seqDesc = studioHdr.pSeqdesc( iSeq );
-			if ( V_strcasecmp( seqDesc.pszLabel(), m_sCurrentPose.Get() ) == 0 )
+			if ( V_strieq( seqDesc.pszLabel(), m_sCurrentPose.Get() ) )
 			{
 				return iSeq;
 			}
@@ -4102,7 +4102,7 @@ void CTFFileImportDialog::SetItemPrefab( const char *pszPrefab )
 		for ( int i = 0; i < m_pTypeComboBox->GetItemCount(); ++i )
 		{
 			KeyValues *pKeyValues = m_pTypeComboBox->GetItemUserData( m_pTypeComboBox->GetItemIDFromRow( i ) );
-			if ( V_strcasecmp( pszPrefab, pKeyValues->GetString( kItemPrefab ) ) == 0 )
+			if ( V_strieq( pszPrefab, pKeyValues->GetString( kItemPrefab ) ) )
 			{
 				bFound = true;
 				m_pTypeComboBox->ActivateItemByRow( i );
@@ -5239,7 +5239,7 @@ CTFFileImportDialog::BUILD_RESULT CTFFileImportDialog::ValidateMaterialValues( K
 		},
 	};
 
-	if ( V_strcasecmp( pKV->GetName(), MATERIAL_SHADER ) != 0 )
+	if ( !V_strieq( pKV->GetName(), MATERIAL_SHADER ) )
 	{
 		return BUILD_FAILED_MATERIALMISSINGSHADER;
 	}
@@ -5909,10 +5909,10 @@ void CTFFileImportDialog::SetDirty( bool bDirty )
 //-----------------------------------------------------------------------------
 static int FindSuffix( const char *pszString, const char *pszSuffix )
 {
-	int nStringLen = V_strlen(pszString);
-	int nSuffixLen = V_strlen(pszSuffix);
-	int nSuffixOffset = nStringLen - nSuffixLen;
-	if ( nSuffixOffset >= 0 && V_strcasecmp( (pszString + nSuffixOffset), pszSuffix ) == 0 )
+	intp nStringLen = V_strlen(pszString);
+	intp nSuffixLen = V_strlen(pszSuffix);
+	intp nSuffixOffset = nStringLen - nSuffixLen;
+	if ( nSuffixOffset >= 0 && V_strieq( pszString + nSuffixOffset, pszSuffix ) )
 	{
 		return nSuffixOffset;
 	}
@@ -6857,11 +6857,11 @@ KeyValues *CTFFileImportDialog::BuildItemSchema( const char *pszItemName )
 CTFFileImportDialog::LOAD_RESULT CTFFileImportDialog::Load( const char *pszFilePath, const char *pathID, CUtlString &sFailedPath )
 {
 	const char *pszExtension = V_GetFileExtension( pszFilePath );
-	if ( V_strcasecmp( pszExtension, "txt" ) == 0 )
+	if ( V_strieq( pszExtension, "txt" ) )
 	{
 		return LoadTxt( pszFilePath, pathID, sFailedPath );
 	}
-	if ( V_strcasecmp( pszExtension, "zip" ) == 0 )
+	if ( V_strieq( pszExtension, "zip" ) )
 	{
 		return LoadZip( pszFilePath, pathID, sFailedPath );
 	}
@@ -7492,7 +7492,7 @@ void CTFFileImportDialog::SetEquipRegion( const char* pszEquipRegion )
 		for ( int i = 0; i < m_pEquipRegionComboBox->GetItemCount(); ++i )
 		{
 			KeyValues *pKeyValues = m_pEquipRegionComboBox->GetItemUserData( m_pEquipRegionComboBox->GetItemIDFromRow( i ) );
-			if ( V_strcasecmp( pszEquipRegion, pKeyValues->GetString( kEquipRegion ) ) == 0 )
+			if ( V_strieq( pszEquipRegion, pKeyValues->GetString( kEquipRegion ) ) )
 			{
 				bFound = true;
 				m_pEquipRegionComboBox->ActivateItemByRow( i );

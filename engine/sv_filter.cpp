@@ -727,7 +727,7 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 		return;
 	}
 
-	const bool bKick = args.ArgC() >= 3 && Q_strcasecmp( args[ args.ArgC() - 1 ], "kick" ) == 0;
+	const bool bKick = args.ArgC() >= 3 && V_strieq( args[ args.ArgC() - 1 ], "kick" );
 	
 	char szSearchString[64];
 	szSearchString[0] = '\0';

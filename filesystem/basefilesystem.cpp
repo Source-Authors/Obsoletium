@@ -1031,7 +1031,7 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 
 	// Security nightmares already, should not let things explicitly loading from e.g. "MOD" get surprise untrusted
 	// files unless you really really know what you're doing.
-	AssertMsg( V_strcasecmp( pPathID, "GAME" ) == 0,
+	AssertMsg( V_strieq( pPathID, "GAME" ),
 	           "Mounting map files anywhere besides GAME is asking for pain" );
 
 	char newPath[ MAX_FILEPATH ];
@@ -4994,7 +4994,7 @@ FileCacheHandle_t CBaseFileSystem::CreateFileCache( )
 void CBaseFileSystem::AddFilesToFileCache( FileCacheHandle_t cacheId, const char **ppFileNames, int nFileNames, const char *pPathID )
 {
 	// For now, assuming that we're only used with GAME.
-	Assert( pPathID && V_strcasecmp( pPathID, "GAME" ) == 0 );
+	Assert( pPathID && V_strieq( pPathID, "GAME" ) );
 	return static_cast< CFileCacheObject * >( cacheId )->AddFiles( ppFileNames, nFileNames );
 }
 

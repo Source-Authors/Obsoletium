@@ -556,7 +556,7 @@ void CDemoRecorder::StartupDemoFile( void )
 	// make sure the .dem extension is still present
 	char ext[10];
 	V_ExtractFileExtension( demoFileName, ext );
-	if ( Q_strcasecmp( ext, "dem" ) )
+	if ( !V_strieq( ext, "dem" ) )
 	{
 		ConMsg( "StartupDemoFile: invalid filename.\n" );
 		return;

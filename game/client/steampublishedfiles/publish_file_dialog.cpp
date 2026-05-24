@@ -52,7 +52,7 @@ public:
 	// Return 0 for success
 	virtual int Run()
 	{
-		if ( V_strcasecmp( V_GetFileExtension( m_strInput.Get() ), "bsp" ) == 0 )
+		if ( V_strieq( V_GetFileExtension( m_strInput.Get() ), "bsp" ) )
 		{
 			return BSP_SyncRepack( m_strInput.Get(), m_strOutput.Get() ) ? 0 : 1;
 		}

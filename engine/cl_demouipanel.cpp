@@ -352,7 +352,7 @@ void CDemoUIPanel::OnFileSelected( char const *fullpath )
 	char ext[ 10 ];
 	V_ExtractFileExtension( relativepath, ext );
 
-	if ( Q_strcasecmp( ext, "dem" ) )
+	if ( !V_strieq( ext, "dem" ) )
 	{
 		return;
 	}
@@ -891,7 +891,7 @@ void CDemoUIPanel2::OnFileSelected( char const *fullpath )
 	char ext[ 10 ];
 	V_ExtractFileExtension( relativepath, ext );
 
-	if ( Q_strcasecmp( ext, "dem" ) )
+	if ( !V_strieq( ext, "dem" ) )
 	{
 		return;
 	}

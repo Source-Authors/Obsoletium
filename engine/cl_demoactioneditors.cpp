@@ -848,14 +848,14 @@ bool CBaseActionTextMessageStartDialog::OnSaveChanges( void )
 	}
 
 	m_pMessageText->GetText( sz );
-	if ( Q_strcasecmp( sz, GetAction()->GetMessageText() ) )
+	if ( !V_strieq( sz, GetAction()->GetMessageText() ) )
 	{
 		GetAction()->SetMessageText( sz );
 		bret = true;
 	}
 
 	m_pFontName->GetText( sz );
-	if ( Q_strcasecmp( sz, GetAction()->GetFontName() ) )
+	if ( !V_strieq( sz, GetAction()->GetFontName() ) )
 	{
 		GetAction()->SetFontName( sz );
 		bret = true;
@@ -915,7 +915,7 @@ bool CBaseActionPlayCommandsDialog::OnSaveChanges( void )
 	char commands[ 512 ];
 	m_pCommands->GetText( commands );
 
-	if ( Q_strcasecmp( commands, GetAction()->GetCommandStream() ) )
+	if ( !V_strieq( commands, GetAction()->GetCommandStream() ) )
 	{
 		bret = true;
 		GetAction()->SetCommandStream( commands );
@@ -1045,7 +1045,7 @@ bool CBaseActionPlaySoundStartDialog::OnSaveChanges( void )
 	char soundname[ 512 ];
 	m_pSoundName->GetText( soundname );
 
-	if ( Q_strcasecmp( soundname, GetAction()->GetSoundName() ) )
+	if ( !V_strieq( soundname, GetAction()->GetSoundName() ) )
 	{
 		bret = true;
 		GetAction()->SetSoundName( soundname );

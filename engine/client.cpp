@@ -1528,7 +1528,7 @@ void CClientState::CheckUpdatingSteamResources()
 							V_ExtractFileExtension( fname, extension );
 
 							// If the extension is not bsp, skip it.
-							if ( Q_strcasecmp( extension, "bsp" ) )
+							if ( !V_strieq( extension, "bsp" ) )
 							{
 								continue;
 							}

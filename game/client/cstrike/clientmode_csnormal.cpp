@@ -799,7 +799,7 @@ void UpdateClassImageEntity(
 	int i;
 	for ( i=0; i<CTPlayerModels.Count(); ++i )
 	{
-		if ( Q_strcasecmp( pModelName, CTPlayerModels[i] ) == 0 )
+		if ( V_strieq( pModelName, CTPlayerModels[i] ) )
 		{
 			// give CTs a M4
 			pWeaponName = "models/weapons/w_rif_m4a1.mdl";

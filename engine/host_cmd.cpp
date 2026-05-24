@@ -1298,7 +1298,7 @@ CON_COMMAND( kick, "Kick a player by name." )
 				continue;
 
 			// found!
-			if ( Q_strcasecmp( client->GetClientName(), pszName ) == 0 ) 
+			if ( V_strieq( client->GetClientName(), pszName ) ) 
 				break;
 		}
 
@@ -1760,7 +1760,7 @@ void Host_VoiceToggle_f( const CCommand &args )
 #if !defined( NO_VOICE )	
 		bool bToggle = false;
 
-		if ( args.ArgC() == 2 && V_strcasecmp( args[1], "on" ) == 0 )
+		if ( args.ArgC() == 2 && V_strieq( args[1], "on" ) )
 		{
 			bToggle = true;
 		}

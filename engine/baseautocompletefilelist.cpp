@@ -32,7 +32,7 @@ int CBaseAutoCompleteFileList::AutoCompletionFunc( char const *partial, char com
 
 	// Search the directory structure.
 	char searchpath[MAX_QPATH];
-	if ( m_pszSubDir && m_pszSubDir[0] && Q_strcasecmp( m_pszSubDir, "NULL" ) )
+	if ( m_pszSubDir && m_pszSubDir[0] && !V_strieq( m_pszSubDir, "NULL" ) )
 	{
 		Q_snprintf(searchpath,sizeof(searchpath),"%s/*.%s", m_pszSubDir, m_pszExtension );
 	}
