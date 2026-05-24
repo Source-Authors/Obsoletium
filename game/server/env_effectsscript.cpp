@@ -438,12 +438,12 @@ void CEnvEffectsScript::ParseNewEffect( void )
 			break;
 		}
 
-		if ( V_strieq( token, "{" ) )
+		if ( V_streq( token, "{" ) )
 		{
 			while ( 1 )
 			{
 				ParseToken();
-				if ( V_strieq( token, "}" ) )
+				if ( V_streq( token, "}" ) )
 					break;
 
 				if ( V_strieq( token, "type" ) )

@@ -5835,7 +5835,7 @@ void Cmd_Model( )
 		{
 			depth++;
 		}
-		else if ( V_strieq("}", token ) )
+		else if ( V_streq("}", token ) )
 		{
 			depth--;
 		}
@@ -7391,14 +7391,14 @@ void Option_KeyValues( CUtlVector< char > *pKeyValue )
 
 	while ( GetToken(true) )
 	{
-		if ( V_strieq( token, "}" ) )
+		if ( V_streq( token, "}" ) )
 		{
 			nLevel--;
 			if ( nLevel <= 0 )
 				break;
 			AppendKeyValueText( pKeyValue, " }\n" );
 		}
-		else if ( V_strieq( token, "{" ) )
+		else if ( V_streq( token, "{" ) )
 		{
 			AppendKeyValueText( pKeyValue, "{\n" );
 			nLevel++;
@@ -8051,7 +8051,7 @@ bool ParseBoing( s_jigglebone_t *jiggleInfo )
 			return false;
 		}
 
-		if ( V_strieq( token, "{" ) )
+		if ( V_streq( token, "{" ) )
 		{
 			gotOpenBracket = true;
 		}
@@ -8060,7 +8060,7 @@ bool ParseBoing( s_jigglebone_t *jiggleInfo )
 			MdlError( "$jigglebone:is_boing: missing '{'\n" );
 			return false;
 		}
-		else if ( V_strieq( token, "}" ) )
+		else if ( V_streq( token, "}" ) )
 		{
 			// definition complete
 			break;
@@ -8160,7 +8160,7 @@ void Cmd_JiggleBone( void )
 			MdlError( "$jigglebone: missing '{'\n" );
 			return;				
 		}
-		else if (V_strieq( token, "}" ))
+		else if (V_streq( token, "}" ))
 		{
 			// definition complete
 			break;

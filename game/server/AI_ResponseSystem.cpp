@@ -2177,12 +2177,12 @@ void CResponseSystem::ParseResponse( void )
 			break;
 		}
 
-		if ( V_strieq( token, "{" ) )
+		if ( V_streq( token, "{" ) )
 		{
 			while ( 1 )
 			{
 				ParseToken();
-				if ( V_strieq( token, "}" ) )
+				if ( V_streq( token, "}" ) )
 					break;
 
 				if ( V_strieq( token, "permitrepeats" ) )
@@ -2320,14 +2320,14 @@ short CResponseSystem::ParseOneCriterion( const char *criterionName )
 			break;
 		}
 
-		if ( V_strieq( token, "{" ) )
+		if ( V_streq( token, "{" ) )
 		{
 			gotbody = true;
 
 			while ( 1 )
 			{
 				ParseToken();
-				if ( V_strieq( token, "}" ) )
+				if ( V_streq( token, "}" ) )
 					break;
 
 				// Look up subcriteria index
@@ -2418,7 +2418,7 @@ void CResponseSystem::ParseEnumeration( void )
 	while ( 1 )
 	{
 		ParseToken();
-		if ( V_strieq( token, "}" ) )
+		if ( V_streq( token, "}" ) )
 			break;
 
 		if ( Q_isempty( token ) )
@@ -2482,7 +2482,7 @@ void CResponseSystem::ParseRule( void )
 	while ( 1 )
 	{
 		ParseToken();
-		if ( V_strieq( token, "}" ) )
+		if ( V_streq( token, "}" ) )
 		{
 			break;
 		}

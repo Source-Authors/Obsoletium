@@ -3088,7 +3088,7 @@ qboolean	ParseEntity (void)
 	{
 		if (!GetToken (true))
 			Error ("ParseEntity: EOF without closing brace");
-		if (V_strieq (token, "}") )
+		if (V_streq (token, "}") )
 			break;
 		e = ParseEpair ();
 		e->next = mapent->epairs;

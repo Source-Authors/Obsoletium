@@ -1326,7 +1326,7 @@ bool FileOpenDialog::ExtensionMatchesFilter( const char *pExt )
 		if (curFilter[0] == 0)
 			break;
 
-		if ( V_strieq( curFilter, "*" ) || V_strieq( curFilter, "*.*" ) )
+		if ( V_streq( curFilter, "*" ) || V_streq( curFilter, "*.*" ) )
 			return true;
 
 		// FIXME: This isn't exactly right, but tough cookies;
@@ -1376,7 +1376,7 @@ void FileOpenDialog::ChooseExtension( OUT_Z_CAP(nBufLen) char *pExt, intp nBufLe
 		if (curFilter[0] == 0)
 			break;
 
-		if ( V_strieq( curFilter, "*" ) || V_strieq( curFilter, "*.*" ) )
+		if ( V_streq( curFilter, "*" ) || V_streq( curFilter, "*.*" ) )
 			continue;
 
 		// FIXME: This isn't exactly right, but tough cookies;

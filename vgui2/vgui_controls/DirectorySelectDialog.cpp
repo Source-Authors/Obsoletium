@@ -398,7 +398,7 @@ void DirectorySelectDialog::ExpandTreeNode(const char *path, intp parentNodeInde
 
 	for ( ; pFileName; pFileName = g_pFullFileSystem->FindNext( h ) )
 	{
-		if ( V_strieq( pFileName, ".." ) || V_strieq( pFileName, "." ) )
+		if ( V_streq( pFileName, ".." ) || V_streq( pFileName, "." ) )
 			continue;
 
 		KeyValuesAD kv("item");

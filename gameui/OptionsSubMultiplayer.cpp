@@ -1446,7 +1446,7 @@ void FindVMTFilesInFolder( const char *pFolder, const char *pFolderName, CLabele
 
 	while ( fn )
 	{
-		if ( V_strieq( fn, ".") || V_strieq( fn, "..") )
+		if ( V_streq( fn, ".") || V_streq( fn, "..") )
 		{
 			fn = g_pFullFileSystem->FindNext( fh );
 			continue;

@@ -453,7 +453,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 			pfile = engine->ParseFile(pfile, token );
 
 			// Check for malformed task argument type
-			if (V_strieq(token,":"))
+			if (V_streq(token,":"))
 			{
 				DevMsg( "ERROR: LoadSchd (%s): Schedule (%s),\n        Task (%d), has a malformed AI Task Argument = (%s)\n",
 						prefix,new_schedule->GetName(),taskID,save_token);

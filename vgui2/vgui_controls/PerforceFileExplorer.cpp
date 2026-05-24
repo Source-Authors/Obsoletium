@@ -191,7 +191,7 @@ void PerforceFileExplorer::PopulateFileList()
 
 	for ( ; pFileName; pFileName = g_pFullFileSystem->FindNext( h ) )
 	{
-		if ( V_strieq( pFileName, ".." ) || V_strieq( pFileName, "." ) )
+		if ( V_streq( pFileName, ".." ) || V_streq( pFileName, "." ) )
 			continue;
 
 		if ( !Q_IsAbsolutePath( pFileName ) )
@@ -276,7 +276,7 @@ void PerforceFileExplorer::OnFolderUp()
 	V_StripTrailingSlash( pUpDirectory );
 
 	// This occurs at the root directory
-	if ( V_strieq( pUpDirectory, "." ) )
+	if ( V_streq( pUpDirectory, "." ) )
 		return;
 	SetCurrentDirectory( pUpDirectory ); 
 }

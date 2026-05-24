@@ -690,7 +690,7 @@ void BuildFileList_R( int depth, CUtlVector< FileEntry >& files, CUtlVector< Fil
 	HANDLE ff;
 
 	bool canrecurse = true;
-	if ( V_strieq( wild, "..." ) )
+	if ( V_streq( wild, "..." ) )
 	{
 		canrecurse = true;
 		sprintf( directory, "%s%s%s", dir[0] == '\\' ? dir + 1 : dir, dir[0] != 0 ? "\\" : "", "*.*" );
