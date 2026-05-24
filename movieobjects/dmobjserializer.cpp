@@ -1209,7 +1209,7 @@ const char *CDmObjSerializer::FindMtlEntry( const char *pTgaName )
 	intp nCount = m_mtlLib.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( m_mtlLib[i].m_MtlName, pTgaName ) )
+		if ( V_strieq( m_mtlLib[i].m_MtlName, pTgaName ) )
 			return m_mtlLib[i].m_TgaName;
 	}
 	return pTgaName;

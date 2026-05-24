@@ -1127,11 +1127,11 @@ void CVProfPanel::Paint()
 void CVProfPanel::OnCommand( const char *pCommand )
 {
 #ifndef _XBOX
-	if ( !Q_stricmp( pCommand, "StepForward" ) )
+	if ( V_strieq( pCommand, "StepForward" ) )
 	{
 		VProfPlayback_Step();
 	}
-	else if ( !Q_stricmp( pCommand, "StepBack" ) )
+	else if ( V_strieq( pCommand, "StepBack" ) )
 	{
 		int shouldReset = VProfPlayback_StepBack();
 		if ( shouldReset == 2 )
@@ -1139,7 +1139,7 @@ void CVProfPanel::OnCommand( const char *pCommand )
 			Reset();
 		}
 	}
-	else if ( !Q_stricmp( pCommand, "GotoButton" ) )
+	else if ( V_strieq( pCommand, "GotoButton" ) )
 	{
 		int shouldReset = VProfPlayback_SeekToPercent( (float)m_pPlaybackScroll->GetValue() / 1000.0f );
 		if ( shouldReset == 2 )
@@ -1147,7 +1147,7 @@ void CVProfPanel::OnCommand( const char *pCommand )
 			Reset();
 		}
 	}
-	else if ( !Q_stricmp( pCommand, "redosort" ) )
+	else if ( V_strieq( pCommand, "redosort" ) )
 	{
 		//
 		Assert( !m_bHierarchicalView );

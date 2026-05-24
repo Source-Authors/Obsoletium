@@ -202,14 +202,14 @@ void CBaseLobbyContainerFrame::FireGameEvent( IGameEvent *event )
 		return;
 
 	const char *pszEventname = event->GetName();
-	if ( !Q_stricmp( pszEventname, "lobby_updated" ) || !Q_stricmp( pszEventname, "party_updated" ) )
+	if ( V_strieq( pszEventname, "lobby_updated" ) || V_strieq( pszEventname, "party_updated" ) )
 	{
 		WriteControls();
 		return;
 	}
 
 	// Bail when we connect to any server
-	if ( !Q_stricmp( pszEventname, "client_beginconnect" ) )
+	if ( V_strieq( pszEventname, "client_beginconnect" ) )
 	{
 		ShowPanel( false );
 		return;

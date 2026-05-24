@@ -136,7 +136,7 @@ void CAttributeTextEntry::OnPanelDropped( CUtlVector< KeyValues * >& msglist )
 	}
 
 	const char *cmd = data->GetString( "command" );
-	if ( !Q_stricmp( cmd, "droptext" ) || !Q_stricmp( cmd, "default" ) )
+	if ( V_strieq( cmd, "droptext" ) || V_strieq( cmd, "default" ) )
 	{
 		DmAttributeType_t t = pPanel->GetAttributeType();
 		switch ( t )

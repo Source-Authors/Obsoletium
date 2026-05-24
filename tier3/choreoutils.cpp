@@ -22,7 +22,7 @@ static intp LookupSequence( CStudioHdr *pStudioHdr, const char *pSequenceName )
 {
 	for ( intp i = 0; i < pStudioHdr->GetNumSeq(); i++ )
 	{
-		if ( !Q_stricmp( pSequenceName, pStudioHdr->pSeqdesc( i ).pszLabel() ) )
+		if ( V_strieq( pSequenceName, pStudioHdr->pSeqdesc( i ).pszLabel() ) )
 			return i;
 	}
 	return -1;
@@ -87,27 +87,27 @@ bool AutoAddGestureKeys( CChoreoEvent *e, CStudioHdr *pStudioHdr, float *pPosePa
 		// dimhotepus: Precache name.
 		const char *name = pkvFaceposer->GetName();
 
-		if ( !Q_stricmp( name, "startloop" ) )
+		if ( V_strieq( name, "startloop" ) )
 		{
 			V_strcpy_safe( szStartLoop, pkvFaceposer->GetString() );
 			continue;
 		}
-		else if ( !Q_stricmp( name, "endloop" ) )
+		else if ( V_strieq( name, "endloop" ) )
 		{
 			V_strcpy_safe( szEndLoop, pkvFaceposer->GetString() );
 			continue;
 		}
-		else if ( !Q_stricmp( name, "entrytag" ) )
+		else if ( V_strieq( name, "entrytag" ) )
 		{
 			V_strcpy_safe( szEntry, pkvFaceposer->GetString() );
 			continue;
 		}
-		else if ( !Q_stricmp( name, "exittag" ) )
+		else if ( V_strieq( name, "exittag" ) )
 		{
 			V_strcpy_safe( szExit, pkvFaceposer->GetString() );
 			continue;
 		}
-		else if ( !Q_stricmp( name, "tags" ) )
+		else if ( V_strieq( name, "tags" ) )
 		{
 			if ( nMaxFrame <= 0 )
 				continue;

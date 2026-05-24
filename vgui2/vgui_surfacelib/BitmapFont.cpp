@@ -199,7 +199,7 @@ bool CBitmapFont::IsEqualTo( const char *windowsFontName, float scalex, float sc
 	char fontname[MAX_PATH];
 	V_FileBase( windowsFontName, fontname );
 
-	if ( !Q_stricmp( fontname, m_szName.String() ) &&
+	if ( V_strieq( fontname, m_szName.String() ) &&
 		m_scalex == scalex && 
 		m_scaley == scaley  )
 	{

@@ -276,7 +276,7 @@ void CCollectionCraftingPanel::CreateItemPanels()
 //-----------------------------------------------------------------------------
 void CCollectionCraftingPanel::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "reloadscheme" ) )
+	if ( V_strieq( command, "reloadscheme" ) )
 	{
 		InvalidateLayout( false, true );
 		return;

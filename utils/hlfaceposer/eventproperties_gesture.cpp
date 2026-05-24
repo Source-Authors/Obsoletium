@@ -132,7 +132,7 @@ void CEventPropertiesGestureDialog::ShowControlsForEventType( CEventParams *para
 
 	// NULL Gesture doesn't have these controls either
 	if ( g_Params.m_nType == CChoreoEvent::GESTURE && 
-		!Q_stricmp( g_Params.m_szName, "NULL" ) )
+		V_strieq( g_Params.m_szName, "NULL" ) )
 	{
 		ShowWindow( GetControl( IDC_EVENTNAME ), SW_HIDE );
 		ShowWindow( GetControl( IDC_TAGS ), SW_HIDE );

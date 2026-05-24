@@ -947,7 +947,7 @@ void CBaseFileSystem::AddPackFiles( const char *pPath, const CUtlSymbol &pathID,
 		CPackFile *pf = nullptr;
 		for ( auto *p : m_ZipFiles )
 		{
-			if ( !Q_stricmp( p->m_ZipName.Get(), fullpath ) )
+			if ( V_strieq( p->m_ZipName.Get(), fullpath ) )
 			{
 				pf = p;
 				sp->SetPackFile( pf );
@@ -1527,7 +1527,7 @@ void CBaseFileSystem::RemoveSearchPaths( const char *pathID )
 	intp nCount = m_SearchPaths.Count();
 	for (intp i = nCount - 1; i >= 0; i--)
 	{
-		if (!Q_stricmp(m_SearchPaths.Element(i).GetPathIDString(), pathID))
+		if (V_strieq(m_SearchPaths.Element(i).GetPathIDString(), pathID))
 		{
 			m_SearchPaths.FastRemove(i);
 		}

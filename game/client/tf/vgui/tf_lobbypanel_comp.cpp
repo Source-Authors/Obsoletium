@@ -619,7 +619,7 @@ void CLobbyPanel_Comp::OnThink()
 void CLobbyPanel_Comp::FireGameEvent( IGameEvent *event )
 {
 	const char *pszEventname = event->GetName();
-	if ( !Q_stricmp( pszEventname, "gc_new_session" ) )
+	if ( V_strieq( pszEventname, "gc_new_session" ) )
 	{
 		// This is loaded on demand by the GC - if we have a new session, we need to re-request
 		if ( m_bMatchHistoryLoaded )

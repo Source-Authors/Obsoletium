@@ -225,7 +225,7 @@ void CEntityReportPanel::OnDeleteEntities(void)
 //-----------------------------------------------------------------------------
 void CEntityReportPanel::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "delete" ) )
+	if ( V_strieq( pCommand, "delete" ) )
 	{
 		// Confirm we want to do it
 		MessageBox *pConfirm = new MessageBox( "#CommEditDeleteObjects", "#CommEditDeleteObjectsMsg", g_pCommEditTool->GetRootPanel() ); 
@@ -238,7 +238,7 @@ void CEntityReportPanel::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "ShowProperties" ) )
+	if ( V_strieq( pCommand, "ShowProperties" ) )
 	{
 		OnProperties();
 		return;

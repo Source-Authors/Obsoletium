@@ -188,7 +188,7 @@ void CInfoTargetBrowserPanel::SelectNode( CDmeVMFEntity *pNode )
 //-----------------------------------------------------------------------------
 void CInfoTargetBrowserPanel::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "delete" ) )
+	if ( V_strieq( pCommand, "delete" ) )
 	{
 		// Confirm we want to do it
 		MessageBox *pConfirm = new MessageBox( "#VcdBlockDeleteObjects", "#VcdBlockDeleteObjectsMsg", g_pVcdBlockTool->GetRootPanel() ); 
@@ -201,31 +201,31 @@ void CInfoTargetBrowserPanel::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "Save" ) )
+	if ( V_strieq( pCommand, "Save" ) )
 	{
 		g_pVcdBlockTool->Save();
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "RestartMap" ) )
+	if ( V_strieq( pCommand, "RestartMap" ) )
 	{
 		g_pVcdBlockTool->RestartMap();
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "DropInfoTargets" ) )
+	if ( V_strieq( pCommand, "DropInfoTargets" ) )
 	{
 		g_pVcdBlockTool->EnterTargetDropMode();
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "quicksave" ) )
+	if ( V_strieq( pCommand, "quicksave" ) )
 	{
 		g_pVcdBlockTool->QuickSave();
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "quickload" ) )
+	if ( V_strieq( pCommand, "quickload" ) )
 	{
 		g_pVcdBlockTool->QuickLoad();
 		return;
@@ -271,7 +271,7 @@ void CInfoTargetBrowserPanel::UpdateEntityList(void)
 		intp nItemID = m_pEntities->AddItem( kv, 0, false, false );
 
 		// Hide everything that isn't an info_target
-		m_pEntities->SetItemVisible( nItemID, !Q_stricmp( pClassName, "info_target" ) );
+		m_pEntities->SetItemVisible( nItemID, V_strieq( pClassName, "info_target" ) );
 	}
 	m_pEntities->SortList();
 }

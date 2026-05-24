@@ -254,7 +254,7 @@ bool CShaderAPITestApp::Create()
 		pShaderDLL = "shaderapidx10.dll";
 	}
 
-	if ( !bIsVistaOrHigher && !Q_stricmp( pShaderDLL, "shaderapidx10.dll" ) )
+	if ( !bIsVistaOrHigher && V_strieq( pShaderDLL, "shaderapidx10.dll" ) )
 	{
 		pShaderDLL = "shaderapidx9.dll";
 	}

@@ -246,7 +246,7 @@ void CMapEntities::CheckUpdateMap( char const *mapname )
 				Error ("ParseEntity: EOF without closing brace");
 			}
 
-			if (!Q_stricmp (token, "}") )
+			if (V_strieq (token, "}") )
 				break;
 
 			Q_strncpy( key, token, sizeof( key ) );
@@ -257,19 +257,19 @@ void CMapEntities::CheckUpdateMap( char const *mapname )
 
 			// Con_Printf( "Parsed %s -- %s\n", key, value );
 
-			if ( !Q_stricmp( key, "name" ) )
+			if ( V_strieq( key, "name" ) )
 			{
 				Q_strncpy( name, value, sizeof( name ) );
 			}
-			if ( !Q_stricmp( key, "targetname" ) )
+			if ( V_strieq( key, "targetname" ) )
 			{
 				Q_strncpy( name, value, sizeof( name ) );
 			}
-			if ( !Q_stricmp( key, "origin" ) )
+			if ( V_strieq( key, "origin" ) )
 			{
 				Q_strncpy( origin, value, sizeof( origin ) );
 			}
-			if ( !Q_stricmp( key, "angles" ) )
+			if ( V_strieq( key, "angles" ) )
 			{
 				Q_strncpy( angles, value, sizeof( angles ) );
 			}

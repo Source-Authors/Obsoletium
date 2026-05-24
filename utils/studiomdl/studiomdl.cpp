@@ -634,7 +634,7 @@ s_sourceanim_t *FindSourceAnim( s_source_t *pSource, const char *pAnimName )
 	for ( intp i = 0; i < nCount; ++i )
 	{
 		s_sourceanim_t *pAnim = &pSource->m_Animations[i];
-		if ( !Q_stricmp( pAnimName, pAnim->animationname ) )
+		if ( V_strieq( pAnimName, pAnim->animationname ) )
 			return pAnim;
 	}
 	return NULL;
@@ -649,7 +649,7 @@ const s_sourceanim_t *FindSourceAnim( const s_source_t *pSource, const char *pAn
 	for ( intp i = 0; i < nCount; ++i )
 	{
 		const s_sourceanim_t *pAnim = &pSource->m_Animations[i];
-		if ( !Q_stricmp( pAnimName, pAnim->animationname ) )
+		if ( V_strieq( pAnimName, pAnim->animationname ) )
 			return pAnim;
 	}
 	return NULL;
@@ -664,7 +664,7 @@ s_sourceanim_t *FindOrAddSourceAnim( s_source_t *pSource, const char *pAnimName 
 	for ( intp i = 0; i < nCount; ++i )
 	{
 		s_sourceanim_t *pAnim = &pSource->m_Animations[i];
-		if ( !Q_stricmp( pAnimName, pAnim->animationname ) )
+		if ( V_strieq( pAnimName, pAnim->animationname ) )
 			return pAnim;
 	}
 
@@ -858,12 +858,12 @@ void Cmd_PoseParameter( )
 	{
 		GetToken (false);
 
-		if ( !Q_stricmp( token, "wrap" ) )
+		if ( V_strieq( token, "wrap" ) )
 		{
 			g_pose[i].flags |= STUDIO_LOOPING;
 			g_pose[i].loop = g_pose[i].max - g_pose[i].min;
 		}
-		else if ( !Q_stricmp( token, "loop" ) )
+		else if ( V_strieq( token, "loop" ) )
 		{
 			g_pose[i].flags |= STUDIO_LOOPING;
 			GetToken (false);
@@ -892,7 +892,7 @@ int LookupTexture( const char *pTextureName, bool bRelativePath )
 	{
 		if ( g_texture[i].flags == nFlags )
 		{
-			if ( !Q_stricmp( pTextureNoExt, g_texture[i].name ) )
+			if ( V_strieq( pTextureNoExt, g_texture[i].name ) )
 				return i;
 			continue;
 		}
@@ -900,14 +900,14 @@ int LookupTexture( const char *pTextureName, bool bRelativePath )
 		// Comparing relative vs non-relative
 		if ( bRelativePath )
 		{
-			if ( !Q_stricmp( pTextureBase, g_texture[i].name ) )
+			if ( V_strieq( pTextureBase, g_texture[i].name ) )
 				return i;
 			continue;
 		}
 
 		// Comparing non-relative vs relative
 		Q_FileBase( g_texture[i].name, pTextureBase2 );
-		if ( !Q_stricmp( pTextureNoExt, pTextureBase2 ) )
+		if ( V_strieq( pTextureNoExt, pTextureBase2 ) )
 			return i;
 	}
 
@@ -1379,33 +1379,33 @@ bool ParseOptionStudio( CDmeSourceSkin *pSkin )
 	while ( TokenAvailable() )
 	{
 		GetToken(false);
-		if ( !Q_stricmp( "reverse", token ) )
+		if ( V_strieq( "reverse", token ) )
 		{
 			pSkin->m_bFlipTriangles = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( "scale", token ) )
+		if ( V_strieq( "scale", token ) )
 		{
 			GetToken(false);
 			pSkin->m_flScale = verify_atof( token );
 			continue;
 		}
 
-		if ( !Q_stricmp( "faces", token ) )
+		if ( V_strieq( "faces", token ) )
 		{
 			GetToken( false );
 			GetToken( false );
 			continue;
 		}
 
-		if ( !Q_stricmp( "bias", token ) )
+		if ( V_strieq( "bias", token ) )
 		{
 			GetToken( false );
 			continue;
 		}
 
-		if ( !Q_stricmp( "{", token ) )
+		if ( V_strieq( "{", token ) )
 		{
 			UnGetToken( );
 			break;
@@ -2198,7 +2198,7 @@ void Grab_Animation( s_source_t *pSource, const char *pAnimName )
 			continue;
 		}
 
-		if ( !Q_stricmp( cmd, "time" ) ) 
+		if ( V_strieq( cmd, "time" ) ) 
 		{
 			t = index;
 			if ( pAnim->startframe == -1 )
@@ -2240,7 +2240,7 @@ void Grab_Animation( s_source_t *pSource, const char *pAnimName )
 			continue;
 		}
 		
-		if ( !Q_stricmp( cmd, "end" ) ) 
+		if ( V_strieq( cmd, "end" ) ) 
 		{
 			pAnim->numframes = pAnim->endframe - pAnim->startframe + 1;
 
@@ -2544,37 +2544,37 @@ void Cmd_UpAxis( void )
 	// Note: x, -x, -y are untested
 	RadianEuler angles( 0.0f, 0.0f, M_PI / 2.0f );
 	GetToken (false);
-	if (!Q_stricmp( token, "x" ))
+	if (V_strieq( token, "x" ))
 	{
 		// rotate 90 degrees around y to move x into z
 		angles.x = 0.0f;
 		angles.y = M_PI / 2.0f;
 	}
-	else if (!Q_stricmp( token, "-x" ))
+	else if (V_strieq( token, "-x" ))
 	{
 		// untested
 		angles.x = 0.0f;
 		angles.y = -M_PI / 2.0f;
 	}
-	else if (!Q_stricmp( token, "y" ))
+	else if (V_strieq( token, "y" ))
 	{
 		// rotate 90 degrees around x to move y into z
 		angles.x = M_PI / 2.0f;
 		angles.y = 0.0f;
 	}
-	else if (!Q_stricmp( token, "-y" ))
+	else if (V_strieq( token, "-y" ))
 	{
 		// untested
 		angles.x = -M_PI / 2.0f;
 		angles.y = 0.0f;
 	}
-	else if (!Q_stricmp( token, "z" ))
+	else if (V_strieq( token, "z" ))
 	{
 		// there's still a built in 90 degree Z rotation :(
 		angles.x = 0.0f;
 		angles.y = 0.0f;
 	}
-	else if (!Q_stricmp( token, "-z" ))
+	else if (V_strieq( token, "-z" ))
 	{
 		// there's still a built in 90 degree Z rotation :(
 		angles.x = 0.0f;
@@ -2617,7 +2617,7 @@ void Cmd_AnimBlockSize( void )
 	while (TokenAvailable())
 	{
 		GetToken( false );
-		if (!Q_stricmp( token, "nostall" ))
+		if (V_strieq( token, "nostall" ))
 		{
 			g_bNoAnimblockStall = true;
 		}
@@ -2703,7 +2703,7 @@ static s_source_t *FindCachedSource( const char* name, const char* xext )
 		Q_snprintf( g_szFilename, sizeof(g_szFilename), "%s%s.%s", cddir[numdirs], name, xext );
 		for (i = 0; i < g_numsources; i++)
 		{
-			if ( !Q_stricmp( g_szFilename, g_source[i]->filename ) )
+			if ( V_strieq( g_szFilename, g_source[i]->filename ) )
 				return g_source[i];
 		}
 	}
@@ -2713,31 +2713,31 @@ static s_source_t *FindCachedSource( const char* name, const char* xext )
 		Q_snprintf( g_szFilename, sizeof(g_szFilename), "%s%s.vrm", cddir[numdirs], name );
 		for (i = 0; i < g_numsources; i++)
 		{
-			if ( !Q_stricmp( g_szFilename, g_source[i]->filename ) )
+			if ( V_strieq( g_szFilename, g_source[i]->filename ) )
 				return g_source[i];
 		}
 		Q_snprintf (g_szFilename, sizeof(g_szFilename), "%s%s.smd", cddir[numdirs], name );
 		for (i = 0; i < g_numsources; i++)
 		{
-			if ( !Q_stricmp( g_szFilename, g_source[i]->filename ) )
+			if ( V_strieq( g_szFilename, g_source[i]->filename ) )
 				return g_source[i];
 		}
 		Q_snprintf (g_szFilename, sizeof(g_szFilename), "%s%s.dmx", cddir[numdirs], name );
 		for (i = 0; i < g_numsources; i++)
 		{
-			if ( !Q_stricmp( g_szFilename, g_source[i]->filename ) )
+			if ( V_strieq( g_szFilename, g_source[i]->filename ) )
 				return g_source[i];
 		}
 		Q_snprintf (g_szFilename, sizeof(g_szFilename), "%s%s.xml", cddir[numdirs], name );
 		for (i = 0; i < g_numsources; i++)
 		{
-			if ( !Q_stricmp( g_szFilename, g_source[i]->filename ) )
+			if ( V_strieq( g_szFilename, g_source[i]->filename ) )
 				return g_source[i];
 		}
 		Q_snprintf (g_szFilename, sizeof(g_szFilename), "%s%s.obj", cddir[numdirs], name );
 		for (i = 0; i < g_numsources; i++)
 		{
-			if ( !Q_stricmp( g_szFilename, g_source[i]->filename ) )
+			if ( V_strieq( g_szFilename, g_source[i]->filename ) )
 				return g_source[i];
 		}
 		/*
@@ -2849,7 +2849,7 @@ s_sequence_t *LookupSequence( const char *name )
 {
 	for ( intp i = 0; i < g_sequence.Count(); ++i )
 	{
-		if ( !Q_stricmp( g_sequence[i].name, name ) )
+		if ( V_strieq( g_sequence[i].name, name ) )
 			return &g_sequence[i];
 	}
 	return NULL;
@@ -2861,7 +2861,7 @@ s_animation_t *LookupAnimation( const char *name )
 	int i;
 	for ( i = 0; i < g_numani; i++)
 	{
-		if ( !Q_stricmp( g_panimation[i]->name, name ) )
+		if ( V_strieq( g_panimation[i]->name, name ) )
 			return g_panimation[i];
 	}
 
@@ -3412,7 +3412,7 @@ int ParseCmdlistToken( int &numcmds, s_animcmd_t *cmds )
 //-----------------------------------------------------------------------------
 bool ParseAnimationToken( s_animation_t *panim )
 {
-	if ( !Q_stricmp( "if", token ) )
+	if ( V_strieq( "if", token ) )
 	{
 		// fixme: add expression evaluation
 		GetToken( false );
@@ -3439,7 +3439,7 @@ bool ParseAnimationToken( s_animation_t *panim )
 		return true;
 	}
 
-	if ( !Q_stricmp( "fps", token ) )
+	if ( V_strieq( "fps", token ) )
 	{
 		GetToken( false );
 		panim->fps = verify_atof( token );
@@ -3450,7 +3450,7 @@ bool ParseAnimationToken( s_animation_t *panim )
 		return true;
 	}
 	
-	if ( !Q_stricmp( "origin", token ) )
+	if ( V_strieq( "origin", token ) )
 	{
 		GetToken (false);
 		panim->adjust.x = verify_atof (token);
@@ -3463,7 +3463,7 @@ bool ParseAnimationToken( s_animation_t *panim )
 		return true;
 	}
 	
-	if ( !Q_stricmp( "rotate", token ) )
+	if ( V_strieq( "rotate", token ) )
 	{
 		GetToken( false );
 		// FIXME: broken for Maya
@@ -3471,7 +3471,7 @@ bool ParseAnimationToken( s_animation_t *panim )
 		return true;
 	}
 	
-	if ( !Q_stricmp( "angles", token ) )
+	if ( V_strieq( "angles", token ) )
 	{
 		GetToken( false );
 		panim->rotation.x = DEG2RAD( verify_atof( token ) );
@@ -3482,7 +3482,7 @@ bool ParseAnimationToken( s_animation_t *panim )
 		return true;
 	}
 	
-	if ( !Q_stricmp( "scale", token ) )
+	if ( V_strieq( "scale", token ) )
 	{
 		GetToken( false );
 		panim->scale = verify_atof( token );
@@ -3503,7 +3503,7 @@ bool ParseAnimationToken( s_animation_t *panim )
 		return true;
 	}
 	
-	if ( !Q_stricmp( "fudgeloop", token ) )
+	if ( V_strieq( "fudgeloop", token ) )
 	{
 		panim->fudgeloop = true;
 		panim->flags |= STUDIO_LOOPING;
@@ -3548,7 +3548,7 @@ bool ParseAnimationToken( s_animation_t *panim )
 		return true;
 	}
 
-	if ( !Q_stricmp( "blockname", token ) )
+	if ( V_strieq( "blockname", token ) )
 	{
 		GetToken( false );
 		s_sourceanim_t *pSourceAnim = FindSourceAnim( panim->source, token );
@@ -3574,19 +3574,19 @@ bool ParseAnimationToken( s_animation_t *panim )
 		return true;
 	}
 
-	if ( !Q_stricmp( "post", token ) )
+	if ( V_strieq( "post", token ) )
 	{
 		panim->flags |= STUDIO_POST;
 		return true;
 	}
 	
-	if ( !Q_stricmp( "noautoik", token ) )
+	if ( V_strieq( "noautoik", token ) )
 	{
 		panim->noAutoIK = true;
 		return true;
 	}
 	
-	if ( !Q_stricmp( "autoik", token ) )
+	if ( V_strieq( "autoik", token ) )
 	{
 		panim->noAutoIK = false;
 		return true;
@@ -3595,7 +3595,7 @@ bool ParseAnimationToken( s_animation_t *panim )
 	if ( ParseCmdlistToken( panim->numcmds, panim->cmds ) )
 		return true;
 
-	if ( !Q_stricmp( "cmdlist", token ) )
+	if ( V_strieq( "cmdlist", token ) )
 	{
 		GetToken( false ); // A
 
@@ -3621,20 +3621,20 @@ bool ParseAnimationToken( s_animation_t *panim )
 		return true;
 	}
 
-	if ( !Q_stricmp( "motionrollback", token ) )
+	if ( V_strieq( "motionrollback", token ) )
 	{
 		GetToken( false );
 		panim->motionrollback = strtof( token, nullptr );
 		return true;
 	}
 
-	if ( !Q_stricmp( "noanimblock", token ) )
+	if ( V_strieq( "noanimblock", token ) )
 	{
 		panim->disableAnimblocks = true;
 		return true;
 	}
 
-	if ( !Q_stricmp( "noanimblockstall", token ) )
+	if ( V_strieq( "noanimblockstall", token ) )
 	{
 		panim->isFirstSectionLocal = true;
 		return true;
@@ -4768,7 +4768,7 @@ void Option_Eyeball( s_model_t *pmodel )
 	GetToken (false);
 	for (i = 0; i < pmodel->source->numbones; i++)
 	{
-		if ( !Q_stricmp( pmodel->source->localBone[i].name, token ) )
+		if ( V_strieq( pmodel->source->localBone[i].name, token ) )
 		{
 			eyeball->bone = i;
 			break;
@@ -5044,7 +5044,7 @@ intp FindSourceFlexKey( s_source_t *pSource, const char *pName )
 	intp nCount = pSource->m_FlexKeys.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( pSource->m_FlexKeys[i].animationname, pName ) )
+		if ( V_strieq( pSource->m_FlexKeys[i].animationname, pName ) )
 			return i;
 	}
 	return -1;
@@ -5831,23 +5831,23 @@ void Cmd_Model( )
 			}
 			return;
 		}
-		if ( !Q_stricmp("{", token ) )
+		if ( V_strieq("{", token ) )
 		{
 			depth++;
 		}
-		else if ( !Q_stricmp("}", token ) )
+		else if ( V_strieq("}", token ) )
 		{
 			depth--;
 		}
-		else if ( !Q_stricmp( "eyeball", token ) )
+		else if ( V_strieq( "eyeball", token ) )
 		{
 			Option_Eyeball( g_model[g_nummodels] );
 		}
-		else if ( !Q_stricmp( "eyelid", token ) )
+		else if ( V_strieq( "eyelid", token ) )
 		{
 			Option_Eyelid( g_nummodels );
 		}
-		else if ( !Q_stricmp( "flex", token ) )
+		else if ( V_strieq( "flex", token ) )
 		{
 			// g_flex
 			GetToken (false);
@@ -5860,7 +5860,7 @@ void Cmd_Model( )
 			}
 			Option_Flex( FAC, vtafile, g_nummodels, 0.0 ); // FIXME: this needs to point to a model used, not loaded!!!
 		}
-		else if ( !Q_stricmp( "flexpair", token ) )
+		else if ( V_strieq( "flexpair", token ) )
 		{
 			// g_flex
 			GetToken (false);
@@ -5877,7 +5877,7 @@ void Cmd_Model( )
 			}
 			Option_Flex( FAC, vtafile, g_nummodels, split ); // FIXME: this needs to point to a model used, not loaded!!!
 		}
-		else if ( !Q_stricmp( "defaultflex", token ) )
+		else if ( V_strieq( "defaultflex", token ) )
 		{
 			if (depth == 0)
 			{
@@ -5890,13 +5890,13 @@ void Cmd_Model( )
 			Option_Flex( "default", vtafile, g_nummodels, 0.0 ); // FIXME: this needs to point to a model used, not loaded!!!
 			g_defaultflexkey = &g_flexkey[g_numflexkeys-1];
 		}
-		else if ( !Q_stricmp( "flexfile", token ) )
+		else if ( V_strieq( "flexfile", token ) )
 		{
 			// file
 			GetToken (false);
 			V_strcpy_safe( vtafile, token );
 		}
-		else if ( !Q_stricmp( "localvar", token ) )
+		else if ( V_strieq( "localvar", token ) )
 		{
 			while (TokenAvailable())
 			{
@@ -5904,11 +5904,11 @@ void Cmd_Model( )
 				Add_Flexdesc( token );
 			}
 		}
-		else if ( !Q_stricmp( "mouth", token ) )
+		else if ( V_strieq( "mouth", token ) )
 		{
 			Option_Mouth( g_model[g_nummodels] );
 		}
-		else if ( !Q_stricmp( "flexcontroller", token ) )
+		else if ( V_strieq( "flexcontroller", token ) )
 		{
 			Option_Flexcontroller( g_model[g_nummodels] );
 		}
@@ -5916,11 +5916,11 @@ void Cmd_Model( )
 		{
 			Option_Flexrule( g_model[g_nummodels], &token[1] );
 		}
-		else if ( !Q_stricmp("attachment", token ) )
+		else if ( V_strieq("attachment", token ) )
 		{
 		// 	Option_Attachment( g_model[g_nummodels] );
 		}
-		else if ( !Q_stricmp( token, "spherenormals" ) )
+		else if ( V_strieq( token, "spherenormals" ) )
 		{
 			Option_Spherenormals( g_model[g_nummodels]->source );
 		}
@@ -8302,7 +8302,7 @@ void Grab_Vertexanimation( s_source_t *psource, const char *pAnimName )
 
 					t -= pAnim->startframe;
 				}
-				else if ( !Q_stricmp( cmd, "end" ) ) 
+				else if ( V_strieq( cmd, "end" ) ) 
 				{
 					pAnim->numframes = pAnim->endframe - pAnim->startframe + 1;
 					return;
@@ -9249,7 +9249,7 @@ bool GenerateAnimations( CDmeMDLMakefile *pMDLMakeFile )
 		int numblends = 0;
 		for ( n = 0; n < g_numani; n++ )
 		{
-			if ( !Q_stricmp( pFullPath, g_panimation[n]->name ) )
+			if ( V_strieq( pFullPath, g_panimation[n]->name ) )
 			{
 				animations[numblends++] = g_panimation[n];
 				break;
@@ -9681,149 +9681,149 @@ bool CStudioMDLApp::ParseArguments()
 		if ( pArgv[0] != '-' ) 
 			continue;
 
-		if ( !Q_stricmp( pArgv, "-allowdebug" ) )
+		if ( V_strieq( pArgv, "-allowdebug" ) )
 		{
 			// Ignore, used by interface system to catch debug builds checked into release tree
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-mdlreport" ) )
+		if ( V_strieq( pArgv, "-mdlreport" ) )
 		{
 			// Will reparse later, ignore rest of arguments.
 			return true;
 		}
 
-		if ( !Q_stricmp( pArgv, "-mdlreportspreadsheet" ) )
+		if ( V_strieq( pArgv, "-mdlreportspreadsheet" ) )
 		{
 			// Will reparse later, ignore for now.
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-ihvtest" ) )
+		if ( V_strieq( pArgv, "-ihvtest" ) )
 		{
 			++i;
 			g_IHVTest = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-overridedefinebones" ) )
+		if ( V_strieq( pArgv, "-overridedefinebones" ) )
 		{
 			g_bOverridePreDefinedBones = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-striplods" ) )
+		if ( V_strieq( pArgv, "-striplods" ) )
 		{
 			g_bStripLods = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-stripmodel" ) )
+		if ( V_strieq( pArgv, "-stripmodel" ) )
 		{
 			g_eRunMode = RUN_MODE_STRIP_MODEL;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-stripvhv" ) )
+		if ( V_strieq( pArgv, "-stripvhv" ) )
 		{
 			g_eRunMode = RUN_MODE_STRIP_VHV;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-vsi" ) )
+		if ( V_strieq( pArgv, "-vsi" ) )
 		{
 			g_bMakeVsi = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-quiet" ) )
+		if ( V_strieq( pArgv, "-quiet" ) )
 		{
 			g_quiet = true;
 			g_verbose = false;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-verbose" ) )
+		if ( V_strieq( pArgv, "-verbose" ) )
 		{
 			g_quiet = false;
 			g_verbose = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-fullcollide" ) )
+		if ( V_strieq( pArgv, "-fullcollide" ) )
 		{
 			g_badCollide = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-checklengths" ) )
+		if ( V_strieq( pArgv, "-checklengths" ) )
 		{
 			g_bCheckLengths = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-printbones" ) )
+		if ( V_strieq( pArgv, "-printbones" ) )
 		{
 			g_bPrintBones = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-perf" ) )
+		if ( V_strieq( pArgv, "-perf" ) )
 		{
 			g_bPerf = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-printgraph" ) )
+		if ( V_strieq( pArgv, "-printgraph" ) )
 		{
 			g_bDumpGraph = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-definebones" ) )
+		if ( V_strieq( pArgv, "-definebones" ) )
 		{
 			g_definebones = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-makefile" ) )
+		if ( V_strieq( pArgv, "-makefile" ) )
 		{
 			g_bCreateMakefile = true;
 			g_quiet = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-verify" ) )
+		if ( V_strieq( pArgv, "-verify" ) )
 		{
 			g_bVerifyOnly = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-minlod" ) )
+		if ( V_strieq( pArgv, "-minlod" ) )
 		{
 			g_minLod = atoi( CommandLine()->GetParm( ++i ) );
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-nowarnings" ) )
+		if ( V_strieq( pArgv, "-nowarnings" ) )
 		{
 			g_bNoWarnings = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-maxwarnings" ) )
+		if ( V_strieq( pArgv, "-maxwarnings" ) )
 		{
 			g_maxWarnings = atoi( CommandLine()->GetParm( ++i ) );
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-preview" ) )
+		if ( V_strieq( pArgv, "-preview" ) )
 		{
 			g_bBuildPreview = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( pArgv, "-dumpmaterials" ) )
+		if ( V_strieq( pArgv, "-dumpmaterials" ) )
 		{
 			g_bDumpMaterials = true;
 			continue;
@@ -10016,7 +10016,7 @@ int CStudioMDLApp::Main()
 	const char *pExt = Q_GetFileExtension( g_path );
 
 	// Look for the presence of a .mdl file (only -vsi is currently supported for .mdl files)
-	if ( pExt && !Q_stricmp( pExt, "mdl" ) )
+	if ( pExt && V_strieq( pExt, "mdl" ) )
 	{
 		if ( g_bMakeVsi )
 			return Main_MakeVsi();
@@ -10033,7 +10033,7 @@ int CStudioMDLApp::Main()
 	// If so, load it first
 	CDmeMDLMakefile *pMDLMakeFile = NULL;
 	
-	if ( pExt && !Q_stricmp( pExt, "dmx" ) )
+	if ( pExt && V_strieq( pExt, "dmx" ) )
 	{
 		CDmElement *pRoot;
 		if ( g_pDataModel->RestoreFromFile( g_path, NULL, NULL, &pRoot ) != DMFILEID_INVALID )

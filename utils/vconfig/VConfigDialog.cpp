@@ -166,7 +166,7 @@ void CVConfigDialog::PopulateConfigList( bool bSelectActiveConfig /*=true*/ )
 
 		if ( bSelectActiveConfig )
 		{
-			if ( !Q_stricmp( g_Configs[i]->m_ModDir.Base(), szKeyValue ) )
+			if ( V_strieq( g_Configs[i]->m_ModDir.Base(), szKeyValue ) )
 			{
 				activeItem = index;
 			}

@@ -111,7 +111,7 @@ static DeltaState_t* FindOrAddDeltaState( const char *pDeltaStateName, int nBase
 	intp nCount = s_DeltaStates.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( s_DeltaStates[i].m_Name, pDeltaStateName ) )
+		if ( V_strieq( s_DeltaStates[i].m_Name, pDeltaStateName ) )
 		{
 			MdlWarning( "Unsupported duplicate delta state named \"%s\" in DMX file\n", pDeltaStateName );
 
@@ -533,7 +533,7 @@ static bool LoadMesh( CDmeMesh *pMesh, CDmeVertexData *pBindState, const matrix3
 		// skip all faces with the null texture on them.
 		char pPathNoExt[MAX_PATH];
 		Q_StripExtension( pTextureName, pPathNoExt );
-		if ( !Q_stricmp( pPathNoExt, "null" ) )
+		if ( V_strieq( pPathNoExt, "null" ) )
 			continue;
 
 		texture = LookupTexture( pTextureName, true );
@@ -1005,7 +1005,7 @@ static void LoadAnimations( s_source_t *pSource, CDmeAnimationList *pAnimationLi
 	{
 		CDmeChannelsClip *pAnimation = pAnimationList->GetAnimation( i );
 
-		if ( !Q_stricmp( pAnimationList->GetName(), "BindPose" ) )
+		if ( V_strieq( pAnimationList->GetName(), "BindPose" ) )
 		{
 			MdlError( "Error: Cannot use \"BindPose\" as an animation name!\n" );
 			break;

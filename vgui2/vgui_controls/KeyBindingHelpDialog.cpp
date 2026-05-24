@@ -167,13 +167,13 @@ bool CKeyBindingHelpDialog::IsHelpKeyStillBeingHeld()
 
 void CKeyBindingHelpDialog::OnCommand( char const *cmd )
 {
-	if ( !Q_stricmp( cmd, "OK" ) ||
-		 !Q_stricmp( cmd, "cancel" ) ||
-		 !Q_stricmp( cmd, "Close" ) )
+	if ( V_strieq( cmd, "OK" ) ||
+		 V_strieq( cmd, "cancel" ) ||
+		 V_strieq( cmd, "Close" ) )
 	{
 		MarkForDeletion();
 	}
-	else if ( !Q_stricmp( cmd, "edit" ) )
+	else if ( V_strieq( cmd, "edit" ) )
 	{
 		// Show the keybindings edit dialog
 		if ( m_hKeyBindingsEditor.Get() )

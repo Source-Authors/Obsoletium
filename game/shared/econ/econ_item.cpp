@@ -43,7 +43,7 @@ int StringFieldToInt( const char *szValue, const char **pValueStrings, int iNumS
 
 	for ( int i = 0; i < iNumStrings; i++ )
 	{
-		if ( !Q_stricmp(szValue, pValueStrings[i]) )
+		if ( V_strieq(szValue, pValueStrings[i]) )
 			return i;
 	}
 

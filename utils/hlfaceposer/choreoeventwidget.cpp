@@ -347,7 +347,7 @@ void CChoreoEventWidget::DrawGestureEvent(  CChoreoWidgetDrawHelper& drawHelper,
 	bool nullevent = false;
 
 	COLORREF clrEvent = GrayOutColor( IsSelected() ? COLOR_CHOREO_EVENT_SELECTED : COLOR_CHOREO_EVENT );
-	if ( !Q_stricmp( event->GetName(), "NULL" ) )
+	if ( V_strieq( event->GetName(), "NULL" ) )
 	{
 		clrEvent = GrayOutColor( RGB( 50, 50, 120 ) );
 		nullevent = true;

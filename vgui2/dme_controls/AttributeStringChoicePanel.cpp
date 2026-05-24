@@ -140,7 +140,7 @@ void CAttributeStringChoicePanel::SetComboBoxFromAttribute( vgui::ComboBox *pCom
 	intp c = pInfo->GetChoiceCount();
 	for ( intp i = 0; i < c; ++i )
 	{
-		if ( !Q_stricmp( pValue, pInfo->GetChoiceValue( i ) ) )
+		if ( V_strieq( pValue, pInfo->GetChoiceValue( i ) ) )
 		{
 			pComboBox->SetText( pInfo->GetChoiceString( i ) );
 			return;
@@ -156,7 +156,7 @@ void CAttributeStringChoicePanel::SetComboBoxFromAttribute( vgui::ComboBox *pCom
 			c = choices.Count();
 			for ( intp i = 0; i < c; ++i )
 			{
-				if ( !Q_stricmp( pValue, choices[i].m_pValue ) )
+				if ( V_strieq( pValue, choices[i].m_pValue ) )
 				{
 					pComboBox->SetText( choices[i].m_pChoiceString );
 					return;

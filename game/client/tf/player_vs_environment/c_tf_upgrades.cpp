@@ -1973,7 +1973,7 @@ bool CHudUpgradePanel::QuickEquipBottle( void )
 //-----------------------------------------------------------------------------
 void CHudUpgradePanel::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "close" ) )
+	if ( V_strieq( command, "close" ) )
 	{
 		m_bShowUpgradeMenu = false;
 		m_bCancelUpgrades = false;
@@ -1991,7 +1991,7 @@ void CHudUpgradePanel::OnCommand( const char *command )
 
 		return;
 	}
-	else if ( !Q_stricmp( command, "cancel" ) )
+	else if ( V_strieq( command, "cancel" ) )
 	{
 		m_bShowUpgradeMenu = false;
 		m_bCancelUpgrades = true;
@@ -2000,7 +2000,7 @@ void CHudUpgradePanel::OnCommand( const char *command )
 		m_hPlayer = NULL;
 		return;
 	}
-	else if ( !Q_stricmp( command, "next" ) )
+	else if ( V_strieq( command, "next" ) )
 	{
 		int nPrevLoadoutSlot = -1;
 		int nLoadoutSlot = -1;
@@ -2035,7 +2035,7 @@ void CHudUpgradePanel::OnCommand( const char *command )
 			}
 		}
 	}
-	else if ( !Q_stricmp( command, "prev" ) )
+	else if ( V_strieq( command, "prev" ) )
 	{
 		int nPrevLoadoutSlot = -1;
 		int nLoadoutSlot = -1;
@@ -2083,7 +2083,7 @@ void CHudUpgradePanel::OnCommand( const char *command )
 		m_bOpenLoadout = true;
 		return;
 	}
-	else if ( !Q_stricmp( command, "PlayerUpgrade" ) )
+	else if ( V_strieq( command, "PlayerUpgrade" ) )
 	{
 		UpgradeItemInSlot( -1 );
 

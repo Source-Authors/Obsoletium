@@ -330,7 +330,7 @@ bool IsValveMap( const char *pMapName )
 {
 	for ( int i = 0; i < ARRAYSIZE( s_ValveMaps ); ++i )
 	{
-		if ( !Q_stricmp( s_ValveMaps[i].pDiskName, pMapName ) )
+		if ( V_strieq( s_ValveMaps[i].pDiskName, pMapName ) )
 		{
 			return true;
 		}
@@ -3248,23 +3248,23 @@ CTFGameRules::CTFGameRules()
 		char szCurrentMap[MAX_MAP_NAME];
 		Q_strncpy( szCurrentMap, STRING( gpGlobals->mapname ), sizeof( szCurrentMap ) );
 
-		if ( !Q_stricmp( szCurrentMap, "cp_manor_event" ) )
+		if ( V_strieq( szCurrentMap, "cp_manor_event" ) )
 		{
 			m_halloweenScenario.Set( HALLOWEEN_SCENARIO_MANN_MANOR );
 		}
-		else if ( !Q_stricmp( szCurrentMap, "koth_viaduct_event" ) )
+		else if ( V_strieq( szCurrentMap, "koth_viaduct_event" ) )
 		{
 			m_halloweenScenario.Set( HALLOWEEN_SCENARIO_VIADUCT );
 		}
-		else if ( !Q_stricmp( szCurrentMap, "koth_lakeside_event" ) )
+		else if ( V_strieq( szCurrentMap, "koth_lakeside_event" ) )
 		{
 			m_halloweenScenario.Set( HALLOWEEN_SCENARIO_LAKESIDE );
 		}
-		else if( !Q_stricmp( szCurrentMap, "plr_hightower_event" ) )
+		else if( V_strieq( szCurrentMap, "plr_hightower_event" ) )
 		{
 			m_halloweenScenario.Set( HALLOWEEN_SCENARIO_HIGHTOWER );
 		}
-		else if ( !Q_stricmp( szCurrentMap, "sd_doomsday_event" ) )
+		else if ( V_strieq( szCurrentMap, "sd_doomsday_event" ) )
 		{
 			m_halloweenScenario.Set( HALLOWEEN_SCENARIO_DOOMSDAY );
 		}
@@ -18341,7 +18341,7 @@ const char *GetMapDisplayName( const char *mapName )
 
 	for ( int i = 0; i < ARRAYSIZE( s_ValveMaps ); ++i )
 	{
-		if ( !Q_stricmp( s_ValveMaps[i].pDiskName, pszSrc ) )
+		if ( V_strieq( s_ValveMaps[i].pDiskName, pszSrc ) )
 		{
 			return s_ValveMaps[i].pDisplayName;
 		}
@@ -18350,7 +18350,7 @@ const char *GetMapDisplayName( const char *mapName )
 	// check the community maps that we've featured
 	for ( int i = 0; i < ARRAYSIZE( s_CommunityMaps ); ++i )
 	{
-		if ( !Q_stricmp( s_CommunityMaps[i].pDiskName, pszSrc ) )
+		if ( V_strieq( s_CommunityMaps[i].pDiskName, pszSrc ) )
 		{
 			return s_CommunityMaps[i].pDisplayName;
 		}
@@ -18459,7 +18459,7 @@ const char *GetMapType( const char *mapName )
 	{
 		for ( i = 0; i < ARRAYSIZE( s_ValveMaps ); ++i )
 		{
-			if ( !Q_stricmp( s_ValveMaps[i].pDiskName, mapName ) )
+			if ( V_strieq( s_ValveMaps[i].pDiskName, mapName ) )
 			{
 				return s_ValveMaps[i].pGameType;
 			}
@@ -18468,7 +18468,7 @@ const char *GetMapType( const char *mapName )
 		// check the community maps that we've featured
 		for ( i = 0; i < ARRAYSIZE( s_CommunityMaps ); ++i )
 		{
-			if ( !Q_stricmp( s_CommunityMaps[i].pDiskName, mapName ) )
+			if ( V_strieq( s_CommunityMaps[i].pDiskName, mapName ) )
 			{
 				return s_CommunityMaps[i].pGameType;
 			}

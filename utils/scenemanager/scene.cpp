@@ -92,7 +92,7 @@ CVCDFile *CScene::FindVCD( char const *filename )
 		if ( !vcd )
 			continue;
 
-		if ( !Q_stricmp( filename, vcd->GetName() ) )
+		if ( V_strieq( filename, vcd->GetName() ) )
 			return vcd;
 	}
 	return NULL;

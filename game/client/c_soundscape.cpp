@@ -311,7 +311,7 @@ bool C_SoundscapeSystem::Init()
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
 		{
-			if ( !Q_stricmp( sub->GetName(), "file" ) )
+			if ( V_strieq( sub->GetName(), "file" ) )
 			{
 				// Add
 				AddSoundScapeFile( sub->GetString() );
@@ -345,7 +345,7 @@ int C_SoundscapeSystem::FindSoundscapeByName( const char *pSoundscapeName )
 	// UNDONE: Bad perf, linear search!
 	for ( int i = m_soundscapes.Count()-1; i >= 0; --i )
 	{
-		if ( !Q_stricmp( m_soundscapes[i]->GetName(), pSoundscapeName ) )
+		if ( V_strieq( m_soundscapes[i]->GetName(), pSoundscapeName ) )
 			return i;
 	}
 

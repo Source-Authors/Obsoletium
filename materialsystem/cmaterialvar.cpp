@@ -290,7 +290,7 @@ MaterialVarSym_t IMaterialVar::FindSymbol( const char* pName )
 
 bool IMaterialVar::SymbolMatches( const char* pName, MaterialVarSym_t symbol )
 {
-	return !Q_stricmp( s_MaterialVarSymbols.String(symbol), pName );
+	return V_strieq( s_MaterialVarSymbols.String(symbol), pName );
 }
 
 

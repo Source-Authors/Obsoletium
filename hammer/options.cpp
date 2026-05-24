@@ -338,7 +338,7 @@ void COptionsConfigs::SaveGameConfigs()
 		bFoundConfig = false;
 		for ( int i = 0; i < nConfigs; i++ )
 		{
-			if ( !Q_stricmp( pConfig->GetName(), Configs.GetAt(i)->szName ) )
+			if ( V_strieq( pConfig->GetName(), Configs.GetAt(i)->szName ) )
 			{
 				bFoundConfig = true;
 				break;

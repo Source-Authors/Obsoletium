@@ -1266,7 +1266,7 @@ void BuildGroup::ApplySettings( KeyValues *resourceData )
 			// make the control name match CASE INSENSITIVE!
 			char const *panelName = panel->GetName();
 
-			if (!Q_stricmp(panelName, keyName))
+			if (V_strieq(panelName, keyName))
 			{
 				// apply the settings
 				panel->ApplySettings(controlKeys);

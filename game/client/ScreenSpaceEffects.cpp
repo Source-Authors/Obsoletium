@@ -106,7 +106,7 @@ IScreenSpaceEffect *CScreenSpaceEffectManager::GetScreenSpaceEffect( const char 
 {
 	for( CScreenSpaceEffectRegistration *pReg=CScreenSpaceEffectRegistration::s_pHead; pReg!=NULL; pReg=pReg->m_pNext )
 	{
-		if( !Q_stricmp( pReg->m_pEffectName, pEffectName ) )
+		if( V_strieq( pReg->m_pEffectName, pEffectName ) )
 		{
 			IScreenSpaceEffect *pEffect = pReg->m_pEffect;
 			return pEffect;

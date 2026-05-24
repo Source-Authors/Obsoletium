@@ -469,7 +469,7 @@ void CJointedModel::SortCollisionList( void )
 
 			// Don't try to move ones where the pPhys and its parent have the same name
 			// otherwise an infinite loop results
-			if ( !Q_stricmp( pPhys->m_name, pPhys->m_parent ) )
+			if ( V_strieq( pPhys->m_name, pPhys->m_parent ) )
 				continue;
 
 			// find the parent
@@ -2197,7 +2197,7 @@ void LoadSurfacePropsAll()
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
 		{
-			if ( !Q_stricmp( sub->GetName(), "file" ) )
+			if ( V_strieq( sub->GetName(), "file" ) )
 			{
 				// Add
 				LoadSurfaceProps( sub->GetString() );

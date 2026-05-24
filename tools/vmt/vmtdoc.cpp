@@ -265,7 +265,7 @@ void CVMTDoc::CopyParamsFromVMT( CDmElement *pVMT )
 		if ( !pVMT->HasAttribute( pDst->GetName() ) )
 		{
 			// Special hack for alpha + colors
-			if ( !Q_stricmp( pDst->GetName(), "$alpha" ) )
+			if ( V_strieq( pDst->GetName(), "$alpha" ) )
 			{
 				pDst->SetValue( 1.0f );
 			}
@@ -382,13 +382,13 @@ CDmElement* CVMTDoc::ExtractDefaultParameters( )
 		intp i;
 		for ( i = 0; g_pStandardParams[i].m_pParamName != NULL; ++i )
 		{
-			if ( !Q_stricmp( g_pStandardParams[i].m_pParamName, pShaderParam ) )
+			if ( V_strieq( g_pStandardParams[i].m_pParamName, pShaderParam ) )
 			{
 				char temp[512];
 				CUtlBuffer buf( temp, sizeof(temp), CUtlBuffer::TEXT_BUFFER | CUtlBuffer::EXTERNAL_GROWABLE );
 				pAttribute->Serialize( buf );
 
-				if ( !Q_stricmp( (char*)buf.Base(), g_pStandardParams[i].m_pDefaultValue ) )
+				if ( V_strieq( (char*)buf.Base(), g_pStandardParams[i].m_pDefaultValue ) )
 				{
 					// Buffers match! Therefore it's still using the default parameter
 					pMaterial->RemoveAttributeByPtr( pAttribute );
@@ -410,7 +410,7 @@ CDmElement* CVMTDoc::ExtractDefaultParameters( )
 		for ( i = 0; i < nCount; ++i )
 		{
 			const char *pFlagName = g_pMaterialSystem->ShaderFlagName( i );
-			if ( !Q_stricmp( pShaderParam, pFlagName ) )
+			if ( V_strieq( pShaderParam, pFlagName ) )
 				break;
 		}
 
@@ -494,7 +494,7 @@ IShader *CVMTDoc::FindShader( const char *pShaderName )
 	g_pMaterialSystem->GetShaders( 0, nCount, ppShaderList );
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( pShaderName, ppShaderList[i]->GetName() ) )
+		if ( V_strieq( pShaderName, ppShaderList[i]->GetName() ) )
 			return ppShaderList[i];
 	}
 	return NULL;
@@ -527,7 +527,7 @@ bool CVMTDoc::IsShaderParam( CDmAttribute* pAttribute )
 	// Standard params aren't counted here
 	for ( int i = 0; g_pStandardParams[i].m_pParamName; ++i )
 	{
-		if ( !Q_stricmp( g_pStandardParams[i].m_pParamName, pName ) )
+		if ( V_strieq( g_pStandardParams[i].m_pParamName, pName ) )
 			return false;
 	}
 
@@ -577,7 +577,7 @@ void CVMTDoc::RemoveUnusedShaderParams( CDmElement *pMaterial, IShader *pShader,
 		for ( i = 0; i < nCount; ++i )
 		{
 			const char *pFlagName = g_pMaterialSystem->ShaderFlagName( i );
-			if ( !Q_stricmp( pAttribute->GetName(), pFlagName ) )
+			if ( V_strieq( pAttribute->GetName(), pFlagName ) )
 				break;
 		}
 
@@ -591,7 +591,7 @@ void CVMTDoc::RemoveUnusedShaderParams( CDmElement *pMaterial, IShader *pShader,
 		for ( int j = 0; j < nCount; ++j )
 		{
 			// FIXME: Check type matches
-			if ( !Q_stricmp( pShaderParam, pShader->GetParamName( j ) ) )
+			if ( V_strieq( pShaderParam, pShader->GetParamName( j ) ) )
 				break;
 		}
 
@@ -912,7 +912,7 @@ void CVMTDoc::AddNewShaderParam( CDmElement *pMaterial, const char *pParamName, 
 			continue;
 
 		const char *pAttributeName = pAttribute->GetName();
-		if ( !Q_stricmp( pAttributeName, pParamName ) )
+		if ( V_strieq( pAttributeName, pParamName ) )
 			return;
 	}
 
@@ -995,7 +995,7 @@ void CVMTDoc::SetParamsToDefault()
 void CVMTDoc::SetShader( const char *pShaderName )
 {
 	// No change? don't bother
-	if ( !Q_stricmp( m_CurrentShader, pShaderName ) )
+	if ( V_strieq( m_CurrentShader, pShaderName ) )
 		return;
 
 	m_CurrentShader = pShaderName;

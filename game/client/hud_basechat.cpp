@@ -778,7 +778,7 @@ void CBaseHudChat::MsgFunc_SayText( bf_read &msg )
 
 int CBaseHudChat::GetFilterForString( const char *pString )
 {
-	if ( !Q_stricmp( pString, "#HL_Name_Change" ) ) 
+	if ( V_strieq( pString, "#HL_Name_Change" ) ) 
 	{
 		return CHAT_FILTER_NAMECHANGE;
 	}

@@ -137,7 +137,7 @@ void CEconSampleRootUI::FireGameEvent( IGameEvent *event )
 //-----------------------------------------------------------------------------
 void CEconSampleRootUI::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "close" ) )
+	if ( V_strieq( command, "close" ) )
 	{
 		ShowPanel( false );
 
@@ -158,11 +158,11 @@ void CEconSampleRootUI::OnCommand( const char *command )
 			}
 		}
 	}
-	else if ( !Q_stricmp( command, "back" ) )
+	else if ( V_strieq( command, "back" ) )
 	{
 		ShowPanel( true );
 	}
-	else if ( !Q_stricmp( command, "loadout" ) )
+	else if ( V_strieq( command, "loadout" ) )
 	{
 		// Ignore selection while we don't have a steam connection
 		if ( !InventoryManager()->GetLocalInventory()->RetrievedInventoryFromSteam() )

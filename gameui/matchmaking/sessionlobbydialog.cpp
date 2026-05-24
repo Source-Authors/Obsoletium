@@ -691,11 +691,11 @@ void CSessionLobbyDialog::SetStartGame( bool bStartGame )
 //---------------------------------------------------------------------
 void CSessionLobbyDialog::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "ReturnToMainMenu" ) )
+	if ( V_strieq( pCommand, "ReturnToMainMenu" ) )
 	{
 		matchmaking->KickPlayerFromSession( 0 );
 	}
-	else if ( !Q_stricmp( pCommand, "KickPlayer" ) )
+	else if ( V_strieq( pCommand, "KickPlayer" ) )
 	{
 		CDialogMenu *pMenu = &m_Menus[m_iActiveMenu];
 		CPlayerItem *pItem = (CPlayerItem*)pMenu->GetItem( pMenu->GetActiveItemIndex() );

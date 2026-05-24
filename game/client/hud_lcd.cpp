@@ -221,19 +221,19 @@ void CLCD::Init( void )
 		for ( KeyValues *sub = kv->GetFirstSubKey(); sub; sub = sub->GetNextKey() )
 		{
 			char const *keyName = sub->GetName();
-			if ( !Q_stricmp( keyName, "game" ) )
+			if ( V_strieq( keyName, "game" ) )
 			{
 				// Handled above!!!
 			}
-			else if ( !Q_stricmp( keyName, "icons" ) )
+			else if ( V_strieq( keyName, "icons" ) )
 			{
 				ParseIconMappings( sub );
 			}
-			else if ( !Q_stricmp( keyName, "replace" ) )
+			else if ( V_strieq( keyName, "replace" ) )
 			{
 				ParseReplacements( sub );
 			}
-			else if ( !Q_stricmp( keyName, "page" ) )
+			else if ( V_strieq( keyName, "page" ) )
 			{
 				ParsePage( sub );
 			}
@@ -691,15 +691,15 @@ void CLCD::ParseItems_R( CLCDPage *page, bool bCreateHandles, KeyValues *kv, CUt
 	for ( KeyValues *sub = kv->GetFirstSubKey(); sub; sub = sub->GetNextKey() )
 	{
 		char const *keyName = sub->GetName();
-		if ( !Q_stricmp( keyName, "iterate_players" ) ||
-			      !Q_stricmp( keyName, "iterate_team" ) )
+		if ( V_strieq( keyName, "iterate_players" ) ||
+			      V_strieq( keyName, "iterate_team" ) )
 		{
 			int aggType = AGGTYPE_UNKNOWN;
-			if ( !Q_stricmp( keyName, "iterate_players" ) )
+			if ( V_strieq( keyName, "iterate_players" ) )
 			{
 				aggType = AGGTYPE_PERPLAYER;
 			}
-			else if ( !Q_stricmp( keyName, "iterate_team" ) )
+			else if ( V_strieq( keyName, "iterate_team" ) )
 			{
 				aggType = AGGTYPE_PERTEAM;
 			}
@@ -724,19 +724,19 @@ void CLCD::ParseItems_R( CLCDPage *page, bool bCreateHandles, KeyValues *kv, CUt
 
 			list.AddToTail( item );
 		}
-		else if ( !Q_stricmp( keyName, "static_icon" ) )
+		else if ( V_strieq( keyName, "static_icon" ) )
 		{
 			CLCDItemIcon *item = ParseItemIcon( page, true, sub );
 			Assert( item );
 			list.AddToTail(item );
 		}
-		else if ( !Q_stricmp( keyName, "static_text" ) )
+		else if ( V_strieq( keyName, "static_text" ) )
 		{
 			CLCDItemText *item = ParseItemText( page, true, sub );
 			Assert( item );
 			list.AddToTail( item );
 		}
-		else if ( !Q_stricmp( keyName, "newsubpage" ) )
+		else if ( V_strieq( keyName, "newsubpage" ) )
 		{
 			// Add to new subpage
 			++page->m_nSubPageCount;
@@ -835,7 +835,7 @@ typedescription_t *FindFieldByName( datamap_t *pMap, char const *fn )
 			if ( !current->fieldName )
 				continue;
 
-			if ( !Q_stricmp( current->fieldName, fn ) )
+			if ( V_strieq( current->fieldName, fn ) )
 				return current;
 		}
 
@@ -1292,19 +1292,19 @@ void CLCD::LookupToken( char const *in, CUtlString& value )
 
 			*to = 0;
 
-			if ( !Q_stricmp( token, "localplayer" ) )
+			if ( V_strieq( token, "localplayer" ) )
 			{
 				ref = player;
 			}
-			else if ( !Q_stricmp( token, "localteam" ) )
+			else if ( V_strieq( token, "localteam" ) )
 			{
 				ref = player->GetTeam();
 			}
-			else if ( !Q_stricmp( token, "localplayerweapon" ) )
+			else if ( V_strieq( token, "localplayerweapon" ) )
 			{
 				ref = player->GetActiveWeapon();
 			}
-			else if ( !Q_stricmp( token, "playerresource" ) )
+			else if ( V_strieq( token, "playerresource" ) )
 			{
 				ref = g_PR;
 			}

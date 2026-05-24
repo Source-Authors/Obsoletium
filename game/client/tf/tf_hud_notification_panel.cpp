@@ -567,7 +567,7 @@ bool CHudNotificationPanel::LoadManifest( void )
 	// Load each file defined in the text
 	for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
 	{
-		if ( !Q_stricmp( sub->GetName(), "file" ) )
+		if ( V_strieq( sub->GetName(), "file" ) )
 		{
 			if ( BuildGroup::PrecacheResFile( sub->GetString() ) == false )
 			{

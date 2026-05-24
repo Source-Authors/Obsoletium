@@ -500,7 +500,7 @@ intp CParticleProperty::FindEffect( const char *pEffectName, intp nStart /*= 0*/
 {
 	for ( intp i = nStart; i < m_ParticleEffects.Count(); i++ )
 	{
-		if ( !Q_stricmp( m_ParticleEffects[i].pParticleEffect->GetName(), pEffectName ) )
+		if ( V_strieq( m_ParticleEffects[i].pParticleEffect->GetName(), pEffectName ) )
 			return i;
 	}
 

@@ -1116,7 +1116,7 @@ const CShaderManager::ShaderCombos_t *CShaderManager::FindOrCreateShaderCombos( 
 			if ( Q_strlen( pShaderName ) >= 3 )
 			{
 				char *pszEndFilename = filename + strlen( filename );
-				if ( !Q_stricmp( pszEndFilename - 6, "30.fxc" ) )
+				if ( V_strieq( pszEndFilename - 6, "30.fxc" ) )
 				{
 					// Total hack. Who knows what builds that 30 shader?
 					strcpy( pszEndFilename - 6, "20b.fxc" );
@@ -1638,7 +1638,7 @@ retry_compile:
 		if ( strlen( pShaderName ) >= 3 )
 		{
 			char *pszEndFilename = filename + strlen( filename );
-			if ( !Q_stricmp( pszEndFilename - 6, "30.fxc" ) )
+			if ( V_strieq( pszEndFilename - 6, "30.fxc" ) )
 			{
 				strcpy( pszEndFilename - 6, "20b.fxc" );
 				fp = g_pFullFileSystem->Open( filename, "r" );
@@ -1656,12 +1656,12 @@ retry_compile:
 			}
 			else
 			{
-				if ( !Q_stricmp( pszEndFilename - 6, "20.fxc" ) )
+				if ( V_strieq( pszEndFilename - 6, "20.fxc" ) )
 				{
 					pszEndFilename[ -5 ] = 'x';
 					fp = g_pFullFileSystem->Open( filename, "r" );
 				}
-				else if ( !Q_stricmp( pszEndFilename - 7, "20b.fxc" ) )
+				else if ( V_strieq( pszEndFilename - 7, "20b.fxc" ) )
 				{
 					strcpy( pszEndFilename - 7, "2x.fxc" );
 					fp = g_pFullFileSystem->Open( filename, "r" );
@@ -1782,11 +1782,11 @@ retry_compile:
 	se::win::com::com_ptr<ID3DBlob> pShader;
 	se::win::com::com_ptr<ID3DBlob> pErrorMessages;
 
-	const bool b30Shader = !Q_stricmp( pShaderProfile, "vs_3_0" ) || !Q_stricmp( pShaderProfile, "ps_3_0" );
+	const bool b30Shader = V_strieq( pShaderProfile, "vs_3_0" ) || V_strieq( pShaderProfile, "ps_3_0" );
 	// dimhotepus: Shader model 4, 4.1, 5 support.
-	const bool b40Shader = !Q_stricmp( pShaderProfile, "vs_4_0" ) || !Q_stricmp( pShaderProfile, "ps_4_0" );
-	const bool b41Shader = !Q_stricmp( pShaderProfile, "vs_4_1" ) || !Q_stricmp( pShaderProfile, "ps_4_1" );
-	const bool b50Shader = !Q_stricmp( pShaderProfile, "vs_5_0" ) || !Q_stricmp( pShaderProfile, "ps_5_0" );
+	const bool b40Shader = V_strieq( pShaderProfile, "vs_4_0" ) || V_strieq( pShaderProfile, "ps_4_0" );
+	const bool b41Shader = V_strieq( pShaderProfile, "vs_4_1" ) || V_strieq( pShaderProfile, "ps_4_1" );
+	const bool b50Shader = V_strieq( pShaderProfile, "vs_5_0" ) || V_strieq( pShaderProfile, "ps_5_0" );
 
 	wchar_t wfilename[MAX_PATH];
 	V_UTF8ToUnicode( filename, wfilename, sizeof(wfilename) );

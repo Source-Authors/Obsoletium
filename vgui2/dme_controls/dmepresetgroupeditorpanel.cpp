@@ -173,7 +173,7 @@ void CDmePresetRemapPanel::RefreshPresetList( )
 		return;
 
 	CDmePresetRemap *pRemap = m_hDestGroup->GetPresetRemap();
-	bool bUseRemap = ( pRemap && m_hSourceGroup.Get() && !Q_stricmp( pRemap->m_SourcePresetGroup, m_hSourceGroup->GetName() ) );
+	bool bUseRemap = ( pRemap && m_hSourceGroup.Get() && V_strieq( pRemap->m_SourcePresetGroup, m_hSourceGroup->GetName() ) );
 
 	for ( intp i = 0; i < nCount; ++i )
 	{
@@ -326,7 +326,7 @@ void CDmePresetRemapPanel::DoModal( CDmeAnimationSet *pAnimationSet, CDmePresetG
 		KeyValues *kv = new KeyValues( "entry" );
 		SetElementKeyValue( kv, "presetGroup", pPresetGroup );
 		int nItemID = m_pSourcePresetGroup->AddItem( pPresetGroup->GetName(), kv );
-		if ( !bSelected || ( pRemap && !Q_stricmp( pRemap->m_SourcePresetGroup, pPresetGroup->GetName() ) ) )
+		if ( !bSelected || ( pRemap && V_strieq( pRemap->m_SourcePresetGroup, pPresetGroup->GetName() ) ) )
 		{
 			m_pSourcePresetGroup->ActivateItem( nItemID );
 			bSelected = true;
@@ -372,14 +372,14 @@ void CDmePresetRemapPanel::ApplyChangesToPresetRemap()
 //-----------------------------------------------------------------------------
 void CDmePresetRemapPanel::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "Ok") )
+	if ( V_strieq( command, "Ok") )
 	{
 		ApplyChangesToPresetRemap();
 		CloseModal();
 		return;
 	}
 
-	if ( !Q_stricmp( command, "Cancel") )
+	if ( V_strieq( command, "Cancel") )
 	{
 		CloseModal();
 		return;
@@ -950,21 +950,21 @@ void CDmePresetGroupEditorPanel::SetupFileOpenDialog( vgui::FileOpenDialog *pDia
 	}
 
 	char pPresetPath[MAX_PATH];
-	if ( !Q_stricmp( pFileFormat, PRESET_FILE_FORMAT ) )
+	if ( V_strieq( pFileFormat, PRESET_FILE_FORMAT ) )
 	{
 		GetModSubdirectory( "models", pPresetPath );
 		pDialog->SetStartDirectoryContext( "preset_importexport", pPresetPath );
 		pDialog->AddFilter( "*.*", "All Files (*.*)", false );
 		pDialog->AddFilter( "*.pre", "Preset File (*.pre)", true, PRESET_FILE_FORMAT );
 	}
-	else if ( !Q_stricmp( pFileFormat, "vfe" ) )
+	else if ( V_strieq( pFileFormat, "vfe" ) )
 	{
 		GetModSubdirectory( "expressions", pPresetPath );
 		pDialog->SetStartDirectoryContext( "preset_exportvfe", pPresetPath );
 		pDialog->AddFilter( "*.*", "All Files (*.*)", false );
 		pDialog->AddFilter( "*.vfe", "Expression File (*.vfe)", true, "vfe" );
 	}
-	else if ( !Q_stricmp( pFileFormat, "txt" ) )
+	else if ( V_strieq( pFileFormat, "txt" ) )
 	{
 		GetModSubdirectory( "expressions", pPresetPath );
 		pDialog->SetStartDirectoryContext( "preset_exportvfe", pPresetPath );
@@ -984,7 +984,7 @@ bool CDmePresetGroupEditorPanel::OnReadFileFromDisk( const char *pFileName, cons
 		return false;
 
 	// When importing an entire group, we can do it all right here
-	if ( !Q_stricmp( pContextKeyValues->GetName(), "ImportPresetGroup" ) )
+	if ( V_strieq( pContextKeyValues->GetName(), "ImportPresetGroup" ) )
 	{
 		CDmePresetGroup *pPresetGroup = CastElement< CDmePresetGroup >( pRoot );
 		if ( !pPresetGroup )
@@ -1026,7 +1026,7 @@ bool CDmePresetGroupEditorPanel::OnReadFileFromDisk( const char *pFileName, cons
 bool CDmePresetGroupEditorPanel::OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues )
 {
 	// Used when exporting an entire preset group
-	if ( !Q_stricmp( pContextKeyValues->GetName(), "ExportPresetGroup" ) )
+	if ( V_strieq( pContextKeyValues->GetName(), "ExportPresetGroup" ) )
 	{
 		CDmePresetGroup *pPresetGroup = GetElementKeyValue<CDmePresetGroup>( pContextKeyValues, "presetGroup" );
 		if ( !pPresetGroup )
@@ -1037,7 +1037,7 @@ bool CDmePresetGroupEditorPanel::OnWriteFileToDisk( const char *pFileName, const
 	}
 
 	// Used when exporting an entire preset group
-	if ( !Q_stricmp( pContextKeyValues->GetName(), "ExportPresetGroupToVFE" ) )
+	if ( V_strieq( pContextKeyValues->GetName(), "ExportPresetGroupToVFE" ) )
 	{
 		CDmePresetGroup *pPresetGroup = GetElementKeyValue<CDmePresetGroup>( pContextKeyValues, "presetGroup" );
 		if ( !pPresetGroup )
@@ -1048,7 +1048,7 @@ bool CDmePresetGroupEditorPanel::OnWriteFileToDisk( const char *pFileName, const
 	}
 
 	// Used when exporting an entire preset group
-	if ( !Q_stricmp( pContextKeyValues->GetName(), "ExportPresetGroupToTXT" ) )
+	if ( V_strieq( pContextKeyValues->GetName(), "ExportPresetGroupToTXT" ) )
 	{
 		CDmePresetGroup *pPresetGroup = GetElementKeyValue<CDmePresetGroup>( pContextKeyValues, "presetGroup" );
 		if ( !pPresetGroup )
@@ -1583,7 +1583,7 @@ void CDmePresetGroupEditorPanel::PerformAddPhonemeGroup( const char *pNewGroupNa
 
 		char pTempBuf[256];
 		const char *pPhonemeName = NameForPhonemeByIndex( i );
-		if ( !Q_stricmp( pPhonemeName, "<sil>" ) )
+		if ( V_strieq( pPhonemeName, "<sil>" ) )
 		{
 			pPhonemeName = "silence";
 		}
@@ -1755,7 +1755,7 @@ void CDmePresetGroupEditorPanel::OnRemoveGroup()
 	if ( !pPresetGroup )
 		return;
 
-	if ( !Q_stricmp( pPresetGroup->GetName(), "procedural" ) )
+	if ( V_strieq( pPresetGroup->GetName(), "procedural" ) )
 	{
 		vgui::MessageBox *pError = new vgui::MessageBox( "#DmePresetGroupEditor_CannotRemovePresetGroupTitle", "#DmePresetGroupEditor_CannotRemovePresetGroupText", this );
 		pError->DoModal();
@@ -2222,7 +2222,7 @@ void CDmePresetGroupEditorFrame::SetAnimationSet( CDmeAnimationSet *pComboSystem
 //-----------------------------------------------------------------------------
 void CDmePresetGroupEditorFrame::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "Ok" ) )
+	if ( V_strieq( pCommand, "Ok" ) )
 	{
 		CloseModal();
 		return;

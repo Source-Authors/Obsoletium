@@ -1572,7 +1572,7 @@ CON_COMMAND_F( startmovie, "Start recording movie frames.", FCVAR_DONTRECORD )
 		flags = 0;
 		for ( int i = 2; i < args.ArgC(); ++i )
 		{
-			if ( !Q_stricmp( args[ i ], "avi" ) )
+			if ( V_strieq( args[ i ], "avi" ) )
 			{
 				//flags |= MovieInfo_t::FMOVIE_VID | MovieInfo_t::FMOVIE_VIDSOUND;
 				//videoSystem = VideoSystem::AVI;
@@ -1584,46 +1584,46 @@ CON_COMMAND_F( startmovie, "Start recording movie frames.", FCVAR_DONTRECORD )
 				return;
 			}
 #ifdef USE_WEBM_FOR_REPLAY
-			else if ( !Q_stricmp( args[ i ], "webm" ) )
+			else if ( V_strieq( args[ i ], "webm" ) )
 			{
 				flags |= MovieInfo_t::FMOVIE_VID | MovieInfo_t::FMOVIE_VIDSOUND;
 				videoSystem = VideoSystem::WEBM;
 			}
-			else if ( !Q_stricmp( args[ i ], "h264" ) )
+			else if ( V_strieq( args[ i ], "h264" ) )
 			{
 				Warning( "h264 is not supported on this platform!  Use \"webm\".\n" );
 				return;
 			}
 #else
-			else if ( !Q_stricmp( args[ i ], "h264" ) )
+			else if ( V_strieq( args[ i ], "h264" ) )
 			{
 				flags |= MovieInfo_t::FMOVIE_VID | MovieInfo_t::FMOVIE_VIDSOUND;
 				videoSystem = VideoSystem::QUICKTIME;
 			}
-			else if ( !Q_stricmp( args[ i ], "webm" ) )
+			else if ( V_strieq( args[ i ], "webm" ) )
 			{
 				Warning( "WebM is not supported on this platform!  Make sure QuickTime is installed and use \"h264\" - if you install QuickTime, you will need to reboot before using startmovie.\n" );
 				return;
 			}
 #endif
-			if ( !Q_stricmp( args[ i ], "raw" ) )
+			if ( V_strieq( args[ i ], "raw" ) )
 			{
 				flags |= MovieInfo_t::FMOVIE_TGA | MovieInfo_t::FMOVIE_WAV;
 			}
-			if ( !Q_stricmp( args[ i ], "tga" ) )
+			if ( V_strieq( args[ i ], "tga" ) )
 			{
 				flags |= MovieInfo_t::FMOVIE_TGA;
 			}
-			if ( !Q_stricmp( args[ i ], "jpeg" ) || !Q_stricmp( args[ i ], "jpg" ) )
+			if ( V_strieq( args[ i ], "jpeg" ) || V_strieq( args[ i ], "jpg" ) )
 			{
 				flags &= ~MovieInfo_t::FMOVIE_TGA;
 				flags |= MovieInfo_t::FMOVIE_JPG;
 			}
-			if ( !Q_stricmp( args[ i ], "jpeg_quality" ) )
+			if ( V_strieq( args[ i ], "jpeg_quality" ) )
 			{
 				nJpegQuality = clamp( Q_atoi( args[ ++i ] ), 1, 100 );
 			}
-			if ( !Q_stricmp( args[ i ], "wav" ) )
+			if ( V_strieq( args[ i ], "wav" ) )
 			{
 				flags |= MovieInfo_t::FMOVIE_WAV;
 			}
@@ -2184,7 +2184,7 @@ bool CL_ShouldLoadBackgroundLevel( const CCommand &args )
 
 	if ( args.ArgC() == 2 )
 	{
-		if ( !Q_stricmp( args[1], "force" ) )
+		if ( V_strieq( args[1], "force" ) )
 		{
 			// Adrian: Have to do this so the menu shows up if we ever call this while in a level.
 			Host_Disconnect( true );
@@ -2192,7 +2192,7 @@ bool CL_ShouldLoadBackgroundLevel( const CCommand &args )
 			return false;
 		}
 
-		if ( !Q_stricmp( args[1], "playendgamevid" ) )
+		if ( V_strieq( args[1], "playendgamevid" ) )
 		{
 			// Bail back to the menu and play the end game video.
 			CommandLine()->AppendParm( "-endgamevid", NULL ); 
@@ -2203,7 +2203,7 @@ bool CL_ShouldLoadBackgroundLevel( const CCommand &args )
 			return false;
 		}
 
-		if ( !Q_stricmp( args[1], "playrecapvid" ) )
+		if ( V_strieq( args[1], "playrecapvid" ) )
 		{
 			// Bail back to the menu and play the recap video
 			CommandLine()->AppendParm( "-recapvid", NULL ); 

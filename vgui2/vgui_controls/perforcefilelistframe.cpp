@@ -260,7 +260,7 @@ const char *COperationFileListFrame::CompletionMessage()
 //-----------------------------------------------------------------------------
 void COperationFileListFrame::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "Yes" ) )
+	if ( V_strieq( pCommand, "Yes" ) )
 	{
 		if ( m_pDescription )
 		{
@@ -289,7 +289,7 @@ void COperationFileListFrame::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "No" ) )
+	if ( V_strieq( pCommand, "No" ) )
 	{
 		KeyValues *pActionKeys = new KeyValues( CompletionMessage(), "operationPerformed", 0 );
 		if ( m_pContextKeyValues )
@@ -542,7 +542,7 @@ bool CPerforceFileListFrame::PerformOperation( )
 	//	{ 
 	//		// Ensure a description was added
 	//		const char *pDescription = GetDescription();
-	//		if ( !pDescription[0] || !Q_stricmp( pDescription, "<enter description here>" ) )
+	//		if ( !pDescription[0] || V_strieq( pDescription, "<enter description here>" ) )
 	//		{
 	//			vgui::MessageBox *pError = new vgui::MessageBox( "Submission Error!", "Description required for submission.", GetParent() );
 	//			pError->SetSmallCaption( true );

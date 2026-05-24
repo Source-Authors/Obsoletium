@@ -380,10 +380,10 @@ void CShaderSystem::LoadModShaderDLLs( int dxSupportLevel )
 {
 	// Don't do this for Valve mods. They don't need them, and attempting to load them is an opportunity for cheaters to get their code into the process
 	const char *pGameDir = COM_GetModDirectory();
-	if ( !Q_stricmp( pGameDir, "hl2" ) || !Q_stricmp( pGameDir, "cstrike" ) || !Q_stricmp( pGameDir, "cstrike_beta" ) ||
-		!Q_stricmp( pGameDir, "hl2mp" ) || !Q_stricmp( pGameDir, "lostcoast" ) || !Q_stricmp( pGameDir, "episodic" ) ||
-		!Q_stricmp( pGameDir, "portal" ) || !Q_stricmp( pGameDir, "ep2" ) || !Q_stricmp( pGameDir, "dod" ) ||
-		!Q_stricmp( pGameDir, "tf" ) || !Q_stricmp( pGameDir, "tf_beta" ) || !Q_stricmp( pGameDir, "hl1" ) )
+	if ( V_strieq( pGameDir, "hl2" ) || V_strieq( pGameDir, "cstrike" ) || V_strieq( pGameDir, "cstrike_beta" ) ||
+		V_strieq( pGameDir, "hl2mp" ) || V_strieq( pGameDir, "lostcoast" ) || V_strieq( pGameDir, "episodic" ) ||
+		V_strieq( pGameDir, "portal" ) || V_strieq( pGameDir, "ep2" ) || V_strieq( pGameDir, "dod" ) ||
+		V_strieq( pGameDir, "tf" ) || V_strieq( pGameDir, "tf_beta" ) || V_strieq( pGameDir, "hl1" ) )
 	{
 		return;
 	}
@@ -564,7 +564,7 @@ intp CShaderSystem::FindShaderDLL( const char *pFullPath )
 {
 	for ( intp i = m_ShaderDLLs.Count(); --i >= 0; )
 	{
-		if ( !Q_stricmp( pFullPath, m_ShaderDLLs[i].m_pFileName ) )
+		if ( V_strieq( pFullPath, m_ShaderDLLs[i].m_pFileName ) )
 			return i;
 	}
 
@@ -1660,7 +1660,7 @@ void CShaderSystem::CopyMaterialVarToDebugShader( IMaterialInternal *pDebugMater
 
 	for( int i = pShader->GetNumParams(); --i >= 0; )
 	{
-		if( !Q_stricmp( ppParams[i]->GetName( ), pSrcVarName ) )
+		if( V_strieq( ppParams[i]->GetName( ), pSrcVarName ) )
 		{
 			pMaterialVar->CopyFrom( ppParams[i] );
 			return;

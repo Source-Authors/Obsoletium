@@ -1651,7 +1651,7 @@ int	  CWin32Surface::DrawGetTextureId( char const *filename )
 	while ( i != m_VGuiSurfaceTextures.InvalidIndex() )
 	{
 		Texture *texture = &m_VGuiSurfaceTextures[i];
-		if ( !Q_stricmp( filename, texture->_filename ) )
+		if ( V_strieq( filename, texture->_filename ) )
 			return texture->_id;
 
 		i = m_VGuiSurfaceTextures.NextInorder( i );
@@ -3470,9 +3470,9 @@ private:
 
 static bool ShouldMakeUnique( char const *extension )
 {
-	if ( !Q_stricmp( extension, "cur" ) )
+	if ( V_strieq( extension, "cur" ) )
 		return true;
-	if ( !Q_stricmp( extension, "ani" ) )
+	if ( V_strieq( extension, "ani" ) )
 		return true;
 	return false;
 }

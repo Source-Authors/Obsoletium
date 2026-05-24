@@ -130,7 +130,7 @@ CDmeTransformList *CDmeModel::FindBaseState( const char *pBaseStateName )
 	intp nCount = m_BaseStates.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( m_BaseStates[i]->GetName(), pBaseStateName ) )
+		if ( V_strieq( m_BaseStates[i]->GetName(), pBaseStateName ) )
 			return m_BaseStates[i];
 	}
 	return NULL;

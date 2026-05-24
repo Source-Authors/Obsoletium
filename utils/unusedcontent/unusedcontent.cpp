@@ -690,7 +690,7 @@ void BuildFileList_R( int depth, CUtlVector< FileEntry >& files, CUtlVector< Fil
 	HANDLE ff;
 
 	bool canrecurse = true;
-	if ( !Q_stricmp( wild, "..." ) )
+	if ( V_strieq( wild, "..." ) )
 	{
 		canrecurse = true;
 		sprintf( directory, "%s%s%s", dir[0] == '\\' ? dir + 1 : dir, dir[0] != 0 ? "\\" : "", "*.*" );
@@ -795,7 +795,7 @@ bool ShouldCheckDir( char const *dirname )
 	{
 		char const *check = g_Analysis.symbols.String( g_DirList[ i ] );
 
-		if ( !Q_stricmp( dirname, check ) )
+		if ( V_strieq( dirname, check ) )
 			return true;
 	}
 
@@ -816,7 +816,7 @@ bool ShouldIgnoreDir( const char *dirname )
 			return true;
 		}
 
-		if ( !Q_stricmp( dirname, check ) )
+		if ( V_strieq( dirname, check ) )
 		{
 			vprint( 1, "Ignoring dir %s\n", dirname );
 			return true;
@@ -858,11 +858,11 @@ void BuildCheckdirList()
 			{
 				for ( KeyValues *sub = kv->GetFirstSubKey(); sub; sub = sub->GetNextKey() )
 				{
-					if ( !Q_stricmp( sub->GetName(), "dir" ) )
+					if ( V_strieq( sub->GetName(), "dir" ) )
 					{
 						AddCheckdir( sub->GetString() );
 					}
-					else if ( !Q_stricmp( sub->GetName(), "ignore" ) )
+					else if ( V_strieq( sub->GetName(), "ignore" ) )
 					{
 						AddIgnoredir( sub->GetString() );
 					}
@@ -996,11 +996,11 @@ void BuildWhiteList()
 		{
 			for ( KeyValues *sub = kv->GetFirstSubKey(); sub; sub = sub->GetNextKey() )
 			{
-				if ( !Q_stricmp( sub->GetName(), "add" ) )
+				if ( V_strieq( sub->GetName(), "add" ) )
 				{
 					AddToWhiteList( sub->GetString() );
 				}
-				else if ( !Q_stricmp( sub->GetName(), "remove" ) )
+				else if ( V_strieq( sub->GetName(), "remove" ) )
 				{
 					RemoveFromWhiteList( sub->GetString() );
 				}
@@ -1641,7 +1641,7 @@ int main( int argc, char* argv[] )
 				break;
 			case 'g':
 				// Just skip -game
-				Assert( !Q_stricmp( argv[ i ], "-game" ) );
+				Assert( V_strieq( argv[ i ], "-game" ) );
 				++i;
 				break;
 			case 'f':

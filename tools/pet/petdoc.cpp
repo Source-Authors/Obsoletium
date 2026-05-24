@@ -60,7 +60,7 @@ void CPetDoc::NotifyDataChanged( const char *pReason, int nNotifySource, int nNo
 bool CPetDoc::GetIntChoiceList( const char *pChoiceListType, [[maybe_unused]] CDmElement *pElement, 
 	[[maybe_unused]] const char *pAttributeName, [[maybe_unused]] bool bArrayElement, IntChoiceList_t &list )
 {
-	if ( !Q_stricmp( pChoiceListType, "particlefield" ) )
+	if ( V_strieq( pChoiceListType, "particlefield" ) )
 	{
 		for ( int i = 0; i < MAX_PARTICLE_ATTRIBUTES; ++i )
 		{
@@ -75,7 +75,7 @@ bool CPetDoc::GetIntChoiceList( const char *pChoiceListType, [[maybe_unused]] CD
 		return true;
 	}
 
-	if ( !Q_stricmp( pChoiceListType, "particlefield_scalar" ) )
+	if ( V_strieq( pChoiceListType, "particlefield_scalar" ) )
 	{
 		for ( int i = 0; i < MAX_PARTICLE_ATTRIBUTES; ++i )
 		{
@@ -93,7 +93,7 @@ bool CPetDoc::GetIntChoiceList( const char *pChoiceListType, [[maybe_unused]] CD
 		return true;
 	}
 
-	if ( !Q_stricmp( pChoiceListType, "particlefield_vector" ) )
+	if ( V_strieq( pChoiceListType, "particlefield_vector" ) )
 	{
 		for ( int i = 0; i < MAX_PARTICLE_ATTRIBUTES; ++i )
 		{
@@ -355,7 +355,7 @@ CDmeParticleSystemDefinition *CPetDoc::FindParticleSystemDefinition( const char 
 	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeParticleSystemDefinition* pParticleSystem = particleSystemList[i];
-		if ( !Q_stricmp( pName, pParticleSystem->GetName() ) ) 
+		if ( V_strieq( pName, pParticleSystem->GetName() ) ) 
 			return pParticleSystem;
 	}
 	return NULL;
@@ -378,7 +378,7 @@ void CPetDoc::ReplaceParticleSystemDefinition( CDmeParticleSystemDefinition *pPa
 		if ( !particleSystemList[i] )
 			continue;
 
-		if ( !Q_stricmp( particleSystemList[i]->GetName(), pParticleSystem->GetName() ) ) 
+		if ( V_strieq( particleSystemList[i]->GetName(), pParticleSystem->GetName() ) ) 
 		{
 			nFoundIndex = i;
 			break;
@@ -464,7 +464,7 @@ void CPetDoc::UpdateParticleDefinition( CDmeParticleSystemDefinition *pDef )
 bool CPetDoc::GetStringChoiceList( const char *pChoiceListType, [[maybe_unused]] CDmElement *pElement, 
 									[[maybe_unused]] const char *pAttributeName, [[maybe_unused]] bool bArrayElement, StringChoiceList_t &list )
 {
-	if ( !Q_stricmp( pChoiceListType, "particleSystemDefinitions" ) )
+	if ( V_strieq( pChoiceListType, "particleSystemDefinitions" ) )
 	{
 		CDmrParticleSystemList particleSystemList( GetParticleSystemDefinitionList() );
 
@@ -495,13 +495,13 @@ bool CPetDoc::GetStringChoiceList( const char *pChoiceListType, [[maybe_unused]]
 bool CPetDoc::GetElementChoiceList( const char *pChoiceListType, [[maybe_unused]] CDmElement *pElement, 
 									 [[maybe_unused]] const char *pAttributeName, [[maybe_unused]] bool bArrayElement, ElementChoiceList_t &list )
 {
-	if ( !Q_stricmp( pChoiceListType, "allelements" ) )
+	if ( V_strieq( pChoiceListType, "allelements" ) )
 	{
 		AddElementsRecursively( m_hRoot, list );
 		return true;
 	}
 
-	if ( !Q_stricmp( pChoiceListType, "particleSystemDefinitions" ) )
+	if ( V_strieq( pChoiceListType, "particleSystemDefinitions" ) )
 	{
 		CDmrParticleSystemList particleSystemList( GetParticleSystemDefinitionList() );
 

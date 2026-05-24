@@ -352,7 +352,7 @@ void CDmeCombinationOperatorPanel::RemoveAnimationControlFromPresets( const char
 			for ( intp k = 0; k < nControlCount; ++k )
 			{
 				CDmElement *v = controlValues[ k ];
-				if ( !Q_stricmp( v->GetName(), pControlName ) )
+				if ( V_strieq( v->GetName(), pControlName ) )
 				{
 					controlValues.FastRemove( k );
 					break;
@@ -379,7 +379,7 @@ void CDmeCombinationOperatorPanel::RemoveAnimationControlFromSelectionGroups( co
 		intp nControlCount = selectedControls.Count();
 		for ( intp j = 0; j < nControlCount; ++j )
 		{
-			if ( !Q_stricmp( selectedControls[ j ], pControlName ) )
+			if ( V_strieq( selectedControls[ j ], pControlName ) )
 			{
 				selectedControls.FastRemove( j );
 				break;
@@ -686,7 +686,7 @@ void CDmeCombinationOperatorPanel::SortAnimationSetControls()
 	{
 		const char *pControlName = controls[i]->GetName();
 		const char *pComboName = m_hCombinationOperator->GetControlName( i );
-		Assert( !Q_stricmp( pControlName, pComboName ) );
+		Assert( V_strieq( pControlName, pComboName ) );
 	}
 #endif
 }

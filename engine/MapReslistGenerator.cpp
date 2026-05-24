@@ -292,7 +292,7 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 	{
 		for ( intp i = 0 ; i < c; ++i )
 		{
-			if ( !Q_stricmp( aMaps->Element(i).name, startmap ) )
+			if ( V_strieq( aMaps->Element(i).name, startmap ) )
 			{
 				*iCurrentMap = i;
 			}
@@ -383,7 +383,7 @@ void CMapReslistGenerator::LogToEngineReslist( char const *pLine )
 void CMapReslistGenerator::EnableReslistGeneration( bool usemaplistfile )
 {
 	//hackhack !!!! This is a work-around until CS precaches things on level start, not player spawn
-	if ( !Q_stricmp( "cstrike", GetCurrentMod() ))
+	if ( V_strieq( "cstrike", GetCurrentMod() ))
 	{
 		m_iPauseTimeBetweenMaps = PAUSE_TIME_BETWEEN_MAPS * 3;
 		m_iPauseFramesBetweenMaps = PAUSE_FRAMES_BETWEEN_MAPS * 3;
@@ -834,7 +834,7 @@ void CMapReslistGenerator::EnableDeletionsTracking()
 					if ( Q_isempty( token ) )
 						break;
 
-					if ( !Q_stricmp( token, "del" ) )
+					if ( V_strieq( token, "del" ) )
 						continue;
 
 					Q_snprintf(filename, sizeof( filename ), "%s/%s", com_gamedir, token );

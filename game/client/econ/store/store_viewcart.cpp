@@ -301,7 +301,7 @@ void CStoreViewCartPanel::UpdateCartItemList( void )
 //-----------------------------------------------------------------------------
 void CStoreViewCartPanel::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "close" ) )
+	if ( V_strieq( command, "close" ) )
 	{
 		ShowPanel( false );
 	}
@@ -315,7 +315,7 @@ void CStoreViewCartPanel::OnCommand( const char *command )
 		}
 		return;
 	}
-	else if ( !Q_stricmp( command, "checkout" ) )
+	else if ( V_strieq( command, "checkout" ) )
 	{
 		EconUI()->GetStorePanel()->InitiateCheckout( false );
 	}

@@ -486,7 +486,7 @@ void CParticleSystemDefinitionBrowser::PasteFromClipboard( )
 //-----------------------------------------------------------------------------
 void CParticleSystemDefinitionBrowser::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "create" ) )
+	if ( V_strieq( pCommand, "create" ) )
 	{
 		vgui::InputDialog *pInputDialog = new vgui::InputDialog( g_pPetTool->GetRootPanel(), "Enter Particle System Name", "Name:", "" );
 		pInputDialog->SetSmallCaption( true );
@@ -495,7 +495,7 @@ void CParticleSystemDefinitionBrowser::OnCommand( const char *pCommand )
 		pInputDialog->DoModal( new KeyValues("create") );
 		return;
 	}
-	if ( !Q_stricmp( pCommand, "copy" ) )
+	if ( V_strieq( pCommand, "copy" ) )
 	{
 		vgui::InputDialog *pInputDialog = new vgui::InputDialog( g_pPetTool->GetRootPanel(), "Enter Particle System Name", "Name:", "" );
 		pInputDialog->SetSmallCaption( true );
@@ -504,7 +504,7 @@ void CParticleSystemDefinitionBrowser::OnCommand( const char *pCommand )
 		pInputDialog->DoModal( new KeyValues("copy") );
 		return;
 	}
-	if ( !Q_stricmp( pCommand, "Create From KeyValue" ) )
+	if ( V_strieq( pCommand, "Create From KeyValue" ) )
 	{
 		vgui::FileOpenDialog *pDialog = new vgui::FileOpenDialog( g_pPetTool->GetRootPanel(), "Select KV File", vgui::FOD_OPEN );
 		pDialog->SetTitle( "Choose KeyValue File", true );
@@ -518,19 +518,19 @@ void CParticleSystemDefinitionBrowser::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "delete" ) )
+	if ( V_strieq( pCommand, "delete" ) )
 	{
 		DeleteParticleSystems();
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "Save" ) )
+	if ( V_strieq( pCommand, "Save" ) )
 	{
 		g_pPetTool->Save();
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "SaveAndTest" ) )
+	if ( V_strieq( pCommand, "SaveAndTest" ) )
 	{
 		g_pPetTool->SaveAndTest();
 		return;

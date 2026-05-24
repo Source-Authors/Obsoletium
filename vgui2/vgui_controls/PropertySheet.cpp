@@ -373,7 +373,7 @@ public:
 
 	void OnCommand( char const *cmd ) override
 	{
-		if ( !Q_stricmp( cmd, "ShowContextMenu" ) )
+		if ( V_strieq( cmd, "ShowContextMenu" ) )
 		{
 			KeyValues *kv = new KeyValues("OpenContextMenu");
 			kv->SetPtr( "page", m_pPage );

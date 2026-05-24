@@ -202,7 +202,7 @@ void CDecalEmitterSystem::LoadDecalsFromScript( char const *filename )
 				{
 					char const *keyname = p->GetName();
 
-					if ( !Q_stricmp( keyname, TRANSLATION_DATA_SECTION ) )
+					if ( V_strieq( keyname, TRANSLATION_DATA_SECTION ) )
 					{
 						translation = p;
 					}
@@ -248,7 +248,7 @@ void CDecalEmitterSystem::LoadDecalsFromScript( char const *filename )
 			for ( KeyValues *sub = translation->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
 			{
 				// Don't add NULL string to list
-				if ( !Q_stricmp( sub->GetString(), "" ) )
+				if ( V_strieq( sub->GetString(), "" ) )
 					continue;
 
 				int idx = m_Decals.Find( sub->GetString() );
@@ -314,7 +314,7 @@ char const *CDecalEmitterSystem::TranslateDecalForGameMaterial( char const *deca
 	if ( gamematerial == CHAR_TEX_CONCRETE )
 		return decalName;
 
-	if ( !Q_stricmp( decalName, "Impact.Concrete" ) )
+	if ( V_strieq( decalName, "Impact.Concrete" ) )
 	{
 		if ( gamematerial == '-' )
 			return "";

@@ -1123,7 +1123,7 @@ bool KeyValues::LoadFromBuffer( char const *resourceName, const char *pBuffer, I
 		if ( !pfile || !s || *s == 0 )
 			break;
 
-		if ( !Q_stricmp( s, "#include" ) )	// special include macro (not a key name)
+		if ( V_strieq( s, "#include" ) )	// special include macro (not a key name)
 		{
 			s = ReadToken( &pfile, wasQuoted );
 			// Name of subfile to load is now in s

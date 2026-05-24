@@ -49,7 +49,7 @@ DmeClipType_t ClipTypeFromString( const char *pName )
 {
 	for ( DmeClipType_t i = DMECLIP_FIRST; i <= DMECLIP_LAST; ++i )
 	{
-		if ( !Q_stricmp( pName, s_pClipTypeNames[i] ) )
+		if ( V_strieq( pName, s_pClipTypeNames[i] ) )
 			return i;
 	}
 	return DMECLIP_UNKNOWN;

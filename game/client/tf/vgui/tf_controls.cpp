@@ -128,7 +128,7 @@ void CTFFooter::ApplySettings( KeyValues *inResourceData )
 	{
 		const char *pNameButton = pButton->GetName();
 
-		if ( !Q_stricmp( pNameButton, "button" ) )
+		if ( V_strieq( pNameButton, "button" ) )
 		{
 			// Add a button to the footer
 			const char *pName = pButton->GetString( "name", "NULL" );
@@ -184,7 +184,7 @@ void CTFFooter::ShowButtonLabel( const char *name, bool show )
 {
 	for ( int i = 0; i < m_Buttons.Count(); ++i )
 	{
-		if ( !Q_stricmp( m_Buttons[ i ]->name, name ) )
+		if ( V_strieq( m_Buttons[ i ]->name, name ) )
 		{
 			m_Buttons[ i ]->bVisible = show;
 			break;
@@ -666,7 +666,7 @@ void CTFAdvancedOptionsDialog::CreateControls()
 				pListItem = pObj->pListItems;
 				while ( pListItem )
 				{
-					if ( iRow == -1 && !Q_stricmp( pListItem->szValue, pObj->curValue ) )
+					if ( iRow == -1 && V_strieq( pListItem->szValue, pObj->curValue ) )
 						iRow = iCount;
 
 					pCombo->AddItem( pListItem->szItemText, NULL );

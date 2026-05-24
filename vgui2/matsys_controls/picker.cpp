@@ -279,7 +279,7 @@ void CPickerFrame::DoModal( const PickerList_t &list, KeyValues *pContextKeyValu
 //-----------------------------------------------------------------------------
 void CPickerFrame::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "Open" ) )
+	if ( V_strieq( pCommand, "Open" ) )
 	{
 		KeyValues *pActionKeys = new KeyValues( "Picked" );
 		pActionKeys->SetInt( "choiceIndex", m_pPicker->GetSelectedIndex( ) );
@@ -305,7 +305,7 @@ void CPickerFrame::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "Cancel" ) )
+	if ( V_strieq( pCommand, "Cancel" ) )
 	{
 		CloseModal();
 		return;

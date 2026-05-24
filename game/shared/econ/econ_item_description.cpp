@@ -982,7 +982,7 @@ static void GenerateLocalizedFullItemName
 #ifdef PROJECT_TF
 	static CSchemaAttributeDefHandle pAttrDef_SupplyCrateSeries( "set supply crate series" );
 	// do not display series number for crates that have a collection reference
-	if ( pAttrDef_SupplyCrateSeries && pEconItemDefinition->GetItemClass() && !Q_stricmp( pEconItemDefinition->GetItemClass(), "supply_crate" ) && !pEconItemDefinition->GetCollectionReference() )
+	if ( pAttrDef_SupplyCrateSeries && pEconItemDefinition->GetItemClass() && V_strieq( pEconItemDefinition->GetItemClass(), "supply_crate" ) && !pEconItemDefinition->GetCollectionReference() )
 	{
 		// It's a crate, find a series #
 		uint32 unSupplyCrateSeries;
@@ -1043,7 +1043,7 @@ static void GenerateLocalizedFullItemName
 	locchar_t szDynamicRecipeOutputName[ kToolApplicationNameLength ] = LOCCHAR("");
 
 	static CSchemaAttributeDefHandle pAttribDef_ToolTarget( "tool target item" );
-	if( pAttribDef_ToolTarget && pEconItem->GetItemDefinition()->GetItemClass() && !Q_stricmp( pEconItem->GetItemDefinition()->GetItemClass(), "tool" ) )
+	if( pAttribDef_ToolTarget && pEconItem->GetItemDefinition()->GetItemClass() && V_strieq( pEconItem->GetItemDefinition()->GetItemClass(), "tool" ) )
 	{
 		// It's a tool, see if it has a tool target item attribute
 		float flItemDef;

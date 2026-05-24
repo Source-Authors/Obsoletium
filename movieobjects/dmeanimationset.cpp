@@ -48,7 +48,7 @@ intp CDmePreset::FindControlValueIndex( const char *pControlName )
 	for ( intp i = 0; i < c; ++i )
 	{
 		CDmElement *e = m_ControlValues.Get( i );
-		if ( !Q_stricmp( e->GetName(), pControlName ) )
+		if ( V_strieq( e->GetName(), pControlName ) )
 			return i;
 	}
 	return -1;
@@ -178,7 +178,7 @@ const char *CDmePresetRemap::FindSourcePreset( const char *pDestPresetName )
 	intp nCount = m_DestPresets.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( pDestPresetName, m_DestPresets[i] ) )
+		if ( V_strieq( pDestPresetName, m_DestPresets[i] ) )
 			return m_SrcPresets[i];
 	}
 	return NULL;
@@ -264,7 +264,7 @@ CDmePreset *CDmePresetGroup::FindPreset( const char *pPresetName )
 	for ( intp i = 0; i < c; ++i )
 	{
 		CDmePreset *e = m_Presets.Get( i );
-		if ( !Q_stricmp( e->GetName(), pPresetName ) )
+		if ( V_strieq( e->GetName(), pPresetName ) )
 			return e;
 	}
 	return NULL;
@@ -374,7 +374,7 @@ static intp FindExportedControlIndex( const char *pControlName, CUtlVector< Expo
 	intp nCount = uniqueControls.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( pControlName, uniqueControls[i].m_Name ) )
+		if ( V_strieq( pControlName, uniqueControls[i].m_Name ) )
 			return i;
 	}
 	return -1;
@@ -489,7 +489,7 @@ bool CDmePresetGroup::ExportToTXT( const char *pFileName, CDmeAnimationSet *pAni
 		const char *pPresetName = pPreset->GetName();
 
 		// Hack for 'silence' and for p_ naming scheme
-		if ( !Q_stricmp( pPresetName, "p_silence" ) )
+		if ( V_strieq( pPresetName, "p_silence" ) )
 		{
 			pPresetName = "<sil>";
 		}
@@ -798,7 +798,7 @@ bool CDmePresetGroup::ExportToVFE( const char *pFileName, CDmeAnimationSet *pAni
 		{
 			pPresetName = &pPresetName[2];
 		}
-		if ( !Q_stricmp( pPresetName, "silence" ) )
+		if ( V_strieq( pPresetName, "silence" ) )
 		{
 			pPresetName = "<sil>";
 		}
@@ -973,7 +973,7 @@ intp CDmeAnimationSet::FindPresetGroupIndex( const char *pGroupName )
 	for ( intp i = 0; i < c; ++i )
 	{
 		CDmePresetGroup *e = m_PresetGroups.Get( i );
-		if ( e && !Q_stricmp( e->GetName(), pGroupName ) )
+		if ( e && V_strieq( e->GetName(), pGroupName ) )
 			return i;
 	}
 	return -1; 
@@ -1143,7 +1143,7 @@ CDmePhonemeMapping *CDmeAnimationSet::FindMapping( const char *pRawPhoneme )
 		if ( !e )
 			continue;
 
-		if ( !Q_stricmp( e->GetName(), pRawPhoneme ) )
+		if ( V_strieq( e->GetName(), pRawPhoneme ) )
 			return e;
 	}
 	return NULL;
@@ -1159,7 +1159,7 @@ CDmElement *CDmeAnimationSet::FindControl( const char *pControlName )
 	for ( intp i = 0; i < c; ++i )
 	{
 		CDmElement *e = m_Controls.Get( i );
-		if ( !Q_stricmp( e->GetName(), pControlName ) )
+		if ( V_strieq( e->GetName(), pControlName ) )
 			return e;
 	}
 	return NULL;
@@ -1188,7 +1188,7 @@ CDmElement *CDmeAnimationSet::FindSelectionGroup( const char *pSelectionGroupNam
 	for ( intp i = 0; i < c; ++i )
 	{
 		CDmElement *e = m_SelectionGroups.Get( i );
-		if ( !Q_stricmp( e->GetName(), pSelectionGroupName ) )
+		if ( V_strieq( e->GetName(), pSelectionGroupName ) )
 			return e;
 	}
 	return NULL;

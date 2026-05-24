@@ -2357,7 +2357,7 @@ bool KeyValues::LoadFromBuffer( char const *resourceName, CUtlBuffer &buf, IBase
 		if ( !buf.IsValid() || !s || *s == 0 )
 			break;
 
-		if ( !Q_stricmp( s, "#include" ) )	// special include macro (not a key name)
+		if ( V_strieq( s, "#include" ) )	// special include macro (not a key name)
 		{
 			s = ReadToken( buf, wasQuoted, wasConditional );
 			// Name of subfile to load is now in s
@@ -2373,7 +2373,7 @@ bool KeyValues::LoadFromBuffer( char const *resourceName, CUtlBuffer &buf, IBase
 
 			continue;
 		}
-		else if ( !Q_stricmp( s, "#base" ) )
+		else if ( V_strieq( s, "#base" ) )
 		{
 			s = ReadToken( buf, wasQuoted, wasConditional );
 			// Name of subfile to load is now in s
@@ -3106,7 +3106,7 @@ bool KeyValues::ProcessResolutionKeys( const char *pResString )
 
 			// substring must match exactly, otherwise keys like "_lodef" and "_lodef_wide" would clash.
 			char *pString = Q_stristr( normalKeyName, pResString );
-			if ( pString && !Q_stricmp( pString, pResString ) )
+			if ( pString && V_strieq( pString, pResString ) )
 			{
 				*pString = '\0';
 

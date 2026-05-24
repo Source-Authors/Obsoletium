@@ -74,7 +74,7 @@ bool CDmeCombinationInputControl::AddRawControl( const char *pRawControlName )
 	intp nCount = m_RawControlNames.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( pRawControlName, m_RawControlNames[i] ) )
+		if ( V_strieq( pRawControlName, m_RawControlNames[i] ) )
 			return false;
 	}
 
@@ -93,7 +93,7 @@ intp CDmeCombinationInputControl::FindRawControl( const char *pRawControlName )
 	intp nCount = m_RawControlNames.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( pRawControlName, m_RawControlNames[i] ) )
+		if ( V_strieq( pRawControlName, m_RawControlNames[i] ) )
 			return i;
 	}
 	return -1;
@@ -294,7 +294,7 @@ bool CDmeCombinationDominationRule::HasString( const char *pString, const CDmaSt
 	intp nCount = attr.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( pString, attr[i] ) )
+		if ( V_strieq( pString, attr[i] ) )
 			return true;
 	}
 	return false;
@@ -385,7 +385,7 @@ bool CDmeCombinationDominationRule::HasDominatorControl( const char *pDominatorC
 	intp nCount = DominatorCount();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( GetDominator(i), pDominatorControl ) )
+		if ( V_strieq( GetDominator(i), pDominatorControl ) )
 			return true;
 	}
 	return false;
@@ -396,7 +396,7 @@ bool CDmeCombinationDominationRule::HasSuppressedControl( const char *pSuppresse
 	intp nCount = SuppressedCount();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( GetSuppressed(i), pSuppressedControl ) )
+		if ( V_strieq( GetSuppressed(i), pSuppressedControl ) )
 			return true;
 	}
 	return false;
@@ -471,7 +471,7 @@ ControlIndex_t CDmeCombinationOperator::FindOrCreateControl( const char *pContro
 		if ( !m_InputControls[i] )
 			continue;
 
-		if ( !Q_stricmp( pControlName, m_InputControls[i]->GetName() ) )
+		if ( V_strieq( pControlName, m_InputControls[i]->GetName() ) )
 			return i;
 	}
 
@@ -506,7 +506,7 @@ ControlIndex_t CDmeCombinationOperator::FindControlIndex( const char *pControlNa
 		if ( !m_InputControls[i] )
 			continue;
 
-		if ( !Q_stricmp( pControlName, m_InputControls[i]->GetName() ) )
+		if ( V_strieq( pControlName, m_InputControls[i]->GetName() ) )
 			return i;
 	}
 	return -1;
@@ -993,7 +993,7 @@ CDmeCombinationOperator::RawControlIndex_t CDmeCombinationOperator::FindRawContr
 		if ( bIgnoreDefaultControls && m_RawControlInfo[i].m_bIsDefaultControl )
 			continue;
 
-		if ( !Q_stricmp( pControlName, m_RawControlInfo[i].m_Name ) )
+		if ( V_strieq( pControlName, m_RawControlInfo[i].m_Name ) )
 			return i;
 	}
 	return -1;
@@ -1067,7 +1067,7 @@ bool CDmeCombinationOperator::DoesTargetContainDeltaState( const char *pSearchNa
 					++pEnd;
 				}
 
-				if ( !Q_stricmp( pSearchName, pName ) )
+				if ( V_strieq( pSearchName, pName ) )
 					return true;
 			}
 		}
@@ -1363,7 +1363,7 @@ intp CDmeCombinationOperator::FindDeltaStateIndex( CDmAttribute *pDeltaArray, co
 	for ( intp i = 0; i < nDeltaArrayCount; ++i )
 	{
 		CDmElement *pDeltaElement = deltas[i];
-		if ( pDeltaElement && !Q_stricmp( pDeltaElement->GetName(), pDeltaStateName ) )
+		if ( pDeltaElement && V_strieq( pDeltaElement->GetName(), pDeltaStateName ) )
 			return i;
 	}
 
@@ -2160,7 +2160,7 @@ intp CDmeMayaCombinationOperator::FindDeltaState( const char *pDeltaStateName )
 	intp nCount = m_DeltaStates.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( pDeltaStateName, m_DeltaStates[i]->GetName() ) )
+		if ( V_strieq( pDeltaStateName, m_DeltaStates[i]->GetName() ) )
 			return i;
 	}
 	return -1;

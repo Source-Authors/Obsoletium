@@ -536,7 +536,7 @@ void CCharInfoLoadoutSubPanel::OnCommand( const char *command )
 	{
 		OpenTradingStartDialog( this );
 	}
-	else if ( !Q_stricmp( command, "show_explanations" ) )
+	else if ( V_strieq( command, "show_explanations" ) )
 	{
 		if ( !m_flStartExplanationsAt )
 		{

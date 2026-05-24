@@ -3088,7 +3088,7 @@ qboolean	ParseEntity (void)
 	{
 		if (!GetToken (true))
 			Error ("ParseEntity: EOF without closing brace");
-		if (!Q_stricmp (token, "}") )
+		if (V_strieq (token, "}") )
 			break;
 		e = ParseEpair ();
 		e->next = mapent->epairs;
@@ -3178,7 +3178,7 @@ void SetKeyValue(entity_t *ent, const char *key, const char *value)
 	epair_t	*ep;
 	
 	for (ep=ent->epairs ; ep ; ep=ep->next)
-		if (!Q_stricmp (ep->key, key) )
+		if (V_strieq (ep->key, key) )
 		{
 			free (ep->value);
 			ep->value = copystring(value);
@@ -3194,7 +3194,7 @@ void SetKeyValue(entity_t *ent, const char *key, const char *value)
 const char 	*ValueForKey (entity_t *ent, const char *key)
 {
 	for (epair_t *ep=ent->epairs ; ep ; ep=ep->next)
-		if (!Q_stricmp (ep->key, key) )
+		if (V_strieq (ep->key, key) )
 			return ep->value;
 	return "";
 }
@@ -3208,7 +3208,7 @@ vec_t	FloatForKey (entity_t *ent, const char *key)
 vec_t	FloatForKeyWithDefault (entity_t *ent, const char *key, float default_value)
 {
 	for (epair_t *ep=ent->epairs ; ep ; ep=ep->next)
-		if (!Q_stricmp (ep->key, key) )
+		if (V_strieq (ep->key, key) )
 			return strtof( ep->value, nullptr );
 	return default_value;
 }

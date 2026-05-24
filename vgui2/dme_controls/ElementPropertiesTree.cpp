@@ -1821,7 +1821,7 @@ bool CElementPropertiesTreeInternal::BuildExpansionListToFindElement_R(
 			for ( CDmAttribute *attribute = element->FirstAttribute(); attribute; attribute = attribute->NextAttribute(), --idx )
 			{
 				const char *attributeName = attribute->GetName();
-				if ( !Q_stricmp( attributeName, sr.attributeName.Get() ) )
+				if ( V_strieq( attributeName, sr.attributeName.Get() ) )
 				{
 					expandIndices.AddToTail( idx );
 					break;
@@ -3292,7 +3292,7 @@ void CElementPropertiesTreeInternal::OnLabelChanged( int itemIndex, const char *
 	}
 
 	// No change!!!
-	if ( !Q_stricmp( oldString, newString ) )
+	if ( V_strieq( oldString, newString ) )
 		return;
 
 	CDmElement *pElement = GetElementKeyValue< CDmElement >( data, "dmeelement" );
@@ -3591,9 +3591,9 @@ void CElementPropertiesTreeInternal::OnItemDropped( int itemIndex, CUtlVector< K
 		}
 		else
 		{
-			bool bTail = !cmd[ 0 ] || !Q_stricmp( cmd, "default" ) || !Q_stricmp( cmd, "tail" );
-			bool bHead = !bTail && !Q_stricmp( cmd, "head" );
-			bool bReplace = !bTail && !bHead && !Q_stricmp( cmd, "replace" );
+			bool bTail = !cmd[ 0 ] || V_strieq( cmd, "default" ) || V_strieq( cmd, "tail" );
+			bool bHead = !bTail && V_strieq( cmd, "head" );
+			bool bReplace = !bTail && !bHead && V_strieq( cmd, "replace" );
 			if ( !bTail && !bHead && !bReplace )
 			{
 				Warning( "Unknown command '%s'\n", cmd );
@@ -3800,7 +3800,7 @@ int CElementPropertiesTreeInternal::FindTreeItem( int nParentIndex, const TreeIt
 		}
 
 		if ( ( pElement == info.m_pElement ) && ( pArrayElement == info.m_pArrayElement ) &&
-			!Q_stricmp( pAttributeName, info.m_pAttributeName ) )
+			V_strieq( pAttributeName, info.m_pAttributeName ) )
 		{
 			return nChildIndex;
 		}
@@ -4418,17 +4418,17 @@ void CElementPropertiesTree::SetObject( CDmElement *object )
 
 void CElementPropertiesTree::OnCommand( const char *cmd )
 {
-	if ( !Q_stricmp( cmd, "close" ) )
+	if ( V_strieq( cmd, "close" ) )
 	{
 		m_pProperties->ApplyChanges();
 		MarkForDeletion();
 	}
-	else if ( !Q_stricmp( cmd, "apply" ) )
+	else if ( V_strieq( cmd, "apply" ) )
 	{
 		m_pProperties->ApplyChanges();
 		m_pProperties->Refresh();
 	}
-	else if ( !Q_stricmp( cmd, "cancel" ) )
+	else if ( V_strieq( cmd, "cancel" ) )
 	{
 		MarkForDeletion();
 	}

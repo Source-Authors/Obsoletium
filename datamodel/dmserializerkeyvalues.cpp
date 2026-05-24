@@ -140,7 +140,7 @@ bool CDmSerializerKeyValues::SerializeAttributes( CUtlBuffer& buf, CDmElement *p
 		// Rename "_type", "_name", or "_id" fields, since they are special fields
 		for ( intp iAttr = 0; s_pAttributeRemap[i].m_pKeyValuesName; ++i )
 		{
-			if ( !Q_stricmp( pName, s_pAttributeRemap[iAttr].m_pDmeName ) )
+			if ( V_strieq( pName, s_pAttributeRemap[iAttr].m_pDmeName ) )
 			{
 				pName = s_pAttributeRemap[iAttr].m_pKeyValuesName;
 				break;
@@ -148,7 +148,7 @@ bool CDmSerializerKeyValues::SerializeAttributes( CUtlBuffer& buf, CDmElement *p
 		}
 
   		DmAttributeType_t nAttrType = pAttribute->GetType();
-		if ( ( nAttrType ==  AT_ELEMENT_ARRAY ) && !Q_stricmp( pName, "subkeys" ) )
+		if ( ( nAttrType ==  AT_ELEMENT_ARRAY ) && V_strieq( pName, "subkeys" ) )
 		{
 			SerializeSubKeys( buf, pAttribute );
 			continue;
@@ -306,7 +306,7 @@ void CDmSerializerKeyValues::UnserializeAttribute( CDmElement *pElement, KeyValu
 	// Rename "type", "name", or "id" fields, since they are special fields
 	for ( intp i = 0; s_pAttributeRemap[i].m_pKeyValuesName; ++i )
 	{
-		if ( !Q_stricmp( pLowerName, s_pAttributeRemap[i].m_pKeyValuesName ) )
+		if ( V_strieq( pLowerName, s_pAttributeRemap[i].m_pKeyValuesName ) )
 		{
 			pLowerName = s_pAttributeRemap[i].m_pDmeName;
 			break;

@@ -455,7 +455,7 @@ int FindTexData( const char *pName )
 	for( int i = 0; i < numtexdata; i++ )
 	{
 		char const *pTexDataName = TexDataStringTable_GetString( GetTexData( i )->nameStringTableID );
-		if ( !Q_stricmp( pTexDataName, pName ) )
+		if ( V_strieq( pTexDataName, pName ) )
 			return i;
 	}
 	return -1;
@@ -720,7 +720,7 @@ void LoadSurfaceProperties( void )
 	{
 		for ( auto *sub = manifest->GetFirstSubKey(); sub != nullptr; sub = sub->GetNextKey() )
 		{
-			if ( !Q_stricmp( sub->GetName(), "file" ) )
+			if ( V_strieq( sub->GetName(), "file" ) )
 			{
 				// Add
 				LoadSurfacePropFile( sub->GetString() );

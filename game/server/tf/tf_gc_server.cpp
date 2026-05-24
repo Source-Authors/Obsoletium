@@ -2119,7 +2119,7 @@ bool CTFGCServerSystem::ShouldHibernate()
 void CTFGCServerSystem::FireGameEvent( IGameEvent *event )
 {
 	// Disconnected from gameserver
-	if ( !Q_stricmp( event->GetName(), "player_disconnect" ) )
+	if ( V_strieq( event->GetName(), "player_disconnect" ) )
 	{
 		const char * pszReason = event->GetString( "reason", "" );
 		if ( Q_strstr( pszReason, "kick" ) || Q_strstr( pszReason, "Kick" ) || Q_strstr( pszReason, g_pszVoteKickString ) )

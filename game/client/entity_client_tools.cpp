@@ -719,7 +719,7 @@ QAngle CClientTools::GetAbsAngles( HTOOLHANDLE handle )
 //-----------------------------------------------------------------------------
 void CClientTools::PostToolMessage( KeyValues *pKeyValues )
 {
-	if ( !Q_stricmp( pKeyValues->GetName(), "QueryParticleManifest" ) )
+	if ( V_strieq( pKeyValues->GetName(), "QueryParticleManifest" ) )
 	{
 		// NOTE: This cannot be done during particle system init because tools aren't set up at that point
 		CUtlVector<CUtlString> files;
@@ -735,20 +735,20 @@ void CClientTools::PostToolMessage( KeyValues *pKeyValues )
 		return;
 	}
 
-	if ( !Q_stricmp( pKeyValues->GetName(), "QueryMonitorTexture" ) )
+	if ( V_strieq( pKeyValues->GetName(), "QueryMonitorTexture" ) )
 	{
 		pKeyValues->SetPtr( "texture", GetCameraTexture() );
 		return;
 	}
 
 #ifdef PORTAL
-	if ( !Q_stricmp( pKeyValues->GetName(), "portals" ) )
+	if ( V_strieq( pKeyValues->GetName(), "portals" ) )
 	{
 		g_pPortalRender->HandlePortalPlaybackMessage( pKeyValues );
 		return;
 	}
 	
-	if ( !Q_stricmp( pKeyValues->GetName(), "query CPortalRenderer" ) )
+	if ( V_strieq( pKeyValues->GetName(), "query CPortalRenderer" ) )
 	{
 		pKeyValues->SetInt( "IsRenderingPortal", g_pPortalRender->IsRenderingPortal() ? 1 : 0 );
 		return;

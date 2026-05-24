@@ -177,7 +177,7 @@ CPluginGameUIDialog::~CPluginGameUIDialog()
 //-----------------------------------------------------------------------------
 void CPluginGameUIDialog::OnCommand( const char *cmd )
 {
-	if ( !Q_stricmp( cmd, "close" ) )
+	if ( V_strieq( cmd, "close" ) )
 	{
 		if ( !Q_isempty(m_szEntryCommand) )
 		{

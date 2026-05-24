@@ -126,7 +126,7 @@ bool CDmxSerializer::ShouldWriteAttribute( const char *pAttributeName, CDmxAttri
 		return false;
 
 	// These are already written in the initial element dictionary
-	if ( !Q_stricmp( pAttributeName, "name" ) )
+	if ( V_strieq( pAttributeName, "name" ) )
 		return false;
 
 	return true;

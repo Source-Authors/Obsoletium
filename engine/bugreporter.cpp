@@ -422,7 +422,7 @@ CBugReportFinishedDialog::CBugReportFinishedDialog(Panel *parent, const char *na
 
 void CBugReportFinishedDialog::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "Close" ) )
+	if ( V_strieq( command, "Close" ) )
 	{
 		MarkForDeletion();
 		OnClose();
@@ -1559,7 +1559,7 @@ bool CBugUIPanel::IsValidSubmission( bool verbose )
 	char owner[ 256 ];
 	Q_strncpy( owner, m_pBugReporter->GetDisplayName( m_pAssignTo->GetActiveItem() ), sizeof( owner ) );
 	// dimhotepus: Drop as only public repo used.
-	// if ( !isPublic && !Q_stricmp( owner, "<<Unassigned>>" ) )
+	// if ( !isPublic && V_strieq( owner, "<<Unassigned>>" ) )
 	// {
 	// 	if ( verbose ) 
 	// 	{
@@ -2610,7 +2610,7 @@ bool CBugUIPanel::Compare( char const *value, char const *token, bool partial )
 {
 	if ( !partial )
 	{
-		if ( !Q_stricmp( value, token ) )
+		if ( V_strieq( value, token ) )
 			return true;
 	}
 	else
@@ -2684,13 +2684,13 @@ bool CBugUIPanel::AutoFillToken( char const *token, bool partial )
 		}
 	}
 
-	if ( !Q_stricmp( token, "screenshot" ) )
+	if ( V_strieq( token, "screenshot" ) )
 	{
 		m_fAutoAddScreenshot = eAutoAddScreenshot_Add;
 		return true;
 	}
 
-	if ( !Q_stricmp( token, "noscreenshot" ) )
+	if ( V_strieq( token, "noscreenshot" ) )
 	{
 		m_fAutoAddScreenshot = eAutoAddScreenshot_DontAdd;
 		return true;
@@ -2748,7 +2748,7 @@ CON_COMMAND( _bugreporter_restart, "Restarts bug reporter " DLL_EXT_STRING )
 	IEngineBugReporter::BR_TYPE type = IEngineBugReporter::BR_PUBLIC;
 
 	// dimhotepus: Drop internal bug reporter.
-	if ( !Q_stricmp( args.Arg( 1 ), "autoselect" ) )
+	if ( V_strieq( args.Arg( 1 ), "autoselect" ) )
 	{
 		type = IEngineBugReporter::BR_AUTOSELECT;
 	}

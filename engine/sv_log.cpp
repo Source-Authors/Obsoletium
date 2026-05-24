@@ -95,7 +95,7 @@ CON_COMMAND( log, "Enables logging to file, console, and udp < on | off >." )
 		return;
 	}
 
-	if ( !Q_stricmp( args[1], "off" ) || !Q_stricmp( args[1], "0" ) )
+	if ( V_strieq( args[1], "off" ) || V_strieq( args[1], "0" ) )
 	{
 		if ( g_Log.IsActive() )
 		{
@@ -104,7 +104,7 @@ CON_COMMAND( log, "Enables logging to file, console, and udp < on | off >." )
 			ConMsg( "Server logging disabled.\n" );
 		}
 	}
-	else if ( !Q_stricmp( args[1], "on" ) || !Q_stricmp( args[1], "1" ) )
+	else if ( V_strieq( args[1], "on" ) || V_strieq( args[1], "1" ) )
 	{
 		g_Log.SetLoggingState( true );
 		ConMsg( "Server logging enabled.\n" );

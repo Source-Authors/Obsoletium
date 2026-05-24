@@ -338,13 +338,13 @@ void CArmoryPanel::OnCommand( const char *command )
 		PostMessage( GetParent(), new KeyValues("ArmoryClosed") );
 		return;
 	}
-	else if ( !Q_stricmp( command, "reloadscheme" ) )
+	else if ( V_strieq( command, "reloadscheme" ) )
 	{
 		InvalidateLayout( false, true );
 		SetTall( YRES(400) );
 		SetVisible( true );
 	}
-	else if ( !Q_stricmp( command, "openstore" ) )
+	else if ( V_strieq( command, "openstore" ) )
 	{
 		// Only available in the loadout->catalog path. So we close down the character info, and move to the store.
 		// Bit of a hack.
@@ -354,7 +354,7 @@ void CArmoryPanel::OnCommand( const char *command )
 		EconUI()->OpenStorePanel( iItemDef, false );
 		return;
 	}
-	else if ( !Q_stricmp( command, "wiki" ) )
+	else if ( V_strieq( command, "wiki" ) )
 	{
 		if ( steamapicontext && steamapicontext->SteamFriends() )
 		{
@@ -374,7 +374,7 @@ void CArmoryPanel::OnCommand( const char *command )
 			}
 		}
 	}
-	else if ( !Q_stricmp( command, "viewset" ) )
+	else if ( V_strieq( command, "viewset" ) )
 	{
 		if ( m_SelectedItem.IsValid() )
 		{

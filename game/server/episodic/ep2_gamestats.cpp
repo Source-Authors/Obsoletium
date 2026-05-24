@@ -127,7 +127,7 @@ Ep2LevelStats_t::EntityDeathsLump_t *CEP2GameStats::FindDeathsLump( char const *
 
 	char const *name = npcName;
 	// Hack to fixup name
-	if ( !Q_stricmp( name, "npc_ministrider" ) )
+	if ( V_strieq( name, "npc_ministrider" ) )
 	{
 		name = "npc_hunter";
 	}

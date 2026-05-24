@@ -744,7 +744,7 @@ void CChoreoChannelWidget::SetUsingCombinedFieldByTokenName( char const *token, 
 	for ( intp i = 0; i < c; ++i )
 	{
 		CChoreoEvent *e = GetEvent( i )->GetEvent();
-		if ( !Q_stricmp( e->GetCloseCaptionToken(), token ) )
+		if ( V_strieq( e->GetCloseCaptionToken(), token ) )
 		{
 			e->SetUsingCombinedFile( usingcombinedfile );
 		}
@@ -945,7 +945,7 @@ void CChoreoChannelWidget::GetMasterAndSlaves( CChoreoEvent *master, CUtlVector<
 	for ( i = 0; i < c; ++i )
 	{
 		CChoreoEvent *e = GetEvent( i )->GetEvent();
-		if ( !Q_stricmp( master->GetCloseCaptionToken(), e->GetCloseCaptionToken() ) )
+		if ( V_strieq( master->GetCloseCaptionToken(), e->GetCloseCaptionToken() ) )
 		{
 			if ( fulllist.Find( e ) == fulllist.InvalidIndex() )
 			{

@@ -407,9 +407,9 @@ char *CLinuxFont::GetFontFileName( const char *windowsFontName, int flags )
 	bool bBold = false;
 	const char *pchFontName = windowsFontName;
 
-	if ( !Q_stricmp( pchFontName, "Tahoma" ) )
+	if ( V_strieq( pchFontName, "Tahoma" ) )
 		pchFontName = "Bitstream Vera Sans";
-	else if ( !Q_stricmp( pchFontName, "Arial Black" ) || Q_stristr( pchFontName, "bold" ) )
+	else if ( V_strieq( pchFontName, "Arial Black" ) || Q_stristr( pchFontName, "bold" ) )
 		bBold = true;
 
     const int italic = ( flags & vgui::ISurface::FONTFLAG_ITALIC ) ? FC_SLANT_ITALIC : FC_SLANT_ROMAN;
@@ -658,7 +658,7 @@ void CLinuxFont::GetCharABCWidths(wchar_t ch, int &a, int &b, int &c)
 //-----------------------------------------------------------------------------
 bool CLinuxFont::IsEqualTo(const char *windowsFontName, int tall, int weight, int blur, int scanlines, int flags)
 {
-	if (!Q_stricmp(windowsFontName, m_szName.String() ) 
+	if (V_strieq(windowsFontName, m_szName.String() ) 
 		&& m_iTall == tall
 		&& m_iWeight == weight
 		&& m_iBlur == blur

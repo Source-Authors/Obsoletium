@@ -1210,7 +1210,7 @@ void CStorePage::OnCommand( const char *command )
 		EconUI()->GetStorePanel()->InitiateCheckout( false );
 		return;
 	}
-	else if ( !Q_stricmp( command, "show_details" ) )
+	else if ( V_strieq( command, "show_details" ) )
 	{
 		if ( m_pSelectedPanel )
 		{
@@ -1222,7 +1222,7 @@ void CStorePage::OnCommand( const char *command )
 		}
 		return;
 	}
-	else if ( !Q_stricmp( command, "show_preview" ) )
+	else if ( V_strieq( command, "show_preview" ) )
 	{
 		SetDetailsVisible( false );
 		return;
@@ -1235,7 +1235,7 @@ void CStorePage::OnCommand( const char *command )
 		}
 		return;
 	}
-	else if ( !Q_stricmp( command, "reloadscheme" ) )
+	else if ( V_strieq( command, "reloadscheme" ) )
 	{
 		InvalidateLayout( false, true );
 		SetVisible( true );

@@ -235,7 +235,7 @@ public:
 
 		while ( p )
 		{
-			if ( !Q_stricmp( getLabel( p ), child ) )
+			if ( V_strieq( getLabel( p ), child ) )
 				return p;
 
 			p = getNextChild( p );
@@ -889,7 +889,7 @@ void CWaveBrowser::PopulateTree( char const *subdirectory )
 
 		int slot = m_pListView->add( name );
 
-		if ( !Q_stricmp( prevSelectedName, name ) )
+		if ( V_strieq( prevSelectedName, name ) )
 		{
 			selectedSlot = slot;
 		}
@@ -1043,7 +1043,7 @@ void CWaveBrowser::JumpToItem( CWaveFile *wav )
 	for ( ; idx < c; idx++ )
 	{
 		CWaveFile *item = (CWaveFile *)m_pListView->getUserData( idx, 0 );
-		if ( !Q_stricmp( item->GetFileName(), wav->GetFileName() ) )
+		if ( V_strieq( item->GetFileName(), wav->GetFileName() ) )
 		{
 			break;
 		}
@@ -1169,7 +1169,7 @@ void CWaveBrowser::SetCurrent( char const *filename )
 		Q_strncpy( fixed, wav->GetName(), sizeof( fixed ) );
 		Q_FixSlashes( fixed );
 
-		if ( !Q_stricmp( fixed, fn ) )
+		if ( V_strieq( fixed, fn ) )
 		{
 			m_pListView->scrollToItem( i );
 			m_pListView->setSelected( i, true );

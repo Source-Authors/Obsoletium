@@ -164,7 +164,7 @@ void CSteamWorksGameStatsUploader::UploadCvars()
 
 			const char* pDefValue = ((ConVar*)var)->GetDefault();
 			const char* pValue = ((ConVar*)var)->GetString();
-			if ( bOnlyDiffCvars && !Q_stricmp( pDefValue, pValue ) )
+			if ( bOnlyDiffCvars && V_strieq( pDefValue, pValue ) )
 				continue;
 
 			KeyValues *pKV = new KeyValues( "Cvars" );

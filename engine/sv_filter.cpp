@@ -151,7 +151,7 @@ static void Filter_Add_f( const CCommand& args )
 	char		szDuration[256];
 	CGameClient *client = NULL;
 
-	if ( !Q_stricmp( args[0], "banip" ) )
+	if ( V_strieq( args[0], "banip" ) )
 	{
 		ConWarning( "Please use \"addip\" instead of \"banip\".\n" );
 	}

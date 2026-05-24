@@ -232,7 +232,7 @@ int CDmxEditApp::Main()
 
 			setVars[ sKey ] = sVal;
 
-			if ( !Q_stricmp( sKey.Get(), "game" ) && sGame.IsEmpty() )
+			if ( V_strieq( sKey.Get(), "game" ) && sGame.IsEmpty() )
 			{
 				sGame = sKey;
 			}

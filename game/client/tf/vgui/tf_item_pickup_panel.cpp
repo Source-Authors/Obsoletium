@@ -55,7 +55,7 @@ void CTFItemPickupPanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 //-----------------------------------------------------------------------------
 void CTFItemPickupPanel::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "changeloadout" ) )
+	if ( V_strieq( command, "changeloadout" ) )
 	{
 		// We dont want the UI to close -- we're about to change our loadout
 		SetReturnToGame( false );
@@ -306,7 +306,7 @@ void CTFItemDiscardPanel::OnTick( void )
 //-----------------------------------------------------------------------------
 void CTFItemDiscardPanel::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "show_explanations" ) )
+	if ( V_strieq( command, "show_explanations" ) )
 	{
 		if ( !m_flStartExplanationsAt )
 		{

@@ -260,14 +260,14 @@ bool COSXFont::Create( const char *windowsFontName, int tall, int weight, int bl
 	MetricsTweaks_t metricTweaks = g_defaultMetricTweaks;
 	for ( int i = 0; i < ssize( g_FontMetricTweaks ); i++ )
 	{
-		if ( !Q_stricmp( windowsFontName, g_FontMetricTweaks[ i ].m_windowsFontName ) )
+		if ( V_strieq( windowsFontName, g_FontMetricTweaks[ i ].m_windowsFontName ) )
 		{
 			metricTweaks = g_FontMetricTweaks[ i ];
 			break;
 		}
 	}
 
-	bool bBold = ( !Q_stricmp( windowsFontName, "Arial Black" ) || Q_stristr( windowsFontName, "bold" ) );
+	bool bBold = ( V_strieq( windowsFontName, "Arial Black" ) || Q_stristr( windowsFontName, "bold" ) );
 	float flFontSize = ( (float)( m_iTall + metricTweaks.m_sizeAdjust ) / ( aMetrics.ascent - aMetrics.descent + aMetrics.leading ) );
 
 	m_iAscent = ceil( ( aMetrics.ascent / ( aMetrics.ascent - aMetrics.descent + aMetrics.leading ) ) *
@@ -654,7 +654,7 @@ void COSXFont::GetCharABCWidths( wchar_t ch, int &a, int &b, int &c )
 //-----------------------------------------------------------------------------
 bool COSXFont::IsEqualTo(const char *windowsFontName, int tall, int weight, int blur, int scanlines, int flags)
 {
-	if ( !Q_stricmp( windowsFontName, m_szName.String() ) &&
+	if ( V_strieq( windowsFontName, m_szName.String() ) &&
 		( m_iTall == tall ) &&
 		( m_iWeight == weight ) &&
 		( m_iBlur == blur ) &&

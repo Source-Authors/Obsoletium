@@ -36,11 +36,11 @@ extern ConVar hud_classautokill;
 //-----------------------------------------------------------------------------
 Panel *CDODClassInfoPanel::CreateControlByName( const char *controlName )
 {
-	if( !Q_stricmp( "ProgressBar", controlName ) )
+	if( V_strieq( "ProgressBar", controlName ) )
 	{
 		return new CDODProgressBar(this);
 	}
-	else if ( !Q_stricmp( "CIconPanel", controlName ) )
+	else if ( V_strieq( "CIconPanel", controlName ) )
 	{
 		return new CIconPanel(this, "icon_panel");
 	}
@@ -180,19 +180,19 @@ void CDODClassMenu::Update()
 //-----------------------------------------------------------------------------
 Panel *CDODClassMenu::CreateControlByName( const char *controlName )
 {
-	if ( !Q_stricmp( "DODMouseOverPanelButton", controlName ) )
+	if ( V_strieq( "DODMouseOverPanelButton", controlName ) )
 	{
 		 return new CDODMouseOverButton<CDODClassInfoPanel>( this, NULL, m_pClassInfoPanel );
 	}
-	else if( !Q_stricmp( "DODButton", controlName ) )
+	else if( V_strieq( "DODButton", controlName ) )
 	{
 		return new CDODButton(this);
 	}
-	else if( !Q_stricmp( "DODRandomButton", controlName ) )
+	else if( V_strieq( "DODRandomButton", controlName ) )
 	{
 		return new CDODRandomButton<CDODClassInfoPanel>(this, NULL, m_pClassInfoPanel );
 	}
-	else if ( !Q_stricmp( "ImageButton", controlName ) )
+	else if ( V_strieq( "ImageButton", controlName ) )
 	{
 		CImageMouseOverButton<CDODClassInfoPanel> *newButton = new CImageMouseOverButton<CDODClassInfoPanel>( this, NULL, m_pClassInfoPanel );
 
@@ -203,7 +203,7 @@ Panel *CDODClassMenu::CreateControlByName( const char *controlName )
 
 		return newButton;
 	}
-	else if ( !Q_stricmp( "CIconPanel", controlName ) )
+	else if ( V_strieq( "CIconPanel", controlName ) )
 	{
 		return new CIconPanel(this, "icon_panel");
 	}

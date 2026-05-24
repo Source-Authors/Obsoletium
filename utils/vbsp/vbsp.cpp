@@ -951,109 +951,109 @@ int RunVBSP( int argc, char **argv )
 
 			i++;
 		}
-		else if (!Q_stricmp(argv[i],"-glview"))
+		else if (V_strieq(argv[i],"-glview"))
 		{
 			Msg("--glview: true\n");
 			glview = true;
 		}
-		else if ( !Q_stricmp(argv[i], "-v") || !Q_stricmp(argv[i], "-verbose") )
+		else if ( V_strieq(argv[i], "-v") || V_strieq(argv[i], "-verbose") )
 		{
 			Msg("--verbose: true\n");
 			verbose = true;
 		}
-		else if (!Q_stricmp(argv[i], "-noweld"))
+		else if (V_strieq(argv[i], "-noweld"))
 		{
 			Msg ("--no-weld: true\n");
 			noweld = true;
 		}
-		else if (!Q_stricmp(argv[i], "-nocsg"))
+		else if (V_strieq(argv[i], "-nocsg"))
 		{
 			Msg ("--no-csg: true\n");
 			nocsg = true;
 		}
-		else if (!Q_stricmp(argv[i], "-noshare"))
+		else if (V_strieq(argv[i], "-noshare"))
 		{
 			Msg ("--no-share: true\n");
 			noshare = true;
 		}
-		else if (!Q_stricmp(argv[i], "-notjunc"))
+		else if (V_strieq(argv[i], "-notjunc"))
 		{
 			Msg ("--no-tjunc: true\n");
 			notjunc = true;
 		}
-		else if (!Q_stricmp(argv[i], "-nowater"))
+		else if (V_strieq(argv[i], "-nowater"))
 		{
 			Msg ("--no-water: true\n");
 			nowater = true;
 		}
-		else if (!Q_stricmp(argv[i], "-noopt"))
+		else if (V_strieq(argv[i], "-noopt"))
 		{
 			Msg ("--no-opt: true\n");
 			noopt = true;
 		}
-		else if (!Q_stricmp(argv[i], "-noprune"))
+		else if (V_strieq(argv[i], "-noprune"))
 		{
 			Msg ("--no-prune: true\n");
 			noprune = true;
 		}
-		else if (!Q_stricmp(argv[i], "-nomerge"))
+		else if (V_strieq(argv[i], "-nomerge"))
 		{
 			Msg ("--no-merge: true\n");
 			nomerge = true;
 		}
-		else if (!Q_stricmp(argv[i], "-nomergewater"))
+		else if (V_strieq(argv[i], "-nomergewater"))
 		{
 			Msg ("--no-merge-water: true\n");
 			nomergewater = true;
 		}
-		else if (!Q_stricmp(argv[i], "-nosubdiv"))
+		else if (V_strieq(argv[i], "-nosubdiv"))
 		{
 			Msg ("--no-subdiv: true\n");
 			nosubdiv = true;
 		}
-		else if (!Q_stricmp(argv[i], "-nodetail"))
+		else if (V_strieq(argv[i], "-nodetail"))
 		{
 			Msg ("--no-detail: true\n");
 			nodetail = true;
 		}
-		else if (!Q_stricmp(argv[i], "-fulldetail"))
+		else if (V_strieq(argv[i], "-fulldetail"))
 		{
 			Msg ("--full-detail: true\n");
 			fulldetail = true;
 		}
-		else if (!Q_stricmp(argv[i], "-onlyents"))
+		else if (V_strieq(argv[i], "-onlyents"))
 		{
 			Msg ("--only-ents: true\n");
 			onlyents = true;
 		}
-		else if (!Q_stricmp(argv[i], "-onlyprops"))
+		else if (V_strieq(argv[i], "-onlyprops"))
 		{
 			Msg ("--only-props: true\n");
 			onlyprops = true;
 		}
-		else if (!Q_stricmp(argv[i], "-micro"))
+		else if (V_strieq(argv[i], "-micro"))
 		{
 			microvolume = strtof(argv[i+1], nullptr);
 			Msg ("--micro-volume: %f\n", microvolume);
 			i++;
 		}
-		else if (!Q_stricmp(argv[i], "-leaktest"))
+		else if (V_strieq(argv[i], "-leaktest"))
 		{
 			Msg ("--leak-test: true\n");
 			leaktest = true;
 		}
-		else if (!Q_stricmp(argv[i], "-verboseentities"))
+		else if (V_strieq(argv[i], "-verboseentities"))
 		{
 			Msg ("--verbose-entities: true\n");
 			verboseentities = true;
 		}
-		else if (!Q_stricmp(argv[i], "-snapaxial"))
+		else if (V_strieq(argv[i], "-snapaxial"))
 		{
 			Msg ("--snap-axial: true\n");
 			g_snapAxialPlanes = true;
 		}
 #if 0
-		else if (!Q_stricmp(argv[i], "-maxlightmapdim"))
+		else if (V_strieq(argv[i], "-maxlightmapdim"))
 		{
 			// dimhotepus: atof -> strtof.
 			g_maxLightmapDimension = strtof(argv[i+1], nullptr);
@@ -1061,14 +1061,14 @@ int RunVBSP( int argc, char **argv )
 			i++;
 		}
 #endif
-		else if (!Q_stricmp(argv[i], "-block"))
+		else if (V_strieq(argv[i], "-block"))
 		{
 			block_xl = block_xh = atoi(argv[i+1]);
 			block_yl = block_yh = atoi(argv[i+2]);
 			Msg ("--block: %i,%i\n", block_xl, block_yl);
 			i+=2;
 		}
-		else if (!Q_stricmp(argv[i], "-blocks"))
+		else if (V_strieq(argv[i], "-blocks"))
 		{
 			block_xl = atoi(argv[i+1]);
 			block_yl = atoi(argv[i+2]);
@@ -1078,35 +1078,35 @@ int RunVBSP( int argc, char **argv )
 				block_xl, block_yl, block_xh, block_yh);
 			i+=4;
 		}
-		else if ( !Q_stricmp( argv[i], "-dumpcollide" ) )
+		else if ( V_strieq( argv[i], "-dumpcollide" ) )
 		{
 			Msg("--dump-collide: Dumping collision models to collideXXX.txt\n" );
 			dumpcollide = true;
 		}
-		else if ( !Q_stricmp( argv[i], "-dumpstaticprop" ) )
+		else if ( V_strieq( argv[i], "-dumpstaticprop" ) )
 		{
 			Msg("--dump-static-prop: Dumping static props to staticpropXXX.txt\n" );
 			g_DumpStaticProps = true;
 		}
-		else if ( !Q_stricmp( argv[i], "-forceskyvis" ) )
+		else if ( V_strieq( argv[i], "-forceskyvis" ) )
 		{
 			Msg("--force-sky-vis: Enabled vis in 3d skybox\n" );
 			g_bSkyVis = true;
 		}
-		else if (!Q_stricmp (argv[i],"-tmpout"))
+		else if (V_strieq (argv[i],"-tmpout"))
 		{
 			Msg("--tmp-out: Write to /tmp\n" );
 			V_strcpy_safe (outbase, "/tmp");
 		}
 #if 0
-		else if( !Q_stricmp( argv[i], "-defaultluxelsize" ) )
+		else if( V_strieq( argv[i], "-defaultluxelsize" ) )
 		{
 			g_defaultLuxelSize = strtof( argv[i+1], nullptr );
 			Msg("--default-luxel-size: %d\n", g_defaultLuxelSize );
 			i++;
 		}
 #endif
-		else if( !Q_stricmp( argv[i], "-luxelscale" ) )
+		else if( V_strieq( argv[i], "-luxelscale" ) )
 		{
 			g_luxelScale = strtof( argv[i+1], nullptr );
 			Msg("--luxel-scale: %f\n", g_luxelScale );
@@ -1120,79 +1120,79 @@ int RunVBSP( int argc, char **argv )
 			Msg("--min-luxel-scale: %f\n", g_luxelScale );
 			i++;
 		}
-		else if( !Q_stricmp( argv[i], "-dxlevel" ) )
+		else if( V_strieq( argv[i], "-dxlevel" ) )
 		{
 			g_nDXLevel = atoi( argv[i+1] );
 			Msg( "--dx-level: %d\n", g_nDXLevel );
 			i++;
 		}
-		else if( !Q_stricmp( argv[i], "-bumpall" ) )
+		else if( V_strieq( argv[i], "-bumpall" ) )
 		{
 			Msg( "--bump-all: true\n" );
 			g_BumpAll = true;
 		}
-		else if( !Q_stricmp( argv[i], "-low" ) )
+		else if( V_strieq( argv[i], "-low" ) )
 		{
 			Msg( "--low: Run worker threads with low priority\n" );
 			g_bLowPriority = true;
 		}
-		else if( !Q_stricmp( argv[i], "-lightifmissing" ) )
+		else if( V_strieq( argv[i], "-lightifmissing" ) )
 		{
 			Msg( "--light-if-missing: true\n" );
 			g_bLightIfMissing = true;
 		}
-		else if ( !Q_stricmp( argv[i], CMDLINEOPTION_NOVCONFIG ) )
+		else if ( V_strieq( argv[i], CMDLINEOPTION_NOVCONFIG ) )
 		{
 			Msg( "--no-vconfig: true\n" );
 		}
-		else if ( !Q_stricmp( argv[i], "-allowdebug" ) || !Q_stricmp( argv[i], "-steam" ) )
+		else if ( V_strieq( argv[i], "-allowdebug" ) || V_strieq( argv[i], "-steam" ) )
 		{
 			Msg( "--allow-debug or --steam: true\n" );
 			// nothing to do here, but don't bail on this option
 		}
-		else if ( !Q_stricmp( argv[i], "-vproject" ) || !Q_stricmp( argv[i], "-game" ) || !Q_stricmp( argv[i], "-insert_search_path" ) )
+		else if ( V_strieq( argv[i], "-vproject" ) || V_strieq( argv[i], "-game" ) || V_strieq( argv[i], "-insert_search_path" ) )
 		{
 			++i;
 		}
-		else if ( !Q_stricmp( argv[i], "-keepstalezip" ) )
+		else if ( V_strieq( argv[i], "-keepstalezip" ) )
 		{
 			Msg( "--keep-stale-zip: true\n" );
 			g_bKeepStaleZip = true;
 		}
-		else if ( !Q_stricmp( argv[i], "-xbox" ) )
+		else if ( V_strieq( argv[i], "-xbox" ) )
 		{
 			Msg( "--xbox: true\n" );
 			// enable mandatory xbox extensions
 			g_NodrawTriggers = true;
 			g_DisableWaterLighting = true;
 		}
-		else if ( !Q_stricmp( argv[i], "-allowdetailcracks"))
+		else if ( V_strieq( argv[i], "-allowdetailcracks"))
 		{
 			Msg( "--allow-detail-cracks: true\n" );
 			g_bAllowDetailCracks = true;
 		}
-		else if ( !Q_stricmp( argv[i], "-novirtualmesh"))
+		else if ( V_strieq( argv[i], "-novirtualmesh"))
 		{
 			Msg( "--no-virtual-mesh: true\n" );
 			g_bNoVirtualMesh = true;
 		}
-		else if ( !Q_stricmp( argv[i], "-replacematerials" ) )
+		else if ( V_strieq( argv[i], "-replacematerials" ) )
 		{
 			Msg( "--replace-materials: true\n" );
 			g_ReplaceMaterials = true;
 		}
-		else if ( !Q_stricmp(argv[i], "-nodrawtriggers") )
+		else if ( V_strieq(argv[i], "-nodrawtriggers") )
 		{
 			Msg( "--no-draw-triggers: true\n" );
 			g_NodrawTriggers = true;
 		}
-		else if ( !Q_stricmp( argv[i], "-FullMinidumps" ) )
+		else if ( V_strieq( argv[i], "-FullMinidumps" ) )
 		{
 			Msg( "--full-minidumps: true\n" );
 			se::utils::common::EnableFullMinidumps( true );
 		}
 		// dimhotepus: Check arg is in bounds first.
-		else if ( i < argc - 1 && !Q_stricmp( argv[i], "-embed" ) )
+		else if ( i < argc - 1 && V_strieq( argv[i], "-embed" ) )
 		{
 			V_MakeAbsolutePath( g_szEmbedDir, argv[++i], "." );
 			V_FixSlashes( g_szEmbedDir );

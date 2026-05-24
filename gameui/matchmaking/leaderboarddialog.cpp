@@ -163,7 +163,7 @@ void CLeaderboardDialog::ApplySchemeSettings( vgui::IScheme *pScheme )
 //----------------------------------------------------------
 void CLeaderboardDialog::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "CenterOnPlayer" ) )
+	if ( V_strieq( pCommand, "CenterOnPlayer" ) )
 	{
 		if ( GetPlayerStats( -1 ) == 0 )
 		{
@@ -171,7 +171,7 @@ void CLeaderboardDialog::OnCommand( const char *pCommand )
 			GetPlayerStats( 1 );
 		}
 	}
-	else if ( !Q_stricmp( pCommand, "Friends" ) )
+	else if ( V_strieq( pCommand, "Friends" ) )
 	{
 		GetPlayerStats( -1, true );
 	}

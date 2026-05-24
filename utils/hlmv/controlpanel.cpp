@@ -3010,11 +3010,11 @@ void ControlPanel::CreateSortedSequenceList( CStudioHdr* hdr, int *pSequence )
 			if ( pFacePoserKeys )
 			{
 				const char *pType = pFacePoserKeys->GetString( "type", "" );
-				if ( !Q_stricmp( pType, "posture" ) )
+				if ( V_strieq( pType, "posture" ) )
 				{
 					pSort[j].m_nType = 2;
 				}
-				else if ( !Q_stricmp( pType, "gesture" ) )
+				else if ( V_strieq( pType, "gesture" ) )
 				{
 					pSort[j].m_nType = 1;
 				}

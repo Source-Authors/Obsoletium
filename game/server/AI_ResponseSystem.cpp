@@ -1043,7 +1043,7 @@ bool CResponseSystem::CompareUsingMatcher( const char *setValue, Matcher& m, boo
 		}
 		else
 		{
-			if ( !Q_stricmp( setValue, m.GetToken() ) )
+			if ( V_strieq( setValue, m.GetToken() ) )
 				return false;
 		}
 
@@ -1061,7 +1061,7 @@ bool CResponseSystem::CompareUsingMatcher( const char *setValue, Matcher& m, boo
 		return v == strtof( m.GetToken(), nullptr );
 	}
 
-	return !Q_stricmp( setValue, m.GetToken() ) ? true : false;
+	return V_strieq( setValue, m.GetToken() ) ? true : false;
 }
 
 bool CResponseSystem::Compare( const char *setValue, Criteria *c, bool verbose /*= false*/ )
@@ -1206,7 +1206,7 @@ float CResponseSystem::ScoreCriteriaAgainstRule( const AI_CriteriaSet& set, shor
 
 	// See if we're trying to debug this rule
 	const char *pszText = rr_debugrule.GetString();
-	if ( pszText && pszText[0] && !Q_stricmp( pszText, m_Rules.GetElementName( irule ) ) )
+	if ( pszText && pszText[0] && V_strieq( pszText, m_Rules.GetElementName( irule ) ) )
 	{
 		bBeingWatched = true;
 	}
@@ -1905,24 +1905,24 @@ void CResponseSystem::LoadFromBuffer( const char *scriptfile, const char *buffer
 			break;
 		}
 
-		if ( !Q_stricmp( token, "#include" ) )
+		if ( V_strieq( token, "#include" ) )
 		{
 			ParseInclude( includedFiles );
 		}
-		else if ( !Q_stricmp( token, "response" ) )
+		else if ( V_strieq( token, "response" ) )
 		{
 			ParseResponse();
 		}
-		else if ( !Q_stricmp( token, "criterion" ) || 
-			!Q_stricmp( token, "criteria" ) )
+		else if ( V_strieq( token, "criterion" ) || 
+			V_strieq( token, "criteria" ) )
 		{
 			ParseCriterion();
 		}
-		else if ( !Q_stricmp( token, "rule" ) )
+		else if ( V_strieq( token, "rule" ) )
 		{
 			ParseRule();
 		}
-		else if ( !Q_stricmp( token, "enumeration" ) )
+		else if ( V_strieq( token, "enumeration" ) )
 		{
 			ParseEnumeration();
 		}
@@ -1975,23 +1975,23 @@ void CResponseSystem::LoadRuleSet( const char *basescript )
 
 static ResponseType_t ComputeResponseType( const char *s )
 {
-	if ( !Q_stricmp( s, "scene" ) )
+	if ( V_strieq( s, "scene" ) )
 	{
 		return RESPONSE_SCENE;
 	}
-	else if ( !Q_stricmp( s, "sentence" ) )
+	else if ( V_strieq( s, "sentence" ) )
 	{
 		return RESPONSE_SENTENCE;
 	}
-	else if ( !Q_stricmp( s, "speak" ) )
+	else if ( V_strieq( s, "speak" ) )
 	{
 		return RESPONSE_SPEAK;
 	}
-	else if ( !Q_stricmp( s, "response" ) )
+	else if ( V_strieq( s, "response" ) )
 	{
 		return RESPONSE_RESPONSE;
 	}
-	else if ( !Q_stricmp( s, "print" ) )
+	else if ( V_strieq( s, "print" ) )
 	{
 		return RESPONSE_PRINT;
 	}
@@ -2018,7 +2018,7 @@ void CResponseSystem::ParseOneResponse( const char *responseGroupName, ResponseG
 	while ( TokenWaiting() )
 	{
 		ParseToken();
-		if ( !Q_stricmp( token, "weight" ) )
+		if ( V_strieq( token, "weight" ) )
 		{
 			ParseToken();
 			// dimhotepus: atof -> strtof
@@ -2026,7 +2026,7 @@ void CResponseSystem::ParseOneResponse( const char *responseGroupName, ResponseG
 			continue;
 		}
 
-		if ( !Q_stricmp( token, "predelay" ) )
+		if ( V_strieq( token, "predelay" ) )
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_DELAYBEFORESPEAK;
@@ -2034,7 +2034,7 @@ void CResponseSystem::ParseOneResponse( const char *responseGroupName, ResponseG
 			continue;
 		}
 
-		if ( !Q_stricmp( token, "nodelay" ) )
+		if ( V_strieq( token, "nodelay" ) )
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_DELAYAFTERSPEAK;
@@ -2043,7 +2043,7 @@ void CResponseSystem::ParseOneResponse( const char *responseGroupName, ResponseG
 			continue;
 		}
 
-		if ( !Q_stricmp( token, "defaultdelay" ) )
+		if ( V_strieq( token, "defaultdelay" ) )
 		{
 			rp->flags |= AI_ResponseParams::RG_DELAYAFTERSPEAK;
 			rp->delay.start = AIS_DEF_MIN_DELAY;
@@ -2051,7 +2051,7 @@ void CResponseSystem::ParseOneResponse( const char *responseGroupName, ResponseG
 			continue;
 		}
 	
-		if ( !Q_stricmp( token, "delay" ) )
+		if ( V_strieq( token, "delay" ) )
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_DELAYAFTERSPEAK;
@@ -2059,25 +2059,25 @@ void CResponseSystem::ParseOneResponse( const char *responseGroupName, ResponseG
 			continue;
 		}
 		
-		if ( !Q_stricmp( token, "speakonce" ) )
+		if ( V_strieq( token, "speakonce" ) )
 		{
 			rp->flags |= AI_ResponseParams::RG_SPEAKONCE;
 			continue;
 		}
 		
-		if ( !Q_stricmp( token, "noscene" ) )
+		if ( V_strieq( token, "noscene" ) )
 		{
 			rp->flags |= AI_ResponseParams::RG_DONT_USE_SCENE;
 			continue;
 		}
 
-		if ( !Q_stricmp( token, "stop_on_nonidle" ) )
+		if ( V_strieq( token, "stop_on_nonidle" ) )
 		{
 			rp->flags |= AI_ResponseParams::RG_STOP_ON_NONIDLE;
 			continue;
 		}
 		
-		if ( !Q_stricmp( token, "odds" ) )
+		if ( V_strieq( token, "odds" ) )
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_ODDS;
@@ -2085,7 +2085,7 @@ void CResponseSystem::ParseOneResponse( const char *responseGroupName, ResponseG
 			continue;
 		}
 		
-		if ( !Q_stricmp( token, "respeakdelay" ) )
+		if ( V_strieq( token, "respeakdelay" ) )
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_RESPEAKDELAY;
@@ -2093,7 +2093,7 @@ void CResponseSystem::ParseOneResponse( const char *responseGroupName, ResponseG
 			continue;
 		}
 		
-		if ( !Q_stricmp( token, "weapondelay" ) )
+		if ( V_strieq( token, "weapondelay" ) )
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_WEAPONDELAY;
@@ -2101,7 +2101,7 @@ void CResponseSystem::ParseOneResponse( const char *responseGroupName, ResponseG
 			continue;
 		}
 
-		if ( !Q_stricmp( token, "soundlevel" ) )
+		if ( V_strieq( token, "soundlevel" ) )
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_SOUNDLEVEL;
@@ -2109,14 +2109,14 @@ void CResponseSystem::ParseOneResponse( const char *responseGroupName, ResponseG
 			continue;
 		}
 
-		if ( !Q_stricmp( token, "displayfirst" ) )
+		if ( V_strieq( token, "displayfirst" ) )
 		{
 			newResponse.first = true;
 			group.m_bHasFirst = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( token, "displaylast" ) )
+		if ( V_strieq( token, "displaylast" ) )
 		{
 			newResponse.last = true;
 			group.m_bHasLast= true;
@@ -2135,17 +2135,17 @@ void CResponseSystem::ParseOneResponse( const char *responseGroupName, ResponseG
 //-----------------------------------------------------------------------------
 bool CResponseSystem::IsRootCommand()
 {
-	if ( !Q_stricmp( token, "#include" ) )
+	if ( V_strieq( token, "#include" ) )
 		return true;
-	if ( !Q_stricmp( token, "response" ) )
+	if ( V_strieq( token, "response" ) )
 		return true;
-	if ( !Q_stricmp( token, "enumeration" ) )
+	if ( V_strieq( token, "enumeration" ) )
 		return true;
-	if ( !Q_stricmp( token, "criteria" ) )
+	if ( V_strieq( token, "criteria" ) )
 		return true;
-	if ( !Q_stricmp( token, "criterion" ) )
+	if ( V_strieq( token, "criterion" ) )
 		return true;
-	if ( !Q_stricmp( token, "rule" ) )
+	if ( V_strieq( token, "rule" ) )
 		return true;
 	return false;
 }
@@ -2177,25 +2177,25 @@ void CResponseSystem::ParseResponse( void )
 			break;
 		}
 
-		if ( !Q_stricmp( token, "{" ) )
+		if ( V_strieq( token, "{" ) )
 		{
 			while ( 1 )
 			{
 				ParseToken();
-				if ( !Q_stricmp( token, "}" ) )
+				if ( V_strieq( token, "}" ) )
 					break;
 
-				if ( !Q_stricmp( token, "permitrepeats" ) )
+				if ( V_strieq( token, "permitrepeats" ) )
 				{
 					newGroup.m_bDepleteBeforeRepeat = false;
 					continue;
 				}
-				else if ( !Q_stricmp( token, "sequential" ) )
+				else if ( V_strieq( token, "sequential" ) )
 				{
 					newGroup.SetSequential( true );
 					continue;
 				}
-				else if ( !Q_stricmp( token, "norepeat" ) )
+				else if ( V_strieq( token, "norepeat" ) )
 				{
 					newGroup.SetNoRepeat( true );
 					continue;
@@ -2206,7 +2206,7 @@ void CResponseSystem::ParseResponse( void )
 			break;
 		}
 
-		if ( !Q_stricmp( token, "predelay" ) )
+		if ( V_strieq( token, "predelay" ) )
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_DELAYBEFORESPEAK;
@@ -2214,7 +2214,7 @@ void CResponseSystem::ParseResponse( void )
 			continue;
 		}
 
-		if ( !Q_stricmp( token, "nodelay" ) )
+		if ( V_strieq( token, "nodelay" ) )
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_DELAYAFTERSPEAK;
@@ -2223,7 +2223,7 @@ void CResponseSystem::ParseResponse( void )
 			continue;
 		}
 
-		if ( !Q_stricmp( token, "defaultdelay" ) )
+		if ( V_strieq( token, "defaultdelay" ) )
 		{
 			rp->flags |= AI_ResponseParams::RG_DELAYAFTERSPEAK;
 			rp->delay.start = AIS_DEF_MIN_DELAY;
@@ -2231,7 +2231,7 @@ void CResponseSystem::ParseResponse( void )
 			continue;
 		}
 	
-		if ( !Q_stricmp( token, "delay" ) )
+		if ( V_strieq( token, "delay" ) )
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_DELAYAFTERSPEAK;
@@ -2239,25 +2239,25 @@ void CResponseSystem::ParseResponse( void )
 			continue;
 		}
 		
-		if ( !Q_stricmp( token, "speakonce" ) )
+		if ( V_strieq( token, "speakonce" ) )
 		{
 			rp->flags |= AI_ResponseParams::RG_SPEAKONCE;
 			continue;
 		}
 		
-		if ( !Q_stricmp( token, "noscene" ) )
+		if ( V_strieq( token, "noscene" ) )
 		{
 			rp->flags |= AI_ResponseParams::RG_DONT_USE_SCENE;
 			continue;
 		}
 		
-		if ( !Q_stricmp( token, "stop_on_nonidle" ) )
+		if ( V_strieq( token, "stop_on_nonidle" ) )
 		{
 			rp->flags |= AI_ResponseParams::RG_STOP_ON_NONIDLE;
 			continue;
 		}
 
-		if ( !Q_stricmp( token, "odds" ) )
+		if ( V_strieq( token, "odds" ) )
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_ODDS;
@@ -2265,7 +2265,7 @@ void CResponseSystem::ParseResponse( void )
 			continue;
 		}
 		
-		if ( !Q_stricmp( token, "respeakdelay" ) )
+		if ( V_strieq( token, "respeakdelay" ) )
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_RESPEAKDELAY;
@@ -2273,7 +2273,7 @@ void CResponseSystem::ParseResponse( void )
 			continue;
 		}
 
-		if ( !Q_stricmp( token, "weapondelay" ) )
+		if ( V_strieq( token, "weapondelay" ) )
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_WEAPONDELAY;
@@ -2281,7 +2281,7 @@ void CResponseSystem::ParseResponse( void )
 			continue;
 		}
 
-		if ( !Q_stricmp( token, "soundlevel" ) )
+		if ( V_strieq( token, "soundlevel" ) )
 		{
 			ParseToken();
 			rp->flags |= AI_ResponseParams::RG_SOUNDLEVEL;
@@ -2320,14 +2320,14 @@ short CResponseSystem::ParseOneCriterion( const char *criterionName )
 			break;
 		}
 
-		if ( !Q_stricmp( token, "{" ) )
+		if ( V_strieq( token, "{" ) )
 		{
 			gotbody = true;
 
 			while ( 1 )
 			{
 				ParseToken();
-				if ( !Q_stricmp( token, "}" ) )
+				if ( V_strieq( token, "}" ) )
 					break;
 
 				// Look up subcriteria index
@@ -2343,11 +2343,11 @@ short CResponseSystem::ParseOneCriterion( const char *criterionName )
 			}
 			continue;
 		}
-		else if ( !Q_stricmp( token, "required" ) )
+		else if ( V_strieq( token, "required" ) )
 		{
 			newCriterion.required = true;
 		}
-		else if ( !Q_stricmp( token, "weight" ) )
+		else if ( V_strieq( token, "weight" ) )
 		{
 			ParseToken();
 			// dimhotepus: atof -> strtof.
@@ -2418,7 +2418,7 @@ void CResponseSystem::ParseEnumeration( void )
 	while ( 1 )
 	{
 		ParseToken();
-		if ( !Q_stricmp( token, "}" ) )
+		if ( V_strieq( token, "}" ) )
 			break;
 
 		if ( Q_isempty( token ) )
@@ -2482,7 +2482,7 @@ void CResponseSystem::ParseRule( void )
 	while ( 1 )
 	{
 		ParseToken();
-		if ( !Q_stricmp( token, "}" ) )
+		if ( V_strieq( token, "}" ) )
 		{
 			break;
 		}
@@ -2493,19 +2493,19 @@ void CResponseSystem::ParseRule( void )
 			break;
 		}
 
-		if ( !Q_stricmp( token, "matchonce" ) )
+		if ( V_strieq( token, "matchonce" ) )
 		{
 			newRule.m_bMatchOnce = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( token, "applyContextToWorld" ) )
+		if ( V_strieq( token, "applyContextToWorld" ) )
 		{
 			newRule.m_bApplyContextToWorld = true;
 			continue;
 		}
 
-		if ( !Q_stricmp( token, "applyContext" ) )
+		if ( V_strieq( token, "applyContext" ) )
 		{
 			ParseToken();
 			if ( newRule.GetContext() == NULL )
@@ -2520,7 +2520,7 @@ void CResponseSystem::ParseRule( void )
 			continue;
 		}
 		
-		if ( !Q_stricmp( token, "response" ) )
+		if ( V_strieq( token, "response" ) )
 		{
 			// Read them until we run out.
 			while ( TokenWaiting() )
@@ -2541,8 +2541,8 @@ void CResponseSystem::ParseRule( void )
 			continue;
 		}
 
-		if ( !Q_stricmp( token, "criteria" ) ||
-			 !Q_stricmp( token, "criterion" ) )
+		if ( V_strieq( token, "criteria" ) ||
+			 V_strieq( token, "criterion" ) )
 		{
 			// Read them until we run out.
 			while ( TokenWaiting() )
@@ -3092,7 +3092,7 @@ public:
 			// dimhotepus: Null terminate.
 			szResponseGroupBlockName[0] = '\0';
 			pRestore->StartBlock( szResponseGroupBlockName );
-			if ( !Q_stricmp( szResponseGroupBlockName, "ResponseGroup" ) )
+			if ( V_strieq( szResponseGroupBlockName, "ResponseGroup" ) )
 			{
 				char groupname[ 256 ];
 				pRestore->ReadString( groupname, 0 );
@@ -3113,7 +3113,7 @@ public:
 
 						char responsename[ 256 ];
 						pRestore->StartBlock( szResponseBlockName );
-						if ( !Q_stricmp( szResponseBlockName, "Response" ) )
+						if ( V_strieq( szResponseBlockName, "Response" ) )
 						{
 							pRestore->ReadString( responsename, 0 );
 
@@ -3122,7 +3122,7 @@ public:
 							for ( ri = 0; ri < group->group.Count(); ++ri )
 							{
 								Response *response = &group->group[ ri ];
-								if ( !Q_stricmp( response->value, responsename ) )
+								if ( V_strieq( response->value, responsename ) )
 								{
 									break;
 								}
@@ -3213,7 +3213,7 @@ public:
 			szResponseGroupBlockName[0] = '\0';
 
 			pRestore->StartBlock( szResponseGroupBlockName );
-			if ( !Q_stricmp( szResponseGroupBlockName, "ResponseGroup" ) )
+			if ( V_strieq( szResponseGroupBlockName, "ResponseGroup" ) )
 			{
 				char groupname[ 256 ];
 				pRestore->ReadString( groupname, 0 );
@@ -3234,7 +3234,7 @@ public:
 
 						char responsename[ 256 ];
 						pRestore->StartBlock( szResponseBlockName );
-						if ( !Q_stricmp( szResponseBlockName, "Response" ) )
+						if ( V_strieq( szResponseBlockName, "Response" ) )
 						{
 							pRestore->ReadString( responsename, 0 );
 
@@ -3243,7 +3243,7 @@ public:
 							for ( ri = 0; ri < group->group.Count(); ++ri )
 							{
 								Response *response = &group->group[ ri ];
-								if ( !Q_stricmp( response->value, responsename ) )
+								if ( V_strieq( response->value, responsename ) )
 								{
 									break;
 								}

@@ -83,7 +83,7 @@ int GetLogType( char const *type )
 {
 	for ( const auto &layerType : g_LayerTypes )
 	{
-		if ( !Q_stricmp( type, layerType.logtype ) )
+		if ( V_strieq( type, layerType.logtype ) )
 			return layerType.datatype;
 	}
 	return AT_UNKNOWN;
@@ -103,7 +103,7 @@ char const *GetLogLayerType( char const *logType )
 {
 	for ( const auto &layerType : g_LayerTypes )
 	{
-		if ( !Q_stricmp( logType, layerType.logtype ) )
+		if ( V_strieq( logType, layerType.logtype ) )
 			return layerType.loglayertype;
 	}
 	return NULL;

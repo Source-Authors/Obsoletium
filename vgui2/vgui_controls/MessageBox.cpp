@@ -112,14 +112,14 @@ void MessageBox::OnCommand( const char *pCommand )
 		vgui::input()->ReleaseAppModalSurface();
 	}
 
-	if ( !Q_stricmp( pCommand, "OnOk" ) )
+	if ( V_strieq( pCommand, "OnOk" ) )
 	{
 		if ( m_OkCommand )
 		{
 			PostActionSignal(m_OkCommand->MakeCopy());
 		}
 	}
-	else if ( !Q_stricmp( pCommand, "OnCancel" ) )
+	else if ( V_strieq( pCommand, "OnCancel" ) )
 	{
 		if ( m_CancelCommand )
 		{

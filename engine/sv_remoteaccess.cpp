@@ -788,22 +788,22 @@ const char *CServerRemoteAccess::LookupStringValue(const char *variable)
 	}
 
 	// special types
-	if ( !Q_stricmp( variable, "map" ) )
+	if ( V_strieq( variable, "map" ) )
 		return sv.GetMapName();
 
-	if ( !Q_stricmp( variable, "playercount" ) )
+	if ( V_strieq( variable, "playercount" ) )
 	{
 		V_to_chars( s_ReturnBuf, sv.GetNumClients() - sv.GetNumProxies());
 		return s_ReturnBuf;
 	}
 	
-	if ( !Q_stricmp( variable, "maxplayers" ) )
+	if ( V_strieq( variable, "maxplayers" ) )
 	{
 		V_to_chars( s_ReturnBuf, sv.GetMaxClients() );
 		return s_ReturnBuf;
 	}
 	
-	if ( !Q_stricmp( variable, "gamedescription" ) && serverGameDLL )
+	if ( V_strieq( variable, "gamedescription" ) && serverGameDLL )
 		return serverGameDLL->GetGameDescription();
 
 	return NULL;

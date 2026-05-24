@@ -126,7 +126,7 @@ TFNavAttributeType NameToTFAttribute( const char *name )
 {
 	for( unsigned int i=0; s_TFAttributeTable[i].name; ++i )
 	{
-		if ( !Q_stricmp( s_TFAttributeTable[i].name, name ) )
+		if ( V_strieq( s_TFAttributeTable[i].name, name ) )
 		{
 			return s_TFAttributeTable[i].attribute;
 		}

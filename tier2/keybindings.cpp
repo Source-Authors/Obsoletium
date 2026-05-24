@@ -28,7 +28,7 @@ void CKeyBindings::SetBinding( ButtonCode_t code, const char *pBinding )
 	if ( !m_KeyInfo[code].IsEmpty() )
 	{
 		// Exactly the same, don't re-bind and fragment memory
-		if ( !Q_stricmp( m_KeyInfo[code], pBinding ) )
+		if ( V_strieq( m_KeyInfo[code], pBinding ) )
 			return;
 	}
 			
@@ -118,12 +118,12 @@ const char *CKeyBindings::ButtonNameForBinding( const char *pBinding )
 
 		if ( m_KeyInfo[i][0] == '+' )
 		{
-			if ( !Q_stricmp( &m_KeyInfo[i].Get()[1], pBind ) )
+			if ( V_strieq( &m_KeyInfo[i].Get()[1], pBind ) )
 				return g_pInputSystem->ButtonCodeToString( (ButtonCode_t)i );
 		}
 		else
 		{
-			if ( !Q_stricmp( m_KeyInfo[i], pBind ) )
+			if ( V_strieq( m_KeyInfo[i], pBind ) )
 				return g_pInputSystem->ButtonCodeToString( (ButtonCode_t)i );
 		}
 	}

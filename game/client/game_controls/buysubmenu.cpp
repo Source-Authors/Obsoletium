@@ -47,7 +47,7 @@ CBuySubMenu::~CBuySubMenu()
 //-----------------------------------------------------------------------------
 Panel *CBuySubMenu::CreateControlByName( const char *controlName )
 {
-	if( !Q_stricmp( "MouseOverPanelButton", controlName ) )
+	if( V_strieq( "MouseOverPanelButton", controlName ) )
 	{
 		MouseOverPanelButton *newButton = CreateNewMouseOverPanelButton( m_pPanel );
 		
@@ -107,7 +107,7 @@ void CBuySubMenu::OnCommand( const char *command)
 		// check the cache
 		for ( i = 0; i < m_SubMenus.Count(); i++ )
 		{
-			if ( !Q_stricmp( m_SubMenus[i].filename, command ) )
+			if ( V_strieq( m_SubMenus[i].filename, command ) )
 			{
 				m_NextPanel = m_SubMenus[i].panel;
 				Assert( m_NextPanel );

@@ -228,7 +228,7 @@ void CEntityReportPanel::OnDeleteEntities(void)
 //-----------------------------------------------------------------------------
 void CEntityReportPanel::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "delete" ) )
+	if ( V_strieq( pCommand, "delete" ) )
 	{
 		// Confirm we want to do it
 		MessageBox *pConfirm = new MessageBox( "#FoundryDeleteObjects", "#FoundryDeleteObjectsMsg", g_pFoundryTool->GetRootPanel() ); 
@@ -241,7 +241,7 @@ void CEntityReportPanel::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "ShowProperties" ) )
+	if ( V_strieq( pCommand, "ShowProperties" ) )
 	{
 		OnProperties();
 		return;
@@ -510,13 +510,13 @@ bool CEntityReportPanel::ShouldAddEntityToList( CDmeVMFEntity *pEntity )
 	for ( CDmAttribute *pKey = pEntity->FirstEntityKey(); pKey; pKey = pEntity->NextEntityKey( pKey ) )
 	{
 		// first, check key
-		if ( m_szFilterKey.IsEmpty() || !Q_stricmp( m_szFilterKey, pKey->GetName() ) )
+		if ( m_szFilterKey.IsEmpty() || V_strieq( m_szFilterKey, pKey->GetName() ) )
 		{
 			// now, check value (as a string)
 			buf.Clear();
 			pKey->Serialize( buf );
 			const char *pValue = (const char*)buf.Base();
-			if ( (!m_bExact && Q_stristr( pValue, m_szFilterValue ) ) || !Q_stricmp( pValue, m_szFilterValue ) )
+			if ( (!m_bExact && Q_stristr( pValue, m_szFilterValue ) ) || V_strieq( pValue, m_szFilterValue ) )
 				return true;
 		}
 	}

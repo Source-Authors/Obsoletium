@@ -746,7 +746,7 @@ void CVMTTool::OnCommand( const char *cmd )
 //-----------------------------------------------------------------------------
 void CVMTTool::PostMessage( HTOOLHANDLE hEntity, KeyValues *message )
 {
-	if ( !Q_stricmp( message->GetName(), "EditMaterial" ) )
+	if ( V_strieq( message->GetName(), "EditMaterial" ) )
 	{
 		const char *pMaterialName = message->GetString( "material", "debug/debugempty" );
 
@@ -786,19 +786,19 @@ void CVMTTool::OnFileOperationCompleted( const char *pFileType, bool bWroteFile,
 	if ( state != FileOpenStateMachine::SUCCESSFUL )
 		return;
 
-	if ( !Q_stricmp( pContextKeyValues->GetName(), "OnNew" ) )
+	if ( V_strieq( pContextKeyValues->GetName(), "OnNew" ) )
 	{
 		PerformNew();
 		return;
 	}
 
-	if ( !Q_stricmp( pContextKeyValues->GetName(), "OnClose" ) )
+	if ( V_strieq( pContextKeyValues->GetName(), "OnClose" ) )
 	{
 		OnCloseNoSave();
 		return;
 	}
 
-	if ( !Q_stricmp( pContextKeyValues->GetName(), "OnQuit" ) )
+	if ( V_strieq( pContextKeyValues->GetName(), "OnQuit" ) )
 	{
 		OnCloseNoSave();
 		vgui::ivgui()->PostMessage( GetVPanel(), new KeyValues( "OnExit" ), 0 );
@@ -966,7 +966,7 @@ void CVMTTool::OpenSpecificFile( const char *pFileName )
 	if ( m_pDoc )
 	{
 		// File is already open
-		if ( !Q_stricmp( m_pDoc->GetFileName(), pFileName ) )
+		if ( V_strieq( m_pDoc->GetFileName(), pFileName ) )
 			return;
 
 		if ( m_pDoc->IsDirty() )

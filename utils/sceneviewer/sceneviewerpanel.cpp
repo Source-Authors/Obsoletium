@@ -440,15 +440,15 @@ void CSceneViewerPanel::OnKeyCodePressed( vgui::KeyCode code )
 //-----------------------------------------------------------------------------
 void CSceneViewerPanel::OnCommand( char const *cmd )
 {
-	if ( !Q_stricmp( cmd, "OnEdit" ) )
+	if ( V_strieq( cmd, "OnEdit" ) )
 	{
 		OnEdit();
 	}
-	else if ( !Q_stricmp( cmd, "OnUndo" ) )
+	else if ( V_strieq( cmd, "OnUndo" ) )
 	{
 		OnUndo();
 	}
-	else if ( !Q_stricmp( cmd, "OnRedo" ) )
+	else if ( V_strieq( cmd, "OnRedo" ) )
 	{
 		OnRedo();
 	}
@@ -627,11 +627,11 @@ bool CSceneViewerPanel::OnWriteFileToDisk(
 	if ( V_streq( pContextKeyValues->GetName(), "SaveCurrentAs" ) )
 		return SaveCurrentAs( pFilename );
 
-	if ( !Q_stricmp( pPassedFileFormat, "obj" ) )
+	if ( V_strieq( pPassedFileFormat, "obj" ) )
 		return CDmObjSerializer().WriteOBJ( pFilename, m_pRoot, true );
 
 	const int fLen( Q_strlen( pFilename ) );
-	if ( fLen > 4 && !Q_stricmp( pFilename + fLen - 4, ".obj" ) )
+	if ( fLen > 4 && V_strieq( pFilename + fLen - 4, ".obj" ) )
 		return CDmObjSerializer().WriteOBJ( pFilename, m_pRoot, true );
 
 	const char *pEncoding = g_pDataModel->GetDefaultEncoding( pPassedFileFormat );
@@ -765,7 +765,7 @@ bool CSceneViewerPanel::Load( const char *pFilename, CUtlStringMap< Vector > *pO
 	CDmElement *pRoot( NULL );
 
 	const int fLen( Q_strlen( pFilename ) );
-	if ( fLen > 4 && !Q_stricmp( pFilename + fLen - 4, ".obj" ) )
+	if ( fLen > 4 && V_strieq( pFilename + fLen - 4, ".obj" ) )
 	{
 		pRoot = CDmObjSerializer().ReadOBJ( pFilename );
 	}

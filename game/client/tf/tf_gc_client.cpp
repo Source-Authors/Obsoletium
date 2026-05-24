@@ -785,12 +785,12 @@ void CTFGCClientSystem::FireGameEvent( IGameEvent *event )
 {
 	const char *pEventName = event->GetName();
 	// Disconnected from gameserver
-	if ( !Q_stricmp( pEventName, "client_disconnect" ) )
+	if ( V_strieq( pEventName, "client_disconnect" ) )
 	{
 		m_steamIDCurrentServer.Clear();
 
 		// Do not send end match making if we see the mvm end message
-		if ( !Q_stricmp( event->GetString( "message", "" ), "#TF_PVE_Disconnect" ) )
+		if ( V_strieq( event->GetString( "message", "" ), "#TF_PVE_Disconnect" ) )
 			return;
 
 		// Don't bail if GC has told us to expect to be put into a new party
@@ -800,7 +800,7 @@ void CTFGCClientSystem::FireGameEvent( IGameEvent *event )
 		m_eConnectState = eConnectState_Disconnected; // clear variable first to avoid recursion
 
 		// Ladder games
-		//if ( !Q_stricmp( event->GetString( "message", "" ), "#TF_Competitive_Disconnect" ) ) // FIXME only disconnect if we were previously connected(ing), this fires spuriously from the main menu
+		//if ( V_strieq( event->GetString( "message", "" ), "#TF_Competitive_Disconnect" ) ) // FIXME only disconnect if we were previously connected(ing), this fires spuriously from the main menu
 		//{
 		//	engine->ClientCmd_Unrestricted( "OpenMatchmakingLobby ladder" );
 		//	return;
@@ -834,7 +834,7 @@ void CTFGCClientSystem::FireGameEvent( IGameEvent *event )
 	}
 
 	// Started attempting connection to gameserver
-	if ( !Q_stricmp( pEventName, "client_beginconnect" ) )
+	if ( V_strieq( pEventName, "client_beginconnect" ) )
 	{
 		Assert( IsConnectStateDisconnected() );
 
@@ -1585,11 +1585,11 @@ void CTFGCClientSystem::SOChanged( const GCSDK::CSharedObject *pObject, SOChange
 //
 //	for ( KeyValues *pItems = m_pNewsKeys->GetFirstSubKey(); pItems; pItems = pItems->GetNextKey() )
 //	{
-//		if ( !Q_stricmp( pItems->GetName(), "newsitems" ) )
+//		if ( V_strieq( pItems->GetName(), "newsitems" ) )
 //		{
 //			for ( KeyValues *pItem = pItems->GetFirstSubKey(); pItem; pItem = pItem->GetNextKey() )
 //			{
-//				if ( !Q_stricmp( pItem->GetName(), "newsitem" ) )
+//				if ( V_strieq( pItem->GetName(), "newsitem" ) )
 //				{
 //					for ( KeyValues *pStory = pItem->GetFirstSubKey(); pStory; pStory = pStory->GetNextKey() )
 //					{
@@ -1613,11 +1613,11 @@ void CTFGCClientSystem::SOChanged( const GCSDK::CSharedObject *pObject, SOChange
 //	int nCount = 0;
 //	for ( KeyValues *pItems = m_pNewsKeys->GetFirstSubKey(); pItems; pItems = pItems->GetNextKey() )
 //	{
-//		if ( !Q_stricmp( pItems->GetName(), "newsitems" ) )
+//		if ( V_strieq( pItems->GetName(), "newsitems" ) )
 //		{
 //			for ( KeyValues *pItem = pItems->GetFirstSubKey(); pItem; pItem = pItem->GetNextKey() )
 //			{
-//				if ( !Q_stricmp( pItem->GetName(), "newsitem" ) )
+//				if ( V_strieq( pItem->GetName(), "newsitem" ) )
 //				{
 //					for ( KeyValues *pStory = pItem->GetFirstSubKey(); pStory; pStory = pStory->GetNextKey() )
 //					{

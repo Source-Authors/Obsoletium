@@ -1716,7 +1716,7 @@ void COP_Entity::SetCurKey(LPCTSTR pszKey)
 	for (int i = 0; i < nSel; i++)
 	{
 		CString str = (CString)(const char*)m_VarList.GetItemData( i );
-		if ( !Q_stricmp( str, pszKey ) )
+		if ( V_strieq( str, pszKey ) )
 		{
 			// found it here - 
 			SetCurVarListSelection( i );

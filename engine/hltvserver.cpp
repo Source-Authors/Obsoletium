@@ -1699,7 +1699,7 @@ bool CHLTVServer::ProcessConnectionlessPacket( netpacket_t * packet )
 	case A2S_INFO:
 		char rgchInfoPostfix[64];
 		msg.ReadString( rgchInfoPostfix );
-		if ( !Q_stricmp( rgchInfoPostfix, A2S_KEY_STRING_STEAM ) )
+		if ( V_strieq( rgchInfoPostfix, A2S_KEY_STRING_STEAM ) )
 		{
 			ReplyInfo( packet->from );
 			return true;
@@ -1995,7 +1995,7 @@ const char *CHLTVServer::GetPassword() const
 	const char *password = tv_password.GetString();
 
 	// if password is empty or "none", return NULL
-	if ( !password[0] || !Q_stricmp(password, "none" ) )
+	if ( !password[0] || V_strieq(password, "none" ) )
 	{
 		return NULL;
 	}

@@ -343,7 +343,7 @@ static int Helper_SortStreamsByViewersCount( const CStreamInfo *a, const CStream
 
 static void Helper_ConvertLanguageToCountryCode( CUtlString &s )
 {
-	if ( !Q_stricmp(s, "en") )
+	if ( V_strieq(s, "en") )
 		s = "gb";
 }
 

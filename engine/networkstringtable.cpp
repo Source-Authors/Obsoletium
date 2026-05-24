@@ -1362,7 +1362,7 @@ INetworkStringTable *CNetworkStringTableContainer::FindTable( const char *tableN
 {
 	for ( auto *t : m_Tables )
 	{
-		if ( !Q_stricmp( tableName, t->GetTableName() ) )
+		if ( V_strieq( tableName, t->GetTableName() ) )
 			return t;
 	}
 

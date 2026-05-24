@@ -40,7 +40,7 @@ CDmeBodyGroup *CDmeBodyGroupList::FindBodyGroup( const char *pName )
 	intp nCount = m_BodyGroups.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( pName, m_BodyGroups[i]->GetName() ) )
+		if ( V_strieq( pName, m_BodyGroups[i]->GetName() ) )
 			return m_BodyGroups[i];
 	}
 	return NULL;

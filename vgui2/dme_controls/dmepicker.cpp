@@ -239,7 +239,7 @@ void CDmePickerFrame::DoModal( const CUtlVector< DmePickerInfo_t >& vec, KeyValu
 //-----------------------------------------------------------------------------
 void CDmePickerFrame::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "Open" ) )
+	if ( V_strieq( pCommand, "Open" ) )
 	{
 		CDmElement *pElement = m_pPicker->GetSelectedDme( );
 
@@ -258,7 +258,7 @@ void CDmePickerFrame::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "Cancel" ) )
+	if ( V_strieq( pCommand, "Cancel" ) )
 	{
 		KeyValues *pActionKeys = new KeyValues( "DmeSelectionCancelled" );
 		if ( m_pContextKeyValues )

@@ -3486,7 +3486,7 @@ static void BuildSpriteLoadName( const char *pName, char *pOut, int outLen, bool
 	const char *pExt = V_GetFileExtension( pName );
 	if ( pExt != NULL )
 	{
-		bIsVMT = !Q_stricmp( pExt, "vmt" );
+		bIsVMT = V_strieq( pExt, "vmt" );
 		if ( !bIsVMT )
 		{
 			if ( g_pVideo )

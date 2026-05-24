@@ -404,7 +404,7 @@ void CPotteryWheelPanel::ParseLightsFromKV( KeyValues *pLightsKV )
 		Vector vecColor;
 		StringToVector( vecColor.Base(), pLocalLight->GetString( "color" ) );
 
-		if ( !Q_stricmp( pType, "directional" ) )
+		if ( V_strieq( pType, "directional" ) )
 		{
 			Vector vecDirection;
 			StringToVector( vecDirection.Base(), pLocalLight->GetString( "direction" ) );
@@ -413,7 +413,7 @@ void CPotteryWheelPanel::ParseLightsFromKV( KeyValues *pLightsKV )
 			continue;
 		}
 
-		if ( !Q_stricmp( pType, "point" ) )
+		if ( V_strieq( pType, "point" ) )
 		{
 			Vector vecAtten;
 			StringToVector( vecAtten.Base(), pLocalLight->GetString( "attenuation" ) );
@@ -429,7 +429,7 @@ void CPotteryWheelPanel::ParseLightsFromKV( KeyValues *pLightsKV )
 			continue;
 		}
 
-		if ( !Q_stricmp( pType, "spot" ) )
+		if ( V_strieq( pType, "spot" ) )
 		{
 			Vector vecAtten;
 			StringToVector( vecAtten.Base(), pLocalLight->GetString( "attenuation" ) );
@@ -542,14 +542,14 @@ void CPotteryWheelPanel::SetLightProbe( CDmxElement *pLightProbe )
 		const char *pType = pLocalLight->GetValueString( "name" );
 		const Vector& vecColor = pLocalLight->GetValue<Vector>( "color" );
 
-		if ( !Q_stricmp( pType, "directional" ) )
+		if ( V_strieq( pType, "directional" ) )
 		{
 			pDesc->InitDirectional( pLocalLight->GetValue<Vector>( "direction" ), vecColor ); 
 			++m_nLightCount;
 			continue;
 		}
 
-		if ( !Q_stricmp( pType, "point" ) )
+		if ( V_strieq( pType, "point" ) )
 		{
 			const Vector& vecAtten = pLocalLight->GetValue<Vector>( "attenuation" );
 			pDesc->InitPoint( pLocalLight->GetValue<Vector>( "origin" ), vecColor );
@@ -562,7 +562,7 @@ void CPotteryWheelPanel::SetLightProbe( CDmxElement *pLightProbe )
 			continue;
 		}
 
-		if ( !Q_stricmp( pType, "spot" ) )
+		if ( V_strieq( pType, "spot" ) )
 		{
 			const Vector& vecAtten = pLocalLight->GetValue<Vector>( "attenuation" );
 			pDesc->InitSpot( pLocalLight->GetValue<Vector>( "origin" ), vecColor, vec3_origin,

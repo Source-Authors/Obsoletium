@@ -588,7 +588,7 @@ void CToolFrameworkInternal::LoadTools()
 				tool != NULL;
 				tool = tool->GetNextKey() )
 		{
-			if ( !Q_stricmp( tool->GetName(),  "library" ) )
+			if ( V_strieq( tool->GetName(),  "library" ) )
 			{
 				// CHECK both bin{/x64}/tools and gamedir/bin{/x64}/tools
 				LoadToolsFromLibrary( tool->GetString() );
@@ -910,7 +910,7 @@ IToolSystem *CToolFrameworkInternal::SwitchToTool( const char* pToolName )
 	int nCount = GetToolCount();
 	for ( int i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( pToolName, GetToolName(i) ) )
+		if ( V_strieq( pToolName, GetToolName(i) ) )
 		{
 			SwitchToTool( i );
 			return m_ToolSystems[i];

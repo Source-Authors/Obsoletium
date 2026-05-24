@@ -199,7 +199,7 @@ void CMatchmaking::AddSessionPropertyInternal( KeyValues *pProperty )
 			pProperty->SetString( "displaystring", szBuffer );
 
 			// X360TBD: Such game specifics as this shouldn't be hard-coded
-			if ( m_CurrentState != MMSTATE_INITIAL && !Q_stricmp( pID, "CONTEXT_SCENARIO" ) )
+			if ( m_CurrentState != MMSTATE_INITIAL && V_strieq( pID, "CONTEXT_SCENARIO" ) )
 			{
 				// Set the scenario in our host data structure
 				Q_strncpy( m_HostData.scenario, szBuffer, sizeof( m_HostData.scenario ) );
@@ -212,7 +212,7 @@ void CMatchmaking::AddSessionPropertyInternal( KeyValues *pProperty )
 		{
 			Msg( "Adding Property: %s : %s\n", pID, pValue );
 
-			if ( !Q_stricmp( pID, "PROPERTY_PRIVATE_SLOTS" ) )
+			if ( V_strieq( pID, "PROPERTY_PRIVATE_SLOTS" ) )
 			{
 				// "Private Slots" is not a search criteria
 				m_nPrivateSlots = atoi( pValue );
@@ -225,7 +225,7 @@ void CMatchmaking::AddSessionPropertyInternal( KeyValues *pProperty )
 			XUSER_PROPERTY &prop = m_SessionProperties[idx];
 			prop.dwPropertyId = id;
 
-			if ( !Q_stricmp( pProperty->GetString( "valuetype" ), "int" ) )
+			if ( V_strieq( pProperty->GetString( "valuetype" ), "int" ) )
 			{
 				prop.value.nData = atoi( pValue );
 				prop.value.type = XUSER_DATA_TYPE_INT32;
@@ -237,15 +237,15 @@ void CMatchmaking::AddSessionPropertyInternal( KeyValues *pProperty )
 			pProperty->SetString( "displaystring", szBuffer );
 
 			// X360TBD: Such game specifics as these shouldn't be so hard-coded
-			if ( !Q_stricmp( pID, "PROPERTY_GAME_SIZE" ) )
+			if ( V_strieq( pID, "PROPERTY_GAME_SIZE" ) )
 			{
 				m_nGameSize = atoi( pValue );
 			}
-			if ( !Q_stricmp( pID, "PROPERTY_NUMBER_OF_TEAMS" ) )
+			if ( V_strieq( pID, "PROPERTY_NUMBER_OF_TEAMS" ) )
 			{
 				m_nTotalTeams = atoi( pValue );
 			}
-			if ( m_CurrentState != MMSTATE_INITIAL && !Q_stricmp( pID, "PROPERTY_MAX_GAME_TIME" ) )
+			if ( m_CurrentState != MMSTATE_INITIAL && V_strieq( pID, "PROPERTY_MAX_GAME_TIME" ) )
 			{
 				// Set the game time in our host data structure
 				m_HostData.gameTime = prop.value.nData;
@@ -585,7 +585,7 @@ static uint64 FindPlayerByName( CClientInfo *pClient, const char *pName )
 {
 	for ( int i = 0; i < MAX_PLAYERS_PER_CLIENT; ++i )
 	{
-		if ( pClient->m_xuids[i] && !Q_stricmp( pClient->m_szGamertags[i], pName ) )
+		if ( pClient->m_xuids[i] && V_strieq( pClient->m_szGamertags[i], pName ) )
 		{
 			return pClient->m_xuids[i];
 		}
@@ -1229,7 +1229,7 @@ void CMatchmaking::ChangeTeam( const char *pTeamName )
 		for ( int iTeam = 0; iTeam < m_nTotalTeams; ++iTeam )
 		{
 			g_ClientDLL->GetPropertyDisplayString( id, iTeam, szTeamName, sizeof( szTeamName ) );
-			if ( !Q_stricmp( szTeamName, pTeamName ) )
+			if ( V_strieq( szTeamName, pTeamName ) )
 			{
 				bool bChanged = false;
 				MM_ClientInfo info;

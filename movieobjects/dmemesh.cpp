@@ -1106,7 +1106,7 @@ CDmeVertexData *CDmeMesh::FindBaseState( const char *pStateName ) const
 	for ( int i = 0; i < nBaseStateCount; ++i )
 	{
 		CDmeVertexData *pBaseState = GetBaseState( i );
-		if ( !Q_stricmp( pStateName, pBaseState->GetName() ) )
+		if ( V_strieq( pStateName, pBaseState->GetName() ) )
 			return pBaseState;
 	}
 
@@ -1139,7 +1139,7 @@ bool CDmeMesh::DeleteBaseState( const char *pStateName )
 	for ( int i = 0; i < nBaseStateCount; ++i )
 	{
 		const CDmeVertexData *pBaseState = GetBaseState( i );
-		if ( !Q_stricmp( pStateName, pBaseState->GetName() ) )
+		if ( V_strieq( pStateName, pBaseState->GetName() ) )
 		{
 			m_BaseStates.Remove( i );
 			g_pDataModel->DestroyElement( pBaseState->GetHandle() );
@@ -1361,7 +1361,7 @@ intp CDmeMesh::FindDeltaStateIndex( const char *pInDeltaName ) const
 	for ( intp di = 0; di < dn; ++di )
 	{
 		CDmeVertexDeltaData *pDeltaState = GetDeltaState( di );
-		if ( !Q_stricmp( pDeltaName, pDeltaState->GetName() ) )
+		if ( V_strieq( pDeltaName, pDeltaState->GetName() ) )
 			return di;
 	}
 
@@ -2058,7 +2058,7 @@ void CDmeMesh::BuildAtomicControlLists( int nCount, DeltaComputation_t *pInfo, C
 			intp nControlCount = atomicControls.Count();
 			for ( j = 0; j < nControlCount; ++j )
 			{
-				if ( !Q_stricmp( pUnderBar, atomicControls[j] ) )
+				if ( V_strieq( pUnderBar, atomicControls[j] ) )
 					break;
 			}
 			if ( j == nControlCount )

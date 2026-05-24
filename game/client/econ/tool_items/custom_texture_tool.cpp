@@ -160,11 +160,11 @@ struct SDecalBlendLayer
 	bool FromKV( KeyValues *pkvLayerBlock, CUtlString &errMsg )
 	{
 		const char *op = pkvLayerBlock->GetString( "op", "(none)" );
-		if      ( !Q_stricmp( op, "normal" ) ) eLayerOp = eLayerBlendOp_Normal;
-		else if ( !Q_stricmp( op, "multiply" ) ) eLayerOp = eLayerBlendOp_Multiply;
-		else if ( !Q_stricmp( op, "screen" ) ) eLayerOp = eLayerBlendOp_Screen;
-		else if ( !Q_stricmp( op, "overlay" ) ) eLayerOp = eLayerBlendOp_Overlay;
-		else if ( !Q_stricmp( op, "ReplaceAlpha" ) ) eLayerOp = eLayerBlendOp_ReplaceAlpha;
+		if      ( V_strieq( op, "normal" ) ) eLayerOp = eLayerBlendOp_Normal;
+		else if ( V_strieq( op, "multiply" ) ) eLayerOp = eLayerBlendOp_Multiply;
+		else if ( V_strieq( op, "screen" ) ) eLayerOp = eLayerBlendOp_Screen;
+		else if ( V_strieq( op, "overlay" ) ) eLayerOp = eLayerBlendOp_Overlay;
+		else if ( V_strieq( op, "ReplaceAlpha" ) ) eLayerOp = eLayerBlendOp_ReplaceAlpha;
 		else
 		{
 			errMsg.Format( "Invalid blend operation '%s'", op );
@@ -1643,13 +1643,13 @@ void CConfirmCustomizeTextureDialog::OnCommand( const char *command )
 	}
 
 	// !KLUDGE! Base class closes window.  I don't want to do this.
-	if ( !Q_stricmp( command, "apply" ) )
+	if ( V_strieq( command, "apply" ) )
 	{
 		Apply();
 		return;
 	}
 
-	if ( !Q_stricmp( command, "next_page" ) )
+	if ( V_strieq( command, "next_page" ) )
 	{
 		if ( eCurrentPage < ePage_FinalConfirm )
 		{
@@ -1658,7 +1658,7 @@ void CConfirmCustomizeTextureDialog::OnCommand( const char *command )
 		return;
 	}
 
-	if ( !Q_stricmp( command, "prev_page" ) )
+	if ( V_strieq( command, "prev_page" ) )
 	{
 		if ( eCurrentPage > ePage_SelectImage )
 		{
@@ -1667,13 +1667,13 @@ void CConfirmCustomizeTextureDialog::OnCommand( const char *command )
 		return;
 	}
 
-	if ( !Q_stricmp( command, "next_stencil_palette" ) )
+	if ( V_strieq( command, "next_stencil_palette" ) )
 	{
 		SelectStencilPalette( m_nSelectedStencilPalette + 1 );
 		return;
 	}
 
-	if ( !Q_stricmp( command, "prev_stencil_palette" ) )
+	if ( V_strieq( command, "prev_stencil_palette" ) )
 	{
 		SelectStencilPalette( m_nSelectedStencilPalette + m_vecStencilPalettes.Count() - 1 );
 		return;

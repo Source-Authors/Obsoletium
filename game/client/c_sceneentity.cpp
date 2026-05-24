@@ -529,7 +529,7 @@ void C_SceneEntity::StartEvent( float currenttime, CChoreoScene *scene, CChoreoE
 {
 	Assert( event );
 
-	if ( !Q_stricmp( event->GetName(), "NULL" ) )
+	if ( V_strieq( event->GetName(), "NULL" ) )
  	{
  		Scene_Printf( "%s : %8.2f:  ignored %s\n", GetSceneFileName(), currenttime, event->GetDescription() );
  		return;
@@ -746,7 +746,7 @@ void C_SceneEntity::EndEvent( float currenttime, CChoreoScene *scene, CChoreoEve
 {
 	Assert( event );
 
-	if ( !Q_stricmp( event->GetName(), "NULL" ) )
+	if ( V_strieq( event->GetName(), "NULL" ) )
  	{
  		return;
  	}
@@ -968,7 +968,7 @@ void C_SceneEntity::DispatchEndExpression( CChoreoScene *scene, C_BaseFlex *acto
 void C_SceneEntity::DispatchStartGesture( CChoreoScene *scene, C_BaseFlex *actor, CChoreoEvent *event )
 {
 	// Ingore null gestures
-	if ( !Q_stricmp( event->GetName(), "NULL" ) )
+	if ( V_strieq( event->GetName(), "NULL" ) )
 		return;
 
 	actor->AddSceneEvent( scene, event, NULL, IsClientOnly() ); 
@@ -982,7 +982,7 @@ void C_SceneEntity::DispatchStartGesture( CChoreoScene *scene, C_BaseFlex *actor
 void C_SceneEntity::DispatchProcessGesture( CChoreoScene *scene, C_BaseFlex *actor, CChoreoEvent *event )
 {
 	// Ingore null gestures
-	if ( !Q_stricmp( event->GetName(), "NULL" ) )
+	if ( V_strieq( event->GetName(), "NULL" ) )
 		return;
 
 	actor->RemoveSceneEvent( scene, event, false );
@@ -997,7 +997,7 @@ void C_SceneEntity::DispatchProcessGesture( CChoreoScene *scene, C_BaseFlex *act
 void C_SceneEntity::DispatchEndGesture( CChoreoScene *scene, C_BaseFlex *actor, CChoreoEvent *event )
 {
 	// Ingore null gestures
-	if ( !Q_stricmp( event->GetName(), "NULL" ) )
+	if ( V_strieq( event->GetName(), "NULL" ) )
 		return;
 
 	actor->RemoveSceneEvent( scene, event, false );

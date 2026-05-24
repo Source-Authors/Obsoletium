@@ -2020,7 +2020,7 @@ void ValidateForeignLanguageWaves( char const *language, CUtlVector< CUtlSymbol 
 				vprint( 0, "--> Localized combined file for '%s' doesn't have sentence data '%s'\n",
 					language, localizedwavename );
 			}
-			else if ( !Q_stricmp( sentence_english.GetText(), sentence_localized.GetText()) )
+			else if ( V_strieq( sentence_english.GetText(), sentence_localized.GetText()) )
 			{
 				vprint( 0, "--> Localized combined file for '%s' still using english phoneme and text data '%s'\n",
 					language, localizedwavename );
@@ -2132,7 +2132,7 @@ void CheckWaveFile( CUtlDict< CUtlSymbol, int >& wavtosound, char const *wavname
 	}
 	else
 	{
-		if ( !Q_stricmp( soundname, UNK_SOUND_ENTRY ) )
+		if ( V_strieq( soundname, UNK_SOUND_ENTRY ) )
 		{
 			Q_snprintf( caption, sizeof( caption ), "!!!%s", soundname );
 		}
@@ -3357,7 +3357,7 @@ int CLocalizationCheckApp::Main()
 				iArg++;
 				break;
 			case 'l':
-				if ( !Q_stricmp( &pArg[1], "loop" ) )
+				if ( V_strieq( &pArg[1], "loop" ) )
 				{
 					checkforloops = true;
 					Q_strncpy( sounddir, CommandLine()->GetParm( iArg + 1 ), sizeof( sounddir ) );
@@ -3369,7 +3369,7 @@ int CLocalizationCheckApp::Main()
 				}
 				break;
 			case 'f':
-				if ( !Q_stricmp( pArg, "-forceduck" ))
+				if ( V_strieq( pArg, "-forceduck" ))
 				{
 					forceducking = true;
 					break;
@@ -3418,7 +3418,7 @@ int CLocalizationCheckApp::Main()
 	Q_strncpy( language, CommandLine()->GetParm( argc - 1 ), sizeof( language ) );
 
 	// If it's english, turn off checks.
-	if ( !Q_stricmp( language, "english" ) )
+	if ( V_strieq( language, "english" ) )
 	{
 		language[ 0 ] = 0;
 	}

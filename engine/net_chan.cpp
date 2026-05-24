@@ -1918,7 +1918,7 @@ bool CNetChan::ProcessMessages( bf_read &buf  )
 
 			if ( showmsgname )
 			{
-				if ( (*showmsgname == '1') || !Q_stricmp(showmsgname, netmsg->GetName() ) )
+				if ( (*showmsgname == '1') || V_strieq(showmsgname, netmsg->GetName() ) )
 				{
 					ConMsg("Msg from %s: %s\n", remote_address.ToString(), netmsg->ToString() );
 				}
@@ -1926,7 +1926,7 @@ bool CNetChan::ProcessMessages( bf_read &buf  )
 
 			if ( blockmsgname )
 			{
-				if ( (*blockmsgname== '1') || !Q_stricmp(blockmsgname, netmsg->GetName() ) )
+				if ( (*blockmsgname== '1') || V_strieq(blockmsgname, netmsg->GetName() ) )
 				{
 					ConMsg("Blocking message %s\n", netmsg->ToString() );
 					continue;

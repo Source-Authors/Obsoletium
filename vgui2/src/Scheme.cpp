@@ -700,11 +700,11 @@ void CScheme::LoadFonts()
 			for ( KeyValues *pData = kv->GetFirstSubKey(); pData != NULL; pData = pData->GetNextKey() )
 			{
 				const char *pszKey = pData->GetName();
-				if ( !Q_stricmp( pszKey, "font" ) )
+				if ( V_strieq( pszKey, "font" ) )
 				{
 					fontFile = pData->GetString();
 				}
-				else if ( !Q_stricmp( pszKey, "name" ) )
+				else if ( V_strieq( pszKey, "name" ) )
 				{
 					pszName = pData->GetString();
 				}

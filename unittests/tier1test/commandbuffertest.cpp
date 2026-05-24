@@ -35,86 +35,86 @@ DEFINE_TESTCASE( CommandBufferTestSimple, CommandBufferTestSuite )
 								   
 	argc = buffer.DequeueNextCommand( argv );
 	Shipping_Assert( argc == 3 );
-	Shipping_Assert( !Q_stricmp( argv[0], "test_command" ) );
-	Shipping_Assert( !Q_stricmp( argv[1], "test_arg1" ) );
-	Shipping_Assert( !Q_stricmp( argv[2], "test_arg2" ) );
-	Shipping_Assert( !Q_stricmp( buffer.ArgS(), "test_arg1 test_arg2" ) );
+	Shipping_Assert( V_strieq( argv[0], "test_command" ) );
+	Shipping_Assert( V_strieq( argv[1], "test_arg1" ) );
+	Shipping_Assert( V_strieq( argv[2], "test_arg2" ) );
+	Shipping_Assert( V_strieq( buffer.ArgS(), "test_arg1 test_arg2" ) );
 
 	argc = buffer.DequeueNextCommand( argv );
 	Shipping_Assert( argc == 2 );
-	Shipping_Assert( !Q_stricmp( argv[0], "test_command2" ) );
-	Shipping_Assert( !Q_stricmp( argv[1], "test_arg3" ) );
-	Shipping_Assert( !Q_stricmp( buffer.ArgS(), "test_arg3" ) );
+	Shipping_Assert( V_strieq( argv[0], "test_command2" ) );
+	Shipping_Assert( V_strieq( argv[1], "test_arg3" ) );
+	Shipping_Assert( V_strieq( buffer.ArgS(), "test_arg3" ) );
 
 	argc = buffer.DequeueNextCommand( argv );
 	Shipping_Assert( argc == 2 );
-	Shipping_Assert( !Q_stricmp( argv[0], "test_command3" ) );
-	Shipping_Assert( !Q_stricmp( argv[1], "test_arg4" ) );
-	Shipping_Assert( !Q_stricmp( buffer.ArgS(), "test_arg4" ) );
+	Shipping_Assert( V_strieq( argv[0], "test_command3" ) );
+	Shipping_Assert( V_strieq( argv[1], "test_arg4" ) );
+	Shipping_Assert( V_strieq( buffer.ArgS(), "test_arg4" ) );
 
 	argc = buffer.DequeueNextCommand( argv );
 	Shipping_Assert( argc == 1 );
-	Shipping_Assert( !Q_stricmp( argv[0], "test_command4" ) );
-	Shipping_Assert( !Q_stricmp( buffer.ArgS(), "" ) );
+	Shipping_Assert( V_strieq( argv[0], "test_command4" ) );
+	Shipping_Assert( V_strieq( buffer.ArgS(), "" ) );
 
 	argc = buffer.DequeueNextCommand( argv );
 	Shipping_Assert( argc == 1 );
-	Shipping_Assert( !Q_stricmp( argv[0], "test_command5" ) );
-	Shipping_Assert( !Q_stricmp( buffer.ArgS(), "" ) );
+	Shipping_Assert( V_strieq( argv[0], "test_command5" ) );
+	Shipping_Assert( V_strieq( buffer.ArgS(), "" ) );
 
 	argc = buffer.DequeueNextCommand( argv );
 	Shipping_Assert( argc == 1 );
-	Shipping_Assert( !Q_stricmp( argv[0], "test_command6" ) );
-	Shipping_Assert( !Q_stricmp( buffer.ArgS(), "" ) );
+	Shipping_Assert( V_strieq( argv[0], "test_command6" ) );
+	Shipping_Assert( V_strieq( buffer.ArgS(), "" ) );
 
 	argc = buffer.DequeueNextCommand( argv );
 	Shipping_Assert( argc == 1 );
-	Shipping_Assert( !Q_stricmp( argv[0], "test_command8" ) );
-	Shipping_Assert( !Q_stricmp( buffer.ArgS(), "" ) );
+	Shipping_Assert( V_strieq( argv[0], "test_command8" ) );
+	Shipping_Assert( V_strieq( buffer.ArgS(), "" ) );
 
 	argc = buffer.DequeueNextCommand( argv );
 	Shipping_Assert( argc == 1 );
-	Shipping_Assert( !Q_stricmp( argv[0], "test_command10" ) );
-	Shipping_Assert( !Q_stricmp( buffer.ArgS(), "" ) );
+	Shipping_Assert( V_strieq( argv[0], "test_command10" ) );
+	Shipping_Assert( V_strieq( buffer.ArgS(), "" ) );
 
 	argc = buffer.DequeueNextCommand( argv );
 	Shipping_Assert( argc == 2 );
-	Shipping_Assert( !Q_stricmp( argv[0], "test_command11" ) );
-	Shipping_Assert( !Q_stricmp( argv[1], "test_arg5 test_arg6" ) );
-	Shipping_Assert( !Q_stricmp( buffer.ArgS(), "\"test_arg5 test_arg6\"" ) );
+	Shipping_Assert( V_strieq( argv[0], "test_command11" ) );
+	Shipping_Assert( V_strieq( argv[1], "test_arg5 test_arg6" ) );
+	Shipping_Assert( V_strieq( buffer.ArgS(), "\"test_arg5 test_arg6\"" ) );
 
 	argc = buffer.DequeueNextCommand( argv );
 	Shipping_Assert( argc == 2 );
-	Shipping_Assert( !Q_stricmp( argv[0], "test_command12" ) );
-	Shipping_Assert( !Q_stricmp( argv[1], "" ) );
-	Shipping_Assert( !Q_stricmp( buffer.ArgS(), "\"\"" ) );
+	Shipping_Assert( V_strieq( argv[0], "test_command12" ) );
+	Shipping_Assert( V_strieq( argv[1], "" ) );
+	Shipping_Assert( V_strieq( buffer.ArgS(), "\"\"" ) );
 
 	argc = buffer.DequeueNextCommand( argv );
 	Shipping_Assert( argc == 2 );
-	Shipping_Assert( !Q_stricmp( argv[0], "test_command13" ) );
-	Shipping_Assert( !Q_stricmp( argv[1], "test_arg7" ) );
-	Shipping_Assert( !Q_stricmp( buffer.ArgS(), "\"test_arg7\"" ) );
+	Shipping_Assert( V_strieq( argv[0], "test_command13" ) );
+	Shipping_Assert( V_strieq( argv[1], "test_arg7" ) );
+	Shipping_Assert( V_strieq( buffer.ArgS(), "\"test_arg7\"" ) );
 
 	argc = buffer.DequeueNextCommand( argv );
 	Shipping_Assert( argc == 3 );
-	Shipping_Assert( !Q_stricmp( argv[0], "test_command14" ) );
-	Shipping_Assert( !Q_stricmp( argv[1], "test_arg8" ) );
-	Shipping_Assert( !Q_stricmp( argv[2], "test_arg9" ) );
-	Shipping_Assert( !Q_stricmp( buffer.ArgS(), "\"test_arg8\"test_arg9" ) );
+	Shipping_Assert( V_strieq( argv[0], "test_command14" ) );
+	Shipping_Assert( V_strieq( argv[1], "test_arg8" ) );
+	Shipping_Assert( V_strieq( argv[2], "test_arg9" ) );
+	Shipping_Assert( V_strieq( buffer.ArgS(), "\"test_arg8\"test_arg9" ) );
 
 	argc = buffer.DequeueNextCommand( argv );
 	Shipping_Assert( argc == 2 );
-	Shipping_Assert( !Q_stricmp( argv[0], "test_command15" ) );
-	Shipping_Assert( !Q_stricmp( argv[1], "test_arg10" ) );
-	Shipping_Assert( !Q_stricmp( buffer.ArgS(), "test_arg10" ) );
+	Shipping_Assert( V_strieq( argv[0], "test_command15" ) );
+	Shipping_Assert( V_strieq( argv[1], "test_arg10" ) );
+	Shipping_Assert( V_strieq( buffer.ArgS(), "test_arg10" ) );
 
 	argc = buffer.DequeueNextCommand( argv );
 	Shipping_Assert( argc == 4 );
-	Shipping_Assert( !Q_stricmp( argv[0], "test_command16" ) );
-	Shipping_Assert( !Q_stricmp( argv[1], "test_arg11" ) );
-	Shipping_Assert( !Q_stricmp( argv[2], ":" ) );
-	Shipping_Assert( !Q_stricmp( argv[3], "test_arg12" ) );
-	Shipping_Assert( !Q_stricmp( buffer.ArgS(), "test_arg11:test_arg12" ) );
+	Shipping_Assert( V_strieq( argv[0], "test_command16" ) );
+	Shipping_Assert( V_strieq( argv[1], "test_arg11" ) );
+	Shipping_Assert( V_strieq( argv[2], ":" ) );
+	Shipping_Assert( V_strieq( argv[3], "test_arg12" ) );
+	Shipping_Assert( V_strieq( buffer.ArgS(), "test_arg11:test_arg12" ) );
 
 	argc = buffer.DequeueNextCommand( argv );
 	Shipping_Assert( argc == 0 );
@@ -140,13 +140,13 @@ DEFINE_TESTCASE( CommandBufferTestTiming, CommandBufferTestSuite )
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 3 );
-		Shipping_Assert( !Q_stricmp( argv[0], "test_command" ) );
-		Shipping_Assert( !Q_stricmp( argv[1], "test_arg1" ) );
-		Shipping_Assert( !Q_stricmp( argv[2], "test_arg2" ) );
+		Shipping_Assert( V_strieq( argv[0], "test_command" ) );
+		Shipping_Assert( V_strieq( argv[1], "test_arg1" ) );
+		Shipping_Assert( V_strieq( argv[2], "test_arg2" ) );
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 1 );
-		Shipping_Assert( !Q_stricmp( argv[0], "test_command3" ) );
+		Shipping_Assert( V_strieq( argv[0], "test_command3" ) );
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 0 );
@@ -158,14 +158,14 @@ DEFINE_TESTCASE( CommandBufferTestTiming, CommandBufferTestSuite )
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 4 );
-		Shipping_Assert( !Q_stricmp( argv[0], "test_command2" ) );
-		Shipping_Assert( !Q_stricmp( argv[1], "test_arg1" ) );
-		Shipping_Assert( !Q_stricmp( argv[2], "test_arg2" ) );
-		Shipping_Assert( !Q_stricmp( argv[3], "test_arg3" ) );
+		Shipping_Assert( V_strieq( argv[0], "test_command2" ) );
+		Shipping_Assert( V_strieq( argv[1], "test_arg1" ) );
+		Shipping_Assert( V_strieq( argv[2], "test_arg2" ) );
+		Shipping_Assert( V_strieq( argv[3], "test_arg3" ) );
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 1 );
-		Shipping_Assert( !Q_stricmp( argv[0], "test_command4" ) );
+		Shipping_Assert( V_strieq( argv[0], "test_command4" ) );
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 0 );
@@ -185,7 +185,7 @@ DEFINE_TESTCASE( CommandBufferTestTiming, CommandBufferTestSuite )
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 1 );
-		Shipping_Assert( !Q_stricmp( argv[0], "test_command5" ) );
+		Shipping_Assert( V_strieq( argv[0], "test_command5" ) );
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 0 );
@@ -210,9 +210,9 @@ DEFINE_TESTCASE( CommandBufferTestNested, CommandBufferTestSuite )
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 3 );
-		Shipping_Assert( !Q_stricmp( argv[0], "test_command" ) );
-		Shipping_Assert( !Q_stricmp( argv[1], "test_arg1" ) );
-		Shipping_Assert( !Q_stricmp( argv[2], "test_arg2" ) );
+		Shipping_Assert( V_strieq( argv[0], "test_command" ) );
+		Shipping_Assert( V_strieq( argv[1], "test_arg1" ) );
+		Shipping_Assert( V_strieq( argv[2], "test_arg2" ) );
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 0 );
@@ -221,11 +221,11 @@ DEFINE_TESTCASE( CommandBufferTestNested, CommandBufferTestSuite )
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 1 );
-		Shipping_Assert( !Q_stricmp( argv[0], "test_command3" ) );
+		Shipping_Assert( V_strieq( argv[0], "test_command3" ) );
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 1 );
-		Shipping_Assert( !Q_stricmp( argv[0], "test_command4" ) );
+		Shipping_Assert( V_strieq( argv[0], "test_command4" ) );
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 0 );
@@ -237,10 +237,10 @@ DEFINE_TESTCASE( CommandBufferTestNested, CommandBufferTestSuite )
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 4 );
-		Shipping_Assert( !Q_stricmp( argv[0], "test_command2" ) );
-		Shipping_Assert( !Q_stricmp( argv[1], "test_arg3" ) );
-		Shipping_Assert( !Q_stricmp( argv[2], "test_arg4" ) );
-		Shipping_Assert( !Q_stricmp( argv[3], "test_arg5" ) );
+		Shipping_Assert( V_strieq( argv[0], "test_command2" ) );
+		Shipping_Assert( V_strieq( argv[1], "test_arg3" ) );
+		Shipping_Assert( V_strieq( argv[2], "test_arg4" ) );
+		Shipping_Assert( V_strieq( argv[3], "test_arg5" ) );
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 0 );
@@ -269,23 +269,23 @@ DEFINE_TESTCASE( CommandBufferTestOverflow, CommandBufferTestSuite )
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 3 );
-		Shipping_Assert( !Q_stricmp( argv[0], "test_command" ) );
-		Shipping_Assert( !Q_stricmp( argv[1], "test_arg1" ) );
-		Shipping_Assert( !Q_stricmp( argv[2], "test_arg2" ) );
+		Shipping_Assert( V_strieq( argv[0], "test_command" ) );
+		Shipping_Assert( V_strieq( argv[1], "test_arg1" ) );
+		Shipping_Assert( V_strieq( argv[2], "test_arg2" ) );
 
 		bOk = buffer.AddText( "test_command3 test_arg6;wait;test_command4" );
 		Shipping_Assert( bOk );
 
 		// This makes sure that AddText doesn't cause argv to become bogus after
 		// compacting memory
-		Shipping_Assert( !Q_stricmp( argv[0], "test_command" ) );
-		Shipping_Assert( !Q_stricmp( argv[1], "test_arg1" ) );
-		Shipping_Assert( !Q_stricmp( argv[2], "test_arg2" ) );
+		Shipping_Assert( V_strieq( argv[0], "test_command" ) );
+		Shipping_Assert( V_strieq( argv[1], "test_arg1" ) );
+		Shipping_Assert( V_strieq( argv[2], "test_arg2" ) );
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 2 );
-		Shipping_Assert( !Q_stricmp( argv[0], "test_command3" ) );
-		Shipping_Assert( !Q_stricmp( argv[1], "test_arg6" ) );
+		Shipping_Assert( V_strieq( argv[0], "test_command3" ) );
+		Shipping_Assert( V_strieq( argv[1], "test_arg6" ) );
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 0 );
@@ -297,7 +297,7 @@ DEFINE_TESTCASE( CommandBufferTestOverflow, CommandBufferTestSuite )
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 1 );
-		Shipping_Assert( !Q_stricmp( argv[0], "test_command4" ) );
+		Shipping_Assert( V_strieq( argv[0], "test_command4" ) );
 
 		argc = buffer.DequeueNextCommand( argv );
 		Shipping_Assert( argc == 0 );

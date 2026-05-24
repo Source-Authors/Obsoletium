@@ -4288,9 +4288,9 @@ static bool GetIconBits( HDC hdc, ICONINFO& iconInfo, int& w, int& h, unsigned c
 
 static bool ShouldMakeUnique( char const *extension )
 {
-	if ( !Q_stricmp( extension, "cur" ) )
+	if ( V_strieq( extension, "cur" ) )
 		return true;
-	if ( !Q_stricmp( extension, "ani" ) )
+	if ( V_strieq( extension, "ani" ) )
 		return true;
 	return false;
 }

@@ -162,7 +162,7 @@ int CDmeGlobalFlexControllerOperator::FindGlobalFlexControllerIndex() const
 					flex->localToGlobal = g_pGlobalFlexController->FindGlobalFlexController( flex->pszName() );
 				}
 
-				if ( !Q_stricmp( flex->pszName(), GetName() ) )
+				if ( V_strieq( flex->pszName(), GetName() ) )
 				{
 					nGlobalFlexControllerIndex = flex->localToGlobal;
 					// Grow the array
@@ -217,7 +217,7 @@ CDmeGlobalFlexControllerOperator *CDmeGameModel::AddGlobalFlexController( const 
 	{
 		CDmeGlobalFlexControllerOperator *op = m_globalFlexControllers.Get( i );
 		Assert( op );
-		if ( op && !Q_stricmp( op->GetName(), controllerName ) )
+		if ( op && V_strieq( op->GetName(), controllerName ) )
 			break;
 	}
 

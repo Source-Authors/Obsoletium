@@ -1321,15 +1321,15 @@ static Activity DetermineExpressionMoveActivity( CChoreoEvent *event, CAI_BaseNP
 		pszAct = sParam2;
 	}
 
-	if ( !Q_stricmp( pszAct, "Walk" ) )
+	if ( V_strieq( pszAct, "Walk" ) )
 	{
 		activity = ACT_WALK;
 	}
-	else if ( !Q_stricmp( pszAct, "Run" ) )
+	else if ( V_strieq( pszAct, "Run" ) )
 	{
 		activity = ACT_RUN;
 	}
-	else if ( !Q_stricmp( pszAct, "CrouchWalk" ) )
+	else if ( V_strieq( pszAct, "CrouchWalk" ) )
 	{
 		activity = ACT_WALK_CROUCH;
 	}

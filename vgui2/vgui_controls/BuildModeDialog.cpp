@@ -1340,7 +1340,7 @@ void BuildModeDialog::OnSetClipboardText(const char *text)
 
 void BuildModeDialog::OnCreateNewControl( char const *text )
 {
-	if ( !Q_stricmp( text, "None" ) )
+	if ( V_strieq( text, "None" ) )
 		return;
 
 	OnNewControl( text, m_nClick[ 0 ], m_nClick[ 1 ] );

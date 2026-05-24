@@ -287,7 +287,7 @@ void CItemSelectionPanel::OnThink( void )
 //-----------------------------------------------------------------------------
 void CItemSelectionPanel::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "vguicancel" ) )
+	if ( V_strieq( command, "vguicancel" ) )
 	{
 		PostMessageSelectionReturned( INVALID_ITEM_ID );
 

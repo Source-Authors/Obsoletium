@@ -402,7 +402,7 @@ static bool IsFlexTrackBeingUsed( CChoreoEvent *event, char const *trackName )
 			continue;
 
 		// Otherwise, see if the test track has this as an active track
-		if ( !Q_stricmp( t->GetFlexControllerName(), trackName ) )
+		if ( V_strieq( t->GetFlexControllerName(), trackName ) )
 		{
 			return true;
 		}

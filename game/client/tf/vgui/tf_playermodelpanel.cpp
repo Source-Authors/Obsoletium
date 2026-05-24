@@ -58,7 +58,7 @@ static bool IsTauntItem( GameItemDefinition_t *pItemDef, const int iTeam, const 
 	for ( int i=0; i<pItemDef->GetNumAnimations( iTeam ); ++i )
 	{
 		animation_on_wearable_t* pAnim = pItemDef->GetAnimationData( iTeam, i );
-		if ( pAnim && pAnim->pszActivity &&	!Q_stricmp( pAnim->pszActivity, "taunt_concept" ) )
+		if ( pAnim && pAnim->pszActivity &&	V_strieq( pAnim->pszActivity, "taunt_concept" ) )
 		{
 			// If we have a scene, use it first
 			const char *pszScene = pAnim->pszScene;

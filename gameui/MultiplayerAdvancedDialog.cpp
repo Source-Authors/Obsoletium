@@ -312,7 +312,7 @@ void CMultiplayerAdvancedDialog::CreateControls()
 			pListItem = pObj->pListItems;
 			while ( pListItem )
 			{
-				if ( iRow == -1 && !Q_stricmp( pListItem->szValue, pObj->curValue ) )
+				if ( iRow == -1 && V_strieq( pListItem->szValue, pObj->curValue ) )
 					iRow = iCount;
 
 				pCombo->AddItem( pListItem->szItemText, NULL );

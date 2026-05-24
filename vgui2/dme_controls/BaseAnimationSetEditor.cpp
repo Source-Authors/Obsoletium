@@ -382,7 +382,7 @@ CDmeChannel* CBaseAnimationSetEditor::FindImportChannel( CDmeChannel *pChannel, 
 		const char *pImportName = pImportTargetElement->GetName();
 		
 		// Element name has to match exactly or be of the form *(channel name)*
-		if ( !Q_stricmp( pTargetName, pImportName ) )
+		if ( V_strieq( pTargetName, pImportName ) )
 			return pImportChannel;
 
 		char pTemp[512];
@@ -394,7 +394,7 @@ CDmeChannel* CBaseAnimationSetEditor::FindImportChannel( CDmeChannel *pChannel, 
 		if ( !pParen2 )
 			continue;
 		*pParen2 = 0;
-		if ( !Q_stricmp( pImportName, pTemp ) )
+		if ( V_strieq( pImportName, pTemp ) )
 			return pImportChannel;
 	}
 	return NULL;

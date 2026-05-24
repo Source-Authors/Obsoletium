@@ -2096,7 +2096,7 @@ void VOX_TouchSound( const char *pszin, CUtlDict< int, int >& filelist, CUtlRBTr
 		for ( i = 0; i < rep.Count(); ++i )
 		{
 			/*
-			if ( !Q_stricmp( rep[ i ].word, "_comma" ) )
+			if ( V_strieq( rep[ i ].word, "_comma" ) )
 			{
 				if ( i != 0 && Q_strlen( outbuf ) >= 1 )
 				{

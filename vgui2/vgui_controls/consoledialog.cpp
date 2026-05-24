@@ -682,7 +682,7 @@ void CConsolePanel::OnTextChanged(Panel *panel)
 //-----------------------------------------------------------------------------
 void CConsolePanel::OnCommand(const char *command)
 {
-	if ( !Q_stricmp( command, "Submit" ) )
+	if ( V_strieq( command, "Submit" ) )
 	{
 		// submit the entry as a console commmand
 		char szCommand[256];

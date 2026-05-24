@@ -339,7 +339,7 @@ void CFilmGrainEffect::Render( int x, int y, int w, int h )
 		// alpha operates from 1.0 -> m_NoiseScale.w
 		float alpha = 1.0 - ( 1.0 - m_NoiseScale.w ) * m_flEffectAlpha;
 		
-		if( !Q_stricmp( pVar->GetName(), "$noisescale" ) )
+		if( V_strieq( pVar->GetName(), "$noisescale" ) )
 		{
 			if( g_pMaterialSystemHardwareConfig->GetDXSupportLevel()<=70 )
 			{
@@ -445,7 +445,7 @@ void CFilmGrainEffect::Render( int x, int y, int w, int h )
 		{
 			IMaterialVar *pVar = pParams[i];
 			
-			if( !Q_stricmp( pVar->GetName(), "$channel_select" ) )
+			if( V_strieq( pVar->GetName(), "$channel_select" ) )
 			{
 				pVar->SetVecValue( channelSelect[0], channelSelect[1], channelSelect[2], channelSelect[3] );
 			}

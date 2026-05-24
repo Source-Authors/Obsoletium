@@ -845,7 +845,7 @@ CHudCloseCaption::CHudCloseCaption( const char *pElementName )
 	uilanguage[0] = 0;
 	engine->GetUILanguage( uilanguage, sizeof( uilanguage ) );
 
-	if ( !Q_stricmp( uilanguage, "english" ) )
+	if ( V_strieq( uilanguage, "english" ) )
 	{
 		english.SetValue( 1 );
 	}
@@ -2539,7 +2539,7 @@ void CHudCloseCaption::Flush()
 
 void CHudCloseCaption::InitCaptionDictionary( const char *dbfile )
 {
-	if ( m_CurrentLanguage.IsValid() && !Q_stricmp( m_CurrentLanguage.String(), dbfile ) )
+	if ( m_CurrentLanguage.IsValid() && V_strieq( m_CurrentLanguage.String(), dbfile ) )
 		return;
 
 	m_CurrentLanguage = dbfile;

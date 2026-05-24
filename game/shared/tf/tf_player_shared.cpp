@@ -11481,7 +11481,7 @@ const char *CTFPlayer::GetOverrideStepSound( const char *pszBaseStepSoundName )
 			if ( iOverrideFootstepSoundSet == s_ReplacementSounds[i].iOverrideIndex )
 			{
 				if ( !s_ReplacementSounds[i].pszBaseSoundName[0] ||
-					 !Q_stricmp( pszBaseStepSoundName, s_ReplacementSounds[i].pszBaseSoundName ) )
+					 V_strieq( pszBaseStepSoundName, s_ReplacementSounds[i].pszBaseSoundName ) )
 					return s_ReplacementSounds[i].pszNewSoundName;
 			}
 		}

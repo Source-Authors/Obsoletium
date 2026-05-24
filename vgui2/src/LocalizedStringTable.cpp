@@ -286,7 +286,7 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 	for ( intp lf = 0; lf < lfc; ++lf )
 	{
 		LocalizationFileInfo_t& entry = m_LocalizationFiles[ lf ];
-		if ( !Q_stricmp( entry.symName.String(), fileName ) )
+		if ( V_strieq( entry.symName.String(), fileName ) )
 		{
 			m_LocalizationFiles.Remove( lf );
 			break;
@@ -1005,7 +1005,7 @@ bool CLocalizedStringTable::LocalizationFileIsLoaded(const char *name)
 	intp c = m_LocalizationFiles.Count();
 	for ( intp i = 0; i < c; ++i )
 	{
-		if ( !Q_stricmp( m_LocalizationFiles[ i ].symName.String(), name ) )
+		if ( V_strieq( m_LocalizationFiles[ i ].symName.String(), name ) )
 			return true;
 	}
 

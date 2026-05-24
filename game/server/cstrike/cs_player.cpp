@@ -6684,7 +6684,7 @@ CBaseEntity	*CCSPlayer::GiveNamedItem( const char *pszName, int iSubType )
 		return  NULL;
 
 #ifndef CS_SHIELD_ENABLED
-	if ( !Q_stricmp( pszName, "weapon_shield" ) )
+	if ( V_strieq( pszName, "weapon_shield" ) )
 		return NULL;
 #endif
 

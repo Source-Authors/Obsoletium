@@ -302,7 +302,7 @@ s_source_t* GetModelLODSource( const char *pModelName,
 //		if (!pSlash)
 //			pSlash = pTempBuf1;
 
-		if( !Q_stricmp( pTempBuf, scriptLOD.modelReplacements[i].GetSrcName() ) )
+		if( V_strieq( pTempBuf, scriptLOD.modelReplacements[i].GetSrcName() ) )
 		{
 			*pFound = true;
 			return scriptLOD.modelReplacements[i].m_pSource;
@@ -1214,7 +1214,7 @@ static void MarkRootLODBones( CVertexDictionary &vertexDictionary )
 //-----------------------------------------------------------------------------
 static void UnifyModelLODs( s_model_t *pSrcModel )
 {
-	if ( !Q_stricmp( pSrcModel->name, "blank" ) )
+	if ( V_strieq( pSrcModel->name, "blank" ) )
 		return;
 
 	// each lod has a unique vertex mapping table
@@ -1434,7 +1434,7 @@ void LoadLODSources( void )
 	g_nummodelsbeforeLOD = g_nummodels;
 	for( int modelID = 0; modelID < g_nummodelsbeforeLOD; modelID++ )
 	{
-		if ( !Q_stricmp( g_model[modelID]->name, "blank" ) )
+		if ( V_strieq( g_model[modelID]->name, "blank" ) )
 		{
 			intp nNumLODs = g_ScriptLODs.Count();
 			g_model[modelID]->m_LodSources.SetCount( nNumLODs );

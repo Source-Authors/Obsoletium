@@ -307,7 +307,7 @@ bool CAssetTreeView::SelectFolder_R( intp nItemID, const char *pPath )
 
 	KeyValues *kv = GetItemData( nItemID );
 	const char *pTestPath = kv->GetString( "path" );
-	if ( !Q_stricmp( pTestPath, pPath ) )
+	if ( V_strieq( pTestPath, pPath ) )
 	{
 		AddSelectedItem( nItemID, true, false, true );
 		return true;
@@ -570,7 +570,7 @@ bool CAssetCache::DoesExtensionMatch( CachedAssetList_t& info, const char *pFile
 	intp nCount = info.m_Ext.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( info.m_Ext[i], pChildExt ) )
+		if ( V_strieq( info.m_Ext[i], pChildExt ) )
 			return true;
 	}
 
@@ -1270,7 +1270,7 @@ const char *CBaseAssetPicker::GetModPath( intp nModIndex )
 //-----------------------------------------------------------------------------
 void CBaseAssetPicker::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "AssetRescan" ) )
+	if ( V_strieq( pCommand, "AssetRescan" ) )
 	{
 		RescanAssets();
 		return;
@@ -1593,7 +1593,7 @@ void CBaseAssetPickerFrame::PostMessageAndClose( KeyValues *pKeyValues )
 //-----------------------------------------------------------------------------
 void CBaseAssetPickerFrame::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "Open" ) )
+	if ( V_strieq( pCommand, "Open" ) )
 	{
 		KeyValues *pActionKeys = new KeyValues( "AssetSelected" );
 		if ( !m_pPicker->IsMultiselectEnabled() )
@@ -1616,7 +1616,7 @@ void CBaseAssetPickerFrame::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "Cancel" ) )
+	if ( V_strieq( pCommand, "Cancel" ) )
 	{
 		CloseModal();
 		return;

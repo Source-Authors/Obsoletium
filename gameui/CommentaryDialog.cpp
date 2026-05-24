@@ -91,13 +91,13 @@ void CCommentaryDialog::OnClose( void )
 //-----------------------------------------------------------------------------
 void CCommentaryDialog::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "TurnOn" ) )
+	if ( V_strieq( command, "TurnOn" ) )
 	{
 		ConVarRef commentary("commentary");
 		commentary.SetValue( 1 );
 		Close();
 	}
-	else if ( !Q_stricmp( command, "TurnOff" ) )
+	else if ( V_strieq( command, "TurnOff" ) )
 	{
 		ConVarRef commentary("commentary");
 		commentary.SetValue( 0 );

@@ -76,7 +76,7 @@ void TestReadFile( CDmxElement *pRoot )
 	const VMatrix& mat = pRoot->GetValue<VMatrix>( "vmatrix_test" );
 	Shipping_Assert( MatricesAreEqual( mat, mattest, 1e-3 ) );
 
-	Shipping_Assert( !Q_stricmp( pRoot->GetValueString( "string_test" ), "test" ) );
+	Shipping_Assert( V_strieq( pRoot->GetValueString( "string_test" ), "test" ) );
 	const CUtlBinaryBlock& blob = pRoot->GetValue<CUtlBinaryBlock>( "binary_test" );
 	Shipping_Assert( blob.Length() == 256 );
 	Shipping_Assert( !memcmp( blob.Get(), buftest, 256 ) );
@@ -128,7 +128,7 @@ void TestReadFile( CDmxElement *pRoot )
 	Shipping_Assert( MatricesAreEqual( matVec[1], mat2test, 1e-3 ) );
 
 	const CUtlVector< CUtlString > &stringVec = pElement5->GetArray<CUtlString>( "string_array_test" );
-	Shipping_Assert( stringVec.Count() == 3 && !Q_stricmp( stringVec[2], "string3" ) );
+	Shipping_Assert( stringVec.Count() == 3 && V_strieq( stringVec[2], "string3" ) );
 
 	const CUtlVector< CUtlBinaryBlock > &binaryVec = pElement5->GetArray<CUtlBinaryBlock>( "binary_array_test" );
 	Shipping_Assert( binaryVec.Count() == 2 && !memcmp( binaryVec[1].Get(), buf2test, 256 ) );
@@ -149,7 +149,7 @@ void TestReadFile( CDmxElement *pRoot )
 	Shipping_Assert( testStruct.m_Angles.x == 0.0f && testStruct.m_Angles.y == 90.0f && testStruct.m_Angles.z == -90.0f );
 	Shipping_Assert( testStruct.m_Quaternion.x == 1.0f && testStruct.m_Quaternion.y == -1.0f && testStruct.m_Quaternion.z == 0.0f && testStruct.m_Quaternion.w == 2.0f );
 	Shipping_Assert( MatricesAreEqual( testStruct.m_Matrix, mattest, 1e-3 ) );
-	Shipping_Assert( !Q_stricmp( testStruct.m_pStringBuf, "test" ) );
+	Shipping_Assert( V_strieq( testStruct.m_pStringBuf, "test" ) );
 
 	pElement6->UnpackIntoStructure( &testStruct, sizeof( testStruct ), s_TestStructUnpack );
 
@@ -162,7 +162,7 @@ void TestReadFile( CDmxElement *pRoot )
 	Shipping_Assert( testStruct.m_Vector4D.x == 5.0f && testStruct.m_Vector4D.y == 1.0f && testStruct.m_Vector4D.z == -4.0f && testStruct.m_Vector4D.w == 2.0f );
 	Shipping_Assert( testStruct.m_Angles.x == 5.0f && testStruct.m_Angles.y == 1.0f && testStruct.m_Angles.z == -3.0f );
 	Shipping_Assert( testStruct.m_Quaternion.x == 5.0f && testStruct.m_Quaternion.y == 1.0f && testStruct.m_Quaternion.z == -4.0f && testStruct.m_Quaternion.w == 2.0f );
-	Shipping_Assert( !Q_stricmp( testStruct.m_pStringBuf, "default" ) );
+	Shipping_Assert( V_strieq( testStruct.m_pStringBuf, "default" ) );
 }
 
 DEFINE_TESTCASE_NOSUITE( DmxLoaderTest )

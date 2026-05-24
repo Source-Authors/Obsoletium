@@ -2079,7 +2079,7 @@ CON_COMMAND_F( record, "Record a demo.", FCVAR_DONTRECORD )
 	bool incremental = false;
 	if ( args.ArgC() == 3 )
 	{
-		if ( !Q_stricmp( args[2], "incremental" ) )
+		if ( V_strieq( args[2], "incremental" ) )
 		{
 			incremental = true;
 		}

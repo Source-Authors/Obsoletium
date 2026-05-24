@@ -445,7 +445,7 @@ void CDirWatcher::AddFileToChangeList( const char *pchFile )
 	// make sure it isn't already in the list
 	FOR_EACH_LL( m_listChangedFiles, i )
 	{
-		if ( !Q_stricmp( m_listChangedFiles[i], pchFile ) )
+		if ( V_strieq( m_listChangedFiles[i], pchFile ) )
 			return;
 	}
 

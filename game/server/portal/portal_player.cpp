@@ -473,12 +473,12 @@ void CPortal_Player::OnRestore( void )
 
 bool CPortal_Player::ValidatePlayerModel( const char *pModel )
 {
-	if ( !Q_stricmp( g_pszPlayerModel, pModel ) )
+	if ( V_strieq( g_pszPlayerModel, pModel ) )
 	{
 		return true;
 	}
 
-	if ( !Q_stricmp( g_pszChellModel, pModel ) )
+	if ( V_strieq( g_pszChellModel, pModel ) )
 	{
 		return true;
 	}

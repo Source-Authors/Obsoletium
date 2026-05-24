@@ -133,7 +133,7 @@ static bool BHasTag( const CUtlStringList &TagList, const char *tag )
 {
 	for ( int i = 0; i < TagList.Count(); i++ )
 	{
-		if ( !Q_stricmp( TagList[i], tag) )
+		if ( V_strieq( TagList[i], tag) )
 		{
 			return true;
 		}

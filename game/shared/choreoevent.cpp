@@ -2078,7 +2078,7 @@ CChoreoEvent::EVENTTYPE CChoreoEvent::TypeForName( const char *name )
 	for ( int i = 0; i < NUM_TYPES; ++i )
 	{
 		EventNameMap_t *slot = &g_NameMap[ i ];
-		if ( !Q_stricmp( name, slot->name ) )
+		if ( V_strieq( name, slot->name ) )
 			return slot->type;
 	}
 	
@@ -2156,7 +2156,7 @@ CChoreoEvent::CLOSECAPTION CChoreoEvent::CCTypeForName( const char *name )
 	for ( int i = 0; i < NUM_CC_TYPES; ++i )
 	{
 		CCNameMap_t *slot = &g_CCNameMap[ i ];
-		if ( !Q_stricmp( name, slot->name ) )
+		if ( V_strieq( name, slot->name ) )
 			return slot->type;
 	}
 	

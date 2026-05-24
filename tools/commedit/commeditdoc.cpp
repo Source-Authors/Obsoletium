@@ -364,7 +364,7 @@ CDmeCommentaryNodeEntity *CCommEditDoc::GetCommentaryNodeForLocation( Vector &ve
 bool CCommEditDoc::GetStringChoiceList( const char *pChoiceListType, [[maybe_unused]] CDmElement *pElement, 
 									[[maybe_unused]] const char *pAttributeName, [[maybe_unused]] bool bArrayElement, StringChoiceList_t &list )
 {
-	if ( !Q_stricmp( pChoiceListType, "info_targets" ) )
+	if ( V_strieq( pChoiceListType, "info_targets" ) )
 	{
 		CDmrCommentaryNodeEntityList entities = GetEntityList();
 
@@ -399,13 +399,13 @@ bool CCommEditDoc::GetStringChoiceList( const char *pChoiceListType, [[maybe_unu
 bool CCommEditDoc::GetElementChoiceList( const char *pChoiceListType, [[maybe_unused]] CDmElement *pElement, 
 									 [[maybe_unused]] const char *pAttributeName, [[maybe_unused]] bool bArrayElement, ElementChoiceList_t &list )
 {
-	if ( !Q_stricmp( pChoiceListType, "allelements" ) )
+	if ( V_strieq( pChoiceListType, "allelements" ) )
 	{
 		AddElementsRecursively( m_hRoot, list );
 		return true;
 	}
 
-	if ( !Q_stricmp( pChoiceListType, "info_targets" ) )
+	if ( V_strieq( pChoiceListType, "info_targets" ) )
 	{
 		CDmrCommentaryNodeEntityList entities = GetEntityList();
 

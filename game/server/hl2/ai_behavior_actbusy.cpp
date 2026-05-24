@@ -220,7 +220,7 @@ intp CActBusyAnimData::FindBusyAnim( Activity iActivity, const char *pSequence )
 		busyanim_t *pBusyAnim = &m_ActBusyAnims[i];
 		Assert( pBusyAnim );
 
-		if ( pSequence && pBusyAnim->iszName != NULL_STRING && !Q_stricmp( STRING(pBusyAnim->iszName), pSequence ) )
+		if ( pSequence && pBusyAnim->iszName != NULL_STRING && V_strieq( STRING(pBusyAnim->iszName), pSequence ) )
 			return i;
 
 		if ( iActivity != ACT_INVALID && pBusyAnim->iActivities[BA_BUSY] == iActivity )

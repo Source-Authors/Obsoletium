@@ -237,7 +237,7 @@ StudioModel *FindAssociatedModel( CChoreoScene *scene, CChoreoActor *a )
 	for ( intp i = 0; i < c; i++ )
 	{
 		char const *modelname = models->GetModelName( i );
-		if ( !Q_stricmp( modelname, a->GetName() ) )
+		if ( V_strieq( modelname, a->GetName() ) )
 		{
 			return models->GetStudioModel( i );
 		}
@@ -5039,7 +5039,7 @@ void CChoreoView::ProcessGesture( CChoreoScene *scene, CChoreoEvent *event )
 	Assert( event->GetType() == CChoreoEvent::GESTURE );
 
 	// NULL event is just a placeholder
-	if ( !Q_stricmp( event->GetName(), "NULL" ) )
+	if ( V_strieq( event->GetName(), "NULL" ) )
 	{
 		return;
 	}
@@ -7272,7 +7272,7 @@ void CChoreoView::EditEvent( CChoreoEvent *event )
 				shouldBreak = true;
 				break;
 			case CChoreoEvent::GESTURE:
-				if ( !Q_stricmp( params.m_szName, "NULL" ) )
+				if ( V_strieq( params.m_szName, "NULL" ) )
 				{ 
 					shouldBreak = true;
 				}

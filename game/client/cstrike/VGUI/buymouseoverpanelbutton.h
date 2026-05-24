@@ -107,7 +107,7 @@ public:
 		SetMapTypeState();
 
 #ifndef CS_SHIELD_ENABLED
-		if ( !Q_stricmp( GetName(), "shield" ) )
+		if ( V_strieq( GetName(), "shield" ) )
 		{
 			SetVisible( false );
 			SetEnabled( false );
@@ -353,7 +353,7 @@ public:
 
 		BaseClass::ShowPage();
 
-		if ( !Q_stricmp( m_command, "vguicancel" ) )
+		if ( V_strieq( m_command, "vguicancel" ) )
 			return;
 
 		if ( CSGameRules() && CSGameRules()->IsBlackMarket() )

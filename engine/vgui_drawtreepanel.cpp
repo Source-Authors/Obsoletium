@@ -223,7 +223,7 @@ public:
 
 	void OnCommand( const char *command ) override
 	{
-		if ( !Q_stricmp( command, "performlayout" ) )
+		if ( V_strieq( command, "performlayout" ) )
 		{
 			if ( g_DrawTreeSelectedPanel )
 			{
@@ -231,7 +231,7 @@ public:
 				vgui::ipanel()->SendMessage( g_DrawTreeSelectedPanel, KeyValuesAD( new KeyValues("Command", "command", "performlayout") ), GetVPanel() );
 			}
 		}
-		else if ( !Q_stricmp( command, "reloadscheme" ) )
+		else if ( V_strieq( command, "reloadscheme" ) )
 		{
 			if ( g_DrawTreeSelectedPanel )
 			{

@@ -465,15 +465,15 @@ void CBlacklistedServers::OnFileSelected( char const *fullpath )
 //-----------------------------------------------------------------------------
 void CBlacklistedServers::OnCommand(const char *command)
 {
-	if (!Q_stricmp(command, "AddServerByName"))
+	if (V_strieq(command, "AddServerByName"))
 	{
 		OnAddServerByName();
 	}
-	else if (!Q_stricmp(command, "AddCurrentServer" ))
+	else if (V_strieq(command, "AddCurrentServer" ))
 	{
 		OnAddCurrentServer();
 	}
-	else if (!Q_stricmp(command, "ImportBlacklist" ))
+	else if (V_strieq(command, "ImportBlacklist" ))
 	{
 		OnImportBlacklist();
 	}

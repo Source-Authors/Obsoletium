@@ -276,7 +276,7 @@ void CSessionBrowserDialog::SwapMenuItems( int iOne, int iTwo )
 //-----------------------------------------------------------------
 void CSessionBrowserDialog::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "SelectSession" ) )
+	if ( V_strieq( pCommand, "SelectSession" ) )
 	{
 		int idx = m_SearchIndices[ m_Menu.GetActiveItemIndex() ];
 		matchmaking->SelectSession( idx );

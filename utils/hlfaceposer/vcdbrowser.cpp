@@ -80,7 +80,7 @@ public:
 
 		while ( p )
 		{
-			if ( !Q_stricmp( getLabel( p ), child ) )
+			if ( V_strieq( getLabel( p ), child ) )
 				return p;
 
 			p = getNextChild( p );
@@ -664,7 +664,7 @@ void CVCDBrowser::PopulateTree( char const *subdirectory )
 		int slot = m_pListView->add( name );
 		m_pListView->setUserData( slot, COL_VCD, (void *)vcd );
 
-		if ( !Q_stricmp( prevSelectedName, name ) )
+		if ( V_strieq( prevSelectedName, name ) )
 		{
 			selectedSlot = slot;
 		}
@@ -867,7 +867,7 @@ void CVCDBrowser::SetCurrent( char const *filename )
 
 		Q_FixSlashes( fixed );
 
-		if ( !Q_stricmp( fixed, fn ) )
+		if ( V_strieq( fixed, fn ) )
 		{
 			m_pListView->scrollToItem( i );
 			m_pListView->setSelected( i, true );

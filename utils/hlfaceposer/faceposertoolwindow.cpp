@@ -195,7 +195,7 @@ static bool TranslateToolPos( char const *toolname, int workspacew, int workspac
 	{
 		ToolTranslate& tt = s_ToolTranslate[ i ];
 
-		if ( !Q_stricmp( toolname, tt.toolname ) )
+		if ( V_strieq( toolname, tt.toolname ) )
 		{
 			x = (int)((float)workspacew * tt.xfrac + 0.5f );
 			y = (int)((float)workspaceh * tt.yfrac + 0.5f );

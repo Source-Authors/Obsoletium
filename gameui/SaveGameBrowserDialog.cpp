@@ -1339,7 +1339,7 @@ void CSaveGameBrowserDialog::ScanSavedGames( bool bIgnoreAutosave )
 			// If we're ignoring autosaves, skip it here
 			if ( bIgnoreAutosave )
 			{
-				if ( !Q_stricmp( save.szType, "#GameUI_Autosave" ) )
+				if ( V_strieq( save.szType, "#GameUI_Autosave" ) )
 				{
 					pFileName = g_pFullFileSystem->FindNext( handle );
 					continue;

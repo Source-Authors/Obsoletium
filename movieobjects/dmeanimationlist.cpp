@@ -61,7 +61,7 @@ intp CDmeAnimationList::FindAnimation( const char *pAnimName ) const
 	intp nCount = m_Animations.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( m_Animations[i]->GetName(), pAnimName ) )
+		if ( V_strieq( m_Animations[i]->GetName(), pAnimName ) )
 			return i;
 	}
 	return -1;

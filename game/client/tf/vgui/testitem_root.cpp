@@ -577,22 +577,22 @@ void CTestItemRoot::CloseAndTestItem( void )
 //-----------------------------------------------------------------------------
 void CTestItemRoot::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "cancel" ) )
+	if ( V_strieq( command, "cancel" ) )
 	{
 		Close();
 		return;
 	}
-	else if ( !Q_stricmp( command, "ok" ) )
+	else if ( V_strieq( command, "ok" ) )
 	{
 		CloseAndTestItem();
 		return;
 	}
-	else if ( !Q_stricmp( command, "steamworkshop" ) )
+	else if ( V_strieq( command, "steamworkshop" ) )
 	{
 		Close();
 		engine->ClientCmd_Unrestricted( "OpenSteamWorkshopDialog;" );
 	}
-	else if ( !Q_stricmp( command, "reloadscheme" ) )
+	else if ( V_strieq( command, "reloadscheme" ) )
 	{
 		InvalidateLayout( false, true );
 		return;
@@ -630,7 +630,7 @@ void CTestItemRoot::OnCommand( const char *command )
 		}
 		return;
 	}
-	else if ( !Q_stricmp( command, "export" ) || !Q_stricmp( command, "import" ) )
+	else if ( V_strieq( command, "export" ) || V_strieq( command, "import" ) )
 	{
 		m_bExporting = ( command[0] == 'e' );
 
@@ -647,12 +647,12 @@ void CTestItemRoot::OnCommand( const char *command )
 		m_hImportExportDialog->Activate();
 		return;
 	}
-	else if ( !Q_stricmp( command, "importrecent" ) )
+	else if ( V_strieq( command, "importrecent" ) )
 	{
 		ImportTestSetup( tf_testitem_recent.GetString() );
 		return;
 	}
-	else if ( !Q_stricmp( command, "bot_add" ) )
+	else if ( V_strieq( command, "bot_add" ) )
 	{
 		KeyValues *pKV = m_pBotSelectionComboBox->GetActiveItemUserData();
 		int iClass = pKV->GetInt( "class", TF_CLASS_UNDEFINED );
@@ -663,7 +663,7 @@ void CTestItemRoot::OnCommand( const char *command )
 		}
 		return;
 	}
-	else if ( !Q_stricmp( command, "bot_removeall" ) )
+	else if ( V_strieq( command, "bot_removeall" ) )
 	{
 		// Kick everyone above the first player
 		for ( int i = 2; i <= gpGlobals->maxClients; i++ )
@@ -853,17 +853,17 @@ void CTestItemBotControls::PerformLayout( void )
 //-----------------------------------------------------------------------------
 void CTestItemBotControls::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "cancel" ) )
+	if ( V_strieq( command, "cancel" ) )
 	{
 		Close();
 		return;
 	}
-	else if ( !Q_stricmp( command, "ok" ) )
+	else if ( V_strieq( command, "ok" ) )
 	{
 		UpdateBots();
 		return;
 	}
-	else if ( !Q_stricmp( command, "reloadscheme" ) )
+	else if ( V_strieq( command, "reloadscheme" ) )
 	{
 		InvalidateLayout( false, true );
 		return;

@@ -429,7 +429,7 @@ void CGameUI::PlayGameStartupSound()
 			char ext[ 10 ];
 			V_ExtractFileExtension( fn, ext );
 
-			if ( !Q_stricmp( ext, "mp3" ) )
+			if ( V_strieq( ext, "mp3" ) )
 			{
 				char temp[ 512 ];
 				if ( bHolidayFound )

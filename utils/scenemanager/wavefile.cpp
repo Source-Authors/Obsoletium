@@ -88,7 +88,7 @@ CSoundEntry *CWaveFile::GetOwnerSoundEntry()
 //-----------------------------------------------------------------------------
 void CWaveFile::SetName( char const *filename )
 {
-	if ( !Q_stricmp( m_szName, filename ) )
+	if ( V_strieq( m_szName, filename ) )
 		return;
 
 	Q_strncpy( m_szName, filename, sizeof( m_szName ) );
@@ -121,7 +121,7 @@ char const	*CWaveFile::GetSentenceText()
 void CWaveFile::SetSentenceText( char const *newText )
 {
 	EnsureSentence();
-	if ( !Q_stricmp( GetSentenceText(), newText ) )
+	if ( V_strieq( GetSentenceText(), newText ) )
 		return;
 
 	if ( !IsCheckedOut() )

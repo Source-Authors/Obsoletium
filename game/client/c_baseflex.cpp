@@ -451,7 +451,7 @@ void *CFlexSceneFileManager::FindSceneFile( IHasLocalToGlobalFlexSettings *insta
 	for ( int i = 0; i < m_FileList.Count(); i++ )
 	{
 		CFlexSceneFile *file = m_FileList[ i ];
-		if ( file && !Q_stricmp( file->filename, szFilename ) )
+		if ( file && V_strieq( file->filename, szFilename ) )
 		{
 			// Make sure translations (local to global flex controller) are set up for this instance
 			EnsureTranslations( instance, ( const flexsettinghdr_t * )file->buffer );

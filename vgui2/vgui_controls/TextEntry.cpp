@@ -4243,14 +4243,14 @@ void TextEntry::OnPanelDropped( CUtlVector< KeyValues * >& msglist )
 		return;
 
 	char const *cmd = data->GetString( "command" );
-	if ( !Q_stricmp( cmd, "replace" ) ||
-		 !Q_stricmp( cmd, "default" ) )
+	if ( V_strieq( cmd, "replace" ) ||
+		 V_strieq( cmd, "default" ) )
 	{
 		SetText( newText );
 		_dataChanged = true;
 		FireActionSignal();
 	}
-	else if ( !Q_stricmp( cmd, "append" ) )
+	else if ( V_strieq( cmd, "append" ) )
 	{
 		size_t newLen = wcslen( newText );
 		intp curLen = m_TextStream.Count();
@@ -4265,7 +4265,7 @@ void TextEntry::OnPanelDropped( CUtlVector< KeyValues * >& msglist )
 		_dataChanged = true;
 		FireActionSignal();
 	}
-	else if ( !Q_stricmp( cmd, "prepend" ) )
+	else if ( V_strieq( cmd, "prepend" ) )
 	{
 		size_t newLen = wcslen( newText );
 		intp curLen = m_TextStream.Count();

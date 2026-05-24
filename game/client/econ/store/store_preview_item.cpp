@@ -158,12 +158,12 @@ void CStorePreviewItemPanel::OnCommand( const char *command )
 		SetVisible( false );
 		return;
 	}
-	else if ( !Q_stricmp( command, "icons_left" ) )
+	else if ( V_strieq( command, "icons_left" ) )
 	{
 		m_iCurrentIconPosition = MAX( m_iCurrentIconPosition - 1, 0 );
 		UpdateIcons();
 	}
-	else if ( !Q_stricmp( command, "icons_right" ) )
+	else if ( V_strieq( command, "icons_right" ) )
 	{
 		// It's only visible if we can still move right.
 		m_iCurrentIconPosition++;

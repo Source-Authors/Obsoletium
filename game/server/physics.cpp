@@ -308,7 +308,7 @@ bool CPhysicsHook::FindOrAddVehicleScript( const char *pScriptName, vehicleparam
 	intp index = -1;
 	for ( intp i = 0; i < m_vehicleScripts.Count(); i++ )
 	{
-		if ( !Q_stricmp(m_vehicleScripts[i].scriptName.ToCStr(), pScriptName) )
+		if ( V_strieq(m_vehicleScripts[i].scriptName.ToCStr(), pScriptName) )
 		{
 			index = i;
 			bLoadedSounds = true;
@@ -336,7 +336,7 @@ bool CPhysicsHook::FindOrAddVehicleScript( const char *pScriptName, vehicleparam
 				{
 					pParse->ParseVehicle( &m_vehicleScripts[index].params, NULL );
 				}
-				else if ( !Q_stricmp( pBlock, "vehicle_sounds" ) )
+				else if ( V_strieq( pBlock, "vehicle_sounds" ) )
 				{
 					bLoadedSounds = true;
 					CVehicleSoundsParser soundParser;

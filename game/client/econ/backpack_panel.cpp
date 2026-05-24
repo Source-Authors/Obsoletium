@@ -4078,7 +4078,7 @@ void CBackpackPanel::OnCommand( const char *command )
 		UpdateModelPanels();
 		return;
 	}
-	else if ( !Q_stricmp( command, "show_explanations" ) )
+	else if ( V_strieq( command, "show_explanations" ) )
 	{
 		if ( !m_flStartExplanationsAt )
 		{
@@ -4087,7 +4087,7 @@ void CBackpackPanel::OnCommand( const char *command )
 		}
 		RequestFocus();
 	}
-	else if ( !Q_stricmp( command, "showdetails" ) )
+	else if ( V_strieq( command, "showdetails" ) )
 	{
 		for ( int i = 0; i < m_pItemModelPanels.Count(); i++ )
 		{

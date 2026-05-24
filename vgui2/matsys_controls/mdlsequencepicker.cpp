@@ -338,7 +338,7 @@ void CMDLSequencePicker::PlaySelectedSequence( )
 	for (int i = 0; i < pstudiohdr->GetNumSeq(); i++)
 	{
 		mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( i );
-		if ( !Q_stricmp( seqdesc.pszLabel(), pSequenceName ) )
+		if ( V_strieq( seqdesc.pszLabel(), pSequenceName ) )
 		{
 			m_pMDLPreview->SetSequence( i );
 			break;

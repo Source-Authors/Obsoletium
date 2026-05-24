@@ -85,7 +85,7 @@ void CModelPanel::ApplySettings( KeyValues *inResourceData )
 	// do we have a valid "model" section in the .res file?
 	for ( KeyValues *pData = inResourceData->GetFirstSubKey() ; pData != NULL ; pData = pData->GetNextKey() )
 	{
-		if ( !Q_stricmp( pData->GetName(), "model" ) )
+		if ( V_strieq( pData->GetName(), "model" ) )
 		{
 			ParseModelInfo( pData );
 		}
@@ -136,11 +136,11 @@ void CModelPanel::ParseModelInfo( KeyValues *inResourceData )
 
 	for ( KeyValues *pData = inResourceData->GetFirstSubKey(); pData != NULL; pData = pData->GetNextKey() )
 	{
-		if ( !Q_stricmp( pData->GetName(), "animation" ) )
+		if ( V_strieq( pData->GetName(), "animation" ) )
 		{
 			OnAddAnimation( pData );
 		}
-		else if ( !Q_stricmp( pData->GetName(), "attached_model" ) )
+		else if ( V_strieq( pData->GetName(), "attached_model" ) )
 		{
 			CModelPanelAttachedModelInfo *pAttachedModelInfo = new CModelPanelAttachedModelInfo;
 
@@ -176,7 +176,7 @@ void CModelPanel::OnAddAnimation( KeyValues *pData )
 
 		for ( KeyValues *pAnimData = pData->GetFirstSubKey(); pAnimData != NULL; pAnimData = pAnimData->GetNextKey() )
 		{
-			if ( !Q_stricmp( pAnimData->GetName(), "pose_parameters" ) )
+			if ( V_strieq( pAnimData->GetName(), "pose_parameters" ) )
 			{
 				pAnimation->m_pPoseParameters = pAnimData->MakeCopy();
 			}
@@ -215,7 +215,7 @@ void CModelPanel::SetDefaultAnimation( const char *pszName )
 		{
 			if ( m_pModelInfo->m_Animations[i] && m_pModelInfo->m_Animations[i]->m_pszName )
 			{
-				if ( !Q_stricmp( m_pModelInfo->m_Animations[i]->m_pszName, pszName ) )
+				if ( V_strieq( m_pModelInfo->m_Animations[i]->m_pszName, pszName ) )
 				{
 					m_iDefaultAnimation = i;
 					return;

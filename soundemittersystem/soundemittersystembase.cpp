@@ -193,7 +193,7 @@ bool CSoundEmitterSystemBase::InternalModInit()
 
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
 		{
-			if ( !Q_stricmp( sub->GetName(), "precache_file" ) )
+			if ( V_strieq( sub->GetName(), "precache_file" ) )
 			{
 				AccumulateFileNameAndTimestampIntoChecksum( &crc, sub->GetString() );
 
@@ -201,7 +201,7 @@ bool CSoundEmitterSystemBase::InternalModInit()
 				AddSoundsFromFile( sub->GetString(), false );
 				continue;
 			}
-			else if ( !Q_stricmp( sub->GetName(), "preload_file" ) )
+			else if ( V_strieq( sub->GetName(), "preload_file" ) )
 			{
 				AccumulateFileNameAndTimestampIntoChecksum( &crc, sub->GetString() );
 
@@ -209,7 +209,7 @@ bool CSoundEmitterSystemBase::InternalModInit()
 				AddSoundsFromFile( sub->GetString(), true );
 				continue;
 			}
-			else if ( !Q_stricmp( sub->GetName(), "faceposer_file" ) )
+			else if ( V_strieq( sub->GetName(), "faceposer_file" ) )
 			{
 				// do nothing for these files; they're only used for faceposer
 				continue;
@@ -629,11 +629,11 @@ void CSoundEmitterSystemBase::LoadGlobalActors()
 				}
 
 				gender_t gender = GENDER_NONE;
-				if ( !Q_stricmp( pvkActor->GetString(), "male" ) )
+				if ( V_strieq( pvkActor->GetString(), "male" ) )
 				{
 					gender = GENDER_MALE;
 				}
-				else if (!Q_stricmp( pvkActor->GetString(), "female" ) )
+				else if (V_strieq( pvkActor->GetString(), "female" ) )
 				{
 					gender = GENDER_FEMALE;
 				}
@@ -1413,7 +1413,7 @@ CUtlSymbol CSoundEmitterSystemBase::AddWaveName( const char *name )
 void CSoundEmitterSystemBase::RenameSound( const char *soundname, const char *newname )
 {
 	// Same name?
-	if ( !Q_stricmp( soundname, newname ) )
+	if ( V_strieq( soundname, newname ) )
 	{
 		return;
 	}

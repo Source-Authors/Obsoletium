@@ -919,7 +919,7 @@ bool CDmeCombinationControlsPanel::HasDuplicateControlName( const char *pControl
 	intp nRetiredControlNameCount = retiredControlNames.Count();
 	for ( i = 0; i < nRetiredControlNameCount; ++i )
 	{
-		if ( !Q_stricmp( retiredControlNames[i], pControlName ) )
+		if ( V_strieq( retiredControlNames[i], pControlName ) )
 			break;
 	}
 	if ( i == nRetiredControlNameCount )
@@ -1354,7 +1354,7 @@ void CDmeRawControlListPanel::OnMouseDoublePressed( vgui::MouseCode code )
 	KeyValues *pKeyValues = GetItem( nEditingItem );
 	float flWrinkleValue = pKeyValues->GetFloat( "wrinkle" );
 
-	m_bIsWrinkle = !Q_stricmp( pKeyValues->GetString( "wrinkletype" ), "Wrinkle" );
+	m_bIsWrinkle = V_strieq( pKeyValues->GetString( "wrinkletype" ), "Wrinkle" );
 
 	char buf[64];
 	V_to_chars( buf, flWrinkleValue );
@@ -1505,7 +1505,7 @@ void CRawControlPickerFrame::DoModal( CDmeCombinationOperator *pCombinationOpera
 //-----------------------------------------------------------------------------
 void CRawControlPickerFrame::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "Ok" ) )
+	if ( V_strieq( pCommand, "Ok" ) )
 	{
 		KeyValues *pActionKeys = new KeyValues( "RawControlPicked" );
 		KeyValues *pControlList = pActionKeys->FindKey( "rawControls", true );
@@ -1533,7 +1533,7 @@ void CRawControlPickerFrame::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "Cancel" ) )
+	if ( V_strieq( pCommand, "Cancel" ) )
 	{
 		CloseModal();
 		return;
@@ -2132,12 +2132,12 @@ void CDmeCombinationSystemEditorFrame::SetCombinationOperator( CDmeCombinationOp
 //-----------------------------------------------------------------------------
 void CDmeCombinationSystemEditorFrame::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "Open" ) )
+	if ( V_strieq( pCommand, "Open" ) )
 	{
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "Cancel" ) )
+	if ( V_strieq( pCommand, "Cancel" ) )
 	{
 		return;
 	}

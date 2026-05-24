@@ -2681,7 +2681,7 @@ CVisGroup *CMapDoc::VisGroups_GroupForName( const char *pszName, bool bIsAuto )
 	for ( intp i = 0; i < nCount; i++ )
 	{
 		CVisGroup *pGroup = m_VisGroups->Element(i);
-		if ( !Q_stricmp( pGroup->GetName(), pszName ) && ( pGroup->IsAutoVisGroup() == bIsAuto )  )
+		if ( V_strieq( pGroup->GetName(), pszName ) && ( pGroup->IsAutoVisGroup() == bIsAuto )  )
 		{
 			return pGroup;
 		}
@@ -9100,7 +9100,7 @@ void CMapDoc::OnMapLoadportalfile(void)
 	int portalCount;
 	if (fscanf (fp,"%79s\n%i\n%i\n",szLine, &clusterCount, &portalCount) == 3)
 	{
-		if ( !Q_stricmp( szLine, "PRT1") )
+		if ( V_strieq( szLine, "PRT1") )
 		{
 			for ( int iPortal = 0; iPortal < portalCount; iPortal++ )
 			{
@@ -9259,7 +9259,7 @@ CVisGroup *CMapDoc::GetRootAutoVisGroup()
 	for ( intp i = 0; i < nVisGroupCount; ++i )
 	{
 		CVisGroup *pVisGroup = VisGroups_GetRootVisGroup(i);
-		if ( !Q_stricmp( "Auto", pVisGroup->GetName() ) )
+		if ( V_strieq( "Auto", pVisGroup->GetName() ) )
 		{
 			pFoundVisGroup = pVisGroup;
 			break;
@@ -9527,7 +9527,7 @@ void CMapDoc::AddToAutoVisGroup( CMapClass *pObject, const char *pAutoVisGroup )
 	for ( intp i = 0; i < nVisGroupCount; ++i )
 	{
 		CVisGroup *pVisGroup = pRootVisGroup->GetChild(i);
-		if ( !Q_stricmp( pAutoVisGroup, pVisGroup->GetName() ) )
+		if ( V_strieq( pAutoVisGroup, pVisGroup->GetName() ) )
 		{
 			pFoundVisGroup = pVisGroup;
 			break;
@@ -9566,7 +9566,7 @@ void CMapDoc::AddChildGroupToAutoVisGroup( CMapClass *pObject, const char *pAuto
 	for ( intp i = 0; i < nVisGroupCount; ++i )
 	{
 		CVisGroup *pVisGroup = pRootVisGroup->GetChild(i);
-		if ( !Q_stricmp( pAutoVisGroup, pVisGroup->GetName() ) )//&& pVisGroup->IsAutoVisGroup() )
+		if ( V_strieq( pAutoVisGroup, pVisGroup->GetName() ) )//&& pVisGroup->IsAutoVisGroup() )
 		{
 			pFoundVisGroup = pVisGroup;
 			break;

@@ -130,7 +130,7 @@ void CSaveDocumentQuery::PostCommand( const char *pCommand )
 //-----------------------------------------------------------------------------
 void CSaveDocumentQuery::OnCommand( char const *cmd )
 {
-	if ( !Q_stricmp( cmd, "yes" ) )
+	if ( V_strieq( cmd, "yes" ) )
 	{
 		KeyValues *kv = new KeyValues( "OnSaveFile" );
 		kv->SetString( "filename", m_szFileName );
@@ -144,7 +144,7 @@ void CSaveDocumentQuery::OnCommand( char const *cmd )
 		vgui::ivgui()->PostMessage( m_pActionSignalTarget->GetVPanel(), kv, 0 );
 		MarkForDeletion();
 	}
-	else if ( !Q_stricmp( cmd, "no" ) )
+	else if ( V_strieq( cmd, "no" ) )
 	{
 		PostCommand( "OnMarkNotDirty" );
 		if ( m_pPostSaveKeyValues )
@@ -153,7 +153,7 @@ void CSaveDocumentQuery::OnCommand( char const *cmd )
 		}
 		MarkForDeletion();
 	}
-	else if ( !Q_stricmp( cmd, "cancel" ) )
+	else if ( V_strieq( cmd, "cancel" ) )
 	{
 		PostCommand( "OnCancelSaveDocument" );
 		MarkForDeletion();

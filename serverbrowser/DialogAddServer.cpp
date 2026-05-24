@@ -150,7 +150,7 @@ void CDialogAddServer::OnCommand(const char *command)
 	
 		TestServers();
 	}
-	else if ( !Q_stricmp( command, "addselected" ) )
+	else if ( V_strieq( command, "addselected" ) )
 	{
 		if ( m_pDiscoveredGames->GetSelectedItemsCount() )
 		{

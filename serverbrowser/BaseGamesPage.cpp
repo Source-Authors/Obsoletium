@@ -1095,7 +1095,7 @@ void CBaseGamesPage::UpdateDerivedLayouts( void )
 //-----------------------------------------------------------------------------
 void CBaseGamesPage::OnTextChanged(Panel *panel, const char *text)
 {
-	if (!Q_stricmp(text, m_szComboAllText))
+	if (V_strieq(text, m_szComboAllText))
 	{
 		ComboBox *box = dynamic_cast<ComboBox *>(panel);
 		if (box)
@@ -1655,16 +1655,16 @@ void CBaseGamesPage::SetRefreshing(bool state)
 //-----------------------------------------------------------------------------
 void CBaseGamesPage::OnCommand(const char *command)
 {
-	if (!Q_stricmp(command, "Connect"))
+	if (V_strieq(command, "Connect"))
 	{
 		OnBeginConnect();
 	}
-	else if (!Q_stricmp(command, "stoprefresh"))
+	else if (V_strieq(command, "stoprefresh"))
 	{
 		// cancel the existing refresh
 		StopRefresh();
 	}
-	else if ( !Q_stricmp(command, "refresh") )
+	else if ( V_strieq(command, "refresh") )
 	{
 		if ( steamapicontext->SteamMatchmakingServers() )
 			steamapicontext->SteamMatchmakingServers()->RefreshQuery( m_hRequest );
@@ -1672,7 +1672,7 @@ void CBaseGamesPage::OnCommand(const char *command)
 		m_iServerRefreshCount = 0;
 		ClearQuickList();
 	}
-	else if (!Q_stricmp(command, "GetNewList"))
+	else if (V_strieq(command, "GetNewList"))
 	{
 		GetNewServerList();
 	}

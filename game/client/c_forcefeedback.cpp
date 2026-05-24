@@ -59,7 +59,7 @@ FORCEFEEDBACK_t ForceFeedbackEffectForName( const char *name )
 	{
 		const FFEffectInfo_t& info = g_EffectTypes[ i ];
 
-		if ( !Q_stricmp( info.name, name ) )
+		if ( V_strieq( info.name, name ) )
 			return info.effectType;
 	}
 

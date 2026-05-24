@@ -2108,17 +2108,17 @@ bool CPopulationManager::Parse( void )
 			continue;
 		}
 
-		if ( !Q_stricmp( name, "StartingCurrency" ) )
+		if ( V_strieq( name, "StartingCurrency" ) )
 		{
 			m_nStartingCurrency = data->GetInt();
 		}
-		else if ( !Q_stricmp( name, "RespawnWaveTime" ) )
+		else if ( V_strieq( name, "RespawnWaveTime" ) )
 		{
 			m_nRespawnWaveTime = data->GetInt();
 		}
-		else if ( !Q_stricmp( name, "EventPopfile" ) )
+		else if ( V_strieq( name, "EventPopfile" ) )
 		{
-			if ( !Q_stricmp( data->GetString(), "Halloween" ) )
+			if ( V_strieq( data->GetString(), "Halloween" ) )
 			{
 				m_nMvMEventPopfileType = MVM_EVENT_POPFILE_HALLOWEEN;
 			}
@@ -2127,21 +2127,21 @@ bool CPopulationManager::Parse( void )
 				m_nMvMEventPopfileType = MVM_EVENT_POPFILE_NONE;
 			}
 		}
-		else if ( !Q_stricmp( name, "FixedRespawnWaveTime" ) )
+		else if ( V_strieq( name, "FixedRespawnWaveTime" ) )
 		{
 			m_bFixedRespawnWaveTime = true;
 		}
-		else if ( !Q_stricmp( name, "AddSentryBusterWhenDamageDealtExceeds" ) )
+		else if ( V_strieq( name, "AddSentryBusterWhenDamageDealtExceeds" ) )
 		{
 			m_sentryBusterDamageDealtThreshold = data->GetInt();
 		}
-		else if ( !Q_stricmp( name, "AddSentryBusterWhenKillCountExceeds" ) )
+		else if ( V_strieq( name, "AddSentryBusterWhenKillCountExceeds" ) )
 		{
 			m_sentryBusterKillThreshold = data->GetInt();
 		}
-		else if ( !Q_stricmp( name, "CanBotsAttackWhileInSpawnRoom" ) )
+		else if ( V_strieq( name, "CanBotsAttackWhileInSpawnRoom" ) )
 		{
-			if ( !Q_stricmp( data->GetString(), "no" ) || !Q_stricmp( data->GetString(), "false" ) )
+			if ( V_strieq( data->GetString(), "no" ) || V_strieq( data->GetString(), "false" ) )
 			{
 				m_canBotsAttackWhileInSpawnRoom = false;
 			}
@@ -2150,7 +2150,7 @@ bool CPopulationManager::Parse( void )
 				m_canBotsAttackWhileInSpawnRoom = true;
 			}
 		}
-		else if ( !Q_stricmp( name, "RandomPlacement" ) )
+		else if ( V_strieq( name, "RandomPlacement" ) )
 		{
 			CRandomPlacementPopulator *randomPopulator = new CRandomPlacementPopulator( this );
 
@@ -2162,7 +2162,7 @@ bool CPopulationManager::Parse( void )
 
 			m_populatorVector.AddToTail( randomPopulator );
 		}
-		else if ( !Q_stricmp( name, "PeriodicSpawn" ) )
+		else if ( V_strieq( name, "PeriodicSpawn" ) )
 		{
 			CPeriodicSpawnPopulator *periodicPopulator = new CPeriodicSpawnPopulator( this );
 
@@ -2174,7 +2174,7 @@ bool CPopulationManager::Parse( void )
 
 			m_populatorVector.AddToTail( periodicPopulator );
 		}
-		else if ( !Q_stricmp( name, "Wave" ) )
+		else if ( V_strieq( name, "Wave" ) )
 		{
 			CWave *wave = new CWave( this );
 
@@ -2188,7 +2188,7 @@ bool CPopulationManager::Parse( void )
 			// also keep vector of wave pointers for convenience
 			m_waveVector.AddToTail( wave );
 		}
-		else if ( !Q_stricmp( name, "Mission" ) )
+		else if ( V_strieq( name, "Mission" ) )
 		{
 			CMissionPopulator *missionPopulator = new CMissionPopulator( this );
 
@@ -2200,15 +2200,15 @@ bool CPopulationManager::Parse( void )
 
 			m_populatorVector.AddToTail( missionPopulator );
 		}
-		else if ( !Q_stricmp( name, "Templates" ) )
+		else if ( V_strieq( name, "Templates" ) )
 		{
 			// handled above
 		}
-		else if ( !Q_stricmp( name, "Advanced" ) )
+		else if ( V_strieq( name, "Advanced" ) )
 		{
 			m_bAdvancedPopFile = true;
 		}
-		else if ( !Q_stricmp( name, "IsEndless" ) )
+		else if ( V_strieq( name, "IsEndless" ) )
 		{
 			m_bEndlessOn = true;
 		}

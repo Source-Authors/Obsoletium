@@ -172,7 +172,7 @@ void CSUpdateProgressBarForPage( vgui::EditablePanel* pPanel, CCSBaseAchievement
 bool CSGameSupportsAchievementTrackerForPage()
 {
     const char *pGame = Q_UnqualifiedFileName( engine->GetGameDirectory() );
-    return ( !Q_stricmp( pGame, "cstrike" ) );
+    return ( V_strieq( pGame, "cstrike" ) );
 }
 
 //////////////////////////////////////////////////////////////////////////

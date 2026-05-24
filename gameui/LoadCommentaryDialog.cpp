@@ -196,7 +196,7 @@ CLoadCommentaryDialog::CLoadCommentaryDialog(vgui::Panel *parent) : BaseClass(pa
 //-----------------------------------------------------------------------------
 void CLoadCommentaryDialog::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "loadcommentary" ) )
+	if ( V_strieq( command, "loadcommentary" ) )
 	{
 		intp itemIndex = GetSelectedItemIndex();
 		if ( m_CommentaryItems.IsValidIndex(itemIndex) )

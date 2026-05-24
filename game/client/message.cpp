@@ -743,7 +743,7 @@ void CHudMessage::MessageAdd( const char *pName )
 	{
 		for ( i = 0; i < maxHUDMessages; i++ )
 		{
-			if ( m_pMessages[ i ] && !Q_stricmp( m_pMessages[ i ]->pName, pMessage->pClearMessage ) )
+			if ( m_pMessages[ i ] && V_strieq( m_pMessages[ i ]->pName, pMessage->pClearMessage ) )
 			{
 				m_startTime[ i ] = 0.0f;
 				m_pMessages[ i ] = NULL;

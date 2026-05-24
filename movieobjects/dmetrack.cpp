@@ -248,7 +248,7 @@ CDmeClip *CDmeTrack::FindNamedClip( const char *name )
 	for ( intp i = c - 1; i >= 0; --i )
 	{
 		CDmeClip *child = m_Clips[ i ];
-		if ( child && !Q_stricmp( child->GetName(), name ) )
+		if ( child && V_strieq( child->GetName(), name ) )
 			return child;
 	}
 	return NULL;

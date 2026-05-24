@@ -461,7 +461,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 		bool printKeyHits = false;
 		const char *debugName = "";
 
-		if ( *ent_debugkeys.GetString() && !Q_stricmp(ent_debugkeys.GetString(), STRING(m_iClassname)) )
+		if ( *ent_debugkeys.GetString() && V_strieq(ent_debugkeys.GetString(), STRING(m_iClassname)) )
 		{
 			// Msg( "-- found entity of type %s\n", STRING(m_iClassname) );
 			printKeyHits = true;
@@ -471,7 +471,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 		// loop through the data description, and try and place the keys in
 		for ( datamap_t *dmap = GetDataDescMap(); dmap != NULL; dmap = dmap->baseMap )
 		{
-			if ( !printKeyHits && *ent_debugkeys.GetString() && !Q_stricmp(dmap->dataClassName, ent_debugkeys.GetString()) )
+			if ( !printKeyHits && *ent_debugkeys.GetString() && V_strieq(dmap->dataClassName, ent_debugkeys.GetString()) )
 			{
 				// Msg( "-- found class of type %s\n", dmap->dataClassName );
 				printKeyHits = true;

@@ -508,7 +508,7 @@ CON_COMMAND( status, "Display map and connection status." )
 	// Early exit for this server.
 	if ( args.ArgC() == 2 )
 	{
-		if ( !Q_stricmp( args[1], "short" ) )
+		if ( V_strieq( args[1], "short" ) )
 		{
 			for ( j=0 ; j < sv.GetClientCount() ; j++ )
 			{
@@ -741,7 +741,7 @@ CON_COMMAND( restart, "Restart the game on the same level (add setpos to jump to
 	if ( cmd_source != src_command )
 		return;
 
-	bool bRememberLocation = ( args.ArgC() == 2 && !Q_stricmp( args[1], "setpos" ) );
+	bool bRememberLocation = ( args.ArgC() == 2 && V_strieq( args[1], "setpos" ) );
 
 	Host_Disconnect(false);	// stop old game
 
@@ -774,7 +774,7 @@ CON_COMMAND( reload, "Reload the most recent saved game (add setpos to jump to c
 
 	bool remember_location = false;
 	if ( args.ArgC() == 2 && 
-		!Q_stricmp( args[1], "setpos" ) )
+		V_strieq( args[1], "setpos" ) )
 	{
 		remember_location = true;
 	}

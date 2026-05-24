@@ -3158,7 +3158,7 @@ bool CParticleSystemMgr::ReadParticleDefinitions( CUtlBuffer &buf, const char *p
 		return false;
 	}
 
-	if ( !Q_stricmp( pRoot->GetTypeString(), "DmeParticleSystemDefinition" ) )
+	if ( V_strieq( pRoot->GetTypeString(), "DmeParticleSystemDefinition" ) )
 	{
 		CParticleSystemDefinition *pDef = m_pParticleSystemDictionary->AddParticleSystem( pRoot );
 		if ( pDef && bPrecache )

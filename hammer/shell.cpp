@@ -310,7 +310,7 @@ bool CShell::EntitySetKeyValue(const char *pszCommand, const char *pszArguments)
 			CMapEntity *pEntity = m_pDoc->FindEntity(szArgs[0], x, y, z);
 			if (pEntity != NULL)
 			{
-				if ( !Q_stricmp( szArgs[4], "origin" ) )
+				if ( V_strieq( szArgs[4], "origin" ) )
 				{
 					Vector origin;
 					[[maybe_unused]] const int scanned =
@@ -321,7 +321,7 @@ bool CShell::EntitySetKeyValue(const char *pszCommand, const char *pszArguments)
 					pEntity->GetOrigin( oldOrigin );
 					pEntity->TransMove(origin - oldOrigin);
 				}
-				else if ( pEntity->IsSolidClass() && !Q_stricmp( szArgs[4], "angles" ) )
+				else if ( pEntity->IsSolidClass() && V_strieq( szArgs[4], "angles" ) )
 				{
 					QAngle angles;
 					[[maybe_unused]] const int scanned =

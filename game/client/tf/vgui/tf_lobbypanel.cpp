@@ -284,7 +284,7 @@ void CBaseLobbyPanel::FireGameEvent( IGameEvent *event )
 		return;
 
 	const char *pszEventName = event->GetName();
-	if ( !Q_stricmp( pszEventName, "party_updated" ) )
+	if ( V_strieq( pszEventName, "party_updated" ) )
 	{
 
 		CTFParty *pParty = GTFGCClientSystem()->GetParty();
@@ -326,7 +326,7 @@ void CBaseLobbyPanel::FireGameEvent( IGameEvent *event )
 		return;
 	}
 
-	if ( !Q_stricmp( pszEventName, "mm_lobby_chat" ) )
+	if ( V_strieq( pszEventName, "mm_lobby_chat" ) )
 	{
 		CSteamID steamID = SteamIDFromDecimalString( event->GetString( "steamid", "0" ) );
 
@@ -365,7 +365,7 @@ void CBaseLobbyPanel::FireGameEvent( IGameEvent *event )
 		return;
 	}
 
-	if ( !Q_stricmp( pszEventName, "mm_lobby_member_join" ) )
+	if ( V_strieq( pszEventName, "mm_lobby_member_join" ) )
 	{
 		CSteamID steamID = SteamIDFromDecimalString( event->GetString( "steamid", "0" ) );
 
@@ -405,7 +405,7 @@ void CBaseLobbyPanel::FireGameEvent( IGameEvent *event )
 		return;
 	}
 
-	if ( !Q_stricmp( pszEventName, "mm_lobby_member_leave" ) )
+	if ( V_strieq( pszEventName, "mm_lobby_member_leave" ) )
 	{
 		CSteamID steamID = SteamIDFromDecimalString( event->GetString( "steamid", "0" ) );
 		wchar_t wCharPlayerName[ 128 ];

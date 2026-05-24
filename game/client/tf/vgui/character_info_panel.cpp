@@ -582,7 +582,7 @@ void CServerNotConnectedToSteamDialog::ApplySchemeSettings( IScheme *pScheme )
 //-----------------------------------------------------------------------------
 void CServerNotConnectedToSteamDialog::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "close" ) )
+	if ( V_strieq( command, "close" ) )
 	{
 		TFModalStack()->PopModal( this );
 		SetVisible( false );
@@ -832,7 +832,7 @@ void CCheatDetectionDialog::ApplySchemeSettings( IScheme *pScheme )
 //-----------------------------------------------------------------------------
 void CCheatDetectionDialog::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "close" ) )
+	if ( V_strieq( command, "close" ) )
 	{
 		TFModalStack()->PopModal( this );
 		SetVisible( false );

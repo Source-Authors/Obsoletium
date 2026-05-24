@@ -1650,7 +1650,7 @@ EGCSQLType ETypeFromMSSQLDataType( const char *pchType )
 {
 	for( uint32 unMapping = 0; unMapping < g_cSQLTypeMapping; unMapping++ )
 	{
-		if( !Q_stricmp( pchType, g_rSQLTypeMapping[ unMapping ].m_pchTypeName ) )
+		if( V_strieq( pchType, g_rSQLTypeMapping[ unMapping ].m_pchTypeName ) )
 			return g_rSQLTypeMapping[ unMapping ].m_eType;
 	}
 	return k_EGCSQLTypeInvalid;

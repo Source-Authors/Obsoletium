@@ -336,7 +336,7 @@ static char g_pchSkipName[ 64 ];
 		{
 			if ( ParseString( pText, g_pchSkipName, sizeof( g_pchSkipName ) ) )
 			{
-				if ( !g_pchSkipName[ 0 ] || !Q_stricmp( g_pchSkipName, "0" ) )
+				if ( !g_pchSkipName[ 0 ] || V_strieq( g_pchSkipName, "0" ) )
 				{
 					gMessageParms.pClearMessage = nullptr;
 				}
@@ -606,27 +606,27 @@ void TextMessage_DemoMessageFull( const char *pszMessage, client_textmessage_t c
 
 client_textmessage_t *TextMessageGet( const char *pName )
 {
-	if (!Q_stricmp( pName, DEMO_MESSAGE ))
+	if (V_strieq( pName, DEMO_MESSAGE ))
 		return &tm_demomessage;
 
 	// HACKHACK -- add 4 "channels" of network text
-	if (!Q_stricmp( pName, NETWORK_MESSAGE1 ))
+	if (V_strieq( pName, NETWORK_MESSAGE1 ))
 		return gNetworkTextMessage;
-	if (!Q_stricmp( pName, NETWORK_MESSAGE2 ))
+	if (V_strieq( pName, NETWORK_MESSAGE2 ))
 		return gNetworkTextMessage + 1;
-	if (!Q_stricmp( pName, NETWORK_MESSAGE3 ))
+	if (V_strieq( pName, NETWORK_MESSAGE3 ))
 		return gNetworkTextMessage + 2;
-	if (!Q_stricmp( pName, NETWORK_MESSAGE4 ))
+	if (V_strieq( pName, NETWORK_MESSAGE4 ))
 		return gNetworkTextMessage + 3;
-	if (!Q_stricmp( pName, NETWORK_MESSAGE5 ))
+	if (V_strieq( pName, NETWORK_MESSAGE5 ))
 		return gNetworkTextMessage + 4;
-	if (!Q_stricmp( pName, NETWORK_MESSAGE6 ))
+	if (V_strieq( pName, NETWORK_MESSAGE6 ))
 		return gNetworkTextMessage + 5;
 
 	for ( int i = 0; i < gMessageTableCount; i++ )
 	{
 		auto &message = gMessageTable[i];
-		if ( !Q_stricmp( pName, message.pName ) )
+		if ( V_strieq( pName, message.pName ) )
 			return &message;
 	}
 

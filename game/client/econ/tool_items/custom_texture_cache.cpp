@@ -596,7 +596,7 @@ static SCustomImageCacheEntry *CustomTextureCache_FindOrAddByDigest( const char 
 	{
 
 		// Match?
-		if ( !Q_stricmp(pEntry->m_szDigestAscii, szDigestAscii) )
+		if ( V_strieq(pEntry->m_szDigestAscii, szDigestAscii) )
 		{
 
 			// Found.  Se at MRU and return it.
@@ -1029,7 +1029,7 @@ EResult CApplyCustomTextureJob::YieldingFindFileIncacheOrUploadFileToCDN()
 
 			// This *can* happen if the list file gets lost and they reuse an image.  It means we are wasting
 			// some of their cloud quota, but should be rare, and it's harmless.
-			Assert( !Q_stricmp(entryDigsetAscii, pSelectedCacheEntry->m_szDigestAscii) );
+			Assert( V_strieq(entryDigsetAscii, pSelectedCacheEntry->m_szDigestAscii) );
 			break;
 		}
 

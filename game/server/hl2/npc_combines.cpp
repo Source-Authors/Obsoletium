@@ -96,7 +96,7 @@ void CNPC_CombineS::Precache()
 {
 	const char *pModelName = STRING( GetModelName() );
 
-	if( !Q_stricmp( pModelName, "models/combine_super_soldier.mdl" ) )
+	if( V_strieq( pModelName, "models/combine_super_soldier.mdl" ) )
 	{
 		m_fIsElite = true;
 	}

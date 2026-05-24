@@ -179,7 +179,7 @@ void CGameEventEditPanel::OnTextChanged( KeyValues *params )
 //-----------------------------------------------------------------------------
 void CGameEventEditPanel::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "SendEvent" ) )
+	if ( V_strieq( pCommand, "SendEvent" ) )
 	{
 		KeyValues *pData = m_pEventCombo->GetActiveItemUserData();
 

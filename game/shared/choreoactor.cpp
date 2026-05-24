@@ -244,7 +244,7 @@ CChoreoChannel *CChoreoActor::FindChannel( const char *name )
 {
 	for ( auto *channel : m_Channels )
 	{
-		if ( !Q_stricmp( channel->GetName(), name ) )
+		if ( V_strieq( channel->GetName(), name ) )
 			return channel;
 	}
 

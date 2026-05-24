@@ -636,7 +636,7 @@ float CollateAttributeValues( const CEconItemAttributeDefinition *pAttrDef1, con
 {
 	Assert( pAttrDef1 );
 	Assert( pAttrDef2 );
-	AssertMsg2( !Q_stricmp( pAttrDef1->GetAttributeClass(), pAttrDef2->GetAttributeClass() ), "We can only collate attributes of matching definitions: mismatch between '%s' / '%s'!", pAttrDef1->GetAttributeClass(), pAttrDef2->GetAttributeClass() );
+	AssertMsg2( V_strieq( pAttrDef1->GetAttributeClass(), pAttrDef2->GetAttributeClass() ), "We can only collate attributes of matching definitions: mismatch between '%s' / '%s'!", pAttrDef1->GetAttributeClass(), pAttrDef2->GetAttributeClass() );
 	AssertMsg2( pAttrDef1->GetDescriptionFormat() == pAttrDef2->GetDescriptionFormat(), "We can only collate attributes of matching description format: mismatch between '%u' / '%u'!", pAttrDef1->GetDescriptionFormat(), pAttrDef2->GetDescriptionFormat() );
 
 	const int iAttrDescFormat = pAttrDef1->GetDescriptionFormat();

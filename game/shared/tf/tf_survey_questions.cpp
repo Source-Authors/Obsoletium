@@ -171,9 +171,9 @@ void CSurveyQuestionPanel::FireGameEvent( IGameEvent *event )
 	const char *pEventName = event->GetName();
 	
 	// They left/changed servers.  Consider the survey abandoned
-	if ( !Q_stricmp( pEventName, "client_disconnect" ) ||
-		 !Q_stricmp( pEventName, "client_beginconnect" ) ||
-		 !Q_stricmp( pEventName, "server_spawn" ) )
+	if ( V_strieq( pEventName, "client_disconnect" ) ||
+		 V_strieq( pEventName, "client_beginconnect" ) ||
+		 V_strieq( pEventName, "server_spawn" ) )
 	{
 		MarkForDeletion();
 	}

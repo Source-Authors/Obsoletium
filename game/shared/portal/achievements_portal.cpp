@@ -202,7 +202,7 @@ public:
 protected:
 	virtual void FireGameEvent( IGameEvent* event )
 	{
-		if ( !Q_stricmp( event->GetName(), "advanced_map_complete" ) )
+		if ( V_strieq( event->GetName(), "advanced_map_complete" ) )
 		{
 			if ( !IsAchieved() )
 			{
@@ -245,7 +245,7 @@ public:
 protected:
 	virtual void FireGameEvent( IGameEvent* event )
 	{
-		if ( !Q_stricmp( event->GetName(), "advanced_map_complete" ) )
+		if ( V_strieq( event->GetName(), "advanced_map_complete" ) )
 		{
 			if ( !IsAchieved() )
 			{
@@ -288,7 +288,7 @@ public:
 protected:
 	virtual void FireGameEvent( IGameEvent* event )
 	{
-		if ( !Q_stricmp( event->GetName(), "advanced_map_complete" ) )
+		if ( V_strieq( event->GetName(), "advanced_map_complete" ) )
 		{
 			if ( !IsAchieved() )
 			{
@@ -330,7 +330,7 @@ public:
 protected:
 	virtual void FireGameEvent( IGameEvent* event )
 	{
-		if ( !Q_stricmp( event->GetName(), "challenge_map_complete" ) )
+		if ( V_strieq( event->GetName(), "challenge_map_complete" ) )
 		{
 			if ( !IsAchieved() )
 			{
@@ -372,7 +372,7 @@ public:
 protected:
 	virtual void FireGameEvent( IGameEvent* event )
 	{
-		if ( !Q_stricmp( event->GetName(), "challenge_map_complete" ) )
+		if ( V_strieq( event->GetName(), "challenge_map_complete" ) )
 		{
 			if ( !IsAchieved() )
 			{
@@ -414,7 +414,7 @@ public:
 protected:
 	virtual void FireGameEvent( IGameEvent* event )
 	{
-		if ( !Q_stricmp( event->GetName(), "challenge_map_complete" ) )
+		if ( V_strieq( event->GetName(), "challenge_map_complete" ) )
 		{
 			if ( !IsAchieved() )
 			{

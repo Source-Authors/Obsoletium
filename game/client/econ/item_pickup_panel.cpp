@@ -225,28 +225,28 @@ void CItemPickupPanel::FireGameEvent( IGameEvent *event )
 //-----------------------------------------------------------------------------
 void CItemPickupPanel::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "vguicancel" ) )
+	if ( V_strieq( command, "vguicancel" ) )
 	{
 		AcknowledgeItems();
 		ShowPanel( false );
 	}
-	else if ( !Q_stricmp( command, "changeloadout" ) )
+	else if ( V_strieq( command, "changeloadout" ) )
 	{
 		AcknowledgeItems();
 		ShowPanel( false );
 		EconUI()->OpenEconUI( ECONUI_LOADOUT, true );
 	}
-	else if ( !Q_stricmp( command, "nextitem" ) )
+	else if ( V_strieq( command, "nextitem" ) )
 	{
 		m_iSelectedItem = clamp( m_iSelectedItem+1, 0, m_aItems.Count()-1 );
 		UpdateModelPanels();
 	}
-	else if ( !Q_stricmp( command, "previtem" ) )
+	else if ( V_strieq( command, "previtem" ) )
 	{
 		m_iSelectedItem = clamp( m_iSelectedItem-1, 0, m_aItems.Count()-1 );
 		UpdateModelPanels();
 	}
-	else if ( !Q_stricmp( command, "discarditem" ) )
+	else if ( V_strieq( command, "discarditem" ) )
 	{
 		// Bring up confirm dialog
 		CConfirmDeleteItemDialog *pConfirm = vgui::SETUP_PANEL( new CConfirmDeleteItemDialog( this ) );
@@ -741,7 +741,7 @@ void CItemDiscardPanel::FireGameEvent( IGameEvent *event )
 //-----------------------------------------------------------------------------
 void CItemDiscardPanel::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "vguicancel" ) )
+	if ( V_strieq( command, "vguicancel" ) )
 	{
 		ShowPanel( false );
 
@@ -755,7 +755,7 @@ void CItemDiscardPanel::OnCommand( const char *command )
 			}
 		}
 	}
-	else if ( !Q_stricmp( command, "discarditem" ) )
+	else if ( V_strieq( command, "discarditem" ) )
 	{
 		// Bring up confirm dialog
 		CConfirmDeleteItemDialog *pConfirm = vgui::SETUP_PANEL( new CConfirmDeleteItemDialog( this ) );

@@ -76,7 +76,7 @@ const char *FindMtlEntry( const char *pTgaName )
 	intp nCount = g_MtlLib.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( g_MtlLib[i].m_MtlName, pTgaName ) )
+		if ( V_strieq( g_MtlLib[i].m_MtlName, pTgaName ) )
 			return g_MtlLib[i].m_TgaName;
 	}
 	return pTgaName;

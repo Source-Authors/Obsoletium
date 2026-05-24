@@ -326,7 +326,7 @@ bool CDmeSourceDCCFilePanel::CheckForDuplicateNames( const char *pDCCObjectName,
 			if ( i == nDCCObjectSkipIndex )
 				continue;
 
-			if ( !Q_stricmp( pDCCObjectName, m_hSourceDCCFile->m_RootDCCObjects[i] ) )
+			if ( V_strieq( pDCCObjectName, m_hSourceDCCFile->m_RootDCCObjects[i] ) )
 			{
 				vgui::MessageBox *pError = new vgui::MessageBox( "#DmeSourceDCCFile_DuplicateSourceTitle", "#DmeSourceDCCFile_DuplicateSourceText", GetParent() );
 				pError->DoModal();
@@ -460,25 +460,25 @@ void CDmeSourceDCCFilePanel::OnKeyCodeTyped( vgui::KeyCode code )
 //-----------------------------------------------------------------------------
 void CDmeSourceDCCFilePanel::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "OnBrowseDCCObject" ) )
+	if ( V_strieq( pCommand, "OnBrowseDCCObject" ) )
 	{
 		OnBrowseDCCObject();
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "OnAddDCCObject" ) )
+	if ( V_strieq( pCommand, "OnAddDCCObject" ) )
 	{
 		OnAddDCCObject();
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "OnRemoveDCCObject" ) )
+	if ( V_strieq( pCommand, "OnRemoveDCCObject" ) )
 	{
 		OnRemoveDCCObject();
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "OnApplyChanges" ) )
+	if ( V_strieq( pCommand, "OnApplyChanges" ) )
 	{
 		OnDCCObjectNameChanged();
 		return;

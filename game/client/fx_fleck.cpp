@@ -105,7 +105,7 @@ public:
 	bool MergeParticleSystems( PARTICLE_EFFECT *pSystem, const char *pEffectName, const Vector &center, const Vector &extents )
 	{
 		// by default, match names
-		if ( !Q_stricmp(pSystem->GetEffectName(), pEffectName) )
+		if ( V_strieq(pSystem->GetEffectName(), pEffectName) )
 		{
 			Vector mins, maxs;
 			pSystem->GetBinding().GetWorldspaceBounds( &mins, &maxs );

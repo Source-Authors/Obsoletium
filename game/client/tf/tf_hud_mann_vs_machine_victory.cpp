@@ -1458,7 +1458,7 @@ void CMvMVictoryMannUpPlayerTab::SetSelected( bool bState )
 
 void CMvMVictoryMannUpPlayerTab::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "switch_tab" ) )
+	if ( V_strieq( command, "switch_tab" ) )
 	{
 		Panel* pParent = GetParent();
 		if ( pParent )
@@ -1468,7 +1468,7 @@ void CMvMVictoryMannUpPlayerTab::OnCommand( const char *command )
 
 		return;
 	}
-	else if ( !Q_stricmp( command, "highlight_on" ) )
+	else if ( V_strieq( command, "highlight_on" ) )
 	{
 		// Active tab doesnt highlight
 		if ( m_bIsActive )
@@ -1479,7 +1479,7 @@ void CMvMVictoryMannUpPlayerTab::OnCommand( const char *command )
 			m_pMouseoverHighlightPanel->SetVisible( true );
 		}
 	}
-	else if ( !Q_stricmp( command, "highlight_off" ) )
+	else if ( V_strieq( command, "highlight_off" ) )
 	{
 		// Active tab doesnt highlight
 		if ( m_bIsActive )
@@ -1904,7 +1904,7 @@ void CMvMVictoryPanelContainer::OnTick( void )
 //-----------------------------------------------------------------------------
 void CMvMVictoryPanelContainer::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "done" ) )
+	if ( V_strieq( command, "done" ) )
 	{
 		SetMouseInputEnabled( false );
 		m_pVictoryPanelNormal->SetVisible( false );

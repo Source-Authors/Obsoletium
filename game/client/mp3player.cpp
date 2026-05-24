@@ -257,7 +257,7 @@ void CMP3FileListPage::OnOpenContextMenu( int itemID )
 
 void CMP3FileListPage::OnCommand( char const *cmd )
 {
-	if ( !Q_stricmp( cmd, "addsong" ) )
+	if ( V_strieq( cmd, "addsong" ) )
 	{
 		// Get selected item
 		intp c = m_pList->GetSelectedItemsCount();
@@ -435,7 +435,7 @@ void CMP3PlayListPage::OnOpenContextMenu( int itemID )
 
 void CMP3PlayListPage::OnCommand( char const *cmd )
 {
-	if ( !Q_stricmp( cmd, "removesong" ) )
+	if ( V_strieq( cmd, "removesong" ) )
 	{
 		// Get selected item
 		intp c = m_pList->GetSelectedItemsCount();
@@ -450,19 +450,19 @@ void CMP3PlayListPage::OnCommand( char const *cmd )
 			}
 		}
 	}
-	else if ( !Q_stricmp( cmd, "clear" ) )
+	else if ( V_strieq( cmd, "clear" ) )
 	{
 		m_pPlayer->ClearPlayList();
 	}
-	else if ( !Q_stricmp( cmd, "load" ) )
+	else if ( V_strieq( cmd, "load" ) )
 	{
 		m_pPlayer->OnLoadPlayList();
 	}
-	else if ( !Q_stricmp( cmd, "save" ) )
+	else if ( V_strieq( cmd, "save" ) )
 	{
 		m_pPlayer->OnSavePlayList();
 	}
-	else if ( !Q_stricmp( cmd, "saveas" ) )
+	else if ( V_strieq( cmd, "saveas" ) )
 	{
 		m_pPlayer->OnSavePlayListAs();
 	}
@@ -619,7 +619,7 @@ void CMP3TreeControl::OpenContextMenu()
 
 void CMP3TreeControl::OnCommand( char const *cmd )
 {
-	if ( !Q_stricmp( cmd, "addsong" ) )
+	if ( V_strieq( cmd, "addsong" ) )
 	{
 		// Get selected item
 		intp songIndex = GetSelectedSongIndex();
@@ -628,7 +628,7 @@ void CMP3TreeControl::OnCommand( char const *cmd )
 			m_pPlayer->AddToPlayList( songIndex, false );
 		}
 	}
-	else if ( !Q_stricmp( cmd, "playsong" ) )
+	else if ( V_strieq( cmd, "playsong" ) )
 	{
 		intp songIndex = GetSelectedSongIndex();
 		if ( songIndex >= 0 )
@@ -806,7 +806,7 @@ void CMP3Player::RemoveTempSounds()
 				char ext[ 10 ];
 				V_ExtractFileExtension( fn, ext );
 
-				if ( !Q_stricmp( ext, "mp3" ) )
+				if ( V_strieq( ext, "mp3" ) )
 				{
 					char killname[ 512 ];
 					V_sprintf_safe( killname, "sound/_mp3/%s", fn );
@@ -980,35 +980,35 @@ void CMP3Player::ApplySchemeSettings(IScheme *pScheme)
 
 void CMP3Player::OnCommand( char const *cmd )
 {
-	if ( !Q_stricmp( cmd, "OnClose" ) )
+	if ( V_strieq( cmd, "OnClose" ) )
 	{
 		SetVisible( false );
 	}
-	else if ( !Q_stricmp( cmd, "play" ) )
+	else if ( V_strieq( cmd, "play" ) )
 	{
 		OnPlay();
 	}
-	else if ( !Q_stricmp( cmd, "stop" ) )
+	else if ( V_strieq( cmd, "stop" ) )
 	{
 		OnStop();
 	}
-	else if ( !Q_stricmp( cmd, "nexttrack" ) )
+	else if ( V_strieq( cmd, "nexttrack" ) )
 	{
 		OnNextTrack();
 	}
-	else if ( !Q_stricmp( cmd, "prevtrack" ) )
+	else if ( V_strieq( cmd, "prevtrack" ) )
 	{
 		OnPrevTrack();
 	}
-	else if ( !Q_stricmp( cmd, "refresh" ) )
+	else if ( V_strieq( cmd, "refresh" ) )
 	{
 		OnRefresh();
 	}
-	else if ( !Q_stricmp( cmd, "adddirectory" ) )
+	else if ( V_strieq( cmd, "adddirectory" ) )
 	{
 		ShowDirectorySelectDialog();
 	}
-	else if ( !Q_stricmp( cmd, "addgamesongs" ) )
+	else if ( V_strieq( cmd, "addgamesongs" ) )
 	{
 		AddGameSounds( true );
 		PopulateTree();
@@ -1043,7 +1043,7 @@ MP3Dir_t *CMP3Player::FindOrAddSubdirectory( MP3Dir_t *parent, char const *dirna
 	for ( intp i = 0; i < c; ++i )
 	{
 		MP3Dir_t *sub = parent->m_Subdirectories[ i ];
-		if ( !Q_stricmp( sub->m_DirName.String(), dirname ) )
+		if ( V_strieq( sub->m_DirName.String(), dirname ) )
 		{
 			return sub;
 		}
@@ -1145,7 +1145,7 @@ void CMP3Player::RecursiveFindMP3Files( SoundDirectory_t *root, char const *curr
 					char ext[ 10 ];
 					V_ExtractFileExtension( fn, ext );
 
-					if ( !Q_stricmp( ext, "mp3" ) )
+					if ( V_strieq( ext, "mp3" ) )
 					{
 						char relative[ 512 ];
 						if ( root->m_bGameSound )
@@ -1844,27 +1844,27 @@ void CMP3Player::RestoreDirectory( KeyValues *dir, SoundDirectory_t *sd )
 {
 	for ( KeyValues *kv = dir->GetFirstSubKey(); kv; kv = kv->GetNextKey() )
 	{
-		if ( !Q_stricmp( kv->GetName(), "name" ) )
+		if ( V_strieq( kv->GetName(), "name" ) )
 		{
 			sd->m_Root = kv->GetString();
 		}
-		else if ( !Q_stricmp( kv->GetName(), "gamesounds" ) )
+		else if ( V_strieq( kv->GetName(), "gamesounds" ) )
 		{
 			sd->m_bGameSound = kv->GetInt() ? true : false;
 		}
-		else if ( !Q_stricmp( kv->GetName(), "dirname" ) )
+		else if ( V_strieq( kv->GetName(), "dirname" ) )
 		{
 			sd->m_pTree->m_DirName = kv->GetString();
 		}
-		else if ( !Q_stricmp( kv->GetName(), "fullpath" ) )
+		else if ( V_strieq( kv->GetName(), "fullpath" ) )
 		{
 			sd->m_pTree->m_FullDirPath = kv->GetString();
 		}
-		else if ( !Q_stricmp( kv->GetName(), "files" ) )
+		else if ( V_strieq( kv->GetName(), "files" ) )
 		{
 			for ( KeyValues *f = kv->GetFirstSubKey(); f != NULL; f = f->GetNextKey() )
 			{
-				if ( !Q_stricmp( f->GetName(), "file" ) )
+				if ( V_strieq( f->GetName(), "file" ) )
 				{
 					int songIndex = f->GetInt();
 					if ( songIndex >= 0 && songIndex < m_Files.Count() )
@@ -1915,11 +1915,11 @@ bool CMP3Player::RestoreDb( char const *filename )
 
 	KeyValues *songs = kv;
 
-	Assert( !Q_stricmp( songs->GetName(), "songs" ) );
+	Assert( V_strieq( songs->GetName(), "songs" ) );
 	RestoreSongs( songs );
 
 	KeyValues *dirs = songs->GetNextKey();
-	Assert( !Q_stricmp( dirs->GetName(), "directories" ) );
+	Assert( V_strieq( dirs->GetName(), "directories" ) );
 	RestoreDirectories( dirs );
 
 	return true;
@@ -2105,7 +2105,7 @@ void CMP3Player::LoadPlayList( char const *filename )
 
 	for ( KeyValues *song = kv->GetFirstSubKey(); song != NULL; song = song->GetNextKey() )
 	{
-		if ( !Q_stricmp( song->GetName(), "song" ) )
+		if ( V_strieq( song->GetName(), "song" ) )
 		{
 			char const *songname = song->GetString( "relativepath" );
 			if ( !songname || !songname[ 0 ] )

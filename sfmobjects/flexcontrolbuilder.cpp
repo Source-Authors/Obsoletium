@@ -152,7 +152,7 @@ intp CFlexControlBuilder::FindDesiredFlexController( const char *pFlexController
 	intp nCount = m_FlexControllerInfo.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( pFlexControllerName, m_FlexControllerInfo[i].m_pFlexControlName ) )
+		if ( V_strieq( pFlexControllerName, m_FlexControllerInfo[i].m_pFlexControlName ) )
 			return i;
 	}
 	return -1;
@@ -398,11 +398,11 @@ void CFlexControlBuilder::GetExistingVBLog( ExistingLogInfo_t *pLogs, CDmeFilmCl
 
 		const char *pToAttributeName = pChannel->GetToAttribute()->GetName();
 		int nLogIndex = -1;
-		if ( !Q_stricmp( pToAttributeName, "value" ) )
+		if ( V_strieq( pToAttributeName, "value" ) )
 		{
 			nLogIndex = CONTROL_VALUE;
 		}
-		else if ( !Q_stricmp( pToAttributeName, "balance" ) )
+		else if ( V_strieq( pToAttributeName, "balance" ) )
 		{
 			nLogIndex = CONTROL_BALANCE;
 		}

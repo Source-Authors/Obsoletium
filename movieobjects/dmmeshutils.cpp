@@ -686,25 +686,25 @@ bool CDmMeshUtils::Mirror( CDmeMesh *pMesh, int axis /*= kXAxis */ )
 		{
 			CUtlString materialName;
 
-			if ( !Q_stricmp( pSrcMaterialName + nNameLen - 2, "_l" ) )
+			if ( V_strieq( pSrcMaterialName + nNameLen - 2, "_l" ) )
 			{
 				materialName = pSrcMaterialName;
 				materialName.SetLength( nNameLen - 2 );
 				materialName += "_r";
 			}
-			else if ( !Q_stricmp( pSrcMaterialName + nNameLen - 2, "_r" ) )
+			else if ( V_strieq( pSrcMaterialName + nNameLen - 2, "_r" ) )
 			{
 				materialName = pSrcMaterialName;
 				materialName.SetLength( nNameLen - 2 );
 				materialName += "_l";
 			}
-			else if ( nNameLen >= 5 && !Q_stricmp( pSrcMaterialName + nNameLen - 5, "_left" ) )
+			else if ( nNameLen >= 5 && V_strieq( pSrcMaterialName + nNameLen - 5, "_left" ) )
 			{
 				materialName = pSrcMaterialName;
 				materialName.SetLength( nNameLen - 5 );
 				materialName += "_right";
 			}
-			else if ( nNameLen >= 6 && !Q_stricmp( pSrcMaterialName + nNameLen - 6, "_right" ) )
+			else if ( nNameLen >= 6 && V_strieq( pSrcMaterialName + nNameLen - 6, "_right" ) )
 			{
 				materialName = pSrcMaterialName;
 				materialName.SetLength( nNameLen - 6 );
@@ -1235,7 +1235,7 @@ bool CDmMeshUtils::RemapMaterial( CDmeMesh *pMesh, const CUtlString &src, const 
 		Q_FixSlashes( matName, '/' );
 
 		// TODO: Regular expressions or at least glob style matching would be cool
-		if ( !Q_stricmp( srcName, matName ) )
+		if ( V_strieq( srcName, matName ) )
 		{
 			pMaterial->SetMaterial( dstName );
 			pMaterial->SetName( dstName );

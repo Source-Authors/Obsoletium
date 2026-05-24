@@ -66,7 +66,7 @@ EEconItemQuality EconQuality_GetQualityFromString( const char* pszQuality )
 		CUtlString strLoweredQuality( g_szQualityStrings[i] );
 		strLoweredQuality.ToLower();
 
-		if( !Q_stricmp( strLoweredInput.Get(), strLoweredQuality.Get() ) )
+		if( V_strieq( strLoweredInput.Get(), strLoweredQuality.Get() ) )
 			return EEconItemQuality(i);
 	}
 

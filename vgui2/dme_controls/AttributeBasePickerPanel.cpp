@@ -30,7 +30,7 @@ CAttributeBasePickerPanel::CAttributeBasePickerPanel( vgui::Panel *parent, const
 
 void CAttributeBasePickerPanel::OnCommand( char const *cmd )
 {
-	if ( !Q_stricmp( cmd, "open" ) )
+	if ( V_strieq( cmd, "open" ) )
 	{
 		ShowPickerDialog();
 	}

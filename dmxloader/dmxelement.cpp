@@ -193,7 +193,7 @@ void CDmxElement::RenameAttribute( const char *pAttributeName, const char *pNewN
 	CDmxElementModifyScope modify( this );
 
 	// No change...
-	if ( !Q_stricmp( pAttributeName, pNewName ) )
+	if ( V_strieq( pAttributeName, pNewName ) )
 		return;
 
 	intp idx = FindAttribute( pAttributeName );

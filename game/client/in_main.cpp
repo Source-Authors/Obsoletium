@@ -267,7 +267,7 @@ kbutton_t *CInput::FindKey( const char *name )
 	p = m_pKeys;
 	while ( p )
 	{
-		if ( !Q_stricmp( name, p->name ) )
+		if ( V_strieq( name, p->name ) )
 		{
 			return p->pkey;
 		}

@@ -151,7 +151,7 @@ void CDODTextWindow::ApplySchemeSettings( vgui::IScheme *pScheme )
 //-----------------------------------------------------------------------------
 Panel *CDODTextWindow::CreateControlByName( const char *controlName )
 {
-	if( !Q_stricmp( "DODButton", controlName ) )
+	if( V_strieq( "DODButton", controlName ) )
 	{
 		return new CDODButton(this);
 	}

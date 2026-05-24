@@ -168,52 +168,52 @@ void CVPhysicsParse::ParseSolid( solid_t *pSolid, IVPhysicsKeyHandler *unknownKe
 			return;
 		}
 
-		if ( !Q_stricmp( key, "index" ) )
+		if ( V_strieq( key, "index" ) )
 		{
 			pSolid->index = atoi(value);
 		}
-		else if ( !Q_stricmp( key, "name" ) )
+		else if ( V_strieq( key, "name" ) )
 		{
 			Q_strncpy( pSolid->name, value, sizeof(pSolid->name) );
 		}
-		else if ( !Q_stricmp( key, "parent" ) )
+		else if ( V_strieq( key, "parent" ) )
 		{
 			Q_strncpy( pSolid->parent, value, sizeof(pSolid->parent) );
 		}
-		else if ( !Q_stricmp( key, "surfaceprop" ) )
+		else if ( V_strieq( key, "surfaceprop" ) )
 		{
 			Q_strncpy( pSolid->surfaceprop, value, sizeof(pSolid->surfaceprop) );
 		}
-		else if ( !Q_stricmp( key, "mass" ) )
+		else if ( V_strieq( key, "mass" ) )
 		{
 			pSolid->params.mass = strtof(value, nullptr);
 		}
-		else if ( !Q_stricmp( key, "massCenterOverride" ) )
+		else if ( V_strieq( key, "massCenterOverride" ) )
 		{
 			ReadVector( value, pSolid->massCenterOverride );
 			pSolid->params.massCenterOverride = &pSolid->massCenterOverride;
 		}
-		else if ( !Q_stricmp( key, "inertia" ) )
+		else if ( V_strieq( key, "inertia" ) )
 		{
 			pSolid->params.inertia = strtof(value, nullptr);
 		}
-		else if ( !Q_stricmp( key, "damping" ) )
+		else if ( V_strieq( key, "damping" ) )
 		{
 			pSolid->params.damping = strtof(value, nullptr);
 		}
-		else if ( !Q_stricmp( key, "rotdamping" ) )
+		else if ( V_strieq( key, "rotdamping" ) )
 		{
 			pSolid->params.rotdamping = strtof(value, nullptr);
 		}
-		else if ( !Q_stricmp( key, "volume" ) )
+		else if ( V_strieq( key, "volume" ) )
 		{
 			pSolid->params.volume = strtof(value, nullptr);
 		}
-		else if ( !Q_stricmp( key, "drag" ) )
+		else if ( V_strieq( key, "drag" ) )
 		{
 			pSolid->params.dragCoefficient = strtof(value, nullptr);
 		}
-		else if ( !Q_stricmp( key, "rollingdrag" ) )
+		else if ( V_strieq( key, "rollingdrag" ) )
 		{
 			AssertMsg( false, "Solid '%s' rolling drag is not implemented.", pSolid->name );
 			//pSolid->params.rollingDrag = strtof(value, nullptr);
@@ -264,49 +264,49 @@ void CVPhysicsParse::ParseRagdollConstraint( constraint_ragdollparams_t *pConstr
 			return;
 		}
 
-		if ( !Q_stricmp( key, "parent" ) )
+		if ( V_strieq( key, "parent" ) )
 		{
 			pConstraint->parentIndex = atoi( value );
 		}
-		else if ( !Q_stricmp( key, "child" ) )
+		else if ( V_strieq( key, "child" ) )
 		{
 			pConstraint->childIndex = atoi( value );
 		}
-		else if ( !Q_stricmp( key, "xmin" ) )
+		else if ( V_strieq( key, "xmin" ) )
 		{
 			pConstraint->axes[0].minRotation = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "xmax" ) )
+		else if ( V_strieq( key, "xmax" ) )
 		{
 			pConstraint->axes[0].maxRotation = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "xfriction" ) )
+		else if ( V_strieq( key, "xfriction" ) )
 		{
 			pConstraint->axes[0].angularVelocity = 0;
 			pConstraint->axes[0].torque = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "ymin" ) )
+		else if ( V_strieq( key, "ymin" ) )
 		{
 			pConstraint->axes[1].minRotation = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "ymax" ) )
+		else if ( V_strieq( key, "ymax" ) )
 		{
 			pConstraint->axes[1].maxRotation = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "yfriction" ) )
+		else if ( V_strieq( key, "yfriction" ) )
 		{
 			pConstraint->axes[1].angularVelocity = 0;
 			pConstraint->axes[1].torque = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "zmin" ) )
+		else if ( V_strieq( key, "zmin" ) )
 		{
 			pConstraint->axes[2].minRotation = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "zmax" ) )
+		else if ( V_strieq( key, "zmax" ) )
 		{
 			pConstraint->axes[2].maxRotation = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "zfriction" ) )
+		else if ( V_strieq( key, "zfriction" ) )
 		{
 			pConstraint->axes[2].angularVelocity = 0;
 			pConstraint->axes[2].torque = strtof( value, nullptr );
@@ -355,27 +355,27 @@ void CVPhysicsParse::ParseFluid( fluid_t *pFluid, IVPhysicsKeyHandler *unknownKe
 			return;
 		}
 
-		if ( !Q_stricmp( key, "index" ) )
+		if ( V_strieq( key, "index" ) )
 		{
 			pFluid->index = atoi( value );
 		}
-		else if ( !Q_stricmp( key, "damping" ) )
+		else if ( V_strieq( key, "damping" ) )
 		{
 			pFluid->params.damping = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "surfaceplane" ) )
+		else if ( V_strieq( key, "surfaceplane" ) )
 		{
 			ReadVector4D( value, pFluid->params.surfacePlane );
 		}
-		else if ( !Q_stricmp( key, "currentvelocity" ) )
+		else if ( V_strieq( key, "currentvelocity" ) )
 		{
 			ReadVector( value, pFluid->params.currentVelocity );
 		}
-		else if ( !Q_stricmp( key, "contents" ) )
+		else if ( V_strieq( key, "contents" ) )
 		{
 			pFluid->params.contents = atoi( value );
 		}
-		else if ( !Q_stricmp( key, "surfaceprop" ) )
+		else if ( V_strieq( key, "surfaceprop" ) )
 		{
 			V_strcpy_safe( pFluid->surfaceprop, value );
 		}
@@ -463,11 +463,11 @@ void CVPhysicsParse::ParseVehicleAxle( vehicle_axleparams_t &axle )
 		// parse subchunks
 		if ( value[0] == '{' )
 		{
-			if ( !Q_stricmp( key, "wheel" ) )
+			if ( V_strieq( key, "wheel" ) )
 			{
 				ParseVehicleWheel( axle.wheels );
 			}
-			else if ( !Q_stricmp( key, "suspension" ) )
+			else if ( V_strieq( key, "suspension" ) )
 			{
 				ParseVehicleSuspension( axle.suspension );
 			}
@@ -476,19 +476,19 @@ void CVPhysicsParse::ParseVehicleAxle( vehicle_axleparams_t &axle )
 				SkipBlock();
 			}
 		}
-		else if ( !Q_stricmp( key, "offset" ) )
+		else if ( V_strieq( key, "offset" ) )
 		{
 			ReadVector( value, axle.offset );
 		}
-		else if ( !Q_stricmp( key, "wheeloffset" ) )
+		else if ( V_strieq( key, "wheeloffset" ) )
 		{
 			ReadVector( value, axle.wheelOffset );
 		}
-		else if ( !Q_stricmp( key, "torquefactor" ) )
+		else if ( V_strieq( key, "torquefactor" ) )
 		{
 			axle.torqueFactor = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "brakefactor" ) )
+		else if ( V_strieq( key, "brakefactor" ) )
 		{
 			axle.brakeFactor = strtof( value, nullptr );
 		}
@@ -513,39 +513,39 @@ void CVPhysicsParse::ParseVehicleWheel( vehicle_wheelparams_t &wheel )
 		if ( key[0] == '}' )
 			return;
 		
-		if ( !Q_stricmp( key, "radius" ) )
+		if ( V_strieq( key, "radius" ) )
 		{
 			wheel.radius = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "mass" ) )
+		else if ( V_strieq( key, "mass" ) )
 		{
 			wheel.mass = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "inertia" ) )
+		else if ( V_strieq( key, "inertia" ) )
 		{
 			wheel.inertia = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "damping" ) )
+		else if ( V_strieq( key, "damping" ) )
 		{
 			wheel.damping = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "rotdamping" ) )
+		else if ( V_strieq( key, "rotdamping" ) )
 		{
 			wheel.rotdamping = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "frictionscale" ) )
+		else if ( V_strieq( key, "frictionscale" ) )
 		{
 			wheel.frictionScale = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "material" ) )
+		else if ( V_strieq( key, "material" ) )
 		{
 			wheel.materialIndex = physprops->GetSurfaceIndex( value );
 		}
-		else if ( !Q_stricmp( key, "skidmaterial" ) )
+		else if ( V_strieq( key, "skidmaterial" ) )
 		{
 			wheel.skidMaterialIndex = physprops->GetSurfaceIndex( value );
 		}
-		else if ( !Q_stricmp( key, "brakematerial" ) )
+		else if ( V_strieq( key, "brakematerial" ) )
 		{
 			wheel.brakeMaterialIndex = physprops->GetSurfaceIndex( value );
 		}
@@ -570,23 +570,23 @@ void CVPhysicsParse::ParseVehicleSuspension( vehicle_suspensionparams_t &suspens
 		if ( key[0] == '}' )
 			return;
 		
-		if ( !Q_stricmp( key, "springconstant" ) )
+		if ( V_strieq( key, "springconstant" ) )
 		{
 			suspension.springConstant = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "springdamping" ) )
+		else if ( V_strieq( key, "springdamping" ) )
 		{
 			suspension.springDamping = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "stabilizerconstant" ) )
+		else if ( V_strieq( key, "stabilizerconstant" ) )
 		{
 			suspension.stabilizerConstant = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "springdampingcompression" ) )
+		else if ( V_strieq( key, "springdampingcompression" ) )
 		{
 			suspension.springDampingCompression = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "maxbodyforce" ) )
+		else if ( V_strieq( key, "maxbodyforce" ) )
 		{
 			suspension.maxBodyForce = strtof( value, nullptr );
 		}
@@ -611,35 +611,35 @@ void CVPhysicsParse::ParseVehicleBody( vehicle_bodyparams_t &body )
 		if ( key[0] == '}' )
 			return;
 		
-		if ( !Q_stricmp( key, "massCenterOverride" ) )
+		if ( V_strieq( key, "massCenterOverride" ) )
 		{
 			ReadVector( value, body.massCenterOverride );
 		}
-		else if ( !Q_stricmp( key, "addgravity" ) )
+		else if ( V_strieq( key, "addgravity" ) )
 		{
 			body.addGravity = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "maxAngularVelocity" ) )
+		else if ( V_strieq( key, "maxAngularVelocity" ) )
 		{
 			body.maxAngularVelocity = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "massOverride" ) )
+		else if ( V_strieq( key, "massOverride" ) )
 		{
 			body.massOverride = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "tiltforce" ) )
+		else if ( V_strieq( key, "tiltforce" ) )
 		{
 			body.tiltForce = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "tiltforceheight" ) )
+		else if ( V_strieq( key, "tiltforceheight" ) )
 		{
 			body.tiltForceHeight = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "countertorquefactor" ) )
+		else if ( V_strieq( key, "countertorquefactor" ) )
 		{
 			body.counterTorqueFactor = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "keepuprighttorque" ) )
+		else if ( V_strieq( key, "keepuprighttorque" ) )
 		{
 			body.keepUprightTorque = strtof( value, nullptr );
 		}
@@ -665,23 +665,23 @@ void CVPhysicsParse::ParseVehicleEngineBoost( vehicle_engineparams_t &engine )
 			return;
 
 		// parse subchunks
-		if ( !Q_stricmp( key, "force" ) )
+		if ( V_strieq( key, "force" ) )
 		{
 			engine.boostForce = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "duration" ) )
+		else if ( V_strieq( key, "duration" ) )
 		{
 			engine.boostDuration = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "delay" ) )
+		else if ( V_strieq( key, "delay" ) )
 		{
 			engine.boostDelay = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "maxspeed" ) )
+		else if ( V_strieq( key, "maxspeed" ) )
 		{
 			engine.boostMaxSpeed = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "torqueboost" ) )
+		else if ( V_strieq( key, "torqueboost" ) )
 		{
 			engine.torqueBoost = atoi( value ) != 0 ? true : false;
 		}
@@ -708,7 +708,7 @@ void CVPhysicsParse::ParseVehicleEngine( vehicle_engineparams_t &engine )
 		// parse subchunks
 		if ( value[0] == '{' )
 		{
-			if ( !Q_stricmp( key, "boost" ) )
+			if ( V_strieq( key, "boost" ) )
 			{
 				ParseVehicleEngineBoost( engine );
 			}
@@ -717,7 +717,7 @@ void CVPhysicsParse::ParseVehicleEngine( vehicle_engineparams_t &engine )
 				SkipBlock();
 			}
 		}
-		else if ( !Q_stricmp( key, "gear" ) )
+		else if ( V_strieq( key, "gear" ) )
 		{
 			// Protect against exploits/overruns
 			if ( engine.gearCount < ssize(engine.gearRatio) )
@@ -733,47 +733,47 @@ void CVPhysicsParse::ParseVehicleEngine( vehicle_engineparams_t &engine )
 					engine.gearCount + 1, ssize(engine.gearRatio), key, value );
 			}
 		}
-		else if ( !Q_stricmp( key, "horsepower" ) )
+		else if ( V_strieq( key, "horsepower" ) )
 		{
 			engine.horsepower = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "maxSpeed" ) )
+		else if ( V_strieq( key, "maxSpeed" ) )
 		{
 			engine.maxSpeed = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "maxReverseSpeed" ) )
+		else if ( V_strieq( key, "maxReverseSpeed" ) )
 		{
 			engine.maxRevSpeed = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "axleratio" ) )
+		else if ( V_strieq( key, "axleratio" ) )
 		{
 			engine.axleRatio = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "maxRPM" ) )
+		else if ( V_strieq( key, "maxRPM" ) )
 		{
 			engine.maxRPM = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "throttleTime" ) )
+		else if ( V_strieq( key, "throttleTime" ) )
 		{
 			engine.throttleTime = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "AutoTransmission" ) )
+		else if ( V_strieq( key, "AutoTransmission" ) )
 		{
 			engine.isAutoTransmission = atoi( value ) != 0 ? true : false;
 		}
-		else if ( !Q_stricmp( key, "shiftUpRPM" ) )
+		else if ( V_strieq( key, "shiftUpRPM" ) )
 		{
 			engine.shiftUpRPM = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "shiftDownRPM" ) )
+		else if ( V_strieq( key, "shiftDownRPM" ) )
 		{
 			engine.shiftDownRPM = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "autobrakeSpeedGain" ) )
+		else if ( V_strieq( key, "autobrakeSpeedGain" ) )
 		{
 			engine.autobrakeSpeedGain = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "autobrakeSpeedFactor" ) )
+		else if ( V_strieq( key, "autobrakeSpeedFactor" ) )
 		{
 			engine.autobrakeSpeedFactor = strtof( value, nullptr );
 		}
@@ -799,79 +799,79 @@ void CVPhysicsParse::ParseVehicleSteering( vehicle_steeringparams_t &steering )
 			return;
 
 		// parse subchunks
-		if ( !Q_stricmp( key, "degreesSlow" ) )
+		if ( V_strieq( key, "degreesSlow" ) )
 		{
 			steering.degreesSlow = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "degreesFast" ) )
+		else if ( V_strieq( key, "degreesFast" ) )
 		{
 			steering.degreesFast = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "degreesBoost" ) )
+		else if ( V_strieq( key, "degreesBoost" ) )
 		{
 			steering.degreesBoost = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "fastcarspeed" ) )
+		else if ( V_strieq( key, "fastcarspeed" ) )
 		{
 			steering.speedFast = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "slowcarspeed" ) )
+		else if ( V_strieq( key, "slowcarspeed" ) )
 		{
 			steering.speedSlow = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "slowsteeringrate" ) )
+		else if ( V_strieq( key, "slowsteeringrate" ) )
 		{
 			steering.steeringRateSlow = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "faststeeringrate" ) )
+		else if ( V_strieq( key, "faststeeringrate" ) )
 		{
 			steering.steeringRateFast = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "steeringRestRateSlow" ) )
+		else if ( V_strieq( key, "steeringRestRateSlow" ) )
 		{
 			steering.steeringRestRateSlow = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "steeringRestRateFast" ) )
+		else if ( V_strieq( key, "steeringRestRateFast" ) )
 		{
 			steering.steeringRestRateFast = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "throttleSteeringRestRateFactor" ) )
+		else if ( V_strieq( key, "throttleSteeringRestRateFactor" ) )
 		{
 			steering.throttleSteeringRestRateFactor = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "boostSteeringRestRateFactor" ) )
+		else if ( V_strieq( key, "boostSteeringRestRateFactor" ) )
 		{
 			steering.boostSteeringRestRateFactor = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "boostSteeringRateFactor" ) )
+		else if ( V_strieq( key, "boostSteeringRateFactor" ) )
 		{
 			steering.boostSteeringRateFactor = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "steeringExponent" ) )
+		else if ( V_strieq( key, "steeringExponent" ) )
 		{
 			steering.steeringExponent = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "turnThrottleReduceSlow" ) )
+		else if ( V_strieq( key, "turnThrottleReduceSlow" ) )
 		{
 			steering.turnThrottleReduceSlow = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "turnThrottleReduceFast" ) )
+		else if ( V_strieq( key, "turnThrottleReduceFast" ) )
 		{
 			steering.turnThrottleReduceFast = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "brakeSteeringRateFactor" ) )
+		else if ( V_strieq( key, "brakeSteeringRateFactor" ) )
 		{
 			steering.brakeSteeringRateFactor = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "powerSlideAccel" ) )
+		else if ( V_strieq( key, "powerSlideAccel" ) )
 		{
 			steering.powerSlideAccel = strtof( value, nullptr );
 		}
-		else if ( !Q_stricmp( key, "skidallowed" ) )
+		else if ( V_strieq( key, "skidallowed" ) )
 		{
 			steering.isSkidAllowed = atoi( value ) != 0 ? true : false;
 		}
-		else if ( !Q_stricmp( key, "dustcloud" ) )
+		else if ( V_strieq( key, "dustcloud" ) )
 		{
 			steering.dustCloud = atoi( value ) != 0 ? true : false;
 		}
@@ -910,7 +910,7 @@ void CVPhysicsParse::ParseVehicle( vehicleparams_t *pVehicle, IVPhysicsKeyHandle
 		// parse subchunks
 		if ( value[0] == '{' )
 		{
-			if ( !Q_stricmp( key, "axle" ) )
+			if ( V_strieq( key, "axle" ) )
 			{
 				// Protect against exploits/overruns
 				if ( pVehicle->axleCount < ssize(pVehicle->axles) )
@@ -923,15 +923,15 @@ void CVPhysicsParse::ParseVehicle( vehicleparams_t *pVehicle, IVPhysicsKeyHandle
 					Assert( 0 );
 				}
 			}
-			else if ( !Q_stricmp( key, "body" ) )
+			else if ( V_strieq( key, "body" ) )
 			{
 				ParseVehicleBody( pVehicle->body );
 			}
-			else if ( !Q_stricmp( key, "engine" ) )
+			else if ( V_strieq( key, "engine" ) )
 			{
 				ParseVehicleEngine( pVehicle->engine );
 			}
-			else if ( !Q_stricmp( key, "steering" ) )
+			else if ( V_strieq( key, "steering" ) )
 			{
 				ParseVehicleSteering( pVehicle->steering );
 			}
@@ -940,7 +940,7 @@ void CVPhysicsParse::ParseVehicle( vehicleparams_t *pVehicle, IVPhysicsKeyHandle
 				SkipBlock();
 			}
 		}
-		else if ( !Q_stricmp( key, "wheelsperaxle" ) )
+		else if ( V_strieq( key, "wheelsperaxle" ) )
 		{
 			pVehicle->wheelsPerAxle = atoi( value );
 		}

@@ -146,7 +146,7 @@ void CAttributeElementPickerPanel::OnDmeSelected( KeyValues *pKeyValues )
 //-----------------------------------------------------------------------------
 void CAttributeElementPickerPanel::OnCommand( char const *cmd )
 {
-	if ( !Q_stricmp( cmd, "open" ) )
+	if ( V_strieq( cmd, "open" ) )
 	{
 		ShowPickerDialog();
 	}

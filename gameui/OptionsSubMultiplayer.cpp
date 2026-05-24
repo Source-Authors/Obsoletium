@@ -1364,7 +1364,7 @@ void COptionsSubMultiplayer::InitLogoList( CLabeledCommandComboBox *cb )
 
 				// check to see if this is the one we have set
 				Q_snprintf( filename, sizeof(filename), "materials/vgui/logos/%s", fn );
-				if (!Q_stricmp(filename, logofile))
+				if (V_strieq(filename, logofile))
 				{
 					initialItem = i;
 				}
@@ -1750,7 +1750,7 @@ void COptionsSubMultiplayer::OnApplyChanges()
 //-----------------------------------------------------------------------------
 Panel *COptionsSubMultiplayer::CreateControlByName( const char *controlName )
 {
-	if( !Q_stricmp( "CCvarToggleCheckButton", controlName ) )
+	if( V_strieq( "CCvarToggleCheckButton", controlName ) )
 	{
 		CCvarToggleCheckButton *newButton = new CCvarToggleCheckButton( this, controlName, "", "" );
 		m_cvarToggleCheckButtons.AddElement( newButton );

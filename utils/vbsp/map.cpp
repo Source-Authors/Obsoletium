@@ -1710,7 +1710,7 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, void* nParam)
 		}
 
 #ifdef VSVMFIO
-		if ( !Q_stricmp( pClassName, "light" ) )
+		if ( V_strieq( pClassName, "light" ) )
 		{
 			CVmfImport::GetVmfImporter()->ImportLightCallback(
 				ValueForKey( mapent, "hammerid" ),
@@ -1721,7 +1721,7 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, void* nParam)
 				ValueForKey( mapent, "_quadratic_attn" ) );
 		}
 
-		if ( !Q_stricmp( pClassName, "light_spot" ) )
+		if ( V_strieq( pClassName, "light_spot" ) )
 		{
 			CVmfImport::GetVmfImporter()->ImportLightSpotCallback(
 				ValueForKey( mapent, "hammerid" ),
@@ -1737,7 +1737,7 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, void* nParam)
 				ValueForKey( mapent, "_exponent" ) );
 		}
 
-		if ( !Q_stricmp( pClassName, "light_dynamic" ) )
+		if ( V_strieq( pClassName, "light_dynamic" ) )
 		{
 			CVmfImport::GetVmfImporter()->ImportLightDynamicCallback(
 				ValueForKey( mapent, "hammerid" ),
@@ -1753,7 +1753,7 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, void* nParam)
 				ValueForKey( mapent, "spotlight_radius" ) );
 		}
 
-		if ( !Q_stricmp( pClassName, "light_environment" ) )
+		if ( V_strieq( pClassName, "light_environment" ) )
 		{
 			CVmfImport::GetVmfImporter()->ImportLightEnvironmentCallback(
 				ValueForKey( mapent, "hammerid" ),
@@ -1828,7 +1828,7 @@ void CMapFile::ForceFuncAreaPortalWindowContents()
 		// Don't do this on "normal" func_areaportal entities.  Those are tied to doors
 		// and should be opaque when closed.  But areaportal windows (and any other 
 		// distance-based areaportals) should be windows because they are normally open/transparent
-		if( !IsAreaPortal( pClassName ) || !Q_stricmp( pClassName, "func_areaportal" ) )
+		if( !IsAreaPortal( pClassName ) || V_strieq( pClassName, "func_areaportal" ) )
 			continue;
 
 //		const char *pTestEntName = ValueForKey( e, "targetname" );

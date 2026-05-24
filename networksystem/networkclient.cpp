@@ -131,7 +131,7 @@ bool CNetworkClient::Connect( char const *server, int port /*=SM_SERVER_PORT*/ )
 	
 	// Resolve remote name
 	sockaddr sa;
-	if ( !Q_stricmp( server, "localhost" ) )
+	if ( V_strieq( server, "localhost" ) )
 	{
 		remote.ip[ 0 ] = 127;
 		remote.ip[ 1 ] = 0;

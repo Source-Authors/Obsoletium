@@ -693,11 +693,11 @@ void CDynamicRecipePanel::OnCommand( const char *command )
 	
 		return;
 	}
-	else if ( !Q_stricmp( command, "reloadscheme" ) )
+	else if ( V_strieq( command, "reloadscheme" ) )
 	{
 		InvalidateLayout( true, true );	// deliberatly fallthrough to baseclass
 	}
-	else if( !Q_stricmp( command, "cancel" ) )
+	else if( V_strieq( command, "cancel" ) )
 	{
 		SetVisible( false );
 		return;

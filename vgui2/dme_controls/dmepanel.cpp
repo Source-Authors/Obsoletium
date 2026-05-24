@@ -188,7 +188,7 @@ void CDmePanel::PopulateEditorNames( const char *pPanelName )
 
 		int nItemID = m_pEditorNames->AddItem( pDisplayName, pKeyValues );
 
-		if ( pPanelName && !Q_stricmp( pPanelName, pEditorName ) )
+		if ( pPanelName && V_strieq( pPanelName, pEditorName ) )
 		{
 			nBestInheritanceDepth = 0;
 			nActiveItemID = nItemID;
@@ -196,7 +196,7 @@ void CDmePanel::PopulateEditorNames( const char *pPanelName )
 			continue;
 		}
 
-		if ( pPreferredEditor && !bFoundPanelName && !Q_stricmp( pPreferredEditor, pEditorName ) )
+		if ( pPreferredEditor && !bFoundPanelName && V_strieq( pPreferredEditor, pEditorName ) )
 		{
 			nBestInheritanceDepth = 0;
 			nActiveItemID = nItemID;
@@ -328,7 +328,7 @@ void CDmePanel::OnViewedElementChanged( KeyValues *kv )
 		for ( ; h != DMEFACTORY_HANDLE_INVALID; h = DmePanelNextFactory( h, pElement ) )
 		{
 			const char *pEditorName = DmePanelFactoryName( h );
-			if ( !Q_stricmp( m_CurrentEditorName, pEditorName ) )
+			if ( V_strieq( m_CurrentEditorName, pEditorName ) )
 			{
 				bFound = true;
 				break;
@@ -422,7 +422,7 @@ void CDmePanel::DeactivateCurrentEditor()
 //-----------------------------------------------------------------------------
 void CDmePanel::SetEditor( const char *pEditorName )
 {
-	if ( pEditorName && !Q_stricmp( m_CurrentEditorName, pEditorName ) )
+	if ( pEditorName && V_strieq( m_CurrentEditorName, pEditorName ) )
 		return;
 
 	DeactivateCurrentEditor();
@@ -486,7 +486,7 @@ void CDmePanel::SetDmeElement( CDmElement *pDmeElement, bool bForce, const char 
 {
 	if ( ( m_hElement == pDmeElement ) && !bForce )
 	{
-		if ( !pPanelName || !Q_stricmp( pPanelName, m_CurrentEditorName.Get() ) )
+		if ( !pPanelName || V_strieq( pPanelName, m_CurrentEditorName.Get() ) )
 			return;
 	}
 
@@ -515,8 +515,8 @@ CBaseDmePanelFactory::CBaseDmePanelFactory( const char *pElementType, const char
 	for( CBaseDmePanelFactory* pFactory = s_pFirstDmePanelFactory; pFactory; 
 		pPrevFactory = pFactory, pFactory = pFactory->m_pNext )
 	{
-		if ( !Q_stricmp( pFactory->m_pElementType, pElementType ) &&
-			 !Q_stricmp( pFactory->m_pEditorDisplayName, pEditorDisplayName ) )
+		if ( V_strieq( pFactory->m_pElementType, pElementType ) &&
+			 V_strieq( pFactory->m_pEditorDisplayName, pEditorDisplayName ) )
 		{
 			// Collision found! If this is not an override, then we've been overridden
 			if ( !bIsOverride )
@@ -625,7 +625,7 @@ bool CDmePanel::CreateDmePanel( vgui::Panel *pParent, const char *pPanelName, CD
 		
 		if ( pEditorName )
 		{
-			if ( !Q_stricmp( pEditorName, pFactory->m_pEditorName ) )
+			if ( V_strieq( pEditorName, pFactory->m_pEditorName ) )
 			{
 				pBestFactory = pFactory;
 				break;

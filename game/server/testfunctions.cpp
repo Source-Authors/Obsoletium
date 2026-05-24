@@ -32,7 +32,7 @@ void Test_CreateEntity( const CCommand &args )
 	const char *pClassName = args[ 1 ];
 
 	// Don't allow regular users to create point_servercommand entities for the same reason as blocking ent_fire
-	if ( pPlayer && !Q_stricmp( pClassName, "point_servercommand" ) )
+	if ( pPlayer && V_strieq( pClassName, "point_servercommand" ) )
 	{
 		if ( engine->IsDedicatedServer() )
 		{

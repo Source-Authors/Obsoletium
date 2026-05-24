@@ -1051,7 +1051,7 @@ static bool IsTypeOfSequence( StudioModel *model, int sequence, char const *type
 		if ( pkvAllFaceposer )
 		{
 			char const *t = pkvAllFaceposer->GetString( "type", "" );
-			if ( t && !Q_stricmp( t, typestring ) )
+			if ( t && V_strieq( t, typestring ) )
 			{
 				match = true;
 			}
@@ -1256,7 +1256,7 @@ void AnimationBrowser::RenameCustomFile( int index )
 		return;
 
 	// No change
-	if ( !Q_stricmp( anim->m_ShortName.String(), params.m_szInputText ) )
+	if ( V_strieq( anim->m_ShortName.String(), params.m_szInputText ) )
 		return;
 
 	char fn[ 512 ];

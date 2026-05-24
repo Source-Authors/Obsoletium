@@ -1990,7 +1990,7 @@ void UTIL_ValidateSoundName( string_t &name, const char *defaultStr )
 {
 	if ( ( !name || 
 		   strlen( (char*) STRING( name ) ) < 1 ) || 
-		   !Q_stricmp( (char *)STRING(name), "0" ) )
+		   V_strieq( (char *)STRING(name), "0" ) )
 	{
 		name = AllocPooledString( defaultStr );
 	}

@@ -40,7 +40,7 @@ class CDefaultCvarQuery final : public CBaseAppSystem< ICvarQuery >
 public:
 	void *QueryInterface( const char *pInterfaceName ) override
 	{
-		if ( !Q_stricmp( pInterfaceName, CVAR_QUERY_INTERFACE_VERSION ) )
+		if ( V_strieq( pInterfaceName, CVAR_QUERY_INTERFACE_VERSION ) )
 			return (ICvarQuery*)this;
 		return nullptr;
 	
@@ -633,7 +633,7 @@ void CCvar::RevertFlaggedConVars( int nFlag )
 			continue;
 
 		// It's == to the default value, don't count
-		if ( !Q_stricmp( pCvar->GetDefault(), pCvar->GetString() ) )
+		if ( V_strieq( pCvar->GetDefault(), pCvar->GetString() ) )
 			continue;
 
 		pCvar->Revert();

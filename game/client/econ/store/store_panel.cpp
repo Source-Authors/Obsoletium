@@ -487,7 +487,7 @@ void CStorePanel::OnCommand( const char *command )
 		InitiateCheckout( false );
 		return;
 	}
-	else if ( !Q_stricmp( command, "close" ) )
+	else if ( V_strieq( command, "close" ) )
 	{
 		ShowPanel( false );
 
@@ -504,7 +504,7 @@ void CStorePanel::OnCommand( const char *command )
 		}
 #endif
 	}
-	else if ( !Q_stricmp( command, "back" ) )
+	else if ( V_strieq( command, "back" ) )
 	{
 		ShowPanel( true );
 	}
@@ -1850,7 +1850,7 @@ void CStoreStatusDialog::OnCommand( const char *command )
 {
 	bool bClose = false;
 
-	if ( !Q_stricmp( command, "close" ) )
+	if ( V_strieq( command, "close" ) )
 	{
 		bClose = true;
 
@@ -1859,7 +1859,7 @@ void CStoreStatusDialog::OnCommand( const char *command )
 			InventoryManager()->ShowItemsPickedUp( true );
 		}
 	}
-	else if ( !Q_stricmp( command, "forceclose" ) )
+	else if ( V_strieq( command, "forceclose" ) )
 	{
 		bClose = true;
 	}

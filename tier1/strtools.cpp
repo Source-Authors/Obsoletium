@@ -4209,7 +4209,7 @@ void V_StripAndPreserveHTMLCore( CUtlBuffer *pbuffer, IN_Z const char *pchHTML, 
 	{
 		for ( size_t i = 0; i < cPreserveTags; ++i )
 		{
-			if ( !Q_stricmp( rgszPreserveTags[ i ], "\n" ) )
+			if ( V_strieq( rgszPreserveTags[ i ], "\n" ) )
 				bStripNewLines = false;
 		}
 	}

@@ -57,7 +57,7 @@ IShader *CDmeShader::FindShader()
 	MaterialSystem()->GetShaders( 0, nCount, ppShaderList );
 	for ( int i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( m_ShaderName, ppShaderList[i]->GetName() ) )
+		if ( V_strieq( m_ShaderName, ppShaderList[i]->GetName() ) )
 			return ppShaderList[i];
 	}
 	return NULL;
@@ -84,7 +84,7 @@ void CDmeShader::RemoveUnusedShaderParams( IShader *pShader )
 		int i;
 		for ( i = 0; i < nCount; ++i )
 		{
-			if ( !Q_stricmp( pShaderParam, pShader->GetParamName( i ) ) )
+			if ( V_strieq( pShaderParam, pShader->GetParamName( i ) ) )
 				break;
 		}
 
@@ -182,7 +182,7 @@ void CDmeShader::AddNewShaderParams( IShader *pShader )
 				continue;
 
 			const char *pAttributeName = pAttribute->GetName();
-			if ( !Q_stricmp( pAttributeName, pParamName ) )
+			if ( V_strieq( pAttributeName, pParamName ) )
 				break;
 		}
 
@@ -242,7 +242,7 @@ void CDmeShader::CreateMaterial( const char *pMaterialName )
 		int i;
 		for ( i = 0; i < nCount; ++i )
 		{
-			if ( !Q_stricmp( pShaderParam, pShader->GetParamName( i ) ) )
+			if ( V_strieq( pShaderParam, pShader->GetParamName( i ) ) )
 				break;
 		}
 

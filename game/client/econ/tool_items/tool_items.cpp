@@ -166,7 +166,7 @@ void CBaseToolUsageDialog::OnCommand( const char *command )
 								 : "n/a";
 #endif
 
-	if ( !Q_stricmp( command, "apply" ) )
+	if ( V_strieq( command, "apply" ) )
 	{
 #ifdef TF_CLIENT_DLL
 		C_CTFGameStats::ImmediateWriteInterfaceEvent( CFmtStr( "tool_usage_proceed(%s)", m_pszInternalPanelName ).Access(),

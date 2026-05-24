@@ -375,14 +375,14 @@ void CMDLPicker::OnAssetSelected( KeyValues *pParams )
 //-----------------------------------------------------------------------------
 void CMDLPicker::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "ChooseLightProbe" ) )
+	if ( V_strieq( pCommand, "ChooseLightProbe" ) )
 	{
 		CAssetPickerFrame *pPicker = new CAssetPickerFrame( this, "Select Light Probe (.prb) File",
 			"Light Probe", "prb", "materials/lightprobes", "lightprobe" );
 		pPicker->DoModal();
 		return;
 	}
-	else if ( !Q_stricmp( pCommand, "OutputDirectorySelect" ) )
+	else if ( V_strieq( pCommand, "OutputDirectorySelect" ) )
 	{
 		if ( !m_hDirectorySelectDialog.Get() )
 		{
@@ -399,12 +399,12 @@ void CMDLPicker::OnCommand( const char *pCommand )
 		m_hDirectorySelectDialog->DoModal();
 		return;
 	}
-	else if ( !Q_stricmp( pCommand, "Capture" ) )
+	else if ( V_strieq( pCommand, "Capture" ) )
 	{
 		CaptureScreenCaps();
 		return;
 	}
-	else if ( !Q_stricmp( pCommand, "GenerateBackpackIcons" ) )
+	else if ( V_strieq( pCommand, "GenerateBackpackIcons" ) )
 	{
 		// shut off the ground grid
 		vgui::CheckButton *pGroundToggle = (vgui::CheckButton *)m_pRenderPage->FindChildByName( "NoGround" );
@@ -425,12 +425,12 @@ void CMDLPicker::OnCommand( const char *pCommand )
 
 		return;
 	}
-	else if ( !Q_stricmp( pCommand, "SaveCaps" ) )
+	else if ( V_strieq( pCommand, "SaveCaps" ) )
 	{
 		SaveCaps( NULL );
 		return;
 	}
-	else if ( !Q_stricmp( pCommand, "RestoreCaps" ) )
+	else if ( V_strieq( pCommand, "RestoreCaps" ) )
 	{
 		if ( input()->IsKeyDown( KEY_RCONTROL ) || input()->IsKeyDown( KEY_LCONTROL ) )
 		{
@@ -1510,7 +1510,7 @@ void CMDLPicker::SelectSequence( const char *pSequenceName )
 	for (int i = 0; i < pstudiohdr->GetNumSeq(); i++)
 	{
 		mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( i );
-		if ( !Q_stricmp( seqdesc.pszLabel(), pSequenceName ) )
+		if ( V_strieq( seqdesc.pszLabel(), pSequenceName ) )
 		{
 			m_pMDLPreview->SetSequence( i );
 			break;

@@ -69,7 +69,7 @@ void CMatchmakingBasePanel::SetFooterButtons( CBaseDialog *pOwner, KeyValues *pK
 		{
 			for ( KeyValues *pButton = pKeyValues->GetFirstSubKey(); pButton != NULL; pButton = pButton->GetNextKey() )
 			{
-				if ( !Q_stricmp( pButton->GetName(), "button" ) )
+				if ( V_strieq( pButton->GetName(), "button" ) )
 				{
 					// Add a button to the footer
 					const char *pText = pButton->GetString( "text", NULL );
@@ -134,31 +134,31 @@ void CMatchmakingBasePanel::Activate( void )
 //-----------------------------------------------------------------------------
 void CMatchmakingBasePanel::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( "OpenWelcomeDialog", pCommand ) )
+	if ( V_strieq( "OpenWelcomeDialog", pCommand ) )
 	{
 		OnOpenWelcomeDialog();
 	}
-	if ( !Q_stricmp( "OpenPauseDialog", pCommand ) )
+	if ( V_strieq( "OpenPauseDialog", pCommand ) )
 	{
 		OnOpenPauseDialog();
 	}
-	if ( !Q_stricmp( "OpenRankingsDialog", pCommand ) )
+	if ( V_strieq( "OpenRankingsDialog", pCommand ) )
 	{
 		OnOpenRankingsDialog();
 	}
-	else if ( !Q_stricmp( "OpenSystemLinkDialog", pCommand ) )
+	else if ( V_strieq( "OpenSystemLinkDialog", pCommand ) )
 	{
 		OnOpenSystemLinkDialog();
 	}
-	else if ( !Q_stricmp( "OpenPlayerMatchDialog", pCommand ) )
+	else if ( V_strieq( "OpenPlayerMatchDialog", pCommand ) )
 	{
 		OnOpenPlayerMatchDialog();
 	}
-	else if ( !Q_stricmp( "OpenRankedMatchDialog", pCommand ) )
+	else if ( V_strieq( "OpenRankedMatchDialog", pCommand ) )
 	{
 		OnOpenRankedMatchDialog();
 	}
-    else if ( !Q_stricmp( "OpenAchievementsDialog", pCommand ) )
+    else if ( V_strieq( "OpenAchievementsDialog", pCommand ) )
     {
         OnOpenAchievementsDialog();
     }
@@ -168,7 +168,7 @@ void CMatchmakingBasePanel::OnCommand( const char *pCommand )
     // [dwenger] Specific code for CS Achievements Display
     //=============================================================================
 
-    else if ( !Q_stricmp( "OpenCSAchievementsDialog", pCommand ) )
+    else if ( V_strieq( "OpenCSAchievementsDialog", pCommand ) )
     {
         OnOpenCSAchievementsDialog();
     }
@@ -177,38 +177,38 @@ void CMatchmakingBasePanel::OnCommand( const char *pCommand )
     // HPE_END
     //=============================================================================
 
-	else if ( !Q_stricmp( "LevelLoadingStarted", pCommand ) )
+	else if ( V_strieq( "LevelLoadingStarted", pCommand ) )
 	{
 		OnLevelLoadingStarted();
 	}
-	else if ( !Q_stricmp( "LevelLoadingFinished", pCommand ) )
+	else if ( V_strieq( "LevelLoadingFinished", pCommand ) )
 	{
 		OnLevelLoadingFinished();
 	}
-	else if ( !Q_stricmp( "SessionOptions_Modify", pCommand ) )
+	else if ( V_strieq( "SessionOptions_Modify", pCommand ) )
 	{
 		OnOpenSessionOptionsDialog( pCommand );
 	}
-	else if ( !Q_stricmp( "ModifySession", pCommand ) )
+	else if ( V_strieq( "ModifySession", pCommand ) )
 	{
 		matchmaking->ModifySession();
 	}
-	else if ( !Q_stricmp( "ChangeClass", pCommand ) )
+	else if ( V_strieq( "ChangeClass", pCommand ) )
 	{
 		engine->ClientCmd_Unrestricted( "changeclass" );
 		OnCommand( "ResumeGame" );
 	}
-	else if ( !Q_stricmp( "ChangeTeam", pCommand ) )
+	else if ( V_strieq( "ChangeTeam", pCommand ) )
 	{
 		engine->ClientCmd_Unrestricted( "changeteam" );
 		OnCommand( "ResumeGame" );
 	}
-	else if ( !Q_stricmp( "ShowMapInfo", pCommand ) )
+	else if ( V_strieq( "ShowMapInfo", pCommand ) )
 	{
 		engine->ClientCmd_Unrestricted( "showmapinfo" );
 		OnCommand( "ResumeGame" );
 	}
-	else if ( !Q_stricmp( "StartHost", pCommand ) )
+	else if ( V_strieq( "StartHost", pCommand ) )
 	{
 		// Show progress dialog
 		GameUI().ShowMessageDialog( MD_CREATING_GAME, this );
@@ -216,7 +216,7 @@ void CMatchmakingBasePanel::OnCommand( const char *pCommand )
 		// Send the host start command
 		matchmaking->StartHost();
 	}
-	else if ( !Q_stricmp( "StartSystemLinkHost", pCommand ) )
+	else if ( V_strieq( "StartSystemLinkHost", pCommand ) )
 	{
 		// Show progress dialog
 		GameUI().ShowMessageDialog( MD_CREATING_GAME, this );
@@ -224,7 +224,7 @@ void CMatchmakingBasePanel::OnCommand( const char *pCommand )
 		m_nGameType = GAMETYPE_SYSTEMLINK_MATCH;
 		matchmaking->StartHost( true );
 	}
-	else if ( !Q_stricmp( "StartClient", pCommand ) )
+	else if ( V_strieq( "StartClient", pCommand ) )
 	{
 		// Show progress dialog
 		GameUI().ShowMessageDialog( MD_SEARCHING_FOR_GAMES, this );
@@ -232,7 +232,7 @@ void CMatchmakingBasePanel::OnCommand( const char *pCommand )
 		// Tell matchmaking to start a client and search for games
 		matchmaking->StartClient( false );
 	}
-	else if ( !Q_stricmp( "StartSystemLinkClient", pCommand ) )
+	else if ( V_strieq( "StartSystemLinkClient", pCommand ) )
 	{
 		// Show progress dialog
 		GameUI().ShowMessageDialog( MD_SEARCHING_FOR_GAMES, this );
@@ -269,7 +269,7 @@ void CMatchmakingBasePanel::OnCommand( const char *pCommand )
 		// Tell matchmaking to start a client and search for games
 		matchmaking->StartClient( false );
 	}
-	else if ( !Q_stricmp( "StartGame", pCommand ) )
+	else if ( V_strieq( "StartGame", pCommand ) )
 	{
 		// Tell matchmaking the host wants to start the game
 		matchmaking->StartGame();
@@ -285,15 +285,15 @@ void CMatchmakingBasePanel::OnCommand( const char *pCommand )
 		// Each command has a unique options menu - the command string is used as the name of the .res file.
 		OnOpenSessionOptionsDialog( pCommand );
 	}
-	else if ( !Q_stricmp( pCommand, "DialogClosing" ) )
+	else if ( V_strieq( pCommand, "DialogClosing" ) )
 	{
 		PopDialog();
 	}
-	else if ( !Q_stricmp( pCommand, "AchievementsDialogClosing" ) )
+	else if ( V_strieq( pCommand, "AchievementsDialogClosing" ) )
 	{
 		PopDialog();
 	}
-    else if ( !Q_stricmp( pCommand, "show_achievements_dialog" ) )
+    else if ( V_strieq( pCommand, "show_achievements_dialog" ) )
     {
         OnOpenAchievementsDialog();
     }
@@ -303,7 +303,7 @@ void CMatchmakingBasePanel::OnCommand( const char *pCommand )
     // [dwenger] Specific code for CS Achievements Display
     //=============================================================================
 
-    else if ( !Q_stricmp( pCommand, "show_csachievements_dialog" ) )
+    else if ( V_strieq( pCommand, "show_csachievements_dialog" ) )
     {
         OnOpenCSAchievementsDialog();
     }
@@ -312,7 +312,7 @@ void CMatchmakingBasePanel::OnCommand( const char *pCommand )
     // HPE_END
     //=============================================================================
 
-    else if ( !Q_stricmp( pCommand, "ShowSessionOptionsDialog" ) )
+    else if ( V_strieq( pCommand, "ShowSessionOptionsDialog" ) )
 	{
 		// Need to close the client options dialog and open the host options equivalent
 		PopDialog();
@@ -332,25 +332,25 @@ void CMatchmakingBasePanel::OnCommand( const char *pCommand )
 			break;
 		}
 	}
-	else if ( !Q_stricmp( pCommand, "ReturnToMainMenu" ) )
+	else if ( V_strieq( pCommand, "ReturnToMainMenu" ) )
 	{
 		CloseAllDialogs();
 		Activate();
 	}
-	else if ( !Q_stricmp( pCommand, "CancelOperation" ) )
+	else if ( V_strieq( pCommand, "CancelOperation" ) )
 	{
 		GameUI().CloseMessageDialog();
 		PopDialog();
 		matchmaking->CancelCurrentOperation();
 	}
-	else if ( !Q_stricmp( pCommand, "StorageDeviceDenied" ) )
+	else if ( V_strieq( pCommand, "StorageDeviceDenied" ) )
 	{
 		// Set us as declined
 		XBX_SetStorageDeviceId( XBX_STORAGE_DECLINED );
 	}
 	else
 	{
-		if ( !Q_stricmp( "ResumeGame", pCommand ) )
+		if ( V_strieq( "ResumeGame", pCommand ) )
 		{
 			CloseAllDialogs();
 		}

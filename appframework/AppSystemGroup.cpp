@@ -53,7 +53,7 @@ AppModule_t CAppSystemGroup::LoadModule( const char *pDLLName )
 
 		if ( module.m_pModuleName )
 		{
-			if ( !Q_stricmp( pModuleName, module.m_pModuleName ) )
+			if ( V_strieq( pModuleName, module.m_pModuleName ) )
 				return i;
 		}
 	}

@@ -379,7 +379,7 @@ void CMortarControlPanel::OnCommand( const char *command )
 	if ( !pMortar )
 		return;
 
-	if ( !Q_stricmp( command, "FireMortar" ) )
+	if ( V_strieq( command, "FireMortar" ) )
 	{
 		pMortar->ClickFire();
 	}

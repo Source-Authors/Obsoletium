@@ -74,20 +74,20 @@ void CClientState::ConnectionClosing( const char * reason )
 	if ( m_nSignonState > SIGNONSTATE_NONE )
 	{
 		ConMsg( "Disconnect: %s.\n", reason );
-		if ( !Q_stricmp( reason, INVALID_STEAM_TICKET )
-			|| !Q_stricmp( reason, INVALID_STEAM_LOGON_TICKET_CANCELED ) )
+		if ( V_strieq( reason, INVALID_STEAM_TICKET )
+			|| V_strieq( reason, INVALID_STEAM_LOGON_TICKET_CANCELED ) )
 		{
 			g_eSteamLoginFailure = STEAMLOGINFAILURE_BADTICKET;
 		}
-		else if ( !Q_stricmp( reason, INVALID_STEAM_LOGON_NOT_CONNECTED ) )
+		else if ( V_strieq( reason, INVALID_STEAM_LOGON_NOT_CONNECTED ) )
 		{
 			g_eSteamLoginFailure = STEAMLOGINFAILURE_NOSTEAMLOGIN;
 		}
-		else if ( !Q_stricmp( reason, INVALID_STEAM_LOGGED_IN_ELSEWHERE ) )
+		else if ( V_strieq( reason, INVALID_STEAM_LOGGED_IN_ELSEWHERE ) )
 		{
 			g_eSteamLoginFailure = STEAMLOGINFAILURE_LOGGED_IN_ELSEWHERE;
 		}
-		else if ( !Q_stricmp( reason, INVALID_STEAM_VACBANSTATE ) )
+		else if ( V_strieq( reason, INVALID_STEAM_VACBANSTATE ) )
 		{
 			g_eSteamLoginFailure = STEAMLOGINFAILURE_VACBANNED;
 		}

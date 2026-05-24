@@ -1326,13 +1326,13 @@ bool FileOpenDialog::ExtensionMatchesFilter( const char *pExt )
 		if (curFilter[0] == 0)
 			break;
 
-		if ( !Q_stricmp( curFilter, "*" ) || !Q_stricmp( curFilter, "*.*" ) )
+		if ( V_strieq( curFilter, "*" ) || V_strieq( curFilter, "*.*" ) )
 			return true;
 
 		// FIXME: This isn't exactly right, but tough cookies;
 		// it assumes the first two characters of the filter are *.
 		Assert( curFilter[0] == '*' && curFilter[1] == '.' );
-		if ( !Q_stricmp( &curFilter[2], pExt ) )
+		if ( V_strieq( &curFilter[2], pExt ) )
 			return true;
 	}
 
@@ -1376,7 +1376,7 @@ void FileOpenDialog::ChooseExtension( OUT_Z_CAP(nBufLen) char *pExt, intp nBufLe
 		if (curFilter[0] == 0)
 			break;
 
-		if ( !Q_stricmp( curFilter, "*" ) || !Q_stricmp( curFilter, "*.*" ) )
+		if ( V_strieq( curFilter, "*" ) || V_strieq( curFilter, "*.*" ) )
 			continue;
 
 		// FIXME: This isn't exactly right, but tough cookies;

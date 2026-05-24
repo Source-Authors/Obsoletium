@@ -140,7 +140,7 @@ bool CVGuiSystemModuleLoader::LoadPlatformModules(CreateInterfaceFn *factorylist
 		const char *pchInterface = it->GetString("interface");
 
 		// don't load friends if we are using Steam Community
-		if ( !Q_stricmp( pchInterface, "VGuiModuleTracker001" ) && bSteamCommunityFriendsVersion )
+		if ( V_strieq( pchInterface, "VGuiModuleTracker001" ) && bSteamCommunityFriendsVersion )
 			continue;
 
 		// get copy out of steam cache

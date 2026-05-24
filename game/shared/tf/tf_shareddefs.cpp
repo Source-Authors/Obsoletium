@@ -1211,7 +1211,7 @@ int GetWeaponId( const char *pszWeaponName )
 
 	for ( int iWeapon = 0; iWeapon < ARRAYSIZE( g_aWeaponNames ); ++iWeapon )
 	{
-		if ( !Q_stricmp( pszWeaponName, g_aWeaponNames[iWeapon] ) )
+		if ( V_strieq( pszWeaponName, g_aWeaponNames[iWeapon] ) )
 			return iWeapon;
 	}
 
@@ -1278,7 +1278,7 @@ int GetWeaponFromDamage( const CTakeDamageInfo &info )
 	{
 		for( int i = 0; i < ARRAYSIZE( g_szProjectileNames ); i++ )
 		{
-			if ( !Q_stricmp( &killer_weapon_name[ 3 ], g_szProjectileNames[ i ] ) )
+			if ( V_strieq( &killer_weapon_name[ 3 ], g_szProjectileNames[ i ] ) )
 			{
 				iWeapon = g_iProjectileWeapons[ i ];
 				break;
@@ -1290,7 +1290,7 @@ int GetWeaponFromDamage( const CTakeDamageInfo &info )
 		int iLen = Q_strlen( killer_weapon_name );
 
 		// strip off _projectile from projectiles shot from other projectiles
-		if ( ( iLen < 256 ) && ( iLen > 11 ) && !Q_stricmp( &killer_weapon_name[ iLen - 11 ], "_projectile" ) )
+		if ( ( iLen < 256 ) && ( iLen > 11 ) && V_strieq( &killer_weapon_name[ iLen - 11 ], "_projectile" ) )
 		{
 			char temp[ 256 ];
 			V_strcpy_safe( temp, killer_weapon_name );
@@ -1385,7 +1385,7 @@ int GetBuildableId( const char *pszBuildableName )
 {
 	for ( int iBuildable = 0; iBuildable < OBJ_LAST; ++iBuildable )
 	{
-		if ( !Q_stricmp( pszBuildableName, g_ObjectInfos[iBuildable].m_pObjectName ) )
+		if ( V_strieq( pszBuildableName, g_ObjectInfos[iBuildable].m_pObjectName ) )
 			return iBuildable;
 	}
 
@@ -1767,7 +1767,7 @@ const char *TranslateWeaponEntForClass( const char *pszName, int iClass )
 	{
 		for ( int i = 0; i < ARRAYSIZE(pszWpnEntTranslationList); i++ )
 		{
-			if ( !Q_stricmp( pszName, pszWpnEntTranslationList[i].pszWpnString ) )
+			if ( V_strieq( pszName, pszWpnEntTranslationList[i].pszWpnString ) )
 			{
 				const char *pTransName = pszWpnEntTranslationList[i].pszClassWpn[ iClass ];
 				Assert( pTransName && pTransName[0] );

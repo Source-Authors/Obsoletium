@@ -751,7 +751,7 @@ void CNewGameDialog::SetSelectedChapter( const char *chapter )
 	Assert( chapter );
 	for (intp i = 0; i < m_ChapterPanels.Count(); i++)
 	{
-		if ( chapter && !Q_stricmp(m_ChapterPanels[i]->GetChapter(), chapter) )
+		if ( chapter && V_strieq(m_ChapterPanels[i]->GetChapter(), chapter) )
 		{
 			m_iSelectedChapter = i;
 			m_ChapterPanels[m_iSelectedChapter]->SetSelected( true );
@@ -1150,7 +1150,7 @@ void CNewGameDialog::OnCommand( const char *command )
 		ScrollBonusSelection( SCROLL_RIGHT );
 		bReset = false;
 	}
-	else if ( !Q_stricmp( command, "ReleaseModalWindow" ) )
+	else if ( V_strieq( command, "ReleaseModalWindow" ) )
 	{
 		vgui::surface()->RestrictPaintToSinglePanel(NULL);
 	}

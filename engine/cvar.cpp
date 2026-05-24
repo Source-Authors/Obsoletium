@@ -131,7 +131,7 @@ public:
 
 	virtual void *QueryInterface( const char *pInterfaceName )
 	{
-		if ( !Q_stricmp( pInterfaceName, CVAR_QUERY_INTERFACE_VERSION ) )
+		if ( V_strieq( pInterfaceName, CVAR_QUERY_INTERFACE_VERSION ) )
 			return (ICvarQuery*)this;
 		return NULL;
 
@@ -978,7 +978,7 @@ void CCvarUtilities::CvarDifferences( const CCommand &args )
 		if ( var->IsFlagSet(FCVAR_DEVELOPMENTONLY) || var->IsFlagSet(FCVAR_HIDDEN) )
 			continue;
 
-		if ( !Q_stricmp( ((const ConVar *)var)->GetDefault(), ((const ConVar *)var)->GetString() ) )
+		if ( V_strieq( ((const ConVar *)var)->GetDefault(), ((const ConVar *)var)->GetString() ) )
 			continue;
 
 		ConVar_PrintDescription( (const ConVar *)var );	

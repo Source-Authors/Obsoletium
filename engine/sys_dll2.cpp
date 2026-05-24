@@ -568,7 +568,7 @@ public:
 					V_strcpy_safe( var1, Host_CleanupConVarStringValue( pCvar->GetString() ) );
 					V_strcpy_safe( var2, Host_CleanupConVarStringValue( pCvar->GetDefault() ) );
 
-					if ( !Q_stricmp( var1, var2 ) )
+					if ( V_strieq( var1, var2 ) )
 						continue;
 				}
 				else
@@ -2039,7 +2039,7 @@ bool CModAppSystemGroup::ModuleAlreadyInList( CUtlVector< AppSystemInfo_t >& lis
 {
 	for ( int i = 0; i < list.Count(); ++i )
 	{
-		if ( !Q_stricmp( list[ i ].m_pModuleName, moduleName ) )
+		if ( V_strieq( list[ i ].m_pModuleName, moduleName ) )
 		{
 			if ( Q_stricmp( list[ i ].m_pInterfaceName, interfaceName ) )
 			{

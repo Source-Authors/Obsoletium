@@ -43,7 +43,7 @@ CDmeLODList *CDmeBodyGroup::FindBodyPart( const char *pName )
 		if ( !pLODList )
 			continue;
 
-		if ( !Q_stricmp( pName, pLODList->GetName() )	)
+		if ( V_strieq( pName, pLODList->GetName() )	)
 			return pLODList;
 	}
 

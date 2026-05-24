@@ -659,7 +659,7 @@ void ReadPolyFile(const char *name) {
   char ext[4];
   V_ExtractFileExtension(name, ext);
 
-  bool isPHY = !Q_stricmp(ext, "phy");
+  bool isPHY = V_strieq(ext, "phy");
   if (isPHY) {
     CreateInterfaceFnT<IPhysicsCollision> physicsFactory = GetPhysicsFactory();
     physcollision =

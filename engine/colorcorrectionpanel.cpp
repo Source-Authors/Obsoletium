@@ -1032,7 +1032,7 @@ CColorCurvesUIPanel::~CColorCurvesUIPanel()
 //-----------------------------------------------------------------------------
 void CColorCurvesUIPanel::OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel)
 {
-	if ( !Q_stricmp( "SliderMoved", params->GetName() ) )
+	if ( V_strieq( "SliderMoved", params->GetName() ) )
 	{
 		vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(params)->GetPtr("panel") );
 		CPrecisionSlider *pSlider = dynamic_cast<CPrecisionSlider *>( pPanel );
@@ -1054,7 +1054,7 @@ void CColorCurvesUIPanel::OnCommand( const char *command )
 {
 	BaseClass::OnCommand( command );
 
-	if( !Q_stricmp( "BlendFactorUpdate", command ) )
+	if( V_strieq( "BlendFactorUpdate", command ) )
 	{
 		ResetBlendFactorSlider( );
 	}
@@ -2018,7 +2018,7 @@ void CColorLevelsUIPanel::ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char 
 //-----------------------------------------------------------------------------
 void CColorLevelsUIPanel::OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel)
 {
-	if ( !Q_stricmp( "SliderMoved", params->GetName() ) )
+	if ( V_strieq( "SliderMoved", params->GetName() ) )
 	{
 		vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(params)->GetPtr("panel") );
 		if ( pPanel == m_pBlendFactorSlider )
@@ -2057,7 +2057,7 @@ void CColorLevelsUIPanel::OnCommand( const char *command )
 {
 	BaseClass::OnCommand( command );
 
-	if( !Q_stricmp( "BlendFactorUpdate", command ) )
+	if( V_strieq( "BlendFactorUpdate", command ) )
 	{
 		ResetBlendFactorSlider( );
 	}
@@ -3105,7 +3105,7 @@ void CSelectedHSVUIPanel::ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char 
 //-----------------------------------------------------------------------------
 void CSelectedHSVUIPanel::OnMessage(const KeyValues *params, VPANEL fromPanel)
 {
-	if ( !Q_stricmp( "SliderMoved", params->GetName() ) )
+	if ( V_strieq( "SliderMoved", params->GetName() ) )
 	{
 		vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(params)->GetPtr("panel") );
 		CPrecisionSlider *pSlider = dynamic_cast<CPrecisionSlider *>( pPanel );
@@ -3122,7 +3122,7 @@ void CSelectedHSVUIPanel::OnMessage(const KeyValues *params, VPANEL fromPanel)
 			PostMessage( GetParent(), new KeyValues( "command", "command", "BlendFactorUpdate" ) );
 		}
 	}
-	else if ( !Q_stricmp( "CheckButtonChecked", params->GetName() ) )
+	else if ( V_strieq( "CheckButtonChecked", params->GetName() ) )
 	{
 		vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(params)->GetPtr("panel") );
 		vgui::CheckButton *pButton = dynamic_cast<vgui::CheckButton *>( pPanel );
@@ -3147,11 +3147,11 @@ void CSelectedHSVUIPanel::OnCommand( const char *command )
 {
 	BaseClass::OnCommand( command );
 
-	if( !Q_stricmp( "BlendFactorUpdate", command ) )
+	if( V_strieq( "BlendFactorUpdate", command ) )
 	{
 		ResetBlendFactorSlider( );
 	}
-	else if( !Q_stricmp( "ToggleSelection", command ) )
+	else if( V_strieq( "ToggleSelection", command ) )
 	{
 		EnableSelectionMode( !m_bSelectionEnable );
 	}
@@ -3482,7 +3482,7 @@ CColorLookupUIPanel::~CColorLookupUIPanel()
 //-----------------------------------------------------------------------------
 void CColorLookupUIPanel::OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel)
 {
-	if ( !Q_stricmp( "SliderMoved", params->GetName() ) )
+	if ( V_strieq( "SliderMoved", params->GetName() ) )
 	{
 		vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(params)->GetPtr("panel") );
 		if ( pPanel == m_pBlendFactorSlider )
@@ -3509,7 +3509,7 @@ void CColorLookupUIPanel::OnCommand( const char *command )
 		open_dialog->AddFilter( "*.raw", ".RAW files", true );
 		open_dialog->DoModal( true );
 	}
-	else if( !Q_stricmp( "BlendFactorUpdate", command ) )
+	else if( V_strieq( "BlendFactorUpdate", command ) )
 	{
 		ResetBlendFactorSlider( );
 	}
@@ -4028,7 +4028,7 @@ CColorBalanceUIPanel::~CColorBalanceUIPanel()
 //-----------------------------------------------------------------------------
 void CColorBalanceUIPanel::OnMessage(const KeyValues *params,  vgui::VPANEL fromPanel)
 {
-	if ( !Q_stricmp( "SliderMoved", params->GetName() ) )
+	if ( V_strieq( "SliderMoved", params->GetName() ) )
 	{
 		vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(params)->GetPtr("panel") );
 		if ( pPanel == m_pBlendFactorSlider )
@@ -4055,7 +4055,7 @@ void CColorBalanceUIPanel::OnMessage(const KeyValues *params,  vgui::VPANEL from
 			return;
 		}
 	}
-	else if ( !Q_stricmp( "CheckButtonChecked", params->GetName() ) )
+	else if ( V_strieq( "CheckButtonChecked", params->GetName() ) )
     {
 		vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(params)->GetPtr("panel") );
 		if( pPanel == m_pPreserveLuminosityButton )
@@ -4074,7 +4074,7 @@ void CColorBalanceUIPanel::OnCommand( const char *command )
 {
 	BaseClass::OnCommand( command );
 
-	if( !Q_stricmp( "BlendFactorUpdate", command ) )
+	if( V_strieq( "BlendFactorUpdate", command ) )
 	{
 		ResetBlendFactorSlider();
 	}
@@ -4293,7 +4293,7 @@ CNewOperationDialog::~CNewOperationDialog( )
 
 void CNewOperationDialog::OnCommand( const char *command )
 {
-	if( !Q_stricmp( command, "Create" ) )
+	if( V_strieq( command, "Create" ) )
 	{
 		int nSelectedItem = m_pOperationType->GetActiveItem();
 
@@ -4318,7 +4318,7 @@ void CNewOperationDialog::OnCommand( const char *command )
 
 		PostActionSignal( new KeyValues( "Command", "Command", "NewComplete" ) );
 	}
-	else if( !Q_stricmp( command, "Cancel" ) )
+	else if( V_strieq( command, "Cancel" ) )
 	{
 		PostActionSignal( new KeyValues( "Command", "Command", "NewCancel" ) );
 	}
@@ -4720,7 +4720,7 @@ void CColorOperationListPanel::OnCheckButtonChecked( KeyValues *data )
 
 void CColorOperationListPanel::OnCommand( const char *command )
 {
-	if( !Q_stricmp( command, "NewOperation" ) )
+	if( V_strieq( command, "NewOperation" ) )
 	{
 		if( !m_pNewDialog )
 		{
@@ -4729,7 +4729,7 @@ void CColorOperationListPanel::OnCommand( const char *command )
 			m_pNewDialog->Activate();
 		}
 	}
-	else if( !Q_stricmp( command, "DeleteOperation" ) )
+	else if( V_strieq( command, "DeleteOperation" ) )
 	{
 		if( m_pOperationListPanel->GetSelectedItemsCount()!=0 )
 		{
@@ -4755,7 +4755,7 @@ void CColorOperationListPanel::OnCommand( const char *command )
 			colorcorrectiontools->UpdateColorCorrection( );
 		}
 	}
-	else if( !Q_stricmp( command, "BringForward" ) )
+	else if( V_strieq( command, "BringForward" ) )
 	{
 		intp nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
 		if( nSelectedItem!=0 )
@@ -4769,7 +4769,7 @@ void CColorOperationListPanel::OnCommand( const char *command )
 			m_pOperationListPanel->SetSingleSelectedItem( nSelectedItem-1 );
 		}
 	}
-	else if( !Q_stricmp( command, "PushBack" ) )
+	else if( V_strieq( command, "PushBack" ) )
 	{
 		intp nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
 		if( nSelectedItem<m_OperationList.GetNumOperations()-1 )
@@ -4783,14 +4783,14 @@ void CColorOperationListPanel::OnCommand( const char *command )
 			m_pOperationListPanel->SetSingleSelectedItem( nSelectedItem+1 );
 		}
 	}
-	else if( !Q_stricmp( command, "Save" ) )
+	else if( V_strieq( command, "Save" ) )
 	{
  		FileOpenDialog *save_dialog = new FileOpenDialog( this, "File Save", false );
 		save_dialog->AddActionSignalTarget( this );
 		save_dialog->AddFilter( "*.raw", ".RAW files", true );
 		save_dialog->DoModal( true );
 	}
-	else if( !Q_stricmp( command, "NewComplete" ) )
+	else if( V_strieq( command, "NewComplete" ) )
 	{
 		if( m_pNewDialog )
 		{
@@ -4804,7 +4804,7 @@ void CColorOperationListPanel::OnCommand( const char *command )
 
 		OnKeyCodeTyped( KEY_ENTER );
 	}
-	else if( !Q_stricmp( command, "NewCancel" ) )
+	else if( V_strieq( command, "NewCancel" ) )
 	{
 		if( m_pNewDialog )
 		{
@@ -4812,19 +4812,19 @@ void CColorOperationListPanel::OnCommand( const char *command )
 			m_pNewDialog = 0;
 		}
 	}
-	else if( !Q_stricmp( command, "SelectedItemChanged" ) )
+	else if( V_strieq( command, "SelectedItemChanged" ) )
 	{
 		ResetSlider();
 	}
-	else if( !Q_stricmp( command, "BlendFactorUpdate" ) )
+	else if( V_strieq( command, "BlendFactorUpdate" ) )
 	{
 		ResetSlider();
 	}
-	else if( !Q_stricmp( command, "UpdateList" ) )
+	else if( V_strieq( command, "UpdateList" ) )
 	{
 		PopulateList();
 	}
-	else if( !Q_stricmp( command, "CloneOperation" ) )
+	else if( V_strieq( command, "CloneOperation" ) )
 	{
 		intp nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
 
@@ -5176,14 +5176,14 @@ void CColorCorrectionUIPanel::OnCommand( char const *command )
 {
 	BaseClass::OnCommand( command );
 
-	if( !Q_stricmp( "EnableColorCorrection", command ) )
+	if( V_strieq( "EnableColorCorrection", command ) )
 	{
 		m_bEnable = true;
 		UpdateColorCorrection();
 
 		colorcorrection->SetResetable( m_CCHandle, false );
 	}
-	else if( !Q_stricmp( "DisableColorCorrection", command ) )
+	else if( V_strieq( "DisableColorCorrection", command ) )
 	{
 		m_bEnable = false;
 		UpdateColorCorrection();

@@ -112,11 +112,11 @@ void DetailObjects::ParseDetailGroup( intp detailId, KeyValues* pGroupKeyValues 
 
 					if ( pProcModelType )
 					{
-						if ( !Q_stricmp( pProcModelType, "cross" ) )
+						if ( V_strieq( pProcModelType, "cross" ) )
 						{
 							model.m_Type = DETAIL_PROP_TYPE_SHAPE_CROSS;
 						}
-						else if ( !Q_stricmp( pProcModelType, "tri" ) )
+						else if ( V_strieq( pProcModelType, "tri" ) )
 						{
 							model.m_Type = DETAIL_PROP_TYPE_SHAPE_TRI;
 						}

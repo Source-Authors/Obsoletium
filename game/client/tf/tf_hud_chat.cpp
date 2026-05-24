@@ -144,7 +144,7 @@ int CHudChat::GetFilterForString( const char *pString )
 
 	if ( iFilter == CHAT_FILTER_NONE )
 	{
-		if ( !Q_stricmp( pString, "#TF_Name_Change" ) ) 
+		if ( V_strieq( pString, "#TF_Name_Change" ) ) 
 		{
 			return CHAT_FILTER_NAMECHANGE;
 		}

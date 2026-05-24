@@ -195,10 +195,10 @@ public:
 
 		Select_t SelectTypeStringToType( const char *pSelectString )
 		{
-			if ( !Q_stricmp( pSelectString, "NONE" ) )
+			if ( V_strieq( pSelectString, "NONE" ) )
 				return kNone;
 
-			if ( !Q_stricmp( pSelectString, "ALL" ) )
+			if ( V_strieq( pSelectString, "ALL" ) )
 				return kAll;
 
 			return kDelta;

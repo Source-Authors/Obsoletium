@@ -180,7 +180,7 @@ bool CAI_BaseActor::IsServerSideFlexController( char const *szName )
 {
 	for ( const auto *c : g_ServerSideFlexControllers )
 	{
-		if ( !Q_stricmp( szName, c ) )
+		if ( V_strieq( szName, c ) )
 			return true;
 	}
 	return false;

@@ -566,13 +566,13 @@ static void SetupRootTransform( CDmeFilmClip *shot, CDmeChannelsClip *srcChannel
 //-----------------------------------------------------------------------------
 static bool ShouldRandomize( const char *name )
 {
-	if ( !Q_stricmp( name, "eyes_updown" ) )
+	if ( V_strieq( name, "eyes_updown" ) )
 		return false;
-	if ( !Q_stricmp( name, "eyes_rightleft" ) )
+	if ( V_strieq( name, "eyes_rightleft" ) )
 		return false;
-	if ( !Q_stricmp( name, "lip_bite" ) )
+	if ( V_strieq( name, "lip_bite" ) )
 		return false;
-	if ( !Q_stricmp( name, "blink" ) )
+	if ( V_strieq( name, "blink" ) )
 		return false;
 	if ( Q_stristr( name, "sneer" ) )
 		return false;
@@ -700,7 +700,7 @@ void LoadDefaultGroupMappings( CUtlDict< CUtlString, int > &defaultGroupMapping,
 
 		for ( KeyValues *pControl = sub->GetFirstSubKey(); pControl; pControl = pControl->GetNextKey() )
 		{
-			Assert( !Q_stricmp( pControl->GetName(), "control" ) );
+			Assert( V_strieq( pControl->GetName(), "control" ) );
 			CUtlString controlName = pControl->GetString();
 			defaultGroupMapping.Insert( controlName, pGroupName );
 		}
@@ -714,7 +714,7 @@ CDmElement *FindOrAddDefaultGroupForControls( const char *pGroupName, CDmaElemen
 	for ( intp i = 0; i < c; ++i )
 	{
 		CDmElement *pGroup = groups[ i ];
-		if ( !Q_stricmp( pGroup->GetName(), pGroupName ) )
+		if ( V_strieq( pGroup->GetName(), pGroupName ) )
 			return pGroup;
 	}
 
@@ -743,7 +743,7 @@ static void BuildGroupMappings( CDmeAnimationSet *pAnimationSet )
 	for ( intp i = 0; i < nCount; ++i )
 	{
 		const char *pGroupName = static_cast<const char *>(defaultGroupOrdering[ i ]);
-		if ( !Q_stricmp( pGroupName, "IGNORE" ) )
+		if ( V_strieq( pGroupName, "IGNORE" ) )
 			continue;
 
 		CDmElement *pGroup = CreateElement< CDmElement >( pGroupName, pAnimationSet->GetFileId() );
@@ -772,7 +772,7 @@ static void BuildGroupMappings( CDmeAnimationSet *pAnimationSet )
 			pGroupName = "Root";
 		}
 
-		if ( !Q_stricmp( pGroupName, "IGNORE" ) )
+		if ( V_strieq( pGroupName, "IGNORE" ) )
 			continue;
 
 		CDmElement *pGroup = FindOrAddDefaultGroupForControls( pGroupName, groups, pAnimationSet->GetFileId() );

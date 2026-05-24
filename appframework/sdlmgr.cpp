@@ -591,7 +591,7 @@ void CSDLMgr::Disconnect()
 void *CSDLMgr::QueryInterface( const char *pInterfaceName )
 {
 	SDLAPP_FUNC;
-	if ( !Q_stricmp( pInterfaceName, SDLMGR_INTERFACE_VERSION ) )
+	if ( V_strieq( pInterfaceName, SDLMGR_INTERFACE_VERSION ) )
 		return this;
 	return nullptr;
 }

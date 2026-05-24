@@ -63,7 +63,7 @@ void GetParticleManifest( CUtlVector<CUtlString>& list )
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
 		{
-			if ( !Q_stricmp( sub->GetName(), "file" ) )
+			if ( V_strieq( sub->GetName(), "file" ) )
 			{
 				list.AddToTail( sub->GetString() );
 				continue;
@@ -184,14 +184,14 @@ void ParseParticleEffectsMap( const char *pMapName, bool bLoadSheets, IFileList 
 		DevMsg( "Successfully loaded particle effects manifest '%s' for map '%s'\n", szMapManifestFilename, pMapName );
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
 		{
-			if ( !Q_stricmp( sub->GetName(), "file" ) )
+			if ( V_strieq( sub->GetName(), "file" ) )
 			{
 				// Ensure the particles are in the particles directory
 				char szPath[ 512 ];
 				Q_strncpy( szPath, sub->GetString(), sizeof( szPath ) );
 				Q_StripFilename( szPath );
 				char *pszPath = (szPath[0] == '!') ? &szPath[1] : &szPath[0];
-				if ( pszPath && pszPath[0] && !Q_stricmp( pszPath, "particles" ) )
+				if ( pszPath && pszPath[0] && V_strieq( pszPath, "particles" ) )
 				{
 					files.AddToTail( sub->GetString() );
 					continue;

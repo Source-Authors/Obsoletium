@@ -834,7 +834,7 @@ void CPetTool::OpenSpecificFile( const char *pFileName )
 	if ( m_pDoc )
 	{
 		// File is already open
-		if ( !Q_stricmp( m_pDoc->GetFileName(), pFileName ) )
+		if ( V_strieq( m_pDoc->GetFileName(), pFileName ) )
 			return;
 
 		if ( m_pDoc->IsDirty() )
@@ -880,26 +880,26 @@ void CPetTool::OnFileOperationCompleted( [[maybe_unused]] const char *pFileType,
 	if ( state != FileOpenStateMachine::SUCCESSFUL )
 		return;
 
-	if ( !Q_stricmp( pContextKeyValues->GetName(), "OnNew" ) )
+	if ( V_strieq( pContextKeyValues->GetName(), "OnNew" ) )
 	{
 		PerformNew();
 		return;
 	}
 
-	if ( !Q_stricmp( pContextKeyValues->GetName(), "OnClose" ) )
+	if ( V_strieq( pContextKeyValues->GetName(), "OnClose" ) )
 	{
 		OnCloseNoSave();
 		return;
 	}
 
-	if ( !Q_stricmp( pContextKeyValues->GetName(), "OnQuit" ) )
+	if ( V_strieq( pContextKeyValues->GetName(), "OnQuit" ) )
 	{
 		OnCloseNoSave();
 		vgui::ivgui()->PostMessage( GetVPanel(), new KeyValues( "OnExit" ), 0 );
 		return;
 	}
 
-	if ( !Q_stricmp( pContextKeyValues->GetName(), "RestartLevel" ) )
+	if ( V_strieq( pContextKeyValues->GetName(), "RestartLevel" ) )
 	{
 		OnRestartLevel();
 		return;

@@ -232,7 +232,7 @@ bool CCommandBuffer::AddText( const char *pText, int nTickDelay )
 			continue;
 
 		// Deal with the special 'wait' command
-		if ( !Q_stricmp( pArgV0, "wait" ) && IsWaitEnabled() )
+		if ( V_strieq( pArgV0, "wait" ) && IsWaitEnabled() )
 		{
 			int nDelay = pArgS ? atoi( pArgS ) : m_nWaitDelayTicks;
 			nTick += nDelay;

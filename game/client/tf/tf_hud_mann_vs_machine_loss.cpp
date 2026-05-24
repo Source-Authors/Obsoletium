@@ -138,13 +138,13 @@ void CMvMWaveLossPanel::OnTick( void )
 //-----------------------------------------------------------------------------
 void CMvMWaveLossPanel::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "vote_restart" ) )
+	if ( V_strieq( command, "vote_restart" ) )
 	{
 		engine->ClientCmd( "callvote RestartGame;" );
 		SetMouseInputEnabled( false );
 		SetVisible( false );
 	}
-	else if ( !Q_stricmp( command, "continue" )  )
+	else if ( V_strieq( command, "continue" )  )
 	{
 		SetMouseInputEnabled( false );
 		SetVisible( false );

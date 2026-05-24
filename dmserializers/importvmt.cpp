@@ -159,7 +159,7 @@ bool CImportVMT::SerializeShaderParameters( CUtlBuffer &buf, CDmElement *pRoot )
 
 		// Skip the shader name
 		const char *pName = pAttribute->GetName();
-		if ( !Q_stricmp( pAttribute->GetName(), "shader" ) )
+		if ( V_strieq( pAttribute->GetName(), "shader" ) )
 			continue;
 
 		// Names that don't start with a $ or a % are not shader parameters
@@ -727,7 +727,7 @@ CDmElement* CImportVMT::UnserializeFromKeyValues( KeyValues *pKeyValues )
 	// Subkeys are either proxies or fallbacks
 	for ( KeyValues *pSubKey = pKeyValues->GetFirstTrueSubKey(); pSubKey != NULL; pSubKey = pSubKey->GetNextTrueSubKey() )
 	{
-		if ( !Q_stricmp( pSubKey->GetName(), "Proxies" ) )
+		if ( V_strieq( pSubKey->GetName(), "Proxies" ) )
 		{
 			UnserializeProxies( pRoot, pSubKey );
 		}

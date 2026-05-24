@@ -128,7 +128,7 @@ bool CDmxEdit::Load( const char *pFilename, const CObjType &loadType /* = DIST_A
 	Unload();
 
 	const intp sLen = Q_strlen( pFilename );
-	if ( sLen > 4 && !Q_stricmp( pFilename + sLen - 4, ".dmx" ) )
+	if ( sLen > 4 && V_strieq( pFilename + sLen - 4, ".dmx" ) )
 	{
 		g_pDataModel->RestoreFromFile( pFilename, NULL, NULL, &m_pRoot );
 
@@ -319,7 +319,7 @@ bool CDmxEdit::Import( const char *pFilename, const char *pParentName )
 		for ( int i = 0; i < nJointTransformCount; ++i )
 		{
 			pJoint = pDstModel->GetJointTransform( i );
-			if ( !Q_stricmp( pJoint->GetName(), pParentName ) )
+			if ( V_strieq( pJoint->GetName(), pParentName ) )
 			{
 				nSkinningJointIndex = i;
 				break;
@@ -686,7 +686,7 @@ bool IsASubsetOfB( CDmeCombinationOperator *pComboA, int nIndexA, CDmeCombinatio
 
 		for ( int j = 0; j < nCountB; ++j )
 		{
-			if ( !Q_stricmp( pNameA, pComboB->GetRawControlName( nIndexB, j ) ) )
+			if ( V_strieq( pNameA, pComboB->GetRawControlName( nIndexB, j ) ) )
 			{
 				bFound = true;
 				break;
@@ -727,7 +727,7 @@ int FindControlIndexFromRawControlName( CDmeCombinationOperator *pCombo, const c
 		const int nRawCount = pCombo->GetRawControlCount( i );
 		for ( int j = 0; j < nRawCount; ++j )
 		{
-			if ( !Q_stricmp( pRawControlName, pCombo->GetRawControlName( i, j ) ) )
+			if ( V_strieq( pRawControlName, pCombo->GetRawControlName( i, j ) ) )
 			{
 				return i;
 			}
@@ -1341,7 +1341,7 @@ bool CDmxEdit::Add(
 	const CFalloffType &falloffType,
 	const CDistanceType &passedDistanceType )
 {
-	if ( !Q_stricmp( "BASE", pDeltaName ) )
+	if ( V_strieq( "BASE", pDeltaName ) )
 		return Add( addType, CDmxEditProxy( *this ), weight, featherDistance, falloffType );
 
 	if ( !m_pMesh )
@@ -1457,7 +1457,7 @@ bool CDmxEdit::Interp( const CDmxEditProxy &e, float weight /* = 1.0f */, float 
 //-----------------------------------------------------------------------------
 bool CDmxEdit::Interp( const char *pDeltaName, float weight /* = 1.0f */, float featherDistance /* = 0.0f */, const CFalloffType &falloffType, const CDistanceType &passedDistanceType )
 {
-	if ( !Q_stricmp( "BASE", pDeltaName ) )
+	if ( V_strieq( "BASE", pDeltaName ) )
 		return Interp( CDmxEditProxy( *this ), weight, featherDistance, falloffType );
 
 	if ( !m_pMesh )
@@ -1530,7 +1530,7 @@ bool CDmxEdit::Save( const char *pFilename, const CObjType &saveType /* = ABSOLU
 	bool retVal = false;
 
 	const intp sLen = Q_strlen( pFilename );
-	if ( sLen > 4 && !Q_stricmp( pFilename + sLen - 4, ".dmx" ) )
+	if ( sLen > 4 && V_strieq( pFilename + sLen - 4, ".dmx" ) )
 	{
 		retVal = g_p4factory->AccessFile( pFilename )->Edit();
 		if ( !retVal )
@@ -1555,7 +1555,7 @@ bool CDmxEdit::Save( const char *pFilename, const CObjType &saveType /* = ABSOLU
 
 		if ( pDeltaName )
 		{
-			if ( !Q_stricmp( "base", pDeltaName ) )
+			if ( V_strieq( "base", pDeltaName ) )
 			{
 				retVal = CDmObjSerializer().WriteOBJ( pFilename, m_pRoot, false, NULL, absolute );
 			}
@@ -1788,7 +1788,7 @@ bool CDmxEdit::SaveDelta( const char *pDeltaName )
 	if ( !m_pMesh )
 		return SetErrorString( "No Mesh" );
 
-	if ( !Q_stricmp( pDeltaName, "base" ) )
+	if ( V_strieq( pDeltaName, "base" ) )
 	{
 		CDmeVertexData *pCurr = m_pMesh->GetCurrentBaseState();
 		if ( !pCurr )
@@ -2935,7 +2935,7 @@ bool HasDuplicateControlName(
 	intp nRetiredControlNameCount = retiredControlNames.Count();
 	for ( i = 0; i < nRetiredControlNameCount; ++i )
 	{
-		if ( !Q_stricmp( retiredControlNames[i], pControlName ) )
+		if ( V_strieq( retiredControlNames[i], pControlName ) )
 			break;
 	}
 

@@ -14,13 +14,13 @@ namespace se::dedicated {
 // stop people being able to get a pointer to a FILESYSTEM_INTERFACE_VERSION
 // stdio interface.
 void *FileSystemFactory(const char *name, int *rc) {
-  if (!Q_stricmp(name, FILESYSTEM_INTERFACE_VERSION)) {
+  if (V_strieq(name, FILESYSTEM_INTERFACE_VERSION)) {
     if (rc) *rc = IFACE_OK;
 
     return g_pFileSystem;
   }
 
-  if (!Q_stricmp(name, BASEFILESYSTEM_INTERFACE_VERSION)) {
+  if (V_strieq(name, BASEFILESYSTEM_INTERFACE_VERSION)) {
     if (rc) *rc = IFACE_OK;
 
     return g_pBaseFileSystem;

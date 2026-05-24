@@ -892,7 +892,7 @@ bool CHL2MPRules::IsOfficialMap( void )
 
 	for ( const auto *officialMap : s_OfficialMaps )
 	{
-		if ( !Q_stricmp( officialMap, szCurrentMap ) )
+		if ( V_strieq( officialMap, szCurrentMap ) )
 		{
 			return true;
 		}

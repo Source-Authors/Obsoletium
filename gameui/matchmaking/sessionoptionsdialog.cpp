@@ -85,7 +85,7 @@ void CSessionOptionsDialog::ApplyCommonProperties( KeyValues *pKeys )
 	{
 		const char *pName = pProperty->GetName();
 
-		if ( !Q_stricmp( pName, "SessionContext" ) )
+		if ( V_strieq( pName, "SessionContext" ) )
 		{
 			// Create a new session context
 			sessionProperty_t ctx;
@@ -96,7 +96,7 @@ void CSessionOptionsDialog::ApplyCommonProperties( KeyValues *pKeys )
 
 			m_SessionProperties.AddToTail( ctx );
 		}
-		else if ( !Q_stricmp( pName, "SessionProperty" ) )
+		else if ( V_strieq( pName, "SessionProperty" ) )
 		{
 			// Create a new session property
 			sessionProperty_t prop;
@@ -107,7 +107,7 @@ void CSessionOptionsDialog::ApplyCommonProperties( KeyValues *pKeys )
 
 			m_SessionProperties.AddToTail( prop );
 		}
-		else if ( !Q_stricmp( pName, "SessionFlag" ) )
+		else if ( V_strieq( pName, "SessionFlag" ) )
 		{
 			sessionProperty_t flag;
 			flag.nType = SESSION_FLAG;
@@ -339,7 +339,7 @@ void CSessionOptionsDialog::OverrideMenuItem( KeyValues *pItemKeys )
 {
 	if ( m_bModifySession && m_pDialogKeys )
 	{
-		if ( !Q_stricmp( pItemKeys->GetName(), "OptionsItem" ) )
+		if ( V_strieq( pItemKeys->GetName(), "OptionsItem" ) )
 		{
 			const char *pID	= pItemKeys->GetString( "id", "NULL" );
 
@@ -357,13 +357,13 @@ void CSessionOptionsDialog::OverrideMenuItem( KeyValues *pItemKeys )
 	//	- restrict max number of players to bandwidth allowed
 	//
 	if ( !m_bModifySession &&
-		( !Q_stricmp( m_szGametype, "hoststandard" ) || !Q_stricmp( m_szGametype, "hostranked" ) )
+		( V_strieq( m_szGametype, "hoststandard" ) || V_strieq( m_szGametype, "hostranked" ) )
 		)
 	{
-		if ( !Q_stricmp( pItemKeys->GetName(), "OptionsItem" ) )
+		if ( V_strieq( pItemKeys->GetName(), "OptionsItem" ) )
 		{
 			const char *pID	= pItemKeys->GetString( "id", "NULL" );
-			if ( !Q_stricmp( pID, "PROPERTY_GAME_SIZE" ) )
+			if ( V_strieq( pID, "PROPERTY_GAME_SIZE" ) )
 			{
 				// dimhotepus: int -> uint64.
 				pItemKeys->SetUint64( "activeoption", GetMaxPlayersRecommendedOption() );

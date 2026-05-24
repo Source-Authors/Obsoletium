@@ -841,25 +841,25 @@ void CVehicleMortarControlPanel::OnCommand( const char *command )
 		GetInRam();
 		return;
 	}
-	else if ( !Q_stricmp( command, "Deploy" ) )
+	else if ( V_strieq( command, "Deploy" ) )
 	{
 		m_pDeployMessageLabel->SetText( "Deployed in" );
 		m_pCancelDeployButton->SetVisible( true );
 
 		SendToServerObject( "Deploy" );	// Tell the server.
 	}
-	else if ( !Q_stricmp( command, "CancelDeploy" ) )
+	else if ( V_strieq( command, "CancelDeploy" ) )
 	{
 		SendToServerObject( command );
 	}
-	else if ( !Q_stricmp( command, "Undeploy" ) )
+	else if ( V_strieq( command, "Undeploy" ) )
 	{
 		m_pDeployMessageLabel->SetText( "Undeployed in" );
 		m_pCancelDeployButton->SetVisible( false );
 
 		SendToServerObject( "Undeploy" );	// Tell the server.
 	}
-	else if ( !Q_stricmp( command, "FireMortar" ) )
+	else if ( V_strieq( command, "FireMortar" ) )
 	{
 		pMortar->ClickFire();
 	}

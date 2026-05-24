@@ -81,7 +81,7 @@ const char *GetCurveInfoTypeFromLogType( const char *pLogType )
 {
 	for ( const auto &typeMap : g_typeMap )
 	{
-		if ( !Q_stricmp( pLogType, typeMap.pLogType ) )
+		if ( V_strieq( pLogType, typeMap.pLogType ) )
 			return typeMap.pCurveInfoType;
 	}
 	return NULL;
@@ -91,7 +91,7 @@ bool IsLogLayerType( const char *pLogLayerType )
 {
 	for ( const auto &typeMap : g_typeMap )
 	{
-		if ( !Q_stricmp( pLogLayerType, typeMap.pLogLayerType ) )
+		if ( V_strieq( pLogLayerType, typeMap.pLogLayerType ) )
 			return true;
 	}
 	return false;

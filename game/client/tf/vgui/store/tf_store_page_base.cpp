@@ -71,7 +71,7 @@ void CTFStorePageBase::OnPageShow( void )
 //-----------------------------------------------------------------------------
 void CTFStorePageBase::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "show_explanations" ) )
+	if ( V_strieq( command, "show_explanations" ) )
 	{
 		if ( !m_flStartExplanationsAt )
 		{

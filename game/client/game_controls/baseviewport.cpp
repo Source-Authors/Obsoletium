@@ -119,7 +119,7 @@ bool CBaseViewport::LoadHudAnimations( void )
 	// Load each file defined in the text
 	for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
 	{
-		if ( !Q_stricmp( sub->GetName(), "file" ) )
+		if ( V_strieq( sub->GetName(), "file" ) )
 		{
 			// Add it
 			if ( m_pAnimController->SetScriptFile( GetVPanel(), sub->GetString(), bClearScript ) == false )

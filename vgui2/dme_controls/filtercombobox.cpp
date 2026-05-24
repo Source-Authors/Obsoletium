@@ -34,7 +34,7 @@ void CFilterComboBox::OnKillFocus()
 	for ( i = 0; i < nItemCount; ++i )
 	{
 		GetItemText( i, pItemText, sizeof(pItemText) );
-		if ( !Q_stricmp( pFilterText, pItemText ) )
+		if ( V_strieq( pFilterText, pItemText ) )
 			break;
 	}
 

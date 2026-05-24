@@ -742,7 +742,7 @@ bool CDmxSerializerKeyValues2::Serialize( CUtlBuffer &outBuf, CDmxElement *pRoot
 	SetSerializationDelimiter( GetCStringCharConversion() );
 	SetSerializationArrayDelimiter( "," );
 
-	bool bFlatMode = !Q_stricmp( pFormatName, "keyvalues2_flat" );
+	bool bFlatMode = V_strieq( pFormatName, "keyvalues2_flat" );
 
 	// Save elements, attribute links
 	CDmxSerializationDictionary dict;
@@ -1323,7 +1323,7 @@ bool CDmxSerializerKeyValues2::UnserializeElement( CUtlBuffer &buf, const char *
 		DmAttributeType_t nAttrType = AT_UNKNOWN;
 		for ( int i = 0; i < AT_TYPE_COUNT; ++i )
 		{
-			if ( !Q_stricmp( g_pAttributeTypeName[i], pAttributeType ) )
+			if ( V_strieq( g_pAttributeTypeName[i], pAttributeType ) )
 			{
 				nAttrType = (DmAttributeType_t)i;
 				break;

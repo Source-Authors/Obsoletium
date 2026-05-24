@@ -298,7 +298,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 		szNewParms[0] = szNewRun[0] = '\0';
 
 		// HACK: force the spawnv call for launching the game
-		if (!Q_stricmp(cmd.szRun, "$game_exe"))
+		if (V_strieq(cmd.szRun, "$game_exe"))
 		{
 			cmd.bUseProcessWnd = FALSE;
 		}

@@ -1034,23 +1034,23 @@ unsigned char *ImgUtl_ReadImageAsRGBA( const char *path, int &width, int &height
 	const char *pExt = V_GetFileExtension( path );
 	if ( pExt )
 	{
-		if ( !Q_stricmp(pExt, "vtf") )
+		if ( V_strieq(pExt, "vtf") )
 		{
 			return ImgUtl_ReadVTFAsRGBA( path, width, height, errcode );
 		}
-		if ( !Q_stricmp(pExt, "bmp") )
+		if ( V_strieq(pExt, "bmp") )
 		{
 			return ImgUtl_ReadBMPAsRGBA( path, width, height, errcode );
 		}
-		if ( !Q_stricmp(pExt, "jpg") || !Q_stricmp(pExt, "jpeg") )
+		if ( V_strieq(pExt, "jpg") || V_strieq(pExt, "jpeg") )
 		{
 			return ImgUtl_ReadJPEGAsRGBA( path, width, height, errcode );
 		}
-		if ( !Q_stricmp(pExt, "png") )
+		if ( V_strieq(pExt, "png") )
 		{
 			return ImgUtl_ReadPNGAsRGBA( path, width, height, errcode );
 		}
-		if ( !Q_stricmp(pExt, "tga") )
+		if ( V_strieq(pExt, "tga") )
 		{
 			TGAHeader header;
 			return ImgUtl_ReadTGAAsRGBA( path, width, height, errcode, header );

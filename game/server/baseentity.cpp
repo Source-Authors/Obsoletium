@@ -1302,7 +1302,7 @@ void CBaseEntity::FireNamedOutput( const char *pszOutput, variant_t variant, CBa
 			if ( ( dataDesc->fieldType == FIELD_CUSTOM ) && ( dataDesc->flags & FTYPEDESC_OUTPUT ) )
 			{
 				CBaseEntityOutput *pOutput = ( CBaseEntityOutput * )( ( intp )this + ( intp )dataDesc->fieldOffset[0] );
-				if ( !Q_stricmp( dataDesc->externalName, pszOutput ) )
+				if ( V_strieq( dataDesc->externalName, pszOutput ) )
 				{
 					pOutput->FireOutput( variant, pActivator, pCaller, flDelay );
 					return;
@@ -3105,7 +3105,7 @@ static FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
 
 bool CBaseEntity::NameMatchesComplex( const char *pszNameOrWildcard )
 {
-	if ( !Q_stricmp( "!player", pszNameOrWildcard) )
+	if ( V_strieq( "!player", pszNameOrWildcard) )
 		return IsPlayer();
 
 	return NamesMatch( pszNameOrWildcard, m_iName );
@@ -3982,7 +3982,7 @@ bool CBaseEntity::AcceptInput( const char *szInputName, CBaseEntity *pActivator,
 		{
 			if ( dmap->dataDesc[i].flags & FTYPEDESC_INPUT )
 			{
-				if ( !Q_stricmp(dmap->dataDesc[i].externalName, szInputName) )
+				if ( V_strieq(dmap->dataDesc[i].externalName, szInputName) )
 				{
 					// found a match
 
@@ -4121,7 +4121,7 @@ bool CBaseEntity::ReadKeyField( const char *varName, variant_t *var )
 		{
 			if ( dmap->dataDesc[i].flags & (FTYPEDESC_OUTPUT | FTYPEDESC_KEY) )
 			{
-				if ( !Q_stricmp(dmap->dataDesc[i].externalName, varName) )
+				if ( V_strieq(dmap->dataDesc[i].externalName, varName) )
 				{
 					var->Set( dmap->dataDesc[i].fieldType, ((char*)this) + dmap->dataDesc[i].fieldOffset[ TD_OFFSET_NORMAL ] );
 					return true;
@@ -5385,7 +5385,7 @@ void CC_Ent_Dump( const CCommand& args )
 						}
 
 						// don't print out the duplicate keys
-						if ( !Q_stricmp("parentname",dmap->dataDesc[i].externalName) || !Q_stricmp("targetname",dmap->dataDesc[i].externalName) )
+						if ( V_strieq("parentname",dmap->dataDesc[i].externalName) || V_strieq("targetname",dmap->dataDesc[i].externalName) )
 							continue;
 
 						// don't print out empty keys
@@ -7406,7 +7406,7 @@ void CC_Ent_Create( const CCommand& args )
 	}
 
 	// Don't allow regular users to create point_servercommand entities for the same reason as blocking ent_fire
-	if ( !Q_stricmp( args[1], "point_servercommand" ) )
+	if ( V_strieq( args[1], "point_servercommand" ) )
 	{
 		if ( engine->IsDedicatedServer() )
 		{

@@ -250,7 +250,7 @@ void CTFGiveawayItemPanel::FireGameEvent( IGameEvent *event )
 //-----------------------------------------------------------------------------
 void CTFGiveawayItemPanel::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "vguicancel" ) )
+	if ( V_strieq( command, "vguicancel" ) )
 	{
 		ShowPanel( false );
 

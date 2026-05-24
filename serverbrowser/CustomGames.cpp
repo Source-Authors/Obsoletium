@@ -410,7 +410,7 @@ void CCustomGames::AddTagToFilterList( const char *pszTag )
 		for ( intp i = 0; i < TagList.Count(); i++ )
 		{
 			// Already in the tag list?
-			if ( !Q_stricmp( TagList[i], pszTag ) )
+			if ( V_strieq( TagList[i], pszTag ) )
 			{
 				TagList.PurgeAndDeleteElementsArray();
 				return;

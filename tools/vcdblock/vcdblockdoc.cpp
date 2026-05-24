@@ -347,7 +347,7 @@ CDmeVMFEntity *CVcdBlockDoc::GetInfoTargetForLocation( Vector &vecStart, Vector 
 bool CVcdBlockDoc::GetStringChoiceList( const char *pChoiceListType, [[maybe_unused]] CDmElement *pElement, 
 									[[maybe_unused]] const char *pAttributeName, [[maybe_unused]] bool bArrayElement, StringChoiceList_t &list )
 {
-	if ( !Q_stricmp( pChoiceListType, "info_targets" ) )
+	if ( V_strieq( pChoiceListType, "info_targets" ) )
 	{
 		const CDmrElementArray<> entities = GetEntityList();
 
@@ -380,13 +380,13 @@ bool CVcdBlockDoc::GetStringChoiceList( const char *pChoiceListType, [[maybe_unu
 bool CVcdBlockDoc::GetElementChoiceList( const char *pChoiceListType, [[maybe_unused]] CDmElement *pElement, 
 									 [[maybe_unused]] const char *pAttributeName, [[maybe_unused]] bool bArrayElement, ElementChoiceList_t &list )
 {
-	if ( !Q_stricmp( pChoiceListType, "allelements" ) )
+	if ( V_strieq( pChoiceListType, "allelements" ) )
 	{
 		AddElementsRecursively( m_hEditRoot, list );
 		return true;
 	}
 
-	if ( !Q_stricmp( pChoiceListType, "info_targets" ) )
+	if ( V_strieq( pChoiceListType, "info_targets" ) )
 	{
 		const CDmrElementArray<> entities = GetEntityList();
 
@@ -460,7 +460,7 @@ void CVcdBlockDoc::InitializeFromServer( CDmrElementArray<> &entityList )
 
 		if (servertools->GetKeyValue( pServerEnt, "classname", classname, sizeof( classname ) ) )
 		{
-			if ( !Q_stricmp( classname, "info_target" ))
+			if ( V_strieq( classname, "info_target" ))
 			{
 				char hammerid[256];
 				if ( servertools->GetKeyValue( pServerEnt, "hammerid", hammerid, sizeof( hammerid ) ) )

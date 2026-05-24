@@ -512,7 +512,7 @@ intp CBaseAnimSetControlGroupPanel::FindTreeItem( intp nParentIndex, const TreeI
 		Assert( data );
 
 		const char *pAttributeName = data->GetString( "text" );
-		if ( !Q_stricmp( pAttributeName, info.m_pAttributeName ) )
+		if ( V_strieq( pAttributeName, info.m_pAttributeName ) )
 		{
 			return nChildIndex;
 		}

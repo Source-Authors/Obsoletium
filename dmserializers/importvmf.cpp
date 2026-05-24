@@ -86,7 +86,7 @@ static const char *GetRemapName( const char *pName, bool bSerialization )
 {
 	for ( int i = 0; s_pKeyRemapNames[i][0]; ++i )
 	{
-		if ( !Q_stricmp( pName, s_pKeyRemapNames[i][bSerialization] ) )
+		if ( V_strieq( pName, s_pKeyRemapNames[i][bSerialization] ) )
 			return s_pKeyRemapNames[i][1 - bSerialization];
 	}
 	return pName;
@@ -102,7 +102,7 @@ bool CImportVMF::SerializeAttribute( CUtlBuffer &buf, CDmAttribute *pAttribute, 
 		return true;
 
 	const char *pFieldName = GetRemapName( pAttribute->GetName(), true );
-	if ( !Q_stricmp( pFieldName, "editorType" ) )
+	if ( V_strieq( pFieldName, "editorType" ) )
 		return true;
 
 	if ( !IsArrayType( pAttribute->GetType() ) )
@@ -154,7 +154,7 @@ bool CImportVMF::SerializeOther( CUtlBuffer &buf, CDmAttribute *pOther, const ch
 			intp j;
 			for ( j = 0; ppFilter[j]; ++j )
 			{
-				if ( !Q_stricmp( pElementName, ppFilter[j] ) )
+				if ( V_strieq( pElementName, ppFilter[j] ) )
 					break;
 			}
 
@@ -260,7 +260,7 @@ bool CImportVMF::SerializeEntities( CUtlBuffer &buf, CDmAttribute *pEntities )
 	    for( CDmAttribute *pAttribute = pElement->FirstAttribute(); pAttribute; pAttribute = pAttribute->NextAttribute() )
 		{
 			// Do 'editor' at the end to preserve ordering and not make terrible diffs
-			if ( !Q_stricmp( pAttribute->GetName(), "editor" ) )
+			if ( V_strieq( pAttribute->GetName(), "editor" ) )
 				continue;
 
 			if ( !SerializeAttribute( buf, pAttribute, false ) )
@@ -270,7 +270,7 @@ bool CImportVMF::SerializeEntities( CUtlBuffer &buf, CDmAttribute *pEntities )
 	    for( CDmAttribute *pAttribute = pElement->FirstAttribute(); pAttribute; pAttribute = pAttribute->NextAttribute() )
 		{
 			// Do 'editor' at the end to preserve ordering and not make terrible diffs
-			if ( !Q_stricmp( pAttribute->GetName(), "editor" ) )
+			if ( V_strieq( pAttribute->GetName(), "editor" ) )
 				continue;
 
 			if ( !SerializeAttribute( buf, pAttribute, true ) )
@@ -338,7 +338,7 @@ bool CImportVMF::Serialize( CUtlBuffer &buf, CDmElement *pRoot )
 //-----------------------------------------------------------------------------
 void CImportVMF::UpdateMaxHammerId( KeyValues *pField )
 {
-	if ( !Q_stricmp( pField->GetName(), "id" ) )
+	if ( V_strieq( pField->GetName(), "id" ) )
 	{
 		int nId = atoi( pField->GetString() );
 		if ( nId > m_nMaxHammerId )
@@ -432,7 +432,7 @@ bool CImportVMF::UnserializeEntityKey( CDmAttribute *pEntities, KeyValues *pKeyV
 
 		// Don't do id: it's used as the name
 		// Not to mention it's a protected name
-		if ( !Q_stricmp( pFieldName, "id" ) )
+		if ( V_strieq( pFieldName, "id" ) )
 		{
 			UpdateMaxHammerId( pField );
 			continue;
@@ -495,7 +495,7 @@ bool CImportVMF::UnserializeEntityKey( CDmAttribute *pEntities, KeyValues *pKeyV
 	for ( KeyValues *pSubKey = pKeyValues->GetFirstTrueSubKey(); pSubKey != NULL; pSubKey = pSubKey->GetNextTrueSubKey() )
 	{
 		bool bOk = false;
-		if ( !Q_stricmp( pSubKey->GetName(), "editor" ) )
+		if ( V_strieq( pSubKey->GetName(), "editor" ) )
 		{
 			bOk = UnserializeEntityEditorKey( pEditor, pSubKey );
 		}
@@ -600,7 +600,7 @@ CDmElement* CImportVMF::UnserializeFromKeyValues( KeyValues *pKeyValues )
 	for ( ; pKeyValues != NULL; pKeyValues = pKeyValues->GetNextKey() )
 	{
 		bool bOk = false;
-		if ( !Q_stricmp( pKeyValues->GetName(), "entity" ) )
+		if ( V_strieq( pKeyValues->GetName(), "entity" ) )
 		{
 			bOk = UnserializeEntityKey( pEntityArray, pKeyValues );
 		}

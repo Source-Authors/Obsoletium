@@ -977,13 +977,13 @@ void CCraftingPanel::OnCommand( const char *command )
 		}
 		return;
 	}
-	else if ( !Q_stricmp( command, "upgrade" ) )
+	else if ( V_strieq( command, "upgrade" ) )
 	{
 		EconUI()->CloseEconUI();
 		EconUI()->OpenStorePanel( STOREPANEL_SHOW_UPGRADESTEPS, false );
 		return;
 	}
-	else if ( !Q_stricmp( command, "reloadscheme" ) )
+	else if ( V_strieq( command, "reloadscheme" ) )
 	{
 		InvalidateLayout( true, true );
 	}
@@ -1306,7 +1306,7 @@ void CCraftingStatusDialog::OnCommand( const char *command )
 {
 	bool bClose = false;
 
-	if ( !Q_stricmp( command, "close" ) )
+	if ( V_strieq( command, "close" ) )
 	{
 		// If we were a success, show the player their new crafted items
 		if ( m_bShowOnExit )
@@ -1321,7 +1321,7 @@ void CCraftingStatusDialog::OnCommand( const char *command )
 
 		bClose = true;
 	}
-	else if ( !Q_stricmp( command, "forceclose" ) )
+	else if ( V_strieq( command, "forceclose" ) )
 	{
 		bClose = true;
 	}

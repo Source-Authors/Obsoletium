@@ -280,7 +280,7 @@ void CChoreoChannel::ReconcileGestureTimes()
 			//  to the begining of the scene even if there is a null gesture in place at the begining.
 			// -------------------------
 			/*
-			else if ( pEntryTag && !Q_stricmp( previous->GetName(), "NULL" ) )
+			else if ( pEntryTag && V_strieq( previous->GetName(), "NULL" ) )
 			{
 				// If the previous was a null event, then do a bit of fixup
 				event->SetStartTime( previous->GetEndTime() );

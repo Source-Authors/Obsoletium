@@ -44,7 +44,7 @@ unsigned char Interpolator_InterpolatorForName( char const *name )
 {
 	for ( auto &slot : g_InterpolatorNameMap )
 	{
-		if ( !Q_stricmp( name, slot.name ) )
+		if ( V_strieq( name, slot.name ) )
 			return slot.type;
 	}
 	

@@ -82,7 +82,7 @@ static void PopulateCloseCaptionTokenList( HWND wnd, CCloseCaptionLookupParams *
 
 		SendMessage( control, LVM_SETITEMW, 0, (LPARAM)(const LV_ITEMW FAR*)(&lvItem));
 
-		if ( !Q_stricmp( name, params->m_szCCToken ) )
+		if ( V_strieq( name, params->m_szCCToken ) )
 		{
 			ListView_SetItemState( control, lvItem.iItem, LVIS_SELECTED, LVIS_STATEIMAGEMASK );
 			saveSelected = lvItem.iItem;

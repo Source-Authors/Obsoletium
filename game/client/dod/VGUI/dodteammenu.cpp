@@ -233,7 +233,7 @@ void CDODTeamMenu::PaintBackground( void )
 //-----------------------------------------------------------------------------
 Panel *CDODTeamMenu::CreateControlByName( const char *controlName )
 {
-	if( !Q_stricmp( "DODMouseOverPanelButton", controlName ) )
+	if( V_strieq( "DODMouseOverPanelButton", controlName ) )
 	{
 		CDODMouseOverButton<EditablePanel> *newButton = new CDODMouseOverButton<EditablePanel>( this, NULL, m_pPanel );
 		
@@ -243,11 +243,11 @@ Panel *CDODTeamMenu::CreateControlByName( const char *controlName )
 		}
 		return newButton;
 	}
-	else if( !Q_stricmp( "DODButton", controlName ) )
+	else if( V_strieq( "DODButton", controlName ) )
 	{
 		return new CDODButton(this);
 	}
-	else if ( !Q_stricmp( "CIconPanel", controlName ) )
+	else if ( V_strieq( "CIconPanel", controlName ) )
 	{
 		return new CIconPanel(this, "icon_panel");
 	}
@@ -262,11 +262,11 @@ void CDODTeamMenu::OnShowPage( char const *pagename )
 	if ( !pagename || !pagename[ 0 ] )
 		return;
 
-	if ( !Q_stricmp( pagename, "allies") )
+	if ( V_strieq( pagename, "allies") )
 	{
 		m_iActiveTeam = TEAM_ALLIES;
 	}
-	else if ( !Q_stricmp( pagename, "axis" ) )
+	else if ( V_strieq( pagename, "axis" ) )
 	{
 		m_iActiveTeam = TEAM_AXIS;
 	}

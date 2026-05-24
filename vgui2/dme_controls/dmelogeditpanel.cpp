@@ -516,7 +516,7 @@ void CDmeLogEditFrame::DoModal( CDmeLog *pLog, DmeTime_t startTime, DmeTime_t en
 //-----------------------------------------------------------------------------
 void CDmeLogEditFrame::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "Ok" ) )
+	if ( V_strieq( pCommand, "Ok" ) )
 	{
 		KeyValues *pActionKeys = new KeyValues( "LogEdited" );
 		if ( m_pContextKeyValues )
@@ -532,7 +532,7 @@ void CDmeLogEditFrame::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "Cancel" ) )
+	if ( V_strieq( pCommand, "Cancel" ) )
 	{
 		CloseModal();
 		return;

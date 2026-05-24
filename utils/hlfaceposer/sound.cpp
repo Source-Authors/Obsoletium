@@ -1144,7 +1144,7 @@ void CFacePoserSound::Init( void )
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
 		{
-			if ( !Q_stricmp( sub->GetName(), "faceposer_file" ) )
+			if ( V_strieq( sub->GetName(), "faceposer_file" ) )
 			{
 				soundemitter->AddSoundOverrides( sub->GetString() );
 				continue;

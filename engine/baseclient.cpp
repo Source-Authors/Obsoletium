@@ -184,7 +184,7 @@ void CBaseClient::SetUserCVar( const char *pchCvar, const char *value)
 		return;
 
 	// Name is handled differently
-	if ( !Q_stricmp( pchCvar, "name") )
+	if ( V_strieq( pchCvar, "name") )
 	{
 		//Msg("CBaseClient::SetUserCVar[index=%d]('name', '%s')\n", m_nClientSlot, value );
 		ClientRequestNameChange( value );
@@ -449,7 +449,7 @@ void CBaseClient::SetName(const char * playerName)
 					continue;
 				
 				// If it's 2 bots they're allowed to have matching names, otherwise there's a conflict
-				if( !Q_stricmp( client->GetClientName(), val ) && !( IsFakeClient() && client->IsFakeClient() ) )
+				if( V_strieq( client->GetClientName(), val ) && !( IsFakeClient() && client->IsFakeClient() ) )
 				{
 					CBaseClient *pClient = dynamic_cast< CBaseClient* >( client );
 					if ( IsFakeClient() && pClient )
@@ -1306,7 +1306,7 @@ bool CBaseClient::ExecuteStringCommand( const char *pCommand )
 	if ( !pCommand || !pCommand[0] )
 		return false;
 
-	if ( !Q_stricmp( pCommand, "demorestart" ) )
+	if ( V_strieq( pCommand, "demorestart" ) )
 	{
 		DemoRestart();
 		// trick, dont return true, so serverGameClients gets this command too

@@ -418,9 +418,9 @@ bool CSoundSystem::BuildGameSoundList()
 
 	for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
 	{
-		if ( !Q_stricmp( sub->GetName(), "precache_file" ) ||
-			!Q_stricmp( sub->GetName(), "declare_file" ) ||
-			!Q_stricmp( sub->GetName(), "preload_file" ) )
+		if ( V_strieq( sub->GetName(), "precache_file" ) ||
+			V_strieq( sub->GetName(), "declare_file" ) ||
+			V_strieq( sub->GetName(), "preload_file" ) )
 		{
 			// Add and always precache
 			AddGameSoundsFromFile( sub->GetString() );

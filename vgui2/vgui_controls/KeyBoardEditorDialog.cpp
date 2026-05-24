@@ -505,7 +505,7 @@ void CKeyBoardEditorPage::OnKeyCodeTyped(vgui::KeyCode code)
 
 void CKeyBoardEditorPage::OnCommand( char const *cmd )
 {
-	if ( !m_pList->IsCapturing() && !Q_stricmp( cmd, "ChangeKey" ) )
+	if ( !m_pList->IsCapturing() && V_strieq( cmd, "ChangeKey" ) )
 	{
 		m_pList->StartCaptureMode(dc_blank);
 	}
@@ -816,22 +816,22 @@ CKeyBoardEditorDialog::CKeyBoardEditorDialog( Panel *parent, Panel *panelToEdit,
 
 void CKeyBoardEditorDialog::OnCommand( char const *cmd )
 {
-	if ( !Q_stricmp( cmd, "save" ) )
+	if ( V_strieq( cmd, "save" ) )
 	{
 		m_pKBEditor->OnSaveChanges();
 		MarkForDeletion();
 	}
-	else if ( !Q_stricmp( cmd, "cancel" ) ||
-		      !Q_stricmp( cmd, "Close" ) )
+	else if ( V_strieq( cmd, "cancel" ) ||
+		      V_strieq( cmd, "Close" ) )
 	{
 		m_pKBEditor->OnRevert();
 		MarkForDeletion();
 	}
-	else if ( !Q_stricmp( cmd, "revert" ) )
+	else if ( V_strieq( cmd, "revert" ) )
 	{
 		m_pKBEditor->OnRevert();
 	}
-	else if ( !Q_stricmp( cmd, "defaults" ) )
+	else if ( V_strieq( cmd, "defaults" ) )
 	{
 		m_pKBEditor->OnUseDefaults();
 	}

@@ -86,15 +86,15 @@ const char *CWorkspaceFiles::NameForType( int type )
 
 int CWorkspaceFiles::TypeForName( const char *name )
 {
-	if ( !Q_stricmp( name, "expressionfiles" ) )
+	if ( V_strieq( name, "expressionfiles" ) )
 	{
 		return EXPRESSION;
 	}
-	else if ( !Q_stricmp( name, "choreodatafiles" ) )
+	else if ( V_strieq( name, "choreodatafiles" ) )
 	{
 		return CHOREODATA;
 	}
-	else if ( !Q_stricmp( name, "modelfiles" ) )
+	else if ( V_strieq( name, "modelfiles" ) )
 	{
 		return MODELDATA;
 	}

@@ -3226,7 +3226,7 @@ DmAttributeType_t AttributeType( const char *pName )
 {
 	for ( int i = 0; i < AT_TYPE_COUNT; ++i )
 	{
-		if ( !Q_stricmp( s_pAttrInfo[ i ]->AttributeTypeName(), pName ) )
+		if ( V_strieq( s_pAttrInfo[ i ]->AttributeTypeName(), pName ) )
 			return (DmAttributeType_t)i;
 	}
 

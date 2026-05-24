@@ -63,7 +63,7 @@ int StringToButtonCode( const char *name )
 {
 	for ( const auto &controllerButton : s_ControllerButtons )
 	{
-		if ( !Q_stricmp( controllerButton.name, name ) )
+		if ( V_strieq( controllerButton.name, name ) )
 			return controllerButton.code;
 	}
 	return -1;
@@ -108,7 +108,7 @@ void CControllerMap::ApplySettings( KeyValues *inResourceData )
 	// loop through all the data adding items to the menu
 	for (KeyValues *dat = inResourceData->GetFirstSubKey(); dat != NULL; dat = dat->GetNextKey())
 	{
-		if ( !Q_stricmp( dat->GetName(), "button" ) )
+		if ( V_strieq( dat->GetName(), "button" ) )
 		{
 			const char *buttonName = dat->GetString( "name", "" );
 			int keycode = StringToButtonCode( buttonName );

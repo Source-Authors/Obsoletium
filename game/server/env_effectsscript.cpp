@@ -128,7 +128,7 @@ private:
 //-----------------------------------------------------------------------------
 	bool IsRootCommand( void )
 	{
-		if ( !Q_stricmp( token, "effect" ) )
+		if ( V_strieq( token, "effect" ) )
 			return true;
 
 		return false;
@@ -406,7 +406,7 @@ void CEnvEffectsScript::LoadFromBuffer( const char *scriptfile, const char *buff
 			break;
 		}
 
-		if ( !Q_stricmp( token, "effect" ) )
+		if ( V_strieq( token, "effect" ) )
 		{
 			ParseNewEffect();
 		}
@@ -438,27 +438,27 @@ void CEnvEffectsScript::ParseNewEffect( void )
 			break;
 		}
 
-		if ( !Q_stricmp( token, "{" ) )
+		if ( V_strieq( token, "{" ) )
 		{
 			while ( 1 )
 			{
 				ParseToken();
-				if ( !Q_stricmp( token, "}" ) )
+				if ( V_strieq( token, "}" ) )
 					break;
 
-				if ( !Q_stricmp( token, "type" ) )
+				if ( V_strieq( token, "type" ) )
 				{
 					ParseToken();
 
-					if ( !Q_stricmp( token, "trail" ) )
+					if ( V_strieq( token, "trail" ) )
 						NewElement.m_iType = EFFECT_TYPE_TRAIL;
-					else if ( !Q_stricmp( token, "sprite" ) )
+					else if ( V_strieq( token, "sprite" ) )
 						NewElement.m_iType = EFFECT_TYPE_SPRITE;
 
 					continue;
 				}
 
-				if ( !Q_stricmp( token, "material" ) )
+				if ( V_strieq( token, "material" ) )
 				{
 					ParseToken();
 					Q_strncpy( NewElement.m_szMaterial, token, sizeof( NewElement.m_szMaterial ) );
@@ -467,7 +467,7 @@ void CEnvEffectsScript::ParseNewEffect( void )
 					continue;
 				}
 
-				if ( !Q_stricmp( token, "attachment" ) )
+				if ( V_strieq( token, "attachment" ) )
 				{
 					ParseToken();
 					Q_strncpy( NewElement.m_szAttachment, token, sizeof( NewElement.m_szAttachment ) );
@@ -475,7 +475,7 @@ void CEnvEffectsScript::ParseNewEffect( void )
 					continue;
 				}
 
-				if ( !Q_stricmp( token, "color" ) )
+				if ( V_strieq( token, "color" ) )
 				{
 					ParseToken();
 					sscanf( token, "%i %i %i %i", &NewElement.m_iR, &NewElement.m_iG, &NewElement.m_iB, &NewElement.m_iA );
@@ -483,7 +483,7 @@ void CEnvEffectsScript::ParseNewEffect( void )
 					continue;
 				}
 
-				if ( !Q_stricmp( token, "scale" ) )
+				if ( V_strieq( token, "scale" ) )
 				{
 					ParseToken();
 
@@ -491,7 +491,7 @@ void CEnvEffectsScript::ParseNewEffect( void )
 					continue;
 				}
 
-				if ( !Q_stricmp( token, "texturescale" ) )
+				if ( V_strieq( token, "texturescale" ) )
 				{
 					ParseToken();
 
@@ -500,7 +500,7 @@ void CEnvEffectsScript::ParseNewEffect( void )
 					continue;
 				}
 
-				if ( !Q_stricmp( token, "fadetime" ) )
+				if ( V_strieq( token, "fadetime" ) )
 				{
 					ParseToken();
 
@@ -508,7 +508,7 @@ void CEnvEffectsScript::ParseNewEffect( void )
 					continue;
 				}
 
-				if ( !Q_stricmp( token, "stopfollowonkill" ) )
+				if ( V_strieq( token, "stopfollowonkill" ) )
 				{
 					ParseToken();
 
@@ -528,7 +528,7 @@ CEffectScriptElement *CEnvEffectsScript::GetScriptElementByName( const char *pNa
 {
 	for ( auto &e : m_ScriptElements )
 	{
-		if ( !Q_stricmp( e.m_szEffectName, pName ) ) 
+		if ( V_strieq( e.m_szEffectName, pName ) ) 
 		{
 			return &e;
 		}

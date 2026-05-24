@@ -24,7 +24,7 @@ DEFINE_TESTCASE( ProcessTestSimple, ProcessTestSuite )
 	char *pBuf = (char*)_alloca( nLen );
 	g_pProcessUtils->GetProcessOutput( hProcess, pBuf, nLen );
 	g_pProcessUtils->CloseProcess( hProcess );
-	Shipping_Assert( !Q_stricmp( pBuf, "Test Finished!\n" ) );
+	Shipping_Assert( V_strieq( pBuf, "Test Finished!\n" ) );
 }
 
 

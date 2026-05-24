@@ -535,7 +535,7 @@ void CSoundPickerFrame::DoModal( CSoundPicker::PickType_t initialType, const cha
 void CSoundPickerFrame::OnCommand( const char *pCommand )
 {
 	CSoundPicker *pPicker = static_cast <CSoundPicker*>( GetAssetPicker() );
-	if ( !Q_stricmp( pCommand, "Open" ) )
+	if ( V_strieq( pCommand, "Open" ) )
 	{
 		CSoundPicker::PickType_t type = pPicker->GetSelectedSoundType( );
 		if (( type == CSoundPicker::PICK_GAMESOUNDS ) || ( type == CSoundPicker::PICK_WAVFILES ))

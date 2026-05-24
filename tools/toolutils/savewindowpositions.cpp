@@ -81,7 +81,7 @@ CWindowPositionMgr::LoadInfo_t *CWindowPositionMgr::Find( char const *panelName 
 	for ( intp i = 0; i < c; ++i )
 	{
 		LoadInfo_t *info = &m_Panels[ i ];
-		if ( !Q_stricmp( info->m_Name.String(), panelName ) )
+		if ( V_strieq( info->m_Name.String(), panelName ) )
 			return info;
 	}
 	return NULL;

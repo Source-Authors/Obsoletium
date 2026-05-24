@@ -349,7 +349,7 @@ const char *CPhysicsSurfaceProps::GetReservedMaterialName( int materialIndex ) c
 
 intp CPhysicsSurfaceProps::GetReservedSurfaceIndex( const char *pPropertyName ) const
 {
-	if ( !Q_stricmp( pPropertyName, "$MATERIAL_INDEX_SHADOW" ) )
+	if ( V_strieq( pPropertyName, "$MATERIAL_INDEX_SHADOW" ) )
 	{
 		return MATERIAL_INDEX_SHADOW;
 	}

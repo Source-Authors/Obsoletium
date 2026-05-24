@@ -44,7 +44,7 @@ int GetWeaponSoundFromString( const char *pszString )
 {
 	for ( int i = EMPTY; i < NUM_SHOOT_SOUND_TYPES; i++ )
 	{
-		if ( !Q_stricmp(pszString,pWeaponSoundCategories[i]) )
+		if ( V_strieq(pszString,pWeaponSoundCategories[i]) )
 			return (WeaponSound_t)i;
 	}
 	return -1;
@@ -160,7 +160,7 @@ void PrecacheFileWeaponInfoDatabase( IFileSystem *pFilesystem, const unsigned ch
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL ; sub = sub->GetNextKey() )
 		{
-			if ( !Q_stricmp( sub->GetName(), "file" ) )
+			if ( V_strieq( sub->GetName(), "file" ) )
 			{
 				char fileBase[512];
 				V_FileBase( sub->GetString(), fileBase );

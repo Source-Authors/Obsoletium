@@ -267,7 +267,7 @@ void CConfirmNameDialog::OnCommand( const char *command )
 {
 	BaseClass::OnCommand( command );
 
-	if ( !Q_stricmp( command, "backfrominvalid" ) )
+	if ( V_strieq( command, "backfrominvalid" ) )
 	{
 		// Re-open the name dialog
 		CRequestNameDialog *dialog = vgui::SETUP_PANEL( new CRequestNameDialog( GetParent(), "ItemRenameDialog", m_pToolModelPanel->GetItem(), m_pSubjectModelPanel->GetItem(), m_bDescription ) );

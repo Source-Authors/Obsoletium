@@ -129,7 +129,7 @@ bool Replay_IsSupportedModAndPlatform()
 	for ( int i = 0; i < nNumSupportedReplayGames; ++i )
 	{
 		const char *pCurGame = s_pSupportedReplayGames[ i ];
-		if ( !Q_stricmp( COM_GetModDirectory(), pCurGame ) )
+		if ( V_strieq( COM_GetModDirectory(), pCurGame ) )
 			return true;
 	}
 	return false;

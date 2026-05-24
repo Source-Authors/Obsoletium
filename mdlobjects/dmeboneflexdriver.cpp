@@ -94,7 +94,7 @@ CDmeBoneFlexDriverControl *CDmeBoneFlexDriver::FindOrCreateControl( const char *
 		if ( !pDmeBoneFlexDriverControl )
 			continue;
 
-		if ( !Q_stricmp( pszControlName, pDmeBoneFlexDriverControl->m_sFlexControllerName.Get() ) )
+		if ( V_strieq( pszControlName, pDmeBoneFlexDriverControl->m_sFlexControllerName.Get() ) )
 			return pDmeBoneFlexDriverControl;
 	}
 
@@ -148,7 +148,7 @@ CDmeBoneFlexDriver *CDmeBoneFlexDriverList::FindOrCreateBoneFlexDriver( const ch
 		if ( !pDmeBoneFlexDriver )
 			continue;
 
-		if ( !Q_stricmp( pszBoneName, pDmeBoneFlexDriver->m_sBoneName.Get() ) )
+		if ( V_strieq( pszBoneName, pDmeBoneFlexDriver->m_sBoneName.Get() ) )
 			return pDmeBoneFlexDriver;
 	}
 

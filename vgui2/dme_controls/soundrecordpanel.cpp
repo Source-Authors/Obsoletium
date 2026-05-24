@@ -157,7 +157,7 @@ void CSoundRecordPanel::OnTick()
 //-----------------------------------------------------------------------------
 void CSoundRecordPanel::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "ToggleRecord" ) )
+	if ( V_strieq( pCommand, "ToggleRecord" ) )
 	{
 		if ( !m_bIsRecording )
 		{
@@ -186,20 +186,20 @@ void CSoundRecordPanel::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "Play" ) )
+	if ( V_strieq( pCommand, "Play" ) )
 	{
 		PlaySoundPreview();
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "Ok" ) )
+	if ( V_strieq( pCommand, "Ok" ) )
 	{
 		PostActionSignal( new KeyValues( "SoundRecorded", "relativepath", m_EngineFileName.Get() ) );
 		CloseModal();
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "Cancel" ) )
+	if ( V_strieq( pCommand, "Cancel" ) )
 	{
 		g_pFullFileSystem->RemoveFile( m_FileName, "MOD" );
 		CloseModal();

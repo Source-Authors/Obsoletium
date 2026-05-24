@@ -150,7 +150,7 @@ CON_COMMAND_F( r_cleardecals, "Usage r_cleardecals <permanent>.", FCVAR_CLIENTCM
 		bool bPermanent = false;
 		if ( args.ArgC() == 2 )
 		{
-			if ( !Q_stricmp( args[1], "permanent" ) )
+			if ( V_strieq( args[1], "permanent" ) )
 			{
 				bPermanent = true;
 			}

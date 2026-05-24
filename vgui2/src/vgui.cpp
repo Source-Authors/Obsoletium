@@ -826,7 +826,7 @@ bool CVGui::DispatchMessages()
 			// Deal with special internal cursor movement messages
 			if ( messageItem->_messageTo == 0xFFFFFFFF )
 			{
-				if ( !Q_stricmp( params->GetName(), "SetCursorPosInternal" ) )
+				if ( V_strieq( params->GetName(), "SetCursorPosInternal" ) )
 				{
 					int nXPos = params->GetInt( "xpos", 0 );
 					int nYPos = params->GetInt( "ypos", 0 );

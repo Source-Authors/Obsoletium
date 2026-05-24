@@ -137,7 +137,7 @@ int	CSpeaker::Restore( IRestore &restore )
 		{
 			char szResponseSystemBlockName[SIZE_BLOCK_NAME_BUF];
 			restore.StartBlock( szResponseSystemBlockName );
-			if ( !Q_stricmp( szResponseSystemBlockName, "InstancedResponseSystem" ) )
+			if ( V_strieq( szResponseSystemBlockName, "InstancedResponseSystem" ) )
 			{
 				if ( !m_pInstancedResponseSystem && !Q_isempty( STRING(m_iszRuleScriptFile) ) )
 				{

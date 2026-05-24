@@ -91,7 +91,7 @@ void CDmeCommentaryNodeEntity::OnAttributeChanged( CDmAttribute *pAttribute )
 	if ( pAttribute == m_ClassName.GetAttribute() )
 	{
 		m_bInfoTarget = !Q_strncmp( m_ClassName, "info_target", 11 );
-		if ( !Q_stricmp( m_ClassName, "point_commentary_node" ) )
+		if ( V_strieq( m_ClassName, "point_commentary_node" ) )
 		{
 			SetModelName( "models/extras/info_speech.mdl" );
 			GetMDL()->m_flPlaybackRate = 0.0f;

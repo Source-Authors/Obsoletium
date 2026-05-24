@@ -2161,9 +2161,9 @@ void UpdateChapterRestrictions( const char *mapname )
 
 		// HACK: HL2 added a zany chapter "9a" which wreaks
 		//       havoc in this stupid atoi-based chapter code.
-		if ( !Q_stricmp( modDir, "hl2" ) )
+		if ( V_strieq( modDir, "hl2" ) )
 		{
-			if ( !Q_stricmp( newChapter, "9a" ) )
+			if ( V_strieq( newChapter, "9a" ) )
 			{
 				nNewChapter = 10;
 			}

@@ -2960,57 +2960,57 @@ void CTextureListPanel::OnTextChanged( void )
 
 void CTextureListPanel::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "Close" ) )
+	if ( V_strieq( command, "Close" ) )
 	{
 		vgui::Frame::OnCommand( command );
 		return;
 	}
 
-	if ( !Q_stricmp( command, "Collapse" ) )
+	if ( V_strieq( command, "Collapse" ) )
 	{
 		InvalidateLayout();
 		return;
 	}
 
-	if ( !Q_stricmp( command, "ShowAlpha" ) )
+	if ( V_strieq( command, "ShowAlpha" ) )
 	{
 		m_pViewPanel->SetPaintAlpha( m_pAlpha->IsSelected() );
 		return;
 	}
 
-	if ( !Q_stricmp( command, "ThumbWarnings" ) )
+	if ( V_strieq( command, "ThumbWarnings" ) )
 	{
 		g_warn_enable = m_pThumbWarnings->IsSelected();
 		return;
 	}
 
-	if ( !Q_stricmp( command, "ViewThumbnails" ) )
+	if ( V_strieq( command, "ViewThumbnails" ) )
 	{
 		InvalidateLayout();
 		return;
 	}
 
-	if ( !Q_stricmp( command, COPYTOCLIPBOARD_CMDNAME ) )
+	if ( V_strieq( command, COPYTOCLIPBOARD_CMDNAME ) )
 	{
 		CopyListPanelToClipboard( m_pListPanel );
 		return;
 	}
 
-	if ( !Q_stricmp( command, "ReloadAllMaterials" ) )
+	if ( V_strieq( command, "ReloadAllMaterials" ) )
 	{
 		Cbuf_AddText( "mat_reloadallmaterials" );
 		Cbuf_Execute();
 		return;
 	}
 
-	if ( !Q_stricmp( command, "CommitChanges" ) )
+	if ( V_strieq( command, "CommitChanges" ) )
 	{
 		Cbuf_AddText( "mat_texture_list_txlod_sync save" );
 		Cbuf_Execute();
 		return;
 	}
 
-	if ( !Q_stricmp( command, "DiscardChanges" ) )
+	if ( V_strieq( command, "DiscardChanges" ) )
 	{
 		Cbuf_AddText( "mat_texture_list_txlod_sync reset" );
 		Cbuf_Execute();

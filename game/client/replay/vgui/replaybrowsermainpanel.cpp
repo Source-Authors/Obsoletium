@@ -170,7 +170,7 @@ void CReplayBrowserPanel::FireGameEvent( IGameEvent *event )
 //-----------------------------------------------------------------------------
 void CReplayBrowserPanel::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "back" ) )
+	if ( V_strieq( command, "back" ) )
 	{
 		if ( m_pReplaysPage->IsDetailsViewOpen() )
 		{

@@ -966,7 +966,7 @@ int CSFMGenApp::Main()
 		return 0;
 	}
 
-	if ( info.m_pExportFacDirectory && !Q_stricmp( info.m_pExportFacDirectory, info.m_pOutputDirectory ) )
+	if ( info.m_pExportFacDirectory && V_strieq( info.m_pExportFacDirectory, info.m_pOutputDirectory ) )
 	{
 		Warning( "Must specify different directories for output + facial export!\n" );
 		return 0;

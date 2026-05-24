@@ -1076,7 +1076,7 @@ void CVcdBlockTool::OpenSpecificFile( const char *pFileName )
 	if ( m_pDoc )
 	{
 		// File is already open
-		if ( !Q_stricmp( m_pDoc->GetEditFileName(), pFileName ) )
+		if ( V_strieq( m_pDoc->GetEditFileName(), pFileName ) )
 			return;
 
 		if ( m_pDoc->IsDirty() )
@@ -1118,20 +1118,20 @@ void CVcdBlockTool::OnFileOperationCompleted( [[maybe_unused]] const char *pFile
 	if ( state != FileOpenStateMachine::SUCCESSFUL )
 		return;
 
-	if ( !Q_stricmp( pContextKeyValues->GetName(), "OnClose" ) )
+	if ( V_strieq( pContextKeyValues->GetName(), "OnClose" ) )
 	{
 		OnCloseNoSave();
 		return;
 	}
 
-	if ( !Q_stricmp( pContextKeyValues->GetName(), "OnQuit" ) )
+	if ( V_strieq( pContextKeyValues->GetName(), "OnQuit" ) )
 	{
 		OnCloseNoSave();
 		vgui::ivgui()->PostMessage( GetVPanel(), new KeyValues( "OnExit" ), 0 );
 		return;
 	}
 
-	if ( !Q_stricmp( pContextKeyValues->GetName(), "RestartLevel" ) )
+	if ( V_strieq( pContextKeyValues->GetName(), "RestartLevel" ) )
 	{
 		OnRestartLevel();
 		return;
@@ -1146,7 +1146,7 @@ void CVcdBlockTool::SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, [[maybe_
 {
 	char pStartingDir[ MAX_PATH ];
 
-	if ( !Q_stricmp( pFileFormat, "bsp" ) )
+	if ( V_strieq( pFileFormat, "bsp" ) )
 	{
 		GetModSubdirectory( "maps", pStartingDir, sizeof(pStartingDir) );
 		pDialog->SetTitle( "Choose Valve BSP File", true );

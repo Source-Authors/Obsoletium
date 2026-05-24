@@ -56,11 +56,11 @@ static EventInfo *ParseEvent( KeyValues *values )
 			continue;
 		}
 
-		if ( !Q_stricmp( name, "Target" ) )
+		if ( V_strieq( name, "Target" ) )
 		{
 			eventInfo->m_target.sprintf( "%s", data->GetString() );
 		}
-		else if ( !Q_stricmp( name, "Action" ) )
+		else if ( V_strieq( name, "Action" ) )
 		{
 			eventInfo->m_action.sprintf( "%s", data->GetString() );
 		}
@@ -441,25 +441,25 @@ bool CMissionPopulator::Parse( KeyValues *values )
 			continue;
 		}
 
-		if ( !Q_stricmp( name, "Objective" ) )
+		if ( V_strieq( name, "Objective" ) )
 		{
-			if ( !Q_stricmp( data->GetString(), "DestroySentries" ) )
+			if ( V_strieq( data->GetString(), "DestroySentries" ) )
 			{
 				m_mission = CTFBot::MISSION_DESTROY_SENTRIES;
 			}
-			else if ( !Q_stricmp( data->GetString(), "Sniper" ) )
+			else if ( V_strieq( data->GetString(), "Sniper" ) )
 			{
 				m_mission = CTFBot::MISSION_SNIPER;
 			}
-			else if ( !Q_stricmp( data->GetString(), "Spy" ) )
+			else if ( V_strieq( data->GetString(), "Spy" ) )
 			{
 				m_mission = CTFBot::MISSION_SPY;
 			}
-			else if ( !Q_stricmp( data->GetString(), "Engineer" ) )
+			else if ( V_strieq( data->GetString(), "Engineer" ) )
 			{
 				m_mission = CTFBot::MISSION_ENGINEER;
 			}
-			else if ( !Q_stricmp( data->GetString(), "SeekAndDestroy" ) )
+			else if ( V_strieq( data->GetString(), "SeekAndDestroy" ) )
 			{
 				m_mission = CTFBot::MISSION_DESTROY_SENTRIES;
 			}
@@ -469,23 +469,23 @@ bool CMissionPopulator::Parse( KeyValues *values )
 				return false;
 			}
 		}
-		else if ( !Q_stricmp( name, "InitialCooldown" ) )
+		else if ( V_strieq( name, "InitialCooldown" ) )
 		{
 			m_initialCooldown = data->GetFloat();
 		}
-		else if ( !Q_stricmp( name, "CooldownTime" ) )
+		else if ( V_strieq( name, "CooldownTime" ) )
 		{
 			m_cooldownDuration = data->GetFloat();
 		}
-		else if ( !Q_stricmp( name, "BeginAtWave" ) )
+		else if ( V_strieq( name, "BeginAtWave" ) )
 		{
 			m_beginAtWaveIndex = data->GetInt() - 1;		// internally counts from 0
 		}
-		else if ( !Q_stricmp( name, "RunForThisManyWaves" ) )
+		else if ( V_strieq( name, "RunForThisManyWaves" ) )
 		{
 			waveDuration = data->GetInt();
 		}
-		else if ( !Q_stricmp( name, "DesiredCount" ) )
+		else if ( V_strieq( name, "DesiredCount" ) )
 		{
 			m_desiredCount = data->GetInt();
 		}
@@ -917,21 +917,21 @@ bool CRandomPlacementPopulator::Parse( KeyValues *values )
 			continue;
 		}
 
-		if ( !Q_stricmp( name, "Count" ) )
+		if ( V_strieq( name, "Count" ) )
 		{
 			m_count = data->GetInt();
 		}
-		else if ( !Q_stricmp( name, "MinimumSeparation" ) )
+		else if ( V_strieq( name, "MinimumSeparation" ) )
 		{
 			m_minSeparation = data->GetFloat();
 		}
-		else if ( !Q_stricmp( name, "NavAreaFilter" ) )
+		else if ( V_strieq( name, "NavAreaFilter" ) )
 		{
-			if ( !Q_stricmp( data->GetString(), "SENTRY_SPOT" ) )
+			if ( V_strieq( data->GetString(), "SENTRY_SPOT" ) )
 			{
 				m_navAreaFilter = TF_NAV_SENTRY_SPOT;
 			}
-			else if ( !Q_stricmp( data->GetString(), "SNIPER_SPOT" ) )
+			else if ( V_strieq( data->GetString(), "SNIPER_SPOT" ) )
 			{
 				m_navAreaFilter = TF_NAV_SNIPER_SPOT;
 			}
@@ -1011,17 +1011,17 @@ bool CPeriodicSpawnPopulator::Parse( KeyValues *values )
 			continue;
 		}
 
-		if ( !Q_stricmp( name, "When" ) )
+		if ( V_strieq( name, "When" ) )
 		{
 			if ( data->GetFirstSubKey() )
 			{
 				for ( KeyValues *whenData = data->GetFirstSubKey(); whenData != NULL; whenData = whenData->GetNextKey() )
 				{
-					if ( !Q_stricmp( whenData->GetName(), "MinInterval" ) )
+					if ( V_strieq( whenData->GetName(), "MinInterval" ) )
 					{
 						m_minInterval = whenData->GetFloat();
 					}
-					else if ( !Q_stricmp( whenData->GetName(), "MaxInterval" ) )
+					else if ( V_strieq( whenData->GetName(), "MaxInterval" ) )
 					{
 						m_maxInterval = whenData->GetFloat();
 					}
@@ -1212,26 +1212,26 @@ bool CWaveSpawnPopulator::Parse( KeyValues *values )
 		}
 
 		// Skip templates when looping through the rest of the keys
-		if ( !Q_stricmp( name, "Template" ) )
+		if ( V_strieq( name, "Template" ) )
 			continue;
 
-		if ( !Q_stricmp( name, "TotalCount" ) )
+		if ( V_strieq( name, "TotalCount" ) )
 		{
 			m_totalCount = data->GetInt();
 		}
-		else if ( !Q_stricmp( name, "MaxActive" ) )
+		else if ( V_strieq( name, "MaxActive" ) )
 		{
 			m_maxActive = data->GetInt();
 		}
-		else if ( !Q_stricmp( name, "SpawnCount" ) )
+		else if ( V_strieq( name, "SpawnCount" ) )
 		{
 			m_spawnCount = data->GetInt();
 		}
-		else if ( !Q_stricmp( name, "WaitBeforeStarting" ) )
+		else if ( V_strieq( name, "WaitBeforeStarting" ) )
 		{
 			m_waitBeforeStarting = data->GetFloat();
 		}
-		else if ( !Q_stricmp( name, "WaitBetweenSpawns" ) )
+		else if ( V_strieq( name, "WaitBetweenSpawns" ) )
 		{
 			if ( m_waitBetweenSpawns != 0.f && m_bWaitBetweenSpawnAfterDeath )
 			{
@@ -1241,7 +1241,7 @@ bool CWaveSpawnPopulator::Parse( KeyValues *values )
 
 			m_waitBetweenSpawns = data->GetFloat();
 		}
-		else if ( !Q_stricmp( name, "WaitBetweenSpawnsAfterDeath" ) )
+		else if ( V_strieq( name, "WaitBetweenSpawnsAfterDeath" ) )
 		{
 			if ( m_waitBetweenSpawns != 0.f )
 			{
@@ -1252,60 +1252,60 @@ bool CWaveSpawnPopulator::Parse( KeyValues *values )
 			m_bWaitBetweenSpawnAfterDeath = true;
 			m_waitBetweenSpawns = data->GetFloat();
 		}
-		else if ( !Q_stricmp( name, "StartWaveWarningSound" ) )
+		else if ( V_strieq( name, "StartWaveWarningSound" ) )
 		{
 			m_startWaveWarningSound.sprintf( "%s", data->GetString() );
 		}
-		else if ( !Q_stricmp( name, "StartWaveOutput" ) )
+		else if ( V_strieq( name, "StartWaveOutput" ) )
 		{
 			m_startWaveOutput = ParseEvent( data );
 		}
-		else if ( !Q_stricmp( name, "FirstSpawnWarningSound" ) )
+		else if ( V_strieq( name, "FirstSpawnWarningSound" ) )
 		{
 			m_firstSpawnWarningSound.sprintf( "%s", data->GetString() );
 		}
-		else if ( !Q_stricmp( name, "FirstSpawnOutput" ) )
+		else if ( V_strieq( name, "FirstSpawnOutput" ) )
 		{
 			m_firstSpawnOutput = ParseEvent( data );
 		}
-		else if ( !Q_stricmp( name, "LastSpawnWarningSound" ) )
+		else if ( V_strieq( name, "LastSpawnWarningSound" ) )
 		{
 			m_lastSpawnWarningSound.sprintf( "%s", data->GetString() );
 		}
-		else if ( !Q_stricmp( name, "LastSpawnOutput" ) )
+		else if ( V_strieq( name, "LastSpawnOutput" ) )
 		{
 			m_lastSpawnOutput = ParseEvent( data );
 		}
-		else if ( !Q_stricmp( name, "DoneWarningSound" ) )
+		else if ( V_strieq( name, "DoneWarningSound" ) )
 		{
 			m_doneWarningSound.sprintf( "%s", data->GetString() );
 		}
-		else if ( !Q_stricmp( name, "DoneOutput" ) )
+		else if ( V_strieq( name, "DoneOutput" ) )
 		{
 			m_doneOutput = ParseEvent( data );
 		}
-		else if ( !Q_stricmp( name, "TotalCurrency" ) )
+		else if ( V_strieq( name, "TotalCurrency" ) )
 		{
 			m_totalCurrency = data->GetInt();
 		}
-		else if ( !Q_stricmp( name, "Name" ) )
+		else if ( V_strieq( name, "Name" ) )
 		{
 			m_name = data->GetString();
 		}
-		else if ( !Q_stricmp( name, "WaitForAllSpawned" ) )
+		else if ( V_strieq( name, "WaitForAllSpawned" ) )
 		{
 			m_waitForAllSpawned = data->GetString();
 		}
-		else if ( !Q_stricmp( name, "WaitForAllDead" ) )
+		else if ( V_strieq( name, "WaitForAllDead" ) )
 		{
 			m_waitForAllDead = data->GetString();
 		}
-		else if ( !Q_stricmp( name, "Support" ) )
+		else if ( V_strieq( name, "Support" ) )
 		{
-			m_bLimitedSupport = !Q_stricmp( data->GetString(), "Limited" );
+			m_bLimitedSupport = V_strieq( data->GetString(), "Limited" );
 			m_bSupportWave = true;
 		}
-		else if ( !Q_stricmp( name, "RandomSpawn" ) )
+		else if ( V_strieq( name, "RandomSpawn" ) )
 		{
 			m_bRandomSpawn = data->GetBool();
 		}
@@ -1776,7 +1776,7 @@ bool CWave::Parse( KeyValues *data )
 
 	FOR_EACH_SUBKEY( data, kvWave )
 	{
-		if ( !Q_stricmp( kvWave->GetName(), "WaveSpawn" ) )
+		if ( V_strieq( kvWave->GetName(), "WaveSpawn" ) )
 		{
 			CWaveSpawnPopulator *wavePopulator = new CWaveSpawnPopulator( GetManager() );
 
@@ -1838,31 +1838,31 @@ bool CWave::Parse( KeyValues *data )
 				}
 			}
 		}				
-		else if ( !Q_stricmp( kvWave->GetName(), "Sound" ) )
+		else if ( V_strieq( kvWave->GetName(), "Sound" ) )
 		{
 			m_soundName.sprintf( "%s", kvWave->GetString() );
 		}
-		else if ( !Q_stricmp( kvWave->GetName(), "Description" ) )
+		else if ( V_strieq( kvWave->GetName(), "Description" ) )
 		{
 			m_description.sprintf( "%s", kvWave->GetString() );
 		}
-		else if ( !Q_stricmp( kvWave->GetName(), "WaitWhenDone" ) )
+		else if ( V_strieq( kvWave->GetName(), "WaitWhenDone" ) )
 		{
 			m_waitWhenDone = kvWave->GetFloat();
 		}
-		else if ( !Q_stricmp( kvWave->GetName(), "Checkpoint" ) )
+		else if ( V_strieq( kvWave->GetName(), "Checkpoint" ) )
 		{
 			//m_isCheckpoint = true;
 		}
-		else if ( !Q_stricmp( kvWave->GetName(), "StartWaveOutput" ) )
+		else if ( V_strieq( kvWave->GetName(), "StartWaveOutput" ) )
 		{
 			m_startOutput = ParseEvent( kvWave );
 		}
-		else if ( !Q_stricmp( kvWave->GetName(), "DoneOutput" ) )
+		else if ( V_strieq( kvWave->GetName(), "DoneOutput" ) )
 		{
 			m_doneOutput = ParseEvent( kvWave );
 		}
-		else if ( !Q_stricmp( kvWave->GetName(), "InitWaveOutput" ) )
+		else if ( V_strieq( kvWave->GetName(), "InitWaveOutput" ) )
 		{
 			m_initOutput = ParseEvent( kvWave );
 		}
@@ -1959,7 +1959,7 @@ CWaveSpawnPopulator *CWave::FindWaveSpawnPopulator( const char *name )
 	FOR_EACH_VEC( m_waveSpawnVector, i )
 	{
 		CWaveSpawnPopulator *waveSpawnPopulator = m_waveSpawnVector[i];
-		if ( !Q_stricmp( waveSpawnPopulator->m_name.Get(), name ) )
+		if ( V_strieq( waveSpawnPopulator->m_name.Get(), name ) )
 		{
 			return waveSpawnPopulator;
 		}
@@ -2055,7 +2055,7 @@ void CWave::ActiveWaveUpdate( void )
 			FOR_EACH_VEC( m_waveSpawnVector, j )
 			{
 				CWaveSpawnPopulator *predecessor = m_waveSpawnVector[j];
-				if ( predecessor && !Q_stricmp( predecessor->m_name.Get(), name ) )
+				if ( predecessor && V_strieq( predecessor->m_name.Get(), name ) )
 				{
 					if ( !predecessor->IsDoneSpawningBots() )
 					{
@@ -2075,7 +2075,7 @@ void CWave::ActiveWaveUpdate( void )
 				FOR_EACH_VEC( m_waveSpawnVector, j )
 				{
 					CWaveSpawnPopulator *predecessor = m_waveSpawnVector[j];
-					if ( predecessor && !Q_stricmp( predecessor->m_name.Get(), name ) )
+					if ( predecessor && V_strieq( predecessor->m_name.Get(), name ) )
 					{
 						if ( !predecessor->IsDone() )
 						{

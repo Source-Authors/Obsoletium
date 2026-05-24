@@ -138,17 +138,17 @@ static void *ShaderFactory( const char *pName, int *pReturnCode )
 		*pReturnCode = IFACE_OK;
 	}
 	
-	if ( !Q_stricmp( pName, FILESYSTEM_INTERFACE_VERSION ))
+	if ( V_strieq( pName, FILESYSTEM_INTERFACE_VERSION ))
 		return g_pFullFileSystem;
 
-	if ( !Q_stricmp( pName, QUEUEDLOADER_INTERFACE_VERSION ))
+	if ( V_strieq( pName, QUEUEDLOADER_INTERFACE_VERSION ))
 		return g_pQueuedLoader;
 
-	if ( !Q_stricmp( pName, SHADER_UTIL_INTERFACE_VERSION ))
+	if ( V_strieq( pName, SHADER_UTIL_INTERFACE_VERSION ))
 		return g_pShaderUtil;
 
 #ifdef USE_SDL
-	if ( !Q_stricmp( pName, "SDLMgrInterface001" /*SDLMGR_INTERFACE_VERSION*/ ))
+	if ( V_strieq( pName, "SDLMgrInterface001" /*SDLMGR_INTERFACE_VERSION*/ ))
 		return g_pLauncherMgr;
 #endif
 
@@ -633,7 +633,7 @@ InitReturnVal_t CMaterialSystem::Init()
     {
 		char szRight[20];
 		V_StrRight( szExeName, 11, szRight );
-		if ( !Q_stricmp( szRight, "\\hammer.exe" ) )
+		if ( V_strieq( szRight, "\\hammer.exe" ) )
 		{
 			m_bRequestedEditorMaterials = true;
 		}
@@ -1738,7 +1738,7 @@ void CMaterialSystem::ReadConfigFromConVars( MaterialSystem_Config_t *pConfig )
 static bool WasConVarSpecifiedOnCommandLine( const char *pConfigName )
 {
 	// mat_dxlevel cannot be used on the command-line. Use -dxlevel instead.
-	if ( !Q_stricmp( pConfigName, "mat_dxlevel" ) )
+	if ( V_strieq( pConfigName, "mat_dxlevel" ) )
 		return false;
 
 	return ( g_pCVar->GetCommandLineValue( pConfigName ) != NULL);
@@ -2460,7 +2460,7 @@ IMaterial* CMaterialSystem::FindMaterialEx( char const* pMaterialName, const cha
 		V_strncat( matNameWithExtension, ".vmt", nLen, COPY_ALL_CHARACTERS );
 
 		IMaterialInternal *pMat = NULL;
-		if ( !Q_stricmp( pKeyValues->GetName(), "subrect" ) )
+		if ( V_strieq( pKeyValues->GetName(), "subrect" ) )
 		{
 			pMat = m_MaterialDict.AddMaterialSubRect( matNameWithExtension, pTextureGroupName, pKeyValues, pPatchKeyValues );
 		}
@@ -3711,7 +3711,7 @@ void CMaterialSystem::GetShaderFallback( const char *pShaderName, char *pFallbac
 		intp i;
 		for ( i = 0; i < nCount; ++i )
 		{
-			if ( !Q_stricmp( pShaderName, ppShaderList[i]->GetName() ) )
+			if ( V_strieq( pShaderName, ppShaderList[i]->GetName() ) )
 				break;
 		}
 

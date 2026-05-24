@@ -182,7 +182,7 @@ CSWeaponType WeaponClassFromString( const char* weaponType )
 {
 	for ( int i = 0; i < ARRAYSIZE(s_weaponTypeInfo); ++i )
 	{
-		if ( !Q_stricmp( s_weaponTypeInfo[i].name, weaponType ) )
+		if ( V_strieq( s_weaponTypeInfo[i].name, weaponType ) )
 		{
 			return s_weaponTypeInfo[i].type;
 		}

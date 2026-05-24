@@ -87,7 +87,7 @@ ELanguage PchLanguageToELanguage( const char *pchShortName, ELanguage eDefault )
 
 	for ( auto &n : s_LanguageNames )
 	{
-		if ( !Q_stricmp( pchShortName, n.m_pchShortName ) )
+		if ( V_strieq( pchShortName, n.m_pchShortName ) )
 		{
 			return n.m_ELanguage;
 		}

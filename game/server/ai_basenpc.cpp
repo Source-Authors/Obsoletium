@@ -13068,11 +13068,11 @@ void CAI_BaseNPC::ParseScriptedNPCInteractions( void )
 				const char *pszDontFixup = pkvNode->GetString( "dont_teleport_at_end", NULL );
 				if ( pszDontFixup )
 				{
-					if ( !Q_stricmp( pszDontFixup, "me" ) || !Q_stricmp( pszDontFixup, "both" ) )
+					if ( V_strieq( pszDontFixup, "me" ) || V_strieq( pszDontFixup, "both" ) )
 					{
 						sInteraction.iFlags |= SCNPC_FLAG_DONT_TELEPORT_AT_END_ME;
 					}
-					else if ( !Q_stricmp( pszDontFixup, "them" ) || !Q_stricmp( pszDontFixup, "both" ) ) 
+					else if ( V_strieq( pszDontFixup, "them" ) || V_strieq( pszDontFixup, "both" ) ) 
 					{
 						sInteraction.iFlags |= SCNPC_FLAG_DONT_TELEPORT_AT_END_THEM;
 					}

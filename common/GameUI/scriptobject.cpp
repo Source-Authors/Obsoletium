@@ -355,7 +355,7 @@ void CScriptObject::WriteToFile( FileHandle_t fp )
 		pItem = pListItems;
 		while ( pItem )
 		{
-			if ( !Q_stricmp( pItem->szValue, curValue ) )
+			if ( V_strieq( pItem->szValue, curValue ) )
 				break;
 
 			pItem = pItem->pNext;
@@ -409,7 +409,7 @@ void CScriptObject::WriteToConfig( )
 		pItem = pListItems;
 		while ( pItem )
 		{
-			if ( !Q_stricmp( pItem->szValue, curValue ) )
+			if ( V_strieq( pItem->szValue, curValue ) )
 				break;
 
 			pItem = pItem->pNext;

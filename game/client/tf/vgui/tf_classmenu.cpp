@@ -1106,7 +1106,7 @@ void CTFClassMenu::Update()
 //-----------------------------------------------------------------------------
 Panel *CTFClassMenu::CreateControlByName( const char *controlName )
 {
-	if ( !Q_stricmp( "CIconPanel", controlName ) )
+	if ( V_strieq( "CIconPanel", controlName ) )
 	{
 		return new CIconPanel( this, "icon_panel" );
 	}

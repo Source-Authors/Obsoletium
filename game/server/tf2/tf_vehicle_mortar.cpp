@@ -179,21 +179,21 @@ bool CVehicleMortar::ClientCommand( CBaseTFPlayer *pPlayer, const char *pCmd, IC
 {
 	ResetDeteriorationTime();
 
-	if ( !Q_stricmp( pCmd, "Deploy" ) )
+	if ( V_strieq( pCmd, "Deploy" ) )
 	{
 		Deploy();
 		return true;
 	}
-	else if ( !Q_stricmp( pCmd, "Undeploy" ) )
+	else if ( V_strieq( pCmd, "Undeploy" ) )
 	{
 		UnDeploy();
 	}
-	else if ( !Q_stricmp( pCmd, "CancelDeploy" ) )
+	else if ( V_strieq( pCmd, "CancelDeploy" ) )
 	{
 		CancelDeploy();
 		return true;
 	}
-	else if ( !Q_stricmp( pCmd, "FireMortar" ) )
+	else if ( V_strieq( pCmd, "FireMortar" ) )
 	{
 		if ( pArg->Argc() == 3 )
 		{
@@ -201,7 +201,7 @@ bool CVehicleMortar::ClientCommand( CBaseTFPlayer *pPlayer, const char *pCmd, IC
 		}
 		return true;
 	}
-	else if ( !Q_stricmp( pCmd, "MortarYaw" ) )
+	else if ( V_strieq( pCmd, "MortarYaw" ) )
 	{
 		if ( pArg->Argc() == 2 )
 		{

@@ -2219,7 +2219,7 @@ KeyBindingMap_t *Panel::LookupBinding( char const *bindingName )
 		for( intp i = 0; i < c ; ++i )
 		{
 			KeyBindingMap_t *binding = &map->entries[ i ];
-			if ( !Q_stricmp( binding->bindingname, bindingName ) )
+			if ( V_strieq( binding->bindingname, bindingName ) )
 				return binding;
 		}
 
@@ -2238,7 +2238,7 @@ PanelKeyBindingMap *Panel::LookupMapForBinding( char const *bindingName )
 		for( intp i = 0; i < c ; ++i )
 		{
 			KeyBindingMap_t *binding = &map->entries[ i ];
-			if ( !Q_stricmp( binding->bindingname, bindingName ) )
+			if ( V_strieq( binding->bindingname, bindingName ) )
 				return map;
 		}
 
@@ -2283,7 +2283,7 @@ BoundKey_t *Panel::LookupDefaultKey( char const *bindingName )
 		for( intp i = 0; i < c ; ++i )
 		{
 			BoundKey_t *kb = &map->defaultkeys[ i ];
-			if ( !Q_stricmp( kb->bindingname, bindingName ) )
+			if ( V_strieq( kb->bindingname, bindingName ) )
 			{
 				return kb;
 			}
@@ -2303,7 +2303,7 @@ void Panel::LookupBoundKeys( char const *bindingName, CUtlVector< BoundKey_t * >
 		for( intp i = 0; i < c ; ++i )
 		{
 			BoundKey_t *kb = &map->boundkeys[ i ];
-			if ( !Q_stricmp( kb->bindingname, bindingName ) )
+			if ( V_strieq( kb->bindingname, bindingName ) )
 			{
 				list.AddToTail( kb );
 			}
@@ -2547,7 +2547,7 @@ KeyCode Panel::StringToKeyCode( char const *str )
 {
 	for ( auto &&keyName : g_KeyNames )
 	{
-		if ( !Q_stricmp( str, keyName.string ) )
+		if ( V_strieq( str, keyName.string ) )
 			return keyName.code;
 	}
 
@@ -3959,11 +3959,11 @@ bool Panel::IsCursorOver(void)
 //-----------------------------------------------------------------------------
 void Panel::OnCommand(const char *command)
 {
-	if ( !Q_stricmp( "performlayout", command ) )
+	if ( V_strieq( "performlayout", command ) )
 	{
 		InvalidateLayout();
 	}
-	else if ( !Q_stricmp( "reloadscheme", command ) )
+	else if ( V_strieq( "reloadscheme", command ) )
 	{
 		InvalidateLayout( false, true );
 	}
@@ -4379,7 +4379,7 @@ Panel::PinCorner_e GetPinCornerFromString( const char* pszCornerName )
 
 	for( size_t i=0; i<std::size( g_PinCornerStrings ); ++i )
 	{
-		if ( !Q_stricmp( g_PinCornerStrings[i], pszCornerName ) )
+		if ( V_strieq( g_PinCornerStrings[i], pszCornerName ) )
 		{
 			return (Panel::PinCorner_e)i;
 		}
@@ -9091,7 +9091,7 @@ int ComputePos( Panel* pPanel, const char *pszInput, int &nPos, const int& nSize
 
 	}
 
-	if (tf_debug_tabcontainer.GetBool() && !Q_stricmp("TabContainer", pPanel->GetName()))
+	if (tf_debug_tabcontainer.GetBool() && V_strieq("TabContainer", pPanel->GetName()))
 	{
 		Msg("TabContainer nFlags:%x nPos:%d nParentSize:%d nPosDelta:%d nSize:%d GetParent:%p (%s) pszInput:'%s'\n",
 			nFlags, nPos, nParentSize, nPosDelta, nSize, pPanel->GetParent(), pPanel->GetParent() ? pPanel->GetParent()->GetName() : "??",

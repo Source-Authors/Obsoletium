@@ -558,7 +558,7 @@ T *FindAttributeInArray( const CDmrElementArray<> &array, const char *elementNam
 		if ( !element )
 			continue;
 
-		if ( !Q_stricmp( element->GetName(), elementName ) )
+		if ( V_strieq( element->GetName(), elementName ) )
 			return element;
 	}
 
@@ -922,7 +922,7 @@ bool ConvertDmxToScene( CDmeFilmClip *dmx, CChoreoScene *scene )
 	bool bret = true;
 
 	// This should have been created correctly already
-	// Assert( !Q_stricmp( scene->GetFilename(), dmx->GetName() ) );
+	// Assert( V_strieq( scene->GetFilename(), dmx->GetName() ) );
 
 	CDmElement *scaleSettings = dmx->GetValueElement< CDmElement >( "scalesettings" );
 	Assert( scaleSettings );

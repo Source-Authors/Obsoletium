@@ -42,11 +42,11 @@ void CAttributeSoundPickerPanel::ShowPickerDialog()
 	const char *pTextType = GetTextType();
 	if ( pTextType )
 	{
-		if ( !Q_stricmp( pTextType, "gamesoundName" ) )
+		if ( V_strieq( pTextType, "gamesoundName" ) )
 		{
 			pickType = CSoundPicker::PICK_GAMESOUNDS;
 		}
-		else if ( !Q_stricmp( pTextType, "wavName" ) )
+		else if ( V_strieq( pTextType, "wavName" ) )
 		{
 			pickType = CSoundPicker::PICK_WAVFILES;
 		}

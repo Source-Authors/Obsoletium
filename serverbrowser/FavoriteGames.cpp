@@ -185,11 +185,11 @@ void CFavoriteGames::OnAddCurrentServer()
 //-----------------------------------------------------------------------------
 void CFavoriteGames::OnCommand(const char *command)
 {
-	if (!Q_stricmp(command, "AddServerByName"))
+	if (V_strieq(command, "AddServerByName"))
 	{
 		OnAddServerByName();
 	}
-	else if (!Q_stricmp(command, "AddCurrentServer" ))
+	else if (V_strieq(command, "AddCurrentServer" ))
 	{
 		OnAddCurrentServer();
 	}

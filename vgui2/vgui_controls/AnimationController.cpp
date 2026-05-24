@@ -192,7 +192,7 @@ AnimationController::RelativeAlignment AnimationController::LookupAlignment( cha
 {
 	for ( const auto &alignmentLookup : g_AlignmentLookup )
 	{
-		if ( !Q_stricmp( token, alignmentLookup.name ) )
+		if ( V_strieq( token, alignmentLookup.name ) )
 		{
 			return alignmentLookup.align;
 		}
@@ -1324,7 +1324,7 @@ void AnimationController::StartCmd_Animate(UtlSymId_t seqName, AnimCmdAnimate_t 
 	{
 		// Check the parent
 		Panel *parent = GetParent();
-		if ( !Q_stricmp( parent->GetName(), g_ScriptSymbols.String(cmd.panel) ) )
+		if ( V_strieq( parent->GetName(), g_ScriptSymbols.String(cmd.panel) ) )
 		{
 			panel = parent;
 		}

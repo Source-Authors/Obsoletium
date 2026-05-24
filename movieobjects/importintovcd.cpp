@@ -506,7 +506,7 @@ void GetStereoFlexControllerRange( float *pMin, float *pMax, studiohdr_t *pStudi
 	{
 		mstudioflexcontroller_t *pFlex = pStudioHdr->pFlexcontroller( i );
 		const char *pFlexControllerName = pFlex->pszName();
-		if ( !Q_stricmp( pFlexControllerName, pFlexName ) )
+		if ( V_strieq( pFlexControllerName, pFlexName ) )
 		{
 			*pMin = pFlex->min;
 			*pMax = pFlex->max;
@@ -514,7 +514,7 @@ void GetStereoFlexControllerRange( float *pMin, float *pMax, studiohdr_t *pStudi
 		}
 
 		// FIXME: Probably want to get the left + right controller + find the min and max of each, but this is unnecessary.
-		if ( !Q_stricmp( pFlexControllerName, pRightBuf ) )
+		if ( V_strieq( pFlexControllerName, pRightBuf ) )
 		{
 			*pMin = pFlex->min;
 			*pMax = pFlex->max;
@@ -533,7 +533,7 @@ void GetFlexControllerRange( float *pMin, float *pMax, studiohdr_t *pStudioHdr, 
 	{
 		mstudioflexcontroller_t *pFlex = pStudioHdr->pFlexcontroller( i );
 		const char *pFlexControllerName = pFlex->pszName();
-		if ( !Q_stricmp( pFlexControllerName, pFlexName ) )
+		if ( V_strieq( pFlexControllerName, pFlexName ) )
 		{
 			*pMin = pFlex->min;
 			*pMax = pFlex->max;
@@ -719,7 +719,7 @@ void ImportAnimations( CDmElement *pRoot, CChoreoScene *pChoreoScene, CChoreoAct
 			char pBalanceName[256];
 			Q_snprintf( pBalanceName, sizeof(pBalanceName), "balance_%s", pLogName + 6 );
 			CDmElement *pBalanceLog = animations[i+1];
-			if ( !Q_stricmp( pBalanceName, pBalanceLog->GetName() ) )
+			if ( V_strieq( pBalanceName, pBalanceLog->GetName() ) )
 			{
 				++i;
 			}

@@ -2990,7 +2990,7 @@ int findGlobalBone( const char *name )
 	name = RenameBone( name );
 	for ( int k = 0; k < g_numbones; k++ )
 	{
-		if ( !Q_stricmp( g_bonetable[k].name, name ) )
+		if ( V_strieq( g_bonetable[k].name, name ) )
 			return k;
 	}
 	
@@ -3696,7 +3696,7 @@ void MakeStaticProp()
 			bool bFound = false;
 			for ( k = 0; k < g_numattachments; k++ )
 			{
-				if ( !Q_stricmp( g_attachment[k].name, pAttachmentName ) )
+				if ( V_strieq( g_attachment[k].name, pAttachmentName ) )
 				{
 					bFound = true;
 					break;
@@ -3835,7 +3835,7 @@ void MapFlexDriveBonesToGlobalBoneTable()
 
 		for ( int j = 0; j < g_numbones; ++j )
 		{
-			if ( !Q_stricmp( g_bonetable[j].name, pDmeBoneFlexDriver->m_sBoneName.Get() ) )
+			if ( V_strieq( g_bonetable[j].name, pDmeBoneFlexDriver->m_sBoneName.Get() ) )
 			{
 				if ( g_bonetable[j].flags & BONE_ALWAYS_PROCEDURAL )
 				{
@@ -3911,7 +3911,7 @@ void TagFlexDriverBones( s_source_t *pSource )
 
 			for ( int k = 0; k < g_numflexcontrollers; ++k )
 			{
-				if ( !Q_stricmp( g_flexcontroller[k].name, pDmeBoneFlexDriverControl->m_sFlexControllerName.Get() ) )
+				if ( V_strieq( g_flexcontroller[k].name, pDmeBoneFlexDriverControl->m_sFlexControllerName.Get() ) )
 				{
 					pDmeBoneFlexDriverControl->SetValue( "__flexControlIndex", k );
 					break;
@@ -3934,7 +3934,7 @@ void TagFlexDriverBones( s_source_t *pSource )
 
 		for ( int j = 0; j < pSource->numbones; ++j )
 		{
-			if ( !Q_stricmp( pSource->localBone[j].name, pDmeBoneFlexDriver->m_sBoneName.Get() ) )
+			if ( V_strieq( pSource->localBone[j].name, pDmeBoneFlexDriver->m_sBoneName.Get() ) )
 			{
 				// Mark used by all LODs
 				pSource->boneflags[j] |= BONE_USED_BY_VERTEX_MASK;
@@ -4098,7 +4098,7 @@ const char *RenameBone( const char *pName )
 {
 	for ( int k = 0; k < g_numrenamedbones; k++)
 	{
-		if ( !Q_stricmp( pName, g_renamedbone[k].from ) )
+		if ( V_strieq( pName, g_renamedbone[k].from ) )
 			return g_renamedbone[k].to;
 	}
 	return pName;

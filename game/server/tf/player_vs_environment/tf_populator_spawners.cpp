@@ -57,7 +57,7 @@ bool IsSpaceToSpawnHere( const Vector &where )
 		return NULL;
 	}
 
-	if ( !Q_stricmp( name, "TFBot" ) )
+	if ( V_strieq( name, "TFBot" ) )
 	{
 		CTFBotSpawner *botSpawner = new CTFBotSpawner( populator );
 
@@ -70,7 +70,7 @@ bool IsSpaceToSpawnHere( const Vector &where )
 
 		return botSpawner;
 	}
-	else if ( !Q_stricmp( name, "Tank" ) )
+	else if ( V_strieq( name, "Tank" ) )
 	{
 		CTankSpawner *tankSpawner = new CTankSpawner( populator );
 
@@ -83,7 +83,7 @@ bool IsSpaceToSpawnHere( const Vector &where )
 
 		return tankSpawner;
 	}
-	else if ( !Q_stricmp( name, "SentryGun" ) )
+	else if ( V_strieq( name, "SentryGun" ) )
 	{
 		CSentryGunSpawner *sentrySpawner = new CSentryGunSpawner( populator );
 
@@ -96,7 +96,7 @@ bool IsSpaceToSpawnHere( const Vector &where )
 
 		return sentrySpawner;
 	}
-	else if ( !Q_stricmp( name, "Squad" ) )
+	else if ( V_strieq( name, "Squad" ) )
 	{
 		CSquadSpawner *squadSpawner = new CSquadSpawner( populator );
 
@@ -109,7 +109,7 @@ bool IsSpaceToSpawnHere( const Vector &where )
 
 		return squadSpawner;
 	}
-	else if ( !Q_stricmp( name, "Mob" ) )
+	else if ( V_strieq( name, "Mob" ) )
 	{
 		CMobSpawner *mobSpawner = new CMobSpawner( populator );
 
@@ -122,7 +122,7 @@ bool IsSpaceToSpawnHere( const Vector &where )
 
 		return mobSpawner;
 	}
-	else if ( !Q_stricmp( name, "RandomChoice" ) )
+	else if ( V_strieq( name, "RandomChoice" ) )
 	{
 		CRandomChoiceSpawner *randomSpawner = new CRandomChoiceSpawner( populator );
 
@@ -154,11 +154,11 @@ static EventInfo *ParseEvent( KeyValues *values )
 			continue;
 		}
 
-		if ( !Q_stricmp( name, "Target" ) )
+		if ( V_strieq( name, "Target" ) )
 		{
 			eventInfo->m_target.sprintf( "%s", data->GetString() );
 		}
-		else if ( !Q_stricmp( name, "Action" ) )
+		else if ( V_strieq( name, "Action" ) )
 		{
 			eventInfo->m_action.sprintf( "%s", data->GetString() );
 		}
@@ -501,7 +501,7 @@ static void ParseItemAttributes( CTFBot::EventChangeAttributes_t& event, KeyValu
 
 	FOR_EACH_SUBKEY( data, pKVSubkey )
 	{
-		if ( !Q_stricmp( pKVSubkey->GetName(), "ItemName" ) )
+		if ( V_strieq( pKVSubkey->GetName(), "ItemName" ) )
 		{
 			if ( pszItemName )
 			{
@@ -539,7 +539,7 @@ static void ParseItemAttributes( CTFBot::EventChangeAttributes_t& event, KeyValu
 	{
 		CTFBot::EventChangeAttributes_t::item_attributes_t& botItemAttrs = event.m_itemsAttributes[i];
 
-		if ( !Q_stricmp( botItemAttrs.m_itemName, pszItemName ) )
+		if ( V_strieq( botItemAttrs.m_itemName, pszItemName ) )
 		{
 			// found an existing entry for this name -- stomp attribute values if present or add
 			// new entries if not
@@ -583,21 +583,21 @@ static bool ParseDynamicAttributes( CTFBot::EventChangeAttributes_t& event, KeyV
 	const char *name = data->GetName();
 	const char *value = data->GetString();
 
-	if ( !Q_stricmp( name, "Skill" ) )
+	if ( V_strieq( name, "Skill" ) )
 	{
-		if ( !Q_stricmp( value, "Easy" ) )
+		if ( V_strieq( value, "Easy" ) )
 		{
 			event.m_skill = CTFBot::EASY;
 		}
-		else if ( !Q_stricmp( value, "Normal" ) )
+		else if ( V_strieq( value, "Normal" ) )
 		{
 			event.m_skill = CTFBot::NORMAL;
 		}
-		else if ( !Q_stricmp( value, "Hard" ) )
+		else if ( V_strieq( value, "Hard" ) )
 		{
 			event.m_skill = CTFBot::HARD;
 		}
-		else if ( !Q_stricmp( value, "Expert" ) )
+		else if ( V_strieq( value, "Expert" ) )
 		{
 			event.m_skill = CTFBot::EXPERT;
 		}
@@ -607,17 +607,17 @@ static bool ParseDynamicAttributes( CTFBot::EventChangeAttributes_t& event, KeyV
 			return false;
 		}	
 	}
-	else if ( !Q_stricmp( name, "WeaponRestrictions" ) )
+	else if ( V_strieq( name, "WeaponRestrictions" ) )
 	{
-		if ( !Q_stricmp( value, "MeleeOnly" ) )
+		if ( V_strieq( value, "MeleeOnly" ) )
 		{
 			event.m_weaponRestriction = CTFBot::MELEE_ONLY;
 		}
-		else if ( !Q_stricmp( value, "PrimaryOnly" ) )
+		else if ( V_strieq( value, "PrimaryOnly" ) )
 		{
 			event.m_weaponRestriction = CTFBot::PRIMARY_ONLY;
 		}
-		else if ( !Q_stricmp( value, "SecondaryOnly" ) )
+		else if ( V_strieq( value, "SecondaryOnly" ) )
 		{
 			event.m_weaponRestriction = CTFBot::SECONDARY_ONLY;
 		}
@@ -627,10 +627,10 @@ static bool ParseDynamicAttributes( CTFBot::EventChangeAttributes_t& event, KeyV
 			return false;
 		}
 	}
-	else if ( !Q_stricmp( name, "BehaviorModifiers" ) )
+	else if ( V_strieq( name, "BehaviorModifiers" ) )
 	{
 		// modifying bot attribute flags here due to legacy code
-		if ( !Q_stricmp( value, "Mobber" ) || !Q_stricmp( value, "Push" ) )
+		if ( V_strieq( value, "Mobber" ) || V_strieq( value, "Push" ) )
 		{
 			event.m_attributeFlags |= CTFBot::AGGRESSIVE;
 		}
@@ -640,105 +640,105 @@ static bool ParseDynamicAttributes( CTFBot::EventChangeAttributes_t& event, KeyV
 			return false;
 		}
 	}
-	else if ( !Q_stricmp( name, "Attributes" ) )
+	else if ( V_strieq( name, "Attributes" ) )
 	{
-		if ( !Q_stricmp( value, "RemoveOnDeath" ) )
+		if ( V_strieq( value, "RemoveOnDeath" ) )
 		{
 			event.m_attributeFlags |= CTFBot::REMOVE_ON_DEATH;
 		}
-		else if ( !Q_stricmp( value, "Aggressive" ) )
+		else if ( V_strieq( value, "Aggressive" ) )
 		{
 			event.m_attributeFlags |= CTFBot::AGGRESSIVE;
 		}
-		else if ( !Q_stricmp( value, "SuppressFire" ) )
+		else if ( V_strieq( value, "SuppressFire" ) )
 		{
 			event.m_attributeFlags |= CTFBot::SUPPRESS_FIRE;
 		}
-		else if ( !Q_stricmp( value, "DisableDodge" ) )
+		else if ( V_strieq( value, "DisableDodge" ) )
 		{
 			event.m_attributeFlags |= CTFBot::DISABLE_DODGE;
 		}
-		else if ( !Q_stricmp( value, "BecomeSpectatorOnDeath" ) )
+		else if ( V_strieq( value, "BecomeSpectatorOnDeath" ) )
 		{
 			event.m_attributeFlags |= CTFBot::BECOME_SPECTATOR_ON_DEATH;
 		}
-		else if ( !Q_stricmp( value, "RetainBuildings" ) )
+		else if ( V_strieq( value, "RetainBuildings" ) )
 		{
 			event.m_attributeFlags |= CTFBot::RETAIN_BUILDINGS;
 		}
-		else if ( !Q_stricmp( value, "SpawnWithFullCharge" ) )
+		else if ( V_strieq( value, "SpawnWithFullCharge" ) )
 		{
 			event.m_attributeFlags |= CTFBot::SPAWN_WITH_FULL_CHARGE;
 		}
-		else if ( !Q_stricmp( value, "AlwaysCrit" ) )
+		else if ( V_strieq( value, "AlwaysCrit" ) )
 		{
 			event.m_attributeFlags |= CTFBot::ALWAYS_CRIT;
 		}
-		else if ( !Q_stricmp( value, "IgnoreEnemies" ) )
+		else if ( V_strieq( value, "IgnoreEnemies" ) )
 		{
 			event.m_attributeFlags |= CTFBot::IGNORE_ENEMIES;
 		}
-		else if ( !Q_stricmp( value, "HoldFireUntilFullReload" ) )
+		else if ( V_strieq( value, "HoldFireUntilFullReload" ) )
 		{
 			event.m_attributeFlags |= CTFBot::HOLD_FIRE_UNTIL_FULL_RELOAD;
 		}
-		else if ( !Q_stricmp( value, "AlwaysFireWeapon" ) )
+		else if ( V_strieq( value, "AlwaysFireWeapon" ) )
 		{
 			event.m_attributeFlags |= CTFBot::ALWAYS_FIRE_WEAPON;
 		}
-		else if ( !Q_stricmp( value, "TeleportToHint" ) )
+		else if ( V_strieq( value, "TeleportToHint" ) )
 		{
 			event.m_attributeFlags |= CTFBot::TELEPORT_TO_HINT;
 		}
-		else if ( !Q_stricmp( value, "MiniBoss" ) )
+		else if ( V_strieq( value, "MiniBoss" ) )
 		{
 			event.m_attributeFlags |= CTFBot::MINIBOSS;
 		}
-		else if ( !Q_stricmp( value, "UseBossHealthBar" ) )
+		else if ( V_strieq( value, "UseBossHealthBar" ) )
 		{
 			event.m_attributeFlags |= CTFBot::USE_BOSS_HEALTH_BAR;
 		}
-		else if ( !Q_stricmp( value, "IgnoreFlag" ) )
+		else if ( V_strieq( value, "IgnoreFlag" ) )
 		{
 			event.m_attributeFlags |= CTFBot::IGNORE_FLAG;
 		}
-		else if ( !Q_stricmp( value, "AutoJump" ) )
+		else if ( V_strieq( value, "AutoJump" ) )
 		{
 			event.m_attributeFlags |= CTFBot::AUTO_JUMP;
 		}
-		else if ( !Q_stricmp( value, "AirChargeOnly" ) )
+		else if ( V_strieq( value, "AirChargeOnly" ) )
 		{
 			event.m_attributeFlags |= CTFBot::AIR_CHARGE_ONLY;
 		}
-		else if( !Q_stricmp( value, "VaccinatorBullets" ) )
+		else if( V_strieq( value, "VaccinatorBullets" ) )
 		{
 			event.m_attributeFlags |= CTFBot::PREFER_VACCINATOR_BULLETS;
 		}
-		else if( !Q_stricmp( value, "VaccinatorBlast" ) )
+		else if( V_strieq( value, "VaccinatorBlast" ) )
 		{
 			event.m_attributeFlags |= CTFBot::PREFER_VACCINATOR_BLAST;
 		}
-		else if( !Q_stricmp( value, "VaccinatorFire" ) )
+		else if( V_strieq( value, "VaccinatorFire" ) )
 		{
 			event.m_attributeFlags |= CTFBot::PREFER_VACCINATOR_FIRE;
 		}
-		else if( !Q_stricmp( value, "BulletImmune" ) )
+		else if( V_strieq( value, "BulletImmune" ) )
 		{
 			event.m_attributeFlags |= CTFBot::BULLET_IMMUNE;
 		}
-		else if( !Q_stricmp( value, "BlastImmune" ) )
+		else if( V_strieq( value, "BlastImmune" ) )
 		{
 			event.m_attributeFlags |= CTFBot::BLAST_IMMUNE;
 		}
-		else if( !Q_stricmp( value, "FireImmune" ) )
+		else if( V_strieq( value, "FireImmune" ) )
 		{
 			event.m_attributeFlags |= CTFBot::FIRE_IMMUNE;
 		}
-		else if ( !Q_stricmp( value, "Parachute" ) )
+		else if ( V_strieq( value, "Parachute" ) )
 		{
 			event.m_attributeFlags |= CTFBot::PARACHUTE;
 		}
-		else if ( !Q_stricmp( value, "ProjectileShield" ) )
+		else if ( V_strieq( value, "ProjectileShield" ) )
 		{
 			event.m_attributeFlags |= CTFBot::PROJECTILE_SHIELD;
 		}
@@ -748,23 +748,23 @@ static bool ParseDynamicAttributes( CTFBot::EventChangeAttributes_t& event, KeyV
 			return false;
 		}
 	}
-	else if ( !Q_stricmp( name, "MaxVisionRange" ) )
+	else if ( V_strieq( name, "MaxVisionRange" ) )
 	{
 		event.m_maxVisionRange = data->GetFloat();
 	}
-	else if ( !Q_stricmp( name, "Item" ) )
+	else if ( V_strieq( name, "Item" ) )
 	{
 		event.m_items.CopyAndAddToTail( value );
 	}
-	else if ( !Q_stricmp( name, "ItemAttributes" ) )
+	else if ( V_strieq( name, "ItemAttributes" ) )
 	{
 		ParseItemAttributes( event, data );
 	}
-	else if ( !Q_stricmp( name, "CharacterAttributes" ) )
+	else if ( V_strieq( name, "CharacterAttributes" ) )
 	{
 		ParseCharacterAttributes( event, data );
 	}
-	else if ( !Q_stricmp( name, "Tag" ) )
+	else if ( V_strieq( name, "Tag" ) )
 	{
 		event.m_tags.CopyAndAddToTail( value );
 	}
@@ -820,10 +820,10 @@ bool CTFBotSpawner::Parse( KeyValues *values )
 		}
 
 		// Skip templates when looping through the rest of the keys
-		if ( !Q_stricmp( name, "Template" ) )
+		if ( V_strieq( name, "Template" ) )
 			continue;
 
-		if ( !Q_stricmp( name, "Class" ) )
+		if ( V_strieq( name, "Class" ) )
 		{
 			m_class = GetClassIndexFromString( value );
 			if ( m_class == TF_CLASS_UNDEFINED )
@@ -836,35 +836,35 @@ bool CTFBotSpawner::Parse( KeyValues *values )
 				m_name = value;
 			}
 		}
-		else if ( !Q_stricmp( name, "ClassIcon" ) )
+		else if ( V_strieq( name, "ClassIcon" ) )
 		{
 			m_iszClassIcon = AllocPooledString( value );
 		}
-		else if ( !Q_stricmp( name, "Health" ) )
+		else if ( V_strieq( name, "Health" ) )
 		{
 			m_health = data->GetInt();
 		}
-		else if ( !Q_stricmp( name, "Scale" ) )
+		else if ( V_strieq( name, "Scale" ) )
 		{
 			m_scale = data->GetFloat();
 		}
-		else if ( !Q_stricmp( name, "Name" ) )
+		else if ( V_strieq( name, "Name" ) )
 		{
 			m_name = value;
 		}
-		else if ( !Q_stricmp( name, "TeleportWhere" ) )
+		else if ( V_strieq( name, "TeleportWhere" ) )
 		{
 			m_teleportWhereName.CopyAndAddToTail( data->GetString() );
 		}
-		else if ( !Q_stricmp( name, "AutoJumpMin" ) )
+		else if ( V_strieq( name, "AutoJumpMin" ) )
 		{
 			m_flAutoJumpMin = data->GetFloat();
 		}
-		else if ( !Q_stricmp( name, "AutoJumpMax" ) )
+		else if ( V_strieq( name, "AutoJumpMax" ) )
 		{
 			m_flAutoJumpMax = data->GetFloat();
 		}
-		else if ( !Q_stricmp( name, "EventChangeAttributes" ) )
+		else if ( V_strieq( name, "EventChangeAttributes" ) )
 		{
 			if ( !ParseEventChangeAttributes( data ) )
 			{
@@ -909,7 +909,7 @@ bool CTFBotSpawner::ParseEventChangeAttributes( KeyValues *data )
 		}
 
 		// should override default attr?
-		if ( !Q_stricmp( pszEventName, "default" ) )
+		if ( V_strieq( pszEventName, "default" ) )
 		{
 			m_defaultAttributes = event;
 		}
@@ -1383,31 +1383,31 @@ bool CTankSpawner::Parse( KeyValues *values )
 			continue;
 		}
 
-		if ( !Q_stricmp( name, "Health" ) )
+		if ( V_strieq( name, "Health" ) )
 		{
 			m_health = data->GetInt();
 		}
-		else if ( !Q_stricmp( name, "Speed" ) )
+		else if ( V_strieq( name, "Speed" ) )
 		{
 			m_speed = data->GetFloat();
 		}
-		else if ( !Q_stricmp( name, "Name" ) )
+		else if ( V_strieq( name, "Name" ) )
 		{
 			m_name = data->GetString();
 		}
-		else if ( !Q_stricmp( name, "Skin" ) )
+		else if ( V_strieq( name, "Skin" ) )
 		{
 			m_skin = data->GetInt();
 		}
-		else if ( !Q_stricmp( name, "StartingPathTrackNode" ) )
+		else if ( V_strieq( name, "StartingPathTrackNode" ) )
 		{
 			m_startingPathTrackNodeName = data->GetString();
 		}
-		else if ( !Q_stricmp( name, "OnKilledOutput" ) )
+		else if ( V_strieq( name, "OnKilledOutput" ) )
 		{
 			m_onKilledOutput = ParseEvent( data );
 		}
-		else if ( !Q_stricmp( name, "OnBombDroppedOutput" ) )
+		else if ( V_strieq( name, "OnBombDroppedOutput" ) )
 		{
 			m_onBombDroppedOutput = ParseEvent( data );
 		}
@@ -1480,7 +1480,7 @@ bool CSentryGunSpawner::Parse( KeyValues *values )
 			continue;
 		}
 
-		if ( !Q_stricmp( name, "Level" ) )
+		if ( V_strieq( name, "Level" ) )
 		{
 			m_level = data->GetInt();
 		}
@@ -1831,7 +1831,7 @@ bool CMobSpawner::Parse( KeyValues *values )
 			continue;
 		}
 
-		if ( !Q_stricmp( name, "Count" ) )
+		if ( V_strieq( name, "Count" ) )
 		{
 			m_count = data->GetInt();
 		}

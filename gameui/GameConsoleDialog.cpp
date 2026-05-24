@@ -33,7 +33,7 @@ CGameConsoleDialog::CGameConsoleDialog( vgui::Panel *parent ) : BaseClass( paren
 //-----------------------------------------------------------------------------
 void CGameConsoleDialog::OnCommand(const char *command)
 {
-	if ( !Q_stricmp( command, "Close" ) )
+	if ( V_strieq( command, "Close" ) )
 	{
 		if ( GameUI().IsInBackgroundLevel() )
 		{

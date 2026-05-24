@@ -64,7 +64,7 @@ void CDialogServerPassword::OnCommand(const char *command)
 {
 	bool bClose = false;
 
-	if (!Q_stricmp(command, "Connect"))
+	if (V_strieq(command, "Connect"))
 	{
 		char buf[64];
 		m_pPasswordEntry->GetText(buf);
@@ -76,7 +76,7 @@ void CDialogServerPassword::OnCommand(const char *command)
 
 		bClose = true;
 	}
-	else if (!Q_stricmp(command, "Close"))
+	else if (V_strieq(command, "Close"))
 	{
 		bClose = true;
 	}

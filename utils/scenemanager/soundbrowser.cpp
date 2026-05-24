@@ -536,11 +536,11 @@ void CSoundBrowser::PopulateTree( bool voiceonly, char const *scriptonly )
 
 	if ( scriptonly )
 	{
-		if ( !Q_stricmp( scriptonly, ENTRY_ALLSOUNDS ) )
+		if ( V_strieq( scriptonly, ENTRY_ALLSOUNDS ) )
 		{
 			scriptonly = NULL;
 		}
-		else if ( !Q_stricmp( scriptonly, ENTRY_SEARCHRESULTS ) )
+		else if ( V_strieq( scriptonly, ENTRY_SEARCHRESULTS ) )
 		{
 			scriptonly = NULL;
 			textsearch = true;
@@ -779,7 +779,7 @@ void CSoundBrowser::JumpToItem( CSoundEntry *se )
 	for ( ; idx < c; idx++ )
 	{
 		CSoundEntry *item = (CSoundEntry *)m_pListView->getUserData( idx, 0 );
-		if ( !Q_stricmp( item->GetName(), se->GetName() ) )
+		if ( V_strieq( item->GetName(), se->GetName() ) )
 		{
 			break;
 		}

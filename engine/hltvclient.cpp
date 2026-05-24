@@ -184,15 +184,15 @@ bool CHLTVClient::ExecuteStringCommand( const char *pCommandString )
 
 	const char *cmd = args[ 0 ];
 
-	if ( !Q_stricmp( cmd, "spec_next" ) || 
-		 !Q_stricmp( cmd, "spec_prev" ) ||
-		 !Q_stricmp( cmd, "spec_mode" ) )
+	if ( V_strieq( cmd, "spec_next" ) || 
+		 V_strieq( cmd, "spec_prev" ) ||
+		 V_strieq( cmd, "spec_mode" ) )
 	{
 		ClientPrintf("Camera settings can't be changed during a live broadcast.\n");
 		return true;
 	}
 	
-	if ( !Q_stricmp( cmd, "say" ) && args.ArgC() > 1 )
+	if ( V_strieq( cmd, "say" ) && args.ArgC() > 1 )
 	{
 		// if tv_chattimelimit = 0, chat is turned off
 		if ( tv_chattimelimit.GetFloat() <= 0 )

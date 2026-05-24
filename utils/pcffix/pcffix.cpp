@@ -340,7 +340,7 @@ static void	ReplaceChildReferences( CDmElement *pElement, CDmElement *pOldVersio
 //-----------------------------------------------------------------------------
 static void	AddUniqueElementsToList( CDmElement *pElement, CUtlVector<CDmElement*> &list )
 {
-	Assert( !Q_stricmp( pElement->GetTypeString(), "DmeParticleSystemDefinition" ) );
+	Assert( V_strieq( pElement->GetTypeString(), "DmeParticleSystemDefinition" ) );
 	int nCount = list.Count();
 	for ( int i = 0; i < nCount; ++i )
 	{

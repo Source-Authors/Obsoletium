@@ -1210,7 +1210,7 @@ void EnsurePresenceOfWaterLODControlEntity( void )
 		entity_t *e = &entities[i];
 
 		const char *pClassName = ValueForKey( e, "classname" );
-		if( !Q_stricmp( pClassName, "water_lod_control" ) )
+		if( V_strieq( pClassName, "water_lod_control" ) )
 		{
 			// Found one!!!!
 			return;

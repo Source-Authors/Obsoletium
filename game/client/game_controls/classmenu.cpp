@@ -116,7 +116,7 @@ MouseOverPanelButton* CClassMenu::CreateNewMouseOverPanelButton(EditablePanel *p
 
 Panel *CClassMenu::CreateControlByName(const char *controlName)
 {
-	if( !Q_stricmp( "MouseOverPanelButton", controlName ) )
+	if( V_strieq( "MouseOverPanelButton", controlName ) )
 	{
 		MouseOverPanelButton *newButton = CreateNewMouseOverPanelButton( m_pPanel );
 

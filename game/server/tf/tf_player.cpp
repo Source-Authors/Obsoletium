@@ -10593,7 +10593,7 @@ void CTFPlayer::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo &
 		// Don't play speech if this kill disguises the spy
 		if ( IsPlayerClass( TF_CLASS_SPY ) )
 		{
-			if ( !Q_stricmp( "customdeath:backstab", pszCustomDeath ) )
+			if ( V_strieq( "customdeath:backstab", pszCustomDeath ) )
 			{
 				CTFKnife *pKnife = dynamic_cast<CTFKnife *>( GetActiveTFWeapon() );
 				if ( pKnife && pKnife->GetKnifeType() == KNIFE_DISGUISE_ONKILL )
@@ -16565,7 +16565,7 @@ int CTFPlayer::GetTauntConcept( CEconItemDefinition *pItemDef )
 	{
 		animation_on_wearable_t* pAnim = pItemDef->GetAnimationData( GetTeamNumber(), i );
 		if ( pAnim && pAnim->pszActivity &&
-			!Q_stricmp( pAnim->pszActivity, "taunt_concept" ) )
+			V_strieq( pAnim->pszActivity, "taunt_concept" ) )
 		{
 			const char* pszConcept = pAnim->pszReplacement;
 			if ( !pszConcept )
@@ -17128,7 +17128,7 @@ void CTFPlayer::Taunt( taunts_t iTauntIndex, int iTauntConcept )
 		if ( IsPlayerClass( TF_CLASS_ENGINEER ) )
 		{
 			// Wrenchmotron taunt teleport home effect
-			if ( !Q_stricmp( szResponse, "scenes/player/engineer/low/taunt_drg_melee.vcd" ) )
+			if ( V_strieq( szResponse, "scenes/player/engineer/low/taunt_drg_melee.vcd" ) )
 			{
 				m_bIsTeleportingUsingEurekaEffect = true;
 
@@ -20363,7 +20363,7 @@ void CTFPlayer::ItemTesting_Start( KeyValues *pKV )
 		return;
 
 	// We also need to be on the item testing map.
-	if ( !Q_stricmp(STRING(gpGlobals->mapname), "item_test.bsp" ) )
+	if ( V_strieq(STRING(gpGlobals->mapname), "item_test.bsp" ) )
 		return;
 
 	FOR_EACH_VEC( m_ItemsToTest, i )

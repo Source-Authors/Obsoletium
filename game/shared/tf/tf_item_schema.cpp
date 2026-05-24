@@ -2815,7 +2815,7 @@ const CQuestThemeDefinition *CTFItemSchema::GetQuestThemeByName( const char *psz
 	{
 		FOR_EACH_MAP_FAST( m_mapQuestThemes, i )
 		{
-			if ( !Q_stricmp( m_mapQuestThemes[ i ]->GetName(), pszDefName ) )
+			if ( V_strieq( m_mapQuestThemes[ i ]->GetName(), pszDefName ) )
 			{
 				return m_mapQuestThemes[ i ];
 			}
@@ -3012,15 +3012,15 @@ RTime32 CTFItemSchema::GetCustomExpirationDate( const char *pszExpirationDate ) 
 
 EMvMChallengeDifficulty GetMvMChallengeDifficultyByInternalName( const char *pszEnglishID )
 {
-	if ( !Q_stricmp( pszEnglishID, "normal" ) )
+	if ( V_strieq( pszEnglishID, "normal" ) )
 		return k_EMvMChallengeDifficulty_Normal;
-	if ( !Q_stricmp( pszEnglishID, "intermediate" ) )
+	if ( V_strieq( pszEnglishID, "intermediate" ) )
 		return k_EMvMChallengeDifficulty_Intermediate;
-	if ( !Q_stricmp( pszEnglishID, "advanced" ) )
+	if ( V_strieq( pszEnglishID, "advanced" ) )
 		return k_EMvMChallengeDifficulty_Advanced;
-	if ( !Q_stricmp( pszEnglishID, "expert" ) )
+	if ( V_strieq( pszEnglishID, "expert" ) )
 		return k_EMvMChallengeDifficulty_Expert;
-	if ( !Q_stricmp( pszEnglishID, "haunted" ) )
+	if ( V_strieq( pszEnglishID, "haunted" ) )
 		return k_EMvMChallengeDifficulty_Haunted;
 	return k_EMvMChallengeDifficulty_Invalid;
 }

@@ -355,10 +355,10 @@ const char *Key_NameForBinding( const char *pBinding )
 	}
 
 	// Xbox 360 controller: Handle the dual bindings for duck and zoom
-	if ( !Q_stricmp( "duck", pBind ) )
+	if ( V_strieq( "duck", pBind ) )
 		return Key_NameForBinding( "toggle_duck" );
 
-	if ( !Q_stricmp( "zoom", pBind ) )
+	if ( V_strieq( "zoom", pBind ) )
 		return Key_NameForBinding( "toggle_zoom" );
 
 	return NULL;
@@ -636,7 +636,7 @@ static bool HandleEngineKey( const InputEvent_t &event )
 	}
 
 	// Swallow console toggle if any modifier keys are down if it's bound to toggleconsole (the default)
-	if ( !Q_stricmp( kb, "toggleconsole" ) )
+	if ( V_strieq( kb, "toggleconsole" ) )
 	{
 		if ( s_pKeyInfo[KEY_LALT].m_bKeyDown || s_pKeyInfo[KEY_LSHIFT].m_bKeyDown || s_pKeyInfo[KEY_LCONTROL].m_bKeyDown ||
 			s_pKeyInfo[KEY_RALT].m_bKeyDown || s_pKeyInfo[KEY_RSHIFT].m_bKeyDown || s_pKeyInfo[KEY_RCONTROL].m_bKeyDown )

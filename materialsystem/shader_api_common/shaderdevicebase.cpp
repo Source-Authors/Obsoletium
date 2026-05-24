@@ -159,9 +159,9 @@ void CShaderDeviceMgrBase::Disconnect()
 //-----------------------------------------------------------------------------
 void *CShaderDeviceMgrBase::QueryInterface( const char *pInterfaceName )
 {
-	if ( !Q_stricmp( pInterfaceName, SHADER_DEVICE_MGR_INTERFACE_VERSION ) )
+	if ( V_strieq( pInterfaceName, SHADER_DEVICE_MGR_INTERFACE_VERSION ) )
 		return ( IShaderDeviceMgr* )this;
-	if ( !Q_stricmp( pInterfaceName, MATERIALSYSTEM_HARDWARECONFIG_INTERFACE_VERSION ) )
+	if ( V_strieq( pInterfaceName, MATERIALSYSTEM_HARDWARECONFIG_INTERFACE_VERSION ) )
 		return ( IMaterialSystemHardwareConfig* )g_pHardwareConfig;
 	return NULL;
 }
@@ -854,11 +854,11 @@ void* CShaderDeviceMgrBase::ShaderInterfaceFactory( const char *pInterfaceName, 
 	{
 		*pReturnCode = IFACE_OK;
 	}
-	if ( !Q_stricmp( pInterfaceName, SHADER_DEVICE_INTERFACE_VERSION ) )
+	if ( V_strieq( pInterfaceName, SHADER_DEVICE_INTERFACE_VERSION ) )
 		return static_cast< IShaderDevice* >( g_pShaderDevice );
-	if ( !Q_stricmp( pInterfaceName, SHADERAPI_INTERFACE_VERSION ) )
+	if ( V_strieq( pInterfaceName, SHADERAPI_INTERFACE_VERSION ) )
 		return static_cast< IShaderAPI* >( g_pShaderAPI );
-	if ( !Q_stricmp( pInterfaceName, SHADERSHADOW_INTERFACE_VERSION ) )
+	if ( V_strieq( pInterfaceName, SHADERSHADOW_INTERFACE_VERSION ) )
 		return static_cast< IShaderShadow* >( g_pShaderShadow );
 
 	if ( pReturnCode )

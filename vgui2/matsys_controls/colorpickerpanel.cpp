@@ -1099,7 +1099,7 @@ void CColorPickerFrame::GetInitialColor( Color *pColor )
 //-----------------------------------------------------------------------------
 void CColorPickerFrame::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "Ok" ) )
+	if ( V_strieq( pCommand, "Ok" ) )
 	{
 		Color c;
 		m_pPicker->GetCurrentColor( &c );
@@ -1116,7 +1116,7 @@ void CColorPickerFrame::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "Cancel" ) )
+	if ( V_strieq( pCommand, "Cancel" ) )
 	{
 		vgui::input()->ReleaseAppModalSurface();
 		KeyValues *pActionKeys = new KeyValues( "ColorPickerCancel" );
@@ -1130,7 +1130,7 @@ void CColorPickerFrame::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "Preview" ) )
+	if ( V_strieq( pCommand, "Preview" ) )
 	{
 		Color c;
 		m_pPicker->GetCurrentColor( &c );

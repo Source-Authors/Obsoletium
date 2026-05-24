@@ -36,7 +36,7 @@ const char* PchNameFrom##etype##Unsafe( etype nValue ) \
 { for( uint i=0; i<std::size(s_##etype); i++ ) { if ( s_##etype[i].nValue == nValue ) return s_##etype[i].pszString; } \
 	AssertMsg2( false, "Missing String for %s (%d)", #etype, nValue ); return "Unknown"; }; \
 	etype etype##FromName( const char *pchName ) \
-{ for( uint i=0; i<std::size(s_##etype); i++ ) { if ( !Q_stricmp( s_##etype[i].pszString, pchName ) ) return (etype)(s_##etype[i].nValue); } \
+{ for( uint i=0; i<std::size(s_##etype); i++ ) { if ( V_strieq( s_##etype[i].pszString, pchName ) ) return (etype)(s_##etype[i].nValue); } \
 	return default; }
 
 

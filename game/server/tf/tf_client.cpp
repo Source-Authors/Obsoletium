@@ -140,11 +140,11 @@ void ClientGamePrecache( void )
 		if ( Q_strlen( pszType ) > 0 &&
 			 Q_strlen( pszFile ) > 0 )
 		{
-			if ( !Q_stricmp( pData->GetName(), "model" ) )
+			if ( V_strieq( pData->GetName(), "model" ) )
 			{
 				CBaseEntity::PrecacheModel( pszFile );
 			}
-			else if ( !Q_stricmp( pData->GetName(), "scriptsound" ) )
+			else if ( V_strieq( pData->GetName(), "scriptsound" ) )
 			{
 				CBaseEntity::PrecacheScriptSound( pszFile );
 			}

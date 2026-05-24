@@ -129,7 +129,7 @@ void CPresetPickerFrame::DoModal( CDmElement *pPresetGroup, bool bSelectAll, Key
 //-----------------------------------------------------------------------------
 void CPresetPickerFrame::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "Ok" ) )
+	if ( V_strieq( pCommand, "Ok" ) )
 	{
 		int nSelectedItemCount = m_pPresetList->GetSelectedItemsCount();
 		if ( nSelectedItemCount == 0 )
@@ -175,7 +175,7 @@ void CPresetPickerFrame::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "Cancel" ) )
+	if ( V_strieq( pCommand, "Cancel" ) )
 	{
 		KeyValues *pActionKeys = new KeyValues( "PresetPickCancelled" );
 		if ( m_pContextKeyValues )

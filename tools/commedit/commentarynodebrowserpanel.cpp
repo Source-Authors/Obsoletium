@@ -194,7 +194,7 @@ void CCommentaryNodeBrowserPanel::SelectNode( CDmeCommentaryNodeEntity *pNode )
 //-----------------------------------------------------------------------------
 void CCommentaryNodeBrowserPanel::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "delete" ) )
+	if ( V_strieq( pCommand, "delete" ) )
 	{
 		// Confirm we want to do it
 		MessageBox *pConfirm = new MessageBox( "#CommEditDeleteObjects", "#CommEditDeleteObjectsMsg", g_pCommEditTool->GetRootPanel() ); 
@@ -207,13 +207,13 @@ void CCommentaryNodeBrowserPanel::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "Save" ) )
+	if ( V_strieq( pCommand, "Save" ) )
 	{
 		g_pCommEditTool->Save();
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "CenterView" ) )
+	if ( V_strieq( pCommand, "CenterView" ) )
 	{
 		if ( m_pEntities->GetSelectedItemsCount() == 1 )
 		{
@@ -225,13 +225,13 @@ void CCommentaryNodeBrowserPanel::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "SaveAndTest" ) )
+	if ( V_strieq( pCommand, "SaveAndTest" ) )
 	{
 		g_pCommEditTool->SaveAndTest();
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "DropNodes" ) )
+	if ( V_strieq( pCommand, "DropNodes" ) )
 	{
 		g_pCommEditTool->EnterNodeDropMode();
 		return;

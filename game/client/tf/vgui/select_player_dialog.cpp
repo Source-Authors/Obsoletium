@@ -161,7 +161,7 @@ void CSelectPlayerDialog::PerformLayout( void )
 //-----------------------------------------------------------------------------
 void CSelectPlayerDialog::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "cancel" ) )
+	if ( V_strieq( command, "cancel" ) )
 	{
 		if ( m_iCurrentState != SPDS_SELECTING_PLAYER )
 		{
@@ -179,13 +179,13 @@ void CSelectPlayerDialog::OnCommand( const char *command )
 		}
 		return;
 	}
-	else if ( !Q_stricmp( command, "friends" ) )
+	else if ( V_strieq( command, "friends" ) )
 	{
 		m_iCurrentState = SPDS_SELECTING_FROM_FRIENDS;
 		UpdateState();
 		return;
 	}
-	else if ( !Q_stricmp( command, "server" ) )
+	else if ( V_strieq( command, "server" ) )
 	{
 		m_iCurrentState = SPDS_SELECTING_FROM_SERVER;
 		UpdateState();

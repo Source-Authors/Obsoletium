@@ -389,7 +389,7 @@ void PerforceFileList::RemoveAllFiles()
 			continue;*/
 
 		// const char *pPerforceFileName = p4->String( fileList[i].m_sLocalFile );
-		/*if ( !Q_stricmp( pPerforceFileName, pFileName ) )
+		/*if ( V_strieq( pPerforceFileName, pFileName ) )
 		{
 			pFound[i] = true;
 			return &fileList[i];
@@ -508,7 +508,7 @@ int PerforceFileList::FindFile( const char *pFullPath )
 	for ( int i = FirstItem(); i != InvalidItemID(); i = NextItem( i ) )
 	{
 		const char *pFile = GetFile( i ); 
-		if ( !Q_stricmp( pFile, pFullPath ) )
+		if ( V_strieq( pFile, pFullPath ) )
 			return i;
 	}
 	return InvalidItemID();

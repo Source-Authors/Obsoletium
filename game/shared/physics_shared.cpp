@@ -58,7 +58,7 @@ const objectparams_t g_PhysDefaultObjectParams =
 
 void CSolidSetDefaults::ParseKeyValue( void *pData, const char *pKey, const char *pValue )
 {
-	if ( !Q_stricmp( pKey, "contents" ) )
+	if ( V_strieq( pKey, "contents" ) )
 	{
 		m_contentsMask = atoi( pValue );
 	}
@@ -539,7 +539,7 @@ void PhysParseSurfaceData( IPhysicsSurfaceProps *pProps, IFileSystem *pFileSyste
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
 		{
-			if ( !Q_stricmp( sub->GetName(), "file" ) )
+			if ( V_strieq( sub->GetName(), "file" ) )
 			{
 				// Add
 				AddSurfacepropFile( sub->GetString(), pProps, pFileSystem );

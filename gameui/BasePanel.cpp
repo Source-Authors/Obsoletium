@@ -1147,7 +1147,7 @@ CGameMenu *CBasePanel::RecursiveLoadGameMenu(KeyValues *datafile)
 		const char *cmd = dat->GetString("command", nullptr);
 		const char *name = dat->GetString("name", label);
 
-		if ( cmd && !Q_stricmp( cmd, "OpenFriendsDialog" ) && bSteamCommunityFriendsVersion )
+		if ( cmd && V_strieq( cmd, "OpenFriendsDialog" ) && bSteamCommunityFriendsVersion )
 			continue;
 
 		menu->AddMenuItem(name, label, cmd, this, dat);
@@ -1384,78 +1384,78 @@ void CBasePanel::OnGameUIActivated()
 //-----------------------------------------------------------------------------
 void CBasePanel::RunMenuCommand(const char *command)
 {
-	if ( !Q_stricmp( command, "OpenGameMenu" ) )
+	if ( V_strieq( command, "OpenGameMenu" ) )
 	{
 		if ( m_pGameMenu )
 		{
 			PostMessage( m_pGameMenu, new KeyValues("Command", "command", "Open") );
 		}
 	}
-	else if ( !Q_stricmp( command, "OpenPlayerListDialog" ) )
+	else if ( V_strieq( command, "OpenPlayerListDialog" ) )
 	{
 		OnOpenPlayerListDialog();
 	}
-	else if ( !Q_stricmp( command, "OpenNewGameDialog" ) )
+	else if ( V_strieq( command, "OpenNewGameDialog" ) )
 	{
 		OnOpenNewGameDialog();
 	}
-	else if ( !Q_stricmp( command, "OpenLoadGameDialog" ) )
+	else if ( V_strieq( command, "OpenLoadGameDialog" ) )
 	{
 		OnOpenLoadGameDialog();
 	}
-	else if ( !Q_stricmp( command, "OpenSaveGameDialog" ) )
+	else if ( V_strieq( command, "OpenSaveGameDialog" ) )
 	{
 		OnOpenSaveGameDialog();
 	}
-	else if ( !Q_stricmp( command, "OpenBonusMapsDialog" ) )
+	else if ( V_strieq( command, "OpenBonusMapsDialog" ) )
 	{
 		OnOpenBonusMapsDialog();
 	}
-	else if ( !Q_stricmp( command, "OpenOptionsDialog" ) )
+	else if ( V_strieq( command, "OpenOptionsDialog" ) )
 	{
 		OnOpenOptionsDialog();
 	}
-	else if ( !Q_stricmp( command, "OpenControllerDialog" ) )
+	else if ( V_strieq( command, "OpenControllerDialog" ) )
 	{
 		// XBOX only.
 	}
-	else if ( !Q_stricmp( command, "OpenBenchmarkDialog" ) )
+	else if ( V_strieq( command, "OpenBenchmarkDialog" ) )
 	{
 		OnOpenBenchmarkDialog();
 	}
-	else if ( !Q_stricmp( command, "OpenServerBrowser" ) )
+	else if ( V_strieq( command, "OpenServerBrowser" ) )
 	{
 		OnOpenServerBrowser();
 	}
-	else if ( !Q_stricmp( command, "OpenFriendsDialog" ) )
+	else if ( V_strieq( command, "OpenFriendsDialog" ) )
 	{
 		OnOpenFriendsDialog();
 	}
-	else if ( !Q_stricmp( command, "OpenLoadDemoDialog" ) )
+	else if ( V_strieq( command, "OpenLoadDemoDialog" ) )
 	{
 		// dimhotepus: Drop empty function.
 	}
-	else if ( !Q_stricmp( command, "OpenCreateMultiplayerGameDialog" ) )
+	else if ( V_strieq( command, "OpenCreateMultiplayerGameDialog" ) )
 	{
 		OnOpenCreateMultiplayerGameDialog();
 	}
-	else if ( !Q_stricmp( command, "OpenChangeGameDialog" ) )
+	else if ( V_strieq( command, "OpenChangeGameDialog" ) )
 	{
 		OnOpenChangeGameDialog();
 	}
-	else if ( !Q_stricmp( command, "OpenLoadCommentaryDialog" ) )
+	else if ( V_strieq( command, "OpenLoadCommentaryDialog" ) )
 	{
 		OnOpenLoadCommentaryDialog();
 	}
-	else if ( !Q_stricmp( command, "OpenLoadSingleplayerCommentaryDialog" ) )
+	else if ( V_strieq( command, "OpenLoadSingleplayerCommentaryDialog" ) )
 	{
 		OpenLoadSingleplayerCommentaryDialog();	
 	}
-	else if ( !Q_stricmp( command, "OpenMatchmakingBasePanel" ) )
+	else if ( V_strieq( command, "OpenMatchmakingBasePanel" ) )
 	{
 		OnOpenMatchmakingBasePanel();
 	}
-	else if ( !Q_stricmp( command, "OpenAchievementsDialog" ) )
+	else if ( V_strieq( command, "OpenAchievementsDialog" ) )
 	{
 #ifndef NO_STEAM
 		if ( !steamapicontext->SteamUser() || !steamapicontext->SteamUser()->BLoggedOn() )
@@ -1473,7 +1473,7 @@ void CBasePanel::RunMenuCommand(const char *command)
     // [dwenger] Use cs-specific achievements dialog
     //=============================================================================
 
-    else if ( !Q_stricmp( command, "OpenCSAchievementsDialog" ) )
+    else if ( V_strieq( command, "OpenCSAchievementsDialog" ) )
     {
         if ( !steamapicontext->SteamUser() || !steamapicontext->SteamUser()->BLoggedOn() )
         {
@@ -1488,15 +1488,15 @@ void CBasePanel::RunMenuCommand(const char *command)
     // HPE_END
     //=============================================================================
 
-	else if ( !Q_stricmp( command, "AchievementsDialogClosing" ) )
+	else if ( V_strieq( command, "AchievementsDialogClosing" ) )
 	{
 		// XBOX-only.
 	}
-	else if ( !Q_stricmp( command, "Quit" ) )
+	else if ( V_strieq( command, "Quit" ) )
 	{
 		OnOpenQuitConfirmationDialog();
 	}
-	else if ( !Q_stricmp( command, "QuitNoConfirm" ) )
+	else if ( V_strieq( command, "QuitNoConfirm" ) )
 	{
         //=============================================================================
         // HPE_BEGIN:
@@ -1517,19 +1517,19 @@ void CBasePanel::RunMenuCommand(const char *command)
 		vgui::surface()->RestrictPaintToSinglePanel( GetVPanel() );
 		engine->ClientCmd_Unrestricted( "quit\n" );
 	}
-	else if ( !Q_stricmp( command, "QuitRestartNoConfirm" ) )
+	else if ( V_strieq( command, "QuitRestartNoConfirm" ) )
 	{
 		// XBOX only.
 	}
-	else if ( !Q_stricmp( command, "ResumeGame" ) )
+	else if ( V_strieq( command, "ResumeGame" ) )
 	{
 		GameUI().HideGameUI();
 	}
-	else if ( !Q_stricmp( command, "Disconnect" ) )
+	else if ( V_strieq( command, "Disconnect" ) )
 	{
 		engine->ClientCmd_Unrestricted( "disconnect" );
 	}
-	else if ( !Q_stricmp( command, "DisconnectNoConfirm" ) )
+	else if ( V_strieq( command, "DisconnectNoConfirm" ) )
 	{
 		ConVarRef commentary( "commentary" );
 		if ( commentary.IsValid() && commentary.GetBool() )
@@ -1549,7 +1549,7 @@ void CBasePanel::RunMenuCommand(const char *command)
 			matchmaking->KickPlayerFromSession( 0 );
 		}
 	}
-	else if ( !Q_stricmp( command, "ReleaseModalWindow" ) )
+	else if ( V_strieq( command, "ReleaseModalWindow" ) )
 	{
 		vgui::surface()->RestrictPaintToSinglePanel(NULL);
 	}
@@ -1562,16 +1562,16 @@ void CBasePanel::RunMenuCommand(const char *command)
 			engine->ClientCmd_Unrestricted( const_cast<char *>( engineCMD ) );
 		}
 	}
-	else if ( !Q_stricmp( command, "ShowSigninUI" ) )
+	else if ( V_strieq( command, "ShowSigninUI" ) )
 	{
 		m_bWaitingForUserSignIn = true;
 		xboxsystem->ShowSigninUI( 1, 0 ); // One user, no special flags
 	}
-	else if ( !Q_stricmp( command, "ShowDeviceSelector" ) )
+	else if ( V_strieq( command, "ShowDeviceSelector" ) )
 	{
 		OnChangeStorageDevice();
 	}
-	else if ( !Q_stricmp( command, "SignInDenied" ) )
+	else if ( V_strieq( command, "SignInDenied" ) )
 	{
 		// The user doesn't care, so re-send the command they wanted and mark that we want to skip checking
 		if ( m_strPostPromptCommand.IsEmpty() == false )
@@ -1579,15 +1579,15 @@ void CBasePanel::RunMenuCommand(const char *command)
 			OnCommand( m_strPostPromptCommand );		
 		}
 	}
-	else if ( !Q_stricmp( command, "RequiredSignInDenied" ) )
+	else if ( V_strieq( command, "RequiredSignInDenied" ) )
 	{
 		m_strPostPromptCommand = "";
 	}
-	else if ( !Q_stricmp( command, "RequiredStorageDenied" ) )
+	else if ( V_strieq( command, "RequiredStorageDenied" ) )
 	{
 		m_strPostPromptCommand = "";
 	}
-	else if ( !Q_stricmp( command, "StorageDeviceDenied" ) )
+	else if ( V_strieq( command, "StorageDeviceDenied" ) )
 	{
 		// The user doesn't care, so re-send the command they wanted and mark that we want to skip checking
 		IssuePostPromptCommand();
@@ -1602,11 +1602,11 @@ void CBasePanel::RunMenuCommand(const char *command)
 			m_pStorageDeviceValidatedNotify = NULL;
 		}
 	}
-	else if ( !Q_stricmp( command, "clear_storage_deviceID" ) )
+	else if ( V_strieq( command, "clear_storage_deviceID" ) )
 	{
 		XBX_SetStorageDeviceId( XBX_STORAGE_DECLINED );
 	}
-	else if ( !Q_stricmp( command, "RestartWithNewLanguage" ) )
+	else if ( V_strieq( command, "RestartWithNewLanguage" ) )
 	{
 		// hide everything while we quit
 		SetVisible( false );
@@ -1853,7 +1853,7 @@ bool CBasePanel::HandleSignInRequest( const char *command )
 //-----------------------------------------------------------------------------
 void CBasePanel::ClearPostPromptCommand( const char *pCompletedCommand )
 {
-	if ( !Q_stricmp( m_strPostPromptCommand, pCompletedCommand ) )
+	if ( V_strieq( m_strPostPromptCommand, pCompletedCommand ) )
 	{
 		// All commands are executed, so stop holding this
 		m_strPostPromptCommand = "";
@@ -1961,11 +1961,11 @@ public:
 
 	void OnCommand(const char *command) override
 	{
-		if (!Q_stricmp(command, "Quit"))
+		if (V_strieq(command, "Quit"))
 		{
 			PostMessage(GetVParent(), new KeyValues("Command", "command", "QuitNoConfirm"));
 		}
-		else if (!Q_stricmp(command, "SaveAndQuit"))
+		else if (V_strieq(command, "SaveAndQuit"))
 		{
 			// find a new name to save
 			char saveName[128];
@@ -1981,7 +1981,7 @@ public:
 			// quit
 			PostMessage(GetVParent(), new KeyValues("Command", "command", "QuitNoConfirm"));
 		}
-		else if (!Q_stricmp(command, "Cancel"))
+		else if (V_strieq(command, "Cancel"))
 		{
 			Close();
 		}
@@ -2797,7 +2797,7 @@ void CFooterPanel::ApplySettings( KeyValues *inResourceData )
 	{
 		const char *pName = pButton->GetName();
 
-		if ( !Q_stricmp( pName, "button" ) )
+		if ( V_strieq( pName, "button" ) )
 		{
 			// Add a button to the footer
 			const char *pText = pButton->GetString( "text", "NULL" );
@@ -2914,7 +2914,7 @@ void CFooterPanel::ShowButtonLabel( const char *name, bool show )
 {
 	for ( intp i = 0; i < m_ButtonLabels.Count(); ++i )
 	{
-		if ( !Q_stricmp( m_ButtonLabels[ i ]->name, name ) )
+		if ( V_strieq( m_ButtonLabels[ i ]->name, name ) )
 		{
 			m_ButtonLabels[ i ]->bVisible = show;
 			break;
@@ -2929,7 +2929,7 @@ void CFooterPanel::SetButtonText( const char *buttonName, const char *text )
 {
 	for ( intp i = 0; i < m_ButtonLabels.Count(); ++i )
 	{
-		if ( !Q_stricmp( m_ButtonLabels[ i ]->name, buttonName ) )
+		if ( V_strieq( m_ButtonLabels[ i ]->name, buttonName ) )
 		{
 			wchar_t *wtext = g_pVGuiLocalize->Find( text );
 			if ( text )

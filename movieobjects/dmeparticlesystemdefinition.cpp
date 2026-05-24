@@ -82,22 +82,22 @@ static void CreateEditorAttributeInfo( CDmeEditorType *pEditorType, const char *
 	if ( parse.ArgC() == 2 )
 	{
 		CDmeEditorChoicesInfo *pInfo = NULL;
-		if ( !Q_stricmp( parse[0], "intchoice" ) )
+		if ( V_strieq( parse[0], "intchoice" ) )
 		{
 			pInfo = CreateElement< CDmeEditorIntChoicesInfo >( "field info" );
 		}
 
-		if ( !Q_stricmp( parse[0], "boolchoice" ) )
+		if ( V_strieq( parse[0], "boolchoice" ) )
 		{
 			pInfo = CreateElement< CDmeEditorBoolChoicesInfo >( "field info" );
 		}
 
-		if ( !Q_stricmp( parse[0], "stringchoice" ) )
+		if ( V_strieq( parse[0], "stringchoice" ) )
 		{
 			pInfo = CreateElement< CDmeEditorStringChoicesInfo >( "field info" );
 		}
 
-		if ( !Q_stricmp( parse[0], "elementchoice" ) )
+		if ( V_strieq( parse[0], "elementchoice" ) )
 		{
 			pInfo = CreateElement< CDmeEditorChoicesInfo >( "field info" );
 		}
@@ -377,7 +377,7 @@ static void RemoveObsoleteAttributes( CDmElement *pElement, const DmxElementUnpa
 		bool bFound = false;
 		for ( const DmxElementUnpackStructure_t *pTrav = pUnpack; pTrav->m_pAttributeName; ++pTrav )
 		{
-			if ( !Q_stricmp( pTrav->m_pAttributeName, pAttr->GetName() ) )
+			if ( V_strieq( pTrav->m_pAttributeName, pAttr->GetName() ) )
 			{
 				bFound = true;
 				break;
@@ -518,7 +518,7 @@ intp CDmeParticleSystemDefinition::FindFunction( ParticleFunctionType_t type, co
 	intp nCount = m_ParticleFunction[type].Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( pFunctionName, m_ParticleFunction[type][i]->GetFunctionType() ) )
+		if ( V_strieq( pFunctionName, m_ParticleFunction[type][i]->GetFunctionType() ) )
 			return i;
 	}
 	return -1;

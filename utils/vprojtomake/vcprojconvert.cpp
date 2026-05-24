@@ -725,21 +725,21 @@ CVCProjConvert::CConfiguration::FileType_e CVCProjConvert::GetFileType(
   char ext[10];
   Q_ExtractFileExtension(fileName, ext, sizeof(ext));
 
-  if (!Q_stricmp(ext, "lib")) {
+  if (V_strieq(ext, "lib")) {
     type = CConfiguration::FILE_LIBRARY;
-  } else if (!Q_stricmp(ext, "h")) {
+  } else if (V_strieq(ext, "h")) {
     type = CConfiguration::FILE_HEADER;
-  } else if (!Q_stricmp(ext, "hh")) {
+  } else if (V_strieq(ext, "hh")) {
     type = CConfiguration::FILE_HEADER;
-  } else if (!Q_stricmp(ext, "hpp")) {
+  } else if (V_strieq(ext, "hpp")) {
     type = CConfiguration::FILE_HEADER;
-  } else if (!Q_stricmp(ext, "cpp")) {
+  } else if (V_strieq(ext, "cpp")) {
     type = CConfiguration::FILE_SOURCE;
-  } else if (!Q_stricmp(ext, "cxx")) {
+  } else if (V_strieq(ext, "cxx")) {
     type = CConfiguration::FILE_SOURCE;
-  } else if (!Q_stricmp(ext, "c")) {
+  } else if (V_strieq(ext, "c")) {
     type = CConfiguration::FILE_SOURCE;
-  } else if (!Q_stricmp(ext, "cc")) {
+  } else if (V_strieq(ext, "cc")) {
     type = CConfiguration::FILE_SOURCE;
   }
 

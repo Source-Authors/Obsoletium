@@ -2399,7 +2399,7 @@ void CHudMainMenuOverride::OnCommand( const char *command )
 		PlaySoundEntry( command + 11 );
 		return;
 	}
-	else if ( !Q_stricmp( command, "motd_viewurl" ) )
+	else if ( V_strieq( command, "motd_viewurl" ) )
 	{
 		CMOTDEntryDefinition *pMOTD = GetMOTDManager().GetMOTDByIndex( m_iCurrentMOTD );
 		if ( pMOTD )
@@ -2415,7 +2415,7 @@ void CHudMainMenuOverride::OnCommand( const char *command )
 		}
 		return;
 	}
-	else if ( !Q_stricmp( command, "view_newuser_forums" ) )
+	else if ( V_strieq( command, "view_newuser_forums" ) )
 	{
 		HideHighlight( MMHA_NEWUSERFORUM );
 
@@ -2425,13 +2425,13 @@ void CHudMainMenuOverride::OnCommand( const char *command )
 		}
 		return;
 	}
-	else if ( !Q_stricmp( command, "opentf2options" ) )
+	else if ( V_strieq( command, "opentf2options" ) )
 	{
 		HideHighlight( MMHA_OPTIONS );
 
 		GetClientModeTFNormal()->GameUI()->SendMainMenuCommand( "engine opentf2options" );
 	}
-	else if ( !Q_stricmp( command, "motd_prev" ) )
+	else if ( V_strieq( command, "motd_prev" ) )
 	{
 		if ( m_iCurrentMOTD > 0 )
 		{
@@ -2440,7 +2440,7 @@ void CHudMainMenuOverride::OnCommand( const char *command )
 		}
 		return;
 	}
-	else if ( !Q_stricmp( command, "motd_next" ) )
+	else if ( V_strieq( command, "motd_next" ) )
 	{
 		if ( m_iCurrentMOTD < (GetMOTDManager().GetNumMOTDs()-1) )
 		{
@@ -2449,23 +2449,23 @@ void CHudMainMenuOverride::OnCommand( const char *command )
 		}
 		return;
 	}
-	else if ( !Q_stricmp( command, "motd_show" ) )
+	else if ( V_strieq( command, "motd_show" ) )
 	{
 		SetMOTDVisible( !m_pMOTDPanel->IsVisible() );
 	}
-	else if ( !Q_stricmp( command, "motd_hide" ) )
+	else if ( V_strieq( command, "motd_hide" ) )
 	{
 		SetMOTDVisible( false );
 	}
-	else if ( !Q_stricmp( command, "noti_show" ) )
+	else if ( V_strieq( command, "noti_show" ) )
 	{
 		SetNotificationsPanelVisible( true );
 	}
-	else if ( !Q_stricmp( command, "noti_hide" ) )
+	else if ( V_strieq( command, "noti_hide" ) )
 	{
 		SetNotificationsPanelVisible( false );
 	}
-	else if ( !Q_stricmp( command, "notifications_update" ) )
+	else if ( V_strieq( command, "notifications_update" ) )
 	{
 		// force visible if 
 		if ( NotificationQueue_GetNumNotifications() != 0 )
@@ -2477,7 +2477,7 @@ void CHudMainMenuOverride::OnCommand( const char *command )
 			UpdateNotifications();
 		}
 	}
-	else if ( !Q_stricmp( command, "test_anim" ) )
+	else if ( V_strieq( command, "test_anim" ) )
 	{
 		InvalidateLayout( true, true ); 
 
@@ -2489,21 +2489,21 @@ void CHudMainMenuOverride::OnCommand( const char *command )
 		StartHighlightAnimation( MMHA_LOADOUT );
 		StartHighlightAnimation( MMHA_WAR );
 	}
-	else if ( !Q_stricmp( command, "offlinepractice" ) )
+	else if ( V_strieq( command, "offlinepractice" ) )
 	{
 		HideHighlight( MMHA_PRACTICE );
 
 		GetClientModeTFNormal()->GameUI()->SendMainMenuCommand( "engine training_showdlg" );
 	}
-	else if ( !Q_stricmp( command, "buyfeatured" ) )
+	else if ( V_strieq( command, "buyfeatured" ) )
 	{
 		GetClientModeTFNormal()->GameUI()->SendMainMenuCommand( VarArgs("engine open_store %d 1", m_pFeaturedItemPanel ? m_pFeaturedItemPanel->GetItem()->GetItemDefIndex() : 0 ) );
 	}
-	else if ( !Q_stricmp( command, "armory_open" ) )
+	else if ( V_strieq( command, "armory_open" ) )
 	{
 		GetClientModeTFNormal()->GameUI()->SendMainMenuCommand( "engine open_charinfo_armory" );
 	}
-	else if ( !Q_stricmp( command, "engine disconnect" ) && engine->IsInGame() && TFGameRules() && ( TFGameRules()->IsMannVsMachineMode() || TFGameRules()->IsCompetitiveMode() ) )
+	else if ( V_strieq( command, "engine disconnect" ) && engine->IsInGame() && TFGameRules() && ( TFGameRules()->IsMannVsMachineMode() || TFGameRules()->IsCompetitiveMode() ) )
 	{
 		// If we're playing MvM, "New Game" should take us back to MvM matchmaking
 		CTFDisconnectConfirmDialog *pDialog = BuildDisconnectConfirmDialog();
@@ -2513,7 +2513,7 @@ void CHudMainMenuOverride::OnCommand( const char *command )
 		}
 		return;
 	}
-	else if ( !Q_stricmp( command, "callvote" ) )
+	else if ( V_strieq( command, "callvote" ) )
 	{
 		GetClientModeTFNormal()->GameUI()->SendMainMenuCommand( "engine callvote" );
 		if ( GetClientModeTFNormal()->GameUI() )
@@ -2522,7 +2522,7 @@ void CHudMainMenuOverride::OnCommand( const char *command )
 		}
 		return;
 	}
-	else if ( !Q_stricmp( command, "showpromocodes" ) )
+	else if ( V_strieq( command, "showpromocodes" ) )
 	{
 		if ( steamapicontext && steamapicontext->SteamFriends() && steamapicontext->SteamUtils() )
 		{
@@ -2535,7 +2535,7 @@ void CHudMainMenuOverride::OnCommand( const char *command )
 			}
 		}
 	}
-	else if ( !Q_stricmp( command, "exitreplayeditor" ) )
+	else if ( V_strieq( command, "exitreplayeditor" ) )
 	{
  #if defined( REPLAY_ENABLED )
 		CReplayPerformanceEditorPanel *pEditor = ReplayUI_GetPerformanceEditor();

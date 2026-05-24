@@ -1580,7 +1580,7 @@ void MDLViewer::OnFileLoaded( char const *pszFile )
 	int i;
 	for (i = 0; i < 8; i++)
 	{
-		if (!Q_stricmp( recentFiles[i], pszFile ))
+		if (V_strieq( recentFiles[i], pszFile ))
 			break;
 	}
 
@@ -1782,13 +1782,13 @@ int MDLViewer::handleEvent (mxEvent *event)
 						char ext[ 4 ];
 						V_ExtractFileExtension( recentFiles[ i ], ext );
 						bool valid = false;
-						if ( !Q_stricmp( ext, "mdl" ) )
+						if ( V_strieq( ext, "mdl" ) )
 						{
 							// Check extension
 							LoadModelFile( recentFiles[ i ] );
 							valid = true;
 						}
-						else if ( !Q_stricmp( ext, "vcd" ) )
+						else if ( V_strieq( ext, "vcd" ) )
 						{
 							g_pChoreoView->LoadSceneFromFile( recentFiles[ i ] );
 							valid = true;

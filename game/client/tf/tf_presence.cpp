@@ -93,7 +93,7 @@ static unsigned int GetMapID( const char *pMapName )
 {
 	for ( int i = 0; i < ARRAYSIZE( s_Scenarios ); ++i )
 	{
-		if ( !Q_stricmp( s_Scenarios[i].pDiskName, pMapName ) )
+		if ( V_strieq( s_Scenarios[i].pDiskName, pMapName ) )
 		{
 			return i;
 		}
@@ -192,7 +192,7 @@ uint CTF_Presence::GetPresenceID( const char *pIDName )
 {
 	for ( int i = 0; i < ARRAYSIZE( s_PresenceIds ); ++i )
 	{
-		if ( !Q_stricmp( s_PresenceIds[i].pString, pIDName ) )
+		if ( V_strieq( s_PresenceIds[i].pString, pIDName ) )
 		{
 			return s_PresenceIds[i].id;
 		}
@@ -200,7 +200,7 @@ uint CTF_Presence::GetPresenceID( const char *pIDName )
 
 	for ( int i = 0; i < ARRAYSIZE( s_PresenceValues ); ++i )
 	{
-		if ( !Q_stricmp( s_PresenceValues[i].pString, pIDName ) )
+		if ( V_strieq( s_PresenceValues[i].pString, pIDName ) )
 		{
 			return s_PresenceValues[i].id;
 		}
@@ -315,7 +315,7 @@ void CTF_Presence::FireGameEvent( IGameEvent *event )
 {
 	const char *eventname = event->GetName();
 
-	if ( !Q_stricmp( "teamplay_round_start", eventname ) )
+	if ( V_strieq( "teamplay_round_start", eventname ) )
 	{
 		// Set presence for this map
 		// TODO: Set appropriate presence mode based on game type
@@ -337,7 +337,7 @@ void CTF_Presence::FireGameEvent( IGameEvent *event )
 		}
 #endif
 	}
-	else if ( !Q_stricmp( "controlpoint_initialized", eventname ) )
+	else if ( V_strieq( "controlpoint_initialized", eventname ) )
 	{
 		int nPoints = ObjectiveResource()->GetNumControlPoints();
 		int nOwned = ObjectiveResource()->GetNumControlPointsOwned();
@@ -345,12 +345,12 @@ void CTF_Presence::FireGameEvent( IGameEvent *event )
 		UserSetProperty( XBX_GetPrimaryUserId(), PROPERTY_CAPS_TOTAL, sizeof(int), &nPoints, true );
 		UserSetProperty( XBX_GetPrimaryUserId(), PROPERTY_CAPS_OWNED, sizeof(int), &nOwned, true );
 	}
-	else if ( !Q_stricmp( "controlpoint_updateowner", eventname ) )
+	else if ( V_strieq( "controlpoint_updateowner", eventname ) )
 	{
 		int nOwned = ObjectiveResource()->GetNumControlPointsOwned();
 		UserSetProperty( XBX_GetPrimaryUserId(), PROPERTY_CAPS_OWNED, sizeof(int), &nOwned, true );
 	}
-	else if ( !Q_stricmp( "ctf_flag_captured", eventname ) )
+	else if ( V_strieq( "ctf_flag_captured", eventname ) )
 	{
 		C_TFTeam *pLocalTeam = GetGlobalTFTeam( GetLocalPlayerTeam() );
 		
@@ -414,7 +414,7 @@ void CTF_Presence::FireGameEvent( IGameEvent *event )
 #endif 
 		}	
 	}
-	else if ( !Q_stricmp( "playing_commentary", eventname ) )
+	else if ( V_strieq( "playing_commentary", eventname ) )
 	{
 		m_bIsInCommentary = true;
 #if defined ( _X360 )

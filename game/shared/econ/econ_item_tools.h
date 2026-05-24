@@ -877,7 +877,7 @@ public:
 		{
 			m_pszLootListName = pUsageKV->GetString( "loot_list", NULL );
 			m_iMaxRecipients = pUsageKV->GetInt( "max_recipients", 0 );
-			m_eTargetRule = !Q_stricmp( pUsageKV->GetString( "target_rule", "only_others" ), "only_self" )
+			m_eTargetRule = V_strieq( pUsageKV->GetString( "target_rule", "only_others" ), "only_self" )
 						  ? kGiftTargetRule_OnlySelf
 						  : kGiftTargetRule_OnlyOthers;
 		}

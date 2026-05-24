@@ -88,7 +88,7 @@ void CAddPresetDialog::DoModal( CDmeAnimationSet *pAnimationSet, KeyValues *pCon
 		KeyValues *kv = new KeyValues( "entry" );
 		SetElementKeyValue( kv, "presetGroup", pPresetGroup );
 		int nItemID = m_pPresetGroup->AddItem( pPresetGroup->GetName(), kv );
-		if ( pCurrentGroupName && !Q_stricmp( pPresetGroup->GetName(), pCurrentGroupName ) )
+		if ( pCurrentGroupName && V_strieq( pPresetGroup->GetName(), pCurrentGroupName ) )
 		{
 			m_pPresetGroup->ActivateItem( nItemID );
 		}
@@ -108,7 +108,7 @@ void CAddPresetDialog::DoModal( CDmeAnimationSet *pAnimationSet, KeyValues *pCon
 //-----------------------------------------------------------------------------
 void CAddPresetDialog::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "OK" ) )
+	if ( V_strieq( command, "OK" ) )
 	{
 		int nTextLength = m_pInput->GetTextLength() + 1;
 		char* txt = (char*)_alloca( nTextLength * sizeof(char) );
@@ -138,7 +138,7 @@ void CAddPresetDialog::OnCommand( const char *command )
 		return;
 	}
 
-	if ( !Q_stricmp( command, "Cancel") )
+	if ( V_strieq( command, "Cancel") )
 	{
 		CloseModal();
 		return;

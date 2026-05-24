@@ -84,7 +84,7 @@ void CDmeVertexDataBase::UpdateStandardFieldInfo( int nFieldIndex, const char *p
 
 	for ( int i = 0; i < STANDARD_FIELD_COUNT; ++i )
 	{
-		if ( !Q_stricmp( pFieldName, g_pStandardFieldNames[i] ) )
+		if ( V_strieq( pFieldName, g_pStandardFieldNames[i] ) )
 		{
 			if ( attrType != g_pStandardFieldTypes[i] )
 			{
@@ -440,7 +440,7 @@ void CDmeVertexDataBase::FindOrAddVertexField( const char *pFieldName )
 	int nFormatCount = m_VertexFormat.Count();
 	for ( i = 0; i < nFormatCount; ++i )
 	{
-		if ( !Q_stricmp( pFieldName, m_VertexFormat[i] ) )
+		if ( V_strieq( pFieldName, m_VertexFormat[i] ) )
 			return;
 	}
 	m_VertexFormat.AddToTail( pFieldName );
@@ -454,8 +454,8 @@ FieldIndex_t CDmeVertexDataBase::CreateField( const char *pFieldName, DmAttribut
 {
 	Assert( Q_stricmp( pFieldName, g_pStandardFieldNames[FIELD_JOINT_WEIGHTS] ) );
 	Assert( Q_stricmp( pFieldName, g_pStandardFieldNames[FIELD_JOINT_INDICES] ) );
-	if ( !Q_stricmp( pFieldName, g_pStandardFieldNames[FIELD_JOINT_WEIGHTS] ) ||
-		!Q_stricmp( pFieldName, g_pStandardFieldNames[FIELD_JOINT_INDICES] ) )
+	if ( V_strieq( pFieldName, g_pStandardFieldNames[FIELD_JOINT_WEIGHTS] ) ||
+		V_strieq( pFieldName, g_pStandardFieldNames[FIELD_JOINT_INDICES] ) )
 	{
 		return -1;
 	}
@@ -576,7 +576,7 @@ FieldIndex_t CDmeVertexDataBase::FindFieldIndex( const char *pFieldName ) const
 	intp nCount = m_FieldInfo.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		if ( !Q_stricmp( m_FieldInfo[i].m_Name, pFieldName ) )
+		if ( V_strieq( m_FieldInfo[i].m_Name, pFieldName ) )
 			return i;
 	}
 	return -1;

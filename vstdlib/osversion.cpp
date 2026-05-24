@@ -340,7 +340,7 @@ EOSType GetOSTypeFromString_Deprecated( const char *pchName )
 
 	for ( auto &m : k_rgOSTypeToName )
 	{
-		if ( !Q_stricmp( m.m_pchOSName, pchName ) ) 
+		if ( V_strieq( m.m_pchOSName, pchName ) ) 
 			return m.m_OSType;
 	}
 	return eOSType;

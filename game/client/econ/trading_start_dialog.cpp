@@ -183,7 +183,7 @@ void CTradingStartDialog::Close( void )
 //-----------------------------------------------------------------------------
 void CTradingStartDialog::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "cancel" ) )
+	if ( V_strieq( command, "cancel" ) )
 	{
 		if ( m_iCurrentState != TDS_SELECTING_PLAYER )
 		{
@@ -195,19 +195,19 @@ void CTradingStartDialog::OnCommand( const char *command )
 		Close();
 		return;
 	}
-	else if ( !Q_stricmp( command, "friends" ) )
+	else if ( V_strieq( command, "friends" ) )
 	{
 		m_iCurrentState = TDS_SELECTING_FROM_FRIENDS;
 		UpdateState();
 		return;
 	}
-	else if ( !Q_stricmp( command, "server" ) )
+	else if ( V_strieq( command, "server" ) )
 	{
 		m_iCurrentState = TDS_SELECTING_FROM_SERVER;
 		UpdateState();
 		return;
 	}
-	else if ( !Q_stricmp( command, "profile" ) )
+	else if ( V_strieq( command, "profile" ) )
 	{
 		m_iCurrentState = TDS_SELECTING_FROM_PROFILE;
 		UpdateState();
@@ -222,7 +222,7 @@ void CTradingStartDialog::OnCommand( const char *command )
 		}
 		return;
 	}
-	else if ( !Q_stricmp( command, "url_ok" ) )
+	else if ( V_strieq( command, "url_ok" ) )
 	{
 		vgui::TextEntry *pEntry = dynamic_cast<vgui::TextEntry*>( m_pStatePanels[m_iCurrentState]->FindChildByName("URLEntry") );
 		if ( pEntry )

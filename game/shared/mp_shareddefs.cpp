@@ -207,7 +207,7 @@ int GetMPConceptIndexFromString( const char *pszConcept )
 {
 	for ( int iConcept = 0; iConcept < ssize( g_pszMPConcepts ); ++iConcept )
 	{
-		if ( !Q_stricmp( pszConcept, g_pszMPConcepts[iConcept] ) )
+		if ( V_strieq( pszConcept, g_pszMPConcepts[iConcept] ) )
 			return iConcept;
 	}
 

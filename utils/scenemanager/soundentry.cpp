@@ -125,7 +125,7 @@ int CSoundEntry::FindWave( CWaveFile *wave )
 //-----------------------------------------------------------------------------
 void CSoundEntry::SetName( char const *name )
 {
-	if ( !Q_stricmp( m_szName, name ) )
+	if ( V_strieq( m_szName, name ) )
 		return;
 
 	Q_strncpy( m_szName, name, sizeof( m_szName ) );
@@ -227,7 +227,7 @@ void CSoundEntry::SetScriptFile( char const *scriptfile )
 	int slot = g_pSoundEmitterSystem->GetSoundIndex( GetName() );
 	Q_FileBase( g_pSoundEmitterSystem->GetSourceFileForSound( slot ), filebase, sizeof( filebase ) );
 
-	if ( !Q_stricmp( GetScriptFile(), filebase ) )
+	if ( V_strieq( GetScriptFile(), filebase ) )
 		return;
 
 	Q_strncpy( m_szScriptFile, filebase, sizeof( m_szScriptFile ) );

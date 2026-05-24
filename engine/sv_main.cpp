@@ -766,7 +766,7 @@ void SV_InitGameDLL( void )
         // find the game dir we're running
 		for ( const auto &p : g_ModDirPermissions )
 		{
-			if ( !Q_stricmp( COM_GetModDirectory(), p.m_pchGameDir ) )
+			if ( V_strieq( COM_GetModDirectory(), p.m_pchGameDir ) )
 			{
 				// we've found the mod, make sure we own the app
 				if ( Steam3Client().SteamApps()->BIsSubscribedApp( p.m_iAppID ) )

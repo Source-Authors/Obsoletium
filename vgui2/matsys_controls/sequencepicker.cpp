@@ -320,7 +320,7 @@ void CSequencePicker::PlaySequence( const char *pSequenceName )
 	for (int i = 0; i < pstudiohdr->GetNumSeq(); i++)
 	{
 		mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( i );
-		if ( !Q_stricmp( seqdesc.pszLabel(), pSequenceName ) )
+		if ( V_strieq( seqdesc.pszLabel(), pSequenceName ) )
 		{
 			m_pMDLPreview->SetSequence( i );
 			break;
@@ -450,7 +450,7 @@ void CSequencePickerFrame::OnSequencePreviewChanged( KeyValues *pKeyValues )
 //-----------------------------------------------------------------------------
 void CSequencePickerFrame::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "Open" ) )
+	if ( V_strieq( pCommand, "Open" ) )
 	{
 		CSequencePicker::PickType_t type = m_pPicker->GetSelectedSequenceType( );
 		if (( type == CSequencePicker::PICK_SEQUENCES ) || ( type == CSequencePicker::PICK_ACTIVITIES ))
@@ -473,7 +473,7 @@ void CSequencePickerFrame::OnCommand( const char *pCommand )
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "Cancel" ) )
+	if ( V_strieq( pCommand, "Cancel" ) )
 	{
 		CloseModal();
 		return;

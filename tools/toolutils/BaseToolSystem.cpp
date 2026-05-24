@@ -316,7 +316,7 @@ void CBaseToolSystem::Think( [[maybe_unused]] bool finalTick )
 
 void CBaseToolSystem::PostMessage( [[maybe_unused]] HTOOLHANDLE hEntity, KeyValues *message )
 {
-	if ( !Q_stricmp( message->GetName(), "ReleaseLayoffTexture" ) )
+	if ( V_strieq( message->GetName(), "ReleaseLayoffTexture" ) )
 	{
 		if ( m_hMiniViewport.Get() )
 		{

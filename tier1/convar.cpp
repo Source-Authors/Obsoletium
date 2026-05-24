@@ -453,7 +453,7 @@ const char* CCommand::FindArg( const char *pName ) const
 	int nArgC = ArgC();
 	for ( int i = 1; i < nArgC; i++ )
 	{
-		if ( !Q_stricmp( Arg(i), pName ) )
+		if ( V_strieq( Arg(i), pName ) )
 			return (i+1) < nArgC ? Arg( i+1 ) : "";
 	}
 	return nullptr;

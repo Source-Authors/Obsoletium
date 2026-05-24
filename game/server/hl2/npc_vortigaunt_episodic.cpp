@@ -1148,7 +1148,7 @@ void CNPC_Vortigaunt::Precache()
 		char modDir[MAX_PATH];
 		if ( UTIL_GetModDir( modDir ) )
 		{
-			if ( !Q_stricmp( modDir, "ep2" ) )
+			if ( V_strieq( modDir, "ep2" ) )
 			{
 				PrecacheMaterial( "effects/rollerglow" );
 			}

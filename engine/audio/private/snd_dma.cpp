@@ -974,7 +974,7 @@ void S_InternalReloadSound( CSfxTable *sfx )
 
 	char pExt[10];
 	V_ExtractFileExtension( sfx->getname(), pExt );
-	CAudioSource::AudioSource nSource = !Q_stricmp( pExt, "mp3" )
+	CAudioSource::AudioSource nSource = V_strieq( pExt, "mp3" )
 		? CAudioSource::AUDIO_SOURCE_MP3
 		: CAudioSource::AUDIO_SOURCE_WAV;
 	audiosourcecache->GetInfo( nSource, sfx->IsPrecachedSound(), sfx ); // Do a size/date check and rebuild the cache entry if necessary.
@@ -6539,7 +6539,7 @@ void S_Play( const char *pszName, bool flush = false )
 
 static void S_Play( const CCommand &args )
 {
-	bool bFlush = !Q_stricmp( args[0], "playflush" );
+	bool bFlush = V_strieq( args[0], "playflush" );
 	for ( int i = 1; i < args.ArgC(); ++i )
 	{
 		S_Play( args[i], bFlush );
@@ -6753,7 +6753,7 @@ static void S_Say( const CCommand &args )
 	V_strcpy_safe( sound, args[1] );
 	
 	// DEBUG - test performance of dsp code
-	if ( !Q_stricmp( sound, "dsp" ) )
+	if ( V_strieq( sound, "dsp" ) )
 	{
 		constexpr intp count = 1000000;
 
@@ -6785,7 +6785,7 @@ static void S_Say( const CCommand &args )
 		return;
 	}
 	
-	if ( !Q_stricmp( sound, "paint" ) )
+	if ( V_strieq( sound, "paint" ) )
 	{
 		constexpr intp count = 100000;
 
@@ -6982,14 +6982,14 @@ void MXR_SetCurrentSoundMixer( const char *szsoundmixer )
 {
 	// if soundmixer name is not different from current name, return
 
-	if ( !Q_stricmp(szsoundmixer, g_szsoundmixer_cur) )
+	if ( V_strieq(szsoundmixer, g_szsoundmixer_cur) )
 	{
 		return;
 	}
 
 	for (int i = 0; i < g_csoundmixers; i++)
 	{
-		if ( !Q_stricmp(g_soundmixers[i].szsoundmixer, szsoundmixer) )
+		if ( V_strieq(g_soundmixers[i].szsoundmixer, szsoundmixer) )
 		{
 			g_isoundmixer = i;
 
@@ -7696,7 +7696,7 @@ int MXR_GetMixgroupFromName( const char *pszgroupname )
 
 	for (int i = 0; i < g_cgrouprules; i++)
 	{
-		if ( !Q_stricmp(g_grouprules[i].szmixgroup, pszgroupname ) )
+		if ( V_strieq(g_grouprules[i].szmixgroup, pszgroupname ) )
 			return g_grouprules[i].mixgroupid;
 	}	
 
@@ -7752,7 +7752,7 @@ int MXR_AddClassname( const char *pName )
 	Q_strncpy( szclassname, pName, CMXRNAMEMAX );
 	for ( int i = 0; i < g_cgroupclass; i++ )
 	{
-		if ( !Q_stricmp( szclassname, g_groupclasslist[i].szclassname ) )
+		if ( V_strieq( szclassname, g_groupclasslist[i].szclassname ) )
 			return i;
 	}
 	if ( g_cgroupclass >= CMXRCLASSMAX )
@@ -7863,17 +7863,17 @@ bool MXR_LoadAllSoundMixers( void )
 		pstart = COM_Parse( pstart, token );
 		if (token[0])
 		{
-			if (!Q_stricmp(token, "CHAN_STATIC"))
+			if (V_strieq(token, "CHAN_STATIC"))
 				pgroup->chantype = CHAN_STATIC;
-			else if (!Q_stricmp(token, "CHAN_WEAPON"))
+			else if (V_strieq(token, "CHAN_WEAPON"))
 				pgroup->chantype = CHAN_WEAPON;
-			else if (!Q_stricmp(token, "CHAN_VOICE"))
+			else if (V_strieq(token, "CHAN_VOICE"))
 				pgroup->chantype = CHAN_VOICE;
-			else if (!Q_stricmp(token, "CHAN_VOICE2"))
+			else if (V_strieq(token, "CHAN_VOICE2"))
 				pgroup->chantype = CHAN_VOICE2;
-			else if (!Q_stricmp(token, "CHAN_BODY"))
+			else if (V_strieq(token, "CHAN_BODY"))
 				pgroup->chantype = CHAN_BODY;
-			else if (!Q_stricmp(token, "CHAN_ITEM"))
+			else if (V_strieq(token, "CHAN_ITEM"))
 				pgroup->chantype = CHAN_ITEM;
 		}
 		else

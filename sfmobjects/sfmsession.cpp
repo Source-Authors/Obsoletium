@@ -243,7 +243,7 @@ CDmeDag *CSFMSession::FindOrCreateScene( CDmeFilmClip *pShot, const char *pScene
 	for ( intp i = 0 ; i < c; ++i )
 	{
 		CDmeDag *pChild = pScene->GetChild( i );
-		if ( pChild && !Q_stricmp( pChild->GetName(), pSceneName ) )
+		if ( pChild && V_strieq( pChild->GetName(), pSceneName ) )
 			return pChild;
 	}
 

@@ -68,7 +68,7 @@ bool CBuildFactoryHelper::HasFactory( char const *className )
 	CBuildFactoryHelper *p = m_sHelpers;
 	while ( p )
 	{
-		if ( !Q_stricmp( className, p->GetClassName() ) )
+		if ( V_strieq( className, p->GetClassName() ) )
 			return true;
 
 		p = p->GetNext();
@@ -83,7 +83,7 @@ vgui::Panel *CBuildFactoryHelper::InstancePanel( char const *className, vgui::Pa
 	CBuildFactoryHelper *p = m_sHelpers;
 	while ( p )
 	{
-		if ( !Q_stricmp( className, p->GetClassName() ) )
+		if ( V_strieq( className, p->GetClassName() ) )
             return p->CreatePanel( parent );
 
 		p = p->GetNext();

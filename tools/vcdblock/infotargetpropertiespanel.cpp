@@ -198,7 +198,7 @@ void CInfoTargetPropertiesPanel::SetObject( CDmeVMFEntity *pEntity )
 
 	if ( pEntity )
 	{
-		if ( !Q_stricmp( pEntity->GetClassName(), "info_target" ) )
+		if ( V_strieq( pEntity->GetClassName(), "info_target" ) )
 		{
 			PopulateInfoTargetFields();
 			m_pInfoTargetScroll->SetVisible( true );

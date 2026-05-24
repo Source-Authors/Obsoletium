@@ -68,7 +68,7 @@ static const mstudiosrcbonetransform_t *GetSrcBoneTransform( const studiohdr_t *
 	for ( int i = 0; i < nSrcBoneTransformCount; ++i )
 	{
 		const mstudiosrcbonetransform_t *pSrcBoneTransform = pStudioHdr->SrcBoneTransform( i );
-		if ( pSrcBoneTransform && !Q_stricmp( pSrcBoneTransform->pszName(), pszBoneName ) )
+		if ( pSrcBoneTransform && V_strieq( pSrcBoneTransform->pszName(), pszBoneName ) )
 			return pSrcBoneTransform;
 	}
 

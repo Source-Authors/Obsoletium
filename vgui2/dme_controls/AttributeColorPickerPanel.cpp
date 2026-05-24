@@ -32,7 +32,7 @@ CAttributeColorPickerPanel::CAttributeColorPickerPanel( vgui::Panel *parent, con
 
 void CAttributeColorPickerPanel::OnCommand( char const *cmd )
 {
-	if ( !Q_stricmp( cmd, "open" ) )
+	if ( V_strieq( cmd, "open" ) )
 	{
 		m_InitialColor = GetAttributeValue<Color>();
 		CColorPickerFrame *pColorPickerDialog = new CColorPickerFrame( this, "Select Color" );

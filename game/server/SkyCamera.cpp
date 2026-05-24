@@ -134,7 +134,7 @@ void CSkyCamera::Activate( )
 	{
 		for ( const auto* bogusMap : s_pBogusFogMaps)
 		{
-			if ( !Q_stricmp( bogusMap, STRING(gpGlobals->mapname) ) )
+			if ( V_strieq( bogusMap, STRING(gpGlobals->mapname) ) )
 			{
 				m_skyboxData.fog.colorPrimary.SetR( ( m_skyboxData.fog.colorPrimary.GetR() + m_skyboxData.fog.colorSecondary.GetR() ) * 0.5f );
 				m_skyboxData.fog.colorPrimary.SetG( ( m_skyboxData.fog.colorPrimary.GetG() + m_skyboxData.fog.colorSecondary.GetG() ) * 0.5f );

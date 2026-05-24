@@ -733,7 +733,7 @@ ButtonCode_t ButtonCode_StringToButtonCode( const char *pString, bool bXControll
 
 	for ( int i = 0; i < BUTTON_CODE_LAST; ++i )
 	{
-		if ( !Q_stricmp( s_pButtonCodeName[i], pString ) )
+		if ( V_strieq( s_pButtonCodeName[i], pString ) )
 			return static_cast<ButtonCode_t>(i);
 	}
 
@@ -742,7 +742,7 @@ ButtonCode_t ButtonCode_StringToButtonCode( const char *pString, bool bXControll
 	{
 		for ( int i = 0; i < ssize(s_pXControllerButtonCodeNames); ++i )
 		{
-			if ( !Q_stricmp( s_pXControllerButtonCodeNames[i], pString ) )
+			if ( V_strieq( s_pXControllerButtonCodeNames[i], pString ) )
 				return static_cast<ButtonCode_t>(JOYSTICK_FIRST_BUTTON + i);
 		}
 	}
@@ -792,7 +792,7 @@ AnalogCode_t AnalogCode_StringToAnalogCode( const char *pString )
 
 	for ( int i = 0; i < ANALOG_CODE_LAST; ++i )
 	{
-		if ( !Q_stricmp( s_pAnalogCodeName[i], pString ) )
+		if ( V_strieq( s_pAnalogCodeName[i], pString ) )
 			return static_cast<AnalogCode_t>(i);
 	}
 

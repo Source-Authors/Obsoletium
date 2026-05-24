@@ -1058,42 +1058,42 @@ void HTML::OnKillFocus()
 //-----------------------------------------------------------------------------
 void HTML::OnCommand( const char *pchCommand )
 {
-	if ( !Q_stricmp( pchCommand, "back" ) )
+	if ( V_strieq( pchCommand, "back" ) )
 	{
 		PostActionSignal( new KeyValues( "HTMLBackRequested" ) );
 	}
-	else if ( !Q_stricmp( pchCommand, "forward" ) )
+	else if ( V_strieq( pchCommand, "forward" ) )
 	{
 		PostActionSignal( new KeyValues( "HTMLForwardRequested" ) );
 	}
-	else if ( !Q_stricmp( pchCommand, "reload" ) )
+	else if ( V_strieq( pchCommand, "reload" ) )
 	{
 		Refresh();
 	}
-	else if ( !Q_stricmp( pchCommand, "stop" ) )
+	else if ( V_strieq( pchCommand, "stop" ) )
 	{
 		StopLoading();
 	}
-	else if ( !Q_stricmp( pchCommand, "viewsource" ) )
+	else if ( V_strieq( pchCommand, "viewsource" ) )
 	{
 		if (m_SteamAPIContext.SteamHTMLSurface())
 			m_SteamAPIContext.SteamHTMLSurface()->ViewSource( m_unBrowserHandle );
 	}
-	else if ( !Q_stricmp( pchCommand, "copy" ) )
+	else if ( V_strieq( pchCommand, "copy" ) )
 	{
 		if (m_SteamAPIContext.SteamHTMLSurface())
 			m_SteamAPIContext.SteamHTMLSurface()->CopyToClipboard( m_unBrowserHandle );
 	}
-	else if ( !Q_stricmp( pchCommand, "paste" ) )
+	else if ( V_strieq( pchCommand, "paste" ) )
 	{
 		if (m_SteamAPIContext.SteamHTMLSurface())
 			m_SteamAPIContext.SteamHTMLSurface()->PasteFromClipboard( m_unBrowserHandle );
 	}
-	else if ( !Q_stricmp( pchCommand, "copyurl" ) )
+	else if ( V_strieq( pchCommand, "copyurl" ) )
 	{
 		system()->SetClipboardText( m_sCurrentURL, m_sCurrentURL.Length() );
 	}
-	else if ( !Q_stricmp( pchCommand, "copylink" ) )
+	else if ( V_strieq( pchCommand, "copylink" ) )
 	{
 		int x, y;
 		m_pContextMenu->GetPos( x, y );
@@ -1224,15 +1224,15 @@ HTML::CHTMLFindBar::CHTMLFindBar( HTML *parent ) : EditablePanel( parent, "FindB
 //-----------------------------------------------------------------------------
 void HTML::CHTMLFindBar::OnCommand( const char *pchCmd )
 {
-	if ( !Q_stricmp( pchCmd, "close" ) )
+	if ( V_strieq( pchCmd, "close" ) )
 	{
 		m_pParent->HideFindDialog();
 	}
-	else if ( !Q_stricmp( pchCmd, "previous" ) )
+	else if ( V_strieq( pchCmd, "previous" ) )
 	{
 		m_pParent->FindPrevious();
 	}
-	else if ( !Q_stricmp( pchCmd, "next" ) )
+	else if ( V_strieq( pchCmd, "next" ) )
 	{
 		m_pParent->FindNext();
 	}
@@ -1295,7 +1295,7 @@ void HTML::BrowserNeedsPaint( HTML_NeedsPaint_t *pCallback )
 //-----------------------------------------------------------------------------
 bool HTML::OnStartRequest( const char *url, const char *target, const char *pchPostData, bool bIsRedirect )
 {
-	if ( !url || !Q_stricmp( url, "about:blank") )
+	if ( !url || V_strieq( url, "about:blank") )
 		return true ; // this is just webkit loading a new frames contents inside an existing page
 
 	HideFindDialog();
@@ -1321,7 +1321,7 @@ bool HTML::OnStartRequest( const char *url, const char *target, const char *pchP
 
 	if ( m_bNewWindowsOnly && bIsRedirect )
 	{
-		if ( target && ( !Q_stricmp( target, "_blank" ) || !Q_stricmp( target, "_new" ) )  ) // only allow NEW windows (_blank ones)
+		if ( target && ( V_strieq( target, "_blank" ) || V_strieq( target, "_new" ) )  ) // only allow NEW windows (_blank ones)
 		{
 			return true;
 		}

@@ -1485,7 +1485,7 @@ void CWebAPIValues::DeleteChild( const char *pchName )
 
 	for ( pChild = m_pFirstChild; pChild != NULL; pPrev = pChild, pChild = pChild->m_pNextPeer )
 	{
-		if ( !Q_stricmp( pChild->GetName(), pchName ) )
+		if ( V_strieq( pChild->GetName(), pchName ) )
 		{
 			if ( pChild == m_pFirstChild )
 			{

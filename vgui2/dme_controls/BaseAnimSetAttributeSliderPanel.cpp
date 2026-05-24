@@ -263,13 +263,13 @@ CBaseAnimSetAttributeSliderPanel::CBaseAnimSetAttributeSliderPanel( vgui::Panel 
 
 void CBaseAnimSetAttributeSliderPanel::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "OnLeftOnly" ) )
+	if ( V_strieq( pCommand, "OnLeftOnly" ) )
 	{
 		m_pPresetSideFilter->SetPos( 0.0f );
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "OnRightOnly" ) )
+	if ( V_strieq( pCommand, "OnRightOnly" ) )
 	{
 		m_pPresetSideFilter->SetPos( 1.0f );
 		return;

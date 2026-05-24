@@ -114,7 +114,7 @@ public:
 
 		while ( p )
 		{
-			if ( !Q_stricmp( getLabel( p ), child ) )
+			if ( V_strieq( getLabel( p ), child ) )
 				return p;
 
 			p = getNextChild( p );
@@ -704,7 +704,7 @@ void CWaveBrowser::PopulateTree( char const *subdirectory, bool textsearch /*= f
 
 		int slot = m_pListView->add( name );
 
-		if ( !Q_stricmp( prevSelectedName, name ) )
+		if ( V_strieq( prevSelectedName, name ) )
 		{
 			selectedSlot = slot;
 		}
@@ -869,7 +869,7 @@ void CWaveBrowser::JumpToItem( CWaveFile *wav )
 	for ( ; idx < c; idx++ )
 	{
 		CWaveFile *item = (CWaveFile *)m_pListView->getUserData( idx, 0 );
-		if ( !Q_stricmp( item->GetFileName(), wav->GetFileName() ) )
+		if ( V_strieq( item->GetFileName(), wav->GetFileName() ) )
 		{
 			break;
 		}

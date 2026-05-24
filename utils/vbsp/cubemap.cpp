@@ -147,7 +147,7 @@ static const char *FindDependentMaterial( const char *pMaterialName, const char 
 		if ( !GetValueFromMaterial( pMaterialName, s_pDependentMaterialVar[i], pDependentMaterialName, MAX_MATERIAL_NAME - 1 ) )
 			continue;
 
-		if ( !Q_stricmp( pDependentMaterialName, pMaterialName ) )
+		if ( V_strieq( pDependentMaterialName, pMaterialName ) )
 		{
 			Warning( "Material %s is depending on itself through materialvar %s! Ignoring...\n", pMaterialName, s_pDependentMaterialVar[i] );
 				continue;

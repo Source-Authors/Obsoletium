@@ -72,11 +72,11 @@ void CAttributeSequencePickerPanel::ShowSequencePickerDialog( const char *pMDLNa
 	const char *pTextType = GetTextType();
 	if ( pTextType )
 	{
-		if ( !Q_stricmp( pTextType, "activityName" ) )
+		if ( V_strieq( pTextType, "activityName" ) )
 		{
 			pickType = CSequencePicker::PICK_ACTIVITIES;
 		}
-		else if ( !Q_stricmp( pTextType, "sequenceName" ) )
+		else if ( V_strieq( pTextType, "sequenceName" ) )
 		{
 			pickType = CSequencePicker::PICK_SEQUENCES;
 		}

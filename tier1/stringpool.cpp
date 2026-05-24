@@ -160,7 +160,7 @@ unsigned short CCountedStringPool::FindStringHandle( const char* pIntrinsic )
 	{
 		for( ; nCurrentBucket != INVALID_ELEMENT  ; nCurrentBucket = m_Elements[nCurrentBucket].nNextElement )
 		{
-			if( !Q_stricmp( pIntrinsic, m_Elements[nCurrentBucket].pString ) )
+			if( V_strieq( pIntrinsic, m_Elements[nCurrentBucket].pString ) )
 			{
 				return nCurrentBucket;
 			}
@@ -195,7 +195,7 @@ unsigned short CCountedStringPool::ReferenceStringHandle( const char* pIntrinsic
 		{
 			auto& elem = m_Elements[nCurrentBucket];
 
-			if( !Q_stricmp( pIntrinsic, elem.pString ) )
+			if( V_strieq( pIntrinsic, elem.pString ) )
 			{
 				// Anyone who hits 65k references is permanant
 				if( elem.nReferenceCount < MAX_REFERENCE )
@@ -255,7 +255,7 @@ void CCountedStringPool::DereferenceString( const char* pIntrinsic )
 	{
 		auto &elem = m_Elements[nCurrentBucket];
 
-		if( !Q_stricmp( pIntrinsic, elem.pString ) )
+		if( V_strieq( pIntrinsic, elem.pString ) )
 		{
 			// Anyone who hits 65k references is permanant
 			if( elem.nReferenceCount < MAX_REFERENCE )

@@ -321,7 +321,7 @@ CDmeSource *CDmeMakefile::FindSource( const char *pSourceType, const char *pFull
 		if ( Q_stricmp( pSourceType, m_Sources[i]->GetTypeString() ) )
 			continue;
 
-		if ( !Q_stricmp( pRelativePath, m_Sources[i]->GetRelativeFileName() ) )
+		if ( V_strieq( pRelativePath, m_Sources[i]->GetRelativeFileName() ) )
 			return m_Sources[i];
 	}
 	return NULL;
@@ -424,7 +424,7 @@ void CDmeMakefile::RemoveSource( const char *pSourceType, const char *pFullPath 
 		if ( Q_stricmp( pSourceType, m_Sources[i]->GetTypeString() ) )
 			continue;
 
-		if ( !Q_stricmp( pRelativePath, m_Sources[i]->GetRelativeFileName() ) )
+		if ( V_strieq( pRelativePath, m_Sources[i]->GetRelativeFileName() ) )
 		{
 			m_Sources.Remove( i );
 			break;
@@ -441,7 +441,7 @@ void CDmeMakefile::RemoveAllSources( const char *pSourceType )
 	intp nCount = m_Sources.Count();
 	for ( intp i = nCount; --i >= 0; )
 	{
-		if ( !Q_stricmp( pSourceType, m_Sources[i]->GetTypeString() ) )
+		if ( V_strieq( pSourceType, m_Sources[i]->GetTypeString() ) )
 		{
 			// NOTE: This works because we're iterating backward
 			m_Sources.Remove( i );
@@ -458,7 +458,7 @@ bool CDmeMakefile::HasSourceOfType( const char *pSourceType )
 	intp nCount = m_Sources.Count();
 	for ( intp i = nCount; --i >= 0; )
 	{
-		if ( !Q_stricmp( pSourceType, m_Sources[i]->GetTypeString() ) )
+		if ( V_strieq( pSourceType, m_Sources[i]->GetTypeString() ) )
 			return true;
 	}
 	return false;

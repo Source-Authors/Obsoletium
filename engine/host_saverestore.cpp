@@ -2046,12 +2046,12 @@ int CSaveRestore::SaveReadNameAndComment( FileHandle_t f, OUT_Z_CAP(nameSize) ch
 		pFieldName = pTokenList[ *(short *)pData ];
 		pData += sizeof(short);
 
-		if ( !Q_stricmp( pFieldName, "comment" ) )
+		if ( V_strieq( pFieldName, "comment" ) )
 		{
 			int copySize = MAX( commentSize, nFieldSize );
 			Q_strncpy( comment, pData, copySize );
 		}
-		else if ( !Q_stricmp( pFieldName, "mapName" ) )
+		else if ( V_strieq( pFieldName, "mapName" ) )
 		{
 			int copySize = MAX( commentSize, nFieldSize );
 			Q_strncpy( name, pData, copySize );
@@ -2703,15 +2703,15 @@ static void SaveGame( const CCommand &args )
 	{
 		for ( int i = 2; i < args.ArgC(); i++ )
 		{
-			if ( !Q_stricmp( args[i], "wait" ) )
+			if ( V_strieq( args[i], "wait" ) )
 			{
 				bFinishAsync = true;
 			}
-			else if ( !Q_stricmp(args[i], "notmostrecent"))
+			else if ( V_strieq(args[i], "notmostrecent"))
 			{
 				bSetMostRecent = false;
 			}
-			else if ( !Q_stricmp( args[i], "copymap" ) )
+			else if ( V_strieq( args[i], "copymap" ) )
 			{
 				bRenameMap = true;
 			}

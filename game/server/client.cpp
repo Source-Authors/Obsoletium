@@ -903,7 +903,7 @@ CON_COMMAND( give, "Give item to player.\n\tArguments: <item_name>" )
 		Q_strlower( item_to_give );
 
 		// Don't allow regular users to create point_servercommand entities for the same reason as blocking ent_fire
-		if ( !Q_stricmp( item_to_give, "point_servercommand" ) )
+		if ( V_strieq( item_to_give, "point_servercommand" ) )
 		{
 			if ( engine->IsDedicatedServer() )
 			{
@@ -921,7 +921,7 @@ CON_COMMAND( give, "Give item to player.\n\tArguments: <item_name>" )
 		}
 
 		// Dirty hack to avoid suit playing it's pickup sound
-		if ( !Q_stricmp( item_to_give, "item_suit" ) )
+		if ( V_strieq( item_to_give, "item_suit" ) )
 		{
 			pPlayer->EquipSuit( false );
 			return;
@@ -1069,7 +1069,7 @@ void CC_Player_PhysSwap( void )
 
 			const char *strWeaponName = pWeapon->GetName();
 
-			if ( !Q_stricmp( strWeaponName, "weapon_physcannon" ) )
+			if ( V_strieq( strWeaponName, "weapon_physcannon" ) )
 			{
 				PhysCannonForceDrop( pWeapon, NULL );
 				pPlayer->SelectLastItem();
@@ -1102,7 +1102,7 @@ void CC_Player_BugBaitSwap( void )
 
 			const char *strWeaponName = pWeapon->GetName();
 
-			if ( !Q_stricmp( strWeaponName, "weapon_bugbait" ) )
+			if ( V_strieq( strWeaponName, "weapon_bugbait" ) )
 			{
 				pPlayer->SelectLastItem();
 			}

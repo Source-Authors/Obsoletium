@@ -70,7 +70,7 @@ void CBaseModelPanel::ApplySettings( KeyValues *inResourceData )
 	// Parse our resource file and apply all necessary updates to the MDL.
  	for ( KeyValues *pData = inResourceData->GetFirstSubKey() ; pData != NULL ; pData = pData->GetNextKey() )
  	{
- 		if ( !Q_stricmp( pData->GetName(), "model" ) )
+ 		if ( V_strieq( pData->GetName(), "model" ) )
  		{
  			ParseModelResInfo( pData );
  		}
@@ -100,11 +100,11 @@ void CBaseModelPanel::ParseModelResInfo( KeyValues *inResourceData )
 
 	for ( KeyValues *pData = inResourceData->GetFirstSubKey(); pData != NULL; pData = pData->GetNextKey() )
 	{
-		if ( !Q_stricmp( pData->GetName(), "animation" ) )
+		if ( V_strieq( pData->GetName(), "animation" ) )
 		{
 			ParseModelAnimInfo( pData );
 		}
-		else if ( !Q_stricmp( pData->GetName(), "attached_model" ) )
+		else if ( V_strieq( pData->GetName(), "attached_model" ) )
 		{
 			ParseModelAttachInfo( pData );
 		}
@@ -133,7 +133,7 @@ void CBaseModelPanel::ParseModelAnimInfo( KeyValues *inResourceData )
 
 	for ( KeyValues *pAnimData = inResourceData->GetFirstSubKey(); pAnimData != NULL; pAnimData = pAnimData->GetNextKey() )
 	{
-		if ( !Q_stricmp( pAnimData->GetName(), "pose_parameters" ) )
+		if ( V_strieq( pAnimData->GetName(), "pose_parameters" ) )
 		{
 			anim.m_pPoseParameters = pAnimData->MakeCopy();
 		}
@@ -214,7 +214,7 @@ int CBaseModelPanel::FindAnimByName( const char *pszName )
 	int nAnimCount = m_BMPResData.m_aAnimations.Count();
 	for ( int iAnim = 0; iAnim < nAnimCount; ++iAnim )
 	{
-		if ( !Q_stricmp( m_BMPResData.m_aAnimations[iAnim].m_pszName, pszName ) )
+		if ( V_strieq( m_BMPResData.m_aAnimations[iAnim].m_pszName, pszName ) )
 			return iAnim;
 	}
 

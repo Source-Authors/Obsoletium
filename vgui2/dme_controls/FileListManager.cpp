@@ -566,7 +566,7 @@ void CFileListManager::OnThink( )
 
 void CFileListManager::OnCommand( const char *cmd )
 {
-	// if ( !Q_stricmp( cmd, "foo" ) ) ...
+	// if ( V_strieq( cmd, "foo" ) ) ...
 	BaseClass::OnCommand( cmd );
 }
 

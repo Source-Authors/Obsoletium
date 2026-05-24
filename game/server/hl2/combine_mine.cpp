@@ -196,7 +196,7 @@ void CBounceBomb::Spawn()
 		{
 			if ( dmap->dataDesc[i].flags & (FTYPEDESC_OUTPUT | FTYPEDESC_KEY) )
 			{
-				if ( !Q_stricmp(dmap->dataDesc[i].externalName, "Skin") )
+				if ( V_strieq(dmap->dataDesc[i].externalName, "Skin") )
 				{
 					bFoundSkin = true; 
 					break;

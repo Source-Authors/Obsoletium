@@ -172,7 +172,7 @@ void CSelectPlayerForCoachDialog::OnSelectPlayer( const CSteamID &steamID )
 
 void CSelectPlayerForCoachDialog::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "performmatchmaking" ) )
+	if ( V_strieq( command, "performmatchmaking" ) )
 	{
 		if ( CanAskPlayerToCoach( CSteamID() ) )
 		{

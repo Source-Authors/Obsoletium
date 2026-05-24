@@ -331,7 +331,7 @@ int CHudChat::GetFilterForString( const char *pString )
 
 	if ( iFilter == CHAT_FILTER_NONE )
 	{
-		if ( !Q_stricmp( pString, "#CStrike_Name_Change" ) ) 
+		if ( V_strieq( pString, "#CStrike_Name_Change" ) ) 
 		{
 			return CHAT_FILTER_NAMECHANGE;
 		}

@@ -187,7 +187,7 @@ void CTestItemDialog::InitializeFromExistingKVs( KeyValues *pExistingKVs )
 					KeyValues *pKVEntry = pkvVisuals->GetFirstSubKey();
 					while ( pKVEntry )
 					{
-						if ( !Q_stricmp( pKVEntry->GetName(), "player_bodygroups" ) )
+						if ( V_strieq( pKVEntry->GetName(), "player_bodygroups" ) )
 						{
 							FOR_EACH_SUBKEY( pKVEntry, pKVSubEntry )
 							{
@@ -406,22 +406,22 @@ void CTestItemDialog::CloseAndUpdateItem( void )
 //-----------------------------------------------------------------------------
 void CTestItemDialog::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "cancel" ) )
+	if ( V_strieq( command, "cancel" ) )
 	{
 		Close();
 		return;
 	}
-	else if ( !Q_stricmp( command, "ok" ) )
+	else if ( V_strieq( command, "ok" ) )
 	{
 		CloseAndUpdateItem();
 		return;
 	}
-	else if ( !Q_stricmp( command, "reloadscheme" ) )
+	else if ( V_strieq( command, "reloadscheme" ) )
 	{
 		InvalidateLayout( false, true );
 		return;
 	}
-	else if ( !Q_stricmp( command, "select_model" ) )
+	else if ( V_strieq( command, "select_model" ) )
 	{
 		OpenSelectModelDialog();
 		return;

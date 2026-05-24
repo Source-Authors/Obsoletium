@@ -336,7 +336,7 @@ CExpClass *CExpressionManager::FindClass( const char *classname, bool bMatchBase
 	{
 		CExpClass *cl = m_Classes[ i ];
 
-		if ( !Q_stricmp( search, bMatchBaseNameOnly ? cl->GetBaseName() : cl->GetName() ) )
+		if ( V_strieq( search, bMatchBaseNameOnly ? cl->GetBaseName() : cl->GetName() ) )
 		{
 			return cl;
 		}

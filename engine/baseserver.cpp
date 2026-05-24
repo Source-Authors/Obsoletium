@@ -343,7 +343,7 @@ const char *CBaseServer::GetPassword() const
 	const char *password = sv_password.GetString();
 
 	// if password is empty or "none", return NULL
-	if ( !password[0] || !Q_stricmp(password, "none" ) )
+	if ( !password[0] || V_strieq(password, "none" ) )
 	{
 		return NULL;
 	}
@@ -2474,7 +2474,7 @@ void CBaseServer::AddTag( const char *pszTag )
 	for ( const char *tag : TagList )
 	{
 		// Already in the tag list?
-		if ( !Q_stricmp(tag,pszTag) )
+		if ( V_strieq(tag,pszTag) )
 			return;
 	}
 	TagList.PurgeAndDeleteElementsArray();

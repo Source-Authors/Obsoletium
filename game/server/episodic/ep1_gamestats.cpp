@@ -21,7 +21,7 @@ CEP1GameStats::CEP1GameStats( void )
 
 CBaseGameStats *CEP1GameStats::OnInit( CBaseGameStats *pCurrentGameStats, char const *gamedir )
 {
-	if ( !Q_stricmp( gamedir, "ep2" ) )
+	if ( V_strieq( gamedir, "ep2" ) )
 	{
 		return g_pEP2GameStats;
 	}

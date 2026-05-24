@@ -251,7 +251,7 @@ void CFoundryDoc::AddOriginalEntities( CUtlBuffer &entityBuf, const char *pActua
 
 		for ( int i = 0; s_pUseOriginalClasses[i]; ++i )
 		{
-			if ( !Q_stricmp( pClassName, s_pUseOriginalClasses[i] ) )
+			if ( V_strieq( pClassName, s_pUseOriginalClasses[i] ) )
 			{
 				// Found one we need to keep, add it to the buffer
 				int nBytes = (int)( (size_t)pActualEntityData - (size_t)pBlockStart );
@@ -285,7 +285,7 @@ void CFoundryDoc::AddVMFEntities( CUtlBuffer &entityBuf, [[maybe_unused]] const 
 		bool bDontUse = false;
 		for ( intp i = 0; s_pUseOriginalClasses[i]; ++i )
 		{
-			if ( !Q_stricmp( pClassName, s_pUseOriginalClasses[i] ) )
+			if ( V_strieq( pClassName, s_pUseOriginalClasses[i] ) )
 			{
 				bDontUse = true;
 				break;
@@ -306,7 +306,7 @@ void CFoundryDoc::AddVMFEntities( CUtlBuffer &entityBuf, [[maybe_unused]] const 
 			if ( IsArrayType( pAttribute->GetType() ) )
 				continue;
 
-			if ( !Q_stricmp( pAttribute->GetName(), "editorType" ) || !Q_stricmp( pAttribute->GetName(), "editor" ) )
+			if ( V_strieq( pAttribute->GetName(), "editorType" ) || V_strieq( pAttribute->GetName(), "editor" ) )
 				continue;
 
 			entityBuf.Printf( "\"%s\" ", pAttribute->GetName() );

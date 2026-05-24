@@ -71,30 +71,30 @@ CAbuseReportDlg::~CAbuseReportDlg()
 
 void CAbuseReportDlg::OnCommand( const char *command )
 {
-	if ( !Q_stricmp( command, "cancel" ) )
+	if ( V_strieq( command, "cancel" ) )
 	{
 		Close();
 		return;
 	}
-	if ( !Q_stricmp( command, "discard" ) )
+	if ( V_strieq( command, "discard" ) )
 	{
 		Close();
 		g_AbuseReportMgr->DestroyIncidentData();
 		return;
 	}
-	if ( !Q_stricmp( command, "submit" ) )
+	if ( V_strieq( command, "submit" ) )
 	{
 		OnSubmitReport();
 		return;
 	}
-	if ( !Q_stricmp( command, "nextcustomtexture" ) )
+	if ( V_strieq( command, "nextcustomtexture" ) )
 	{
 		++m_iUserImageIndex;
 		UpdateCustomTextures();
 		return;
 	}
 
-	if ( !Q_stricmp( command, "prevcustomtexture" ) )
+	if ( V_strieq( command, "prevcustomtexture" ) )
 	{
 		--m_iUserImageIndex;
 		UpdateCustomTextures();

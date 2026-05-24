@@ -763,7 +763,7 @@ void CWorkspaceManager::AddFileToRecentWorkspaceList( char const *filename )
 
 	for ( i = 0; i < c; i++ )
 	{
-		if (!Q_stricmp( m_RecentFiles[i].filename, filename ))
+		if (V_strieq( m_RecentFiles[i].filename, filename ))
 			break;
 	}
 
@@ -1344,7 +1344,7 @@ void CWorkspaceManager::OnSoundEditText()
 	if ( !InputProperties( &params ) )
 		return;
 
-	if ( !Q_stricmp( params.m_szInputText, s->GetSentenceText() ) )
+	if ( V_strieq( params.m_szInputText, s->GetSentenceText() ) )
 	{
 		return;
 	}

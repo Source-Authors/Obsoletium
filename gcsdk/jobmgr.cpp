@@ -297,7 +297,7 @@ bool CJobMgr::BIsJobRunning( const char *pchJobName )
 {
 	FOR_EACH_MAP_FAST( m_MapJob, i )
 	{
-		if ( !Q_stricmp( m_MapJob[i]->GetName(), pchJobName ) )
+		if ( V_strieq( m_MapJob[i]->GetName(), pchJobName ) )
 			return true;
 	}
 	return false;

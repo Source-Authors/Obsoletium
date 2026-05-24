@@ -91,7 +91,7 @@ int GetTeamVisualsFromString( const char *pszString )
 	for ( int i = 0; i < TEAM_VISUAL_SECTIONS; i++ )
 	{
 		// There's a NULL hidden in g_TeamVisualSections
-		if ( g_TeamVisualSections[i] && !Q_stricmp( pszString, g_TeamVisualSections[i] ) )
+		if ( g_TeamVisualSections[i] && V_strieq( pszString, g_TeamVisualSections[i] ) )
 			return i;
 	}
 	return -1;
@@ -1235,7 +1235,7 @@ bool CEconLootListDefinition::BInitFromKV( KeyValues *pKVLootList, CEconItemSche
 			m_bPublicListContents = pKVListItem->GetBool( nullptr, true );
 			continue;
 		}
-		else if ( !Q_stricmp( pszName, "__no_dupes_iter_count" ) )
+		else if ( V_strieq( pszName, "__no_dupes_iter_count" ) )
 		{
 			m_iNoDupesIterations = pKVListItem->GetInt( nullptr, -1 );
 			continue;
@@ -4256,7 +4256,7 @@ void CEconItemDefinition::BInitVisualBlockFromKV( KeyValues *pKVItem, CUtlVector
 			{
 				const char *pszEntry = pKVEntry->GetName();
 
-				if ( !Q_stricmp( pszEntry, "use_visualsblock_as_base" ) )
+				if ( V_strieq( pszEntry, "use_visualsblock_as_base" ) )
 				{
 					// Start with a copy of an existing PerTeamVisuals
 					const char *pszString = pKVEntry->GetString();
@@ -4270,7 +4270,7 @@ void CEconItemDefinition::BInitVisualBlockFromKV( KeyValues *pKVItem, CUtlVector
 						pVecErrors->AddToTail( CFmtStr( "Unknown visuals block: %s", pszString ).Access() );
 					}
 				}
-				else if ( !Q_stricmp( pszEntry, "attached_models" ) )
+				else if ( V_strieq( pszEntry, "attached_models" ) )
 				{
 					FOR_EACH_SUBKEY( pKVEntry, pKVAttachedModelData )
 					{
@@ -4279,7 +4279,7 @@ void CEconItemDefinition::BInitVisualBlockFromKV( KeyValues *pKVItem, CUtlVector
 						pVisData->m_AttachedModels[iAtt].m_pszModelName = pKVAttachedModelData->GetString( "model", NULL );
 					}
 				}
-				else if ( !Q_stricmp( pszEntry, "attached_models_festive" ) )
+				else if ( V_strieq( pszEntry, "attached_models_festive" ) )
 				{
 					FOR_EACH_SUBKEY( pKVEntry, pKVAttachedModelData )
 					{
@@ -4288,7 +4288,7 @@ void CEconItemDefinition::BInitVisualBlockFromKV( KeyValues *pKVItem, CUtlVector
 						pVisData->m_AttachedModelsFestive[iAtt].m_pszModelName = pKVAttachedModelData->GetString( "model", NULL );
 					}
 				}
-				else if ( !Q_stricmp( pszEntry, "attached_particlesystems" ) )
+				else if ( V_strieq( pszEntry, "attached_particlesystems" ) )
 				{
 					FOR_EACH_SUBKEY( pKVEntry, pKVAttachedParticleSystemData )
 					{
@@ -4299,19 +4299,19 @@ void CEconItemDefinition::BInitVisualBlockFromKV( KeyValues *pKVItem, CUtlVector
 						pVisData->m_AttachedParticles[iAtt].iCustomType = 0;
 					}
 				}
-				else if ( !Q_stricmp( pszEntry, "custom_particlesystem2" ) )
+				else if ( V_strieq( pszEntry, "custom_particlesystem2" ) )
 				{
 					int iAtt = pVisData->m_AttachedParticles.AddToTail();
 					pVisData->m_AttachedParticles[iAtt].pszSystemName = pKVEntry->GetString( "system", NULL );
 					pVisData->m_AttachedParticles[iAtt].iCustomType = 2;
 				}
-				else if ( !Q_stricmp( pszEntry, "custom_particlesystem" ) )
+				else if ( V_strieq( pszEntry, "custom_particlesystem" ) )
 				{
 					int iAtt = pVisData->m_AttachedParticles.AddToTail();
 					pVisData->m_AttachedParticles[iAtt].pszSystemName = pKVEntry->GetString( "system", NULL );
 					pVisData->m_AttachedParticles[iAtt].iCustomType = 1;
 				}
-				else if ( !Q_stricmp( pszEntry, "playback_activity" ) )
+				else if ( V_strieq( pszEntry, "playback_activity" ) )
 				{
 					FOR_EACH_SUBKEY( pKVEntry, pKVSubKey )
 					{
@@ -4323,7 +4323,7 @@ void CEconItemDefinition::BInitVisualBlockFromKV( KeyValues *pKVItem, CUtlVector
 						}
 					}
 				}
-				else if ( !Q_stricmp( pszEntry, "animation_replacement" ) )
+				else if ( V_strieq( pszEntry, "animation_replacement" ) )
 				{
 					FOR_EACH_SUBKEY( pKVEntry, pKVSubKey )
 					{
@@ -4331,7 +4331,7 @@ void CEconItemDefinition::BInitVisualBlockFromKV( KeyValues *pKVItem, CUtlVector
 						pEntry->pszReplacement = pKVSubKey->GetString();
 					}
 				}
-				else if ( !Q_stricmp( pszEntry, "animation_sequence" ) )
+				else if ( V_strieq( pszEntry, "animation_sequence" ) )
 				{
 					FOR_EACH_SUBKEY( pKVEntry, pKVSubKey )
 					{
@@ -4339,7 +4339,7 @@ void CEconItemDefinition::BInitVisualBlockFromKV( KeyValues *pKVItem, CUtlVector
 						pEntry->pszSequence = pKVSubKey->GetString();
 					}
 				}
-				else if ( !Q_stricmp( pszEntry, "animation_scene" ) )
+				else if ( V_strieq( pszEntry, "animation_scene" ) )
 				{
 					FOR_EACH_SUBKEY( pKVEntry, pKVSubKey )
 					{
@@ -4347,7 +4347,7 @@ void CEconItemDefinition::BInitVisualBlockFromKV( KeyValues *pKVItem, CUtlVector
 						pEntry->pszScene = pKVSubKey->GetString();
 					}
 				}
-				else if ( !Q_stricmp( pszEntry, "animation_required_item" ) )
+				else if ( V_strieq( pszEntry, "animation_required_item" ) )
 				{
 					FOR_EACH_SUBKEY( pKVEntry, pKVSubKey )
 					{
@@ -4355,7 +4355,7 @@ void CEconItemDefinition::BInitVisualBlockFromKV( KeyValues *pKVItem, CUtlVector
 						pEntry->pszRequiredItem = pKVSubKey->GetString();
 					}
 				}
-				else if ( !Q_stricmp( pszEntry, "player_bodygroups" ) )
+				else if ( V_strieq( pszEntry, "player_bodygroups" ) )
 				{
 					FOR_EACH_SUBKEY( pKVEntry, pKVBodygroupKey )
 					{
@@ -4369,23 +4369,23 @@ void CEconItemDefinition::BInitVisualBlockFromKV( KeyValues *pKVItem, CUtlVector
 						GetItemSchema()->AssignDefaultBodygroupState( pszBodygroupName, iValue );
 					}
 				}
-				else if ( !Q_stricmp( pszEntry, "skin" ) )
+				else if ( V_strieq( pszEntry, "skin" ) )
 				{
 					pVisData->iSkin = pKVEntry->GetInt();
 				}
-				else if ( !Q_stricmp( pszEntry, "use_per_class_bodygroups" ) )
+				else if ( V_strieq( pszEntry, "use_per_class_bodygroups" ) )
 				{
 					pVisData->bUsePerClassBodygroups = pKVEntry->GetBool();
 				}
-				else if ( !Q_stricmp( pszEntry, "muzzle_flash" ) )
+				else if ( V_strieq( pszEntry, "muzzle_flash" ) )
 				{
 					pVisData->pszMuzzleFlash = pKVEntry->GetString();
 				}
-				else if ( !Q_stricmp( pszEntry, "tracer_effect" ) )
+				else if ( V_strieq( pszEntry, "tracer_effect" ) )
 				{
 					pVisData->pszTracerEffect = pKVEntry->GetString();
 				}
-				else if ( !Q_stricmp( pszEntry, "particle_effect" ) )
+				else if ( V_strieq( pszEntry, "particle_effect" ) )
 				{
 					pVisData->pszParticleEffect = pKVEntry->GetString();
 				}
@@ -4398,7 +4398,7 @@ void CEconItemDefinition::BInitVisualBlockFromKV( KeyValues *pKVItem, CUtlVector
 					}
 					pVisData->pszCustomSounds[iIndex] = pKVEntry->GetString();
 				}
-				else if ( !Q_stricmp( pszEntry, "material_override" ) )
+				else if ( V_strieq( pszEntry, "material_override" ) )
 				{
 					pVisData->pszMaterialOverride = pKVEntry->GetString();
 				}
@@ -4410,7 +4410,7 @@ void CEconItemDefinition::BInitVisualBlockFromKV( KeyValues *pKVItem, CUtlVector
 						pVisData->pszWeaponSoundReplacements[iIndex] = pKVEntry->GetString();
 					}
 				}
-				else if ( !Q_stricmp( pszEntry, "code_controlled_bodygroup" ) )
+				else if ( V_strieq( pszEntry, "code_controlled_bodygroup" ) )
 				{
 					const char *pBodyGroupName = pKVEntry->GetString( "bodygroup", NULL );
 					const char *pFuncName = pKVEntry->GetString( "function", NULL );
@@ -4420,19 +4420,19 @@ void CEconItemDefinition::BInitVisualBlockFromKV( KeyValues *pKVItem, CUtlVector
 						pVisData->m_Maps.m_CodeControlledBodyGroupNames.Insert( pBodyGroupName, ccbgd );
 					}
 				}
-				else if ( !Q_stricmp( pszEntry, "vm_bodygroup_override" ) )
+				else if ( V_strieq( pszEntry, "vm_bodygroup_override" ) )
 				{
 					pVisData->m_iViewModelBodyGroupOverride = pKVEntry->GetInt();
 				}
-				else if ( !Q_stricmp( pszEntry, "vm_bodygroup_state_override" ) )
+				else if ( V_strieq( pszEntry, "vm_bodygroup_state_override" ) )
 				{
 					pVisData->m_iViewModelBodyGroupStateOverride = pKVEntry->GetInt();
 				}
-				else if ( !Q_stricmp( pszEntry, "wm_bodygroup_override" ) )
+				else if ( V_strieq( pszEntry, "wm_bodygroup_override" ) )
 				{
 					pVisData->m_iWorldModelBodyGroupOverride = pKVEntry->GetInt();
 				}
-				else if ( !Q_stricmp( pszEntry, "wm_bodygroup_state_override" ) )
+				else if ( V_strieq( pszEntry, "wm_bodygroup_state_override" ) )
 				{
 					pVisData->m_iWorldModelBodyGroupStateOverride = pKVEntry->GetInt();
 				}
@@ -7224,7 +7224,7 @@ bool CEconItemSchema::BInitEquipRegions( KeyValues *pKVEquipRegions, CUtlVector<
 		// bunch of different names. This is useful in TF where different classes have different regions, but
 		// those regions cannot possibly conflict with each other. For example, "scout_backpack" cannot possibly
 		// overlap with "pyro_shoulder" because they can't even be equipped on the same character.
-		if ( pRegionKeyName && !Q_stricmp( pRegionKeyName, "shared" ) )
+		if ( pRegionKeyName && V_strieq( pRegionKeyName, "shared" ) )
 		{
 			FOR_EACH_SUBKEY( pKVRegion, pKVSharedRegionName )
 			{
@@ -9090,7 +9090,7 @@ CEconColorDefinition *CEconItemSchema::GetColorDefinitionByName( const char *psz
 {
 	FOR_EACH_VEC( m_vecColorDefs, i )
 	{
-		if ( !Q_stricmp( m_vecColorDefs[i]->GetName(), pszDefName ) )
+		if ( V_strieq( m_vecColorDefs[i]->GetName(), pszDefName ) )
 			return m_vecColorDefs[i];
 	}
 	return NULL;
@@ -9129,7 +9129,7 @@ attachedparticlesystem_t* CEconItemSchema::FindAttributeControlledParticleSystem
 {
 	FOR_EACH_MAP_FAST( m_mapAttributeControlledParticleSystems, nSystem )
 	{
-		if( !Q_stricmp( m_mapAttributeControlledParticleSystems[nSystem].pszSystemName, pchSystemName ) )
+		if( V_strieq( m_mapAttributeControlledParticleSystems[nSystem].pszSystemName, pchSystemName ) )
 			return &m_mapAttributeControlledParticleSystems[nSystem];
 	}
 	return NULL;

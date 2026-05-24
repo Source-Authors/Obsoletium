@@ -1003,19 +1003,19 @@ void CAssetBuilder::OnBrowseSourceFile( )
 //-----------------------------------------------------------------------------
 void CAssetBuilder::OnCommand( const char *pCommand )
 {
-	if ( !Q_stricmp( pCommand, "OnCompile" ) )
+	if ( V_strieq( pCommand, "OnCompile" ) )
 	{
 		OnCompile();
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "OnAbortCompile" ) )
+	if ( V_strieq( pCommand, "OnAbortCompile" ) )
 	{
 		OnAbortCompile();
 		return;
 	}
 
-	if ( !Q_stricmp( pCommand, "OnPublish" ) )
+	if ( V_strieq( pCommand, "OnPublish" ) )
 	{
 		OnPublish();
 		return;
