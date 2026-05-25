@@ -453,7 +453,7 @@ int	CItemTestManifest::GetMaterialType( const char *pszMaterialType )
 {
 	FOR_EACH_VEC( m_vecMaterialTypes, i )
 	{
-		if ( V_stricmp(m_vecMaterialTypes[i].pszMaterialType, pszMaterialType) == 0 )
+		if ( V_strieq(m_vecMaterialTypes[i].pszMaterialType, pszMaterialType) )
 			return i;
 	}
 
@@ -467,7 +467,7 @@ int	CItemTestManifest::GetMaterialSkin( const char *pszMaterialSkin )
 {
 	FOR_EACH_VEC( m_vecMaterialSkins, i )
 	{
-		if ( V_stricmp(m_vecMaterialSkins[i].pszMaterialSkin, pszMaterialSkin) == 0 )
+		if ( V_strieq(m_vecMaterialSkins[i].pszMaterialSkin, pszMaterialSkin) )
 			return i;
 	}
 
@@ -481,7 +481,7 @@ int	CItemTestManifest::GetTextureType( const char *pszTextureType )
 {
 	FOR_EACH_VEC( m_vecTextureTypes, i )
 	{
-		if ( V_stricmp(m_vecTextureTypes[i].pszTextureType, pszTextureType) == 0 )
+		if ( V_strieq(m_vecTextureTypes[i].pszTextureType, pszTextureType) )
 			return i;
 	}
 
@@ -507,7 +507,7 @@ int	CItemTestManifest::GetIconType( const char *pszIconType )
 {
 	FOR_EACH_VEC( m_vecIconTypes, i )
 	{
-		if ( V_stricmp(m_vecIconTypes[i].pszIconType, pszIconType) == 0 )
+		if ( V_strieq(m_vecIconTypes[i].pszIconType, pszIconType) )
 			return i;
 	}
 
@@ -573,7 +573,7 @@ const char *GetClassString( const char *pszClassString )
 	for ( int i = 0; i < CItemUpload::Manifest()->GetNumClasses(); i++ )
 	{
 		const char *pszHero = CItemUpload::Manifest()->GetClass(i);
-		if ( V_stricmp(pszHero, pszClassString) == 0 )
+		if ( V_strieq(pszHero, pszClassString) )
 			return pszHero;
 	}
 

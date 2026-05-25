@@ -626,7 +626,7 @@ void CPopulationManager::FindDefaultPopulationFileShortNames( CUtlVector< CUtlSt
 
 		// Legacy: Prior to proper support for in-BSP pop files, maps could jankily match their popfile to their exact
 		// map name in the BSP. Map this to "normal"
-		if ( V_stricmp( szShortName, STRING(gpGlobals->mapname) ) == 0 )
+		if ( V_strieq( szShortName, STRING(gpGlobals->mapname) ) )
 		{
 			V_strncpy( szShortName, "normal", sizeof( szShortName ) );
 		}

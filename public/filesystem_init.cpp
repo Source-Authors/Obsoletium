@@ -493,7 +493,7 @@ static void FileSystem_AddLoadedSearchPath(
 {
 
 	// Check for mounting LV game content in LV builds only
-	if ( V_stricmp( pPathID, "game_lv" ) == 0 )
+	if ( V_strieq( pPathID, "game_lv" ) )
 	{
 
 		// Not in LV build, don't mount
@@ -505,7 +505,7 @@ static void FileSystem_AddLoadedSearchPath(
 	}
 
 	// Check for mounting HD game content if enabled
-	if ( V_stricmp( pPathID, "game_hd" ) == 0 )
+	if ( V_strieq( pPathID, "game_hd" ) )
 	{
 
 		// Not in LV build, don't mount

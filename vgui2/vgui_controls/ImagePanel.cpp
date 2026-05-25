@@ -81,7 +81,7 @@ void ImagePanel::SetImage(IImage *image)
 //-----------------------------------------------------------------------------
 void ImagePanel::SetImage(const char *imageName)
 {
-	if ( imageName && m_pszImageName && V_stricmp( imageName, m_pszImageName ) == 0 )
+	if ( imageName && m_pszImageName && V_strieq( imageName, m_pszImageName ) )
 		return;
 
 	delete [] m_pszImageName;

@@ -12104,7 +12104,7 @@ static void cc_taunt_by_name( const CCommand &args )
 		g_pVGuiLocalize->ConvertUnicodeToANSI( g_pVGuiLocalize->Find ( pItem->GetStaticData()->GetItemBaseName() ) , pszItemName, sizeof(pszItemName) );
 		strTauntList.CopyAndAddToTail( pszItemName );
 
-		if ( V_stricmp( pszTauntItemName, pszItemName ) == 0 )
+		if ( V_strieq( pszTauntItemName, pszItemName ) )
 		{
 			int iTauntSlot = iSlot - LOADOUT_POSITION_TAUNT + 1;
 			engine->ClientCmd( CFmtStr( "taunt %d", iTauntSlot ) );

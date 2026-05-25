@@ -493,13 +493,13 @@ void CZipPackFile::GetFileAndDirLists( const char *pRawWildCard, CUtlStringList 
 			if ( bBaseWildcard )
 				bBaseMatch = true;  // The base is the wildCard ("*"), so whatever we have as the base matches
 			else
-				bBaseMatch = ( 0 == V_stricmp( szCandidateBaseName, szWildCardBase ) );
+				bBaseMatch = V_strieq( szCandidateBaseName, szWildCardBase );
 
 			// If we have an extension and we have a szWildCardExtension to mach against
 			if ( ( bExtWildcard && pExt ) || ( !pExt && !bWildcardHasExt ) )
 				bExtMatch = true;
 			else
-				bExtMatch = bWildcardHasExt && pExt && ( 0 == V_stricmp( pExt, szWildCardExt ) );
+				bExtMatch = bWildcardHasExt && pExt && V_strieq( pExt, szWildCardExt );
 
 			// If both parts match, then add it to the list
 			if ( bBaseMatch && bExtMatch )

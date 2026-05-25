@@ -1492,7 +1492,7 @@ void CMultiPlayerAnimState::GetMovementFlags( CStudioHdr *pStudioHdr )
 		if (pkvMovement)
 		{
 			const char *szStyle = pkvMovement->GetString();
-			if ( V_stricmp( szStyle, "robot2" ) == 0 )
+			if ( V_strieq( szStyle, "robot2" ) )
 			{
 				m_LegAnimType = LEGANIM_8WAY;
 			}

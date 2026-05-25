@@ -391,14 +391,16 @@ class CModelBrowserMaterialProxyFactory : public IMaterialProxyFactory
 public:
 	virtual IMaterialProxy *CreateProxy( const char *proxyName )
 	{
-		if ( V_stricmp( proxyName, "SelectFirstIfNonZero" ) == 0 )
+		if ( V_strieq( proxyName, "SelectFirstIfNonZero" ) )
 		{
 			return new CSelectFirstIfNonZeroProxy;
 		}
-		else if ( V_stricmp( proxyName, "BurnLevel" ) == 0 )
+
+		if ( V_strieq( proxyName, "BurnLevel" ) )
 		{
 			return new CFakeBurnLevelProxy;
 		}
+		
 		return NULL;
 	}
 

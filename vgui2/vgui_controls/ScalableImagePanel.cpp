@@ -71,7 +71,7 @@ void ScalableImagePanel::SetImage(const char *imageName)
 		len += ssize(pszDir) - 1;
 		Q_snprintf( szImage, len, "%s%s", pszDir, imageName );
 
-		if ( m_pszImageName && V_stricmp( szImage, m_pszImageName ) == 0 )
+		if ( m_pszImageName && V_strieq( szImage, m_pszImageName ) )
 			return;
 
 		delete [] m_pszImageName;

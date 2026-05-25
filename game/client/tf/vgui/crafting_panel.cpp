@@ -766,23 +766,23 @@ const char *CCraftingPanel::GetItemTextForCriteria( const CItemSelectionCriteria
 			return ItemSystem()->GetItemSchema()->GetLoadoutStringsForDisplay( EEquipType_t::EQUIP_TYPE_CLASS )[iSlot];
 
 		// Is it a craft material type?
-		if ( V_stricmp( pszVal, "weapon" ) == 0 )
+		if ( V_strieq( pszVal, "weapon" ) )
 		{
 			return "#RI_W";
 		}
-		else if ( V_stricmp( pszVal, "hat" ) == 0 )
+		else if ( V_strieq( pszVal, "hat" ) )
 		{
 			return "#RI_Hg";
 		}
-		else if ( V_stricmp( pszVal, "craft_token" ) == 0 )
+		else if ( V_strieq( pszVal, "craft_token" ) )
 		{
 			return "#RI_T";
 		}
-		else if ( V_stricmp( pszVal, "class_token" ) == 0 )
+		else if ( V_strieq( pszVal, "class_token" ) )
 		{
 			return "#CI_T_C";
 		}
-		else if ( V_stricmp( pszVal, "slot_token" ) == 0 )
+		else if ( V_strieq( pszVal, "slot_token" ) )
 		{
 			return "#CI_T_S";
 		}

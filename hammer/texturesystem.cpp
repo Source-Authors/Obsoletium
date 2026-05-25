@@ -635,7 +635,7 @@ void CTextureSystem::LoadMaterials(CGameConfig *pConfig)
 	m_pNoDrawTexture = NULL;
 	for ( intp i=0; i < m_Textures.Count(); i++ )
 	{
-		if ( V_stricmp( m_Textures[i]->GetName(), "tools/toolsnodraw" ) == 0 )
+		if ( V_strieq( m_Textures[i]->GetName(), "tools/toolsnodraw" ) )
 		{
 			m_pNoDrawTexture = m_Textures[i];
 			break;
@@ -751,12 +751,12 @@ bool CTextureSystem::GetFileTypeFromFilename( const char *pFilename, CTextureSys
 {
 	char strRight[16];
 	V_StrRight( pFilename, 4, strRight );
-	if ( V_stricmp( strRight, ".vmt" ) == 0 )
+	if ( V_strieq( strRight, ".vmt" ) )
 	{
 		*pFileType = CTextureSystem::k_eFileTypeVMT;
 		return true;
 	}
-	else if ( V_stricmp( strRight, ".vtf" ) == 0 )
+	else if ( V_strieq( strRight, ".vtf" ) )
 	{
 		*pFileType = CTextureSystem::k_eFileTypeVTF;
 		return true;

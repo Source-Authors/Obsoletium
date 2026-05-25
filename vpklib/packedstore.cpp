@@ -267,7 +267,7 @@ static void StripTrailingString( char *pszBuf, const char *pszStrip )
 	if ( lBuf < lStrip )
 		return;
 	char *pExpectedPos = pszBuf + lBuf - lStrip;
-	if ( V_stricmp( pExpectedPos, pszStrip ) == 0 )
+	if ( V_strieq( pExpectedPos, pszStrip ) )
 		*pExpectedPos = '\0';
 }
 

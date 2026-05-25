@@ -435,7 +435,7 @@ void CEditorObjectNode::PerformLayout()
 //-----------------------------------------------------------------------------
 void CEditorObjectNode::OnCommand( const char *command )
 {
-	if ( V_stricmp( "togglecollapse", command ) == 0 )
+	if ( V_strieq( "togglecollapse", command ) )
 	{
 		if ( IsFlagSet( FLAG_COLLAPSED ) )
 		{
@@ -451,7 +451,7 @@ void CEditorObjectNode::OnCommand( const char *command )
 
 		return;
 	}
-	if ( V_stricmp( command, "delete" ) == 0 )
+	if ( V_strieq( command, "delete" ) )
 	{
 		RemoveNode();
 		return;
@@ -755,11 +755,11 @@ void CComboBoxEditorParam::OnTextChanged( KeyValues *data )
 			const char* pszCommand = m_pComboBox->GetActiveItemUserData()->GetString( "command" );
 			// What to write
 			const char* pszWriteValue = m_pComboBox->GetActiveItemUserData()->GetString( "write" );
-			if ( V_stricmp( pszCommand, "changetype" ) == 0 )
+			if ( V_strieq( pszCommand, "changetype" ) )
 			{
 				pParent->SetNewType( pszWriteValue );
 			}
-			else if ( V_stricmp( pszCommand, "changeevent" ) == 0 )
+			else if ( V_strieq( pszCommand, "changeevent" ) )
 			{
 				pParent->SetNewEvent( pszWriteValue );
 			}

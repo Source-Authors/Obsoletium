@@ -299,10 +299,10 @@ void CStudioFileChangeWatcher::OnFileChange( const char *pRelativeFilename, cons
 	if ( !pExt )
 		return;			 
 		
-	if ( V_stricmp( pExt, "mdl" ) == 0 ||
-		 V_stricmp( pExt, "vtx" ) == 0 ||
-		 V_stricmp( pExt, "phy" ) == 0 ||
-		 V_stricmp( pExt, "vvd" ) == 0 )
+	if ( V_strieq( pExt, "mdl" ) ||
+		 V_strieq( pExt, "vtx" ) ||
+		 V_strieq( pExt, "phy" ) ||
+		 V_strieq( pExt, "vvd" ) )
 	{
 		// Ok, it's at least related to a model. Flush out the model.
 		char tempFilename[MAX_PATH];

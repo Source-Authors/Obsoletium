@@ -793,7 +793,7 @@ void RunProcessAtCommandLine(
 		{
 			V_FileBase( newArgv[0], g_RunningProcess_ExeName, sizeof( g_RunningProcess_ExeName ) );
 			
-			if ( V_stricmp( g_RunningProcess_ExeName, "vrad" ) == 0 || V_stricmp( g_RunningProcess_ExeName, "vvis" ) == 0 )
+			if ( V_strieq( g_RunningProcess_ExeName, "vrad" ) || V_strieq( g_RunningProcess_ExeName, "vvis" ) )
 				V_FileBase( newArgv[newArgv.Count()-1], g_RunningProcess_MapName, sizeof( g_RunningProcess_MapName ) );
 		}
 
@@ -1191,7 +1191,7 @@ bool StartDownloadingAppFiles(
 	// Pass all the -mpi_worker, -mpi_file, -mpi_filebase args into the downloader app.
 	for ( int i=1; i < (int)newArgv.Count()-1; i++ )
 	{
-		if ( V_stricmp( newArgv[i], "-mpi_filebase" ) == 0 || V_stricmp( newArgv[i], "-mpi_file" ) == 0 )
+		if ( V_strieq( newArgv[i], "-mpi_filebase" ) || V_strieq( newArgv[i], "-mpi_file" ) )
 		{
 			downloaderArgs.AddToTail( newArgv[i] );
 			downloaderArgs.AddToTail( newArgv[i+1] );
@@ -1199,7 +1199,7 @@ bool StartDownloadingAppFiles(
 			newArgv.Remove( i );
 			--i;
 		}
-		else if ( V_stricmp( newArgv[i], "-mpi_worker" ) == 0 )
+		else if ( V_strieq( newArgv[i], "-mpi_worker" ) )
 		{
 			// We need this arg so it knows what IP to connect to, but we want to leave it in the final launch args too.
 			downloaderArgs.AddToTail( newArgv[i] );
@@ -1425,7 +1425,7 @@ void HandlePacket_LOOKING_FOR_WORKERS( bf_read &buf, const CIPAddr &ipFrom )
 	if ( StartDownloadingAppFiles( newArgv, cacheDir, sizeof( cacheDir ), g_Waiting_bShowAppWindow, &g_Waiting_hProcess, bPatching ) )
 	{
 		// After it's downloaded, we want it to switch to the main connection port.
-		if ( newArgv.Count() >= 3 && V_stricmp( newArgv[2], strDownloaderIP ) == 0 )
+		if ( newArgv.Count() >= 3 && V_strieq( newArgv[2], strDownloaderIP ) )
 		{
 			delete newArgv[2];
 			newArgv[2] = CopyString( strMainIP );

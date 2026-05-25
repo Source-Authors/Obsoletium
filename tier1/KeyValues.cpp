@@ -300,7 +300,7 @@ private:
 			const char *pchLhs = nLhs > 0 ? m_pchCurBase + nLhs : m_pchCurString;
 			const char *pchRhs = nRhs > 0 ? m_pchCurBase + nRhs : m_pchCurString;
 			
-			return ( 0 == V_stricmp( pchLhs, pchRhs ) );
+			return V_strieq( pchLhs, pchRhs );
 		}
 
 		// The hash function.

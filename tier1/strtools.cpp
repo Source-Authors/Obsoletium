@@ -4188,7 +4188,7 @@ bool V_URLContainsDomain( IN_Z const char *pchURL, IN_Z const char *pchDomain )
 			if ( cchExtractedDomain > cchDomain && rgchExtractedDomain[ cchExtractedDomain - cchDomain - 1 ] != '.' )
 				return false;
 
-			if ( 0 == V_stricmp( rgchExtractedDomain + cchExtractedDomain - cchDomain, pchDomain ) )
+			if ( V_strieq( rgchExtractedDomain + cchExtractedDomain - cchDomain, pchDomain ) )
 				return true;
 		}
 	}

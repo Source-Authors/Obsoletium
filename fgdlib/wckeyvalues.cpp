@@ -70,7 +70,7 @@ intp WCKVBase_Vector::FindByKeyName( const char *pKeyName ) const
 {
 	for ( intp i=0; i < m_KeyValues.Count(); i++ )
 	{
-		if ( V_stricmp( m_KeyValues[i].szKey, pKeyName ) == 0 )
+		if ( V_strieq( m_KeyValues[i].szKey, pKeyName ) )
 			return i;
 	}
 	return GetInvalidIndex();

@@ -986,7 +986,7 @@ VideoSystem_t CValveVideoServices::LocateSystemAndFeaturesForFileName( const cha
 	
 	for ( intp i = 0; i < m_ExtInfo.Count(); i++ )
 	{
-		if ( V_stricmp( fileExt, m_ExtInfo[i].m_FileExtension ) == STRINGS_MATCH )
+		if ( V_strieq( fileExt, m_ExtInfo[i].m_FileExtension ) )
 		{
 			// must it have certain feature support?
 			if ( requiredFeatures != VideoSystemFeature::NO_FEATURES )
@@ -1022,7 +1022,7 @@ bool CValveVideoServices::IsMatchAnyExtension( const char *pFileName )
 		return false;
 	}
 	
-	return ( V_stricmp( pExt, FILE_EXTENSION_ANY_MATCHING_VIDEO ) == STRINGS_MATCH );
+	return V_strieq( pExt, FILE_EXTENSION_ANY_MATCHING_VIDEO );
 }
 
 

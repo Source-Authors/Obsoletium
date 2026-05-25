@@ -1986,7 +1986,7 @@ int main(int argc, char **argv) {
   }
 
   const char *pszCommand = argv[1];
-  if (V_stricmp(pszCommand, "l") == 0) {
+  if (V_strieq(pszCommand, "l")) {
     if (argc != 3) {
       fprintf(stderr, "Incorrect number of arguments for '%s' command.\n",
               pszCommand);

@@ -689,11 +689,11 @@ void ParseOperationFromKV( KeyValues* _kv, void* _pDest )
 	ECombineOperation* realDest = ( ECombineOperation* ) _pDest;
 	const char* opStr = _kv->GetString();
 
-	if ( V_stricmp( "multiply", opStr ) == 0 )
+	if ( V_strieq( "multiply", opStr ) )
 		(*realDest) = ECO_Multiply;
-	else if ( V_stricmp( "add", opStr ) == 0 )
+	else if ( V_strieq( "add", opStr ) )
 		(*realDest) = ECO_Add;
-	else if ( V_stricmp( "lerp", opStr) == 0 )
+	else if ( V_strieq( "lerp", opStr) )
 		(*realDest) = ECO_Lerp;
 	else
 		(*realDest) = ECO_Error;
@@ -1916,7 +1916,7 @@ void ParseIntoStruct( S* _outStruct, CUtlVector< KeyValues *>* _leftovers, KeyVa
 		bool parsed = false;
 		for ( int e = 0; _entries[e].keyName; ++e )
 		{
-			if ( V_stricmp( _entries[e].keyName, thisKey->GetName() ) == 0 )
+			if ( V_strieq( _entries[e].keyName, thisKey->GetName() ) )
 			{
 				// If we're instancing, go ahead and run the parse function. If we're just doing template verification
 				// then the right hand side may still have variables that need to be expanded, so just verify that the
@@ -1952,7 +1952,7 @@ bool ParseNodes( CUtlVector< CTCStage* >* _outStages, const CUtlVector< KeyValue
 		bool parsed = false;
 		for ( int e = 0; cNodeParseTable[ e ].keyName; ++e )
 		{			
-			if ( V_stricmp( cNodeParseTable[ e ].keyName, thisKV->GetName() ) == 0 )
+			if ( V_strieq( cNodeParseTable[ e ].keyName, thisKV->GetName() ) )
 			{
 				CTCStage* pNewStage = NULL;
 				if ( !cNodeParseTable[ e ].buildFunc( &pNewStage, thisKV->GetName(), thisKV, nTexCompositeCreateFlags ) )
@@ -2093,7 +2093,7 @@ KeyValues* ResolveTemplate( const char* pRootName, KeyValues* pValues, uint32 nT
 	FOR_EACH_SUBKEY( pValues, pChild )
 	{
 		const char* pChildName = pChild->GetName();
-		if ( V_stricmp( pChildName, "implements" ) == 0 )
+		if ( V_strieq( pChildName, "implements" ) )
 		{
 			if ( bImplementsTemplate )
 			{
@@ -2535,7 +2535,7 @@ bool HasTemplateOrVariables( const char** ppOutTemplateName, KeyValues* pKV)
 	FOR_EACH_SUBKEY( pKV, pChild )
 	{
 		const char* pName = pChild->GetName();
-		if ( V_stricmp( pName, "implements" ) == 0 )	
+		if ( V_strieq( pName, "implements" ) )
 		{
 			( *ppOutTemplateName ) = pChild->GetString();
 			retVal = true;

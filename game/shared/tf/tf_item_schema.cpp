@@ -45,7 +45,7 @@ static bool ValidateKeysAreSubset( KeyValues* kv, const CUtlVector<const char *>
 		const char* testVal = pKey->GetName();
 
 		for ( auto it = testKeys.begin(); it != testKeys.end(); ++it ) {
-			if (0 == V_stricmp((*it), testVal)) {
+			if (V_strieq((*it), testVal)) {
 				matchAny = true;
 				break;
 			}

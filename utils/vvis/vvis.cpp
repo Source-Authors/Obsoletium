@@ -1101,7 +1101,7 @@ void PrintUsage( int argc, char **argv )
 	// Show VMPI parameters?
 	for ( int i=1; i < argc; i++ )
 	{
-		if ( V_stricmp( argv[i], "-mpi_ListParams" ) == 0 )
+		if ( V_strieq( argv[i], "-mpi_ListParams" ) )
 		{
 			Warning( "--mpi-list-params: VMPI-specific options:\n\n" );
 

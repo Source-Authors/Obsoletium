@@ -277,7 +277,7 @@ static int FindCommonPathID( const char *pPathID )
 {
 	for ( int i=0; i < ssize( g_MostCommonPathIDs ); i++ )
 	{
-		if ( V_stricmp( pPathID, g_MostCommonPathIDs[i] ) == 0 )
+		if ( V_strieq( pPathID, g_MostCommonPathIDs[i] ) )
 			return i;
 	}
 	return -1;

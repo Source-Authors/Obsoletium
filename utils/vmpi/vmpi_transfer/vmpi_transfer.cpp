@@ -94,7 +94,7 @@ int RunVMPITransferWorker( int argc, char  **argv )
 	for ( int i=1; i < pCommandLine->ParmCount()-1; i++ )
 	{
 		const char *pParm = pCommandLine->GetParm( i );
-		if ( V_stricmp( pParm, "-mpi_file" ) == 0 )
+		if ( V_strieq( pParm, "-mpi_file" ) )
 		{
 			const char *pNextParm = pCommandLine->GetParm( i+1 );
 			DownloadFile( pCachePath, pRemoteFileBase, pNextParm );

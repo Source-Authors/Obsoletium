@@ -452,7 +452,7 @@ void LogicAuto( CChunk *pChunk )
 		FOR_EACH_LL( pConnections->m_Keys, i )
 		{
 			CKeyValue *pTestKV = pConnections->m_Keys[i];
-			if ( V_stricmp( pTestKV->m_pKey, "OnMapSpawn" ) == 0 )
+			if ( V_strieq( pTestKV->m_pKey, "OnMapSpawn" ) )
 			{
 				if ( V_stristr( pTestKV->m_pValue, "tonemap" ) == pTestKV->m_pValue )
 				{

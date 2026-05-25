@@ -889,7 +889,7 @@ CHudElement *CHud::FindElement( const char *pName )
 {
 	for ( auto *h : m_HudList )
 	{
-		if ( V_stricmp( h->GetName(), pName ) == 0 )
+		if ( V_strieq( h->GetName(), pName ) )
 			return h;
 	}
 

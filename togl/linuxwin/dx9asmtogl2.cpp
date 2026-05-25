@@ -268,7 +268,7 @@ bool DoParamNamesMatch( const char *pParam1, const char *pParam2 )
 	char szTemp[2][256];
 	GetParamNameWithoutSwizzle( pParam1, szTemp[0], sizeof( szTemp[0] ) );
 	GetParamNameWithoutSwizzle( pParam2, szTemp[1], sizeof( szTemp[1] ) );
-	return ( V_stricmp( szTemp[0], szTemp[1] ) == 0 );
+	return V_strieq( szTemp[0], szTemp[1] );
 }
 
 

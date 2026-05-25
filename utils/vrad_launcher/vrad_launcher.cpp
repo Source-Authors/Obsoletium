@@ -49,7 +49,7 @@ template <intp size>
 [[nodiscard]] int GetBothArgIndex(int argc, char *argv[]) {
   int both_arg{0};
   for (int arg{1}; arg < argc; arg++) {
-    if (V_stricmp(argv[arg], "-both") == 0) {
+    if (V_strieq(argv[arg], "-both")) {
       both_arg = arg;
     }
   }

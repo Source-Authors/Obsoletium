@@ -2650,7 +2650,7 @@ void COP_Entity::OnChangeKeyorValue(void)
 	m_kv.SetValue(szKey, szValue);
 
 	// If they changed spawnflags, notify the flags page so its changes don't overwrite ours later.
-	if ( V_stricmp( szKey, SPAWNFLAGS_KEYNAME ) == 0 )
+	if ( V_strieq( szKey, SPAWNFLAGS_KEYNAME ) )
 	{
 		unsigned long value;
 		sscanf( szValue, "%lu", &value );
@@ -2750,7 +2750,7 @@ static unsigned long GetMatchingFlagsMask( GDinputvariable *pVar1, GDinputvariab
 		{
 			if ( pVar1->GetFlagMask( i ) == pVar2->GetFlagMask( j ) )
 			{
-				if ( V_stricmp( pVar1->GetFlagCaption( i ), pVar2->GetFlagCaption( j ) ) == 0 )
+				if ( V_strieq( pVar1->GetFlagCaption( i ), pVar2->GetFlagCaption( j ) ) )
 				{
 					unsigned long iMask = (unsigned long)pVar1->GetFlagMask( i );
 					nMatchingMask |= iMask;

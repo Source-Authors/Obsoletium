@@ -148,7 +148,7 @@ static void ApplyPingToMsg( CMsgGCDataCenterPing_Update &msg, const CMsgGCDataCe
 	{
 		CMsgGCDataCenterPing_Update_PingEntry& existingEntry = *msg.mutable_pingdata(j);
 
-		if ( V_stricmp( existingEntry.name().c_str(), pszName ) == 0 )
+		if ( V_strieq( existingEntry.name().c_str(), pszName ) )
 		{
 			pEntry = &existingEntry;
 			break;
@@ -1873,7 +1873,7 @@ bool ForceCompetitiveConvars()
 
 		// Hack: This var is created by the dxconfig system, but it doesn't actually exist.
 		// Skip it so we have no vars change when running a clean config.
-		if ( V_stricmp( pVar->GetName(), "r_decal_cullsize" ) == 0 )
+		if ( V_strieq( pVar->GetName(), "r_decal_cullsize" ) )
 			continue;
 		
 		if ( !pVar->SetCompetitiveMode( true ) )

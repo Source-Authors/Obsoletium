@@ -490,7 +490,7 @@ void CTFFileImportTextEditDialog::ApplySchemeSettings( vgui::IScheme *pScheme )
 //-----------------------------------------------------------------------------
 void CTFFileImportTextEditDialog::OnCommand( const char *command )
 {
-	if ( V_stricmp( command, "Done" ) == 0 )
+	if ( V_strieq( command, "Done" ) )
 	{
 		if ( m_sCommand.IsEmpty() )
 		{
@@ -3217,23 +3217,23 @@ void CTFFileImportDialog::ApplySchemeSettings( vgui::IScheme *pScheme )
 //-----------------------------------------------------------------------------
 void CTFFileImportDialog::OnCommand( const char *command )
 {
-	if ( V_stricmp( command, "Load" ) == 0 )
+	if ( V_strieq( command, "Load" ) )
 	{
 		OnCommandLoad();
 	}
-	else if ( V_stricmp( command, "Save" ) == 0 )
+	else if ( V_strieq( command, "Save" ) )
 	{
 		OnCommandSave();
 	}
-	else if ( V_stricmp( command, "ClearIcon" ) == 0 )
+	else if ( V_strieq( command, "ClearIcon" ) )
 	{
 		SetItemIcon( "" );
 	}
-	else if ( V_stricmp( command, "BrowseIcon" ) == 0 )
+	else if ( V_strieq( command, "BrowseIcon" ) )
 	{
 		OnCommandBrowseIcon();
 	}
-	else if ( V_stricmp( command, "UpdateBodygroup" ) == 0 )
+	else if ( V_strieq( command, "UpdateBodygroup" ) )
 	{
 		OnCommandUpdateBodygroup();
 	}
@@ -3260,7 +3260,7 @@ void CTFFileImportDialog::OnCommand( const char *command )
 
 		OnCommandBrowseLOD( index );
 	}
-	else if ( V_stricmp( command, "SwapVMT" ) == 0 )
+	else if ( V_strieq( command, "SwapVMT" ) )
 	{
 		OnCommandSwapVMT();
 	}
@@ -3282,19 +3282,19 @@ void CTFFileImportDialog::OnCommand( const char *command )
 			OnCommandEditMaterial( nSkinIndex, nMaterialIndex );
 		}
 	}
-	else if ( V_stricmp( command, "UpdateAnimationLoopable" ) == 0 )
+	else if ( V_strieq( command, "UpdateAnimationLoopable" ) )
 	{
 		SetLoopableTaunt( IsLoopableTaunt(), GetAnimationLoopStartTime() );
 	}
-	else if ( V_stricmp( command, "ClearAnimationSource" ) == 0 )
+	else if ( V_strieq( command, "ClearAnimationSource" ) )
 	{
 		SetAnimationSource( m_nSelectedClass, NULL );
 	}
-	else if ( V_stricmp( command, "ClearAnimationVCD" ) == 0 )
+	else if ( V_strieq( command, "ClearAnimationVCD" ) )
 	{
 		SetAnimationVCD( m_nSelectedClass, NULL );
 	}
-	else if ( V_stricmp( command, "BrowseAnimationSource" ) == 0 )
+	else if ( V_strieq( command, "BrowseAnimationSource" ) )
 	{
 		if ( m_nSelectedClass == TF_CLASS_UNDEFINED )
 		{
@@ -3304,7 +3304,7 @@ void CTFFileImportDialog::OnCommand( const char *command )
 
 		OnCommandBrowseAnimationSource();
 	}
-	else if ( V_stricmp( command, "BrowseAnimationVCD" ) == 0 )
+	else if ( V_strieq( command, "BrowseAnimationVCD" ) )
 	{
 		if ( m_nSelectedClass == TF_CLASS_UNDEFINED )
 		{
@@ -3314,35 +3314,35 @@ void CTFFileImportDialog::OnCommand( const char *command )
 
 		OnCommandBrowseAnimationVCD();
 	}
-	else if ( V_stricmp( command, "EditQC" ) == 0 )
+	else if ( V_strieq( command, "EditQC" ) )
 	{
 		OnCommandEditQC();
 	}
-	else if ( V_stricmp( command, "EditQCI") == 0 )
+	else if ( V_strieq( command, "EditQCI") )
 	{
 		OnCommandEditQCI();
 	}
-	else if ( V_stricmp( command, "EditQCDone" ) == 0 )
+	else if ( V_strieq( command, "EditQCDone" ) )
 	{
 		OnCommandEditQCDone();
 	}
-	else if ( V_stricmp( command, "EditQCIDone" ) == 0 )
+	else if ( V_strieq( command, "EditQCIDone" ) )
 	{
 		OnCommandEditQCIDone();
 	}
-	else if ( V_stricmp( command, "BuildPreview" ) == 0 )
+	else if ( V_strieq( command, "BuildPreview" ) )
 	{
 		OnCommandBuild( BUILD_PREVIEW );
 	}
-	else if ( V_stricmp( command, "BuildVerify") == 0 )
+	else if ( V_strieq( command, "BuildVerify") )
 	{
 		OnCommandBuild( BUILD_VERIFY );
 	}
-	else if ( V_stricmp( command, "BuildFinal" ) == 0 )
+	else if ( V_strieq( command, "BuildFinal" ) )
 	{
 		OnCommandBuild( BUILD_FINAL );
 	}
-	else if ( V_stricmp( command, "PreviewDone" ) == 0 )
+	else if ( V_strieq( command, "PreviewDone" ) )
 	{
 		CleanupPreviewData();
 	}

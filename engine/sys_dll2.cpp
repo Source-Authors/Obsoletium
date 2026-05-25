@@ -1125,7 +1125,7 @@ void CEngineAPI::SetStartupInfo( StartupInfo_t &info )
 		// Enable file tracking - client always does this in case it connects to a pure server.
 		// server only does this if sv_pure is set
 		// If it's not singleplayer_only
-		if ( V_stricmp( modinfo->GetString("type", "singleplayer_only"), "singleplayer_only") == 0 )
+		if ( V_strieq( modinfo->GetString("type", "singleplayer_only"), "singleplayer_only") )
 		{
 			DevMsg( "Disabling whitelist file tracking in filesystem...\n" );
 			g_pFileSystem->EnableWhitelistFileTracking( false, false, false );

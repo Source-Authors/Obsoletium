@@ -762,7 +762,7 @@ protected:
 
 	virtual void OnCommand( const char *command )
 	{	
-		if ( V_stricmp( command, "MainFileCosmetics" ) == 0 )
+		if ( V_strieq( command, "MainFileCosmetics" ) )
 		{
 #ifdef WORKSHOP_IMPORT_ENABLED
 			if ( CItemUpload::InitManifest() )
@@ -778,7 +778,7 @@ protected:
 			}
 #endif
 		}
-		else if ( V_stricmp( command, "Publish" ) == 0 || V_stricmp( command, "Update" ) == 0 )
+		else if ( V_strieq( command, "Publish" ) || V_strieq( command, "Update" ) )
 		{
 			if ( m_bImported )
 			{

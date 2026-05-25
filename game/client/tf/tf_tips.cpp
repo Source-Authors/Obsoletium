@@ -60,15 +60,15 @@ bool CTFTips::Init()
 				// Figure out which bucket it goes in
 				CUtlVector< CaptainCanteenAsset_t > *pAssetBucket = NULL;
 
-				if ( V_stricmp( pSubKey->GetName(), "body" ) == 0 )
+				if ( V_strieq( pSubKey->GetName(), "body" ) )
 				{
 					pAssetBucket = &m_CaptainCanteenBody;
 				}
-				else if ( V_stricmp( pSubKey->GetName(), "misc" ) == 0 )
+				else if ( V_strieq( pSubKey->GetName(), "misc" ) )
 				{
 					pAssetBucket = &m_CaptainCanteenMisc;
 				}
-				else if ( V_stricmp( pSubKey->GetName(), "hat" ) == 0 )
+				else if ( V_strieq( pSubKey->GetName(), "hat" ) )
 				{
 					pAssetBucket = &m_CaptainCanteenHat;
 				}

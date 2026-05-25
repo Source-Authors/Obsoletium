@@ -394,7 +394,7 @@ int CRecordInfo::FindIndexByName( const char *pszName ) const
 {
 	for ( int i = 0; i < m_VecIndexes.Count(); i++ )
 	{
-		if ( V_stricmp( m_VecIndexes[i].GetIndexName(), pszName )== 0 )
+		if ( V_strieq( m_VecIndexes[i].GetIndexName(), pszName ) )
 			return i;
 	}
 

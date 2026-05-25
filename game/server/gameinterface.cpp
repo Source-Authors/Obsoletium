@@ -2084,7 +2084,7 @@ void CServerGameDLL::LoadSpecificMOTDMsg( const ConVar &convar, const char *pszS
 	}
 	buf.PutChar( '\0' );
 
-	if ( V_stricmp( szPreferredFilename, szResolvedFilename ) == 0)
+	if ( V_strieq( szPreferredFilename, szResolvedFilename ) )
 	{
 		Msg( "Set %s from file '%s'\n", pszStringName, szResolvedFilename );
 	}

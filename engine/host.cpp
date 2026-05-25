@@ -1278,7 +1278,7 @@ CON_COMMAND( host_writeconfig, "Store current settings to config.cfg (or specifi
 
 	if ( args.ArgC() >= 2 )
 	{
-		bool bWriteAll = ( args.ArgC() == 3 && V_stricmp( args[ 2 ], "full" ) == 0 );
+		bool bWriteAll = ( args.ArgC() == 3 && V_strieq( args[ 2 ], "full" ) );
 
 		char const *filename = args[ 1 ];
 		if ( Q_isempty( filename ) )

@@ -586,7 +586,7 @@ void CMaterial::SetShaderAndParams( KeyValues *pKeyValues )
 	if ( pLoadedKeyValues->LoadFromFile( g_pFullFileSystem, pFileName, pPathID ) )
 	{
 		// Load succeeded, check if it's a patch file
-		if ( V_stricmp( pLoadedKeyValues->GetName(), "patch" ) == 0 )
+		if ( V_strieq( pLoadedKeyValues->GetName(), "patch" ) )
 		{
 			// it's a patch file, recursively build up patch keyvalues
 			KeyValuesAD pPatchKeyValues( "vmt_patch" );
@@ -3420,7 +3420,7 @@ bool AccumulateRecursiveVmtPatches( KeyValues &patchKeyValuesOut, KeyValues **pp
 
 	// Recurse down through all patch files:
 	int nCount = 0;
-	while( ( nCount < 10 ) && ( V_stricmp( pCurrentKeyValues->GetName(), "patch" ) == 0 ) )
+	while( ( nCount < 10 ) && ( V_strieq( pCurrentKeyValues->GetName(), "patch" ) ) )
 	{
 		// Accumulate the new patch keys from this file
 		AccumulatePatchKeyValues( *pCurrentKeyValues, patchKeyValuesOut );

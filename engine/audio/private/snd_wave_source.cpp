@@ -2122,7 +2122,7 @@ CAudioSourceCache::SearchPathCache *CAudioSourceCache::FindCacheForSearchPath( c
 	FOR_EACH_VEC( m_vecCaches, idx )
 	{
 		SearchPathCache *pCache = m_vecCaches[idx];
-		if ( V_stricmp( pCache->m_szSearchPath, pszSearchPath ) == 0 )
+		if ( V_strieq( pCache->m_szSearchPath, pszSearchPath ) )
 		{
 			return pCache;
 		}
@@ -2434,7 +2434,7 @@ void CAudioSourceCache::BuildCache( char const *pszSearchPath )
 		CAudioSourceCachedInfo::s_CurrentType = CAudioSource::AUDIO_SOURCE_WAV;
 		char szExt[ 10 ] = { 0 };
 		V_ExtractFileExtension( pszFilename, szExt );
-		if ( V_stricmp( szExt, "mp3" ) == 0 )
+		if ( V_strieq( szExt, "mp3" ) )
 		{
 			CAudioSourceCachedInfo::s_CurrentType = CAudioSource::AUDIO_SOURCE_MP3;
 		}

@@ -282,7 +282,7 @@ bool CGCAccess::InternalValidateAccess( GCAccessSystem_t nSystem, CSteamID steam
 		SingleAssert_t* pAssert = m_SingleAsserts[ nCurrAssert ];
 		if( nSystem == pAssert->m_System )
 		{
-			if( V_stricmp( ( pAssert->m_bContext ) ? pContext->GetName() : pszJobName, pAssert->m_sContextOrJob ) == 0 )
+			if( V_strieq( ( pAssert->m_bContext ) ? pContext->GetName() : pszJobName, pAssert->m_sContextOrJob ) )
 			{
 				//log this assert
 				{
@@ -382,7 +382,7 @@ bool CGCAccess::CatchSingleAssert( const char* pszSystem, bool bContext, const c
 	GCAccessSystem_t nSystemID = ( GCAccessSystem_t )-1;
 	FOR_EACH_MAP_FAST( m_Systems, nSystem )
 	{
-		if( V_stricmp( m_Systems[ nSystem ]->m_sName, pszSystem ) == 0 )
+		if( V_strieq( m_Systems[ nSystem ]->m_sName, pszSystem ) )
 		{
 			nSystemID = m_Systems.Key( nSystem );
 			break;
@@ -559,7 +559,7 @@ void CGCAccess::DependencyReport( const char* pszSystem, EDisplay eDisplay ) con
 	FOR_EACH_MAP_FAST( m_Systems, nSystem )
 	{
 		const CGCAccessSystem* pSystem = m_Systems[ nSystem ];
-		if( V_stricmp( pszSystem, pSystem->m_sName ) == 0 )
+		if( V_strieq( pszSystem, pSystem->m_sName ) )
 		{
 			pMatchSystem = pSystem;
 			break;

@@ -202,18 +202,18 @@ bool CPureServerWhitelist::LoadCommandsFromKeyValues( KeyValues *kv )
 		for ( int i=0; i < mods.Count(); i++ )
 		{
 			if (
-				V_stricmp( mods[i], "from_steam" ) == 0
-				|| V_stricmp( mods[i], "trusted_source" ) == 0
+				V_strieq( mods[i], "from_steam" )
+				|| V_strieq( mods[i], "trusted_source" )
 			)
 				bFromTrustedSource = true;
-			else if ( V_stricmp( mods[i], "allow_from_disk" ) == 0 )
+			else if ( V_strieq( mods[i], "allow_from_disk" ) )
 				bAllowFromDisk = true;
 			else if (
-				V_stricmp( mods[i], "check_crc" ) == 0
-				|| V_stricmp( mods[i], "check_hash" ) == 0
+				V_strieq( mods[i], "check_crc" )
+				|| V_strieq( mods[i], "check_hash" )
 			)
 				bCheckCRC = true;
-			else if ( V_stricmp( mods[i], "any" ) == 0 )
+			else if ( V_strieq( mods[i], "any" ) )
 				bAny = true;
 			else
 				Warning( "Unknown modifier in whitelist file: %s.\n", mods[i] );

@@ -812,7 +812,7 @@ bool CBaseClient::ProcessSetConVar( NET_SetConVar *msg )
 		}
 
 		// "name" convar is handled differently
-		if ( V_stricmp( name, "name" ) == 0 )
+		if ( V_strieq( name, "name" ) )
 		{
 			ClientRequestNameChange( value );
 			continue;

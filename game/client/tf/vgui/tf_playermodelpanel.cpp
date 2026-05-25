@@ -585,7 +585,7 @@ void CTFPlayerModelPanel::SwitchHeldItemTo( CEconItemView *pItem )
 				const char *pszClassName = pItem->GetStaticData()->GetItemClass();
 				if ( pszClassName && *pszClassName )
 				{
-					bCanRunScene = V_stricmp( pszClassName, m_pszWeaponEntityRequired ) == 0;
+					bCanRunScene = V_strieq( pszClassName, m_pszWeaponEntityRequired );
 				}
 			}
 		}

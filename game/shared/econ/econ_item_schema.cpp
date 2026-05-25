@@ -2063,7 +2063,7 @@ private:
 				// the attribute value of supply_crate_series (187)
 				FOR_EACH_MAP_FAST( mapRevolvingLootlists, i )
 				{
-					if ( V_stricmp( mapRevolvingLootlists[ i ], m_pDroppingLootlist->GetName() ) == 0 )
+					if ( V_strieq( mapRevolvingLootlists[ i ], m_pDroppingLootlist->GetName() ) )
 					{
 						nRevolvingIdx = mapRevolvingLootlists.Key( i );
 						break;
@@ -8856,7 +8856,7 @@ const CEconItemQualityDefinition *CEconItemSchema::GetQualityDefinitionByName( c
 {
 	FOR_EACH_MAP_FAST( m_mapQualities, i )
 	{
-		if ( V_stricmp( pszDefName, m_mapQualities[i].GetName()) == 0 )
+		if ( V_strieq( pszDefName, m_mapQualities[i].GetName()) )
 			return &m_mapQualities[i]; 
 	}
 	return NULL;
@@ -9004,7 +9004,7 @@ CEconItemDefinition *CEconItemSchema::GetItemDefinitionByName( const char *pszDe
 
 	FOR_EACH_MAP_FAST( m_mapItems, i )
 	{
-		if ( V_stricmp( pszDefName, m_mapItems[i]->GetDefinitionName()) == 0 )
+		if ( V_strieq( pszDefName, m_mapItems[i]->GetDefinitionName()) )
 			return m_mapItems[i]; 
 	}
 	return NULL;
@@ -9060,7 +9060,7 @@ CEconItemAttributeDefinition *CEconItemSchema::GetAttributeDefinitionByName( con
 		if ( !m_mapAttributes[i].GetDefinitionName() )
 			continue;
 
-		if ( V_stricmp( pszDefName, m_mapAttributes[i].GetDefinitionName() ) == 0 )
+		if ( V_strieq( pszDefName, m_mapAttributes[i].GetDefinitionName() ) )
 			return &m_mapAttributes[i]; 
 	}
 	return NULL;

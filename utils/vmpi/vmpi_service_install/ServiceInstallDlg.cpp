@@ -589,9 +589,9 @@ void RemoveRegistryKeys()
 
 bool IsAnInstallFile( const char *pName )
 {
-	for ( int i=0; i < ARRAYSIZE( g_pInstallFiles ); i++ )
+	for ( intp i=0; i < std::size( g_pInstallFiles ); i++ )
 	{
-		if ( V_stricmp( g_pInstallFiles[i], pName ) == 0 )
+		if ( V_strieq( g_pInstallFiles[i], pName ) )
 			return true;
 	}
 	return false;

@@ -1352,7 +1352,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	{
 		for ( int i = 0; i < m_MapList.Count(); i++ )
 		{
-			if ( V_stricmp( pszName, m_MapList[i] ) == 0 )
+			if ( V_strieq( pszName, m_MapList[i] ) )
 			{
 				return true;
 			}

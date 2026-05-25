@@ -719,7 +719,7 @@ void CBaseFileSystem::AddVPKFile( char const *pPath, const char *pPathID, Search
 	for ( auto &s : m_SearchPaths )
 	{
 		CPackedStoreRefCount *p = s.GetPackedStore();
-		if ( p && V_stricmp( p->FullPathName(), nameBuf ) == 0 )
+		if ( p && V_strieq( p->FullPathName(), nameBuf ) )
 		{
 			// Already present
 			if ( s.GetPath() == pathIDSym )
@@ -776,7 +776,7 @@ bool CBaseFileSystem::RemoveVPKFile( const char *pPath, const char *pPathID )
 	for ( intp i = 0; i < m_SearchPaths.Count(); i++ )
 	{
 		CPackedStoreRefCount *p = m_SearchPaths[i].GetPackedStore();
-		if ( p && V_stricmp( p->FullPathName(), nameBuf ) == 0 )
+		if ( p && V_strieq( p->FullPathName(), nameBuf ) )
 		{
 			// remove if we find one
 			if ( m_SearchPaths[i].GetPath() == pathIDSym )
@@ -891,32 +891,6 @@ void CBaseFileSystem::AddPackFiles( const char *pPath, const CUtlSymbol &pathID,
 		pakNames.AddToTail( pakfile );
 		pakSizes.AddToTail( (int64)((unsigned int)buf.st_size) );
 	}
-
-#if defined( _X360 )
-	// localized zips are added last to ensure they appear first in the search path construction
-	// localized zips can only appear in the game or mod directories
-	bool bUseEnglishAudio = XboxLaunch()->GetForceEnglish();
-
-	if ( XBX_IsLocalized() && ( bUseEnglishAudio == false ) && 
-		 ( V_stricmp( g_PathIDTable.String( pathID ), "game" ) == 0 || V_stricmp( g_PathIDTable.String( pathID ), "mod" ) == 0 ) )
-	{
-		// determine localized pak files, [zip0_language..zipN_language]
-		for ( int i = 0; ; i++ )
-		{
-			char pakfile[MAX_PATH];
-			char fullpath[MAX_PATH];
-			V_snprintf( pakfile, sizeof( pakfile ), PACK_LOCALIZED_NAME_FORMAT, i, XBX_GetLanguageString() );
-			V_ComposeFileName( pPath, pakfile, fullpath );
-
-			struct _stat buf;
-			if ( FS_stat( fullpath, &buf ) == -1 )
-				break;
-
-			pakNames.AddToTail( pakfile );
-			pakSizes.AddToTail( (int64)((unsigned int)buf.st_size) );
-		}
-	}
-#endif
 
 	// Add any zip files in the format zip1.zip ... zip0.zip
 	// Add them backwards so zip(N) is higher priority than zip(N-1), etc.
@@ -1062,7 +1036,7 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 		if ( !( sp.GetPackFile() && sp.GetPackFile()->m_bIsMapPath ) )
 			continue;
 		
-		if ( V_stricmp( sp.GetPackFile()->m_ZipName.Get(), fullpath ) == 0 )
+		if ( V_strieq( sp.GetPackFile()->m_ZipName.Get(), fullpath ) )
 		{
 			// Already set as map path
 			return;
@@ -1079,7 +1053,7 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 	// preserved this ZIP across a map reload via refcount holding
 	for ( auto *pf : m_ZipFiles )
 	{
-		if ( pf && pf->m_bIsMapPath && pf->GetPath() == pathSymbol && V_stricmp( pf->m_ZipName.Get(), fullpath ) == 0 )
+		if ( pf && pf->m_bIsMapPath && pf->GetPath() == pathSymbol && V_strieq( pf->m_ZipName.Get(), fullpath ) )
 		{
 			CSearchPath *sp = &m_SearchPaths[ ( addType == PATH_ADD_TO_TAIL ) ? m_SearchPaths.AddToTail() : m_SearchPaths.AddToHead() ];
 			pf->AddRef();
@@ -1575,9 +1549,9 @@ const char *CBaseFileSystem::GetWritePath( const char *pFilename, const char *pa
 	{
 
 		// Check for "game_write" and "mod_write"
-		if ( V_stricmp( pathID, "game" ) == 0 )
+		if ( V_strieq( pathID, "game" ) )
 			pSearchPath = FindWritePath( pFilename, "game_write" );
-		else if ( V_stricmp( pathID, "mod" ) == 0 )
+		else if ( V_strieq( pathID, "mod" ) )
 			pSearchPath = FindWritePath( pFilename, "mod_write" );
 
 		if ( pSearchPath == nullptr )
@@ -2257,7 +2231,7 @@ FileHandle_t CBaseFileSystem::OpenForRead( const char *pFileNameT, const char *p
 					CPackedStore *pVPK = m_SearchPaths[i].GetPackedStore();
 					if ( pVPK )
 					{
-						if ( V_stricmp( pVPK->FullPathName(), openInfo.m_AbsolutePath ) == 0 )
+						if ( V_strieq( pVPK->FullPathName(), openInfo.m_AbsolutePath ) )
 						{
 							CPackedStoreFileHandle fHandle = pVPK->OpenFile( pRelativeFileName );
 							if ( fHandle )
@@ -4330,7 +4304,7 @@ bool CBaseFileSystem::GetCaseCorrectFullPath_Ptr( const char *pFullPath, OUT_Z_C
 	const char *pszCaseCorrectName = FindFirst( strSearchPath.Get(), &findHandle );
 	while ( pszCaseCorrectName )
 	{
-		if ( V_stricmp( strSearchName.String(), pszCaseCorrectName ) == 0 )
+		if ( V_strieq( strSearchName.String(), pszCaseCorrectName ) )
 		{
 			strFoundCaseCorrectName = pszCaseCorrectName;
 			break;
