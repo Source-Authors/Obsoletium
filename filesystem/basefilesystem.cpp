@@ -3786,7 +3786,7 @@ const char *CBaseFileSystem::FindFirstHelper( const char *pWildCardT, const char
 				//            looking for misc files suddenly finding them in the (untrusted) BSP and causing security
 				//            nightmares. For now, restricting FindFirst() support to BSPs only when the BSP search path
 				//            is explicitly requested, but this would otherwise work fine.
-				if ( !pPathID || V_strcmp( pPathID, "BSP" ) != 0 )
+				if ( !pPathID || !V_streq( pPathID, "BSP" ) )
 				{
 					continue;
 				}
@@ -3904,7 +3904,7 @@ bool CBaseFileSystem::FindNextFileHelper( FindData_t *pFindData, int *pFoundStor
 			//            looking for misc files suddenly finding them in the (untrusted) BSP and causing security
 			//            nightmares. For now, restricting FindFirst() support to BSPs only when the BSP search path
 			//            is explicitly requested, but this would otherwise work fine.
-			if ( !pFindData->m_FilterPathID || V_strcmp( g_PathIDTable.String( pFindData->m_FilterPathID ), "BSP" ) != 0 )
+			if ( !pFindData->m_FilterPathID || !V_streq( g_PathIDTable.String( pFindData->m_FilterPathID ), "BSP" ) )
 			{
 				continue;
 			}

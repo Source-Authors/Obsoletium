@@ -352,7 +352,7 @@ void CFileListManager::OnSaveFileAs( KeyValues * )
 	vgui::FileOpenDialog *pFileOpenDialog = new vgui::FileOpenDialog( this, "Save .dmx File As", false, pContextKeyValues );
 	// if this control is moved to vgui_controls, change the default format to "dmx", the generic dmx format
 	pFileOpenDialog->AddFilter( "*.dmx", "Generic MovieObjects File (*.dmx)", false, "movieobjects" );
-	if ( V_strcmp( pFileFormat, "movieobjects" ) != 0 )
+	if ( !V_streq( pFileFormat, "movieobjects" ) )
 	{
 		char description[ 256 ];
 		V_snprintf( description, sizeof( description ), "%s (*.dmx)", g_pDataModel->GetFormatDescription( pFileFormat ) );

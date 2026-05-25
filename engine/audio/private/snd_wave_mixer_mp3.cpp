@@ -163,7 +163,7 @@ IAudioStream *CAudioMixerWaveMP3::GetStream()
 			const char *fileName{m_pData->Source().GetFileName()};
 
 			// dimhotepus: Do not spam console when no MSS codec.
-			if ( V_strcmp( lastFileName, fileName ) )
+			if ( !V_streq( lastFileName, fileName ) )
 			{
 				Warning( "Failed to create decoder for MP3 [ %s ]\n", fileName );
 

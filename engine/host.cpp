@@ -548,7 +548,7 @@ void HostTimerSpinMsChangedCallback( IConVar *var, const char *pOldString, float
 	const char *pForcedValue = CommandLine()->ParmValue( "+host_timer_spin_ms" );
 	if ( pForcedValue != NULL )
 	{
-		if ( V_strcmp( host_timer_spin_ms.GetString(), pForcedValue ) )
+		if ( !V_streq( host_timer_spin_ms.GetString(), pForcedValue ) )
 		{
 			Msg( "Value for host_timer_spin_ms is locked to %s by command line parameter.\n", pForcedValue );
 			host_timer_spin_ms.SetValue( pForcedValue );

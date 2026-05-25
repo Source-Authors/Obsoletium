@@ -1181,7 +1181,7 @@ bool CEmbeddedItemModelPanel::UpdateParticle(
 	if ( m_pItemParticle )
 	{
 		// Check if its a new particle system
-		if ( V_strcmp( m_pItemParticle->m_pParticleSystem->GetName(), pszSystemName ) )
+		if ( !V_streq( m_pItemParticle->m_pParticleSystem->GetName(), pszSystemName ) )
 		{
 			SafeDeleteParticleData( &m_pItemParticle );
 			m_pItemParticle = CreateParticleData( pszSystemName );

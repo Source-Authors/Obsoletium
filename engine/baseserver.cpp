@@ -722,7 +722,7 @@ bool CBaseServer::ProcessConnectionlessPacket(netpacket_t * packet)
 				// checking.
 				const char *pszVersionInP4 = "2000";
 				const char *pszVersionString = GetSteamInfIDVersionInfo().szVersionString;
-				if ( V_strcmp( pszVersionString, pszVersionInP4 ) && V_strcmp( productVersion, pszVersionInP4 ) )
+				if ( !V_streq( pszVersionString, pszVersionInP4 ) && !V_streq( productVersion, pszVersionInP4 ) )
 				{
 					int nVersionCheck = Q_strncmp( pszVersionString, productVersion, V_strlen( pszVersionString ) );
 					if ( nVersionCheck < 0 )

@@ -270,7 +270,7 @@ long CSystem::GetTimeMillis()
 //-----------------------------------------------------------------------------
 void CSystem::ShellExecute(const char *command, const char *file)
 {
-	if ( V_strcmp( command, "open" ) != 0 )
+	if ( !V_streq( command, "open" ) )
 	{
 		// Nope
 		AssertMsg( false, "This legacy command is only supported in the form of open <foo>" );

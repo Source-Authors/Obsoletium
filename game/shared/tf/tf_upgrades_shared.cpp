@@ -165,7 +165,7 @@ void CMannVsMachineUpgradeManager::LoadUpgradesFileFromPath( const char *pszPath
 		V_strstr( pszPath, "\r" ) || V_strstr( pszPath, "\n" ) ||
 		V_strstr( pszPath, ":" ) || V_strstr( pszPath, "\\\\" ) ||
 		V_IsAbsolutePath( pszPath ) ||
-		pszExtension == NULL || V_strcmp( pszExtension, "txt" ) != 0 )
+		pszExtension == NULL || !V_streq( pszExtension, "txt" ) )
 	{
 		return;
 	}

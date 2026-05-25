@@ -803,7 +803,7 @@ void ConVar::ChangeStringValue( const char *tempVal, float flOldValue )
 	}
 
 	// If nothing has changed, don't do the callbacks.
-	if (V_strcmp(pszOldValue, m_pszString) != 0)
+	if (!V_streq(pszOldValue, m_pszString))
 	{
 		// Invoke any necessary callback function
 		if ( m_fnChangeCallback )

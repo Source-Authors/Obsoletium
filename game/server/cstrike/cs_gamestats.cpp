@@ -1409,7 +1409,7 @@ void CCSGameStats::IncrementStat( CCSPlayer* pPlayer, CSStatType_t statId, int i
 		    if (ServerStatBasedAchievements[i].statId == statId)
 		    {
 			    // skip this if there is a map filter and it doesn't match
-			    if (ServerStatBasedAchievements[i].mapFilter != NULL && V_strcmp(gpGlobals->mapname.ToCStr(), ServerStatBasedAchievements[i].mapFilter) != 0)
+			    if (ServerStatBasedAchievements[i].mapFilter != NULL && !V_streq(gpGlobals->mapname.ToCStr(), ServerStatBasedAchievements[i].mapFilter))
 				    continue;
 
 			    bool bWasMet = ServerStatBasedAchievements[i].IsMet(stats.statsCurrentRound[statId] - iDelta, stats.statsCurrentMatch[statId] - iDelta);
@@ -1445,7 +1445,7 @@ void CCSGameStats::SetStat( CCSPlayer *pPlayer, CSStatType_t statId, int iValue 
 			if (ServerStatBasedAchievements[i].statId == statId)
 			{
 				// skip this if there is a map filter and it doesn't match
-				if (ServerStatBasedAchievements[i].mapFilter != NULL && V_strcmp(gpGlobals->mapname.ToCStr(), ServerStatBasedAchievements[i].mapFilter) != 0)
+				if (ServerStatBasedAchievements[i].mapFilter != NULL && !V_streq(gpGlobals->mapname.ToCStr(), ServerStatBasedAchievements[i].mapFilter))
 					continue;
 
 				bool bWasMet = ServerStatBasedAchievements[i].IsMet(oldRoundValue, oldMatchValue);

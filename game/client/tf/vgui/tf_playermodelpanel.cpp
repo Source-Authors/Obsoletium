@@ -1586,7 +1586,7 @@ bool CTFPlayerModelPanel::UpdateCosmeticParticles(
 	if ( m_aParticleSystems[ iSystem ] )
 	{
 		// Check if its a new particle system
-		if ( V_strcmp( m_aParticleSystems[ iSystem ]->m_pParticleSystem->GetName(), pszSystemName ) )
+		if ( !V_streq( m_aParticleSystems[ iSystem ]->m_pParticleSystem->GetName(), pszSystemName ) )
 		{
 			SafeDeleteParticleData( &m_aParticleSystems[ iSystem ] );
 			m_aParticleSystems[ iSystem ] = CreateParticleData( pszSystemName );

@@ -975,9 +975,9 @@ bool CDataModel::Unserialize( CUtlBuffer &inBuf, const char *pEncodingName, cons
 	// advance the buffer the the end of the header
 	if ( bStoresVersionInFile )
 	{
-		if ( V_strcmp( pEncodingName, header.encodingName ) != 0 )
+		if ( !V_streq( pEncodingName, header.encodingName ) )
 			return false;
-		if ( V_strcmp( pSourceFormatName, header.formatName ) != 0 )
+		if ( !V_streq( pSourceFormatName, header.formatName ) )
 			return false;
 
 		if ( pSerializer->IsBinaryFormat() )

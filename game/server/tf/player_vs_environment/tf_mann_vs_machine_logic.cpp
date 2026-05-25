@@ -169,7 +169,7 @@ void CMannVsMachineLogic::InitPopulationManager( void )
 		Q_snprintf( szFileName, sizeof( szFileName ), pszFormat, STRING( gpGlobals->mapname ) );
 	}
 
-	if ( m_populationManager && V_strcmp( m_populationManager->GetPopulationFilename(), szFileName ) != 0 )
+	if ( m_populationManager && !V_streq( m_populationManager->GetPopulationFilename(), szFileName ) )
 	{
 		UTIL_RemoveImmediate( m_populationManager );
 		m_populationManager = NULL;

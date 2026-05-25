@@ -586,7 +586,7 @@ void CL_DispatchSound( const SoundInfo_t &sound )
 		V_strncpy( name, cl.GetSoundName( sound.nSoundNum ), sizeof( name ) );
 
 		const char *pchTranslatedName = g_ClientDLL->TranslateEffectForVisionFilter( "sounds", name );
-		if ( V_strcmp( pchTranslatedName, name ) != 0 )
+		if ( !V_streq( pchTranslatedName, name ) )
 		{
 			V_strncpy( name, pchTranslatedName, sizeof( name ) );
 			nSoundNum = cl.LookupSoundIndex( name );

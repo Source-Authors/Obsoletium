@@ -199,7 +199,7 @@ bool ASISTRUCT::Init( void *pCallbackObject, const char *pInputFileType, const c
 	if ( !hProvider )
 	{
 		// dimhotepus: Do not spam console when no MSS codec.
-		if ( V_strcmp( lastInputFileType, pInputFileType ) || strcmp( lastOutputFileType, pOutputFileType ) )
+		if ( !V_streq( lastInputFileType, pInputFileType ) || !V_streq( lastOutputFileType, pOutputFileType ) )
 		{
 			DevWarning( "Can't find provider 'ASI codec' for input %s, output %s\n",
 				pInputFileType, pOutputFileType );

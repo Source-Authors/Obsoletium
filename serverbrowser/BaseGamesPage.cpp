@@ -1324,7 +1324,7 @@ void CBaseGamesPage::UpdateFilterSettings()
 	{
 		const char *pszVersion = g_pRunGameEngine->GetProductVersionString();
 		const char k_VersionFromP4[] = "2000"; // magic version string we use when we're running from P4
-		if ( pszVersion && *pszVersion && ( V_strcmp( pszVersion, k_VersionFromP4 ) != 0 ) )
+		if ( !Q_isempty( pszVersion ) && !V_streq( pszVersion, k_VersionFromP4 ) )
 		{
 			m_vecServerFilters.AddToTail( MatchMakingKeyValuePair_t( "version_match", pszVersion ) );
 		}

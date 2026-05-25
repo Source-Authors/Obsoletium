@@ -2763,7 +2763,7 @@ void CImportPreviewItemPanel::OnTextChanged( KeyValues *data )
 		{
 			KeyValues *pData = pComboBox->GetActiveItemUserData();
 			const char *pszPose = pData->GetString( "pose" );
-			if ( V_strcmp( pszPose, m_sCurrentPose ) != 0 )
+			if ( !V_streq( pszPose, m_sCurrentPose ) )
 			{
 				m_sCurrentPose = pszPose;
 				UpdateActivity();
