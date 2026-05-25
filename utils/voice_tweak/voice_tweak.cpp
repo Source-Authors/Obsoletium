@@ -5,6 +5,7 @@
 #include "voice_tweak.h"
 #include "waveout.h"
 #include "audio/private/voice_mixer_controls.h"
+#include "tier1/strtools.h"
 #include "voice_tweakDlg.h"
 
 #ifdef _DEBUG
@@ -128,7 +129,7 @@ CVoiceTweakApp theApp;
 
 char const* FindArg(char const* pName) {
   for (int i = 0; i < __argc; i++)
-    if (_stricmp(__argv[i], pName) == 0)
+    if (V_strieq(__argv[i], pName))
       return ((i + 1) < __argc) ? __argv[i + 1] : "";
 
   return NULL;

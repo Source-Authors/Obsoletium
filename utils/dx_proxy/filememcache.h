@@ -11,6 +11,7 @@
 #include <string_view>
 
 #include "tier0/threadtools.h"
+#include "tier1/strtools.h"
 
 namespace se::dx_proxy {
 
@@ -78,7 +79,7 @@ class FileCache final {
     // Comparer.
     [[nodiscard]] inline bool operator()(const char *s1,
                                          const char *s2) const noexcept {
-      return _stricmp(s1, s2) == 0;
+      return V_strieq(s1, s2);
     }
   };
 
