@@ -372,11 +372,11 @@ class CHammerCmdLine : public CCommandLineInfo
 
 				m_bGame = false;
 			}
-			else if (bFlag && !strcmpi(lpszParam, "nologo"))
+			else if (bFlag && V_strieq(lpszParam, "nologo"))
 			{
 				m_bShowLogo = false;
 			}
-			else if (bFlag && !strcmpi(lpszParam, "makelib"))
+			else if (bFlag && V_strieq(lpszParam, "makelib"))
 			{
 				bMakeLib = TRUE;
 			}

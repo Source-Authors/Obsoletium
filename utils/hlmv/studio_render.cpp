@@ -741,7 +741,7 @@ int FindBoneIndex( CStudioHdr *pstudiohdr, const char *pName )
 	mstudiobone_t *pbones = pstudiohdr->pBone( 0 );
 	for (int i = 0; i < pstudiohdr->numbones(); i++)
 	{
-		if ( !strcmpi( pName, pbones[i].pszName() ) )
+		if ( V_strieq( pName, pbones[i].pszName() ) )
 			return i;
 	}
 
@@ -764,7 +764,7 @@ int StudioModel::Physics_GetBoneIndex( const char *pName )
 	for (int i = 0; i < m_pPhysics->Count(); i++)
 	{
 		CPhysmesh *pmesh = m_pPhysics->GetMesh(i);
-		if ( !strcmpi( pName, pmesh[i].m_boneName ) )
+		if ( V_strieq( pName, pmesh[i].m_boneName ) )
 			return i;
 	}
 

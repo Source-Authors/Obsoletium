@@ -8934,7 +8934,7 @@ float DSP_LookupStringToken( char *psz, int ipset )
 
 	for (i = 0; i < gcdsp_stringmap; i++)
 	{
-		if (!strcmpi(gdsp_stringmap[i].sz, psz))
+		if (V_strieq(gdsp_stringmap[i].sz, psz))
 			return gdsp_stringmap[i].i;
 	}
 

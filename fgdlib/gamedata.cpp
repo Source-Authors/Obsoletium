@@ -544,7 +544,7 @@ GDclass *GameData::BeginInstanceRemap( const char *pszClassName, const char *psz
 	delete m_InstanceClass;
 	m_InstanceClass = NULL;
 
-	if ( strcmpi( pszClassName, "info_overlay_accessor" ) == 0 )
+	if ( V_strieq( pszClassName, "info_overlay_accessor" ) )
 	{	// yucky hack for a made up entity in the bsp process
 		pszClassName = "info_overlay";
 	}

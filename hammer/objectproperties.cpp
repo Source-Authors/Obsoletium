@@ -1122,7 +1122,7 @@ void CObjectProperties::ReloadData()
 		CMapEntity	*pEntity = dynamic_cast< CMapEntity * >( pobj );
 		if ( pEntity )
 		{
-			if ( strcmpi( pEntity->GetClassName(), "func_instance" ) == 0 )
+			if ( V_strieq( pEntity->GetClassName(), "func_instance" ) )
 			{
 				pDoc->PopulateInstance( pEntity );
 				CMapInstance	*pMapInstance = pEntity->GetChildOfType( ( CMapInstance * )NULL );
@@ -1131,7 +1131,7 @@ void CObjectProperties::ReloadData()
 					m_pInstanceButton->ShowWindow( SW_SHOW );
 				}
 			}
-			else if ( strcmpi( pEntity->GetClassName(), "func_instance_parms" ) == 0 )
+			else if ( V_strieq( pEntity->GetClassName(), "func_instance_parms" ) )
 			{
 				if ( pDoc )
 				{

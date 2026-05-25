@@ -536,28 +536,28 @@ public:
 	virtual void ParseKeyValue( void *pData, const char *pKey, const char *pValue )
 	{
 		breakmodel_t *pModel = (breakmodel_t *)pData;
-		if ( !strcmpi( pKey, "model" ) )
+		if ( V_strieq( pKey, "model" ) )
 		{
 			ParseModelName( pModel, pValue );
 		}
-		else if (!strcmpi( pKey, "ragdoll" ) )
+		else if (V_strieq( pKey, "ragdoll" ) )
 		{
 			ParseModelName( pModel, pValue );
 			pModel->isRagdoll = true;
 		}
-		else if (!strcmpi( pKey, "motiondisabled" ) )
+		else if (V_strieq( pKey, "motiondisabled" ) )
 		{
 			pModel->isMotionDisabled = true;
 		}
-		else if ( !strcmpi( pKey, "offset" ) )
+		else if ( V_strieq( pKey, "offset" ) )
 		{
 			UTIL_StringToVector( pModel->offset, pValue );
 		}
-		else if ( !strcmpi( pKey, "health" ) )
+		else if ( V_strieq( pKey, "health" ) )
 		{
 			pModel->health = strtof(pValue, nullptr);
 		}
-		else if ( !strcmpi( pKey, "fadetime" ) )
+		else if ( V_strieq( pKey, "fadetime" ) )
 		{
 			pModel->fadeTime = strtof(pValue, nullptr);
 			if ( !m_wroteCollisionGroup )
@@ -565,34 +565,34 @@ public:
 				pModel->collisionGroup = COLLISION_GROUP_DEBRIS;
 			}
 		}
-		else if ( !strcmpi( pKey, "fademindist" ) )
+		else if ( V_strieq( pKey, "fademindist" ) )
 		{
 			pModel->fadeMinDist = strtof(pValue, nullptr);
 		}
-		else if ( !strcmpi( pKey, "fademaxdist" ) )
+		else if ( V_strieq( pKey, "fademaxdist" ) )
 		{
 			pModel->fadeMaxDist = strtof(pValue, nullptr);
 		}
-		else if ( !strcmpi( pKey, "debris" ) )
+		else if ( V_strieq( pKey, "debris" ) )
 		{
 			pModel->collisionGroup = atoi(pValue) > 0 ? COLLISION_GROUP_DEBRIS : COLLISION_GROUP_INTERACTIVE;
 			m_wroteCollisionGroup = true;
 		}
-		else if ( !strcmpi( pKey, "burst" ) )
+		else if ( V_strieq( pKey, "burst" ) )
 		{
 			pModel->burstScale = strtof( pValue, nullptr );
 		}
-		else if ( !strcmpi( pKey, "placementbone" ) )
+		else if ( V_strieq( pKey, "placementbone" ) )
 		{
 			Q_strncpy( pModel->placementName, pValue, sizeof(pModel->placementName) );
 			pModel->placementIsBone = true;
 		}
-		else if ( !strcmpi( pKey, "placementattachment" ) )
+		else if ( V_strieq( pKey, "placementattachment" ) )
 		{
 			Q_strncpy( pModel->placementName, pValue, sizeof(pModel->placementName) );
 			pModel->placementIsBone = false;
 		}
-		else if ( !strcmpi( pKey, "multiplayer_break" ) )
+		else if ( V_strieq( pKey, "multiplayer_break" ) )
 		{
 			if ( FStrEq( pValue, "server" ) )
 			{
@@ -603,7 +603,7 @@ public:
 				pModel->mpBreakMode = MULTIPLAYER_BREAK_CLIENTSIDE;
 			}
 		}
-		else if ( !strcmpi( pKey, "velocity" ) )
+		else if ( V_strieq( pKey, "velocity" ) )
 		{
 			UTIL_StringToVector( pModel->velocity, pValue );
 		}
@@ -646,7 +646,7 @@ void BuildPropList( const char *pszBlockName, CUtlVector<breakmodel_t> &list, in
 		CBreakParser breakParser( defBurstScale, defCollisionGroup );
 		
 		const char *pBlock = pParse->GetCurrentBlockName();
-		if ( !strcmpi( pBlock, pszBlockName ) )
+		if ( V_strieq( pBlock, pszBlockName ) )
 		{
 			breakmodel_t &breakModel = list[list.AddToTail()];
 			pParse->ParseCustom( &breakModel, &breakParser );
@@ -1252,7 +1252,7 @@ void PrecachePropsForModel( int iModel, const char *pszBlockName )
 	while ( !pParse->Finished() )
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();
-		if ( !strcmpi( pBlock, pszBlockName ) )
+		if ( V_strieq( pBlock, pszBlockName ) )
 		{
 			breakmodel_t breakModel;
 			pParse->ParseCustom( &breakModel, &breakParser );

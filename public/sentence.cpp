@@ -636,11 +636,11 @@ void CSentence::ParseOptions( CUtlBuffer& buf )
 		buf.GetString( token );
 		Q_strncpy( value, token, sizeof( value ) );
 
-		if ( !strcmpi( key, "voice_duck" ) )
+		if ( V_strieq( key, "voice_duck" ) )
 		{
 			SetVoiceDuck( atoi(value) ? true : false );
 		}
-		else if ( !strcmpi( key, "checksum" ) )
+		else if ( V_strieq( key, "checksum" ) )
 		{
 			SetDataCheckSum( (unsigned int)atoi( value ) );
 		}

@@ -332,7 +332,7 @@ bool CPhysicsHook::FindOrAddVehicleScript( const char *pScriptName, vehicleparam
 			while ( !pParse->Finished() )
 			{
 				const char *pBlock = pParse->GetCurrentBlockName();
-				if ( !strcmpi( pBlock, "vehicle" ) )
+				if ( V_strieq( pBlock, "vehicle" ) )
 				{
 					pParse->ParseVehicle( &m_vehicleScripts[index].params, NULL );
 				}

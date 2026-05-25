@@ -21,6 +21,7 @@
 #include <shellapi.h>
 
 #include "tier1/utlvector.h"
+#include "tier1/strtools.h"
 
 
 void mxTab_resizeChild (HWND hwnd);
@@ -253,17 +254,17 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM
 
 			CHAR className[128];
 			GetClassName (hwndCtrl, className, 128);
-			if (!strcmpi (className, "edit"))
+			if (V_strieq (className, "edit"))
 			{
 				if (wNotifyCode != EN_CHANGE)
 					break;
 			}
-			else if (!strcmpi (className, "combobox"))
+			else if (V_strieq (className, "combobox"))
 			{
 				if (wNotifyCode != CBN_SELCHANGE)
 					break;
 			}
-			else if (!strcmpi (className, "listbox"))
+			else if (V_strieq (className, "listbox"))
 			{
 				if (wNotifyCode != LBN_SELCHANGE)
 					break;

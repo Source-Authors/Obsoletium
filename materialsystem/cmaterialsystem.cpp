@@ -4640,7 +4640,7 @@ IMaterialProxy *CMaterialSystem::DetermineProxyReplacements( IMaterial *pMateria
 
 	V_strcpy_safe( szLastPath, pszMaterialName );
 	intp nLength = V_strlen( szLastPath ) - (ssize( REPLACEMENT_NAME ) - 1);
-	if ( nLength > 0 && strcmpi( &szLastPath[ nLength ], REPLACEMENT_NAME ) == 0 )
+	if ( nLength > 0 && V_strieq( &szLastPath[ nLength ], REPLACEMENT_NAME ) )
 	{
 		return nullptr;
 	}

@@ -791,7 +791,7 @@ bool CPropVehicleChoreoGeneric::ParseViewParams( const char *pScriptName )
 	while ( !pParse->Finished() )
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();
-		if ( !strcmpi( pBlock, "vehicle_view" ) )
+		if ( V_strieq( pBlock, "vehicle_view" ) )
 		{
 			pParse->ParseCustom( &m_vehicleView, &viewParser );
 		}
@@ -920,43 +920,43 @@ void CVehicleChoreoViewParser::ParseKeyValue( void *pData, const char *pKey, con
 {
 	vehicleview_t *pView = (vehicleview_t *)pData;
 	// New gear?
-	if ( !strcmpi( pKey, "clamp" ) )
+	if ( V_strieq( pKey, "clamp" ) )
 	{
 		pView->bClampEyeAngles = !!atoi( pValue );
 	}
-	else if ( !strcmpi( pKey, "pitchcurvezero" ) )
+	else if ( V_strieq( pKey, "pitchcurvezero" ) )
 	{
 		pView->flPitchCurveZero = strtof(pValue, nullptr);
 	}
-	else if ( !strcmpi( pKey, "pitchcurvelinear" ) )
+	else if ( V_strieq( pKey, "pitchcurvelinear" ) )
 	{
 		pView->flPitchCurveLinear = strtof(pValue, nullptr);
 	}
-	else if ( !strcmpi( pKey, "rollcurvezero" ) )
+	else if ( V_strieq( pKey, "rollcurvezero" ) )
 	{
 		pView->flRollCurveZero = strtof(pValue, nullptr);
 	}
-	else if ( !strcmpi( pKey, "rollcurvelinear" ) )
+	else if ( V_strieq( pKey, "rollcurvelinear" ) )
 	{
 		pView->flRollCurveLinear = strtof(pValue, nullptr);
 	}
-	else if ( !strcmpi( pKey, "yawmin" ) )
+	else if ( V_strieq( pKey, "yawmin" ) )
 	{
 		pView->flYawMin = strtof(pValue, nullptr);
 	}
-	else if ( !strcmpi( pKey, "yawmax" ) )
+	else if ( V_strieq( pKey, "yawmax" ) )
 	{
 		pView->flYawMax = strtof(pValue, nullptr);
 	}
-	else if ( !strcmpi( pKey, "pitchmin" ) )
+	else if ( V_strieq( pKey, "pitchmin" ) )
 	{
 		pView->flPitchMin = strtof(pValue, nullptr);
 	}
-	else if ( !strcmpi( pKey, "pitchmax" ) )
+	else if ( V_strieq( pKey, "pitchmax" ) )
 	{
 		pView->flPitchMax = strtof(pValue, nullptr);
 	}
-	else if ( !strcmpi( pKey, "fov" ) )
+	else if ( V_strieq( pKey, "fov" ) )
 	{
 		pView->flFOV = strtof(pValue, nullptr);
 	}

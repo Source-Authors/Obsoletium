@@ -13,6 +13,7 @@
 #include "tier0/annotations.h"
 #include "tier0/basetypes.h"
 #include "tier0/valve_minmax_on.h"
+#include "tier1/strtools.h"
 
 
 
@@ -30,7 +31,7 @@ enum trtoken_t
 
 
 [[nodiscard]]
-inline bool IsToken(const char* s1, const char* s2) { return !strcmpi(s1, s2); }
+inline bool IsToken(const char* s1, const char* s2) { return V_strieq(s1, s2); }
 
 #define MAX_TOKEN (128 + 1)
 #define MAX_IDENT (64 + 1)

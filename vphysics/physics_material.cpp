@@ -444,106 +444,106 @@ intp CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *
 					m_props.AddToTail( prop );
 					break;
 				}
-				else if ( !strcmpi( key, "base" ) )
+				else if ( V_strieq( key, "base" ) )
 				{
 					baseMaterial = GetSurfaceIndex( value );
 					CopyPhysicsProperties( &prop, baseMaterial );
 				}
-				else if ( !strcmpi( key, "thickness" ) )
+				else if ( V_strieq( key, "thickness" ) )
 				{
 					prop.data.physics.thickness = strtof(value, nullptr);
 				}
-				else if ( !strcmpi( key, "density" ) )
+				else if ( V_strieq( key, "density" ) )
 				{
 					prop.data.physics.density = strtof(value, nullptr);
 				}
-				else if ( !strcmpi( key, "elasticity" ) )
+				else if ( V_strieq( key, "elasticity" ) )
 				{
 					prop.data.physics.elasticity = strtof(value, nullptr);
 				}
-				else if ( !strcmpi( key, "friction" ) )
+				else if ( V_strieq( key, "friction" ) )
 				{
 					prop.data.physics.friction = strtof(value, nullptr);
 				}
-				else if ( !strcmpi( key, "maxspeedfactor" ) )
+				else if ( V_strieq( key, "maxspeedfactor" ) )
 				{
 					prop.data.game.maxSpeedFactor = strtof(value, nullptr);
 				}
-				else if ( !strcmpi( key, "jumpfactor" ) )
+				else if ( V_strieq( key, "jumpfactor" ) )
 				{
 					prop.data.game.jumpFactor = strtof(value, nullptr);
 				}
-				else if ( !strcmpi( key, "climbable" ) )
+				else if ( V_strieq( key, "climbable" ) )
 				{
 					prop.data.game.climbable = atoi(value);
 				}
 				// audio parameters
-				else if ( !strcmpi( key, "audioReflectivity" ) )
+				else if ( V_strieq( key, "audioReflectivity" ) )
 				{
 					prop.data.audio.reflectivity = strtof(value, nullptr);
 				}
-				else if ( !strcmpi( key, "audioHardnessFactor" ) )
+				else if ( V_strieq( key, "audioHardnessFactor" ) )
 				{
 					prop.data.audio.hardnessFactor = strtof(value, nullptr);
 				}
-				else if ( !strcmpi( key, "audioHardMinVelocity" ) )
+				else if ( V_strieq( key, "audioHardMinVelocity" ) )
 				{
 					prop.data.audio.hardVelocityThreshold = strtof(value, nullptr);
 				}
-				else if ( !strcmpi( key, "audioRoughnessFactor" ) )
+				else if ( V_strieq( key, "audioRoughnessFactor" ) )
 				{
 					prop.data.audio.roughnessFactor = strtof(value, nullptr);
 				}
-				else if ( !strcmpi( key, "scrapeRoughThreshold" ) )
+				else if ( V_strieq( key, "scrapeRoughThreshold" ) )
 				{
 					prop.data.audio.roughThreshold = strtof(value, nullptr);
 				}
-				else if ( !strcmpi( key, "impactHardThreshold" ) )
+				else if ( V_strieq( key, "impactHardThreshold" ) )
 				{
 					prop.data.audio.hardThreshold = strtof(value, nullptr);
 				}
 				// sound names
-				else if ( !strcmpi( key, "stepleft" ) )
+				else if ( V_strieq( key, "stepleft" ) )
 				{
 					prop.data.sounds.stepleft = m_strings.AddString( value );
 				}
-				else if ( !strcmpi( key, "stepright" ) )
+				else if ( V_strieq( key, "stepright" ) )
 				{
 					prop.data.sounds.stepright = m_strings.AddString( value );
 				}
-				else if ( !strcmpi( key, "impactsoft" ) )
+				else if ( V_strieq( key, "impactsoft" ) )
 				{
 					prop.data.sounds.impactSoft = m_strings.AddString( value );
 				}
-				else if ( !strcmpi( key, "impacthard" ) )
+				else if ( V_strieq( key, "impacthard" ) )
 				{
 					prop.data.sounds.impactHard = m_strings.AddString( value );
 				}
-				else if ( !strcmpi( key, "scrapesmooth" ) )
+				else if ( V_strieq( key, "scrapesmooth" ) )
 				{
 					prop.data.sounds.scrapeSmooth = m_strings.AddString( value );
 				}
-				else if ( !strcmpi( key, "scraperough" ) )
+				else if ( V_strieq( key, "scraperough" ) )
 				{
 					prop.data.sounds.scrapeRough = m_strings.AddString( value );
 				}
-				else if ( !strcmpi( key, "bulletimpact" ) )
+				else if ( V_strieq( key, "bulletimpact" ) )
 				{
 					prop.data.sounds.bulletImpact = m_strings.AddString( value );
 				}
-				else if ( !strcmpi( key, "break" ) )
+				else if ( V_strieq( key, "break" ) )
 				{
 					prop.data.sounds.breakSound = m_strings.AddString( value );
 				}
-				else if ( !strcmpi( key, "strain" ) )
+				else if ( V_strieq( key, "strain" ) )
 				{
 					prop.data.sounds.strainSound = m_strings.AddString( value );
 				}
-				else if ( !strcmpi( key, "rolling" ) )
+				else if ( V_strieq( key, "rolling" ) )
 				{
 					prop.data.sounds.rolling = m_strings.AddString( value );
 				}
-				else if ( !strcmpi( key, "gamematerial" ) )
+				else if ( V_strieq( key, "gamematerial" ) )
 				{
 					if ( strlen(value) == 1 && !V_isdigit( value[0]) )
 					{
@@ -554,7 +554,7 @@ intp CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *
 						prop.data.game.material = atoi(value);
 					}
 				}
-				else if ( !strcmpi( key, "dampening" ) )
+				else if ( V_strieq( key, "dampening" ) )
 				{
 					prop.data.physics.dampening = strtof(value, nullptr);
 				}

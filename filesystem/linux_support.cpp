@@ -237,7 +237,7 @@ bool findFileInDirCaseInsensitive( const char *file, char* output, size_t bufSiz
 	// Scan through the directory.
 	for ( dirent* pEntry = NULL; ( pEntry = readdir( pDir ) ); /**/ )
 	{
-		if ( strcasecmp( pEntry->d_name, filePart ) == 0 )
+		if ( V_strieq( pEntry->d_name, filePart ) )
 		{
 			// If we don't have an existing candidate or if this name is
 			// a better candidate then copy it in. A 'better' candidate

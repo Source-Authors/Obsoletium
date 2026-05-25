@@ -1020,7 +1020,7 @@ GDinputvariable *GDclass::VarForName(const char *pszName, intp *piIndex)
 	for(intp i = 0; i < GetVariableCount(); i++)
 	{
 		GDinputvariable *pVar = GetVariableAt(i);
-		if(!strcmpi(pVar->GetName(), pszName))
+		if(V_strieq(pVar->GetName(), pszName))
 		{
 			if(piIndex)
 				piIndex[0] = i;
@@ -1040,7 +1040,7 @@ void GDclass::GetHelperForGDVar( GDinputvariable *pVar, CUtlVector<const char *>
 		intp nParamCount = pHelper->GetParameterCount();
 		for ( intp j = 0; j < nParamCount; j++ )
 		{
-			if ( !strcmpi( pszName, pHelper->GetParameter( j ) ) )
+			if ( V_strieq( pszName, pHelper->GetParameter( j ) ) )
 			{
 				pszHelperName->AddToTail(pHelper->GetName());
 			}

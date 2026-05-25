@@ -197,7 +197,7 @@ bool PhysModelParseSolidByIndex( solid_t &solid, CBaseEntity *pEntity, int model
 	while ( !pParse->Finished() )
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();
-		if ( !strcmpi( pBlock, "solid" ) )
+		if ( V_strieq( pBlock, "solid" ) )
 		{
 			solid_t tmpSolid;
 			memset( &tmpSolid, 0, sizeof(tmpSolid) );
@@ -260,7 +260,7 @@ bool PhysModelParseSolidByIndex( solid_t &solid, CBaseEntity *pEntity, vcollide_
 	while ( !pParse->Finished() )
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();
-		if ( !strcmpi( pBlock, "solid" ) )
+		if ( V_strieq( pBlock, "solid" ) )
 		{
 			solid_t tmpSolid;
 			memset( &tmpSolid, 0, sizeof(tmpSolid) );
@@ -614,7 +614,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();
 
-		if ( !strcmpi( pBlock, "solid" ) || !strcmpi( pBlock, "staticsolid" ) )
+		if ( V_strieq( pBlock, "solid" ) || V_strieq( pBlock, "staticsolid" ) )
 		{
 			solid.params = defaultParams;
 			pParse->ParseSolid( &solid, &g_SolidSetup );
@@ -651,7 +651,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 				pWorldPhysics = pObject;
 			}
 		}
-		else if ( !strcmpi( pBlock, "fluid" ) )
+		else if ( V_strieq( pBlock, "fluid" ) )
 		{
 			pParse->ParseFluid( &fluid, NULL );
 
@@ -673,7 +673,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 				physenv->CreateFluidController( pWater, &fluid.params );
 			}
 		}
-		else if ( !strcmpi( pBlock, "materialtable" ) )
+		else if ( V_strieq( pBlock, "materialtable" ) )
 		{
 			intp surfaceTable[128];
 			memset( surfaceTable, 0, sizeof(surfaceTable) );
@@ -681,7 +681,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 			pParse->ParseSurfaceTable( surfaceTable, NULL );
 			physprops->SetWorldMaterialIndexTable( surfaceTable, 128 );
 		}
-		else if ( !strcmpi(pBlock, "virtualterrain" ) )
+		else if ( V_strieq(pBlock, "virtualterrain" ) )
 		{
 			bCreateVirtualTerrain = true;
 			pParse->SkipBlock();

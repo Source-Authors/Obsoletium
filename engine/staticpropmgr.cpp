@@ -1177,7 +1177,7 @@ void CStaticProp::CreateVPhysics( IPhysicsEnvironment *pPhysEnv, IVPhysicsKeyHan
 		while ( !pParse->Finished() )
 		{
 			const char *pBlock = pParse->GetCurrentBlockName();
-			if ( !strcmpi( pBlock, "solid" ) )
+			if ( V_strieq( pBlock, "solid" ) )
 			{
 				pParse->ParseSolid( &solid, pDefaults );
 				break;

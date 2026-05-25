@@ -79,13 +79,13 @@ public:
 	}
 	virtual void ParseKeyValue( void *pData, const char *pKey, const char *pValue )
 	{
-		if ( !strcmpi( pKey, "selfcollisions" ) )
+		if ( V_strieq( pKey, "selfcollisions" ) )
 		{
 			// keys disabled by default
 			Assert( atoi(pValue) == 0 );
 			m_bSelfCollisions = false;
 		}
-		else if ( !strcmpi( pKey, "collisionpair" ) )
+		else if ( V_strieq( pKey, "collisionpair" ) )
 		{
 			if ( m_bSelfCollisions )
 			{
@@ -119,23 +119,23 @@ public:
 	}
 	virtual void ParseKeyValue( void *pData, const char *pKey, const char *pValue )
 	{
-		if ( !strcmpi( pKey, "animfrictionmin" ) )
+		if ( V_strieq( pKey, "animfrictionmin" ) )
 		{
 			m_ragdoll->animfriction.iMinAnimatedFriction = atoi( pValue );
 		}
-		else if ( !strcmpi( pKey, "animfrictionmax" ) )
+		else if ( V_strieq( pKey, "animfrictionmax" ) )
 		{
 			m_ragdoll->animfriction.iMaxAnimatedFriction = atoi( pValue );
 		}
-		else if ( !strcmpi( pKey, "animfrictiontimein" ) )
+		else if ( V_strieq( pKey, "animfrictiontimein" ) )
 		{
 			m_ragdoll->animfriction.flFrictionTimeIn = strtof( pValue, nullptr );
 		}
-		else if ( !strcmpi( pKey, "animfrictiontimeout" ) )
+		else if ( V_strieq( pKey, "animfrictiontimeout" ) )
 		{
 			m_ragdoll->animfriction.flFrictionTimeOut = strtof( pValue, nullptr );
 		}
-		else if ( !strcmpi( pKey, "animfrictiontimehold" ) )
+		else if ( V_strieq( pKey, "animfrictiontimehold" ) )
 		{
 			m_ragdoll->animfriction.flFrictionTimeHold = strtof( pValue, nullptr );
 		}
@@ -159,7 +159,7 @@ void RagdollSetupAnimatedFriction( IPhysicsEnvironment *pPhysEnv, ragdoll_t *rag
 		{
 			const char *pBlock = pParse->GetCurrentBlockName();
 
-			if ( !strcmpi( pBlock, "animatedfriction") ) 
+			if ( V_strieq( pBlock, "animatedfriction") ) 
 			{
 				CRagdollAnimatedFriction friction( ragdoll );
 				pParse->ParseCustom( (void*)&friction, &friction );
@@ -280,26 +280,26 @@ static void RagdollCreateObjects( IPhysicsEnvironment *pPhysEnv, ragdoll_t &ragd
 	while ( !pParse->Finished() )
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();
-		if ( !strcmpi( pBlock, "solid" ) )
+		if ( V_strieq( pBlock, "solid" ) )
 		{
 			solid_t solid;
 
 			pParse->ParseSolid( &solid, &g_SolidSetup );
 			RagdollAddSolid( pPhysEnv, ragdoll, params, solid );
 		}
-		else if ( !strcmpi( pBlock, "ragdollconstraint" ) )
+		else if ( V_strieq( pBlock, "ragdollconstraint" ) )
 		{
 			constraint_ragdollparams_t constraint;
 			pParse->ParseRagdollConstraint( &constraint, NULL );
 			RagdollAddConstraint( pPhysEnv, ragdoll, params, constraint );
 		}
-		else if ( !strcmpi( pBlock, "collisionrules" ) )
+		else if ( V_strieq( pBlock, "collisionrules" ) )
 		{
 			IPhysicsCollisionSet *pSet = physics->FindOrCreateCollisionSet( params.modelIndex, ragdoll.listCount );
 			CRagdollCollisionRules rules(pSet);
 			pParse->ParseCustom( (void *)&rules, &rules );
 		}
-		else if ( !strcmpi( pBlock, "animatedfriction") ) 
+		else if ( V_strieq( pBlock, "animatedfriction") ) 
 		{
 			CRagdollAnimatedFriction friction( &ragdoll );
 			pParse->ParseCustom( (void*)&friction, &friction );
@@ -331,7 +331,7 @@ void RagdollSetupCollisions( ragdoll_t &ragdoll, vcollide_t *pCollide, int model
 		while ( !pParse->Finished() )
 		{
 			const char *pBlock = pParse->GetCurrentBlockName();
-			if ( !strcmpi( pBlock, "collisionrules" ) )
+			if ( V_strieq( pBlock, "collisionrules" ) )
 			{
 				IPhysicsCollisionSet *pSetRules = physics->FindOrCreateCollisionSet( modelIndex, ragdoll.listCount );
 				CRagdollCollisionRules rules( pSetRules );
@@ -538,7 +538,7 @@ int RagdollExtractBoneIndices( int *boneIndexOut, CStudioHdr *pStudioHdr, vcolli
 	while ( !pParse->Finished() )
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();
-		if ( !strcmpi( pBlock, "solid" ) )
+		if ( V_strieq( pBlock, "solid" ) )
 		{
 			solid_t solid;
 			pParse->ParseSolid( &solid, NULL );

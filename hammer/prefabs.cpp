@@ -205,11 +205,11 @@ CPrefab::pfiletype_t CPrefab::CheckFileType(LPCTSTR pszFilename)
 	const char *p = strrchr(pszFilename, '.');
 	if(p)
 	{
-		if(!strcmpi(p, ".rmf"))
+		if(V_strieq(p, ".rmf"))
 			return pftRMF;
-		else if(!strcmpi(p, ".map"))
+		else if(V_strieq(p, ".map"))
 			return pftMAP;
-		else if(!strcmpi(p, ".os"))
+		else if(V_strieq(p, ".os"))
 			return pftScript;
 	}
 
@@ -598,7 +598,7 @@ CPrefabLibraryRMF::~CPrefabLibraryRMF()
 //-----------------------------------------------------------------------------
 bool CPrefabLibraryRMF::IsFile(const char *szFilename)
 {
-	return(strcmpi(m_strOpenFileName, szFilename) == 0);
+	return V_strieq(m_strOpenFileName, szFilename);
 }
 
 
@@ -935,7 +935,7 @@ CPrefabLibraryVMF::~CPrefabLibraryVMF()
 //-----------------------------------------------------------------------------
 bool CPrefabLibraryVMF::IsFile(const char *szFilename)
 {
-	return(strcmpi(m_szFolderName, szFilename) == 0);
+	return V_strieq(m_szFolderName, szFilename);
 }
 
 

@@ -7979,7 +7979,7 @@ static BOOL ReplaceTexFunc(CMapSolid *pSolid, ReplaceTexInfo_t *pInfo)
 		{
 			case 0:	// replace exact matches only:
 			{
-				if(!strcmpi(pszFaceTex, pInfo->szFind))
+				if(V_strieq(pszFaceTex, pInfo->szFind))
 				{
 					if(bMarkOnly)
 					{

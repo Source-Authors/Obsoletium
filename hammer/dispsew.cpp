@@ -341,7 +341,7 @@ void AverageVectorFieldData( CMapDisp *pDisp1, int ndx1, CMapDisp *pDisp2, int n
 	char szMatName2[128];
 	pFace1->GetTexture()->GetShortName( szMatName1 );
 	pFace2->GetTexture()->GetShortName( szMatName2 );
-	if ( !strcmpi( szMatName1, szMatName2 ) )
+	if ( V_strieq( szMatName1, szMatName2 ) )
 	{
 		// Grab the alphas at the points and average them.
 		float flAlpha1, flAlpha2;
@@ -408,7 +408,7 @@ void BlendVectorFieldData( CMapDisp *pDisp1, int ndxSrc1, int ndxDst1,
 	char szMatName2[128];
 	pFace1->GetTexture()->GetShortName( szMatName1 );
 	pFace2->GetTexture()->GetShortName( szMatName2 );
-	if ( !strcmpi( szMatName1, szMatName2 ) )
+	if ( V_strieq( szMatName1, szMatName2 ) )
 	{
 		float flAlpha1, flAlpha2;
 		flAlpha1 = pDisp1->GetAlpha( ndxDst1 );

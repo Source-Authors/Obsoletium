@@ -2392,7 +2392,7 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 		}
 
 		const char *pEntity = ValueForKey( entity, "classname" );
-		if ( strcmpi( pEntity, "worldspawn" ) == 0 )
+		if ( V_strieq( pEntity, "worldspawn" ) )
 		{
 			WorldspawnEnt = entity;
 		}
@@ -2434,7 +2434,7 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 				}
 			}
 
-			if ( strcmpi( pEntity, "func_simpleladder" ) == 0 )
+			if ( V_strieq( pEntity, "func_simpleladder" ) )
 			{	// hate having to do this, but the key values are so screwed up
 				AddLadderKeys( entity );
 /*				Vector	vInNormal, vOutNormal;
@@ -2557,7 +2557,7 @@ bool LoadMapFile( const char *pszFileName )
 	g_nMapFileVersion = 400;
 
 	const char *pszExtension =V_GetFileExtension( pszFileName );
-	if ( pszExtension && strcmpi( pszExtension, "vmm" ) == 0 )
+	if ( pszExtension && V_strieq( pszExtension, "vmm" ) )
 	{
 		pMainManifest = new CManifest();
 		if ( pMainManifest->LoadVMFManifest( pszFileName ) )

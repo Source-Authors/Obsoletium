@@ -1745,7 +1745,7 @@ static int SoundStateIndexFromName( const char *pName )
 	for ( int i = 0; i < SS_NUM_STATES; i++ )
 	{
 		Assert( i < static_cast<int>(ARRAYSIZE(pSoundStateNames)) );
-		if ( !strcmpi( pSoundStateNames[i], pName ) )
+		if ( V_strieq( pSoundStateNames[i], pName ) )
 			return i;
 	}
 	return -1;
@@ -2619,7 +2619,7 @@ void CVehicleSoundsParser::ParseKeyValue( void *pData, const char *pKey, const c
 {
 	vehiclesounds_t *pSounds = (vehiclesounds_t *)pData;
 	// New gear?
-	if ( !strcmpi( pKey, "gear" ) )
+	if ( V_strieq( pKey, "gear" ) )
 	{
 		// Create, initialize, and add a new gear to our list
 		intp iNewGear = pSounds->pGears.AddToTail();
@@ -2640,11 +2640,11 @@ void CVehicleSoundsParser::ParseKeyValue( void *pData, const char *pKey, const c
 		// Remember which gear we're reading data from
 		m_iCurrentGear = iNewGear;
 	}
-	else if ( !strcmpi( pKey, "state" ) )
+	else if ( V_strieq( pKey, "state" ) )
 	{
 		m_iCurrentState = 0;
 	}
-	else if ( !strcmpi( pKey, "crashsound" ) )
+	else if ( V_strieq( pKey, "crashsound" ) )
 	{
 		m_iCurrentCrashSound = pSounds->crashSounds.AddToTail();
 		pSounds->crashSounds[m_iCurrentCrashSound].flMinSpeed = 0;
@@ -2661,12 +2661,12 @@ void CVehicleSoundsParser::ParseKeyValue( void *pData, const char *pKey, const c
 			Assert( m_iCurrentGear < pSounds->pGears.Count() );
 
 			// Check gear keys
-			if ( !strcmpi( pKey, "max_speed" ) )
+			if ( V_strieq( pKey, "max_speed" ) )
 			{
 				pSounds->pGears[m_iCurrentGear].flMaxSpeed = strtof( pValue, nullptr );
 				return;
 			}
-			if ( !strcmpi( pKey, "speed_approach_factor" ) )
+			if ( V_strieq( pKey, "speed_approach_factor" ) )
 			{
 				pSounds->pGears[m_iCurrentGear].flSpeedApproachFactor = strtof( pValue, nullptr );
 				return;
@@ -2677,19 +2677,19 @@ void CVehicleSoundsParser::ParseKeyValue( void *pData, const char *pKey, const c
 
 		if ( m_iCurrentState >= 0 )
 		{
-			if ( !strcmpi( pKey, "name" ) )
+			if ( V_strieq( pKey, "name" ) )
 			{
 				m_iCurrentState = SoundStateIndexFromName( pValue );
 				pSounds->iszStateSounds[m_iCurrentState] = NULL_STRING;
 				pSounds->minStateTime[m_iCurrentState] = 0.0f;
 				return;
 			}
-			else if ( !strcmpi( pKey, "sound" ) )
+			else if ( V_strieq( pKey, "sound" ) )
 			{
 				pSounds->iszStateSounds[m_iCurrentState] = AllocPooledString(pValue);
 				return;
 			}
-			else if ( !strcmpi( pKey, "min_time" ) )
+			else if ( V_strieq( pKey, "min_time" ) )
 			{
 				pSounds->minStateTime[m_iCurrentState] = strtof( pValue, nullptr );
 				return;
@@ -2700,22 +2700,22 @@ void CVehicleSoundsParser::ParseKeyValue( void *pData, const char *pKey, const c
 
 		if ( m_iCurrentCrashSound >= 0 )
 		{
-			if ( !strcmpi( pKey, "min_speed" ) )
+			if ( V_strieq( pKey, "min_speed" ) )
 			{
 				pSounds->crashSounds[m_iCurrentCrashSound].flMinSpeed = strtof( pValue, nullptr );
 				return;
 			}
-			else if ( !strcmpi( pKey, "sound" ) )
+			else if ( V_strieq( pKey, "sound" ) )
 			{
 				pSounds->crashSounds[m_iCurrentCrashSound].iszCrashSound = AllocPooledString(pValue);
 				return;
 			}
-			else if ( !strcmpi( pKey, "min_speed_change" ) )
+			else if ( V_strieq( pKey, "min_speed_change" ) )
 			{
 				pSounds->crashSounds[m_iCurrentCrashSound].flMinDeltaSpeed = strtof( pValue, nullptr );
 				return;
 			}
-			else if ( !strcmpi( pKey, "gear_limit" ) )
+			else if ( V_strieq( pKey, "gear_limit" ) )
 			{
 				pSounds->crashSounds[m_iCurrentCrashSound].gearLimit = atoi(pValue);
 				return;
@@ -2725,7 +2725,7 @@ void CVehicleSoundsParser::ParseKeyValue( void *pData, const char *pKey, const c
 
 		for ( i = 0; i < VS_NUM_SOUNDS; i++ )
 		{
-			if ( !strcmpi( pKey, vehiclesound_parsenames[i] ) )
+			if ( V_strieq( pKey, vehiclesound_parsenames[i] ) )
 			{
 				pSounds->iszSound[i] = AllocPooledString(pValue);
 				return;

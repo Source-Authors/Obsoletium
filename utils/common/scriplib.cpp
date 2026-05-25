@@ -226,7 +226,7 @@ static bool AddMacroToStack( char *macroname, char (&out)[MAXTOKEN] )
 	int i;
 	for (i = 0; i < nummacros; i++)
 	{
-		if (strcmpi( macrolist[i]->filename, &macroname[1] ) == 0)
+		if (V_strieq( macrolist[i]->filename, &macroname[1] ))
 		{
 			break;
 		}

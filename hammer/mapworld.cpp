@@ -1768,7 +1768,7 @@ CMapEntity *CMapWorld::FindEntityByName( const char *pszName, bool bVisiblesOnly
 							continue;
 						}
 
-						if ( strcmpi( pszName, InstancePos + 1 ) == 0 )
+						if ( V_strieq( pszName, InstancePos + 1 ) )
 						{
 							return pEntity;
 						}

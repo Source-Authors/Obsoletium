@@ -373,7 +373,7 @@ IEditorTexture *CTextureSystem::FindActiveTexture(LPCSTR pszInputName, int *piIn
 		for (intp nDummy = 0; nDummy < nDummyCount; nDummy++)
 		{
 			IEditorTexture *pTexDummy = m_pActiveContext->Dummies.Element(nDummy);
-			if (!strcmpi(pszName, pTexDummy->GetName()))
+			if (V_strieq(pszName, pTexDummy->GetName()))
 			{
 				m_pLastTex = pTexDummy;
 				m_nLastIndex = -1;
@@ -487,7 +487,7 @@ void CTextureSystem::SetActiveGroup(const char *pcszName)
 	for (intp i = 0; i < iCount; i++)
 	{
 		CTextureGroup *pGroup = m_pActiveContext->Groups.Element(i);
-		if (!strcmpi(pGroup->GetName(), pcszName))
+		if (V_strieq(pGroup->GetName(), pcszName))
 		{
 			m_pActiveGroup = pGroup;
 			return;

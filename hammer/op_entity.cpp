@@ -2781,7 +2781,7 @@ void COP_Entity::AssignClassDefaults(GDclass *pClass, GDclass *pOldClass)
 		LPCTSTR p = m_kv.GetValue(pVar->GetName(), &iIndex);
 		
 		// Always reset spawnflags.
-		if (!strcmpi(pVar->GetName(), SPAWNFLAGS_KEYNAME))
+		if (V_strieq(pVar->GetName(), SPAWNFLAGS_KEYNAME))
 		{
 			unsigned long nOriginalFlagsValue = 0;
 			if (p)

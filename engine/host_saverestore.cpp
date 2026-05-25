@@ -2449,7 +2449,7 @@ void CSaveRestore::LoadAdjacentEnts( const char *pOldLevel, const char *pLandmar
 
 		// make sure the previous level is in the connection list so we can
 		// bring over the player.
-		if ( !strcmpi( mapName, pOldLevel ) )
+		if ( V_strieq( mapName, pOldLevel ) )
 		{
 			foundprevious = true;
 		}
