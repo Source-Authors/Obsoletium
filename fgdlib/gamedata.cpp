@@ -713,7 +713,7 @@ bool GameData::RemapKeyValue( const char *pszKey, const char *pszInValue, OUT_Z_
 			break;
 	}
 
-	return ( strcmpi( pszInValue, pszOutValue ) != 0 );
+	return !V_strieq( pszInValue, pszOutValue );
 }
 
 
@@ -747,7 +747,7 @@ bool GameData::RemapNameField( const char *pszInValue, OUT_Z_CAP(outLen) char *p
 		}
 	}
 
-	return ( strcmpi( pszInValue, pszOutValue ) != 0 );
+	return !V_strieq( pszInValue, pszOutValue );
 }
 
 

@@ -64,6 +64,7 @@ class XStr {
 
 #include "tier0/platform.h"
 #include "tier1/utlvector.h"
+#include "tier1/strtools.h"
 
 namespace se::vprojtomake {
 
@@ -657,7 +658,7 @@ bool CVCProjConvert::ExtractFiles(IXMLDOMDocument *pDoc) {
 #ifdef _LINUX
 static char fileName[MAX_PATH];
 int CheckName(const struct dirent *dir) {
-  return !strcasecmp(dir->d_name, fileName);
+  return V_strieq(dir->d_name, fileName) ? 1 : 0;
 }
 
 const char *findFileInDirCaseInsensitive(const char *file) {

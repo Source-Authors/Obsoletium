@@ -814,7 +814,7 @@ static int __cdecl SortTexturesProc(IEditorTexture * const *elem1, IEditorTextur
 	Assert((pElem1 != NULL) && (pElem2 != NULL));
 	if ((pElem1 == NULL) || (pElem2 == NULL))
 	{
-		return(0);
+		return 0;
 	}
 
 	const char *pszName1 = pElem1->GetName();
@@ -829,9 +829,9 @@ static int __cdecl SortTexturesProc(IEditorTexture * const *elem1, IEditorTextur
 		int iFamily = strnicmp(pszName1+2, pszName2, iFamilyLen);
 		if (!iFamily)
 		{
-			return(-1);	// same family - put elem1 before elem2
+			return -1;	// same family - put elem1 before elem2
 		}
-		return(iFamily);	// sort normally
+		return iFamily;	// sort normally
 	}
 	else if (!IsSortChr(ch1) && IsSortChr(ch2))
 	{
@@ -839,9 +839,9 @@ static int __cdecl SortTexturesProc(IEditorTexture * const *elem1, IEditorTextur
 		int iFamily = strnicmp(pszName1, pszName2+2, iFamilyLen);
 		if (!iFamily)
 		{
-			return(1);	// same family - put elem2 before elem1
+			return 1;	// same family - put elem2 before elem1
 		}
-		return(iFamily);	// sort normally
+		return iFamily;	// sort normally
 	}
 	else if (IsSortChr(ch1) && IsSortChr(ch2))
 	{
@@ -855,10 +855,10 @@ static int __cdecl SortTexturesProc(IEditorTexture * const *elem1, IEditorTextur
 		}
 
 		// different family
-		return(iFamily);
+		return iFamily;
 	}
 
-	return(strcmpi(pszName1, pszName2));
+	return strcmpi(pszName1, pszName2);
 }
 
 

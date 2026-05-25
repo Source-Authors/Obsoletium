@@ -758,7 +758,7 @@ void SewCorner_ResolveDisp( SewCornerData_t *pCornerData )
 		else
 		{
 			pFace->GetTexture()->GetShortName( szMatName2 );
-			if ( strcmpi( szMatName1, szMatName2 ) )
+			if ( !V_strieq( szMatName1, szMatName2 ) )
 			{
 				bBlendAlpha = false;
 				break;

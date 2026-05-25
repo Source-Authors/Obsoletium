@@ -2168,7 +2168,7 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionSmoothAmount()
 
 	V_sprintf_safe( t2, "%g%%", m_SmoothAmount * 100.0f );
 
-	if ( strcmpi( temp, t2 ) != 0 )
+	if ( !V_strieq( temp, t2 ) )
 	{
 		m_SmoothAmountControl.SetWindowText( t2 );
 	}
@@ -2193,7 +2193,7 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionOffsetAmount()
 
 	V_sprintf_safe( t2, "%g%%", m_OffsetAmount * 100.0f );
 
-	if ( strcmpi( temp, t2 ) != 0 )
+	if ( !V_strieq( temp, t2 ) )
 	{
 		m_OffsetAmountControl.SetWindowText( t2 );
 	}
@@ -2219,7 +2219,7 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionFalloffPosition()
 
 	V_sprintf_safe( t2, "%g%%", m_flFalloffSpot * 100.0f );
 
-	if ( strcmpi( temp, t2 ) != 0 )
+	if ( !V_strieq( temp, t2 ) )
 	{
 		m_FalloffPositionControl.SetWindowText( t2 );
 	}
@@ -2245,7 +2245,7 @@ void CSculptPushOptions::OnEnKillfocusSculptPushOptionFalloffFinal()
 
 	V_sprintf_safe( t2, "%g%%", m_flFalloffEndingValue * 100.0f );
 
-	if ( strcmpi( temp, t2 ) != 0 )
+	if ( !V_strieq( temp, t2 ) )
 	{
 		m_FalloffFinalControl.SetWindowText( t2 );
 	}
@@ -3218,7 +3218,7 @@ void CSculptCarveOptions::OnEnKillfocusSculptPushOptionSmoothAmount()
 
 	V_sprintf_safe( t2, "%g%%", m_SmoothAmount * 100.0f );
 
-	if ( strcmpi( temp, t2 ) != 0 )
+	if ( !V_strieq( temp, t2 ) )
 	{
 		m_SmoothAmountControl.SetWindowText( t2 );
 	}
@@ -3243,7 +3243,7 @@ void CSculptCarveOptions::OnEnKillfocusSculptPushOptionOffsetAmount()
 
 	V_sprintf_safe( t2, "%g%%", m_OffsetAmount * 100.0f );
 
-	if ( strcmpi( temp, t2 ) != 0 )
+	if ( !V_strieq( temp, t2 ) )
 	{
 		m_OffsetAmountControl.SetWindowText( t2 );
 	}

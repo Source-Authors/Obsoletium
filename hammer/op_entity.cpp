@@ -865,7 +865,7 @@ void COP_Entity::UpdateData( int Mode, PVOID pData, bool bCanEdit )
 		if ( m_bClassSelectionEmpty )
 			str = "";
 			
-		if (strcmpi(str, pEdit->GetClassName()))
+		if (!V_strieq(str, pEdit->GetClassName()))
 		{
 			//
 			// Not the same - set class to be blank and 
@@ -1305,7 +1305,7 @@ void COP_Entity::PresentProperties()
 			//
 			// Spawnflags are handled separately - don't add that key.
 			//
-			if (strcmpi(pVar->GetName(), SPAWNFLAGS_KEYNAME) != 0)
+			if (!V_strieq(pVar->GetName(), SPAWNFLAGS_KEYNAME))
 			{
 				int iItem = m_VarList.InsertItem( size_cast<int>(i), pVar->GetLongName() );
 				m_VarList.SetItemData( iItem, (DWORD_PTR)pVar->GetName() );
@@ -2868,7 +2868,7 @@ void COP_Entity::UpdateEditClass(const char *pszClass, bool bForce)
 	//
 	// Remove unused keyvalues.
 	//
-	if (m_pEditClass != pOldEditClass && m_pEditClass && pOldEditClass && strcmpi(pszClass, "multi_manager"))
+	if (m_pEditClass != pOldEditClass && m_pEditClass && pOldEditClass && !V_strieq(pszClass, "multi_manager"))
 	{
 		unsigned short iNext;
 		for ( auto i=m_kv.GetFirst(); i != m_kv.GetInvalidIndex(); i=iNext )

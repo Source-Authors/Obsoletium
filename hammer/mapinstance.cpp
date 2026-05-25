@@ -335,7 +335,7 @@ bool CMapInstance::OnApply( void )
 	if ( ent && ent->GetKeyValue( "file" ) )
 	{
 		DeterminePath( MapFileName, ent->GetKeyValue( "file" ), FileName );
-		if ( strcmpi( FileName, m_FileName ) != 0 ) 
+		if ( !V_strieq( FileName, m_FileName ) ) 
 		{
 			bool	bSaveVisible = CHammer::IsNewDocumentVisible();
 

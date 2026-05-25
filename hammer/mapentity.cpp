@@ -66,7 +66,7 @@ static CMapObjectList FoundEntities;
 static BOOL FindKeyValue(CMapEntity *pEntity, MDkeyvalue *pKV)
 {
 	LPCTSTR pszValue = pEntity->GetKeyValue(pKV->szKey);
-	if (!pszValue || strcmpi(pszValue, pKV->szValue))
+	if (!pszValue || !V_strieq(pszValue, pKV->szValue))
 	{
 		return TRUE;
 	}
