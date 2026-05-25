@@ -2938,7 +2938,7 @@ void CTFFileImportDialog::ApplySchemeSettings( vgui::IScheme *pScheme )
 			{
 				for ( int j=0; j<ARRAYSIZE(kPrefabs); ++j )
 				{
-					if ( V_strcmp( kPrefabs[j], pPrefabKeyValues->GetName() ) == 0 )
+					if ( V_streq( kPrefabs[j], pPrefabKeyValues->GetName() ) )
 					{
 						pKeyValues->SetString( kItemPrefab, pPrefabKeyValues->GetName() );
 						m_pTypeComboBox->AddItem( CFmtStr( "#TF_ItemPrefab_%s", pPrefabKeyValues->GetName() ), pKeyValues );
@@ -3595,7 +3595,7 @@ void CTFFileImportDialog::OnCommandEditMaterialDone( int nSkinIndex, int nMateri
 void CTFFileImportDialog::OnCommandEditQC()
 {
 	// The QC template is dependent on the item type, so make sure that's set first
-	if ( V_strcmp( GetItemPrefab(), "" ) == 0 )
+	if ( Q_isempty( GetItemPrefab() ) )
 	{
 		ShowMessageBox( "#TF_SteamWorkshop_Error", "#TF_ImportFile_BuildFailedNoType" );
 		return;
@@ -3622,7 +3622,7 @@ void CTFFileImportDialog::OnCommandEditQC()
 void CTFFileImportDialog::OnCommandEditQCI()
 {
 	// The QC template is dependent on the item type, so make sure that's set first
-	if ( V_strcmp(GetItemPrefab(), "") == 0 )
+	if ( Q_isempty(GetItemPrefab()) )
 	{
 		ShowMessageBox( "#TF_SteamWorkshop_Error", "#TF_ImportFile_BuildFailedNoType" );
 		return;
@@ -6343,12 +6343,12 @@ CTFFileImportDialog::BUILD_RESULT CTFFileImportDialog::Build( BUILD_STAGE buildS
 	// check for build errors
 	if ( !bPreview )
 	{
-		if ( V_strcmp( GetItemName(), "" ) == 0 )
+		if ( Q_isempty( GetItemName() ) )
 		{
 			return BUILD_FAILED_NONAME;
 		}
 
-		if ( V_strcmp( GetItemPrefab(), "" ) == 0 )
+		if ( Q_isempty( GetItemPrefab() ) )
 		{
 			return BUILD_FAILED_NOTYPE;
 		}
@@ -6388,7 +6388,7 @@ CTFFileImportDialog::BUILD_RESULT CTFFileImportDialog::Build( BUILD_STAGE buildS
 			}
 		}
 
-		if ( V_strcmp( GetItemIcon(), "" ) == 0 )
+		if ( Q_isempty( GetItemIcon() ) )
 		{
 			return BUILD_FAILED_NOBACKPACKICON;
 		}

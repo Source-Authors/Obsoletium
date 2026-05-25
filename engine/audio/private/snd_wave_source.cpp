@@ -2099,9 +2099,9 @@ bool CAudioSourceCache::Init( size_t memSize )
 		bool bFound = false;
 		FOR_EACH_VEC( m_vecCaches, idxCache )
 		{
-			if ( V_stricmp( szSearchPath, m_vecCaches[idxCache]->m_szSearchPath ) == 0 )
+			if ( V_strieq( szSearchPath, m_vecCaches[idxCache]->m_szSearchPath ) )
 			{
-				Assert( V_strcmp( szSearchPath, m_vecCaches[idxCache]->m_szSearchPath ) == 0 ); // case *should* match exactly
+				Assert( V_streq( szSearchPath, m_vecCaches[idxCache]->m_szSearchPath ) ); // case *should* match exactly
 				bFound = true;
 				break;
 			}

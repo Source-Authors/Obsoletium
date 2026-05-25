@@ -955,7 +955,7 @@ void CCSGameStats::Event_PlayerKilledOther( CBasePlayer *pAttacker, CBaseEntity 
 		else
 		{
 			//In the case of grenades, the inflictor is the spawned grenade entity.
-			if ( V_strcmp(pInflictor->m_iClassname.ToCStr(), "hegrenade_projectile") == 0 )
+			if ( V_streq(pInflictor->m_iClassname.ToCStr(), "hegrenade_projectile") )
 				weaponId = WEAPON_HEGRENADE;
 		}
 	}

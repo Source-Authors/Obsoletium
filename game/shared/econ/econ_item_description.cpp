@@ -1420,7 +1420,7 @@ void CEconItemDescription::Generate_ItemLevelDesc_Default( const CLocalizationPr
 				bLimitedQuantity = pEconItem->FindAttribute( pAttrDef_LimitedQuantityItem );
 
 #if defined( TF_CLIENT_DLL )
-				if ( pEconItem->GetItemDefinition()->GetItemClass() && V_strcmp( pEconItem->GetItemDefinition()->GetItemClass(), "map_token" ) == 0 )
+				if ( pEconItem->GetItemDefinition()->GetItemClass() && V_streq( pEconItem->GetItemDefinition()->GetItemClass(), "map_token" ) )
 				{
 					// For map stamps on the client we can show how many hours they've played each map
 					// And how many times they've donated to it instead of the generic "level"

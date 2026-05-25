@@ -196,7 +196,7 @@ bool CPublishTester::Test_Protocol( const char *pDescription, const char *pProto
 	int i = 0;
 	while ( pAcceptableProtocols[ i ] )
 	{
-		if ( V_strcmp( pAcceptableProtocols[ i++ ], pProtocol ) == 0 )
+		if ( V_streq( pAcceptableProtocols[ i++ ], pProtocol ) )
 		{
 			bProtocolOK = true;
 			break;

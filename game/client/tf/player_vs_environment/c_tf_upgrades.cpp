@@ -1393,7 +1393,7 @@ void CHudUpgradePanel::UpdateHighlights( void )
 			vgui::Panel *pTabPanel = pMouseOverPanel;
 
 			bool bIsUpgradeButton = StringHasPrefix( pMouseOverPanel->GetName(), "UpgradeButton" );
-			bool bIsPlayerUpgradeButton = V_strcmp( pMouseOverPanel->GetName(), "PlayerUpgradeButton" ) == 0;
+			bool bIsPlayerUpgradeButton = V_streq( pMouseOverPanel->GetName(), "PlayerUpgradeButton" );
 
 			if ( bIsPlayerUpgradeButton )
 			{

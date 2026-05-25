@@ -1483,7 +1483,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		int nOldPreviousMap = ( nOldCycleIndex == 0 ) ? ( m_MapList.Count() - 1 ) : ( nOldCycleIndex - 1 );
 		if ( nOldCycleIndex >= 0 && nOldCycleIndex < m_MapList.Count() &&
 		     nOldPreviousMap >= 0 && nOldPreviousMap < m_MapList.Count() &&
-		     V_strcmp( STRING( gpGlobals->mapname ), m_MapList[ nOldPreviousMap ] ) == 0 )
+		     V_streq( STRING( gpGlobals->mapname ), m_MapList[ nOldPreviousMap ] ) )
 		{
 			// The old index is still valid, and falls after our current map in the new cycle, use it
 			m_nMapCycleindex = nOldCycleIndex;
@@ -1493,7 +1493,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 			// Otherwise, if the current map selection is in the list, set m_nMapCycleindex to the map that follows it.
 			for ( intp i = 0; i < m_MapList.Count(); i++ )
 			{
-				if ( V_strcmp( STRING( gpGlobals->mapname ), m_MapList[i] ) == 0 )
+				if ( V_streq( STRING( gpGlobals->mapname ), m_MapList[i] ) )
 				{
 					m_nMapCycleindex = i;
 					IncrementMapCycleIndex();

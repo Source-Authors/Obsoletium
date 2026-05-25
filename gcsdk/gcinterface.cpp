@@ -390,7 +390,7 @@ void CGCInterface::InitConVars( KeyValues *pkvConvars )
 
 		ConVar *pVar = NULL;
 		const char *pchSuffix = V_strrchr( pkvVar->GetName(), '_' );
-		if ( NULL != pchSuffix && 0 == V_strcmp( pchSuffix, CFmtStr( "_%u", GetAppID() ) ) )
+		if ( NULL != pchSuffix && V_streq( pchSuffix, CFmtStr( "_%u", GetAppID() ) ) )
 		{
 			pVar = g_pCVar->FindVar( pkvVar->GetName() );
 		}

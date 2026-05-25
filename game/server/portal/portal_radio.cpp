@@ -498,7 +498,7 @@ void CSpawnDinosaurHack::LevelInitPostEntity()
 	for ( int i = 0; i < ARRAYSIZE( s_radiolocs ); ++i )
 	{
 		radiolocs loc = s_radiolocs[i];
-		if ( V_strcmp( STRING(gpGlobals->mapname), loc.mapname ) == 0 )
+		if ( V_streq( STRING(gpGlobals->mapname), loc.mapname ) )
 		{
 #if defined ( RADIO_DEBUG_SERVER )
 			Msg( "Found Dinosaur and signal info for %s, spawning.\n", loc.mapname );
@@ -544,7 +544,7 @@ CPortal_Dinosaur *CSpawnDinosaurHack::SpawnDinosaur( radiolocs& loc )
 		CPhysicsProp *pOldDinosaur	= (CPhysicsProp*)gEntList.FindEntityByClassname( NULL, "prop_physics" );
 		while ( pOldDinosaur )
 		{
-			if ( V_strcmp( STRING( pOldDinosaur->GetModelName() ), RADIO_MODEL_NAME ) == 0 )
+			if ( V_streq( STRING( pOldDinosaur->GetModelName() ), RADIO_MODEL_NAME ) )
 			{
 				vSpawnPos = pOldDinosaur->GetAbsOrigin();
 				vSpawnAng = pOldDinosaur->GetAbsAngles();
@@ -603,7 +603,7 @@ CDinosaurSignal *CSpawnDinosaurHack::SpawnSignal( radiolocs& loc )
 
 void CSpawnDinosaurHack::ApplyMapSpecificHacks()
 {
-	if ( V_strcmp( STRING(gpGlobals->mapname), "testchmb_a_02" ) == 0 )
+	if ( V_streq( STRING(gpGlobals->mapname), "testchmb_a_02" ) )
 	{
 		CBaseEntity *pFilter = CreateEntityByName( "filter_activator_name" );
 		Assert( pFilter );

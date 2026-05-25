@@ -3826,7 +3826,7 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 		return false;
 	}
 
-	const bool bEnableMapAccess = V_strcmp(sv.GetMapName(), szMapName) == 0;
+	const bool bEnableMapAccess = V_streq(sv.GetMapName(), szMapName);
 	const LocalMapAccessScope mapscope{ bEnableMapAccess, g_pFileSystem };
 
 	g_pFileSystem->AsyncFinishAll();

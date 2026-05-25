@@ -1038,8 +1038,8 @@ ConVar cl_autohelp(
 
 		// [tj] used to determine which achievement to award for sufficient kills
 		CBaseEntity* pInflictor = info.GetInflictor();
-		bool isGrenade = pInflictor && V_strcmp(pInflictor->GetClassname(), "hegrenade_projectile") == 0;
-		bool isBomb = pInflictor && V_strcmp(pInflictor->GetClassname(), "planted_c4") == 0;
+		bool isGrenade = pInflictor && V_streq(pInflictor->GetClassname(), "hegrenade_projectile");
+		bool isBomb = pInflictor && V_streq(pInflictor->GetClassname(), "planted_c4");
          
         //=============================================================================
         // HPE_END

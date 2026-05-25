@@ -498,7 +498,7 @@ void CTFGameStats::SendStatsToPlayer( CTFPlayer *pPlayer, bool bIsAlive )
 	for ( int i = 0; i < GetItemSchema()->GetMapCount(); i++ )
 	{
 		const MapDef_t *pMapDef = GetItemSchema()->GetMasterMapDefByIndex( i );
-		if ( V_strcmp( pMapDef->pszMapName, gpGlobals->mapname.ToCStr() ) == 0 )
+		if ( V_streq( pMapDef->pszMapName, gpGlobals->mapname.ToCStr() ) )
 		{
 			iStat = 0;
 			iSendBits = 0;

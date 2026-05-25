@@ -3477,7 +3477,7 @@ void CBaseObject::ReattachChildren( void )
 void CBaseObject::SetModel( const char *pModel )
 {
 	// Skip if we're already the proper model
-	if ( V_strcmp( GetModelName().ToCStr(), pModel ) == 0 )
+	if ( V_streq( GetModelName().ToCStr(), pModel ) )
 		return;
 
 	BaseClass::SetModel( pModel );

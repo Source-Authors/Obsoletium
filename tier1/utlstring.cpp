@@ -146,7 +146,7 @@ bool CUtlString::IsEqual_CaseSensitive( const char *src ) const
 	{
 		return (Length() == 0);
 	}
-	return ( V_strcmp( Get(), src ) == 0 );
+	return V_streq( Get(), src );
 }
 
 bool CUtlString::IsEqual_CaseInsensitive( const char *src ) const
@@ -155,7 +155,7 @@ bool CUtlString::IsEqual_CaseInsensitive( const char *src ) const
 	{
 		return (Length() == 0);
 	}
-	return ( V_stricmp( Get(), src ) == 0 );
+	return V_strieq( Get(), src );
 }
 
 

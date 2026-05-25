@@ -155,7 +155,7 @@ intp CDmeDag::FindChild( const char *name ) const
 	intp nChildren = m_Children.Count();
 	for ( intp ci = 0; ci < nChildren; ++ci )
 	{
-		if ( V_strcmp( m_Children[ ci ]->GetName(), name ) == 0 )
+		if ( V_streq( m_Children[ ci ]->GetName(), name ) )
 			return ci;
 	}
 	return -1;

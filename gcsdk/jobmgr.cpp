@@ -1545,7 +1545,7 @@ void CJobMgr::DumpJobs( const char *pszJobName, int nMax, int nPrintLocksMax ) c
 			break;
 		nMax--;
 
-		if ( pszJobName == NULL || V_strcmp( pszJobName, m_MapJob[iJob]->GetName() ) == 0 )
+		if ( pszJobName == NULL || V_streq( pszJobName, m_MapJob[iJob]->GetName() ) )
 		{
 			DumpJob( m_MapJob.Key(iJob), nPrintLocksMax );
 		}

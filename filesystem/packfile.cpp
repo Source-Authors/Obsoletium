@@ -417,8 +417,8 @@ void CZipPackFile::GetFileAndDirLists( const char *pRawWildCard, CUtlStringList 
 	// there's no one point where we implement it, so rather than trying to match one of our broken implementations
 	// (windows stdio is the only one I could find that was actually right), I'm going with "you shouldn't use this API
 	// for that".
-	bool bBaseWildcard = ( V_strcmp( szWildCardBase, "*" ) == 0 );
-	bool bExtWildcard = ( V_strcmp( szWildCardExt, "*" ) == 0 );
+	bool bBaseWildcard = V_streq( szWildCardBase, "*" );
+	bool bExtWildcard = V_streq( szWildCardExt, "*" );
 
 	if ( !bWildcardHasExt && bBaseWildcard )
 	{

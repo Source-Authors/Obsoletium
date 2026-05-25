@@ -963,9 +963,9 @@ CUtlString D3DToGL::GetParameterString( uint32 dwToken, uint32 dwSourceOrDest, b
 // If the register happens to end with ".xyzw", then this strips off the mask.
 void SimplifyFourParamRegister( char *pRegister )
 {
-	int nLen = V_strlen( pRegister );
-	if ( nLen > 5 && V_strcmp( &pRegister[nLen-5], ".xyzw" ) == 0 )
-		pRegister[nLen-5] = 0;
+	intp nLen = V_strlen( pRegister );
+	if ( nLen > 5 && V_streq( &pRegister[nLen-5], ".xyzw" ) )
+		pRegister[nLen-5] = '\0';
 }
 
 

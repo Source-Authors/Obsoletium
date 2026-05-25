@@ -7547,7 +7547,7 @@ CSWeaponID CCSPlayer::GetWeaponIdCausingDamange( const CTakeDamageInfo &info )
 
 		return pAttackerWeapon->GetWeaponID();
 	}
-	else if (pInflictor && V_strcmp(pInflictor->GetClassname(), "hegrenade_projectile") == 0)
+	else if (pInflictor && V_streq(pInflictor->GetClassname(), "hegrenade_projectile"))
 	{
 		return WEAPON_HEGRENADE;
 	}
