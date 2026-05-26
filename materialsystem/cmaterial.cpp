@@ -3405,7 +3405,7 @@ bool AccumulateRecursiveVmtPatches( KeyValues &patchKeyValuesOut, KeyValues **pp
 
 	patchKeyValuesOut.Clear();
 
-	if ( V_stricmp( keyValues.GetName(), "patch" ) != 0 )
+	if ( !V_strieq( keyValues.GetName(), "patch" ) )
 	{
 		// Not a patch file, nothing to do
 		if ( ppBaseKeyValuesOut )

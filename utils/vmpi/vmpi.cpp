@@ -683,8 +683,8 @@ void VMPI_ReceiveExeName() {
 
   // Unless we're a vmpi_transfer.. vmpi_transfer can always connect.
   V_FileBase(baseExeFilename, fileBase);
-  if (V_stricmp(fileBase, "vmpi_transfer") != 0) {
-    if (V_stricmp(fileBase, g_MasterExeName) != 0) {
+  if (!V_strieq(fileBase, "vmpi_transfer")) {
+    if (!V_strieq(fileBase, g_MasterExeName)) {
       Error(
           "VMPI_ReceiveExeName: mismatched exe names (master: %s, me: "
           "%s).\nThis usually just means the master finished"
@@ -781,7 +781,7 @@ void CMasterBroadcaster::GetPatchWorkerList(int argc, char **argv) {
   m_PatchWorkerIPs.Purge();
 
   for (int i = 0; i < argc - 1; i++) {
-    if (V_stricmp(argv[i], "-mpi_PatchWorkers") == 0) {
+    if (V_strieq(argv[i], "-mpi_PatchWorkers")) {
       int workerCount = atoi(argv[i + 1]);
 
       for (int iWorker = 0; iWorker < workerCount; iWorker++) {
@@ -1452,7 +1452,7 @@ bool IsValidSDKBinPath(CUtlVector<char *> &outStrings, int *pError) {
   intp counter_shift = 0;
 
 #ifdef PLATFORM_64BITS
-  if (V_stricmp(outStrings[outStrings.Count() - 2], "x64") != 0) {
+  if (!V_strieq(outStrings[outStrings.Count() - 2], "x64")) {
     *pError = 1;
     return false;
   }
@@ -1460,20 +1460,19 @@ bool IsValidSDKBinPath(CUtlVector<char *> &outStrings, int *pError) {
   counter_shift = 1;
 #endif
 
-  if (V_stricmp(outStrings[outStrings.Count() - 2 - counter_shift], "bin") !=
-      0) {
+  if (!V_strieq(outStrings[outStrings.Count() - 2 - counter_shift], "bin")) {
     *pError = 1;
     return false;
   }
 
-  if (V_stricmp(outStrings[outStrings.Count() - 5 - counter_shift],
-                "sourcesdk") != 0) {
+  if (!V_strieq(outStrings[outStrings.Count() - 5 - counter_shift],
+                "sourcesdk")) {
     *pError = 2;
     return false;
   }
 
-  if (V_stricmp(outStrings[outStrings.Count() - 7 - counter_shift],
-                "steamapps") != 0) {
+  if (!V_strieq(outStrings[outStrings.Count() - 7 - counter_shift],
+                "steamapps")) {
     *pError = 3;
     return false;
   }

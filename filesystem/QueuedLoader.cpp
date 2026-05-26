@@ -658,7 +658,7 @@ bool CQueuedLoader::CResourceNameLessFunc::Less( const FileNameHandle_t &hFilena
 			{
 				return ( bIsCubemapLHS == true && bIsCubemapRHS == false );
 			}
-			return ( V_stricmp( pNameLHS, pNameRHS ) < 0 );
+			return V_stricmp( pNameLHS, pNameRHS ) < 0;
 		}
 		break;
 

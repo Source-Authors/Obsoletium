@@ -109,7 +109,7 @@ static KeyValues *HandleKeyValuesMacro_Insert( KeyValues *pkvInsert, KeyValues *
 {
 	const char *pszName = pkvInsert->GetName();
 
-	if ( V_stricmp( "#insert", pszName ) != 0 )
+	if ( !V_strieq( "#insert", pszName ) )
 		return nullptr;
 
 	// Have an #insert key
@@ -371,7 +371,7 @@ static KeyValues *HandleKeyValuesMacro_Update( KeyValues *pkvUpdate, KeyValues *
 {
 	const char *pszName = pkvUpdate->GetName();
 
-	if ( V_stricmp( "#update", pszName ) != 0 )
+	if ( !V_strieq( "#update", pszName ) )
 		return nullptr;
 
 	// Have an #update key

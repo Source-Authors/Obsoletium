@@ -725,7 +725,7 @@ void CTFParty::SetSearchMannUpTourName( const char *pszTourName )
 {
 	if ( pszTourName == NULL )
 		pszTourName = "";
-	if ( V_stricmp( Obj().search_mvm_mannup_tour().c_str(), pszTourName ) != 0 )
+	if ( !V_strieq( Obj().search_mvm_mannup_tour().c_str(), pszTourName ) )
 	{
 		EmitInfo( SPEW_GC, MATCHMAKING_SPEWLEVEL4, LOG_ALWAYS, "Party %016llx SetSearchMannUpTourName(%s)\n", Obj().party_id(), pszTourName );
 		Obj().set_search_mvm_mannup_tour( pszTourName );

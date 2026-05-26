@@ -487,7 +487,7 @@ void CGCAccess::ReportSystems( const char* pszContext, EDisplay eDisplay ) const
 		{
 			const CGCAccessSystem::TrackedJob_t& job = pSystem->m_Jobs[ nJob ];
 			//skip any contexts we don't care about
-			if( pszContext && ( V_stricmp( pszContext, job.m_sContext ) != 0 ) )
+			if( pszContext && !V_strieq( pszContext, job.m_sContext ) )
 				continue;		
 
 			stats.Add( job.m_Stats );
@@ -522,7 +522,7 @@ void CGCAccess::FullReport( const char* pszSystemFilter, const char* pszContextF
 	FOR_EACH_MAP_FAST( m_Systems, nSystem )
 	{
 		const CGCAccessSystem* pSystem = m_Systems[ nSystem ];
-		if( pszSystemFilter && V_stricmp( pszSystemFilter, pSystem->m_sName ) )
+		if( pszSystemFilter && !V_strieq( pszSystemFilter, pSystem->m_sName ) )
 			continue;
 
 		FOR_EACH_MAP_FAST( pSystem->m_Jobs, nJob )
@@ -533,9 +533,9 @@ void CGCAccess::FullReport( const char* pszSystemFilter, const char* pszContextF
 
 			if( !ShouldDisplayStats( eDisplay, stats ) )
 				continue;			
-			if( pszJobFilter && V_stricmp( pszJobFilter, pszJob ) )
+			if( pszJobFilter && !V_strieq( pszJobFilter, pszJob ) )
 				continue;
-			if( pszContextFilter && V_stricmp( pszContextFilter, pszContext ) )
+			if( pszContextFilter && !V_strieq( pszContextFilter, pszContext ) )
 				continue;
 
 			rp.StrValue( pszJob, CFmtStr( "gcaccess_dump_job \"%s\" %d", pszJob, eDisplay ).String() );

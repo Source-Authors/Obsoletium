@@ -396,7 +396,7 @@ bool CGenericPersistentManager< T >::Load()
 				while ( pFilename )
 				{
 					// Ignore index file
-					if ( V_stricmp( pFilename, GetIndexFilename() ) )
+					if ( !V_strieq( pFilename, GetIndexFilename() ) )
 					{
 						if ( !ReadObjFromFile( pFilename ) )
 						{

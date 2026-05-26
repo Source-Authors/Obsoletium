@@ -583,7 +583,7 @@ int DebugDrawModelTexCoord( IStudioRender *pStudioRender, const char *pMaterialN
 	for( intp batchID = 0; batchID < tris.m_MaterialBatches.Count(); batchID++ )
 	{
 		GetTriangles_MaterialBatch_t &materialBatch = tris.m_MaterialBatches[batchID];
-		if ( !materialBatch.m_Verts.Count() || V_stricmp(materialBatch.m_pMaterial->GetName(), pMaterialName) )
+		if ( !materialBatch.m_Verts.Count() || !V_strieq(materialBatch.m_pMaterial->GetName(), pMaterialName) )
 			continue;
 		batchList.AddToTail(batchID);
 	}

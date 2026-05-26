@@ -212,17 +212,17 @@ entity_t *FindEntity( KeyValues *pEntity )
 			const char *pMatchClassName = ValueForKey( &entities[i], "classname" );
 			if ( !pMatchClassName || !pMatchClassName[0] )
 				continue;
-			if ( V_stricmp( pClassName, pMatchClassName ) )
+			if ( !V_strieq( pClassName, pMatchClassName ) )
 				continue;
 
 			const char *pOrigin = "(na)";
-			if ( V_stricmp( pClassName, "worldspawn" ) ) // allow worldspawn to match all
+			if ( !V_strieq( pClassName, "worldspawn" ) ) // allow worldspawn to match all
 			{
 				pOrigin = pEntity->GetString( "origin" );
 				const char *pMatchOrigin = ValueForKey( &entities[i], "origin" );
 				if ( !pMatchOrigin || !pMatchOrigin[0] )
 					continue;
-				if ( V_stricmp( pOrigin, pMatchOrigin ) )
+				if ( !V_strieq( pOrigin, pMatchOrigin ) )
 					continue;
 			}
 

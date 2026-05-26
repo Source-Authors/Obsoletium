@@ -316,7 +316,7 @@ public:
 			return NULL;
 
 		// assert that the specified vpanel is from the same module as requesting the cast
-		if ( !vguiPanel || V_stricmp(GetModuleName(vguiPanel), moduleName) )
+		if ( !vguiPanel || !V_strieq(GetModuleName(vguiPanel), moduleName) )
 		{
 			// Assert(!("GetPanel() used to retrieve a Panel * from a different dll than which which it was created. This is bad, you can't pass Panel * across dll boundaries else you'll break the versioning.  Please only use a VPANEL."));
 			// this is valid for now

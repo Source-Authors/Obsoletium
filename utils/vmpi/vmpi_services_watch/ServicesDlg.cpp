@@ -680,7 +680,7 @@ void CServicesDlg::SendToSelectedServices( const char *pData, int len )
 void UpdateItemText( CListCtrl &ctrl, int iItem, int iColumn, const char *pNewVal )
 {
 	CString str = ctrl.GetItemText( iItem, iColumn );
-	if ( V_stricmp( str, pNewVal ) != 0 )
+	if ( !V_strieq( str, pNewVal ) )
 		ctrl.SetItemText( iItem, iColumn, pNewVal );
 }
 

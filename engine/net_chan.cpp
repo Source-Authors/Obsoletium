@@ -3195,11 +3195,11 @@ bool CNetChan::IsValidFileForTransfer( const char *pszFilename )
 	intp extension_len = V_strlen( extension );
 	if ( ( extension_len != 3 ) &&
 	     ( extension_len != 4 ) &&
-	     V_stricmp( extension, ".bsp.bz2" ) &&
-	     V_stricmp( extension, ".xbox.vtx" ) &&
-	     V_stricmp( extension, ".dx80.vtx" ) &&
-	     V_stricmp( extension, ".dx90.vtx" ) &&
-	     V_stricmp( extension, ".sw.vtx" ) )
+	     !V_strieq( extension, ".bsp.bz2" ) &&
+	     !V_strieq( extension, ".xbox.vtx" ) &&
+	     !V_strieq( extension, ".dx80.vtx" ) &&
+	     !V_strieq( extension, ".dx90.vtx" ) &&
+	     !V_strieq( extension, ".sw.vtx" ) )
 	{
 		return false;
 	}

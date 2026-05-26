@@ -289,14 +289,14 @@ bool CPureServerWhitelist::LoadTrustedKeysFromKeyValues( KeyValues *kv )
 {
 	for ( KeyValues *pCurItem = kv->GetFirstTrueSubKey(); pCurItem; pCurItem = pCurItem->GetNextTrueSubKey() )
 	{
-		if ( V_stricmp( pCurItem->GetName(), "public_key" ) != 0 )
+		if ( !V_strieq( pCurItem->GetName(), "public_key" ) )
 		{
 			Warning( "Trusted key list has unexpected block '%s'; expected only 'public_key' blocks\n", pCurItem->GetName() );
 			continue;
 		}
 
 		const char *pszType = pCurItem->GetString( "type", "(none)" );
-		if ( V_stricmp( pszType, "rsa" ) != 0 )
+		if ( !V_strieq( pszType, "rsa" ) )
 		{
 			Warning( "Trusted key type '%s' not supported.\n", pszType );
 			continue;

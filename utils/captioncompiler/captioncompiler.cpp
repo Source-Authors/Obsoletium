@@ -174,7 +174,7 @@ bool CompileCaptionsApp::Create() {
   //
   // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
   // supports using a UTF-8 code page.
-  if (V_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+  if (!V_strieq(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
     Warning("setlocale('%s') failed, current locale is '%s'.\n",
             kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
   }

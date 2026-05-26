@@ -2787,7 +2787,7 @@ MenuItem* MenuBuilder::AddCascadingMenuItem( const wchar_t *pwszButtonText, Menu
 void MenuBuilder::AddSepratorIfNeeded( const char *pszCategoryName )
 {
 	// Add a separator if the categories are different
-	if ( m_pszLastCategory && V_stricmp( pszCategoryName, m_pszLastCategory ) != 0 )
+	if ( m_pszLastCategory && !V_strieq( pszCategoryName, m_pszLastCategory ) )
 	{
 		m_pMenu->AddSeparator();
 	}

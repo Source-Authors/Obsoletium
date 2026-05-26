@@ -1222,7 +1222,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		const char *pszVar = mapcyclefile.GetString();
 		if ( *pszVar == '\0' )
 		{
-			if ( bForceSpew || V_stricmp( szLastResult, "__novar") )
+			if ( bForceSpew || !V_strieq( szLastResult, "__novar") )
 			{
 				Msg( "mapcyclefile convar not set.\n" );
 				V_strcpy_safe( szLastResult, "__novar" );
@@ -1238,7 +1238,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		V_strncpy( pszResult, szRecommendedName, nSizeResult );
 		if ( filesystem->FileExists( pszResult, "GAME" ) )
 		{
-			if ( bForceSpew || V_stricmp( szLastResult, pszResult) )
+			if ( bForceSpew || !V_strieq( szLastResult, pszResult) )
 			{
 				Msg( "Using map cycle file '%s'.\n", pszResult );
 				V_strcpy_safe( szLastResult, pszResult );
@@ -1250,7 +1250,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		V_strncpy( pszResult, pszVar, nSizeResult );
 		if ( filesystem->FileExists( pszResult, "GAME" ) )
 		{
-			if ( bForceSpew || V_stricmp( szLastResult, pszResult) )
+			if ( bForceSpew || !V_strieq( szLastResult, pszResult) )
 			{
 				Msg( "Using map cycle file '%s'.  ('%s' was not found.)\n", pszResult, szRecommendedName );
 				V_strcpy_safe( szLastResult, pszResult );
@@ -1264,7 +1264,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 			V_strncpy( pszResult, "cfg/mapcycle_default.txt", nSizeResult );
 			if ( filesystem->FileExists( pszResult, "GAME" ) )
 			{
-				if ( bForceSpew || V_stricmp( szLastResult, pszResult) )
+				if ( bForceSpew || !V_strieq( szLastResult, pszResult) )
 				{
 					Msg( "Using map cycle file '%s'.  ('%s' was not found.)\n", pszResult, szRecommendedName );
 					V_strcpy_safe( szLastResult, pszResult );
@@ -1275,7 +1275,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 		// Failed
 		*pszResult = '\0';
-		if ( bForceSpew || V_stricmp( szLastResult, "__notfound") )
+		if ( bForceSpew || !V_strieq( szLastResult, "__notfound") )
 		{
 			Msg( "Map cycle file '%s' was not found.\n", szRecommendedName );
 			V_strcpy_safe( szLastResult, "__notfound" );

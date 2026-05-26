@@ -2885,7 +2885,7 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 			Msg("--mpi: %s MPI", g_bUseMPI ? "Enable" : "Disable");
 		
 			// Any other args that start with -mpi are ok too.
-			if ( i == argc - 1 && V_stricmp( argv[i], "-mpi_ListParams" ) != 0 )
+			if ( i == argc - 1 && !V_strieq( argv[i], "-mpi_ListParams" ) )
 				break;
 		}
 #endif
@@ -3085,7 +3085,7 @@ int VRAD_Main(int argc, char **argv)
 	constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
 
 	const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-	if (V_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+	if (!V_strieq(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
 		Warning("setlocale('%s') failed, current locale is '%s'.\n",
 			kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
 	}

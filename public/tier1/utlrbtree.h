@@ -43,13 +43,13 @@ public:
 inline bool StringLessThan( const char * const &lhs, const char * const &rhs)			{ 
 	if ( !lhs ) return false;
 	if ( !rhs ) return true;
-	return ( V_strcmp( lhs, rhs) < 0 );  
+	return V_strcmp( lhs, rhs) < 0;  
 }
 
 inline bool CaselessStringLessThan( const char * const &lhs, const char * const &rhs )	{ 
 	if ( !lhs ) return false;
 	if ( !rhs ) return true;
-	return ( V_stricmp( lhs, rhs) < 0 ); 
+	return V_stricmp( lhs, rhs) < 0; 
 }
 
 

@@ -386,9 +386,9 @@ void CEconEntity::UpdateModelToClass( void )
 
 		pszModel = pItem->GetPlayerDisplayModel( m_iOldOwnerClass, nTeam );
 	}
-	if ( pszModel && pszModel[0] )
+	if ( Q_isempty( pszModel ) )
 	{
-		if ( V_stricmp( STRING( GetModelName() ), pszModel ) != 0 )
+		if ( !V_strieq( STRING( GetModelName() ), pszModel ) )
 		{
 			if ( pItem->GetStaticData()->IsContentStreamable() )
 			{

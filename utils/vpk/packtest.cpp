@@ -234,7 +234,7 @@ static void LoadKeyFile(const char *pszFilename, const char *pszTag,
   const char *pszType = kv->GetString("type", nullptr);
   if (!pszType) Error("Key file %s is missing 'type'", pszFilename);
 
-  if (V_stricmp(pszType, "rsa") != 0)
+  if (!V_strieq(pszType, "rsa"))
     Error("Key type '%s' is not supported", pszType);
 
   const char *pszEncodedBytes = kv->GetString(pszTag, nullptr);

@@ -448,7 +448,7 @@ void PushMemoryScript( char *pszBuffer, const int nSize )
 //-----------------------------------------------------------------------------
 bool PopMemoryScript()
 {
-	if ( V_stricmp( script->filename, "memory buffer" ) )
+	if ( !V_strieq( script->filename, "memory buffer" ) )
 		return false;
 
 	if ( script == scriptstack )

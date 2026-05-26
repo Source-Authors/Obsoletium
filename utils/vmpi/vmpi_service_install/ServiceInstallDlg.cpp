@@ -225,10 +225,10 @@ int DeleteDirectory( const char *pRootDir, bool bDeleteSubdirectories, char erro
 bool CreateDirectory_R( const char *pDirName )
 {
 	char chPrevDir[MAX_PATH];
-	V_strncpy( chPrevDir, pDirName, sizeof( chPrevDir ) );
-	if ( V_StripLastDir( chPrevDir, sizeof( chPrevDir ) ) )
+	V_strcpy_safe( chPrevDir, pDirName );
+	if ( V_StripLastDir( chPrevDir ) )
 	{
-		if ( V_stricmp( chPrevDir, ".\\" ) != 0 && V_stricmp( chPrevDir, "./" ) != 0 )
+		if ( !V_streq( chPrevDir, ".\\" ) && !V_streq( chPrevDir, "./" ) )
 			if ( !CreateDirectory_R( chPrevDir ) )
 				return false;
 	}

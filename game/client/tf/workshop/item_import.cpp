@@ -2000,7 +2000,7 @@ protected:
 	{
 		for ( int nModelIndex = 0; nModelIndex < NUM_IMPORT_LODS; ++nModelIndex )
 		{
-			if ( V_stricmp( m_pItemValues->GetString( CFmtStr( kClassLODNFile, kClassFolders[ nClassIndex ], nModelIndex ) ), "" ) != 0 )
+			if ( !V_strieq( m_pItemValues->GetString( CFmtStr( kClassLODNFile, kClassFolders[ nClassIndex ], nModelIndex ) ), "" ) )
 				return true;
 		}
 		return false;
@@ -7271,7 +7271,7 @@ bool CTFFileImportDialog::ClassHasModels( int nClassIndex )
 {
 	for ( int nModelIndex = 0; nModelIndex < NUM_IMPORT_LODS; ++nModelIndex )
 	{
-		if ( V_stricmp( GetItemValues()->GetString( CFmtStr( kClassLODNFile, kClassFolders[ nClassIndex ], nModelIndex ) ), "" ) != 0 )
+		if ( !V_strieq( GetItemValues()->GetString( CFmtStr( kClassLODNFile, kClassFolders[ nClassIndex ], nModelIndex ) ), "" ) )
 			return true;
 	}
 	return false;

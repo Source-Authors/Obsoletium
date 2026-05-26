@@ -578,7 +578,7 @@ bool CZipFile::CZipEntry::ZipFileLessFunc( CZipEntry const& src1, CZipEntry cons
 
 bool CZipFile::CZipEntry::ZipFileLessFunc_CaselessSort( CZipEntry const& src1, CZipEntry const& src2 )
 {
-	return ( V_stricmp( src1.m_Name.String(), src2.m_Name.String() ) < 0 );
+	return V_stricmp( src1.m_Name.String(), src2.m_Name.String() ) < 0;
 }
 
 void CZipFile::ForceAlignment( bool bAligned, bool bCompatibleFormat, unsigned int alignment )

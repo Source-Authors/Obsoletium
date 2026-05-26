@@ -210,7 +210,7 @@ bool CEconTool_StrangeCountTransfer::AreItemsEligibleForStrangeCountTransfer( co
 			return false;
 		}
 	}
-	else if ( V_stricmp( pItem1Xifier, pItem2Xifier ) != 0 )
+	else if ( !V_strieq( pItem1Xifier, pItem2Xifier ) )
 	{
 		return false;
 	}

@@ -2470,7 +2470,7 @@ bool CItemModelPanel::CheckRecipeMatches()
 
 	// If this isnt a dynamic recipe tool, dont show or do any of this
 	if( !pTool 
-		|| V_stricmp( m_ItemData.GetStaticData()->GetEconTool()->GetTypeName() , "dynamic_recipe")
+		|| !V_strieq( m_ItemData.GetStaticData()->GetEconTool()->GetTypeName(), "dynamic_recipe")
 		|| m_ItemData.GetStaticData()->GetDefaultLoadoutSlot() != INVALID_EQUIPPED_SLOT )
 	{
 		if( m_pMatchesLabel )

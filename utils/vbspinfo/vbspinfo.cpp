@@ -299,7 +299,7 @@ int main(int argc, char **argv) {
   constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
 
   const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-  if (V_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+  if (!V_strieq(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
     Warning("setlocale('%s') failed, current locale is '%s'.\n",
             kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
   }

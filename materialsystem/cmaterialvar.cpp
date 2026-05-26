@@ -584,7 +584,7 @@ int	CMaterialVar::VectorSizeInternal() const
 }
 
 // Don't want to be grabbing the dummy var and changing it's value.  That usually means badness.
-#define ASSERT_NOT_DUMMY_VAR()	AssertMsg( m_bFakeMaterialVar || ( V_stricmp( GetName(), "$dummyvar" ) != 0 ), "TRYING TO MODIFY $dummyvar, WHICH IS BAD, MMMKAY!" )
+#define ASSERT_NOT_DUMMY_VAR()	AssertMsg( m_bFakeMaterialVar || !V_strieq( GetName(), "$dummyvar" ), "TRYING TO MODIFY $dummyvar, WHICH IS BAD, MMMKAY!" )
 
 //-----------------------------------------------------------------------------
 // float
