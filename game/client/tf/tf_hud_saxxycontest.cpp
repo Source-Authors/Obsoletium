@@ -286,7 +286,8 @@ void CSaxxyAwardsPanel::OnCommand( const char *pCommand )
 	{
 		if ( steamapicontext && steamapicontext->SteamFriends() )
 		{
-			steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( "http://www.teamfortress.com/saxxyawards/" );
+			// dimhotepus: http:// -> https://
+			steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( "https://www.teamfortress.com/saxxyawards/" );
 		}
 	}
 	else if ( FStrEq( pCommand, "submit" ) )
@@ -813,7 +814,8 @@ void CSaxxyAwardsSubmitForm::OnCommand( const char *pCommand )
 	{
 		if ( steamapicontext && steamapicontext->SteamFriends() )
 		{
-			steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( "http://www.teamfortress.com/saxxyawards/#rules" );
+			// dimhotepus: http:// -> https://
+			steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( "https://www.teamfortress.com/saxxyawards/#rules" );
 		}
 	}
 	else

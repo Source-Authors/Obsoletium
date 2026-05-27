@@ -2421,7 +2421,8 @@ void CHudMainMenuOverride::OnCommand( const char *command )
 
 		if ( steamapicontext && steamapicontext->SteamFriends() )
 		{
-			steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( "http://forums.steampowered.com/forums/forumdisplay.php?f=906" );
+			// dimhotepus: http:// -> https://
+			steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( "https://forums.steampowered.com/forums/forumdisplay.php?f=906" );
 		}
 		return;
 	}
@@ -2529,8 +2530,9 @@ void CHudMainMenuOverride::OnCommand( const char *command )
 			CSteamID steamID = steamapicontext->SteamUser()->GetSteamID();
 			switch ( GetUniverse() )
 			{
-			case k_EUniversePublic: steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( CFmtStr1024( "http://steamcommunity.com/profiles/%llu/promocodes/tf2", steamID.ConvertToUint64() ) ); break;
-			case k_EUniverseBeta:	steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( CFmtStr1024( "http://beta.steamcommunity.com/profiles/%llu/promocodes/tf2", steamID.ConvertToUint64() ) ); break;
+			// dimhotepus: http:// -> https://
+			case k_EUniversePublic: steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( CFmtStr1024( "https://steamcommunity.com/profiles/%llu/promocodes/tf2", steamID.ConvertToUint64() ) ); break;
+			case k_EUniverseBeta:	steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( CFmtStr1024( "https://beta.steamcommunity.com/profiles/%llu/promocodes/tf2", steamID.ConvertToUint64() ) ); break;
 			case k_EUniverseDev:	steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( CFmtStr1024( "http://localhost/community/profiles/%llu/promocodes/tf2", steamID.ConvertToUint64() ) ); break;
 			}
 		}
@@ -2570,9 +2572,10 @@ void CHudMainMenuOverride::OnCommand( const char *command )
 			CSteamID steamID = steamapicontext->SteamUser()->GetSteamID();
 			switch ( GetUniverse() )
 			{
-			case k_EUniversePublic: steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( "http://www.teamfortress.com/meetyourmatch" ); break;
+			// dimhotepus: http:// -> https://
+			case k_EUniversePublic: steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( "https://www.teamfortress.com/meetyourmatch" ); break;
 			case k_EUniverseBeta:	// Fall through
-			case k_EUniverseDev:	steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( "http://csham.valvesoftware.com/tf.com/meetyourmatch" ); break;
+			case k_EUniverseDev:	steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( "https://csham.valvesoftware.com/tf.com/meetyourmatch" ); break;
 			}
 		}
 		else
@@ -2588,9 +2591,11 @@ void CHudMainMenuOverride::OnCommand( const char *command )
 			CSteamID steamID = steamapicontext->SteamUser()->GetSteamID();
 			switch ( GetUniverse() )
 			{
-			case k_EUniversePublic: steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( "http://www.teamfortress.com/gargoyles_and_gravel" ); break;
+			// dimhotepus: http:// -> https://
+			case k_EUniversePublic: steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( "https://www.teamfortress.com/gargoyles_and_gravel" ); break;
 			case k_EUniverseBeta:	// Fall through
-			case k_EUniverseDev:	steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( "http://www.teamfortress.com/gargoyles_and_gravel" ); break;
+			// dimhotepus: http:// -> https://
+			case k_EUniverseDev:	steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( "https://www.teamfortress.com/gargoyles_and_gravel" ); break;
 			}
 		}
 		else

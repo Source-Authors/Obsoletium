@@ -43,8 +43,10 @@ HTMLDemo2::HTMLDemo2(Panel *parent, const char *name) : DemoPage(parent, name)
 	m_pHTML2->SetBounds(20+250, 10, 240, 300);
 	
 	// now open a URL
-	m_pHTML1->OpenURL("http://www.valvesoftware.com", NULL);
-	m_pHTML2->OpenURL("http://www.valve-erc.com", NULL);
+	// dimhotepus: http:// -> https://
+	m_pHTML1->OpenURL("https://www.valvesoftware.com", NULL);
+	// dimhotepus: Change dead link to smth meaningful.
+	m_pHTML2->OpenURL("https://developer.valvesoftware.com", NULL);
 	// the URL can be any valid URL accepted by Internet Explorer, use file:///c:/... for local filesystem files :)
 	
 	// this call causes the control to repaint itself every 1000msec or so, to allow animated gifs to work

@@ -539,7 +539,8 @@ void CTFStreamManager::UpdateTwitchTvAccounts()
 	//
 	// Create HTTP download job
 	//
-	m_hHTTPRequestHandleTwitchTv = steamapicontext->SteamHTTP()->CreateHTTPRequest( k_EHTTPMethodGET, CFmtStr( "http://api.twitch.tv/api/steam/%llu", m_pLoadingAccount->m_uiSteamID ) );
+	// dimhotepus: http:// -> https://
+	m_hHTTPRequestHandleTwitchTv = steamapicontext->SteamHTTP()->CreateHTTPRequest( k_EHTTPMethodGET, CFmtStr( "https://api.twitch.tv/api/steam/%llu", m_pLoadingAccount->m_uiSteamID ) );
 	steamapicontext->SteamHTTP()->SetHTTPRequestHeaderValue( m_hHTTPRequestHandleTwitchTv, "Accept", cl_streams_request_accept.GetString() );
 	DevMsg( "Requesting twitch.tv account link...\n" );
 

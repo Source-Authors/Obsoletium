@@ -823,7 +823,8 @@ bool CYouTubeSystem::GetProfileURL( CUtlString &strProfileURL ) const
 {
 	if ( m_eLoginStatus == kYouTubeLogin_LoggedIn )
 	{
-		strProfileURL = CFmtStr1024( "http://www.youtube.com/profile?user=%s", m_strYouTubeUserName.Get() );
+		// dimhotepus: http:// -> https://
+		strProfileURL = CFmtStr1024( "https://www.youtube.com/profile?user=%s", m_strYouTubeUserName.Get() );
 		return true;
 	}
 	return false;

@@ -45,7 +45,8 @@ public:
 		// For some weird reason, this dialog can 
 		if ( V_strieq( command, "ShowFAQ" ) )
 		{
-			system()->ShellExecute( "open", "http://www.valve-erc.com/srcsdk/faq.html#convertINI" );
+			// dimhotepus: Change dead link to a valid one.
+			system()->ShellExecute( "open", "https://developer.valvesoftware.com/wiki/SDK_Installation" );
 		}
 	}
 };
@@ -108,7 +109,6 @@ CVConfigDialog::CVConfigDialog( Panel *parent, const char *name ) : BaseClass( p
 	// See if we converted on load and notify
 	if ( g_ConfigManager.WasConvertedOnLoad() )
 	{
-		//VGUIMessageBox( this, "Update Occured", "Your game configurations have been updated.\n\nA backup file GameCfg.INI.OLD has been created.\n\nPlease visit http://www.valve-erc.com/srcsdk/faq.html#GameConfigUpdate for more information." );
 		CConversionInfoMessageBox *pDlg = new CConversionInfoMessageBox( this, "ConversionInfo" );
 
 		pDlg->RequestFocus();

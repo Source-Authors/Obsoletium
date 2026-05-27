@@ -4181,11 +4181,13 @@ const char *CGCBase::GetCDNURL() const
 		{
 		case k_EUniverseDev:
 		case k_EUniverseBeta:
-			m_sCDNURL.Format( "http://cdn.beta.steampowered.com/apps/%d/", GetAppID() );
+			// dimhotepus: http:// -> https://
+			m_sCDNURL.Format( "https://cdn.beta.steampowered.com/apps/%d/", GetAppID() );
 			break;
 		case k_EUniversePublic:
 		default:
-			m_sCDNURL.Format( "http://media.steampowered.com/apps/%d/", GetAppID() );
+			// dimhotepus: http:// -> https://
+			m_sCDNURL.Format( "https://media.steampowered.com/apps/%d/", GetAppID() );
 			break;
 		}
 	}

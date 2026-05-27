@@ -3681,7 +3681,8 @@ void CItemModelPanel::OnCommand( const char *command )
 			}
 			uint32 nAssetContext = 2; // k_EEconContextBackpack
 			char szURL[512];
-			V_snprintf( szURL, sizeof(szURL), "http://%ssteamcommunity.com/my/inventory/?sellOnLoad=1#%d_%d_%llu", pszPrefix, engine->GetAppID(), nAssetContext, GetItem()->GetItemID() );
+			// dimhotepus: http:// -> https://
+			V_snprintf( szURL, sizeof(szURL), "https://%ssteamcommunity.com/my/inventory/?sellOnLoad=1#%d_%d_%llu", pszPrefix, engine->GetAppID(), nAssetContext, GetItem()->GetItemID() );
 			steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( szURL );
 		}
 	}

@@ -34,7 +34,8 @@
 #if _DEBUG
 #define WEEKLY_PRICE_URL "http://gamestats/weeklyprices.dat"
 #else
-#define WEEKLY_PRICE_URL "http://www.steampowered.com/stats/csmarket/weeklyprices.dat"
+// dimhotepus: http:// -> https://
+#define WEEKLY_PRICE_URL "https://www.steampowered.com/stats/csmarket/weeklyprices.dat"
 #endif
 
 

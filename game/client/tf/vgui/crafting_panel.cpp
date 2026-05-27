@@ -1629,7 +1629,8 @@ private:
 		{
 			if ( steamapicontext && steamapicontext->SteamFriends() )
 			{
-				steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( "http://www.teamfortress.com/saxxyawards/winners.php" );
+				// dimhotepus: http:// -> https://
+				steamapicontext->SteamFriends()->ActivateGameOverlayToWebPage( "https://www.teamfortress.com/saxxyawards/winners.php" );
 			}
 			MarkForDeletion();
 		}

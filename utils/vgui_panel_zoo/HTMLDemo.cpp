@@ -39,7 +39,8 @@ HTMLDemo::HTMLDemo(Panel *parent, const char *name) : DemoPage(parent, name)
 	m_pHTML->SetBounds(10, 10, 500, 300);
 	
 	// now open a URL
-	m_pHTML->OpenURL("http://www.valvesoftware.com", NULL);
+	// dimhotepus: http:// -> https://
+	m_pHTML->OpenURL("https://www.valvesoftware.com", NULL);
 //	m_pHTML->OpenURL("file:///c:/temp/WebCap.plg");
 	// the URL can be any valid URL accepted by Internet Explorer, use file:///c:/... for local filesystem files :)
 	
