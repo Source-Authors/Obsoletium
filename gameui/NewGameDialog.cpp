@@ -608,7 +608,7 @@ void CNewGameDialog::UpdateBonusSelection( void )
 		for ( intp iBonus = 0; iBonus < BonusMapsDatabase()->BonusCount(); ++iBonus )
 		{
 			pAdvancedDescription = BonusMapsDatabase()->GetBonusData( iBonus );
-			if ( Q_stricmp( szMapAdvancedName, pAdvancedDescription->szMapFileName ) == 0 )
+			if ( V_strieq( szMapAdvancedName, pAdvancedDescription->szMapFileName ) )
 				break;
 		}
 

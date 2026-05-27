@@ -129,7 +129,7 @@ void RadiusFlash(
 	while ((pEntity = gEntList.FindEntityInSphere( pEntity, vecSrc, flRadius )) != NULL)
 	{	
 		bool bPlayer = pEntity->IsPlayer();
-		bool bHostage = ( Q_stricmp( pEntity->GetClassname(), "hostage_entity" ) == 0 );
+		bool bHostage = V_strieq( pEntity->GetClassname(), "hostage_entity" );
 		
 		if( !bPlayer && !bHostage )
 			continue;

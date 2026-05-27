@@ -91,7 +91,7 @@ static bool IsValidTargetName( const char *pTestName )
 	{
 		CMapEntity *pEntity = pList->Element( i );
 		const char *pszTargetName = pEntity->GetKeyValue("targetname");
-		if ( pszTargetName && Q_stricmp( pszTargetName, pTestName ) == 0 )
+		if ( pszTargetName && V_strieq( pszTargetName, pTestName ) )
 			return true;
 	}
 
@@ -582,7 +582,7 @@ void COP_Entity::GetKeyState( const char *pShortName, EKeyState *pState, bool *p
 	varCopy.ResetDefaults();
 	varCopy.ToKeyValue( &tmpkv );
 
-	if ( Q_stricmp( pszCurValue, tmpkv.szValue ) == 0 )
+	if ( V_strieq( pszCurValue, tmpkv.szValue ) )
 		*pState = k_EKeyState_DefaultFGDValue;
 	else
 		*pState = k_EKeyState_Modified;
@@ -1790,7 +1790,7 @@ void COP_Entity::CreateSmartControls(GDinputvariable *pVar, CUtlVector<const cha
 	// If this is the same var that our smart controls are already setup for, then don't do anything.
 	if ( m_SmartControls.Count() > 0 && 
 		 pVar == m_pLastSmartControlVar && 
-		 Q_stricmp( strValue, m_LastSmartControlVarValue ) == 0 )
+		 V_strieq( strValue, m_LastSmartControlVarValue ) )
 	{
 		return;
 	}

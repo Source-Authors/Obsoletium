@@ -541,19 +541,19 @@ bool CHudHintKeyDisplay::SetHintText( const char *text )
 					if ( !pBinding )
 						continue;
 
-					bUseThisKey = ( Q_stricmp( pBinding, binding ) == 0 );
+					bUseThisKey = V_strieq( pBinding, binding );
 
 					if ( !bUseThisKey && 
-						( Q_stricmp( pBinding, "+duck" ) == 0 || Q_stricmp( pBinding, "toggle_duck" ) == 0 ) && 
-						( Q_stricmp( binding, "+duck" ) == 0 || Q_stricmp( binding, "toggle_duck" ) == 0 ) )
+						( V_strieq( pBinding, "+duck" ) || V_strieq( pBinding, "toggle_duck" ) ) && 
+						( V_strieq( binding, "+duck" ) || V_strieq( binding, "toggle_duck" ) ) )
 					{
 						// +duck and toggle_duck are interchangable
 						bUseThisKey = true;
 					}
 
 					if ( !bUseThisKey && 
-						( Q_stricmp( pBinding, "+zoom" ) == 0 || Q_stricmp( pBinding, "toggle_zoom" ) == 0 ) && 
-						( Q_stricmp( binding, "+zoom" ) == 0 || Q_stricmp( binding, "toggle_zoom" ) == 0 ) )
+						( V_strieq( pBinding, "+zoom" ) || V_strieq( pBinding, "toggle_zoom" ) ) && 
+						( V_strieq( binding, "+zoom" ) || V_strieq( binding, "toggle_zoom" ) ) )
 					{
 						// +zoom and toggle_zoom are interchangable
 						bUseThisKey = true;

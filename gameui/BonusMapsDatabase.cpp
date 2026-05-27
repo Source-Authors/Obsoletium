@@ -715,10 +715,10 @@ void CBonusMapsDatabase::BuildSubdirectoryList( const char *pCurrentPath, bool b
 	{
 		// Skip it if it's not a directory, is the root, is back, or is an invalid folder
 		if ( !g_pFullFileSystem->FindIsDirectory( dirHandle ) || 
-			 Q_strcmp( pDirFileName, "." ) == 0 || 
-			 Q_strcmp( pDirFileName, ".." ) == 0 ||
-			 Q_stricmp( pDirFileName, "soundcache" ) == 0 ||
-			 Q_stricmp( pDirFileName, "graphs" ) == 0 )
+			 V_streq( pDirFileName, "." ) || 
+			 V_streq( pDirFileName, ".." ) ||
+			 V_strieq( pDirFileName, "soundcache" ) ||
+			 V_strieq( pDirFileName, "graphs" ) )
 		{
 			pDirFileName = g_pFullFileSystem->FindNext( dirHandle );
 			continue;

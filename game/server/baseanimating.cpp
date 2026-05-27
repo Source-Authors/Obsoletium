@@ -1299,7 +1299,7 @@ int CBaseAnimating::LookupPoseParameter( CStudioHdr *pStudioHdr, const char *szN
 
 	for (int i = 0; i < pStudioHdr->GetNumPoseParameters(); i++)
 	{
-		if (Q_stricmp( pStudioHdr->pPoseParameter( i ).pszName(), szName ) == 0)
+		if (V_strieq( pStudioHdr->pPoseParameter( i ).pszName(), szName ))
 		{
 			return i;
 		}
@@ -3219,7 +3219,7 @@ bool CBaseAnimating::LookupHitbox( const char *szName, int& outSet, int& outBox 
 				continue;
 			
 			const char* szBoxName = pBox->pszHitboxName();
-			if( Q_stricmp( szBoxName, szName ) == 0 )
+			if( V_strieq( szBoxName, szName ) )
 			{
 				outSet = set;
 				outBox = i;

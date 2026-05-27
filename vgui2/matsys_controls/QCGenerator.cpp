@@ -397,17 +397,17 @@ CQCGenerator::~CQCGenerator()
 
 void CQCGenerator::OnCommand( const char *command )
 {	
-	if ( Q_stricmp( command, "createQC" ) == 0 )
+	if ( V_strieq( command, "createQC" ) )
 	{
 		m_QCInfo_t.SyncFromControls();
 		GenerateQCFile();
 	}
-	if ( Q_stricmp( command, "deleteSeq" ) == 0 )
+	if ( V_strieq( command, "deleteSeq" ) )
 	{
 		//delete it
 		DeleteLOD();
 	}
-	if ( Q_stricmp( command, "editSeq" ) == 0 )
+	if ( V_strieq( command, "editSeq" ) )
 	{
 		//edit
 		EditLOD();

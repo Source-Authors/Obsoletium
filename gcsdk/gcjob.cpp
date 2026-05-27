@@ -1297,11 +1297,11 @@ static void ThreadedEmitFormattedOutputWrapperAndFreeResponse( CWebAPIResponse *
 
 	if  ( pszParamOutput ) 
 	{ 
-		if ( Q_stricmp( pszParamOutput, "xml" ) == 0 ) 
+		if ( V_strieq( pszParamOutput, "xml" ) ) 
 			eOutputFormat = k_EWebAPIOutputFormat_XML; 
-		else if ( Q_stricmp( pszParamOutput, "vdf" ) == 0 ) 
+		else if ( V_strieq( pszParamOutput, "vdf" ) ) 
 			eOutputFormat = k_EWebAPIOutputFormat_VDF; 
-		else if ( Q_stricmp( pszParamOutput, "json" ) == 0 ) 
+		else if ( V_strieq( pszParamOutput, "json" ) ) 
 			eOutputFormat = k_EWebAPIOutputFormat_JSON; 
 	} 
 

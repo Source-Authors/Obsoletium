@@ -137,7 +137,7 @@ void UpdateProgressBar( vgui::EditablePanel* pPanel, IAchievement *pAchievement,
 bool GameSupportsAchievementTracker()
 {
 	const char *pGame = Q_UnqualifiedFileName( engine->GetGameDirectory() );
-	if ( ( Q_stricmp( pGame, "tf" ) == 0 ) || ( Q_stricmp( pGame, "tf_beta" ) == 0 ) )
+	if ( V_strieq( pGame, "tf" ) || V_strieq( pGame, "tf_beta" ) )
 		return true;
 
 	return false;

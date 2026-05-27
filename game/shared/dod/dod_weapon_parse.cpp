@@ -90,55 +90,55 @@ void CDODWeaponInfo::Parse( KeyValues *pKeyValuesData, const char *szWeaponName 
 	{
 		Assert( false );
 	}
-	else if ( Q_stricmp( pTypeString, "Melee" ) == 0 )
+	else if ( V_strieq( pTypeString, "Melee" ) )
 	{
 		m_WeaponType = WPN_TYPE_MELEE;
 	}
-	else if ( Q_stricmp( pTypeString, "Camera" ) == 0 )
+	else if ( V_strieq( pTypeString, "Camera" ) )
 	{
 		m_WeaponType = WPN_TYPE_CAMERA;
 	}
-	else if ( Q_stricmp( pTypeString, "Grenade" ) == 0 )
+	else if ( V_strieq( pTypeString, "Grenade" ) )
 	{
 		m_WeaponType = WPN_TYPE_GRENADE;
 	}
-	else if ( Q_stricmp( pTypeString, "Pistol" ) == 0 )
+	else if ( V_strieq( pTypeString, "Pistol" ) )
 	{
 		m_WeaponType = WPN_TYPE_PISTOL;
 	}
-	else if ( Q_stricmp( pTypeString, "Rifle" ) == 0 )
+	else if ( V_strieq( pTypeString, "Rifle" ) )
 	{
 		m_WeaponType = WPN_TYPE_RIFLE;
 	}
-	else if ( Q_stricmp( pTypeString, "Sniper" ) == 0 )
+	else if ( V_strieq( pTypeString, "Sniper" ) )
 	{
 		m_WeaponType = WPN_TYPE_SNIPER;
 	}
-	else if ( Q_stricmp( pTypeString, "SubMG" ) == 0 )
+	else if ( V_strieq( pTypeString, "SubMG" ) )
 	{
 		m_WeaponType = WPN_TYPE_SUBMG;
 	}
-	else if ( Q_stricmp( pTypeString, "MG" ) == 0 )
+	else if ( V_strieq( pTypeString, "MG" ) )
 	{
 		m_WeaponType = WPN_TYPE_MG;
 	}
-	else if ( Q_stricmp( pTypeString, "Bazooka" ) == 0 )
+	else if ( V_strieq( pTypeString, "Bazooka" ) )
 	{
 		m_WeaponType = WPN_TYPE_BAZOOKA;
 	}
-	else if ( Q_stricmp( pTypeString, "Bandage" ) == 0 )
+	else if ( V_strieq( pTypeString, "Bandage" ) )
 	{
 		m_WeaponType = WPN_TYPE_BANDAGE;
 	}
-	else if ( Q_stricmp( pTypeString, "Sidearm" ) == 0 )
+	else if ( V_strieq( pTypeString, "Sidearm" ) )
 	{
 		m_WeaponType = WPN_TYPE_SIDEARM;
 	}
-	else if ( Q_stricmp( pTypeString, "RifleGrenade" ) == 0 )
+	else if ( V_strieq( pTypeString, "RifleGrenade" ) )
 	{
 		m_WeaponType = WPN_TYPE_RIFLEGRENADE;
 	}
-	else if ( Q_stricmp( pTypeString, "Bomb" ) == 0 )
+	else if ( V_strieq( pTypeString, "Bomb" ) )
 	{
 		m_WeaponType = WPN_TYPE_BOMB;
 	}

@@ -1166,7 +1166,7 @@ CBasePlayer* UTIL_PlayerByName( const char *name )
 			continue;
 #endif
 
-		if ( Q_stricmp( pPlayer->GetPlayerName(), name ) == 0 )
+		if ( V_strieq( pPlayer->GetPlayerName(), name ) )
 		{
 			return pPlayer;
 		}

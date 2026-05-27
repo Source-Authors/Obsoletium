@@ -75,7 +75,7 @@ public:
 	}
 	void OnCommand( const char *command )
 	{
-		if ( Q_stricmp( command, "ResetConfigs" ) == 0 )
+		if ( V_strieq( command, "ResetConfigs" ) )
 		{
 			Close();
 			
@@ -84,7 +84,7 @@ public:
 				PostMessage( GetVParent(), new KeyValues( "Command", "command", "ResetConfigs"));
 			}
 		}
-		else if ( Q_stricmp( command, "MoreInfo" ) == 0 )
+		else if ( V_strieq( command, "MoreInfo" ) )
 		{
 			OpenLocalizedURL( "URL_Reset_Config" );
 		}
@@ -112,7 +112,7 @@ public:
 		BaseClass::OnCommand( command );
 
 		// For some weird reason, this dialog can 
-		if ( Q_stricmp( command, "ShowFAQ" ) == 0 )
+		if ( V_strieq( command, "ShowFAQ" ) )
 		{
 			OpenLocalizedURL( "URL_Convert_INI" );
 		}
@@ -138,12 +138,12 @@ public:
 		BaseClass::OnCommand( command );
 
 		// For some weird reason, this dialog can 
-		if ( Q_stricmp( command, "RunAnyway" ) == 0 )
+		if ( V_strieq( command, "RunAnyway" ) )
 		{
 			m_pDialog->Launch( m_iActiveItem, true );
 			MarkForDeletion();
 		}
-		else if ( Q_stricmp( command, "Troubleshooting" ) == 0 )
+		else if ( V_strieq( command, "Troubleshooting" ) )
 		{
 			OpenLocalizedURL( "URL_SDK_FAQ" );
 			MarkForDeletion();
@@ -177,12 +177,12 @@ public:
 	{
 		BaseClass::OnCommand( command );
 
-		if ( Q_stricmp( command, "Continue" ) == 0 )
+		if ( V_strieq( command, "Continue" ) )
 		{
 			PostMessage( g_pSDKLauncherDialog, new KeyValues( "Command", "command", "RefreshMinFootprint" ) );
 			MarkForDeletion();
 		}
-		else if ( Q_stricmp( command, "Close" ) == 0 )
+		else if ( V_strieq( command, "Close" ) )
 		{
 			MarkForDeletion();
 		}
@@ -306,7 +306,7 @@ void CSDKLauncherDialog::Launch( int hActiveListItem, bool bForce )
 	const char *pStr = item->GetString( "InlineProgram", NULL );
 	if ( pStr )
 	{
-		if ( Q_stricmp( pStr, "CreateMod" ) == 0 )
+		if ( V_strieq( pStr, "CreateMod" ) )
 		{
 			if ( V_strieq( g_engineDir, "ep1" ) || V_strieq( g_engineDir, "source2007" ) )
 			{
@@ -317,7 +317,7 @@ void CSDKLauncherDialog::Launch( int hActiveListItem, bool bForce )
 				VGUIMessageBox( this, "Unable to Run 'Create A Mod' Wizard", "Support for creating total conversions are not available using this engine versions." );
 			}
 		}
-		else if ( Q_stricmp( pStr, "refresh_min_footprint" ) == 0 )
+		else if ( V_strieq( pStr, "refresh_min_footprint" ) )
 		{
 			CMinFootprintRefreshConfirmationDialog *pDlg = new CMinFootprintRefreshConfirmationDialog( this, "RefreshConfirmation" );
 
@@ -325,7 +325,7 @@ void CSDKLauncherDialog::Launch( int hActiveListItem, bool bForce )
 			pDlg->SetVisible( true );
 			pDlg->MoveToCenterOfScreen();
 		}
-		else if ( Q_stricmp( pStr, "reset_configs" ) == 0 )
+		else if ( V_strieq( pStr, "reset_configs" ) )
 		{
 			CResetConfirmationMessageBox *pDlg = new CResetConfirmationMessageBox( this, "ResetConfirmation" );
 
@@ -453,15 +453,15 @@ void CSDKLauncherDialog::Launch( int hActiveListItem, bool bForce )
 
 void CSDKLauncherDialog::OnCommand( const char *command )
 {
-	if ( Q_stricmp( command, "LaunchButton" ) == 0 )
+	if ( V_strieq( command, "LaunchButton" ) )
 	{
 		Launch( m_pMediaList->GetSelectedItem(), false );
 	}
-	else if ( Q_stricmp( command, "ResetConfigs" ) == 0 )
+	else if ( V_strieq( command, "ResetConfigs" ) )
 	{
 		ResetConfigs();
 	}
-	else if ( Q_stricmp( command, "RefreshMinFootprint" ) == 0 )
+	else if ( V_strieq( command, "RefreshMinFootprint" ) )
 	{
 		DumpMinFootprintFiles( true );
 	}
@@ -630,7 +630,7 @@ void CSDKLauncherDialog::SetCurrentGame( const char* pcCurrentGame )
 		KeyValues *kv = m_pCurrentGameCombo->GetItemUserData( i );
 
 		// Check to see if this is our currently active game
-		if ( Q_stricmp( kv->GetString( "ModDir" ), pcCurrentGame ) == 0 )
+		if ( V_strieq( kv->GetString( "ModDir" ), pcCurrentGame ) )
 		{
 			activeConfig = i;
 			continue;

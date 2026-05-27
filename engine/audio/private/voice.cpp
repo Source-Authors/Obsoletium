@@ -597,9 +597,9 @@ bool Voice_Init( const char *pCodecName, int nSampleRate )
 		return false;
 	}
 
-	bool bSpeex = Q_stricmp( pCodecName, "vaudio_speex" ) == 0;
-	bool bCelt  = Q_stricmp( pCodecName, "vaudio_celt" )  == 0;
-	bool bSteam = Q_stricmp( pCodecName, "steam" )        == 0;
+	bool bSpeex = V_strieq( pCodecName, "vaudio_speex" );
+	bool bCelt  = !bSpeex && V_strieq( pCodecName, "vaudio_celt" );
+	bool bSteam = !bCelt && V_strieq( pCodecName, "steam" );
 	// Miles has not been in use for voice in a long long time.  Not worth the surface to support ancient demos that may
 	// use it (and probably do not work for other reasons)
 	// "vaudio_miles"

@@ -895,7 +895,7 @@ ServerClass* SV_FindServerClass( const char *pName )
 	ServerClass *pCur = serverGameDLL->GetAllServerClasses();
 	while ( pCur )
 	{
-		if ( Q_stricmp( pCur->GetName(), pName ) == 0 )
+		if ( V_strieq( pCur->GetName(), pName ) )
 			return pCur;
 
 		pCur = pCur->m_pNext;

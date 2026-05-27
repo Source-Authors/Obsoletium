@@ -706,14 +706,14 @@ void CBaseServerVehicle::ParseNPCPassengerSeat( KeyValues *pSetKeyValues, CPasse
 	{
 		const char *lpszName = pKey->GetName();
 
-		if ( Q_stricmp( lpszName, "entry" ) == 0 )
+		if ( V_strieq( lpszName, "entry" ) )
 		{
 			intp nIndex = pSeat->m_EntryTransitions.AddToTail();
 			Assert( pSeat->m_EntryTransitions.IsValidIndex( nIndex ) );
 
 			ParseNPCSeatTransition( pKey, &pSeat->m_EntryTransitions[nIndex] );
 		}
-		else if ( Q_stricmp( lpszName, "exit" ) == 0 )
+		else if ( V_strieq( lpszName, "exit" ) )
 		{
 			intp nIndex = pSeat->m_ExitTransitions.AddToTail();
 			Assert( pSeat->m_ExitTransitions.IsValidIndex( nIndex ) );

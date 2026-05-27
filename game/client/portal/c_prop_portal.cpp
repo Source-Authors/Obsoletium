@@ -493,7 +493,7 @@ void C_Prop_Portal::UpdateOnRemove( void )
 
 void C_Prop_Portal::OnNewParticleEffect( const char *pszParticleName, CNewParticleEffect *pNewParticleEffect )
 {
-	if ( Q_stricmp( pszParticleName, "portal_1_overlap" ) == 0 || Q_stricmp( pszParticleName, "portal_2_overlap" ) == 0 )
+	if ( V_strieq( pszParticleName, "portal_1_overlap" ) || V_strieq( pszParticleName, "portal_2_overlap" ) )
 	{
 		float fClosestDistanceSqr = -1.0f;
 		Vector vClosestPosition;

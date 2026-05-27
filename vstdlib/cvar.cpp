@@ -1023,7 +1023,7 @@ CConCommandHash::CCommandHashHandle_t CConCommandHash::Find( const char *name, H
 	{
 		const HashEntry_t &element = m_aDataPool[iElement];
 		if ( element.m_uiKey == hashkey && // if hashes of strings match,
-			 Q_stricmp( name, element.m_Data->GetName() ) == 0) // then test the actual strings
+			 V_strieq( name, element.m_Data->GetName() ) ) // then test the actual strings
 		{
 			return iElement;
 		}

@@ -1188,10 +1188,7 @@ CWebAPIValues * CWebAPIValues::CreateChildInternal( const char *pchName, EWebAPI
 		pCurLastChild = m_pFirstChild;
 		if ( m_eValueType != k_EWebAPIValueType_NumericArray )
 		{
-			if ( Q_stricmp( pCurLastChild->GetName(), pchName ) == 0 )
-			{
-				AssertMsg( false, "Trying to create CWebAPIValues child with name %s that conflicts with existing child.  Breaks JSON output!", pchName );
-			}
+			AssertMsg( !V_strieq( pCurLastChild->GetName(), pchName ), "Trying to create CWebAPIValues child with name %s that conflicts with existing child.  Breaks JSON output!", pchName );
 		}
 
 		while ( pCurLastChild->m_pNextPeer )
@@ -1199,10 +1196,7 @@ CWebAPIValues * CWebAPIValues::CreateChildInternal( const char *pchName, EWebAPI
 			pCurLastChild = pCurLastChild->m_pNextPeer;
 			if ( m_eValueType != k_EWebAPIValueType_NumericArray )
 			{
-				if ( Q_stricmp( pCurLastChild->GetName(), pchName ) == 0 )
-				{
-					AssertMsg( false, "Trying to create CWebAPIValues child with name %s that conflicts with existing child.  Breaks JSON output!", pchName );
-				}
+				AssertMsg( !V_strieq( pCurLastChild->GetName(), pchName ), "Trying to create CWebAPIValues child with name %s that conflicts with existing child.  Breaks JSON output!", pchName );
 			}
 		}
 		// Also, in debug assert last child ptr looks correct
@@ -1438,7 +1432,7 @@ CWebAPIValues * CWebAPIValues::FindChild( const char *pchName )
 	
 	while ( pCurLastChild )
 	{
-		if ( Q_stricmp( pCurLastChild->GetName(), pchName ) == 0 )
+		if ( V_strieq( pCurLastChild->GetName(), pchName ) )
 			return pCurLastChild;
 
 		pCurLastChild = pCurLastChild->m_pNextPeer;

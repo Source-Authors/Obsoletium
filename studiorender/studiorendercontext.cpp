@@ -194,7 +194,7 @@ static bool UsesMouthShader( IMaterial *pMaterial )
 	static unsigned int clientShaderCache = 0;
 	IMaterialVar *clientShaderVar = pMaterial->FindVarFast( "$clientShader", &clientShaderCache );
 	if ( clientShaderVar )
-		return ( Q_stricmp( clientShaderVar->GetStringValue(), "MouthShader" ) == 0 );
+		return V_strieq( clientShaderVar->GetStringValue(), "MouthShader" );
 	return false;
 }
 

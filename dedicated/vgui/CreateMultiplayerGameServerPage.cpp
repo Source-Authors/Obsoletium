@@ -504,7 +504,7 @@ void CCreateMultiplayerGameServerPage::LoadModListInDirectory(
     // add to the mod list
     if (filename[0] != '.' && g_pFullFileSystem->FindIsDirectory(findHandle)) {
       char fullFilename[MAX_PATH];
-      if (Q_stricmp(pDirectoryName, ".") == 0) {
+      if (V_streq(pDirectoryName, ".")) {
         // If we don't do this, then the games in hlds_steamgames.vdf will get
         // listed twice since their gamedir is listed as "cstrike" and "hl2mp",
         // not ".\cstrike" or ".\hl2mp".

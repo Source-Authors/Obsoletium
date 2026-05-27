@@ -2074,7 +2074,7 @@ void CQuestEditorPanel::OnCommand( const char *command )
 
 		return;
 	}
-	else if ( Q_stricmp( "revert", command ) == 0 )
+	else if ( V_strieq( "revert", command ) )
 	{
 		if ( m_pCurrentOpenEdit )
 		{
@@ -2083,7 +2083,7 @@ void CQuestEditorPanel::OnCommand( const char *command )
 
 		ResetQuestSelectionState();
 	}
-	else if ( Q_stricmp( "save", command ) == 0 )
+	else if ( V_strieq( "save", command ) )
 	{
 		WriteLocalizationData();
 
@@ -2096,7 +2096,7 @@ void CQuestEditorPanel::OnCommand( const char *command )
 
 		return;
 	}
-	else if ( Q_stricmp( "newquest", command ) == 0 )
+	else if ( V_strieq( "newquest", command ) )
 	{
 		CloseEdit( m_pCurrentOpenEdit );
 		m_pEditingPanel->ResetScrollAmount();
@@ -2104,7 +2104,7 @@ void CQuestEditorPanel::OnCommand( const char *command )
 		m_pCurrentOpenEdit = OpenForEdit( IEditableDataType::TYPE_QUEST, CFmtStr( "%s", pNewEditable->GetLiveData()->GetName() ), m_pEditingPanel );
 		ResetQuestSelectionState();
 	}
-	else if ( Q_stricmp( "newobjcond", command ) == 0 )
+	else if ( V_strieq( "newobjcond", command ) )
 	{
 		CloseEdit( m_pCurrentOpenEdit );
 		m_pEditingPanel->ResetScrollAmount();
@@ -2112,7 +2112,7 @@ void CQuestEditorPanel::OnCommand( const char *command )
 		m_pCurrentOpenEdit = OpenForEdit( IEditableDataType::TYPE_OBJECTIVE_CONDITIONS, CFmtStr( "%s", pNewEditable->GetLiveData()->GetName() ), m_pEditingPanel );
 		ResetQuestSelectionState();
 	}
-	else if ( Q_stricmp( "delete", command ) == 0 )
+	else if ( V_strieq( "delete", command ) )
 	{
 		if ( m_pCurrentOpenEdit )
 		{
@@ -2143,7 +2143,7 @@ void CQuestEditorPanel::OnCommand( const char *command )
 		}
 		ResetQuestSelectionState();
 	}
-	else if ( Q_stricmp( "open_edit_context", command ) == 0 )
+	else if ( V_strieq( "open_edit_context", command ) )
 	{
 		OpenEditContextMenu();
 		ResetQuestSelectionState();

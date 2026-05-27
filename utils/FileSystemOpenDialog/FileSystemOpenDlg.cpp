@@ -169,7 +169,7 @@ void CFileSystemOpenDlg::OnOK()
 			char *pPos = strrchr( tempFilename, '.' );
 			if ( pPos )
 			{
-				if ( Q_stricmp( pPos, ".jpeg" ) == 0 || Q_stricmp( pPos, ".jpg" ) == 0 )
+				if ( V_strieq( pPos, ".jpeg" ) || V_strieq( pPos, ".jpg" ) )
 				{
 					pPos[0] = 0;
 					V_strcat_safe( tempFilename, ".mdl" );

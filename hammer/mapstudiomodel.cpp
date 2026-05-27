@@ -901,7 +901,7 @@ intp CMapStudioModel::GetSequenceIndex( const char *pSequenceName ) const
 		{
 			char name[2048];
 			m_pStudioModel->GetSequenceName( i, name );
-			if ( Q_stricmp( pSequenceName, name ) == 0 )
+			if ( V_strieq( pSequenceName, name ) )
 				return i;
 		}
 	}

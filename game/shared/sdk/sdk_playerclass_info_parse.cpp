@@ -61,11 +61,11 @@ void CSDKPlayerClassInfo::Parse( KeyValues *pKeyValuesData, const char *szWeapon
 	const char *pTeam = pKeyValuesData->GetString( "team", NULL );
 	if ( pTeam )
 	{
-		if ( Q_stricmp( pTeam, "BLUE" ) == 0 )
+		if ( V_strieq( pTeam, "BLUE" ) )
 		{
 			m_iTeam = SDK_TEAM_BLUE;
 		}
-		else if ( Q_stricmp( pTeam, "RED" ) == 0 )
+		else if ( V_strieq( pTeam, "RED" ) )
 		{
 			m_iTeam = SDK_TEAM_RED;
 		}

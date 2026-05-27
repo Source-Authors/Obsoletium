@@ -245,7 +245,7 @@ static bool DecompressBZipToDisk( const char *outFilename, const char *srcFilena
 		Q_FileBase( outFilename, szOutFilenameBase );
 		if ( !Q_isempty( cl.m_szLevelBaseName ) )
 		{
-			bMapFile = ( Q_stricmp( szOutFilenameBase, cl.m_szLevelBaseName ) == 0 );
+			bMapFile = V_strieq( szOutFilenameBase, cl.m_szLevelBaseName );
 		}
 
 		while ( 1 )

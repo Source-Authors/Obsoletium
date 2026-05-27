@@ -990,7 +990,7 @@ bool CEconOperationDefinition::BInitFromKV( KeyValues *pKVPOperation, CUtlVector
 RTime32	CEconOperationDefinition::GetMinQueueFreq() const
 { 
 #ifdef STAGING_ONLY
-	if ( Q_stricmp( gc_quick_operation_drop_name.GetString(), m_pszName ) == 0 )
+	if ( V_strieq( gc_quick_operation_drop_name.GetString(), m_pszName ) )
 	{
 		return gc_quick_operation_drop_rate.GetInt();
 	}
@@ -1002,7 +1002,7 @@ RTime32	CEconOperationDefinition::GetMinQueueFreq() const
 RTime32	CEconOperationDefinition::GetMaxQueueFreq() const
 { 
 #ifdef STAGING_ONLY
-	if ( Q_stricmp( gc_quick_operation_drop_name.GetString(), m_pszName ) == 0 )
+	if ( V_strieq( gc_quick_operation_drop_name.GetString(), m_pszName ) )
 	{
 		return gc_quick_operation_drop_rate.GetInt() + 2;
 	}
@@ -1014,7 +1014,7 @@ RTime32	CEconOperationDefinition::GetMaxQueueFreq() const
 RTime32	CEconOperationDefinition::GetMinDropFreq() const 
 { 
 #ifdef STAGING_ONLY
-	if ( Q_stricmp( gc_quick_operation_drop_name.GetString(), m_pszName ) == 0 )
+	if ( V_strieq( gc_quick_operation_drop_name.GetString(), m_pszName ) )
 	{
 		return gc_quick_operation_drop_rate.GetInt();
 	}
@@ -1026,7 +1026,7 @@ RTime32	CEconOperationDefinition::GetMinDropFreq() const
 RTime32	CEconOperationDefinition::GetMaxDropFreq() const 
 { 
 #ifdef STAGING_ONLY
-	if ( Q_stricmp( gc_quick_operation_drop_name.GetString(), m_pszName ) == 0 )
+	if ( V_strieq( gc_quick_operation_drop_name.GetString(), m_pszName ) )
 	{
 		return gc_quick_operation_drop_rate.GetInt() + 2;
 	}
@@ -3748,27 +3748,27 @@ private:
 
 		const char *pszMethod = staticAttrib.m_pKVCustomData->GetString( "method", NULL );
 
-		if ( Q_stricmp( pszMethod, "employee_number" ) == 0 )
+		if ( V_strieq( pszMethod, "employee_number" ) )
 		{
 			flValue = pGameAccount->Obj().m_rtime32FirstPlayed;
 		}
-		else if ( Q_stricmp( pszMethod, "date" ) == 0 ) // Not used?
+		else if ( V_strieq( pszMethod, "date" ) ) // Not used?
 		{
 			flValue = CRTime::RTime32TimeCur();
 		}
-		else if ( Q_stricmp( pszMethod, "year" ) == 0 )
+		else if ( V_strieq( pszMethod, "year" ) )
 		{
 			flValue = CRTime( CRTime::RTime32TimeCur() ).GetYear();
 		}
-		else if ( Q_stricmp( pszMethod, "gifts_given_out" ) == 0 )
+		else if ( V_strieq( pszMethod, "gifts_given_out" ) )
 		{
 			flValue = pGameAccount->Obj().m_unNumGiftsGiven;
 		}
-		else if ( Q_stricmp( pszMethod, "expiration_period_hours_from_now" ) == 0 )
+		else if ( V_strieq( pszMethod, "expiration_period_hours_from_now" ) )
 		{
 			flValue = CRTime::RTime32DateAdd( CRTime::RTime32TimeCur(), staticAttrib.m_value.asFloat, k_ETimeUnitHour );
 		}
-		else if ( Q_stricmp( pszMethod, "def index from lootlist" ) == 0 )
+		else if ( V_strieq( pszMethod, "def index from lootlist" ) )
 		{
 			const char* pszLootlistName = staticAttrib.m_pKVCustomData->GetString( "lootlist" );
 			// Custom data stores the lootlist
@@ -5519,7 +5519,7 @@ const char *CEconItemDefinition::GetActivityOverride( int iTeam, const char *psz
 	for ( int i = 0; i < iAnims; i++ )
 	{
 		animation_on_wearable_t *pData = GetAnimationData( iTeam, i );
-		if ( Q_stricmp( pszActivity, pData->pszActivity ) == 0 )
+		if ( V_strieq( pszActivity, pData->pszActivity ) )
 			return pData->pszReplacement;
 	}
 
@@ -7384,7 +7384,7 @@ bool CEconItemSchema::BInitItems( KeyValues *pKVItems, CUtlVector<CUtlString> *p
 	{
 		FOR_EACH_TRUE_SUBKEY( pKVItems, pKVItem )
 		{
-			if ( Q_stricmp( pKVItem->GetName(), "default" ) == 0 )
+			if ( V_strieq( pKVItem->GetName(), "default" ) )
 			{
 #if defined(CLIENT_DLL) || defined(GAME_DLL)
 				SCHEMA_INIT_CHECK(

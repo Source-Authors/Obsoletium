@@ -178,7 +178,7 @@ static bool DoesMaterialHaveKey( KeyValues *pKeyValues, const char *pKeyName )
 static bool DoesMaterialHaveKeyValuePair( KeyValues *pKeyValues, const char *pKeyName, const char *pSearchValue )
 {
 	const char *pVal = pKeyValues->GetString( pKeyName, NULL );
-	if ( pVal != NULL && ( Q_stricmp( pSearchValue, pVal ) == 0 ) )
+	if ( pVal != NULL && V_strieq( pSearchValue, pVal ) )
 		return true;
 
 	for( KeyValues *pSubKey = pKeyValues->GetFirstTrueSubKey(); pSubKey; pSubKey = pSubKey->GetNextTrueSubKey() )

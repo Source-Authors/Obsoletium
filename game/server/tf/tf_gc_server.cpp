@@ -3206,7 +3206,7 @@ void CTFGCServerSystem::UpdateConnectedPlayersAndServerInfo( CMsgGameServerMatch
 	     ( eGameServerInfoState == m_eLastGameServerUpdateState ) &&
 	     ( eGameServerInfoMatchmakingMode == m_eLastGameServerUpdateMatchmakingMode ) &&
 	     // map changes are infrequent, and matter quite a bit, so always send them
-	     Q_stricmp( m_sLastGameServerUpdateMap, sGameServerInfoMap ) == 0 )
+	     V_strieq( m_sLastGameServerUpdateMap, sGameServerInfoMap ) )
 	{
 
 		// No need to send periodic updates if we're not participating and don't think we have a lobby or match at all.
@@ -3305,7 +3305,7 @@ void CTFGCServerSystem::UpdateConnectedPlayersAndServerInfo( CMsgGameServerMatch
 	     ( msg.Body().matchmaking_state() == m_eLastGameServerUpdateState ) &&
 	     ( msg.Body().matchmaking_mode() == m_eLastGameServerUpdateMatchmakingMode ) &&
 	     // map changes are infrequent, and matter quite a bit, so always send them
-	     Q_stricmp( m_sLastGameServerUpdateMap, msg.Body().map().c_str() ) == 0 )
+	     V_strieq( m_sLastGameServerUpdateMap, msg.Body().map().c_str() ) )
 	{
 
 		// No need to send periodic updates if we're not participating and don't think we have a lobby or match at all.

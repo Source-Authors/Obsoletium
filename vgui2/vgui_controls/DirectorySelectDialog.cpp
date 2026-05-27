@@ -262,7 +262,7 @@ void DirectorySelectDialog::ExpandTreeToPath( const char *lpszPath, bool bSelect
 			KeyValues *pValues = m_pDirTree->GetItemData( nChild );
 
 			// See if this matches
-			if ( Q_stricmp( pValues->GetString( "Text" ), subDirName ) == 0 )
+			if ( V_strieq( pValues->GetString( "Text" ), subDirName ) )
 			{
 				// This is the new root item
 				nItemIndex = nChild;

@@ -171,13 +171,10 @@ void CvarToggleCheckButton<T>::ApplySettings( KeyValues *inResourceData )
 	const char *cvarName = inResourceData->GetString("cvar_name", "");
 	const char *cvarValue = inResourceData->GetString("cvar_value", "");
 
-	if( Q_stricmp( cvarName, "") == 0 )
+	if( Q_isempty( cvarName ) )
 		return;// Doesn't have cvar set up in res file, must have been constructed with it.
 
-	if( Q_stricmp( cvarValue, "1") == 0 )
-		m_bStartValue = true;
-	else
-		m_bStartValue = false;
+	m_bStartValue = V_streq( cvarValue, "1")
 
 	m_cvar.Init( cvarName, m_bIgnoreMissingCvar );
 	if ( m_cvar.IsValid() )

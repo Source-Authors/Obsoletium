@@ -4379,7 +4379,7 @@ void V_StripAndPreserveHTMLCore( CUtlBuffer *pbuffer, IN_Z const char *pchHTML, 
 									{
 										vecTagStack.Remove( vecTagStack.Count() - 1 );
 
-										if ( Q_stricmp( szTag, "pre" ) == 0 )
+										if ( V_strieq( szTag, "pre" ) )
 										{
 											nPreTagDepth--;
 											if ( nPreTagDepth < 0 )
@@ -4409,7 +4409,7 @@ void V_StripAndPreserveHTMLCore( CUtlBuffer *pbuffer, IN_Z const char *pchHTML, 
 									if ( !bNoCloseTag )
 									{
 										vecTagStack.AddToTail( szTag );
-										if ( Q_stricmp( szTag, "pre" ) == 0 )
+										if ( V_strieq( szTag, "pre" ) )
 										{
 											nPreTagDepth++;
 										}

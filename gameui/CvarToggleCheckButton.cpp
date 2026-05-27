@@ -136,7 +136,7 @@ void CCvarToggleCheckButton::ApplySettings( KeyValues *inResourceData )
 	const char *cvarName = inResourceData->GetString("cvar_name", "");
 	const char *cvarValue = inResourceData->GetString("cvar_value", "");
 
-	if( Q_stricmp( cvarName, "") == 0 )
+	if( Q_isempty( cvarName ) )
 		return;// Doesn't have cvar set up in res file, must have been constructed with it.
 
 	if( m_pszCvarName )
@@ -144,17 +144,11 @@ void CCvarToggleCheckButton::ApplySettings( KeyValues *inResourceData )
 
 	m_pszCvarName = cvarName ? strdup( cvarName ) : NULL;
 
-	if( Q_stricmp( cvarValue, "1") == 0 )
-		m_bStartValue = true;
-	else
-		m_bStartValue = false;
+	m_bStartValue = V_streq( cvarValue, "1" );
 
 	const ConVar *var = cvar->FindVar( m_pszCvarName );
 	if ( var )
 	{
-		if( var->GetBool() )
-			SetSelected( true );
-		else
-			SetSelected( false );
+		SetSelected( var->GetBool() );
 	}
 }

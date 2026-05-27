@@ -50,19 +50,19 @@ void CRagdollLowViolenceManager::SetLowViolence( const char *pMapName )
 	// the player has the super gravity gun and fading ragdolls will break things.
 	if( hl2_episodic.GetBool() )
 	{
-		if ( Q_stricmp( pMapName, "ep1_citadel_02" ) == 0 ||
-			Q_stricmp( pMapName, "ep1_citadel_02b" ) == 0 ||
-			Q_stricmp( pMapName, "ep1_citadel_03" ) == 0 )
+		if ( V_strieq( pMapName, "ep1_citadel_02" ) ||
+			V_strieq( pMapName, "ep1_citadel_02b" ) ||
+			V_strieq( pMapName, "ep1_citadel_03" ) )
 		{
 			m_bLowViolence = false;
 		}
 	}
 	else
 	{
-		if ( Q_stricmp( pMapName, "d3_citadel_03" ) == 0 ||
-			Q_stricmp( pMapName, "d3_citadel_04" ) == 0 ||
-			Q_stricmp( pMapName, "d3_citadel_05" ) == 0 ||
-			Q_stricmp( pMapName, "d3_breen_01" ) == 0 )
+		if ( V_strieq( pMapName, "d3_citadel_03" ) ||
+			V_strieq( pMapName, "d3_citadel_04" ) ||
+			V_strieq( pMapName, "d3_citadel_05" ) ||
+			V_strieq( pMapName, "d3_breen_01" ) )
 		{
 			m_bLowViolence = false;
 		}

@@ -132,7 +132,7 @@ void CClassMenu_TER::Update()
 
 Panel *CClassMenu_TER::CreateControlByName(const char *controlName)
 {
-	if ( Q_stricmp( controlName, "CSClassImagePanel" ) == 0 )
+	if ( V_strieq( controlName, "CSClassImagePanel" ) )
 	{
 		return new CCSClassImagePanel( NULL, controlName );
 	}
@@ -155,7 +155,7 @@ CClassMenu_CT::CClassMenu_CT(IViewPort *pViewPort) : CClassMenu(pViewPort, PANEL
 
 Panel *CClassMenu_CT::CreateControlByName(const char *controlName)
 {
-	if ( Q_stricmp( controlName, "CSClassImagePanel" ) == 0 )
+	if ( V_strieq( controlName, "CSClassImagePanel" ) )
 	{
 		return new CCSClassImagePanel( NULL, controlName );
 	}

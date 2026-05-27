@@ -60,7 +60,7 @@ void Bot_RunAll( void );
 #ifndef GAME_DLL
 inline bool FStrEq(const char *sz1, const char *sz2)
 {
-	return(Q_stricmp(sz1, sz2) == 0);
+	return sz1 == sz2 || V_strieq(sz1, sz2);
 }
 #endif
 //---------------------------------------------------------------------------------

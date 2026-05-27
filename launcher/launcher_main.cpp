@@ -218,7 +218,7 @@ void RemoveDuplicatedGameParameters(ICommandLine *command_line) {
   char last_game_arg[MAX_PATH];
 
   for (int i = 0; i < command_line->ParmCount() - 1; i++) {
-    if (Q_stricmp(command_line->GetParm(i), "-game") == 0) {
+    if (V_strieq(command_line->GetParm(i), "-game")) {
       Q_snprintf(last_game_arg, sizeof(last_game_arg), "\"%s\"",
                  command_line->GetParm(i + 1));
 

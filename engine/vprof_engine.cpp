@@ -299,7 +299,7 @@ CON_COMMAND( vprof_vtune_group, "enable vtune for a particular vprof group (\"di
 		return;
 	}
 	const char *pArg = args[ 1 ];
-	if( Q_stricmp( pArg, "disable" ) == 0 )
+	if( V_strieq( pArg, "disable" ) )
 	{
 		g_VProfCurrentProfile.DisableVTuneGroup();
 	}

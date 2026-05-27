@@ -120,7 +120,7 @@ bool CManageGamesDialog::IsGameNameUnique( const char *name )
 void CManageGamesDialog::OnCommand( const char *command )
 {
 	// Handle "OK" button
-	if ( Q_stricmp( command, "Select" ) == 0 )
+	if ( V_strieq( command, "Select" ) )
 	{
 		char textBuffer[1024];
 
@@ -175,7 +175,7 @@ void CManageGamesDialog::OnCommand( const char *command )
 		Close();
 	}
 	// Modified to allow more than one browse button
-	else if ( Q_stricmp( command, "BrowseDir" ) == 0 )
+	else if ( V_strieq( command, "BrowseDir" ) )
 	{
 		// Create a new dialog
 		CModalDirectorySelectDialog *pDlg = vgui::SETUP_PANEL( new CModalDirectorySelectDialog( this, "Select Game Directory" ) );

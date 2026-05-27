@@ -624,15 +624,15 @@ void CTFTeamMenu::OnCommand( const char *command )
 			const char *pTeam = command + Q_strlen( "jointeam " );
 			int iTeam = TEAM_INVALID;
 
-			if ( Q_stricmp( pTeam, "spectate" ) == 0 )
+			if ( V_strieq( pTeam, "spectate" ) )
 			{
 				iTeam = TEAM_SPECTATOR;
 			}
-			else if ( Q_stricmp( pTeam, "red" ) == 0 )
+			else if ( V_strieq( pTeam, "red" ) )
 			{
 				iTeam = TF_TEAM_RED;
 			}
-			else if ( Q_stricmp( pTeam, "blue" ) == 0 )
+			else if ( V_strieq( pTeam, "blue" ) )
 			{
 				iTeam = TF_TEAM_BLUE;
 			}

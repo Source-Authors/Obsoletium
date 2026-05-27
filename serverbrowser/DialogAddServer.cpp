@@ -138,11 +138,11 @@ void CDialogAddServer::OnTextChanged()
 //-----------------------------------------------------------------------------
 void CDialogAddServer::OnCommand(const char *command)
 {
-	if ( Q_stricmp(command, "OK") == 0 )
+	if ( V_strieq(command, "OK") )
 	{
 		OnOK();
 	}
-	else if ( Q_stricmp( command, "TestServers" ) == 0 )
+	else if ( V_strieq( command, "TestServers" ) )
 	{
 		SetTall( m_OriginalHeight );
 		m_pTabPanel->SetVisible( true );

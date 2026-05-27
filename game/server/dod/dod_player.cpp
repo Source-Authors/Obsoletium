@@ -3272,7 +3272,7 @@ int CDODPlayer::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 				weaponID = pGren->GetEmitterWeaponID();
 			}
 		}
-		else if ( Q_stricmp( weaponName, "dod_bomb_target" ) == 0 )
+		else if ( V_strieq( weaponName, "dod_bomb_target" ) )
 		{
 			weaponID = WEAPON_NONE;
 		}

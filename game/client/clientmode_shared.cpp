@@ -240,7 +240,7 @@ static void __MsgFunc_VGUIMenu( bf_read &msg )
 	}
 
 	// is the server telling us to show the scoreboard (at the end of a map)?
-	if ( Q_stricmp( panelname, "scores" ) == 0 )
+	if ( V_strieq( panelname, "scores" ) )
 	{
 		if ( hud_takesshots.GetBool() == true )
 		{
@@ -257,7 +257,7 @@ static void __MsgFunc_VGUIMenu( bf_read &msg )
 
 	// is the server trying to show an MOTD panel? Check that it's allowed right now.
 	ClientModeShared *mode = ( ClientModeShared * )GetClientModeNormal();
-	if ( Q_stricmp( panelname, PANEL_INFO ) == 0 && mode )
+	if ( V_strieq( panelname, PANEL_INFO ) && mode )
 	{
 		if ( !mode->IsInfoPanelAllowed() )
 		{

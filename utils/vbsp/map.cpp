@@ -1673,12 +1673,12 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, void* nParam)
 			return ( ChunkFile_Ok );
 		}
 
-		if ( Q_stricmp( pClassName, "info_no_dynamic_shadow" ) == 0 )
+		if ( V_strieq( pClassName, "info_no_dynamic_shadow" ) )
 		{
 			return HandleNoDynamicShadowsEnt( mapent );
 		}
 
-		if ( Q_stricmp( pClassName, "func_instance_parms" ) == 0 )
+		if ( V_strieq( pClassName, "func_instance_parms" ) )
 		{
 			// Clear out this entity.
 			mapent->epairs = NULL;

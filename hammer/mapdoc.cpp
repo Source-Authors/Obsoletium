@@ -7076,7 +7076,7 @@ static bool FindName( CUtlVector<const char*>*pList, const char * pszString )
 {
 	for ( int i=0; i<pList->Count(); i++ )
 	{
-		if ( Q_stricmp( pszString, pList->Element(i)) == 0 )
+		if ( V_strieq( pszString, pList->Element(i)) )
 			return true;
 	}
 

@@ -917,7 +917,7 @@ bool IsVCProjFile( const char *pFilename )
 {
 	char ext[512];
 	Q_StrRight( pFilename, 7, ext, sizeof( ext ) );
-	return ( Q_stricmp( ext, ".vcxproj" ) == 0 );
+	return V_strieq( ext, ".vcxproj" );
 }	
 
 

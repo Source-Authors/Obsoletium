@@ -1023,7 +1023,7 @@ void CBaseAssetPicker::SetInitialSelection( const char *pAssetName )
 			if ( !pTestAssetName )
 				continue;
 				
-			if ( Q_stricmp( pTestAssetName, pAssetName ) == 0 )
+			if ( V_strieq( pTestAssetName, pAssetName ) )
 			{
 				m_pAssetBrowser->SetSelectedCell( i, 0 );
 				break;

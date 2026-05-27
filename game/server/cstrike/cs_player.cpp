@@ -3450,11 +3450,11 @@ BuyResult_e CCSPlayer::HandleCommand_Buy_Internal( const char* wpnName )
 	CCSWeaponInfo *pWeaponInfo = GetWeaponInfo( AliasToWeaponID( wpnName ) );
 	if ( pWeaponInfo == NULL )
 	{
-		if ( Q_stricmp( wpnName, "primammo" ) == 0 )
+		if ( V_strieq( wpnName, "primammo" ) )
 		{
 			result = AttemptToBuyAmmo( 0 );
 		}
-		else if ( Q_stricmp( wpnName, "secammo" ) == 0 )
+		else if ( V_strieq( wpnName, "secammo" ) )
 		{
 			result = AttemptToBuyAmmo( 1 );
 		}

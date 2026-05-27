@@ -96,7 +96,7 @@ typedef const char *AIConcept_t;
 
 inline bool CompareConcepts( AIConcept_t c1, AIConcept_t c2 ) 
 {
-	return ( (void *)c1 == (void *)c2 || ( c1 && c2 && Q_stricmp( c1, c2 ) == 0 ) );
+	return c1 == c2 || ( c1 && c2 && V_strieq( c1, c2 ) );
 }
 
 //-------------------------------------

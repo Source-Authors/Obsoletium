@@ -996,7 +996,7 @@ void S_ReloadSound( const char *name )
 #ifdef _DEBUG
 	if ( sfx )
 	{
-		Assert( Q_stricmp( sfx->getname(), name ) == 0 );
+		Assert( V_strieq( sfx->getname(), name ) );
 	}
 #endif
 	

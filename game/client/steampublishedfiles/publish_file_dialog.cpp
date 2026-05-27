@@ -802,7 +802,7 @@ void CFilePublishDialog::PerformLayout()
 //-----------------------------------------------------------------------------
 void CFilePublishDialog::OnCommand( const char *command )
 {
-	if ( Q_stricmp( command, "Publish" ) == 0 )
+	if ( V_strieq( command, "Publish" ) )
 	{
 		// Verify they've filled everything out properly
 		bool bHasTitle = ( m_pFileTitle->GetTextLength() > 0 );
@@ -833,11 +833,11 @@ void CFilePublishDialog::OnCommand( const char *command )
 
 		PublishFile();
 	}
-	else if ( Q_stricmp( command, "Update" ) == 0 )
+	else if ( V_strieq( command, "Update" ) )
 	{
 		UpdateFile();
 	}
-	else if ( Q_stricmp( command, "MainFileMaps" ) == 0 )
+	else if ( V_strieq( command, "MainFileMaps" ) )
 	{
 		m_fileOpenMode = FILEOPEN_MAIN_FILE;
 
@@ -866,7 +866,7 @@ void CFilePublishDialog::OnCommand( const char *command )
 		pDlg->DoModal();
 		pDlg->Activate();
 	}
-	else if ( Q_stricmp( command, "MainFileOther" ) == 0 )
+	else if ( V_strieq( command, "MainFileOther" ) )
 	{
 		m_fileOpenMode = FILEOPEN_MAIN_FILE;
 
@@ -895,7 +895,7 @@ void CFilePublishDialog::OnCommand( const char *command )
 		pDlg->DoModal();
 		pDlg->Activate();
 	}
-	else if ( Q_stricmp( command, "PreviewBrowse" ) == 0 )
+	else if ( V_strieq( command, "PreviewBrowse" ) )
 	{
 		m_fileOpenMode = FILEOPEN_PREVIEW;
 		

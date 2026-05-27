@@ -1175,7 +1175,7 @@ CON_COMMAND( kickid, "Kick a player by userid or uniqueid, with a message." )
 		// searching by UniqueID
 		else	
 		{
-			if ( Q_stricmp( client->GetNetworkIDString(), szSearchString ) == 0 ) 
+			if ( V_strieq( client->GetNetworkIDString(), szSearchString ) ) 
 			{
 				// found!
 				break;

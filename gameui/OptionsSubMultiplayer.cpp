@@ -1644,15 +1644,15 @@ void COptionsSubMultiplayer::OnResetData()
 		// cl_downloadfilter
 		ConVarRef cl_downloadfilter( "cl_downloadfilter");
 
-		if ( Q_stricmp( cl_downloadfilter.GetString(), "none" ) == 0 )
+		if ( V_strieq( cl_downloadfilter.GetString(), "none" ) )
 		{
 			m_pDownloadFilterCombo->ActivateItem( 3 );
 		}
-		else if ( Q_stricmp( cl_downloadfilter.GetString(), "nosounds" ) == 0 )
+		else if ( V_strieq( cl_downloadfilter.GetString(), "nosounds" ) )
 		{
 			m_pDownloadFilterCombo->ActivateItem( 1 );
 		}
-		else if ( Q_stricmp( cl_downloadfilter.GetString(), "mapsonly" ) == 0 )
+		else if ( V_strieq( cl_downloadfilter.GetString(), "mapsonly" ) )
 		{
 			m_pDownloadFilterCombo->ActivateItem( 2 );
 		}

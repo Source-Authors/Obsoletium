@@ -196,7 +196,7 @@ bool CModWizardSubPanel_GetModInfo::OnNextButton()
 
 void CModWizardSubPanel_GetModInfo::OnCommand( const char *command )
 {
-	if ( Q_stricmp( command, "SearchButton" ) == 0 )
+	if ( V_strieq( command, "SearchButton" ) )
 	{
 		CModalPreserveDirectorySelectDialog *pDlg = vgui::SETUP_PANEL( new CModalPreserveDirectorySelectDialog( this, "#SelectInstallDirectory" ) );
 		pDlg->SetStartDirectory( "C:\\" );

@@ -3761,32 +3761,32 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 	if ( token[0] ) 
 	{
 		//TODO: Parse the type from a list instead
-		if ( Q_stricmp( token, "COMBINE" ) == 0 )
+		if ( V_strieq( token, "COMBINE" ) )
 		{
 			weaponType = MUZZLEFLASH_COMBINE;
 		}
-		else if ( Q_stricmp( token, "SMG1" ) == 0 )
+		else if ( V_strieq( token, "SMG1" ) )
 		{
 			weaponType = MUZZLEFLASH_SMG1;
 		}
 		// dimhotepus: Handle SMG2 muzzle flashes.
-		else if ( Q_stricmp( token, "SMG2" ) == 0 )
+		else if ( V_strieq( token, "SMG2" ) )
 		{
 			weaponType = MUZZLEFLASH_SMG2;
 		}
-		else if ( Q_stricmp( token, "PISTOL" ) == 0 )
+		else if ( V_strieq( token, "PISTOL" ) )
 		{
 			weaponType = MUZZLEFLASH_PISTOL;
 		}
-		else if ( Q_stricmp( token, "SHOTGUN" ) == 0 )
+		else if ( V_strieq( token, "SHOTGUN" ) )
 		{
 			weaponType = MUZZLEFLASH_SHOTGUN;
 		}
-		else if ( Q_stricmp( token, "357" ) == 0 )
+		else if ( V_strieq( token, "357" ) )
 		{
 			weaponType = MUZZLEFLASH_357;
 		}
-		else if ( Q_stricmp( token, "RPG" ) == 0 )
+		else if ( V_strieq( token, "RPG" ) )
 		{
 			weaponType = MUZZLEFLASH_RPG;
 		}
@@ -3820,7 +3820,7 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 		{
 			// dimhotepus: Combine have MUZZLE attachment not present on model.
 			// Try to attach them to left hand instead.
-			if ( Q_stricmp( token, "MUZZLE" ) == 0 )
+			if ( V_strieq( token, "MUZZLE" ) )
 			{
 				Warning( "Missed %s attachment on %s, fall back to anim_attachment_LH.\n", token, GetModelName() );
 

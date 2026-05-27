@@ -518,7 +518,7 @@ static void FileSystem_AddLoadedSearchPath(
 
 
 	// Special processing for ordinary game folders
-	if ( V_stristr( fullLocationPath, ".vpk" ) == nullptr && Q_stricmp( pPathID, "game" ) == 0 )
+	if ( V_stristr( fullLocationPath, ".vpk" ) == nullptr && V_strieq( pPathID, "game" ) )
 	{
 		if ( CommandLine()->FindParm( "-tempcontent" ) != 0 )
 		{
@@ -626,7 +626,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 
 		// dimhotepus: x86-64 support. TF2 backport.
 		char szBinLocation[MAX_PATH];
-		if ( Q_stricmp( pszPathID, "GAMEBIN" ) == 0 )
+		if ( V_strieq( pszPathID, "GAMEBIN" ) )
 		{
 			V_sprintf_safe( szBinLocation, "%s" PLATFORM_DIR, pLocation );
 			pLocation = szBinLocation;

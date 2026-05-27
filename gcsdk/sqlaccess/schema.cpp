@@ -888,7 +888,7 @@ void CSchema::AddIncludedFields( const char *pchIndexName, const char *pchNames 
 	{
 		FieldSet_t &refSet = m_VecIndexes.Element(i);
 		const char *pstrMatch = refSet.GetIndexName();
-			if ( Q_stricmp( pstrMatch, pchIndexName ) == 0 )
+		if ( V_strieq( pstrMatch, pchIndexName ) )
 		{
 			nIndexIndex = i;
 			break;

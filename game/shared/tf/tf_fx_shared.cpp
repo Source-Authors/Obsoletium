@@ -48,7 +48,7 @@ void ImpactSoundGroup( const char *pSoundName, const Vector &vecEndPos )
 		{
 			if ( vecEndPos.DistToSqr( pSound->m_vecPos ) < ( 300.0f * 300.0f ) )
 			{
-				if ( Q_stricmp( pSound->m_SoundName, pSoundName ) == 0 )
+				if ( V_strieq( pSound->m_SoundName, pSoundName ) )
 					return;
 			}
 		}

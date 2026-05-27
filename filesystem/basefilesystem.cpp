@@ -2159,7 +2159,7 @@ FileHandle_t CBaseFileSystem::OpenForRead( const char *pFileNameT, const char *p
 	FixUpPath ( pFileNameT, pFileNameBuff );
 
 	// Try the memory cache for un-restricted searches or "GAME" items.
-	if ( !pathID || Q_stricmp( pathID, "GAME" ) == 0 )
+	if ( !pathID || V_strieq( pathID, "GAME" ) )
 	{
 		CMemoryFileBacking* pBacking = nullptr;
 		{
@@ -2249,7 +2249,7 @@ FileHandle_t CBaseFileSystem::OpenForRead( const char *pFileNameT, const char *p
 				CPackFile *pPackFile = m_SearchPaths[i].GetPackFile();
 				if ( pPackFile )
 				{
-					if ( Q_stricmp( pPackFile->m_ZipName.Get(), openInfo.m_AbsolutePath ) == 0 )
+					if ( V_strieq( pPackFile->m_ZipName.Get(), openInfo.m_AbsolutePath ) )
 					{
 						openInfo.m_pSearchPath = &m_SearchPaths[i];
 						openInfo.m_pFileHandle = pPackFile->OpenFile( pRelativeFileName, openInfo.m_pOptions );

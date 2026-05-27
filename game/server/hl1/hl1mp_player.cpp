@@ -537,7 +537,7 @@ void CHL1MP_Player::SetPlayerModel( void )
 	Q_FileBase( engine->GetClientConVarValue( engine->IndexOfEdict( edict() ), "cl_playermodel" ), szBaseName, 128 );
 
 	// Don't let it be 'none'; default to Barney
-	if ( Q_stricmp( "none", szBaseName ) == 0 )
+	if ( V_strieq( "none", szBaseName ) )
 	{
 		Q_strcpy( szBaseName, "gordon"  );
 	}

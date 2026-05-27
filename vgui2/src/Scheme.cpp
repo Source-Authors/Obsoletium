@@ -711,7 +711,7 @@ void CScheme::LoadFonts()
 				else
 				{
 					// we must have a language
-					if ( Q_stricmp( language, pszKey ) == 0 ) // matches the language we're running?
+					if ( V_strieq( language, pszKey ) ) // matches the language we're running?
 					{
 						// get the range
 						KeyValues *pRange = pData->FindKey( "range" );

@@ -1562,7 +1562,7 @@ ClientClass* CBaseClientState::FindClientClass(const char *pClassName)
 
 	for(ClientClass *pCur=ClientDLL_GetAllClasses(); pCur; pCur=pCur->m_pNext)
 	{
-		if( Q_stricmp(pCur->m_pNetworkName, pClassName) == 0)
+		if( V_strieq(pCur->m_pNetworkName, pClassName) )
 			return pCur;
 	}
 

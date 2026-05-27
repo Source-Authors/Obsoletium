@@ -1246,7 +1246,7 @@ bool CTFItemDefinition::BInitFromKV( KeyValues *pKVItem, CUtlVector<CUtlString> 
 	const char *pszAnimSlot = pKVInitValues->GetString("anim_slot");
 	if ( pszAnimSlot && pszAnimSlot[0] )
 	{
-		if ( Q_stricmp(pszAnimSlot, "FORCE_NOT_USED") == 0 )
+		if ( V_strieq(pszAnimSlot, "FORCE_NOT_USED") )
 		{
 			m_iAnimationSlot = -2;
 		}
@@ -2335,7 +2335,7 @@ bool CTFItemSchema::BInitGameModes( KeyValues *pKVMaps, CUtlVector<CUtlString> *
 					const char *pszValue = NULL;
 
 					const char *pszType = pKVRestriction->GetName();
-					if ( Q_stricmp( pszType, "holiday" ) == 0 )
+					if ( V_strieq( pszType, "holiday" ) )
 					{
 						eType = kMatchmakingGameModeRestrictionType_Holiday;
 #ifndef GC_DLL
@@ -2344,7 +2344,7 @@ bool CTFItemSchema::BInitGameModes( KeyValues *pKVMaps, CUtlVector<CUtlString> *
 						nValue = EconHolidays_GetHolidayForString( pKVRestriction->GetString() );
 #endif
 					}
-					else if ( Q_stricmp( pszType, "operation" ) == 0 )
+					else if ( V_strieq( pszType, "operation" ) )
 					{
 						eType = kMatchmakingGameModeRestrictionType_Operation;
 						pszValue = pKVRestriction->GetString();

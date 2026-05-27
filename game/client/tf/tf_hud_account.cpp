@@ -455,7 +455,7 @@ public:
 		}
 
 		const char *pszTeam = inResourceData->GetString( "team" );
-		if ( Q_stricmp( pszTeam, "red" ) == 0 )
+		if ( V_strieq( pszTeam, "red" ) )
 		{
 			m_nTeam = TF_TEAM_RED;
 		}

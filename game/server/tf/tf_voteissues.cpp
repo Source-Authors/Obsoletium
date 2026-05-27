@@ -1146,7 +1146,7 @@ ConVar sv_vote_issue_mvm_challenge_allowed( "sv_vote_issue_mvm_challenge_allowed
 //-----------------------------------------------------------------------------
 void CMannVsMachineChangeChallengeIssue::ExecuteCommand( void )
 {
-	if ( Q_stricmp( m_szDetailsString, "normal" ) == 0 )
+	if ( V_strieq( m_szDetailsString, "normal" ) )
 	{
 		engine->ServerCommand( CFmtStr( "tf_mvm_popfile \"%s\";", STRING(gpGlobals->mapname) ) );
 	}

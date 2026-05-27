@@ -224,7 +224,7 @@ CCareerBaseBox::CCareerBaseBox(Panel *parent, const char *panelName, bool loadRe
 //--------------------------------------------------------------------------------------------------------------
 vgui::Panel * CCareerBaseBox::CreateControlByName(const char *controlName)
 {
-	if ( Q_stricmp( controlName, "ConVarCheckButton" ) == 0 )
+	if ( V_strieq( controlName, "ConVarCheckButton" ) )
 	{
 		ConVarToggleCheckButton *button = new ConVarToggleCheckButton( NULL, controlName, "" );
 		m_conVarCheckButtons.PutElement( button );

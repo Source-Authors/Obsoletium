@@ -1235,7 +1235,7 @@ SQLRETURN CJobUpdateSchema::YieldingGetTableFKConstraints( ESchemaCatalog eSchem
 		const char *pchTableName;
 		DbgVerify( sqlRecord.BGetStringValue( 1, &pchTableName ) );
 
-		AssertMsg( Q_stricmp( pchTableName, pRecordInfo->GetName() ) == 0, "FOREIGN KEY schema conversion found FK for table not matching search!\n" );
+		AssertMsg( V_strieq( pchTableName, pRecordInfo->GetName() ), "FOREIGN KEY schema conversion found FK for table not matching search!\n" );
 
 		const char *pchParentTable;
 		DbgVerify( sqlRecord.BGetStringValue( 2, &pchParentTable ) );

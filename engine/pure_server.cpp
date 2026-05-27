@@ -260,9 +260,9 @@ void CPureServerWhitelist::AddFileCommand( const char *pszFilePath, EPureServerF
 	// Figure out if they're referencing a file, a recursive directory, or a nonrecursive directory.		
 	CUtlDict<CCommand*,int> *pList;
 	const char *pEndPart = V_UnqualifiedFileName( pszFilePath );
-	if ( Q_stricmp( pEndPart, "..." ) == 0 )
+	if ( V_streq( pEndPart, "..." ) )
 		pList = &m_RecursiveDirCommands;
-	else if ( Q_stricmp( pEndPart, "*.*" ) == 0 )
+	else if ( V_streq( pEndPart, "*.*" ) )
 		pList = &m_NonRecursiveDirCommands;
 	else
 		pList = &m_FileCommands;

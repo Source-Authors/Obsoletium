@@ -293,7 +293,7 @@ static void TakeCubemapSnapshot( const Vector &origin, const char *pFileNameBase
 //-----------------------------------------------------------------------------
 void* CubemapsFSFactory( const char *pName, int *pReturnCode )
 {
-	if ( Q_stricmp( pName, FILESYSTEM_INTERFACE_VERSION ) == 0 )
+	if ( V_strieq( pName, FILESYSTEM_INTERFACE_VERSION ) )
 		return g_pFileSystem;
 
 	return NULL;

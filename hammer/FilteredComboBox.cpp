@@ -163,7 +163,7 @@ void CFilteredComboBox::SelectItem( const char *pStr )
 	{
 		CString str;
 		GetLBText( iCurSel, str );
-		if ( Q_stricmp( pStr, str ) == 0 )
+		if ( V_strieq( pStr, str ) )
 		{
 			// Make sure the edit control has the right text in there. If they called ForceEditControlText,
 			// then it might not.
@@ -765,7 +765,7 @@ void CFilteredComboBox::DoTextChangedCallback( const char *pText )
 {
 	// Sometimes it'll call here from a few places in a row. Only pass the result
 	// to the owner once.
-	if ( Q_stricmp( pText, m_LastTextChangedValue ) == 0 )
+	if ( V_strieq( pText, m_LastTextChangedValue ) )
 		return;
 		
 	m_LastTextChangedValue = pText;

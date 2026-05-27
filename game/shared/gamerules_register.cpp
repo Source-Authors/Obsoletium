@@ -35,7 +35,7 @@ CGameRulesRegister* CGameRulesRegister::FindByName( const char *pName )
 {
 	for ( CGameRulesRegister *pCur=s_pHead; pCur; pCur=pCur->m_pNext )
 	{
-		if ( Q_stricmp( pName, pCur->m_pClassName ) == 0 )
+		if ( V_strieq( pName, pCur->m_pClassName ) )
 			return pCur;
 	}
 	return NULL;

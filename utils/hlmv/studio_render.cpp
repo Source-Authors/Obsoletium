@@ -649,7 +649,7 @@ void StudioModel::SetUpBones( bool mergeBones )
 		{
 			for (j = 0; j < g_pCacheHdr->numbones(); j++)
 			{
-				if ( Q_stricmp( pStudioHdr->pBone( i )->pszName(), g_pCacheHdr->pBone( j )->pszName() ) == 0 )
+				if ( V_strieq( pStudioHdr->pBone( i )->pszName(), g_pCacheHdr->pBone( j )->pszName() ) )
 					break;
 			}
 			if (j < g_pCacheHdr->numbones())

@@ -322,11 +322,11 @@ void CCSWeaponInfo::Parse( KeyValues *pKeyValuesData, const char *szWeaponName )
 	
 	if( pMuzzleFlashStyle )
 	{
-		if ( Q_stricmp( pMuzzleFlashStyle, "CS_MUZZLEFLASH_X" ) == 0 )
+		if ( V_strieq( pMuzzleFlashStyle, "CS_MUZZLEFLASH_X" ) )
 		{
 			m_iMuzzleFlashStyle = CS_MUZZLEFLASH_X;
 		}
-		else if ( Q_stricmp( pMuzzleFlashStyle, "CS_MUZZLEFLASH_NONE" ) == 0 )
+		else if ( V_strieq( pMuzzleFlashStyle, "CS_MUZZLEFLASH_NONE" ) )
 		{
 			m_iMuzzleFlashStyle = CS_MUZZLEFLASH_NONE;
 		}
@@ -384,15 +384,15 @@ void CCSWeaponInfo::Parse( KeyValues *pKeyValuesData, const char *szWeaponName )
 	const char *pTeam = pKeyValuesData->GetString( "Team", NULL );
 	if ( pTeam )
 	{
-		if ( Q_stricmp( pTeam, "CT" ) == 0 )
+		if ( V_strieq( pTeam, "CT" ) )
 		{
 			m_iTeam = TEAM_CT;
 		}
-		else if ( Q_stricmp( pTeam, "TERRORIST" ) == 0 )
+		else if ( V_strieq( pTeam, "TERRORIST" ) )
 		{
 			m_iTeam = TEAM_TERRORIST;
 		}
-		else if ( Q_stricmp( pTeam, "ANY" ) == 0 )
+		else if ( V_strieq( pTeam, "ANY" ) )
 		{
 			m_iTeam = TEAM_UNASSIGNED;
 		}

@@ -390,7 +390,7 @@ void CGameUI::PlayGameStartupSound()
 
 	// only want to run the holiday check for TF2
 	const char *pGameName = CommandLine()->ParmValue( "-game", "hl2" );
-	if ( ( Q_stricmp( pGameName, "tf" ) == 0 ) || ( Q_stricmp( pGameName, "tf_beta" ) == 0 ) )
+	if ( ( V_strieq( pGameName, "tf" ) ) || ( V_strieq( pGameName, "tf_beta" ) ) )
 	{
 		// check for a holiday sound file
 		const char *pszHoliday = NULL;
@@ -744,7 +744,7 @@ void CGameUI::OnGameUIActivated()
 	{
 		const char *pGameName = CommandLine()->ParmValue( "-game", "hl2" );
 		// only want to run this for TF2
-		if ( ( Q_stricmp( pGameName, "tf" ) == 0 ) || ( Q_stricmp( pGameName, "tf_beta" ) == 0 ) )
+		if ( ( V_strieq( pGameName, "tf" ) ) || ( V_strieq( pGameName, "tf_beta" ) ) )
 		{
 			GameClientExports()->OnGameUIActivated();
 		}
@@ -760,7 +760,7 @@ void CGameUI::OnGameUIHidden()
 	{
 		const char *pGameName = CommandLine()->ParmValue( "-game", "hl2" );
 		// only want to run this for TF2
-		if ( ( Q_stricmp( pGameName, "tf" ) == 0 ) || ( Q_stricmp( pGameName, "tf_beta" ) == 0 ) )
+		if ( ( V_strieq( pGameName, "tf" ) ) || ( V_strieq( pGameName, "tf_beta" ) ) )
 		{
 			GameClientExports()->OnGameUIHidden();
 		}

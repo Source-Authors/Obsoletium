@@ -412,7 +412,7 @@ void DumpMinFootprintFiles( bool bForceRefresh )
 	// NOTE: copy files that are set to always_copy whether the version changed or not.
 	for ( KeyValues *pCur=pFileList->GetFirstSubKey(); pCur; pCur=pCur->GetNextKey() )
 	{
-		if ( ( Q_stricmp( pCur->GetName(), "mapping" ) == 0 ) && bVersionChanged )
+		if ( V_strieq( pCur->GetName(), "mapping" ) && bVersionChanged )
 		{
 			const char *pSrcMapping  = pCur->GetString( "src" );
 			const char *pDestMapping = pCur->GetString( "dest" );
@@ -423,7 +423,7 @@ void DumpMinFootprintFiles( bool bForceRefresh )
 
 			GetMinFootprintFiles_R( pDisplay->m_Filenames, pSrcMapping, destDir );
 		}
-		else if ( Q_stricmp( pCur->GetName(), "single_file" ) == 0 )
+		else if ( V_strieq( pCur->GetName(), "single_file" ) )
 		{
 			const char *pDestMapping = pCur->GetString();
 			
@@ -451,7 +451,7 @@ void DumpMinFootprintFiles( bool bForceRefresh )
 				AddMinFootprintFile( pDisplay->m_Filenames, pDestMapping, destFile, flags );
 			}
 		}
-		else if ( ( Q_stricmp( pCur->GetName(), "create_directory" ) == 0 ) && bVersionChanged )
+		else if ( V_strieq( pCur->GetName(), "create_directory" ) && bVersionChanged )
 		{
 			// Create an empty directory?
 			char destFile[MAX_PATH], destFileTemp[MAX_PATH];

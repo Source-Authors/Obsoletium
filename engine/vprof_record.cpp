@@ -180,7 +180,7 @@ public:
 		const CVProfNode *pInChild = pIn->m_pChild;
 		while ( pOutChild && pInChild )
 		{
-			Assert( Q_stricmp( pInChild->m_pszName, pOutChild->m_pszName ) == 0 );
+			Assert( V_strieq( pInChild->m_pszName, pOutChild->m_pszName ) );
 			Assert( pInChild->GetUniqueNodeID() == pOutChild->GetUniqueNodeID() );
 			Record_MatchTree_R( pOutChild, pInChild, pInProfile );
 			

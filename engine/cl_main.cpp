@@ -2171,15 +2171,11 @@ bool CL_ShouldLoadBackgroundLevel( const CCommand &args )
 	if ( InEditMode() )
 		return false;
 
-	// If TF2 and PC we don't want to load the background map.
-	bool bIsTF2 = false;
-	if ( ( Q_stricmp( COM_GetModDirectory(), "tf" ) == 0 ) ||
-		 ( Q_stricmp( COM_GetModDirectory(), "tf_beta" ) == 0 ) )
-	{
-		bIsTF2 = true;
-	}
+	// If TF2 we don't want to load the background map.
+	const char *pszModDir = COM_GetModDirectory();
+	bool bIsTF2 = V_strieq( pszModDir, "tf" ) || V_strieq( pszModDir, "tf_beta" );
 
-	if ( bIsTF2 && IsPC() )
+	if ( bIsTF2 )
 		return false;
 
 	if ( args.ArgC() == 2 )
@@ -2607,7 +2603,7 @@ CON_COMMAND_F( setinfo, "Adds a new user info value", FCVAR_CLIENTCMD_CAN_EXECUT
 	const char *value = args[ 2 ];
 
 	// Prevent players manually changing their name (their Steam account provides it now)
-	if ( Q_stricmp( name, "name" ) == 0 )
+	if ( V_strieq( name, "name" ) )
 		return;
 
 	// Discard any convar change request if contains funky characters

@@ -57,7 +57,7 @@
 
 			if ( vEndPos.DistToSqr( pSound->m_vPos ) < 300*300 )
 			{
-				if ( Q_stricmp( pSound->m_SoundName, pSoundName ) == 0 )
+				if ( V_strieq( pSound->m_SoundName, pSoundName ) )
 					return;
 			}
 		}

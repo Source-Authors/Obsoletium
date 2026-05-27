@@ -287,7 +287,7 @@ static bool HandleQcHints(
 
 	if ( sscanf( pBuf, "// %511s=%511s", key, val ) == 2 )
 	{
-		if ( Q_stricmp( key, "UPAXIS" ) == 0 )
+		if ( V_strieq( key, "UPAXIS" ) )
 		{
 			if ( strpbrk( val, "xX" ) )
 			{

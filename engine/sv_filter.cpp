@@ -810,7 +810,7 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 		else
 		{
 			// searching by UniqueID
-			if ( Q_stricmp( client->GetNetworkIDString(), szSearchString ) == 0 ) 
+			if ( V_strieq( client->GetNetworkIDString(), szSearchString ) ) 
 			{
 				// found!
 				localId = client->GetNetworkID();

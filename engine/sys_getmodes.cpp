@@ -785,7 +785,7 @@ void CVideoMode_Common::SetupStartupGraphic()
     buf.Clear();	// added this Clear() because we saw cases where LoadVTF was not emptying the buf fully in the above section
     // dimhotepus: Better SteamDeck support. HL2:DM before Anniversary Update
     // has no gamepadui.
-    const bool isHl2Dm = Q_stricmp(COM_GetModDirectory(), "hl2mp") == 0;
+    const bool isHl2Dm = V_strieq(COM_GetModDirectory(), "hl2mp");
     const char *loadingVtf = !IsSteamDeck() || isHl2Dm
         ? "materials/console/startup_loading.vtf"
         : "materials/gamepadui/game_logo.vtf";
@@ -850,7 +850,7 @@ void CVideoMode_Common::DrawStartupGraphic()
 
     // dimhotepus: Better SteamDeck support. HL2:DM before Anniversary Update
     // has no gamepadui.
-    const bool isHl2Dm = Q_stricmp(COM_GetModDirectory(), "hl2mp") == 0;
+    const bool isHl2Dm = V_strieq(COM_GetModDirectory(), "hl2mp");
     const char *loadingVtf = !IsSteamDeck() || isHl2Dm
         ? "console/startup_loading.vtf"
         : "gamepadui/game_logo.vtf";

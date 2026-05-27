@@ -1672,12 +1672,13 @@ void CEngineAPI::OnShutdown()
 static bool IsValveMod( const char *pModName )
 {
 	// Figure out if we're running a Valve mod or not.
-	return ( Q_stricmp( pModName, "cstrike" ) == 0 ||
-		Q_stricmp( pModName, "dod" ) == 0 ||
-		Q_stricmp( pModName, "hl1mp" ) == 0 ||
-		Q_stricmp( pModName, "tf" ) == 0 || 
-		Q_stricmp( pModName, "tf_beta" ) == 0 ||
-		Q_stricmp( pModName, "hl2mp" ) == 0 );
+	return
+		V_strieq( pModName, "cstrike" ) ||
+		V_strieq( pModName, "dod" ) ||
+		V_strieq( pModName, "hl1mp" ) ||
+		V_strieq( pModName, "tf" ) || 
+		V_strieq( pModName, "tf_beta" ) ||
+		V_strieq( pModName, "hl2mp" );
 }
 
 //-----------------------------------------------------------------------------

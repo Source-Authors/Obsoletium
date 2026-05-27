@@ -860,7 +860,7 @@ void CBaseGameStats_Driver::LevelInitPreEntity()
 	m_bInLevel = true;
 	m_bFirstLevel = false;
 
-	if ( Q_stricmp( s_szPseudoUniqueID, "unknown" ) == 0 )
+	if ( V_strieq( s_szPseudoUniqueID, "unknown" ) )
 	{
 		// "unknown" means this is a dedicated server and we weren't able to generate a unique ID (e.g. Linux server).
 		// Change the unique ID to be a hash of IP & port.  We couldn't do this earlier because IP is not known until level

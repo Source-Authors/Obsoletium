@@ -1,4 +1,4 @@
-//====== Copyright © 1996-2010, Valve Corporation, All rights reserved. =======
+//====== Copyright Â© 1996-2010, Valve Corporation, All rights reserved. =======
 //
 // Purpose: HTTP related enums and objects, stuff that both clients and server use should go here
 //
@@ -217,7 +217,7 @@ const CMsgHttpRequest_QueryParam *CHTTPRequest::GetGETParam( const char *pchGetP
 		}
 		else
 		{
-			if ( Q_stricmp( param.name().c_str(), pchGetParamName ) == 0 )
+			if ( V_strieq( param.name().c_str(), pchGetParamName ) )
 				return &param;
 		}
 	}
@@ -328,12 +328,12 @@ const CMsgHttpRequest_QueryParam *CHTTPRequest::GetPOSTParam( const char *pchPos
 		const CMsgHttpRequest_QueryParam& param = m_pProto->post_params( nParam );
 		if ( bMatchCase )
 		{
-			if ( Q_strcmp( param.name().c_str(), pchPostParamName ) == 0 )
+			if ( V_strieq( param.name().c_str(), pchPostParamName ) )
 				return &param;
 		}
 		else
 		{
-			if ( Q_stricmp( param.name().c_str(), pchPostParamName ) == 0 )
+			if ( V_strieq( param.name().c_str(), pchPostParamName ) )
 				return &param;
 		}
 	}
@@ -478,7 +478,7 @@ const char * CHTTPRequest::GetRequestHeaderValue( const char *pchRequestHeaderNa
 	for( uint32 nHeader = 0; nHeader < nNumHeaders; nHeader++ )
 	{
 		const CMsgHttpRequest_RequestHeader& header = m_pProto->headers( nHeader );
-		if( Q_stricmp( header.name().c_str(), pchRequestHeaderName ) == 0 )
+		if( V_strieq( header.name().c_str(), pchRequestHeaderName ) )
 		{
 			return header.value().c_str();
 		}
@@ -496,7 +496,7 @@ void CHTTPRequest::SetRequestHeaderValue( const char *pchHeaderName, const char 
 	for( uint32 nHeader = 0; nHeader < nNumHeaders; nHeader++ )
 	{
 		CMsgHttpRequest_RequestHeader* pHeader = m_pProto->mutable_headers( nHeader );
-		if( Q_stricmp( pHeader->name().c_str(), pchHeaderName ) == 0 )
+		if( V_strieq( pHeader->name().c_str(), pchHeaderName ) )
 		{
 			pHeader->set_value( pchHeaderString );
 			return;

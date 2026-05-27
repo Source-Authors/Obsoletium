@@ -685,7 +685,7 @@ void CQuestLogPanel::OnCommand( const char *pCommand )
 			}
 		}
 	}
-	else if ( Q_stricmp( "open_debug_menu", pCommand ) == 0 )
+	else if ( V_strieq( "open_debug_menu", pCommand ) )
 	{
 		if ( GetUniverse() == k_EUniverseBeta || GetUniverse() == k_EUniverseDev )
 		{

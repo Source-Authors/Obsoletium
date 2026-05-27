@@ -3528,9 +3528,9 @@ void CElementPropertiesTreeInternal::OnItemDropped( int itemIndex, CUtlVector< K
 	// Mouse if over an array entry which is an element array type...
 	if ( isArrayElement )
 	{
-		bool bReplace = Q_stricmp( cmd, "replace" ) == 0;
-		bool bBefore  = Q_stricmp( cmd, "before" ) == 0;
-		bool bAfter   = Q_stricmp( cmd, "after" ) == 0 || Q_stricmp( cmd, "default" ) == 0;
+		bool bReplace = V_strieq( cmd, "replace" );
+		bool bBefore  = V_strieq( cmd, "before" );
+		bool bAfter   = V_strieq( cmd, "after" ) || V_strieq( cmd, "default" );
 		if ( !bReplace && !bBefore && !bAfter )
 		{
 			Warning( "Unknown command '%s'\n", cmd );

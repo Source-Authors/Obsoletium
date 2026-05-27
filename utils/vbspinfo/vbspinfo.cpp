@@ -208,9 +208,9 @@ void PrintModelStats(FILE *fp) {
     const char *pClassName = NULL;
     const char *pModelName = NULL;
     for (; pEPair; pEPair = pEPair->next) {
-      if (Q_stricmp(pEPair->key, "classname") == 0) {
+      if (V_strieq(pEPair->key, "classname")) {
         pClassName = pEPair->value;
-      } else if (Q_stricmp(pEPair->key, "model") == 0) {
+      } else if (V_strieq(pEPair->key, "model")) {
         if (StringHasPrefix(pEPair->value, "models")) {
           pModelName = pEPair->value;
         }

@@ -1322,7 +1322,7 @@ void CBasePanel::ApplySchemeSettings(IScheme *pScheme)
 	if ( m_iLoadingImageID == -1 )
 	{
 		// dimhotepus: Better SteamDeck support. HL2:DM before Anniversary Update has no gamepadui.
-		const bool isHl2Dm = Q_stricmp( COM_GetModDirectory(), "hl2mp" ) == 0;
+		const bool isHl2Dm = V_strieq( COM_GetModDirectory(), "hl2mp" );
 		const char* loadingVtf = !IsSteamDeck() || isHl2Dm
 			? "console/startup_loading"
 			: "gamepadui/game_logo";

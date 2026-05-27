@@ -50,7 +50,7 @@ bool IsReplayServer( gameserveritem_t &server )
 			V_SplitString( server.m_szGameTags, ",", TagList );
 			for ( const auto *tag : TagList )
 			{
-				if ( Q_stricmp( tag, "replays" ) == 0 )
+				if ( V_strieq( tag, "replays" ) )
 				{
 					bReplay = true;
 				}
@@ -600,7 +600,7 @@ void CBaseGamesPage::CreateFilters()
 	m_pFilter = new ToggleButton(this, "Filter", "#ServerBrowser_Filters");
 	m_pFilterString = new Label(this, "FilterString", "");
 	
-	if ( Q_stricmp( COM_GetModDirectory(), "cstrike" ) == 0 )
+	if ( V_strieq( COM_GetModDirectory(), "cstrike" ) )
 	{
 		m_pFilter->SetSelected( false );
 		m_bFiltersVisible = false;
@@ -2087,7 +2087,7 @@ void CDialogServerWarning::ApplySchemeSettings( IScheme *pScheme )
 //-----------------------------------------------------------------------------
 void CDialogServerWarning::OnCommand(const char *command)
 {
-	if ( Q_stricmp(command, "OK") == 0 )
+	if ( V_strieq(command, "OK") )
 	{
 		// mark ourselves to be closed
 		PostMessage(this, new KeyValues("Close"));

@@ -244,7 +244,7 @@ void CServerRemoteAccess::WriteDataRequest( CRConServer *pNetworkListener, ra_li
 						{
 							if ( var->IsCommand() )
 							{
-								if ( Q_stricmp( var->GetName(), "mp_disable_autokick" ) == 0 )
+								if ( V_strieq( var->GetName(), "mp_disable_autokick" ) )
 								{
 									Cbuf_AddText( va( "mp_disable_autokick %d\n", userID ) );
 									Cbuf_Execute();

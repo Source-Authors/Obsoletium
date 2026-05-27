@@ -165,12 +165,12 @@ const char * GetTranslatedWeaponAlias( const char *szAlias )
 //
 const char * GetWeaponAliasFromTranslated(const char *translatedAlias)
 {
-	int i = 0;
+	intp i = 0;
 	const WeaponAliasTranslationInfoStruct *info = &(s_WeaponAliasTranslationInfo[i]);
 
-	while (info->alias[0] != 0)
+	while (!Q_isempty(info->alias))
 	{
-		if (Q_stricmp(translatedAlias, info->translatedAlias) == 0)
+		if (V_strieq(translatedAlias, info->translatedAlias))
 		{
 			return info->alias;
 		}
