@@ -288,7 +288,7 @@ void CNeurotoxinCountdown::RestoreControlPanels( void )
 
 		CVGuiScreen *pScreen = (CVGuiScreen *)gEntList.FindEntityByClassname( NULL, pScreenClassname );
 
-		while ( ( pScreen && pScreen->GetOwnerEntity() != this ) || Q_strcmp( pScreen->GetPanelName(), pScreenName ) != 0 )
+		while ( ( pScreen && pScreen->GetOwnerEntity() != this ) || !V_streq( pScreen->GetPanelName(), pScreenName ) )
 		{
 			pScreen = (CVGuiScreen *)gEntList.FindEntityByClassname( pScreen, pScreenClassname );
 		}

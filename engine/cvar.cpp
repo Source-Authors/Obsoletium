@@ -584,9 +584,9 @@ void CCvarUtilities::WriteVariables( CUtlBuffer &buff, bool bAllVars )
 		{
 			const ConVar *pConvar = assert_cast<const ConVar *>( var );
 			// Only write out values that differ from the defaults.
-			if ( bAllVars || Q_strcmp( pConvar->GetString(), pConvar->GetDefault() ) != 0 )
+			if ( bAllVars || !V_streq( pConvar->GetString(), pConvar->GetDefault() ) )
 			{
-				buff.Printf( "%s \"%s\"\n", var->GetName(), ((ConVar *)var)->GetString() );
+				buff.Printf( "%s \"%s\"\n", var->GetName(), pConvar->GetString() );
 			}
 		}
 	}

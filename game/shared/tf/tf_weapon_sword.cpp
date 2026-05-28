@@ -388,7 +388,7 @@ bool CTFDecapitationMeleeWeaponBase::Holster( CBaseCombatWeapon *pSwitchingTo )
 void CTFDecapitationMeleeWeaponBase::FireGameEvent( IGameEvent *event )
 {
 	const char *pszEventName = event->GetName();
-	if ( Q_strcmp( pszEventName, "player_death" ) != 0 )
+	if ( !V_streq( pszEventName, "player_death" ) )
 		return;
 
 	CTFPlayer *pOwner = ToTFPlayer( GetOwner() );

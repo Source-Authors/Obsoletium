@@ -147,7 +147,7 @@ bool CHudAchievementTracker::ShouldShowAchievement( IAchievement *pAchievement )
 	CBaseAchievement *pBaseAchievement = dynamic_cast< CBaseAchievement * >( pAchievement );
 	if ( pBaseAchievement && pBaseAchievement->GetMapNameFilter() && pBaseAchievement->GetAchievementMgr() )
 	{
-		if ( Q_strcmp( pBaseAchievement->GetAchievementMgr()->GetMapName(), pBaseAchievement->GetMapNameFilter() ) != 0 )
+		if ( !V_streq( pBaseAchievement->GetAchievementMgr()->GetMapName(), pBaseAchievement->GetMapNameFilter() ) )
 			return false;
 	}
 

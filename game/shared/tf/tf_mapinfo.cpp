@@ -492,7 +492,7 @@ public:
 
 	virtual void FireGameEvent( IGameEvent *event )
 	{
-		if ( Q_strcmp( event->GetName(), "item_schema_initialized" ) != 0 )
+		if ( !V_streq( event->GetName(), "item_schema_initialized" ) )
 			return;
 
 		for ( int i = 0; i < GetItemSchema()->GetMapCount(); i++ )

@@ -2206,7 +2206,7 @@ GC_CON_COMMAND( list_keys, "Lists all the keys in the schema" )
 	FOR_EACH_MAP_FAST( mapItemDefs, i )
 	{
 		const CEconItemDefinition* pItemDef = mapItemDefs[ i ];
-		if ( !pItemDef || !pItemDef->GetEconTool() || ( Q_strcmp( pItemDef->GetEconTool()->GetTypeName(), "decoder_ring" ) != 0 ) )
+		if ( !pItemDef || !pItemDef->GetEconTool() || ( !V_streq( pItemDef->GetEconTool()->GetTypeName(), "decoder_ring" ) ) )
 		{
 			continue;
 		}
@@ -4944,7 +4944,7 @@ bool CEconItemDefinition::BInitFromKV( KeyValues *pKVItem, CUtlVector<CUtlString
 #else
 			// Check that if we convert back to a string, we get the same value.  Emit an error, but don't fail in the game code
 			char rtimeBuf[k_RTimeRenderBufferSize];
-			if ( Q_strcmp( CRTime::RTime32ToString( m_rtExpiration, rtimeBuf ), pchExpiration ) != 0 )
+			if ( !V_streq( CRTime::RTime32ToString( m_rtExpiration, rtimeBuf ), pchExpiration ) )
 			{
 #if ( defined( _MSC_VER ) && _MSC_VER >= 1900 )
 #define timezone _timezone

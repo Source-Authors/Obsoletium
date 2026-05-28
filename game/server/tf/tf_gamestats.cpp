@@ -1804,10 +1804,10 @@ bool CTFGameStats::GetVoteData( const char *szIssueName, int nNumOptions, CUtlVe
 			const char *szItemName = m_MapsPlaytime.Key( iIndex ).Get();
 			int nItemTime = m_MapsPlaytime.Element( iIndex );
 			// Exclude the next map (already added) and the current map (omitted)
-			if ( Q_strcmp( szItemName, m_szNextMap ) != 0 &&
-				 Q_strcmp( szItemName, STRING( gpGlobals->mapname ) ) != 0 )
+			if ( !V_streq( szItemName, m_szNextMap ) &&
+				 !V_streq( szItemName, STRING( gpGlobals->mapname ) ) )
 			{
-				int iVec = vecMapsAndPlaytime.AddToTail();
+				intp iVec = vecMapsAndPlaytime.AddToTail();
 				vecMapsAndPlaytime[ iVec ].szName = szItemName;
 				vecMapsAndPlaytime[ iVec ].nTime = nItemTime;
 			}

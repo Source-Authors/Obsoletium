@@ -2515,7 +2515,7 @@ void NET_OpenSockets (void)
 	{
 		const char *net_interface = ipname.GetString();
 		// If net_interface was specified and it's not localhost...
-		if ( net_interface[ 0 ] && ( Q_strcmp( net_interface, "localhost" ) != 0 ) )
+		if ( net_interface[ 0 ] && ( !V_streq( net_interface, "localhost" ) ) )
 		{
 			// From clientdll/matchmaking/ServerList.cpp, the ports queried are:
 			//   27015 - 27020, 26900 - 26905

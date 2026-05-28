@@ -1212,7 +1212,7 @@ void CBackpackPanel::AssignItemToPanel( CItemModelPanel *pPanel, int iIndex )
 						continue;
 					}
 
-					if ( ( m_ToolSelectionItem.GetStaticData()->GetCapabilities() & ITEM_CAP_DECODABLE ) && pItem->GetStaticData()->GetEconTool() && ( Q_strcmp( pItem->GetStaticData()->GetEconTool()->GetTypeName(), "decoder_ring" ) != 0 ) )
+					if ( ( m_ToolSelectionItem.GetStaticData()->GetCapabilities() & ITEM_CAP_DECODABLE ) && pItem->GetStaticData()->GetEconTool() && ( !V_streq( pItem->GetStaticData()->GetEconTool()->GetTypeName(), "decoder_ring" ) ) )
 					{
 						continue;
 					}

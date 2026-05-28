@@ -651,7 +651,7 @@ void CTFHudMannVsMachineScoreboard::UpdatePopFile( void )
 {
 	if ( TFObjectiveResource() )
 	{
-		if ( Q_strcmp( m_popfile, TFObjectiveResource()->GetMvMPopFileName() ) != 0 )
+		if ( !V_streq( m_popfile, TFObjectiveResource()->GetMvMPopFileName() ) )
 		{
 			V_strcpy_safe( m_popfile, TFObjectiveResource()->GetMvMPopFileName() );
 			char szTempName[MAX_PATH];
