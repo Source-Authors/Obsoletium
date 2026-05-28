@@ -363,7 +363,7 @@ void CMaterialModifyProxy::OnBindSetVar( C_MaterialModifyControl *pControl )
 	if ( !bFound )
 		return;
 
-	if( Q_strcmp( pControl->GetMaterialVariableValue(), "" ) )
+	if( !Q_isempty( pControl->GetMaterialVariableValue() ) )
 	{
 //		const char *pMaterialName = m_pMaterial->GetName();
 //		const char *pMaterialVarName = pMaterialVar->GetName();

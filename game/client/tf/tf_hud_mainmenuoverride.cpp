@@ -1695,7 +1695,7 @@ void CHudMainMenuOverride::UpdateMOTD( bool bNewMOTDs )
 		if ( m_pMOTDHeaderIcon )
 		{
 			// Header Class icon
-			if (  pMOTD->GetHeaderIcon() == NULL || Q_strcmp( pMOTD->GetHeaderIcon(), "" ) == 0)
+			if ( Q_isempty( pMOTD->GetHeaderIcon() ) )
 			{
 				m_pMOTDHeaderIcon->SetVisible(false);
 			}
@@ -1760,7 +1760,7 @@ void CHudMainMenuOverride::UpdateMOTD( bool bNewMOTDs )
 		if ( m_pMOTDTitleImage )
 		{
 			m_pMOTDTitleImage->SetShouldScaleImage( false );
-			if ( pszImage == NULL || Q_strcmp( pszImage, "" ) == 0 || Q_strcmp( pszImage, "class_icons/filter_all_on") == 0 )
+			if ( Q_isempty( pszImage ) || V_streq( pszImage, "class_icons/filter_all_on") )
 			{
 				m_pMOTDTitleImage->SetImage( "../logo/new_tf2_logo" );
 			}

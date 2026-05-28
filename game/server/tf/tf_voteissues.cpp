@@ -808,7 +808,7 @@ bool CNextLevelIssue::CanCallVote( int iEntIndex, const char *pszDetails, vote_c
 	if ( sv_vote_issue_nextlevel_choicesmode.GetBool() && iEntIndex == 99 )
 	{
 		// Invokes a UI down stream
-		if ( Q_strcmp( pszDetails, "" ) == 0 )
+		if ( Q_isempty( pszDetails ) )
 		{
 			return true;
 		}
@@ -822,7 +822,7 @@ bool CNextLevelIssue::CanCallVote( int iEntIndex, const char *pszDetails, vote_c
 		return false;
 	}
 
-	if ( Q_strcmp( pszDetails, "" ) == 0 )
+	if ( Q_isempty( pszDetails ) )
 	{
 		nFailCode = VOTE_FAILED_MAP_NAME_REQUIRED;
 		return false;
@@ -860,7 +860,7 @@ bool CNextLevelIssue::CanCallVote( int iEntIndex, const char *pszDetails, vote_c
 const char *CNextLevelIssue::GetDisplayString( void )
 {
 	// If we don't have a map passed in already...
-	if ( Q_strcmp( m_szDetailsString, "" ) == 0 )
+	if ( Q_isempty( m_szDetailsString ) )
 	{
 		if ( sv_vote_issue_nextlevel_choicesmode.GetBool() )
 		{
@@ -917,7 +917,7 @@ void CNextLevelIssue::ListIssueDetails( CBasePlayer *pForWhom )
 bool CNextLevelIssue::IsYesNoVote( void )
 {
 	// If we don't have a map name already, this will trigger a list of choices
-	if ( Q_strcmp( m_szDetailsString, "" ) == 0 )
+	if ( Q_isempty( m_szDetailsString ) )
 	{
 		if ( sv_vote_issue_nextlevel_choicesmode.GetBool() )
 			return false;
@@ -932,7 +932,7 @@ bool CNextLevelIssue::IsYesNoVote( void )
 int CNextLevelIssue::GetNumberVoteOptions( void )
 {
 	// If we don't have a map name already, this will trigger a list of choices
-	if ( Q_strcmp( m_szDetailsString, "" ) == 0 )
+	if ( Q_isempty( m_szDetailsString ) )
 	{
 		if ( sv_vote_issue_nextlevel_choicesmode.GetBool() )
 			return MAX_VOTE_OPTIONS;
@@ -1197,7 +1197,7 @@ bool CMannVsMachineChangeChallengeIssue::CanCallVote( int iEntIndex, const char 
 		return false;
 	}
 
-	if ( Q_strcmp( pszDetails, "" ) == 0 )
+	if ( Q_isempty( pszDetails ) )
 	{
 		nFailCode = VOTE_FAILED_MAP_NAME_REQUIRED;
 		return false;

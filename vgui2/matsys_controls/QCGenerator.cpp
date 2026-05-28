@@ -563,7 +563,7 @@ bool CQCGenerator::GenerateQCFile()
 		}
 		else 
 		{
-			if( Q_strcmp( m_QCInfo_t.pszCollisionPath, "" ) )
+			if( !Q_isempty( m_QCInfo_t.pszCollisionPath ) )
 			{
 				g_pFullFileSystem->FPrintf( pSaveFile, "$collisionmodel \"%s\"", strrchr( m_QCInfo_t.pszCollisionPath, '\\' ) + 1 );
 			}
