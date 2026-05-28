@@ -330,7 +330,7 @@ void CBonusMapsDialog::BuildMapsList( void )
 	BonusMapsDatabase()->ScanBonusMaps();
 
 	// Enable back button if we're in a sub folder
-	bool bIsRoot = ( Q_strcmp( BonusMapsDatabase()->GetPath(), "." ) == 0 );
+	bool bIsRoot = V_streq( BonusMapsDatabase()->GetPath(), "." );
 	SetControlEnabled( "Back", !bIsRoot );
 	SetControlVisible( "Back", !bIsRoot );
 	SetControlEnabled( "ImportBonusMaps", bIsRoot );

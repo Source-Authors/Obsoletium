@@ -906,7 +906,7 @@ void PlaySounds( StudioModel *pStudioModel )
 		switch ( pEvent->event )
 		{
 		case 0:
-			if ( Q_strcmp( pEvent->pszEventName(), "AE_CL_PLAYSOUND" ) == 0 )
+			if ( V_streq( pEvent->pszEventName(), "AE_CL_PLAYSOUND" ) )
 			{
 				PlaySound( pEvent->pszOptions(), pStudioModel );
 				continue;

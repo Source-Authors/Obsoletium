@@ -258,7 +258,7 @@ public:
 			MenuItem *menuItem = dynamic_cast<MenuItem *>(GetChild(i));
 			if (menuItem)
 			{
-				if ( Q_strcmp( menuItem->GetCommand()->GetString("command", ""), itemName ) == 0 )
+				if ( V_streq( menuItem->GetCommand()->GetString("command", ""), itemName ) )
 				{
 					menuItem->SetBlink( state );
 				}

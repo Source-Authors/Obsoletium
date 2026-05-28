@@ -35,11 +35,11 @@ public:
 
 	virtual void OnCommand( const char *pCommand )
 	{
-		if ( Q_strcmp( pCommand, "OK" ) == 0 )
+		if ( V_streq( pCommand, "OK" ) )
 		{	
 			m_pBrowser->EndDialog( IDOK );
 		}
-		else if ( Q_strcmp( pCommand, "Cancel" ) == 0 )
+		else if ( V_streq( pCommand, "Cancel" ) )
 		{
 			m_pBrowser->EndDialog( IDCANCEL );
 		}
@@ -63,7 +63,7 @@ public:
 	{
 		vgui::EditablePanel::OnMessage( params, ifromPanel );
 		
-		if ( Q_strcmp( params->GetName(), "MDLPreviewChanged" ) == 0 ) 
+		if ( V_streq( params->GetName(), "MDLPreviewChanged" ) ) 
 		{
 			m_pBrowser->UpdateStatusLine();
 		}

@@ -1254,7 +1254,7 @@ SQLRETURN CJobUpdateSchema::YieldingGetTableFKConstraints( ESchemaCatalog eSchem
 
 		// Is this more data for the FK we are already tracking?  If so just append the column data,
 		// otherwise, assuming some data exists, add the key to the record info
-		if ( Q_strcmp( fkData.m_rgchName, pchFKName ) == 0 )
+		if ( V_streq( fkData.m_rgchName, pchFKName ) )
 		{
 			int iColRelation = fkData.m_VecColumnRelations.AddToTail();
 			FKColumnRelation_t &colRelation = fkData.m_VecColumnRelations[iColRelation];

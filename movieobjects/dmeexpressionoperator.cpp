@@ -877,14 +877,14 @@ bool CDmeExpressionOperator::IsInputAttribute( CDmAttribute *pAttribute )
 {
 	const char *pName = pAttribute->GetName( );
 #if 0 // skip this test, since none of these are float attributes, but leave the code as a reminder
-	if ( Q_strcmp( pName, "name" ) == 0 )
+	if ( V_streq( pName, "name" ) )
 		return false;
 
-	if ( Q_strcmp( pName, "expr" ) == 0 )
+	if ( V_streq( pName, "expr" ) )
 		return false;
 #endif
 
-	if ( Q_strcmp( pName, "result" ) == 0 )
+	if ( V_streq( pName, "result" ) )
 		return false;
 
 	if ( pAttribute->GetType() != AT_FLOAT )

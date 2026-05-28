@@ -153,7 +153,7 @@ bool CRConServer::IsPassword( const char *pPassword ) const
 		return false;
 
 	// If the pw does not match, then not authed
-	return ( Q_strcmp( pPassword, m_Password.Get() ) == 0 );
+	return V_streq( pPassword, m_Password.Get() );
 }
 
 

@@ -687,7 +687,7 @@ Vector CReplayServer::GetOriginFromPackedEntity(PackedEntity* pe)
 	{
 		SendProp *pProp = pSendTable->GetProp( i );
 
-		if ( Q_strcmp( pProp->GetName(), "m_vecOrigin" ) == 0 )
+		if ( V_streq( pProp->GetName(), "m_vecOrigin" ) )
 		{
 			Assert( pProp->GetType() == DPT_Vector );
 		

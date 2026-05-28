@@ -58,11 +58,11 @@ void GetBooleanStatus( KeyValues *pBonusFilesKey, BonusMapDescription_t &map )
 
 	for ( auto *pFileKey = pBonusFilesKey->GetFirstSubKey(); pFileKey; pFileKey = pFileKey->GetNextTrueSubKey() )
 	{
-		if ( Q_strcmp( pFileKey->GetName(), map.szFileName ) == 0 )
+		if ( V_streq( pFileKey->GetName(), map.szFileName ) )
 		{
 			for ( pBonusKey = pFileKey->GetFirstSubKey(); pBonusKey; pBonusKey = pBonusKey->GetNextKey() )
 			{
-				if ( Q_strcmp( pBonusKey->GetName(), map.szMapName ) == 0 )
+				if ( V_streq( pBonusKey->GetName(), map.szMapName ) )
 				{
 					// Found the data
 					break;
@@ -95,11 +95,11 @@ bool SetBooleanStatus( KeyValues *pBonusFilesKey, const char *pchName, const cha
 
 	for ( pFileKey = pBonusFilesKey->GetFirstSubKey(); pFileKey; pFileKey = pFileKey->GetNextTrueSubKey() )
 	{
-		if ( Q_strcmp( pFileKey->GetName(), pchFileName ) == 0 )
+		if ( V_streq( pFileKey->GetName(), pchFileName ) )
 		{
 			for ( pBonusKey = pFileKey->GetFirstSubKey(); pBonusKey; pBonusKey = pBonusKey->GetNextKey() )
 			{
-				if ( Q_strcmp( pBonusKey->GetName(), pchMapName ) == 0 )
+				if ( V_streq( pBonusKey->GetName(), pchMapName ) )
 				{
 					// Found the data
 					break;
@@ -142,11 +142,11 @@ float GetChallengeBests( KeyValues *pBonusFilesKey, BonusMapDescription_t &chall
 
 	for ( auto *pFileKey = pBonusFilesKey->GetFirstSubKey(); pFileKey; pFileKey = pFileKey->GetNextTrueSubKey() )
 	{
-		if ( Q_strcmp( pFileKey->GetName(), challenge.szFileName ) == 0 )
+		if ( V_streq( pFileKey->GetName(), challenge.szFileName ) )
 		{
 			for ( pBonusKey = pFileKey->GetFirstSubKey(); pBonusKey; pBonusKey = pBonusKey->GetNextKey() )
 			{
-				if ( Q_strcmp( pBonusKey->GetName(), challenge.szMapName ) == 0 )
+				if ( V_streq( pBonusKey->GetName(), challenge.szMapName ) )
 				{
 					// Found the data
 					break;
@@ -193,11 +193,11 @@ bool UpdateChallengeBest( KeyValues *pBonusFilesKey, const BonusMapChallenge_t &
 
 	for ( pFileKey = pBonusFilesKey->GetFirstSubKey(); pFileKey; pFileKey = pFileKey->GetNextTrueSubKey() )
 	{
-		if ( Q_strcmp( pFileKey->GetName(), challenge.szFileName ) == 0 )
+		if ( V_streq( pFileKey->GetName(), challenge.szFileName ) )
 		{
 			for ( pBonusKey = pFileKey->GetFirstSubKey(); pBonusKey; pBonusKey = pBonusKey->GetNextKey() )
 			{
-				if ( Q_strcmp( pBonusKey->GetName(), challenge.szMapName ) == 0 )
+				if ( V_streq( pBonusKey->GetName(), challenge.szMapName ) )
 				{
 					// Found the challenge
 					break;
@@ -414,14 +414,14 @@ void CBonusMapsDatabase::ScanBonusMaps( void )
 	// populate list box with all bonus maps in the current path
 	char szDirectory[MAX_PATH];
 
-	if ( Q_strcmp( m_szCurrentPath, "." ) == 0 )
+	if ( V_streq( m_szCurrentPath, "." ) )
 	{
 		// We're at the root, so look at the directories in the manifest
 		KeyValues *pKey = NULL;
 		for ( pKey = m_pBonusMapsManifest->GetFirstSubKey(); pKey; pKey = pKey->GetNextKey() )
 		{
 			const char *pchType = pKey->GetName();
-			if ( Q_strcmp( pchType, "search" ) == 0 )
+			if ( V_streq( pchType, "search" ) )
 			{
 				// Search through the directory
 				V_sprintf_safe( szDirectory, "%s/", pKey->GetString() );
@@ -429,11 +429,11 @@ void CBonusMapsDatabase::ScanBonusMaps( void )
 				BuildSubdirectoryList( szDirectory, true );
 				BuildBonusMapsList( szDirectory, true );
 			}
-			else if ( Q_strcmp( pchType, "dir" ) == 0 )
+			else if ( V_streq( pchType, "dir" ) )
 			{
 				AddBonus( "", pKey->GetString(), true );
 			}
-			else if ( Q_strcmp( pchType, "map" ) == 0 )
+			else if ( V_streq( pchType, "map" ) )
 			{
 				AddBonus( "", pKey->GetString(), false );
 			}
@@ -533,7 +533,7 @@ bool CBonusMapsDatabase::BonusesUnlocked( void )
 		for ( intp iBonusMap = 0; iBonusMap < BonusMapsDatabase()->BonusCount(); ++iBonusMap )
 		{
 			BonusMapDescription_t *pMap = BonusMapsDatabase()->GetBonusData( iBonusMap );
-			if ( Q_strcmp( pMap->szMapName, "#Bonus_Map_AdvancedChambers" ) == 0 && !pMap->bLocked )
+			if ( V_streq( pMap->szMapName, "#Bonus_Map_AdvancedChambers" ) && !pMap->bLocked )
 			{
 				// All bonuses unlocked, remember this and set up the proper X360 scan to get info.
 				m_iX360BonusesUnlocked = 1;

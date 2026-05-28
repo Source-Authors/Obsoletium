@@ -717,27 +717,27 @@ int	ClientModeShared::KeyInput( int down, ButtonCode_t keynum, const char *pszCu
 int ClientModeShared::HandleSpectatorKeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBinding )
 {
 	// we are in spectator mode, open spectator menu
-	if ( down && pszCurrentBinding && Q_strcmp( pszCurrentBinding, "+duck" ) == 0 )
+	if ( down && pszCurrentBinding && V_streq( pszCurrentBinding, "+duck" ) )
 	{
 		m_pViewport->ShowPanel( PANEL_SPECMENU, true );
 		return 0; // we handled it, don't handle twice or send to server
 	}
-	else if ( down && pszCurrentBinding && Q_strcmp( pszCurrentBinding, "+attack" ) == 0 )
+	else if ( down && pszCurrentBinding && V_streq( pszCurrentBinding, "+attack" ) )
 	{
 		engine->ClientCmd( "spec_next" );
 		return 0;
 	}
-	else if ( down && pszCurrentBinding && Q_strcmp( pszCurrentBinding, "+attack2" ) == 0 )
+	else if ( down && pszCurrentBinding && V_streq( pszCurrentBinding, "+attack2" ) )
 	{
 		engine->ClientCmd( "spec_prev" );
 		return 0;
 	}
-	else if ( down && pszCurrentBinding && Q_strcmp( pszCurrentBinding, "+jump" ) == 0 )
+	else if ( down && pszCurrentBinding && V_streq( pszCurrentBinding, "+jump" ) )
 	{
 		engine->ClientCmd( "spec_mode" );
 		return 0;
 	}
-	else if ( down && pszCurrentBinding && Q_strcmp( pszCurrentBinding, "+strafe" ) == 0 )
+	else if ( down && pszCurrentBinding && V_streq( pszCurrentBinding, "+strafe" ) )
 	{
 		HLTVCamera()->SetAutoDirector( true );
 #if defined( REPLAY_ENABLED )

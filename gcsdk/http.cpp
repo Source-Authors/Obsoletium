@@ -212,7 +212,7 @@ const CMsgHttpRequest_QueryParam *CHTTPRequest::GetGETParam( const char *pchGetP
 		const CMsgHttpRequest_QueryParam& param = m_pProto->get_params( nParam );
 		if ( bMatchCase )
 		{
-			if ( Q_strcmp( param.name().c_str(), pchGetParamName ) == 0 )
+			if ( V_streq( param.name().c_str(), pchGetParamName ) )
 				return &param;
 		}
 		else
