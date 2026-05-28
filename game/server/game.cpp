@@ -14,7 +14,7 @@
 
 void MapCycleFileChangedCallback( IConVar *var, const char *pOldString, float flOldValue )
 {
-	if ( Q_stricmp( pOldString, mapcyclefile.GetString() ) != 0 )
+	if ( !V_strieq( pOldString, mapcyclefile.GetString() ) )
 	{
 		if ( GameRules() )
 		{

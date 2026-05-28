@@ -334,7 +334,7 @@ void GetMinFootprintFiles_R( CUtlVector<CMinFootprintFilename> &filenames, const
 	const char *pFilename = g_pFullFileSystem->FindFirstEx( wildcard, SDKLAUNCHER_MAIN_PATH_ID, &findHandle );
 	while ( pFilename )
 	{
-		if ( Q_stricmp( pFilename, "." ) != 0 && Q_stricmp( pFilename, ".." ) != 0 )
+		if ( !V_streq( pFilename, "." ) && !V_streq( pFilename, ".." ) )
 		{
 			char fullSrcFilename[MAX_PATH], fullDestFilename[MAX_PATH];
 			Q_snprintf( fullSrcFilename, sizeof( fullSrcFilename ), "%s%c%s", pSrcDirName, CORRECT_PATH_SEPARATOR, pFilename );

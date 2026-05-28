@@ -778,7 +778,7 @@ bool ShouldRecreateClassImageEntity( C_BaseAnimating *pEnt, const char *pNewMode
 	// reload only if names are different
 	const char *pNameNoPath = V_UnqualifiedFileName( pName );
 	const char *pNewModelNameNoPath = V_UnqualifiedFileName( pNewModelName );
-	return( Q_stricmp( pNameNoPath, pNewModelNameNoPath ) != 0 );
+	return !V_strieq( pNameNoPath, pNewModelNameNoPath );
 }
 
 

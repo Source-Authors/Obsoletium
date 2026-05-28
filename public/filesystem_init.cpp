@@ -365,7 +365,7 @@ bool FileSystem_GetExecutableDir( OUT_Z_CAP(exeDirLen) char *exedir, unsigned ex
 	char ext[MAX_PATH];
 	// dimhotepus: x86-64 support. TF2 backport.
 	V_StrRight( exedir, ssize( PLATFORM_BIN_DIR ), ext);
-	if ( ext[0] != CORRECT_PATH_SEPARATOR || Q_stricmp( ext+1, PLATFORM_BIN_DIR ) != 0 )
+	if ( ext[0] != CORRECT_PATH_SEPARATOR || !V_strieq( ext+1, PLATFORM_BIN_DIR ) )
 	{
 		Q_strncat( exedir, CORRECT_PATH_SEPARATOR_S, exeDirLen, COPY_ALL_CHARACTERS );
 		// dimhotepus: x86-64 support. TF2 backport.

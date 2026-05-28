@@ -101,7 +101,7 @@ void CHudDODCrosshair::Paint()
 	if ( !crosshairfile )
 		return;
 
-	if ( Q_stricmp( m_szPreviousCrosshair, crosshairfile ) != 0 )
+	if ( !V_strieq( m_szPreviousCrosshair, crosshairfile ) )
 	{
 		char buf[256];
 		Q_snprintf( buf, sizeof(buf), "vgui/crosshairs/%s", crosshairfile );

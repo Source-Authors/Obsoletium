@@ -192,7 +192,7 @@ protected:
 	return false; \
 } \
 	\
-	if ( Q_stricmp( pchMethod, method ) != 0 ) \
+	if ( !V_strieq( pchMethod, method ) ) \
 { \
 	AssertMsg2( false, "WebAPIJob received request fo unexpected method (got %s, expected %s)!", pchMethod, method ); \
 	pResponse->SetStatusCode( k_EHTTPStatusCode500InternalServerError ); \

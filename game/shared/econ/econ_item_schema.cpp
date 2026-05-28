@@ -1077,7 +1077,7 @@ bool BCommonInitPropertyGeneratorsFromKV( const char *pszContext, CUtlVector<con
 		IEconItemPropertyGenerator *pGenerator = NULL;
 		for ( const auto& gen : s_Generators )
 		{
-			if ( Q_stricmp( gen.m_pszGeneratorName, pszGeneratorName ) != 0 )
+			if ( !V_strieq( gen.m_pszGeneratorName, pszGeneratorName ) )
 				continue;
 
 			pGenerator = (*gen.m_funcCreateGeneratorInstance)( pKVGenerator, pVecErrors );

@@ -345,7 +345,7 @@ void CCvar::RegisterConCommand( ConCommandBase *variable )
 				if(  pChildVar->m_pszDefaultValue && pParentVar->m_pszDefaultValue &&
 					 pChildVar->IsFlagSet( FCVAR_REPLICATED ) && pParentVar->IsFlagSet( FCVAR_REPLICATED ) )
 				{
-					if( Q_stricmp( pChildVar->m_pszDefaultValue, pParentVar->m_pszDefaultValue ) != 0 )
+					if( !V_strieq( pChildVar->m_pszDefaultValue, pParentVar->m_pszDefaultValue ) )
 					{
 						Warning( "Parent and child ConVars with different default values! %s child: %s parent: %s (parent wins)\n", 
 							variable->GetName(), pChildVar->m_pszDefaultValue, pParentVar->m_pszDefaultValue );
@@ -376,7 +376,7 @@ void CCvar::RegisterConCommand( ConCommandBase *variable )
 				{
 					if ( pParentVar->m_pszHelpString && !Q_isempty( pParentVar->m_pszHelpString ) )
 					{
-						if ( Q_stricmp( pParentVar->m_pszHelpString, pChildVar->m_pszHelpString ) != 0 )
+						if ( !V_strieq( pParentVar->m_pszHelpString, pChildVar->m_pszHelpString ) )
 						{
 							Warning( "Convar %s has multiple help strings:\n\tparent (wins): \"%s\"\n\tchild: \"%s\"\n", 
 								variable->GetName(), pParentVar->m_pszHelpString, pChildVar->m_pszHelpString );

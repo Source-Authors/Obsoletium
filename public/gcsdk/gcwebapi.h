@@ -72,7 +72,7 @@ public:
 #define REQUIRED_GCWEBAPI_PARAM( pchName, eType, pchDescription ) \
 { \
 	KeyValues *pkvParams = pkvMethod->FindKey( "params", true ); \
-	AssertMsg( Q_stricmp( pchName, "format" ) != 0, "'format' is a magic reserved API param for specifying output format!" ); \
+	AssertMsg( !V_strieq( pchName, "format" ), "'format' is a magic reserved API param for specifying output format!" ); \
 	KeyValues *pkvParam = pkvParams->FindKey( pchName, true ); \
 	pkvParam->SetString( "description", pchDescription ); \
 	pkvParam->SetInt( "type", eType ); \
@@ -82,7 +82,7 @@ public:
 #define OPTIONAL_GCWEBAPI_PARAM( pchName, eType, pchDescription ) \
 { \
 	KeyValues *pkvParams = pkvMethod->FindKey( "params", true ); \
-	AssertMsg( Q_stricmp( pchName, "format" ) != 0, "'format' is a magic reserved API param for specifying output format!" ); \
+	AssertMsg( !V_strieq( pchName, "format" ), "'format' is a magic reserved API param for specifying output format!" ); \
 	KeyValues *pkvParam = pkvParams->FindKey( pchName, true ); \
 	pkvParam->SetString( "description", pchDescription ); \
 	pkvParam->SetInt( "type", eType ); \

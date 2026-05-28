@@ -553,7 +553,7 @@ void CCreateMultiplayerGameServerPage::AddMod(const char *pGameDirName,
 
   // If this mod supports multiplayer, then we'll add it.
   const char *gameType = pGameInfo->GetString("type", "singleplayer_only");
-  if (Q_stricmp(gameType, "singleplayer_only") != 0) {
+  if (!V_strieq(gameType, "singleplayer_only")) {
     // Validate the gameinfo.txt format..
     KeyValues *pSub = pGameInfo->FindKey("FileSystem");
     if (!pSub) Error("%s missing FileSystem key.", pGameInfoFilename);

@@ -2676,7 +2676,7 @@ bool CTFItemSchema::BInitMvmMissions( KeyValues *pKVMvmMaps, CUtlVector<CUtlStri
 				}
 
 				// Pop filenames are required to obey a naming convention.
-				if ( ( Q_stricmp( mission.m_sPop.Get(), map.m_sMap.Get() ) != 0 )
+				if ( ( !V_strieq( mission.m_sPop.Get(), map.m_sMap.Get() ) )
 					&& ( Q_strnicmp( mission.m_sPop.Get(), map.m_sMap.Get(), nMapNameLen ) != 0
 					|| mission.m_sPop.Get()[nMapNameLen] != '_' ) )
 				{

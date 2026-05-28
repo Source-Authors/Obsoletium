@@ -148,7 +148,7 @@ void CHudTFCrosshair::Paint()
 		return;
 
 	const char *crosshairfile = cl_crosshair_file.GetString();
-	if ( ( crosshairfile == NULL ) || ( Q_stricmp( m_szPreviousCrosshair, crosshairfile ) != 0 ) )
+	if ( ( crosshairfile == NULL ) || ( !V_strieq( m_szPreviousCrosshair, crosshairfile ) ) )
 	{
 		char buf[256];
 		Q_snprintf( buf, sizeof(buf), "vgui/crosshairs/%s", crosshairfile );

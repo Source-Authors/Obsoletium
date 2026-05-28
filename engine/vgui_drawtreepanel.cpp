@@ -422,7 +422,7 @@ bool UpdateItemState(
 	KeyValues *pItemData = pTree->GetItemData( iChildItemId );
 	// dimhotepus: GetInt -> GetPtr
 	if ( pItemData->GetPtr( "PanelPtr" ) != pSub->GetPtr( "PanelPtr" ) ||
-		Q_stricmp( pItemData->GetString( "Text" ), pSub->GetString( "Text" ) ) != 0 )
+		 !V_strieq( pItemData->GetString( "Text" ), pSub->GetString( "Text" ) ) )
 	{
 		pTree->ModifyItem( iChildItemId, pSub );
 		bRet = true;

@@ -127,7 +127,7 @@ void CTFTrainingComplete::SetUpResults( IGameEvent *event )
 	const char *map = event->GetString( "map" );
 	const char *nextMap = event->GetString( "next_map" );
 	const char *endText = event->GetString( "text" );
-	bool bHasNextMap = Q_stricmp( nextMap, "" ) != 0;
+	bool bHasNextMap = !Q_isempty( nextMap );
 
 	// title
 	{
@@ -170,7 +170,7 @@ void CTFTrainingComplete::SetUpResults( IGameEvent *event )
 		g_pVGuiLocalize->ConstructString_safe( wsResult, g_pVGuiLocalize->Find( endText ), 2, wsText_LastMap, wsText_NextMap );
 		pRichText->SetText( wsResult );
 
-		bHasNextMap = Q_stricmp( nextMap, "" ) != 0;
+		bHasNextMap = !Q_isempty( nextMap );
 		m_pNext->SetVisible( bHasNextMap );
 		m_pQuit->SetVisible( !bHasNextMap );
 	}

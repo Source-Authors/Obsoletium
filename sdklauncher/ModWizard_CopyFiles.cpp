@@ -109,7 +109,7 @@ bool CModWizardSubPanel_CopyFiles::BuildCopyFiles_R( const char *pSourceDir, con
 
 				char ext[512];
 				Q_StrRight( pFilename, strlen(pIgnoreExtension), ext, sizeof( ext ) );
-				if ( Q_stricmp( ext, pIgnoreExtension ) != 0 )
+				if ( !V_strieq( ext, pIgnoreExtension ) )
 				{
 					CFileCopyInfo info( fullName, fullOutName );
 					m_FileCopyInfos.AddToTail( info );

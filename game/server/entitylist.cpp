@@ -1386,7 +1386,7 @@ public:
 	bool ShouldCreateEntity( const char *pClassname ) override
 	{
 		// Create everything but the world
-		return Q_stricmp( pClassname, "worldspawn" ) != 0;
+		return !V_strieq( pClassname, "worldspawn" );
 	}
 
 	CBaseEntity* CreateNextEntity( const char *pClassname ) override

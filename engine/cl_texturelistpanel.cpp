@@ -3043,9 +3043,9 @@ bool CTextureListPanel::UpdateDisplayedItem( KeyValues *pDispData, KeyValues *kv
 	if( pDispData->GetInt( KEYNAME_SIZE ) != kv->GetInt( KEYNAME_SIZE ) ||
 		pDispData->GetInt( KEYNAME_WIDTH ) != kv->GetInt( KEYNAME_WIDTH ) ||
 		pDispData->GetInt( KEYNAME_HEIGHT ) != kv->GetInt( KEYNAME_HEIGHT ) ||
-		Q_stricmp( pDispData->GetString( KEYNAME_FORMAT ), kv->GetString( KEYNAME_FORMAT ) ) != 0 ||
-		Q_stricmp( pDispData->GetString( KEYNAME_PATH ), kv->GetString( KEYNAME_PATH ) ) != 0 ||
-		Q_stricmp( pDispData->GetString( KEYNAME_TEXTURE_GROUP ), kv->GetString( KEYNAME_TEXTURE_GROUP ) ) != 0 )
+		!V_strieq( pDispData->GetString( KEYNAME_FORMAT ), kv->GetString( KEYNAME_FORMAT ) ) ||
+		!V_strieq( pDispData->GetString( KEYNAME_PATH ), kv->GetString( KEYNAME_PATH ) ) ||
+		!V_strieq( pDispData->GetString( KEYNAME_TEXTURE_GROUP ), kv->GetString( KEYNAME_TEXTURE_GROUP ) ) )
 	{
 		pDispData->SetInt( KEYNAME_SIZE, kv->GetInt( KEYNAME_SIZE ) );
 		pDispData->SetInt( KEYNAME_WIDTH, kv->GetInt( KEYNAME_WIDTH ) );

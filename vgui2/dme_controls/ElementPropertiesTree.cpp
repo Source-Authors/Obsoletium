@@ -2028,7 +2028,7 @@ void CElementPropertiesTreeInternal::OnNavSearch( const char *text )
 		return;
 	}
 
-	bool changed = Q_stricmp( text, m_szSearchStr ) != 0 ? true : false;
+	bool changed = !V_strieq( text, m_szSearchStr );
 	if ( changed )
 	{
 		m_SearchResults.RemoveAll();

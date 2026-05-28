@@ -1199,7 +1199,7 @@ void COP_Entity::RefreshKVListValues( const char *pOnlyThisVar )
 		char tmpValueBuf[512];
 
 		// If they only wanted to update one var...
-		if ( pOnlyThisVar && Q_stricmp( pVarName, pOnlyThisVar ) != 0 )
+		if ( pOnlyThisVar && !V_strieq( pVarName, pOnlyThisVar ) )
 			continue;
 		
 		if ( m_bSmartedit )
@@ -2828,7 +2828,7 @@ void COP_Entity::AssignClassDefaults(GDclass *pClass, GDclass *pOldClass)
 			Q_snprintf( szValue, sizeof( szValue ), "%lu", nCurrent );
 
 			// Remember that we added or changed this key.
-			if (!p || Q_stricmp(p, szValue) != 0)
+			if (!p || !V_strieq(p, szValue))
 			{
 				m_kvAdded.SetValue(SPAWNFLAGS_KEYNAME, "1");
 			}

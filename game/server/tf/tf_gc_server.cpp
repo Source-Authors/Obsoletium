@@ -3215,7 +3215,7 @@ void CTFGCServerSystem::UpdateConnectedPlayersAndServerInfo( CMsgGameServerMatch
 
 		// Check for certain rules changes.  When they change, we care about them being
 		// eventually correct, but it's not urgent
-		if ( ( Q_stricmp( m_sLastGameServerUpdateTags, sGameServerInfoTags ) != 0 ) ||
+		if ( ( !V_strieq( m_sLastGameServerUpdateTags, sGameServerInfoTags ) ) ||
 		     ( nMaxHumans != m_nLastGameServerUpdateMaxHumans ) ||
 		     ( nBotCountToSend != m_nLastGameServerUpdateBotCount ) )
 		{
@@ -3314,7 +3314,7 @@ void CTFGCServerSystem::UpdateConnectedPlayersAndServerInfo( CMsgGameServerMatch
 
 		// Check for certain rules changes.  When they change, we care about them being
 		// eventually correct, but it's not urgent
-		if ( ( Q_stricmp( m_sLastGameServerUpdateTags, msg.Body().tags().c_str() ) != 0 ) ||
+		if ( ( !V_strieq( m_sLastGameServerUpdateTags, msg.Body().tags().c_str() ) ) ||
 		     ( msg.Body().max_players() != (uint32)m_nLastGameServerUpdateMaxHumans ) ||
 		     ( msg.Body().bot_count() != (uint32)m_nLastGameServerUpdateBotCount ) )
 		{

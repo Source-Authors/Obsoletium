@@ -1600,7 +1600,7 @@ bool CBaseClientState::LinkClasses()
 			const char *pServerName = pServerClass->m_DatatableName;
 			const char *pClientName = pServerClass->m_pClientClass->m_pRecvTable->GetName();
 
-			if ( Q_stricmp( pServerName, pClientName ) != 0 )
+			if ( !V_strieq( pServerName, pClientName ) )
 			{
 				Host_EndGame( true, "CL_ParseClassInfo_EndClasses: server and client classes for '%s' use different datatables (server: %s, client: %s)",
 					pServerClass->m_ClassName, pServerName, pClientName );

@@ -4367,7 +4367,7 @@ void V_StripAndPreserveHTMLCore( CUtlBuffer *pbuffer, IN_Z const char *pchHTML, 
 								if ( bEndTag )
 								{
 									// ending a paragraph tag is optional. If we were expecting to find one, and didn't, skip
-									if ( Q_stricmp( szTag, "p" ) != 0 )
+									if ( !V_strieq( szTag, "p" ) )
 									{
 										while ( vecTagStack.Count() > 0 && Q_stricmp( vecTagStack[ vecTagStack.Count() - 1 ], "p" ) == 0 )
 										{

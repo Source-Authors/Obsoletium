@@ -3250,7 +3250,7 @@ void Host_CheckGore( void )
 	// Next check the new method of enabling low violence based on country of purchase
 	// and other means that are inaccessible by the user.
 	//
-	if ( GetCurrentMod() && Q_stricmp( GetCurrentMod(), "cstrike" ) != 0 )
+	if ( GetCurrentMod() && !V_strieq( GetCurrentMod(), "cstrike" ) )
 		bLowViolenceSecure = IsLowViolence_Secure();
 
 	//

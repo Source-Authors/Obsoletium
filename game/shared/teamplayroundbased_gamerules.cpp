@@ -2737,7 +2737,7 @@ bool CTeamplayRoundBasedRules::MapHasActiveTimer( void )
 	while ( ( pEntity = gEntList.FindEntityByClassname( pEntity, "team_round_timer" ) ) != NULL )
 	{
 		CTeamRoundTimer *pTimer = assert_cast<CTeamRoundTimer*>( pEntity );
-		if ( pTimer && pTimer->ShowInHud() && ( Q_stricmp( STRING( pTimer->GetEntityName() ), "zz_teamplay_timelimit_timer" ) != 0 ) )
+		if ( pTimer && pTimer->ShowInHud() && ( !V_strieq( STRING( pTimer->GetEntityName() ), "zz_teamplay_timelimit_timer" ) ) )
 		{
 			return true;
 		}

@@ -1692,7 +1692,7 @@ CDmeChannel *FindChannelTargetingElement( CDmeChannelsClip *pChannelsClip, CDmEl
 		if ( toElement != pElement )
 			continue;
 
-		if ( pAttributeName && ( Q_stricmp( pChannel->GetToAttribute()->GetName(), pAttributeName ) != 0 ) )
+		if ( pAttributeName && ( !V_strieq( pChannel->GetToAttribute()->GetName(), pAttributeName ) ) )
 			continue;
 
 		return pChannel;

@@ -169,7 +169,7 @@ void CFilteredComboBox::SelectItem( const char *pStr )
 			// then it might not.
 			CString strWindow;
 			GetWindowText( strWindow );
-			if ( Q_stricmp( strWindow, pStr ) != 0 )
+			if ( !V_strieq( strWindow, pStr ) )
 			{
 				SetWindowText( pStr );
 			}			
@@ -881,7 +881,7 @@ bool CFilteredComboBox::InternalSelectItemByName( const char *pName )
 		
 		CString str;
 		GetWindowText( str );
-		if ( Q_stricmp( str, pName ) != 0 )
+		if ( !V_strieq( str, pName ) )
 			SetWindowText( pName );
 		
 		return true;
