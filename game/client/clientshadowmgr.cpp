@@ -2171,6 +2171,35 @@ void CClientShadowMgr::ComputeExtraClipPlanes( IClientRenderable* pRenderable,
 		}
 	}
 
+	// ---------------------------------------
+	// dimhotepus: Fix a case of dynamic shadows bleeding through thin surfaces (copperpixel).
+	class CTraceFilterShadowReceiversOnly : public CTraceFilter
+	{
+		bool ShouldHitEntity( IHandleEntity *pHandleEntity, int fContentsMask ) override
+		{
+			if ( !StandardFilterRules( pHandleEntity, fContentsMask ) )
+				return false;
+
+			C_BaseEntity *pEntity = EntityFromEntityHandle( pHandleEntity );
+			if ( pEntity && !pEntity->ShouldReceiveProjectedTextures( SHADOW_FLAGS_SHADOW ) )
+				return false;
+
+			return true;
+		}
+	};
+
+	// Do a trace to the bbox corner origin. If it hits a shadow receiving brush
+	// move the corner to be outside it so shadows won't poke-thru thin walls
+	CTraceFilterShadowReceiversOnly traceFilter;
+	trace_t tr;
+	UTIL_TraceLine( pRenderable->GetRenderOrigin(), origin, MASK_SOLID_BRUSHONLY, &traceFilter, &tr );
+	if ( tr.fraction < 1.f )
+	{
+		VectorAdd( tr.endpos, tr.plane.normal, origin );
+	}
+
+	// ---------------------------------------
+
 	// Now that we have it, create 3 planes...
 	Vector normal;
 	ClearExtraClipPlanes(handle);
