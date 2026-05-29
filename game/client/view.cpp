@@ -22,7 +22,7 @@
 #include "mathlib/vmatrix.h"
 #include "rendertexture.h"
 #include "c_world.h"
-#include <KeyValues.h>
+#include "tier1/KeyValues.h"
 #include "igameevents.h"
 #include "smoke_fog_overlay.h"
 #include "bitmap/tgawriter.h"
@@ -45,6 +45,8 @@
 #include "ScreenSpaceEffects.h"
 #include "sourcevr/isourcevirtualreality.h"
 #include "client_virtualreality.h"
+#include "tier1/fmtstr.h"
+#include "vgui/ISystem.h"
 
 #include "mapoverview.h"
 
@@ -1266,32 +1268,48 @@ static void GetPos( const CCommand &args, Vector &vecOrigin, QAngle &angles )
 	}
 }
 
-CON_COMMAND( spec_pos, "dump position and angles to the console" )
+// dimhotepus: Support copy to clipboard (copperpixel).
+CON_COMMAND( spec_pos, "dump position and angles to the console ( 1 = to clipboard )" )
 {
 	Vector vecOrigin;
 	QAngle angles;
 	GetPos( args, vecOrigin, angles );
-	Warning( "spec_goto %.1f %.1f %.1f %.1f %.1f\n", vecOrigin.x, vecOrigin.y, 
-		vecOrigin.z, angles.x, angles.y );
+
+	bool bClip = ( args.ArgC() >= 2 && Q_atoi( args[ 1 ] ) == 1 );
+
+	CFmtStr fmtCommand(
+		"spec_goto %.1f %.1f %.1f %.1f %.1f",
+		vecOrigin.x, vecOrigin.y, vecOrigin.z, angles.x, angles.y
+	);
+
+	Warning( "%s\n", fmtCommand.String() );
+	if ( bClip )
+	{
+		vgui::system()->SetClipboardText( fmtCommand.String(), fmtCommand.Length() );
+	}
 }
 
-CON_COMMAND( getpos, "dump position and angles to the console" )
+// dimhotepus: Support copy to clipboard (copperpixel).
+CON_COMMAND( getpos, "dump position and angles to the console ( 1 = to clipboard, 2 = exact pos, 3 = all )" )
 {
 	Vector vecOrigin;
 	QAngle angles;
 	GetPos( args, vecOrigin, angles );
 
-	const char *pCommand1 = "setpos";
-	const char *pCommand2 = "setang";
-	if ( args.ArgC() == 2 && atoi( args[1] ) == 2 )
-	{
-		pCommand1 = "setpos_exact";
-		pCommand2 = "setang_exact";
-	}
+	int  nParm  = ( args.ArgC() >= 2 ) ? Q_atoi( args[ 1 ] ) : 0;
+	bool bClip  = ( nParm == 1 || nParm == 3 );
+	bool bExact = ( nParm == 2 || nParm == 3 );
 
-	// dimhotepus: Join two warnings into one as first missed \n and second dumps channel name.
-	Warning( "%s %f %f %f;%s %f %f %f\n",
-		pCommand1, vecOrigin.x, vecOrigin.y, vecOrigin.z,
-		pCommand2, angles.x, angles.y, angles.z );
+	CFmtStr fmtCommand(
+		"%s %f %f %f;%s %f %f %f",
+		bExact ? "setpos_exact" : "setpos", vecOrigin.x, vecOrigin.y, vecOrigin.z,
+		bExact ? "setang_exact" : "setang", angles.x, angles.y, angles.z
+	);
+
+	Warning( "%s\n", fmtCommand.String() );
+	if ( bClip )
+	{
+		vgui::system()->SetClipboardText( fmtCommand.String(), fmtCommand.Length() );
+	}
 }
 
