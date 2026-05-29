@@ -560,6 +560,8 @@ extern	int	firstmodelface;
 void MakeFaces (node_t *headnode);
 void MakeDetailFaces (node_t *headnode);
 face_t *FixTjuncs( node_t *headnode, face_t *pLeafFaceList );
+// dimhotepus: Notify about tjuncs overflow (ficool).
+void EndTjuncs();
 
 face_t	*AllocFace (void);
 void FreeFace (face_t *f);
