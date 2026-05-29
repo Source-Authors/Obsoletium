@@ -491,6 +491,10 @@ void CBaseModelPanel::OnMouseReleased( vgui::MouseCode code )
 	if ( !m_bAllowRotation && !m_bAllowPitch )
 		return;
 
+	// dimhotepus: Only accept manipulation if we were capturing the mouse (copperpixel).
+	if ( input()->GetMouseCapture() != GetVPanel() )
+		return;
+
 	EnableMouseCapture( false );
 	m_bMousePressed = false;
 
