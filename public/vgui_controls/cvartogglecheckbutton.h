@@ -174,7 +174,7 @@ void CvarToggleCheckButton<T>::ApplySettings( KeyValues *inResourceData )
 	if( Q_isempty( cvarName ) )
 		return;// Doesn't have cvar set up in res file, must have been constructed with it.
 
-	m_bStartValue = V_streq( cvarValue, "1")
+	m_bStartValue = V_streq( cvarValue, "1");
 
 	m_cvar.Init( cvarName, m_bIgnoreMissingCvar );
 	if ( m_cvar.IsValid() )
