@@ -51,7 +51,9 @@ int area_sky_cameras[MAX_MAP_AREAS];
 
 entity_t	*face_entity[MAX_MAP_FACES];
 Vector		face_offset[MAX_MAP_FACES];		// for rotating bmodels
-int			fakeplanes;
+// dimhotepus: 
+dplane_t 	fakeplanes;
+int			numfakeplanes = 0;
 
 unsigned	numbounce = 100; // 25; /* Originally this was 8 */
 
@@ -627,12 +629,11 @@ void MakePatchForFace (int fn, winding_t *w)
 		dplane_t	*pl;
 
 		// origin offset faces must create new planes
-		if (numplanes + fakeplanes >= MAX_MAP_PLANES)
+		if (numfakeplanes >= MAX_MAP_PLANES)
 		{
-			Error ("numplanes + fakeplanes >= MAX_MAP_PLANES");
+			Error ("numfakeplanes >= MAX_MAP_PLANES");
 		}
-		pl = &dplanes[numplanes + fakeplanes];
-		fakeplanes++;
+		pl = &fakeplanes[numfakeplanes++];
 
 		*pl = *(patch->plane);
 		pl->dist += DotProduct (face_offset[fn], pl->normal);
@@ -1729,19 +1730,6 @@ void RadWorld_Start()
 {
 	if (luxeldensity < 1.0f)
 	{
-		// Remember the old lightmap vectors.
-		float oldLightmapVecs[MAX_MAP_TEXINFO][2][4];
-		for (intp i = 0; i < texinfo.Count(); i++)
-		{
-			for( int j=0; j < 2; j++ )
-			{
-				for( int k=0; k < 3; k++ )
-				{
-					oldLightmapVecs[i][j][k] = texinfo[i].lightmapVecsLuxelsPerWorldUnits[j][k];
-				}
-			}
-		}
-
 		// rescale luxels to be no denser than "luxeldensity"
 		for (intp i = 0; i < texinfo.Count(); i++)
 		{

@@ -103,12 +103,12 @@ struct cbrushside_t
 struct cbrush_t
 {
 	int				contents;
-	unsigned short	numsides;
-	unsigned short	firstbrushside;
+	// dimhotepus: unsigned short -> int, to allow bump MAX_MAP_BRUSHSIDES 65536 -> 655360 (ficool).
+	int				numsides;
+	int				firstbrushside;
 
 	inline int GetBox() const { return firstbrushside; }
-	// dimhotepus: int -> unsigned short
-	inline void SetBox( unsigned short boxID )
+	inline void SetBox( int boxID )
 	{
 		numsides = NUMSIDES_BOXBRUSH;
 		firstbrushside = boxID;
