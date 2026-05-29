@@ -409,6 +409,26 @@ static ConCommand *FindAutoCompleteCommmandFromPartial( const char *partial )
 	return cmd;
 }
 
+// dimhotepus: Add chained commands autocomplete (callumok2004).
+static int FindChainedPrefix( const char *szText )
+{
+	bool bInQuotes = false;
+	const char *pLastSplit = nullptr;
+	for ( const char *p = szText; *p; p++ )
+	{
+		if ( *p == '"' )
+			bInQuotes = !bInQuotes;
+		else if ( *p == ';' && !bInQuotes )
+			pLastSplit = p;
+	}
+	if ( !pLastSplit )
+		return 0;
+	pLastSplit++;
+	while ( *pLastSplit == ' ' )
+		pLastSplit++;
+	return pLastSplit - szText;
+}
+
 
 //-----------------------------------------------------------------------------
 // Purpose: rebuilds the list of possible completions from the current entered text
@@ -530,6 +550,19 @@ void CConsolePanel::RebuildCompletionList(const char *text)
 	}
 }
 
+// dimhotepus: Add chained commands autocomplete (callumok2004).
+static void SetAutocompleteEntryText( const char *pszPartial, vgui::TextEntry *pEntry, const char *pszCompleted )
+{
+	int nPrefix = FindChainedPrefix( pszPartial );
+	char szFull[512];
+	if ( nPrefix > 0 )
+		V_sprintf_safe( szFull, "%.*s%s", nPrefix, pszPartial, pszCompleted );
+	else
+		V_strcpy_safe( szFull, pszCompleted );
+
+	pEntry->SetText( szFull );
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: auto completes current text
 //-----------------------------------------------------------------------------
@@ -583,7 +616,9 @@ void CConsolePanel::OnAutoComplete(bool reverse)
 		V_strcat_safe(completedText, " " );
 	}
 
-	m_pEntry->SetText(completedText);
+	// dimhotepus: Add chained commands autocomplete (callumok2004).
+	SetAutocompleteEntryText( m_szPartialText, m_pEntry, completedText );
+
 	m_pEntry->GotoTextEnd();
 	m_pEntry->SelectNone();
 
@@ -636,7 +671,9 @@ void CConsolePanel::OnTextChanged(Panel *panel)
 	// clear auto-complete state since the user has typed
 	m_bAutoCompleteMode = false;
 
-	RebuildCompletionList(m_szPartialText);
+	// dimhotepus: Add chained commands autocomplete (callumok2004).
+	int nPrefix = FindChainedPrefix( m_szPartialText );
+	RebuildCompletionList( m_szPartialText + nPrefix );
 
 	// build the menu
 	if ( m_CompletionList.Count() < 1 )
@@ -896,7 +933,12 @@ void CConsolePanel::OnMenuItemSelected(const char *command)
 	}
 	else
 	{
-		m_pEntry->SetText(command);
+		char szEntry[256];
+		m_pEntry->GetText( szEntry );
+
+		// dimhotepus: Add chained commands autocomplete (callumok2004).
+		SetAutocompleteEntryText( szEntry, m_pEntry, command );
+
 		m_pEntry->GotoTextEnd();
 		m_pEntry->InsertChar(' ');
 		m_pEntry->GotoTextEnd();
