@@ -2737,9 +2737,8 @@ void EnsureFileDirectoryExists( const char *pFilename )
 
 		if ( _access( dirName, 0 ) != 0 )
 		{
-			char cmdLine[512];
-			Q_snprintf( cmdLine, sizeof( cmdLine ), "md \"%s\"", dirName );
-			system( cmdLine );
+			// dimhotepus: Use safe I/O api call instead of system.
+			_mkdir( dirName );
 		}
 	}
 }
