@@ -559,18 +559,16 @@ int CFileSystem_Stdio::FS_chmod( const char *pathT, int pmode )
 		return -1;
 
 	char path[ MAX_PATH ];
-
 	CBaseFileSystem::FixUpPath ( pathT, path );
 
-	int rt = _chmod( path, pmode );
+	const int rt = _chmod( path, pmode );
 #if defined(LINUX)
-	if (rt==-1)
+	if ( rt == -1 )
 	{
 		char caseFixedName[ MAX_PATH ];
-		const bool found = findFileInDirCaseInsensitive_safe( path, caseFixedName );
-		if ( found )
+		if ( findFileInDirCaseInsensitive_safe( path, caseFixedName ) )
 		{
-			rt=_chmod( caseFixedName, pmode );
+			rt = _chmod( caseFixedName, pmode );
 		}
 	}	
 #endif
@@ -600,8 +598,7 @@ int CFileSystem_Stdio::FS_stat( const char *pathT, struct _stat *buf, bool *pbLo
 	if ( rt == -1 )
 	{
 		char caseFixedName[ MAX_PATH ];
-		bool found = findFileInDirCaseInsensitive_safe( path, caseFixedName );
-		if ( found )
+		if ( findFileInDirCaseInsensitive_safe( path, caseFixedName ) )
 		{
 			rt = _stat( caseFixedName, buf );
 		}
@@ -745,15 +742,14 @@ CStdioFile *CStdioFile::FS_fopen( const char *filenameT, const char *options, in
 
 #ifdef LINUX
 	// Try opening the lower cased version.
-	if ( !pFile && !strchr(options, 'w') && !strchr(options,'+') )
+	if ( !pFile && !strchr(options, 'w') && !strchr(options, '+') )
 	{
 		char caseFixedName[ MAX_PATH ];
-		const bool found = findFileInDirCaseInsensitive_safe( filename, caseFixedName );
-		if ( found )
+		if ( findFileInDirCaseInsensitive_safe( filename, caseFixedName ) )
 		{
 			pFile = fopen( caseFixedName, options );
 			// dimhotepus: filename should contain valid file name.
-			if (pFile)
+			if ( pFile )
 			{
 				V_strcpy_safe( filename, caseFixedName );
 			}
