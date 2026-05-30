@@ -1891,7 +1891,7 @@ void COP_Output::SetConnection(CEntityConnectionList *pConnectionList)
 	}
 
 	// Put a <none> in param box if no param
-	if (strlen(m_strParam) == 0)
+	if (Q_isempty(m_strParam))
 	{
 		m_strParam = PARAM_STRING_NONE;
 	}

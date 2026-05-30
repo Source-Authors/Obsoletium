@@ -243,7 +243,7 @@ void Info_SetValueForStarKey ( char *s, const char *key, const char *value, int 
 		return;
 	}
 	Info_RemoveKey (s, key);
-	if (!value || !strlen(value))
+	if (Q_isempty(value))
 		return;
 
 	Q_snprintf (news, sizeof( news ), "\\%s\\%s", key, value);

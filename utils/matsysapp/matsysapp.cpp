@@ -389,7 +389,7 @@ int MaterialSystemApp::WinMain(void *hInstance, void *hPrevInstance, char *szCmd
 	
     // Parse the command line if there is one
     m_argc = 0;
-    if (strlen(szCmdLine) > 0)
+    if (!Q_isempty(szCmdLine))
 	{
         m_szCmdLine = szCmdLine;
         GetParameters();

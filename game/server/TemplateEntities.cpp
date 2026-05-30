@@ -74,7 +74,7 @@ int	g_iCurrentTemplateInstance;
 intp Templates_Add(CBaseEntity *pEntity, const char *pszMapData, int nLen)
 {
 	const char *pszName = STRING(pEntity->GetEntityName());
-	if ((!pszName) || (!strlen(pszName)))
+	if (Q_isempty(pszName))
 	{
 		DevWarning(1, "RegisterTemplateEntity: template entity with no name, class %s\n", pEntity->GetClassname());
 		return -1;

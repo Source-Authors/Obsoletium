@@ -2807,7 +2807,7 @@ void PhysFlushVehicleScripts()
 
 IPhysicsObject *FindPhysicsObjectByName( const char *pName, CBaseEntity *pErrorEntity )
 {
-	if ( !pName || !strlen(pName) )
+	if ( Q_isempty(pName) )
 		return NULL;
 
 	CBaseEntity *pEntity = NULL;

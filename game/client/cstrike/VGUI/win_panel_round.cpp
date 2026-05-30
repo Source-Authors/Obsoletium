@@ -187,7 +187,7 @@ void WinPanel_Round::FireGameEvent( IGameEvent* event )
 		int iFunFactPlayer = event->GetInt("funfact_player");
 		const char* funfactToken = event->GetString("funfact_token", "");
 
-		if (strlen(funfactToken) != 0)
+		if (!Q_isempty(funfactToken))
 		{
 			wchar_t funFactText[256];
 			wchar_t playerText[64];

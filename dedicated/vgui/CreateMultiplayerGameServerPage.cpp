@@ -648,7 +648,7 @@ void CCreateMultiplayerGameServerPage::LoadMapList() {
   m_pMapList->DeleteAllItems();
 
   Assert(!Q_isempty(m_szMod));
-  if (strlen(m_szMod) < 1) {
+  if (Q_isempty(m_szMod)) {
     m_pMapList->SetEnabled(false);
     return;
   }
