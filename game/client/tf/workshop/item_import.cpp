@@ -4448,7 +4448,7 @@ const char *CTFFileImportDialog::GetUserAnimationQCTemplate( int nSelectedClass,
 const char *CTFFileImportDialog::GetQCTemplate( int nSelectedClass )
 {
 	const char *pszQCText = GetItemValues()->GetString( CFmtStr( kClassQC, kClassFolders[nSelectedClass] ) );
-	if ( V_strlen(pszQCText) == 0 )
+	if ( Q_isempty(pszQCText) )
 	{
 		CUtlString strQCTemplateFile;
 		if ( GetItemPrefabValue( m_nPrefab == PREFAB_TAUNT ? "misc" : GetItemPrefab(), "qc_template", strQCTemplateFile ) )
@@ -4476,7 +4476,7 @@ const char *CTFFileImportDialog::GetQCTemplate( int nSelectedClass )
 const char *CTFFileImportDialog::GetQCITemplate( int nSelectedClass )
 {
 	const char *pszQCText = GetItemValues()->GetString( CFmtStr( kClassQCI, kClassFolders[nSelectedClass] ) );
-	if ( V_strlen(pszQCText) == 0 )
+	if ( Q_isempty(pszQCText) )
 	{
 		CUtlString strQCITemplateFile = CItemUpload::Manifest()->GetQCITemplate();
 		CAssetTF asset;

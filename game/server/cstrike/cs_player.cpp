@@ -5931,7 +5931,7 @@ void CCSPlayer::ParseAutoBuyString(const char *string, bool &boughtPrimary, bool
 		}
 
 		// make sure we actually have a command.
-		if (strlen(command) == 0)
+		if (Q_isempty(command))
 		{
 			continue;
 		}
@@ -6092,7 +6092,7 @@ void CCSPlayer::PrioritizeAutoBuyString(char *autobuyString, const char *priorit
 			++priorityChar;
 		}
 
-		if (strlen(priorityToken) == 0)
+		if (Q_isempty(priorityToken))
 		{
 			continue;
 		}
