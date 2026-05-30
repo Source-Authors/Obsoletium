@@ -80,7 +80,8 @@ static int FastToLower( char c )
 	}
 	else
 	{
-		i += isupper( i ) ? 0x20 : 0;
+		// dimhotepus: isupper -> V_isupper.
+		i += V_isupper( c ) ? 0x20 : 0;
 	}
 	return i;
 }

@@ -1526,7 +1526,8 @@ void CClass::CheckForHungarianErrors( int& warnings )
 			// The first character after the prefix must be upper case or we skip...
 			int nextchar = 2 + Q_strlen( tst->prefix );
 
-			if ( !isupper( var->m_szName[ nextchar ] ) )
+			// dimhotepus: isupper -> V_isupper.
+			if ( !V_isupper( var->m_szName[ nextchar ] ) )
 				continue;
 
 			bool typeFound = Q_stristr( var->m_szType, tst->mustinclude ) ? true : false;
@@ -1565,7 +1566,8 @@ void CClass::CheckForHungarianErrors( int& warnings )
 
 
 		if ( !Q_strncmp( var->m_szName, "m_f", 3 ) &&
-			 Q_strncmp( var->m_szName, "m_fl", 4 ) && isupper( var->m_szName[3] ) )
+			 // dimhotepus: isupper->V_isupper.
+			 Q_strncmp( var->m_szName, "m_fl", 4 ) && V_isupper( var->m_szName[3] ) )
 		{
 			// If it's a "flag" and not a "float" type, it better be a bool or an int
 			if ( !Q_stristr( var->m_szType, "bool" ) &&

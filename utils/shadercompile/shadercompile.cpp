@@ -322,7 +322,7 @@ struct CGlobalMutexAutoLock {
 #define GLOBAL_DATA_MTX_UNLOCK() threading::g_mtxGlobal.Unlock()
 #define GLOBAL_DATA_MTX_LOCK_AUTO threading::CGlobalMutexAutoLock UNIQUE_ID;
 
-// Consume all characters for which (isspace) is true
+// Consume all characters for which (V_isspace) is true
 template <typename T>
 char *ConsumeCharacters(char *szString, T pred) {
   if (szString) {
@@ -416,14 +416,16 @@ void ErrMsgDispatchInt(
     char *szMessage, char const *szShaderName,
     CUtlStringMap<CompilerMsgInfo> &shader_message_info_map) {
   // First line is the command number "szCommand"
-  char *szCommand = ConsumeCharacters(szMessage, isspace);
+  // dimhotepus: isspace -> V_isspace. 
+  char *szCommand = ConsumeCharacters(szMessage, V_isspace);
   char *szMessageListing = FindNext(szCommand, "\r\n");
   char chTerminator = *szMessageListing;
   *(szMessageListing++) = '\0';
 
   // Now come the command lines actually
   while (chTerminator) {
-    char *szMsgText = ConsumeCharacters(szMessageListing, isspace);
+    // dimhotepus: isspace -> V_isspace. 
+    char *szMsgText = ConsumeCharacters(szMessageListing, V_isspace);
     szMessageListing = FindNext(szMsgText, "\r\n");
     chTerminator = *szMessageListing;
     *(szMessageListing++) = 0;

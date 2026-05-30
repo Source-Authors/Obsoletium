@@ -523,7 +523,8 @@ void CSFMGenApp::UniqueifyNames( CUtlVector< SFMInfo_t > &infoList )
 		char *pTemp = (char*)_alloca( nLen + nDigits + 1 );
 		for ( int j = 0; j < nLen; ++j )
 		{
-			if ( isspace( pName[j] ) )
+			// dimhotepus: isspace -> V_isspace.
+			if ( V_isspace( pName[j] ) )
 			{
 				pTemp[j] = '_';
 			}

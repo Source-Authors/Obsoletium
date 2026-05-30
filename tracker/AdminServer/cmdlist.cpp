@@ -100,7 +100,8 @@ void CCMDList::ServerResponded()
 			&& strncmp(cur,"Total Commands",14) && strncmp(cur,"CmdList ? for syntax",20)  )
 		{
 			char *removeWhiteSpace=cur;
-			while(!isspace(*removeWhiteSpace) && removeWhiteSpace<next)
+			// dimhtepus: isspace -> V_isspace.
+			while(!V_isspace(*removeWhiteSpace) && removeWhiteSpace<next)
 			{
 				removeWhiteSpace++;
 			}

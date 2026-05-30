@@ -238,7 +238,7 @@ void CCommandLine::CreateCmdLine( const char *commandline )
 
 		if ( *pSrc == '@' )
 		{
-			if ( pSrc == commandline || (!bInQuotes && isspace( pSrc[-1] )) || (bInQuotes && pSrc == pInQuotesStart) )
+			if ( pSrc == commandline || (!bInQuotes && isspace( static_cast<unsigned char>( pSrc[-1] ) )) || (bInQuotes && pSrc == pInQuotesStart) )
 			{
 				LoadParametersFromFile( pSrc, pDst, sizeof( szFull ) - (pDst - szFull), bInQuotes );
 				continue;
@@ -520,7 +520,7 @@ void CCommandLine::ParseCommandLine()
 		return;
 
 	const char *pChar = m_pszCmdLine;
-	while ( *pChar && isspace(*pChar) )
+	while ( *pChar && isspace( static_cast<unsigned char>( *pChar )) )
 	{
 		++pChar;
 	}
@@ -549,8 +549,7 @@ void CCommandLine::ParseCommandLine()
 				pFirstLetter = pChar + 1;
 				continue;
 			}
-
-			if ( isspace( *pChar ) )
+			if ( isspace( static_cast<unsigned char>( *pChar ) ) )
 				continue;
 
 			pFirstLetter = pChar;
@@ -558,7 +557,7 @@ void CCommandLine::ParseCommandLine()
 		}
 
 		// Here, we're in the middle of a word. Look for the end of it.
-		if ( isspace( *pChar ) )
+		if ( isspace( static_cast<unsigned char>( *pChar ) ) )
 		{
 			AddArgument( pFirstLetter, pChar );
 			pFirstLetter = nullptr;

@@ -129,7 +129,8 @@ void CUtlMemoryPool::ReportLeaks()
 		while (scanPoint < scanEnd)
 		{
 			// search for and dump any strings
-			if ((unsigned)(*scanPoint + 1) <= 256 && isprint(*scanPoint))
+			// dimhotepus: isprint -> V_isprint.
+			if ((unsigned)(*scanPoint + 1) <= 256 && V_isprint(*scanPoint))
 			{
 				g_ReportFunc("%c", *scanPoint);
 				needSpace = true;

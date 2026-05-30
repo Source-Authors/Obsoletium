@@ -1388,7 +1388,7 @@ bool CUtlBuffer::ParseToken( const char *pStartingDelim, const char *pEndingDeli
 	while ( *pStartingDelim )
 	{
 		nCurrChar = *pStartingDelim++;
-		if ( !V_isspace((unsigned char)nCurrChar) )
+		if ( !V_isspace(nCurrChar) )
 		{
 			// dimhotepus: tolower -> V_tolower
 			if ( V_tolower( GetChar() ) != V_tolower( nCurrChar ) )

@@ -28,7 +28,8 @@ static unsigned long GetInstalledRAM()
 		if ( !strncasecmp( pszSearchString, rgchLine, cchSearchString ) )
 		{
 			char *pszVal = rgchLine+cchSearchString;
-			while( isspace(*pszVal) )
+			// dimhotepus: isspace -> V_isspace.
+			while( V_isspace(*pszVal) )
 				++pszVal;
 			ulTotalRamMB = atol( pszVal ) / 1024; // go from KiB to MiB
 			break;

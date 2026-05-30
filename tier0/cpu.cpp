@@ -126,7 +126,7 @@ void TrimSpaces( char (&in)[128], char (&out)[128] )
 {
 	size_t i{0};
 	// Trim leading space.
-	while (std::isspace( in[i] )) ++i;
+	while (std::isspace( static_cast<unsigned char>( in[i] ) )) ++i;
 	
 	if (in[i] == '\0')
 	{
@@ -136,8 +136,7 @@ void TrimSpaces( char (&in)[128], char (&out)[128] )
 	
 	// Trim trailing space.
 	char *end{in + strlen( in ) - 1};
-	
-	while (end > in && std::isspace( *end )) end--;
+	while (end > in && std::isspace( static_cast<unsigned char>( *end ) )) end--;
 	
 	// Write new null terminator character.
 	end[1] = '\0';
@@ -603,7 +602,7 @@ const CPUInformation* GetCPUInformation()
 		{
 			if ( char *value = strchr( buf, ':' ) )
 			{
-				for ( char *p = value - 1; p > buf && isspace((unsigned char)*p); --p )
+				for ( char *p = value - 1; p > buf && std::isspace(static_cast<unsigned char>(*p)); --p )
 				{
 					*p = 0;
 				}

@@ -132,7 +132,8 @@ bool CModWizardSubPanel_GetModInfo::OnNextButton()
 		int modNameLen = strlen( modName );
 		for ( int i=0; i < modNameLen; i++ )
 		{
-			if ( !isalnum( modName[i] ) && modName[i] != '-' && modName[i] != '_' && modName[i] != ' ' )
+			// dimhotepus: isalnum -> V_isalnum.
+			if ( !V_isalnum( modName[i] ) && modName[i] != '-' && modName[i] != '_' && modName[i] != ' ' )
 			{
 				VGUIMessageBox( this, "Error", "#ModNameInvalidCharacters" );
 				return false;

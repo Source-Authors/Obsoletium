@@ -99,7 +99,8 @@ int main(int argc, char* argv[])
 		const char *pTimeout = FindArg( argc, argv, "-patch", "60" );
 		if ( pTimeout )
 		{
-			if ( isdigit( pTimeout[0] ) )
+			// dimhotepus: isdigit -> V_isdigit.
+			if ( V_isdigit( pTimeout[0] ) )
 			{
 				cRequest = VMPI_SERVICE_PATCH;
 				timeout = atoi( pTimeout );

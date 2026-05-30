@@ -2146,7 +2146,8 @@ void CTextureManager::SetExcludedTextures( const char *pScriptName )
 			while ( tokenLength > 0 )
 			{
 				tokenLength--;
-				if ( isgraph( szToken[tokenLength] ) )
+				// dimhotepus: isgraph -> V_isgraph.
+				if ( V_isgraph( szToken[tokenLength] ) )
 				{
 					break;
 				}
@@ -2156,7 +2157,8 @@ void CTextureManager::SetExcludedTextures( const char *pScriptName )
 			// first optional token may be a dimension limit hint
 			int nDimensionsLimit = 0;
 			char *pTextureName = szToken;
-			if ( pTextureName[0] != 0 && isdigit( pTextureName[0] ) )
+			// dimhotepus: isdigit -> V_isdigit.
+			if ( !Q_isempty( szToken ) && V_isdigit( szToken[0] ) )
 			{
 				nDimensionsLimit = atoi( pTextureName );
 				
@@ -2164,7 +2166,8 @@ void CTextureManager::SetExcludedTextures( const char *pScriptName )
 				for ( ;; )
 				{
 					char ch = *pTextureName;
-					if ( !ch || ( !isdigit( ch ) && !isspace( ch ) ) )
+					// dimhotepus: isdigit -> V_isdigit, isspace -> V_isspace.
+					if ( !ch || ( !V_isdigit( ch ) && !V_isspace( ch ) ) )
 					{
 						break;
 					}

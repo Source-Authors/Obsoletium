@@ -62,10 +62,10 @@ void CHudNumeric::BuildPrintablesList( void )
 		return;
 
 	s_bPrintablesBuilt = true;
-	int i;
-	for ( i = 0; i < 256; i++ )
+	for ( int i = 0; i < 256; i++ )
 	{
-		if ( isalnum( i ) )  // isprint or isgraph?
+		// dimhotpeus: isalnum -> V_isalnum.
+		if ( V_isalnum( i ) )  // isprint or isgraph?
 		{
 			m_Printables.Insert( i );
 		}

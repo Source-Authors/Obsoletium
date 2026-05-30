@@ -266,7 +266,8 @@ bool CCDKeyEntryDialog::IsEnteredKeyValid()
 	// verify the entry
 	for (int i = 0; i < 29; i++)
 	{
-		if (cdkey[i] != '-' && !isalnum(cdkey[i]))
+		// dimhotepus: isalnum -> V_isalnum.
+		if (cdkey[i] != '-' && !V_isalnum(cdkey[i]))
 			return false;
 	}
 #if !defined( NO_STEAM )

@@ -841,7 +841,8 @@ void Grab_Triangles(s_source_t *psource) {
     intp i;
     // strip off trailing smag
     V_strcpy_safe(texturename, g_szLine);
-    for (i = V_strlen(texturename) - 1; i >= 0 && !isgraph(texturename[i]);
+	// dimhotepus: isgraph -> V_isgraph.		
+    for (i = V_strlen(texturename) - 1; i >= 0 && !V_isgraph(texturename[i]);
          i--) {
     }
     texturename[i + 1] = '\0';

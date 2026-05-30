@@ -197,7 +197,8 @@ bool SharedTokenWaiting( const char *buffer )
 	p = buffer;
 	while ( *p && *p!='\n')
 	{
-		if ( !isspace( *p ) || isalnum( *p ) )
+		// dimhotepus: isspace -> V_isspace, isalnum -> V_isalnum.
+		if ( !V_isspace( *p ) || V_isalnum( *p ) )
 			return true;
 
 		p++;

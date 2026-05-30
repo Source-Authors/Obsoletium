@@ -1307,12 +1307,14 @@ const CShaderManager::ShaderCombos_t *CShaderManager::FindOrCreateShaderCombos( 
 		pScan++;
 
 		// make sure that we have a number after the quote.
-		if( !isdigit( *pScan ) )
+		// dimhotepus: isdigit -> V_isdigit.
+		if( !V_isdigit( *pScan ) )
 		{
 			continue;
 		}
 
-		while( isdigit( *pScan ) )
+		// dimhotepus: isdigit -> V_isdigit.
+		while( V_isdigit( *pScan ) )
 		{
 			begin = begin * 10 + ( *pScan - '0' );
 			pScan++;
@@ -1325,12 +1327,14 @@ const CShaderManager::ShaderCombos_t *CShaderManager::FindOrCreateShaderCombos( 
 		pScan += 2;
 
 		// make sure that we have a number
-		if( !isdigit( *pScan ) )
+		// dimhotepus: isdigit -> V_isdigit.
+		if( !V_isdigit( *pScan ) )
 		{
 			continue;
 		}
-
-		while( isdigit( *pScan ) )
+		
+		// dimhotepus: isdigit -> V_isdigit.
+		while( V_isdigit( *pScan ) )
 		{
 			end = end * 10 + ( *pScan - '0' );
 			pScan++;

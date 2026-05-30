@@ -1641,7 +1641,8 @@ bool CSentence::ShouldSplitWord( char in )
 	if ( (unsigned char)in > SCHAR_MAX )
 		return true;
 
-	if ( ispunct( in ) )
+	// dimhotepus: ispunct -> V_ispunct.
+	if ( V_ispunct( in ) )
 	{
 		// don't split on apostrophe
 		if ( in == '\'' )

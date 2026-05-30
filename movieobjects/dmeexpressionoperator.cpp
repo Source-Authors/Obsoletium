@@ -476,11 +476,13 @@ bool CExpressionCalculator::ParsePrimary( const char *&expr )
 		return false;
 
 	// Variables can't start with a number
-	if ( isdigit( *expr ) )
+	// dimhotepus: isdigit -> V_isdigit.
+	if ( V_isdigit( *expr ) )
 		return false;
 
 	const char *pStart = expr;
-	while ( isalnum( *expr ) || *expr == '_' )
+	// dimhotepus: isalnum -> V_isalnum.
+	while ( V_isalnum( *expr ) || *expr == '_' )
 	{
 		++expr;
 	}

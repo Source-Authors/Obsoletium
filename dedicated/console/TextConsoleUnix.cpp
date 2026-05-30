@@ -140,7 +140,8 @@ static bool add_command(const char *cmd, int cmd_len) {
     tmZone(TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__);
 
     // Trim trailing whitespace.
-    while ((cmd_len > 0) && isspace(cmd[cmd_len - 1])) cmd_len--;
+    // dimhotepus: isspace -> V_isspace.
+    while ((cmd_len > 0) && V_isspace(cmd[cmd_len - 1])) cmd_len--;
 
     if (cmd_len > 0) {
       pthread_mutex_lock(&g_lock);

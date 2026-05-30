@@ -97,7 +97,8 @@ void PerforceFileExplorer::SetCurrentDirectory( const char *pFullPath )
 	if ( !pFullPath )
 		return;
 
-	while ( isspace( *pFullPath ) )
+	// dimhotepus: isspace -> V_isspace.
+	while ( V_isspace( *pFullPath ) )
 	{
 		++pFullPath;
 	}

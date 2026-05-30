@@ -1596,7 +1596,8 @@ void ReadTrianglesFromSMD( std::vector< submesh_t* > &meshes, int numbones, std:
 		// the studiomdl comment here is "strip off trailing smag" whatever smag is...
 		strncpy( texname, line, MAXTEXNAME );
 		int i;
-		for ( i = strlen( texname ) - 1; i >= 0 && ! isgraph( texname[i] ); i-- )
+		// dimhotepus: isgraph -> V_isgraph.
+		for ( i = strlen( texname ) - 1; i >= 0 && ! V_isgraph( texname[i] ); i-- )
 		{
 		}
 		texname[i + 1] = '\0';

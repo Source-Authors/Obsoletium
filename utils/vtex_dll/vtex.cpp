@@ -638,7 +638,8 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 					m_vtfProcOptions.numNotDecayMips[ch] = nSteps;
 					m_vtfProcOptions.clrDecayGoal[ch] = atoi( szParse );
 					
-					while ( isdigit( *szParse ) )
+					// dimhotepus: isdigit -> V_isdigit.
+					while ( V_isdigit( *szParse ) )
 						++ szParse;
 
 					// Exponential decay

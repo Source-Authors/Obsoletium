@@ -4714,7 +4714,8 @@ void Panel::ApplySettings(KeyValues *inResourceData)
 			// Get the color as a string - test whether it is an actual color or a reference to a scheme color
 			const char *pColorStr = inResourceData->GetString( e.m_pszScriptName );
 			Color &clrDest = e.m_colFromScript;
-			if ( pColorStr[0] == '.' || isdigit( pColorStr[0] ) )
+			// dimhotepus: isdigit -> V_isdigit.
+			if ( pColorStr[0] == '.' || V_isdigit( pColorStr[0] ) )
 			{
 				float r = 0.0f, g = 0.0f, b = 0.0f, a = 0.0f;
 				// dimhotepus: Check all 4 color components are present.

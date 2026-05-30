@@ -643,7 +643,8 @@ public:
 			if ( *p == '/' && *(p+1) == '/' )
 				return false;
 
-			if ( !V_isspace( *p ) || isalnum( *p ) )
+			// dimhotepus: isspace -> V_isspace, isalnum -> V_isalnum.
+			if ( !V_isspace( *p ) || V_isalnum( *p ) )
 				return true;
 
 			p++;

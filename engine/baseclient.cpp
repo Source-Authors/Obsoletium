@@ -374,7 +374,8 @@ void ValidateName( char *pszName, int nBuffSize )
 		const unsigned char *pChar = (unsigned char *)pszName;
 
 		// also skip characters we're going to ignore
-		while ( *pChar && ( isspace(*pChar) || BIgnoreCharInName( *pChar, true ) ) )
+		// dimhotepus: isspace -> V_isspace.
+		while ( *pChar && ( V_isspace(*pChar) || BIgnoreCharInName( *pChar, true ) ) )
 		{
 			++pChar;
 		}

@@ -663,11 +663,13 @@ unsigned			     InputFileBytes = 0;
 char* CleanFilename( char* filename )
 {
 	// Trim leading white space:
-	while( isspace(*filename) )
+	// dimhotepus: isspace -> V_isspace.
+	while( V_isspace(*filename) )
 		filename++;
 
 	// Trim trailing white space:
-	while( isspace( filename[strlen(filename)-1] ) )
+	// dimhotepus: isspace -> V_isspace.
+	while( V_isspace( filename[strlen(filename)-1] ) )
 	{
 		filename[strlen(filename)-1] = '\0';
 	}
@@ -854,7 +856,8 @@ bool xZipAddFile( const char* zipname, bool bPrecacheEntireFile, bool bProcessPr
 	}
 
 	// Skip leading white space:
-	for( filename = buffer; isspace(*filename); filename++ )
+	// dimhotepus: isspace -> V_isspace.
+	for( filename = buffer; V_isspace(*filename); filename++ )
 		;
 
 	// Obliterate trailing white space:
@@ -866,8 +869,8 @@ bool xZipAddFile( const char* zipname, bool bPrecacheEntireFile, bool bProcessPr
 			printf("!!!! BAD FILENAME: \"%s\"\n", filename );
 			return false;
 		}
-		
-		if( isspace( filename[len-1] ) )
+		// dimhotepus: isspace -> V_isspace.
+		if( V_isspace( filename[len-1] ) )
 			filename[len-1]='\0';
 		else
 			break;

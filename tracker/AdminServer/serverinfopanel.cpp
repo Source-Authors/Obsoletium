@@ -249,7 +249,8 @@ void CServerInfoPanel::ParseIntoMapList(const char *maplist, CUtlVector<CUtlSymb
 	{
 		// newline-seperated map list
 		//!! this should be done with a more standard tokenizer
-		if (isspace(*parse))
+		// dimhotepus: isspace -> V_isspace.
+		if (V_isspace(*parse))
 		{
 			parse++;
 			continue;
