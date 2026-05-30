@@ -600,7 +600,7 @@ int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE,
     return 1;
   }
 
-  atexit(CoUninitialize);
+  RunCodeAtScopeExit(CoUninitialize());
 
   if (FailedUI(
           atl_com.Init(ObjectMap, instance, &LIBID_ATLLib),
