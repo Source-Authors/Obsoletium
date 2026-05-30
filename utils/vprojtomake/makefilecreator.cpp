@@ -107,8 +107,8 @@ void CMakefileCreator::CreateDirectoryFriendlyName(const char *dirName,
     }
 
     if (isalpha(friendlyDirName[i])) {
-      friendlyDirName[i] = static_cast<unsigned char>(
-          toupper(static_cast<unsigned char>(friendlyDirName[i])));
+      // dimhotepus: toupper -> V_toupper.
+      friendlyDirName[i] = V_toupper(friendlyDirName[i]);
     }
 
     if (friendlyDirName[i] == '.') {

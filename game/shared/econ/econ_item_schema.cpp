@@ -6470,7 +6470,8 @@ static void CalculateKeyValuesCRCRecursive( KeyValues *pKV, CRC32_t *crc, bool b
 		const char *s = pKV->GetName();  
 		for (;;)
 		{
-			unsigned char x = tolower(*s);
+			// dimhotepus: tolower -> V_tolower.
+			unsigned char x = static_cast<unsigned char>(V_tolower(*s));
 			CRC32_ProcessBuffer( crc, &x, 1 ); // !SPEED! This is slow, but it works.
 			if (*s == '\0') break;
 			++s;

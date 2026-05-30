@@ -228,10 +228,8 @@ void TextImage::GetText(OUT_Z_CAP(bufferSize) char *buffer, int bufferSize)
 	if ( m_bAllCaps )
 	{
 		// Uppercase all the letters
-		for ( intp i = V_strlen( buffer ); i >= 0; --i )
-		{
-			buffer[ i ] = toupper( buffer[ i ] );
-		}
+		// dimhotepus: Loop toupper -> V_strupr
+		V_strupr( buffer ); 
 	}
 }
 

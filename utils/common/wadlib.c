@@ -1,4 +1,4 @@
-//========= Copyright © 1996-2005, Valve LLC, All rights reserved. ============//
+//========= Copyright Â© 1996-2005, Valve LLC, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -94,7 +94,7 @@ void CleanupName (char *in, char *out)
 		if (!in[i])
 			break;
 			
-		out[i] = toupper(in[i]);
+		out[i] = (char)toupper((unsigned char)in[i]);
 	}
 	
 	for ( ; i<sizeof( ((lumpinfo_t *)0)->name ); i++ )

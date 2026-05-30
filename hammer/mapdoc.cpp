@@ -7934,11 +7934,13 @@ static char * FindInString(char *pszSub, char *pszMain)
 	char *p = pszMain;
 	size_t nSub = strlen(pszSub);
 	
-	int ch1 = toupper(pszSub[0]);
+	// dimhotepus: toupper -> V_toupper.
+	char ch1 = V_toupper(pszSub[0]);
 
 	while(p[0])
 	{
-		if(ch1 == toupper(p[0]))
+		// dimhotepus: toupper -> V_toupper.
+		if(ch1 == V_toupper(p[0]))
 		{
 			if(!strnicmp(pszSub, p, nSub))
 				return p;

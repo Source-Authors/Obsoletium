@@ -1946,7 +1946,8 @@ bool ComparePath( const char *a, const char *b )
 		{
 			continue;
 		}
-		if ( tolower( *a ) == tolower( *b ) )
+		// dimhotepus: tolower -> V_tolower.
+		if ( V_tolower( *a ) == V_tolower( *b ) )
 		{
 			continue;
 		}

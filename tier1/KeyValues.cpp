@@ -2608,7 +2608,8 @@ void KeyValues::RecursiveLoadFromBuffer( char const *resourceName, CUtlBuffer &b
 #ifdef POSIX
 			// strtod supports hex representation in strings under posix but we DON'T
 			// want that support in keyvalues, so undo it here if needed
-			if ( len > 1 &&  tolower(value[1]) == 'x' )
+			// dimhotepus: tolower -> V_tolower.
+			if ( len > 1 && V_tolower(value[1]) == 'x' )
 			{
 				fval = 0.0f;
 				pFEnd = (char *)value;

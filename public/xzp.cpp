@@ -639,7 +639,8 @@ unsigned xZipCRCFilename( const char* filename )
 		if( c == '/' )
 			c = '\\';
 		else
-			c = (char)tolower(c);
+			// dimhotepus: tolower -> V_tolower.
+			c = V_tolower(c);
 
 		hash = hash * 33 + c;
 	}
@@ -847,7 +848,8 @@ bool xZipAddFile( const char* zipname, bool bPrecacheEntireFile, bool bProcessPr
 			*filename = '\\';
 		else
 		{
-			*filename = (char)tolower(*filename);
+			// dimhotepus: tolower -> V_tolower.
+			*filename = V_tolower(*filename);
 		}
 	}
 

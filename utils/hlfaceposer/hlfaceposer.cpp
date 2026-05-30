@@ -701,7 +701,8 @@ char const *FacePoser_TranslateSoundName( CChoreoEvent *event )
 
 static bool charsmatch( char c1, char c2 )
 {
-	if ( tolower( c1 ) == tolower( c2 ) )
+	// dimhotepus: tolower -> V_tolower. 
+	if ( V_tolower( c1 ) == V_tolower( c2 ) )
 		return true;
 	if ( PATHSEPARATOR( c1 ) && PATHSEPARATOR( c2 ) )
 		return true;

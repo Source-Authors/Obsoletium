@@ -584,7 +584,8 @@ bool WildcardMatch( const char *query, const char *test )
 	{
 		char nameChar = *test;
 		char queryChar = *query;
-		if ( tolower(nameChar) != tolower(queryChar) ) // case-insensitive
+		// dimhotepus: tolower -> V_tolower.
+		if ( V_tolower(nameChar) != V_tolower(queryChar) ) // case-insensitive
 			break;
 		++test;
 		++query;

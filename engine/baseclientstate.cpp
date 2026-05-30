@@ -1229,7 +1229,8 @@ bool CBaseClientState::ProcessServerInfo( SVC_ServerInfo *msg )
 		event->SetString( "mapname", msg->m_szMapName );
 		event->SetInt(    "maxplayers", msg->m_nMaxClients );
 		event->SetInt(	  "password", 0 );				// TODO
-		event->SetString( "os", va("%c", toupper( msg->m_cOS ) ) );
+		// dimhotepus: toupper -> V_toupper.
+		event->SetString( "os", va("%c", V_toupper( msg->m_cOS )) );
 		event->SetInt(    "dedicated", msg->m_bIsDedicated ? 1 : 0 );
 		if ( m_ulGameServerSteamID != 0 )
 		{

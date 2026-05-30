@@ -127,8 +127,6 @@ BOOL ReadText(LPTSTR pszText, short iBeginLine, short iEndLine) {
 }
 
 short CharToCode(char c) {
-  int upper = toupper(c);
-
   switch (c) {
     case 13:
       return 28;
@@ -136,6 +134,9 @@ short CharToCode(char c) {
     default:
       break;
   }
+
+  // dimhotepus: toupper -> V_toupper.
+  char upper = V_toupper(c);
 
   if (V_isalpha(c)) return static_cast<short>(30 + upper - 65);
   if (V_isdigit(c)) return static_cast<short>(1 + upper - 47);
@@ -150,8 +151,9 @@ BOOL WriteText(LPCTSTR szText) {
   while (*sz) {
     // 13 is the code for a carriage return (\n) instead of 10.
     if (*sz == 10) *sz = 13;
-
-    auto upper = static_cast<unsigned short>(toupper(*sz));
+  
+    // dimhotepus: toupper -> V_toupper.
+    auto upper = static_cast<unsigned short>(V_toupper(*sz));
 
     rec.EventType = KEY_EVENT;
     rec.Event.KeyEvent.bKeyDown = TRUE;

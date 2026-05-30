@@ -690,7 +690,8 @@ bool CGCInterface::BAsyncInit( uint32 unAppID, const char *pchDebugName, int iGC
 		if ( const char *pSlash = strrchr( sGCPath.Get(), '\\' ) )
 		{
 			//skip over the slash, and verify that we have a 'v' before the version
-			if( tolower( pSlash[ 1 ] ) == 'v' )
+			// dimhotepus: tolower -> V_tolower.
+			if( V_tolower( pSlash[ 1 ] ) == 'v' )
 			{
 				//grab the version number
 				m_nVersion = ( uint32 )max( 0, atoi( pSlash + 2 ) );

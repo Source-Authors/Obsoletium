@@ -727,7 +727,8 @@ bool CFilteredComboBox::MatchString( const char *pStringToMatchStart, const char
 				break;
 			
 			// Match this character.
-			if ( toupper( *pStringToMatch ) != toupper( *pTestString ) )
+			// dimhotepus: toupper -> V_toupper.
+			if ( V_toupper( *pStringToMatch ) != V_toupper( *pTestString ) )
 				break;
 			
 			++pStringToMatch;

@@ -296,10 +296,11 @@ static int FixupFileName( char const* pInFile, char* pOutBuf )
 		return 0;
 	}
 
-	int len = strlen(pInFile); 
-	for (int i = 0; i <= len; ++i)
+	intp len = strlen(pInFile); 
+	for (intp i = 0; i <= len; ++i)
 	{
-		pOutBuf[i] = tolower( pInFile[i] );
+		// dimhotepus: tolower -> V_tolower.
+		pOutBuf[i] = V_tolower( pInFile[i] );
 		if (pOutBuf[i] == '\\')
 			pOutBuf[i] = '/';
 	}

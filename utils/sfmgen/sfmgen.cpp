@@ -529,7 +529,8 @@ void CSFMGenApp::UniqueifyNames( CUtlVector< SFMInfo_t > &infoList )
 			}
 			else
 			{
-				pTemp[j] = tolower( pName[j] );
+				// dimhotepus: tolower -> V_tolower.
+				pTemp[j] = V_tolower( pName[j] );
 			}
 		}
 		if ( nFoundCount > 1 )

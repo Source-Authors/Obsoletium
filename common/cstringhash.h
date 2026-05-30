@@ -100,7 +100,8 @@ private:
 
 		while( *s )
 		{
-			result += tolower( ( int )*s ) * 6029;
+			// dimhotepus: tolower -> V_tolower.
+			result += static_cast<unsigned>(V_tolower( *s )) * 6029;
 			result *= 5749;
 			s++;
 		}

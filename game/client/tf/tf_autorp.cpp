@@ -404,7 +404,8 @@ bool CTFAutoRP::PerformReplacement( const char *pszReplacement, replacementcheck
 	if ( pszReplacement && pszReplacement[0] )
 	{
 		// Check to see if the previous word should be modified
-		char fc = tolower( *pszReplacement );
+		// dimhotepus: tolower -> V_tolower.
+		char fc = V_tolower( *pszReplacement );
 		if ( !_strnicmp( pRepCheck->szPrevWord, "an", MAX(pRepCheck->iPrevLen,2) ) )
 		{
 			if ( fc != 'a' && fc != 'e' && fc != 'i' && fc != 'o' && fc != 'u' )
@@ -545,11 +546,14 @@ void CTFAutoRP::ModifySpeech( const char *pszInText, char *pszOutText, int iOutL
 				// Match case of the first letter in the word we're replacing
 				if ( pszCurWord[0] >= 'A' && pszCurWord[0] <= 'Z' )
 				{
-					szStoredWord[0] = toupper( szStoredWord[0] );
+					// dimhotepus: toupper -> V_toupper.
+					szStoredWord[0] = V_toupper(szStoredWord[0]);
 				}
-				else if ( pszCurWord[0] >= 'a' && pszCurWord[0] <= 'a' )
+				// dimhotepus: Fix autoreplace upper bounds check.
+				else if ( pszCurWord[0] >= 'a' && pszCurWord[0] <= 'z' )
 				{
-					szStoredWord[0] = tolower( szStoredWord[0] );
+					// dimhotepus: tolower -> V_tolower.
+					szStoredWord[0] = V_tolower(szStoredWord[0]);
 				}
 			}
 			else

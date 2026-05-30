@@ -190,13 +190,10 @@ wchar_t *_V_wcslower (const char*, int, INOUT_Z wchar_t *start)
 
 char *V_strupr( INOUT_Z char *start )
 {
-	auto *str = (unsigned char*)start;
+	auto *str = start;
 	while( *str )
 	{
-		if ( (unsigned char)(*str - 'a') <= ('z' - 'a') )
-			*str -= 'a' - 'A';
-		else if ( (unsigned char)*str >= 0x80 ) // non-ascii, fall back to CRT
-			*str = static_cast<unsigned char>(toupper( *str ));
+		*str = V_toupper( *str );
 		str++;
 	}
 	return start;
@@ -204,13 +201,10 @@ char *V_strupr( INOUT_Z char *start )
 
 char *V_strlower( INOUT_Z char *start )
 {
-	auto *str = (unsigned char*)start;
+	auto *str = start;
 	while( *str )
 	{
-		if ( (unsigned char)(*str - 'A') <= ('Z' - 'A') )
-			*str += 'a' - 'A';
-		else if ( (unsigned char)*str >= 0x80 ) // non-ascii, fall back to CRT
-			*str = static_cast<unsigned char>(tolower( *str ));
+		*str = V_tolower( *str );
 		str++;
 	}
 	return start;
@@ -221,7 +215,7 @@ char *V_strnlwr( INOUT_Z_CAP(count) char *s, size_t count )
 	// Assert( count >= 0 ); tautology since size_t is unsigned
 	AssertValidStringPtr( s, count );
 
-	auto *it = reinterpret_cast<unsigned char *>(s);
+	auto *it = s;
 	char* pRet = s;
 	if ( !s || !count )
 		return s;
@@ -231,16 +225,11 @@ char *V_strnlwr( INOUT_Z_CAP(count) char *s, size_t count )
 		if ( !*it )
 			return pRet; // reached end of string
 
-		// dimhotepus: Use fast ASCII way to lowercase.
-		if ( (unsigned char)(*it - 'A') <= ('Z' - 'A') )
-			*it += 'a' - 'A';
-		else if ( (unsigned char)*it >= 0x80 ) // non-ascii, fall back to CRT
-			*it =static_cast<unsigned char>(tolower( static_cast<unsigned char>(*it) ));
-
+		*it = V_tolower(*it);
 		++it;
 	}
 
-	*it = 0; // null-terminate original string at "count-1"
+	*it = '\0'; // null-terminate original string at "count-1"
 	return pRet;
 }
 
@@ -713,7 +702,7 @@ RET_MAY_BE_NULL char const* V_stristr( IN_Z char const* pStr, IN_Z char const* p
 	while (*pLetter != 0)
 	{
 		// Skip over non-matches
-		if (FastToLower((unsigned char)*pLetter) == FastToLower((unsigned char)*pSearch))
+		if (FastToLower(*pLetter) == FastToLower(*pSearch))
 		{
 			// Check for match
 			char const* pMatch = pLetter + 1;
@@ -724,7 +713,7 @@ RET_MAY_BE_NULL char const* V_stristr( IN_Z char const* pStr, IN_Z char const* p
 				if (*pMatch == 0)
 					return nullptr;
 
-				if (FastToLower((unsigned char)*pMatch) != FastToLower((unsigned char)*pTest))
+				if (FastToLower(*pMatch) != FastToLower(*pTest))
 					break;
 
 				++pMatch;

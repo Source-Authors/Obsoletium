@@ -48,8 +48,11 @@ mx_strcasecmp (const char *s1, const char *s2)
 char *
 mx_strlower (char *str)
 {
-	int i;
-	for (i = (int)strlen (str) - 1; i >= 0; i--)
-		str[i] = (char)tolower (str[i]);
-	return str;
+	char *start = str;
+	while (*str)
+	{
+		*str = static_cast<char>(tolower (static_cast<unsigned char>(*str)));
+		str++;
+	}
+	return start;
 }

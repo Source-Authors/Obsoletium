@@ -1015,7 +1015,8 @@ int GetSectorSize( const char *pszFilename )
 
 	static DriveSectorSize_t cachedSizes[8];
 
-	char volume = tolower( *pszFilename );
+	// dimhotepus: tolower -> V_tolower.
+	char volume = V_tolower( *pszFilename );
 
 	size_t i;
 	for ( i = 0; i < std::size(cachedSizes) && cachedSizes[i].volume; i++ )

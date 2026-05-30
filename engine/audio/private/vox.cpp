@@ -2179,7 +2179,8 @@ void VOX_ParseLineCommands( char *pSentenceData, int sentenceIndex )
 			}
 
 			// Simple comparison of string commands:
-			switch( tolower( *pSentenceData ) )
+			// dimhotepus: tolower -> V_tolower.
+			switch( V_tolower( *pSentenceData ) )
 			{
 			case 'l':
 				// All commands starting with the letter 'l' here

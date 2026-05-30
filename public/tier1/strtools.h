@@ -60,7 +60,41 @@ wchar_t*	_V_wcsupr	( const char* file, int line, INOUT_Z wchar_t *start );
 
 // ASCII-optimized functions which fall back to CRT only when necessary
 char *V_strupr( INOUT_Z char *start );
+// dimhotepus: Correctly work with signed/unsigned char.
+[[nodiscard]] inline char V_toupper(char ch)
+{
+	constexpr auto zMinusA = static_cast<unsigned char>('z' - 'a');
+	constexpr auto aMinusA = static_cast<unsigned char>('a' - 'A');
+
+	const auto uch = static_cast<unsigned char>(ch);
+
+	if (static_cast<unsigned char>(uch - static_cast<unsigned char>('a')) <=
+		zMinusA)
+		return static_cast<char>(uch - aMinusA);
+
+	if (uch >= 0x80)  // non-ASCII, fall back to CRT
+		return static_cast<char>(std::toupper(uch));
+
+	return ch;
+}
 char *V_strlower( INOUT_Z char *start );
+// dimhotepus: Correctly work with signed/unsigned char.
+[[nodiscard]] inline char V_tolower(char ch)
+{
+	constexpr auto zMinusA = static_cast<unsigned char>('Z' - 'A');
+	constexpr auto aMinusA = static_cast<unsigned char>('a' - 'A');
+
+	const auto uch = static_cast<unsigned char>(ch);
+
+	if (static_cast<unsigned char>(uch - static_cast<unsigned char>('A')) <=
+		zMinusA)
+		return static_cast<char>(uch + aMinusA);
+
+	if (uch >= 0x80)  // non-ASCII, fall back to CRT
+		return static_cast<char>(std::tolower(uch));
+
+	return ch;
+}
 [[nodiscard]] int V_stricmp( IN_Z const char *s1, IN_Z const char *s2 );
 [[nodiscard]] int V_strncmp( IN_Z const char *s1, IN_Z const char *s2, intp count );
 [[nodiscard]] int V_strnicmp( IN_Z const char *s1, IN_Z const char *s2, intp n );

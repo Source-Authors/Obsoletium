@@ -13,6 +13,7 @@
 #include "tier0/basetypes.h"
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
+#include "tier1/strtools.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -133,7 +134,8 @@ unsigned FASTCALL HashStringCaselessConventional( const char *pszKey )
 
 	for( ; *pszKey ; pszKey++ )
 	{
-		hash = ( ( hash << 5 ) + hash ) + (uint8)tolower(*pszKey);
+		// dimhotepus: tolower -> V_tolower.
+		hash = ( ( hash << 5 ) + hash ) + (uint8)V_tolower(*pszKey);
 	}
 
 	return hash;

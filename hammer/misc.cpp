@@ -74,7 +74,8 @@ int mychdir(LPCTSTR pszDir)
 	int curdrive = _getdrive();
 
 	// changes to drive/directory
-	if(pszDir[1] == ':' && _chdrive(toupper(pszDir[0]) - 'A' + 1) == -1)
+	// dimhotepus: toupper -> V_toupper.
+	if(pszDir[1] == ':' && _chdrive(V_toupper(pszDir[0]) - 'A' + 1) == -1)
 		return -1;
 	if(_chdir(pszDir) == -1)
 	{

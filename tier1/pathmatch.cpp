@@ -571,7 +571,8 @@ PathMod_t pathmatch( const char *pszIn, char **ppszOut, bool bAllowBasenameMisma
 			if ( *p == '/' )
 				pBasename = p+1;
 
-			*p = tolower(*p);
+			// dimhotepus: tolower -> V_tolower.
+			*p = V_tolower(*p);
 			p++;
 		}
 		if ( __real_access( pPath, F_OK ) == 0 )

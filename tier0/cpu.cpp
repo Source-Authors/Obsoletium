@@ -609,7 +609,7 @@ const CPUInformation* GetCPUInformation()
 				}
 				for ( char *p = buf; p < value && *p; ++p )
 				{
-					*p = tolower((unsigned char)*p);
+					*p = static_cast<char>(tolower((unsigned char)*p));
 				}
 				if ( !strcmp( buf, "processor" ) )
 				{
