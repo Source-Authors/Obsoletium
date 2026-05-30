@@ -112,6 +112,10 @@ static intp FindGameDataClass( const char *pName )
 CObjectBar::CObjectBar()
 	: CHammerBar(), m_CreateList( this )
 {
+	iBlockSel = -1;
+	iEntitySel = -1;
+	m_iLastTool = -1;
+
 	for(int i = 0; i < MAX_PREV_SEL; i++)
 	{
 		m_PrevSel[i].dwGameID = 0;

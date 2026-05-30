@@ -46,6 +46,7 @@ COP_Groups::COP_Groups()
 {
 	//{{AFX_DATA_INIT(COP_Groups)
 	//}}AFX_DATA_INIT
+	pUpdateObject = nullptr;
 	m_pEditObjectRuntimeClass = RUNTIME_CLASS(editCMapClass);
 }
 

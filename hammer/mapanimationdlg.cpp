@@ -42,6 +42,7 @@ CMapAnimationDlg::CMapAnimationDlg()
 	m_flAnimationStart = 0.0;
 	m_flAnimTime = 0.0;
 	m_bPlaying = false;
+	m_bEnabled = false;
 }
 
 

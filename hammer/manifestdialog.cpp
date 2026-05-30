@@ -24,6 +24,7 @@ CManifestMove::CManifestMove( bool bIsMove, CWnd* pParent /*=NULL*/ )
 	: CBaseDlg(CManifestMove::IDD, pParent)
 {
 	m_bIsMove = bIsMove;
+	m_CenterContents = false;
 }
 
 

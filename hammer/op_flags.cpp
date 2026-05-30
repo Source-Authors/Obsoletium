@@ -23,6 +23,7 @@ COP_Flags::COP_Flags() : CObjectPage(COP_Flags::IDD)
 	//{{AFX_DATA_INIT(COP_Flags)
 		// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
+	pObjClass = nullptr;
 	m_pEditObjectRuntimeClass = RUNTIME_CLASS(editCEditGameClass);
 	m_nNumSelectedObjects = 0;
 	m_pEntityPage = NULL;

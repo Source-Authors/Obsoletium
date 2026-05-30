@@ -26,6 +26,7 @@ CMapOverlayTransition::CMapOverlayTransition()
 	m_bIsWater = true;
 	m_aFaceCache1.Purge();
 	m_aFaceCache2.Purge();
+	m_nShorelineId = -1;
 	m_bDebugDraw = false;
 }
 

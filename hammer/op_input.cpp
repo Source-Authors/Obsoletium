@@ -58,6 +58,12 @@ COP_Input::COP_Input(void)
 {
 	m_pObjectList = NULL;
 	m_pEntityList = new CMapEntityList;
+	m_pEditGameClass = nullptr;
+	m_pEntity = nullptr;
+	m_pTargetEntityList = nullptr;
+	m_pConnectionList = nullptr;
+	m_bMultipleTargetNames = false;
+
 	m_pEditObjectRuntimeClass = RUNTIME_CLASS(editCMapClass);
 	m_nSortColumn = OUTPUT_NAME_COLUMN;
 

@@ -89,6 +89,7 @@ CMapFrustum::CMapFrustum(void)
 	m_flNearPlane = 10;
 	m_flFarPlane = 200;
 	m_flPitchScale = -1;
+	m_fBrightness = 1;
 }
 
 

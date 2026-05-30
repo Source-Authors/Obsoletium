@@ -52,6 +52,7 @@ CMapQuadBounds::CMapQuadBounds(void)
 	m_vUpperLeft.Init();
 	m_vLowerRight.Init();
 	m_vUpperRight.Init();
+	m_nError = QUAD_ERR_NONE;
 }
 
 

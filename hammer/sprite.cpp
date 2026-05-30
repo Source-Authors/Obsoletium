@@ -185,10 +185,21 @@ void CSpriteCache::Release(CSpriteModel *pSprite)
 // Purpose: Constructor.
 //-----------------------------------------------------------------------------
 CSpriteModel::CSpriteModel(void) : 
-	m_pMaterial(0), m_NumFrames(-1), m_fScale(1.0), m_Origin(0,0,0), m_UL(0,0), m_LR(0,0), m_TexUL(0,1), m_TexLR(1,0), m_bInvert(false)
+	m_pMaterial(0),
+	m_NumFrames(-1),
+	m_Type(-1),
+	m_Width(-1),
+	m_Height(-1),
+	m_fScale(1.0),
+	m_Origin(0,0,0),
+	m_UL(0,0),
+	m_LR(0,0),
+	m_TexUL(0,1),
+	m_TexLR(1,0),
+	m_bInvert(false)
 {
 	// dimhotepus: Member init in ctor.
-	m_pMaterial = nullptr;
+	m_MaterialPrimitiveType = MATERIAL_POINTS;
 	m_pFrameVar = nullptr;
 	m_pRenderModeVar = nullptr;
 }

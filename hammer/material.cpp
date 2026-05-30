@@ -197,6 +197,7 @@ CMaterialCache::CMaterialCache(void)
 {
 	m_pCache = NULL;
 	m_nMaxEntries = 0;
+	m_nEntries = 0;
 }
 
 

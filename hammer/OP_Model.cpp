@@ -42,6 +42,8 @@ COP_Model::COP_Model() : CObjectPage(COP_Model::IDD), m_ComboSequence( this )
 
 	m_pEditObjectRuntimeClass = RUNTIME_CLASS(editCEditGameClass);
 	m_ComboSequence.SetOnlyProvideSuggestions( true );
+	pObjClass = nullptr;
+	m_bOldAnimatedModels = false;
 }
 
 

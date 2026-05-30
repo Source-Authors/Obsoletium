@@ -34,6 +34,7 @@ COPTView3D::COPTView3D(void)
 {
 	//{{AFX_DATA_INIT(COPTView3D)
 	//}}AFX_DATA_INIT
+	m_bOldFilterTextures = FALSE;
 }
 
 

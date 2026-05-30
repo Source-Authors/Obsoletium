@@ -23,7 +23,7 @@ public:
 
 	CObjectPage(void) : m_pObjectList{nullptr}
 	{
-		m_bMultiEdit = false;
+		m_bMultiEdit = m_bCanEdit = false;
 		m_bFirstTimeActive = true;
 		m_bHasUpdatedData = false;
 		m_pEditObjectRuntimeClass = nullptr;
@@ -31,8 +31,9 @@ public:
 
 	CObjectPage(UINT nResourceID) : CPropertyPage(nResourceID), m_pObjectList{nullptr}
 	{
-		m_bMultiEdit = false;
+		m_bMultiEdit = m_bCanEdit = false;
 		m_bFirstTimeActive = false;
+		m_bHasUpdatedData = false;
 		m_pEditObjectRuntimeClass = nullptr;
 	}
 

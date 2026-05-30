@@ -134,15 +134,16 @@ bool BoxesIntersect(Vector const &mins1, Vector const &maxs1, Vector const &mins
 // Purpose: Constructor. Initializes data members.
 //-----------------------------------------------------------------------------
 CMapWorld::CMapWorld( void )
+    // Face IDs start at 1. An ID of 0 means no ID.
+	: m_pCullTree(nullptr), m_nNextFaceID(1), m_pWorldDispMgr(nullptr), m_pOwningDocument(nullptr)
 {
-
 }
 
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor. Initializes data members.
 //-----------------------------------------------------------------------------
-CMapWorld::CMapWorld( CMapDoc *pOwningDocument )
+CMapWorld::CMapWorld( CMapDoc *pOwningDocument ) : CMapWorld()
 {
 	//
 	// Make sure subsequent UpdateBounds() will be effective.
@@ -152,9 +153,6 @@ CMapWorld::CMapWorld( CMapDoc *pOwningDocument )
 	m_Render2DBox.UpdateBounds(pt);
 
 	SetClass("worldspawn");
-	m_pCullTree = NULL;
-
-	m_nNextFaceID = 1;			// Face IDs start at 1. An ID of 0 means no ID.
 
 	// create the world displacement manager
 	m_pWorldDispMgr = CreateWorldEditDispMgr();

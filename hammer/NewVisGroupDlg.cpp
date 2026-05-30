@@ -37,6 +37,7 @@ CNewVisGroupDlg::CNewVisGroupDlg(CString &str, CWnd *pParent)
 	m_pPickedVisGroup = NULL;
 
 	//{{AFX_DATA_INIT(CNewVisGroupDlg)
+	m_bRemoveFromOtherGroups = m_bHideObjects = FALSE;
 	m_strName = str;
 	//}}AFX_DATA_INIT
 }

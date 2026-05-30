@@ -39,6 +39,7 @@ CMapView::CMapView(void)
 	m_dwTimeLastRender = 0;
 	m_nRenderedFrames = 0;
 	m_pToolManager = NULL;
+	m_nLastRaytracedBitmapRenderTimeStamp = -1;
 }
 
 bool CMapView::IsOrthographic()

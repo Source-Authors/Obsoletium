@@ -50,6 +50,7 @@ COPTBuild::COPTBuild()
 	//}}AFX_DATA_INIT
 
 	m_pConfig = NULL;
+	m_pAddParmWnd = NULL;
 }
 
 
