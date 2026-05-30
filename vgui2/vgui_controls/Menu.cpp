@@ -1584,9 +1584,10 @@ void Menu::OnKeyTyped(wchar_t unichar)
 
 	while ( i != itemToSelect )
 	{
-		 m_MenuItems[i]->GetText(menuItemName);
+		m_MenuItems[i]->GetText(menuItemName);
 
-		if ( tolower( unichar ) == tolower( menuItemName[0] ) )
+		// dimhotepus: tolower -> towlower for wchar_t.
+		if ( towlower( unichar ) == towlower( menuItemName[0] ) )
 		{
 			itemToSelect = i;
 			break;			

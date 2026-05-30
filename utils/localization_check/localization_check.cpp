@@ -21,15 +21,16 @@
 //
 //===========================================================================//
 #include "cbase.h"
-#include <stdio.h>
 #include <conio.h>
+#include <wctype.h>  // iswspace.
 #include <windows.h>
 #include <mmreg.h>
 #include <direct.h>
+#include <cstdio>
 #include "tier0/dbg.h"
-#include "utldict.h"
+#include "tier1/utldict.h"
+#include "tier1/KeyValues.h"
 #include "filesystem.h"
-#include "KeyValues.h"
 #include "cmdlib.h"
 #include "scriplib.h"
 #include "appframework/tier3app.h"
@@ -2708,7 +2709,8 @@ bool SplitCommand( wchar_t const **ppIn, wchar_t *cmd, wchar_t *args )
 	cmd[ 0 ]= 0;
 	wchar_t *out = cmd;
 	in++;
-	while ( *in != L'\0' && *in != L':' && *in != L'>' && !isspace( *in ) )
+	// dimhotepus: isspace -> iswspace for wchar_t.
+	while ( *in != L'\0' && *in != L':' && *in != L'>' && !iswspace( *in ) )
 	{
 		*out++ = *in++;
 	}
