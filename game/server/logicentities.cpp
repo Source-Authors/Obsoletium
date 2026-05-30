@@ -2130,7 +2130,8 @@ void CLogicBranch::UpdateOnRemove()
 		CBaseEntity *pEntity = l.Get();
 		if ( pEntity )
 		{
-			g_EventQueue.AddEvent( this, "_OnLogicBranchRemoved", 0, this, this );
+			// dimhotepus: this -> pEntity to correctly notify on remove (celisej567).
+			g_EventQueue.AddEvent( pEntity, "_OnLogicBranchRemoved", 0, this, this );
 		}
 	}
 	
