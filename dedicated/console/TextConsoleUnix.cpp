@@ -81,8 +81,12 @@ static bool init_tinfo_functions() {
     if (!s_ncurses_handle) {
       fprintf(
           stderr,
-          "\nWARNING: Failed to load 32-bit libtinfo.so.5 or libncurses.so.5.\n"
+          "\nWARNING: Failed to load libtinfo.so.5 or libncurses.so.5.\n"
+#ifdef PLATFORM_64BITS
+          "  Please install (libtinfo5 / ncurses-libs / equivalent) to "
+#else
           "  Please install (lib32tinfo5 / ncurses-libs.i686 / equivalent) to "
+#endif
           "enable readline.\n\n");
     }
   }
