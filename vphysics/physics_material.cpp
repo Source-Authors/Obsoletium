@@ -545,7 +545,9 @@ intp CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *
 				}
 				else if ( V_strieq( key, "gamematerial" ) )
 				{
-					if ( strlen(value) == 1 && !V_isdigit( value[0]) )
+					// dimhotepus: Speedup single char check.
+					const bool isSingleChar = !Q_isempty(value) && value[1] == '\0';
+					if ( isSingleChar && !V_isdigit( value[0]) )
 					{
 						// dimhotepus: toupper -> V_toupper.
 						prop.data.game.material = V_toupper(value[0]);
