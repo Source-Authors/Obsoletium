@@ -2646,7 +2646,7 @@ void CLogicBranchList::Activate( void )
 //-----------------------------------------------------------------------------
 void CLogicBranchList::Input_OnLogicBranchRemoved( inputdata_t &inputdata )
 {
-	int nIndex = m_LogicBranchList.Find( inputdata.pActivator );
+	intp nIndex = m_LogicBranchList.Find( inputdata.pActivator );
 	if ( nIndex != -1 )
 	{
 		m_LogicBranchList.FastRemove( nIndex );
@@ -2686,9 +2686,9 @@ void CLogicBranchList::DoTest( CBaseEntity *pActivator )
 	bool bOneTrue = false;
 	bool bOneFalse = false;
 	
-	for ( int i = 0; i < m_LogicBranchList.Count(); i++ )
+	for ( auto &el : m_LogicBranchList )
 	{
-		CLogicBranch *pBranch = (CLogicBranch *)m_LogicBranchList.Element( i ).Get();
+		CLogicBranch *pBranch = (CLogicBranch *)el.Get();
 		if ( pBranch && pBranch->GetLogicBranchState() )
 		{
 			bOneTrue = true;
@@ -2737,12 +2737,12 @@ int CLogicBranchList::DrawDebugTextOverlays( void )
 	{
 		char tempstr[512];
 
-		for ( int i = 0; i < m_LogicBranchList.Count(); i++ )
+		for ( auto &el : m_LogicBranchList )
 		{
-			CLogicBranch *pBranch = (CLogicBranch *)m_LogicBranchList.Element( i ).Get();
+			CLogicBranch *pBranch = (CLogicBranch *)el.Get();
 			if ( pBranch )
 			{
-				Q_snprintf( tempstr, sizeof(tempstr), "Branch (%s): %s", STRING(pBranch->GetEntityName()), (pBranch->GetLogicBranchState()) ? "TRUE" : "FALSE" );
+				V_sprintf_safe( tempstr, "Branch (%s): %s", STRING(pBranch->GetEntityName()), (pBranch->GetLogicBranchState()) ? "TRUE" : "FALSE" );
 				EntityText( text_offset, tempstr, 0 );
 				text_offset++;
 			}
