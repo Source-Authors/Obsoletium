@@ -2125,9 +2125,9 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 void CLogicBranch::UpdateOnRemove()
 {
-	for ( int i = 0; i < m_Listeners.Count(); i++ )
+	for ( auto &l : m_Listeners )
 	{
-		CBaseEntity *pEntity = m_Listeners.Element( i ).Get();
+		CBaseEntity *pEntity = l.Get();
 		if ( pEntity )
 		{
 			g_EventQueue.AddEvent( this, "_OnLogicBranchRemoved", 0, this, this );
@@ -2197,9 +2197,9 @@ void CLogicBranch::UpdateValue( bool bNewValue, CBaseEntity *pActivator, LogicBr
 	{
 		m_bInValue = bNewValue;
 
-		for ( int i = 0; i < m_Listeners.Count(); i++ )
+		for ( auto &l : m_Listeners )
 		{
-			CBaseEntity *pEntity = m_Listeners.Element( i ).Get();
+			CBaseEntity *pEntity = l.Get();
 			if ( pEntity )
 			{
 				g_EventQueue.AddEvent( pEntity, "_OnLogicBranchChanged", 0, this, this );
