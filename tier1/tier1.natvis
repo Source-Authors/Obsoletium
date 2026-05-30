@@ -29,6 +29,17 @@
     </Expand>
   </Type>
 
+  <!-- tier1/utlsymbol.h -->
+
+  <Type Name="CUtlSymbol">
+    <Intrinsic Name="id" Expression="m_Id" />
+    <DisplayString Condition="m_Id != -1">{String()}</DisplayString>
+    <DisplayString Condition="m_Id == -1">{{empty}}</DisplayString>
+      <Expand>
+          <Item Condition="m_Id != -1" Name="[str]">String()</Item>
+      </Expand>
+  </Type>
+
   <!-- tier1/utlsymbollarge.h -->
 
   <Type Name="CUtlSymbolLarge">
