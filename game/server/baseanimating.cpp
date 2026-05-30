@@ -1227,9 +1227,14 @@ float CBaseAnimating::SetPoseParameter( CStudioHdr *pStudioHdr, int iParameter, 
 
 	if (iParameter >= 0)
 	{
-		float flNewValue;
-		flValue = Studio_SetPoseParameter( pStudioHdr, iParameter, flValue, flNewValue );
-		m_flPoseParameter.Set( iParameter, flNewValue );
+		// dimhotepus: Prevent pose parameters overflow.
+		Assert( iParameter < NUM_POSEPAREMETERS );
+		if ( iParameter < NUM_POSEPAREMETERS )
+		{
+			float flNewValue;
+			flValue = Studio_SetPoseParameter( pStudioHdr, iParameter, flValue, flNewValue );
+			m_flPoseParameter.Set( iParameter, flNewValue );
+		}
 	}
 
 	return flValue;
