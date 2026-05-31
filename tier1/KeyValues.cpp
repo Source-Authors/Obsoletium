@@ -1901,27 +1901,21 @@ void KeyValues::CopyKeyValue( const KeyValues& src, size_t tmpBufferSizeB, char*
 	case TYPE_STRING:
 		if( src.m_sValue )
 		{
-			intp len = Q_strlen(src.m_sValue) + 1;
-			m_sValue = new char[len];
-			Q_strncpy( m_sValue, src.m_sValue, len );
+			m_sValue = V_strdup( src.m_sValue );
 		}
 		break;
 	case TYPE_INT:
 		{
 			m_iValue = src.m_iValue;
 			Q_snprintf( tmpBuffer, tmpBufferSizeB, "%d", m_iValue );
-			intp len = Q_strlen(tmpBuffer) + 1;
-			m_sValue = new char[len];
-			Q_strncpy( m_sValue, tmpBuffer, len  );
+			m_sValue = V_strdup( tmpBuffer );
 		}
 		break;
 	case TYPE_FLOAT:
 		{
 			m_flValue = src.m_flValue;
 			Q_snprintf( tmpBuffer, tmpBufferSizeB, "%f", m_flValue );
-			intp len = Q_strlen(tmpBuffer) + 1;
-			m_sValue = new char[len];
-			Q_strncpy( m_sValue, tmpBuffer, len );
+			m_sValue = V_strdup( tmpBuffer );
 		}
 		break;
 	case TYPE_PTR:
