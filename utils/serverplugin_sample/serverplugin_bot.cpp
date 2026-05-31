@@ -274,7 +274,7 @@ void Bot_FlipOut( CPluginBot *pBot, CBotCmd &cmd )
 
 void Bot_HandleSendCmd( CPluginBot *pBot )
 {
-	if ( strlen( bot_sendcmd.GetString() ) > 0 )
+	if ( !Q_isempty( bot_sendcmd.GetString() ) )
 	{
 		//send the cmd from this bot
 		helpers->ClientCommand( pBot->m_BotEdict, bot_sendcmd.GetString() );
@@ -287,7 +287,7 @@ void Bot_HandleSendCmd( CPluginBot *pBot )
 // If bots are being forced to fire a weapon, see if I have it
 void Bot_ForceFireWeapon( CPluginBot *pBot, CBotCmd &cmd )
 {
-	if ( Q_strlen( bot_forcefireweapon.GetString() ) > 0 )
+	if ( !Q_isempty( bot_forcefireweapon.GetString() ) )
 	{
 		pBot->m_BotInterface->SetActiveWeapon( bot_forcefireweapon.GetString() );
 		bot_forcefireweapon.SetValue( "" );

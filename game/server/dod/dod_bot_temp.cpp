@@ -373,7 +373,7 @@ void Bot_Think( CDODPlayer *pBot )
 				buttons |= IN_RELOAD;
 		}
 		
-		if ( Q_strlen( bot_sendcmd.GetString() ) > 0 )
+		if ( !Q_isempty( bot_sendcmd.GetString() ) )
 		{
 			//send the cmd from this bot
 			CCommand args;

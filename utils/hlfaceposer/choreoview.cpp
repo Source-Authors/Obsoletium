@@ -6709,14 +6709,14 @@ void CChoreoView::AddEvent( int type, int subtype /*= 0*/, char const *defaultpa
 		}
 		m_bForceProcess = false;
 
-		if ( Q_strlen( params.m_szName ) <= 0 )
+		if ( Q_isempty( params.m_szName ) )
 		{
 			mxMessageBox( this, va( "Event must have a valid name" ),
 				"Edit Event", MX_MB_OK | MX_MB_ERROR );
 			continue;
 		}
 
-		if ( Q_strlen( params.m_szParameters ) <= 0 )
+		if ( Q_isempty( params.m_szParameters ) )
 		{
 			bool shouldBreak = false;
 
@@ -7253,14 +7253,14 @@ void CChoreoView::EditEvent( CChoreoEvent *event )
 		}
 		m_bForceProcess = false;
 
-		if ( Q_strlen( params.m_szName ) <= 0 )
+		if ( Q_isempty( params.m_szName ) )
 		{
 			mxMessageBox( this, va( "Event %s must have a valid name", event->GetName() ),
 				"Edit Event", MX_MB_OK | MX_MB_ERROR );
 			continue;
 		}
 
-		if ( Q_strlen( params.m_szParameters ) <= 0 )
+		if ( Q_isempty( params.m_szParameters ) )
 		{
 			bool shouldBreak = false;
 

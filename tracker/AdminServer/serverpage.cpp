@@ -542,7 +542,7 @@ void VInternetDlg::OnManageServer(int serverID)
 
 		if(m_bSaveRcon) 
 		{ // rcons are being saved		
-			if(strlen(server.rconPassword)>0) 
+			if(!Q_isempty(server.rconPassword)) 
 			{ // this rcon password is already saved :)
 				ManageServer(serverID,server.rconPassword);
 				return;

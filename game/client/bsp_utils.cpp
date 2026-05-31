@@ -151,7 +151,7 @@ CON_COMMAND( bsp_repack, "Repack and output a (re)compressed version of a bsp fi
 		szOutFilename = args.Arg( 2 );
 	}
 
-	if ( !szInFilename || !szOutFilename || !strlen( szInFilename ) || !strlen( szOutFilename ) )
+	if ( Q_isempty( szInFilename ) || Q_isempty( szOutFilename ) )
 	{
 		Msg( "Usage: bsp_repack [-nocompress] map.bsp output_map.bsp\n" );
 		return;

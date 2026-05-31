@@ -1451,7 +1451,7 @@ void CheckUnusedSounds()
 								CSentence sentence;
 								if ( LoadSentenceFromWavFile( va( "sound/%s", PSkipSoundChars( wavname ) ), sentence ) )
 								{
-									if ( Q_strlen( sentence.GetText() ) > 0 ) 
+									if ( !Q_isempty( sentence.GetText() ) ) 
 									{
 										Q_snprintf( ansi, sizeof( ansi ), "%s", sentence.GetText() );
 										cleanquotes( ansi );
@@ -1513,7 +1513,7 @@ void CheckUnusedSounds()
 					CSentence sentence;
 					if ( LoadSentenceFromWavFile( va( "sound/%s", PSkipSoundChars( wavname ) ), sentence ) )
 					{
-						if ( Q_strlen( sentence.GetText() ) > 0 )
+						if ( !Q_isempty( sentence.GetText() ) )
 						{
 							Q_snprintf( ansi, sizeof( ansi ), "%s", sentence.GetText() );
 							cleanquotes( ansi );
@@ -1617,7 +1617,7 @@ void SpewScript( char const *vcdname, CUtlRBTree< CChoreoEvent *, int >& list )
 					CSentence sentence;
 					if ( LoadSentenceFromWavFile( va( "sound/%s", PSkipSoundChars( wavname ) ), sentence ) )
 					{
-						if ( Q_strlen( sentence.GetText() ) > 0 ) 
+						if ( !Q_isempty( sentence.GetText() ) ) 
 						{
 							Q_snprintf( sentence_text, sizeof( sentence_text ), "%s", sentence.GetText() );
 							cleanquotes( sentence_text );
@@ -1815,7 +1815,7 @@ void CheckLocalizationEntries( CUtlVector< CUtlSymbol >& vcdfiles, CUtlRBTree< C
 										CSentence sentence;
 										if ( LoadSentenceFromWavFile( va( "sound/%s", PSkipSoundChars( wavname ) ), sentence ) )
 										{
-											if ( Q_strlen( sentence.GetText() ) > 0 ) 
+											if ( !Q_isempty( sentence.GetText() ) ) 
 											{
 												Q_snprintf( suggested, sizeof( suggested ), "%s", sentence.GetText() );
 												cleanquotes( suggested );
@@ -2115,7 +2115,7 @@ void CheckWaveFile( CUtlDict< CUtlSymbol, int >& wavtosound, char const *wavname
 	CSentence sentence;
 	if ( LoadSentenceFromWavFile( va( "sound/%s", PSkipSoundChars( wavname ) ), sentence ) )
 	{
-		if ( Q_strlen( sentence.GetText() ) > 0 ) 
+		if ( !Q_isempty( sentence.GetText() ) ) 
 		{
 			Q_snprintf( ansi, sizeof( ansi ), "%s", sentence.GetText() );
 			cleanquotes( ansi );

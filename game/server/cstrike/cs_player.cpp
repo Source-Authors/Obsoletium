@@ -5147,7 +5147,7 @@ CBaseEntity* CCSPlayer::EntSelectSpawnPoint()
 
 
 	// If startspot is set, (re)spawn there.
-	if ( !gpGlobals->startspot || !strlen(STRING(gpGlobals->startspot)))
+	if ( !gpGlobals->startspot || Q_isempty(STRING(gpGlobals->startspot)))
 	{
 		pSpot = gEntList.FindEntityByClassname(NULL, "info_player_terrorist");
 		if ( pSpot )
@@ -6363,7 +6363,7 @@ BuyResult_e CCSPlayer::RebuyPrimaryWeapon()
 		return BUY_ALREADY_HAVE;	// don't drop primary weapons via rebuy - if the player picked up a different weapon, he wants to keep it.
 	}
 
-	if( strlen( m_rebuyStruct.m_szPrimaryWeapon ) > 0 )
+	if( !Q_isempty( m_rebuyStruct.m_szPrimaryWeapon ) )
 		return HandleCommand_Buy(m_rebuyStruct.m_szPrimaryWeapon);
 
 	return BUY_ALREADY_HAVE;
@@ -6377,7 +6377,7 @@ BuyResult_e CCSPlayer::RebuySecondaryWeapon()
 		return BUY_ALREADY_HAVE;	// don't drop pistols via rebuy if we've bought one other than the default pistol
 	}
 
-	if( strlen( m_rebuyStruct.m_szSecondaryWeapon ) > 0 )
+	if( !Q_isempty( m_rebuyStruct.m_szSecondaryWeapon ) )
 		return HandleCommand_Buy(m_rebuyStruct.m_szSecondaryWeapon);
 
 	return BUY_ALREADY_HAVE;

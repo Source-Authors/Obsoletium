@@ -1331,7 +1331,7 @@ bool HTML::OnStartRequest( const char *url, const char *target, const char *pchP
 		}
 	}
 
-	if ( target && !Q_strlen( target ) )
+	if ( target && Q_isempty( target ) )
 	{
 		m_sCurrentURL = url;
 

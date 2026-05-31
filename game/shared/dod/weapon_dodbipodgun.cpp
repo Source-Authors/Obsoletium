@@ -75,19 +75,19 @@ void CDODBipodWeapon::Precache( void )
 
 	const CDODWeaponInfo &info = GetDODWpnData();
 
-	if( Q_strlen(info.m_szDeployedModel) > 0 )
+	if( !Q_isempty(info.m_szDeployedModel) )
 	{
 		Assert( info.m_iAltWpnCriteria & ALTWPN_CRITERIA_DEPLOYED );
 		m_iDeployedModelIndex = CBaseEntity::PrecacheModel( info.m_szDeployedModel );
 	}
 
-	if( Q_strlen(info.m_szDeployedReloadModel) > 0 )
+	if( !Q_isempty(info.m_szDeployedReloadModel) )
 	{
 		Assert( info.m_iAltWpnCriteria & ALTWPN_CRITERIA_DEPLOYED_RELOAD );
 		m_iDeployedReloadModelIndex = CBaseEntity::PrecacheModel( info.m_szDeployedReloadModel );
 	}
 
-	if( Q_strlen(info.m_szProneDeployedReloadModel) > 0 )
+	if( !Q_isempty(info.m_szProneDeployedReloadModel) )
 	{
 		Assert( info.m_iAltWpnCriteria & ALTWPN_CRITERIA_PRONE_DEPLOYED_RELOAD );
 		m_iProneDeployedReloadModelIndex = CBaseEntity::PrecacheModel( info.m_szProneDeployedReloadModel );

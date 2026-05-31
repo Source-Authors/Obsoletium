@@ -367,7 +367,7 @@ void Bot_Think( CHL1MP_Player *pBot )
 			}
 		}
 		
-		if ( strlen( bot_sendcmd.GetString() ) > 0 )
+		if ( !Q_isempty( bot_sendcmd.GetString() ) )
 		{
 			//send the cmd from this bot
 			CCommand args;

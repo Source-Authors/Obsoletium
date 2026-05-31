@@ -103,7 +103,7 @@ void TFExplosionCallback( const Vector &vecOrigin, const Vector &vecNormal, int 
 		{
 			if ( bIsWater )
 			{
-				if ( Q_strlen( pWeaponInfo->m_szExplosionWaterEffect ) > 0 )
+				if ( !Q_isempty( pWeaponInfo->m_szExplosionWaterEffect ) )
 				{
 					pszEffect = pWeaponInfo->m_szExplosionWaterEffect;
 				}
@@ -112,14 +112,14 @@ void TFExplosionCallback( const Vector &vecOrigin, const Vector &vecNormal, int 
 			{
 				if ( bIsPlayer || bInAir )
 				{
-					if ( Q_strlen( pWeaponInfo->m_szExplosionPlayerEffect ) > 0 )
+					if ( !Q_isempty( pWeaponInfo->m_szExplosionPlayerEffect ) )
 					{
 						pszEffect = pWeaponInfo->m_szExplosionPlayerEffect;
 					}
 				}
 				else
 				{
-					if ( Q_strlen( pWeaponInfo->m_szExplosionEffect ) > 0 )
+					if ( !Q_isempty( pWeaponInfo->m_szExplosionEffect ) )
 					{
 						pszEffect = pWeaponInfo->m_szExplosionEffect;
 					}
@@ -128,7 +128,7 @@ void TFExplosionCallback( const Vector &vecOrigin, const Vector &vecNormal, int 
 		}
 
 		// Sound.
-		if ( Q_strlen( pWeaponInfo->m_szExplosionSound ) > 0 )
+		if ( !Q_isempty( pWeaponInfo->m_szExplosionSound ) )
 		{
 			// Check for a replacement sound in the itemdef first - defaults to SPECIAL1
 			if ( nDefID >= 0 )

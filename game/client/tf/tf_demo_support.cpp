@@ -467,7 +467,7 @@ bool CTFDemoSupport::StartRecording( void )
 	V_sprintf_safe( szPrefix, "%s", ds_prefix.GetString() );
 	V_sprintf_safe( m_szFilename, "%s%s", szPrefix, szTime );
 
-	if ( Q_strlen( ds_dir.GetString() ) > 0 )
+	if ( !Q_isempty( ds_dir.GetString() ) )
 	{
 		// check folder
 		if ( !IsValidPath( ds_dir.GetString() ) )

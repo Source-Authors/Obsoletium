@@ -720,7 +720,7 @@ void BuildCommandLineFromArgs( CUtlVector<char*> &newArgv, char *pOut, int outLe
 	for ( int i=0; i < newArgv.Count(); i++ )
 	{
 		char argStr[512];
-		if ( strlen( newArgv[i] ) > 0 && newArgv[i][strlen(newArgv[i])-1] == '\\' )
+		if ( !Q_isempty( newArgv[i] ) && newArgv[i][strlen(newArgv[i])-1] == '\\' )
 			Q_snprintf( argStr, sizeof( argStr ), "\"%s\\\" ", newArgv[i] );
 		else
 			Q_snprintf( argStr, sizeof( argStr ), "\"%s\" ", newArgv[i] );

@@ -715,7 +715,7 @@ void CTeamControlPoint::InternalSetOwner( int iCapTeam, bool bMakeSound, int iNu
 //-----------------------------------------------------------------------------
 void CTeamControlPoint::SendCapString( int iCapTeam, int iNumCappingPlayers, int *pCappingPlayers )
 {
-	if ( strlen( STRING(m_iszPrintName) ) <= 0 )
+	if ( Q_isempty( STRING(m_iszPrintName) ) )
 		return;
 
 	int iNumCappers = iNumCappingPlayers;
@@ -755,7 +755,7 @@ void CTeamControlPoint::SendCapString( int iCapTeam, int iNumCappingPlayers, int
 //-----------------------------------------------------------------------------
 void CTeamControlPoint::CaptureBlocked( CBaseMultiplayerPlayer *pPlayer, CBaseMultiplayerPlayer *pVictim )
 {
-	if( strlen( STRING(m_iszPrintName) ) <= 0 )
+	if( Q_isempty( STRING(m_iszPrintName) ) )
 		return;
 
 	IGameEvent *event = gameeventmanager->CreateEvent( "teamplay_capture_blocked" );

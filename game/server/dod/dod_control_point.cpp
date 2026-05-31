@@ -336,7 +336,7 @@ void CControlPoint::InternalSetOwner( int owner, bool bMakeSound, int iNumCapper
 
 void CControlPoint::SendCapString( int team, int iNumCappers, int *pCappingPlayers )
 {
-	if( strlen( STRING(m_iszPrintName) ) <= 0 )
+	if( Q_isempty( STRING(m_iszPrintName) ) )
 		return;
 
 	IGameEvent * event = gameeventmanager->CreateEvent( "dod_point_captured" );
@@ -367,7 +367,7 @@ void CControlPoint::SendCapString( int team, int iNumCappers, int *pCappingPlaye
 
 void CControlPoint::CaptureBlocked( CDODPlayer *pPlayer )
 {
-	if( strlen( STRING(m_iszPrintName) ) <= 0 )
+	if( Q_isempty( STRING(m_iszPrintName) ) )
 		return;
 
 	IGameEvent *event = gameeventmanager->CreateEvent( "dod_capture_blocked" );
@@ -481,13 +481,13 @@ void CControlPoint::Precache( void )
 	m_iNeutralIcon = GetMaterialIndex( STRING( m_iszNeutralIcon ) );
 	Assert( m_iNeutralIcon != 0 );
 
-	if ( strlen( STRING( m_iszTimerCapIcon ) ) > 0 )
+	if ( !Q_isempty( STRING( m_iszTimerCapIcon ) ) )
 	{
 		PrecacheMaterial( STRING( m_iszTimerCapIcon ) );
 		m_iTimerCapIcon = GetMaterialIndex( STRING( m_iszTimerCapIcon ) );
 	}
 
-	if ( strlen( STRING( m_iszBombedIcon ) ) > 0 )
+	if ( !Q_isempty( STRING( m_iszBombedIcon ) ) )
 	{
 		PrecacheMaterial( STRING( m_iszBombedIcon ) );
 		m_iBombedIcon = GetMaterialIndex( STRING( m_iszBombedIcon ) );

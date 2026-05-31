@@ -1640,7 +1640,7 @@ bool CMapWorld::GenerateNewTargetname( const char *startName, char *outputName, 
 	Q_strncat( outputName, startName, newNameBufferSize );
 
 	// if new name is still empty, set entity as default
-	if ( Q_strlen( outputName ) == 0 )
+	if ( Q_isempty( outputName ) )
 	{
 		Q_strncpy( outputName, "entity", newNameBufferSize );
 	}

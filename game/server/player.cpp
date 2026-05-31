@@ -4868,7 +4868,7 @@ CBaseEntity *CBasePlayer::EntSelectSpawnPoint()
 	}
 
 	// If startspot is set, (re)spawn there.
-	if ( !gpGlobals->startspot || !strlen(STRING(gpGlobals->startspot)))
+	if ( !gpGlobals->startspot || Q_isempty(STRING(gpGlobals->startspot)))
 	{
 		pSpot = FindPlayerStart( "info_player_start" );
 		if ( pSpot )

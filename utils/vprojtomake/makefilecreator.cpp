@@ -190,7 +190,7 @@ bool CMakefileCreator::OutputDirs(FileHandle_t f) {
   for (auto i = m_BaseDirs.First(); i != m_BaseDirs.InvalidIndex();
        i = m_BaseDirs.Next(i)) {
     const char *dirName = m_BaseDirs.GetElementName(i);
-    if (!dirName || !Q_strlen(dirName)) dirName = m_BaseDir.String();
+    if (Q_isempty(dirName)) dirName = m_BaseDir.String();
 
     char friendlyDirName[MAX_PATH];
     CreateDirectoryFriendlyName(dirName, friendlyDirName,

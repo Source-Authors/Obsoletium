@@ -337,7 +337,7 @@ void Bot_FlipOut( CSDKBot *pBot, CUserCmd &cmd )
 
 void Bot_HandleSendCmd( CSDKBot *pBot )
 {
-	if ( strlen( bot_sendcmd.GetString() ) > 0 )
+	if ( !Q_isempty( bot_sendcmd.GetString() ) )
 	{
 		//send the cmd from this bot
 		pBot->ClientCommand( bot_sendcmd.GetString() );

@@ -787,7 +787,7 @@ void CloseCaptionTool::AddWorkUnit( CCloseCaptionItem *item,
 {
 	params.Finalize();
 
-	if ( wcslen( params.stream ) > 0 )
+	if ( !Q_isempty( params.stream ) )
 	{
 		CCloseCaptionWorkUnit *wu = new CCloseCaptionWorkUnit();
 
