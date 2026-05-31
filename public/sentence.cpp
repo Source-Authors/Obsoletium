@@ -292,13 +292,11 @@ void CPhonemeTag::SetTag( const char *phoneme )
 {
 	delete m_szPhoneme;
 	m_szPhoneme = NULL;
-	if ( !phoneme || !phoneme [ 0 ] )
+	if ( Q_isempty( phoneme ) )
 		return;
 
-	intp len = Q_strlen( phoneme ) + 1;
-	m_szPhoneme = new char[ len ];
+	m_szPhoneme = V_strdup( phoneme );
 	Assert( m_szPhoneme );
-	Q_strncpy( m_szPhoneme, phoneme, len );
 }
 
 char const *CPhonemeTag::GetTag() const
@@ -1321,15 +1319,13 @@ void CSentence::SetText( const char *text )
 	delete[] m_szText;
 	m_szText = NULL;
 
-	if ( !text || !text[ 0 ] )
+	if ( Q_isempty( text ) )
 	{
 		return;
 	}
 
-	size_t len = strlen( text ) + 1;
-	m_szText = new char[ len ];
+	m_szText = V_strdup( text );
 	Assert( m_szText );
-	Q_strncpy( m_szText, text, len );
 #endif
 }
 
