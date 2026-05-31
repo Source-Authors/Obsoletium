@@ -1084,7 +1084,7 @@ void CL_FullyConnected( void )
 	float map_loadtime_start = dev_loadtime_map_start.GetFloat();
 	if (map_loadtime_start > 0.0)
 	{
-		float elapsed = Plat_FloatTime() - map_loadtime_start;
+		float elapsed = static_cast<float>( Plat_FloatTime() - map_loadtime_start );
 		dev_loadtime_map_elapsed.SetValue( elapsed );
 
 		// Clear this for next time so we know we did.
