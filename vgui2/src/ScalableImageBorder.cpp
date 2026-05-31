@@ -255,14 +255,8 @@ const char *ScalableImageBorder::GetName()
 //-----------------------------------------------------------------------------
 void ScalableImageBorder::SetName(const char *name)
 {
-	if (_name)
-	{
-		delete [] _name;
-	}
-
-	intp len = Q_strlen(name) + 1;
-	_name = new char[ len ];
-	Q_strncpy( _name, name, len );
+	delete [] _name;
+	_name = V_strdup( name );
 }
 
 //-----------------------------------------------------------------------------

@@ -203,9 +203,7 @@ void ScalableImagePanel::ApplySettings(KeyValues *inResourceData)
 	if (*pszDrawColor)
 	{
 		int r = 0, g = 0, b = 0, a = 255;
-		intp len = Q_strlen(pszDrawColor) + 1;
-		m_pszDrawColorName = new char[ len ];
-		Q_strncpy( m_pszDrawColorName, pszDrawColor, len );
+		m_pszDrawColorName = V_strdup( pszDrawColor );
 
 		if (sscanf(pszDrawColor, "%d %d %d %d", &r, &g, &b, &a) >= 3)
 		{

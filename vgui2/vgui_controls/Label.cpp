@@ -1215,11 +1215,9 @@ void Label::ApplySettings( KeyValues *inResourceData )
 	// the control we are to be associated with may not have been created yet,
 	// so keep a pointer to it's name and calculate it when we can
 	const char *associateName = inResourceData->GetString("associate", "");
-	if (associateName[0] != 0)
+	if (!Q_isempty(associateName))
 	{
-		intp len = Q_strlen(associateName) + 1;
-		_associateName = new char[ len ];
-		Q_strncpy( _associateName, associateName, len );
+		_associateName = V_strdup(associateName);
 	}
 
 	if (inResourceData->GetInt("dulltext", 0) == 1)
@@ -1242,9 +1240,7 @@ void Label::ApplySettings( KeyValues *inResourceData )
 	if (*overrideFont)
 	{
 		delete [] _fontOverrideName;
-		intp len = Q_strlen(overrideFont) + 1;
-		_fontOverrideName = new char[ len ];
-		Q_strncpy(_fontOverrideName, overrideFont, len );
+		_fontOverrideName = V_strdup(overrideFont);
 		SetFont(pScheme->GetFont(_fontOverrideName, IsProportional()));
 	}
 	else if (_fontOverrideName)

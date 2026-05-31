@@ -828,9 +828,7 @@ void Panel::SetName( const char *panelName )
 
 	if (panelName)
 	{
-		intp len = Q_strlen(panelName) + 1;
-		_panelName = new char[ len ];
-		Q_strncpy( _panelName, panelName, len );
+		_panelName = V_strdup( panelName );
 	}
 }
 
@@ -4109,9 +4107,7 @@ void Panel::PinToSibling( const char *pszSibling, PinCorner_e pinOurCorner, PinC
 
 	if (pszSibling)
 	{
-		intp len = Q_strlen(pszSibling) + 1;
-		_pinToSibling = new char[ len ];
-		Q_strncpy( _pinToSibling, pszSibling, len );
+		_pinToSibling = V_strdup( pszSibling );
 	}
 	m_pinSibling = NULL;
 
@@ -5739,9 +5735,7 @@ void Panel::SetTooltip( BaseTooltip *pToolTip, const char *pszText )
 
 	if ( pszText )
 	{
-		intp len = Q_strlen(pszText) + 1;
-		_tooltipText = new char[ len ];
-		Q_strncpy( _tooltipText, pszText, len );
+		_tooltipText = V_strdup( pszText );
 	}
 }
 
