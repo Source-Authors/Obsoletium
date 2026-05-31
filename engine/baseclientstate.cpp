@@ -706,7 +706,8 @@ void CBaseClientState::FullConnect( netadr_t &adr )
 	IGameEvent *event = g_GameEventManager.CreateEvent( "client_connected" );
 	if ( event )
 	{
-		event->SetString( "address", m_NetChannel->GetRemoteAddress().ToString( true )	);
+		char buffer[32];
+		event->SetString( "address", m_NetChannel->GetRemoteAddress().ToString_safe( buffer, true )	);
 		event->SetInt(    "ip", m_NetChannel->GetRemoteAddress().GetIPNetworkByteOrder() ); // <<< Network byte order?
 		event->SetInt(    "port", m_NetChannel->GetRemoteAddress().GetPort() );
 		g_GameEventManager.FireEventClientSide( event );
@@ -887,7 +888,8 @@ bool CBaseClientState::ProcessConnectionlessPacket( netpacket_t *packet )
 	{
 		if ( cl_show_connectionless_packet_warnings.GetBool() )
 		{
-			ConDMsg ( "Discarding connectionless packet ( CL '%c' ) from %s.\n", c, packet->from.ToString() );
+			char buffer[32];
+			ConDMsg ( "Discarding connectionless packet ( CL '%c' ) from %s.\n", c, packet->from.ToString_safe(buffer) );
 		}
 		return false;
 	}
@@ -985,7 +987,8 @@ bool CBaseClientState::ProcessConnectionlessPacket( netpacket_t *packet )
 							// Otherwise, don't do anything.
 							if ( cl_show_connectionless_packet_warnings.GetBool() )
 							{
-								ConDMsg ( "Bad connectionless packet ( CL '%c' ) from %s.\n", c, packet->from.ToString() );
+								char buffer[32];
+								ConDMsg ( "Bad connectionless packet ( CL '%c' ) from %s.\n", c, packet->from.ToString_safe(buffer) );
 							}
 							return false;
 	}
@@ -1221,8 +1224,9 @@ bool CBaseClientState::ProcessServerInfo( SVC_ServerInfo *msg )
 
 	if ( event )
 	{
+		char buffer[32];
 		event->SetString( "hostname", msg->m_szHostName );
-		event->SetString( "address", m_NetChannel->GetRemoteAddress().ToString( true )	);
+		event->SetString( "address", m_NetChannel->GetRemoteAddress().ToString_safe( buffer, true )	);
 		event->SetInt(    "ip", m_NetChannel->GetRemoteAddress().GetIPNetworkByteOrder() ); // <<< Network byte order?
 		event->SetInt(    "port", m_NetChannel->GetRemoteAddress().GetPort() );
 		event->SetString( "game", msg->m_szGameDir );

@@ -428,6 +428,7 @@ CON_COMMAND( status, "Display map and connection status." )
 
 	if ( NET_IsMultiplayer() )
 	{
+		char buffer[32];
 		CUtlString sPublicIPInfo;
 		if ( !Steam3Server().BLanOnly() )
 		{
@@ -436,10 +437,10 @@ CON_COMMAND( status, "Display map and connection status." )
 			{
 				netadr_t addr;
 				addr.SetIP( unPublicIP );
-				sPublicIPInfo.Format("  (public ip: %s)", addr.ToString( true ) );
+				sPublicIPInfo.Format("  (public ip: %s)", addr.ToString_safe( buffer, true ) );
 			}
 		}
-		print( "udp/ip  : %s:%i%s\n", net_local_adr.ToString(true), sv.GetUDPPort(), sPublicIPInfo.String() );
+		print( "udp/ip  : %s:%i%s\n", net_local_adr.ToString_safe(buffer, true), sv.GetUDPPort(), sPublicIPInfo.String() );
 
 		if ( !Steam3Server().BLanOnly() )
 		{

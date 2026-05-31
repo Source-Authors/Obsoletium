@@ -519,7 +519,8 @@ void CDownloadManager::SetupURLPath( RequestContext_t *pRequestContext, const ch
 //--------------------------------------------------------------------------------------------------------------
 void CDownloadManager::SetupServerURL( RequestContext_t *pRequestContext )
 {
-	V_strcpy_safe( pRequestContext->serverURL, cl.m_NetChannel->GetRemoteAddress().ToString() );
+	char buffer[32];
+	V_strcpy_safe( pRequestContext->serverURL, cl.m_NetChannel->GetRemoteAddress().ToString_safe(buffer) );
 }
 //--------------------------------------------------------------------------------------------------------------
 bool CDownloadManager::HasMapBeenDownloadedFromServer( const char *serverMapName )

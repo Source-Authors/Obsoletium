@@ -304,7 +304,8 @@ void CDialogAddServer::ServerResponded( gameserveritem_t &server )
 	netadr_t reportedIPAddr;
 	reportedIPAddr.SetIP( server.m_NetAdr.GetIP() );
 	reportedIPAddr.SetPort( server.m_NetAdr.GetConnectionPort() );
-	kv->SetString("IPAddr", reportedIPAddr.ToString() );
+	char buffer[32];
+	kv->SetString("IPAddr", reportedIPAddr.ToString_safe(buffer) );
 
 	char buf[32];
 	Q_snprintf(buf, sizeof(buf), "%d / %d", server.m_nPlayers, server.m_nMaxPlayers);

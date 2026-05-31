@@ -388,7 +388,8 @@ bool CBaseServer::CheckIPConnectionReuse( netadr_t &adr )
 	
 	if ( nSimultaneouslyConnections > MAX_REUSE_PER_IP ) 
 	{
-		Msg ("Too many connect packets from %s\n", adr.ToString( true ) );	
+		char buffer[32];
+		Msg ("Too many connect packets from %s\n", adr.ToString_safe( buffer, true ) );
 		return false; // too many connect packets!!!!
 	}
 	return true; // this IP is okay
@@ -472,7 +473,8 @@ IClient *CBaseServer::ConnectClient ( netadr_t &adr, int protocol, int challenge
 		if ( !CheckPassword( adr, password, name ) )
 		{
 			// failed
-			ConMsg ( "%s:  password failed.\n", adr.ToString() );
+			char buffer[32];
+			ConMsg ( "%s:  password failed.\n", adr.ToString_safe(buffer) );
 			// Special rejection handler.
 			RejectConnection( adr, clientChallenge, "#GameUI_ServerRejectBadPassword" );
 			return NULL;
@@ -527,7 +529,8 @@ IClient *CBaseServer::ConnectClient ( netadr_t &adr, int protocol, int challenge
 	COM_TimestampedLog( "CBaseServer::ConnectClient:  NET_CreateNetChannel" );
 
 	// create network channel
-	INetChannel * netchan = NET_CreateNetChannel( m_Socket, &adr, adr.ToString(), client );
+	char buffer[32];
+	INetChannel * netchan = NET_CreateNetChannel( m_Socket, &adr, adr.ToString_safe(buffer), client );
 
 	if ( !netchan )
 	{
@@ -1961,7 +1964,8 @@ CBaseClient * CBaseServer::GetFreeClient( netadr_t &adr )
 		{
 			if ( adr.CompareAdr ( client->m_NetChannel->GetRemoteAddress() ) )
 			{
-				ConMsg ( "%s:reconnect\n", adr.ToString() );
+				char buffer[32];
+				ConMsg ( "%s:reconnect\n", adr.ToString_safe(buffer) );
 
 				RemoveClientFromGame( client );
 
@@ -2042,8 +2046,9 @@ CBaseClient *CBaseServer::CreateFakeClient( const char *name )
 	INetChannel *netchan = NULL;
 	if ( sv_stressbots.GetBool() )
 	{
+		char buffer[32];
 		netadr_t adrNull( 0, 0 ); // 0.0.0.0:0 signifies a bot. It'll plumb all the way down to winsock calls but it won't make them.
-		netchan = NET_CreateNetChannel( m_Socket, &adrNull, adrNull.ToString(), fakeclient, true );
+		netchan = NET_CreateNetChannel( m_Socket, &adrNull, adrNull.ToString_safe(buffer), fakeclient, true );
 	}
 
 	// a NULL netchannel signals a fakeclient

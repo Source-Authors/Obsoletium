@@ -737,11 +737,12 @@ void CClientState::FullConnect( netadr_t &adr )
 
 	// we didn't send commands yet
 	chokedcommands = 0;
-	
+
+	char address[32];
 	// Report connection success.
-	if ( Q_stricmp("loopback", adr.ToString() ) )
+	if ( !V_strieq( "loopback", adr.ToString_safe(address) ) )
 	{
-		ConMsg( "Connected to %s\n", adr.ToString() );
+		ConMsg( "Connected to %s\n", address );
 	}
 }
 

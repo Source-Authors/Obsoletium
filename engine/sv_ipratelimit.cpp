@@ -46,7 +46,8 @@ bool CIPRateLimit::CheckIP( netadr_t adr )
 	bool ret = CheckIPInternal(adr);
 	if ( !ret && sv_logblocks.GetBool() == true )
 	{
-		g_Log.Printf("Traffic from %s was blocked for exceeding rate limits\n", adr.ToString() );
+		char buffer[32];
+		g_Log.Printf("Traffic from %s was blocked for exceeding rate limits\n", adr.ToString_safe(buffer) );
 	}
 	return ret;
 }

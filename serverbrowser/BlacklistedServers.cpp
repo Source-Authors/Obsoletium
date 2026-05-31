@@ -204,7 +204,8 @@ void CBlacklistedServers::AddServer( gameserveritem_t &server )
 	{
 		// send command to propagate to the client so the client can send it on to the GC
 		char command[ 256 ];
-		V_sprintf_safe( command, "rbgc %s\n", blackServer->m_NetAdr.ToString() );
+		char buffer[32];
+		V_sprintf_safe( command, "rbgc %s\n", blackServer->m_NetAdr.ToString_safe(buffer) );
 		g_pRunGameEngine->AddTextCommand( command );
 	}
 }
@@ -265,7 +266,8 @@ void CBlacklistedServers::UpdateBlacklistUI( blacklisted_server_t *blackServer )
 		kv->SetString("BlacklistedAt", buf);
 	}
 
-	kv->SetString( "IPAddr", blackServer->m_NetAdr.ToString() );
+	char buffer[32];
+	kv->SetString( "IPAddr", blackServer->m_NetAdr.ToString_safe(buffer) );
 
 	if ( !m_pGameList->IsValidItemID( iItemId ) )
 	{

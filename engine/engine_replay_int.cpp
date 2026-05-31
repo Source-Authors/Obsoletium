@@ -187,8 +187,9 @@ public:
 		netadr_t adr;
 		if ( !NET_StringToAdr( pHostname, &adr ) )
 			return false;
-
-		V_strncpy( pOut, adr.ToString( true ), nOutSize );
+		
+		char buffer[32];
+		V_strncpy( pOut, adr.ToString( buffer, true ), nOutSize );
 
 		return true;
 	}

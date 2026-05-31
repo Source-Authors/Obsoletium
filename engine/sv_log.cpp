@@ -168,13 +168,14 @@ CON_COMMAND( logaddress_add, "Set address and port for remote host <ip:port>." )
 
 	if ( NET_StringToAdr( szAdr, &adr ) )
 	{
+		char buffer[32];
 		if ( g_Log.AddLogAddress( adr ) )
 		{
-			ConMsg( "logaddress_add:  %s\n", adr.ToString() );
+			ConMsg( "logaddress_add:  %s\n", adr.ToString_safe(buffer) );
 		}
 		else
 		{
-			ConMsg( "logaddress_add:  %s is already in the list\n", adr.ToString() );
+			ConMsg( "logaddress_add:  %s is already in the list\n", adr.ToString_safe(buffer) );
 		}
 	}
 	else
@@ -239,13 +240,14 @@ CON_COMMAND( logaddress_del, "Remove address and port for remote host <ip:port>.
 
 	if ( NET_StringToAdr( szAdr, &adr ) )
 	{
+		char buffer[32];
 		if ( g_Log.DelLogAddress( adr ) )
 		{
-			ConMsg( "logaddress_del:  %s\n", adr.ToString() );
+			ConMsg( "logaddress_del:  %s\n", adr.ToString_safe(buffer) );
 		}
 		else
 		{
-			ConMsg( "logaddress_del:  address %s not found in the list\n", adr.ToString() );
+			ConMsg( "logaddress_del:  address %s not found in the list\n", adr.ToString_safe(buffer) );
 		}
 	}
 	else
@@ -384,10 +386,11 @@ void CLog::ListLogAddress( void )
 		{
 			ConMsg( "logaddress_list: %zi entries\n", count );
 		}
-
+		
+		char buffer[32];
 		for ( auto &address : m_LogAddresses )
 		{
-			ConMsg( "%s\n", address.ToString() );
+			ConMsg( "%s\n", address.ToString_safe(buffer) );
 		}
 	}
 }

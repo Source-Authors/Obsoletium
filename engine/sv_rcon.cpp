@@ -120,7 +120,8 @@ bool CRConServer::ConnectToListeningClient( const netadr_t &adr, bool bSingleSoc
 {
 	if ( m_Socket.ConnectSocket( adr, bSingleSocket ) < 0 )
 	{
-		ConWarning( "Unable to connect to remote client (%s)\n", adr.ToString() );
+		char buffer[32];
+		ConWarning( "Unable to connect to remote client (%s)\n", adr.ToString_safe(buffer) );
 		return false;
 	}
 	return true;
@@ -513,9 +514,10 @@ bool CRConServer::HandleFailedRconAuth( const netadr_t & adr )
 {
 	if ( sv_rcon_whitelist_address.GetString()[0] )
 	{
-		if ( V_streq( adr.ToString( true ), sv_rcon_whitelist_address.GetString() ) )
+		char buffer[32];
+		if ( V_streq( adr.ToString_safe( buffer, true ), sv_rcon_whitelist_address.GetString() ) )
 		{
-			ConMsg( "Rcon auth failed from rcon whitelist address %s\n", adr.ToString() );
+			ConMsg( "Rcon auth failed from rcon whitelist address %s\n", adr.ToString_safe(buffer) );
 			return false;
 		}
 	}
@@ -582,8 +584,9 @@ bool CRConServer::HandleFailedRconAuth( const netadr_t & adr )
 	// check if the user should be banned based on total failed attempts
 	if ( failedRcon->badPasswordCount > sv_rcon_maxfailures.GetInt() )
 	{
-		ConMsg( "Banning %s for overflowing total rcon authentication attempts\n", failedRcon->adr.ToString( true ) );
-		Cbuf_AddText( va( "addip %i %s\n", sv_rcon_banpenalty.GetInt(), failedRcon->adr.ToString( true ) ) );
+		char buffer[32];
+		ConMsg( "Banning %s for overflowing total rcon authentication attempts\n", failedRcon->adr.ToString_safe( buffer, true ) );
+		Cbuf_AddText( va( "addip %i %s\n", sv_rcon_banpenalty.GetInt(), failedRcon->adr.ToString_safe( buffer, true ) ) );
 		Cbuf_Execute();
 		return true;
 	}
@@ -599,8 +602,9 @@ bool CRConServer::HandleFailedRconAuth( const netadr_t & adr )
 	}
 	if ( recentFailures > sv_rcon_minfailures.GetInt() )
 	{
-		ConMsg( "Banning %s for overflowing recent rcon authentication attempts\n", failedRcon->adr.ToString( true ) );
-		Cbuf_AddText( va( "addip %i %s\n", sv_rcon_banpenalty.GetInt(), failedRcon->adr.ToString( true ) ) );
+		char buffer[32];
+		ConMsg( "Banning %s for overflowing recent rcon authentication attempts\n", failedRcon->adr.ToString_safe( buffer, true ) );
+		Cbuf_AddText( va( "addip %i %s\n", sv_rcon_banpenalty.GetInt(), failedRcon->adr.ToString_safe( buffer, true ) ) );
 		Cbuf_Execute();
 		return true;
 	}

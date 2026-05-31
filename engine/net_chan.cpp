@@ -719,7 +719,8 @@ const char * CNetChan::GetName() const
 
 const char * CNetChan::GetAddress() const
 {
-	return remote_address.ToString();
+	static thread_local char buffer[32];
+	return remote_address.ToString_safe(buffer);
 }
 
 
@@ -1424,7 +1425,8 @@ bool CNetChan::ReadSubChannelData( bf_read &buf, int stream  )
 	{
 		delete[] data->buffer;
 		data->buffer = NULL;
-		ConMsg("Malformed fragment ofs %i len %d, buffer size %d from %s\n", offset, length, PAD_NUMBER(data->bytes, 4), remote_address.ToString() );
+		char buffer[32];
+		ConMsg("Malformed fragment ofs %i len %d, buffer size %d from %s\n", offset, length, PAD_NUMBER(data->bytes, 4), remote_address.ToString_safe(buffer) );
 		return false;
 	}
 
@@ -1599,7 +1601,8 @@ int CNetChan::SendDatagram(bf_write *datagram)
 
 	if ( m_StreamReliable.IsOverflowed() )
 	{
-		ConMsg ("%s:send reliable stream overflow\n" ,remote_address.ToString());
+		char buffer[32];
+		ConMsg ("%s:send reliable stream overflow\n", remote_address.ToString_safe(buffer));
 		return 0;
 	}
 	else if ( m_StreamReliable.GetNumBitsWritten() > 0 )
@@ -1839,8 +1842,9 @@ bool CNetChan::ProcessControlMessage( int cmd, bf_read &buf)
 		}
 		return true;
 	}
-	
-	ConMsg( "Netchannel: received bad control cmd %i from %s.\n", cmd, remote_address.ToString() );
+
+	char buffer[32];
+	ConMsg( "Netchannel: received bad control cmd %i from %s.\n", cmd, remote_address.ToString_safe(buffer) );
 	return false;
 	
 }
@@ -1909,7 +1913,8 @@ bool CNetChan::ProcessMessages( bf_read &buf  )
 
 			if ( !netmsg->ReadFromBuffer( buf ) )
 			{
-				ConMsg( "Netchannel: failed reading message %s from %s.\n", msgname, remote_address.ToString() );
+				char buffer[32];
+				ConMsg( "Netchannel: failed reading message %s from %s.\n", msgname, remote_address.ToString_safe(buffer) );
 				Assert ( 0 );
 				return false;
 			}
@@ -1920,7 +1925,8 @@ bool CNetChan::ProcessMessages( bf_read &buf  )
 			{
 				if ( (*showmsgname == '1') || V_strieq(showmsgname, netmsg->GetName() ) )
 				{
-					ConMsg("Msg from %s: %s\n", remote_address.ToString(), netmsg->ToString() );
+					char buffer[32];
+					ConMsg("Msg from %s: %s\n", remote_address.ToString_safe(buffer), netmsg->ToString() );
 				}
 			}
 
@@ -1965,7 +1971,8 @@ bool CNetChan::ProcessMessages( bf_read &buf  )
 		}
 		else
 		{
-			ConMsg( "Netchannel: unknown net message (%i) from %s.\n", cmd, remote_address.ToString() );
+			char buffer[32];
+			ConMsg( "Netchannel: unknown net message (%i) from %s.\n", cmd, remote_address.ToString_safe(buffer) );
 			Assert ( 0 );
 			return false;
 		}
@@ -2232,8 +2239,9 @@ int CNetChan::ProcessPacketHeader( netpacket_t * packet )
 	
 		if ( usDataCheckSum != usCheckSum )
 		{
+			char buffer[32];
 			ConMsg ("%s:corrupted packet %i at %i\n"
-				, remote_address.ToString ()
+				, remote_address.ToString_safe(buffer)
 				, sequence
 				, m_nInSequenceNr);
 			return -1;
@@ -2263,17 +2271,18 @@ int CNetChan::ProcessPacketHeader( netpacket_t * packet )
 	{
 		if ( net_showdrop.GetInt() )
 		{
+			char buffer[32];
 			if ( sequence == m_nInSequenceNr )
 			{
 				ConMsg ("%s:duplicate packet %i at %i\n"
-					, remote_address.ToString ()
+					, remote_address.ToString_safe(buffer)
 					, sequence
 					, m_nInSequenceNr);
 			}
 			else
 			{
 				ConMsg ("%s:out of order packet %i at %i\n"
-					, remote_address.ToString ()
+					, remote_address.ToString_safe(buffer)
 					, sequence
 					, m_nInSequenceNr);
 			}
@@ -2291,8 +2300,9 @@ int CNetChan::ProcessPacketHeader( netpacket_t * packet )
 	{
 		if ( net_showdrop.GetInt() )
 		{
+			char buffer[32];
 			ConMsg ("%s:Dropped %i packets at %i\n"
-			,remote_address.ToString(), m_PacketDrop, sequence );
+				,remote_address.ToString_safe(buffer), m_PacketDrop, sequence );
 		}
 	}
 
@@ -2300,8 +2310,9 @@ int CNetChan::ProcessPacketHeader( netpacket_t * packet )
 	{
 		if ( net_showdrop.GetInt() )
 		{
+			char buffer[32];
 			ConMsg ("%s:Too many dropped packets (%i) at %i\n"
-				,remote_address.ToString(), m_PacketDrop, sequence );
+				,remote_address.ToString_safe(buffer), m_PacketDrop, sequence );
 		}
 		return -1;
 	}
@@ -2325,7 +2336,8 @@ int CNetChan::ProcessPacketHeader( netpacket_t * packet )
 			}
 			else if ( subchan->sendSeqNr > sequence_ack )
 			{
-				ConMsg ("%s:reliable state invalid (%i).\n"	,remote_address.ToString(), i );
+				char buffer[32];
+				ConMsg ("%s:reliable state invalid (%i).\n"	,remote_address.ToString_safe(buffer), i );
 				Assert( 0 );
 				return -1;
 			}
@@ -2378,7 +2390,8 @@ int CNetChan::ProcessPacketHeader( netpacket_t * packet )
 
 	m_nInSequenceNr = sequence;
 	m_nOutSequenceNrAck = sequence_ack;
-	ETWReadPacket( packet->from.ToString(), packet->wiresize, m_nInSequenceNr, m_nOutSequenceNr );
+	char buffer[32];
+	ETWReadPacket( packet->from.ToString_safe(buffer), packet->wiresize, m_nInSequenceNr, m_nOutSequenceNr );
 
 // Update waiting list status
 	
@@ -2610,7 +2623,8 @@ bool CNetChan::SendReliableViaStream( dataFragments_t *data)
 
 	if ( net_showtcp.GetInt() )
 	{
-		ConMsg ("TCP -> %s: sz=%i seq=%i\n", remote_address.ToString(), data->bytes, m_nOutSequenceNr );
+		char buffer[32];
+		ConMsg ("TCP -> %s: sz=%i seq=%i\n", remote_address.ToString_safe(buffer), data->bytes, m_nOutSequenceNr );
 	}
 	
 	NET_SendStream( m_StreamSocket, (char*)header.GetData(), header.GetNumBytesWritten(), 0	);
@@ -2630,7 +2644,8 @@ bool CNetChan::SendReliableAcknowledge(int seqnr)
 
 	if ( net_showtcp.GetInt() )
 	{
-		ConMsg ("TCP -> %s: ACKN seq=%i\n", remote_address.ToString(), seqnr );
+		char buffer[32];
+		ConMsg ("TCP -> %s: ACKN seq=%i\n", remote_address.ToString_safe(buffer), seqnr );
 	}
 
 	return NET_SendStream( m_StreamSocket, (char*)header.GetData(), header.GetNumBytesWritten(), 0 ) > 0;
@@ -2735,7 +2750,8 @@ bool CNetChan::ProcessStream( void )
 		{
 			if ( net_showtcp.GetInt() )
 			{
-				ConMsg ("TCP <- %s: ACKN seqnr=%i\n", remote_address.ToString(), m_StreamSeqNr );
+				char buffer[32];
+				ConMsg ("TCP <- %s: ACKN seqnr=%i\n", remote_address.ToString_safe(buffer), m_StreamSeqNr );
 			}
 
 			Assert( data->pendingFragments == data->numFragments );
@@ -2744,7 +2760,8 @@ bool CNetChan::ProcessStream( void )
 		}
 		else
 		{
-			ConMsg ("TCP <- %s: invalid ACKN seqnr=%i\n", remote_address.ToString(), m_StreamSeqNr );
+			char buffer[32];
+			ConMsg ("TCP <- %s: invalid ACKN seqnr=%i\n", remote_address.ToString_safe(buffer), m_StreamSeqNr );
 		}
 
 		ResetStreaming();

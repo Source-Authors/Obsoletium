@@ -247,8 +247,9 @@ bool CHLTVClient::ExecuteStringCommand( const char *pCommandString )
 			}
 		}
 
+		char buffer[32];
 		ClientPrintf("IP %s:%i, Online %s, Version %i (%s)\n",
-			net_local_adr.ToString( true ), m_pHLTV->GetUDPPort(),
+			net_local_adr.ToString( buffer, true ), m_pHLTV->GetUDPPort(),
 			COM_FormatSeconds( m_pHLTV->GetOnlineTime() ), build_number(),
 // dimhotepus: More OSes in status string.
 #if defined(_WIN32)

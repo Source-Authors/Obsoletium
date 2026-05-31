@@ -164,12 +164,13 @@ void CBenchmarkResults::Upload()
 	KeyValuesAD kv( "benchmark" );
 	if ( kv->LoadFromFile( g_pFileSystem, szFilename, "MOD" ) )
 	{
+		char buffer[32];
 		// this sends the data to the Steam CSER
-		if ( !UploadData( netadr_CserIP.ToString(), "benchmark", kv ) )
+		if ( !UploadData( netadr_CserIP.ToString_safe(buffer), "benchmark", kv ) )
 		{
 			// dimhotepus: Notify when Steam reporting server fails.
 			Warning("Unable to upload benchmark results %s. Steam reporting server %s failed.\n",
-				m_szFilename, netadr_CserIP.ToString());
+				m_szFilename, netadr_CserIP.ToString_safe(buffer));
 		}
 	}
 #endif

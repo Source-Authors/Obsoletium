@@ -1245,13 +1245,14 @@ void CConPanel::PaintBackground()
 		}
 		else
 		{
+			char buffer[32];
 			V_swprintf_safe(ver,
 #ifdef _WIN32
 				L"Server '%S' Map '%S'",
 #else
 				L"Server '%ls' Map '%ls'",
 #endif
-				cl.m_NetChannel->GetRemoteAddress().ToString(), cl.m_szLevelBaseName );
+				cl.m_NetChannel->GetRemoteAddress().ToString_safe(buffer), cl.m_szLevelBaseName );
 		}
 
 		int tall = vgui::surface()->GetFontTall( m_hFont );
