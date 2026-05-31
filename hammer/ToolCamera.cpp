@@ -264,7 +264,7 @@ ChunkFileResult_t Camera3D::LoadCamerasKeyCallback(const char *szKey, const char
 ChunkFileResult_t Camera3D::LoadCameraCallback(CChunkFile *pFile, Camera3D *pCameras)
 {
 	CAMSTRUCT Cam;
-	memset(&Cam, 0, sizeof(Cam));
+	BitwiseClear(Cam);
 
 	ChunkFileResult_t eResult = pFile->ReadChunk(LoadCameraKeyCallback, &Cam);
 
