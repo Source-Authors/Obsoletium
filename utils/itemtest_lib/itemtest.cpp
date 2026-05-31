@@ -398,14 +398,14 @@ CItemTestManifest::CItemTestManifest( const char *pszManifestFile, CItemLog *pIt
 	m_pZipOutputDirectory = m_pManifestKV->GetString("archive_output_path");
 
 	m_pQCTemplate = m_pManifestKV->GetString("qc_template");
-	if ( V_strlen( m_pQCTemplate ) == 0 )
+	if ( Q_isempty( m_pQCTemplate ) )
 	{
 		m_pItemLog->Warning( "ERROR: qc_template not defined in manifest file: %s\n", pszManifestFile );
 		return;
 	}
 
 	m_pQCITemplate = m_pManifestKV->GetString( "qci_template" );
-	if ( V_strlen( m_pQCITemplate ) == 0 )
+	if ( Q_isempty( m_pQCITemplate ) )
 	{
 		m_pItemLog->Warning( "ERROR: qci_template not defined in manifest file: %s\n", pszManifestFile );
 		return;
@@ -566,7 +566,7 @@ const char *GetClassString( int i )
 //-----------------------------------------------------------------------------
 const char *GetClassString( const char *pszClassString )
 {
-	if ( !pszClassString || V_strlen( pszClassString ) <= 0 )
+	if ( Q_isempty( pszClassString ) )
 		return NULL;
 
 	// Make sure it exists in our manifest file
@@ -2160,7 +2160,7 @@ bool CTargetTGA::SetInputFile( const char *pszFilename )
 {
 	Clear();
 
-	if ( !pszFilename || V_strlen( pszFilename ) <= 0 )
+	if ( Q_isempty( pszFilename ) )
 	{
 		Warning( "ERROR: Empty filename specified for TGA file\n" );
 		return false;
