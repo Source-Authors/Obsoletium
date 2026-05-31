@@ -1946,8 +1946,10 @@ void RichText::TruncateTextStream()
 	}
 
 	// renormalize the remainder of the format stream
-	for (auto &f : m_FormatStream)
+	for (intp i = 1; i < m_FormatStream.Count(); i++)
 	{
+		auto &f = m_FormatStream[i];
+
 		Assert(f.textStreamIndex > cullPos);
 		f.textStreamIndex -= cullPos;
 	}
@@ -1976,7 +1978,6 @@ void RichText::InsertChar(wchar_t wch)
 	m_TextStream.AddToTail(wch);
 
 	// mark the linebreak steam as needing recalculating from that point
-
 	_recalculateBreaksIndex = m_LineBreaks.Count() - 2;
 	Repaint();
 }
