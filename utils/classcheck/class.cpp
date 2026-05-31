@@ -391,7 +391,7 @@ bool CClass::CheckForMissingTypeDescriptionFields( int& missingcount, bool creat
 		while ( 1 )
 		{
 			p = CC_ParseToken( p );
-			if ( strlen( com_token ) <= 0 )
+			if ( Q_isempty( com_token ) )
 				break;
 			if ( V_strieq( com_token, "static" ) )
 			{
@@ -484,7 +484,7 @@ bool CClass::CheckForPredictionFieldsInRecvTableNotMarkedAsSuchCorrectly( int &m
 		while ( 1 )
 		{
 			p = CC_ParseToken( p );
-			if ( strlen( com_token ) <= 0 )
+			if ( Q_isempty( com_token ) )
 				break;
 			if ( V_strieq( com_token, "static" ) )
 			{
@@ -562,7 +562,7 @@ bool CClass::CheckForMissingPredictionFields( int& missingcount, bool createtds 
 		while ( 1 )
 		{
 			p = CC_ParseToken( p );
-			if ( strlen( com_token ) <= 0 )
+			if ( Q_isempty( com_token ) )
 				break;
 			if ( V_strieq( com_token, "static" ) )
 			{
@@ -1047,7 +1047,7 @@ bool CClass::ParseClassMember( char *&input, int protection )
 	do
 	{
 		input = CC_ParseToken( input );
-		if ( strlen( com_token ) <= 0 )
+		if ( Q_isempty( com_token ) )
 			break;
 
 		if ( V_streq( com_token, "(" ) )
@@ -1091,7 +1091,7 @@ bool CClass::ParseClassMember( char *&input, int protection )
 				do
 				{ 
 					input = CC_ParseToken( input );
-					if ( strlen( com_token ) <= 0 )
+					if ( Q_isempty( com_token ) )
 						break;
 
 					if ( com_token[0] == '*' )
@@ -1166,7 +1166,7 @@ bool CClass::ParseClassMember( char *&input, int protection )
 				strcpy( var.m_pName, com_token );
 
 				input = CC_ParseToken( input );
-				if ( strlen( com_token ) <= 0 )
+				if ( Q_isempty( com_token ) )
 					break;
 			}
 			while ( strcmp( com_token, ">" ) );
@@ -1261,7 +1261,7 @@ bool CClass::ParseClassMember( char *&input, int protection )
 				break;
 
 			input = CC_ParseToken( input );
-			if ( strlen( com_token ) <= 0 )
+			if ( Q_isempty( com_token ) )
 				break;
 
 			// Remove length specifiers
@@ -1297,7 +1297,7 @@ bool CClass::ParseNestedClass( char *&input )
 		return false;
 	
 	input = CC_ParseToken( input );
-	if ( strlen( com_token ) > 0 )
+	if ( !Q_isempty( com_token ) )
 	{
 		//vprint( depth, "class %s\n", com_token );
 		char decorated[ 256 ];
@@ -1314,7 +1314,7 @@ bool CClass::ParseNestedClass( char *&input )
 			if ( V_strieq( com_token, "public" ) )
 			{
 				input = CC_ParseToken( input );
-				if ( strlen( com_token ) > 0 )
+				if ( !Q_isempty( com_token ) )
 				{
 					cl->SetBaseClass( com_token );
 
@@ -1387,7 +1387,7 @@ char *CClass::ParseClassDeclaration( char *input )
 	do
 	{
 		input = CC_ParseToken( input );
-		if ( strlen( com_token ) <= 0 )
+		if ( Q_isempty( com_token ) )
 			break;
 
 		if ( com_token[ 1 ] == 0 )
@@ -1505,7 +1505,7 @@ void CClass::CheckForHungarianErrors( int& warnings )
 		while ( 1 )
 		{
 			p = CC_ParseToken( p );
-			if ( strlen( com_token ) <= 0 )
+			if ( Q_isempty( com_token ) )
 				break;
 			if ( V_strieq( com_token, "static" ) )
 			{

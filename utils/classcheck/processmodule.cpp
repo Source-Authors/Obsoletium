@@ -555,7 +555,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 	if ( !fIsMacroized )
 	{
 		current = CC_ParseToken( current );
-		if ( strlen( com_token ) <= 0 )
+		if ( Q_isempty( com_token ) )
 			return current;
 
 		strcpy( classname, com_token );
@@ -572,7 +572,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 		Assert( V_streq( com_token, ":" ) );
 
 		current = CC_ParseToken( current );
-		if ( strlen( com_token ) <= 0 )
+		if ( Q_isempty( com_token ) )
 			return current;
 
 		strcpy( variablename, com_token );
@@ -586,7 +586,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 		}
 
 		current = CC_ParseToken( current );
-		if ( strlen( com_token ) <= 0 )
+		if ( Q_isempty( com_token ) )
 			return current;
 
 		strcpy( classname, com_token );
@@ -607,7 +607,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 		char ch;
 		current = CC_RawParseChar( current, "{", &ch );
 		Assert( ch == '{' );
-		if ( strlen( com_token ) <= 0 )
+		if ( Q_isempty( com_token ) )
 			return current;
 	}
 
@@ -618,7 +618,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 	while ( 1 )
 	{
 		current = CC_ParseToken( current );
-		if ( strlen( com_token ) <= 0 )
+		if ( Q_isempty( com_token ) )
 			break;
 
 		// Go to next line
@@ -762,7 +762,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 		do
 		{
 			current = CC_ParseToken( current );
-			if ( strlen( com_token ) <= 0 )
+			if ( Q_isempty( com_token ) )
 				break;
 
 			if ( V_streq( com_token, "(" ) )
@@ -819,7 +819,7 @@ char *CCodeProcessor::ParseReceiveTable( char *current )
 	}
 
 	current = CC_ParseToken( current );
-	if ( strlen( com_token ) <= 0 )
+	if ( Q_isempty( com_token ) )
 		return current;
 
 	strcpy( classname, com_token );
@@ -847,7 +847,7 @@ char *CCodeProcessor::ParseReceiveTable( char *current )
 		cl = leafClass;
 
 		current = CC_ParseToken( current );
-		if ( strlen( com_token ) <= 0 )
+		if ( Q_isempty( com_token ) )
 			break;
 
 		// Go to next line
@@ -983,7 +983,7 @@ char *CCodeProcessor::ParsePredictionTypeDescription( char *current )
 	}
 
 	current = CC_ParseToken( current );
-	if ( strlen( com_token ) <= 0 )
+	if ( Q_isempty( com_token ) )
 		return current;
 
 	strcpy( classname, com_token );
@@ -1012,7 +1012,7 @@ char *CCodeProcessor::ParsePredictionTypeDescription( char *current )
 	while ( 1 )
 	{
 		current = CC_ParseToken( current );
-		if ( strlen( com_token ) <= 0 )
+		if ( Q_isempty( com_token ) )
 			break;
 
 		// Go to next line
@@ -1089,7 +1089,7 @@ char *CCodeProcessor::ParsePredictionTypeDescription( char *current )
 		do
 		{
 			current = CC_ParseToken( current );
-			if ( strlen( com_token ) <= 0 )
+			if ( Q_isempty( com_token ) )
 				break;
 
 			if ( V_streq( com_token, "(" ) )
@@ -1287,8 +1287,7 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 		if ( V_strieq( com_token, "#include" ) )
 		{
 			current = CC_ParseToken( current );
-			if ( strlen( com_token ) > 0 &&
-				com_token[ 0 ] != '<' )
+			if ( !Q_isempty( com_token ) && com_token[ 0 ] != '<' )
 			{
 				//vprint( "#include %s\n", com_token );
 				m_nHeadersProcessed++;
@@ -1300,7 +1299,7 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 			 V_strieq( com_token, "struct" ) )
 		{
 			current = CC_ParseToken( current );
-			if ( strlen( com_token ) > 0 )
+			if ( !Q_isempty( com_token ) )
 			{
 				//vprint( depth, "class %s\n", com_token );
 
@@ -1315,14 +1314,14 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 					if ( V_strieq( com_token, "public" ) )
 					{
 						current = CC_ParseToken( current );
-						if ( strlen( com_token ) > 0 )
+						if ( !Q_isempty( com_token ) )
 						{
 							cl->SetBaseClass( com_token );
 
 							do
 							{
 								current = CC_ParseToken( current );
-							} while ( strlen( com_token ) && stricmp( com_token, "{" ) );
+							} while ( !Q_iesmpty( com_token ) && stricmp( com_token, "{" ) );
 
 							if ( V_streq( com_token, "{" ) )
 							{
@@ -1392,7 +1391,7 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 			{
 				// Now the classname
 				current = CC_ParseToken( current );
-				if ( strlen( com_token ) > 0 )
+				if ( !Q_isempty( com_token ) )
 				{
 					//vprint( depth, "class %s\n", com_token );
 
@@ -1404,7 +1403,7 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 					{
 						// Parse out public and then classname an
 						current = CC_ParseToken( current );
-						if ( strlen( com_token ) > 0 )
+						if ( !Q_isempty( com_token ) )
 						{
 							char basename[ 256 ];
 							sprintf( basename, "%s%s", prefix, com_token );
@@ -1419,7 +1418,7 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 								if ( V_streq( com_token, "," ) )
 								{
 									current = CC_ParseToken( current );
-									if ( strlen( com_token ) > 0 )
+									if ( !Q_isempty( com_token ) )
 									{
 										valid = true;
 										if ( usebase == 1 )
@@ -1439,7 +1438,7 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 							do
 							{
 								current = CC_ParseToken( current );
-							} while ( strlen( com_token ) && stricmp( com_token, ")" ) );
+							} while ( !Q_isempty( com_token ) && stricmp( com_token, ")" ) );
 
 							if ( V_streq( com_token, ")" ) )
 							{

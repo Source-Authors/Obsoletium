@@ -316,7 +316,7 @@ char *CC_RawParseChar( char *input, const char *ch, char *breakchar )
 	do
 	{
 		input = CC_ParseToken( input );
-		if ( strlen( com_token ) <= 0 )
+		if ( Q_isempty( com_token ) )
 			break;
 
 		if ( strlen( com_token ) == 1 )
@@ -349,7 +349,7 @@ char *CC_DiscardUntilMatchingCharIncludingNesting( char *input, const char *pair
 	do
 	{
 		input = CC_ParseToken( input );
-		if ( strlen( com_token ) <= 0 )
+		if ( Q_isempty( com_token ) )
 			break;
 
 		if ( strlen( com_token ) == 1 )
