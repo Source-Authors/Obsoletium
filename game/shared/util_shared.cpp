@@ -1246,10 +1246,8 @@ char* ReadAndAllocStringValue( KeyValues *pSub, const char *pName, const char *p
 		return empty;
 	}
 
-	intp len = Q_strlen( pValue ) + 1;
-	char *pAlloced = new char[ len ];
+	char *pAlloced = V_strdup( pValue );
 	Assert( pAlloced );
-	Q_strncpy( pAlloced, pValue, len );
 	return pAlloced;
 }
 

@@ -471,9 +471,7 @@ void CFlexAnimationTrack::RemoveSample( intp index, int type /*=0*/ )
 void CFlexAnimationTrack::SetFlexControllerName( const char *name )
 {
 	delete[] m_pControllerName;
-	intp len = Q_strlen( name ) + 1;
-	m_pControllerName = new char[ len ];
-	Q_strncpy( m_pControllerName, name, len );
+	m_pControllerName = V_strdup( name );
 }
 
 //-----------------------------------------------------------------------------
