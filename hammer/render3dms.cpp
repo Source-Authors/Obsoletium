@@ -265,10 +265,10 @@ void CRender3D::EndRenderHitTarget(void)
 				const uintp low = (uintp)m_Pick.uSelectionBuffer[3];
 				const uintp hi = ((uintp)m_Pick.uSelectionBuffer[4] << 32);
 				const uintp ptr = hi | low;
-				hit.pObject = (CMapClass *)ptr;
+				hit.pObject = (CMapAtom *)ptr;
 				hit.uData = m_Pick.uSelectionBuffer[5];
 #else
-				hit.pObject = (CMapClass *)m_Pick.uSelectionBuffer[3];
+				hit.pObject = (CMapAtom *)m_Pick.uSelectionBuffer[3];
 				hit.uData = m_Pick.uSelectionBuffer[4];
 #endif
 				hit.m_LocalMatrix = m_LocalMatrix.Head();

@@ -147,7 +147,8 @@ bool CMapView::SelectAt(const Vector2D &ptClient, bool bMakeFirst, bool bFace)
 	{
 		if ( HitData[i].pObject )
 		{
-			CMapClass *pSelObject = HitData[i].pObject->PrepareSelection( eSelectMode );
+			auto *pMapClass = dynamic_cast<CMapClass *>(HitData[i].pObject);
+			CMapClass *pSelObject = pMapClass->PrepareSelection( eSelectMode );
 			if (pSelObject)
 			{
 				pSelection->AddHit(pSelObject);

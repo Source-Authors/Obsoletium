@@ -4626,7 +4626,7 @@ void CMapDoc::GetBestPastePoint(Vector &vecPasteOrigin)
 
 					// If they clicked on a solid, the index of the face they clicked on is stored
 					// in array index [1].
-					CMapClass *pObject = Hits.pObject;
+					CMapClass *pObject = dynamic_cast<CMapClass *>(Hits.pObject);
 					CMapSolid *pSolid = dynamic_cast<CMapSolid *>(pObject);
 
 					Vector HitPos,HitNormal;

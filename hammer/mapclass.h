@@ -60,7 +60,8 @@ struct MapObjectPair_t
 //-----------------------------------------------------------------------------
 typedef struct HitInfo_s
 {
-	CMapClass *pObject;		// Pointer to the CMapAtom that was clicked on.
+	// dimhotepus: Make map atom to correctly process clicks.
+	CMapAtom *pObject;		// Pointer to the CMapAtom that was clicked on.
 	unsigned int uData;		// Additional data provided by the CMapAtom object.
 	unsigned int nDepth;	// Depth value of the object that was clicked on.
 	VMatrix m_LocalMatrix;

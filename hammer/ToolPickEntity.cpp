@@ -138,7 +138,8 @@ bool CToolPickEntity::OnLMouseDownLogical(CMapViewLogical *pView, UINT nFlags, c
 	int nHits = pView->ObjectsAt( vPoint, &hitData, 1 );
 	if ( ( nHits > 0 ) && hitData.pObject )
 	{
-		CMapClass *pSelObject = hitData.pObject->PrepareSelection( selectObjects );
+		auto *pMapClass = dynamic_cast<CMapClass *>(hitData.pObject);
+		CMapClass *pSelObject = pMapClass->PrepareSelection( selectObjects );
 		CMapEntity *pEntity = dynamic_cast <CMapEntity *>( pSelObject );
 		if (pEntity != NULL)
 		{
