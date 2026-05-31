@@ -1611,6 +1611,8 @@ void CCodeProcessor::ConstructModuleList_R( int level, const char *baseentitycla
 	if ( ( ff = FindFirstFile( directory, &wfd ) ) == INVALID_HANDLE_VALUE )
 		return;
 
+	RunCodeAtScopeExit(FindClose( ff ));
+
 	do
 	{
 		if ( wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
