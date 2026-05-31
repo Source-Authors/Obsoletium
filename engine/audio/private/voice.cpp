@@ -680,7 +680,8 @@ bool Voice_Init( const char *pCodecName, int nSampleRate )
 
 	if( !g_pVoiceRecord )
 	{
-		Msg( "Unable to initialize sound capture. You won't be able to speak to other players." );
+		// dimhotepus: Add missed \n. 
+		Msg( "Unable to initialize sound capture. You won't be able to speak to other players.\n" );
 	}
 
 	// Init codec DLL for non-steam
