@@ -824,11 +824,11 @@ int CBaseButton::DrawDebugTextOverlays()
 			nState = 4;
 		}
 
-		Q_snprintf( tempstr, sizeof(tempstr), "State: %s", pszStates[nState] );
+		V_sprintf_safe( tempstr, "State: %s", pszStates[nState] );
 		EntityText( text_offset, tempstr, 0 );
 		text_offset++;
 
-		Q_snprintf( tempstr, sizeof(tempstr), "%s", m_bLocked ? "Locked" : "Unlocked" );
+		V_strcpy_safe( tempstr, m_bLocked ? "Locked" : "Unlocked" );
 		EntityText( text_offset, tempstr, 0 );
 		text_offset++;
 	}

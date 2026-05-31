@@ -180,7 +180,7 @@ void C_BaseFlex::SetupMappings( char const *pchFileRoot )
 	memset( m_PhonemeClasses, 0, sizeof( m_PhonemeClasses ) );
 
 	Emphasized_Phoneme *normal = &m_PhonemeClasses[ PHONEME_CLASS_NORMAL ];
-	Q_snprintf( normal->classname, sizeof( normal->classname ), "%s", pchFileRoot );
+	V_strcpy_safe( normal->classname, pchFileRoot );
 	normal->required = true;
 
 	Emphasized_Phoneme *weak = &m_PhonemeClasses[ PHONEME_CLASS_WEAK ];

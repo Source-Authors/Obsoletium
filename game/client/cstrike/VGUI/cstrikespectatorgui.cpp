@@ -1711,7 +1711,7 @@ bool CCSMapOverview::CreateRadarImage(const char *mapName, const char * radarFil
 
 		// And need a vmt file to go with it.
 		char vmtFilename[MAX_PATH];
-		Q_snprintf(vmtFilename, MAX_PATH, "%s", fullRadarFileName);
+		V_strcpy_safe(vmtFilename, fullRadarFileName);
 		char *extension = &vmtFilename[Q_strlen(vmtFilename) - 3];
 		*extension++ = 'v';
 		*extension++ = 'm';

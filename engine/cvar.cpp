@@ -771,7 +771,7 @@ static void PrintCommand( const ConCommand *cmd, bool logging, FileHandle_t& f )
 
 		// Names staring with +/- need to be wrapped in single quotes
 		char name[ 256 ];
-		Q_snprintf( name, sizeof( name ), "%s", cmd->GetName() );
+		V_strcpy_safe( name, cmd->GetName() );
 		if ( name[ 0 ] == '+' || name[ 0 ] == '-' )
 		{
 			Q_snprintf( name, sizeof( name ), "'%s'", cmd->GetName() );
@@ -820,7 +820,7 @@ void CCvarUtilities::CvarList( const CCommand &args )
 	if ( V_strieq( args[1],"log" ) && iArgs >= 3 )
 	{
 		char fn[256];
-		Q_snprintf( fn, sizeof( fn ), "%s", args[2] );
+		V_strcpy_safe( fn, args[2] );
 		f = g_pFileSystem->Open( fn,"wb" );
 		if ( f )
 		{

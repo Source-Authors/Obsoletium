@@ -1156,7 +1156,7 @@ void CL_TakeScreenshot(const char *name)
 
 		if ( !Q_isempty( cl_screenshotname.GetString() ) )
 		{
-			Q_snprintf( cl_snapshotname, sizeof( cl_snapshotname ), "%s", cl_screenshotname.GetString() );		
+			V_strcpy_safe( cl_snapshotname, cl_screenshotname.GetString() );
 		}
 	}
 

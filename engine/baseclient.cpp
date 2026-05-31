@@ -1625,7 +1625,7 @@ const char *GetUserIDString( const USERID_t& id )
 			}
 			else
 			{
-				V_sprintf_safe( idstr, "%s", id.steamid.Render() );
+				V_strcpy_safe( idstr, id.steamid.Render() );
 			}
 		}
 		break;		

@@ -5378,7 +5378,7 @@ void CC_Ent_Dump( const CCommand& args )
 								// get the entities name
 								if ( var.Entity() )
 								{
-									Q_snprintf( buf,sizeof(buf), "%s", STRING(var.Entity()->GetEntityName()) );
+									V_strcpy_safe( buf, STRING(var.Entity()->GetEntityName()) );
 								}
 							}
 							break;

@@ -48,7 +48,7 @@ const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
   if (length > 1 && message[length - 1] == '\n') {
     V_sprintf_safe(out, "[%.3f][%s] %s", Plat_FloatTime(), group, message);
   } else {
-    V_sprintf_safe(out, "%s", message);
+    V_strcpy_safe(out, message);
   }
 
   return out;

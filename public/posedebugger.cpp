@@ -513,8 +513,8 @@ void CPoseDebuggerImpl::AccumulatePose( const CStudioHdr *pStudioHdr, CIKContext
 	int numLines = 0;
 	
 	txt.m_iActivity = seqdesc.activity;
-	V_sprintf_safe( txt.m_chActivity, "%s", seqdesc.pszActivityName() );
-	V_sprintf_safe( txt.m_chLabel, "%s", seqdesc.pszLabel() );
+	V_strcpy_safe( txt.m_chActivity, seqdesc.pszActivityName() );
+	V_strcpy_safe( txt.m_chLabel, seqdesc.pszLabel() );
 
 	if ( !txt.m_chActivity[0] )
 	{
@@ -525,7 +525,7 @@ void CPoseDebuggerImpl::AccumulatePose( const CStudioHdr *pStudioHdr, CIKContext
 			if ( lastSeenTxt.m_uiFlags & ModelPoseDebugInfo::F_SEEN_THIS_FRAME &&
 				 lastSeenTxt.m_chActivity[0] )
 			{
-				V_sprintf_safe( txt.m_chActivity, "%s", lastSeenTxt.m_chActivity );
+				V_strcpy_safe( txt.m_chActivity, lastSeenTxt.m_chActivity );
 				break;
 			}
 		}

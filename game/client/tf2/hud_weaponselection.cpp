@@ -803,7 +803,7 @@ void CHudWeaponSelection::GetSlotInfo( const CWeaponMenuItem *w, C_BaseCombatWea
 		}
 		info.ammoCaution = ( info.ammoPerc >= CLIP_PERC_THRESHOLD ) ? true : false;
 
-		Q_snprintf( info.printname, sizeof( info.printname ), "%s", pWeapon->GetPrintName() );
+		V_strcpy_safe( info.printname, pWeapon->GetPrintName() );
 		info.weapon = pWeapon;
 	}
 

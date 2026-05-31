@@ -6140,7 +6140,7 @@ void CCSPlayer::PrioritizeAutoBuyString(char *autobuyString, const char *priorit
 	// terminate the string.  Trailing spaces shouldn't matter.
 	newString[newStringPos] = 0;
 
-	Q_snprintf(autobuyString, sizeof(autobuyString), "%s", newString);
+	V_strcpy_safe(autobuyString, newString);
 }
 
 

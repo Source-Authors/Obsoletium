@@ -52,7 +52,7 @@ int CBaseAutoCompleteFileList::AutoCompletionFunc( char const *partial, char com
 
 	while ( findfn )
 	{
-		Q_snprintf( sz, sizeof( sz ), "%s", findfn );
+		V_strcpy_safe( sz, findfn );
 
 		bool add = false;
 		// Insert into lookup

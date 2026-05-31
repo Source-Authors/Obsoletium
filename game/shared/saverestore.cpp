@@ -299,7 +299,7 @@ void CSave::Log( const char *pName, fieldtype_t fieldType, void *value, int coun
 		case FIELD_STRING:
 			{
 				string_t *pValue = ( string_t* )( value );
-				Q_snprintf( szTempBuf, sizeof( szTempBuf ), "%s", ( const char* )STRING( *pValue ) );
+				V_strcpy_safe( szTempBuf, ( const char* )STRING( *pValue ) );
 				Q_strncat( szBuf, szTempBuf, sizeof( szTempBuf ), COPY_ALL_CHARACTERS );
 				break;					
 			}

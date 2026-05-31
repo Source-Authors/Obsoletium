@@ -578,7 +578,7 @@ CON_COMMAND( removeid, "Remove a user ID from the ban list." )
 			{
 				bValid = id->steamid.IsValid();
 				if ( bValid )
-					V_sprintf_safe( szSearchString, "%s", id->steamid.Render() );
+					V_strcpy_safe( szSearchString, id->steamid.Render() );
 			}
 		}
 		else
@@ -590,7 +590,7 @@ CON_COMMAND( removeid, "Remove a user ID from the ban list." )
 
 				bValid = cSteamIDCheck.IsValid();
 				if ( bValid )
-					V_sprintf_safe( szSearchString, "%s", cSteamIDCheck.Render() );
+					V_strcpy_safe( szSearchString, cSteamIDCheck.Render() );
 			}
 		}
 
@@ -758,7 +758,7 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 
 				bValid = cSteamIDCheck.IsValid();
 				if ( bValid )
-					V_sprintf_safe( szSearchString, "%s", cSteamIDCheck.Render() );
+					V_strcpy_safe( szSearchString, cSteamIDCheck.Render() );
 			}
 		}
 

@@ -535,7 +535,7 @@ void CSoundSystem::OpenSource( SoundType_t type, intp nIndex )
 	if ( pFileName )
 	{
 		char pRelativePath[MAX_PATH];
-		V_sprintf_safe( pRelativePath, "%s", pFileName );
+		V_strcpy_safe( pRelativePath, pFileName );
 
 		char pFullPath[MAX_PATH];
 		if ( g_pFullFileSystem->GetLocalPath_safe( pRelativePath, pFullPath ) )

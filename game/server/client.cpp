@@ -219,7 +219,7 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 		else
 		{
 			// Just a one word command, use the first word...sigh
-			V_sprintf_safe( szTemp, "%s", pcmd );
+			V_strcpy_safe( szTemp, pcmd );
 		}
 	}
 

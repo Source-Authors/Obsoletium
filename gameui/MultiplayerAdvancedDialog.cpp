@@ -178,17 +178,17 @@ void CMultiplayerAdvancedDialog::GatherCurrentValues()
 		{
 		case O_BOOL:
 			pBox = (CheckButton *)pList->pControl;
-			V_sprintf_safe( szValue, "%s", pBox->IsSelected() ? "1" : "0" );
+			V_strcpy_safe( szValue, pBox->IsSelected() ? "1" : "0" );
 			break;
 		case O_NUMBER:
 			pEdit = ( TextEntry * )pList->pControl; //-V1037
 			pEdit->GetText( strValue );
-			V_sprintf_safe( szValue, "%s", strValue );
+			V_strcpy_safe( szValue, strValue );
 			break;
 		case O_STRING:
 			pEdit = ( TextEntry * )pList->pControl;
 			pEdit->GetText( strValue );
-			V_sprintf_safe( szValue, "%s", strValue );
+			V_strcpy_safe( szValue, strValue );
 			break;
 		case O_LIST:
 			{
@@ -209,12 +209,12 @@ void CMultiplayerAdvancedDialog::GatherCurrentValues()
 
 				if ( pItem )
 				{
-					V_sprintf_safe( szValue, "%s", pItem->szValue );
+					V_strcpy_safe( szValue, pItem->szValue );
 				}
 				else  // Couln't find index
 				{
 					//Assert(!("Couldn't find string in list, using default value"));
-					V_sprintf_safe( szValue, "%s", pObj->defValue );
+					V_strcpy_safe( szValue, pObj->defValue );
 				}
 				break;
 			}

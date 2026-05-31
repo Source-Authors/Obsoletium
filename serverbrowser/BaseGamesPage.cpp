@@ -460,7 +460,7 @@ static int ServerMapnameSortFunc( const servermaps_t *p1,  const servermaps_t *p
 void CBaseGamesPage::PrepareQuickListMap( const char *pMapName, int iListID )
 {
 	char szMapName[ 512 ];
-	V_sprintf_safe( szMapName, "%s",  pMapName );
+	V_strcpy_safe( szMapName, pMapName );
 
 	V_strlower( szMapName );
 
@@ -1059,7 +1059,7 @@ void CBaseGamesPage::UpdateDerivedLayouts( void )
 	char rgchControlSettings[MAX_PATH];
 	if ( m_pCustomResFilename )
 	{
-		Q_snprintf( rgchControlSettings, sizeof( rgchControlSettings ), "%s", m_pCustomResFilename );
+		V_strcpy_safe( rgchControlSettings, m_pCustomResFilename );
 	}
 	else
 	{

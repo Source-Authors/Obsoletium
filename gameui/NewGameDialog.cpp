@@ -373,7 +373,7 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 		sscanf(fileName, "chapter%31s", chapterID);
 		chapterID[ssize(chapterID) - 1] = '\0';
 
-		V_sprintf_safe( szFullFileName, "%s", fileName );
+		V_strcpy_safe( szFullFileName, fileName );
 
 		// strip the extension
 		char *ext = V_stristr(chapterID, ".cfg");

@@ -285,7 +285,7 @@ const char *CChunkFile::GetErrorText(ChunkFileResult_t eResult)
 
 		case ChunkFile_OpenFail:
 		{
-			Q_snprintf(szError, sizeof( szError ), "%s", strerror(errno)) ;
+			V_strcpy_safe(szError, strerror(errno));
 			break;
 		}
 

@@ -417,7 +417,7 @@ void CScriptObject::WriteToConfig( )
 
 		if ( pItem )
 		{
-			V_sprintf_safe( szValue, "%s", pItem->szValue );
+			V_strcpy_safe( szValue, pItem->szValue );
 			V_StripInvalidCharacters( szValue );
 		}
 		else  //Couldn't find index

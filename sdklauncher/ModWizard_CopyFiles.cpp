@@ -668,7 +668,7 @@ bool CModWizardSubPanel_CopyFiles_Source2007::BuildCopyFilesForMod_HL2MP()
 bool CModWizardSubPanel_CopyFiles_Source2006::BuildCopyFilesForMod_SourceCodeOnly()
 {
 	char outputSrcDirName[MAX_PATH];
-	Q_snprintf( outputSrcDirName, sizeof( outputSrcDirName ), "%s", m_OutputDirName );
+	V_strcpy_safe( outputSrcDirName, m_OutputDirName );
 	int len = strlen( outputSrcDirName );
 	if ( len > 0 && PATHSEPARATOR( outputSrcDirName[len-1] ) )
 		outputSrcDirName[len-1] = 0;
@@ -685,7 +685,7 @@ bool CModWizardSubPanel_CopyFiles_Source2006::BuildCopyFilesForMod_SourceCodeOnl
 bool CModWizardSubPanel_CopyFiles_Source2009::BuildCopyFilesForMod_SourceCodeOnly()
 {
 	char outputSrcDirName[MAX_PATH];
-	Q_snprintf( outputSrcDirName, sizeof( outputSrcDirName ), "%s", m_OutputDirName );
+	V_strcpy_safe( outputSrcDirName, m_OutputDirName );
 	int len = strlen( outputSrcDirName );
 	if ( len > 0 && PATHSEPARATOR( outputSrcDirName[len-1] ) )
 		outputSrcDirName[len-1] = 0;
@@ -702,7 +702,7 @@ bool CModWizardSubPanel_CopyFiles_Source2009::BuildCopyFilesForMod_SourceCodeOnl
 bool CModWizardSubPanel_CopyFiles_Source2007::BuildCopyFilesForMod_SourceCodeOnly()
 {
 	char outputSrcDirName[MAX_PATH];
-	Q_snprintf( outputSrcDirName, sizeof( outputSrcDirName ), "%s", m_OutputDirName );
+	V_strcpy_safe( outputSrcDirName, m_OutputDirName );
 	int len = strlen( outputSrcDirName );
 	if ( len > 0 && PATHSEPARATOR( outputSrcDirName[len-1] ) )
 		outputSrcDirName[len-1] = 0;
@@ -902,7 +902,7 @@ void CModWizardSubPanel_CopyFiles::OnTick()
 			if ( iNum < (unsigned int)m_FileCopyInfos.Count() )
 			{
 				char msg[512];
-				Q_snprintf( msg, sizeof( msg ), "%s", m_FileCopyInfos[iNum].m_InFilename );
+				V_strcpy_safe( msg, m_FileCopyInfos[iNum].m_InFilename );
 				m_pLabel->SetText( msg );
 
 				m_pProgressBar->SetProgress( (float)iNum / m_FileCopyInfos.Count() );
@@ -942,7 +942,7 @@ bool CModWizardSubPanel_CopyFiles_Source2009::HandleReplacements_GameProjectFile
 	if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\source2009\\materialsystem\\stdshaders\\stdshader_dx9-2005.vcxproj" ) == 0 )
 	{
 		bErrorStatus = true;
-		Q_snprintf( replaceWith, sizeof( replaceWith ), "%s", m_OutModGamedirName );
+		V_strcpy_safe( replaceWith, m_OutModGamedirName );
 		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 
 		return true;
@@ -953,7 +953,7 @@ bool CModWizardSubPanel_CopyFiles_Source2009::HandleReplacements_GameProjectFile
 		bErrorStatus = true;
 		if ( m_ModType == ModType_FromScratch )
 		{
-			Q_snprintf( replaceWith, sizeof( replaceWith ), "%s", m_OutModGamedirName );
+			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 
 			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
@@ -967,7 +967,7 @@ bool CModWizardSubPanel_CopyFiles_Source2009::HandleReplacements_GameProjectFile
 		bErrorStatus = true;
 		if ( m_ModType == ModType_HL2 || m_ModType == ModType_SourceCodeOnly )
 		{
-			Q_snprintf( replaceWith, sizeof( replaceWith ), "%s", m_OutModGamedirName );
+			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 
 			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
@@ -980,7 +980,7 @@ bool CModWizardSubPanel_CopyFiles_Source2009::HandleReplacements_GameProjectFile
 		bErrorStatus = true;
 		if ( m_ModType == ModType_HL2_Multiplayer )
 		{
-			Q_snprintf( replaceWith, sizeof( replaceWith ), "%s", m_OutModGamedirName );
+			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 
 			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
@@ -1013,7 +1013,7 @@ bool CModWizardSubPanel_CopyFiles_Source2007::HandleReplacements_GameProjectFile
 	if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\orangebox\\materialsystem\\stdshaders\\stdshader_dx9-2005.vcxproj" ) == 0 )
 	{
 		bErrorStatus = true;
-		Q_snprintf( replaceWith, sizeof( replaceWith ), "%s", m_OutModGamedirName );
+		V_strcpy_safe( replaceWith, m_OutModGamedirName );
 		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 
 		return true;
@@ -1024,7 +1024,7 @@ bool CModWizardSubPanel_CopyFiles_Source2007::HandleReplacements_GameProjectFile
 		bErrorStatus = true;
 		if ( m_ModType == ModType_FromScratch )
 		{
-			Q_snprintf( replaceWith, sizeof( replaceWith ), "%s", m_OutModGamedirName );
+			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 
 			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
@@ -1038,7 +1038,7 @@ bool CModWizardSubPanel_CopyFiles_Source2007::HandleReplacements_GameProjectFile
 		bErrorStatus = true;
 		if ( m_ModType == ModType_HL2 || m_ModType == ModType_SourceCodeOnly )
 		{
-			Q_snprintf( replaceWith, sizeof( replaceWith ), "%s", m_OutModGamedirName );
+			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 
 			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
@@ -1051,7 +1051,7 @@ bool CModWizardSubPanel_CopyFiles_Source2007::HandleReplacements_GameProjectFile
 		bErrorStatus = true;
 		if ( m_ModType == ModType_HL2_Multiplayer )
 		{
-			Q_snprintf( replaceWith, sizeof( replaceWith ), "%s", m_OutModGamedirName );
+			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 
 			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
@@ -1084,7 +1084,7 @@ bool CModWizardSubPanel_CopyFiles_Source2006::HandleReplacements_GameProjectFile
 		 Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\materialsystem\\stdshaders\\stdshader_dx9-2005.vcxproj" ) == 0 )
 	{
 		bErrorStatus = true;
-		Q_snprintf( replaceWith, sizeof( replaceWith ), "%s", m_OutModGamedirName );
+		V_strcpy_safe( replaceWith, m_OutModGamedirName );
 		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 
 		return true;
@@ -1097,7 +1097,7 @@ bool CModWizardSubPanel_CopyFiles_Source2006::HandleReplacements_GameProjectFile
 		bErrorStatus = true;
 		if ( m_ModType == ModType_FromScratch )
 		{
-			Q_snprintf( replaceWith, sizeof( replaceWith ), "%s", m_OutModGamedirName );
+			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 			
 			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
@@ -1112,7 +1112,7 @@ bool CModWizardSubPanel_CopyFiles_Source2006::HandleReplacements_GameProjectFile
 		bErrorStatus = true;
 		if ( m_ModType == ModType_HL2 || m_ModType == ModType_SourceCodeOnly )
 		{
-			Q_snprintf( replaceWith, sizeof( replaceWith ), "%s", m_OutModGamedirName );
+			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 
 			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
@@ -1127,7 +1127,7 @@ bool CModWizardSubPanel_CopyFiles_Source2006::HandleReplacements_GameProjectFile
 		bErrorStatus = true;
 		if ( m_ModType == ModType_HL2_Multiplayer )
 		{
-			Q_snprintf( replaceWith, sizeof( replaceWith ), "%s", m_OutModGamedirName );
+			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 
 			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}

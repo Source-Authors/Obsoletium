@@ -109,7 +109,7 @@ IEditorObject::IEditorObject( EditorObjectInitStruct init )
 	memset( m_szKeyName, 0, sizeof( m_szKeyName ) );
 	if ( init.m_pszKeyName )
 	{
-		V_sprintf_safe( m_szKeyName, "%s", init.m_pszKeyName );
+		V_strcpy_safe( m_szKeyName, init.m_pszKeyName );
 	}
 
 	SetWide( init.pParent->GetWide() );
@@ -557,7 +557,7 @@ void IEditorObjectParameter::UpdateSavedValue( const char* pszNewValue ) const
 {
 	// Update saved string
 	memset( m_szSavedValueBuff, 0, sizeof( m_szSavedValueBuff ) );
-	V_sprintf_safe( m_szSavedValueBuff, "%s", pszNewValue );
+	V_strcpy_safe( m_szSavedValueBuff, pszNewValue );
 }
 
 //-----------------------------------------------------------------------------
@@ -651,7 +651,7 @@ CLocalizationEditorParam::CLocalizationEditorParam( EditorObjectInitStruct init,
 	SetTextEntryValue( szBuff );
 	UpdateSavedValue( szBuff );
 
-	V_sprintf_safe( m_szLocalizationToken, "%s", pszLocalizationToken );
+	V_strcpy_safe( m_szLocalizationToken, pszLocalizationToken );
 }
 
 
@@ -1347,7 +1347,7 @@ void CQuestObjectiveRestrictionNode::SetNewEvent( const char *pszEvent )
 	m_pNewCondition = NULL;
 
 	char szType[256];
-	V_sprintf_safe( szType, "%s", m_pCondition->GetConditionName() );
+	V_strcpy_safe( szType, m_pCondition->GetConditionName() );
 
 	// Create new restriction
 	CTFQuestCondition* pParent = m_pCondition->GetParent();
@@ -1361,7 +1361,7 @@ void CQuestObjectiveRestrictionNode::SetNewEvent( const char *pszEvent )
 		m_pCondition = CreateEvaluatorByName( szType, NULL );
 	}
 
-	V_sprintf_safe( m_szEventName, "%s", pszEvent );
+	V_strcpy_safe( m_szEventName, pszEvent );
 
 	m_pCondition->SetEventName( m_szEventName );
 	CreateControlsForCondition();

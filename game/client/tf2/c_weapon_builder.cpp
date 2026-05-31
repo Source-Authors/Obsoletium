@@ -365,7 +365,7 @@ void CHumanPDAPanel::OnTick()
 	m_pObjectImage->SetImageFile( buf );
 	m_pObjectImage->SetColor( GetFgColor() );
 	
-	Q_snprintf( buf, sizeof( buf ), "%s", info->m_pStatusName );
+	V_strcpy_safe( buf, info->m_pStatusName );
 	m_pObjectName->SetText( buf );
 
 	Q_snprintf( buf, sizeof( buf ), "Cost:  %i", iCost );
@@ -374,7 +374,7 @@ void CHumanPDAPanel::OnTick()
 	Q_snprintf( buf, sizeof( buf ), "You own:  %i", numOwned );
 	m_pObjectOnTeamCount->SetText( buf );
 
-	Q_snprintf( buf, sizeof( buf ), "%s", info->m_pBuilderPlacementString ? info->m_pBuilderPlacementString : "" );
+	V_strcpy_safe( buf, info->m_pBuilderPlacementString ? info->m_pBuilderPlacementString : "" );
 	m_pObjectPlacementDetails->SetText( buf );
 	//m_pObjectPlacementDetails->SizeToContents();
 }

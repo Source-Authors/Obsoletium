@@ -2655,7 +2655,7 @@ void CDmeTypedCurveInfo< T >::OnConstruction()
 	for ( int i = 0; i < 2; ++i )
 	{
 		char edgename[ 32 ];
-		Q_snprintf( edgename, sizeof( edgename ), "%s", i == 0 ? "left" : "right" );
+		V_strcpy_safe( edgename, i == 0 ? "left" : "right" );
 		char name[ 32 ];
 		Q_snprintf( name, sizeof( name ), "%sEdgeActive", edgename );
 		m_bEdgeActive[ i ].Init( this, name );

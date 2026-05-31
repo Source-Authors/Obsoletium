@@ -86,7 +86,7 @@ int FillDataStruct( FIND_DATA *dat )
 	dat->dwFileAttributes = !stat( szFullPath, &fileStat ) ? fileStat.st_mode : 0;           
 
 	// now just put the filename in the output data
-	V_sprintf_safe( dat->cFileName, "%s", name->d_name );  
+	V_strcpy_safe( dat->cFileName, name->d_name );
 
 	free( name );
 

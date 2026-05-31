@@ -923,7 +923,7 @@ void UTIL_ReplaceKeyBindings( const wchar_t *inbuf, intp inbufsizebytes, OUT_Z_B
 				//!! change some key names into better names
 				char friendlyName[64];
 				bool bAddBrackets = false;
-				V_sprintf_safe( friendlyName, "%s", key );
+				V_strcpy_safe( friendlyName, key );
 				V_strupr( friendlyName );
 
 				const wchar_t* locName = nullptr;

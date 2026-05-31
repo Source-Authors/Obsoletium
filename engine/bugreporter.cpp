@@ -1275,11 +1275,11 @@ void CBugUIPanel::OnFileSelected( char const *fullpath )
 	// 
 	// if ( baseDirFile )
 	// {
-	// 	V_sprintf_safe( inc.fixedname, "%s", inc.name+3 ); // strip the "..\"
+	// 	V_strcpy_safe( inc.fixedname, inc.name+3 ); // strip the "..\"
 	// }
 	// else
 	// {
-	// 	V_sprintf_safe( inc.fixedname, "%s", inc.name );
+	// 	V_strcpy_safe( inc.fixedname, inc.name );
 	// }
 	// V_FixSlashes( inc.fixedname );
 	// 
@@ -1733,7 +1733,7 @@ void CBugUIPanel::OnSubmit()
 	}
 	else
 	{
-		Q_snprintf( title, sizeof( title ), "%s", temp );
+		V_strcpy_safe( title, temp );
 	}
 
 	Msg( "title:  %s\n", title );

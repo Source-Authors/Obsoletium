@@ -350,10 +350,7 @@ void VGui_RecursivePrintTree(
 	// Bind data to pVal.
 	char name[1024];
 	const char *pInputName = ipanel->GetName( current );
-	if ( !Q_isempty( pInputName ) )
-		V_sprintf_safe( name, "%s", pInputName );
-	else
-		V_sprintf_safe( name, "%s", "(no name)" );
+	V_strcpy_safe( name, !Q_isempty( pInputName ) ? pInputName : "(no name)" );
 
 	if ( ipanel->IsMouseInputEnabled( current ) )
 	{
@@ -387,7 +384,7 @@ void VGui_RecursivePrintTree(
 		V_sprintf_safe( str, "%s - [%d]", name, kv->GetInt("alpha") );
 	}
 	else
-		V_sprintf_safe( str, "%s", name );
+		V_strcpy_safe( str, name );
 
 	pVal->SetString( "Text", str );
 	// dimhotepus: SetInt -> SetPtr

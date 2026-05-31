@@ -535,7 +535,7 @@ void CDODFreezePanel::ShowSnapshotPanel( bool bShow )
 	if ( bShow )
 	{
 		char szKey[16];
-		Q_snprintf( szKey, sizeof(szKey), "%s", key );
+		V_strcpy_safe( szKey, key );
 		wchar_t wKey[16];
 		wchar_t wLabel[256];
 

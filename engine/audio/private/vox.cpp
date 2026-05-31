@@ -2031,7 +2031,7 @@ void VOX_TouchSound( const char *pszin, CUtlDict< int, int >& filelist, CUtlRBTr
 				for ( intp j = 0 ; j < c; ++j )
 				{
 					char name[ 256 ];
-					Q_snprintf( name, sizeof( name ), "%s", list[ j ].word );
+					V_strcpy_safe( name, list[ j ].word );
 
 					if ( !Q_strnicmp( name, "V_", 2 ) )
 					{

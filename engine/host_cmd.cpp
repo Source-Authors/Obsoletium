@@ -1111,7 +1111,7 @@ CON_COMMAND( kickid, "Kick a player by userid or uniqueid, with a message." )
 		// NOTE: assumed to be one argument
 		else
 		{
-			Q_snprintf( szSearchString, sizeof( szSearchString ), "%s", pszArg1 );
+			V_strcpy_safe( szSearchString, pszArg1 );
 		}
 	}
 	// this is a userid
