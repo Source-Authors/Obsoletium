@@ -317,17 +317,17 @@ void CCreateMultiplayerGameGameplayPage::GatherCurrentValues()
 		{
 		case O_BOOL:
 			pBox = (CheckButton *)pList->pControl;
-			Q_snprintf( szValue, sizeof( szValue ), "%s", pBox->IsSelected() ? "1" : "0" );
+			V_strcpy_safe( szValue, pBox->IsSelected() ? "1" : "0" );
 			break;
 		case O_NUMBER:
 			pEdit = ( TextEntry * )pList->pControl; //-V1037
 			pEdit->GetText( strValue );
-			Q_snprintf( szValue, sizeof( szValue ), "%s", strValue );
+			V_strcpy_safe( szValue, strValue );
 			break;
 		case O_STRING:
 			pEdit = ( TextEntry * )pList->pControl;
 			pEdit->GetText( strValue );
-			Q_snprintf( szValue, sizeof( szValue ), "%s", strValue );
+			V_strcpy_safe( szValue, strValue );
 			break;
 		case O_LIST:
 			pCombo = ( ComboBox *)pList->pControl;
@@ -368,11 +368,11 @@ void CCreateMultiplayerGameGameplayPage::GatherCurrentValues()
 
 			if ( pItem )
 			{
-				Q_snprintf( szValue, sizeof( szValue ), "%s", pItem->szValue );
+				V_strcpy_safe( szValue, pItem->szValue );
 			}
 			else  //Couldn't find index
 			{
-				Q_snprintf( szValue, sizeof( szValue ), "%s", pObj->defValue );
+				V_strcpy_safe( szValue, pObj->defValue );
 			}
 			break;
 		}

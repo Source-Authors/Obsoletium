@@ -177,7 +177,7 @@ void BotProfileManager::Init( const char *filename, unsigned int *checksum )
 
 		if ( isCustomSkin )
 		{
-			const int BufLen = 64;
+			constexpr int BufLen = 64;
 			char skinName[BufLen];
 
 			// get skin name
@@ -189,7 +189,7 @@ void BotProfileManager::Init( const char *filename, unsigned int *checksum )
 				return;
 			}
 			token = SharedGetToken();
-			Q_snprintf( skinName, sizeof( skinName ), "%s", token );
+			V_strcpy_safe( skinName, token );
 
 			// get attribute name
 			dataFile = SharedParse( dataFile );

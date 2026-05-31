@@ -2175,7 +2175,7 @@ bool CEngineClient::StartDemoRecording( const char *pszFilename, const char *psz
 	}
 	else
 	{
-		V_sprintf_safe( szTemp, "%s", pszFilename );
+		V_strcpy_safe( szTemp, pszFilename );
 	}
 
 	// remove .dem extension if it exists
@@ -2246,7 +2246,7 @@ void CEngineClient::TakeScreenshot( const char *pszFilename, const char *pszFold
 		}
 		else
 		{
-			V_sprintf_safe( szFinal, "%s", pszFilename );
+			V_strcpy_safe( szFinal, pszFilename );
 		}
 
 		V_SetExtension( szFinal, ".tga" ); 

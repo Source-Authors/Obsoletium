@@ -1442,7 +1442,7 @@ void CHLTVServer::UpdateStats( void )
 		else
 		{
 			// forward address
-			Q_snprintf( address, sizeof(address), "%s", m_RootServer.ToString() );
+			V_strcpy_safe( address, m_RootServer.ToString() );
 		}
 
 		event->SetString( "master", address );

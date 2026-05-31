@@ -464,7 +464,7 @@ bool CTFDemoSupport::StartRecording( void )
 		ptm->tm_hour, ptm->tm_min, ptm->tm_sec );
 
 	char szPrefix[24] = {0};
-	V_sprintf_safe( szPrefix, "%s", ds_prefix.GetString() );
+	V_strcpy_safe( szPrefix, ds_prefix.GetString() );
 	V_sprintf_safe( m_szFilename, "%s%s", szPrefix, szTime );
 
 	if ( !Q_isempty( ds_dir.GetString() ) )
@@ -476,7 +476,7 @@ bool CTFDemoSupport::StartRecording( void )
 			return false;
 		}
 
-		V_sprintf_safe( m_szFolder, "%s", ds_dir.GetString() );
+		V_strcpy_safe( m_szFolder, ds_dir.GetString() );
 
 		// make sure the folder exists
 		g_pFullFileSystem->CreateDirHierarchy( m_szFolder, "GAME" );
@@ -486,7 +486,7 @@ bool CTFDemoSupport::StartRecording( void )
 	else
 	{
 		m_szFolder[0] = '\0';
-		V_sprintf_safe( m_szFolderAndFilename, "%s", m_szFilename );
+		V_strcpy_safe( m_szFolderAndFilename, m_szFilename );
 	}
 
 	if ( !engine->StartDemoRecording( m_szFilename, m_szFolder ) )

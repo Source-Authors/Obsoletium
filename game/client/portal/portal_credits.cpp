@@ -773,9 +773,9 @@ void CHudPortalCredits::DrawPortalOutroCreditsName( void )
 			char tmpstr2[256];
 			Q_strncpy( tmpstr2, pCredit->szCreditName, m_iXOffset );
 			if (bCursor)
-				Q_snprintf( tmpstr, 256, "%s_",tmpstr2);
+				V_sprint_safe( tmpstr, "%s_", tmpstr2 );
 			else
-				Q_snprintf( tmpstr, 256, "%s",tmpstr2);
+				V_strcpy_safe( tmpstr, tmpstr2 );
 		}
 		else
 		{
@@ -1076,9 +1076,9 @@ void CHudPortalCredits::DrawPortalOutroCreditsLyrics( void )
 			char tmpstr2[256];
 			Q_strncpy( tmpstr2, pCredit->szCreditName, m_iXOffsetNames );
 			if (!bCursor)
-				Q_snprintf( tmpstr, 256, "%s_",tmpstr2);
+				V_sprintf_safe( tmpstr, "%s_", tmpstr2 );
 			else
-				Q_snprintf( tmpstr, 256, "%s",tmpstr2);
+				V_strcpy_safe( tmpstr, tmpstr2 );
 		}
 		else
 		{

@@ -20,6 +20,7 @@
 #include "tier0/icommandline.h"
 #include "tier0/dbg.h"
 #include "tier0/platform.h"
+#include "tier1/strtools.h"
 #include "vgui/ivgui.h"
 #include "vgui/ISurface.h"
 #include "vstdlib/cvar.h"
@@ -71,9 +72,9 @@ const char *PrefixMessageGroup(
 
   const size_t length{strlen(message)};
   if (length > 1 && message[length - 1] == '\n') {
-    Q_snprintf(out, std::size(out), "[%s] %s", out_group, message);
+    V_sprintf_safe(out, "[%s] %s", out_group, message);
   } else {
-    Q_snprintf(out, std::size(out), "%s", message);
+    V_strcpy_safe(out, message);
   }
 
   return out;

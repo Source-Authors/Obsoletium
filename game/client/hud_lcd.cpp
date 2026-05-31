@@ -1356,7 +1356,7 @@ void CLCD::LookupToken( char const *in, CUtlString& value )
 	case FIELD_STRING:
 		{
 			string_t *pString = (string_t *)((string_t *)pInputData + iIndex );
-			Q_snprintf( sz, sizeof( sz ), "%s", pString ? STRING( *pString ) : "" );
+			V_strcpy_safe( sz, pString ? STRING( *pString ) : "" );
 		}
 		break;
 	case FIELD_VECTOR:
@@ -1373,7 +1373,7 @@ void CLCD::LookupToken( char const *in, CUtlString& value )
 		break;
 		
 	case FIELD_BOOLEAN:
-		Q_snprintf( sz, sizeof( sz ), "%s", *( ( const bool *)pInputData + iIndex ) ? "true" : "false" );
+		V_strcpy_safe( sz, *( ( const bool *)pInputData + iIndex ) ? "true" : "false" );
 		break;
 	case FIELD_INTEGER:
 		V_to_chars( sz, *( (const int *)pInputData + iIndex ));
@@ -1384,7 +1384,7 @@ void CLCD::LookupToken( char const *in, CUtlString& value )
 		break;
 		
 	case FIELD_CHARACTER:
-		Q_snprintf( sz, sizeof( sz ), "%s", ((const char *)pInputData + iIndex ) );
+		V_strcpy_safe( sz, ((const char *)pInputData + iIndex ) );
 		break;
 	}
 

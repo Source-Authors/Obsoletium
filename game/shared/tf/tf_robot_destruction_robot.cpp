@@ -310,8 +310,7 @@ void CTFRobotDestruction_Robot::FireEvent( const Vector& origin, const QAngle& a
 		FOR_EACH_VEC( m_aSpawnProps, i )
 		{
 			char pstrLowerName[ MAX_PATH ];
-			memset( pstrLowerName, 0, sizeof(pstrLowerName) );
-			Q_snprintf( pstrLowerName, sizeof(pstrLowerName), "%s", options );
+			V_strcpy_safe( pstrLowerName, options );
 			Q_strlower( pstrLowerName );
 			if ( Q_strstr( m_aSpawnProps[i].modelName, pstrLowerName ) )
 			{
@@ -376,8 +375,7 @@ void CTFRobotDestruction_Robot::HandleAnimEvent( animevent_t *pEvent )
 			FOR_EACH_VEC( m_aSpawnProps, i )
 			{
 				char pstrLowerName[ MAX_PATH ];
-				memset( pstrLowerName, 0, sizeof(pstrLowerName) );
-				Q_snprintf( pstrLowerName, sizeof(pstrLowerName), "%s", pEvent->options );
+				V_strcpy_safe( pstrLowerName, pEvent->options );
 				Q_strlower( pstrLowerName );
 				if ( Q_strstr( m_aSpawnProps[i].modelName, pstrLowerName ) )
 				{

@@ -1611,7 +1611,7 @@ char const * Host_CleanupConVarStringValue( char const *invalue )
 {
 	static char clean[ 256 ];
 
-	V_sprintf_safe( clean, "%s", invalue );
+	V_strcpy_safe( clean, invalue );
 
 	// Don't mess with empty string
 	// Otherwise, if it appears numeric and has a decimal, try to strip all zeroes after decimal

@@ -121,7 +121,7 @@ void CDownloadListGenerator::OnLevelLoadStart(const char *levelName)
 	Q_FixSlashes( m_gameDir );
 
 	// save off the map name
-	Q_snprintf( m_mapName, sizeof( m_mapName ), "%s", levelName );
+	V_strcpy_safe( m_mapName, levelName );
 }
 
 //-----------------------------------------------------------------------------

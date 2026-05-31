@@ -50,7 +50,7 @@ static bool ConstructFullImagePath(
 	{
 		// Use the specified image
 		if ( pchImageName[ 0 ] != '.' )
-			V_sprintf_safe( pchImageFileName, "%s", pchImageName );
+			V_strcpy_safe( pchImageFileName, pchImageName );
 		else
 			V_sprintf_safe( pchImageFileName, "%s/%s", pCurrentPath, pchImageName );
 

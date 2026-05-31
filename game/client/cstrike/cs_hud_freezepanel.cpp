@@ -319,7 +319,7 @@ void CCSFreezePanel::SetActive( bool bActive )
 		}
 
 		char szKey[16];
-		Q_snprintf( szKey, sizeof(szKey), "%s", pKey );
+		V_strcpy_safe( szKey, pKey );
 		wchar_t wKey[16];
 		wchar_t wLabel[256];
 

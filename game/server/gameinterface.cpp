@@ -362,7 +362,7 @@ void DrawMeasuredSections(void)
 	while ( p )
 	{
 		char str[256];
-		Q_snprintf(str,sizeof(str),"%s",p->GetName());
+		V_strcpy_safe(str,p->GetName());
 		NDebugOverlay::ScreenText( 0.01,0.51+(row*rowheight),str, 255,255,255,255, 0.0 );
 		
 		Q_snprintf(str,sizeof(str),"%5.2f\n",p->GetTime().GetMillisecondsF());

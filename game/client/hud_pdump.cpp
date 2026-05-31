@@ -78,7 +78,7 @@ void CPDumpPanel::DumpComparision( const char *classname, const char *fieldname,
 
 	DumpInfo *slot = &m_DumpEntityInfo[ idx ];
 
-	Q_snprintf( slot->classname, sizeof( slot->classname ), "%s", classname );
+	V_strcpy_safe( slot->classname, classname );
 	slot->networked = networked;
 	Q_snprintf( slot->fieldstring, sizeof( slot->fieldstring ), "%s %s",
 		fieldname,
@@ -318,7 +318,7 @@ void CPDumpPanel::Paint()
 			surface()->DrawSetTextFont( m_FontMedium );
 			surface()->DrawSetTextColor( Color( 0, 255, 100, 255 ) );
 			surface()->DrawSetTextPos( x[ col ] - 10, y );
-			Q_snprintf( sz, sizeof( sz ), "%s", slot->classname );
+			V_strcpy_safe( sz, slot->classname );
 			g_pVGuiLocalize->ConvertANSIToUnicode( sz, szconverted );
 			surface()->DrawPrintText( szconverted, V_wcslen( szconverted ) );
 
@@ -333,7 +333,7 @@ void CPDumpPanel::Paint()
 		surface()->DrawSetTextFont( m_FontSmall );
 		surface()->DrawSetTextColor( Color( r, g, b, a ) );
 		surface()->DrawSetTextPos( x[ col ], y );
-		Q_snprintf( sz, sizeof( sz ), "%s", slot->fieldstring );
+		V_strcpy_safe( sz, slot->fieldstring );
 		g_pVGuiLocalize->ConvertANSIToUnicode( sz, szconverted );
 		surface()->DrawPrintText( szconverted, V_wcslen( szconverted ) );
 

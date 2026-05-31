@@ -140,7 +140,7 @@ bool CWeaponBox::PackAmmo( char *szName, int iCount )
 		return false;
 	}
 	
-	Q_snprintf( szConvertedName, sizeof( szConvertedName ), "%s", szName );
+	V_strcpy_safe( szConvertedName, szName );
 	if ( V_strieq( szName, "bolts" ) )
 	{
 		Q_snprintf( szConvertedName, sizeof( szConvertedName ), "XBowBolt" );

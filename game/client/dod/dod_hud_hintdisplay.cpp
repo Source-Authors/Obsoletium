@@ -171,7 +171,7 @@ bool CDODHudHintDisplay::SetHintText( wchar_t *text )
 
 					//!! change some key names into better names
 					char friendlyName[64];
-					Q_snprintf( friendlyName, sizeof(friendlyName), "%s", key );
+					V_strcpy_safe( friendlyName, key );
 					Q_strupr( friendlyName );
 
 					g_pVGuiLocalize->ConvertANSIToUnicode( friendlyName, token, sizeof(token) );

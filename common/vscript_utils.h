@@ -62,7 +62,7 @@ inline bool ScriptVmStringFromVariant( ScriptVariant_t &varValue, char (&chScrat
 		V_sprintf_safe( chScratchBuffer, "%c", ( char ) varValue );
 		return true;
 	case FIELD_CSTRING:
-		V_sprintf_safe( chScratchBuffer, "%s", ( const char * ) varValue );
+		V_strcpy_safe( chScratchBuffer, ( const char * ) varValue );
 		return true;
 	default:
 		Warning( "ScriptVmStringFromVariant failed to unpack parameter variant type %d\n", varValue.GetType() );

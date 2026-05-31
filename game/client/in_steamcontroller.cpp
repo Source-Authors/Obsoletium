@@ -269,7 +269,7 @@ void CInput::SteamControllerMove( float flFrametime, CUserCmd *cmd )
 				if ( ( data.bState && !state.bAwaitingDebounce ) || state.cmd[0] == '+' )
 				{
 					char cmdbuf[128];
-					Q_snprintf( cmdbuf, sizeof( cmdbuf ), "%s", state.cmd );
+					V_strcpy_safe( cmdbuf, state.cmd );
 					if ( !data.bState )
 					{
 						cmdbuf[0] = '-';

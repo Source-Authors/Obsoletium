@@ -97,7 +97,7 @@ public:
 		}
 
 		char szKeyBuffer[16];
-		int nKeyLength = Q_snprintf( szKeyBuffer, sizeof( szKeyBuffer ), "%s", tf_server_identity_token.GetString() );
+		int nKeyLength = V_sprintf_safe( szKeyBuffer, "%s", tf_server_identity_token.GetString() );
 
 		if ( nKeyLength <= 0 || nKeyLength >= ARRAYSIZE( szKeyBuffer ) )
 		{

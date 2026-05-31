@@ -934,7 +934,7 @@ void CStaticProp::DisplayStaticPropInfo( int nInfoType )
 	switch( nInfoType )
 	{
 	case 1:
-		Q_snprintf( buf, sizeof( buf ), "%s", modelloader->GetName( m_pModel ) );
+		V_strcpy_safe( buf, modelloader->GetName( m_pModel ) );
 		break;
 
 	case 2:

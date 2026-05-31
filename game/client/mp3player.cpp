@@ -1055,7 +1055,7 @@ MP3Dir_t *CMP3Player::FindOrAddSubdirectory( MP3Dir_t *parent, char const *dirna
 	char fullpath[ 512 ];
 	if ( Q_isempty( parent->m_FullDirPath.String() ) )
 	{
-		V_sprintf_safe( fullpath, "%s", dirname );
+		V_strcpy_safe( fullpath, dirname );
 	}
 	else
 	{
@@ -1135,7 +1135,7 @@ void CMP3Player::RecursiveFindMP3Files( SoundDirectory_t *root, char const *curr
 					}
 					else
 					{
-						V_sprintf_safe( nextdir, "%s", fn );
+						V_strcpy_safe( nextdir, fn );
 					}
 
 					RecursiveFindMP3Files( root, nextdir, pathID );
@@ -1160,7 +1160,7 @@ void CMP3Player::RecursiveFindMP3Files( SoundDirectory_t *root, char const *curr
 							}
 							else
 							{
-								V_sprintf_safe( relative, "%s", fn );
+								V_strcpy_safe( relative, fn );
 							}
 						}
 						Msg( "Found '%s/%s'\n", current, fn );
