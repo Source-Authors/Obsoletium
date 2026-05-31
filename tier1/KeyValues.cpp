@@ -1954,6 +1954,27 @@ KeyValues& KeyValues::operator=( const KeyValues& src )
 }
 
 
+KeyValues& KeyValues::operator=( KeyValues&& src ) noexcept
+{
+	using std::swap;
+
+	swap( m_iKeyName, src.m_iKeyName );
+
+	swap( m_sValue, src.m_sValue );
+	swap( m_wsValue, src.m_wsValue );
+
+	swap( m_pValue, src.m_pValue );
+
+	swap( m_iDataType, src.m_iDataType );
+	swap( m_bHasEscapeSequences, src.m_bHasEscapeSequences );
+	swap( m_bEvaluateConditionals, src.m_bEvaluateConditionals );
+
+	swap( m_pPeer, src.m_pPeer );
+	swap( m_pSub, src.m_pSub );
+	swap( m_pChain, src.m_pChain );
+	return *this;
+}
+
 //-----------------------------------------------------------------------------
 // Make a new copy of all subkeys, add them all to the passed-in keyvalues
 //-----------------------------------------------------------------------------

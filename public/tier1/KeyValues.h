@@ -206,6 +206,31 @@ public:
 	void operator delete( void *pMem, int nBlockUse, const char *pFileName, int nLine );
 
 	KeyValues& operator=( const KeyValues& src );
+	// dimhotepus: Add move ctor / assignment.
+	KeyValues( KeyValues&& src ) noexcept
+		: m_iKeyName{std::move(src.m_iKeyName)},
+		m_sValue{std::move(src.m_sValue)},
+		m_wsValue{std::move(src.m_wsValue)},
+		m_pValue{std::move(src.m_pValue)},
+		m_iDataType{std::move(src.m_iDataType)},
+		m_bHasEscapeSequences{std::move(src.m_bHasEscapeSequences)},
+		m_bEvaluateConditionals{std::move(src.m_bEvaluateConditionals)},
+		m_pPeer{std::move(src.m_pPeer)},
+		m_pSub{std::move(src.m_pSub)},
+		m_pChain{std::move(src.m_pChain)}
+	{
+		src.m_iKeyName = -1;
+		src.m_sValue = nullptr;
+		src.m_wsValue = nullptr;
+		src.m_pValue = nullptr;
+		src.m_iDataType = TYPE_NONE;
+		src.m_bHasEscapeSequences = false;
+		src.m_bEvaluateConditionals = false;
+		src.m_pPeer = nullptr;
+		src.m_pSub = nullptr;
+		src.m_pChain = nullptr;
+	}
+	KeyValues& operator=( KeyValues&& src ) noexcept;
 
 	// Adds a chain... if we don't find stuff in this keyvalue, we'll look
 	// in the one we're chained to.

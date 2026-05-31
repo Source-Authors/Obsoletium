@@ -3501,7 +3501,8 @@ void ExpandPatchFile( KeyValues& keyValues, KeyValues &patchKeyValues, const cha
 	{
 		// We're dealing with a patch file. Apply accumulated patches to final vmt
 		ApplyPatchKeyValues( *pNonPatchKeyValues, patchKeyValues );
-		keyValues = *pNonPatchKeyValues;
+		// dimhotepus: Use move to speedup.
+		keyValues = std::move( *pNonPatchKeyValues );
 		pNonPatchKeyValues->deleteThis();
 	}
 }
