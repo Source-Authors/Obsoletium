@@ -649,7 +649,7 @@ bool ValidateCombinedFileCheckSum( char const *outfilename, char const *cctoken,
 
 	char actualfile[ 512 ];
 	g_pSoundEmitterSystem->GenderExpandString( gender, outfilename, actualfile, sizeof( actualfile ) );
-	if ( Q_strlen( actualfile ) <= 0 )
+	if ( Q_isempty( actualfile ) )
 	{
 		return false;
 	}
@@ -890,7 +890,7 @@ void ParseVCDFilesFromResList( CUtlVector< CUtlSymbol >& vcdsinreslist, char con
 					if ( !pFileList )
 						break;
 
-					if ( strlen( tokenFile ) > 0 )
+					if ( !Q_isempty( tokenFile ) )
 					{
 						char szFileName[ 256 ];
 						Q_strncpy( szFileName, tokenFile, sizeof( szFileName ) );
@@ -1004,7 +1004,7 @@ void BuildVCDAndMapNameListsFromReslists( CUtlVector< CUtlSymbol >& vcdsinreslis
 
 						pFileList = ParseFile( pFileList, com_token, NULL );
 
-						if ( strlen( com_token ) <= 0 )
+						if ( Q_isempty( com_token ) )
 							break;
 
 						Q_strncpy(szMap, com_token, sizeof(szMap));
@@ -1126,7 +1126,7 @@ void ParseUsedSoundsFromSndFile( CUtlRBTree< int, int >& usedsounds, char const 
 					if ( !pFileList )
 						break;
 
-					if ( strlen( tokenFile ) > 0 )
+					if ( !Q_isempty( tokenFile ) )
 					{
 						char soundname[ 256 ];
 						Q_strncpy( soundname, tokenFile, sizeof( soundname ) );
