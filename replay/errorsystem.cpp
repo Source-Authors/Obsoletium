@@ -51,15 +51,11 @@ void CErrorSystem::Clear()
 
 void CErrorSystem::AddError( const wchar_t *pError )
 {
-	if ( !pError || !pError[0] )
+	if ( Q_isempty( pError ) )
 		return;
 
 	// Cache a copied version of the string
-	const int nLen = wcslen( pError ) + 1;
-	wchar_t *pNewError = new wchar_t[ nLen ];
-	const int nSize = nLen * sizeof( wchar_t );
-	V_wcsncpy( pNewError, pError, nSize );
-
+	wchar_t *pNewError = V_wcsdup( pError );
 	m_lstErrors.AddToTail( pNewError );
 }
 
