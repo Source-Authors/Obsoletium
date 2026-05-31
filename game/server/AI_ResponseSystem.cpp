@@ -2789,11 +2789,7 @@ public:
 	  m_pszScriptFile( 0 )
 	{
 		Assert( scriptfile );
-
-		intp len = Q_strlen( scriptfile ) + 1;
-		m_pszScriptFile = new char[ len ];
-		Assert( m_pszScriptFile );
-		Q_strncpy( m_pszScriptFile, scriptfile, len );
+		m_pszScriptFile = V_strdup( scriptfile );
 	}
 
 	~CInstancedResponseSystem()
