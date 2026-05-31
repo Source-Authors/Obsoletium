@@ -734,17 +734,24 @@ const char *CMaterialVar::GetStringValue( void ) const
 
 	case MATERIAL_VAR_TYPE_TEXTURE:
 		// check for env_cubemap
-		if( IsTextureInternalEnvCubemap( m_pTexture ) )
+		if ( IsTextureInternalEnvCubemap( m_pTexture ) )
 		{
 			return "env_cubemap";
 		}
 		else
 		{
-			Q_snprintf( s_CharBuf, sizeof( s_CharBuf ), "%s", m_pTexture->GetName() );
+			V_strcpy_safe( s_CharBuf, m_pTexture->GetName() );
 			return s_CharBuf;
 		}
 	case MATERIAL_VAR_TYPE_MATERIAL:
-		Q_snprintf( s_CharBuf, sizeof( s_CharBuf ), "%s", ( m_pMaterialValue ? m_pMaterialValue->GetName() : "" ) );
+		if ( m_pMaterialValue )
+		{
+			V_strcpy_safe( s_CharBuf, m_pMaterialValue->GetName() );
+		}
+		else
+		{
+			s_CharBuf[0] = '\0';
+		}
 		return s_CharBuf;
 
 	case MATERIAL_VAR_TYPE_UNDEFINED:
