@@ -370,7 +370,7 @@ void CServerBrowserDialog::UpdateStatusText(wchar_t *unicode)
 	if ( !m_pStatusLabel )
 		return;
 
-	if ( unicode && wcslen(unicode) > 0 )
+	if ( !Q_isempty( unicode ) )
 	{
 		m_pStatusLabel->SetText( unicode );
 	}
