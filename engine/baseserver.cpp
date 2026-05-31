@@ -1985,7 +1985,7 @@ CBaseClient * CBaseServer::GetFreeClient( netadr_t &adr )
 
 	if ( !freeclient )
 	{
-		int count = m_Clients.Count();
+		intp count = m_Clients.Count();
 
 		if ( count >= m_nMaxclients )
 		{
@@ -2101,7 +2101,7 @@ void CBaseServer::Shutdown( void )
 	m_State = ss_dead;
 
 	// Only drop clients if we have not cleared out entity data prior to this.
-	for(  int i=m_Clients.Count()-1; i>=0; i-- )
+	for( intp i=m_Clients.Count()-1; i>=0; i-- )
 	{
 		CBaseClient * cl = m_Clients[ i ];
 		if ( cl->IsConnected() )
@@ -2113,7 +2113,7 @@ void CBaseServer::Shutdown( void )
 			// free any memory do this out side here in case the reason the server is shutting down 
 			// is because the listen server client typed disconnect, in which case we won't call
 			// cl->DropClient, but the client might have some frame snapshot references left over, etc.
-			cl->Clear();	
+			cl->Clear();
 		}
 
 		delete cl;
@@ -2314,7 +2314,7 @@ void CBaseServer::WriteTempEntities( CBaseClient *client, CFrameSnapshot *pCurre
 		{
 			buffer.WriteOneBit( 0 ); // delta against last temp entity
 
-			int startBit = bDebug ? buffer.GetNumBitsWritten() : 0;
+			intp startBit = bDebug ? buffer.GetNumBitsWritten() : 0;
 
 			SendTable_WriteAllDeltaProps( event->pSendTable, 
 				pLastEvent->pData,
@@ -2326,8 +2326,8 @@ void CBaseServer::WriteTempEntities( CBaseClient *client, CFrameSnapshot *pCurre
 
 			if ( bDebug )
 			{
-				int length = buffer.GetNumBitsWritten() - startBit;
-				DevMsg("TE %s delta bits: %i\n", event->pSendTable->GetName(), length );
+				intp length = buffer.GetNumBitsWritten() - startBit;
+				DevMsg("TE %s delta bits: %zd\n", event->pSendTable->GetName(), length );
 			}
 		}
 		else
@@ -2336,7 +2336,7 @@ void CBaseServer::WriteTempEntities( CBaseClient *client, CFrameSnapshot *pCurre
 
 			buffer.WriteOneBit( 1 );
 
-			int startBit = bDebug ? buffer.GetNumBitsWritten() : 0;
+			intp startBit = bDebug ? buffer.GetNumBitsWritten() : 0;
 
 			buffer.WriteUBitLong( event->classID, GetClassBits() );
 
@@ -2358,8 +2358,8 @@ void CBaseServer::WriteTempEntities( CBaseClient *client, CFrameSnapshot *pCurre
 
 			if ( bDebug )
 			{
-				int length = buffer.GetNumBitsWritten() - startBit;
-				DevMsg("TE %s full bits: %i\n", event->pSendTable->GetName(), length );
+				intp length = buffer.GetNumBitsWritten() - startBit;
+				DevMsg("TE %s full bits: %zd\n", event->pSendTable->GetName(), length );
 			}
 		}
 
