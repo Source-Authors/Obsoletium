@@ -2559,7 +2559,7 @@ const char *CTFWeaponBase::GetMuzzleFlashModel( void )
 { 
 	const char *pszModel = GetTFWpnData().m_szMuzzleFlashModel;
 
-	if ( Q_strlen( pszModel ) > 0 )
+	if ( !Q_isempty( pszModel ) )
 	{
 		return pszModel;
 	}
@@ -2584,7 +2584,7 @@ const char *CTFWeaponBase::GetMuzzleFlashParticleEffect( void )
 		}
 	}
 
-	if ( Q_strlen( pszPEffect ) > 0 )
+	if ( !Q_isempty( pszPEffect ) )
 	{
 		return pszPEffect;
 	}

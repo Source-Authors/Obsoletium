@@ -153,7 +153,7 @@ void CDODPlayerClassInfo::Parse( KeyValues *pKeyValuesData, const char *szWeapon
 
 	Q_strncpy( m_szLimitCvar, pKeyValuesData->GetString( "limitcvar", "!! Missing limit cvar on Player Class" ), sizeof(m_szLimitCvar) );
 
-	Assert( Q_strlen( m_szLimitCvar ) > 0 && "Every class must specify a limitcvar" );
+	Assert( !Q_isempty( m_szLimitCvar ) && "Every class must specify a limitcvar" );
 
 	m_bClassLimitMGMerge = ( pKeyValuesData->GetInt( "mergemgclass" ) > 0 );
 
