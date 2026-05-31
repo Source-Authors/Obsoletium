@@ -50,7 +50,7 @@ public:
 
 private:
 	// CFileChangeWatcher::ICallbacks..
-	virtual void OnFileChange( const char *pRelativeFilename, const char *pFullFilename );
+	void OnFileChange( const char *pRelativeFilename, const char *pFullFilename ) override;
 
 private:
 	CFileChangeWatcher m_Watcher;
