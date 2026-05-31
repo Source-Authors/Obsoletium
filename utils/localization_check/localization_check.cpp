@@ -2660,9 +2660,7 @@ struct OrderedCaption_t
 
 		if ( src.commands )
 		{
-			int len = wcslen( src.commands ) + 1;
-			commands = new wchar_t[ len ];
-			wcscpy( commands, src.commands );
+			commands = V_wcsdup( src.commands );
 		}
 		else
 		{
@@ -2671,9 +2669,7 @@ struct OrderedCaption_t
 
 		if ( src.english )
 		{
-			int len = wcslen( src.english ) + 1;
-			english = new wchar_t[ len ];
-			wcscpy( english, src.english );
+			english = V_wcsdup( src.english );
 		}
 		else
 		{
@@ -2769,11 +2765,7 @@ wchar_t *GetStartupCommands( const wchar_t *str )
 
 wchar_t *CopyUnicode( const wchar_t *in )
 {
-	int len = wcslen( in ) + 1;
-	wchar_t *out = new wchar_t[ len ];
-	wcsncpy( out, in, len );
-	out[ len - 1 ] = L'\0';
-	return out;
+	return V_wcsdup( in );
 }
 
 void BuildOrderedCaptionList( CUtlVector< OrderedCaption_t >& list )

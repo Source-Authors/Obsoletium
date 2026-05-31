@@ -136,9 +136,7 @@ void SetPassword( const char *pPassword )
 	delete [] g_pPassword;
 	if ( pPassword )
 	{
-		int len = V_strlen( pPassword ) + 1;
-		g_pPassword = new char[len];
-		V_strncpy( g_pPassword, pPassword, len );
+		g_pPassword = V_strdup( pPassword );
 	}
 	else
 	{
@@ -391,10 +389,7 @@ SpewRetval_t MySpewOutputFunc( SpewType_t spewType, const char *pMsg )
 
 char* CopyString( const char *pStr )
 {
-	int len = V_strlen( pStr ) + 1;
-	char *pRet = new char[len];
-	V_strncpy( pRet, pStr, len );
-	return pRet;
+	return V_strdup( pStr );
 }
 
 void AppendArg( CUtlVector<char*> &newArgv, const char *pIn )

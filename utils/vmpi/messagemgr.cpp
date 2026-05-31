@@ -250,11 +250,7 @@ DWORD CMessageMgr::ThreadFn()
 			{
 				index = m_MessageQ.AddToTail();
 			}
-			int bufLen = strlen( m_pMessageText ) + 1;
-			m_MessageQ[index] = new char[ bufLen ];
-			strcpy( m_MessageQ[index], m_pMessageText );
-
-
+			m_MessageQ[index] = V_strdup( m_pMessageText );
 			
 			// Ok, send out the message.
 			char packetID = MSGMGR_PACKETID_MSG;
