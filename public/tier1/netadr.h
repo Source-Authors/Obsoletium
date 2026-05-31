@@ -47,14 +47,17 @@ public:
 	// DON'T CALL THIS
 	[[nodiscard]] const char*		ToString( bool onlyBase = false ) const; // returns xxx.xxx.xxx.xxx:ppppp
 
-	void	ToString( OUT_Z_CAP(unBufferSize) char *pchBuffer, size_t unBufferSize, bool onlyBase = false ) const; // returns xxx.xxx.xxx.xxx:ppppp
+	// returns xxx.xxx.xxx.xxx:ppppp
+	const char *ToString( OUT_Z_CAP(unBufferSize) char *pchBuffer, size_t unBufferSize, bool onlyBase = false ) const;
+	// returns xxx.xxx.xxx.xxx:ppppp
 	template< size_t maxLenInChars >
-	void	ToString_safe( OUT_Z_ARRAY char (&pDest)[maxLenInChars], bool onlyBase = false ) const
+	std::enable_if_t<maxLenInChars >= 22, const char>
+	*ToString_safe( OUT_Z_ARRAY char (&pDest)[maxLenInChars], bool onlyBase = false ) const
 	{
-		ToString( &pDest[0], maxLenInChars, onlyBase );
+		return ToString( pDest, maxLenInChars, onlyBase );
 	}
 
-	void			ToSockadr(struct sockaddr *s) const;
+	void ToSockadr(struct sockaddr *s) const;
 
 	// Returns 0xAABBCCDD for AA.BB.CC.DD on all platforms, which is the same format used by SetIP().
 	// (So why isn't it just named GetIP()?  Because previously there was a fucntion named GetIP(), and
