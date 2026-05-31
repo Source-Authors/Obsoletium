@@ -160,7 +160,7 @@ bool GetModelNameFromSourceFile( char const *filename, char *modelname, int maxl
 	while ( current )
 	{
 		current = CC_ParseToken( current );
-		if ( strlen( com_token ) <= 0 )
+		if ( Q_isempty( com_token ) )
 			break;
 
 		if ( stricmp( com_token, "$modelname" ) )

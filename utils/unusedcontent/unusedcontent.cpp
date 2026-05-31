@@ -1107,7 +1107,7 @@ void ParseFilesFromResList( UnusedContent::CUtlSymbol & resfilesymbol, CUtlRBTre
 					if ( !pFileList )
 						break;
 
-					if ( strlen( token ) > 0 )
+					if ( !Q_isempty( token ) )
 					{
 						char szFileName[ 256 ];
 						Q_snprintf( szFileName, sizeof( szFileName ), "%s%s", basedir, token );

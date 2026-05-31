@@ -87,7 +87,7 @@ void CreateTemplateVMT( const char *pcDirectory, const char *pcBaseName, const c
 	V_snprintf( sz_Buffer, MAX_PATH, "\t\"$baseTexture\" \"models/contrib/%s/%s/%s\"\n", pcSteamName, pcBaseName, szTGAColorFileBase );
 	fputs( sz_Buffer,  fp );
 	
-	if ( pcTGANormalFile && ( V_strlen( pcTGANormalFile ) > 0 ) )
+	if ( !Q_isempty( pcTGANormalFile ) )
 	{
 		V_StripExtension( pcTGANormalFile, szTGANormalFileBase, sizeof( szTGANormalFileBase ) );
 		V_snprintf( sz_Buffer, MAX_PATH, "\t\"$bumpmap\" \"models/contrib/%s/%s/%s\"\n", pcSteamName, pcBaseName, szTGANormalFileBase );
@@ -294,7 +294,7 @@ bool GetSteamUserName( char *pcSteamName, size_t nSteamNameBufSize )
 		V_FileBase( szModInstallPath, pcSteamName, nSteamNameBufSize  );
 	}
 
-	return ( V_strlen( pcSteamName ) > 0 );
+	return !Q_isempty( pcSteamName );
 }
 
 bool GetSDKBinDirectory( char *pcSDKBinDir, size_t nBuffSize )

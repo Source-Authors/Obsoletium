@@ -120,13 +120,13 @@ void CMakefileCreator::CreateDirectoryFriendlyName(const char *dirName,
   }
 
   // strip any leading/trailing underscores
-  while (friendlyDirName[0] == '_' && Q_strlen(friendlyDirName) > 0) {
+  while (friendlyDirName[0] == '_' && !Q_isempty(friendlyDirName)) {
     Q_memmove(&friendlyDirName[0], &friendlyDirName[1],
               Q_strlen(friendlyDirName) - 1);
     friendlyDirName[Q_strlen(friendlyDirName) - 1] = 0;
   }
 
-  while (Q_strlen(friendlyDirName) > 0 &&
+  while (!Q_isempty(friendlyDirName) &&
          friendlyDirName[Q_strlen(friendlyDirName) - 1] == '_') {
     friendlyDirName[Q_strlen(friendlyDirName) - 1] = 0;
   }

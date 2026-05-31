@@ -373,12 +373,14 @@ void CWorkspace::SetVSSUserName( char const *username )
 void CWorkspace::SetVSSProject( char const *projectname )
 {
 	Q_strncpy( m_szVSSProject, projectname, sizeof( m_szVSSProject ) );
-	while ( Q_strlen( m_szVSSProject ) > 0 )
+	while ( !Q_isempty( m_szVSSProject ) )
 	{
-		if ( m_szVSSProject[ Q_strlen( m_szVSSProject ) - 1 ] == '/' ||
-			 m_szVSSProject[ Q_strlen( m_szVSSProject ) - 1 ] == '\\' )
+		// dimhotepus: Cache length.
+		const intp len = Q_strlen( m_szVSSProject );
+		if ( m_szVSSProject[ len - 1 ] == '/' ||
+			 m_szVSSProject[ len - 1 ] == '\\' )
 		{
-			m_szVSSProject[ Q_strlen( m_szVSSProject ) - 1 ] = 0;
+			m_szVSSProject[ len - 1 ] = 0;
 		}
 		else
 		{
