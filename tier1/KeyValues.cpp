@@ -544,16 +544,14 @@ KeyValues::~KeyValues()
 //-----------------------------------------------------------------------------
 void KeyValues::RemoveEverything()
 {
-	KeyValues *dat;
-	KeyValues *datNext = nullptr;
-	for ( dat = m_pSub; dat != nullptr; dat = datNext )
+	for ( KeyValues *dat = m_pSub, *datNext = nullptr; dat != nullptr; dat = datNext )
 	{
 		datNext = dat->m_pPeer;
 		dat->m_pPeer = nullptr;
 		delete dat;
 	}
 
-	for ( dat = m_pPeer; dat && dat != this; dat = datNext )
+	for ( KeyValues *dat = m_pPeer, *datNext = nullptr; dat && dat != this; dat = datNext )
 	{
 		datNext = dat->m_pPeer;
 		dat->m_pPeer = nullptr;
