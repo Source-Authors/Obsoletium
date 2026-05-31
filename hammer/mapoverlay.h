@@ -71,7 +71,8 @@ public:
 	void HandleMoveTo( int iHandle, Vector &vecPoint, CMapFace *pFace );
 	void SetTexCoords( Vector2D vecTexCoords[4] );
 	void GetHandlePos( int iHandle, Vector &vecPos );
-	bool IsSelected( void )									{ return ( GetSelectionState() == SELECT_NORMAL ); }
+	// dimhotepus: Add const.
+	bool IsSelected( void ) const override { return ( GetSelectionState() == SELECT_NORMAL ); }
 
 	void DoClip( void );
 	void CenterEntity( void );
