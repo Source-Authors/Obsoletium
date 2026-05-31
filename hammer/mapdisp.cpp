@@ -673,7 +673,8 @@ void CMapDisp::SamplePoints( int index, int width, int height, bool *pValidPoint
 	// set initial sample values
 	//
 	Vector vField, vSPos, vSNormal;
-	int value = GetFieldDistance( index );
+	// dimhotepus: int -> float.
+	float value = GetFieldDistance( index );
 	float alpha = GetAlpha( index );
 	GetFieldVector( index, vField );
 	GetSubdivPosition( index, vSPos );
