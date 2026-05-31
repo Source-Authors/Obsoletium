@@ -182,7 +182,7 @@ bool CModWizardSubPanel_CopyFiles_Source2006::BuildCopyFilesForMod_HL2()
 
 	char outputGamedirNameNoSlash[MAX_PATH];
 	Q_strncpy( outputGamedirNameNoSlash, m_OutModGamedirName, sizeof( outputGamedirNameNoSlash ) );
-	if ( strlen( outputGamedirNameNoSlash ) > 0 )
+	if ( !Q_isempty( outputGamedirNameNoSlash ) )
 		outputGamedirNameNoSlash[strlen(outputGamedirNameNoSlash)-1] = 0;
 	
 	// These go in c:\steam\steamapps\sourcemods\modname
@@ -249,7 +249,7 @@ bool CModWizardSubPanel_CopyFiles_Source2009::BuildCopyFilesForMod_HL2()
 
 	char outputGamedirNameNoSlash[MAX_PATH];
 	Q_strncpy( outputGamedirNameNoSlash, m_OutModGamedirName, sizeof( outputGamedirNameNoSlash ) );
-	if ( strlen( outputGamedirNameNoSlash ) > 0 )
+	if ( !Q_isempty( outputGamedirNameNoSlash ) )
 		outputGamedirNameNoSlash[strlen(outputGamedirNameNoSlash)-1] = 0;
 
 	// These go in c:\steam\steamapps\sourcemods\modname
@@ -311,7 +311,7 @@ bool CModWizardSubPanel_CopyFiles_Source2007::BuildCopyFilesForMod_HL2()
 
 	char outputGamedirNameNoSlash[MAX_PATH];
 	Q_strncpy( outputGamedirNameNoSlash, m_OutModGamedirName, sizeof( outputGamedirNameNoSlash ) );
-	if ( strlen( outputGamedirNameNoSlash ) > 0 )
+	if ( !Q_isempty( outputGamedirNameNoSlash ) )
 		outputGamedirNameNoSlash[strlen(outputGamedirNameNoSlash)-1] = 0;
 
 	// These go in c:\steam\steamapps\sourcemods\modname
@@ -513,7 +513,7 @@ bool CModWizardSubPanel_CopyFiles_Source2006::BuildCopyFilesForMod_HL2MP()
 
 	char outputGamedirNameNoSlash[MAX_PATH];
 	Q_strncpy( outputGamedirNameNoSlash, m_OutModGamedirName, sizeof( outputGamedirNameNoSlash ) );
-	if ( strlen( outputGamedirNameNoSlash ) > 0 )
+	if ( !Q_isempty( outputGamedirNameNoSlash ) )
 		outputGamedirNameNoSlash[strlen(outputGamedirNameNoSlash)-1] = 0;
 
 	// These go in c:\steam\steamapps\sourcemods\modname
@@ -573,7 +573,7 @@ bool CModWizardSubPanel_CopyFiles_Source2009::BuildCopyFilesForMod_HL2MP()
 
 	char outputGamedirNameNoSlash[MAX_PATH];
 	Q_strncpy( outputGamedirNameNoSlash, m_OutModGamedirName, sizeof( outputGamedirNameNoSlash ) );
-	if ( strlen( outputGamedirNameNoSlash ) > 0 )
+	if ( !Q_isempty( outputGamedirNameNoSlash ) )
 		outputGamedirNameNoSlash[strlen(outputGamedirNameNoSlash)-1] = 0;
 
 	// These go in c:\steam\steamapps\sourcemods\modname
@@ -631,7 +631,7 @@ bool CModWizardSubPanel_CopyFiles_Source2007::BuildCopyFilesForMod_HL2MP()
 
 	char outputGamedirNameNoSlash[MAX_PATH];
 	Q_strncpy( outputGamedirNameNoSlash, m_OutModGamedirName, sizeof( outputGamedirNameNoSlash ) );
-	if ( strlen( outputGamedirNameNoSlash ) > 0 )
+	if ( !Q_isempty( outputGamedirNameNoSlash ) )
 		outputGamedirNameNoSlash[strlen(outputGamedirNameNoSlash)-1] = 0;
 	
 	// These go in c:\steam\steamapps\sourcemods\modname
@@ -846,7 +846,7 @@ void CModWizardSubPanel_CopyFiles::OnTick()
 				// Also, add a game configuration.
 				char modGamedirNoSlash[MAX_PATH];
 				Q_strncpy( modGamedirNoSlash, m_OutModGamedirName, sizeof( modGamedirNoSlash ) );
-				if ( strlen( modGamedirNoSlash ) > 0 )
+				if ( !Q_isempty( modGamedirNoSlash ) )
 				{
 					if ( modGamedirNoSlash[strlen(modGamedirNoSlash)-1] == '/' || modGamedirNoSlash[strlen(modGamedirNoSlash)-1] == '\\' )
 						modGamedirNoSlash[strlen(modGamedirNoSlash)-1] = 0;
