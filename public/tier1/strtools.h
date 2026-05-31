@@ -264,6 +264,8 @@ void V_normalizeFloatString( INOUT_Z char* pFloat );
 }
 
 [[nodiscard]] inline bool V_isempty( IN_OPT_Z const char* pszString ) { return !pszString || !pszString[ 0 ]; }
+// dimhotepus: Add wchar_t version.
+[[nodiscard]] inline bool V_isempty( IN_OPT_Z const wchar_t* pszString ) { return !pszString || !pszString[ 0 ]; }
 
 // The islower/isdigit/etc. functions all expect a parameter that is either
 // 0-0xFF or EOF. It is easy to violate this constraint simply by passing
@@ -1574,9 +1576,9 @@ size_t Q_URLDecode( OUT_CAP(nDecodeDestLen) char *pchDecodeDest, intp nDecodeDes
 #define Q_MakeRelativePath		V_MakeRelativePath
 #define Q_qsort_s				V_qsort_s
 
-[[nodiscard]] inline bool Q_isempty(IN_Z const char *v) { return V_isempty(v); }
+[[nodiscard]] inline bool Q_isempty(IN_OPT_Z const char *v) { return V_isempty(v); }
 
-[[nodiscard]] inline bool Q_isempty(IN_Z const wchar_t *v) { return v[0] == L'\0'; }
+[[nodiscard]] inline bool Q_isempty(IN_OPT_Z const wchar_t *v) { return V_isempty(v); }
 
 template<size_t size>
 [[nodiscard]] constexpr inline bool Q_isempty(IN_Z_ARRAY char (&v)[size]) { return v[0] == '\0'; }
