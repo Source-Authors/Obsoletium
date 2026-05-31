@@ -964,9 +964,7 @@ void CAchievementsPageGroupPanel::PreloadResourceFile( void )
 void CAchievementsPageGroupPanel::SetGroupInfo( const wchar_t* name, int firstAchievementID, int lastAchievementID )
 {
     // Store away the group name
-    short   _textLen = (short)wcslen(name) + 1;
-    m_pGroupName = new wchar_t[_textLen];
-    Q_memcpy( m_pGroupName, name, _textLen * sizeof(wchar_t) );
+    m_pGroupName = V_wcsdup( name );
 
     // Store off the start & end achievement IDs
     m_iFirstAchievementID = firstAchievementID;

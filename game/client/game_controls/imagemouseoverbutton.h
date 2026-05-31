@@ -131,17 +131,13 @@ void CImageMouseOverButton<T>::RecalculateImageSizes( void )
 template <class T>
 void CImageMouseOverButton<T>::SetActiveImage( const char *imagename )
 {
-	intp len = Q_strlen( imagename ) + 1;
-	m_pszActiveImageName = new char[ len ];
-	Q_strncpy( m_pszActiveImageName, imagename, len );
+	m_pszActiveImageName = V_strdup( imagename );
 }
 
 template <class T>
 void CImageMouseOverButton<T>::SetInactiveImage( const char *imagename )
 {
-	intp len = Q_strlen( imagename ) + 1;
-	m_pszInactiveImageName = new char[ len ];
-	Q_strncpy( m_pszInactiveImageName, imagename, len );
+	m_pszInactiveImageName = V_strdup( imagename );
 }
 
 template <class T>

@@ -323,13 +323,8 @@ void CBaseStatGroupPanel::PreloadResourceFile( void )
 void CBaseStatGroupPanel::SetGroupInfo ( const wchar_t* name, const wchar_t* title)
 {
 	// Store away the group name
-	short   _textLen = (short)wcslen(name) + 1;
-	m_pGroupName = new wchar_t[_textLen];
-	Q_memcpy( m_pGroupName, name, _textLen * sizeof(wchar_t) );
-
-	_textLen = (short)wcslen(title) + 1;
-	m_pGroupTitle = new wchar_t[_textLen];
-	Q_memcpy( m_pGroupTitle, title, _textLen * sizeof(wchar_t) );
+	m_pGroupName = V_wcsdup( name );
+	m_pGroupTitle = V_wcsdup( title );
 }
 
 

@@ -935,17 +935,8 @@ void ClientModeTFNormal::FireGameEvent( IGameEvent *event )
 			const char *hostname = event->GetString( "hostname" );
 			if ( hostname )
 			{
-				if ( m_lastServerName )
-				{
-					delete [] m_lastServerName;
-					m_lastServerName = NULL;
-				}
-
-				int hostnameLength = V_strlen( hostname )+1;
-
-				m_lastServerName = new char[ hostnameLength ];
-
-				V_strncpy( m_lastServerName, hostname, hostnameLength );
+				delete [] m_lastServerName;
+				m_lastServerName = V_strdup( hostname );
 			}
 
 			m_lastServerConnectTime = GetSteamWorksSGameStatsUploader().GetTimeSinceEpoch();

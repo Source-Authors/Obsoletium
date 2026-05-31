@@ -92,9 +92,7 @@ bool VideoPlayerPanel::SetVideo( const char *pVideoFile )
 	}
 
 	// save filename	
-	intp sLen = V_strlen( pVideoFile ) + 1;
-	m_VideoFileName = new char[ sLen ];
-	V_strncpy( m_VideoFileName, pVideoFile, sLen );
+	m_VideoFileName = V_strdup( pVideoFile );
 	
 	// compute Playback dimensions
 	
