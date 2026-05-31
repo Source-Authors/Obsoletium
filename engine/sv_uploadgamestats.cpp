@@ -973,7 +973,8 @@ EGameStatsUploadStatus Win32UploadGameStatsBlocking
 	struct sockaddr_in sa;
 	rGameStatsParameters.m_ipCSERServer.ToSockadr( (struct sockaddr *)&sa );
 
-	UpdateProgress( rGameStatsParameters, "Sending game stats to server %s.", rGameStatsParameters.m_ipCSERServer.ToString() );
+	char buffer[32];
+	UpdateProgress( rGameStatsParameters, "Sending game stats to server %s.", rGameStatsParameters.m_ipCSERServer.ToString_safe(buffer) );
 
 	bcs.SendSocketMessage( sa, buf.Base<const u8>(), buf.TellPut() ); //lint !e534
 
@@ -1039,7 +1040,8 @@ EGameStatsUploadStatus Win32UploadGameStatsBlocking
 				return eGameStatsUploadFailed;
 			}
 
-			UpdateProgress( rGameStatsParameters, "Server requested game stats upload to %s.", GameStatsHarvesterFSMIPAddress.ToString() );
+			char buffer[32];
+			UpdateProgress( rGameStatsParameters, "Server requested game stats upload to %s.", GameStatsHarvesterFSMIPAddress.ToString_safe(buffer) );
 
 			// Keep using the same scratch buffer for messaging
 			CWin32UploadGameStats uploader( GameStatsHarvesterFSMIPAddress, rGameStatsParameters, dumpcontext );

@@ -693,9 +693,9 @@ bool CHLTVServer::DispatchToRelay( CHLTVClient *pClient )
 	if ( !pszRelayAddr )
 		return false;
 	
-
+	char buffer[32];
 	ConMsg( "Redirecting spectator %s to SourceTV relay %s\n", 
-		pClient->GetNetChannel()->GetRemoteAddress().ToString(), 
+		pClient->GetNetChannel()->GetRemoteAddress().ToString_safe(buffer), 
 		pszRelayAddr );
 
 	// first tell that client that we are a SourceTV server,
@@ -710,7 +710,6 @@ bool CHLTVServer::DispatchToRelay( CHLTVClient *pClient )
 
  	// increase this proxies client number in advance so this proxy isn't used again next time
 	int clients = Q_atoi( pBestProxy->GetUserSetting( "hltv_clients" ) );
-	char buffer[16];
 	V_to_chars(buffer, clients+1);
 	pBestProxy->SetUserCVar( "hltv_clients", buffer );
 
@@ -1432,17 +1431,17 @@ void CHLTVServer::UpdateStats( void )
 		if ( !event )
 			return;
 
-		char address[32];
+		char address[32], buffer[32];
 
 		if ( IsMasterProxy() || tv_overridemaster.GetBool() )
 		{
 			// broadcast own address
-			Q_snprintf( address, sizeof(address), "%s:%u", net_local_adr.ToString(true), GetUDPPort() );
+			V_sprintf_safe( address, "%s:%u", net_local_adr.ToString_safe(buffer, true), GetUDPPort() );
 		}
 		else
 		{
 			// forward address
-			V_strcpy_safe( address, m_RootServer.ToString() );
+			V_strcpy_safe( address, m_RootServer.ToString_safe(buffer) );
 		}
 
 		event->SetString( "master", address );
@@ -2189,7 +2188,8 @@ CON_COMMAND( tv_status, "Show SourceTV server status." )
 	{
 		if ( hltv->GetRelayAddress() )
 		{
-			ConMsg("Relay \"%s\", connect to %s\n", hltv->GetName(), hltv->GetRelayAddress()->ToString() );
+			char buffer[32];
+			ConMsg("Relay \"%s\", connect to %s\n", hltv->GetName(), hltv->GetRelayAddress()->ToString_safe(buffer) );
 		}
 		else
 		{
@@ -2200,8 +2200,9 @@ CON_COMMAND( tv_status, "Show SourceTV server status." )
 	ConMsg("Game Time %s, Mod \"%s\", Map \"%s\", Players %i\n", COM_FormatSeconds( hltv->GetTime() ),
 		gd, hltv->GetMapName(), hltv->GetNumPlayers() );
 
+	char buffer[32];
 	ConMsg("Local IP %s:%i, KiB/sec In %.1f, Out %.1f\n",
-		net_local_adr.ToString( true ), hltv->GetUDPPort(), in ,out );
+		net_local_adr.ToString_safe( buffer, true ), hltv->GetUDPPort(), in ,out );
 
 	hltv->GetLocalStats( proxies, slots, clients );
 	

@@ -908,7 +908,9 @@ void CHLTVClientState::UpdateStats()
 	conVars.m_ConVars.AddToTail( acvar );
 
 	Q_strncpy( acvar.name, "hltv_addr", sizeof(acvar.name) );
-	Q_snprintf( acvar.value, sizeof(acvar.value), "%s:%u", net_local_adr.ToString(true), m_pHLTV->GetUDPPort()  );
+
+	char buffer[32];
+	V_sprintf_safe( acvar.value, "%s:%u", net_local_adr.ToString_safe(buffer, true), m_pHLTV->GetUDPPort()  );
 	conVars.m_ConVars.AddToTail( acvar );
 
 	m_NetChannel->SendNetMsg( conVars );

@@ -2446,10 +2446,11 @@ void CL_SetSteamCrashComment()
 		latency
 	);
 
+	char buffer[32];
 	const char *pNetChannel = "Not Connected";
 	if ( cl.m_NetChannel )
 	{
-		pNetChannel = cl.m_NetChannel->GetRemoteAddress().ToString();
+		pNetChannel = cl.m_NetChannel->GetRemoteAddress().ToString_safe(buffer);
 	}
 
 		CL_SetPagedPoolInfo();

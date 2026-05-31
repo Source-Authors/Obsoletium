@@ -749,7 +749,8 @@ bool CSteam3Server::NotifyClientConnect( CBaseClient *client, uint32 unUserID, n
 	}
 	if ( !steamID.IsValid() || !steamID.BIndividualAccount() )
 	{
-		WarningAndLog("Client %d connected from %s with invalid Steam ID %s\n", unUserID, adr.ToString(), steamID.Render() );
+		char buffer[32];
+		WarningAndLog("Client %d connected from %s with invalid Steam ID %s\n", unUserID, adr.ToString_safe(buffer), steamID.Render() );
 		return false;
 	}
 

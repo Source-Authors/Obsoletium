@@ -89,13 +89,14 @@ void CBlacklistedServerManager::SaveToFile( const char *pszFilename )
 {
 	KeyValuesAD pKV( "serverblacklist" );
 
+	char addr[32];
 	for ( auto &bl : m_Blacklist )
 	{
 		auto *pSubKey = new KeyValues( "server" );
 		pSubKey->SetString( "name", bl.m_szServerName );
 		// dimhotepus: uint32 -> time_t
 		pSubKey->SetUint64( "date", bl.m_ulTimeBlacklistedAt );
-		pSubKey->SetString( "addr", bl.m_NetAdr.ToString() );
+		pSubKey->SetString( "addr", bl.m_NetAdr.ToString_safe(addr) );
 		pKV->AddSubKey( pSubKey );
 	}
 
@@ -233,9 +234,10 @@ bool CBlacklistedServerManager::IsServerBlacklisted( uint32 serverIP, uint16 ser
 		{
 			if ( bl.m_NetAdr.CompareClassCAdr( netAdr ) )
 			{
+				char buffer1[32], buffer2[32];
 				if ( sb_showblacklists.IsValid() && sb_showblacklists.GetBool() )
 				{
-					Msg( "Blacklisted '%s' (%s), due to rule '%s' (Class C).\n", serverName, netAdr.ToString(), bl.m_NetAdr.ToString() );
+					Msg( "Blacklisted '%s' (%s), due to rule '%s' (Class C).\n", serverName, netAdr.ToString_safe(buffer1), bl.m_NetAdr.ToString_safe(buffer2) );
 				}
 				return true;
 			}
@@ -246,7 +248,8 @@ bool CBlacklistedServerManager::IsServerBlacklisted( uint32 serverIP, uint16 ser
 			{
 				if ( sb_showblacklists.IsValid() && sb_showblacklists.GetBool() )
 				{
-					Msg( "Blacklisted '%s' (%s), due to rule '%s'.\n", serverName, netAdr.ToString(), bl.m_NetAdr.ToString() );
+					char buffer1[32], buffer2[32];
+					Msg( "Blacklisted '%s' (%s), due to rule '%s'.\n", serverName, netAdr.ToString_safe(buffer1), bl.m_NetAdr.ToString_safe(buffer2) );
 				}
 				return true;
 			}

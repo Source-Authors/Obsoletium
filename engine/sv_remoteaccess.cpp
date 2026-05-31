@@ -456,7 +456,8 @@ void CServerRemoteAccess::LogCommand( ra_listener_id listener, const char *msg )
 		
 	if ( listener < (ra_listener_id)m_ListenerIDs.Count() && m_ListenerIDs[listener].m_bHasAddress )
 	{
-		Log( "rcon from \"%s\": %s\n", m_ListenerIDs[listener].adr.ToString(), msg );
+		char buffer[32];
+		Log( "rcon from \"%s\": %s\n", m_ListenerIDs[listener].adr.ToString_safe(buffer), msg );
 	}
 	else
 	{
@@ -731,8 +732,8 @@ bool CServerRemoteAccess::LookupValue(const char *variable, CUtlBuffer &value)
 	}
 	else if (V_strieq(variable, "ipaddress"))
 	{
-		char addr[25];
-		Q_snprintf( addr, sizeof(addr), "%s:%i", net_local_adr.ToString(true), sv.GetUDPPort());
+		char addr[32], buffer[32];
+		V_sprintf_safe( addr, "%s:%i", net_local_adr.ToString_safe(buffer, true), sv.GetUDPPort());
 		value.PutString( addr );
 		value.PutChar(0);
 	}

@@ -2555,8 +2555,9 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 	IGameEvent *event = g_GameEventManager.CreateEvent( "server_spawn" );
 	if ( event )
 	{
+		char buffer[32];
 		event->SetString( "hostname", host_name.GetString() );
-		event->SetString( "address", net_local_adr.ToString( false ) );
+		event->SetString( "address", net_local_adr.ToString_safe( buffer, false ) );
 		event->SetInt(    "port", GetUDPPort() );
 		event->SetString( "game", com_gamedir );
 		event->SetString( "mapname", GetMapName() );

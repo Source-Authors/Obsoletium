@@ -1177,8 +1177,9 @@ bool NET_GetLong( const intp sock, netpacket_t *packet )
 	// RaphaelIT7: Do not accept negative packet IDs due to out-of-buffer access and related exploit.
 	if ( packetID < 0 )
 	{
+		char buffer[32];
 		Msg( "NET_GetLong:  Split packet from %s with invalid packetID %hd out of allowed range [%hd, %hd].\n", 
-			packet->from.ToString(),
+			packet->from.ToString_safe(buffer),
 			packetID,
 			0,
 			std::numeric_limits<decltype(packetID)>::max() );
@@ -1193,8 +1194,9 @@ bool NET_GetLong( const intp sock, netpacket_t *packet )
 	if ( nSplitSizeMinusHeader < MIN_SPLIT_SIZE ||
 		 nSplitSizeMinusHeader > MAX_SPLIT_SIZE )
 	{
+		char buffer[32];
 		Msg( "NET_GetLong:  Split packet from %s with invalid split size (number %i/ count %i) where size %i is out of valid range [%llu - %llu]\n", 
-			packet->from.ToString(), 
+			packet->from.ToString_safe(buffer), 
 			packetNumber, 
 			packetCount, 
 			nSplitSizeMinusHeader,
@@ -1206,8 +1208,9 @@ bool NET_GetLong( const intp sock, netpacket_t *packet )
 	if ( packetNumber >= MAX_SPLITPACKET_SPLITS ||
 		 packetCount > MAX_SPLITPACKET_SPLITS )
 	{
+		char buffer[32];
 		Msg( "NET_GetLong:  Split packet from %s with too many split parts (number %i/ count %i) where %llu is max count allowed\n", 
-			packet->from.ToString(), 
+			packet->from.ToString_safe(buffer), 
 			packetNumber, 
 			packetCount, 
 			(uint64)MAX_SPLITPACKET_SPLITS );
@@ -1233,8 +1236,9 @@ bool NET_GetLong( const intp sock, netpacket_t *packet )
 
 	if ( entry->netsplit.nExpectedSplitSize != nSplitSizeMinusHeader )
 	{
+		char buffer[32];
 		Msg( "NET_GetLong:  Split packet from %s with inconsistent split size (number %i/ count %i) where size %i not equal to initial size of %i\n", 
-			packet->from.ToString(), 
+			packet->from.ToString_safe(buffer), 
 			packetNumber, 
 			packetCount, 
 			nSplitSizeMinusHeader,
@@ -1259,6 +1263,7 @@ bool NET_GetLong( const intp sock, netpacket_t *packet )
 
 		if ( net_showsplits.GetInt() && net_showsplits.GetInt() != 3 )
 		{
+			char buffer[32];
 			Msg( "<-- [%s] Split packet %4i/%4i seq %5i size %4i mtu %4llu from %s\n", 
 				DescribeSocket( sock ),
 				packetNumber + 1, 
@@ -1266,12 +1271,13 @@ bool NET_GetLong( const intp sock, netpacket_t *packet )
 				sequenceNumber,
 				size, 
 				(uint64)(nSplitSizeMinusHeader + sizeof( SPLITPACKET )), 
-				packet->from.ToString() );
+				packet->from.ToString_safe(buffer) );
 		}
 	}
 	else
 	{
-		Msg( "NET_GetLong:  Ignoring duplicated split packet %i of %i ( %i bytes ) from %s\n", packetNumber + 1, packetCount, size, packet->from.ToString() );
+		char buffer[32];
+		Msg( "NET_GetLong:  Ignoring duplicated split packet %i of %i ( %i bytes ) from %s\n", packetNumber + 1, packetCount, size, packet->from.ToString_safe(buffer) );
 	}
 
 
@@ -1285,7 +1291,8 @@ bool NET_GetLong( const intp sock, netpacket_t *packet )
 		entry->netsplit.currentSequence = -1;	// Clear packet
 		if ( entry->netsplit.totalSize > static_cast<int>(sizeof(entry->netsplit.buffer)) )
 		{
-			Msg("Split packet too large! %d bytes from %s\n", entry->netsplit.totalSize, packet->from.ToString() );
+			char buffer[32];
+			Msg("Split packet too large! %d bytes from %s\n", entry->netsplit.totalSize, packet->from.ToString_safe(buffer) );
 			return false;
 		}
 
@@ -1368,7 +1375,8 @@ bool NET_ReceiveDatagram ( const intp sock, netpacket_t * packet )
 
 		if ( net_showudp_wire.GetBool() )
 		{
-			Msg( "WIRE:  UDP sz=%d tm=%f rt %f from %s\n", ret, net_time, Plat_FloatTime(), packet->from.ToString() );
+			char buffer[32];
+			Msg( "WIRE:  UDP sz=%d tm=%f rt %f from %s\n", ret, net_time, Plat_FloatTime(), packet->from.ToString_safe(buffer) );
 		}
 
 		MEM_ALLOC_CREDIT();
@@ -1404,7 +1412,8 @@ bool NET_ReceiveDatagram ( const intp sock, netpacket_t * packet )
 				{
 					if ( net_showudp.GetBool() )
 					{
-						Msg( "UDP:  discarding %d bytes from %s due to decompression error [%d decomp, actual %d] at tm=%f rt=%f\n", ret, packet->from.ToString(), uDecompressedSize, actualSize, 
+						char buffer[32];
+						Msg( "UDP:  discarding %d bytes from %s due to decompression error [%d decomp, actual %d] at tm=%f rt=%f\n", ret, packet->from.ToString_safe(buffer), uDecompressedSize, actualSize, 
 							net_time, Plat_FloatTime() );
 					}
 					return false;
@@ -1420,7 +1429,8 @@ bool NET_ReceiveDatagram ( const intp sock, netpacket_t * packet )
 		}
 		else
 		{
-			ConDMsg ( "NET_ReceiveDatagram:  Oversize packet from %s\n", packet->from.ToString() );
+			char buffer[32];
+			ConDMsg ( "NET_ReceiveDatagram:  Oversize packet from %s\n", packet->from.ToString_safe(buffer) );
 		}
 	}
 	else if ( ret == -1  )									// error?
@@ -1602,14 +1612,16 @@ void NET_ProcessPending( void )
 
 						if ( net_showtcp.GetInt() )
 						{
-							Msg ("TCP <- %s: connection accepted\n", psock->addr.ToString() );
+							char buffer[32];
+							Msg ("TCP <- %s: connection accepted\n", psock->addr.ToString_safe(buffer) );
 						}
 						
 						break;
 					}
 					else
 					{
-						Msg ("TCP <- %s: IP address mismatch.\n", psock->addr.ToString() );
+						char buffer[32];
+						Msg ("TCP <- %s: IP address mismatch.\n", psock->addr.ToString_safe(buffer) );
 					}
 				}
 			}
@@ -1617,7 +1629,8 @@ void NET_ProcessPending( void )
 
 		if ( !bOK )
 		{
-			Msg ("TCP <- %s: invalid connection request.\n", psock->addr.ToString() );
+			char buffer[32];
+			Msg ("TCP <- %s: invalid connection request.\n", psock->addr.ToString_safe(buffer) );
 			NET_CloseSocket( psock->newsock );
 		}
 
@@ -1674,7 +1687,8 @@ static void NET_ProcessListen(netsocket_t &netsock, intp sock)
 
 	if ( net_showtcp.GetInt() )
 	{
-		Msg ("TCP <- %s: connection request.\n", psock.addr.ToString() );
+		char buffer[32];
+		Msg ("TCP <- %s: connection request.\n", psock.addr.ToString_safe(buffer) );
 	}
 }
 
@@ -1735,7 +1749,8 @@ void NET_ProcessSocket( intp sock, IConnectionlessPacketHandler *handler )
 
 			if ( net_showudp.GetInt() )
 			{
-				Msg("UDP <- %s: sz=%i OOB '%c' wire=%i\n", packet->from.ToString(), packet->size, packet->data[4], packet->wiresize );
+				char buffer[32];
+				Msg("UDP <- %s: sz=%i OOB '%c' wire=%i\n", packet->from.ToString_safe(buffer), packet->size, packet->data[4], packet->wiresize );
 			}
 
 			handler->ProcessConnectionlessPacket( packet );
@@ -1791,7 +1806,8 @@ void NET_LogBadPacket(netpacket_t * packet)
 
 	if ( i < 1024 )
 	{
-		Msg( "Error buffer for %s written to %s\n", packet->from.ToString(), filename );
+		char buffer[32];
+		Msg( "Error buffer for %s written to %s\n", packet->from.ToString_safe(buffer), filename );
 	}
 	else
 	{
@@ -2149,7 +2165,8 @@ int NET_SendLong( INetChannel *chan, intp sock, socket_handle s, const char FAR 
 		if ( net_showsplits.GetInt() && net_showsplits.GetInt() != 2 )
 		{
 			netadr_t adr;
-
+			
+			char buffer[32];
 			Msg( "--> [%s] Split packet %4i/%4i seq %5i size %4i mtu %4i to %s [ total %4i ]\n",
 				DescribeSocket( sock ),
 				nPacketNumber, 
@@ -2157,7 +2174,7 @@ int NET_SendLong( INetChannel *chan, intp sock, socket_handle s, const char FAR 
 				nSequenceNumber,
 				size,
 				nMaxRoutableSize,
-				adr.SetFromSockadr( to ) ? adr.ToString() : "N/A",
+				adr.SetFromSockadr( to ) ? adr.ToString_safe(buffer) : "N/A",
 				sendlen );
 		}
 	}
@@ -2177,7 +2194,9 @@ int NET_SendLong( INetChannel *chan, intp sock, socket_handle s, const char FAR 
 int NET_SendPacket ( INetChannel *chan, intp sock,  const netadr_t &to, const unsigned char *data, int length, bf_write *pVoicePayload /* = NULL */, bool bUseCompression /*=false*/ )
 {
 	VPROF_BUDGET( "NET_SendPacket", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-	ETWSendPacket( to.ToString() , length , 0 , 0 );
+
+	char buffer[32];
+	ETWSendPacket( to.ToString_safe(buffer) , length , 0 , 0 );
 
 	int		ret;
 	struct sockaddr	addr;
@@ -2185,8 +2204,9 @@ int NET_SendPacket ( INetChannel *chan, intp sock,  const netadr_t &to, const un
 
 	if ( net_showudp.GetInt() && (*(const unsigned int*)data == CONNECTIONLESS_HEADER) )
 	{
+		char buffer[32];
 		Assert( !bUseCompression );
-		Msg("UDP -> %s: sz=%i OOB '%c'\n", to.ToString(), length, data[4] );
+		Msg("UDP -> %s: sz=%i OOB '%c'\n", to.ToString_safe(buffer), length, data[4] );
 	}
 
 	if ( !NET_IsMultiplayer() || to.type == NA_LOOPBACK || ( to.IsLocalhost() && !net_usesocketsforloopback.GetBool() ) )
@@ -2343,8 +2363,9 @@ int NET_SendPacket ( INetChannel *chan, intp sock,  const netadr_t &to, const un
 		// some PPP links dont allow broadcasts
 		if ( ( net_error == WSAEADDRNOTAVAIL) && ( to.type == NA_BROADCAST ) )
 			return 0;
-
-		ConDMsg ("NET_SendPacket Warning: %s : %s\n", NET_ErrorString(net_error), to.ToString() );
+		
+		char buffer[32];
+		ConDMsg ("NET_SendPacket Warning: %s : %s\n", NET_ErrorString(net_error), to.ToString_safe(buffer) );
 		ret = length;
 	}
 	
@@ -2757,6 +2778,7 @@ void NET_Config ( void )
 	net_time = 0.0f;
 
 	// now reconfigure
+	char buffer[32];
 
 	if ( net_multiplayer )
 	{
@@ -2774,7 +2796,7 @@ void NET_Config ( void )
 		{
 			netadr_t rconAddr = net_local_adr;
 			rconAddr.SetPort( net_sockets[NS_SERVER].nPort );
-			RCONServer().SetAddress( rconAddr.ToString() );
+			RCONServer().SetAddress( rconAddr.ToString_safe(buffer) );
 			RCONServer().CreateSocket();
 		}
 	}
@@ -2785,7 +2807,7 @@ void NET_Config ( void )
 	}
 
 	Msg( "Network: IP %s, mode %s, dedicated %s, ports %i SV / %i CL\n",
-		net_local_adr.ToString(true), net_multiplayer?"MP":"SP", net_dedicated?"Yes":"No",
+		net_local_adr.ToString_safe(buffer, true), net_multiplayer?"MP":"SP", net_dedicated?"Yes":"No",
 		net_sockets[NS_SERVER].nPort, net_sockets[NS_CLIENT].nPort );
 }
 
@@ -3042,8 +3064,8 @@ CON_COMMAND( net_status, "Shows current network status" )
 
 	intp numChannels = s_NetChannels.Count();
 
-	ConMsg("Net status for host %s:\n", 
-		net_local_adr.ToString(true) );
+	char buffer[32];
+	ConMsg("Net status for host %s:\n", net_local_adr.ToString_safe(buffer, true) );
 
 	ConMsg("- Config: %s, %s, %zd connections\n",
 		net_multiplayer?"Multiplayer":"Singleplayer",
