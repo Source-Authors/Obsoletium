@@ -129,7 +129,8 @@ void CRender::PushInstanceData( CMapInstance *pInstanceClass, const Vector &Inst
 	m_CurrentInstanceState.m_InstanceOrigin = vecTransformedOrigin;
 	//	RotateInstanceVector( ( Vector )InstanceState.m_InstanceAngles, m_CurrentInstanceState.m_InstanceAngles );		no one uses this right now   make sure to store it in the same fashion as vecTransformedOrigin
 
-	if ( m_InstanceState.Count() > 0 )
+	// dimhotepus: Prevent nullptr pInstanceClass dereference.
+	if ( pInstanceClass && m_InstanceState.Count() > 0 )
 	{	// first push is just a default state
 		m_bInstanceRendering = true;
 		BeginLocalTransfrom( InstanceState.m_InstanceMatrix, true );
