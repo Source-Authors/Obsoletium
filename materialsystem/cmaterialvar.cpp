@@ -786,7 +786,8 @@ void CMaterialVar::SetStringValue( const char *val )
 	CleanUpData();
 	m_pStringVal = V_strdup( val );
 	m_Type = MATERIAL_VAR_TYPE_STRING;
-	m_intVal = atoi( val );
+	// dimhotepus: atoi -> V_atoi.
+	m_intVal = V_atoi( val );
 	// dimhotepus: atof -> V_atof.
 	m_VecVal[0] = m_VecVal[1] = m_VecVal[2] = m_VecVal[3] = V_atof( m_pStringVal );
 	VarChanged();
