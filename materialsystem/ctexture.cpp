@@ -771,13 +771,8 @@ void CReferenceToHandleTexture::SetName( char const *szName )
 	m_Name = NormalizeTextureName( szName, szCleanName, sizeof( szCleanName ) );
 
 #ifdef _DEBUG
-	if ( m_pDebugName )
-	{
-		delete [] m_pDebugName;
-	}
-	intp nLen = V_strlen( szCleanName ) + 1;
-	m_pDebugName = new char[nLen];
-	V_memcpy( m_pDebugName, szCleanName, nLen );
+	delete [] m_pDebugName;
+	m_pDebugName = V_strdup( szCleanName );
 #endif
 }
 
@@ -2579,13 +2574,8 @@ void CTexture::SetName( const char* pName )
 	m_Name = NormalizeTextureName( pName, szCleanName, sizeof( szCleanName ) );
 
 #ifdef _DEBUG
-	if ( m_pDebugName )
-	{
-		delete [] m_pDebugName;
-	}
-	intp nLen = V_strlen( szCleanName ) + 1;
-	m_pDebugName = new char[nLen];
-	V_memcpy( m_pDebugName, szCleanName, nLen );
+	delete [] m_pDebugName;
+	m_pDebugName = V_strdup( szCleanName );
 #endif
 }
 
