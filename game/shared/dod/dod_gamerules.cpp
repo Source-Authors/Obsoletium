@@ -553,7 +553,7 @@ static CDODViewVectors g_DODViewVectors(
 
 	void CDODGameRules::UploadLevelStats( void )
 	{
-		if ( Q_strlen( STRING( gpGlobals->mapname ) ) > 0 )
+		if ( !Q_isempty( STRING( gpGlobals->mapname ) ) )
 		{
 			int i,j;
 			CDODTeam *pAllies = GetGlobalDODTeam( TEAM_ALLIES );
