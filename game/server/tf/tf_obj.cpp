@@ -2187,7 +2187,7 @@ void CBaseObject::Explode( void )
 {
 	const char *pExplodeSound = GetObjectInfo( ObjectType() )->m_pExplodeSound;
 
-	if ( pExplodeSound && Q_strlen(pExplodeSound) > 0 )
+	if ( !Q_isempty(pExplodeSound) )
 	{
 		EmitSound( pExplodeSound );
 	}

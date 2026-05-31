@@ -455,7 +455,7 @@ void CHL2MP_Player::SetPlayerModel( void )
 	}
 	else
 	{
-		if ( Q_strlen( szModelName ) == 0 ) 
+		if ( Q_isempty( szModelName ) ) 
 		{
 			szModelName = g_ppszRandomCitizenModels[0];
 		}

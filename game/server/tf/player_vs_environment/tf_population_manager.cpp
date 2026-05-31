@@ -2103,7 +2103,7 @@ bool CPopulationManager::Parse( void )
 	{
 		const char *name = data->GetName();
 
-		if ( Q_strlen( name ) <= 0 )
+		if ( Q_isempty( name ) )
 		{
 			continue;
 		}

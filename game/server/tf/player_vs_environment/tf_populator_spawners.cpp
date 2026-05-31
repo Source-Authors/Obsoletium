@@ -52,7 +52,7 @@ bool IsSpaceToSpawnHere( const Vector &where )
 {
 	const char *name = data->GetName();
 
-	if ( Q_strlen( name ) <= 0 )
+	if ( Q_isempty( name ) )
 	{
 		return NULL;
 	}
@@ -149,7 +149,7 @@ static EventInfo *ParseEvent( KeyValues *values )
 	{
 		const char *name = data->GetName();
 
-		if ( Q_strlen( name ) <= 0 )
+		if ( Q_isempty( name ) )
 		{
 			continue;
 		}
@@ -204,7 +204,7 @@ bool CRandomChoiceSpawner::Parse( KeyValues *values )
 	{
 		const char *name = data->GetName();
 
-		if ( Q_strlen( name ) <= 0 )
+		if ( Q_isempty( name ) )
 		{
 			continue;
 		}
@@ -814,7 +814,7 @@ bool CTFBotSpawner::Parse( KeyValues *values )
 		const char *name = data->GetName();
 		const char *value = data->GetString();
 
-		if ( Q_strlen( name ) <= 0 )
+		if ( Q_isempty( name ) )
 		{
 			continue;
 		}
@@ -1378,7 +1378,7 @@ bool CTankSpawner::Parse( KeyValues *values )
 	{
 		const char *name = data->GetName();
 
-		if ( Q_strlen( name ) <= 0 )
+		if ( Q_isempty( name ) )
 		{
 			continue;
 		}
@@ -1475,7 +1475,7 @@ bool CSentryGunSpawner::Parse( KeyValues *values )
 	{
 		const char *name = data->GetName();
 
-		if ( Q_strlen( name ) <= 0 )
+		if ( Q_isempty( name ) )
 		{
 			continue;
 		}
@@ -1556,7 +1556,7 @@ bool CSquadSpawner::Parse( KeyValues *values )
 	{
 		const char *name = data->GetName();
 
-		if ( V_strlen( name ) <= 0 )
+		if ( Q_isempty( name ) )
 		{
 			continue;
 		}
@@ -1826,7 +1826,7 @@ bool CMobSpawner::Parse( KeyValues *values )
 	{
 		const char *name = data->GetName();
 
-		if ( Q_strlen( name ) <= 0 )
+		if ( Q_isempty( name ) )
 		{
 			continue;
 		}

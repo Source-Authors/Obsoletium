@@ -137,8 +137,8 @@ void ClientGamePrecache( void )
 		const char *pszType = pData->GetName();
 		const char *pszFile = pData->GetString();
 
-		if ( Q_strlen( pszType ) > 0 &&
-			 Q_strlen( pszFile ) > 0 )
+		if ( !Q_isempty( pszType ) &&
+			 !Q_isempty( pszFile ) )
 		{
 			if ( V_strieq( pData->GetName(), "model" ) )
 			{

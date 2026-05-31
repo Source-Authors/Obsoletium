@@ -219,7 +219,7 @@ void CBotNPC::PrecacheArmorParts( void )
 			}
 
 			// Make sure we have a valid string before trying to precache it.
-			if ( Q_strlen( partName ) > 0 )
+			if ( !Q_isempty( partName ) )
 			{
 				PrecacheModel( partName );
 			}

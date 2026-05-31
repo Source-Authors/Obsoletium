@@ -51,7 +51,7 @@ static EventInfo *ParseEvent( KeyValues *values )
 	{
 		const char *name = data->GetName();
 
-		if ( Q_strlen( name ) <= 0 )
+		if ( Q_isempty( name ) )
 		{
 			continue;
 		}
@@ -199,7 +199,7 @@ bool CSpawnLocation::Parse( KeyValues *data )
 	const char *name = data->GetName();
 	const char *value = data->GetString();
 
-	if ( Q_strlen( name ) <= 0 )
+	if ( Q_isempty( name ) )
 	{
 		return false;
 	}
@@ -431,7 +431,7 @@ bool CMissionPopulator::Parse( KeyValues *values )
 	{
 		const char *name = data->GetName();
 
-		if ( Q_strlen( name ) <= 0 )
+		if ( Q_isempty( name ) )
 		{
 			continue;
 		}
@@ -912,7 +912,7 @@ bool CRandomPlacementPopulator::Parse( KeyValues *values )
 	{
 		const char *name = data->GetName();
 
-		if ( Q_strlen( name ) <= 0 )
+		if ( Q_isempty( name ) )
 		{
 			continue;
 		}
@@ -1001,7 +1001,7 @@ bool CPeriodicSpawnPopulator::Parse( KeyValues *values )
 	{
 		const char *name = data->GetName();
 
-		if ( Q_strlen( name ) <= 0 )
+		if ( Q_isempty( name ) )
 		{
 			continue;
 		}
@@ -1201,7 +1201,7 @@ bool CWaveSpawnPopulator::Parse( KeyValues *values )
 	{
 		const char *name = data->GetName();
 
-		if ( Q_strlen( name ) <= 0 )
+		if ( Q_isempty( name ) )
 		{
 			continue;
 		}
