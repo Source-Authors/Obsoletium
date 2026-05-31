@@ -1650,10 +1650,8 @@ void CCodeProcessor::CleanupIncludePath()
 
 void CCodeProcessor::AddIncludePath( const char *pPath )
 {
-	int i = m_IncludePath.AddToTail();
-	int nLen = strlen(pPath) + 1;
-	m_IncludePath[i] = new char[nLen];
-	memcpy( m_IncludePath[i], pPath, nLen );
+	intp i = m_IncludePath.AddToTail();
+	m_IncludePath[i] = V_strdup(pPath);
 }
 
 void CCodeProcessor::SetupIncludePath( const char *sourcetreebase, const char *subdir, const char *gamespecific )
