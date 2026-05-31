@@ -128,7 +128,7 @@ void C_TFBaseHint::ParseFromData( KeyValues *pkv )
 	}
 
 	const char *completionfunction = pkv->GetString( "completionfunction" );
-	if ( completionfunction && strlen( completionfunction ) > 0 )
+	if ( !Q_isempty( completionfunction ) )
 	{
 		SetCompletionFunction( LookupCompletionFunction( completionfunction ) );
 	}

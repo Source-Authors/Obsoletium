@@ -830,7 +830,7 @@ void CCSClientScoreBoardDialog::UpdateTeamPlayerDisplay( TeamDisplayInfo& teamDi
 // 			char *newName = (char *)_alloca( bufsize );
 // 			UTIL_MakeSafeName( oldName, newName, bufsize );
 
-			if ( pUTF8Name != NULL && V_strlen( pUTF8Name ) > 0 )
+			if ( !Q_isempty( pUTF8Name ) )
 			{
 				bool isAlive = cs_PR->IsAlive( playerIndex );
 				Color fgColor = ( isAlive ? teamDisplay.playerDataColor : m_DeadPlayerDataColor );

@@ -788,7 +788,7 @@ void CSaxxyAwardsSubmitForm::OnCommand( const char *pCommand )
 		// need a non-empty string
 		char szText[256];
 		m_pURLInput->GetText( szText, sizeof( szText ) );
-		if ( Q_strlen( szText ) == 0 )
+		if ( Q_isempty( szText ) )
 		{
 			ShowMessageBox( "#Replay_Contest_StatusTitle",  "#Replay_Contest_EnterURL", "#GameUI_OK" );
 			return;

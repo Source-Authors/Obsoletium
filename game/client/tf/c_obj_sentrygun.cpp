@@ -659,7 +659,7 @@ void C_ObjectSentrygun::UpdateDamageEffects( BuildingDamageLevel_t damageLevel )
 		break;
 	}
 
-	if ( Q_strlen(pszEffect) > 0 )
+	if ( !Q_isempty(pszEffect) )
 	{
 		switch( m_iUpgradeLevel )
 		{

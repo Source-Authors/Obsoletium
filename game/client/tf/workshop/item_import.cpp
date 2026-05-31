@@ -6263,7 +6263,7 @@ CTFFileImportDialog::BUILD_RESULT CTFFileImportDialog::AddMaterialsToAsset( CAss
 				{
 					MATERIAL_FILE_TYPE materialFileType = (MATERIAL_FILE_TYPE)nTextureType;
 					const char *pszTexturePath = GetMaterialTextureFile( nSkinIndex, nValidVMTIndex, materialFileType );
-					if ( V_strlen( pszTexturePath ) == 0 )
+					if ( Q_isempty pszTexturePath ) )
 					{
 						continue;
 					}
@@ -6428,7 +6428,7 @@ CTFFileImportDialog::BUILD_RESULT CTFFileImportDialog::Build( BUILD_STAGE buildS
 	Assert( pItemData != NULL );
 
 	const char *pszIcon = GetItemIcon();
-	if ( V_strlen( pszIcon ) > 0 )
+	if ( !Q_isempty( pszIcon ) )
 	{
 		int nNumIconTypes = CItemUpload::Manifest()->GetNumIconTypes();
 		if ( nNumIconTypes > 0 )
@@ -6686,7 +6686,7 @@ KeyValues *CTFFileImportDialog::BuildItemSchema( const char *pszItemName )
 	}
 
 	const char *pszIcon = GetItemIcon();
-	if ( V_strlen( pszIcon ) > 0 )
+	if ( !Q_isempty( pszIcon ) )
 	{
 		if ( asset.SetTargetIcon( 0, pszIcon ) )
 		{

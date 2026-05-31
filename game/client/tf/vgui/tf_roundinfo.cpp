@@ -533,7 +533,7 @@ void CTFRoundInfo::OnCommand( const char *command )
 //-----------------------------------------------------------------------------
 void CTFRoundInfo::UpdateImage( ImagePanel *pImagePanel, const char *pszImageName )
 {
-	if ( pImagePanel && ( Q_strlen( pszImageName ) > 0 ) )
+	if ( pImagePanel && !Q_isempty( pszImageName ) )
 	{
 		char szTemp[255];
 		Q_snprintf( szTemp, sizeof( szTemp ), "VGUI/%s", pszImageName );

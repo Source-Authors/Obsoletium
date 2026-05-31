@@ -424,10 +424,7 @@ void CTFDemoSupport::BookMarkCurrentTick( const char *pszValue /* = NULL */ )
 //-----------------------------------------------------------------------------
 bool CTFDemoSupport::IsValidPath( const char *pszFolder )
 {
-	if ( !pszFolder )
-		return false;
-
-	if ( Q_strlen( pszFolder ) <= 0 ||
+	if ( Q_isempty( pszFolder ) ||
 		Q_strstr( pszFolder, "\\\\" ) ||	// to protect network paths
 		Q_strstr( pszFolder, ":" ) ||	// to protect absolute paths
 		Q_strstr( pszFolder, ".." ) ||	// to protect relative paths

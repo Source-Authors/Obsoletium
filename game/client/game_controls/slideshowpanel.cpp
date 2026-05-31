@@ -228,7 +228,7 @@ void CSlideshowPanel::UpdateNextTransitionTime()
 
 void CSlideshowPanel::AddImage( const char *pImageName )
 {
-	if ( pImageName && strlen( pImageName ) > 0 )
+	if ( !Q_isempty( pImageName ) )
 	{
 		AddImage( scheme()->GetImage( pImageName, m_pImagePanel->GetShouldScaleImage() ) );
 	}

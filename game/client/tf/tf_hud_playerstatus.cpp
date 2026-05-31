@@ -1150,7 +1150,7 @@ void CTFClassImage::SetClass( int iTeam, int iClass, int iCloakstate )
 		break;
 	}
 
-	if ( Q_strlen( szImage ) > 0 )
+	if ( !Q_isempty( szImage ) )
 	{
 		SetImage( szImage );
 	}

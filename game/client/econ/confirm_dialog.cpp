@@ -757,7 +757,7 @@ void CTFMessageBoxDialogWithSound::OnTick()
 	{
 		m_bPlayedSound = true;
 
-		if ( Q_strlen( m_szSound ) > 0 )
+		if ( !Q_isempty( m_szSound ) )
 		{
 			C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
 			if ( pLocalPlayer )

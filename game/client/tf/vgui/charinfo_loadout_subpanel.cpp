@@ -111,12 +111,12 @@ void CImageButton::ApplySchemeSettings( vgui::IScheme *pScheme )
 {
 	BaseClass::ApplySchemeSettings( pScheme );
 
-	if ( m_pszActiveImageName && strlen( m_pszActiveImageName ) > 0 )
+	if ( !Q_isempty( m_pszActiveImageName ) )
 	{
 		SetActiveImage(vgui::scheme()->GetImage( m_pszActiveImageName, m_bScaleImage ) );
 	}
 
-	if ( m_pszInactiveImageName && strlen( m_pszInactiveImageName ) > 0 )
+	if ( !Q_isempty( m_pszInactiveImageName ) )
 	{
 		SetInactiveImage(vgui::scheme()->GetImage( m_pszInactiveImageName, m_bScaleImage ) );
 	}

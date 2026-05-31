@@ -1291,7 +1291,7 @@ void CHudVote::MsgFunc_VoteStart( bf_read &msg )
 	wchar_t *pwcIssue;
 	wchar_t wcIssue[k_MAX_VOTE_NAME_LENGTH];
 
-	if ( Q_strlen( szParam1 ) > 0 )
+	if ( !Q_isempty( szParam1 ) )
 	{
 		if ( szParam1[0] == '#' )
 		{
@@ -1449,7 +1449,7 @@ void CHudVote::MsgFunc_VotePass( bf_read &msg )
 	wchar_t *pwcIssue;
 	wchar_t wcIssue[k_MAX_VOTE_NAME_LENGTH];
 
-	if ( Q_strlen( szParam1 ) > 0 )
+	if ( !Q_isempty( szParam1 ) )
 	{
 		if ( szParam1[0] == '#' )
 		{

@@ -368,7 +368,7 @@ void CHudChat::ChatPrintf( int iPlayerIndex, const char *fmt, ... )
 	va_end(marker);
 
 	// Strip any trailing '\n'
-	if ( strlen( msg ) > 0 && msg[ strlen( msg )-1 ] == '\n' )
+	if ( !Q_isempty( msg ) && msg[ strlen( msg )-1 ] == '\n' )
 	{
 		msg[ strlen( msg ) - 1 ] = 0;
 	}

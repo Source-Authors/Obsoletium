@@ -325,7 +325,7 @@ void C_ObjectDispenser::UpdateDamageEffects( BuildingDamageLevel_t damageLevel )
 		break;
 	}
 
-	if ( Q_strlen(pszEffect) > 0 )
+	if ( !Q_isempty(pszEffect) )
 	{
 		m_hDamageEffects = ParticleProp()->Create( pszEffect, PATTACH_ABSORIGIN );
 	}

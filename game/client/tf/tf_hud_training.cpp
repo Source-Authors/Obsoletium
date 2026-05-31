@@ -97,7 +97,7 @@ bool CTFHudTraining::FormatTrainingText(const char* inputString, wchar_t* output
 
 			// set the variable text - key may need to be localized (button images for example)
 			wchar_t *locName = g_pVGuiLocalize->Find( friendlyName );
-			if ( !locName || wcslen(locName) <= 0)
+			if ( Q_isempty( locName ) )
 			{
 				wchar_t wszFriendly[64];
 				g_pVGuiLocalize->ConvertANSIToUnicode( friendlyName+1, wszFriendly, sizeof( wszFriendly ) );

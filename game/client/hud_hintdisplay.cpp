@@ -460,7 +460,7 @@ bool CHudHintKeyDisplay::SetHintText( const char *text )
 	wchar_t *ws = g_pVGuiLocalize->Find( text );
 
 	wchar_t wszBuf[256];
-	if ( !ws || wcslen(ws) <= 0)
+	if ( Q_isempty( ws ) )
 	{
 		if (text[0] == '#')
 		{
@@ -601,7 +601,7 @@ bool CHudHintKeyDisplay::SetHintText( const char *text )
 
 				// set the variable text - key may need to be localized (button images for example)
 				wchar_t *locName = g_pVGuiLocalize->Find( friendlyName );
-				if ( !locName || wcslen(locName) <= 0)
+				if ( Q_isempty( locName ) )
 				{
 					label->SetText( friendlyName + 1 );
 				}

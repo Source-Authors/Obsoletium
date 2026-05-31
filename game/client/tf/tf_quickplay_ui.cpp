@@ -492,7 +492,7 @@ void CQuickListPanel::SetMapName( const char *pMapName )
 //-----------------------------------------------------------------------------
 void CQuickListPanel::SetGameType( const char *pGameType )
 {
-	if ( strlen ( pGameType ) == 0 )
+	if ( Q_isempty( pGameType ) )
 	{
 		m_pGameTypeLabel->SetVisible( false );
 		return;

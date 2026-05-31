@@ -938,7 +938,7 @@ void UTIL_ReplaceKeyBindings( const wchar_t *inbuf, intp inbufsizebytes, OUT_Z_B
 					locName = g_pVGuiLocalize->Find( friendlyName );
 				}
 
-				if ( !locName || wcslen(locName) <= 0)
+				if ( Q_isempty( locName ) )
 				{
 					g_pVGuiLocalize->ConvertANSIToUnicode( friendlyName, token );
 
