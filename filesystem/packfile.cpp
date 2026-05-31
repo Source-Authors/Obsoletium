@@ -514,10 +514,7 @@ void CZipPackFile::GetFileAndDirLists( const char *pRawWildCard, CUtlStringList 
 				}
 				else
 				{
-					size_t nMatchSize = V_strlen( szCandidateName ) + 1;
-					char *pszFullMatch = new char[ nMatchSize ];
-					V_strncpy( pszFullMatch, szCandidateName, nMatchSize );
-					outFilenames.AddToTail( pszFullMatch );
+					outFilenames.AddToTail( V_strdup( szCandidateName ) );
 				}
 			}
 		}
