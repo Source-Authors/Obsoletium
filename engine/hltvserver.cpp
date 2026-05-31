@@ -2160,11 +2160,21 @@ CON_COMMAND( tv_status, "Show SourceTV server status." )
 	ConMsg("--- SourceTV Status ---\n");
 	ConMsg("Online %s, FPS %.1f, Version %i (%s)\n", 
 		COM_FormatSeconds( hltv->GetOnlineTime() ), hltv->m_flFPS, build_number(),
-
-#ifdef _WIN32
-		"Win32" );
+// dimhotepus: More OSes in status string.
+#if defined(_WIN32)
+#if defined(_WIN64)
+			"Win64" );
+#elif defined(__ARM_ARCH)
+			"ARM " CONST_INTEGER_AS_STRING(__ARM_ARCH) );
 #else
-		"Linux" );
+			"Win32" );
+#endif
+#elif defined(_LINUX)
+			"Linux" );
+#elif defined(OSX)
+			"OSX" );
+#else
+#error Please set OS string.
 #endif
 
 	if ( hltv->IsDemoPlayback() )

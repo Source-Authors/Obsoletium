@@ -250,10 +250,21 @@ bool CHLTVClient::ExecuteStringCommand( const char *pCommandString )
 		ClientPrintf("IP %s:%i, Online %s, Version %i (%s)\n",
 			net_local_adr.ToString( true ), m_pHLTV->GetUDPPort(),
 			COM_FormatSeconds( m_pHLTV->GetOnlineTime() ), build_number(),
-#ifdef _WIN32
-			"Win32" );
+// dimhotepus: More OSes in status string.
+#if defined(_WIN32)
+#if defined(_WIN64)
+			"Win64" );
+#elif defined(__ARM_ARCH)
+			"ARM " CONST_INTEGER_AS_STRING(__ARM_ARCH) );
 #else
+			"Win32" );
+#endif
+#elif defined(_LINUX)
 			"Linux" );
+#elif defined(OSX)
+			"OSX" );
+#else
+#error Please set OS string.
 #endif
 
 		ClientPrintf("Game Time %s, Mod \"%s\", Map \"%s\", Players %i\n", COM_FormatSeconds( m_pHLTV->GetTime() ),
