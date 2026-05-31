@@ -263,7 +263,7 @@ retry:
 	while ( current )
 	{
 		// No more tokens
-		if ( strlen( com_token ) <= 0 )
+		if ( Q_isempty( com_token ) )
 			break;
 
 		if ( V_strieq( com_token, "#include" ) )
@@ -272,7 +272,7 @@ retry:
 
 			current = CC_ParseToken( current );
 
-			if ( strlen( com_token ) > 0)
+			if ( !Q_isempty( com_token ) )
 			{
 				vprint( 1, "#include %s", com_token );
 				m_nHeadersProcessed++;
