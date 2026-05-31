@@ -10687,7 +10687,7 @@ bool CChoreoView::GenerateCombinedFile( char const *outfilename, char const *cct
 
 	char actualfile[ 512 ];
 	soundemitter->GenderExpandString( gender, outfilename, actualfile, sizeof( actualfile ) );
-	if ( Q_strlen( actualfile ) <= 0 )
+	if ( Q_isempty( actualfile ) )
 	{
 		return false;
 	}
@@ -10732,7 +10732,7 @@ bool CChoreoView::ValidateCombinedFileCheckSum( char const *outfilename, char co
 
 	char actualfile[ 512 ];
 	soundemitter->GenderExpandString( gender, outfilename, actualfile, sizeof( actualfile ) );
-	if ( Q_strlen( actualfile ) <= 0 )
+	if ( Q_isempty( actualfile ) )
 	{
 		return false;
 	}
@@ -10804,7 +10804,7 @@ void SuggestCaption( char *dest, int destlen, CUtlVector< CChoreoEvent * >& even
 			}
 		}
 
-		if ( found && Q_strlen( dest ) > 0 && i != c - 1 )
+		if ( found && !Q_isempty( dest ) && i != c - 1 )
 		{
 			Q_strncat( dest, " ", destlen, COPY_ALL_CHARACTERS );
 		}

@@ -583,7 +583,7 @@ void CloseCaptionTool::Process( char const *tokenname, float duration, int langu
 	}
 
 	// Nothing to do...
-	if ( wcslen( stream ) == 0 )
+	if ( Q_isempty( stream ) )
 	{
 		return;
 	}
@@ -606,7 +606,7 @@ void CloseCaptionTool::Process( char const *tokenname, float duration, int langu
 				// End current phrase
 				*out = L'\0';
 
-				if ( wcslen( phrase ) > 0 )
+				if ( !Q_isempty( phrase ) )
 				{
 					CCloseCaptionItem *item = new CCloseCaptionItem( phrase, duration + CAPTION_LINGER_TIME, delay, valid );
 					m_Items.AddToTail( item );
@@ -627,7 +627,7 @@ void CloseCaptionTool::Process( char const *tokenname, float duration, int langu
 
 	// End final phrase, if any
 	*out = L'\0';
-	if ( wcslen( phrase ) > 0 )
+	if ( !Q_isempty( phrase ) )
 	{
 		CCloseCaptionItem *item = new CCloseCaptionItem( phrase, duration + CAPTION_LINGER_TIME, delay, valid );
 		m_Items.AddToTail( item );

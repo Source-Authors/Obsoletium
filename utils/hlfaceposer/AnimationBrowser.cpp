@@ -905,7 +905,7 @@ int AnimationBrowser::handleEvent (mxEvent *event)
 
 			if ( search )
 			{
-				if ( Q_strlen( m_szSearchString ) > 0 )
+				if ( !Q_isempty( m_szSearchString ) )
 				{
 					m_pFilterTab->select( FILTER_STRING );
 					m_nCurFilter = FILTER_STRING;
