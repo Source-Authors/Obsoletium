@@ -1642,10 +1642,10 @@ void CompileShaders(
       V_sprintf_safe(
           chCommands, "%s",
           PrettyPrintNumber(pEntry->m_iCommandEnd - pEntry->m_iCommandStart));
-      V_sprintf_safe(chStaticCombos, "%s",
-                     PrettyPrintNumber(pEntry->m_numStaticCombos));
-      V_sprintf_safe(chDynamicCombos, "%s",
-                     PrettyPrintNumber(pEntry->m_numDynamicCombos));
+      V_strcpy_safe(chStaticCombos,
+                    PrettyPrintNumber(pEntry->m_numStaticCombos));
+      V_strcpy_safe(chDynamicCombos,
+                    PrettyPrintNumber(pEntry->m_numDynamicCombos));
 
       Msg("Compiling %s commands in %s static, %s dynamic combos in %s...\n",
           chCommands, chStaticCombos, chDynamicCombos, pEntry->m_szName);
@@ -1848,12 +1848,12 @@ int ShaderCompileMain(int argc, char *argv[]) {
   {
     char commands_no[32], static_combos_no[32], dynamic_combos_no[32];
 
-    V_sprintf_safe(commands_no, "%s",
-                   PrettyPrintNumber(parseResult.compile_commands_num));
-    V_sprintf_safe(static_combos_no, "%s",
-                   PrettyPrintNumber(parseResult.static_combos_num));
-    V_sprintf_safe(dynamic_combos_no, "%s",
-                   PrettyPrintNumber(parseResult.dynamic_combos_num));
+    V_strcpy_safe(commands_no,
+                  PrettyPrintNumber(parseResult.compile_commands_num));
+    V_strcpy_safe(static_combos_no,
+                  PrettyPrintNumber(parseResult.static_combos_num));
+    V_strcpy_safe(dynamic_combos_no,
+                  PrettyPrintNumber(parseResult.dynamic_combos_num));
 
     Msg("Compiling %s commands in %s static, %s dynamic combos...\n",
         commands_no, static_combos_no, dynamic_combos_no);

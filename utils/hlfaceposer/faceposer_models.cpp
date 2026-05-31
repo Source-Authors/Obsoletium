@@ -123,7 +123,7 @@ const char *IFaceposerModels::CFacePoserModel::GetBitmapChecksum( intp sequence 
 	char hex[ 16 ];
 	V_binarytohex( crc, hex );
 
-	V_sprintf_safe( filename, "%s", hex );
+	V_strcpy_safe( filename, hex );
 	return filename;
 }
 
@@ -585,7 +585,7 @@ void IFaceposerModels::CFacePoserModel::RecreateAnimationBitmap( intp sequence, 
 	}
 
 	char filename[ 512 ];
-	Q_snprintf( filename, sizeof( filename ), "%s", GetBitmapFilename( sequence ) );
+	V_strcpy_safe( filename, GetBitmapFilename( sequence ) );
 
 	if ( filesystem->FileExists( filename ) )
 	{

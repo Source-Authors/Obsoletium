@@ -10896,7 +10896,7 @@ void CChoreoView::OnCombineSpeakEvents()
 
 		SuggestCaption( suggested, sizeof( suggested ), selected );
 
-		Q_snprintf( ip.m_szInputText, sizeof( ip.m_szInputText ), "%s", suggested );
+		V_strcpy_safe( ip.m_szInputText, suggested );
 
 		if ( !InputProperties( &ip ) )
 		{

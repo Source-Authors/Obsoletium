@@ -851,7 +851,7 @@ int FindOrCreateWaterTexInfo( texinfo_t *pBaseInfo, float depth )
 	// Otherwise, fill in the rest of the data
 	lookup.m_nWaterDepth = (int)depth;
 	// Remember the current material name
-	V_sprintf_safe( materialname, "%s", name );
+	V_strcpy_safe( materialname, name );
 	strlwr( materialname );
 	lookup.m_MaterialName = materialname;
 

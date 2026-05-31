@@ -1123,7 +1123,7 @@ void CChoreoChannelWidget::redrawStatus( CChoreoWidgetDrawHelper& drawHelper, RE
 					statusClr = RGB( 255, 0, 0 );
 				}
 
-				Q_snprintf( exist, sizeof( exist ), "%s", valid ? "exist" : "missing!" );
+				V_strcpy_safe( exist, valid ? "exist" : "missing!" );
 			}
 			else
 			{
@@ -1133,7 +1133,7 @@ void CChoreoChannelWidget::redrawStatus( CChoreoWidgetDrawHelper& drawHelper, RE
 					statusClr = RGB( 255, 0, 0 );
 				}
 
-				Q_snprintf( exist, sizeof( exist ), "%s", valid ? "exists" : "missing!" );
+				V_strcpy_safe( exist, valid ? "exists" : "missing!" );
 			}
 
 			RECT rcPartial = rcText;

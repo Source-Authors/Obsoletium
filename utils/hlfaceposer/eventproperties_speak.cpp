@@ -568,7 +568,7 @@ BOOL CEventPropertiesSpeakDialog::HandleMessage( HWND hwndDlg, UINT uMsg, WPARAM
 						if ( scriptfile )
 						{
 							char relative_path[MAX_PATH];
-							Q_snprintf( relative_path, MAX_PATH, "%s", scriptfile );
+							V_strcpy_safe( relative_path, scriptfile );
 
 							char full_path[MAX_PATH];
 							if ( filesystem->GetLocalPath_safe( relative_path, full_path ) )

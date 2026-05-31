@@ -117,7 +117,7 @@ void CScene::ValidateTree( mxTreeView *tree, mxTreeViewItem* parent )
 		}
 		else
 		{
-			Q_snprintf( sz, sizeof( sz ), "%s", vcd->GetName() );
+			V_strcpy_safe( sz, vcd->GetName() );
 		}
 
 		mxTreeViewItem *spot = vcd->FindItem( tree, parent );

@@ -2348,11 +2348,11 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 	const char *pName = ValueForKey( pInstanceEntity, "name" );
 	if ( pTargetName[ 0 ] )
 	{
-		V_sprintf_safe( NameFixup, "%s", pTargetName );
+		V_strcpy_safe( NameFixup, pTargetName );
 	}
 	else if ( pName[ 0 ] )
 	{
-		V_sprintf_safe( NameFixup, "%s", pName );
+		V_strcpy_safe( NameFixup, pName );
 	}
 	else
 	{

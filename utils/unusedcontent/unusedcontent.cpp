@@ -743,7 +743,7 @@ void BuildFileList_R( int depth, CUtlVector< FileEntry >& files, CUtlVector< Fil
 			char filename[ MAX_PATH ];
 			if ( dirlen <= skipchars )
 			{
-				Q_snprintf( filename, sizeof( filename ), "%s", wfd.cFileName );
+				V_strcpy_safe( filename, wfd.cFileName );
 			}
 			else
 			{

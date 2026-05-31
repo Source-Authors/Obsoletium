@@ -474,7 +474,7 @@ void mxExpressionSlider::DrawTitle( HDC &dc )
 	InflateRect( &rc, -5, -2 );
 
 	char sz[ 128 ];
-	V_sprintf_safe( sz, "%s", getLabel() );
+	V_strcpy_safe( sz, getLabel() );
 
 	HFONT fnt = CreateFont(
 		-12					             // H

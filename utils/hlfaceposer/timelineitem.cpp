@@ -938,7 +938,7 @@ void TimelineItem::Draw( CChoreoWidgetDrawHelper& drawHelper )
 
 				// Draw curve type indicator...
 				char sz[ 128 ];
-				Q_snprintf( sz, sizeof( sz ), "%s", Interpolator_NameForCurveType( start->GetCurveType(), true ) );
+				V_strcpy_safe( sz, Interpolator_NameForCurveType( start->GetCurveType(), true ) );
 				RECT rc;
 				int fontSize = 9;
 				rc.top = clamp( static_cast<long>(y) + 5, rcClient.top + 2, rcClient.bottom - 2 - fontSize );
@@ -1012,7 +1012,7 @@ void TimelineItem::Draw( CChoreoWidgetDrawHelper& drawHelper )
 			active ? RGB( 0, 150, 100 ) : RGB( 100, 100, 100 ), 
 			title, sz );
 
-		V_sprintf_safe( sz, "%s", IsActive() ? "enabled" : "disabled" );
+		V_strcpy_safe( sz, IsActive() ? "enabled" : "disabled" );
 
 		title.left += len + 2;
 

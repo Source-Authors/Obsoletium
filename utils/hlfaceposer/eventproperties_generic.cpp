@@ -229,7 +229,7 @@ BOOL CEventPropertiesGenericDialog::HandleMessage( HWND hwndDlg, UINT uMsg, WPAR
 
 						SendMessage( GetControl( IDC_EVENTCHOICES2 ), WM_GETTEXT, (WPARAM)sizeof( buf1 ), (LPARAM)buf1 );
 
-						Q_snprintf( g_Params.m_szParameters2, sizeof( g_Params.m_szParameters2 ), "%s", buf1 );
+						V_strcpy_safe( g_Params.m_szParameters2, buf1 );
 					}
 				}
 			}

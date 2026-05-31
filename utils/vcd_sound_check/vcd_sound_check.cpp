@@ -544,7 +544,7 @@ void ProcessVCD( CUtlDict< VCDList, int >& database, CUtlSymbol& vcdname )
 
 	// Load the .vcd
 	char fullname[ 512 ];
-	Q_snprintf( fullname, sizeof( fullname ), "%s", g_Analysis.symbols.String( vcdname ) );
+	V_strcpy_safe( fullname, g_Analysis.symbols.String( vcdname ) );
 
 	LoadScriptFile( fullname );
 	

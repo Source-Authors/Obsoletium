@@ -1453,7 +1453,7 @@ void CheckUnusedSounds()
 								{
 									if ( !Q_isempty( sentence.GetText() ) ) 
 									{
-										Q_snprintf( ansi, sizeof( ansi ), "%s", sentence.GetText() );
+										V_strcpy_safe( ansi, sentence.GetText() );
 										cleanquotes( ansi );
 
 										logprint( "cc_foundphonemes.txt", "\t\"%s\"\t\t\"%s\"\n", keyname, ansi );
@@ -1515,7 +1515,7 @@ void CheckUnusedSounds()
 					{
 						if ( !Q_isempty( sentence.GetText() ) )
 						{
-							Q_snprintf( ansi, sizeof( ansi ), "%s", sentence.GetText() );
+							V_strcpy_safe( ansi, sentence.GetText() );
 							cleanquotes( ansi );
 						}
 					}
@@ -1619,7 +1619,7 @@ void SpewScript( char const *vcdname, CUtlRBTree< CChoreoEvent *, int >& list )
 					{
 						if ( !Q_isempty( sentence.GetText() ) ) 
 						{
-							Q_snprintf( sentence_text, sizeof( sentence_text ), "%s", sentence.GetText() );
+							V_strcpy_safe( sentence_text, sentence.GetText() );
 							cleanquotes( sentence_text );
 						}
 					}
@@ -1702,7 +1702,7 @@ void CheckLocalizationEntries( CUtlVector< CUtlSymbol >& vcdfiles, CUtlRBTree< C
 
 		// Load the .vcd
 		char fullname[ 512 ];
-		Q_snprintf( fullname, sizeof( fullname ), "%s", g_Analysis.symbols.String( vcdname ) );
+		V_strcpy_safe( fullname, g_Analysis.symbols.String( vcdname ) );
 
 		LoadScriptFile( fullname );
 	
@@ -1817,7 +1817,7 @@ void CheckLocalizationEntries( CUtlVector< CUtlSymbol >& vcdfiles, CUtlRBTree< C
 										{
 											if ( !Q_isempty( sentence.GetText() ) ) 
 											{
-												Q_snprintf( suggested, sizeof( suggested ), "%s", sentence.GetText() );
+												V_strcpy_safe( suggested, sentence.GetText() );
 												cleanquotes( suggested );
 											}
 										}
@@ -2117,7 +2117,7 @@ void CheckWaveFile( CUtlDict< CUtlSymbol, int >& wavtosound, char const *wavname
 	{
 		if ( !Q_isempty( sentence.GetText() ) ) 
 		{
-			Q_snprintf( ansi, sizeof( ansi ), "%s", sentence.GetText() );
+			V_strcpy_safe( ansi, sentence.GetText() );
 			cleanquotes( ansi );
 		}
 	}
@@ -2434,7 +2434,7 @@ void ExtractPhonemesForWave( IPhonemeExtractor *extractor, char const *wavname )
 	CSentence			outsentence;
 
 	char filename[ 512 ];
-	Q_snprintf( filename, sizeof( filename ), "%s", wavname );
+	V_strcpy_safe( filename, wavname );
 
 	int result = extractor->Extract( 
 		filename,

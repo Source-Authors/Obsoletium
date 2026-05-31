@@ -1206,7 +1206,7 @@ void GestureTool::DrawMouseOverPos( CChoreoWidgetDrawHelper& drawHelper, RECT& r
 	char sz[ 128 ];
 	if ( t != snapped )
 	{
-		Q_snprintf( sz, sizeof( sz ), "%s", FacePoser_DescribeSnappedTime( t ) );
+		V_strcpy_safe( sz, FacePoser_DescribeSnappedTime( t ) );
 	}
 	else
 	{
@@ -1389,7 +1389,7 @@ void GestureTool::DrawAbsoluteTags( CChoreoWidgetDrawHelper& drawHelper )
 			}
 			
 			char text[ 256 ];
-			V_sprintf_safe( text, "%s", tag->GetName() );
+			V_strcpy_safe( text, tag->GetName() );
 
 			int len = drawHelper.CalcTextWidth( "Arial", 9, FW_NORMAL, text );
 			rcText.left = ( rcMark.left + rcMark.right ) / 2 - len / 2;

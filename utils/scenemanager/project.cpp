@@ -291,7 +291,7 @@ void CProject::ValidateTree( mxTreeView *tree, mxTreeViewItem* parent )
 		}
 		else
 		{
-			Q_snprintf( sz, sizeof( sz ) , "%s", scene->GetName() );
+			V_strcpy_safe( sz, scene->GetName() );
 		}
 		
 

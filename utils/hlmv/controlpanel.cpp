@@ -3424,7 +3424,7 @@ void ControlPanel::initMaterialChoices()
 			for (int i = 0; i < pStudioHdr->numtextures; i++)
 			{
 				char str[512];
-				V_sprintf_safe (str, "%s", pStudioHdr->pTexture(i)->pszName() );
+				V_strcpy_safe (str, pStudioHdr->pTexture(i)->pszName() );
 				cMaterials->add (str);
 			}
 
@@ -3451,7 +3451,7 @@ void ControlPanel::showActivityModifiers( intp sequence )
 	for (int i = 0; i < desc.numactivitymodifiers; i++)
 	{
 		char str[512];
-		V_sprintf_safe (str, "%s", desc.pActivityModifier( i )->pszName() );
+		V_strcpy_safe (str, desc.pActivityModifier( i )->pszName() );
 		cActivityModifiers->add (str);
 	}
 

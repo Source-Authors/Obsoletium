@@ -1269,7 +1269,7 @@ void RampTool::DrawMouseOverPos( CChoreoWidgetDrawHelper& drawHelper, RECT& rcPo
 	char sz[ 128 ];
 	if ( t != snapped )
 	{
-		Q_snprintf( sz, sizeof( sz ), "%s", FacePoser_DescribeSnappedTime( t ) );
+		V_strcpy_safe( sz, FacePoser_DescribeSnappedTime( t ) );
 	}
 	else
 	{
@@ -1948,7 +1948,7 @@ void RampTool::DrawSamples( CChoreoWidgetDrawHelper& drawHelper, RECT &rcSamples
 
 		// Draw curve type indicator...
 		char sz[ 128 ];
-		Q_snprintf( sz, sizeof( sz ), "%s", Interpolator_NameForCurveType( start->GetCurveType(), true ) );
+		V_strcpy_safe( sz, Interpolator_NameForCurveType( start->GetCurveType(), true ) );
 		RECT rc;
 		int fontSize = 9;
 		rc.top = clamp( static_cast<long>(y) + 5, rcSamples.top + 2, rcSamples.bottom - 2 - fontSize );

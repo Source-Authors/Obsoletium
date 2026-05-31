@@ -666,7 +666,7 @@ int CCompileKeyValuesApp::Main()
 	for ( i = 0; i < worklist.Count() - 1; ++i )
 	{
         char workdir[ 256 ];
-		Q_snprintf( workdir, sizeof( workdir ), "%s", worklist[ i ].String() );
+		V_strcpy_safe( workdir, worklist[ i ].String() );
 
 		Q_StripTrailingSlash( workdir );
 
