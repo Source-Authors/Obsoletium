@@ -207,11 +207,9 @@ CNetworkStringTable::CNetworkStringTable( TABLEID id, const char *tableName, int
 	m_pItemsClientSide( NULL )
 {
 	m_id = id;
-	intp len = strlen( tableName ) + 1;
-	m_pszTableName = new char[ len ];
-	Assert( m_pszTableName );
 	Assert( tableName );
-	Q_strncpy( m_pszTableName, tableName, len );
+	m_pszTableName = V_strdup( tableName );
+	Assert( m_pszTableName );
 
 	m_changeFunc = NULL;
 	m_pObject = NULL;

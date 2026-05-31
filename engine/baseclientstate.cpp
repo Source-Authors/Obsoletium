@@ -1288,22 +1288,16 @@ bool CBaseClientState::ProcessClassInfo( SVC_ClassInfo *msg )
 	// copy class names and class IDs from message to CClientState
 	for (int i=0; i<m_nServerClasses; i++)
 	{
-		SVC_ClassInfo::class_t * svclass = &msg->m_Classes[ i ];
-
-		if( svclass->classID >= m_nServerClasses )
+		const SVC_ClassInfo::class_t * svclass = &msg->m_Classes[ i ];
+		if ( svclass->classID >= m_nServerClasses )
 		{
 			Host_EndGame(true, "ProcessClassInfo: invalid class index (%d).\n", svclass->classID);
 			return false;
 		}
 
 		C_ServerClassInfo * svclassinfo = &m_pServerClasses[svclass->classID];
-
-		intp len = Q_strlen(svclass->classname) + 1;
-		svclassinfo->m_ClassName = new char[ len ];
-		Q_strncpy( svclassinfo->m_ClassName, svclass->classname, len );
-		len = Q_strlen(svclass->datatablename) + 1;
-		svclassinfo->m_DatatableName = new char[ len ];
-		Q_strncpy( svclassinfo->m_DatatableName,svclass->datatablename, len );
+		svclassinfo->m_ClassName = V_strdup( svclass->classname );
+		svclassinfo->m_DatatableName = V_strdup( svclass->datatablename );
 	}
 
 	COM_TimestampedLog( " CBaseClient::ProcessClassInfo(done)" );

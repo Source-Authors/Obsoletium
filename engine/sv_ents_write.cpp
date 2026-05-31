@@ -100,9 +100,7 @@ CChangeTrack* GetChangeTrack( const char *pName )
 	}
 
 	CChangeTrack *pCur = new CChangeTrack;
-	intp len = strlen(pName)+1;
-	pCur->m_pName = new char[len];
-	Q_strncpy( pCur->m_pName, pName, len );
+	pCur->m_pName = V_strdup( pName );
 	pCur->m_nChanged = pCur->m_nUnchanged = 0;
 	
 	g_Tracks.AddToTail( pCur );
