@@ -261,7 +261,7 @@ void CDmeDagRenderPanel::DrawJointNames( CDmeDag *pRoot, CDmeDag *pDag, const ma
 		}
 		else
 		{
-			Q_snprintf( pJointName, sizeof(pJointName), "%s", pJoint->GetName() );
+			V_strcpy_safe( pJointName, pJoint->GetName() );
 		}
 		g_pMatSystemSurface->DrawColoredText( m_hFont, vecPanelPos.x + 5, vecPanelPos.y, 255, 255, 255, 255, pJointName );
 	}

@@ -1276,7 +1276,7 @@ IImage *CSchemeManager::GetImage(const char *imageName, bool hardwareFiltered, b
 
 	if ( Q_stristr( imageName, ".pic" ) )
 	{
-		V_sprintf_safe( szFileName, "%s", imageName );
+		V_strcpy_safe( szFileName, imageName );
 	}
 	else
 	{
@@ -1337,7 +1337,7 @@ bool CSchemeManager::DeleteImage( const char *pImageName )
 	char szFileName[256];
 	if ( Q_stristr( pImageName, ".pic" ) )
 	{
-		Q_snprintf( szFileName, sizeof(szFileName), "%s", pImageName );
+		V_strcpy_safe( szFileName, pImageName );
 	}
 	else
 	{

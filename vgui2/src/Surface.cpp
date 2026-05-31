@@ -3497,7 +3497,7 @@ IImage *CWin32Surface::GetIconImageForFullPath( char const *pFullPath )
 			V_ExtractFileExtension( pFullPath, ext );
 
 			char lookup[ 512 ];
-			V_sprintf_safe( lookup, "%s", ShouldMakeUnique( ext ) ? pFullPath : info.szTypeName );
+			V_strcpy_safe( lookup, ShouldMakeUnique( ext ) ? pFullPath : info.szTypeName );
 
 			// Now check the dictionary
 			auto idx = m_FileTypeImages.Find( lookup );

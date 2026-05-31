@@ -2852,7 +2852,7 @@ void CElementPropertiesTreeInternal::UpdateTree()
 		m_AttributeWidgets.RemoveAll();
 
 		char label[ 256 ];
-		Q_snprintf( label, sizeof( label ), "%s", m_hObject->GetValueString( "name" ) );
+		V_strcpy_safe( label, m_hObject->GetValueString( "name" ) );
 		constexpr bool editableLabel = true;
 
 		KeyValuesAD kv( "item" );

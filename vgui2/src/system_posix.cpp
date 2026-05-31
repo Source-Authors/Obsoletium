@@ -166,7 +166,7 @@ CSystem::CSystem()
 	PasteboardCreate( kPasteboardClipboard, &m_PasteBoardRef );
 #endif
 	
-	Q_snprintf( m_szRegistryPath, sizeof(m_szRegistryPath), "%s", REGISTRY_NAME );
+	V_strcpy_safe( m_szRegistryPath, REGISTRY_NAME );
 	
 	m_pRegistry = new KeyValues( "registry" );
 }
