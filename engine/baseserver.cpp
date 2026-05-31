@@ -14,20 +14,19 @@
 #if defined(_WIN32) && !defined(_X360)
 #include "winlite.h"		// FILETIME
 #elif defined(POSIX)
-#include <time.h>
+#include <ctime>
 /*
 #include <sys/sysinfo.h>          
 #include <asm/param.h> // for HZ
 */
 #include <sys/resource.h>
 #include <netinet/in.h>
-#elif defined(_X360)
 #else
 #error "Includes for CPU usage calcs here"
 #endif
 
-#include "filesystem_engine.h"
 #include "baseserver.h"
+#include "filesystem_engine.h"
 #include "sysexternal.h"
 #include "quakedef.h"
 #include "host.h"
@@ -43,23 +42,19 @@
 #include "sv_steamauth.h"
 
 #include <proto_oob.h>
-#include <vstdlib/random.h>
 #include <irecipientfilter.h>
-#include <KeyValues.h>
-#include <tier0/vprof.h>
 #include <cdll_int.h>
 #include <eiface.h>
 #include <client_class.h>
-#include "tier0/icommandline.h"
-#include "sv_steamauth.h"
-#include "tier0/vcrmode.h"
 #include "sv_ipratelimit.h"
 #include "cl_steamauth.h"
 #include "sv_filter.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
+#include "tier0/icommandline.h"
+#include "tier0/vcrmode.h"
+#include "tier0/vprof.h"
+#include "tier1/KeyValues.h"
+#include "vstdlib/random.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
