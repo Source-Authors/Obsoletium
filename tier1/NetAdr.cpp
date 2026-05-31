@@ -117,7 +117,7 @@ const char * netadr_t::ToString( bool onlyBase ) const
 	return s[useSlot];
 }
 
-void netadr_t::ToString( OUT_Z_CAP(unBufferSize) char *pchBuffer, size_t unBufferSize, bool onlyBase ) const
+const char *netadr_t::ToString( OUT_Z_CAP(unBufferSize) char *pchBuffer, size_t unBufferSize, bool onlyBase ) const
 {
 	if (type == NA_LOOPBACK)
 	{
@@ -131,17 +131,21 @@ void netadr_t::ToString( OUT_Z_CAP(unBufferSize) char *pchBuffer, size_t unBuffe
 	{
 		if ( onlyBase )
 		{
-			V_snprintf( pchBuffer, unBufferSize, "%i.%i.%i.%i", ip[0], ip[1], ip[2], ip[3]);
+			// dimhotepus: Print ip with correct specifiers.
+			V_snprintf( pchBuffer, unBufferSize, "%hhu.%hhu.%hhu.%hhu", ip[0], ip[1], ip[2], ip[3]);
 		}
 		else
 		{
-			V_snprintf( pchBuffer, unBufferSize, "%i.%i.%i.%i:%i", ip[0], ip[1], ip[2], ip[3], ntohs(port));
+			// dimhotepus: Print ip & port with correct specifiers.
+			V_snprintf( pchBuffer, unBufferSize, "%hhu.%hhu.%hhu.%hhu:%hu", ip[0], ip[1], ip[2], ip[3], ntohs(port));
 		}
 	}
 	else
 	{
 		V_strncpy( pchBuffer, "unknown", unBufferSize );
 	}
+
+	return pchBuffer;
 }
 
 bool netadr_t::IsLocalhost() const
