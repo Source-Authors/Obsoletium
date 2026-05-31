@@ -544,7 +544,8 @@ CBaseTool *Selection3D::GetToolObject( CMapView2D *pView, const Vector2D &vPoint
 			// They clicked on some part of the object. See if there is a
 			// tool associated with what we clicked on.
 			//
-			CBaseTool *pToolHit = HitData.pObject->GetToolObject(HitData.uData, bAttach );
+			auto *pMapClass = dynamic_cast<CMapClass *>(HitData.pObject);
+			CBaseTool *pToolHit = pMapClass->GetToolObject(HitData.uData, bAttach );
 			if ( pToolHit != NULL )
 			{
 				return pToolHit;
@@ -573,7 +574,8 @@ CBaseTool *Selection3D::GetToolObjectLogical( CMapViewLogical *pView, const Vect
 			// They clicked on some part of the object. See if there is a
 			// tool associated with what we clicked on.
 			//
-			CBaseTool *pToolHit = HitData.pObject->GetToolObject(HitData.uData, bAttach );
+			auto *pMapClass = dynamic_cast<CMapClass *>(HitData.pObject);
+			CBaseTool *pToolHit = pMapClass->GetToolObject(HitData.uData, bAttach );
 			if ( pToolHit != NULL )
 			{
 				return pToolHit;

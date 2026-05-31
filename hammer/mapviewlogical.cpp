@@ -143,7 +143,8 @@ bool CMapViewLogical::SelectAtCascading( const Vector2D &ptClient, bool bMakeFir
 
 	for ( int i=0; i<nHits; ++i )
 	{
-		CMapClass *pSelObject = HitData[i].pObject->PrepareSelection( eSelectMode );
+		auto *pMapClass = dynamic_cast<CMapClass *>(HitData[i].pObject);
+		CMapClass *pSelObject = pMapClass->PrepareSelection( eSelectMode );
 		if ( !pSelObject )
 			continue;
 		
