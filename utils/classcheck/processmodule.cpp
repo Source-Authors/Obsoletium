@@ -389,7 +389,7 @@ void CCodeProcessor::PrintClassList( void ) const
 			else if ( cl->m_szBaseClass[ 0 ] )
 			{
 				missing = true;
-				sprintf( missingwarning, ", missing typedef %s BaseClass", cl->m_szBaseClass );
+				V_sprintf_safe( missingwarning, ", missing typedef %s BaseClass", cl->m_szBaseClass );
 			}
 
 			if ( GetPrintHierarchy() || missing )
@@ -558,7 +558,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 		if ( Q_isempty( com_token ) )
 			return current;
 
-		strcpy( classname, com_token );
+		V_strcpy_safe( classname, com_token );
 		if ( classname[0]=='*' )
 			return current;
 
@@ -575,7 +575,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 		if ( Q_isempty( com_token ) )
 			return current;
 
-		strcpy( variablename, com_token );
+		V_strcpy_safe( variablename, com_token );
 	}
 	else
 	{
@@ -589,7 +589,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 		if ( Q_isempty( com_token ) )
 			return current;
 
-		strcpy( classname, com_token );
+		V_strcpy_safe( classname, com_token );
 		if ( classname[0]=='*' )
 			return current;
 
@@ -600,7 +600,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 		}
 
 		// It's macro-ized
-		strcpy( variablename, "m_DataDesc" );
+		V_strcpy_safe( variablename, "m_DataDesc" );
 	}
 	if ( !fIsMacroized )
 	{
@@ -663,7 +663,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 				else
 				{
 					char commentedvarname[ 256 ];
-					strcpy( commentedvarname, com_token );
+					V_strcpy_safe( commentedvarname, com_token );
 
 					CClass *cl = FindClass( classname );
 					if ( cl )
@@ -685,7 +685,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 
 		// Parse a typedescription line
 		char definetype[ 256 ];
-		strcpy( definetype, com_token );
+		V_strcpy_safe( definetype, com_token );
 
 		current = CC_ParseToken( current );
 		if ( stricmp( com_token, "(" ) )
@@ -694,7 +694,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 		char varname[ 256 ];
 		current = CC_ParseToken( current );
 
-		strcpy( varname, com_token );
+		V_strcpy_safe( varname, com_token );
 
 		
 		char vartype[ 256 ];
@@ -708,7 +708,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 			V_strieq( definetype, "DEFINE_OUTPUT" ) ||
 			V_strieq( definetype, "DEFINE_INPUTFUNC" ) )
 		{
-			strcpy( vartype, "funcptr" );
+			V_strcpy_safe( vartype, "funcptr" );
 		}
 		else if ( V_strieq(definetype, "DEFINE_FIELD") || 
 			V_strieq(definetype, "DEFINE_INDEX") ||
@@ -730,14 +730,14 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 			{
 				// Read array...
 				current = CC_ParseToken( current );
-				strcat( varname, "[" );
-				strcat( varname, com_token );
+				V_strcat_safe( varname, "[" );
+				V_strcat_safe( varname, com_token );
 				current = CC_ParseToken( current );
 
 				// eat everything until the next "]"
 				while (strcmp( com_token, "]") != 0)
 				{
-					strcat( varname, com_token );
+					V_strcat_safe( varname, com_token );
 					current = CC_ParseToken( current );
 				}
 
@@ -746,7 +746,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 					current = current;
 				}
 
- 				strcat( varname, "]" );
+ 				V_strcat_safe( varname, "]" );
 
 				// skip comma
 				current = CC_ParseToken( current );
@@ -754,7 +754,7 @@ char *CCodeProcessor::ParseTypeDescription( char *current, bool fIsMacroized )
 
 			current = CC_ParseToken( current );
 
-			strcpy( vartype, com_token );
+			V_strcpy_safe( vartype, com_token );
 		}
 
 		// Jump to end of definition
@@ -822,7 +822,7 @@ char *CCodeProcessor::ParseReceiveTable( char *current )
 	if ( Q_isempty( com_token ) )
 		return current;
 
-	strcpy( classname, com_token );
+	V_strcpy_safe( classname, com_token );
 	if ( classname[0]=='*' )
 		return current;
 	if ( V_streq( classname, "className" ) )
@@ -867,9 +867,9 @@ char *CCodeProcessor::ParseReceiveTable( char *current )
 
 		// Parse recproxy line
 		char recvproptype[ 256 ];
-		strcpy( recvproptype, com_token );
+		V_strcpy_safe( recvproptype, com_token );
 
-		if ( strnicmp( recvproptype, "RecvProp", strlen( "RecvProp" ) ) )
+		if ( strnicmp( recvproptype, "RecvProp", ssize( "RecvProp" ) - 1 ) )
 		{
 			current = CC_ParseUntilEndOfLine( current );
 			continue;
@@ -882,7 +882,7 @@ char *CCodeProcessor::ParseReceiveTable( char *current )
 				break;
 
 			current = CC_ParseToken( current );
-			if ( strnicmp( recvproptype, "RecvProp", strlen( "RecvProp" ) ) )
+			if ( strnicmp( recvproptype, "RecvProp", ssize( "RecvProp" ) - 1 ) )
 			{
 				current = CC_ParseUntilEndOfLine( current );
 				continue;
@@ -898,7 +898,7 @@ char *CCodeProcessor::ParseReceiveTable( char *current )
 
 		char varname[ 256 ];
 
-		if ( !strnicmp( com_token, "RECVINFO", strlen( "RECVINFO" ) ) )
+		if ( !strnicmp( com_token, "RECVINFO", ssize( "RECVINFO" ) - 1 ) )
 		{
 			current = CC_ParseToken( current );
 			if ( stricmp( com_token, "(" ) )
@@ -911,7 +911,7 @@ char *CCodeProcessor::ParseReceiveTable( char *current )
 			continue;
 		}
 
-		strcpy( varname, com_token );
+		V_strcpy_safe( varname, com_token );
 
 		current = CC_ParseUntilEndOfLine( current );
 
@@ -927,7 +927,7 @@ char *CCodeProcessor::ParseReceiveTable( char *current )
 			{
 				char cropped[ 256 ];
 				char root[ 256 ];
-				strcpy( cropped, varname );
+				V_strcpy_safe( cropped, varname );
 
 				while ( 1 )
 				{
@@ -935,9 +935,9 @@ char *CCodeProcessor::ParseReceiveTable( char *current )
 					char *spot = strstr( cropped, "." );
 					if ( spot )
 					{
-						strcpy( root, cropped );
+						V_strcpy_safe( root, cropped );
 						root[ spot - cropped ] = 0;
-						strcpy( cropped, spot + 1 );
+						V_strcpy_safe( cropped, spot + 1 );
 
 						classVar = cl->FindVar( root, true );	
 					}
@@ -986,7 +986,7 @@ char *CCodeProcessor::ParsePredictionTypeDescription( char *current )
 	if ( Q_isempty( com_token ) )
 		return current;
 
-	strcpy( classname, com_token );
+	V_strcpy_safe( classname, com_token );
 	if ( classname[0]=='*' )
 		return current;
 
@@ -1003,7 +1003,7 @@ char *CCodeProcessor::ParsePredictionTypeDescription( char *current )
 	}
 
 	// It's macro-ized
-	strcpy( variablename, "m_PredDesc" );
+	V_strcpy_safe( variablename, "m_PredDesc" );
 
 	com_ignoreinlinecomment = true;
 	bool insidecomment = false;
@@ -1053,7 +1053,7 @@ char *CCodeProcessor::ParsePredictionTypeDescription( char *current )
 
 		// Parse a typedescription line
 		char definetype[ 256 ];
-		strcpy( definetype, com_token );
+		V_strcpy_safe( definetype, com_token );
 
 		current = CC_ParseToken( current );
 		if ( stricmp( com_token, "(" ) )
@@ -1062,7 +1062,7 @@ char *CCodeProcessor::ParsePredictionTypeDescription( char *current )
 		char varname[ 256 ];
 		current = CC_ParseToken( current );
 
-		strcpy( varname, com_token );
+		V_strcpy_safe( varname, com_token );
 
 		
 		char vartype[ 256 ];
@@ -1076,11 +1076,11 @@ char *CCodeProcessor::ParsePredictionTypeDescription( char *current )
 
 			current = CC_ParseToken( current );
 
-			strcpy( vartype, com_token );
+			V_strcpy_safe( vartype, com_token );
 		}
 		else
 		{
-			strcpy( vartype, "funcptr" );
+			V_strcpy_safe( vartype, "funcptr" );
 		}
 
 		bool inrecvtable = false;
@@ -1267,7 +1267,7 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 
 	if ( !forcequiet )
 	{
-		strcpy( m_szCurrentCPP, filename );
+		V_strcpy_safe( m_szCurrentCPP, filename );
 	}
 
 	AddHeader( depth, filename, m_szCurrentCPP );
@@ -1336,7 +1336,7 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 				}
 			}
 		}
-		else if ( !strnicmp( com_token, "PREDICTABLE_CLASS", strlen( "PREDICTABLE_CLASS" ) ) )
+		else if ( !strnicmp( com_token, "PREDICTABLE_CLASS", ssize( "PREDICTABLE_CLASS" ) - 1 ) )
 		{
 			char prefix[ 32 ];
 			prefix[ 0 ] = 0;
@@ -1350,11 +1350,11 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 				bases = 2;
 				if ( onclient )
 				{
-					strcpy( prefix, "C_" );
+					V_strcpy_safe( prefix, "C_" );
 				}
 				else
 				{
-					strcpy( prefix, "C" );
+					V_strcpy_safe( prefix, "C" );
 					usebase = 1;
 				}
 			}
@@ -1369,11 +1369,11 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 				bases = 1;
 				if ( onclient )
 				{
-					strcpy( prefix, "C_" );
+					V_strcpy_safe( prefix, "C_" );
 				}
 				else
 				{
-					strcpy( prefix, "C" );
+					V_strcpy_safe( prefix, "C" );
 				}
 			}
 			else if ( V_strieq( com_token, "PREDICTABLE_CLASS_ALIASED_PREFIXED" ) )
@@ -1406,7 +1406,7 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 						if ( !Q_isempty( com_token ) )
 						{
 							char basename[ 256 ];
-							sprintf( basename, "%s%s", prefix, com_token );
+							V_sprintf_safe( basename, "%s%s", prefix, com_token );
 
 							bool valid = true;
 
@@ -1423,7 +1423,7 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 										valid = true;
 										if ( usebase == 1 )
 										{
-											sprintf( basename, "%s%s", prefix, com_token );
+											V_sprintf_safe( basename, "%s%s", prefix, com_token );
 										}
 									}
 								}
@@ -1432,7 +1432,7 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 							if ( valid )
 							{
 								cl->SetBaseClass( basename );
-								strcpy( cl->m_szTypedefBaseClass, basename );
+								V_strcpy_safe( cl->m_szTypedefBaseClass, basename );
 							}
 							
 							do
@@ -1601,13 +1601,12 @@ CCodeProcessor::~CCodeProcessor( void )
 void CCodeProcessor::ConstructModuleList_R( int level, const char *baseentityclass, 
 	const char *gamespecific, const char *root, const char *srcroot )
 {
-	char directory[ 256 ];
-	char filename[ 256 ];
+	char directory[ MAX_PATH ], filename[ MAX_PATH ];
+
+	V_sprintf_safe( directory, "%s\\*.*", root );
+
 	WIN32_FIND_DATA wfd;
 	HANDLE ff;
-
-	sprintf( directory, "%s\\*.*", root );
-
 	if ( ( ff = FindFirstFile( directory, &wfd ) ) == INVALID_HANDLE_VALUE )
 		return;
 
@@ -1617,7 +1616,6 @@ void CCodeProcessor::ConstructModuleList_R( int level, const char *baseentitycla
 	{
 		if ( wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
 		{
-
 			if ( wfd.cFileName[ 0 ] == '.' )
 				continue;
 
@@ -1626,7 +1624,7 @@ void CCodeProcessor::ConstructModuleList_R( int level, const char *baseentitycla
 				continue;
 
 			// Recurse down directory
-			sprintf( filename, "%s\\%s", root, wfd.cFileName );
+			V_sprintf_safe( filename, "%s\\%s", root, wfd.cFileName );
 			ConstructModuleList_R( level+1, baseentityclass, gamespecific, filename, srcroot );
 		}
 		else
@@ -1641,7 +1639,7 @@ void CCodeProcessor::ConstructModuleList_R( int level, const char *baseentitycla
 
 void CCodeProcessor::CleanupIncludePath()
 {
-	for ( int i = m_IncludePath.Count(); --i >= 0; )
+	for ( intp i = m_IncludePath.Count(); --i >= 0; )
 	{
 		delete [] m_IncludePath[i];
 	}
@@ -1659,38 +1657,38 @@ void CCodeProcessor::SetupIncludePath( const char *sourcetreebase, const char *s
 	CleanupIncludePath();
 
 	char path[MAX_PATH];
-	sprintf( path, "%s\\%s", sourcetreebase, subdir );
+	V_sprintf_safe( path, "%s\\%s", sourcetreebase, subdir );
 	strlwr( path );
 	AddIncludePath( path );
 
 	char modsubdir[128];
 	if ( V_strieq(subdir, "dlls") )
 	{
-		sprintf(modsubdir,"%s\\%s_dll", subdir, gamespecific );
+		V_sprintf_safe(modsubdir,"%s\\%s_dll", subdir, gamespecific );
 	}
 	else if ( V_strieq(subdir, "cl_dll") )
 	{
-		sprintf(modsubdir,"%s\\%s_hud", subdir, gamespecific );
+		V_sprintf_safe(modsubdir,"%s\\%s_hud", subdir, gamespecific );
 	}
 	else
 	{
-		sprintf(modsubdir,"%s\\%s", subdir, gamespecific );
+		V_sprintf_safe(modsubdir,"%s\\%s", subdir, gamespecific );
 	}
 
-	sprintf( path, "%s\\%s", sourcetreebase, modsubdir );
+	V_sprintf_safe( path, "%s\\%s", sourcetreebase, modsubdir );
 	strlwr( path );
 	AddIncludePath( path );
 
 	// Game shared
-	sprintf( path, "%s\\game_shared", sourcetreebase );
+	V_sprintf_safe( path, "%s\\game_shared", sourcetreebase );
 	strlwr( path );
 	AddIncludePath( path );
 
-	sprintf( path, "%s\\game_shared\\%s", sourcetreebase, gamespecific );
+	V_sprintf_safe( path, "%s\\game_shared\\%s", sourcetreebase, gamespecific );
 	strlwr( path );
 	AddIncludePath( path );
 
-	sprintf( path, "%s\\public", sourcetreebase );
+	V_sprintf_safe( path, "%s\\public", sourcetreebase );
 	strlwr( path );
 	AddIncludePath( path );
 }
@@ -1700,7 +1698,7 @@ void CCodeProcessor::Process( const char *baseentityclass, const char *gamespeci
 {
 	SetupIncludePath( sourcetreebase, subdir, gamespecific );
 
-	strcpy( m_szBaseEntityClass, baseentityclass );
+	V_strcpy_safe( m_szBaseEntityClass, baseentityclass );
 
 	m_nBytesProcessed	= 0;
 	m_nFilesProcessed	= 0;
@@ -1716,7 +1714,7 @@ void CCodeProcessor::Process( const char *baseentityclass, const char *gamespeci
 	m_flStart = UTIL_FloatTime();
 
 	char rootdirectory[ 256 ];
-	sprintf( rootdirectory, "%s\\%s", sourcetreebase, subdir );
+	V_sprintf_safe( rootdirectory, "%s\\%s", sourcetreebase, subdir );
 
 	vprint( 0, "--- Processing %s\n\n", rootdirectory );
 
@@ -1724,7 +1722,7 @@ void CCodeProcessor::Process( const char *baseentityclass, const char *gamespeci
 
 	ConstructModuleList_R( 0, baseentityclass, gamespecific, rootdirectory, sourcetreebase );
 
-	sprintf( rootdirectory, "%s\\%s", sourcetreebase, "game_shared" );
+	V_sprintf_safe( rootdirectory, "%s\\%s", sourcetreebase, "game_shared" );
 
 	vprint( 0, "--- Processing %s\n\n", rootdirectory );
 
@@ -1742,7 +1740,7 @@ void CCodeProcessor::Process( const char *baseentityclass, const char *gamespeci
 {
 	SetupIncludePath( sourcetreebase, subdir, gamespecific );
 
-	strcpy( m_szBaseEntityClass, baseentityclass );
+	V_strcpy_safe( m_szBaseEntityClass, baseentityclass );
 
 	m_nBytesProcessed	= 0;
 	m_nFilesProcessed	= 0;
@@ -1758,7 +1756,7 @@ void CCodeProcessor::Process( const char *baseentityclass, const char *gamespeci
 	m_flStart = UTIL_FloatTime();
 
 	char rootdirectory[ 256 ];
-	sprintf( rootdirectory, "%s\\%s", sourcetreebase, subdir );
+	V_sprintf_safe( rootdirectory, "%s\\%s", sourcetreebase, subdir );
 
 	vprint( 0, "--- Processing %s\n\n", rootdirectory );
 
@@ -1862,4 +1860,4 @@ bool CCodeProcessor::GetCheckHungarian() const
 }
 
 static CCodeProcessor g_Processor;
-ICodeProcessor *processor = ( ICodeProcessor * )&g_Processor;
+ICodeProcessor *processor = &g_Processor;
