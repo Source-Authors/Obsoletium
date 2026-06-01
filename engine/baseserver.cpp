@@ -1520,20 +1520,9 @@ bool CBaseServer::CheckPassword( netadr_t &adr, const char *password, const char
 		return true; // local client can always connect
 	}
 
-	intp iServerPassLen = Q_strlen(server_password);
-
-	if ( iServerPassLen != Q_strlen(password) )
-	{
-		return false; // different length cannot be equal
+	// dimhotepus: Simplify password equality check. Use cryptosafe compare in the future.
+	return V_streq( password, server_password );
 	}
-
-	if ( Q_strncmp( password, server_password, iServerPassLen ) == 0)
-	{
-		return true; // passwords are equal
-	}
-
-	return false; // all test failed
-}
 
 float CBaseServer::GetTime() const
 {
