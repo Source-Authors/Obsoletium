@@ -1272,7 +1272,7 @@ netpacket_t *CDemoPlayer::ReadPacket( void )
 				int outgoing_sequence = m_DemoFile.ReadUserCmd( buffer, length );
 
 				// put it into a bitbuffer 
-				bf_read msg( "CDemo::ReadUserCmd", buffer, length );
+				bf_read msg( "CDemo::ReadUserCmd", &buffer[0], length );
 
 				g_ClientDLL->DecodeUserCmdFromBuffer( msg, outgoing_sequence );
 

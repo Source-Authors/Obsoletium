@@ -773,8 +773,9 @@ bool CClientState::ProcessGameEvent(SVC_GameEvent *msg)
 bool CClientState::ProcessUserMessage(SVC_UserMessage *msg)
 {
 	// buffer for incoming user message
-	ALIGN4 byte userdata[ MAX_USER_MSG_DATA ] ALIGN4_POST = { 0 };
-	bf_read userMsg( "UserMessage(read)", userdata, sizeof( userdata ) );
+	alignas(4) byte userdata[ MAX_USER_MSG_DATA ];
+	BitwiseClear( userdata );
+	bf_read userMsg( "UserMessage(read)", userdata );
 	intp bitsRead = msg->m_DataIn.ReadBitsClamped( userdata, msg->m_nLength );
 	userMsg.StartReading( userdata, Bits2Bytes( bitsRead ) );
 
@@ -804,8 +805,10 @@ bool CClientState::ProcessEntityMessage(SVC_EntityMessage *msg)
 	MDLCACHE_CRITICAL_SECTION_( g_pMDLCache );
 
 	// buffer for incoming user message
-	ALIGN4 byte entityData[ MAX_ENTITY_MSG_DATA ] ALIGN4_POST = { 0 };
-	bf_read entMsg( "EntityMessage(read)", entityData, sizeof( entityData ) );
+	alignas(4) byte entityData[ MAX_ENTITY_MSG_DATA ];
+	BitwiseClear( entityData );
+
+	bf_read entMsg( "EntityMessage(read)", entityData );
 	intp bitsRead = msg->m_DataIn.ReadBitsClamped( entityData, msg->m_nLength );
 	entMsg.StartReading( entityData, Bits2Bytes( bitsRead ) );
 

@@ -2654,7 +2654,7 @@ bool CNetChan::SendReliableAcknowledge(int seqnr)
 bool CNetChan::ProcessStream( void )
 {
 	char		cmd;
-	ALIGN4 char	headerBuf[512] ALIGN4_POST;
+	alignas(4) char	headerBuf[512];
 	
 	if ( !m_StreamSocket )
 		return true;
@@ -2681,7 +2681,7 @@ bool CNetChan::ProcessStream( void )
 
 	}
 
-	bf_read		header( "inDataHeader", headerBuf, sizeof(headerBuf) );
+	bf_read		header( "inDataHeader", headerBuf );
 
 	// now check command type
 

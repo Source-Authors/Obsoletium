@@ -466,7 +466,7 @@ void CServicesDlg::UpdateServicesFromNetMessages()
 		if ( len < 4 )
 			break;
 
-		bf_read buf( in, len );
+		bf_read buf( &in[0], len );
 		unsigned char protocolVersion = buf.ReadByte();
 		if ( protocolVersion == 4 || protocolVersion == VMPI_PROTOCOL_VERSION ) // Protocol version 4 is almost the same.
 		{

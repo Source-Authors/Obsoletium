@@ -1517,7 +1517,7 @@ void VMPI_Waiter_Update()
 		if ( len <= 0 )
 			break;
 
-		bf_read buf( data, len );
+		bf_read buf( &data[0], len );
 		if ( buf.ReadByte() != VMPI_PROTOCOL_VERSION )
 			continue;
 

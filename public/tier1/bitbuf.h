@@ -510,7 +510,20 @@ public:
 	// nMaxBits can be used as the number of bits in the buffer. 
 	// It must be <= nBytes*8. If you leave it at -1, then it's set to nBytes * 8.
 	bf_read( const void *pData, intp nBytes, intp nBits = -1 );
+	// dimhotepus: Bounds-safe ctor.
+	template<typename T, intp size>
+	bf_read( T (&data)[size], intp nBits = -1 )
+		: bf_read{&data, static_cast<intp>( sizeof(T) * size ), nBits}
+	{
+	}
+
 	bf_read( const char *pDebugName, const void *pData, intp nBytes, intp nBits = -1 );
+	// dimhotepus: Bounds-safe ctor.
+	template<typename T, intp size>
+	bf_read( const char *debugName, T (&data)[size], intp nBits = -1 )
+		: bf_read{debugName, &data, static_cast<intp>( sizeof(T) * size ), nBits}
+	{
+	}
 
 	// Start reading from the specified buffer.
 	// pData's start address must be dword-aligned.

@@ -1906,8 +1906,8 @@ void CHLTVServer::ReadCompleteDemoFile()
 			break;
 		case dem_datatables:
 			{
-				ALIGN4 char data[64*1024] ALIGN4_POST;
-				bf_read buf( "dem_datatables", data, sizeof(data) );
+				alignas(4) char data[64*1024];
+				bf_read buf( "dem_datatables", data );
 				
 				m_DemoFile.ReadNetworkDataTables( &buf );
 				buf.Seek( 0 );

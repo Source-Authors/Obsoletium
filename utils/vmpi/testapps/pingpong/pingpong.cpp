@@ -109,7 +109,7 @@ void DoServerConnect()
 		int len = pSocket->RecvFrom( data, sizeof( data ), &ipFrom );
 		if ( len > 3 )
 		{
-			bf_read buf( data, len );
+			bf_read buf( &data[0], len );
 			if ( buf.ReadByte() == VMPI_PROTOCOL_VERSION )
 			{
 				if ( buf.ReadByte() == VMPI_LOOKING_FOR_WORKERS )

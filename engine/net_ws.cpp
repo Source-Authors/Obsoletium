@@ -1562,7 +1562,8 @@ void NET_ProcessPending( void )
 	{
 		pendingsocket_t * psock = &s_PendingSockets[i];
 
-		ALIGN4 char	headerBuf[5] ALIGN4_POST;
+		alignas(4) char	headerBuf[5];
+		BitwiseClear( headerBuf );
 
 		if ( (net_time - psock->time) > TCP_CONNECT_TIMEOUT )
 		{
@@ -1584,7 +1585,7 @@ void NET_ProcessPending( void )
 			continue;	// connection closed somehow
 		}
 		
-		bf_read		header( headerBuf, sizeof(headerBuf) );
+		bf_read		header( headerBuf );
 
 		int cmd = header.ReadByte();
 		// dimhotepus: unsigned long -> uint32
@@ -2362,7 +2363,7 @@ int NET_SendPacket ( INetChannel *chan, intp sock,  const netadr_t &to, const un
 		// some PPP links dont allow broadcasts
 		if ( ( net_error == WSAEADDRNOTAVAIL) && ( to.type == NA_BROADCAST ) )
 			return 0;
-		
+
 		ConDMsg ("NET_SendPacket Warning: %s : %s\n", NET_ErrorString(net_error), to.ToString_safe(buffer) );
 		ret = length;
 	}
