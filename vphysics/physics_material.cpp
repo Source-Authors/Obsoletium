@@ -576,7 +576,7 @@ intp CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *
 		//AddReservedMaterials
 		CSurface prop;
 		
-		int baseMaterial = GetSurfaceIndex( "default" );
+		intp baseMaterial = GetSurfaceIndex( "default" );
 		BitwiseClear( prop.data );
 		prop.m_name = m_strings.AddString( GetReservedMaterialName(MATERIAL_INDEX_SHADOW) );
 		CopyPhysicsProperties( &prop, baseMaterial );

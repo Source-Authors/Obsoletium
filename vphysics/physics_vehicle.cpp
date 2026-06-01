@@ -278,7 +278,7 @@ public:
 	vehicleparams_t &GetVehicleParamsForChange() override			{ return m_vehicleData; }
 	int GetWheelCount(void) override									{ return m_wheelCount; }
 	IPhysicsObject* GetWheel(int index) override;
-	bool GetWheelContactPoint( int index, Vector *pContactPoint, int *pSurfaceProps ) override;
+	bool GetWheelContactPoint( int index, Vector *pContactPoint, intp *pSurfaceProps ) override;
 	void SetWheelFriction(int wheelIndex, float friction) override;
 
 	void SetEngineDisabled( bool bDisable ) override				{ m_bEngineDisable = bDisable; }
@@ -445,7 +445,7 @@ void CVehicleController::SetWheelFriction(int wheelIndex, float friction)
 	pAirboat->SetWheelFriction( wheelIndex, friction );
 }
 
-bool CVehicleController::GetWheelContactPoint( int index, Vector *pContactPoint, int *pSurfaceProps )
+bool CVehicleController::GetWheelContactPoint( int index, Vector *pContactPoint, intp *pSurfaceProps )
 {
 	bool bSet = false;
 	if ( index < m_wheelCount )
@@ -1091,7 +1091,7 @@ void CVehicleController::UpdateSkidding( bool bHandbrake )
 
 		Vector contact;
 		Vector velocity;
-		int surfaceProps;
+		intp surfaceProps;
 		m_currentState.wheelsInContact = 0;
 
 		for( int iWheel = 0; iWheel < m_wheelCount; ++iWheel )

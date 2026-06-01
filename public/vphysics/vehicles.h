@@ -86,7 +86,7 @@ public:
 	[[nodiscard]] virtual float UpdateBooster(float dt) = 0;
 	[[nodiscard]] virtual int GetWheelCount(void) = 0;
 	[[nodiscard]] virtual IPhysicsObject *GetWheel(int index) = 0;
-	[[nodiscard]] virtual bool GetWheelContactPoint( int index, Vector *pContactPoint, int *pSurfaceProps ) = 0;
+	[[nodiscard]] virtual bool GetWheelContactPoint( int index, Vector *pContactPoint, intp *pSurfaceProps ) = 0;
 	virtual void SetSpringLength(int wheelIndex, float length) = 0;
 	virtual void SetWheelFriction(int wheelIndex, float friction) = 0;
 
