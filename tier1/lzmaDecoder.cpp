@@ -251,10 +251,10 @@ bool CLZMAStream::Read( unsigned char *pInput, unsigned int nMaxInputBytes,
 	}
 
 	// These are input ( available size ) *and* output ( size processed ) vars for lzma
-	SizeT expectedInputRemaining = m_nCompressedSize - Min( m_nCompressedBytesRead + nCompressedBytesRead, m_nCompressedSize );
-	SizeT expectedOutputRemaining = m_nActualSize - m_nActualBytesRead;
-	SizeT inSize = Min( (SizeT)nMaxInputBytes, expectedInputRemaining );
-	SizeT outSize = Min( (SizeT)nMaxOutputBytes, expectedOutputRemaining );
+	unsigned expectedInputRemaining = m_nCompressedSize - Min( m_nCompressedBytesRead + nCompressedBytesRead, m_nCompressedSize );
+	unsigned expectedOutputRemaining = m_nActualSize - m_nActualBytesRead;
+	SizeT inSize = Min( nMaxInputBytes, expectedInputRemaining );
+	SizeT outSize = Min( nMaxOutputBytes, expectedOutputRemaining );
 	ELzmaStatus status;
 	ELzmaFinishMode finishMode = LZMA_FINISH_ANY;
 	if ( inSize == expectedInputRemaining && outSize == expectedOutputRemaining )
@@ -290,8 +290,8 @@ bool CLZMAStream::Read( unsigned char *pInput, unsigned int nMaxInputBytes,
 		return false;
 	}
 
-	nCompressedBytesRead += inSize;
-	nOutputBytesWritten += outSize;
+	nCompressedBytesRead += static_cast<unsigned>( inSize );
+	nOutputBytesWritten += static_cast<unsigned>( outSize );
 
 	m_nCompressedBytesRead += nCompressedBytesRead;
 	m_nActualBytesRead += nOutputBytesWritten;
