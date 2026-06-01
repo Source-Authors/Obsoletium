@@ -366,10 +366,8 @@ bool CBaseServer::CheckIPConnectionReuse( netadr_t &adr )
 {
 	int nSimultaneouslyConnections = 0;
 
-	for ( int slot = 0 ; slot < m_Clients.Count() ; slot++ )
+	for ( auto *client : m_Clients )
 	{
-		CBaseClient *client = m_Clients[slot];
-
 		// if the user is connected but not fully in AND the addr's match
 		if ( client->IsConnected() &&
 			 !client->IsActive() &&
@@ -393,12 +391,12 @@ bool CBaseServer::CheckIPConnectionReuse( netadr_t &adr )
 int CBaseServer::GetNextUserID()
 {
 	// Note: we'll usually exit on the first pass of this loop..
-	for ( int i=0; i < m_Clients.Count()+1; i++ )
+	for ( intp i=0; i < m_Clients.Count()+1; i++ )
 	{
 		int nTestID = (m_nUserid + i + 1) % SHRT_MAX;
 
 		// Make sure no client has this user ID.		
-		int iClient;
+		intp iClient;
 		for ( iClient=0; iClient < m_Clients.Count(); iClient++ )
 		{
 			if ( m_Clients[iClient]->GetUserID() == nTestID )
@@ -787,9 +785,9 @@ bool CBaseServer::ProcessConnectionlessPacket(netpacket_t * packet)
 int CBaseServer::GetNumFakeClients() const
 {
 	int count = 0; 
-	for ( int i = 0; i < m_Clients.Count(); i++ )
+	for ( auto *cl : m_Clients )
 	{
-		if ( m_Clients[i]->IsFakeClient() )
+		if ( cl->IsFakeClient() )
 		{
 			count++;
 		}
@@ -808,9 +806,9 @@ int CBaseServer::GetNumClients( void ) const
 {
 	int count	= 0;
 
-	for (int i=0 ; i < m_Clients.Count() ; i++ )
+	for ( auto *cl : m_Clients )
 	{
-		if ( m_Clients[ i ]->IsConnected() )
+		if ( cl->IsConnected() )
 		{
 			count++;
 		}
@@ -830,12 +828,12 @@ int CBaseServer::GetNumProxies( void ) const
 {
 	int count	= 0;
 
-	for (int i=0 ; i < m_Clients.Count() ; i++ )
+	for ( auto *cl : m_Clients )
 	{
 #if defined( REPLAY_ENABLED )
-		if ( m_Clients[ i ]->IsConnected() && (m_Clients[ i ]->IsHLTV() || m_Clients[ i ]->IsReplay() ) )
+		if ( cl->IsConnected() && (cl->IsHLTV() || cl->IsReplay() ) )
 #else
-		if ( m_Clients[ i ]->IsConnected() && m_Clients[ i ]->IsHLTV() )
+		if ( cl->IsConnected() && cl->IsHLTV() )
 #endif
 		{
 			count++;
@@ -1071,10 +1069,8 @@ void CBaseServer::GetNetStats( float &avgIn, float &avgOut )
 {
 	avgIn = avgOut = 0.0f;
 
-	for (int i = 0; i < m_Clients.Count(); i++ )
+	for ( auto *cl : m_Clients )
 	{
-		CBaseClient	*cl = m_Clients[ i ];
-
 		// Fake clients get killed in here.
 		if ( cl->IsFakeClient() )
 			continue;
@@ -1182,10 +1178,8 @@ void CBaseServer::CalculateCPUUsage( void )
 //-----------------------------------------------------------------------------
 void CBaseServer::InactivateClients( void )
 {
-	for (int i = 0; i < m_Clients.Count(); i++ )
+	for ( auto *cl : m_Clients )
 	{
-		CBaseClient	*cl = m_Clients[ i ];
-
 		// Fake clients get killed in here.
 #if defined( REPLAY_ENABLED )
 		if ( cl->IsFakeClient() && !cl->IsHLTV() && !cl->IsReplay() )
@@ -1209,10 +1203,8 @@ void CBaseServer::InactivateClients( void )
 
 void CBaseServer::ReconnectClients( void )
 {
-	for (int i=0 ; i< m_Clients.Count() ; i++ )
+	for ( auto *cl : m_Clients )
 	{
-		CBaseClient *cl = m_Clients[i];
-		
 		if ( cl->IsConnected() )
 		{
 			cl->m_nSignonState = SIGNONSTATE_CONNECTED;
@@ -1238,23 +1230,16 @@ void CBaseServer::CheckTimeouts (void)
 {
 	VPROF_BUDGET( "CBaseServer::CheckTimeouts", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	// Don't timeout in _DEBUG builds
-	int i;
-
 #if !defined( _DEBUG )
 		
-	for (i=0 ; i< m_Clients.Count() ; i++ )
+	for ( auto *cl : m_Clients )
 	{
-		IClient	*cl = m_Clients[ i ];
-		
 		if ( cl->IsFakeClient() || !cl->IsConnected() )
 			continue;
 
 		INetChannel *netchan = cl->GetNetChannel();
-
 		if ( !netchan )
 			continue;
-
-	
 
 		if ( netchan->IsTimedOut() )
 		{
@@ -1263,17 +1248,18 @@ void CBaseServer::CheckTimeouts (void)
 	}
 #endif
 
-	for (i=0 ; i< m_Clients.Count() ; i++ )
+	intp i = 0;
+	for ( auto *cl : m_Clients )
 	{
-		IClient	*cl = m_Clients[ i ];
-		
 		if ( cl->IsFakeClient() || !cl->IsConnected() )
 			continue;
 		
 		if ( cl->GetNetChannel() && cl->GetNetChannel()->IsOverflowed() )
 		{
-			cl->Disconnect( "Client %d overflowed reliable channel.", i );
+			cl->Disconnect( "Client %zd overflowed reliable channel.", i );
 		}
+
+		++i;
 	}
 }
 
@@ -1283,10 +1269,8 @@ void CBaseServer::CheckTimeouts (void)
 void CBaseServer::UpdateUserSettings(void)
 {
 	VPROF_BUDGET( "CBaseServer::UpdateUserSettings", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-	for (int i=0 ; i< m_Clients.Count() ; i++ )
+	for ( auto *cl : m_Clients )
 	{
-		CBaseClient	*cl = m_Clients[ i ];
-
 		cl->CheckFlushNameChange();
 
 		if ( cl->m_bConVarsChanged )
@@ -1302,10 +1286,8 @@ void CBaseServer::UpdateUserSettings(void)
 void CBaseServer::SendPendingServerInfo()
 {
 	VPROF_BUDGET( "CBaseServer::SendPendingServerInfo", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-	for (int i=0 ; i< m_Clients.Count() ; i++ )
+	for ( auto *cl : m_Clients )
 	{
-		CBaseClient	*cl = m_Clients[ i ];
-
 		if ( cl->m_bSendServerInfo )
 		{
 			cl->SendServerInfo();
@@ -1943,7 +1925,7 @@ CBaseClient * CBaseServer::GetFreeClient( netadr_t &adr )
 {
 	CBaseClient *freeclient = NULL;
 	
-	for ( int slot = 0 ; slot < m_Clients.Count() ; slot++ )
+	for ( intp slot = 0 ; slot < m_Clients.Count() ; slot++ )
 	{
 		CBaseClient *client = m_Clients[slot];
 
@@ -2000,10 +1982,8 @@ void CBaseServer::SendClientMessages ( bool bSendSnapshots )
 {
 	VPROF_BUDGET( "SendClientMessages", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	
-	for (int i=0; i< m_Clients.Count(); i++ )
+	for (auto *client : m_Clients )
 	{
-		CBaseClient* client = m_Clients[i];
-		
 		// Update Host client send state...
 		if ( !client->ShouldSendMessages() )
 			continue;
@@ -2143,10 +2123,8 @@ void CBaseServer::BroadcastPrintf (const char *fmt, ...)
 
 void CBaseServer::BroadcastMessage( INetMessage &msg, bool onlyActive, bool reliable )
 {
-	for ( int i = 0; i < m_Clients.Count(); i++ )
+	for ( auto *cl : m_Clients )
 	{
-		CBaseClient *cl = m_Clients[ i ];
-
 		if ( (onlyActive && !cl->IsActive()) || !cl->IsSpawned() )
 		{
 			continue;
