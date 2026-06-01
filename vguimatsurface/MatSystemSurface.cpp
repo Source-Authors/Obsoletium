@@ -1456,16 +1456,6 @@ bool CMatSystemSurface::DeleteTextureByID(int id)
 	return false;
 }
 
-#ifdef _X360
-void CMatSystemSurface::UncacheUnusedMaterials()
-{
-	// unbind any currently set texture (which may be uncached)
-	DrawSetTexture( -1 );
-
-	// X360TBD: Need to only destroy "marked" textures
-}
-#endif
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : id - 
