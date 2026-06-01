@@ -1892,7 +1892,6 @@ inline void CThreadSpinRWLock::LockForWrite()
 
 // read data from a memory address
 template<class T>
-FORCEINLINE
 [[nodiscard]]
 [[deprecated("Since C++17 you should use atomics.")]]
 T ReadVolatileMemory( T const *pPtr )
