@@ -132,7 +132,7 @@ void CGameConsole::Initialize( vgui::VPANEL parent, const char *panelModule )
 	int swide, stall;
 	vgui::surface()->GetScreenSize(swide, stall);
 	// dimhotepus: Console should take more space as scaled it is too small.
-	int offsetx = vgui::scheme()->GetProportionalScaledValue(80);
+	int offsetx = vgui::scheme()->GetProportionalScaledValue(120);
 	int offsety = vgui::scheme()->GetProportionalScaledValue(64);
 
 	m_pConsole->SetBounds(
