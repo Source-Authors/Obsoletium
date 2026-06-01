@@ -251,7 +251,7 @@ CBaseServer::CBaseServer()
 	m_szSkyname[0] = '\0';
 	m_Password[0] = '\0';
 
-	V_memset( worldmapMD5.bits, 0, sizeof(worldmapMD5.bits) );
+	BitwiseClear( worldmapMD5.bits );
 	
 	m_StringTables = nullptr;
 
@@ -345,7 +345,7 @@ void CBaseServer::SetPassword(const char *password)
 {
 	if ( password != NULL )
 	{
-		Q_strncpy( m_Password, password, sizeof(m_Password) );
+		V_strcpy_safe( m_Password, password );
 	}
 	else
 	{
@@ -878,7 +878,7 @@ bool CBaseServer::GetPlayerInfo( int nClientIndex, player_info_t *pinfo )
 
 	if ( nClientIndex < 0 || !GetUserInfoTable() || nClientIndex >= GetUserInfoTable()->GetNumStrings() )
 	{
-		Q_memset( pinfo, 0, sizeof( player_info_t ) );
+		BitwiseClear( *pinfo );
 		return false;
 	}
 
@@ -886,7 +886,7 @@ bool CBaseServer::GetPlayerInfo( int nClientIndex, player_info_t *pinfo )
 
 	if ( !pi )
 	{
-		Q_memset( pinfo, 0, sizeof( player_info_t ) );
+		BitwiseClear( *pinfo );
 		return false;
 	}
 
@@ -932,7 +932,7 @@ void CBaseServer::FillServerInfo(SVC_ServerInfo &serverinfo)
 
 	serverinfo.m_nProtocol		= PROTOCOL_VERSION;
 	serverinfo.m_nServerCount	= GetSpawnCount();
-	V_memcpy( serverinfo.m_nMapMD5.bits, worldmapMD5.bits, MD5_DIGEST_LENGTH );
+	BitwiseCopy( worldmapMD5.bits, serverinfo.m_nMapMD5.bits );
 	serverinfo.m_nMaxClients	= GetMaxClients();
 	serverinfo.m_nMaxClasses	= serverclasses;
 	serverinfo.m_bIsDedicated	= IsDedicated();
@@ -1588,10 +1588,10 @@ void CBaseServer::Clear( void )
 	
 	m_nTickCount = 0;
 	
-	Q_memset( m_szMapname, 0, sizeof( m_szMapname ) );
-	Q_memset( m_szSkyname, 0, sizeof( m_szSkyname ) );
+	BitwiseClear( m_szMapname );
+	BitwiseClear( m_szSkyname );
 
-	V_memset( worldmapMD5.bits, 0, MD5_DIGEST_LENGTH );
+	BitwiseClear( worldmapMD5.bits );
 
 	MEM_ALLOC_CREDIT();
 
