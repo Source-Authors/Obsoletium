@@ -305,10 +305,6 @@ bool CBaseServer::CheckChallengeNr( netadr_t &adr, int nChallengeValue )
 	if ( adr.IsLoopback() )
 		return true;
 
-	// X360TBD: network
-	if ( IsX360() )
-		return true;
-
 	uint64 challenge = ((uint64)adr.GetIPNetworkByteOrder() << 32) + m_CurrentRandomNonce;
 	CRC32_t hash;
 	CRC32_Init( &hash );
@@ -1508,10 +1504,6 @@ bool CBaseServer::CheckIPRestrictions( const netadr_t &adr, int nAuthProtocol )
 {
 	// Determine if client is outside appropriate address range
 	if ( adr.IsLoopback() )
-		return true;
-
-	// X360TBD: network
-	if ( IsX360() )
 		return true;
 
 	// allow other users if they're on the same ip range
