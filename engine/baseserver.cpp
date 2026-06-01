@@ -332,7 +332,7 @@ const char *CBaseServer::GetPassword() const
 	const char *password = sv_password.GetString();
 
 	// if password is empty or "none", return NULL
-	if ( !password[0] || V_strieq(password, "none" ) )
+	if ( Q_isempty( password ) || V_strieq( password, "none" ) )
 	{
 		return NULL;
 	}
@@ -349,7 +349,7 @@ void CBaseServer::SetPassword(const char *password)
 	}
 	else
 	{
-		m_Password[0] = 0; // clear password
+		m_Password[0] = '\0'; // clear password
 	}
 }
 
@@ -2408,7 +2408,7 @@ void CBaseServer::RecalculateTags( void )
 			{
 				const char *pszDef = pConVar->GetDefault();
 				const char *pszCur = pConVar->GetString();
-				if ( Q_strcmp( pszDef, pszCur ) )
+				if ( !V_streq( pszDef, pszCur ) )
 				{
 					AddTag( p->GetString("tag") );
 				}
@@ -2483,7 +2483,7 @@ void CBaseServer::AddTag( const char *pszTag )
 void CBaseServer::RemoveTag( const char *pszTag )
 {
 	const char *pszTags = sv_tags.GetString();
-	if ( !pszTags || !pszTags[0] )
+	if ( Q_isempty( pszTags ) )
 		return;
 
 	char tmptags[MAX_TAG_STRING_LENGTH];
@@ -2496,7 +2496,7 @@ void CBaseServer::RemoveTag( const char *pszTag )
 	for ( const char *tag : TagList )
 	{
 		// Keep any tags other than the specified one
-		if ( Q_stricmp(tag,pszTag) )
+		if ( !V_strieq( tag, pszTag ) )
 		{
 			V_strcat_safe( tmptags, tag );
 			V_strcat_safe( tmptags, "," );
