@@ -150,6 +150,7 @@ static void SvTagsChangeCallback( IConVar *pConVar, const char *pOldValue, float
 		return;
 
 	bTagsChangeCallback = true;
+	RunCodeAtScopeExit([&]{ bTagsChangeCallback = false; });
 
 	ServerTagsCleanUp();
 
@@ -158,8 +159,6 @@ static void SvTagsChangeCallback( IConVar *pConVar, const char *pOldValue, float
 		ConVarRef var( pConVar );
 		Steam3Server().SteamGameServer()->SetGameTags( var.GetString() );
 	}
-
-	bTagsChangeCallback = false;
 }
 
 ConVar			sv_region( "sv_region","-1", FCVAR_NONE, "The region of the world to report this server in." );
@@ -2400,6 +2399,7 @@ void CBaseServer::RecalculateTags( void )
 		return;
 
 	bRecalculatingTags = true;
+	RunCodeAtScopeExit([&]() { bRecalculatingTags = false; });
 
 	// Games without this interface will have no tagged cvars besides "increased_maxplayers"
 	if ( serverGameTags )
@@ -2460,8 +2460,6 @@ void CBaseServer::RecalculateTags( void )
 		RemoveTag( "replays" );
 	}
 #endif
-
-	bRecalculatingTags = false;
 }
 
 //-----------------------------------------------------------------------------
