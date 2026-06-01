@@ -212,6 +212,13 @@ public:
 
 		return CUtlSymbolTable::String( id );
 	}
+
+	void RemoveAll()
+	{
+		m_lock.LockForWrite();
+		CUtlSymbolTable::RemoveAll();
+		m_lock.UnlockWrite();
+	}
 	
 private:
 #if defined(WIN32) || defined(_WIN32)
