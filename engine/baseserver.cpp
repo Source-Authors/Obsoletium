@@ -2094,7 +2094,7 @@ void CBaseServer::Shutdown( void )
 // Input  : *fmt -
 //			... -
 //-----------------------------------------------------------------------------
-void CBaseServer::BroadcastPrintf (const char *fmt, ...)
+void CBaseServer::BroadcastPrintf (PRINTF_FORMAT_STRING const char *fmt, ...) FMTFUNCTION( 2, 3 )
 {
 	va_list		argptr;
 	char		string[1024];
