@@ -2265,7 +2265,8 @@ void CBaseServer::WriteTempEntities( CBaseClient *client, CFrameSnapshot *pCurre
 		else
 		{
 			buffer.WriteOneBit( 1 );
-			buffer.WriteSBitLong( event->fire_delay*100.0f, 8 );
+			// dimhotepus: float -> int.
+			buffer.WriteSBitLong( static_cast<std::int32_t>( event->fire_delay * 100.0f ), 8 );
 		}
 
 		if ( pLastEvent && 
