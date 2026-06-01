@@ -69,7 +69,7 @@ class posix_file_stream {
   }
 
   // Check |path| exists.
-  static [[nodiscard]] io_result<bool> exists(const char* path) noexcept {
+  [[nodiscard]] static io_result<bool> exists(const char* path) noexcept {
 #ifdef _WIN32
     struct _stat st = {};
     const bool exists{_stat(path, &st) == 0};
