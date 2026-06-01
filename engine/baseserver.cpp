@@ -364,7 +364,7 @@ Determine if this IP requesting the connect is connecting too often
 */
 bool CBaseServer::CheckIPConnectionReuse( netadr_t &adr )
 {
-	int nSimultaneouslyConnections = 0;
+	intp nSimultaneouslyConnections = 0;
 
 	for ( auto *client : m_Clients )
 	{
@@ -374,7 +374,7 @@ bool CBaseServer::CheckIPConnectionReuse( netadr_t &adr )
 			 !client->IsFakeClient() && 
 			 adr.CompareAdr ( client->m_NetChannel->GetRemoteAddress(), true ) )
 		{
-			nSimultaneouslyConnections++;
+			++nSimultaneouslyConnections;
 		}
 	}
 	
