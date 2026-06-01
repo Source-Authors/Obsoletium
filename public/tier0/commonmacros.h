@@ -312,7 +312,7 @@ __forceinline
 #else
 inline
 #endif
-    void unreachable() noexcept { //-V1082 It is UB by design
+    void unreachable() noexcept {  //-V1082 It is UB by design
 #ifdef COMPILER_MSVC
   __assume(false);
 #else
@@ -509,6 +509,27 @@ std::enable_if_t<std::is_trivially_copyable_v<T>> BitwiseCopy(
 }
 
 /**
+ * @brief std::copy_n.
+ * @tparam InputIt Input iterator type.
+ * @tparam Size Count type.
+ * @tparam OutputIt Ouput iterator type.
+ * @param first Input iterator.
+ * @param count Size.
+ * @param result Output iterator.
+ * @return Output iterator after copying.
+ */
+template <class InputIt, class Size, class OutputIt>
+constexpr OutputIt copy_n(InputIt first, Size count, OutputIt result) {
+  if (count > 0) {
+    *result = *first;
+    ++result;
+    for (Size i = 1; i != count; ++i, (void)++result) *result = *++first;
+  }
+
+  return result;
+}
+
+/**
  * @brief Type-safe copying for non-trivial types.  Note source and destination
  * sizes in T's should be >= size.
  * @tparam T Type to copy
@@ -519,7 +540,7 @@ std::enable_if_t<std::is_trivially_copyable_v<T>> BitwiseCopy(
 template <typename T>
 std::enable_if_t<!std::is_trivially_copyable_v<T>> constexpr BitwiseCopy(
     const T* src, T* dest, size_t size = 1) noexcept {
-  std::copy_n(src, size, dest);
+  copy_n(src, size, dest);
 }
 
 /**
