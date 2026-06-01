@@ -1248,6 +1248,7 @@ void CBaseServer::CheckTimeouts (void)
 	}
 #endif
 
+	intp i = 0;
 	for ( auto *cl : m_Clients )
 	{
 		if ( cl->IsFakeClient() || !cl->IsConnected() )
@@ -1255,8 +1256,10 @@ void CBaseServer::CheckTimeouts (void)
 		
 		if ( cl->GetNetChannel() && cl->GetNetChannel()->IsOverflowed() )
 		{
-			cl->Disconnect( "Client %d overflowed reliable channel.", i );
+			cl->Disconnect( "Client %zd overflowed reliable channel.", i );
 		}
+
+		++i;
 	}
 }
 
