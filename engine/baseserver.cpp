@@ -83,7 +83,7 @@ static CIPRateLimit s_connectRateChecker( &sv_max_connects_sec, &sv_max_connects
 // Steam has a matching one in matchmakingtypes.h
 #define MAX_TAG_STRING_LENGTH		128
 
-int SortServerTags( char* const *p1, char* const *p2 )
+static int SortServerTags( char* const *p1, char* const *p2 )
 {
 	return ( Q_strcmp( *p1, *p2 ) > 0 );
 }
