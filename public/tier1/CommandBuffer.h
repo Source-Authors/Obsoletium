@@ -91,7 +91,7 @@ private:
 	struct Command_t
 	{
 		int m_nTick;
-		int m_nFirstArgS;
+		intp m_nFirstArgS;
 		intp m_nBufferSize;
 	};
 
