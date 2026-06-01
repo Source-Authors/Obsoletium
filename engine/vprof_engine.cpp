@@ -185,10 +185,6 @@ void PreUpdateProfile( float filteredtime )
 				g_VProfCurrentProfile.OutputReport( VPRT_SUMMARY | VPRT_LIST_BY_TIME | VPRT_LIST_BY_TIME_LESS_CHILDREN | VPRT_LIST_TOP_ITEMS_ONLY,
 													( vprof_dump_spikes_node.GetString()[0] ) ? vprof_dump_spikes_node.GetString() : NULL,
 													( vprof_dump_spikes_budget_group.GetString()[0] ) ? g_VProfCurrentProfile.BudgetGroupNameToBudgetGroupID( vprof_dump_spikes_budget_group.GetString() ) : -1 );
-#ifdef _XBOX // X360TBD
-				if ( GetLastProfileFileRead() )
-					Msg( "******* %s\n", GetLastProfileFileRead() );
-#endif
 				LastSpikeTime = Sys_FloatTime();
 				LastSpikeFrame = g_ServerGlobalVariables.framecount;
 

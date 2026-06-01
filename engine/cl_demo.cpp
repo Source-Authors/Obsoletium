@@ -1229,7 +1229,8 @@ netpacket_t *CDemoPlayer::ReadPacket( void )
 					Msg( "%d dem_datatables\n", tick );
 				}
 
-				void *data = malloc( 256*1024 ); // X360TBD: How much memory is really needed here?
+				void *data = malloc( 256*1024 ); 
+				RunCodeAtScopeExit(free( data ));
 				bf_read buf( "dem_datatables", data, 256*1024 );
 				m_DemoFile.ReadNetworkDataTables( &buf );
 				buf.Seek( 0 );								// re-read data
@@ -1239,7 +1240,6 @@ netpacket_t *CDemoPlayer::ReadPacket( void )
 				{
 					Host_Error( "Error parsing network data tables during demo playback." );
 				}
-				free( data );
 			}
 			break;
 		case dem_stringtables:
