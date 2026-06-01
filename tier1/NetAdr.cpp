@@ -106,8 +106,8 @@ bool netadr_t::IsReservedAdr () const
 const char * netadr_t::ToString( bool onlyBase ) const
 {
 	// Select a static buffer
-	static	char	s[4][64];
-	static int slot = 0;
+	static thread_local char s[4][64];
+	static thread_local int slot = 0;
 	int useSlot = ( slot++ ) % 4;
 
 	// Render into it
