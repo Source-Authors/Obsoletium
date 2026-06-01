@@ -618,7 +618,7 @@ struct TextureStreamSettings_t
 // Clients should read this much into a UtlBuffer and then pass it in to
 // Unserialize
 //-----------------------------------------------------------------------------
-constexpr [[nodiscard]] unsigned short VTFFileHeaderSize( int nMajorVersion = -1, int nMinorVersion = -1 )
+[[nodiscard]] constexpr unsigned short VTFFileHeaderSize( int nMajorVersion = -1, int nMinorVersion = -1 )
 {
 	if ( nMajorVersion == -1 )
 	{
