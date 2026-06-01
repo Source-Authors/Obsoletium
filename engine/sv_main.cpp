@@ -1985,8 +1985,8 @@ void SV_CreateBaseline (void)
 			// create entity baseline
 			//
 			
-			ALIGN4 char packedData[MAX_PACKEDENTITY_DATA] ALIGN4_POST;
-			bf_write writeBuf( "SV_CreateBaseline->writeBuf", packedData, sizeof( packedData ) );
+			alignas(4) char packedData[MAX_PACKEDENTITY_DATA];
+			bf_write writeBuf( "SV_CreateBaseline->writeBuf", packedData );
 
 
 			// create basline from zero values

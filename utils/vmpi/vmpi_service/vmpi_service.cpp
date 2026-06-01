@@ -403,7 +403,7 @@ void SendStartStatus( bool bStatus )
 	for ( int i=0; i < 3; i++ )
 	{
 		char data[4096];
-		bf_write dataBuf( data, sizeof( data ) );
+		bf_write dataBuf( data );
 		dataBuf.WriteByte( VMPI_PROTOCOL_VERSION );
 		dataBuf.WriteByte( VMPI_NOTIFY_START_STATUS );
 		dataBuf.WriteBytes( g_CurJobID, sizeof( g_CurJobID ) );
@@ -420,7 +420,7 @@ void SendEndStatus()
 	for ( int i=0; i < 3; i++ )
 	{
 		char data[4096];
-		bf_write dataBuf( data, sizeof( data ) );
+		bf_write dataBuf( data );
 		dataBuf.WriteByte( VMPI_PROTOCOL_VERSION );
 		dataBuf.WriteByte( VMPI_NOTIFY_END_STATUS );
 		dataBuf.WriteBytes( g_CurJobID, sizeof( g_CurJobID ) );

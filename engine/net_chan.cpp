@@ -1566,7 +1566,7 @@ A 0 length will still generate a packet and deal with the reliable messages.
 */
 int CNetChan::SendDatagram(bf_write *datagram)
 {
-	ALIGN4 byte		send_buf[ NET_MAX_MESSAGE ] ALIGN4_POST;
+	alignas(4) byte		send_buf[ NET_MAX_MESSAGE ];
 
 #ifndef NO_VCR
 	if ( vcr_verbose.GetInt() && datagram && datagram->GetNumBytesWritten() > 0 )
@@ -1611,7 +1611,7 @@ int CNetChan::SendDatagram(bf_write *datagram)
 		m_StreamReliable.Reset();
 	}
 
-	bf_write send( "CNetChan_TransmitBits->send", send_buf, sizeof(send_buf) );
+	bf_write send( "CNetChan_TransmitBits->send", send_buf );
 
 	// Prepare the packet header
 	// build packet flags
@@ -2610,8 +2610,8 @@ bool CNetChan::SendReliableViaStream( dataFragments_t *data)
 {
 	// Always queue any pending reliable data ahead of the fragmentation buffer
 
-	ALIGN4 char		headerBuf[32] ALIGN4_POST;
-	bf_write	header( "outDataHeader", headerBuf, sizeof(headerBuf) );
+	alignas(4) char		headerBuf[32];
+	bf_write	header( "outDataHeader", headerBuf );
 
 	
 	data->transferID = m_nOutSequenceNr; // used for acknowledging
@@ -2636,8 +2636,8 @@ bool CNetChan::SendReliableAcknowledge(int seqnr)
 {
 	// Always queue any pending reliable data ahead of the fragmentation buffer
 
-	ALIGN4 char		headerBuf[32] ALIGN4_POST;
-	bf_write	header( "outAcknHeader", headerBuf, sizeof(headerBuf) );
+	alignas(4) char		headerBuf[32];
+	bf_write	header( "outAcknHeader", headerBuf );
 
 	header.WriteByte( STREAM_CMD_ACKN );
 	header.WriteLong( seqnr );	// used for acknowledging

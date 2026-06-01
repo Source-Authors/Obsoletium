@@ -438,8 +438,8 @@ void CHLTVClient::SendSnapshot( CClientFrame * pFrame )
 {
 	VPROF_BUDGET( "CHLTVClient::SendSnapshot", "HLTV" );
 
-	ALIGN4 byte		buf[NET_MAX_PAYLOAD] ALIGN4_POST;
-	bf_write	msg( "CHLTVClient::SendSnapshot", buf, sizeof(buf) );
+	alignas(4) byte buf[NET_MAX_PAYLOAD];
+	bf_write	msg( "CHLTVClient::SendSnapshot", buf );
 
 	// if we send a full snapshot (no delta-compression) before, wait until client
 	// received and acknowledge that update. don't spam client with full updates

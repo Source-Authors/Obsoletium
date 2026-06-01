@@ -518,7 +518,7 @@ void CBaseClientState::SendConnectPacket (int challengeNr, int authProtocol, uin
 	}
 
 	alignas(4) char msg_buffer[MAX_ROUTABLE_PAYLOAD];
-	bf_write	msg( msg_buffer, sizeof(msg_buffer) );
+	bf_write	msg( msg_buffer );
 
 	msg.WriteLong( CONNECTIONLESS_HEADER );
 	msg.WriteByte( C2S_CONNECT );
@@ -856,7 +856,7 @@ void CBaseClientState::CheckForResend (void)
 	// Request another challenge value.
 	{
 		alignas(4) char msg_buffer[MAX_ROUTABLE_PAYLOAD];
-		bf_write	msg( msg_buffer, sizeof(msg_buffer) );
+		bf_write	msg( msg_buffer );
 
 		msg.WriteLong( CONNECTIONLESS_HEADER );
 		msg.WriteByte( A2S_GETCHALLENGE );

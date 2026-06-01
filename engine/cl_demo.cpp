@@ -377,22 +377,8 @@ void CDemoRecorder::RecordServerClasses( ServerClass *pClasses )
 {
 	MEM_ALLOC_CREDIT();
 
-	char *pBigBuffer;
-	CUtlBuffer bigBuff;
-
-	int buffSize = 256*1024;
-	if ( !IsX360() )
-	{
-		pBigBuffer = stackallocT( char, buffSize );
-	}
-	else
-	{
-		// keep temp large allocations off of stack
-		bigBuff.EnsureCapacity( buffSize );
-		pBigBuffer = bigBuff.Base<char>();
-	}
-
-	bf_write buf( pBigBuffer, buffSize );
+	char pBigBuffer[256*1024];
+	bf_write buf( pBigBuffer );
 
 	// Send SendTable info.
 	DataTable_WriteSendTablesBuffer( pClasses, &buf );
@@ -445,7 +431,7 @@ void CDemoRecorder::RecordUserInput( int cmdnumber )
 {
 	char buffer[256];
 	buffer[0] = '\0';
-	bf_write msg( "CDemo::WriteUserCmd", buffer, sizeof(buffer) );
+	bf_write msg( "CDemo::WriteUserCmd", buffer );
 
 	g_ClientDLL->EncodeUserCmdToBuffer( msg, cmdnumber );
 

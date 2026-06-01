@@ -857,8 +857,8 @@ void RunDataTableTest()
 	pSendTable->SetWriteFlag( false );
 	
 	// Send DataTable info to the client.
-	ALIGN4 unsigned char commBuf[8192] ALIGN4_POST;
-	bf_write bfWrite( "RunDataTableTest->commBuf", commBuf, sizeof(commBuf) );
+	alignas(4) unsigned char commBuf[8192];
+	bf_write bfWrite( "RunDataTableTest->commBuf", commBuf );
 	if( !WriteSendTable_R( pSendTable, bfWrite, true ) )
 	{
 		AssertMsg( false, "RunDataTableTest: SendTable_SendInfo failed." );
@@ -927,7 +927,7 @@ void RunDataTableTest()
 		}
 
 		// Fully encode it.
-		bf_write bfFullEncoded( "RunDataTableTest->bfFullEncoded", fullEncoded, sizeof(fullEncoded) );
+		bf_write bfFullEncoded( "RunDataTableTest->bfFullEncoded", fullEncoded );
 		if( !SendTable_Encode( pSendTable, &dtServer, &bfFullEncoded, -1, NULL ) )
 		{
 			Assert(false);
@@ -935,7 +935,7 @@ void RunDataTableTest()
 
 
 		ALIGN4 unsigned char deltaEncoded[4096] ALIGN4_POST;
-		bf_write bfDeltaEncoded( "RunDataTableTest->bfDeltaEncoded", deltaEncoded, sizeof(deltaEncoded) );
+		bf_write bfDeltaEncoded( "RunDataTableTest->bfDeltaEncoded", deltaEncoded );
 		
 		if ( iIteration == 0 )
 		{
@@ -983,7 +983,7 @@ void RunDataTableTest()
 		// copy of the encoded data.
 		ALIGN4 unsigned char copyEncoded[4096] ALIGN4_POST;
 		bf_read bfReadDeltaEncoded( "RunDataTableTest->bfReadDeltaEncoded", deltaEncoded, sizeof( deltaEncoded ) );
-		bf_write bfCopyEncoded( "RunDataTableTest->bfCopyEncoded", copyEncoded, sizeof(copyEncoded) );
+		bf_write bfCopyEncoded( "RunDataTableTest->bfCopyEncoded", copyEncoded );
 
 		RecvTable_CopyEncoding( pRecvTable, &bfReadDeltaEncoded, &bfCopyEncoded, -1 );
 		

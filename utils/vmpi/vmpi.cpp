@@ -1012,7 +1012,7 @@ bool CMasterBroadcaster::Update() {
     unsigned long long curTime = Plat_USTime();
     if (curTime - m_LastSendTime >= MASTER_BROADCAST_INTERVAL * 1000ULL) {
       char packetData[512] = {};
-      bf_write packetBuf("packetBuf", packetData, sizeof(packetData));
+      bf_write packetBuf("packetBuf", packetData);
       BuildBroadcastPacket(packetBuf);
 
       for (int iBroadcastPort = VMPI_SERVICE_PORT;

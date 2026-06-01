@@ -378,7 +378,7 @@ bool CBaseServer::CheckIPConnectionReuse( netadr_t &adr )
 		}
 	}
 	
-	if ( nSimultaneouslyConnections > MAX_REUSE_PER_IP ) 
+	if ( nSimultaneouslyConnections > MAX_REUSE_PER_IP )
 	{
 		char buffer[32];
 		Msg ("Too many connect packets from %s\n", adr.ToString_safe( buffer, true ) );
@@ -558,7 +558,7 @@ IClient *CBaseServer::ConnectClient ( netadr_t &adr, int protocol, int challenge
 	// Tell client connection worked, now use netchannels
 	{
 		alignas(4) char msg_buffer[MAX_ROUTABLE_PAYLOAD];
-		bf_write	msg( msg_buffer, sizeof(msg_buffer) );
+		bf_write	msg( msg_buffer );
 
 		msg.WriteLong( CONNECTIONLESS_HEADER );
 		msg.WriteByte( S2C_CONNECTION );
@@ -850,7 +850,7 @@ int CBaseServer::GetNumPlayers()
 	{
 		return 0;
 	}
-
+	
 	const int maxPlayers = GetUserInfoTable()->GetNumStrings();
 
 	for ( int i=0; i < maxPlayers; i++ )
@@ -972,7 +972,7 @@ challenge, they must give a valid IP address.
 void CBaseServer::ReplyChallenge(netadr_t &adr, int clientChallenge )
 {
 	alignas(4) char	buffer[STEAM_KEYSIZE+32];
-	bf_write msg(buffer,sizeof(buffer));
+	bf_write msg(buffer);
 
 	// get a free challenge number
 	int challengeNr = GetChallengeNr( adr );
@@ -1021,7 +1021,7 @@ amplification.
 void CBaseServer::ReplyServerChallenge(netadr_t &adr)
 {
 	alignas(4) char	buffer[16];
-	bf_write msg(buffer, sizeof(buffer));
+	bf_write msg(buffer);
 
 	// get a free challenge number
 	int challengeNr = GetChallengeNr( adr );
@@ -1300,7 +1300,7 @@ const char *CBaseServer::CompressPackedEntity(ServerClass *pServerClass, const c
 {
 	alignas(4) static char s_packedData[MAX_PACKEDENTITY_DATA];
 
-	bf_write writeBuf( "CompressPackedEntity", s_packedData, sizeof( s_packedData ) );
+	bf_write writeBuf( "CompressPackedEntity", s_packedData );
 
 	const void *pBaselineData = NULL;
 	intp nBaselineBits = 0;
@@ -1351,7 +1351,7 @@ const char* CBaseServer::UncompressPackedEntity(PackedEntity *pPackedEntity, int
 	// store this baseline in u.m_pUpdateBaselines
 	bf_read oldBuf( "UncompressPackedEntity1", pBaseline, nBaselineBytes );
 	bf_read newBuf( "UncompressPackedEntity2", pPackedEntity->GetData(), Bits2Bytes(pPackedEntity->GetNumBits()) );
-	bf_write outBuf( "UncompressPackedEntity3", pdc->data, MAX_PACKEDENTITY_DATA );
+	bf_write outBuf( "UncompressPackedEntity3", pdc->data );
 
 	Assert( pPackedEntity->m_pClientClass );
 
@@ -1525,7 +1525,7 @@ bool CBaseServer::CheckPassword( netadr_t &adr, const char *password, const char
 
 	// dimhotepus: Simplify password equality check. Use cryptosafe compare in the future.
 	return V_streq( password, server_password );
-	}
+}
 
 float CBaseServer::GetTime() const
 {
@@ -1596,7 +1596,7 @@ Rejects connection request and sends back a message
 void CBaseServer::RejectConnection( const netadr_t &adr, int clientChallenge, const char *s )
 {
 	alignas(4) char	msg_buffer[MAX_ROUTABLE_PAYLOAD];
-	bf_write	msg( msg_buffer, sizeof(msg_buffer) );
+	bf_write	msg( msg_buffer );
 
 	msg.WriteLong( CONNECTIONLESS_HEADER );
 	msg.WriteByte( S2C_CONNREJECT );
@@ -1639,7 +1639,7 @@ void CBaseServer::Init (bool bIsDedicated)
 	m_nUserid = 1;
 	m_nNumConnections = 0;
 	m_bIsDedicated = bIsDedicated;
-	m_Socket = NS_SERVER;	
+	m_Socket = NS_SERVER;
 	
 	m_Signon.SetDebugName( "m_Signon" );
 	
@@ -1868,7 +1868,7 @@ void CBaseServer::RunFrame( void )
 	VPROF_BUDGET( "CBaseServer::RunFrame", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "CBaseServer::RunFrame" );
 
-	NET_ProcessSocket( m_Socket, this );	
+	NET_ProcessSocket( m_Socket, this );
 
 #ifdef LINUX
 	// Process the linux sv lan port if it's open.
@@ -1999,7 +1999,7 @@ CBaseClient *CBaseServer::CreateFakeClient( const char *name )
 	if ( !fakeclient )
 	{
 		// server is full
-		return NULL;		
+		return NULL;
 	}
 
 	INetChannel *netchan = NULL;
@@ -2107,7 +2107,7 @@ void CBaseServer::BroadcastPrintf (PRINTF_FORMAT_STRING const char *fmt, ...) FM
 	va_end (argptr);
 
 	SVC_Print print( string );
-	BroadcastMessage( print );	
+	BroadcastMessage( print );
 }
 
 void CBaseServer::BroadcastMessage( INetMessage &msg, bool onlyActive, bool reliable )
@@ -2208,7 +2208,7 @@ void CBaseServer::WriteTempEntities( CBaseClient *client, CFrameSnapshot *pCurre
 	SVC_TempEntities msg;
 	msg.m_DataOut.StartWriting( data, sizeof(data) );
 	bf_write &buffer = msg.m_DataOut; // shortcut
-	
+
 	CFrameSnapshot *pSnapshot;
 	CEventInfo *pLastEvent = NULL;
 
@@ -2241,7 +2241,7 @@ void CBaseServer::WriteTempEntities( CBaseClient *client, CFrameSnapshot *pCurre
 			sorted.Insert( event );
 			// More space still
 			if ( (int)sorted.Count() >= ev_max )
-				break;	
+				break;
 		}
 
 		// stop, we reached our current snapshot
@@ -2295,7 +2295,7 @@ void CBaseServer::WriteTempEntities( CBaseClient *client, CFrameSnapshot *pCurre
 		}
 		else
 		{
-			 // full update, just compressed against zeros in MP
+			// full update, just compressed against zeros in MP
 
 			buffer.WriteOneBit( 1 );
 

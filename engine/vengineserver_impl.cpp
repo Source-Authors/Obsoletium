@@ -1728,8 +1728,8 @@ void CVEngineServer::PlaybackTempEntity( IRecipientFilter& filter, float delay, 
 	classID = classID + 1;
 
 	// Encode now!
-	ALIGN4 unsigned char data[ CEventInfo::MAX_EVENT_DATA ] ALIGN4_POST;
-	bf_write buffer( "PlaybackTempEntity", data, sizeof(data) );
+	alignas(4) unsigned char data[ CEventInfo::MAX_EVENT_DATA ];
+	bf_write buffer( "PlaybackTempEntity", data );
 
 	// write all properties, if init or reliable message delta against zero values
 	if( !SendTable_Encode( pST, pSender, &buffer, classID, NULL, false ) )
