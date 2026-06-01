@@ -2204,7 +2204,6 @@ int NET_SendPacket ( INetChannel *chan, intp sock,  const netadr_t &to, const un
 
 	if ( net_showudp.GetInt() && (*(const unsigned int*)data == CONNECTIONLESS_HEADER) )
 	{
-		char buffer[32];
 		Assert( !bUseCompression );
 		Msg("UDP -> %s: sz=%i OOB '%c'\n", to.ToString_safe(buffer), length, data[4] );
 	}
@@ -2364,7 +2363,6 @@ int NET_SendPacket ( INetChannel *chan, intp sock,  const netadr_t &to, const un
 		if ( ( net_error == WSAEADDRNOTAVAIL) && ( to.type == NA_BROADCAST ) )
 			return 0;
 		
-		char buffer[32];
 		ConDMsg ("NET_SendPacket Warning: %s : %s\n", NET_ErrorString(net_error), to.ToString_safe(buffer) );
 		ret = length;
 	}
