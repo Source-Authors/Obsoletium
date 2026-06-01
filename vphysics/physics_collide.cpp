@@ -759,7 +759,7 @@ CPhysConvex *CPhysicsCollision::ConvexFromConvexPolyhedron( const CPolyhedron &C
 		ConvertPositionToIVP( ConvexPolyhedron.pPolygons[i].polyNormal, polyTemplate.surfaces[i].normal );
 
 		Polyhedron_IndexedLineReference_t *pLineReferences = &ConvexPolyhedron.pIndices[ConvexPolyhedron.pPolygons[i].iFirstIndex];
-		for( int j = 0; j != ConvexPolyhedron.pPolygons[i].iIndexCount; ++j )
+		for( int j = 0; j < ConvexPolyhedron.pPolygons[i].iIndexCount; ++j )
 		{
 			polyTemplate.surfaces[i].lines[j] = pLineReferences[j].iLineIndex;
 			polyTemplate.surfaces[i].revert_line[j] = pLineReferences[j].iEndPointIndex;
@@ -827,7 +827,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	memset( pPointRemapping, 0, iHighestPointIndex * sizeof( int ) );
 	for( int i = 0; i < iTriangles; ++i )
 	{
-		for( int j = 0; j != 3; ++j )
+		for( int j = 0; j < 3; ++j )
 			++(pPointRemapping[pTriangles[i].Edges[j].iPointIndices[0]]);
 	}
 
@@ -850,9 +850,9 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 
 	for( int i = 0; i < iTriangles; ++i )
 	{
-		for( int j = 0; j != 3; ++j )
+		for( int j = 0; j < 3; ++j )
 		{
-			for( int k = 0; k != 2; ++k )
+			for( int k = 0; k < 2; ++k )
 				pTriangles[i].Edges[j].iPointIndices[k] = pPointRemapping[pTriangles[i].Edges[j].iPointIndices[k]];
 		}
 	}
@@ -864,7 +864,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	int iLinkCount = 0;
 	for( int i = 0; i < iTriangles; ++i )
 	{
-		for( int j = 0; j != 3; ++j )
+		for( int j = 0; j < 3; ++j )
 		{
 			const unsigned *pIndices = pTriangles[i].Edges[j].iPointIndices;
 			byte iLow = pIndices[0] > pIndices[1] ? 1 : 0;
@@ -895,7 +895,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	iInsertIndex = 0;
 	for( int i = 0; i < iNumPoints; ++i )
 	{
-		for( int j = i + 1; j != iNumPoints; ++j )
+		for( int j = i + 1; j < iNumPoints; ++j )
 		{
 			if( bLinks[(i * iNumPoints) + j] )
 			{
@@ -916,7 +916,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	iInsertIndex = 1;
 	for( int i = 1; i < iNumPoints; ++i )
 	{
-		for( int j = iInsertIndex; j != iLinkCount; ++j )
+		for( int j = iInsertIndex; j < iLinkCount; ++j )
 		{
 			if( pReturn->pLines[j].iPointIndices[0] == i )
 			{
@@ -945,7 +945,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 		pReturn->pPolygons[i].polyNormal = v1to3.Cross( v1to2 );
 		pReturn->pPolygons[i].polyNormal.NormalizeInPlace();
 
-		for( int j = 0; j != 3; ++j, ++iInsertIndex )
+		for( int j = 0; j < 3; ++j, ++iInsertIndex )
 		{
 			const unsigned *pIndices = pTriangles[i].Edges[j].iPointIndices;
 			byte iLow = (pIndices[0] > pIndices[1]) ? 1 : 0;
@@ -1841,7 +1841,7 @@ unsigned int CCollisionQuery::GetGameData( int convexIndex )
 	return 0;
 }
 
-	// Gets the triangle's verts to an array
+// Gets the triangle's verts to an array
 void CCollisionQuery::GetTriangleVerts( int convexIndex, int triangleIndex, Vector *verts )
 {
 	IVP_Compact_Ledge *pLedge = m_ledges.element_at( convexIndex );
