@@ -316,7 +316,6 @@ void CServerBrowser::Shutdown()
 //-----------------------------------------------------------------------------
 bool CServerBrowser::OpenGameInfoDialog( uint64 ulSteamIDFriend, const char *pszConnectCode )
 {
-#if !defined( _X360 ) // X360TBD: SteamFriends()
 	if ( m_hInternetDlg.Get() )
 	{
 		// activate an already-existing dialog
@@ -339,7 +338,6 @@ bool CServerBrowser::OpenGameInfoDialog( uint64 ulSteamIDFriend, const char *psz
 			return true;
 		}
 	}
-#endif
 	return false;
 }
 

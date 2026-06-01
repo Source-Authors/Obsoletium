@@ -1375,7 +1375,6 @@ void CInputSystem::SurfaceSetCursorPos(int x, int y)
 
 void CInputSystem::SurfaceGetCursorPos( int &x, int &y )
 {
-#ifndef _X360 // X360TBD
 	if ( g_pSurface->HasCursorPosFunctions() ) // does the surface export cursor functions for us to use?
 	{
 		g_pSurface->SurfaceGetCursorPos( x,y );
@@ -1403,10 +1402,6 @@ void CInputSystem::SurfaceGetCursorPos( int &x, int &y )
 		y = 0;
 #endif
 	}
-#else
-	x = 0;
-	y = 0;
-#endif
 }
 
 void CInputSystem::SetCursorOveride(HCursor cursor)

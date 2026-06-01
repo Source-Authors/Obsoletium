@@ -150,7 +150,6 @@ const char *C_PlayerResource::GetPlayerName( int iIndex )
 	if ( !IsConnected( iIndex ) && !IsValid( iIndex ) )
 		return PLAYER_UNCONNECTED_NAME;
 
-	// X360TBD: Network - figure out why the name isn't set
 	if ( !m_szName[ iIndex ] || V_strieq( m_szName[ iIndex ], PLAYER_UNCONNECTED_NAME ) )
 	{
 		// If you get a full "reset" uncompressed update from server, then you can have NULLNAME show up in the scoreboard
