@@ -1558,11 +1558,14 @@ CPhysicsObject *CreatePhysicsObject( CPhysicsEnvironment *pEnvironment, const CP
 		objectTemplate.mass_center_override = &massCenterMatrix;
 	}
 
-	CPhysicsObject *pObject = new CPhysicsObject();
 	short collideType;
 	IVP_SurfaceManager *pSurman = CreateSurfaceManager( pCollisionModel, collideType );
 	if ( !pSurman )
+	{
 		return NULL;
+	}
+	// dimhotepus: Do not leak physics object if surface manager fails to create.
+	CPhysicsObject *pObject = new CPhysicsObject();
 	pObject->m_collideType = collideType;
 	pObject->m_asleepSinceCreation = true;
 
