@@ -517,7 +517,7 @@ void CBaseClientState::SendConnectPacket (int challengeNr, int authProtocol, uin
 		adr.SetPort( PORT_SERVER );
 	}
 
-	ALIGN4 char		msg_buffer[MAX_ROUTABLE_PAYLOAD] ALIGN4_POST;
+	alignas(4) char msg_buffer[MAX_ROUTABLE_PAYLOAD];
 	bf_write	msg( msg_buffer, sizeof(msg_buffer) );
 
 	msg.WriteLong( CONNECTIONLESS_HEADER );
@@ -855,7 +855,7 @@ void CBaseClientState::CheckForResend (void)
 
 	// Request another challenge value.
 	{
-		ALIGN4 char		msg_buffer[MAX_ROUTABLE_PAYLOAD] ALIGN4_POST;
+		alignas(4) char msg_buffer[MAX_ROUTABLE_PAYLOAD];
 		bf_write	msg( msg_buffer, sizeof(msg_buffer) );
 
 		msg.WriteLong( CONNECTIONLESS_HEADER );

@@ -559,7 +559,7 @@ IClient *CBaseServer::ConnectClient ( netadr_t &adr, int protocol, int challenge
 	
 	// Tell client connection worked, now use netchannels
 	{
-		ALIGN4 char		msg_buffer[MAX_ROUTABLE_PAYLOAD] ALIGN4_POST;
+		alignas(4) char msg_buffer[MAX_ROUTABLE_PAYLOAD];
 		bf_write	msg( msg_buffer, sizeof(msg_buffer) );
 
 		msg.WriteLong( CONNECTIONLESS_HEADER );
@@ -973,7 +973,7 @@ challenge, they must give a valid IP address.
 
 void CBaseServer::ReplyChallenge(netadr_t &adr, int clientChallenge )
 {
-	ALIGN4 char	buffer[STEAM_KEYSIZE+32] ALIGN4_POST;
+	alignas(4) char	buffer[STEAM_KEYSIZE+32];
 	bf_write msg(buffer,sizeof(buffer));
 
 	// get a free challenge number
@@ -1022,8 +1022,8 @@ amplification.
 */
 void CBaseServer::ReplyServerChallenge(netadr_t &adr)
 {
-	ALIGN4 char	buffer[16] ALIGN4_POST;
-	bf_write msg(buffer,sizeof(buffer));
+	alignas(4) char	buffer[16];
+	bf_write msg(buffer, sizeof(buffer));
 
 	// get a free challenge number
 	int challengeNr = GetChallengeNr( adr );
@@ -1316,7 +1316,7 @@ void CBaseServer::SendPendingServerInfo()
 // compresses a packed entity, returns data & bits
 const char *CBaseServer::CompressPackedEntity(ServerClass *pServerClass, const char *data, int &bits)
 {
-	ALIGN4 static char s_packedData[MAX_PACKEDENTITY_DATA] ALIGN4_POST;
+	alignas(4) static char s_packedData[MAX_PACKEDENTITY_DATA];
 
 	bf_write writeBuf( "CompressPackedEntity", s_packedData, sizeof( s_packedData ) );
 
@@ -1624,7 +1624,7 @@ Rejects connection request and sends back a message
 */
 void CBaseServer::RejectConnection( const netadr_t &adr, int clientChallenge, const char *s )
 {
-	ALIGN4 char		msg_buffer[MAX_ROUTABLE_PAYLOAD] ALIGN4_POST;
+	alignas(4) char	msg_buffer[MAX_ROUTABLE_PAYLOAD];
 	bf_write	msg( msg_buffer, sizeof(msg_buffer) );
 
 	msg.WriteLong( CONNECTIONLESS_HEADER );
@@ -2237,7 +2237,7 @@ void CBaseServer::WriteTempEntities( CBaseClient *client, CFrameSnapshot *pCurre
 {
 	VPROF_BUDGET( "CBaseServer::WriteTempEntities", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
-	ALIGN4 char data[NET_MAX_PAYLOAD] ALIGN4_POST;
+	alignas(4) char data[NET_MAX_PAYLOAD];
 	SVC_TempEntities msg;
 	msg.m_DataOut.StartWriting( data, sizeof(data) );
 	bf_write &buffer = msg.m_DataOut; // shortcut
