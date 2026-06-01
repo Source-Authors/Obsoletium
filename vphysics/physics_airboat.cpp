@@ -508,7 +508,7 @@ void CPhysics_Airboat::PreRaycasts( IVP_Ray_Solver_Template *pRaySolverTemplates
 // Input  : pImpacts - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-void CPhysics_Airboat::UpdateAirborneState( IVP_Raycast_Airboat_Impact *pImpacts, IVP_Event_Sim *pEventSim )
+void CPhysics_Airboat::UpdateAirborneState( IVP_Raycast_Airboat_Impact *pImpacts, IVP_Event_Sim * )
 {
 	int nCount = CountSurfaceContactPoints(pImpacts);
 	if (!nCount)
@@ -684,7 +684,7 @@ void CPhysics_Airboat::DoSimulationPontoonsGround( IVP_Raycast_Airboat_Wheel *pP
 //-----------------------------------------------------------------------------
 // Purpose: Handle pontoons on water.
 //-----------------------------------------------------------------------------
-void CPhysics_Airboat::DoSimulationPontoonsWater( IVP_Raycast_Airboat_Wheel *pPontoonPoint, 
+void CPhysics_Airboat::DoSimulationPontoonsWater( IVP_Raycast_Airboat_Wheel *, 
 										            IVP_Raycast_Airboat_Impact *pImpact, IVP_Event_Sim *pEventSim )
 {
 	#define AIRBOAT_BUOYANCY_SCALAR	1.6f
@@ -1037,7 +1037,7 @@ void CPhysics_Airboat::DoSimulationSteering( IVP_Event_Sim *pEventSim )
 //-----------------------------------------------------------------------------
 // Purpose: Adds extra gravity unless we are performing a strong jump.
 //-----------------------------------------------------------------------------
-void CPhysics_Airboat::DoSimulationGravity( IVP_Event_Sim *pEventSim )
+void CPhysics_Airboat::DoSimulationGravity( [[maybe_unused]] IVP_Event_Sim *pEventSim )
 {
 	return;
 

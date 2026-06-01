@@ -983,7 +983,7 @@ int CPhysicsCollision::GetConvexesUsedInCollideable( const CPhysCollide *pCollid
 	return iLedgeCount;
 }
 
-void CPhysicsCollision::ConvexesFromConvexPolygon( const Vector &vPolyNormal, const Vector *pPoints, int iPointCount, CPhysConvex **pOutput )
+void CPhysicsCollision::ConvexesFromConvexPolygon( const Vector &, const Vector *pPoints, int iPointCount, CPhysConvex **pOutput )
 {
 	IVP_U_Point *pIVP_Points = stackallocT( IVP_U_Point, iPointCount );
 	IVP_U_Point **pTriangulator = stackallocT( IVP_U_Point*, iPointCount );
