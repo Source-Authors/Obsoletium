@@ -90,7 +90,7 @@ static int SortServerTags( char* const *p1, char* const *p2 )
 
 static void ServerTagsCleanUp( void )
 {
-	CUtlVector<char*> TagList;
+	CUtlStringList TagList;
 	ConVarRef sv_tags( "sv_tags" );
 	if ( !sv_tags.IsValid() ) return;
 
@@ -140,7 +140,6 @@ static void ServerTagsCleanUp( void )
 
 	// set our convar and purge our list
 	sv_tags.SetValue( tmptags );
-	TagList.PurgeAndDeleteElementsArray();
 }
 
 static void SvTagsChangeCallback( IConVar *pConVar, const char *pOldValue, float flOldValue )
@@ -2470,7 +2469,7 @@ void CBaseServer::RecalculateTags( void )
 //-----------------------------------------------------------------------------
 void CBaseServer::AddTag( const char *pszTag )
 {
-	CUtlVector<char*> TagList;
+	CUtlStringList TagList;
 	V_SplitString( sv_tags.GetString(), ",", TagList );
 	for ( const char *tag : TagList )
 	{
@@ -2478,7 +2477,6 @@ void CBaseServer::AddTag( const char *pszTag )
 		if ( V_strieq(tag,pszTag) )
 			return;
 	}
-	TagList.PurgeAndDeleteElementsArray();
 
 	// Append it
 	char tmptags[MAX_TAG_STRING_LENGTH];
@@ -2503,7 +2501,7 @@ void CBaseServer::RemoveTag( const char *pszTag )
 	
 	bool bFoundIt = false;
 
-	CUtlVector<char*> TagList;
+	CUtlStringList TagList;
 	V_SplitString( sv_tags.GetString(), ",", TagList );
 	for ( const char *tag : TagList )
 	{
@@ -2518,7 +2516,6 @@ void CBaseServer::RemoveTag( const char *pszTag )
 			bFoundIt = true;
 		}
 	}
-	TagList.PurgeAndDeleteElementsArray();
 
 	// Didn't find it in our list?
 	if ( !bFoundIt )
