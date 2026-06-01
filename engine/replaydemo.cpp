@@ -187,8 +187,8 @@ int CReplayDemoRecorder::GetRecordingTick()
 
 void CReplayDemoRecorder::WriteServerInfo()
 {
-	ALIGN4 byte		buffer[ NET_MAX_PAYLOAD ] ALIGN4_POST;
-	bf_write	msg( "CReplayDemoRecorder::WriteServerInfo", buffer, sizeof( buffer ) );
+	alignas(4) byte		buffer[ NET_MAX_PAYLOAD ];
+	bf_write	msg( "CReplayDemoRecorder::WriteServerInfo", buffer );
 
 	SVC_ServerInfo serverinfo;	// create serverinfo message
 
@@ -241,12 +241,8 @@ void CReplayDemoRecorder::RecordServerClasses( ServerClass *pClasses )
 {
 	MEM_ALLOC_CREDIT();
 
-	CUtlBuffer bigBuff;
-
-	intp buffSize = 256*1024;
-	char *pBigBuffer = stackallocT( char, buffSize );
-
-	bf_write buf( pBigBuffer, buffSize );
+	char pBigBuffer[256*1024];
+	bf_write buf( pBigBuffer );
 
 	// Send SendTable info.
 	DataTable_WriteSendTablesBuffer( pClasses, &buf );
@@ -308,8 +304,8 @@ int CReplayDemoRecorder::WriteSignonData()
 	RecordServerClasses( serverGameDLL->GetAllServerClasses() );
 	RecordStringTables();
 
-	ALIGN4 byte		buffer[ NET_MAX_PAYLOAD ] ALIGN4_POST;
-	bf_write	msg( "CReplayDemo::WriteSignonData", buffer, sizeof( buffer ) );
+	alignas(4) byte	buffer[ NET_MAX_PAYLOAD ];
+	bf_write	msg( "CReplayDemo::WriteSignonData", buffer );
 
 	// use your class infos, CRC is correct
 	SVC_ClassInfo classmsg( true, pServer->serverclasses );
@@ -341,8 +337,8 @@ int CReplayDemoRecorder::WriteSignonData()
 
 void CReplayDemoRecorder::WriteFrame( CReplayFrame *pFrame )
 {
-	ALIGN4 byte		buffer[ NET_MAX_PAYLOAD ] ALIGN4_POST;
-	bf_write	msg( "CReplayDemo::RecordFrame", buffer, sizeof( buffer ) );
+	alignas(4) byte	buffer[ NET_MAX_PAYLOAD ];
+	bf_write	msg( "CReplayDemo::RecordFrame", buffer );
 
 	//first write reliable data
 	bf_write *data = &pFrame->m_Messages[REPLAY_BUFFER_RELIABLE];

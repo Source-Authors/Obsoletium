@@ -130,9 +130,9 @@ void CHLTVClientState::CopyNewEntity(
 	pPackedEntity->SetServerAndClientClass( pServerClass, pClientClass );
 
 	// Make space for the baseline data.
-	ALIGN4 char packedData[MAX_PACKEDENTITY_DATA] ALIGN4_POST;
+	alignas(4) char packedData[MAX_PACKEDENTITY_DATA];
 	bf_read fromBuf( "HLTV_ReadEnterPVS1", pFromData, Bits2Bytes( nFromBits ), nFromBits );
-	bf_write writeBuf( "HLTV_ReadEnterPVS2", packedData, sizeof( packedData ) );
+	bf_write writeBuf( "HLTV_ReadEnterPVS2", packedData );
 
 	int changedProps[MAX_DATATABLE_PROPS];
 	
@@ -733,7 +733,7 @@ void CHLTVClientState::ReadDeltaEnt( CEntityReadInfo &u )
 	}
 
 	// Make space for the baseline data.
-	ALIGN4 char packedData[MAX_PACKEDENTITY_DATA] ALIGN4_POST;
+	alignas(4) char packedData[MAX_PACKEDENTITY_DATA];
 	const void *pFromData;
 	int nFromBits;
 
@@ -748,7 +748,7 @@ void CHLTVClientState::ReadDeltaEnt( CEntityReadInfo &u )
 	}
 
 	bf_read fromBuf( "HLTV_ReadEnterPVS1", pFromData, Bits2Bytes( nFromBits ), nFromBits );
-	bf_write writeBuf( "HLTV_ReadEnterPVS2", packedData, sizeof( packedData ) );
+	bf_write writeBuf( "HLTV_ReadEnterPVS2", packedData );
 
 	int changedProps[MAX_DATATABLE_PROPS];
 	

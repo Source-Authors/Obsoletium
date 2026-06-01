@@ -224,8 +224,8 @@ void CMatchmaking::UpdateSearch()
 		if ( GetTime() - m_fSendTimer > SYSTEMLINK_RETRYINTERVAL && m_nSendCount < SYSTEMLINK_MAXRETRIES )
 		{
 			// Send out a search for lan servers
-			ALIGN4 char	 msg_buffer[MAX_ROUTABLE_PAYLOAD] ALIGN4_POST;
-			bf_write msg( msg_buffer, sizeof(msg_buffer) );
+			alignas(4) char	 msg_buffer[MAX_ROUTABLE_PAYLOAD];
+			bf_write msg( msg_buffer );
 
 			msg.WriteLong( CONNECTIONLESS_HEADER );
 			msg.WriteByte( PTH_SYSTEMLINK_SEARCH );
@@ -455,8 +455,8 @@ void CMatchmaking::JoinInviteSessionByID( XNKID nSessionID )
 //-----------------------------------------------------------------------------
 void CMatchmaking::SendJoinRequest( netadr_t *adr )
 {
-	ALIGN4 char	 msg_buffer[MAX_ROUTABLE_PAYLOAD] ALIGN4_POST;
-	bf_write msg( msg_buffer, sizeof(msg_buffer) );
+	alignas(4) char	 msg_buffer[MAX_ROUTABLE_PAYLOAD];
+	bf_write msg( msg_buffer );
 
 	// Send local player info
 	msg.WriteLong( CONNECTIONLESS_HEADER );

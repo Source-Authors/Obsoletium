@@ -1152,7 +1152,7 @@ void CBaseClient::SendSnapshot( CClientFrame *pFrame )
 
 	bool bFailedOnce = false;
 write_again:
-	bf_write msg( "CBaseClient::SendSnapshot", m_SnapshotScratchBuffer, sizeof( m_SnapshotScratchBuffer ) );
+	bf_write msg( "CBaseClient::SendSnapshot", m_SnapshotScratchBuffer );
 
 	TRACE_PACKET( ( "SendSnapshot(%d)\n", pFrame->tick_count ) );
 

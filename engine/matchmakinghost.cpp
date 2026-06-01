@@ -119,7 +119,7 @@ void CMatchmaking::HandleSystemLinkSearch( netpacket_t *pPacket )
 	m_Session.GetSessionInfo( &info );
 
 	char msg_buffer[MAX_ROUTABLE_PAYLOAD];
-	bf_write msg( msg_buffer, sizeof(msg_buffer) );
+	bf_write msg( msg_buffer );
 
 	msg.WriteLong( CONNECTIONLESS_HEADER );
 	msg.WriteByte( HTP_SYSTEMLINK_REPLY );

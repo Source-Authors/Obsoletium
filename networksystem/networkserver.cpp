@@ -129,7 +129,7 @@ bool CNetworkServer::ProcessConnectionlessPacket( CNetPacket *packet )
 void CNetworkServer::AcceptConnection( const netadr_t& remote )
 {
 	byte data[ 512 ];
-	bf_write buf( "CNetworkServer::AcceptConnection", data, sizeof( data ) );
+	bf_write buf( "CNetworkServer::AcceptConnection", data );
 
 	buf.WriteLong( -1 );
 	buf.WriteByte( s2c_connect_accept );

@@ -385,7 +385,7 @@ void CL_CopyNewEntity(
 	{
 		// store this baseline in u.m_pUpdateBaselines
 		alignas(4) char packedData[MAX_PACKEDENTITY_DATA];
-		bf_write writeBuf( "CL_CopyNewEntity->newBuf", packedData, sizeof(packedData) );
+		bf_write writeBuf( "CL_CopyNewEntity->newBuf", packedData );
 
 		RecvTable_MergeDeltas( pRecvTable, &fromBuf, u.m_pBuf, &writeBuf, -1, NULL, true );
 

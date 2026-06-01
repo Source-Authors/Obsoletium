@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
 		for ( int i=VMPI_SERVICE_PORT; i <= VMPI_LAST_SERVICE_PORT; i++ )
 		{
 			unsigned char data[256];
-			bf_write buf( data, sizeof( data ) );
+			bf_write buf( data );
 			buf.WriteByte( VMPI_PROTOCOL_VERSION );
 			buf.WriteString( pPassword );
 			buf.WriteByte( cRequest );

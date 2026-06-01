@@ -142,7 +142,20 @@ public:
 	// nMaxBits can be used as the number of bits in the buffer. 
 	// It must be <= nBytes*8. If you leave it at -1, then it's set to nBytes * 8.
 	bf_write( void *pData, intp nBytes, intp nMaxBits = -1 );
+	// dimhotepus: Bounds-safe ctor.
+	template<typename T, intp size>
+	bf_write( T (&data)[size], intp nMaxBits = -1 )
+		: bf_write{&data, static_cast<intp>( sizeof(T) * size ), nMaxBits}
+	{
+	}
+
 	bf_write( const char *pDebugName, void *pData, intp nBytes, intp nMaxBits = -1 );
+	// dimhotepus: Bounds-safe ctor.
+	template<typename T, intp size>
+	bf_write( const char *debugName, T (&data)[size], intp nMaxBits = -1 )
+		: bf_write{debugName, &data, static_cast<intp>( sizeof(T) * size ), nMaxBits}
+	{
+	}
 
 	// Start writing to the specified buffer.
 	// nMaxBits can be used as the number of bits in the buffer. 

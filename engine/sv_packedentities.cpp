@@ -121,8 +121,8 @@ static inline void SV_PackEntity(
 	}
 	
 	// First encode the entity's data.
-	ALIGN4 char packedData[MAX_PACKEDENTITY_DATA] ALIGN4_POST;
-	bf_write writeBuf( "SV_PackEntity->writeBuf", packedData, sizeof( packedData ) );
+	alignas(4) char packedData[MAX_PACKEDENTITY_DATA];
+	bf_write writeBuf( "SV_PackEntity->writeBuf", packedData );
 
 	SendTable *pSendTable = pServerClass->m_pTable;
 	

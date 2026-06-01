@@ -419,7 +419,7 @@ int CNetChannel::SendDatagram( bf_write *datagram )
 		return 0;
 	}
 
-	bf_write send( "CNetChannel_TransmitBits->send", send_buf, sizeof(send_buf) );
+	bf_write send( "CNetChannel_TransmitBits->send", send_buf );
 
 	// Prepare the packet header
 	// build packet flags
