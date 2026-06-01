@@ -29,6 +29,16 @@
     </Expand>
   </Type>
 
+  <!-- tier1/netadr.h -->
+
+  <Type Name="netadr_t">
+    <AlternativeType Name="netadr_s" />
+    <DisplayString Condition="type == NA_LOOPBACK">loopback</DisplayString>
+    <DisplayString Condition="type == NA_BROADCAST">broadcast</DisplayString>
+    <DisplayString Condition="type == NA_IP">{(int)ip[0]}.{(int)ip[1]}.{(int)ip[2]}.{(int)ip[3]}:{(int)port}n</DisplayString>
+    <DisplayString>unknown</DisplayString>
+  </Type>
+
   <!-- tier1/utlsymbol.h -->
 
   <Type Name="CUtlSymbol">
