@@ -106,7 +106,8 @@ static void PackLedgeIntoBuffer( packedhull_t *pHull, CUtlBuffer &buf, const IVP
 	CUtlVector<intp> edgeList, edgeMap;
 	vertmap_t vertMap;
 	BuildVertMap( vertMap, list.pVerts, list.vertexCount, pLedge );
-	pHull->baseVert = vertMap.minRef;
+	Assert(vertMap.minRef <= std::numeric_limits<byte>::max());
+	pHull->baseVert = static_cast<byte>( vertMap.minRef );
 	// clear the maps
 	triangleMap.EnsureCount(pLedge->get_n_triangles());
 	for ( auto& t : triangleMap )
@@ -136,7 +137,8 @@ static void PackLedgeIntoBuffer( packedhull_t *pHull, CUtlBuffer &buf, const IVP
 			triangleMap[i] = triangleList.AddToTail(i);
 		}
 	}
-	pHull->vtriCount = triangleList.Count();
+	Assert(triangleList.Count() <= std::numeric_limits<byte>::max());
+	pHull->vtriCount = static_cast<byte>( triangleList.Count() );
 	for ( int i = 0; i < pLedge->get_n_triangles(); i++ )
 	{
 		const IVP_Compact_Triangle *pTri = pLedge->get_first_triangle() + i;
@@ -158,7 +160,9 @@ static void PackLedgeIntoBuffer( packedhull_t *pHull, CUtlBuffer &buf, const IVP
 			}
 		}
 	}
-	pHull->vedgeCount = edgeList.Count();
+
+	Assert(edgeList.Count() <= std::numeric_limits<byte>::max());
+	pHull->vedgeCount = static_cast<byte>( edgeList.Count() );
 
 	for ( int i = 0; i < pLedge->get_n_triangles(); i++ )
 	{
@@ -211,8 +215,8 @@ static void PackLedgeIntoBuffer( packedhull_t *pHull, CUtlBuffer &buf, const IVP
 		int v1 = vertMap.map[pEdge->get_next()->get_start_point_index()] - pHull->baseVert;
 		Assert(v0>=0 && v0<256);
 		Assert(v1>=0 && v1<256);
-		edge.v0 = v0;
-		edge.v1 = v1;
+		edge.v0 = static_cast<byte>(v0);
+		edge.v1 = static_cast<byte>(v1);
 		buf.Put(&edge, sizeof(edge));
 	}
 }
@@ -343,7 +347,8 @@ virtualmeshhull_t *CVPhysicsVirtualMeshWriter::CreatePackedHullFromLedges( const
 	{
 		virtualmeshhull_t tmp;
 		BitwiseClear( tmp );
-		tmp.hullCount = ledgeCount;
+		Assert(ledgeCount <= std::numeric_limits<byte>::max());
+		tmp.hullCount = static_cast<byte>( ledgeCount );
 		buf.Put(&tmp, sizeof(tmp));
 	}
 
@@ -353,8 +358,10 @@ virtualmeshhull_t *CVPhysicsVirtualMeshWriter::CreatePackedHullFromLedges( const
 	for ( int i = 0; i < ledgeCount; i++ )
 	{
 		pHulls[i] = (packedhull_t *)buf.PeekPut();
+		const short triangleCount{pLedges[i]->get_n_triangles()};
 		packedhull_t hull;
-		hull.triangleCount = pLedges[i]->get_n_triangles();
+		Assert(triangleCount <= std::numeric_limits<byte>::max());
+		hull.triangleCount = static_cast<byte>( triangleCount );
 		hull.edgeCount = (hull.triangleCount * 3) / 2;
 		buf.Put(&hull, sizeof(hull));
 	}

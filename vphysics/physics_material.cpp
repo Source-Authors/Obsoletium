@@ -475,7 +475,9 @@ intp CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *
 				}
 				else if ( V_strieq( key, "climbable" ) )
 				{
-					prop.data.game.climbable = atoi(value);
+					const int climbable = atoi(value);
+					Assert(climbable >= 0 && climbable <= std::numeric_limits<byte>::max());
+					prop.data.game.climbable = static_cast<byte>( climbable );
 				}
 				// audio parameters
 				else if ( V_strieq( key, "audioReflectivity" ) )
@@ -554,7 +556,9 @@ intp CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *
 					}
 					else
 					{
-						prop.data.game.material = atoi(value);
+						const int material = atoi(value);
+						Assert(material >= 0 && material <= std::numeric_limits<unsigned short>::max());
+						prop.data.game.material = static_cast<unsigned short>( material );
 					}
 				}
 				else if ( V_strieq( key, "dampening" ) )
