@@ -19,31 +19,32 @@
 class CPhysicsCollisionSet final : public IPhysicsCollisionSet
 {
 public:
-	virtual ~CPhysicsCollisionSet() = default;
 	CPhysicsCollisionSet()
 	{
 		BitwiseClear( m_bits );
 	}
-	void EnableCollisions( int index0, int index1 ) override
+	virtual ~CPhysicsCollisionSet() = default;
+
+	void EnableCollisions( intp index0, intp index1 ) override
 	{
 		Assert(index0<ssize(m_bits)&&index1<ssize(m_bits));
-		m_bits[index0] |= 1<<index1;
-		m_bits[index1] |= 1<<index0;
+		m_bits[index0] |= (uintp)(1u)<<index1;
+		m_bits[index1] |= (uintp)(1u)<<index0;
 	}
-	void DisableCollisions( int index0, int index1 ) override
+	void DisableCollisions( intp index0, intp index1 ) override
 	{
 		Assert(index0<ssize(m_bits)&&index1<ssize(m_bits));
-		m_bits[index0] &= ~(1<<index1);
-		m_bits[index1] &= ~(1<<index0);
+		m_bits[index0] &= ~((uintp)(1u)<<index1);
+		m_bits[index1] &= ~((uintp)(1u)<<index0);
 	}
 
-	bool ShouldCollide( int index0, int index1 ) override
+	bool ShouldCollide( intp index0, intp index1 ) const override
 	{
 		Assert(index0<ssize(m_bits)&&index1<ssize(m_bits));
-		return (m_bits[index0] & (1<<index1)) ? true : false;
+		return (m_bits[index0] & ((uintp)(1u)<<index1)) ? true : false;
 	}
 private:
-	unsigned int m_bits[32];
+	uintp m_bits[CHAR_BIT * sizeof(void*)];
 };
 
 

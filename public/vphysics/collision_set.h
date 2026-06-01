@@ -18,10 +18,11 @@ abstract_class IPhysicsCollisionSet
 public:
 	virtual ~IPhysicsCollisionSet() {}
 
-	virtual void EnableCollisions( int index0, int index1 ) = 0;
-	virtual void DisableCollisions( int index0, int index1 ) = 0;
+	virtual void EnableCollisions( intp index0, intp index1 ) = 0;
+	virtual void DisableCollisions( intp index0, intp index1 ) = 0;
 
-	[[nodiscard]] virtual bool ShouldCollide( int index0, int index1 ) = 0;
+	// dimhotepus: Add const.
+	[[nodiscard]] virtual bool ShouldCollide( intp index0, intp index1 ) const = 0;
 };
 
 #endif
