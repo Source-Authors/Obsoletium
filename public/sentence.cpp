@@ -224,11 +224,6 @@ CBasePhonemeTag::CBasePhonemeTag()
 	m_nPhonemeCode = 0;
 }
 
-CBasePhonemeTag::CBasePhonemeTag( const CBasePhonemeTag& from )
-{
-	memcpy( this, &from, sizeof(*this) );
-}
-
 
 //-----------------------------------------------------------------------------
 // Purpose: 
