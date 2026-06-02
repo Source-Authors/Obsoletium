@@ -131,7 +131,8 @@ inline void *MemAlloc_InlineCallocMemset( void *pMem, size_t nCount, size_t nEle
 // Make sure we don't define strdup twice
 #if !defined(MEMDBGON_H)
 
-inline char *MemAlloc_StrDup(const char *pString, const char *pFileName, unsigned nLine)
+// dimhotepus: unsigned -> int for line.
+inline char *MemAlloc_StrDup(const char *pString, const char *pFileName, int nLine)
 {
 	if (!pString)
 		return nullptr;
@@ -145,7 +146,8 @@ inline char *MemAlloc_StrDup(const char *pString, const char *pFileName, unsigne
 	return nullptr;
 }
 
-inline wchar_t *MemAlloc_WcStrDup(const wchar_t *pString, const char *pFileName, unsigned nLine)
+// dimhotepus: unsigned -> int for line.
+inline wchar_t *MemAlloc_WcStrDup(const wchar_t *pString, const char *pFileName, int nLine)
 {
 	if (!pString)
 		return nullptr;
