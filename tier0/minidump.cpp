@@ -424,10 +424,9 @@ static const char *GetExceptionCodeName( unsigned long code )
 		case EXCEPTION_NONCONTINUABLE_EXCEPTION: return "noncontinuableexception";
 		case EXCEPTION_PRIV_INSTRUCTION: return "privinstruction";
 		case EXCEPTION_SINGLE_STEP: return "singlestep";
+		// Unknown exception
+		default: return "crash";
 	}
-
-	// Unknown exception
-	return "crash";
 }
 
 int CatchAndWriteMiniDump_Impl( CatchAndWriteContext_t &ctx )

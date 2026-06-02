@@ -362,6 +362,10 @@ static INT_PTR CALLBACK AssertDialogProc(
 			g_dpi_window_behavior.OnDestroyWindow();
 			return TRUE;
 		}
+
+		default:
+			// dimhotepus: Add default case.
+			return FALSE;
 	}
 
 	return FALSE;

@@ -362,6 +362,10 @@ static SpewRetval_t _SpewMessage( SpewType_t spewType, const char *pGroupName, i
 	// dimhotepus: Do nothing.
 	case SPEW_CONTINUE:
 		break;
+
+	default:
+		// dimhotepus: Catch missed spew types.
+		assert(false);
 	}
 
 	return ret;
