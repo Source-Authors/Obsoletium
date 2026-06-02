@@ -265,7 +265,8 @@ void CCommandLine::CreateCmdLine( const char *commandline )
 //-----------------------------------------------------------------------------
 // Finds a string in another string with a case insensitive test
 //-----------------------------------------------------------------------------
-static char * _stristr( char * pStr, const char * pSearch )
+// dimhotepus: _stristr -> V_stristr
+static char * V_stristr( char * pStr, const char * pSearch )
 {
 	AssertValidStringPtr(pStr);
 	AssertValidStringPtr(pSearch);
@@ -330,7 +331,7 @@ void CCommandLine::RemoveParm( const char *pszParm )
 	{
 		curlen = strlen( p );
 
-		found = _stristr( p, pszParm );
+		found = V_stristr( p, pszParm );
 		if ( !found )
 			break;
 			
