@@ -1305,7 +1305,8 @@ public:
 	const char *GetName();
 	void SetName( const char * );
 
-	size_t CalcStackDepth( void *pStackVariable ) const	{ return static_cast<byte *>(m_pStackBase) - static_cast<byte *>(pStackVariable); }
+	// dimhotepus: size_t -> ptrdiff_t.
+	[[nodiscard]] std::ptrdiff_t CalcStackDepth( void *pStackVariable ) const	{ return static_cast<byte *>(m_pStackBase) - static_cast<byte *>(pStackVariable); }
 
 	//-----------------------------------------------------
 	// Functions for the other threads
