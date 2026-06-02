@@ -434,7 +434,7 @@ float CPortalMPGameRules::FlWeaponTryRespawn( CBaseCombatWeapon *pWeapon )
 //=========================================================
 Vector CPortalMPGameRules::VecWeaponRespawnSpot( CBaseCombatWeapon *pWeapon )
 {
-#pragma message( __FILE__ "(" __LINE__AS_STRING ") : warning custom: Disabled weapon respawn location code" )
+#pragma message( __FILE__ "(" LINE__AS_STRING ") : warning custom: Disabled weapon respawn location code" )
 #if 0
 #ifndef CLIENT_DLL
 	CWeaponHL2MPBase *pHL2Weapon = dynamic_cast< CWeaponHL2MPBase*>( pWeapon );
@@ -465,7 +465,7 @@ bool GetObjectsOriginalParameters( CBaseEntity *pObject, Vector &vOriginalOrigin
 {
 	if ( CItem *pItem = IsManagedObjectAnItem( pObject ) )
 	{
-#pragma message( __FILE__ "(" __LINE__AS_STRING ") : warning custom: Disabled rest time code" )
+#pragma message( __FILE__ "(" LINE__AS_STRING ") : warning custom: Disabled rest time code" )
 #if 0
 		if ( pItem->m_flNextResetCheckTime > gpGlobals->curtime )
 			return false;
@@ -768,7 +768,7 @@ void CPortalMPGameRules::ClientSettingsChanged( CBasePlayer *pPlayer )
 		//Too soon, set the cvar back to what it was.
 		//Note: this will make this function be called again
 		//but since our models will match it'll just skip this whole dealio.
-#pragma message( __FILE__ "(" __LINE__AS_STRING ") : warning custom: Disabled model change code" )
+#pragma message( __FILE__ "(" LINE__AS_STRING ") : warning custom: Disabled model change code" )
 #if 0
 		if ( pPortalPlayer->GetNextModelChangeTime() >= gpGlobals->curtime )
 		{
@@ -1074,7 +1074,7 @@ void CPortalMPGameRules::RestartGame()
 		}
 		pPlayer->RemoveAllItems( true );
 		respawn( pPlayer, false );
-#pragma message( __FILE__ "(" __LINE__AS_STRING ") : warning custom: Disabled player reset" )
+#pragma message( __FILE__ "(" LINE__AS_STRING ") : warning custom: Disabled player reset" )
 #if 0
 		pPlayer->Reset();
 #endif
@@ -1145,7 +1145,7 @@ void CPortalMPGameRules::CleanUpMap()
 	// could kill respawning CTs
 	g_EventQueue.Clear();
 
-#pragma message( __FILE__ "(" __LINE__AS_STRING ") : warning custom: Disabled entity parsing" )
+#pragma message( __FILE__ "(" LINE__AS_STRING ") : warning custom: Disabled entity parsing" )
 #if 0
 	// Now reload the map entities.
 	class CHL2MPMapEntityFilter : public IMapEntityFilter
@@ -1234,7 +1234,7 @@ void CPortalMPGameRules::CheckRestartGame( void )
 		mp_restartgame.SetValue( 0 );
 	}
 
-#pragma message( __FILE__ "(" __LINE__AS_STRING ") : warning custom: Disabled ready restart" )
+#pragma message( __FILE__ "(" LINE__AS_STRING ") : warning custom: Disabled ready restart" )
 #if 0
 	if( mp_readyrestart.GetBool() )
 	{
@@ -1265,7 +1265,7 @@ void CPortalMPGameRules::CheckRestartGame( void )
 
 void CPortalMPGameRules::CheckAllPlayersReady( void )
 {
-#pragma message( __FILE__ "(" __LINE__AS_STRING ") : warning custom: Disabled ready restart" )
+#pragma message( __FILE__ "(" LINE__AS_STRING ") : warning custom: Disabled ready restart" )
 #if 0
 	for (int i = 1; i <= gpGlobals->maxClients; i++ )
 	{

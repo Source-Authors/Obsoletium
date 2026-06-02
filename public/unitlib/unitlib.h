@@ -251,15 +251,15 @@ protected:
 	do {																\
 		if (!(_exp)) 													\
 		{ 																\
-			_SpewInfo( SPEW_ASSERT, __TFILE__, __LINE__ );				\
+			_SpewInfo( SPEW_ASSERT, TFILE, __LINE__ );				\
 			SpewRetval_t ret = _SpewMessage(_msg);						\
 			_executeExp; 												\
 			if ( ret == SPEW_DEBUGGER)									\
 			{															\
-				if ( !ShouldUseNewAssertDialog() || DoNewAssertDialog( __TFILE__, __LINE__, _msg ) ) \
+				if ( !ShouldUseNewAssertDialog() || DoNewAssertDialog( TFILE, __LINE__, _msg ) ) \
 					DebuggerBreak();									\
 				if ( _bFatal )											\
-					_ExitOnFatalAssert( __TFILE__, __LINE__ );			\
+					_ExitOnFatalAssert( TFILE, __LINE__ );			\
 			}															\
 		}																\
 	} while (0)

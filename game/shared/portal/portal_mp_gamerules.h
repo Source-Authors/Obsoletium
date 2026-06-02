@@ -5,7 +5,7 @@
 //=============================================================================//
 
 #ifndef PORTAL_MP
-#pragma message( __FILE__ "(" __LINE__AS_STRING ") : error custom: This file should not be included anywhere except in the portal multiplayer testing builds" )
+#pragma message( __FILE__ "(" LINE__AS_STRING ") : error custom: This file should not be included anywhere except in the portal multiplayer testing builds" )
 #endif
 
 #ifndef PORTAL_MP_GAMERULES_H

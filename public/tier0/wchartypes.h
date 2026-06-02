@@ -36,11 +36,12 @@ using byte = unsigned char;
 using wchar = wchar_t;
 //typedef char wchar;
 
-// __WFILE__
+// WFILE
 // This is a Unicode version of __FILE__
 #define WIDEN2(x) L ## x
 #define WIDEN(x) WIDEN2(x)
-#define __WFILE__ WIDEN(__FILE__)
+// dimhotepus: __WFILE__ -> WFILE
+#define WFILE WIDEN(__FILE__)
 
 #ifdef STEAM
 #ifndef _UNICODE
@@ -71,12 +72,14 @@ using wchar = wchar_t;
 #if defined(_UNICODE)
 typedef wchar tchar;
 #define tstring std::wstring
-#define __TFILE__ __WFILE__
+// dimhotepus: __TFILE__ -> TFILE
+#define TFILE WFILE
 #define TCHAR_IS_WCHAR
 #else
 using tchar = char;
 #define tstring std::string
-#define __TFILE__ __FILE__
+// dimhotepus: __TFILE__ -> TFILE
+#define TFILE __FILE__
 #define TCHAR_IS_CHAR
 #endif
 

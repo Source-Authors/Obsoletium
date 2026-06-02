@@ -257,7 +257,7 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 	// all of the logical expressions that the regular compiler can handle.
 	// Include _msg in the macro so that format errors in it are detected.
 	#define _AssertMsg( _exp, _msg, _executeExp, _bFatal ) do { __analysis_assume( !!(_exp) ); _msg; } while (0)
-	#define  _AssertMsgOnce( _exp, _msg, _bFatal ) do { __analysis_assume( !!(_exp) ); _msg; } while (0)
+	#define _AssertMsgOnce( _exp, _msg, _bFatal ) do { __analysis_assume( !!(_exp) ); _msg; } while (0)
 	// Force asserts on for /analyze so that we get a __analysis_assume of all of the constraints.
 	#define DBGFLAG_ASSERT
 	#define DBGFLAG_ASSERTFATAL
@@ -267,21 +267,21 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 		do {																\
 			if (!!(_exp)) { 													\
 			} else {																\
-				_SpewInfo( SPEW_ASSERT, __TFILE__, __LINE__ );				\
+				_SpewInfo( SPEW_ASSERT, TFILE, __LINE__ );				\
 				const auto _movedMsg = std::move(_msg);				\
 				const tchar *_message = static_cast<const tchar *>( _movedMsg );				\
 				SpewRetval_t retAssert = _SpewMessage("%s", static_cast<const char*>( _message ));	\
-				CallAssertFailedNotifyFunc( __TFILE__, __LINE__, _message );					\
+				CallAssertFailedNotifyFunc( TFILE, __LINE__, _message );					\
 				_executeExp; 												\
 				if ( retAssert == SPEW_DEBUGGER)									\
 				{															\
-					if ( !ShouldUseNewAssertDialog() || DoNewAssertDialog( __TFILE__, __LINE__, _message ) ) \
+					if ( !ShouldUseNewAssertDialog() || DoNewAssertDialog( TFILE, __LINE__, _message ) ) \
 					{														\
 						DebuggerBreak();									\
 					}														\
 					if ( _bFatal )											\
 					{														\
-						_ExitOnFatalAssert( __TFILE__, __LINE__ );			\
+						_ExitOnFatalAssert( TFILE, __LINE__ );			\
 					}														\
 				}															\
 			}																\

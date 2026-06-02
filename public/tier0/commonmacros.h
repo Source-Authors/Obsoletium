@@ -330,10 +330,12 @@ inline
 
 //__LINE__ can only be converted to an actual number by going through
 // this, otherwise the output is literally "__LINE__".
-#define __HACK_LINE_AS_STRING__(x) CONST_INTEGER_AS_STRING(x)
+// dimhotepus: __HACK_LINE_AS_STRING__ -> HACK_LINE_AS_STRING
+#define HACK_LINE_AS_STRING(x) CONST_INTEGER_AS_STRING(x)
 
 // Gives you the line number in constant string form.
-#define __LINE__AS_STRING __HACK_LINE_AS_STRING__(__LINE__)
+// dimhotepus: __LINE__AS_STRING -> LINE__AS_STRING
+#define LINE__AS_STRING HACK_LINE_AS_STRING(__LINE__)
 
 // Using ARRAYSIZE implementation from winnt.h:
 #ifdef ARRAYSIZE
