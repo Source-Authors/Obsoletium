@@ -44,8 +44,8 @@ public:
 	void Init( intp nGrowSize = 0, intp nInitSize = 0 );
 
 	// here to match CUtlMemory, but only used by ResetDbgInfo, so it can just return NULL
-	T* Base() { return NULL; }
-	const T* Base() const { return NULL; }
+	T* Base() { return nullptr; }
+	const T* Base() const { return nullptr; }
 
 protected:
 	struct BlockHeader_t;
@@ -101,7 +101,7 @@ public:
 		return false;
 	}
 	bool IsValidIterator( const Iterator_t &it ) const	{ return it.m_pBlockHeader && it.m_nIndex >= 0 && it.m_nIndex < it.m_pBlockHeader->m_nBlockSize; }
-	constexpr Iterator_t InvalidIterator() const		{ return Iterator_t( NULL, INVALID_INDEX ); }
+	constexpr Iterator_t InvalidIterator() const		{ return Iterator_t( nullptr, INVALID_INDEX ); }
 
 	// element access
 	T& operator[]( intp i );
@@ -160,7 +160,7 @@ protected:
 
 template< class T >
 CUtlFixedMemory<T>::CUtlFixedMemory( intp nGrowSize, intp nInitAllocationCount )
-: m_pBlocks( 0 ), m_nAllocationCount( 0 ), m_nGrowSize( 0 )
+: m_pBlocks( nullptr ), m_nAllocationCount( 0 ), m_nGrowSize( 0 )
 {
 	Init( nGrowSize, nInitAllocationCount );
 }
@@ -292,7 +292,7 @@ void CUtlFixedMemory<T>::Grow( intp num )
 	{
 		Error( "CUtlFixedMemory overflow!\n" );
 	}
-	pBlockHeader->m_pNext = NULL;
+	pBlockHeader->m_pNext = nullptr;
 	pBlockHeader->m_nBlockSize = nBlockSize;
 
 	if ( !m_pBlocks )
@@ -341,7 +341,7 @@ void CUtlFixedMemory<T>::Purge()
 		pbh = pbh->m_pNext;
 		free( pFree );
 	}
-	m_pBlocks = NULL;
+	m_pBlocks = nullptr;
 	m_nAllocationCount = 0;
 }
 

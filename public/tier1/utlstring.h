@@ -391,18 +391,18 @@ template < typename T = char >
 class CUtlConstStringBase
 {
 public:
-	CUtlConstStringBase() : m_pString( NULL ) {}
-	explicit CUtlConstStringBase( const T *pString ) : m_pString( NULL ) { Set( pString ); }
-	CUtlConstStringBase( const CUtlConstStringBase& src ) : m_pString( NULL ) { Set( src.m_pString ); }
-	~CUtlConstStringBase() { Set( NULL ); }
+	CUtlConstStringBase() : m_pString( nullptr ) {}
+	explicit CUtlConstStringBase( const T *pString ) : m_pString( nullptr ) { Set( pString ); }
+	CUtlConstStringBase( const CUtlConstStringBase& src ) : m_pString( nullptr ) { Set( src.m_pString ); }
+	~CUtlConstStringBase() { Set( nullptr ); }
 
 	void Set( const T *pValue );
-	void Clear() { Set( NULL ); }
+	void Clear() { Set( nullptr ); }
 
 	const T *Get() const { return m_pString ? m_pString : StringFuncs<T>::EmptyString(); }
 	operator const T*() const { return m_pString ? m_pString : StringFuncs<T>::EmptyString(); }
 
-	[[nodiscard]] bool IsEmpty() const { return m_pString == NULL; } // Note: empty strings are never stored by Set
+	[[nodiscard]] bool IsEmpty() const { return m_pString == nullptr; } // Note: empty strings are never stored by Set
 
 	int Compare( const T *rhs ) const;
 
@@ -438,7 +438,7 @@ void CUtlConstStringBase<T>::Set( const T *pValue )
 	if ( pValue != m_pString )
 	{
 		free( m_pString );
-		m_pString = pValue && pValue[0] ? StringFuncs<T>::Duplicate( pValue ) : NULL;
+		m_pString = pValue && pValue[0] ? StringFuncs<T>::Duplicate( pValue ) : nullptr;
 	}
 }
 

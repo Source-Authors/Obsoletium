@@ -203,7 +203,7 @@ struct HasClassAltArgumentType
 {
 	template < typename X > static long Test( typename X::AltArgumentType_t* );
 	template < typename X > static char Test( ... );
-	enum { value = ( sizeof( Test< T >( NULL ) ) != sizeof( char ) ) };
+	enum { value = ( sizeof( Test< T >( nullptr ) ) != sizeof( char ) ) };
 };
 
 template < typename T, bool = HasClassAltArgumentType< T >::value >

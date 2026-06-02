@@ -182,7 +182,7 @@ protected:
 
 template <class T, class I>
 CUtlMultiList<T,I>::CUtlMultiList( intp growSize, intp initSize ) :
-	m_Memory(growSize, initSize), m_pElementList(0)
+	m_Memory(growSize, initSize), m_pElementList(nullptr)
 {
 	ConstructList();
 }

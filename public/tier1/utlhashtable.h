@@ -997,7 +997,7 @@ template <typename KeyArgumentT>
 inline UtlHashHandle_t CUtlStableHashtable<K,V,H,E,S,A>::DoFind( KeyArgumentT k ) const
 {
 	unsigned int hash = m_table.GetHashRef()( k );
-	UtlHashHandle_t h = m_table.template DoLookup<KeyArgumentT>( k, hash, NULL );
+	UtlHashHandle_t h = m_table.template DoLookup<KeyArgumentT>( k, hash, nullptr );
 	if ( h != m_table.InvalidHandle() )
 		return m_table[ h ].m_index;
 
@@ -1009,7 +1009,7 @@ template <typename KeyArgumentT>
 inline UtlHashHandle_t CUtlStableHashtable<K,V,H,E,S,A>::DoInsert( KeyArgumentT k )
 {
 	unsigned int hash = m_table.GetHashRef()( k );
-	UtlHashHandle_t h = m_table.template DoLookup<KeyArgumentT>( k, hash, NULL );
+	UtlHashHandle_t h = m_table.template DoLookup<KeyArgumentT>( k, hash, nullptr );
 	if ( h != m_table.InvalidHandle() )
 		return m_table[ h ].m_index;
 

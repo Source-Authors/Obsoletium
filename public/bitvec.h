@@ -1424,7 +1424,7 @@ inline void CVarBitVecBase<BITCOUNTTYPE>::FreeInts( void )
 	{
 		free( m_pInt );
 	}
-	m_pInt = NULL;
+	m_pInt = nullptr;
 }
 
 #include "tier0/memdbgoff.h"
