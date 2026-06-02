@@ -264,8 +264,8 @@ public:
 
 
 #ifdef USE_M64S
-	[[nodiscard]] __m64 &AsM64() { return *reinterpret_cast<__m64*>(&x); }
-	[[nodiscard]] const __m64 &AsM64() const { return *reinterpret_cast<const __m64*>(&x); } 
+	[[nodiscard]][[deprecated("Unsafe, UB")]] __m64 &AsM64() { return *reinterpret_cast<__m64*>(&x); }
+	[[nodiscard]][[deprecated("Unsafe, UB")]] const __m64 &AsM64() const { return *reinterpret_cast<const __m64*>(&x); } 
 #endif
 
 	// Setter
