@@ -265,7 +265,11 @@ PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
 		// ensure that they will run promptly on a specific CPU.
 		for ( int i = 0; i < g_numCPUs; ++i )
 		{
-			auto thread = (HANDLE)_beginthreadex( nullptr, 0x10000, MeasureThread, (void*)static_cast<intp>(i), 0, nullptr );
+			auto thread = reinterpret_cast<HANDLE>(
+				reinterpret_cast<void*>(
+					_beginthreadex( nullptr, 0x10000, MeasureThread, reinterpret_cast<void*>( static_cast<intp>(i) ), 0, nullptr )
+				)
+			);
 			if (thread)
 			{
 				SetThreadAffinityMask( thread, static_cast<size_t>(1u) << i );

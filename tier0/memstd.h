@@ -77,7 +77,7 @@ private:
 	class CFreeList : public CTSListBase
 	{
 	public:
-		void Push( void *p ) { CTSListBase::Push( (TSLNodeBase_t *)p );	}
+		void Push( void *p ) { CTSListBase::Push( static_cast<TSLNodeBase_t *>( p ) );	}
 	};
 
 	CFreeList		m_FreeList;
@@ -123,7 +123,7 @@ class ALIGN16 CStdMemAlloc : public IMemAlloc
 public:
 	CStdMemAlloc()
 	  :	m_pfnFailHandler( DefaultFailHandler ),
-		m_sMemoryAllocFailed( (size_t)0 )
+		m_sMemoryAllocFailed( 0 )
 	{
 		// Make sure that we return 64-bit addresses in 64-bit builds.
 		ReserveBottomMemory();

@@ -279,7 +279,7 @@ static char * _stristr( char * pStr, const char * pSearch )
 	while (*pLetter != 0)
 	{
 		// Skip over non-matches
-		if (tolower((unsigned char)*pLetter) == tolower((unsigned char)*pSearch))
+		if (tolower(static_cast<unsigned char>(*pLetter)) == tolower(static_cast<unsigned char>(*pSearch)))
 		{
 			// Check for match
 			char const* pMatch = pLetter + 1;
@@ -290,7 +290,7 @@ static char * _stristr( char * pStr, const char * pSearch )
 				if (*pMatch == 0)
 					return nullptr;
 
-				if (tolower((unsigned char)*pMatch) != tolower((unsigned char)*pTest))
+				if (tolower(static_cast<unsigned char>(*pMatch)) != tolower(static_cast<unsigned char>(*pTest)))
 					break;
 
 				++pMatch;

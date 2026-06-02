@@ -919,7 +919,7 @@ void SpewDeactivate()
 // functions in and printfs with %f cause runtime errors in the C libraries.
 DBG_INTERFACE float CrackSmokingCompiler( float a )
 {
-	return (float)fabs( a );
+	return static_cast<float>( fabs( a ) );
 }
 
 void* Plat_SimpleLog( const tchar* file, int line )

@@ -88,7 +88,7 @@ static void InitializeToFeeFee( void *pMem, size_t nSize )
 
 static void InitializeToRandom( void *pMem, size_t nSize )
 {
-	auto *pOut = (unsigned char *)pMem;
+	auto *pOut = static_cast<unsigned char *>(pMem);
 	for ( size_t i=0; i < nSize; i++ )
 	{
 		pOut[i] = g_RandomValues[(g_iCurRandomValueOffset & 255)];

@@ -20,7 +20,10 @@
 #define SystemPerformanceInformation 2
 #define SystemTimeInformation 3
 
-#define Li2Double(x) ((double)((x).HighPart) * 4.294967296E9 + (double)((x).LowPart))
+[[nodiscard]] static constexpr inline double Li2Double(LARGE_INTEGER x)
+{
+	return static_cast<double>(x.HighPart) * 4.294967296E9 + static_cast<double>(x.LowPart);
+}
 
 using SYSTEM_BASIC_INFORMATION = struct 
 {

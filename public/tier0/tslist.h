@@ -96,7 +96,7 @@ class TSLIST_HEAD_ALIGN CTSListBase : public CAlignedNewDelete<TSLIST_HEAD_ALIGN
 	  , 0
 #endif
   }}} {
-    if (((size_t)&head_) % TSLIST_HEAD_ALIGNMENT != 0) {
+    if ((reinterpret_cast<size_t>(&head_)) % TSLIST_HEAD_ALIGNMENT != 0) {
       Error("CTSListBase: Misaligned list head.\n");
     }
   }

@@ -1398,7 +1398,7 @@ void ReserveBottomMemory()
 	// heap (and dlmalloc and the small block heap) from grabbing address space
 	// from the bottom 4 GiB, while still allowing Steam to allocate a few pages
 	// for setting up detours.
-	const size_t LOW_MEM_LINE = 0x100000000LL;
+	constexpr size_t LOW_MEM_LINE = 0x100000000LL;
 	size_t totalReservation = 0;
 	size_t numVAllocs = 0;
 	size_t numHeapAllocs = 0;
@@ -1410,7 +1410,7 @@ void ReserveBottomMemory()
 			if ( !p )
 				break;
 
-			if ( (size_t)p >= LOW_MEM_LINE )
+			if ( reinterpret_cast<size_t>( p ) >= LOW_MEM_LINE )
 			{
 				// We don't need this memory, so release it completely.
 				VirtualFree( p, 0, MEM_RELEASE );
@@ -1434,7 +1434,7 @@ void ReserveBottomMemory()
 			if ( !p )
 				break;
 
-			if ( (size_t)p >= LOW_MEM_LINE )
+			if ( reinterpret_cast<size_t>( p ) >= LOW_MEM_LINE )
 			{
 				// We don't need this memory, so release it completely.
 				HeapFree( heap, 0, p );
