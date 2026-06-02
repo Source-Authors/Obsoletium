@@ -1456,7 +1456,7 @@ void ReserveBottomMemory()
 		buffer,
 		std::size(buffer),
 		"[tier0] Reserved %1.3f MiB (%zu vallocs, %zu heap allocs) to keep allocations out of low-memory in x64.\n",
-		totalReservation / (1024 * 1024.0f),
+		totalReservation / (1024 * 1024.0),
 		numVAllocs,
 		numHeapAllocs );
 	// Can't use Msg here because it isn't necessarily initialized yet.
