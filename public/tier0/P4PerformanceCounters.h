@@ -247,6 +247,8 @@ public:
 		        escr.OS = 1;
 			    break;
 			}
+        default:
+            assert(false);
         }
 
         escr.EventMask = m_eventMask;

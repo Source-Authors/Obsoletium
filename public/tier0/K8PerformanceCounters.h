@@ -143,6 +143,8 @@ public:
             select.USR = 1;
             select.OS = 1;
             break;
+        default:
+            assert(false);
         }
 
        
