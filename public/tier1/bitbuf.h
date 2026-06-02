@@ -347,7 +347,7 @@ BITBUF_INLINE void bf_write::SetOverflowFlag()
 
 BITBUF_INLINE void bf_write::WriteOneBitNoCheck(int nValue)
 {
-#if __i386__
+#if defined(__i386__) && __i386__
 	if(nValue)
 		m_pData[m_iCurBit >> 5] |= 1u << (m_iCurBit & 31);
 	else
@@ -384,7 +384,7 @@ inline void	bf_write::WriteOneBitAt( int iBit, int nValue )
 		return;
 	}
 
-#if __i386__
+#if defined(__i386__) && __i386__
 	if(nValue)
 		m_pData[iBit >> 5] |= 1u << (iBit & 31);
 	else
@@ -771,7 +771,7 @@ inline bool bf_read::CheckForOverflow(intp nBits)
 
 inline int bf_read::ReadOneBitNoCheck()
 {
-#if VALVE_LITTLE_ENDIAN
+#if defined(VALVE_LITTLE_ENDIAN) && VALVE_LITTLE_ENDIAN
 	const unsigned int value = ((const unsigned * RESTRICT)m_pData)[m_iCurBit >> 5] >> (m_iCurBit & 31);
 #else
 	const unsigned char value = m_pData[m_iCurBit >> 3] >> (m_iCurBit & 7);
@@ -830,7 +830,7 @@ BITBUF_INLINE uint32 bf_read::ReadUBitLong( int numbits )
 	size_t iWordOffset2 = iLastBit >> 5;
 	m_iCurBit += numbits;
 	
-#if __i386__
+#if defined(__i386__) && __i386__
 	unsigned int bitmask = (2 << (numbits-1)) - 1;
 #else
 	extern unsigned g_ExtraMasks[33];
