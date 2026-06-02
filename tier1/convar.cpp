@@ -1318,7 +1318,7 @@ void ConVar_PrintDescription( const ConCommandBase *pVar )
 		{
 			ConColorMsg( clr, R"("%s" = "%s")", var->GetName(), value );
 
-			if ( stricmp( value, var->GetDefault() ) != 0 )
+			if ( !V_strieq( value, var->GetDefault() ) )
 			{
 				ConMsg( " ( def. \"%s\" )", var->GetDefault() );
 			}
