@@ -110,7 +110,7 @@ SE_GCC_END_WARNING_OVERRIDE_SCOPE()
 		dbSystemTime = Li2Double(SysTimeInfo.liKeSystemTime) - Li2Double(liOldSystemTime);
 
 		// CurrentCpuIdle = IdleTime / SystemTime
-		dbIdleTime = dbIdleTime / dbSystemTime / (double)SysBaseInfo.bKeNumberProcessors;
+		dbIdleTime = dbIdleTime / dbSystemTime / static_cast<double>(SysBaseInfo.bKeNumberProcessors);
 
 		// CurrentCpuUsage% = 100 - (CurrentCpuIdle * 100) / NumberOfProcessors
 		// dbIdleTime = 100.0 - dbIdleTime * 100.0 / (double)SysBaseInfo.bKeNumberProcessors + 0.5;

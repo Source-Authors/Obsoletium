@@ -119,7 +119,7 @@ void CL2Cache::End( )
 		m_pL2CacheEvent->StopCounter(); 
 		
 		// Save the delta for later query.
-		m_iL2CacheMissCount = ( int )i64Delta;
+		m_iL2CacheMissCount = static_cast<int>(i64Delta);
 	}
 }
 
