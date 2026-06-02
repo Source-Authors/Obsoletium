@@ -127,10 +127,10 @@
 
 /**
  * @brief Makes a signed 4-byte "packed ID" int out of 4 characters.
- * @param d
- * @param c
- * @param b
- * @param a
+ * @param d Byte.
+ * @param c Byte.
+ * @param b Byte.
+ * @param a Byte.
  * @return Packed ID.
  */
 constexpr inline int MAKEID(char d, char c, char b, char a) noexcept {
@@ -140,10 +140,10 @@ constexpr inline int MAKEID(char d, char c, char b, char a) noexcept {
 
 /**
  * @brief Makes a unsigned 4-byte "packed ID" int out of 4 characters.
- * @param d
- * @param c
- * @param b
- * @param a
+ * @param d Byte.
+ * @param c Byte.
+ * @param b Byte.
+ * @param a Byte.
  * @return Packed ID.
  */
 constexpr inline unsigned MAKEUID(char d, char c, char b, char a) noexcept {
@@ -192,8 +192,8 @@ template <typename T>
 
 /**
  * @brief Set bits in bit vector.
- * @tparam T
- * @tparam Y
+ * @tparam T Vector type.
+ * @tparam Y Bits type.
  * @param vector Vector.
  * @param bits Bits.
  * @return Bit vector with set bits.
@@ -205,8 +205,8 @@ constexpr inline auto& SETBITS(T& vector, Y bits) noexcept {
 
 /**
  * @brief Clear bits in vector.
- * @tparam T
- * @tparam Y
+ * @tparam T Vector type.
+ * @tparam Y Bits type.
  * @param vector Vector.
  * @param bits Bits.
  * @return Bit vector with cleared bits.
@@ -218,8 +218,8 @@ constexpr inline auto& CLEARBITS(T& vector, Y bits) noexcept {
 
 /**
  * @brief Check bits set in vector.
- * @tparam T
- * @tparam Y
+ * @tparam T Vector type.
+ * @tparam Y Bits type.
  * @param vector Vector.
  * @param bits Bits.
  * @return Bit mask with set bits.
@@ -231,7 +231,7 @@ constexpr inline auto FBitSet(T vector, Y bits) noexcept {
 
 /**
  * @brief Check value is power of two.
- * @tparam T
+ * @tparam T Value type.
  * @param value Value.
  * @return true if value is power of two.
  */
@@ -450,8 +450,8 @@ extern "C++"  // templates cannot be declared to have 'C' linkage
 
 /**
  * @brief Clamp array index to be in bounds.
- * @tparam IndexType
- * @tparam T
+ * @tparam IndexType Index type.
+ * @tparam T Array element type.
  * @tparam N Array size.
  * @param buffer Array.
  * @param index Index to clamp.
@@ -465,7 +465,7 @@ constexpr IndexType ClampedArrayIndex([[maybe_unused]] const T (&buffer)[N],
 
 /**
  * @brief Get array element by index. Clamp index if out of range.
- * @tparam T
+ * @tparam T Array element type.
  * @tparam N Array size.
  * @param buffer Array.
  * @param index Index to clamp.
