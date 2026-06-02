@@ -75,7 +75,10 @@ float GetCPUUsage()
 		if ( !ntdll )
 			return(0);
 
+SE_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
+SE_GCC_DISABLE_CAST_FUNCTION_TYPE_STRICT_WARNING()
 		NtQuerySystemInformation = reinterpret_cast<PROCNTQSI>(GetProcAddress( ntdll, "NtQuerySystemInformation" ));
+SE_GCC_END_WARNING_OVERRIDE_SCOPE()
 
 		if ( !NtQuerySystemInformation )
 			return(0);

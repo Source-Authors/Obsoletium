@@ -656,6 +656,12 @@ BitwiseClear(T* src, size_t size) noexcept {
   _Pragma("GCC diagnostic ignored \"-Wcast-function-type-mismatch\"")
 
 /*
+ * @brief Disables GCC / Clang cast-function-type-mismatch.
+ */
+#define SE_GCC_DISABLE_CAST_FUNCTION_TYPE_STRICT_WARNING() \
+  _Pragma("GCC diagnostic ignored \"-Wcast-function-type-strict\"")
+
+/*
  * @brief Disables GCC / Clang overloaded-virtual.
  */
 #define SE_GCC_DISABLE_OVERLOADED_VIRTUAL_WARNING() \
@@ -681,6 +687,11 @@ BitwiseClear(T* src, size_t size) noexcept {
  * @brief Do nothing.
  */
 #define SE_GCC_DISABLE_CAST_FUNCTION_TYPE_MISMATCH_WARNING()
+
+/*
+ * @brief Do nothing.
+ */
+#define SE_GCC_DISABLE_CAST_FUNCTION_TYPE_STRICT_WARNING()
 
 /*
  * @brief Do nothing.

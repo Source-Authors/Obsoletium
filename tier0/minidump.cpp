@@ -60,8 +60,11 @@ bool WriteMiniDumpUsingExceptionInfo(
 
 	bool bReturnValue = false;
 
+SE_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
+SE_GCC_DISABLE_CAST_FUNCTION_TYPE_STRICT_WARNING()
 	auto pfnMiniDumpWrite =
 		reinterpret_cast<MINIDUMPWRITEDUMP>( ::GetProcAddress( hDbgHelpDll, V_STRINGIFY(MiniDumpWriteDump) ) );
+SE_GCC_END_WARNING_OVERRIDE_SCOPE()
 	if ( pfnMiniDumpWrite )
 	{
 		// create a unique filename for the minidump based on the current time and module name
