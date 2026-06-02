@@ -18,7 +18,7 @@ double g_ClockSpeedSecondsMultiplier;
 uint64 g_ClockRtscpOverhead;
 
 // Constructor init the clock speed.
-CClockSpeedInit g_ClockSpeedInit CONSTRUCT_EARLY;
+static CClockSpeedInit g_ClockSpeedInit CONSTRUCT_EARLY;
 
 void CClockSpeedInit::Init()
 {
