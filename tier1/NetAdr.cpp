@@ -218,7 +218,7 @@ void netadr_t::ToSockadr (sockaddr * s) const
 	else if (type == NA_IP)
 	{
 		((sockaddr_in*)s)->sin_family = AF_INET;
-		((sockaddr_in*)s)->sin_addr.s_addr = *(int *)&ip;
+		((sockaddr_in*)s)->sin_addr.s_addr = *(const int *)&ip;
 		((sockaddr_in*)s)->sin_port = port;
 	}
 	else if (type == NA_LOOPBACK )
@@ -234,8 +234,8 @@ bool netadr_t::SetFromSockadr(const sockaddr * s)
 	if (s->sa_family == AF_INET)
 	{
 		type = NA_IP;
-		*(int *)&ip = ((sockaddr_in *)s)->sin_addr.s_addr;
-		port = ((sockaddr_in *)s)->sin_port;
+		*(int *)&ip = ((const sockaddr_in *)s)->sin_addr.s_addr;
+		port = ((const sockaddr_in *)s)->sin_port;
 		return true;
 	}
 
@@ -353,9 +353,9 @@ bool netadr_t::SetFromString( const char *pch, bool bUseDNS )
 
 bool netadr_t::operator<(const netadr_t &netadr) const
 {
-	if ( *((uint *)netadr.ip) < *((uint *)ip) )
+	if ( *((const uint *)netadr.ip) < *((const uint *)ip) )
 		return true;
-	else if ( *((uint *)netadr.ip) > *((uint *)ip) )
+	else if ( *((const uint *)netadr.ip) > *((const uint *)ip) )
 		return false;
 	return ( netadr.port < port );
 }

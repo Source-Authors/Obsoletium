@@ -1280,7 +1280,7 @@ void ConVar_PrintDescription( const ConCommandBase *pVar )
 
 	if ( !pVar->IsCommand() )
 	{
-		auto *var = ( ConVar * )pVar;
+		const auto *var = ( const ConVar * )pVar;
 		const auto *pBounded = dynamic_cast<const ConVar_ServerBounded*>( var );
 
 		bMin = var->GetMin( fMin );
@@ -1344,7 +1344,7 @@ void ConVar_PrintDescription( const ConCommandBase *pVar )
 	}
 	else
 	{
-		auto *var = ( ConCommand * )pVar;
+		auto *var = ( const ConCommand * )pVar;
 
 		ConColorMsg( clr, "\"%s\"\n", var->GetName() );
 	}

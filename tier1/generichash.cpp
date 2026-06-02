@@ -327,7 +327,7 @@ uint32 MurmurHash2( const void * key, int len, uint32 seed )
 
 	while(len >= 4)
 	{
-		uint32 k = LittleDWord( *(uint32 *)data );
+		uint32 k = LittleDWord( *(const uint32 *)data );
 
 		k *= m; 
 		k ^= k >> r; 
@@ -418,11 +418,11 @@ uint64 MurmurHash64( const void * key, int len, uint32 seed )
 	// Handle the last few bytes of the input array
 	switch(len)
 	{
-	case 3: h2 ^= ((uint8*)data)[2] << 16;
+	case 3: h2 ^= ((const uint8*)data)[2] << 16;
         [[fallthrough]];
-	case 2: h2 ^= ((uint8*)data)[1] << 8;
+	case 2: h2 ^= ((const uint8*)data)[1] << 8;
         [[fallthrough]];
-	case 1: h2 ^= ((uint8*)data)[0];
+	case 1: h2 ^= ((const uint8*)data)[0];
 			h2 *= m;
 	}
 

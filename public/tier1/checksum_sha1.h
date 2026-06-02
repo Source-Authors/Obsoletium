@@ -77,7 +77,7 @@ public:
 	void Reset();
 
 	// Update the hash value
-	void Update(unsigned char *data, unsigned int len);
+	void Update(const unsigned char *data, unsigned int len);
 #if !defined(_MINIMUM_BUILD_) 
 	bool HashFile(char *szFileName);
 #endif
@@ -91,7 +91,7 @@ public:
 
 private:
 	// Private SHA-1 transformation
-	void Transform(unsigned long state[5], unsigned char buffer[64]);
+	void Transform(unsigned long state[5], const unsigned char buffer[64]);
 
 	// Member variables
 	unsigned char m_workspace[64];

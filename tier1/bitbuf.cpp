@@ -739,7 +739,7 @@ void bf_write::WriteLongLong(int64 val)
 	// dimhotepus: Fix writing int64 bits in LP64 model.
 	// Insert the two DWORDS according to network endian
 	constexpr short endianIndex = 0x0100;
-	byte *idx = (byte*)&endianIndex;
+	const byte *idx = (const byte*)&endianIndex;
 	WriteUBitLong(pLongs[*idx++], sizeof(uint32) * CHAR_BIT);
 	WriteUBitLong(pLongs[*idx], sizeof(uint32) * CHAR_BIT);
 }
@@ -751,7 +751,7 @@ void bf_write::WriteULongLong(uint64 val)
 	// dimhotepus: Fix writing int64 bits in LP64 model.
 	// Insert the two DWORDS according to network endian
 	constexpr short endianIndex = 0x0100;
-	byte *idx = (byte*)&endianIndex;
+	const byte *idx = (const byte*)&endianIndex;
 	WriteUBitLong(pLongs[*idx++], sizeof(uint32) * CHAR_BIT);
 	WriteUBitLong(pLongs[*idx], sizeof(uint32) * CHAR_BIT);
 }
@@ -820,7 +820,7 @@ void bf_read::StartReading( const void *pData, intp nBytes, intp iStartBit, intp
 	// Make sure we're dword aligned.
 	Assert(((uintp)pData & 3) == 0);
 
-	m_pData = (unsigned char*)pData;
+	m_pData = (const unsigned char*)pData;
 	m_nDataBytes = nBytes;
 
 	if ( nBits == -1 )
@@ -1467,10 +1467,10 @@ int bf_read::CompareBitsAt( int offset, bf_read * RESTRICT other, int otherOffse
 
 	unsigned iStartBit1 = offset & 31u;
 	unsigned iStartBit2 = otherOffset & 31u;
-	unsigned *pData1 = (unsigned*)m_pData + (offset >> 5);
-	unsigned *pData2 = (unsigned*)other->m_pData + (otherOffset >> 5);
-	unsigned *pData1End = pData1 + ((offset + numbits - 1) >> 5);
-	unsigned *pData2End = pData2 + ((otherOffset + numbits - 1) >> 5);
+	const unsigned *pData1 = (const unsigned*)m_pData + (offset >> 5);
+	const unsigned *pData2 = (const unsigned*)other->m_pData + (otherOffset >> 5);
+	const unsigned *pData1End = pData1 + ((offset + numbits - 1) >> 5);
+	const unsigned *pData2End = pData2 + ((otherOffset + numbits - 1) >> 5);
 
 	constexpr int kUint32Bits = CHAR_BIT * sizeof(uint32);
 

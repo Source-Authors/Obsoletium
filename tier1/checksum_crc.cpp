@@ -108,7 +108,7 @@ CRC32_t	CRC32_GetTableEntry( unsigned int slot )
 void CRC32_ProcessBuffer(CRC32_t *pulCRC, IN_BYTECAP(nBuffer) const void *pBuffer, intp nBuffer)
 {
 	CRC32_t ulCrc = *pulCRC;
-	auto *pb = (unsigned char *)pBuffer;
+	const auto *pb = (const unsigned char *)pBuffer;
     unsigned int nFront;
     intp nMain;
 

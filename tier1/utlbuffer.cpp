@@ -440,7 +440,7 @@ intp CUtlBuffer::PeekWhiteSpace( intp nOffset )
 
 	while ( CheckPeekGet( nOffset, sizeof(char) ) )
 	{
-		if ( !V_isspace( *(unsigned char*)PeekGet( nOffset ) ) )
+		if ( !V_isspace( *(const unsigned char*)PeekGet( nOffset ) ) )
 			break;
 		nOffset += sizeof(char);
 	}
@@ -985,8 +985,8 @@ intp CUtlBuffer::VaScanf( const char* pFmt, va_list list )
 								return numScanned;
 							}
 
-							*i = (int)strtol( (char*)PeekGet(), &pEnd, 10 );
-							intp nBytesRead = pEnd - (char*)PeekGet();
+							*i = (int)strtol( (const char*)PeekGet(), &pEnd, 10 );
+							intp nBytesRead = pEnd - (const char*)PeekGet();
 							if ( nBytesRead == 0 )
 								return numScanned;
 							m_Get += nBytesRead;
@@ -1005,8 +1005,8 @@ intp CUtlBuffer::VaScanf( const char* pFmt, va_list list )
 									return numScanned;
 								}
 
-								*i = (short)strtol( (char*)PeekGet(), &pEnd, 10 );
-								intp nBytesRead = pEnd - (char*)PeekGet();
+								*i = (short)strtol( (const char*)PeekGet(), &pEnd, 10 );
+								intp nBytesRead = pEnd - (const char*)PeekGet();
 								if ( nBytesRead == 0 )
 									return numScanned;
 								m_Get += nBytesRead;
@@ -1023,8 +1023,8 @@ intp CUtlBuffer::VaScanf( const char* pFmt, va_list list )
 									return numScanned;
 								}
 
-								*i = (signed char)strtol( (char*)PeekGet(), &pEnd, 10 );
-								intp nBytesRead = pEnd - (char*)PeekGet();
+								*i = (signed char)strtol( (const char*)PeekGet(), &pEnd, 10 );
+								intp nBytesRead = pEnd - (const char*)PeekGet();
 								if ( nBytesRead == 0 )
 									return numScanned;
 								m_Get += nBytesRead;
@@ -1041,8 +1041,8 @@ intp CUtlBuffer::VaScanf( const char* pFmt, va_list list )
 									return numScanned;
 								}
 
-								*i = strtol( (char*)PeekGet(), &pEnd, 10 );
-								intp nBytesRead = pEnd - (char*)PeekGet();
+								*i = strtol( (const char*)PeekGet(), &pEnd, 10 );
+								intp nBytesRead = pEnd - (const char*)PeekGet();
 								if ( nBytesRead == 0 )
 									return numScanned;
 								m_Get += nBytesRead;
@@ -1059,8 +1059,8 @@ intp CUtlBuffer::VaScanf( const char* pFmt, va_list list )
 									return numScanned;
 								}
 
-								*i = strtoll( (char*)PeekGet(), &pEnd, 10 );
-								intp nBytesRead = pEnd - (char*)PeekGet();
+								*i = strtoll( (const char*)PeekGet(), &pEnd, 10 );
+								intp nBytesRead = pEnd - (const char*)PeekGet();
 								if ( nBytesRead == 0 )
 									return numScanned;
 								m_Get += nBytesRead;
@@ -1112,8 +1112,8 @@ intp CUtlBuffer::VaScanf( const char* pFmt, va_list list )
 								return numScanned;
 							}
 
-							*i = (unsigned int)strtoul( (char*)PeekGet(), &pEnd, base );
-							intp nBytesRead = pEnd - (char*)PeekGet();
+							*i = (unsigned int)strtoul( (const char*)PeekGet(), &pEnd, base );
+							intp nBytesRead = pEnd - (const char*)PeekGet();
 							if ( nBytesRead == 0 )
 								return numScanned;
 							m_Get += nBytesRead;
@@ -1132,8 +1132,8 @@ intp CUtlBuffer::VaScanf( const char* pFmt, va_list list )
 									return numScanned;
 								}
 
-								*i = (unsigned short)strtoul( (char*)PeekGet(), &pEnd, base );
-								intp nBytesRead = pEnd - (char*)PeekGet();
+								*i = (unsigned short)strtoul( (const char*)PeekGet(), &pEnd, base );
+								intp nBytesRead = pEnd - (const char*)PeekGet();
 								if ( nBytesRead == 0 )
 									return numScanned;
 								m_Get += nBytesRead;
@@ -1150,8 +1150,8 @@ intp CUtlBuffer::VaScanf( const char* pFmt, va_list list )
 									return numScanned;
 								}
 
-								*i = (unsigned char)strtoul( (char*)PeekGet(), &pEnd, base );
-								intp nBytesRead = pEnd - (char*)PeekGet();
+								*i = (unsigned char)strtoul( (const char*)PeekGet(), &pEnd, base );
+								intp nBytesRead = pEnd - (const char*)PeekGet();
 								if ( nBytesRead == 0 )
 									return numScanned;
 								m_Get += nBytesRead;
@@ -1168,8 +1168,8 @@ intp CUtlBuffer::VaScanf( const char* pFmt, va_list list )
 									return numScanned;
 								}
 
-								*i = strtoul( (char*)PeekGet(), &pEnd, base );
-								intp nBytesRead = pEnd - (char*)PeekGet();
+								*i = strtoul( (const char*)PeekGet(), &pEnd, base );
+								intp nBytesRead = pEnd - (const char*)PeekGet();
 								if ( nBytesRead == 0 )
 									return numScanned;
 								m_Get += nBytesRead;
@@ -1186,8 +1186,8 @@ intp CUtlBuffer::VaScanf( const char* pFmt, va_list list )
 									return numScanned;
 								}
 
-								*i = strtoull( (char*)PeekGet(), &pEnd, base );
-								intp nBytesRead = pEnd - (char*)PeekGet();
+								*i = strtoull( (const char*)PeekGet(), &pEnd, base );
+								intp nBytesRead = pEnd - (const char*)PeekGet();
 								if ( nBytesRead == 0 )
 									return numScanned;
 								m_Get += nBytesRead;
@@ -1219,8 +1219,8 @@ intp CUtlBuffer::VaScanf( const char* pFmt, va_list list )
 								return numScanned;
 							}
 
-							*f = strtof( (char*)PeekGet(), &pEnd );
-							intp nBytesRead = pEnd - (char*)PeekGet();
+							*f = strtof( (const char*)PeekGet(), &pEnd );
+							intp nBytesRead = pEnd - (const char*)PeekGet();
 							if ( nBytesRead == 0 )
 								return numScanned;
 							m_Get += nBytesRead;
@@ -1237,8 +1237,8 @@ intp CUtlBuffer::VaScanf( const char* pFmt, va_list list )
 								return numScanned;
 							}
 
-							*f = strtod( (char*)PeekGet(), &pEnd );
-							intp nBytesRead = pEnd - (char*)PeekGet();
+							*f = strtod( (const char*)PeekGet(), &pEnd );
+							intp nBytesRead = pEnd - (const char*)PeekGet();
 							if ( nBytesRead == 0 )
 								return numScanned;
 							m_Get += nBytesRead;

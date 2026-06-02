@@ -765,7 +765,7 @@ bool KeyValues::LoadFromFile( IBaseFileSystem *filesystem, const char *resourceN
 	
 	RunCodeAtScopeExit(fs->Close( f ));
 
-	s_LastFileLoadingFrom = (char*)resourceName;
+	s_LastFileLoadingFrom = (const char*)resourceName;
 
 	// load file into a null-terminated buffer
 	int fileSize = fs->Size( f );
@@ -2499,9 +2499,9 @@ bool KeyValues::LoadFromBuffer( char const *resourceName, const char *pBuffer, I
 	// Translate Unicode files into UTF-8 before proceeding
 	if ( nLen > 2 && (uint8)pBuffer[0] == 0xFF && (uint8)pBuffer[1] == 0xFE )
 	{
-		intp nUTF8Len = V_UnicodeToUTF8( (wchar_t*)(pBuffer+2), nullptr, 0 );
+		intp nUTF8Len = V_UnicodeToUTF8( (const wchar_t*)(pBuffer+2), nullptr, 0 );
 		char *pUTF8Buf = new char[nUTF8Len];
-		V_UnicodeToUTF8( (wchar_t*)(pBuffer+2), pUTF8Buf, nUTF8Len );
+		V_UnicodeToUTF8( (const wchar_t*)(pBuffer+2), pUTF8Buf, nUTF8Len );
 		buf.AssumeMemory( pUTF8Buf, nUTF8Len, nUTF8Len, CUtlBuffer::READ_ONLY | CUtlBuffer::TEXT_BUFFER );
 	}
 
