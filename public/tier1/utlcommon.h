@@ -70,6 +70,22 @@ public:
 	[[nodiscard]] constexpr const V &GetValue() const { return m_value; }
 };
 
+template<typename K, typename V>
+[[nodiscard]] constexpr bool operator ==(
+	const CUtlKeyValuePair<K, V>& l,
+	const CUtlKeyValuePair<K, V>& r)
+{
+	return l.m_key == r.m_key && l.m_value == r.m_value;
+}
+
+template<typename K, typename V>
+[[nodiscard]] constexpr bool operator !=(
+	const CUtlKeyValuePair<K, V>& l,
+	const CUtlKeyValuePair<K, V>& r)
+{
+	return !(l == r);
+}
+
 template <typename K>
 class CUtlKeyValuePair<K, empty_t>
 {
@@ -88,6 +104,22 @@ public:
 	constexpr CUtlKeyValuePair( const K &k, const empty_t& ) : m_key( k ) {}
 	[[nodiscard]] constexpr const K &GetValue() const { return m_key; }
 };
+
+template<typename K>
+[[nodiscard]] constexpr bool operator ==(
+	const CUtlKeyValuePair<K, empty_t>& l,
+	const CUtlKeyValuePair<K, empty_t>& r)
+{
+	return l.m_key == r.m_key;
+}
+
+template<typename K>
+[[nodiscard]] constexpr bool operator !=(
+	const CUtlKeyValuePair<K, empty_t>& l,
+	const CUtlKeyValuePair<K, empty_t>& r)
+{
+	return !(l == r);
+}
 
 
 // Default functors. You can specialize these if your type does
