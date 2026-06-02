@@ -407,7 +407,7 @@ int64 V_atoi64( IN_Z const char *str )
 	while (true)
 	{
 		c = *str++;
-		if (c <'0' || c > '9')
+		if (c < '0' || c > '9')
 			return val*sign;
 		val = val*10 + c - '0';
 	}
@@ -466,7 +466,7 @@ uint64 V_atoui64( IN_Z const char *str )
 	while (true)
 	{
 		c = *str++;
-		if (c <'0' || c > '9')
+		if (c < '0' || c > '9')
 			return val;
 		val = val*10 + c - '0';
 	}
@@ -541,7 +541,7 @@ int V_atoi( IN_Z const char *str )
 	while (true)
 	{
 		c = *str++;
-		if (c <'0' || c > '9')
+		if (c < '0' || c > '9')
 			return val*sign;
 		val = val*10 + c - '0';
 	}
