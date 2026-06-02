@@ -54,7 +54,7 @@ public:
 
 	void SetRawColor( int color32 )
 	{
-		std::memcpy( this, &color32, sizeof(*this) );
+		std::memcpy( _color, &color32, sizeof(*this) );
 	}
 
 	int GetRawColor() const
