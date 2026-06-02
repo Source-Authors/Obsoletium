@@ -75,7 +75,7 @@ float GetCPUUsage()
 		if ( !ntdll )
 			return(0);
 
-		NtQuerySystemInformation = (PROCNTQSI)GetProcAddress( ntdll, "NtQuerySystemInformation" );
+		NtQuerySystemInformation = reinterpret_cast<PROCNTQSI>(GetProcAddress( ntdll, "NtQuerySystemInformation" ));
 
 		if ( !NtQuerySystemInformation )
 			return(0);
@@ -111,14 +111,14 @@ float GetCPUUsage()
 	}
 	else
 	{
-		dbIdleTime = 1.0f;
+		dbIdleTime = 1.0;
 	}
 
 	// store new CPU's idle and system time
 	liOldIdleTime = SysPerfInfo.liIdleTime;
 	liOldSystemTime = SysTimeInfo.liKeSystemTime;
 
-	return (float)(1.0f - dbIdleTime);
+	return static_cast<float>(1.0 - dbIdleTime);
 }
 
 #endif // WIN32

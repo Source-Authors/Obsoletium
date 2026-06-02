@@ -52,7 +52,7 @@ public:
 
 		~CSharedLibraryItem()
 		{
-			dbgdynfn("CDynamicFunction: Closing library '%s' (%p)\n", m_name, (void *) m_handle);
+			dbgdynfn("CDynamicFunction: Closing library '%s' (%p)\n", m_name, static_cast<void *>(m_handle));
 			CloseLibraryHandle(m_handle);
 			delete[] m_name;
 			delete m_next;
@@ -72,7 +72,7 @@ public:
 		if (item == nullptr)
 		{
 			LibraryHandle lib = LoadLibraryHandle(name);
-			dbgdynfn("CDynamicFunction: Loading library '%s' (%p)\n", name, (void *) lib);
+			dbgdynfn("CDynamicFunction: Loading library '%s' (%p)\n", name, static_cast<void *>(lib));
 			if (lib == nullptr)
 				return nullptr;
 

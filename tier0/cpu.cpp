@@ -381,7 +381,7 @@ uint8 LogicalProcessorsPerPackage( unsigned ebx )
 	// EBX[23:16] indicate number of logical processors per package
 	constexpr unsigned NUM_LOGICAL_BITS = 0x00FF0000U;
 
-	return (uint8) ((ebx & NUM_LOGICAL_BITS) >> 16U);
+	return static_cast<uint8>((ebx & NUM_LOGICAL_BITS) >> 16U);
 }
 
 #ifdef _WIN32

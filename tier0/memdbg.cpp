@@ -457,9 +457,9 @@ public:
 	[[nodiscard]] const_pointer address (const_reference value) const { return &value;}
 	[[nodiscard]] size_type max_size() const { return INT_MAX; }
 
-	pointer allocate(size_type num, const void* = nullptr)  { return (pointer)DebugAlloc(num * sizeof(T)); }
+	pointer allocate(size_type num, const void* = nullptr)  { return static_cast<pointer>(DebugAlloc(num * sizeof(T))); }
 	void deallocate (pointer p, size_type num) { DebugFree(p); }
-	void construct(pointer p, const T& value) {	new((void*)p)T(value); }
+	void construct(pointer p, const T& value) {	new(static_cast<void*>(p))T(value); }
 	void destroy (pointer p) { p->~T(); }
 };
 
@@ -1404,7 +1404,7 @@ void* CDbgMemAlloc::CrtSetReportFile( int nRptType, void* hFile )
 #ifdef POSIX
 	return 0;
 #else
-	return (void*)_CrtSetReportFile( nRptType, (_HFILE)hFile );
+	return _CrtSetReportFile( nRptType, hFile );
 #endif
 }
 
@@ -1413,7 +1413,7 @@ void* CDbgMemAlloc::CrtSetReportHook( void* pfnNewHook )
 #ifdef POSIX
 	return 0;
 #else
-	return (void*)_CrtSetReportHook( (_CRT_REPORT_HOOK)pfnNewHook );
+	return reinterpret_cast<void*>( _CrtSetReportHook( reinterpret_cast<_CRT_REPORT_HOOK>( pfnNewHook ) ) );
 #endif
 }
 
@@ -1438,7 +1438,7 @@ int CDbgMemAlloc::heapchk()
 
 void CDbgMemAlloc::DumpBlockStats( void *p )
 {
-	if ( auto *pBlock = (DbgMemHeader_t *)p - 1; !CrtIsValidHeapPointer( pBlock ) )
+	if ( auto *pBlock = static_cast<DbgMemHeader_t *>( p ) - 1; !CrtIsValidHeapPointer( pBlock ) )
 	{
 		Msg( "0x%p is not valid heap pointer\n", p );
 		return;
@@ -1447,7 +1447,7 @@ void CDbgMemAlloc::DumpBlockStats( void *p )
 	const char *pFileName = GetAllocatonFileName( p );
 	int line = GetAllocatonLineNumber( p );
 
-	Msg( "0x%p allocated by %s line %d, %llu bytes\n", p, pFileName, line, (uint64)GetSize( p ) );
+	Msg( "0x%p allocated by %s line %d, %zu bytes\n", p, pFileName, line, GetSize( p ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1463,7 +1463,7 @@ void CDbgMemAlloc::DumpMemInfo( const char *pAllocationName, int line, const Mem
 		info.m_nTotalSize / 1024.0f,
 		info.m_nOverheadSize / 1024.0f,
 		info.m_nPeakOverheadSize / 1024.0f,
-		(int)(info.m_nTime / 1000),
+		static_cast<int>(info.m_nTime / 1000),
 		info.m_nCurrentCount,
 		info.m_nPeakCount,
 		info.m_nTotalCount

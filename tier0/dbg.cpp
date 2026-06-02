@@ -857,8 +857,8 @@ void SpewActivate( const tchar* pGroupName, int level )
 		++s_GroupCount;
 		if ( s_pSpewGroups )
 		{
-			s_pSpewGroups = (SpewGroup_t*)PvRealloc( s_pSpewGroups, 
-				s_GroupCount * sizeof(SpewGroup_t) );
+			s_pSpewGroups = static_cast<SpewGroup_t*>( PvRealloc( s_pSpewGroups, 
+				s_GroupCount * sizeof(SpewGroup_t) ) );
 			
 			// shift elements down to preserve order
 			size_t numToMove = s_GroupCount - ind - 1;
@@ -876,7 +876,7 @@ void SpewActivate( const tchar* pGroupName, int level )
 		}
 		else
 		{
-			s_pSpewGroups = (SpewGroup_t*)PvAlloc( s_GroupCount * sizeof(SpewGroup_t) ); 
+			s_pSpewGroups = static_cast<SpewGroup_t*>( PvAlloc( s_GroupCount * sizeof(SpewGroup_t) ) ); 
 		}
 		
 		Assert( _tcslen( pGroupName ) < MAX_GROUP_NAME_LENGTH );

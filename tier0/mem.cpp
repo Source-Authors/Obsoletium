@@ -60,12 +60,12 @@ void *MemAllocScratch( size_t nMemSize )
 
 		if (s_pBuf)
 		{
-			s_pBuf = (uint8*)PvRealloc( s_pBuf, s_nBufAllocSize );
+			s_pBuf = static_cast<uint8*>( PvRealloc( s_pBuf, s_nBufAllocSize ) );
 			Assert( s_pBuf );
 		}
 		else
 		{
-			s_pBuf = (uint8*)PvAlloc( s_nBufAllocSize );
+			s_pBuf = static_cast<uint8*>( PvAlloc( s_nBufAllocSize ) );
 		}
 	}
 

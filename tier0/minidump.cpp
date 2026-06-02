@@ -155,10 +155,10 @@ bool WriteMiniDumpUsingExceptionInfo(
 				MINIDUMP_USER_STREAM *pCommentStream = &UserStreams[StreamInformationHeader.UserStreamCount++];
 				pCommentStream->Type = CommentStreamA;
 				pCommentStream->Buffer = g_rgchMinidumpComment;
-				pCommentStream->BufferSize = (ULONG)strlen(g_rgchMinidumpComment)+1;
+				pCommentStream->BufferSize = static_cast<ULONG>( strlen(g_rgchMinidumpComment) + 1 );
 			}
 
-			bMinidumpResult = (*pfnMiniDumpWrite)( ::GetCurrentProcess(), ::GetCurrentProcessId(), hFile, (MINIDUMP_TYPE)minidumpType, &ExInfo, &StreamInformationHeader, nullptr );
+			bMinidumpResult = (*pfnMiniDumpWrite)( ::GetCurrentProcess(), ::GetCurrentProcessId(), hFile, static_cast<MINIDUMP_TYPE>( minidumpType ), &ExInfo, &StreamInformationHeader, nullptr );
 			::CloseHandle( hFile );
 
 			// Clear comment for next time
@@ -371,14 +371,14 @@ struct CatchAndWriteContext_t
 			break;
 		case k_eSCatchAndWriteFunctionTypeWMain:
 			ErrorIfNot( m_pargc && m_pargv, ( "CatchAndWriteContext_t::Invoke with bogus argc/argv" ) )
-			((FnWMain)m_pfn)( *m_pargc, *m_pargv );
+			reinterpret_cast<FnWMain>(m_pfn)( *m_pargc, *m_pargv );
 			break;
 		case k_eSCatchAndWriteFunctionTypeWMainIntReg:
 			ErrorIfNot( m_pargc && m_pargv, ( "CatchAndWriteContext_t::Invoke with bogus argc/argv" ) )
-			return ((FnWMainIntRet)m_pfn)( *m_pargc, *m_pargv );
+			return reinterpret_cast<FnWMainIntRet>(m_pfn)( *m_pargc, *m_pargv );
 		case k_eSCatchAndWriteFunctionTypeVoidPtr:
 			ErrorIfNot( m_ppv, ( "CatchAndWriteContext_t::Invoke with bogus void *ptr" ) )
-			((FnVoidPtrFn)m_pfn)( *m_ppv );
+			reinterpret_cast<FnVoidPtrFn>(m_pfn)( *m_ppv );
 			break;
 		default:
 			break;
@@ -482,7 +482,7 @@ int CatchAndWriteMiniDump_Impl( CatchAndWriteContext_t &ctx )
 void CatchAndWriteMiniDumpEx( FnWMain pfn, int argc, tchar *argv[], ECatchAndWriteMinidumpAction eAction )
 {
 	CatchAndWriteContext_t ctx = {};
-	ctx.Set( k_eSCatchAndWriteFunctionTypeWMain, eAction, (void *)pfn, &argc, &argv, nullptr );
+	ctx.Set( k_eSCatchAndWriteFunctionTypeWMain, eAction, reinterpret_cast<void *>( pfn ), &argc, &argv, nullptr );
 	CatchAndWriteMiniDump_Impl( ctx );
 }
 
@@ -495,7 +495,7 @@ void CatchAndWriteMiniDumpEx( FnWMain pfn, int argc, tchar *argv[], ECatchAndWri
 int CatchAndWriteMiniDumpExReturnsInt( FnWMainIntRet pfn, int argc, tchar *argv[], ECatchAndWriteMinidumpAction eAction )
 {
 	CatchAndWriteContext_t ctx = {};
-	ctx.Set( k_eSCatchAndWriteFunctionTypeWMainIntReg, eAction, (void *)pfn, &argc, &argv, nullptr );
+	ctx.Set( k_eSCatchAndWriteFunctionTypeWMainIntReg, eAction, reinterpret_cast<void *>( pfn ), &argc, &argv, nullptr );
 	return CatchAndWriteMiniDump_Impl( ctx );
 }
 
@@ -510,7 +510,7 @@ int CatchAndWriteMiniDumpExReturnsInt( FnWMainIntRet pfn, int argc, tchar *argv[
 void CatchAndWriteMiniDumpExForVoidPtrFn( FnVoidPtrFn pfn, void *pv, ECatchAndWriteMinidumpAction eAction )
 {
 	CatchAndWriteContext_t ctx = {};
-	ctx.Set( k_eSCatchAndWriteFunctionTypeVoidPtr, eAction, (void *)pfn, nullptr, nullptr, &pv );
+	ctx.Set( k_eSCatchAndWriteFunctionTypeVoidPtr, eAction, reinterpret_cast<void *>( pfn ), nullptr, nullptr, &pv );
 	CatchAndWriteMiniDump_Impl( ctx );
 }
 
