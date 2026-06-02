@@ -64,8 +64,8 @@ public:
 
 	// a point light with infinite range
 	LightDesc_t( const Vector &pos, const Vector &color )
-		: m_ThetaDot{0.0F}, m_PhiDot{0.0F},
-		m_Falloff{0.0F}, m_Theta{0.0F}, m_Phi{0.0F}
+		: m_Falloff{0.0F}, m_Theta{0.0F}, m_Phi{0.0F},
+		m_ThetaDot{0.0F}, m_PhiDot{0.0F}
 	{
 		InitPoint( pos, color );
 	}
