@@ -47,7 +47,14 @@ public:
 	Vector4D() = default;
 #endif
 
-	Vector4D(vec_t X, vec_t Y, vec_t Z, vec_t W);
+#ifndef _DEBUG
+constexpr
+#endif
+	inline Vector4D(vec_t X, vec_t Y, vec_t Z, vec_t W)
+		: x{X}, y{Y}, z{Z}, w{W}
+	{ 
+		Assert( IsValid() );
+	}
 	Vector4D(const float *pFloat);
 
 	// Initialization
@@ -160,10 +167,20 @@ public:
 	Vector4D& operator=( Vector4D const& src );
 };
 
-// dimhotepus: inline
-const inline Vector4D vec4_origin( 0.0f, 0.0f, 0.0f, 0.0f );
-// dimhotepus: inline
-const inline Vector4D vec4_invalid( FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX );
+// dimhotepus: inline / constexpr
+#ifndef _DEBUG
+constexpr
+#else
+const
+#endif
+inline Vector4D vec4_origin(0.0f, 0.0f, 0.0f, 0.0f);
+// dimhotepus: inline / constexpr
+#ifndef _DEBUG
+constexpr
+#else
+const
+#endif
+inline Vector4D vec4_invalid(FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX);
 
 //-----------------------------------------------------------------------------
 // SSE optimized routines
@@ -248,13 +265,6 @@ void XM_CALLCONV Vector4DLerp(Vector4D const& src1, Vector4D const& src2, vec_t 
 //-----------------------------------------------------------------------------
 // constructors
 //-----------------------------------------------------------------------------
-
-inline Vector4D::Vector4D(vec_t X, vec_t Y, vec_t Z, vec_t W )
-    : x{X}, y{Y}, z{Z}, w{W}
-{ 
-	Assert( IsValid() );
-}
-
 inline Vector4D::Vector4D(const float *pFloat)
 {
 	Assert( pFloat );

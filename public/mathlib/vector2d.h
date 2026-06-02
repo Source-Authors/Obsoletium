@@ -40,7 +40,14 @@ public:
 	Vector2D() = default;
 #endif
 
-	Vector2D(vec_t X, vec_t Y);
+#ifndef _DEBUG
+	constexpr
+#endif
+	inline Vector2D(vec_t X, vec_t Y)
+		: x{X}, y{Y}
+	{ 
+		Assert( IsValid() );
+	}
 	Vector2D(const float *pFloat);
 
 	// Initialization
@@ -157,10 +164,20 @@ private:
 
 //-----------------------------------------------------------------------------
 
-// dimhotepus: inline
-const inline Vector2D vec2_origin( 0, 0 );
-// dimhotepus: inline
-const inline Vector2D vec2_invalid( FLT_MAX, FLT_MAX );
+// dimhotepus: inline / constexpr
+#ifndef _DEBUG
+constexpr
+#else
+const
+#endif
+inline Vector2D vec2_origin(0, 0);
+// dimhotepus: inline / constexpr
+#ifndef _DEBUG
+constexpr
+#else
+const
+#endif
+inline Vector2D vec2_invalid(FLT_MAX, FLT_MAX);
 
 //-----------------------------------------------------------------------------
 // Vector2D related operations
@@ -210,12 +227,6 @@ void XM_CALLCONV Vector2DLerp(const Vector2D& src1, const Vector2D& src2, vec_t 
 //-----------------------------------------------------------------------------
 // constructors
 //-----------------------------------------------------------------------------
-inline Vector2D::Vector2D(vec_t X, vec_t Y)
-	: x{X}, y{Y}
-{ 
-	Assert( IsValid() );
-}
-
 inline Vector2D::Vector2D(const float *pFloat)
 {
 	Assert( pFloat );
