@@ -156,8 +156,11 @@ inline bool ValidStackAddress( void *pAddress, const void *pNoLessThan, const vo
 	return true;
 }
 
+// dimhotepus: CLang and GCC do not support it.
+#if !defined(COMPILER_CLANG) && !defined(COMPILER_GCC)
 #pragma auto_inline( off )
-intp GetCallStack_Fast( void **pReturnAddressesOut, intp iArrayCount, intp iSkipCount )
+#endif
+intp GetCallStack_Fast( [[maybe_unused]] void **pReturnAddressesOut, [[maybe_unused]] intp iArrayCount, [[maybe_unused]] intp iSkipCount )
 {
 	//Only tested in windows. This function won't work with frame pointer omission enabled. "vpc /nofpo" all projects
 #if (defined( TIER0_FPO_DISABLED ) || defined( _DEBUG )) && (defined( WIN32 ) && !defined( _X360 ) && !defined(_M_X64))
@@ -239,8 +242,10 @@ intp GetCallStack_Fast( void **pReturnAddressesOut, intp iArrayCount, intp iSkip
 
 #endif
 }
+// dimhotepus: CLang and GCC do not support it.
+#if !defined(COMPILER_CLANG) && !defined(COMPILER_GCC)
 #pragma auto_inline( on )
-
+#endif
 
 
 
