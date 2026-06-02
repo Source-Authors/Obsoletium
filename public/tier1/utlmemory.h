@@ -225,7 +225,7 @@ public:
 
 	// Size
 	[[nodiscard]] intp NumAllocated() const								{ return SIZE; }
-	[[nodiscard]] intp Count() const										{ return SIZE; }
+	[[nodiscard]] intp Count() const									{ return SIZE; }
 
 	// Grows the memory, so that at least allocated + num elements are allocated
 	void Grow( intp num = 1 )								{ Assert( 0 ); }
@@ -329,7 +329,7 @@ public:
 
 	FORCEINLINE void ReAlloc( size_t sz )
 	{
-		m_pMemory = (T*)realloc( m_pMemory, sz );
+		m_pMemory = static_cast<T*>( realloc( m_pMemory, sz ) );
 		RememberAllocSize( sz );
 	}
 	// Grows the memory, so that at least allocated + num elements are allocated
@@ -438,7 +438,7 @@ void CUtlMemory<T,I>::Init( intp nGrowSize /*= 0*/, intp nInitSize /*= 0*/ )
 	{
 		UTLMEMORY_TRACK_ALLOC();
 		MEM_ALLOC_CREDIT_CLASS();
-		m_pMemory = (T*)malloc( m_nAllocationCount * sizeof(T) );
+		m_pMemory = static_cast<T*>( malloc( m_nAllocationCount * sizeof(T) ) );
 	}
 }
 
@@ -470,13 +470,13 @@ void CUtlMemory<T,I>::ConvertToGrowableMemory( intp nGrowSize )
 		MEM_ALLOC_CREDIT_CLASS();
 
 		intp nNumBytes = m_nAllocationCount * sizeof(T);
-		T *pMemory = (T*)malloc( nNumBytes );
+		T *pMemory = static_cast<T*>( malloc( nNumBytes ) );
 		memcpy( pMemory, m_pMemory, nNumBytes ); 
 		m_pMemory = pMemory;
 	}
 	else
 	{
-		m_pMemory = NULL;
+		m_pMemory = nullptr;
 	}
 }
 
@@ -530,7 +530,7 @@ inline T& CUtlMemory<T,I>::operator[]( I i )
 {
 	// Avoid function calls in the asserts to improve debug build performance
 	Assert( m_nGrowSize != EXTERNAL_CONST_BUFFER_MARKER ); //Assert( !IsReadOnly() );
-	Assert( (uintp)i < (uintp)m_nAllocationCount );
+	Assert( static_cast<uintp>( i ) < static_cast<uintp>( m_nAllocationCount ) );
 	return m_pMemory[static_cast<uintp>( i )];
 }
 
@@ -538,7 +538,7 @@ template< class T, class I >
 inline const T& CUtlMemory<T,I>::operator[]( I i ) const
 {
 	// Avoid function calls in the asserts to improve debug build performance
-	Assert( (uintp)i < (uintp)m_nAllocationCount );
+	Assert( static_cast<uintp>( i ) < static_cast<uintp>( m_nAllocationCount ) );
 	return m_pMemory[static_cast<uintp>( i )];
 }
 
@@ -547,7 +547,7 @@ inline T& CUtlMemory<T,I>::Element( I i )
 {
 	// Avoid function calls in the asserts to improve debug build performance
 	Assert( m_nGrowSize != EXTERNAL_CONST_BUFFER_MARKER ); //Assert( !IsReadOnly() );
-	Assert( (uintp)i < (uintp)m_nAllocationCount );
+	Assert( static_cast<uintp>( i ) < static_cast<uintp>( m_nAllocationCount ) );
 	return m_pMemory[static_cast<uintp>( i )];
 }
 
@@ -555,7 +555,7 @@ template< class T, class I >
 inline const T& CUtlMemory<T,I>::Element( I i ) const
 {
 	// Avoid function calls in the asserts to improve debug build performance
-	Assert( (uintp)i < (uintp)m_nAllocationCount );
+	Assert( static_cast<uintp>( i ) < static_cast<uintp>( m_nAllocationCount ) );
 	return m_pMemory[static_cast<uintp>( i )];
 }
 
@@ -632,7 +632,7 @@ inline bool CUtlMemory<T,I>::IsIdxValid( I i ) const
 	// If we always cast 'i' and 'm_nAllocationCount' to unsigned then we can
 	// do our range checking with a single comparison instead of two. This gives
 	// a modest speedup in debug builds.
-	return (uintp)i < (uintp)m_nAllocationCount;
+	return static_cast<uintp>( i ) < static_cast<uintp>( m_nAllocationCount );
 }
 
 //-----------------------------------------------------------------------------
@@ -748,12 +748,12 @@ inline void CUtlMemory<T,I>::EnsureCapacity( intp num )
 	if (m_pMemory)
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		m_pMemory = (T*)realloc( m_pMemory, m_nAllocationCount * sizeof(T) );
+		m_pMemory = static_cast<T*>( realloc( m_pMemory, m_nAllocationCount * sizeof(T) ) );
 	}
 	else
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		m_pMemory = (T*)malloc( m_nAllocationCount * sizeof(T) );
+		m_pMemory = static_cast<T*>( malloc( m_nAllocationCount * sizeof(T) ) );
 	}
 }
 
@@ -823,7 +823,7 @@ void CUtlMemory<T,I>::Purge( intp numElements )
 
 	// Allocation count > 0, shrink it down.
 	MEM_ALLOC_CREDIT_CLASS();
-	m_pMemory = (T*)realloc( m_pMemory, m_nAllocationCount * sizeof(T) );
+	m_pMemory = static_cast<T*>( realloc( m_pMemory, m_nAllocationCount * sizeof(T) ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -867,7 +867,7 @@ private:
 template< class T, unsigned nAlignment >
 void *CUtlMemoryAligned<T, nAlignment>::Align( const void *pAddr )
 {
-	const size_t nAlignmentMask = nAlignment - 1; //-V101
+	constexpr size_t nAlignmentMask = nAlignment - 1; //-V101
 	return (void*)( ((size_t)pAddr + nAlignmentMask) & (~nAlignmentMask) );
 }
 
@@ -890,7 +890,7 @@ CUtlMemoryAligned<T, nAlignment>::CUtlMemoryAligned( intp nGrowSize, intp nInitA
 	{
 		UTLMEMORY_TRACK_ALLOC();
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)_aligned_malloc( nInitAllocationCount * sizeof(T), nAlignment ); //-V106
+		CUtlMemory<T>::m_pMemory = static_cast<T*>( _aligned_malloc( nInitAllocationCount * sizeof(T), nAlignment ) ); //-V106
 	}
 }
 
@@ -900,7 +900,7 @@ CUtlMemoryAligned<T, nAlignment>::CUtlMemoryAligned( T* pMemory, intp numElement
 	// Special marker indicating externally supplied memory
 	CUtlMemory<T>::m_nGrowSize = CUtlMemory<T>::EXTERNAL_BUFFER_MARKER;
 
-	CUtlMemory<T>::m_pMemory = (T*)Align( pMemory );
+	CUtlMemory<T>::m_pMemory = static_cast<T*>( Align( pMemory ) );
 	CUtlMemory<T>::m_nAllocationCount = ( (intp)(pMemory + numElements) - (intp)CUtlMemory<T>::m_pMemory ) / sizeof(T);
 }
 
@@ -910,7 +910,7 @@ CUtlMemoryAligned<T, nAlignment>::CUtlMemoryAligned( const T* pMemory, intp numE
 	// Special marker indicating externally supplied memory
 	CUtlMemory<T>::m_nGrowSize = CUtlMemory<T>::EXTERNAL_CONST_BUFFER_MARKER;
 
-	CUtlMemory<T>::m_pMemory = (T*)Align( pMemory );
+	CUtlMemory<T>::m_pMemory = static_cast<T*>( Align( pMemory ) );
 	CUtlMemory<T>::m_nAllocationCount = ( (intp)(pMemory + numElements) - (intp)CUtlMemory<T>::m_pMemory ) / sizeof(T);
 }
 
@@ -930,7 +930,7 @@ void CUtlMemoryAligned<T, nAlignment>::SetExternalBuffer( T* pMemory, intp numEl
 	// Blow away any existing allocated memory
 	Purge();
 
-	CUtlMemory<T>::m_pMemory = (T*)Align( pMemory );
+	CUtlMemory<T>::m_pMemory = static_cast<T*>( Align( pMemory ) );
 	CUtlMemory<T>::m_nAllocationCount = ( (intp)(pMemory + numElements) - (intp)CUtlMemory<T>::m_pMemory ) / sizeof(T);
 
 	// Indicate that we don't own the memory
@@ -943,7 +943,7 @@ void CUtlMemoryAligned<T, nAlignment>::SetExternalBuffer( const T* pMemory, intp
 	// Blow away any existing allocated memory
 	Purge();
 
-	CUtlMemory<T>::m_pMemory = (T*)Align( pMemory );
+	CUtlMemory<T>::m_pMemory = static_cast<T*>( Align( pMemory ) );
 	CUtlMemory<T>::m_nAllocationCount = ( (intp)(pMemory + numElements) - (intp)CUtlMemory<T>::m_pMemory ) / sizeof(T);
 
 	// Indicate that we don't own the memory
@@ -979,13 +979,13 @@ void CUtlMemoryAligned<T, nAlignment>::Grow( intp num )
 	if ( CUtlMemory<T>::m_pMemory )
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_ReallocAligned( CUtlMemory<T>::m_pMemory, CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ); //-V106
+		CUtlMemory<T>::m_pMemory = static_cast<T*>( MemAlloc_ReallocAligned( CUtlMemory<T>::m_pMemory, CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ) ); //-V106
 		Assert( CUtlMemory<T>::m_pMemory );
 	}
 	else
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_AllocAligned( CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ); //-V106
+		CUtlMemory<T>::m_pMemory = static_cast<T*>( MemAlloc_AllocAligned( CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ) ); //-V106
 		Assert( CUtlMemory<T>::m_pMemory );
 	}
 }
@@ -1016,12 +1016,12 @@ inline void CUtlMemoryAligned<T, nAlignment>::EnsureCapacity( intp num )
 	if ( CUtlMemory<T>::m_pMemory )
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_ReallocAligned( CUtlMemory<T>::m_pMemory, CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ); //-V106
+		CUtlMemory<T>::m_pMemory = static_cast<T*>( MemAlloc_ReallocAligned( CUtlMemory<T>::m_pMemory, CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ) ); //-V106
 	}
 	else
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_AllocAligned( CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ); //-V106
+		CUtlMemory<T>::m_pMemory = static_cast<T*>( MemAlloc_AllocAligned( CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ) ); //-V106
 	}
 }
 
@@ -1038,7 +1038,7 @@ void CUtlMemoryAligned<T, nAlignment>::Purge()
 		{
 			UTLMEMORY_TRACK_FREE();
 			MemAlloc_FreeAligned( CUtlMemory<T>::m_pMemory );
-			CUtlMemory<T>::m_pMemory = 0;
+			CUtlMemory<T>::m_pMemory = nullptr;
 		}
 		CUtlMemory<T>::m_nAllocationCount = 0;
 	}

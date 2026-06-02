@@ -673,11 +673,11 @@ inline void CUtlBuffer::GetTypeBin( T &dest )
 	{
 		if ( !m_Byteswap.IsSwappingBytes() || ( sizeof( T ) == 1 ) )
 		{
-			dest = *(const T *)PeekGet();
+			dest = *static_cast<const T *>( PeekGet() );
 		}
 		else
 		{
-			m_Byteswap.SwapBufferToTargetEndian<T>( &dest, (const T*)PeekGet() );
+			m_Byteswap.SwapBufferToTargetEndian<T>( &dest, static_cast<const T*>( PeekGet() ) );
 		}
 		m_Get += sizeof(T);
 	}
@@ -897,11 +897,11 @@ inline void CUtlBuffer::PutTypeBin( T src )
 	{
 		if ( !m_Byteswap.IsSwappingBytes() || ( sizeof( T ) == 1 ) )
 		{
-			*(T *)PeekPut() = src;
+			*static_cast<T*>( PeekPut() ) = src;
 		}
 		else
 		{
-			m_Byteswap.SwapBufferToTargetEndian<T>( (T*)PeekPut(), &src );
+			m_Byteswap.SwapBufferToTargetEndian<T>( static_cast<T*>( PeekPut() ), &src );
 		}
 		m_Put += sizeof(T);
 		AddNullTermination();
