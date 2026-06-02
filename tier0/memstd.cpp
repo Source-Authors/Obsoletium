@@ -24,7 +24,7 @@
 // at catching memory stomps.
 #if defined( _WIN64 )
 
-	#define FORCE_PROCESS_HEAP
+#define FORCE_PROCESS_HEAP
 
 #elif defined( _WIN32 )
 // Define this to force using the OS Heap* functions for allocations. This is useful
@@ -1451,11 +1451,16 @@ void ReserveBottomMemory()
 	// 85 heap allocs. Note that since the process may have multiple heaps (each
 	// CRT seems to have its own) there is likely to be a few MiB of address space
 	// that was previously reserved and is available to be handed out by some allocators.
-	//char buffer[1000];
-	//sprintf_s( buffer, "Reserved %1.3f MiB (%d vallocs, %d heap allocs) to keep allocations out of low-memory.\n",
-	//			totalReservation / (1024 * 1024.0), (int)numVAllocs, (int)numHeapAllocs );
+	char buffer[1000];
+	snprintf(
+		buffer,
+		std::size(buffer),
+		"[tier0] Reserved %1.3f MiB (%zu vallocs, %zu heap allocs) to keep allocations out of low-memory in x64.\n",
+		totalReservation / (1024 * 1024.0f),
+		numVAllocs,
+		numHeapAllocs );
 	// Can't use Msg here because it isn't necessarily initialized yet.
-	//OutputDebugString( buffer );
+	Plat_DebugString( buffer );
 #endif
 }
 
