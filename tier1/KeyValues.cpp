@@ -1936,6 +1936,13 @@ void KeyValues::CopyKeyValue( const KeyValues& src, size_t tmpBufferSizeB, OUT_Z
 			m_Color[3] = src.m_Color[3];
 		}
 		break;
+	// dimhotepus: Add wstring copy support.
+	case TYPE_WSTRING:
+		if( src.m_wsValue )
+		{
+			m_wsValue = V_wcsdup( src.m_wsValue );
+		}
+		break;
 			
 	default:
 		{
