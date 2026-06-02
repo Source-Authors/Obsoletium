@@ -32,19 +32,19 @@ struct CTypeSelect<0, A, B> { using type = B; };
 
 // CTypeEquals<A, B>::value is nonzero if A and B are the same type
 template <typename A, typename B, bool bIgnoreConstVolatile = false, bool bIgnoreReference = false>
-struct CTypeEquals { enum { value = 0 }; };
+struct [[deprecated("Use std::is_same_v")]] CTypeEquals { enum { value = 0 }; };
 
 template <typename Same>
-struct CTypeEquals<Same, Same, false, false> { enum { value = 1 }; };
+struct [[deprecated("Use std::is_same_v")]] CTypeEquals<Same, Same, false, false> { enum { value = 1 }; };
 
 template <typename A, typename B>
-struct CTypeEquals<A, B, true, true> : CTypeEquals< const volatile A&, const volatile B& > {};
+struct [[deprecated("Use std::is_same_v")]] CTypeEquals<A, B, true, true> : CTypeEquals< const volatile A&, const volatile B& > {};
 
 template <typename A, typename B>
-struct CTypeEquals<A, B, true, false> : CTypeEquals< const volatile A, const volatile B > {};
+struct [[deprecated("Use std::is_same_v")]] CTypeEquals<A, B, true, false> : CTypeEquals< const volatile A, const volatile B > {};
 
 template <typename A, typename B>
-struct CTypeEquals<A, B, false, true> : CTypeEquals< A&, B& > {};
+struct [[deprecated("Use std::is_same_v")]] CTypeEquals<A, B, false, true> : CTypeEquals< A&, B& > {};
 
 // CUtlKeyValuePair is intended for use with key-lookup containers.
 // Because it is specialized for "empty_t" values, one container can
