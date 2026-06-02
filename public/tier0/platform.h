@@ -751,7 +751,19 @@ inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 8 && alignof(T) == a
 
 // If a swapped float passes through the fpu, the bytes may get changed.
 // Prevent this by swapping floats as DWORDs.
-#define SafeSwapFloat( pOut, pIn )	(*((uint*)pOut) = DWordSwap( *((const uint*)pIn) ))
+// dimhotepus: Use safe swap instead of UB on casts. Also return float, not uint swap.
+inline float SafeSwapFloat( float *pOut, const float *pIn )
+{
+	uint tmp;
+	static_assert(sizeof(tmp) == sizeof(*pIn));
+	memcpy( &tmp, pIn, sizeof(*pIn) );
+
+	const uint swap{ DWordSwap( tmp ) };
+	static_assert(sizeof(swap) == sizeof(*pOut));
+	memcpy( pOut, &swap, sizeof(*pOut) );
+
+	return *pOut;
+}
 
 #if defined(VALVE_LITTLE_ENDIAN)
 
