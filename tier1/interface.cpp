@@ -330,29 +330,6 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Determine if any debug modules were loaded
-//-----------------------------------------------------------------------------
-static bool Sys_RunningWithDebugModules()
-{
-	if ( !s_bRunningWithDebugModules )
-	{
-#if 0 //def IS_WINDOWS_PC
-		char chMemoryName[ MAX_PATH ];
-		DebugKernelMemoryObjectName( chMemoryName );
-
-		HANDLE hObject = OpenFileMapping( FILE_MAP_READ, FALSE, chMemoryName );
-		if ( hObject && hObject != INVALID_HANDLE_VALUE )
-		{
-			CloseHandle( hObject );
-			s_bRunningWithDebugModules = true;
-		}
-#endif
-	}
-	return s_bRunningWithDebugModules;
-}
-
-
-//-----------------------------------------------------------------------------
 // Purpose: Unloads a DLL/component from
 // Input  : *pModuleName - filename of the component
 // Output : opaque handle to the module (hides system dependency)
