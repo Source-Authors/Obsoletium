@@ -374,7 +374,7 @@ int CUtlString::Format( PRINTF_FORMAT_STRING const char *pFormat, ... ) FMTFUNCT
 
 int CUtlString::FormatV( PRINTF_FORMAT_STRING const char *pFormat, va_list marker )
 {
-	char tmpBuf[ 4096 ];	//< Nice big 4k buffer, as much memory as my first computer had, a Radio Shack Color Computer
+	char tmpBuf[ 4096 ];	///< Nice big 4k buffer, as much memory as my first computer had, a Radio Shack Color Computer
 
 	//va_start( marker, pFormat );
 	int len = V_vsprintf_safe( tmpBuf, pFormat, marker );
