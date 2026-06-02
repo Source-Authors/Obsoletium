@@ -185,8 +185,10 @@ public:
 	//-----------------------------------------------------
 	// Offer the current thread to the pool
 	//-----------------------------------------------------
-	virtual int YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) = 0;
-	virtual int YieldWait( CJob **, int nJobs, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) = 0;
+	// dimhotepus: int -> unsigned.
+	virtual unsigned YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) = 0;
+	// dimhotepus: int -> unsigned.
+	virtual unsigned YieldWait( CJob **, int nJobs, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) = 0;
 	virtual void Yield( unsigned timeout ) = 0;
 
 	bool YieldWait( CThreadEvent &event, unsigned timeout = TT_INFINITE );

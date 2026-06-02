@@ -210,8 +210,8 @@ public:
 	//-----------------------------------------------------
 	// Offer the current thread to the pool
 	//-----------------------------------------------------
-	int YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) override;
-	int YieldWait( CJob **, int nJobs, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) override;
+	unsigned YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) override;
+	unsigned YieldWait( CJob **, int nJobs, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) override;
 	void Yield( unsigned timeout ) override;
 
 	//-----------------------------------------------------
@@ -607,13 +607,13 @@ void CThreadPool::WaitForIdle( bool bAll )
 
 //---------------------------------------------------------
 
-int CThreadPool::YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll, unsigned timeout )
+unsigned CThreadPool::YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll, unsigned timeout )
 {
 	tmZone( TELEMETRY_LEVEL0, TMZF_IDLE, "%s(%d) SPINNING %t", __FUNCTION__, timeout, tmSendCallStack( TELEMETRY_LEVEL0, 0 ) );
 
 	Assert( timeout == TT_INFINITE ); // unimplemented
 
-	int result;
+	unsigned result;
 	CJob *pJob;
 	// Always wait for zero milliseconds initially, to let us process jobs on this thread.
 	timeout = 0;
@@ -645,7 +645,7 @@ int CThreadPool::YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll, 
 
 //---------------------------------------------------------
 
-int CThreadPool::YieldWait( CJob **ppJobs, int nJobs, bool bWaitAll, unsigned timeout )
+unsigned CThreadPool::YieldWait( CJob **ppJobs, int nJobs, bool bWaitAll, unsigned timeout )
 {
 	CUtlVectorFixed<CThreadEvent *, 64> handles;
 	if ( nJobs > handles.NumAllocated() - 2 )

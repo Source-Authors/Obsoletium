@@ -465,7 +465,8 @@ ASSERT_INVARIANT( TW_FAILED == WAIT_FAILED );
 ASSERT_INVARIANT( TW_TIMEOUT  == WAIT_TIMEOUT );
 ASSERT_INVARIANT( WAIT_OBJECT_0 == 0 );
 
-int ThreadWaitForObjects( int nEvents, const HANDLE *pHandles, bool bWaitAll, unsigned timeout )
+// dimhotepus: int -> unsigned.
+[[nodiscard]] unsigned ThreadWaitForObjects( int nEvents, const HANDLE *pHandles, bool bWaitAll, unsigned timeout )
 {
 	return VCRHook_WaitForMultipleObjects( nEvents, pHandles, bWaitAll, timeout );
 }

@@ -189,15 +189,18 @@ PLATFORM_INTERFACE void ThreadSetAffinity( ThreadHandle_t hThread, intp nAffinit
 
 //-----------------------------------------------------------------------------
 
-enum ThreadWaitResult_t
+// dimhotepus: int -> unsigned
+enum ThreadWaitResult_t : unsigned
 {
-	TW_FAILED = 0xffffffff, // WAIT_FAILED //-V112
-	TW_TIMEOUT = 0x00000102, // WAIT_TIMEOUT
+	TW_FAILED = 0xffffffffu, // WAIT_FAILED //-V112
+	TW_TIMEOUT = 0x00000102u, // WAIT_TIMEOUT
 };
 
 #ifdef _WIN32
-PLATFORM_INTERFACE int ThreadWaitForObjects( int nEvents, const HANDLE *pHandles, bool bWaitAll = true, unsigned timeout = TT_INFINITE );
-inline int ThreadWaitForObject( HANDLE handle, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) { return ThreadWaitForObjects( 1, &handle, bWaitAll, timeout ); }
+// dimhotepus: int -> unsigned.
+PLATFORM_INTERFACE unsigned ThreadWaitForObjects( int nEvents, const HANDLE *pHandles, bool bWaitAll = true, unsigned timeout = TT_INFINITE );
+// dimhotepus: int -> unsigned.
+inline unsigned ThreadWaitForObject( HANDLE handle, bool bWaitAll = true, unsigned timeout = TT_INFINITE ) { return ThreadWaitForObjects( 1, &handle, bWaitAll, timeout ); }
 #endif
 
 //-----------------------------------------------------------------------------
@@ -1180,7 +1183,8 @@ public:
 	}
 };
 
-inline int ThreadWaitForEvents( int nEvents, CThreadEvent * const *pEvents, bool bWaitAll = true, unsigned timeout = TT_INFINITE )
+// dimhotepus: int -> unsigned.
+inline unsigned ThreadWaitForEvents( int nEvents, CThreadEvent * const *pEvents, bool bWaitAll = true, unsigned timeout = TT_INFINITE )
 {
 #ifdef POSIX
   Assert( nEvents == 1);
