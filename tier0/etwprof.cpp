@@ -79,7 +79,9 @@ public:
 	// QPC frequency
 	LARGE_INTEGER m_frequency;
 
-} g_ETWRegister;
+};
+
+static CETWRegister g_ETWRegister;
 
 // Call QueryPerformanceCounter
 static int64 GetQPCTime()

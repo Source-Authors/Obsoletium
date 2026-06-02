@@ -200,7 +200,7 @@ bool WriteMiniDumpUsingExceptionInfo(
 }
 
 
-void InternalWriteMiniDumpUsingExceptionInfo( unsigned int uStructuredExceptionCode, _EXCEPTION_POINTERS * pExceptionInfo, const char *pszFilenameSuffix )
+static void InternalWriteMiniDumpUsingExceptionInfo( unsigned int uStructuredExceptionCode, _EXCEPTION_POINTERS * pExceptionInfo, const char *pszFilenameSuffix )
 {
 	// If this is is a real crash (not an assert or one we purposefully triggered), then try to write a full dump
 	// only do this on our GC (currently GC is 64-bit, so we can use a #define rather than some run-time switch
@@ -429,7 +429,7 @@ static const char *GetExceptionCodeName( unsigned long code )
 	}
 }
 
-int CatchAndWriteMiniDump_Impl( CatchAndWriteContext_t &ctx )
+static int CatchAndWriteMiniDump_Impl( CatchAndWriteContext_t &ctx )
 {
 	// Sorry, this is the only action currently implemented!
 	Assert( ctx.m_eAction == k_ECatchAndWriteMiniDumpAbort );

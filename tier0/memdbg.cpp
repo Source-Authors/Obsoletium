@@ -721,8 +721,8 @@ struct DbgInfoStack_t
 	int m_nLine;
 };
 
-thread_local DbgInfoStack_t* g_DbgInfoStack CONSTRUCT_EARLY;
-thread_local int				g_nDbgInfoStackDepth CONSTRUCT_EARLY;
+static thread_local DbgInfoStack_t* g_DbgInfoStack CONSTRUCT_EARLY;
+static thread_local int				g_nDbgInfoStackDepth CONSTRUCT_EARLY;
 
 //-----------------------------------------------------------------------------
 // Singleton...
@@ -737,7 +737,7 @@ IMemAlloc *g_pActualAlloc = &s_DbgMemAlloc;
 
 //-----------------------------------------------------------------------------
 
-CThreadMutex g_DbgMemMutex CONSTRUCT_EARLY;
+static CThreadMutex g_DbgMemMutex CONSTRUCT_EARLY;
 
 #define HEAP_LOCK() AUTO_LOCK( g_DbgMemMutex )
 
@@ -909,7 +909,7 @@ void *CDbgMemAlloc::Expand_NoLongerSupported( void *, size_t )
 	return nullptr;
 }
 
-void SetupDebugInfoStack(DbgInfoStack_t *&stack, int &stack_depth)
+static void SetupDebugInfoStack(DbgInfoStack_t *&stack, int &stack_depth)
 {
 	stack = (DbgInfoStack_t *)DebugAlloc( sizeof(DbgInfoStack_t) * DBG_INFO_STACK_DEPTH );
 	stack_depth = -1;
