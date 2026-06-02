@@ -36,7 +36,7 @@ public:
 	*/
 	
 	// dimhotepus: TF2 backport.
-	virtual bool IsToggleButton() { return true; }
+	bool IsToggleButton() override { return true; }
 
 protected:
 	// overrides
