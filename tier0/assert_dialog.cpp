@@ -237,7 +237,7 @@ static INT_PTR CALLBACK AssertDialogProc(
 
 			// dimhotepus: Add launcher icon for Assert dialog.
 			HANDLE hExeIcon = LoadImageW( GetModuleHandleW( nullptr ), MAKEINTRESOURCEW( SE_IDI_APP_MAIN ), IMAGE_ICON, 0, 0, LR_SHARED );
-			SendMessage( hDlg, WM_SETICON, ICON_BIG, (LPARAM)hExeIcon );
+			SendMessage( hDlg, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>( hExeIcon ) );
 		
 			// Center the dialog.
 			RECT rcDlg, rcDesktop;
