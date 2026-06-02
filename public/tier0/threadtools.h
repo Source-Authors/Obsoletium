@@ -423,6 +423,10 @@ public:
 	CThreadLocalBase();
 	~CThreadLocalBase();
 
+	// dimhotepus: Delete implicit things.
+	CThreadLocalBase(const CThreadLocalBase &) = delete;
+	CThreadLocalBase& operator=(const CThreadLocalBase &) = delete;
+
 	[[nodiscard]] void * Get() const;
 	void   Set(void *);
 
