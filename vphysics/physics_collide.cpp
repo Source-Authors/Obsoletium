@@ -1860,10 +1860,22 @@ void CCollisionQuery::GetTriangleVerts( int convexIndex, int triangleIndex, Vect
 }
 
 // UNDONE: This doesn't work!!!
+// dimhotepus: Implemented SetTriangleVerts.
 void CCollisionQuery::SetTriangleVerts( int convexIndex, int triangleIndex, const Vector *verts )
 {
 	IVP_Compact_Ledge *pLedge = m_ledges.element_at( convexIndex );
-	Triangle( pLedge, triangleIndex );
+	IVP_Compact_Triangle *pTriangle = Triangle( pLedge, triangleIndex );
+
+	int vertIndex = 0;
+	for ( int k = 2; k >= 0; k-- )
+	{
+		IVP_Compact_Edge *pEdge = pTriangle->get_edge( k );
+		IVP_U_Float_Point *pPoint = const_cast<IVP_Compact_Poly_Point *>( pEdge->get_start_point( pLedge ) );
+
+		const Vector* pVec = verts + vertIndex;
+		ConvertPositionToIVP( *pVec, *pPoint );
+		vertIndex++;
+	}
 }
 
 	
