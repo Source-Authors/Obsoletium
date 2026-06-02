@@ -494,6 +494,8 @@ uint64 CalculateCPUFreq(); // from cpu_linux.cpp
 
 }  // namespace
 
+int64 QueryCurrentCpuFrequency();
+
 // Measure the processor clock speed by sampling the cycle count, waiting for
 // some fraction of a second, then measuring the elapsed number of cycles.
 int64 QueryCurrentCpuFrequency()
