@@ -103,8 +103,9 @@ inline int FirstBitInWord( unsigned int elem, int offset )
 template <typename T>
 inline std::enable_if_t<sizeof(T) <= sizeof(unsigned), unsigned>
 GetEndMask( T numBits ) 
-{ 
-	static unsigned bitStringEndMasks[] = 
+{
+	// dimhotepus: static -> constexpr.
+	constexpr unsigned bitStringEndMasks[] = 
 	{
 		0xffffffffU,
 		0x00000001U,
@@ -147,7 +148,8 @@ template<typename T>
 constexpr inline std::enable_if_t<sizeof(T) <= sizeof(unsigned), T>
 GetBitForBitnum( T bitNum ) 
 { 
-	T bitsForBitnum[] = 
+	// dimhotepus: static -> constexpr.
+	constexpr T bitsForBitnum[] = 
 	{
 		( static_cast<T>(1) << 0 ),
 		( static_cast<T>(1) << 1 ),
@@ -190,7 +192,8 @@ template<typename T>
 inline std::enable_if_t<sizeof(T) <= sizeof(unsigned), T>
 GetBitForBitnumByte( T bitNum ) 
 { 
-	static T bitsForBitnum[] =
+	// dimhotepus: static -> constexpr.
+	constexpr T bitsForBitnum[] =
 	{
 		( static_cast<T>(1) << 0 ),
 		( static_cast<T>(1) << 1 ),
