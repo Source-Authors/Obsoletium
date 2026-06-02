@@ -4,6 +4,7 @@
 #define SE_PUBLIC_TIER0_MINIDUMP_H_
 
 #include "platform.h"
+#include "annotations.h"
 
 // Set prefix to use for minidump files.  If you don't set one, it is defaulted for you,
 // using the current module name
@@ -86,8 +87,8 @@ PLATFORM_INTERFACE void EnableCrashingOnCrashes();
 // There currently is a single header string, and an array of 64 comment strings.
 //	MinidumpUserStreamInfoSetHeader() will set the single header string.
 //	MinidumpUserStreamInfoAppend() will round robin through and array and set the comment strings, overwriting old.
-PLATFORM_INTERFACE void MinidumpUserStreamInfoSetHeader( const char *pFormat, ... );
-PLATFORM_INTERFACE void MinidumpUserStreamInfoAppend( const char *pFormat, ... );
+PLATFORM_INTERFACE void MinidumpUserStreamInfoSetHeader( PRINTF_FORMAT_STRING const char *pFormat, ... );
+PLATFORM_INTERFACE void MinidumpUserStreamInfoAppend( PRINTF_FORMAT_STRING const char *pFormat, ... );
 
 // Retrieve the StreamInfo strings.
 //  Index 0: header string

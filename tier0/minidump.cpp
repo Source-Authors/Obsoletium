@@ -610,7 +610,7 @@ static char g_UserStreamInfo[ 64 ][ 128 ];
 static int g_UserStreamInfoIndex = 0;
 
 // Set the single g_UserStreamInfoHeader string.
-void MinidumpUserStreamInfoSetHeader( const char *pFormat, ... )
+void MinidumpUserStreamInfoSetHeader( PRINTF_FORMAT_STRING const char *pFormat, ... )
 {
 	va_list marker;
 
@@ -620,7 +620,7 @@ void MinidumpUserStreamInfoSetHeader( const char *pFormat, ... )
 }
 
 // Set the next comment in the g_UserStreamInfo array.
-void MinidumpUserStreamInfoAppend( const char *pFormat, ... )
+void MinidumpUserStreamInfoAppend( PRINTF_FORMAT_STRING const char *pFormat, ... )
 {
 	va_list marker;
 	char *pData = g_UserStreamInfo[ g_UserStreamInfoIndex ];
