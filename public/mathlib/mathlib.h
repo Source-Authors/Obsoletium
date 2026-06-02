@@ -678,7 +678,7 @@ int __cdecl BoxOnPlaneSide (const float *emins, const float *emaxs, const cplane
 
 [[nodiscard]] inline float XM_CALLCONV anglemod(float a)
 {
-	a = (360.f/65536) * ((int)(a*(65536.f/360.0f)) & 65535);
+	a = (360.f/65536) * (static_cast<int>(a*(65536.f/360.0f)) & 65535);
 	return a;
 }
 
