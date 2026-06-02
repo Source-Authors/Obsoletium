@@ -342,7 +342,8 @@ public:
 		}
 		else
 		{
-			AssertMsg( "Unable to add double quotes to '%s' (%zd length). Buffer size is %zd and not enough",
+			AssertMsg( false,
+				"Unable to add double quotes to '%s' (%zd length). Buffer size is %zd and not enough",
 				m_szBuf, nLength, ssize(m_szBuf) );
 		}
 	}
