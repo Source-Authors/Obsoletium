@@ -1053,7 +1053,7 @@ void XM_CALLCONV BuildGammaTable( float gamma, float texGamma, float brightness,
 {
 	extern ALIGN128 float power2_n[256]; 
 	Assert( exponent >= -128 && exponent <= 127 );
-	return ( float )c * power2_n[exponent+128];
+	return static_cast<float>(c) * power2_n[exponent+128];
 }
 
 
@@ -1344,14 +1344,14 @@ int32x4_t
 #ifdef Assert
 	Assert( (nResult & ~0xFF) == 0 );
 #endif
-	return (unsigned char) nResult;
+	return static_cast<unsigned char>(nResult);
 }
 
 // dimhotepus: unsigned long -> unsigned.
 [[nodiscard]] FORCEINLINE unsigned XM_CALLCONV RoundFloatToUnsignedLong(float f)
 {
 #if defined( PLATFORM_WINDOWS_PC64 )
-	uint nRet = ( uint ) f;
+	uint nRet = static_cast<uint>(f);
 	if ( nRet & 1 )
 	{
 		if ( ( f - floor( f ) >= 0.5f ) )
@@ -1552,7 +1552,7 @@ inline void XM_CALLCONV GetBarycentricCoords2D(
 	int i = RoundFloatToInt( f * 1024.f );
 
 	// Presumably the comman case will be not to clamp, so check that first:
-	if( (unsigned)i > 4095 )
+	if( static_cast<unsigned>(i) > 4095 )
 	{
 		if ( i < 0 )
 			i = 0;		// Compare to zero instead of 4095 to save 4 bytes in the instruction stream
@@ -1572,7 +1572,7 @@ inline void XM_CALLCONV GetBarycentricCoords2D(
 	int i = RoundFloatToInt( f * 1024.f );	// assume 0..4 range
 
 	// Presumably the comman case will be not to clamp, so check that first:
-	if ( (unsigned)i > 4095 )
+	if ( static_cast<unsigned>(i) > 4095 )
 	{
 		if ( i < 0 )
 			i = 0;		// Compare to zero instead of 4095 to save 4 bytes in the instruction stream
@@ -2001,9 +2001,9 @@ FORCEINLINE float * XM_CALLCONV UnpackNormal_HEND3N( const unsigned int *pPacked
 	{
 		temp[2] = 1024 - temp[2];
 	}
-	pNormal[0] = (float)temp[0] * 1.0f/1023.0f;
-	pNormal[1] = (float)temp[1] * 1.0f/1023.0f;
-	pNormal[2] = (float)temp[2] * 1.0f/511.0f;
+	pNormal[0] = static_cast<float>(temp[0]) * 1.0f/1023.0f;
+	pNormal[1] = static_cast<float>(temp[1]) * 1.0f/1023.0f;
+	pNormal[2] = static_cast<float>(temp[2]) * 1.0f/511.0f;
 	return pNormal;
 }
 
@@ -2104,9 +2104,8 @@ FORCEINLINE unsigned int * XM_CALLCONV PackNormal_SHORT2( float nx, float ny, fl
 
 	ny *= binormalSign;			// Set the sign bit for the binormal (use when encoding a tangent vector)
 
-	// FIXME: short math is slow on 360 - use ints here instead (bit-twiddle to deal w/ the sign bits), also use Float2Int()
-	auto sX = (short)nx;		// signed short [1,32767]
-	auto sY = (short)ny;
+	auto sX = static_cast<short>(nx);		// signed short [1,32767]
+	auto sY = static_cast<short>(ny);
 
 	*pPackedNormal = ( sX & 0x0000FFFF ) | ( sY << 16 ); // NOTE: The mask is necessary (if sX is negative and cast to an int...)
 
@@ -2218,8 +2217,8 @@ FORCEINLINE unsigned int * XM_CALLCONV PackNormal_UBYTE4( float nx, float ny, fl
 	xbits += 128.0f;								// 0..255 range
 	ybits += 128.0f;
 
-	auto cX = (unsigned char) xbits;
-	auto cY = (unsigned char) ybits;
+	auto cX = static_cast<unsigned char>(xbits);
+	auto cY = static_cast<unsigned char>(ybits);
 
 	if ( !bIsTangent )
 		*pPackedNormal = (cX <<  0) | (cY <<  8);	// xy for normal
