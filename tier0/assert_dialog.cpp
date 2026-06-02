@@ -6,7 +6,7 @@
 
 #if defined( _WIN32 )
 #include "winlite.h"
-#include "commctrl.h"
+#include <CommCtrl.h>
 #include "windows/dpi_wnd_behavior.h"
 #include "windows/com_error_category.h"
 
