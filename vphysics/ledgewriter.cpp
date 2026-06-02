@@ -160,7 +160,7 @@ static void PackLedgeIntoBuffer( packedhull_t *pHull, CUtlBuffer &buf, const IVP
 			}
 		}
 	}
-
+	
 	Assert(edgeList.Count() <= std::numeric_limits<byte>::max());
 	pHull->vedgeCount = static_cast<byte>( edgeList.Count() );
 
@@ -188,20 +188,32 @@ static void PackLedgeIntoBuffer( packedhull_t *pHull, CUtlBuffer &buf, const IVP
 	// now write the packed triangles
 	for ( int i = 0; i < pHull->triangleCount; i++ )
 	{
-		packedtriangle_t tri;
 		const IVP_Compact_Triangle *pTri = pLedge->get_first_triangle() + triangleList[i];
-		const IVP_Compact_Edge *pEdge;
-		pEdge = pTri->get_edge(0);
-		tri.opposite = triangleMap[pTri->get_pierce_index()];
-		Assert(tri.opposite<pHull->triangleCount);
-		tri.e0 = edgeMap[EdgeIndex(pLedge, pEdge)];
+		
+		packedtriangle_t tri;
+		const intp opposite = triangleMap[pTri->get_pierce_index()];
+		Assert(opposite < (intp)pHull->triangleCount);
+		tri.opposite = static_cast<byte>(opposite);
+		
+		const IVP_Compact_Edge *pEdge = pTri->get_edge(0);
+		const intp e0 = edgeMap[EdgeIndex(pLedge, pEdge)];
+		Assert(e0 <= std::numeric_limits<byte>::max());
+		tri.e0 = static_cast<byte>( e0 );
+
 		pEdge = pTri->get_edge(1);
-		tri.e1 = edgeMap[EdgeIndex(pLedge, pEdge)];
+		const intp e1 = edgeMap[EdgeIndex(pLedge, pEdge)];
+		Assert(e1 <= std::numeric_limits<byte>::max());
+		tri.e1 = static_cast<byte>( e1 );
+
 		pEdge = pTri->get_edge(2);
-		tri.e2 = edgeMap[EdgeIndex(pLedge, pEdge)];
+		const intp e2 = edgeMap[EdgeIndex(pLedge, pEdge)];
+		Assert(e2 <= std::numeric_limits<byte>::max());
+		tri.e2 = static_cast<byte>( e2 );
+
 		Assert(tri.e0<pHull->edgeCount);
 		Assert(tri.e1<pHull->edgeCount);
 		Assert(tri.e2<pHull->edgeCount);
+
 		buf.Put(&tri, sizeof(tri));
 	}
 	// now write the packed edges
