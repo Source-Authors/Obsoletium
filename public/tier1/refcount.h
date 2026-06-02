@@ -306,7 +306,7 @@ template < class REFCOUNT_SERVICE = CRefCountService >
 class NO_VTABLE CRefCounted : public REFCOUNT_SERVICE
 {
 public:
-  virtual ~CRefCounted() = default;
+	~CRefCounted() override = default;
 	int AddRef() 			{ return REFCOUNT_SERVICE::DoAddRef(); }
 	int Release()			{ return REFCOUNT_SERVICE::DoRelease(); }
 };
