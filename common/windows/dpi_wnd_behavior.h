@@ -69,25 +69,25 @@ class CDpiWindowBehavior {
 
   /**
    * @brief Previous X DPI.
-   * @return
+   * @return X DPI.
    */
   [[nodiscard]] unsigned GetPreviousDpiX() const { return m_previous_dpi_x; }
 
   /**
    * @brief Previous Y DPI.
-   * @return
+   * @return Y DPI.
    */
   [[nodiscard]] unsigned GetPreviousDpiY() const { return m_previous_dpi_y; }
 
   /**
    * @brief Current X DPI.
-   * @return
+   * @return X DPI.
    */
   [[nodiscard]] unsigned GetCurrentDpiX() const { return m_current_dpi_x; }
 
   /**
    * @brief Current Y DPI.
-   * @return
+   * @return Y DPI.
    */
   [[nodiscard]] unsigned GetCurrentDpiY() const { return m_current_dpi_y; }
 

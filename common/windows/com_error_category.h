@@ -73,7 +73,7 @@ class ComErrorCategory : public std::error_category {
 
 /**
  * @brief Get COM error code.
- * @param rc Native system COM error code.
+ * @param result Native system COM error code.
  * @return System COM error code.
  */
 [[nodiscard]] inline std::error_code GetComErrorCode(
