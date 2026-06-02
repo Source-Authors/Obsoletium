@@ -333,9 +333,15 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindOrAddFileName( const char *pFileNa
 	{
 		m_lock.LockForWrite();
 		RunCodeAtScopeExit(m_lock.UnlockWrite());
+		
+		const auto path = m_Strings->Insert( basepath ) + 1;
+		const auto file = m_Strings->Insert( filename ) + 1;
 
-		handle.path = m_Strings->Insert( basepath ) + 1;
-		handle.file = m_Strings->Insert( filename ) + 1;
+		Assert(path <= std::numeric_limits<decltype(handle.path)>::max());
+		Assert(file <= std::numeric_limits<decltype(handle.file)>::max());
+
+		handle.path = static_cast<decltype(handle.path)>(path);
+		handle.file = static_cast<decltype(handle.file)>(file);
 	}
 
 	return *( FileNameHandle_t * )( &handle );
