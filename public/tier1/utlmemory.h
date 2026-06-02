@@ -399,7 +399,7 @@ CUtlMemory<T,I>::CUtlMemory( intp nGrowSize, intp nInitAllocationCount ) : m_pMe
 	{
 		UTLMEMORY_TRACK_ALLOC();
 		MEM_ALLOC_CREDIT_CLASS();
-		m_pMemory = (T*)malloc( m_nAllocationCount * sizeof(T) );
+		m_pMemory = static_cast<T*>( malloc( m_nAllocationCount * sizeof(T) ) );
 	}
 }
 
@@ -531,7 +531,7 @@ inline T& CUtlMemory<T,I>::operator[]( I i )
 	// Avoid function calls in the asserts to improve debug build performance
 	Assert( m_nGrowSize != EXTERNAL_CONST_BUFFER_MARKER ); //Assert( !IsReadOnly() );
 	Assert( (uintp)i < (uintp)m_nAllocationCount );
-	return m_pMemory[(uintp)i];
+	return m_pMemory[static_cast<uintp>( i )];
 }
 
 template< class T, class I >
@@ -539,7 +539,7 @@ inline const T& CUtlMemory<T,I>::operator[]( I i ) const
 {
 	// Avoid function calls in the asserts to improve debug build performance
 	Assert( (uintp)i < (uintp)m_nAllocationCount );
-	return m_pMemory[(uintp)i];
+	return m_pMemory[static_cast<uintp>( i )];
 }
 
 template< class T, class I >
@@ -548,7 +548,7 @@ inline T& CUtlMemory<T,I>::Element( I i )
 	// Avoid function calls in the asserts to improve debug build performance
 	Assert( m_nGrowSize != EXTERNAL_CONST_BUFFER_MARKER ); //Assert( !IsReadOnly() );
 	Assert( (uintp)i < (uintp)m_nAllocationCount );
-	return m_pMemory[(uintp)i];
+	return m_pMemory[static_cast<uintp>( i )];
 }
 
 template< class T, class I >
@@ -556,7 +556,7 @@ inline const T& CUtlMemory<T,I>::Element( I i ) const
 {
 	// Avoid function calls in the asserts to improve debug build performance
 	Assert( (uintp)i < (uintp)m_nAllocationCount );
-	return m_pMemory[(uintp)i];
+	return m_pMemory[static_cast<uintp>( i )];
 }
 
 
@@ -711,13 +711,13 @@ void CUtlMemory<T,I>::Grow( intp num )
 	if (m_pMemory)
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		m_pMemory = (T*)realloc( m_pMemory, m_nAllocationCount * sizeof(T) );
+		m_pMemory = static_cast<T*>( realloc( m_pMemory, m_nAllocationCount * sizeof(T) ) );
 		Assert( m_pMemory );
 	}
 	else
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		m_pMemory = (T*)malloc( m_nAllocationCount * sizeof(T) );
+		m_pMemory = static_cast<T*>( malloc( m_nAllocationCount * sizeof(T) ) );
 		Assert( m_pMemory );
 	}
 }
@@ -769,7 +769,7 @@ void CUtlMemory<T,I>::Purge()
 		if (m_pMemory)
 		{
 			UTLMEMORY_TRACK_FREE();
-			free( (void*)m_pMemory );
+			free( m_pMemory );
 			m_pMemory = nullptr;
 		}
 		m_nAllocationCount = 0;
