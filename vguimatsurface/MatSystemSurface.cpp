@@ -4320,7 +4320,7 @@ vgui::IImage *CMatSystemSurface::GetIconImageForFullPath( char const *pFullPath 
 					size_t bufsize = 0;
 					
 					HDC hdc = ::GetDC(reinterpret_cast<HWND>(m_HWnd));
-					RunCodeAtScopeExit(::ReleaseDC( reinterpret_cast<HWND>(m_HWnd), hdc );)
+					RunCodeAtScopeExit(::ReleaseDC( reinterpret_cast<HWND>(m_HWnd), hdc ););
 
 					if ( GetIconBits( hdc, iconInfo, w, h, NULL, bufsize ) )
 					{
