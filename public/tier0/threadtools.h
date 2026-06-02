@@ -658,7 +658,8 @@ private:
 class ReentrancyVerifier
 {
 public:
-	inline ReentrancyVerifier(CInterlockedInt* counter, int sleepTimeMS)
+	// dimhotepus: int -> unsigned.
+	inline ReentrancyVerifier(CInterlockedInt* counter, unsigned sleepTimeMS)
 	: mCounter(counter)
 	{
 		Assert(mCounter != nullptr);
