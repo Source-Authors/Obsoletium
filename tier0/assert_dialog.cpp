@@ -269,7 +269,7 @@ static INT_PTR CALLBACK AssertDialogProc(
 				case IDC_IGNORE_THIS:
 				{
 					BOOL bTranslated = false;
-					UINT value = GetDlgItemInt( hDlg, IDC_IGNORE_NUMTIMES, &bTranslated, false );
+					UINT value = GetDlgItemInt( hDlg, IDC_IGNORE_NUMTIMES, &bTranslated, FALSE );
 					if ( bTranslated && value > 1 )
 					{
 						CAssertDisable *pDisable = IgnoreAssertsNearby( 0 );
@@ -292,7 +292,7 @@ static INT_PTR CALLBACK AssertDialogProc(
 				case IDC_IGNORE_NEARBY:
 				{
 					BOOL bTranslated = false;
-					UINT value = GetDlgItemInt( hDlg, IDC_IGNORE_NUMLINES, &bTranslated, false );
+					UINT value = GetDlgItemInt( hDlg, IDC_IGNORE_NUMLINES, &bTranslated, FALSE );
 					if ( !bTranslated || value < 1 )
 						return TRUE;
 
