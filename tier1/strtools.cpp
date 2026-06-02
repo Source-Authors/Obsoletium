@@ -1226,7 +1226,7 @@ char *V_pretifynum( int64 inputValue )
 //			characters in this set are removed from the beginning and/or end of strings
 //			by Q_AggressiveStripPrecedingAndTrailingWhitespaceW() 
 //-----------------------------------------------------------------------------
-bool Q_IsMeanSpaceW( wchar_t wch )
+static bool Q_IsMeanSpaceW( wchar_t wch )
 {
 	bool bIsMean = false;
 
@@ -2617,7 +2617,7 @@ bool V_StrSubst(
 }
 
 
-char* AllocString( const char *pStr, intp nMaxChars )
+static char* AllocString( const char *pStr, intp nMaxChars )
 {
 	intp allocLen = (intp)strlen( pStr );
 	if ( nMaxChars == -1 )
@@ -2929,7 +2929,7 @@ static constexpr int iHexCharToInt( char cValue )
 // Purpose: Internal implementation of encode, works in the strict RFC manner, or
 //          with spaces turned to + like HTML form encoding.
 //-----------------------------------------------------------------------------
-void Q_URLEncodeInternal( char *pchDest, intp nDestLen, const char *pchSource, intp nSourceLen, bool bUsePlusForSpace )
+static void Q_URLEncodeInternal( char *pchDest, intp nDestLen, const char *pchSource, intp nSourceLen, bool bUsePlusForSpace )
 {
 	if ( nDestLen < 3*nSourceLen )
 	{
@@ -2988,7 +2988,7 @@ void Q_URLEncodeInternal( char *pchDest, intp nDestLen, const char *pchSource, i
 //
 //			Returns the amount of space used in the output buffer.
 //-----------------------------------------------------------------------------
-size_t Q_URLDecodeInternal( char *pchDecodeDest, intp nDecodeDestLen, const char *pchEncodedSource, intp nEncodedSourceLen, bool bUsePlusForSpace )
+static size_t Q_URLDecodeInternal( char *pchDecodeDest, intp nDecodeDestLen, const char *pchEncodedSource, intp nEncodedSourceLen, bool bUsePlusForSpace )
 {
 	if ( nDecodeDestLen < nEncodedSourceLen )
 	{
@@ -3817,7 +3817,7 @@ bool V_BBCodeToHTML( OUT_Z_CAP( nDestSize ) char *pDest, const intp nDestSize, I
 //			characters in this set are removed from the beginning and/or end of strings
 //			by Q_AggressiveStripPrecedingAndTrailingWhitespaceW() 
 //-----------------------------------------------------------------------------
-bool V_IsMeanUnderscoreW( wchar_t wch )
+static bool V_IsMeanUnderscoreW( wchar_t wch )
 {
 	bool bIsMean = false;
 

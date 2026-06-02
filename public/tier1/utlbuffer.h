@@ -79,9 +79,10 @@ protected:
 #define BEGIN_CUSTOM_CHAR_CONVERSION( _className, _name, _delimiter, _escapeChar ) \
 	static CUtlCharConversion::ConversionArray_t s_pConversionArray ## _name[] = {
 
+// dimhotepus: Add static.
 #define END_CUSTOM_CHAR_CONVERSION( _className, _name, _delimiter, _escapeChar ) \
 	}; \
-	_className _name( _escapeChar, _delimiter, sizeof( s_pConversionArray ## _name ) / sizeof( CUtlCharConversion::ConversionArray_t ), s_pConversionArray ## _name );
+	static _className _name( _escapeChar, _delimiter, sizeof( s_pConversionArray ## _name ) / sizeof( CUtlCharConversion::ConversionArray_t ), s_pConversionArray ## _name );
 
 //-----------------------------------------------------------------------------
 // Character conversions for C strings

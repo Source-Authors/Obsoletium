@@ -19,9 +19,9 @@
 // Purpose: Comparison function for string sorted associative data structures
 //-----------------------------------------------------------------------------
 
-bool StrLess( const char * const &pszLeft, const char * const &pszRight )
+static bool StrLess( const char * const &pszLeft, const char * const &pszRight )
 {
-	return ( Q_stricmp( pszLeft, pszRight) < 0 );
+	return Q_stricmp( pszLeft, pszRight) < 0;
 }
 
 //-----------------------------------------------------------------------------

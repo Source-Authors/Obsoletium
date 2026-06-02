@@ -64,7 +64,7 @@ InterfaceReg::InterfaceReg( InstantiateInterfaceFn fn, const char *pName ) :
 // makes sure Sys_GetFactoryThis() has the dll specific symbol and GetProcAddress() returns the module specific
 // function for CreateInterface again getting the dll specific symbol we need.
 // ------------------------------------------------------------------------------------ //
-void* CreateInterfaceInternal( const char *pName, int *pReturnCode )
+static void* CreateInterfaceInternal( const char *pName, int *pReturnCode )
 {
 	for (auto *pCur=InterfaceReg::s_pInterfaceRegs; pCur; pCur=pCur->m_pNext)
 	{
@@ -173,7 +173,7 @@ static HMODULE InternalLoadLibrary( const char *pName, Sys_Flags flags )
 		return LoadLibraryExA( pName, nullptr, LOAD_WITH_ALTERED_SEARCH_PATH );
 }
 
-unsigned ThreadedLoadLibraryFunc( void *pParam )
+static unsigned ThreadedLoadLibraryFunc( void *pParam )
 {
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("ModuleLoader");
@@ -184,7 +184,7 @@ unsigned ThreadedLoadLibraryFunc( void *pParam )
 
 #endif // _WIN32
 
-HMODULE Sys_LoadLibrary( const char *pLibraryName, Sys_Flags flags )
+static HMODULE Sys_LoadLibrary( const char *pLibraryName, Sys_Flags flags )
 {
 	char str[ 1024 ];
 	// Note: DLL_EXT_STRING can be "_srv.so" or "_360.dll". So be careful
@@ -332,7 +332,7 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 //-----------------------------------------------------------------------------
 // Purpose: Determine if any debug modules were loaded
 //-----------------------------------------------------------------------------
-bool Sys_RunningWithDebugModules()
+static bool Sys_RunningWithDebugModules()
 {
 	if ( !s_bRunningWithDebugModules )
 	{

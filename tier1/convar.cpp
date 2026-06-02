@@ -472,7 +472,7 @@ int CCommand::FindArgInt( const char *pName, int nDefaultVal ) const
 //-----------------------------------------------------------------------------
 // Default console command autocompletion function 
 //-----------------------------------------------------------------------------
-int DefaultCompletionFunc( [[maybe_unused]] const char *partial, [[maybe_unused]] char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] )
+static int DefaultCompletionFunc( [[maybe_unused]] const char *partial, [[maybe_unused]] char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] )
 {
 	return 0;
 }

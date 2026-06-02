@@ -125,8 +125,9 @@ private:
 	const char *m_pFilename{"NULL"};
 	int		m_errorIndex{0};
 	int		m_maxErrorIndex{0};
-} g_KeyValuesErrorStack;
+};
 
+static CKeyValuesErrorStack g_KeyValuesErrorStack;
 
 // a simple helper that creates stack entries as it goes in & out of scope
 class CKeyErrorContext

@@ -32,7 +32,7 @@
 //-----------------------------------------------------------------------------
 // For serialization, set the delimiter rules
 //-----------------------------------------------------------------------------
-CUtlCharConversion *s_pConv = nullptr;
+static CUtlCharConversion *s_pConv = nullptr;
 const char *s_pUtlBufferUtilArrayDelim = nullptr;
 void SetSerializationDelimiter( CUtlCharConversion *pConv )
 {
