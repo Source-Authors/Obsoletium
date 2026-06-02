@@ -882,7 +882,7 @@ public:
 	[[nodiscard]] UtlHashHandle_t FirstHandle() const { return ExtendInvalidHandle( m_data.Head() ); }
 	[[nodiscard]] UtlHashHandle_t NextHandle( UtlHashHandle_t h ) const { return ExtendInvalidHandle( m_data.Next( h ) ); }
 	[[nodiscard]] bool IsValidHandle( UtlHashHandle_t h ) const { return m_data.IsValidIndex( h ); }
-	[[nodiscard]] UtlHashHandle_t InvalidHandle() const { return (UtlHashHandle_t)-1; }
+	[[nodiscard]] static constexpr UtlHashHandle_t InvalidHandle() { return (UtlHashHandle_t)-1; }
 
 	UtlHashHandle_t RemoveAndAdvance( UtlHashHandle_t h )
 	{

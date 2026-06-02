@@ -37,7 +37,7 @@ public:
 	~CUtlHash();
 
 	// invalid handle
-	static UtlHashHandle_t InvalidHandle()  { return ( UtlHashHandle_t )~0; }
+	[[nodiscard]] static constexpr UtlHashHandle_t InvalidHandle()  { return ( UtlHashHandle_t )~0; }
 	[[nodiscard]] bool IsValidHandle( UtlHashHandle_t handle ) const;
 
 	// size

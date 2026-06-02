@@ -363,7 +363,7 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindFileName( const char *pFileName )
 
 	alignas(FileNameHandle_t) FileNameHandleInternal_t handle;
 
-	Assert( (uint16)(m_Strings->InvalidHandle() + 1) == 0 );
+	static_assert( m_Strings->InvalidHandle() + 1 == 0 );
 
 	{
 		m_lock.LockForRead();
