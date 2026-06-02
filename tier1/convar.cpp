@@ -44,6 +44,8 @@ static bool s_bRegistered = false;
 class CDefaultAccessor : public IConCommandBaseAccessor
 {
 public:
+	virtual ~CDefaultAccessor() {}
+
 	bool RegisterConCommandBase( ConCommandBase *pVar ) override
 	{
 		// Link to engine's list instead
