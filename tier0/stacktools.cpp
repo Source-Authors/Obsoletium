@@ -745,6 +745,8 @@ public:
 		if( m_pSymSetSearchPath == nullptr )
 			m_pSymSetSearchPath = SymSetSearchPath_DummyFn;
 
+SE_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
+SE_GCC_DISABLE_CAST_FUNCTION_TYPE_STRICT_WARNING()
 		m_pSymEnumerateModules64 = (PFN_SymEnumerateModules64) ::GetProcAddress( m_hDbgHelpDll, "SymEnumerateModules64" );
 		if( m_pSymEnumerateModules64 == nullptr )
 			m_pSymEnumerateModules64 = SymEnumerateModules64_DummyFn;
@@ -786,6 +788,7 @@ public:
 		m_pCaptureStackBackTrace = (PFN_CaptureStackBackTrace) ::GetProcAddress( m_hNTDllDll, "RtlCaptureStackBackTrace" );
 		if( m_pCaptureStackBackTrace == NULL )		m_pCaptureStackBackTrace = CaptureStackBackTrace_DummyFn;
 #endif
+SE_GCC_END_WARNING_OVERRIDE_SCOPE()
 
 
 		m_pSymSetOptions( m_pSymGetOptions() |
