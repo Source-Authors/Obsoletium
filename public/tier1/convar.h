@@ -625,7 +625,7 @@ class CConCommandMemberAccessor : public ConCommand, public ICommandCallback, pu
 public:
 	CConCommandMemberAccessor( T* pOwner, const char *pName, FnMemberCommandCallback_t callback, const char *pHelpString = nullptr,
 		int flags = 0, FnMemberCommandCompletionCallback_t completionFunc = nullptr ) :
-		BaseClass( pName, this, pHelpString, flags, ( completionFunc != 0 ) ? this : nullptr )
+		BaseClass( pName, this, pHelpString, flags, completionFunc != nullptr ? this : nullptr )
 	{
 		m_pOwner = pOwner;
 		m_Func = callback;
