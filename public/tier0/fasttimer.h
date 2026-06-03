@@ -84,7 +84,8 @@ public:
 	[[nodiscard]] CCycleCount 		GetDurationInProgress() const; // Call without ending. Not that cheap.
 
 	// Return number of cycles per second on this processor.
-	static inline int64	GetClockSpeed();
+	// dimhotepus: int64 -> uint64.
+	[[nodiscard]] static inline uint64 GetClockSpeed();
 
 private:
 	CCycleCount	m_Duration;
@@ -250,8 +251,8 @@ inline void CCycleCount::Init()
 
 inline void CCycleCount::Init( float initTimeMsec )
 {
-	if ( g_ClockSpeedMillisecondsMultiplier > 0 )
-		Init( static_cast<uint64>(initTimeMsec / g_ClockSpeedMillisecondsMultiplier) ); //-V2004
+	if ( g_ClockSpeedMillisecondsMultiplier > 0.0 )
+		Init( static_cast<uint64>( static_cast<double>( initTimeMsec ) / g_ClockSpeedMillisecondsMultiplier) ); //-V2004
 	else
 		Init( static_cast<uint64>(0) );
 }
@@ -316,13 +317,13 @@ inline unsigned long CCycleCount::GetMicroseconds() const
 
 inline uint64 CCycleCount::GetUlMicroseconds() const
 {
-	return ((m_Int64 * 1000000) / g_ClockSpeed);
+	return m_Int64 * 1000000 / g_ClockSpeed;
 }
 
 
 inline double CCycleCount::GetMicrosecondsF() const
 {
-	return static_cast<double>( m_Int64 * g_ClockSpeedMicrosecondsMultiplier );
+	return static_cast<double>( m_Int64 ) * g_ClockSpeedMicrosecondsMultiplier;
 }
 
 
@@ -340,13 +341,13 @@ inline unsigned long CCycleCount::GetMilliseconds() const
 
 inline double CCycleCount::GetMillisecondsF() const
 {
-	return static_cast<double>( m_Int64 * g_ClockSpeedMillisecondsMultiplier );
+	return static_cast<double>( m_Int64 ) * g_ClockSpeedMillisecondsMultiplier;
 }
 
 
 inline double CCycleCount::GetSeconds() const
 {
-	return static_cast<double>( m_Int64 * g_ClockSpeedSecondsMultiplier );
+	return static_cast<double>( m_Int64 ) * g_ClockSpeedSecondsMultiplier;
 }
 
 
@@ -386,7 +387,7 @@ inline CCycleCount CFastTimer::GetDurationInProgress() const
 }
 
 
-inline int64 CFastTimer::GetClockSpeed()
+inline uint64 CFastTimer::GetClockSpeed()
 {
 	return g_ClockSpeed;
 }
