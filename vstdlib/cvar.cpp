@@ -892,7 +892,7 @@ void CCvar::Find( const CCommand &args )
 }
 
 #ifdef _DEBUG
-void CCvar::HashReport( const CCommand &args )
+void CCvar::HashReport( const CCommand & )
 {
 	m_CommandHash.Report();
 }
