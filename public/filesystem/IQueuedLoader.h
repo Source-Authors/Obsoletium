@@ -136,7 +136,7 @@ public:
 	// callback is asynchronous
 	virtual bool				ClaimAnonymousJob( const char *pFilename, QueuedLoaderCallback_t pCallback, void *pContext, void *pContext2 = NULL ) = 0;
 	// provides data if loaded, caller owns data
-	virtual bool				ClaimAnonymousJob( const char *pFilename, void **pData, int *pDataSize, LoaderError_t *pError = NULL ) = 0;
+	virtual bool				ClaimAnonymousJob( const char *pFilename, void **pData, int *pDataSize, LoaderError_t *pError = nullptr ) = 0;
 
 	virtual bool				IsMapLoading() const = 0;
 	virtual bool				IsSameMapLoading() const = 0;

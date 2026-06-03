@@ -346,8 +346,8 @@ public:
 	virtual const char		*GetFactoryName( int index ) const = 0;
 
 	// create/destroy element methods - proxies to installed element factories
-	virtual DmElementHandle_t	CreateElement( UtlSymId_t typeSymbol, const char *pElementName, DmFileId_t fileid = DMFILEID_INVALID, const DmObjectId_t *pObjectID = NULL ) = 0;
-	virtual DmElementHandle_t	CreateElement( const char *pTypeName, const char *pElementName, DmFileId_t fileid = DMFILEID_INVALID, const DmObjectId_t *pObjectID = NULL ) = 0;
+	virtual DmElementHandle_t	CreateElement( UtlSymId_t typeSymbol, const char *pElementName, DmFileId_t fileid = DMFILEID_INVALID, const DmObjectId_t *pObjectID = nullptr ) = 0;
+	virtual DmElementHandle_t	CreateElement( const char *pTypeName, const char *pElementName, DmFileId_t fileid = DMFILEID_INVALID, const DmObjectId_t *pObjectID = nullptr ) = 0;
 	virtual void				DestroyElement( DmElementHandle_t hElement ) = 0;
 
 	// element handle related methods
@@ -412,7 +412,7 @@ public:
 	// NOTE: Format name is only used here for those formats which don't store
 	// the format name in the file. Use NULL for those formats which store the 
 	// format name in the file.
-	virtual DmFileId_t			RestoreFromFile( const char *pFileName, const char *pPathID, const char *pFormatHint, CDmElement **ppRoot, DmConflictResolution_t idConflictResolution = CR_DELETE_NEW, DmxHeader_t *pHeaderOut = NULL ) = 0;
+	virtual DmFileId_t			RestoreFromFile( const char *pFileName, const char *pPathID, const char *pFormatHint, CDmElement **ppRoot, DmConflictResolution_t idConflictResolution = CR_DELETE_NEW, DmxHeader_t *pHeaderOut = nullptr ) = 0;
 
 	// Sets the name of the DME element to create in keyvalues serialization
 	virtual void			SetKeyValuesElementCallback( IElementForKeyValueCallback *pCallbackInterface ) = 0;
@@ -462,7 +462,7 @@ public:
 	virtual UtlSymId_t		GetRedoDescInternal( const char *context ) = 0;
 
 	virtual void			EmptyClipboard() = 0;
-	virtual void			SetClipboardData( CUtlVector< KeyValues * >& data, IClipboardCleanup *pfnOptionalCleanuFunction = 0 ) = 0;
+	virtual void			SetClipboardData( CUtlVector< KeyValues * >& data, IClipboardCleanup *pfnOptionalCleanuFunction = nullptr ) = 0;
 	virtual void			AddToClipboardData( KeyValues *add ) = 0;
 	virtual void			GetClipboardData( CUtlVector< KeyValues * >& data ) = 0;
 	virtual bool			HasClipboardData() const = 0;
@@ -592,11 +592,11 @@ private:
 class CUndoScopeGuard
 {
 public:
-	explicit CUndoScopeGuard( const char *udesc, const char *rdesc = NULL )
+	explicit CUndoScopeGuard( const char *udesc, const char *rdesc = nullptr )
 	{
 		m_bReleased = false;
 		m_bNotify = false;
-		m_pNotify = NULL;
+		m_pNotify = nullptr;
 		g_pDataModel->StartUndo( udesc, rdesc ? rdesc : udesc );
 	}
 
@@ -604,15 +604,15 @@ public:
 	{
 		m_bReleased = false;
 		m_bNotify = false;
-		m_pNotify = NULL;
+		m_pNotify = nullptr;
 		g_pDataModel->StartUndo( udesc, udesc, nChainingID );
 	}
 
-	explicit CUndoScopeGuard( int nNotifySource, int nNotifyFlags, const char *udesc, const char *rdesc = NULL, int nChainingID = 0 )
+	explicit CUndoScopeGuard( int nNotifySource, int nNotifyFlags, const char *udesc, const char *rdesc = nullptr, int nChainingID = 0 )
 	{
 		m_bReleased = false;
 		m_bNotify = true;
-		m_pNotify = NULL;
+		m_pNotify = nullptr;
 		g_pDataModel->StartUndo( udesc, rdesc ? rdesc : udesc, nChainingID );
 		g_pDataModel->PushNotificationScope( udesc, nNotifySource, nNotifyFlags );
 	}
@@ -621,7 +621,7 @@ public:
 	{
 		m_bReleased = false;
 		m_bNotify = true;
-		m_pNotify = NULL;
+		m_pNotify = nullptr;
 		g_pDataModel->StartUndo( udesc, rdesc ? rdesc : udesc, nChainingID );
 		if ( pNotify )
 		{
@@ -651,7 +651,7 @@ public:
 			if ( m_pNotify )
 			{
 				g_pDataModel->RemoveNotificationCallback( m_pNotify );
-				m_pNotify = NULL;
+				m_pNotify = nullptr;
 			}
 			m_bReleased = true;
 		}
@@ -670,7 +670,7 @@ public:
 			if ( m_pNotify )
 			{
 				g_pDataModel->RemoveNotificationCallback( m_pNotify );
-				m_pNotify = NULL;
+				m_pNotify = nullptr;
 			}
 			m_bReleased = true;
 		}
@@ -693,7 +693,7 @@ public:
 	{
 		m_bReleased = false;
 		m_bNotify = false;
-		m_pNotify = NULL;
+		m_pNotify = nullptr;
 		m_bOldValue = g_pDataModel->IsUndoEnabled();
 		g_pDataModel->SetUndoEnabled( bNewState );
 	};
@@ -705,7 +705,7 @@ public:
 		g_pDataModel->SetUndoEnabled( bNewState );
 
 		m_bNotify = true;
-		m_pNotify = NULL;
+		m_pNotify = nullptr;
 		if ( pNotify )
 		{
 			if ( g_pDataModel->InstallNotificationCallback( pNotify ) )
@@ -736,7 +736,7 @@ public:
 			if ( m_pNotify )
 			{
 				g_pDataModel->RemoveNotificationCallback( m_pNotify );
-				m_pNotify = NULL;
+				m_pNotify = nullptr;
 			}
 		}
 	}
@@ -754,7 +754,7 @@ class CDisableUndoScopeGuard : public CChangeUndoScopeGuard
 
 public:
 	CDisableUndoScopeGuard() : BaseClass( false ) { }
-	CDisableUndoScopeGuard( const char *pDesc, int nNotifySource, int nNotifyFlags, IDmNotify *pNotify = NULL ) :
+	CDisableUndoScopeGuard( const char *pDesc, int nNotifySource, int nNotifyFlags, IDmNotify *pNotify = nullptr ) :
 		BaseClass( false, pDesc, nNotifySource, nNotifyFlags, pNotify ) {}
 };
 
@@ -764,7 +764,7 @@ class CEnableUndoScopeGuard : public CChangeUndoScopeGuard
 
 public:
 	CEnableUndoScopeGuard( ) : BaseClass( true ) { }
-	CEnableUndoScopeGuard( const char *pDesc, int nNotifySource, int nNotifyFlags, IDmNotify *pNotify = NULL ) :
+	CEnableUndoScopeGuard( const char *pDesc, int nNotifySource, int nNotifyFlags, IDmNotify *pNotify = nullptr ) :
 		BaseClass( true, pDesc, nNotifySource, nNotifyFlags, pNotify ) {}
 };
 
@@ -816,10 +816,10 @@ public:
 class CNotifyScopeGuard
 {
 public:
-	CNotifyScopeGuard( const char *pReason, int nNotifySource, int nNotifyFlags, IDmNotify *pNotify = NULL )
+	CNotifyScopeGuard( const char *pReason, int nNotifySource, int nNotifyFlags, IDmNotify *pNotify = nullptr )
 	{
 		m_bReleased = false;
-		m_pNotify = NULL;
+		m_pNotify = nullptr;
 		g_pDataModel->PushNotificationScope( pReason, nNotifySource, nNotifyFlags );
 		if ( pNotify )
 		{
@@ -844,7 +844,7 @@ public:
 			if ( m_pNotify )
 			{
 				g_pDataModel->RemoveNotificationCallback( m_pNotify );
-				m_pNotify = NULL;
+				m_pNotify = nullptr;
 			}
 			m_bReleased = true;
 		}
