@@ -22,6 +22,8 @@
 [[nodiscard]] unsigned FASTCALL HashBlock( const void *pKey, unsigned size );
 
 [[nodiscard]] unsigned FASTCALL HashInt(const int key);
+// dimhotepus: Add unsigned overload.
+[[nodiscard]] unsigned FASTCALL HashUint(const unsigned key);
 
 // hash a uint32 into a uint32
 [[nodiscard]] constexpr FORCEINLINE uint32 HashIntAlternate( uint32 n)
@@ -95,7 +97,7 @@ template <> [[nodiscard]] inline unsigned HashItem<int>(const int &key )
 
 template <> [[nodiscard]] inline unsigned HashItem<unsigned>(const unsigned &key )
 {
-	return HashInt( (int)key );
+	return HashUint( key );
 }
 
 template <> [[nodiscard]] inline unsigned HashItem<uint64>(const uint64 &key )

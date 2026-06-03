@@ -158,6 +158,22 @@ unsigned FASTCALL HashInt( const int n )
 }
 
 //-----------------------------------------------------------------------------
+// uint hash
+//-----------------------------------------------------------------------------
+unsigned FASTCALL HashUint( const unsigned n )
+{
+	unsigned		even, odd;
+	odd   = g_nRandomValues[((n >> 8) & 0xff)];
+
+	even  = g_nRandomValues[odd ^ (n >> 24)]; //-V519
+	odd   = g_nRandomValues[even ^ ((n >> 16) & 0xff)];
+	even  = g_nRandomValues[odd ^ ((n >> 8) &  0xff)];
+	odd   = g_nRandomValues[even  ^ (n & 0xff)];
+
+	return (even << 8) | odd;
+}
+
+//-----------------------------------------------------------------------------
 // 4-byte hash
 //-----------------------------------------------------------------------------
 unsigned FASTCALL Hash4( const void *pKey )
