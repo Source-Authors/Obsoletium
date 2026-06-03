@@ -52,6 +52,7 @@ public:
 	CTier1AppSystem( bool bIsPrimaryAppSystem = true ) : BaseClass(	bIsPrimaryAppSystem )
 	{
 	}
+	~CTier1AppSystem() override {}
 
 	bool Connect( CreateInterfaceFn factory ) override
 	{

@@ -319,8 +319,10 @@ class NO_VTABLE CRefCounted1 : public BASE1,
 {
 public:
 	virtual ~CRefCounted1() = default;
-	int AddRef() 			{ return REFCOUNT_SERVICE::DoAddRef(); }
-	int Release()			{ return REFCOUNT_SERVICE::DoRelease(); }
+	// dimhotepus: It is not always override.
+	int AddRef()		{ return REFCOUNT_SERVICE::DoAddRef(); }
+	// dimhotepus: It is not always override.
+	int Release()		{ return REFCOUNT_SERVICE::DoRelease(); }
 };
 
 //-------------------------------------
