@@ -845,9 +845,23 @@ void RunDataTableTest()
 	x.WriteUBitLong(3, 2);
 	x.WriteUBitLong(7, 3);
 	x.WriteUBitLong(0x31415926, 32);
+	x.WriteBitAngles(QAngle{1.5f, 2.5f, 3.5f});
+	x.WriteBitCoord(2.5f);
+	x.WriteBitCoordMP(3.5f, false, false);
+	x.WriteBitFloat(4.5f);
+	x.WriteBitLong(123, 8, false);
+	x.WriteBitLong(static_cast<uint32>(-12), 8, true);
 	Verify( y.ReadOneBit() == 1 );
 	Verify( y.ReadUBitLong(5) == 7*4+3 );
 	Verify( y.ReadUBitLong(32) == 0x31415926 );
+	QAngle res;
+	y.ReadBitAngles(res);
+	Verify( res == QAngle(1.5f, 2.5f, 3.5f) );
+	Verify( y.ReadBitCoord() == 2.5f );
+	Verify( y.ReadBitCoordMP(false, false) == 3.5f );
+	Verify( y.ReadBitFloat() == 4.5f );
+	Verify( y.ReadBitLong(8, false) == 123 );
+	Verify( static_cast<int32>(y.ReadBitLong(8, true)) == -12 );
 
 
 	// Initialize the send and receive modules.
