@@ -31,13 +31,13 @@ public:
 				{
 					m_pNetworkName = pNetworkName;
 					m_pTable = pTable;
-					m_pNext = NULL;
+					m_pNext = nullptr;
 					m_InstanceBaselineIndex = INVALID_STRING_INDEX;
 					// g_pServerClassHead is sorted alphabetically, so find the correct place to insert
 					if ( !g_pServerClassHead )
 					{
 						g_pServerClassHead = this;
-						m_pNext = NULL;
+						m_pNext = nullptr;
 					}
 					else
 					{
@@ -49,12 +49,12 @@ public:
 						{
 							m_pNext = g_pServerClassHead;
 							g_pServerClassHead = this;
-							p1 = NULL;
+							p1 = nullptr;
 						}
 
 						while( p1 )
 						{
-							if ( p2 == NULL || _stricmp( p2->GetName(), pNetworkName ) > 0)
+							if ( p2 == nullptr || _stricmp( p2->GetName(), pNetworkName ) > 0)
 							{
 								m_pNext = p2;
 								p1->m_pNext = this;
@@ -125,7 +125,7 @@ class CBaseNetworkable;
 		} \
 		namespace sendTable \
 		{ \
-			int verifyDeclareClass = CheckDeclareClass_Access( (sendTable::ignored*)0 ); \
+			int verifyDeclareClass = CheckDeclareClass_Access( (sendTable::ignored*)nullptr ); \
 		}
 #else
 	#define CHECK_DECLARE_CLASS( DLLClassName, sendTable )

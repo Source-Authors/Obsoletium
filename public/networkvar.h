@@ -68,7 +68,7 @@ inline int CheckDeclareClass_Access( T *, const char *pShouldBe )
 		static int CheckDeclareClass( const char *pShouldBe ) \
 		{ \
 			InternalCheckDeclareClass( pShouldBe, #className, (ThisClass*)0xFFFFF, (BaseClass*)(ThisClass*)0xFFFFF ); \
-			return CheckDeclareClass_Access( (BaseClass *)NULL, #baseClassName ); \
+			return CheckDeclareClass_Access( (BaseClass *)nullptr, #baseClassName ); \
 		}
 
 	// Use this macro when you have a base class, but it's part of a library that doesn't use network vars
