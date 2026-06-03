@@ -497,7 +497,7 @@ private:
 
 //-----------------------------------------------------------------------------
 
-CGlobalThreadPool g_ThreadPool;
+static CGlobalThreadPool g_ThreadPool;
 IThreadPool *g_pThreadPool = &g_ThreadPool;
 
 //-----------------------------------------------------------------------------
