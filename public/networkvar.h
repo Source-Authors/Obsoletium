@@ -159,7 +159,7 @@ static inline void DispatchNetworkStateChanged( T *pObj, void *pVar )
 	class NetworkVar_##name; \
 	friend class NetworkVar_##name; \
 	[[nodiscard]] static inline intp GetOffset_##name() { const intp offset = MyOffsetOf(ThisClass,name); return offset; } \
-	typedef ThisClass ThisClass_##name; \
+	using ThisClass_##name = ThisClass; \
 	class NetworkVar_##name : public type \
 	{ \
 		template< class T > NetworkVar_##name& operator=( const T &val ) { *((type*)this) = val; return *this; } \
@@ -675,7 +675,7 @@ private:
 #define CNetworkString( name, length ) \
 	class NetworkVar_##name; \
 	friend class NetworkVar_##name; \
-	typedef ThisClass MakeANetworkVar_##name; \
+	using MakeANetworkVar_##name = ThisClass; \
 	class NetworkVar_##name \
 	{ \
 	public: \
@@ -707,7 +707,7 @@ private:
 #define CNetworkArrayInternal( type, name, count, stateChangedFn ) \
 	class NetworkVar_##name; \
 	friend class NetworkVar_##name; \
-	typedef ThisClass MakeANetworkVar_##name; \
+	using MakeANetworkVar_##name = ThisClass; \
 	class NetworkVar_##name \
 	{ \
 	public: \
@@ -764,7 +764,7 @@ private:
 #define NETWORK_VAR_START( type, name ) \
 	class NetworkVar_##name; \
 	friend class NetworkVar_##name; \
-	typedef ThisClass MakeANetworkVar_##name; \
+	using MakeANetworkVar_##name = ThisClass; \
 	class NetworkVar_##name \
 	{ \
 	public: \
