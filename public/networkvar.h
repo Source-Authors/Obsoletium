@@ -158,7 +158,7 @@ static inline void DispatchNetworkStateChanged( T *pObj, void *pVar )
 #define CNetworkVarEmbedded( type, name ) \
 	class NetworkVar_##name; \
 	friend class NetworkVar_##name; \
-	static inline int GetOffset_##name() { return MyOffsetOf(ThisClass,name); } \
+	[[nodiscard]] static inline intp GetOffset_##name() { const intp offset = MyOffsetOf(ThisClass,name); return offset; } \
 	typedef ThisClass ThisClass_##name; \
 	class NetworkVar_##name : public type \
 	{ \
@@ -167,11 +167,13 @@ static inline void DispatchNetworkStateChanged( T *pObj, void *pVar )
 		void CopyFrom( const type &src ) { *((type *)this) = src; NetworkStateChanged(); } \
 		virtual void NetworkStateChanged() \
 		{ \
-			DispatchNetworkStateChanged( (ThisClass_##name*)( ((char*)this) - GetOffset_##name() ) ); \
+			const intp offset = GetOffset_##name(); \
+			DispatchNetworkStateChanged( (ThisClass_##name*)( ((char*)this) - offset ) ); \
 		} \
 		virtual void NetworkStateChanged( void *pVar ) \
 		{ \
-			DispatchNetworkStateChanged( (ThisClass_##name*)( ((char*)this) - GetOffset_##name() ), pVar ); \
+			const intp offset = GetOffset_##name(); \
+			DispatchNetworkStateChanged( (ThisClass_##name*)( ((char*)this) - offset ), pVar ); \
 		} \
 	}; \
 	NetworkVar_##name name; 
@@ -689,7 +691,8 @@ private:
 	protected: \
 		inline void NetworkStateChanged() \
 		{ \
-		CHECK_USENETWORKVARS ((ThisClass*)(((char*)this) - MyOffsetOf(ThisClass,name)))->NetworkStateChanged(); \
+		const intp offset = MyOffsetOf(ThisClass, name); \
+		CHECK_USENETWORKVARS ((ThisClass*)(((char*)this) - offset))->NetworkStateChanged(); \
 		} \
 	private: \
 		char m_Value[length]; \
@@ -746,7 +749,8 @@ private:
 	protected: \
 		inline void NetworkStateChanged( int net_change_index ) \
 		{ \
-			CHECK_USENETWORKVARS ((ThisClass*)(((char*)this) - MyOffsetOf(ThisClass,name)))->stateChangedFn( &m_Value[net_change_index] ); \
+			const intp offset = MyOffsetOf(ThisClass, name); \
+			CHECK_USENETWORKVARS ((ThisClass*)(((char*)this) - offset))->stateChangedFn( &m_Value[net_change_index] ); \
 		} \
 		type m_Value[count]; \
 	}; \
@@ -771,7 +775,8 @@ private:
 	public: \
 		static inline void NetworkStateChanged( void *ptr ) \
 		{ \
-			CHECK_USENETWORKVARS ((ThisClass*)(((char*)ptr) - MyOffsetOf(ThisClass,name)))->stateChangedFn( ptr ); \
+			const intp offset = MyOffsetOf(ThisClass, name); \
+			CHECK_USENETWORKVARS ((ThisClass*)(((char*)ptr) - offset))->stateChangedFn( ptr ); \
 		} \
 	}; \
 	base< type, NetworkVar_##name > name;
