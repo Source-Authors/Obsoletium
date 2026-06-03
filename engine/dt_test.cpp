@@ -852,7 +852,10 @@ void RunDataTableTest()
 
 	// Initialize the send and receive modules.
 	SendTable_Init( &pSendTable, 1 );
+	RunCodeAtScopeExit(SendTable_Term());
+
 	RecvTable_Init( &pRecvTable, 1 );
+	RunCodeAtScopeExit(RecvTable_Term());
 
 	pSendTable->SetWriteFlag( false );
 	
@@ -1002,9 +1005,6 @@ void RunDataTableTest()
 		// Verify that only the changed properties were sent and that they were received correctly.
 		CompareDTTest( &dtClient, &dtServer );
 	}
-
-	SendTable_Term();
-	RecvTable_Term();
 }
 
 
