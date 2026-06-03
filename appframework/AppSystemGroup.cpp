@@ -68,7 +68,7 @@ AppModule_t CAppSystemGroup::LoadModule( const char *pDLLName )
 	auto nIndex = m_Modules.AddToTail();
 	m_Modules[nIndex].m_pModule = pSysModule;
 	m_Modules[nIndex].m_Factory = nullptr;
-	m_Modules[nIndex].m_pModuleName = (char*)malloc( nLen );
+	m_Modules[nIndex].m_pModuleName = static_cast<char*>( malloc( nLen ) );
 	Q_strncpy( m_Modules[nIndex].m_pModuleName, pModuleName, nLen );
 
 	return nIndex;
