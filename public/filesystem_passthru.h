@@ -69,7 +69,7 @@ protected:
 class CBaseFileSystemPassThru : public CInternalFileSystemPassThru<IBaseFileSystem>
 {
 public:
-	~CBaseFileSystemPassThru() override {};
+	~CBaseFileSystemPassThru() override {}
 };
 
 
