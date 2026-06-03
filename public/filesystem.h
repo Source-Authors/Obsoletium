@@ -965,7 +965,7 @@ public:
 	// (this free can't skip memdbg if paired malloc used memdbg)
 #include <tier0/memdbgon.h>
 	CMemoryFileBacking( IFileSystem* pFS ) : m_pFS( pFS ), m_nRegistered( 0 ), m_pFileName( nullptr ), m_pData( nullptr ), m_nLength( 0 ) { }
-	~CMemoryFileBacking() override { free( (char*)m_pFileName ); if ( m_pData ) m_pFS->FreeOptimalReadBuffer( const_cast<char*>(m_pData) ); }
+	~CMemoryFileBacking() override { free( const_cast<char*>( m_pFileName ) ); if ( m_pData ) m_pFS->FreeOptimalReadBuffer( const_cast<char*>(m_pData) ); }
 #include <tier0/memdbgoff.h>
 
 	IFileSystem* m_pFS;
