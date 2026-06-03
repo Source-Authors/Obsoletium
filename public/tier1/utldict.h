@@ -157,7 +157,7 @@ inline const T& CUtlDict<T, I>::Element( I i ) const
 template <class T, class I>
 inline char *CUtlDict<T, I>::GetElementName( I i )
 {
-	return (char *)m_Elements.Key( i );
+	return const_cast<char *>( m_Elements.Key( i ) );
 }
 
 template <class T, class I>
