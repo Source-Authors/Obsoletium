@@ -1111,7 +1111,7 @@ void CBaseToolSystem::PaintBackground()
 			h = logoH;
 		}
 
-		int alpha = hasDoc ? 0 : 255;
+		byte alpha = hasDoc ? 0 : 255;
 
 		RenderQuad( m_pLogo, x, y, w, h, surface()->GetZPos(), 0.0f, 0.0f, 1.0f, 1.0f, Color( 255, 255, 255, alpha ) );
 	}
