@@ -463,11 +463,11 @@ public:
 	{
 		static_assert( sizeof(Node_t) >= sizeof(TSLNodeBase_t) );
 
-		if ( ((size_t)&m_Head) % TSLIST_HEAD_ALIGNMENT != 0 )
+		if ( reinterpret_cast<size_t>(&m_Head) % TSLIST_HEAD_ALIGNMENT != 0 )
 		{
 			Error( "CTSQueue: Misaligned queue head %p.\n", &m_Head );
 		}
-		if ( ((size_t)&m_Tail) % TSLIST_HEAD_ALIGNMENT != 0 )
+		if ( reinterpret_cast<size_t>(&m_Tail) % TSLIST_HEAD_ALIGNMENT != 0 )
 		{
 			Error( "CTSQueue: Misaligned queue tail %p.\n", &m_Tail );
 		}
@@ -580,7 +580,7 @@ public:
 	Node_t *Push( Node_t *pNode )
 	{
 #ifdef _DEBUG
-		if ( (size_t)pNode % TSLIST_NODE_ALIGNMENT != 0 )
+		if ( reinterpret_cast<size_t>(pNode) % TSLIST_NODE_ALIGNMENT != 0 )
 		{
 			Error( "CTSQueue: Misaligned node %p.\n", pNode );
 		}
@@ -658,7 +658,7 @@ public:
 			if ( head.value.pNode == *pTailNode )
 			{
 				if ( pNext == End() )
-					return NULL;
+					return nullptr;
 
 				// Another thread is trying to push, help it along
 				NodeLink_t &oldTail = head; // just reuse local memory for head to build old tail
@@ -734,7 +734,7 @@ private:
 
 	[[nodiscard]] static bool InterlockedCompareExchangeNode( Node_t * volatile *ppNode, Node_t *value, Node_t *comperand )
 	{
-		return ThreadInterlockedCompareExchangePointer( (void * volatile *)ppNode, value, comperand ) == comperand;
+		return ThreadInterlockedCompareExchangePointer( reinterpret_cast<void * volatile *>( ppNode ), value, comperand ) == comperand;
 	}
 
 	bool InterlockedCompareExchangeNodeLink( NodeLink_t volatile *pLink, const NodeLink_t &value, const NodeLink_t &comperand )
