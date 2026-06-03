@@ -617,8 +617,10 @@ void Coroutine_ReleaseThreadMemory()
 
 
 // predecs
-void Coroutine_Launch( CCoroutine &coroutine );
-void Coroutine_Finish();
+// dimhotepus: Add noreturn.
+[[noreturn]] void Coroutine_Launch( CCoroutine &coroutine );
+// dimhotepus: Add noreturn.
+[[noreturn]] void Coroutine_Finish();
 
 
 //-----------------------------------------------------------------------------
@@ -788,7 +790,8 @@ bool Coroutine_Continue( HCoroutine hCoroutine, const char *pchName )
 //-----------------------------------------------------------------------------
 // Purpose: launches a coroutine way ahead on the stack
 //-----------------------------------------------------------------------------
-void NOINLINE Coroutine_Launch( CCoroutine &coroutine ) 
+// dimhotepus: Add noreturn.
+[[noreturn]] void NOINLINE Coroutine_Launch( CCoroutine &coroutine ) 
 {
 #if defined( VPROF_ENABLED )
 	coroutine.m_pVProfNodeScope = g_VProfCurrentProfile.GetCurrentNode();
@@ -970,7 +973,8 @@ void Coroutine_YieldToMain()
 //-----------------------------------------------------------------------------
 // Purpose: done with the Coroutine, terminate safely
 //-----------------------------------------------------------------------------
-void Coroutine_Finish()
+// dimhotepus: Add noreturn.
+[[noreturn]] void Coroutine_Finish()
 {
 	Assert( Coroutine_IsActive() );
 
