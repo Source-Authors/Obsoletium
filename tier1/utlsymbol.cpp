@@ -235,8 +235,12 @@ CUtlSymbol CUtlSymbolTable::AddString( const char* pString )
 
 	// didn't find, insert the string into the vector.
 	CStringPoolIndex index;
-	index.m_iPool = iPool;
-	index.m_iOffset = iStringOffset;
+
+	Assert( iPool <= std::numeric_limits<decltype(index.m_iPool)>::max() );
+	Assert( iStringOffset <= std::numeric_limits<decltype(index.m_iOffset)>::max() );
+
+	index.m_iPool = static_cast<decltype(index.m_iPool)>( iPool );
+	index.m_iOffset = static_cast<decltype(index.m_iOffset)>( iStringOffset );
 
 	UtlSymId_t idx = m_Lookup.Insert( index );
 	return { idx };
@@ -376,8 +380,14 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindFileName( const char *pFileName )
 		m_lock.LockForRead();
 		RunCodeAtScopeExit(m_lock.UnlockRead());
 
-		handle.path = m_Strings->Find(basepath) + 1;
-		handle.file = m_Strings->Find(filename) + 1;
+		const auto path = m_Strings->Find(basepath) + 1;
+		const auto file = m_Strings->Find(filename) + 1;
+
+		Assert( path <= std::numeric_limits<decltype(handle.path)>::max() );
+		Assert( file <= std::numeric_limits<decltype(handle.file)>::max() );
+
+		handle.path = static_cast<decltype(handle.path)>( path );
+		handle.file = static_cast<decltype(handle.file)>( file );
 	}
 
 	if ( handle.path == 0 || handle.file == 0 )
