@@ -325,7 +325,7 @@ public:
 			GetStackPtr( pStack );
 			if ( pStack >= m_pStackLow && pStack <= m_pStackHigh )
 			{
-				CoroutineDbgMsg( g_fmtstr.sprintf( "Restoring stack over ESP (%x, %x, %x)\n", pStack, m_pStackLow, m_pStackHigh ) );
+				CoroutineDbgMsg( "Restoring stack over ESP (%x, %x, %x)\n", pStack, m_pStackLow, m_pStackHigh );
 				AssertMsg3( false, "Restoring stack over ESP (%p, %p, %p)\n", pStack, m_pStackLow, m_pStackHigh );
 			}
 
@@ -500,7 +500,7 @@ public:
 	{
 		HCoroutine hCoroutine = m_ListCoroutines.AddToTail();
 
-		CoroutineDbgMsg( g_fmtstr.sprintf( "Coroutine_Create() hCoroutine = %x pFunc = 0x%x pvParam = 0x%x\n", hCoroutine, pFunc, pvParam ) );
+		CoroutineDbgMsg( "Coroutine_Create() hCoroutine = %x pFunc = 0x%x pvParam = 0x%x\n", hCoroutine, pFunc, pvParam );
 
 		m_ListCoroutines[hCoroutine].m_pFunc = pFunc;
 		m_ListCoroutines[hCoroutine].m_pvParam = pvParam;
@@ -669,7 +669,7 @@ static bool Internal_Coroutine_Continue( HCoroutine hCoroutine, const char *pchD
 	if ( pchName )
 		coroutine.m_pchName = pchName;
 
-	CoroutineDbgMsg( g_fmtstr.sprintf( "Coroutine_Continue() %s#%x -> %s#%x\n", coroutinePrev.m_pchName, coroutinePrev.m_hCoroutine, coroutine.m_pchName, coroutine.m_hCoroutine ) );
+	CoroutineDbgMsg( "Coroutine_Continue() %s#%x -> %s#%x\n", coroutinePrev.m_pchName, coroutinePrev.m_hCoroutine, coroutine.m_pchName, coroutine.m_hCoroutine );
 
 	bool bStillRunning = true;
 
@@ -697,7 +697,7 @@ static bool Internal_Coroutine_Continue( HCoroutine hCoroutine, const char *pchD
 					Assert( coroutine.m_pStackHigh <= coroutinePrev.m_pStackHigh );
 				}
 				coroutinePrev.SaveStack();
-				CoroutineDbgMsg( g_fmtstr.sprintf( "SaveStack() %s#%x [%x - %x]\n", coroutinePrev.m_pchName, coroutinePrev.m_hCoroutine, coroutinePrev.m_pStackLow, coroutinePrev.m_pStackHigh ) );
+				CoroutineDbgMsg( "SaveStack() %s#%x [%x - %x]\n", coroutinePrev.m_pchName, coroutinePrev.m_hCoroutine, coroutinePrev.m_pStackLow, coroutinePrev.m_pStackHigh );
 			}			
 
 			// If the coroutine's stack is close enough to where we are on the stack, we need to push ourselves
@@ -711,7 +711,7 @@ static bool Internal_Coroutine_Continue( HCoroutine hCoroutine, const char *pchD
 					intp cubPush = pStackSavePoint - coroutine.m_pStackLow + 512;
 					volatile byte *pvStackGap = stackallocT( byte, cubPush );
 					pvStackGap[ cubPush-1 ] = 0xF;
-					CoroutineDbgMsg( g_fmtstr.sprintf( "Adjusting stack point by %zd (%x <- %x)\n", cubPush, pvStackGap, &pvStackGap[cubPush] ) );
+					CoroutineDbgMsg( "Adjusting stack point by %zd (%x <- %x)\n", cubPush, pvStackGap, &pvStackGap[cubPush] );
 				}
 			}
 
@@ -734,7 +734,7 @@ static bool Internal_Coroutine_Continue( HCoroutine hCoroutine, const char *pchD
 			}
 
 			// restore the coroutine stack
-			CoroutineDbgMsg( g_fmtstr.sprintf( "RestoreStack() %s#%x [%x - %x] (current %x)\n", coroutine.m_pchName, coroutine.m_hCoroutine, coroutine.m_pStackLow, coroutine.m_pStackHigh, pStackSavePoint ) );
+			CoroutineDbgMsg( "RestoreStack() %s#%x [%x - %x] (current %x)\n", coroutine.m_pchName, coroutine.m_hCoroutine, coroutine.m_pStackLow, coroutine.m_pStackHigh, pStackSavePoint );
 			coroutine.RestoreStack();
 			
 			// the new stack is in place, so no code here can reference local stack vars
@@ -891,7 +891,7 @@ void Coroutine_YieldToMain()
 	Assert( Coroutine_IsActive() );
 	CCoroutine &coroutinePrev = GCoroutineMgr().GetPreviouslyActiveCoroutine();
 	CCoroutine &coroutine = GCoroutineMgr().GetActiveCoroutine();
-	CoroutineDbgMsg( g_fmtstr.sprintf( "Coroutine_YieldToMain() %s#%x -> %s#%x\n", coroutine.m_pchName, coroutine.m_hCoroutine, coroutinePrev.m_pchName, coroutinePrev.m_hCoroutine ) );
+	CoroutineDbgMsg( "Coroutine_YieldToMain() %s#%x -> %s#%x\n", coroutine.m_pchName, coroutine.m_hCoroutine, coroutinePrev.m_pchName, coroutinePrev.m_hCoroutine );
 
 #ifdef _WIN32
 #ifndef _WIN64
@@ -938,7 +938,7 @@ void Coroutine_YieldToMain()
 
 		// save our stack - all the way to the top, err bottom err, the end of it ( where esp is )
 		coroutine.SaveStack();
-		CoroutineDbgMsg( g_fmtstr.sprintf( "SaveStack() %s#%x [%x - %x]\n", coroutine.m_pchName, coroutine.m_hCoroutine, coroutine.m_pStackLow, coroutine.m_pStackHigh ) );
+		CoroutineDbgMsg( "SaveStack() %s#%x [%x - %x]\n", coroutine.m_pchName, coroutine.m_hCoroutine, coroutine.m_pStackLow, coroutine.m_pStackHigh );
 
 		// restore the main thread stack
 		// allocate a bunch of stack padding so we don't kill ourselves while in stack restoration
@@ -950,10 +950,10 @@ void Coroutine_YieldToMain()
 			intp cubPush = coroutinePrev.m_cubSavedStack + 512;
 			volatile byte *pvStackGap = stackallocT( byte, cubPush );
 			pvStackGap[ cubPush - 1 ] = 0xF;
-			CoroutineDbgMsg( g_fmtstr.sprintf( "Adjusting stack point by %zd (%x <- %x)\n", cubPush, pvStackGap, &pvStackGap[cubPush] ) );
+			CoroutineDbgMsg( "Adjusting stack point by %zd (%x <- %x)\n", cubPush, pvStackGap, &pvStackGap[cubPush] );
 		}
 
-		CoroutineDbgMsg( g_fmtstr.sprintf( "RestoreStack() %s#%x [%x - %x]\n", coroutinePrev.m_pchName, coroutinePrev.m_hCoroutine, coroutinePrev.m_pStackLow, coroutinePrev.m_pStackHigh ) );
+		CoroutineDbgMsg( "RestoreStack() %s#%x [%x - %x]\n", coroutinePrev.m_pchName, coroutinePrev.m_hCoroutine, coroutinePrev.m_pStackLow, coroutinePrev.m_pStackHigh );
 		coroutinePrev.RestoreStack();
 
 		// jump back to the main thread
@@ -974,7 +974,7 @@ void Coroutine_Finish()
 {
 	Assert( Coroutine_IsActive() );
 
-	CoroutineDbgMsg( g_fmtstr.sprintf( "Coroutine_Finish() %s#%x -> %s#%x\n", GCoroutineMgr().GetActiveCoroutine().m_pchName, GCoroutineMgr().GetActiveCoroutineHandle(), GCoroutineMgr().GetPreviouslyActiveCoroutine().m_pchName, &GCoroutineMgr().GetPreviouslyActiveCoroutine() ) );
+	CoroutineDbgMsg( "Coroutine_Finish() %s#%x -> %s#%x\n", GCoroutineMgr().GetActiveCoroutine().m_pchName, GCoroutineMgr().GetActiveCoroutineHandle(), GCoroutineMgr().GetPreviouslyActiveCoroutine().m_pchName, &GCoroutineMgr().GetPreviouslyActiveCoroutine() );
 
 	// allocate a bunch of stack padding so we don't kill ourselves while in stack restoration
 	volatile byte *pvStackGap = stackallocT( byte, GCoroutineMgr().GetPreviouslyActiveCoroutine().m_cubSavedStack + 512 );
