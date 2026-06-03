@@ -4,8 +4,8 @@
 //
 //=====================================================================================//
 
-#ifndef _MATH_PFNS_H_
-#define _MATH_PFNS_H_
+#ifndef SE_PUBLIC_MATHLIB_MATH_PFNS_H_
+#define SE_PUBLIC_MATHLIB_MATH_PFNS_H_
 
 #include <DirectXMath.h>
 #include <intrin.h>
@@ -187,4 +187,4 @@ inline const DirectX::XMVECTOR  f05 = DirectX::XMVectorSet( 0.5f, 0.0f, 0.0f, 0.
 #define FastSinCos(x, s, c) DirectX::XMScalarSinCos(s, c, x)
 #define FastCos(x)			DirectX::XMScalarCos(x)
 
-#endif // _MATH_PFNS_H_
+#endif  // !SE_PUBLIC_MATHLIB_MATH_PFNS_H_
