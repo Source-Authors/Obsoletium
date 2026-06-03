@@ -56,7 +56,7 @@ public:
 	// Left at growSize = 0, the memory will first allocate 1 element and double in size
 	// at each increment.
 	// LessFunc_t is required, but may be set after the constructor using SetLessFunc() below
-	CUtlMap( intp growSize = 0, intp initSize = 0, LessFunc_t lessfunc = 0 )
+	CUtlMap( intp growSize = 0, intp initSize = 0, LessFunc_t lessfunc = nullptr )
 	 : m_Tree( growSize, initSize, CKeyLess( lessfunc ) )
 	{
 	}
