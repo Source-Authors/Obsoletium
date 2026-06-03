@@ -56,10 +56,10 @@ extern "C"	__declspec(dllimport) void __stdcall OutputDebugStringA( const char *
 void OutputDebugStringA( const char *pchMsg ) { fprintf( stderr, pchMsg ); fflush( stderr ); } 
 #endif
 #define CoroutineDbgMsg( fmt, ... ) \
-{ \
+do  { \
  g_fmtstr.sprintf( fmt, ##__VA_ARGS__ ); \
  OutputDebugStringA( g_fmtstr ); \
-}
+} while ( false )
 #else
 #define CoroutineDbgMsg( pchMsg, ... )
 #endif // COROUTINE_TRACE
@@ -210,7 +210,7 @@ static const int k_cubMaxCoroutineStackSize = (32 * 1024);
 
 #ifdef _WIN64
 extern "C" byte *GetStackPtr64();
-#define GetStackPtr( pStackPtr)		byte *pStackPtr = GetStackPtr64();
+#define GetStackPtr( pStackPtr)		byte *pStackPtr = GetStackPtr64()
 #else
 #ifdef WIN32
 #define GetStackPtr( pStackPtr )	byte *pStackPtr;	__asm mov pStackPtr, esp	
