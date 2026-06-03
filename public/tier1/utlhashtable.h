@@ -61,6 +61,8 @@
 #include "utllinkedlist.h"
 #include "mathlib/mathlib.h"
 
+#include <type_traits>
+
 //-----------------------------------------------------------------------------
 // Henry Goffin (henryg) was here. Questions? Bugs? Go slap him around a bit.
 //-----------------------------------------------------------------------------
@@ -70,7 +72,7 @@ using UtlHashHandle_t = uintp;
 #define FOR_EACH_HASHTABLE( table, iter ) \
 	for ( UtlHashHandle_t iter = (table).FirstHandle(); iter != (table).InvalidHandle(); iter = (table).NextHandle( iter ) )
 
-// CUtlHashtableEntry selects between 16 and 32 bit storage backing
+// CUtlHashtableEntry selects between 16, 32 bit and 64 bit (on x64) storage backing
 // for flags_and_hash depending on the size of the stored types.
 template < typename KeyT, typename ValueT = empty_t >
 class CUtlHashtableEntry
@@ -81,36 +83,46 @@ public:
 	enum
 	{
 		INT16_STORAGE = ( sizeof( KVPair ) <= 2 ),
-//#ifdef PLATFORM_64BITS
-//		INT32_STORAGE = ( sizeof( KVPair ) >= 2 && sizeof( KVPair ) <= 4 )
-//#endif
+		INT32_STORAGE = ( sizeof( KVPair ) > 2 && sizeof( KVPair ) <= 4 ),
+#ifdef PLATFORM_64BITS
+		INT64_STORAGE = ( sizeof( KVPair ) > 4 ),
+#endif
 	};
-	using storage_t = typename CTypeSelect<INT16_STORAGE, int16, int32>::type;
+	using storage_t =
+#ifdef PLATFORM_64BITS
+		std::conditional_t<INT64_STORAGE,
+			int64,
+#endif
+			std::conditional_t<INT32_STORAGE,
+				int32,
+				std::conditional_t<INT16_STORAGE, int16, undefined_t>>
+#ifdef PLATFORM_64BITS
+				>;
+#else
+		;
+#endif
 
-	enum
+	enum : storage_t
 	{
 		// must be high bit for IsValid and IdealIndex to work
-		FLAG_FREE = INT16_STORAGE
-			? 0x8000
-//#ifdef PLATFORM_64BITS
-//			: (INT32_STORAGE ? 0x80000000 : 0x8000000000000000),
-//#else
-			: 0x80000000,
-//#endif
-		FLAG_LAST = INT16_STORAGE
-			? 0x4000
-//#ifdef PLATFORM_64BITS
-//			: (INT32_STORAGE ? 0x40000000 : 0x4000000000000000),
-//#else
-			: 0x40000000,
-//#endif
-		MASK_HASH = INT16_STORAGE
-			? 0x3FFF
-//#ifdef PLATFORM_64BITS
-//			: (INT32_STORAGE ? 0x3FFFFFFF : 0x3FFFFFFFFFFFFFFF)
-//#else
-			: 0x3FFFFFFF
-//#endif
+		FLAG_FREE =
+#ifdef PLATFORM_64BITS
+			INT64_STORAGE ? 0x8000000000000000 :
+#endif
+				(INT32_STORAGE ? 0x80000000 :
+					(INT16_STORAGE ? 0x8000 : -1)),
+		FLAG_LAST =
+#ifdef PLATFORM_64BITS
+			INT64_STORAGE ? 0x4000000000000000 :
+#endif
+				(INT32_STORAGE ? 0x40000000 :
+					(INT16_STORAGE ? 0x4000 : -1)),
+		MASK_HASH =
+#ifdef PLATFORM_64BITS
+			INT64_STORAGE ? 0x3FFFFFFFFFFFFFFF :
+#endif
+				(INT32_STORAGE ? 0x3FFFFFFF :
+					(INT16_STORAGE ? 0x3FFF : -1))
 	};
 
 	storage_t flags_and_hash;
@@ -118,42 +130,46 @@ public:
 
 	[[nodiscard]] bool IsValid() const { return flags_and_hash >= 0; }
 	void MarkInvalid() { constexpr auto flag = FLAG_FREE; flags_and_hash = (storage_t)flag; }
-	const KVPair *Raw() const { return reinterpret_cast< const KVPair * >( &data[0] ); }
-	const KVPair *operator->() const { Assert( IsValid() ); return reinterpret_cast< const KVPair * >( &data[0] ); }
-	KVPair *Raw() { return reinterpret_cast< KVPair * >( &data[0] ); }
-	KVPair *operator->() { Assert( IsValid() ); return reinterpret_cast< KVPair * >( &data[0] ); }
+	[[nodiscard]] const KVPair *Raw() const { return reinterpret_cast< const KVPair * >( &data[0] ); }
+	[[nodiscard]] const KVPair *operator->() const { Assert( IsValid() ); return reinterpret_cast< const KVPair * >( &data[0] ); }
+	[[nodiscard]] KVPair *Raw() { return reinterpret_cast< KVPair * >( &data[0] ); }
+	[[nodiscard]] KVPair *operator->() { Assert( IsValid() ); return reinterpret_cast< KVPair * >( &data[0] ); }
 
 	// Returns the ideal index of the data in this slot, or all bits set if invalid
 	[[nodiscard]] size_t FORCEINLINE IdealIndex( size_t slotmask ) const
 	{
-//#ifdef PLATFORM_64BITS
-//		return IdealIndex( flags_and_hash, slotmask ) | ( (int64)flags_and_hash >> 63 );
-//#else
-		return IdealIndex( flags_and_hash, slotmask ) | ( (int32)flags_and_hash >> 31 );
-//#endif
+#ifdef PLATFORM_64BITS
+		if constexpr ( std::is_same_v<storage_t, int64> )
+			return IdealIndex( flags_and_hash, slotmask ) | ( flags_and_hash >> 63 );
+		else
+#endif
+		if constexpr ( std::is_same_v<storage_t, int32> )
+			return IdealIndex( flags_and_hash, slotmask ) | ( flags_and_hash >> 31 );
+		else
+			return IdealIndex( flags_and_hash, slotmask ) | ( (int32)flags_and_hash >> 31 );
 	}
 
-	// Use template tricks to fully define only one function that takes either 16 or 32 bits
+	// Use template tricks to fully define only one function that takes either 16, 32 or 64 bits
 	// and performs different logic without using "if ( INT16_STORAGE )", because GCC and MSVC
 	// sometimes have trouble removing the constant branch, which is dumb... but whatever.
 	// 16-bit hashes are simply too narrow for large hashtables; more mask bits than hash bits!
 	// So we duplicate the hash bits. (Note: h *= MASK_HASH+2 is the same as h += h<<HASH_BITS)
-	using uint32_if16BitStorage = typename CTypeSelect<INT16_STORAGE, int16, undefined_t>::type;
-	using uint32_if32BitStorage = typename CTypeSelect<INT16_STORAGE, undefined_t, int32>::type;
-	//typedef typename CTypeSelect< INT32_STORAGE, undefined_t, int64 >::type uint32_if64BitStorage;
-	static FORCEINLINE uint32 IdealIndex( uint32_if16BitStorage h, size_t m )
+	using uint32_if16BitStorage = std::conditional_t<INT16_STORAGE, int16, undefined_t>;
+	using uint32_if32BitStorage = std::conditional_t<INT32_STORAGE, int32,
+#ifdef PLATFORM_64BITS
+		std::conditional_t<INT64_STORAGE, int64, undefined_t>>;
+#else
+		undefined_t>;
+#endif
+	[[nodiscard]] static FORCEINLINE size_t IdealIndex( uint32_if16BitStorage h, size_t m )
 	{
 		h &= MASK_HASH; h *= MASK_HASH + 2;
 		return h & m;
 	}
-	static FORCEINLINE uint32 IdealIndex( uint32_if32BitStorage h, size_t m )
+	[[nodiscard]] static FORCEINLINE size_t IdealIndex( uint32_if32BitStorage h, size_t m )
 	{
 		return h & m;
 	}
-	/*static FORCEINLINE uint32 IdealIndex( uint32_if64BitStorage h, size_t m )
-	{
-		return h & m;
-	}*/
 
 	// More efficient than memcpy for the small types that are stored in a hashtable
 	void MoveDataFrom( CUtlHashtableEntry &src )
@@ -176,9 +192,9 @@ protected:
 	using KeyAlt_t = typename ArgumentTypeInfo<AlternateKeyT>::Arg_t;
 	using entry_t = CUtlHashtableEntry<KeyT, ValueT>;
 
-	enum { FLAG_FREE = entry_t::FLAG_FREE };
-	enum { FLAG_LAST = entry_t::FLAG_LAST };
-	enum { MASK_HASH = entry_t::MASK_HASH };
+	const typename entry_t::storage_t FLAG_FREE = entry_t::FLAG_FREE;
+	const typename entry_t::storage_t FLAG_LAST = entry_t::FLAG_LAST;
+	const typename entry_t::storage_t MASK_HASH = entry_t::MASK_HASH;
 
 	CUtlMemory< entry_t > m_table;
 	intp m_nUsed;
@@ -191,23 +207,23 @@ protected:
 	void DoRealloc( intp size );
 
 	// Move an existing entry to a free slot, leaving a hole behind
-	void BumpEntry( unsigned int idx );
+	void BumpEntry( size_t idx );
 
 	// Insert an unconstructed KVPair at the primary slot
-	int DoInsertUnconstructed( unsigned int h, bool allowGrow );
+	size_t DoInsertUnconstructed( size_t h, bool allowGrow );
 
 	// Implementation for Insert functions, constructs a KVPair
 	// with either a default-construted or copy-constructed value
-	template <typename KeyParamT> handle_t DoInsert( KeyParamT k, unsigned int h );
-	template <typename KeyParamT> handle_t DoInsert( KeyParamT k, typename ArgumentTypeInfo<ValueT>::Arg_t v, unsigned int h, bool* pDidInsert );
-	template <typename KeyParamT> handle_t DoInsertNoCheck( KeyParamT k, typename ArgumentTypeInfo<ValueT>::Arg_t v, unsigned int h );
+	template <typename KeyParamT> handle_t DoInsert( KeyParamT k, size_t h );
+	template <typename KeyParamT> handle_t DoInsert( KeyParamT k, typename ArgumentTypeInfo<ValueT>::Arg_t v, size_t h, bool* pDidInsert );
+	template <typename KeyParamT> handle_t DoInsertNoCheck( KeyParamT k, typename ArgumentTypeInfo<ValueT>::Arg_t v, size_t h );
 
 	// Key lookup. Can also return previous-in-chain if result is chained.
-	template <typename KeyParamT> handle_t DoLookup( KeyParamT x, unsigned int h, handle_t *pPreviousInChain ) const;
+	template <typename KeyParamT> handle_t DoLookup( KeyParamT x, size_t h, handle_t *pPreviousInChain ) const;
 
 	// Remove single element by key + hash. Returns the index of the new hole
 	// that was created. Returns InvalidHandle() if element was not found. 
-	template <typename KeyParamT> int DoRemove( KeyParamT x, unsigned int h );
+	template <typename KeyParamT> intp DoRemove( KeyParamT x, size_t h );
 
 	// Friend CUtlStableHashtable so that it can call our Do* functions directly
 	template < typename K, typename V, typename S, typename H, typename E, typename A > friend class CUtlStableHashtable;
@@ -219,7 +235,7 @@ public:
 	CUtlHashtable( intp minimumSize, const KeyHashT &hash, KeyIsEqualT const &eq = KeyIsEqualT() )
 		: m_nUsed(0), m_nMinSize(MAX(8, minimumSize)), m_bSizeLocked(false), m_eq(eq), m_hash(hash) { }
 
-	CUtlHashtable( entry_t* pMemory, unsigned int nCount, const KeyHashT &hash = KeyHashT(), KeyIsEqualT const &eq = KeyIsEqualT() )
+	CUtlHashtable( entry_t* pMemory, uintp nCount, const KeyHashT &hash = KeyHashT(), KeyIsEqualT const &eq = KeyIsEqualT() )
 		: m_nUsed(0), m_nMinSize(8), m_bSizeLocked(false), m_eq(eq), m_hash(hash) { SetExternalBuffer( pMemory, nCount ); }
 
 	~CUtlHashtable() { RemoveAll(); }
@@ -231,17 +247,17 @@ public:
 	void SetExternalBuffer( entry_t* pBuffer, uintp nSize, bool bAssumeOwnership = false, bool bGrowable = false );
 
 	// Functor/function-pointer access
-	KeyHashT& GetHashRef() { return m_hash; }
-	KeyIsEqualT& GetEqualRef() { return m_eq; }
-	KeyHashT const &GetHashRef() const { return m_hash; }
-	KeyIsEqualT const &GetEqualRef() const { return m_eq; }
+	[[nodiscard]] KeyHashT& GetHashRef() { return m_hash; }
+	[[nodiscard]] KeyIsEqualT& GetEqualRef() { return m_eq; }
+	[[nodiscard]] KeyHashT const &GetHashRef() const { return m_hash; }
+	[[nodiscard]] KeyIsEqualT const &GetEqualRef() const { return m_eq; }
 
 	// Handle validation
 	[[nodiscard]] bool IsValidHandle( handle_t idx ) const { return (uintp)idx < (uintp)m_table.Count() && m_table[idx].IsValid(); }
-	static handle_t InvalidHandle() { return (handle_t) -1; }
+	[[nodiscard]] static constexpr handle_t InvalidHandle() { return (handle_t) -1; }
 
 	// Iteration functions
-	[[nodiscard]] handle_t FirstHandle() const { return NextHandle( (handle_t) -1 ); }
+	[[nodiscard]] handle_t FirstHandle() const { return NextHandle( InvalidHandle() ); }
 	[[nodiscard]] handle_t NextHandle( handle_t start ) const;
 
 	// Returns the number of unique keys in the table
@@ -249,31 +265,31 @@ public:
 
 
 	// Key lookup, returns InvalidHandle() if not found
-	handle_t Find( KeyArg_t k ) const { return DoLookup<KeyArg_t>( k, m_hash(k), NULL ); }
-	handle_t Find( KeyArg_t k, unsigned int hash) const { Assert( hash == m_hash(k) ); return DoLookup<KeyArg_t>( k, hash, NULL ); }
+	[[nodiscard]] handle_t Find( KeyArg_t k ) const { return DoLookup<KeyArg_t>( k, m_hash(k), NULL ); }
+	[[nodiscard]] handle_t Find( KeyArg_t k, size_t hash) const { Assert( hash == m_hash(k) ); return DoLookup<KeyArg_t>( k, hash, NULL ); }
 	// Alternate-type key lookup, returns InvalidHandle() if not found
-	handle_t Find( KeyAlt_t k ) const { return DoLookup<KeyAlt_t>( k, m_hash(k), NULL ); }
-	handle_t Find( KeyAlt_t k, unsigned int hash) const { Assert( hash == m_hash(k) ); return DoLookup<KeyAlt_t>( k, hash, NULL ); }
+	[[nodiscard]] handle_t Find( KeyAlt_t k ) const { return DoLookup<KeyAlt_t>( k, m_hash(k), NULL ); }
+	[[nodiscard]] handle_t Find( KeyAlt_t k, size_t hash) const { Assert( hash == m_hash(k) ); return DoLookup<KeyAlt_t>( k, hash, NULL ); }
 
 	// True if the key is in the table
-	bool HasElement( KeyArg_t k ) const { return InvalidHandle() != Find( k ); }
-	bool HasElement( KeyAlt_t k ) const { return InvalidHandle() != Find( k ); }
+	[[nodiscard]] bool HasElement( KeyArg_t k ) const { return InvalidHandle() != Find( k ); }
+	[[nodiscard]] bool HasElement( KeyAlt_t k ) const { return InvalidHandle() != Find( k ); }
 	
 	// Key insertion or lookup, always returns a valid handle
 	handle_t Insert( KeyArg_t k ) { return DoInsert<KeyArg_t>( k, m_hash(k) ); }
 	handle_t Insert( KeyArg_t k, ValueArg_t v, bool *pDidInsert = nullptr ) { return DoInsert<KeyArg_t>( k, v, m_hash(k), pDidInsert ); }
-	handle_t Insert( KeyArg_t k, ValueArg_t v, unsigned int hash, bool *pDidInsert = nullptr ) { Assert( hash == m_hash(k) ); return DoInsert<KeyArg_t>( k, v, hash, pDidInsert ); }
+	handle_t Insert( KeyArg_t k, ValueArg_t v, size_t hash, bool *pDidInsert = nullptr ) { Assert( hash == m_hash(k) ); return DoInsert<KeyArg_t>( k, v, hash, pDidInsert ); }
 	// Alternate-type key insertion or lookup, always returns a valid handle
 	handle_t Insert( KeyAlt_t k ) { return DoInsert<KeyAlt_t>( k, m_hash(k) ); }
 	handle_t Insert( KeyAlt_t k, ValueArg_t v, bool *pDidInsert = nullptr ) { return DoInsert<KeyAlt_t>( k, v, m_hash(k), pDidInsert ); }
-	handle_t Insert( KeyAlt_t k, ValueArg_t v, unsigned int hash, bool *pDidInsert = nullptr ) { Assert( hash == m_hash(k) ); return DoInsert<KeyAlt_t>( k, v, hash, pDidInsert ); }
+	handle_t Insert( KeyAlt_t k, ValueArg_t v, size_t hash, bool *pDidInsert = nullptr ) { Assert( hash == m_hash(k) ); return DoInsert<KeyAlt_t>( k, v, hash, pDidInsert ); }
 
 	// Key removal, returns false if not found
 	bool Remove( KeyArg_t k ) { return DoRemove<KeyArg_t>( k, m_hash(k) ) >= 0; }
-	bool Remove( KeyArg_t k, unsigned int hash ) { Assert( hash == m_hash(k) ); return DoRemove<KeyArg_t>( k, hash ) >= 0; }
+	bool Remove( KeyArg_t k, size_t hash ) { Assert( hash == m_hash(k) ); return DoRemove<KeyArg_t>( k, hash ) >= 0; }
 	// Alternate-type key removal, returns false if not found
 	bool Remove( KeyAlt_t k ) { return DoRemove<KeyAlt_t>( k, m_hash(k) ) >= 0; }
-	bool Remove( KeyAlt_t k, unsigned int hash ) { Assert( hash == m_hash(k) ); return DoRemove<KeyAlt_t>( k, hash ) >= 0; }
+	bool Remove( KeyAlt_t k, size_t hash ) { Assert( hash == m_hash(k) ); return DoRemove<KeyAlt_t>( k, hash ) >= 0; }
 
 	// Remove while iterating, returns the next handle for forward iteration
 	// Note: aside from this, ALL handles are invalid if an element is removed
@@ -289,7 +305,7 @@ public:
 	void Purge() { RemoveAll(); m_table.Purge(); }
 
 	// Reserve table capacity up front to avoid reallocation during insertions
-	void Reserve( int expected ) { if ( expected > m_nUsed ) DoRealloc( expected * 4 / 3 ); }
+	void Reserve( intp expected ) { if ( expected > m_nUsed ) DoRealloc( expected * 4 / 3 ); }
 
 	// Shrink to best-fit size, re-insert keys for optimal lookup
 	void Compact( bool bMinimal ) { DoRealloc( bMinimal ? m_nUsed : ( m_nUsed * 4 / 3 ) ); }
@@ -344,7 +360,7 @@ public:
 template <typename KeyT, typename ValueT, typename KeyHashT, typename KeyIsEqualT, typename AltKeyT>
 void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::SetExternalBuffer( byte* pRawBuffer, uintp nBytes, bool bAssumeOwnership, bool bGrowable )
 {
-	Assert( ((uintptr_t)pRawBuffer % __alignof(int)) == 0 );
+	Assert( ((uintptr_t)pRawBuffer % alignof(int)) == 0 );
 	uint32 bestSize = LargestPowerOfTwoLessThanOrEqual( nBytes / sizeof(entry_t) );
 	Assert( bestSize != 0 && bestSize*sizeof(entry_t) <= nBytes );
 
@@ -391,7 +407,7 @@ void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoRealloc( int
 	{
 		if ( pOldBase[i].IsValid() )
 		{
-			intp newIdx = DoInsertUnconstructed( pOldBase[i].flags_and_hash, false );
+			size_t newIdx = DoInsertUnconstructed( pOldBase[i].flags_and_hash, false );
 			pNewBase[newIdx].MoveDataFrom( pOldBase[i] );
 			if ( --nLeftToMove == 0 )
 				break;
@@ -403,7 +419,7 @@ void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoRealloc( int
 
 // Move an existing entry to a free slot, leaving a hole behind
 template <typename KeyT, typename ValueT, typename KeyHashT, typename KeyIsEqualT, typename AltKeyT>
-void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::BumpEntry( unsigned int idx )
+void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::BumpEntry( size_t idx )
 {
 	Assert( m_table[idx].IsValid() );
 	Assert( m_nUsed < m_table.Count() );
@@ -471,7 +487,7 @@ void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::BumpEntry( uns
 
 // Insert a value at the root position for that value's hash chain.
 template <typename KeyT, typename ValueT, typename KeyHashT, typename KeyIsEqualT, typename AltKeyT>
-int CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoInsertUnconstructed( unsigned int h, bool allowGrow )
+size_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoInsertUnconstructed( size_t h, bool allowGrow )
 {
 	if ( allowGrow && !m_bSizeLocked )
 	{
@@ -509,12 +525,12 @@ int CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoInsertUnconst
 // Key lookup. Can also return previous-in-chain if result is a chained slot.
 template <typename KeyT, typename ValueT, typename KeyHashT, typename KeyIsEqualT, typename AltKeyT>
 template <typename KeyParamT>
-UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoLookup( KeyParamT x, unsigned int h, handle_t *pPreviousInChain ) const
+UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoLookup( KeyParamT x, size_t h, handle_t *pPreviousInChain ) const
 {
 	if ( m_nUsed == 0 )
 	{
 		// Empty table.
-		return (handle_t) -1;
+		return InvalidHandle();
 	}
 
 	const entry_t* table = m_table.Base();
@@ -526,11 +542,11 @@ UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoL
 	if ( table[idx].IdealIndex( slotmask ) != chainid )
 	{
 		// Nothing in root position? No match.
-		return (handle_t) -1;
+		return InvalidHandle();
 	}
 
 	// Linear scan until found or end of chain
-	handle_t lastIdx = (handle_t) -1;
+	handle_t lastIdx = InvalidHandle();
 	while (1)
 	{
 		// Only examine this slot if it is valid and belongs to our hash chain
@@ -549,7 +565,7 @@ UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoL
 			if ( table[idx].flags_and_hash & FLAG_LAST )
 			{
 				// End of chain. No match.
-				return (handle_t) -1;
+				return InvalidHandle();
 			}
 
 			lastIdx = (handle_t) idx;
@@ -562,10 +578,10 @@ UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoL
 // Key insertion, or return index of existing key if found
 template <typename KeyT, typename ValueT, typename KeyHashT, typename KeyIsEqualT, typename AltKeyT>
 template <typename KeyParamT>
-UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoInsert( KeyParamT k, unsigned int h )
+UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoInsert( KeyParamT k, size_t h )
 {
 	handle_t idx = DoLookup<KeyParamT>( k, h, NULL );
-	if ( idx == (handle_t) -1 )
+	if ( idx == InvalidHandle() )
 	{
 		idx = (handle_t) DoInsertUnconstructed( h, true );
 		Construct( m_table[ idx ].Raw(), k );
@@ -576,10 +592,10 @@ UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoI
 // Key insertion, or return index of existing key if found
 template <typename KeyT, typename ValueT, typename KeyHashT, typename KeyIsEqualT, typename AltKeyT>
 template <typename KeyParamT>
-UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoInsert( KeyParamT k, typename ArgumentTypeInfo<ValueT>::Arg_t v, unsigned int h, bool *pDidInsert )
+UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoInsert( KeyParamT k, typename ArgumentTypeInfo<ValueT>::Arg_t v, size_t h, bool *pDidInsert )
 {
 	handle_t idx = DoLookup<KeyParamT>( k, h, NULL );
-	if ( idx == (handle_t) -1 )
+	if ( idx == InvalidHandle() )
 	{
 		idx = (handle_t) DoInsertUnconstructed( h, true );
 		Construct( m_table[ idx ].Raw(), k, v );
@@ -595,9 +611,9 @@ UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoI
 // Key insertion
 template <typename KeyT, typename ValueT, typename KeyHashT, typename KeyIsEqualT, typename AltKeyT>
 template <typename KeyParamT>
-UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoInsertNoCheck( KeyParamT k, typename ArgumentTypeInfo<ValueT>::Arg_t v, unsigned int h )
+UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoInsertNoCheck( KeyParamT k, typename ArgumentTypeInfo<ValueT>::Arg_t v, size_t h )
 {
-	Assert( DoLookup<KeyParamT>( k, h, NULL ) == (handle_t) -1 );
+	Assert( DoLookup<KeyParamT>( k, h, NULL ) == InvalidHandle() );
 	handle_t idx = (handle_t) DoInsertUnconstructed( h, true );
 	Construct( m_table[ idx ].Raw(), k, v );
 	return idx;
@@ -607,19 +623,19 @@ UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoI
 // Remove single element by key + hash. Returns the location of the new empty hole.
 template <typename KeyT, typename ValueT, typename KeyHashT, typename KeyIsEqualT, typename AltKeyT>
 template <typename KeyParamT>
-int CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoRemove( KeyParamT x, unsigned int h )
+intp CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoRemove( KeyParamT x, size_t h )
 {
-	unsigned int slotmask = m_table.Count()-1;
-	handle_t previous = (handle_t) -1;
-	int idx = (int) DoLookup<KeyParamT>( x, h, &previous );
-	if (idx == -1)
+	uintp slotmask = m_table.Count()-1;
+	handle_t previous = InvalidHandle();
+	auto idx = DoLookup<KeyParamT>( x, h, &previous );
+	if (idx == InvalidHandle())
 	{
 		return -1;
 	}
 
 	enum { FAKEFLAG_ROOT = 1 };
 	auto nLastAndRootFlags = m_table[idx].flags_and_hash & FLAG_LAST;
-	nLastAndRootFlags |= ( (uint)idx == m_table[idx].IdealIndex( slotmask ) );
+	nLastAndRootFlags |= ( (uintp)idx == m_table[idx].IdealIndex( slotmask ) );
 
 	// Remove from table
 	m_table[idx].MarkInvalid();
@@ -630,7 +646,7 @@ int CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoRemove( KeyPa
 	{
 		// This was the end of the chain - mark previous as last.
 		// (This isn't the root, so there must be a previous.)
-		Assert( previous != (handle_t) -1 );
+		Assert( previous != InvalidHandle() );
 		m_table[previous].flags_and_hash |= FLAG_LAST;
 	}
 
@@ -639,7 +655,7 @@ int CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoRemove( KeyPa
 		// If we are removing the root and there is more to the chain,
 		// scan to find the next chain entry and move it to the root.
 		auto chainid = entry_t::IdealIndex( h, slotmask );
-		unsigned int nextIdx = idx;
+		auto nextIdx = idx;
 		while (1)
 		{
 			nextIdx = (nextIdx + 1) & slotmask;
@@ -680,14 +696,14 @@ CUtlHashtable<K,V,H,E,A> &CUtlHashtable<K,V,H,E,A>::operator=( CUtlHashtable<K,V
 		}
 
 		const entry_t * srcTable = src.m_table.Base();
-		for ( int i = src.m_table.Count() - 1; i >= 0; --i )
+		for ( intp i = src.m_table.Count() - 1; i >= 0; --i )
 		{
 			if ( srcTable[i].IsValid() )
 			{
 				// If this assert trips, double-check that both hashtables
 				// have the same hash function pointers or hash functor state!
 				Assert( m_hash(srcTable[i]->m_key) == src.m_hash(srcTable[i]->m_key) );
-				int newIdx = DoInsertUnconstructed( srcTable[i].flags_and_hash , false );
+				size_t newIdx = DoInsertUnconstructed( srcTable[i].flags_and_hash , false );
 				CopyConstruct( m_table[newIdx].Raw(), *srcTable[i].Raw() ); // copy construct KVPair
 			}
 		}
@@ -702,9 +718,9 @@ UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::Rem
 	Assert( IsValidHandle( idx ) );
 
 	// TODO optimize, implement DoRemoveAt that does not need to re-evaluate equality in DoLookup
-	int hole = DoRemove< KeyArg_t >( m_table[idx]->m_key, m_table[idx].flags_and_hash & MASK_HASH );
+	auto hole = DoRemove< KeyArg_t >( m_table[idx]->m_key, m_table[idx].flags_and_hash & MASK_HASH );
 	// DoRemove returns the index of the element that it moved to fill the hole, if any.
-	if ( hole <= (int) idx )
+	if ( hole <= (intp) idx )
 	{
 		// Didn't fill, or filled from a previously seen element.
 		return NextHandle( idx );
@@ -755,12 +771,12 @@ template <typename KeyT, typename ValueT, typename KeyHashT, typename KeyIsEqual
 UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::NextHandle( handle_t start ) const
 {
 	const entry_t *table = m_table.Base();
-	for ( int i = (int)start + 1; i < m_table.Count(); ++i )
+	for ( intp i = (intp)start + 1; i < m_table.Count(); ++i )
 	{
 		if ( table[i].IsValid() )
 			return (handle_t) i;
 	}
-	return (handle_t) -1;
+	return InvalidHandle();
 }
 
 
@@ -823,7 +839,16 @@ public:
 	using KeyArg_t = typename ArgumentTypeInfo<KeyT>::Arg_t;
 	using ValueArg_t = typename ArgumentTypeInfo<ValueT>::Arg_t;
 	using KeyAlt_t = typename ArgumentTypeInfo<AlternateKeyT>::Arg_t;
-	using IndexStorage_t = typename CTypeSelect<sizeof(IndexStorageT) == 2, uint16, uint32>::type;
+	using IndexStorage_t =
+#ifdef PLATFORM_64BITS
+		std::conditional_t<sizeof(IndexStorageT) >= 5, uint64,
+#endif
+			std::conditional_t<sizeof(IndexStorageT) >= 3, uint32, uint16>
+#ifdef PLATFORM_64BITS
+		>;
+#else
+		;
+#endif
 
 protected:
 	COMPILE_TIME_ASSERT( sizeof( IndexStorage_t ) == sizeof( IndexStorageT ) );
@@ -927,32 +952,32 @@ protected:
 	struct HashProxy 
 	{
 		KeyHashT m_hash;
-		unsigned int operator()( IndirectIndex idx ) const
+		size_t operator()( IndirectIndex idx ) const
 		{
 			const intp tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetHashRef()) - 1024;
 			const intp owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
 			CUtlStableHashtable* pOwner = (CUtlStableHashtable*)((uintptr_t)this - owneroffset);
 			return m_hash( pOwner->m_data[ idx.m_index ].m_key );
 		}
-		unsigned int operator()( KeyArg_t k ) const { return m_hash( k ); }
-		unsigned int operator()( KeyAlt_t k ) const { return m_hash( k ); }
+		size_t operator()( KeyArg_t k ) const { return m_hash( k ); }
+		size_t operator()( KeyAlt_t k ) const { return m_hash( k ); }
 	};
 
 	struct EqualProxy
 	{
 		KeyIsEqualT m_eq;
-		unsigned int operator()( IndirectIndex lhs, IndirectIndex rhs ) const
+		size_t operator()( IndirectIndex lhs, IndirectIndex rhs ) const
 		{
 			return lhs.m_index == rhs.m_index;
 		}
-		unsigned int operator()( IndirectIndex lhs, KeyArg_t rhs ) const
+		size_t operator()( IndirectIndex lhs, KeyArg_t rhs ) const
 		{
 			const intp tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetEqualRef()) - 1024;
 			const intp owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
 			CUtlStableHashtable* pOwner = (CUtlStableHashtable*)((uintptr_t)this - owneroffset);
 			return m_eq( pOwner->m_data[ lhs.m_index ].m_key, rhs );
 		}
-		unsigned int operator()( IndirectIndex lhs, KeyAlt_t rhs ) const
+		size_t operator()( IndirectIndex lhs, KeyAlt_t rhs ) const
 		{
 			const intp tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetEqualRef()) - 1024;
 			const intp owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
@@ -981,12 +1006,12 @@ template <typename K, typename V, typename H, typename E, typename S, typename A
 template <typename KeyArgumentT>
 inline bool CUtlStableHashtable<K,V,H,E,S,A>::DoRemove( KeyArgumentT k )
 {
-	unsigned int hash = m_table.GetHashRef()( k );
+	auto hash = m_table.GetHashRef()( k );
 	UtlHashHandle_t h = m_table.template DoLookup<KeyArgumentT>( k, hash, NULL );
 	if ( h == m_table.InvalidHandle() )
 		return false;
 
-	int idx = m_table[ h ].m_index;
+	auto idx = m_table[ h ].m_index;
 	m_table.template DoRemove<IndirectIndex>( IndirectIndex( idx ), hash );
 	m_data.Remove( idx );
 	return true;
@@ -996,19 +1021,19 @@ template <typename K, typename V, typename H, typename E, typename S, typename A
 template <typename KeyArgumentT>
 inline UtlHashHandle_t CUtlStableHashtable<K,V,H,E,S,A>::DoFind( KeyArgumentT k ) const
 {
-	unsigned int hash = m_table.GetHashRef()( k );
+	auto hash = m_table.GetHashRef()( k );
 	UtlHashHandle_t h = m_table.template DoLookup<KeyArgumentT>( k, hash, nullptr );
 	if ( h != m_table.InvalidHandle() )
 		return m_table[ h ].m_index;
 
-	return (UtlHashHandle_t) -1;
+	return InvalidHandle();
 }
 
 template <typename K, typename V, typename H, typename E, typename S, typename A>
 template <typename KeyArgumentT>
 inline UtlHashHandle_t CUtlStableHashtable<K,V,H,E,S,A>::DoInsert( KeyArgumentT k )
 {
-	unsigned int hash = m_table.GetHashRef()( k );
+	auto hash = m_table.GetHashRef()( k );
 	UtlHashHandle_t h = m_table.template DoLookup<KeyArgumentT>( k, hash, nullptr );
 	if ( h != m_table.InvalidHandle() )
 		return m_table[ h ].m_index;
@@ -1023,7 +1048,7 @@ template <typename K, typename V, typename H, typename E, typename S, typename A
 template <typename KeyArgumentT, typename ValueArgumentT>
 inline UtlHashHandle_t CUtlStableHashtable<K,V,H,E,S,A>::DoInsert( KeyArgumentT k, ValueArgumentT v )
 {
-	unsigned int hash = m_table.GetHashRef()( k );
+	auto hash = m_table.GetHashRef()( k );
 	UtlHashHandle_t h = m_table.template DoLookup<KeyArgumentT>( k, hash, NULL );
 	if ( h != m_table.InvalidHandle() )
 		return m_table[ h ].m_index;

@@ -25,10 +25,10 @@ struct undefined_t;
 
 // CTypeSelect<sel,A,B>::type is a typedef of A if sel is nonzero, else B
 template <int sel, typename A, typename B>
-struct CTypeSelect { using type = A; };
+struct [[deprecated("Use std::conditional")]] CTypeSelect { using type = A; };
 
 template <typename A, typename B>
-struct CTypeSelect<0, A, B> { using type = B; };
+struct [[deprecated("Use std::conditional")]] CTypeSelect<0, A, B> { using type = B; };
 
 // CTypeEquals<A, B>::value is nonzero if A and B are the same type
 template <typename A, typename B, bool bIgnoreConstVolatile = false, bool bIgnoreReference = false>

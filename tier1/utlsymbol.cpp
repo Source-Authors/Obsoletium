@@ -280,7 +280,8 @@ class CUtlFilenameSymbolTable::HashTable
 		empty_t,
 		DefaultHashFunctor<CUtlConstString>,
 		DefaultEqualFunctor<CUtlConstString>,
-		uint32
+		// dimhotepus: uint32 -> size_t
+		size_t
 	>
 {
 };
@@ -369,7 +370,7 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindFileName( const char *pFileName )
 
 	alignas(FileNameHandle_t) FileNameHandleInternal_t handle;
 
-	static_assert( m_Strings->InvalidHandle() + 1 == 0 );
+	static_assert( HashTable::InvalidHandle() + 1 == 0 );
 
 	{
 		m_lock.LockForRead();
