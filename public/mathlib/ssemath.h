@@ -2197,7 +2197,7 @@ fltx4 XM_CALLCONV Pow_FixedPoint_Exponent_SIMD( DirectX::FXMVECTOR x, int expone
 [[nodiscard]]
 inline fltx4 XM_CALLCONV PowSIMD( DirectX::FXMVECTOR x, float exponent )
 {
-	return Pow_FixedPoint_Exponent_SIMD(x, (int)(4.0f * exponent));
+	return Pow_FixedPoint_Exponent_SIMD(x, static_cast<int>(4.0f * exponent));
 }
 
 
