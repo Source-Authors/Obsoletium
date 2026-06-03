@@ -233,7 +233,7 @@ extern "C" byte *GetStackPtr64();
 #ifdef _M_X64
 #define _REGISTER_ALIGNMENT 16ull
 
-int CalcAlignOffset( const unsigned char *p )
+[[nodiscard]] static int CalcAlignOffset( const unsigned char *p )
 {
 	return static_cast<int>( AlignValue( p, _REGISTER_ALIGNMENT ) - p );
 }
@@ -584,10 +584,10 @@ private:
 
 static thread_local CCoroutineMgr* g_ThreadLocalCoroutineMgr;
 
-CUtlVector< CCoroutineMgr * > g_VecPCoroutineMgr;
-CThreadMutex g_ThreadMutexCoroutineMgr;
+static CUtlVector< CCoroutineMgr * > g_VecPCoroutineMgr;
+static CThreadMutex g_ThreadMutexCoroutineMgr;
 
-CCoroutineMgr &GCoroutineMgr()
+static CCoroutineMgr &GCoroutineMgr()
 {
 	if ( !g_ThreadLocalCoroutineMgr )
 	{
@@ -639,7 +639,7 @@ HCoroutine Coroutine_Create( CoroutineFunc_t pFunc, void *pvParam )
 //-----------------------------------------------------------------------------
 static const char *k_pchDebugMsg_GenericBreak = (const char *)1;
 
-bool Internal_Coroutine_Continue( HCoroutine hCoroutine, const char *pchDebugMsg, const char *pchName )
+static bool Internal_Coroutine_Continue( HCoroutine hCoroutine, const char *pchDebugMsg, const char *pchName )
 {
 	Assert( GCoroutineMgr().IsValidCoroutine(hCoroutine) );
 
@@ -990,7 +990,7 @@ void Coroutine_Finish()
 //-----------------------------------------------------------------------------
 // Purpose: Coroutine that spawns another coroutine
 //-----------------------------------------------------------------------------
-void CoroutineTestFunc( void *pvRelaunch )
+static void CoroutineTestFunc( void *pvRelaunch )
 {
 	static const char *g_pchTestString = "test string";
 
@@ -1016,7 +1016,7 @@ void CoroutineTestFunc( void *pvRelaunch )
 
 
 // test that just spins a few times
-void CoroutineTestL2( void * )
+static void CoroutineTestL2( void * )
 {
 	// spin a few times
 	for ( int i = 0; i < 5; i++ )
@@ -1027,7 +1027,7 @@ void CoroutineTestL2( void * )
 
 
 // level 1 of a test
-void CoroutineTestL1( void *pvecCoroutineL2 )
+static void CoroutineTestL1( void *pvecCoroutineL2 )
 {
 	CUtlVector<HCoroutine> &vecCoroutineL2 = *(CUtlVector<HCoroutine> *)pvecCoroutineL2;
 
