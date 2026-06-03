@@ -1671,7 +1671,7 @@ class alignas(16) FourVectors : public CAlignedNewDelete<16>
 public:
 	fltx4 x, y, z;
 
-	FORCEINLINE void XM_CALLCONV DuplicateVector(Vector const &v)			//< set all 4 vectors to the same vector value
+	FORCEINLINE void XM_CALLCONV DuplicateVector(Vector const &v)			///< set all 4 vectors to the same vector value
 	{
 		x=ReplicateX4(v.x);
 		y=ReplicateX4(v.y);
@@ -1690,42 +1690,42 @@ public:
 		return *((&x)+idx);
 	}
 
-	FORCEINLINE void operator+=(FourVectors const &b)			//< add 4 vectors to another 4 vectors
+	FORCEINLINE void operator+=(FourVectors const &b)			///< add 4 vectors to another 4 vectors
 	{
 		x=AddSIMD(x,b.x);
 		y=AddSIMD(y,b.y);
 		z=AddSIMD(z,b.z);
 	}
 
-	FORCEINLINE void operator-=(FourVectors const &b)			//< subtract 4 vectors from another 4
+	FORCEINLINE void operator-=(FourVectors const &b)			///< subtract 4 vectors from another 4
 	{
 		x=SubSIMD(x,b.x);
 		y=SubSIMD(y,b.y);
 		z=SubSIMD(z,b.z);
 	}
 
-	FORCEINLINE void operator*=(FourVectors const &b)			//< scale all four vectors per component scale
+	FORCEINLINE void operator*=(FourVectors const &b)			///< scale all four vectors per component scale
 	{
 		x=MulSIMD(x,b.x);
 		y=MulSIMD(y,b.y);
 		z=MulSIMD(z,b.z);
 	}
 
-	FORCEINLINE void XM_CALLCONV operator*=(DirectX::FXMVECTOR scale)  //< scale 
+	FORCEINLINE void XM_CALLCONV operator*=(DirectX::FXMVECTOR scale)  ///< scale 
 	{
 		x=MulSIMD(x,scale);
 		y=MulSIMD(y,scale);
 		z=MulSIMD(z,scale);
 	}
 
-	FORCEINLINE void XM_CALLCONV operator*=(float scale)					//< uniformly scale all 4 vectors
+	FORCEINLINE void XM_CALLCONV operator*=(float scale)					///< uniformly scale all 4 vectors
 	{
 		fltx4 scalepacked = ReplicateX4(scale);
 		*this *= scalepacked;
 	}
 	
 	[[nodiscard]]
-	FORCEINLINE fltx4 XM_CALLCONV operator*(FourVectors const &b) const		//< 4 dot products
+	FORCEINLINE fltx4 XM_CALLCONV operator*(FourVectors const &b) const		///< 4 dot products
 	{
 		fltx4 dot=MulSIMD(x,b.x);
 		dot=MaddSIMD(y,b.y,dot);
@@ -1734,7 +1734,7 @@ public:
 	}
 	
 	[[nodiscard]]
-	FORCEINLINE fltx4 XM_CALLCONV operator*(Vector const &b) const			//< dot product all 4 vectors with 1 vector
+	FORCEINLINE fltx4 XM_CALLCONV operator*(Vector const &b) const			///< dot product all 4 vectors with 1 vector
 	{
 		fltx4 dot=MulSIMD(x,ReplicateX4(b.x));
 		dot=MaddSIMD(y,ReplicateX4(b.y), dot);
@@ -1742,20 +1742,20 @@ public:
 		return dot;
 	}
 
-	FORCEINLINE void VProduct(FourVectors const &b)				//< component by component mul //-V524
+	FORCEINLINE void VProduct(FourVectors const &b)				///< component by component mul //-V524
 	{
 		x=MulSIMD(x,b.x);
 		y=MulSIMD(y,b.y);
 		z=MulSIMD(z,b.z);
 	}
-	FORCEINLINE void MakeReciprocal()						//< (x,y,z)=(1/x,1/y,1/z)
+	FORCEINLINE void MakeReciprocal()						///< (x,y,z)=(1/x,1/y,1/z)
 	{
 		x=ReciprocalSIMD(x);
 		y=ReciprocalSIMD(y);
 		z=ReciprocalSIMD(z);
 	}
 
-	FORCEINLINE void MakeReciprocalSaturate()				//< (x,y,z)=(1/x,1/y,1/z), 1/0=1.0e23
+	FORCEINLINE void MakeReciprocalSaturate()				///< (x,y,z)=(1/x,1/y,1/z), 1/0=1.0e23
 	{
 		x=ReciprocalSaturateSIMD(x);
 		y=ReciprocalSaturateSIMD(y);
@@ -1828,7 +1828,7 @@ public:
 	}
 	
 	[[nodiscard]]
-	FORCEINLINE Vector XM_CALLCONV Vec(int idx) const						//< unpack one of the vectors
+	FORCEINLINE Vector XM_CALLCONV Vec(int idx) const						///< unpack one of the vectors
 	{
 		return { X(idx), Y(idx), Z(idx) };
 	}

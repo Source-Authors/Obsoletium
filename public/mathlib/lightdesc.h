@@ -33,18 +33,18 @@ enum LightType_OptimizationFlags_t
 
 struct LightDesc_t 
 {
-    LightType_t m_Type;										//< MATERIAL_LIGHT_xxx
-	Vector m_Color;											//< color+intensity 
-    Vector m_Position;										//< light source center position
-    Vector m_Direction;										//< for SPOT, direction it is pointing
-    float  m_Range;											//< distance range for light.0=infinite
-    float m_Falloff;										//< angular falloff exponent for spot lights
-    float m_Attenuation0;									//< constant distance falloff term
-    float m_Attenuation1;									//< linear term of falloff
-    float m_Attenuation2;									//< quadatic term of falloff
-    float m_Theta;											//< inner cone angle. no angular falloff 
-															//< within this cone
-    float m_Phi;											//< outer cone angle
+    LightType_t m_Type;										///< MATERIAL_LIGHT_xxx
+	Vector m_Color;											///< color+intensity 
+    Vector m_Position;										///< light source center position
+    Vector m_Direction;										///< for SPOT, direction it is pointing
+    float  m_Range;											///< distance range for light.0=infinite
+    float m_Falloff;										///< angular falloff exponent for spot lights
+    float m_Attenuation0;									///< constant distance falloff term
+    float m_Attenuation1;									///< linear term of falloff
+    float m_Attenuation2;									///< quadatic term of falloff
+    float m_Theta;											///< inner cone angle. no angular falloff 
+															///< within this cone
+    float m_Phi;											///< outer cone angle
 
 	// the values below are derived from the above settings for optimizations
 	// These aren't used by DX8. . used for software lighting.
