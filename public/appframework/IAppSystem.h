@@ -53,7 +53,9 @@ public:
 template<typename IInterface> 
 class CBaseAppSystem : public IInterface
 {
-public:
+ public:
+	virtual ~CBaseAppSystem() {}
+
 	// Here's where the app systems get to learn about each other 
 	bool Connect( CreateInterfaceFn ) override { return true; }
 	void Disconnect() override {}
@@ -78,6 +80,7 @@ public:
 	explicit CTier0AppSystem( bool bIsPrimaryAppSystem = true ) : m_bIsPrimaryAppSystem{ bIsPrimaryAppSystem }
 	{
 	}
+	~CTier0AppSystem() override {}
 
 protected:
 	// NOTE: a single DLL may have multiple AppSystems it's trying to
