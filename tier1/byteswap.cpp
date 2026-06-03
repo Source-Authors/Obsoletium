@@ -94,7 +94,8 @@ void CByteswap<isBigEndian>::SwapFieldsToTargetEndian( void *pOutputBuffer, cons
 	}
 }
 
-void InstantiateTemplates()
+// dimhotepus: Do not make static as template will not instantiated.
+[[maybe_unused]] void InstantiateTemplates()
 {
 	typedescription_t t = {};
 	datamap_t d = {};
