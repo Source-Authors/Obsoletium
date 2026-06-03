@@ -62,8 +62,8 @@ inline int CheckDeclareClass_Access( T *, const char *pShouldBe )
 #ifdef  VALIDATE_DECLARE_CLASS
 
 	#define DECLARE_CLASS( className, baseClassName ) \
-		typedef baseClassName BaseClass; \
-		typedef className ThisClass; \
+		using BaseClass = baseClassName; \
+		using ThisClass = className; \
 		template <typename T> friend int CheckDeclareClass_Access(T *, const char *pShouldBe); \
 		static int CheckDeclareClass( const char *pShouldBe ) \
 		{ \
@@ -74,8 +74,8 @@ inline int CheckDeclareClass_Access( T *, const char *pShouldBe )
 	// Use this macro when you have a base class, but it's part of a library that doesn't use network vars
 	// or any of the things that use ThisClass or BaseClass.
 	#define DECLARE_CLASS_GAMEROOT( className, baseClassName ) \
-		typedef baseClassName BaseClass; \
-		typedef className ThisClass; \
+		using BaseClass = baseClassName; \
+		using ThisClass = className; \
 		template <typename T> friend int CheckDeclareClass_Access(T *, const char *pShouldBe); \
 		static int CheckDeclareClass( const char *pShouldBe ) \
 		{ \
@@ -87,7 +87,7 @@ inline int CheckDeclareClass_Access( T *, const char *pShouldBe )
 		DECLARE_CLASS( className, baseClassName )
 
 	#define DECLARE_CLASS_NOBASE( className ) \
-		typedef className ThisClass; \
+		using ThisClass = className; \
 		template <typename T> friend int CheckDeclareClass_Access(T *, const char *pShouldBe); \
 		static int CheckDeclareClass( const char *pShouldBe ) \
 		{ \
@@ -96,13 +96,13 @@ inline int CheckDeclareClass_Access( T *, const char *pShouldBe )
 
 #else
 	#define DECLARE_CLASS( className, baseClassName ) \
-		typedef baseClassName BaseClass; \
-		typedef className ThisClass;
+		using BaseClass = baseClassName; \
+		using ThisClass = className;
 
 	#define DECLARE_CLASS_GAMEROOT( className, baseClassName )	DECLARE_CLASS( className, baseClassName )
 	#define DECLARE_CLASS_NOFRIEND( className, baseClassName )	DECLARE_CLASS( className, baseClassName )
 
-	#define DECLARE_CLASS_NOBASE( className )					typedef className ThisClass;
+	#define DECLARE_CLASS_NOBASE( className )					using ThisClass = className;
 #endif
 
 
