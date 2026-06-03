@@ -152,7 +152,7 @@ public:
 	[[nodiscard]] bool IsIdxValid( I i ) const							{ return (i >= 0) && (i < m_nAllocated); }
 
 	// Specify the invalid ('null') index that we'll only return on failure
-	static constexpr I INVALID_INDEX = ( I )-1; // For use with COMPILE_TIME_ASSERT
+	static constexpr I INVALID_INDEX = static_cast<I>(-1); // For use with COMPILE_TIME_ASSERT
 	[[nodiscard]] static constexpr I InvalidIndex() { return INVALID_INDEX; }
 
 	class Iterator_t

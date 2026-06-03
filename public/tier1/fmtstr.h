@@ -37,7 +37,7 @@
 		(szBuf)[(nBufSize)-1] = 0; \
 		if ( bTruncated && !(bQuietTruncation) && scAsserted < 5 ) \
 		{ \
-			Warning( "FmtStrVSNPrintf truncated to %d without QUIET_TRUNCATION specified!\n", ( int )( nBufSize ) ); \
+			Warning( "FmtStrVSNPrintf truncated to %d without QUIET_TRUNCATION specified!\n", static_cast<int>( nBufSize ) ); \
 			AssertMsg( 0, "FmtStrVSNPrintf truncated without QUIET_TRUNCATION specified!\n" ); \
 			scAsserted++; \
 		} \
@@ -310,10 +310,10 @@ public:
 
 	inline void SetBool( bool b )			{ Q_memcpy( m_szBuf, b ? "1" : "0", 2 ); } 
 
-	inline void SetInt8( int8 n8 )			{ V_to_chars( m_szBuf, (int32)n8 ); }
-	inline void SetUint8( uint8 un8 )		{ V_to_chars( m_szBuf, (int32)un8 ); }
-	inline void SetInt16( int16 n16 )		{ V_to_chars( m_szBuf, (int32)n16 ); }
-	inline void SetUint16( uint16 un16 )	{ V_to_chars( m_szBuf, (int32)un16 ); }
+	inline void SetInt8( int8 n8 )			{ V_to_chars( m_szBuf, static_cast<int32>(n8) ); }
+	inline void SetUint8( uint8 un8 )		{ V_to_chars( m_szBuf, static_cast<int32>(un8) ); }
+	inline void SetInt16( int16 n16 )		{ V_to_chars( m_szBuf, static_cast<int32>(n16) ); }
+	inline void SetUint16( uint16 un16 )	{ V_to_chars( m_szBuf, static_cast<int32>(un16) ); }
 	inline void SetInt32( int32 n32 )		{ V_to_chars( m_szBuf, n32 ); }
 	inline void SetUint32( uint32 un32 )	{ V_to_chars( m_szBuf, un32 ); }
 	inline void SetInt64( int64 n64 )		{ V_to_chars( m_szBuf, n64 ); }
