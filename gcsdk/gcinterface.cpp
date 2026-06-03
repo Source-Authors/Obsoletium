@@ -247,6 +247,13 @@ CGCInterface::CGCInterface()
 CGCInterface::~CGCInterface()
 {
 	m_BlockEmitStrings.PurgeAndDeleteElements();
+
+	// dimhotepus: Close parent process handle.
+	if ( m_hParentProcess )
+	{
+		CloseHandle( m_hParentProcess );
+	}
+
 	ClearAssertInfo();
 	delete m_pGC;
 }
@@ -960,6 +967,13 @@ bool CGCInterface::BAsyncShutdown()
 	bool bResult = false;
 	if ( m_pGC )
 		bResult = m_pGC->BAsyncShutdown();
+
+	// dimhotepus: Close parent process handle.
+	if ( m_hParentProcess )
+	{
+		CloseHandle( m_hParentProcess );
+		m_hParentProcess = nullptr;
+	}
 
 	//if they have requested a shutdown, go ahead and allow exit
 	g_bCrashIfExitDetected = false;
