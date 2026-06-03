@@ -204,9 +204,11 @@ static bool IsSteamProcessActive( DWORD nProcessID )
 		return false;
 
 	HANDLE hProcess = OpenProcess( PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION, FALSE, nProcessID );
-	bool bProcessActive = ( hProcess != 0 );
+	bool bProcessActive = hProcess != nullptr;
 	if ( bProcessActive )
 	{
+		RunCodeAtScopeExit(CloseHandle( hProcess ));
+
 		DWORD nExitCode;
 		BOOL bOk = GetExitCodeProcess( hProcess, &nExitCode );
 		if ( !bOk || ( nExitCode != STILL_ACTIVE ) )
@@ -215,7 +217,6 @@ static bool IsSteamProcessActive( DWORD nProcessID )
 		}
 	}
 
-	CloseHandle( hProcess );
 	return bProcessActive;
 }
 
@@ -226,10 +227,11 @@ static void TerminateSteamProcess( DWORD nProcessID )
 		return;
 
 	HANDLE hProcess = OpenProcess( PROCESS_TERMINATE, FALSE, nProcessID );
-	if ( hProcess != 0 )
+	if ( hProcess )
 	{
-		TerminateProcess( hProcess, 0 );
-		CloseHandle( hProcess );
+		RunCodeAtScopeExit( CloseHandle( hProcess ) );
+
+		TerminateProcess( hProcess, -1 );
 	}
 }
 

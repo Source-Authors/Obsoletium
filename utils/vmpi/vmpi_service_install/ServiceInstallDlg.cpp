@@ -416,93 +416,96 @@ bool StopRunningApp()
 	
 	// Send the 
 	ISocket *pSocket = CreateIPSocket();
-	if ( pSocket )
+	if ( !pSocket )
 	{
-		if ( pSocket->BindToAny( 0 ) )
-		{
-			CUtlVector<char> protocolVersions;
-			protocolVersions.AddToTail( VMPI_PROTOCOL_VERSION );
-			if ( VMPI_PROTOCOL_VERSION == 5 )
-				protocolVersions.AddToTail( 4 );	// We want this installer to kill the previous services too.
-			
-			for ( int iProtocolVersion=0; iProtocolVersion < protocolVersions.Count(); iProtocolVersion++ )
-			{
-				char cPacket[4] =
-				{
-					protocolVersions[iProtocolVersion],
-					VMPI_PASSWORD_OVERRIDE,	// (force it to accept this message).
-					0,
-					VMPI_STOP_SERVICE
-				};
-				
-				CIPAddr addr( 127, 0, 0, 1, 0 );
-				
-				for ( int iPort=VMPI_SERVICE_PORT; iPort <= VMPI_LAST_SERVICE_PORT; iPort++ )
-				{
-					addr.port = iPort;
-					pSocket->SendTo( &addr, cPacket, sizeof( cPacket ) );
-				}
-			}
-			
-			// Give it a sec to get the message and shutdown in case we're restarting.
-			Sleep( 2000 );
-			
-			
-			// This is the overkill method. If it didn't shutdown gracefully, kill it.
-			HMODULE hInst = LoadLibrary( "psapi.dll" );
-			if ( hInst )
-			{
-				typedef BOOL (WINAPI *EnumProcessesFn)(DWORD *lpidProcess, DWORD cb, DWORD *cbNeeded);
-				typedef BOOL (WINAPI *EnumProcessModulesFn)(HANDLE hProcess, HMODULE *lphModule, DWORD cb, LPDWORD lpcbNeeded );
-				typedef DWORD (WINAPI *GetModuleBaseNameFn)( HANDLE hProcess, HMODULE hModule, LPTSTR lpBaseName, DWORD nSize );
-				
-				EnumProcessesFn EnumProcesses = (EnumProcessesFn)GetProcAddress( hInst, "EnumProcesses" );
-				EnumProcessModulesFn EnumProcessModules = (EnumProcessModulesFn)GetProcAddress( hInst, "EnumProcessModules" );
-				GetModuleBaseNameFn GetModuleBaseName = (GetModuleBaseNameFn)GetProcAddress( hInst, "GetModuleBaseNameA" );
-				if ( EnumProcessModules && EnumProcesses )
-				{				
-					// Now just to make sure, kill the processes we're interested in.
-					DWORD procIDs[1024];
-					DWORD nBytes;
-					if ( EnumProcesses( procIDs, sizeof( procIDs ), &nBytes ) )
-					{
-						DWORD nProcs = nBytes / sizeof( procIDs[0] );
-						for ( DWORD i=0; i < nProcs; i++ )
-						{
-							HANDLE hProc = OpenProcess( PROCESS_ALL_ACCESS, FALSE, procIDs[i] );
-							if ( hProc )
-							{
-								HMODULE hModules[1024];
-								if ( EnumProcessModules( hProc, hModules, sizeof( hModules ), &nBytes ) )
-								{
-									DWORD nModules = nBytes / sizeof( hModules[0] );
-									for ( DWORD iModule=0; iModule < nModules; iModule++ )
-									{
-										char filename[512];
-										if ( GetModuleBaseName( hProc, hModules[iModule], filename, sizeof( filename ) ) )
-										{
-											if ( Q_stristr( filename, "vmpi_service.exe" ) || Q_stristr( filename, "vmpi_service_ui.exe" ) )
-											{
-												TerminateProcess( hProc, 1 );
-												CloseHandle( hProc );
-												hProc = NULL;
-												break;
-											}
-										}
-									}
-								}
+		return true;
+	}
 
-								CloseHandle( hProc );
+	RunCodeAtScopeExit( pSocket->Release() );
+
+	if ( pSocket->BindToAny( 0 ) )
+	{
+		CUtlVector<char> protocolVersions;
+		protocolVersions.AddToTail( VMPI_PROTOCOL_VERSION );
+		if ( VMPI_PROTOCOL_VERSION == 5 )
+			protocolVersions.AddToTail( 4 );	// We want this installer to kill the previous services too.
+			
+		for ( int iProtocolVersion=0; iProtocolVersion < protocolVersions.Count(); iProtocolVersion++ )
+		{
+			char cPacket[4] =
+			{
+				protocolVersions[iProtocolVersion],
+				VMPI_PASSWORD_OVERRIDE,	// (force it to accept this message).
+				0,
+				VMPI_STOP_SERVICE
+			};
+				
+			CIPAddr addr( 127, 0, 0, 1, 0 );
+			
+			for ( int iPort=VMPI_SERVICE_PORT; iPort <= VMPI_LAST_SERVICE_PORT; iPort++ )
+			{
+				addr.port = iPort;
+				pSocket->SendTo( &addr, cPacket, sizeof( cPacket ) );
+			}
+		}
+			
+		// Give it a sec to get the message and shutdown in case we're restarting.
+		Sleep( 2000 );
+
+		// This is the overkill method. If it didn't shutdown gracefully, kill it.
+		HMODULE hInst = LoadLibrary( "psapi.dll" );
+		if ( !hInst )
+		{
+			return true;
+		}
+
+		RunCodeAtScopeExit(	FreeLibrary( hInst ) );
+
+		using auto EnumProcessesFn = decltype(&EnumProcesses);
+		using auto EnumProcessModulesFn = decltype(&EnumProcessModules);
+		using auto GetModuleBaseName = decltype(&GetModuleBaseNameA);
+			
+		const auto EnumProcesses = (EnumProcessesFn)GetProcAddress( hInst, "EnumProcesses" );
+		const auto EnumProcessModules = (EnumProcessModulesFn)GetProcAddress( hInst, "EnumProcessModules" );
+		const auto GetModuleBaseName = (GetModuleBaseNameFn)GetProcAddress( hInst, "GetModuleBaseNameA" );
+		if ( EnumProcessModules && EnumProcesses )
+		{				
+			// Now just to make sure, kill the processes we're interested in.
+			DWORD procIDs[1024];
+			DWORD nBytes;
+			if ( EnumProcesses( procIDs, sizeof( procIDs ), &nBytes ) )
+			{
+				DWORD nProcs = nBytes / sizeof( procIDs[0] );
+				for ( DWORD i=0; i < nProcs; i++ )
+				{
+					HANDLE hProc = OpenProcess( PROCESS_ALL_ACCESS, FALSE, procIDs[i] );
+					if ( !hProc )
+					{
+						continue;
+					}
+					
+					RunCodeAtScopeExit(	CloseHandle( hProc ) );
+
+					HMODULE hModules[1024];
+					if ( EnumProcessModules( hProc, hModules, sizeof( hModules ), &nBytes ) )
+					{
+						DWORD nModules = nBytes / sizeof( hModules[0] );
+						for ( DWORD iModule=0; iModule < nModules; iModule++ )
+						{
+							char filename[512];
+							if ( GetModuleBaseName( hProc, hModules[iModule], filename, sizeof( filename ) ) )
+							{
+								if ( Q_stristr( filename, "vmpi_service.exe" ) || Q_stristr( filename, "vmpi_service_ui.exe" ) )
+								{
+									TerminateProcess( hProc, 1 );
+									break;
+								}
 							}
 						}
 					}
 				}
-
-				FreeLibrary( hInst );
 			}
 		}
-
-		pSocket->Release();
 	}
 
 	return true;

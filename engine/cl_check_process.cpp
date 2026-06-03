@@ -204,7 +204,7 @@ int CheckOtherInstancesWithEnumProcess( const char *thisProcessNameShort )
 				FALSE,
 				nLastProcess );
 	
-			if ( process != NULL )
+			if ( process )
 			{
 				RunCodeAtScopeExit(CloseHandle( process ));
 

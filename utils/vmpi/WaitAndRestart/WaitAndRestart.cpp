@@ -76,6 +76,8 @@ Sleep(5000);
 		HANDLE hProcess = OpenProcess( PROCESS_QUERY_INFORMATION | SYNCHRONIZE, false, dwProcessId );
 		if ( hProcess )
 		{
+			RunCodeAtScopeExit( CloseHandle( hProcess ) );
+
 			while ( 1 )
 			{
 				DWORD val = WaitForSingleObject( hProcess, 100 );
@@ -99,8 +101,6 @@ Sleep(5000);
 		{
 			PrintLog( "Process %lu not running. Continuing.\n", dwProcessId );
 		}
-		
-		CloseHandle( hProcess );
 	}
 	else
 	{
