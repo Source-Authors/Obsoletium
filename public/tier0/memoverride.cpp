@@ -1098,7 +1098,9 @@ class ErrorHandlerRegistrar {
  private:
   _purecall_handler old_pure_;
   _invalid_parameter_handler old_invalid_;
-} s_ErrorHandlerRegistration;
+};
+
+static ErrorHandlerRegistrar s_ErrorHandlerRegistration;
 
 }  // namespace
 
