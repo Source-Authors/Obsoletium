@@ -76,7 +76,7 @@ public:
 		CCommandHashHandle_t handle;
 
 		CCommandHashIterator_t(intp _bucket, const CCommandHashHandle_t &_handle) 
-			: bucket(_bucket), handle(_handle) {};
+			: bucket(_bucket), handle(_handle) {}
 	};
 	[[nodiscard]] inline CCommandHashIterator_t First() const;
 	[[nodiscard]] inline CCommandHashIterator_t Next( const CCommandHashIterator_t &hHash ) const;
@@ -102,7 +102,7 @@ protected:
 		ConCommandBase *m_Data;
 
 		HashEntry_t(unsigned int _hash, ConCommandBase * _cmd)
-			: m_uiKey(_hash), m_Data(_cmd) {};
+			: m_uiKey(_hash), m_Data(_cmd) {}
 
 		HashEntry_t() : HashEntry_t{0, nullptr} {}
 	};
