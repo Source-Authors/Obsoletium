@@ -32,6 +32,10 @@
 #include "tier1/utlvector.h"
 #include <csetjmp>
 
+#ifdef __SANITIZE_ADDRESS__
+#include <sanitizer/asan_interface.h>
+#endif
+
 // for debugging
 //#define CHECK_STACK_CORRUPTION
 
@@ -189,8 +193,8 @@ static constexpr inline int k_iSetJmpDone		= 0x02;
 static constexpr inline int k_iSetJmpDbgBreak	= 0x03;
 
 // distance up the stack that coroutine functions stacks' start
-static constexpr inline int k_cubCoroutineStackGap = (64 * 1024);	
-static constexpr inline int k_cubCoroutineStackGapSmall = 64;	
+static constexpr inline int k_cubCoroutineStackGap = (64 * 1024);
+static constexpr inline int k_cubCoroutineStackGapSmall = 64;
 
 // Warning size for allocated stacks
 #ifdef _DEBUG
@@ -295,6 +299,11 @@ public:
 
 	FORCEINLINE void RestoreStack()
 	{
+		// dimhotepus: AddressSanitizer and dynamic stack doesn't work well.
+#ifdef __SANITIZE_ADDRESS__
+		__asan_handle_no_return();
+#endif
+
 		if ( m_cubSavedStack )
 		{
 			Assert( m_pStackHigh );
@@ -365,6 +374,11 @@ public:
 
 	FORCEINLINE void SaveStack()
 	{
+		// dimhotepus: AddressSanitizer and dynamic stack doesn't work well.
+#ifdef __SANITIZE_ADDRESS__
+		__asan_handle_no_return();
+#endif
+
 		MEM_ALLOC_CREDIT_( "Coroutine saved stack" );
 		if ( m_pSavedStack )
 		{

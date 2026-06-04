@@ -51,6 +51,7 @@
 #include "cl_steamauth.h"
 #include "tier0/etwprof.h"
 #include "tier2/tier2.h"
+#include "vstdlib/coroutine.h"
 
 // dimhotepus: NO_STEAM
 #ifdef NO_STEAM
@@ -959,8 +960,16 @@ int Sys_InitGame( CreateInterfaceFn appSystemFactory, const char* pBaseDir, void
 #if defined(_DEBUG)
 	if( !CommandLine()->FindParm( "-nodttest" ) && !CommandLine()->FindParm( "-dti" ) )
 	{
-		RunDataTableTest();	
+		RunDataTableTest();
 	}
+
+	// dimhotepus: Add coroutine self-tests.
+#ifdef PLATFORM_INTEL 
+	if ( !CommandLine()->FindParm( "-nocoroutinetest" ))
+	{
+		Coroutine_Test();
+	}
+#endif
 #endif
 
 	// NOTE: Can't use COM_CheckParm here because it hasn't been set up yet.
