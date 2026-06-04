@@ -975,13 +975,13 @@ static void CoroutineTestFunc( void *pvRelaunch )
 	static const char *g_pchTestString = "test string";
 
 	char rgchT[256];
-	Q_strncpy( rgchT, g_pchTestString, sizeof(rgchT) );
+	V_strcpy_safe( rgchT, g_pchTestString );
 
 	// yield
 	Coroutine_YieldToMain();
 
 	// ensure the string is still valid
-	DbgVerifyNot( Q_strcmp( rgchT, g_pchTestString ) );
+	DbgVerify( V_streq( rgchT, g_pchTestString ) );
 
 	if ( !pvRelaunch )
 	{
