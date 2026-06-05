@@ -824,7 +824,7 @@ void	GLMDisplayDB::PopulateRenderers( void )
 					int problems = 0;
 					
 					GLMRendererInfoFields	fields;
-					memset( &fields, 0, sizeof(fields) );
+					BitwiseClear( fields );
 
 					// early out if renderer ID already in the table
 					cgl_err = CGLDescribeRenderer( cgl_rend, j,   kCGLRPRendererID, &fields.m_rendererID );			problems += (cgl_err != 0);
@@ -1287,7 +1287,7 @@ int		GLMDisplayDB::GetRendererCount( void )
 
 bool	GLMDisplayDB::GetRendererInfo( int rendererIndex, GLMRendererInfoFields *infoOut )
 {
-	memset( infoOut, 0, sizeof( GLMRendererInfoFields ) );
+	BitwiseClear( *infoOut );
 
 	if (rendererIndex >= GetRendererCount())
 		return true; // fail
@@ -1310,7 +1310,7 @@ int		GLMDisplayDB::GetDisplayCount( int rendererIndex )
 
 bool	GLMDisplayDB::GetDisplayInfo( int rendererIndex, int displayIndex, GLMDisplayInfoFields *infoOut )
 {
-	memset( infoOut, 0, sizeof( GLMDisplayInfoFields ) );
+	BitwiseClear( *infoOut );
 	
 	if (rendererIndex >= GetRendererCount())
 		return true; // fail
@@ -1339,7 +1339,7 @@ int		GLMDisplayDB::GetModeCount( int rendererIndex, int displayIndex )
 
 bool	GLMDisplayDB::GetModeInfo( int rendererIndex, int displayIndex, int modeIndex, GLMDisplayModeInfoFields *infoOut )
 {
-	memset( infoOut, 0, sizeof( GLMDisplayModeInfoFields ) );
+	BitwiseClear( *infoOut );
 	
 	if (rendererIndex >= GetRendererCount())
 		return true; // fail
@@ -1418,7 +1418,7 @@ bool	GLMDisplayDB::GetModeInfo( int rendererIndex, int displayIndex, int modeInd
 		}
 
 		// if we get here, we could not find the mode
-		memset( infoOut, 0, sizeof( *infoOut ) );
+		BitwiseClear( *infoOut );
 		return true; // fail
 	}
 	return false;

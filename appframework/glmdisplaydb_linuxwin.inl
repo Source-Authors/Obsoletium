@@ -9,20 +9,20 @@
 
 //===============================================================================
 
-GLMRendererInfo::GLMRendererInfo( void )
+GLMRendererInfo::GLMRendererInfo()
+        : m_display{ nullptr }
 {
-        m_display = NULL;
-        Q_memset( &m_info, 0, sizeof( m_info ) );
+        BitwiseClear( m_info );
 }
 
-GLMRendererInfo::~GLMRendererInfo( void )
+GLMRendererInfo::~GLMRendererInfo()
 {
         SDLAPP_FUNC;
 
         if (m_display)
         {
                 delete m_display;
-                m_display = NULL;
+                m_display = nullptr;
         }
 }
 
@@ -32,7 +32,7 @@ void GLMRendererInfo::Init( GLMRendererInfoFields *info )
         SDLAPP_FUNC;
 
         m_info = *info;
-        m_display = NULL;
+        m_display = nullptr;
 
         m_info.m_fullscreen = 0;
         m_info.m_accelerated = 1;
@@ -175,7 +175,7 @@ GLMDisplayDB::GLMDisplayDB ()
 {
         SDLAPP_FUNC;
 
-        m_renderer.m_display = NULL;    
+        m_renderer.m_display = nullptr;    
 }
 
 GLMDisplayDB::~GLMDisplayDB     ( void )
@@ -185,7 +185,7 @@ GLMDisplayDB::~GLMDisplayDB     ( void )
         if ( m_renderer.m_display )
         {
                 delete m_renderer.m_display;
-                m_renderer.m_display = NULL;
+                m_renderer.m_display = nullptr;
         }
 }
 
@@ -220,7 +220,7 @@ void GLMDisplayDB::PopulateRenderers( void )
         Assert( !m_renderer.m_display );
 
         GLMRendererInfoFields   fields;
-        memset( &fields, 0, sizeof(fields) );
+        BitwiseClear( fields );
 
         // Assume 512MB of available video memory
         fields.m_vidMemory = 512 * 1024 * 1024;
@@ -375,7 +375,7 @@ bool    GLMDisplayDB::GetRendererInfo( int rendererIndex, GLMRendererInfoFields 
 {
         SDLAPP_FUNC;
 
-        memset( infoOut, 0, sizeof( GLMRendererInfoFields ) );
+        BitwiseClear( *infoOut );
 
         if (rendererIndex >= GetRendererCount())
                 return true; // fail
@@ -402,7 +402,7 @@ bool    GLMDisplayDB::GetDisplayInfo( int rendererIndex, int displayIndex, GLMDi
 {
         SDLAPP_FUNC;
 
-        memset( infoOut, 0, sizeof( GLMDisplayInfoFields ) );
+        BitwiseClear( *infoOut );
         
         if (rendererIndex >= GetRendererCount())
                 return true; // fail
@@ -432,7 +432,7 @@ bool    GLMDisplayDB::GetModeInfo( int rendererIndex, int displayIndex, int mode
 {
         SDLAPP_FUNC;
 
-        memset( infoOut, 0, sizeof( GLMDisplayModeInfoFields ) );
+        BitwiseClear( *infoOut );
         
         if ( rendererIndex >= GetRendererCount())
                 return true; // fail
@@ -479,7 +479,7 @@ GLMDisplayInfo::GLMDisplayInfo()
 {
         SDLAPP_FUNC;
 
-        m_modes = NULL;
+        m_modes = nullptr;
 
         int Width, Height;
         GetLargestDisplaySize( Width, Height );
