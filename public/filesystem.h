@@ -527,6 +527,13 @@ public:
 	// Reads/writes files to utlbuffers. Use this for optimal read performance when doing open/read/close
 	//--------------------------------------------------------
 	virtual bool			ReadFile( const char *pFileName, const char *pPath, CUtlBuffer &buf, int nMaxBytes = 0, int nStartingByte = 0, FSAllocFunc_t pfnAlloc = nullptr ) = 0;
+	// dimhotepus: For automatic size deduction.
+	template<typename T>
+	bool					ReadFile( const char *pFileName, const char *pPath, CUtlBuffer &buf, int nStartingByte = 0, FSAllocFunc_t pfnAlloc = nullptr )
+	{
+		return ReadFile( pFileName, pPath, buf, sizeof(T), nStartingByte, pfnAlloc );
+	}
+	
 	virtual bool			WriteFile( const char *pFileName, const char *pPath, CUtlBuffer &buf ) = 0;
 	virtual bool			UnzipFile( const char *pFileName, const char *pPath, const char *pDestination ) = 0;
 };

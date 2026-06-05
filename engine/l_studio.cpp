@@ -3645,7 +3645,7 @@ void CModelRender::ValidateStaticPropColorData( ModelInstanceHandle_t handle )
 		}
 	}
 
-	if ( !g_pFileSystem->ReadFile( fileName, "GAME", utlBuf, sizeof( HardwareVerts::FileHeader_t ), 0 ) )
+	if ( !g_pFileSystem->ReadFile<HardwareVerts::FileHeader_t>( fileName, "GAME", utlBuf ) )
 	{
 		// not available
 		return;

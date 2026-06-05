@@ -111,7 +111,7 @@ bool IsPSDFile( CUtlBuffer &buf )
 bool IsPSDFile( const char *pFileName, const char *pPathID )
 {
 	CUtlBuffer buf;
-	if ( !g_pFullFileSystem->ReadFile( pFileName, pPathID, buf, sizeof(PSDHeader_t) ) )
+	if ( !g_pFullFileSystem->ReadFile<PSDHeader_t>( pFileName, pPathID, buf ) )
 	{
 		Warning( "Unable to read file %s\n", pFileName );
 		return false;
@@ -148,7 +148,7 @@ bool PSDGetInfo( CUtlBuffer &buf, int *pWidth, int *pHeight, ImageFormat *pImage
 bool PSDGetInfo( const char *pFileName, const char *pPathID, int *pWidth, int *pHeight, ImageFormat *pImageFormat, float *pSourceGamma )
 {
 	CUtlBuffer buf;
-	if ( !g_pFullFileSystem->ReadFile( pFileName, pPathID, buf, sizeof(PSDHeader_t) ) )
+	if ( !g_pFullFileSystem->ReadFile<PSDHeader_t>( pFileName, pPathID, buf ) )
 	{
 		Warning( "Unable to read file %s\n", pFileName );
 		return false;
@@ -480,7 +480,7 @@ bool PSDReadFileRGBA8888( CUtlBuffer &buf, Bitmap_t &bitmap )
 bool PSDReadFileRGBA8888( const char *pFileName, const char *pPathID, Bitmap_t &bitmap )
 {
 	CUtlStreamBuffer buf( pFileName, pPathID, CUtlBuffer::READ_ONLY );
-	if ( !g_pFullFileSystem->ReadFile( pFileName, pPathID, buf, sizeof(PSDHeader_t) ) )
+	if ( !g_pFullFileSystem->ReadFile<PSDHeader_t>( pFileName, pPathID, buf ) )
 	{
 		Warning( "Unable to read file %s\n", pFileName );
 		return false;
