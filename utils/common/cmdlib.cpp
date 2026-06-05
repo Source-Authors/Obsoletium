@@ -80,7 +80,7 @@ char *CmdLib_FGets(char *pOut, int outSize, FileHandle_t hFile) {
   int it = 0;
   for (; it < (outSize - 1); it++) {
     char c;
-    if (!g_pFileSystem->Read(&c, 1, hFile)) {
+    if (!g_pFileSystem->Read(c, hFile)) {
       if (it == 0) return nullptr;
 
       break;

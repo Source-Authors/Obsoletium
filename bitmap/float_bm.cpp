@@ -116,7 +116,7 @@ FloatBitMap_t::FloatBitMap_t(FloatBitMap_t const *orig) : FloatBitMap_t{}
 static char GetChar(IFileSystem *file_system, FileHandle_t &f)
 {
 	char a;
-	file_system->Read(&a,1,f);
+	file_system->Read(a,f);
 	return a;
 }
 

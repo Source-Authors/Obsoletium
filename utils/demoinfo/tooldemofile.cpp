@@ -35,8 +35,8 @@ void CToolDemoFile::ReadSequenceInfo(int &nSeqNrIn, int &nSeqNrOut)
 {
 	Assert( m_hDemoFile != FILESYSTEM_INVALID_HANDLE );
 
-	g_pFileSystem->Read( &nSeqNrIn, sizeof(int), m_hDemoFile );
-	g_pFileSystem->Read( &nSeqNrOut, sizeof(int), m_hDemoFile );
+	g_pFileSystem->Read( nSeqNrIn, m_hDemoFile );
+	g_pFileSystem->Read( nSeqNrOut, m_hDemoFile );
 }
 
 //-----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ void CToolDemoFile::ReadSequenceInfo(int &nSeqNrIn, int &nSeqNrOut)
 void CToolDemoFile::ReadCmdInfo( democmdinfo_t& info )
 {
 	Assert( m_hDemoFile != FILESYSTEM_INVALID_HANDLE );
-	g_pFileSystem->Read( &info, sizeof( democmdinfo_t ), m_hDemoFile );
+	g_pFileSystem->Read( info, m_hDemoFile );
 }
 
 //-----------------------------------------------------------------------------
@@ -59,7 +59,7 @@ void CToolDemoFile::ReadCmdHeader( unsigned char& cmd, int& tick )
 	Assert( m_hDemoFile != FILESYSTEM_INVALID_HANDLE );
 
 	// Read the command
-	int r = g_pFileSystem->Read ( &cmd, sizeof(byte), m_hDemoFile );
+	int r = g_pFileSystem->Read ( cmd, m_hDemoFile );
 	
 	if ( r <=0 )
 	{
@@ -71,7 +71,7 @@ void CToolDemoFile::ReadCmdHeader( unsigned char& cmd, int& tick )
 	Assert( cmd >= 1 && cmd <= dem_lastcmd );
 
 	// Read the timestamp
-	g_pFileSystem->Read ( &tick, sizeof(int), m_hDemoFile );
+	g_pFileSystem->Read ( tick, m_hDemoFile );
 	
 	tick = LittleDWord( tick );
 }
@@ -104,7 +104,7 @@ int CToolDemoFile::ReadNetworkDataTables( CUtlBuffer *buf )
 	char data[ 1024 ];
 	int length;
 
-	g_pFileSystem->Read( &length, sizeof( int ), m_hDemoFile );
+	g_pFileSystem->Read( length, m_hDemoFile );
 
 	while( length > 0 )
 	{
@@ -131,7 +131,7 @@ int CToolDemoFile::ReadUserCmd( char *buffer, int &size )
 
 	int outgoing_sequence;
 	
-	g_pFileSystem->Read( &outgoing_sequence, sizeof( int ), m_hDemoFile );
+	g_pFileSystem->Read( outgoing_sequence, m_hDemoFile );
 	
 	size = ReadRawData( buffer, size );
 
@@ -158,7 +158,7 @@ int CToolDemoFile::ReadRawData( char *buffer, int length )
 	int size;
 	
 	// read length of data block
-	g_pFileSystem->Read( &size, sizeof( int ), m_hDemoFile );
+	g_pFileSystem->Read( size, m_hDemoFile );
 
 	if ( buffer && (length < size) )
 	{
@@ -205,7 +205,7 @@ demoheader_t *CToolDemoFile::ReadDemoHeader()
 
 	Q_memset( &m_DemoHeader, 0, sizeof(m_DemoHeader) );
 
-	int r = g_pFileSystem->Read( &m_DemoHeader, sizeof(demoheader_t), m_hDemoFile );
+	int r = g_pFileSystem->Read( m_DemoHeader, m_hDemoFile );
 
 	if ( r != sizeof(demoheader_t) )
 		return NULL;  // reading failed

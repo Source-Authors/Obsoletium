@@ -24,7 +24,7 @@ void ReadPHYFile(const char *name, vcollide_t &collide )
 
 	phyheader_t header;
 
-	g_pFullFileSystem->Read( &header, sizeof(header), fp );
+	g_pFullFileSystem->Read( header, fp );
 	if ( header.size != sizeof(header) || header.solidCount <= 0 )
 		return;
 
@@ -183,7 +183,7 @@ void Benchmark_PHY( const CPhysCollide *pCollide, benchresults_t *pOut )
 #endif
 }
 
-//===== Copyright © 1996-2005, Valve Corporation, All rights reserved. ======//
+//===== Copyright Â© 1996-2005, Valve Corporation, All rights reserved. ======//
 //
 // Purpose: 
 //

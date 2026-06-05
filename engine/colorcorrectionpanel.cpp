@@ -3359,7 +3359,7 @@ void CColorLookupOperation::LoadLookupTable( const char *pFilename )
 		for( int i=0;i<res*res*res;i++ )
 		{
 			color24 color;
-			g_pFileSystem->Read( &color, sizeof(color24), file_handle );
+			g_pFileSystem->Read( color, file_handle );
 			m_LookupTable[i] = color;
 		}
 	}

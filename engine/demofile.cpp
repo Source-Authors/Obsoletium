@@ -476,7 +476,7 @@ void CDemoFile::WriteFileBytes( FileHandle_t fh, int length )
 
 	while ( copysize > COM_COPY_CHUNK_SIZE )
 	{
-		g_pFileSystem->Read ( copybuf, COM_COPY_CHUNK_SIZE, fh );
+		g_pFileSystem->Read ( copybuf, fh );
 		m_pBuffer->Put( copybuf, COM_COPY_CHUNK_SIZE ); //-V2002
 		copysize -= COM_COPY_CHUNK_SIZE;
 	}

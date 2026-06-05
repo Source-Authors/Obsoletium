@@ -443,7 +443,7 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 		return;
 	}
 
-	g_pFileSystem->Read( &s_MapHeader, sizeof( dheader_t ), s_MapFileHandle );
+	g_pFileSystem->Read( s_MapHeader, s_MapFileHandle );
 	if ( s_MapHeader.ident != IDBSPHEADER )
 	{
 		g_pFileSystem->Close( s_MapFileHandle );
@@ -502,7 +502,7 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 
 			// Read the lump header
 			BitwiseClear( lumpHeader );
-			g_pFileSystem->Read( &lumpHeader, sizeof( lumpfileheader_t ), lumpFile );
+			g_pFileSystem->Read( lumpHeader, lumpFile );
 
 			if ( lumpHeader.lumpID >= 0 && lumpHeader.lumpID < HEADER_LUMPS )
 			{
@@ -5178,7 +5178,7 @@ bool CModelLoader::Map_IsValid( char const *pMapFile, bool bQuiet /* = false */ 
 		dheader_t header;
 		BitwiseClear( header );
 
-		g_pFileSystem->Read( &header, sizeof( dheader_t ), mapfile );
+		g_pFileSystem->Read( header, mapfile );
 
 		if ( header.ident == IDBSPHEADER )
 		{

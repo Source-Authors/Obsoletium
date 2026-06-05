@@ -1833,7 +1833,7 @@ bool CWin32Surface::LoadBMP(Texture *texture, const char *filename)
 
 	const DWORD dwFileSize = g_pFullFileSystem->Size( file );
 
-	g_pFullFileSystem->Read( &bmfHeader, sizeof(bmfHeader), file );
+	g_pFullFileSystem->Read( bmfHeader, file );
 	
 	if (bmfHeader.bfType == DIB_HEADER_MARKER)
 	{
@@ -1918,7 +1918,7 @@ bool CWin32Surface::LoadTGA(Texture *texture, const char *filename)
 
 	// read the header
 	tga_header_t tgaHeader;
-	g_pFullFileSystem->Read(&tgaHeader, sizeof(tgaHeader), file);
+	g_pFullFileSystem->Read(tgaHeader, file);
 
 	if (tgaHeader.image_type != 2 && tgaHeader.image_type != 10)
 	{

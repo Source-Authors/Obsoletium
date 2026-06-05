@@ -9,6 +9,7 @@
 #define FILESYSTEM_H
 
 #include <climits>
+#include <type_traits>
 
 #include "appframework/IAppSystem.h"
 #include "tier0/threadtools.h"
@@ -501,6 +502,11 @@ abstract_class IBaseFileSystem
 {
 public:
 	virtual int				Read( OUT_BYTECAP(size) void* pOutput, int size, FileHandle_t file ) = 0;
+	template<typename T>
+	std::enable_if_t<!std::is_pointer_v<T>, int>		Read( T &out, FileHandle_t file )
+	{
+		return Read( &out, static_cast<int>( sizeof(out) ), file );
+	}
 	virtual int				Write( void const* pInput, int size, FileHandle_t file ) = 0;
 
 	// if pathID is nullptr, all paths will be searched for the file

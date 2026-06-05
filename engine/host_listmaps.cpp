@@ -140,7 +140,7 @@ int CMapListItem::CheckFSHeaderVersion( char const *name )
 	{
 		RunCodeAtScopeExit(g_pFileSystem->Close(fp));
 
-		g_pFileSystem->Read( &header, sizeof( header ), fp );
+		g_pFileSystem->Read( header, fp );
 	}
 
 	return ( header.version >= MINBSPVERSION && header.version <= BSPVERSION ) ? VALID : INVALID;

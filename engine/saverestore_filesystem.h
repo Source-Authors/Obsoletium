@@ -10,8 +10,10 @@
 #pragma once
 #endif
 
-#include "utlmap.h"
-#include "utlsymbol.h"
+#include <type_traits>
+
+#include "tier1/utlmap.h"
+#include "tier1/utlsymbol.h"
 #include "filesystem.h"
 
 abstract_class ISaveRestoreFileSystem
@@ -20,6 +22,11 @@ public:
 	virtual FileHandle_t	Open( const char *pFileName, const char *pOptions, const char *pathID = NULL ) = 0;
 	virtual void			Close( FileHandle_t ) = 0;
 	virtual int				Read( void *pOutput, int size, FileHandle_t file ) = 0;
+	template<typename T>
+	std::enable_if_t<!std::is_pointer_v<T>, int>		Read( T &out, FileHandle_t file )
+	{
+		return Read( &out, static_cast<int>( sizeof(out) ), file );
+	}
 	virtual int				Write( void const* pInput, int size, FileHandle_t file ) = 0;
 	virtual void			Seek( FileHandle_t file, int pos, FileSystemSeek_t method ) = 0;
 	virtual unsigned int	Tell( FileHandle_t file ) = 0;

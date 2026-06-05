@@ -750,7 +750,7 @@ void COM_CopyFileChunk( FileHandle_t dst, FileHandle_t src, int nSize )
 	while (copysize > COM_COPY_CHUNK_SIZE)
 	{
 		// dimhotepus: Write exactly bytes count which was read.
-		const int read = g_pFileSystem->Read( copybuf, COM_COPY_CHUNK_SIZE, src );
+		const int read = g_pFileSystem->Read( copybuf, src );
 		g_pFileSystem->Write( copybuf, read, dst );
 
 		copysize -= read;

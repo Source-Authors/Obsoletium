@@ -377,7 +377,7 @@ bool CUtlCachedFileData<T>::IsUpToDate()
 	{
 		RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
 
-		g_pFullFileSystem->Read( header, sizeof( header ), fh );
+		g_pFullFileSystem->Read( header, fh );
 	}
 
 	const int cacheversion = *( int *)&header[ 0 ];
@@ -517,13 +517,13 @@ void CUtlCachedFileData<T>::InitLargeBuffer( FileHandle_t& fh, bool& deleteFile 
 	deleteFile = false;
 
 	int cacheversion = 0;
-	g_pFullFileSystem->Read( &cacheversion, sizeof( cacheversion ), fh );
+	g_pFullFileSystem->Read( cacheversion, fh );
 
 	if ( UTL_CACHE_SYSTEM_VERSION == cacheversion )
 	{
 		// Now parse data from the buffer
 		int version = 0;
-		g_pFullFileSystem->Read( &version, sizeof( version ), fh );
+		g_pFullFileSystem->Read( version, fh );
 		
 		if ( version == m_nVersion )
 		{
@@ -531,13 +531,13 @@ void CUtlCachedFileData<T>::InitLargeBuffer( FileHandle_t& fh, bool& deleteFile 
 			//  meta data function
 			unsigned int cache_meta_checksum = 0;
 			
-			g_pFullFileSystem->Read( &cache_meta_checksum, sizeof( cache_meta_checksum ), fh );
+			g_pFullFileSystem->Read( cache_meta_checksum, fh );
 
 			if ( cache_meta_checksum == m_uCurrentMetaChecksum )
 			{
 				int count = 0;
 				
-				g_pFullFileSystem->Read( &count, sizeof( count ), fh );
+				g_pFullFileSystem->Read( count, fh );
 
 				Assert( count < 2000000 );
 
@@ -546,7 +546,7 @@ void CUtlCachedFileData<T>::InitLargeBuffer( FileHandle_t& fh, bool& deleteFile 
 				for ( int i = 0 ; i < count; ++i )
 				{
 					int bufsize = 0;
-					g_pFullFileSystem->Read( &bufsize, sizeof( bufsize ), fh );
+					g_pFullFileSystem->Read( bufsize, fh );
 
 					Assert( bufsize < 1000000 );
 					if ( bufsize > 1000000 )

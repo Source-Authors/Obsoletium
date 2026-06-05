@@ -237,10 +237,10 @@ public:
 		for ( int i = 0; i < fileCount && success; i++ )
 		{
 			// Filename can only be as long as a map name + extension
-			if ( g_pSaveRestoreFileSystem->Read( fileName, MAX_PATH, pFile ) != MAX_PATH )
+			if ( g_pSaveRestoreFileSystem->Read( fileName, pFile ) != sizeof(fileName) )
 				return false;
 
-			if ( g_pSaveRestoreFileSystem->Read( &fileSize, sizeof(int), pFile ) != sizeof(int) )
+			if ( g_pSaveRestoreFileSystem->Read( fileSize, pFile ) != sizeof(fileSize) )
 				return false;
 
 			if ( !fileSize )

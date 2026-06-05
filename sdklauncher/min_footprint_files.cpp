@@ -71,7 +71,7 @@ void SafeCopy( const char *pSrcFilename, const char *pDestFilename )
 			while ( 1 )
 			{
 				char tempData[4096];
-				int nBytesRead = g_pFullFileSystem->Read( tempData, sizeof( tempData ), fpSrc );
+				int nBytesRead = g_pFullFileSystem->Read( tempData, fpSrc );
 				if ( nBytesRead )
 					fwrite( tempData, 1, nBytesRead, fpDest );
 

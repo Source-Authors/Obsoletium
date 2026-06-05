@@ -2582,7 +2582,7 @@ void CHudCloseCaption::InitCaptionDictionary( const char *dbfile )
 			AsyncCaption_t& entry = m_AsyncCaptions[ m_AsyncCaptions.AddToTail() ];
 
 			// Read the header
-			filesystem->Read( &entry.m_Header, sizeof( entry.m_Header ), fh );
+			filesystem->Read( entry.m_Header, fh );
 			if ( entry.m_Header.magic != COMPILED_CAPTION_FILEID )
 				Error( "Invalid file id for %s\n", fullpath );
 			if ( entry.m_Header.version != COMPILED_CAPTION_VERSION )

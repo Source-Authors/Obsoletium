@@ -195,7 +195,7 @@ void COM_CopyFileChunk(FileHandle_t dst, FileHandle_t src, int nSize) {
   char copybuf[COM_COPY_CHUNK_SIZE];
 
   while (copysize > COM_COPY_CHUNK_SIZE) {
-    g_pFileSystem->Read(copybuf, COM_COPY_CHUNK_SIZE, src);
+    g_pFileSystem->Read(copybuf, src);
     g_pFileSystem->Write(copybuf, COM_COPY_CHUNK_SIZE, dst);
     copysize -= COM_COPY_CHUNK_SIZE;
   }

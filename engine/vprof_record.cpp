@@ -313,13 +313,13 @@ public:
 		else
 		{
 			int version;
-			g_pFileSystem->Read( &version, sizeof( version ), m_hFile );
+			g_pFileSystem->Read( version, m_hFile );
 			if ( !Playback_Assert( version == VPROF_FILE_VERSION ) )
 				return false;
 
 			// Read the root node ID.
 			int nodeID;
-			g_pFileSystem->Read( &nodeID, sizeof( nodeID ), m_hFile );
+			g_pFileSystem->Read( nodeID, m_hFile );
 			GetRoot()->SetUniqueNodeID( nodeID );
 
 			m_iSkipPastHeaderPos = g_pFileSystem->Tell( m_hFile );
@@ -354,7 +354,7 @@ public:
 	{
 		Assert( m_Mode == Mode_Playback );
 		char token;
-		if ( g_pFileSystem->Read( &token, 1, m_hFile ) != 1 )
+		if ( g_pFileSystem->Read( token, m_hFile ) != 1 )
 			token = TOKEN_FILE_FINISHED;
 		
 		return token;
@@ -367,7 +367,7 @@ public:
 		while ( 1 )
 		{
 			char ch;
-			if ( g_pFileSystem->Read( &ch, 1, m_hFile ) == 0 )
+			if ( g_pFileSystem->Read( ch, m_hFile ) == 0 )
 			{
 				Playback_Assert( false );
 				return false;
@@ -397,7 +397,7 @@ public:
 			return false;
 
 		int flags = 0;
-		g_pFileSystem->Read( &flags, sizeof( flags ), m_hFile );
+		g_pFileSystem->Read( flags, m_hFile );
 
 		AddBudgetGroupName( name, flags );
 		return true;
@@ -428,11 +428,11 @@ public:
 		
 		char nodeName[512];
 
-		g_pFileSystem->Read( &parentNodeID, sizeof( parentNodeID ), m_hFile );					// Parent node ID.
+		g_pFileSystem->Read( parentNodeID, m_hFile );					// Parent node ID.
 		if ( !Playback_ReadString( nodeName, sizeof( nodeName ) ) )
 			return false;
-		g_pFileSystem->Read( &budgetGroupID, sizeof( budgetGroupID ), m_hFile );
-		g_pFileSystem->Read( &nodeID, sizeof( nodeID ), m_hFile );
+		g_pFileSystem->Read( budgetGroupID, m_hFile );
+		g_pFileSystem->Read( nodeID, m_hFile );
 
 		// Now find the parent node.
 		CVProfNode *pParentNode = FindVProfNodeByID_R( GetRoot(), parentNodeID );
@@ -454,13 +454,13 @@ public:
 	{
 		// Read the timing.
 		unsigned char token;
-		if ( g_pFileSystem->Read( &token, sizeof( token ), m_hFile ) != sizeof( token ) )
+		if ( g_pFileSystem->Read( token, m_hFile ) != sizeof( token ) )
 			return false;
 
 		if ( token == 255 )
 		{
 			unsigned short curCalls;
-			if ( g_pFileSystem->Read( &curCalls, sizeof( curCalls ), m_hFile ) != sizeof( curCalls ) )
+			if ( g_pFileSystem->Read( curCalls, m_hFile ) != sizeof( curCalls ) )
 				return false;
 
 			pNode->m_nCurFrameCalls = curCalls;
@@ -473,13 +473,13 @@ public:
 
 		// This allows us to write 2 bytes unless it's > 256 milliseconds (unlikely).
 		unsigned short microsecondsToken;
-		if ( g_pFileSystem->Read( &microsecondsToken, sizeof( microsecondsToken ), m_hFile ) != sizeof( microsecondsToken ) )
+		if ( g_pFileSystem->Read( microsecondsToken, m_hFile ) != sizeof( microsecondsToken ) )
 			return false;
 
 		if ( microsecondsToken == 0xFFFF )
 		{
 			unsigned long nMicroseconds;
-			if ( g_pFileSystem->Read( &nMicroseconds, sizeof( nMicroseconds ), m_hFile ) != sizeof( nMicroseconds ) )
+			if ( g_pFileSystem->Read( nMicroseconds, m_hFile ) != sizeof( nMicroseconds ) )
 				return false;
 
 			pNode->m_CurFrameTime.SetMicroseconds( nMicroseconds * 4 );
@@ -525,7 +525,7 @@ public:
 			return false;
 
 		int iPlaybackTick = m_iPlaybackTick;
-		g_pFileSystem->Read( &iPlaybackTick, sizeof( iPlaybackTick ), m_hFile );
+		g_pFileSystem->Read( iPlaybackTick, m_hFile );
 		
 		// First test if this tick would go past the number they don't want us to go past.
 		if ( iDontGoPast != -1 && iPlaybackTick > iDontGoPast )

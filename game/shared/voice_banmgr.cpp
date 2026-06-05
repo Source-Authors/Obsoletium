@@ -55,7 +55,7 @@ bool CVoiceBanMgr::Init(const char *pGameDir)
 		RunCodeAtScopeExit(filesystem->Close(fh));
 
 		int version;
-		filesystem->Read(&version, sizeof(version), fh);
+		filesystem->Read(version, fh);
 		if(version == BANMGR_FILEVERSION && filesystem->Size(fh) > 4 )
 		{
 			int nIDs = ( filesystem->Size( fh ) - sizeof(version)) / SIGNED_GUID_LEN;

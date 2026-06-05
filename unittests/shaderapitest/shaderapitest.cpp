@@ -934,7 +934,7 @@ void CShaderAPITestApp::LoadShaderFile( const char *pName, bool bVertexShader )
 	}
 
 	ShaderHeader_t header; 
-	g_pFullFileSystem->Read( &header, sizeof( ShaderHeader_t ), hFile );
+	g_pFullFileSystem->Read( header, hFile );
 
 	// cache the dictionary
 	int nComboSize =  header.m_nNumStaticCombos * sizeof( StaticComboRecord_t );

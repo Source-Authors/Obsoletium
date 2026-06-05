@@ -153,7 +153,7 @@ bool CRC_MapFile(CRC32_t *crcvalue, const char *pszFileName)
 	startOfs = g_pFileSystem->Tell(fp);
 
 	// Don't CRC the header.
-	if (g_pFileSystem->Read(&header, sizeof(dheader_t), fp) == 0)
+	if (g_pFileSystem->Read(header, fp) == 0)
 	{
 		ConMsg("Could not read BSP header for map [%s].\n", pszFileName);
 		return false;
@@ -229,7 +229,7 @@ bool MD5_MapFile(MD5Value_t *md5value, const char *pszFileName)
 	startOfs = g_pFileSystem->Tell(fp);
 
 	// Don't MD5 the header.
-	if (g_pFileSystem->Read(&header, sizeof(dheader_t), fp) == 0)
+	if (g_pFileSystem->Read(header, fp) == 0)
 	{
 		ConMsg("Could not read BSP header for map [%s].\n", pszFileName);
 		return false;

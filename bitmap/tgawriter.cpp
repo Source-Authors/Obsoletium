@@ -267,7 +267,7 @@ bool WriteRectNoAlloc( unsigned char *pImageData, const char *fileName, int nXOr
 	// Read in the targa header
 	//
 	TGAHeader_t tgaHeader;
-	int read = g_pFullFileSystem->Read( &tgaHeader, sizeof(tgaHeader), fp );
+	int read = g_pFullFileSystem->Read( tgaHeader, fp );
 	if ( read != sizeof(tgaHeader) )
 	{
 		Warning( "TGA '%s' is not TGA file.\n", fileName );

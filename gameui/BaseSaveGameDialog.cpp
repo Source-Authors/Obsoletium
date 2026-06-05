@@ -529,22 +529,22 @@ int SaveReadNameAndComment( FileHandle_t f,	OUT_Z_CAP(nameSize) char *name,	int 
 	name[0] = '\0';
 	comment[0] = '\0';
 
-	g_pFullFileSystem->Read( &tag, sizeof(int), f );
+	g_pFullFileSystem->Read( tag, f );
 	if ( tag != MAKEID('J','S','A','V') )
 	{
 		return 0;
 	}
 		
-	g_pFullFileSystem->Read( &tag, sizeof(int), f );
+	g_pFullFileSystem->Read( tag, f );
 	if ( tag != SAVEGAME_VERSION )				// Enforce version for now
 	{
 		return 0;
 	}
 
-	g_pFullFileSystem->Read( &size, sizeof(int), f );
+	g_pFullFileSystem->Read( size, f );
 	
-	g_pFullFileSystem->Read( &tokenCount, sizeof(int), f );	// These two ints are the token list
-	g_pFullFileSystem->Read( &tokenSize, sizeof(int), f );
+	g_pFullFileSystem->Read( tokenCount, f );	// These two ints are the token list
+	g_pFullFileSystem->Read( tokenSize, f );
 	size += tokenSize;
 
 	// Sanity Check.

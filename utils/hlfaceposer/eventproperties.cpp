@@ -183,7 +183,7 @@ void CMapEntities::CheckUpdateMap( char const *mapname )
 	RunCodeAtScopeExit(filesystem->Close( hfile ));
 
 	dheader_t header;
-	filesystem->Read( &header, sizeof( header ), hfile );
+	filesystem->Read( header, hfile );
 
 	// Check the header
 	if ( header.ident != IDBSPHEADER ||

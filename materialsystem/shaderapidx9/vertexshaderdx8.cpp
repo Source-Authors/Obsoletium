@@ -2425,7 +2425,7 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 			{
 				// read static combo alias records
 				int nNumDups;
-				g_pFullFileSystem->Read( &nNumDups, sizeof( nNumDups ), hFile );
+				g_pFullFileSystem->Read( nNumDups, hFile );
 				if ( nNumDups )
 				{
 					pFileCache.m_StaticComboDupRecords.EnsureCount( nNumDups );

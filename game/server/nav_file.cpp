@@ -1239,7 +1239,7 @@ static NavErrorType CheckNavFile( const char *bspFilename )
 	// check magic number
 	int result;
 	unsigned int magic;
-	result = filesystem->Read( &magic, sizeof(unsigned int), file );
+	result = filesystem->Read( magic, file );
 	if (!result || magic != NAV_MAGIC_NUMBER)
 	{
 		filesystem->Close( file );
@@ -1248,7 +1248,7 @@ static NavErrorType CheckNavFile( const char *bspFilename )
 
 	// read file version number
 	unsigned int version;
-	result = filesystem->Read( &version, sizeof(unsigned int), file );
+	result = filesystem->Read( version, file );
 	if (!result || version > NavCurrentVersion || version < 4)
 	{
 		filesystem->Close( file );
@@ -1257,7 +1257,7 @@ static NavErrorType CheckNavFile( const char *bspFilename )
 
 	// get size of source bsp file and verify that the bsp hasn't changed
 	unsigned int saveBspSize;
-	filesystem->Read( &saveBspSize, sizeof(unsigned int), file );
+	filesystem->Read( saveBspSize, file );
 
 	// verify size
 	unsigned int bspSize = filesystem->Size( bspPathname );

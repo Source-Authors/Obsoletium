@@ -850,7 +850,7 @@ int CSaveRestore::SaveReadHeader( FileHandle_t pFile, GAME_HEADER *pHeader, int 
 	char				*pszTokenList;
 	CSaveRestoreData	*pSaveData = NULL;
 
-	if( g_pSaveRestoreFileSystem->Read( &tag, sizeof(int), pFile ) != sizeof(int) )
+	if( g_pSaveRestoreFileSystem->Read( tag, pFile ) != sizeof(tag) )
 		return 0;
 
 	if ( tag != MAKEID('J','S','A','V') )
@@ -859,7 +859,7 @@ int CSaveRestore::SaveReadHeader( FileHandle_t pFile, GAME_HEADER *pHeader, int 
 		return 0;
 	}
 		
-	if ( g_pSaveRestoreFileSystem->Read( &tag, sizeof(int), pFile ) != sizeof(int) )
+	if ( g_pSaveRestoreFileSystem->Read( tag, pFile ) != sizeof(tag) )
 		return 0;
 
 	if ( tag != SAVEGAME_VERSION )				// Enforce version for now
@@ -868,13 +868,13 @@ int CSaveRestore::SaveReadHeader( FileHandle_t pFile, GAME_HEADER *pHeader, int 
 		return 0;
 	}
 
-	if ( g_pSaveRestoreFileSystem->Read( &size, sizeof(int), pFile ) != sizeof(int) )
+	if ( g_pSaveRestoreFileSystem->Read( size, pFile ) != sizeof(size) )
 		return 0;
 
-	if ( g_pSaveRestoreFileSystem->Read( &tokenCount, sizeof(int), pFile ) != sizeof(int) )
+	if ( g_pSaveRestoreFileSystem->Read( tokenCount, pFile ) != sizeof(tokenCount) )
 		return 0;
 
-	if ( g_pSaveRestoreFileSystem->Read( &tokenSize, sizeof(int), pFile ) != sizeof(int) )
+	if ( g_pSaveRestoreFileSystem->Read( tokenSize, pFile ) != sizeof(tokenSize) )
 		return 0;
 
 	// At this point we must clean this data up if we fail!
@@ -1654,7 +1654,7 @@ void CSaveRestore::RestoreClientState( char const *fileName, bool adjacent )
 	RunCodeAtScopeExit(g_pSaveRestoreFileSystem->Close(pFile));
 
 	SaveFileHeaderTag_t tag;
-	g_pSaveRestoreFileSystem->Read( &tag, sizeof(tag), pFile );
+	g_pSaveRestoreFileSystem->Read( tag, pFile );
 	if ( tag != CURRENT_SAVEFILE_HEADER_TAG )
 	{
 		return;
@@ -1667,17 +1667,17 @@ void CSaveRestore::RestoreClientState( char const *fileName, bool adjacent )
 	int magicnumber = 0;
 	baseclientsections_t sections;
 
-	g_pSaveRestoreFileSystem->Read( &magicnumber, sizeof( magicnumber ), pFile );
+	g_pSaveRestoreFileSystem->Read( magicnumber, pFile );
 
 	if ( magicnumber == SECTION_MAGIC_NUMBER )
 	{
-		g_pSaveRestoreFileSystem->Read( &sectionheaderversion, sizeof( sectionheaderversion ), pFile );
+		g_pSaveRestoreFileSystem->Read( sectionheaderversion, pFile );
 
 		if ( sectionheaderversion != SECTION_VERSION_NUMBER )
 		{
 			return;
 		}
-		g_pSaveRestoreFileSystem->Read( &sections, sizeof(baseclientsections_t), pFile );
+		g_pSaveRestoreFileSystem->Read( sections, pFile );
 	}
 	else
 	{
@@ -1686,7 +1686,7 @@ void CSaveRestore::RestoreClientState( char const *fileName, bool adjacent )
 	
 		baseclientsectionsold_t oldsections;
 
-		g_pSaveRestoreFileSystem->Read( &oldsections, sizeof(baseclientsectionsold_t), pFile );
+		g_pSaveRestoreFileSystem->Read( oldsections, pFile );
 
 		Q_memset( &sections, 0, sizeof( sections ) );
 		sections.entitysize = oldsections.entitysize;
@@ -1966,20 +1966,20 @@ int CSaveRestore::SaveReadNameAndComment( FileHandle_t f, OUT_Z_CAP(nameSize) ch
 	if ( g_pSaveRestoreFileSystem->Size( f ) < tagsize )
 		return 0;
 
-	int nRead = g_pSaveRestoreFileSystem->Read( &tag, sizeof(int), f );
+	int nRead = g_pSaveRestoreFileSystem->Read( tag, f );
 	if ( ( nRead != sizeof(int) ) || tag != MAKEID('J','S','A','V') )
 		return 0;
 
-	if ( g_pSaveRestoreFileSystem->Read( &tag, sizeof(int), f ) != sizeof(int) )
+	if ( g_pSaveRestoreFileSystem->Read( tag, f ) != sizeof(tag) )
 		return 0;
 
-	if ( g_pSaveRestoreFileSystem->Read( &size, sizeof(int), f ) != sizeof(int) )
+	if ( g_pSaveRestoreFileSystem->Read( size, f ) != sizeof(size) )
 		return 0;
 
-	if ( g_pSaveRestoreFileSystem->Read( &tokenCount, sizeof(int), f ) != sizeof(int) )	// These two ints are the token list
+	if ( g_pSaveRestoreFileSystem->Read( tokenCount, f ) != sizeof(tokenCount) )	// These two ints are the token list
 		return 0;
 
-	if ( g_pSaveRestoreFileSystem->Read( &tokenSize, sizeof(int), f ) != sizeof(int) )
+	if ( g_pSaveRestoreFileSystem->Read( tokenSize, f ) != sizeof(tokenSize) )
 		return 0;
 
 	size += tokenSize;
@@ -2092,7 +2092,7 @@ CSaveRestoreData *CSaveRestore::LoadSaveData( const char *level )
 		//---------------------------------
 		// Read the header
 		SaveFileHeaderTag_t tag;
-		if ( g_pSaveRestoreFileSystem->Read( &tag, sizeof(tag), pFile ) != sizeof(tag) )
+		if ( g_pSaveRestoreFileSystem->Read( tag, pFile ) != sizeof(tag) )
 			return NULL;
 
 		// Is this a valid save?
@@ -2102,7 +2102,7 @@ CSaveRestoreData *CSaveRestore::LoadSaveData( const char *level )
 		//---------------------------------
 		// Read the sections info and the data
 		//	
-		if ( g_pSaveRestoreFileSystem->Read( &sectionsInfo, sizeof(sectionsInfo), pFile ) != sizeof(sectionsInfo) )
+		if ( g_pSaveRestoreFileSystem->Read( sectionsInfo, pFile ) != sizeof(sectionsInfo) )
 			return NULL;
 
 		void *pSaveMemory = SaveAllocMemory( sizeof(CSaveRestoreData) + sectionsInfo.SumBytes(), sizeof(char) );
@@ -2276,10 +2276,10 @@ void CSaveRestore::EntityPatchRead( CSaveRestoreData *pSaveData, const char *lev
 
 		int	size, entityId;
 		// Patch count
-		g_pSaveRestoreFileSystem->Read( &size, sizeof(int), pFile );
+		g_pSaveRestoreFileSystem->Read( size, pFile );
 		for ( int i = 0; i < size; i++ )
 		{
-			g_pSaveRestoreFileSystem->Read( &entityId, sizeof(int), pFile );
+			g_pSaveRestoreFileSystem->Read( entityId, pFile );
 			pSaveData->GetEntityInfo(entityId)->flags = FENTTABLE_REMOVED;
 		}
 	}

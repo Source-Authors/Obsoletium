@@ -1563,7 +1563,7 @@ CON_COMMAND( ray_load, "Load the rays" )
 		RunCodeAtScopeExit(g_pFileSystem->Close(hFile));
 
 		int count = 0;
-		g_pFileSystem->Read( &count, sizeof(count), hFile );
+		g_pFileSystem->Read( count, hFile );
 		if ( count )
 		{
 			s_BenchmarkRays.EnsureCount( count );
