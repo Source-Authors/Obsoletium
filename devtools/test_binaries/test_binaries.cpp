@@ -9,10 +9,16 @@
 //
 // Adapted from PEDUMP, AUTHOR:  Matt Pietrek - 1993
 //--------------------
-#include <windows.h>
-#include <stdio.h>
+
+#include <winlite.h>
+#include <cstdio>
+
 #include "common.h"
-#include "strtools.h"
+
+#include "tier0/platform.h"
+#include "tier1/strtools.h"
+
+namespace {
 
 bool HasSection( PIMAGE_SECTION_HEADER section, int numSections, const char *pSectionName )
 {
@@ -25,125 +31,107 @@ bool HasSection( PIMAGE_SECTION_HEADER section, int numSections, const char *pSe
 	return false;
 }
 
-
-void TestExeFile( const char *pFilename, PIMAGE_DOS_HEADER dosHeader )
+bool TestExeFile( const char *pFilename, PIMAGE_DOS_HEADER dosHeader )
 {
-	PIMAGE_NT_HEADERS pNTHeader;
-	
-	pNTHeader = MakePtr( PIMAGE_NT_HEADERS, dosHeader,
-								dosHeader->e_lfanew );
+	PIMAGE_NT_HEADERS pNTHeader = MakePtr( PIMAGE_NT_HEADERS, dosHeader,
+		dosHeader->e_lfanew );
 
 	// First, verify that the e_lfanew field gave us a reasonable
 	// pointer, then verify the PE signature.
 	if ( IsBadReadPtr(pNTHeader, sizeof(IMAGE_NT_HEADERS)) ||
 	     pNTHeader->Signature != IMAGE_NT_SIGNATURE )
 	{
-		printf("Unhandled EXE type, or invalid .EXE (%s)\n", pFilename);
-		return;
+		fprintf(stderr, "Unhandled EXE type, or invalid .EXE (%s).\n", pFilename);
+		return false;
 	}
 
 	if ( HasSection( (PIMAGE_SECTION_HEADER)(pNTHeader+1), pNTHeader->FileHeader.NumberOfSections, "ValveDBG" ) )
 	{
-		printf("%s is a debug build\n", pFilename);
+		printf("%s is a debug build.\n", pFilename);
 	}
+
+	return true;
 }
 
 //
 // Open up a file, memory map it, and call the appropriate dumping routine
 //
-void TestFile(const char *pFilename)
+bool TestFile(const char *pFilename)
 {
-	HANDLE hFile;
-	HANDLE hFileMapping;
-	LPVOID lpFileBase;
-	PIMAGE_DOS_HEADER dosHeader;
-	
-	hFile = CreateFile(pFilename, GENERIC_READ, FILE_SHARE_READ, NULL,
-						OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-					
+	HANDLE hFile = CreateFile(pFilename, GENERIC_READ, FILE_SHARE_READ, NULL,
+		OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	if ( hFile == INVALID_HANDLE_VALUE )
 	{
-		printf("Couldn't open file %s with CreateFile()\n", pFilename );
-		return;
+		fprintf(stderr, "Couldn't open file %s with CreateFile().\n", pFilename );
+		return false;
 	}
+	RunCodeAtScopeExit(CloseHandle(hFile));
 
-	hFileMapping = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
-	if ( hFileMapping == 0 )
+	HANDLE hFileMapping = CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
+	if ( hFileMapping == nullptr )
 	{
-		CloseHandle(hFile);
-		printf("Couldn't open file mapping with CreateFileMapping()\n");
-		return;
+		fprintf(stderr, "Couldn't open file %s mapping with CreateFileMapping().\n", pFilename );
+		return false;
 	}
+	RunCodeAtScopeExit(CloseHandle(hFileMapping));
 
-	lpFileBase = MapViewOfFile(hFileMapping, FILE_MAP_READ, 0, 0, 0);
-	if ( lpFileBase == 0 )
+	LPVOID lpFileBase = MapViewOfFile(hFileMapping, FILE_MAP_READ, 0, 0, 0);
+	if ( lpFileBase == nullptr )
 	{
-		CloseHandle(hFileMapping);
-		CloseHandle(hFile);
-		printf("Couldn't map view of file with MapViewOfFile()\n");
-		return;
+		fprintf(stderr, "Couldn't map view of file %s with MapViewOfFile().\n", pFilename );
+		return false;
 	}
+	RunCodeAtScopeExit(UnmapViewOfFile(lpFileBase));
 
-	dosHeader = (PIMAGE_DOS_HEADER)lpFileBase;
+	PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)lpFileBase;
 	if ( dosHeader->e_magic == IMAGE_DOS_SIGNATURE )
 	{
-		TestExeFile( pFilename, dosHeader );
+		return TestExeFile( pFilename, dosHeader );
 	}
-#if 0
-	else if ( (dosHeader->e_magic == 0x014C)	// Does it look like a i386
-		      && (dosHeader->e_sp == 0) )		// COFF OBJ file???
-	{
-		// The two tests above aren't what they look like.  They're
-		// really checking for IMAGE_FILE_HEADER.Machine == i386 (0x14C)
-		// and IMAGE_FILE_HEADER.SizeOfOptionalHeader == 0;
-			
-		DumpObjFile( (PIMAGE_FILE_HEADER)lpFileBase );
-	}
-#endif
-	else
-		printf("unrecognized file format\n");
-	UnmapViewOfFile(lpFileBase);
-	CloseHandle(hFileMapping);
-	CloseHandle(hFile);
+
+	fprintf(stderr, "Unrecognized %s file format.\n", pFilename);
+	return false;
 }
+
+}  // namespace
+
 int main(int argc, char* argv[])
 {
 	if ( argc < 2 )
 	{
-		printf("Usage: test_binaries <FILENAME>\n" );
+		fprintf(stderr, "Usage: test_binaries <FILENAME>.\n" );
+		return EINVAL;
+	}
+
+	char fileName[MAX_PATH], dir[MAX_PATH];
+	if ( !V_ExtractFilePath( argv[1], dir ) )
+	{
+		dir[0] = '\0';
 	}
 	else
 	{
-		char fileName[2048], dir[2048];
-		if ( !Q_ExtractFilePath( argv[1], dir, sizeof( dir ) ) )
+		V_FixSlashes( dir, '/' );
+
+		if ( const intp len = V_strlen(dir); len && dir[len-1] !='/' )
 		{
-			strcpy( dir, "" );
-		}
-		else
-		{
-			Q_FixSlashes( dir, '/' );
-			int len = strlen(dir);
-			if ( len && dir[len-1] !='/' )
-			{
-				strcat( dir, "/" );
-			}
-		}
-		
-		WIN32_FIND_DATA findData;
-		HANDLE hFind = FindFirstFile( argv[1], &findData );
-		if ( hFind == INVALID_HANDLE_VALUE )
-		{
-			printf("Can't find %s\n", argv[1] );
-		}
-		else
-		{
-			do
-			{
-				sprintf( fileName, "%s%s", dir, findData.cFileName );
-				TestFile( fileName );
-			} while ( FindNextFile( hFind, &findData ) );
-			FindClose( hFind );
+			V_strcat_safe( dir, "/" );
 		}
 	}
-	return 0;
+	
+	WIN32_FIND_DATA findData;
+	if ( HANDLE hFind = FindFirstFile( argv[1], &findData ); hFind != INVALID_HANDLE_VALUE )
+	{
+		RunCodeAtScopeExit(FindClose( hFind ));
+
+		do
+		{
+			V_sprintf_safe( fileName, "%s%s", dir, findData.cFileName );
+			TestFile( fileName );
+		} while ( FindNextFile( hFind, &findData ) );
+
+		return 0;
+	}
+
+	fprintf(stderr, "Can't find %s.\n", argv[1] );
+	return EINVAL;
 }
