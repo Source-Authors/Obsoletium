@@ -141,6 +141,8 @@ SE_GCC_END_WARNING_OVERRIDE_SCOPE()
 #endif
 		if ( hFile )
 		{
+			RunCodeAtScopeExit(::CloseHandle( hFile ));
+
 			// dump the exception information into the file
 			_MINIDUMP_EXCEPTION_INFORMATION	ExInfo = {};
 			ExInfo.ThreadId	= ::GetCurrentThreadId();
@@ -162,7 +164,6 @@ SE_GCC_END_WARNING_OVERRIDE_SCOPE()
 			}
 
 			bMinidumpResult = (*pfnMiniDumpWrite)( ::GetCurrentProcess(), ::GetCurrentProcessId(), hFile, static_cast<MINIDUMP_TYPE>( minidumpType ), &ExInfo, &StreamInformationHeader, nullptr );
-			::CloseHandle( hFile );
 
 			// Clear comment for next time
 			g_rgchMinidumpComment[0] = '\0';
