@@ -137,33 +137,27 @@ public:
 		}
 	}
 
-
 	bool SaveCRCFileToCache( CRC32_t crcValue, const void *pFileData, int fileLength )
 	{
 		CLogoFilename logohex( crcValue, true );
 		
 		FileHandle_t hFile = g_pFileSystem->Open( logohex.m_Filename, "wb" );
-		if ( hFile == FILESYSTEM_INVALID_HANDLE )
+		if ( !hFile )
 		{
 			Warning( "SaveCRCFileToCache: couldn't open '%s' for writing.\n", logohex.m_Filename );
 			return false;
 		}
-		else
-		{
-			int writeRet = g_pFileSystem->Write( pFileData, fileLength, hFile );
-			g_pFileSystem->Close( hFile );
+		RunCodeAtScopeExit(g_pFileSystem->Close( hFile ));
 
-			// If we couldn't write it, then delete it.
-			if ( writeRet == fileLength )
-			{
-				return true;
-			}
-			else
-			{
-				Warning( "SaveCRCFileToCache: couldn't write data (%d should be %d).\n", writeRet, fileLength );
-				return false;
-			}
+		int writeRet = g_pFileSystem->Write( pFileData, fileLength, hFile );
+		// If we couldn't write it, then delete it.
+		if ( writeRet == fileLength )
+		{
+			return true;
 		}
+
+		Warning( "SaveCRCFileToCache: couldn't write data (%d should be %d).\n", writeRet, fileLength );
+		return false;
 	}
 
 	void UpdatePendingFiles()

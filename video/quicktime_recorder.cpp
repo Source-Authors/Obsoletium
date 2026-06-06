@@ -205,7 +205,7 @@ void SaveToTargaFile( int frameNum, const char* pBaseFileName, int width, int he
 {
 	if ( pBaseFileName == nullptr || pPixels== nullptr ) return;
 
-	Assert( sizeof( TGA_Header ) == 18 );
+	static_assert( sizeof( TGA_Header ) == 18 );
 	
 	TGA_Header  theHeader;
 	ZeroVar( theHeader );
@@ -221,10 +221,15 @@ void SaveToTargaFile( int frameNum, const char* pBaseFileName, int width, int he
 	theHeader.descriptor = ( BytesPerPixel == 4) ? ( 8 | 32 ) : 32;		// Targa32, Upper Left Origin, attribute (alpha) bits in bits 0-3
 
 	char TGAFileName[MAX_PATH];
-	
-	V_snprintf( TGAFileName, MAX_PATH, "%s%.4d.tga", pBaseFileName, frameNum );
+	V_sprintf_safe( TGAFileName, "%s%.4d.tga", pBaseFileName, frameNum );
 
 	FileHandle_t TGAFile = g_pFullFileSystem->Open( TGAFileName, "wb" );
+	if ( !TGAFile )
+	{
+		Warning( "Unable to open %s for writing.\n", TGAFileName );
+		return;
+	}
+	RunCodeAtScopeExit(g_pFullFileSystem->Close( TGAFile ));
 
 	g_pFullFileSystem->Write( theHeader, TGAFile );
 	
@@ -249,20 +254,15 @@ void SaveToTargaFile( int frameNum, const char* pBaseFileName, int width, int he
 	}
 	else	// we need to convert the bits from RGB to BGR
 	{
-		byte *pData = new byte[width * height * BytesPerPixel];
+		auto pData = std::make_unique<byte[]>(width * height * BytesPerPixel);
 
 		OSType tgaFormat = ( PixelFormat == k24RGBPixelFormat ) ? k24BGRPixelFormat :
 						   ( PixelFormat == k32RGBAPixelFormat ) ? k32BGRAPixelFormat : 0;
 						   
-		CopyBitMapPixels( width, height, PixelFormat, (byte*) pPixels, width * BytesPerPixel + strideAdjust, tgaFormat, pData, width * BytesPerPixel );
+		CopyBitMapPixels( width, height, PixelFormat, (byte*) pPixels, width * BytesPerPixel + strideAdjust, tgaFormat, pData.get(), width * BytesPerPixel );
 		
-		g_pFullFileSystem->Write( pData, width * height * BytesPerPixel, TGAFile );
-		
-		delete [] pData;	
-	}
-	
-	g_pFullFileSystem->Close( TGAFile );
-	
+		g_pFullFileSystem->Write( pData.get(), width * height * BytesPerPixel, TGAFile );
+	}	
 }
 
 

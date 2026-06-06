@@ -466,19 +466,19 @@ int LoadFileIntoBuffer(CUtlBuffer &buf, char *pszFilename)
 {
 	// Open the file
 	FileHandle_t fh = g_pFullFileSystem->Open( pszFilename, "rb" );
-	if (fh == 0)
+	if (!fh)
 	{
 		MessageBox *dlg = new MessageBox ("Unable to open datafile.", false);
 		dlg->DoModal();
 		return 0;	//file didn't load
 	}
+	RunCodeAtScopeExit(g_pFullFileSystem->Close( fh ));
 
 	int nFileSize = g_pFullFileSystem->Size(fh);
 	
 	// Read the file in one gulp
 	buf.EnsureCapacity( nFileSize );
 	int result = g_pFullFileSystem->Read( buf.Base(), nFileSize, fh );
-	g_pFullFileSystem->Close( fh );
 	
 	return nFileSize;	
 }
@@ -494,17 +494,18 @@ void CFavoriteGames::ImportFavorites()
 	return;
 
 	char name[512];
+	name[0] = '\0';
 	// check if halflife is installed
 	if (vgui::system()->GetRegistryString("HKEY_LOCAL_MACHINE\\Software\\Valve\\Half-life\\InstallPath", name, sizeof(name)))
 	{
 		// attach name of favorites file
-		strcat(name, "\\favsvrs.dat");
+		V_strcat_safe(name, "\\favsvrs.dat");
 	}
 	// check if counterstrike is installed
 	else if (vgui::system()->GetRegistryString("HKEY_LOCAL_MACHINE\\Software\\Sierra OnLine\\Setup\\CSTRIKE\\Directory", name, sizeof(name)))
 	{
 		// attach name of favorites file
-		strcat(name, "\\favsvrs.dat");
+		V_strcat_safe(name, "\\favsvrs.dat");
 	}
 	else // no hl installation, no fav servers?
 	{
@@ -517,8 +518,7 @@ void CFavoriteGames::ImportFavorites()
 	{
 		return;
 	}
-	g_pFullFileSystem->Close(fh);
-	
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
 
 	// it exists! yay lets transfer the servers over into the server browser
 

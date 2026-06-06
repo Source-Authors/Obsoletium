@@ -845,8 +845,8 @@ void CWorkspaceManager::SaveRecentFilesMenuToDisk()
 	FileHandle_t fh = filesystem->Open( recentfiles, "wt" );
 	if (fh)
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
 		filesystem->Write( buf.Base(), buf.TellPut(), fh );
-		filesystem->Close(fh);
 	}
 	else
 	{

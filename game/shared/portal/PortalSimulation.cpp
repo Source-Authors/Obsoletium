@@ -3037,6 +3037,14 @@ static void PortalSimulatorDumps_DumpCollideToGlView( CPhysCollide *pCollide, co
 	Vector *outVerts;
 	int vertCount = physcollision->CreateDebugMesh( pCollide, &outVerts );
 	FileHandle_t fp = filesystem->Open( pFilename, "ab" );
+	if (!fp)
+	{
+		fprintf(stderr, "Can't open %s to dump collide.\n", pFilename);
+		return;
+	}
+
+	RunCodeAtScopeExit(filesystem->Close( fp ));
+
 	int triCount = vertCount / 3;
 	int vert = 0;
 	VMatrix tmp = SetupMatrixOrgAngles( origin, angles );
@@ -3056,13 +3064,19 @@ static void PortalSimulatorDumps_DumpCollideToGlView( CPhysCollide *pCollide, co
 		filesystem->FPrintf( fp, "%6.3f %6.3f %6.3f 0 0 %.2f\n", outVerts[vert].x, outVerts[vert].y, outVerts[vert].z, fColorScale );
 		vert++;
 	}
-	filesystem->Close( fp );
 	physcollision->DestroyDebugMesh( vertCount, outVerts );
 }
 
 static void PortalSimulatorDumps_DumpPlanesToGlView( float *pPlanes, int iPlaneCount, const char *pszFileName )
 {
 	FileHandle_t fp = filesystem->Open( pszFileName, "wb" );
+	if (!fp)
+	{
+		fprintf(stderr, "Can't open %s to dump planes.\n", pszFileName);
+		return;
+	}
+
+	RunCodeAtScopeExit(filesystem->Close( fp ));
 
 	for( int i = 0; i < iPlaneCount; ++i )
 	{
@@ -3082,14 +3096,19 @@ static void PortalSimulatorDumps_DumpPlanesToGlView( float *pPlanes, int iPlaneC
 		filesystem->FPrintf( fp, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vPlaneVerts[1].x, vPlaneVerts[1].y, vPlaneVerts[1].z, fRed, fGreen, fBlue );
 		filesystem->FPrintf( fp, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vPlaneVerts[0].x, vPlaneVerts[0].y, vPlaneVerts[0].z, fRed, fGreen, fBlue );
 	}
-
-	filesystem->Close( fp );
 }
 
 
 static void PortalSimulatorDumps_DumpBoxToGlView( const Vector &vMins, const Vector &vMaxs, float fRed, float fGreen, float fBlue, const char *pszFileName )
 {
 	FileHandle_t fp = filesystem->Open( pszFileName, "ab" );
+	if (!fp)
+	{
+		fprintf(stderr, "Can't open %s to dump box.\n", pszFileName);
+		return;
+	}
+
+	RunCodeAtScopeExit(filesystem->Close( fp ));
 
 	//x min side
 	filesystem->FPrintf( fp, "4\n" );
@@ -3175,13 +3194,18 @@ static void PortalSimulatorDumps_DumpBoxToGlView( const Vector &vMins, const Vec
 	filesystem->FPrintf( fp, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMaxs.z, fRed, fGreen, fBlue );
 	filesystem->FPrintf( fp, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMaxs.z, fRed, fGreen, fBlue );
 	filesystem->FPrintf( fp, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMaxs.z, fRed, fGreen, fBlue );
-
-	filesystem->Close( fp );
 }
 
 static void PortalSimulatorDumps_DumpOBBoxToGlView( const Vector &ptOrigin, const Vector &vExtent1, const Vector &vExtent2, const Vector &vExtent3, float fRed, float fGreen, float fBlue, const char *pszFileName )
 {
 	FileHandle_t fp = filesystem->Open( pszFileName, "ab" );
+	if (!fp)
+	{
+		fprintf(stderr, "Can't open %s to dump obbox.\n", pszFileName);
+		return;
+	}
+
+	RunCodeAtScopeExit(filesystem->Close( fp ));
 
 	Vector ptExtents[8];
 	int counter;
@@ -3277,8 +3301,6 @@ static void PortalSimulatorDumps_DumpOBBoxToGlView( const Vector &ptOrigin, cons
 	filesystem->FPrintf( fp, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", ptExtents[7].x, ptExtents[7].y, ptExtents[7].z, fRed, fGreen, fBlue );
 	filesystem->FPrintf( fp, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", ptExtents[6].x, ptExtents[6].y, ptExtents[6].z, fRed, fGreen, fBlue );
 	filesystem->FPrintf( fp, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", ptExtents[4].x, ptExtents[4].y, ptExtents[4].z, fRed, fGreen, fBlue );
-
-	filesystem->Close( fp );
 }
 
 

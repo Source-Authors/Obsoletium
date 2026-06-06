@@ -967,44 +967,48 @@ void CBaseGameStats::SetDXLevelStatistic( int iDXLevel )
 void CBaseGameStats::SetHL2UnlockedChapterStatistic( void )
 {
 	// Now grab the hl2/cfg/config.cfg and suss out the sv_unlockedchapters cvar to estimate how far they got in HL2
-	char const *relative = "cfg/config.cfg";
-	char fullpath[ 512 ];
-	char gamedir[256];
+	constexpr char relative[]{"cfg/config.cfg"};
+
+	char fullpath[512], gamedir[256];
+
 	engine->GetGameDir( gamedir );
-	Q_snprintf( fullpath, sizeof( fullpath ), "%s/../hl2/%s", gamedir, relative );
+	V_sprintf_safe( fullpath, "%s/../hl2/%s", gamedir, relative );
 
-	if ( filesystem->FileExists( fullpath ) )
+	if ( !filesystem->FileExists( fullpath ) )
 	{
-		FileHandle_t fh = filesystem->Open( fullpath, "rb" );
-		if ( FILESYSTEM_INVALID_HANDLE != fh )
-		{
-			// read file into memory
-			int size = filesystem->Size(fh);
-			char *configBuffer = new char[ size + 1 ];
-			filesystem->Read( configBuffer, size, fh );
-			configBuffer[size] = 0;
-			filesystem->Close( fh );
+		return;
+	}
 
-			// loop through looking for all the cvars to apply
-			const char *search = Q_stristr(configBuffer, "sv_unlockedchapters" );
-			if ( search )
-			{
-				// read over the token
-				search = strtok( (char *)search, " \n" );
-				search = strtok( NULL, " \n" );
+	FileHandle_t fh = filesystem->Open( fullpath, "rb" );
+	if ( !fh )
+	{
+		Warning( "Unable to open '%s' to read unlocked chapter statistic.\n", fullpath );
+		return;
+	}
+	RunCodeAtScopeExit(filesystem->Close( fh ));
 
-				if ( search[0]== '\"' )
-					++search;
+	// read file into memory
+	int size = filesystem->Size(fh);
+	auto configBuffer = std::make_unique<char[]>( size + 1 );
 
-				// read the value
-				int iChapter = Q_atoi( search );
-				m_BasicStats.m_nHL2ChaptureUnlocked = iChapter;
-			}
+	filesystem->Read( configBuffer, size, fh );
+	configBuffer[size] = '\0';
 
-			// free
-			delete [] configBuffer;
-		}
-	}	
+	// loop through looking for all the cvars to apply
+	const char *search = Q_stristr(configBuffer, "sv_unlockedchapters" );
+	if ( search )
+	{
+		// read over the token
+		search = strtok( (char *)search, " \n" );
+		search = strtok( NULL, " \n" );
+
+		if ( search[0]== '\"' )
+			++search;
+
+		// read the value
+		int iChapter = Q_atoi( search );
+		m_BasicStats.m_nHL2ChaptureUnlocked = iChapter;
+	}
 }
 
 static void CC_ResetGameStats( const CCommand &args )

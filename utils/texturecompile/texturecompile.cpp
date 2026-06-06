@@ -331,11 +331,12 @@ void Worker_ReadFilesToCopy( void )
 	DebugOut( "using \"%s\" as filestocopy\n", filename );
 	char buf[1024];
 	FileHandle_t fp = g_pFileSystem->Open( filename, "r" );
-	if( fp == FILESYSTEM_INVALID_HANDLE )
+	if( !fp )
 	{
-		fprintf( stderr, "Can't open uniquefilestocopy.txt!\n" );
+		fprintf( stderr, "Can't open %s!\n", filename );
 		exit( -1 );
 	}
+	RunCodeAtScopeExit( g_pFileSystem->Close(fp) );
 
 	while( CmdLib_FGets( buf, sizeof( buf ), fp ) )
 	{
@@ -362,7 +363,6 @@ void Worker_ReadFilesToCopy( void )
 		pair.pSrcName = strdup( pSrcName );
 		pair.pTargetName = strdup( pVtfName );
 	}
-	g_pFileSystem->Close( fp );
 }
 
 void Worker_GetSourceFiles( int iWorkUnit )
@@ -383,7 +383,7 @@ void Worker_GetFileFromMaster( const char *pFileName )
 	DebugOut( "Worker_GetFileFromMaster: \"%s\"\n", pFileName );
 	FileHandle_t fp2 = g_pFileSystem->Open( pFileName, "rb" );
 	bool bZeroLength = false;
-	if( fp2 == FILESYSTEM_INVALID_HANDLE )
+	if( !fp2 )
 	{
 		bZeroLength = true;
 		Warning( "zero length file: \"%s\"\n", pFileName );
@@ -488,26 +488,26 @@ void Shared_ParseListOfCompileCommands( void )
 	char buf[1024];
 
 	char fileListFileName[1024];
-	sprintf( fileListFileName, "%s\\texturelist.txt", g_pGameDir );
+	V_sprintf_safe( fileListFileName, "%s\\texturelist.txt", g_pGameDir );
 	FileHandle_t fp = g_pFileSystem->Open( fileListFileName, "r" );
-	if( fp == FILESYSTEM_INVALID_HANDLE )
+	if( !fp )
 	{
 		DebugOut( "Can't open %s!\n", fileListFileName );
 		fprintf( stderr, "Can't open %s!\n", fileListFileName );
 		exit( -1 );
 	}
+	RunCodeAtScopeExit( g_pFileSystem->Close(fp) );
+
 	while( CmdLib_FGets( buf, 1023, fp ) )
 	{
 		char *pNewString = new char[ strlen( buf ) + 1 ];
 		strcpy( pNewString, buf );
 		pNewString[strlen( pNewString ) - 2] = '\0';  // This is some hacky shit right here.
-		int newID = g_CompileCommands.AddToTail();
+		intp newID = g_CompileCommands.AddToTail();
 		g_CompileCommands[newID] = pNewString;
 	}
-	g_pFileSystem->Close( fp );
 
-//	printf( "%d compiles\n", g_CompileCommands.Count() );
-	DebugOut( "%d compiles\n", g_CompileCommands.Count() );
+	DebugOut( "%zd compiles\n", g_CompileCommands.Count() );
 }
 
 void SetupPaths( int argc, char **argv )

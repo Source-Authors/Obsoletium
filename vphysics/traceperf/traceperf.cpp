@@ -22,17 +22,17 @@ void ReadPHYFile(const char *name, vcollide_t &collide )
 	if (!fp)
 		Error ("Couldn't open %s", name);
 
-	phyheader_t header;
+	RunCodeAtScopeExit(g_pFullFileSystem->Close( fp ));
 
+	phyheader_t header;
 	g_pFullFileSystem->Read( header, fp );
 	if ( header.size != sizeof(header) || header.solidCount <= 0 )
 		return;
 
 	int fileSize = g_pFullFileSystem->Size(fp);
 
-	char *buf = (char *)_alloca( fileSize );
+	char *buf = stackallocT( char, fileSize );
 	g_pFullFileSystem->Read( buf, fileSize, fp );
-	g_pFullFileSystem->Close( fp );
 
 	physcollision->VCollideLoad( &collide, header.solidCount, (const char *)buf, fileSize );
 }

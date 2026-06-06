@@ -640,11 +640,12 @@ bool LoadFileIntoBuffer( CUtlBuffer &buf, const char *pFilename )
 	if ( !fileHandle )
 		return false;
 
+	RunCodeAtScopeExit(g_pFileSystem->Close( fileHandle ));
+
 	// Get the file size
 	int texSize = g_pFileSystem->Size( fileHandle );
 	buf.EnsureCapacity( texSize );
 	int nBytesRead = g_pFileSystem->Read( buf.Base(), texSize, fileHandle );
-	g_pFileSystem->Close( fileHandle );
 	buf.SeekPut( CUtlBuffer::SEEK_HEAD, nBytesRead );
 	buf.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
 	return true;
@@ -2215,11 +2216,12 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void *pModelData )
 		Error( "Unable to load vertex data \"%s\"\n", fileName );
 	}
 
+	RunCodeAtScopeExit(g_pFileSystem->Close( fileHandle ));
+
 	// Get the file size
 	int vvdSize = g_pFileSystem->Size( fileHandle );
 	if ( vvdSize == 0 )
 	{
-		g_pFileSystem->Close( fileHandle );
 		Error( "Bad size for vertex data \"%s\"\n", fileName );
 	}
 
@@ -2230,7 +2232,6 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void *pModelData )
 	}
 
 	g_pFileSystem->Read( pVvdHdr, vvdSize, fileHandle );
-	g_pFileSystem->Close( fileHandle );
 
 	// check header
 	if ( pVvdHdr->id != MODEL_VERTEX_FILE_ID )

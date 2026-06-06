@@ -927,11 +927,12 @@ void CShaderAPITestApp::LoadShaderFile( const char *pName, bool bVertexShader )
 	Q_snprintf( pFileName, MAX_PATH, "..\\hl2\\shaders\\fxc\\%s.vcs", pName );
 
 	FileHandle_t hFile = g_pFullFileSystem->Open( pFileName, "rb", "EXECUTABLE_PATH" );
-	if ( hFile == FILESYSTEM_INVALID_HANDLE )
+	if ( !hFile )
 	{
 		Warning( "Couldn't load %s shader %s\n", bVertexShader ? "vertex" : "pixel", pName );
 		return;
 	}
+	RunCodeAtScopeExit(	g_pFullFileSystem->Close( hFile ));
 
 	ShaderHeader_t header; 
 	g_pFullFileSystem->Read( header, hFile );
@@ -957,8 +958,6 @@ void CShaderAPITestApp::LoadShaderFile( const char *pName, bool bVertexShader )
 	}
 
 	free( pRecords );
-	g_pFullFileSystem->Close( hFile );
-
 }
 
 

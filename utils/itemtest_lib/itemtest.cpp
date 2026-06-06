@@ -1104,30 +1104,24 @@ bool CItemUpload::CopyFiles( const char *pszSourceDir, const char *pszPattern, c
 static bool DoFileCopy( const char *pszSourceFile, const char *pszDestFile )
 {
 	int             remaining, count;
-	char			buf[4096];
-	FileHandle_t	in, out;
+	char			buf[65535];
 
-	in = g_pFullFileSystem->Open( pszSourceFile, "rb" );
-
+	FileHandle_t in = g_pFullFileSystem->Open( pszSourceFile, "rb" );
 	AssertMsg( in, "DoFileCopy: Input file failed to open" );
-
-	if ( in == FILESYSTEM_INVALID_HANDLE )
+	if ( !in )
 		return false;
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(in));
 		
 	// create directories up to the cache file
 	char szDestPath[MAX_PATH];
-	V_ExtractFilePath( pszDestFile, szDestPath, sizeof( szDestPath ) );
+	V_ExtractFilePath( pszDestFile, szDestPath );
 	g_pFullFileSystem->CreateDirHierarchy( szDestPath );
 
-	out = g_pFullFileSystem->Open( pszDestFile, "wb" );
-
+	FileHandle_t out = g_pFullFileSystem->Open( pszDestFile, "wb" );
 	AssertMsg( out, "DoFileCopy: Output file failed to open" );
-	
-	if ( out == FILESYSTEM_INVALID_HANDLE )
-	{
-		g_pFullFileSystem->Close( in );
+	if ( !out )
 		return false;
-	}
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(out));
 		
 	remaining = g_pFullFileSystem->Size( in );
 	while ( remaining > 0 )
@@ -1143,10 +1137,7 @@ static bool DoFileCopy( const char *pszSourceFile, const char *pszDestFile )
 		g_pFullFileSystem->Read( buf, count, in );
 		g_pFullFileSystem->Write( buf, count, out );
 		remaining -= count;
-	}
-
-	g_pFullFileSystem->Close( in );
-	g_pFullFileSystem->Close( out );   
+	}   
 	
 	return true;
 }

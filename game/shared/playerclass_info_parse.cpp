@@ -110,49 +110,44 @@ void ResetFilePlayerClassInfoDatabase( void )
 KeyValues* ReadEncryptedKVPlayerClassFile( IFileSystem *pFilesystem, const char *szFilenameWithoutExtension, const unsigned char *pICEKey )
 {
 	Assert( strchr( szFilenameWithoutExtension, '.' ) == NULL );
+
 	char szFullName[512];
+	V_sprintf_safe(szFullName, "%s.txt", szFilenameWithoutExtension);
 
 	// Open the weapon data file, and abort if we can't
 	KeyValues *pKV = new KeyValues( "PlayerClassDatafile" );
-
-	Q_snprintf(szFullName,sizeof(szFullName), "%s.txt", szFilenameWithoutExtension);
-
 	if ( !pKV->LoadFromFile( pFilesystem, szFullName, "GAME" ) ) // try to load the normal .txt file first
 	{
-		if ( pICEKey )
+		if ( !pICEKey )
 		{
-			Q_snprintf(szFullName,sizeof(szFullName), "%s.ctx", szFilenameWithoutExtension); // fall back to the .ctx file
-
-			FileHandle_t f = pFilesystem->Open( szFullName, "rb", "GAME");
-
-			if (!f)
-			{
-				pKV->deleteThis();
-				return NULL;
-			}
-			// load file into a null-terminated buffer
-			int fileSize = pFilesystem->Size(f);
-			char *buffer = (char*)MemAllocScratch(fileSize + 1);
-		
-			Assert(buffer);
-		
-			pFilesystem->Read(buffer, fileSize, f); // read into local buffer
-			buffer[fileSize] = 0; // null terminate file as EOF
-			pFilesystem->Close( f );	// close file after reading
-
-			UTIL_DecodeICE( (unsigned char*)buffer, fileSize, pICEKey );
-
-			bool retOK = pKV->LoadFromBuffer( szFullName, buffer, pFilesystem );
-
-			MemFreeScratch();
-
-			if ( !retOK )
-			{
-				pKV->deleteThis();
-				return NULL;
-			}
+			pKV->deleteThis();
+			return NULL;
 		}
-		else
+
+		V_sprintf_safe(szFullName, "%s.ctx", szFilenameWithoutExtension); // fall back to the .ctx file
+		FileHandle_t f = pFilesystem->Open( szFullName, "rb", "GAME");
+		if (!f)
+		{
+			pKV->deleteThis();
+			return NULL;
+		}
+
+		RunCodeAtScopeExit(pFilesystem->Close( f ));
+
+		// load file into a null-terminated buffer
+		int fileSize = pFilesystem->Size(f);
+
+		char *buffer = (char*)MemAllocScratch(fileSize + 1);
+		Assert(buffer);
+		RunCodeAtScopeExit(MemFreeScratch());
+	
+		pFilesystem->Read(buffer, fileSize, f); // read into local buffer
+		buffer[fileSize] = '\0'; // null terminate file as EOF
+
+		UTIL_DecodeICE( (unsigned char*)buffer, fileSize, pICEKey );
+
+		bool retOK = pKV->LoadFromBuffer( szFullName, buffer, pFilesystem );
+		if ( !retOK )
 		{
 			pKV->deleteThis();
 			return NULL;

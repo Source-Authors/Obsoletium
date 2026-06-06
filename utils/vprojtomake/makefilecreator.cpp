@@ -36,13 +36,13 @@ bool CMakefileCreator::CreateMakefiles(CVCProjConvert &proj) {
       continue;
     }
 
+    RunCodeAtScopeExit(g_pFileSystem->Close(f));
+
     ok = ok && OutputDirs(f);
     ok = ok && OutputIncludes(proj.GetConfiguration(i), f);
     ok = ok && OutputObjLists(proj.GetConfiguration(i), f);
     ok = ok && OutputMainBuilder(f);
     ok = ok && OutputBuildTarget(f);
-
-    g_pFileSystem->Close(f);
   }
 
   return ok && !isSkippedMakefile;

@@ -233,9 +233,9 @@ CUtlVector<char>* GetFileStringWithReplacements(
 	{
 		return false;
 	}
+	RunCodeAtScopeExit(g_pFullFileSystem->Close( hFile ));
 	g_FileData.SetSize( g_pFullFileSystem->Size( hFile ) );
 	g_pFullFileSystem->Read( g_FileData.Base(), g_FileData.Count(), hFile );
-	g_pFullFileSystem->Close( hFile );
 	
 	CUtlVector<char> *pCurData = &g_FileData;
 	dataWriteLen = g_FileData.Count();

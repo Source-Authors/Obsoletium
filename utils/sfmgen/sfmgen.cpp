@@ -898,8 +898,8 @@ void CSFMGenApp::GenerateSFMFiles( SFMGenInfo_t& info )
 			FileHandle_t fh = g_pFullFileSystem->Open("tf_PhonemeData.txt", "wb");
 			if (fh)
 			{
+				RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
 				g_pFullFileSystem->Write(bufOutput.Base(), bufOutput.TellPut(), fh);
-				g_pFullFileSystem->Close(fh);
 			}
 		}
 
@@ -908,8 +908,8 @@ void CSFMGenApp::GenerateSFMFiles( SFMGenInfo_t& info )
 			FileHandle_t fh = g_pFullFileSystem->Open("tf_PhonemeFiles.txt", "wb");
 			if (fh)
 			{
+				RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
 				g_pFullFileSystem->Write(bufFilenames.Base(), bufFilenames.TellPut(), fh);
-				g_pFullFileSystem->Close(fh);
 			}
 		}
 	}

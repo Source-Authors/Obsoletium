@@ -1084,10 +1084,11 @@ void ParseFilesFromResList( UnusedContent::CUtlSymbol & resfilesymbol, CUtlRBTre
 	if ( !Q_StripLastDir( basedir, sizeof( basedir ) ) )
 		Error( "Can't get basedir from %s.", gamedir );
 
-	FileHandle_t resfilehandle;
-	resfilehandle = g_pFileSystem->Open( resfile, "rb" );
-	if ( FILESYSTEM_INVALID_HANDLE != resfilehandle )
+	FileHandle_t resfilehandle = g_pFileSystem->Open( resfile, "rb" );
+	if ( resfilehandle )
 	{
+		RunCodeAtScopeExit( g_pFileSystem->Close(resfilehandle) );
+
 		// Read in the entire file
 		int length = g_pFileSystem->Size(resfilehandle);
 		if ( length > 0 )
@@ -1151,8 +1152,6 @@ void ParseFilesFromResList( UnusedContent::CUtlSymbol & resfilesymbol, CUtlRBTre
 			}
 			delete[] pStart;
 		}
-
-		g_pFileSystem->Close(resfilehandle);
 	}
 
 	int filesFound = addedStrings;
@@ -1165,9 +1164,14 @@ bool BuildReferencedFileList( CUtlVector< UnusedContent::CUtlSymbol >& resfiles,
 	char token[COM_TOKEN_MAX_LENGTH];
 
 	// Load the reslist file
-	FileHandle_t resfilehandle;
-	resfilehandle = g_pFileSystem->Open( resfile, "rb" );
-	if ( FILESYSTEM_INVALID_HANDLE != resfilehandle )
+	FileHandle_t resfilehandle = g_pFileSystem->Open( resfile, "rb" );
+	if ( !resfilehandle )
+	{
+		Error( "Unable to open reslist file '%s'.\n", resfile );
+		exit( -1 );
+	}
+	RunCodeAtScopeExit( g_pFileSystem->Close(resfilehandle) );
+
 	{
 		// Read in and parse mapcycle.txt
 		int length = g_pFileSystem->Size(resfilehandle);
@@ -1180,18 +1184,17 @@ bool BuildReferencedFileList( CUtlVector< UnusedContent::CUtlSymbol >& resfiles,
 				pStart[ length ] = 0;
 
 				char *pFileList = pStart;
+				char szResList[ 256 ];
 
 				while ( 1 )
 				{
-					char szResList[ 256 ];
-
 					pFileList = COM_Parse( pFileList, token );
 					if ( Q_isempty( token ) )
 						break;
 
-					Q_snprintf(szResList, sizeof( szResList ), "%s%s.lst", g_szReslistDir, token );
-					_strlwr( szResList );
-					Q_FixSlashes( szResList );
+					V_sprintf_safe(szResList, "%s%s.lst", g_szReslistDir, token );
+					V_strlower( szResList );
+					V_FixSlashes( szResList );
 
 					if ( !g_pFileSystem->FileExists( szResList ) )
 					{
@@ -1199,20 +1202,11 @@ bool BuildReferencedFileList( CUtlVector< UnusedContent::CUtlSymbol >& resfiles,
 						continue;
 					}
 
-					UnusedContent::CUtlSymbol sym = g_Analysis.symbols.AddString( szResList );
-					resfiles.AddToTail( sym );
-
+					resfiles.AddToTail( g_Analysis.symbols.AddString( szResList ) );
 				}
 			}
 			delete[] pStart;
 		}
-
-		g_pFileSystem->Close(resfilehandle);
-	}
-	else
-	{
-		Error( "Unable to open reslist file %s\n", resfile );
-		exit( -1 );
 	}
 
 	if ( g_pFileSystem->FileExists( CFmtStr( "%sall.lst", g_szReslistDir ) ) )
@@ -1237,17 +1231,13 @@ bool BuildReferencedFileList( CUtlVector< UnusedContent::CUtlSymbol >& resfiles,
 
 	vprint( 0, "Parsed %i reslist files\n", resfiles.Count() );
 
+	char fn[ MAX_PATH ];
 	// Now load in each res file
-	int c = resfiles.Count();
-	for ( int i = 0; i < c; ++i )
+	for ( auto &filename : resfiles )
 	{
-		UnusedContent::CUtlSymbol& filename = resfiles[ i ];
-		char fn[ 256 ];
-		Q_strncpy( fn, g_Analysis.symbols.String( filename ), sizeof( fn ) );
-
+		V_strcpy_safe( fn, g_Analysis.symbols.String( filename ) );
 		ParseFilesFromResList( filename, files, fn );
 	}
-
 
 	return true;
 }

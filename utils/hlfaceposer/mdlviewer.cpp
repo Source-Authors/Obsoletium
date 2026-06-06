@@ -276,14 +276,21 @@ void CreatePath( const char *relative )
 int LoadFile (const char *filename, void **bufferptr)
 {
 	FileHandle_t f = filesystem->Open( filename, "rb" );
+	if (!f)
+	{
+		Error ("File '%s' open failure.\n", filename);
+		*bufferptr = nullptr;
+		return 0;
+	}
+	RunCodeAtScopeExit(filesystem->Close (f));
+
 	int length = filesystem->Size( f );
 	void *buffer = malloc (length+1);
 	((char *)buffer)[length] = 0;
 	if ( filesystem->Read (buffer, length, f) != (int)length )
 	{
-		Error ("File read failure");
+		Error ("File '%s' read failure.\n", filename);
 	}
-	filesystem->Close (f);
 
 	*bufferptr = buffer;
 	return length;

@@ -866,10 +866,11 @@ void ParseVCDFilesFromResList( CUtlVector< CUtlSymbol >& vcdsinreslist, char con
 	int addedStrings = 0;
 	int resourcesConsidered = 0;
 
-	FileHandle_t resfilehandle;
-	resfilehandle = g_pFullFileSystem->Open( resfile, "rb" );
-	if ( FILESYSTEM_INVALID_HANDLE != resfilehandle )
+	FileHandle_t resfilehandle = g_pFullFileSystem->Open( resfile, "rb" );
+	if ( resfilehandle )
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close(resfilehandle));
+
 		// Read in the entire file
 		int length = g_pFullFileSystem->Size(resfilehandle);
 		if ( length > 0 )
@@ -949,8 +950,6 @@ void ParseVCDFilesFromResList( CUtlVector< CUtlSymbol >& vcdsinreslist, char con
 			}
 			delete[] pStart;
 		}
-
-		g_pFullFileSystem->Close(resfilehandle);
 	}
 
 //	int filesFound = addedStrings;
@@ -983,10 +982,11 @@ void BuildVCDAndMapNameListsFromReslists( CUtlVector< CUtlSymbol >& vcdsinreslis
 		// and add engine.lst and all.lst at the very end
 
 		// Load them in
-		FileHandle_t resfilehandle;
-		resfilehandle = g_pFullFileSystem->Open( MAPLIST_FILE, "rb" );
-		if ( FILESYSTEM_INVALID_HANDLE != resfilehandle )
+		FileHandle_t resfilehandle = g_pFullFileSystem->Open( MAPLIST_FILE, "rb" );
+		if ( resfilehandle )
 		{
+			RunCodeAtScopeExit(g_pFullFileSystem->Close(resfilehandle));
+
 			// Read in and parse mapcycle.txt
 			int length = g_pFullFileSystem->Size(resfilehandle);
 			if ( length > 0 )
@@ -1028,8 +1028,6 @@ void BuildVCDAndMapNameListsFromReslists( CUtlVector< CUtlSymbol >& vcdsinreslis
 
 				loaded = true;
 			}
-
-			g_pFullFileSystem->Close(resfilehandle);
 		}
 	}
 	
@@ -1102,10 +1100,11 @@ void ParseUsedSoundsFromSndFile( CUtlRBTree< int, int >& usedsounds, char const 
 	int addedStrings = 0;
 	int resourcesConsidered = 0;
 
-	FileHandle_t resfilehandle;
-	resfilehandle = g_pFullFileSystem->Open( sndfile, "rb" );
-	if ( FILESYSTEM_INVALID_HANDLE != resfilehandle )
+	FileHandle_t resfilehandle = g_pFullFileSystem->Open( sndfile, "rb" );
+	if ( resfilehandle )
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close(resfilehandle));
+
 		// Read in the entire file
 		int length = g_pFullFileSystem->Size(resfilehandle);
 		if ( length > 0 )
@@ -1153,8 +1152,6 @@ void ParseUsedSoundsFromSndFile( CUtlRBTree< int, int >& usedsounds, char const 
 			}
 			delete[] pStart;
 		}
-
-		g_pFullFileSystem->Close(resfilehandle);
 	}
 
 	vprint( 1, "Found %i new resources (%i total) in %s\n", addedStrings, resourcesConsidered, sndfile );
@@ -2772,11 +2769,12 @@ void BuildOrderedCaptionList( CUtlVector< OrderedCaption_t >& list )
 {
 	// parse out the file
 	FileHandle_t file = g_pFullFileSystem->Open( "resource/closecaption_english.txt", "rb");
-	if ( file == FILESYSTEM_INVALID_HANDLE )
+	if ( !file )
 	{
 		// assert(!("CLocalizedStringTable::AddFile() failed to load file"));
 		return;
 	}
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(file));
 
 	// read into a memory block
 	int fileSize = g_pFullFileSystem->Size(file) ;
@@ -2790,7 +2788,6 @@ void BuildOrderedCaptionList( CUtlVector< OrderedCaption_t >& list )
 	// check the first character, make sure this a little-endian unicode file
 	if (data[0] != 0xFEFF)
 	{
-		g_pFullFileSystem->Close(file);
 		free(memBlock);
 		return;
 	}
@@ -2880,7 +2877,6 @@ void BuildOrderedCaptionList( CUtlVector< OrderedCaption_t >& list )
 		}
 	}
 
-	g_pFullFileSystem->Close(file);
 	free(memBlock);
 
 	vprint( 0, "Loaded %i captionnames from closecaption_english.txt\n", list.Count() );
@@ -2902,11 +2898,12 @@ void LoadImportData( char const *filename, CUtlDict< LookupData_t, int >& lookup
 {
 // parse out the file
 	FileHandle_t file = g_pFullFileSystem->Open( filename, "rb");
-	if ( file == FILESYSTEM_INVALID_HANDLE )
+	if ( !file )
 	{
 		// assert(!("CLocalizedStringTable::AddFile() failed to load file"));
 		return;
 	}
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(file));
 
 	// read into a memory block
 	int fileSize = g_pFullFileSystem->Size(file) ;
@@ -2920,7 +2917,6 @@ void LoadImportData( char const *filename, CUtlDict< LookupData_t, int >& lookup
 	// check the first character, make sure this a little-endian unicode file
 	if (data[0] != 0xFEFF)
 	{
-		g_pFullFileSystem->Close(file);
 		free(memBlock);
 		return;
 	}
@@ -2964,7 +2960,6 @@ void LoadImportData( char const *filename, CUtlDict< LookupData_t, int >& lookup
 		lookup.Insert( key, ld );
 	}
 
-	g_pFullFileSystem->Close(file);
 	free(memBlock);
 
 	vprint( 0, "Loaded %i wav/captions from %s\n", lookup.Count(), filename );
@@ -3079,10 +3074,10 @@ void ImportCaptions( char const *pchImportfile )
 
 	// Now try and spit out a file like the cc english file, but with the new data
 	FileHandle_t fh = g_pFullFileSystem->Open( CAPTION_OUT_FILE , "wb" );
-	if ( FILESYSTEM_INVALID_HANDLE != fh )
+	if ( fh )
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close( fh ));
 		g_pFullFileSystem->Write( buf.Base(), buf.TellPut(), fh );
-		g_pFullFileSystem->Close( fh );
 	}
 	else
 	{

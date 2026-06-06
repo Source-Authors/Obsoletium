@@ -101,8 +101,10 @@ intp CmdLib_ExpandWithBasePaths( CUtlVector< CUtlString > &expandedPathList, con
 int LoadFile( const char *filename, void **bufferptr )
 {
 	FileHandle_t f = g_pFullFileSystem->Open( filename, "rb" );
-	if ( FILESYSTEM_INVALID_HANDLE != f )
+	if ( f )
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close (f));
+		
 		int length = g_pFullFileSystem->Size( f );
 		void *buffer = malloc(length+1);
 		if (!buffer)
@@ -112,15 +114,12 @@ int LoadFile( const char *filename, void **bufferptr )
 		}
 		((char *)buffer)[length] = 0;
 		g_pFullFileSystem->Read( buffer, length, f );
-		g_pFullFileSystem->Close (f);
 		*bufferptr = buffer;
 		return length;
 	}
-	else
-	{
-		*bufferptr = NULL;
-		return 0;
-	}
+
+	*bufferptr = NULL;
+	return 0;
 }
 
 

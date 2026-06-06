@@ -69,17 +69,21 @@ WriteBrushList
 */
 void WriteBrushList (char *name, bspbrush_t *brush, qboolean onlyvis)
 {
-	int		i;
-	side_t	*s;
-
 	qprintf ("writing %s\n", name);
+
 	FileHandle_t f = g_pFileSystem->Open(name, "w");
+	if (!f)
+	{
+		Warning( "Unable to open '%s' to write brush list.\n", name );
+		return;
+	}
+	RunCodeAtScopeExit(g_pFileSystem->Close (f));
 
 	for ( ; brush ; brush=brush->next)
 	{
-		for (i=0 ; i<brush->numsides ; i++)
+		for (int i=0 ; i<brush->numsides ; i++)
 		{
-			s = &brush->sides[i];
+			auto *s = &brush->sides[i];
 			if (!s->winding)
 				continue;
 			if (onlyvis && !s->visible)
@@ -87,8 +91,6 @@ void WriteBrushList (char *name, bspbrush_t *brush, qboolean onlyvis)
 			OutputWinding (brush->sides[i].winding, f);
 		}
 	}
-
-	g_pFileSystem->Close (f);
 }
 
 void PrintBrush (bspbrush_t *brush)

@@ -296,18 +296,16 @@ void CWaveFile::ExportValveDataChunk( char const *tempfile )
 		Con_ColorPrintf( ERROR_R, ERROR_G, ERROR_B, "CWaveFile::ExportValveDataChunk:  Unable to write to %s (read-only?)\n", tempfile );
 		return;
 	}
-	else
-	{
-		// Buffer and dump data
-		CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
 
-		m_Sentence.SaveToBuffer( buf );
+	// Buffer and dump data
+	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
 
-		filesystem->Write( buf.Base(), buf.TellPut(), fh );
-		filesystem->Close(fh);
+	m_Sentence.SaveToBuffer( buf );
 
-		Con_Printf( "Exported %i words to %s\n", m_Sentence.m_Words.Count(), tempfile );
-	}
+	filesystem->Write( buf.Base(), buf.TellPut(), fh );
+
+	Con_Printf( "Exported %zd words to %s\n", m_Sentence.m_Words.Count(), tempfile );
 }
 
 //-----------------------------------------------------------------------------

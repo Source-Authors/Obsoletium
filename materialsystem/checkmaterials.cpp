@@ -41,14 +41,16 @@ static bool DoesTextureUseAlpha( const char *pTextureName, const char *pMaterial
 
 	CUtlBuffer buf;
 	FileHandle_t fileHandle = g_pFullFileSystem->Open( pCacheFileName, "rb" );
-	if ( fileHandle == FILESYSTEM_INVALID_HANDLE)
+	if ( !fileHandle )
 	{
 		Warning( "Material \"%s\": can't open texture \"%s\"\n", pMaterialName, pCacheFileName );
 		return false;
 	}
+	RunCodeAtScopeExit( g_pFullFileSystem->Close( fileHandle ) );
 
 	// Check the .vtf for an alpha channel
 	IVTFTexture *pVTFTexture = CreateVTFTexture();
+	RunCodeAtScopeExit(DestroyVTFTexture( pVTFTexture ));
 
 	int nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
 	buf.EnsureCapacity( nHeaderSize );
@@ -63,7 +65,6 @@ static bool DoesTextureUseAlpha( const char *pTextureName, const char *pMaterial
 	if (!pVTFTexture->Unserialize( buf, true ))
 	{
 		Warning( "Error reading material \"%s\"\n", pCacheFileName );
-		g_pFullFileSystem->Close(fileHandle);
 	}
 	else
 	{
@@ -73,8 +74,6 @@ static bool DoesTextureUseAlpha( const char *pTextureName, const char *pMaterial
 		}
 	}
 
-	DestroyVTFTexture( pVTFTexture );
-	g_pFullFileSystem->Close( fileHandle );
 	return bUsesAlpha;
 }
 
@@ -105,14 +104,16 @@ static bool DoesTextureUseNormal( const char *pTextureName, const char *pMateria
 
 	CUtlBuffer buf;
 	FileHandle_t fileHandle = g_pFullFileSystem->Open( pCacheFileName, "rb" );
-	if ( fileHandle == FILESYSTEM_INVALID_HANDLE)
+	if ( !fileHandle )
 	{
-//		Warning( "Material \"%s\": can't open texture \"%s\"\n", pMaterialName, pCacheFileName );
+		Warning( "Material \"%s\": can't open texture \"%s\"\n", pMaterialName, pCacheFileName );
 		return false;
 	}
+	RunCodeAtScopeExit( g_pFullFileSystem->Close( fileHandle ) );
 
 	// Check the .vtf for an alpha channel
 	IVTFTexture *pVTFTexture = CreateVTFTexture();
+	RunCodeAtScopeExit(DestroyVTFTexture( pVTFTexture ));
 
 	int nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
 	buf.EnsureCapacity( nHeaderSize );
@@ -141,9 +142,7 @@ static bool DoesTextureUseNormal( const char *pTextureName, const char *pMateria
 			}
 		}
 	}
-
-	DestroyVTFTexture( pVTFTexture );
-	g_pFullFileSystem->Close( fileHandle );
+	
 	return bUsesNormal;
 }
 
@@ -164,10 +163,10 @@ static bool IsTexture( const char *pTextureName )
 	Q_snprintf( pCacheFileName, sizeof( pCacheFileName ), "materials/%s.vtf", pTextureName );
 
 	FileHandle_t fileHandle = g_pFullFileSystem->Open( pCacheFileName, "rb" );
-	if ( fileHandle == FILESYSTEM_INVALID_HANDLE)
+	if ( !fileHandle )
 		return false;
 
-	g_pFullFileSystem->Close( fileHandle );
+	RunCodeAtScopeExit( g_pFullFileSystem->Close( fileHandle ) );
 	return true;
 }
 

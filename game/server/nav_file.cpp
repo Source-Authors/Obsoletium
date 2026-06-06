@@ -1217,11 +1217,11 @@ static NavErrorType CheckNavFile( const char *bspFilename )
 		return NAV_CANT_ACCESS_FILE;
 
 	char baseName[256];
-	Q_StripExtension(bspFilename,baseName,sizeof(baseName));
+	V_StripExtension(bspFilename,baseName);
 	char bspPathname[256];
-	Q_snprintf(bspPathname,sizeof(bspPathname), FORMAT_BSPFILE, baseName);
+	V_sprintf_safe(bspPathname, FORMAT_BSPFILE, baseName);
 	char filename[256];
-	Q_snprintf(filename,sizeof(filename), FORMAT_NAVFILE, baseName);
+	V_sprintf_safe(filename, FORMAT_NAVFILE, baseName);
 
 	bool navIsInBsp = false;
 	FileHandle_t file = filesystem->Open( filename, "rb", "MOD" );	// this ignores .nav files embedded in the .bsp ...
@@ -1236,13 +1236,13 @@ static NavErrorType CheckNavFile( const char *bspFilename )
 		return NAV_CANT_ACCESS_FILE;
 	}
 
+	RunCodeAtScopeExit(filesystem->Close( file ));
+
 	// check magic number
-	int result;
 	unsigned int magic;
-	result = filesystem->Read( magic, file );
+	int result = filesystem->Read( magic, file );
 	if (!result || magic != NAV_MAGIC_NUMBER)
 	{
-		filesystem->Close( file );
 		return NAV_INVALID_FILE;
 	}
 
@@ -1251,7 +1251,6 @@ static NavErrorType CheckNavFile( const char *bspFilename )
 	result = filesystem->Read( version, file );
 	if (!result || version > NavCurrentVersion || version < 4)
 	{
-		filesystem->Close( file );
 		return NAV_BAD_FILE_VERSION;
 	}
 

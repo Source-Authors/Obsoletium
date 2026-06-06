@@ -275,20 +275,18 @@ static bool SaveCleanKeyValuesToFile( KeyValues *pkv, IBaseFileSystem *pFileSyst
 	// Write out KeyValues to the specified file but cleaner than KeyValues::SaveToFile
 	// create a write file
 	FileHandle_t hFile = pFileSystem->Open( pszFileName, "wb", pszPathID );
-
-	if ( hFile == FILESYSTEM_INVALID_HANDLE )
+	if ( !hFile )
 	{
-		Msg( "CleanSaveKeyValuesToFile: Couldn't open file \"%s\" for writing in path \"%s\".\n",
+		Warning( "CleanSaveKeyValuesToFile: Couldn't open file \"%s\" for writing in path \"%s\".\n",
 			pszFileName ? pszFileName : "NULL", pszPathID ? pszPathID : "NULL" );
 		return false;
 	}
+	RunCodeAtScopeExit(pFileSystem->Close( hFile ));
 
 	for ( KeyValues *pkvTmp = pkv; pkvTmp; pkvTmp = pkvTmp->GetNextKey() )
 	{
 		SaveToFile_R( pkvTmp, pFileSystem, hFile, bOptTabs, nOptSpaceIndent, 0 );
 	}
-
-	pFileSystem->Close( hFile );
 
 	return true;
 }

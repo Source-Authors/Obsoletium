@@ -262,8 +262,8 @@ void CWorkspace::SaveToFile()
 	FileHandle_t fh = filesystem->Open( m_szFile, "wt" );
 	if (fh)
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
 		filesystem->Write( buf.Base(), buf.TellPut(), fh );
-		filesystem->Close(fh);
 	}
 	else
 	{

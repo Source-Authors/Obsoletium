@@ -65,9 +65,13 @@ void SafeCopy( const char *pSrcFilename, const char *pDestFilename )
 	FileHandle_t fpSrc = g_pFullFileSystem->Open( pSrcFilename, "rb" );
 	if ( fpSrc )
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close( fpSrc ));
+
 		FILE *fpDest = fopen( pDestFilename, "wb" );
 		if ( fpDest )
 		{
+			RunCodeAtScopeExit(fclose( fpDest ));
+
 			while ( 1 )
 			{
 				char tempData[4096];
@@ -78,16 +82,11 @@ void SafeCopy( const char *pSrcFilename, const char *pDestFilename )
 				if ( nBytesRead < sizeof( tempData ) )
 					break;
 			}
-
-			fclose( fpDest );
 		}
 		else
 		{
 			Warning( "SafeCopy: can't open %s for writing.", pDestFilename );
 		}
-
-
-		g_pFullFileSystem->Close( fpSrc );
 	}
 	else
 	{
@@ -207,7 +206,7 @@ public:
 		{
 			// Write file that ensures we never perform this check again
 			fp = g_pFullFileSystem->Open( SHOW_DEPRECATED_APP_ID_MARKER, "wb" );
-			g_pFullFileSystem->Close( fp );
+			RunCodeAtScopeExit(g_pFullFileSystem->Close( fp ));
 
 			//
 			// Look for all of the mods under 'SourceMods', check if the SteamAppId is out of date, and warn the user if 
@@ -240,8 +239,7 @@ public:
 				// GameInfo.txt exists so let's inspect it...
 				if ( fpGameInfo )
 				{
-					// Close the file handle
-					g_pFullFileSystem->Close( fpGameInfo );
+					RunCodeAtScopeExit(g_pFullFileSystem->Close( fpGameInfo ));
 				
 					// Load up the "gameinfo.txt"
 					KeyValues *pMainFile, *pFileSystemInfo, *pSearchPaths;
@@ -252,7 +250,7 @@ public:
 						const int iAppId = pFileSystemInfo->GetInt( "SteamAppId", -1 );
 
 						// This is the one that needs replacing add this mod to the list of suspect mods
-                  if ( GetAppSteamAppId( k_App_HL2 ) == iAppId)
+                  		if ( GetAppSteamAppId( k_App_HL2 ) == iAppId)
 						{
 							bProblemModExists = true;
 							Q_strncat( szProblemMods, modDirs[i], MAX_PATH , COPY_ALL_CHARACTERS );
@@ -288,7 +286,7 @@ public:
 
 		// Remember that we showed it.
 		fp = g_pFullFileSystem->Open( SHOW_MIGRATION_MARKER, "wb" );
-		g_pFullFileSystem->Close( fp );
+		RunCodeAtScopeExit( g_pFullFileSystem->Close( fp ) );
 
 		OpenLocalizedURL( "URL_Content_Migration_Notice" );
 	}

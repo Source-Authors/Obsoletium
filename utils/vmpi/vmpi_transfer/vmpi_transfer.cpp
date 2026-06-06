@@ -23,22 +23,25 @@ void DownloadFile( const char *pCachePath, const char *pRemoteFileBase, const ch
 {
 	// Setup local and remote filenames.
 	char remoteFilename[MAX_PATH];
+	V_ComposeFileName( pRemoteFileBase, pFilename, remoteFilename );
+	
 	char localFilename[MAX_PATH];
-	V_ComposeFileName( pRemoteFileBase, pFilename, remoteFilename, sizeof( remoteFilename ) );
-	V_ComposeFileName( pCachePath, pFilename, localFilename, sizeof( localFilename ) );
+	V_ComposeFileName( pCachePath, pFilename, localFilename );
 
 	// Read the file in.
 	FileHandle_t fpSrc = g_pFileSystem->Open( remoteFilename, "rb" );
-	if ( fpSrc == FILESYSTEM_INVALID_HANDLE )
+	if ( !fpSrc )
 	{
 		Error( "Unable to open %s on master.\n", remoteFilename );
 	}
+	RunCodeAtScopeExit(g_pFileSystem->Close( fpSrc ));
 	
 	unsigned int fileSize = g_pFileSystem->Size( fpSrc );
+
 	CUtlVector<char> data;
 	data.SetSize( fileSize );
+
 	g_pFileSystem->Read( data.Base(), fileSize, fpSrc );
-	g_pFileSystem->Close( fpSrc );
 	
 	// Now write the file to disk.
 	FILE *fpDest = fopen( localFilename, "wb" );
@@ -46,8 +49,9 @@ void DownloadFile( const char *pCachePath, const char *pRemoteFileBase, const ch
 	{
 		Error( "Can't open %s for writing.\n", localFilename );
 	}
+	RunCodeAtScopeExit(fclose( fpDest ));
+
 	fwrite( data.Base(), 1, data.Count(), fpDest );
-	fclose( fpDest );
 
 Warning( "Got file: %s\n", pFilename );
 }
