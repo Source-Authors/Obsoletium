@@ -30,11 +30,11 @@ bool WaveCreateTmpFile( const char *filename, int rate, int bits, int nChannels 
 
 	int chunkid = LittleLong( RIFF_ID );
 	int chunksize = LittleLong( 0 );
-	g_pFileSystem->Write( &chunkid, sizeof(int), file );
-	g_pFileSystem->Write( &chunksize, sizeof(int), file );
+	g_pFileSystem->Write( chunkid, file );
+	g_pFileSystem->Write( chunksize, file );
 
 	chunkid = LittleLong( RIFF_WAVE );
-	g_pFileSystem->Write( &chunkid, sizeof(int), file );
+	g_pFileSystem->Write( chunkid, file );
 
 	// create a 16-bit PCM stereo output file
 	PCMWAVEFORMAT fmt = {};
@@ -47,14 +47,14 @@ bool WaveCreateTmpFile( const char *filename, int rate, int bits, int nChannels 
 
 	chunkid = LittleLong( WAVE_FMT );
 	chunksize = LittleLong( sizeof(fmt) );
-	g_pFileSystem->Write( &chunkid, sizeof(int), file );
-	g_pFileSystem->Write( &chunksize, sizeof(int), file );
-	g_pFileSystem->Write( &fmt, sizeof( PCMWAVEFORMAT ), file );
+	g_pFileSystem->Write( chunkid, file );
+	g_pFileSystem->Write( chunksize, file );
+	g_pFileSystem->Write( fmt, file );
 
 	chunkid = LittleLong( WAVE_DATA );
 	chunksize = LittleLong( 0 );
-	g_pFileSystem->Write( &chunkid, sizeof(int), file );
-	g_pFileSystem->Write( &chunksize, sizeof(int), file );
+	g_pFileSystem->Write( chunkid, file );
+	g_pFileSystem->Write( chunksize, file );
 
 	return true;
 }
@@ -101,12 +101,12 @@ bool WaveFixupTmpFile( const char *filename )
 
 	size = LittleLong( size );
 	g_pFileSystem->Seek( file, sizeof( int ), FILESYSTEM_SEEK_HEAD );
-	g_pFileSystem->Write( &size, sizeof( int ), file );
+	g_pFileSystem->Write( size, file );
 
 	// skip the header and the 4-byte chunk tag and write the size
 	dataSize = LittleLong( dataSize );
 	g_pFileSystem->Seek( file, headerSize+sizeof( int ), FILESYSTEM_SEEK_HEAD );
-	g_pFileSystem->Write( &dataSize, sizeof( int ), file );
+	g_pFileSystem->Write( dataSize, file );
 
 	return true;
 }

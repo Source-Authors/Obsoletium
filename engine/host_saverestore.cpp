@@ -2543,7 +2543,7 @@ void CSaveRestore::DirectoryCopy( const char *pPath, const char *pDestFileName )
 		{
 			RunCodeAtScopeExit( g_pSaveRestoreFileSystem->Close( hFile ) );
 
-			g_pSaveRestoreFileSystem->Write( &nMaps, sizeof(nMaps), hFile );
+			g_pSaveRestoreFileSystem->Write( nMaps, hFile );
 		}
 
 		g_pSaveRestoreFileSystem->DirectoryCopy( pPath, pDestFileName );

@@ -987,7 +987,7 @@ void CEngineTool::StartRecordingVoiceToFile( const char *filename, const char *p
 
 		byte foo = 'b';
 
-		g_pFileSystem->Write( &foo, 1, fh );
+		g_pFileSystem->Write( foo, fh );
 	}
 
 	g_pFileSystem->RelativePathToFullPath_safe( filename, pPathID, m_szVoiceoverFile );

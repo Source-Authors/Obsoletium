@@ -28,6 +28,11 @@ public:
 		return Read( &out, static_cast<int>( sizeof(out) ), file );
 	}
 	virtual int				Write( void const* pInput, int size, FileHandle_t file ) = 0;
+	template<typename T>
+	std::enable_if_t<!std::is_pointer_v<T>, int>		Write( const T &in, FileHandle_t file )
+	{
+		return Write( &in, static_cast<int>( sizeof(in) ), file );
+	}
 	virtual void			Seek( FileHandle_t file, int pos, FileSystemSeek_t method ) = 0;
 	virtual unsigned int	Tell( FileHandle_t file ) = 0;
 	virtual unsigned int	Size( FileHandle_t file ) = 0;

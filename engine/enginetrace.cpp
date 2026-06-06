@@ -1543,7 +1543,7 @@ CON_COMMAND( ray_save, "Save the rays" )
 		{
 			RunCodeAtScopeExit(g_pFileSystem->Close(hFile));
 
-			g_pFileSystem->Write( &count, sizeof(count), hFile );
+			g_pFileSystem->Write( count, hFile );
 			g_pFileSystem->Write( s_BenchmarkRays.Base(), sizeof(s_BenchmarkRays[0])*count, hFile );
 		}
 	}

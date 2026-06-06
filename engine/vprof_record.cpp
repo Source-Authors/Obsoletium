@@ -114,11 +114,11 @@ public:
 		{
 			// Write the version number.
 			int version = VPROF_FILE_VERSION;
-			g_pFileSystem->Write( &version, sizeof( version ), m_hFile );
+			g_pFileSystem->Write( version, m_hFile );
 
 			// Write the root node ID.
 			int nodeID = g_VProfCurrentProfile.GetRoot()->GetUniqueNodeID();
-			g_pFileSystem->Write( &nodeID, sizeof( nodeID ), m_hFile );
+			g_pFileSystem->Write( nodeID, m_hFile );
 
 			++m_nQueuedStarts;
 			
@@ -130,7 +130,7 @@ public:
 
 	void Record_WriteToken( char val )
 	{
-		g_pFileSystem->Write( &val, sizeof( val ), m_hFile );
+		g_pFileSystem->Write( val, m_hFile );
 	}		
 
 	void Record_MatchTree_R( CVProfNode *pOut, const CVProfNode *pIn, CVProfile *pInProfile )
@@ -161,10 +161,10 @@ public:
 				int nodeID = pToAdd->GetUniqueNodeID();
 				
 				Record_WriteToken( Token_AddNode );
-				g_pFileSystem->Write( &parentNodeID, sizeof( parentNodeID ), m_hFile );						// Parent node ID.
+				g_pFileSystem->Write( parentNodeID, m_hFile );						// Parent node ID.
 				g_pFileSystem->Write( pToAdd->m_pszName, V_strlen( pToAdd->m_pszName ) + 1, m_hFile );	// Name of the new node.
-				g_pFileSystem->Write( &budgetGroupID, sizeof( budgetGroupID ), m_hFile );
-				g_pFileSystem->Write( &nodeID, sizeof( nodeID ), m_hFile );
+				g_pFileSystem->Write( budgetGroupID, m_hFile );
+				g_pFileSystem->Write( nodeID, m_hFile );
 
 				// There's a new one here.
 				const char *pBudgetGroupName = g_VProfCurrentProfile.GetBudgetGroupName( pToAdd->m_BudgetGroupID );
@@ -200,7 +200,7 @@ public:
 			int flags = pInProfile->GetBudgetGroupFlags( i );
 			Record_WriteToken( Token_AddBudgetGroup );
 			g_pFileSystem->Write( pName, V_strlen( pName ) + 1, m_hFile );
-			g_pFileSystem->Write( &flags, sizeof( flags ), m_hFile );
+			g_pFileSystem->Write( flags, m_hFile );
 
 			AddBudgetGroupName( pName, flags );
 		}
@@ -212,14 +212,14 @@ public:
 		if ( curCalls >= 255 )
 		{
 			unsigned char token = 255;
-			g_pFileSystem->Write( &token, sizeof( token ), m_hFile );
-			g_pFileSystem->Write( &curCalls, sizeof( curCalls ), m_hFile );
+			g_pFileSystem->Write( token, m_hFile );
+			g_pFileSystem->Write( curCalls, m_hFile );
 		}
 		else
 		{
 			// Get away with one byte if we can.
 			unsigned char token = (char)curCalls;
-			g_pFileSystem->Write( &token, sizeof( token ), m_hFile );
+			g_pFileSystem->Write( token, m_hFile );
 		}
 
 		// This allows us to write 2 bytes unless it's > 256 milliseconds (unlikely).
@@ -227,13 +227,13 @@ public:
 		if ( nMicroseconds >= 0xFFFF )
 		{
 			unsigned short token = 0xFFFF;
-			g_pFileSystem->Write( &token, sizeof( token ), m_hFile );
-			g_pFileSystem->Write( &nMicroseconds, sizeof( nMicroseconds ), m_hFile );
+			g_pFileSystem->Write( token, m_hFile );
+			g_pFileSystem->Write( nMicroseconds, m_hFile );
 		}
 		else
 		{
 			unsigned short token = (unsigned short)nMicroseconds;
-			g_pFileSystem->Write( &token, sizeof( token ), m_hFile );
+			g_pFileSystem->Write( token, m_hFile );
 		}
 
 		for ( const CVProfNode *pChild = pIn->m_pChild; pChild; pChild = pChild->m_pSibling )
@@ -250,9 +250,9 @@ public:
 		// Record the tick count and start of frame.
 		Record_WriteToken( Token_StartFrame );
 #ifdef SWDS
-		g_pFileSystem->Write( &host_tickcount, sizeof( host_tickcount ), m_hFile );		
+		g_pFileSystem->Write( host_tickcount, m_hFile );		
 #else
-		g_pFileSystem->Write( &g_ClientGlobalVariables.tickcount, sizeof( g_ClientGlobalVariables.tickcount ), m_hFile );
+		g_pFileSystem->Write( g_ClientGlobalVariables.tickcount, m_hFile );
 #endif
 		
 		// Record all the changes to get our tree and budget groups to g_VProfCurrentProfile.

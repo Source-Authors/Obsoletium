@@ -888,7 +888,7 @@ void VPKBuilder::BuildSteamPipeFriendlyFromInputKeys() {
       Assert(s_iChunkAlign > 0);
       while (iOffsetInChunk % s_iChunkAlign) {
         unsigned char zero = 0;
-        g_pFullFileSystem->Write(&zero, 1, fChunkWrite);
+        g_pFullFileSystem->Write(zero, fChunkWrite);
         ++iOffsetInChunk;
       }
 

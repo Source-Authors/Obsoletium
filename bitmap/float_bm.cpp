@@ -321,7 +321,7 @@ bool FloatBitMap_t::WriteTGAFile(char const *filename) const
 	myheader.height0= Height & 0xff;
 	myheader.height1= static_cast<unsigned char>(Height>>8);
 	myheader.attributes=0x20;
-	g_pFullFileSystem->Write(&myheader,sizeof(myheader),f);
+	g_pFullFileSystem->Write(myheader,f);
 	// now, write the pixels
 	for(int y=0;y<Height;y++)
 	{
@@ -333,7 +333,7 @@ bool FloatBitMap_t::WriteTGAFile(char const *filename) const
 			// dimhotepus: 4x speedup - write 4 colors at once.
 			const unsigned char pixels[]{pix8.Blue, pix8.Green, pix8.Red, pix8.Alpha};
 
-			g_pFullFileSystem->Write(pixels, sizeof(pixels), f);
+			g_pFullFileSystem->Write(pixels, f);
 		}
 	}
 		

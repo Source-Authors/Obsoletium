@@ -508,6 +508,11 @@ public:
 		return Read( &out, static_cast<int>( sizeof(out) ), file );
 	}
 	virtual int				Write( void const* pInput, int size, FileHandle_t file ) = 0;
+	template<typename T>
+	std::enable_if_t<!std::is_pointer_v<T>, int>		Write( const T &in, FileHandle_t file )
+	{
+		return Write( &in, static_cast<int>( sizeof(in) ), file );
+	}
 
 	// if pathID is nullptr, all paths will be searched for the file
 	virtual FileHandle_t	Open( const char *pFileName, const char *pOptions, const char *pathID = nullptr ) = 0;

@@ -634,7 +634,7 @@ bool CLocalizedStringTable::SaveToFile( const char *szFileName )
 	// write litte-endian unicode marker
 	unsigned short marker = 0xFEFF;
 	marker = LittleShort( marker );
-	g_pFullFileSystem->Write(&marker, sizeof( marker ), file);
+	g_pFullFileSystem->Write(marker, file);
 
 	const char *startStr = "\"lang\"\r\n{\r\n\"Language\" \"English\"\r\n\"Tokens\"\r\n{\r\n";
 	const char *endStr = "}\r\n}\r\n";
@@ -667,22 +667,22 @@ bool CLocalizedStringTable::SaveToFile( const char *szFileName )
 		// convert the name to a unicode string
 		ConvertANSIToUnicode(name, unicodeString);
 
-		g_pFullFileSystem->Write(&unicodeTab, sizeof(wchar_t), file);
+		g_pFullFileSystem->Write(unicodeTab, file);
 
 		// write out
-		g_pFullFileSystem->Write(&unicodeQuote, sizeof(wchar_t), file);
+		g_pFullFileSystem->Write(unicodeQuote, file);
 		g_pFullFileSystem->Write(unicodeString, V_wcslen( unicodeString ) * static_cast<int>(sizeof(wchar_t)), file);
-		g_pFullFileSystem->Write(&unicodeQuote, sizeof(wchar_t), file);
+		g_pFullFileSystem->Write(unicodeQuote, file);
 
-		g_pFullFileSystem->Write(&unicodeTab, sizeof(wchar_t), file);
-		g_pFullFileSystem->Write(&unicodeTab, sizeof(wchar_t), file);
+		g_pFullFileSystem->Write(unicodeTab, file);
+		g_pFullFileSystem->Write(unicodeTab, file);
 
-		g_pFullFileSystem->Write(&unicodeQuote, sizeof(wchar_t), file);
+		g_pFullFileSystem->Write(unicodeQuote, file);
 		g_pFullFileSystem->Write(value, V_wcslen(value) * static_cast<int>(sizeof(wchar_t)), file);
-		g_pFullFileSystem->Write(&unicodeQuote, sizeof(wchar_t), file);
+		g_pFullFileSystem->Write(unicodeQuote, file);
 
-		g_pFullFileSystem->Write(&unicodeCR, sizeof(wchar_t), file);
-		g_pFullFileSystem->Write(&unicodeNewline, sizeof(wchar_t), file);
+		g_pFullFileSystem->Write(unicodeCR, file);
+		g_pFullFileSystem->Write(unicodeNewline, file);
 	}
 
 	// write end string

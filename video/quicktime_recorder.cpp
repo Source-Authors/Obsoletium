@@ -226,7 +226,7 @@ void SaveToTargaFile( int frameNum, const char* pBaseFileName, int width, int he
 
 	FileHandle_t TGAFile = g_pFullFileSystem->Open( TGAFileName, "wb" );
 
-	g_pFullFileSystem->Write( &theHeader, sizeof( theHeader ), TGAFile );
+	g_pFullFileSystem->Write( theHeader, TGAFile );
 	
 	// is the buffer in BGR format?
 	if ( PixelFormat == k24BGRPixelFormat || PixelFormat == k32BGRAPixelFormat )

@@ -50,8 +50,8 @@ void CScratchPad3D::CCommand_Point::Read( CFileRead *pFile )
 
 void CScratchPad3D::CCommand_Point::Write( IFileSystem* pFileSystem, FileHandle_t fp )
 {
-	pFileSystem->Write( &m_flPointSize, sizeof(m_flPointSize), fp );
-	pFileSystem->Write( &m_Vert, sizeof(m_Vert), fp );
+	pFileSystem->Write( m_flPointSize, fp );
+	pFileSystem->Write( m_Vert, fp );
 }
 
 
@@ -66,7 +66,7 @@ void CScratchPad3D::CCommand_Line::Read( CFileRead *pFile )
 
 void CScratchPad3D::CCommand_Line::Write( IFileSystem* pFileSystem, FileHandle_t fp )
 {
-	pFileSystem->Write( m_Verts, sizeof(m_Verts), fp );
+	pFileSystem->Write( m_Verts, fp );
 }
 
 
@@ -88,7 +88,7 @@ void CScratchPad3D::CCommand_Polygon::Read( CFileRead *pFile )
 void CScratchPad3D::CCommand_Polygon::Write( IFileSystem* pFileSystem, FileHandle_t fp )
 {
 	int count = size_cast<int>( m_Verts.Count() );
-	pFileSystem->Write( &count, sizeof(count), fp );
+	pFileSystem->Write( count, fp );
 	
 	if( count )
 		pFileSystem->Write( &m_Verts[0], static_cast<int>(sizeof(CSPVert))*count, fp );
@@ -106,7 +106,7 @@ void CScratchPad3D::CCommand_Matrix::Read( CFileRead *pFile )
 
 void CScratchPad3D::CCommand_Matrix::Write( IFileSystem* pFileSystem, FileHandle_t fp )
 {
-	pFileSystem->Write( &m_mMatrix, sizeof(m_mMatrix), fp );
+	pFileSystem->Write( m_mMatrix, fp );
 }
 
 
@@ -122,8 +122,8 @@ void CScratchPad3D::CCommand_RenderState::Read( CFileRead *pFile )
 
 void CScratchPad3D::CCommand_RenderState::Write( IFileSystem* pFileSystem, FileHandle_t fp )
 {
-	pFileSystem->Write( &m_State, sizeof(m_State), fp );
-	pFileSystem->Write( &m_Val, sizeof(m_Val), fp );
+	pFileSystem->Write( m_State, fp );
+	pFileSystem->Write( m_Val, fp );
 }
 
 
@@ -145,10 +145,10 @@ void CScratchPad3D::CCommand_Text::Read( CFileRead *pFile )
 void CScratchPad3D::CCommand_Text::Write( IFileSystem* pFileSystem, FileHandle_t fp )
 {
 	int strLen = size_cast<int>( m_String.Count() );
-	pFileSystem->Write( &strLen, sizeof( strLen ), fp );
+	pFileSystem->Write( strLen, fp );
 	pFileSystem->Write( m_String.Base(), strLen, fp );
 
-	pFileSystem->Write( &m_TextParams, sizeof( m_TextParams ), fp );
+	pFileSystem->Write( m_TextParams, fp );
 }
 
 
@@ -447,7 +447,7 @@ void CScratchPad3D::Flush()
 	// Append the new commands to the file.
 	for( auto *c : m_Commands )
 	{
-		m_pFileSystem->Write( &c->m_iCommand, sizeof(c->m_iCommand), fp );
+		m_pFileSystem->Write( c->m_iCommand, fp );
 		c->Write( m_pFileSystem, fp );
 	}
 

@@ -701,16 +701,16 @@ void CUtlCachedFileData<T>::Save()
 		SetDirty( false );
 
 		int v = UTL_CACHE_SYSTEM_VERSION;
-		g_pFullFileSystem->Write( &v, sizeof( v ), fh );
+		g_pFullFileSystem->Write( v, fh );
 		v = m_nVersion;
-		g_pFullFileSystem->Write( &v, sizeof( v ), fh );
+		g_pFullFileSystem->Write( v, fh );
 		v = (int)m_uCurrentMetaChecksum;
-		g_pFullFileSystem->Write( &v, sizeof( v ), fh );
+		g_pFullFileSystem->Write( v, fh );
 
 		// Element count
 		int c = Count();
 
-		g_pFullFileSystem->Write( &c, sizeof( c ), fh );
+		g_pFullFileSystem->Write( c, fh );
 
 		// Save repository back out to disk...
 		CUtlBuffer buf( (intp)0, 0, 0 );
@@ -740,7 +740,7 @@ void CUtlCachedFileData<T>::Save()
 			((IBaseCacheInfo *)data)->Save( buf );
 
 			int bufsize = buf.TellPut();
-			g_pFullFileSystem->Write( &bufsize, sizeof( bufsize ), fh );
+			g_pFullFileSystem->Write( bufsize, fh );
 			g_pFullFileSystem->Write( buf.Base(), bufsize, fh );
 		}
 	}

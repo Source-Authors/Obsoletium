@@ -4966,7 +4966,7 @@ void CColorOperationListPanel::OnFileSelected( const char *pFilename )
 				color24 outColor;
 
 				outColor = colorcorrection->GetLookup( m_CCHandle, inColor );
-				g_pFileSystem->Write( &outColor, sizeof(color24), file_handle );
+				g_pFileSystem->Write( outColor, file_handle );
 			}
 		}
 	}

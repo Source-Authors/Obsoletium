@@ -99,13 +99,13 @@ void CVoiceBanMgr::SaveState(const char *pGameDir)
 		RunCodeAtScopeExit(filesystem->Close(fh));
 
 		int version = BANMGR_FILEVERSION;
-		filesystem->Write(&version, sizeof(version), fh);
+		filesystem->Write(version, fh);
 
 		for(auto &player : m_PlayerHash)
 		{
 			for(BannedPlayer *pCur=player.m_pNext; pCur != &player; pCur=pCur->m_pNext)
 			{
-				filesystem->Write(pCur->m_PlayerID, SIGNED_GUID_LEN, fh);
+				filesystem->Write(pCur->m_PlayerID, fh);
 			}
 		}
 	}
