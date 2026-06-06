@@ -57,7 +57,7 @@ CServerList::CServerList(IServerRefreshResponse *target) : m_Queries(0, MAX_QUER
 	if (!vgui::system()->GetRegistryString("HKEY_CURRENT_USER\\Software\\Valve\\Tracker\\Rate", speedBuf, sizeof(speedBuf)-1))
 	{
 		// default to DSL speed if no reg key found (an unlikely occurance)
-		strcpy(speedBuf, "7500");
+		V_strcpy_safe(speedBuf, "7500");
 	}
 	internetSpeed = atoi(speedBuf);
 	int maxSockets = (MAX_QUERY_SOCKETS * internetSpeed) / 10000;

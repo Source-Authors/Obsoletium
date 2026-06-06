@@ -69,7 +69,7 @@ void CCMDList::RunFrame()
 void CCMDList::ServerResponded()
 {
 	char store[2048];
-	strcpy(store, m_pRcon->RconResponse());
+	V_strcpy_safe(store, m_pRcon->RconResponse());
 	char *cur=store;
 	char *next=NULL;
 	char *cmd=NULL;
@@ -107,10 +107,9 @@ void CCMDList::ServerResponded()
 			}
 			*removeWhiteSpace='\0';
 
-			cmd = new char[strlen(cur)];
+			cmd = V_strdup(cur);
 			if(cmd)
 			{
-				strcpy(cmd,cur);
 				m_CMDList.AddToTail(cmd);
 			}
 		} 

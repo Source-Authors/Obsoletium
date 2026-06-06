@@ -232,9 +232,7 @@ void CChunk::RenameKey( const char *szOldName, const char *szNewName )
 // --------------------------------------------------------------------------------- //
 char *CopyString( char const *pStr )
 {
-	char *pRet = new char[ strlen(pStr) + 1 ];
-	strcpy( pRet, pStr );
-	return pRet;
+	return V_strdup( pStr );
 }
 
 ChunkFileResult_t MyDefaultHandler( CChunkFile *pFile, void *pData, char const *pChunkName )

@@ -20,8 +20,7 @@
 CTestCase::CTestCase( char const* pName, ITestSuite* pParent )
 {
 	Assert( pName );
-	m_pName = new char[strlen(pName) + 1];
-	strcpy( m_pName, pName );
+	m_pName = V_strdup( pName );
 	
 	// Only install the test case if it has no parent
 	if (pParent)
@@ -57,8 +56,7 @@ CTestSuite::CTestSuite( char const* pName, ITestSuite* pParent )
 	m_TestCount = 0;
 	m_ppTestCases = 0;
 
-	m_pName = new char[strlen(pName) + 1];
-	strcpy( m_pName, pName );
+	m_pName = V_strdup( pName );
 
 	// Only install the test case if it has no parent
 	if (pParent)

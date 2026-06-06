@@ -7,14 +7,13 @@
 #include <windows.h>
 #include "imysqlwrapper.h"
 #include "mysql_async.h"
-#include "utllinkedlist.h"
+#include "tier1/utllinkedlist.h"
+#include "tier1/strtools.h"
 
 
 static char* CopyString( const char *pStr )
 {
-	char *pRet = new char[ strlen( pStr ) + 1 ];
-	strcpy( pRet, pStr );
-	return pRet;
+	return V_strdup( pStr );
 }
 
 

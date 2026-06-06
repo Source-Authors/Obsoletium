@@ -14,6 +14,7 @@
 #include <libc.h>
 #endif
 
+#include "tier1/strtools.h"
 #include "goldsrc_standin.h"
 #include "wadlib.h"
 
@@ -243,8 +244,8 @@ void AddLump(char *name, void *buffer, int length, char type, char compress) {
 
   memset(info, 0, sizeof(info));
 
-  strcpy(info->name, name);
-  strupr(info->name);
+  V_strcpy_safe(info->name, name);
+  V_strupr(info->name);
 
   long ofs = ftell(outwad);
   info->filepos = wadlong(ofs);

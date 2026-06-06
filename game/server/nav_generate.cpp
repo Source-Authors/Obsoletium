@@ -4066,8 +4066,7 @@ void CNavMesh::SetPlayerSpawnName( const char *name )
 		delete [] m_spawnName;
 	}
 
-	m_spawnName = new char [ strlen(name) + 1 ];
-	strcpy( m_spawnName, name );
+	m_spawnName = name ? V_strdup( name ) : nullptr;
 }
 
 

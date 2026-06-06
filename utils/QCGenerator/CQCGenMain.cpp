@@ -52,9 +52,9 @@ CQCGenMain::CQCGenMain( Panel *parent, const char *pszPath, const char *pszScene
 	SetSize( 846, 770 );
 	SetMinimumSize(846, 770);	
 	char szTitle[MAX_PATH];
-	strcpy( szTitle, pszPath );
-	strcat( szTitle, "\\" );
-	strcat( szTitle, pszScene );
+	V_strcpy_safe( szTitle, pszPath );
+	V_strcat_safe( szTitle, "\\" );
+	V_strcat_safe( szTitle, pszScene );
 	SetTitle( szTitle, true );
 
     m_pQCGenerator = new CQCGenerator( this, pszPath, pszScene );

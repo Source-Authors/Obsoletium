@@ -8,6 +8,7 @@
 #include "smoothinggroupmgr.h"
 #include "mapface.h"
 #include "ChunkFile.h"
+#include "tier1/strtools.h"
 
 class CSmoothingGroupMgr : public ISmoothingGroupMgr
 {
@@ -387,7 +388,7 @@ ChunkFileResult_t CSmoothingGroupMgr::LoadSmoothingGroupKeyCallback( const char 
 		CMapDoc *pDoc = CMapDoc::GetActiveMapDoc();
 
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy( szBuf, szValue );
+		V_strcpy_safe( szBuf, szValue );
 
 		int iRow = atoi( &szKey[3] );
 

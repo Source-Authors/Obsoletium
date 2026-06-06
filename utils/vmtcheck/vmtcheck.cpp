@@ -250,7 +250,7 @@ int main( int argc, char* argv[] )
 	vprint( 0, "    Looking for messed up .vmt files...\n" );
 
 	char vmtdir[ 256 ];
-	strcpy( vmtdir, argv[ i - 1 ] );
+	V_strcpy_safe( vmtdir, argv[ i - 1 ] );
 
 	if ( !strstr( vmtdir, "materials" ) )
 	{

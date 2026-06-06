@@ -492,7 +492,7 @@ int main( int argc, char* argv[] )
 
 	vprint( 0, "    Paginating and Bates numbering documents...\n" );
 
-	strcpy( rootdir, argv[ argc - 1 ] );
+	V_strcpy_safe( rootdir, argv[ argc - 1 ] );
 
 	Q_FixSlashes( rootdir );
 	Q_strlower( rootdir );

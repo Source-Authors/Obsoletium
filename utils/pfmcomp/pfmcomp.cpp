@@ -1,6 +1,7 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 
 #include "tier0/platform.h"
+#include "tier1/strtools.h"
 #include "tier2/tier2.h"
 #include "bitmap/float_bm.h"
 #include "mathlib/mathlib.h"
@@ -35,7 +36,7 @@ int main(int argc,char **argv)
 		FloatBitMap_t save_orig(&cmap);
 		cmap.CompressTo8Bits(8.0);
 		char fname[1024];
-		strcpy(fname,argv[1]);
+		V_strcpy_safe(fname,argv[1]);
 		char *dot=strstr(fname,".pfm");
 		if (! dot)
 			dot=fname+strlen(fname);

@@ -162,7 +162,7 @@ void CBanList::ServerResponded()
 				{
 					if( ban.name[i]==' ') 
 					{
-						strcpy(&ban.name[i],&ban.name[i+1]);
+						V_strcpy_safe(ban.name[i],&ban.name[i+1]);
 					} 
 					else 
 					{

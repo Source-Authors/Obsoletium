@@ -522,7 +522,7 @@ void SetupPaths( int argc, char **argv )
 
 	CommandLine()->CreateCmdLine( argc, argv );
 	g_pGameDir = CommandLine()->ParmValue( "-gamedir", "" );
-	strcpy( g_ExeDir, argv[0] );
+	V_strcpy_safe( g_ExeDir, argv[0] );
 	Q_StripFilename( g_ExeDir );
 	Q_FixSlashes( g_ExeDir );
 //	printf( "exedir: \"%s\"\n", g_ExeDir );

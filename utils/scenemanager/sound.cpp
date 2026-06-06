@@ -1062,7 +1062,7 @@ CAudioSource *CSceneManagerSound::FindOrAddSound( const char *filename )
 
 	i = m_ActiveSounds.AddToTail();
 	s = &m_ActiveSounds[ i ];
-	strcpy( s->filename, filename );
+	V_strcpy_safe( s->filename, filename );
 	s->source = LoadSound( filename );
 	s->filetime = filesystem->GetFileTime( filename );
 

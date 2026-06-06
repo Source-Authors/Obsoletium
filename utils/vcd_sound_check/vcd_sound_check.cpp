@@ -9,6 +9,7 @@
 #include "tier0/dbg.h"
 #include "utldict.h"
 #include "tier1/UtlLinkedList.h"
+#include "tier1/strtools.h"
 #include "filesystem.h"
 #include "FileSystem_Tools.h"
 #include "KeyValues.h"
@@ -709,8 +710,8 @@ int main( int argc, char* argv[] )
 
 	char sounddir[ 256 ];
 	char vcddir[ 256 ];
-	strcpy( sounddir, argv[ i - 2 ] );
-	strcpy( vcddir, argv[ i - 1 ] );
+	V_strcpy_safe( sounddir, argv[ i - 2 ] );
+	V_strcpy_safe( vcddir, argv[ i - 1 ] );
 	if ( !strstr( sounddir, "sound" ) )
 	{
 		vprint( 0, "Sound dir %s looks invalid (format:  u:/tf2/hl2/sound/vo)\n", sounddir );

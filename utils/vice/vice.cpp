@@ -8,23 +8,25 @@
 // vice.cpp : Defines the entry point for the console application.
 //
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <malloc.h>
-#include <string.h>
-#include "tier1/strtools.h"
 #include <sys/stat.h>
-#include "conio.h"
+#include <conio.h>
 #include <direct.h>
 #include <io.h>
-#include "UtlBuffer.h"
-#include "tier0/dbg.h"
+#include <windows.h>
+
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+
 #include "cmdlib.h"
+#include "tier0/dbg.h"
 #include "tier0/icommandline.h"
-#include "windows.h"
+#include "tier1/strtools.h"
+#include "tier1/utlbuffer.h"
 
 #include "mathlib/IceKey.h"
-#include <filesystem_tools.h>
+#include "filesystem_tools.h"
 
 #define FF_TRYAGAIN 1
 #define FF_DONTPROCESS 2
@@ -151,7 +153,7 @@ int main(int argc, char* argv[])
 	}
 	char *pInputBaseName = NULL;
 	int i = 1;
-	strcpy( g_Extension, ".dat" );
+	V_strcpy_safe( g_Extension, ".dat" );
 	while( i < argc )
 	{
 		if( stricmp( argv[i], "-quiet" ) == 0 )

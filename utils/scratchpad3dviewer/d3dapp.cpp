@@ -130,7 +130,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	
 	// Initialize global strings
 	LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
-	strcpy( szWindowClass, "d3dapp" );
+	V_strcpy_safe( szWindowClass, "d3dapp" );
 	MyRegisterClass(hInstance);
 	
 	// Perform application initialization:

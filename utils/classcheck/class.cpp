@@ -19,7 +19,7 @@ CClass::CClass( const char *name )
 	m_nTDCount = 0;
 	m_nPredTDCount = 0;
 
-	strcpy( m_szName, name );
+	V_strcpy_safe( m_szName, name );
 	m_szBaseClass[0]=0;
 	m_pBaseClass = NULL;
 	m_szTypedefBaseClass[0]=0;
@@ -122,9 +122,9 @@ CTypeDescriptionField	*CClass::AddTD( const char *name, const char *type, const 
 	if ( !td )
 	{
 		td = new CTypeDescriptionField();
-		strcpy( td->m_szVariableName, name );
-		strcpy( td->m_szType, type );
-		strcpy( td->m_szDefineType, definetype );
+		V_strcpy_safe( td->m_szVariableName, name );
+		V_strcpy_safe( td->m_szType, type );
+		V_strcpy_safe( td->m_szDefineType, definetype );
 		td->m_bCommentedOut = incomments;
 
 		m_TDFields[ m_nTDCount++ ] = td;
@@ -143,9 +143,9 @@ CTypeDescriptionField	*CClass::AddPredTD( const char *name, const char *type, co
 	if ( !td )
 	{
 		td = new CTypeDescriptionField();
-		strcpy( td->m_szVariableName, name );
-		strcpy( td->m_szType, type );
-		strcpy( td->m_szDefineType, definetype );
+		V_strcpy_safe( td->m_szVariableName, name );
+		V_strcpy_safe( td->m_szType, type );
+		V_strcpy_safe( td->m_szDefineType, definetype );
 		td->m_bCommentedOut = incomments;
 		td->m_bRepresentedInRecvTable = inrecvtable;
 
@@ -165,7 +165,7 @@ CClassVariable	*CClass::AddVar( const char *name )
 	if ( !var )
 	{
 		var = new CClassVariable();
-		strcpy( var->m_szName, name );
+		V_strcpy_safe( var->m_szName, name );
 
 		m_Variables[ m_nVarCount++ ] = var;
 		if ( m_nVarCount >= MAX_VARIABLES )
@@ -183,7 +183,7 @@ CClassMemberFunction *CClass::AddMember( const char *name )
 	if ( !member )
 	{
 		member = new CClassMemberFunction();
-		strcpy( member->m_szName, name );
+		V_strcpy_safe( member->m_szName, name );
 
 		m_Members[ m_nMemberCount++ ] = member;
 		if ( m_nMemberCount >= MAX_MEMBERS )
@@ -199,7 +199,7 @@ void CClass::SetBaseClass( const char *name )
 {
 	if ( !m_szBaseClass[ 0 ] )
 	{
-		strcpy( m_szBaseClass, name );
+		V_strcpy_safe( m_szBaseClass, name );
 	}
 	else if ( stricmp( m_szBaseClass, name ) )
 	{
@@ -803,7 +803,7 @@ void CClass::AddVariable( int protection, char *type, char *name, bool array, ch
 	if ( !var )
 		return;
 
-	strcpy( var->m_szType, type );
+	V_strcpy_safe( var->m_szType, type );
 	var->m_Type = (CClassVariable::VARTYPE)protection;
 	var->m_TypeSize = GetTypeSize( this, var );
 
@@ -812,7 +812,7 @@ void CClass::AddVariable( int protection, char *type, char *name, bool array, ch
 	if ( array )
 	{
 		var->m_bIsArray = true;
-		strcpy( var->m_szArraySize, arraysize );
+		V_strcpy_safe( var->m_szArraySize, arraysize );
 	}
 	else
 	{
@@ -899,19 +899,19 @@ bool CClass::ParseNetworkVar( char *&input, int protection )
 		Assert( V_streq( com_token, "(") );
 
 		input = CC_ParseToken( input );
-		strcpy( var.m_pType, "CHandle<" );
+		V_strcpy_safe( var.m_pType, "CHandle<" );
 		do
 		{
-			strcat( var.m_pType, com_token );
-			strcat( var.m_pType, " " );
+			V_strcat_safe( var.m_pType, com_token );
+			V_strcat_safe( var.m_pType, " " );
 			input = CC_ParseToken( input );
 		} while( strcmp( com_token, ",") );
-		strcat( var.m_pType, ">" );
+		V_strcat_safe( var.m_pType, ">" );
 
 		input = CC_ParseToken( input );
 		do
 		{
-			strcat( var.m_pName, com_token );
+			V_strcat_safe( var.m_pName, com_token );
 			input = CC_ParseToken( input );
 		} while( strcmp( com_token, ")") );
 
@@ -1025,7 +1025,7 @@ bool CClass::ParseClassMember( char *&input, int protection )
 	if ( ParseNetworkVar( input, protection ) )
 		return true;
 
-	strcpy( var.m_pName, com_token );
+	V_strcpy_safe( var.m_pName, com_token );
 	if ( V_strieq( var.m_pName, "SHARED_CLASSNAME" ) )
 	{
 		input = CC_ParseToken( input );
@@ -1103,8 +1103,8 @@ bool CClass::ParseClassMember( char *&input, int protection )
 				if ( com_token[0] == '*' )
 				{
 					// com_token is the variable name
-					sprintf( var.m_pType, "%s (%s)", var.m_pName, pfn );
-					strcpy( var.m_pName, com_token );
+					V_sprintf_safe( var.m_pType, "%s (%s)", var.m_pName, pfn );
+					V_strcpy_safe( var.m_pName, com_token );
 					input = end + 1;
 				}
 
@@ -1163,7 +1163,7 @@ bool CClass::ParseClassMember( char *&input, int protection )
 			do
 			{
 				AppendType( var.m_pName, var.m_pType );
-				strcpy( var.m_pName, com_token );
+				V_strcpy_safe( var.m_pName, com_token );
 
 				input = CC_ParseToken( input );
 				if ( Q_isempty( com_token ) )
@@ -1172,7 +1172,7 @@ bool CClass::ParseClassMember( char *&input, int protection )
 			while ( strcmp( com_token, ">" ) );
 
 			AppendType( var.m_pName, var.m_pType );
-			strcpy( var.m_pName, com_token );
+			V_strcpy_safe( var.m_pName, com_token );
 		}
 		else
 		{
@@ -1183,7 +1183,7 @@ bool CClass::ParseClassMember( char *&input, int protection )
 				skipvar = true;
 			}
 			AppendType( var.m_pName, var.m_pType );
-			strcpy( var.m_pName, com_token );
+			V_strcpy_safe( var.m_pName, com_token );
 			continue;
 		}
 
@@ -1223,8 +1223,8 @@ bool CClass::ParseClassMember( char *&input, int protection )
 		strcat( type, " *" );
 
 		char newname[ 256 ];
-		strcpy( newname, &var.m_pName[1] );
-		strcpy( var.m_pName, newname );
+		V_strcpy_safe( newname, &var.m_pName[1] );
+		V_strcpy_safe( var.m_pName, newname );
 	}
 	*/
 
@@ -1233,7 +1233,7 @@ bool CClass::ParseClassMember( char *&input, int protection )
 		CClassMemberFunction *member = AddMember( var.m_pName );
 		if ( member )
 		{
-			strcpy( member->m_szType, var.m_pType );
+			V_strcpy_safe( member->m_szType, var.m_pType );
 			member->m_Type = (CClassMemberFunction::MEMBERTYPE)protection;
 		}
 	}
@@ -1253,7 +1253,7 @@ bool CClass::ParseClassMember( char *&input, int protection )
 					char *p = var.m_pType;
 					p = CC_ParseToken( p );
 					p = CC_ParseToken( p );
-					strcpy( m_szTypedefBaseClass, com_token );
+					V_strcpy_safe( m_szTypedefBaseClass, com_token );
 				}
 			}
 
@@ -1279,7 +1279,7 @@ bool CClass::ParseClassMember( char *&input, int protection )
 			if ( V_streq( com_token, ";" ) )
 				break;
 			
-			strcpy( var.m_pName, com_token );
+			V_strcpy_safe( var.m_pName, com_token );
 
 		} while ( 1 );
 	}

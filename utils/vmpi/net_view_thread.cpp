@@ -6,13 +6,12 @@
 
 #include "stdafx.h"
 #include "net_view_thread.h"
+#include "tier1/strtools.h"
 
 
 char* CopyAlloc( const char *pStr )
 {
-	char *pRet = new char[ strlen( pStr ) + 1];
-	strcpy( pRet, pStr );
-	return pRet;
+	return V_strdup( pStr );
 }
 
 

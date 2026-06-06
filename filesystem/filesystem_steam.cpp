@@ -1194,7 +1194,7 @@ HANDLE CFileSystem_Steam::FS_FindFirstFile(const char *findname, WIN32_FIND_DATA
 	else
 	{
 		hResult = (HANDLE)steamResult;
-		strcpy(dat->cFileName, steamFindInfo.cszName);
+		V_strcpy_safe(dat->cFileName, steamFindInfo.cszName);
 		
 // NEED TO DEAL WITH THIS STUFF!!!  FORTUNATELY HALF-LIFE DOESN'T USE ANY OF IT
 // AND ARCANUM USES _findfirst() etc.
@@ -1237,7 +1237,7 @@ bool CFileSystem_Steam::FS_FindNextFile(HANDLE handle, WIN32_FIND_DATA *dat)
 
 	if ( result )
 	{
-		strcpy(dat->cFileName, steamFindInfo.cszName);
+		V_strcpy_safe(dat->cFileName, steamFindInfo.cszName);
 		if ( steamFindInfo.bIsDir )
 			dat->dwFileAttributes |= FILE_ATTRIBUTE_DIRECTORY;
 		else

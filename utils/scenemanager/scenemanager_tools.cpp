@@ -14,9 +14,10 @@
 #include "workspacebrowser.h"
 #include "tier2/riff.h"
 #include "sentence.h"
-#include "utlbuffer.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/strtools.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
-#include <KeyValues.h>
+#include "tier1/KeyValues.h"
 #include "MultipleRequest.h"
 
 bool SceneManager_HasWindowStyle( mxWindow *w, int bits )
@@ -157,7 +158,7 @@ void Con_ColorPrintf( int r, int g, int b, const char *fmt, ... )
 char *SceneManager_MakeWindowsSlashes( char *pname )
 {
 	static char returnString[ 4096 ];
-	strcpy( returnString, pname );
+	V_strcpy_safe( returnString, pname );
 	pname = returnString;
 
 	while ( *pname ) {

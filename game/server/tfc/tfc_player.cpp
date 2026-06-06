@@ -867,7 +867,7 @@ void CTFCPlayer::Spy_ResetExternalWeaponModel( void )
 
 #ifdef TFCTODO // spy
 	pev->weaponmodel = MAKE_STRING( m_pszSavedWeaponModel );
-	strcpy( m_szAnimExtention, m_szSavedAnimExtention );
+	V_strcpy_safe( m_szAnimExtention, m_szSavedAnimExtention );
 	m_iCurrentAnimationState = 0; // force the current animation sequence to be recalculated
 #endif
 }

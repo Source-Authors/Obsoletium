@@ -19,6 +19,8 @@
 #include "bot_util.h"
 #include "cs_bot.h"		// BOTPORT: Remove this CS dependency
 
+#include "tier1/strtools.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -365,7 +367,7 @@ void BotProfileManager::Init( const char *filename, unsigned int *checksum )
 
 			// found attribute name - keep it
 			char attributeName[64];
-			strcpy( attributeName, token );
+			V_strcpy_safe( attributeName, token );
 
 			// eat '='
 			dataFile = SharedParse( dataFile );

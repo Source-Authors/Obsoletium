@@ -110,7 +110,7 @@ int main( int argc, char* argv[] )
 	vprint( 0, "    Looking for unneeded header includes...\n" );
 
 	char sourcetreebase[ 256 ];
-	strcpy( sourcetreebase, argv[i-2] );
+	V_strcpy_safe( sourcetreebase, argv[i-2] );
 
 	Q_StripTrailingSlash( sourcetreebase );
 

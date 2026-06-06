@@ -30,6 +30,7 @@
 #include "tier0/icommandline.h"
 
 #include "tier0/vprof.h"
+#include "tier1/strtools.h"
 #include "glmtexinlines.h"
 
 #include "materialsystem/IShader.h"
@@ -3350,7 +3351,7 @@ void GLMContext::DebugDump( GLMDebugHookInfo *info, uint options, uint vertDumpM
 			}
 			else
 			{
-				strcpy( attribtemp, "no attrib map" );
+				V_strcpy_safe( attribtemp, "no attrib map" );
 			}
 			
 			char *trans = strstr(vp->m_text, "#// trans#");
@@ -3360,7 +3361,7 @@ void GLMContext::DebugDump( GLMDebugHookInfo *info, uint options, uint vertDumpM
 			}
 			else
 			{
-				strcpy( transtemp, "no translation info" );
+				V_strcpy_safe( transtemp, "no translation info" );
 			}
 			
 			char *linkpath = "no file link";
@@ -3397,7 +3398,7 @@ void GLMContext::DebugDump( GLMDebugHookInfo *info, uint options, uint vertDumpM
 			}
 			else
 			{
-				strcpy( transtemp, "no translation info" );
+				V_strcpy_safe( transtemp, "no translation info" );
 			}
 			
 			char *linkpath = "no file link";
@@ -3645,7 +3646,7 @@ void GLMContext::DebugDump( GLMDebugHookInfo *info, uint options, uint vertDumpM
 				}
 				else
 				{
-					strcpy( sizestr, GLMDecode( eGL_ENUM, setdesc->m_nCompCount ) );
+					V_strcpy_safe( sizestr, GLMDecode( eGL_ENUM, setdesc->m_nCompCount ) );
 				}
 				
 				if (pSetup->m_vtxAttribMap[index] != 0xBB)

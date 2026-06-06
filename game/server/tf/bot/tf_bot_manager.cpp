@@ -717,7 +717,7 @@ CON_COMMAND_F( tf_bot_debug_stuck_log, "Given a server logfile, visually display
 
 				if ( mapname )
 				{
-					strcpy( logMapName, mapname );
+					V_strcpy_safe( logMapName, mapname );
 					Warning( "*** Log file from map '%s'\n", mapname );
 				}
 			}

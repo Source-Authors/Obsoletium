@@ -367,7 +367,7 @@ void CWaveFile::ImportValveDataChunk( char const *tempfile )
 void CWaveFile::GetPhonemeExportFile( char *path, int maxlen )
 {
 	char relative[ 512 ];
-	strcpy( relative, GetFileName() );
+	V_strcpy_safe( relative, GetFileName() );
 	Q_StripExtension( relative, relative, sizeof( relative ) );
 	Q_DefaultExtension( relative, WORD_DATA_EXTENSION, sizeof( relative ) );
 

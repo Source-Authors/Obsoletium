@@ -5,6 +5,8 @@
 //=====================================================================================//
 #include "vproject.h"
 
+#include "tier1/strtools.h"
+
 #define MAX_PROJECTS 50
 
 #define ID_PROJECTS_LISTVIEW 100
@@ -52,7 +54,7 @@ void SetVProject( const char *pProjectName )
 
 	if ( pProjectName )
 	{
-		strcpy( project, pProjectName );
+		V_strcpy_safe( project, pProjectName );
 		Sys_StripQuotesFromToken( project );
 
 		for ( i=0; i<g_numProjects; i++ )
@@ -176,7 +178,7 @@ void LoadRegistryValues()
 		projectName[0] = '\0';
 		gamedirString[0] = '\0';
 
-		sprintf( keyBuff, "project%d", i );
+		V_sprintf_safe( keyBuff, "project%d", i );
 		Sys_GetRegistryString( keyBuff, valueBuff, "", sizeof( valueBuff ) );
 
 		// parse and populate valid values
@@ -184,7 +186,7 @@ void LoadRegistryValues()
 		token = Sys_GetToken( &ptr, false, NULL );
 		if ( token[0] )
 		{
-			strcpy( projectName, token );
+			V_strcpy_safe( projectName, token );
 		}
 		else
 		{
@@ -194,7 +196,7 @@ void LoadRegistryValues()
 		token = Sys_GetToken( &ptr, false, NULL );
 		if ( token[0] )
 		{
-			strcpy( gamedirString, token );
+			V_strcpy_safe( gamedirString, token );
 		}
 
 		AddVProject( projectName, gamedirString );
@@ -372,10 +374,10 @@ void ShowPopupMenu( HWND hWnd, bool bUseCachedMenuPos )
 	char szMenuItem[MAX_PATH];
 	for ( int nIndex = 0; nIndex < g_numProjects; nIndex++ )
 	{
-		strcpy( szMenuItem, g_projects[nIndex].pName );
-		strcat( szMenuItem, "\t" );
-		strcat( szMenuItem, g_projects[nIndex].pGamedir );
-		strcat( szMenuItem, "     " );
+		V_strcpy_safe( szMenuItem, g_projects[nIndex].pName );
+		V_strcat_safe( szMenuItem, "\t" );
+		V_strcat_safe( szMenuItem, g_projects[nIndex].pGamedir );
+		V_strcat_safe( szMenuItem, "     " );
 
 		InsertMenu( g_hMenu, nIndex, MF_BYPOSITION | MF_STRING, nIndex + 1, szMenuItem );
 	}
@@ -428,8 +430,8 @@ void TrayMessageHandler( HWND hWnd, UINT uMessageID )
 		SetForegroundWindow( hWnd );
 		if ( g_nActiveVProject )
 		{
-			strcpy( g_project_name, g_projects[g_nActiveVProject-1].pName );
-			strcpy( g_project_gamedir, g_projects[g_nActiveVProject-1].pGamedir );
+			V_strcpy_safe( g_project_name, g_projects[g_nActiveVProject-1].pName );
+			V_strcpy_safe( g_project_gamedir, g_projects[g_nActiveVProject-1].pGamedir );
 			if ( ModifyDlg_Open() )
 			{
 				ModifyVProject( g_nActiveVProject-1, g_project_name, g_project_gamedir );
@@ -545,7 +547,7 @@ bool Startup()
 	g_iconData.uCallbackMessage = WM_TRAY;
 	g_iconData.uFlags           = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 	g_iconData.uID              = ID_TRAY;
-	strcpy(g_iconData.szTip, "VPROJECT");
+	V_strcpy_safe(g_iconData.szTip, "VPROJECT");
 	Shell_NotifyIcon( NIM_ADD, &g_iconData );
 
 	// Create popup menu and add initial items
@@ -563,7 +565,7 @@ bool Startup()
 	if ( vproject && vproject[0] )
 	{
 		char temp[MAX_PATH];
-		strcpy( temp, vproject );
+		V_strcpy_safe( temp, vproject );
 		Sys_NormalizePath( temp, false );
 		for ( i=0; i<g_numProjects; i++ )
 		{

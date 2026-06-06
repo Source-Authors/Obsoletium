@@ -17,7 +17,7 @@
 #include "vmpi.h"
 #include "service_conn_mgr.h"
 #include <io.h>
-#include <time.h>
+#include <ctime>
 
 
 
@@ -182,8 +182,7 @@ void CUIConnMgr::HandlePacket( const char *pData, int len )
 			delete [] g_pPassword;
 
 		const char *pStr = &pData[offset];
-		g_pPassword = new char[ strlen( pStr ) + 1 ];
-		strcpy( g_pPassword, pStr );
+		g_pPassword = V_strdup( pStr );
 		offset += strlen( pStr ) + 1;
 
 		UpdatePopupMenuState();

@@ -840,7 +840,7 @@ bool xZipAddFile( const char* zipname, bool bPrecacheEntireFile, bool bProcessPr
 {
 	// Clean up the filename:
 	char buffer[MAX_PATH];
-	strcpy(buffer, zipname);
+	V_strcpy_safe(buffer, zipname);
 
 	// Fix slashes and convert it to lower case:
 	char *filename;

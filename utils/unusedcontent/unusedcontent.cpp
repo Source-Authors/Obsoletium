@@ -1668,7 +1668,7 @@ int main( int argc, char* argv[] )
 	vprint( 0, "    Looking for extraneous content...\n" );
 
 	char resfile[ 256 ];
-	strcpy( resfile, argv[ i - 1 ] );
+	V_strcpy_safe( resfile, argv[ i - 1 ] );
 
 	vprint( 0, "    Comparing results of resfile (%s) with files under current directory...\n",	resfile );
 

@@ -13,6 +13,7 @@
 #include <direct.h>
 #include <stdarg.h>
 
+#include "tier1/strtools.h"
 #include "goldsrc_standin.h"
 
 #include "wadlib.h"
@@ -329,14 +330,14 @@ int PrintUsage(const char *pExtra, ...) {
 }
 
 // Take something like "c:/a/b/c/filename.ext" and return "filename".
-void GetBaseFilename(const char *pWadFilename, char wadBaseName[512]) {
+void GetBaseFilename(const char *pWadFilename, char (&wadBaseName)[512]) {
   const char *pBase = strrchr(pWadFilename, '\\');
   if (strrchr(pWadFilename, '/') > pBase) pBase = strrchr(pWadFilename, '/');
 
   if (pBase)
-    strcpy(wadBaseName, pBase + 1);
+    V_strcpy_safe(wadBaseName, pBase + 1);
   else
-    strcpy(wadBaseName, pWadFilename);
+    V_strcpy_safe(wadBaseName, pWadFilename);
 
   char *pDot = strchr(wadBaseName, '.');
   if (pDot) *pDot = 0;

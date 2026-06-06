@@ -16,6 +16,8 @@
 #include <rpcdce.h>
 #include <ks.h>
 
+#include "tier1/strtools.h"
+
 // Fwd declarations
 class CValveIpcMgr;
 class CValveIpcServer;
@@ -476,9 +478,11 @@ VALVE_IPC_IMPL HANDLE CValveIpcMgr::DuplicateMemorySegmentHandle()
 VALVE_IPC_IMPL CValveIpcServer::CValveIpcServer( char const *szServerName )
 {
 	// Copy server name
-	size_t nLen = szServerName ? strlen( szServerName ) : 0;
-	m_szServerName = new char[ nLen + 1 ];
-	strcpy( m_szServerName, szServerName ? szServerName : "" );
+	m_szServerName = szServerName ? V_strdup( szServerName ) : new char[ 1 ];
+	if (!szServerName)
+	{
+		m_szServerName[0] = '\0';
+	}
 
 	// Init remaining
 	m_szServerUID = nullptr;
@@ -816,9 +820,11 @@ VALVE_IPC_IMPL BOOL CValveIpcServer::Stop()
 VALVE_IPC_IMPL CValveIpcClient::CValveIpcClient( char const *szServerName )
 {
 	// Copy server name
-	size_t nLen = szServerName ? strlen( szServerName ) : 0;
-	m_szServerName = new char[ nLen + 1 ];
-	strcpy( m_szServerName, szServerName ? szServerName : "" );
+	m_szServerName = szServerName ? V_strdup( szServerName ) : new char[ 1 ];
+	if (!szServerName)
+	{
+		m_szServerName[0] = '\0';
+	}
 
 	// Init remaining
 	m_szServerUID = nullptr;

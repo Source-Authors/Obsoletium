@@ -297,7 +297,7 @@ void CTabWindow::add( const char *item )
 
 	Q_memset( &p->rect, 0, sizeof( p->rect) );
 
-	strcpy( p->m_szString, item );
+	V_strcpy_safe( p->m_szString, item );
 	p->m_szPrefix[ 0 ] = 0;
 	m_nSelected = min( m_nSelected, m_Items.Size() - 1 );
 	m_nSelected = max( m_nSelected, 0 );

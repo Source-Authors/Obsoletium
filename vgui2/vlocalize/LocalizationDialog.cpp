@@ -58,7 +58,7 @@ CLocalizationDialog::CLocalizationDialog(const char *fileName) : Frame(NULL, "Lo
 
 	LoadControlSettings("Resource/LocalizationDialog.res");
 
-	strcpy(m_szFileName, fileName);
+	V_strcpy_safe(m_szFileName, fileName);
 
 	char buf[512];
 	Q_snprintf(buf, sizeof( buf ), "%s - Localization Editor", m_szFileName);

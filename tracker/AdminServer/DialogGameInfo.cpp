@@ -108,11 +108,11 @@ void CDialogGameInfo::Run(const char *titleName)
 	char buf[512];
 	if (titleName)
 	{
-		sprintf(buf, "Game Info - %s", titleName);
+		V_sprintf_safe(buf, "Game Info - %s", titleName);
 	}
 	else
 	{
-		strcpy(buf, "Game Info");
+		V_strcpy_safe(buf, "Game Info");
 	}
 	SetTitle(buf, true);
 

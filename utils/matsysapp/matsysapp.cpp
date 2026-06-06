@@ -73,8 +73,8 @@ public:
 		}
 		// allocate exactly enough memory for the versioned name on the stack.
 		char proxyVersionedName[1024];
-		strcpy( proxyVersionedName, proxyName );
-		strcat( proxyVersionedName, IMATERIAL_PROXY_INTERFACE_VERSION );
+		V_strcpy_safe( proxyVersionedName, proxyName );
+		V_strcat_safe( proxyVersionedName, IMATERIAL_PROXY_INTERFACE_VERSION );
 
 		IMaterialProxy *materialProxy;
 		materialProxy = ( IMaterialProxy * )clientFactory( proxyVersionedName, NULL );
@@ -620,7 +620,7 @@ bool MaterialSystemApp::InitMaterialSystem()
 	char defaultShaderDLL[256];
 	if(!pShaderDLL)
 	{
-		strcpy(defaultShaderDLL, "shaderapidx9.dll");
+		V_strcpy_safe(defaultShaderDLL, "shaderapidx9.dll");
 		pShaderDLL = defaultShaderDLL;
 	}
 

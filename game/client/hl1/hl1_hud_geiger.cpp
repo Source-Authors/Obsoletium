@@ -199,11 +199,11 @@ void CHudGeiger::Paint()
 		char sz[256];
 		if ( highsound )
 		{
-			strcpy( sz, "Geiger.BeepHigh" );
+			V_strcpy_safe( sz, "Geiger.BeepHigh" );
 		}
 		else
 		{
-			strcpy( sz, "Geiger.BeepLow" );
+			V_strcpy_safe( sz, "Geiger.BeepLow" );
 		}
 
 		CSoundParameters params;

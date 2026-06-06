@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
 	// If it didn't load the module above, then use the 
 	if ( !pModule )
 	{
-		strcpy( dllName, "texturecompile_dll.dll" );
+		V_strcpy_safe( dllName, "texturecompile_dll.dll" );
 		pModule = Sys_LoadModule( dllName );
 	}
 

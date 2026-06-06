@@ -15,7 +15,8 @@ extern "C"
 };
 
 #include "imysqlwrapper.h"
-#include <stdio.h>
+#include "tier1/strtools.h"
+#include <cstdio>
 
 
 static char* CopyString( const char *pStr )
@@ -25,9 +26,7 @@ static char* CopyString( const char *pStr )
 		pStr = "";
 	}
 
-	char *pRet = new char[ strlen( pStr ) + 1 ];
-	strcpy( pRet, pStr );
-	return pRet;
+	return V_strdup( pStr );
 }
 
 

@@ -25,6 +25,7 @@
 #include "resource.h"
 #include "perf_counters.h"
 #include "tier0/icommandline.h"
+#include "tier1/strtools.h"
 
 
 // If we couldn't get into a job (maybe they weren't accepting more workers at the time),
@@ -1087,9 +1088,7 @@ void AdjustSuperDebugArgs( CUtlVector<char*> &args )
 
 
 	// Now insert -allowdebug.
-	const char *pAllowDebug = "-allowdebug";
-	char *pToInsert = new char[ strlen( pAllowDebug ) + 1 ];
-	strcpy( pToInsert, pAllowDebug );
+	char *pToInsert = V_strdup( "-allowdebug" );
 	args.InsertAfter( 0, pToInsert );
 
 }

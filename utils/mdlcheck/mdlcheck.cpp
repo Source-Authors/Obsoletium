@@ -9,7 +9,7 @@
 #include <windows.h>
 #include "mdlcheck_util.h"
 #include "tier0/dbg.h"
-#include "utldict.h"
+#include "tier1/utldict.h"
 #include "tier1/utlstring.h"
 
 bool uselogfile = false;
@@ -195,8 +195,8 @@ bool AddModelNameFromSource( CUtlDict< ModelFile, int >& models, char const *fil
 	{
 		char shortname[ MAX_PATH ];
 		char shortname2[ MAX_PATH ];
-		strcpy( shortname, &filename[ offset ] );
-		strcpy( shortname2, &models[ idx ].qcfile[ offset ] );
+		V_strcpy_safe( shortname, &filename[ offset ] );
+		V_strcpy_safe( shortname2, &models[ idx ].qcfile[ offset ] );
 
 		vprint_queued( 0, "multiple .qc's build %s\n  %s\n  %s\n",
 			modelname,
@@ -206,8 +206,8 @@ bool AddModelNameFromSource( CUtlDict< ModelFile, int >& models, char const *fil
 	}
 
 	ModelFile mf;
-	strcpy( mf.qcfile, filename );
-	_strlwr( mf.qcfile );
+	V_strcpy_safe( mf.qcfile, filename );
+	V_strlower( mf.qcfile );
 	mf.version = 0;
 
 	models.Insert( modelname, mf );
@@ -297,7 +297,7 @@ bool ValidateModelFile( char const *modelname, int offset )
 
 	// See if there's a .qc which builds this model
 	char shortname[ MAX_PATH ];
-	strcpy( shortname, &modelname[ offset ] );
+	V_strcpy_safe( shortname, &modelname[ offset ] );
 
 	Q_FixSlashes( shortname );
 
@@ -492,9 +492,9 @@ int main( int argc, char* argv[] )
 	CheckLogFile();
 
 	char modelsources[ 256 ];
-	strcpy( modelsources, argv[ i - 2 ] );
+	V_strcpy_safe( modelsources, argv[ i - 2 ] );
 	char modelsdir[ 256 ];
-	strcpy( modelsdir, argv[ i - 1 ] );
+	V_strcpy_safe( modelsdir, argv[ i - 1 ] );
 
 	if ( !strstr( modelsdir, "models" ) )
 	{

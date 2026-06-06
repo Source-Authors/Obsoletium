@@ -7,7 +7,8 @@
 //=============================================================================//
 
 #include <windows.h>
-#include <stdio.h>
+#include <cstdio>
+#include "tier1/strtools.h"
 
 template <class T, int nBlockSize, int nMaxBlocks>
 class BlockArray
@@ -86,11 +87,11 @@ T& BlockArray<T,nBlockSize,nMaxBlocks>::operator[] (int iIndex)
 	return Blocks[iIndex / nBlockSize][iIndex % nBlockSize];
 }
 
-typedef struct
+struct Buffy
 {
 	char Name[128];
 	int iValue;
-} Buffy;
+};
 
 int main()
 {
@@ -99,10 +100,10 @@ int main()
 	for(int i = 0; i < 256; i++)
 	{
 		Buffies[i].iValue = i;
-		strcpy(Buffies[i].Name, "Buk bUk buK");
+		V_strcpy_safe(Buffies[i].Name, "Buk bUk buK");
 	}
 
-	for(i = 0; i < 256; i++)
+	for(int i = 0; i < 256; i++)
 	{
 		printf("%d: %s\n", Buffies[i].iValue, Buffies[i].Name);
 	}

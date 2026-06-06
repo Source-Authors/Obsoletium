@@ -10,6 +10,7 @@
 #ifndef SHARED_UTIL_H
 #define SHARED_UTIL_H
 
+#include "tier1/strtools.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -43,9 +44,7 @@ bool SharedTokenWaiting( const char *buffer );
  */
 inline char *CloneString( const char *str )
 {
-	char *cloneStr = new char [ strlen(str)+1 ];
-	strcpy( cloneStr, str );
-	return cloneStr;
+	return V_strdup( str );
 }
 
 //--------------------------------------------------------------------------------------------------------------

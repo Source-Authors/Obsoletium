@@ -11,6 +11,7 @@
 #include <windows.h>
 
 #include "tier0/platform.h"
+#include "tier1/strtools.h"
 #include "depcheck_util.h"
 #include "codeprocessor.h"
 
@@ -56,7 +57,7 @@ void CCodeProcessor::AddHeader( int depth, const char *filename, const char *roo
 	}
 	
 	// Add to list
-	strcpy( m_Headers[ m_nHeaderCount++ ].name, filename );
+	V_strcpy_safe( m_Headers[ m_nHeaderCount++ ].name, filename );
 }
 
 void CCodeProcessor::CreateBackup( const char *filename, bool& wasreadonly )
@@ -76,7 +77,7 @@ void CCodeProcessor::CreateBackup( const char *filename, bool& wasreadonly )
 	}
 
 	char backupname[ 256 ];
-	strcpy( backupname, filename );
+	V_strcpy_safe( backupname, filename );
 	strcpy( (char *)&backupname[ strlen( filename ) - 4 ], ".bak" );
 
 	unlink( backupname );
@@ -89,7 +90,7 @@ void CCodeProcessor::RestoreBackup( const char *filename, bool makereadonly )
 	assert( strstr( filename, ".cpp" ) );
 
 	char backupname[ 256 ];
-	strcpy( backupname, filename );
+	V_strcpy_safe( backupname, filename );
 	strcpy( (char *)&backupname[ strlen( filename ) - 4 ], ".bak" );
 
 	SetFileAttributes( filename, FILE_ATTRIBUTE_NORMAL );
@@ -223,11 +224,11 @@ retry:
 		{
 			checkroot = true;
 			// Load the base module
-			sprintf( filename, "%s\\%s", baseroot, module );
+			V_sprintf_safe( filename, "%s\\%s", baseroot, module );
 			goto retry;
 		}
 		m_Modules[ m_nModuleCount ].skipped = true;
-		strcpy( m_Modules[ m_nModuleCount++ ].name, filename );
+		V_strcpy_safe( m_Modules[ m_nModuleCount++ ].name, filename );
 		
 		skippedfiles++;
 		return;
@@ -236,7 +237,7 @@ retry:
 	m_nBytesProcessed += filelength;
 
 	m_Modules[ m_nModuleCount ].skipped = false;
-	strcpy( m_Modules[ m_nModuleCount++ ].name, filename );
+	V_strcpy_safe( m_Modules[ m_nModuleCount++ ].name, filename );
 
 	bool readonly = false;
 	bool madechanges = false;
@@ -244,7 +245,7 @@ retry:
 
 	if ( !forcequiet )
 	{
-		strcpy( m_szCurrentCPP, filename );
+		V_strcpy_safe( m_szCurrentCPP, filename );
 		
 		vprint( 0, "- %s\n", (char *)&filename[ m_nOffset ] );
 	}
@@ -426,11 +427,11 @@ char const *stristr( char const *src, char const *search )
 	char buf1[ 512 ];
 	char buf2[ 512 ];
 
-	strcpy( buf1, src );
-	_strlwr( buf1 );
+	V_strcpy_safe( buf1, src );
+	V_strlower( buf1 );
 
-	strcpy( buf2, search );
-	_strlwr( buf2 );
+	V_strcpy_safe( buf2, search );
+	V_strlower( buf2 );
 
 	char *p =  strstr( buf1, buf2 );
 	if ( p )
@@ -481,8 +482,8 @@ void CCodeProcessor::ConstructModuleList_R( int level, const char *gamespecific,
 
 void CCodeProcessor::Process( const char *gamespecific, const char *root, const char *dsp, const char *config )
 {
-	strcpy( m_szDSP, dsp );
-	strcpy( m_szConfig, config );
+	V_strcpy_safe( m_szDSP, dsp );
+	V_strcpy_safe( m_szConfig, config );
 
 	m_nBytesProcessed	= 0;
 	m_nFilesProcessed	= 0;

@@ -203,7 +203,7 @@ int main (int argc, char *argv[])
 
 	// make sure, we start in the right directory
 	char szName[256];
-	strcpy (szName, mx::getApplicationPath() );
+	V_strcpy_safe (szName, mx::getApplicationPath() );
 	mx::init (argc, argv);
 
 	char workingdir[ 256 ];
