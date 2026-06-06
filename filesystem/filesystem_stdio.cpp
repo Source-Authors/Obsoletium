@@ -1105,8 +1105,6 @@ bool CWin32ReadOnlyFile::CanOpen( const char *, const char *options )
 
 static HANDLE OpenWin32File( const char *filename, bool bOverlapped, bool bUnbuffered, int64 *pFileSize )
 {
-	HANDLE hFile;
-
 	DWORD createFlags = FILE_ATTRIBUTE_NORMAL;
 		
 	if ( bOverlapped )
@@ -1119,7 +1117,7 @@ static HANDLE OpenWin32File( const char *filename, bool bOverlapped, bool bUnbuf
 		createFlags |= FILE_FLAG_NO_BUFFERING;
 	}
 
-	hFile = ::CreateFile( filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, createFlags, NULL );
+	HANDLE hFile = ::CreateFile( filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, createFlags, NULL );
 	if ( hFile != INVALID_HANDLE_VALUE && !*pFileSize )
 	{
 		LARGE_INTEGER fileSize;
@@ -1127,8 +1125,14 @@ static HANDLE OpenWin32File( const char *filename, bool bOverlapped, bool bUnbuf
 		{
 			CloseHandle( hFile );
 			hFile = INVALID_HANDLE_VALUE;
+
+			// dimhotepus: Ensure 0 size when file is not opened.
+			*pFileSize = 0;
 		}
-		*pFileSize = fileSize.QuadPart;
+		else
+		{
+			*pFileSize = fileSize.QuadPart;
+		}
 	}
 	return hFile;
 }
