@@ -166,17 +166,13 @@ bool CCodeProcessor::TryBuild( const char *rootdir, const char *filename, unsign
 	// Wait until child process exits.
     WaitForSingleObject( pi.hProcess, INFINITE );
 
-	bool retval = false;
-	DWORD exitCode = -1;
-	if ( GetExitCodeProcess( pi.hProcess, &exitCode ) )
+	// dimhotepus: Correctly process exit code for processes.
+	if ( DWORD rc; ::GetExitCodeProcess( pi.hProcess, &rc ) && rc != STILL_ACTIVE )
 	{
-		if ( !exitCode )
-		{
-			retval = true;
-		}
+		return rc == 0;
 	}
 
-	return retval;
+	return false;
 }
 
 void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, int& numheaders, int& skippedfiles, const char *baseroot, const char *root, const char *module )

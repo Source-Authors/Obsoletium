@@ -164,10 +164,10 @@ bool CItemUpload::RunCommandLine( const char *pszCmdLine, const char *pszWorking
 
 		bOk = false;
 
-		DWORD nExitCode = 0;
-		if ( GetExitCodeProcess( piProcInfo.hProcess, &nExitCode ) )
+		// dimhotepus: Correctly process exit code for processes.
+		if ( DWORD rc; ::GetExitCodeProcess( piProcInfo.hProcess, &rc ) && rc != STILL_ACTIVE )
 		{
-			bOk = ( nExitCode == 0 );
+			bOk = rc == 0;
 		}
 	}
 	else

@@ -257,13 +257,14 @@ int Sys_Exec( const char *pProgName, const char *pCmdLine, bool verbose )
 		} while ( exitCode == STILL_ACTIVE );
 		*/
 		
-		DWORD exitCode;
+		// dimhotepus: Correctly process exit code for processes.
+		if ( DWORD rc; ::GetExitCodeProcess( pi.hProcess, &rc ) && rc != STILL_ACTIVE )
+		{
+			Con_Printf( "Finished\n" );
+			return (int)rc;
+		}
 		
-		GetExitCodeProcess( pi.hProcess, &exitCode );
-
-		Con_Printf( "Finished\n" );
-		
-		return (int)exitCode;
+		return 1;
 	}
 	else
 	{
