@@ -2378,9 +2378,6 @@ void CHammer::Autosave( void )
 //-----------------------------------------------------------------------------
 bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 {	
-	HANDLE hDir;
-	HANDLE hTestFile;
-
 	char szRootDir[MAX_PATH];
 	if ( szAutosaveDirectory )
 	{
@@ -2407,7 +2404,7 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 		}
 	}
 
-	hDir = CreateFile (
+	HANDLE hDir = CreateFile (
 		strAutosaveDirectory,
 		GENERIC_READ,
 		FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
@@ -2416,7 +2413,6 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 		FILE_FLAG_BACKUP_SEMANTICS,
 		NULL
 		);
-
 	if ( hDir == INVALID_HANDLE_VALUE )
 	{
 		bool bDirResult = CreateDirectory( strAutosaveDirectory, NULL );
@@ -2428,35 +2424,30 @@ bool CHammer::VerifyAutosaveDirectory( char *szAutosaveDirectory ) const
 	}    
 	else
 	{
-		CloseHandle( hDir );
+		RunCodeAtScopeExit( CloseHandle( hDir ) );
 
-		hTestFile = CreateFile( strAutosaveDirectory + "test.txt", 
+		HANDLE hTestFile = CreateFile( strAutosaveDirectory + "test.txt", 
 			GENERIC_READ,
 			FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,
 			NULL,
 			CREATE_NEW,
-			FILE_FLAG_BACKUP_SEMANTICS,
+			// dimhotepus: Use delete on close semantic.
+			FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_DELETE_ON_CLOSE,
 			NULL
 			);
-		
 		if ( hTestFile == INVALID_HANDLE_VALUE )
 		{
-			 if ( GetLastError() == ERROR_ACCESS_DENIED )
-			 {
-				 AfxMessageBox( "The autosave directory is marked as read only.\n\nPlease remove the read only attribute or select a new directory in Tools->Options->General.\nThe autosave feature will be disabled.", MB_OK | MB_ICONERROR );
-				 return false;
-			 }
-			 else
-			 {
-				 AfxMessageBox( "There is a problem with the autosave directory.\n\nPlease select a new directory in Tools->Options->General.\nThe autosave feature will be disabled.", MB_OK | MB_ICONERROR );
-				 return false;
-			 }
+			if ( GetLastError() == ERROR_ACCESS_DENIED )
+			{
+				AfxMessageBox( "The autosave directory is marked as read only.\n\nPlease remove the read only attribute or select a new directory in Tools->Options->General.\nThe autosave feature will be disabled.", MB_OK | MB_ICONERROR );
+				return false;
+			}
 
-			 
+			AfxMessageBox( "There is a problem with the autosave directory.\n\nPlease select a new directory in Tools->Options->General.\nThe autosave feature will be disabled.", MB_OK | MB_ICONERROR );
+			return false;
 		}
 
-		CloseHandle( hTestFile );
-		DeleteFile( strAutosaveDirectory + "test.txt" );	
+		RunCodeAtScopeExit( CloseHandle( hTestFile ) );
 	}
 
 	return true;
