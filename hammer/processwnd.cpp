@@ -84,7 +84,6 @@ void CProcessWnd::Append(CString str)
 int CProcessWnd::Execute(LPCTSTR pszCmd, LPCTSTR pszCmdLine)
 {
 	int rval = -1;
-	HANDLE hChildStdinRd_, hChildStdinWr, hChildStdoutRd_, hChildStdoutWr, hChildStderrWr; 
 
     // Set the bInheritHandle flag so pipe handles are inherited.
     SECURITY_ATTRIBUTES saAttr = {}; 
@@ -93,112 +92,114 @@ int CProcessWnd::Execute(LPCTSTR pszCmd, LPCTSTR pszCmdLine)
     saAttr.lpSecurityDescriptor = NULL; 
  
     // Create a pipe for the child's STDOUT. 
-    if (::CreatePipe(&hChildStdoutRd_, &hChildStdoutWr, &saAttr, 0))
+	HANDLE hChildStdoutRd_, hChildStdoutWr;
+    if (!::CreatePipe(&hChildStdoutRd_, &hChildStdoutWr, &saAttr, 0))
+		return rval;
+
+	RunCodeAtScopeExit(::CloseHandle(hChildStdoutRd_));
+	RunCodeAtScopeExit(::CloseHandle(hChildStdoutWr));
+
+	HANDLE hChildStdinRd_, hChildStdinWr;
+	if (!::CreatePipe(&hChildStdinRd_, &hChildStdinWr, &saAttr, 0))
+		return rval;
+	
+	RunCodeAtScopeExit(::CloseHandle(hChildStdinRd_));
+	RunCodeAtScopeExit(::CloseHandle(hChildStdinWr));
+
+	HANDLE hChildStderrWr;
+	if (!::DuplicateHandle
+		(
+			::GetCurrentProcess(),
+			hChildStdoutWr,
+			::GetCurrentProcess(),
+			&hChildStderrWr,
+			0,
+			TRUE,
+			DUPLICATE_SAME_ACCESS
+		))
+		return rval;
+
+	RunCodeAtScopeExit(::CloseHandle(hChildStderrWr));
+
+	/* Now create the child process. */ 
+	STARTUPINFO si = {static_cast<DWORD>(sizeof(si))};
+	si.dwFlags = STARTF_USESTDHANDLES;
+	si.hStdInput = hChildStdinRd_;
+	si.hStdError = hChildStderrWr;
+	si.hStdOutput = hChildStdoutWr;
+
+	PROCESS_INFORMATION pi;
+	CString str;
+	str.Format("%s %s", pszCmd, pszCmdLine);
+
+	if (!::CreateProcess(NULL, str.GetBuffer(), NULL, NULL, TRUE, 
+		DETACHED_PROCESS, NULL, NULL, &si, &pi))
 	{
-		if (::CreatePipe(&hChildStdinRd_, &hChildStdinWr, &saAttr, 0))
+		const char *error{GetErrorString()};
+
+		SetForegroundWindow();
+
+		CString strTmp;
+		strTmp.Format("* Could not execute the command:\r\n   %s\r\n* Windows gave the error message:\r\n   \"%s\"\r\n", str.GetBuffer(), error);
+		Append(strTmp);
+
+		return rval;
+	}
+
+	RunCodeAtScopeExit(::CloseHandle(pi.hThread));
+	RunCodeAtScopeExit(::CloseHandle(pi.hProcess));
+
+	HANDLE hProcess = pi.hProcess;
+	
+	constexpr DWORD BUFFER_SIZE{4096};
+	// read from pipe..
+	char buffer[BUFFER_SIZE];
+	BOOL bDone = FALSE;
+	
+	while (true)
+	{
+		DWORD dwCount = 0, dwRead = 0;
+		
+		// read from input handle
+		if (PeekNamedPipe( hChildStdoutRd_, NULL, NULL, NULL, &dwCount, NULL) && dwCount)
 		{
-			if (::DuplicateHandle
-				(
-					::GetCurrentProcess(),
-					hChildStdoutWr,
-					::GetCurrentProcess(),
-					&hChildStderrWr,
-					0,
-					TRUE,
-					DUPLICATE_SAME_ACCESS
-				))
-			{
-				/* Now create the child process. */ 
-				STARTUPINFO si;
-				memset(&si, 0, sizeof si);
-
-				si.cb = sizeof(si);
-				si.dwFlags = STARTF_USESTDHANDLES;
-				si.hStdInput = hChildStdinRd_;
-				si.hStdError = hChildStderrWr;
-				si.hStdOutput = hChildStdoutWr;
-
-				PROCESS_INFORMATION pi;
-				CString str;
-				str.Format("%s %s", pszCmd, pszCmdLine);
-
-				if (::CreateProcess(NULL, str.GetBuffer(), NULL, NULL, TRUE, 
-					DETACHED_PROCESS, NULL, NULL, &si, &pi))
-				{
-					HANDLE hProcess = pi.hProcess;
-					
-					constexpr DWORD BUFFER_SIZE{4096};
-					// read from pipe..
-					char buffer[BUFFER_SIZE];
-					BOOL bDone = FALSE;
-					
-					while(1)
-					{
-						DWORD dwCount = 0, dwRead = 0;
-						
-						// read from input handle
-						if (PeekNamedPipe( hChildStdoutRd_, NULL, NULL, NULL, &dwCount, NULL) && dwCount)
-						{
-							dwCount = min(dwCount, BUFFER_SIZE - 1);
-							ReadFile( hChildStdoutRd_, buffer, dwCount, &dwRead, NULL);
-						}
-
-						if (dwRead)
-						{
-							buffer[dwRead] = 0;
-							Append(buffer);
-						}
-						else if (WaitForSingleObject(hProcess, 1000) != WAIT_TIMEOUT)
-						{
-							// check process termination
-							if(bDone)
-								break;
-
-							bDone = TRUE;	// next time we get it
-						}
-					}
-
-					// dimhotepus: Correctly process exit code for processes.
-					if ( DWORD rc; ::GetExitCodeProcess(pi.hProcess, &rc) && rc != STILL_ACTIVE )
-					{
-						rval = rc;
-					}
-					else
-					{
-						rval = STILL_ACTIVE;
-					}
-
-					::CloseHandle(pi.hThread);
-					::CloseHandle(pi.hProcess);
-
-					if (rval != 0)
-					{
-						SetForegroundWindow();
-
-						// dimhotepus: Dump process exit code on failure.
-						CString strTmp;
-						strTmp.Format("\r\n* Failure during command execution:\r\n   %s\r\n* Command returned nonsuccess error code:   \"%d\"\r\n", str.GetBuffer(), rval);
-						Append(strTmp);
-					}
-				}
-				else
-				{
-					const char *error{GetErrorString()};
-
-					SetForegroundWindow();
-
-					CString strTmp;
-					strTmp.Format("* Could not execute the command:\r\n   %s\r\n* Windows gave the error message:\r\n   \"%s\"\r\n", str.GetBuffer(), error);
-					Append(strTmp);
-				}
-				
-				::CloseHandle(hChildStderrWr);
-			}
-			::CloseHandle(hChildStdinRd_);
-			::CloseHandle(hChildStdinWr);
+			dwCount = min(dwCount, BUFFER_SIZE - 1);
+			ReadFile( hChildStdoutRd_, buffer, dwCount, &dwRead, NULL);
 		}
-		::CloseHandle(hChildStdoutRd_);
-		::CloseHandle(hChildStdoutWr);
+
+		if (dwRead)
+		{
+			buffer[dwRead] = 0;
+			Append(buffer);
+		}
+		else if (WaitForSingleObject(hProcess, 1000) != WAIT_TIMEOUT)
+		{
+			// check process termination
+			if(bDone)
+				break;
+
+			bDone = TRUE;	// next time we get it
+		}
+	}
+
+	// dimhotepus: Correctly process exit code for processes.
+	if ( DWORD rc; ::GetExitCodeProcess(pi.hProcess, &rc) && rc != STILL_ACTIVE )
+	{
+		rval = rc;
+	}
+	else
+	{
+		rval = STILL_ACTIVE;
+	}
+
+	if (rval != 0)
+	{
+		SetForegroundWindow();
+
+		// dimhotepus: Dump process exit code on failure.
+		CString strTmp;
+		strTmp.Format("\r\n* Failure during command execution:\r\n   %s\r\n* Command returned nonsuccess error code:   \"%d\"\r\n", str.GetBuffer(), rval);
+		Append(strTmp);
 	}
 
 	return rval;
