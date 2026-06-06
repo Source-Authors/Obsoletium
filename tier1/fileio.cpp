@@ -229,14 +229,8 @@ CDirWatcher::~CDirWatcher()
 		m_WatcherStream = 0;
 	}
 #endif
-	if ( m_pFileInfo )
-	{
-		free( m_pFileInfo );
-	}
-	if ( m_pOverlapped )
-	{
-		free( m_pOverlapped );
-	}
+	free( m_pFileInfo );
+	free( m_pOverlapped );
 }
 
 
