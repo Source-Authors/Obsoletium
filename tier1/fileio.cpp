@@ -212,7 +212,7 @@ CDirWatcher::~CDirWatcher()
 		pDirWatcherOverlapped->m_pDirWatcher = nullptr;
 	}
 
-	if ( m_hFile )
+	if ( m_hFile != INVALID_HANDLE_VALUE )
 	{
 		// make sure we flush any pending I/O's on the handle
 		::CancelIo( m_hFile );

@@ -167,7 +167,7 @@ int VMPI_SendFileChunk(const void *pvChunkPrefix, int lenPrefix,
 
   hFile = ::CreateFile(ptchFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING,
                        FILE_ATTRIBUTE_NORMAL, NULL);
-  if (!hFile || (hFile == INVALID_HANDLE_VALUE)) goto done;
+  if (hFile == INVALID_HANDLE_VALUE) goto done;
 
   hMapping = ::CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
   if (!hMapping || (hMapping == INVALID_HANDLE_VALUE)) goto done;

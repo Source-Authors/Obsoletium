@@ -878,7 +878,8 @@ VALVE_IPC_IMPL BOOL CValveIpcClient::Connect()
 		FILE_FLAG_WRITE_THROUGH,
 		nullptr
 		);
-	if ( !m_hClientPipe )
+	// dimhotepus: Correctly check file open result.
+	if ( m_hClientPipe == INVALID_HANDLE_VALUE )
 	{
 		Disconnect();
 		return FALSE;

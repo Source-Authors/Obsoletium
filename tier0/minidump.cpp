@@ -139,7 +139,7 @@ SE_GCC_END_WARNING_OVERRIDE_SCOPE()
 #else
 		HANDLE hFile = ::CreateFile( rgchFileName, GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr );
 #endif
-		if ( hFile )
+		if ( hFile != INVALID_HANDLE_VALUE )
 		{
 			RunCodeAtScopeExit(::CloseHandle( hFile ));
 
