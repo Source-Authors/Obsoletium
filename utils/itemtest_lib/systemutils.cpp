@@ -153,6 +153,9 @@ bool CItemUpload::RunCommandLine( const char *pszCmdLine, const char *pszWorking
 	if ( !bSuccess ) 
 		return false;
 
+	RunCodeAtScopeExit( CloseHandle( piProcInfo.hThread ) );
+	RunCodeAtScopeExit( CloseHandle( piProcInfo.hProcess ) );
+
 	if ( pLog )
 	{
 		ReadFromPipe( pLog ); 
@@ -166,9 +169,6 @@ bool CItemUpload::RunCommandLine( const char *pszCmdLine, const char *pszWorking
 		{
 			bOk = ( nExitCode == 0 );
 		}
-
-		CloseHandle( piProcInfo.hProcess );
-		CloseHandle( piProcInfo.hThread );
 	}
 	else
 	{
@@ -189,11 +189,24 @@ bool CItemUpload::IsSameFile( const char *szPath1, const char *szPath2 )
 		return false;
 
 	HANDLE handle1 = ::CreateFile( szPath1, 0, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL ); 
+	RunCodeAtScopeExit({
+		if ( handle1 != INVALID_HANDLE_VALUE )
+		{
+			::CloseHandle( handle1 );
+		}
+	});
+
 	HANDLE handle2 = ::CreateFile( szPath2, 0, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL ); 
+	RunCodeAtScopeExit({
+		if ( handle2 != INVALID_HANDLE_VALUE )
+		{
+			::CloseHandle( handle2 );
+		}
+	});
 
 	bool bResult = false;
 
-	if ( handle1 != NULL && handle2 != NULL )
+	if ( handle1 != INVALID_HANDLE_VALUE && handle2 != INVALID_HANDLE_VALUE )
 	{
 		BY_HANDLE_FILE_INFORMATION fileInfo1;
 		BY_HANDLE_FILE_INFORMATION fileInfo2;
@@ -203,16 +216,6 @@ bool CItemUpload::IsSameFile( const char *szPath1, const char *szPath2 )
 				fileInfo1.nFileIndexHigh == fileInfo2.nFileIndexHigh &&
 				fileInfo1.nFileIndexLow == fileInfo2.nFileIndexLow;
 		}
-	}
-
-	if ( handle1 != NULL )
-	{
-		::CloseHandle(handle1);
-	}
-
-	if ( handle2 != NULL )
-	{
-		::CloseHandle( handle2 );
 	}
 
 	return bResult;

@@ -942,8 +942,8 @@ TryAgain:;
 			&si,
 			&pi ) )
 		{
-			CloseHandle( pi.hProcess );
-			CloseHandle( pi.hThread );
+			RunCodeAtScopeExit( CloseHandle( pi.hThread ) );
+			RunCodeAtScopeExit( CloseHandle( pi.hProcess ) );
 
 			V_AfxMessageBox( MB_OK, "Patch master successfully started.\nServices patching now.\nClose the patch master console app when finished." );
 		}

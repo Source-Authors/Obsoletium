@@ -152,9 +152,10 @@ Sleep(5000);
 		&si,
 		&pi ) )
 	{
+		RunCodeAtScopeExit( CloseHandle( pi.hThread ) );
+		RunCodeAtScopeExit( CloseHandle( pi.hProcess ) );
+
 		PrintLog( "Process started.\n" );
-		CloseHandle( pi.hThread );	// We don't care what the process does.
-		CloseHandle( pi.hProcess );
 	}
 	else
 	{

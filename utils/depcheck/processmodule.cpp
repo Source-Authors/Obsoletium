@@ -9,6 +9,8 @@
 #include <ctime>
 #include <cstdio>
 #include <windows.h>
+
+#include "tier0/platform.h"
 #include "depcheck_util.h"
 #include "codeprocessor.h"
 
@@ -107,8 +109,7 @@ bool CCodeProcessor::TryBuild( const char *rootdir, const char *filename, unsign
 {
 //	vprintf( "trying build\n" );
 
-	FILE *fp;
-	fp = fopen( filename, "wb" );
+	FILE *fp = fopen( filename, "wb" );
 	if ( !fp )
 	{
 		assert( 0 );
@@ -134,32 +135,33 @@ bool CCodeProcessor::TryBuild( const char *rootdir, const char *filename, unsign
 	PROCESS_INFORMATION pi;
 	memset( &pi, 0, sizeof( pi ) );
 
-	STARTUPINFO si;
-	memset( &si, 0, sizeof( si ) );
-	si.cb = sizeof( si );
+	STARTUPINFO si = {static_cast<DWORD>(sizeof(si))};
 
 	if ( !CreateProcess( NULL, commandline, NULL, NULL, TRUE, 0, NULL, directory, &si, &pi ) )
 	{
-LPVOID lpMsgBuf;
-FormatMessage( 
-    FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-    FORMAT_MESSAGE_FROM_SYSTEM | 
-    FORMAT_MESSAGE_IGNORE_INSERTS,
-    NULL,
-    GetLastError(),
-    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-    (LPTSTR) &lpMsgBuf,
-    0,
-    NULL 
-);
-// Process any inserts in lpMsgBuf.
-// ...
-// Display the string.
-MessageBox( NULL, (LPCTSTR)lpMsgBuf, "Error", MB_OK | MB_ICONINFORMATION );
-// Free the buffer.
-LocalFree( lpMsgBuf );
+		LPVOID lpMsgBuf;
+		FormatMessage( 
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+			FORMAT_MESSAGE_FROM_SYSTEM | 
+			FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			GetLastError(),
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+			(LPTSTR) &lpMsgBuf,
+			0,
+			NULL 
+		);
+		// Process any inserts in lpMsgBuf.
+		// ...
+		// Display the string.
+		MessageBox( NULL, (LPCTSTR)lpMsgBuf, "Error", MB_OK | MB_ICONINFORMATION );
+		// Free the buffer.
+		LocalFree( lpMsgBuf );
 		return false;
 	}
+
+	RunCodeAtScopeExit(CloseHandle( pi.hThread ));
+	RunCodeAtScopeExit(CloseHandle( pi.hProcess ));
 
 	// Wait until child process exits.
     WaitForSingleObject( pi.hProcess, INFINITE );
@@ -173,10 +175,6 @@ LocalFree( lpMsgBuf );
 			retval = true;
 		}
 	}
-	
-    // Close process and thread handles. 
-    CloseHandle( pi.hProcess );
-    CloseHandle( pi.hThread );
 
 	return retval;
 }

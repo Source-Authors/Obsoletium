@@ -215,13 +215,13 @@ void MySystem( char *pCommand )
 		Error( "CreateProcess failed." );
 		Assert( 0 );
 	}
+
+	// Close process and thread handles.
+	RunCodeAtScopeExit(CloseHandle( pi.hThread )); 
+	RunCodeAtScopeExit(CloseHandle( pi.hProcess ));
 	
 	// Wait until child process exits.
 	WaitForSingleObject( pi.hProcess, INFINITE );
-	
-	// Close process and thread handles. 
-	CloseHandle( pi.hProcess );
-	CloseHandle( pi.hThread );
 }
 
 void VTFNameToTGAName( const char *pSrcName, char *pDstName )

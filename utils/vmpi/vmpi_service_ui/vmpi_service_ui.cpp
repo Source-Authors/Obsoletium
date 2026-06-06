@@ -211,10 +211,10 @@ void CUIConnMgr::HandlePacket( const char *pData, int len )
 		memset( &pi, 0, sizeof( pi ) );
 		if ( CreateProcess( NULL, commandLine, NULL, NULL, false, CREATE_NO_WINDOW, NULL, workingDir, &si, &pi ) )
 		{
-			LogString( "CreateProcess succeeded:\n%s\n", commandLine );
+			RunCodeAtScopeExit(	CloseHandle( pi.hThread ) );
+			RunCodeAtScopeExit(	CloseHandle( pi.hProcess ) );
 
-			CloseHandle( pi.hProcess );
-			CloseHandle( pi.hThread );
+			LogString( "CreateProcess succeeded:\n%s\n", commandLine );
 			
 			if ( bExitAfter )
 				PostQuitMessage( 0 );

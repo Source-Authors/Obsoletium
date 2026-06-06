@@ -85,13 +85,16 @@ void CNetViewThread::UpdateServicesFromNetView()
     HANDLE hChildStdoutRd, hChildStdoutWr;
     
 	// Set the bInheritHandle flag so pipe handles are inherited.
-    SECURITY_ATTRIBUTES saAttr; 
+    SECURITY_ATTRIBUTES saAttr = {}; 
 	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
     saAttr.bInheritHandle = TRUE; 
     saAttr.lpSecurityDescriptor = NULL; 
 
 	if( CreatePipe( &hChildStdoutRd, &hChildStdoutWr, &saAttr, 0 ) )
 	{
+		RunCodeAtScopeExit( CloseHandle( hChildStdoutRd ) );
+		RunCodeAtScopeExit( CloseHandle( hChildStdoutWr ) );
+
 		STARTUPINFO si;
 		memset(&si, 0, sizeof si);
 		si.cb = sizeof(si);
@@ -113,6 +116,9 @@ void CNetViewThread::UpdateServicesFromNetView()
 			&pi					// lpProcessInformation
 			) )
 		{
+			RunCodeAtScopeExit( CloseHandle( pi.hThread ) );
+			RunCodeAtScopeExit( CloseHandle( pi.hProcess ) );
+			
 			// read from pipe..
 			#define BUFFER_SIZE 8192
 			char buffer[BUFFER_SIZE];
@@ -150,9 +156,6 @@ void CNetViewThread::UpdateServicesFromNetView()
 			totalBuffer.AddToTail( 0 );
 			ParseComputerNames( totalBuffer.Base() );
 		}
-
-		CloseHandle( hChildStdoutRd );
-		CloseHandle( hChildStdoutWr );
 	}
 }
 

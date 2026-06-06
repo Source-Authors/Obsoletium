@@ -892,6 +892,10 @@ std::unique_ptr<se::shader_compile::command_sink::IResponse> MySystem(
     Error("Unable to create console process '%s/%s' (%lu: %s)!\n", temp_path,
           temp_file_name, rc, std::system_category().message(rc).c_str());
   }
+  
+  // Close process and thread handles.
+  RunCodeAtScopeExit(CloseHandle(pi.hThread));
+  RunCodeAtScopeExit(CloseHandle(pi.hProcess));
 
   // Wait until child process exits.
   WaitForSingleObject(pi.hProcess, INFINITE);
@@ -900,10 +904,6 @@ std::unique_ptr<se::shader_compile::command_sink::IResponse> MySystem(
   if (GetExitCodeProcess(pi.hProcess, &rc) && rc != 0) {
     Warning("'%s' command failed w/e %lu.\n", pCommand, rc);
   }
-
-  // Close process and thread handles.
-  CloseHandle(pi.hThread);
-  CloseHandle(pi.hProcess);
 
   if (unlink(temp_file_name) && errno != ENOENT) {
     Warning("Unable to remove '%s' (%d: %s).\n", pCommand, errno,

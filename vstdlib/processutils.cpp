@@ -174,7 +174,7 @@ ProcessHandle_t CProcessUtils::StartProcess( const char *pCommandLine, bool bCon
 		return CreateProcess( info, false );
 	}
 
-    SECURITY_ATTRIBUTES saAttr; 
+    SECURITY_ATTRIBUTES saAttr = {}; 
 
     // Set the bInheritHandle flag so pipe handles are inherited.
 	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
@@ -182,30 +182,36 @@ ProcessHandle_t CProcessUtils::StartProcess( const char *pCommandLine, bool bCon
     saAttr.lpSecurityDescriptor = nullptr; 
  
     // Create a pipe for the child's STDOUT. 
-    if ( CreatePipe( &info.m_hChildStdoutRd, &info.m_hChildStdoutWr, &saAttr, 0 ) )
+    if ( !CreatePipe( &info.m_hChildStdoutRd, &info.m_hChildStdoutWr, &saAttr, 0 ) )
 	{
-		if ( CreatePipe( &info.m_hChildStdinRd, &info.m_hChildStdinWr, &saAttr, 0 ) )
-		{
-			if ( DuplicateHandle( GetCurrentProcess(), info.m_hChildStdoutWr, GetCurrentProcess(), 
-				&info.m_hChildStderrWr, 0, TRUE, DUPLICATE_SAME_ACCESS ) )
-			{
-//				_setmode( info.m_hChildStdoutRd, _O_TEXT );
-//				_setmode( info.m_hChildStdoutWr, _O_TEXT );
-//				_setmode( info.m_hChildStderrWr, _O_TEXT );
-
-				ProcessHandle_t hProcess = CreateProcess( info, true );
-				if ( hProcess != PROCESS_HANDLE_INVALID )
-					return hProcess;
-
-				CloseHandle( info.m_hChildStderrWr );
-			}
-			CloseHandle( info.m_hChildStdinRd );
-			CloseHandle( info.m_hChildStdinWr );
-		}
-		CloseHandle( info.m_hChildStdoutRd );
-		CloseHandle( info.m_hChildStdoutWr );
+		return PROCESS_HANDLE_INVALID;
 	}
-	return PROCESS_HANDLE_INVALID;
+
+	RunCodeAtScopeExit(CloseHandle( info.m_hChildStdoutRd ));
+	RunCodeAtScopeExit(CloseHandle( info.m_hChildStdoutWr ));
+	
+	if ( !CreatePipe( &info.m_hChildStdinRd, &info.m_hChildStdinWr, &saAttr, 0 ) )
+	{
+		return PROCESS_HANDLE_INVALID;
+	}
+
+	RunCodeAtScopeExit(CloseHandle( info.m_hChildStdinRd ));
+	RunCodeAtScopeExit(CloseHandle( info.m_hChildStdinWr ));
+
+	if ( !DuplicateHandle( GetCurrentProcess(), info.m_hChildStdoutWr, GetCurrentProcess(), 
+		&info.m_hChildStderrWr, 0, TRUE, DUPLICATE_SAME_ACCESS ) )
+	{
+		return PROCESS_HANDLE_INVALID;
+	}
+
+	RunCodeAtScopeExit(CloseHandle( info.m_hChildStderrWr ));
+
+//		_setmode( info.m_hChildStdoutRd, _O_TEXT );
+//		_setmode( info.m_hChildStdoutWr, _O_TEXT );
+//		_setmode( info.m_hChildStderrWr, _O_TEXT );
+
+	ProcessHandle_t hProcess = CreateProcess( info, true );
+	return hProcess;
 }
 
 

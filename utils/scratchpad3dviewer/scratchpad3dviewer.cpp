@@ -760,14 +760,14 @@ bool CheckForNewFile( bool bForce )
 		OPEN_EXISTING,
 		0,
 		NULL );
-
-	if( !hFile )
+	if( hFile == INVALID_HANDLE_VALUE )
 		return false;
+
+	RunCodeAtScopeExit(CloseHandle(hFile));
 
 	FILETIME createTime, accessTime, writeTime;
 	if( !GetFileTime( hFile, &createTime, &accessTime, &writeTime ) )
 	{
-		CloseHandle( hFile );
 		return false;
 	}
 
@@ -781,7 +781,6 @@ bool CheckForNewFile( bool bForce )
 		}
 	}
 
-	CloseHandle( hFile );
 	return bChange;
 }
 

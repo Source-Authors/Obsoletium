@@ -484,7 +484,7 @@ bool StopRunningApp()
 						continue;
 					}
 					
-					RunCodeAtScopeExit(	CloseHandle( hProc ) );
+					RunCodeAtScopeExit( CloseHandle( hProc ) );
 
 					HMODULE hModules[1024];
 					if ( EnumProcessModules( hProc, hModules, sizeof( hModules ), &nBytes ) )

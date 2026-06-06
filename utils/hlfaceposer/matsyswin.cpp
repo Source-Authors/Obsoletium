@@ -666,7 +666,6 @@ void MatSysWindow::PopSnapshotMode( )
 void MatSysWindow::TakeSnapshotRect( const char *pFilename, int x, int y, int w, int h )
 {
 	int i;
-	HANDLE hf;
 	BITMAPFILEHEADER hdr;
 	BITMAPINFOHEADER bi;
 	DWORD dwTmp, imageSize;
@@ -676,11 +675,13 @@ void MatSysWindow::TakeSnapshotRect( const char *pFilename, int x, int y, int w,
 
 	imageSize = w * h * 3;
 	// Create the file
-	hf = CreateFile( pFilename, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+	HANDLE hf = CreateFile( pFilename, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
 	if( hf == INVALID_HANDLE_VALUE )
 	{
 		return;
 	}
+
+	RunCodeAtScopeExit(CloseHandle(hf));
 
 	// file header
 	hdr.bfType = 0x4d42;	// 'BM'
@@ -749,10 +750,6 @@ void MatSysWindow::TakeSnapshotRect( const char *pFilename, int x, int y, int w,
 		Error( "Couldn't write bitmap data snapshot.\n" );
 
 	free(hp);
-
-	// clean up
-	if( !CloseHandle( hf ) )
-		Error( "Couldn't close file for snapshot.\n" );
 }
 
 //-----------------------------------------------------------------------------

@@ -234,6 +234,9 @@ int Sys_Exec( const char *pProgName, const char *pCmdLine, bool verbose )
 
 	if ( CreateProcess( NULL, cmdLine, NULL, NULL, TRUE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi ) )
 	{
+		RunCodeAtScopeExit( CloseHandle( pi.hThread ) );
+		RunCodeAtScopeExit( CloseHandle( pi.hProcess ) );
+		
 		WaitForSingleObject( pi.hProcess, INFINITE );
 		/*
 		do 
@@ -260,7 +263,6 @@ int Sys_Exec( const char *pProgName, const char *pCmdLine, bool verbose )
 
 		Con_Printf( "Finished\n" );
 		
-		CloseHandle( pi.hProcess );
 		return (int)exitCode;
 	}
 	else
