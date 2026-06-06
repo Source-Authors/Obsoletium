@@ -35,14 +35,14 @@ void DownloadFile( const char *pCachePath, const char *pRemoteFileBase, const ch
 		Error( "Unable to open %s on master.\n", remoteFilename );
 	}
 	RunCodeAtScopeExit(g_pFileSystem->Close( fpSrc ));
-	
+
 	unsigned int fileSize = g_pFileSystem->Size( fpSrc );
 
 	CUtlVector<char> data;
 	data.SetSize( fileSize );
 
 	g_pFileSystem->Read( data.Base(), fileSize, fpSrc );
-	
+
 	// Now write the file to disk.
 	FILE *fpDest = fopen( localFilename, "wb" );
 	if ( !fpDest )
@@ -53,23 +53,8 @@ void DownloadFile( const char *pCachePath, const char *pRemoteFileBase, const ch
 
 	fwrite( data.Base(), 1, data.Count(), fpDest );
 
-Warning( "Got file: %s\n", pFilename );
+	Warning( "Got file: %s\n", pFilename );
 }
-
-#if 0
-SpewRetval_t MySpewFunc( SpewType_t spewType, const tchar *pMsg )
-{
-	printf( "%s", pMsg );
-	if ( spewType == SPEW_ERROR )
-	{
-		printf( "\nWaiting for keypress to quit...\n" );
-		getch();
-		TerminateProcess( GetCurrentProcess(), 1 );
-	}
-
-	return SPEW_CONTINUE;
-}
-#endif
 
 int RunVMPITransferWorker( int argc, char  **argv )
 {
