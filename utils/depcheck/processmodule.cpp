@@ -4,10 +4,10 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <assert.h>
-#include <time.h>
 #include "stdafx.h"
-#include <stdio.h>
+#include <cassert>
+#include <ctime>
+#include <cstdio>
 #include <windows.h>
 #include "depcheck_util.h"
 #include "codeprocessor.h"
