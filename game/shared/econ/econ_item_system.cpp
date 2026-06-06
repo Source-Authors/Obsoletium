@@ -233,6 +233,7 @@ bool CEconItemSystem::DecryptItemFiles( KeyValues *pKV, const char *pName )
 
 	int fileSize = filesystem->Size(f);
 	char *buffer = (char*)MemAllocScratch(fileSize + 1);
+	RunCodeAtScopeExit( MemFreeScratch() );
 
 	Assert(buffer);
 
@@ -242,14 +243,7 @@ bool CEconItemSystem::DecryptItemFiles( KeyValues *pKV, const char *pName )
 
 	UTIL_DecodeICE( (unsigned char*)buffer, fileSize, GetEncryptionKey() );
 
-	bool retOK = pKV->LoadFromBuffer( szFullName, buffer, filesystem );
-
-	MemFreeScratch();
-
-	if ( !retOK )
-		return false;
-
-	return true;
+	return pKV->LoadFromBuffer( szFullName, buffer, filesystem );
 }
 
 

@@ -2560,6 +2560,8 @@ void CBugUIPanel::ParseDefaultParams( void )
 	// load file into a null-terminated buffer
 	int fileSize = g_pFileSystem->Size(hLocal);
 	char *buffer = (char*)MemAllocScratch(fileSize + 1);
+	// dimhotepus: Do not leak allocated memory.
+	RunCodeAtScopeExit( MemFreeScratch() );
 
 	Assert(buffer);
 
