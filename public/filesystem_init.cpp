@@ -946,40 +946,6 @@ ShowError:
 		GAMEINFO_FILENAME, GAMEINFO_FILENAME );
 }
 
-bool DoesPathExistAlready( const char *pPathEnvVar, const char *pTestPath )
-{
-	// Fix the slashes in the input arguments.
-	char correctedPathEnvVar[8192], correctedTestPath[MAX_PATH];
-	V_strcpy_safe( correctedPathEnvVar, pPathEnvVar );
-	Q_FixSlashes( correctedPathEnvVar );
-	pPathEnvVar = correctedPathEnvVar;
-
-	V_strcpy_safe( correctedTestPath, pTestPath );
-	const size_t correctTestPathLen = strlen( correctedTestPath );
-	Q_FixSlashes( correctedTestPath );
-	if ( correctTestPathLen && PATHSEPARATOR( correctedTestPath[ correctTestPathLen - 1 ] ) )
-		correctedTestPath[ correctTestPathLen - 1 ] = 0;
-
-	pTestPath = correctedTestPath;
-
-	size_t nTestPathLen = strlen( pTestPath );
-	const char *pCurPos = pPathEnvVar;
-	while ( 1 )
-	{
-		const char *pTestPos = Q_stristr( pCurPos, pTestPath );
-		if ( !pTestPos )
-			return false;
-
-		// Ok, we found pTestPath in the path, but it's only valid if it's followed by an optional slash and a semicolon.
-		pTestPos += nTestPathLen;
-		if ( pTestPos[0] == 0 || pTestPos[0] == ';' || (PATHSEPARATOR( pTestPos[0] ) && pTestPos[1] == ';') )
-			return true;
-	
-		// Advance our marker..
-		pCurPos = pTestPos;
-	}
-}
-
 FSReturnCode_t FileSystem_SetBasePaths( IFileSystem *pFileSystem )
 {
 	pFileSystem->RemoveSearchPaths( "EXECUTABLE_PATH" );
