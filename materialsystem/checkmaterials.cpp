@@ -81,7 +81,7 @@ static bool DoesTextureUseNormal( const char *pTextureName, const char *pMateria
 	bUsesAlpha = false;
 
 	// Special textures start with '_'..
-	if ( !pTextureName || ( pTextureName[0] == '_' ) || ( pTextureName[0] == 0 ) )
+	if ( Q_isempty( pTextureName ) || pTextureName[0] == '_' )
 		return false;
 
 	// The texture name doubles as the relative file name
