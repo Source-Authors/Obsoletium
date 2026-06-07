@@ -1189,13 +1189,13 @@ void CBugUIPanel::OnChooseArea(vgui::Panel *panel)
 
 	// dimhotepus: Drop internal bug reporter as we are fully public.
 	int area_index = m_pGameArea->GetActiveItem();
-	int c = m_pBugReporter->GetLevelCount(area_index);
+	intp c = m_pBugReporter->GetLevelCount(area_index);
 	int item = -1;
 	const char *currentLevel = cl.IsActive() ? cl.m_szLevelBaseName : "console";
 
 	m_pMapNumber->DeleteAllItems();
 		
-	for ( int i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		const char *level = m_pBugReporter->GetLevel(area_index, i );
 		int id = m_pMapNumber->AddItem( level, NULL );
@@ -2441,10 +2441,9 @@ void CBugUIPanel::PopulateControls()
 		return;
 
 	m_pAssignTo->DeleteAllItems();
-	int i;
-	int c = m_pBugReporter->GetDisplayNameCount();
-	int defitem = 0;
-	for ( i = 0; i < c; i++ )
+	intp c = m_pBugReporter->GetDisplayNameCount();
+	intp defitem = 0;
+	for ( intp i = 0; i < c; i++ )
 	{
 		char const  *name = m_pBugReporter->GetDisplayName( i );
 		if (V_strieq(name, "Triage"))
@@ -2456,7 +2455,7 @@ void CBugUIPanel::PopulateControls()
 	defitem = 0;
 	m_pSeverity->DeleteAllItems();
 	c = m_pBugReporter->GetSeverityCount();
-	for ( i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		char const  *severity = m_pBugReporter->GetSeverity( i );
 		if (V_strieq(severity, "Zero"))
@@ -2467,7 +2466,7 @@ void CBugUIPanel::PopulateControls()
 
 	m_pReportType->DeleteAllItems();
 	c = m_pBugReporter->GetReportTypeCount();
-	for ( i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		m_pReportType->AddItem( m_pBugReporter->GetReportType( i ), NULL );
 	}
@@ -2475,7 +2474,7 @@ void CBugUIPanel::PopulateControls()
 
 	m_pPriority->DeleteAllItems();
 	c = m_pBugReporter->GetPriorityCount();
-	for ( i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		m_pPriority->AddItem( m_pBugReporter->GetPriority( i ), NULL );
 	}
@@ -2483,7 +2482,7 @@ void CBugUIPanel::PopulateControls()
 
 	m_pGameArea->DeleteAllItems();
 	c = m_pBugReporter->GetAreaCount();
-	for ( i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		m_pGameArea->AddItem( m_pBugReporter->GetArea( i ), NULL );
 	}
@@ -2633,11 +2632,8 @@ bool CBugUIPanel::AutoFillToken( char const *token, bool partial )
 	if ( !m_pBugReporter )
 		return true;
 
-	int i;
-	int c;
-	
-	c = m_pBugReporter->GetDisplayNameCount();
-	for ( i = 0; i < c; i++ )
+	intp c = m_pBugReporter->GetDisplayNameCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		if ( Compare( m_pBugReporter->GetDisplayName( i ), token, partial ) )
 		{
@@ -2647,7 +2643,7 @@ bool CBugUIPanel::AutoFillToken( char const *token, bool partial )
 	}
 	
 	c = m_pBugReporter->GetSeverityCount();
-	for ( i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		if ( Compare( m_pBugReporter->GetSeverity( i ), token, partial ) )
 		{
@@ -2657,7 +2653,7 @@ bool CBugUIPanel::AutoFillToken( char const *token, bool partial )
 	}
 
 	c = m_pBugReporter->GetReportTypeCount();
-	for ( i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		if ( Compare( m_pBugReporter->GetReportType( i ), token, partial ) )
 		{
@@ -2667,7 +2663,7 @@ bool CBugUIPanel::AutoFillToken( char const *token, bool partial )
 	}
 
 	c = m_pBugReporter->GetPriorityCount();
-	for ( i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		if ( Compare( m_pBugReporter->GetPriority( i ), token, partial ) )
 		{
@@ -2677,7 +2673,7 @@ bool CBugUIPanel::AutoFillToken( char const *token, bool partial )
 	}
 
 	c = m_pBugReporter->GetAreaCount();
-	for ( i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		if ( Compare( m_pBugReporter->GetArea( i ), token, partial ) )
 		{
