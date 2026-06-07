@@ -2969,7 +2969,7 @@ void PrintUsage( int argc, char **argv )
 		"                            light across a wider area.\n"
         "  -StaticPropLighting     : Generate baked static prop vertex lighting.\n"
         "  -StaticPropPolys        : Perform shadow tests of static props at polygon precision.\n"
-        "  -StaticPropIndirectMode : Override prop indirect lighting algorithm (0 - Balanced [CS:GO], 1 - Dark [SteamPipe], 2 - Bright [Orangebox]).\n"
+        "  -StaticPropIndirectMode : Override prop indirect lighting algorithm (0 - Balanced [CS:GO], 1 - Dark [SteamPipe], 2 - Bright [Orangebox]) (default: 0).\n"
         "  -StaticPropSampleScale  : Override prop indirect lighting sample scale factor (default 4).\n"
 		"  -OnlyStaticProps        : Only perform direct static prop lighting (vrad debug option).\n"
 		"  -StaticPropNormals      : When lighting static props, just show their normal vector.\n"
