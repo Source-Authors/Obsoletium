@@ -207,6 +207,7 @@ void C_SlideshowDisplay::BuildSlideShowImagesList( void )
 		if ( pMatFileName )
 			V_strcpy_safe( szMatFileName, pMatFileName );
 	}
+	RunCodeAtScopeExit( g_pFullFileSystem->FindClose( matHandle ) );
 
 	int iSlideIndex = 0;
 
@@ -300,6 +301,4 @@ void C_SlideshowDisplay::BuildSlideShowImagesList( void )
 
 		++iSlideIndex;
 	}
-
-	g_pFullFileSystem->FindClose( matHandle );
 }

@@ -579,6 +579,7 @@ void CPopulationManager::FindDefaultPopulationFileShortNames( CUtlVector< CUtlSt
 
 	FileFindHandle_t popHandle;
 	const char *pPopFileName = filesystem->FindFirstEx( szBaseName, "GAME", &popHandle );
+	RunCodeAtScopeExit( filesystem->FindClose( popHandle ) );
 
 	while ( pPopFileName && pPopFileName[ 0 ] != '\0' )
 	{
@@ -605,11 +606,10 @@ void CPopulationManager::FindDefaultPopulationFileShortNames( CUtlVector< CUtlSt
 		pPopFileName = filesystem->FindNext( popHandle );
 	}
 
-	filesystem->FindClose( popHandle );
-
 	// Search for all pop files in the BSP next. Note that loose files override these (by short name)
 	FileFindHandle_t popHandleBSP;
 	const char *pPopFileNameBSP = filesystem->FindFirstEx( MVM_POP_FILE_PATH "/*.pop", "BSP", &popHandleBSP );
+	RunCodeAtScopeExit( filesystem->FindClose( popHandleBSP ) );
 
 	while ( pPopFileNameBSP && pPopFileNameBSP[ 0 ] != '\0' )
 	{
@@ -638,8 +638,6 @@ void CPopulationManager::FindDefaultPopulationFileShortNames( CUtlVector< CUtlSt
 
 		pPopFileNameBSP = filesystem->FindNext( popHandleBSP );
 	}
-
-	filesystem->FindClose( popHandleBSP );
 
 	// Always treat "normal" as the default pop-file
 	int normalIdx = outVecShortNames.Find( "normal" );

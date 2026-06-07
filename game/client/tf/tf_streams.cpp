@@ -195,8 +195,10 @@ static void Helper_ConfigureStreamInfoPreviewImages( CStreamInfo &info, CTFStrea
 			{
 				FileFindHandle_t hFind = NULL;
 				int numRemove = 0;
-				for ( char const *szFileName = g_pFullFileSystem->FindFirst( CFmtStr( "%s/*", s_pszCacheImagePath ), &hFind );
-					szFileName && *szFileName; szFileName = g_pFullFileSystem->FindNext( hFind ) )
+				char const *szFileName = g_pFullFileSystem->FindFirst( CFmtStr( "%s/*", s_pszCacheImagePath ), &hFind );
+				RunCodeAtScopeExit(	g_pFullFileSystem->FindClose( hFind ) );
+				
+				for ( ;	szFileName && *szFileName; szFileName = g_pFullFileSystem->FindNext( hFind ) )
 				{
 					if ( V_streq( ".", szFileName ) || V_streq( "..", szFileName ) ) continue;
 					CFmtStr fmtFilename( "%s/%s", s_pszCacheImagePath, szFileName );
@@ -213,7 +215,6 @@ static void Helper_ConfigureStreamInfoPreviewImages( CStreamInfo &info, CTFStrea
 					}
 				}
 				DevMsg( 2, "Streams preview cache evicted %u files\n", numRemove );
-				g_pFullFileSystem->FindClose( hFind );
 			}
 
 			g_pFullFileSystem->CreateDirHierarchy( s_pszCacheImagePath, "GAME" );

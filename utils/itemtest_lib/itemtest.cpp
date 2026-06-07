@@ -1068,9 +1068,7 @@ bool CItemUpload::FileExists( const char *pszFilename )
 //-----------------------------------------------------------------------------
 bool CItemUpload::CopyFiles( const char *pszSourceDir, const char *pszPattern, const char *pszDestDir )
 {
-	char szFindPattern[ k64KB ];
-	bool bAllSucceeded = true;
-
+	char szFindPattern[ MAX_PATH ];
 	V_snprintf( szFindPattern, sizeof( szFindPattern ), "%s%s", pszSourceDir, pszPattern );
 
 	WIN32_FIND_DATA findData;
@@ -1079,25 +1077,26 @@ bool CItemUpload::CopyFiles( const char *pszSourceDir, const char *pszPattern, c
 	{
 		return false;
 	}
-	else
+
+	RunCodeAtScopeExit(FindClose( hFind ));
+
+	bool bAllSucceeded = true;
+	
+	do
 	{
-		do
-		{
-			char szSrcPath[ k64KB ];
-			char szDestPath[ k64KB ];
+		char szSrcPath[ MAX_PATH ];
+		V_sprintf_safe( szSrcPath, "%s%s", pszSourceDir, findData.cFileName );
 
-			V_snprintf( szSrcPath, sizeof( szSrcPath ), "%s%s", pszSourceDir, findData.cFileName );
-			V_snprintf( szDestPath, sizeof( szDestPath ), "%s\\%s", pszDestDir, findData.cFileName );
+		char szDestPath[ MAX_PATH ];
+		V_sprintf_safe( szDestPath, "%s\\%s", pszDestDir, findData.cFileName );
 
-			DeleteFile( szDestPath );
-			::CopyFile( szSrcPath, szDestPath, false );
-			bAllSucceeded &= FileExists( szDestPath );
+		DeleteFile( szDestPath );
+		::CopyFile( szSrcPath, szDestPath, false );
 
-		} while ( FindNextFile( hFind, &findData ) );
-		FindClose( hFind );
+		bAllSucceeded &= FileExists( szDestPath );
+	} while ( FindNextFile( hFind, &findData ) );
 
-		return bAllSucceeded;
-	}
+	return bAllSucceeded;
 }
 
 

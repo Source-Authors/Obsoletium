@@ -1602,7 +1602,6 @@ void CCodeProcessor::ConstructModuleList_R( int level, const char *baseentitycla
 	const char *gamespecific, const char *root, const char *srcroot )
 {
 	char directory[ MAX_PATH ], filename[ MAX_PATH ];
-
 	V_sprintf_safe( directory, "%s\\*.*", root );
 
 	WIN32_FIND_DATA wfd;

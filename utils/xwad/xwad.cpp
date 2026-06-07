@@ -941,6 +941,8 @@ int main(int argc, char **argv) {
     _finddata_t findData;
     intptr_t handle = _findfirst(pWadFilenames, &findData);
     if (handle != -1) {
+    	RunCodeAtScopeExit(_findclose( handle ));
+
       do {
         if (!(findData.attrib & _A_SUBDIR)) {
           char fullFilename[512];
@@ -950,8 +952,6 @@ int main(int argc, char **argv) {
           ProcessWadFile(fullFilename, pBaseDir, pSubDir, pOnlyTex, bVTex);
         }
       } while (_findnext(handle, &findData) == 0);
-
-      _findclose(handle);
     }
   }
 
@@ -962,17 +962,16 @@ int main(int argc, char **argv) {
     _finddata_t findData;
     intptr_t handle = _findfirst(pBMPFilenames, &findData);
     if (handle != -1) {
+      RunCodeAtScopeExit(_findclose( handle ));
+
       do {
         if (!(findData.attrib & _A_SUBDIR)) {
           char fullFilename[512];
-          snprintf(fullFilename, ARRAYSIZE(fullFilename), "%s\\%s", prefix,
-                   findData.name);
+          V_sprintf_safe(fullFilename, "%s\\%s", prefix, findData.name);
 
           ProcessBMPFile(pBaseDir, pSubDir, fullFilename, bVTex);
         }
       } while (_findnext(handle, &findData) == 0);
-
-      _findclose(handle);
     }
   }
 
@@ -982,6 +981,8 @@ int main(int argc, char **argv) {
     _finddata_t findData;
     intptr_t handle = _findfirst(pSPRFilenames, &findData);
     if (handle != -1) {
+      RunCodeAtScopeExit(_findclose( handle ));
+
       do {
         if (!(findData.attrib & _A_SUBDIR)) {
           char fullFilename[512];
@@ -991,8 +992,6 @@ int main(int argc, char **argv) {
           ProcessSPRFile(pBaseDir, pSubDir, fullFilename, bVTex);
         }
       } while (_findnext(handle, &findData) == 0);
-
-      _findclose(handle);
     }
   }
 

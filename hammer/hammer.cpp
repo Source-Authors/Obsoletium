@@ -2186,7 +2186,7 @@ int CHammer::GetNextAutosaveNumber( CUtlMap<FILETIME, WIN32_FIND_DATA, int> *pFi
 	if ( HANDLE hFile = FindFirstFile( strAutosaveDirectory + "*.vmf_autosave", &fileData );
 		 hFile != INVALID_HANDLE_VALUE )
 	{
-		RunCodeAtScopeExit(	FindClose(hFile) );
+		RunCodeAtScopeExit( FindClose(hFile) );
 
 		//go through and for each file check to see if it is an autosave for this map; also keep track of total file size
 		//for directory.

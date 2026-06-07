@@ -422,6 +422,8 @@ void CGameUI::PlayGameStartupSound()
 	}
 
 	char const *fn = g_pFullFileSystem->FindFirstEx( path, "MOD", &fh );
+	RunCodeAtScopeExit( g_pFullFileSystem->FindClose( fh ) );
+
 	if ( fn )
 	{
 		do
@@ -450,8 +452,6 @@ void CGameUI::PlayGameStartupSound()
 			fn = g_pFullFileSystem->FindNext( fh );
 
 		} while ( fn );
-
-		g_pFullFileSystem->FindClose( fh );
 	}
 
 	// did we find any?

@@ -311,6 +311,7 @@ int NavMeshMergeAutocomplete( char const *partial, char commands[ COMMAND_COMPLE
 	FileFindHandle_t findHandle;
 	char txtFilenameNoExtension[ MAX_PATH ];
 	const char *txtFilename = filesystem->FindFirstEx( "maps/*_selected_*.txt", "MOD", &findHandle );
+	RunCodeAtScopeExit( filesystem->FindClose( findHandle ) );
 	while ( txtFilename )
 	{
 		Q_FileBase( txtFilename, txtFilenameNoExtension, sizeof( txtFilenameNoExtension ) );
@@ -326,7 +327,6 @@ int NavMeshMergeAutocomplete( char const *partial, char commands[ COMMAND_COMPLE
 
 		txtFilename = filesystem->FindNext( findHandle );
 	}
-	filesystem->FindClose( findHandle );
 
 	return numMatches;
 }

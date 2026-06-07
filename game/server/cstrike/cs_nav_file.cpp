@@ -1147,6 +1147,7 @@ void CommandNavCheckFileConsistency( void )
 
 	FileFindHandle_t findHandle;
 	const char *bspFilename = filesystem->FindFirstEx( "maps/*.bsp", "MOD", &findHandle );
+	RunCodeAtScopeExit( filesystem->FindClose( findHandle ) );
 	while ( bspFilename )
 	{
 		switch ( CheckNavFile( bspFilename ) )
@@ -1170,7 +1171,6 @@ void CommandNavCheckFileConsistency( void )
 
 		bspFilename = filesystem->FindNext( findHandle );
 	}
-	filesystem->FindClose( findHandle );
 }
 static ConCommand nav_check_file_consistency( "nav_check_file_consistency", CommandNavCheckFileConsistency, "Scans the maps directory and reports any missing/out-of-date navigation files.", FCVAR_GAMEDLL | FCVAR_CHEAT );
 

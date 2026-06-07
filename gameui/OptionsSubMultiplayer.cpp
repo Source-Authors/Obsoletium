@@ -928,6 +928,7 @@ void CrosshairImagePanelAdvanced::InitAdvCrosshairStyleList()
 	char directory[ 512 ];
 	V_sprintf_safe( directory, "materials/vgui/crosshairs/*.vtf" );
 	const char *fn = g_pFullFileSystem->FindFirst( directory, &fh );
+	RunCodeAtScopeExit( g_pFullFileSystem->FindClose( fh ) );
 	int i = 0, initialItem = 0; 
 	while (fn)
 	{
@@ -968,7 +969,6 @@ void CrosshairImagePanelAdvanced::InitAdvCrosshairStyleList()
 		fn = g_pFullFileSystem->FindNext( fh );
 	}
 
-	g_pFullFileSystem->FindClose( fh );
 	m_pAdvCrosshairStyle->SetInitialItem(initialItem);
 }
 
@@ -1346,6 +1346,7 @@ void COptionsSubMultiplayer::InitLogoList( CLabeledCommandComboBox *cb )
 	const char *logofile = cl_logofile.GetString();
 	Q_snprintf( directory, sizeof( directory ), "materials/vgui/logos/*.vtf" );
 	const char *fn = g_pFullFileSystem->FindFirst( directory, &fh );
+	RunCodeAtScopeExit( g_pFullFileSystem->FindClose( fh ) );
 	int i = 0, initialItem = 0; 
 	while (fn)
 	{
@@ -1376,7 +1377,6 @@ void COptionsSubMultiplayer::InitLogoList( CLabeledCommandComboBox *cb )
 		fn = g_pFullFileSystem->FindNext( fh );
 	}
 
-	g_pFullFileSystem->FindClose( fh );
 	cb->SetInitialItem(initialItem);
 }
 

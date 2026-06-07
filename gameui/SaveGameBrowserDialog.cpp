@@ -1300,59 +1300,61 @@ void CSaveGameBrowserDialog::ScanSavedGames( bool bIgnoreAutosave )
 	Q_DefaultExtension( szDirectory, ".sav", sizeof( szDirectory ) );
 	Q_FixSlashes( szDirectory );
 
-	// iterate the saved files
-	FileFindHandle_t handle = FILESYSTEM_INVALID_FIND_HANDLE;
-	const char *pFileName = g_pFullFileSystem->FindFirstEx( szDirectory, MOD_DIR, &handle );
-	while (pFileName)
 	{
-		if ( !Q_strnicmp(pFileName, "HLSave", std::size( "HLSave" ) - 1 ) )
+		// iterate the saved files
+		FileFindHandle_t handle = FILESYSTEM_INVALID_FIND_HANDLE;
+		const char *pFileName = g_pFullFileSystem->FindFirstEx( szDirectory, MOD_DIR, &handle );
+		RunCodeAtScopeExit( g_pFullFileSystem->FindClose( handle ) );
+
+		while (pFileName)
 		{
-			pFileName = g_pFullFileSystem->FindNext( handle );
-			continue;
-		}
-
-		char szFileName[MAX_PATH];
-		Q_snprintf(szFileName, sizeof( szFileName ), "%s/%s", SAVE_DIR, pFileName);
-
-		Q_FixSlashes( szFileName );
-
-		// Only load save games from the current mod's save dir
-		if( !g_pFullFileSystem->FileExists( szFileName, MOD_DIR ) )
-		{
-			pFileName = g_pFullFileSystem->FindNext( handle );
-			continue;
-		}
-
-		SaveGameDescription_t save;
-		if ( ParseSaveData( szFileName, pFileName, &save ) )
-		{
-			// Add on this file's size to the count
-			m_nUsedStorageSpace += save.iSize;
-
-			// Always ignore autosave dangerous (they're not considered safe until committed)
-			if ( Q_stristr( save.szShortName, "dangerous" ) )
+			if ( !Q_strnicmp(pFileName, "HLSave", std::size( "HLSave" ) - 1 ) )
 			{
 				pFileName = g_pFullFileSystem->FindNext( handle );
 				continue;
 			}
-			
-			// If we're ignoring autosaves, skip it here
-			if ( bIgnoreAutosave )
+
+			char szFileName[MAX_PATH];
+			Q_snprintf(szFileName, sizeof( szFileName ), "%s/%s", SAVE_DIR, pFileName);
+
+			Q_FixSlashes( szFileName );
+
+			// Only load save games from the current mod's save dir
+			if( !g_pFullFileSystem->FileExists( szFileName, MOD_DIR ) )
 			{
-				if ( V_strieq( save.szType, "#GameUI_Autosave" ) )
+				pFileName = g_pFullFileSystem->FindNext( handle );
+				continue;
+			}
+
+			SaveGameDescription_t save;
+			if ( ParseSaveData( szFileName, pFileName, &save ) )
+			{
+				// Add on this file's size to the count
+				m_nUsedStorageSpace += save.iSize;
+
+				// Always ignore autosave dangerous (they're not considered safe until committed)
+				if ( Q_stristr( save.szShortName, "dangerous" ) )
 				{
 					pFileName = g_pFullFileSystem->FindNext( handle );
 					continue;
 				}
+				
+				// If we're ignoring autosaves, skip it here
+				if ( bIgnoreAutosave )
+				{
+					if ( V_strieq( save.szType, "#GameUI_Autosave" ) )
+					{
+						pFileName = g_pFullFileSystem->FindNext( handle );
+						continue;
+					}
+				}
+
+				saveGames.AddToTail( save );
 			}
 
-			saveGames.AddToTail( save );
+			pFileName = g_pFullFileSystem->FindNext( handle );
 		}
-
-		pFileName = g_pFullFileSystem->FindNext( handle );
 	}
-
-	g_pFullFileSystem->FindClose( handle );
 
 	// Sort the save list
 	SortSaveGames( saveGames.Base(), saveGames.Count() );

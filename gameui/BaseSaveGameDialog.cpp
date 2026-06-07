@@ -212,37 +212,39 @@ void CBaseSaveGameDialog::ScanSavedGames()
 	m_pGameList->DeleteAllItems();
 	m_SaveGames.RemoveAll();
 	
-	// iterate the saved files
-	FileFindHandle_t handle = FILESYSTEM_INVALID_FIND_HANDLE;
-	const char *pFileName = g_pFullFileSystem->FindFirstEx( szDirectory, MOD_DIR, &handle );
-	while (pFileName)
 	{
-		if ( !Q_strnicmp(pFileName, "HLSave", std::size( "HLSave" ) - 1 ) )
-		{
-			pFileName = g_pFullFileSystem->FindNext( handle );
-			continue;
-		}
+		// iterate the saved files
+		FileFindHandle_t handle = FILESYSTEM_INVALID_FIND_HANDLE;
+		const char *pFileName = g_pFullFileSystem->FindFirstEx( szDirectory, MOD_DIR, &handle );
+		RunCodeAtScopeExit( g_pFullFileSystem->FindClose( handle ) );
 
-		char szFileName[MAX_PATH];
-		V_sprintf_safe(szFileName, "%s/%s", SAVE_DIR, pFileName);
+		while (pFileName)
+		{
+			if ( !Q_strnicmp(pFileName, "HLSave", std::size( "HLSave" ) - 1 ) )
+			{
+				pFileName = g_pFullFileSystem->FindNext( handle );
+				continue;
+			}
 
-		// Only load save games from the current mod's save dir
-		if( !g_pFullFileSystem->FileExists( szFileName, MOD_DIR ) )
-		{
+			char szFileName[MAX_PATH];
+			V_sprintf_safe(szFileName, "%s/%s", SAVE_DIR, pFileName);
+
+			// Only load save games from the current mod's save dir
+			if( !g_pFullFileSystem->FileExists( szFileName, MOD_DIR ) )
+			{
+				pFileName = g_pFullFileSystem->FindNext( handle );
+				continue;
+			}
+			
+			SaveGameDescription_t save;
+			if ( ParseSaveData( szFileName, pFileName, save ) )
+			{
+				m_SaveGames.AddToTail( save );
+			}
+			
 			pFileName = g_pFullFileSystem->FindNext( handle );
-			continue;
 		}
-		
-		SaveGameDescription_t save;
-		if ( ParseSaveData( szFileName, pFileName, save ) )
-		{
-			m_SaveGames.AddToTail( save );
-		}
-		
-		pFileName = g_pFullFileSystem->FindNext( handle );
 	}
-	
-	g_pFullFileSystem->FindClose( handle );
 
 	// notify derived classes that save games are being scanned (so they can insert their own)
 	OnScanningSaveGames();

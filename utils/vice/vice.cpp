@@ -247,25 +247,25 @@ int main(int argc, char* argv[])
 			Q_FixSlashes( search, '/' );
 
 			WIN32_FIND_DATA wfd;
-			HANDLE hResult;
 			memset(&wfd, 0, sizeof(WIN32_FIND_DATA));
 			
-			hResult = FindFirstFile( search, &wfd );
-
-			while ( hResult != INVALID_HANDLE_VALUE )
+			HANDLE hResult = FindFirstFile( search, &wfd );
+			if (hResult != INVALID_HANDLE_VALUE )
 			{
-				if ( !strnicmp( fname, wfd.cFileName, strlen(fname) ) )
+				RunCodeAtScopeExit( FindClose( hResult ) );
+
+				while ( hResult != INVALID_HANDLE_VALUE )
 				{
-					if ( !Process_File( wfd.cFileName, sizeof( wfd.cFileName ) ) )
+					if ( !strnicmp( fname, wfd.cFileName, strlen(fname) ) )
+					{
+						if ( !Process_File( wfd.cFileName, sizeof( wfd.cFileName ) ) )
+							break;
+					}
+
+					if ( !FindNextFile( hResult, &wfd) )
 						break;
 				}
-
-				if ( !FindNextFile( hResult, &wfd) )
-					break;
-							
 			}
-			
-			FindClose( hResult );
 		}
 		else
 		{

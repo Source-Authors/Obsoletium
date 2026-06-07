@@ -116,13 +116,13 @@ int main( int argc, char *argv[] )
 
 	// parse through all the bsp files
 	_finddata_t fileinfo;
-	int FHandle = _findfirst( fileMask, &fileinfo );
-	
+	intptr_t FHandle = _findfirst( fileMask, &fileinfo );
 	if ( FHandle == -1 )
 	{
 		fprintf( stderr, "error: no files found in current directory\n" );
 		return 1;
 	}
+	RunCodeAtScopeExit(_findclose( FHandle ));
 
 	SetSearchWord( "\"classname\"" );
 

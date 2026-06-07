@@ -81,6 +81,8 @@ bool CModWizardSubPanel_CopyFiles::BuildCopyFiles_R( const char *pSourceDir, con
 
 	FileFindHandle_t findHandle;
 	const char *pFilename = g_pFullFileSystem->FindFirstEx( mask, 0, &findHandle );
+	RunCodeAtScopeExit(g_pFullFileSystem->FindClose( findHandle ));
+
 	while ( pFilename )
 	{
 		// Skip the "." and ".." directories.
@@ -119,9 +121,6 @@ bool CModWizardSubPanel_CopyFiles::BuildCopyFiles_R( const char *pSourceDir, con
 
 		pFilename = g_pFullFileSystem->FindNext( findHandle );
 	}
-	
-	g_pFullFileSystem->FindClose( findHandle );
-
 
 	// See the definition of directories for why we do this.
 	for ( int i=0; i < directories.Count(); i++ )

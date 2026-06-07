@@ -155,6 +155,7 @@ static void PortalStats_UpdateFileList( void )
 	s_PortalStatsDataFileList.RemoveAll();
 	FileFindHandle_t fileHandle;
 	const char *pszFileName = filesystem->FindFirst( "customstats/*.dat", &fileHandle );
+	RunCodeAtScopeExit( filesystem->FindClose( findHandle ) );
 
 	while( pszFileName )
 	{
@@ -174,8 +175,6 @@ static void PortalStats_UpdateFileList( void )
 
 		pszFileName = filesystem->FindNext( fileHandle );
 	}
-
-	filesystem->FindClose( fileHandle );
 }
 
 static int PortalStats_LoadFile_f_CompletionFunc( char const *partial, char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] )

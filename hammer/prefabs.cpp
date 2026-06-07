@@ -406,14 +406,14 @@ void CPrefabLibrary::LoadAllLibraries()
 
 	WIN32_FIND_DATA fd;
 	HANDLE hnd = FindFirstFile(szDir, &fd);
-	strrchr(szDir, '\\')[0] = 0;	// truncate that
-
 	if (hnd == INVALID_HANDLE_VALUE)
 	{
 		return;	// no libraries
 	}
 
 	RunCodeAtScopeExit(FindClose(hnd));
+
+	strrchr(szDir, '\\')[0] = 0;	// truncate that
 
 	do
 	{
@@ -967,7 +967,7 @@ int CPrefabLibraryVMF::Load(LPCTSTR pszFilename)
 	if (hnd == INVALID_HANDLE_VALUE)
 	{
 		// No prefabs in this folder.
-		return(1);
+		return 1;
 	}
 
 	RunCodeAtScopeExit(FindClose(hnd));

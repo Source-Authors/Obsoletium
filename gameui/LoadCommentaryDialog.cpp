@@ -282,6 +282,8 @@ void CLoadCommentaryDialog::ScanCommentaryFiles()
 	// iterate the files
 	FileFindHandle_t handle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFileName = g_pFullFileSystem->FindFirst( szDirectory, &handle );
+	RunCodeAtScopeExit( g_pFullFileSystem->FindClose( handle ) );
+
 	while (pFileName)
 	{
 		char szFileName[MAX_PATH];
@@ -298,8 +300,6 @@ void CLoadCommentaryDialog::ScanCommentaryFiles()
 
 		pFileName = g_pFullFileSystem->FindNext( handle );
 	}
-
-	g_pFullFileSystem->FindClose( handle );
 
 	// sort the save list
 	std::sort( m_CommentaryItems.begin(), m_CommentaryItems.end(), []( const CommentaryItem_t &s1, const CommentaryItem_t &s2 )

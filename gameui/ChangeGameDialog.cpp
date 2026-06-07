@@ -69,8 +69,7 @@ void CChangeGameDialog::LoadModList()
 	WIN32_FIND_DATA wfd;
 	BitwiseClear( wfd );
 	
-	HANDLE hResult = FindFirstFile(szSearchPath, &wfd);
-	if (hResult != INVALID_HANDLE_VALUE)
+	if (HANDLE hResult = FindFirstFile(szSearchPath, &wfd); hResult != INVALID_HANDLE_VALUE)
 	{
 		RunCodeAtScopeExit( FindClose( hResult ));
 

@@ -529,6 +529,8 @@ bool CQcData::GetQcData(
 
 			if ( intptr_t hFile = _findfirst( sQcGlob.Get(), &qcFile ); hFile != -1L )
 			{
+				RunCodeAtScopeExit(_findclose( hFile ));
+
 				/* Find the rest of the .qc files */
 				do {
 					CUtlString sQcFile = sFilePath;
@@ -541,13 +543,10 @@ bool CQcData::GetQcData(
 					{
 						if ( V_stristr( buf.c_str(), sFileBase0.Get() ) || V_stristr( buf.c_str(), sFileBase1.Get() ) )
 						{
-							_findclose( hFile );
 							return ParseQc( smdPath, sQcFile );
 						}
 					}
 				} while( _findnext( hFile, &qcFile ) == 0 );
-
-				_findclose( hFile );
 			}
 		}
 	}

@@ -1131,6 +1131,8 @@ bool StartDownloadingAppFiles(
 	intptr_t ret = _findfirst( searchStr, &findData );
 	if ( ret != -1 )
 	{
+    	RunCodeAtScopeExit(_findclose( handle ));
+
 		do
 		{
 			if ( findData.name[0] == '.' )
@@ -1144,8 +1146,6 @@ bool StartDownloadingAppFiles(
 				return false;
 			}
 		} while ( _findnext( ret, &findData ) == 0 );
-		
-		_findclose( ret );
 	}
 
 	// Change the EXE name to an absolute path to exactly where it is in the cache directory.

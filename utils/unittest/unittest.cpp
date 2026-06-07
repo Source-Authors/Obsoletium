@@ -86,7 +86,11 @@ bool CUnitTestApp::Create()
 	// to this program.
 
 	WIN32_FIND_DATA findFileData;
-	HANDLE hFind= FindFirstFile("*.dll", &findFileData);
+	HANDLE hFind = FindFirstFile("*.dll", &findFileData);
+	if (hFind == INVALID_HANDLE_VALUE)
+		return true;
+
+	RunCodeAtScopeExit(FindClose( hFind ));
 
 	while (hFind != INVALID_HANDLE_VALUE)
 	{

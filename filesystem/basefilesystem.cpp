@@ -4300,18 +4300,21 @@ bool CBaseFileSystem::GetCaseCorrectFullPath_Ptr( const char *pFullPath, OUT_Z_C
 	strSearchPath += "*";
 
 	CUtlString strFoundCaseCorrectName;
-	FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
-	const char *pszCaseCorrectName = FindFirst( strSearchPath.Get(), &findHandle );
-	while ( pszCaseCorrectName )
 	{
-		if ( V_strieq( strSearchName.String(), pszCaseCorrectName ) )
+		FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
+		const char *pszCaseCorrectName = FindFirst( strSearchPath.Get(), &findHandle );
+		RunCodeAtScopeExit(FindClose( findHandle ));
+
+		while ( pszCaseCorrectName )
 		{
-			strFoundCaseCorrectName = pszCaseCorrectName;
-			break;
+			if ( V_strieq( strSearchName.String(), pszCaseCorrectName ) )
+			{
+				strFoundCaseCorrectName = pszCaseCorrectName;
+				break;
+			}
+			pszCaseCorrectName = FindNext( findHandle );
 		}
-		pszCaseCorrectName = FindNext( findHandle );
 	}
-	FindClose( findHandle );
 
 	// Not found
 	if ( strFoundCaseCorrectName.IsEmpty() )

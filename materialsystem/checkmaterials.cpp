@@ -515,8 +515,7 @@ void CheckVTFInDirectoryRecursive( const char *pRoot, const char *pDirectory, CU
 	V_sprintf_safe( buf, "%s/%s/*.vtf", pRoot, pDirectory );
 
 	WIN32_FIND_DATA wfd;
-	HANDLE findHandle = FindFirstFile( buf, &wfd );
-	if ( findHandle != INVALID_HANDLE_VALUE ) 
+	if ( HANDLE findHandle = FindFirstFile( buf, &wfd ); findHandle != INVALID_HANDLE_VALUE ) 
 	{
 		RunCodeAtScopeExit(FindClose ( findHandle ));
 
@@ -539,8 +538,7 @@ void CheckVTFInDirectoryRecursive( const char *pRoot, const char *pDirectory, CU
 
 	// do subdirectories
 	V_sprintf_safe( buf, "%s/%s/*.*", pRoot, pDirectory );
-	findHandle = FindFirstFile( buf, &wfd );
-	if ( findHandle != INVALID_HANDLE_VALUE ) 
+	if ( HANDLE findHandle = FindFirstFile( buf, &wfd ); findHandle != INVALID_HANDLE_VALUE ) 
 	{
 		RunCodeAtScopeExit(FindClose ( findHandle ));
 
@@ -575,8 +573,7 @@ void _CheckMateralsInDirectoryRecursive( const char *pRoot, const char *pDirecto
 	V_sprintf_safe( buf, "%s/%s/*.vmt", pRoot, pDirectory );
 	
 	WIN32_FIND_DATA wfd;
-	HANDLE findHandle = FindFirstFile( buf, &wfd );
-	if ( findHandle != INVALID_HANDLE_VALUE ) 
+	if ( HANDLE findHandle = FindFirstFile( buf, &wfd ); findHandle != INVALID_HANDLE_VALUE ) 
 	{
 		RunCodeAtScopeExit(FindClose ( findHandle ));
 
@@ -598,8 +595,7 @@ void _CheckMateralsInDirectoryRecursive( const char *pRoot, const char *pDirecto
 
 	// do subdirectories
 	V_sprintf_safe( buf, "%s/%s/*.*", pRoot, pDirectory );
-	findHandle = FindFirstFile( buf, &wfd );
-	if ( findHandle != INVALID_HANDLE_VALUE ) 
+	if ( HANDLE findHandle = FindFirstFile( buf, &wfd ); findHandle != INVALID_HANDLE_VALUE ) 
 	{
 		RunCodeAtScopeExit(FindClose ( findHandle ));
 

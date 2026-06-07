@@ -169,6 +169,8 @@ void CCreateMultiplayerGameServerPage::LoadMaps( const char *pszPathID )
 	char mapname[MAX_PATH];
 	bool firstTime = true;
 	const char *pszFilename = g_pFullFileSystem->FindFirstEx( "maps/*.bsp", pszPathID, &findHandle );
+	RunCodeAtScopeExit( g_pFullFileSystem->FindClose( findHandle ) );
+
 	while ( pszFilename )
 	{
 		if (!firstTime)
@@ -225,8 +227,6 @@ void CCreateMultiplayerGameServerPage::LoadMaps( const char *pszPathID )
 		// add to the map list
 		m_pMapList->AddItem( mapname, KeyValuesAD(new KeyValues( "data", "mapname", mapname )) );
 	}
-
-	g_pFullFileSystem->FindClose( findHandle );
 }
 
 

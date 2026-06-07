@@ -294,6 +294,8 @@ bool CopyFilesRecursively( const char *pSrcPath, const char *pDestPath )
 	if( INVALID_HANDLE_VALUE == hFind )
 		return true;
 
+	RunCodeAtScopeExit(FindClose( hFind ));
+
 	// Make sure the dest path exists
 	if ( ( GetFileAttributes( pDestPath ) & FILE_ATTRIBUTE_DIRECTORY ) == 0 )
 	{
@@ -345,8 +347,6 @@ bool CopyFilesRecursively( const char *pSrcPath, const char *pDestPath )
 
 	} while( FindNextFile( hFind, &find ) );
 
-	// Close the find handle.
-	FindClose( hFind );
 	return true;
 }
 

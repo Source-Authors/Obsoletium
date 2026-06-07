@@ -391,10 +391,12 @@ CDmElement *CDmObjSerializer::ReadOBJ(
 
 		FileFindHandle_t hFind = FILESYSTEM_INVALID_FIND_HANDLE;
 
-		char deltaFile[ MAX_PATH ];
-		char deltaPath[ MAX_PATH ];
+		char deltaFile[ MAX_PATH ], deltaPath[ MAX_PATH ];
 
-		for ( const char *pFindFile( g_pFullFileSystem->FindFirst( findPath, &hFind ) ); pFindFile && *pFindFile; pFindFile = g_pFullFileSystem->FindNext( hFind ) )
+		const char *pFindFile( g_pFullFileSystem->FindFirst( findPath, &hFind ) );
+		RunCodeAtScopeExit( g_pFullFileSystem->FindClose( hFind ) );
+
+		for ( ; pFindFile && *pFindFile; pFindFile = g_pFullFileSystem->FindNext( hFind ) )
 		{
 			V_FileBase( pFindFile, deltaFile );
 
@@ -436,8 +438,6 @@ CDmElement *CDmObjSerializer::ReadOBJ(
 				}
 			}
 		}
-
-		g_pFullFileSystem->FindClose( hFind );
 
 		if ( pCombo )
 		{

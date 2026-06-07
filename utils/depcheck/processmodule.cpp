@@ -444,13 +444,13 @@ char const *stristr( char const *src, char const *search )
 
 void CCodeProcessor::ConstructModuleList_R( int level, const char *gamespecific, const char *root )
 {
-	char directory[ 256 ];
-	char filename[ 256 ];
-	WIN32_FIND_DATA wfd;
-	HANDLE ff;
-
+	char filename[ MAX_PATH ];
+	
+	char directory[ MAX_PATH ];
 	V_sprintf_safe( directory, "%s\\*.*", root );
 
+	HANDLE ff;
+	WIN32_FIND_DATA wfd;
 	if ( ( ff = FindFirstFile( directory, &wfd ) ) == INVALID_HANDLE_VALUE )
 		return;
 

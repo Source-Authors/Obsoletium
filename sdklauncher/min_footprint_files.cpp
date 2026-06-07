@@ -327,32 +327,35 @@ void GetMinFootprintFiles_R( CUtlVector<CMinFootprintFilename> &filenames, const
 	// Make sure the dest directory exists for when we're copying files into it.
 	CreateDirectory( pDestDirName, NULL );
 
-	// Look at all the files.
-	FileFindHandle_t findHandle;
-	const char *pFilename = g_pFullFileSystem->FindFirstEx( wildcard, SDKLAUNCHER_MAIN_PATH_ID, &findHandle );
-	while ( pFilename )
 	{
-		if ( !V_streq( pFilename, "." ) && !V_streq( pFilename, ".." ) )
-		{
-			char fullSrcFilename[MAX_PATH], fullDestFilename[MAX_PATH];
-			Q_snprintf( fullSrcFilename, sizeof( fullSrcFilename ), "%s%c%s", pSrcDirName, CORRECT_PATH_SEPARATOR, pFilename );
-			Q_snprintf( fullDestFilename, sizeof( fullDestFilename ), "%s%c%s", pDestDirName, CORRECT_PATH_SEPARATOR, pFilename );
+		// Look at all the files.
+		FileFindHandle_t findHandle;
+		const char *pFilename = g_pFullFileSystem->FindFirstEx( wildcard, SDKLAUNCHER_MAIN_PATH_ID, &findHandle );
+		RunCodeAtScopeExit(g_pFullFileSystem->FindClose( findHandle ));
 
-			if ( g_pFullFileSystem->FindIsDirectory( findHandle ) )
+		while ( pFilename )
+		{
+			if ( !V_streq( pFilename, "." ) && !V_streq( pFilename, ".." ) )
 			{
-				CTempDirName *pOut = &subDirs[subDirs.AddToTail()];
-				Q_strncpy( pOut->m_SrcDirName, fullSrcFilename, sizeof( pOut->m_SrcDirName ) );
-				Q_strncpy( pOut->m_DestDirName, fullDestFilename, sizeof( pOut->m_DestDirName ) );
+				char fullSrcFilename[MAX_PATH], fullDestFilename[MAX_PATH];
+				Q_snprintf( fullSrcFilename, sizeof( fullSrcFilename ), "%s%c%s", pSrcDirName, CORRECT_PATH_SEPARATOR, pFilename );
+				Q_snprintf( fullDestFilename, sizeof( fullDestFilename ), "%s%c%s", pDestDirName, CORRECT_PATH_SEPARATOR, pFilename );
+
+				if ( g_pFullFileSystem->FindIsDirectory( findHandle ) )
+				{
+					CTempDirName *pOut = &subDirs[subDirs.AddToTail()];
+					Q_strncpy( pOut->m_SrcDirName, fullSrcFilename, sizeof( pOut->m_SrcDirName ) );
+					Q_strncpy( pOut->m_DestDirName, fullDestFilename, sizeof( pOut->m_DestDirName ) );
+				}
+				else
+				{
+					AddMinFootprintFile( filenames, fullSrcFilename, fullDestFilename, 0 );
+				}
 			}
-			else
-			{
-				AddMinFootprintFile( filenames, fullSrcFilename, fullDestFilename, 0 );
-			}
+			
+			pFilename = g_pFullFileSystem->FindNext( findHandle );
 		}
-		
-		pFilename = g_pFullFileSystem->FindNext( findHandle );
 	}
-	g_pFullFileSystem->FindClose( findHandle );
 	
 	// Recurse.
 	for ( int i=0; i < subDirs.Count(); i++ )

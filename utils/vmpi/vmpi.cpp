@@ -445,6 +445,8 @@ void SetupDependenciesForPatch(CDependencyInfo *pInfo,
   intptr_t handle = _findfirst(searchStr, &data);
 
   if (handle != -1) {
+    RunCodeAtScopeExit(_findclose( handle ));
+
     do {
       if (data.name[0] == '.' || (data.attrib & _A_SUBDIR) != 0) continue;
 
@@ -454,8 +456,6 @@ void SetupDependenciesForPatch(CDependencyInfo *pInfo,
 
       pInfo->m_Files.AddToTail(pFile);
     } while (_findnext(handle, &data) == 0);
-
-    _findclose(handle);
   }
 }
 

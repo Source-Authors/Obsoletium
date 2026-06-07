@@ -71,13 +71,18 @@ void ModConfigsHelper::setSourceModBaseDir()
 void ModConfigsHelper::EnumerateModDirs()
 {
 	char szWildCardPath[MAX_PATH];
+	V_strcpy_safe( szWildCardPath, m_sourceModBaseDir );
+	V_AppendSlash( szWildCardPath );
+	V_strcat_safe( szWildCardPath, "*.*" );
+
 	WIN32_FIND_DATA wfd;
-
-	Q_strncpy( szWildCardPath, m_sourceModBaseDir, sizeof( szWildCardPath ) );
-	Q_AppendSlash( szWildCardPath, sizeof( szWildCardPath ) );
-	Q_strncat( szWildCardPath, "*.*", sizeof( szWildCardPath ), COPY_ALL_CHARACTERS );
-
 	HANDLE ff = FindFirstFile( szWildCardPath, &wfd );
+	if (ff == INVALID_HANDLE_VALUE)
+	{
+		return;	// no libraries
+	}
+
+	RunCodeAtScopeExit(FindClose ( ff ));
 
 	do
 	{
@@ -90,9 +95,7 @@ void ModConfigsHelper::EnumerateModDirs()
 			else
 			{
 				// They are directories not named '.' or '..' so add them to the list of mod directories
-				char *dirName = new char[ strlen( wfd.cFileName ) + 1 ];
-				Q_strncpy( dirName, wfd.cFileName, strlen( wfd.cFileName ) + 1 );
-				m_ModDirs.AddToTail( dirName );
+				m_ModDirs.AddToTail( V_strdup( wfd.cFileName ) );
 			}
 		}
 	} while ( FindNextFile( ff, &wfd ) );

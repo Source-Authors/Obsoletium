@@ -710,6 +710,7 @@ void CBonusMapsDatabase::BuildSubdirectoryList( const char *pCurrentPath, bool b
 
 	FileFindHandle_t dirHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pDirFileName = g_pFullFileSystem->FindFirst( szDirectory, &dirHandle );
+	RunCodeAtScopeExit( g_pFullFileSystem->FindClose( dirHandle ) );
 
 	while (pDirFileName)
 	{
@@ -735,8 +736,6 @@ void CBonusMapsDatabase::BuildSubdirectoryList( const char *pCurrentPath, bool b
 
 		pDirFileName = g_pFullFileSystem->FindNext( dirHandle );
 	}
-
-	g_pFullFileSystem->FindClose( dirHandle );
 }
 
 void CBonusMapsDatabase::BuildBonusMapsList( const char *pCurrentPath, bool bOutOfRoot )
@@ -746,6 +745,7 @@ void CBonusMapsDatabase::BuildBonusMapsList( const char *pCurrentPath, bool bOut
 
 	FileFindHandle_t mapHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pMapFileName = g_pFullFileSystem->FindFirst( szDirectory, &mapHandle );
+	RunCodeAtScopeExit( g_pFullFileSystem->FindClose( mapHandle ) );
 
 	while ( pMapFileName && !Q_isempty(pMapFileName) )
 	{
@@ -767,8 +767,6 @@ void CBonusMapsDatabase::BuildBonusMapsList( const char *pCurrentPath, bool bOut
 
 		pMapFileName = g_pFullFileSystem->FindNext( mapHandle );
 	}
-
-	g_pFullFileSystem->FindClose( mapHandle );
 }
 
 //-----------------------------------------------------------------------------

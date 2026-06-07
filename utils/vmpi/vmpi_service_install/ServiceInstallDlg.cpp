@@ -152,7 +152,9 @@ void ScanDirectory( const char *pDirName, CUtlVector<CString> &subDirs, CUtlVect
 	HANDLE hFile = ::FindFirstFile( strPattern, &fileInfo );
 	if ( hFile == INVALID_HANDLE_VALUE )
 		return;
-		
+
+	RunCodeAtScopeExit(::FindClose( hFile ));					
+	
 	do
 	{
 		if ( fileInfo.cFileName[0] == '.' )
@@ -163,8 +165,6 @@ void ScanDirectory( const char *pDirName, CUtlVector<CString> &subDirs, CUtlVect
 		else
 			files.AddToTail( fileInfo.cFileName );			
 	} while( ::FindNextFile(hFile, &fileInfo) );
-
-	::FindClose( hFile );
 }
 
 
@@ -607,9 +607,11 @@ bool AnyNonInstallFilesInDirectory( const char *strInstallLocation )
 	V_ComposeFileName( strInstallLocation, "*.*", searchStr, sizeof( searchStr ) );
 
 	_finddata_t data;
-	long handle = _findfirst( searchStr, &data );
+	intptr_t handle = _findfirst( searchStr, &data );
 	if ( handle != -1 )
 	{
+    	RunCodeAtScopeExit(_findclose( handle ));
+
 		do
 		{
 			if ( data.name[0] == '.' || (data.attrib & _A_SUBDIR) != 0 )
@@ -619,8 +621,6 @@ bool AnyNonInstallFilesInDirectory( const char *strInstallLocation )
 				return true;
 			
 		} while( _findnext( handle, &data ) == 0 );
-	
-		_findclose( handle );
 	}
 	return false;
 }

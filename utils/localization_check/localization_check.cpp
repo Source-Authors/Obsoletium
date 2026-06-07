@@ -377,14 +377,13 @@ void Con_Printf( const char *fmt, ... )
 
 void BuildFileList_R( CUtlVector< CUtlSymbol >& files, char const *dir, char const *extension )
 {
-	WIN32_FIND_DATA wfd;
-
-	char directory[ 256 ];
 	char filename[ MAX_PATH ];
-	HANDLE ff;
 
+	char directory[ MAX_PATH ];
 	V_sprintf_safe( directory, "%s\\*.*", dir );
 
+	HANDLE ff;
+	WIN32_FIND_DATA wfd;
 	if ( ( ff = FindFirstFile( directory, &wfd ) ) == INVALID_HANDLE_VALUE )
 		return;
 
@@ -2509,6 +2508,7 @@ int LoadPhonemeExtractors()
 	// Enumerate modules under bin folder of exe
 	FileFindHandle_t findHandle;
 	const char *pFilename = g_pFullFileSystem->FindFirstEx( "phonemeextractors/*.dll", "EXECUTABLE_PATH", &findHandle );
+	RunCodeAtScopeExit(g_pFullFileSystem->FindClose( findHandle ));
 	int useextractor = -1;
 	while ( pFilename )
 	{	
@@ -2549,8 +2549,6 @@ int LoadPhonemeExtractors()
 
 		g_Extractors.AddToTail( e );	
 	}
-
-	g_pFullFileSystem->FindClose( findHandle );
 
 	return useextractor;
 }

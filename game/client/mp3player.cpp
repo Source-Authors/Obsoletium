@@ -795,10 +795,10 @@ void CMP3Player::RemoveTempSounds()
 	V_strcpy_safe( path, "sound/_mp3/*.mp3" );
 
 	char const *fn = g_pFullFileSystem->FindFirstEx( path, "MOD", &fh );
+	RunCodeAtScopeExit(g_pFullFileSystem->FindClose( fh ));
+
 	if ( fn )
 	{
-		RunCodeAtScopeExit(g_pFullFileSystem->FindClose( fh ));
-
 		do
 		{
 			if ( fn[0] != '.'  )
@@ -1118,10 +1118,10 @@ void CMP3Player::RecursiveFindMP3Files( SoundDirectory_t *root, char const *curr
 	
 	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
 	char const *fn = g_pFullFileSystem->FindFirstEx( path, pathID, &fh );
+	RunCodeAtScopeExit(g_pFullFileSystem->FindClose( fh ));
+
 	if ( fn )
 	{
-		RunCodeAtScopeExit(g_pFullFileSystem->FindClose( fh ));
-
 		do
 		{
 			if ( fn[0] != '.' && Q_strnicmp( fn, "_mp3", 4 ) )

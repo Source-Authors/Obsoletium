@@ -1764,11 +1764,10 @@ static void DumpSignatureInfo(const char *pszFilename) {
 
 void BuildRecursiveFileList(const char *pcDirName, CUtlStringList &fileList) {
   char szDirWildcard[MAX_PATH];
-  FileFindHandle_t findHandle;
-
   V_sprintf_safe(szDirWildcard, "%s%c%s", pcDirName, CORRECT_PATH_SEPARATOR,
                  "*.*");
 
+  FileFindHandle_t findHandle;
   char const *pcResult =
       g_pFullFileSystem->FindFirst(szDirWildcard, &findHandle);
   RunCodeAtScopeExit(g_pFullFileSystem->FindClose(findHandle));

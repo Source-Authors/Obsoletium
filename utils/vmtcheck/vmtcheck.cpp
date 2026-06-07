@@ -61,20 +61,19 @@ void printusage( void )
 
 void BuildFileList_R( CUtlVector< CUtlSymbol >& files, char const *dir, char const *extension )
 {
-	WIN32_FIND_DATA wfd;
 
-	char directory[ 256 ];
-	char filename[ 256 ];
-	HANDLE ff;
-
+	char directory[ MAX_PATH ];
 	V_sprintf_safe( directory, "%s\\*.*", dir );
-
+	
+	WIN32_FIND_DATA wfd;
+	HANDLE ff;
 	if ( ( ff = FindFirstFile( directory, &wfd ) ) == INVALID_HANDLE_VALUE )
 		return;
 
 	RunCodeAtScopeExit(FindClose( ff ));
 
 	int extlen = strlen( extension );
+	char filename[ MAX_PATH ];
 
 	do
 	{

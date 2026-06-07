@@ -369,6 +369,8 @@ void ExpandWildcards(int *argc, char ***argv) {
     intptr_t handle = _findfirst(path, &fileinfo);
     if (handle == -1) return;
 
+    RunCodeAtScopeExit(_findclose(handle));
+
     V_ExtractFilePath(path, filebase);
 
     do {
@@ -376,8 +378,6 @@ void ExpandWildcards(int *argc, char ***argv) {
 
       ex_argv[ex_argc++] = copystring(filename);
     } while (_findnext(handle, &fileinfo) != -1);
-
-    _findclose(handle);
   }
 
   *argc = ex_argc;
