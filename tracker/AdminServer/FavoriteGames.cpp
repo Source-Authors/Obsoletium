@@ -569,13 +569,13 @@ void CFavoriteGames::OnImportFavoritesFile()
 	if (vgui::system()->GetRegistryString("HKEY_LOCAL_MACHINE\\Software\\Valve\\Half-life\\InstallPath", name, sizeof(name)))
 	{
 		// add filename
-		strcat(name, "\\favsvrs.dat");
+		V_strcat_safe(name, "\\favsvrs.dat");
 	}
 	// check if they have counterstrike
 	else if (vgui::system()->GetRegistryString("HKEY_LOCAL_MACHINE\\Software\\Sierra OnLine\\Setup\\CSTRIKE\\Directory", name, sizeof(name)))
 	{
 		// add filename
-		strcat(name, "\\favsvrs.dat");
+		V_strcat_safe(name, "\\favsvrs.dat");
 	}
 	else // no hl installation, no fav servers?	// should never hit this!
 	{

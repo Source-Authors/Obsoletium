@@ -843,7 +843,7 @@ bool CClass::ParseBaseClass( char *&input )
 		input = CC_ParseToken( input );
 		do
 		{
-			strcat( m_szTypedefBaseClass, com_token );
+			V_strcat_safe( m_szTypedefBaseClass, com_token );
 			input = CC_ParseToken( input );
 		} while( strcmp( com_token, ")") );
 		return true;
@@ -877,15 +877,15 @@ bool CClass::ParseNetworkVar( char *&input, int protection )
 		input = CC_ParseToken( input );
 		do
 		{
-			strcat( var.m_pType, com_token );
-			strcat( var.m_pType, " " );
+			V_strcat_safe( var.m_pType, com_token );
+			V_strcat_safe( var.m_pType, " " );
 			input = CC_ParseToken( input );
 		} while( strcmp( com_token, ",") );
 
 		input = CC_ParseToken( input );
 		do
 		{
-			strcat( var.m_pName, com_token );
+			V_strcat_safe( var.m_pName, com_token );
 			input = CC_ParseToken( input );
 		} while( strcmp( com_token, ")") );
 
@@ -929,7 +929,7 @@ bool CClass::ParseNetworkVar( char *&input, int protection )
 		input = CC_ParseToken( input );
 		do
 		{
-			strcat( var.m_pName, com_token );
+			V_strcat_safe( var.m_pName, com_token );
 			input = CC_ParseToken( input );
 		} while( strcmp( com_token, ")") );
 
@@ -945,7 +945,7 @@ bool CClass::ParseNetworkVar( char *&input, int protection )
 		input = CC_ParseToken( input );
 		do
 		{
-			strcat( var.m_pName, com_token );
+			V_strcat_safe( var.m_pName, com_token );
 			input = CC_ParseToken( input );
 		} while( strcmp( com_token, ")") );
 
@@ -961,14 +961,14 @@ bool CClass::ParseNetworkVar( char *&input, int protection )
 		input = CC_ParseToken( input );
 		do
 		{
-			strcat( var.m_pName, com_token );
+			V_strcat_safe( var.m_pName, com_token );
 			input = CC_ParseToken( input );
 		} while( strcmp( com_token, ",") );
 
 		input = CC_ParseToken( input );
 		do
 		{
-			strcat( var.m_pArraySize, com_token );
+			V_strcat_safe( var.m_pArraySize, com_token );
 			input = CC_ParseToken( input );
 		} while( strcmp( com_token, ")") );
 
@@ -984,22 +984,22 @@ bool CClass::ParseNetworkVar( char *&input, int protection )
 		input = CC_ParseToken( input );
 		do
 		{
-			strcat( var.m_pType, com_token );
-			strcat( var.m_pType, " " );
+			V_strcat_safe( var.m_pType, com_token );
+			V_strcat_safe( var.m_pType, " " );
 			input = CC_ParseToken( input );
 		} while( strcmp( com_token, ",") );
 
 		input = CC_ParseToken( input );
 		do
 		{
-			strcat( var.m_pName, com_token );
+			V_strcat_safe( var.m_pName, com_token );
 			input = CC_ParseToken( input );
 		} while( strcmp( com_token, ",") );
 
 		input = CC_ParseToken( input );
 		do
 		{
-			strcat( var.m_pArraySize, com_token );
+			V_strcat_safe( var.m_pArraySize, com_token );
 			input = CC_ParseToken( input );
 		} while( strcmp( com_token, ")") );
 
@@ -1039,8 +1039,8 @@ bool CClass::ParseClassMember( char *&input, int protection )
 			strncpy( inside, saveinput, len );
 			inside[ len ] =0;
 
-			strcat( var.m_pName, "(" );
-			strcat( var.m_pName, inside );
+			V_strcat_safe( var.m_pName, "(" );
+			V_strcat_safe( var.m_pName, inside );
 		}
 	}
 
@@ -1220,7 +1220,7 @@ bool CClass::ParseClassMember( char *&input, int protection )
 	/*
 	if ( var.m_pName[0] == '*' )
 	{
-		strcat( type, " *" );
+		V_strcat_safe( type, " *" );
 
 		char newname[ 256 ];
 		V_strcpy_safe( newname, &var.m_pName[1] );

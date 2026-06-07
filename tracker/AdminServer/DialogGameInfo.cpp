@@ -479,12 +479,12 @@ void CDialogGameInfo::ConnectToServer()
 	{
 		char command[256];
 //		sprintf(command, " -game %s +connect %s", gameDir, buf);
-		sprintf(command, " +connect %s", buf);
+		V_sprintf_safe(command, " +connect %s", buf);
 		if (m_szPassword[0])
 		{
-			strcat(command, " +password \"");
-			strcat(command, m_szPassword);
-			strcat(command, "\"");\
+			V_strcat_safe(command, " +password \"");
+			V_strcat_safe(command, m_szPassword);
+			V_strcat_safe(command, "\"");\
 		}
 		
 		g_pRunGameEngine->RunEngine(gameDir, command);

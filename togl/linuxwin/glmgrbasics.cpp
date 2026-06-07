@@ -4290,7 +4290,7 @@ void	CGLMEditableTextItem::GenBaseNameAndFullPath(  char *prefix, char *suffix  
 	Q_binarytohex( m_origDigest, sizeof(m_origDigest), temp, sizeof( temp ) );
 	if (suffix)
 	{
-		strcat( temp, suffix );
+		V_strcat_safe( temp, suffix );
 	}
 	if (m_mirrorBaseName)	free(m_mirrorBaseName);
 	m_mirrorBaseName = strdup( temp );

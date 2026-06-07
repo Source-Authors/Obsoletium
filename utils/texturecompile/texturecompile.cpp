@@ -513,9 +513,9 @@ void Shared_ParseListOfCompileCommands( void )
 void SetupPaths( int argc, char **argv )
 {
 	GetTempPath( sizeof( g_WorkerTempPath ), g_WorkerTempPath );
-	strcat( g_WorkerTempPath, "texturecompiletemp\\" );
+	V_strcat_safe( g_WorkerTempPath, "texturecompiletemp\\" );
 	char tmp[MAX_PATH];
-	sprintf( tmp, "rd /s /q \"%s\"", g_WorkerTempPath );
+	V_sprintf_safe( tmp, "rd /s /q \"%s\"", g_WorkerTempPath );
 	system( tmp );
 	_mkdir( g_WorkerTempPath );
 //	printf( "g_WorkerTempPath: \"%s\"\n", g_WorkerTempPath );
@@ -584,9 +584,9 @@ void WriteTexture( const char *pTextureName )
 
 	char filename[MAX_PATH];
 	char filename2[MAX_PATH];
-//	strcpy( filename2, g_pShaderOutputDir );
-	strcpy( filename2, g_pShaderPath );
-	strcat( filename2, "\\shaders\\fxc" );
+//	V_strcpy_safe( filename2, g_pShaderOutputDir );
+	V_strcpy_safe( filename2, g_pShaderPath );
+	V_strcat_safe( filename2, "\\shaders\\fxc" );
 
 	struct	_stat buf;
 	if( _stat( filename2, &buf ) == -1 )
@@ -596,15 +596,15 @@ void WriteTexture( const char *pTextureName )
 		_mkdir( filename2 );
 	}
 
-	strcat( filename2, "\\" );
-	strcpy( filename, pShaderName );
+	V_strcat_safe( filename2, "\\" );
+	V_strcpy_safe( filename, pShaderName );
 	char *dot = strstr( filename, "." );
 	if( dot )
 	{
 		*dot = '\0';
 	}
-	strcat( filename, ".vcs" );
-	strcat( filename2, filename );
+	V_strcat_safe( filename, ".vcs" );
+	V_strcat_safe( filename2, filename );
 	if( _stat( filename2, &buf ) != -1 )
 	{
 		// The file exists, let's see if it's writable.

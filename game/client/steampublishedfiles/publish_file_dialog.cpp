@@ -857,8 +857,8 @@ void CFilePublishDialog::OnCommand( const char *command )
 		char szFilePath[MAX_PATH];
 		g_pFullFileSystem->GetCurrentDirectory( szFilePath, sizeof(szFilePath) );
 
-		strcat( szFilePath, "/" );
-		strcat( szFilePath, textBuffer );
+		V_strcat_safe( szFilePath, "/" );
+		V_strcat_safe( szFilePath, textBuffer );
 
 		// Get the currently set dir and use that as the start
 		// pDlg->ExpandTreeToPath( szFilePath );
@@ -886,8 +886,8 @@ void CFilePublishDialog::OnCommand( const char *command )
 		char szFilePath[MAX_PATH];
 		g_pFullFileSystem->GetCurrentDirectory( szFilePath, sizeof( szFilePath ) );
 
-		strcat( szFilePath, "/" );
-		strcat( szFilePath, textBuffer );
+		V_strcat_safe( szFilePath, "/" );
+		V_strcat_safe( szFilePath, textBuffer );
 
 		// Get the currently set dir and use that as the start
 		// pDlg->ExpandTreeToPath( szFilePath );
@@ -912,8 +912,8 @@ void CFilePublishDialog::OnCommand( const char *command )
 		char szFilePath[MAX_PATH];
 		g_pFullFileSystem->GetCurrentDirectory( szFilePath, sizeof(szFilePath) );
 
-		strcat( szFilePath, "/" );
-		strcat( szFilePath, g_PreviewFilename );
+		V_strcat_safe( szFilePath, "/" );
+		V_strcat_safe( szFilePath, g_PreviewFilename );
 
 		// Get the currently set dir and use that as the start
 		// pDlg->ExpandTreeToPath( szFilePath );

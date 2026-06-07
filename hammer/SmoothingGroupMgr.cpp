@@ -265,15 +265,15 @@ ChunkFileResult_t CSmoothingGroupMgr::SaveVMF( CChunkFile *pFile, CSaveInfo *pSa
 							
 							if (!bFirst)
 							{
-								strcat(szBuf, " ");
+								V_strcat_safe(szBuf, " ");
 							}
 
 							CMapFace *pFace = pGroup->m_aFaces[iFace];
 							if ( pFace )
 							{
 								bFirst = false;
-								sprintf( szTemp, "%d", pFace->GetFaceID() );
-								strcat( szBuf, szTemp );
+								V_sprintf_safe( szTemp, "%d", pFace->GetFaceID() );
+								V_strcat_safe( szBuf, szTemp );
 							}
 						}
 						
