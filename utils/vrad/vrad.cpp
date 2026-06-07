@@ -51,8 +51,8 @@ int area_sky_cameras[MAX_MAP_AREAS];
 
 entity_t	*face_entity[MAX_MAP_FACES];
 Vector		face_offset[MAX_MAP_FACES];		// for rotating bmodels
-// dimhotepus: 
-dplane_t 	fakeplanes;
+// dimhotepus: Extend serveral BSP limits (ficool2).
+dplane_t 	fakeplanes[MAX_MAP_PLANES];
 int			numfakeplanes = 0;
 
 unsigned	numbounce = 100; // 25; /* Originally this was 8 */
