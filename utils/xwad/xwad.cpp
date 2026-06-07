@@ -367,7 +367,7 @@ void EnsureDirExists(const char *pDir) {
 void WriteVMTFile(const char *pBaseDir, const char *pSubDir, const char *pName,
                   bool bTranslucent) {
   char vmtFilename[512];
-  sprintf(vmtFilename, "%s\\materials\\%s\\%s.vmt", pBaseDir, pSubDir, pName);
+  V_sprintf_safe(vmtFilename, "%s\\materials\\%s\\%s.vmt", pBaseDir, pSubDir, pName);
 
   FILE *fp = fopen(vmtFilename, "wt");
   if (!fp) {
@@ -401,7 +401,7 @@ void WriteVMTFile(const char *pBaseDir, const char *pSubDir, const char *pName,
 void WriteTXTFile(const char *pBaseDir, const char *pSubDir,
                   const char *pName) {
   char filename[512];
-  sprintf(filename, "%s\\materialsrc\\%s\\%s.txt", pBaseDir, pSubDir, pName);
+  V_sprintf_safe(filename, "%s\\materialsrc\\%s\\%s.txt", pBaseDir, pSubDir, pName);
 
   FILE *fp = fopen(filename, "wt");
   if (!fp) Error("\tWriteTXTFile: can't open %s for writing.\n", filename);
@@ -413,7 +413,7 @@ void WriteTXTFile(const char *pBaseDir, const char *pSubDir,
 void WriteResizeInfoFile(const char *pBaseDir, const char *pSubDir,
                          const char *pName, int width, int height) {
   char filename[512];
-  sprintf(filename, "%s\\materials\\%s\\%s.resizeinfo", pBaseDir, pSubDir,
+  V_sprintf_safe(filename, "%s\\materials\\%s\\%s.resizeinfo", pBaseDir, pSubDir,
           pName);
 
   FILE *fp = fopen(filename, "wt");
@@ -463,7 +463,7 @@ void WriteOutputFiles(const char *pBaseDir, const char *pSubDir,
   bool bPowerOf2 = true;
 
   char tgaFilename[1024];
-  sprintf(tgaFilename, "%s\\materialsrc\\%s\\%s.tga", pBaseDir, pSubDir, pName);
+  V_sprintf_safe(tgaFilename, "%s\\materialsrc\\%s\\%s.tga", pBaseDir, pSubDir, pName);
   if (!WriteTGAFile(tgaFilename, bAllowTranslucent, buffer, width, height,
                     pPalette, bPowerOf2, &bTranslucent, &bResized)) {
     Error("\tError writing %s.\n", tgaFilename);
@@ -489,8 +489,8 @@ void WriteOutputFiles(const char *pBaseDir, const char *pSubDir,
 
 void EnsureDirectoriesExist(const char *pBaseDir, const char *pSubDir) {
   char materialsrcDir[512], materialsDir[512];
-  sprintf(materialsrcDir, "%s\\materialsrc\\%s", pBaseDir, pSubDir);
-  sprintf(materialsDir, "%s\\materials\\%s", pBaseDir, pSubDir);
+  V_sprintf_safe(materialsrcDir, "%s\\materialsrc\\%s", pBaseDir, pSubDir);
+  V_sprintf_safe(materialsDir, "%s\\materials\\%s", pBaseDir, pSubDir);
   EnsureDirExists(materialsrcDir);
   EnsureDirExists(materialsDir);
 }
@@ -736,7 +736,7 @@ void ProcessSPRFile(const char *pBaseDir, const char *pSubDir,
   // Generate a .txt file for the sprite.
   //
   char txtFilename[512];
-  sprintf(txtFilename, "%s\\materialsrc\\%s\\%s.txt", pBaseDir, pSubDir,
+  V_sprintf_safe(txtFilename, "%s\\materialsrc\\%s\\%s.txt", pBaseDir, pSubDir,
           baseFilename);
 
   fp = fopen(txtFilename, "wt");

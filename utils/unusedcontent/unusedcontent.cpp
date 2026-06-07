@@ -693,16 +693,18 @@ void BuildFileList_R( int depth, CUtlVector< FileEntry >& files, CUtlVector< Fil
 	if ( V_streq( wild, "..." ) )
 	{
 		canrecurse = true;
-		sprintf( directory, "%s%s%s", dir[0] == '\\' ? dir + 1 : dir, dir[0] != 0 ? "\\" : "", "*.*" );
+		V_sprintf_safe( directory, "%s%s%s", dir[0] == '\\' ? dir + 1 : dir, dir[0] != 0 ? "\\" : "", "*.*" );
 	}
 	else
 	{
-		sprintf( directory, "%s%s%s", dir, dir[0] != 0 ? "\\" : "", wild );
+		V_sprintf_safe( directory, "%s%s%s", dir, dir[0] != 0 ? "\\" : "", wild );
 	}
 	int dirlen = Q_strlen( dir );
 
 	if ( ( ff = FindFirstFile( directory, &wfd ) ) == INVALID_HANDLE_VALUE )
 		return;
+
+	RunCodeAtScopeExit(FindClose( ff ));
 
 	do
 	{
@@ -727,11 +729,11 @@ void BuildFileList_R( int depth, CUtlVector< FileEntry >& files, CUtlVector< Fil
 			// Recurse down directory
 			if ( dir[0] )
 			{
-				sprintf( filename, "%s\\%s", dir, wfd.cFileName );
+				V_sprintf_safe( filename, "%s\\%s", dir, wfd.cFileName );
 			}
 			else
 			{
-				sprintf( filename, "%s", wfd.cFileName );
+				V_sprintf_safe( filename, "%s", wfd.cFileName );
 			}
 			BuildFileList_R( depth + 1, useOtherFiles ? *otherfiles: files, NULL, filename, wild, skipchars );
 		}

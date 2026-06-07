@@ -105,7 +105,7 @@ ScrollBarDemo::~ScrollBarDemo()
 void ScrollBarDemo::OnSliderMoved()
 {
 	char number[6];
-	sprintf (number, "%d", m_pScrollbar->GetValue());
+	V_sprintf_safe(number, "%d", m_pScrollbar->GetValue());
 	m_pScrollValue->SetText(number);
 }
 

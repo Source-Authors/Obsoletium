@@ -278,7 +278,7 @@ ChunkFileResult_t CSmoothingGroupMgr::SaveVMF( CChunkFile *pFile, CSaveInfo *pSa
 						}
 						
 						char szKey[10];
-						sprintf( szKey, "row%d", iRow );
+						V_sprintf_safe( szKey, "row%d", iRow );
 						eResult = pFile->WriteKeyValue( szKey, szBuf );
 					}
 				}

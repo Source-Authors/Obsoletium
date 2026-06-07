@@ -1,6 +1,7 @@
 #include "qangle.h"
 
 #include "mathlib/mathlib.h"
+#include "tier1/strtools.h"
 
 #include "vec3.h"
 
@@ -159,7 +160,7 @@ static int qangle_tostring( lua_State *pState )
 	QAngle	*v = lua_getqangle( pState, 1 );
 	if (!v) return 0;
 
-	sprintf( s, "%s (%f, %f, %f)", QANGLE_TYPE, v->x, v->y, v->z );
+	V_sprintf_safe( s, "%s (%f, %f, %f)", QANGLE_TYPE, v->x, v->y, v->z );
 
 	lua_pushstring( pState, s );
 

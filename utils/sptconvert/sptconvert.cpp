@@ -253,16 +253,16 @@ void OutputTreeTextures(CSpeedTreeRT &speedTree) {
 
 void OutputQCFile(char *treeName) {
   char smdFileName[MAX_PATH];
-  sprintf(smdFileName, "%s.smd", treeName);
+  V_sprintf_safe(smdFileName, "%s.smd", treeName);
 
   char qcFileName[MAX_PATH];
-  sprintf(qcFileName, "%s.qc", treeName);
+  V_sprintf_safe(qcFileName, "%s.qc", treeName);
 
   char smdAnimFileName[MAX_PATH];
-  sprintf(smdAnimFileName, "%s_anim.smd", treeName);
+  V_sprintf_safe(smdAnimFileName, "%s_anim.smd", treeName);
 
   char mdlFileName[MAX_PATH];
-  sprintf(mdlFileName, "%s.mdl", treeName);
+  V_sprintf_safe(mdlFileName, "%s.mdl", treeName);
 
   FILE *file = fopen(qcFileName, "wt");
 
@@ -307,10 +307,10 @@ int main(int argc, char **argv) {
   _splitpath(argv[1], NULL, NULL, treeName, NULL);
 
   char smdFileName[MAX_PATH];
-  sprintf(smdFileName, "%s.smd", treeName);
+  V_sprintf_safe(smdFileName, "%s.smd", treeName);
 
   char qcFileName[MAX_PATH];
-  sprintf(qcFileName, "%s.qc", treeName);
+  V_sprintf_safe(qcFileName, "%s.qc", treeName);
 
   OutputQCFile(treeName);
 

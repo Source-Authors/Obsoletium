@@ -93,7 +93,7 @@ void CHudWeaponSelection::VidInit()
 	{
 		char szNumString[ 10 ];
 
-		sprintf( szNumString, "bucket%d", i );
+		V_sprintf_safe( szNumString, "bucket%d", i );
 		icon_buckets[ i ] = gHUD.GetIcon( szNumString );
 	}
 }

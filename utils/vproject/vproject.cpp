@@ -218,7 +218,7 @@ void SaveRegistryValues()
 
 	for ( i=0; i<MAX_PROJECTS; i++ )
 	{
-		sprintf( keyBuff, "project%d", i );
+		V_sprintf_safe( keyBuff, "project%d", i );
 
 		pProjectName = g_projects[i].pName;
 		if ( !pProjectName )

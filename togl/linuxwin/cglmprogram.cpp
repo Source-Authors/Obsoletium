@@ -872,7 +872,7 @@ void	CGLMProgram::GetComboIndexNameString	( char *stringOut, int stringOutMaxCha
 	if ( (len+20) < stringOutMaxChars )
 	{
 		// output formatted version
-		sprintf( stringOut, "%08X-%08X-%s", m_labelCombo, m_labelIndex, m_labelName );
+		V_snprintf( stringOut, stringOutMaxChars, "%08X-%08X-%s", m_labelCombo, m_labelIndex, m_labelName );
 	}
 }
 
@@ -1053,7 +1053,7 @@ bool CGLMShaderPair::ValidateProgramPair()
 			for (int sampler = 0; sampler < 16; sampler++)
 			{
 				char tmp[16];
-				sprintf( tmp, "sampler%d", sampler );	// sampler0 .. sampler1.. etc
+				V_sprintf_safe( tmp, "sampler%d", sampler );	// sampler0 .. sampler1.. etc
 
 				GLint nLoc = gGL->glGetUniformLocationARB( m_program, tmp );
 				m_locSamplers[sampler] = nLoc;
@@ -1158,7 +1158,7 @@ bool CGLMShaderPair::SetProgramPair( CGLMProgram *vp, CGLMProgram *fp )
 		for( int i = 0; i < 16; i++ )
 		{
 			char tmp[16];
-			sprintf(tmp, "v%d", i);	// v0 v1 v2 ... et al
+			V_sprintf_safe(tmp, "v%d", i);	// v0 v1 v2 ... et al
 				
 			gGL->glBindAttribLocationARB( m_program, i, tmp );
 		}

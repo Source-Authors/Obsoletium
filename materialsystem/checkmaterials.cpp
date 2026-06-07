@@ -37,7 +37,7 @@ static bool DoesTextureUseAlpha( const char *pTextureName, const char *pMaterial
 	// It's assumed to have already been set by this point	
 	// Compute the cache name
 	char pCacheFileName[MATERIAL_MAX_PATH];
-	Q_snprintf( pCacheFileName, sizeof( pCacheFileName ), "materials/%s.vtf", pTextureName );
+	V_sprintf_safe( pCacheFileName, "materials/%s.vtf", pTextureName );
 
 	CUtlBuffer buf;
 	FileHandle_t fileHandle = g_pFullFileSystem->Open( pCacheFileName, "rb" );
@@ -100,7 +100,7 @@ static bool DoesTextureUseNormal( const char *pTextureName, const char *pMateria
 	// It's assumed to have already been set by this point	
 	// Compute the cache name
 	char pCacheFileName[MATERIAL_MAX_PATH];
-	Q_snprintf( pCacheFileName, sizeof( pCacheFileName ), "materials/%s.vtf", pTextureName );
+	V_sprintf_safe( pCacheFileName, "materials/%s.vtf", pTextureName );
 
 	CUtlBuffer buf;
 	FileHandle_t fileHandle = g_pFullFileSystem->Open( pCacheFileName, "rb" );
@@ -160,7 +160,7 @@ static bool IsTexture( const char *pTextureName )
 	// It's assumed to have already been set by this point	
 	// Compute the cache name
 	char pCacheFileName[MATERIAL_MAX_PATH];
-	Q_snprintf( pCacheFileName, sizeof( pCacheFileName ), "materials/%s.vtf", pTextureName );
+	V_sprintf_safe( pCacheFileName, "materials/%s.vtf", pTextureName );
 
 	FileHandle_t fileHandle = g_pFullFileSystem->Open( pCacheFileName, "rb" );
 	if ( !fileHandle )
@@ -524,39 +524,38 @@ void CheckVTFInDirectoryRecursive( const char *pRoot, const char *pDirectory, CU
 {
 #define BUF_SIZE 1024
 	char buf[BUF_SIZE];
-	WIN32_FIND_DATA wfd;
-	HANDLE findHandle;
+	V_sprintf_safe( buf, "%s/%s/*.vtf", pRoot, pDirectory );
 	
-	sprintf( buf, "%s/%s/*.vtf", pRoot, pDirectory );
-
-	findHandle = FindFirstFile( buf, &wfd );
+	WIN32_FIND_DATA wfd;
+	HANDLE findHandle = FindFirstFile( buf, &wfd );
 	if ( findHandle != INVALID_HANDLE_VALUE ) 
 	{ 
+		RunCodeAtScopeExit(FindClose ( findHandle ));
+
 		do 
 		{
-			int i = vtf.AddToTail( );
+			intp i = vtf.AddToTail( );
 
 			char buf[MAX_PATH];
 			char buf2[MAX_PATH];
-			Q_snprintf( buf, MAX_PATH, "%s/%s", pDirectory, wfd.cFileName );
-			Q_FixSlashes( buf );
+			V_sprintf_safe( buf, "%s/%s", pDirectory, wfd.cFileName );
+			V_FixSlashes( buf );
 
-			Q_StripExtension( buf, buf2, sizeof(buf2) );
+			V_StripExtension( buf, buf2 );
 			Assert( !Q_strnicmp( buf2, "materials\\", 10 ) );
 
 			vtf[i].m_VTFName = &buf2[10];
 			vtf[i].m_bFoundInVMT = false;
-
 		} while ( FindNextFile ( findHandle, &wfd ) ); 
-		
-		FindClose ( findHandle ); 
 	}
 
 	// do subdirectories
-	sprintf( buf, "%s/%s/*.*", pRoot, pDirectory );
+	V_sprintf_safe( buf, "%s/%s/*.*", pRoot, pDirectory );
 	findHandle = FindFirstFile( buf, &wfd );
 	if ( findHandle != INVALID_HANDLE_VALUE ) 
 	{ 
+		RunCodeAtScopeExit(FindClose ( findHandle ));
+
 		do 
 		{ 
 			if( wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
@@ -568,11 +567,10 @@ void CheckVTFInDirectoryRecursive( const char *pRoot, const char *pDirectory, CU
 				}
 
 				char buf[MAX_PATH];
-				Q_snprintf( buf, MAX_PATH, "%s/%s", pDirectory, wfd.cFileName );
+				V_sprintf_safe( buf, "%s/%s", pDirectory, wfd.cFileName );
 				CheckVTFInDirectoryRecursive( pRoot, buf, vtf );
 			}
 		} while ( FindNextFile ( findHandle, &wfd ) ); 
-		FindClose ( findHandle ); 
 	}
 
 #undef BUF_SIZE
@@ -586,19 +584,20 @@ void _CheckMateralsInDirectoryRecursive( const char *pRoot, const char *pDirecto
 {
 #define BUF_SIZE 1024
 	char buf[BUF_SIZE];
-	WIN32_FIND_DATA wfd;
-	HANDLE findHandle;
+	V_sprintf_safe( buf, "%s/%s/*.vmt", pRoot, pDirectory );
 	
-	sprintf( buf, "%s/%s/*.vmt", pRoot, pDirectory );
-	findHandle = FindFirstFile( buf, &wfd );
+	WIN32_FIND_DATA wfd;
+	HANDLE findHandle = FindFirstFile( buf, &wfd );
 	if ( findHandle != INVALID_HANDLE_VALUE ) 
 	{ 
+		RunCodeAtScopeExit(FindClose ( findHandle ));
+
 		do 
 		{
-			KeyValues * vmtKeyValues = new KeyValues("vmt");
+			auto vmtKeyValues = KeyValuesAD("vmt");
 
 			char pFileName[MAX_PATH];
-			Q_snprintf( pFileName, sizeof( pFileName ), "%s/%s", pDirectory, wfd.cFileName );
+			V_sprintf_safe( pFileName, "%s/%s", pDirectory, wfd.cFileName );
 			if ( !vmtKeyValues->LoadFromFile( g_pFullFileSystem, pFileName, "GAME" ) )
 			{
 				Warning( "CheckMateralsInDirectoryRecursive: can't open \"%s\"\n", pFileName );
@@ -606,19 +605,16 @@ void _CheckMateralsInDirectoryRecursive( const char *pRoot, const char *pDirecto
 			}
 
 			CheckMaterial( vmtKeyValues, pRoot, pFileName, vtf );
-
-			vmtKeyValues->deleteThis();
-
 		} while ( FindNextFile ( findHandle, &wfd ) ); 
-		
-		FindClose ( findHandle ); 
 	}
 
 	// do subdirectories
-	sprintf( buf, "%s/%s/*.*", pRoot, pDirectory );
+	V_sprintf_safe( buf, "%s/%s/*.*", pRoot, pDirectory );
 	findHandle = FindFirstFile( buf, &wfd );
 	if ( findHandle != INVALID_HANDLE_VALUE ) 
 	{ 
+		RunCodeAtScopeExit(FindClose ( findHandle ));
+
 		do 
 		{ 
 			if( wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
@@ -630,11 +626,10 @@ void _CheckMateralsInDirectoryRecursive( const char *pRoot, const char *pDirecto
 				}
 
 				char buf[MAX_PATH];
-				Q_snprintf( buf, MAX_PATH, "%s/%s", pDirectory, wfd.cFileName );
+				V_sprintf_safe( buf, "%s/%s", pDirectory, wfd.cFileName );
 				_CheckMateralsInDirectoryRecursive( pRoot, buf, vtf );
 			}
 		} while ( FindNextFile ( findHandle, &wfd ) ); 
-		FindClose ( findHandle ); 
 	}
 
 //	Msg( "Normal only %d/%d/%d Normal w alpha %d/%d\n", s_nNormalBytes, s_nNormalPalettizedBytes, s_nNormalCompressedBytes, s_nNormalWithAlphaBytes, s_nNormalWithAlphaCompressedBytes );

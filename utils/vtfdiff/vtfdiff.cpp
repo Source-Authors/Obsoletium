@@ -66,7 +66,7 @@ char const * ResourceToString( uint32 uiResType )
 		return "VTF_RSRC_TEXTURE_LOD_SETTINGS";
 	
 	default:
-		sprintf( chBuffer, "0x%08X", uiResType );
+		V_sprintf_safe( chBuffer, "0x%08X", uiResType );
 		return chBuffer;
 	}
 

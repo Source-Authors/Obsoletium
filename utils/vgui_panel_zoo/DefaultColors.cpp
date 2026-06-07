@@ -53,7 +53,7 @@ DefaultColors::DefaultColors(Panel *parent, const char *name) : DemoPage(parent,
 	char buf[32];
 	for (int i=1; i<=12; i++)
 	{
-		sprintf(buf, "ColorPanel%d", i);
+		V_sprintf_safe(buf, "ColorPanel%d", i);
 		m_pColorPanel[i-1] = new Panel (this, buf);
 	}
 	LoadControlSettings("Demo/DefaultColors.res");

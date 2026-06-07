@@ -126,12 +126,12 @@ bool CCodeProcessor::TryBuild( const char *rootdir, const char *filename, unsign
 	char commandline[ 512 ];
 	char directory[ 512 ];
 
-	sprintf( directory, rootdir );
+	V_sprintf_safe( directory, rootdir );
 
-	//	sprintf( commandline, "msdev engdll.dsw /MAKE \"quiver - Win32 GL Debug\" /OUT log.txt" );
+	//	V_sprintf_safe( commandline, "msdev engdll.dsw /MAKE \"quiver - Win32 GL Debug\" /OUT log.txt" );
 
 	// Builds the default configuration
-	sprintf( commandline, "\"C:\\Program Files\\Microsoft Visual Studio\\Common\\MSDev98\\Bin\\msdev.exe\" %s /MAKE \"%s\" /OUT log.txt", m_szDSP, m_szConfig );
+	V_sprintf_safe( commandline, "\"C:\\Program Files\\Microsoft Visual Studio\\Common\\MSDev98\\Bin\\msdev.exe\" %s /MAKE \"%s\" /OUT log.txt", m_szDSP, m_szConfig );
 
 	PROCESS_INFORMATION pi;
 	memset( &pi, 0, sizeof( pi ) );
@@ -188,8 +188,8 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 	}
 
 	// Load the base module
-	sprintf( filename, "%s\\%s", root, module );
-	strlwr( filename );
+	V_sprintf_safe( filename, "%s\\%s", root, module );
+	V_strlower( filename );
 
 	bool firstheader = true;
 retry:
@@ -449,16 +449,17 @@ void CCodeProcessor::ConstructModuleList_R( int level, const char *gamespecific,
 	WIN32_FIND_DATA wfd;
 	HANDLE ff;
 
-	sprintf( directory, "%s\\*.*", root );
+	V_sprintf_safe( directory, "%s\\*.*", root );
 
 	if ( ( ff = FindFirstFile( directory, &wfd ) ) == INVALID_HANDLE_VALUE )
 		return;
+
+	RunCodeAtScopeExit(FindClose( ff ));
 
 	do
 	{
 		if ( wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
 		{
-
 			if ( wfd.cFileName[ 0 ] == '.' )
 				continue;
 
@@ -467,7 +468,7 @@ void CCodeProcessor::ConstructModuleList_R( int level, const char *gamespecific,
 				continue;
 
 			// Recurse down directory
-			sprintf( filename, "%s\\%s", root, wfd.cFileName );
+			V_sprintf_safe( filename, "%s\\%s", root, wfd.cFileName );
 			ConstructModuleList_R( level+1, gamespecific, filename );
 		}
 		else

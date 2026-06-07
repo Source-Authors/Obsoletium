@@ -379,7 +379,7 @@ VALVE_IPC_IMPL BOOL CValveIpcMgr::RegisterServer( char const *szServerName, RPC_
 			char chAliveName[ MAX_PATH ];
 				RPC_CSTR szBaseName;
 				UuidToString( &it.m_uuid, &szBaseName );
-			sprintf( chAliveName, "%s" "_ALIVE_" VALVE_IPC_PROTOCOL_VER, szBaseName );
+			V_sprintf_safe( chAliveName, "%s" "_ALIVE_" VALVE_IPC_PROTOCOL_VER, szBaseName );
 				RpcStringFree( &szBaseName );
 			HANDLE hAliveTest = ::OpenMutex( MUTEX_ALL_ACCESS, FALSE, chAliveName );
 			if ( hAliveTest )
@@ -528,7 +528,7 @@ VALVE_IPC_IMPL BOOL CValveIpcServer::Register()
 	
 	// create the "server alive" object
 	char chAliveName[ MAX_PATH ];
-	sprintf( chAliveName, "%s" "_ALIVE_" VALVE_IPC_PROTOCOL_VER, m_szServerUID );
+	V_sprintf_safe( chAliveName, "%s" "_ALIVE_" VALVE_IPC_PROTOCOL_VER, m_szServerUID );
 	m_hServerAlive = ::CreateMutex( nullptr, FALSE, chAliveName );
 	if ( !m_hServerAlive )
 	{
@@ -546,7 +546,7 @@ VALVE_IPC_IMPL BOOL CValveIpcServer::Register()
 
 	// Create the server end of the pipe
 	char chPipeName[ MAX_PATH ];
-	sprintf( chPipeName, "\\\\.\\pipe\\" "%s" "_PIPE_" VALVE_IPC_PROTOCOL_VER, m_szServerUID  );
+	V_sprintf_safe( chPipeName, "\\\\.\\pipe\\" "%s" "_PIPE_" VALVE_IPC_PROTOCOL_VER, m_szServerUID  );
 	m_hServerPipe = ::CreateNamedPipe(
 		chPipeName,
 		PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED | FILE_FLAG_WRITE_THROUGH,
@@ -858,7 +858,7 @@ VALVE_IPC_IMPL BOOL CValveIpcClient::Connect()
 	// Server got discovered
 	// check the "server alive" object
 	char chAliveName[ MAX_PATH ];
-	sprintf( chAliveName, "%s" "_ALIVE_" VALVE_IPC_PROTOCOL_VER, m_szServerUID );
+	V_sprintf_safe( chAliveName, "%s" "_ALIVE_" VALVE_IPC_PROTOCOL_VER, m_szServerUID );
 	
 	HANDLE hServerAlive = ::OpenMutex( MUTEX_ALL_ACCESS, FALSE, chAliveName );
 	if ( !hServerAlive )
@@ -874,7 +874,7 @@ VALVE_IPC_IMPL BOOL CValveIpcClient::Connect()
 
 	// Connect the server pipe
 	char chPipeName[ MAX_PATH ];
-	sprintf( chPipeName, "\\\\.\\pipe\\" "%s" "_PIPE_" VALVE_IPC_PROTOCOL_VER, m_szServerUID  );
+	V_sprintf_safe( chPipeName, "\\\\.\\pipe\\" "%s" "_PIPE_" VALVE_IPC_PROTOCOL_VER, m_szServerUID  );
 	m_hClientPipe = ::CreateFile(
 		chPipeName,
 		GENERIC_READ | GENERIC_WRITE,

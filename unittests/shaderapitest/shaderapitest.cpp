@@ -1027,7 +1027,7 @@ int CShaderAPITestApp::Main()
 			{
 				TestColoredQuad( (ShaderBufferType_t)nVBType, (ShaderBufferType_t)nIBType, nBuffered != 0 );
 
-				sprintf( buf, "TestColoredQuad results VB: %d IB: %d Buffered: %d HIT A KEY!", 
+				V_sprintf_safe( buf, "TestColoredQuad results VB: %d IB: %d Buffered: %d HIT A KEY!", 
 					nVBType, nIBType, nBuffered != 0 );
 				SetWindowText( m_HWnd, buf );
 

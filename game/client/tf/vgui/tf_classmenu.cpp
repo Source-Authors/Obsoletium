@@ -833,11 +833,11 @@ void CTFClassMenu::SelectClass( int iClass )
 	char nClassMusicStr[64];
 	if ( TFGameRules() && TFGameRules()->IsMannVsMachineMode() )
 	{
-		sprintf( nClassMusicStr, "music.mvm_class_menu_0%i", iClass );
+		V_sprintf_safe( nClassMusicStr, "music.mvm_class_menu_0%i", iClass );
 	}
 	else
 	{
-		sprintf( nClassMusicStr, "music.class_menu_0%i", iClass );
+		V_sprintf_safe( nClassMusicStr, "music.class_menu_0%i", iClass );
 	}
 	CBaseEntity::EmitSound( filter, SOUND_FROM_UI_PANEL, nClassMusicStr );
 	m_nBaseMusicGuid = enginesound->GetGuidForLastSoundEmitted();

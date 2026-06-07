@@ -413,7 +413,7 @@ void ScanRopeSlack( CChunk *pChunk )
 				// Subtract 100 from all the Slack properties.
 				float flCur = (float)atof( pKey->m_pValue );
 				char str[256];
-				sprintf( str, "%f", flCur + 100 );
+				V_sprintf_safe( str, "%f", flCur + 100 );
 				pKey->m_pValue = CopyString( str );
 			}
 		}
@@ -480,7 +480,7 @@ void LogicAuto( CChunk *pChunk )
 			{
 				--curVal;
 				char str[512];
-				sprintf( str, "%lu", curVal );
+				V_sprintf_safe( str, "%lu", curVal );
 				pFlags->SetValue( str );
 			}
 		}

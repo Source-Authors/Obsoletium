@@ -8590,15 +8590,15 @@ void CShaderAPIDx8::SpewBoardState()
 		boardState.m_AlphaFunc, boardState.m_SrcBlend, BlendModeToString( boardState.m_SrcBlend ),
 		boardState.m_DestBlend, BlendModeToString( boardState.m_DestBlend ) );
 	Plat_DebugString(buf);
-	int len = V_sprintf_safe(buf,"Alpha Ref %d, Lighting: %d, Ambient Color %lx, LightsEnabled ",
+	V_sprintf_safe(buf,"Alpha Ref %d, Lighting: %d, Ambient Color %lx, LightsEnabled ",
 		boardState.m_AlphaRef, boardState.m_Lighting, m_DynamicState.m_Ambient);
 
 	int i;
 	for ( i = 0; i < g_pHardwareConfig->Caps().m_MaxNumLights; ++i)
 	{
-		len += sprintf(buf+len,"%d ", m_DynamicState.m_LightEnable[i] );
+		V_sprintfcat_safe(buf,"%d ", m_DynamicState.m_LightEnable[i] );
 	}
-	sprintf(buf+len,"\n");
+	V_sprintfcat_safe(buf,"\n");
 	Plat_DebugString(buf);
 	V_sprintf_safe(buf,"Fixed Function: %d, VertexBlend %d\n",
 		boardState.m_UsingFixedFunction, m_DynamicState.m_VertexBlend );

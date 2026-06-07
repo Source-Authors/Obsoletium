@@ -1822,7 +1822,7 @@ void D3DToGL::Handle_DCL()
 
 			char temp[128];
 			// regnum goes straight into the vertex.attrib[n] index
-			sprintf( temp, "%08x %08x\n", dwToken, dwRegToken );
+			V_sprintf_safe( temp, "%08x %08x\n", dwToken, dwRegToken );
 			StrcatToHeaderCode( temp );
 		}
 	}

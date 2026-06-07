@@ -116,7 +116,7 @@ void TextEntryDemo4::OnTick()
 		if (currentTime > m_iTimeoutTime)
 		{	
 			char buf[125];
-			sprintf (buf, "Additional Text %d\n", m_iTimeoutTime);
+			V_sprintf_safe(buf, "Additional Text %d\n", m_iTimeoutTime);
 
 			// Move to the end of the history before we add some new text.
 			// Its important to call this and explicitly move to the

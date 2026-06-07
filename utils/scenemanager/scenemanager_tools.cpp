@@ -225,7 +225,7 @@ int Sys_Exec( const char *pProgName, const char *pCmdLine, bool verbose )
 	si.cb = sizeof(si);
 	//GetStartupInfo( &si );
 
-	sprintf( cmdLine, "%s %s", pProgName, pCmdLine );
+	V_sprintf_safe( cmdLine, "%s %s", pProgName, pCmdLine );
 
 	PROCESS_INFORMATION pi;
 	memset( &pi, 0, sizeof( pi ) );
@@ -291,9 +291,8 @@ int Sys_Exec( const char *pProgName, const char *pCmdLine, bool verbose )
 	return false;
 #else
 	char tmp[1024];
-	sprintf( tmp, "%s %s\n", pProgName, pCmdLine );
-
-	_strlwr( tmp );
+	V_sprintf_safe( tmp, "\"%s\" %s\n", pProgName, pCmdLine );
+	V_strlower( tmp );
 
 	int iret = system( tmp );
 	if ( iret != 0 && verbose )
@@ -315,7 +314,7 @@ static void SceneManager_VSSCheckout( char const *pUserName, char const *pProjec
 	char buf[1024];
 
 	// Check for the existence of the file in source safe...
-	sprintf( buf, "filetype %s/%s%s -O- -y%s\n",
+	V_sprintf_safe( buf, "filetype %s/%s%s -O- -y%s\n",
 		pProjectDir, pRelativeDir, pFileNameWithExtension,
 		pUserName );
 	int retVal = Sys_Exec( "ss.exe", buf, false );
@@ -326,7 +325,7 @@ static void SceneManager_VSSCheckout( char const *pUserName, char const *pProjec
 	}
 
 	// It's there, try to check it out
-	sprintf( buf, "checkout %s/%s%s -GL%s -GWA -O- -y%s\n",
+	V_sprintf_safe( buf, "checkout %s/%s%s -GL%s -GWA -O- -y%s\n",
 		pProjectDir, pRelativeDir, pFileNameWithExtension,
 		pDestPath, pUserName );
 	Sys_Exec( "ss.exe", buf, true );
@@ -342,26 +341,26 @@ static void SceneManager_VSSCheckin( char const *pUserName, char const *pProject
 	char buf[1024];
 
 	// Check for the existence of the file on disk. If it's not there, don't bother
-	sprintf( buf, "%s%s", pDestPath, pFileNameWithExtension );
+	V_sprintf_safe( buf, "%s%s", pDestPath, pFileNameWithExtension );
 	struct _stat statbuf;
 	int result = _stat( buf, &statbuf );
 	if (result != 0)
 		return;
 
 	// Check for the existence of the file in source safe...
-	sprintf( buf, "filetype %s/%s%s -O- -y%s\n",
+	V_sprintf_safe( buf, "filetype %s/%s%s -O- -y%s\n",
 		pProjectDir, pRelativeDir, pFileNameWithExtension,
 		pUserName );
 	int retVal = Sys_Exec( "ss.exe", buf, false );
 	if (retVal != 0)
 	{
-		sprintf( buf, "Cp %s -O- -y%s\n",
+		V_sprintf_safe( buf, "Cp %s -O- -y%s\n",
 			pProjectDir ,
 			pUserName );
 		Sys_Exec( "ss.exe", buf, true );
 
 		// Try to add the file to source safe...
-		sprintf( buf, "add %s%s -GL%s -O- -I- -y%s\n",
+		V_sprintf_safe( buf, "add %s%s -GL%s -O- -I- -y%s\n",
 			pRelativeDir, pFileNameWithExtension,
 			pDestPath, pUserName );
 		Sys_Exec( "ss.exe", buf, true );
@@ -369,7 +368,7 @@ static void SceneManager_VSSCheckin( char const *pUserName, char const *pProject
 	else
 	{
 		// It's there, just check it in
-		sprintf( buf, "checkin %s/%s%s -GL%s -O- -I- -y%s\n",
+		V_sprintf_safe( buf, "checkin %s/%s%s -GL%s -O- -I- -y%s\n",
 			pProjectDir, pRelativeDir, pFileNameWithExtension,
 			pDestPath, pUserName );
 		Sys_Exec( "ss.exe", buf, true );

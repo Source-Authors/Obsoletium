@@ -27,7 +27,7 @@ void CHL1HudNumbers::VidInit( void )
 	{
 		char szNumString[ 10 ];
 
-		sprintf( szNumString, "number_%d", i );
+		V_sprintf_safe( szNumString, "number_%d", i );
 		icon_digits[ i ] = gHUD.GetIcon( szNumString );
 	}
 }

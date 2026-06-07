@@ -190,7 +190,7 @@ void BuildFileList_R( CUtlVector< CUtlSymbol >& files, char const *dir, char con
 	char filename[ 256 ];
 	HANDLE ff;
 
-	sprintf( directory, "%s\\*.*", dir );
+	V_sprintf_safe( directory, "%s\\*.*", dir );
 
 #if defined( TESTING )
 	if ( files.Count() > 100 )
@@ -199,6 +199,8 @@ void BuildFileList_R( CUtlVector< CUtlSymbol >& files, char const *dir, char con
 
 	if ( ( ff = FindFirstFile( directory, &wfd ) ) == INVALID_HANDLE_VALUE )
 		return;
+
+	RunCodeAtScopeExit(FindClose( ff ));
 
 	int extlen = strlen( extension );
 
@@ -215,7 +217,7 @@ void BuildFileList_R( CUtlVector< CUtlSymbol >& files, char const *dir, char con
 				continue;
 
 			// Recurse down directory
-			sprintf( filename, "%s\\%s", dir, wfd.cFileName );
+			V_sprintf_safe( filename, "%s\\%s", dir, wfd.cFileName );
 			BuildFileList_R( files, filename, extension );
 		}
 		else
@@ -297,7 +299,7 @@ void BuildFileListWildcard_R( CUtlVector< CUtlSymbol >& files, char const *dir, 
 	char filename[ 256 ];
 	HANDLE ff;
 
-	sprintf( directory, "%s\\*.*", dir );
+	V_sprintf_safe( directory, "%s\\*.*", dir );
 
 #if defined( TESTING )
 	if ( files.Count() > 100 )
@@ -306,6 +308,8 @@ void BuildFileListWildcard_R( CUtlVector< CUtlSymbol >& files, char const *dir, 
 
 	if ( ( ff = FindFirstFile( directory, &wfd ) ) == INVALID_HANDLE_VALUE )
 		return;
+
+	RunCodeAtScopeExit(FindClose( ff ));
 
 	do
 	{
@@ -319,7 +323,7 @@ void BuildFileListWildcard_R( CUtlVector< CUtlSymbol >& files, char const *dir, 
 				continue;
 
 			// Recurse down directory
-			sprintf( filename, "%s\\%s", dir, wfd.cFileName );
+			V_sprintf_safe( filename, "%s\\%s", dir, wfd.cFileName );
 			BuildFileListWildcard_R( files, filename, wildcard );
 		}
 	} while ( FindNextFile( ff, &wfd ) );

@@ -134,7 +134,7 @@ void CFavoriteGames::SaveFavoritesList(KeyValues *favoritesData,bool savercon)
 		}
 		
 		char buf[64];
-		sprintf(buf, "%d.%d.%d.%d:%d", server.ip[0], server.ip[1], server.ip[2], server.ip[3], server.port);
+		V_sprintf_safe(buf, "%d.%d.%d.%d:%d", server.ip[0], server.ip[1], server.ip[2], server.ip[3], server.port);
 		dat->SetString("address", buf);
 	}
 }
@@ -308,7 +308,7 @@ void CFavoriteGames::ServerResponded(serveritem_t &server)
 		kv->SetPtr("password", server.password ? m_pPasswordIcon : NULL);
 		
 		char buf[256];
-		sprintf(buf, "%d / %d", server.players, server.maxPlayers);
+		V_sprintf_safe(buf, "%d / %d", server.players, server.maxPlayers);
 		kv->SetString("Players", buf);
 	}
 	
@@ -337,7 +337,7 @@ void CFavoriteGames::ServerResponded(serveritem_t &server)
 	if (m_pGameList->GetItemCount() > 1)
 	{
 		char buf[64];
-		sprintf(buf, " Servers (%d)", m_pGameList->GetItemCount());
+		V_sprintf_safe(buf, " Servers (%d)", m_pGameList->GetItemCount());
 		m_pGameList->SetColumnHeaderText(1, buf);
 	}
 	else

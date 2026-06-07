@@ -239,10 +239,12 @@ void BuildFileList_R( CUtlVector< CUtlSymbol >& files, char const *dir, char con
 	char filename[ 256 ];
 	HANDLE ff;
 
-	sprintf( directory, "%s\\*.*", dir );
+	V_sprintf_safe( directory, "%s\\*.*", dir );
 
 	if ( ( ff = FindFirstFile( directory, &wfd ) ) == INVALID_HANDLE_VALUE )
 		return;
+
+	RunCodeAtScopeExit(FindClose( ff ));
 
 	int extlen = strlen( extension );
 
@@ -255,7 +257,7 @@ void BuildFileList_R( CUtlVector< CUtlSymbol >& files, char const *dir, char con
 				continue;
 
 			// Recurse down directory
-			sprintf( filename, "%s\\%s", dir, wfd.cFileName );
+			V_sprintf_safe( filename, "%s\\%s", dir, wfd.cFileName );
 			BuildFileList_R( files, filename, extension );
 		}
 		else

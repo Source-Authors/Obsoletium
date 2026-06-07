@@ -167,7 +167,7 @@ void CDialogGameInfo::PerformLayout()
 	char buf[128];
 	if (server.maxPlayers > 0)
 	{
-		sprintf(buf, "%d / %d", server.players, server.maxPlayers);
+		V_sprintf_safe(buf, "%d / %d", server.players, server.maxPlayers);
 	}
 	else
 	{
@@ -178,7 +178,7 @@ void CDialogGameInfo::PerformLayout()
 	if (server.ip[0] && server.port)
 	{
 		char buf[64];
-		sprintf(buf, "%d.%d.%d.%d:%d", server.ip[0], server.ip[1], server.ip[2], server.ip[3], server.port);
+		V_sprintf_safe(buf, "%d.%d.%d.%d:%d", server.ip[0], server.ip[1], server.ip[2], server.ip[3], server.port);
 		SetControlText("ServerIPText", buf);
 		m_pConnectButton->SetEnabled(true);
 	}
@@ -188,7 +188,7 @@ void CDialogGameInfo::PerformLayout()
 		m_pConnectButton->SetEnabled(false);
 	}
 
-	sprintf(buf, "%d", server.ping);
+	V_sprintf_safe(buf, "%d", server.ping);
 	SetControlText("PingText", buf);
 
 	// set the info text
@@ -457,7 +457,7 @@ void CDialogGameInfo::ConnectToServer()
 
 	// tell the engine to connect
 	char buf[64];
-	sprintf(buf, "%d.%d.%d.%d:%d", server.ip[0], server.ip[1], server.ip[2], server.ip[3], server.port);
+	V_sprintf_safe(buf, "%d.%d.%d.%d:%d", server.ip[0], server.ip[1], server.ip[2], server.ip[3], server.port);
 
 	const char *gameDir = server.gameDir;
 	if (g_pRunGameEngine->IsRunning())
@@ -467,18 +467,18 @@ void CDialogGameInfo::ConnectToServer()
 		// set the server password, if any
 		if (m_szPassword[0])
 		{
-			sprintf(command, "password \"%s\"\n", m_szPassword);
+			V_sprintf_safe(command, "password \"%s\"\n", m_szPassword);
 			g_pRunGameEngine->AddTextCommand(command);
 		}
 
 		// send engine command to change servers
-		sprintf(command, "connect %s\n", buf);
+		V_sprintf_safe(command, "connect %s\n", buf);
 		g_pRunGameEngine->AddTextCommand(command);
 	}
 	else
 	{
 		char command[256];
-//		sprintf(command, " -game %s +connect %s", gameDir, buf);
+//		V_sprintf_safe(command, " -game %s +connect %s", gameDir, buf);
 		V_sprintf_safe(command, " +connect %s", buf);
 		if (m_szPassword[0])
 		{

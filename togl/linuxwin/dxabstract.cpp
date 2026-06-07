@@ -3162,7 +3162,7 @@ HRESULT IDirect3DDevice9::CreateRenderTarget(UINT Width,UINT Height,D3DFORMAT Fo
 
 	#if IUNKNOWN_ALLOC_SPEW
 		char scratch[1024];
-		sprintf(scratch,"RT %s", surf->m_tex->m_layout->m_layoutSummary );
+		V_sprintf_safe(scratch,"RT %s", surf->m_tex->m_layout->m_layoutSummary );
 		surf->SetMark( true, scratch ); 
 	#endif
 	

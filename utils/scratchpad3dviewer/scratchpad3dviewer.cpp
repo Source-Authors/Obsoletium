@@ -792,7 +792,7 @@ bool CheckForNewFile( bool bForce )
 void UpdateWindowText()
 {
 	char str[512];
-	sprintf( str, "ScratchPad3DViewer: <%s>  lines: %d, polygons: %d", g_Filename, g_nLines, g_nPolygons );
+	V_sprintf_safe( str, "ScratchPad3DViewer: <%s>  lines: %d, polygons: %d", g_Filename, g_nLines, g_nPolygons );
 	Sys_SetWindowText( str );
 }
 

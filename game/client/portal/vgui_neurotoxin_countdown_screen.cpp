@@ -167,20 +167,20 @@ void CNeurotoxinCountdownScreen::Update( C_NeurotoxinCountdown *pNeurotoxinCount
 	}
 
 	if ( iMinutes < 10 )
-		sprintf( szMinutesBuff, "0%i", iMinutes );
+		V_sprintf_safe( szMinutesBuff, "0%i", iMinutes );
 	else
-		sprintf( szMinutesBuff, "%i", iMinutes );
+		V_sprintf_safe( szMinutesBuff, "%i", iMinutes );
 
 	if ( iSeconds < 10 )
-		sprintf( szSecondsBuff, "0%i", iSeconds );
+		V_sprintf_safe( szSecondsBuff, "0%i", iSeconds );
 	else
-		sprintf( szSecondsBuff, "%i", iSeconds );
+		V_sprintf_safe( szSecondsBuff, "%i", iSeconds );
 
 	if ( iMilliseconds < 10 )
-		sprintf( szMillisecondsBuff, "0%i", iMilliseconds );
+		V_sprintf_safe( szMillisecondsBuff, "0%i", iMilliseconds );
 	else
-		sprintf( szMillisecondsBuff, "%i", iMilliseconds );
+		V_sprintf_safe( szMillisecondsBuff, "%i", iMilliseconds );
 
-	sprintf( szBuff, "%s:%s:%s", szMinutesBuff, szSecondsBuff, szMillisecondsBuff );
+	V_sprintf_safe( szBuff, "%s:%s:%s", szMinutesBuff, szSecondsBuff, szMillisecondsBuff );
 	m_pDisplayTextLabel->SetText( szBuff );
 }

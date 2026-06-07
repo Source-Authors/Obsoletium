@@ -2172,7 +2172,6 @@ void CBaseMeshDX8::Spew( int nVertexCount, int nIndexCount, const MeshDesc_t &sp
 	MeshDesc_t desc = spewDesc;
 
 	char tempbuf[256];
-	char* temp = tempbuf;
 	V_sprintf_safe( tempbuf,"\nVerts: (Vertex Format %llx)\n", fmt);
 	Plat_DebugString(tempbuf);
 
@@ -2181,33 +2180,34 @@ void CBaseMeshDX8::Spew( int nVertexCount, int nIndexCount, const MeshDesc_t &sp
 	int numBoneWeights = NumBoneWeights( fmt );
 	for ( i = 0; i < nVertexCount; ++i )
 	{
-		temp += sprintf( temp, "[%4d] ", i + desc.m_nFirstVertex );
+		tempbuf[0] = '\0';
+		V_sprintfcat_safe( tempbuf, "[%4d] ", i + desc.m_nFirstVertex );
 		if( fmt & VERTEX_POSITION )
 		{
 			const auto& pos = Position( desc, i );
-			temp += sprintf(temp, "P %8.2f %8.2f %8.2f ",
-				pos.x, pos.y, pos.z);
+			V_sprintfcat_safe( tempbuf, "P %8.2f %8.2f %8.2f ",
+				pos.x, pos.y, pos.z );
 		}
 
 		if ( fmt & VERTEX_WRINKLE )
 		{
 			float flWrinkle = Wrinkle( desc, i );
-			temp += sprintf(temp, "Wr %8.2f ",flWrinkle );
+			V_sprintfcat_safe( tempbuf, "Wr %8.2f ",flWrinkle );
 		}
 
 		if (numBoneWeights > 0)
 		{
-			temp += sprintf(temp, "BW ");
+			V_sprintfcat_safe( tempbuf, "BW ");
 			const float* pWeight = &BoneWeight( desc, i ).x;
 			for (int j = 0; j < numBoneWeights; ++j)
 			{
-				temp += sprintf(temp, "%1.2f ", pWeight[j]);
+				V_sprintfcat_safe( tempbuf, "%1.2f ", pWeight[j]);
 			}
 		}
 		if ( fmt & VERTEX_BONE_INDEX )
 		{
 			unsigned char *pIndex = BoneIndex( desc, i );
-			temp += sprintf( temp, "BI %hhu %hhu %hhu %hhu ", pIndex[0], pIndex[1], pIndex[2], pIndex[3] );
+			V_sprintfcat_safe( tempbuf, "BI %hhu %hhu %hhu %hhu ", pIndex[0], pIndex[1], pIndex[2], pIndex[3] );
 			Assert( pIndex[0] < 16 );
 			Assert( pIndex[1] < 16 );
 			Assert( pIndex[2] < 16 );
@@ -2217,14 +2217,14 @@ void CBaseMeshDX8::Spew( int nVertexCount, int nIndexCount, const MeshDesc_t &sp
 		if ( fmt & VERTEX_NORMAL )
 		{
 			const auto& normal = Normal( desc, i );
-			temp += sprintf(temp, "N %1.2f %1.2f %1.2f ",
+			V_sprintfcat_safe( tempbuf, "N %1.2f %1.2f %1.2f ",
 				normal.x,	normal.y,	normal.z);
 		}
 		
 		if (fmt & VERTEX_COLOR)
 		{
 			unsigned char* pColor = Color( desc, i );
-			temp += sprintf(temp, "C b %3d g %3d r %3d a %3d ",
+			V_sprintfcat_safe( tempbuf, "C b %3d g %3d r %3d a %3d ",
 				pColor[0], pColor[1], pColor[2], pColor[3]);
 		}
 
@@ -2233,43 +2233,41 @@ void CBaseMeshDX8::Spew( int nVertexCount, int nIndexCount, const MeshDesc_t &sp
 			if( TexCoordSize( j, fmt ) > 0)
 			{
 				const auto& texcoord = TexCoord( desc, i, j );
-				temp += sprintf(temp, "T%d %.2f %.2f ", j, texcoord.x, texcoord.y);
+				V_sprintfcat_safe( tempbuf, "T%d %.2f %.2f ", j, texcoord.x, texcoord.y );
 			}
 		}
 
 		if (fmt & VERTEX_TANGENT_S)
 		{
 			const auto& tangentS = TangentS( desc, i );
-			temp += sprintf(temp, "S %1.2f %1.2f %1.2f ",
+			V_sprintfcat_safe( tempbuf, "S %1.2f %1.2f %1.2f ",
 				tangentS.x, tangentS.y, tangentS.z);
 		}
 
 		if (fmt & VERTEX_TANGENT_T)
 		{
 			const auto& tangentT = TangentT( desc, i );
-			temp += sprintf(temp, "T %1.2f %1.2f %1.2f ",
+			V_sprintfcat_safe( tempbuf, "T %1.2f %1.2f %1.2f ",
 				tangentT.x, tangentT.y, tangentT.z);
 		}
 
-		sprintf(temp,"\n");
-		Plat_DebugString(tempbuf);
-		temp = tempbuf;
+		V_sprintfcat_safe( tempbuf, "\n" );
+		Plat_DebugString( tempbuf );
 	}
 
 	V_sprintf_safe( tempbuf,"\nIndices: %d\n", nIndexCount );
 	Plat_DebugString(tempbuf);
 	for ( i = 0; i < nIndexCount; ++i )
 	{
-		temp += sprintf( temp, "%hu ", desc.m_pIndices[i] );
+		V_sprintfcat_safe( tempbuf, "%hu ", desc.m_pIndices[i] );
 		if ((i & 0x0F) == 0x0F)
 		{
-			sprintf( temp, "\n" );
+			V_sprintfcat_safe( tempbuf, "\n" );
 			Plat_DebugString(tempbuf);
 			tempbuf[0] = '\0';
-			temp = tempbuf;
 		}
 	}
-	sprintf(temp,"\n");
+	V_sprintfcat_safe( tempbuf, "\n" );
 	Plat_DebugString( tempbuf );
 }
 

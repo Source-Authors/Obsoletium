@@ -3486,7 +3486,7 @@ void GLMContext::DebugDump( GLMDebugHookInfo *info, uint options, uint vertDumpM
 							// bone
 							char bonelabel[100];
 
-							sprintf(bonelabel, "MODEL_BONE%-2d", (slotIndex-58)/3 );
+							V_sprintf_safe(bonelabel, "MODEL_BONE%-2d", (slotIndex-58)/3 );
 							printmat( bonelabel, slotIndex, 3, values );
 
 							slotIndex += 3;
@@ -3642,7 +3642,7 @@ void GLMContext::DebugDump( GLMDebugHookInfo *info, uint options, uint vertDumpM
 				char	sizestr[100];
 				if (setdesc->m_nCompCount < 32)
 				{
-					sprintf( sizestr, "%d", setdesc->m_nCompCount);
+					V_sprintf_safe( sizestr, "%d", setdesc->m_nCompCount);
 				}
 				else
 				{
@@ -3687,14 +3687,13 @@ void GLMContext::DebugDump( GLMDebugHookInfo *info, uint options, uint vertDumpM
 		for( int vtxIndex=-1; vtxIndex < realEnd; vtxIndex++ )	// vtxIndex will jump from -1 to start after first spin, not necessarily to 0
 		{
 			char buf[64000];
-			char *mark = buf;
 			
 			// index -1 is the first run through the loop, we just print a header
 			
 			// iterate attrs
 			if (vtxIndex>=0)
 			{
-				mark += sprintf(mark, "-D-  %04d: ", vtxIndex );
+				V_sprintfcat_safe(buf, "-D-  %04d: ", vtxIndex );
 			}
 			
 				// for transform dumping, we latch values as we spot them
@@ -3730,11 +3729,11 @@ void GLMContext::DebugDump( GLMDebugHookInfo *info, uint options, uint vertDumpM
 					
 					if (vtxIndex <0)
 					{
-						mark += sprintf(mark, "[%s%1d @ offs=%04d / strd %03d] ", GLMDecode(eD3D_VTXDECLUSAGE, usage ), usageindex, fieldoffset, stride );
+						V_sprintfcat_safe(buf, "[%s%1d @ offs=%04d / strd %03d] ", GLMDecode(eD3D_VTXDECLUSAGE, usage ), usageindex, fieldoffset, stride );
 					}
 					else
 					{
-						mark += sprintf(mark, "[%s%1d ", GLMDecode(eD3D_VTXDECLUSAGE, usage ), usageindex );
+						V_sprintfcat_safe(buf, "[%s%1d ", GLMDecode(eD3D_VTXDECLUSAGE, usage ), usageindex );
 						
 						if (desc->m_nCompCount<32)
 						{
@@ -3746,7 +3745,7 @@ void GLMContext::DebugDump( GLMDebugHookInfo *info, uint options, uint vertDumpM
 									case GL_FLOAT:
 									{
 										float	*floatbase = (float*)attrBase;
-										mark += sprintf(mark, (usage != D3DDECLUSAGE_TEXCOORD) ? "%c%7.3f " : "%c%.3f", fieldname[which], floatbase[which] );
+										V_sprintfcat_safe(buf, (usage != D3DDECLUSAGE_TEXCOORD) ? "%c%7.3f " : "%c%.3f", fieldname[which], floatbase[which] );
 										
 										if (usage==D3DDECLUSAGE_POSITION)
 										{
@@ -3771,13 +3770,13 @@ void GLMContext::DebugDump( GLMDebugHookInfo *info, uint options, uint vertDumpM
 									case GL_UNSIGNED_BYTE:
 									{
 										unsigned char *unchbase = (unsigned char*)attrBase;
-										mark += sprintf(mark, "%c$%02X ", fieldname[which], unchbase[which] );
+										V_sprintfcat_safe(buf, "%c$%02X ", fieldname[which], unchbase[which] );
 									}
 									break;
 
 									default:
 										// hold off on other formats for now
-										mark += sprintf(mark, "%c????? ", fieldname[which] );
+										V_sprintfcat_safe(buf, "%c????? ", fieldname[which] );
 									break;
 								}
 							}
@@ -3796,7 +3795,7 @@ void GLMContext::DebugDump( GLMDebugHookInfo *info, uint options, uint vertDumpM
 											case GL_UNSIGNED_BYTE:
 											{
 												unsigned char *unchbase = (unsigned char*)attrBase;
-												mark += sprintf(mark, "%c$%02X ", fieldname[which], unchbase[which] );
+												V_sprintfcat_safe(buf, "%c$%02X ", fieldname[which], unchbase[which] );
 												
 												if (usage==D3DDECLUSAGE_BLENDINDICES)
 												{
@@ -3818,7 +3817,7 @@ void GLMContext::DebugDump( GLMDebugHookInfo *info, uint options, uint vertDumpM
 								break;
 							}
 						}
-						mark += sprintf(mark, "] " );
+						V_sprintfcat_safe(buf, "] " );
 					}
 				}
 			}
@@ -3912,7 +3911,7 @@ void GLMContext::DebugDump( GLMDebugHookInfo *info, uint options, uint vertDumpM
 			}
 			else
 			{	// no more < and > around vert dump lines
-				//mark += sprintf(mark, "" );
+				//V_sprintfcat_safe(buf, "" );
 			}
 		}
 	}
@@ -5464,16 +5463,16 @@ return;
 			
 			decodedStr2 = GLMDecode( eGL_ERROR, errorcode2 );
 
-			sprintf( errbuf, "\n%s - GL Error %08x/%08x = '%s / %s'\n", comment, errorcode, errorcode2, decodedStr, decodedStr2 );
+			V_sprintf_safe( errbuf, "\n%s - GL Error %08x/%08x = '%s / %s'\n", comment, errorcode, errorcode2, decodedStr, decodedStr2 );
 		}
 		else
 		{
-			sprintf( errbuf, "\n%s - GL Error %08x = '%s'\n", comment, errorcode, decodedStr );
+			V_sprintf_safe( errbuf, "\n%s - GL Error %08x = '%s'\n", comment, errorcode, decodedStr );
 		}
 
 		if ( m_params.m_glErrToConsole )
 		{
-			printf("%s", errbuf );
+			fprintf(stderr, "%s", errbuf );
 		}
 		
 		if ( m_params.m_glErrToDebugger )
@@ -5944,7 +5943,7 @@ void GLMTester::Test2( void )
 		for( int j=0; j<16; j++)
 		{
 			char text[256];
-			sprintf(text, "The quick brown fox jumped over the lazy dog %d times", i );
+			V_sprintf_safe(text, "The quick brown fox jumped over the lazy dog %d times", i );
 			
 			float theta = ( (i*0.10f) + (j * 6.28f) ) / 16.0f;
 			
@@ -6061,7 +6060,7 @@ void GLMTester::Test3( void )
 		for( int j=0; j<16; j++)
 		{
 			char text[256];
-			sprintf(text, "This here is running through a trivial vertex shader");
+			V_sprintf_safe(text, "This here is running through a trivial vertex shader");
 			
 			float theta = ( (i*0.10f) + (j * 6.28f) ) / 16.0f;
 			

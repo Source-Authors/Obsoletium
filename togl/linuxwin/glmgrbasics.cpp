@@ -3064,7 +3064,7 @@ void GLMPrintText( const char *str, EGLMDebugFlavor flavor, uint options )
 		}
 		if (options & GLMPRINTTEXT_NUMBEREDLINES)
 		{
-			sprintf( lineout, "%-5d| %s", linenum, printfrom );
+			V_sprintf_safe( lineout, "%-5d| %s", linenum, printfrom );
 			GLMPrintStr( lineout, flavor );
 			linenum++;
 		}
@@ -4144,7 +4144,7 @@ void	CGLMFileMirror::OpenInEditor( bool foreground )
 	char temp[64000];
 	
 	// pass -b if no desire to bring editor to foreground
-	sprintf(temp,"/usr/bin/bbedit %s %s", foreground ? "" : "-b", m_path );
+	V_sprintf_safe(temp,"/usr/bin/bbedit %s '%s'", foreground ? "" : "-b", m_path );
 	system( temp );
 }
 
@@ -4295,7 +4295,7 @@ void	CGLMEditableTextItem::GenBaseNameAndFullPath(  char *prefix, char *suffix  
 	if (m_mirrorBaseName)	free(m_mirrorBaseName);
 	m_mirrorBaseName = strdup( temp );
 
-	sprintf( temp, "%s%s", prefix, m_mirrorBaseName );
+	V_sprintf_safe( temp, "%s%s", prefix, m_mirrorBaseName );
 	if (m_mirrorFullPath)	free(m_mirrorFullPath);
 	m_mirrorFullPath = strdup( temp );
 }

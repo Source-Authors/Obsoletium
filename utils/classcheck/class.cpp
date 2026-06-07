@@ -1301,7 +1301,7 @@ bool CClass::ParseNestedClass( char *&input )
 	{
 		//vprint( depth, "class %s\n", com_token );
 		char decorated[ 256 ];
-		sprintf( decorated, "%s::%s", m_szName, com_token );
+		V_sprintf_safe( decorated, "%s::%s", m_szName, com_token );
 
 		CClass *cl = processor->AddClass( decorated );
 

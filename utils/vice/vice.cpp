@@ -242,7 +242,7 @@ int main(int argc, char* argv[])
 			_splitpath( pInputBaseName, NULL, NULL, fname, ext ); //find extension wanted
 			fname[strlen(fname)-1] = 0; // remove *
 
-			sprintf( search, "%s\\*%s", gamedir, ext );
+			V_sprintf_safe( search, "%s\\*%s", gamedir, ext );
 
 			Q_FixSlashes( search, '/' );
 

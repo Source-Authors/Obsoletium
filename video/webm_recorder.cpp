@@ -462,7 +462,7 @@ bool CWebMVideoRecorder::AppendVideoFrame( void *pFrameBuffer, int nStrideAdjust
 		int i,j;
 		byte *pByte;
 	
-		sprintf(rgch, "./frames/vid_%d", m_nFramesAdded);
+		V_sprintf_safe(rgch, "./frames/vid_%d", m_nFramesAdded);
 		fp = fopen(rgch, "wb");
 
 		pByte = (byte *)pFrameBuffer;
@@ -603,7 +603,7 @@ bool CWebMVideoRecorder::AppendAudioSamples( void *pSampleBuffer, size_t sampleS
 
 		i_AudSample_frame = m_nFramesAdded;
 	
-		sprintf(rgch, "./frames/aud_%d_%d", i_AudSample_frame, i_AudSample_batch);
+		V_sprintf_safe(rgch, "./frames/aud_%d_%d", i_AudSample_frame, i_AudSample_batch);
 		fp = fopen(rgch, "wb");
 
 		// Size

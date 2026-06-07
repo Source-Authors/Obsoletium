@@ -90,7 +90,7 @@ void CStatusWindow::redraw()
 		rcTime.right = rcTime.left + 50;
 
 		char sz[ 32 ];
-		sprintf( sz, "%.3f",  m_rgTextLines[ line ].curtime );
+		V_sprintf_safe( sz, "%.3f",  m_rgTextLines[ line ].curtime );
 
 		int len = helper.CalcTextWidth( "Arial", STATUS_FONT_SIZE, FW_NORMAL, sz );
 
@@ -122,7 +122,7 @@ void CStatusWindow::StatusPrint( int r, int g, int b, bool overwrite, const char
 	float curtime = (float)Plat_FloatTime();
 
 	char sz[32];
-	sprintf( sz, "%.3f  ", curtime );
+	V_sprintf_safe( sz, "%.3f  ", curtime );
 
 	OutputDebugString( sz );
 	OutputDebugString( text );

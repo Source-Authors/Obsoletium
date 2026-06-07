@@ -651,7 +651,7 @@ GLMTexLayout *CGLMTexLayoutTable::NewLayoutRef( GLMTexLayoutKey *pDesiredKey )
 			case GL_TEXTURE_CUBE_MAP:	targetname = "CUBE";		break;
 		}
 		
-		sprintf( scratch, "[%s %s %dx%dx%d mips=%d slices=%d flags=%02lX%s]",
+		V_sprintf_safe( scratch, "[%s %s %dx%dx%d mips=%d slices=%d flags=%02lX%s]",
 					targetname,
 					formatDesc->m_formatSummary,
 					layout->m_key.m_xSize, layout->m_key.m_ySize, layout->m_key.m_zSize,

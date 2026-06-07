@@ -193,13 +193,11 @@ void CModelCheckInDlg::PerformCheckoutCommand( ProjectType_t project,
 {
 	char error[1024];
 	char buf[1024];
-	int len = 0;
 
-	int currExtension;
-	for ( currExtension = 0; s_ppExtensions[currExtension][0]; ++currExtension )
+	for ( int currExtension = 0; s_ppExtensions[currExtension][0]; ++currExtension )
 	{
 		// Check for the existence of the file in source safe...
-		sprintf( buf, "ss filetype %s%s/%s%s -O- -y%s\n",
+		V_sprintf_safe( buf, "ss filetype %s%s/%s%s -O- -y%s\n",
 			s_ppProjectDir[project], pRelativeDir, pFileName, s_ppExtensions[currExtension],
 			(char const*)m_UserName );
 		int retVal = system( buf );
@@ -207,20 +205,20 @@ void CModelCheckInDlg::PerformCheckoutCommand( ProjectType_t project,
 			continue;
 
 		// It's there, try to check it out
-		sprintf( buf, "ss checkout %s%s/%s%s -GL%s -GWA -O- -y%s\n",
+		V_sprintf_safe( buf, "ss checkout %s%s/%s%s -GL%s -GWA -O- -y%s\n",
 			s_ppProjectDir[project], pRelativeDir, pFileName, s_ppExtensions[currExtension],
 			pDestPath, (char const*)m_UserName );
 		retVal = system( buf );
 		if (retVal > 0)
 		{
-			len += sprintf( &error[len], "*** SourceSafe error attempting to check out \"%s%s\"\n", 
+			V_sprintfcat_safe( error, "*** SourceSafe error attempting to check out \"%s%s\"\n", 
 				pFileName, s_ppExtensions[currExtension] );
 		}
 	}
 
-	if (len > 0)
+	if ( !Q_isempty(error) )
 	{
-		MessageBox( error, "Error!" );					
+		MessageBox( error, "Error!" );
 	}
 }
 
@@ -233,54 +231,52 @@ void CModelCheckInDlg::PerformCheckinCommand( ProjectType_t project,
 {
 	char buf[1024];
 	char error[1024];
-	int len = 0;
 
-	int currExtension;
-	for ( currExtension = 0; s_ppExtensions[currExtension][0]; ++currExtension )
+	for ( int currExtension = 0; s_ppExtensions[currExtension][0]; ++currExtension )
 	{
 		// Check for the existence of the file on disk. If it's not there, don't bother
-		sprintf( buf, "%s/%s%s", pDestPath, pFileName, s_ppExtensions[currExtension] );
-		struct _stat statbuf;
+		V_sprintf_safe( buf, "%s/%s%s", pDestPath, pFileName, s_ppExtensions[currExtension] );
+		_stat statbuf;
 		int result = _stat( buf, &statbuf );
 		if (result != 0)
 			continue;
 
 		// Check for the existence of the file in source safe...
-		sprintf( buf, "ss filetype %s%s/%s%s -O- -y%s\n",
+		V_sprintf_safe( buf, "ss filetype %s%s/%s%s -O- -y%s\n",
 			s_ppProjectDir[project], pRelativeDir, pFileName, s_ppExtensions[currExtension],
 			(char const*)m_UserName );
 		int retVal = system( buf );
 		if (retVal > 0)
 		{
 			// Try to add the file to source safe...
-			sprintf( buf, "ss add %s%s/%s%s -GL%s -O- -y%s\n",
+			V_sprintf_safe( buf, "ss add %s%s/%s%s -GL%s -O- -y%s\n",
 				s_ppProjectDir[project], pRelativeDir, pFileName, s_ppExtensions[currExtension],
 				pDestPath, (char const*)m_UserName );
 			int retVal = system( buf );
 			if (retVal > 0)
 			{
-				len += sprintf( &error[len], "SourceSafe error attempting to add \"%s%s\"\n", 
+				V_sprintfcat_safe( error, "SourceSafe error attempting to add \"%s%s\"\n", 
 					pFileName, s_ppExtensions[currExtension] );
 			}
 		}
 		else
 		{
 			// It's there, just check it in
-			sprintf( buf, "ss checkin %s%s/%s%s -GL%s -O- -y%s\n",
+			V_sprintf_safe( buf, "ss checkin %s%s/%s%s -GL%s -O- -y%s\n",
 				s_ppProjectDir[project], pRelativeDir, pFileName, s_ppExtensions[currExtension],
 				pDestPath, (char const*)m_UserName );
 			retVal = system( buf );
 			if (retVal > 0)
 			{
-				len += sprintf( &error[len], "SourceSafe error attempting to check in \"%s%s\"\n", 
+				V_sprintfcat_safe( error, "SourceSafe error attempting to check in \"%s%s\"\n", 
 					pFileName, s_ppExtensions[currExtension] );
 			}
 		}
 	}
 
-	if (len > 0)
+	if ( !Q_isempty(error) )
 	{
-		MessageBox( error, "Error!" );					
+		MessageBox( error, "Error!" );
 	}
 }
 
@@ -409,7 +405,7 @@ CModelCheckInDlg::ProjectType_t CModelCheckInDlg::GetFileNames( char const* pTit
 	if (projectType == PROJECT_ERROR)
 	{
 		char buf[MAX_PATH];
-		sprintf( buf, "%s\nwas not found under either game directory!\n", dlg.GetPathName() );
+		V_sprintf_safe( buf, "%s\nwas not found under either game directory!\n", dlg.GetPathName() );
 		MessageBox( buf, "Error!" );
 		return PROJECT_ERROR;
 	}
