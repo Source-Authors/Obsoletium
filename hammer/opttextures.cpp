@@ -196,21 +196,6 @@ BOOL COPTTextures::OnApply()
 	return __super::OnApply();
 }
 
-static void GetDirectory(char *pDest, const char *pLongName)
-{
-	strcpy(pDest, pLongName);
-	size_t i = strlen(pDest);
-	while (pLongName[i] != '\\' && pLongName[i] != '/' && i > 0)
-		i--;
-
-	if (i <= 0)
-		i = 0;
-	
-	pDest[i] = 0;
-
-	return;
-}
-
 
 void COPTTextures::OnAddtexfile2() 
 {
