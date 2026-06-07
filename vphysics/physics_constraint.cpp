@@ -239,6 +239,8 @@ void CPhysicsConstraintGroup::GetErrorParams( constraint_groupparams_t *pParams 
 		return;
 
 	vphysics_save_cphysicsconstraintgroup_t tmp;
+	// dimhotepus: Ensure net set fields are empty.
+	BitwiseClear(tmp);
 	WriteToTemplate( tmp );
 	*pParams = tmp;
 }
@@ -1026,7 +1028,11 @@ void CPhysicsConstraint::WriteToTemplate( vphysics_save_cphysicsconstraint_t &he
 	
 	// this constraint is inert due to one of it's objects getting deleted
 	if ( !m_HkConstraint )
+	{
+		// dimhotepus: Ensure no constraint means template is empty.
+		BitwiseClear( constraintTemplate );
 		return;
+	}
 
 	header.pGroup = GetConstraintGroup();
 
@@ -1161,8 +1167,8 @@ bool CPhysicsConstraint::GetConstraintParams( constraint_breakableparams_t *pPar
 	if ( !pParams )
 		return false;
 	vphysics_save_cphysicsconstraint_t header;
-	vphysics_save_constraint_t constraintTemplate;
 	BitwiseClear( header );
+	vphysics_save_constraint_t constraintTemplate;
 	BitwiseClear( constraintTemplate );
 	WriteToTemplate( header, constraintTemplate );
 
@@ -1593,8 +1599,8 @@ bool IsExternalConstraint( IVP_Controller *pLCS, void *pGameData )
 bool SavePhysicsConstraint( const physsaveparams_t &params, CPhysicsConstraint *pConstraint )
 {
 	vphysics_save_cphysicsconstraint_t header;
-	vphysics_save_constraint_t constraintTemplate;
 	BitwiseClear( header );
+	vphysics_save_constraint_t constraintTemplate;
 	BitwiseClear( constraintTemplate );
 
 	pConstraint->WriteToTemplate( header, constraintTemplate );

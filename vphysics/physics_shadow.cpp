@@ -1377,8 +1377,8 @@ bool RestorePhysicsShadowController( const physrestoreparams_t &, IPhysicsShadow
 bool RestorePhysicsShadowControllerInternal( const physrestoreparams_t &params, IPhysicsShadowController **ppShadowController, CPhysicsObject *pObject )
 {
 	vphysics_save_cshadowcontroller_t controllerTemplate;
-
 	memset( &controllerTemplate, 0, sizeof(controllerTemplate) );
+
 	params.pRestore->ReadAll( &controllerTemplate );
 	
 	// HACKHACK: pass this in
