@@ -3010,9 +3010,14 @@ STRINGTABLE
 BEGIN
     ID_HELP_EDITINGSITE     "https://developer.valvesoftware.com/wiki/Category:Level_Design"
     ID_HELP_ORDERNOW        "Order Worldcraft Online using your credit card"
+    ID_TOOLS_TRANSFORM      "Transform\tCtrl+M"
     ID_TOOLS_SNAPSELECTEDTOGRID 
                             "Snap the selected objects to the grid (without altering size/relativity)"
+    ID_TOOLS_SNAP_SELECTED_TO_GRID_INDIVIDUALLY
+                            "Snap Selected to Grid Individually\tCtrl+Shift+B"
+    ID_TOOLS_CENTER_ORIGINS "Center &Origins"
     ID_EDIT_UNDOREDOACTIVE  "Toggle Undo/Redo (off conserves memory)"
+    ID_EDIT_FINDENTITIES    "&Find entities...\tCtrl+Shift+F"
     ID_TOOLS_MORPH          "Vertex manipulation\nVertex tool [Shift+V]"
     ID_TOOLS_CLIPPER        "Clipping tool\nClipping tool [Shift+X]"
     ID_TOOLS_TOGGLETEXLOCK  "Toggle texture locking\nTexture Lock"
@@ -3159,6 +3164,7 @@ BEGIN
     ID_VIEW_2DXY            "View 2D X/Y axes\n2D X/Y View"
     ID_VIEW_2DXZ            "View 2D X/Z axes\n2D X/Z View"
     ID_VIEW_2DYZ            "View 2D Y/Z axes\n2D Y/Z View"
+    ID_VIEW_3DLIGHTMAP_GRID "3D &Lightmap Grid"
     IDS_CANT_OPEN_ENTS_FILE "Can't open ents file %1!s!."
     IDS_CANT_SAVE_ENTS_FILE "Can't save ents file %1!s!."
 END
@@ -3231,6 +3237,7 @@ BEGIN
     ID_EDIT_APPLYTEXTURE    "Apply current texture to selection\nApply current texture"
     ID_TOOLS_SUBTRACTSELECTION 
                             "Carve using the selected objects\nCarve with selected objects"
+    ID_TOOLS_PREFABFACTORY  "&Prefab Factory..."
     ID_TOOLS_OPTIONS        "Configuration options"
     ID_TOOLS_GROUP          "Create an associative group with all the selected objects\nGroup selected objects"
     ID_TOOLS_UNGROUP        "Ungroup the selected groups\nUngroup selected groups"
@@ -3264,16 +3271,21 @@ BEGIN
     ID_CREATEOBJECT         "Creates the drawn object"
     ID_EDIT_MAPPROPERTIES   "Edit global map properties"
     ID_FILE_RUNMAP          "Run the map in the game\nRun Map! [F9]"
+    ID_FILE_CONVERT_WAD     "Convert &WAD to VMT..."
+    ID_FILE_RELOAD_SOUNDS   "&Reload Sounds"
     ID_TOOLS_SHOWITEMS      "Toggles the display of Items (Monsters, Weapons, etc)"
 END
 
 STRINGTABLE 
 BEGIN
     ID_MODE_APPLICATOR      "Texture application mode\nToggle texture application [Shift+A]"
+    ID_EDIT_REPLACETEX      "R&eplace Textures..."
     ID_TOOLS_VERTEX         "Vertex mode."
     ID_MAP_INFORMATION      "Get &Information about the current Map"
     ID_TOOLS_LOADPTSFILE    "Load a QBSP PTS file to detect leaks"
-    ID_VIEW_CENTERONSELECTION "Center the 2D views on the selected objects"
+    ID_VIEW_CENTERONSELECTION        "Center the 2D views on the selected objects"
+    ID_VIEW_CENTER3DVIEWSONSELECTION "Center &3D Views on Selection"
+    ID_GOTO_COORDS          "Go to Coordinates..."
     ID_TOOLS_HOLLOWOUT      "Turn the selected solid into a hollow room"
     ID_TOOLS_HOLLOW         "Make each of the selected solids a group of hollow objects\nHollow Solids"
     ID_EDIT_PASTESPECIAL    "Paste objects with special options"
@@ -3390,10 +3402,11 @@ BEGIN
     ID_PATHEDIT_NODEPROPERTIES "Edit node properties"
     ID_PATHEDIT_PATHPROPERTIES "Edit path properties"
     ID_MAP_ENTITYREPORT     "Entity report"
-    ID_TOGGLE_SELECTBYHANDLE 
-                            "Select by handles only\nToggle Select-by-handles"
+    ID_TOGGLE_SELECTBYHANDLE "Select by handles only\nToggle Select-by-handles"
     ID_TOGGLE_INFINITESELECT "Toggle auto-selection\nToggle auto-selection"
-    ID_FILE_EXPORTTODXF     "Export to .DXF format"
+    ID_FILE_EXPORT           "&Export..."
+    ID_FILE_EXPORTAGAIN      "Export Again\tAlt-B"
+    ID_FILE_EXPORTTODXF      "Export to .DXF format"
 END
 
 STRINGTABLE 
