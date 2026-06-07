@@ -158,6 +158,8 @@ int CEntityHelpDlg::GetMaxVariableWidth(GDclass *pClass)
 //-----------------------------------------------------------------------------
 void CEntityHelpDlg::OnClose(void)
 {
+	// dimhotepus: Call super to invoke OnDestroy and cleanup.
+	__super::OnClose();
 	DestroyWindow();
 }
 
@@ -167,6 +169,8 @@ void CEntityHelpDlg::OnClose(void)
 //-----------------------------------------------------------------------------
 void CEntityHelpDlg::OnDestroy(void)
 {
+	// Call super destroy to free up DPI.
+	__super::OnDestroy();
 	delete this;
 }
 
