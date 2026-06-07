@@ -320,6 +320,8 @@ void CLoadCommentaryDialog::ScanCommentaryFiles()
 	{
 		vgui::Label *pNoCommentaryItemsLabel = SETUP_PANEL(new Label(m_pGameList, "NoCommentaryItemsLabel", "#GameUI_NoCommentaryItemsToDisplay"));
 		pNoCommentaryItemsLabel->SetTextColorState(vgui::Label::CS_DULL);
+		// dimhotepus: Ensure label looks good regarding of UI scaling.
+		pNoCommentaryItemsLabel->SizeToContents();
 		m_pGameList->AddItem( NULL, pNoCommentaryItemsLabel );
 	}
 
