@@ -1735,7 +1735,8 @@ bool CMapCheckDlg::DoCheck(void)
 
 	if (!m_Errors.GetCount())
 	{
-		AfxMessageBox("No errors were found.");
+		// dimhotepus: Use information icon.
+		AfxMessageBox("There are no errors found.", MB_OK | MB_ICONINFORMATION);
 		EndDialog(IDOK);
 		return true;
 	}
