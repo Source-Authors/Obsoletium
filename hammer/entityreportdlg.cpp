@@ -559,6 +559,8 @@ void CEntityReportDlg::OnOK()
 //-----------------------------------------------------------------------------
 void CEntityReportDlg::OnClose()
 {
+	// dimhotepus: Invoke default messages on close.
+	__super::OnClose();
 	DestroyWindow();
 }
 

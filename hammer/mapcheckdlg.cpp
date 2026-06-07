@@ -1758,6 +1758,8 @@ void CMapCheckDlg::OnOK()
 //-----------------------------------------------------------------------------
 void CMapCheckDlg::OnClose()
 {
+	// dimhotepus: Invoke default messages on close.
+	__super::OnClose();
 	DestroyWindow();
 }
 
