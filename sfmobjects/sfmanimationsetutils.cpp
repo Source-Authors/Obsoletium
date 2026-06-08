@@ -133,6 +133,14 @@ static void CreateAnimationLogs( CDmeChannelsClip *channelsClip, CDmeGameModel *
 	Vector pos[ MAXSTUDIOBONES ];
 	Quaternion q[ MAXSTUDIOBONES ];
 
+// dimhotepus: Catch uninit vars.
+#if defined(FP_EXCEPTIONS_ENABLED) || defined(DBGFLAG_ASSERT)
+	// Having these uninitialized means that some bugs are very hard
+	// to reproduce. A memset of 0xFF is a simple way of getting NaNs.
+	memset( pos, 0xFF, sizeof(pos) );
+	memset( q, 0xFF, sizeof(q) );
+#endif
+
 	float poseparameter[ MAXSTUDIOPOSEPARAM ];
 	for ( int pp = 0; pp < MAXSTUDIOPOSEPARAM; ++pp )
 	{
@@ -442,6 +450,15 @@ static void SetupBoneTransform( CDmeFilmClip *shot, CDmeChannelsClip *srcChannel
 
 		Vector pos[ MAXSTUDIOBONES ];
 		Quaternion q[ MAXSTUDIOBONES ];
+
+// dimhotepus: Catch uninit vars.
+#if defined(FP_EXCEPTIONS_ENABLED) || defined(DBGFLAG_ASSERT)
+	// Having these uninitialized means that some bugs are very hard
+	// to reproduce. A memset of 0xFF is a simple way of getting NaNs.
+	memset( pos, 0xFF, sizeof(pos) );
+	memset( q, 0xFF, sizeof(q) );
+#endif
+
 		float poseparameter[ MAXSTUDIOPOSEPARAM ];
 		for ( int pp = 0; pp < MAXSTUDIOPOSEPARAM; ++pp )
 		{

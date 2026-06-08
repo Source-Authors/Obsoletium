@@ -294,6 +294,14 @@ void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix
 	Vector		pos[MAXSTUDIOBONES];
 	Quaternion	q[MAXSTUDIOBONES];
 
+// dimhotepus: Catch uninit vars.
+#if defined(FP_EXCEPTIONS_ENABLED) || defined(DBGFLAG_ASSERT)
+	// Having these uninitialized means that some bugs are very hard
+	// to reproduce. A memset of 0xFF is a simple way of getting NaNs.
+	memset( pos, 0xFF, sizeof(pos) );
+	memset( q, 0xFF, sizeof(q) );
+#endif
+
 	IBoneSetup boneSetup( &studioHdr, BONE_USED_BY_ANYTHING_AT_LOD( m_nLOD ), pPoseParameter, nullptr );
 	boneSetup.InitPose( pos, q );
 	boneSetup.AccumulatePose( pos, q, m_nSequence, flCycle, 1.0f, m_flTime, nullptr );
@@ -419,6 +427,14 @@ void CMDL::SetupBonesWithBoneMerge( const CStudioHdr *pMergeHdr, matrix3x4_t *pM
 
 	Vector pos[MAXSTUDIOBONES];
 	Quaternion q[MAXSTUDIOBONES];
+
+// dimhotepus: Catch uninit vars.
+#if defined(FP_EXCEPTIONS_ENABLED) || defined(DBGFLAG_ASSERT)
+	// Having these uninitialized means that some bugs are very hard
+	// to reproduce. A memset of 0xFF is a simple way of getting NaNs.
+	memset( pos, 0xFF, sizeof(pos) );
+	memset( q, 0xFF, sizeof(q) );
+#endif
 
 	IBoneSetup boneSetup( pMergeHdr,  BONE_USED_BY_ANYTHING_AT_LOD( m_nLOD ), pPoseParameter );
 	boneSetup.InitPose( pos, q );

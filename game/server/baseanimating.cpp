@@ -1814,6 +1814,14 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 	Vector pos[MAXSTUDIOBONES];
 	Quaternion q[MAXSTUDIOBONES];
 
+// dimhotepus: Catch uninit vars.
+#if defined(FP_EXCEPTIONS_ENABLED) || defined(DBGFLAG_ASSERT)
+	// Having these uninitialized means that some bugs are very hard
+	// to reproduce. A memset of 0xFF is a simple way of getting NaNs.
+	memset( pos, 0xFF, sizeof(pos) );
+	memset( q, 0xFF, sizeof(q) );
+#endif
+
 	// adjust hit boxes based on IK driven offset
 	Vector adjOrigin = GetAbsOrigin() + Vector( 0, 0, m_flEstIkOffset );
 

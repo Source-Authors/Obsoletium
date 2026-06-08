@@ -2399,6 +2399,14 @@ void CBoneSetup::AccumulatePose(
 	Vector		pos2[MAXSTUDIOBONES];
 	QuaternionAligned	q2[MAXSTUDIOBONES];
 
+// dimhotepus: Catch uninit vars.
+#if defined(FP_EXCEPTIONS_ENABLED) || defined(DBGFLAG_ASSERT)
+	// Having these uninitialized means that some bugs are very hard
+	// to reproduce. A memset of 0xFF is a simple way of getting NaNs.
+	memset( pos2, 0xFF, sizeof(pos2) );
+	memset( q2, 0xFF, sizeof(q2) );
+#endif
+
 	Assert( flWeight >= 0.0f && flWeight <= 1.0f );
 	// This shouldn't be necessary, but the Assert should help us catch whoever is screwing this up
 	flWeight = clamp( flWeight, 0.0f, 1.0f );

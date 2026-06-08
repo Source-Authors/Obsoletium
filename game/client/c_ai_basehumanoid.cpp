@@ -122,6 +122,13 @@ void C_AI_BaseHumanoid::StandardBlendingRules( CStudioHdr *pStudioHdr, Vector po
 	{
 		Vector		pos2[MAXSTUDIOBONES];
 		Quaternion	q2[MAXSTUDIOBONES];
+		// dimhotepus: Catch uninit vars.
+#if defined(FP_EXCEPTIONS_ENABLED) || defined(DBGFLAG_ASSERT)
+		// Having these uninitialized means that some bugs are very hard
+		// to reproduce. A memset of 0xFF is a simple way of getting NaNs.
+		memset( pos2, 0xFF, sizeof(pos) );
+		memset( q, 0xFF, sizeof(q) );
+#endif
 		float fWeight = m_Layer[i][1].flWeight * (1 - dadt) + m_Layer[i][2].flWeight * dadt;
 
 		/*

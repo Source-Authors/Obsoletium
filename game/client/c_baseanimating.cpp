@@ -1935,6 +1935,14 @@ void C_BaseAnimating::ChildLayerBlend( Vector pos[], Quaternion q[], float curre
 	// dimhotepus: Comment unreachable code. if enabled causes issues with combine holding SMG.
 	//Vector		childPos[MAXSTUDIOBONES];
 	//Quaternion	childQ[MAXSTUDIOBONES];
+	
+	// dimhotepus: Catch uninit vars.
+	// #if defined(FP_EXCEPTIONS_ENABLED) || defined(DBGFLAG_ASSERT)
+	// 	// Having these uninitialized means that some bugs are very hard
+	// 	// to reproduce. A memset of 0xFF is a simple way of getting NaNs.
+	// 	memset( childPos, 0xFF, sizeof(pos) );
+	// 	memset( childQ, 0xFF, sizeof(q) );
+	// #endif
 	//float		childPoseparam[MAXSTUDIOPOSEPARAM];
 
 	//// go through all children
@@ -4893,6 +4901,15 @@ C_BaseAnimating *C_BaseAnimating::BecomeRagdollOnClient()
 		matrix3x4_t boneDelta0[MAXSTUDIOBONES];
 		matrix3x4_t boneDelta1[MAXSTUDIOBONES];
 		matrix3x4_t currentBones[MAXSTUDIOBONES];
+
+// dimhotepus: Catch uninit vars.
+#if defined(FP_EXCEPTIONS_ENABLED) || defined(DBGFLAG_ASSERT)
+		// Having these uninitialized means that some bugs are very hard
+		// to reproduce. A memset of 0xFF is a simple way of getting NaNs.
+		memset( boneDelta0, 0xFF, sizeof(boneDelta0) );
+		memset( boneDelta1, 0xFF, sizeof(boneDelta1) );
+		memset( currentBones, 0xFF, sizeof(currentBones) );
+#endif
 		constexpr float boneDt = 0.1f;
 
 		bool bInitAsClient = false;
