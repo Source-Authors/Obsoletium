@@ -4510,17 +4510,22 @@ void CBaseFileSystem::Warning( FileWarningLevel_t level, PRINTF_FORMAT_STRING co
 	V_vsprintf_safe( warningtext, fmt, argptr );
 	va_end( argptr );
 
-	// Dump to stdio
-#ifdef _WIN32
-	// dimhotepus: On Windows Plat_DebugString dumps to debug output only, so need explicit.
-	fprintf( stderr, "%s", warningtext );
-#endif
-	// dimhotepus: On *nix it dumps to stderr.
-	Plat_DebugString( "[fs] " );
-	Plat_DebugString( warningtext );
 	if ( m_pfnWarning )
 	{
 		(*m_pfnWarning)( warningtext );
+	}
+	else
+	{
+		// dimhotepus: Only fallback to this if no warning function.
+		// Dump to stdio
+#ifdef _WIN32
+		// dimhotepus: On Windows Plat_DebugString dumps to debug output only,
+		// so need explicit.
+		fprintf(stderr, "%s", warningtext);
+#endif
+		// dimhotepus: On *nix it dumps to stderr.
+		Plat_DebugString("[fs] ");
+		Plat_DebugString(warningtext);
 	}
 }
 
