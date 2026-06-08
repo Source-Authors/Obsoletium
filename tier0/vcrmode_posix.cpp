@@ -522,30 +522,28 @@ static void VCR_Hook_Cmd_Exec(char **f)
 	}
 }
 
-enum {
-  MAX_LINUX_CMDLINE = 512
-};
-static char linuxCmdline[ MAX_LINUX_CMDLINE + 7 ]; // room for -steam
+constexpr inline intp kMaxLinuxCmdLineLength = 512;
+constexpr inline char kSteamArgName[] = " -steam";
+static char linuxCmdline[kMaxLinuxCmdLineLength + std::size(kSteamArgName)];  // room for -steam
 
 const char * BuildCmdLine( int argc, char **argv, bool fAddSteam )
 {
-	int len;
-	int i;
-
-	for (len = 0, i = 0; i < argc; i++)
+	intp len = 0;
+	for (intp i = 0; i < argc; i++)
 	{
-		len += strlen(argv[i]);
+		// dimhotepus: +1 for ' '.
+		len += strlen(argv[i]) + 1;
 	}
 
-	if ( len > MAX_LINUX_CMDLINE )
+	if ( len > kMaxLinuxCmdLineLength )
 	{
-		fprintf( stderr, "command line too long, %i max\n", MAX_LINUX_CMDLINE );
+		fprintf( stderr, "command line is too long, %zd max.\n", kMaxLinuxCmdLineLength );
 		// dimhotepus: 1 -> EINVAL.
 		exit( EINVAL );  //-V2014
 	}
 
 	linuxCmdline[0] = '\0';
-	for ( i = 0; i < argc; i++ )
+	for ( intp i = 0; i < argc; i++ )
 	{
 		if ( i > 0 )
 		{
@@ -554,7 +552,7 @@ const char * BuildCmdLine( int argc, char **argv, bool fAddSteam )
 		strcat( linuxCmdline, argv[ i ] );
 	}
 
-	if( fAddSteam )
+	if ( fAddSteam )
 	{
 		strcat( linuxCmdline, " -steam" );
 	}
