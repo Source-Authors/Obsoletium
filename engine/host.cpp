@@ -457,14 +457,17 @@ ConVar telemetry_demoend( "telemetry_demoend", "0", 0, "When playing demo, stop 
 #ifdef _WIN32
 static bool host_checkheap = false;
 
-static void CheckHeap( bool bEnabled, const char *pszFunction )
+// dimhotepus: Pack into a function for reuse.
+static inline void CheckHeap( bool bEnabled, const char *pszFunction )
 {
-	if ( bEnabled )
+	if ( !bEnabled )
 	{
-		if ( _heapchk() != _HEAPOK )
-		{
-			Sys_Error( "%s:  _heapchk() != _HEAPOK\n", pszFunction );
-		}
+		return;
+	}
+
+	if ( _heapchk() != _HEAPOK )
+	{
+		Sys_Error( "%s:  _heapchk() != _HEAPOK\n", pszFunction );
 	}
 }
 #endif
@@ -3087,7 +3090,7 @@ static void _Host_RunFrame (float time)
 
 		Host_PostFrameRate( host_frametime );
 		
-#ifdef _WIN32
+#if defined(_WIN32)
 		CheckHeap( host_checkheap, __FUNCTION__ " (bottom)" );
 #endif
 
@@ -4186,7 +4189,7 @@ void Host_FreeToLowMark( bool server )
 //-----------------------------------------------------------------------------
 void Host_Shutdown(void)
 {
-#ifdef _WIN32
+#if defined(_WIN32)
 	CheckHeap( host_checkheap, __FUNCTION__  " (top)");
 #endif
 
@@ -4332,7 +4335,7 @@ void Host_Shutdown(void)
 	}
 #endif
 	
-#ifdef _WIN32
+#if defined(_WIN32)
 	CheckHeap( host_checkheap, __FUNCTION__ " (bottom)");
 #endif
 }
