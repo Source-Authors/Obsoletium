@@ -8,6 +8,8 @@
 #if defined( WIN32 ) && !defined( _X360 )
 #include "winlite.h"
 
+#include <windowsx.h>
+#include <hidusage.h>
 #include <imm.h>
 #endif
 #include "inputsystem/iinputsystem.h"
@@ -76,9 +78,22 @@ extern HWND thisWindow;
 // Initializes the input system
 //-----------------------------------------------------------------------------
 
+static HWND s_hLastHWnd = nullptr;
+// dimhotepus: Use raw mouse input.
+static bool s_bRawInputSupported = false;
 static bool s_bIMEComposing = false;
-static HWND s_hLastHWnd = 0;
 
+// dimhotepus: Get window cursor position.
+static POINT GetWindowCursorPos( HWND window )
+{
+	Assert( window );
+
+	POINT cursorPos;
+	GetCursorPos( &cursorPos );
+	ScreenToClient( window, &cursorPos );
+
+	return cursorPos;
+}
 
 //-----------------------------------------------------------------------------
 // Handles input messages
@@ -122,6 +137,43 @@ static LRESULT CALLBACK MatSurfaceWindowProc( HWND hwnd, UINT uMsg, WPARAM wPara
 		}
 		return 0;
 
+	case WM_INPUT:
+		{
+			// dimhotepus: Use raw mouse input to read mouse buttons for performance.
+			if ( s_bRawInputSupported )
+			{
+				UINT bufferSize{ sizeof(RAWINPUT) };
+				alignas(RAWINPUT) BYTE buffer[sizeof(RAWINPUT)];
+
+				const auto hInput = reinterpret_cast<HRAWINPUT>( lParam );
+				if ( UINT_MAX != GetRawInputData(hInput, RID_INPUT, buffer, &bufferSize, sizeof(RAWINPUTHEADER)) )
+				{
+					const auto* raw = reinterpret_cast<RAWINPUT*>( buffer );
+					if ( raw->header.dwType == RIM_TYPEMOUSE )
+					{
+						const unsigned short mouseButtonFlags{raw->data.mouse.usButtonFlags};
+						if ( mouseButtonFlags && ( mouseButtonFlags != RI_MOUSE_WHEEL ) )
+						{
+							POINT cursorPos = GetWindowCursorPos( hwnd );
+							event.m_nType = IE_LocateMouseClick;
+							event.m_nData = (int)cursorPos.x;
+							event.m_nData2 = (int)cursorPos.y;
+							g_pInputSystem->PostUserEvent( event );
+						}
+					}
+				}
+			}
+
+			if ( wParam == RIM_INPUT && !s_ChainedWindowProc )
+			{
+				// dimhotepus: Input occurred while the application was in the foreground.
+				// The application must call DefWindowProc so the system can perform cleanup.
+				// If no chained proc which should handle this, than do.
+				return DefWindowProc( hwnd, uMsg, wParam, lParam );
+			}
+		}
+		break;
+
 	// All mouse messages need to mark where the click occurred before chaining down
 	case WM_LBUTTONDOWN:
 	case WM_RBUTTONDOWN:
@@ -135,10 +187,15 @@ static LRESULT CALLBACK MatSurfaceWindowProc( HWND hwnd, UINT uMsg, WPARAM wPara
 	case WM_RBUTTONDBLCLK:
 	case WM_MBUTTONDBLCLK:
 	case WM_XBUTTONDBLCLK:
-		event.m_nType = IE_LocateMouseClick;
-		event.m_nData = (short)LOWORD(lParam);
-		event.m_nData2 = (short)HIWORD(lParam);
-		g_pInputSystem->PostUserEvent( event );
+		// dimhotepus: Raw input mouse buttons support.
+		if ( !s_bRawInputSupported )
+		{
+			event.m_nType = IE_LocateMouseClick;
+			// dimhotepus: LOWORD -> GET_X_LPARAM, HIWORD -> GET_Y_LPARAM
+			event.m_nData = GET_X_LPARAM(lParam);
+			event.m_nData2 = GET_Y_LPARAM(lParam);
+			g_pInputSystem->PostUserEvent( event );
+		}
 		break;
 
 	case WM_SETCURSOR:
@@ -300,6 +357,17 @@ void InputAttachToWindow(void *hwnd)
 #if !defined( USE_SDL )
 	s_ChainedWindowProc = (WNDPROC)GetWindowLongPtrW( (HWND)hwnd, GWLP_WNDPROC );
 	SetWindowLongPtrW( (HWND)hwnd, GWLP_WNDPROC, (LONG_PTR)MatSurfaceWindowProc );
+
+#if defined( PLATFORM_WINDOWS_PC ) && !defined( USE_SDL )
+	// dimhotepus: Register to read raw mouse input.
+	RAWINPUTDEVICE Rid[1];
+	Rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
+	Rid[0].usUsage = HID_USAGE_GENERIC_MOUSE;
+	Rid[0].dwFlags = RIDEV_INPUTSINK;
+	Rid[0].hwndTarget = static_cast<HWND>( hwnd );
+	s_bRawInputSupported = !!RegisterRawInputDevices(Rid, std::size(Rid), sizeof(Rid[0]));
+	Assert(s_bRawInputSupported);
+#endif
 #endif
 }
 
@@ -309,6 +377,24 @@ void InputDetachFromWindow(void *hwnd)
 		return;
 	if ( s_ChainedWindowProc )
 	{
+#if defined( PLATFORM_WINDOWS_PC ) && !defined( USE_SDL )
+		// dimhotepus: Unregister read raw mouse input.
+		if ( s_bRawInputSupported )
+		{
+			// unregister raw mouse input
+			RAWINPUTDEVICE Rid[1];
+			Rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
+			Rid[0].usUsage = HID_USAGE_GENERIC_MOUSE;
+			Rid[0].dwFlags = RIDEV_REMOVE;
+			// RegisterRawInputDevices requires nullptr window when RIDEV_REMOVE.
+			Rid[0].hwndTarget = nullptr;
+			[[maybe_unused]] const bool is_succeeded{!!RegisterRawInputDevices(Rid, std::size(Rid), sizeof(Rid[0]))};
+			Assert(is_succeeded);
+
+			s_bRawInputSupported = false;
+		}
+#endif
+
 		SetWindowLongPtrW( (HWND)hwnd, GWLP_WNDPROC, (LONG_PTR) s_ChainedWindowProc );
 		s_ChainedWindowProc = NULL;
 	}
