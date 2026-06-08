@@ -2057,13 +2057,10 @@ void CBaseFileSystem::HandleOpenRegularFile( CFileOpenInfo &openInfo, bool bIsAb
 
 		if ( m_bOutputDebugString )
 		{
-#ifdef _WIN32
+			// dimhotepus: Use Plat_DebugString everywhere.
 			Plat_DebugString( "fs_debug: " );
 			Plat_DebugString( openInfo.m_AbsolutePath );
 			Plat_DebugString( "\n" );
-#elif POSIX
-			fprintf(stderr, "fs_debug: %s\n", openInfo.m_AbsolutePath );
-#endif
 		}
 
 		openInfo.m_pFileHandle = new CFileHandle(this);
@@ -4514,16 +4511,16 @@ void CBaseFileSystem::Warning( FileWarningLevel_t level, PRINTF_FORMAT_STRING co
 	va_end( argptr );
 
 	// Dump to stdio
+#ifdef _WIN32
+	// dimhotepus: On Windows Plat_DebugString dumps to debug output only, so need explicit.
 	fprintf( stderr, "%s", warningtext );
+#endif
+	// dimhotepus: On *nix it dumps to stderr.
+	Plat_DebugString( "[fs] " );
+	Plat_DebugString( warningtext );
 	if ( m_pfnWarning )
 	{
 		(*m_pfnWarning)( warningtext );
-	}
-	else
-	{
-#ifdef _WIN32
-		Plat_DebugString( warningtext );
-#endif
 	}
 }
 
