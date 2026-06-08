@@ -211,7 +211,7 @@ static LRESULT CALLBACK MatSurfaceWindowProc( HWND hwnd, UINT uMsg, WPARAM wPara
 			default:
 				break;
 
-			case 14:  // Chinese Traditional IMN_PRIVATE...
+			case IMN_PRIVATE:  // Chinese Traditional IMN_PRIVATE...
 				break; 
 
 			case IMN_OPENCANDIDATE:
