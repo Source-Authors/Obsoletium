@@ -323,7 +323,8 @@ public:
 	void BuildMatricesWithBoneMerge( const CStudioHdr *pStudioHdr, const QAngle& angles, 
 		const Vector& origin, const Vector pos[MAXSTUDIOBONES],
 		const Quaternion q[MAXSTUDIOBONES], matrix3x4_t bonetoworld[MAXSTUDIOBONES],
-		CBaseAnimating *pParent, CBoneCache *pParentCache );
+		// dimhotepus: Take into account bone mask for initialized quaternion and position.
+		CBaseAnimating *pParent, CBoneCache *pParentCache, int boneMask );
 
 	void	SetFadeDistance( float minFadeDist, float maxFadeDist );
 

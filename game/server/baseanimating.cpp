@@ -1722,7 +1722,9 @@ void CBaseAnimating::BuildMatricesWithBoneMerge(
 	const Quaternion q[MAXSTUDIOBONES],
 	matrix3x4_t bonetoworld[MAXSTUDIOBONES],
 	CBaseAnimating *pParent,
-	CBoneCache *pParentCache
+	CBoneCache *pParentCache,
+	// dimhotepus: Take into account bone mask for initialized quaternion and position.
+	int boneMask
 	)
 {
 	CStudioHdr *fhdr = pParent->GetModelPtr();
@@ -1748,17 +1750,27 @@ void CBaseAnimating::BuildMatricesWithBoneMerge(
 
 		if ( !merged )
 		{
-			// If we get down here, then the bone wasn't merged.
-			matrix3x4_t bonematrix;
-			QuaternionMatrix( q[i], pos[i], bonematrix );
+			// dimhotepus: Merge bone quaternion and position only if they were read by mask.
+			if ( pStudioHdr->pBone(i)->flags & boneMask )
+			{
+				// If we get down here, then the bone wasn't merged.
+				matrix3x4_t bonematrix;
+				QuaternionMatrix( q[i], pos[i], bonematrix );
 
-			if (pbones[i].parent == -1) 
+				if (pbones[i].parent == -1) 
+				{
+					ConcatTransforms (rotationmatrix, bonematrix, bonetoworld[i]);
+				} 
+				else 
+				{
+					ConcatTransforms (bonetoworld[pbones[i].parent], bonematrix, bonetoworld[i]);
+				}
+			}
+			else
 			{
-				ConcatTransforms (rotationmatrix, bonematrix, bonetoworld[i]);
-			} 
-			else 
-			{
-				ConcatTransforms (bonetoworld[pbones[i].parent], bonematrix, bonetoworld[i]);
+				// Having these uninitialized means that some bugs are very hard
+				// to reproduce. A memset of 0xFF is a simple way of getting NaNs.
+				memset( &bonetoworld[i], 0xFF, sizeof(bonetoworld[i]) );
 			}
 		}
 	}
@@ -1867,7 +1879,9 @@ void CBaseAnimating::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 				q, 
 				pBoneToWorld, 
 				pParent, 
-				pParentCache );
+				pParentCache,
+				// dimhotepus: Take into account bone mask for initialized quaternion and position.
+				boneMask );
 			
 			RemoveEFlags( EFL_SETTING_UP_BONES );
 			if (ai_setupbones_debug.GetBool())
