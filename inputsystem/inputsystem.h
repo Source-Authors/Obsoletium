@@ -301,7 +301,8 @@ public:
 	void ClearInputState();
 
 	// Called for mouse move events. Sets the current x and y and posts events for the mouse moving.
-	void UpdateMousePositionState( InputState_t &state, short x, short y );
+	// dimhotepus: short -> int to handle multiple monitors.
+	void UpdateMousePositionState( InputState_t &state, int x, int y );
 
 	// Initializes SteamControllers - Returns true if steam is running and finds controllers, otherwise false
 	bool InitializeSteamControllers( void );
@@ -376,6 +377,12 @@ public:
 
 	// Current action set
 	GameActionSet_t m_currentActionSet[STEAM_CONTROLLER_MAX_COUNT];
+
+	// dimhotepus: Double clicks handling for raw mouse input.
+#ifdef _WIN32
+	unsigned long long m_dblClickTime[MOUSE_COUNT];
+	const unsigned m_dblCurrentClickTime;
+#endif
 
 	unsigned long long m_StartupTimeTick;
 	int m_nLastPollTick;

@@ -42,6 +42,9 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CInputSystem, IInputSystem,
 // Constructor, destructor
 //-----------------------------------------------------------------------------
 CInputSystem::CInputSystem()
+#ifdef _WIN32
+	: m_dblCurrentClickTime{ GetDoubleClickTime() }
+#endif
 {
 #if defined(USE_SDL)
 	m_pLauncherMgr = nullptr;
@@ -52,6 +55,9 @@ CInputSystem::CInputSystem()
 	m_bPumpEnabled = true;
 	m_bIsPolling = false;
 	BitwiseClear( m_currentActionSet );
+#ifdef _WIN32
+	BitwiseClear( m_dblClickTime );
+#endif
 	m_StartupTimeTick = 0;
 	m_nLastPollTick = 0;
 	m_nLastSampleTick = 0;
@@ -785,7 +791,8 @@ void CInputSystem::PollInputState_Platform()
 
 				case CocoaEvent_MouseMove:
 				{
-					UpdateMousePositionState( state, (short)pEvent->m_MousePos[0], (short)pEvent->m_MousePos[1] );
+					// dimhotepus: short -> int to handle multiple monitors.
+					UpdateMousePositionState( state, (int)pEvent->m_MousePos[0], (int)pEvent->m_MousePos[1] );
 
 					InputEvent_t event;
 					memset( &event, 0, sizeof(event) );
@@ -1214,7 +1221,8 @@ void CInputSystem::SetCursorPosition( int x, int y )
 }
 
 
-void CInputSystem::UpdateMousePositionState( InputState_t &state, short x, short y )
+// dimhotepus: short -> int to handle multiple monitors.
+void CInputSystem::UpdateMousePositionState( InputState_t &state, int x, int y )
 {
 	int nOldX = state.m_pAnalogValue[ MOUSE_X ];
 	int nOldY = state.m_pAnalogValue[ MOUSE_Y ];
@@ -1508,9 +1516,6 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 						m_mouseRawAccumY += raw->data.mouse.lLastY;
 
 						// dimhotepus: Handle mouse buttons by raw input for performance.
-						static unsigned long long dblClickTime[MOUSE_COUNT];
-						static unsigned dblCurrentClickTime = GetDoubleClickTime();
-
 						const unsigned short mouseButtonFlags{raw->data.mouse.usButtonFlags};
 						int nButtonMask = 0;
 
@@ -1523,13 +1528,13 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 							nButtonMask |= ButtonMaskFromMouseWParam( MK_LBUTTON, MOUSE_LEFT, true );
 
 							const unsigned long long tick64 = GetTickCount64();
-							if ( tick64 < ( dblClickTime[0] + dblCurrentClickTime ) )
+							if ( tick64 < ( m_dblClickTime[0] + m_dblCurrentClickTime ) )
 							{
 								UpdateMouseButtonState( nButtonMask, MOUSE_LEFT );
 							}
 							else
 							{
-								dblClickTime[0] = tick64;
+								m_dblClickTime[0] = tick64;
 							}
 						}
 
@@ -1551,13 +1556,13 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 							nButtonMask |= ButtonMaskFromMouseWParam( MK_RBUTTON, MOUSE_RIGHT, true );
 
 							const unsigned long long tick64 = GetTickCount64();
-							if ( tick64 < ( dblClickTime[2] + dblCurrentClickTime ) )
+							if ( tick64 < ( m_dblClickTime[2] + m_dblCurrentClickTime ) )
 							{
 								UpdateMouseButtonState( nButtonMask, MOUSE_RIGHT );
 							}
 							else
 							{
-								dblClickTime[2] = tick64;
+								m_dblClickTime[2] = tick64;
 							}
 						}
 
@@ -1579,13 +1584,13 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 							nButtonMask |= ButtonMaskFromMouseWParam( MK_MBUTTON, MOUSE_MIDDLE, true );
 
 							const unsigned long long tick64 = GetTickCount64();
-							if ( tick64 < ( dblClickTime[1] + dblCurrentClickTime ) )
+							if ( tick64 < ( m_dblClickTime[1] + m_dblCurrentClickTime ) )
 							{
 								UpdateMouseButtonState( nButtonMask, MOUSE_MIDDLE );
 							}
 							else
 							{
-								dblClickTime[1] = tick64;
+								m_dblClickTime[1] = tick64;
 							}
 						}
 
@@ -1607,13 +1612,13 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 							nButtonMask |= ButtonMaskFromMouseWParam( MS_MK_BUTTON4, MOUSE_4, true );
 
 							const unsigned long long tick64 = GetTickCount64();
-							if ( tick64 < ( dblClickTime[4] + dblCurrentClickTime ) )
+							if ( tick64 < ( m_dblClickTime[4] + m_dblCurrentClickTime ) )
 							{
 								UpdateMouseButtonState( nButtonMask, MOUSE_4 );
 							}
 							else
 							{
-								dblClickTime[4] = tick64;
+								m_dblClickTime[4] = tick64;
 							}
 						}
 
@@ -1635,13 +1640,13 @@ LRESULT CInputSystem::WindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lP
 							nButtonMask |= ButtonMaskFromMouseWParam( MS_MK_BUTTON5, MOUSE_5, true );
 
 							const unsigned long long tick64 = GetTickCount64();
-							if ( tick64 < ( dblClickTime[5] + dblCurrentClickTime ) )
+							if ( tick64 < ( m_dblClickTime[5] + m_dblCurrentClickTime ) )
 							{
 								UpdateMouseButtonState( nButtonMask, MOUSE_5 );
 							}
 							else
 							{
-								dblClickTime[5] = tick64;
+								m_dblClickTime[5] = tick64;
 							}
 						}
 
