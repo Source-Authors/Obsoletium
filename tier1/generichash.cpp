@@ -29,10 +29,12 @@ unsigned FASTCALL HashStringCaseless( const char *pszKey )
 				odd  = 0,
 				n;
 
-	while ((n = toupper(*k++)) != 0)
+	// dimhotepus: toupper -> V_toupper.
+	while ((n = V_toupper(*k++)) != 0)
 	{
 		even = g_nRandomValues[odd ^ n];
-		if ((n = toupper(*k++)) != 0)
+		// dimhotepus: toupper -> V_toupper.
+		if ((n = V_toupper(*k++)) != 0)
 			odd = g_nRandomValues[even ^ n];
 		else
 			break;
