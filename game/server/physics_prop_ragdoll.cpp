@@ -837,7 +837,7 @@ void CRagdollProp::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 	MDLCACHE_CRITICAL_SECTION();
 	CStudioHdr *pStudioHdr = GetModelPtr( );
 	bool sim[MAXSTUDIOBONES];
-	memset( sim, 0, pStudioHdr->numbones() );
+	memset( sim, 0, sizeof(sim) );
 
 	int i;
 
