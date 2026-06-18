@@ -458,7 +458,7 @@ void CToolFrameworkInternal::LoadToolsFromLibrary( const char *dllname )
 {
 	char fixedDllName[ MAX_PATH ];
 	// dimhotepus: x86-64 support.
-	if ( ssize( PLATFORM_DIR ) > 0 && V_stristr( dllname, PLATFORM_DIR ) == nullptr )
+	if ( ssize( PLATFORM_DIR ) > 1 && V_stristr( dllname, PLATFORM_DIR ) == nullptr )
 	{
 		if ( V_strncmp( dllname, "tools", ssize( "tools" ) - 1 ) == 0 ) 
 		{

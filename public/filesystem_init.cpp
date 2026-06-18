@@ -383,7 +383,7 @@ static bool FileSystem_GetBaseDir( OUT_Z_ARRAY char (&baseDir)[max_size] )
 	{
 		V_StripFilename( baseDir );
 		// dimhotepus: Need to strip PLATFORM_DIR, too.
-		if constexpr ( ssize( PLATFORM_DIR ) > 0 )
+		if constexpr ( ssize( PLATFORM_DIR ) > 1 )
 			V_StripFilename( baseDir );
 		return true;
 	}
@@ -956,7 +956,7 @@ FSReturnCode_t FileSystem_SetBasePaths( IFileSystem *pFileSystem )
 
 	pFileSystem->AddSearchPath( executablePath, "EXECUTABLE_PATH" );
 	// dimhotepus: x86-64 support.
-	if constexpr ( ssize( PLATFORM_DIR ) > 0 )
+	if constexpr ( ssize( PLATFORM_DIR ) > 1 )
 	{
 		char baseBinFolder[MAX_PATH];
 		V_strcpy_safe( baseBinFolder, executablePath );

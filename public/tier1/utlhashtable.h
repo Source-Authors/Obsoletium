@@ -83,9 +83,11 @@ public:
 	enum
 	{
 		INT16_STORAGE = ( sizeof( KVPair ) <= 2 ),
-		INT32_STORAGE = ( sizeof( KVPair ) > 2 && sizeof( KVPair ) <= 4 ),
 #ifdef PLATFORM_64BITS
+		INT32_STORAGE = ( sizeof( KVPair ) > 2 && sizeof( KVPair ) <= 4 ),
 		INT64_STORAGE = ( sizeof( KVPair ) > 4 ),
+#else
+		INT32_STORAGE = ( sizeof( KVPair ) > 2 ),
 #endif
 	};
 	using storage_t =
