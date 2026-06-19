@@ -847,7 +847,13 @@ bool CUtlBuffer::CheckArbitraryPeekGet( intp nOffset, intp &nIncrement )
 
 	// NOTE: CheckPeekGet could modify TellMaxPut for streaming files
 	// We have to call TellMaxPut again here
-	CheckPeekGet( nOffset, nIncrement );
+	// dimhotepus: Check peek get succeeds.
+	if ( !CheckPeekGet( nOffset, nIncrement ) )
+	{
+		const intp nOldIncrement = std::exchange( nIncrement, 0 );
+		AssertMsg( false, "Unable to peek %zd bytes at offset %zd.", nOldIncrement, nOffset );
+		return false;
+	}
 	intp nMaxGet = TellMaxPut() - TellGet();
 	if ( nMaxGet < nIncrement )
 	{
