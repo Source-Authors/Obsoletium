@@ -522,7 +522,12 @@ static void AddSurfacepropFile( const char *pFileName, IPhysicsSurfaceProps *pPr
 		pFileSystem->ReadEx( buffer, nBufSize, len, file );
 		buffer[len] = 0;
 
-		pProps->ParseSurfaceData( pFileName, buffer );
+		// dimhotepus: Dump warning if no props in file.
+		const intp parsedPropsCount = pProps->ParseSurfaceData( pFileName, buffer );
+		if ( parsedPropsCount == 0 )
+		{
+			DevWarning( "No props in '%s', skipping...\n", pFileName );
+		}
 		// buffer is on the stack, no need to free
 	}
 	else

@@ -978,6 +978,7 @@ abstract_class IPhysicsSurfaceProps
 public:
 	virtual ~IPhysicsSurfaceProps( void ) {}
 
+	// dimhotepus: Breaking change. Return actual existing props count if file already parsed.
 	// parses a text file containing surface prop keys
 	[[nodiscard]] virtual intp		ParseSurfaceData( const char *pFilename, const char *pTextfile ) = 0;
 	// current number of entries in the database

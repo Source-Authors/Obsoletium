@@ -403,7 +403,8 @@ intp CPhysicsSurfaceProps::ParseSurfaceData( const char *pFileName, const char *
 {
 	if ( !AddFileToDatabase( pFileName ) )
 	{
-		return 0;
+		// dimhotepus: Breaking change. Return actual existing props count if file already parsed.
+		return m_props.Count();
 	}
 
 	const char *pText = pTextfile;
