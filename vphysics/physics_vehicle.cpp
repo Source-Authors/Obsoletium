@@ -1410,8 +1410,8 @@ void CVehicleController::WriteToTemplate( vphysics_save_cvehiclecontroller_t &co
 	controllerTemplate.m_bTraceData = m_bTraceData;
 	controllerTemplate.m_bOccupied = m_bOccupied;
 	controllerTemplate.m_bEngineDisable = m_bEngineDisable;
-	memcpy( &controllerTemplate.m_currentState, &m_currentState, sizeof(m_currentState) );
-	memcpy( &controllerTemplate.m_vehicleData, &m_vehicleData, sizeof(m_vehicleData) );
+	BitwiseClear( controllerTemplate.m_currentState );
+	BitwiseClear( controllerTemplate.m_vehicleData );
 	for (int i = 0; i < VEHICLE_MAX_WHEEL_COUNT; ++i )
 	{
 		controllerTemplate.m_pWheels[i] = m_pWheels[i];
