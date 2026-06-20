@@ -737,6 +737,8 @@ private:
 	IPhysicsCollisionEvent			*m_pCallback;
 	vcollisionevent_t				m_event;
 
+	// dimhotepus: Allow to configure max event friction pairs.
+	constexpr static inline	int		kMaxEventFrictionPairs = 16;
 };
 
 
@@ -769,7 +771,8 @@ void CPhysicsListenerCollision::event_friction_pair_created( IVP_Friction_Core_P
 	}
 	else
 	{
-		if ( m_pairList.Count() < 16 )
+		// dimhotepus: Inclusive max.
+		if ( m_pairList.Count() <= kMaxEventFrictionPairs )
 		{
 			m_pairList.Insert( test );
 		}
@@ -792,7 +795,8 @@ void CPhysicsListenerCollision::event_friction_pair_deleted( IVP_Friction_Core_P
 	}
 	else
 	{
-		if ( m_pairList.Count() < 16 )
+		// dimhotepus: Inclusive max.
+		if ( m_pairList.Count() <= kMaxEventFrictionPairs )
 		{
 			m_pairList.Insert( test );
 		}
