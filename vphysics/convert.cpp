@@ -337,11 +337,11 @@ static constexpr inline char axisMap[] = {0,2,1,3};
 
 int ConvertCoordinateAxisToIVP( int axisIndex )
 {
-	return axisIndex < 4 ? axisMap[axisIndex] : 0;
+  return axisIndex < ssize(axisMap) ? axisMap[axisIndex] : 0;
 }
 
 int ConvertCoordinateAxisToHL( int axisIndex )
 {
-	return axisIndex < 4 ? axisMap[axisIndex] : 0;
+  return axisIndex < ssize(axisMap) ? axisMap[axisIndex] : 0;
 }
 
