@@ -321,7 +321,7 @@ public:
 	// Gets the triangle's verts to an array
 	virtual void	GetTriangleVerts( int convexIndex, int triangleIndex, Vector *verts ) = 0;
 	
-	// UNDONE: This doesn't work!!!
+	// dimhotepus: Implemented SetTriangleVerts.
 	virtual void	SetTriangleVerts( int convexIndex, int triangleIndex, const Vector *verts ) = 0;
 	
 	// returns the 7-bit material index

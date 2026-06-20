@@ -1859,7 +1859,6 @@ void CCollisionQuery::GetTriangleVerts( int convexIndex, int triangleIndex, Vect
 	}
 }
 
-// UNDONE: This doesn't work!!!
 // dimhotepus: Implemented SetTriangleVerts.
 void CCollisionQuery::SetTriangleVerts( int convexIndex, int triangleIndex, const Vector *verts )
 {
