@@ -214,6 +214,7 @@ public:
 		if ( physenv )
 		{
 			physprerestoreparams_t params;
+			BitwiseClear(params);
 			params.recreatedObjectCount = 0;
 			physenv->PreRestore( params );
 		}
@@ -239,6 +240,7 @@ public:
 			if ( physenv )
 			{
 				physprerestoreparams_t params;
+				BitwiseClear(params);
 				params.recreatedObjectCount = 1;
 				params.recreatedObjectList[0].pNewObject = g_PhysWorldObject;
 				params.recreatedObjectList[0].pOldObject = m_blockHeader.pWorldObject;
