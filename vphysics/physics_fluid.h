@@ -19,7 +19,7 @@ class IVP_Liquid_Surface_Descriptor;
 class CPhysicsObject;
 class CPhysicsObject;
 
-class CPhysicsFluidController : public IPhysicsFluidController
+class CPhysicsFluidController final : public IPhysicsFluidController
 {
 public:
 	CPhysicsFluidController( CBuoyancyAttacher *pBuoy, IVP_Liquid_Surface_Descriptor *pLiquid, CPhysicsObject *pObject, int nContents );

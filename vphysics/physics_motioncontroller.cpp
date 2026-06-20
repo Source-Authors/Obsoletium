@@ -30,11 +30,11 @@ END_DATADESC()
 
 
 
-class CPhysicsMotionController : public IVP_Controller_Independent, public IPhysicsMotionController
+class CPhysicsMotionController final : public IVP_Controller_Independent, public IPhysicsMotionController
 {
 public:
 	CPhysicsMotionController( IMotionEvent *pHandler, CPhysicsEnvironment *pVEnv );
-	virtual ~CPhysicsMotionController( void );
+	~CPhysicsMotionController( void );
 
     void do_simulation_controller(IVP_Event_Sim *event,IVP_U_Vector<IVP_Core> *core_list) override;
     IVP_CONTROLLER_PRIORITY get_controller_priority() override;

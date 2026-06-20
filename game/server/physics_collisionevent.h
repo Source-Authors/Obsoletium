@@ -56,7 +56,7 @@ struct penetrateevent_t
 	int				collisionState;
 };
 
-class CCollisionEvent : public IPhysicsCollisionEvent, public IPhysicsCollisionSolver, public IPhysicsObjectEvent
+class CCollisionEvent final : public IPhysicsCollisionEvent, public IPhysicsCollisionSolver, public IPhysicsObjectEvent
 {
 public:
 	CCollisionEvent();

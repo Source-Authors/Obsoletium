@@ -1607,9 +1607,9 @@ IPhysicsConstraint *CRagdollConstraint::CreateConstraint( IPhysicsConstraintGrou
 
 
 
-class CPhysConstraintEvents : public IPhysicsConstraintEvent
+class CPhysConstraintEvents final : public IPhysicsConstraintEvent
 {
-	void ConstraintBroken( IPhysicsConstraint *pConstraint )
+	void ConstraintBroken( IPhysicsConstraint *pConstraint ) override
 	{
 		CBaseEntity *pEntity = (CBaseEntity *)pConstraint->GetGameData();
 		if ( pEntity )

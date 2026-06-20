@@ -114,7 +114,7 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: This is the main database of materials
 //-----------------------------------------------------------------------------
-class CPhysicsSurfaceProps : public IPhysicsSurfacePropsInternal
+class CPhysicsSurfaceProps final : public IPhysicsSurfacePropsInternal
 {
 public:
 	CPhysicsSurfaceProps( void );

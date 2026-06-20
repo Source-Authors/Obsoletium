@@ -1763,7 +1763,7 @@ bool CPhysicsCollision::GetBBoxCacheSize( size_t *pCachedSize, intp *pCachedCoun
 	return true;
 }
 
-class CCollisionQuery : public ICollisionQuery
+class CCollisionQuery final : public ICollisionQuery
 {
 public:
 	CCollisionQuery( CPhysCollide *pCollide );

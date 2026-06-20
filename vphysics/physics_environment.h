@@ -29,7 +29,7 @@ class IVPhysicsDebugOverlay;
 struct constraint_limitedhingeparams_t;
 struct vphysics_save_iphysicsobject_t;
 
-class CPhysicsEnvironment : public IPhysicsEnvironment
+class CPhysicsEnvironment final : public IPhysicsEnvironment
 {
 public:
 	CPhysicsEnvironment( void );

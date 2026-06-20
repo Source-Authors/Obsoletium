@@ -711,7 +711,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 //
 // Physics Game Trace
 //
-class CPhysicsGameTrace : public IPhysicsGameTrace
+class CPhysicsGameTrace final : public IPhysicsGameTrace
 {
 public:
 

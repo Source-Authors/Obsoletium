@@ -73,7 +73,7 @@ enum
 };
 
 
-class CPhysicsObject : public IPhysicsObject
+class CPhysicsObject final : public IPhysicsObject
 {
 public:
 	CPhysicsObject( void );

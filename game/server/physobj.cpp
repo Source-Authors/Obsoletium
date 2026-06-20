@@ -41,7 +41,7 @@ const char *GetMassEquivalent(float flMass);
 
 #define SF_SPRING_ONLYSTRETCH		0x0001
 
-class CPhysicsSpring : public CBaseEntity
+class CPhysicsSpring final : public CBaseEntity
 {
 	DECLARE_CLASS( CPhysicsSpring, CBaseEntity );
 public:

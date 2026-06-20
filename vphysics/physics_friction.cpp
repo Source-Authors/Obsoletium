@@ -18,7 +18,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-class CFrictionSnapshot : public IPhysicsFrictionSnapshot
+class CFrictionSnapshot final : public IPhysicsFrictionSnapshot
 {
 public:
 	CFrictionSnapshot( IVP_Real_Object *pObject );
