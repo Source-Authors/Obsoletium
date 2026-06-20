@@ -3447,8 +3447,11 @@ void CBaseFileSystem::FileTimeToString( OUT_Z_CAP(maxChars) char *pString, intp 
 	{
 		pString[ len - 1 ] = '\0';
 	}
-
-	pString[maxChars - 1] = '\0';
+	else
+	{
+		// dimhotepus: zero terminate if not already zero-terminated.
+		pString[ maxChars - 1 ] = '\0';
+	}
 }
 
 //-----------------------------------------------------------------------------
