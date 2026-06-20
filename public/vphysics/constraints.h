@@ -47,9 +47,9 @@ struct constraint_breakableparams_t
 
 	inline void Defaults()
 	{
+		strength = 1.0f;
 		forceLimit = 0.0f;
 		torqueLimit = 0.0f;
-		strength = 1.0f;
 		bodyMassScale[0] = 1.0f;
 		bodyMassScale[1] = 1.0f;
 		isActive = true;
@@ -111,7 +111,6 @@ struct constraint_ragdollparams_t
 	inline void Defaults()
 	{
 		constraint.Defaults();
-		isActive = true;
 		SetIdentityMatrix( constraintToReference );
 		SetIdentityMatrix( constraintToAttached );
 		parentIndex = -1;
@@ -120,6 +119,7 @@ struct constraint_ragdollparams_t
 		axes[1].Defaults();
 		axes[2].Defaults();
 		onlyAngularLimits = false;
+		isActive = true;
 		useClockwiseRotations = false;
 	}
 };
@@ -194,11 +194,12 @@ struct constraint_ballsocketparams_t
 {
 	Vector							constraintPosition[2];		// position of the constraint in each object's space 
 	constraint_breakableparams_t	constraint;
+
 	inline void Defaults()
 	{
-		constraint.Defaults();
 		constraintPosition[0].Init();
 		constraintPosition[1].Init();
+		constraint.Defaults();
 	}
 
 	void InitWithCurrentObjectState( IPhysicsObject *pRef, IPhysicsObject *pAttached, const Vector &ballsocketOrigin )
@@ -223,10 +224,10 @@ struct constraint_slidingparams_t
 	{
 		SetIdentityMatrix( attachedRefXform );
 		slideAxisRef.Init();
+		constraint.Defaults();
 		limitMin = limitMax = 0;
 		friction = 0;
 		velocity = 0;
-		constraint.Defaults();
 	}
 
 	inline void SetFriction( float inputFriction )
@@ -262,12 +263,12 @@ struct constraint_pulleyparams_t
 	inline void Defaults()
 	{
 		constraint.Defaults();
-		totalLength = 1.0;
-		gearRatio = 1.0;
 		pulleyPosition[0].Init();
 		pulleyPosition[1].Init();
 		objectPosition[0].Init();
 		objectPosition[1].Init();
+		totalLength = 1.0;
+		gearRatio = 1.0;
 		isRigid = false;
 	}
 };
