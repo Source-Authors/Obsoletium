@@ -1665,7 +1665,7 @@ static float GetFogMaxDensity( fogparams_t *pFogParams )
 }
 
 // dimhotepus: TF2 backport.
-static float GetFogRadial( fogparams_t *pFogParams )
+static bool GetFogRadial( fogparams_t *pFogParams )
 {
 	if ( cl_leveloverview.GetFloat() > 0 )
 		return false;
