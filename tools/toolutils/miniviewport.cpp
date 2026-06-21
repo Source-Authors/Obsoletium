@@ -119,6 +119,9 @@ CMiniViewportEngineRenderArea::CMiniViewportEngineRenderArea( Panel *parent, con
 CMiniViewportEngineRenderArea::~CMiniViewportEngineRenderArea()
 {
 	ShutdownSceneMaterials();
+
+	// dimhotepus: Do not leak texture.
+	vgui::surface()->DestroyTextureID( m_nEngineOutputTexture );
 }
 
 void CMiniViewportEngineRenderArea::RenderFrameBegin()
