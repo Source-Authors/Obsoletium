@@ -311,7 +311,7 @@ inline bool IsSpace( ButtonCode_t code )
 
 inline bool IsKeypad( ButtonCode_t code )
 {
-	// dimhotepus: Fix lower bound check.
+	// dimhotepus: Fix lower bound check. See https://github.com/ValveSoftware/source-sdk-2013/pull/1709
 	return ( code >= KEY_PAD_0 ) && ( code <= KEY_PAD_DECIMAL );
 }
 
