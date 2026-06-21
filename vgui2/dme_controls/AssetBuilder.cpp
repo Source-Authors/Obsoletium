@@ -65,6 +65,8 @@ private:
 	vgui::Label *m_pStatus;
 	CompileStatus_t m_Status;
 	int m_CompilingId;
+	// dimhotepus: Track we allocated texture or not.
+	bool m_CreatedCompilingId;
 };
 
 
@@ -81,15 +83,26 @@ CCompileStatusBar::CCompileStatusBar( vgui::Panel *pParent, const char *pPanelNa
 	SetStatus( NOT_COMPILING, "" );
 	SetPaintBackgroundEnabled( true );
 	m_CompilingId = vgui::surface()->DrawGetTextureId( "vgui/progressbar" );
+	// dimhotepus: Track we not allocated texture.
+	m_CreatedCompilingId = false;
 	if ( m_CompilingId == -1 ) // we didn't find it, so create a new one
 	{
 		m_CompilingId = vgui::surface()->CreateNewTextureID();
 		vgui::surface()->DrawSetTextureFile( m_CompilingId, "vgui/progressbar", true, false );
+		// dimhotepus: Track we allocated texture.
+		m_CreatedCompilingId = true;
 	}
 }
 
 CCompileStatusBar::~CCompileStatusBar()
 {
+	// dimhotepus: Do not leak texture.
+	if ( m_CreatedCompilingId && m_CompilingId != -1 ) // we didn't find it, so created a new one
+	{
+		vgui::surface()->DestroyTextureID( m_CompilingId );
+		m_CompilingId = -1;
+		m_CreatedCompilingId = false;
+	}
 }
 
 

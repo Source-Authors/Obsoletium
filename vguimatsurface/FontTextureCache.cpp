@@ -71,6 +71,18 @@ void CFontTextureCache::Clear()
 {
 	// remove all existing data
 	m_CharCache.RemoveAll();
+
+	// dimhotepus: Do not leak textures.
+	for ( auto &page : m_PageList )
+	{
+		for ( auto tid : page.textureID )
+		{
+			if ( tid != -1 )
+			{
+				g_MatSystemSurface.DestroyTextureID( tid );
+			}
+		}
+	}
 	m_PageList.RemoveAll();
 
 	// reinitialize
@@ -83,6 +95,20 @@ void CFontTextureCache::Clear()
 	for (int i = 0; i < FONT_PAGE_SIZE_COUNT; ++i)
 	{
 		m_pCurrPage[i] = -1;
+	}
+
+	// dimhotepus: Do not leak textures.
+	FOR_EACH_MAP_FAST( m_FontPages, i )
+	{
+		Page_t &page = m_FontPages[i];
+
+		for ( auto tid : page.textureID )
+		{
+			if ( tid != -1 )
+			{
+				g_MatSystemSurface.DestroyTextureID( tid );
+			}
+		}
 	}
 	m_FontPages.SetLessFunc( DefLessFunc( vgui::HFont ) );
 	m_FontPages.RemoveAll();
@@ -419,9 +445,9 @@ bool CFontTextureCache::AllocatePageForChar(int charWide, int charTall, intp &pa
 		Page_t &newPage = m_PageList[pageIndex];
 		m_pCurrPage[nPageType] = pageIndex;
 
-		for (int i = 0; i < vgui::FontDrawType_t::FONT_DRAW_TYPE_COUNT; ++i )
+		for ( auto &tid : newPage.textureID )
 		{
-			newPage.textureID[i] = g_MatSystemSurface.CreateNewTextureID( true );
+			tid = g_MatSystemSurface.CreateNewTextureID( true );
 		}
 
 		newPage.maxFontHeight = s_pFontPageSize[nPageType];

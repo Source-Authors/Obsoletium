@@ -41,9 +41,10 @@ CVTFPreviewPanel::CVTFPreviewPanel( vgui::Panel *pParent, const char *pName ) :
 
 CVTFPreviewPanel::~CVTFPreviewPanel()
 {
-	if ( vgui::surface() && m_nTextureID != -1 )
+	// dimhotepus: vgui::surface() -> MatSystemSurface() to match Create.
+	if ( m_nTextureID != -1 )
 	{
-		vgui::surface()->DestroyTextureID( m_nTextureID );
+		MatSystemSurface()->DestroyTextureID( m_nTextureID );
 		m_nTextureID = -1;
 	}
 }
@@ -72,7 +73,8 @@ void CVTFPreviewPanel::SetVTF( const char *pFullPath, bool bLoadImmediately )
 	}
 	pVMTKeyValues->SetInt( "$nocull", 1 );
 	pVMTKeyValues->SetInt( "$nodebug", 1 );
-	m_PreviewMaterial.Init( MaterialSystem()->CreateMaterial( pFullPath, pVMTKeyValues ));
+	// dimhotepus: Do not leak texture.
+	m_PreviewMaterial.Init( pFullPath, pVMTKeyValues );
 
 	MatSystemSurface()->DrawSetTextureMaterial( m_nTextureID, m_PreviewMaterial );
 

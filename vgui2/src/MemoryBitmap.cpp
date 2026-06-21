@@ -40,6 +40,12 @@ MemoryBitmap::MemoryBitmap(unsigned char *texture,int wide, int tall)
 //-----------------------------------------------------------------------------
 MemoryBitmap::~MemoryBitmap()
 {
+	// dimhotepus: Do not leak texture.
+	if (_id)
+	{
+		g_pSurface->DestroyTextureID( _id );
+		_id = 0;
+	}
 }
 
 //-----------------------------------------------------------------------------

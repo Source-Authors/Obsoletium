@@ -141,7 +141,8 @@ m_UpdateTooltip( this, &HTML::BrowserUpdateToolTip ),
 m_HideTooltip( this, &HTML::BrowserHideToolTip )
 #endif
 {
-	m_iHTMLTextureID = 0;
+	// dimhotepus: 0 -> -1.
+	m_iHTMLTextureID = -1;
 	m_bCanGoBack = false;
 	m_bCanGoForward = false;
 	m_bInFind = false;
@@ -239,6 +240,13 @@ HTML::~HTML()
 //		surface()->DeleteCursor( m_vecHCursor[i].m_Cursor );
 	}
 	m_vecHCursor.RemoveAll();
+
+	// dimhotepus: Do not leak texture.
+	if ( m_iHTMLTextureID != -1 )
+	{
+		surface()->DeleteTextureByID( m_iHTMLTextureID );
+		m_iHTMLTextureID = -1;
+	}
 }
 
 
@@ -268,7 +276,7 @@ void HTML::Paint()
 	//VPROF_BUDGET( "HTML::Paint()", VPROF_BUDGETGROUP_OTHER_VGUI );
 	BaseClass::Paint();
 
-	if ( m_iHTMLTextureID != 0 )
+	if ( m_iHTMLTextureID != -1 )
 	{
 		surface()->DrawSetTexture( m_iHTMLTextureID );
 		int tw = 0, tt = 0;
@@ -1249,23 +1257,23 @@ void HTML::CHTMLFindBar::OnCommand( const char *pchCmd )
 void HTML::BrowserNeedsPaint( HTML_NeedsPaint_t *pCallback )
 {
 	int tw = 0, tt = 0;
-	if ( m_iHTMLTextureID != 0 )
+	if ( m_iHTMLTextureID != -1 )
 	{
 		tw = m_allocedTextureWidth;
 		tt = m_allocedTextureHeight;
 	}
 
-	if ( m_iHTMLTextureID != 0 && ( ( _vbar->IsVisible() && pCallback->unScrollY > 0 && abs( (int)pCallback->unScrollY - m_scrollVertical.m_nScroll) > 5 ) || ( _hbar->IsVisible() && pCallback->unScrollX > 0 && abs( (int)pCallback->unScrollX - m_scrollHorizontal.m_nScroll ) > 5 ) ) )
+	if ( m_iHTMLTextureID != -1 && ( ( _vbar->IsVisible() && pCallback->unScrollY > 0 && abs( (int)pCallback->unScrollY - m_scrollVertical.m_nScroll) > 5 ) || ( _hbar->IsVisible() && pCallback->unScrollX > 0 && abs( (int)pCallback->unScrollX - m_scrollHorizontal.m_nScroll ) > 5 ) ) )
 	{
 		m_bNeedsFullTextureUpload = true;
 		return;
 	}
 
 	// update the vgui texture
-	if ( m_bNeedsFullTextureUpload || m_iHTMLTextureID == 0  || tw != (int)pCallback->unWide || tt != (int)pCallback->unTall )
+	if ( m_bNeedsFullTextureUpload || m_iHTMLTextureID == -1 || tw != (int)pCallback->unWide || tt != (int)pCallback->unTall )
 	{
 		m_bNeedsFullTextureUpload = false;
-		if ( m_iHTMLTextureID != 0 )
+		if ( m_iHTMLTextureID != -1 )
 			surface()->DeleteTextureByID( m_iHTMLTextureID );
 
 		// if the dimensions changed we also need to re-create the texture ID to support the overlay properly (it won't resize a texture on the fly, this is the only control that needs
