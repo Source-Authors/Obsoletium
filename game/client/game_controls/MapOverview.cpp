@@ -175,6 +175,17 @@ void CMapOverview::InitTeamColorsAndIcons()
 	Q_memset( m_TeamIcons, 0, sizeof(m_TeamIcons) );
 	Q_memset( m_TeamColors, 0, sizeof(m_TeamColors) );
 	Q_memset( m_ObjectIcons, 0, sizeof(m_ObjectIcons) );
+	
+	// dimhotepus: Do not leak textures.
+	FOR_EACH_DICT_FAST( m_TextureIDs, i )
+	{
+		int &tid = m_TextureIDs[i];
+		if ( tid != -1 )
+		{
+			surface()->DestroyTextureID( tid );
+			tid =-1;
+		}
+	}
 
 	m_TextureIDs.RemoveAll();
 }
@@ -183,7 +194,7 @@ int CMapOverview::AddIconTexture(const char *filename)
 {
 	int index = m_TextureIDs.Find( filename );
 
-    if ( m_TextureIDs.IsValidIndex( index ) )
+	if ( m_TextureIDs.IsValidIndex( index ) )
 	{
 		// already known, return texture ID
 		return m_TextureIDs.Element(index);
@@ -213,6 +224,22 @@ CMapOverview::~CMapOverview()
 	g_pMapOverview = NULL;
 
 	//TODO release Textures ? clear lists
+	// dimhotepus: Do not leak textures.
+	if ( m_nMapTextureID != -1 )
+		surface()->DestroyTextureID( m_nMapTextureID );
+
+	// dimhotepus: Do not leak textures.
+	FOR_EACH_DICT_FAST( m_TextureIDs, i )
+	{
+		int &tid = m_TextureIDs[i];
+		if ( tid != -1 )
+		{
+			surface()->DestroyTextureID( tid );
+			tid =-1;
+		}
+	}
+
+	m_TextureIDs.RemoveAll();
 }
 
 void CMapOverview::UpdatePlayers()
@@ -844,8 +871,12 @@ void CMapOverview::SetMap(const char * levelname)
 		m_fFullZoom = 1;
 		return;
 	}
-
-	// TODO release old texture ?
+	
+	// dimhotepus: Do not leak textures.
+	if ( m_nMapTextureID != 1 )
+	{
+		surface()->DestroyTextureID( m_nMapTextureID );
+	}
 
 	m_nMapTextureID = surface()->CreateNewTextureID();
 
