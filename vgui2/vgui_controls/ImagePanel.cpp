@@ -266,8 +266,8 @@ void ImagePanel::GetSettings(KeyValues *outResourceData)
 		outResourceData->SetString("border", GetBorder()->GetName());
 	}
 
-	// dimhotepus: Set position image.
-	outResourceData->SetInt("positionImage", m_bPositionImage );
+	// dimhotepus: Set position image. See https://github.com/ValveSoftware/source-sdk-2013/pull/1695
+	outResourceData->SetInt("positionImage", m_bPositionImage);
 	outResourceData->SetInt("scaleImage", m_bScaleImage);
 	outResourceData->SetFloat("scaleAmount", m_fScaleAmount);
 	outResourceData->SetInt("tileImage", m_bTileImage);
