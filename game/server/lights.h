@@ -13,9 +13,11 @@
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
+// raphaelit7: Do not network as all is in stringtable.
 class CLight : public CServerOnlyPointEntity
 {
 public:
+	// raphaelit7: Do not network as all is in stringtable.
 	DECLARE_CLASS( CLight, CServerOnlyPointEntity );
 
 	bool	KeyValue( const char *szKeyName, const char *szValue );
