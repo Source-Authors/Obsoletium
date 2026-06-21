@@ -4873,6 +4873,7 @@ void CSkyboxView::DrawInternal( view_id_t iSkyBoxViewID, bool bInvokePreAndPostR
 
 	render->BeginUpdateLightmaps();
 	// dimhotepus: Automatically compute view leaf instead of 1.
+	// dimhotepus: Fix maps with multiple 3d skyboxes rendering all of them at the same time
 	BuildWorldRenderLists( true, -1, true );
 	BuildRenderableRenderLists( iSkyBoxViewID );
 	render->EndUpdateLightmaps();
