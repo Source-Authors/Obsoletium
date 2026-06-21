@@ -204,6 +204,9 @@ struct CInterpolatedVarEntryBase
 
 	CInterpolatedVarEntryBase& operator=( const CInterpolatedVarEntryBase& src )
 	{
+		// dimhotepus: Protect against self-assignment.
+		if (&src == this) return *this;
+
 		delete[] value;
 		value = NULL;
 		count = 0;
