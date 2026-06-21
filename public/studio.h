@@ -3172,6 +3172,7 @@ inline void Studio_SetRootLOD( studiohdr_t *pStudioHdr, uint8_t rootLOD )
 	}
 
 	Assert( rootLOD >= 0 && rootLOD < MAX_NUM_LODS );
+	// dimhotepus: Correctly clamp root LOD.
 	rootLOD = Clamp( rootLOD, (uint8_t)0, (uint8_t)(MAX_NUM_LODS - 1) );
 
 	// run the lod fixups that culls higher detail lods
