@@ -15,6 +15,8 @@
 
 using namespace vgui;
 
+// dimhotepus: Add texture name counter.
+unsigned CProceduralTexturePanel::m_sTextureSerial = 0;
 
 //-----------------------------------------------------------------------------
 // constructor
@@ -22,10 +24,14 @@ using namespace vgui;
 CProceduralTexturePanel::CProceduralTexturePanel( vgui::Panel *pParent, const char *pName ) : BaseClass( pParent, pName )
 {
 	m_pImageBuffer = NULL;
-	m_bMaintainProportions = false;
-	m_bUsePaintRect = false;
+	m_nWidth = m_nHeight = -1;
 	m_PaintRect.x = m_PaintRect.y = 0;
 	m_PaintRect.width = m_PaintRect.height = 0;
+	m_TextureSubRect.x = m_TextureSubRect.y = 0;
+	m_TextureSubRect.width = m_TextureSubRect.height = 0;
+	m_nTextureID = -1;
+	m_bMaintainProportions = false;
+	m_bUsePaintRect = false;
 }
 
 CProceduralTexturePanel::~CProceduralTexturePanel()
@@ -50,8 +56,9 @@ bool CProceduralTexturePanel::Init( int nWidth, int nHeight, bool bAllocateImage
 	m_TextureSubRect.width = nWidth;
 	m_TextureSubRect.height = nHeight;
 
+	// dimhotepus: Use counter in name to make it unique.
 	char pTemp[512];
-	Q_snprintf( pTemp, 512, "__%s", GetName() );
+	V_sprintf_safe( pTemp, "__%s_%u", GetName(), m_sTextureSerial++ );
 
 	// dimhotepus: Do not leak materials for lookup view panel
 	m_ProceduralTexture.InitProceduralTexture( pTemp, TEXTURE_GROUP_VGUI,
@@ -63,8 +70,9 @@ bool CProceduralTexturePanel::Init( int nWidth, int nHeight, bool bAllocateImage
 	KeyValues *pVMTKeyValues = new KeyValues( "UnlitGeneric" );
 	pVMTKeyValues->SetString( "$basetexture", pTemp );
 	pVMTKeyValues->SetInt( "$nocull", 1 );
-	pVMTKeyValues->SetInt( "$nodebug", 1 );
-	m_ProceduralMaterial.Init( MaterialSystem()->CreateMaterial( pTemp, pVMTKeyValues ));
+	pVMTKeyValues->SetInt("$nodebug", 1);
+	// dimhotepus: Do not leak materials for lookup view panel
+	m_ProceduralMaterial.Init( pTemp, pVMTKeyValues );
 
 	m_nTextureID = MatSystemSurface()->CreateNewTextureID( false );
 	MatSystemSurface()->DrawSetTextureMaterial( m_nTextureID, m_ProceduralMaterial );
@@ -91,6 +99,13 @@ void CProceduralTexturePanel::MaintainProportions( bool bEnable )
 //-----------------------------------------------------------------------------
 void CProceduralTexturePanel::CleanUp()
 {
+	// dimhotepus: Do not leak texture.
+	if ( m_nTextureID != -1 )
+	{
+		MatSystemSurface()->DestroyTextureID( m_nTextureID );
+		m_nTextureID = -1;
+	}
+
 	if ( (ITexture*)m_ProceduralTexture )
 	{
 		m_ProceduralTexture->SetTextureRegenerator( NULL );

@@ -86,6 +86,9 @@ protected:
 	int m_nTextureID;
 	bool m_bMaintainProportions;
 	bool m_bUsePaintRect;
+
+	// dimhotepus: Add texture serial counter.
+	static unsigned m_sTextureSerial;
 };
 
 
