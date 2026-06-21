@@ -126,6 +126,7 @@ inline CParticleRenderIterator::CParticleRenderIterator()
 	m_pParticleDraw = nullptr;
 	m_pMeshBuilder = nullptr;
 	m_pMesh = nullptr;
+	m_bBucketSort = false;
 
 	m_MinZ = std::numeric_limits<decltype(m_MinZ)>::max();
 	m_MaxZ = std::numeric_limits<decltype(m_MaxZ)>::min();
@@ -214,7 +215,10 @@ inline ParticleDraw* CParticleRenderIterator::GetParticleDraw() const
 
 inline CParticleSimulateIterator::CParticleSimulateIterator()
 {
-	m_pNextParticle = NULL;
+	m_pEffectBinding = nullptr;
+	m_pNextParticle = nullptr;
+	m_pMaterial = nullptr;
+	m_flTimeDelta = 0.f;
 #ifdef _DEBUG
 	m_bGotFirst = false;
 #endif

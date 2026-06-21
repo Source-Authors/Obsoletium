@@ -57,7 +57,7 @@ private:
 
 inline ParticleDraw::ParticleDraw()
 {
-	m_pMaterial = 0;
+	Init( nullptr, nullptr, 0.0f );
 }
 
 inline void ParticleDraw::Init( CMeshBuilder *pMeshBuilder, IMaterial *pMaterial, float fTimeDelta )
