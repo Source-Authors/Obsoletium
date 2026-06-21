@@ -1433,7 +1433,7 @@ void CViewRender::ViewDrawScene( bool bDrew3dSkybox, SkyboxVisibility_t nSkyboxV
 }
 
 
-void CheckAndTransitionColor( float flPercent, float *pColor, float *pLerpToColor )
+static void CheckAndTransitionColor( float flPercent, float *pColor, float *pLerpToColor )
 {
 	if ( pLerpToColor[0] != pColor[0] || pLerpToColor[1] != pColor[1] || pLerpToColor[2] != pColor[2] )
 	{
