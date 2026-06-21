@@ -1447,12 +1447,6 @@ void CheckAndTransitionColor( float flPercent, float *pColor, float *pLerpToColo
 		pColor[1] = FLerp( pColor[1], flDestColor[1], flPercent );
 		pColor[2] = FLerp( pColor[2], flDestColor[2], flPercent );
 	}
-	else
-	{
-		pColor[0] = pLerpToColor[0];
-		pColor[1] = pLerpToColor[1];
-		pColor[2] = pLerpToColor[2];
-	}
 }
 
 static void GetFogColorTransition( fogparams_t *pFogParams, float *pColorPrimary, float *pColorSecondary )
