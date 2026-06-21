@@ -117,6 +117,7 @@ bool CColorCorrectionVolume::KeyValue( const char *szKeyName, const char *szValu
 {
 	if ( FStrEq( szKeyName, "filename" ) )
 	{
+		// dimhotepus: Can drop this as DEFINE_AUTO_ARRAY_KEYFIELD sends names now.
 		Q_strncpy( m_lookupFilename.GetForModify(), szValue, MAX_PATH );
 
 		return true;
