@@ -137,9 +137,6 @@ inline int CMouthInfo::GetIndexForSource( CAudioSource *source )
 	for ( int i = 0; i < m_nVoiceSources; i++ )
 	{
 		CVoiceData *v = &m_VoiceSources[ i ];
-		if ( !v )
-			continue;
-
 		if ( v->GetSource() == source )
 			return i;
 	}
