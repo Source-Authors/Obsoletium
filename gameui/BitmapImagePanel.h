@@ -17,8 +17,9 @@ class CBitmapImagePanel : public vgui::Panel
 {
 public:
 	CBitmapImagePanel( vgui::Panel *parent, char const *panelName, char const *filename = NULL );
+	~CBitmapImagePanel();
 
-	virtual void	PaintBackground();
+	void	PaintBackground() override;
 
 	virtual void	setTexture( char const *filename );
 

@@ -29,6 +29,16 @@ CBitmapImagePanel::CBitmapImagePanel( Panel *parent, char const *panelName,
 	}
 }
 
+CBitmapImagePanel::~CBitmapImagePanel()
+{
+	// dimhotepus: Do not leak texture id if any.
+	if ( m_nTextureId != -1 )
+	{
+		vgui::surface()->DestroyTextureID( m_nTextureId );
+		m_nTextureId = -1;
+	}
+}
+
 void CBitmapImagePanel::PaintBackground()
 {
 	if (!m_szTexture[0])
@@ -65,6 +75,8 @@ void CBitmapImagePanel::forceUpload()
 
 	m_bUploaded = true;
 
+	// dimhotepus: Ensure no leak of old texture.
+	Assert( m_nTextureId == -1 );
 	m_nTextureId = surface()->CreateNewTextureID();
 	surface()->DrawSetTextureFile( m_nTextureId, m_szTexture, false, true);
 }
