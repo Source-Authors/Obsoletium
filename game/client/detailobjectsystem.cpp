@@ -26,9 +26,10 @@
 #include <algorithm>
 #include "tier0/valve_minmax_on.h"
 
-#if defined(DOD_DLL) || defined(CSTRIKE_DLL)
+// dimhotepus: Enable detail shapes for all games.
+// #if defined(DOD_DLL) || defined(CSTRIKE_DLL)
 #define USE_DETAIL_SHAPES
-#endif
+// #endif
 
 #ifdef USE_DETAIL_SHAPES
 #include "engine/ivdebugoverlay.h"
@@ -51,10 +52,10 @@ struct model_t;
 ConVar cl_detaildist( "cl_detaildist", "1200", 0, "Distance at which detail props are no longer visible" );
 ConVar cl_detailfade( "cl_detailfade", "400", 0, "Distance across which detail props fade in" );
 #if defined( USE_DETAIL_SHAPES ) 
-ConVar cl_detail_max_sway( "cl_detail_max_sway", "0", FCVAR_ARCHIVE, "Amplitude of the detail prop sway" );
-ConVar cl_detail_avoid_radius( "cl_detail_avoid_radius", "0", FCVAR_ARCHIVE, "radius around detail sprite to avoid players" );
-ConVar cl_detail_avoid_force( "cl_detail_avoid_force", "0", FCVAR_ARCHIVE, "force with which to avoid players ( in units, percentage of the width of the detail sprite )" );
-ConVar cl_detail_avoid_recover_speed( "cl_detail_avoid_recover_speed", "0", FCVAR_ARCHIVE, "how fast to recover position after avoiding players" );
+ConVar cl_detail_max_sway( "cl_detail_max_sway", "5", FCVAR_ARCHIVE, "Amplitude of the detail prop sway" );
+ConVar cl_detail_avoid_radius( "cl_detail_avoid_radius", "64", FCVAR_ARCHIVE, "radius around detail sprite to avoid players" );
+ConVar cl_detail_avoid_force( "cl_detail_avoid_force", "0.4", FCVAR_ARCHIVE, "force with which to avoid players ( in units, percentage of the width of the detail sprite )" );
+ConVar cl_detail_avoid_recover_speed( "cl_detail_avoid_recover_speed", "0.25", FCVAR_ARCHIVE, "how fast to recover position after avoiding players" );
 #endif
 
 // Per detail instance information
@@ -534,7 +535,7 @@ bool CDetailModel::InitCommon( int index, const Vector& org, const QAngle& angle
 //-----------------------------------------------------------------------------
 
 // NOTE: If DetailPropType_t enum changes, change CDetailModel::QuadsToDraw
-static int s_pQuadCount[4] =
+static constexpr int s_pQuadCount[DETAIL_PROP_TYPE_SHAPE_TRI + 1] =
 {
 	0, //DETAIL_PROP_TYPE_MODEL
 	1, //DETAIL_PROP_TYPE_SPRITE

@@ -23,13 +23,12 @@ class CPlayerEnumerator : public IPartitionEnumerator
 public:
 	//Forced constructor
 	CPlayerEnumerator( float radius, Vector vecOrigin )
+		: m_flRadiusSquared{radius * radius}, m_vecOrigin{vecOrigin}
 	{
-		m_flRadiusSquared = radius * radius;
-		m_vecOrigin = vecOrigin;
 		m_Objects.RemoveAll();
 	}
 
-	int	GetObjectCount() { return m_Objects.Size(); }
+	intp	GetObjectCount() const { return m_Objects.Count(); }
 
 	C_BaseEntity *GetObject( int index )
 	{
@@ -40,10 +39,10 @@ public:
 	}
 
 	//Actual work code
-	virtual IterationRetval_t EnumElement( IHandleEntity *pHandleEntity )
+	IterationRetval_t EnumElement( IHandleEntity *pHandleEntity ) override
 	{
 		C_BaseEntity *pEnt = ClientEntityList().GetBaseEntityFromHandle( pHandleEntity->GetRefEHandle() );
-		if ( pEnt == NULL )
+		if ( pEnt == nullptr )
 			return ITERATION_CONTINUE;
 
 		if ( !pEnt->IsPlayer() )
@@ -53,8 +52,7 @@ public:
 		if ( deltaPos.LengthSqr() > m_flRadiusSquared )
 			return ITERATION_CONTINUE;
 
-		CHandle< C_BaseEntity > h;
-		h = pEnt;
+		CHandle< C_BaseEntity > h = pEnt;
 		m_Objects.AddToTail( h );
 
 		return ITERATION_CONTINUE;
@@ -62,8 +60,8 @@ public:
 
 public:
 	//Data members
-	float	m_flRadiusSquared;
-	Vector m_vecOrigin;
+	const float	m_flRadiusSquared;
+	const Vector m_vecOrigin;
 
 	CUtlVector< CHandle< C_BaseEntity > > m_Objects;
 };
