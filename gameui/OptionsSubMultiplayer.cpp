@@ -108,6 +108,7 @@ class CrosshairImagePanelSimple : public CrosshairImagePanelBase
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CrosshairImagePanelSimple, CrosshairImagePanelBase );
 public:
 	CrosshairImagePanelSimple( Panel *parent, const char *name, COptionsSubMultiplayer* pOptionsPanel );
+	~CrosshairImagePanelSimple();
 	void Paint() override;
 	void ResetData() override;
 	void ApplyChanges() override;
@@ -148,6 +149,15 @@ CrosshairImagePanelSimple::CrosshairImagePanelSimple( Panel *parent, const char 
 	InitCrosshairSizeList();
 	InitCrosshairColorEntries();
 	ResetData();
+}
+
+CrosshairImagePanelSimple::~CrosshairImagePanelSimple()
+{
+	// dimhotepus: Do not leak textures.
+	if ( m_iCrosshairTextureID != -1 )
+	{
+		vgui::surface()->CreateNewTextureID( m_iCrosshairTextureID );
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -393,6 +403,7 @@ class CrosshairImagePanelCS : public CrosshairImagePanelBase
 
 public:
 	CrosshairImagePanelCS( Panel *parent, const char *name, COptionsSubMultiplayer* pOptionsPanel );
+	~CrosshairImagePanelCS();
 	void ResetData() override;
 	void ApplyChanges() override;
 
@@ -469,6 +480,15 @@ CrosshairImagePanelCS::CrosshairImagePanelCS( Panel *parent, const char *name, C
 	vgui::surface()->DrawSetTextureFile( m_iCrosshairTextureID, "vgui/white_additive" , true, false);
 
 	ResetData();
+}
+
+CrosshairImagePanelCS::~CrosshairImagePanelCS()
+{
+	// dimhotepus: Do not leak textures.
+	if ( m_iCrosshairTextureID != -1 )
+	{
+		vgui::surface()->CreateNewTextureID( m_iCrosshairTextureID );
+	}
 }
 
 void CrosshairImagePanelCS::InitCrosshairColorEntries()
@@ -787,6 +807,12 @@ CrosshairImagePanelAdvanced::~CrosshairImagePanelAdvanced()
 	{
 		delete m_pAdvCrosshairMaterial;
 		m_pAdvCrosshairMaterial = NULL;
+	}
+	
+	// dimhotepus: Do not leak textures.
+	if ( m_iCrosshairTextureID != -1 )
+	{
+		vgui::surface()->CreateNewTextureID( m_iCrosshairTextureID );
 	}
 }
 
