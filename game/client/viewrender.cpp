@@ -3921,7 +3921,7 @@ static inline void DrawOpaqueRenderable( IClientRenderable *pEnt, bool bTwoPass,
 		view->SetCurrentlyDrawingEntity( pEnt->GetIClientUnknown()->GetBaseEntity() );
 		pEnt->DrawModel( flags );
 		view->SetCurrentlyDrawingEntity( NULL );
-		if( pRenderClipPlane && !materials->UsingFastClipping() )	
+		if( !materials->UsingFastClipping() )	
 			pRenderContext->PopCustomClipPlane();
 	}
 	else
@@ -4323,7 +4323,7 @@ static inline void DrawTranslucentRenderable( IClientRenderable *pEnt, bool twoP
 		pEnt->DrawModel( flags );
 		view->SetCurrentlyDrawingEntity( NULL );
 
-		if( pRenderClipPlane && !materials->UsingFastClipping() )	
+		if( !materials->UsingFastClipping() )	
 			pRenderContext->PopCustomClipPlane();
 	}
 	else
