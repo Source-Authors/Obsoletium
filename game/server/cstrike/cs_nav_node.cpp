@@ -136,7 +136,7 @@ void CSNavNode::Draw( void )
 	if ( (!m_isCovered && nav_show_node_id.GetBool()) || (m_isCovered && nav_show_node_id.GetInt() < 0) )
 	{
 		char text[16];
-		Q_snprintf( text, sizeof( text ), "%d", m_id );
+		V_to_chars( text, m_id );
 		NDebugOverlay::Text( m_pos, text, true, 0.1f );
 	}
 

@@ -172,7 +172,7 @@ void VoteBarPanel::FireGameEvent( IGameEvent *event )
 		for ( int index = 0; index < MAX_VOTE_OPTIONS; index++ )
 		{
 			char szOption[2];
-			Q_snprintf( szOption, sizeof( szOption ), "%i", index + 1 );
+			V_to_chars( szOption, index + 1 );
 
 			char szVoteOption[13] = "vote_option";
 			Q_strncat( szVoteOption, szOption, sizeof( szVoteOption ), COPY_ALL_CHARACTERS );
@@ -672,7 +672,7 @@ void CVoteSetupDialog::OnItemSelected( vgui::Panel *panel )
 						continue;
 
 					char szPlayerIndex[32];
-					Q_snprintf( szPlayerIndex, sizeof( szPlayerIndex ), "%d", playerIndex );
+					V_to_chars( szPlayerIndex, playerIndex );
 
 					KeyValues *pKeyValues = new KeyValues( szPlayerIndex );
 					pKeyValues->SetString( "Name", pPlayer->GetPlayerName() );
@@ -993,7 +993,7 @@ int	CHudVote::KeyInput( int down, ButtonCode_t keynum, const char *pszCurrentBin
 		return 1;
 
 	char szNumber[2];
-	Q_snprintf( szNumber, sizeof( szNumber ), "%i", nSlot );
+	V_to_chars( szNumber, nSlot );
 
 	char szOptionName[13] = "vote option";
 	Q_strncat( szOptionName, szNumber, sizeof( szOptionName ), COPY_ALL_CHARACTERS );
@@ -1039,7 +1039,7 @@ void CHudVote::MsgFunc_CallVoteFailed( bf_read &msg )
 	{
 		nTime /= 60;
 	}
-	Q_snprintf( szTime, sizeof ( szTime), "%i", nTime );
+	V_to_chars( szTime, nTime );
 	g_pVGuiLocalize->ConvertANSIToUnicode( szTime, wszTime, sizeof( wszTime ) );
 
 	wchar_t wszHeaderString[k_MAX_VOTE_NAME_LENGTH];
@@ -1347,7 +1347,7 @@ void CHudVote::MsgFunc_VoteStart( bf_read &msg )
 			{
 				// Construct Label name
 				char szOptionNum[2];
-				Q_snprintf( szOptionNum, sizeof( szOptionNum ), "%i", iIndex + 1 );
+				V_to_chars( szOptionNum, iIndex + 1 );
 
 				char szVoteOptionCount[13] = "LabelOption";
 				Q_strncat( szVoteOptionCount, szOptionNum, sizeof( szVoteOptionCount ), COPY_ALL_CHARACTERS );
@@ -1368,7 +1368,7 @@ void CHudVote::MsgFunc_VoteStart( bf_read &msg )
 
 				// Construct Label name
 				char szOptionNum[2];
-				Q_snprintf( szOptionNum, sizeof( szOptionNum ), "%i", iIndex + 1 );
+				V_to_chars( szOptionNum, iIndex + 1 );
 
 				char szVoteOptionCount[13] = "LabelOption";
 				Q_strncat( szVoteOptionCount, szOptionNum, sizeof( szVoteOptionCount ), COPY_ALL_CHARACTERS );
@@ -1665,7 +1665,7 @@ void CHudVote::FireGameEvent( IGameEvent *event )
 		for ( int index = 0; index < MAX_VOTE_OPTIONS; index++ )
 		{
 			char szOption[2];
-			Q_snprintf( szOption, sizeof( szOption ), "%i", index + 1 );
+			V_to_chars( szOption, index + 1 );
 
 			char szVoteOptionCount[13] = "vote_option";
 			Q_strncat( szVoteOptionCount, szOption, sizeof( szVoteOptionCount ), COPY_ALL_CHARACTERS );
@@ -1682,7 +1682,7 @@ void CHudVote::FireGameEvent( IGameEvent *event )
 		for ( int iIndex = 0; iIndex < m_nVoteChoicesCount; iIndex++ )
 		{
 			char szNumber[2];
-			Q_snprintf( szNumber, sizeof( szNumber ), "%i", iIndex + 1 );
+			V_to_chars( szNumber, iIndex + 1 );
 
 			char szOptionName[8] = "option";
 			Q_strncat( szOptionName, szNumber, sizeof( szOptionName ), COPY_ALL_CHARACTERS );
@@ -1778,10 +1778,10 @@ void CHudVote::OnThink()
 			if ( m_bIsYesNoVote && m_pVoteActive )
 			{
 				char szYesCount[k_MAX_VOTE_NAME_LENGTH] = "";
-				Q_snprintf( szYesCount, sizeof( szYesCount ), "%d", m_nVoteOptionCount[0] );
+				V_to_chars( szYesCount, m_nVoteOptionCount[0] );
 
 				char szNoCount[k_MAX_VOTE_NAME_LENGTH] = "";
-				Q_snprintf( szNoCount, sizeof( szNoCount ), "%d", m_nVoteOptionCount[1] );
+				V_to_chars( szNoCount, m_nVoteOptionCount[1] );
 
 				m_pVoteActive->SetControlString( "Option1CountLabel", szYesCount );
 				m_pVoteActive->SetControlString( "Option2CountLabel", szNoCount );

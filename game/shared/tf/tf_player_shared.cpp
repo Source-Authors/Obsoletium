@@ -8305,7 +8305,7 @@ void CTFPlayerShared::ProcessDisguiseImpulse( CTFPlayer *pPlayer )
 	if ( pPlayer->GetImpulse() > 200 )
 	{ 
 		char szImpulse[6];
-		Q_snprintf( szImpulse, sizeof( szImpulse ), "%d", pPlayer->GetImpulse() );
+		V_to_chars( szImpulse, pPlayer->GetImpulse() );
 
 		char szTeam[3];
 		Q_snprintf( szTeam, sizeof( szTeam ), "%c", szImpulse[1] );

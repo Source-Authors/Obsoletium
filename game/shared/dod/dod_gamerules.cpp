@@ -825,7 +825,7 @@ static CDODViewVectors g_DODViewVectors(
 					}
 					else
 					{
-						Q_snprintf( szMinutes, sizeof(szMinutes), "%d", iTimeLeft / 60 );
+						V_to_chars( szMinutes, iTimeLeft / 60 );
 						Q_snprintf( szSeconds, sizeof(szSeconds), "%02d", iTimeLeft % 60 );
 					}				
 

@@ -136,8 +136,8 @@ void CDODSpectatorGUI::UpdateTimer( void )
 			int mins = timer / 60;
 			int secs = timer % 60;
 
-			Q_snprintf( szMins, sizeof(szMins), "%d", mins );
-			Q_snprintf( szSecs, sizeof(szSecs), "%d", secs );
+			V_to_chars( szMins, mins );
+			V_to_chars( szSecs, secs );
 
 			wchar_t wMins[4], wSecs[4];
 			g_pVGuiLocalize->ConvertANSIToUnicode(szMins, wMins, sizeof(wMins));

@@ -1592,7 +1592,7 @@ void CCaptureFlag::Capture( CTFPlayer *pPlayer, int nCapturePoint )
 	else if ( m_nType == TF_FLAGTYPE_ATTACK_DEFEND )
 	{
 		char szNumber[64];
-		Q_snprintf( szNumber, sizeof(szNumber), "%d", nCapturePoint );
+		V_to_chars( szNumber, nCapturePoint );
 
 		for ( int iTeam = TF_TEAM_RED; iTeam < TF_TEAM_COUNT; ++iTeam )
 		{

@@ -286,7 +286,7 @@ void CLobbyPanel_MvM::SetMannUpTicketCount( int nCount )
 	m_pMannUpTicketImage->SetImage( nCount > 0 ? "pve/mvm_ticket_active" : "pve/mvm_ticket_inactive" );
 
 	char szCount[ 5 ];
-	V_snprintf( szCount, sizeof( szCount ), "%i", nCount );
+	V_to_chars( szCount, nCount );
 
 	m_MvMEconItemsGroupBox->SetDialogVariable( "ticket_count", szCount );
 }
@@ -294,7 +294,7 @@ void CLobbyPanel_MvM::SetMannUpTicketCount( int nCount )
 void CLobbyPanel_MvM::SetSquadSurplusCount( int nCount )
 {
 	char szCount[ 5 ];
-	V_snprintf( szCount, sizeof( szCount ), "%i", nCount );
+	V_to_chars( szCount, nCount );
 
 	m_MvMEconItemsGroupBox->SetDialogVariable( "voucher_count", szCount );
 }

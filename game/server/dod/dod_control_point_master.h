@@ -188,7 +188,7 @@ private:
 			else
 			{
 				char buf[8];
-				Q_snprintf( buf, sizeof(buf), "%d", points );
+				V_to_chars( buf, points );
 				UTIL_ClientPrintAll( HUD_PRINTTALK, "#game_score_allie_points", buf );
 			}
 

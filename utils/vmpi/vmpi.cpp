@@ -185,7 +185,7 @@ class CVMPIConnection final : public ITCPSocketHandler {
     m_bIsAService = false;
 
     char str[512];
-    Q_snprintf(str, sizeof(str), "%d", iConnection);
+    V_to_chars(str, iConnection);
     SetMachineName(str);
     m_JobWorkerID = 0xFFFFFFFF;
 

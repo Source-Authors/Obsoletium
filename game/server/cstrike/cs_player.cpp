@@ -3145,7 +3145,7 @@ bool CCSPlayer::CanPlayerBuy( bool display )
 		if ( display == true )
 		{
 			char strBuyTime[16];
-			Q_snprintf( strBuyTime, sizeof( strBuyTime ), "%d", buyTime );
+			V_to_chars( strBuyTime, buyTime );
 			ClientPrint( this, HUD_PRINTCENTER, "#Cant_buy", strBuyTime );
 		}
 
@@ -5810,7 +5810,7 @@ CON_COMMAND( timeleft, "prints the time remaining in the match" )
 		char minutes[8];
 		char seconds[8];
 
-		Q_snprintf( minutes, sizeof(minutes), "%d", iMinutes );
+		V_to_chars( minutes, iMinutes );
 		Q_snprintf( seconds, sizeof(seconds), "%2.2d", iSeconds );
 
 		if ( pPlayer )

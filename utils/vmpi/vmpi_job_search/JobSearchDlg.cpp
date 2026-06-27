@@ -220,7 +220,7 @@ void CJobSearchDlg::RepopulateJobsList()
 		m_JobsList.SetItemText( iItem, 3, timeStr );
 
 		char jobIDStr[512];
-		Q_snprintf( jobIDStr, sizeof( jobIDStr ), "%d", pInfo->m_JobID );
+		V_to_chars( jobIDStr, pInfo->m_JobID );
 		m_JobsList.SetItemText( iItem, 4, jobIDStr );
 	}
 	

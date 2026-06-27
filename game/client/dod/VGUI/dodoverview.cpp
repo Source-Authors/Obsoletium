@@ -178,7 +178,7 @@ void CDODMapOverview::UpdateCapturePoints()
 		if ( iBombs > 0 )
 		{
 			char text[8];
-			Q_snprintf( text, sizeof(text), "%d", iBombs );
+			V_to_chars( text, iBombs );
 			SetObjectText( objID, text, colorGreen );
 		}
 		//Draw the number of cappers below the icon

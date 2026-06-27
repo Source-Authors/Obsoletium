@@ -323,7 +323,7 @@ void CNPC_Hydra::RunAI( void )
 
 #if 0
 		char text[128];
-		Q_snprintf( text, sizeof( text ), "%d", i );
+		V_to_chars( text, i );
 		NDebugOverlay::Text( m_body[i].vecPos, text, false, 0.1 );
 #endif
 

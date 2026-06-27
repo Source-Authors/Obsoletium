@@ -905,7 +905,7 @@ void CStorePanel::UpsellStamps( void )
 	wchar_t *pwchMapName = g_pVGuiLocalize->Find( pUpsellMap->pszMapNameLocKey );
 
 	char szMapHours[ 8 ];
-	V_snprintf( szMapHours, sizeof( szMapHours ), "%i", nUpsellNumHours );
+	V_to_chars( szMapHours, nUpsellNumHours );
 
 	wchar_t wszMapHours[ 8 ];
 	g_pVGuiLocalize->ConvertANSIToUnicode( szMapHours, wszMapHours, sizeof( wszMapHours ) );

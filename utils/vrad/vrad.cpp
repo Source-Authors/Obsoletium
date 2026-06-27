@@ -1937,7 +1937,7 @@ void MakeAllScales (void)
 
 			// Draw the text.
 			char str[512];
-			Q_snprintf( str, sizeof( str ), "%d", i );
+			V_to_chars( str, i );
 
 			CTextParams params;
 

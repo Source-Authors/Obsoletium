@@ -737,7 +737,7 @@ PLUGIN_RESULT CEmptyServerPlugin::ClientCommand( edict_t *pEntity, const CComman
 		for( int i = 1; i < 9; i++ )
 		{
 			char num[10], msg[10], cmd[10];
-			Q_snprintf( num, sizeof(num), "%i", i );
+			V_to_chars( num, i );
 			Q_snprintf( msg, sizeof(msg), "Option %i", i );
 			Q_snprintf( cmd, sizeof(cmd), "option%i", i );
 

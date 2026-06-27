@@ -1507,7 +1507,7 @@ void CHudWeaponItemPanel::OnWeaponSelectionDrawn( CHudWeaponSelection *selection
 	int y = tall - m_flPriceYEndPos - fontHeight;
 
 	char text[ 32 ];
-	Q_snprintf( text, sizeof( text ), "%i", iCost );
+	V_to_chars( text, iCost );
 
 	// Compute pixels needed so we can right justify it
 	int pixels = 0;

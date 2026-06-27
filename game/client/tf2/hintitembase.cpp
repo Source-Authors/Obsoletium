@@ -388,13 +388,13 @@ void CHintItemBase::SetPosition( int x, int y )
 void CHintItemBase::SetItemNumber( int index )
 {
 /*
-m_nIndex = index;
+	m_nIndex = index;
 
-  char sz[ 32 ];
-  Q_snprintf( sz, sizeof( sz ), "%i", m_nIndex );
+	char sz[ 32 ];
+	V_to_chars( sz, m_nIndex );
   
 	m_pIndex->setText( sz );
-	*/
+*/
 }
 
 //-----------------------------------------------------------------------------

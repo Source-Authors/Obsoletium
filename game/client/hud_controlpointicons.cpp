@@ -601,7 +601,7 @@ void CControlPointIcon::OnTick( void )
 	}
 
 	char szTime[4];
-	Q_snprintf( szTime, sizeof( szTime ), "%d", nTime );
+	V_to_chars( szTime, nTime );
 	m_pCPTimerLabel->SetText( szTime );
 }
 

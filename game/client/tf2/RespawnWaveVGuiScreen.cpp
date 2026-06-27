@@ -89,12 +89,12 @@ void CRespawnWaveVGuiScreen::OnTick()
 	char buf[32];
 	if (m_pTime1RemainingLabel)
 	{
-		Q_snprintf( buf, sizeof( buf ), "%d", nTime1Remaining );
+		V_to_chars( buf, nTime1Remaining );
 		m_pTime1RemainingLabel->SetText( buf );
 	}
 	if (m_pTime2RemainingLabel)
 	{
-		Q_snprintf( buf, sizeof( buf ), "%d", nTime2Remaining );
+		V_to_chars( buf, nTime2Remaining );
 		m_pTime2RemainingLabel->SetText( buf );
 	}
 }

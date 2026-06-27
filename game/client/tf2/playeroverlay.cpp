@@ -272,7 +272,7 @@ void CHudPlayerOverlay::OnTick( )
 	if ( MapData().m_Players[ m_PlayerNum - 1 ].m_nSquadNumber != 0 )
 	{
 		char sz[ 32 ];
-		Q_snprintf( sz, sizeof( sz ), "%i", MapData().m_Players[ m_PlayerNum - 1 ].m_nSquadNumber );
+		V_to_chars( sz, MapData().m_Players[ m_PlayerNum - 1 ].m_nSquadNumber );
 
 		m_pSquad->SetSquad( sz );
 		m_pSquad->SetVisible( true );

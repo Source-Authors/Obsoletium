@@ -549,8 +549,7 @@ void CCSBaseBuyMenu::HandleBlackMarket( void )
 			if ( pLabel )
 			{
 				char wbuf[16];
-
-				Q_snprintf( wbuf, 16, "%d", CSGameRules()->m_pPrices->iCurrentPrice[iBargain] );
+				V_to_chars( wbuf, CSGameRules()->m_pPrices->iCurrentPrice[iBargain] );
 
 				pLabel->SetText( wbuf );
 			}

@@ -193,7 +193,7 @@ public:
 
 				char strPrice[16];
 				wchar_t szPrice[64];
-				Q_snprintf( strPrice, sizeof( strPrice ), "%d", m_iPreviousPrice );
+				V_to_chars( strPrice, m_iPreviousPrice );
 
 				g_pVGuiLocalize->ConvertANSIToUnicode( strPrice, szPrice, sizeof(szPrice));
 
@@ -215,7 +215,7 @@ public:
 
 				char strPrice[16];
 				wchar_t szPrice[64];
-				Q_snprintf( strPrice, sizeof( strPrice ), "%d", m_iPrice );
+				V_to_chars( strPrice, m_iPrice );
 
 				g_pVGuiLocalize->ConvertANSIToUnicode( strPrice, szPrice, sizeof(szPrice));
 
@@ -249,7 +249,7 @@ public:
 					pLabel->SetFgColor( Color( 192, 28, 0, 255 ) );
 				}
 
-				Q_snprintf( strPrice, sizeof( strPrice ), "%d", abs( iDifference ) );
+				V_to_chars( strPrice, abs( iDifference ) );
 
 				g_pVGuiLocalize->ConvertANSIToUnicode( strPrice, szPrice, sizeof(szPrice));
 

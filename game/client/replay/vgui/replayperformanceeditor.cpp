@@ -1662,7 +1662,7 @@ void CReplayPerformanceEditorPanel::OnTick()
 #elif defined( CSTRIKE_DLL )
 		// TODO - create and use class icons
 		char szText[16];
-		V_snprintf( szText, sizeof( szText ), "%i", nTeamCounts[ nCurTeam ] );
+		V_to_chars( szText, nTeamCounts[ nCurTeam ] );
 		pCell->SetText( szText );
 #endif
 

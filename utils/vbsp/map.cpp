@@ -1659,7 +1659,7 @@ ChunkFileResult_t CMapFile::LoadEntityCallback(CChunkFile *pFile, void* nParam)
 
 				// Remember the id for accessing the overlay
 				char buf[16];
-				Q_snprintf( buf, sizeof(buf), "%i", iAccessorID );
+				V_to_chars( buf, iAccessorID );
 				SetKeyValue( mapent, "OverlayID", buf );
 			}
 
@@ -2444,13 +2444,13 @@ void CMapFile::MergeEntities( entity_t *pInstanceEntity, CMapFile *Instance, Vec
 				vInNormal.z = FloatForKey( entity, "normal.z" );
 				VectorRotate( vInNormal, InstanceMatrix, vOutNormal );
 
-				Q_snprintf( temp, sizeof( temp ), "%f", vOutNormal.x );
+				V_to_chars( temp, vOutNormal.x );
 				SetKeyValue( entity, "normal.x", temp );
 
-				Q_snprintf( temp, sizeof( temp ), "%f", vOutNormal.y );
+				V_to_chars( temp, vOutNormal.y );
 				SetKeyValue( entity, "normal.y", temp );
 
-				Q_snprintf( temp, sizeof( temp ), "%f", vOutNormal.z );
+				V_to_chars( temp, vOutNormal.z );
 				SetKeyValue( entity, "normal.z", temp );*/
 			}
 		}

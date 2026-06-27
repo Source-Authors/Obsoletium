@@ -128,7 +128,7 @@ int CMatchStatsPage::AddSimpleStat( int desiredStat, const StatsCollection_t& pe
 	pKeyValues->SetFloat( "playerValue", 0 );
 
 	char buf[64];
-	Q_snprintf( buf, sizeof( buf ), "%d", personalMatchStats[stat.iStatId] );
+	V_to_chars( buf, personalMatchStats[stat.iStatId] );
 	pKeyValues->SetString( "playerValue", (personalMatchStats[stat.iStatId])?buf:"" );
 
 	if (desiredStat == CSSTAT_ROUNDS_WON)
@@ -136,13 +136,13 @@ int CMatchStatsPage::AddSimpleStat( int desiredStat, const StatsCollection_t& pe
 		C_Team *ts = GetGlobalTeam(TEAM_TERRORIST);
 		if (ts)
 		{
-			Q_snprintf( buf, sizeof( buf ), "%d", ts->Get_Score() );
+			V_to_chars( buf, ts->Get_Score() );
 			pKeyValues->SetString( "tValue", buf );
 		}
 
 		C_Team *cts = GetGlobalTeam(TEAM_CT);
 		if (cts){
-			Q_snprintf( buf, sizeof( buf ), "%d", cts->Get_Score());
+			V_to_chars( buf, cts->Get_Score());
 			pKeyValues->SetString( "ctValue", buf );
 		}
 	}

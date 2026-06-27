@@ -869,7 +869,7 @@ void CCSClientScoreBoardDialog::UpdateTeamPlayerDisplay( TeamDisplayInfo& teamDi
 
 				if ( playerDisplay.pScoreLabel != NULL )
 				{
-					Q_snprintf( tmpbuf, sizeof( tmpbuf ), "%d", pPlayerScore->frags);
+					V_to_chars( tmpbuf, pPlayerScore->frags);
 					playerDisplay.pScoreLabel->SetVisible( true );
 					playerDisplay.pScoreLabel->SetText( tmpbuf );
 					playerDisplay.pScoreLabel->SetBgColor( m_PlayerDataBgColor );
@@ -880,7 +880,7 @@ void CCSClientScoreBoardDialog::UpdateTeamPlayerDisplay( TeamDisplayInfo& teamDi
 
 				if ( playerDisplay.pDeathsLabel != NULL )
 				{
-					Q_snprintf( tmpbuf, sizeof( tmpbuf ), "%d", pPlayerScore->deaths);
+					V_to_chars( tmpbuf, pPlayerScore->deaths);
 					playerDisplay.pDeathsLabel->SetVisible( true );
 					playerDisplay.pDeathsLabel->SetText( tmpbuf );
 					playerDisplay.pDeathsLabel->SetBgColor( m_PlayerDataBgColor );
@@ -893,7 +893,7 @@ void CCSClientScoreBoardDialog::UpdateTeamPlayerDisplay( TeamDisplayInfo& teamDi
 				if ( playerDisplay.pPingLabel != NULL )
 				{
 					if ( pPlayerScore->ping >= 0 )
-						Q_snprintf( tmpbuf, sizeof( tmpbuf ), "%d", pPlayerScore->ping);
+						V_to_chars( tmpbuf, pPlayerScore->ping);
 					else
 						Q_strcpy( tmpbuf, "BOT");
 

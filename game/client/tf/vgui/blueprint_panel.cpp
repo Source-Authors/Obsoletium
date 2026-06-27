@@ -69,7 +69,7 @@ void CBlueprintPanel::SetObjectInfo( const CObjectInfo* pNewInfo )
 	{
 		if ( m_pObjectInfo )
 		{
-			V_snprintf( m_pszCost, sizeof( m_pszCost ), "%i", m_pObjectInfo->m_Cost );
+			V_to_chars( m_pszCost, m_pObjectInfo->m_Cost );
 			m_pItemCostLabel->SetText( m_pszCost );
 		}
 		m_pItemCostLabel->SetVisible( bVisible );

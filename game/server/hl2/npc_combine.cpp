@@ -1043,7 +1043,7 @@ void CNPC_Combine::RunTask( const Task_t *pTask )
 	if (m_iMySquadSlot != SQUAD_SLOT_NONE)
 	{
 	char text[64];
-	Q_snprintf( text, strlen( text ), "%d", m_iMySquadSlot );
+	V_to_chars( text, m_iMySquadSlot );
 
 	NDebugOverlay::Text( Center() + Vector( 0, 0, 72 ), text, false, 0.1 );
 	}

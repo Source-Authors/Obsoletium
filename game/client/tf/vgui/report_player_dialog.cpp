@@ -134,7 +134,7 @@ void CReportPlayerDialog::Activate()
 		}
 
 		char szPlayerIndex[32];
-		Q_snprintf( szPlayerIndex, sizeof( szPlayerIndex ), "%d", i );
+		V_to_chars( szPlayerIndex, i );
 
 		KeyValues *pData = new KeyValues( szPlayerIndex );
 		pData->SetString( "Name", pi.name );

@@ -144,7 +144,7 @@ int CLifetimeStatsPage::AddSimpleStat( int desiredStat, const StatsCollection_t&
 	pKeyValues->SetFloat( "playerValue", 0 );
 
 	char buf[64];
-	Q_snprintf( buf, sizeof( buf ), "%d", personalLifetimeStats[stat.iStatId] );
+	V_to_chars( buf, personalLifetimeStats[stat.iStatId] );
 	pKeyValues->SetString( "playerValue", (personalLifetimeStats[stat.iStatId])?buf:"" );
 
 	int newItem = m_statsList->AddItem(0, pKeyValues);

@@ -6536,7 +6536,7 @@ void CTFPlayer::HandleCommand_JoinClass( const char *pClassName, bool bAllowSpaw
 		if ( IsAlive() && !TFGameRules()->CanChangeClassInStalemate() )
 		{
 			char szTime[6];
-			Q_snprintf( szTime, sizeof( szTime ), "%d", tf_stalematechangeclasstime.GetInt() );
+			V_to_chars( szTime, tf_stalematechangeclasstime.GetInt() );
 	
 			ClientPrint( this, HUD_PRINTTALK, "#game_stalemate_cant_change_class", szTime );
 			return;

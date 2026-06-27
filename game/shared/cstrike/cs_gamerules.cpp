@@ -1430,7 +1430,7 @@ ConVar cl_autohelp(
 			if ( mp_autokick.GetBool() )
 			{
 				char strTeamKills[64];
-				Q_snprintf( strTeamKills, sizeof( strTeamKills ), "%d", pCSScorer->m_iTeamKills );
+				V_to_chars( strTeamKills, pCSScorer->m_iTeamKills );
 				ClientPrint( pCSScorer, HUD_PRINTCONSOLE, "#Game_teammate_kills", strTeamKills ); // this includes a " of 3" in it
 
 				if ( pCSScorer->m_iTeamKills >= 3 )
@@ -3661,7 +3661,7 @@ ConVar cl_autohelp(
 
 			// let the players know
 			char strRestartDelay[64];
-			Q_snprintf( strRestartDelay, sizeof( strRestartDelay ), "%d", iRestartDelay );
+			V_to_chars( strRestartDelay, iRestartDelay );
 			UTIL_ClientPrintAll( HUD_PRINTCENTER, "#Game_will_restart_in", strRestartDelay, iRestartDelay == 1 ? "SECOND" : "SECONDS" );
 			UTIL_ClientPrintAll( HUD_PRINTCONSOLE, "#Game_will_restart_in", strRestartDelay, iRestartDelay == 1 ? "SECOND" : "SECONDS" );
 

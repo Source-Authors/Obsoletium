@@ -454,7 +454,7 @@ void CDoDHudAmmo::PaintMGAmmo( CWeaponDODBase *pWpn )
 		pFullClip->DrawSelf( xpos, ypos, nIconWidth, nIconHeight, m_clrIcon );
 
 		char buf[16];
-		Q_snprintf( buf, sizeof(buf), "%d", m_iAmmo );
+		V_to_chars( buf, m_iAmmo );
 		DrawText( buf, xpos + nIconWidth - ( (float)nIconWidth / 3.0 ), ypos + nIconHeight - ( (float)nIconHeight / 3.0 ), m_clrTextColor );
 	}
 

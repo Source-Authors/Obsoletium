@@ -55,7 +55,7 @@ void ScratchPad_DrawFace( IScratchPad3D *pPad, dface_t *f, int iFaceNumber, cons
 	if ( iFaceNumber != -1 )
 	{
 		char str[64];
-		Q_snprintf( str, sizeof( str ), "%d", iFaceNumber );
+		V_to_chars( str, iFaceNumber );
 
 		CTextParams params;
 

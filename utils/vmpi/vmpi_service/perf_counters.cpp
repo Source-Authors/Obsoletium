@@ -278,7 +278,7 @@ void QueryPerformanceData(PERF_DATA_BLOCK **pPerfData, DWORD dwObjectIndex, DWOR
 	LONG lRes;
 
 	char keyName[32];
-	V_snprintf(keyName, sizeof(keyName), "%d",dwObjectIndex);
+	V_to_chars(keyName, dwObjectIndex);
 
 	memset( Buffer.Base(), 0, Buffer.Count() );
 	while( (lRes = RegQueryValueEx( HKEY_PERFORMANCE_DATA,

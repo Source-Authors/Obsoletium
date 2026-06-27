@@ -221,7 +221,7 @@ static void SaveToFile_R( KeyValues *pkv, IBaseFileSystem *pFileSystem, FileHand
 		case KeyValues::TYPE_INT:
 		{
 			char szTmpBuf[32] = {};
-			V_snprintf( szTmpBuf, sizeof( szTmpBuf ), "%d", pkv->GetInt() );
+			V_to_chars( szTmpBuf, pkv->GetInt() );
 			pFileSystem->Write( szTmpBuf, V_strlen( szTmpBuf ), hFile );
 			break;
 		}
@@ -239,8 +239,8 @@ static void SaveToFile_R( KeyValues *pkv, IBaseFileSystem *pFileSystem, FileHand
 		}
 		case KeyValues::TYPE_FLOAT:
 		{
-			char szTmpBuf[32] = {};
-			V_snprintf( szTmpBuf, sizeof( szTmpBuf ), "%f", pkv->GetFloat() );
+			char szTmpBuf[32];
+			V_to_chars( szTmpBuf, pkv->GetFloat() );
 			int nStrLen = V_strlen( szTmpBuf );
 			nStrLen = CleanFloatString( szTmpBuf );
 			pFileSystem->Write( szTmpBuf, nStrLen, hFile );
@@ -250,13 +250,13 @@ static void SaveToFile_R( KeyValues *pkv, IBaseFileSystem *pFileSystem, FileHand
 		{
 			char szTmpBuf[32] = {};
 			const Color c = pkv->GetColor();
-			V_snprintf( szTmpBuf, sizeof( szTmpBuf ), "%d", c.r() );
+			V_to_chars( szTmpBuf, c.r() );
 			pFileSystem->Write( " ", 1, hFile );
-			V_snprintf( szTmpBuf, sizeof( szTmpBuf ), "%d", c.g() );
+			V_to_chars( szTmpBuf, c.g() );
 			pFileSystem->Write( " ", 1, hFile );
-			V_snprintf( szTmpBuf, sizeof( szTmpBuf ), "%d", c.b() );
+			V_to_chars( szTmpBuf, c.b() );
 			pFileSystem->Write( " ", 1, hFile );
-			V_snprintf( szTmpBuf, sizeof( szTmpBuf ), "%d", c.a() );
+			V_to_chars( szTmpBuf, c.a() );
 			break;
 		}
 		default:

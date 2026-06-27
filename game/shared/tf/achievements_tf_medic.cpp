@@ -1542,7 +1542,7 @@ class CAchievementTFMedic_ChargeFriends : public CBaseTFAchievement
 					V_SplitString( tf_chargedfriends.GetString(), ":", vecChargedFriends );
 
 					char szTargetFriendsID[16];
-					Q_snprintf( szTargetFriendsID, sizeof(szTargetFriendsID), "%d", pi.friendsID );
+					V_to_chars( szTargetFriendsID, pi.friendsID );
 
 					bool bFound = false;
 
@@ -1584,7 +1584,7 @@ class CAchievementTFMedic_ChargeFriends : public CBaseTFAchievement
 
 						// write friends back to the convar
 						char buf[512];	// what is max size of 10 * steam ids?
-						Q_snprintf( buf, sizeof(buf), "%d", pi.friendsID );
+						V_to_chars( buf, pi.friendsID );
 
 						for ( int i=0;i<vecChargedFriends.Count();i++ )
 						{

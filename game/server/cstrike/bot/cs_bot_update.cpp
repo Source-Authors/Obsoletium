@@ -1069,7 +1069,7 @@ void CCSBot::DebugDisplay( void ) const
 			NDebugOverlay::Line( position, position + size * right, 255, 0, 0, true, 0.1f );
 			NDebugOverlay::Line( position, position + size * up, 0, 255, 0, true, 0.1f );
 
-			Q_snprintf( buffer, 16, "%d", i );
+			V_to_chars( buffer, i );
 			if (i == 12)
 			{
 				// in local bone space

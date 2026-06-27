@@ -1441,7 +1441,7 @@ const char *CTFStatsSummaryPanel::RenderValue( float flValue, TFStatType_t statT
 	else
 	{
 		// otherwise, render as an integer
-		Q_snprintf( szValue, ARRAYSIZE( szValue ), "%d", (int) flValue );
+		V_to_chars( szValue, (int) flValue );
 	}
 
 	return szValue;

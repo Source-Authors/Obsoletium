@@ -72,7 +72,7 @@ CON_COMMAND( buyequip, "Show equipment buy menu" )
 		else if( CSGameRules()->IsBuyTimeElapsed() )
 		{
 			char strBuyTime[16];
-			Q_snprintf( strBuyTime, sizeof( strBuyTime ), "%d", (int)CSGameRules()->GetBuyTimeLength() );
+			V_to_chars( strBuyTime, (int)CSGameRules()->GetBuyTimeLength() );
 			
 			wchar_t buffer[128];
 			wchar_t buytime[16];
@@ -110,7 +110,7 @@ CON_COMMAND( buymenu, "Show main buy menu" )
 		else if( CSGameRules()->IsBuyTimeElapsed() )
 		{
 			char strBuyTime[16];
-			Q_snprintf( strBuyTime, sizeof( strBuyTime ), "%d", (int)CSGameRules()->GetBuyTimeLength() );
+			V_to_chars( strBuyTime, (int)CSGameRules()->GetBuyTimeLength() );
 
 			wchar_t buffer[128];
 			wchar_t buytime[16];

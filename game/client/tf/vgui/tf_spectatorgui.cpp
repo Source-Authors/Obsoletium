@@ -421,7 +421,7 @@ void CTFSpectatorGUI::UpdateReinforcements( void )
 					int nCost = ( bNewMethod ) ? g_TF_PR->GetNumBuybackCredits( pPlayer->entindex() ) : iRespawnWait * MVM_BUYBACK_COST_PER_SEC;
 					const char *pszString = ( bNewMethod ) ? "#TF_PVE_Buyback_Fixed" : "#TF_PVE_Buyback";
 
-					Q_snprintf( szSecs, sizeof( szSecs ), "%d", nCost );
+					V_to_chars( szSecs, nCost );
 					g_pVGuiLocalize->ConvertANSIToUnicode( szSecs, wSecs, sizeof( wSecs ) );
 					g_pVGuiLocalize->ConstructString_safe( wLabel, g_pVGuiLocalize->Find( pszString ), 1, wSecs );
 
@@ -432,7 +432,7 @@ void CTFSpectatorGUI::UpdateReinforcements( void )
 				}
 			}
 
-			Q_snprintf( szSecs, sizeof(szSecs), "%d", iRespawnWait );
+			V_to_chars( szSecs, iRespawnWait );
 
 			g_pVGuiLocalize->ConvertANSIToUnicode(szSecs, wSecs, sizeof(wSecs));
 			g_pVGuiLocalize->ConstructString_safe( wLabel, g_pVGuiLocalize->Find("#game_respawntime_in_secs" ), 1, wSecs );

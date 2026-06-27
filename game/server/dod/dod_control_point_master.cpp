@@ -283,7 +283,7 @@ void CControlPointMaster::CPMThink( void )
 				else
 				{
 					char buf[8];
-					Q_snprintf( buf, sizeof(buf), "%d", AlliesPoints );
+					V_to_chars( buf, AlliesPoints );
 					UTIL_ClientPrintAll( HUD_PRINTTALK, "#game_score_allie_points", buf );
 				}
 
@@ -311,7 +311,7 @@ void CControlPointMaster::CPMThink( void )
 				else
 				{
 					char buf[8];
-					Q_snprintf( buf, sizeof(buf), "%d", AxisPoints );
+					V_to_chars( buf, AxisPoints );
 					UTIL_ClientPrintAll( HUD_PRINTTALK, "#game_score_axis_points", buf );
 				}
 			}

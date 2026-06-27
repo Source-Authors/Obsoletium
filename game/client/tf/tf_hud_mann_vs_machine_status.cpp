@@ -450,7 +450,7 @@ void CWaveStatusPanel::OnTick( void )
 		}
 		else if ( m_nMaxWaveCount == 0 )
 		{
-			V_snprintf( szbuf, sizeof(szbuf), "%d", m_nWaveCount );
+			V_to_chars( szbuf, m_nWaveCount );
 		}
 		else
 		{
