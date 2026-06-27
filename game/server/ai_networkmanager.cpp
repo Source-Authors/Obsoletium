@@ -577,7 +577,8 @@ void CAI_NetworkManager::LoadNetworkGraph( void )
 	{
 		DevWarning( "%s\n\n", buf.Base<const char>() );
 		Assert( 0 );
-		Error( "AI node graph %s is corrupt\n", szNrpFilename );
+		// dimhotepus: Dump problematic nodes count.
+		Error( "AI node graph %s is corrupt. Nodes count is %d.\n", szNrpFilename, numNodes );
 		return;
 	}
 	

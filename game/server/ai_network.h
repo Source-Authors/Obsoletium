@@ -33,7 +33,8 @@ class CAI_NetworkManager;
 //-----------------------------------------------------------------------------
 
 #define	AI_MAX_NODE_LINKS 30
-#define MAX_NODES 1500
+// dimhotepus: Bump 1500 -> 4096
+constexpr inline int MAX_NODES{4096};
 
 //-----------------------------------------------------------------------------
 // 
