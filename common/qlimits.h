@@ -20,13 +20,13 @@
 
 
 // Resource counts;
-#define MAX_MODEL_INDEX_BITS	12   // sent as a short
-#define	MAX_MODELS				(1<<MAX_MODEL_INDEX_BITS)
+constexpr inline int MAX_MODEL_INDEX_BITS{12};   // sent as a short
+constexpr inline int MAX_MODELS{1 << MAX_MODEL_INDEX_BITS};
 
-#define MAX_GENERIC_INDEX_BITS	9
-#define MAX_GENERIC				(1<<MAX_GENERIC_INDEX_BITS)
-#define MAX_DECAL_INDEX_BITS	9
-#define MAX_BASE_DECALS			(1<<MAX_DECAL_INDEX_BITS)
+constexpr inline int MAX_GENERIC_INDEX_BITS{9};
+constexpr inline int MAX_GENERIC{1 << MAX_GENERIC_INDEX_BITS};
+constexpr inline int MAX_DECAL_INDEX_BITS{9};
+constexpr inline int MAX_BASE_DECALS{1 << MAX_DECAL_INDEX_BITS};
 
 // Base width and height for display.
 constexpr inline int BASE_WIDTH{640};
