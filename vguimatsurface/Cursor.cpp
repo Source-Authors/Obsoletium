@@ -202,7 +202,7 @@ void Cursor_ClearUserCursors()
 //-----------------------------------------------------------------------------
 // Initializes all the textures for software cursors
 //-----------------------------------------------------------------------------
-int InitSoftwareCursorTexture( const char *pchFilename )
+static int InitSoftwareCursorTexture( const char *pchFilename )
 {
 	if( !pchFilename || !*pchFilename )
 		return -1;
