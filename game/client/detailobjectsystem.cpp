@@ -50,7 +50,12 @@ struct model_t;
 
 
 ConVar cl_detaildist( "cl_detaildist", "1200", 0, "Distance at which detail props are no longer visible" );
+// dimhotepus: Allow to force cl_detaildist even if map overrides it.
+ConVar cl_detaildist_force( "cl_detaildist_force", "0", 0, "Force override distance at which detail props are no longer visible even if map sets its own", true, 0, true, 1 );
 ConVar cl_detailfade( "cl_detailfade", "400", 0, "Distance across which detail props fade in" );
+// dimhotepus: Allow to force cl_detailfade even if map overrides it.
+ConVar cl_detailfade_force( "cl_detailfade_force", "0", 0, "Force override distance across which detail props fade in even if map sets its own", true, 0, true, 1 );
+
 #if defined( USE_DETAIL_SHAPES ) 
 ConVar cl_detail_max_sway( "cl_detail_max_sway", "5", FCVAR_ARCHIVE, "Amplitude of the detail prop sway" );
 ConVar cl_detail_avoid_radius( "cl_detail_avoid_radius", "64", FCVAR_ARCHIVE, "radius around detail sprite to avoid players" );
@@ -1530,8 +1535,10 @@ void CDetailObjectSystem::LevelInitPostEntity()
 
 	if ( GetDetailController() )
 	{
-		cl_detailfade.SetValue( MIN( m_flDefaultFadeStart, GetDetailController()->m_flFadeStartDist ) );
-		cl_detaildist.SetValue( MIN( m_flDefaultFadeEnd, GetDetailController()->m_flFadeEndDist ) );
+		// dimhotepus: Allow to force cl_detailfade even if map overrides it.
+		cl_detailfade.SetValue( !cl_detailfade_force.GetBool() ? MIN( m_flDefaultFadeStart, GetDetailController()->m_flFadeStartDist ) : m_flDefaultFadeStart );
+		// dimhotepus: Allow to force cl_detaildist even if map overrides it.
+		cl_detaildist.SetValue( !cl_detaildist_force.GetBool() ? MIN( m_flDefaultFadeEnd, GetDetailController()->m_flFadeEndDist ) : m_flDefaultFadeEnd );
 	}
 	else
 	{

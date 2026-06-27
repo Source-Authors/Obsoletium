@@ -1747,7 +1747,11 @@ static bool WasConVarSpecifiedOnCommandLine( const char *pConfigName )
 
 static const char *pConvarsAllowedInDXSupport[]={
 	"cl_detaildist",
+	// dimhotepus: Allow to force cl_detaildist even if map overrides it.
+	"cl_detaildist_force",
 	"cl_detailfade",
+	// dimhotepus: Allow to force cl_detailfade even if map overrides it.
+	"cl_detailfade_force",
 	"cl_ejectbrass",
 	"dsp_off",
 	"dsp_slow_cpu",
