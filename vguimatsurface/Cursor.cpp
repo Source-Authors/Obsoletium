@@ -535,8 +535,7 @@ void EnableSoftwareCursor( bool bEnable )
 	if( bEnable )
 		InitSoftwareCursors();
 
-	bool bWasEnabled = s_bSoftwareCursorActive;
-	s_bSoftwareCursorActive = bEnable;
+	const bool bWasEnabled = std::exchange( s_bSoftwareCursorActive, bEnable );
 
 	// set the cursor to the arrow (or none if appropriate) if we're activating the
 	// software cursor. VGUI will likely update it again soon, but this will give
