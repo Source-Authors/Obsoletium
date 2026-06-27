@@ -9,8 +9,8 @@
 #define QLIMITS_H
 
 // DATA STRUCTURE INFO
-
-#define MAX_NUM_ARGVS	50
+// dimhotepus: Unused, dropped
+// #define MAX_NUM_ARGVS	50
 
 // SYSTEM INFO
 #define	MAX_QPATH		96			// max length of a game pathname
