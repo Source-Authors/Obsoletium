@@ -48,11 +48,12 @@
 //-----------------------------------------------------------------------------
 struct model_t;
 
-
-ConVar cl_detaildist( "cl_detaildist", "1200", 0, "Distance at which detail props are no longer visible" );
+// dimhotepus: Bump default cl_detaildist 1200 -> 2000.
+ConVar cl_detaildist( "cl_detaildist", "2000", 0, "Distance at which detail props are no longer visible" );
 // dimhotepus: Allow to force cl_detaildist even if map overrides it.
 ConVar cl_detaildist_force( "cl_detaildist_force", "0", 0, "Force override distance at which detail props are no longer visible even if map sets its own", true, 0, true, 1 );
-ConVar cl_detailfade( "cl_detailfade", "400", 0, "Distance across which detail props fade in" );
+// dimhotepus: Bump default cl_detailfade 400 -> 200.
+ConVar cl_detailfade( "cl_detailfade", "200", 0, "Distance across which detail props fade in" );
 // dimhotepus: Allow to force cl_detailfade even if map overrides it.
 ConVar cl_detailfade_force( "cl_detailfade_force", "0", 0, "Force override distance across which detail props fade in even if map sets its own", true, 0, true, 1 );
 
