@@ -66,7 +66,8 @@ bool CHLTVClient::SendSignonData( void )
 	// check class table CRCs
 	if ( m_nSendtableCRC != SendTable_GetCRC() )
 	{
-		Disconnect( "Server uses different class tables" );
+		// dimhotepus: Dump more meaningful message.
+		Disconnect( "Server and client versions differ" );
 		return false;
 	}
 	else
