@@ -549,8 +549,8 @@ static WorldDecalHandle_t DecalToHandle( decal_t *pDecal )
 // Init the decal pool
 void R_DecalInit( void )
 {
-	g_nMaxDecals = Q_atoi( r_decals.GetDefault() );
-	g_nMaxDecals = MAX(64, g_nMaxDecals);
+	// dimhotepus: Use current r_decals value as upper bound instead of default one.
+	g_nMaxDecals = max( 64, r_decals.GetInt() );
 	Assert( g_DecalAllocator.Count() == 0 );
 	g_nDynamicDecals = 0;
 	g_nStaticDecals = 0;

@@ -74,7 +74,8 @@ static CEffectsClient s_EffectClient;
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CEffectsClient, IEffects, IEFFECTS_INTERFACE_VERSION, s_EffectClient);
 IEffects *g_pEffects = &s_EffectClient;
 
-ConVar r_decals( "r_decals", "2048" );
+// dimhotepus: Bump default 2048 -> 4096. Limit max decals to 8192.
+ConVar r_decals( "r_decals", "4096", 0, "Max decals count", true, 0, true, 8192 );
 
 //-----------------------------------------------------------------------------
 // constructor, destructor

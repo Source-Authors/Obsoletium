@@ -93,7 +93,8 @@ static CTextureReference g_ResolvedFullFrameDepth;
 void WorldStaticMeshCreate( void );
 void WorldStaticMeshDestroy( void );
 
-ConVar	r_decals( "r_decals", "2048" );
+// dimhotepus: Bump default 2048 -> 4096. Limit max decals to 8192.
+ConVar	r_decals( "r_decals", "4096", 0, "Max decals count", true, 0, true, 8192 );
 ConVar	mp_decals( "mp_decals","200", FCVAR_ARCHIVE);
 ConVar	r_lightmap( "r_lightmap", "-1", FCVAR_CHEAT | FCVAR_MATERIAL_SYSTEM_THREAD );
 ConVar	r_lightstyle( "r_lightstyle","-1", FCVAR_CHEAT | FCVAR_MATERIAL_SYSTEM_THREAD );
