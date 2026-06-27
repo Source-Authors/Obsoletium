@@ -440,6 +440,7 @@ thirdparty/**/out/
 
 # CMake
 out/
+build/
 CMakeFiles/
 
 # Shader compiler
