@@ -3865,7 +3865,7 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void MaterialFootstepSound( C_BaseAnimating *pEnt, bool bLeftFoot, float flVolume )
+static void MaterialFootstepSound( C_BaseAnimating *pEnt, bool bLeftFoot, float flVolume )
 {
 	trace_t tr;
 	Vector traceStart;
