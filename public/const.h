@@ -12,6 +12,16 @@
 #pragma once
 #endif
 
+// RaphaelIT7: log function for constexpr numbers - mainly used to figure out how many bits for networking are needed for a limit
+constexpr int RequiredBits(int v)
+{
+    int bits = 0;
+    while ((1 << bits) < v)
+        ++bits;
+
+    return bits;
+}
+
 // the command line param that tells the engine to use steam
 #define STEAM_PARM					"-steam"
 // the command line param to tell dedicated server to restart 
