@@ -2781,8 +2781,9 @@ static void PostThreadedBoneSetup()
 	mdlcache->EndLock();
 }
 
-static bool g_bInThreadedBoneSetup;
-static bool g_bDoThreadedBoneSetup;
+// dimhotepus: Mark atomic to fix UB due to data races.
+static std::atomic_bool g_bInThreadedBoneSetup;
+static std::atomic_bool g_bDoThreadedBoneSetup;
 
 void C_BaseAnimating::InitBoneSetupThreadPool()
 {
@@ -2794,17 +2795,17 @@ void C_BaseAnimating::ShutdownBoneSetupThreadPool()
 
 void C_BaseAnimating::ThreadedBoneSetup()
 {
-	g_bDoThreadedBoneSetup = cl_threaded_bone_setup.GetBool();
-	if ( g_bDoThreadedBoneSetup )
+	g_bDoThreadedBoneSetup.store( cl_threaded_bone_setup.GetBool() );
+	if ( g_bDoThreadedBoneSetup.load( std::memory_order_relaxed ) )
 	{
 		intp nCount = g_PreviousBoneSetups.Count();
 		if ( nCount > 1 )
 		{
-			g_bInThreadedBoneSetup = true;
+			g_bInThreadedBoneSetup.store( true, std::memory_order::memory_order_relaxed );
 
 			ParallelProcess( "C_BaseAnimating::ThreadedBoneSetup", g_PreviousBoneSetups.Base(), nCount, &SetupBonesOnBaseAnimating, &PreThreadedBoneSetup, &PostThreadedBoneSetup );
 
-			g_bInThreadedBoneSetup = false;
+			g_bInThreadedBoneSetup.store( false, std::memory_order::memory_order_relaxed );
 		}
 	}
 	g_iPreviousBoneCounter++;
@@ -2860,7 +2861,7 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 		boneMask |= BONE_USED_BY_ANYTHING;
 	}
 
-	if ( g_bInThreadedBoneSetup )
+	if ( g_bInThreadedBoneSetup.load( std::memory_order::memory_order_relaxed ) )
 	{
 		if ( !m_BoneSetupLock.TryLock() )
 		{
@@ -2884,7 +2885,7 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 
 	AUTO_LOCK( m_BoneSetupLock );
 
-	if ( g_bInThreadedBoneSetup )
+	if ( g_bInThreadedBoneSetup.load( std::memory_order::memory_order_relaxed ) )
 	{
 		m_BoneSetupLock.Unlock();
 	}
@@ -2912,7 +2913,11 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 	}
 
 	intp nBoneCount = m_CachedBoneData.Count();
-	if ( g_bDoThreadedBoneSetup && !g_bInThreadedBoneSetup && ( nBoneCount >= 16 ) && !GetMoveParent() && m_iMostRecentBoneSetupRequest != g_iPreviousBoneCounter )
+	if ( g_bDoThreadedBoneSetup.load( std::memory_order::memory_order_relaxed ) &&
+		!g_bInThreadedBoneSetup.load( std::memory_order::memory_order_relaxed ) &&
+		( nBoneCount >= 16 ) &&
+		!GetMoveParent() &&
+		m_iMostRecentBoneSetupRequest != g_iPreviousBoneCounter )
 	{
 		m_iMostRecentBoneSetupRequest = g_iPreviousBoneCounter;
 		Assert( g_PreviousBoneSetups.Find( this ) == -1 );
