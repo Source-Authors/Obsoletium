@@ -286,12 +286,18 @@ END_DATADESC()
 
 C_ClientRagdoll::C_ClientRagdoll( bool bRestoring )
 {
+	m_bFadeOut = false;
+	m_bImportant = false;
+	m_flEffectTime = 0.0f;
 	m_iCurrentFriction = 0;
+	m_iMinFriction = m_iMaxFriction = 0;
+	m_flFrictionModTime = m_flFrictionTime = 0.0f;
 	m_iFrictionAnimState = RAGDOLL_FRICTION_NONE;
 	m_bReleaseRagdoll = false;
-	m_bFadeOut = false;
 	m_bFadingOut = false;
-	m_bImportant = false;
+	BitwiseSet( m_flScaleEnd, 0 );
+	BitwiseSet( m_flScaleTimeStart, 0 );
+	BitwiseSet( m_flScaleTimeEnd, 0 );
 	m_bNoModelParticles = false;
 
 	SetClassname("client_ragdoll");
