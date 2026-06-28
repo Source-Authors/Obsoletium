@@ -28,8 +28,8 @@ public:
 	void SetOrder( int order );
 
 public:
-
-	bool IsActive( void );
+	// dimhotepus: Mark const.
+	[[nodiscard]] bool IsActive( void ) const;
 
 	CRangeCheckedVar<int, -1, 65535, 0>	m_nSequence;
 	CRangeCheckedVar<float, -2, 2, 0>	m_flPrevCycle;
@@ -39,8 +39,9 @@ public:
 	// used for automatic crossfades between sequence changes
 	CRangeCheckedVar<float, -50, 50, 1>		m_flPlaybackRate;
 	CRangeCheckedVar<float, -2, 2, 0>		m_flCycle;
-
-	float GetFadeout( float flCurTime );
+	
+	// dimhotepus: Mark const.
+	[[nodiscard]] float GetFadeout( float flCurTime ) const;
 
 	void BlendWeight();
 
@@ -81,11 +82,11 @@ inline void C_AnimationLayer::SetOrder( int order )
 	m_nOrder = order;
 }
 
-inline float C_AnimationLayer::GetFadeout( float flCurTime )
+inline float C_AnimationLayer::GetFadeout( float flCurTime ) const
 {
 	float s;
 
-    if (m_flLayerFadeOuttime <= 0.0f)
+	if (m_flLayerFadeOuttime <= 0.0f)
 	{
 		s = 0;
 	}

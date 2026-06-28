@@ -94,7 +94,7 @@ void VCollideWireframe_ChangeCallback( IConVar *pConVar, char const *pOldString,
 
 ConVar vcollide_wireframe( "vcollide_wireframe", "0", FCVAR_CHEAT, "Render physics collision models in wireframe", VCollideWireframe_ChangeCallback );
 
-bool C_AnimationLayer::IsActive( void )
+bool C_AnimationLayer::IsActive( void ) const
 {
 	return (m_nOrder != C_BaseAnimatingOverlay::MAX_OVERLAYS);
 }
