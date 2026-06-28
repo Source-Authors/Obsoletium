@@ -619,8 +619,7 @@ void C_ClientRagdoll::SetupWeights( const matrix3x4_t *pBoneToWorld, int nFlexWe
 		matrix3x4_t attToWorld;
 		if ( GetAttachment( m_iEyeAttachment, attToWorld ) )
 		{
-			Vector local, tmp;
-			local.Init( 1000.0f, 0.0f, 0.0f );
+			Vector local( 1000.0f, 0.0f, 0.0f ), tmp;
 			VectorTransform( local, attToWorld, tmp );
 			modelrender->SetViewTarget( GetModelPtr(), GetBody(), tmp );
 		}
