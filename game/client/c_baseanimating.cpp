@@ -5312,7 +5312,7 @@ float C_BaseAnimating::GetSequenceCycleRate( CStudioHdr *pStudioHdr, int iSequen
 
 float C_BaseAnimating::GetAnimTimeInterval( void ) const
 {
-#define MAX_ANIMTIME_INTERVAL 0.2f
+	constexpr float MAX_ANIMTIME_INTERVAL{0.2f};
 
 	float flInterval = MIN( gpGlobals->curtime - m_flAnimTime, MAX_ANIMTIME_INTERVAL );
 	return flInterval;
