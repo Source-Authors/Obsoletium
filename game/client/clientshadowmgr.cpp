@@ -92,7 +92,8 @@ static ConVar r_shadowrendertotexture( "r_shadowrendertotexture", "0" );
 static ConVar r_flashlight_version2( "r_flashlight_version2", "0", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY );
 
 ConVar r_flashlightdepthtexture( "r_flashlightdepthtexture", "1", FCVAR_ALLOWED_IN_COMPETITIVE );
-ConVar r_flashlightdepthres( "r_flashlightdepthres", "1024" );
+// dimhotepus: Increase default flashlight depth resolution 1024 -> 2048.
+ConVar r_flashlightdepthres( "r_flashlightdepthres", "2048", 0, "Depth texture resolution (NxN)", true, 128, false, 0 );
 
 ConVar r_threaded_client_shadow_manager( "r_threaded_client_shadow_manager", "0" );
 
