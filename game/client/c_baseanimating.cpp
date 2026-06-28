@@ -6332,7 +6332,7 @@ void C_BaseAnimating::DoMuzzleFlash()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void DevMsgRT( char const* pMsg, ... )
+void DevMsgRT( PRINTF_FORMAT_STRING char const* pMsg, ... )
 {
 	if (gpGlobals->frametime != 0.0f)
 	{

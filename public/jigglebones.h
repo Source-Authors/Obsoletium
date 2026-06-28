@@ -80,6 +80,6 @@ public:
 };
 
 
-extern void DevMsgRT( PRINTF_FORMAT_STRING char const* pMsg, ... );
+void DevMsgRT( PRINTF_FORMAT_STRING char const* pMsg, ... );
 
 #endif // C_BASEANIMATING_H
