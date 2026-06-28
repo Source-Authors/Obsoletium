@@ -372,12 +372,9 @@ void RecvProxy_LocalVelocity( const CRecvProxyData *pData, void *pStruct, void *
 {
 	CBaseEntity *pEnt = (CBaseEntity *)pStruct;
 
-	Vector vecVelocity;
+	auto& velocity = pData->m_Value.m_Vector;
+	Vector vecVelocity{velocity[0], velocity[1], velocity[2]};
 	
-	vecVelocity.x = pData->m_Value.m_Vector[0];
-	vecVelocity.y = pData->m_Value.m_Vector[1];
-	vecVelocity.z = pData->m_Value.m_Vector[2];
-
 	// SetLocalVelocity checks to see if the value has changed
 	pEnt->SetLocalVelocity( vecVelocity );
 }

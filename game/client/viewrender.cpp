@@ -2701,11 +2701,12 @@ bool DoesViewPlaneIntersectWater( float waterZ, int leafWaterDataID )
 
 	Vector mins, maxs;
 	ClearBounds( mins, maxs );
-	Vector testPoint[4];
-	testPoint[0].Init( -1.0f, -1.0f, 0.0f );
-	testPoint[1].Init( -1.0f, 1.0f, 0.0f );
-	testPoint[2].Init( 1.0f, -1.0f, 0.0f );
-	testPoint[3].Init( 1.0f, 1.0f, 0.0f );
+	Vector testPoint[4]{
+		Vector( -1.0f, -1.0f, 0.0f ),
+		Vector( -1.0f, 1.0f, 0.0f ),
+		Vector( 1.0f, -1.0f, 0.0f ),
+		Vector( 1.0f, 1.0f, 0.0f )
+	};
 	int i;
 	bool bAbove = false;
 	bool bBelow = false;
