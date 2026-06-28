@@ -47,7 +47,6 @@ inline void UpdateRefractTexture( int x, int y, int w, int h, bool bForceUpdate 
 
 	CMatRenderContextPtr pRenderContext( materials );
 	ITexture *pTexture = GetPowerOfTwoFrameBufferTexture();
-	if ( IsPC() || bForceUpdate || g_bAllowMultipleRefractUpdatesPerScenePerFrame || (gpGlobals->framecount != g_viewscene_refractUpdateFrame) )
 	{
 		// forced or only once per frame 
 		Rect_t rect;
