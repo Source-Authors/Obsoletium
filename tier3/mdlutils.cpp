@@ -244,8 +244,10 @@ void CMDL::Draw( const matrix3x4_t &rootToWorld )
 	studiohdr_t *pStudioHdr = g_pMDLCache->GetStudioHdr( m_MDLHandle );
 
 	matrix3x4_t *pBoneToWorld = g_pStudioRender->LockBoneMatrices( pStudioHdr->numbones );
-	SetUpBones( rootToWorld, pStudioHdr->numbones, pBoneToWorld );
-	g_pStudioRender->UnlockBoneMatrices();
+	{
+		RunCodeAtScopeExit( g_pStudioRender->UnlockBoneMatrices() );
+		SetUpBones( rootToWorld, pStudioHdr->numbones, pBoneToWorld );
+	}
 
 	Draw( rootToWorld, pBoneToWorld );
 }

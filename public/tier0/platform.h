@@ -1528,16 +1528,45 @@ private:
 };
 
 //--------------------------------------------------------------------------------------------------
+// RunCodeAtScopeExitOpt
+//
+// Example:
+//	if ( flag ) Lock();
+//	RunCodeAtScopeExitOpt( flag, Unlock() )
+//--------------------------------------------------------------------------------------------------
+template <typename LambdaType>
+class CScopeGuardLambdaImplOpt
+{
+public:
+	CScopeGuardLambdaImplOpt( bool do_invoke, LambdaType&& lambda )
+		: m_lambda( std::move( lambda ) ), m_do_invoke( do_invoke ) { }
+	~CScopeGuardLambdaImplOpt() { if ( m_do_invoke ) { m_lambda(); } }
+private:
+	LambdaType m_lambda;
+	const bool m_do_invoke;
+};
+
+//--------------------------------------------------------------------------------------------------
 template <typename LambdaType>
 CScopeGuardLambdaImpl< LambdaType > MakeScopeGuardLambda( LambdaType&& lambda )
 {
 	return CScopeGuardLambdaImpl< LambdaType >( std::move( lambda ) );
 }
 
+template <typename LambdaType>
+CScopeGuardLambdaImplOpt< LambdaType > MakeScopeGuardLambdaOpt( bool do_invoke, LambdaType&& lambda )
+{
+	return CScopeGuardLambdaImplOpt< LambdaType >( do_invoke, std::move( lambda ) );
+}
+
 //--------------------------------------------------------------------------------------------------
 #define RunLambdaAtScopeExit2( VarName, ... )		[[maybe_unused]] const auto VarName( MakeScopeGuardLambda( __VA_ARGS__ ) )
 #define RunLambdaAtScopeExit( ... )					RunLambdaAtScopeExit2( UNIQUE_ID, __VA_ARGS__ )
 #define RunCodeAtScopeExit( ... )					RunLambdaAtScopeExit( [&]() { __VA_ARGS__ ; } )
+
+#define RunLambdaAtScopeExit2Opt( VarName, do_invoke, ... )		[[maybe_unused]] const auto VarName( MakeScopeGuardLambdaOpt( do_invoke, __VA_ARGS__ ) )
+#define RunLambdaAtScopeExitOpt( do_invoke, ... )		RunLambdaAtScopeExit2Opt( UNIQUE_ID, do_invoke, __VA_ARGS__ )
+#define RunCodeAtScopeExitOpt( do_invoke, ... )			RunLambdaAtScopeExitOpt( do_invoke, [&]() { __VA_ARGS__ ; } )
 
 
 //

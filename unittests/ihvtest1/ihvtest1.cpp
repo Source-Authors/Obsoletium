@@ -788,6 +788,8 @@ matrix3x4_t* CIHVTestApp::SetUpBones( studiohdr_t *pStudioHdr, const matrix3x4_t
 	MatrixCopy( shapeToWorld, rootToWorld );
 
 	matrix3x4_t *pBoneToWorld = g_pStudioRender->LockBoneMatrices( studioHdr.numbones() );
+	RunCodeAtScopeExit( g_pStudioRender->UnlockBoneMatrices() );
+	
 	for ( int i = 0; i < studioHdr.numbones(); i++ ) 
 	{
 		// If it's not being used, fill with NAN for errors
@@ -817,7 +819,6 @@ matrix3x4_t* CIHVTestApp::SetUpBones( studiohdr_t *pStudioHdr, const matrix3x4_t
 			ConcatTransforms (pBoneToWorld[ studioHdr.pBone(i)->parent ], boneMatrix, pBoneToWorld[i] );
 		}
 	}
-	g_pStudioRender->UnlockBoneMatrices();
 	return pBoneToWorld;
 }
 

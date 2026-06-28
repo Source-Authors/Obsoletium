@@ -1013,8 +1013,10 @@ void CDmeTestMesh::Draw( const matrix3x4_t& shapeToWorld, CDmeDrawSettings *pDra
 //	info.m_LocalLightDescs;
 	
 	matrix3x4_t *pBoneToWorld = g_pStudioRender->LockBoneMatrices( info.m_pStudioHdr->numbones );
-	SetUpBones( pTransform, info.m_pStudioHdr->numbones, pBoneToWorld );
-	g_pStudioRender->UnlockBoneMatrices();
+	{
+		RunCodeAtScopeExit( g_pStudioRender->UnlockBoneMatrices() );
+		SetUpBones( pTransform, info.m_pStudioHdr->numbones, pBoneToWorld );
+	}
 
 	// Root transform
 	matrix3x4_t rootToWorld;

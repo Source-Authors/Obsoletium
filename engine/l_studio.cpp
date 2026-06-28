@@ -1844,10 +1844,11 @@ matrix3x4_t* CModelRender::SetupModelState( IClientRenderable *pRenderable )
 	// Set up skinning state
 	Assert ( pRenderable );
 	{
-		int nBoneCount = pStudioHdr->numbones;
-		pBoneMatrices = g_pStudioRender->LockBoneMatrices( pStudioHdr->numbones );
+		const int nBoneCount = pStudioHdr->numbones;
+		pBoneMatrices = g_pStudioRender->LockBoneMatrices( nBoneCount );
+		RunCodeAtScopeExit( g_pStudioRender->UnlockBoneMatrices() );
+
 		pRenderable->SetupBones( pBoneMatrices, nBoneCount, BONE_USED_BY_ANYTHING, cl.GetTime() ); // hack hack
-		g_pStudioRender->UnlockBoneMatrices();
 	}
 #endif
 
@@ -2396,18 +2397,15 @@ bool CModelRender::DrawModelSetup( ModelRenderInfo_t &pInfo, DrawModelState_t *p
 	}
 
 	int nBoneCount = state.m_pStudioHdr->numbones;
-	matrix3x4_t *pBoneToWorld = pCustomBoneToWorld;
-	if ( !pCustomBoneToWorld )
+	matrix3x4_t *pBoneToWorld = !pCustomBoneToWorld
+		? g_pStudioRender->LockBoneMatrices( nBoneCount )
+		: pCustomBoneToWorld;
 	{
-		pBoneToWorld = g_pStudioRender->LockBoneMatrices( nBoneCount );
+		RunCodeAtScopeExitOpt( !pCustomBoneToWorld, g_pStudioRender->UnlockBoneMatrices() );
+		const bool bOk = pInfo.pRenderable->SetupBones( pBoneToWorld, nBoneCount, boneMask, cl.GetTime() );
+		if ( !bOk )
+			return false;
 	}
-	const bool bOk = pInfo.pRenderable->SetupBones( pBoneToWorld, nBoneCount, boneMask, cl.GetTime() );
-	if ( !pCustomBoneToWorld )
-	{
-		g_pStudioRender->UnlockBoneMatrices();
-	}
-	if ( !bOk )
-		return false;
 
 	*ppBoneToWorldOut = pBoneToWorld;
 
@@ -3237,15 +3235,16 @@ matrix3x4_t* CModelRender::DrawModelShadowSetup( IClientRenderable *pRenderable,
 		info.m_Lod = info.m_pHardwareData->m_RootLOD;
 	}
 
-	matrix3x4_t *pBoneToWorld = pCustomBoneToWorld;
-	if ( !pBoneToWorld )
+	matrix3x4_t *pBoneToWorld = !pCustomBoneToWorld
+		? g_pStudioRender->LockBoneMatrices( info.m_pStudioHdr->numbones )
+		: pCustomBoneToWorld;
 	{
-		pBoneToWorld = g_pStudioRender->LockBoneMatrices( info.m_pStudioHdr->numbones );
+		// dimhotepus: Unlock only if locked.
+		RunCodeAtScopeExitOpt( !pCustomBoneToWorld, g_pStudioRender->UnlockBoneMatrices() );
+		const bool bOk = pRenderable->SetupBones( pBoneToWorld, info.m_pStudioHdr->numbones, BONE_USED_BY_VERTEX_AT_LOD(info.m_Lod), cl.GetTime() );
+		if ( !bOk )
+			return NULL;
 	}
-	const bool bOk = pRenderable->SetupBones( pBoneToWorld, info.m_pStudioHdr->numbones, BONE_USED_BY_VERTEX_AT_LOD(info.m_Lod), cl.GetTime() );
-	g_pStudioRender->UnlockBoneMatrices();
-	if ( !bOk )
-		return NULL;
 	return pBoneToWorld;
 #else
 	return NULL;

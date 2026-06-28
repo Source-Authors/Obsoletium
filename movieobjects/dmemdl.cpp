@@ -170,8 +170,10 @@ void CDmeMDL::Draw( const matrix3x4_t &shapeToWorld, CDmeDrawSettings *pDrawSett
 	}
 
 	matrix3x4_t *pBoneToWorld = g_pStudioRender->LockBoneMatrices( pStudioHdr->numbones );
-	SetUpBones( shapeToWorld, pStudioHdr->numbones, pBoneToWorld );
-	g_pStudioRender->UnlockBoneMatrices();
+	{
+		RunCodeAtScopeExit( g_pStudioRender->UnlockBoneMatrices() );
+		SetUpBones( shapeToWorld, pStudioHdr->numbones, pBoneToWorld );
+	}
 
 	m_MDL.Draw( shapeToWorld, pBoneToWorld );
 

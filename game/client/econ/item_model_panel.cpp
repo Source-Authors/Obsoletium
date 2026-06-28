@@ -1289,22 +1289,25 @@ void CEmbeddedItemModelPanel::RenderingRootModel( IMatRenderContext *pRenderCont
 		matrix3x4_t matIdentity;
 		SetIdentityMatrix( matIdentity );
 
-		matrix3x4_t *pBoneToWorld = g_pStudioRender->LockBoneMatrices( pItemStudioHdr->numbones );
-		m_ItemModel.m_MDL.SetUpBones( matIdentity, pItemStudioHdr->numbones, pBoneToWorld );
-
-		// Get attachment transform
-		mstudioattachment_t attach = pItemStudioHdr->pAttachment( m_iPedestalAttachment );
 		matrix3x4_t matLocalToWorld;
 		matrix3x4_t matWorldToLocal;
 		matrix3x4_t matTransform;
 
-		ConcatTransforms( pBoneToWorld[ attach.localbone ], attach.local, matLocalToWorld );
-		MatrixInvert( matLocalToWorld, matWorldToLocal );
-		ConcatTransforms( m_RootMDL.m_MDLToWorld, matWorldToLocal, matTransform );
+		matrix3x4_t *pBoneToWorld = g_pStudioRender->LockBoneMatrices( pItemStudioHdr->numbones );
+		{
+			RunCodeAtScopeExit( g_pStudioRender->UnlockBoneMatrices() );
 
-		m_ItemModel.m_MDL.SetUpBones( matTransform, pItemStudioHdr->numbones, pBoneToWorld );
+			m_ItemModel.m_MDL.SetUpBones( matIdentity, pItemStudioHdr->numbones, pBoneToWorld );
 
-		g_pStudioRender->UnlockBoneMatrices();
+			// Get attachment transform
+			mstudioattachment_t attach = pItemStudioHdr->pAttachment( m_iPedestalAttachment );
+
+			ConcatTransforms( pBoneToWorld[ attach.localbone ], attach.local, matLocalToWorld );
+			MatrixInvert( matLocalToWorld, matWorldToLocal );
+			ConcatTransforms( m_RootMDL.m_MDLToWorld, matWorldToLocal, matTransform );
+
+			m_ItemModel.m_MDL.SetUpBones( matTransform, pItemStudioHdr->numbones, pBoneToWorld );
+		}
 
 		IMaterial* pOverrideMaterial = GetOverrideMaterial( m_ItemModel.m_MDL.GetMDL() );
 		if ( pOverrideMaterial != NULL )
