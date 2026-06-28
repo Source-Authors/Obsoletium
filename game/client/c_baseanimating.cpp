@@ -667,7 +667,7 @@ class C_BaseAnimatingGameSystem : public CAutoGameSystem
 		g_iPreviousBoneCounter = (unsigned)-1;
 		if ( g_PreviousBoneSetups.Count() != 0 )
 		{
-			Msg( "%d entities in bone setup array. Should have been cleaned up by now\n", g_PreviousBoneSetups.Count() );
+			Msg( "%zd entities in bone setup array. Should have been cleaned up by now\n", g_PreviousBoneSetups.Count() );
 			g_PreviousBoneSetups.RemoveAll();
 		}
 	}
