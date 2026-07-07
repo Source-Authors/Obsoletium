@@ -57,19 +57,21 @@ extern IVideoServices *g_pVideo;
 extern ConVar snd_refdb;
 extern ConVar snd_refdist;
 
-inline float SNDLVL_TO_DIST_MULT( soundlevel_t sndlvl )
+[[nodiscard]]
+static inline float SNDLVL_TO_DIST_MULT( soundlevel_t sndlvl )
 {
   return sndlvl != SNDLVL_NONE
 		? powf( 10.0f, ( snd_refdb.GetFloat() - static_cast<float>( sndlvl ) ) / 20 ) / snd_refdist.GetFloat()
 		: 0;
 }
 
-inline soundlevel_t DIST_MULT_TO_SNDLVL( float dist_mult )
+[[nodiscard]]
+static inline soundlevel_t DIST_MULT_TO_SNDLVL( float dist_mult )
 {
 	// dimhotepus: Rewrite and simplify to match SNDLVL_TO_DIST_MULT.
-	return (soundlevel_t)(int)( dist_mult
+	return static_cast<soundlevel_t>( static_cast<int>( dist_mult
 		? snd_refdb.GetFloat() - log10f( dist_mult * snd_refdist.GetFloat() ) * 20
-		: 0 );
+		: 0 ) );
 }
 
 extern ConVar dsp_spatial;
