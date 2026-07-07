@@ -91,8 +91,8 @@ public:
 	{
 		m_deleteQuick = bQuick;
 	}
-	[[nodiscard]] virtual bool ShouldQuickDelete() const { return m_deleteQuick; }
-	virtual void TraceBox( trace_t *ptr, const Vector &mins, const Vector &maxs, const Vector &start, const Vector &end );
+	[[nodiscard]] bool ShouldQuickDelete() const { return m_deleteQuick; }
+	void TraceBox( trace_t *ptr, const Vector &mins, const Vector &maxs, const Vector &start, const Vector &end );
 	void SetCollisionSolver( IPhysicsCollisionSolver *pCollisionSolver ) override;
 	void GetGravity( Vector *pGravityVector ) const override;
 	[[nodiscard]] intp GetActiveObjectCount() const override;
