@@ -6828,15 +6828,6 @@ constexpr float MapSizeToRVANumDelays[] =
 	12,	// GIGANTIC	12 reverbs
 };
 
-constexpr float MapSizeToRVAFeedback[] =
-{
-	0.75,	// SMALL	
-	0.8,	// MEDIUM	
-	0.9,	// LARGE	
-	0.95,	// HUGE		
-	0.98,	// GIGANTIC
-};
-
 void ADSP_SetupAutoReverb( prc_t *pprc_rva, auto_params_t *pa )
 {
 	// shape: hall, tunnel or room
