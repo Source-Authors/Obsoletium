@@ -2503,11 +2503,11 @@ rva_t * RVA_Alloc ( int *D, int *a, int *b, int m, flt_t *pflt, int fparallel, f
 //		otherwise, filter is in feedback loop
 
 
-constexpr int g_MapIntoPBITSDivInt[] = 
-{
-	0, PMAX/1, PMAX/2,	PMAX/3,	PMAX/4,	PMAX/5,	PMAX/6,	PMAX/7,	PMAX/8, 
-	   PMAX/9, PMAX/10, PMAX/11,PMAX/12,PMAX/13,PMAX/14,PMAX/15,PMAX/16, 
-};
+// constexpr int g_MapIntoPBITSDivInt[] = 
+// {
+// 	0, PMAX/1, PMAX/2,	PMAX/3,	PMAX/4,	PMAX/5,	PMAX/6,	PMAX/7,	PMAX/8, 
+// 	   PMAX/9, PMAX/10, PMAX/11,PMAX/12,PMAX/13,PMAX/14,PMAX/15,PMAX/16, 
+// };
 
 inline int RVA_GetNext( rva_t *prva, int x )
 {
@@ -2654,8 +2654,8 @@ constexpr prm_rng_t rva_rng[] = {
 // nominal delay and feedback values. More delays = more density.
 
 #define RVADLYSMAX	49
-constexpr float rvadlys[] =   {18,  23,  28,  33,   42,  21,  26,  36,   39,  45,  47,  30};
-constexpr float rvafbs[] =	{0.9, 0.9, 0.9, 0.85, 0.8, 0.9, 0.9, 0.85, 0.8, 0.8, 0.8, 0.85};
+// constexpr float rvadlys[] =   {18,  23,  28,  33,   42,  21,  26,  36,   39,  45,  47,  30};
+// constexpr float rvafbs[] =	{0.9, 0.9, 0.9, 0.85, 0.8, 0.9, 0.9, 0.85, 0.8, 0.8, 0.8, 0.85};
 
 #define SWAP(a,b,t)				{(t) = (a); (a) = (b); (b) = (t);}
 
