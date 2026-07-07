@@ -1384,11 +1384,9 @@ int Voice_AddIncomingData(int nChannel, const char *pchData, int nCount, int iSe
 	alignas(short) char decompressed[22528];
 
 #ifdef VOICE_SEND_RAW_TEST
-
-		int nDecompressed = nCount;
-		for ( int i=0; i < nDecompressed; i++ )
-			((short*)decompressed)[i] = pchData[i] << 8;
-
+	int nDecompressed = nCount;
+	for ( int i=0; i < nDecompressed; i++ )
+		((short*)decompressed)[i] = pchData[i] << 8;
 #else
 
 	int nDecompressed = 0;
@@ -1398,8 +1396,8 @@ int Voice_AddIncomingData(int nChannel, const char *pchData, int nCount, int iSe
 #ifndef NO_STEAM
 		uint32 nBytesWritten = 0;
 		EVoiceResult result = steamapicontext->SteamUser()->DecompressVoice( pchData, nCount,
-		                                                                     decompressed, sizeof( decompressed ),
-		                                                                     &nBytesWritten, Voice_SamplesPerSec() );
+			decompressed, sizeof( decompressed ),
+			&nBytesWritten, Voice_SamplesPerSec() );
 		if ( result == k_EVoiceResultOK )
 		{
 			nDecompressed = nBytesWritten / BYTES_PER_SAMPLE;
@@ -1432,10 +1430,10 @@ int Voice_AddIncomingData(int nChannel, const char *pchData, int nCount, int iSe
 
 	// Upsample into the dest buffer. We could do this in a mixer but it complicates the mixer.
 	pChannel->m_LastFraction = UpsampleIntoBuffer( (short*)decompressed,
-	                                               nDecompressed,
-	                                               &pChannel->m_Buffer,
-	                                               pChannel->m_LastFraction,
-	                                               (double)Voice_SamplesPerSec()/g_VoiceSampleFormat.nSamplesPerSec );
+		nDecompressed,
+		&pChannel->m_Buffer,
+		pChannel->m_LastFraction,
+		(double)Voice_SamplesPerSec()/g_VoiceSampleFormat.nSamplesPerSec );
 	pChannel->m_LastSample = decompressed[nDecompressed];
 
 	// Write to our file buffer..
