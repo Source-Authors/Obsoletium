@@ -398,13 +398,6 @@ FileNameHandle_t CSfxTable::GetFileNameHandle() const
 
 const char *CSfxTable::GetFileName()
 {
-	if ( IsX360() && m_bUseErrorFilename )
-	{
-		// Redirecting error sounds to a valid empty wave, prevents a bad loading retry pattern during gameplay
-		// which may event sounds skipped by preload, because they don't exist.
-		return "common/null.wav";
-	}
-
 	const char *pName = getname();
 	return pName ? PSkipSoundChars( pName ) : NULL;	
 }
