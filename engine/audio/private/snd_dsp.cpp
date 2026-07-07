@@ -44,7 +44,6 @@ template<typename T>
 
 extern ConVar das_debug;
 
-#define SOUND_MS_PER_FT	1			// sound travels approx 1 foot per millisecond
 #define ROOM_MAX_SIZE	1000		// max size in feet of room simulation for dsp
 
 void DSP_ReleaseMemory( void );
