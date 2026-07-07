@@ -711,7 +711,8 @@ typedef int fix20int;
 
 typedef void * (*prc_Param_t)( void *pprc );					// individual processor allocation functions
 typedef int (*prc_GetNext_t) ( void *pdata, int x );			// get next function for processor
-typedef int (*prc_GetNextN_t) ( void *pdata,  portable_samplepair_t *pbuffer, int SampleCount, int op);	// batch version of getnext
+// dimhotepus: int -> void as we assign such functions. 
+typedef void (*prc_GetNextN_t) ( void *pdata,  portable_samplepair_t *pbuffer, int SampleCount, int op);	// batch version of getnext
 typedef void (*prc_Free_t) ( void *pdata );						// free function for processor
 typedef void (*prc_Mod_t) (void *pdata, float v);				// modulation function for processor	
 
