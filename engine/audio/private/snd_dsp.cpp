@@ -6232,12 +6232,9 @@ void DSP_SetPreset( int idsp, int ipsetnew)
 	for (int i = 0; i < pdsp->cchan; i++)
 	{
 		// current becomes previous
-
-		pdsp->ppsetprev[i] = pdsp->ppset[i];
-		
 		// new becomes current
 
-		pdsp->ppset[i] = ppsetnew[i];
+		pdsp->ppsetprev[i] = std::exchange( pdsp->ppset[i], ppsetnew[i] );
 	}
 	
 	pdsp->ipsetprev = pdsp->ipset;
