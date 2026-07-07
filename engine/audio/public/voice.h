@@ -11,6 +11,7 @@
 
 
 #include "ivoicetweak.h"
+#include "tier1/strtools.h"
 
 
 /*! @defgroup Voice Voice
