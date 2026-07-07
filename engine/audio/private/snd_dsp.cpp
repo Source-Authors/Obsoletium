@@ -44,8 +44,6 @@ template<typename T>
 
 extern ConVar das_debug;
 
-#define ROOM_MAX_SIZE	1000		// max size in feet of room simulation for dsp
-
 void DSP_ReleaseMemory( void );
 bool DSP_LoadPresetFile( void );
 
