@@ -7,7 +7,7 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#include "platform.h"
+#include "tier0/platform.h"
 
 #if defined( WIN32 )
 #include "winlite.h"
@@ -17,11 +17,11 @@
 
 #include "tier0/basetypes.h"
 #include "tier0/commonmacros.h"
-#include "mathlib/mathlib.h"
 #include "tier0/dbg.h"
 #include "tier0/vprof.h"
 #include "tier0/icommandline.h"
 #include "tier1/strtools.h"
+#include "mathlib/mathlib.h"
 
 #include "tier2/riff.h"
 #include "sound.h"
@@ -44,7 +44,6 @@
 #include "snd_dev_direct.h"
 #include "snd_dev_xaudio.h"
 #include "snd_sfx.h"
-#include "snd_audio_source.h"
 #include "snd_wave_source.h"
 #include "snd_wave_temp.h"
 #include "snd_wave_data.h"
