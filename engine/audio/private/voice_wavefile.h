@@ -18,7 +18,7 @@
 	char *&pData,
 	int &nDataBytes,
 	std::uint16_t &wBitsPerSample,
-	int &nChannels,
+	std::uint16_t &nChannels,
 	int &nSamplesPerSec);
 
 
@@ -28,7 +28,7 @@
 	const char *pData, 
 	int nBytes, 
 	std::uint16_t wBitsPerSample, 
-	int nChannels, 
+	std::uint16_t nChannels, 
 	int nSamplesPerSec);
 
 

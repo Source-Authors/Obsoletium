@@ -998,8 +998,8 @@ bool Voice_RecordStart(
 	
 	if(pMicInputFile)
 	{
-		int b, c;
-		std::uint16_t a;
+		int c;
+		std::uint16_t a, b;
 		if (!ReadWaveFile(pMicInputFile, g_pMicInputFileData, g_nMicInputFileBytes, a, b, c))
 		{
 			Warning("Voice recording unable to read input file '%s'.\n", pMicInputFile);
