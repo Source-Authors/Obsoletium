@@ -987,7 +987,7 @@ inline void MatrixSetRow( VMatrix &dst, int nRow, const Vector &row )
 // NJS: src2 is passed in as a full vector rather than a reference to prevent the need
 // for 2 branches and a potential copy in the body.  (ie, handling the case when the src2
 // reference is the same as the dst reference ).
-inline void Vector3DMultiplyPosition( const VMatrix& src1, const VectorByValue src2, Vector& dst )
+inline void Vector3DMultiplyPosition( const VMatrix& src1, const VectorByValue src2, Vector& dst ) //-V801
 {
 	dst[0] = src1[0][0] * src2.x + src1[0][1] * src2.y + src1[0][2] * src2.z + src1[0][3];
 	dst[1] = src1[1][0] * src2.x + src1[1][1] * src2.y + src1[1][2] * src2.z + src1[1][3];
