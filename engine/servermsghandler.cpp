@@ -902,7 +902,6 @@ bool CClientState::ProcessTempEntities( SVC_TempEntities *msg )
 	bf_read &buffer = msg->m_DataIn; // shortcut
 
 	int classID = -1;
-	void *from = NULL;
 	C_ServerClassInfo *pServerClass = NULL;
 	ClientClass *pClientClass = NULL;
 	alignas(4) unsigned char data[CEventInfo::MAX_EVENT_DATA];
@@ -922,8 +921,6 @@ bool CClientState::ProcessTempEntities( SVC_TempEntities *msg )
 
 		if ( buffer.ReadOneBit() )
 		{
-			from = NULL; // full update
-
 			classID = buffer.ReadUBitLong( m_nServerClassBits ); // classID 
 		
 			// Look up the client class, etc.
