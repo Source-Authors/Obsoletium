@@ -120,4 +120,26 @@ constexpr inline short CLIP(T x) noexcept {
   return x > 32767 ? 32767 : (x < -32767 ? -32767 : static_cast<short>(x));
 }
 
+// dB = 20 log (amplitude/32768)		0 to -90.3dB
+// amplitude = 32768 * 10 ^ (dB/20)		0 to +/- 32768
+// gain = amplitude/32768				0 to 1.0
+[[nodiscard]] inline float Gain_To_dB(float gain) {
+	float dB = 20.0f * logf ( gain );
+	return dB;
+}
+
+[[nodiscard]] inline float dB_To_Gain(float dB) {
+	float gain = powf (10.0f, dB / 20.0f);
+	return gain;
+}
+
+[[nodiscard]] constexpr inline float Gain_To_Amplitude(float gain) {
+	return gain * 32768.0f;
+}
+
+[[nodiscard]] constexpr inline float Amplitude_To_Gain(float amplitude) {
+	return amplitude / 32768.0f;
+}
+
+
 #endif // SND_MIX_BUF_H

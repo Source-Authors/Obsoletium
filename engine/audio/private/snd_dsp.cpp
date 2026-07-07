@@ -47,11 +47,6 @@ extern ConVar das_debug;
 void DSP_ReleaseMemory( void );
 bool DSP_LoadPresetFile( void );
 
-extern float Gain_To_dB ( float gain );
-extern float dB_To_Gain ( float dB );
-extern float Gain_To_Amplitude ( float gain );
-extern float Amplitude_To_Gain ( float amplitude );
-
 extern bool g_bdas_room_init;
 extern bool g_bdas_init_nodes;
 

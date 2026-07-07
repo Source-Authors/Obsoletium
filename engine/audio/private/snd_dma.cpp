@@ -1838,32 +1838,6 @@ ConVar snd_showstart( "snd_showstart", "0", FCVAR_CHEAT );	// showstart always s
 
 #define SND_GAIN_PLAYER_WEAPON_DB 2.0F	// increase player weapon gain by N dB
 
-// dB = 20 log (amplitude/32768)		0 to -90.3dB
-// amplitude = 32768 * 10 ^ (dB/20)		0 to +/- 32768
-// gain = amplitude/32768				0 to 1.0
-
-float Gain_To_dB ( float gain )
-{
-	float dB = 20 * logf ( gain );
-	return dB;
-}
-
-float dB_To_Gain ( float dB )
-{
-	float gain = powf (10, dB / 20.0F);
-	return gain;
-}
-
-float Gain_To_Amplitude ( float gain )
-{
-	return gain * 32768;
-}
-
-float Amplitude_To_Gain ( float amplitude )
-{
-	return amplitude / 32768;
-}
-
 soundlevel_t SND_GetSndlvl ( channel_t *pchannel )
 {
 	return DIST_MULT_TO_SNDLVL( pchannel->dist_mult );
