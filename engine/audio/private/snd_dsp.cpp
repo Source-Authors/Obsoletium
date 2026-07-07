@@ -1013,11 +1013,22 @@ flt_t * FLT_Params ( prc_t *pprc )
 	flt_t *pf3 = NULL;
 	
 	// scale b numerators with gain - only scale for first filter if series filters
-
-	for (int i = 0; i < FLT_M; i++)
+	// dimhotepus: Fill b / b_bp only when needed.
+	if (bpass)
+	{
+	// dimhotepus: Correctly read from b_bp only filled data.
+	for (int i = 0; i <= M_bp; i++)
 	{
 		b_bp_scaled[i] = (int)((float)(b_bp[i]) * gain );
+	}
+	}
+	else
+	{
+	// dimhotepus: Correctly read from b only filled data.
+	for (int i = 0; i <= M; i++)
+	{
 		b_scaled[i] = (int)((float)(b[i]) * gain );
+	}
 	}
 
 	if (bpass)
