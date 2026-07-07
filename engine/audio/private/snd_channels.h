@@ -236,10 +236,10 @@ public:
 	void Add( channel_t *pChannel );
 	void Remove( channel_t *pChannel );
 
-	void GetActiveChannels( CChannelList &list );
+	void GetActiveChannels( CChannelList &list ) const;
 
 	void Init();
-	int	 GetActiveCount() { return m_count; }
+	int	 GetActiveCount() const { return m_count; }
 private:
 	int		m_count;
 	short	m_list[MAX_CHANNELS];

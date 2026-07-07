@@ -190,7 +190,7 @@ void CActiveChannels::Remove( channel_t *pChannel )
 }
 
 
-void CActiveChannels::GetActiveChannels( CChannelList &list )
+void CActiveChannels::GetActiveChannels( CChannelList &list ) const
 {
 	list.m_count = m_count;
 	if ( m_count )
@@ -387,7 +387,7 @@ const char *CSfxTable::getname()
 	return NULL;
 }
 
-FileNameHandle_t CSfxTable::GetFileNameHandle()
+FileNameHandle_t CSfxTable::GetFileNameHandle() const
 {
 	if ( s_Sounds.InvalidIndex() != m_namePoolIndex )
 	{

@@ -24,7 +24,7 @@ public:
 	virtual const char	*getname();
 	// gets the filename, the part after the optional prefixes
 	const char			*GetFileName();
-	FileNameHandle_t	GetFileNameHandle();
+	FileNameHandle_t	GetFileNameHandle() const;
 
 	void				SetNamePoolIndex( unsigned short index );
 	bool				IsPrecachedSound();
