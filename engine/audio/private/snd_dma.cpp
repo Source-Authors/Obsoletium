@@ -147,14 +147,7 @@ int g_cgroupclass	= 0;
 // this is used to enable/disable music playback on x360 when the user selects his own soundtrack to play
 void S_EnableMusic( bool bEnable )
 {
-	if ( bEnable )
-	{
-		g_DashboardMusicMixTarget = 1.0f;
-	}
-	else
-	{
-		g_DashboardMusicMixTarget = 0.0f;
-	}
+	g_DashboardMusicMixTarget = bEnable ? 1.0f : 0.0f;
 }
 
 static bool IsSoundSourceLocalPlayer( SoundSource soundsource )
