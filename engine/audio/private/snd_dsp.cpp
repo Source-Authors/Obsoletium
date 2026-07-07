@@ -30,7 +30,7 @@ template<typename T>
 }
 
 template<typename T>
-[[nodicard]] constexpr inline T MSEC_TO_SAMPS(T a) noexcept
+[[nodiscard]] constexpr inline T MSEC_TO_SAMPS(T a) noexcept
 {
 	return SEC_TO_SAMPS( a ) / 1000;		// convert milliseconds to # samples in equivalent time
 }
