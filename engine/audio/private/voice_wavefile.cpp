@@ -52,7 +52,7 @@ bool ReadWaveFile(
 	const char *pFilename,
 	char *&pData,
 	int &nDataBytes,
-	int &wBitsPerSample,
+	std::uint16_t &wBitsPerSample,
 	int &nChannels,
 	int &nSamplesPerSec)
 {
@@ -106,7 +106,7 @@ bool WriteWaveFile(
 	const char *pFilename, 
 	const char *pData, 
 	int nBytes, 
-	int wBitsPerSample, 
+	std::uint16_t wBitsPerSample, 
 	int nChannels, 
 	int nSamplesPerSec)
 {
