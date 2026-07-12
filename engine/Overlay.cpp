@@ -144,7 +144,7 @@ public:
 
 private:
 	// Create, destroy material sort order ids...
-	int					GetMaterialSortID( IMaterial* pMaterial, int nLightmapPage );
+	unsigned short		GetMaterialSortID( IMaterial* pMaterial, int nLightmapPage );
 	void				CleanupMaterial( unsigned short nSortOrder );
 
 	moverlay_t			*GetOverlay( int iOverlay );
@@ -165,7 +165,7 @@ private:
 									 float clipDistStart, int nInterval, int nLoopStart, int nLoopEnd, int nLoopInc );
 
 	// Utility
-	OverlayFragmentHandle_t AddFragmentToFragmentList( int nSize );
+	OverlayFragmentHandle_t AddFragmentToFragmentList( intp nSize );
 	OverlayFragmentHandle_t AddFragmentToFragmentList( moverlayfragment_t *pSrc );
 
 	bool FadeOverlayFragmentGlobal( moverlayfragment_t *pFragment );
@@ -287,14 +287,14 @@ void COverlayMgr::UnloadOverlays( )
 		m_RenderQueue[i].m_pMaterial->DecrementReferenceCount();
 	}
 
-	int nOverlayCount = m_aOverlays.Count();
-	for ( int iOverlay = 0; iOverlay < nOverlayCount; ++iOverlay )
+	intp nOverlayCount = m_aOverlays.Count();
+	for ( intp iOverlay = 0; iOverlay < nOverlayCount; ++iOverlay )
 	{
 		moverlay_t *pOverlay = &m_aOverlays.Element( iOverlay );
-		int hFrag = pOverlay->m_hFirstFragment;
+		OverlayFragmentList_t hFrag = pOverlay->m_hFirstFragment;
 		while ( hFrag != OVERLAY_FRAGMENT_INVALID )
 		{
-			int iFrag = m_OverlayFragments[hFrag];
+			auto iFrag = m_OverlayFragments[hFrag];
 			m_aFragments.Free( iFrag );
 			hFrag = m_OverlayFragments.Next( hFrag );
 		}
@@ -315,7 +315,7 @@ void COverlayMgr::UnloadOverlays( )
 //-----------------------------------------------------------------------------
 // Create, destroy material sort order ids...
 //-----------------------------------------------------------------------------
-int COverlayMgr::GetMaterialSortID( IMaterial* pMaterial, int nLightmapPage )
+unsigned short COverlayMgr::GetMaterialSortID( IMaterial* pMaterial, int nLightmapPage )
 {
 	// Search the sort order handles for an enumeration id match (means materials + lightmaps match)
 	unsigned short i;
@@ -404,10 +404,10 @@ void COverlayMgr::ClearRenderLists()
 bool COverlayMgr::FadeOverlayFragmentGlobal( moverlayfragment_t *pFragment )
 {
 	// Test the overlay distance and set alpha values.
-	int iVert;
+	intp iVert;
 	bool bInRange = false;
 
-	int nVertexCount = pFragment->m_aPrimVerts.Count();
+	intp nVertexCount = pFragment->m_aPrimVerts.Count();
 	for ( iVert = 0; iVert < nVertexCount; ++iVert )
 	{
 		Vector vecSegment;
@@ -470,8 +470,8 @@ bool COverlayMgr::FadeOverlayFragment( moverlay_t *pOverlay, moverlayfragment_t 
 		}
 	}
 
-	int nVertexCount = pFragment->m_aPrimVerts.Count();
-	for ( int iVert = 0; iVert < nVertexCount; ++iVert )
+	intp nVertexCount = pFragment->m_aPrimVerts.Count();
+	for ( intp iVert = 0; iVert < nVertexCount; ++iVert )
 	{
 		pFragment->m_aPrimVerts.Element( iVert ).flAlpha = flAlpha;
 	}
@@ -496,7 +496,7 @@ void COverlayMgr::AddFragmentListToRenderList( int nSortGroup, OverlayFragmentHa
 			continue;
 
 		// Triangle count too low? Skip it...
-		int nVertexCount = pFragment->m_aPrimVerts.Count();
+		intp nVertexCount = pFragment->m_aPrimVerts.Count();
 		if ( nVertexCount < 3 )
 			continue;
 
@@ -520,7 +520,7 @@ void COverlayMgr::AddFragmentListToRenderList( int nSortGroup, OverlayFragmentHa
 		pFragment->m_nRenderFrameID = g_OverlayRenderFrameID;
 
 		// Determine the material associated with the fragment...
-		int nMaterialSortID = pFragment->m_nMaterialSortID;
+		auto nMaterialSortID = pFragment->m_nMaterialSortID;
 
 		// Insert the render queue into the list of render queues to render
 		RenderQueueHead_t &renderQueue = m_RenderQueue[nMaterialSortID];
@@ -553,8 +553,8 @@ void COverlayMgr::AddFragmentListToRenderList( int nSortGroup, OverlayFragmentHa
 void COverlayMgr::ClearRenderLists( int nSortGroup )
 {
 	g_OverlayRenderFrameID++;
-	int nNextRenderQueue;
-	for( int i = m_nFirstRenderQueue[nSortGroup]; i != RENDER_QUEUE_INVALID; i = nNextRenderQueue )
+	unsigned short nNextRenderQueue;
+	for( auto i = m_nFirstRenderQueue[nSortGroup]; i != RENDER_QUEUE_INVALID; i = nNextRenderQueue )
 	{
  		RenderQueueInfo_t &renderQueue = m_RenderQueue[i].m_Queue[nSortGroup];
 		nNextRenderQueue = renderQueue.m_nNextRenderQueue;
@@ -600,8 +600,8 @@ void COverlayMgr::RenderOverlays( int nSortGroup )
 	int nMaxIndices = pRenderContext->GetMaxIndicesToRender();
 	while ( iCurrentRenderOrder <= iHighestRenderOrder )
 	{
-		int nNextRenderQueue;
-		for( int i = m_nFirstRenderQueue[nSortGroup]; i != RENDER_QUEUE_INVALID; i = nNextRenderQueue )
+		unsigned short nNextRenderQueue;
+		for( unsigned short i = m_nFirstRenderQueue[nSortGroup]; i != RENDER_QUEUE_INVALID; i = nNextRenderQueue )
 		{
 			RenderQueueHead_t &renderQueueHead = m_RenderQueue[i];
  			RenderQueueInfo_t &renderQueue = renderQueueHead.m_Queue[nSortGroup];
@@ -652,8 +652,8 @@ void COverlayMgr::RenderOverlays( int nSortGroup )
 					if ( iThisOverlayRenderOrder != iCurrentRenderOrder )
 						continue;
 
-					int nVertCount = pFragment->m_aPrimVerts.Count();
-					int nIndexCount = 3 * ( nVertCount - 2 );
+					intp nVertCount = pFragment->m_aPrimVerts.Count();
+					intp nIndexCount = 3 * ( nVertCount - 2 );
 
 					if ( pMesh )
 					{					  
@@ -766,8 +766,8 @@ bool COverlayMgr::Surf_PreClipFragment( moverlay_t *pOverlay, moverlayfragment_t
 	InitTexCoords( pOverlay, overlayFrag );
 
 	// Surface
-	int nVertCount = surfaceFrag.m_aPrimVerts.Count();
-	for ( int iVert = 0; iVert < nVertCount; ++iVert )
+	intp nVertCount = surfaceFrag.m_aPrimVerts.Count();
+	for ( intp iVert = 0; iVert < nVertCount; ++iVert )
 	{
 		// Position.
 		Overlay_WorldToOverlayPlane( pOverlay->m_vecOrigin, pOverlay->m_vecBasis[2], 
@@ -784,7 +784,7 @@ void COverlayMgr::Surf_PostClipFragment( moverlay_t *pOverlay, moverlayfragment_
 {
 #ifndef SWDS
 	// Get fragment vertex count.
-	int nVertCount = overlayFrag.m_aPrimVerts.Count();
+	intp nVertCount = overlayFrag.m_aPrimVerts.Count();
 
 	if ( nVertCount == 0 )
 		return;
@@ -812,7 +812,7 @@ void COverlayMgr::Surf_PostClipFragment( moverlay_t *pOverlay, moverlayfragment_
 	}
 	InitTexCoords( pOverlay, origOverlay );
 
-	for ( int iVert = 0; iVert < nVertCount; ++iVert )
+	for ( intp iVert = 0; iVert < nVertCount; ++iVert )
 	{
 		Vector2D vecUV;
 		PointInQuadToBarycentric( origOverlay.m_aPrimVerts[0].pos, 
@@ -982,11 +982,11 @@ void COverlayMgr::Surf_CreateFragments( moverlay_t *pOverlay, SurfaceHandle_t su
 //-----------------------------------------------------------------------------
 void COverlayMgr::CreateFragments( void )
 {
-	int nOverlayCount = m_aOverlays.Count();
-	for ( int iOverlay = 0; iOverlay < nOverlayCount; ++iOverlay )
+	intp nOverlayCount = m_aOverlays.Count();
+	for ( intp iOverlay = 0; iOverlay < nOverlayCount; ++iOverlay )
 	{
 		moverlay_t *pOverlay = &m_aOverlays.Element( iOverlay );
-		int nFaceCount = pOverlay->m_aFaces.Count();
+		intp nFaceCount = pOverlay->m_aFaces.Count();
 		if ( nFaceCount == 0 )
 			continue;
 
@@ -996,7 +996,7 @@ void COverlayMgr::CreateFragments( void )
 		Overlay_BuildBasis( pOverlay->m_vecBasis[2], pOverlay->m_vecBasis[0], pOverlay->m_vecBasis[1], bFlip );
 
 		// Clip against each face in the face list.
-		for( int iFace = 0; iFace < nFaceCount; ++iFace )
+		for( intp iFace = 0; iFace < nFaceCount; ++iFace )
 		{
 			SurfaceHandle_t surfID = pOverlay->m_aFaces[iFace];
 		
@@ -1012,23 +1012,23 @@ void COverlayMgr::CreateFragments( void )
 	}
 
 	// Overlay checking!
-	for ( int iOverlay = 0; iOverlay < nOverlayCount; ++iOverlay )
+	for ( intp iOverlay = 0; iOverlay < nOverlayCount; ++iOverlay )
 	{
 		moverlay_t *pOverlay = &m_aOverlays.Element( iOverlay );
-		int hFrag = pOverlay->m_hFirstFragment;
+		OverlayFragmentList_t hFrag = pOverlay->m_hFirstFragment;
 		while ( hFrag != OVERLAY_FRAGMENT_INVALID )
 		{
-			int iFrag = m_OverlayFragments[hFrag];
+			unsigned short iFrag = m_OverlayFragments[hFrag];
 			moverlayfragment_t *pFrag = &m_aFragments[iFrag];
-			int nVertCount = pFrag->m_aPrimVerts.Count();
-			for ( int iVert = 0; iVert < nVertCount; ++iVert )
+			intp nVertCount = pFrag->m_aPrimVerts.Count();
+			for ( intp iVert = 0; iVert < nVertCount; ++iVert )
 			{
 				overlayvert_t *pVert = &pFrag->m_aPrimVerts[iVert];
 				if ( !pVert->pos.IsValid() )
 				{
 					Assert( 0 );
 					mtexinfo_t *pTexInfo = &host_state.worldbrush->texinfo[pOverlay->m_nTexInfo];
-					DevMsg( 1, "Bad overlay vert - %d at (%f, %f, %f) with material '%s'\n", iOverlay,
+					DevMsg( 1, "Bad overlay vert - %zd at (%f, %f, %f) with material '%s'\n", iOverlay,
 						pOverlay->m_vecOrigin.x, pOverlay->m_vecOrigin.y, pOverlay->m_vecOrigin.z,
 						pTexInfo->material ? pTexInfo->material->GetName() : ""	);
 				}
@@ -1037,7 +1037,7 @@ void COverlayMgr::CreateFragments( void )
 				{
 					Assert( 0 );
 					mtexinfo_t *pTexInfo = &host_state.worldbrush->texinfo[pOverlay->m_nTexInfo];
-					DevMsg( 1, "Bad overlay normal - %d at (%f, %f, %f) with material '%s'\n", iOverlay,
+					DevMsg( 1, "Bad overlay normal - %zd at (%f, %f, %f) with material '%s'\n", iOverlay,
 						pOverlay->m_vecOrigin.x, pOverlay->m_vecOrigin.y, pOverlay->m_vecOrigin.z,
 						pTexInfo->material ? pTexInfo->material->GetName() : ""	);
 				}
@@ -1046,7 +1046,7 @@ void COverlayMgr::CreateFragments( void )
 				{
 					Assert( 0 );
 					mtexinfo_t *pTexInfo = &host_state.worldbrush->texinfo[pOverlay->m_nTexInfo];
-					DevMsg( 1, "Bad overlay texture coords - %d at (%f, %f, %f) with material '%s'\n", iOverlay,
+					DevMsg( 1, "Bad overlay texture coords - %zd at (%f, %f, %f) with material '%s'\n", iOverlay,
 						pOverlay->m_vecOrigin.x, pOverlay->m_vecOrigin.y, pOverlay->m_vecOrigin.z,
 						pTexInfo->material ? pTexInfo->material->GetName() : ""	);
 				}
@@ -1070,8 +1070,8 @@ void COverlayMgr::ReSortMaterials( void )
 	}
 
 	// Update all fragments.
-	int nOverlayCount = m_aOverlays.Count();
-	for ( int iOverlay = 0; iOverlay < nOverlayCount; ++iOverlay )
+	intp nOverlayCount = m_aOverlays.Count();
+	for ( intp iOverlay = 0; iOverlay < nOverlayCount; ++iOverlay )
 	{
 		moverlay_t *pOverlay = &m_aOverlays.Element( iOverlay );
 		if ( !pOverlay )
@@ -1081,10 +1081,10 @@ void COverlayMgr::ReSortMaterials( void )
 		if ( !pTexInfo )
 			continue;
 
-		int hFrag = pOverlay->m_hFirstFragment;
+		OverlayFragmentList_t hFrag = pOverlay->m_hFirstFragment;
 		while ( hFrag != OVERLAY_FRAGMENT_INVALID )
 		{
-			int iFrag = m_OverlayFragments[hFrag];
+			unsigned short iFrag = m_OverlayFragments[hFrag];
 			moverlayfragment_t *pFrag = &m_aFragments[iFrag];
 			{
 				const MaterialSystem_SortInfo_t &sortInfo = materialSortInfoArray[MSurf_MaterialSortID( pFrag->m_SurfId )];
@@ -1094,8 +1094,8 @@ void COverlayMgr::ReSortMaterials( void )
 				SurfaceCtx_t ctx;
 				SurfSetupSurfaceContext( ctx, pFrag->m_SurfId );	
 
-				int nVertCount = pFrag->m_aPrimVerts.Count();
-				for ( int iVert = 0; iVert < nVertCount; ++iVert )
+				intp nVertCount = pFrag->m_aPrimVerts.Count();
+				for ( intp iVert = 0; iVert < nVertCount; ++iVert )
 				{
 					// Lightmap coordinates.
 					Vector2D uv;
@@ -1277,7 +1277,7 @@ void COverlayMgr::Disp_CreateFragments( moverlay_t *pOverlay, SurfaceHandle_t su
 		}
 	}
 
-	for ( int i = aDispFragments.Count(); --i >= 0; )
+	for ( intp i = aDispFragments.Count(); --i >= 0; )
 	{
 		DestroyTempFragment( aDispFragments[i] );
 	}
@@ -1313,7 +1313,7 @@ bool COverlayMgr::Disp_PreClipFragment( moverlay_t *pOverlay, OverlayFragmentVec
 	Surf_ClipFragment( pOverlay, overlayFrag, surfID, surfaceFrag );
 
 	// Get fragment vertex count.
-	int nVertCount = overlayFrag.m_aPrimVerts.Count();
+	intp nVertCount = overlayFrag.m_aPrimVerts.Count();
 	if ( nVertCount == 0 )
 		return false;
 
@@ -1387,14 +1387,14 @@ void COverlayMgr::Disp_PostClipFragment( CDispInfo *pDisp, CMeshReader *pReader,
 	pReader->TexCoord2f( nInterval * ( nInterval - 1 ), DISP_LMCOORDS_STAGE, lightCoords[3].x, lightCoords[3].y );
 
 	// Get the number of displacement fragments.
-	int nFragCount = aDispFragments.Count();
-	for ( int iFrag = 0; iFrag < nFragCount; ++iFrag )
+	intp nFragCount = aDispFragments.Count();
+	for ( intp iFrag = 0; iFrag < nFragCount; ++iFrag )
 	{
 		moverlayfragment_t *pDispFragment = aDispFragments[iFrag];
 		if ( !pDispFragment )
 			continue;
 
-		int nVertCount = pDispFragment->m_aPrimVerts.Count();
+		intp nVertCount = pDispFragment->m_aPrimVerts.Count();
 		if ( nVertCount < 3 )
 			continue;
 
@@ -1518,8 +1518,8 @@ void COverlayMgr::Disp_DoClip( CDispInfo *pDisp, OverlayFragmentVector_t &aDispF
 		aDispFragments.Purge();
 
 		// Clip in V.
-		int nFragCount = aClippedFragments.Count();
-		for ( int iFrag = 0; iFrag < nFragCount; iFrag++ )
+		intp nFragCount = aClippedFragments.Count();
+		for ( intp iFrag = 0; iFrag < nFragCount; iFrag++ )
 		{
 			moverlayfragment_t *pClipFrag = aClippedFragments[iFrag];
 			if ( pClipFrag )
@@ -1583,7 +1583,7 @@ void COverlayMgr::DoClipFragment( moverlayfragment_t *pFragment, cplane_t *pClip
 	// Determine "sidedness" of all the polygon points.
 	//
 	nSideCounts[0] = nSideCounts[1] = nSideCounts[2] = 0;
-	int iVert = 0;
+	intp iVert = 0;
 	for ( ; iVert < pFragment->m_aPrimVerts.Count(); ++iVert )
 	{
 		flDists[iVert] = pClipPlane->normal.Dot( pFragment->m_aPrimVerts[iVert].pos ) - pClipPlane->dist;
@@ -1635,7 +1635,7 @@ void COverlayMgr::DoClipFragment( moverlayfragment_t *pFragment, cplane_t *pClip
 
 	MEM_ALLOC_CREDIT();
 
-	int nVertCount = pFragment->m_aPrimVerts.Count();
+	intp nVertCount = pFragment->m_aPrimVerts.Count();
 	for ( iVert = 0; iVert < nVertCount; ++iVert )
 	{
 		// "On" clip plane.
@@ -1687,7 +1687,7 @@ void COverlayMgr::DoClipFragment( moverlayfragment_t *pFragment, cplane_t *pClip
 //-----------------------------------------------------------------------------
 // Copies a fragment into the main fragment list
 //-----------------------------------------------------------------------------
-OverlayFragmentHandle_t COverlayMgr::AddFragmentToFragmentList( int nSize )
+OverlayFragmentHandle_t COverlayMgr::AddFragmentToFragmentList( intp nSize )
 {
 	MEM_ALLOC_CREDIT();
 
@@ -1784,8 +1784,8 @@ void COverlayMgr::BuildClipPlanes( SurfaceHandle_t surfID, moverlayfragment_t &s
 								   const Vector &vecBasisNormal, 
 								   CUtlVector<cplane_t> &m_ClipPlanes )
 {
-	int nVertCount = surfaceFrag.m_aPrimVerts.Count();
-	for ( int iVert = 0; iVert < nVertCount; ++iVert )
+	intp nVertCount = surfaceFrag.m_aPrimVerts.Count();
+	for ( intp iVert = 0; iVert < nVertCount; ++iVert )
 	{
 		Vector vecEdge;
 		vecEdge = surfaceFrag.m_aPrimVerts[(iVert+1)%nVertCount].pos - surfaceFrag.m_aPrimVerts[iVert].pos;
