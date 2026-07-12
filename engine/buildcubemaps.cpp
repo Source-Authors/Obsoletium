@@ -685,7 +685,7 @@ void Cubemap_CreateDefaultCubemap( const char *pMapName, IBSPPack *iBSPPack )
 				// Copy the bits from the source images into the cube faces
 				// unsigned char *pSrcBits = pSrcVTFTextures[iFace]->ImageData( iFrame, 0, iMip + iMipLevelOffset );
 				unsigned char *pDstBits = pDstCubemap->ImageData( iFrame, iFace, iMip );
-				int iSize = pDstCubemap->ComputeMipSize( iMip );
+				intp iSize = pDstCubemap->ComputeMipSize( iMip );
 				// int iSrcMipSize = pSrcVTFTextures[iFace]->ComputeMipSize( iMip + iMipLevelOffset );
 
 				// !!! FIXME: Set this to black until the LDR/HDR issues are fixed on line ~563 in this file
@@ -712,7 +712,7 @@ void Cubemap_CreateDefaultCubemap( const char *pMapName, IBSPPack *iBSPPack )
 	{
 		// set alpha to zero since the source doesn't have any alpha in it
 		unsigned char *pImageData = pDstCubemap->ImageData();
-		int size = pDstCubemap->ComputeTotalSize(); // in bytes!
+		intp size = pDstCubemap->ComputeTotalSize(); // in bytes!
 		unsigned char *pEnd = pImageData + size;
 		for( ; pImageData < pEnd; pImageData += 4 )
 		{
