@@ -410,7 +410,7 @@ static ConCommand *FindAutoCompleteCommmandFromPartial( const char *partial )
 }
 
 // dimhotepus: Add chained commands autocomplete (callumok2004).
-static int FindChainedPrefix( const char *szText )
+static intp FindChainedPrefix( const char *szText )
 {
 	bool bInQuotes = false;
 	const char *pLastSplit = nullptr;
@@ -553,7 +553,7 @@ void CConsolePanel::RebuildCompletionList(const char *text)
 // dimhotepus: Add chained commands autocomplete (callumok2004).
 static void SetAutocompleteEntryText( const char *pszPartial, vgui::TextEntry *pEntry, const char *pszCompleted )
 {
-	int nPrefix = FindChainedPrefix( pszPartial );
+	intp nPrefix = FindChainedPrefix( pszPartial );
 	char szFull[512];
 	if ( nPrefix > 0 )
 		V_sprintf_safe( szFull, "%.*s%s", nPrefix, pszPartial, pszCompleted );
@@ -672,7 +672,7 @@ void CConsolePanel::OnTextChanged(Panel *panel)
 	m_bAutoCompleteMode = false;
 
 	// dimhotepus: Add chained commands autocomplete (callumok2004).
-	int nPrefix = FindChainedPrefix( m_szPartialText );
+	intp nPrefix = FindChainedPrefix( m_szPartialText );
 	RebuildCompletionList( m_szPartialText + nPrefix );
 
 	// build the menu
@@ -1024,7 +1024,7 @@ void CConsolePanel::AddToHistory( const char *commandText, const char *extraText
 	RebuildCompletionList( m_szPartialText );
 }
 
-void CConsolePanel::GetConsoleText( char *pchText, intp bufSize ) const
+void CConsolePanel::GetConsoleText( char *pchText, int bufSize ) const
 {
 	// dimhotepus: Use unique_ptr<[]>. Can't allocate on stack as text may be long.
 	std::unique_ptr<wchar_t[]> temp = std::make_unique<wchar_t[]>( bufSize );

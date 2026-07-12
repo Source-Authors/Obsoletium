@@ -60,7 +60,7 @@ public:
 	void ColorPrint( const Color& clr, const char *pMessage ) override;
 	void Print( const char *pMessage ) override;
 	void DPrint( const char *pMessage ) override;
-	virtual void GetConsoleText( char *pchText, intp bufSize ) const;
+	virtual void GetConsoleText( char *pchText, int bufSize ) const;
 
 	// clears the console
 	void Clear();
