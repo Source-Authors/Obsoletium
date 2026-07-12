@@ -498,7 +498,7 @@ void CVMTPreviewPanel::LookAt( const Vector &vecLookAt, float flRadius )
 	float flFOVx = FOV;
 
 	// Compute fov/2 in radians
-	flFOVx *= M_PI / 360.0f;
+	flFOVx *= M_PI_F / 360.0f;
 
 	// Compute an effective fov	based on the aspect ratio 
 	// if the height is smaller than the width

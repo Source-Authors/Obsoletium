@@ -741,7 +741,7 @@ void CBaseAnimSetAttributeSliderPanel::UpdatePreviewSliderTimes()
 	const CDmaElementArray< CDmElement > &controls = m_AnimSet->GetControls();
 
 	double curtime = system()->GetFrameTime();
-	float dt = clamp( curtime - m_flPrevTime, 0.0, 0.1 );
+	float dt = clamp( static_cast<float>( curtime - m_flPrevTime ), 0.0f, 0.1f );
 	m_flPrevTime = curtime;
 
 	dt *= ifm_fader_timescale;

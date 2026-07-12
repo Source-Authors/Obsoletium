@@ -151,8 +151,8 @@ private:
 CRotationManipulator::CRotationManipulator( matrix3x4_t *pTransform ) : CTransformManipulator( pTransform )
 {
 	m_lastx = m_lasty = 0;
-	m_altitude = M_PI/6;
-	m_azimuth = -3*M_PI/4;
+	m_altitude = M_PI_F/6;
+	m_azimuth = -3*M_PI_F/4;
 	m_roll = 0.0f;
 	m_bDoRoll = false;
 	UpdateTransform();
@@ -678,7 +678,7 @@ void CPotteryWheelPanel::LookAt( float flRadius )
 	float flFOVx = m_Camera.m_flFOV;
 
 	// Compute fov/2 in radians
-	flFOVx *= M_PI / 360.0f;
+	flFOVx *= M_PI_F / 360.0f;
 
 	// Compute an effective fov	based on the aspect ratio 
 	// if the height is smaller than the width

@@ -318,7 +318,7 @@ CDmeVMFEntity *CVcdBlockDoc::GetInfoTargetForLocation( Vector &vecStart, Vector 
 	flEndDist = VectorNormalize( vecDelta );
 
 	CDmeVMFEntity *pSelectedNode = NULL;
-	float flMinDistFromLine = 1E30;
+	float flMinDistFromLine = std::numeric_limits<float>::max();
 
 	const CDmrElementArray<CDmElement> entities = GetEntityList();
 	intp nCount = entities.Count();

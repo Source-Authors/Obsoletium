@@ -438,7 +438,7 @@ void CBaseAnimationSetEditor::TransformImportedChannel( CDmeChannel *pChannel )
 
 		// Deal with the 'up axis' rotation
 		matrix3x4_t rootTransform;
-		RadianEuler angles( M_PI / 2.0f, 0.0f, M_PI / 2.0f );
+		RadianEuler angles( M_PI_F / 2.0f, 0.0f, M_PI_F / 2.0f );
 		if ( bHasPreTransform )
 		{
 			AngleMatrix( angles, rootTransform );

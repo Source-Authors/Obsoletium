@@ -1207,7 +1207,7 @@ static bool LoadFaceFromPSD( IVTFTexture *pTexture, CUtlBuffer &psdBuffer, int z
 						uint8 nOrigAlpha = bmPsdData.GetColor(nOrig_x, nOrig_y).a();
 						bool bInOrOut=nOrigAlpha > DISTANCE_CODE_ALPHA_INOUT_THRESHOLD;
 
-						float flClosest_Dist=1.0e23;
+						float flClosest_Dist=std::numeric_limits<float>::max();
 						for(int iy=-nSearchRad; iy <= nSearchRad; iy++ )
 						{
 							for(int ix=-nSearchRad; ix <= nSearchRad; ix++ )
@@ -1361,7 +1361,7 @@ static bool LoadFaceFromTGA( IVTFTexture *pTexture, CUtlBuffer &tgaBuffer, int z
 						uint8 nOrigAlpha=tmpImage[3+4*(nOrig_x+static_cast<intp>(nWidth)*nOrig_y)];
 						bool bInOrOut=nOrigAlpha > DISTANCE_CODE_ALPHA_INOUT_THRESHOLD;
 
-						float flClosest_Dist=1.0e23;
+						float flClosest_Dist=std::numeric_limits<float>::max();
 						for(int iy=-nSearchRad; iy <= nSearchRad; iy++ )
 						{
 							for(int ix=-nSearchRad; ix <= nSearchRad; ix++ )
@@ -1616,7 +1616,7 @@ static bool LoadSourceImages( IVTFTexture *pTexture, const char *pFullNameWithou
 
 				V_strcpy_safe( info.m_SrcName, pSrcName );
 				// NOTE: This here will generate all mip levels of the source image
-				if (!LoadFace( pTexture, tgaBuffer, z, iFrame, iFace, 2.2, info ))
+				if (!LoadFace( pTexture, tgaBuffer, z, iFrame, iFace, 2.2f, info ))
 				{
 					Error( "Error loading texture %s\n", pInputFileName );
 				}
