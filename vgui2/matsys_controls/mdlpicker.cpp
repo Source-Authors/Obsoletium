@@ -434,8 +434,8 @@ void CMDLPicker::OnCommand( const char *pCommand )
 	{
 		if ( input()->IsKeyDown( KEY_RCONTROL ) || input()->IsKeyDown( KEY_LCONTROL ) )
 		{
-			int nCount = m_AssetList.Count();
-			for ( int i = 0; i < nCount; ++i )
+			intp nCount = m_AssetList.Count();
+			for ( intp i = 0; i < nCount; ++i )
 			{
 				if ( m_pAssetBrowser->IsItemVisible( m_AssetList[ i ].m_nItemId ) &&
 					 m_pAssetBrowser->IsItemSelected( m_AssetList[ i ].m_nItemId ) )
@@ -654,9 +654,9 @@ void CMDLPicker::CaptureScreenCaps( void )
 		bSelectedOnly = true;
 	}
 
-	int nCount = m_AssetList.Count();
-	int nNumItems = 0;
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_AssetList.Count();
+	intp nNumItems = 0;
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( m_pAssetBrowser->IsItemVisible( m_AssetList[ i ].m_nItemId ) &&
 			( !bSelectedOnly || m_pAssetBrowser->IsItemSelected( m_AssetList[ i ].m_nItemId ) ) )
@@ -1269,7 +1269,7 @@ void CMDLPicker::RefreshActivitiesAndSequencesList()
 				if ( activityNames.Find( pActivityName ) == activityNames.InvalidIndex() )
 				{
 					KeyValuesAD pkv( new KeyValues("node", "activity", pActivityName ) );
-					int nItemID = m_pActivitiesList->AddItem( pkv, 0, false, false );
+					intp nItemID = m_pActivitiesList->AddItem( pkv, 0, false, false );
 
 					KeyValuesAD pDrag( new KeyValues( "drag", "text", pActivityName ) );
 					pDrag->SetString( "texttype", "activityName" );
@@ -1284,7 +1284,7 @@ void CMDLPicker::RefreshActivitiesAndSequencesList()
 			if ( pSequenceName && pSequenceName[0] )
 			{
 				KeyValuesAD pkv( new KeyValues("node", "sequence", pSequenceName) );
-				int nItemID = m_pSequencesList->AddItem( pkv, 0, false, false );
+				intp nItemID = m_pSequencesList->AddItem( pkv, 0, false, false );
 
 				KeyValuesAD pDrag( new KeyValues( "drag", "text", pSequenceName ) );
 				pDrag->SetString( "texttype", "sequenceName" );
@@ -1443,7 +1443,7 @@ const char *CMDLPicker::GetSelectedSequenceName()
 	if ( !m_pSequencesPage  )
 		return NULL;
 
-	int nIndex = m_pSequencesList->GetSelectedItem( 0 );
+	intp nIndex = m_pSequencesList->GetSelectedItem( 0 );
 	if ( nIndex >= 0 )
 	{
 		KeyValues *pkv = m_pSequencesList->GetItem( nIndex );
@@ -1458,7 +1458,7 @@ const char *CMDLPicker::GetSelectedActivityName()
 	if ( !m_pActivitiesPage  )
 		return NULL;
 
-	int nIndex = m_pActivitiesList->GetSelectedItem( 0 );
+	intp nIndex = m_pActivitiesList->GetSelectedItem( 0 );
 	if ( nIndex >= 0 )
 	{
 		KeyValues *pkv = m_pActivitiesList->GetItem( nIndex );
@@ -1472,7 +1472,7 @@ int	CMDLPicker::GetSelectedSkin()
 	if ( !m_pSkinsPage )
 		return 0;
 
-	int nIndex = m_pSkinsList->GetSelectedItem( 0 );
+	intp nIndex = m_pSkinsList->GetSelectedItem( 0 );
 	if ( nIndex >= 0 )
 	{
 		return nIndex;
@@ -1655,10 +1655,11 @@ void CMDLPicker::UpdateInfoTab()
 	if ( !hdr )
 		return;
 	
-	int nMass = hdr->mass;
+	// dimhotepus: Do not truncate model mass to int
+	float fMass = hdr->mass;
 	Panel *pTempPanel = m_pInfoPage->FindChildByName("MassValue");
-	char massBuff[10];
-	V_to_chars( massBuff, nMass );
+	char massBuff[16];
+	V_to_chars( massBuff, fMass );
 	((vgui::Label *)pTempPanel)->SetText( massBuff );
 	bool bIsStatic = hdr->flags & STUDIOHDR_FLAGS_STATIC_PROP;
 	bool bIsPhysics = false;
