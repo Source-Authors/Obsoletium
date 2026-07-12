@@ -99,7 +99,8 @@ private:
 	Vector m_pControlPointValue[MAX_PARTICLE_CONTROL_POINTS];
 
 	DmObjectId_t m_RenderHelperId;
-	float m_flLastTime;
+	// dimhotepus: float -> double.
+	double m_flLastTime;
 
 	// Stores the id or name of the particle system being viewed
 	DmObjectId_t m_ParticleSystemId;

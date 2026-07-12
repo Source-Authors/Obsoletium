@@ -45,7 +45,7 @@ enum
 CParticleSystemPanel::CParticleSystemPanel( vgui::Panel *pParent, const char *pName ) : BaseClass( pParent, pName )
 {
 	m_pParticleSystem = NULL;
-	m_flLastTime = FLT_MAX;
+	m_flLastTime = DBL_MAX;
 	m_bRenderBounds = false;
 	m_bRenderCullBounds = false;
 	m_bRenderHelpers = false;
@@ -148,13 +148,13 @@ void CParticleSystemPanel::OnTick()
 	if ( !m_pParticleSystem )
 		return;
 
-	float flTime = Plat_FloatTime();
-	if ( m_flLastTime == FLT_MAX )
+	double flTime = Plat_FloatTime();
+	if ( m_flLastTime == DBL_MAX )
 	{
 		m_flLastTime = flTime;
 	}
 
-	float flDt = flTime - m_flLastTime;
+	float flDt = static_cast<float>( flTime - m_flLastTime );
 	m_flLastTime = flTime;
 
 	for ( int i = 0; i < MAX_PARTICLE_CONTROL_POINTS; ++i )
@@ -201,7 +201,7 @@ void CParticleSystemPanel::OnTick()
 		{
 			PostActionSignal( new KeyValues( "ParticleSystemReconstructed" ) );
 		}
-		m_flLastTime = FLT_MAX;
+		m_flLastTime = DBL_MAX;
 	}
 }
 
@@ -215,7 +215,7 @@ void CParticleSystemPanel::StartupParticleCollection()
 	{
 		vgui::ivgui()->AddTickSignal( GetVPanel(), 0 );
 	}
-	m_flLastTime = FLT_MAX;
+	m_flLastTime = DBL_MAX;
 }
 
 void CParticleSystemPanel::ShutdownParticleCollection()
