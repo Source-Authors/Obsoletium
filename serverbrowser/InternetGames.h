@@ -68,7 +68,8 @@ private:
 
 	CUtlVector<struct regions_s> m_Regions;	// list of the different regions you can query for
 
-	float				m_fLastSort;	// Time of last re-sort
+	// dimhotepus: float -> double for time.
+	double				m_fLastSort;	// Time of last re-sort
 	bool				m_bDirty;	// Has the list been modified, thereby needing re-sort
 	bool				m_bRequireUpdate;	// checks whether we need an update upon opening
 	

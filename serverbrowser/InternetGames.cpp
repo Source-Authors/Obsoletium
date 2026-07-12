@@ -12,7 +12,7 @@
 using namespace vgui;
 
 // How often to re-sort the server list
-constexpr inline float MINIMUM_SORT_TIME = 1.5f;
+constexpr inline double MINIMUM_SORT_TIME = 1.5;
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
@@ -22,7 +22,7 @@ constexpr inline float MINIMUM_SORT_TIME = 1.5f;
 CInternetGames::CInternetGames(vgui::Panel *parent, const char *panelName, EPageType eType ) : 
 	CBaseGamesPage(parent, panelName, eType )
 {
-	m_fLastSort = 0.0f;
+	m_fLastSort = 0.0;
 	m_bDirty = false;
 	m_bRequireUpdate = true;
 	m_bOfflineMode = !IsSteamGameServerBrowsingEnabled();
@@ -237,13 +237,11 @@ bool CInternetGames::SupportsItem(IGameList::InterfaceItem_e item)
 //-----------------------------------------------------------------------------
 void CInternetGames::CheckRedoSort( void )
 {
-	float fCurTime;
-
 	// No changes detected
 	if ( !m_bDirty )
 		return;
 
-	fCurTime = Plat_FloatTime();
+	double fCurTime = Plat_FloatTime();
 	// Not time yet
 	if ( fCurTime - m_fLastSort < MINIMUM_SORT_TIME)
 		return;
@@ -252,7 +250,7 @@ void CInternetGames::CheckRedoSort( void )
 	if ( input()->IsMouseDown(MOUSE_LEFT) || input()->IsMouseDown(MOUSE_RIGHT) )
 	{
 		// don't sort for at least another second
-		m_fLastSort = fCurTime - MINIMUM_SORT_TIME + 1.0f;
+		m_fLastSort = fCurTime - MINIMUM_SORT_TIME + 1.0;
 		return;
 	}
 
