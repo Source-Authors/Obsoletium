@@ -291,8 +291,8 @@ static void AddSingleDynamicLightToBumpLighting( dlight_t& dl, SurfaceHandle_t s
 				}
 				
 				float lDotN = DotProduct( lightDirection, MSurf_Plane( surfID ).normal );
-				if (lDotN < 1e-3)
-					lDotN = 1e-3;
+				if (lDotN < 1e-3f)
+					lDotN = 1e-3f;
 				scale /= lDotN;
 
 				int i;

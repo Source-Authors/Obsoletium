@@ -166,7 +166,7 @@ inline void SCR_ShowVCRPlaybackAmount()
 
 	con_nprint_t info;
 	info.index = 20;
-	info.time_to_live = 0.01;
+	info.time_to_live = 0.01f;
 	info.color[0] = info.color[1] = info.color[2] = 1;
 	info.fixed_width_font = false;
 

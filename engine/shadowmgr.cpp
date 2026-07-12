@@ -932,7 +932,7 @@ void CShadowMgr::ComputeSurfaceBounds( SurfaceBounds_t* pBounds, SurfaceHandle_t
 		pBounds->m_vecMaxs = MaxSIMD( pos4, pBounds->m_vecMaxs );
 	}
 
-	fltx4 eps = ReplicateX4( 1e-3 );
+	fltx4 eps = ReplicateX4( 1e-3f );
 	pBounds->m_vecMins = SetWToZeroSIMD( SubSIMD( pBounds->m_vecMins, eps ) );
 	pBounds->m_vecMaxs = SetWToZeroSIMD( AddSIMD( pBounds->m_vecMaxs, eps ) );
 	pBounds->m_vecCenter /= nCount;

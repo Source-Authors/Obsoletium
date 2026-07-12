@@ -857,7 +857,7 @@ void DrawGridOverlay(void)
 			RenderLine( startLine, endLine, Color( color.x, color.y, color.z, 255 ), true );
 			startLine[0] += gridSpacing;
 		}
-		VectorScale( color, 0.7, color );
+		VectorScale( color, 0.7f, color );
 		startGrid[2] -= gridSpacing;
 	}
 	s_bDrawGrid	= false;

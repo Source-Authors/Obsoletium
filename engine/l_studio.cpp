@@ -198,8 +198,8 @@ bool WorldLightToMaterialLight( dworldlight_t* pWorldLight, LightDesc_t& light )
 		// A 180 degree spotlight
 		light.m_Type = MATERIAL_LIGHT_SPOT;
 		light.m_Attenuation2 = 1.0;
-		light.m_Theta = M_PI;
-		light.m_Phi = M_PI;
+		light.m_Theta = M_PI_F;
+		light.m_Phi = M_PI_F;
 		light.m_ThetaDot = 0.0f;
 		light.m_PhiDot = 0.0f;
 		light.m_Falloff = 1.0f;
@@ -2668,7 +2668,7 @@ int	CModelRender::DrawModelExStaticProp( ModelRenderInfo_t &pInfo )
 #ifdef _DEBUG
 	Vector tmp;
 	MatrixGetColumn( *pInfo.pModelToWorld, 3, &tmp );
-	Assert( VectorsAreEqual( pInfo.origin, tmp, 1e-3 ) );
+	Assert( VectorsAreEqual( pInfo.origin, tmp, 1e-3f ) );
 #endif
 
 	g_pStudioRender->DrawModelStaticProp( info, *pInfo.pModelToWorld, drawFlags );

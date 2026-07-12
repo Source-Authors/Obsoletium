@@ -393,7 +393,7 @@ void RecomputeClipbrushes( bool bEnabled )
 	{
 		int contents[3] = {CONTENTS_PLAYERCLIP|CONTENTS_MONSTERCLIP, CONTENTS_MONSTERCLIP, CONTENTS_PLAYERCLIP};
 		g_ClipVis[v] = new leafvis_t;
-		g_ClipVis[v]->color.Init( v != 1 ? 1.0f : 0.5, 0.0f, v != 0 ? 1.0f : 0.0f );
+		g_ClipVis[v]->color.Init( v != 1 ? 1.0f : 0.5f, 0.0f, v != 0 ? 1.0f : 0.0f );
 		CCollisionBSPData *pBSP = GetCollisionBSPData();
 		int lastBrush = pBSP->numbrushes; 
 		if ( pBSP->numcmodels > 1 )
