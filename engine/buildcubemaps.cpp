@@ -129,8 +129,8 @@ static void TakeCubemapSnapshot( const Vector &origin, const char *pFileNameBase
 	view.x = 0;
 	view.y = 0;
 
-	view.width = ( float )screenBufSize;
-	view.height = ( float )screenBufSize;
+	view.width = screenBufSize;
+	view.height = screenBufSize;
 
 	Shader_BeginRendering();
 
