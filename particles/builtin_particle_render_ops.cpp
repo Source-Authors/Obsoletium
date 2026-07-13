@@ -164,7 +164,8 @@ void C_OP_RenderPoints::Render( IMatRenderContext *pRenderContext, CParticleColl
 		for( int i = 0; i < nParticlesInBatch; i++ )
 		{
 			int hParticle = (--pRenderList)->m_nIndex;
-			int nIndex = ( hParticle / 4 ) * xyz_stride;
+			// dimhotepus: int -> size_t.
+			size_t nIndex = ( hParticle / 4 ) * xyz_stride;
 			int nOffset = hParticle & 0x3;
 			meshBuilder.Position3f( SubFloat( xyz[nIndex], nOffset ), SubFloat( xyz[nIndex+1], nOffset ), SubFloat( xyz[nIndex+2], nOffset ) );
 			meshBuilder.Color4ub( 255, 255, 255, 255 );
@@ -427,7 +428,8 @@ void C_OP_RenderSprites::RenderNonSpriteCardCameraFacing( CParticleCollection *p
 			if ( ac == 0 )
 				continue;
 
-			int nColorIndex = nGroup * rgb_stride;
+			// dimhotepus: int -> size_t.
+			size_t nColorIndex = nGroup * rgb_stride;
 			float r = SubFloat( pRGB[nColorIndex], nOffset );
 			float g = SubFloat( pRGB[nColorIndex+1], nOffset );
 			float b = SubFloat( pRGB[nColorIndex+2], nOffset );
@@ -442,7 +444,8 @@ void C_OP_RenderSprites::RenderNonSpriteCardCameraFacing( CParticleCollection *p
 
 			float rad = pSortList->m_flRadius;
 
-			int nXYZIndex = nGroup * xyz_stride;
+			// dimhotepus: int -> size_t.
+			size_t nXYZIndex = nGroup * xyz_stride;
 			Vector vecWorldPos( SubFloat( xyz[ nXYZIndex ], nOffset ), SubFloat( xyz[ nXYZIndex+1 ], nOffset ), SubFloat( xyz[ nXYZIndex+2 ], nOffset ) );
 
 			// Move the Particle if their is a camerabias
@@ -538,7 +541,8 @@ void C_OP_RenderSprites::RenderNonSpriteCardZRotating( CMeshBuilder &meshBuilder
 	bool bCameraBias = ( &pCtx->m_VisibilityData )->m_flCameraBias != 0.0f;
 	float flCameraBias = ( &pCtx->m_VisibilityData )->m_flCameraBias;
 
-	int nColorIndex = nGroup * info.m_nRGBStride;
+	// dimhotepus: int -> size_t.
+	size_t nColorIndex = nGroup * info.m_nRGBStride;
 	float r = SubFloat( info.m_pRGB[nColorIndex], nOffset );
 	float g = SubFloat( info.m_pRGB[nColorIndex+1], nOffset );
 	float b = SubFloat( info.m_pRGB[nColorIndex+2], nOffset );
@@ -557,7 +561,8 @@ void C_OP_RenderSprites::RenderNonSpriteCardZRotating( CMeshBuilder &meshBuilder
 	float ca = (float)cos(-rot);
 	float sa = (float)sin(-rot);
 
-	int nXYZIndex = nGroup * info.m_nXYZStride;
+	// dimhotepus: int -> size_t.
+	size_t nXYZIndex = nGroup * info.m_nXYZStride;
 	Vector vecWorldPos( SubFloat( info.m_pXYZ[ nXYZIndex ], nOffset ), SubFloat( info.m_pXYZ[ nXYZIndex+1 ], nOffset ), SubFloat( info.m_pXYZ[ nXYZIndex+2 ], nOffset ) );
 
 	// Move the Particle if their is a camerabias
@@ -717,7 +722,8 @@ void C_OP_RenderSprites::RenderNonSpriteCardOriented(
 	bool bCameraBias = ( &pCtx->m_VisibilityData )->m_flCameraBias != 0.0f;
 	float flCameraBias = ( &pCtx->m_VisibilityData )->m_flCameraBias;
 
-	int nColorIndex = nGroup * info.m_nRGBStride;
+	// dimhotepus: int -> size_t.
+	size_t nColorIndex = nGroup * info.m_nRGBStride;
 	float r = SubFloat( info.m_pRGB[nColorIndex], nOffset );
 	float g = SubFloat( info.m_pRGB[nColorIndex+1], nOffset );
 	float b = SubFloat( info.m_pRGB[nColorIndex+2], nOffset );
@@ -736,7 +742,8 @@ void C_OP_RenderSprites::RenderNonSpriteCardOriented(
 	float ca = (float)cos(-rot);
 	float sa = (float)sin(-rot);
 
-	int nXYZIndex = nGroup * info.m_nXYZStride;
+	// dimhotepus: int -> size_t.
+	size_t nXYZIndex = nGroup * info.m_nXYZStride;
 	Vector vecWorldPos( SubFloat( info.m_pXYZ[ nXYZIndex ], nOffset ), SubFloat( info.m_pXYZ[ nXYZIndex+1 ], nOffset ), SubFloat( info.m_pXYZ[ nXYZIndex+2 ], nOffset ) );
 
 	// Move the Particle if their is a camerabias
@@ -909,7 +916,8 @@ void C_OP_RenderSprites::RenderSpriteCard( CMeshBuilder &meshBuilder, C_OP_Rende
 	int nGroup = hParticle / 4;
 	int nOffset = hParticle & 0x3;
 
-	int nColorIndex = nGroup * info.m_nRGBStride;
+	// dimhotepus: int -> size_t.
+	size_t nColorIndex = nGroup * info.m_nRGBStride;
 	float r = SubFloat( info.m_pRGB[nColorIndex], nOffset );
 	float g = SubFloat( info.m_pRGB[nColorIndex+1], nOffset );
 	float b = SubFloat( info.m_pRGB[nColorIndex+2], nOffset );
@@ -936,7 +944,8 @@ void C_OP_RenderSprites::RenderSpriteCard( CMeshBuilder &meshBuilder, C_OP_Rende
 	float rot = SubFloat( info.m_pRot[ nGroup * info.m_nRotStride ], nOffset );
 	float yaw = SubFloat( info.m_pYaw[ nGroup * info.m_nYawStride ], nOffset );
 
-	int nXYZIndex = nGroup * info.m_nXYZStride;
+	// dimhotepus: int -> size_t.
+	size_t nXYZIndex = nGroup * info.m_nXYZStride;
 	Vector vecWorldPos;
 	vecWorldPos.x = SubFloat( info.m_pXYZ[ nXYZIndex ], nOffset );
 	vecWorldPos.y = SubFloat( info.m_pXYZ[ nXYZIndex+1 ], nOffset );
@@ -1032,7 +1041,8 @@ void C_OP_RenderSprites::RenderTwoSequenceSpriteCard( CMeshBuilder &meshBuilder,
 	int nGroup = hParticle / 4;
 	int nOffset = hParticle & 0x3;
 
-	int nColorIndex = nGroup * info.m_nRGBStride;
+	// dimhotepus: int -> size_t.
+	size_t nColorIndex = nGroup * info.m_nRGBStride;
 	float r = SubFloat( info.m_pRGB[nColorIndex], nOffset );
 	float g = SubFloat( info.m_pRGB[nColorIndex+1], nOffset );
 	float b = SubFloat( info.m_pRGB[nColorIndex+2], nOffset );
@@ -1053,7 +1063,8 @@ void C_OP_RenderSprites::RenderTwoSequenceSpriteCard( CMeshBuilder &meshBuilder,
 	float rot = SubFloat( info.m_pRot[ nGroup * info.m_nRotStride ], nOffset );
 	float yaw = SubFloat( info.m_pYaw[ nGroup * info.m_nYawStride ], nOffset );
 
-	int nXYZIndex = nGroup * info.m_nXYZStride;
+	// dimhotepus: int -> size_t.
+	size_t nXYZIndex = nGroup * info.m_nXYZStride;
 	Vector vecWorldPos;
 	vecWorldPos.x = SubFloat( info.m_pXYZ[ nXYZIndex ], nOffset );
 	vecWorldPos.y = SubFloat( info.m_pXYZ[ nXYZIndex+1 ], nOffset );
@@ -1446,7 +1457,8 @@ void C_OP_RenderSpritesTrail::RenderSpriteTrail( CMeshBuilder &meshBuilder,
 		return;
 
 	// Setup our colors
-	int nColorIndex = nGroup * info.m_nRGBStride;
+	// dimhotepus: int -> size_t.
+	size_t nColorIndex = nGroup * info.m_nRGBStride;
 	float r = SubFloat( info.m_pRGB[nColorIndex], nOffset );
 	float g = SubFloat( info.m_pRGB[nColorIndex+1], nOffset );
 	float b = SubFloat( info.m_pRGB[nColorIndex+2], nOffset );
@@ -1475,17 +1487,20 @@ void C_OP_RenderSpritesTrail::RenderSpriteTrail( CMeshBuilder &meshBuilder,
 
 	const SequenceSampleTextureCoords_t *pSample0 = &(pSample->m_TextureCoordData[0]);
 
-	int nCreationTimeIndex = nGroup * info.m_nCreationTimeStride;
+	// dimhotepus: int -> size_t.
+	size_t nCreationTimeIndex = nGroup * info.m_nCreationTimeStride;
 	float flAge = info.m_pParticles->m_flCurTime - SubFloat( info.m_pCreationTimeStamp[ nCreationTimeIndex ], nOffset );
 
 	float flLengthScale = ( flAge >= m_flLengthFadeInTime ) ? 1.0f : ( flAge / m_flLengthFadeInTime );
 
-	int nXYZIndex = nGroup * info.m_nXYZStride;
+	// dimhotepus: int -> size_t.
+	size_t nXYZIndex = nGroup * info.m_nXYZStride;
 	Vector vecWorldPos( SubFloat( info.m_pXYZ[ nXYZIndex ], nOffset ), SubFloat( info.m_pXYZ[ nXYZIndex+1 ], nOffset ), SubFloat( info.m_pXYZ[ nXYZIndex+2 ], nOffset ) );
 	Vector vecViewPos = vecWorldPos;
 
 	// Get our screenspace last position
-	int nPrevXYZIndex = nGroup * info.m_nPrevXYZStride;
+	// dimhotepus: int -> size_t.
+	size_t nPrevXYZIndex = nGroup * info.m_nPrevXYZStride;
 	Vector vecPrevWorldPos( SubFloat( info.m_pPrevXYZ[ nPrevXYZIndex ], nOffset ), SubFloat( info.m_pPrevXYZ[ nPrevXYZIndex+1 ], nOffset ), SubFloat( info.m_pPrevXYZ[ nPrevXYZIndex+2 ], nOffset ) );
 	Vector vecPrevViewPos = vecPrevWorldPos;
 
@@ -1660,8 +1675,9 @@ struct RopeRenderInfo_t
 		int nGroup = hParticle / 4;
 		int nOffset = hParticle & 0x3;
 
-		int nXYZIndex = nGroup * m_nXYZStride;
-		int nColorIndex = nGroup * m_nRGBStride;
+		// dimhotepus: int -> size_t.
+		size_t nXYZIndex = nGroup * m_nXYZStride;
+		size_t nColorIndex = nGroup * m_nRGBStride;
 		seg.m_vPos.Init( SubFloat( m_pXYZ[ nXYZIndex ], nOffset ), SubFloat( m_pXYZ[ nXYZIndex+1 ], nOffset ), SubFloat( m_pXYZ[ nXYZIndex+2 ], nOffset ) );
 		seg.m_vColor.Init( SubFloat( m_pRGB[ nColorIndex ], nOffset ), SubFloat( m_pRGB[ nColorIndex+1 ], nOffset ), SubFloat( m_pRGB[nColorIndex+2], nOffset ) );
 		seg.m_flAlpha = SubFloat( m_pAlpha[ nGroup * m_nAlphaStride ], nOffset );
@@ -1876,7 +1892,8 @@ void C_OP_RenderRope::RenderSpriteCard( CParticleCollection *pParticles, void *p
 		vecP3.Init( pXYZ[2], pXYZ[6], pXYZ[10], pRadius[2] );
 	}
 	int nPnt = 3;
-	int nCurIDX = 0;
+	// dimhotepus: int -> unsigned short.
+	unsigned short nCurIDX = 0;
 
 	int nSegmentsAvailableInBuffer = nNumSegmentsIWillRenderPerBatch;
 
@@ -2059,7 +2076,8 @@ void C_OP_RenderRope::RenderUnsorted( CParticleCollection *pParticles, void *pCo
 	{
 		int nGroup = ( nFirstParticle-1 ) / 4;
 		int nOffset = ( nFirstParticle-1 ) & 0x3;
-		int nXYZIndex = nGroup * info.m_nXYZStride;
+		// dimhotepus: int -> size_t.
+		size_t nXYZIndex = nGroup * info.m_nXYZStride;
 		vecCatmullRom[0].Init( SubFloat( info.m_pXYZ[ nXYZIndex ], nOffset ), SubFloat( info.m_pXYZ[ nXYZIndex+1 ], nOffset ), SubFloat( info.m_pXYZ[ nXYZIndex+2 ], nOffset ) );
 	}
 
@@ -2080,7 +2098,8 @@ void C_OP_RenderRope::RenderUnsorted( CParticleCollection *pParticles, void *pCo
 			{
 				int nGroup = ( hParticle+1 ) / 4;
 				int nOffset = ( hParticle+1 ) & 0x3;
-				int nXYZIndex = nGroup * info.m_nXYZStride;
+				// dimhotepus: int -> size_t.
+				size_t nXYZIndex = nGroup * info.m_nXYZStride;
 				vecCatmullRom[ (i+2) & 0x3 ].Init( SubFloat( info.m_pXYZ[ nXYZIndex ], nOffset ), SubFloat( info.m_pXYZ[ nXYZIndex+1 ], nOffset ), SubFloat( info.m_pXYZ[ nXYZIndex+2 ], nOffset ) );
 			}
 			else
@@ -2379,7 +2398,8 @@ void C_OP_RenderScreenVelocityRotate::Render( IMatRenderContext *pRenderContext,
 		int nGroup = ( hParticle / 4 );
 		int nOffset = hParticle & 0x3;
 
-		int nXYZIndex = nGroup * xyz_stride;
+		// dimhotepus: int -> size_t.
+		size_t nXYZIndex = nGroup * xyz_stride;
 		Vector vecWorldPos( SubFloat( xyz[ nXYZIndex ], nOffset ), SubFloat( xyz[ nXYZIndex+1 ], nOffset ), SubFloat( xyz[ nXYZIndex+2 ], nOffset ) );
 		Vector vecViewPos;
 		Vector3DMultiplyPosition( tempView, vecWorldPos, vecViewPos );
@@ -2387,7 +2407,8 @@ void C_OP_RenderScreenVelocityRotate::Render( IMatRenderContext *pRenderContext,
 		if (!IsFinite(vecViewPos.x))
 			continue;
 
-		int nPrevXYZIndex = nGroup * prev_xyz_stride;
+		// dimhotepus: int -> size_t.
+		size_t nPrevXYZIndex = nGroup * prev_xyz_stride;
 		Vector vecPrevWorldPos( SubFloat( prev_xyz[ nPrevXYZIndex ], nOffset ), SubFloat( prev_xyz[ nPrevXYZIndex+1 ], nOffset ), SubFloat( prev_xyz[ nPrevXYZIndex+2 ], nOffset ) );
 		Vector vecPrevViewPos;
 		Vector3DMultiplyPosition( tempView, vecPrevWorldPos, vecPrevViewPos );
