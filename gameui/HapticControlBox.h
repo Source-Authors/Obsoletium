@@ -49,7 +49,8 @@ protected:
 
 	CCvarSliderCube *SlideValues;// up right near down left far and spingk
 	int m_iMouseOver;
-	float m_flTime;
+	// dimhotepus: float -> double.
+	double m_flTime;
 };
 
 #endif

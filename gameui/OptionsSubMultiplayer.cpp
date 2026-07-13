@@ -552,14 +552,14 @@ void CrosshairImagePanelCS::Paint()
 	int iBarSize = RoundFloatToInt(m_barSize * screenTall / BASE_HEIGHT);
 	int iBarThickness = max(1, RoundFloatToInt(m_barThickness * (float)screenTall / BASE_HEIGHT));
 
-	float fBarGap = 4.0f;
+	double fBarGap = 4.0;
 	if ( bDynamic )
 	{
-		float curtime = system()->GetFrameTime();
-		fBarGap *= (1.0f + cosf(curtime * 1.5f) * 0.5f);
+		double curtime = system()->GetFrameTime();
+		fBarGap *= (1.0 + cos(curtime * 1.5) * 0.5);
 	}
 
-	int iBarGap = RoundFloatToInt(fBarGap * screenTall / BASE_HEIGHT);
+	int iBarGap = RoundFloatToInt(static_cast<float>( fBarGap * screenTall / BASE_HEIGHT ));
 
 	// draw horizontal crosshair lines
 	int iInnerLeft	= centerX - iBarGap - iBarThickness / 2;
@@ -753,7 +753,8 @@ private:
 
 	// animation
 	IVguiMatInfoVar	*m_pFrameVar;
-	float			m_flNextFrameChange;
+	// dimhotepus: float -> double.
+	double			m_flNextFrameChange;
 	int				m_nNumFrames;
 	bool			m_bAscending;	// animating forward or in reverse?
 };
@@ -838,7 +839,7 @@ void CrosshairImagePanelAdvanced::SetCrosshairTexture( const char *crosshairname
 	m_pFrameVar = m_pAdvCrosshairMaterial->FindVarFactory( "$frame", NULL );
 	m_nNumFrames = m_pAdvCrosshairMaterial->GetNumAnimationFrames();
 
-	m_flNextFrameChange = system()->GetFrameTime() + 0.2f;
+	m_flNextFrameChange = system()->GetFrameTime() + 0.2;
 	m_bAscending = true;
 }
 
@@ -856,11 +857,11 @@ void CrosshairImagePanelAdvanced::Paint()
 	// scroll through all frames
 	if ( m_pFrameVar )
 	{	
-		float curtime = system()->GetFrameTime();
+		double curtime = system()->GetFrameTime();
 
 		if ( curtime >= m_flNextFrameChange )
 		{
-			m_flNextFrameChange = curtime + 0.2f;
+			m_flNextFrameChange = curtime + 0.2;
 
 			int frame = m_pFrameVar->GetIntValue();
 
@@ -890,7 +891,7 @@ void CrosshairImagePanelAdvanced::Paint()
 	float x, y;
 
 	// assume square
-	float flDrawWidth = ( m_flScale/48.0 ) * (float)wide;	
+	float flDrawWidth = ( m_flScale/48.0f ) * (float)wide;
 	int flHalfWidth = (int)( flDrawWidth / 2 );
 
 	x = wide/2 - flHalfWidth;
