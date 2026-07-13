@@ -5943,9 +5943,10 @@ void CDmeTypedLog< float >::BuildNormalizedLayer( CDmeTypedLogLayer< float > *ta
 	for ( intp i = 0; i < kc; ++i )
 	{
 		DmeTime_t keyTime = baseLayer->GetKeyTime( i );
-		int keyValue = baseLayer->GetKeyValue( i );
+		// dimhotepus: int -> float.
+		float keyValue = baseLayer->GetKeyValue( i );
 
-		float len = (float)keyValue;
+		float len = keyValue;
 
 		if ( len < flMin )
 		{
