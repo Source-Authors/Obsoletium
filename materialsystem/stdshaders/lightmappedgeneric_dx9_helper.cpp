@@ -725,7 +725,7 @@ void DrawLightmappedGeneric_DX9_Internal(CBaseVSShader *pShader, IMaterialVar** 
 				pContextData->m_SemiStaticCmdsOut.OutputConstantData( params[info.m_nEnvmapSaturation]->GetVecValue() );
 				float flFresnel = params[info.m_nFresnelReflection]->GetFloatValue();
 				// [ 0, 0, 1-R(0), R(0) ]
-				pContextData->m_SemiStaticCmdsOut.OutputConstantData4( 0., 0., 1.0 - flFresnel, flFresnel );
+				pContextData->m_SemiStaticCmdsOut.OutputConstantData4( 0.f, 0.f, 1.0f - flFresnel, flFresnel );
 				
 				pContextData->m_SemiStaticCmdsOut.SetPixelShaderConstant( 7, params[info.m_nSelfIllumTint]->GetVecValue() );
 			}

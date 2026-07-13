@@ -102,7 +102,7 @@ BEGIN_VS_SHADER_FLAGS( Shadow, "Help for Shadow", SHADER_NOT_EDITABLE )
 				nHeight = pTexture->GetActualHeight();
 			}
 
-			Vector4D vecJitter( 1.0 / nWidth, 1.0 / nHeight, 0.0, 0.0 );
+			Vector4D vecJitter( 1.0f / nWidth, 1.0f / nHeight, 0.0f, 0.0f );
 			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_2, vecJitter.Base() );
 
 			vecJitter.y *= -1.0f;
