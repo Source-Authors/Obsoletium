@@ -135,8 +135,10 @@ public:
 	virtual int				GetOwningWeaponEntIndex( int entindex ) = 0;
 	virtual int				GetEntIndex( EntitySearchResult entityToAttach ) = 0;
 
-	virtual int				FindGlobalFlexcontroller( char const *name ) = 0;
-	virtual char const		*GetGlobalFlexControllerName( int idx ) = 0;
+	// dimhotepus: int -> UtlSymId_t.
+	virtual UtlSymId_t		FindGlobalFlexcontroller( char const *name ) = 0;
+	// dimhotepus: int -> UtlSymId_t.
+	virtual char const		*GetGlobalFlexControllerName( UtlSymId_t idx ) = 0;
 
 	// helper for traversing ownership hierarchy
 	virtual EntitySearchResult	GetOwnerEntity( EntitySearchResult currentEnt ) = 0;

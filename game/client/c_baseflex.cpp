@@ -1345,9 +1345,10 @@ int C_BaseFlex::g_numflexcontrollers;
 char * C_BaseFlex::g_flexcontroller[MAXSTUDIOFLEXCTRL*4];
 float C_BaseFlex::g_flexweight[MAXSTUDIOFLEXDESC];
 
-int C_BaseFlex::AddGlobalFlexController( const char *szName )
+// dimhotepus: int -> UtlSymId_t.
+UtlSymId_t C_BaseFlex::AddGlobalFlexController( const char *szName )
 {
-	int i;
+	UtlSymId_t i;
 	for (i = 0; i < g_numflexcontrollers; i++)
 	{
 		if (Q_stricmp( g_flexcontroller[i], szName ) == 0)
@@ -1368,7 +1369,8 @@ int C_BaseFlex::AddGlobalFlexController( const char *szName )
 	return -1;
 }
 
-char const *C_BaseFlex::GetGlobalFlexControllerName( int idx )
+// dimhotepus: int -> UtlSymId_t.
+char const *C_BaseFlex::GetGlobalFlexControllerName( UtlSymId_t idx )
 {
 	if ( idx < 0 || idx >= g_numflexcontrollers )
 	{

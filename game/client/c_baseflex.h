@@ -191,8 +191,10 @@ public:
 
 	int				m_blinktoggle;
 
-	static int		AddGlobalFlexController( const char *szName );
-	static char const *GetGlobalFlexControllerName( int idx );
+	// dimhotepus: int -> UtlSymId_t.
+	static UtlSymId_t AddGlobalFlexController( const char *szName );
+	// dimhotepus: int -> UtlSymId_t.
+	static char const *GetGlobalFlexControllerName( UtlSymId_t idx );
 
 	// bah, this should be unified with all prev/current stuff.
 

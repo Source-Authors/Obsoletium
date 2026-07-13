@@ -88,8 +88,10 @@ public:
 	virtual int				GetOwningWeaponEntIndex( int entindex );
 	virtual int				GetEntIndex( EntitySearchResult entityToAttach );
 
-	virtual int				FindGlobalFlexcontroller( char const *name );
-	virtual char const		*GetGlobalFlexControllerName( int idx );
+	// dimhotepus: int -> UtlSymId_t.
+	virtual UtlSymId_t		FindGlobalFlexcontroller( char const *name );
+	// dimhotepus: int -> UtlSymId_t.
+	virtual char const		*GetGlobalFlexControllerName( UtlSymId_t idx );
 
 	// helper for traversing ownership hierarchy
 	virtual EntitySearchResult	GetOwnerEntity( EntitySearchResult currentEnt );
@@ -644,12 +646,14 @@ void CClientTools::UpdateProjectedTexture( ClientShadowHandle_t h, bool bForce )
 	g_pClientShadowMgr->UpdateProjectedTexture( h, bForce );
 }
 
-int CClientTools::FindGlobalFlexcontroller( char const *name )
+// dimhotepus: int -> UtlSymId_t.
+UtlSymId_t CClientTools::FindGlobalFlexcontroller( char const *name )
 {
 	return C_BaseFlex::AddGlobalFlexController( name );
 }
 
-char const *CClientTools::GetGlobalFlexControllerName( int idx )
+// dimhotepus: int -> UtlSymId_t.
+char const *CClientTools::GetGlobalFlexControllerName( UtlSymId_t idx )
 {
 	return C_BaseFlex::GetGlobalFlexControllerName( idx );
 }
