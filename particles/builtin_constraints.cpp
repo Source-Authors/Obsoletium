@@ -428,10 +428,10 @@ END_PARTICLE_OPERATOR_UNPACK( C_OP_PlanarConstraint )
 
 
 static Vector s_OrientationRelativeTraceVectors[] = {
-	Vector( 0, .1962, .784929 ),
-	Vector( -.1962, 0, .784929 ),
-	Vector( .1962, 0, .784929 ),
-	Vector( 0, -.1962, .78929 ),
+	Vector( 0, .1962f, .784929f ),
+	Vector( -.1962f, 0, .784929f ),
+	Vector( .1962f, 0, .784929f ),
+	Vector( 0, -.1962f, .78929f ),
 };
 
 void CWorldCollideContextData::SetBaseTrace(  int nIndex, Vector const &rayStart, Vector const &traceDir, int nCollisionGroup, bool bKeepMisses )

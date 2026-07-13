@@ -1168,8 +1168,8 @@ void C_INIT_InitialVelocityNoise::InitNewParticlesScalar(
 	float CoordScale = m_flNoiseScale;
 	float CoordScaleLoc = m_flNoiseScaleLoc;
 
-	Vector ofs_y = Vector( 100000.5, 300000.25, 9000000.75 );
-	Vector ofs_z = Vector( 110000.25, 310000.75, 9100000.5 );
+	Vector ofs_y = Vector( 100000.5f, 300000.25f, 9000000.75f );
+	Vector ofs_z = Vector( 110000.25f, 310000.75f, 9100000.5f );
 
 	for( ; nParticleCount--; start_p++ )
 	{	
@@ -2160,16 +2160,16 @@ void C_INIT_CreationNoise::InitNewParticlesBlock( CParticleCollection *pParticle
 	if ( m_bAbsVal )
 	{
 		fl4AbsVal = DirectX::XMLoadInt4A( g_SIMD_clear_signmask );
-		flAbsScale = 1.0;
+		flAbsScale = 1.0f;
 	}
 
 	float fMin = m_flOutputMin;
-	float fMax = m_flOutputMax;	
+	float fMax = m_flOutputMax;
 
 	if ( ATTRIBUTES_WHICH_ARE_ANGLES & (1 << m_nFieldOutput ) )
 	{
-		fMin *= ( M_PI / 180.0f );
-		fMax *= ( M_PI / 180.0f );
+		fMin *= ( M_PI_F / 180.0f );
+		fMax *= ( M_PI_F / 180.0f );
 	}	
 
 	float CoordScale = m_flNoiseScale;
@@ -3656,10 +3656,10 @@ void C_INIT_RandomYawFlip::InitNewParticlesScalar(
 {
 	for( ; nParticleCount--; start_p++ )
 	{
-		float flChance = pParticles->RandomFloat( 0.0, 1.0 );
+		float flChance = pParticles->RandomFloat( 0.0f, 1.0f );
 		if ( flChance < m_flPercent )
 		{
-			float flRadians = 180 * ( M_PI / 180.0f );
+			float flRadians = 180 * ( M_PI_F / 180.0f );
 			float *drot = pParticles->GetFloatAttributePtrForWrite( PARTICLE_ATTRIBUTE_YAW, start_p );
 			*drot += flRadians;
 		}

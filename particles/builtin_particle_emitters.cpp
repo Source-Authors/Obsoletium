@@ -395,7 +395,7 @@ class C_OP_ContinuousEmitter : public CParticleOperatorInstance
 			int maxDrawTime = static_cast<int>( flCurrDrawTime * 10 );
 			for( int i = static_cast<int>( flPrevDrawTime * 10 ); i < maxDrawTime; i++ )
 			{
-				pParticles->Simulate( .1, false );
+				pParticles->Simulate( .1f, false );
 			}
 		}
 	}

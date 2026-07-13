@@ -1066,8 +1066,8 @@ void C_OP_Noise::Operate( CParticleCollection *pParticles, float flStrength, voi
 
 	if ( ATTRIBUTES_WHICH_ARE_ANGLES & (1 << m_nFieldOutput ) )
 	{
-		fMin *= ( M_PI / 180.0f );
-		fMax *= ( M_PI / 180.0f );
+		fMin *= ( M_PI_F / 180.0f );
+		fMax *= ( M_PI_F / 180.0f );
 	}
 	// calculate coefficients. noise retuns -1..1
 	fltx4 ValueScale=ReplicateX4( 0.5f*(fMax-fMin ) );

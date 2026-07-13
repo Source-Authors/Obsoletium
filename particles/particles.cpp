@@ -1986,7 +1986,7 @@ void CParticleCollection::Simulate( float dt, bool updateBboxOnly )
 		++m_nSimulatedFrames;
 
 		float flRemainingDt = dt;
-		float flMaxDT = 0.1;									// default
+		float flMaxDT = 0.1f;									// default
 		if ( m_pDef->m_flMaximumTimeStep > 0.0 )
 			flMaxDT = m_pDef->m_flMaximumTimeStep;
 
@@ -2419,10 +2419,10 @@ void CParticleCollection::RecomputeBounds( void )
 		return;
 	}
 
-	fltx4 min_x = ReplicateX4(1.0e23);
+	fltx4 min_x = ReplicateX4(1.0e23f);
 	fltx4 min_y = min_x;
 	fltx4 min_z = min_x;
-	fltx4 max_x = ReplicateX4(-1.0e23);
+	fltx4 max_x = ReplicateX4(-1.0e23f);
 	fltx4 max_y = max_x;
 	fltx4 max_z = max_x;
 
