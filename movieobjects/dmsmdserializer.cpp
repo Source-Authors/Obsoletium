@@ -107,7 +107,7 @@ void CDmSmdSerializer::SetUpAxis( CDmSmdSerializer::Axis_t nUpAxis )
 	switch ( m_nUpAxis )
 	{
 	case X_AXIS:	// X Up
-		AngleMatrix( RadianEuler( -M_PI / 2.0, M_PI / 2.0, 0.0 ), m_mAdj );
+		AngleMatrix( RadianEuler( -M_PI_F / 2.0f, M_PI_F / 2.0f, 0.0f ), m_mAdj );
 		MatrixInverseTranspose( m_mAdj, m_mAdjNormal );
 		break;
 	case Y_AXIS:	// Y Up
@@ -116,7 +116,7 @@ void CDmSmdSerializer::SetUpAxis( CDmSmdSerializer::Axis_t nUpAxis )
 		break;
 	case Z_AXIS:
 	default:
-		AngleMatrix( RadianEuler( -M_PI / 2.0, 0.0, 0.0 ), m_mAdj );
+		AngleMatrix( RadianEuler( -M_PI_F / 2.0f, 0.0f, 0.0f ), m_mAdj );
 		MatrixInverseTranspose( m_mAdj, m_mAdjNormal );
 		break;
 	}
@@ -834,7 +834,7 @@ static bool ParserCreateJoint(
 		pDmePosChannel->SetMode( CM_PLAY );
 		pDmePosChannel->SetOutput( pDmeTransform, "position" );
 		CDmeVector3Log *pDmePosLog = pDmePosChannel->CreateLog< Vector >();
-		pDmePosLog->SetValueThreshold( 1.0e-6 );
+		pDmePosLog->SetValueThreshold( 1.0e-6f );
 		pDmeChannelsClip->m_Channels.AddToTail( pDmePosChannel );
 
 		CDmAttribute *pPosLogAttr = pDmeJoint->AddAttribute( "__posLog", AT_ELEMENT );
@@ -845,7 +845,7 @@ static bool ParserCreateJoint(
 		pDmeRotChannel->SetMode( CM_PLAY );
 		pDmeRotChannel->SetOutput( pDmeTransform, "orientation" );
 		CDmeQuaternionLog *pDmeRotLog = pDmeRotChannel->CreateLog< Quaternion >();
-		pDmeRotLog->SetValueThreshold( 1.0e-6 );
+		pDmeRotLog->SetValueThreshold( 1.0e-6f );
 		pDmeChannelsClip->m_Channels.AddToTail( pDmeRotChannel );
 
 		CDmAttribute *pRotLogAttr = pDmeJoint->AddAttribute( "__rotLog", AT_ELEMENT );
@@ -1035,7 +1035,7 @@ static void HandleVertexWeights(
 	CUtlVector< CUtlString > tokens;
 	Tokenize( tokens, pszLine );
 
-	const float flEps = 1.0e-6;
+	const float flEps = 1.0e-6f;
 
 	intp nTokenEnd = tokens.Count();
 	if ( nTokenEnd > 10 )
