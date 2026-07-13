@@ -4206,8 +4206,8 @@ void CIKContext::SolveDependencies( Vector pos[], Quaternion q[], matrix3x4_t bo
 				if (pChainResult->target != -1)
 				{
 					CIKTarget *pTarget = &m_target[pChainResult->target];
-					VectorScale( pTarget->latched.deltaPos, 0.8, pTarget->latched.deltaPos );
-					QuaternionScale( pTarget->latched.deltaQ, 0.8, pTarget->latched.deltaQ );
+					VectorScale( pTarget->latched.deltaPos, 0.8f, pTarget->latched.deltaPos );
+					QuaternionScale( pTarget->latched.deltaQ, 0.8f, pTarget->latched.deltaQ );
 				}
 			}
 		}

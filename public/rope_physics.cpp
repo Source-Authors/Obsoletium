@@ -94,7 +94,7 @@ void CBaseRopePhysics::SetDelegate( CSimplePhysics::IHelper *pDelegate )
 
 void CBaseRopePhysics::Simulate( float dt )
 {
-	static float flEnergy = 0.98;
+	constexpr float flEnergy = 0.98f;
 	m_Physics.Simulate( m_pNodes, m_nNodes, this, dt, flEnergy );
 }
 

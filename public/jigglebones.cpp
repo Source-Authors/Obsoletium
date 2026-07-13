@@ -621,9 +621,9 @@ void CJiggleBones::BuildJiggleTransformations( int boneIndex, float currenttime,
 					if ( debugoverlay )
 					{
 						debugoverlay->AddLineOverlay( goalBasePosition, goalBasePosition + 5.0f * data->boingDir, 255, 255, 0, true, 999.9f );
-						debugoverlay->AddLineOverlay( goalBasePosition, goalBasePosition + Vector( 0.1, 0, 0 ), 128, 128, 0, true, 999.9f );
-						debugoverlay->AddLineOverlay( goalBasePosition, goalBasePosition + Vector( 0, 0.1, 0 ), 128, 128, 0, true, 999.9f );
-						debugoverlay->AddLineOverlay( goalBasePosition, goalBasePosition + Vector( 0, 0, 0.1 ), 128, 128, 0, true, 999.9f );
+						debugoverlay->AddLineOverlay( goalBasePosition, goalBasePosition + Vector( 0.1f, 0, 0 ), 128, 128, 0, true, 999.9f );
+						debugoverlay->AddLineOverlay( goalBasePosition, goalBasePosition + Vector( 0, 0.1f, 0 ), 128, 128, 0, true, 999.9f );
+						debugoverlay->AddLineOverlay( goalBasePosition, goalBasePosition + Vector( 0, 0, 0.1f ), 128, 128, 0, true, 999.9f );
 					}
 				}
 #endif
