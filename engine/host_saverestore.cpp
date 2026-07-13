@@ -503,7 +503,7 @@ char *CSaveRestore::GetSaveDir()
 	if ( szDirectory[0] ) return szDirectory;
 
 	// dimhotepus: Dropped / at the end to unify all places.
-	V_sprintf_safe(szDirectory, "save" PLATFORM_DIR, MOD_DIR);
+	V_strcpy_safe(szDirectory, "save" PLATFORM_DIR);
 
 	return szDirectory;
 }
@@ -530,7 +530,6 @@ void CSaveRestore::AgeSaveFile( const char *pName, const char *ext, int count )
 {
 	char newName[MAX_OSPATH], oldName[MAX_OSPATH];
 
-	// dimhotepus: Use MOD inside GetSaveDir.
 	if ( count == 1 )
 	{
 		V_sprintf_safe( oldName, "%s/%s.%s", GetSaveDir(), pName, ext );	// quick.sav.
@@ -540,9 +539,9 @@ void CSaveRestore::AgeSaveFile( const char *pName, const char *ext, int count )
 		V_sprintf_safe( oldName, "%s/%s%02d.%s", GetSaveDir(), pName, count-1, ext );	// quick04.sav, etc.
 	}
 	
-	// dimhotepus: Use MOD inside GetSaveDir.
 	V_sprintf_safe( newName, "%s/%s%02d.%s", GetSaveDir(), pName, count, ext );
-
+	
+	// dimhotepus: Use MOD for fs.
 	// Scroll the name list down (rename quick04.sav to quick05.sav)
 	if ( g_pFileSystem->FileExists( oldName, MOD_DIR ) )
 	{
@@ -1022,8 +1021,6 @@ bool CSaveRestore::LoadGame( const char *pName )
 
 	m_bClearSaveDir = false;
 	DoClearSaveDir();
-
-	bool bLoadedToMemory = false;
 	
 	int iElapsedMinutes = 0;
 	int iElapsedSeconds = 0;
@@ -1055,10 +1052,6 @@ bool CSaveRestore::LoadGame( const char *pName )
 		}
 		else
 		{
-			if ( bLoadedToMemory )
-			{
-				g_pSaveRestoreFileSystem->RemoveFile( name );
-			}
 			return NULL;
 		}
 
@@ -1075,11 +1068,6 @@ bool CSaveRestore::LoadGame( const char *pName )
 			// dimhotepus: Msg -> Warning.
 			Warning( "Map '%s' missing or invalid\n", gameHeader.mapName );
 			validload = false;
-		}
-		
-		if ( bLoadedToMemory )
-		{
-			g_pSaveRestoreFileSystem->RemoveFile( name );
 		}
 	}
 	else
@@ -1827,7 +1815,9 @@ void CSaveRestore::RestoreClientState( char const *fileName, bool adjacent )
 void CSaveRestore::RestoreAdjacenClientState( char const *map )
 {
 	char name[256];
-	Q_snprintf( name, sizeof( name ), "%s/%s.HL2", GetSaveDir(), GetSaveGameMapName( map ) );// DON'T FixSlashes on this, it needs to be //MOD
+	Q_snprintf( name, sizeof( name ), "%s/%s.HL2", GetSaveDir(), GetSaveGameMapName( map ) );
+	// dimhotepus: Fix file name.
+	V_FixSlashes( name );
 	COM_CreatePath( name );
 
 	RestoreClientState( name, true );
@@ -2579,7 +2569,7 @@ void CSaveRestore::DirectoryCount( const char *pPath, int *pResult )
 //-----------------------------------------------------------------------------
 void CSaveRestore::DirectoryClear( const char *pPath )
 {
-	g_pSaveRestoreFileSystem->DirectoryClear( pPath, false );
+	g_pSaveRestoreFileSystem->DirectoryClear( pPath );
 }
 
 
@@ -2603,6 +2593,8 @@ void CSaveRestore::DoClearSaveDir()
 	char szName[MAX_OSPATH];
 
 	V_strcpy_safe( szName, GetSaveDir() );
+	// dimhotepus: GetSaveDir after changes missed separator, readd it.
+	V_strcat_safe( szName, CORRECT_PATH_SEPARATOR_S );
 	Q_FixSlashes( szName );
 	// Create save directory if it doesn't exist
 	Sys_mkdir( szName );

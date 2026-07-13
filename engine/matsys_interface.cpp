@@ -139,16 +139,16 @@ static void NukeModeSwitchSaveGames( void )
 
 	V_sprintf_safe( modeswitch, "%s/modeswitchsave.sav", saveDir );
 
-	if (g_pFileSystem->FileExists(modeswitch ))
+	if (g_pFileSystem->FileExists(modeswitch, "MOD" ))
 	{
-		g_pFileSystem->RemoveFile( modeswitch );
+		g_pFileSystem->RemoveFile( modeswitch, "MOD" );
 	}
 
 	V_sprintf_safe( modeswitch, "%s/modeswitchsave.tga", saveDir );
 
-	if (g_pFileSystem->FileExists(modeswitch ))
+	if (g_pFileSystem->FileExists(modeswitch, "MOD" ))
 	{
-		g_pFileSystem->RemoveFile( modeswitch );
+		g_pFileSystem->RemoveFile( modeswitch, "MOD" );
 	}
 }
 

@@ -209,7 +209,8 @@ public:
 			Q_snprintf( szName, sizeof( szName ), "%s/%s", saverestore->GetSaveDir(), list[i].szFileName );
 			Q_FixSlashes( szName );
 
-			unsigned fileSize = g_pFileSystem->Size( szName );
+			// dimhotepus: Correctly check file size.
+			unsigned fileSize = g_pFileSystem->Size( szName, "MOD" );
 			if ( fileSize )
 			{
 				Assert( sizeof(list[i].szFileName) == MAX_PATH );
@@ -282,7 +283,7 @@ public:
 	//-----------------------------------------------------------------------------
 	// Purpose: Clears the save directory of all temporary files (*.hl)
 	//-----------------------------------------------------------------------------
-	void DirectoryClear( const char *pPath, bool bIsXSave )
+	void DirectoryClear( const char *pPath )
 	{
 		char		szPath[ MAX_PATH ];
 		
@@ -290,14 +291,7 @@ public:
 		RunCodeAtScopeExit(Sys_FindClose());
 		while ( findfn != NULL )
 		{
-			if ( !bIsXSave )
-			{
-				Q_snprintf( szPath, sizeof( szPath ), "%s/%s", saverestore->GetSaveDir(), findfn );
-			}
-			else
-			{
-				Q_snprintf( szPath, sizeof( szPath ), "%s:\\%s", GetCurrentMod(), findfn );
-			}
+			Q_snprintf( szPath, sizeof( szPath ), "%s/%s", saverestore->GetSaveDir(), findfn );
 
 			// Delete the temporary save file
 			g_pFileSystem->RemoveFile( szPath, "MOD" );

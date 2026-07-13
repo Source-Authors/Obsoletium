@@ -52,7 +52,7 @@ public:
 	virtual void			DirectoryCopy( const char *pPath, const char *pDestFileName ) = 0;
 	virtual	bool			DirectoryExtract( FileHandle_t pFile, int fileCount ) = 0;
 	virtual int				DirectoryCount( const char *pPath ) = 0;
-	virtual void			DirectoryClear( const char *pPath, bool bIsXSave ) = 0;
+	virtual void			DirectoryClear( const char *pPath ) = 0;
 
 	virtual void			AuditFiles( void ) = 0;
 	virtual bool			LoadFileFromDisk( const char *pFilename ) = 0;
