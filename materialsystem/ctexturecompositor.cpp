@@ -332,7 +332,7 @@ void ParseRangeFromKV( KeyValues* _kv, void* _pDest )
 // ------------------------------------------------------------------------------------------------
 void ParseInverseRangeFromKV( KeyValues* _kv, void* _pDest )
 {
-	constexpr float kSubstValue = 0.00001;
+	constexpr float kSubstValue = 0.00001f;
 	ParseRangeFromKV( _kv, _pDest );
 	Range* realDest = ( Range* ) _pDest;
 

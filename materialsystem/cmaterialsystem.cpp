@@ -2854,9 +2854,9 @@ void CMaterialSystem::AllocateStandardTextures()
 
 	m_StandardTexturesAllocated = true;
 
-	float nominal_lightmap_value = 1.0;
+	float nominal_lightmap_value = 1.0f;
 	if ( HardwareConfig()->GetHDRType() == HDR_TYPE_INTEGER )
-		nominal_lightmap_value = 1.0/16.0;
+		nominal_lightmap_value = 1.0f/16.0f;
 
 	unsigned char texel[4];
 	texel[3] = 255;
