@@ -1829,7 +1829,7 @@ bool MM_Heartbeat::ReadFromBuffer( bf_read &buffer )
 
 const char *MM_Heartbeat::ToString( ) const
 {
-	V_sprintf_safe( s_text, "Heartbeat" );
+	V_strcpy_safe( s_text, "Heartbeat" );
 	return s_text;
 }
 

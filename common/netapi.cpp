@@ -100,7 +100,7 @@ char *CNetAPI::AdrToString( netadr_t *a )
 	{
 		if ( a->type == NA_LOOPBACK )
 		{
-			V_sprintf_safe (s, "loopback");
+			V_strcpy_safe(s, "loopback");
 		}
 		else if ( a->type == NA_IP )
 		{
