@@ -1893,7 +1893,7 @@ void CFrameTimer::MarkFrame()
 
 }
 
-#define FRAME_TIME_FILTER_TIME 0.5f
+#define FRAME_TIME_FILTER_TIME 0.5
 
 void CFrameTimer::ComputeFrameVariability()
 {

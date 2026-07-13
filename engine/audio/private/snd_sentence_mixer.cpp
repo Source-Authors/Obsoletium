@@ -293,7 +293,7 @@ float CSentenceMixer::GetVolumeScale( void )
 	{
 		if ( m_VoxWords[m_currentWordIndex].volume )
 		{
-			float volume = m_VoxWords[m_currentWordIndex].volume * 0.01;
+			float volume = m_VoxWords[m_currentWordIndex].volume * 0.01f;
 			if ( volume < 1.0f )
 				return volume;
 		}

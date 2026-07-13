@@ -1588,7 +1588,7 @@ constexpr prm_rng_t dly_rng[] = {
 
 	{dly_idtype,	0, DLY_MAX},		// delay type DLY_PLAIN, DLY_LOWPASS, DLY_ALLPASS etc	
 	{dly_idelay,	-1.0, 1000.0},		// delay in milliseconds (-1 forces auto dsp to set delay value from room size)
-	{dly_ifeedback,	0.0, 0.99},			// feedback 0-1.0
+	{dly_ifeedback,	0.0, 0.99f},			// feedback 0-1.0
 	{dly_igain,	    0.0, 10.0},			// final gain of output stage, 0-10.0 
 
 	// filter params if dly type DLY_LOWPASS or DLY_FLINEAR
@@ -2194,7 +2194,7 @@ constexpr prm_rng_t mdy_rng[] = {
 
 	{mdy_idtype,	0, DLY_MAX},		// delay type DLY_PLAIN, DLY_LOWPASS, DLY_ALLPASS	
 	{mdy_idelay,	0.0, 1000.0},		// delay in milliseconds
-	{mdy_ifeedback,	0.0, 0.99},			// feedback 0-1.0
+	{mdy_ifeedback,	0.0, 0.99f},			// feedback 0-1.0
 	{mdy_igain,	    0.0, 1.0},			// final gain of output stage, 0-1.0
 
 	// filter params if mdy type DLY_LOWPASS
@@ -2204,9 +2204,9 @@ constexpr prm_rng_t mdy_rng[] = {
 	{mdy_iqwidth,	100.0, 11025.0},
 	{mdy_iquality,	0, QUA_MAX},
 	
-	{mdy_imodrate,	0.01, 200.0},		// frequency at which delay values change to new random value. 0 is no self-modulation
+	{mdy_imodrate,	0.01f, 200.0},		// frequency at which delay values change to new random value. 0 is no self-modulation
 	{mdy_imoddepth,	0.0, 1.0},			// how much delay changes (decreases) from current value (0-1.0) 
-	{mdy_imodglide,	0.01, 100.0},		// glide time between dcur and dnew in milliseconds
+	{mdy_imodglide,	0.01f, 100.0},		// glide time between dcur and dnew in milliseconds
 	{mdy_imix,		0.0, 1.0}			// 1.0 = full fx mix, 0.5 = 50% fx, 50% dry
 };
 
@@ -2650,7 +2650,7 @@ constexpr prm_rng_t rva_rng[] = {
 	{rva_fbheight,	-1.0, 1.0},		// 0-1.0 material reflectivity - used as feedback param instead of decay if non-zero	
 									// if < 0, a predelay is allocated, then feedback is -1*param given
 
-	{rva_iftaps,	0.0, 0.333}		// if > 0, use 3 extra taps with delay values = d * (1 - faps*n) n = 0,1,2,3
+	{rva_iftaps,	0.0, 0.333f}		// if > 0, use 3 extra taps with delay values = d * (1 - faps*n) n = 0,1,2,3
 };
 
 #define RVA_BASEM		1				// base number of parallel delays
@@ -3921,9 +3921,9 @@ constexpr prm_rng_t ptc_rng[] = {
 
 	{ptc_cparam,	0, 0},				// first entry is # of parameters
 
-	{ptc_ipitch,		0.1, 4.0},		// 0-n.0 where 1.0 = 1 octave up and 0.5 is one octave down	
-	{ptc_itimeslice,	20.0, 300.0},	// in milliseconds - size of sound chunk to analyze and cut/duplicate - 100ms nominal
-	{ptc_ixfade,		1.0, 200.0},	// in milliseconds - size of crossfade region between spliced chunks - 20ms nominal	
+	{ptc_ipitch,		0.1f, 4.0f},		// 0-n.0 where 1.0 = 1 octave up and 0.5 is one octave down	
+	{ptc_itimeslice,	20.0f, 300.0f},	// in milliseconds - size of sound chunk to analyze and cut/duplicate - 100ms nominal
+	{ptc_ixfade,		1.0f, 200.0f},	// in milliseconds - size of crossfade region between spliced chunks - 20ms nominal	
 };
 
 
@@ -4586,7 +4586,7 @@ crs_t * CRS_Alloc( int lfotype, float fHz, float fdepth, float mix )
 
 	D = fdepth * MSEC_TO_SAMPS(CRS_DELAYMAX);		// sweep from 0 - n milliseconds
 
-	ramptime = (float) CRS_RAMPTIME / 1000.0;				// # milliseconds to ramp between new values
+	ramptime = (float) CRS_RAMPTIME / 1000.0f;				// # milliseconds to ramp between new values
 	
 	pdly = DLY_Alloc ( D, 0, 1, DLY_LINEAR );
 
@@ -4983,7 +4983,7 @@ constexpr prm_rng_t amp_rng[] = {
 
 	{amp_imodrate,	0.0, 200.0},		// frequency at which amplitude values change to new random value. 0 is no self-modulation
 	{amp_imoddepth,	0.0, 1.0},			// how much amplitude changes (decreases) from current value (0-1.0) 
-	{amp_imodglide,	0.01, 100.0},		// glide time between mapcur and ampnew in milliseconds
+	{amp_imodglide,	0.01f, 100.0},		// glide time between mapcur and ampnew in milliseconds
 	{amp_irand,		0.0, 1.0},			// if 1, use random modulation otherwise alternate from max-min-max
 };
 
@@ -6745,11 +6745,11 @@ constexpr int MapReflectivityToDLYCutoff[] =
 
 constexpr float MapSizeToDLYFeedback[] = 
 {
-	0.9, // 0.6,	// SMALL	
-	0.8, // 0.5,	// MEDIUM	
-	0.7, // 0.4,	// LARGE	
-	0.6, // 0.3,	// HUGE		
-	0.5, // 0.2,	// GIGANTIC	
+	0.9f, // 0.6,	// SMALL	
+	0.8f, // 0.5,	// MEDIUM	
+	0.7f, // 0.4,	// LARGE	
+	0.6f, // 0.3,	// HUGE		
+	0.5f, // 0.2,	// GIGANTIC	
 };
 
 void ADSP_SetupAutoDelay( prc_t *pprc_dly, auto_params_t *pa )
@@ -6841,25 +6841,25 @@ void ADSP_SetupAutoReverb( prc_t *pprc_rva, auto_params_t *pa )
 	// decay: 0-2.0 scales feedback parameters (.7 to .9 * scale/2.0 = feedback)
 	// fparallel: if true, filters are built into delays, otherwise filter output only
 	// fmoddly: if true, all delays are modulating delays
-	float gain = 1.0;
+	float gain = 1.0f;
 
 	pprc_rva->type = PRC_RVA;
 
-	pprc_rva->prm[rva_size_max]			= 50.0;
-	pprc_rva->prm[rva_size_min]			= 30.0;
+	pprc_rva->prm[rva_size_max]			= 50.0f;
+	pprc_rva->prm[rva_size_min]			= 30.0f;
 	
 	if (ADSP_IsRoom(pa))
 		pprc_rva->prm[rva_inumdelays]	= MapSizeToRVANumDelays[pa->size];
 	else
 		pprc_rva->prm[rva_inumdelays]	= MapSizeToRVANumDelays[pa->len];
 
-	pprc_rva->prm[rva_ifeedback]	= 0.9;
+	pprc_rva->prm[rva_ifeedback]	= 0.9f;
 	
 	pprc_rva->prm[rva_icutoff]		= MapReflectivityToRVACutoff[pa->reflectivity];
 	
 	pprc_rva->prm[rva_ifparallel]	= 1;
 	pprc_rva->prm[rva_imoddly]		= ADSP_IsEmpty(pa) ? 0 : 4;
-	pprc_rva->prm[rva_imodrate]		= 3.48;
+	pprc_rva->prm[rva_imodrate]		= 3.48f;
 
 	pprc_rva->prm[rva_iftaps]		= 0;	// 0.1 // use extra delay taps to increase density
 
@@ -6868,9 +6868,9 @@ void ADSP_SetupAutoReverb( prc_t *pprc_rva, auto_params_t *pa )
 	pprc_rva->prm[rva_height]		= clamp( ((float)(pa->height) / 12.0F), 6.0F, 500.0F);
 
 	// room
-	pprc_rva->prm[rva_fbwidth]		= 0.9; // MapSizeToRVAFeedback[pa->size];	// larger size = more feedback
-	pprc_rva->prm[rva_fbdepth]		= 0.9; // MapSizeToRVAFeedback[pa->size];	
-	pprc_rva->prm[rva_fbheight]		= 0.5; // MapSizeToRVAFeedback[pa->size];
+	pprc_rva->prm[rva_fbwidth]		= 0.9f; // MapSizeToRVAFeedback[pa->size];	// larger size = more feedback
+	pprc_rva->prm[rva_fbdepth]		= 0.9f; // MapSizeToRVAFeedback[pa->size];	
+	pprc_rva->prm[rva_fbheight]		= 0.5f; // MapSizeToRVAFeedback[pa->size];
 
 	// feedback is based on size of room:
 	
@@ -6878,25 +6878,25 @@ void ADSP_SetupAutoReverb( prc_t *pprc_rva, auto_params_t *pa )
 	{
 		if (pa->shape == ADSP_HALL)
 		{
-			pprc_rva->prm[rva_fbwidth]		= 0.7; //MapSizeToRVAFeedback[pa->wid];
-			pprc_rva->prm[rva_fbdepth]		= -0.5; //MapSizeToRVAFeedback[pa->len];	
-			pprc_rva->prm[rva_fbheight]		= 0.3; //MapSizeToRVAFeedback[pa->ht];
+			pprc_rva->prm[rva_fbwidth]		= 0.7f; //MapSizeToRVAFeedback[pa->wid];
+			pprc_rva->prm[rva_fbdepth]		= -0.5f; //MapSizeToRVAFeedback[pa->len];	
+			pprc_rva->prm[rva_fbheight]		= 0.3f; //MapSizeToRVAFeedback[pa->ht];
 		}
 
 		if (pa->shape == ADSP_TUNNEL)
 		{
-			pprc_rva->prm[rva_fbwidth]		= 0.9;	
-			pprc_rva->prm[rva_fbdepth]		= -0.8;	// fixed pre-delay, no feedback
-			pprc_rva->prm[rva_fbheight]		= 0.3;	
+			pprc_rva->prm[rva_fbwidth]		= 0.9f;	
+			pprc_rva->prm[rva_fbdepth]		= -0.8f;	// fixed pre-delay, no feedback
+			pprc_rva->prm[rva_fbheight]		= 0.3f;	
 		}
 	}
 	else
 	{
 		if  (pa->shape == ADSP_ALLEY)
 		{
-			pprc_rva->prm[rva_fbwidth]		= 0.9; 
-			pprc_rva->prm[rva_fbdepth]		= -0.8; // fixed pre-delay, no feedback	
-			pprc_rva->prm[rva_fbheight]		= 0.0; 
+			pprc_rva->prm[rva_fbwidth]		= 0.9f; 
+			pprc_rva->prm[rva_fbdepth]		= -0.8f; // fixed pre-delay, no feedback	
+			pprc_rva->prm[rva_fbheight]		= 0.0f; 
 		}
 	}
 

@@ -448,7 +448,7 @@ void CHLTVFrame::FreeBuffers( void )
 
 CHLTVServer::CHLTVServer()
 {
-	m_flTickInterval = 0.03;
+	m_flTickInterval = 0.03f;
 	m_MasterClient = NULL;
 	m_Server = NULL;
 	m_Director = NULL;

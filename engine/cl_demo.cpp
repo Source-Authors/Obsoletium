@@ -136,15 +136,17 @@ public:
 	void DrawOverlay( float fSetting );
 
 protected:
-	float m_fLastTickTime;
-	float m_fLastTickOverlay;
+	// dimhotepus: float -> double.
+	double m_fLastTickTime;
+	// dimhotepus: float -> double.
+	double m_fLastTickOverlay;
 	enum Overlay { OVR_NONE = 0, OVR_REC = 1 << 1, OVR_PLAY = 1 << 2 };
 	bool m_bTick;
 	int m_maskDrawnOverlay;
 } g_DemoOverlay;
 
 DemoOverlay::DemoOverlay() :
-	m_fLastTickTime( 0.f ), m_fLastTickOverlay( 0.f ), m_bTick( false ), m_maskDrawnOverlay( OVR_NONE )
+	m_fLastTickTime( 0 ), m_fLastTickOverlay( 0 ), m_bTick( false ), m_maskDrawnOverlay( OVR_NONE )
 {
 }
 
@@ -154,12 +156,12 @@ void DemoOverlay::Tick()
 	{
 		m_bTick = true;
 
-		float const fRealTime = Sys_FloatTime();
+		double const fRealTime = Sys_FloatTime();
 		if ( m_fLastTickTime != fRealTime )
 		{
 			m_fLastTickTime = fRealTime;
 
-			float const fDelta = m_fLastTickTime - m_fLastTickOverlay;
+			float const fDelta = static_cast<float>( m_fLastTickTime - m_fLastTickOverlay );
 			float const fSettingDelta = cl_showdemooverlay.GetFloat();
 
 			if ( fSettingDelta <= 0.f ||
@@ -827,7 +829,7 @@ void CDemoPlayer::StopPlayback( void )
 	m_bPlayingBack = false;
 	m_bLoading = false;
 	m_bPlaybackPaused = false;
-	m_flAutoResumeTime = 0.0f;
+	m_flAutoResumeTime = 0.0;
 	m_nEndTick = 0;
 
 	if ( m_bTimeDemo )
@@ -848,7 +850,7 @@ void CDemoPlayer::StopPlayback( void )
 	else
 	{
 		int framecount = host_framecount - m_nTimeDemoStartFrame;
-		float demotime = Sys_FloatTime() - m_flTimeDemoStartTime;
+		float demotime = static_cast<float>( Sys_FloatTime() - m_flTimeDemoStartTime );
 
 		if ( demotime > 0.0f )
 		{
@@ -1597,7 +1599,7 @@ CDemoPlayer::CDemoPlayer()
 	V_memset(&m_DemoPacket, 0x00, sizeof(m_DemoPacket));
 	m_bPlayingBack = false;
 	m_bPlaybackPaused = false;
-	m_flAutoResumeTime = 0.0f;
+	m_flAutoResumeTime = 0.0;
 	m_flPlaybackRateModifier = 1.0f;
 	m_nSkipToTick = -1;
 	m_nEndTick = 0;
@@ -1702,7 +1704,7 @@ bool CDemoPlayer::StartPlayback( const char *filename, bool bAsTimeDemo )
 	demoaction->StartPlaying( filename );
 
 	// m_bFastForwarding = false;
-	m_flAutoResumeTime = 0.0f;
+	m_flAutoResumeTime = 0.0;
 	m_flPlaybackRateModifier = 1.0f;
 
 	scr_demo_override_fov = 0.0f;
@@ -1723,10 +1725,8 @@ void CDemoPlayer::MarkFrame( float flFPSVariability )
 
 void CDemoPlayer::WriteTimeDemoResults( void )
 {
-	int		frames;
-	float	time;
-	frames = (host_framecount - m_nTimeDemoStartFrame) - 1;
-	time = Sys_FloatTime() - m_flTimeDemoStartTime;
+	int frames = (host_framecount - m_nTimeDemoStartFrame) - 1;
+	float time = static_cast<float>( Sys_FloatTime() - m_flTimeDemoStartTime );
 	if (!time)
 	{
 		time = 1;
@@ -1839,14 +1839,14 @@ void CDemoPlayer::PausePlayback( float seconds  )
 	}
 	else
 	{
-		m_flAutoResumeTime = 0.0f;
+		m_flAutoResumeTime = 0.0;
 	}
 }
 
 void CDemoPlayer::ResumePlayback()
 {
 	m_bPlaybackPaused = false;
-	m_flAutoResumeTime = 0.0f;
+	m_flAutoResumeTime = 0.0;
 }
 
 bool CDemoPlayer::CheckPausedPlayback()
@@ -1884,7 +1884,7 @@ bool CDemoPlayer::CheckPausedPlayback()
 
 	if ( m_bPlaybackPaused )
 	{
-		if ( (m_flAutoResumeTime > 0.0f) &&
+		if ( (m_flAutoResumeTime > 0.0) &&
 			 (Sys_FloatTime() >= m_flAutoResumeTime) )
 		{
 			// it's time to unpause replay

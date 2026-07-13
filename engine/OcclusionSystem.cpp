@@ -2320,13 +2320,13 @@ void COcclusionSystem::StitchClippedVertices( Vector *pVertices, int nCount )
 	for ( int i = 0; i < nCount; ++i )
 	{
 		// Only stitch ones that have been clipped by the near clip plane
-		if ( fabs( pVertices[i].z ) > 1e-3 )
+		if ( fabs( pVertices[i].z ) > 1e-3f )
 			continue;
 
 		intp j;
 		for ( j = m_ClippedVerts.Count(); --j >= 0; )
 		{
-			if ( VectorsAreEqual( pVertices[i], m_ClippedVerts[j], 1e-3 ) )
+			if ( VectorsAreEqual( pVertices[i], m_ClippedVerts[j], 1e-3f ) )
 			{
 				pVertices[i] = m_ClippedVerts[j];
 				break;

@@ -2825,8 +2825,8 @@ bool CNetChan::HasPendingReliableData( void )
 
 float CNetChan::GetTimeConnected() const
 {
-	float t = net_time - connect_time;
-	return (t>0.0f) ? t : 0.0f ;
+	double t = net_time - connect_time;
+	return (t>0.0) ? static_cast<float>( t ) : 0.0f;
 }
 
 const netadr_t & CNetChan::GetRemoteAddress() const
@@ -2862,8 +2862,8 @@ float CNetChan::GetTimeoutSeconds() const
 
 float CNetChan::GetTimeSinceLastReceived() const
 {
-	float t = net_time - last_received;
-	return (t>0.0f) ? t : 0.0f ;
+	double t = net_time - last_received;
+	return (t>0.0) ? static_cast<float>( t ) : 0.0f;
 }
 
 bool CNetChan::IsOverflowed() const

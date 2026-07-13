@@ -731,10 +731,10 @@ void CEngineTool::SetMainView( const Vector &vecOrigin, const QAngle &angles )
 
 static float ScaleFOVByWidthRatio( float fovDegrees, float ratio )
 {
-	float halfAngleRadians = fovDegrees * ( 0.5f * M_PI / 180.0f );
+	float halfAngleRadians = fovDegrees * ( 0.5f * M_PI_F / 180.0f );
 	float t = tan( halfAngleRadians );
 	t *= ratio;
-	float retDegrees = ( 180.0f / M_PI ) * atan( t );
+	float retDegrees = ( 180.0f / M_PI_F ) * atan( t );
 	return retDegrees * 2.0f;
 }
 

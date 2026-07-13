@@ -767,15 +767,16 @@ void ResetVProfExport( IVProfExport *pExport )
 struct VProfListenInfo_t
 {
 	ra_listener_id m_nListenerId;
-	float m_flLastSentVProfDataTime;
+	// dimhotepus: float -> double.
+	double m_flLastSentVProfDataTime;
 	CUtlVector< CUtlString > m_SentGroups;
 
-	VProfListenInfo_t() : m_nListenerId{std::numeric_limits<ra_listener_id>::max()}, m_flLastSentVProfDataTime( 0.0f ) {}
-	VProfListenInfo_t( ra_listener_id nListenerId ) : m_nListenerId( nListenerId ), m_flLastSentVProfDataTime( 0.0f ) {}
+	VProfListenInfo_t() : m_nListenerId{std::numeric_limits<ra_listener_id>::max()}, m_flLastSentVProfDataTime( 0.0 ) {}
+	VProfListenInfo_t( ra_listener_id nListenerId ) : m_nListenerId( nListenerId ), m_flLastSentVProfDataTime( 0.0 ) {}
 	bool operator==( const VProfListenInfo_t& src ) const { return src.m_nListenerId == m_nListenerId; }
 
 private:
-	VProfListenInfo_t( const VProfListenInfo_t& src );
+	VProfListenInfo_t( const VProfListenInfo_t& src ) = delete;
 };
 
 static CUtlVector<VProfListenInfo_t> s_VProfListeners;
@@ -847,17 +848,13 @@ void WriteRemoteVProfGroupData( VProfListenInfo_t &info )
 static ConVar rpt_vprof_time( "rpt_vprof_time","0.25", FCVAR_HIDDEN | FCVAR_DONTRECORD, "" );
 void WriteRemoteVProfData()
 {
-	if ( IsX360() )
-		return;
-
 	// Throttle sending too much data
 	float flMaxDelta = rpt_vprof_time.GetFloat();
-	float flTime = Plat_FloatTime();
+	const double flTime = Plat_FloatTime();
 	bool bShouldSend = false;
-	int nListenerCount = s_VProfListeners.Count();
-	for( int i = 0; i < nListenerCount; i++ )
+	for( const auto &l : s_VProfListeners )
 	{
-		if ( flTime - s_VProfListeners[i].m_flLastSentVProfDataTime >= flMaxDelta )
+		if ( flTime - l.m_flLastSentVProfDataTime >= flMaxDelta )
 		{
 			bShouldSend = true;
 			break;
@@ -871,25 +868,25 @@ void WriteRemoteVProfData()
 	float *pTimes = stackallocT( float, nGroupCount );
 	g_VProfExport.GetAllBudgetGroupTimes( pTimes );
 
-	for( int i = 0; i < nListenerCount; i++ )
+	for( auto &l : s_VProfListeners )
 	{
-		if ( flTime - s_VProfListeners[i].m_flLastSentVProfDataTime < flMaxDelta )
+		if ( flTime - l.m_flLastSentVProfDataTime < flMaxDelta )
 			continue;
 
-		WriteRemoteVProfGroupData( s_VProfListeners[i] );
-		s_VProfListeners[i].m_flLastSentVProfDataTime = flTime;
+		WriteRemoteVProfGroupData( l );
+		l.m_flLastSentVProfDataTime = flTime;
 
 		// Re-order send times to match send group order
-		intp nSentSize = s_VProfListeners[i].m_SentGroups.Count();
+		intp nSentSize = l.m_SentGroups.Count();
 		float *pSentTimes = stackallocT( float, nSentSize );
 		memset( pSentTimes, 0, nSentSize * sizeof(float) );
 		for ( int j = 0; j < nGroupCount; ++j )
 		{
-			int nIndex = FindSentGroupIndex( s_VProfListeners[i], g_pVProfileForDisplay->GetBudgetGroupName( j ) );
+			int nIndex = FindSentGroupIndex( l, g_pVProfileForDisplay->GetBudgetGroupName( j ) );
 			Assert( nIndex >= 0 );
 			pSentTimes[ nIndex ] = pTimes[j];
 		}
-		g_ServerRemoteAccess.SendVProfData( s_VProfListeners[i].m_nListenerId, false, pSentTimes, nSentSize );
+		g_ServerRemoteAccess.SendVProfData( l.m_nListenerId, false, pSentTimes, nSentSize );
 	}
 }
 

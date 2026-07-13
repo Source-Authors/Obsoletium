@@ -548,7 +548,7 @@ void CDemoUIPanel::HandleInput( bool active )
 		// Convert to pitch/yaw
 
 		float pitch = (float)dy * 0.22f;
-		float yaw = -(float)dx * 0.22;
+		float yaw = -(float)dx * 0.22f;
 
 		// Apply mouse
 		m_ViewAngles.x += pitch;

@@ -2315,13 +2315,13 @@ void MIX_PaintChannels( int endtime, bool bIsUnderwater )
 			g_AudioDevice->ApplyDSPEffects( idsp_speaker, MIX_GetPFrontFromIPaint(SOUND_BUFFER_SPEAKER), MIX_GetPRearFromIPaint(SOUND_BUFFER_SPEAKER), MIX_GetPCenterFromIPaint(SOUND_BUFFER_SPEAKER), count );
 			
 			// mix SOUND_BUFFER_SPEAKER with SOUND_BUFFER_ROOM and SOUND_BUFFER_FACING
-			MIX_ScalePaintBuffer( SOUND_BUFFER_SPEAKER, count, 0.7 );
+			MIX_ScalePaintBuffer( SOUND_BUFFER_SPEAKER, count, 0.7f );
 
-			MIX_MixPaintbuffers( SOUND_BUFFER_SPEAKER, SOUND_BUFFER_FACING, SOUND_BUFFER_FACING, count, 1.0 );	// +70% dry speaker
+			MIX_MixPaintbuffers( SOUND_BUFFER_SPEAKER, SOUND_BUFFER_FACING, SOUND_BUFFER_FACING, count, 1.0f );	// +70% dry speaker
 
-			MIX_ScalePaintBuffer( SOUND_BUFFER_SPEAKER, count, 0.43 );
+			MIX_ScalePaintBuffer( SOUND_BUFFER_SPEAKER, count, 0.43f );
 
-			MIX_MixPaintbuffers( SOUND_BUFFER_SPEAKER, SOUND_BUFFER_ROOM, SOUND_BUFFER_ROOM, count, 1.0 );		// +30% wet speaker
+			MIX_MixPaintbuffers( SOUND_BUFFER_SPEAKER, SOUND_BUFFER_ROOM, SOUND_BUFFER_ROOM, count, 1.0f );		// +30% wet speaker
 		}
 
 		if ( !g_bDspOff )
@@ -2339,13 +2339,13 @@ void MIX_PaintChannels( int endtime, bool bIsUnderwater )
 						g_AudioDevice->ApplyDSPEffects( pSpecialBuffer->idsp_specialdsp, MIX_GetPFrontFromIPaint( i ), MIX_GetPRearFromIPaint( i ), MIX_GetPCenterFromIPaint( i ), count );
 
 						// mix SOUND_BUFFER_SPECIALs with SOUND_BUFFER_ROOM and SOUND_BUFFER_FACING
-						MIX_ScalePaintBuffer( i, count, 0.7 );
+						MIX_ScalePaintBuffer( i, count, 0.7f );
 
-						MIX_MixPaintbuffers( i, SOUND_BUFFER_FACING, SOUND_BUFFER_FACING, count, 1.0 );	// +70% dry speaker
+						MIX_MixPaintbuffers( i, SOUND_BUFFER_FACING, SOUND_BUFFER_FACING, count, 1.0f );	// +70% dry speaker
 
-						MIX_ScalePaintBuffer( i, count, 0.43 );
+						MIX_ScalePaintBuffer( i, count, 0.43f );
 
-						MIX_MixPaintbuffers( i, SOUND_BUFFER_ROOM, SOUND_BUFFER_ROOM, count, 1.0 );		// +30% wet speaker
+						MIX_MixPaintbuffers( i, SOUND_BUFFER_ROOM, SOUND_BUFFER_ROOM, count, 1.0f );		// +30% wet speaker
 						
 						bFoundMixer = true;
 

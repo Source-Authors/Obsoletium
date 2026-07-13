@@ -2060,12 +2060,12 @@ void CL_Move(float accumulated_extra_samples, bool bFinalTick )
 	if ( hasProblem )
 	{
 		con_nprint_t np;
-		np.time_to_live = 1.0;
+		np.time_to_live = 1.0f;
 		np.index = 2;
 		np.fixed_width_font = false;
-		np.color[ 0 ] = 1.0;
-		np.color[ 1 ] = 0.2;
-		np.color[ 2 ] = 0.2;
+		np.color[ 0 ] = 1.0f;
+		np.color[ 1 ] = 0.2f;
+		np.color[ 2 ] = 0.2f;
 		
 		float flTimeOut = cl.m_NetChannel->GetTimeoutSeconds();
 		Assert( flTimeOut != -1.0f );

@@ -3299,9 +3299,9 @@ void VGui_UpdateTextureListPanel()
 	{
 		con_nprint_t info;
 		info.index = 4;
-		info.time_to_live = 0.2;
+		info.time_to_live = 0.2f;
 		info.color[0] = 1;
-		info.color[1] = 0.5;
+		info.color[1] = 0.5f;
 		info.color[2] = 0;
 		info.fixed_width_font = true;
 

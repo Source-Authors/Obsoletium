@@ -93,7 +93,8 @@ public:
 	netpacket_t		m_DemoPacket;	// last read demo packet
 	bool			m_bPlayingBack; // true if demo playback
 	bool			m_bPlaybackPaused; // true if demo is paused right now
-	float			m_flAutoResumeTime; // how long do we pause demo playback
+	// dimhotepus: float -> double.
+	double			m_flAutoResumeTime; // how long do we pause demo playback
 	float			m_flPlaybackRateModifier;
 	int				m_nSkipToTick;	// skip to tick ASAP, -1 = off
 	int				m_nEndTick; // if nonzero, stop playback once we reach this tick

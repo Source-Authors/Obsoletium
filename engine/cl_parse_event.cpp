@@ -32,9 +32,9 @@ void CL_DescribeEvent( intp slot, CEventInfo *event, const char *eventname )
 	n.index = idx;
 	n.fixed_width_font = true;
 	n.time_to_live = 4.0f;
-	n.color[0] = 0.8;
-	n.color[1] = 0.8;
-	n.color[2] = 1.0;
+	n.color[0] = 0.8f;
+	n.color[1] = 0.8f;
+	n.color[2] = 1.0f;
 
 	Con_NXPrintf( &n, "%02zi %6.3ff %20s %03i bytes", slot, cl.GetTime(), eventname, Bits2Bytes( event->bits ) );
 

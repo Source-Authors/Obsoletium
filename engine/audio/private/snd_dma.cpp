@@ -2357,15 +2357,15 @@ void SND_SetSpatialDelays()
 		if ( g_AudioDevice->IsSurround() )
 		{
 			// 4-5 speaker case - front left
-			v_dir = (-listener_right + listener_forward2d) / 2.0;
-			v_dir = g_ssp.cycle ? (g_ssp.cycle == 1 ? -listener_right * 0.5: listener_forward2d * 0.5) : v_dir;
+			v_dir = (-listener_right + listener_forward2d) / 2.0f;
+			v_dir = g_ssp.cycle ? (g_ssp.cycle == 1 ? -listener_right * 0.5f: listener_forward2d * 0.5f) : v_dir;
 		}
 		else
 		{
 			// 2 speaker case - left
-			v_dir = listener_right * -1.0;
-			v_dir2 = g_ssp.cycle ? (g_ssp.cycle == 1 ? listener_forward2d * 0.5 : -listener_forward2d * 0.5) : v_dir;
-			v_dir = (v_dir + v_dir2) / 2.0;
+			v_dir = listener_right * -1.0f;
+			v_dir2 = g_ssp.cycle ? (g_ssp.cycle == 1 ? listener_forward2d * 0.5f : -listener_forward2d * 0.5f) : v_dir;
+			v_dir = (v_dir + v_dir2) / 2.0f;
 		}
 		break;
 
@@ -2373,31 +2373,31 @@ void SND_SetSpatialDelays()
 		if ( g_AudioDevice->IsSurround() )
 		{
 			// 4-5 speaker case - front right
-			v_dir = (listener_right + listener_forward2d) / 2.0;
-			v_dir = g_ssp.cycle ? (g_ssp.cycle == 1 ? listener_right * 0.5: listener_forward2d * 0.5) : v_dir;
+			v_dir = (listener_right + listener_forward2d) / 2.0f;
+			v_dir = g_ssp.cycle ? (g_ssp.cycle == 1 ? listener_right * 0.5f: listener_forward2d * 0.5f) : v_dir;
 		}
 		else
 		{
 			// 2 speaker case - right
 			v_dir = listener_right;
-			v_dir2 = g_ssp.cycle ? (g_ssp.cycle == 1 ? listener_forward2d * 0.5 : -listener_forward2d * 0.5) : v_dir;
-			v_dir = (v_dir + v_dir2) / 2.0;
+			v_dir2 = g_ssp.cycle ? (g_ssp.cycle == 1 ? listener_forward2d * 0.5f : -listener_forward2d * 0.5f) : v_dir;
+			v_dir = (v_dir + v_dir2) / 2.0f;
 		}
 		break;
 
 	case 2: // rear left: trace max 100' 'cone' to player's rear left
-		v_dir = (listener_right + listener_forward2d) / -2.0;
-		v_dir = g_ssp.cycle ? (g_ssp.cycle == 1 ? -listener_right * 0.5 : -listener_forward2d * 0.5) : v_dir;
+		v_dir = (listener_right + listener_forward2d) / -2.0f;
+		v_dir = g_ssp.cycle ? (g_ssp.cycle == 1 ? -listener_right * 0.5f : -listener_forward2d * 0.5f) : v_dir;
 		break;
 
 	case 3: // rear right: trace max 100' 'cone' to player's rear right
-		v_dir = (listener_right - listener_forward2d) / 2.0;
-		v_dir = g_ssp.cycle ? (g_ssp.cycle == 1 ? listener_right * 0.5: -listener_forward2d * 0.5) : v_dir;
+		v_dir = (listener_right - listener_forward2d) / 2.0f;
+		v_dir = g_ssp.cycle ? (g_ssp.cycle == 1 ? listener_right * 0.5f: -listener_forward2d * 0.5f) : v_dir;
 		break;
 		
 	case 4: // front center: trace max 100' 'cone' to player's front
 		v_dir = listener_forward2d;
-		v_dir2 = g_ssp.cycle ? (g_ssp.cycle == 1 ? listener_right * 0.15 : -listener_right * 0.15) : v_dir;
+		v_dir2 = g_ssp.cycle ? (g_ssp.cycle == 1 ? listener_right * 0.15f : -listener_right * 0.15f) : v_dir;
 		v_dir = (v_dir + v_dir2);
 		break;
 	}
@@ -2619,9 +2619,9 @@ void DAS_InitNodes( void )
 
 	// init trace vectors
 	// set up trace vectors for max, min width
-	float vl = DAS_ROOM_TRACE_LEN;
-	float vlu = DAS_ROOM_TRACE_LEN * 0.52;
-	float vlu2 = DAS_ROOM_TRACE_LEN * 0.48;	// don't use 'perfect' diagonals
+	constexpr float vl = DAS_ROOM_TRACE_LEN;
+	constexpr float vlu = DAS_ROOM_TRACE_LEN * 0.52f;
+	constexpr float vlu2 = DAS_ROOM_TRACE_LEN * 0.48f;	// don't use 'perfect' diagonals
 
 	g_das_vec3[0].Init(vl, 0.0, 0.0);				// x left
 	g_das_vec3[1].Init(-vl, 0.0, 0.0);				// x right
@@ -4103,13 +4103,13 @@ void RemapPlayerOrMusicVols(  channel_t *ch, int volumes[CCHANVOLUMES/2], bool f
 		//float vol_dist5[]   = {0.29, 0.29, 0.09, 0.09, 0.63};	// FL, FR, RL, RR, FC - 5 channel (mono source) volume distribution		
 		//float vol_dist5st[] = {0.29, 0.29, 0.09, 0.09, 0.63};	// FL, FR, RL, RR, FC - 5 channel (stereo source) volume distribution
 		
-		float vol_dist5[]   = {0.30, 0.30, 0.09, 0.09, 0.59};	// FL, FR, RL, RR, FC - 5 channel (mono source) volume distribution		
-		float vol_dist5st[] = {0.30, 0.30, 0.09, 0.09, 0.59};	// FL, FR, RL, RR, FC - 5 channel (stereo source) volume distribution
+		constexpr float vol_dist5[]   = {0.30f, 0.30f, 0.09f, 0.09f, 0.59f};	// FL, FR, RL, RR, FC - 5 channel (mono source) volume distribution		
+		constexpr float vol_dist5st[] = {0.30f, 0.30f, 0.09f, 0.09f, 0.59f};	// FL, FR, RL, RR, FC - 5 channel (stereo source) volume distribution
 		
-		float vol_dist4[]   = {0.50, 0.50, 0.15, 0.15, 0.00};	// FL, FR, RL, RR, 0  - 4 channel (mono source) volume distribution
-		float vol_dist4st[] = {0.50, 0.50, 0.15, 0.15, 0.00};	// FL, FR, RL, RR, 0  - 4 channel (stereo source)volume distribution
+		constexpr float vol_dist4[]   = {0.50f, 0.50f, 0.15f, 0.15f, 0.00f};	// FL, FR, RL, RR, 0  - 4 channel (mono source) volume distribution
+		constexpr float vol_dist4st[] = {0.50f, 0.50f, 0.15f, 0.15f, 0.00f};	// FL, FR, RL, RR, 0  - 4 channel (stereo source)volume distribution
 
-		float *pvol_dist;
+		const float *pvol_dist;
 		
 		if ( ch->flags.bstereowav && (ch->wavtype == CHAR_OMNI || ch->wavtype == CHAR_SPATIALSTEREO || ch->wavtype == 0))
 		{
@@ -6054,15 +6054,15 @@ void S_Update( const AudioState_t *pAudioState )
 				np.index = total + 2;
 				if ( channel.flags.fromserver )
 				{
-					np.color[0] = 1.0;
-					np.color[1] = 0.8;
-					np.color[2] = 0.1;
+					np.color[0] = 1.0f;
+					np.color[1] = 0.8f;
+					np.color[2] = 0.1f;
 				}
 				else
 				{
-					np.color[0] = 0.1;
-					np.color[1] = 0.9;
-					np.color[2] = 1.0;
+					np.color[0] = 0.1f;
+					np.color[1] = 0.9f;
+					np.color[2] = 1.0f;
 				}
 
 				unsigned int sampleCount = RemainingSamples( &channel );
@@ -7213,7 +7213,7 @@ void MXR_DebugGraphMixVolumes( debug_showvols_t *groupvols, int cgroups)
 	char text[128];
 	char bartext[MXR_DEBUG_VOLSCALE*3];
 
-	duration = 0.01;
+	duration = 0.01f;
 
 	g_debug_mxr_displaycount++;
 
