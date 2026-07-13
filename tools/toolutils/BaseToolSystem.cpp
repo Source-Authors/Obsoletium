@@ -1085,7 +1085,7 @@ void CBaseToolSystem::PaintBackground()
 	if ( m_pLogo )
 	{
 		int texWide = m_pLogo->GetMappingWidth();
-		float logoAspectRatio = 0.442;
+		constexpr float logoAspectRatio = 0.442f;
 
 		if ( hasDoc )
 		{
