@@ -4328,7 +4328,7 @@ void CShaderAPIDx8::ApplyZBias( const ShadowState_t& shaderState )
 		// this causes the z values to be more than 50 units away from the original z values
 
 		a = 0.0f;
-		c = -1.0/4096.0;
+		c = -1.0f/4096.0f;
 	}
 
 	// bias = (s * D3DRS_SLOPESCALEDEPTHBIAS) + D3DRS_DEPTHBIAS, where s is the maximum depth slope of the triangle being rendered
@@ -7841,7 +7841,7 @@ void CShaderAPIDx8::SetLight( int lightNum, const LightDesc_t& desc_ )
 
 	case MATERIAL_LIGHT_DIRECTIONAL:
 		light.Type = D3DLIGHT_DIRECTIONAL;
-		light.Range = 1e12;	// This is supposed to be ignored
+		light.Range = 1e12f;	// This is supposed to be ignored
 		break;
 
 	case MATERIAL_LIGHT_SPOT:
