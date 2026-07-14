@@ -394,7 +394,7 @@ void CClientVirtualReality::DrawMainMenu()
 
 	// render the main view
 	CViewSetup viewEye[STEREO_EYE_MAX];
-	viewEye[ STEREO_EYE_MONO ].zNear = 0.1;
+	viewEye[ STEREO_EYE_MONO ].zNear = 0.1f;
 	viewEye[ STEREO_EYE_MONO ].zFar = 10000.f;
 	viewEye[ STEREO_EYE_MONO ].angles.Init();
 	viewEye[ STEREO_EYE_MONO ].origin.Zero();

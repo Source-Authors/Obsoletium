@@ -73,7 +73,7 @@ CON_COMMAND_F( viewanim_addkeyframe, "", FCVAR_CHEAT )
 		QAngle vecTarget;
 		engine->GetViewAngles( vecTarget );
 
-		float flDelay = 0.2;
+		float flDelay = 0.2f;
 		if (args.ArgC() > 1)
 		{
 			flDelay = strtof( args[1], nullptr );
@@ -198,7 +198,7 @@ void CViewAngleAnimation::LoadViewAnimFile( const char *pKeyFrameFileName )
 		sscanf( pszAngles, "%f %f %f", &angles[0], &angles[1], &angles[2] );
 
 		// time
-		flTime = pKey->GetFloat( "time", 0.001 );
+		flTime = pKey->GetFloat( "time", 0.001f );
 
 		// flags
 		iFlags = pKey->GetInt( "flags", 0 );
@@ -272,7 +272,7 @@ void CViewAngleAnimation::ClientThink()
 	float flCurrentTime = gpGlobals->curtime - m_flAnimStartTime;
 
 	if ( flCurrentTime < 0 )
-		flCurrentTime = 0.001;
+		flCurrentTime = 0.001f;
 
 	// find two nearest points
 	intp i, c = m_KeyFrames.Count();

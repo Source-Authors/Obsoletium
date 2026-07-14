@@ -498,7 +498,7 @@ void C_BaseAnimatingOverlay::DoAnimationEvents( CStudioHdr *pStudioHdr )
 			}
 
 			// Necessary to get the next loop working
-			m_flOverlayPrevEventCycle[j] = -0.01;
+			m_flOverlayPrevEventCycle[j] = -0.01f;
 		}
 
 		for (int i = 0; i < (int)seqdesc.numevents; i++)

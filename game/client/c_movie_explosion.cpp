@@ -150,7 +150,7 @@ void C_MovieExplosion::Update(float fTimeDelta)
 		MovieExplosionEmitter *pEmitter = &m_Emitters[iEmitter];
 
 		pEmitter->m_Pos = pEmitter->m_Pos + pEmitter->m_Velocity * fTimeDelta;
-		pEmitter->m_Velocity = pEmitter->m_Velocity * 0.9;
+		pEmitter->m_Velocity = pEmitter->m_Velocity * 0.9f;
 
 		float tempDelta = fTimeDelta;
 		while(pEmitter->m_ParticleSpawn.NextEvent(tempDelta))

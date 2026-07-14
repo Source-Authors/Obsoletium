@@ -116,31 +116,31 @@ constexpr float AFTERGLOW_SIZE = 64;
 CGunshipFXEnvelope::CGunshipFXEnvelope()
 {
 	// Glow flare
-	AddKey( GUNSHIPFX_FLARE_COLOR, CSimpleKeyInterp( 0.0, KEY_LINEAR, 0 ) );
-	AddKey( GUNSHIPFX_FLARE_COLOR, CSimpleKeyInterp( 0.5, KEY_SPLINE, 1 ) );
-	AddKey( GUNSHIPFX_FLARE_COLOR, CSimpleKeyInterp( 2.9, KEY_LINEAR, 1 ) );
-	AddKey( GUNSHIPFX_FLARE_COLOR, CSimpleKeyInterp( 3.2, KEY_DECELERATE, 0 ) );
+	AddKey( GUNSHIPFX_FLARE_COLOR, CSimpleKeyInterp( 0.0f, KEY_LINEAR, 0 ) );
+	AddKey( GUNSHIPFX_FLARE_COLOR, CSimpleKeyInterp( 0.5f, KEY_SPLINE, 1 ) );
+	AddKey( GUNSHIPFX_FLARE_COLOR, CSimpleKeyInterp( 2.9f, KEY_LINEAR, 1 ) );
+	AddKey( GUNSHIPFX_FLARE_COLOR, CSimpleKeyInterp( 3.2f, KEY_DECELERATE, 0 ) );
 
-	AddKey( GUNSHIPFX_FLARE_SIZE, CSimpleKeyInterp( 0.0, KEY_LINEAR, 0 ) );
-	AddKey( GUNSHIPFX_FLARE_SIZE, CSimpleKeyInterp( 2.9, KEY_ACCELERATE, 1 ) );
-	AddKey( GUNSHIPFX_FLARE_SIZE, CSimpleKeyInterp( 5.0, KEY_LINEAR, 1 ) );
+	AddKey( GUNSHIPFX_FLARE_SIZE, CSimpleKeyInterp( 0.0f, KEY_LINEAR, 0 ) );
+	AddKey( GUNSHIPFX_FLARE_SIZE, CSimpleKeyInterp( 2.9f, KEY_ACCELERATE, 1 ) );
+	AddKey( GUNSHIPFX_FLARE_SIZE, CSimpleKeyInterp( 5.0f, KEY_LINEAR, 1 ) );
 
 	// Ground beam
-	AddKey( GUNSHIPFX_NARROW_BEAM_COLOR, CSimpleKeyInterp( 0.0, KEY_LINEAR, 0.0 ) );
-	AddKey( GUNSHIPFX_NARROW_BEAM_COLOR, CSimpleKeyInterp( 2.5, KEY_SPLINE, 1.0 ) );
-	AddKey( GUNSHIPFX_NARROW_BEAM_COLOR, CSimpleKeyInterp( 3.0, KEY_LINEAR, 1 ) );
-	AddKey( GUNSHIPFX_NARROW_BEAM_COLOR, CSimpleKeyInterp( 3.2, KEY_ACCELERATE, 0 ) );
+	AddKey( GUNSHIPFX_NARROW_BEAM_COLOR, CSimpleKeyInterp( 0.0f, KEY_LINEAR, 0.0 ) );
+	AddKey( GUNSHIPFX_NARROW_BEAM_COLOR, CSimpleKeyInterp( 2.5f, KEY_SPLINE, 1.0 ) );
+	AddKey( GUNSHIPFX_NARROW_BEAM_COLOR, CSimpleKeyInterp( 3.0f, KEY_LINEAR, 1 ) );
+	AddKey( GUNSHIPFX_NARROW_BEAM_COLOR, CSimpleKeyInterp( 3.2f, KEY_ACCELERATE, 0 ) );
 
-	AddKey( GUNSHIPFX_NARROW_BEAM_SIZE, CSimpleKeyInterp( 0.0, KEY_LINEAR, 0 ) );
-	AddKey( GUNSHIPFX_NARROW_BEAM_SIZE, CSimpleKeyInterp( 2.5, KEY_SPLINE, 0.25 ) );
-	AddKey( GUNSHIPFX_NARROW_BEAM_SIZE, CSimpleKeyInterp( 2.8, KEY_ACCELERATE, 1 ) );
-	AddKey( GUNSHIPFX_NARROW_BEAM_SIZE, CSimpleKeyInterp( 3.0, KEY_ACCELERATE, 4 ) );
-	AddKey( GUNSHIPFX_NARROW_BEAM_SIZE, CSimpleKeyInterp( 3.2, KEY_DECELERATE, 0 ) );
+	AddKey( GUNSHIPFX_NARROW_BEAM_SIZE, CSimpleKeyInterp( 0.0f, KEY_LINEAR, 0 ) );
+	AddKey( GUNSHIPFX_NARROW_BEAM_SIZE, CSimpleKeyInterp( 2.5f, KEY_SPLINE, 0.25 ) );
+	AddKey( GUNSHIPFX_NARROW_BEAM_SIZE, CSimpleKeyInterp( 2.8f, KEY_ACCELERATE, 1 ) );
+	AddKey( GUNSHIPFX_NARROW_BEAM_SIZE, CSimpleKeyInterp( 3.0f, KEY_ACCELERATE, 4 ) );
+	AddKey( GUNSHIPFX_NARROW_BEAM_SIZE, CSimpleKeyInterp( 3.2f, KEY_DECELERATE, 0 ) );
 
 	// Glow color on the ship
-	AddKey( GUNSHIPFX_AFTERGLOW_COLOR, CSimpleKeyInterp( 0.0, KEY_LINEAR, 0 ) );
-	AddKey( GUNSHIPFX_AFTERGLOW_COLOR, CSimpleKeyInterp( 3.0, KEY_LINEAR, 1 ) );
-	AddKey( GUNSHIPFX_AFTERGLOW_COLOR, CSimpleKeyInterp( 5.0, KEY_SPLINE, 0 ) );
+	AddKey( GUNSHIPFX_AFTERGLOW_COLOR, CSimpleKeyInterp( 0.0f, KEY_LINEAR, 0 ) );
+	AddKey( GUNSHIPFX_AFTERGLOW_COLOR, CSimpleKeyInterp( 3.0f, KEY_LINEAR, 1 ) );
+	AddKey( GUNSHIPFX_AFTERGLOW_COLOR, CSimpleKeyInterp( 5.0f, KEY_SPLINE, 0 ) );
 }
 
 CGunshipFXEnvelope g_GunshipCannonEnvelope;

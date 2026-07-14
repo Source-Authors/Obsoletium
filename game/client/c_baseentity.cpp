@@ -5597,7 +5597,7 @@ void C_BaseEntity::DrawBBoxVisualizations( void )
 		if ( debugoverlay )
 		{
 			debugoverlay->AddBoxOverlay( CollisionProp()->GetCollisionOrigin(), CollisionProp()->OBBMins(),
-				CollisionProp()->OBBMaxs(), CollisionProp()->GetCollisionAngles(), 190, 190, 0, 0, 0.01 );
+				CollisionProp()->OBBMaxs(), CollisionProp()->GetCollisionAngles(), 190, 190, 0, 0, 0.01f );
 		}
 	}
 
@@ -5608,7 +5608,7 @@ void C_BaseEntity::DrawBBoxVisualizations( void )
 		if ( debugoverlay )
 		{
 			debugoverlay->AddBoxOverlay( vec3_origin, vecSurroundMins,
-				vecSurroundMaxs, vec3_angle, 0, 255, 255, 0, 0.01 );
+				vecSurroundMaxs, vec3_angle, 0, 255, 255, 0, 0.01f );
 		}
 	}
 

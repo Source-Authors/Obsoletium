@@ -55,7 +55,7 @@ public:
 
 			if ( dtime != timeDelta )
 			{
-				decay = ExponentialDecay( 0.1, 0.4f, dtime );
+				decay = ExponentialDecay( 0.1f, 0.4f, dtime );
 				dtime = timeDelta;
 			}
 

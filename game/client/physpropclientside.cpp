@@ -519,7 +519,7 @@ void C_PhysPropClientside::Clone( Vector &velocity )
 	if( pPhysicsObject )
 	{
 		// randomize velocity by 5%
-		float rndf = RandomFloat( -0.025, 0.025 );
+		float rndf = RandomFloat( -0.025f, 0.025f );
 		Vector rndVel = velocity + rndf*velocity;
 
 		pPhysicsObject->AddVelocity( &rndVel, NULL );
@@ -786,7 +786,7 @@ CBaseEntity *BreakModelCreateSingle( CBaseEntity *pOwner, breakmodel_t *pModel, 
 	if( pPhysicsObject )
 	{
 		// randomize velocity by 5%
-		float rndf = RandomFloat( -0.025, 0.025 );
+		float rndf = RandomFloat( -0.025f, 0.025f );
 		Vector rndVel = velocity + rndf*velocity;
 
 		pPhysicsObject->AddVelocity( &rndVel, &angVelocity );
@@ -868,7 +868,7 @@ bool C_FuncPhysicsRespawnZone::Initialize( void )
 
 	UpdateVisibility();
 
-	SetNextClientThink( gpGlobals->curtime + (cl_phys_props_respawnrate.GetFloat() * RandomFloat(1.0,1.1)) );
+	SetNextClientThink( gpGlobals->curtime + (cl_phys_props_respawnrate.GetFloat() * RandomFloat(1.0f,1.1f)) );
 
 	return true;
 }
@@ -1024,5 +1024,5 @@ void C_FuncPhysicsRespawnZone::ClientThink( void )
 {
 	RespawnProps();
 
-	SetNextClientThink( gpGlobals->curtime + (cl_phys_props_respawnrate.GetFloat() * RandomFloat(1.0,1.1)) );
+	SetNextClientThink( gpGlobals->curtime + (cl_phys_props_respawnrate.GetFloat() * RandomFloat(1.0f,1.1f)) );
 }

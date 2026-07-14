@@ -148,8 +148,8 @@ void C_NPC_AntlionGuard::ClientThink()
 		m_dlight->color.r = 220;
 		m_dlight->color.g = 255;
 		m_dlight->color.b = 80;
-		m_dlight->radius	= 180;
-		m_dlight->minlight = 128.0 / 256.0f;
+		m_dlight->radius  = 180;
+		m_dlight->minlight = 128.0f / 256.0f;
 		m_dlight->flags = DLIGHT_NO_MODEL_ILLUMINATION;
 	}
 

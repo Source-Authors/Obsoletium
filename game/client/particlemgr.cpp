@@ -987,8 +987,8 @@ bool CParticleEffectBinding::RecalculateBoundingBox()
 		return false;
 	}
 
-	Vector bbMin(  1e28,  1e28,  1e28 );
-	Vector bbMax( -1e28, -1e28, -1e28 );
+	Vector bbMin(  1e28f,  1e28f,  1e28f );
+	Vector bbMax( -1e28f, -1e28f, -1e28f );
 
 	FOR_EACH_LL( m_Materials, iMaterial )
 	{

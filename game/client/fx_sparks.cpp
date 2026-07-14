@@ -353,7 +353,7 @@ void FX_ElectricSpark( const Vector &pos, int nMagnitude, int nTrailLength, cons
 		}
 			
 		pParticle->m_flWidth		= random->RandomFloat( 2.0f, 5.0f );
-		pParticle->m_flLength		= nTrailLength * random->RandomFloat( 0.02, 0.05f );
+		pParticle->m_flLength		= nTrailLength * random->RandomFloat( 0.02f, 0.05f );
 		
 		pParticle->m_vecVelocity	= dir * random->RandomFloat( SPARK_ELECTRIC_MINSPEED, SPARK_ELECTRIC_MAXSPEED );
 
@@ -785,7 +785,7 @@ void FX_Sparks( const Vector &pos, int nMagnitude, int nTrailLength, const Vecto
 		pParticle->m_vecVelocity	= dir * random->RandomFloat( (flMinSpeed*(2.0f-spreadOfs)), (flMaxSpeed*(2.0f-spreadOfs)) );
 			
 		pParticle->m_flWidth		= flWidth + random->RandomFloat( 0.0f, 0.5f );
-		pParticle->m_flLength		= nTrailLength * random->RandomFloat( 0.02, 0.05f );
+		pParticle->m_flLength		= nTrailLength * random->RandomFloat( 0.02f, 0.05f );
 		Color32Init( pParticle->m_color, 255, 255, 255, 255 );
 	}
 
@@ -1106,7 +1106,7 @@ void FX_Explosion( Vector& origin, Vector& normal, char materialType )
 		pParticle->m_flLifetime	= 0.0f;
 
 		pParticle->m_flWidth		= random->RandomFloat( 5.0f, 10.0f );
-		pParticle->m_flLength		= random->RandomFloat( 0.05, 0.1f );
+		pParticle->m_flLength		= random->RandomFloat( 0.05f, 0.1f );
 		pParticle->m_flDieTime		= random->RandomFloat( 1.0f, 2.0f );
 		
 		dir[0] = normal[0] + random->RandomFloat( -EXPLOSION_SPREAD, EXPLOSION_SPREAD );

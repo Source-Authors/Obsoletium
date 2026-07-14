@@ -268,9 +268,9 @@ void CViewEffects::CalcShake( void )
 			con_nprint_t np;
 			np.time_to_live = 2.0f;
 			np.fixed_width_font = true;
-			np.color[0] = 1.0;
-			np.color[1] = 0.8;
-			np.color[2] = 0.1;
+			np.color[0] = 1.0f;
+			np.color[1] = 0.8f;
+			np.color[2] = 0.1f;
 			np.index = nShake + 2;
 
 			engine->Con_NXPrintf( &np, "%02d: dur(%8.2f) amp(%8.2f) freq(%8.2f)", nShake + 1, (double)pShake->duration, (double)pShake->amplitude, (double)pShake->frequency );

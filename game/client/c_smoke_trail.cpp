@@ -1954,8 +1954,8 @@ void C_DustTrail::CleanupToolRecordingState( KeyValues *msg )
 		pVelocity->SetFloat( "velocityX", pEnt->GetAbsVelocity().x );
 		pVelocity->SetFloat( "velocityY", pEnt->GetAbsVelocity().y );
 		pVelocity->SetFloat( "velocityZ", pEnt->GetAbsVelocity().z );
-		pVelocity->SetFloat( "decayto", 0.5 );
-		pVelocity->SetFloat( "decaytime", 0.3 );
+		pVelocity->SetFloat( "decayto", 0.5f );
+		pVelocity->SetFloat( "decaytime", 0.3f );
 
 		KeyValues *pLifetime = pInitializers->FindKey( "DmeRandomLifetimeInitializer", true );
 		pLifetime->SetFloat( "minLifetime", m_ParticleLifetime );

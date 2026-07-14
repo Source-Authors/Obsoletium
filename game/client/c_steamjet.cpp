@@ -471,8 +471,8 @@ void C_SteamJet::SimulateParticles( CParticleSimulateIterator *pIterator )
 
 void C_SteamJet::UpdateLightingRamp()
 {
-	if( VectorsAreEqual( m_vLastRampUpdatePos, GetAbsOrigin(), 0.1 ) && 
-		QAnglesAreEqual( m_vLastRampUpdateAngles, GetAbsAngles(), 0.1 ) )
+	if( VectorsAreEqual( m_vLastRampUpdatePos, GetAbsOrigin(), 0.1f ) && 
+		QAnglesAreEqual( m_vLastRampUpdateAngles, GetAbsAngles(), 0.1f ) )
 	{
 		return;
 	}

@@ -38,7 +38,7 @@ bool CPlayerProximityProxy::Init( IMaterial *pMaterial, KeyValues *pKeyValues )
 	if (!CResultProxy::Init( pMaterial, pKeyValues ))
 		return false;
 
-	m_Factor = pKeyValues->GetFloat( "scale", 0.002 );
+	m_Factor = pKeyValues->GetFloat( "scale", 0.002f );
 	return true;
 }
 
@@ -182,7 +182,7 @@ bool CPlayerSpeedProxy::Init( IMaterial *pMaterial, KeyValues *pKeyValues )
 	if (!CResultProxy::Init( pMaterial, pKeyValues ))
 		return false;
 
-	m_Factor = pKeyValues->GetFloat( "scale", 0.005 );
+	m_Factor = pKeyValues->GetFloat( "scale", 0.005f );
 	return true;
 }
 
@@ -223,7 +223,7 @@ bool CPlayerPositionProxy::Init( IMaterial *pMaterial, KeyValues *pKeyValues )
 	if (!CResultProxy::Init( pMaterial, pKeyValues ))
 		return false;
 	  
-	m_Factor = pKeyValues->GetFloat( "scale", 0.005 );
+	m_Factor = pKeyValues->GetFloat( "scale", 0.005f );
 	return true;
 }
 

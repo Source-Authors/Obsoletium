@@ -15,7 +15,7 @@
 #include "smoke_fog_overlay_shared.h"
 
 
-#define ROTATION_SPEED				0.1
+#define ROTATION_SPEED				0.1f
 #define TRADE_DURATION_MIN			10
 #define TRADE_DURATION_MAX			20
 #define SMOKEGRENADE_PARTICLERADIUS	80

@@ -1162,13 +1162,13 @@ intp C_SoundscapeSystem::AddLoopingSound( const char *pSoundName, bool isAmbient
 			EmitSound_t ep;
 			ep.m_nChannel = CHAN_STATIC;
 			ep.m_pSoundName =  pSoundName;
-			ep.m_flVolume = 0.05;
+			ep.m_flVolume = 0.05f;
 			ep.m_SoundLevel = soundlevel;
 			ep.m_nPitch = pitch;
 			ep.m_pOrigin = &position;
 
 			C_BaseEntity::EmitSound( filter, SOUND_FROM_WORLD, ep );
-			m_loopingSounds[soundSlot].volumeCurrent = 0.05;
+			m_loopingSounds[soundSlot].volumeCurrent = 0.05f;
 		}
 	}
 	loopingsound_t &sound = m_loopingSounds[soundSlot];

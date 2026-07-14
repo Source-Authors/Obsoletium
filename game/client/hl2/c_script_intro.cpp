@@ -225,7 +225,7 @@ void C_ScriptIntro::PostDataUpdate( DataUpdateType_t updateType )
 
 		if ( !m_flFadeDuration )
 		{
-			m_flFadeDuration = 0.01;
+			m_flFadeDuration = 0.01f;
 		}
 
 		//Msg("STARTING NEW FADE: alpha %.2f, duration %.2f.\n", m_flFadeAlpha, m_flFadeDuration );

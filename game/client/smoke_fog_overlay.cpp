@@ -59,7 +59,7 @@ void DrawSmokeFogOverlay()
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
 	// Hard-coded for now..
-	g_SmokeFogOverlayColor.Init( 0.3, 0.3, 0.3 );
+	g_SmokeFogOverlayColor.Init( 0.3f, 0.3f, 0.3f );
 	
 	CMatRenderContextPtr pRenderContext( materials );
 

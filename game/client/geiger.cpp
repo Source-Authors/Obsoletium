@@ -131,59 +131,59 @@ void CHudGeiger::Paint()
 	else if (m_iGeigerRange > 600)
 	{
 		pct = 2;
-		flvol = 0.2;		//Msg ( "range > 600\n");
+		flvol = 0.2f;		//Msg ( "range > 600\n");
 	}
 	else if (m_iGeigerRange > 500)
 	{
 		pct = 4;
-		flvol = 0.25;		//Msg ( "range > 500\n");
+		flvol = 0.25f;		//Msg ( "range > 500\n");
 	}
 	else if (m_iGeigerRange > 400)
 	{
 		pct = 8;
-		flvol = 0.3;		//Msg ( "range > 400\n");
+		flvol = 0.3f;		//Msg ( "range > 400\n");
 		highsound = true;
 	}
 	else if (m_iGeigerRange > 300)
 	{
 		pct = 8;
-		flvol = 0.35;		//Msg ( "range > 300\n");
+		flvol = 0.35f;		//Msg ( "range > 300\n");
 		highsound = true;
 	}
 	else if (m_iGeigerRange > 200)
 	{
 		pct = 28;
-		flvol = 0.39;		//Msg ( "range > 200\n");
+		flvol = 0.39f;		//Msg ( "range > 200\n");
 		highsound = true;
 	}
 	else if (m_iGeigerRange > 150)
 	{
 		pct = 40;
-		flvol = 0.40;		//Msg ( "range > 150\n");
+		flvol = 0.40f;		//Msg ( "range > 150\n");
 		highsound = true;
 	}
 	else if (m_iGeigerRange > 100)
 	{
 		pct = 60;
-		flvol = 0.425;		//Msg ( "range > 100\n");
+		flvol = 0.425f;		//Msg ( "range > 100\n");
 		highsound = true;
 	}
 	else if (m_iGeigerRange > 75)
 	{
 		pct = 80;
-		flvol = 0.45;		//Msg ( "range > 75\n");
+		flvol = 0.45f;		//Msg ( "range > 75\n");
 		//gflGeigerDelay = cl.time + GEIGERDELAY * 0.75;
 		highsound = true;
 	}
 	else if (m_iGeigerRange > 50)
 	{
 		pct = 90;
-		flvol = 0.475;		//Msg ( "range > 50\n");
+		flvol = 0.475f;		//Msg ( "range > 50\n");
 	}
 	else
 	{
 		pct = 95;
-		flvol = 0.5;		//Msg ( "range < 50\n");
+		flvol = 0.5f;		//Msg ( "range < 50\n");
 	}
 
 	flvol = (flvol * (random->RandomInt(0,127)) / 255) + 0.25f;

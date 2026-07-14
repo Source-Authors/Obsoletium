@@ -20,9 +20,9 @@
 // dimhotepus: Drop PI.
 #define GLASS_SHARD_MIN_LIFE 2
 #define GLASS_SHARD_MAX_LIFE 5
-#define GLASS_SHARD_NOISE	 0.3
+#define GLASS_SHARD_NOISE	 0.3f
 #define GLASS_SHARD_GRAVITY  500
-#define GLASS_SHARD_DAMPING	 0.3
+#define GLASS_SHARD_DAMPING	 0.3f
 
 #include "clienteffectprecachesystem.h"
 
@@ -172,7 +172,7 @@ void C_TEShatterSurface::PostDataUpdate( DataUpdateType_t updateType )
 	engine->ComputeLighting( m_vecOrigin, NULL, true, vecColor );
 
 	// HACK: Blend a little toward white to match the materials...
-	VectorLerp( vecColor, Vector( 1, 1, 1 ), 0.3, vecColor );
+	VectorLerp( vecColor, Vector( 1, 1, 1 ), 0.3f, vecColor );
 
 	PMaterialHandle *hMaterial;
 	if (m_nSurfaceType == SHATTERSURFACE_GLASS)

@@ -138,7 +138,7 @@ float GetClientInterpAmount()
 			AssertMsgOnce( false, "GetInterpolationAmount: can't get cl_updaterate cvar." );
 		}
 	
-		return 0.1;
+		return 0.1f;
 	}
 }
 

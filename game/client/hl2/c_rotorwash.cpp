@@ -39,7 +39,7 @@ public:
 		pParticle->m_vecVelocity[ 2 ] += 64 * timeDelta;
 
 		// FIXME: optimize this....
-		pParticle->m_vecVelocity *= ExponentialDecay( 0.8, 0.05, timeDelta );
+		pParticle->m_vecVelocity *= ExponentialDecay( 0.8f, 0.05f, timeDelta );
 	}
 
 	virtual	float UpdateRoll( SimpleParticle *pParticle, float timeDelta )

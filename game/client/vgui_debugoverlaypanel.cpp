@@ -190,6 +190,6 @@ void DebugDrawLine( const Vector& vecAbsStart, const Vector& vecAbsEnd, int r, i
 {
 	if ( debugoverlay )
 	{
-		debugoverlay->AddLineOverlay( vecAbsStart + Vector( 0,0,0.1), vecAbsEnd + Vector( 0,0,0.1), r,g,b, test, duration );
+		debugoverlay->AddLineOverlay( vecAbsStart + Vector( 0,0,0.1f), vecAbsEnd + Vector( 0,0,0.1f), r,g,b, test, duration );
 	}
 }

@@ -136,7 +136,7 @@ void CPlasmaSpray::RenderParticles( CParticleRenderIterator *pIterator )
 	const SimpleParticle *pParticle = (const SimpleParticle *)pIterator->GetFirst();
 	while ( pParticle )
 	{
-		float scale = random->RandomFloat( 0.02, 0.08 );
+		float scale = random->RandomFloat( 0.02f, 0.08f );
 
 		// NOTE: We need to do everything in screen space
 		Vector  delta;
@@ -203,7 +203,7 @@ void C_PlasmaBeamNode::OnDataChanged(DataUpdateType_t updateType)
 	{
 		Vector vMoveDir = GetAbsVelocity();
 		float  flVel = VectorNormalize(vMoveDir);
-		m_pFirePlasmaSpray->m_ParticleCollision.Setup( GetAbsOrigin(), &vMoveDir, 0.3, 
+		m_pFirePlasmaSpray->m_ParticleCollision.Setup( GetAbsOrigin(), &vMoveDir, 0.3f, 
 											flVel-50, flVel+50, 800, 0.5f );
 		SetNextClientThink(gpGlobals->curtime + 0.01f);
 	}
@@ -233,7 +233,7 @@ void C_PlasmaBeamNode::ClientThink(void)
 	}
 	
 	trace_t trace;
-	Vector vEndTrace = GetAbsOrigin() + (0.3*GetAbsVelocity());
+	Vector vEndTrace = GetAbsOrigin() + (0.3f*GetAbsVelocity());
 	UTIL_TraceLine( GetAbsOrigin(), vEndTrace, MASK_SHOT, NULL, COLLISION_GROUP_NONE, &trace );
 	if ( trace.fraction != 1.0f || trace.startsolid)
 	{

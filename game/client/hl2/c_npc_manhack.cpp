@@ -134,21 +134,21 @@ void C_NPC_Manhack::SoundInit( void )
 	{
 		m_pEngineSound1 = CSoundEnvelopeController::GetController().SoundCreate( filter, entindex(), "NPC_Manhack.EngineSound1" );
 		CSoundEnvelopeController::GetController().Play( m_pEngineSound1, 0.0, m_nEnginePitch1 );
-		CSoundEnvelopeController::GetController().SoundChangeVolume( m_pEngineSound1, 0.7, 2.0 );
+		CSoundEnvelopeController::GetController().SoundChangeVolume( m_pEngineSound1, 0.7f, 2.0f );
 	}
 
 	if( !m_pEngineSound2 )
 	{
 		m_pEngineSound2 = CSoundEnvelopeController::GetController().SoundCreate( filter, entindex(), "NPC_Manhack.EngineSound2" );
 		CSoundEnvelopeController::GetController().Play( m_pEngineSound2, 0.0, m_nEnginePitch2 );
-		CSoundEnvelopeController::GetController().SoundChangeVolume( m_pEngineSound2, 0.7, 2.0 );
+		CSoundEnvelopeController::GetController().SoundChangeVolume( m_pEngineSound2, 0.7f, 2.0f );
 	}
 
 	if( !m_pBladeSound )
 	{
 		m_pBladeSound = CSoundEnvelopeController::GetController().SoundCreate( filter, entindex(), "NPC_Manhack.BladeSound" );
 		CSoundEnvelopeController::GetController().Play( m_pBladeSound, 0.0, m_nEnginePitch1 );
-		CSoundEnvelopeController::GetController().SoundChangeVolume( m_pBladeSound, 0.7, 2.0 );
+		CSoundEnvelopeController::GetController().SoundChangeVolume( m_pBladeSound, 0.7f, 2.0f );
 	}
 }
 

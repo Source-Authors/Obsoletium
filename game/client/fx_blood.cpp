@@ -423,7 +423,7 @@ void FX_BloodBulletImpact( const Vector &origin, const Vector &normal, float sca
 	pTrailEmitter->SetGravity( 400.0 ); 
 	
 	// Enable simple collisions with nearby surfaces
-	pTrailEmitter->Setup(origin, &normal, 1, 10, 100, 400, 0.2, 0 );
+	pTrailEmitter->Setup(origin, &normal, 1, 10, 100, 400, 0.2f, 0 );
 
 	if ( g_Blood_Drops == NULL )
 	{

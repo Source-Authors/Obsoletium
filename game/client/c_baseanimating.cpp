@@ -1649,7 +1649,7 @@ void C_BaseAnimating::ApplyBoneMatrixTransform( matrix3x4_t& transform )
 			int axis = RandomInt(0,1);
 			if ( axis == 1 ) // Choose between x & z
 				axis = 2;
-			VectorScale( transform[axis], RandomFloat(1,1.484), transform[axis] );
+			VectorScale( transform[axis], RandomFloat(1,1.484f), transform[axis] );
 		}
 		else if ( RandomInt(0,49) == 0 )
 		{
@@ -2555,7 +2555,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 					if (trace.DidHitWorld())
 					{
 						// clamp normal to 33 degrees
-						constexpr float limit = 0.832;
+						constexpr float limit = 0.832f;
 						float dot = DotProduct(trace.plane.normal, up);
 						if (dot < limit)
 						{
@@ -3657,7 +3657,7 @@ void C_BaseAnimating::DoAnimationEvents( CStudioHdr *pStudioHdr )
 
 		m_nEventSequence = GetSequence();
 		flEventCycle = 0.0f;
-		m_flPrevEventCycle = -0.01; // back up to get 0'th frame animations
+		m_flPrevEventCycle = -0.01f; // back up to get 0'th frame animations
 	}
 
 	// stalled?
@@ -5647,13 +5647,13 @@ float C_BaseAnimating::SequenceDuration( CStudioHdr *pStudioHdr, int iSequence )
 
 	if ( !pStudioHdr->SequencesAvailable() )
 	{
-		return 0.1;
+		return 0.1f;
 	}
 
 	if (iSequence >= pStudioHdr->GetNumSeq() || iSequence < 0 )
 	{
 		DevWarning( 2, "C_BaseAnimating::SequenceDuration( %d ) out of range\n", iSequence );
-		return 0.1;
+		return 0.1f;
 	}
 
 	return Studio_Duration( pStudioHdr, iSequence, m_flPoseParameter );

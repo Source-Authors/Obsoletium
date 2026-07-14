@@ -264,7 +264,7 @@ void CBaseHudChatLine::PerformFadeout( void )
 		float frac = frac1;
 
 		frac *= CHATLINE_NUM_FLASHES;
-		frac *= 2 * M_PI;
+		frac *= 2 * M_PI_F;
 
 		frac = cos( frac );
 

@@ -142,8 +142,8 @@ C_Hairball::C_Hairball()
 	// Distribute on the sphere (need a better random distribution for the sphere).
 	for ( int i=0; i < m_HairPositions.Count(); i++ )
 	{
-		float theta = RandomFloat( -M_PI, M_PI );
-		float phi   = RandomFloat( -M_PI/2, M_PI/2 );
+		float theta = RandomFloat( -M_PI_F, M_PI_F );
+		float phi   = RandomFloat( -M_PI_F/2, M_PI_F/2 );
 		
 		float cosPhi = cos( phi );
 
@@ -291,7 +291,7 @@ void C_Hairball::ClientThink()
 	}
 
 	// Simulate the physics and apply constraints.
-	m_Physics.Simulate( m_Nodes.Base(), m_Nodes.Count(), &m_Delegate, gpGlobals->frametime, 0.98 );
+	m_Physics.Simulate( m_Nodes.Base(), m_Nodes.Count(), &m_Delegate, gpGlobals->frametime, 0.98f );
 }
 
 

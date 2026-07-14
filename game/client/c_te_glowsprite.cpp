@@ -114,7 +114,7 @@ void C_TEGlowSprite::PostDataUpdate( DataUpdateType_t updateType )
 	C_LocalTempEntity *ent = tempents->TempSprite( m_vecOrigin, vec3_origin, m_fScale, m_nModelIndex, kRenderTransAdd, 0, a, m_fLife, FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP );
 	if ( ent )
 	{
-		ent->bounceFactor = 0.2;
+		ent->bounceFactor = 0.2f;
 	}
 	RecordGlowSprite( m_vecOrigin, m_nModelIndex, m_fLife, m_fScale, m_nBrightness );
 }
@@ -126,7 +126,7 @@ void TE_GlowSprite( IRecipientFilter& filter, float delay,
 	C_LocalTempEntity *ent = tempents->TempSprite( *pos, vec3_origin, size, modelindex, kRenderTransAdd, 0, a, life, FTENT_SPRANIMATE | FTENT_SPRANIMATELOOP );
 	if ( ent )
 	{
-		ent->bounceFactor = 0.2;
+		ent->bounceFactor = 0.2f;
 	}
 	RecordGlowSprite( *pos, modelindex, life, size, brightness );
 }

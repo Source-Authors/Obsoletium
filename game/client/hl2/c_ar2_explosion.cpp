@@ -29,8 +29,8 @@
 #define	AR2_DUST_ALPHA				0.5f
 #define	AR2_DUST_FADE_IN_TIME		0.25f
 
-static Vector g_AR2DustColor1(0.35, 0.345, 0.33 );
-static Vector g_AR2DustColor2(0.75, 0.75, 0.7);
+static const Vector g_AR2DustColor1(0.35f, 0.345f, 0.33f );
+static const Vector g_AR2DustColor2(0.75f, 0.75f, 0.7f);
 
 
 // ------------------------------------------------------------------------- //
@@ -335,10 +335,10 @@ void C_AR2Explosion::Start(CParticleMgr *pParticleMgr, IPrototypeArgAccess *pArg
 	{
 		Vector randVec = RandomVector(-1,1);
 		VectorNormalize( randVec );
-		Vector endPos = vCenter + randVec * AR2_DUST_RADIUS / 4.0;
+		Vector endPos = vCenter + randVec * AR2_DUST_RADIUS / 4.0f;
 
 		Vector direction = (endPos - vCenter );
-		float dist = VectorNormalize( direction ) + random->RandomFloat( 0, AR2_DUST_RADIUS / 4.0 );
+		float dist = VectorNormalize( direction ) + random->RandomFloat( 0, AR2_DUST_RADIUS / 4.0f );
 		if(dist > AR2_DUST_RADIUS)
 			dist = AR2_DUST_RADIUS;
 
@@ -379,8 +379,8 @@ void C_AR2Explosion::SimulateParticles( CParticleSimulateIterator *pIterator )
 	AR2ExplosionParticle *pParticle = (AR2ExplosionParticle*)pIterator->GetFirst();
 	while ( pParticle )
 	{
-		if (dt > 0.05)
-			dt = 0.05; // yuck, air resistance function craps out at less then 20fps
+		if (dt > 0.05f)
+			dt = 0.05f; // yuck, air resistance function craps out at less then 20fps
 
 		// Update its lifetime.
 		pParticle->m_Lifetime += dt; // pDraw->GetTimeDelta();
@@ -416,9 +416,9 @@ void C_AR2Explosion::SimulateParticles( CParticleSimulateIterator *pIterator )
 				if (dtime != dt)
 				{
 					dtime = dt;
-					decay = ExponentialDecay( 0.3, 1.0, dtime );
+					decay = ExponentialDecay( 0.3f, 1.0f, dtime );
 				}
-				if (fabs(pParticle->m_RollSpeed) > 0.2)
+				if (fabs(pParticle->m_RollSpeed) > 0.2f)
 					pParticle->m_RollSpeed = pParticle->m_RollSpeed * decay;
 			}
 		}

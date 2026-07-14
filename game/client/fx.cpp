@@ -737,7 +737,7 @@ void FX_BuildSmoke( Vector &vecOrigin, QAngle &vecAngles, ClientEntityHandle_t h
 	pSimple->SetLifeTime( flLifeTime );
 	pSimple->SetSpurtAngle( vecAngles );
 	pSimple->SetSpurtColor( pColor );
-	pSimple->SetSpawnRate( 0.03 );
+	pSimple->SetSpawnRate( 0.03f );
 	pSimple->CreateSpurtParticles();
 }
 
@@ -1023,12 +1023,12 @@ void FX_BuildTesla(
 	beamInfo.m_flLife = flTimeVisible;
 	beamInfo.m_flWidth = flBeamWidth;
 	beamInfo.m_flEndWidth = 1;
-	beamInfo.m_flFadeLength = 0.3;
+	beamInfo.m_flFadeLength = 0.3f;
 	beamInfo.m_flAmplitude = 16;
-	beamInfo.m_flBrightness = 200.0;
-	beamInfo.m_flSpeed = 0.0;
+	beamInfo.m_flBrightness = 200.0f;
+	beamInfo.m_flSpeed = 0.0f;
 	beamInfo.m_nStartFrame = 0;
-	beamInfo.m_flFrameRate = 1.0;
+	beamInfo.m_flFrameRate = 1.0f;
 	beamInfo.m_flRed = vColor.x * 255.0f;
 	beamInfo.m_flGreen = vColor.y * 255.0f;
 	beamInfo.m_flBlue = vColor.z * 255.0f;
@@ -1137,7 +1137,7 @@ void BuildTeslaCallback( const CEffectData &data )
 	teslaInfo.m_nEntIndex = data.entindex();
 	teslaInfo.m_flBeamWidth = 5;
 	teslaInfo.m_vColor.Init( 1, 1, 1 );
-	teslaInfo.m_flTimeVisible = 0.3;
+	teslaInfo.m_flTimeVisible = 0.3f;
 	teslaInfo.m_flRadius = 192;
 	teslaInfo.m_nBeams = 6;
 	teslaInfo.m_pszSpriteName = "sprites/physbeam.vmt";
@@ -1302,16 +1302,16 @@ void FX_BuildTeslaZap( const CEffectData &data )
 	beamInfo.m_pEndEnt = NULL;
 	beamInfo.m_vecEnd = data.m_vOrigin;
 	beamInfo.m_pszModelName = "sprites/physbeam.vmt";
-	beamInfo.m_flHaloScale = 0.0;
+	beamInfo.m_flHaloScale = 0.0f;
 	beamInfo.m_flLife = 0.3f;
 	beamInfo.m_flWidth = data.m_flScale;
 	beamInfo.m_flEndWidth = 1;
-	beamInfo.m_flFadeLength = 0.3;
+	beamInfo.m_flFadeLength = 0.3f;
 	beamInfo.m_flAmplitude = 16;
-	beamInfo.m_flBrightness = 200.0;
+	beamInfo.m_flBrightness = 200.0f;
 	beamInfo.m_flSpeed = 0.0;
 	beamInfo.m_nStartFrame = 0;
-	beamInfo.m_flFrameRate = 1.0;
+	beamInfo.m_flFrameRate = 1.0f;
 	beamInfo.m_flRed = vColor.x * 255.0f;
 	beamInfo.m_flGreen = vColor.y * 255.0f;
 	beamInfo.m_flBlue = vColor.z * 255.0f;

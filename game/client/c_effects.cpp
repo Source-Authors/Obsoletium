@@ -29,20 +29,20 @@
 ConVar	cl_winddir			( "cl_winddir", "0", FCVAR_CHEAT, "Weather effects wind direction angle" );
 ConVar	cl_windspeed		( "cl_windspeed", "0", FCVAR_CHEAT, "Weather effects wind speed scalar" );
 
-Vector g_vSplashColor( 0.5, 0.5, 0.5 );
-float g_flSplashScale = 0.15;
-float g_flSplashLifetime = 0.5f;
-float g_flSplashAlpha = 0.3f;
+Vector g_vSplashColor( 0.5f, 0.5f, 0.5f );
+constexpr inline float g_flSplashScale = 0.15f;
+constexpr inline float g_flSplashLifetime = 0.5f;
+constexpr inline float g_flSplashAlpha = 0.3f;
 ConVar r_RainSplashPercentage( "r_RainSplashPercentage", "20", FCVAR_CHEAT ); // N% chance of a rain particle making a splash.
 
 
-float GUST_INTERVAL_MIN = 1;
-float GUST_INTERVAL_MAX = 2;
+constexpr inline float GUST_INTERVAL_MIN = 1;
+constexpr inline float GUST_INTERVAL_MAX = 2;
 
-float GUST_LIFETIME_MIN = 1;
-float GUST_LIFETIME_MAX = 3;
+constexpr inline float GUST_LIFETIME_MIN = 1;
+constexpr inline float GUST_LIFETIME_MAX = 3;
 
-float MIN_SCREENSPACE_RAIN_WIDTH = 1;
+constexpr inline float MIN_SCREENSPACE_RAIN_WIDTH = 1;
 
 #ifndef _XBOX
 ConVar r_RainHack( "r_RainHack", "0", FCVAR_CHEAT );
@@ -275,7 +275,7 @@ void CClient_Precipitation::OnDataChanged( DataUpdateType_t updateType )
 		}
 	}
 
-	m_flDensity = RemapVal( m_clrRender->a, 0, 255, 0, 0.001 );
+	m_flDensity = RemapVal( m_clrRender->a, 0, 255, 0, 0.001f );
 
 	BaseClass::OnDataChanged( updateType );
 }

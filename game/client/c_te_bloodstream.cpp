@@ -110,7 +110,7 @@ void TE_BloodStream( IRecipientFilter& filter, float delay,
 
 	// Add our particles.
 	Vector		dirCopy;
-	float		arc = 0.05;
+	float		arc = 0.05f;
 	int			count, count2;
 	float		num;
 	float		speedCopy = amount;
@@ -124,7 +124,7 @@ void TE_BloodStream( IRecipientFilter& filter, float delay,
 		StandardParticle_t *p = pRen->AddParticle();
 		if(p)
 		{
-			p->SetColor(r * random->RandomFloat(0.7, 1.0), g, b);
+			p->SetColor(r * random->RandomFloat(0.7f, 1.0f), g, b);
 			p->SetAlpha(a);
 			p->m_Pos = *org;
 			pRen->SetParticleLifetime(p, 2);
@@ -133,23 +133,23 @@ void TE_BloodStream( IRecipientFilter& filter, float delay,
 			VectorCopy (dir, dirCopy);
 			
 			dirCopy[2] -= arc;
-			arc -= 0.005;
+			arc -= 0.005f;
 			
 			VectorScale (dirCopy, speedCopy, p->m_Velocity);
 			
-			speedCopy -= 0.00001;// so last few will drip
+			speedCopy -= 0.00001f;// so last few will drip
 		}
 	}
 	
 	// now a few rogue voxels
-	arc = 0.075;
+	arc = 0.075f;
 	for (count = 0 ; count < (amount/5); count ++)
 	{
 		StandardParticle_t *p = pRen->AddParticle();
 		if(p)
 		{
 			pRen->SetParticleLifetime(p, 3);
-			p->SetColor(r * random->RandomFloat(0.7, 1.0), g, b);
+			p->SetColor(r * random->RandomFloat(0.7f, 1.0f), g, b);
 			p->SetAlpha(a);
 			p->m_Pos = *org;
 			pRen->SetParticleType(p, pt_vox_slowgrav);
@@ -157,12 +157,12 @@ void TE_BloodStream( IRecipientFilter& filter, float delay,
 			VectorCopy (dir, dirCopy);
 			
 			dirCopy[2] -= arc;
-			arc -= 0.005;
+			arc -= 0.005f;
 			
 			num = random->RandomFloat(0,1);
 			speedCopy = amount * num;
 			
-			num *= 1.7;
+			num *= 1.7f;
 			
 			VectorScale (dirCopy, num, dirCopy);// randomize a bit
 			p->m_Velocity = dirCopy * speedCopy;
@@ -176,7 +176,7 @@ void TE_BloodStream( IRecipientFilter& filter, float delay,
 				if( pChunky )
 				{
 					pRen->SetParticleLifetime( pChunky, 3);
-					pChunky->SetColor(random->RandomFloat(0.7, 1.0), g, b);
+					pChunky->SetColor(random->RandomFloat(0.7f, 1.0f), g, b);
 					pChunky->SetAlpha(a);
 					pChunky->m_Pos.Init(
 						(*org)[0] + random->RandomFloat(-1,1),

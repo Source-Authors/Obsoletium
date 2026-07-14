@@ -467,9 +467,9 @@ void FX_DebrisFlecks( const Vector& origin, trace_t *tr, char materialType, int 
 
 #define	GLASS_SHARD_MIN_LIFE	2.5f
 #define	GLASS_SHARD_MAX_LIFE	5.0f
-#define	GLASS_SHARD_NOISE		0.8
+#define	GLASS_SHARD_NOISE		0.8f
 #define	GLASS_SHARD_GRAVITY		800
-#define	GLASS_SHARD_DAMPING		0.3
+#define	GLASS_SHARD_DAMPING		0.3f
 #define	GLASS_SHARD_MIN_SPEED	1
 #define	GLASS_SHARD_MAX_SPEED	300
 
@@ -486,7 +486,7 @@ void FX_GlassImpact( const Vector &pos, const Vector &normal )
 	engine->ComputeLighting( pos, NULL, true, vecColor );
 
 	// HACK: Blend a little toward white to match the materials...
-	VectorLerp( vecColor, Vector( 1, 1, 1 ), 0.3, vecColor );
+	VectorLerp( vecColor, Vector( 1, 1, 1 ), 0.3f, vecColor );
 
 	float flShardSize	= random->RandomFloat( 2.0f, 6.0f );
 
@@ -662,7 +662,7 @@ void FX_AntlionImpact( const Vector &pos, trace_t *trace )
 	fleckEmitter->m_ParticleCollision.Setup( spawnOffset, &shotDir, flAngularSpray, 8.0f, flMaxSpeed, FLECK_GRAVITY, FLECK_DAMPEN );
 
 	Vector	dir;
-	Vector	color = Vector( 1, 0.9, 0.75 );
+	Vector	color = Vector( 1, 0.9f, 0.75f );
 	float	colorRamp;
 
 	int	numFlecks = random->RandomInt( 8, 16 );
@@ -735,7 +735,7 @@ void FX_AntlionImpact( const Vector &pos, trace_t *trace )
 		pParticle->m_uchStartAlpha	= random->RandomInt( 32, 64);
 		pParticle->m_uchEndAlpha	= 0;
 		
-		pParticle->m_flRoll			= random->RandomFloat( 0, 2.0f*M_PI );
+		pParticle->m_flRoll			= random->RandomFloat( 0, 2.0f * M_PI_F );
 		pParticle->m_flRollDelta	= random->RandomFloat( -0.5f, 0.5f );
 
 		colorRamp = random->RandomFloat( 0.5f, 1.0f );

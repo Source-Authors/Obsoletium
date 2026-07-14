@@ -110,10 +110,10 @@ void C_EnvStarfield::ClientThink( void )
 		Vector vecEnd = vecViewOrigin + (MainViewRight() * RandomFloat(-flDiameter,flDiameter)) + (MainViewUp() * RandomFloat(-flDiameter,flDiameter));
 		Vector vecDir = (vecEnd - vecStart);
 		float flDistance = VectorNormalize( vecDir );
-		float flTravelTime = 2.0;
+		constexpr float flTravelTime = 2.0f;
 		
 		// Start a random amount along the path
-		vecStart += vecDir * ( RandomFloat(0.1,0.3) * flDistance );
+		vecStart += vecDir * ( RandomFloat(0.1f,0.3f) * flDistance );
 
 		TrailParticle *pParticle = (TrailParticle *) m_pEmitter->AddParticle( sizeof(TrailParticle), hParticleMaterial, vecStart );
 		if ( pParticle )
@@ -122,7 +122,7 @@ void C_EnvStarfield::ClientThink( void )
 			pParticle->m_flDieTime = flTravelTime;
 			pParticle->m_flLifetime = 0;
 			pParticle->m_flWidth = RandomFloat( 1, 3 );
-			pParticle->m_flLength = RandomFloat( 0.05, 0.4 );
+			pParticle->m_flLength = RandomFloat( 0.05f, 0.4f );
 			pParticle->m_color.r	= 255;
 			pParticle->m_color.g	= 255;
 			pParticle->m_color.b	= 255;

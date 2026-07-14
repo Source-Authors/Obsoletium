@@ -139,13 +139,13 @@ public:
 
 //interesting barbed-wire-looking effect
 static int		g_nBarbedSubdivs = 3;
-static Vector	g_BarbedSubdivs[MAX_ROPE_SUBDIVS] = {	Vector(1.5,		1.5*1.5,		1.5*1.5*1.5),
-														Vector(-0.5,	-0.5 * -0.5,	-0.5*-0.5*-0.5),
-														Vector(0.5,		0.5*0.5,		0.5*0.5*0.5) };
+static Vector	g_BarbedSubdivs[MAX_ROPE_SUBDIVS] = {	Vector(1.5f,		1.5f*1.5f,		1.5f*1.5f*1.5f),
+														Vector(-0.5f,	-0.5f * -0.5f,	-0.5f*-0.5f*-0.5f),
+														Vector(0.5f,		0.5f*0.5f,		0.5f*0.5f*0.5f) };
 
 // This can be exposed through the entity if we ever care.
-static float g_flLockAmount = 0.1;
-static float g_flLockFalloff = 0.3;
+static constexpr inline float g_flLockAmount = 0.1f;
+static constexpr inline float g_flLockFalloff = 0.3f;
 
 
 
@@ -1630,7 +1630,7 @@ inline bool C_RopeKeyframe::DidEndPointMove( int iPt )
 		return true;
 
 	// Register a change if the endpoint moves.
-	if( !VectorsAreEqual( vOld, m_vPrevEndPointPos[iPt], 0.1 ) )
+	if( !VectorsAreEqual( vOld, m_vPrevEndPointPos[iPt], 0.1f ) )
 		return true;
 
 	return false;

@@ -15,8 +15,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define DEFAULT_OPEN_PUPIL_RATE 0.03
-#define DEFAULT_CLOSE_PUPIL_RATE 0.1
+#define DEFAULT_OPEN_PUPIL_RATE 0.03f
+#define DEFAULT_CLOSE_PUPIL_RATE 0.1f
 
 //-----------------------------------------------------------------------------
 // Returns the proximity of the player to the entity

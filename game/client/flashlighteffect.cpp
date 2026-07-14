@@ -162,7 +162,7 @@ void CFlashlightEffect::UpdateLightNew(const Vector &vecPos, const Vector &vecFo
 
 	constexpr float flEpsilon = 0.1f;			// Offset flashlight position along vecUp
 	constexpr float flDistCutoff = 128.0f;
-	constexpr float flDistDrag = 0.2;
+	constexpr float flDistDrag = 0.2f;
 
 	CTraceFilterSkipPlayerAndViewModel traceFilter;
 	float flOffsetY = r_flashlightoffsety.GetFloat();

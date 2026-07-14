@@ -563,7 +563,7 @@ bool C_LocalTempEntity::Frame( float frametime, int framenumber )
 				if ( damp != 1 )
 				{
 					VectorScale( m_vecTempEntVelocity, damp, m_vecTempEntVelocity );
-					SetLocalAngles( GetLocalAngles() * 0.9 );
+					SetLocalAngles( GetLocalAngles() * 0.9f );
 				}
 			}
 		}
@@ -3472,7 +3472,7 @@ void CTempEnts::CSEjectBrass( const Vector &vecPosition, const QAngle &angVeloci
 
 	pTemp->hitSound = hitsound;
 
-	pTemp->SetGravity( 0.4 );
+	pTemp->SetGravity( 0.4f );
 
 	pTemp->m_nBody	= 0;
 	pTemp->flags = FTENT_FADEOUT | FTENT_GRAVITY | FTENT_COLLIDEALL | FTENT_HITSOUND | FTENT_ROTATE | FTENT_CHANGERENDERONCOLLIDE;

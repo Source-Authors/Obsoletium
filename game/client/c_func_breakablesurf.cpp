@@ -624,7 +624,7 @@ void C_BreakableSurface::DrawRenderListHighlights(IBrushSurface* pBrushSurface)
 		Vector vRenderPos = m_vCorner + 
 							(m_RenderList[i].m_nWidth*vWidthStep)	+ 
 							(m_RenderList[i].m_nHeight*vHeightStep) +
-							(0.30*m_vNormal);
+							(0.30f*m_vNormal);
 
 		DrawOneHighlight(pBrushSurface, pMesh,&pMeshBuilder,vRenderPos,vWidthStep,vHeightStep,(WinSide_t)m_RenderList[i].m_nSide);
 	}
@@ -1162,7 +1162,7 @@ void C_BreakableSurface::DrawOneHighlight( IBrushSurface* pBrushSurface, IMesh* 
 	CMeshBuilder *pMeshBuilder,  const Vector &vStartPos,  const Vector &vWStep, 
 	const Vector &vHStep, WinSide_t nEdge )
 {
-	Vector vColor = Vector(0.41,0.35,0.24);
+	Vector vColor = Vector(0.41f,0.35f,0.24f);
 
 	pMeshBuilder->Begin( pMesh, MATERIAL_QUADS, 1 );
 

@@ -864,7 +864,7 @@ void DrawSplineSegs( int noise_divisions, float *prgNoise,
 				VectorNormalize(vLookDir);
 
 				float	dotpr		= fabs(DotProduct(vBeamDir1,vLookDir));
-				static float thresh = 0.85;
+				static float thresh = 0.85f;
 				if (dotpr > thresh && dotpr > bestDot)
 				{
 					bestDot		  = dotpr;
@@ -933,18 +933,18 @@ void DrawSplineSegs( int noise_divisions, float *prgNoise,
 				VectorNormalize(vLookDir);
 
 				bestDot		= fabs(DotProduct(vBeamDir1,vLookDir));
-				static float thresh = 0.85;
+				static float thresh = 0.85f;
 				if (bestDot > thresh)
 				{
-					fBestFraction = 0.5;
+					fBestFraction = 0.5f;
 					VectorAdd(pStart,pEnd,vHaloPos);
-					VectorScale(vHaloPos,0.5,vHaloPos);
+					VectorScale(vHaloPos,0.5f,vHaloPos);
 				}	
 			}
 			if (fBestFraction > 0)
 			{
 				float	fade	= powf(bestDot,60.0f);
-				if (fade > 1.0) fade = 1.0;
+				if (fade > 1.0) fade = 1.0f;
 				float haloColor[3];
 				VectorScale( color, fade, haloColor );
 				pRenderContext->Bind(pHaloMaterial);

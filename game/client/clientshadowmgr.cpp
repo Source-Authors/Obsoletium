@@ -1278,11 +1278,11 @@ bool CClientShadowMgr::Init()
 	m_bRenderTargetNeedsClear = false;
 	m_SimpleShadow.Init( "decals/simpleshadow", TEXTURE_GROUP_DECAL );
 
-	Vector dir( 0.1, 0.1, -1 );
+	Vector dir( 0.1f, 0.1f, -1 );
 	SetShadowDirection(dir);
 	SetShadowDistance( 50 );
 
-	SetShadowBlobbyCutoffArea( 0.005 );
+	SetShadowBlobbyCutoffArea( 0.005f );
 
 	bool bTools = CommandLine()->CheckParm( "-tools" ) != NULL;
 	// dimhotepus: Increase shadow depth textures count in game 1 -> 2.
@@ -2418,40 +2418,40 @@ void CClientShadowMgr::DrawRenderToTextureDebugInfo( IClientRenderable* pRendera
 
 	VectorMA( start, vecSize.x, vec[0], end );
 	VectorMA( end, vecSize.z, vec[2], end2 );
-	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01 ); 
-	debugoverlay->AddLineOverlay( end2, end, 255, 0, 0, true, 0.01 ); 
+	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01f ); 
+	debugoverlay->AddLineOverlay( end2, end, 255, 0, 0, true, 0.01f ); 
 
 	VectorMA( start, vecSize.y, vec[1], end );
 	VectorMA( end, vecSize.z, vec[2], end2 );
-	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01 ); 
-	debugoverlay->AddLineOverlay( end2, end, 255, 0, 0, true, 0.01 ); 
+	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01f ); 
+	debugoverlay->AddLineOverlay( end2, end, 255, 0, 0, true, 0.01f ); 
 
 	VectorMA( start, vecSize.z, vec[2], end );
-	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01 );
+	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01f );
 	
 	start = end;
 	VectorMA( start, vecSize.x, vec[0], end );
-	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01 ); 
+	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01f ); 
 
 	VectorMA( start, vecSize.y, vec[1], end );
-	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01 ); 
+	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01f ); 
 
 	VectorMA( end, vecSize.x, vec[0], start );
 	VectorMA( start, -vecSize.x, vec[0], end );
-	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01 ); 
+	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01f ); 
 
 	VectorMA( start, -vecSize.y, vec[1], end );
-	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01 ); 
+	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01f ); 
 
 	VectorMA( start, -vecSize.z, vec[2], end );
-	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01 );
+	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01f );
 
 	start = end;
 	VectorMA( start, -vecSize.x, vec[0], end );
-	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01 ); 
+	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01f ); 
 
 	VectorMA( start, -vecSize.y, vec[1], end );
-	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01 ); 
+	debugoverlay->AddLineOverlay( start, end, 255, 0, 0, true, 0.01f ); 
 
 	C_BaseEntity *pEnt = pRenderable->GetIClientUnknown()->GetBaseEntity();
 	if ( pEnt )

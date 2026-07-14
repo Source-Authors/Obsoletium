@@ -667,7 +667,7 @@ void CDebugViewRender::GenerateOverdrawForTesting()
 
 	for ( int i=0; i < 40; i++ )
 	{
-		g_SmokeFogOverlayAlpha = 20 / 255.0;
+		g_SmokeFogOverlayAlpha = 20 / 255.0f;
 		DrawSmokeFogOverlay();
 	}
 	g_SmokeFogOverlayAlpha = 0;

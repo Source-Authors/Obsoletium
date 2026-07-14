@@ -174,7 +174,7 @@ void CCommentaryModelViewer::HandleMovementInput( void )
 	bool bForwardDown = vgui::input()->IsKeyDown(KEY_UP);
 	bool bBackDown = vgui::input()->IsKeyDown(KEY_DOWN);
 
-	float flAccel = 0.05;
+	float flAccel = 0.05f;
 
 	// Rotation around Z
 	if ( bLeftDown )
