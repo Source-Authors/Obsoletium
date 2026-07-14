@@ -1294,8 +1294,7 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 			decal.m_Flags = flags;
 
 			// Add this decal to the history...
-			auto h = list.m_pLod[i].m_DecalHistory.AddToTail();
-			auto &d = list.m_pLod[i].m_DecalHistory[h];
+			auto &d = list.m_pLod[i].m_DecalHistory[list.m_pLod[i].m_DecalHistory.AddToTail()];
 			d.m_Material = materialIdx;
 			d.m_Decal = decalIndex;
 			d.m_nId = m_nDecalId;
@@ -1312,12 +1311,6 @@ void CStudioRender::AddDecal( StudioDecalHandle_t hDecal, const StudioRenderCont
 
 		// Increment count.
 		++m_nDecalId;
-	}
-
-	if ( IsX360() )
-	{
-		free( buildInfo.m_pMeshVertices );
-		free( buildInfo.m_pVertexBuffer );
 	}
 
 	m_pStudioHdr = NULL;
