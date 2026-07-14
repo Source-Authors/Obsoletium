@@ -28,9 +28,9 @@
 #define CLIENTNAME_TIMED_OUT "%s timed out"
 
 // This is the default, see shareddefs.h for mod-specific value, which can override this
-#define DEFAULT_TICK_INTERVAL	(0.015)				// 15 msec is the default
-#define MINIMUM_TICK_INTERVAL   (0.001)
-#define MAXIMUM_TICK_INTERVAL	(0.1)
+#define DEFAULT_TICK_INTERVAL	(0.015f)				// 15 msec is the default
+#define MINIMUM_TICK_INTERVAL   (0.001f)
+#define MAXIMUM_TICK_INTERVAL	(0.1f)
 
 // This is the max # of players the engine can handle
 #define ABSOLUTE_PLAYER_LIMIT 255  // not 256, so we can send the limit as a byte 
