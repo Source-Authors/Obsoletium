@@ -1002,7 +1002,7 @@ private:
 	void PrioritySort();
 
 	CUtlVector<VisibleShadowInfo_t> m_ShadowsInView;
-	CUtlVector<int>	m_PriorityIndex;
+	CUtlVector<intp>	m_PriorityIndex;
 };
 
 
@@ -1124,7 +1124,7 @@ void CVisibleShadowList::PrioritySort()
 		float flLargestArea = m_ShadowsInView[m_PriorityIndex[i]].m_flArea;
 		for ( j = i + 1; j < nCount; ++j )
 		{
-			int nIndex = m_PriorityIndex[j];
+			intp nIndex = m_PriorityIndex[j];
 			if ( flLargestArea < m_ShadowsInView[nIndex].m_flArea )
 			{
 				nLargestInd = j;

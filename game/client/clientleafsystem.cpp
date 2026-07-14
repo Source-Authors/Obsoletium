@@ -1322,7 +1322,7 @@ void CClientLeafSystem::AddToViewModelList( ClientRenderHandle_t handle )
 
 void CClientLeafSystem::RemoveFromViewModelList( ClientRenderHandle_t handle )
 {
-	int i = m_ViewModels.Find( handle );
+	intp i = m_ViewModels.Find( handle );
 	Assert( i != m_ViewModels.InvalidIndex() );
 	m_ViewModels.FastRemove( i );
 }
