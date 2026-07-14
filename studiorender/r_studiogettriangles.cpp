@@ -57,15 +57,13 @@ void CStudioRenderContext::GetTriangles( const DrawModelInfo_t& info, matrix3x4_
 	int boneMask = BONE_USED_BY_VERTEX_AT_LOD(lod);
 	ComputePoseToWorld( out.m_PoseToWorld, info.m_pStudioHdr, boneMask, m_RC.m_ViewOrigin, pBoneToWorld );
 
-	int i;
-	for (i=0 ; i < info.m_pStudioHdr->numbodyparts ; i++) 
+	for (int i = 0 ; i < info.m_pStudioHdr->numbodyparts ; i++) 
 	{
 		mstudiomodel_t *pModel = NULL;
 		R_StudioSetupModel( i, info.m_Body, &pModel, info.m_pStudioHdr );
 
 		// Iterate over all the meshes.... each mesh is a new material
-		int k;
-		for ( k = 0; k < pModel->nummeshes; ++k )
+		for ( int k = 0; k < pModel->nummeshes; ++k )
 		{
 			GetTriangles_MaterialBatch_t &materialBatch = out.m_MaterialBatches[out.m_MaterialBatches.AddToTail()];
 			mstudiomesh_t *pMesh = pModel->pMesh(k);
@@ -119,16 +117,14 @@ void CStudioRenderContext::GetTriangles( const DrawModelInfo_t& info, matrix3x4_
 			materialBatch.m_TriListIndices.SetCount( 0 );
 
 			// Iterate over all stripgroups
-			int stripGroupID;
-			for ( stripGroupID = 0; stripGroupID < pMeshData->m_NumGroup; stripGroupID++ )
+			for ( int stripGroupID = 0; stripGroupID < pMeshData->m_NumGroup; stripGroupID++ )
 			{
 				studiomeshgroup_t *pMeshGroup = &pMeshData->m_pMeshGroup[stripGroupID];
 //				bool bIsFlexed = ( pMeshGroup->m_Flags & MESHGROUP_IS_FLEXED ) != 0;
 //				bool bIsHWSkinned = ( pMeshGroup->m_Flags & MESHGROUP_IS_HWSKINNED ) != 0;
 				
 				// Iterate over all strips. . . each strip potentially changes bones states.
-				int stripID;
-				for ( stripID = 0; stripID < pMeshGroup->m_NumStrips; stripID++ )
+				for ( int stripID = 0; stripID < pMeshGroup->m_NumStrips; stripID++ )
 				{
 					OptimizedModel::StripHeader_t *pStripData = &pMeshGroup->m_pStripData[stripID];
 //					int boneID;
@@ -139,9 +135,9 @@ void CStudioRenderContext::GetTriangles( const DrawModelInfo_t& info, matrix3x4_
 //					}
 					if ( pStripData->flags & OptimizedModel::STRIP_IS_TRILIST )
 					{
-						for ( int i = 0; i < pStripData->numIndices; i += 3 )
+						for ( int j = 0; j < pStripData->numIndices; j += 3 )
 						{
-							int idx = pStripData->indexOffset + i;
+							int idx = pStripData->indexOffset + j;
 							materialBatch.m_TriListIndices.AddToTail( pMeshGroup->MeshIndex( idx ) );
 							materialBatch.m_TriListIndices.AddToTail( pMeshGroup->MeshIndex( idx + 1 ) );
 							materialBatch.m_TriListIndices.AddToTail( pMeshGroup->MeshIndex( idx + 2 ) );
@@ -150,10 +146,10 @@ void CStudioRenderContext::GetTriangles( const DrawModelInfo_t& info, matrix3x4_
 					else
 					{
 						Assert( pStripData->flags & OptimizedModel::STRIP_IS_TRISTRIP );
-						for (int i = 0; i < pStripData->numIndices - 2; ++i)
+						for (int j = 0; j < pStripData->numIndices - 2; ++j)
 						{
-							int idx = pStripData->indexOffset + i;
-							bool ccw = (i & 0x1) == 0;
+							int idx = pStripData->indexOffset + j;
+							bool ccw = (j & 0x1) == 0;
 							materialBatch.m_TriListIndices.AddToTail( pMeshGroup->MeshIndex( idx ) );
 							materialBatch.m_TriListIndices.AddToTail( pMeshGroup->MeshIndex( idx + 1 + ccw ) );
 							materialBatch.m_TriListIndices.AddToTail( pMeshGroup->MeshIndex( idx + 2 - ccw ) );
