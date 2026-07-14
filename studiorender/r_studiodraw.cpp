@@ -2421,7 +2421,7 @@ int CStudioRender::R_StudioDrawEyeball( IMatRenderContext *pRenderContext, mstud
 	m_VertexCache.SetupComputation( pmesh );
 
 	int nAlpnaInt = RoundFloatToInt( m_pRC->m_AlphaMod * 255 );
-	unsigned char a = clamp( nAlpnaInt, 0, 255 );
+	unsigned char a = static_cast<unsigned char>( clamp( nAlpnaInt, 0, 255 ) );
 
 	Vector color;
 
