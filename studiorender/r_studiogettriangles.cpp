@@ -28,14 +28,7 @@ void CStudioRenderContext::GetTriangles( const DrawModelInfo_t& info, matrix3x4_
 	int lod = info.m_Lod;
 	int lastlod = info.m_pHardwareData->m_NumLODs - 1;
 
-	if ( lod == USESHADOWLOD )
-	{
-		lod = lastlod;
-	} 
-	else
-	{
-		lod = clamp( lod, 0, lastlod );
-	}
+	lod = lod == USESHADOWLOD ? lastlod : clamp( lod, 0, lastlod );
 
 	// clamp to root lod
 	if ( lod < info.m_pHardwareData->m_RootLOD)
