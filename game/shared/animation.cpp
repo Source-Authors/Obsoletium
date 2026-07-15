@@ -398,7 +398,7 @@ int CStudioHdr::CActivityToSequenceMapping::SelectWeightedSequenceFromModifiers(
 	// randomly pick between the highest scoring sequences ( NOTE: this method of selecting a sequence ignores activity weights )
 	if ( IsInPrediction() )
 	{
-		return topScoring[ SharedRandomInt( "SelectWeightedSequence", 0, topScoring.Count() - 1 ) ];
+		return topScoring[ SharedRandomInt( "SelectWeightedSequence", (intp)0, topScoring.Count() - 1 ) ];
 	}
 	
 	return topScoring[ RandomIntp( 0, topScoring.Count() - 1 ) ];

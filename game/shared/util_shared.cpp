@@ -170,6 +170,17 @@ int SharedRandomInt( const char *sharedname, int iMinVal, int iMaxVal, int addit
 	return RandomInt( iMinVal, iMaxVal );
 }
 
+#ifdef PLATFORM_64BITS
+intp SharedRandomInt( const char *sharedname, intp iMinVal, intp iMaxVal, int additionalSeed /*=0*/ )
+{
+	Assert( CBaseEntity::GetPredictionRandomSeed() != -1 );
+
+	int seed = SeedFileLineHash( CBaseEntity::GetPredictionRandomSeed(), sharedname, additionalSeed );
+	RandomSeed( seed );
+	return RandomInt64( iMinVal, iMaxVal );
+}
+#endif
+
 Vector SharedRandomVector( const char *sharedname, float minVal, float maxVal, int additionalSeed /*=0*/ )
 {
 	Assert( CBaseEntity::GetPredictionRandomSeed() != -1 );

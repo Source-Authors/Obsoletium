@@ -65,6 +65,10 @@ Vector		UTIL_YawToVector		( float yaw );
 //-----------------------------------------------------------------------------
 float	SharedRandomFloat( const char *sharedname, float flMinVal, float flMaxVal, int additionalSeed = 0 );
 int		SharedRandomInt( const char *sharedname, int iMinVal, int iMaxVal, int additionalSeed = 0 );
+// dimhotepus: x86-64 support.
+#ifdef PLATFORM_64BITS
+intp	SharedRandomInt( const char *sharedname, intp iMinVal, intp iMaxVal, int additionalSeed = 0 );
+#endif
 Vector	SharedRandomVector( const char *sharedname, float minVal, float maxVal, int additionalSeed = 0 );
 QAngle	SharedRandomAngle( const char *sharedname, float minVal, float maxVal, int additionalSeed = 0 );
 
