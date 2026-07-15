@@ -1530,7 +1530,7 @@ inline void AddRenderableToRenderList( CClientRenderablesList &renderList, IClie
 //-----------------------------------------------------------------------------
 void CClientLeafSystem::CollateViewModelRenderables( CUtlVector< IClientRenderable * >& opaque, CUtlVector< IClientRenderable * >& translucent )
 {
-	for ( int i = m_ViewModels.Count()-1; i >= 0; --i )
+	for ( intp i = m_ViewModels.Count()-1; i >= 0; --i )
 	{
 		ClientRenderHandle_t handle = m_ViewModels[i];
 		RenderableInfo_t& renderable = m_Renderables[handle];
