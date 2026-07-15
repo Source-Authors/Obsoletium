@@ -486,10 +486,10 @@ void CClientLeafSystem::LevelInitPreEntity()
 	ClientLeaf_t newLeaf;
 	newLeaf.m_FirstElement = m_RenderablesInLeaf.InvalidIndex();
 	newLeaf.m_FirstShadow = m_ShadowsInLeaf.InvalidIndex();
-	memset( newLeaf.m_pSubSystemData, 0, sizeof( newLeaf.m_pSubSystemData ) );
 	newLeaf.m_FirstDetailProp = 0;
 	newLeaf.m_DetailPropCount = 0;
 	newLeaf.m_DetailPropRenderFrame = -1;
+	BitwiseClear( newLeaf.m_pSubSystemData );
 	while ( --leafCount >= 0 )
 	{
 		m_Leaf.AddToTail( newLeaf );
