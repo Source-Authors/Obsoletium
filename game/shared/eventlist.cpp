@@ -74,7 +74,7 @@ eventlist_t *EventList_AddEventEntry( const char *pName, int iEventIndex, bool i
 static eventlist_t *ListFromString( const char *pString )
 {
 	// just use the string registry to do this search/map
-	int stringID = g_EventStrings.GetStringID( pString );
+	intp stringID = g_EventStrings.GetStringID( pString );
 	if ( stringID < 0 )
 		return NULL;
 
