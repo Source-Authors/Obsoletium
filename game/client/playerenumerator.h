@@ -30,7 +30,7 @@ public:
 
 	intp	GetObjectCount() const { return m_Objects.Count(); }
 
-	C_BaseEntity *GetObject( int index )
+	C_BaseEntity *GetObject( intp index )
 	{
 		if ( index < 0 || index >= GetObjectCount() )
 			return NULL;

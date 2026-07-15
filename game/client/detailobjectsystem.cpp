@@ -1319,8 +1319,8 @@ void CDetailModel::UpdatePlayerAvoid( void )
 	::partition->EnumerateElementsInSphere( PARTITION_CLIENT_SOLID_EDICTS, m_Origin, flRadius, false, &avoid );
 
 	// Okay, decide how to avoid if there's anything close by
-	int c = avoid.GetObjectCount();
-	for ( int i=0; i<c+1; i++ )	// +1 for the local player we tack on the end
+	intp c = avoid.GetObjectCount();
+	for ( intp i=0; i<c+1; i++ )	// +1 for the local player we tack on the end
 	{
 		if ( i == c )
 		{
