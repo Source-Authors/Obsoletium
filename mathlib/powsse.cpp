@@ -54,7 +54,7 @@ fltx4 XM_CALLCONV Pow_FixedPoint_Exponent_SIMD( DirectX::FXMVECTOR x, int expone
 
 
 static constexpr float shift23=(1<<23);
-static constexpr float OOshift23=1.0/(1<<23);
+static constexpr float OOshift23=1.0f/(1<<23);
 
 float XM_CALLCONV FastLog2(float i)
 {
