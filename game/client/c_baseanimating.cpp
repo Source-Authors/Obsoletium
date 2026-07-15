@@ -901,7 +901,8 @@ void C_BaseAnimating::AddBaseAnimatingInterpolatedVars()
 	AddVar( m_flEncodedController, &m_iv_flEncodedController, LATCH_ANIMATION_VAR, true );
 	AddVar( m_flPoseParameter, &m_iv_flPoseParameter, LATCH_ANIMATION_VAR, true );
 	
-	int flags = LATCH_ANIMATION_VAR;
+	// dimhotepus: Use byte for flags.
+	byte flags = LATCH_ANIMATION_VAR;
 	if ( m_bClientSideAnimation )
 		flags |= EXCLUDE_AUTO_INTERPOLATE;
 		
