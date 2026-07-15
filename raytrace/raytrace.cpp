@@ -270,9 +270,9 @@ struct NodeToVisit {
 };
 
 
-static fltx4 FourEpsilons={1.0e-10f,1.0e-10f,1.0e-10f,1.0e-10f};
-static fltx4 FourZeros={1.0e-10f,1.0e-10f,1.0e-10f,1.0e-10f};
-static fltx4 FourNegativeEpsilons={-1.0e-10f,-1.0e-10f,-1.0e-10f,-1.0e-10f};
+static constexpr fltx4 FourEpsilons={1.0e-10f,1.0e-10f,1.0e-10f,1.0e-10f};
+static constexpr fltx4 FourZeros={1.0e-10f,1.0e-10f,1.0e-10f,1.0e-10f};
+static constexpr fltx4 FourNegativeEpsilons={-1.0e-10f,-1.0e-10f,-1.0e-10f,-1.0e-10f};
 
 static float BoxSurfaceArea(Vector const &boxmin, Vector const &boxmax)
 {

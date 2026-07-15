@@ -24,10 +24,10 @@ enum {
   MAGIC_NUMBER = (1<<15)								// gives 8 bits of fraction
 };
 
-static fltx4 Four_MagicNumbers = { MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER };
+static constexpr fltx4 Four_MagicNumbers = { MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER };
 
 
-alignas(16) static int32 idx_mask[4] = {0xffff, 0xffff, 0xffff, 0xffff};
+alignas(16) static constexpr int32 idx_mask[4] = {0xffff, 0xffff, 0xffff, 0xffff};
 
 #define MASK255 (*((fltx4 *)(& idx_mask )))
 

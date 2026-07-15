@@ -11,16 +11,16 @@
 
 #define MAGIC_NUMBER (1<<23)
 
-static fltx4 Four_MagicNumbers={ MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER };
-alignas(16) static int32 Four_255s[4] = { 0xff,0xff,0xff,0xff };
-#define PIXMASK ( * ( reinterpret_cast< fltx4 *>( &Four_255s ) ) )
+static constexpr fltx4 Four_MagicNumbers={ MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER };
+alignas(16) static constexpr int32 Four_255s[4] = { 0xff,0xff,0xff,0xff };
+#define PIXMASK ( * ( reinterpret_cast< const fltx4 *>( &Four_255s ) ) )
 
 void MapLinearIntensities(FourVectors const &intens,uint32 *p1, uint32 *p2, uint32 *p3, uint32 *p4)
 {
 	// convert four pixels worth of sse-style rgb into argb lwords
 	// NOTE the _mm_empty macro is voodoo. do not mess with this routine casually - simply throwing
 	// anything that ends up generating a fpu stack references in here would be bad news.
-	static fltx4 pixscale={255.0,255.0,255.0,255.0};
+	constexpr fltx4 pixscale={255.0,255.0,255.0,255.0};
 
 	fltx4 r,g,b;
 	r=MinSIMD(pixscale,MulSIMD(pixscale,PowSIMD(intens.x,IGAMMA)));
@@ -37,11 +37,11 @@ void MapLinearIntensities(FourVectors const &intens,uint32 *p1, uint32 *p2, uint
 	*(p4)=(SubInt(r, 3))|(SubInt(g, 3)<<8)|(SubInt(b, 3)<<16);
 }
 
-alignas(16) static uint32 signmask[4]={0x80000000,0x80000000,0x80000000,0x80000000};
+alignas(16) static constexpr uint32 signmask[4]={0x80000000,0x80000000,0x80000000,0x80000000};
 // dimhtotepus: Comment unused
 // alignas(16) static int32 all_ones[4]={-1,-1,-1,-1};
-static fltx4 all_zeros={0,0,0,0};
-static fltx4 TraceLimit={1.0e20f,1.0e20f,1.0e20f,1.0e20f};
+static constexpr fltx4 all_zeros={0,0,0,0};
+static constexpr fltx4 TraceLimit={1.0e20f,1.0e20f,1.0e20f,1.0e20f};
 
 void RayTracingEnvironment::RenderScene(
 	int width, int height,								   // width and height of desired rendering

@@ -2122,10 +2122,10 @@ int CDetailObjectSystem::SortSpritesBackToFront( int nLeaf, const Vector &viewOr
 #else
 #define MANTISSA_LSB_OFFSET 0
 #endif
-static fltx4 Four_MagicNumbers={ MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER };
-static fltx4 Four_255s={ 255.0, 255.0, 255.0, 255.0 };
+static constexpr fltx4 Four_MagicNumbers={ MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER };
+static constexpr fltx4 Four_255s={ 255.0, 255.0, 255.0, 255.0 };
 
-alignas(16) static int32 And255Mask[4] = {0xff, 0xff, 0xff, 0xff};
+alignas(16) static constexpr int32 And255Mask[4] = {0xff, 0xff, 0xff, 0xff};
 #define PIXMASK ( * ( reinterpret_cast< fltx4 *>( &And255Mask ) ) )
 
 intp CDetailObjectSystem::BuildOutSortedSprites( CFastDetailLeafSpriteList *pData,
