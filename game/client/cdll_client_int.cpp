@@ -1993,7 +1993,7 @@ void CHLClient::PrecacheMaterial( const char *pMaterialName )
 
 void CHLClient::UncacheAllMaterials( )
 {
-	for (int i = m_CachedMaterials.Count(); --i >= 0; )
+	for (intp i = m_CachedMaterials.Count(); --i >= 0; )
 	{
 		m_CachedMaterials[i]->DecrementReferenceCount();
 	}
