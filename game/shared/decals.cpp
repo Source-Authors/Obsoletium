@@ -115,16 +115,16 @@ int CDecalEmitterSystem::GetDecalIndexForName( char const *decalname )
 
 	DecalEntry *e = &m_Decals[ idx ];
 	Assert( e );
-	int count = e->indices.Count();
+	intp count = e->indices.Count();
 	if ( count <= 0 )
 		return -1;
 
 	float totalweight = 0.0f;
-	int slot = 0;
+	UtlHashFastHandle_t slot = 0;
 
-	for ( int i = 0; i < count; i++ )
+	for ( intp i = 0; i < count; i++ )
 	{
-		idx = e->indices[ i ];
+		UtlHashFastHandle_t idx = e->indices[ i ];
 		DecalListEntry *item = &m_AllDecals[ idx ];
 		Assert( item );
 		
@@ -146,7 +146,7 @@ int CDecalEmitterSystem::GetDecalIndexForName( char const *decalname )
 
 const char *CDecalEmitterSystem::GetDecalNameForIndex( int nIndex )
 {
-	for ( int nDecal = 0; nDecal < m_AllDecals.Count(); ++nDecal )
+	for ( intp nDecal = 0; nDecal < m_AllDecals.Count(); ++nDecal )
 	{
 		if ( m_AllDecals[ nDecal ].precache_index == nIndex )
 		{
