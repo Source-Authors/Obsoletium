@@ -1501,7 +1501,7 @@ void CBaseHudChatLine::Colorize( int alpha )
 	for ( intp i=0; i<m_textRanges.Count(); ++i )
 	{
 		wchar_t * start = m_text + m_textRanges[i].start;
-		int len = m_textRanges[i].end - m_textRanges[i].start + 1;
+		intp len = m_textRanges[i].end - m_textRanges[i].start + 1;
 		if ( len > 1 && len <= ssize( wText ) )
 		{
 			wcsncpy( wText, start, len );
