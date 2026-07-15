@@ -448,7 +448,8 @@ public:
 	virtual void EngineStats_EndFrame( void ) override;
 	virtual void FireEvents() override;
 	virtual void CheckPoint( const char *pName ) override;
-	virtual int GetLeavesArea( int *pLeaves, int nLeaves ) override;
+	// dimhotepus: int -> short.
+	virtual short GetLeavesArea( int *pLeaves, int nLeaves ) override;
 	virtual bool DoesBoxTouchAreaFrustum( const Vector &mins, const Vector &maxs, int iArea ) override;
 
 	// Sets the hearing origin
@@ -1178,15 +1179,16 @@ void CEngineClient::CheckPoint( const char *pName )
 	GetTestScriptMgr()->CheckPoint( pName );
 }
 
-int CEngineClient::GetLeavesArea( int *pLeaves, int nLeaves )
+// dimhotepus: int -> short.
+short CEngineClient::GetLeavesArea( int *pLeaves, int nLeaves )
 {
 	if ( nLeaves == 0 )
 		return -1;
 
-	int iArea = host_state.worldbrush->leafs[pLeaves[0]].area;
+	short iArea = host_state.worldbrush->leafs[pLeaves[0]].area;
 	for ( int i=1; i < nLeaves; i++ )
 	{
-		int iTestArea = host_state.worldbrush->leafs[pLeaves[i]].area;
+		short iTestArea = host_state.worldbrush->leafs[pLeaves[i]].area;
 		if ( iTestArea != iArea )
 			return -1;
 	}

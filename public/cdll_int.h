@@ -374,7 +374,8 @@ public:
 	virtual void		FireEvents() = 0;
 
 	// Returns an area index if all the leaves are in the same area. If they span multple areas, then it returns -1.
-	virtual int			GetLeavesArea( int *pLeaves, int nLeaves ) = 0;
+	// dimhotepus: int -> short.
+	virtual short			GetLeavesArea( int *pLeaves, int nLeaves ) = 0;
 
 	// Returns true if the box touches the specified area's frustum.
 	virtual bool		DoesBoxTouchAreaFrustum( const Vector &mins, const Vector &maxs, int iArea ) = 0;
