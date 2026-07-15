@@ -614,7 +614,7 @@ void NDebugOverlay::Circle( const Vector &position, const QAngle &angles, float 
 void NDebugOverlay::Circle( const Vector &position, const Vector &xAxis, const Vector &yAxis, float radius, int r, int g, int b, int a, bool bNoDepthTest, float flDuration )
 {
 	constexpr unsigned int nSegments = 16;
-	constexpr float flRadStep = (M_PI*2.0f) / (float) nSegments;
+	constexpr float flRadStep = (M_PI_F*2.0f) / (float) nSegments;
 
 	Vector vecLastPosition;
 	

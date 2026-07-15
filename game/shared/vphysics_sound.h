@@ -81,7 +81,7 @@ namespace physicssound
 	}
 	void AddImpactSound( soundlist_t &list, void *pGameData, int entityIndex, int soundChannel, IPhysicsObject *pObject, int surfaceProps, int surfacePropsHit, float volume, float impactSpeed )
 	{
-		impactSpeed += 1e-4;
+		impactSpeed += 1e-4f;
 		for ( intp i = list.Count()-1; i >= 0; --i )
 		{
 			impactsound_t &sound = list.GetElement(i);

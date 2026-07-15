@@ -48,7 +48,7 @@ void AddRestoredEntity( C_BaseEntity *pEntity );
 #include "tier0/memdbgon.h"
 
 #define MAX_ENTITYARRAY 1024
-#define ZERO_TIME ((FLT_MAX*-0.5))
+#define ZERO_TIME ((FLT_MAX*-0.5f))
 // A bit arbitrary, but unlikely to collide with any saved games...
 #define TICK_NEVER_THINK_ENCODE	( INT_MAX - 3 )
 
@@ -1023,8 +1023,8 @@ void CSave::WriteTime( const char *pname, const float *data, int count )
 		else
 		{			
 			tmp = data[i] - m_pGameInfo->GetBaseTime();
-			if ( fabsf( tmp ) < 0.001 ) // never allow a time to become zero due to rebasing
-				tmp = 0.001;
+			if ( fabsf( tmp ) < 0.001f ) // never allow a time to become zero due to rebasing
+				tmp = 0.001f;
 		}
 
 		WriteData( (const char *)&tmp, sizeof(float) );
@@ -1053,8 +1053,8 @@ void CSave::WriteTime( const float *data, int count )
 		else
 		{			
 			tmp = data[i] - m_pGameInfo->GetBaseTime();
-			if ( fabsf( tmp ) < 0.001 ) // never allow a time to become zero due to rebasing
-				tmp = 0.001;
+			if ( fabsf( tmp ) < 0.001f ) // never allow a time to become zero due to rebasing
+				tmp = 0.001f;
 		}
 
 		WriteData( (const char *)&tmp, sizeof(float) );

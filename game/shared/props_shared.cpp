@@ -699,11 +699,11 @@ const char *GetMassEquivalent(float flMass)
 		const char *sz;
 	} masstext[] =
 	{
-		{ 5e-6,		"snowflake" },
-		{ 2.5e-3,	"ping-pong ball" },
-		{ 5e-3,		"penny" },
-		{ 0.05,		"golf ball" },
-		{ 0.17,		"billard ball" },
+		{ 5e-6f,	"snowflake" },
+		{ 2.5e-3f,	"ping-pong ball" },
+		{ 5e-3f,	"penny" },
+		{ 0.05f,	"golf ball" },
+		{ 0.17f,	"billard ball" },
 		{ 2,		"bag of sugar" },
 		{ 7,		"male cat" },
 		{ 10,		"bowling ball" },
@@ -717,11 +717,11 @@ const char *GetMassEquivalent(float flMass)
 		{ 2500,		"large car" },
 		{ 6000,		"t-rex" },
 		{ 7200,		"elephant" },
-		{ 8e4,		"space shuttle" },
-		{ 7e5,		"locomotive" },
-		{ 9.2e6,	"Eiffel tower" },
-		{ 6e24,		"the Earth" },
-		{ 7e24,		"really freaking heavy" },
+		{ 8e4f,		"space shuttle" },
+		{ 7e5f,		"locomotive" },
+		{ 9.2e6f,	"Eiffel tower" },
+		{ 6e24f,	"the Earth" },
+		{ 7e24f,	"really freaking heavy" },
 	};
 
 	for (size_t i = 0; i < std::size(masstext) - 1; i++)

@@ -189,7 +189,7 @@ static void RagdollAddSolid( IPhysicsEnvironment *pPhysEnv, ragdoll_t &ragdoll, 
 				solid.params.mass = 1000.f;
 			}
 
-			solid.params.rotInertiaLimit = 0.1;
+			solid.params.rotInertiaLimit = 0.1f;
 			solid.params.pGameData = params.pGameData;
 			intp surfaceData = physprops->GetSurfaceIndex( solid.surfaceprop );
 

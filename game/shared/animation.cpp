@@ -844,7 +844,7 @@ bool GotoSequence( CStudioHdr *pstudiohdr, int iCurrentSequence, float flCurrent
 			if (pstudiohdr->ExitNode( i ) == iEndNode && pstudiohdr->EntryNode( i ) == iInternNode)
 			{
 				iNextDir = -1;
-				flNextCycle = 0.999;	
+				flNextCycle = 0.999f;
 				nNextSequence = i;
 				return true;
 			}

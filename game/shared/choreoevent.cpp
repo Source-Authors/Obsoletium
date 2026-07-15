@@ -3591,7 +3591,7 @@ bool CChoreoEvent::PreventTagOverlap( void )
 	bool bHadOverlap  = false;
 
 	// FIXME: limit to single frame?
-	float minDp = 0.01;
+	float minDp = 0.01f;
 
 	float minP = 1.00;
 

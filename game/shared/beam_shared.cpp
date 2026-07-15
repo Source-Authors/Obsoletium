@@ -87,7 +87,7 @@ void RecvProxy_Beam_ScrollSpeed( const CRecvProxyData *pData, void *pStruct, voi
 
 	// Unpack the data.
 	val	= pData->m_Value.m_Float;
-	val *= 0.1;
+	val *= 0.1f;
 
 	beam = ( C_Beam * )pStruct;
 	Assert( pOut == &beam->m_fSpeed );

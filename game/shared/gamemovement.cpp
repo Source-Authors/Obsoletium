@@ -1401,7 +1401,7 @@ void CGameMovement::WaterMove( void )
 	}
 
 	// Slow us down a bit.
-	wishspeed *= 0.8;
+	wishspeed *= 0.8f;
 	
 	// Water friction
 	VectorCopy(mv->m_vecVelocity, temp);
@@ -3917,11 +3917,11 @@ void CGameMovement::CheckFalling( void )
 				// If they hit the ground going this fast they may take damage (and die).
 				//
 				bAlive = MoveHelper( )->PlayerFallingDamage();
-				fvol = 1.0;
+				fvol = 1.0f;
 			}
 			else if ( player->m_Local.m_flFallVelocity > PLAYER_MAX_SAFE_FALL_SPEED / 2 )
 			{
-				fvol = 0.85;
+				fvol = 0.85f;
 			}
 			else if ( player->m_Local.m_flFallVelocity < PLAYER_MIN_BOUNCE_SPEED )
 			{

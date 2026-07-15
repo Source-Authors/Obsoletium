@@ -1799,7 +1799,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 
 #ifdef GAME_DLL
 		if ( ai_debug_shoot_positions.GetBool() )
-			NDebugOverlay::Line(info.m_vecSrc, vecEnd, 255, 255, 255, false, .1 );
+			NDebugOverlay::Line(info.m_vecSrc, vecEnd, 255, 255, 255, false, .1f );
 #endif
 
 		if ( bStartedInWater )
@@ -2314,17 +2314,17 @@ void CBaseEntity::TraceBleed( float flDamage, const Vector &vecDir, trace_t *ptr
 
 	if (flDamage < 10)
 	{
-		flNoise = 0.1;
+		flNoise = 0.1f;
 		cCount = 1;
 	}
 	else if (flDamage < 25)
 	{
-		flNoise = 0.2;
+		flNoise = 0.2f;
 		cCount = 2;
 	}
 	else
 	{
-		flNoise = 0.3;
+		flNoise = 0.3f;
 		cCount = 4;
 	}
 

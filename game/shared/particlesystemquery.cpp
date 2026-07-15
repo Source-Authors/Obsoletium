@@ -241,13 +241,13 @@ void CParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 						float u = 0, v = 0, w = 0;
 						int nHitbox = 0;
 						int nNumIters = nNumTrysToGetAPointInsideTheModel;
-						if (! vecDirectionalBias.IsZero( 0.0001 ) )
+						if (! vecDirectionalBias.IsZero( 0.0001f ) )
 							nNumIters = MAX( nNumIters, 5 );
 
 						for( int i=0 ; i < nNumPtsOut; i++)
 						{
 							int nTryCnt = nNumIters;
-							float flBestPointGoodness = -1.0e20;
+							float flBestPointGoodness = -1.0e20f;
 							do
 							{
 								int nTryHitbox = pParticles->RandomInt( 0, set->numhitboxes - 1 );
@@ -318,13 +318,13 @@ void CParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 			float u = 0, v = 0, w = 0;
 			int nHitbox = 0;
 			int nNumIters = nNumTrysToGetAPointInsideTheModel;
-			if (! vecDirectionalBias.IsZero( 0.0001 ) )
+			if (! vecDirectionalBias.IsZero( 0.0001f ) )
 				nNumIters = MAX( nNumIters, 5 );
 
 			for( int i=0 ; i < nNumPtsOut; i++)
 			{
 				int nTryCnt = nNumIters;
-				float flBestPointGoodness = -1.0e20;
+				float flBestPointGoodness = -1.0e20f;
 				do
 				{
 					float flTryU = pParticles->RandomFloat( flRandMin, flRandMax );

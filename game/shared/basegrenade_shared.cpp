@@ -124,7 +124,7 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	// Pull out of the wall a bit
 	if ( pTrace->fraction != 1.0 )
 	{
-		SetAbsOrigin( pTrace->endpos + (pTrace->plane.normal * 0.6) );
+		SetAbsOrigin( pTrace->endpos + (pTrace->plane.normal * 0.6f) );
 	}
 
 	Vector vecAbsOrigin = GetAbsOrigin();
@@ -386,7 +386,7 @@ void CBaseGrenade::BounceTouch( CBaseEntity *pOther )
 	// or thrown very far tend to slow down too quickly for me to always catch just by testing velocity. 
 	// trimming the Z velocity a bit seems to help quite a bit.
 	vecTestVelocity = GetAbsVelocity(); 
-	vecTestVelocity.z *= 0.45;
+	vecTestVelocity.z *= 0.45f;
 
 	if ( !m_bHasWarnedAI && vecTestVelocity.Length() <= 60 )
 	{
@@ -468,7 +468,7 @@ void CBaseGrenade ::TumbleThink( void )
 	if (m_flDetonateTime - 1 < gpGlobals->curtime)
 	{
 #if !defined( CLIENT_DLL )
-		CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin() + GetAbsVelocity() * (m_flDetonateTime - gpGlobals->curtime), 400, 0.1, this );
+		CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin() + GetAbsVelocity() * (m_flDetonateTime - gpGlobals->curtime), 400, 0.1f, this );
 #endif
 	}
 
@@ -479,8 +479,8 @@ void CBaseGrenade ::TumbleThink( void )
 
 	if (GetWaterLevel() != WaterLevel::WL_NotInWater)
 	{
-		SetAbsVelocity( GetAbsVelocity() * 0.5 );
-		m_flPlaybackRate = 0.2;
+		SetAbsVelocity( GetAbsVelocity() * 0.5f );
+		m_flPlaybackRate = 0.2f;
 	}
 }
 

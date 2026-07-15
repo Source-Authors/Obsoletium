@@ -603,7 +603,7 @@ void CBasePlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOri
 			iSkipStep = 0;
 		}
 		psurface = physprops->GetSurfaceData( physprops->GetSurfaceIndex( "wade" ) );
-		fvol = 0.65;
+		fvol = 0.65f;
 		SetStepSoundTime( STEPSOUNDTIME_WATER_KNEE, bWalking );
 	}
 	else if ( GetWaterLevel() == WaterLevel::WL_Feet )
@@ -657,7 +657,7 @@ void CBasePlayer::UpdateStepSound( surfacedata_t *psurface, const Vector &vecOri
 	// 65% volume if ducking
 	if ( GetFlags() & FL_DUCKING )
 	{
-		fvol *= 0.65;
+		fvol *= 0.65f;
 	}
 
 	PlayStepSound( feet, psurface, fvol, false );
