@@ -263,8 +263,10 @@ private:
 		unsigned int	m_FirstElement;
 		unsigned int	m_FirstShadow;
 
-		unsigned short	m_FirstDetailProp;
-		unsigned short	m_DetailPropCount;
+		// dimhotepus: unsigned short -> int.
+		int				m_FirstDetailProp;
+		// dimhotepus: unsigned short -> int.
+		int				m_DetailPropCount;
 		int				m_DetailPropRenderFrame;
 		CClientLeafSubSystemData *m_pSubSystemData[N_CLSUBSYSTEMS];
 
@@ -1734,7 +1736,7 @@ void CClientLeafSystem::CollateRenderablesInLeaf( LeafIndex_t leaf, int worldLis
 	// These don't have render handles!
 	if ( info.m_bDrawDetailObjects && ShouldDrawDetailObjectsInLeaf( leaf, info.m_nDetailBuildFrame ) )
 	{
-		idx = m_Leaf[leaf].m_FirstDetailProp;
+		int idx = m_Leaf[leaf].m_FirstDetailProp;
 		int count = m_Leaf[leaf].m_DetailPropCount;
 		while( --count >= 0 )
 		{
