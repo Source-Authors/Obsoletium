@@ -1552,12 +1552,12 @@ void CClientLeafSystem::CollateViewModelRenderables( CUtlVector< IClientRenderab
 
 static RenderGroup_t DetectBucketedRenderGroup( RenderGroup_t group, float fDimension )
 {
-	float const arrThresholds[ 3 ] = {
+	constexpr float arrThresholds[ 3 ] = {
 		200.f,	// tree size
 		80.f,	// player size
 		30.f,	// crate size
 	};
-	Assert( ARRAYSIZE( arrThresholds ) + 1 >= RENDER_GROUP_CFG_NUM_OPAQUE_ENT_BUCKETS );
+	static_assert( ARRAYSIZE( arrThresholds ) + 1 >= RENDER_GROUP_CFG_NUM_OPAQUE_ENT_BUCKETS );
 	Assert( group >= RENDER_GROUP_OPAQUE_STATIC && group <= RENDER_GROUP_OPAQUE_ENTITY );
 
 	int bucketedGroupIndex;
