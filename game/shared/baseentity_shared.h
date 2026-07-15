@@ -11,6 +11,8 @@
 #pragma once
 #endif
 
+#include "worldsize.h"
+#include "vphysics/performance.h"
 
 extern ConVar hl2_episodic;
 
@@ -254,10 +256,15 @@ inline bool CBaseEntity::IsEffectActive( int nEffects ) const
 // Shared EntityMessage between game and client .dlls
 #define BASEENTITY_MSG_REMOVE_DECALS	1
 
-extern float k_flMaxEntityPosCoord;
-extern float k_flMaxEntityEulerAngle;
-extern float k_flMaxEntitySpeed;
-extern float k_flMaxEntitySpinRate;
+// Set default max values for entities based on the existing constants from elsewhere
+constexpr inline float k_flMaxEntityPosCoord = MAX_COORD_FLOAT;
+// really should be restricted to +/-180, but some code doesn't adhere to this.  let's just trap NANs, etc
+constexpr inline float k_flMaxEntityEulerAngle = 360.0f * 1000.0f; 
+// Sometimes the resulting computed speeds are legitimately above the original
+// constants; use bumped up versions for the downstream validation logic to
+// account for this.
+constexpr inline float k_flMaxEntitySpeed = k_flMaxVelocity * 2.0f;
+constexpr inline float k_flMaxEntitySpinRate = k_flMaxAngularVelocity * 10.0f;
 
 inline bool IsEntityCoordinateReasonable ( const vec_t c )
 {
