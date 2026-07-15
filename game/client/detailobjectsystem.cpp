@@ -86,20 +86,6 @@ struct DetailModelAdvInfo_t
 
 };
 
-class CDetailObjectSystemPerLeafData
-{
-	unsigned short	m_FirstDetailProp;
-	unsigned short	m_DetailPropCount;
-	int				m_DetailPropRenderFrame;
-
-	CDetailObjectSystemPerLeafData( void )
-	{
-		m_FirstDetailProp = 0;
-		m_DetailPropCount = 0;
-		m_DetailPropRenderFrame = -1;
-	}
-};
-
 //-----------------------------------------------------------------------------
 // Detail models
 //-----------------------------------------------------------------------------
