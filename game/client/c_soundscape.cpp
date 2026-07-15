@@ -343,7 +343,7 @@ bool C_SoundscapeSystem::Init()
 int C_SoundscapeSystem::FindSoundscapeByName( const char *pSoundscapeName )
 {
 	// UNDONE: Bad perf, linear search!
-	for ( int i = m_soundscapes.Count()-1; i >= 0; --i )
+	for ( intp i = m_soundscapes.Count()-1; i >= 0; --i )
 	{
 		if ( V_strieq( m_soundscapes[i]->GetName(), pSoundscapeName ) )
 			return i;
@@ -371,7 +371,7 @@ const char *C_SoundscapeSystem::SoundscapeNameByIndex( int index )
 
 void C_SoundscapeSystem::Shutdown()
 {
-	for ( int i = m_loopingSounds.Count() - 1; i >= 0; --i )
+	for ( intp i = m_loopingSounds.Count() - 1; i >= 0; --i )
 	{
 		loopingsound_t &sound = m_loopingSounds[i];
 
@@ -497,7 +497,7 @@ void C_SoundscapeSystem::UpdateLoopingSounds( float frametime )
 		amount *= 1.0f / period;
 	}
 
-	int fadeCount = m_loopingSounds.Count();
+	intp fadeCount = m_loopingSounds.Count();
 	while ( fadeCount > 0 )
 	{
 		fadeCount--;

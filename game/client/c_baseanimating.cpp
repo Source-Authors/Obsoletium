@@ -5491,7 +5491,7 @@ void C_BaseAnimating::GetBlendedLinearVelocity( Vector *pVec )
 	VectorScale( vecDist, 1.0f / flDuration, *pVec );
 
 	Vector tmp;
-	for (int i = m_SequenceTransitioner.m_animationQueue.Count() - 2; i >= 0; i--)
+	for (intp i = m_SequenceTransitioner.m_animationQueue.Count() - 2; i >= 0; i--)
 	{
 		C_AnimationLayer *blend = &m_SequenceTransitioner.m_animationQueue[i];
 	
@@ -6418,8 +6418,8 @@ void C_BaseAnimating::UpdateClientSideAnimations()
 {
 	VPROF_BUDGET( "UpdateClientSideAnimations", VPROF_BUDGETGROUP_CLIENT_ANIMATION );
 
-	int c = g_ClientSideAnimationList.Count();
-	for ( int i = 0; i < c ; ++i )
+	intp c = g_ClientSideAnimationList.Count();
+	for ( intp i = 0; i < c ; ++i )
 	{
 		clientanimating_t &anim = g_ClientSideAnimationList.Element(i);
 		if ( !(anim.flags & FCLIENTANIM_SEQUENCE_CYCLE) )

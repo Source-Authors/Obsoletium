@@ -837,8 +837,8 @@ void C_BaseFlex::AddVisemesForSentence( Emphasized_Phoneme *classes, float empha
 		return;
 	}
 
-	int pcount = sentence->GetRuntimePhonemeCount();
-	for ( int k = 0; k < pcount; k++ )
+	intp pcount = sentence->GetRuntimePhonemeCount();
+	for ( intp k = 0; k < pcount; k++ )
 	{
 		const CBasePhonemeTag *phoneme = sentence->GetRuntimePhoneme( k );
 
@@ -1440,7 +1440,7 @@ void C_BaseFlex::ClearSceneEvents( CChoreoScene *scene, bool canceled )
 		return;
 	}
 
-	for ( int i = m_SceneEvents.Count() - 1; i >= 0; i-- )
+	for ( intp i = m_SceneEvents.Count() - 1; i >= 0; i-- )
 	{
 		CSceneEventInfo *info = &m_SceneEvents[ i ];
 

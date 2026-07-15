@@ -1026,8 +1026,8 @@ bool CHud::LockRenderGroup( intp iGroupIndex, CHudElement *pLocker /* = NULL */ 
 		{
 			bool bFound = false;
 			// See if we have it locked already
-			int iNumLockers = group->m_pLockingElements.Count();
-			for ( int i=0;i<iNumLockers;i++ )
+			intp iNumLockers = group->m_pLockingElements.Count();
+			for ( intp i=0;i<iNumLockers;i++ )
 			{
 				if ( pLocker == group->m_pLockingElements.Element(i) )
 				{
@@ -1070,8 +1070,8 @@ bool CHud::UnlockRenderGroup( intp iGroupIndex, CHudElement *pLocker /* = NULL *
 			return true;
 		}
 
-		int iNumLockers = group->m_pLockingElements.Count();
-		for ( int i=0;i<iNumLockers;i++ )
+		intp iNumLockers = group->m_pLockingElements.Count();
+		for ( intp i=0;i<iNumLockers;i++ )
 		{
 			if ( pLocker == group->m_pLockingElements.Element(i) )
 			{
@@ -1123,7 +1123,7 @@ bool CHud::IsRenderGroupLockedFor( CHudElement *pHudElement, int iGroupIndex )
 //-----------------------------------------------------------------------------
 int CHud::RegisterForRenderGroup( const char *pszGroupName )
 {
-	int iGroupNameIndex = m_RenderGroupNames.Find( pszGroupName );
+	intp iGroupNameIndex = m_RenderGroupNames.Find( pszGroupName );
 
 	if ( iGroupNameIndex != m_RenderGroupNames.InvalidIndex() )
 	{	

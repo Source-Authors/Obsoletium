@@ -248,10 +248,10 @@ static int HudElementCompletion( const char *partial, char commands[ COMMAND_COM
 		substring = partial + strlen( cmdname ) + 1;
 	}
 
-	int current = 0;
+	intp current = 0;
 
-	int c = gHUD.m_HudList.Count();
-	int i;
+	intp c = gHUD.m_HudList.Count();
+	intp i;
 	for ( i = 0; i < c; i++ )
 	{
 		CHudElement *e = gHUD.m_HudList[ i ];
