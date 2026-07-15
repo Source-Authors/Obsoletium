@@ -1366,7 +1366,8 @@ UtlSymId_t C_BaseFlex::AddGlobalFlexController( const char *szName )
 	// dimhotepus: Handle out of capacity error.
 	AssertMsg( g_numflexcontrollers < MAXSTUDIOFLEXCTRL * 4, "Flex controllers out of max capacity %d", MAXSTUDIOFLEXCTRL * 4 );
 	Warning( "Flex controllers out of max capacity %d", MAXSTUDIOFLEXCTRL * 4 );
-	return -1;
+	// dimhotepus: -1 -> UTL_INVAL_SYMBOL
+	return UTL_INVAL_SYMBOL;
 }
 
 // dimhotepus: int -> UtlSymId_t.
