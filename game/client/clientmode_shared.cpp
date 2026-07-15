@@ -616,7 +616,7 @@ void ClientModeShared::Update()
 	{
 		int nCount = 0;
 
-		for ( int i = 0; i < g_pParticleSystemMgr->GetParticleSystemCount(); i++ )
+		for ( UtlSymId_t i = 0; i < g_pParticleSystemMgr->GetParticleSystemCount(); i++ )
 		{
 			const char *pParticleSystemName = g_pParticleSystemMgr->GetParticleSystemNameFromIndex(i);
 			CParticleSystemDefinition *pParticleSystem = g_pParticleSystemMgr->FindParticleSystem( pParticleSystemName );
