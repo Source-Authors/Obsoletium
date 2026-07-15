@@ -105,11 +105,11 @@ public:
 
 
 	// Initialization
-	bool InitCommon( int index, const Vector& org, const QAngle& angles );
-	bool Init( int index, const Vector& org, const QAngle& angles, model_t* pModel, 
+	bool InitCommon( intp index, const Vector& org, const QAngle& angles );
+	bool Init( intp index, const Vector& org, const QAngle& angles, model_t* pModel, 
 		ColorRGBExp32 lighting, int lightstyle, unsigned char lightstylecount, int orientation );
 
-	bool InitSprite( int index, bool bFlipped, const Vector& org, const QAngle& angles,
+	bool InitSprite( intp index, bool bFlipped, const Vector& org, const QAngle& angles,
 					 unsigned short nSpriteIndex, 
 					 ColorRGBExp32 lighting, int lightstyle, unsigned char lightstylecount,
 					 int orientation, float flScale, unsigned char type,
@@ -424,7 +424,7 @@ private:
 		float m_flDistance;
 	};
 
-	int BuildOutSortedSprites( CFastDetailLeafSpriteList *pData,
+	intp BuildOutSortedSprites( CFastDetailLeafSpriteList *pData,
 							   Vector const &viewOrigin,
 							   Vector const &viewForward,
 							   Vector const &viewRight,
@@ -512,7 +512,7 @@ IDetailObjectSystem* DetailObjectSystem()
 
 CUtlMap<CDetailModel *, CDetailModel::LightStyleInfo_t> CDetailModel::gm_LightStylesMap( DefLessFunc( CDetailModel * ) );
 
-bool CDetailModel::InitCommon( int index, const Vector& org, const QAngle& angles )
+bool CDetailModel::InitCommon( intp index, const Vector& org, const QAngle& angles )
 {
 	VectorCopy( org, m_Origin );
 	VectorCopy( angles, m_Angles );
@@ -761,7 +761,7 @@ CDetailModel::~CDetailModel()
 //-----------------------------------------------------------------------------
 // Initialization
 //-----------------------------------------------------------------------------
-bool CDetailModel::Init( int index, const Vector& org, const QAngle& angles, 
+bool CDetailModel::Init( intp index, const Vector& org, const QAngle& angles, 
 	model_t* pModel, ColorRGBExp32 lighting, int lightstyle, unsigned char lightstylecount, 
 	int orientation)
 {
@@ -781,7 +781,7 @@ bool CDetailModel::Init( int index, const Vector& org, const QAngle& angles,
 	return InitCommon( index, org, angles );
 }
 
-bool CDetailModel::InitSprite( int index, bool bFlipped, const Vector& org, const QAngle& angles, unsigned short nSpriteIndex, 
+bool CDetailModel::InitSprite( intp index, bool bFlipped, const Vector& org, const QAngle& angles, unsigned short nSpriteIndex, 
 	ColorRGBExp32 lighting, int lightstyle, unsigned char lightstylecount, int orientation, float flScale,
 	unsigned char type, unsigned char shapeAngle, unsigned char shapeSize, unsigned char swayAmount )
 {
@@ -2128,7 +2128,7 @@ static fltx4 Four_255s={ 255.0, 255.0, 255.0, 255.0 };
 alignas(16) static int32 And255Mask[4] = {0xff, 0xff, 0xff, 0xff};
 #define PIXMASK ( * ( reinterpret_cast< fltx4 *>( &And255Mask ) ) )
 
-int CDetailObjectSystem::BuildOutSortedSprites( CFastDetailLeafSpriteList *pData,
+intp CDetailObjectSystem::BuildOutSortedSprites( CFastDetailLeafSpriteList *pData,
 												Vector const &viewOrigin,
 												Vector const &viewForward,
 												Vector const &viewRight,
@@ -2215,7 +2215,7 @@ int CDetailObjectSystem::BuildOutSortedSprites( CFastDetailLeafSpriteList *pData
 	} while( --nSIMDSprites );
 
 	// adjust count for tail
-	int nCount = pOut - m_pFastSortInfo;
+	intp nCount = pOut - m_pFastSortInfo;
 	if ( nLastBfMask != 0xf )						// if last not skipped
 		nCount -= ( 0 - pData->m_nNumSprites ) & 3;
 
@@ -2271,7 +2271,7 @@ void CDetailObjectSystem::RenderFastSprites( const Vector &viewOrigin, const Vec
 		return;
 
 	int nQuadsToDraw = MIN( nQuadCount, nMaxQuadsToDraw );
-	int nQuadsRemaining = nQuadsToDraw;
+	intp nQuadsRemaining = nQuadsToDraw;
 
 	meshBuilder.Begin( pMesh, MATERIAL_QUADS, nQuadsToDraw );
 
@@ -2289,7 +2289,7 @@ void CDetailObjectSystem::RenderFastSprites( const Vector &viewOrigin, const Vec
 		{
 			Assert( pData->m_nNumSprites );					// ptr with no sprites?
 
-			int nCount = BuildOutSortedSprites( pData, viewOrigin, viewForward, viewRight, viewUp );
+			intp nCount = BuildOutSortedSprites( pData, viewOrigin, viewForward, viewRight, viewUp );
 
 			// part 3 - stuff the sorted sprites into the vb
 			SortInfo_t const *pDraw = m_pFastSortInfo;
@@ -2308,7 +2308,7 @@ void CDetailObjectSystem::RenderFastSprites( const Vector &viewOrigin, const Vec
 					nQuadsRemaining = nQuadsToDraw;
 					meshBuilder.Begin( pMesh, MATERIAL_QUADS, nQuadsToDraw );
 				}
-				int nToDraw = MIN( nCount, nQuadsRemaining );
+				intp nToDraw = min( nCount, nQuadsRemaining );
 				nCount -= nToDraw;
 				nQuadsRemaining -= nToDraw;
 				while( nToDraw-- )
