@@ -236,15 +236,15 @@ public:
 	void IssueQuery( IMatRenderContext *pRenderContext, float proxySize, float proxyAspect, IMaterial *pMaterial, bool sizeIsScreenSpace );
 	void IssueCountingQuery( IMatRenderContext *pRenderContext, float proxySize, float proxyAspect, IMaterial *pMaterial, bool sizeIsScreenSpace );
 	void ResetOcclusionQueries();
-	void SetView( int viewID ) 
+	void SetView( unsigned short viewID ) 
 	{ 
-		m_viewID = viewID;	
+		m_frameIssued = -1;
 		m_brightnessTarget = 0.0f;
 		m_clipFraction = 1.0f;
-		m_frameIssued = -1;
-		m_failed = false;
 		m_wasQueriedThisFrame = false;
+		m_failed = false;
 		m_hasValidQueryResults = false;
+		m_viewID = viewID;
 	}
 
 public:
