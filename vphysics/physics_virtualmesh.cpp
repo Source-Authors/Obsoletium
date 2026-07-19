@@ -24,6 +24,7 @@
 #include "tier1/datamanager.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/mempool.h"
+#include "tier1/fmtstr.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -180,7 +181,9 @@ void CMeshInstance::Init( const virtualmeshlist_t &list )
 		const Vector v1 = list.pVerts[list.indices[factor3+1]];
 		const Vector v2 = list.pVerts[list.indices[factor3+2]];
 
-		Assert( v0 != v1 && v1 != v2 && v0 != v2 );
+		AssertMsg( v0 != v1, "Duplicated vertex %s in virtual mesh", VecToString(v0) );
+		AssertMsg( v1 != v2, "Duplicated vertex %s in virtual mesh", VecToString(v1) );
+		AssertMsg( v0 != v2, "Duplicated vertex %s in virtual mesh", VecToString(v2) );
 #endif
 
 		CVPhysicsVirtualMeshWriter::InitTwoSidedTriangleLege( &pLedges[i],
