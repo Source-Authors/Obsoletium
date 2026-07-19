@@ -1103,7 +1103,7 @@ void CNPC_Barnacle::LiftRagdoll( float flBiteZOffset )
 			pAnimating->SetupBones( pBoneToWorld, BONE_USED_BY_ANYTHING );
 
 			// Apply the forces to the ragdoll
-			RagdollApplyAnimationAsVelocity( *(m_hRagdoll->GetRagdoll()), m_pRagdollBones, pBoneToWorld, 0.2 );
+			RagdollApplyAnimationAsVelocity( *(m_hRagdoll->GetRagdoll()), m_pRagdollBones, pBoneToWorld, 0.2f );
 
 			// Store off the current bone matrix for next time
 			pAnimating->SetupBones( m_pRagdollBones, BONE_USED_BY_ANYTHING );

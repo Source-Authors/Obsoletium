@@ -875,13 +875,13 @@ int CNPC_BaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 
 		case RELEASE_RAGDOLL:
 			// Go a little easy on headcrab ragdoll force. They're light!
-			ReleaseHeadcrab( EyePosition(), inputInfo.GetDamageForce() * 0.25, true, false, true );
+			ReleaseHeadcrab( EyePosition(), inputInfo.GetDamageForce() * 0.25f, true, false, true );
 			break;
 
 		case RELEASE_RAGDOLL_SLICED_OFF:
 			{
 				EmitSound( "E3_Phystown.Slicer" );
-				Vector vecForce = inputInfo.GetDamageForce() * 0.1;
+				Vector vecForce = inputInfo.GetDamageForce() * 0.1f;
 				vecForce += Vector( 0, 0, 2000.0 );
 				ReleaseHeadcrab( EyePosition(), vecForce, true, false, true );
 			}
@@ -1079,7 +1079,7 @@ void CNPC_BaseZombie::DieChopped( const CTakeDamageInfo &info )
 		if( random->RandomInt( 0, 1 ) == 0 )
 		{
 			// Drop a live crab half of the time.
-			ReleaseHeadcrab( EyePosition(), forceVector * 0.005, true, false, false );
+			ReleaseHeadcrab( EyePosition(), forceVector * 0.005f, true, false, false );
 		}
 	}
 
@@ -1110,13 +1110,13 @@ void CNPC_BaseZombie::DieChopped( const CTakeDamageInfo &info )
 		CopyRenderColorTo( pLegGib );
 	}
 
-	forceVector *= random->RandomFloat( 0.04, 0.06 );
-	forceVector.z = ( 100 * 12 * 5 ) * random->RandomFloat( 0.8, 1.2 );
+	forceVector *= random->RandomFloat( 0.04f, 0.06f );
+	forceVector.z = ( 100 * 12 * 5 ) * random->RandomFloat( 0.8f, 1.2f );
 
 	if( bSquashed && forceVector.z > 0 )
 	{
 		// Force the broken torso down.
-		forceVector.z *= -1.0;
+		forceVector.z *= -1.0f;
 	}
 
 	// Why do I have to fix this up?! (sjb)

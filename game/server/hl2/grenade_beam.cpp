@@ -137,7 +137,7 @@ void CGrenadeBeam::Spawn( void )
 
 	m_takedamage	= DAMAGE_NO;
 	m_iHealth		= 1;
-	SetGravity( 0.0001 );
+	SetGravity( 0.0001f );
 	m_nNumHits		= 0;
 	UTIL_SetSize( this, vec3_origin, vec3_origin );
 }

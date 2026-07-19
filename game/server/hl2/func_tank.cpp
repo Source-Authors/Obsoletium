@@ -600,23 +600,23 @@ void CFuncTank::DrawDebugGeometryOverlays(void)
 	Vector vecForward;
 	angCenter = QAngle( 0, YawCenterWorld(), 0 );
 	AngleVectors( angCenter, &vecForward );
-	NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + (vecForward * 64), 255,255,255, true, 0.1);
+	NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + (vecForward * 64), 255,255,255, true, 0.1f);
 
 	// Draw the yaw ranges
 	angCenter = QAngle( 0, YawCenterWorld() + m_yawRange, 0 );
 	AngleVectors( angCenter, &vecForward );
-	NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + (vecForward * 128), 0,255,0, true, 0.1);
+	NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + (vecForward * 128), 0,255,0, true, 0.1f);
 	angCenter = QAngle( 0, YawCenterWorld() - m_yawRange, 0 );
 	AngleVectors( angCenter, &vecForward );
-	NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + (vecForward * 128), 0,255,0, true, 0.1);
+	NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + (vecForward * 128), 0,255,0, true, 0.1f);
 
 	// Draw the pitch ranges
 	angCenter = QAngle( PitchCenterWorld() + m_pitchRange, 0, 0 );
 	AngleVectors( angCenter, &vecForward );
-	NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + (vecForward * 128), 255,0,0, true, 0.1);
+	NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + (vecForward * 128), 255,0,0, true, 0.1f);
 	angCenter = QAngle( PitchCenterWorld() - m_pitchRange, 0, 0 );
 	AngleVectors( angCenter, &vecForward );
-	NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + (vecForward * 128), 255,0,0, true, 0.1);
+	NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + (vecForward * 128), 255,0,0, true, 0.1f);
 
 	BaseClass::DrawDebugGeometryOverlays();
 }
@@ -717,13 +717,13 @@ bool CFuncTank::KeyValue( const char *szKeyName, const char *szValue )
 }
 
 
-static Vector gTankSpread[] =
+const static Vector gTankSpread[] =
 {
 	Vector( 0, 0, 0 ),		// perfect
-	Vector( 0.025, 0.025, 0.025 ),	// small cone
-	Vector( 0.05, 0.05, 0.05 ),  // medium cone
-	Vector( 0.1, 0.1, 0.1 ),	// large cone
-	Vector( 0.25, 0.25, 0.25 ),	// extra-large cone
+	Vector( 0.025f, 0.025f, 0.025f ),	// small cone
+	Vector( 0.05f, 0.05f, 0.05f ),  // medium cone
+	Vector( 0.1f, 0.1f, 0.1f ),	// large cone
+	Vector( 0.25f, 0.25f, 0.25f ),	// extra-large cone
 };
 #define MAX_FIRING_SPREADS static_cast<int>(ARRAYSIZE(gTankSpread))
 
@@ -1177,7 +1177,7 @@ void CFuncTank::ControllerPostFrame( void )
 	HapticPunch(pPlayer,0,0,hap_turret_mag.GetFloat());
 #endif	
 	// HACKHACK -- make some noise (that the AI can hear)
-	CSoundEnt::InsertSound( SOUND_COMBAT, WorldSpaceCenter(), FUNCTANK_FIREVOLUME, 0.2 );
+	CSoundEnt::InsertSound( SOUND_COMBAT, WorldSpaceCenter(), FUNCTANK_FIREVOLUME, 0.2f );
 	
 	if( m_iAmmoCount > -1 )
 	{
@@ -2086,7 +2086,7 @@ void CFuncTank::TrackTarget( void )
 		AimBarrelAtPlayerCrosshair( &angles );
 		RotateTankToAngles( angles );
 		SetNextThink( gpGlobals->curtime + 0.05f );
-		SetMoveDoneTime( 0.1 );
+		SetMoveDoneTime( 0.1f );
 		return;
 	}
 
@@ -2095,7 +2095,7 @@ void CFuncTank::TrackTarget( void )
 		AimBarrelAtNPCEnemy( &angles );
 		RotateTankToAngles( angles );
 		SetNextThink( gpGlobals->curtime + 0.05f );
-		SetMoveDoneTime( 0.1 );
+		SetMoveDoneTime( 0.1f );
 		return;
 	}
 
@@ -2292,7 +2292,7 @@ void CFuncTank::StartRotSound( void )
 		EmitSound_t ep;
 		ep.m_nChannel = CHAN_STATIC;
 		ep.m_pSoundName = STRING(m_soundLoopRotate);
-		ep.m_flVolume = 0.85;
+		ep.m_flVolume = 0.85f;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
 		EmitSound( filter, entindex(), ep );
@@ -3138,7 +3138,7 @@ void CFuncTankAPCRocket::FireDying( const Vector &barrelEnd )
 
 void CFuncTankAPCRocket::Fire( int bulletCount, const Vector &barrelEnd, const Vector &forward, CBaseEntity *pAttacker, bool bIgnoreSpread )
 {
-	static float s_pSide[] = { 0.966, 0.866, 0.5, -0.5, -0.866, -0.966 };
+	constexpr float s_pSide[] = { 0.966f, 0.866f, 0.5f, -0.5f, -0.866f, -0.966f };
 
 	Vector vecDir;
 	CrossProduct( Vector( 0, 0, 1 ), forward, vecDir );
@@ -4369,7 +4369,7 @@ void CFuncTankCombineCannon::MakeTracer( const Vector &vecTracerSrc, const trace
 		if( flDist >= 10.0f && flDist <= 120.0f )
 		{
 			// Don't shake the screen if we're hit (within 10 inches), but do shake if a shot otherwise comes within 10 feet.
-			UTIL_ScreenShake( vecNearestPoint, 10, 60, 0.3, 120.0f, SHAKE_START, false );
+			UTIL_ScreenShake( vecNearestPoint, 10, 60, 0.3f, 120.0f, SHAKE_START, false );
 		}
 	}
 

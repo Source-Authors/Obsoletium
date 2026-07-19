@@ -276,7 +276,7 @@ void CAntlionTemplateMaker::Activate( void )
 		if ( !m_flPoolRegenTime )
 		{
 			Msg("%s using pool behavior without a specified pool regen time.\n", GetClassname() );
-			m_flPoolRegenTime = 0.1;
+			m_flPoolRegenTime = 0.1f;
 		}
 
 		// Start up our think cycle unless we're reloading this map (which would reset it)

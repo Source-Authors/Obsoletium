@@ -3305,12 +3305,12 @@ void CNPC_AttackHelicopter::AddSmokeTrail( const Vector &vecPos )
 
 		pSmokeTrail->m_SpawnRate = 48;
 		pSmokeTrail->m_ParticleLifetime = 0.5f;
-		pSmokeTrail->m_StartColor.Init(0.15, 0.15, 0.15);
+		pSmokeTrail->m_StartColor.Init(0.15f, 0.15f, 0.15f);
 		pSmokeTrail->m_EndColor.Init(0.0, 0.0, 0.0);
 		pSmokeTrail->m_StartSize = 24;
 		pSmokeTrail->m_EndSize = 80;
 		pSmokeTrail->m_SpawnRadius = 8;
-		pSmokeTrail->m_Opacity = 0.2;
+		pSmokeTrail->m_Opacity = 0.2f;
 		pSmokeTrail->m_MinSpeed = 16;
 		pSmokeTrail->m_MaxSpeed = 64;
 		pSmokeTrail->SetLifetime(-1);
@@ -4046,7 +4046,7 @@ void CNPC_AttackHelicopter::ComputeAngularVelocity( const Vector &vecGoalUp, con
 		goalRoll = clamp( goalRoll, -45.f, 45.f );
 
 		// calc angular accel needed to hit goal pitch in dt time.
-		float dt = 0.6;
+		constexpr float dt = 0.6f;
 		goalAngAccel.x = 2.0f * (AngleDiff( goalPitch, AngleNormalize( GetAbsAngles().x ) ) - GetLocalAngularVelocity().x * dt) / (dt * dt);
 		goalAngAccel.y = 2.0f * (AngleDiff( goalYaw, AngleNormalize( GetAbsAngles().y ) ) - GetLocalAngularVelocity().y * dt) / (dt * dt);
 		goalAngAccel.z = 2.0f * (AngleDiff( goalRoll, AngleNormalize( GetAbsAngles().z ) ) - GetLocalAngularVelocity().z * dt) / (dt * dt);
@@ -4065,7 +4065,7 @@ void CNPC_AttackHelicopter::ComputeAngularVelocity( const Vector &vecGoalUp, con
 
 	// limit angular accel changes to similate mechanical response times
 	QAngle angAccelAccel;
-	float dt = 0.1;
+	constexpr float dt = 0.1f;
 	angAccelAccel.x = (goalAngAccel.x - m_vecAngAcceleration.x) / dt;
 	angAccelAccel.y = (goalAngAccel.y - m_vecAngAcceleration.y) / dt;
 	angAccelAccel.z = (goalAngAccel.z - m_vecAngAcceleration.z) / dt;
@@ -4079,7 +4079,7 @@ void CNPC_AttackHelicopter::ComputeAngularVelocity( const Vector &vecGoalUp, con
 	// DevMsg( "%6.1f %6.1f %6.1f  :  ", goalAngAccel.x, goalAngAccel.y, goalAngAccel.z );
 	// DevMsg( "%6.0f %6.0f %6.0f\n", angAccelAccel.x, angAccelAccel.y, angAccelAccel.z );
 
-	m_vecAngAcceleration += angAccelAccel * 0.1;
+	m_vecAngAcceleration += angAccelAccel * 0.1f;
 
 	QAngle angVel = GetLocalAngularVelocity();
 	angVel += m_vecAngAcceleration * 0.1f;
@@ -6094,7 +6094,7 @@ CHelicopterChunk *CHelicopterChunk::CreateHelicopterChunk( const Vector &vecPos,
 	pSmokeTrail->m_ParticleLifetime	= 2.0f;
 
 	pSmokeTrail->m_StartColor.Init( 0.7f, 0.7f, 0.7f );
-	pSmokeTrail->m_EndColor.Init( 0.6, 0.6, 0.6 );
+	pSmokeTrail->m_EndColor.Init( 0.6f, 0.6f, 0.6f );
 
 	pSmokeTrail->m_StartSize	= 32;
 	pSmokeTrail->m_EndSize	= 64;

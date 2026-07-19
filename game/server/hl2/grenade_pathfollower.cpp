@@ -73,8 +73,8 @@ void CGrenadePathfollower::Spawn( void )
 	m_takedamage	= DAMAGE_YES;
 	m_iHealth		= 200;
 
-	SetGravity( 0.00001 );
-	SetFriction( 0.8 );
+	SetGravity( 0.00001f );
+	SetFriction( 0.8f );
 	SetSequence( 1 );
 }
 
@@ -140,7 +140,7 @@ void CGrenadePathfollower::Detonate(void)
 	UTIL_DecalTrace( &tr, "Scorch" );
 
 	UTIL_ScreenShake( GetAbsOrigin(), 25.0, 150.0, 1.0, 750, SHAKE_START );
-	CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin(), 400, 0.2 );
+	CSoundEnt::InsertSound ( SOUND_DANGER, GetAbsOrigin(), 400, 0.2f );
 
 	RadiusDamage ( CTakeDamageInfo( this, GetThrower(), m_flDamage, DMG_BLAST ), GetAbsOrigin(),  m_DmgRadius, CLASS_NONE, NULL );
 	CPASAttenuationFilter filter2( this, "GrenadePathfollower.StopSounds" );
@@ -266,7 +266,7 @@ void CGrenadePathfollower::AimThink( void )
 		while (flTimeToUse > 0)
 		{
 			vecNewVelocity += vTargetDir;
-			flTimeToUse = -0.1;
+			flTimeToUse = -0.1f;
 		}
 		vecNewVelocity *= m_flFlySpeed;
 		SetAbsVelocity( vecNewVelocity );

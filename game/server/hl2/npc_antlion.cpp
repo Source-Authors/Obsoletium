@@ -4174,7 +4174,7 @@ bool CNPC_Antlion::OverrideMoveFacing( const AILocalMoveGoal_t &move, float flIn
 		if ( UTIL_DistApprox( vecEnemyLKP, GetAbsOrigin() ) < 512 )
 		{
 			// Only start facing when we're close enough
-			AddFacingTarget( GetEnemy(), vecEnemyLKP, 1.0, 0.2 );
+			AddFacingTarget( GetEnemy(), vecEnemyLKP, 1.0f, 0.2f );
 		}
 	}
 

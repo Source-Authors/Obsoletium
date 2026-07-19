@@ -365,7 +365,7 @@ void CWeaponSMG1::SecondaryAttack( void )
 
 	SendWeaponAnim( ACT_VM_SECONDARYATTACK );
 
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 1000, 0.2, GetOwner(), SOUNDENT_CHANNEL_WEAPON );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 1000, 0.2f, GetOwner(), SOUNDENT_CHANNEL_WEAPON );
 
 	// player "shoot" animation
 	pPlayer->SetAnimation( PLAYER_ATTACK1 );
@@ -503,8 +503,8 @@ const WeaponProficiencyInfo_t *CWeaponSMG1::GetProficiencyValues()
 	{
 		{ 7.0,		0.75	},
 		{ 5.00,		0.75	},
-		{ 10.0/3.0, 0.75	},
-		{ 5.0/3.0,	0.75	},
+		{ 10.0f/3.0f, 0.75	},
+		{ 5.0f/3.0f,	0.75	},
 		{ 1.00,		1.0		},
 	};
 

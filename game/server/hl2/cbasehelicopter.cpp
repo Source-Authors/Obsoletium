@@ -961,7 +961,7 @@ void CBaseHelicopter::Flight( void )
 		}
 	}
 
-	angVel.y *= ( 0.98 ); // why?! (sjb)
+	angVel.y *= ( 0.98f ); // why?! (sjb)
 
 	// estimate where I'll be in two seconds
 	AngleVectors( GetLocalAngles() + angVel * 1 + vecAdj, NULL, NULL, &up );
@@ -976,7 +976,7 @@ void CBaseHelicopter::Flight( void )
 	vecImpulse.z += up.z * m_flForce;
 
 	// add gravity
-	vecImpulse.z -= 38.4; // 32ft/sec
+	vecImpulse.z -= 38.4f; // 32ft/sec
 	ApplyAbsVelocityImpulse( vecImpulse );
 
 	float flSpeed = GetAbsVelocity().Length();
@@ -1234,7 +1234,7 @@ void CBaseHelicopter::DyingThink( void )
 	StudioFrameAdvance( );
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
-	SetLocalAngularVelocity( GetLocalAngularVelocity() * 1.02 );
+	SetLocalAngularVelocity( GetLocalAngularVelocity() * 1.02f );
 }
 
 
@@ -1496,7 +1496,7 @@ void CBaseHelicopter::ApplySidewaysDrag( const Vector &vecRight )
 void CBaseHelicopter::ApplyGeneralDrag( void )
 {
 	Vector vecNewVelocity = GetAbsVelocity();
-	vecNewVelocity *= 0.995;
+	vecNewVelocity *= 0.995f;
 	SetAbsVelocity( vecNewVelocity );
 }
 	

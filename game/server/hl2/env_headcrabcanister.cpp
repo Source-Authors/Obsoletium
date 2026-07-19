@@ -492,10 +492,10 @@ void CEnvHeadcrabCanister::InputFireCanister( inputdata_t &inputdata )
 	m_hTrail = CSpriteTrail::SpriteTrailCreate( "sprites/smoke.vmt", GetAbsOrigin(), true );
 	m_hTrail->SetTransparency( kRenderTransAdd, 224, 224, 255, 255, kRenderFxNone );
 	m_hTrail->SetAttachment( this, 0 );
-	m_hTrail->SetStartWidth( 32.0 );
-	m_hTrail->SetEndWidth( 200.0 );
+	m_hTrail->SetStartWidth( 32.0f );
+	m_hTrail->SetEndWidth( 200.0f );
 	m_hTrail->SetStartWidthVariance( 15.0f );
-	m_hTrail->SetTextureResolution( 0.002 );
+	m_hTrail->SetTextureResolution( 0.002f );
 	m_hTrail->SetLifeTime( ENV_HEADCRABCANISTER_TRAIL_TIME );
 	m_hTrail->SetMinFadeLength( 1000.0f );
 
@@ -856,7 +856,7 @@ void CEnvHeadcrabCanister::Landed( void )
 		m_hSmokeTrail->m_ParticleLifetime	= 2.0f;
 
 		m_hSmokeTrail->m_StartColor.Init( 0.7f, 0.7f, 0.7f );
-		m_hSmokeTrail->m_EndColor.Init( 0.6, 0.6, 0.6 );
+		m_hSmokeTrail->m_EndColor.Init( 0.6f, 0.6f, 0.6f );
 
 		m_hSmokeTrail->m_StartSize	= 32;
 		m_hSmokeTrail->m_EndSize	= 64;

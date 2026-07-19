@@ -3231,7 +3231,7 @@ void CNPC_AntlionGuard::SummonAntlions( void )
 		pAntlion->m_bStartBurrowed = true;
 		DispatchSpawn( pAntlion );
 		pAntlion->Activate();
-		g_EventQueue.AddEvent( pAntlion, "Unburrow", RandomFloat(0.1, 1.0), this, this );
+		g_EventQueue.AddEvent( pAntlion, "Unburrow", RandomFloat(0.1f, 1.0f), this, this );
 
 		// Add it to our squad
 		if ( GetSquad() != NULL )
@@ -4332,7 +4332,7 @@ void CNPC_AntlionGuard::Event_Killed( const CTakeDamageInfo &info )
 			// See if it's a live orphan
 			if ( pAntlion && pAntlion->GetOwnerEntity() == NULL && pAntlion->IsAlive() )
 			{
-				g_EventQueue.AddEvent( pAntlion, "BurrowAway", RandomFloat(0.1, 2.0), this, this );
+				g_EventQueue.AddEvent( pAntlion, "BurrowAway", RandomFloat(0.1f, 2.0f), this, this );
 			}
 		}	
 	}
@@ -4437,7 +4437,7 @@ bool CNPC_AntlionGuard::OverrideMoveFacing( const AILocalMoveGoal_t &move, float
 	// Face
 	if ( bFaceTarget )
 	{
-		AddFacingTarget( pFaceTarget, vecFacePosition, 1.0, 0.2 );
+		AddFacingTarget( pFaceTarget, vecFacePosition, 1.0f, 0.2f );
 	}
 
 	return BaseClass::OverrideMoveFacing( move, flInterval );

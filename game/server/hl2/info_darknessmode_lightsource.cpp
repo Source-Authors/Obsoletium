@@ -93,23 +93,23 @@ public:
 	void DebugThink( void )
 	{
 		Vector vecRadius( m_flLightRadius, m_flLightRadius, m_flLightRadius );
-		NDebugOverlay::Box( GetAbsOrigin(), -vecRadius, vecRadius, 255,255,255, 8, 0.1 );
-		NDebugOverlay::Box( GetAbsOrigin(), -Vector(5,5,5), Vector(5,5,5), 255,0,0, 8, 0.1 );
+		NDebugOverlay::Box( GetAbsOrigin(), -vecRadius, vecRadius, 255,255,255, 8, 0.1f );
+		NDebugOverlay::Box( GetAbsOrigin(), -Vector(5,5,5), Vector(5,5,5), 255,0,0, 8, 0.1f );
 		SetNextThink( gpGlobals->curtime + 0.1f );
 
 		int textoffset = 0;
-		EntityText( textoffset, UTIL_VarArgs("Org: %.2f %.2f %.2f", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z ), 0.1 );
+		EntityText( textoffset, UTIL_VarArgs("Org: %.2f %.2f %.2f", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z ), 0.1f );
 		textoffset++;
-		EntityText( textoffset, UTIL_VarArgs("Radius %.2f", m_flLightRadius), 0.1 );
+		EntityText( textoffset, UTIL_VarArgs("Radius %.2f", m_flLightRadius), 0.1f );
 		textoffset++;
 		if ( m_bIgnoreLOS )
 		{
-			EntityText( textoffset, "Ignoring LOS", 0.1 );
+			EntityText( textoffset, "Ignoring LOS", 0.1f );
 			textoffset++;
 		}
 		if ( m_bDisabled )
 		{
-			EntityText( textoffset, "DISABLED", 0.1 );
+			EntityText( textoffset, "DISABLED", 0.1f );
 			textoffset++;
 		}
 	}
@@ -221,7 +221,7 @@ bool CDarknessLightSourcesSystem::IsEntityVisibleToTarget( CBaseEntity *pLooker,
 			{
 				if ( bDebug )
 				{
-					NDebugOverlay::Line( pTarget->WorldSpaceCenter(), pLightSource->GetAbsOrigin(), 0,255,0,true, 0.1);
+					NDebugOverlay::Line( pTarget->WorldSpaceCenter(), pLightSource->GetAbsOrigin(), 0,255,0,true, 0.1f);
 				}
 				return true;
 			}
@@ -233,15 +233,15 @@ bool CDarknessLightSourcesSystem::IsEntityVisibleToTarget( CBaseEntity *pLooker,
 			{
 				if ( bDebug )
 				{
-					NDebugOverlay::Line( tr.startpos, tr.endpos, 0,255,0,true, 0.1);
+					NDebugOverlay::Line( tr.startpos, tr.endpos, 0,255,0,true, 0.1f);
 				}
 				return true;
 			}
 
 			if ( bDebug )
 			{
-				NDebugOverlay::Line( tr.startpos, tr.endpos, 255,0,0,true, 0.1);
-				NDebugOverlay::Line( tr.endpos, pLightSource->GetAbsOrigin(), 128,0,0,true, 0.1);
+				NDebugOverlay::Line( tr.startpos, tr.endpos, 255,0,0,true, 0.1f);
+				NDebugOverlay::Line( tr.endpos, pLightSource->GetAbsOrigin(), 128,0,0,true, 0.1f);
 			}
 
 			// If the target is within the radius of the light, don't do sillhouette checks
@@ -264,8 +264,8 @@ bool CDarknessLightSourcesSystem::IsEntityVisibleToTarget( CBaseEntity *pLooker,
 			{
 				if ( bDebug )
 				{
-					NDebugOverlay::Line( pLooker->WorldSpaceCenter(), pLooker->WorldSpaceCenter() + (vecLookerToLight * 128), 255,255,255,true, 0.1);
-					NDebugOverlay::Line( pLooker->WorldSpaceCenter(), pLooker->WorldSpaceCenter() + (vecLookerToTarget * 128), 255,0,0,true, 0.1);
+					NDebugOverlay::Line( pLooker->WorldSpaceCenter(), pLooker->WorldSpaceCenter() + (vecLookerToLight * 128), 255,255,255,true, 0.1f);
+					NDebugOverlay::Line( pLooker->WorldSpaceCenter(), pLooker->WorldSpaceCenter() + (vecLookerToTarget * 128), 255,0,0,true, 0.1f);
 				}
 
 				// Now, we need to find out if the light source is obscured by anything. 
@@ -288,12 +288,12 @@ bool CDarknessLightSourcesSystem::IsEntityVisibleToTarget( CBaseEntity *pLooker,
 					{
 						if (tr.fraction != 1.0)
 						{
-							NDebugOverlay::Line( pLooker->WorldSpaceCenter(), vecSpherePoint, 255,0,0,true, 0.1);
+							NDebugOverlay::Line( pLooker->WorldSpaceCenter(), vecSpherePoint, 255,0,0,true, 0.1f);
 						}
 						else
 						{
-							NDebugOverlay::Line( pLooker->WorldSpaceCenter(), vecSpherePoint, 0,255,0,true, 0.1);
-							NDebugOverlay::Line( pLightSource->GetAbsOrigin(), vecSpherePoint, 255,0,0,true, 0.1);
+							NDebugOverlay::Line( pLooker->WorldSpaceCenter(), vecSpherePoint, 0,255,0,true, 0.1f);
+							NDebugOverlay::Line( pLightSource->GetAbsOrigin(), vecSpherePoint, 255,0,0,true, 0.1f);
 						}
 					}
 
@@ -335,12 +335,12 @@ bool CDarknessLightSourcesSystem::AreThereLightSourcesWithinRadius( CBaseEntity 
 			{
 				if (tr.fraction != 1.0)
 				{
-					NDebugOverlay::Line( pLooker->WorldSpaceCenter(), tr.endpos, 255,0,0,true, 0.1);
+					NDebugOverlay::Line( pLooker->WorldSpaceCenter(), tr.endpos, 255,0,0,true, 0.1f);
 				}
 				else
 				{
-					NDebugOverlay::Line( pLooker->WorldSpaceCenter(), tr.endpos, 0,255,0,true, 0.1);
-					NDebugOverlay::Line( pLightSource->GetAbsOrigin(), tr.endpos, 255,0,0,true, 0.1);
+					NDebugOverlay::Line( pLooker->WorldSpaceCenter(), tr.endpos, 0,255,0,true, 0.1f);
+					NDebugOverlay::Line( pLightSource->GetAbsOrigin(), tr.endpos, 255,0,0,true, 0.1f);
 				}
 			}
 

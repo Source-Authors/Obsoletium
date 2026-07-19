@@ -101,7 +101,7 @@ void CNPC_BaseScanner::Spawn(void)
 
 	m_bloodColor		= DONT_BLEED;
 	SetViewOffset( Vector(0, 0, 10) );		// Position of the eyes relative to NPC's origin.
-	m_flFieldOfView		= 0.2;
+	m_flFieldOfView		= 0.2f;
 	m_NPCState			= NPC_STATE_NONE;
 
 	SetNavType( NAV_FLY );
@@ -556,7 +556,7 @@ void CNPC_BaseScanner::Gib( void )
 
 	// Light
 	CBroadcastRecipientFilter filter;
-	te->DynamicLight( filter, 0.0, &WorldSpaceCenter(), 255, 180, 100, 0, 100, 0.1, 0 );
+	te->DynamicLight( filter, 0.0, &WorldSpaceCenter(), 255, 180, 100, 0, 100, 0.1f, 0 );
 
 	// Cover the gib spawn
 	ExplosionCreate( WorldSpaceCenter(), GetAbsAngles(), this, 64, 64, false );
@@ -780,7 +780,7 @@ void CNPC_BaseScanner::AttackDivebombCollide(float flInterval)
 
 				CBroadcastRecipientFilter filter;
 				te->DynamicLight( filter, 0.0,
-					&GetAbsOrigin(), 255, 180, 100, 0, 50, 0.1, 0 );
+					&GetAbsOrigin(), 255, 180, 100, 0, 50, 0.1f, 0 );
 			}
 		}
 	}
@@ -1071,7 +1071,7 @@ bool CNPC_BaseScanner::OverrideMove( float flInterval )
 				if ( g_debug_basescanner.GetBool() )
 				{
 					NDebugOverlay::Line(GetLocalOrigin(), vMoveTargetPos, 0,255,0, true, 0);
-					NDebugOverlay::Cross3D(tr.endpos,Vector(-5,-5,-5),Vector(5,5,5),0,255,0,true,0.1);
+					NDebugOverlay::Cross3D(tr.endpos,Vector(-5,-5,-5),Vector(5,5,5),0,255,0,true,0.1f);
 				}
 
 				SetCondition( COND_SCANNER_FLY_CLEAR );
@@ -1082,7 +1082,7 @@ bool CNPC_BaseScanner::OverrideMove( float flInterval )
 				if ( g_debug_basescanner.GetBool() )
 				{
 					NDebugOverlay::Line(GetLocalOrigin(), vMoveTargetPos, 255,0,0, true, 0);
-					NDebugOverlay::Cross3D(tr.endpos,Vector(-5,-5,-5),Vector(5,5,5),255,0,0,true,0.1);
+					NDebugOverlay::Cross3D(tr.endpos,Vector(-5,-5,-5),Vector(5,5,5),255,0,0,true,0.1f);
 				}
 
 				SetCondition( COND_SCANNER_FLY_BLOCKED );

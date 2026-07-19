@@ -127,7 +127,7 @@ void CGrenadeHomer::Spawn( void )
 	m_iHealth		= 1;
 
 	SetGravity( 1.0 );
-	SetFriction( 0.8 );
+	SetFriction( 0.8f );
 	SetSequence( 1 );
 
 	m_flHomingStrength	= 0;
@@ -177,14 +177,14 @@ void CGrenadeHomer::StartRocketTrail(void)
 		pRocketTrail->m_ParticleLifetime = 2;
 		if ( m_nRocketTrailType == HOMER_SMOKE_TRAIL_ALIEN )
 		{
-			pRocketTrail->m_StartColor.Init(0.5, 0.0, 0.5);
+			pRocketTrail->m_StartColor.Init(0.5f, 0.0, 0.5f);
 		}
 		else
 		{
-			pRocketTrail->m_StartColor.Init(0.75, 0.75, 0.75);
+			pRocketTrail->m_StartColor.Init(0.75f, 0.75f, 0.75f);
 		}
 		pRocketTrail->m_Opacity = 0.35f;
-		pRocketTrail->m_EndColor.Init(0.4,0.4,0.4);
+		pRocketTrail->m_EndColor.Init(0.4f,0.4f,0.4f);
 		pRocketTrail->m_StartSize = 8;
 		pRocketTrail->m_EndSize = 16;
 		pRocketTrail->m_SpawnRadius = 3;
@@ -609,7 +609,7 @@ void CGrenadeHomer::AimThink( void )
 			while (flTimeToUse > 0)
 			{
 				vecNewVelocity = (flCurHomingStrength * vTargetDir) + ((1 - flCurHomingStrength) * vCurDir);
-				flTimeToUse = -0.1;
+				flTimeToUse = -0.1f;
 			}
 			VectorNormalize(vecNewVelocity);
 			vecNewVelocity *= flTargetSpeed;

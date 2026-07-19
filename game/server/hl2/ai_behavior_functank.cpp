@@ -340,7 +340,7 @@ void CAI_FuncTankBehavior::StartTask( const Task_t *pTask )
 			Vector vecTargetForward;
 			AngleVectors( vecTargetAngles, &vecTargetForward );
 			Vector vecTarget = GetOuter()->EyePosition() + (vecTargetForward * 256);
-			GetOuter()->AddLookTarget( vecTarget, 1.0, 2.0, 0.2 );
+			GetOuter()->AddLookTarget( vecTarget, 1.0f, 2.0f, 0.2f );
 
 			m_hFuncTank->NPC_SetIdleAngle( vecTarget );
 
@@ -371,7 +371,7 @@ void CAI_FuncTankBehavior::StartTask( const Task_t *pTask )
 			Vector vecTargetForward;
 			AngleVectors( vecTargetAngles, &vecTargetForward );
 			Vector vecTarget = GetOuter()->EyePosition() + (vecTargetForward * 256);
-			GetOuter()->AddLookTarget( vecTarget, 1.0, 2.0, 0.2 );
+			GetOuter()->AddLookTarget( vecTarget, 1.0f, 2.0f, 0.2f );
 
 			m_hFuncTank->NPC_SetIdleAngle( vecTarget );
 

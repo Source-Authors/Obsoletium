@@ -3145,7 +3145,7 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 		for ( int i = 0; i < 2; i++ )
 		{
 			m_hEndSprites[i]->SetBrightness( random->RandomInt( 200, 255 ) );
-			m_hEndSprites[i]->SetScale( random->RandomFloat( 0.1, 0.15 ) * flScaleFactor );
+			m_hEndSprites[i]->SetScale( random->RandomFloat( 0.1f, 0.15f ) * flScaleFactor );
 		}
 	}
 
@@ -3158,12 +3158,12 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 		if ( IsMegaPhysCannon() )
 		{
 			m_hGlowSprites[i]->SetBrightness( random->RandomInt( 32, 48 ) );
-			m_hGlowSprites[i]->SetScale( random->RandomFloat( 0.15, 0.2 ) * flScaleFactor );
+			m_hGlowSprites[i]->SetScale( random->RandomFloat( 0.15f, 0.2f ) * flScaleFactor );
 		}
 		else
 		{
 			m_hGlowSprites[i]->SetBrightness( random->RandomInt( 16, 24 ) );
-			m_hGlowSprites[i]->SetScale( random->RandomFloat( 0.3, 0.35 ) * flScaleFactor );
+			m_hGlowSprites[i]->SetScale( random->RandomFloat( 0.3f, 0.35f ) * flScaleFactor );
 		}
 	}
 
@@ -3221,12 +3221,12 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 			if ( m_EffectState == EFFECT_HOLDING )
 			{
 				m_hCenterSprite->SetBrightness( random->RandomInt( 32, 64 ) );
-				m_hCenterSprite->SetScale( random->RandomFloat( 0.2, 0.25 ) * flScaleFactor );
+				m_hCenterSprite->SetScale( random->RandomFloat( 0.2f, 0.25f ) * flScaleFactor );
 			}
 			else
 			{
 				m_hCenterSprite->SetBrightness( random->RandomInt( 32, 64 ) );
-				m_hCenterSprite->SetScale( random->RandomFloat( 0.125, 0.15 ) * flScaleFactor );
+				m_hCenterSprite->SetScale( random->RandomFloat( 0.125f, 0.15f ) * flScaleFactor );
 			}
 		}
 		
@@ -3235,12 +3235,12 @@ void CWeaponPhysCannon::DoEffectIdle( void )
 			if ( m_EffectState == EFFECT_HOLDING )
 			{
 				m_hBlastSprite->SetBrightness( random->RandomInt( 125, 150 ) );
-				m_hBlastSprite->SetScale( random->RandomFloat( 0.125, 0.15 ) * flScaleFactor );
+				m_hBlastSprite->SetScale( random->RandomFloat( 0.125f, 0.15f ) * flScaleFactor );
 			}
 			else
 			{
 				m_hBlastSprite->SetBrightness( random->RandomInt( 32, 64 ) );
-				m_hBlastSprite->SetScale( random->RandomFloat( 0.075, 0.15 ) * flScaleFactor );
+				m_hBlastSprite->SetScale( random->RandomFloat( 0.075f, 0.15f ) * flScaleFactor );
 			}
 		}
 	}
@@ -4065,8 +4065,8 @@ void CWeaponPhysCannon::DoEffectLaunch( Vector *pos )
 	{
 		pBeam->PointEntInit( endpos, this );
 		pBeam->SetEndAttachment( 1 );
-		pBeam->SetWidth( 6.4 );
-		pBeam->SetEndWidth( 12.8 );
+		pBeam->SetWidth( 6.4f );
+		pBeam->SetEndWidth( 12.8f );
 		pBeam->SetBrightness( 255 );
 		pBeam->SetColor( 255, 255, 255 );
 		pBeam->LiveForTime( 0.1f );
@@ -4111,7 +4111,7 @@ void CWeaponPhysCannon::DoMegaEffectLaunch( Vector *pos )
 	
 	int numBeams = random->RandomInt( 1, 2 );
 
-	CBeam *pBeam = CBeam::BeamCreate( IsMegaPhysCannon() ? MEGACANNON_BEAM_SPRITE : PHYSCANNON_BEAM_SPRITE, 0.8 );
+	CBeam *pBeam = CBeam::BeamCreate( IsMegaPhysCannon() ? MEGACANNON_BEAM_SPRITE : PHYSCANNON_BEAM_SPRITE, 0.8f );
 
 	if ( pBeam != NULL )
 	{
@@ -4128,7 +4128,7 @@ void CWeaponPhysCannon::DoMegaEffectLaunch( Vector *pos )
 
 	for ( int i = 0; i < numBeams; i++ )
 	{
-		pBeam = CBeam::BeamCreate( IsMegaPhysCannon() ? MEGACANNON_BEAM_SPRITE : PHYSCANNON_BEAM_SPRITE, 0.8 );
+		pBeam = CBeam::BeamCreate( IsMegaPhysCannon() ? MEGACANNON_BEAM_SPRITE : PHYSCANNON_BEAM_SPRITE, 0.8f );
 
 		if ( pBeam != NULL )
 		{

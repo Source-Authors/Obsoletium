@@ -85,7 +85,7 @@ void CGrenadeAR2::Spawn( void )
 	m_iHealth		= 1;
 
 	SetGravity( UTIL_ScaleForGravity( 400 ) );	// use a lower gravity for grenades to make them easier to see
-	SetFriction( 0.8 );
+	SetFriction( 0.8f );
 	SetSequence( 0 );
 
 	m_fDangerRadius = 100;

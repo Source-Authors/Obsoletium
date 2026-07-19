@@ -310,7 +310,7 @@ void CNPC_Combine::Spawn( void )
 	AddSolidFlags( FSOLID_NOT_STANDABLE );
 	SetMoveType( MOVETYPE_STEP );
 	SetBloodColor( BLOOD_COLOR_RED );
-	m_flFieldOfView			= -0.2;// indicates the width of this NPC's forward view cone ( as a dotproduct result )
+	m_flFieldOfView			= -0.2f;// indicates the width of this NPC's forward view cone ( as a dotproduct result )
 	m_NPCState				= NPC_STATE_NONE;
 	m_flNextGrenadeCheck	= gpGlobals->curtime + 1;
 	m_flNextPainSoundTime	= 0;
@@ -441,7 +441,7 @@ void CNPC_Combine::PrescheduleThink()
 
 	extern ConVar ai_debug_shoot_positions;
 	if ( ai_debug_shoot_positions.GetBool() )
-		NDebugOverlay::Cross3D( EyePosition(), 16, 0, 255, 0, false, 0.1 );
+		NDebugOverlay::Cross3D( EyePosition(), 16, 0, 255, 0, false, 0.1f );
 
 	if( gpGlobals->curtime >= m_flStopMoveShootTime )
 	{
@@ -1009,7 +1009,7 @@ void CNPC_Combine::StartTask( const Task_t *pTask )
 			info.SetInflictor( this );
 			info.SetDamage( m_iHealth );
 			info.SetDamageType( pTask->flTaskData );
-			info.SetDamageForce( Vector( 0.1, 0.1, 0.1 ) );
+			info.SetDamageForce( Vector( 0.1f, 0.1f, 0.1f ) );
 
 			TakeDamage( info );
 
@@ -2804,7 +2804,7 @@ bool CNPC_Combine::CanThrowGrenade( const Vector &vecTarget )
 			m_flNextGrenadeCheck = gpGlobals->curtime + 1; // one full second.
 
 			// Tell my squad members to clear out so I can get a grenade in
-			CSoundEnt::InsertSound( SOUND_MOVE_AWAY | SOUND_CONTEXT_COMBINE_ONLY, vecTarget, COMBINE_MIN_GRENADE_CLEAR_DIST, 0.1 );
+			CSoundEnt::InsertSound( SOUND_MOVE_AWAY | SOUND_CONTEXT_COMBINE_ONLY, vecTarget, COMBINE_MIN_GRENADE_CLEAR_DIST, 0.1f );
 			return false;
 		}
 	}

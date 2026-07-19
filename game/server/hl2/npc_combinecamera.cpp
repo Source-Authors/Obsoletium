@@ -77,8 +77,8 @@ constexpr inline float CAMERA_MOVE_INTERVAL = 1.0f;
 // The camera has two FOVs - a wide one for becoming slightly aware of someone,
 // a narrow one for becoming totally aware of them.
 //
-constexpr inline float CAMERA_FOV_WIDE = 0.5;
-constexpr inline float CAMERA_FOV_NARROW = 0.707;
+constexpr inline float CAMERA_FOV_WIDE = 0.5f;
+constexpr inline float CAMERA_FOV_NARROW = 0.707f;
 
 
 // Camera states
@@ -712,12 +712,12 @@ void CNPC_CombineCamera::TrackTarget( CBaseEntity *pTarget )
 	// Draw debug info
 	if (g_debug_combine_camera.GetBool())
 	{
-		NDebugOverlay::Cross3D(vecMid, -Vector(2,2,2), Vector(2,2,2), 0, 255, 0, false, 0.05);
-		NDebugOverlay::Cross3D(pTarget->WorldSpaceCenter(), -Vector(2,2,2), Vector(2,2,2), 0, 255, 0, false, 0.05);
-		NDebugOverlay::Line(vecMid, pTarget->WorldSpaceCenter(), 0, 255, 0, false, 0.05);
+		NDebugOverlay::Cross3D(vecMid, -Vector(2,2,2), Vector(2,2,2), 0, 255, 0, false, 0.05f);
+		NDebugOverlay::Cross3D(pTarget->WorldSpaceCenter(), -Vector(2,2,2), Vector(2,2,2), 0, 255, 0, false, 0.05f);
+		NDebugOverlay::Line(vecMid, pTarget->WorldSpaceCenter(), 0, 255, 0, false, 0.05f);
 
-		NDebugOverlay::Cross3D(vecMid, -Vector(2,2,2), Vector(2,2,2), 0, 255, 0, false, 0.05);
-		NDebugOverlay::Cross3D(vecMidTarget, -Vector(2,2,2), Vector(2,2,2), 0, 255, 0, false, 0.05);
+		NDebugOverlay::Cross3D(vecMid, -Vector(2,2,2), Vector(2,2,2), 0, 255, 0, false, 0.05f);
+		NDebugOverlay::Cross3D(vecMidTarget, -Vector(2,2,2), Vector(2,2,2), 0, 255, 0, false, 0.05f);
 		NDebugOverlay::Line(vecMid, vecMidTarget, 0, 255, 0, false, 0.05f);
 	}
 

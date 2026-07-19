@@ -142,7 +142,7 @@ int CWeaponStunStick::WeaponMeleeAttack1Condition( float flDot, float flDist )
 		//float flSpeed = VectorNormalize( vecDir );
 
 		// If player will be in front of me in one-half second, clock his arse.
-		Vector vecProjectEnemy = pEnemy->GetAbsOrigin() + (pEnemy->GetAbsVelocity() * 0.35);
+		Vector vecProjectEnemy = pEnemy->GetAbsOrigin() + (pEnemy->GetAbsVelocity() * 0.35f);
 		Vector vecProjectMe = GetAbsOrigin();
 
 		if( (vecProjectMe - vecProjectEnemy).Length2D() <= 48.0f )

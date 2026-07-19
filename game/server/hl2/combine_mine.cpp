@@ -262,7 +262,7 @@ void CBounceBomb::SetMineState( int iState )
 	case MINE_STATE_DORMANT:
 		{
 			CSoundEnvelopeController &controller = CSoundEnvelopeController::GetController();
-			controller.SoundChangeVolume( m_pWarnSound, 0.0, 0.1 );
+			controller.SoundChangeVolume( m_pWarnSound, 0.0f, 0.1f );
 			UpdateLight( false, 0, 0, 0, 0 );
 			SetThink( NULL );
 		}
@@ -271,7 +271,7 @@ void CBounceBomb::SetMineState( int iState )
 	case MINE_STATE_CAPTIVE:
 		{
 			CSoundEnvelopeController &controller = CSoundEnvelopeController::GetController();
-			controller.SoundChangeVolume( m_pWarnSound, 0.0, 0.2 );
+			controller.SoundChangeVolume( m_pWarnSound, 0.0f, 0.2f );
 
 			// Unhook
 			unsigned int flags = VPhysicsGetObject()->GetCallbackFlags();
@@ -315,7 +315,7 @@ void CBounceBomb::SetMineState( int iState )
 			CSoundEnt::InsertSound( SOUND_DANGER, GetAbsOrigin(), 300, 1.0f, this );
 
 			CSoundEnvelopeController &controller = CSoundEnvelopeController::GetController();
-			controller.SoundChangeVolume( m_pWarnSound, 0.0, 0.2 );
+			controller.SoundChangeVolume( m_pWarnSound, 0.0f, 0.2f );
 
 			SetTouch( &CBounceBomb::ExplodeTouch );
 			unsigned int flags = VPhysicsGetObject()->GetCallbackFlags();
@@ -487,8 +487,8 @@ void CBounceBomb::BounceThink()
 		{
 			height = tr.endpos.z - GetAbsOrigin().z;
 			height -= BOUNCEBOMB_RADIUS;
-			if ( height < 0.1 )
-				height = 0.1;
+			if ( height < 0.1f )
+				height = 0.1f;
 		}
 
 		float time = sqrt( height / (0.5f * GetCurrentGravity()) );
@@ -549,8 +549,8 @@ void CBounceBomb::CavernBounceThink()
 		{
 			height = tr.endpos.z - GetAbsOrigin().z;
 			height -= BOUNCEBOMB_RADIUS;
-			if ( height < 0.1 )
-				height = 0.1;
+			if ( height < 0.1f )
+				height = 0.1f;
 		}
 
 		float time = sqrt( height / (0.5f * GetCurrentGravity()) );
@@ -735,7 +735,7 @@ void CBounceBomb::UpdateLight( bool bTurnOn, unsigned int r, unsigned int g, uns
 			{
 				pSprite->SetParent( this );		
 				pSprite->SetTransparency( kRenderTransAdd, r, g, b, a, kRenderFxNone );
-				pSprite->SetScale( 0.35, 0.0 );
+				pSprite->SetScale( 0.35f, 0.0f );
 			}
 		}
 		else
@@ -785,7 +785,7 @@ void CBounceBomb::Wake( bool bAwake )
 		if( m_bFoeNearest )
 		{
 			EmitSound( "NPC_CombineMine.TurnOn" );
-			controller.SoundChangeVolume( m_pWarnSound, 1.0, 0.1 );
+			controller.SoundChangeVolume( m_pWarnSound, 1.0f, 0.1f );
 		}
 
 		unsigned char r, g, b;
@@ -811,7 +811,7 @@ void CBounceBomb::Wake( bool bAwake )
 		}
 
 		SetNearestNPC( NULL );
-		controller.SoundChangeVolume( m_pWarnSound, 0.0, 0.1 );
+		controller.SoundChangeVolume( m_pWarnSound, 0.0f, 0.1f );
 		UpdateLight( false, 0, 0, 0, 0 );
 	}
 
@@ -823,7 +823,7 @@ void CBounceBomb::Wake( bool bAwake )
 //---------------------------------------------------------
 float CBounceBomb::FindNearestNPC()
 {
-	float flNearest = (BOUNCEBOMB_WARN_RADIUS * BOUNCEBOMB_WARN_RADIUS) + 1.0;
+	float flNearest = (BOUNCEBOMB_WARN_RADIUS * BOUNCEBOMB_WARN_RADIUS) + 1.0f;
 
 	// Assume this search won't find anyone.
 	SetNearestNPC( NULL );

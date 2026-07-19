@@ -47,8 +47,8 @@ constexpr inline float ROCKET_DELAY_TIME{1.5f};
 #define ROCKET_MAX_BURST_PAUSE_TIME		4
 #define ROCKET_SPEED					800
 #define DEATH_VOLLEY_ROCKET_COUNT		4
-#define DEATH_VOLLEY_MIN_FIRE_TIME		0.333
-#define DEATH_VOLLEY_MAX_FIRE_TIME		0.166
+#define DEATH_VOLLEY_MIN_FIRE_TIME		0.333f
+#define DEATH_VOLLEY_MAX_FIRE_TIME		0.166f
 
 // dimhotepus: short -> int.
 extern int g_sModelIndexFireball; // Echh...
@@ -314,7 +314,7 @@ void CPropAPC::AddSmokeTrail( const Vector &vecPos )
 	pSmokeTrail->m_SpawnRate = 4;
 	pSmokeTrail->m_ParticleLifetime = 5.0f;
 	pSmokeTrail->m_StartColor.Init( 0.7f, 0.7f, 0.7f );
-	pSmokeTrail->m_EndColor.Init( 0.6, 0.6, 0.6 );
+	pSmokeTrail->m_EndColor.Init( 0.6f, 0.6f, 0.6f );
 	pSmokeTrail->m_StartSize = 32;
 	pSmokeTrail->m_EndSize = 64;
 	pSmokeTrail->m_SpawnRadius = 4;
@@ -611,7 +611,7 @@ void CPropAPC::ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMoveData )
 
 	// lay down sound path
 	vecSpot = vecStart + vecDir * 600;
-	CSoundEnt::InsertSound( SOUND_DANGER, vecSpot, 400, 0.1, this );
+	CSoundEnt::InsertSound( SOUND_DANGER, vecSpot, 400, 0.1f, this );
 
 	// put sounds a bit to left and right but slightly closer to APC to make a "cone" of sound 
 	// in front of it
@@ -620,14 +620,14 @@ void CPropAPC::ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMoveData )
 	VehicleAngleVectors( leftAngles, &vecLeftDir, NULL, NULL );
 	vecSpot = vecStart + vecLeftDir * 400;
 	UTIL_TraceLine( vecStart, vecSpot, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
-	CSoundEnt::InsertSound( SOUND_DANGER, vecSpot, 400, 0.1, this );
+	CSoundEnt::InsertSound( SOUND_DANGER, vecSpot, 400, 0.1f, this );
 
 	QAngle rightAngles = vehicleAngles;
 	rightAngles[YAW] -= 20;
 	VehicleAngleVectors( rightAngles, &vecRightDir, NULL, NULL );
 	vecSpot = vecStart + vecRightDir * 400;
 	UTIL_TraceLine( vecStart, vecSpot, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
-	CSoundEnt::InsertSound( SOUND_DANGER, vecSpot, 400, 0.1, this);
+	CSoundEnt::InsertSound( SOUND_DANGER, vecSpot, 400, 0.1f, this);
 
 	m_flDangerSoundTime = gpGlobals->curtime + 0.3f;
 }
@@ -986,7 +986,7 @@ void CPropAPC::FireRocket( void )
 	Vector vecRocketOrigin;
 	GetRocketShootPosition(	&vecRocketOrigin );
 
-	static float s_pSide[] = { 0.966, 0.866, 0.5, -0.5, -0.866, -0.966 };
+	constexpr float s_pSide[] = { 0.966f, 0.866f, 0.5f, -0.5f, -0.866f, -0.966f };
 
 	Vector forward;
 	GetVectors( &forward, NULL, NULL );

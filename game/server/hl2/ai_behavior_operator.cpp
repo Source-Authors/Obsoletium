@@ -64,7 +64,7 @@ bool CAI_OperatorBehavior::CanSeePositionEntity()
 		// NPC spot the position entity a frame before she spots an enemy.
 		if ( !m_WatchSeeEntity.IsRunning() )
 		{
-			m_WatchSeeEntity.Start( 0.3,0.31 );
+			m_WatchSeeEntity.Start( 0.3f,0.31f );
 			return false;
 		}
 

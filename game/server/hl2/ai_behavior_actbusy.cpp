@@ -2016,7 +2016,7 @@ void CAI_ActBusyBehavior::RunTask( const Task_t *pTask )
 				if ( GetHintNode() )
 				{
 					// Show which actbusy we're moving towards
-					NDebugOverlay::Line( GetOuter()->WorldSpaceCenter(), GetHintNode()->GetAbsOrigin(), 0, 255, 0, true, 0.2 );
+					NDebugOverlay::Line( GetOuter()->WorldSpaceCenter(), GetHintNode()->GetAbsOrigin(), 0, 255, 0, true, 0.2f );
 				}
 			}
 
@@ -2730,11 +2730,11 @@ void CAI_ActBusyQueueGoal::DrawDebugGeometryOverlays( void )
 			continue;
 		if ( m_bPlayerBlockedNodes[i] )
 		{
-			NDebugOverlay::Box( m_hNodes[i]->GetAbsOrigin(), -Vector(5,5,5), Vector(5,5,5), 255, 0, 0, 0, 0.1 );
+			NDebugOverlay::Box( m_hNodes[i]->GetAbsOrigin(), -Vector(5,5,5), Vector(5,5,5), 255, 0, 0, 0, 0.1f );
 		}
 		else
 		{
-			NDebugOverlay::Box( m_hNodes[i]->GetAbsOrigin(), -Vector(5,5,5), Vector(5,5,5), 255, 255, 255, 0, 0.1 );
+			NDebugOverlay::Box( m_hNodes[i]->GetAbsOrigin(), -Vector(5,5,5), Vector(5,5,5), 255, 255, 255, 0, 0.1f );
 		}
 	}
 }
@@ -3009,7 +3009,7 @@ void CAI_ActBusyQueueGoal::MoveQueueUp( void )
 	// Find the node the NPC has arrived at, and tell the guy behind him to move forward
 	if ( GetNextThink( QUEUE_MOVEUP_THINK_CONTEXT ) < gpGlobals->curtime )
 	{
-		float flTime = gpGlobals->curtime + RandomFloat( 0.3, 0.5 );
+		float flTime = gpGlobals->curtime + RandomFloat( 0.3f, 0.5f );
 		SetContextThink( &CAI_ActBusyQueueGoal::MoveQueueUpThink, flTime, QUEUE_MOVEUP_THINK_CONTEXT );
 	}
 }

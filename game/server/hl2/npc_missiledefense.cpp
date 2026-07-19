@@ -261,7 +261,7 @@ void CNPC_MissileDefense::Spawn( void )
 	m_takedamage		= DAMAGE_YES;
 	SetBloodColor( DONT_BLEED );
 	m_iHealth			= 10;
-	m_flFieldOfView		= 0.1;
+	m_flFieldOfView		= 0.1f;
 	m_NPCState			= NPC_STATE_NONE;
 	CapabilitiesClear();
 	CapabilitiesAdd ( bits_CAP_INNATE_RANGE_ATTACK1 );
@@ -340,7 +340,7 @@ void CNPC_MissileDefense::Gib(void)
 	CBroadcastRecipientFilter filter;
 
 	te->DynamicLight( filter, 0.0,
-			&GetAbsOrigin(), 255, 180, 100, 0, 100, 0.1, 0 );
+			&GetAbsOrigin(), 255, 180, 100, 0, 100, 0.1f, 0 );
 
 	// Remove top parts
 	SetBodygroup( 1, 0 );

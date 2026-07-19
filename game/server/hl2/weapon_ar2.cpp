@@ -241,7 +241,7 @@ void CWeaponAR2::DelayedAttack( void )
 
 	// View effects
 	color32 white = {255, 255, 255, 64};
-	UTIL_ScreenFade( pOwner, white, 0.1, 0, FFADE_IN  );
+	UTIL_ScreenFade( pOwner, white, 0.1f, 0, FFADE_IN  );
 	
 	//Disorient the player
 	QAngle angles = pOwner->GetLocalAngles();
@@ -504,8 +504,8 @@ const WeaponProficiencyInfo_t *CWeaponAR2::GetProficiencyValues()
 	{
 		{ 7.0,		0.75	},
 		{ 5.00,		0.75	},
-		{ 3.0,		0.85	},
-		{ 5.0/3.0,	0.75	},
+		{ 3.0,		0.85f	},
+		{ 5.0f/3.0f,	0.75	},
 		{ 1.00,		1.0		},
 	};
 

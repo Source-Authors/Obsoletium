@@ -1617,7 +1617,7 @@ void CWeaponRPG::PrimaryAttack( void )
 	UTIL_TraceLine( vecEye, vecEye + vForward * 128, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 	if ( tr.fraction == 1.0 )
 	{
-		m_hMissile->SetGracePeriod( 0.3 );
+		m_hMissile->SetGracePeriod( 0.3f );
 	}
 
 	DecrementAmmo( GetOwner() );
@@ -1633,7 +1633,7 @@ void CWeaponRPG::PrimaryAttack( void )
 	m_iPrimaryAttacks++;
 	gamestats->Event_WeaponFired( pOwner, true, GetClassname() );
 
-	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 1000, 0.2, GetOwner(), SOUNDENT_CHANNEL_WEAPON );
+	CSoundEnt::InsertSound( SOUND_COMBAT, GetAbsOrigin(), 1000, 0.2f, GetOwner(), SOUNDENT_CHANNEL_WEAPON );
 
 	// Check to see if we should trigger any RPG firing triggers
 	intp iCount = g_hWeaponFireTriggers.Count();

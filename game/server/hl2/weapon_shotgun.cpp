@@ -264,7 +264,7 @@ float CWeaponShotgun::GetFireRate()
 		return 0.8f;
 	}
 
-	return 0.7;
+	return 0.7f;
 }
 
 //-----------------------------------------------------------------------------

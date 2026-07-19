@@ -169,15 +169,15 @@ CItem_DynamicResupply::CItem_DynamicResupply( void )
 	m_version = VERSION_CURRENT;
 
 	// Setup default values
-	m_flDesiredHealth[0] = 1.0;	// Health
-	m_flDesiredHealth[1] = 0.3;	// Armor
-	m_flDesiredAmmo[0] = 0.5;	// Pistol
-	m_flDesiredAmmo[1] = 0.5;	// SMG1
-	m_flDesiredAmmo[2] = 0.1;	// SMG1 Grenade
-	m_flDesiredAmmo[3] = 0.4;	// AR2
-	m_flDesiredAmmo[4] = 0.5;	// Shotgun
-	m_flDesiredAmmo[5] = 0.0;	// RPG Round
-	m_flDesiredAmmo[6] = 0.1;	// Grenade
+	m_flDesiredHealth[0] = 1.0f;	// Health
+	m_flDesiredHealth[1] = 0.3f;	// Armor
+	m_flDesiredAmmo[0] = 0.5f;	// Pistol
+	m_flDesiredAmmo[1] = 0.5f;	// SMG1
+	m_flDesiredAmmo[2] = 0.1f;	// SMG1 Grenade
+	m_flDesiredAmmo[3] = 0.4f;	// AR2
+	m_flDesiredAmmo[4] = 0.5f;	// Shotgun
+	m_flDesiredAmmo[5] = 0.0f;	// RPG Round
+	m_flDesiredAmmo[6] = 0.1f;	// Grenade
 	m_flDesiredAmmo[7] = 0;		// 357
 	m_flDesiredAmmo[8] = 0;		// Crossbow
 	m_flDesiredAmmo[9] = 0;		// AR2 alt-fire

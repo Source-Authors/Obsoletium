@@ -328,7 +328,7 @@ int CPropJeep::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		if ( info.GetDamage() <= 10 )
 		{
 			// take 10% damage and make the engine stall
-			info.ScaleDamage( 0.1 );
+			info.ScaleDamage( 0.1f );
 			m_throttleDisableTime = gpGlobals->curtime + 2;
 		}
 	}
@@ -503,7 +503,7 @@ void CPropJeep::HandleWater( void )
 				if ( m_WaterData.m_flNextRippleTime[iWheel] < gpGlobals->curtime )
 				{
 					// Stagger ripple times
-					m_WaterData.m_flNextRippleTime[iWheel] = gpGlobals->curtime + RandomFloat( 0.1, 0.3 );
+					m_WaterData.m_flNextRippleTime[iWheel] = gpGlobals->curtime + RandomFloat( 0.1f, 0.3f );
 					CreateRipple( m_WaterData.m_vecWheelContactPoints[iWheel] );
 				}
 			}
@@ -1021,7 +1021,7 @@ void CPropJeep::FireChargedCannon( void )
 	}
 
 	//Show the effect
-	DrawBeam( m_vecGunOrigin, tr.endpos, 9.6 );
+	DrawBeam( m_vecGunOrigin, tr.endpos, 9.6f );
 
 	// Register a muzzleflash for the AI
 	if ( m_hPlayer )

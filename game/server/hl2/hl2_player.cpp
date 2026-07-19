@@ -410,9 +410,9 @@ CHL2_Player::CHL2_Player()
 #endif
 
 #ifdef HL2_EPISODIC
-	CSuitPowerDevice SuitDeviceFlashlight( bits_SUIT_DEVICE_FLASHLIGHT, 1.111 );	// 100 units in 90 second
+	CSuitPowerDevice SuitDeviceFlashlight( bits_SUIT_DEVICE_FLASHLIGHT, 1.111f );	// 100 units in 90 second
 #else
-	CSuitPowerDevice SuitDeviceFlashlight( bits_SUIT_DEVICE_FLASHLIGHT, 2.222 );	// 100 units in 45 second
+	CSuitPowerDevice SuitDeviceFlashlight( bits_SUIT_DEVICE_FLASHLIGHT, 2.222f );	// 100 units in 45 second
 #endif
 CSuitPowerDevice SuitDeviceBreather( bits_SUIT_DEVICE_BREATHER, 6.7f );		// 100 units in 15 seconds (plus three padded seconds)
 
@@ -2949,7 +2949,7 @@ void CHL2_Player::UpdateWeaponPosture( void )
 
 	if ( pWeapon && m_LowerWeaponTimer.Expired() && pWeapon->CanLower() )
 	{
-		m_LowerWeaponTimer.Set( .3 );
+		m_LowerWeaponTimer.Set( .3f );
 		VPROF( "CHL2_Player::UpdateWeaponPosture-CheckLower" );
 		Vector vecAim = BaseClass::GetAutoaimVector( AUTOAIM_SCALE_DIRECT_ONLY );
 
@@ -3038,7 +3038,7 @@ void CHL2_Player::UpdateWeaponPosture( void )
 		if( !m_AutoaimTimer.Expired() )
 			return;
 
-		m_AutoaimTimer.Set( .1 );
+		m_AutoaimTimer.Set( .1f );
 
 		VPROF( "hl2_x360_aiming" );
 
