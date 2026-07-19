@@ -774,8 +774,7 @@ void CCoreDispInfo::InitDispInfo( int power, int minTess, float smoothingAngle,
 	int nNodeCount = GetNodeCount(power);
 	m_Nodes = new CCoreDispNode[nNodeCount];
 
-	int i;
-	for( i = 0; i < size; i++ )
+	for( int i = 0; i < size; i++ )
 	{
 		m_pVerts[i].m_FieldVector.Init();
 		m_pVerts[i].m_SubdivPos.Init();
@@ -798,12 +797,12 @@ void CCoreDispInfo::InitDispInfo( int power, int minTess, float smoothingAngle,
 		m_pVerts[i].m_Alpha = 0.0f;
 	}
 
-	for( i = 0; i < nIndexCount; i++ )
+	for( int i = 0; i < nIndexCount; i++ )
 	{
 		m_RenderIndices[i] = 0;
 	}
 
-	for( i = 0; i < nNodeCount; i++ )
+	for( int i = 0; i < nNodeCount; i++ )
 	{
 		m_Nodes[i].Init();
 	}
@@ -814,7 +813,7 @@ void CCoreDispInfo::InitDispInfo( int power, int minTess, float smoothingAngle,
 	//
 	if (alphas && dispVectorField && dispDistances)
 	{
-		for( i = 0; i < size; i++ )
+		for( int i = 0; i < size; i++ )
 		{
 			VectorCopy( dispVectorField[i], m_pVerts[i].m_FieldVector );
 			m_pVerts[i].m_FieldDistance = dispDistances[i];
@@ -843,7 +842,7 @@ void CCoreDispInfo::InitDispInfo( int power, int minTess, float smoothingAngle, 
 	float alphas[MAX_DISPVERTS];
 
 	int nVerts = NUM_DISP_POWER_VERTS( power );
-	for ( int i=0; i < nVerts; i++ )
+	for ( int i = 0; i < nVerts; i++ )
 	{
 		vectors[i] = pVerts[i].m_vVector;
 		dists[i] = pVerts[i].m_flDist;
@@ -1006,47 +1005,54 @@ void CCoreDispInfo::CalcRayBoundingBoxes( int nodeIndex, int indices[8][3] )
 
 	for( int i = 0; i < 4; i++ )
 	{
-		triMin[0] = triMax[0] = m_pVerts[indices[(i*2)][0]].m_Vert[0];
-		triMin[1] = triMax[1] = m_pVerts[indices[(i*2)][0]].m_Vert[1];
-		triMin[2] = triMax[2] = m_pVerts[indices[(i*2)][0]].m_Vert[2];
+		// dimhotepus: Cache ref.
+		const auto &startVert = m_pVerts[indices[(i*2)][0]].m_Vert;
+
+		triMin[0] = triMax[0] = startVert[0];
+		triMin[1] = triMax[1] = startVert[1];
+		triMin[2] = triMax[2] = startVert[2];
 
 		for( int j = 0; j < 3; j++ )
 		{
+			// dimhotepus: Cache ref.
+			const auto &lowerVert = m_pVerts[indices[(i*2)][j]].m_Vert;
+			const auto &upperVert = m_pVerts[indices[(i*2+1)][j]].m_Vert;
+
 			//
 			// minimum
 			//
-			if( triMin[0] > m_pVerts[indices[(i*2)][j]].m_Vert[0] )
-				triMin[0] = m_pVerts[indices[(i*2)][j]].m_Vert[0];
-			if( triMin[0] > m_pVerts[indices[(i*2+1)][j]].m_Vert[0] )
-				triMin[0] = m_pVerts[indices[(i*2+1)][j]].m_Vert[0];
+			if( triMin[0] > lowerVert[0] )
+				triMin[0] = lowerVert[0];
+			if( triMin[0] > upperVert[0] )
+				triMin[0] = upperVert[0];
 			
-			if( triMin[1] > m_pVerts[indices[(i*2)][j]].m_Vert[1] )
-				triMin[1] = m_pVerts[indices[(i*2)][j]].m_Vert[1];
-			if( triMin[1] > m_pVerts[indices[(i*2+1)][j]].m_Vert[1] )
-				triMin[1] = m_pVerts[indices[(i*2+1)][j]].m_Vert[1];
+			if( triMin[1] > lowerVert[1] )
+				triMin[1] = lowerVert[1];
+			if( triMin[1] > upperVert[1] )
+				triMin[1] = upperVert[1];
 
-			if( triMin[2] > m_pVerts[indices[(i*2)][j]].m_Vert[2] )
-				triMin[2] = m_pVerts[indices[(i*2)][j]].m_Vert[2];
-			if( triMin[2] > m_pVerts[indices[(i*2+1)][j]].m_Vert[2] )
-				triMin[2] = m_pVerts[indices[(i*2+1)][j]].m_Vert[2];
+			if( triMin[2] > lowerVert[2] )
+				triMin[2] = lowerVert[2];
+			if( triMin[2] > upperVert[2] )
+				triMin[2] = upperVert[2];
 
 			//
 			// maximum
 			//
-			if( triMax[0] < m_pVerts[indices[(i*2)][j]].m_Vert[0] )
-				triMax[0] = m_pVerts[indices[(i*2)][j]].m_Vert[0];
-			if( triMax[0] < m_pVerts[indices[(i*2+1)][j]].m_Vert[0] )
-				triMax[0] = m_pVerts[indices[(i*2+1)][j]].m_Vert[0];
+			if( triMax[0] < lowerVert[0] )
+				triMax[0] = lowerVert[0];
+			if( triMax[0] < upperVert[0] )
+				triMax[0] = upperVert[0];
 			
-			if( triMax[1] < m_pVerts[indices[(i*2)][j]].m_Vert[1] )
-				triMax[1] = m_pVerts[indices[(i*2)][j]].m_Vert[1];
-			if( triMax[1] < m_pVerts[indices[(i*2+1)][j]].m_Vert[1] )
-				triMax[1] = m_pVerts[indices[(i*2+1)][j]].m_Vert[1];
+			if( triMax[1] < lowerVert[1] )
+				triMax[1] = lowerVert[1];
+			if( triMax[1] < upperVert[1] )
+				triMax[1] = upperVert[1];
 
-			if( triMax[2] < m_pVerts[indices[(i*2)][j]].m_Vert[2] )
-				triMax[2] = m_pVerts[indices[(i*2)][j]].m_Vert[2];
-			if( triMax[2] < m_pVerts[indices[(i*2+1)][j]].m_Vert[2] )
-				triMax[2] = m_pVerts[indices[(i*2+1)][j]].m_Vert[2];
+			if( triMax[2] < lowerVert[2] )
+				triMax[2] = lowerVert[2];
+			if( triMax[2] < upperVert[2] )
+				triMax[2] = upperVert[2];
 		}
 
 		m_Nodes[nodeIndex].SetRayBoundingBox( i, triMin, triMax );
@@ -1066,29 +1072,32 @@ void CCoreDispInfo::CalcTriSurfBoundingBoxes( int nodeIndex, int indices[8][3] )
 
         for( int j = 0; j < 3; j++ )
         {
+            // dimhotepus: Cache ref.
+            const auto &vert = m_pVerts[indices[i][j]].m_Vert;
+
             //
             // minimum
             //
-            if( triMin[0] > m_pVerts[indices[i][j]].m_Vert[0] )
-                triMin[0] = m_pVerts[indices[i][j]].m_Vert[0];
+            if( triMin[0] > vert[0] )
+                triMin[0] = vert[0];
 
-            if( triMin[1] > m_pVerts[indices[i][j]].m_Vert[1] )
-                triMin[1] = m_pVerts[indices[i][j]].m_Vert[1];
+            if( triMin[1] > vert[1] )
+                triMin[1] = vert[1];
 
-            if( triMin[2] > m_pVerts[indices[i][j]].m_Vert[2] )
-                triMin[2] = m_pVerts[indices[i][j]].m_Vert[2];
+            if( triMin[2] > vert[2] )
+                triMin[2] = vert[2];
 
             //
             // maximum
             //
-            if( triMax[0] < m_pVerts[indices[i][j]].m_Vert[0] )
-                triMax[0] = m_pVerts[indices[i][j]].m_Vert[0];
+            if( triMax[0] < vert[0] )
+                triMax[0] = vert[0];
 
-            if( triMax[1] < m_pVerts[indices[i][j]].m_Vert[1] )
-                triMax[1] = m_pVerts[indices[i][j]].m_Vert[1];
+            if( triMax[1] < vert[1] )
+                triMax[1] = vert[1];
 
-            if( triMax[2] < m_pVerts[indices[i][j]].m_Vert[2] )
-                triMax[2] = m_pVerts[indices[i][j]].m_Vert[2];
+            if( triMax[2] < vert[2] )
+                triMax[2] = vert[2];
         }
 
 		m_Nodes[nodeIndex].SetTriBoundingBox( i, triMin, triMax );
@@ -1100,37 +1109,39 @@ void CCoreDispInfo::CalcTriSurfBoundingBoxes( int nodeIndex, int indices[8][3] )
 //-----------------------------------------------------------------------------
 void CCoreDispInfo::CalcTriSurfIndices( int nodeIndex, int indices[8][3] )
 {
-    indices[0][0] = m_Nodes[nodeIndex].GetNeighborVertIndex( 4 );
-    indices[0][1] = m_Nodes[nodeIndex].GetNeighborVertIndex( 0 );
-    indices[0][2] = m_Nodes[nodeIndex].GetNeighborVertIndex( 3 );
+	auto &node = m_Nodes[nodeIndex];
 
-    indices[1][0] = m_Nodes[nodeIndex].GetNeighborVertIndex( 3 );
-    indices[1][1] = m_Nodes[nodeIndex].GetNeighborVertIndex( 0 );
-    indices[1][2] = m_Nodes[nodeIndex].GetCenterVertIndex();
+    indices[0][0] = node.GetNeighborVertIndex( 4 );
+    indices[0][1] = node.GetNeighborVertIndex( 0 );
+    indices[0][2] = node.GetNeighborVertIndex( 3 );
 
-    indices[2][0] = m_Nodes[nodeIndex].GetNeighborVertIndex( 3 );
-    indices[2][1] = m_Nodes[nodeIndex].GetCenterVertIndex();
-    indices[2][2] = m_Nodes[nodeIndex].GetNeighborVertIndex( 5 );
+    indices[1][0] = node.GetNeighborVertIndex( 3 );
+    indices[1][1] = node.GetNeighborVertIndex( 0 );
+    indices[1][2] = node.GetCenterVertIndex();
 
-    indices[3][0] = m_Nodes[nodeIndex].GetNeighborVertIndex( 5 );
-    indices[3][1] = m_Nodes[nodeIndex].GetCenterVertIndex();
-    indices[3][2] = m_Nodes[nodeIndex].GetNeighborVertIndex( 2 );
+    indices[2][0] = node.GetNeighborVertIndex( 3 );
+    indices[2][1] = node.GetCenterVertIndex();
+    indices[2][2] = node.GetNeighborVertIndex( 5 );
 
-    indices[4][0] = m_Nodes[nodeIndex].GetNeighborVertIndex( 0 );
-    indices[4][1] = m_Nodes[nodeIndex].GetNeighborVertIndex( 6 );
-    indices[4][2] = m_Nodes[nodeIndex].GetCenterVertIndex();
+    indices[3][0] = node.GetNeighborVertIndex( 5 );
+    indices[3][1] = node.GetCenterVertIndex();
+    indices[3][2] = node.GetNeighborVertIndex( 2 );
 
-    indices[5][0] = m_Nodes[nodeIndex].GetCenterVertIndex();
-    indices[5][1] = m_Nodes[nodeIndex].GetNeighborVertIndex( 6 );
-    indices[5][2] = m_Nodes[nodeIndex].GetNeighborVertIndex( 1 );
+    indices[4][0] = node.GetNeighborVertIndex( 0 );
+    indices[4][1] = node.GetNeighborVertIndex( 6 );
+    indices[4][2] = node.GetCenterVertIndex();
 
-    indices[6][0] = m_Nodes[nodeIndex].GetCenterVertIndex();
-    indices[6][1] = m_Nodes[nodeIndex].GetNeighborVertIndex( 1 );
-    indices[6][2] = m_Nodes[nodeIndex].GetNeighborVertIndex( 2 );
+    indices[5][0] = node.GetCenterVertIndex();
+    indices[5][1] = node.GetNeighborVertIndex( 6 );
+    indices[5][2] = node.GetNeighborVertIndex( 1 );
 
-    indices[7][0] = m_Nodes[nodeIndex].GetNeighborVertIndex( 2 );
-    indices[7][1] = m_Nodes[nodeIndex].GetNeighborVertIndex( 1 );
-    indices[7][2] = m_Nodes[nodeIndex].GetNeighborVertIndex( 7 );
+    indices[6][0] = node.GetCenterVertIndex();
+    indices[6][1] = node.GetNeighborVertIndex( 1 );
+    indices[6][2] = node.GetNeighborVertIndex( 2 );
+
+    indices[7][0] = node.GetNeighborVertIndex( 2 );
+    indices[7][1] = node.GetNeighborVertIndex( 1 );
+    indices[7][2] = node.GetNeighborVertIndex( 7 );
 }
 
 
@@ -1210,53 +1221,59 @@ void CCoreDispInfo::CalcBoundingBoxAtNode( int nodeIndex )
     {
 		CalcMinMaxBoundingBoxAtNode( nodeIndex, bMin, bMax );
 
-        if( bMin[0] > m_pVerts[vertIndex].m_Vert[0] )
-            bMin[0] = m_pVerts[vertIndex].m_Vert[0];
+		// dimhotepus: Cache ref.
+        const auto& vert = m_pVerts[vertIndex].m_Vert;
 
-        if( bMin[1] > m_pVerts[vertIndex].m_Vert[1] )
-            bMin[1] = m_pVerts[vertIndex].m_Vert[1];
+        if( bMin[0] > vert[0] )
+            bMin[0] = vert[0];
 
-        if( bMin[2] > m_pVerts[vertIndex].m_Vert[2] )
-            bMin[2] = m_pVerts[vertIndex].m_Vert[2];
+        if( bMin[1] > vert[1] )
+            bMin[1] = vert[1];
+
+        if( bMin[2] > vert[2] )
+            bMin[2] = vert[2];
 
 
-        if( bMax[0] < m_pVerts[vertIndex].m_Vert[0] )
-            bMax[0] = m_pVerts[vertIndex].m_Vert[0];
+        if( bMax[0] < vert[0] )
+            bMax[0] = vert[0];
 
-        if( bMax[1] < m_pVerts[vertIndex].m_Vert[1] )
-            bMax[1] = m_pVerts[vertIndex].m_Vert[1];
+        if( bMax[1] < vert[1] )
+            bMax[1] = vert[1];
 
-        if( bMax[2] < m_pVerts[vertIndex].m_Vert[2] )
-            bMax[2] = m_pVerts[vertIndex].m_Vert[2];
+        if( bMax[2] < vert[2] )
+            bMax[2] = vert[2];
     }
 
     for( int i = 0; i < 8; i++ )
     {
 		int neighborVertIndex = m_Nodes[nodeIndex].GetNeighborVertIndex( i );
 
+		// dimhotepus: Cache ref.
+        const auto& vert = m_pVerts[neighborVertIndex].m_Vert;
+
         //
         // minimum
         //
-        if( bMin[0] > m_pVerts[neighborVertIndex].m_Vert[0] )
-            bMin[0] = m_pVerts[neighborVertIndex].m_Vert[0];
+        if( bMin[0] > vert[0] )
+            bMin[0] = vert[0];
 
-        if( bMin[1] > m_pVerts[neighborVertIndex].m_Vert[1] )
-            bMin[1] = m_pVerts[neighborVertIndex].m_Vert[1];
+        if( bMin[1] > vert[1] )
+            bMin[1] = vert[1];
 
-        if( bMin[2] > m_pVerts[neighborVertIndex].m_Vert[2] )
-            bMin[2] = m_pVerts[neighborVertIndex].m_Vert[2];
+        if( bMin[2] > vert[2] )
+            bMin[2] = vert[2];
 
         //
         // maximum
         //
-        if( bMax[0] < m_pVerts[neighborVertIndex].m_Vert[0] )
-            bMax[0] = m_pVerts[neighborVertIndex].m_Vert[0];
+        if( bMax[0] < vert[0] )
+            bMax[0] = vert[0];
 
-        if( bMax[1] < m_pVerts[neighborVertIndex].m_Vert[1] )
-            bMax[1] = m_pVerts[neighborVertIndex].m_Vert[1];
+        if( bMax[1] < vert[1] )
+            bMax[1] = vert[1];
 
-        if( bMax[2] < m_pVerts[neighborVertIndex].m_Vert[2] )
-            bMax[2] = m_pVerts[neighborVertIndex].m_Vert[2];
+        if( bMax[2] < vert[2] )
+            bMax[2] = vert[2];
     }
 
 	m_Nodes[nodeIndex].SetBoundingBox( bMin, bMax );
