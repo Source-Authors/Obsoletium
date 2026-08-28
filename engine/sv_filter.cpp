@@ -26,6 +26,11 @@ static ConVar sv_filterban( "sv_filterban", "1", 0, "Set packet filtering by IP 
 
 CUtlVector< ipfilter_t > g_IPFilters;
 CUtlVector< userfilter_t > g_UserFilters;
+#if defined(WIN32) || defined(_WIN32)
+CThreadSpinRWLock g_IPFilterMutex;
+#else
+CThreadRWLock g_IPFilterMutex;
+#endif
 
 #define BANNED_IP_FILENAME "banned_ip.cfg"
 #define BANNED_USER_FILENAME "banned_user.cfg"
@@ -45,6 +50,7 @@ void Filter_SendBan( const netadr_t& adr )
 // Purpose: Checks an IP address to see if it is banned
 // Input  : *adr - 
 // Output : bool
+// RaphaelIT7: This function is fully threadsafe in case the network layer gets threaded
 //-----------------------------------------------------------------------------
 bool Filter_ShouldDiscard( const netadr_t& adr )
 {
@@ -56,6 +62,8 @@ bool Filter_ShouldDiscard( const netadr_t& adr )
 	const bool bNegativeFilter = sv_filterban.GetInt() == 1;
 
 	unsigned in = *(unsigned *)&adr.ip[0];
+
+	AUTO_LOCK_READ( g_IPFilterMutex );
 
 	// Handle timeouts 
 	for ( intp i = g_IPFilters.Count() - 1 ; i >= 0 ; i--)
@@ -176,41 +184,47 @@ static void Filter_Add_f( const CCommand& args )
 		return;
 
 	intp i;
-	for (i=0 ; i<g_IPFilters.Count(); i++)
-	{
-		if ( g_IPFilters[i].compare == 0xffffffff ||
-			( g_IPFilters[i].compare == f.compare && g_IPFilters[i].mask == f.mask ) )
-			break;		// free spot
-	}
-	
-	if (i == g_IPFilters.Count())
-	{
-		if (g_IPFilters.Count() == MAX_IPFILTERS)
+	{ // Scoped due to a possible dead lock since Filter_ShouldDiscard further down locks for read
+		AUTO_LOCK_WRITE( g_IPFilterMutex );
+		g_IPFilterMutex.LockForWrite();
+
+		for (i=0 ; i<g_IPFilters.Count(); i++)
 		{
-			ConMsg( "addip: IP filter list is full (max %zd).\n", MAX_IPFILTERS );
-			return;
+			if ( g_IPFilters[i].compare == 0xffffffff ||
+				( g_IPFilters[i].compare == f.compare && g_IPFilters[i].mask == f.mask ) )
+				break;		// free spot
+		}
+	
+		if (i == g_IPFilters.Count())
+		{
+			if (g_IPFilters.Count() == MAX_IPFILTERS)
+			{
+				ConMsg( "addip: IP filter list is full (max %zd).\n", MAX_IPFILTERS );
+				g_IPFilterMutex.UnlockWrite();
+				return;
+			}
+
+			i = g_IPFilters.AddToTail();
+		}
+		else
+		{
+			// updating in-place, so don't kick people
+			bKick = false;
+		}
+	
+		if (banTime < 0.01)
+		{
+			banTime = 0.0;
 		}
 
-		i = g_IPFilters.AddToTail();
-	}
-	else
-	{
-		// updating in-place, so don't kick people
-		bKick = false;
-	}
-	
-	if (banTime < 0.01)
-	{
-		banTime = 0.0;
-	}
+		g_IPFilters[i].banTime = banTime;
+		// Time to unban.
+		g_IPFilters[i].banEndTime = ( banTime != 0.0 ) ? ( realtime + 60.0 * banTime ) : 0.0;
 
-	g_IPFilters[i].banTime = banTime;
-	// Time to unban.
-	g_IPFilters[i].banEndTime = ( banTime != 0.0 ) ? ( realtime + 60.0 * banTime ) : 0.0;
-
-	if ( !Filter_ConvertString( args[2], &g_IPFilters[i]) )
-	{
-		g_IPFilters[i].compare = 0xffffffff;
+		if ( !Filter_ConvertString( args[2], &g_IPFilters[i]) )
+		{
+			g_IPFilters[i].compare = 0xffffffff;
+		}
 	}
 
 	if ( bKick )
@@ -291,70 +305,73 @@ CON_COMMAND( removeip, "Remove an IP address from the ban list." )
 		return;
 	}
 
-	// if no "." in the string we'll assume it's a slot number
-	if ( !V_strstr( args[1], "." ) )
+	const char *arg = args[1];
+	bool removed = false;
+	char removedIP[32] = {0};
+	const char *eventIP = nullptr;
+
+	// RaphaelIT7: We scope it due to my preference to have it unlocked when firing the gameevent
+	//             to avoid any potential deadlocks if any code may add a filter inside the gameevent.
 	{
-		int slot = V_atoi( args[1] );
-		if ( slot <= 0 || slot > g_IPFilters.Count() )
+		AUTO_LOCK_WRITE( g_IPFilterMutex );
+
+		// if no "." in the string we'll assume it's a slot number
+		if ( !V_strstr( args[1], "." ) )
 		{
-			ConMsg( "removeip: Invalid slot %i\n", slot );
-			return;
-		}
-
-		// array access is zero based
-		byte b[4];
-		memcpy( b, &g_IPFilters[--slot].compare, sizeof(b) );
-
-		g_IPFilters.Remove( slot );
-		
-		char szIP[32];
-		V_sprintf_safe( szIP, "%i.%i.%i.%i", b[0], b[1], b[2], b[3] );
-		// Tell server operator
-		ConMsg( "removeip: Filter removed for %s, IP %s\n", args[1], szIP );
-
-		// send an event
-		IGameEvent *event = g_GameEventManager.CreateEvent( "server_removeban" );
-		if ( event )
-		{
-			event->SetString( "networkid", "" );
-			event->SetString( "ip", szIP );
-			event->SetString( "by", ( cmd_source == src_command ) ? "Console" : host_client->m_Name );
-
-			g_GameEventManager.FireEvent( event );
-		}
-
-		return;
-	}
-
-	ipfilter_t	f;
-	if ( !Filter_ConvertString( args[1], &f ) )
-		return;
-
-	for ( intp i = 0 ; i < g_IPFilters.Count() ; i++ )
-	{
-		if ( ( g_IPFilters[i].mask == f.mask ) &&
-			 ( g_IPFilters[i].compare == f.compare ) )
-		{
-			g_IPFilters.Remove(i);
-
-			ConMsg( "removeip: filter removed for %s\n", args[1] );
-
-			// send an event
-			IGameEvent *event = g_GameEventManager.CreateEvent( "server_removeban" );
-			if ( event )
+			int slot = V_atoi( args[1] );
+			if ( slot <= 0 || slot > g_IPFilters.Count() )
 			{
-				event->SetString( "networkid", "" );
-				event->SetString( "ip", args[1] );
-				event->SetString( "by", ( cmd_source == src_command ) ? "Console" : host_client->m_Name );
-
-				g_GameEventManager.FireEvent( event );
+				ConMsg( "removeip: Invalid slot %i\n", slot );
+				return;
 			}
 
+			// array access is zero based
+			byte b[4];
+			memcpy( b, &g_IPFilters[--slot].compare, sizeof(b) );
+
+			g_IPFilters.Remove( slot );
+		
+			V_sprintf_safe( removedIP, "%i.%i.%i.%i", b[0], b[1], b[2], b[3] );
+
+			removed = true;
+			eventIP = removedIP;
 			return;
+		}
+
+		ipfilter_t	f;
+		if ( !Filter_ConvertString( args[1], &f ) )
+			return;
+
+		for ( intp i = 0 ; i < g_IPFilters.Count() ; i++ )
+		{
+			if ( ( g_IPFilters[i].mask == f.mask ) &&
+				 ( g_IPFilters[i].compare == f.compare ) )
+			{
+				g_IPFilters.Remove(i);
+
+				removed = true;
+				eventIP = arg;
+				break;
+			}
 		}
 	}
 
-	ConMsg( "removeip: Couldn't find %s\n", args[1] );
+	if ( !removed )
+	{
+		ConMsg( "removeip: Couldn't find %s\n", arg );
+		return;
+	}
+
+	ConMsg( "removeip: Filter removed for %s\n", eventIP );
+
+	IGameEvent *event = g_GameEventManager.CreateEvent( "server_removeban" );
+	if ( event )
+	{
+		event->SetString( "networkid", "" );
+		event->SetString( "ip", eventIP );
+		event->SetString( "by", ( cmd_source == src_command ) ? "Console" : host_client->m_Name );
+		g_GameEventManager.FireEvent( event );
+	}
 }
 
 
@@ -363,6 +380,7 @@ CON_COMMAND( removeip, "Remove an IP address from the ban list." )
 //-----------------------------------------------------------------------------
 CON_COMMAND( listip, "List IP addresses on the ban list." )
 {
+	AUTO_LOCK_READ( g_IPFilterMutex );
 	const intp count = g_IPFilters.Count();
 	if ( !count )
 	{
@@ -409,6 +427,8 @@ CON_COMMAND( writeip, "Save the ban list to " BANNED_IP_FILENAME "." )
 
 	RunCodeAtScopeExit(g_pFileSystem->Close(f));
 	
+	AUTO_LOCK_READ( g_IPFilterMutex );
+
 	byte b[4];
 	for ( const auto &ipf : g_IPFilters )
 	{
