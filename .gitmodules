@@ -14,7 +14,6 @@
 	path = thirdparty/zlib
 	url = git@github.com:Source-Authors/zlib.git
 	ignore = dirty
-	ignore = dirty
 [submodule "thirdparty/libpng"]
 	path = thirdparty/libpng
 	url = git@github.com:Source-Authors/libpng.git
