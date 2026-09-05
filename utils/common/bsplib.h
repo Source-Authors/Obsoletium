@@ -284,8 +284,10 @@ bool ExtractZipFileFromBSP( char *pBSPFileName, char *pZipFileName );
 const char *		TexDataStringTable_GetString( intp stringID );
 intp					TexDataStringTable_AddOrFindString( const char *pString );
 
-void	DecompressVis (byte *in, byte *decompressed);
-int		CompressVis (byte *vis, byte *dest);
+// dimhotepus: byte* -> const byte*.
+void DecompressVis (const byte *in, byte *decompressed);
+// dimhotepus: int -> intp and byte* -> const byte*.
+[[nodiscard]] intp CompressVis (const byte *vis, byte *dest);
 
 // dimhotepus: Make stateless. Return header for open file. Call CloseBSPFile when done.
 [[nodiscard]] dheader_t* OpenBSPFile( const char *filename );

@@ -1447,11 +1447,10 @@ CompressVis
 
 ===============
 */
-int CompressVis (byte *vis, byte *dest)
+intp CompressVis (const byte *vis, byte *dest)
 {
 	byte *dest_p = dest;
-//	visrow = (r_numvisleafs + 7)>>3;
-	int visrow = (dvis->numclusters + 7)>>3;
+	const int visrow = (dvis->numclusters + 7)>>3;
 	
 	for (int j=0 ; j<visrow ; j++)
 	{
@@ -1480,15 +1479,10 @@ int CompressVis (byte *vis, byte *dest)
 DecompressVis
 ===================
 */
-void DecompressVis (byte *in, byte *decompressed)
+void DecompressVis (const byte *in, byte *decompressed)
 {
-	intp	c;
-	byte	*out;
-	int		row;
-
-//	row = (r_numvisleafs+7)>>3;	
-	row = (dvis->numclusters+7)>>3;	
-	out = decompressed;
+	const int row = (dvis->numclusters+7)>>3;
+	byte *out = decompressed;
 
 	do
 	{
@@ -1498,7 +1492,7 @@ void DecompressVis (byte *in, byte *decompressed)
 			continue;
 		}
 	
-		c = in[1];
+		intp c = in[1];
 		if (!c)
 			Error("Vis decompression: 0 repeat.\n");
 		in += 2;

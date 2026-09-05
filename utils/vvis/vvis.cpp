@@ -241,7 +241,7 @@ static int CompressAndCrosscheckClusterVis( int clusternum )
 			}
 		}
 	}
-	int numbytes = CompressVis( uncompressed, compressed );
+	intp numbytes = CompressVis( uncompressed, compressed );
 
 	byte *dest = vismap_p;
 	vismap_p += numbytes;
@@ -638,7 +638,7 @@ void CalcPAS (void)
 	//
 	// compress the bit string
 	//
-		int j = CompressVis (uncompressed, compressed);
+		intp j = CompressVis (uncompressed, compressed);
 
 		dest = (intp *)vismap_p;
 		vismap_p += j;
