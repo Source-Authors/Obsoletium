@@ -287,39 +287,41 @@ DBG_INTERFACE void  _SpewInfo( SpewType_t type, const tchar* pFile, int line )
 	s_SpewType = type;
 }
 
-// dimhotepus: Move large buffer to a global thing to reduce stack twiddling.
-static tchar g_SpewMessageBuffer[5020];
 
 static SpewRetval_t _SpewMessage( SpewType_t spewType, const char *pGroupName, int nLevel, const Color *pColor, const tchar* pMsgFormat, va_list args )
 {
+	tchar pTempBuffer[5020];
+
+	assert( _tcslen( pMsgFormat ) < sizeof( pTempBuffer) ); // check that we won't artifically truncate the string
+
 	/* Printf the file and line for warning + assert only... */
 	int len = 0;
 	if ( spewType == SPEW_ASSERT )
 	{
-		len = _sntprintf( g_SpewMessageBuffer, sizeof( g_SpewMessageBuffer ) - 1, _T("%s (%d) : "), s_pFileName, s_Line );
+		len = _sntprintf( pTempBuffer, sizeof( pTempBuffer ) - 1, _T("%s (%d) : "), s_pFileName, s_Line );
 	}
 
 	if ( len == -1 )
 		return SPEW_ABORT;
 	
 	/* Create the message.... */
-	int val= _vsntprintf( &g_SpewMessageBuffer[len], sizeof( g_SpewMessageBuffer ) - len - 1, pMsgFormat, args );
+	int val= _vsntprintf( &pTempBuffer[len], sizeof( pTempBuffer ) - len - 1, pMsgFormat, args );
 	if ( val == -1 )
 		return SPEW_ABORT;
 
 	len += val;
-	assert( len * sizeof(*pMsgFormat) < sizeof(g_SpewMessageBuffer) ); /* use normal assert here; to avoid recursion. */
+	assert( len * sizeof(*pMsgFormat) < sizeof(pTempBuffer) ); /* use normal assert here; to avoid recursion. */
 
 	// Add \n for warning and assert
 	// dimhotepus: Do not add \n twice if Assert already has one.
-	if ( spewType == SPEW_ASSERT && len > 0 && g_SpewMessageBuffer[len - 1] != '\n' )
+	if ( spewType == SPEW_ASSERT && len > 0 && pTempBuffer[len - 1] != '\n' )
 	{
 		// dimhotepus: Limit buffer size to ensure no overflow.
-		len += _sntprintf( &g_SpewMessageBuffer[len], sizeof( g_SpewMessageBuffer ) - 1, _T("\n") );
+		len += _sntprintf( &pTempBuffer[len], sizeof( pTempBuffer ) - 1, _T("\n") ); 
 	}
 	
-	assert( len < ssize(g_SpewMessageBuffer) - 1 ); /* use normal assert here; to avoid recursion. */
-	assert( GetSpewOutputFunc() );
+	assert( len < ssize(pTempBuffer) - 1 ); /* use normal assert here; to avoid recursion. */
+	assert( s_SpewOutputFunc );
 	
 	/* direct it to the appropriate target(s) */
 	SpewInfo_t spewInfo =
@@ -330,7 +332,7 @@ static SpewRetval_t _SpewMessage( SpewType_t spewType, const char *pGroupName, i
 	};
 	// dimhotepus: Allow recursive spew from spew by restoring old spew info.
 	auto pOldSpewInfo = std::exchange(g_pSpewInfo, &spewInfo);
-	SpewRetval_t ret = GetSpewOutputFunc()( spewType, g_SpewMessageBuffer );
+	SpewRetval_t ret = GetSpewOutputFunc()( spewType, pTempBuffer );
 	// dimhotepus: Allow recursive spew from spew by restoring old spew info.
 	std::exchange(g_pSpewInfo, pOldSpewInfo);
 
