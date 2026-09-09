@@ -541,11 +541,11 @@ inline SurfaceHandle_t SurfaceHandleFromIndex( int surfaceIndex, worldbrushdata_
 #if _DEBUG
 #define ASSERT_SURF_VALID(surfID) MSurf_Index(surfID)
 #else
-#define ASSERT_SURF_VALID(surfID)
+#define ASSERT_SURF_VALID(surfID) ((void)0)
 #endif
 
 inline unsigned int& MSurf_Flags( SurfaceHandle_t surfID )
-{
+{    
 	return surfID->flags;
 }
 
