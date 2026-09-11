@@ -511,7 +511,7 @@ void SplitFileComponents( char const *pFileName, char (&pDirOut)[MAX_PATH], char
 	if ( pDot )
 	{
 		*pDot = 0;
-		V_strncpy( pExtOut, pDot+1, MAX_PATH );
+		V_strcpy_safe( pExtOut, pDot+1 );
 	}
 	else
 	{
@@ -572,9 +572,8 @@ CPackedStoreFileHandle CPackedStore::OpenFile( char const *pFileName )
 	// Fix up the filename first
 	char tempFileName[MAX_PATH];
 
-	V_strncpy( tempFileName, pFileName, sizeof( tempFileName ) );
-	V_FixSlashes( tempFileName, CORRECT_PATH_SEPARATOR );
-//	V_RemoveDotSlashes( tempFileName, CORRECT_PATH_SEPARATOR, true );
+	V_strcpy_safe( tempFileName, pFileName );
+	V_FixSlashes( tempFileName );
 	V_FixDoubleSlashes( tempFileName );
 	if ( !V_IsAbsolutePath( tempFileName ) )
 	{
@@ -1997,7 +1996,7 @@ intp CPackedStore::GetFileAndDirLists( const char *pWildCard, CUtlStringList &ou
 				bool bExtMatch = false;
 
 				// Copy everything to the right of the root directory
-				V_strncpy( szSubDir, &m_directoryList[i][nLenWildcardPath], sizeof( szSubDir ) );
+				V_strcpy_safe( szSubDir, &m_directoryList[i][nLenWildcardPath] );
 
 				// Set the next / to NULL and we have our subdirectory
 				char *pSlash = strchr( szSubDir, '/' );
@@ -2028,7 +2027,7 @@ intp CPackedStore::GetFileAndDirLists( const char *pWildCard, CUtlStringList &ou
 				{
 					char szFullPathToDir[ MAX_PATH ];
 
-					V_strncpy( szFullPathToDir, szWildCardPath, nLenWildcardPath );
+					V_strcpy_safe( szFullPathToDir, szWildCardPath );
 					V_strcat_safe( szFullPathToDir, "/" );
 					// V_strcat_safe( szFullPathToDir, CORRECT_PATH_SEPARATOR_S );
 					V_strcat_safe( szFullPathToDir, szSubDir );
