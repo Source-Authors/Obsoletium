@@ -354,9 +354,8 @@ bool CL_CheckCRCs( const char *pszMap )
 	{
 		// Does the file exist?
 		FileHandle_t fp = FILESYSTEM_INVALID_HANDLE;
-		int nSize = COM_OpenFile( pszMap, &fp );
-		if ( fp )
-			RunCodeAtScopeExit(g_pFileSystem->Close(fp));
+		const int nSize{COM_OpenFile( pszMap, &fp )};
+		if (fp) g_pFileSystem->Close(fp);
 
 		if ( nSize != -1 )
 		{
