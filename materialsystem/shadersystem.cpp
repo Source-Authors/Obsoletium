@@ -249,8 +249,8 @@ void CShaderSystem::Init()
 	m_SaveSpewOutput = NULL;
 	
 	m_bForceUsingGraphicsReturnTrue = false;
-	if ( CommandLine()->FindParm( "-noshaderapi" ) ||
-		 CommandLine()->FindParm( "-makereslists" ) )
+	if ( CommandLine()->HasParm( "-noshaderapi" ) ||
+		 CommandLine()->HasParm( "-makereslists" ) )
 	{
 		m_bForceUsingGraphicsReturnTrue = true;
 	}
@@ -351,7 +351,7 @@ void CShaderSystem::LoadAllShaderDLLs( )
 
 #ifdef _DEBUG
 	// For fast-iteration debugging
-	if ( CommandLine()->FindParm( "-testshaders" ) )
+	if ( CommandLine()->HasParm( "-testshaders" ) )
 	{
 		LoadShaderDLL( "shader_test" DLL_EXT_STRING );
 	}
@@ -682,7 +682,7 @@ void CShaderSystem::SetupShaderDictionary( intp nShaderDLLIndex )
 		const char *pShaderName = pShader->GetName();
 
 #ifdef POSIX
-		if (CommandLine()->FindParm("-glmspew"))
+		if (CommandLine()->HasParm("-glmspew"))
 			printf("CShaderSystem::SetupShaderDictionary: %s", pShaderName );
 #endif
 		

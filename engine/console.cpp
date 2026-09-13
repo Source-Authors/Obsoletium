@@ -88,7 +88,7 @@ void ConsoleLogFileCallback( IConVar *var, const char *pOldValue, float flOldVal
 	
 	if ( !COM_IsValidPath( logFile ) )
 	{
-		con_debuglog = CommandLine()->FindParm( "-condebug" ) != 0;
+		con_debuglog = CommandLine()->HasParm( "-condebug" );
 	}
 	else
 	{
@@ -236,8 +236,8 @@ void Con_ShowConsole_f()
 	// make sure we're allowed to see the console
 	if ( con_enable.GetBool() ||
 		developer.GetInt() ||
-		CommandLine()->CheckParm("-console") ||
-		CommandLine()->CheckParm("-rpt") )
+		CommandLine()->HasParm("-console") ||
+		CommandLine()->HasParm("-rpt") )
 	{
 		// show the console
 		EngineVGui()->ShowConsole();
@@ -371,13 +371,13 @@ void Con_Init()
 		con_logfile.SetValue( filename );
 	}
 #else
-	bool bRPTClient = ( CommandLine()->FindParm( "-rpt" ) != 0 );
-	con_debuglog = bRPTClient || ( CommandLine()->FindParm( "-condebug" ) != 0 );
-	con_debuglogmapprefixed = CommandLine()->FindParm( "-makereslists" ) != 0;
+	bool bRPTClient = CommandLine()->HasParm( "-rpt" );
+	con_debuglog = bRPTClient || CommandLine()->HasParm( "-condebug" );
+	con_debuglogmapprefixed = CommandLine()->HasParm( "-makereslists" );
 	if ( con_debuglog )
 	{
 		con_logfile.SetValue( "console.log" );
-		if ( bRPTClient || ( CommandLine()->FindParm( "-conclearlog" ) ) )
+		if ( bRPTClient || ( CommandLine()->HasParm( "-conclearlog" ) ) )
 		{
 			GetConsoleLogManager().RemoveConsoleLogFile();
 		}

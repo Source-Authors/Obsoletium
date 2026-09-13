@@ -325,7 +325,7 @@ void CFileSystem_Steam::Shutdown()
 	TSteamError steamError;
 
 	// If we're not running Steam in local mode, remove all mount points from the STEAM VFS.
-	if ( !CommandLine()->CheckParm("-steamlocal") && !m_bSelfMounted && !steam->UnmountAppFilesystem(&steamError) )
+	if ( !CommandLine()->HasParm("-steamlocal") && !m_bSelfMounted && !steam->UnmountAppFilesystem(&steamError) )
 	{
 #ifdef WIN32
 		OutputDebugString(steamError.szDesc);

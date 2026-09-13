@@ -2281,7 +2281,7 @@ void Mod_LoadCubemapSamples( void )
 	}
 	else
 	{
-		if ( CommandLine()->CheckParm( "-requirecubemaps" ) )
+		if ( CommandLine()->HasParm( "-requirecubemaps" ) )
 		{
 			Sys_Error( "Map \"%s\" does not have cubemaps!", lh.GetMapName() );
 		}
@@ -5213,7 +5213,7 @@ bool CModelLoader::Map_IsValid( char const *pMapFile, bool bQuiet /* = false */ 
 	}
 
 	// Get outta here if we are checking vidmemstats.
-	if ( CommandLine()->CheckParm( "-dumpvidmemstats" ) )
+	if ( CommandLine()->HasParm( "-dumpvidmemstats" ) )
 	{
 		Cbuf_AddText( "quit\n" );
 	}

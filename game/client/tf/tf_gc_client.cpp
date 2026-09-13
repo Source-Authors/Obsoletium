@@ -73,7 +73,7 @@ static bool BPingDebug() { return tf_datacenter_ping_debug.GetBool(); }
 // Allow disabling for staging. Will only send dummy values set by the overrides above
 #ifdef TF_GC_PING_DEBUG
 #include "tier0/icommandline.h"
-static bool BUseSteamDatagram() { return !CommandLine()->CheckParm("-nosteamdatagram" ); }
+static bool BUseSteamDatagram() { return !CommandLine()->HasParm("-nosteamdatagram" ); }
 #else
 static bool BUseSteamDatagram() { return true; }
 #endif

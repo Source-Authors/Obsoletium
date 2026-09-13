@@ -415,7 +415,7 @@ public:
 
 	void UpdateMenuItemState( bool isInGame, bool isMultiplayer, bool isInReplay, bool isVREnabled, bool isVRActive )
 	{
-		bool isSteam = CommandLine()->FindParm("-steam") != 0;
+		bool isSteam = CommandLine()->HasParm("-steam");
 
 		// disabled save button if we're not in a game
 		for (int i = 0; i < GetChildCount(); i++)

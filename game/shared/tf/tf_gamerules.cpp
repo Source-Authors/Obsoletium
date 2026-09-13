@@ -3120,7 +3120,7 @@ CTFGameRules::CTFGameRules()
 	// Vision Filter Translations for swapping out particle effects and models
 	SetUpVisionFilterKeyValues();
 
-	m_bSillyGibs = CommandLine()->FindParm( "-sillygibs" ) ? true : false;
+	m_bSillyGibs = CommandLine()->HasParm( "-sillygibs" );
 	if ( m_bSillyGibs )
 	{
 		cl_burninggibs.SetValue( 0 );

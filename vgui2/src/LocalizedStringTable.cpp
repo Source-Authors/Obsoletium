@@ -411,11 +411,7 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 			bEnglishFile = true;
 		}
 
-		bool spew = false;
-		if ( CommandLine()->FindParm( "-ccsyntax" ) )
-		{
-			spew = true;
-		}
+		bool spew = CommandLine()->HasParm( "-ccsyntax" );
 
 		BuildFastValueLookup();
 

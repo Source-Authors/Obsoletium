@@ -387,7 +387,7 @@ void FileOpenStateMachine::SaveFile( KeyValues *pContextKeyValues, const char *p
 	m_OpenFileName = NULL;
 
 	// Clear the P4 dialog flag for SDK users and licensees without Perforce
-	if ( CommandLine()->FindParm( "-nop4" ) )
+	if ( CommandLine()->HasParm( "-nop4" ) )
 	{
 		nFlags &= ~FOSM_SHOW_PERFORCE_DIALOGS;
 	}

@@ -784,7 +784,7 @@ public:
 					break;
 				case IDC_MODELTAB_LOAD:
 					{
-						if ( ! CommandLine()->FindParm( "-NoSteamDialog" ) )
+						if ( ! CommandLine()->HasParm( "-NoSteamDialog" ) )
 						{
 							g_MDLViewer->LoadModel_Steam();
 						}
@@ -1714,7 +1714,7 @@ int MDLViewer::handleEvent (mxEvent *event)
 			
 			case IDC_FILE_LOADMODEL:
 				{
-					if ( ! CommandLine()->FindParm( "-NoSteamDialog" ) )
+					if ( ! CommandLine()->HasParm( "-NoSteamDialog" ) )
 					{
 						g_MDLViewer->LoadModel_Steam();
 					}
@@ -2591,7 +2591,7 @@ bool CHLFacePoserApp::PreInit( )
 	}
 
 	int adapterFlags = MATERIAL_INIT_ALLOCATE_FULLSCREEN_TEXTURE;
-	if ( CommandLine()->CheckParm( "-ref" ) )
+	if ( CommandLine()->HasParm( "-ref" ) )
 	{
 		adapterFlags |= MATERIAL_INIT_REFERENCE_RASTERIZER;
 	}
@@ -2624,7 +2624,7 @@ int CHLFacePoserApp::Main()
 {
 	// Do Perforce Stuff
 	g_p4factory->SetDummyMode( false );
-	if ( CommandLine()->FindParm( "-nop4" ) || !p4 )
+	if ( CommandLine()->HasParm( "-nop4" ) || !p4 )
 	{
 		g_p4factory->SetDummyMode( true );
 	}

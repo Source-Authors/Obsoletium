@@ -1752,7 +1752,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 	bool CMultiplayRules::IsLoadingBugBaitReport()
 	{
-		return ( !engine->IsDedicatedServer()&& CommandLine()->CheckParm( "-bugbait" ) && sv_cheats->GetBool() );
+		return ( !engine->IsDedicatedServer() && CommandLine()->HasParm( "-bugbait" ) && sv_cheats->GetBool() );
 	}
 
 	void CMultiplayRules::HaveAllPlayersSpeakConceptIfAllowed( int iConcept, int iTeam /* = TEAM_UNASSIGNED */, const char *modifiers /* = NULL */ )

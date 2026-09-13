@@ -53,13 +53,13 @@ void GLMRendererInfo::Init( GLMRendererInfoFields *info )
         m_info.m_hasNativeClipVertexMode = true;
 
         // if user disabled them
-        if (CommandLine()->FindParm("-glmdisableclipplanes"))
+        if (CommandLine()->HasParm("-glmdisableclipplanes"))
         {
                 m_info.m_hasNativeClipVertexMode = false;
         }
         
         // or maybe enabled them..
-        if (CommandLine()->FindParm("-glmenableclipplanes"))
+        if (CommandLine()->HasParm("-glmenableclipplanes"))
         {
                 m_info.m_hasNativeClipVertexMode = true;
         }
@@ -95,7 +95,7 @@ void GLMRendererInfo::Init( GLMRendererInfoFields *info )
         //-------------------------------------------------------------------
         // runtime options that aren't negotiable once set
 
-        m_info.m_hasDualShaders = CommandLine()->FindParm("-glmdualshaders") != 0;
+        m_info.m_hasDualShaders = CommandLine()->HasParm("-glmdualshaders");
 
         //-------------------------------------------------------------------
         // "can'ts "
@@ -107,11 +107,11 @@ void GLMRendererInfo::Init( GLMRendererInfoFields *info )
         m_info.m_cantBlitReliably = false;
 #endif
                 
-        if (CommandLine()->FindParm("-glmenabletrustblit"))
+        if (CommandLine()->HasParm("-glmenabletrustblit"))
         {
                 m_info.m_cantBlitReliably = false;                      // we trust the blit, so set the cant-blit cap to false
         }
-        if (CommandLine()->FindParm("-glmdisabletrustblit"))
+        if (CommandLine()->HasParm("-glmdisabletrustblit"))
         {
                 m_info.m_cantBlitReliably = true;                       // we do not trust the blit, so set the cant-blit cap to true
         }

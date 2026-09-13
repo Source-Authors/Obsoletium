@@ -52,7 +52,7 @@ IHudLCD *hudlcd = &gLCD;
 
 CON_COMMAND( g15_reload, "Reloads the Logitech G-15 Keyboard configs." )
 {
-	if ( !CommandLine()->FindParm( "-g15" ) )
+	if ( !CommandLine()->HasParm( "-g15" ) )
 	{
 		Msg( "Must run with -g15 to enable support for the LCD Keyboard\n" );
 		return;
@@ -63,7 +63,7 @@ CON_COMMAND( g15_reload, "Reloads the Logitech G-15 Keyboard configs." )
 
 CON_COMMAND( g15_dumpplayer, "Spew player data." )
 {
-	if ( !CommandLine()->FindParm( "-g15" ) )
+	if ( !CommandLine()->HasParm( "-g15" ) )
 	{
 		Msg( "Must run with -g15 to enable support for the LCD Keyboard\n" );
 		return;
@@ -170,7 +170,7 @@ void CLCD::Reload()
 ///------------------------------------------------------------------------------
 void CLCD::Init( void )
 {
-	if ( !CommandLine()->FindParm( "-g15" ) )
+	if ( !CommandLine()->HasParm( "-g15" ) )
 		return;
 
 	if ( m_lcd ) 

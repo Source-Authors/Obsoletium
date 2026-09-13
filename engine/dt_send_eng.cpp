@@ -933,7 +933,7 @@ bool SendTable_Init( SendTable **pTables, int nTables )
 
 	g_SendTableCRC = SendTable_ComputeCRC( );
 
-	if ( CommandLine()->FindParm("-dti" ) )
+	if ( CommandLine()->HasParm("-dti" ) )
 	{
 		SendTable_PrintStats();
 	}

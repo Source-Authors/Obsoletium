@@ -425,8 +425,8 @@ void ProcessPaintKitKeyValuesFiles( const CUtlVector< CUtlSymbol > &workList )
 	// This bit of hackery allows us to access files on the harddrive
 	g_pFullFileSystem->AddSearchPath( "", "LOCAL", PATH_ADD_TO_HEAD );
 
-	const bool bOptFix = CommandLine()->CheckParm( "-f" ) != nullptr;
-	const bool bOptVerbose = CommandLine()->CheckParm( "-v" ) != nullptr;
+	const bool bOptFix = CommandLine()->HasParm( "-f" );
+	const bool bOptVerbose = CommandLine()->HasParm( "-v" );
 
 	for ( int i = 0; i < workList.Count(); ++i )
 	{

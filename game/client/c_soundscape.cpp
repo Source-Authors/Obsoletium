@@ -843,7 +843,7 @@ Vector C_SoundscapeSystem::GenerateRandomSoundPosition()
 
 void C_SoundscapeSystem::TouchSoundFiles()
 {
-	if ( !CommandLine()->FindParm( "-makereslists" ) )
+	if ( !CommandLine()->HasParm( "-makereslists" ) )
 		return;
 
 	intp c = m_soundscapes.Count();

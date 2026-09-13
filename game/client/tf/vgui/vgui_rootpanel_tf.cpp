@@ -57,7 +57,7 @@ void CheckCustomModSearchPaths()
 	}
 
 	// only allow to load loose files when using insecure mode
-	if ( CommandLine()->FindParm( "-insecure" ) )
+	if ( CommandLine()->HasParm( "-insecure" ) )
 	{
 		// allow lose files in these search paths
 		g_pFullFileSystem->AddSearchPath( "tf", "vgui" );

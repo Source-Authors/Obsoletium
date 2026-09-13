@@ -83,7 +83,7 @@ static int g_nRptServerSlot = -1;
 
 CON_COMMAND_F( rpt_password, "", FCVAR_DONTRECORD | FCVAR_HIDDEN )
 {
-	if ( CommandLine()->FindParm( "-rpt" ) == 0 )
+	if ( !CommandLine()->HasParm( "-rpt" ) )
 	{
 		ConMsg( "This command will not work unless the game is launched with -rpt\n" );
 		return;
@@ -363,7 +363,7 @@ CON_COMMAND_F( rpt_server_enable, "", FCVAR_DONTRECORD | FCVAR_HIDDEN | FCVAR_CL
 // when another client tries to connect
 CON_COMMAND_F( rpt_connect, "", FCVAR_DONTRECORD | FCVAR_HIDDEN | FCVAR_SERVER_CAN_EXECUTE )
 {
-	if ( CommandLine()->FindParm( "-rpt" ) == 0 )
+	if ( !CommandLine()->HasParm( "-rpt" ) )
 		return;
 
 	if ( args.ArgC() != 4 )

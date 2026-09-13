@@ -713,7 +713,7 @@ bool KeyValues::LoadFromFile( IBaseFileSystem *filesystem, const char *resourceN
 #endif
 
 #ifdef STAGING_ONLY
-	static bool s_bCacheEnabled = !!CommandLine()->FindParm( "-enable_keyvalues_cache" );
+	static bool s_bCacheEnabled = CommandLine()->HasParm( "-enable_keyvalues_cache" );
 	const bool bUseCache = s_bCacheEnabled && ( s_pfGetSymbolForString == KeyValues::GetSymbolForStringClassic );
 #else
 	/*

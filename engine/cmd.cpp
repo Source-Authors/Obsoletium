@@ -450,7 +450,7 @@ static char const *Cmd_TranslateFileAssociation(char const *param )
 	for ( const auto &info : g_FileAssociations )
 	{
 		if ( ! Q_strcmp( extension, info.extension+1 ) && 
-			 ! CommandLine()->FindParm(va( "+%s", info.command_to_issue ) ) )
+			 ! CommandLine()->HasParm(va( "+%s", info.command_to_issue ) ) )
 		{
 			// Translate if haven't already got one of these commands
 			V_strcpy_safe( sz, temp );
@@ -1057,7 +1057,7 @@ const ConCommandBase *Cmd_ExecuteCommand( const CCommand &command, cmd_source_t 
 	}
 
 	// Bail out before we update convars if we're runnign in default mode.
-	if ( pCommand && src == src_command && CommandLine()->CheckParm( "-default" ) && !pCommand->IsFlagSet( FCVAR_EXEC_DESPITE_DEFAULT ) )
+	if ( pCommand && src == src_command && CommandLine()->HasParm( "-default" ) && !pCommand->IsFlagSet( FCVAR_EXEC_DESPITE_DEFAULT ) )
 	{
 		Msg( "Ignoring cvar \"%s\" due to -default on command line\n", pCommand->GetName() );
 		return NULL;

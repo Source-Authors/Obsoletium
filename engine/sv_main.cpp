@@ -622,7 +622,7 @@ void SetupMaxPlayers( int iDesiredMaxPlayers )
 	}
 
 #if defined( REPLAY_ENABLED )
-	if ( Replay_IsSupportedModAndPlatform() && CommandLine()->CheckParm( "-replay" ) )
+	if ( Replay_IsSupportedModAndPlatform() && CommandLine()->HasParm( "-replay" ) )
 	{
 		newmaxplayers += 1;
 		sv.m_nMaxClientsLimit += 1;
@@ -816,7 +816,7 @@ void SV_InitGameDLL( void )
 		Host_Error("IDLLFunctions::DLLInit returned false.\n");
 	}
 
-	if ( CommandLine()->FindParm( "-NoLoadPluginsForClient" ) == 0 )
+	if ( !CommandLine()->HasParm( "-NoLoadPluginsForClient" ) )
 		g_pServerPluginHandler->LoadPlugins(); // load 3rd party plugins
 	
 
@@ -2137,7 +2137,7 @@ bool SV_ActivateServer()
 	// HLTV setup
 	if ( tv_enable.GetBool() )
 	{
-		if ( CommandLine()->FindParm("-nohltv") )
+		if ( CommandLine()->HasParm("-nohltv") )
 		{
 			// let user know that SourceTV will not work
 			ConMsg ("SourceTV is disabled on this server.\n");
@@ -2275,7 +2275,7 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 {
 	Assert( serverGameClients );
 
-	if ( CommandLine()->FindParm( "-NoLoadPluginsForClient" ) != 0 )
+	if ( CommandLine()->HasParm( "-NoLoadPluginsForClient" ) )
 	{
 		if ( !m_bLoadedPlugins )
 		{
@@ -2438,7 +2438,7 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 	g_pFileSystem->BeginMapAccess();
 	RunCodeAtScopeExit(g_pFileSystem->EndMapAccess());
 
-	if ( !CommandLine()->FindParm( "-allowstalezip" ) )
+	if ( !CommandLine()->HasParm( "-allowstalezip" ) )
 	{
 		if ( g_pFileSystem->FileExists( "stale.txt", "GAME" ) )
 		{

@@ -626,7 +626,7 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 	if ( (scenefilecache = (ISceneFileCache *)appSystemFactory( SCENE_FILE_CACHE_INTERFACE_VERSION, NULL )) == NULL )
 		return false;
 
-	if ( !CommandLine()->CheckParm( "-noscripting") )
+	if ( !CommandLine()->HasParm( "-noscripting") )
 	{
 		if ( (scriptmanager = (IScriptManager *)appSystemFactory( VSCRIPT_INTERFACE_VERSION, NULL )) == NULL )
 			return false;
@@ -846,9 +846,9 @@ float CServerGameDLL::GetTickInterval( void ) const
 // HPE_END
 //=============================================================================
 	// override if tick rate specified in command line
-	if ( CommandLine()->CheckParm( "-tickrate" ) )
+	if ( const char *tickRate; CommandLine()->CheckParm( "-tickrate", &tickRate ) )
 	{
-		float tickrate = CommandLine()->ParmValue( "-tickrate", 0 );
+		float tickrate = V_atof( tickRate );
 		if ( tickrate > 10 )
 			tickinterval = 1.0f / tickrate;
 	}

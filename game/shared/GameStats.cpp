@@ -695,8 +695,8 @@ bool CBaseGameStats_Driver::Init()
 	Q_strncpy( s_szStatUploadRegistryKeyName, "GameStatsUpload_", sizeof( s_szStatUploadRegistryKeyName ) );
 	Q_strncat( s_szStatUploadRegistryKeyName, szLoweredGameDir, sizeof( s_szStatUploadRegistryKeyName ) );
 
-	gamestats->m_bLoggingToFile = CommandLine()->FindParm( "-gamestatsloggingtofile" ) ? true : false;
-	gamestats->m_bLogging = CommandLine()->FindParm( "-gamestatslogging" ) ? true : false;
+	gamestats->m_bLoggingToFile = CommandLine()->HasParm( "-gamestatsloggingtofile" );
+	gamestats->m_bLogging = CommandLine()->HasParm( "-gamestatslogging" );
 
 	if ( gamestatsuploader )
 	{
@@ -1055,7 +1055,7 @@ void CBaseGameStats_Driver::SendData()
 	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	m_pGamestatsData->m_pKVData->RecursiveSaveToFile( buf, 0 );
 
-	if ( CommandLine()->FindParm( "-gamestatsfileoutputonly" ) )
+	if ( CommandLine()->HasParm( "-gamestatsfileoutputonly" ) )
 	{
 		// write file for debugging
 		const char szFileName[] = "gamestats.dat";

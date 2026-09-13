@@ -586,7 +586,7 @@ void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, c
 
 			pCaps->m_bSupportsStaticControlFlow = false;
 
-			if (1)	//(CommandLine()->FindParm("-glslmode"))
+			if (1)	//(CommandLine()->HasParm("-glslmode"))
 			{
 				// rbarris 03Feb10: this is now hardwired because we are defaulting GLSL mode "on".
 				// so this will mean that the engine will always ask for user clip planes.
@@ -632,11 +632,11 @@ void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, c
 		{
 			if ( IsOSX() )
 			{
-				pCaps->m_bSupportsStaticControlFlow = CommandLine()->CheckParm( "-glslcontrolflow" ) != NULL;
+				pCaps->m_bSupportsStaticControlFlow = CommandLine()->HasParm( "-glslcontrolflow" );
 			}
 			else
 			{
-				pCaps->m_bSupportsStaticControlFlow = !CommandLine()->CheckParm( "-noglslcontrolflow" );
+				pCaps->m_bSupportsStaticControlFlow = !CommandLine()->HasParm( "-noglslcontrolflow" );
 			}
 
 			pCaps->m_MaxUserClipPlanes = 2;
@@ -965,7 +965,7 @@ bool CHardwareConfig::HasFastVertexTextures() const
 	if ( bEnableFastVertexTextures < 0 )
 	{
 		bEnableFastVertexTextures = 1;
-		if ( CommandLine()->FindParm( "-disallowhwmorph" ) )
+		if ( CommandLine()->HasParm( "-disallowhwmorph" ) )
 		{
 			bEnableFastVertexTextures = 0;
 		}

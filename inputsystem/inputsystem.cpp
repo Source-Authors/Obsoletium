@@ -101,7 +101,7 @@ CInputSystem::CInputSystem()
 #endif
 
 	m_bConsoleTextMode = false;
-	m_bSkipControllerInitialization = CommandLine()->CheckParm( "-nosteamcontroller" );
+	m_bSkipControllerInitialization = CommandLine()->HasParm( "-nosteamcontroller" );
 
 	static_assert( (MAX_JOYSTICKS + 7) >> 3 < sizeof(unsigned short) );
 }

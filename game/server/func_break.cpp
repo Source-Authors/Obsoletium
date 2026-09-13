@@ -457,7 +457,7 @@ void CBreakable::Precache( void )
 	m_iszModelName = MAKE_STRING( pGibName );
 
 	// Precache the spawn item's data
-	if ( !CommandLine()->CheckParm("-makereslists"))
+	if ( !CommandLine()->HasParm("-makereslists"))
 	{
 		if ( m_iszSpawnObject != NULL_STRING )
 		{

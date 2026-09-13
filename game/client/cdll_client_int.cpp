@@ -917,14 +917,14 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	InitFbx();
 #endif
 
-	if ( !CommandLine()->CheckParm( "-noscripting") )
+	if ( !CommandLine()->HasParm( "-noscripting") )
 	{
 		if ( (scriptmanager = (IScriptManager *)appSystemFactory( VSCRIPT_INTERFACE_VERSION, NULL )) == NULL )
 			return false;
 	}
 
 	// it's ok if this is NULL. That just means the sourcevr.dll wasn't found
-	if ( CommandLine()->CheckParm( "-vr" ) )
+	if ( CommandLine()->HasParm( "-vr" ) )
 		g_pSourceVR = (ISourceVirtualReality *)appSystemFactory(SOURCE_VIRTUAL_REALITY_INTERFACE_VERSION, NULL);
 
 	factorylist_t factories = {};
@@ -938,10 +938,10 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 		return false;
 	}
 
-	if ( CommandLine()->FindParm( "-textmode" ) )
+	if ( CommandLine()->HasParm( "-textmode" ) )
 		g_bTextMode = true;
 
-	if ( CommandLine()->FindParm( "-makedevshots" ) )
+	if ( CommandLine()->HasParm( "-makedevshots" ) )
 		g_MakingDevShots = true;
 
 	// Not fatal if the material system stub isn't around.

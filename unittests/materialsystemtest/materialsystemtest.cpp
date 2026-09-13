@@ -255,7 +255,7 @@ bool CMaterialSystemTestApp::PreInit( )
 	const char *pArg;
 	int iWidth = 1024;
 	int iHeight = 768;
-	bool bWindowed = (CommandLine()->CheckParm( "-fullscreen" ) == NULL);
+	bool bWindowed = !CommandLine()->HasParm( "-fullscreen" );
 	if (CommandLine()->CheckParm( "-width", &pArg ))
 	{
 		iWidth = atoi( pArg );
@@ -320,7 +320,7 @@ bool CMaterialSystemTestApp::WaitForKeypress()
 bool CMaterialSystemTestApp::SetMode()
 {
 	MaterialSystem_Config_t config;
-	if ( CommandLine()->CheckParm( "-fullscreen" ) )
+	if ( CommandLine()->HasParm( "-fullscreen" ) )
 	{
 		config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, false );
 	}
@@ -329,12 +329,12 @@ bool CMaterialSystemTestApp::SetMode()
 		config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, true );
 	}
 
-	if ( CommandLine()->CheckParm( "-resizing" ) )
+	if ( CommandLine()->HasParm( "-resizing" ) )
 	{
 		config.SetFlag( MATSYS_VIDCFG_FLAGS_RESIZING, true );
 	}
 
-	if ( CommandLine()->CheckParm( "-mat_vsync" ) )
+	if ( CommandLine()->HasParm( "-mat_vsync" ) )
 	{
 		config.SetFlag( MATSYS_VIDCFG_FLAGS_NO_WAIT_FOR_VSYNC, false );
 	}

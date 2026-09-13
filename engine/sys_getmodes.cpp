@@ -958,7 +958,7 @@ void CVideoMode_Common::DrawStartupGraphic()
 
 void CVideoMode_Common::InvalidateWindow()
 {
-    if ( CommandLine()->FindParm( "-noshaderapi" ) )
+    if ( CommandLine()->HasParm( "-noshaderapi" ) )
     {
 #if defined( USE_SDL )
 		SDL_Event fake;
@@ -979,7 +979,7 @@ void CVideoMode_Common::DrawNullBackground( void *hHDC, int w, int h )
     HDC hdc = (HDC)hHDC;
 
     // Show a message if running without renderer..
-    if ( CommandLine()->FindParm( "-noshaderapi" ) )
+    if ( CommandLine()->HasParm( "-noshaderapi" ) )
     {
         HFONT fnt = CreateFontA( -18, 
          0,
@@ -1933,7 +1933,7 @@ bool CVideoMode_MaterialSystem::Init( )
     int bitsperpixel = 32;
 
     bool bAllowSmallModes = false;
-    if ( CommandLine()->FindParm( "-small" ) )
+    if ( CommandLine()->HasParm( "-small" ) )
     {
         bAllowSmallModes = true;
     }

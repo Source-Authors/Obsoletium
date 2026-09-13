@@ -3720,7 +3720,7 @@ void CDmxEdit::Error( const tchar *pMsgFormat, ... )
 	fflush( stderr );
 	va_end(args);
 
-	if ( CommandLine()->FindParm( "-coe" ) || CommandLine()->FindParm( "-continueOnError" ) )
+	if ( CommandLine()->HasParm( "-coe" ) || CommandLine()->HasParm( "-continueOnError" ) )
 		return;
 
 	if ( Plat_IsInDebugSession() )

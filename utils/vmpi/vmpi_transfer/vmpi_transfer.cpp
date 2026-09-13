@@ -145,7 +145,7 @@ int main( int argc, char **argv )
 	CommandLine()->CreateCmdLine( argc, argv );
 
 	int ret;
-	if ( CommandLine()->FindParm( "-PatchHost" ) == 0 )
+	if ( !CommandLine()->HasParm( "-PatchHost" ) )
 	{
 		ret = RunVMPITransferWorker( argc, argv );
 	}

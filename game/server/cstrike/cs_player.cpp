@@ -947,7 +947,7 @@ void CCSPlayer::ShowViewPortPanel( const char * name, bool bShow, KeyValues *dat
 	if ( CSGameRules()->IsLogoMap() )
 		return;
 
-	if ( CommandLine()->FindParm("-makedevshots") )
+	if ( CommandLine()->HasParm("-makedevshots") )
 		return;
 
 	BaseClass::ShowViewPortPanel( name, bShow, data );
@@ -5287,7 +5287,7 @@ void CCSPlayer::State_Enter_WELCOME()
 	// Show info panel (if it's not a simple demo map).
 	if ( !CSGameRules()->IsLogoMap() )
 	{
-		if ( CommandLine()->FindParm( "-makereslists" ) ) // don't show the MOTD when making reslists
+		if ( CommandLine()->HasParm( "-makereslists" ) ) // don't show the MOTD when making reslists
 		{
 			engine->ClientCommand( edict(), "jointeam 3\n" );
 		}
@@ -5514,7 +5514,7 @@ void CCSPlayer::State_PreThink_OBSERVER_MODE()
 
 void CCSPlayer::State_Enter_PICKINGCLASS()
 {
-	if ( CommandLine()->FindParm( "-makereslists" ) ) // don't show the menu when making reslists
+	if ( CommandLine()->HasParm( "-makereslists" ) ) // don't show the menu when making reslists
 	{
 		engine->ClientCommand( edict(), "joinclass 0\n" );
 		return;

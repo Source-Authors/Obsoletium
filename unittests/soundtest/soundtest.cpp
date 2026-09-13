@@ -247,7 +247,7 @@ bool CSoundTestApp::PreInit( )
 	const char *pArg;
 	int iWidth = 1024;
 	int iHeight = 768;
-	bool bWindowed = (CommandLine()->CheckParm( "-fullscreen" ) == NULL);
+	bool bWindowed = !CommandLine()->HasParm( "-fullscreen" );
 	if (CommandLine()->CheckParm( "-width", &pArg ))
 	{
 		iWidth = atoi( pArg );

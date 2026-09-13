@@ -100,16 +100,16 @@ bool BootAppSystemGroup::Create() {
   AddSystem(file_system_module, QUEUEDLOADER_INTERFACE_VERSION);
 
   // Hook in datamodel and p4 control if we're running with -tools
-  if ((command_line_->FindParm("-tools") &&
-       !command_line_->FindParm("-nop4")) ||
-      command_line_->FindParm("-p4")) {
+  if ((command_line_->HasParm("-tools") &&
+       !command_line_->HasParm("-nop4")) ||
+      command_line_->HasParm("-p4")) {
 #ifdef STAGING_ONLY
     AppModule_t p4libModule{LoadModule("p4lib" DLL_EXT_STRING)};
     IP4 *p4{AddSystem<IP4>(p4libModule, P4_INTERFACE_VERSION)};
 
     // If we are running with -steam then that means the tools are being used by
     // an SDK user. Don't exit in this case!
-    if (!p4 && !command_line_->FindParm("-steam")) {
+    if (!p4 && !command_line_->HasParm("-steam")) {
       return false;
     }
 #endif  // STAGING_ONLY
@@ -131,7 +131,7 @@ bool BootAppSystemGroup::Create() {
     // Load up the appropriate shader DLL
     // This has to be done before connection.
     const char *shader_api{"shaderapidx9" DLL_EXT_STRING};
-    if (command_line_->FindParm("-noshaderapi")) {
+    if (command_line_->HasParm("-noshaderapi")) {
       shader_api = "shaderapiempty" DLL_EXT_STRING;
     }
 

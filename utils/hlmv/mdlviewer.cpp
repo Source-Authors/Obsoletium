@@ -1384,7 +1384,7 @@ private:
 bool CHLModelViewerApp::Create()
 {
 	g_dxlevel = CommandLine()->ParmValue( "-dx", 0 );
-	g_bOldFileDialogs = ( CommandLine()->FindParm( "-olddialogs" ) != 0 );
+	g_bOldFileDialogs = CommandLine()->HasParm( "-olddialogs" );
 
 	AppSystemInfo_t appSystems[] = 
 	{
@@ -1484,14 +1484,14 @@ bool CHLModelViewerApp::PreInit( )
 	}
 
 	int nAdapterFlags = 0;
-	if ( CommandLine()->CheckParm( "-ref" ) )
+	if ( CommandLine()->HasParm( "-ref" ) )
 	{
 		nAdapterFlags |= MATERIAL_INIT_REFERENCE_RASTERIZER;
 	}
 
 	g_pMaterialSystem->SetAdapter( nAdapter, nAdapterFlags );
 	// dimhotepus: Fix typo.
-	g_bOldFileDialogs = !CommandLine()->FindParm( "-NoSteamDialog" );
+	g_bOldFileDialogs = !CommandLine()->HasParm( "-NoSteamDialog" );
 	
 	LoadFileSystemDialogModule();
 
@@ -1544,11 +1544,11 @@ int CHLModelViewerApp::Main()
 		char absPath[MAX_PATH];
 		V_MakeAbsolutePath( absPath, pMdlName );
 
-		if ( CommandLine()->FindParm( "-screenshot" ) )
+		if ( CommandLine()->HasParm( "-screenshot" ) )
 		{
 			g_MDLViewer->SaveScreenShot( absPath );
 		}
-		else if ( CommandLine()->FindParm( "-dump" ) )
+		else if ( CommandLine()->HasParm( "-dump" ) )
 		{
 			g_MDLViewer->DumpText( absPath );
 		}

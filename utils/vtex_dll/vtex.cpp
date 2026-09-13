@@ -1835,7 +1835,7 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 	V_sprintf_safe( dstFileName, "%s/%s%s.vtf", pOutputDir, pBaseName, ( ( Mode::eModePFM == g_eMode ) && isCubeMap ) ? ".hdr" : "" );
 
 	// Now if we are only validating the CRC
-	if ( CommandLine()->FindParm( "-crcvalidate" ) )
+	if ( CommandLine()->HasParm( "-crcvalidate" ) )
 	{
 		CUtlBuffer bufFile;
 		bool bLoad = LoadFile( dstFileName, bufFile, false, NULL );
@@ -1872,7 +1872,7 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 	}
 
 	// Now if we are not forcing the CRC
-	if ( !CommandLine()->FindParm( "-crcforce" ) )
+	if ( !CommandLine()->HasParm( "-crcforce" ) )
 	{
 		CUtlBuffer bufFile;
 		if ( LoadFile( dstFileName, bufFile, false, NULL ) )
@@ -2436,7 +2436,7 @@ static bool Process_File( char (&pInputBaseName)[maxlen] )
 	Q_FixSlashes( pInputBaseName, '/' );
 	Q_StripExtension( pInputBaseName, pInputBaseName );
 
-	if ( CommandLine()->FindParm( "-deducepath" ) )
+	if ( CommandLine()->HasParm( "-deducepath" ) )
 	{
 		V_strcpy_safe( outputDir, pInputBaseName );
 
@@ -2497,7 +2497,7 @@ static bool Process_File( char (&pInputBaseName)[maxlen] )
 	//			vtex -nop4 -dontusegamedir -quickconvert u:\data\game\tf\texture.vtf
 	// Will read the old texture format and write the new texture format
 	//
-	if ( CommandLine()->FindParm( "-quickconvert" ) )
+	if ( CommandLine()->HasParm( "-quickconvert" ) )
 	{
 		printf( "Quick convert of '%s'...\n", pInputBaseName );
 
@@ -2955,7 +2955,7 @@ int CVTex::VTex( int argc, char **argv )
 		Q_FixSlashes( gamedir, '/' );
 	}
 
-	if ( !CommandLine()->FindParm( "-p4skip" ) )
+	if ( !CommandLine()->HasParm( "-p4skip" ) )
 	{
 		// Initialize P4
 		bool bP4DLLExists = false;
@@ -2964,7 +2964,7 @@ int CVTex::VTex( int argc, char **argv )
 			bP4DLLExists = g_pFullFileSystem->FileExists( "p4lib" DLL_EXT_STRING, "EXECUTABLE_PATH" );
 		}
 
-		if ( g_bUsedAsLaunchableDLL && !CommandLine()->FindParm( "-nop4" ) && bP4DLLExists )
+		if ( g_bUsedAsLaunchableDLL && !CommandLine()->HasParm( "-nop4" ) && bP4DLLExists )
 		{
 			constexpr char pModuleName[] = "p4lib" DLL_EXT_STRING;
 			CSysModule *pModule = Sys_LoadModule( pModuleName );
@@ -3065,7 +3065,7 @@ int CVTex::VTex( int argc, char **argv )
 	
 	// dimhotepus: Disable Perforce support.
 	// Shutdown P4
-	// if ( g_bUsedAsLaunchableDLL && p4 && !CommandLine()->FindParm( "-p4skip" ) )
+	// if ( g_bUsedAsLaunchableDLL && p4 && !CommandLine()->HasParm( "-p4skip" ) )
 	// {
 	// 	p4->Shutdown();
 	// 	p4->Disconnect();

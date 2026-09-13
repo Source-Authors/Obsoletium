@@ -941,7 +941,7 @@ void BuildGroup::LoadControlSettings(const char *controlResourceName, const char
 				bSuccess = rDat->LoadFromFile( g_pFullFileSystem, controlResourceName, "BSP" );
 			}
 			// only allow to load loose files when using insecure mode
-			if ( !bSuccess && CommandLine()->FindParm( "-insecure" ) )
+			if ( !bSuccess && CommandLine()->HasParm( "-insecure" ) )
 			{
 				bSuccess = rDat->LoadFromFile( g_pFullFileSystem, controlResourceName, pathID );
 			}

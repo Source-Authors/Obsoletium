@@ -33,13 +33,9 @@ void DevShotGenerator_Usage()
 void DevShotGenerator_Init()
 {
 	// check for devshot generation
-	if ( CommandLine()->FindParm("-makedevshots") )
+	if ( CommandLine()->HasParm("-makedevshots") )
 	{
-		bool usemaplistfile = false;
-		if ( CommandLine()->FindParm("-usedevshotsfile") )
-		{
-			usemaplistfile = true;
-		}
+		bool usemaplistfile = CommandLine()->HasParm("-usedevshotsfile");
 		DevShotGenerator().EnableDevShotGeneration( usemaplistfile );
 	}
 }
@@ -89,7 +85,7 @@ void CDevShotGenerator::BuildMapList()
 	CommandLine()->CheckParm( "-usedevshotsfile", &pMapFile );
 
 	// Build the map list
-	if ( !BuildGeneralMapList( &m_Maps, CommandLine()->FindParm("-usedevshotsfile") != 0, pMapFile, "devshots", &m_iCurrentMap ) )
+	if ( !BuildGeneralMapList( &m_Maps, CommandLine()->HasParm("-usedevshotsfile"), pMapFile, "devshots", &m_iCurrentMap ) )
 	{
 		m_bDevShotsEnabled = false;
 	}

@@ -3033,7 +3033,7 @@ void CSaveRestore::Init( void )
 
 	m_nDeferredCommandFrames = 0;
 	m_szSaveGameScreenshotFile[0] = '\0';
-	if ( !CommandLine()->FindParm( "-noclearsave" ) )
+	if ( !CommandLine()->HasParm( "-noclearsave" ) )
 	{
 		ClearSaveDir();
 	}

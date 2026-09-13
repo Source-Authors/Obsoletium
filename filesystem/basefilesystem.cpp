@@ -79,7 +79,7 @@ static void LogFileOpen( const char *vpk, const char *pFilename, const char *pAb
 	// Figure out if we should be doing this at all, the first time we are acalled
 	if ( mode == nullptr )
 	{
-		if ( CommandLine()->FindParm( "-log_opened_files" ) )
+		if ( CommandLine()->HasParm( "-log_opened_files" ) )
 			mode = "wt";
 		else
 			mode = "";
@@ -374,7 +374,7 @@ void CBaseFileSystem::Shutdown()
 
 	if( m_pLogFile )
 	{
-		if( CommandLine()->FindParm( "-fs_logbins" ) >= 0 )
+		if( CommandLine()->HasParm( "-fs_logbins" ) )
 		{
 			char cwd[MAX_FILEPATH];
 			if( !getcwd( cwd, MAX_FILEPATH-1 ) ) 
@@ -2860,7 +2860,7 @@ void CBaseFileSystem::SetupPreloadData()
 	}
 
 #ifndef DEDICATED
-	if ( !CommandLine()->FindParm( "-fs_nopreloaddata" ) )
+	if ( !CommandLine()->HasParm( "-fs_nopreloaddata" ) )
 	{
 		char fn[MAX_PATH];
 		// Loads in the precompiled keyvalues data for each type

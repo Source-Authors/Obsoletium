@@ -94,7 +94,7 @@ const char *get_consolelog_filename(ICommandLine *command_line) {
     // Don't do the -consolelog thing if -consoledebug is present.
     //  CTextConsoleUnix::Print() looks for -consoledebug.
     const char *file_name = nullptr;
-    if (!command_line->FindParm("-consoledebug") &&
+    if (!command_line->HasParm("-consoledebug") &&
         command_line->CheckParm("-consolelog", &file_name) && file_name) {
       V_strcpy_safe(console_log, file_name);
     }
@@ -168,8 +168,8 @@ SpewRetval_t DedicatedSpewOutputFunc(SpewType_t spewType, char const *pMsg) {
   }
 
   if (spewType == SPEW_ASSERT) {
-    return CommandLine()->FindParm("-noassert") == 0 ? SPEW_DEBUGGER
-                                                     : SPEW_CONTINUE;
+    return CommandLine()->HasParm("-noassert") ? SPEW_CONTINUE
+                                               : SPEW_DEBUGGER;
   }
 
   return SPEW_CONTINUE;

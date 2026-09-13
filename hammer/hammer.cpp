@@ -162,7 +162,7 @@ static int WrapFunctionWithMinidumpHandler( int (*pfn)(void *pParam), void *pPar
 {
 	int nRetVal;
 
-	if ( !Plat_IsInDebugSession() && !CommandLine()->FindParm( "-nominidumps") )
+	if ( !Plat_IsInDebugSession() && !CommandLine()->HasParm( "-nominidumps") )
 	{
 		MinidumpWrapperHelper_t info;
 		info.m_pfn = pfn;
@@ -942,7 +942,7 @@ bool CHammer::InitSessionGameConfig(const char *szGame)
 	CGameConfig *pConfig = NULL;
 	bool bManualChoice = false;
 
-	if ( CommandLine()->FindParm( "-chooseconfig" ) )
+	if ( CommandLine()->HasParm( "-chooseconfig" ) )
 	{
 		pConfig = PromptForGameConfig();
 		bManualChoice = true;

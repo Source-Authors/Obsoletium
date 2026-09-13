@@ -324,10 +324,10 @@ DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
             scoped_winsock.errc().message().c_str());
   }
 
-  const bool is_console_mode{command_line->CheckParm("-console") != nullptr};
+  const bool is_console_mode{command_line->HasParm("-console")};
   se::dedicated::WindowsSystem system{command_line, is_console_mode};
 
-  if (!Plat_IsInDebugSession() && !command_line->FindParm("-nominidumps")) {
+  if (!Plat_IsInDebugSession() && !command_line->HasParm("-nominidumps")) {
     const ScopedThreadSEHTranslator scoped_thread_seh_translator{
         MiniDumpFunction};
 

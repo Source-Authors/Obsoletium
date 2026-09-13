@@ -850,7 +850,7 @@ sndinitstat CAudioDirectSound::SNDDMA_InitDirect( void )
 	buffer_caps.dwSize = sizeof(buffer_caps);
 	
 	bool primary_format_set = false;
-	if ( !CommandLine()->CheckParm("-snoforceformat"))
+	if ( !CommandLine()->HasParm("-snoforceformat"))
 	{
 		if (SUCCEEDED(hr = pDS->CreateSoundBuffer(&buffer_desc, &pDSPBuf, nullptr)))
 		{
@@ -908,7 +908,7 @@ sndinitstat CAudioDirectSound::SNDDMA_InitDirect( void )
 
 	if ( !m_bSurround )
 	{
-		if ( !primary_format_set || !CommandLine()->CheckParm ("-primarysound") )
+		if ( !primary_format_set || !CommandLine()->HasParm ("-primarysound") )
 		{
 			// create the secondary buffer we'll actually work with
 			BitwiseClear( buffer_desc );

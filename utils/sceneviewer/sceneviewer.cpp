@@ -209,7 +209,7 @@ int __stdcall WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmd
 //-----------------------------------------------------------------------------
 bool CSceneViewerApp::Create()
 {
-	if ( CommandLine()->FindParm( "-help" ) )
+	if ( CommandLine()->HasParm( "-help" ) )
 	{
 		const bool newConsole( SetupWin32ConsoleIO() );
 
@@ -404,7 +404,7 @@ int CSceneViewerApp::Main()
 
 		if ( arg && *arg != '\0' && _access( arg, 04 ) == 0 )
 		{
-			if ( !CommandLine()->FindParm( "-nozoom" ) )
+			if ( !CommandLine()->HasParm( "-nozoom" ) )
 			{
 				KeyValues *oz( new KeyValues( "PinAndZoomIt" ) );
 				mainPanel->PostMessage( mainPanel, oz );
@@ -414,13 +414,13 @@ int CSceneViewerApp::Main()
 			ofs->SetString( "fullpath", arg );
 			mainPanel->PostMessage( mainPanel, ofs );
 
-			if ( CommandLine()->FindParm( "-showasset" ) )
+			if ( CommandLine()->HasParm( "-showasset" ) )
 			{
 				KeyValues *msg( new KeyValues( "ShowAssetBuilder" ) );
 				mainPanel->PostMessage( mainPanel, msg );
 			}
 
-			if ( CommandLine()->FindParm( "-showcomboeditor" ) )
+			if ( CommandLine()->HasParm( "-showcomboeditor" ) )
 			{
 				KeyValues *msg( new KeyValues( "ShowComboBuilder" ) );
 				mainPanel->PostMessage( mainPanel, msg );

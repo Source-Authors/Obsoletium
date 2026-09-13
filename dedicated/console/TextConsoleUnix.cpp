@@ -281,8 +281,8 @@ bool CTextConsoleUnix::Init() {
     if (!m_tty) m_tty = stdout;
   }
 
-  m_bConDebug = CommandLine()->FindParm("-condebug") != 0;
-  if (m_bConDebug && CommandLine()->FindParm("-conclearlog"))
+  m_bConDebug = CommandLine()->HasParm("-condebug");
+  if (m_bConDebug && CommandLine()->HasParm("-conclearlog"))
     g_pFullFileSystem->RemoveFile(CONSOLE_LOG_FILE, "GAME");
 
   return CTextConsole::Init();

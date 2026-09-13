@@ -256,7 +256,7 @@ void CInput::CheckMouseAcclerationVars()
 //-----------------------------------------------------------------------------
 void CInput::Init_Mouse (void)
 {
-	if ( CommandLine()->FindParm("-nomouse" ) ) 
+	if ( CommandLine()->HasParm("-nomouse" ) ) 
 		return; 
 
 	m_flPreviousMouseXPosition = 0.0f;
@@ -266,7 +266,7 @@ void CInput::Init_Mouse (void)
 
 	m_fMouseParmsValid = false;
 
-	if ( CommandLine()->FindParm ("-useforcedmparms" ) ) 
+	if ( CommandLine()->HasParm ("-useforcedmparms" ) ) 
 	{
 #ifdef WIN32
 		m_fMouseParmsValid = SystemParametersInfo( SPI_GETMOUSE, 0, m_rgOrigMouseParms, 0 ) ? true : false;
@@ -275,7 +275,7 @@ void CInput::Init_Mouse (void)
 #endif
 		if ( m_fMouseParmsValid )
 		{
-			if ( CommandLine()->FindParm ("-noforcemspd" ) ) 
+			if ( CommandLine()->HasParm ("-noforcemspd" ) ) 
 			{
 				m_rgNewMouseParms[ MOUSE_SPEED_FACTOR ] = m_rgOrigMouseParms[ MOUSE_SPEED_FACTOR ];
 
@@ -296,7 +296,7 @@ void CInput::Init_Mouse (void)
 				m_rgCheckMouseParam[ MOUSE_SPEED_FACTOR ] = 1;
 			}
 
-			if ( CommandLine()->FindParm ("-noforcemaccel" ) ) 
+			if ( CommandLine()->HasParm ("-noforcemaccel" ) ) 
 			{
 				m_rgNewMouseParms[ MOUSE_ACCEL_THRESHHOLD1 ] = m_rgOrigMouseParms[ MOUSE_ACCEL_THRESHHOLD1 ];
 				m_rgNewMouseParms[ MOUSE_ACCEL_THRESHHOLD2 ] = m_rgOrigMouseParms[ MOUSE_ACCEL_THRESHHOLD2 ];

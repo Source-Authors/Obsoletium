@@ -515,7 +515,7 @@ FORCEINLINE void GLContextGetDefault( GLViewportDepthRange_t *dst )
 FORCEINLINE void GLContextSetIndexed( GLClipPlaneEnable_t *src, int index )
 {
 #if GLMDEBUG
-	if (CommandLine()->FindParm("-caps_noclipplanes"))
+	if (CommandLine()->HasParm("-caps_noclipplanes"))
 	{
 		if (GLMKnob("caps-key",NULL) > 0.0)
 		{
@@ -2348,7 +2348,7 @@ FORCEINLINE void GLMContext::BindVertexBufferToCtx( CGLMBuffer *buff )
 
 FORCEINLINE void GLMContext::SetMaxUsedVertexShaderConstantsHint( uint nMaxConstants )
 {
-	static bool bUseMaxVertexShadeConstantHints = !CommandLine()->CheckParm("-disablemaxvertexshaderconstanthints");
+	static bool bUseMaxVertexShadeConstantHints = !CommandLine()->HasParm("-disablemaxvertexshaderconstanthints");
 	if ( bUseMaxVertexShadeConstantHints )
 	{
 		m_nMaxUsedVertexProgramConstantsHint = nMaxConstants;

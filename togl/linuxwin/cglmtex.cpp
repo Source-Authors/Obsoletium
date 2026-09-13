@@ -1251,7 +1251,7 @@ void CGLMTex::WriteTexels( GLMTexLockDesc *desc, bool writeWholeSlice, bool noDa
 	// (mechanism not policy)
 	
 	GLenum intformat = (m_layout->m_key.m_texFlags & kGLMTexSRGB) ? format->m_glIntFormatSRGB : format->m_glIntFormat;
-	if (CommandLine()->FindParm("-disable_srgbtex"))
+	if (CommandLine()->HasParm("-disable_srgbtex"))
 	{
 		// force non srgb flavor - experiment to make ATI r600 happy on 10.5.8 (maybe x1600 too!)
 		intformat = format->m_glIntFormat;
@@ -1792,11 +1792,11 @@ void CGLMTex::HandleSRGBMismatch( bool srgb, int &srgbFlipCount )
 
 #if GLMDEBUG
 		//policy: print the ones that have flipped 1 or N times
-		static bool print_allflips		= CommandLine()->FindParm("-glmspewallsrgbflips");
-		static bool print_firstflips	= CommandLine()->FindParm("-glmspewfirstsrgbflips");
-		static bool print_freqflips	= CommandLine()->FindParm("-glmspewfreqsrgbflips");
-		static bool print_crawls		= CommandLine()->FindParm("-glmspewsrgbcrawls");
-		static bool print_maxcrawls	= CommandLine()->FindParm("-glmspewsrgbmaxcrawls");
+		static bool print_allflips		= CommandLine()->HasParm("-glmspewallsrgbflips");
+		static bool print_firstflips	= CommandLine()->HasParm("-glmspewfirstsrgbflips");
+		static bool print_freqflips	    = CommandLine()->HasParm("-glmspewfreqsrgbflips");
+		static bool print_crawls		= CommandLine()->HasParm("-glmspewsrgbcrawls");
+		static bool print_maxcrawls	    = CommandLine()->HasParm("-glmspewsrgbmaxcrawls");
 		bool print_it = false;
 
 		if (print_allflips)
@@ -1871,7 +1871,7 @@ void CGLMTex::HandleSRGBMismatch( bool srgb, int &srgbFlipCount )
 #endif
 
 		// re-submit the tex unless we're stifling it
-		static bool s_nosrgbflips = CommandLine()->FindParm( "-glmnosrgbflips" );
+		static bool s_nosrgbflips = CommandLine()->HasParm( "-glmnosrgbflips" );
 		if ( !s_nosrgbflips )
 		{
 			ResetSRGB( srgb, false );

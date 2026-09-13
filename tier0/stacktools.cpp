@@ -698,8 +698,8 @@ public:
 		AUTO_LOCK( m_Mutex );
 
 		//Only enabled for P4 and Steam Beta builds
-		if( (CommandLine()->FindParm( "-steam" ) != 0) && //is steam
-			(CommandLine()->FindParm( "-internalbuild" ) == 0) ) //is not steam beta
+		if( CommandLine()->HasParm( "-steam" ) && //is steam
+			!CommandLine()->HasParm( "-internalbuild" ) ) //is not steam beta
 		{
 			//disable the toolset by falsifying initialized state
 			m_bIsInitialized = true;

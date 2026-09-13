@@ -44,7 +44,7 @@ CGPUBufferAllocator::CGPUBufferAllocator( void )
 {
 	memset( &( m_BufferPools[ 0 ] ), 0, sizeof( m_BufferPools ) );
 
-	m_bEnabled = USE_GPU_BUFFER_ALLOCATOR && !CommandLine()->FindParm( "-no_gpu_buffer_allocator" );
+	m_bEnabled = USE_GPU_BUFFER_ALLOCATOR && !CommandLine()->HasParm( "-no_gpu_buffer_allocator" );
 	if ( m_bEnabled )
 	{
 		// Start with one pool (the size should be the lowest-common-denominator for all maps)

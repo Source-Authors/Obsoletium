@@ -1812,14 +1812,14 @@ void CDemoPlayer::WriteTimeDemoResults( void )
 	g_pFileSystem->FPrintf( fileHandle, "0x%x,", info.m_VendorID );
 	g_pFileSystem->FPrintf( fileHandle, "0x%x,", info.m_DeviceID );
 
-//	g_pFileSystem->FPrintf( fileHandle, "%s,", CommandLine()->CheckParm( "-nosound" ) ? "off" : "on" );
+//	g_pFileSystem->FPrintf( fileHandle, "%s,", CommandLine()->HasParm( "-nosound" ) ? "off" : "on" );
 	g_pFileSystem->FPrintf( fileHandle, "%s,", mat_reducefillrate.GetBool() ? "on" : "off" );
 	g_pFileSystem->FPrintf( fileHandle, "%s,", r_waterforcereflectentities.GetBool() ? "on" : "off" );
 	g_pFileSystem->FPrintf( fileHandle, "%s,", mat_motion_blur_enabled.GetBool() ? "on" : "off" );
 	g_pFileSystem->FPrintf( fileHandle, "%s,", r_flashlightdepthtexture.GetBool() ? "on" : "off" );
 	g_pFileSystem->FPrintf( fileHandle, "%s,", mat_reduceparticles.GetBool() ? "on" : "off" );
 	g_pFileSystem->FPrintf( fileHandle, "%s,", r_dopixelvisibility.GetBool() ? "on" : "off" );
-	g_pFileSystem->FPrintf( fileHandle, "%s,", CommandLine()->CheckParm( "-nulldevice" ) ? "yes" : "no" );
+	g_pFileSystem->FPrintf( fileHandle, "%s,", CommandLine()->HasParm( "-nulldevice" ) ? "yes" : "no" );
 
 	int itimedemo_comment = CommandLine()->FindParm( "-timedemo_comment" );
 	const char *timedemo_comment = itimedemo_comment ? CommandLine()->GetParm( itimedemo_comment + 1 ) : "";

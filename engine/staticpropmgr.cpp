@@ -561,7 +561,7 @@ bool CStaticProp::Init( int index, StaticPropLump_t &lump, model_t *pModel )
 	{
 		modelinfo->GetIlluminationPoint( m_pModel, this, m_Origin, m_Angles, &m_LightingOrigin );
 	}
-	g_MakingDevShots = CommandLine()->FindParm( "-makedevshots" ) ? true : false;
+	g_MakingDevShots = CommandLine()->HasParm( "-makedevshots" );
 
 	// If we do Mod_SetMaterialVarFlag() while running with the dedicated server, we crash.
 	//  RJ said he'd save my butt and look into this. (Hip hip horray! We love RJ!)

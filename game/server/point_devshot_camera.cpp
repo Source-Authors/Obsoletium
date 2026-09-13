@@ -79,7 +79,7 @@ void CPointDevShotCamera::Spawn( void )
 	BaseClass::Spawn();
 
 	// Remove this entity immediately if we're not making devshots
-	if ( !CommandLine()->FindParm("-makedevshots") )
+	if ( !CommandLine()->HasParm("-makedevshots") )
 	{
 		UTIL_Remove( this );
 		return;
@@ -195,7 +195,7 @@ public:
 	virtual void SafeRemoveIfDesired( void )
 	{
 		// If we're not making devshots, remove this system immediately
-		if ( !CommandLine()->FindParm("-makedevshots") )
+		if ( !CommandLine()->HasParm("-makedevshots") )
 		{
 			Remove( this );
 			return;

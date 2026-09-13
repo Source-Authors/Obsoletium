@@ -1007,8 +1007,7 @@ void CL_FullyConnected( void )
 	// client DLL where it knows its read in all entities
 	if ( IsPC() )
 	{
-		int i;
-		if( (i = CommandLine()->FindParm( "-buildcubemaps" )) != 0 )
+		if( int i; (i = CommandLine()->FindParm( "-buildcubemaps" )) != 0 )
 		{
 			int numIterations = 1;
 			if( CommandLine()->ParmCount() > i + 1 )
@@ -1023,15 +1022,15 @@ void CL_FullyConnected( void )
 			V_sprintf_safe( cmd, "buildcubemaps %u\nquit\n", numIterations );
 			Cbuf_AddText( cmd );
 		}
-		else if( CommandLine()->FindParm( "-navanalyze" ) )
+		else if( CommandLine()->HasParm( "-navanalyze" ) )
 		{
 			Cbuf_AddText( "nav_edit 1;nav_analyze_scripted\n" );
 		}
-		else if( CommandLine()->FindParm( "-navforceanalyze" ) )
+		else if( CommandLine()->HasParm( "-navforceanalyze" ) )
 		{
 			Cbuf_AddText( "nav_edit 1;nav_analyze_scripted force\n" );
 		}
-		else if ( CommandLine()->FindParm("-exit") )
+		else if ( CommandLine()->HasParm("-exit") )
 		{
 			Cbuf_AddText( "quit\n" );
 		}
@@ -1132,7 +1131,7 @@ void CL_NextDemo (void)
 		}
 	}
 
-	Q_snprintf (str,sizeof( str ), "%s %s", CommandLine()->FindParm("-timedemoloop") ? "timedemo" : "playdemo", cl.demos[cl.demonum].Get());
+	Q_snprintf (str,sizeof( str ), "%s %s", CommandLine()->HasParm("-timedemoloop") ? "timedemo" : "playdemo", cl.demos[cl.demonum].Get());
 	Cbuf_AddText (str);
 	cl.demonum++;
 }
@@ -2218,23 +2217,23 @@ bool CL_ShouldLoadBackgroundLevel( const CCommand &args )
 	}
 	
 	// if force is set, then always return true
-	if (CommandLine()->CheckParm("-forcestartupmenu"))
+	if (CommandLine()->HasParm("-forcestartupmenu"))
 		return true;
 
 	// don't load the map in developer or console mode
 	if ( developer.GetInt() || 
-		CommandLine()->CheckParm("-console") || 
-		CommandLine()->CheckParm("-dev") )
+		CommandLine()->HasParm("-console") || 
+		CommandLine()->HasParm("-dev") )
 		return false;
 
 	// don't load the map if we're going straight into a level
-	if ( CommandLine()->CheckParm("+map") ||
-		CommandLine()->CheckParm("+connect") ||
-		CommandLine()->CheckParm("+playdemo") ||
-		CommandLine()->CheckParm("+timedemo") ||
-		CommandLine()->CheckParm("+timedemoquit") ||
-		CommandLine()->CheckParm("+load") ||
-		CommandLine()->CheckParm("-makereslists"))
+	if ( CommandLine()->HasParm("+map") ||
+		CommandLine()->HasParm("+connect") ||
+		CommandLine()->HasParm("+playdemo") ||
+		CommandLine()->HasParm("+timedemo") ||
+		CommandLine()->HasParm("+timedemoquit") ||
+		CommandLine()->HasParm("+load") ||
+		CommandLine()->HasParm("-makereslists"))
 		return false;
 
 	// nothing else is going on, so load the startup level

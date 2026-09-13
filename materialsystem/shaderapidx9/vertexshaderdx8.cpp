@@ -878,7 +878,7 @@ void CShaderManager::DeinitRemoteShaderCompile()
 void CShaderManager::Init()
 {
 	// only used by PC to help tools reduce d3d footprint
-	m_bCreateShadersOnDemand = ShaderUtil()->InEditorMode() || CommandLine()->CheckParm( "-shadersondemand" );
+	m_bCreateShadersOnDemand = ShaderUtil()->InEditorMode() || CommandLine()->HasParm( "-shadersondemand" );
 
 #ifdef DYNAMIC_SHADER_COMPILE
 #ifdef REMOTE_DYNAMIC_SHADER_COMPILE

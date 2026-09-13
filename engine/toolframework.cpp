@@ -236,7 +236,7 @@ InitReturnVal_t CToolFrameworkInternal::Init()
 	EngineTool_InstallQuitHandler( this, CToolFrameworkInternal_QuitHandler );
 
 	// FIXME: Eventually this should be -edit
-	if ( CommandLine()->FindParm( "-tools" ) )
+	if ( CommandLine()->HasParm( "-tools" ) )
 	{
 		LoadTools();
 	}

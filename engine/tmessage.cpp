@@ -377,7 +377,7 @@ void TextMessageParse( byte *pMemFile, int fileSize )
 	intp		i, nameHeapSize, textHeapSize, messageSize, nameOffset;
 
 	intp filePos = 0;
-	bool bSpew = CommandLine()->FindParm( "-textmessagedebug" ) ? true : false;
+	bool bSpew = CommandLine()->HasParm( "-textmessagedebug" );
 
 	while( memfgets( pMemFile, fileSize, &filePos, buf ) != NULL )
 	{

@@ -2462,13 +2462,13 @@ GLMContext::GLMContext( IDirect3DDevice9 *pDevice, GLMDisplayParams *params )
 // 		m_bUseSamplerObjects = false;
 // 	}
 	
-// 	if ( CommandLine()->CheckParm( "-gl_disablesamplerobjects" ) )
+// 	if ( CommandLine()->HasParm( "-gl_disablesamplerobjects" ) )
 // 	{
 	// Disable sampler object usage for now since ScaleForm isn't aware of them
 	// and doesn't know how to push/pop their binding state. It seems we don't
 	// really use them in this codebase anyhow, except to preload textures.
 	m_bUseSamplerObjects = false;
-	if ( CommandLine()->CheckParm( "-gl_enablesamplerobjects" ) )
+	if ( CommandLine()->HasParm( "-gl_enablesamplerobjects" ) )
 		m_bUseSamplerObjects = true;
 
 	// Try to get some more free memory by relying on driver host copies instead of ours.
@@ -2477,7 +2477,7 @@ GLMContext::GLMContext( IDirect3DDevice9 *pDevice, GLMDisplayParams *params )
 	// Sadly, we have to enable tex client storage for srgb decoding. This should only happen
 	//  on Macs w/ OSX 10.6.
 	m_bTexClientStorage = !gGL->m_bHave_GL_EXT_texture_sRGB_decode;
-	if ( CommandLine()->CheckParm( "-gl_texclientstorage" ) )
+	if ( CommandLine()->HasParm( "-gl_texclientstorage" ) )
 		m_bTexClientStorage = true;
 
 	GLMDebugPrintf( "GL sampler object usage: %s\n", m_bUseSamplerObjects ? "ENABLED" : "DISABLED" );
@@ -2517,7 +2517,7 @@ GLMContext::GLMContext( IDirect3DDevice9 *pDevice, GLMDisplayParams *params )
 	}
 
 	m_bUseBoneUniformBuffers = true;
-	if (CommandLine()->CheckParm("-disableboneuniformbuffers"))
+	if (CommandLine()->HasParm("-disableboneuniformbuffers"))
 	{
 		m_bUseBoneUniformBuffers = false;
 	}
@@ -2528,20 +2528,20 @@ GLMContext::GLMContext( IDirect3DDevice9 *pDevice, GLMDisplayParams *params )
 	m_displayParamsValid = false;
 
 	// peek at any CLI options
-	m_slowAssertEnable = CommandLine()->FindParm("-glmassertslow") != 0;
-	m_slowSpewEnable = CommandLine()->FindParm("-glmspewslow") != 0;
-	m_checkglErrorsAfterEveryBatch = CommandLine()->FindParm("-glcheckerrors") != 0;
+	m_slowAssertEnable = CommandLine()->HasParm("-glmassertslow");
+	m_slowSpewEnable = CommandLine()->HasParm("-glmspewslow");
+	m_checkglErrorsAfterEveryBatch = CommandLine()->HasParm("-glcheckerrors");
 	m_slowCheckEnable = m_slowAssertEnable || m_slowSpewEnable || m_checkglErrorsAfterEveryBatch;
 
 	m_drawingLangAtFrameStart = m_drawingLang = kGLMGLSL;		// default to GLSL
 	
 	// this affects FlushDrawStates which will route program bindings, uniform delivery, sampler setup, and enables accordingly.
 
-	if ( CommandLine()->FindParm("-glslmode") )
+	if ( CommandLine()->HasParm("-glslmode") )
 	{
 		m_drawingLangAtFrameStart = m_drawingLang = kGLMGLSL;
 	}
-	if ( CommandLine()->FindParm("-arbmode") && !CommandLine()->FindParm("-glslcontrolflow") )
+	if ( CommandLine()->HasParm("-arbmode") && !CommandLine()->HasParm("-glslcontrolflow") )
 	{
 		m_drawingLangAtFrameStart = m_drawingLang = kGLMARB;
 	}
@@ -2570,7 +2570,7 @@ GLMContext::GLMContext( IDirect3DDevice9 *pDevice, GLMDisplayParams *params )
 	IncrementWindowRefCount();
 
 	// If we're using GL_ARB_debug_output, go ahead and setup the callback here.
-	if ( gGL->m_bHave_GL_ARB_debug_output && CommandLine()->FindParm( "-gl_debug" ) ) 
+	if ( gGL->m_bHave_GL_ARB_debug_output && CommandLine()->HasParm( "-gl_debug" ) ) 
 	{
 #if GLMDEBUG
 		// Turning this on is a perf loss, but it ensures that you can (at least) swap to the other 
@@ -2599,7 +2599,7 @@ GLMContext::GLMContext( IDirect3DDevice9 *pDevice, GLMDisplayParams *params )
 	}
 
 
-	if (CommandLine()->FindParm("-glmspewcaps"))
+	if (CommandLine()->HasParm("-glmspewcaps"))
 	{
 		DumpCaps();
 	}
@@ -2664,15 +2664,15 @@ GLMContext::GLMContext( IDirect3DDevice9 *pDevice, GLMDisplayParams *params )
 
 	m_paramWriteMode = eParamWriteDirtySlotRange;	// default to fastest mode
 	
-	if (CommandLine()->FindParm("-glmwriteallslots"))				m_paramWriteMode = eParamWriteAllSlots;
-	if (CommandLine()->FindParm("-glmwriteshaderslots"))			m_paramWriteMode = eParamWriteShaderSlots;
-	if (CommandLine()->FindParm("-glmwriteshaderslotsoptional"))	m_paramWriteMode = eParamWriteShaderSlotsOptional;
-	if (CommandLine()->FindParm("-glmwritedirtyslotrange"))			m_paramWriteMode = eParamWriteDirtySlotRange;
+	if (CommandLine()->HasParm("-glmwriteallslots"))				m_paramWriteMode = eParamWriteAllSlots;
+	if (CommandLine()->HasParm("-glmwriteshaderslots"))			m_paramWriteMode = eParamWriteShaderSlots;
+	if (CommandLine()->HasParm("-glmwriteshaderslotsoptional"))	m_paramWriteMode = eParamWriteShaderSlotsOptional;
+	if (CommandLine()->HasParm("-glmwritedirtyslotrange"))			m_paramWriteMode = eParamWriteDirtySlotRange;
 	
 	m_attribWriteMode = eAttribWriteDirty;
 
-	if (CommandLine()->FindParm("-glmwriteallattribs"))				m_attribWriteMode = eAttribWriteAll;
-	if (CommandLine()->FindParm("-glmwritedirtyattribs"))			m_attribWriteMode = eAttribWriteDirty;	
+	if (CommandLine()->HasParm("-glmwriteallattribs"))				m_attribWriteMode = eAttribWriteAll;
+	if (CommandLine()->HasParm("-glmwritedirtyattribs"))			m_attribWriteMode = eAttribWriteDirty;	
 
 	m_pairCache	= new CGLMShaderPairCache( this );
 	m_pBoundPair = NULL;
@@ -2753,23 +2753,23 @@ GLMContext::GLMContext( IDirect3DDevice9 *pDevice, GLMDisplayParams *params )
 #ifdef OSX
 	bool new_mtgl = m_caps.m_hasPerfPackage1;	// i.e. 10.6.4 plus new driver
 	
-	if ( CommandLine()->FindParm("-glmenablemtgl2") )
+	if ( CommandLine()->HasParm("-glmenablemtgl2") )
 	{
 		new_mtgl = true;
 	}
 
-	if ( CommandLine()->FindParm("-glmdisablemtgl2") )
+	if ( CommandLine()->HasParm("-glmdisablemtgl2") )
 	{
 		new_mtgl = false;
 	}
 
 	bool mtgl_on = params->m_mtgl;
-	if (CommandLine()->FindParm("-glmenablemtgl"))
+	if (CommandLine()->HasParm("-glmenablemtgl"))
 	{
 		mtgl_on = true;
 	}
 	
-	if (CommandLine()->FindParm("-glmdisablemtgl"))
+	if (CommandLine()->HasParm("-glmdisablemtgl"))
 	{
 		mtgl_on = false;
 	}

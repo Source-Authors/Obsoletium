@@ -436,9 +436,9 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 		videomode->Shutdown();
 #endif
 
-	if (!CommandLine()->FindParm( "-makereslists" ) &&
-		!CommandLine()->FindParm( "-nomessagebox" ) &&
-		!CommandLine()->FindParm( "-nocrashdialog" ) )
+	if (!CommandLine()->HasParm( "-makereslists" ) &&
+		!CommandLine()->HasParm( "-nomessagebox" ) &&
+		!CommandLine()->HasParm( "-nocrashdialog" ) )
 	{
 		// dimhotepus: Use common message box.
 		Sys_MessageBox( "Source Engine - Error", text, false, true );
@@ -449,7 +449,7 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 	BuildMinidumpComment( text, true );
 	g_bUpdateMinidumpComment = false;
 
-	if ( bMinidump && !Plat_IsInDebugSession() && !CommandLine()->FindParm( "-nominidumps") )
+	if ( bMinidump && !Plat_IsInDebugSession() && !CommandLine()->HasParm( "-nominidumps") )
 	{
 #if defined( WIN32 )
 		// MiniDumpWrite() has problems capturing the calling thread's context 
@@ -585,7 +585,7 @@ BOOL WINAPI DllMain(HMODULE module, ULONG ulInit, LPVOID)
 void Sys_InitMemory()
 {
 	// Allow overrides
-	if ( CommandLine()->FindParm( "-minmemory" ) )
+	if ( CommandLine()->HasParm( "-minmemory" ) )
 	{
 		host_parms.memsize = GetMinimumHeapSize();
 		return;
@@ -832,10 +832,8 @@ SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 	}
 	if (spewType == SPEW_ASSERT)
 	{
-		if ( CommandLine()->FindParm( "-noassert" ) == 0 )
-			return SPEW_DEBUGGER;
-		else
-			return SPEW_CONTINUE;
+    	return CommandLine()->HasParm("-noassert") ? SPEW_CONTINUE
+        	                                       : SPEW_DEBUGGER;
 	}
 	return SPEW_CONTINUE;
 }
@@ -939,7 +937,7 @@ int Sys_InitGame( CreateInterfaceFn appSystemFactory, const char* pBaseDir, void
 	Q_FixSlashes( s_pBaseDir );
 	host_parms.basedir = s_pBaseDir;
 
-	if ( CommandLine()->FindParm ( "-pidfile" ) )
+	if ( CommandLine()->HasParm ( "-pidfile" ) )
 	{	
 		FileHandle_t pidFile = g_pFileSystem->Open( CommandLine()->ParmValue ( "-pidfile", "srcds.pid" ), "w+" );
 		if ( pidFile )
@@ -958,14 +956,14 @@ int Sys_InitGame( CreateInterfaceFn appSystemFactory, const char* pBaseDir, void
 	TRACEINIT( Sys_Init(), Sys_Shutdown() );
 
 #if defined(_DEBUG)
-	if( !CommandLine()->FindParm( "-nodttest" ) && !CommandLine()->FindParm( "-dti" ) )
+	if( !CommandLine()->HasParm( "-nodttest" ) && !CommandLine()->HasParm( "-dti" ) )
 	{
 		RunDataTableTest();
 	}
 
 	// dimhotepus: Add coroutine self-tests.
 #ifdef PLATFORM_INTEL 
-	if ( !CommandLine()->FindParm( "-nocoroutinetest" ))
+	if ( !CommandLine()->HasParm( "-nocoroutinetest" ))
 	{
 		Coroutine_Test();
 	}
@@ -973,7 +971,7 @@ int Sys_InitGame( CreateInterfaceFn appSystemFactory, const char* pBaseDir, void
 #endif
 
 	// NOTE: Can't use COM_CheckParm here because it hasn't been set up yet.
-	SeedRandomNumberGenerator( CommandLine()->FindParm( "-random_invariant" ) != 0 );
+	SeedRandomNumberGenerator( CommandLine()->HasParm( "-random_invariant" ) );
 
 	TRACEINIT( Sys_InitMemory(), Sys_ShutdownMemory() );
 

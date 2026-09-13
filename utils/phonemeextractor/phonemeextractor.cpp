@@ -549,7 +549,7 @@ SR_RESULT ExtractPhonemes( const char *wavname, CSpDynamicString& text, CSentenc
 	LANGID langID = SpGetUserDefaultUILanguage();
 
 	// Allow commandline override
-	if ( CommandLine()->FindParm( "-languageid" ) != 0 )
+	if ( CommandLine()->HasParm( "-languageid" ) )
 	{
 		userSpecified = true;
 		langID = static_cast<LANGID>( CommandLine()->ParmValue( "-languageid", langID ) );

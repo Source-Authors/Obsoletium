@@ -1120,7 +1120,7 @@ void CVGui::Disconnect()
 InitReturnVal_t CVGui::Init()
 {
 	m_hContext = DEFAULT_VGUI_CONTEXT;
-	m_bDebugMessages = CommandLine()->FindParm( "-vguimessages" ) ? true : false;
+	m_bDebugMessages = CommandLine()->HasParm( "-vguimessages" );
 
 	InitReturnVal_t nRetVal = BaseClass::Init();
 	if ( nRetVal != INIT_OK )

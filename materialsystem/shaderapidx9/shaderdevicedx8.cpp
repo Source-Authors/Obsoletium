@@ -339,7 +339,7 @@ void CShaderDeviceMgrDx8::CheckVendorDependentShadowMappingSupport( HardwareCaps
 #endif
 
 	{
-		bool bToolsMode = IsWindows() && ( CommandLine()->CheckParm( "-tools" ) != NULL );
+		bool bToolsMode = IsWindows() && CommandLine()->HasParm( "-tools" );
 		bool bFound16Bit = false;
 
 		if ( ( pCaps->m_VendorID == VENDORID_NVIDIA ) && ( pCaps->m_SupportsShaderModel_3_0  ) )	// ps_3_0 parts from nVidia
@@ -542,9 +542,8 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 	}
 
 	// Intended for debugging only
-	if ( CommandLine()->CheckParm( "-force_device_id" ) )
+	if ( const char *pDevID; CommandLine()->CheckParm( "-force_device_id", &pDevID ) )
 	{
-		const char *pDevID = CommandLine()->ParmValue( "-force_device_id", "" );
 		if ( pDevID )
 		{
 			int nDevID = V_atoi( pDevID );	// use V_atoi for hex support
@@ -556,9 +555,8 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 	}
 
 	// Intended for debugging only
-	if ( CommandLine()->CheckParm( "-force_vendor_id" ) )
+	if ( const char *pVendorID; CommandLine()->CheckParm( "-force_vendor_id", &pVendorID ) )
 	{
-		const char *pVendorID = CommandLine()->ParmValue( "-force_vendor_id", "" );
 		if ( pVendorID )
 		{
 			int nVendorID = V_atoi( pVendorID );	// use V_atoi for hex support
@@ -635,13 +633,13 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 		pCaps->m_MaxPixelShader30InstructionSlots  = caps.MaxPixelShader30InstructionSlots;
 	}
 
-	if( CommandLine()->CheckParm( "-nops2b" ) )
+	if( CommandLine()->HasParm( "-nops2b" ) )
 	{
 		pCaps->m_SupportsPixelShaders_2_b = false;
 	}
 
 	pCaps->m_bSoftwareVertexProcessing = false;
-	if ( IsWindows() && CommandLine()->CheckParm( "-mat_softwaretl" ) )
+	if ( IsWindows() && CommandLine()->HasParm( "-mat_softwaretl" ) )
 	{
 		pCaps->m_bSoftwareVertexProcessing = true;
 	}
@@ -664,9 +662,9 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 
 #ifdef OSX
 	// Static control flow is disabled by default on OSX (the Mac version of togl has known bugs preventing this path from working properly that we've fixed in togl linux/win)
-	pCaps->m_bSupportsStaticControlFlow = CommandLine()->CheckParm( "-glslcontrolflow" ) != NULL;
+	pCaps->m_bSupportsStaticControlFlow = CommandLine()->HasParm( "-glslcontrolflow" );
 #else
-	pCaps->m_bSupportsStaticControlFlow = !CommandLine()->CheckParm( "-noglslcontrolflow" );
+	pCaps->m_bSupportsStaticControlFlow = !CommandLine()->HasParm( "-noglslcontrolflow" );
 #endif
 
 	// NOTE: Texture stages is a fixed-function concept
@@ -730,7 +728,7 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 	else
 	{
 		pCaps->m_NumVertexShaderConstants = caps.MaxVertexShaderConst;
-		if ( CommandLine()->FindParm( "-limitvsconst" ) )
+		if ( CommandLine()->HasParm( "-limitvsconst" ) )
 		{
 			pCaps->m_NumVertexShaderConstants = min( 256, pCaps->m_NumVertexShaderConstants );
 		}
@@ -816,7 +814,7 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 
 	// How many user clip planes?
 	pCaps->m_MaxUserClipPlanes = caps.MaxUserClipPlanes;
-	if ( CommandLine()->CheckParm( "-nouserclip" ) /* || (IsOpenGL() && (!CommandLine()->FindParm("-glslmode"))) || r_emulategl.GetBool() */ )
+	if ( CommandLine()->HasParm( "-nouserclip" ) /* || (IsOpenGL() && (!CommandLine()->HasParm("-glslmode"))) || r_emulategl.GetBool() */ )
 	{
 		// rbarris 03Feb10: this now ignores POSIX / -glslmode / r_emulategl because we're defaulting GLSL mode "on".
 		// so this will mean that the engine will always ask for user clip planes.
@@ -849,7 +847,7 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 		pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, m_AdapterImageFormat, D3DUSAGE_QUERY_SRGBREAD | D3DUSAGE_QUERY_SRGBWRITE, D3DRTYPE_TEXTURE, D3DFMT_A8R8G8B8 ) == S_OK);
 	}
 
-	if ( CommandLine()->CheckParm( "-nosrgb" ) )
+	if ( CommandLine()->HasParm( "-nosrgb" ) )
 	{
 		pCaps->m_SupportsSRGB = false;
 	}
@@ -1056,7 +1054,7 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 
 	// This may get more complex if we start using multiple flavors of compressed vertex - for now it's "on or off"
 	pCaps->m_SupportsCompressedVertices = ( pCaps->m_nDXSupportLevel >= 90 ) && ( pCaps->m_CanDoSRGBReadFromRTs ) ? VERTEX_COMPRESSION_ON : VERTEX_COMPRESSION_NONE;
-	if ( CommandLine()->CheckParm( "-no_compressed_verts" ) )						  // m_CanDoSRGBReadFromRTs limits us to Snow Leopard or later on OSX
+	if ( CommandLine()->HasParm( "-no_compressed_verts" ) )						  // m_CanDoSRGBReadFromRTs limits us to Snow Leopard or later on OSX
 	{
 		pCaps->m_SupportsCompressedVertices = VERTEX_COMPRESSION_NONE;
 	}
@@ -1590,7 +1588,7 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 		m_PresentParameters.BackBufferHeight = useDefault ? mode.m_nHeight : info.m_DisplayMode.m_nHeight;
 		m_PresentParameters.BackBufferFormat = ImageLoader::ImageFormatToD3DFormat( backBufferFormat );
 		m_PresentParameters.BackBufferCount = info.m_nBackBufferCount;
-		if ( !info.m_bWaitForVSync || CommandLine()->FindParm( "-forcenovsync" ) )
+		if ( !info.m_bWaitForVSync || CommandLine()->HasParm( "-forcenovsync" ) )
 		{
 			m_PresentParameters.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 		}
@@ -2015,7 +2013,7 @@ se::win::com::com_ptr<IDirect3DDevice9Ex> CShaderDeviceDx8::InvokeCreateDevice( 
 #endif
 
 #if defined(ENABLE_NULLREF_DEVICE_SUPPORT)
-	devType = CommandLine()->FindParm("-nulldevice") ? D3DDEVTYPE_NULLREF : devType;
+	devType = CommandLine()->HasParm("-nulldevice") ? D3DDEVTYPE_NULLREF : devType;
 #endif
 
 	// Create the device with multi-threaded safeguards if we're using mat_queue_mode 2.

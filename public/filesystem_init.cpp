@@ -430,7 +430,7 @@ static FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t ret
 	// Don't do it if they specifically asked for it not to, or if they manually specified a vconfig with -game or -vproject.
 	if ( bRunVConfig &&
 		 g_FileSystemErrorMode.load(std::memory_order::memory_order_relaxed) == FS_ERRORMODE_VCONFIG &&
-		 !CommandLine()->FindParm( CMDLINEOPTION_NOVCONFIG ) && !GetVProjectCmdLineValue() )
+		 !CommandLine()->HasParm( CMDLINEOPTION_NOVCONFIG ) && !GetVProjectCmdLineValue() )
 	{
 		char vconfigExe[MAX_PATH];
 		if ( !LaunchVConfig( vconfigExe ) )
@@ -520,7 +520,7 @@ static void FileSystem_AddLoadedSearchPath(
 	// Special processing for ordinary game folders
 	if ( V_stristr( fullLocationPath, ".vpk" ) == nullptr && V_strieq( pPathID, "game" ) )
 	{
-		if ( CommandLine()->FindParm( "-tempcontent" ) != 0 )
+		if ( CommandLine()->HasParm( "-tempcontent" ) )
 		{
 			char szPath[MAX_PATH];
 			V_sprintf_safe( szPath, "%s_tempcontent", fullLocationPath );

@@ -2205,8 +2205,7 @@ int VMPI_GetParamFlags(EVMPICmdLineParam eParam) {
 }
 
 bool VMPI_IsParamUsed(EVMPICmdLineParam eParam) {
-  int iParam = CommandLine()->FindParm(VMPI_GetParamString(eParam));
-  return iParam != 0;
+  return CommandLine()->HasParm(VMPI_GetParamString(eParam));
 }
 
 const char *VMPI_GetParamHelpString(EVMPICmdLineParam eParam) {

@@ -1727,7 +1727,7 @@ void CBaseServer::CheckMasterServerRequestRestart()
 	Msg("%cMasterRequestRestart\n", 3);
 
 #ifndef _WIN32
-	if (CommandLine()->FindParm(AUTO_RESTART))
+	if (CommandLine()->HasParm(AUTO_RESTART))
 	{
 		Msg("Your server will be restarted on map change.\n");
 		Log("Your server will be restarted on map change.\n");
@@ -1778,7 +1778,7 @@ void CBaseServer::UpdateMasterServer()
         //return;
     }
 
-	static bool bUpdateMasterServers = !CommandLine()->FindParm( "-nomaster" );
+	static bool bUpdateMasterServers = !CommandLine()->HasParm( "-nomaster" );
 	if ( !bUpdateMasterServers )
 		return;
 

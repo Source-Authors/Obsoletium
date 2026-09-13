@@ -705,7 +705,7 @@ void CEngineVGui::Init()
 	staticGameDLLPanel->SetCursor( vgui::dc_none );
 	staticGameDLLPanel->SetZPos( 135 );
 
-	staticGameDLLPanel->SetVisible( CommandLine()->CheckParm( "-tools" ) != NULL );
+	staticGameDLLPanel->SetVisible( CommandLine()->HasParm( "-tools" ) );
 
 	{
 		COM_TimestampedLog( "Building Panels (staticDebugSystemPanel)" );
@@ -794,15 +794,15 @@ void CEngineVGui::Init()
 	ActivateGameUI();
 
 	if ( staticGameConsole && 
-		!CommandLine()->CheckParm( "-forcestartupmenu" ) && 
-		!CommandLine()->CheckParm( "-hideconsole" ) &&
-		( CommandLine()->FindParm( "-toconsole" ) || CommandLine()->FindParm( "-console" ) || CommandLine()->FindParm( "-rpt" ) || CommandLine()->FindParm( "-allowdebug" ) ) )
+		!CommandLine()->HasParm( "-forcestartupmenu" ) && 
+		!CommandLine()->HasParm( "-hideconsole" ) &&
+		( CommandLine()->HasParm( "-toconsole" ) || CommandLine()->HasParm( "-console" ) || CommandLine()->HasParm( "-rpt" ) || CommandLine()->HasParm( "-allowdebug" ) ) )
 	{
 		// activate the console
 		staticGameConsole->Activate();
 	}
 
-	m_bNoShaderAPI = CommandLine()->FindParm( "-noshaderapi" );
+	m_bNoShaderAPI = CommandLine()->HasParm( "-noshaderapi" );
 
 	// dimhotepus: Added explicit init.
 	demoaction->Init();
@@ -890,9 +890,9 @@ void CEngineVGui::Shutdown()
 	demoaction->Shutdown();
 
 	if ( staticGameConsole && 
-		!CommandLine()->CheckParm( "-forcestartupmenu" ) && 
-		!CommandLine()->CheckParm( "-hideconsole" ) &&
-		( CommandLine()->FindParm( "-toconsole" ) || CommandLine()->FindParm( "-console" ) || CommandLine()->FindParm( "-rpt" ) || CommandLine()->FindParm( "-allowdebug" ) ) )
+		!CommandLine()->HasParm( "-forcestartupmenu" ) && 
+		!CommandLine()->HasParm( "-hideconsole" ) &&
+		( CommandLine()->HasParm( "-toconsole" ) || CommandLine()->HasParm( "-console" ) || CommandLine()->HasParm( "-rpt" ) || CommandLine()->HasParm( "-allowdebug" ) ) )
 	{
 		// hide the console
 		staticGameConsole->Hide();

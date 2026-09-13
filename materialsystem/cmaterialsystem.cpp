@@ -657,7 +657,7 @@ InitReturnVal_t CMaterialSystem::Init()
 
 	// JAY: Added this command line parameter to force creating <32x32 mips
 	// to test for reported performance regressions on some systems
-	if ( CommandLine()->FindParm("-forceallmips") )
+	if ( CommandLine()->HasParm("-forceallmips") )
 	{
 		extern bool g_bForceTextureAllMips;
 		g_bForceTextureAllMips = true;
@@ -4530,7 +4530,7 @@ void CMaterialSystem::LoadReplacementMaterials()
 {
 	constexpr char cLocation[]{"materials"};
 
-	if ( CommandLine()->FindParm( "-matscan") )
+	if ( CommandLine()->HasParm( "-matscan") )
 	{
 		ScanDirForReplacements( cLocation );
 	}

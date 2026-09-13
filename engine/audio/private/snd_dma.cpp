@@ -678,7 +678,7 @@ void S_Init( void )
 	// dimhotepus: Device can be restarted in runtime by different thread.
 	THREAD_LOCK_SOUND();
 
-	if ( sv.IsDedicated() && !CommandLine()->CheckParm( "-forcesound" ) )
+	if ( sv.IsDedicated() && !CommandLine()->HasParm( "-forcesound" ) )
 		return;
 
 	DevMsg( "Sound Initialization: Start\n" );
@@ -688,7 +688,7 @@ void S_Init( void )
 
 	VAudioInit();
 
-	if ( CommandLine()->CheckParm( "-nosound" ) )
+	if ( CommandLine()->HasParm( "-nosound" ) )
 	{
 		g_AudioDevice = Audio_GetNullDevice();
 		TRACEINIT( audiosourcecache->Init( host_parms.memsize >> 2 ), audiosourcecache->Shutdown() );

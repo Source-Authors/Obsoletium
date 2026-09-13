@@ -2739,7 +2739,7 @@ void CTextureManager::ReleaseReadbackTexture( ITextureInternal* pTex )
 void CTextureManager::WarmTextureCache()
 {
 	// Disable cache for osx/linux for now.
-	if ( CommandLine()->CheckParm( "-no_texture_stream" ) )
+	if ( CommandLine()->HasParm( "-no_texture_stream" ) )
 		return;
 	MemoryInformation memInfo;
 	if ( GetMemoryInformation( &memInfo ) )

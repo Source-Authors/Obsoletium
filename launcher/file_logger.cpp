@@ -47,8 +47,8 @@ FileLogger::FileLogger(ICommandLine *command_line, IFileSystem *file_system,
 
 void FileLogger::Init() {
   // Can't do this in edit mode
-  if (command_line_->CheckParm("-edit") ||
-      !command_line_->CheckParm("-makereslists")) {
+  if (command_line_->HasParm("-edit") ||
+      !command_line_->HasParm("-makereslists")) {
     return;
   }
 
@@ -91,8 +91,8 @@ void FileLogger::Init() {
 
   file_system_->CreateDirHierarchy(directory, "GAME");
 
-  if (!command_line_->FindParm("-startmap") &&
-      !command_line_->FindParm("-startstage")) {
+  if (!command_line_->HasParm("-startmap") &&
+      !command_line_->HasParm("-startstage")) {
     logged_tree_.RemoveAll();
 
     file_system_->RemoveFile(

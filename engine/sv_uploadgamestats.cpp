@@ -344,7 +344,7 @@ public:
 	// If user has disabled stats tracking, do nothing
 	virtual bool IsGameStatsLoggingEnabled()
 	{
-		if ( CommandLine()->FindParm( "-nogamestats" ) )
+		if ( CommandLine()->HasParm( "-nogamestats" ) )
 			return false;
 
 #ifdef SWDS

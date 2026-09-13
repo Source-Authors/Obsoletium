@@ -359,7 +359,7 @@ InitReturnVal_t CMatSystemSurface::Init( void )
 	pVMTKeyValues->SetInt( "$ignorez", 1 );
 	pVMTKeyValues->SetInt( "$no_fullbright", 1 );
 	
-	if ( ! (CommandLine()->FindParm("-disable_matsurf_noculls")) )
+	if ( !CommandLine()->HasParm("-disable_matsurf_noculls") )
 	{
 		pVMTKeyValues->SetInt( "$nocull", 1 );	// skip this if user asks for the switch above
 	}
@@ -424,7 +424,7 @@ InitReturnVal_t CMatSystemSurface::Init( void )
 	// font manager needs the file system and material system for bitmap fonts
 	FontManager().SetInterfaces( g_pFullFileSystem, g_pMaterialSystem );
 
-	g_bSpewFocus = CommandLine()->FindParm( "-vguifocus" ) ? true : false;
+	g_bSpewFocus = CommandLine()->HasParm( "-vguifocus" );
 
 	return INIT_OK;
 }

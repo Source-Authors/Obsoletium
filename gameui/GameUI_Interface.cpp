@@ -192,7 +192,7 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 	xboxsystem = (IXboxSystem *)factory( XBOXSYSTEM_INTERFACE_VERSION, NULL );
 	g_pEngineClientReplay = (IEngineClientReplay *)factory( ENGINE_REPLAY_CLIENT_INTERFACE_VERSION, NULL );
 
-	if ( ModInfo().SupportsVR() && CommandLine()->CheckParm( "-vr" ) )
+	if ( ModInfo().SupportsVR() && CommandLine()->HasParm( "-vr" ) )
 	{
 		g_pSourceVR = (ISourceVirtualReality *)factory( SOURCE_VIRTUAL_REALITY_INTERFACE_VERSION, NULL );
 	}
@@ -378,7 +378,7 @@ int __stdcall SendShutdownMsgFunc(WHANDLE hwnd, int lparam)
 //-----------------------------------------------------------------------------
 void CGameUI::PlayGameStartupSound()
 {
-	if ( CommandLine()->FindParm( "-nostartupsound" ) )
+	if ( CommandLine()->HasParm( "-nostartupsound" ) )
 		return;
 
 	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;

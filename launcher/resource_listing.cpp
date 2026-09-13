@@ -429,7 +429,7 @@ bool ResourceListing::InitCommandFile(const char *pchGameDir,
 
   current_wi_ = Clamp(current_wi_, (intp)0, work_items_.Count() - 1);
 
-  bool bCollate = command_line_->CheckParm("-collate") ? true : false;
+  bool bCollate = command_line_->HasParm("-collate");
   if (bCollate) {
     Collate();
     is_active_ = false;

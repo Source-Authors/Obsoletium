@@ -2370,8 +2370,8 @@ void VOX_GroupInitAllLRUs( void )
 //-----------------------------------------------------------------------------
 void VOX_AddSentenceWavesToResList( void )
 {
-	if ( !CommandLine()->FindParm( "-makereslists" ) &&
-		 !CommandLine()->FindParm( "-spewsentences" ) )
+	if ( !CommandLine()->HasParm( "-makereslists" ) &&
+		 !CommandLine()->HasParm( "-spewsentences" ) )
 	{
 		return;
 	}

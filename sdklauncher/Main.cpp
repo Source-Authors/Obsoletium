@@ -157,10 +157,8 @@ SpewRetval_t SDKLauncherSpewOutputFunc( SpewType_t spewType, char const *pMsg )
 	}
 	if (spewType == SPEW_ASSERT)
 	{
-		if ( CommandLine()->FindParm( "-noassert" ) == 0 )
-			return SPEW_DEBUGGER;
-		else
-			return SPEW_CONTINUE;
+		return CommandLine()->HasParm("-noassert") ? SPEW_CONTINUE
+												   : SPEW_DEBUGGER;
 	}
 	return SPEW_CONTINUE;
 }
@@ -511,21 +509,21 @@ bool RunQuickLaunch()
 {
 	char cmdLine[512];
 
-	if ( CommandLine()->FindParm( "-runhammer" ) )
+	if ( CommandLine()->HasParm( "-runhammer" ) )
 	{
 		// dimhotepus: x86-64 port.
 		Q_snprintf( cmdLine, sizeof( cmdLine ), "\"%s\\%s\\" PLATFORM_BIN_DIR "\\hammer.exe\"", GetSDKLauncherBinDirectory(), g_engineDir );
 		QuickLaunchCommandLine( cmdLine );
 		return true;
 	}
-	else if ( CommandLine()->FindParm( "-runmodelviewer" ) )
+	else if ( CommandLine()->HasParm( "-runmodelviewer" ) )
 	{
 		// dimhotepus: x86-64 port.
 		Q_snprintf( cmdLine, sizeof( cmdLine ), "\"%s\\%s\\" PLATFORM_BIN_DIR "\\hlmv.exe\"", GetSDKLauncherBinDirectory(), g_engineDir );
 		QuickLaunchCommandLine( cmdLine );
 		return true;
 	}
-	else if ( CommandLine()->FindParm( "-runfaceposer" ) )
+	else if ( CommandLine()->HasParm( "-runfaceposer" ) )
 	{
 		// dimhotepus: x86-64 port.
 		Q_snprintf( cmdLine, sizeof( cmdLine ), "\"%s\\%s\\" PLATFORM_BIN_DIR "\\hlfaceposer.exe\"", GetSDKLauncherBinDirectory(), g_engineDir );
@@ -539,7 +537,7 @@ bool RunQuickLaunch()
 
 void CheckCreateModParameters()
 {
-	if ( CommandLine()->FindParm( "-AutoHL2Mod" ) )
+	if ( CommandLine()->HasParm( "-AutoHL2Mod" ) )
 		g_bAutoHL2Mod = true;
 
 	int iParm = CommandLine()->FindParm( "-CreateMod" );

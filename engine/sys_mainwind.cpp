@@ -1470,8 +1470,8 @@ void CGame::PlayStartupVideos( void )
 		Sys_Sleep( 300 );
 	}
 
-	bool bEndGame = CommandLine()->CheckParm( "-endgamevid" );
-	bool bRecap = CommandLine()->CheckParm( "-recapvid" );	// FIXME: This is a temp addition until the movie playback is centralized -- jdw
+	bool bEndGame = CommandLine()->HasParm( "-endgamevid" );
+	bool bRecap = CommandLine()->HasParm( "-recapvid" );	// FIXME: This is a temp addition until the movie playback is centralized -- jdw
 	
 	bool bNeedHealthWarning = false;
 
@@ -1479,7 +1479,7 @@ void CGame::PlayStartupVideos( void )
 
 	FileHandle_t	hFile;
 
-	COM_OpenFile( HealthFile, &hFile );	
+	COM_OpenFile( HealthFile, &hFile );
 		
 	//There is no access to steam at this point so we are checking for the presence of an empty file that will only exist in the chinese depot
 	if ( hFile )
@@ -1488,7 +1488,7 @@ void CGame::PlayStartupVideos( void )
 		COM_CloseFile( hFile );
 	}
 
-	if (!bNeedHealthWarning && !bEndGame && !bRecap && (CommandLine()->CheckParm("-dev") || CommandLine()->CheckParm("-novid") || CommandLine()->CheckParm("-allowdebug")))
+	if (!bNeedHealthWarning && !bEndGame && !bRecap && (CommandLine()->HasParm("-dev") || CommandLine()->HasParm("-novid") || CommandLine()->HasParm("-allowdebug")))
 		return;
 
 	const char *pszFile = "media/StartupVids.txt";

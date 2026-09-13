@@ -662,7 +662,7 @@ void CHudMainMenuOverride::PaintTraverse( bool Repaint, bool allowForce )
 {
 	// Ugly hack: disable painting until we're done screwing around with updating the layout during initialization.
 	// Use -menupaintduringinit command line parameter to reinstate old behavior
-	if ( m_bStabilizedInitialLayout || CommandLine()->CheckParm("-menupaintduringinit") )
+	if ( m_bStabilizedInitialLayout || CommandLine()->HasParm("-menupaintduringinit") )
 	{
 		BaseClass::PaintTraverse( Repaint, allowForce );
 	}
@@ -1220,7 +1220,7 @@ void CHudMainMenuOverride::LoadMenuEntries( void )
 		if ( !bLoaded )
 		{
 			// only allow to load loose files when using insecure mode
-			if ( CommandLine()->FindParm( "-insecure" ) )
+			if ( CommandLine()->HasParm( "-insecure" ) )
 			{
 				bLoaded = datafile->LoadFromFile( g_pFullFileSystem, "Resource/GameMenu.res" );
 			}

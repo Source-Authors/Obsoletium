@@ -213,7 +213,7 @@ bool CModelBrowserApp::Create()
 	if ( !AddSystems( appSystems ) )
 		return false;
 
-	if ( !CommandLine()->CheckParm( "-nop4" ))
+	if ( !CommandLine()->HasParm( "-nop4" ))
 	{
 		AppModule_t hModule = LoadModule( "p4lib" );
 		AddSystem( hModule, P4_INTERFACE_VERSION );

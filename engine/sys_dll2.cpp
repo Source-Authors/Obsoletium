@@ -875,14 +875,14 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 
 #ifndef NO_STEAM
 	// If -nobreakpad was specified or we found metamod or sourcemod, don't register breakpad.
-	bool bUseBreakpad = !CommandLine()->FindParm( "-nobreakpad" ) && ( !bDedicated || !IsSourceModLoaded() );
+	bool bUseBreakpad = !CommandLine()->HasParm( "-nobreakpad" ) && ( !bDedicated || !IsSourceModLoaded() );
 	AppId_t BreakpadAppId = bDedicated ? VerInfo.ServerAppID : VerInfo.AppID;
 	Assert( BreakpadAppId != k_uAppIdInvalid || initState < eSteamInfo_Initialized );
 	if ( BreakpadAppId != k_uAppIdInvalid && initState > previousInitState && bUseBreakpad )
 	{
 		void *pvMiniDumpContext = NULL;
 		PFNPreMinidumpCallback pfnPreMinidumpCallback = NULL;
-		bool bFullMemoryDump = !bDedicated && IsWindows() && CommandLine()->FindParm( "-full_memory_dumps" );
+		bool bFullMemoryDump = !bDedicated && IsWindows() && CommandLine()->HasParm( "-full_memory_dumps" );
 
 #if defined( POSIX )
 		// On Windows we're relying on the try/except to build the minidump comment. On Linux, we don't have that
@@ -1136,7 +1136,7 @@ void CEngineAPI::SetStartupInfo( StartupInfo_t &info )
 			g_pFileSystem->EnableWhitelistFileTracking( true, false, false );
 		}
 
-		m_bSupportsVR = modinfo->GetInt( "supportsvr" ) > 0 && CommandLine()->CheckParm( "-vr" );
+		m_bSupportsVR = modinfo->GetInt( "supportsvr" ) > 0 && CommandLine()->HasParm( "-vr" );
 		if ( m_bSupportsVR )
 		{
 			// This also has to happen before CreateGameWindow to know where to put
@@ -1161,7 +1161,7 @@ void CEngineAPI::SetStartupInfo( StartupInfo_t &info )
 //-----------------------------------------------------------------------------
 InitReturnVal_t CEngineAPI::Init() 
 {
-	if ( CommandLine()->FindParm( "-sv_benchmark" ) != 0 )
+	if ( CommandLine()->HasParm( "-sv_benchmark" ) )
 	{
 		Plat_SetBenchmarkMode( true );
 	}
@@ -1743,13 +1743,13 @@ void CEngineAPI::ModShutdown()
 InitReturnVal_t CEngineAPI::HandleSetModeError()
 {
 	// show an error, see if the user wants to restart
-	if ( CommandLine()->FindParm( "-safe" ) )
+	if ( CommandLine()->HasParm( "-safe" ) )
 	{
 		Sys_MessageBox( "Failed to set video mode.\n\nThis game has a minimum requirement of DirectX 7.0 compatible hardware.\n", "Video mode error", false );
 		return INIT_FAILED;
 	}
 	
-	if ( CommandLine()->FindParm( "-autoconfig" ) )
+	if ( CommandLine()->HasParm( "-autoconfig" ) )
 	{
 		if ( Sys_MessageBox( "Failed to set video mode - falling back to safe mode settings.\n\nGame will now restart with the new video settings.", "Video - safe mode fallback", true ))
 		{
@@ -1860,7 +1860,7 @@ extern "C" void __cdecl WriteSteamMiniDumpWithComment( unsigned int uStructuredE
 //-----------------------------------------------------------------------------
 int CEngineAPI::Run()
 {
-	if ( CommandLine()->FindParm( "-insecure" ) || CommandLine()->FindParm( "-textmode" ) )
+	if ( CommandLine()->HasParm( "-insecure" ) || CommandLine()->HasParm( "-textmode" ) )
 	{
 		Host_DisallowSecureServers();
 	}
@@ -1890,7 +1890,7 @@ int CEngineAPI::Run()
 	// of catching exceptions that aren't in callbacks.
 	// The unhandled exception filter will also catch crashes in threads that
 	// don't have a try/catch or __try/__except block.
-	bool hasMinidumps = !CommandLine()->FindParm( "-nominidumps");
+	bool hasMinidumps = !CommandLine()->HasParm( "-nominidumps");
 	if ( hasMinidumps )
 	{
 		const auto oldUnhandled = MinidumpSetUnhandledExceptionFunction2( WriteSteamMiniDumpWithComment );
@@ -1928,7 +1928,7 @@ bool CModAppSystemGroup::AddLegacySystems()
 		return false;
 
 #if !defined( DEDICATED )
-//	if ( CommandLine()->FindParm( "-tools" ) )
+//	if ( CommandLine()->HasParm( "-tools" ) )
 	{
 		AppModule_t toolFrameworkModule = LoadModule( "engine" DLL_EXT_STRING );
 
@@ -2018,7 +2018,7 @@ bool CModAppSystemGroup::Create()
 		return false;
 
 #if !defined( DEDICATED )
-//	if ( CommandLine()->FindParm( "-tools" ) )
+//	if ( CommandLine()->HasParm( "-tools" ) )
 	{
 		AppModule_t toolFrameworkModule = LoadModule( "engine" DLL_EXT_STRING );
 
@@ -2279,12 +2279,12 @@ bool EnableLongTickWatcher()
 //-----------------------------------------------------------------------------
 bool CDedicatedServerAPI::Connect( CreateInterfaceFn factory ) 
 { 
-	if ( CommandLine()->FindParm( "-sv_benchmark" ) != 0 )
+	if ( CommandLine()->HasParm( "-sv_benchmark" ) )
 	{
 		Plat_SetBenchmarkMode( true );
 	}
 
-	if ( CommandLine()->FindParm( "-dumplongticks" ) )
+	if ( CommandLine()->HasParm( "-dumplongticks" ) )
 	{
 		Msg( "-dumplongticks found on command line. Activating long tick watcher thread.\n" );
 		EnableLongTickWatcher();
@@ -2394,13 +2394,13 @@ bool CDedicatedServerAPI::ModInit( ModInfo_t &info )
 	// that is loaded, or not bother doing any
 	// Note that this mirrors g_sv_pure_mode from sv_main.cpp
 	int pure_mode = 1; // default to on, +sv_pure 0 or -sv_pure 0 will turn it off
-	if ( CommandLine()->CheckParm("+sv_pure") )
+	if ( CommandLine()->HasParm("+sv_pure") )
 		pure_mode = CommandLine()->ParmValue( "+sv_pure", 1 );
-	else if ( CommandLine()->CheckParm("-sv_pure") )
+	else if ( CommandLine()->HasParm("-sv_pure") )
 		pure_mode = CommandLine()->ParmValue( "-sv_pure", 1 );
 
 	if ( pure_mode )
-		g_pFullFileSystem->EnableWhitelistFileTracking( true, true, CommandLine()->FindParm( "-sv_pure_verify_hashes" ) ? true : false );
+		g_pFullFileSystem->EnableWhitelistFileTracking( true, true, CommandLine()->HasParm( "-sv_pure_verify_hashes" ) );
 	else
 		g_pFullFileSystem->EnableWhitelistFileTracking( false, false, false );
 

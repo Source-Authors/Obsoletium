@@ -256,15 +256,15 @@ void RemoveParametersOverrides(ICommandLine *command_line) {
 #ifdef WIN32
 bool ApplyProcessPriorityClass(const ICommandLine *command_line) {
   // Make low priority?
-  if (command_line->CheckParm("-low")) {
+  if (command_line->HasParm("-low")) {
     return !!SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
   }
 
-  if (command_line->CheckParm("-high")) {
+  if (command_line->HasParm("-high")) {
     return !!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
   }
 
-  if (!command_line->CheckParm("-normal")) {
+  if (!command_line->HasParm("-normal")) {
     // dimhotepus: Above normal by default.
     return !!SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS);
   }
@@ -405,7 +405,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   command_line->CreateCmdLine(argc, argv);
 #endif
 
-  if (command_line->CheckParm("-sleepatstartup")) {
+  if (command_line->HasParm("-sleepatstartup")) {
     // When launching from Steam, it can be difficult to get a debugger attached
     // when you're crashing quickly at startup.
     //
@@ -447,7 +447,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
     // Allow the user to explicitly say they want to be able to run multiple
     // instances of the source mutex.  Useful for side-by-side comparisons of
     // different renderers.
-    const bool allow_multirun{command_line->CheckParm("-multirun") != nullptr};
+    const bool allow_multirun{command_line->HasParm("-multirun")};
     if (!allow_multirun) {
       Error(
           "Oops, the game is already launched.\n\nSorry, but only single game "
@@ -508,7 +508,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
 #endif
 
   // If we're using -default command line parameters, get rid of DX8 settings.
-  if (command_line->CheckParm("-default")) {
+  if (command_line->HasParm("-default")) {
     command_line->RemoveParm("-dxlevel");
     command_line->RemoveParm("-maxdxlevel");
     command_line->RemoveParm("+mat_dxlevel");
@@ -541,7 +541,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
 
   // If game is not run from Steam then add -insecure in order to avoid client
   // timeout message.
-  if (!command_line->CheckParm("-steam")) {
+  if (!command_line->HasParm("-steam")) {
     command_line->AppendParm("-insecure", nullptr);
   }
 
@@ -549,10 +549,10 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   const se::launcher::ScopedAppRelaunch scoped_app_relaunch;
   // Dump heap leaks if needed.
   const se::launcher::ScopedHeapLeakDumper scoped_heap_leak_dumper{
-      !!command_line->CheckParm("-leakcheck")};
+      !!command_line->HasParm("-leakcheck")};
 
   // Run in text mode (no graphics & sound)?
-  const bool is_text_mode{command_line->CheckParm("-textmode") &&
+  const bool is_text_mode{command_line->HasParm("-textmode") &&
                           InitTextMode()};
 
   rc = RunApp(command_line, base_directory, is_text_mode);

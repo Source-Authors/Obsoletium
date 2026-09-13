@@ -558,7 +558,7 @@ socket_handle NET_OpenSocket ( const char *net_interface, int& port, int protoco
 		}
 	}
 	
-	if ( CommandLine()->FindParm( "-reuse" ) )
+	if ( CommandLine()->HasParm( "-reuse" ) )
 	{
 		opt = 1; // make it reusable
 		VCR_NONPLAYBACKFN( setsockopt(newsocket, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt)), ret, "setsockopt(SO_REUSEADDR)" );
@@ -616,7 +616,7 @@ socket_handle NET_OpenSocket ( const char *net_interface, int& port, int protoco
 		// Try next port
 	}
 
-	const bool bStrictBind = CommandLine()->FindParm( "-strictportbind" );
+	const bool bStrictBind = CommandLine()->HasParm( "-strictportbind" );
 	if ( port_offset == PORT_TRY_MAX && !bStrictBind )
 	{
 		Warning( "UDP_OpenSocket: unable to bind socket.\n" );
@@ -2791,7 +2791,7 @@ void NET_Config ( void )
 		NET_OpenSockets();
 
 		// setup the rcon server sockets
-		if ( net_dedicated || CommandLine()->FindParm( "-usercon" ) )
+		if ( net_dedicated || CommandLine()->HasParm( "-usercon" ) )
 		{
 			netadr_t rconAddr = net_local_adr;
 			rconAddr.SetPort( net_sockets[NS_SERVER].nPort );
@@ -2924,28 +2924,28 @@ void NET_SetMutiplayer(bool multiplayer)
 //-----------------------------------------------------------------------------
 void NET_Init( bool bIsDedicated )
 {
-	if ( CommandLine()->FindParm( "-NoQueuedPacketThread" ) )
+	if ( CommandLine()->HasParm( "-NoQueuedPacketThread" ) )
 		Warning( "Found -NoQueuedPacketThread, so no queued packet thread will be created.\n" );
 	else
 		g_pQueuedPackedSender->Setup();
 
 
-	if (CommandLine()->FindParm("-nodns"))
+	if (CommandLine()->HasParm("-nodns"))
 	{
 		net_nodns = true;
 	}
 
-	if (CommandLine()->FindParm("-usetcp"))
+	if (CommandLine()->HasParm("-usetcp"))
 	{
 		net_notcp = false;
 	}
 
-	if (CommandLine()->FindParm("-nohltv"))
+	if (CommandLine()->HasParm("-nohltv"))
 	{
 		net_nohltv = true;
 	}
 
-	if (CommandLine()->FindParm("-noip"))
+	if (CommandLine()->HasParm("-noip"))
 	{
 		net_noip = true;
 	}

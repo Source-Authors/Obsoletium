@@ -1720,7 +1720,7 @@ void CHLTVServer::Init(bool bIsDedicated)
 	m_Socket = NS_HLTV;
 	
 	// check if only master proxy is allowed, no broadcasting
-	if ( CommandLine()->FindParm("-tvmasteronly") )
+	if ( CommandLine()->HasParm("-tvmasteronly") )
 	{
 		m_bMasterOnlyMode = true;
 	}

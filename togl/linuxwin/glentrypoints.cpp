@@ -429,7 +429,7 @@ COpenGLEntryPoints::COpenGLEntryPoints()
 	m_bHave_GL_NV_bindless_texture = false;
 	m_bHave_GL_AMD_pinned_memory = false;
 #else
-	if ( ( m_bHave_GL_NV_bindless_texture ) && ( !CommandLine()->CheckParm( "-gl_nv_bindless_texturing" ) ) )
+	if ( ( m_bHave_GL_NV_bindless_texture ) && ( !CommandLine()->HasParm( "-gl_nv_bindless_texturing" ) ) )
 	{
 		m_bHave_GL_NV_bindless_texture = false;
 		glGetTextureHandleNV.Force( NULL );
@@ -443,7 +443,7 @@ COpenGLEntryPoints::COpenGLEntryPoints()
 		glIsTextureHandleResidentNV.Force( NULL );
 	}
 
-	if ( !CommandLine()->CheckParm( "-gl_amd_pinned_memory" ) )
+	if ( !CommandLine()->HasParm( "-gl_amd_pinned_memory" ) )
 	{
 		m_bHave_GL_AMD_pinned_memory = false;
 	}
@@ -452,7 +452,7 @@ COpenGLEntryPoints::COpenGLEntryPoints()
 	// Getting reports of black screens, etc. with ARB_buffer_storage and AMD drivers. This type of thing:
 	//  http://forums.steampowered.com/forums/showthread.php?t=3266806
 	// So disable it for now.
-	if ( ( m_nDriverProvider == cGLDriverProviderAMD ) || CommandLine()->CheckParm( "-gl_disable_arb_buffer_storage" ) )
+	if ( ( m_nDriverProvider == cGLDriverProviderAMD ) || CommandLine()->HasParm( "-gl_disable_arb_buffer_storage" ) )
 	{
 		m_bHave_GL_ARB_buffer_storage = false;
 	}
@@ -469,7 +469,7 @@ COpenGLEntryPoints::COpenGLEntryPoints()
 	}
 
 #ifdef OSX
-	if ( CommandLine()->FindParm( "-glmnosrgbdecode" ) )
+	if ( CommandLine()->HasParm( "-glmnosrgbdecode" ) )
 	{
 		Msg( "Forcing m_bHave_GL_EXT_texture_sRGB_decode off.\n" );
 		m_bHave_GL_EXT_texture_sRGB_decode = false;

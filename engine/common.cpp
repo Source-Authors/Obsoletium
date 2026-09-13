@@ -814,7 +814,7 @@ void COM_SetupLogDir( IN_Z const char *mapname )
 	g_pFileSystem->RemoveSearchPath( NULL, "LOGDIR" );
 
 	// set the log directory
-	if ( mapname && CommandLine()->FindParm("-uselogdir") )
+	if ( mapname && CommandLine()->HasParm("-uselogdir") )
 	{
 		int i;
 		char sRelativeLogDir[MAX_PATH];
@@ -934,7 +934,7 @@ void COM_InitFilesystem( const char *pFullModPath )
 		else
 		{
 			// still allow command line override even when not running steam
-			if (CommandLine()->CheckParm(kAudioLanguageArg))
+			if (CommandLine()->HasParm(kAudioLanguageArg))
 			{
 				V_strcpy_safe(language, CommandLine()->ParmValue(kAudioLanguageArg, "english"));
 			}
@@ -1002,7 +1002,7 @@ const char *COM_DXLevelToString( int dxlevel )
 		bHalfPrecision = true;
 	}
 	
-	if( CommandLine()->CheckParm( "-dxlevel" ) )
+	if( CommandLine()->HasParm( "-dxlevel" ) )
 	{
 		switch( dxlevel )
 		{

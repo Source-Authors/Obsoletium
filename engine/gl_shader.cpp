@@ -72,7 +72,7 @@ bool Shader_Connect( bool bSetProxyFactory )
 
 	unsigned nAdapter = CommandLine()->ParmValue( "-adapter", 0 );
 	int nModeFlags = MATERIAL_INIT_ALLOCATE_FULLSCREEN_TEXTURE;
-	if ( CommandLine()->FindParm( "-ref" ) )
+	if ( CommandLine()->HasParm( "-ref" ) )
 	{
 		nModeFlags |= MATERIAL_INIT_REFERENCE_RASTERIZER;
 	}

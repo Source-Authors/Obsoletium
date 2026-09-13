@@ -626,14 +626,14 @@ bool CBaseGameStats_Driver::Init()
 	Q_strncpy( s_szStatUploadRegistryKeyName, "GameStatsUpload_", sizeof( s_szStatUploadRegistryKeyName ) );
 	Q_strncat( s_szStatUploadRegistryKeyName, szLoweredGameDir, sizeof( s_szStatUploadRegistryKeyName ) );
 
-	gamestats->m_bLoggingToFile = CommandLine()->FindParm( "-gamestatsloggingtofile" ) ? true : false;
+	gamestats->m_bLoggingToFile = CommandLine()->HasParm( "-gamestatsloggingtofile" );
 	if ( gamestats->m_bLoggingToFile )
 	{
 		gamestats->m_bLogging = true;
 	}
 	else
 	{
-		gamestats->m_bLogging = CommandLine()->FindParm( "-gamestatslogging" ) ? true : false;
+		gamestats->m_bLogging = CommandLine()->HasParm( "-gamestatslogging" );
 	}
 
 #if 0

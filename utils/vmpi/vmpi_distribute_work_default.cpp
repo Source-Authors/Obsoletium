@@ -346,7 +346,7 @@ public:
 
 
 		CVisibleWindowVector< CWULookupInfo > &vlkup = m_WULookup;
-		if ( CommandLine()->FindParm( "-mpi_NoScheduler" ) )
+		if ( CommandLine()->HasParm( "-mpi_NoScheduler" ) )
 		{
 			Warning( "\n\n-mpi_NoScheduler found: Warning - this should only be used for testing and with 1 worker!\n\n" );
 			vlkup.ExpandWindow( m_pInfo->m_nWorkUnits );

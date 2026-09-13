@@ -189,7 +189,7 @@ bool CVguiMatSysApp::PreInit( )
 	const char *pArg;
 	int iWidth = 1024;
 	int iHeight = 768;
-	bool bWindowed = (CommandLine()->CheckParm( "-fullscreen" ) == nullptr);
+	bool bWindowed = !CommandLine()->HasParm( "-fullscreen" );
 	if (CommandLine()->CheckParm( "-width", &pArg ))
 	{
 		iWidth = atoi( pArg );
@@ -220,7 +220,7 @@ bool CVguiMatSysApp::PreInit( )
 	}
 
 	int adapterFlags = 0;
-	if ( CommandLine()->CheckParm( "-ref" ) )
+	if ( CommandLine()->HasParm( "-ref" ) )
 	{
 		adapterFlags |= MATERIAL_INIT_REFERENCE_RASTERIZER;
 	}
@@ -275,15 +275,15 @@ void* CVguiMatSysApp::GetAppWindow()
 bool CVguiMatSysApp::SetVideoMode( )
 {
 	MaterialSystem_Config_t config;
-	config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, !CommandLine()->CheckParm( "-fullscreen" ) );
-	config.SetFlag( MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER, !!CommandLine()->CheckParm( "-noborder" ) );
+	config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, !CommandLine()->HasParm( "-fullscreen" ) );
+	config.SetFlag( MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER, CommandLine()->HasParm( "-noborder" ) );
 
-	if ( CommandLine()->CheckParm( "-resizing" ) )
+	if ( CommandLine()->HasParm( "-resizing" ) )
 	{
 		config.SetFlag( MATSYS_VIDCFG_FLAGS_RESIZING, true );
 	}
 
-	if ( CommandLine()->CheckParm( "-mat_vsync" ) )
+	if ( CommandLine()->HasParm( "-mat_vsync" ) )
 	{
 		config.SetFlag( MATSYS_VIDCFG_FLAGS_NO_WAIT_FOR_VSYNC, false );
 	}

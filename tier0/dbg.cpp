@@ -89,14 +89,14 @@ DBG_INTERFACE SpewRetval_t DefaultSpewFunc( SpewType_t type, const tchar *pMsg )
 	{
 #ifndef WIN32
 		// Non-win32
-		bool bRaiseOnAssert = getenv( "RAISE_ON_ASSERT" ) || !!CommandLine()->FindParm( "-raiseonassert" );
+		bool bRaiseOnAssert = getenv( "RAISE_ON_ASSERT" ) || CommandLine()->HasParm( "-raiseonassert" );
 		return bRaiseOnAssert ? SPEW_DEBUGGER : SPEW_CONTINUE;
 #elif defined( _DEBUG )
 		// Win32 debug
 		return SPEW_DEBUGGER;
 #else
 		// Win32 release
-		bool bRaiseOnAssert = !!CommandLine()->FindParm( "-raiseonassert" );
+		bool bRaiseOnAssert = CommandLine()->HasParm( "-raiseonassert" );
 		return bRaiseOnAssert ? SPEW_DEBUGGER : SPEW_CONTINUE;
 #endif
 	}
@@ -415,7 +415,7 @@ static bool FindSpewGroup( const tchar* pGroupName, size_t* pInd )
 bool HushAsserts()
 {
 #ifdef DBGFLAG_ASSERT
-	static bool s_bHushAsserts = !!CommandLine()->FindParm( "-hushasserts" );
+	static bool s_bHushAsserts = CommandLine()->HasParm( "-hushasserts" );
 	return s_bHushAsserts;
 #else
 	return true;
@@ -976,8 +976,8 @@ void COM_TimestampedLog( PRINTF_FORMAT_STRING char const *fmt, ... )
 
 	if ( !is_log_checked )
 	{
-		should_log_2_etw = !!CommandLine()->CheckParm( "-etwprofile" );
-		should_log = should_log_2_etw || !!CommandLine()->CheckParm( "-profile" );
+		should_log_2_etw = CommandLine()->HasParm( "-etwprofile" );
+		should_log = should_log_2_etw || CommandLine()->HasParm( "-profile" );
 		is_log_checked = true;
 	}
 

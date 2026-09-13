@@ -711,7 +711,7 @@ void CHostState::OnClientConnected()
 	}
 
 	// Spew global texture memory usage if asked to
-	if( !CommandLine()->CheckParm( "-dumpvidmemstats" ) ) return;
+	if( !CommandLine()->HasParm( "-dumpvidmemstats" ) ) return;
 	
 	// dimhotepus: vidmemstats.txt -> gpu_memstats.txt.
 	// dimhotepus: Notify user we dump stats.

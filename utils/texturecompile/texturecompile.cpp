@@ -530,7 +530,7 @@ void SetupPaths( int argc, char **argv )
 	g_pTextureOutputDir = CommandLine()->ParmValue( "-textureoutputdir", "" );
 //	printf( "shaderoutputdir: \"%s\"\n", g_pShaderOutputDir );
 
-	g_bVerbose = CommandLine()->FindParm("-verbose") != 0;
+	g_bVerbose = CommandLine()->HasParm("-verbose");
 }
 
 void SetupDebugFile( void )

@@ -122,7 +122,7 @@ CCreateMultiplayerGameServerPage::CCreateMultiplayerGameServerPage(
   m_pNetworkCombo = new ComboBox(this, "NetworkCombo", 10, false);
   int defaultItem = m_pNetworkCombo->AddItem("#Internet", nullptr);
   int lanItem = m_pNetworkCombo->AddItem("#LAN", nullptr);
-  if (CommandLine()->CheckParm("-steam") && IsSteamInOfflineMode()) {
+  if (CommandLine()->HasParm("-steam") && IsSteamInOfflineMode()) {
     defaultItem = lanItem;
   }
   m_pNetworkCombo->ActivateItem(defaultItem);
@@ -173,13 +173,13 @@ CCreateMultiplayerGameServerPage::CCreateMultiplayerGameServerPage(
   m_szPassword[0] = 0;
   m_iMaxPlayers = 24;
 
-  if (CommandLine()->CheckParm("-steam") && IsSteamInOfflineMode()) {
+  if (CommandLine()->HasParm("-steam") && IsSteamInOfflineMode()) {
     m_pNetworkCombo->SetEnabled(false);
   }
 
   SetVisible(true);
 
-  if (CommandLine()->CheckParm("-steam") && IsSteamInOfflineMode()) {
+  if (CommandLine()->HasParm("-steam") && IsSteamInOfflineMode()) {
     // dimhotepus: Own message box to scale it.
     auto *box = new vgui::MessageBox("#Start_Server_Offline_Title",
                                      "#Start_Server_Offline_Warning", this);
@@ -456,7 +456,7 @@ void CCreateMultiplayerGameServerPage::LoadMODList() {
   m_pGameCombo->DeleteAllItems();
 
   // add steam games
-  if (CommandLine()->CheckParm("-steam")) {
+  if (CommandLine()->HasParm("-steam")) {
     constexpr char pSteamGamesFilename[] = "hlds_steamgames.vdf";
 
     KeyValuesAD gamesFile(pSteamGamesFilename);
@@ -657,7 +657,7 @@ void CCreateMultiplayerGameServerPage::LoadMapList() {
   m_pMapList->SetEnabled(true);
   m_pStartServerButton->SetEnabled(true);
 
-  if (CommandLine()->CheckParm("-steam")) {
+  if (CommandLine()->HasParm("-steam")) {
     KeyValues *userData = m_pGameCombo->GetActiveItemUserData();
     if (userData && userData->GetString("DedicatedServerStartMap", nullptr)) {
       // set only

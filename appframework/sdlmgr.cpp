@@ -470,7 +470,7 @@ InitReturnVal_t CSDLMgr::Init()
 			Error( "SDL_Init(SDL_INIT_VIDEO) failed: %s", SDL_GetError() );
 
 #if defined( DX_TO_GL_ABSTRACTION )
-		if ( CommandLine()->FindParm( "-gl_debug" ) )
+		if ( CommandLine()->HasParm( "-gl_debug" ) )
 		{
 			SDL_GL_SetAttribute( SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG );
 		}
@@ -484,7 +484,7 @@ InitReturnVal_t CSDLMgr::Init()
 	Msg("SDL video target is '%s'\n", SDL_GetCurrentVideoDriver());
 
 	m_bForbidMouseGrab = true;
-	if ( !CommandLine()->FindParm("-nomousegrab") && CommandLine()->FindParm("-mousegrab") )
+	if ( !CommandLine()->HasParm("-nomousegrab") && CommandLine()->HasParm("-mousegrab") )
 	{
 		m_bForbidMouseGrab = false;
 	}
@@ -719,7 +719,7 @@ bool CSDLMgr::CreateHiddenGameWindow( const char *pTitle, int width, int height 
 	GetDisplayDB()->GetRendererInfo( 0, &rendererInfo );
 	//-----------------------------------------------------------------------------------------
 	//- enforce minimum system requirements for multiplayer branch (CSS / DOD / TF2) : no GMA950, X3100, or NV G7x.
-	if (!CommandLine()->FindParm("-glmnosystemcheck"))	// escape hatch
+	if (!CommandLine()->HasParm("-glmnosystemcheck"))	// escape hatch
 	{
 		if ( rendererInfo.m_osComboVersion < 0x0A0607 )
 		{
@@ -757,7 +757,7 @@ bool CSDLMgr::CreateHiddenGameWindow( const char *pTitle, int width, int height 
 	pszString = ( const char * )glGetString(GL_EXTENSIONS);
 
 	// If we specified -gl_debug, make sure the extension string is present now.
-	if ( CommandLine()->FindParm( "-gl_debug" ) )
+	if ( CommandLine()->HasParm( "-gl_debug" ) )
 	{
 		Assert( V_strstr(pszString, "GL_ARB_debug_output") );
 	}
@@ -768,7 +768,7 @@ bool CSDLMgr::CreateHiddenGameWindow( const char *pTitle, int width, int height 
 	// It is now safe to call any base GL entry point that's supplied by gGL.
 	// You still need to explicitly test for extension entry points, though!
 
-	if ( CommandLine()->FindParm( "-gl_dump_strings" ) )
+	if ( CommandLine()->HasParm( "-gl_dump_strings" ) )
 	{
 		DebugPrintf("GL_RENDERER: %s\n", (const char *) gGL->glGetString(GL_RENDERER));
 		DebugPrintf("GL_VENDOR: %s\n", (const char *) gGL->glGetString(GL_VENDOR));
@@ -1446,7 +1446,7 @@ void CSDLMgr::handleKeyInput( const SDL_Event &event )
 
 #ifdef OSX
 	if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_TAB &&
-	     SDL_GetModState()&KMOD_GUI && CommandLine()->FindParm( "-exclusivefs" ) )
+	     SDL_GetModState()&KMOD_GUI && CommandLine()->HasParm( "-exclusivefs" ) )
 	{
 		// If we're in exclusive fullscreen mode, and they command-tab, handle
 		// that by forcing minimization of the window.
@@ -1465,7 +1465,7 @@ void CSDLMgr::handleKeyInput( const SDL_Event &event )
 
 	// Testing for non-qwerty keyboards: work out the key name and use this to
 	// calculate the scancode.
-	if ( CommandLine()->FindParm( "-nonqwerty" ) )
+	if ( CommandLine()->HasParm( "-nonqwerty" ) )
 	{
 		const char* keyname = SDL_GetKeyName( event.key.keysym.sym );
 		if ( keyname != nullptr && V_strlen( keyname ) == 1) {

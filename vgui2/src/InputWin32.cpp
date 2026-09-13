@@ -552,7 +552,7 @@ void CInputSystem::RunFrame()
 {
 	if ( m_nDebugMessages == -1 )
 	{
-		m_nDebugMessages = CommandLine()->FindParm( "-vguifocus" ) ? 1 : 0;
+		m_nDebugMessages = CommandLine()->HasParm( "-vguifocus" ) ? 1 : 0;
 	}
 
 	InputContext_t *pContext = GetInputContext(m_hContext);

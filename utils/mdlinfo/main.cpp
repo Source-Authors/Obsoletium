@@ -340,17 +340,14 @@ bool CMdlInfoApp::CommandLineHasOpt( const char *pszOpt )
 	{
 		if ( V_strieq( pszOpt, s_binaryOptions[ii].m_pszShortName ) || V_strieq( pszOpt, s_binaryOptions[ii].m_pszLongName ) )
 		{
-			if ( CommandLine()->FindParm( s_binaryOptions[ii].m_pszShortName ) > 0 || CommandLine()->FindParm( s_binaryOptions[ii].m_pszLongName ) > 0 )
+			if ( CommandLine()->HasParm( s_binaryOptions[ii].m_pszShortName ) || CommandLine()->HasParm( s_binaryOptions[ii].m_pszLongName ) )
 				return true;
 
 			return false;
 		}
 	}
 
-	if ( CommandLine()->FindParm( pszOpt ) > 0 )
-		return true;
-
-	return false;
+	return CommandLine()->HasParm( pszOpt );
 }
 
 

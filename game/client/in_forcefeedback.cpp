@@ -476,7 +476,7 @@ static void LoadEffectFiles( LPDIRECTINPUTDEVICE8 device )
 void CInput::Init_ForceFeedback() 
 { 
 	// abort startup if user requests no joystick
-	if ( CommandLine()->FindParm("-noff" ) ) 
+	if ( CommandLine()->HasParm("-noff" ) ) 
 	{
 		return; 
 	}

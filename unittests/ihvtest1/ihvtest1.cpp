@@ -1238,7 +1238,7 @@ bool CIHVTestApp::Create()
 #endif
 
 	const char* pDLLName;
-	if ( CommandLine()->CheckParm( "-null" ) )
+	if ( CommandLine()->HasParm( "-null" ) )
 	{
 		g_bUseEmptyShader = true;
 		pDLLName = "shaderapiempty.dll";
@@ -1344,12 +1344,12 @@ bool CIHVTestApp::PreInit( void )
 	}
 
 	const char *pArgVal;
-	if ( CommandLine()->CheckParm( "-bench" ) )
+	if ( CommandLine()->HasParm( "-bench" ) )
 	{
 		g_BenchMode = true;
 	}
 	
-	if( !g_BenchMode && !CommandLine()->CheckParm( "-i" ) )
+	if( !g_BenchMode && !CommandLine()->HasParm( "-i" ) )
 	{
 		// Set some default parameters for running as a unittest
 		g_BenchMode = true;
@@ -1364,17 +1364,17 @@ bool CIHVTestApp::PreInit( void )
 		}
 	}
 	
-	if( CommandLine()->CheckParm( "-softwaretl" ) )
+	if( CommandLine()->HasParm( "-softwaretl" ) )
 	{
 		g_SoftwareTL = true;
 	}
 
 	// Explicitly in window/fullscreen mode?
-	if ( CommandLine()->CheckParm( "-window") )
+	if ( CommandLine()->HasParm( "-window") )
 	{
 		g_WindowMode = true;
 	}
-	else if ( CommandLine()->CheckParm( "-fullscreen" ) )
+	else if ( CommandLine()->HasParm( "-fullscreen" ) )
 	{
 		g_WindowMode = false;
 	}

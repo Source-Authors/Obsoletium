@@ -370,7 +370,7 @@ static T OverrideVideoConfigFromCommandLine( const char *pCVarName, T curVal )
 {
 	char szOption[256];
 	V_sprintf_safe( szOption, "+%s", pCVarName );
-	if ( CommandLine()->CheckParm( szOption ) )
+	if ( CommandLine()->HasParm( szOption ) )
 	{
 		T newVal = CommandLine()->ParmValue( szOption, curVal );
 		Warning( "Video configuration ignoring %s due to command line override\n", pCVarName );
@@ -544,7 +544,7 @@ static void WriteMaterialSystemConfigToRegistry( const MaterialSystem_Config_t &
 //-----------------------------------------------------------------------------
 static void OverrideMaterialSystemConfigFromCommandLine( MaterialSystem_Config_t &config )
 {
-	if ( CommandLine()->FindParm( "-dxlevel" ) )
+	if ( CommandLine()->HasParm( "-dxlevel" ) )
 	{
 		config.dxSupportLevel = CommandLine()->ParmValue( "-dxlevel", config.dxSupportLevel );
 
@@ -559,36 +559,36 @@ static void OverrideMaterialSystemConfigFromCommandLine( MaterialSystem_Config_t
 	}
 
 	// Check for windowed mode command line override
-	if ( CommandLine()->FindParm( "-sw" ) || 
-		CommandLine()->FindParm( "-startwindowed" ) ||
-		CommandLine()->FindParm( "-windowed" ) ||
-		CommandLine()->FindParm( "-window" ) )
+	if ( CommandLine()->HasParm( "-sw" ) || 
+		CommandLine()->HasParm( "-startwindowed" ) ||
+		CommandLine()->HasParm( "-windowed" ) ||
+		CommandLine()->HasParm( "-window" ) )
 	{
 		config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, true );
 	}
 	// Check for fullscreen override
-	else if ( CommandLine()->FindParm( "-full" ) ||	CommandLine()->FindParm( "-fullscreen" ) )
+	else if ( CommandLine()->HasParm( "-full" ) ||	CommandLine()->HasParm( "-fullscreen" ) )
 	{
 		config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, false );
 	}
 
 	// Check window is borderless
-	if ( CommandLine()->FindParm( "-noborder" ) )
+	if ( CommandLine()->HasParm( "-noborder" ) )
 	{
 		config.SetFlag( MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER, true );
 	}
 
 	// Get width and height
-	if ( CommandLine()->FindParm( "-width" ) || CommandLine()->FindParm( "-w" ) )
+	if ( CommandLine()->HasParm( "-width" ) || CommandLine()->HasParm( "-w" ) )
 	{
 		config.m_VideoMode.m_Width = CommandLine()->ParmValue( "-width", config.m_VideoMode.m_Width );
 		config.m_VideoMode.m_Width = CommandLine()->ParmValue( "-w", config.m_VideoMode.m_Width );
-		if( !( CommandLine()->FindParm( "-height" ) || CommandLine()->FindParm( "-h" ) ) )
+		if( !( CommandLine()->HasParm( "-height" ) || CommandLine()->HasParm( "-h" ) ) )
 		{
 			config.m_VideoMode.m_Height = ( config.m_VideoMode.m_Width * 3 ) / 4;
 		}
 	}
-	if ( CommandLine()->FindParm( "-height" ) || CommandLine()->FindParm( "-h" ) )
+	if ( CommandLine()->HasParm( "-height" ) || CommandLine()->HasParm( "-h" ) )
 	{
 		config.m_VideoMode.m_Height = CommandLine()->ParmValue( "-height", config.m_VideoMode.m_Height );
 		config.m_VideoMode.m_Height = CommandLine()->ParmValue( "-h", config.m_VideoMode.m_Height );
@@ -596,7 +596,7 @@ static void OverrideMaterialSystemConfigFromCommandLine( MaterialSystem_Config_t
 
 #if defined( USE_SDL ) && !defined( SWDS )
 	// If -displayindex was specified on the command line, then set sdl_displayindex.
-	if ( CommandLine()->FindParm( "-displayindex" ) )
+	if ( CommandLine()->HasParm( "-displayindex" ) )
 	{
 		static ConVarRef conVar( "sdl_displayindex" );
 
@@ -621,12 +621,12 @@ static void OverrideMaterialSystemConfigFromCommandLine( MaterialSystem_Config_t
 	}
 #endif // USE_SDL && !SWDS
 
-	if ( CommandLine()->FindParm( "-resizing" ) )
+	if ( CommandLine()->HasParm( "-resizing" ) )
 	{
-		config.SetFlag( MATSYS_VIDCFG_FLAGS_RESIZING, CommandLine()->CheckParm( "-resizing" ) ? true : false );
+		config.SetFlag( MATSYS_VIDCFG_FLAGS_RESIZING, CommandLine()->HasParm( "-resizing" ) );
 	}
 #ifndef CSS_PERF_TEST
-	if ( CommandLine()->FindParm( "-mat_vsync" ) )
+	if ( CommandLine()->HasParm( "-mat_vsync" ) )
 	{
 		int vsync = CommandLine()->ParmValue( "-mat_vsync", 1 );
 		config.SetFlag( MATSYS_VIDCFG_FLAGS_NO_WAIT_FOR_VSYNC, vsync == 0 );
@@ -642,7 +642,7 @@ static void OverrideMaterialSystemConfigFromCommandLine( MaterialSystem_Config_t
 	config.m_VideoMode.m_Height = MIN( videoMode.m_Height, config.m_VideoMode.m_Height );
 
 	// safe mode
-	if ( CommandLine()->FindParm( "-safe" ) )
+	if ( CommandLine()->HasParm( "-safe" ) )
 	{
 		config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, true );
 		config.m_VideoMode.m_Width = BASE_WIDTH;
@@ -751,8 +751,8 @@ void InitMaterialSystemConfig( bool bInEditMode )
 	
 	if ( driverInfo.m_VendorID == currentVendorID && 
 		 driverInfo.m_DeviceID == currentDeviceID &&
-		 !CommandLine()->FindParm( "-autoconfig" ) &&
-		 !CommandLine()->FindParm( "-dxlevel" ))
+		 !CommandLine()->HasParm( "-autoconfig" ) &&
+		 !CommandLine()->HasParm( "-dxlevel" ))
 	{
 		// the stored configuration looks like it will be valid, load it in
 		ReadMaterialSystemConfigFromRegistry( config );
@@ -766,7 +766,7 @@ void InitMaterialSystemConfig( bool bInEditMode )
 	g_pCVar->ProcessQueuedMaterialThreadConVarSets();
 
 	// Don't smack registry if dxlevel is overridden, or if the video config was overridden from the command line.
-	if ( !CommandLine()->FindParm( "-dxlevel" ) && !s_bVideoConfigOverriddenFromCmdLine )
+	if ( !CommandLine()->HasParm( "-dxlevel" ) && !s_bVideoConfigOverriddenFromCmdLine )
 	{
 		WriteMaterialSystemConfigToRegistry( *g_pMaterialSystemConfig );
 	}
@@ -945,7 +945,7 @@ CON_COMMAND( mat_savechanges, "saves current video configuration to the registry
 
 	// write out config
 	UpdateMaterialSystemConfig();
-	if ( !CommandLine()->FindParm( "-dxlevel" ) )
+	if ( !CommandLine()->HasParm( "-dxlevel" ) )
 	{
 		WriteMaterialSystemConfigToRegistry( *g_pMaterialSystemConfig );
 	}
@@ -1943,7 +1943,7 @@ void WorldStaticMeshCreate( void )
 	matSortArray.Init( nSortIDs, 512 );
 	intp *sortIndex = stackallocT( intp, g_WorldStaticMeshes.Count() );
 
-	bool bTools = CommandLine()->CheckParm( "-tools" ) != NULL;
+	bool bTools = CommandLine()->HasParm( "-tools" );
 
 	// sort the surfaces into the sort arrays
 	for( int surfaceIndex = 0; surfaceIndex < host_state.worldbrush->numsurfaces; surfaceIndex++ )

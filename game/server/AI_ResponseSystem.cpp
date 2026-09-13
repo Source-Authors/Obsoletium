@@ -1800,7 +1800,7 @@ static void TouchFile( char const *pchFileName )
 //-----------------------------------------------------------------------------
 void CResponseSystem::Precache()
 {
-	bool bTouchFiles = CommandLine()->FindParm( "-makereslists" ) != 0;
+	bool bTouchFiles = CommandLine()->HasParm( "-makereslists" );
 
 	// enumerate and mark all the scripts so we know they're referenced
 	for ( decltype(m_Responses)::IndexType_t i = 0; i < m_Responses.Count(); i++ )

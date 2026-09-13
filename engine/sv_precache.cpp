@@ -216,11 +216,11 @@ int CGameServer::PrecacheModel( char const *name, int flags, model_t *model /*=N
 
 	bool bLoadNow;
 	bLoadNow = ( !slot->GetModel() && ( ( flags & RES_PRELOAD ) || IsX360() ) );
-	if ( CommandLine()->FindParm( "-nopreload" ) ||	CommandLine()->FindParm( "-nopreloadmodels" ))
+	if ( CommandLine()->HasParm( "-nopreload" ) || CommandLine()->HasParm( "-nopreloadmodels" ))
 	{
 		bLoadNow = false;
 	}
-	else if ( sv_forcepreload.GetInt() || CommandLine()->FindParm( "-preload" ) )
+	else if ( sv_forcepreload.GetInt() || CommandLine()->HasParm( "-preload" ) )
 	{
 		bLoadNow = true;
 	}

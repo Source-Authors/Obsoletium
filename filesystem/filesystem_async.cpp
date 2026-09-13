@@ -632,7 +632,7 @@ void CBaseFileSystem::InitAsync()
 	if ( m_pThreadPool )
 		return;
 
-	if ( CommandLine()->FindParm( "-noasync" ) )
+	if ( CommandLine()->HasParm( "-noasync" ) )
 	{
 		Msg( "Async I/O disabled from command line\n" );
 		return;

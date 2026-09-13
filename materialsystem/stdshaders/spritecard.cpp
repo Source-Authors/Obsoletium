@@ -41,14 +41,14 @@ int GetDefaultDepthFeatheringValue( void ) //Allow the command-line to go agains
 	{
 #		if( DEFAULT_PARTICLE_FEATHERING_ENABLED == 1 )
 		{
-			if( CommandLine()->CheckParm( "-softparticlesdefaultoff" ) )
+			if( CommandLine()->HasParm( "-softparticlesdefaultoff" ) )
 				iRetVal = 0;
 			else
 				iRetVal = 1;
 		}
 #		else
 		{
-			if( CommandLine()->CheckParm( "-softparticlesdefaulton" ) )
+			if( CommandLine()->HasParm( "-softparticlesdefaulton" ) )
 				iRetVal = 1;
 			else
 				iRetVal = 0;

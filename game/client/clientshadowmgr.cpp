@@ -1284,7 +1284,7 @@ bool CClientShadowMgr::Init()
 
 	SetShadowBlobbyCutoffArea( 0.005f );
 
-	bool bTools = CommandLine()->CheckParm( "-tools" ) != NULL;
+	bool bTools = CommandLine()->HasParm( "-tools" );
 	// dimhotepus: Increase shadow depth textures count in game 1 -> 2.
 	m_nMaxDepthTextureShadows = bTools ? 4 : 2;	// Just two shadow depth texture in games, more in tools
 

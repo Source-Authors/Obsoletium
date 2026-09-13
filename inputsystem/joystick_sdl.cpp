@@ -194,7 +194,7 @@ void CInputSystem::InitializeJoysticks( void )
 	}
 
 	// abort startup if user requests no joystick
-	if ( CommandLine()->FindParm("-nojoy") ) return;
+	if ( CommandLine()->HasParm("-nojoy") ) return;
 
 	const char *controllerConfig = joy_gamecontroller_config.GetString();
 	if ( !Q_isempty(controllerConfig) )

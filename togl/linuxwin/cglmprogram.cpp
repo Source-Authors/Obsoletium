@@ -356,7 +356,7 @@ void	CGLMProgram::CompileActiveSources	( void )
 
 void	CGLMProgram::Compile( EGLMProgramLang lang )
 {
-	bool bTimeShaderCompiles = (CommandLine()->FindParm( "-gl_time_shader_compiles" ) != 0);
+	bool bTimeShaderCompiles = CommandLine()->HasParm( "-gl_time_shader_compiles" );
 	// If using "-gl_time_shader_compiles", keeps track of total cycle count spent on shader compiles.
 	CFastTimer shaderCompileTimer;
 	if (bTimeShaderCompiles)
@@ -479,7 +479,7 @@ void	CGLMProgram::Compile( EGLMProgramLang lang )
 			// Check shader validity at creation time.  This will cause the driver to not be able to
 			// multi-thread/defer shader compiles, but it is useful for getting error messages on the
 			// shader when it is compiled
-			bool bValidateShaderEarly = (CommandLine()->FindParm( "-gl_validate_shader_early" ) != 0);
+			bool bValidateShaderEarly = CommandLine()->HasParm( "-gl_validate_shader_early" );
 			if (bValidateShaderEarly)
 			{
 				CheckValidity( lang );
@@ -658,7 +658,7 @@ bool CGLMProgram::CheckValidity( EGLMProgramLang lang )
 {
 	static char *targnames[] = { "vertex", "fragment" };
 
-	bool bTimeShaderCompiles = (CommandLine()->FindParm( "-gl_time_shader_compiles" ) != 0);
+	bool bTimeShaderCompiles = CommandLine()->HasParm( "-gl_time_shader_compiles" );
 	// If using "-gl_time_shader_compiles", keeps track of total cycle count spent on shader compiles.
 	CFastTimer shaderCompileTimer;
 	if (bTimeShaderCompiles)
@@ -929,7 +929,7 @@ bool CGLMShaderPair::ValidateProgramPair()
 	
 	if ( !m_valid && m_bCheckLinkStatus )
 	{
-		bool bTimeShaderCompiles = (CommandLine()->FindParm( "-gl_time_shader_compiles" ) != 0);
+		bool bTimeShaderCompiles = CommandLine()->HasParm( "-gl_time_shader_compiles" );
 		// If using "-gl_time_shader_compiles", keeps track of total cycle count spent on shader compiles.
 		CFastTimer shaderCompileTimer;
 		if (bTimeShaderCompiles)
@@ -1097,7 +1097,7 @@ bool CGLMShaderPair::ValidateProgramPair()
 // glUseProgram() will be called as a side effect!
 bool CGLMShaderPair::SetProgramPair( CGLMProgram *vp, CGLMProgram *fp )
 {
-	bool bTimeShaderCompiles = (CommandLine()->FindParm( "-gl_time_shader_compiles" ) != 0);
+	bool bTimeShaderCompiles = CommandLine()->HasParm( "-gl_time_shader_compiles" );
 	// If using "-gl_time_shader_compiles", keeps track of total cycle count spent on shader compiles.
 	CFastTimer shaderCompileTimer;
 	if (bTimeShaderCompiles)
@@ -1163,7 +1163,7 @@ bool CGLMShaderPair::SetProgramPair( CGLMProgram *vp, CGLMProgram *fp )
 			gGL->glBindAttribLocationARB( m_program, i, tmp );
 		}
 #if !GLM_FREE_SHADER_TEXT
-		if (CommandLine()->CheckParm("-dumpallshaders"))
+		if (CommandLine()->HasParm("-dumpallshaders"))
 		{
 			// Dump all shaders, for debugging.
 			FILE* pFile = fopen("shaderdump.txt", "a+");
@@ -1189,7 +1189,7 @@ bool CGLMShaderPair::SetProgramPair( CGLMProgram *vp, CGLMProgram *fp )
 	// Check shader validity at creation time.  This will cause the driver to not be able to
 	// multi-thread/defer shader compiles, but it is useful for getting error messages on the
 	// shader when it is compiled
-	bool bValidateShaderEarly = (CommandLine()->FindParm( "-gl_validate_shader_early" ) != 0);
+	bool bValidateShaderEarly = CommandLine()->HasParm( "-gl_validate_shader_early" );
 	if (bValidateShaderEarly)
 	{
 		ValidateProgramPair();

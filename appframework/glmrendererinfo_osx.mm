@@ -246,7 +246,7 @@ GLMRendererInfo::GLMRendererInfo( GLMRendererInfoFields *info )
 	}
 	
 	// if CLI option for fake SRGB mode is enabled, turn off this cap, act like we do not have EXT FB SRGB
-	if (CommandLine()->FindParm("-glmenablefakesrgb"))
+	if (CommandLine()->HasParm("-glmenablefakesrgb"))
 	{
 		m_info.m_hasGammaWrites = false;
 	}
@@ -317,13 +317,13 @@ GLMRendererInfo::GLMRendererInfo( GLMRendererInfoFields *info )
 	}
 
 	// if user disabled them
-	if (CommandLine()->FindParm("-glmdisableclipplanes"))
+	if (CommandLine()->HasParm("-glmdisableclipplanes"))
 	{
 		m_info.m_hasNativeClipVertexMode = false;
 	}
 	
 	// or maybe enabled them..
-	if (CommandLine()->FindParm("-glmenableclipplanes"))
+	if (CommandLine()->HasParm("-glmenableclipplanes"))
 	{
 		m_info.m_hasNativeClipVertexMode = true;
 	}
@@ -370,12 +370,12 @@ GLMRendererInfo::GLMRendererInfo( GLMRendererInfoFields *info )
 		m_info.m_hasPerfPackage1 = true;
 	}	
 
-	if (CommandLine()->FindParm("-glmenableperfpackage"))	// force it on
+	if (CommandLine()->HasParm("-glmenableperfpackage"))	// force it on
 	{
 		m_info.m_hasPerfPackage1 = true;
 	}
 	
-	if (CommandLine()->FindParm("-glmdisableperfpackage"))	// force it off
+	if (CommandLine()->HasParm("-glmdisableperfpackage"))	// force it off
 	{
 		m_info.m_hasPerfPackage1 = false;
 	}
@@ -384,17 +384,17 @@ GLMRendererInfo::GLMRendererInfo( GLMRendererInfoFields *info )
 	//-------------------------------------------------------------------
 	// runtime options that aren't negotiable once set
 
-	m_info.m_hasDualShaders = CommandLine()->FindParm("-glmdualshaders");
+	m_info.m_hasDualShaders = CommandLine()->HasParm("-glmdualshaders");
 
 	//-------------------------------------------------------------------
 	// "can'ts "
 	
 	m_info.m_cantBlitReliably = (m_info.m_osComboVersion < 0x000A0606) && m_info.m_intel;		//don't trust FBO blit on Intel before 10.6.6
-	if (CommandLine()->FindParm("-glmenabletrustblit"))
+	if (CommandLine()->HasParm("-glmenabletrustblit"))
 	{
 		m_info.m_cantBlitReliably = false;			// we trust the blit, so set the cant-blit cap to false
 	}
-	if (CommandLine()->FindParm("-glmdisabletrustblit"))
+	if (CommandLine()->HasParm("-glmdisabletrustblit"))
 	{
 		m_info.m_cantBlitReliably = true;			// we do not trust the blit, so set the cant-blit cap to true
 	}
@@ -423,7 +423,7 @@ GLMRendererInfo::GLMRendererInfo( GLMRendererInfoFields *info )
 	
 	// this is just the private assessment of whather scaled resolve is available.
 	// the activation of it will stay tied to the gl_minify_resolve_mode / gl_magnify_resolve_mode convars in glmgr
-	if 	(m_info.m_osComboVersion > 0x000A0700 || CommandLine()->FindParm("-gl_enable_scaled_resolve") )
+	if 	(m_info.m_osComboVersion > 0x000A0700 || CommandLine()->HasParm("-gl_enable_scaled_resolve") )
 	{
 		bool scaledResolveDetected = GLMDetectScaledResolveMode( m_info.m_osComboVersion, m_info.m_hasPerfPackage1 );
 		m_info.m_cantResolveScaled = !scaledResolveDetected;
@@ -434,7 +434,7 @@ GLMRendererInfo::GLMRendererInfo( GLMRendererInfoFields *info )
 	}
 
 	// and you can force it to be "available" if you really want to..
-	if ( CommandLine()->FindParm("-gl_force_enable_scaled_resolve") )
+	if ( CommandLine()->HasParm("-gl_force_enable_scaled_resolve") )
 	{
 		m_info.m_cantResolveScaled = false;
 	}
@@ -454,11 +454,11 @@ GLMRendererInfo::GLMRendererInfo( GLMRendererInfoFields *info )
 	// in 10.9 (and unlikely to be fixed in 10.8). See intelglmallocworkaround.h for more info.
 	bool mountainLion = (m_info.m_osComboVersion >= 0x000A0800) && (m_info.m_osComboVersion < 0x000A0900);
 	m_info.m_badDriver108Intel = mountainLion && m_info.m_intelHD4000;
-	if ( CommandLine()->FindParm("-glmenablemallocworkaround") )
+	if ( CommandLine()->HasParm("-glmenablemallocworkaround") )
 	{
 		m_info.m_badDriver108Intel = true;
 	}
-	if ( CommandLine()->FindParm("-glmdisablemallocworkaround") )
+	if ( CommandLine()->HasParm("-glmdisablemallocworkaround") )
 	{
 		m_info.m_badDriver108Intel = false;
 	}
@@ -874,7 +874,7 @@ void	GLMDisplayDB::PopulateRenderers( void )
 						//encode into one quantity - 10.6.3 becomes 0x000A0603
 						fields.m_osComboVersion = (vMajor << 16) | (vMinor << 8) | (vMinorMinor);
 
-						if (CommandLine()->FindParm("-fakeleopard"))
+						if (CommandLine()->HasParm("-fakeleopard"))
 						{
 							// lie
 							fields.m_osComboVersion = 0x000A0508;
@@ -1232,13 +1232,13 @@ void	GLMDisplayDB::Populate(void)
 	
 	int realRendererIndex = 0;
 
-	if (CommandLine()->FindParm("-glmrenderer0"))
+	if (CommandLine()->HasParm("-glmrenderer0"))
 		realRendererIndex = 0;
-	if (CommandLine()->FindParm("-glmrenderer1"))
+	if (CommandLine()->HasParm("-glmrenderer1"))
 		realRendererIndex = 1;
-	if (CommandLine()->FindParm("-glmrenderer2"))
+	if (CommandLine()->HasParm("-glmrenderer2"))
 		realRendererIndex = 2;
-	if (CommandLine()->FindParm("-glmrenderer3"))
+	if (CommandLine()->HasParm("-glmrenderer3"))
 		realRendererIndex = 3;
 		
 	if (realRendererIndex >= GetRendererCount())

@@ -4606,7 +4606,7 @@ void PrecacheInstancedScene( char const *pszScene )
 	
 	if ( nMakingReslists == -1 )
 	{
-		nMakingReslists = CommandLine()->FindParm( "-makereslists" ) > 0 ? 1 : 0;
+		nMakingReslists = CommandLine()->HasParm( "-makereslists" ) ? 1 : 0;
 	}
 
 	if ( nMakingReslists == 1 )

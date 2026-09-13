@@ -2074,7 +2074,7 @@ bool CAudioSourceCache::Init( size_t memSize )
 	Msg( "CAudioSourceCache: Init\n" );
 #endif
 
-	m_bSndCacheDebug = CommandLine()->FindParm( "-sndcachedebug" ) ? true : false;
+	m_bSndCacheDebug = CommandLine()->HasParm( "-sndcachedebug" );
 
 	if ( !wavedatacache->Init( memSize ) )
 	{

@@ -1892,7 +1892,7 @@ CShaderAPIDx8::CShaderAPIDx8() :
 	
 	//Debugger();
 #ifdef ENABLE_NULLREF_DEVICE_SUPPORT
-	m_NullDevice = !!CommandLine()->FindParm( "-nulldevice" );
+	m_NullDevice = CommandLine()->HasParm( "-nulldevice" );
 #endif
 }
 
@@ -2085,7 +2085,7 @@ bool CShaderAPIDx8::OnDeviceInit()
 	// Initialize the mesh manager
 	MeshMgr()->Init();
 
-	const bool bToolsMode = IsWindows() && CommandLine()->CheckParm( "-tools" );
+	const bool bToolsMode = IsWindows() && CommandLine()->HasParm( "-tools" );
 
 	// Use fat vertices when running in tools
 	MeshMgr()->UseFatVertices( bToolsMode );
@@ -2999,7 +2999,7 @@ void CShaderAPIDx8::ResetDXRenderState( void )
     SetSupportedRenderStateForce( D3DRS_CLIPPLANEENABLE, 0 );
 
 	// -disable_d3d9_hacks is for debugging. For example, the "CENT" driver hack thing causes the flashlight pass to appear much brighter on NVidia drivers.
-	if ( IsPC() && !IsOpenGL() && !CommandLine()->CheckParm( "-disable_d3d9_hacks" ) )
+	if ( IsPC() && !IsOpenGL() && !CommandLine()->HasParm( "-disable_d3d9_hacks" ) )
 	{	
 		if ( g_pHardwareConfig->Caps().m_bNeedsATICentroidHack && ( g_pHardwareConfig->Caps().m_VendorID == VENDORID_ATI ) )
 		{

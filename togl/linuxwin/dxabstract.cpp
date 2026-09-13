@@ -1172,7 +1172,7 @@ static void FillD3DCaps9( const GLMRendererInfoFields &glmRendererInfo, D3DCAPS9
 	pCaps->MaxUserClipPlanes			=	2;		// assume good news
 
 	// is user asking for it to be off ?
-	if ( CommandLine()->CheckParm( "-nouserclip" ) )
+	if ( CommandLine()->HasParm( "-nouserclip" ) )
 	{
 		pCaps->MaxUserClipPlanes		=	0;
 	}
@@ -1674,7 +1674,7 @@ HRESULT IDirect3D9::CheckDeviceMultiSampleType( UINT Adapter,D3DDEVTYPE DeviceTy
 		return D3DERR_INVALIDCALL;
 
 	
-	if ( !CommandLine()->FindParm("-glmenabletrustmsaa") )
+	if ( !CommandLine()->HasParm("-glmenabletrustmsaa") )
 	{
 		// These ghetto drivers don't get MSAA
 		if ( ( glmRendererInfo.m_nvG7x || glmRendererInfo.m_atiR5xx ) && ( MultiSampleType > D3DMULTISAMPLE_NONE ) )
@@ -4177,7 +4177,7 @@ HRESULT IDirect3DDevice9::CreateVertexShader(CONST DWORD* pFunction, IDirect3DVe
 			glslVertexShaderOptions |= D3DToGL_OptionDoUserClipPlanes; 
 		}
 			
-		if ( !CommandLine()->CheckParm("-disableboneuniformbuffers") )
+		if ( !CommandLine()->HasParm("-disableboneuniformbuffers") )
 		{
 			// If using GLSL, enabling a uniform buffer specifically for bone registers. (Not currently supported with ARB shaders, which are not optimized at all anyway.)
 			glslVertexShaderOptions |= D3DToGL_OptionGenerateBoneUniformBuffer;

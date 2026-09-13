@@ -1195,7 +1195,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
       CommandLine()->GetParm(CommandLine()->ParmCount() - 1);
   const ScopedFileSystem scopedFileSystem(pFileName);
 
-  if (CommandLine()->CheckParm("-portal")) {
+  if (CommandLine()->HasParm("-portal")) {
     g_bReadPortals = 1;
     g_nPortalHighlight = CommandLine()->ParmValue("-portalhighlight", -1);
     g_nLeafHighlight = CommandLine()->ParmValue("-leafhighlight", -1);
@@ -1204,7 +1204,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
   g_flMovementSpeed =
       static_cast<float>(CommandLine()->ParmValue("-speed", 320));
 
-  if (CommandLine()->CheckParm("-disp")) {
+  if (CommandLine()->HasParm("-disp")) {
     ReadDisplacementFile(pFileName);
     g_bDisp = TRUE;
   }

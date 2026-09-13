@@ -90,7 +90,7 @@ void C_EnvScreenOverlay::PostDataUpdate( DataUpdateType_t updateType )
 	HandleOverlaySwitch();
 
 	if ( updateType == DATA_UPDATE_CREATED &&
-		CommandLine()->FindParm( "-makereslists" ) )
+		CommandLine()->HasParm( "-makereslists" ) )
 	{
 		for ( int i = 0; i < MAX_SCREEN_OVERLAYS; ++i )
 		{

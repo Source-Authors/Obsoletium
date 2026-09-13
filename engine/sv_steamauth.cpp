@@ -141,7 +141,7 @@ EServerMode CSteam3Server::GetCurrentServerMode()
 	{
 		return eServerModeNoAuthentication;
 	}
-	else if ( CommandLine()->FindParm( "-insecure" ) )
+	else if ( CommandLine()->HasParm( "-insecure" ) )
 	{
 		return eServerModeAuthentication;
 	}
@@ -179,7 +179,7 @@ void CSteam3Server::Activate( EServerType serverType )
 	m_unIP = INADDR_ANY;
 	m_usPort = 26900;
 
-	if ( CommandLine()->FindParm( "-steamport" ) )
+	if ( CommandLine()->HasParm( "-steamport" ) )
 	{
 		m_usPort = CommandLine()->ParmValue( "-steamport", 26900 );
 	}
@@ -251,7 +251,7 @@ void CSteam3Server::Activate( EServerType serverType )
 	}
 
 	SteamAPI_SetTryCatchCallbacks( false ); // We don't use exceptions, so tell steam not to use try/catch in callback handlers
-	if ( CommandLine()->FindParm("-hushsteam") || !SteamGameServer_InitSafe(
+	if ( CommandLine()->HasParm("-hushsteam") || !SteamGameServer_InitSafe(
 			m_unIP,
 			m_usPort+1,	// Steam lives on -steamport + 1, master server updater lives on -steamport.
 			usGamePort,

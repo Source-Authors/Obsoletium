@@ -576,7 +576,7 @@ void CNPC_Citizen::SelectModel()
 	// If making reslists, precache everything!!!
 	static bool madereslists = false;
 
-	if ( CommandLine()->CheckParm("-makereslists") && !madereslists )
+	if ( CommandLine()->HasParm("-makereslists") && !madereslists )
 	{
 		madereslists = true;
 

@@ -361,7 +361,7 @@ int DedicatedAppSystemGroup::Main() {
   info.m_pInitialMod = command_line_->ParmValue("-game", "hl2");
   info.m_pInitialGame = command_line_->ParmValue("-defaultgamedir", "hl2");
   info.m_pParentAppSystemGroup = this;
-  info.m_bTextMode = command_line_->CheckParm("-textmode");
+  info.m_bTextMode = command_line_->HasParm("-textmode");
 
   if (api_->ModInit(info)) api_->ModShutdown();
 

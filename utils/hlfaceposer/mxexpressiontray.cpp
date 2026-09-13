@@ -1163,7 +1163,7 @@ void mxExpressionTray::ReloadBitmaps( void )
 bool IsUsingPerPlayerExpressions()
 {
 	bool bPerPlayerExpressions = false;
-	if ( CommandLine()->CheckParm( "-perplayerexpressions" ) )
+	if ( CommandLine()->HasParm( "-perplayerexpressions" ) )
 	{
 		bPerPlayerExpressions = true;
 	}

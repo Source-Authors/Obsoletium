@@ -5428,7 +5428,7 @@ void Panel::OnOldMessage(KeyValues *params, VPANEL ifromPanel)
 		static int s_bDebugMessages = -1;
 		if ( s_bDebugMessages == -1 )
 		{
-			s_bDebugMessages = CommandLine()->FindParm( "-vguimessages" ) ? 1 : 0;
+			s_bDebugMessages = CommandLine()->HasParm( "-vguimessages" ) ? 1 : 0;
 		}
 		if ( s_bDebugMessages == 1 )
 		{

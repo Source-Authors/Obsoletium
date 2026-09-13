@@ -327,7 +327,7 @@ int CMkEntityPatchApp::Main()
 	// This bit of hackery allows us to access files on the harddrive
 	g_pFullFileSystem->AddSearchPath( "", "LOCAL", PATH_ADD_TO_HEAD ); 
 
-	if ( CommandLine()->CheckParm( "-h" ) || CommandLine()->CheckParm( "-help" ) || CommandLine()->ParmCount() == 1 )
+	if ( CommandLine()->HasParm( "-h" ) || CommandLine()->HasParm( "-help" ) || CommandLine()->ParmCount() == 1 )
 	{
 		PrintHelp();
 		return 0;
@@ -405,7 +405,7 @@ int CMkEntityPatchApp::Main()
 	}
 
 	// Do Perforce Stuff
-	if ( CommandLine()->FindParm( "-nop4" ) )
+	if ( CommandLine()->HasParm( "-nop4" ) )
 	{
 		g_p4factory->SetDummyMode( true );
 	}

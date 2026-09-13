@@ -50,7 +50,7 @@ ConVar snd_async_stream_spew( "snd_async_stream_spew", "0", 0, "Spew streaming i
 static bool SndAsyncSpewBlocking()
 {
 	int pref = snd_async_spew_blocking.GetInt();
-	return ( pref >= 2 ) || ( pref == 1 && CommandLine()->FindParm( "-steam" ) != 0 );
+	return ( pref >= 2 ) || ( pref == 1 && CommandLine()->HasParm( "-steam" ) );
 }
 
 #define SndAlignReads() 1

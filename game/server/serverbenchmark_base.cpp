@@ -56,8 +56,7 @@ public:
 
 	virtual bool StartBenchmark()
 	{
-		bool bBenchmark = (CommandLine()->FindParm( "-sv_benchmark" ) != 0);
-
+		bool bBenchmark = CommandLine()->HasParm( "-sv_benchmark" );
 		return InternalStartBenchmark( bBenchmark, s_flBenchmarkStartWaitSeconds );
 	}
 

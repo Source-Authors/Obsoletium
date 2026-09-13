@@ -1808,7 +1808,7 @@ int ShaderCompileMain(int argc, char *argv[]) {
   if (rc) return rc;
 
   const char *shader_path{cmd_line->ParmValue("-shaderpath", "")};
-  const bool is_verbose{cmd_line->FindParm("-verbose") != 0};
+  const bool is_verbose{cmd_line->HasParm("-verbose")};
   const bool has_game_arg{cmd_line->HasParm("-game")};
 
   if (!FileSystem_Init(

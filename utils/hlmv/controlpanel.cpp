@@ -3022,7 +3022,7 @@ void ControlPanel::CreateSortedSequenceList( CStudioHdr* hdr, int *pSequence )
 		}
 	}
 
-	if ( !CommandLine()->CheckParm( "-nosort" ) )
+	if ( !CommandLine()->HasParm( "-nosort" ) )
 	{
 		qsort( pSort, nSequenceCount, sizeof(SortInfo_t), SortSequenceFunc );
 	}

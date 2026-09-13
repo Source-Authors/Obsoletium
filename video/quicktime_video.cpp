@@ -692,8 +692,8 @@ bool CQuickTimeVideoSubSystem::SetupQuickTime()
     m_bQuickTimeInitialized = true;
 	m_CurrentStatus = VideoSystemStatus::NOT_INITIALIZED;
 	m_AvailableFeatures = VideoSystemFeature::NO_FEATURES;
-    
-	if ( CommandLine()->FindParm( "-noquicktime" ) )
+
+	if ( CommandLine()->HasParm( "-noquicktime" ) )
 	{
 		// Don't even try. leave status as NOT_INITIALIZED
 		return true;

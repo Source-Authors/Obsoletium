@@ -9400,7 +9400,7 @@ bool HandleMdlReport( int &returnValue )
 			if ( pHdr->version == STUDIO_VERSION )
 			{
 				int flags = SPEWPERFSTATS_SHOWPERF;
-				if( CommandLine()->CheckParm( "-mdlreportspreadsheet", NULL ) )
+				if( CommandLine()->HasParm( "-mdlreportspreadsheet" ) )
 				{
 					flags |= SPEWPERFSTATS_SPREADSHEET;
 				}
@@ -9587,7 +9587,7 @@ bool CStudioMDLApp::Create()
 
 	// dimhotepus: No P4 support
 	// Add the P4 module separately so that if it is absent (say in the SDK) then the other system will initialize properly
-	//if ( !CommandLine()->FindParm( "-nop4" ) )
+	//if ( !CommandLine()->HasParm( "-nop4" ) )
 	//{
 	//	AppModule_t p4Module = LoadModule( "p4lib.dll" );
 	//	AddSystem( p4Module, P4_INTERFACE_VERSION );
@@ -9955,7 +9955,7 @@ int CStudioMDLApp::Main()
 	const bool bP4DLLExists = g_pFullFileSystem->FileExists( "p4lib.dll", "EXECUTABLE_PATH" );
 
 	// No p4 mode if specified on the command line or no p4lib.dll found
-	if ( ( CommandLine()->FindParm( "-nop4" ) ) || ( !bP4DLLExists ) )
+	if ( ( CommandLine()->HasParm( "-nop4" ) ) || ( !bP4DLLExists ) )
 	{
 		g_bNoP4 = true;
 		g_p4factory->SetDummyMode( true );

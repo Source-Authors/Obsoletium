@@ -2444,7 +2444,7 @@ void COcclusionSystem::RecomputeOccluderEdgeList()
 		return;
 
 	// Tracker 17772:  If building cubemaps can end up calling into here w/o cl.pAreaBits setup yet, oh well.
-	if ( !cl.m_bAreaBitsValid && CommandLine()->FindParm( "-buildcubemaps" ) )
+	if ( !cl.m_bAreaBitsValid && CommandLine()->HasParm( "-buildcubemaps" ) )
 		return;
 	 
 	m_bEdgeListDirty = false;

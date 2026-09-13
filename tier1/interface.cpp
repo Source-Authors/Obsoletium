@@ -311,7 +311,7 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 	if ( Sys_GetProcAddress( hDLL, "BuiltDebug" ) )
 	{
 		if ( !IsX360() && hDLL && 
-			 !CommandLine()->FindParm( "-allowdebug" ) && 
+			 !CommandLine()->HasParm( "-allowdebug" ) && 
 			 !Sys_IsDebuggerPresent() )
 		{
 			Error( "Module %s is a debug build\n", pModuleName );

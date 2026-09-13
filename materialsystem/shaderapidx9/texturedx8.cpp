@@ -243,7 +243,7 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 		else
 		{
 #ifdef ENABLE_NULLREF_DEVICE_SUPPORT
-			if ( CommandLine()->FindParm( "-nulldevice" ) )
+			if ( CommandLine()->HasParm( "-nulldevice" ) )
 			{
 				Warning( "ShaderAPIDX8::CreateD3DTexture: Null device used. Texture not created.\n" );
 				return nullptr;
@@ -283,7 +283,7 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 		else
 		{
 #ifdef ENABLE_NULLREF_DEVICE_SUPPORT
-			if ( CommandLine()->FindParm( "-nulldevice" ) )
+			if ( CommandLine()->HasParm( "-nulldevice" ) )
 			{
 				Warning( "ShaderAPIDX8::CreateD3DTexture: Null device used. Texture not created.\n" );
 				return nullptr;
@@ -340,7 +340,7 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 		else
 		{
 #ifdef ENABLE_NULLREF_DEVICE_SUPPORT
-			if ( CommandLine()->FindParm( "-nulldevice" ) )
+			if ( CommandLine()->HasParm( "-nulldevice" ) )
 			{
 				Warning( "ShaderAPIDX8::CreateD3DTexture: Null device used. Texture not created.\n" );
 				return nullptr;

@@ -852,11 +852,11 @@ void CClientState::SetModel( int tableIndex )
 	const CPrecacheUserData *data = CL_GetPrecacheUserData( m_pModelPrecacheTable, tableIndex );
 
 	bool bLoadNow = ( data && ( data->flags & RES_PRELOAD ) ) || IsX360();
-	if ( CommandLine()->FindParm( "-nopreload" ) ||	CommandLine()->FindParm( "-nopreloadmodels" ))
+	if ( CommandLine()->HasParm( "-nopreload" ) ||	CommandLine()->HasParm( "-nopreloadmodels" ))
 	{
 		bLoadNow = false;
 	}
-	else if ( CommandLine()->FindParm( "-preload" ) )
+	else if ( CommandLine()->HasParm( "-preload" ) )
 	{
 		bLoadNow = true;
 	}
@@ -1032,11 +1032,11 @@ void CClientState::SetSound( int tableIndex )
 	const CPrecacheUserData *data = CL_GetPrecacheUserData( m_pSoundPrecacheTable, tableIndex );
 
 	bool bLoadNow = ( data && ( data->flags & RES_PRELOAD ) ) || IsX360();
-	if ( CommandLine()->FindParm( "-nopreload" ) ||	CommandLine()->FindParm( "-nopreloadsounds" ))
+	if ( CommandLine()->HasParm( "-nopreload" ) ||	CommandLine()->HasParm( "-nopreloadsounds" ))
 	{
 		bLoadNow = false;
 	}
-	else if ( CommandLine()->FindParm( "-preload" ) )
+	else if ( CommandLine()->HasParm( "-preload" ) )
 	{
 		bLoadNow = true;
 	}

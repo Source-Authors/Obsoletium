@@ -483,14 +483,14 @@ int CPCFFixApp::Main()
 	// This bit of hackery allows us to access files on the harddrive
 	g_pFullFileSystem->AddSearchPath( "", "LOCAL", PATH_ADD_TO_HEAD ); 
 
-	if ( CommandLine()->CheckParm( "-h" ) || CommandLine()->CheckParm( "-help" ) )
+	if ( CommandLine()->HasParm( "-h" ) || CommandLine()->HasParm( "-help" ) )
 	{
 		PrintHelp();
 		return 0;
 	}
 
 	// Do Perforce Stuff
-	if ( CommandLine()->FindParm( "-nop4" ) )
+	if ( CommandLine()->HasParm( "-nop4" ) )
 	{
 		g_p4factory->SetDummyMode( true );
 	}

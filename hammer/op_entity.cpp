@@ -3638,7 +3638,7 @@ void COP_Entity::OnBrowse(void)
 	//
 	// dimhotepus: int -> bool.
 	bool ret;
-	if ( 1/*g_pFullFileSystem->IsSteam()*/ || CommandLine()->FindParm( "-NewDialogs" ) )
+	if ( 1/*g_pFullFileSystem->IsSteam()*/ || CommandLine()->HasParm( "-NewDialogs" ) )
 		ret = pDlg->DoModal();
 	else
 		ret = pDlg->DoModal_WindowsDialog();

@@ -228,7 +228,7 @@ bool HammerAppSystemGroup::Create() {
 
   // dimhotepus: Drop Perforce support
   // Add Perforce separately since it's possible it isn't there. (SDK)
-  // if ( !CommandLine()->CheckParm( "-nop4" ) )
+  // if ( !CommandLine()->HasParm( "-nop4" ) )
   // {
   // 	AppModule_t p4Module = LoadModule( "p4lib" DLL_EXT_STRING );
   // 	AddSystem( p4Module, P4_INTERFACE_VERSION );

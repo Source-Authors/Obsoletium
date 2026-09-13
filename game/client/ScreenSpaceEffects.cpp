@@ -65,7 +65,7 @@ IScreenSpaceEffectManager *g_pScreenSpaceEffects = &g_ScreenSpaceEffectManager;
 //---------------------------------------------------------------------------------------
 void CScreenSpaceEffectManager::InitScreenSpaceEffects( )
 {
-	if ( CommandLine()->FindParm( "-filmgrain" ) )
+	if ( CommandLine()->HasParm( "-filmgrain" ) )
 	{
 		GetScreenSpaceEffect( "filmgrain" )->Enable( true );
 	}

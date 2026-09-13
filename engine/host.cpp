@@ -1016,7 +1016,7 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 
 	// Don't write config when in default--most of the values are defaults which is not what the player wants.
 	// If bAllVars is set, go ahead and write out the file anyways, since it was requested explicitly.
-	if ( !cbIsUserRequested && ( CommandLine()->CheckParm( "-default" ) || host_competitive_ever_enabled.GetBool() ) )
+	if ( !cbIsUserRequested && ( CommandLine()->HasParm( "-default" ) || host_competitive_ever_enabled.GetBool() ) )
 		return;
 	
 	// If in map editing mode don't save configuration
@@ -1494,7 +1494,7 @@ static void Host_AccumulateTime( float dt )
 		host_frametime_unbounded = host_frametime;
 
 #ifndef NO_TOOLFRAMEWORK
-		if ( CommandLine()->CheckParm( "-tools" ) == NULL )
+		if ( !CommandLine()->HasParm( "-tools" ) )
 		{
 #endif
 			host_frametime = min( host_frametime, MAX_FRAMETIME * fullscale);
@@ -1504,7 +1504,7 @@ static void Host_AccumulateTime( float dt )
 	}
 	else
 #ifndef NO_TOOLFRAMEWORK
-		if ( CommandLine()->CheckParm( "-tools" ) != NULL )
+		if ( CommandLine()->HasParm( "-tools" ) )
 		{
 			host_frametime_unbounded = host_frametime;
 		}
@@ -3518,7 +3518,7 @@ bool DLL_LOCAL Host_AllowLoadModule( const char *pFilename, const char *pPathID,
 
 bool DLL_LOCAL Host_IsSecureServerAllowed()
 {
-	if ( CommandLine()->FindParm( "-insecure" ) || CommandLine()->FindParm( "-textmode" ) )
+	if ( CommandLine()->HasParm( "-insecure" ) || CommandLine()->HasParm( "-textmode" ) )
 		g_bAllowSecureServers = false;
 
 	return g_bAllowSecureServers;
@@ -3533,7 +3533,7 @@ void Host_Init( bool bDedicated )
 	host_idealtime = 0;
 
 #if defined(_WIN32)
-	if ( CommandLine()->FindParm( "-pme" ) )
+	if ( CommandLine()->HasParm( "-pme" ) )
 	{
 		s_bInitPME = true;
 	}
@@ -3587,7 +3587,7 @@ void Host_Init( bool bDedicated )
 #endif
 
 	// Check for special -dev flag
-	if ( CommandLine()->FindParm( "-dev" ) || ( CommandLine()->FindParm( "-allowdebug" ) && !CommandLine()->FindParm( "-nodev" ) ) )
+	if ( CommandLine()->HasParm( "-dev" ) || ( CommandLine()->HasParm( "-allowdebug" ) && !CommandLine()->HasParm( "-nodev" ) ) )
 	{
 		sv_cheats.SetValue( 1 );
 		developer.SetValue( 1 );
@@ -3612,7 +3612,7 @@ void Host_Init( bool bDedicated )
 	}
 #endif
 
-	if ( !CommandLine()->FindParm( "-nogamedll" ) )
+	if ( !CommandLine()->HasParm( "-nogamedll" ) )
 	{
 		SV_InitGameDLL();
 	}
@@ -3677,7 +3677,7 @@ void Host_Init( bool bDedicated )
 
 #if defined( REPLAY_ENABLED )
 	// Execute replay.cfg if this is TF and they want to use the replay system
-	if ( Replay_IsSupportedModAndPlatform() && CommandLine()->CheckParm( "-replay" ) )
+	if ( Replay_IsSupportedModAndPlatform() && CommandLine()->HasParm( "-replay" ) )
 	{
 		const char *pConfigName = CommandLine()->ParmValue( "-replay", "replay.cfg" );
 		Cbuf_AddText( va( "exec %s\n", pConfigName ) );
@@ -3718,7 +3718,7 @@ void Host_Init( bool bDedicated )
 	host_hunklevel = Hunk_LowMark();
 
 #ifdef SOURCE_MT
-	if ( CommandLine()->FindParm( "-swapcores" ) )
+	if ( CommandLine()->HasParm( "-swapcores" ) )
 	{
 		g_nMaterialSystemThread = 1;
 		g_nServerThread = 0;
@@ -3739,13 +3739,13 @@ void Host_Init( bool bDedicated )
 	HostState_Init();
 
 	// check for reslist generation
-	if ( CommandLine()->FindParm( "-makereslists" ) )
+	if ( CommandLine()->HasParm( "-makereslists" ) )
 	{
 		MapReslistGenerator().StartReslistGeneration();
 	}
 
 	// check for devshot generation
-	if ( CommandLine()->FindParm( "-makedevshots" ) )
+	if ( CommandLine()->HasParm( "-makedevshots" ) )
 	{
 		DevShotGenerator().StartDevShotGeneration();
 	}

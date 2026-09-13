@@ -282,14 +282,14 @@ void TFViewport::ApplySchemeSettings( vgui::IScheme *pScheme )
 	SetPaintBackgroundEnabled( false );
 
 	// Precache some font characters for the 360
- 	if ( IsX360() || CommandLine()->CheckParm( "-precachefontchars" ) || CommandLine()->CheckParm( "-precachefontintlchars" ) )
+ 	if ( IsX360() || CommandLine()->HasParm( "-precachefontchars" ) || CommandLine()->HasParm( "-precachefontintlchars" ) )
  	{
  		const wchar_t *pAllChars = L"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.!:";
  		const wchar_t *pNumbers = L"0123456789";
 		// Try some tricky characters and some international characters with accents, etc.
 		static const wchar_t IntlChars[] = { 'a', 'b', 'c', 'i', 'o', 'y', 'A', 'B', 'C', 0xbf, 0xc1, 0xd1, 0xd3, 0x00 };
 
-		if ( CommandLine()->CheckParm( "-precachefontintlchars" ) )
+		if ( CommandLine()->HasParm( "-precachefontintlchars" ) )
 			pAllChars = IntlChars;
 
  		vgui::surface()->PrecacheFontCharacters( pScheme->GetFont( "ScoreboardTeamName" ), pAllChars );

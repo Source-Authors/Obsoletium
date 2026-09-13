@@ -13,13 +13,13 @@
 // FIXME, this is BS
 bool IsExternalBuild()
 {
-	if (CommandLine()->FindParm("-publicbuild"))
+	if (CommandLine()->HasParm("-publicbuild"))
 	{
 		return true;
 	}
 
-	if (!CommandLine()->FindParm("-internalbuild") &&
-		!CommandLine()->CheckParm("-dev"))
+	if (!CommandLine()->HasParm("-internalbuild") &&
+		!CommandLine()->HasParm("-dev"))
 	{
 		return true;
 	}
