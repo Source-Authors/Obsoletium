@@ -365,7 +365,7 @@ bool CL_CheckCRCs( const char *pszMap )
 		}
 		else
 		{
-			COM_ExplainDisconnection( true, "Missing map %s,  disconnecting\n", pszMap);
+			COM_ExplainDisconnection( true, "Missing map %s, disconnecting\n", pszMap);
 			Host_Error( "Map is missing" );
 		}
 
