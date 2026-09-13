@@ -2640,7 +2640,7 @@ void CDemoSmootherPanel::SaveSmoothingInfo( char const *filename, CSmoothingCont
 	if ( !infile )
 		return;
 	
-	RunCodeAtScopeExit(fs->Close(infile));
+	RunCodeAtScopeExit(COM_CloseFile(infile));
 
 	int filesize = fs->Size( infile );
 
