@@ -623,7 +623,7 @@ static void OverrideMaterialSystemConfigFromCommandLine( MaterialSystem_Config_t
 
 	if ( CommandLine()->HasParm( "-resizing" ) )
 	{
-		config.SetFlag( MATSYS_VIDCFG_FLAGS_RESIZING, CommandLine()->HasParm( "-resizing" ) );
+		config.SetFlag( MATSYS_VIDCFG_FLAGS_RESIZING, true );
 	}
 #ifndef CSS_PERF_TEST
 	if ( CommandLine()->HasParm( "-mat_vsync" ) )
