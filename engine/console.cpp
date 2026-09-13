@@ -366,7 +366,7 @@ void Con_Init()
 	// Check -consolelog arg and set con_logfile if it's present. This gets some messages logged
 	//  that we would otherwise miss due to con_logfile being set in the .cfg file.
 	const char *filename = NULL;
-	if ( CommandLine()->CheckParm( "-consolelog", &filename ) && filename && filename[ 0 ] )
+	if ( CommandLine()->CheckParm( "-consolelog", &filename ) && !Q_isempty( filename ) )
 	{
 		con_logfile.SetValue( filename );
 	}
