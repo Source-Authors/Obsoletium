@@ -584,7 +584,9 @@ my(%configOptionValues) = (
 		{
 			"0"	=>	"ISO C++14 Standard (std:c++14)",
 			"1"	=>	"ISO C++17 Standard (std:c++17)",
-			"2"	=>	"Preview - Features from the Latest C++ Working Draft (std:c++latest)",
+			"2"	=>	"ISO C++20 Standard (std:c++20)",
+			"3"	=>	"Preview - ISO C++23 Standard (std:c++23preview)",
+			"4"	=>	"Preview - Features from the Latest C++ Working Draft (std:c++latest)",
 		},
 		"DisableLanguageExtensions"		=>
 		{
