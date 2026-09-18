@@ -60,10 +60,11 @@ public:
 		m_pIndexData( NULL ),
 		m_nVerts( 0 ),
 		m_nIndices( 0 ),
+		m_bBuildQueued( false ),
 		m_VertexSize( 0 ),
 		m_Type(MATERIAL_TRIANGLES),
 		m_pVertexOverride( NULL ),
-		m_pIndexOverride ( NULL )
+		m_pIndexOverride( NULL )
 	{
 	}
 
@@ -112,6 +113,8 @@ public:
 			}
 		}
 		FreeBuffers();
+		// darkx1us: Reset build queued flag.
+		m_bBuildQueued = false;
 
 		m_pVertexOverride = pVertexOverride;
 		m_pIndexOverride = pIndexOverride;
@@ -462,8 +465,23 @@ public:
 			bDetachBuffers = false;
 		}
 
-		QueueBuild( bDetachBuffers );
+		// darkx1us: Queue defferred build but not detach buffers.
+		if ( !m_bBuildQueued )
+		{
+			QueueBuild( false );
+			m_bBuildQueued = true;
+		}
+		// Draw.
 		m_pCallQueue->QueueCall( m_pLateBoundMesh, pfnDraw, firstIndex, numIndices );
+
+		// darkx1us: Now detach buffers if needed.
+		if ( bDetachBuffers )
+		{
+			DetachBuffers();
+			m_Type = MATERIAL_TRIANGLES;
+			// darkx1us: Reset build queued flag.
+			m_bBuildQueued = false;
+		}
 	}
 
 	void MarkAsDrawn()
@@ -615,6 +633,9 @@ private:
 
 	int m_nVerts;
 	int m_nIndices;
+
+	// darkx1us: Track mesh build already enqueued or not. 
+	bool m_bBuildQueued;
 
 	unsigned short m_VertexSize;
 	MaterialPrimitiveType_t m_Type;
