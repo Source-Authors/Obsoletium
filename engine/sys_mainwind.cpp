@@ -865,15 +865,9 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			if ( command_type == SC_CLOSE )
 			{
-	#if !defined( NO_VCR )
-				// handle the close message, but make sure 
-				// it's not because we accidently hit ALT-F4
-				if ( HIBYTE(VCRHook_GetKeyState(VK_LMENU)) || HIBYTE(VCRHook_GetKeyState(VK_RMENU) ) )
-					return lRet;
-	#endif
 				Cbuf_Clear();
 				Cbuf_AddText( "quit\n" );
-			}
+            }
 
 	#ifndef SWDS
 			if ( VCRGetMode() == VCR_Disabled )
