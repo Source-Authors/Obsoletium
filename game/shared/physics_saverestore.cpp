@@ -47,7 +47,7 @@ BEGIN_SIMPLE_DATADESC( PhysBlockHeader_t )
 	DEFINE_FIELD( pWorldObject, FIELD_INTEGER ),
 #else
 	// NOTE: We want to save the actual address here for remapping
-	DEFINE_FIELD( pWorldObject, FIELD_CLASSPTR ),
+	DEFINE_ARRAY(pWorldObject, FIELD_INTEGER, 2 ),
 #endif
 END_DATADESC()
 
