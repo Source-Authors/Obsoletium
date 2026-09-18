@@ -17,6 +17,7 @@
 #include <ks.h>
 #include <ksmedia.h>
 #include <mmdeviceapi.h>
+#include <audioclient.h>
 #include <Functiondiscoverykeys_devpkey.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -365,55 +366,75 @@ static bool GetDefaultAudioDeviceFormFactor(
     // Continue.
   }
 
-  ScopedPropVariant device_physical_speakers;
-  hr = props->GetValue(PKEY_AudioEndpoint_PhysicalSpeakers,
-                       &device_physical_speakers);
+  // PKEY_AudioEndpoint_PhysicalSpeakers describes the device's physical
+  // speaker topology, which may differ from the channel layout currently
+  // exposed to applications by the Windows audio mixer.
+  // Use the endpoint's current shared-mode mix format instead.
+  IAudioClient *raw_audio_client = nullptr;
+  hr = default_render_device->Activate(__uuidof(IAudioClient), CLSCTX_ALL,
+                                        nullptr, reinterpret_cast<void**>(&raw_audio_client));
   if (SUCCEEDED(hr)) {
-    unsigned physical_speakers_mask{UINT_MAX};
-    // May fail.
-    if (device_physical_speakers.as_uint(physical_speakers_mask)) {
-      if ((physical_speakers_mask & KSAUDIO_SPEAKER_7POINT1_SURROUND) ==
-          KSAUDIO_SPEAKER_7POINT1_SURROUND) {
-        form_factor = AudioDeviceFormFactor::Digital7Dot1Surround;
-        return true;
+    se::win::com::com_ptr<IAudioClient> audio_client;
+    audio_client.Attach(raw_audio_client);
+    WAVEFORMATEX *mix_format{nullptr};
+
+    hr = audio_client->GetMixFormat(&mix_format);
+    if (SUCCEEDED(hr) && mix_format != nullptr) {
+      DebugWarn(
+          "Default audio endpoint mix format: %hu channel(s), %lu Hz, %hu bit(s).\n",
+          mix_format->nChannels, mix_format->nSamplesPerSec,
+          mix_format->wBitsPerSample);
+
+      switch (mix_format->nChannels) {
+        case 1:
+          form_factor = AudioDeviceFormFactor::MonoSpeaker;
+          break;
+        case 2:
+          // Keep the actual endpoint form factor only to distinguish
+          // headphones/headsets from ordinary stereo speakers.
+          {
+            ScopedPropVariant endpoint_form_factor;
+            HRESULT form_hr = props->GetValue(PKEY_AudioEndpoint_FormFactor,
+                                               &endpoint_form_factor);
+            if (SUCCEEDED(form_hr)) {
+              unsigned untyped_factor{UINT_MAX};
+              if (endpoint_form_factor.as_uint(untyped_factor)) {
+                EndpointFormFactor typed_factor =
+                    static_cast<EndpointFormFactor>(untyped_factor);
+                if (typed_factor == EndpointFormFactor::Headphones ||
+                    typed_factor == EndpointFormFactor::Headset) {
+                  form_factor = AudioDeviceFormFactor::HeadphonesOrHeadset;
+                } else {
+                  form_factor = AudioDeviceFormFactor::StereoSpeakers;
+                }
+              }
+            }
+          }
+          break;
+        case 4:
+          form_factor = AudioDeviceFormFactor::QuadSpeakers;
+          break;
+        case 6:
+          form_factor = AudioDeviceFormFactor::Digital5Dot1Surround;
+          break;
+        case 8:
+          form_factor = AudioDeviceFormFactor::Digital7Dot1Surround;
+          break;
+        default:
+          DebugWarn(
+              "Unsupported Windows endpoint channel count %hu; falling back to stereo.\n",
+              mix_format->nChannels);
+          form_factor = AudioDeviceFormFactor::StereoSpeakers;
+          break;
       }
 
-      if ((physical_speakers_mask & KSAUDIO_SPEAKER_5POINT1_SURROUND) ==
-              KSAUDIO_SPEAKER_5POINT1_SURROUND ||
-          // Obsolete, but still.
-          (physical_speakers_mask & KSAUDIO_SPEAKER_5POINT1) &
-              KSAUDIO_SPEAKER_5POINT1) {
-        form_factor = AudioDeviceFormFactor::Digital5Dot1Surround;
-        return true;
-      }
-
-      if ((physical_speakers_mask & KSAUDIO_SPEAKER_QUAD) ==
-          KSAUDIO_SPEAKER_QUAD) {
-        form_factor = AudioDeviceFormFactor::QuadSpeakers;
-        return true;
-      }
-
-      if ((physical_speakers_mask & KSAUDIO_SPEAKER_STEREO) ==
-          KSAUDIO_SPEAKER_STEREO) {
-        form_factor = AudioDeviceFormFactor::StereoSpeakers;
-        return true;
-      }
-
-      if ((physical_speakers_mask & KSAUDIO_SPEAKER_MONO) ==
-          KSAUDIO_SPEAKER_MONO) {
-        form_factor = AudioDeviceFormFactor::MonoSpeaker;
-        return true;
-      }
+      CoTaskMemFree(mix_format);
+      return true;
     }
 
-    // Fallback to PKEY_AudioEndpoint_FormFactor.
+    DebugWarn( "GetMixFormat for default audio endpoint failed w/e 0x%8x.\n", hr );
   } else {
-    DebugWarn(
-        "Get default audio render endpoint physical speakers mask failed w/e "
-        "0x%8x.\n",
-        hr);
-
-    // Fallback to PKEY_AudioEndpoint_FormFactor.
+    DebugWarn( "Activate IAudioClient for default audio endpoint failed w/e 0x%8x.\n", hr );
   }
 
   ScopedPropVariant device_form_factor;
@@ -652,13 +673,13 @@ bool CAudioXAudio2::Init() {
 
   HRESULT hr{mm_device_enumerator_.CreateInstance(__uuidof(MMDeviceEnumerator),
                                                   nullptr, CLSCTX_ALL)};
+  AudioDeviceFormFactor form_factor{AudioDeviceFormFactor::StereoSpeakers};
+
   if (FAILED(hr)) {
     Warning("XAudio2: Create media devices enumerator failed w/e 0x%8x.\n", hr);
     Warning(
         "XAudio2: Unable to get default system audio device, assume stereo "
         "speakers.\n");
-
-    snd_surround.SetValue(to_underlying(AudioDeviceFormFactor::StereoSpeakers));
   } else {
     hr = DefaultAudioDeviceChangedNotificationClient::Create(
         mm_device_enumerator_, device_data_flow, device_role,
@@ -673,48 +694,55 @@ bool CAudioXAudio2::Init() {
           "sound output.\n");
     }
 
-    AudioDeviceFormFactor form_factor{
-        GetDefaultAudioDeviceFormFactor(mm_device_enumerator_, device_data_flow,
-                                        device_role, form_factor)
-            ? form_factor
-            : AudioDeviceFormFactor::StereoSpeakers};
-    snd_surround.SetValue(to_underlying(form_factor));
+    // GetDefaultAudioDeviceFormFactor now uses the endpoint's current
+    // IAudioClient::GetMixFormat() channel count instead of the physical
+    // speaker topology.
+    if (!GetDefaultAudioDeviceFormFactor(mm_device_enumerator_,
+                                         device_data_flow, device_role,
+                                         form_factor)) {
+      form_factor = AudioDeviceFormFactor::StereoSpeakers;
+    }
   }
 
   m_bHeadphone = false;
   m_bSurround = false;
   m_bSurroundCenter = false;
 
-  switch (snd_surround.GetInt()) {
-    case to_underlying(AudioDeviceFormFactor::HeadphonesOrHeadset):
+  switch (form_factor) {
+    case AudioDeviceFormFactor::HeadphonesOrHeadset:
       m_bHeadphone = true;
       device_channels_count_ = 2;
       break;
 
-    default:
-    // TODO: Add mono speaker support.
-    case to_underlying(AudioDeviceFormFactor::MonoSpeaker):
-    case to_underlying(AudioDeviceFormFactor::StereoSpeakers):
+    case AudioDeviceFormFactor::MonoSpeaker:
+      // XAudio2 transfer code is stereo-minimum, so mono endpoints are
+      // intentionally mixed as stereo.
       device_channels_count_ = 2;
       break;
 
-    case to_underlying(AudioDeviceFormFactor::QuadSpeakers):
+    case AudioDeviceFormFactor::StereoSpeakers:
+      device_channels_count_ = 2;
+      break;
+
+    case AudioDeviceFormFactor::QuadSpeakers:
       m_bSurround = true;
       device_channels_count_ = 4;
       break;
 
-    case to_underlying(AudioDeviceFormFactor::Digital5Dot1Surround):
+    case AudioDeviceFormFactor::Digital5Dot1Surround:
       m_bSurround = true;
       m_bSurroundCenter = true;
       device_channels_count_ = 6;
       break;
 
-    case to_underlying(AudioDeviceFormFactor::Digital7Dot1Surround):
+    case AudioDeviceFormFactor::Digital7Dot1Surround:
       m_bSurround = true;
       m_bSurroundCenter = true;
       device_channels_count_ = 8;
       break;
   }
+
+  snd_surround.SetValue(to_underlying(form_factor));
 
   // Initialize the XAudio2 Engine.
   //
