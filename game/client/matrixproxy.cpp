@@ -108,6 +108,7 @@ void CTextureTransformProxy::OnBind( void *pC_BaseEntity )
 		MatrixBuildTranslation( temp, translation.x, translation.y, 0.0f );
 		MatrixMultiply( temp, mat, mat );
 	}
+		m_pResult->SetMatrixValue( mat );
 
 	if ( ToolsEnabled() )
 	{
