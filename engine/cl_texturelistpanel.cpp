@@ -13,6 +13,7 @@
 #include "client.h"
 #include "client_class.h"
 #include "gl_matsysiface.h"
+#include "host.h"
 #include "icliententitylist.h"
 #include "igame.h"
 #include "ivideomode.h"
@@ -3367,7 +3368,7 @@ CON_COMMAND( mat_texture_save_fonts, "Save all font textures" )
 void mat_texture_list_on_f()
 {
 	ConVarRef sv_cheats( "sv_cheats" );
-	if ( sv_cheats.IsValid() && !sv_cheats.GetBool() )
+	if ( !Host_IsSinglePlayerGame() && sv_cheats.IsValid() && !sv_cheats.GetBool())
 		return;
 
 	ConVarRef mat_queue_mode( "mat_queue_mode" );
