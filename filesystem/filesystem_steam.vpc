@@ -73,8 +73,10 @@ $Project "FileSystem_Steam"
 	{
 		$Lib tier2 
 
-		$DynamicFile	"$SRCDIR\lib\public\steam_api.lib" [$WIN32]
-		$DynamicFile	"$SRCDIR\lib\$PLATFORM\$_IMPLIB_PREFIXsteam$_IMPLIB_EXT" [$POSIX || $LINUX]
-		$DynamicFile	"$SRCDIR\lib\$PLATFORM\$_IMPLIB_PREFIXsteam_api$_IMPLIB_EXT" [$POSIX || $LINUX]
+		$DynamicFile "$SRCDIR\lib\public\steam_api.lib" [$WIN32]
+		$DynamicFile "$SRCDIR\lib\public\x64\steam_api.lib" [$WIN64]
+
+		$DynamicFile "$SRCDIR\lib\$PLATFORM\$_IMPLIB_PREFIXsteam$_IMPLIB_EXT" [$POSIX || $LINUX]
+		$DynamicFile "$SRCDIR\lib\$PLATFORM\$_IMPLIB_PREFIXsteam_api$_IMPLIB_EXT" [$POSIX || $LINUX]
 	}
 }
