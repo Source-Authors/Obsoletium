@@ -25,8 +25,9 @@ CVPhysPtrUtlVectorSaveRestoreOps g_VPhysPtrUtlVectorSaveRestoreOps;
 static void AddPtrAssociation( void *pOldValue, void *pNewValue )
 {
 	// dimhotepus: Remap phys pointers only if old is not nullptr or both are nullptr.
-	// dimhotepus: Old was nullptr for old world -> new world (now we ignore such mapping as no sense).
-	// dimhotepus: Old was nullptr for any pointer which is nullptr like group constraint (was remapped to world mistakenly).
+	// dimhotepus: Old (nullptr) -> new (nullptr) is remapped.
+	// dimhotepus: Old (nullptr) -> new (not nullptr) is old world to new world remapping, no sense.
+	// dimhotepus: Old (not nullptr) -> new (any) for 1:1 remapping.
 	if ( pOldValue != nullptr || pNewValue == nullptr )
 	{
 		s_VPhysPtrMap.Insert( pOldValue, pNewValue );
