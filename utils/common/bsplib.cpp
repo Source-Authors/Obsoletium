@@ -1351,19 +1351,20 @@ static void AddOcclusionLump( dheader_t *dheader, FileHandle_t file )
 {
 	g_Lumps.size[LUMP_OCCLUSION] = 0;	// mark it written
 
-	intp nOccluderCount = g_OccluderData.Count();
-	intp nOccluderPolyDataCount = g_OccluderPolyData.Count();
-	intp nOccluderVertexIndices = g_OccluderVertexIndices.Count();
+	// BSP occlusion counts are serialized as 32-bit integers.
+	int nOccluderCount = size_cast<int>(g_OccluderData.Count());
+	int nOccluderPolyDataCount = size_cast<int>(g_OccluderPolyData.Count());
+	int nOccluderVertexIndices = size_cast<int>(g_OccluderVertexIndices.Count());
 
-	intp nLumpLength = nOccluderCount * sizeof(doccluderdata_t) +
-		nOccluderPolyDataCount * sizeof(doccluderpolydata_t) +
-		nOccluderVertexIndices * sizeof(int) +
+	int nLumpLength = nOccluderCount * sizeof(doccluderdata_t) +
+        nOccluderPolyDataCount * sizeof(doccluderpolydata_t) +
+        nOccluderVertexIndices * sizeof(int) + 
 		3 * sizeof(int);
 
 	lump_t *lump = &dheader->lumps[LUMP_OCCLUSION];
 
-	lump->fileofs = g_pFileSystem->Tell( file );
-	lump->filelen = nLumpLength;
+	lump->fileofs = g_pFileSystem->Tell(file);
+	lump->filelen = size_cast<int>(nLumpLength);
 	lump->version = LUMP_OCCLUSION_VERSION;
 	lump->uncompressedSize = 0;
 
