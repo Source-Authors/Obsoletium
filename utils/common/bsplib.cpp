@@ -1356,10 +1356,20 @@ static void AddOcclusionLump( dheader_t *dheader, FileHandle_t file )
 	int nOccluderPolyDataCount = size_cast<int>(g_OccluderPolyData.Count());
 	int nOccluderVertexIndices = size_cast<int>(g_OccluderVertexIndices.Count());
 
-	int nLumpLength = nOccluderCount * sizeof(doccluderdata_t) +
+	intp nLumpLength = nOccluderCount * sizeof(doccluderdata_t) +
         nOccluderPolyDataCount * sizeof(doccluderpolydata_t) +
         nOccluderVertexIndices * sizeof(int) + 
 		3 * sizeof(int);
+
+	if ( nLumpLength > std::numeric_limits<int>::max() )
+	{
+		Error(
+			"Occlusion lump size %zd exceeds maximum allowed size %d. "
+			"Try to reduce occluder count.\n",
+			nLumpLength,
+			std::numeric_limits<int>::max()
+		);
+	}
 
 	lump_t *lump = &dheader->lumps[LUMP_OCCLUSION];
 
