@@ -14,7 +14,7 @@
 
 #include "physics_collisionevent.h"
 
-class CPortal_CollisionEvent : public CCollisionEvent
+class CPortal_CollisionEvent final : public CCollisionEvent
 {
 public:
 	DECLARE_CLASS_GAMEROOT( CPortal_CollisionEvent, CCollisionEvent );

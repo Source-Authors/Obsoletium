@@ -109,6 +109,9 @@ void CTextureTransformProxy::OnBind( void *pC_BaseEntity )
 		MatrixMultiply( temp, mat, mat );
 	}
 
+	// darkx1us: Apply texture transform proxy result.
+	m_pResult->SetMatrixValue( mat );
+
 	if ( ToolsEnabled() )
 	{
 		ToolFramework_RecordMaterialParams( GetMaterial() );

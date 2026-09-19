@@ -980,7 +980,9 @@ void CPortal_Player::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 				q, 
 				pBoneToWorld, 
 				pParent, 
-				pParentCache );
+				pParentCache,
+				// dimhotepus: Take into account bone mask for initialized quaternion and position.
+				boneMask );
 
 			return;
 		}
