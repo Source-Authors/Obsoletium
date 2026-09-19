@@ -217,7 +217,7 @@ void C_PropVehicleDriveable::GetVehicleViewPosition( int nRole, Vector *pAbsOrig
 //-----------------------------------------------------------------------------
 void C_PropVehicleDriveable::GetVehicleClipPlanes( float &flZNear, float &flZFar ) const
 {
-	// Use a closer near plane to prevent vehicle geometry clipping at high FOV.
+	// darkx1us: Use a closer near plane to prevent vehicle geometry clipping at high FOV (6 -> 4).
 	flZNear = 4;
 }
 
