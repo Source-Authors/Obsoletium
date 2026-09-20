@@ -455,3 +455,6 @@ materialsystem/stdshaders/uniquefilestocopy.txt
 materialsystem/stdshaders/vcslist.txt
 materialsystem/stdshaders/makefile.stdshader_dx9_*
 materialsystem/stdshaders/NIL
+
+# MSVC edit-when-debug temp files
+enc_temp_folder/
