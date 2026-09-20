@@ -3368,6 +3368,7 @@ CON_COMMAND( mat_texture_save_fonts, "Save all font textures" )
 void mat_texture_list_on_f()
 {
 	ConVarRef sv_cheats( "sv_cheats" );
+	// darkx1us: Do not allow in multiplayer.
 	if ( !Host_IsSinglePlayerGame() && sv_cheats.IsValid() && !sv_cheats.GetBool())
 		return;
 
