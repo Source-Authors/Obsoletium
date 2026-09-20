@@ -366,20 +366,23 @@ static bool GetDefaultAudioDeviceFormFactor(
     // Continue.
   }
 
-  // PKEY_AudioEndpoint_PhysicalSpeakers describes the device's physical
+  // darkx1us: PKEY_AudioEndpoint_PhysicalSpeakers describes the device's physical
   // speaker topology, which may differ from the channel layout currently
   // exposed to applications by the Windows audio mixer.
   // Use the endpoint's current shared-mode mix format instead.
-  IAudioClient *raw_audio_client = nullptr;
+  se::win::com::com_ptr<IAudioClient> audio_client;
   hr = default_render_device->Activate(__uuidof(IAudioClient), CLSCTX_ALL,
-                                        nullptr, reinterpret_cast<void**>(&raw_audio_client));
+                                       nullptr, reinterpret_cast<void**>(&audio_client));
   if (SUCCEEDED(hr)) {
-    se::win::com::com_ptr<IAudioClient> audio_client;
-    audio_client.Attach(raw_audio_client);
     WAVEFORMATEX *mix_format{nullptr};
 
+    // The mix format is the format that the audio engine uses internally for
+    // digital processing of shared-mode streams. This format is not necessarily
+    // a format that the audio endpoint device supports.
     hr = audio_client->GetMixFormat(&mix_format);
     if (SUCCEEDED(hr) && mix_format != nullptr) {
+      RunCodeAtScopeExit(CoTaskMemFree(mix_format));
+
       DebugWarn(
           "Default audio endpoint mix format: %hu channel(s), %lu Hz, %hu bit(s).\n",
           mix_format->nChannels, mix_format->nSamplesPerSec,
@@ -395,7 +398,7 @@ static bool GetDefaultAudioDeviceFormFactor(
           {
             ScopedPropVariant endpoint_form_factor;
             HRESULT form_hr = props->GetValue(PKEY_AudioEndpoint_FormFactor,
-                                               &endpoint_form_factor);
+                                              &endpoint_form_factor);
             if (SUCCEEDED(form_hr)) {
               unsigned untyped_factor{UINT_MAX};
               if (endpoint_form_factor.as_uint(untyped_factor)) {
@@ -428,7 +431,6 @@ static bool GetDefaultAudioDeviceFormFactor(
           break;
       }
 
-      CoTaskMemFree(mix_format);
       return true;
     }
 
