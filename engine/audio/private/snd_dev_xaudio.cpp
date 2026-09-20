@@ -326,118 +326,144 @@ class ScopedPropVariant {
   PROPVARIANT prop_;
 };
 
-static bool GetDefaultAudioDeviceFormFactor(
+static bool GetAudioDeviceFormFactor(
     se::win::com::com_ptr<IMMDeviceEnumerator> &mm_device_enumerator,
     EDataFlow device_data_flow, ERole device_role,
-    AudioDeviceFormFactor &form_factor) {
+    _In_opt_ const wchar_t *endpoint_id,
+    AudioDeviceFormFactor& form_factor) {
   // Default value.
   form_factor = AudioDeviceFormFactor::StereoSpeakers;
 
-  se::win::com::com_ptr<IMMDevice> default_render_device;
-  HRESULT hr{mm_device_enumerator->GetDefaultAudioEndpoint(
-      device_data_flow, device_role, &default_render_device)};
+  se::win::com::com_ptr<IMMDevice> audio_device;
+  HRESULT hr;
+
+  if (endpoint_id != nullptr) {
+    // Use the exact endpoint.
+    hr = mm_device_enumerator->GetDevice(endpoint_id, &audio_device);
+  } else {
+    // Initial detection.
+    hr = mm_device_enumerator->GetDefaultAudioEndpoint(
+        device_data_flow, device_role, &audio_device);
+  }
+
+  // endpoint_id is smth like {0.0.0 Guid}, so not printable.
+  const wchar_t* normalized_endpoint_id{endpoint_id != nullptr ? L"selected"
+                                                               : L"default"};
+
   if (FAILED(hr)) {
-    DebugWarn("Get default audio render endpoint failed w/e 0x%8x.\n", hr);
+    DebugWarn("Get %S audio render endpoint failed w/e 0x%8x.\n",
+              normalized_endpoint_id, hr);
     return false;
   }
 
   se::win::com::com_ptr<IPropertyStore> props;
-  hr = default_render_device->OpenPropertyStore(STGM_READ, &props);
+  hr = audio_device->OpenPropertyStore(STGM_READ, &props);
   if (FAILED(hr)) {
-    DebugWarn("Get default audio render endpoint props failed w/e 0x%8x.\n",
-              hr);
+    DebugWarn("Get %S audio render endpoint props failed w/e 0x%8x.\n",
+              normalized_endpoint_id, hr);
     return false;
   }
 
   ScopedPropVariant device_friendly_name;
   hr = props->GetValue(PKEY_Device_FriendlyName, &device_friendly_name);
   if (SUCCEEDED(hr)) {
-    wchar_t *audio_device_name{nullptr};
-    if (device_friendly_name.as_wide_string(audio_device_name)) {
-      // Print endpoint friendly name and endpoint ID.
-      DebugWarn("Using system audio device \"%S\".\n", audio_device_name);
+    const wchar_t* normalized_audio_device_name;
+
+    if (wchar_t *audio_device_name{nullptr};
+        device_friendly_name.as_wide_string(audio_device_name)) {
+      normalized_audio_device_name = audio_device_name;
     } else {
-      DebugWarn("Using system audio device \"%S\".\n", L"N/A");
+      normalized_audio_device_name = L"N/A"; 
     }
+
+    // Print endpoint friendly name and endpoint ID.
+    DebugWarn("Using system audio device \"%S\".\n",
+              normalized_audio_device_name);
   } else {
     DebugWarn(
-        "Get default audio render endpoint friendly name failed w/e 0x%8x.\n",
-        hr);
-    // Continue.
+        "Get %S audio render endpoint friendly name failed w/e 0x%8x.\n",
+        normalized_endpoint_id, hr);
+    // Continue, friendly name is optional.
   }
 
-  // darkx1us: PKEY_AudioEndpoint_PhysicalSpeakers describes the device's physical
-  // speaker topology, which may differ from the channel layout currently
-  // exposed to applications by the Windows audio mixer.
-  // Use the endpoint's current shared-mode mix format instead.
+  // darkx1us: PKEY_AudioEndpoint_PhysicalSpeakers describes the device's
+  // physical speaker topology, which may differ from the channel layout
+  // currently exposed to applications by the Windows audio mixer. Use the
+  // endpoint's current shared-mode mix format instead.
   se::win::com::com_ptr<IAudioClient> audio_client;
-  hr = default_render_device->Activate(__uuidof(IAudioClient), CLSCTX_ALL,
-                                       nullptr, reinterpret_cast<void**>(&audio_client));
-  if (SUCCEEDED(hr)) {
-    WAVEFORMATEX *mix_format{nullptr};
+  hr = audio_device->Activate(__uuidof(IAudioClient), CLSCTX_ALL,
+                              nullptr, reinterpret_cast<void**>(&audio_client));
+  if (FAILED(hr)) {
+    DebugWarn("Activate IAudioClient for %S audio endpoint failed w/e 0x%8x.\n",
+              normalized_endpoint_id, hr);
+    return false;
+  }
 
-    // The mix format is the format that the audio engine uses internally for
-    // digital processing of shared-mode streams. This format is not necessarily
-    // a format that the audio endpoint device supports.
-    hr = audio_client->GetMixFormat(&mix_format);
-    if (SUCCEEDED(hr) && mix_format != nullptr) {
-      RunCodeAtScopeExit(CoTaskMemFree(mix_format));
+  WAVEFORMATEX *mix_format{nullptr};
 
-      DebugWarn(
-          "Default audio endpoint mix format: %hu channel(s), %lu Hz, %hu bit(s).\n",
-          mix_format->nChannels, mix_format->nSamplesPerSec,
-          mix_format->wBitsPerSample);
+  // The mix format is the format that the audio engine uses internally for
+  // digital processing of shared-mode streams.  This format is not necessarily
+  // a format that the audio endpoint device supports.
+  hr = audio_client->GetMixFormat(&mix_format);
+  if (SUCCEEDED(hr) && mix_format != nullptr) {
+    RunCodeAtScopeExit(CoTaskMemFree(mix_format));
 
-      switch (mix_format->nChannels) {
-        case 1:
-          form_factor = AudioDeviceFormFactor::MonoSpeaker;
-          break;
-        case 2:
-          // Keep the actual endpoint form factor only to distinguish
-          // headphones/headsets from ordinary stereo speakers.
-          {
-            ScopedPropVariant endpoint_form_factor;
-            HRESULT form_hr = props->GetValue(PKEY_AudioEndpoint_FormFactor,
-                                              &endpoint_form_factor);
-            if (SUCCEEDED(form_hr)) {
-              unsigned untyped_factor{UINT_MAX};
-              if (endpoint_form_factor.as_uint(untyped_factor)) {
-                EndpointFormFactor typed_factor =
-                    static_cast<EndpointFormFactor>(untyped_factor);
-                if (typed_factor == EndpointFormFactor::Headphones ||
-                    typed_factor == EndpointFormFactor::Headset) {
-                  form_factor = AudioDeviceFormFactor::HeadphonesOrHeadset;
-                } else {
-                  form_factor = AudioDeviceFormFactor::StereoSpeakers;
-                }
+    DebugWarn(
+        "Audio endpoint %S mix format: %hu channel(s), %lu Hz, %hu bit(s).\n",
+        normalized_endpoint_id,
+        mix_format->nChannels,
+        mix_format->nSamplesPerSec,
+        mix_format->wBitsPerSample);
+
+    switch (mix_format->nChannels) {
+      case 1:
+        form_factor = AudioDeviceFormFactor::MonoSpeaker;
+        break;
+      case 2:
+        // Keep the actual endpoint form factor only to distinguish
+        // headphones/headsets from ordinary stereo speakers.
+        {
+          ScopedPropVariant endpoint_form_factor;
+          HRESULT form_hr = props->GetValue(PKEY_AudioEndpoint_FormFactor,
+                                            &endpoint_form_factor);
+          if (SUCCEEDED(form_hr)) {
+            unsigned untyped_factor{UINT_MAX};
+            if (endpoint_form_factor.as_uint(untyped_factor)) {
+              EndpointFormFactor typed_factor =
+                  static_cast<EndpointFormFactor>(untyped_factor);
+              if (typed_factor == EndpointFormFactor::Headphones ||
+                  typed_factor == EndpointFormFactor::Headset) {
+                form_factor = AudioDeviceFormFactor::HeadphonesOrHeadset;
+              } else {
+                form_factor = AudioDeviceFormFactor::StereoSpeakers;
               }
             }
           }
-          break;
-        case 4:
-          form_factor = AudioDeviceFormFactor::QuadSpeakers;
-          break;
-        case 6:
-          form_factor = AudioDeviceFormFactor::Digital5Dot1Surround;
-          break;
-        case 8:
-          form_factor = AudioDeviceFormFactor::Digital7Dot1Surround;
-          break;
-        default:
-          DebugWarn(
-              "Unsupported Windows endpoint channel count %hu; falling back to stereo.\n",
-              mix_format->nChannels);
-          form_factor = AudioDeviceFormFactor::StereoSpeakers;
-          break;
-      }
-
-      return true;
+        }
+        break;
+      case 4:
+        form_factor = AudioDeviceFormFactor::QuadSpeakers;
+        break;
+      case 6:
+        form_factor = AudioDeviceFormFactor::Digital5Dot1Surround;
+        break;
+      case 8:
+        form_factor = AudioDeviceFormFactor::Digital7Dot1Surround;
+        break;
+      default:
+        DebugWarn(
+            "Unsupported Windows endpoint channel count %hu; falling back to stereo.\n",
+            mix_format->nChannels);
+        form_factor = AudioDeviceFormFactor::StereoSpeakers;
+        break;
     }
 
-    DebugWarn( "GetMixFormat for default audio endpoint failed w/e 0x%8x.\n", hr );
-  } else {
-    DebugWarn( "Activate IAudioClient for default audio endpoint failed w/e 0x%8x.\n", hr );
+    return true;
   }
+
+  // Continue.
+  DebugWarn("GetMixFormat for %S audio endpoint failed w/e 0x%8x.\n",
+            normalized_endpoint_id, hr);
 
   ScopedPropVariant device_form_factor;
   hr = props->GetValue(PKEY_AudioEndpoint_FormFactor, &device_form_factor);
@@ -459,8 +485,8 @@ static bool GetDefaultAudioDeviceFormFactor(
     }
   } else {
     DebugWarn(
-        "Get default audio render endpoint form factor failed w/e 0x%8x.\n",
-        hr);
+        "Get %S audio render endpoint form factor failed w/e 0x%8x.\n",
+        normalized_endpoint_id, hr);
     return false;
   }
 
@@ -552,11 +578,13 @@ class DefaultAudioDeviceChangedNotificationClient
                 pwstrDefaultDeviceId != nullptr ? "changed" : "removed");
 
       if (pwstrDefaultDeviceId) {
-        AudioDeviceFormFactor form_factor{
-            GetDefaultAudioDeviceFormFactor(mm_device_enumerator_, flow, role,
-                                            form_factor)
-                ? form_factor
-                : AudioDeviceFormFactor::StereoSpeakers};
+        AudioDeviceFormFactor form_factor;
+        if (!GetAudioDeviceFormFactor(
+              mm_device_enumerator_, flow, role,
+              pwstrDefaultDeviceId,
+              form_factor)) {
+          form_factor = AudioDeviceFormFactor::StereoSpeakers;
+        }
         snd_surround.SetValue(to_underlying(form_factor));
       } else {
         // TODO: reinit with null audio device as no audio in system.
@@ -699,8 +727,9 @@ bool CAudioXAudio2::Init() {
     // GetDefaultAudioDeviceFormFactor now uses the endpoint's current
     // IAudioClient::GetMixFormat() channel count instead of the physical
     // speaker topology.
-    if (!GetDefaultAudioDeviceFormFactor(mm_device_enumerator_,
+    if (!GetAudioDeviceFormFactor(mm_device_enumerator_,
                                          device_data_flow, device_role,
+                                         nullptr,
                                          form_factor)) {
       form_factor = AudioDeviceFormFactor::StereoSpeakers;
     }
