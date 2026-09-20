@@ -112,7 +112,7 @@ void COptionsSubAudio::OnResetData()
 	}
 
 	// speakers
-	ConVarRef snd_surround_speakers("Snd_Surround_Speakers");
+	ConVarRef snd_surround_speakers("snd_surround_speakers");
 	int speakers = snd_surround_speakers.GetInt();
 	
 #ifdef POSIX
@@ -136,14 +136,14 @@ void COptionsSubAudio::OnResetData()
 	}}
 	
 	// sound quality is made up from several cvars
-	ConVarRef Snd_PitchQuality("Snd_PitchQuality");
+	ConVarRef snd_pitchquality("snd_pitchquality");
 	ConVarRef dsp_slow_cpu("dsp_slow_cpu");
 	int quality = SOUNDQUALITY_LOW;
 	if (dsp_slow_cpu.GetBool() == false)
 	{
 		quality = SOUNDQUALITY_MEDIUM;
 	}
-	if (Snd_PitchQuality.GetBool())
+	if (snd_pitchquality.GetBool())
 	{
 		quality = SOUNDQUALITY_HIGH;
 	}
@@ -256,30 +256,30 @@ void COptionsSubAudio::OnApplyChanges()
 	Q_snprintf( cmd, sizeof( cmd ), "closecaption %i\n", closecaption_value );
 	engine->ClientCmd_Unrestricted( cmd );
 
-	ConVarRef snd_surround_speakers( "Snd_Surround_Speakers" );
+	ConVarRef snd_surround_speakers( "snd_surround_speakers" );
 	int speakers = m_pSpeakerSetupCombo->GetActiveItemUserData()->GetInt( "speakers" );
 	snd_surround_speakers.SetValue( speakers );
 
 	// quality
-	ConVarRef Snd_PitchQuality( "Snd_PitchQuality" );
+	ConVarRef snd_pitchquality( "snd_pitchquality" );
 	ConVarRef dsp_slow_cpu( "dsp_slow_cpu" );
 	int quality = m_pSoundQualityCombo->GetActiveItemUserData()->GetInt( "quality" );
 	switch ( quality )
 	{
 	case SOUNDQUALITY_LOW:
 		dsp_slow_cpu.SetValue(true);
-		Snd_PitchQuality.SetValue(false);
+		snd_pitchquality.SetValue(false);
 		break;
 	case SOUNDQUALITY_MEDIUM:
 		dsp_slow_cpu.SetValue(false);
-		Snd_PitchQuality.SetValue(false);
+		snd_pitchquality.SetValue(false);
 		break;
 	default:
 		Assert("Undefined sound quality setting. Fallback to high quality");
 		[[fallthrough]];
 	case SOUNDQUALITY_HIGH:
 		dsp_slow_cpu.SetValue(false);
-		Snd_PitchQuality.SetValue(true);
+		snd_pitchquality.SetValue(true);
 		break;
 	};
 
