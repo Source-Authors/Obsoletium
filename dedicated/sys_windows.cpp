@@ -13,6 +13,9 @@
 #include "tier0/icommandline.h"
 #include "tier0/minidump.h"
 #include "tier1/strtools.h"
+#ifndef NO_STEAM
+#include "steam/steam_api.h"
+#endif
 #include "inputsystem/iinputsystem.h"
 #include "vgui/vguihelpers.h"
 #include "appframework/AppFramework.h"
@@ -202,7 +205,7 @@ void MiniDumpFunction(unsigned int ex_code,
                       EXCEPTION_POINTERS *exception_pointers) {
   // dimhotepus: Write minidump when not under Steam.
 #ifndef NO_STEAM
-  SteamAPI_WriteMiniDump(nExceptionCode, pException, 0);
+  SteamAPI_WriteMiniDump(ex_code, exception_pointers, 0);
 #else
   WriteMiniDumpUsingExceptionInfo(ex_code, exception_pointers,
                                   MiniDumpWithFullMemory, "dedicated_crash");

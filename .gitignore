@@ -455,3 +455,8 @@ materialsystem/stdshaders/uniquefilestocopy.txt
 materialsystem/stdshaders/vcslist.txt
 materialsystem/stdshaders/makefile.stdshader_dx9_*
 materialsystem/stdshaders/NIL
+
+# Steamworks SDK x64 redistributables used by Steam-enabled builds
+!lib/public/x64/
+!lib/public/x64/steam_api.lib
+!lib/public/x64/steam_api64.dll
