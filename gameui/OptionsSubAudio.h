@@ -33,7 +33,7 @@ public:
 	void OnApplyChanges() override;
 	void OnCommand( const char *command ) override;
 	bool RequiresRestart();
-	static char* GetUpdatedAudioLanguage() { return m_pchUpdatedAudioLanguage; }
+	static const char* GetUpdatedAudioLanguage() { return m_pchUpdatedAudioLanguage; }
 
 private:
 	MESSAGE_FUNC( OnControlModified, "ControlModified" );
@@ -49,15 +49,15 @@ private:
 	CCvarSlider					*m_pSFXSlider;
 	CCvarSlider					*m_pMusicSlider;
 	vgui::ComboBox				*m_pCloseCaptionCombo;
-	bool						   m_bRequireRestart;
-   
-   vgui::ComboBox				*m_pSpokenLanguageCombo;
-   MESSAGE_FUNC( OpenThirdPartySoundCreditsDialog, "OpenThirdPartySoundCreditsDialog" );
-   vgui::DHANDLE<class COptionsSubAudioThirdPartyCreditsDlg> m_OptionsSubAudioThirdPartyCreditsDlg;
-   ELanguage         m_nCurrentAudioLanguage;
-   static char             *m_pchUpdatedAudioLanguage;
 
-   CCvarToggleCheckButton  *m_pSoundMuteLoseFocusCheckButton;
+	vgui::ComboBox				*m_pSpokenLanguageCombo;
+	MESSAGE_FUNC( OpenThirdPartySoundCreditsDialog, "OpenThirdPartySoundCreditsDialog" );
+	vgui::DHANDLE<class COptionsSubAudioThirdPartyCreditsDlg> m_OptionsSubAudioThirdPartyCreditsDlg;
+	ELanguage					m_nCurrentAudioLanguage;
+
+	CCvarToggleCheckButton		*m_pSoundMuteLoseFocusCheckButton;
+
+	static const char			*m_pchUpdatedAudioLanguage;
 };
 
 

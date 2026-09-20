@@ -25,7 +25,7 @@
 using namespace vgui;
 
 // This member is static so that the updated audio language can be referenced during shutdown
-char* COptionsSubAudio::m_pchUpdatedAudioLanguage = (char*)GetLanguageShortName( k_Lang_English );
+const char* COptionsSubAudio::m_pchUpdatedAudioLanguage = GetLanguageShortName( k_Lang_English );
 
 enum SoundQuality_e
 {
@@ -70,6 +70,8 @@ COptionsSubAudio::COptionsSubAudio(vgui::Panel *parent) : PropertyPage(parent, N
 
 	// dimhotepus: Disable speaker setup as since Windows Vista user can't change speakers from game by usual user.
 	m_pSpeakerSetupCombo->SetEnabled(false);
+
+	m_nCurrentAudioLanguage = k_Lang_None;
 }
 
 //-----------------------------------------------------------------------------
@@ -84,7 +86,6 @@ COptionsSubAudio::~COptionsSubAudio()
 //-----------------------------------------------------------------------------
 void COptionsSubAudio::OnResetData()
 {
-	m_bRequireRestart = false;
 	m_pSFXSlider->Reset();
 	m_pMusicSlider->Reset();
 
