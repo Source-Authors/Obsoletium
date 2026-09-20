@@ -116,7 +116,7 @@ extern portable_samplepair_t *g_curcenterpaintbuffer;
 
 // hard clip input value to -32767 <= y <= 32767
 template<typename T>
-constexpr inline short CLIP(T x) noexcept {
+[[nodiscard]] constexpr inline short CLIP(T x) noexcept {
   return x > 32767 ? 32767 : (x < -32767 ? -32767 : static_cast<short>(x));
 }
 
