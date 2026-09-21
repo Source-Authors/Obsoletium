@@ -1521,7 +1521,7 @@ byte *CMatQueuedRenderContext::AllocVertices( int nVerts, int nVertexSize )
 	if ( !pResult )
 	{
 		// Force a crash with useful minidump info in the registers.
-		uint64 status = 0x31415926;
+		uint32 status = 0x31415926;
 
 		// Print some information to the console so that it's picked up in the minidump comment.
 		Msg( "AllocVertices( %d, %d ) on %p failed. m_Vertices is based at %p with a size of 0x%zx.\n", nVerts, nVertexSize, this, m_Vertices.GetBase(), m_Vertices.GetSize() );
@@ -1531,7 +1531,7 @@ byte *CMatQueuedRenderContext::AllocVertices( int nVerts, int nVertexSize )
 			Msg( "VirtualAlloc would have been called. %p > %p.\n", pNextAlloc, pCommitLimit );
 
 			const byte *pNewCommitLimit = AlignValue( pNextAlloc, 128 * 1024 );
-			const uint32 commitSize = pNewCommitLimit - pCommitLimit;
+			const size_t commitSize = pNewCommitLimit - pCommitLimit;
 			const void *pRet = VirtualAlloc( (void *)pCommitLimit, commitSize, MEM_COMMIT, PAGE_READWRITE );
 			if ( !pRet )
 				status = GetLastError();
@@ -1546,7 +1546,7 @@ byte *CMatQueuedRenderContext::AllocVertices( int nVerts, int nVertexSize )
 		}
 
 		// Now crash.
-		*(volatile uint64 *)nullptr = status << 32 | m_Vertices.GetUsed();
+		*(volatile uint64 *)nullptr = (uint64)status << 32 | m_Vertices.GetUsed();
 	}
 #endif
 	return (byte *) pResult;
@@ -1566,7 +1566,7 @@ uint16 *CMatQueuedRenderContext::AllocIndices( int nIndices )
 	if ( !pResult )
 	{
 		// Force a crash with useful minidump info in the registers.
-		uint64 status = 0x31415926;
+		uint32 status = 0x31415926;
 
 		// Print some information to the console so that it's picked up in the minidump comment.
 		Msg( "AllocIndices( %d ) on %p failed. m_Indices is based at %p with a size of 0x%zx.\n", nIndices, this, m_Indices.GetBase(), m_Indices.GetSize() );
@@ -1576,12 +1576,12 @@ uint16 *CMatQueuedRenderContext::AllocIndices( int nIndices )
 			Msg( "VirtualAlloc would have been called. %p > %p.\n", pNextAlloc, pCommitLimit );
 
 			const byte *pNewCommitLimit = AlignValue( pNextAlloc, 128u * 1024 );
-			const uint32 commitSize = pNewCommitLimit - pCommitLimit;
+			const size_t commitSize = pNewCommitLimit - pCommitLimit;
 			const void *pRet = VirtualAlloc( (void *)pCommitLimit, commitSize, MEM_COMMIT, PAGE_READWRITE );
 			if ( !pRet )
 				status = GetLastError();
 
-			Msg( "VirtualAlloc(%p, %u) returned %p on repeat. VirtualAlloc %s with code %x.\n",
+			Msg( "VirtualAlloc(%p, %u) returned %p on repeat. VirtualAlloc %s with code %s.\n",
 				pCommitLimit, commitSize, pRet, (pRet != NULL) ? "succeeded" : "failed",
 				std::system_category().message(status).c_str() );
 		}
@@ -1591,7 +1591,7 @@ uint16 *CMatQueuedRenderContext::AllocIndices( int nIndices )
 		}
 
 		// Now crash.
-		*(volatile uint64 *)nullptr = status << 32 | m_Indices.GetUsed();
+		*(volatile uint64 *)nullptr = (uint64)status << 32 | m_Indices.GetUsed();
 	}
 #endif
 	return (uint16 *) pResult;
