@@ -310,8 +310,7 @@ void CMaterialSystem::CleanUpErrorMaterial()
 	// Destruction of g_pErrorMaterial is deferred until after CMaterialDict::Shutdown.
 	// The global g_pErrorMaterial is set to NULL so that IsErrorMaterial() will return false and
 	//  RemoveMaterial() / DestroyMaterial() will delete it.
-	IMaterialInternal *pErrorMaterial = g_pErrorMaterial;
-	g_pErrorMaterial = NULL;
+	IMaterialInternal *pErrorMaterial = std::exchange( g_pErrorMaterial, nullptr );
 	pErrorMaterial->DecrementReferenceCount();
 	// dimhotepus: error material already removed from dictionary as
 	// dictionary.removeall always called before.
