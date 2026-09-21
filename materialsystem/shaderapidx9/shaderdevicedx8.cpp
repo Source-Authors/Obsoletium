@@ -491,7 +491,8 @@ void CShaderDeviceMgrDx8::CheckVendorDependentAlphaToCoverage( HardwareCaps_t *p
 	}
 }
 
-ConVar mat_hdr_level( "mat_hdr_level", "2", FCVAR_ARCHIVE );
+// dimhotepus: Allow extended float HDR by default (2 -> 3).
+ConVar mat_hdr_level( "mat_hdr_level", "3", FCVAR_ARCHIVE );
 ConVar mat_slopescaledepthbias_shadowmap( "mat_slopescaledepthbias_shadowmap", "16", FCVAR_CHEAT );
 #ifdef DX_TO_GL_ABSTRACTION
 ConVar mat_depthbias_shadowmap(	"mat_depthbias_shadowmap", "20", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY );

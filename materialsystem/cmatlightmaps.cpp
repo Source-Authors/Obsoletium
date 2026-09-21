@@ -801,7 +801,7 @@ void CMatLightmaps::BumpedLightmapBitsToPixelWriter_HDRI( float* RESTRICT pFloat
 					Assert( alpha >= 0.0f && alpha <= 1.0f );
 					color[0][3] = color[1][3] = color[2][3] = color[3][3] = alpha;
 
-					float toFloat = ( 1.0f / ( float )( 1 << 16 ) );
+					constexpr float toFloat = ( 1.0f / ( float )( 1 << 16 ) );
 
 					m_LightmapPixelWriter.WritePixelNoAdvanceF( toFloat * color[0][0], toFloat * color[0][1], toFloat * color[0][2], toFloat * color[0][3] );
 

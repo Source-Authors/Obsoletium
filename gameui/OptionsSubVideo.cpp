@@ -409,6 +409,8 @@ public:
 		if ( materials->SupportsHDRMode( HDR_TYPE_FLOAT ) )
 		{
 			m_pHDR->AddItem("#GameUI_hdr_level2", NULL);
+			// dimhotepus: Add expanded HDR (float) as an 4 option.
+			m_pHDR->AddItem("#GameUI_hdr_level3", NULL);
 		}
 
 		m_pHDR->SetEnabled( mat_dxlevel.GetInt() >= 80 );
@@ -577,7 +579,8 @@ public:
 		{
 			ConVarRef mat_hdr_level("mat_hdr_level");
 			Assert( mat_hdr_level.IsValid() );
-			m_pHDR->ActivateItem( clamp( mat_hdr_level.GetInt(), 0, 2 ) );
+			// dimhotepus: Allow extended float HDR (2 -> 3).
+			m_pHDR->ActivateItem( clamp( mat_hdr_level.GetInt(), 0, 3 ) );
 		}
 	}
 
@@ -884,7 +887,8 @@ public:
 		}
 
 		m_pShaderDetail->ActivateItem( mat_reducefillrate.GetBool() ? 0 : 1 );
-		m_pHDR->ActivateItem(clamp( mat_hdr_level.GetInt(), 0, 2) );
+		// dimhotepus: Allow extended float HDR (2 -> 3).
+		m_pHDR->ActivateItem( clamp( mat_hdr_level.GetInt(), 0, 3 ) );
 		// dimhotepus: Always enabled since Windows 7
 		m_pD3D9Ex->ActivateItem( 1 );
 
