@@ -24,10 +24,6 @@ static int				linearToLightmap[4096];	// linear (0..4) to screen corrected textu
 void ColorSpace::SetGamma( float screenGamma, float texGamma, 
 						   float overbright, bool allowCheats, bool linearFrameBuffer )
 {
-	int		i;
-	float	g1, g3;
-	float	g;
-	float	brightness = 0.0f; // This used to be configurable. . hardcode to 0.0
 	AssertMsg( !g_isTextureToLinearInitialized, "Double initialization for gamma?" );
 
 	if( linearFrameBuffer )
@@ -35,7 +31,8 @@ void ColorSpace::SetGamma( float screenGamma, float texGamma,
 		screenGamma = 1.0f;
 	}
 
-	g = screenGamma;
+	float g = screenGamma;
+	float brightness = 0.0f; // This used to be configurable. . hardcode to 0.0
 	
 	// clamp values to prevent cheating in multiplayer
 	if( !allowCheats )
@@ -51,13 +48,12 @@ void ColorSpace::SetGamma( float screenGamma, float texGamma,
 		g = 3.0f;
 
 	g = 1.0f / g;
-	g1 = texGamma * g; 
 
 	// pow( textureColor, g1 ) converts from on-disk texture space to framebuffer space
-	
+	float g3;
 	if (brightness <= 0.0f) 
 	{
-		g3 = 0.125;
+		g3 = 0.125f;
 	}
 	else if (brightness > 1.0f) 
 	{
@@ -68,21 +64,22 @@ void ColorSpace::SetGamma( float screenGamma, float texGamma,
 		g3 = 0.125f - (brightness * brightness) * 0.075f;
 	}
 
-	for (i=0 ; i<256 ; i++)
+	for (int i=0 ; i<256 ; i++)
 	{
 		// convert from nonlinear texture space (0..255) to linear space (0..1)
-		textureToLinear[i] =  powf( i / 255.0f, texGamma );
+		textureToLinear[i] = powf( i / 255.0f, texGamma );
 	}
 
-	float f, overbrightFactor;
+	float overbrightFactor;
 	
 	// Can't do overbright without texcombine
 	// UNDONE: Add GAMMA ramp to rectify this
 
 	if ( !HardwareConfig() )
 	{
-		overbright = 1.0f;
+		overbright = 1.0F;
 	}
+
 	if ( overbright == 2.0F )
 	{
 		overbrightFactor = 0.5F;
@@ -96,16 +93,16 @@ void ColorSpace::SetGamma( float screenGamma, float texGamma,
 		overbrightFactor = 1.0F;
 	}
 	
-	for (i=0 ; i<4096 ; i++)
+	for (int i=0 ; i<4096 ; i++)
 	{
 		// convert from linear 0..4 (x1024) to screen corrected vertex space (0..1?)
-		f = powf ( i/1024.0f, 1.0f / screenGamma );
+		const float f = powf ( i / 1024.0f, 1.0f / screenGamma );
 		
 		g_LinearToVertex[i] = f * overbrightFactor;
 		if (g_LinearToVertex[i] > 1)
 			g_LinearToVertex[i] = 1;
 		
-		linearToLightmap[i] = ( int )( f * 255 * overbrightFactor );
+		linearToLightmap[i] = static_cast<int>( f * 255 * overbrightFactor );
 		if (linearToLightmap[i] > 255)
 			linearToLightmap[i] = 255;
 	}
@@ -117,7 +114,7 @@ void ColorSpace::SetGamma( float screenGamma, float texGamma,
 float ColorSpace::TextureToLinear( int c )
 {
 	if (c < 0)
-		return 0;
+		return 0.0f;
 	if (c > 255)
 		return 1.0f;
 
@@ -128,7 +125,8 @@ float ColorSpace::TexLightToLinear( int c, int exponent )
 {
 	Assert( g_isTextureToLinearInitialized );
 	// optimize me
-	return ( float )c * powf( 2.0f, exponent ) * ( 1.0f / 255.0f );
+	constexpr float coefficient{1.0f / 255.0f};
+	return static_cast<float>( c ) * powf( 2.0f, static_cast<float>( exponent ) ) * coefficient;
 }
 
 uint16 ColorSpace::LinearFloatToCorrectedShort( float in )
