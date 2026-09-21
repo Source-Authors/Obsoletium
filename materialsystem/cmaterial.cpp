@@ -534,15 +534,17 @@ void CMaterial::ClearContextData( void )
 {
 	int nSnapshotCount = SnapshotTypeCount();
 	for( int i = 0 ; i < nSnapshotCount ; i++ )
-		for( int j = 0 ; j < m_ShaderRenderState.m_pSnapshots[i].m_nPassCount; j++ )
+	{
+		auto &snapshot = m_ShaderRenderState.m_pSnapshots[i];
+		for( int j = 0 ; j < snapshot.m_nPassCount; j++ )
 		{
-			if ( m_ShaderRenderState.m_pSnapshots[i].m_pContextData[j] )
+			if ( auto *&data = snapshot.m_pContextData[j]; data )
 			{
-				delete m_ShaderRenderState.m_pSnapshots[i].m_pContextData[j];
-				m_ShaderRenderState.m_pSnapshots[i].m_pContextData[j] = NULL;
+				delete data;
+				data = nullptr;
 			}
-			
 		}
+	}
 }
 
 //-----------------------------------------------------------------------------

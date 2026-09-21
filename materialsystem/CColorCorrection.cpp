@@ -212,9 +212,9 @@ void CColorCorrectionSystem::Init()
 //-----------------------------------------------------------------------------
 void CColorCorrectionSystem::Shutdown()
 {
-	for ( int i=0;i<m_ColorCorrectionList.Count();i++ )
+	for ( auto *cc : m_ColorCorrectionList )
 	{
-		delete m_ColorCorrectionList[i];
+		delete cc;
 	}
 
 	MaterialSystem()->RemoveReleaseFunc( ReleaseColorCorrection );
@@ -321,7 +321,7 @@ void CColorCorrectionSystem::ResetLookup( )
 //  ColorCorrectionLookup_t sorting function
 //-----------------------------------------------------------------------------
 typedef ColorCorrectionLookup_t * CCLPtr;
-int CompareLookups( const CCLPtr *lookup_a, const CCLPtr *lookup_b )
+static int CompareLookups( const CCLPtr *lookup_a, const CCLPtr *lookup_b )
 {
 	if ( (*lookup_a)->m_flWeight < (*lookup_b)->m_flWeight )
 		return 1;
@@ -337,12 +337,12 @@ void CColorCorrectionSystem::SortLookups( )
 {
 	m_ColorCorrectionList.Sort( CompareLookups );
 
-	for ( int i=0;i<COLOR_CORRECTION_MAX_TEXTURES && i<m_ColorCorrectionList.Count();i++ )
+	for ( intp i=0;i<COLOR_CORRECTION_MAX_TEXTURES && i<m_ColorCorrectionList.Count();i++ )
 	{
 		TextureManager()->SetColorCorrectionTexture( i, m_ColorCorrectionList[i]->m_pColorCorrectionTexture );
 	}
 
-	for ( int i=m_ColorCorrectionList.Count();i<COLOR_CORRECTION_MAX_TEXTURES;i++ )
+	for ( intp i=m_ColorCorrectionList.Count();i<COLOR_CORRECTION_MAX_TEXTURES;i++ )
 	{
 		TextureManager()->SetColorCorrectionTexture( i, NULL );
 	}
@@ -353,11 +353,11 @@ void CColorCorrectionSystem::SortLookups( )
 //-----------------------------------------------------------------------------
 ColorCorrectionLookup_t *CColorCorrectionSystem::FindLookup( ColorCorrectionHandle_t handle )
 {
-	for ( int i=0; i<m_ColorCorrectionList.Count(); i++ )
+	for ( auto *cc : m_ColorCorrectionList )
 	{
-		if ( m_ColorCorrectionList[i]->m_Handle == handle )
+		if ( cc->m_Handle == handle )
 		{
-			return m_ColorCorrectionList[i];
+			return cc;
 		}
 	}
 
@@ -414,17 +414,19 @@ bool CColorCorrectionSystem::RemoveLookup( ColorCorrectionHandle_t handle )
 	if ( handle == m_DefaultColorCorrectionHandle )
 		return false;
 
-	for ( int i=0;i<m_ColorCorrectionList.Count();i++ )
+	intp i = 0;
+	for ( auto *cc : m_ColorCorrectionList )
 	{
-		ColorCorrectionLookup_t *lookup = m_ColorCorrectionList[i];
-		if ( lookup->m_Handle == handle )
+		if ( cc->m_Handle == handle )
 		{
 			m_ColorCorrectionList.Remove( i );
 
-			delete lookup;
+			delete cc;
 
-            return true;
+			return true;
 		}
+
+		++i;
 	}
 
 	return false;
@@ -718,17 +720,9 @@ void CColorCorrectionSystem::ResetLookupWeights( )
 {
     m_DefaultColorCorrectionWeight = 0.0f;
 
-	for ( int i=0;i<m_ColorCorrectionList.Count();i++ )
+	for ( auto *cc : m_ColorCorrectionList )
 	{
-		ColorCorrectionLookup_t *lookup = m_ColorCorrectionList[i];
-		if ( lookup->m_bResetable )
-		{
-			lookup->m_flWeight = 0.0f;
-		}
-		else
-		{
-			lookup->m_flWeight = 1.0f;
-		}
+		cc->m_flWeight = cc->m_bResetable ? 0.0f : 1.0f;
 	}
 }
 
@@ -749,9 +743,9 @@ color24 CColorCorrectionSystem::ConvertToColor24( RGBX5551_t inColor )
 //-----------------------------------------------------------------------------
 void CColorCorrectionSystem::ReleaseTextures( )
 {
-	for ( int i=0;i<m_ColorCorrectionList.Count();i++ )
+	for ( auto *cc : m_ColorCorrectionList )
 	{
-		m_ColorCorrectionList[i]->ReleaseTexture();
+		cc->ReleaseTexture();
 	}
 }
 
@@ -760,9 +754,9 @@ void CColorCorrectionSystem::ReleaseTextures( )
 //-----------------------------------------------------------------------------
 void CColorCorrectionSystem::RestoreTextures( )
 {
-	for ( int i=0;i<m_ColorCorrectionList.Count();i++ )
+	for ( auto *cc : m_ColorCorrectionList )
 	{
-		m_ColorCorrectionList[i]->RestoreTexture();
+		cc->RestoreTexture();
 	}
 }
 
@@ -772,14 +766,14 @@ void CColorCorrectionSystem::RestoreTextures( )
 void CColorCorrectionSystem::GetNormalizedWeights( float *pDefaultWeight, float *pLookupWeights )
 {
 	float total_weight = 0.0f;
-	int nLoopCount = min( m_ColorCorrectionList.Count(), (intp)COLOR_CORRECTION_MAX_TEXTURES );
-	for ( int i=0; i<nLoopCount; i++ )
+	intp nLoopCount = min( m_ColorCorrectionList.Count(), (intp)COLOR_CORRECTION_MAX_TEXTURES );
+	for ( intp i=0; i<nLoopCount; i++ )
 	{
 		total_weight += m_ColorCorrectionList[i]->m_flWeight;
 		pLookupWeights[i] = m_ColorCorrectionList[i]->m_flWeight;
 	}
 
-	for ( int i = nLoopCount; i < COLOR_CORRECTION_MAX_TEXTURES; ++i )
+	for ( intp i = nLoopCount; i < COLOR_CORRECTION_MAX_TEXTURES; ++i )
 	{
 		pLookupWeights[i] = 0.0f;
 	}
@@ -793,7 +787,7 @@ void CColorCorrectionSystem::GetNormalizedWeights( float *pDefaultWeight, float 
 		*pDefaultWeight = 0.0f;
 
 		float inv_total_weight = 1.0f / total_weight;
-		for ( int i=0; i< nLoopCount; i++ )
+		for ( intp i=0; i< nLoopCount; i++ )
 		{
 			pLookupWeights[i] *= inv_total_weight;
 		}
@@ -805,7 +799,7 @@ void CColorCorrectionSystem::GetNormalizedWeights( float *pDefaultWeight, float 
 //-----------------------------------------------------------------------------
 int CColorCorrectionSystem::GetNumLookups( )
 {
-	int i;
+	intp i;
 	for ( i=0;i<m_ColorCorrectionList.Count()&&i<COLOR_CORRECTION_MAX_TEXTURES;i++ )
 	{
 		 if ( m_ColorCorrectionList[i]->m_flWeight<=0.0f )

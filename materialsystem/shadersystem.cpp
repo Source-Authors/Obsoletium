@@ -255,9 +255,9 @@ void CShaderSystem::Init()
 		m_bForceUsingGraphicsReturnTrue = true;
 	}
 
-	for ( int i = 0; i < MATERIAL_DEBUG_COUNT; ++i )
+	for ( auto *&m : m_pDebugMaterials )
 	{
-		m_pDebugMaterials[i] = NULL;
+		m = nullptr;
 	}
 
 	LoadAllShaderDLLs();
@@ -673,10 +673,9 @@ void CShaderSystem::SetupShaderDictionary( intp nShaderDLLIndex )
 {
 	// We could have put the shader dictionary into each shader DLL
 	// I'm not sure if that makes this system any less secure than it already is
-	intp i;
 	ShaderDLLInfo_t &info = m_ShaderDLLs[nShaderDLLIndex];
 	intp nCount = info.m_pShaderDLL->ShaderCount();
-	for ( i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		IShader *pShader = info.m_pShaderDLL->GetShader( i );
 		const char *pShaderName = pShader->GetName();
@@ -814,13 +813,13 @@ void CShaderSystem::CreateDebugMaterials()
 	{
 		pVMTKeyValues[i] = new KeyValues( s_pDebugShaderName[i] );
 	}
-	
+
 	pVMTKeyValues[MATERIAL_DEBUG_DEPTH_DECAL]->SetInt( "$decal", 1 );
 
-	for ( i = 0; i < MATERIAL_DEBUG_COUNT; ++i )
+	char shaderName[64];
+	for ( int i = 0; i < MATERIAL_DEBUG_COUNT; ++i )
 	{
-		char shaderName[64];
-		Q_snprintf( shaderName, sizeof( shaderName ), "___%s_%d.vmt", s_pDebugShaderName[i], i );
+		V_sprintf_safe( shaderName, "___%s_%d.vmt", s_pDebugShaderName[i], i );
 		m_pDebugMaterials[i] = static_cast<IMaterialInternal*>(MaterialSystem()->CreateMaterial( shaderName, pVMTKeyValues[i] ));
 		if( m_pDebugMaterials[i] )
 			m_pDebugMaterials[i] = m_pDebugMaterials[i]->GetRealTimeVersion();
@@ -835,18 +834,18 @@ void CShaderSystem::CleanUpDebugMaterials()
 {
 	if (m_pDebugMaterials[0])
 	{
-		for ( int i = 0; i < MATERIAL_DEBUG_COUNT; ++i )
+		for ( auto *&m : m_pDebugMaterials )
 		{
-			m_pDebugMaterials[i]->DecrementReferenceCount();
-			if ( m_pDebugMaterials[i]->InMaterialPage() )
+			m->DecrementReferenceCount();
+			if ( m->InMaterialPage() )
 			{
-				MaterialSystem()->RemoveMaterialSubRect( m_pDebugMaterials[i] );
+				MaterialSystem()->RemoveMaterialSubRect( m );
 			}
 			else
 			{
-				MaterialSystem()->RemoveMaterial( m_pDebugMaterials[i] );
+				MaterialSystem()->RemoveMaterial( m );
 			}
-			m_pDebugMaterials[i] = NULL;
+			m = nullptr;
 		}
 	}
 }
@@ -1009,7 +1008,7 @@ void CShaderSystem::InitShaderParameters( IShader *pShader, IMaterialVar **param
 		if (params[i]->IsDefined())
 			continue;
 
-		int type = pShader->GetParamType( i );
+		ShaderParamType_t type = pShader->GetParamType( i );
 		switch( type )
 		{
 		case SHADER_PARAM_TYPE_TEXTURE:
@@ -1451,13 +1450,14 @@ void CShaderSystem::CleanupRenderState( ShaderRenderState_t* pRenderState )
 		RenderPassList_t *pTemp = pRenderState->m_pSnapshots;
 		for(int i = 0; i < nSnapshotCount; i++ )
 		{
-			for(int j = 0 ; j < pRenderState->m_pSnapshots[i].m_nPassCount; j++ )
-				if ( pTemp[i].m_pContextData[j] )
+			auto &snapshot = pRenderState->m_pSnapshots[i];
+			for(int j = 0 ; j < snapshot.m_nPassCount; j++ )
+				if ( auto *&data = pTemp[i].m_pContextData[j]; data )
 				{
-					delete pTemp[i].m_pContextData[j];
-					pTemp[i].m_pContextData[j] = NULL;
+					delete data;
+					data = nullptr;
 				}
-			pRenderState->m_pSnapshots[i].m_nPassCount = 0;
+			snapshot.m_nPassCount = 0;
 		}
 	}
 }

@@ -726,13 +726,13 @@ IMaterialVar *CMaterialSubRect::FindVar( char const *varName, bool *found, bool 
 	MaterialVarSym_t symVar = IMaterialVar::FindSymbol( varName );
 	if ( symVar != UTL_INVAL_SYMBOL )
 	{
-		int nVarCount = m_aMaterialVars.Count();
-		for ( int iVar = 0; iVar < nVarCount; ++iVar )
+		intp nVarCount = m_aMaterialVars.Count();
+		for ( intp iVar = 0; iVar < nVarCount; ++iVar )
 		{
-			if ( m_aMaterialVars[iVar]->GetNameAsSymbol() == symVar )
+			if ( auto *var = m_aMaterialVars[iVar]; var->GetNameAsSymbol() == symVar )
 			{
 				*found = true;
-				return m_aMaterialVars[iVar];
+				return var;
 			}
 		}
 	}
@@ -740,8 +740,8 @@ IMaterialVar *CMaterialSubRect::FindVar( char const *varName, bool *found, bool 
 	// Not found!
 	if( complain )
 	{
-		static int complainCount = 0;
-		if( complainCount < 100 )
+		static uint8_t complainCount = 0;
+		if( complainCount < 100u )
 		{
 			DevWarning( 1, "No such variable \"%s\" for material \"%s\"\n", varName, GetName() );
 			complainCount++;
@@ -760,11 +760,11 @@ IMaterialVar *CMaterialSubRect::FindVarFast( char const *pVarName, unsigned int 
 
 	if ( *pToken != UTL_INVAL_SYMBOL )
 	{
-		int nVarCount = m_aMaterialVars.Count();
-		for ( int iVar = 0; iVar < nVarCount; ++iVar )
+		intp nVarCount = m_aMaterialVars.Count();
+		for ( intp iVar = 0; iVar < nVarCount; ++iVar )
 		{
-			if ( m_aMaterialVars[iVar]->GetNameAsSymbol() == *pToken )
-				return m_aMaterialVars[iVar];
+			if ( auto *var = m_aMaterialVars[iVar]; var->GetNameAsSymbol() == *pToken )
+				return var;
 		}
 	}
 
