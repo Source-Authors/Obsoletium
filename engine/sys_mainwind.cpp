@@ -1059,7 +1059,7 @@ bool CGame::CreateGameWindow( void )
 		V_strcpy_safe( utf8_window_name, modinfo->GetString("game") );
 	}
 
-	if (!utf8_window_name[0])
+	if ( Q_isempty( utf8_window_name ) )
 	{
 		// dimhotepus: Not HALF-LIFE 2 when no info.
 		V_strcpy_safe( utf8_window_name, "N/A" );
