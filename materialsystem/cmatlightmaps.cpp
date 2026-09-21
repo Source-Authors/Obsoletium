@@ -436,7 +436,7 @@ void CMatLightmaps::AllocateLightmapTexture( int lightmap )
 	m_LightmapPageTextureHandles.EnsureCount( lightmap + 1 );
 
 	char debugName[256];
-	Q_snprintf( debugName, sizeof( debugName ), "[lightmap %d]", lightmap );
+	V_sprintf_safe( debugName, "[lightmap %d]", lightmap );
 	
 	ImageFormat imageFormat;
 	switch ( HardwareConfig()->GetHDRType() )
@@ -723,8 +723,8 @@ void CMatLightmaps::BumpedLightmapBitsToPixelWriter_LDR( float* pFloatImage, flo
 				unsigned char alpha =  RoundFloatToByte( pFloatImage[srcTexelOffset+3] * 255.0f );
 				// Write data to the bitmapped represenations so that PFM files can be written
 				PixRGBAF pixelData;
-				pixelData.Red = color[0][0];                  
-				pixelData.Green = color[0][1];                  
+				pixelData.Red = color[0][0];
+				pixelData.Green = color[0][1];
 				pixelData.Blue = color[0][2];
 				pixelData.Alpha = alpha;
 				pfmOut->WritePixelRGBAF( pOffsetIntoLightmapPage[0] + s, pOffsetIntoLightmapPage[1] + t, pixelData);
@@ -882,8 +882,8 @@ void CMatLightmaps::LightmapBitsToPixelWriter_LDR( float* pFloatImage, int pLigh
 			{
 				// Write data to the bitmapped represenations so that PFM files can be written
 				PixRGBAF pixelData;
-				pixelData.Red = color[0];                  
-				pixelData.Green = color[1];                  
+				pixelData.Red = color[0];
+				pixelData.Green = color[1];
 				pixelData.Blue = color[2];
 				pixelData.Alpha = color[3];
 				pfmOut->WritePixelRGBAF( pOffsetIntoLightmapPage[0] + s, pOffsetIntoLightmapPage[1] + t, pixelData );
@@ -952,8 +952,8 @@ void CMatLightmaps::LightmapBitsToPixelWriter_HDRI( float* RESTRICT pFloatImage,
 				{
 					// Write data to the bitmapped represenations so that PFM files can be written
 					PixRGBAF pixelData;
-					pixelData.Red = pSrc[0];                  
-					pixelData.Green = pSrc[1];                  
+					pixelData.Red = pSrc[0];
+					pixelData.Green = pSrc[1];
 					pixelData.Blue = pSrc[2];
 					pixelData.Alpha = pSrc[3];
 					pfmOut->WritePixelRGBAF( pOffsetIntoLightmapPage[0] + s, pOffsetIntoLightmapPage[1] + t, pixelData );
@@ -1257,4 +1257,3 @@ void CMatLightmaps::EnableLightmapFiltering( bool enabled )
 		}
 	}
 }
-
