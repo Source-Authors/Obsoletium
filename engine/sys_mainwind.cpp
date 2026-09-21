@@ -868,7 +868,7 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				// darkx1us: Now we are first Valve game which exits on ALT+F4!
 				Cbuf_Clear();
 				Cbuf_AddText( "quit\n" );
-            }
+			}
 
 	#ifndef SWDS
 			if ( VCRGetMode() == VCR_Disabled )
@@ -896,8 +896,8 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_MOVE:
 		event.m_nType = IE_WindowMove;
-		event.m_nData = (short)LOWORD(lParam);
-		event.m_nData2 = (short)HIWORD(lParam);
+		event.m_nData = (int)(short)LOWORD(lParam);
+		event.m_nData2 = (int)(short)HIWORD(lParam);
 		g_pInputSystem->PostUserEvent( event );
 		break;
 
