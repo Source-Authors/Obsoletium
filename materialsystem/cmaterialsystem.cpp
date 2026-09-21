@@ -3253,7 +3253,6 @@ void CMaterialSystem::EndFrame( void )
 
 	int iConVarThreadMode = mat_queue_mode.GetInt();
 
-	// For this testing release, -2 is equivalent to 0 (off). When we release, we'll make -2 equivalent to -1 (on)
 	if ( iConVarThreadMode == -2 )
 	{
 		iConVarThreadMode = MATERIAL_QUEUED_THREADED;
