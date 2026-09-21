@@ -2324,6 +2324,8 @@ struct IMESettingsTransform
 		HIMC hImc = ImmGetContext( hwnd );
 		if ( hImc )
 		{
+			RunCodeAtScopeExit( ImmReleaseContext( hwnd, hImc ) );
+
 			DWORD	dwConvMode, dwSentMode;
 
 			ImmGetConversionStatus( hImc, &dwConvMode, &dwSentMode );
@@ -2337,8 +2339,6 @@ struct IMESettingsTransform
 			dwSentMode |= smode_add;
 
 			ImmSetConversionStatus( hImc, dwConvMode, dwSentMode );
-
-			ImmReleaseContext( hwnd, hImc );
 		}
 	}
 
@@ -2461,8 +2461,9 @@ int CInputSystem::GetIMEConversionModes( ConversionModeItem *dest, int destcount
 	HIMC hImc = ImmGetContext( ( HWND )GetIMEWindow() );
 	if ( hImc )
 	{
+		RunCodeAtScopeExit( ImmReleaseContext( ( HWND )GetIMEWindow(), hImc ) );
+
 		ImmGetConversionStatus( hImc, &dwConvMode, &dwSentMode );
-		ImmReleaseContext( ( HWND )GetIMEWindow(), hImc );
 	}
 
 	LanguageIds *info = GetLanguageInfo( LOWORD( GetKeyboardLayout( 0 ) ) );
@@ -2612,8 +2613,9 @@ int CInputSystem::GetIMESentenceModes( SentenceModeItem *dest, int destcount )
 	HIMC hImc = ImmGetContext( ( HWND )GetIMEWindow() );
 	if ( hImc )
 	{
+		RunCodeAtScopeExit( ImmReleaseContext( ( HWND )GetIMEWindow(), hImc ) );
+
 		ImmGetConversionStatus( hImc, &dwConvMode, &dwSentMode );
-		ImmReleaseContext( ( HWND )GetIMEWindow(), hImc );
 	}
 
 	LanguageIds *info = GetLanguageInfo( LOWORD( GetKeyboardLayout( 0 ) ) );
@@ -2721,6 +2723,8 @@ void CInputSystem::OnIMEComposition( int flags )
 	HIMC hIMC = ImmGetContext( ( HWND )GetIMEWindow() );
 	if ( hIMC )
 	{
+		RunCodeAtScopeExit( ImmReleaseContext( ( HWND )GetIMEWindow(), hIMC ) );
+
 		if ( flags & VGUI_GCS_RESULTSTR )
 		{
 			wchar_t tempstr[ 32 ];
@@ -2753,8 +2757,6 @@ void CInputSystem::OnIMEComposition( int flags )
 				InternalSetCompositionString( tempstr );
 			}
 		}
-
-		ImmReleaseContext( ( HWND )GetIMEWindow(), hIMC );
 	}
 #endif
 }
@@ -2824,6 +2826,8 @@ void CInputSystem::CreateNewCandidateList()
 	HIMC hImc = ImmGetContext( ( HWND )GetIMEWindow() );
 	if ( hImc )
 	{
+		RunCodeAtScopeExit( ImmReleaseContext( ( HWND )GetIMEWindow(), hImc ) );
+
 		DWORD numCandidates = 0;
 
 		DWORD bytes = ImmGetCandidateListCountW( hImc, &numCandidates );
@@ -2845,12 +2849,11 @@ void CInputSystem::CreateNewCandidateList()
 				delete[] buf;
 			}
 		}
-		ImmReleaseContext( ( HWND )GetIMEWindow(), hImc );
 	}
 #endif
 }
 
-int  CInputSystem::GetCandidateListCount()
+int CInputSystem::GetCandidateListCount()
 {
 	ASSERT_IF_IME_NYI();
 
@@ -2931,8 +2934,9 @@ void CInputSystem::SetCandidateListPageStart( int start )
 	HIMC hImc = ImmGetContext( ( HWND )GetIMEWindow() );
 	if ( hImc )
 	{
+		RunCodeAtScopeExit( ImmReleaseContext( ( HWND )GetIMEWindow(), hImc ) );
+
 		ImmNotifyIME( hImc, NI_SETCANDIDATE_PAGESTART, 0, start );
-		ImmReleaseContext( ( HWND )GetIMEWindow(), hImc );
 	}
 #endif
 }
@@ -2970,14 +2974,14 @@ void CInputSystem::SetCandidateWindowPos( int x, int y )
 	HIMC hIMC = ImmGetContext( ( HWND )GetIMEWindow() );
 	if ( hIMC ) 
 	{
+		RunCodeAtScopeExit( ImmReleaseContext( ( HWND )GetIMEWindow(), hIMC ) );
+
 		// Set candidate window position near caret position
 		Candidate.dwIndex = 0;
 		Candidate.dwStyle = CFS_FORCE_POSITION;
 		Candidate.ptCurrentPos.x = point.x;
 		Candidate.ptCurrentPos.y = point.y;
 		ImmSetCandidateWindow( hIMC, &Candidate );
-
-		ImmReleaseContext( ( HWND )GetIMEWindow(),hIMC );
 	}
 #endif
 }
