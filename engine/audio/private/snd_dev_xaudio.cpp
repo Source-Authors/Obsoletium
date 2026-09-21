@@ -8,6 +8,7 @@
 #include "tier1/utllinkedlist.h"
 #include "tier3/tier3.h"
 #include "video/ivideoservices.h"
+#include "cmd.h"
 
 #include "winlite.h"
 #include "com_ptr.h"
@@ -672,12 +673,7 @@ static void OnSndSurroundCvarChanged(IConVar *con_var, const char *old_string,
   if (old_value == -1) return;
 
   // restart sound system so it takes effect.
-  // dimhotepus: Can be invoked by mmsystem notification thread pool thread callback.
-  // In this case restart will deadlock as XAudio2 device wants such callback to complete.
-  // Just skip restart as XAudio2 support changing output devices on the fly by itself.
-  if (ThreadInMainThread()) {
-    g_pSoundServices->RestartSoundSystem();
-  }
+  Cbuf_AddText("snd_restart");
 }
 
 static void OnSndVarChanged(IConVar *con_var, const char *old_string,
