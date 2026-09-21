@@ -865,6 +865,7 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			if ( command_type == SC_CLOSE )
 			{
+				// darkx1us: Now we are first Valve game which exists on ALT+F4!
 				Cbuf_Clear();
 				Cbuf_AddText( "quit\n" );
             }
