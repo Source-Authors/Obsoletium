@@ -636,7 +636,7 @@ public:
 	void GenerateErrorTexture( ITexture *pTexture, IVTFTexture *pVTFTexture ) override;
 
 	// Updates the color correction state
-	void SetColorCorrectionTexture( int i, ITextureInternal *pTexture ) override;
+	void SetColorCorrectionTexture( intp i, ITextureInternal *pTexture ) override;
 
 	void ForceAllTexturesIntoHardware( void ) override;
 
@@ -1721,7 +1721,7 @@ ITextureInternal *CTextureManager::ColorCorrectionTexture( int i )
 	return m_pColorCorrectionTextures[ i ];
 }
 
-void CTextureManager::SetColorCorrectionTexture( int i, ITextureInternal *pTexture )
+void CTextureManager::SetColorCorrectionTexture( intp i, ITextureInternal *pTexture )
 {
 	Assert( i<COLOR_CORRECTION_MAX_TEXTURES );
 

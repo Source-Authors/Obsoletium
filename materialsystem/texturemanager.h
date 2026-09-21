@@ -108,7 +108,7 @@ public:
 	virtual void GenerateErrorTexture( ITexture *pTexture, IVTFTexture *pVTFTexture ) = 0;
 
 	// Updates the color correction state
-	virtual void SetColorCorrectionTexture( int i, ITextureInternal *pTexture ) = 0;
+	virtual void SetColorCorrectionTexture( intp i, ITextureInternal *pTexture ) = 0;
 
 	virtual void ForceAllTexturesIntoHardware( void ) = 0;
 
