@@ -194,7 +194,7 @@ namespace ColorSpace
 	
 	[[nodiscard]] uint16 LinearFloatToCorrectedShort(float in);
 
-	[[nodiscard]] inline unsigned short LinearToUnsignedShort( float in, int nFractionalBits )
+	[[nodiscard]] constexpr inline unsigned short LinearToUnsignedShort( float in, int nFractionalBits )
 	{
 		in = in * ( 1 << nFractionalBits );
 		return static_cast<unsigned short>( max( min( in, 65535.f ), 0.0f ) );
