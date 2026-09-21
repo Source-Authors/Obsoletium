@@ -34,8 +34,8 @@
 #if _DEBUG
 #define WEEKLY_PRICE_URL "http://gamestats/weeklyprices.dat"
 #else
-// dimhotepus: http:// -> https://
-#define WEEKLY_PRICE_URL "https://www.steampowered.com/stats/csmarket/weeklyprices.dat"
+// dimhotepus: Need to update handling code to use httpS://
+#define WEEKLY_PRICE_URL "http://www.steampowered.com/stats/csmarket/weeklyprices.dat"
 #endif
 
 
@@ -104,11 +104,12 @@ bool ParseHTTPResponse( SOCKET socketHTML, uint32 *unPageHash = NULL )
 	buf.SetBufferType( false, false );
 	while( 1 )
 	{
-		dwRet = ::recv( socketHTML, szBodyBuf, sizeof(szBodyBuf)-1, 0);
+		dwRet = ::recv( socketHTML, szBodyBuf, sizeof(szBodyBuf), 0);
 		if ( dwRet <= 0 )
 			break;
 
-		buf.Put( szBodyBuf, sizeof(szBodyBuf)-1 );
+		// dimhotepus: Put to buffer only received stuff.
+		buf.Put( szBodyBuf, dwRet );
 	}
 
 	weeklyprice_t weeklyprice;
