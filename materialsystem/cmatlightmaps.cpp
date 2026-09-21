@@ -231,8 +231,7 @@ void CMatLightmaps::CleanupLightmaps()
    // Remove the lightmap data bitmap representations
    if (m_pLightmapDataPtrArray)
    {
-      int i;
-      for( i = 0; i < GetNumLightmapPages(); i++ )
+      for( int i = 0; i < GetNumLightmapPages(); i++ )
       {
          delete m_pLightmapDataPtrArray[i];
       }
@@ -244,8 +243,7 @@ void CMatLightmaps::CleanupLightmaps()
    // delete old lightmap pages
 	if( m_pLightmapPages )
 	{
-		int i;
-		for( i = 0; i < GetNumLightmapPages(); i++ )
+		for( int i = 0; i < GetNumLightmapPages(); i++ )
 		{
 			g_pShaderAPI->DeleteTexture( m_LightmapPageTextureHandles[i] );
 		}
@@ -309,13 +307,12 @@ int CMatLightmaps::AllocateLightmap( int width, int height,
 	pMaterial = pMaterial->GetRealTimeVersion(); //always work with the real time versions of materials internally
 	
 	// material change
-	intp i;
 	intp nPackCount = m_ImagePackers.Count();
 	if ( GetCurrentMaterialInternal() != pMaterial )
 	{
 		// If this happens, then we need to close out all image packers other than
 		// the last one so as to produce as few sort IDs as possible
-		for ( i = nPackCount - 1; --i >= 0; )
+		for ( intp i = nPackCount - 1; --i >= 0; )
 		{
 			// NOTE: We *must* use the order preserving one here so the remaining one
 			// is the last lightmap
@@ -345,6 +342,7 @@ int CMatLightmaps::AllocateLightmap( int width, int height,
 	}
 
 	// Try to add it to any of the current images...
+	intp i;
 	bool bAdded = false;
 	for ( i = 0; i < nPackCount; ++i )
 	{
@@ -407,9 +405,8 @@ void CMatLightmaps::EndLightmapAllocation()
       m_pLightmapDataPtrArray = new FloatBitMap_t*[GetNumLightmapPages()];
    }
 
-	int i;
 	m_LightmapPageTextureHandles.EnsureCapacity( GetNumLightmapPages() );
-	for ( i = 0; i < GetNumLightmapPages(); i++ )
+	for ( int i = 0; i < GetNumLightmapPages(); i++ )
 	{
 		// Compute lightmap dimensions
 		bool lastStaticLightmap = ( i == (m_firstDynamicLightmap-1));
@@ -923,14 +920,12 @@ void CMatLightmaps::LightmapBitsToPixelWriter_HDRI( float* RESTRICT pFloatImage,
 			m_LightmapPixelWriter.Seek( pOffsetIntoLightmapPage[0], pOffsetIntoLightmapPage[1] + t );
 			for ( int s = 0; s < pLightmapSize[0]; ++s, pSrc += (sizeof(Vector4D)/sizeof(*pSrc)) )
 			{
-				int r, g, b, a;
+				int r = ColorSpace::LinearFloatToCorrectedShort( pSrc[0] );
+				int g = ColorSpace::LinearFloatToCorrectedShort( pSrc[1] );
+				int b = ColorSpace::LinearFloatToCorrectedShort( pSrc[2] );
+				int a = ColorSpace::LinearToUnsignedShort( pSrc[3], 16 );
 
-				r = ColorSpace::LinearFloatToCorrectedShort( pSrc[0] );
-				g = ColorSpace::LinearFloatToCorrectedShort( pSrc[1] );
-				b = ColorSpace::LinearFloatToCorrectedShort( pSrc[2] );
-				a = ColorSpace::LinearToUnsignedShort( pSrc[3], 16 );
-
-				float toFloat = ( 1.0f / ( float )( 1 << 16 ) );
+				constexpr float toFloat = ( 1.0f / ( float )( 1 << 16 ) );
 
 				Assert( pSrc[3] >= 0.0f && pSrc[3] <= 1.0f );
 				m_LightmapPixelWriter.WritePixelF( r * toFloat, g * toFloat, b * toFloat, pSrc[3] );
@@ -946,12 +941,10 @@ void CMatLightmaps::LightmapBitsToPixelWriter_HDRI( float* RESTRICT pFloatImage,
 			m_LightmapPixelWriter.Seek( pOffsetIntoLightmapPage[0], pOffsetIntoLightmapPage[1] + t );
 			for ( int s = 0; s < pLightmapSize[0]; ++s, pSrc += (sizeof(Vector4D)/sizeof(*pSrc)) )
 			{
-				int r, g, b, a;
-
-				r = ColorSpace::LinearFloatToCorrectedShort( pSrc[0] );
-				g = ColorSpace::LinearFloatToCorrectedShort( pSrc[1] );
-				b = ColorSpace::LinearFloatToCorrectedShort( pSrc[2] );
-				a = ColorSpace::LinearToUnsignedShort( pSrc[3], 16 );
+				int r = ColorSpace::LinearFloatToCorrectedShort( pSrc[0] );
+				int g = ColorSpace::LinearFloatToCorrectedShort( pSrc[1] );
+				int b = ColorSpace::LinearFloatToCorrectedShort( pSrc[2] );
+				int a = ColorSpace::LinearToUnsignedShort( pSrc[3], 16 );
 
 				m_LightmapPixelWriter.WritePixel( r, g, b, a );
 
@@ -1249,8 +1242,7 @@ void CMatLightmaps::GetSortInfo( MaterialSystem_SortInfo_t *pSortInfoArray )
 //-----------------------------------------------------------------------------
 void CMatLightmaps::EnableLightmapFiltering( bool enabled )
 {
-	int i;
-	for( i = 0; i < GetNumLightmapPages(); i++ )
+	for( int i = 0; i < GetNumLightmapPages(); i++ )
 	{
 		g_pShaderAPI->ModifyTexture( m_LightmapPageTextureHandles[i] );
 		if( enabled )
@@ -1265,5 +1257,4 @@ void CMatLightmaps::EnableLightmapFiltering( bool enabled )
 		}
 	}
 }
-
 
