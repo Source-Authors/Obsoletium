@@ -209,7 +209,7 @@ CMaterialVar *CMaterialVar::AllocThreadVar()
 				s_nOverflowTempVars++;
 				return NULL;
 			}
-			m_nTempIndex = s_nTempVarsUsed++;
+			m_nTempIndex = static_cast<uint8_t>( s_nTempVarsUsed++ );
 		}
 
 		return &s_pTempMaterialVar[m_nTempIndex];
@@ -1144,7 +1144,7 @@ void CMaterialVar::GetLinearVecValue( float *pVal, int numComps ) const
 		{
 			for ( int i = 0; i < numComps; ++i )
 			{
-				pVal[i] = GammaToLinear( m_intVal );
+				pVal[i] = GammaToLinear( static_cast<float>( m_intVal ) );
 			}
 		}
 		break;
