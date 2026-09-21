@@ -15,6 +15,8 @@
 // NOTE: This has to be the last file included
 #include "tier0/memdbgon.h"
 
+// dimhotepus: Check textureToLinear initialized before access.
+static bool				g_isTextureToLinearInitialized = false;
 static float			textureToLinear[256];	// texture (0..255) to linear (0..1)
 float					g_LinearToVertex[4096];	// linear (0..4) to screen corrected vertex space (0..1?)
 static int				linearToLightmap[4096];	// linear (0..4) to screen corrected texture value (0..255)
@@ -26,6 +28,7 @@ void ColorSpace::SetGamma( float screenGamma, float texGamma,
 	float	g1, g3;
 	float	g;
 	float	brightness = 0.0f; // This used to be configurable. . hardcode to 0.0
+	AssertMsg( !g_isTextureToLinearInitialized, "Double initialization for gamma?" );
 
 	if( linearFrameBuffer )
 	{
@@ -106,6 +109,8 @@ void ColorSpace::SetGamma( float screenGamma, float texGamma,
 		if (linearToLightmap[i] > 255)
 			linearToLightmap[i] = 255;
 	}
+
+	g_isTextureToLinearInitialized = true;
 }
 
 // convert texture to linear 0..1 value
@@ -121,7 +126,7 @@ float ColorSpace::TextureToLinear( int c )
 
 float ColorSpace::TexLightToLinear( int c, int exponent )
 {
-//	return texLightToLinear[ c ];
+	Assert( g_isTextureToLinearInitialized );
 	// optimize me
 	return ( float )c * powf( 2.0f, exponent ) * ( 1.0f / 255.0f );
 }
