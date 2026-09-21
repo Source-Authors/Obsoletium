@@ -238,7 +238,8 @@ inline CIndexBuffer::CIndexBuffer( IDirect3DDevice9Ex *pD3D, int count,
 
 	if ( g_pShaderUtil->GetThreadMode() != MATERIAL_SINGLE_THREADED || !ThreadInMainThread() )
 	{
-		m_pSysmemBuffer = ( byte * )malloc( count * IndexSize() );
+		// dimhotepus: Make aligned to pair vertex one.
+		m_pSysmemBuffer = ( byte * )MemAlloc_AllocAligned( count * IndexSize(), 16 );
 		m_nSysmemBufferStartBytes = 0;
 	}
 	else
@@ -381,7 +382,8 @@ inline CIndexBuffer::~CIndexBuffer()
 
 	if ( m_pSysmemBuffer )
 	{
-		free( m_pSysmemBuffer );
+		// dimhotepus: Make aligned to pair vertex one.
+		MemAlloc_FreeAligned( m_pSysmemBuffer );
 		m_pSysmemBuffer = NULL;
 	}
 
@@ -514,7 +516,8 @@ inline unsigned short* CIndexBuffer::Lock( bool bReadOnly, int numIndices, int& 
 	// the non-current thread. 
 	if ( !m_pSysmemBuffer && !g_pShaderUtil->IsRenderThreadSafe() )
 	{
-		m_pSysmemBuffer = ( byte * )malloc( m_IndexCount * IndexSize() );
+		// dimhotepus: Make aligned to pair vertex one.
+		m_pSysmemBuffer = ( byte * )MemAlloc_AllocAligned( m_IndexCount * IndexSize(), 16 );
 		m_nSysmemBufferStartBytes = position * IndexSize();
 	}
 
@@ -645,7 +648,8 @@ inline void CIndexBuffer::HandleLateCreation( IDirect3DDevice9Ex *pD3D )
 	memcpy( pWritePtr, m_pSysmemBuffer + m_nSysmemBufferStartBytes, dataToWriteBytes );
 	ReallyUnlock( dataToWriteBytes );
 
-	free( m_pSysmemBuffer );
+	// dimhotepus: Make aligned to pair vertex one.
+	MemAlloc_FreeAligned( m_pSysmemBuffer );
 	m_pSysmemBuffer = NULL;
 }
 
