@@ -221,7 +221,7 @@ public:
 
 	DELEGATE_TO_OBJECT_0V(                  PopDeformation, g_pShaderAPI );
 
-	DELEGATE_TO_OBJECT_0C(int,				GetNumActiveDeformations, g_pShaderAPI );
+	DELEGATE_TO_OBJECT_0C(intp,				GetNumActiveDeformations, g_pShaderAPI );
 
 	// -----------------------------------------------------------
 	// Window methods
