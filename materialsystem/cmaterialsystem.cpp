@@ -3419,9 +3419,12 @@ void CMaterialSystem::EndFrame( void )
 				{
 					g_pShaderAPI->ReleaseThreadOwnership();
 
-					CJob		*pActiveAsyncJob = new CThreadAcquire();
+					auto *pActiveAsyncJob = new CThreadAcquire();
 					IThreadPool *pThreadPool = CreateMatQueueThreadPool();
 					pThreadPool->AddJob( pActiveAsyncJob );
+					// dimhotepus: We need to wait for job to finish as m_bThreadHasOwnership must be set only after it.
+					pActiveAsyncJob->WaitForFinish();
+
 					SafeRelease( pActiveAsyncJob );
 
 					m_bThreadHasOwnership = true;
@@ -4309,8 +4312,8 @@ void CMaterialSystem::ThreadAcquire( bool bForce )
 	auto *pActiveAsyncJob = new CThreadAcquire();
 	IThreadPool *pThreadPool = CreateMatQueueThreadPool();
 	pThreadPool->AddJob( pActiveAsyncJob );
-//	while we could wait for this job to finish, there's no reason too
-//	pActiveAsyncJob->WaitForFinish();	
+	// dimhotepus: We need to wait for job to finish as m_bThreadHasOwnership must be set only after it.
+	pActiveAsyncJob->WaitForFinish();
 
 	SafeRelease( pActiveAsyncJob );
 
