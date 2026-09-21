@@ -1615,6 +1615,7 @@ KeyValues* CMaterial::InitializeShader( KeyValues &keyValues, KeyValues &patchKe
 	m_pShader = pShader;
 
 	// Store off the material vars + flags
+	Assert( varCount <= UCHAR_MAX );
 	m_VarCount = varCount;
 	m_pShaderParams = (IMaterialVar**)malloc( varCount * sizeof(IMaterialVar*) );
 	memcpy( m_pShaderParams, ppVars, varCount * sizeof(IMaterialVar*) );
@@ -1714,6 +1715,7 @@ void CMaterial::SetupErrorShader()
 	Assert( m_pShader );
 
 	// Create undefined vars for all the actual material vars
+	Assert( m_pShader->GetNumParams() <= UCHAR_MAX );
 	m_VarCount = m_pShader->GetNumParams();
 	m_pShaderParams = (IMaterialVar**)malloc( m_VarCount * sizeof(IMaterialVar*) );
 
@@ -2559,6 +2561,7 @@ void CMaterial::SetShader( const char *pShaderName )
 	m_pShader = pShader;
 
 	// Store off the material vars + flags
+	Assert( iVarCount <= UCHAR_MAX );
 	m_VarCount = iVarCount;
 	m_pShaderParams = (IMaterialVar**)malloc( iVarCount * sizeof(IMaterialVar*) );
 	memcpy( m_pShaderParams, ppVars, iVarCount * sizeof(IMaterialVar*) );
@@ -3082,6 +3085,7 @@ IMaterialVar *CMaterial::GetShaderParam( int id )
 //-----------------------------------------------------------------------------
 void CMaterial::AddMaterialVar( IMaterialVar *pMaterialVar )
 {
+	Assert( m_VarCount < UCHAR_MAX );
 	++m_VarCount;
 	m_pShaderParams = (IMaterialVar**)realloc( m_pShaderParams, m_VarCount * sizeof( IMaterialVar*) );
 	m_pShaderParams[m_VarCount-1] = pMaterialVar;

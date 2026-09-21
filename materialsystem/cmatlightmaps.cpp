@@ -394,6 +394,7 @@ void CMatLightmaps::EndLightmapAllocation()
 	// Compute the dimensions of the last lightmap 
 	int lastLightmapPageWidth, lastLightmapPageHeight;
 	int nLastIdx = m_ImagePackers.Count();
+	Assert( nLastIdx >= 1 );
 	m_ImagePackers[nLastIdx - 1].GetMinimumDimensions( &lastLightmapPageWidth, &lastLightmapPageHeight );
 	m_ImagePackers.Purge();
 
