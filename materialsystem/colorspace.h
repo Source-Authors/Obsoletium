@@ -28,9 +28,9 @@ namespace ColorSpace
 		           float overbright, bool allowCheats, bool linearFrameBuffer );
 
 	// convert texture to linear 0..1 value
-	float TextureToLinear( int c );
+	[[nodiscard]] float TextureToLinear( int c );
 
-	float TexLightToLinear( int c, int exponent );
+	[[nodiscard]] float TexLightToLinear( int c, int exponent );
 
 	// assume 0..4 range
 	void LinearToLightmap( unsigned char *pDstRGB, const float *pSrcRGB );
@@ -192,9 +192,9 @@ namespace ColorSpace
 	}
 
 	
-	uint16 LinearFloatToCorrectedShort( float in );
+	[[nodiscard]] uint16 LinearFloatToCorrectedShort(float in);
 
-	inline unsigned short LinearToUnsignedShort( float in, int nFractionalBits )
+	[[nodiscard]] inline unsigned short LinearToUnsignedShort( float in, int nFractionalBits )
 	{
 		in = in * ( 1 << nFractionalBits );
 		return static_cast<unsigned short>( max( min( in, 65535.f ), 0.0f ) );
