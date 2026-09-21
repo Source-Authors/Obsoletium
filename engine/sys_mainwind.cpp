@@ -865,7 +865,7 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			if ( command_type == SC_CLOSE )
 			{
-				// darkx1us: Now we are first Valve game which exists on ALT+F4!
+				// darkx1us: Now we are first Valve game which exits on ALT+F4!
 				Cbuf_Clear();
 				Cbuf_AddText( "quit\n" );
             }
@@ -1116,6 +1116,7 @@ bool CGame::CreateGameWindow( void )
 	wchar_t utf16_window_name[512];
 	V_strtowcs( utf8_window_name, std::size(utf8_window_name), utf16_window_name );
 
+	// dimhotepus: Cleanup old class registration if any.
 	if ( WNDCLASSW ewc; GetClassInfoW( m_hInstance, CLASSNAME, &ewc ) )
 	{
 		// Oops, we didn't clean up the class registration from last cycle which
