@@ -7,6 +7,8 @@
 #include "colorspace.h"
 
 #include <cmath>
+#include <tuple>
+
 #include "mathlib/bumpvects.h"
 #include "materialsystem_global.h"
 #include "IHardwareConfigInternal.h"
@@ -15,15 +17,30 @@
 // NOTE: This has to be the last file included
 #include "tier0/memdbgon.h"
 
+float	g_LinearToVertex[4096];	// linear (0..4) to screen corrected vertex space (0..1?)
+
+namespace {
+
 // dimhotepus: Check textureToLinear initialized before access.
-static bool				g_isTextureToLinearInitialized = false;
-static float			textureToLinear[256];	// texture (0..255) to linear (0..1)
-float					g_LinearToVertex[4096];	// linear (0..4) to screen corrected vertex space (0..1?)
+bool	g_isTextureToLinearInitialized = false;
+float	textureToLinear[256];	// texture (0..255) to linear (0..1)
+
+// dimhotepus: Store first set gamma args.
+std::tuple<float, float, float, bool, bool> g_setGammaArgs;
+
+}  // namespace
 
 void ColorSpace::SetGamma( float screenGamma, float texGamma, 
 						   float overbright, bool allowCheats, bool linearFrameBuffer )
 {
-	AssertMsg( !g_isTextureToLinearInitialized, "Double initialization for gamma?" );
+	// dimhotepus: Initialize only once.
+	const std::tuple<float, float, float, bool, bool> newArgs{screenGamma, texGamma, overbright, allowCheats, linearFrameBuffer};
+	if ( g_setGammaArgs == newArgs )
+	{
+		return;
+	}
+
+	AssertMsg( !g_isTextureToLinearInitialized, "Overriding material system gamma tables!" );
 
 	if( linearFrameBuffer )
 	{
@@ -103,6 +120,7 @@ void ColorSpace::SetGamma( float screenGamma, float texGamma,
 	}
 
 	g_isTextureToLinearInitialized = true;
+	g_setGammaArgs = std::move(std::make_tuple(screenGamma, texGamma, overbright, allowCheats, linearFrameBuffer));
 }
 
 // convert texture to linear 0..1 value
