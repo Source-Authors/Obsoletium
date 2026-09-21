@@ -634,11 +634,14 @@ inline void CIndexBuffer::HandleLateCreation( IDirect3DDevice9Ex *pD3D )
 			dataToWriteBytes,
 			dwFlags,
 			se::win::com::com_error_category().message(hr).c_str() );
+		AssertMsg( false, "Failed to lock index buffer." );
+
+		// dimhotepus: Exit here to retry later, as pWritePtr is nullptr and we will crash.
+		return;
 	}
 
 	// If this fails we're about to crash. Consider skipping the update and leaving 
 	// m_pSysmemBuffer around to try again later. (For example in case of device loss)
-	Assert( SUCCEEDED( hr ) ); 
 	memcpy( pWritePtr, m_pSysmemBuffer + m_nSysmemBufferStartBytes, dataToWriteBytes );
 	ReallyUnlock( dataToWriteBytes );
 
