@@ -195,7 +195,7 @@ void CVertexMorphDict::SortDeltas()
 // Morph data class 
 //
 //-----------------------------------------------------------------------------
-class CMorph : public IMorphInternal, public ITextureRegenerator
+class CMorph final : public IMorphInternal, public ITextureRegenerator
 {
 public:
 	// Constructor, destructor
@@ -358,7 +358,7 @@ private:
 // Render context for morphing. Only is used to determine
 // where in the morph accumulator to put the texture.
 //-----------------------------------------------------------------------------
-class CMorphMgrRenderContext : public IMorphMgrRenderContext
+class CMorphMgrRenderContext final : public IMorphMgrRenderContext
 {
 public:
 	enum UnnamedEnumsAreNotLegal
@@ -382,7 +382,7 @@ public:
 //-----------------------------------------------------------------------------
 // Morph manager class
 //-----------------------------------------------------------------------------
-class CMorphMgr : public IMorphMgr
+class CMorphMgr final : public IMorphMgr
 {
 public:
 	CMorphMgr();

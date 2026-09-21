@@ -44,7 +44,7 @@ enum MatQueuedMeshFlags_t
 	MQM_FLEX		= ( 1 << 1 ),
 };
 
-class CMatQueuedMesh : public IMesh
+class CMatQueuedMesh final : public IMesh
 {
 public:
 	CMatQueuedMesh( CMatQueuedRenderContext *pOwner, IMatRenderContextInternal *pHardwareContext )

@@ -26,7 +26,7 @@
 // ---------------------------------------------------------------------------------------- //
 static unsigned short g_DummyIndices[6];
 
-class CDummyMesh : public IMesh
+class CDummyMesh final : public IMesh
 {
 public:
 	// Locks/ unlocks the mesh, providing space for nVertexCount and nIndexCount.
@@ -228,7 +228,7 @@ CDummyMesh* GetDummyMesh()
 // ITexture dummy implementation.
 // ---------------------------------------------------------------------------------------- //
 
-class CDummyTexture : public ITexture
+class CDummyTexture final : public ITexture
 {
 public:
 	// Various texture polling methods
@@ -316,7 +316,7 @@ CDummyTexture g_DummyTexture;
 // ---------------------------------------------------------------------------------------- //
 static VMatrix g_DummyMatrix( 1,0,0,0,   0,1,0,0,   0,0,1,0,   0,0,0,1 );
 
-class CDummyMaterialVar : public IMaterialVar
+class CDummyMaterialVar final : public IMaterialVar
 {
 public:
 	virtual char const *	GetName( void ) const { return "DummyMaterialVar"; }
@@ -418,7 +418,7 @@ CDummyMaterialVar g_DummyMaterialVar;
 // Dummy implementation of IMaterialSystemHardwareConfig
 // ---------------------------------------------------------------------------------------- //
 
-class CDummyHardwareConfig : public IMaterialSystemHardwareConfig
+class CDummyHardwareConfig final : public IMaterialSystemHardwareConfig
 {
 public:
 	virtual bool HasDestAlphaBuffer() const			{ return false; }
@@ -519,7 +519,7 @@ CDummyHardwareConfig g_DummyHardwareConfig;
 // CDummyMaterial.
 // ---------------------------------------------------------------------------------------- //
 
-class CDummyMaterial : public IMaterial
+class CDummyMaterial final : public IMaterial
 {
 public:
 	virtual const char *	GetName() const { return "dummy material"; }
@@ -822,7 +822,7 @@ void* DummyMaterialSystemFactory( const char *pName, int *pReturnCode )
 // ---------------------------------------------------------------------------------------- //
 // Dummy morph
 // ---------------------------------------------------------------------------------------- //
-class CDummyMorph : public IMorph
+class CDummyMorph final : public IMorph
 {
 public:
 	virtual void Lock( float flFloatToFixedScale ) {}
@@ -835,7 +835,7 @@ public:
 // ---------------------------------------------------------------------------------------- //
 // CDummyMaterialSystem.
 // ---------------------------------------------------------------------------------------- //
-class CDummyMaterialSystem : public IMaterialSystemStub, public CRefCounted1<IMatRenderContext, CRefCountServiceNull>
+class CDummyMaterialSystem final : public IMaterialSystemStub, public CRefCounted1<IMatRenderContext, CRefCountServiceNull>
 {
 private:
 	IMaterialSystem *m_pRealMaterialSystem;

@@ -431,7 +431,7 @@ const ParseTableEntry cTextureStageParametersParseTable[] =
  // ------------------------------------------------------------------------------------------------
  // ------------------------------------------------------------------------------------------------
  // ------------------------------------------------------------------------------------------------
-class CTCTextureStage : public CTCStage
+class CTCTextureStage final : public CTCStage
 {
 public:
 	CTCTextureStage( const TextureStageParameters& _tsp, uint32 nTexCompositeCreateFlags ) 
@@ -719,7 +719,7 @@ const ParseTableEntry cCombineStageParametersParseTable[] =
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-class CTCCombineStage : public CTCStage 
+class CTCCombineStage final : public CTCStage 
 {
 public:
 	CTCCombineStage( const CombineStageParameters& _csp, uint32 nTexCompositeCreateFlags )
@@ -847,7 +847,7 @@ const ParseTableEntry cSelectStageParametersParseTable[] =
  // ------------------------------------------------------------------------------------------------
  // ------------------------------------------------------------------------------------------------
  // ------------------------------------------------------------------------------------------------
-class CTCSelectStage : public CTCStage
+class CTCSelectStage final : public CTCStage
 {
 public:
 	CTCSelectStage( const SelectStageParameters& _ssp, uint32 nTexCompositeCreateFlags ) 
@@ -1056,7 +1056,7 @@ const ParseTableEntry cApplyStickerStageParametersParseTable[] =
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------------
-class CTCApplyStickerStage : public CTCStage 
+class CTCApplyStickerStage final : public CTCStage 
 {
 	enum { Albedo = 0, Specular = 1 };
 
@@ -1248,7 +1248,7 @@ private:
 // ------------------------------------------------------------------------------------------------
 // This is a procedural stage we use to copy the results of a composite into a texture so we can 
 // release the render targets back to a pool to be used later.
-class CTCCopyStage : public CTCStage
+class CTCCopyStage final : public CTCStage
 {
 public:
 	CTCCopyStage()

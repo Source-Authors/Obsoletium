@@ -38,7 +38,7 @@
 //-----------------------------------------------------------------------------
 // Material implementation
 //-----------------------------------------------------------------------------
-class CMaterial : public IMaterialInternal
+class CMaterial final : public IMaterialInternal
 {
 public:
 	// Members of the IMaterial interface

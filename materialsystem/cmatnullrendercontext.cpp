@@ -12,7 +12,7 @@
 #include "cmatrendercontext.h"
 #include "itextureinternal.h"
 
-class CMatNullRenderContext : public CMatRenderContextBase
+class CMatNullRenderContext final : public CMatRenderContextBase
 {
 public:
 	CMatNullRenderContext()

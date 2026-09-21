@@ -33,7 +33,7 @@ static IMaterialVar *CreateMaterialVarFromKeyValue( IMaterial* pMaterial, KeyVal
 //-----------------------------------------------------------------------------
 // Material SubRect implementation
 //-----------------------------------------------------------------------------
-class CMaterialSubRect : public IMaterialInternal
+class CMaterialSubRect final : public IMaterialInternal
 {
 public:
 

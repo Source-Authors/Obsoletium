@@ -118,7 +118,7 @@ void V_StripWhitespace( char* pBuffer )
 //-----------------------------------------------------------------------------
 // Creates a checkerboard texture
 //-----------------------------------------------------------------------------
-class CCheckerboardTexture : public ITextureRegenerator
+class CCheckerboardTexture final : public ITextureRegenerator
 {
 public:
 	CCheckerboardTexture( int nCheckerSize, color32 color1, color32 color2 ) :
@@ -185,7 +185,7 @@ static void CreateCheckerboardTexture( ITextureInternal *pTexture, int nCheckerS
 //-----------------------------------------------------------------------------
 // Creates a solid texture
 //-----------------------------------------------------------------------------
-class CSolidTexture : public ITextureRegenerator
+class CSolidTexture final : public ITextureRegenerator
 {
 public:
 	CSolidTexture( color32 color ) : m_Color(color)
@@ -243,7 +243,7 @@ static void CreateSolidTexture( ITextureInternal *pTexture, color32 color )
 //-----------------------------------------------------------------------------
 // Creates a normalization cubemap texture
 //-----------------------------------------------------------------------------
-class CNormalizationCubemap : public ITextureRegenerator
+class CNormalizationCubemap final : public ITextureRegenerator
 {
 public:
 	virtual void RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pSubRect )
@@ -316,7 +316,7 @@ public:
 //-----------------------------------------------------------------------------
 // Creates a normalization cubemap texture
 //-----------------------------------------------------------------------------
-class CSignedNormalizationCubemap : public ITextureRegenerator
+class CSignedNormalizationCubemap final : public ITextureRegenerator
 {
 public:
 	virtual void RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pSubRect )
@@ -520,7 +520,7 @@ static void CreateSignedNormalizationCubemap( ITextureInternal *pTexture )
 //-----------------------------------------------------------------------------
 // Creates a color correction texture
 //-----------------------------------------------------------------------------
-class CColorCorrectionTexture : public ITextureRegenerator
+class CColorCorrectionTexture final : public ITextureRegenerator
 {
 public:
 	CColorCorrectionTexture( ColorCorrectionHandle_t handle ) : m_ColorCorrectionHandle(handle)
@@ -578,7 +578,7 @@ void CreateColorCorrectionTexture( ITextureInternal *pTexture, ColorCorrectionHa
 //-----------------------------------------------------------------------------
 // Implementation of the texture manager
 //-----------------------------------------------------------------------------
-class CTextureManager : public ITextureManager
+class CTextureManager final : public ITextureManager
 {
 public:
 	CTextureManager( void );
@@ -793,7 +793,7 @@ struct AsyncLoadJob_t
 };
 
 
-class CAsyncCopyRequest : public IAsyncTextureOperationReceiver
+class CAsyncCopyRequest final : public IAsyncTextureOperationReceiver
 {
 public:
 	CAsyncCopyRequest()
@@ -830,7 +830,7 @@ private:
 	std::atomic_bool m_bSignalled;
 };
 
-class CAsyncMapResult : public IAsyncTextureOperationReceiver
+class CAsyncMapResult final : public IAsyncTextureOperationReceiver
 {
 public:
 	CAsyncMapResult( ITextureInternal* pTex ) 
@@ -977,7 +977,7 @@ bool IsJobCancelled( AsyncLoadJob_t* pJob )
 
 //-----------------------------------------------------------------------------
 // Functions can be called from any thread, unless they are prefixed with a thread name. 
-class TSLIST_HEAD_ALIGN AsyncLoader : public CAlignedNewDelete<TSLIST_HEAD_ALIGNMENT>
+class TSLIST_HEAD_ALIGN AsyncLoader final : public CAlignedNewDelete<TSLIST_HEAD_ALIGNMENT>
 {
 public:
 	AsyncLoader()
@@ -1112,7 +1112,7 @@ private:
 
 //-----------------------------------------------------------------------------
 // Functions can be called from any thread, unless they are prefixed with a thread name. 
-class TSLIST_HEAD_ALIGN AsyncReader : public CAlignedNewDelete<TSLIST_HEAD_ALIGNMENT>
+class TSLIST_HEAD_ALIGN AsyncReader final : public CAlignedNewDelete<TSLIST_HEAD_ALIGNMENT>
 {
 public:
 	AsyncReader()

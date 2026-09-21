@@ -42,7 +42,7 @@ extern ConVar mat_supportflashlight;
 //-----------------------------------------------------------------------------
 // Implementation of the shader system
 //-----------------------------------------------------------------------------
-class CShaderSystem : public IShaderSystemInternal
+class CShaderSystem final : public IShaderSystemInternal
 {
 public:
 	CShaderSystem();

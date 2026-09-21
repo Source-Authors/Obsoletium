@@ -104,7 +104,7 @@ void ColorCorrectionLookup_t::RestoreTexture()
 //-----------------------------------------------------------------------------
 //  IColorCorrectionSystem interface implementation
 //-----------------------------------------------------------------------------
-class CColorCorrectionSystem : public IColorCorrectionSystem
+class CColorCorrectionSystem final : public IColorCorrectionSystem
 {
 public:
 	CColorCorrectionSystem()

@@ -217,7 +217,7 @@ class CTextureStreamingJob;
 // Base texture class
 //-----------------------------------------------------------------------------
 
-class CTexture : public ITextureInternal
+class CTexture final : public ITextureInternal
 {
 public:
 	CTexture();
@@ -559,7 +559,7 @@ protected:
 	friend class CTextureStreamingJob;
 };
 
-class CTextureStreamingJob : public IAsyncTextureOperationReceiver
+class CTextureStreamingJob final : public IAsyncTextureOperationReceiver
 {
 public:
 	CTextureStreamingJob( CTexture* pTex ) : m_referenceCount( 0 ), m_pOwner( pTex ) { Assert( m_pOwner != NULL ); m_pOwner->AddRef(); } 
@@ -589,7 +589,7 @@ private:
 // at a higher level of abstraction requiring an ITexture or ITextureInternal.
 //
 //////////////////////////////////////////////////////////////////////////
-class CReferenceToHandleTexture : public ITextureInternal
+class CReferenceToHandleTexture final : public ITextureInternal
 {
 public:
 	CReferenceToHandleTexture();
@@ -4626,7 +4626,7 @@ static char * BufferReplace( char (&buf)[bufSize], char const *szFindData, char 
 }
 
 
-class CP4Requirement
+class CP4Requirement final
 {
 public:
 	CP4Requirement();
