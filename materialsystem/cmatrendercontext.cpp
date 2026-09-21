@@ -396,7 +396,7 @@ void CMatRenderContextBase::PushMatrix()
 {
 	CUtlStack<MatrixStackItem_t> &curStack = m_MatrixStacks[ m_MatrixMode ];
 	Assert( curStack.Count() );
-	int iNew = curStack.Push();
+	intp iNew = curStack.Push();
 	curStack[ iNew ] = curStack[ iNew - 1 ];
 	m_pCurMatrixItem = &curStack.Top();
 	CurrentMatrixChanged();
@@ -1507,7 +1507,7 @@ void CMatRenderContext::PopCustomClipPlane( void )
 	Assert( m_CustomClipPlanes.Count() );
 	
 	//remove the endmost non-height plane found
-	int i;
+	intp i;
 	for( i = m_CustomClipPlanes.Count(); --i >= 0; )
 	{
 		if( m_CustomClipPlanes[i].bHack_IsHeightClipPlane == false )
@@ -2095,7 +2095,8 @@ int CMatRenderContext::CompareMaterialCombos( IMaterial *pMaterial1, IMaterial *
 	if ( dLightmap )
 		return dLightmap;
 
-	return (intp)pMat1 - (intp)pMat2;
+	intp diff = (intp)pMat1 - (intp)pMat2;
+	return diff > 0 ? 1 : (diff == 0 ? 0 : -1);
 }
 
 
