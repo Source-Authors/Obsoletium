@@ -144,5 +144,7 @@ float ColorSpace::TexLightToLinear( int c, int exponent )
 
 uint16 ColorSpace::LinearFloatToCorrectedShort( float in )
 {
-	return max( min( in * 4096.0F, 65535.0F ), 0.0f );
+	const float result = max( min( in * 4096.0F, 65535.0F ), 0.0f );
+	Assert( result >= std::numeric_limits<uint16>::min() && result <= std::numeric_limits<uint16>::max() );
+	return static_cast<uint16>( result );
 }
