@@ -1759,19 +1759,46 @@ retry_compile:
 			if ( m_RemoteShaderCompileSocket != INVALID_SOCKET )
 			{
 				// Grab the first 32 bits, which tell us what the rest of the data is
-				uint32 compile_rc;
-				memcpy( &compile_rc, pRecvbuf, sizeof( compile_rc ) );
+				// dimhotepus: Check response size.
+				if ( uint32 compile_rc; static_cast<size_t>( rc ) >= sizeof( compile_rc ) )
+				{
+					memcpy( &compile_rc, pRecvbuf, sizeof( compile_rc ) );
 
-				// If is zero, we have an error, so the rest of the data is a text string from the compiler
-				if ( compile_rc == 0x00000000u )
-				{
-					Warning( "Remote shader compile error: %s.\n", pRecvbuf+4 );
+					// If is zero, we have an error, so the rest of the data is a text string from the compiler
+					if ( compile_rc == 0u )
+					{
+						// dimhotepus: Check we received some error string back.
+						if ( int error_length = rc - static_cast<int>( sizeof( compile_rc ) ); error_length > 0 )
+						{
+							// dimhotepus: Ensure error string is C string (has '\0' terminator).
+							pRecvbuf[ 
+								min( static_cast<int>( sizeof( pRecvbuf ) ),
+									 error_length + static_cast<int>( sizeof( compile_rc ) ) ) - 1 ] = '\0';
+							Warning( "Remote shader compile error: %s.\n", pRecvbuf + sizeof( compile_rc ) );
+						}
+						else
+						{
+							Warning( "Remote shader compile error: expected error string back, got nothing.\n" );
+						}
+					}
+					else // we have an actual binary shader blob coming back
+					{
+						// dimhotepus: Check size in protocol matches real one.
+						if ( compile_rc == rc - static_cast<int>( sizeof( compile_rc ) ) )
+						{
+							nRemotelyCompiledShaderLength = compile_rc;
+							pRemotelyCompiledShader = (uint32 *) ( pRecvbuf + sizeof( compile_rc ) );
+						}
+						else
+						{
+							Warning( "Remote shader compile error: expected %u bytes for shader, got %d.\n",
+								compile_rc, rc - static_cast<int>( sizeof( compile_rc ) ) );
+						}
+					}
 				}
-				else // we have an actual binary shader blob coming back
+				else
 				{
-					nRemotelyCompiledShaderLength = compile_rc;
-					pRemotelyCompiledShader = (uint32 *) pRecvbuf;
-					pRemotelyCompiledShader++;
+					Warning( "Remote shader compile error: expected shader compile status (%zu bytes), got %d bytes back.\n", sizeof( compile_rc ), rc );
 				}
 			}
 		}
