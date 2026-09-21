@@ -588,7 +588,8 @@ class DefaultAudioDeviceChangedNotificationClient
         }
         snd_surround.SetValue(to_underlying(form_factor));
       } else {
-        // TODO: reinit with null audio device as no audio in system.
+        // Reinit with null audio device as no audio in system.
+        Cbuf_AddText("snd_restart");
       }
     }
 
