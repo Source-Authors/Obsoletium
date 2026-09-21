@@ -19,7 +19,6 @@
 static bool				g_isTextureToLinearInitialized = false;
 static float			textureToLinear[256];	// texture (0..255) to linear (0..1)
 float					g_LinearToVertex[4096];	// linear (0..4) to screen corrected vertex space (0..1?)
-static int				linearToLightmap[4096];	// linear (0..4) to screen corrected texture value (0..255)
 
 void ColorSpace::SetGamma( float screenGamma, float texGamma, 
 						   float overbright, bool allowCheats, bool linearFrameBuffer )
@@ -101,10 +100,6 @@ void ColorSpace::SetGamma( float screenGamma, float texGamma,
 		g_LinearToVertex[i] = f * overbrightFactor;
 		if (g_LinearToVertex[i] > 1)
 			g_LinearToVertex[i] = 1;
-		
-		linearToLightmap[i] = static_cast<int>( f * 255 * overbrightFactor );
-		if (linearToLightmap[i] > 255)
-			linearToLightmap[i] = 255;
 	}
 
 	g_isTextureToLinearInitialized = true;
