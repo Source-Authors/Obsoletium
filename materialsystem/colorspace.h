@@ -44,11 +44,9 @@ namespace ColorSpace
 	FORCEINLINE void LinearToLightmap( unsigned char *pDstRGB, const float *pSrcRGB )
 	{
 		Vector tmpVect;
-#if 1
-		int i, j;
-		for( j = 0; j < 3; j++ )
+		for( int j = 0; j < 3; j++ )
 		{
-			i = RoundFloatToInt( pSrcRGB[j] * 1024 );	// assume 0..4 range
+			int i = RoundFloatToInt( pSrcRGB[j] * 1024 );	// assume 0..4 range
 			if (i < 0)
 			{
 				i = 0;
@@ -59,11 +57,7 @@ namespace ColorSpace
 			}
 			tmpVect[j] = g_LinearToVertex[i];
 		}
-#else		
-		tmpVect[0] = LinearToVertexLight( pSrcRGB[0] );
-		tmpVect[1] = LinearToVertexLight( pSrcRGB[1] );
-		tmpVect[2] = LinearToVertexLight( pSrcRGB[2] );
-#endif
+
 		ColorClamp( tmpVect );
 		
 		pDstRGB[0] = RoundFloatToByte( tmpVect[0] * 255.0f );
