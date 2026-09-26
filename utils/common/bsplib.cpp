@@ -1360,10 +1360,21 @@ static void AddOcclusionLump( dheader_t *dheader, FileHandle_t file )
 		nOccluderVertexIndices * sizeof(int) +
 		3 * sizeof(int);
 
+	if ( nLumpLength > std::numeric_limits<int>::max() )
+	{
+		// darkx1us: Error if overflow occluders.
+		Error(
+			"Occlusion lump size %zd exceeds maximum allowed size %d. "
+			"Try to reduce occluder count.\n",
+			nLumpLength,
+			std::numeric_limits<int>::max()
+		);
+	}
+
 	lump_t *lump = &dheader->lumps[LUMP_OCCLUSION];
 
 	lump->fileofs = g_pFileSystem->Tell( file );
-	lump->filelen = nLumpLength;
+	lump->filelen = static_cast<int>( nLumpLength );
 	lump->version = LUMP_OCCLUSION_VERSION;
 	lump->uncompressedSize = 0;
 
