@@ -62,6 +62,14 @@ public:
 	{
 		m_pFilename = pFilename;
 		m_maxErrorIndex = 0;
+		// dimhotepus: Add line #. CS:GO backport.
+		m_nLine = 1;
+	}
+
+	// dimhotepus: Add line #. CS:GO backport.
+	void NextLine()
+	{
+		++m_nLine;
 	}
 
 	// entering a new keyvalues block, save state for errors
@@ -98,7 +106,8 @@ public:
 	{
 		bool bSpewCR = false;
 
-		Warning( "KeyValues Error: %s in file %s\n", pError, m_pFilename );
+		// dimhotepus: Add line #. CS:GO backport.
+		Warning( "KeyValues Error: %s in file %s line %d\n", pError, m_pFilename, m_nLine );
 		for ( int i = 0; i < m_maxErrorIndex; i++ )
 		{
 			if ( i < MAX_ERROR_STACK && m_errorStack[i] != INVALID_KEY_SYMBOL )
@@ -123,6 +132,8 @@ public:
 private:
 	HKeySymbol		m_errorStack[MAX_ERROR_STACK];
 	const char *m_pFilename{"NULL"};
+	// dimhotepus: Add line #. CS:GO backport.
+	int		m_nLine{1};
 	int		m_errorIndex{0};
 	int		m_maxErrorIndex{0};
 };
@@ -607,13 +618,30 @@ const char *KeyValues::ReadToken( CUtlBuffer &buf, bool &wasQuoted, bool &wasCon
 	// eating white spaces and remarks loop
 	while ( true )
 	{
-		buf.EatWhiteSpace();
+		// buf.EatWhiteSpace();
+
+		// dimhotepus: Add line #. CS:GO backport.
+		if ( buf.IsText() && buf.IsValid() )
+		{
+			while( buf.GetBytesRemaining() > 0 && V_isspace( *static_cast<const unsigned char*>( buf.PeekGet() ) ) )
+			{
+				if ( const char c = buf.GetChar(); c == '\n' )
+				{
+					g_KeyValuesErrorStack.NextLine();
+				}
+			}
+		}
+
 		if ( !buf.IsValid() )
 			return nullptr;	// file ends after reading whitespaces
 
 		// stop if it's not a comment; a new token starts here
 		if ( !buf.EatCPPComment() )
 			break;
+
+		// dimhotepus: Add line #. CS:GO backport.
+		//C++ comment ends at a new line, so record next line.
+		g_KeyValuesErrorStack.NextLine();
 	}
 
 	const char *c = (const char*)buf.PeekGet( sizeof(char), 0 );
