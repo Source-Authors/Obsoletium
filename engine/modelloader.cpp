@@ -91,6 +91,23 @@ static ConVar mod_dynamicloadspew( "mod_dynamicloadspew", "0", FCVAR_HIDDEN | FC
 
 #define DynamicModelDebugMsg(...) ( mod_dynamicloadspew.GetBool() ? Msg(__VA_ARGS__) : (void)0 )
 
+// dimhotepus: Overflow check. CS:GO backport.
+//
+// Attackers can attempt to force us to overflow the integer multiplication and read a (quite large)
+// number of bytes into a small amount of allocated memory. We attempt to mitigate that here.
+[[nodiscard]] static int ComputeBytesToRead( int lhs, size_t structSize, const char* mapName, const char* structName )
+{
+	const int64 destVal = static_cast<int64>( lhs ) * structSize;
+	const int32 retVal = static_cast<int32>( destVal );
+	if ( destVal != retVal )
+	{
+		AssertMsg( false, "Found a malicious map. Attempted integer overflow bug is present, we're about to shutdown." );
+		Sys_Error( "Couldn't load corrupted map %s: %s overlow (max %lld > map %d bytes)", mapName, structName, destVal, retVal );
+	}
+
+	return retVal;
+}
+
 
 bool g_bHunkAllocLightmaps;
 
@@ -1190,7 +1207,8 @@ void Mod_LoadOcclusion( void )
 			if (b->numoccluders)
 			{
 				b->occluders = Hunk_AllocName<doccluderdata_t>( b->numoccluders, "occluder data" );
-				int nSize = b->numoccluders * sizeof(doccluderdata_t);
+				// dimhotepus: Check overflow. CS:GO backport.
+				int nSize = ComputeBytesToRead( b->numoccluders, sizeof(doccluderdata_t), lh.GetLoadName(), "occluder data" );
 				buf.Get( b->occluders, nSize ); //-V2002
 			}
 
@@ -1198,7 +1216,8 @@ void Mod_LoadOcclusion( void )
 			if (b->numoccluderpolys)
 			{
 				b->occluderpolys = Hunk_AllocName<doccluderpolydata_t>( b->numoccluderpolys, "occluder poly data" );
-				int nSize = b->numoccluderpolys * sizeof(doccluderpolydata_t);
+				// dimhotepus: Check overflow. CS:GO backport.
+				int nSize = ComputeBytesToRead( b->numoccluderpolys, sizeof(doccluderpolydata_t), lh.GetLoadName(), "occluder poly data" );
 				buf.Get( b->occluderpolys, nSize ); //-V2002
 			}
 
@@ -1206,7 +1225,8 @@ void Mod_LoadOcclusion( void )
 			if (b->numoccludervertindices)
 			{
 				b->occludervertindices = Hunk_AllocName<int>( b->numoccludervertindices, "occluder vertices" );
-				int nSize = b->numoccludervertindices * sizeof(int);
+				// dimhotepus: Check overflow. CS:GO backport.
+				int nSize = ComputeBytesToRead( b->numoccludervertindices, sizeof(int), lh.GetLoadName(), "occluder vertices" );
 				buf.Get( b->occludervertindices, nSize ); //-V2002
 			}
 		}
@@ -1232,7 +1252,8 @@ void Mod_LoadOcclusion( void )
 			if (b->numoccluderpolys)
 			{
 				b->occluderpolys = Hunk_AllocName<doccluderpolydata_t>( b->numoccluderpolys, "occluder poly data" );
-				int nSize = b->numoccluderpolys * sizeof(doccluderpolydata_t);
+				// dimhotepus: Check overflow. CS:GO backport.
+				int nSize = ComputeBytesToRead( b->numoccluderpolys, sizeof(doccluderpolydata_t), lh.GetMapName(), "occlyder poly data" );
 				buf.Get( b->occluderpolys, nSize ); //-V2002
 			}
 
@@ -1240,7 +1261,8 @@ void Mod_LoadOcclusion( void )
 			if (b->numoccludervertindices)
 			{
 				b->occludervertindices = Hunk_AllocName<int>( b->numoccludervertindices, "occluder vertices" );
-				int nSize = b->numoccludervertindices * sizeof(int);
+				// dimhotepus: Check overflow. CS:GO backport.
+				int nSize = ComputeBytesToRead( b->numoccludervertindices, sizeof(int), lh.GetMapName(), "occluder vertices" );
 				buf.Get( b->occludervertindices, nSize ); //-V2002
 			}
 		}
