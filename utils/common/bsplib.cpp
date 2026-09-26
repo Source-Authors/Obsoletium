@@ -2885,12 +2885,13 @@ static intp ArrayUsage( const char *szItem, intp items, std::size_t maxitems, st
 
     Msg("%-17.17s %8zd/%-8zu %8zu/%-8zu (%4.1f%%) ", 
 		   szItem, items, maxitems, items * itemsize, maxitems * itemsize, percentage );
-	if ( percentage > 80.0 )
-		Msg( "VERY FULL!\n" );
+	// dimhotepus: Fix usage message. CS:GO backport.
+	if ( percentage > 99.9 )
+		Msg( "SIZE OVERFLOW!!!\n" );
 	else if ( percentage > 95.0 )
 		Msg( "SIZE DANGER!\n" );
-	else if ( percentage > 99.9 )
-		Msg( "SIZE OVERFLOW!!!\n" );
+	else if ( percentage > 80.0 )
+		Msg( "VERY FULL!\n" );
 	else
 		Msg( "\n" );
 	return items * itemsize;
@@ -2899,14 +2900,15 @@ static intp ArrayUsage( const char *szItem, intp items, std::size_t maxitems, st
 static intp GlobUsage( const char *szItem, intp itemstorage, std::size_t maxstorage )
 {
 	float	percentage = maxstorage ? itemstorage * 100.0f / maxstorage : 0.0f;
-    Msg("%-17.17s     [variable]    %8zd/%-8zu (%4.1f%%) ", 
+	Msg("%-17.17s     [variable]    %8zd/%-8zu (%4.1f%%) ", 
 		   szItem, itemstorage, maxstorage, percentage );
-	if ( percentage > 80.0 )
-		Msg( "VERY FULL!\n" );
+	// dimhotepus: Fix usage message. CS:GO backport.
+	if ( percentage > 99.9 )
+		Msg( "SIZE OVERFLOW!!!\n" );
 	else if ( percentage > 95.0 )
 		Msg( "SIZE DANGER!\n" );
-	else if ( percentage > 99.9 )
-		Msg( "SIZE OVERFLOW!!!\n" );
+	else if ( percentage > 80.0 )
+		Msg( "VERY FULL!\n" );
 	else
 		Msg( "\n" );
 	return itemstorage;
