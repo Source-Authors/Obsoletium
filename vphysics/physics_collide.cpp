@@ -90,7 +90,7 @@ public:
 
 	// loads a set of solids into a vcollide_t
 	void			VCollideLoad( vcollide_t *pOutput, int solidCount, const char *pBuffer, int size, bool swap ) override;
-	// destroyts the set of solids created by VCollideLoad
+	// destroys the set of solids created by VCollideLoad
 	void			VCollideUnload( vcollide_t *pVCollide ) override;
 
 	// Trace an AABB against a collide

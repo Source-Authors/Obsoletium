@@ -270,7 +270,7 @@ public:
 
 	// loads a set of solids into a vcollide_t
 	virtual void			VCollideLoad( vcollide_t *pOutput, int solidCount, const char *pBuffer, int size, bool swap = false ) = 0;
-	// destroyts the set of solids created by VCollideLoad
+	// destroys the set of solids created by VCollideLoad
 	virtual void			VCollideUnload( vcollide_t *pVCollide ) = 0;
 
 	// begins parsing a vcollide.  NOTE: This keeps pointers to the text
