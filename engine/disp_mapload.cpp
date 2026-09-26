@@ -300,6 +300,14 @@ void FillStaticBuffer(
 		}
 		
 		float flAlpha = ( ( CCoreDispInfo * )pCoreDisp )->GetAlpha( i );
+
+		// dimhotepus: Check alpha is valid. CS:GO backport.
+		if ( !IsFinite( flAlpha ) )
+		{
+			AssertMsg( false, "Alpha value %f at %d index is not finite. Using 0", flAlpha, i );
+			flAlpha = 0.f;
+		}
+
 		flAlpha *= ( 1.0f / 255.0f );
 		flAlpha = clamp( flAlpha, 0.0f, 1.0f );
 		builder.Color4f( 1.0f, 1.0f, 1.0f, flAlpha );
