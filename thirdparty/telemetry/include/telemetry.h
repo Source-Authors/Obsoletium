@@ -31,14 +31,15 @@
 
 EXPGROUP(_NullGroup)
 
-#define TelemetryRunTimeVersion   "2.0P"   EXPMACRO
-#define LTelemetryRunTimeVersion L"2.0P"   EXPMACRO
-#define Telemetry2Version   "2.0P"   EXPMACRO
-#define LTelemetry2Version L"2.0P"   EXPMACRO
+#define TelemetryRunTimeVersion   "2.1D"   EXPMACRO
+#define LTelemetryRunTimeVersion L"2.1D"   EXPMACRO
+#define Telemetry2Version   "2.1D"   EXPMACRO
+#define LTelemetry2Version L"2.1D"   EXPMACRO
+#define TelemetryVersion   "2.1D"   EXPMACRO
 
 #define TelemetryMajorVersion    2  EXPMACRO    
-#define TelemetryMinorVersion    0  EXPMACRO    
-#define TelemetryBuildNumber    56  EXPMACRO    
+#define TelemetryMinorVersion    1  EXPMACRO    
+#define TelemetryBuildNumber    66  EXPMACRO    
 #define TelemetryCustomization   0  EXPMACRO    
 
 #ifndef TelemetryToolsVersion
@@ -49,7 +50,7 @@ EXPGROUP(_NullGroup)
 #define TelemetrySalesEMailAddress "sales3@radgametools.com" EXPMACRO 
 #define TelemetrySalesPhoneNumber "425-893-4300" EXPMACRO             
 #define TelemetryCompanyName "RAD Game Tools, Inc." EXPMACRO
-#define TelemetryCopyright "Copyright (C) 2009-2014, RAD Game Tools, Inc."  EXPMACRO 
+#define TelemetryCopyright "Copyright (C) 2009-2015, RAD Game Tools, Inc."  EXPMACRO 
 #define TelemetryTrademarks "Telemetry is a registered trademark of RAD Game Tools" EXPMACRO
 #define TelemetrySupportAddress "telemetry@radgametools.com" EXPMACRO 
 #define TelemetrySupportPage "www.radgametools.com/telemetry.htm" EXPMACRO
@@ -70,13 +71,6 @@ EXPGROUP(TMAPI)
 // TM_API_STATIC - functions are statically linked directly and not going through a function pointer table
 // TM_BUILD_LIB - should be set to 1 when building the library
 // TM_HARDLINK  - we're statically linking (not using a DLL)
-//
-// TM_IPC_CLIENT - set to 1 if building the library as an IPC client
-//    * assumes communication is NOT over a network
-//    * assumes single threading
-// TM_IPC_HOST - set to 1 if building the library as an IPC server
-//    * assumes subprocesses use IPC for communication
-//    * IPC mechanism not assumed
 //
 // --- The following can be set by the enduser ---
 //
@@ -121,27 +115,11 @@ EXPGROUP(TMAPI)
 #include "tmtypes.h"
 //#endif
 
-#if !defined __RADQNX__ && !defined __RADSPU__ && !defined __RADNT__ && !defined __RADXENON__ && !defined __RADANDROID__ && !defined __RADSEKRIT__ && !defined __RADPS4__ && !defined __RADPS3__ && !defined __RADIPHONE__ && !defined __RADWIIU__ && !defined __RADLINUX__ && !(defined __RADMAC__ && !defined __RADPPC__) && !defined __RADPSP2__ && !defined NTELEMETRY
+#if !defined __RADQNX__ && !defined __RADNT__ && !defined __RADXENON__ && !defined __RADANDROID__ && !defined __RADXBOXONE__ && !defined __RADPS4__ && !defined __RADPS3__ && !defined __RADIPHONE__ && !defined __RADWIIU__ && !defined __RADLINUX__ && !(defined __RADMAC__ && !defined __RADPPC__) && !defined __RADPSP2__ && !defined NTELEMETRY
 #define NTELEMETRY 1
 #endif
 
-#if defined __RADSPU__ && !defined TM_IPC_CLIENT
-#define TM_IPC_CLIENT 1
-#endif
-
-#if defined __RADPS3__ && !defined TM_IPC_HOST
-#define TM_IPC_HOST 1
-#endif
-
-#if defined __RADSPU__ || defined __RADPS3__
-#define TM_SPU_CONTEXT_SIZE     (2*1024) EXPMACRO // Required size for a Telemetry context on the SPU
-#endif
-
-#ifdef TM_IPC_CLIENT
-#define TM_SINGLE_THREADED 1
-#endif
-
-#if defined __RADXENON__ || defined __RADSEKRIT__ || defined __RADPS4__ || defined __RADIPHONE__ || defined __RADANDROID__ || defined __RADPS3__ || defined __RADWIIU__ || defined __RADPSP2__ || defined __RADQNX__
+#if defined __RADXENON__ || defined __RADXBOXONE__ || defined __RADPS4__ || defined __RADIPHONE__ || defined __RADANDROID__ || defined __RADPS3__ || defined __RADWIIU__ || defined __RADPSP2__ || defined __RADQNX__
 #define TM_HARDLINK 1
 #endif
 
@@ -152,10 +130,6 @@ EXPGROUP(TMAPI)
 #ifndef RADDEFSTART
 #define RADDEFEND }
 #define RADDEFSTART extern "C" {
-#endif
-
-#if defined __RADSPU__
-#define TM_API_STATIC 1
 #endif
 
 #ifndef TM_API
@@ -238,7 +212,7 @@ EXPTYPE typedef enum TmConnectionStatus
 {
     TMCS_DISCONNECTED = 0, //Not connected to a server
     TMCS_CONNECTING   = 1, //Attempting a connection to a server
-    TMCS_CONNECTED    = 2  //Connected to a server
+    TMCS_CONNECTED    = 2, //Connected to a server
 } TmConnectionStatus;
 /*
 Connection status returned by $tmGetConnectionStatus.
@@ -255,7 +229,7 @@ EXPTYPE typedef enum TmZoneFlag
     TMZF_IDLE                      = 0x0002,      // Zone is sleeping/idle until something new happens.  Implies thread is idle. 
     TMZF_PROFILER_ONLY             = 0x0004,      // Telemetry 1 only: Only show this zone in the profiler view, not in the zone view
 
-    TMZF_MEM_REGION_EXPERIMENTAL   = 0x0010,      // Only show this zone in the profiler view, not in the zone view
+    TMZF_MEM_REGION_EXPERIMENTAL   = 0x0010,      // This zone opens a memory region.
 
     TMZF_PLOT_TIME                 = 0x0100,      // Generate plot of the zone's duration on the server
     TMZF_PLOT_TIME_EXPERIMENTAL = TMZF_PLOT_TIME, // Retained for backward compatibility
@@ -264,12 +238,9 @@ EXPTYPE typedef enum TmZoneFlag
     TMZF_INTERNAL_ACCUMULATOR     = 0x10000, //For Telemetry internal use only
     TMZF_INTERNAL_LOCK_STALL      = 0x20000, //For Telemetry internal use only
     TMZF_INTERNAL_OPEN_ENDED      = 0x40000, //For Telemetry internal use only
-    TMZF_INTERNAL_CONTINUATION    = 0x80000, //For Telemetry internal use only
 
-    TMZF_INTERNAL_DISCARD          = 0x100000, //For Telemetry internal use only; this constant is used by the run-time and server for different things
-    TMZF_INTERNAL_DISCARD_SERVER   = 0x100000, //For Telemetry internal use only; this constant is shared but used differently by run time and server
-    TMZF_INTERNAL_NO_INSERT_SERVER = 0x200000, //For Telemetry internal use only (server only)
-    TMZF_INTERNAL_LOD_ZONE         = 0x400000, //For Telemetry internal use only (server only)
+    TMZF_INTERNAL_DISCARD          = 0x100000, //For Telemetry internal use only
+    TMZF_INTERNAL_LOD_ZONE         = 0x400000, //For Telemetry internal use only
 
     // Not really flags...
     TMZF_INTERNAL_LOCK_FAILED    = 0x10000000, //For Telemetry internal use only
@@ -280,7 +251,7 @@ EXPTYPE typedef enum TmZoneFlag
 /*
 Bitmasks that can be ORed together when calling tmZone, tmCoreEnter, tmCoreLeave, tmEnter or tmLeave.
 */
-#define TMZF_INTERNAL_ANY_MASK ( TMZF_INTERNAL_ACCUMULATOR | TMZF_INTERNAL_LOCK_STALL | TMZF_INTERNAL_OPEN_ENDED | TMZF_INTERNAL_CONTINUATION | TMZF_INTERNAL_LOCK_FAILED | TMZF_INTERNAL_LOCK_TIMEOUT )
+#define TMZF_INTERNAL_ANY_MASK ( TMZF_INTERNAL_ACCUMULATOR | TMZF_INTERNAL_LOCK_STALL | TMZF_INTERNAL_OPEN_ENDED | TMZF_INTERNAL_LOCK_FAILED | TMZF_INTERNAL_LOCK_TIMEOUT )
 
 //-----------------------------------------------------------------------------
 // Timespan flags
@@ -408,9 +379,9 @@ Passed to $tmMessage to determine how to present the message to the end user.
 EXPTYPE typedef enum TmOpenFlag
 {
     TMOF_INIT_NETWORKING           = 0x0001,      // Initialize operating system networking layer.  Specify this if you do not already call the platform specific network startup functions (e.g. WSAStartup) prior to $tmOpen.
-    TMOF_DONT_KILL_OTHER_SESSIONS  = 0x0002,      // If set the server should NOT kill any other sessions from this machine with the same app name.
+    TMOF_DONT_KILL_OTHER_SESSIONS  = 0x0002,      // Does nothing in Telemetry 2.1; kept for backwards compatibility.
 
-    // This is an enumeration
+    // You can only specify one of the "context switches" flags at a time.
     TMOF_DISABLE_CONTEXT_SWITCHES  = 0x0000,      // Disable context switch event tracking entirely.  None are sent to server.  See $ug_cswitches_overview for more information.
     TMOF_MODERATE_CONTEXT_SWITCHES = 0x0010,      // Send relevant context switches only (e.g. on PS4 it will not send context switches for the two system cores).  See $ug_cswitches_overview for more information.
     TMOF_MINIMAL_CONTEXT_SWITCHES  = 0x0020,      // Currently the same as "moderate" context switches.
@@ -439,11 +410,10 @@ Flags passed to $tmOpen
 //-----------------------------------------------------------------------------
 EXPTYPE typedef enum TmConnectionType
 {
-    TMCT_TCP,           // Connect to Telemetry server over TCP/IP
-    TMCT_IPC,           // Use an IPC connection (not supported on all platforms)
-    TMCT_FILE,          // Store all data to local disk (not supported on all platforms)
-
-    TMCT_USER_PROVIDED, // Use the user defined callbacks for all file i/o
+    TMCT_TCP            = 0,     // Connect to Telemetry server over TCP/IP
+    TMCT_reserved       = 1,     // (reserved)
+    TMCT_FILE           = 2,     // Store all data to local disk (not supported on all platforms)
+    TMCT_USER_PROVIDED  = 3,     // Use the user defined callbacks for all file I/O.  See $ug_user_io for more information.
 } TmConnectionType;
 /* 
 Determines how the application will connect to the Telemetry server.
@@ -461,27 +431,29 @@ $-
 EXPTYPE typedef enum TmOption
 {
     TMO_OUTPUT_DEBUG_INFO       = 0x0001,  // Print debug output to the debugger window if possible
-    TMO_RECORD_TELEMETRY_STALLS = 0x0002,  // Record stalls within Telemetry itself
+    TMO_RECORD_TELEMETRY_STALLS = 0x0002,  // Record stalls within Telemetry itself (removed; this is now a no-op.)
 
     TMO_RECORD_CALLSTACKS       = 0x0004,  // Record callstacks if requested
 
     TMO_BOOST_PRIORITY          = 0x0008,  // Temporarily boost priority for Telemetry events to help with priority inversion issues
 
-    TMO_SUPPORT_ZONES       = 0x0100,      // Send zones
-    TMO_SUPPORT_MESSAGES    = 0x0200,      // Send messages
+    TMO_SUPPORT_ZONES           = 0x0100,  // Send zones
+    TMO_SUPPORT_MESSAGES        = 0x0200,  // Send messages
 
-    TMO_SUPPORT_LOCK_STATES = 0x0400,      // Send lock states
+    TMO_SUPPORT_LOCK_STATES     = 0x0400,  // Send lock states
 
-    TMO_SUPPORT_MEMORY      = 0x0800,      // Send memory events
-    TMO_SUPPORT_PLOT        = 0x1000,      // Send plots
-    TMO_SUPPORT_BLOB         = 0x2000,     // Send user blobs
+    TMO_SUPPORT_MEMORY          = 0x0800,  // Send memory events
+    TMO_SUPPORT_PLOT            = 0x1000,  // Send plots
+    TMO_SUPPORT_BLOB            = 0x2000,  // Send user blobs
 
-    TMO_PPU_SYNCHRONIZE_SPUS     = 0x4000,  // Lockstep PPU-to-SPU communication
-    TMO_SUPPORT_CONTEXT_SWITCHES = 0x8000,  // Support context switch recording on supported platforms
+    TMO_reserved                = 0x4000,  // (reserved)
+    TMO_SUPPORT_CONTEXT_SWITCHES = 0x8000, // Support context switch recording on supported platforms
 
-    TMO_NULL_NETWORK        = 0x10000,       // Disable network traffic
+    TMO_NULL_NETWORK            = 0x10000, // Disable network traffic
 
-    TMO_SUPPORT_TIMESPANS   = 0x20000,       // Disable timespans
+    TMO_SUPPORT_TIMESPANS       = 0x20000, // Disable timespans
+
+    TMO_BREAK_ON_WARNING        = 0x40000, // Trigger a breakpoint when a Telemetry warning is issued
 
 } TmOption;
 /*
@@ -491,14 +463,12 @@ Option values that can be toggled during recording using $tmEnable.
 //-----------------------------------------------------------------------------
 // Telemetry variables
 //-----------------------------------------------------------------------------
-EXPAPI typedef void TmDebugPrinter(char const *msg);
-/*
-User defined debug print function.
-*/
 
-typedef int (*TMFNC_USERCB_OPEN)(void* user, char const *fname );
-typedef int (*TMFNC_USERCB_CLOSE)(void* user);
-typedef int (*TMFNC_USERCB_WRITE)(void* user,void const* data,int datasize);
+typedef void TmDebugPrinter( char const *msg ); // Debug message printer
+
+typedef int TmUserOpenCallback( void* user, char const *fname ); // User-defined "open" callback. Must return 0 on failure, non-0 otherwise.
+typedef int TmUserCloseCallback( void* user );                   // User-defined "close" callback. Must return 0 on failure, non-0 otherwise.
+typedef int TmUserWriteCallback( void* user, void const* data, int datasize ); // User-defined "write" callback. Must return 0 on failure, non-0 otherwise.
 
 EXPTYPE typedef enum TmParameter
 {
@@ -508,10 +478,10 @@ EXPTYPE typedef enum TmParameter
     TMP_DEBUG_PRINTER    = 2,         // pass in a pointer to a $TmDebugPrinter
     TMP_TELEMETRY_PREFERRED_CPU = 3,  // pass in a pointer to a TmI32 with the preferred CPU for Telemetry's background thread
 
-    TMP_USERCB_OPEN = 4,
-    TMP_USERCB_CLOSE = 5,
-    TMP_USERCB_WRITE = 6,
-    TMP_USERCB_DATA = 7,
+    TMP_USERCB_OPEN  = 4,       // pass in a pointer to a $TmUserOpenCallback.  See $ug_user_io.
+    TMP_USERCB_CLOSE = 5,       // pass in a pointer to a $TmUserCloseCallback.  See $ug_user_io.
+    TMP_USERCB_WRITE = 6,       // pass in a pointer to a $TmUserWriteCallback.  See $ug_user_io.
+    TMP_USERCB_DATA  = 7,       // This is the "data" argument passed to user IO callbacks.  See $ug_user_io.
 
     TMP_EMULATED_SERVER_VERSION = 8,
 
@@ -594,26 +564,12 @@ Passed to $tmGetStati
 
 #ifndef NTELEMETRY
 
-#if defined __RADPS3__
-#define TM_NUM_SPUS 6
-TM_API( TmErrorCode, tmPPUCoreGetListener, ( HTELEMETRY cx, int const kNdx, TmU32 *pListener ) );
-TM_API( TmErrorCode, tmPPUCoreRegisterSPUProgram, ( HTELEMETRY cx, TmU64 const kGuid, void const *imagebase, unsigned int const kImageSize, int const kRdOnlyOffset ) );
-#endif
-
-#if defined __RADSPU__
-TM_API( TmErrorCode, tmSPUCoreBindContextToListener, ( HTELEMETRY *pcx, void * mem, TmU32 kPPUListener, char const *imagename, ...) );
-TM_API( TmErrorCode, tmSPUCoreUpdateTime, ( HTELEMETRY cx ) );
-TM_API( TmErrorCode, tmSPUCoreFlushImage, ( HTELEMETRY cx ) );
-#endif
- 
 TM_API( TmU32, tmCoreGetVersion, ( void ) );
 TM_API( TmErrorCode, tmCoreCheckVersion, ( HTELEMETRY cx, TmU32 const major, TmU32 const minor, TmU32 const build, TmU32 const cust ) );
 TM_API( TmErrorCode, tmCoreGetPlatformInformation, ( void* obj, TmPlatformInformation const kInfo, void* dst, TmU32 const kDstSize ) );
 TM_API( TmErrorCode, tmCoreGetLastError, ( HTELEMETRY cx ) );
 TM_API( TmErrorCode, tmCoreGetSessionName, ( HTELEMETRY cx, char *dst, int const kDstSize ) );
 TM_API( TmConnectionStatus, tmCoreGetConnectionStatus, ( HTELEMETRY cx ) );
-
-#ifndef __RADSPU__
 
 RADDEFFUNC typedef TmU64 TMUSERTIMERFNC( void ); // User defined timing function
 
@@ -629,7 +585,6 @@ TM_API( TmErrorCode, tmCoreOpen, ( HTELEMETRY cx, char const * kpAppName,
        TmU16 const kServerPort,
        TmU32 const kFlags,
        int const kTimeoutMS ) );
-#endif
 
 TM_API( void, tmCoreClose, ( HTELEMETRY cx ) );
 
@@ -707,9 +662,7 @@ typedef struct TM_API_STRUCT
   TM_API_S( tmCoreCheckVersion );
   TM_API_S( tmCoreUpdateSymbolData );
   TM_API_S( tmCoreGetLastContextSwitchTime );    
-#ifndef __RADSPU__
   TM_API_S( tmCoreTick );
-#endif
   TM_API_S( tmCoreFlush );
   TM_API_S( tmCoreDynamicString );
   TM_API_S( tmCoreClearStaticString );
@@ -722,9 +675,7 @@ typedef struct TM_API_STRUCT
   TM_API_S( tmCoreSetTimelineSectionName );
   TM_API_S( tmCoreEnable );
   TM_API_S( tmCoreIsEnabled );
-#ifndef __RADSPU__
   TM_API_S( tmCoreOpen );
-#endif
   TM_API_S( tmCoreClose );
   TM_API_S( tmCorePause );
   TM_API_S( tmCoreIsPaused );
@@ -767,11 +718,6 @@ typedef struct TM_API_STRUCT
 
   TM_API_S( tmCoreSetLockStateMinTime );
   TM_API_S( tmCoreSetParameter );
-
-#if defined __RADPS3__ && !defined TM_API_STATIC
-  TM_API_S( tmPPUCoreGetListener );
-  TM_API_S( tmPPUCoreRegisterSPUProgram );
-#endif
 
   // If adding anything after here make sure to update stubs!
   TM_API_S( tmCoreSendCallStackR );
@@ -908,9 +854,6 @@ typedef void (RADEXPLINK *tmGetAPIproc)( void * buffer );
 
 #define tmPPUGetListener(...)
 #define tmPPURegisterSPUProgram(...)
-#define tmSPUBindContextToListener(...)
-#define tmSPUUpdateTime(...)
-#define tmSPUFlushImage(...)
 
 #endif // __RADNOVARARGMACROS__
 
@@ -989,13 +932,8 @@ RADDEFEND
 #define tmCheckVersion( cx,major,minor,build,cust) TMCHECKCONTEXTR(cx,tmCoreCheckVersion,(cx,major,minor,build,cust),0)
 
 #ifdef __RADPS3__
-#define tmPPUGetListener(cx,n,p) TMCHECKCONTEXTR(cx,tmPPUCoreGetListener,(cx,n,p),TMERR_DISABLED)
-#define tmPPURegisterSPUProgram(cx,guid,address,s,ro_offset) TMCHECKCONTEXTR(cx,tmPPUCoreRegisterSPUProgram,(cx,guid,address,s,ro_offset),TMERR_DISABLED)
-#endif
-
-#ifdef __RADSPU__
-#define tmSPUUpdateTime(cx) TMCHECKCONTEXTV(cx,tmSPUCoreUpdateTime,(cx))
-#define tmSPUFlushImage(cx) TMCHECKCONTEXTV(cx,tmSPUCoreFlushImage,(cx))
+#define tmPPUGetListener(cx,n,p) TMERR_DISABLED
+#define tmPPURegisterSPUProgram(cx,guid,address,s,ro_offset) TMERR_DISABLED
 #endif
 
 #define tmUpdateSymbolData(cx) TMCHECKCONTEXTV(cx,tmCoreUpdateSymbolData,(cx))
@@ -1048,10 +986,6 @@ RADDEFEND
 #define tmFree(cx,ptr) TMCHECKCONTEXT_VA(cx,tmCoreFree,(cx,ptr,__FILE__, __LINE__, &tm_fmt))
 
 #ifndef __RADNOVARARGMACROS__
-
-#ifdef __RADSPU__
-#define tmSPUBindContextToListener(pcx,mem,pptr,imagename,...) TMCHECKCONTEXTV(pcx,tmSPUCoreBindContextToListener,(pcx,mem,pptr,imagename,##__VA_ARGS__))
-#endif
 
 #define tmTryLock(cx,ptr,name,...) TMCHECKCONTEXT_VA(cx,tmCoreTryLock,(cx,0,0,__FILE__,__LINE__,ptr,&tm_fmt,name,##__VA_ARGS__))
 #define tmTryLockEx(cx,matchid,threshold,file,line,ptr,name,...) TMCHECKCONTEXT_VA(cx,tmCoreTryLock,(cx,matchid,threshold,file,line,ptr,&tm_fmt,name,##__VA_ARGS__))
@@ -1157,54 +1091,8 @@ EXPGROUP()
         #pragma intrinsic(__rdtsc)
     #endif
 
-    // SPU
-    #if defined __RADSPU__
-        #ifndef _SPU_INTRINSICS_H
-        #include <spu_intrinsics.h>
-        #endif
-
-        #ifdef __cplusplus
-            extern "C" TmU64 tm_spu_ppu_time;
-            extern "C" TmU64 tm_spu_last_time;
-        #else
-            extern TmU64 tm_spu_ppu_time;
-            extern TmU64 tm_spu_last_time;
-        #endif
-
-        static RADINLINE U32 __tmFastTimeSPU()
-        {
-            U32 dec = spu_readch(SPU_RdDec);
-            U32 tsc = - dec;
-            return tsc;
-        }
-
-        static RADINLINE U64 tmFastTime()
-        {
-            U64 const now = __tmFastTimeSPU();
-            U64 t;
-
-            if ( ( now & 0xFFFFFFFF ) < ( tm_spu_ppu_time & 0xFFFFFFFF ) )
-            {
-                t = now | ( ( tm_spu_ppu_time + 0x100000000LL ) & (~0xFFFFFFFFLL) );
-            }
-            else
-            {
-                t = now | ( tm_spu_ppu_time & (~0xFFFFFFFFLL ));
-            }
-
-            // Check to see if our time has wrapped/reversed
-            if ( tm_spu_last_time > t )
-            {
-                t += 0x100000000LL;
-            }
-
-            tm_spu_last_time = t;
-
-            return t;
-        }
-
     // 32-bit Windows uses RDTSC
-    #elif defined __RADNT__ && !defined __RADX64__
+    #if defined __RADNT__ && !defined __RADX64__
 
        // If intrinsics are available, use them
        #if defined _MSC_VER  && _MSC_VER >= 1400
@@ -1299,10 +1187,14 @@ EXPGROUP()
         RADDEFFUNC unsigned int __MFTBU(void);
         static RADINLINE U64 tmFastTime()
         {
-            U64 a = (U64) __MFTB() | ((U64) __MFTBU() << 32);
-            if ( ( a & 0xffffffff ) < 500 )
-                a = (U64) __MFTB() | ((U64) __MFTBU() << 32);
-            return a;
+            U32 lo, hi1, hi2;
+            do
+            {
+                hi1 = __MFTBU();
+                lo = __MFTB();
+                hi2 = __MFTBU();
+            } while (hi1 != hi2);
+            return (U64) lo | ((U64) hi1 << 32);
         }
     #elif defined __RADPSP2__
         #include <libperf.h>

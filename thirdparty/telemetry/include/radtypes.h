@@ -1,12 +1,12 @@
 /// ========================================================================
-// (C) Copyright 1994- 2014 RAD Game Tools, Inc.  Global types header file
+// (C) Copyright 1994-2016 RAD Game Tools, Inc.  Global types header file
 // ========================================================================
 
 #if !defined(__RADTYPESH__) && !defined(__RADRR_COREH__)
 #define __RADTYPESH__
 #define __RADRR_COREH__ // block old rr_core
 
-#define RADCOPYRIGHT "Copyright (C) 1994-2014, RAD Game Tools, Inc."
+#define RADCOPYRIGHT "Copyright (C) 1994-2016, RAD Game Tools, Inc."
 
 #if !defined(__RADRES__) // don't include anything for resource compiles
 
@@ -21,7 +21,7 @@
 //  __RADXENON__ means the Xbox360 console
 //  __RADXBOXONE__ means Xbox One
 //  __RADWIIU__ means the Nintendo Wii U
-//  __RAD3DS__ means the Nintendo 3DS
+//  __RADNX__ means the Nintendo NX
 //  __RADPS3__ means the Sony PlayStation 3
 //  __RADPS4__ means the Sony PlayStation 4
 //  __RADANDROID__ means Android NDK
@@ -35,7 +35,7 @@
 //  __RADPPC__ means powerpc
 //  __RADX86__ means x86 or x64
 //  __RADX64__ means x64
-//  __RADX64__ means x64
+//  __RADNEON__ means you can use NEON intrinsics on ARM
 
 // __RADNOVARARGMACROS__ means #defines can't use ...
 
@@ -95,11 +95,6 @@
 #if defined(CAFE) 
   #define __RADWIIU__ 7
   #define __RADDETECTED__ __RADWIIU__
-#endif
-
-#if defined(NN_PLATFORM_CTR)
-  #define __RAD3DS__ 8
-  #define __RADDETECTED__ __RAD3DS__
 #endif
 
 #if defined(__psp2__)
@@ -162,7 +157,12 @@
   #endif
 #endif
 
-#if !defined(__RADDETECTED__)
+#if defined(NN_NINTENDO_SDK)
+  #define __RADNX__  18
+  #define __RADDETECTED__ __RADNX__
+#endif
+
+#if !__RADDETECTED__
   #error "radtypes.h did not detect your platform."
 #endif
 
@@ -188,7 +188,9 @@
 #if defined(_x86_64) || defined( __x86_64__ ) || defined( _M_X64 ) || defined( _M_AMD64 )
   #define __RADX86__ 2
   #define __RADX64__ 3
-  #define __RADMMX__
+  #if !defined __RADIPHONESIM__
+    #define __RADMMX__
+  #endif
   #define __RADDETECTEDPROC__ __RADX64__
   #define __RADLITTLEENDIAN__
 #endif
@@ -204,6 +206,12 @@
   #define __RADCELLSPU__ 5 
   #define __RADDETECTEDPROC__ __RADCELLSPU__
   #define __RADBIGENDIAN__
+#endif
+#if defined( __aarch64__ ) || defined( __arm64__ )
+  #define __RADARM__ 1
+  #define __RADARM64__ 6
+  #define __RADDETECTEDPROC__ __RADARM64__
+  #define __RADLITTLEENDIAN__
 #endif
 
 #if !defined(__RADDETECTEDPROC__)
@@ -252,12 +260,18 @@
 #endif
 
 #if defined(__RADANDROID__)
+  #if defined(__RADARM64__)
+    // always neon in ARM64
+    #define __RADNEON__
+  #elif defined(__RADARM__) && defined(__ARM_NEON__)
+    #define __RADNEON__
+  #endif
   #define RADRESTRICT __restrict
   #define RADSTRUCT struct __attribute__((__packed__))
 
   #define RADLINK
   #define RADEXPLINK
-  #define RADDLLEXPORTDLL
+  #define RADDLLEXPORTDLL __attribute__((visibility("default")))
   #define RADDLLIMPORTDLL
 #endif
 
@@ -310,8 +324,8 @@
 
   #define RADLINK __stdcall
   #define RADEXPLINK __stdcall
-  #define RADDLLEXPORTDLL // we don't use dlls on xbox
-  #define RADDLLIMPORTDLL 
+  #define RADDLLEXPORTDLL __declspec(dllexport) 
+  #define RADDLLIMPORTDLL // we don't mark the import functions with dllimport, so we can link to the static lib *or* dll...
 #endif
 
 #if defined(__RADPS4__)
@@ -321,8 +335,19 @@
 
   #define RADLINK
   #define RADEXPLINK
-  #define RADDLLEXPORTDLL
-  #define RADDLLIMPORTDLL
+  #define RADDLLEXPORTDLL __declspec(dllexport)  __attribute__((visibility("default")))
+  #define RADDLLIMPORTDLL 
+#endif
+
+#if defined(__RADNX__)
+  #define __RADNEON__
+  #define RADRESTRICT __restrict
+  #define RADSTRUCT struct __attribute__((__packed__))
+
+  #define RADLINK
+  #define RADEXPLINK
+  #define RADDLLEXPORTDLL __declspec(dllexport)  __attribute__((visibility("default")))
+  #define RADDLLIMPORTDLL 
 #endif
 
 #if defined(__RADNT__)
@@ -351,6 +376,9 @@
 
 #if defined(__RADWINRT__)
   #define __RADWIN__
+  #if defined(__RADARM__) // no non-NEON ARMs in WinRT devices (so far)
+    #define __RADNEON__
+  #endif
   #define RADRESTRICT __restrict
   #define RADSTRUCT struct 
 
@@ -370,17 +398,8 @@
   #define RADDLLIMPORTDLL
 #endif
 
-#if defined(__RAD3DS__)
-  #define RADRESTRICT
-  #define RADSTRUCT struct __attribute__((__packed__))
-
-  #define RADLINK
-  #define RADEXPLINK
-  #define RADDLLEXPORTDLL
-  #define RADDLLIMPORTDLL
-#endif
-
 #if defined(__RADPSP2__)
+  #define __RADNEON__
   #define RADRESTRICT __restrict
   #define RADSTRUCT struct __attribute__((__packed__))
 
@@ -414,6 +433,9 @@
 #endif
 
 #if defined(__RADIPHONE__)
+  #if defined(__ARM_NEON) || defined(__AARCH64_SIMD__)
+    #define __RADNEON__
+  #endif
   #define __RADMACAPI__
   #define RADRESTRICT __restrict
   #define RADSTRUCT struct __attribute__((__packed__))
@@ -506,7 +528,7 @@
   #define RAD_S32 signed int
 
   // pointers are 64 bits.
-  #if (_MSC_VER >= 1300 && defined(_Wp64) && _Wp64 )
+  #if ( defined(_MSC_VER) && _MSC_VER >= 1300 && defined(_Wp64) && _Wp64 )
     #define RAD_SINTa __w64 signed __int64
     #define RAD_UINTa __w64 unsigned __int64
   #else 
