@@ -202,11 +202,22 @@ static void DefineVariable( char *variablename, char (&out)[MAXTOKEN] )
 {
 	variable_t v;
 
-	v.param = strdup( variablename );
+	// dimhotepus: strdup -> V_strdup.
+	v.param = V_strdup( variablename );
 
 	GetToken( false, out );
-	
-	v.value = strdup( out );
+
+	// dimhotepus: strdup -> V_strdup.
+	v.value = V_strdup( out );
+
+	// dimhotepus: CS:GO backport.
+	for ( auto &dv : g_definevariable )
+	{
+		if ( dv.value == v.value || V_streq( dv.value, v.value ) )
+		{
+			Warning( "\"$definevariable %s\" already exists.\n", v.value );
+		}
+	}
 
 	g_definevariable.AddToTail( v );
 }
