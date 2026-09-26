@@ -215,11 +215,12 @@ int CCircularBuffer::Read(void *pchDestIn, int nCount)
 //			the requested amount.
 //Author  : DSpeyrer
 //------------------------------------------------------------------------------
-int CCircularBuffer::Write(void *pData, int nBytesRequested)
+// dimhotepus: Add const to write data pointer. CS:GO backport.
+int CCircularBuffer::Write(const void *pData, int nBytesRequested)
 {
 	// Write all the data.
 	int nBytesToWrite = nBytesRequested;
-	char *pDataToWrite = (char*)pData;
+	const char *pDataToWrite = (const char*)pData;
 	
 	while(nBytesToWrite)
 	{

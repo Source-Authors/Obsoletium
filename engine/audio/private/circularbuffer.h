@@ -69,7 +69,8 @@ public:
 	int					Peek(char *pchDest, int nCount);
 	int					Advance(int nCount);
 	int					Read(void *pchDest, int nCount);
-	int					Write(void *pchData, int nCount);
+	// dimhotepus: Add const to write data pointer. CS:GO backport.
+	int					Write(const void *pchData, int nCount);
 
 public:
 	int		m_nCount;			// Space between the read and write pointers (how much data we can read).
