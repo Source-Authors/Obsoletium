@@ -44,7 +44,9 @@
 #include <sys/statvfs.h>
 #endif
 #include <sched.h>
-#define int64 int64_t
+// dimhotepus: CS:GO backport. using instead of define.
+#include <cstdint>
+using int64 = std::int64_t;
 
 #define _A_SUBDIR S_IFDIR
 
