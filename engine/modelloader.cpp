@@ -412,6 +412,14 @@ static worldbrushdata_t	*s_pMap = NULL;
 static int				s_nMapLoadRecursion = 0;
 static CUtlBuffer		s_MapBuffer;
 
+// dimhotepus: Overflow checks. CS:GO backport.
+// Avoid crafted maps that can cause us to crash by having LUMP_NODES refer to surfaces that don't actually exist. 
+static int				s_nMapSurfacesLoaded = 0;
+
+// dimhotepus: Overflow checks. CS:GO backport.
+// Avoid crafted maps that can cause us to crash by having LUMP_SURFEDGES refer to edges that don't actually exist.
+static int				s_nMapEdgesLoaded = 0;
+
 // Lump files are patches for a shipped map
 // List of lump files found when map was loaded. Each entry is the lump file index for that lump id.
 struct lumpfiles_t
@@ -1171,6 +1179,9 @@ std::unique_ptr<medge_t[]> Mod_LoadEdges()
 		out->v[0] = in->v[0];
 		out->v[1] = in->v[1];
 	}
+	
+	// dimhotepus: Overflow checks. CS:GO backport.
+	s_nMapEdgesLoaded = count;
 
 	// delete this in the loader
 	return medges;
@@ -1854,6 +1865,9 @@ void Mod_LoadFaces( void )
 
 		CalcSurfaceExtents( lh, surfID );
 	}
+
+	// dimhotepus: Overflow checks. CS:GO backport.
+	s_nMapSurfacesLoaded = count;
 }
 
 //-----------------------------------------------------------------------------
@@ -1939,6 +1953,15 @@ void Mod_LoadNodes( void )
 
 		p = in->planenum;
 		out->plane = lh.GetMap()->planes + p;
+
+		// dimhotepus: Overflow checks. CS:GO backport.
+		// Without this, a maliciously crafted map can tell us to reference an arbitrary number 
+		// of surfaces and we will later crash when trying to render.
+		if ( in->firstface + in->numfaces > s_nMapSurfacesLoaded )
+			Host_Error( "Map %s is corrupted and cannot be loaded: surfaces count %d greater than defined in header (%d)",
+				lh.GetMapName(),
+				in->firstface + in->numfaces,
+				s_nMapSurfacesLoaded );
 
 		out->firstsurface = in->firstface;
 		out->numsurfaces = in->numfaces;
@@ -2478,6 +2501,14 @@ void Mod_LoadSurfedges( std::unique_ptr<medge_t[]> &pedges )
 			edge = -edge;
 			index = 1;
 		}
+
+		// dimhotepus: Overflow checks. CS:GO backport.
+		if ( edge >= s_nMapEdgesLoaded )
+			Host_Error( "Map %s is corrupted and cannot be loaded: edges count %d greater than defined in header (%d)",
+				lh.GetMapName(),
+				edge,
+				s_nMapEdgesLoaded );
+
 		out[i] = pedges[edge].v[index];
 	}
 }
@@ -3190,6 +3221,11 @@ void CModelLoader::Init( void )
 	m_szActiveMapName[0] = '\0';
 
 	g_pQueuedLoader->InstallLoader( RESOURCEPRELOAD_MODEL, &s_ResourcePreloadModel );
+
+	// dimhotepus: Overflow checks. CS:GO backport.
+	// Reset.
+	s_nMapSurfacesLoaded = 0;
+	s_nMapEdgesLoaded = 0;
 }
 
 //-----------------------------------------------------------------------------
