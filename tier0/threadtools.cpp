@@ -183,20 +183,13 @@ bool ReleaseThreadHandle( ThreadHandle_t hThread )
 
 void ThreadSleep(unsigned nMilliseconds)
 {
-	if ( nMilliseconds == 0 )
-	{
-		// dimhotepus: Pause a bit.
-		ThreadPause();
-	}
-	else
-	{
-		// dimhotepus: Do not use std thread APIs. Causes issues with ASAN.
+	
+	// dimhotepus: Do not use std thread APIs. Causes issues with ASAN.
 #ifdef _WIN32
-		Sleep(nMilliseconds);
+	Sleep(nMilliseconds);
 #else
-		usleep(nMilliseconds * 1000);
+	usleep(nMilliseconds * 1000);
 #endif
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -2001,13 +1994,15 @@ CThread *CThread::GetCurrentCThread()
 
 //---------------------------------------------------------
 //
-// Offer a context switch.
+// Offer a context switch. Under Win32, equivalent to Sleep(0)
+//
 //
 
 void CThread::Yield()
 {
 #ifdef _WIN32
-	SwitchToThread();
+	// Context switch.
+	Sleep( 0 );
 #elif defined(POSIX)
 	pthread_yield();
 #endif
