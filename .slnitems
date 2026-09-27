@@ -1,6 +1,7 @@
 .clang-format
 .editorconfig
 .gitignore
+.gitattributes
 .github\workflows\build.yml
 .github\workflows\auto-assign.yml
 .github\actions\build-shared\action.yml
