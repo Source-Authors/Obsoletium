@@ -101,12 +101,12 @@ public:
 class CFileExtensionData
 {
 public:
-	CFileExtensionData *m_pNext;							// next one that has the same hash
-	char const *m_Name;						// points at extension string within the directory data
+	CFileExtensionData *m_pNext{nullptr};						// next one that has the same hash
+	char const		   *m_Name{nullptr};						// points at extension string within the directory data
 	// nodes for each directory containing a file of this type
 	CUtlIntrusiveList<CFileDirectoryData> m_pDirectoryHashTable[PACKEDFILE_DIR_HASH_SIZE];
 
-	~CFileExtensionData( void )
+	~CFileExtensionData()
 	{
 		for( auto &&directoryHashTable : m_pDirectoryHashTable )
 		{
@@ -829,6 +829,7 @@ CPackedStoreReadCache::CPackedStoreReadCache( IBaseFileSystem *pFS ):m_treeCache
 {
 	m_pPackedStore = NULL;
 	m_cItemsInCache = 0;
+	BitwiseSet(m_rgCurrentCacheIndex, 0xFF);
 	m_pFileSystem = pFS;
 	m_cubReadFromCache = 0;
 	m_cReadFromCache = 0;
