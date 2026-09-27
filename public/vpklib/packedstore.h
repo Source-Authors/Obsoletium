@@ -139,12 +139,22 @@ struct FileHandleTracker_t
 	PackDataFileHandle_t m_hFileHandle;
 	int m_nCurOfs;
 	CThreadFastMutex m_Mutex;
+	// dimhotepus: Add file name for error tracking.
+	char *m_szFileName;
 
-	FileHandleTracker_t( void )
+	FileHandleTracker_t()
 	{
 		m_nFileNumber = -1;
 		m_hFileHandle = nullptr;
 		m_nCurOfs = 0;
+		// dimhotepus: Add file name for error tracking.
+		m_szFileName = nullptr;
+	}
+
+	// dimhotepus: Remove file name for error tracking.
+	~FileHandleTracker_t()
+	{
+		delete[] m_szFileName;
 	}
 };
 

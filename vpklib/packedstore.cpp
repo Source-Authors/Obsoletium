@@ -16,6 +16,10 @@
 #include "tier2/fileutils.h"
 #include "tier1/utlbuffer.h"
 
+#ifdef IS_WINDOWS_PC
+#include <system_error>
+#endif
+
 #ifdef VPK_ENABLE_SIGNING
 	#include "crypto.h"
 #endif
@@ -881,9 +885,14 @@ bool CPackedStoreReadCache::ReadCacheLine( FileHandleTracker_t &fHandle, CachedV
 	cachedVPKRead.m_cubBuffer = 0;
 #ifdef IS_WINDOWS_PC
 	if ( cachedVPKRead.m_nFileFraction != fHandle.m_nCurOfs )
-		SetFilePointer ( fHandle.m_hFileHandle, cachedVPKRead.m_nFileFraction, NULL,  FILE_BEGIN); 
-	::ReadFile( fHandle.m_hFileHandle, cachedVPKRead.m_pubBuffer, k_cubCacheBufferSize, (LPDWORD) &cachedVPKRead.m_cubBuffer, NULL );
-	SetFilePointer ( fHandle.m_hFileHandle, fHandle.m_nCurOfs, NULL,  FILE_BEGIN); 
+		SetFilePointer( fHandle.m_hFileHandle, cachedVPKRead.m_nFileFraction, NULL, FILE_BEGIN );
+	if ( !::ReadFile( fHandle.m_hFileHandle, cachedVPKRead.m_pubBuffer, k_cubCacheBufferSize, (LPDWORD) &cachedVPKRead.m_cubBuffer, NULL ) )
+	{
+		const auto error = std::system_category().message( ::GetLastError() );
+		AssertMsg( false, "Failed to read %d bytes from %s: %s", k_cubCacheBufferSize, fHandle.m_szFileName, error.c_str() );
+		Warning( "Failed to read %d bytes from %s: %s.\n", k_cubCacheBufferSize, fHandle.m_szFileName, error.c_str() );
+	}
+	SetFilePointer ( fHandle.m_hFileHandle, fHandle.m_nCurOfs, NULL, FILE_BEGIN);
 #else
 	m_pFileSystem->Seek( fHandle.m_hFileHandle, cachedVPKRead.m_nFileFraction, FILESYSTEM_SEEK_HEAD );
 	cachedVPKRead.m_cubBuffer = m_pFileSystem->Read( cachedVPKRead.m_pubBuffer, k_cubCacheBufferSize, fHandle.m_hFileHandle );
@@ -1206,8 +1215,13 @@ int CPackedStore::ReadData( CPackedStoreFileHandle &handle, void *pOutData, int 
 			{
 #ifdef IS_WINDOWS_PC
 				if ( nDesiredPos != fHandle.m_nCurOfs )
-					SetFilePointer ( fHandle.m_hFileHandle, nDesiredPos, NULL,  FILE_BEGIN); 
-				::ReadFile( fHandle.m_hFileHandle, pOutData, nNumBytes, (LPDWORD) &nRead, NULL );
+					SetFilePointer( fHandle.m_hFileHandle, nDesiredPos, NULL, FILE_BEGIN );
+				if ( !::ReadFile( fHandle.m_hFileHandle, pOutData, nNumBytes, (LPDWORD) &nRead, NULL ) )
+				{
+					const auto error = std::system_category().message( ::GetLastError() );
+					AssertMsg( false, "Failed to read %d bytes from %s: %s", nNumBytes, fHandle.m_szFileName, error.c_str() );
+					Warning( "Failed to read %d bytes from %s: %s.\n", nNumBytes, fHandle.m_szFileName, error.c_str() );
+				}
 #else
 				m_pFileSystem->Seek( fHandle.m_hFileHandle, nDesiredPos, FILESYSTEM_SEEK_HEAD );
 				nRead = m_pFileSystem->Read( pOutData, nNumBytes, fHandle.m_hFileHandle );
@@ -1268,9 +1282,14 @@ bool CPackedStore::HashEntirePackFile( CPackedStoreFileHandle &handle, int64 &nF
 		if ( chunkLen == 0 )
 			break;
 
-			unsigned int nRead;
+		unsigned int nRead = 0;
 #ifdef IS_WINDOWS_PC
-			::ReadFile( fHandle.m_hFileHandle, tempBuf, chunkLen, (LPDWORD) &nRead, NULL );
+		if ( !::ReadFile( fHandle.m_hFileHandle, tempBuf, chunkLen, (LPDWORD) &nRead, NULL ) )
+		{
+			const auto error = std::system_category().message( ::GetLastError() );
+			AssertMsg( false, "Failed to read %d bytes from %s: %s", chunkLen, fHandle.m_szFileName, error.c_str() );
+			Warning( "Failed to read %d bytes from %s: %s.\n", chunkLen, fHandle.m_szFileName, error.c_str() );
+		}
 #else
 		nRead = m_pFileSystem->Read( tempBuf, chunkLen, fHandle.m_hFileHandle );
 #endif
@@ -1458,23 +1477,27 @@ FileHandleTracker_t & CPackedStore::GetFileHandle( int nFileNumber )
 		handle.m_nCurOfs = 0;
 #ifdef IS_WINDOWS_PC
 		handle.m_hFileHandle = 
-			CreateFile( pszDataFileName,               // file to open
+			CreateFile( pszDataFileName,       // file to open
 						GENERIC_READ,          // open for reading
 						FILE_SHARE_READ,       // share for reading
 						NULL,                  // default security
 						OPEN_EXISTING,         // existing file only
 						FILE_ATTRIBUTE_NORMAL, // normal file
 						NULL);                 // no attr. template
-			
+
 		if ( handle.m_hFileHandle != INVALID_HANDLE_VALUE )
 		{
 			handle.m_nFileNumber = nFileNumber;
+			// dimhotepus: Add file name for error tracking.
+			handle.m_szFileName = V_strdup( pszDataFileName );
 		}
 #else
 		handle.m_hFileHandle = m_pFileSystem->Open( pszDataFileName, "rb" );
 		if ( handle.m_hFileHandle != FILESYSTEM_INVALID_HANDLE )
 		{
 			handle.m_nFileNumber = nFileNumber;
+			// dimhotepus: Add file name for error tracking.
+			handle.m_szFileName = V_strdup( pszDataFileName );
 		}
 #endif
 		return handle;
