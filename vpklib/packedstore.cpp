@@ -486,7 +486,7 @@ CPackedStore::~CPackedStore( void )
 	}
 }
 
-void SplitFileComponents( char const *pFileName, char (&pDirOut)[MAX_PATH], char (&pBaseOut)[MAX_PATH], char (&pExtOut)[MAX_PATH] )
+static void SplitFileComponents( char const *pFileName, OUT_Z_ARRAY char (&pDirOut)[MAX_PATH], OUT_Z_ARRAY char (&pBaseOut)[MAX_PATH], OUT_Z_ARRAY char (&pExtOut)[MAX_PATH] )
 {
 	char pTmpDirOut[MAX_PATH];
 	V_ExtractFilePath( pFileName, pTmpDirOut );
