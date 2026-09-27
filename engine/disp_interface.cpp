@@ -667,6 +667,9 @@ void DispInfo_DrawPrimLists( ERenderDepthMode DepthMode )
 
 			pMesh->m_nVisible = 0;
 		}
+
+		// dimhotepus: Reset visibility count for groups. CS:GO backport.
+		pGroup->m_nVisible = 0;
 	}
 #endif
 }
