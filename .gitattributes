@@ -33,6 +33,7 @@
 README text
 CONTRIBUTING text
 LICENSE text
+*.md text
 
 *.exe binary
 protoc binary
