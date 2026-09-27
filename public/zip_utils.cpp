@@ -99,6 +99,18 @@ END_BYTESWAP_DATADESC()
 class CWin32File
 {
 public:
+	// dimhotepus: Create abstraction to unify interface.
+	[[nodiscard]] static HANDLE OpenExistingFile( const char *pszFileName )
+	{
+		HANDLE hFile = CreateFile( pszFileName, GENERIC_READ | GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr );
+		if ( hFile == INVALID_HANDLE_VALUE )
+		{
+			// not found
+			return nullptr;
+		}
+		return hFile;
+	}
+
 	static HANDLE CreateTempFile( const CUtlString &WritePath, CUtlString &FileName )
 	{
 		char tempFileName[MAX_PATH];
@@ -173,6 +185,12 @@ public:
 class CWin32File
 {
 public:
+	// dimhotepus: Create abstraction to unify interface.
+	[[nodiscard]] static HANDLE OpenExistingFile( const char *pszFileName )
+	{
+		return fopen( pszFileName, "rw+" );
+	}
+
 	static HANDLE CreateTempFile( CUtlString &WritePath, CUtlString &FileName )
 	{
 		char tempFileName[MAX_PATH];
@@ -773,21 +791,13 @@ void CZipFile::ParseFromBuffer( void *buffer, int bufferlength )
 //-----------------------------------------------------------------------------
 HANDLE CZipFile::ParseFromDisk( const char *pFilename )
 {
-#ifdef WIN32
-	HANDLE hFile = CreateFile( pFilename, GENERIC_READ|GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
-	if ( hFile == INVALID_HANDLE_VALUE )
-	{
-		// not found
-		return NULL;
-	}	
-#else
-	HANDLE hFile = fopen( pFilename, "rw+" );
+	// dimhotepus: Create abstraction to unify interface.
+	HANDLE hFile = CWin32File::OpenExistingFile( pFilename );
 	if ( !hFile )
 	{
 		// not found
-		return NULL;
+		return nullptr;
 	}	
-#endif
 
 	unsigned int fileLen = CWin32File::FileSeek( hFile, 0, FILE_END );
 	CWin32File::FileSeek( hFile, 0, FILE_BEGIN );
