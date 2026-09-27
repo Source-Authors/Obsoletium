@@ -158,7 +158,7 @@ public:
 		{
 			DWarning( "vscript:squirrel",
 				0,
-				"Unable to create %s VM with 0x%x stack bytes. Out of memory?\n",
+				"Unable to create %s VM with 0x%llx stack bytes. Out of memory?\n",
 				SQUIRREL_VERSION, stackSize );
 			return false;
 		}
@@ -1215,8 +1215,8 @@ private:
 	{
 		DWarning( "vscript:squirrel",
 			0,
-			"%s(%d,%d): compile error: %s.\n",
-			source, desc, line, column );
+			"%s(%lld,%lld): compile error: %s.\n",
+			source, line, column, desc );
 	}
 
 	static SQInteger RuntimeErrorHandler(HSQUIRRELVM m_hVM)
