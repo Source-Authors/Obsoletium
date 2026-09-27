@@ -1766,20 +1766,16 @@ private:
 	CZipFile				m_ZipFile;
 };
 
-static CUtlLinkedList< CZip* > g_ZipUtils;
 
 IZip *IZip::CreateZip( const char *pDiskCacheWritePath, bool bSortByName )
 {
 	CZip *pZip = new CZip( pDiskCacheWritePath, bSortByName );
-	g_ZipUtils.AddToTail( pZip );
 
 	return pZip;
 }
 
 void IZip::ReleaseZip( IZip *pZip )
 {
-	g_ZipUtils.FindAndRemove( (CZip *)pZip );
-
 	delete ((CZip *)pZip);
 }
 
