@@ -102,7 +102,7 @@ static ConVar mod_dynamicloadspew( "mod_dynamicloadspew", "0", FCVAR_HIDDEN | FC
 	if ( destVal != retVal )
 	{
 		AssertMsg( false, "Found a malicious map. Attempted integer overflow bug is present, we're about to shutdown." );
-		Sys_Error( "Couldn't load corrupted map %s: %s overlow (max %lld > map %d bytes)", mapName, structName, destVal, retVal );
+		Sys_Error( "Map %s is corrupted and cannot be loaded: %s overlow (max %lld > map %d bytes)", mapName, structName, destVal, retVal );
 	}
 
 	return retVal;
@@ -1235,9 +1235,9 @@ void Mod_LoadOcclusion( void )
 			b->numoccludervertindices = buf.GetInt();
 			if (b->numoccludervertindices)
 			{
-				b->occludervertindices = Hunk_AllocName<int>( b->numoccludervertindices, "occluder vertices" );
+				b->occludervertindices = Hunk_AllocName<int>( b->numoccludervertindices, "occluder vertex indexes" );
 				// dimhotepus: Check overflow. CS:GO backport.
-				int nSize = ComputeBytesToRead( b->numoccludervertindices, sizeof(int), lh.GetLoadName(), "occluder vertices" );
+				int nSize = ComputeBytesToRead( b->numoccludervertindices, sizeof(int), lh.GetLoadName(), "occluder vertex indexes" );
 				buf.Get( b->occludervertindices, nSize ); //-V2002
 			}
 		}
@@ -1264,16 +1264,16 @@ void Mod_LoadOcclusion( void )
 			{
 				b->occluderpolys = Hunk_AllocName<doccluderpolydata_t>( b->numoccluderpolys, "occluder poly data" );
 				// dimhotepus: Check overflow. CS:GO backport.
-				int nSize = ComputeBytesToRead( b->numoccluderpolys, sizeof(doccluderpolydata_t), lh.GetMapName(), "occlyder poly data" );
+				int nSize = ComputeBytesToRead( b->numoccluderpolys, sizeof(doccluderpolydata_t), lh.GetMapName(), "occluder poly data" );
 				buf.Get( b->occluderpolys, nSize ); //-V2002
 			}
 
 			b->numoccludervertindices = buf.GetInt();
 			if (b->numoccludervertindices)
 			{
-				b->occludervertindices = Hunk_AllocName<int>( b->numoccludervertindices, "occluder vertices" );
+				b->occludervertindices = Hunk_AllocName<int>( b->numoccludervertindices, "occluder vertex indexes" );
 				// dimhotepus: Check overflow. CS:GO backport.
-				int nSize = ComputeBytesToRead( b->numoccludervertindices, sizeof(int), lh.GetMapName(), "occluder vertices" );
+				int nSize = ComputeBytesToRead( b->numoccludervertindices, sizeof(int), lh.GetMapName(), "occluder vertex indexes" );
 				buf.Get( b->occludervertindices, nSize ); //-V2002
 			}
 		}
