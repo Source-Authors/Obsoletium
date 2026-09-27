@@ -10,23 +10,27 @@
 #include "tier0/platform.h"
 
 #include "scoped_dll.h"
+#include "scoped_process_error_mode.h"
 #include "winlite.h"
+
+#define VALVE_OB_STRINGIFY(x) #x
+#define VALVE_OB_TOSTRING(x) VALVE_OB_STRINGIFY(x)
 
 namespace {
 
 // Purpose: Return the directory where this .exe is running from
 template <size_t buffer_size>
-[[nodiscard]] const char *GetBaseDirectory(
+[[nodiscard]] const char* GetBaseDirectory(
     const char (&buffer)[buffer_size],
     char (&out_base_directory)[buffer_size]) {
   strcpy_s(out_base_directory, buffer);
 
-  char *separator{strrchr(out_base_directory, '\\')};
+  char* separator{strrchr(out_base_directory, '\\')};
   if (separator) *(separator + 1) = L'\0';
 
   const size_t size{strlen(out_base_directory)};
   if (size > 0) {
-    char &lastChar{out_base_directory[size - 1]};
+    char& lastChar{out_base_directory[size - 1]};
 
     if (lastChar == '\\' || lastChar == '/') {
       lastChar = '\0';
@@ -37,7 +41,7 @@ template <size_t buffer_size>
 }
 
 // Purpose: Shows error box and returns error code.
-[[nodiscard]] int ShowErrorBoxAndExitWithCode(_In_z_ const char *error_message,
+[[nodiscard]] int ShowErrorBoxAndExitWithCode(_In_z_ const char* error_message,
                                               _In_ std::error_code exit_code,
                                               _In_ bool is_console_mode) {
   const auto system_error = exit_code.message();
@@ -51,7 +55,8 @@ template <size_t buffer_size>
     OutputDebugStringA(entire_error_message);
   } else {
     // Note, uses delay load to allow run in no Win32 mode.
-    MessageBoxA(nullptr, entire_error_message, "SRCDS - Error",
+    MessageBoxA(nullptr, entire_error_message,
+                VALVE_OB_TOSTRING(VPCGAME) " srcds - Error",
                 MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
   }
 
@@ -238,26 +243,19 @@ template <size_t buffer_size>
  * @param command_line Command line.
  * @return true if app in console mode, false otherwise.
  */
-bool IsConsoleMode(const char *command_line) {
+bool IsConsoleMode(const char* command_line) {
   constexpr char kConsoleArgName[]{"-console"};
 
-  const char *console_arg{strstr(command_line, kConsoleArgName)};
+  const char* console_arg{strstr(command_line, kConsoleArgName)};
   if (!console_arg) return false;
 
-  const char *next_arg{console_arg + std::size(kConsoleArgName) - 1};
+  const char* next_arg{console_arg + std::size(kConsoleArgName) - 1};
 
   return isspace(*next_arg) != 0;
 }
 
-}  // namespace
-
-#define VALVE_OB_STRINGIFY(x) #x
-#define VALVE_OB_TOSTRING(x) VALVE_OB_STRINGIFY(x)
-
-int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
-                     _In_ LPSTR cmd_line, _In_ int window_flags) {
-  const bool is_console_mode{IsConsoleMode(cmd_line)};
-
+int Run(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
+        _In_ LPSTR cmd_line, _In_ int window_flags, _In_ bool is_console_mode) {
   // Game uses features of Windows 10.
   if (!IsWindows10OrGreater()) {
     return ShowErrorBoxAndExitWithCode(
@@ -266,8 +264,18 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
         GetLastErrorCode(ERROR_EXE_MACHINE_TYPE_MISMATCH), is_console_mode);
   }
 
+  // Use the .exe name to determine the base directory.
+  char module_name[MAX_PATH];
+  if (!::GetModuleFileNameA(instance, module_name, MAX_PATH)) {
+    return ShowErrorBoxAndExitWithCode(
+        "Please check game installed in the folder with less than "
+        VALVE_OB_TOSTRING(MAX_PATH) " chars deep.\n\nUnable to get "
+        "module file name from GetModuleFileName.",
+        GetLastErrorCode(), is_console_mode);
+  }
+
   // Do not show fault error boxes, etc.
-  (void)::SetErrorMode(
+  const source::ScopedProcessErrorMode scoped_process_error_mode{
 #ifdef NDEBUG
       // The system does not display the critical-error-handler message box.
       // Instead, the system sends the error to the calling process.
@@ -275,65 +283,64 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
       SEM_FAILCRITICALERRORS |
 #endif
       // The system automatically fixes memory alignment faults and makes them
-      // invisible to the application.  It does this for the calling process and
-      // any descendant processes.
+      // invisible to the application.  It does this for the calling process
+      // and any descendant processes.
       SEM_NOALIGNMENTFAULTEXCEPT |
       // The system does not display the Windows Error Reporting dialog.
-      SEM_NOGPFAULTERRORBOX);
+      SEM_NOGPFAULTERRORBOX};
 
   {
     // Apply process mitigations.
-    int rc = ApplyProcessMitigations(is_console_mode);
+    const int rc{ApplyProcessMitigations(is_console_mode)};
     if (rc) return static_cast<int>(rc);
   }
 
-  // Use the .exe name to determine the base directory.
-  char module_name[MAX_PATH];
-  if (!::GetModuleFileNameA(instance, module_name, MAX_PATH)) {
-    return ShowErrorBoxAndExitWithCode(
-        "Please check game installed in the folder with less "
-        "than " VALVE_OB_TOSTRING(MAX_PATH) " chars deep.\n\n"
-        "Unable to get module file name from GetModuleFileName.",
-        GetLastErrorCode(), is_console_mode);
-  }
+  constexpr char dll_name[]{"dedicated.dll"};
 
   // Get the base directory the .exe is in.
-  char base_directory_path[MAX_PATH], dedicated_dll_path[MAX_PATH];
-  // Assemble the full path to our "dedicated.dll".
-  _snprintf_s(dedicated_dll_path, _TRUNCATE,
-              "%s\\" PLATFORM_BIN_DIR "\\dedicated.dll",
-              GetBaseDirectory(module_name, base_directory_path));
+  char base_directory_path[MAX_PATH], dll_path[MAX_PATH];
+  // Assemble the full path to our dll.
+  _snprintf_s(dll_path, _TRUNCATE, "%s\\" PLATFORM_BIN_DIR "\\%s",
+              GetBaseDirectory(module_name, base_directory_path), dll_name);
 
   char user_error[1024];
   // STEAM OK ... filesystem not mounted yet.
-  const source::ScopedDll dedicated_dll{dedicated_dll_path,
-                                        LOAD_WITH_ALTERED_SEARCH_PATH};
-  if (!dedicated_dll) {
+  const source::ScopedDll dll{dll_path, LOAD_WITH_ALTERED_SEARCH_PATH};
+  if (!dll) {
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed in the folder with less "
                 "than " VALVE_OB_TOSTRING(MAX_PATH) " chars deep.\n\n"
-                "Unable to load the dedicated DLL from %s.",
-                dedicated_dll_path);
+                "Unable to load the %s from %s.",
+                dll_name, dll_path);
 
-    return ShowErrorBoxAndExitWithCode(user_error, dedicated_dll.error_code(),
+    return ShowErrorBoxAndExitWithCode(user_error, dll.error_code(),
                                        is_console_mode);
   }
 
-  using DedicatedMainFunction = int (*)(HINSTANCE, HINSTANCE, LPSTR, int);
+  using MainFunction = int (*)(HINSTANCE, HINSTANCE, LPSTR, int);
+  constexpr char main_function_name[]{"DedicatedMain"};
 
-  const auto [dedicated_main, errc] =
-      dedicated_dll.GetFunction<DedicatedMainFunction>("DedicatedMain");
-  if (!dedicated_main) {
+  const auto [main_function, errc] =
+      dll.GetFunction<MainFunction>(main_function_name);
+  if (!main_function) {
     _snprintf_s(user_error, _TRUNCATE,
-                "Please check game installed correctly.\n\nUnable to find "
-                "DedicatedMain entry point in the dedicated DLL %s.",
-                dedicated_dll_path);
+                "Please check game installed correctly.\n\nUnable to find %s "
+                "entry point in the %s %s.",
+                main_function_name, dll_name, dll_path);
 
     return ShowErrorBoxAndExitWithCode(user_error, errc, is_console_mode);
   }
 
+  return main_function(instance, old_instance, cmd_line, window_flags);
+}
+
+}  // namespace
+
+int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
+                     _In_ LPSTR cmd_line, _In_ int window_flags) {
+  const bool is_console_mode{IsConsoleMode(cmd_line)};
   const auto rc =
-      dedicated_main(instance, old_instance, cmd_line, window_flags);
+      Run(instance, old_instance, cmd_line, window_flags, is_console_mode);
 
   // Prevent tail call optimization and incorrect stack traces.
   exit(rc);  //-V2014

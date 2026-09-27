@@ -34,21 +34,24 @@ __declspec(dllexport) DWORD AmdPowerXpressRequestHighPerformance = 0x00000001;
 
 }  // extern "C"
 
+#define VALVE_OB_STRINGIFY(x) #x
+#define VALVE_OB_TOSTRING(x) VALVE_OB_STRINGIFY(x)
+
 namespace {
 
 // Purpose: Return the directory where this .exe is running from
 template <size_t buffer_size>
-[[nodiscard]] const char *GetBaseDirectory(
+[[nodiscard]] const char* GetBaseDirectory(
     const char (&buffer)[buffer_size],
     char (&out_base_directory)[buffer_size]) {
   strcpy_s(out_base_directory, buffer);
 
-  char *separator{strrchr(out_base_directory, '\\')};
+  char* separator{strrchr(out_base_directory, '\\')};
   if (separator) *(separator + 1) = L'\0';
 
   const size_t size{strlen(out_base_directory)};
   if (size > 0) {
-    char &lastChar{out_base_directory[size - 1]};
+    char& lastChar{out_base_directory[size - 1]};
 
     if (lastChar == '\\' || lastChar == '/') {
       lastChar = '\0';
@@ -59,15 +62,16 @@ template <size_t buffer_size>
 }
 
 // Purpose: Shows error box and returns error code.
-[[nodiscard]] int ShowErrorBoxAndExitWithCode(_In_z_ const char *error_message,
-                                              std::error_code exit_code) {
+[[nodiscard]] int ShowErrorBoxAndExitWithCode(_In_z_ const char* error_message,
+                                              _In_ std::error_code exit_code) {
   const auto system_error = exit_code.message();
 
   char entire_error_message[2048];
   _snprintf_s(entire_error_message, _TRUNCATE, "%s\n\n%s", error_message,
               system_error.c_str());
 
-  MessageBoxA(nullptr, entire_error_message, "Source Launcher - Error",
+  MessageBoxA(nullptr, entire_error_message,
+              VALVE_OB_TOSTRING(VPCGAME) " launcher - Error",
               MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
   return exit_code.value();
 }
@@ -177,9 +181,6 @@ template <size_t buffer_size>
   return 0;
 }
 
-#define VALVE_OB_STRINGIFY(x) #x
-#define VALVE_OB_TOSTRING(x) VALVE_OB_STRINGIFY(x)
-
 int Run(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
         _In_ LPSTR cmd_line, _In_ int window_flags) {
   // Game uses features of Windows 10.
@@ -188,6 +189,16 @@ int Run(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
         "Unfortunately, your environment is not supported."
         "\n\nApp requires at least Windows 10 to survive.",
         GetLastErrorCode(ERROR_EXE_MACHINE_TYPE_MISMATCH));
+  }
+
+  // Use the .exe name to determine the base directory.
+  char module_name[MAX_PATH];
+  if (!::GetModuleFileNameA(instance, module_name, MAX_PATH)) {
+    return ShowErrorBoxAndExitWithCode(
+        "Please check game installed in the folder with less than "
+        VALVE_OB_TOSTRING(MAX_PATH) " chars deep.\n\nUnable to get "
+        "module file name from GetModuleFileName.",
+        GetLastErrorCode());
   }
 
   // Do not show fault error boxes, etc.
@@ -211,53 +222,42 @@ int Run(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
     if (rc) return static_cast<int>(rc);
   }
 
-  // Use the .exe name to determine the base directory.
-  char module_name[MAX_PATH];
-  if (!::GetModuleFileNameA(instance, module_name, MAX_PATH)) {
-    return ShowErrorBoxAndExitWithCode(
-        "Please check game installed in the folder with less than "
-        VALVE_OB_TOSTRING(MAX_PATH) " chars deep.\n\nUnable to get "
-        "module file name from GetModuleFileName.",
-        GetLastErrorCode());
-  }
+  constexpr char dll_name[]{"launcher.dll"};
 
   // Get the base directory the .exe is in.
-  char base_directory_path[MAX_PATH], launcher_dll_path[MAX_PATH];
-  // Assemble the full path to our "launcher.dll".
-  _snprintf_s(launcher_dll_path, _TRUNCATE,
-              "%s\\" PLATFORM_BIN_DIR "\\launcher.dll",
-              GetBaseDirectory(module_name, base_directory_path));
+  char base_directory_path[MAX_PATH], dll_path[MAX_PATH];
+  // Assemble the full path to our dll.
+  _snprintf_s(dll_path, _TRUNCATE, "%s\\" PLATFORM_BIN_DIR "\\%s",
+              GetBaseDirectory(module_name, base_directory_path), dll_name);
 
   char user_error[1024];
   // STEAM OK ... filesystem not mounted yet.
-  const source::ScopedDll launcher_dll{launcher_dll_path,
-                                       LOAD_WITH_ALTERED_SEARCH_PATH};
-  if (!launcher_dll) {
+  const source::ScopedDll dll{dll_path, LOAD_WITH_ALTERED_SEARCH_PATH};
+  if (!dll) {
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed in the folder with less "
                 "than " VALVE_OB_TOSTRING(MAX_PATH) " chars deep.\n\n"
-                "Unable to load the launcher DLL from %s.",
-                launcher_dll_path);
+                "Unable to load the %s from %s.",
+                dll_name, dll_path);
 
-    return ShowErrorBoxAndExitWithCode(user_error, launcher_dll.error_code());
+    return ShowErrorBoxAndExitWithCode(user_error, dll.error_code());
   }
 
-  using LauncherMainFunction = int (*)(HINSTANCE, HINSTANCE, LPSTR, int);
-  constexpr char launcher_main_function_name[]{"LauncherMain"};
+  using MainFunction = int (*)(HINSTANCE, HINSTANCE, LPSTR, int);
+  constexpr char main_function_name[]{"LauncherMain"};
 
-  const auto [launcher_main, errc] =
-      launcher_dll.GetFunction<LauncherMainFunction>(
-          launcher_main_function_name);
-  if (!launcher_main) {
+  const auto [main_function, errc] =
+      dll.GetFunction<MainFunction>(main_function_name);
+  if (!main_function) {
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed correctly.\n\nUnable to find %s "
-                "entry point in the launcher DLL %s.",
-                launcher_main_function_name, launcher_dll_path);
+                "entry point in the %s %s.",
+                main_function_name, dll_name, dll_path);
 
     return ShowErrorBoxAndExitWithCode(user_error, errc);
   }
 
-  return launcher_main(instance, old_instance, cmd_line, window_flags);
+  return main_function(instance, old_instance, cmd_line, window_flags);
 }
 
 }  // namespace
