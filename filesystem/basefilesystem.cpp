@@ -1804,7 +1804,7 @@ bool CBaseFileSystem::WriteFile( const char *pFileName, const char *pPath, CUtlB
 bool CBaseFileSystem::UnzipFile( const char *pFileName, const char *pPath, const char *pDestination )
 {
 	IZip *pZip = IZip::CreateZip( nullptr, true );
-	RunCodeAtScopeExit(IZip::ReleaseZip(pZip));
+	RunCodeAtScopeExit(IZip::ReleaseZip( pZip ));
 
 	{
 		HANDLE hZipFile = pZip->ParseFromDisk( pFileName );
@@ -1827,7 +1827,7 @@ bool CBaseFileSystem::UnzipFile( const char *pFileName, const char *pPath, const
 		// Create Directories
 		CreateDirHierarchy( pDestination, pPath );
 
-		while ( 1 )
+		while ( true )
 		{
 			// Get the next file in the zip
 			szFileName[0] = '\0';
@@ -1838,20 +1838,20 @@ bool CBaseFileSystem::UnzipFile( const char *pFileName, const char *pPath, const
 			if ( iZipIndex == -1 )
 				break;
 
-			intp iFileNameLength = Q_strlen( szFileName );
+			intp iFileNameLength = V_strlen( szFileName );
 			if ( szFileName[ iFileNameLength - 1 ] == '/' )
 			{
 				// Its a directory, so create it
 				szFileName[ iFileNameLength - 1 ] = '\0';
 
 				char szFinalName[ MAX_PATH ];
-				Q_snprintf( szFinalName, sizeof( szFinalName ), "%s%c%s", pDestination, CORRECT_PATH_SEPARATOR, szFileName );
+				V_sprintf_safe( szFinalName, "%s" CORRECT_PATH_SEPARATOR_S "%s", pDestination, szFileName );
 				CreateDirHierarchy( szFinalName, pPath );
 			}
 		}
 
 		// Write Files
-		while ( 1 )
+		while ( true )
 		{
 			szFileName[0] = '\0';
 			iFileSize = 0;
@@ -1861,7 +1861,7 @@ bool CBaseFileSystem::UnzipFile( const char *pFileName, const char *pPath, const
 			if ( iZipIndex == -1 )
 				break;
 
-			intp iFileNameLength = Q_strlen( szFileName );
+			intp iFileNameLength = V_strlen( szFileName );
 			if ( szFileName[ iFileNameLength - 1 ] != '/' )
 			{
 				// It's not a directory, so write the file
@@ -1871,11 +1871,11 @@ bool CBaseFileSystem::UnzipFile( const char *pFileName, const char *pPath, const
 				if ( pZip->ReadFileFromZip( hZipFile, szFileName, false, fileBuffer ) )
 				{
 					char szFinalName[ MAX_PATH ];
-					Q_snprintf( szFinalName, sizeof( szFinalName ), "%s%c%s", pDestination, CORRECT_PATH_SEPARATOR, szFileName );
+					V_sprintf_safe( szFinalName, "%s" CORRECT_PATH_SEPARATOR_S "%s", pDestination, szFileName );
 
 					// Make sure the directory actually exists in case the ZIP doesn't list it (our zip utils create zips like this)
 					char szFilePath[ MAX_PATH ];
-					Q_strncpy( szFilePath, szFinalName, sizeof(szFilePath) );
+					V_strcpy_safe( szFilePath, szFinalName );
 					V_StripFilename( szFilePath );
 					CreateDirHierarchy( szFilePath, pPath );
 
