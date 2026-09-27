@@ -141,8 +141,8 @@ ProcessHandle_t CProcessUtils::CreateProcess( ProcessInfo_t &info, bool bConnect
 	}
 
 	char buf[ 512 ];
-	Warning( "Could not execute the command:\n   %s\n"
-		"Windows gave the error message:\n   \"%s\"\n",
+	// dimhotepus: Adjust error message to drop "Windows gave the error message"
+	Warning( "Could not execute the command %s:\"%s\"\n",
 		info.m_CommandLine.Get(), GetErrorString( buf ) );
 
 	return PROCESS_HANDLE_INVALID;
@@ -333,8 +333,8 @@ intp CProcessUtils::GetActualProcessOutputSize( ProcessHandle_t hProcess )
 	if ( !PeekNamedPipe( info.m_hChildStdoutRd, nullptr, NULL, nullptr, &dwCount, nullptr ) )
 	{
 		char buf[ 512 ];
-		Warning( "Could not read from pipe associated with command %s\n"
-			"Windows gave the error message:\n   \"%s\"\n",
+		// dimhotepus: Adjust error message to drop "Windows gave the error message"
+		Warning( "Could not read from pipe associated with command %s:\"%s\"\n",
 			info.m_CommandLine.Get(), GetErrorString( buf ) );
 		return 0;
 	}
@@ -357,8 +357,8 @@ intp CProcessUtils::GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf
 	if ( !PeekNamedPipe( info.m_hChildStdoutRd, nullptr, NULL, nullptr, &dwCount, nullptr ) )
 	{
 		char buf[ 512 ];
-		Warning( "Could not read from pipe associated with command %s\n"
-			"Windows gave the error message:\n   \"%s\"\n",
+		// dimhotepus: Adjust error message to drop "Windows gave the error message"
+		Warning( "Could not read from pipe associated with command %s:\n\"%s\"\n",
 			info.m_CommandLine.Get(), GetErrorString( buf ) );
 		return 0;
 	}
@@ -367,8 +367,8 @@ intp CProcessUtils::GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf
 	if ( !::ReadFile( info.m_hChildStdoutRd, pTempBuf, dwCount, &dwRead, nullptr) )
 	{
 		char buf[ 512 ];
-		Warning( "Could not read from pipe associated with command %s\n"
-			"Windows gave the error message:\n   \"%s\"\n",
+		// dimhotepus: Adjust error message to drop "Windows gave the error message"
+		Warning( "Could not read from pipe associated with command %s:\n\"%s\"\n",
 			info.m_CommandLine.Get(), GetErrorString( buf ) );
 		return 0;
 	}
