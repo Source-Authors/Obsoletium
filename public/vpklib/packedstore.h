@@ -244,7 +244,7 @@ public:
 	void RetryAllBadCacheLines();
 
 
-	// cache 64 MiB total
+	// cache 8 MB total. Caching more wastes too much memory.
 	static constexpr inline int k_nCacheBuffersToKeep = 8;
 	static constexpr inline int k_cubCacheBufferSize = 0x00100000; // 1MiB
 	static constexpr inline int k_nCacheBufferMask = 0x7FF00000;
