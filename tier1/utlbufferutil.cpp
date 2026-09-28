@@ -445,10 +445,12 @@ bool Serialize( CUtlBuffer &buf, const CUtlBinaryBlock &src )
 	intp nLength = src.Length();
 	if ( !buf.IsText() )
 	{
-		buf.PutInt( nLength );
+		Assert( nLength <= std::numeric_limits<int>::max() );
+		// dimhotepus: Original code is for int, so must be 4 byte binary compatible.
+		buf.PutInt( size_cast<int>( nLength ) );
 		if ( nLength != 0 )
 		{
-			buf.Put( src.Get(), nLength );
+			buf.Put( src.Get(), size_cast<int>( nLength ) );
 		}
 		return buf.IsValid();
 	}
