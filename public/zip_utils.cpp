@@ -126,9 +126,9 @@ public:
 			{
 				pBuffer++;
 			}
-			if ( pBuffer[strlen( pBuffer )-1] == '.' )
+			if ( size_t endIdx = strlen( pBuffer ) - 1; pBuffer[endIdx] == '.' )
 			{
-				pBuffer[strlen( pBuffer )-1] = '\0';
+				pBuffer[endIdx] = '\0';
 			}
 			V_sprintf_safe( tempFileName, "_%s.tmp", pBuffer );
 		}
