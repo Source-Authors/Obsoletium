@@ -119,6 +119,7 @@ public:
 	CSharedEdictChangeInfo()
 	{
 		m_iSerialNumber = 1;
+		m_nChangeInfos = 0;
 	}
 	
 	// Matched against edict_t::m_iChangeInfoSerialNumber to determine if its
