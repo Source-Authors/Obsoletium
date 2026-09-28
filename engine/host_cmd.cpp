@@ -1104,9 +1104,9 @@ CON_COMMAND( kickid, "Kick a player by userid or uniqueid, with a message." )
 	if ( *pszArg1 < '0' || *pszArg1 > '9' )
 	{
 		// SteamID (need to reassemble it)
-		if ( !Q_strnicmp( pszArg1, STEAM_PREFIX, strlen( STEAM_PREFIX ) ) && Q_strstr( args[2], ":" ) )
+		if ( !Q_strnicmp( pszArg1, STEAM_PREFIX, ssize( STEAM_PREFIX ) - 1 ) && Q_strstr( args[2], ":" ) )
 		{
-			Q_snprintf( szSearchString, sizeof( szSearchString ), "%s:%s:%s", pszArg1, args[3], args[5] );
+			V_sprintf_safe( szSearchString, "%s:%s:%s", pszArg1, args[3], args[5] );
 			argsStartNum = 5;
 			bSteamID = true;
 		}
