@@ -81,7 +81,7 @@ public:
 
 	// The mesh that we specify indices into while tesselating.
 	CMeshBuilder m_IndexMesh;
-	CDispInfo *m_pDisp;
+	CDispInfo *m_pDisp{nullptr};
 };
 
 
