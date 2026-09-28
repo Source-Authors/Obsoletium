@@ -6,6 +6,7 @@
 #if !defined(_STATIC_LINKED) || defined(_SHARED_LIB)
 
 #include <cstdlib>
+#include "tier0/annotations.h"
 #include "vstdlib/random.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -17,11 +18,11 @@
 
 // dimhotepus: Exclude in Multihreaded DLL mode as ucrt lib already has ones.
 #if !defined(_MT) || !defined(_DLL)
-void __cdecl srand(unsigned int)
+void __cdecl srand(IN unsigned int)
 {
 }
 
-int __cdecl rand()
+MUST_CHECK_RETURN int __cdecl rand()
 {
 	return RandomInt( 0, VALVE_RAND_MAX );
 }
