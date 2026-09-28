@@ -28,7 +28,8 @@ public:
 	virtual void			Reset() = 0;
 
 	// Add a single file to a zip - maintains the zip's previous alignment state.
-	virtual void			AddFileToZip		( const char *relativename, const char *fullpath, eCompressionType compressionType = eCompressionType_None ) = 0;
+	// dimhotepus: Report success or failure.
+	virtual bool			AddFileToZip		( const char *relativename, const char *fullpath, eCompressionType compressionType = eCompressionType_None ) = 0;
 
 	// Whether a file is contained in a zip - maintains alignment
 	virtual bool			FileExistsInZip		( const char *pRelativeName ) = 0;

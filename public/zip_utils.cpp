@@ -27,7 +27,6 @@
 #include "tier1/lzmaDecoder.h"
 
 #include "zip_uncompressed.h"
-#include "posix_file_stream.h"
 
 // Not every user of zip utils wants to link LZMA encoder
 #ifdef ZIP_SUPPORT_LZMA_ENCODE
@@ -360,7 +359,8 @@ public:
 	void			Reset( void );
 
 	// Add file to zip under relative name
-	void			AddFileToZip( const char *relativename, const char *fullpath, IZip::eCompressionType compressionType );
+	// dimhotepus: Report success or failure.
+	bool			AddFileToZip( const char *relativename, const char *fullpath, IZip::eCompressionType compressionType );
 
 	// Delete file from zip
 	void			RemoveFileFromZip( const char *relativename );
@@ -1253,28 +1253,37 @@ bool CZipFile::FileExistsInZip( const char *pRelativeName )
 //-----------------------------------------------------------------------------
 // Purpose: Adds a new file to the zip.
 //-----------------------------------------------------------------------------
-void CZipFile::AddFileToZip( const char *relativename, const char *fullpath, IZip::eCompressionType compressionType )
+bool CZipFile::AddFileToZip( const char *relativename, const char *fullpath, IZip::eCompressionType compressionType )
 {
-	auto [temp, rc] = se::posix::posix_file_stream_factory::open( fullpath, "rb" );
-	if ( rc )
-		return;
+	HANDLE f{ CWin32File::OpenExistingFile( fullpath ) };
+	if ( f == INVALID_HANDLE_VALUE )
+	{
+		return false;
+	}
 
-	int64_t size;
-	// Determine length
-	std::tie(size, rc) = temp.size();
-	if ( rc )
-		return;
+	RunCodeAtScopeExit( CWin32File::CloseFile( f ) );
 
-	std::unique_ptr<byte[]> buf = std::make_unique<byte[]>(size + 1);
+	const unsigned size{CWin32File::FileSeek( f, 0, FILE_END )};
+	if ( size == std::numeric_limits<unsigned>::max() )
+	{
+		return false;
+	}
 
-	size_t read;
-	// Read data
-	std::tie(read, rc) = temp.read( buf.get(), size, 1, size );
-	if ( rc || size_cast<int64>( read ) != size )
-		return;
+	if ( const unsigned endPos{CWin32File::FileSeek( f, 0, FILE_BEGIN )};
+		 endPos == std::numeric_limits<unsigned>::max() )
+	{
+		return false;
+	}
 
-	// Now add as a buffer
-	AddBufferToZip( relativename, buf.get(), size, false, compressionType );
+	std::unique_ptr<byte[]> buf = std::make_unique<byte[]>(size);
+
+	if ( CWin32File::FileRead( f, buf.get(), size ) )
+	{
+		// Now add as a buffer
+		AddBufferToZip( relativename, buf.get(), size, false, compressionType );
+	}
+
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1697,7 +1706,7 @@ public:
 	void			Reset() override;
 
 	// Add a single file to a zip - maintains the zip's previous alignment state
-	void			AddFileToZip( const char *relativename, const char *fullpath, eCompressionType compressionType ) override;
+	bool			AddFileToZip( const char *relativename, const char *fullpath, eCompressionType compressionType ) override;
 
 	// Whether a file is contained in a zip - maintains alignment
 	bool			FileExistsInZip( const char *pRelativeName ) override;
@@ -1777,9 +1786,9 @@ void CZip::ActivateByteSwapping( bool bActivate )
 	m_ZipFile.ActivateByteSwapping( bActivate );
 }
 
-void CZip::AddFileToZip( const char *relativename, const char *fullpath, eCompressionType compressionType )
+bool CZip::AddFileToZip( const char *relativename, const char *fullpath, eCompressionType compressionType )
 {
-	m_ZipFile.AddFileToZip( relativename, fullpath, compressionType );
+	return m_ZipFile.AddFileToZip( relativename, fullpath, compressionType );
 }
 
 bool CZip::FileExistsInZip( const char *pRelativeName )
