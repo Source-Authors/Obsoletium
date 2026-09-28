@@ -47,22 +47,22 @@ class IClientMessageHandler;
 			
 #define DECLARE_NET_MESSAGE( name )			\
 	DECLARE_BASE_MESSAGE( net_##name );		\
-	INetMessageHandler *m_pMessageHandler;	\
+	INetMessageHandler *m_pMessageHandler{nullptr};	\
 	bool Process() override { return m_pMessageHandler->Process##name( this ); }\
 	
 #define DECLARE_SVC_MESSAGE( name )		\
 	DECLARE_BASE_MESSAGE( svc_##name );	\
-	IServerMessageHandler *m_pMessageHandler;\
+	IServerMessageHandler* m_pMessageHandler{nullptr};\
 	bool Process() override { return m_pMessageHandler->Process##name( this ); }\
 	
 #define DECLARE_CLC_MESSAGE( name )		\
 	DECLARE_BASE_MESSAGE( clc_##name );	\
-	IClientMessageHandler *m_pMessageHandler;\
+	IClientMessageHandler* m_pMessageHandler{nullptr};\
 	bool Process() override { return m_pMessageHandler->Process##name( this ); }\
 		
 #define DECLARE_MM_MESSAGE( name )		\
 	DECLARE_BASE_MESSAGE( mm_##name );	\
-	IMatchmakingMessageHandler *m_pMessageHandler;\
+	IMatchmakingMessageHandler* m_pMessageHandler{nullptr};\
 	bool Process() override { return m_pMessageHandler->Process##name( this ); }\
 
 class CNetMessage : public INetMessage
@@ -97,7 +97,7 @@ class NET_SetConVar : public CNetMessage
 
 	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::STRINGCMD; }
 
-	NET_SetConVar() : m_pMessageHandler{nullptr} {}
+	NET_SetConVar() = default;
 	NET_SetConVar(const char *name, const char *value) : NET_SetConVar{}
 	{
 		cvar_t localCvar = {};
@@ -124,9 +124,7 @@ class NET_StringCmd : public CNetMessage
 	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::STRINGCMD; }
 
 	NET_StringCmd() : NET_StringCmd{nullptr} {};
-	explicit NET_StringCmd(const char *cmd)
-		: m_pMessageHandler{nullptr},
-		m_szCommand{cmd}
+	explicit NET_StringCmd(const char *cmd) : m_szCommand{cmd}
 	{
 		m_szCommandBuffer[0] = '\0';
 	};
@@ -147,8 +145,8 @@ class NET_Tick : public CNetMessage
 	{ 
 	};
 
-	NET_Tick( int tick, [[maybe_unused]] float hostFrametime, [[maybe_unused]] float hostFrametime_stddeviation ) : m_pMessageHandler{nullptr}
-	{ 
+	NET_Tick( int tick, [[maybe_unused]] float hostFrametime, [[maybe_unused]] float hostFrametime_stddeviation )
+	{
 		m_bReliable = false; 
 		m_nTick = tick; 
 #if PROTOCOL_VERSION > 10
@@ -173,8 +171,7 @@ class NET_SignonState : public CNetMessage
 
 	NET_SignonState() : NET_SignonState{ -1, -1 } {}
 	NET_SignonState( int state, int spawncount )
-		: m_pMessageHandler{nullptr},
-		m_nSignonState{state},
+		: m_nSignonState{state},
 		m_nSpawnCount{spawncount}
 	{
 	}
@@ -195,7 +192,6 @@ class CLC_ClientInfo : public CNetMessage
 
 public:
 	CLC_ClientInfo()
-		: m_pMessageHandler{nullptr}
 	{
 		m_nSendTableCRC = 0;
 		m_nServerCount = -1;
@@ -205,6 +201,7 @@ public:
 #endif
 		m_nFriendsID = 0;
 		m_FriendsName[0] = '\0';
+		BitwiseClear( m_nCustomFiles );
 	}
 
 	CRC32_t			m_nSendTableCRC;
@@ -227,8 +224,6 @@ class CLC_Move : public CNetMessage
 	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::MOVE; }
 
 	CLC_Move()
-		: m_pMessageHandler{nullptr}
-		
 	{
 		m_bReliable = false;
 	}
@@ -247,10 +242,7 @@ class CLC_VoiceData : public CNetMessage
 
 	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::VOICE; }
 
-	CLC_VoiceData()
-		: m_pMessageHandler{nullptr},
-		
-		m_xuid{std::numeric_limits<uint64>::max()}
+	CLC_VoiceData() : m_xuid{std::numeric_limits<uint64>::max()}
 	{
 		m_bReliable = false;
 	}
@@ -268,8 +260,7 @@ class CLC_BaselineAck : public CNetMessage
 
 	CLC_BaselineAck() : CLC_BaselineAck{ -1, -1, } {}
 	CLC_BaselineAck( int tick, int baseline )
-		: m_pMessageHandler{nullptr},
-		m_nBaselineTick{tick},
+		: m_nBaselineTick{tick},
 		m_nBaselineNr{baseline}
 	{}
 
@@ -296,8 +287,7 @@ class CLC_SaveReplay : public CNetMessage
 	DECLARE_CLC_MESSAGE( SaveReplay );
 
 	CLC_SaveReplay()
-		: m_pMessageHandler{nullptr},
-		m_nStartSendByte{-1},
+		: m_nStartSendByte{-1},
 		m_flPostDeathRecordTime{-1}
 	{
 		m_szFilename[0] = '\0';
@@ -400,8 +390,7 @@ class SVC_Print : public CNetMessage
 	SVC_Print() : SVC_Print{nullptr} {}
 
 	explicit SVC_Print(const char * text)
-		: m_pMessageHandler{nullptr},
-		m_szText{text}
+		: m_szText{text}
 	{
 		m_bReliable = false;
 		m_szTextBuffer[0] = '\0';
@@ -468,8 +457,7 @@ class SVC_ClassInfo : public CNetMessage
 
 	SVC_ClassInfo() : SVC_ClassInfo{false, -1} {};
 	SVC_ClassInfo( bool createFromSendTables, int numClasses ) 
-		: m_pMessageHandler{nullptr},
-		  m_bCreateOnClient{createFromSendTables},
+		: m_bCreateOnClient{createFromSendTables},
 		  m_nNumServerClasses{numClasses} {}
 
 public:
@@ -493,7 +481,7 @@ class SVC_SetPause : public CNetMessage
 	
 	SVC_SetPause() : SVC_SetPause{false} {}
 	SVC_SetPause( bool state, [[maybe_unused]] float end = -1.f )
-		: m_pMessageHandler{nullptr}, m_bPaused{state}
+		: m_bPaused{state}
 	{}
 	
 public:
@@ -506,8 +494,7 @@ class SVC_SetPauseTimed : public CNetMessage
 
 	SVC_SetPauseTimed() : SVC_SetPauseTimed{false} {}
 	SVC_SetPauseTimed( bool bState, float flExpireTime = -1.f )
-		: m_pMessageHandler{nullptr},
-		m_bPaused{bState},
+		: m_bPaused{bState},
 		m_flExpireTime{flExpireTime}
 	{}
 
@@ -578,15 +565,13 @@ class SVC_VoiceInit : public CNetMessage
 	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::SIGNON; }
 
 	SVC_VoiceInit()
-		: m_pMessageHandler{nullptr},
-		  m_nSampleRate( 0 )
+		: m_nSampleRate( 0 )
 	{
 		m_szVoiceCodec[0] = '\0';
 	}
 
 	SVC_VoiceInit( const char * codec, int nSampleRate )
-		: m_pMessageHandler{nullptr},
-		  m_nSampleRate( nSampleRate )
+		: m_nSampleRate( nSampleRate )
 	{
 		V_strcpy_safe( m_szVoiceCodec, codec ? codec : "" );
 	}
@@ -620,8 +605,7 @@ class SVC_VoiceData : public CNetMessage
 	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::VOICE; }
 
 	SVC_VoiceData()
-		: m_pMessageHandler{nullptr},
-		m_xuid{std::numeric_limits<uint64>::max()}
+		: m_xuid{std::numeric_limits<uint64>::max()}
 	{
 		m_bReliable = false;
 	}
@@ -654,7 +638,10 @@ public:
 class SVC_Prefetch : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( Prefetch );
-
+	
+	SVC_Prefetch()
+		: m_fType(std::numeric_limits<unsigned short>::max()),
+		m_nSoundIndex(std::numeric_limits<unsigned short>::max()) {}
 	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::SOUNDS; }
 
 	enum
@@ -674,8 +661,7 @@ class SVC_SetView : public CNetMessage
 
 	SVC_SetView() : SVC_SetView{-1} {}
 	explicit SVC_SetView( int entity )
-		: m_pMessageHandler{nullptr},
-		m_nEntityIndex{entity}
+		: m_nEntityIndex{entity}
 	{}
 
 public:	
@@ -689,8 +675,7 @@ class SVC_FixAngle: public CNetMessage
 
 	SVC_FixAngle() : SVC_FixAngle{false, QAngle{-1, -1, -1}} {}
 	SVC_FixAngle( bool bRelative, QAngle angle )
-		: m_pMessageHandler{nullptr},
-		m_bRelative{bRelative},
+		: m_bRelative{bRelative},
 		m_Angle{angle}
 	{
 		m_bReliable = false;
@@ -707,8 +692,7 @@ class SVC_CrosshairAngle : public CNetMessage
 
 	SVC_CrosshairAngle() : SVC_CrosshairAngle{QAngle{-1, -1, -1}} {}
 	explicit SVC_CrosshairAngle(QAngle angle)
-		: m_pMessageHandler{nullptr},
-		m_Angle{angle}
+		: m_Angle{angle}
 	{
 	}
 	
@@ -745,7 +729,6 @@ class SVC_UserMessage: public CNetMessage
 	DECLARE_SVC_MESSAGE( UserMessage );
 
 	SVC_UserMessage()
-		: m_pMessageHandler{nullptr}
 	{
 		m_bReliable = false;
 	}
@@ -764,7 +747,6 @@ class SVC_EntityMessage : public CNetMessage
 	DECLARE_SVC_MESSAGE( EntityMessage );
 
 	SVC_EntityMessage()
-		: m_pMessageHandler{nullptr}
 	{
 		m_bReliable = false;
 	}
@@ -818,7 +800,6 @@ class SVC_TempEntities: public CNetMessage
 	DECLARE_SVC_MESSAGE( TempEntities );
 
 	SVC_TempEntities()
-		: m_pMessageHandler{nullptr}
 	{
 		m_bReliable = false;
 	}
@@ -836,7 +817,7 @@ class SVC_Menu : public CNetMessage
 public:
 	DECLARE_SVC_MESSAGE( Menu );
 
-	SVC_Menu() : m_pMessageHandler{nullptr}
+	SVC_Menu()
 	{
 		m_bReliable = true;
 		m_Type = DIALOG_MENU;
@@ -935,7 +916,7 @@ class MM_JoinResponse : public CNetMessage
 public:
 	DECLARE_MM_MESSAGE( JoinResponse );
 
-	MM_JoinResponse() : m_pMessageHandler{nullptr}
+	MM_JoinResponse()
 	{
 		m_ResponseType = std::numeric_limits<uint>::max();
 		m_id = std::numeric_limits<uint64>::max();

@@ -615,7 +615,7 @@ const char * Base_CmdKeyValues::ToString() const
 }
 
 CLC_CmdKeyValues::CLC_CmdKeyValues( KeyValues *pKeyValues /* = NULL */ )
-	: Base_CmdKeyValues( pKeyValues ), m_pMessageHandler{nullptr}
+	: Base_CmdKeyValues( pKeyValues )
 {
 }
 
@@ -635,7 +635,7 @@ const char *CLC_CmdKeyValues::ToString() const
 }
 
 SVC_CmdKeyValues::SVC_CmdKeyValues( KeyValues *pKeyValues /* = NULL */ )
-	: Base_CmdKeyValues( pKeyValues ), m_pMessageHandler{nullptr}
+	: Base_CmdKeyValues( pKeyValues )
 {
 }
 
@@ -1222,8 +1222,7 @@ const char *SVC_UpdateStringTable::ToString() const
 }
 
 SVC_CreateStringTable::SVC_CreateStringTable()
-    : m_pMessageHandler{nullptr},
-	m_szTableName{nullptr},
+    : m_szTableName{nullptr},
 	m_nMaxEntries{-1},
 	m_nNumEntries{-1},
 	m_bUserDataFixedSize{false},
@@ -1708,7 +1707,7 @@ const char *SVC_PacketEntities::ToString() const
 	return s_text;
 } 
 
-SVC_Menu::SVC_Menu( DIALOG_TYPE type, KeyValues *data ) : m_pMessageHandler{nullptr}
+SVC_Menu::SVC_Menu( DIALOG_TYPE type, KeyValues *data )
 {
 	m_bReliable = true;
 
