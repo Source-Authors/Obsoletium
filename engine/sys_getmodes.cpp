@@ -2209,7 +2209,9 @@ void CVideoMode_MaterialSystem::ChangeDisplaySettingsToFullscreen( int nWidth, i
     }
 
 #if defined(IS_WINDOWS_PC)
-	DEVMODE dmCurrent;
+	DEVMODE dmCurrent = {};
+    // dimhotepus: Should set dmSize to size per docs.
+    dmCurrent.dmSize = sizeof( dmCurrent );
 	if ( EnumDisplaySettings( materials->GetDisplayDeviceName(), ENUM_CURRENT_SETTINGS, &dmCurrent ) &&
 		 dmCurrent.dmBitsPerPel == dm.dmBitsPerPel &&
 		 dmCurrent.dmPelsWidth == dm.dmPelsWidth &&
