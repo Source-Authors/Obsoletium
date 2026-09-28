@@ -177,8 +177,19 @@ public:
         }
     };
 
-    Iterator begin() { return Iterator(channels, m_list, 0); }
-    Iterator end()   { return Iterator(channels, m_list, m_count); }
+	CChannelList()
+		: m_count{0},
+		m_hasSpeakerChannels{false},
+		m_hasDryChannels{false},
+		m_has11kChannels{false},
+		m_has22kChannels{false},
+		m_has44kChannels{false} {
+		BitwiseClear( m_list );
+		BitwiseClear( m_quashed );
+	}
+
+	Iterator begin() { return Iterator(channels, m_list, 0); }
+	Iterator end()   { return Iterator(channels, m_list, m_count); }
 
 	int		Count();
 	int		GetChannelIndex( int listIndex );
