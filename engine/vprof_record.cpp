@@ -530,7 +530,9 @@ public:
 		// First test if this tick would go past the number they don't want us to go past.
 		if ( iDontGoPast != -1 && iPlaybackTick > iDontGoPast )
 		{
-			*pWouldHaveGonePast = true;
+			// dimhotepus: Add safe check for nullptr input. 
+			if ( pWouldHaveGonePast )
+				*pWouldHaveGonePast = true;
 			g_pFileSystem->Seek( m_hFile, -5, FILESYSTEM_SEEK_CURRENT );
 			return true;
 		}
