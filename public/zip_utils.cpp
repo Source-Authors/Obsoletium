@@ -1508,13 +1508,8 @@ void CZipFile::SaveToBuffer( CUtlBuffer& buf )
 //-----------------------------------------------------------------------------
 void CZipFile::SaveDirectory( IWriteStream& stream )
 {
-	void *pPaddingBuffer = NULL;
-	if ( m_AlignmentSize )
-	{
-		// get a temp buffer for all padding work
-		pPaddingBuffer = malloc( m_AlignmentSize );
-		memset( pPaddingBuffer, 0x00, m_AlignmentSize );
-	}
+	// get a temp buffer for all padding work
+	void *pPaddingBuffer = m_AlignmentSize ? calloc( m_AlignmentSize, 1 ) : nullptr;
 
 	if ( m_hDiskCacheWriteFile != INVALID_HANDLE_VALUE )
 	{
