@@ -1207,7 +1207,8 @@ CON_COMMAND( kickid, "Kick a player by userid or uniqueid, with a message." )
 			return;
 		}
 
-		if ( iSearchIndex != -1 || !client->IsFakeClient() )
+		// dimhotepus: Check client is set.
+		if ( iSearchIndex != -1 || (client && !client->IsFakeClient()) )
 		{
 			if ( who == NULL )
 			{
@@ -1241,7 +1242,7 @@ CON_COMMAND( kickid, "Kick a player by userid or uniqueid, with a message." )
 		}
 		else
 		{
-			ConMsg( "uniqueid \"%s\" not found\n", szSearchString );			
+			ConMsg( "uniqueid \"%s\" not found\n", szSearchString );
 		}
 	}
 }
