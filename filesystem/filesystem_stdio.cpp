@@ -1314,7 +1314,8 @@ size_t CWin32ReadOnlyFile::FS_fread( OUT_BYTECAP(destSize) void *dest, size_t de
 
 	// some disk drivers will fail if read is too large
 	static int MAX_READ = filesystem_max_stdio_read.GetInt()*1024*1024;
-	const int MIN_READ = 64 * 1024;
+	constexpr int MIN_READ = 64 * 1024;
+
 	bool bReadOk = true;
 	DWORD nBytesRead = 0;
 	size_t result = 0;
