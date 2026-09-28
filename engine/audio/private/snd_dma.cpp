@@ -305,7 +305,12 @@ static CUtlMap< FileNameHandle_t, SfxDictEntry > s_Sounds( 0, 0, DefLessFunc( Fi
 class CDummySfx : public CSfxTable
 {
 public:
-	virtual const char *getname()
+	CDummySfx()
+	{
+		name[0] = '\0';
+	}
+
+	const char *getname() override
 	{
 		return name;
 	}
