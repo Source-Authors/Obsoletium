@@ -1761,7 +1761,10 @@ bool ClientDLL_Load()
 
 	// Load the client render targets interface from the client .dll
 	// NOTE: Its OK if this returns NULL, as some mods won't provide the interface and will just use the default behavior of the engine
-	g_pClientRenderTargets = (IClientRenderTargets *)g_ClientFactory( CLIENTRENDERTARGETS_INTERFACE_VERSION, NULL );
+	// dimhotepus: Check client factory is set.
+	g_pClientRenderTargets = g_ClientFactory
+		? (IClientRenderTargets *)g_ClientFactory( CLIENTRENDERTARGETS_INTERFACE_VERSION, nullptr )
+		: nullptr;
 
 	return true;
 }
