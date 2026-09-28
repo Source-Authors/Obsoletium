@@ -814,12 +814,16 @@ void CNetChan::FlowNewPacket(int flow, int seqnr, int acknr, int nChoked, int nD
 			}
 		}
 
-		pframe->dropped = nDropped;
-		pframe->choked = nChoked;
-		pframe->size = nSize;
-		pframe->valid = true;
-		pframe->avg_latency = GetAvgLatency( FLOW_OUTGOING );
-		pframe->m_flInterpolationAmount = m_flInterpolationAmount;
+		// dimhotepus: Do not deref nullptr.
+		if ( pframe )
+		{
+			pframe->dropped = nDropped;
+			pframe->choked = nChoked;
+			pframe->size = nSize;
+			pframe->valid = true;
+			pframe->avg_latency = GetAvgLatency( FLOW_OUTGOING );
+			pframe->m_flInterpolationAmount = m_flInterpolationAmount;
+		}
 	}
 	else
 	{
