@@ -11,6 +11,9 @@
 #include <cstring>  // strlen
 #include <utility>  // std::to_underlying, std::unreachable
 
+// dimhotepus: Add SAL annotations.
+#include "tier0/annotations.h"
+
 // dimhotepus: Backport from TF2. Detect the architecture we are running on
 #if defined(__aarch64__) || defined(_M_ARM64)
 #define PLATFORM_ARM 1
@@ -492,7 +495,9 @@ constexpr T ClampedArrayElement(const T (&buffer)[N], size_t index) noexcept {
  */
 template <typename T>
 std::enable_if_t<std::is_trivially_copyable_v<T>> BitwiseCopy(
-    const T* src, T* dest, size_t size) noexcept {
+    IN_READS_BYTES(sizeof(T) * size) const T* src,
+    OUT_WRITES_ALL_BYTES(sizeof(T) * size) T* dest,
+    size_t size) noexcept {
   static_assert(sizeof(*src) == sizeof(*dest));
   std::memcpy(dest, src, sizeof(T) * size);
 }
@@ -506,7 +511,8 @@ std::enable_if_t<std::is_trivially_copyable_v<T>> BitwiseCopy(
  */
 template <typename T, size_t size>
 std::enable_if_t<std::is_trivially_copyable_v<T>> BitwiseCopy(
-    const T (&src)[size], T (&dest)[size]) noexcept {
+    IN_READS_BYTES(sizeof(T) * size) const T (&src)[size],
+    OUT_WRITES_ALL_BYTES(sizeof(T) * size) T (&dest)[size]) noexcept {
   std::memcpy(dest, src, sizeof(T) * size);
 }
 
@@ -583,7 +589,7 @@ BitwiseClear(T& src) noexcept {
 template <typename T, size_t size>
 std::enable_if_t<std::is_trivially_copyable_v<T> &&
                  std::is_trivially_constructible_v<T>>
-BitwiseSet(T (&src)[size], unsigned char byte) noexcept {
+BitwiseSet(OUT_WRITES_ALL_BYTES(sizeof(src)) T (&src)[size], unsigned char byte) noexcept {
   std::memset(src, byte, sizeof(src));
 }
 
@@ -597,7 +603,7 @@ BitwiseSet(T (&src)[size], unsigned char byte) noexcept {
 template <typename T, size_t size>
 std::enable_if_t<std::is_trivially_copyable_v<T> &&
                  std::is_trivially_constructible_v<T>>
-BitwiseClear(T (&src)[size]) noexcept {
+BitwiseClear(OUT_WRITES_ALL_BYTES(sizeof(src)) T (&src)[size]) noexcept {
   BitwiseSet(src, 0);
 }
 
@@ -611,7 +617,7 @@ BitwiseClear(T (&src)[size]) noexcept {
 template <typename T>
 std::enable_if_t<std::is_trivially_copyable_v<T> &&
                  std::is_trivially_constructible_v<T>>
-BitwiseClear(T* src, size_t size) noexcept {
+BitwiseClear(OUT_WRITES_ALL_BYTES(size) T* src, size_t size) noexcept {
   assert(sizeof(*src) >= size);
   std::memset(src, 0, size);
 }
