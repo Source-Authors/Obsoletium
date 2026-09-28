@@ -719,8 +719,7 @@ void CZipFile::ParseFromBuffer( void *buffer, int bufferlength )
 	buf.SeekGet( CUtlBuffer::SEEK_HEAD, rec.startOfCentralDirOffset );
 
 	// Allocate space for directory
-	TmpFileInfo_t *newfiles = new TmpFileInfo_t[numzipfiles];
-	Assert( newfiles );
+	auto newfiles = std::make_unique<TmpFileInfo_t[]>( numzipfiles );
 
 	// build directory
 	int i;
@@ -790,9 +789,6 @@ void CZipFile::ParseFromBuffer( void *buffer, int bufferlength )
 		// Add to tree
 		m_Files.Insert( e );
 	}
-
-	// Through away directory
-	delete[] newfiles;
 }
 
 //-----------------------------------------------------------------------------
