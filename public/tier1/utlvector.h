@@ -1208,7 +1208,10 @@ template< typename T, class A >
 void CUtlVector<T, A>::CopyArray( const T *pArray, intp size )
 {
 	// Can't insert something that's in the list... reallocation may hose us
-	Assert( (Base() == NULL) || !pArray || (Base() >= (pArray + size)) || (pArray >= (Base() + Count()) ) ); 
+	// dimhotepus: Fix bug in assert allowing nullptr pArray to bypass.
+	Assert( Base() == nullptr ||
+		( pArray && 
+			( Base() >= ( pArray + size ) || pArray >= ( Base() + Count() ) ) ) );
 
 	SetSize( size );
 	for( intp i=0; i < size; i++ )
