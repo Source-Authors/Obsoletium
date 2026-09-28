@@ -485,9 +485,8 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CZipFile::CZipEntry::CZipEntry( void )
+CZipFile::CZipEntry::CZipEntry( void ) : m_Name( "" )
 {
-	m_Name = "";
 	m_nCompressedSize = 0;
 	m_nUncompressedSize = 0;
 	m_pData = NULL;
