@@ -1084,6 +1084,8 @@ CON_COMMAND( kickid, "Kick a player by userid or uniqueid, with a message." )
 	IClient		*client = NULL;
 	int			iSearchIndex = -1;
 	char		szSearchString[128];
+	// dimhotepus: Add missed init.
+	szSearchString[0] = '\0';
 	int			argsStartNum = 1;
 	bool		bSteamID = false;
 	int			i = 0;
