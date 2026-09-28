@@ -4,10 +4,13 @@
 //
 //=============================================================================//
 
+#include "zip_utils.h"
+
 // If we are going to include windows.h then we need to disable protected_things.h
 // or else we get many warnings.
 #undef PROTECTED_THINGS_ENABLE
-#include <tier0/platform.h>
+#include "tier0/platform.h"
+
 #ifdef IS_WINDOWS_PC
 #include "winlite.h"
 #else
@@ -15,16 +18,16 @@
 #define FILE_BEGIN SEEK_SET
 #define FILE_END SEEK_END
 #endif
+
+#include "tier1/byteswap.h"
+#include "tier1/checksum_crc.h"
+#include "tier1/utlstring.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/utllinkedlist.h"
-#include "zip_utils.h"
-#include "zip_uncompressed.h"
-#include "tier1/checksum_crc.h"
-#include "tier1/byteswap.h"
-#include "tier1/utlstring.h"
-#include "posix_file_stream.h"
-
 #include "tier1/lzmaDecoder.h"
+
+#include "zip_uncompressed.h"
+#include "posix_file_stream.h"
 
 // Not every user of zip utils wants to link LZMA encoder
 #ifdef ZIP_SUPPORT_LZMA_ENCODE
