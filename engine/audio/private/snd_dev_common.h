@@ -10,7 +10,11 @@
 
 class CAudioDeviceBase : public IAudioDevice
 {
-public:	
+public:
+	CAudioDeviceBase()
+		: m_bSurround{false}, m_bSurroundCenter{false}, m_bHeadphone{false}
+	{}
+
 	virtual bool		IsActive( void ) { return false; }
 	virtual bool		Init( void ) { return false; }
 	virtual void		Shutdown( void ) {}
