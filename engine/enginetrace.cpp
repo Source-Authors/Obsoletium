@@ -1350,7 +1350,7 @@ void EngineTraceRenderRayCasts()
 #if defined _DEBUG && !defined SWDS
 	if( debugrayenable.GetBool() && s_FrameRays.Count() > debugraylimit.GetInt() && !debugrayreset.GetInt() )
 	{
-		Warning( "m_FrameRays.Count() == %d\n", s_FrameRays.Count() );
+		Warning( "m_FrameRays.Count() == %zd\n", s_FrameRays.Count() );
 		debugrayreset.SetValue( 1 );
 		int i;
 		for( i = 0; i < s_FrameRays.Count(); i++ )

@@ -47,7 +47,7 @@ CFrameSnapshotManager::~CFrameSnapshotManager( void )
 	AssertMsg1( m_FrameSnapshots.Count() == 0 || IsInErrorExit(), "Expected m_FrameSnapshots to be empty. It had %i items.", m_FrameSnapshots.Count() );
 
 	// TODO: This assert has been failing. HenryG says it's a valid assert and that we're probably leaking memory.
-	AssertMsg1( m_PackedEntitiesPool.Count() == 0 || IsInErrorExit(), "Expected m_PackedEntitiesPool to be empty. It had %i items.", m_PackedEntitiesPool.Count() );
+	AssertMsg1( m_PackedEntitiesPool.Count() == 0 || IsInErrorExit(), "Expected m_PackedEntitiesPool to be empty. It had %zd items.", m_PackedEntitiesPool.Count() );
 }
 
 //-----------------------------------------------------------------------------

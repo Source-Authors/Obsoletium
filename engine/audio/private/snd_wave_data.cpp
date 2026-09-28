@@ -1546,7 +1546,7 @@ void CAsyncWavDataCache::SpewMemoryUsage( int level )
 
 	float percent = 100.0f * (float)bytesUsed / (float)bytesTotal;
 
-	Msg( "CAsyncWavDataCache:  %zu .wavs total %s, %.2f %% of capacity\n",
+	Msg( "CAsyncWavDataCache:  %d .wavs total %s, %.2f %% of capacity\n",
 		m_CacheHandles.Count(), Q_pretifymem( bytesUsed, 2 ), percent );
 
 	if ( level >= 1 )
@@ -1572,7 +1572,7 @@ void CAsyncWavDataCache::SpewMemoryUsage( int level )
 				Msg( "\t%16.16s : %s\n", "not resident",name);
 			}
 		}
-		Msg( "CAsyncWavDataCache:  %zu .wavs total %s, %.2f %% of capacity\n",
+		Msg( "CAsyncWavDataCache:  %d .wavs total %s, %.2f %% of capacity\n",
 			m_CacheHandles.Count(), Q_pretifymem( bytesUsed, 2 ), percent );
 	}
 }

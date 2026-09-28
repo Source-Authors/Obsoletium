@@ -1765,7 +1765,7 @@ int CNetChan::SendDatagram(bf_write *datagram)
 			Q_snprintf( comp, sizeof( comp ), " compression=%5u [%5.2f %%]", bytesSent, 100.0f * float( bytesSent ) / float( send.GetNumBytesWritten() ) );
 		}
 	
-		ConMsg ("UDP -> %12.12s: sz=%5i seq=%5i ack=%5i rel=%1i ch=%1i tm=%f rt=%f%s\n"
+		ConMsg ("UDP -> %12.12s: sz=%5zd seq=%5i ack=%5i rel=%1i ch=%1i tm=%f rt=%f%s\n"
 			, GetName()
 			, send.GetNumBytesWritten()
 			, ( m_nOutSequenceNr ) & mask

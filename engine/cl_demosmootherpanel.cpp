@@ -2413,7 +2413,7 @@ void CDemoSmootherPanel::OnGotoFrame()
 		if ( !m_bHasSelection )
 		{
 			m_pStartFrame->SetText( va( "%i", 0 ) );
-			m_pEndFrame->SetText( va( "%i", c - 1 ) );
+			m_pEndFrame->SetText( va( "%zd", c - 1 ) );
 			OnSelect();
 		}
 		OnPreview( false );

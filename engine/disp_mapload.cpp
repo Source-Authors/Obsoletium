@@ -573,7 +573,7 @@ bool DispInfo_LoadDisplacements( model_t *pWorld, bool bRestoring )
 
 		ErrorIfNot(
 			g_DispLMAlpha.Count() == nLuxels,
-			("DispInfo_LoadDisplacements: lightmap alpha counts (%d and %d) don't match.", g_DispLMAlpha.Count(), nLuxels)
+			("DispInfo_LoadDisplacements: lightmap alpha counts (%zd and %d) don't match.", g_DispLMAlpha.Count(), nLuxels)
 			);
 	}
 	else

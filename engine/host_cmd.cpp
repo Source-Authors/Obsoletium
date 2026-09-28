@@ -2186,6 +2186,6 @@ CON_COMMAND( fs_find, "Run virtual filesystem find" )
 		matches++;
 	}
 
-	ConMsg( "  %u matching files/directories\n", matches );
+	ConMsg( "  %zu matching files/directories\n", matches );
 }
 #endif // defined( STAGING_ONLY ) || defined( _DEBUG )

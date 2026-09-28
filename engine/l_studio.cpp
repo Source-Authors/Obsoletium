@@ -4385,7 +4385,7 @@ void CModelRender::PurgeCachedStaticPropColorData( void )
 	GetCacheSection()->GetStatus( &status );
 	if ( status.nBytes )
 	{
-		DevWarning( "CModelRender: ColorMesh %d bytes failed to flush!\n", status.nBytes );
+		DevWarning( "CModelRender: ColorMesh %zu bytes failed to flush!\n", status.nBytes );
 	}
 
 	m_colorMeshVBAllocator.Clear();
