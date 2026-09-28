@@ -456,7 +456,7 @@ Log_Printf
 Prints a log message to the server's log file, console, and possible a UDP address
 ==================
 */
-void CLog::Printf( const char *fmt, ... )
+void CLog::Printf( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list			argptr;
 	static char		string[1024];

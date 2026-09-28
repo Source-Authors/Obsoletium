@@ -753,7 +753,7 @@ bool Con_IsVisible()
 	return (EngineVGui()->IsConsoleVisible());	
 }
 
-void Con_NPrintf( int idx, const char *fmt, ... )
+void Con_NPrintf( int idx, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list argptr; 
 	char outtext[MAXPRINTMSG];
@@ -765,7 +765,7 @@ void Con_NPrintf( int idx, const char *fmt, ... )
 	g_pConPanel->Con_NPrintf( idx, outtext );
 }
 
-void Con_NXPrintf( const struct con_nprint_s *info, const char *fmt, ... )
+void Con_NXPrintf( const struct con_nprint_s *info, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list argptr; 
 	char outtext[MAXPRINTMSG];

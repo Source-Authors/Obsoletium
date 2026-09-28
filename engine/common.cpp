@@ -799,13 +799,13 @@ char *COM_StringCopy(IN_Z const char *in)
 	return V_strdup(in);
 }
 
-void COM_StringFree(IN_Z const char *in)
+void COM_StringFree( IN_Z const char *in )
 {
 	delete [] in;
 }
 
 
-void COM_SetupLogDir( IN_Z const char *mapname )
+void COM_SetupLogDir( IN_OPT_Z const char *mapname )
 {
 	char gameDir[MAX_OSPATH];
 	COM_GetGameDir( gameDir );

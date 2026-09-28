@@ -110,7 +110,7 @@ byte* COM_LoadFile (IN_Z const char *path, int usehunk, int *pLength);
 void COM_CopyFileChunk( FileHandle_t dst, FileHandle_t src, int nSize );
 bool COM_CopyFile( IN_Z const char *pSourcePath, IN_Z const char *pDestPath );
 
-void COM_SetupLogDir( IN_Z const char *mapname );
+void COM_SetupLogDir( IN_OPT_Z const char *mapname );
 void COM_GetGameDir( OUT_Z_CAP(maxlen) char *szGameDir, int maxlen );
 template<int maxlen>
 void COM_GetGameDir( OUT_Z_ARRAY char (&szGameDir)[maxlen] )

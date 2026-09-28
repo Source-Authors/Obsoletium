@@ -686,7 +686,7 @@ void CGameClient::Reconnect( void )
 	CBaseClient::Reconnect();
 }
 
-void CGameClient::Disconnect( const char *fmt, ... )
+void CGameClient::Disconnect( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list		argptr;
 	char		reason[1024];

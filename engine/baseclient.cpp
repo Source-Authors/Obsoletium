@@ -1095,7 +1095,7 @@ void CBaseClient::EndTrace( bf_write &msg )
 	m_iTracing = 0;
 }
 
-void CBaseClient::TraceNetworkData( bf_write &msg, char const *fmt, ... )
+void CBaseClient::TraceNetworkData( bf_write &msg, PRINTF_FORMAT_STRING char const *fmt, ... )
 {
 	if ( !IsTracing() )
 		return;
@@ -1113,7 +1113,7 @@ void CBaseClient::TraceNetworkData( bf_write &msg, char const *fmt, ... )
 	m_Trace.m_nCurBit = msg.GetNumBitsWritten();
 }
 
-void CBaseClient::TraceNetworkMsg( int nBits, char const *fmt, ... )
+void CBaseClient::TraceNetworkMsg( int nBits, PRINTF_FORMAT_STRING char const *fmt, ... )
 {
 	if ( !IsTracing() )
 		return;
