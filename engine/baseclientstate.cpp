@@ -475,12 +475,6 @@ bool CBaseClientState::SetSignonState ( int state, int count )
 			g_pClientReplayContext->OnSignonStateFull();
 		}
 #endif
-
-		if ( IsX360() && 
-			g_pMatchmaking->PreventFullServerStartup() )
-		{
-			return true;
-		}
 	}
 
 	m_nSignonState = state;
