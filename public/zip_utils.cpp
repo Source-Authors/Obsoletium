@@ -691,7 +691,7 @@ void CZipFile::ParseFromBuffer( void *buffer, int bufferlength )
 			if ( rec.commentLength )
 			{
 				char commentString[128] = { 0 };
-				int commentLength = min( (int)rec.commentLength, (int)sizeof( commentString ) );
+				unsigned short commentLength = min( rec.commentLength, (unsigned short)sizeof( commentString ) );
 				buf.Get( commentString, commentLength );
 				if ( commentLength == sizeof( commentString ) )
 					--commentLength;
@@ -737,8 +737,8 @@ void CZipFile::ParseFromBuffer( void *buffer, int bufferlength )
 		}
 
 		char tmpString[MAX_PATH] = { 0 };
-		buf.Get( tmpString, Min( (unsigned int)zipFileHeader.fileNameLength, (unsigned int)sizeof( tmpString ) ) );
-		Q_strlower( tmpString );
+		buf.Get( tmpString, min( zipFileHeader.fileNameLength, (unsigned short)sizeof( tmpString ) ) );
+		V_strlower( tmpString );
 
 		// can determine actual filepos, assuming a well formed zip
 		newfiles[i].m_Name = tmpString;
@@ -885,7 +885,7 @@ HANDLE CZipFile::ParseFromDisk( const char *pFilename )
 		}
 
 		char fileName[MAX_PATH] = { 0 };
-		zipDirBuff.Get( fileName, Min( (size_t)zipFileHeader.fileNameLength, sizeof( fileName ) - 1 ) );
+		zipDirBuff.Get( fileName, min( zipFileHeader.fileNameLength, (unsigned short)(sizeof( fileName ) - 1 )) );
 		V_strlower( fileName );
 
 		// can determine actual filepos, assuming a well formed zip
