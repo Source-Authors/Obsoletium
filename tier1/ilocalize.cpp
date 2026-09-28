@@ -165,7 +165,7 @@ const wchar_t *GetTypedKeyValuesString<wchar_t>( KeyValues *pKeyValues, const ch
 }
 
 template < typename T >
-void ConstructStringKeyValuesInternal_Impl( T *unicodeOutput, intp unicodeBufferSizeInBytes, const T *formatString, KeyValues *localizationVariables )
+void ConstructStringKeyValuesInternal_Impl( OUT_Z_BYTECAP(unicodeBufferSizeInBytes) T *unicodeOutput, intp unicodeBufferSizeInBytes, const T *formatString, KeyValues *localizationVariables )
 {
 	T *outputPos = unicodeOutput;
 
