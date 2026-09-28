@@ -402,7 +402,8 @@ public:
 
 	void			ForceAlignment( bool aligned, bool bCompatibleFormat, unsigned int alignmentSize );
 
-	unsigned int	GetAlignment();
+	// dimhotepus: Mark as const.
+	unsigned int	GetAlignment() const;
 
 	void			SetBigEndian( bool bigEndian );
 	void			ActivateByteSwapping( bool bActivate );
@@ -624,7 +625,8 @@ void CZipFile::ForceAlignment( bool bAligned, bool bCompatibleFormat, unsigned i
 	}
 }
 
-unsigned int CZipFile::GetAlignment()
+// dimhotepus: Mark as const.
+unsigned int CZipFile::GetAlignment() const
 {
 	if ( !m_bForceAlignment || !m_AlignmentSize )
 	{
@@ -801,7 +803,7 @@ HANDLE CZipFile::ParseFromDisk( const char *pFilename )
 	{
 		// not found
 		return nullptr;
-	}	
+	}
 
 	unsigned int fileLen = CWin32File::FileSeek( hFile, 0, FILE_END );
 	CWin32File::FileSeek( hFile, 0, FILE_BEGIN );
