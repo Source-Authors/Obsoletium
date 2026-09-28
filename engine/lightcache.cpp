@@ -2969,7 +2969,8 @@ public:
 	}
 
 private:
-	int m_nLightID;
+	// dimhotepus: default -1
+	int m_nLightID{-1};
 };
 
 static MarkStaticPropLightsEmumerator s_MarkStaticPropLightsEnumerator;
