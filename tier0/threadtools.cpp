@@ -612,7 +612,7 @@ CThreadEvent::CThreadEvent( bool bManualReset )
 #ifdef _WIN32
     m_hSyncObject = CreateEvent( nullptr, bManualReset, FALSE, nullptr );
 	m_bCreatedHandle = true;
-    AssertMsg1(m_hSyncObject, "Failed to create event: %s",
+    AssertMsg(m_hSyncObject, "Failed to create event: %s",
 		std::system_category().message(::GetLastError()).c_str() );
 #elif defined( POSIX )
     pthread_mutexattr_t Attr;
@@ -713,7 +713,7 @@ CThreadSemaphore::CThreadSemaphore( long initialValue, long maxValue )
 
 		m_hSyncObject = CreateSemaphore( nullptr, initialValue, maxValue, nullptr );
 
-		AssertMsg1(m_hSyncObject, "Failed to create semaphore: %s",
+		AssertMsg(m_hSyncObject, "Failed to create semaphore: %s",
 			std::system_category().message(::GetLastError()).c_str() );
 	}
 	else
@@ -740,7 +740,7 @@ CThreadFullMutex::CThreadFullMutex( bool bEstablishInitialOwnership, const char 
 {
    m_hSyncObject = CreateMutex( nullptr, bEstablishInitialOwnership, pszName );
 
-   AssertMsg1( m_hSyncObject, "Failed to create mutex: %s",
+   AssertMsg( m_hSyncObject, "Failed to create mutex: %s",
 	   std::system_category().message(::GetLastError()).c_str() );
 }
 
@@ -1689,7 +1689,7 @@ bool CThread::Start( unsigned nBytesStack )
 														&m_threadId );
 	if ( !hThread )
 	{
-		AssertMsg1( 0, "Failed to create thread: %s",
+		AssertMsg( 0, "Failed to create thread: %s",
 			std::system_category().message(::GetLastError()).c_str() );
 		return false;
 	}
