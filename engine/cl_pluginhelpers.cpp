@@ -324,7 +324,9 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: constructor
 //-----------------------------------------------------------------------------
-CPluginHudMessage::CPluginHudMessage( vgui::VPANEL parent ) : vgui::Frame( NULL, "PluginHudMessage" ) 
+CPluginHudMessage::CPluginHudMessage( vgui::VPANEL parent )
+	: vgui::Frame( NULL, "PluginHudMessage" ),
+	m_bHidingControl( false )
 {
 	SetParent( parent );
 	SetVisible( false );
