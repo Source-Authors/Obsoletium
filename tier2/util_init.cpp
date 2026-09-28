@@ -17,7 +17,7 @@ namespace {
 void PrintFReportHandler(char const *job_name, int total_units_to_do, int n_units_completed)
 {
 	static bool work_in_progress=false;
-	static char LastJobName[1024];
+	static char LastJobName[1024] = {};
 	if ( Q_strncmp( LastJobName, job_name, sizeof( LastJobName ) ) )
 	{
 		if ( work_in_progress )
