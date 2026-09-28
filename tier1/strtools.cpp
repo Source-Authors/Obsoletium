@@ -826,6 +826,8 @@ void V_strncpy( OUT_Z_CAP(maxLenInChars) char *pDest, IN_Z char const *pSrc, int
 
 void V_wcsncpy( OUT_Z_BYTECAP(maxLenInBytes) wchar_t *pDest, IN_Z wchar_t const *pSrc, intp maxLenInBytes )
 {
+	// dimhotepus: Check we have room at least for L'\0'.
+	Assert( maxLenInBytes == 0 || maxLenInBytes >= static_cast<intp>(sizeof(wchar_t)) );
 	AssertValidWritePtr( pDest, maxLenInBytes );
 	AssertValidReadPtr( pSrc );
 
