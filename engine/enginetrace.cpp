@@ -1952,8 +1952,8 @@ public:
 		return true;
 	}
 
-	ICollideable *m_pClosest;
-	float m_flClosestDist;
+	ICollideable* m_pClosest{nullptr};
+	float m_flClosestDist{FLT_MAX};
 
 
 };
