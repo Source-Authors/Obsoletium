@@ -197,8 +197,13 @@ void CMemoryStack::FreeToAllocPoint( MemoryStackMark_t mark, bool bDecommit )
 			if ( decommitSize > 0 )
 			{
 				MemAlloc_RegisterExternalDeallocation( CMemoryStack, GetBase(), GetSize() );
-
+				
+				// dimhotepus: We release memory on termination.
+MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+MSVC_DISABLE_WARNING(6250)
 				VirtualFree( pDecommitPoint, decommitSize, MEM_DECOMMIT );
+MSVC_END_WARNING_OVERRIDE_SCOPE()
+
 				m_pCommitLimit = pDecommitPoint;
 
 				if ( mark > 0 )
@@ -223,7 +228,12 @@ void CMemoryStack::FreeAll( bool bDecommit )
 #if defined(_WIN32)
 			MemAlloc_RegisterExternalDeallocation( CMemoryStack, GetBase(), GetSize() );
 
+			// dimhotepus: We release memory on termination.
+MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+MSVC_DISABLE_WARNING(6250)
 			VirtualFree( m_pBase, m_pCommitLimit - m_pBase, MEM_DECOMMIT );
+MSVC_END_WARNING_OVERRIDE_SCOPE()
+
 			m_pCommitLimit = m_pBase;
 #endif
 		}
