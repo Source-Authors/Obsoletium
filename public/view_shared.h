@@ -74,7 +74,7 @@ public:
 		m_bDoBloomAndToneMapping = true;
 
 		m_bCacheFullSceneState = false;
-        m_bViewToProjectionOverride = false;
+		m_bViewToProjectionOverride = false;
 	}
 
 // shared by 2D & 3D views
