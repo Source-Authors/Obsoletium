@@ -4056,14 +4056,12 @@ void SND_RecordBuffer( void )
 	if ( !SND_IsRecording() )
 		return;
 
-	int		i;
-	int		val;
-	int		bufferSize = snd_linear_count * sizeof(short);
-	short	*tmp = (short *)_alloca( bufferSize );
+	const int bufferSize = snd_linear_count * sizeof(short);
+	short	*tmp = stackallocT( short, snd_linear_count );
 	
-	for (i=0 ; i<snd_linear_count ; i+=2)
+	for (int i=0 ; i<snd_linear_count ; i+=2)
 	{
-		val = (snd_p[i]*snd_vol)>>8;
+		int val = (snd_p[i]*snd_vol)>>8;
 		tmp[i] = CLIP(val);
 		
 		val = (snd_p[i+1]*snd_vol)>>8;
