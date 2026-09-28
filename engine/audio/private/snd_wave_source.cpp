@@ -2399,54 +2399,57 @@ void CAudioSourceCache::BuildCache( char const *pszSearchPath )
 		m_vecCaches.AddToTail( pCache );
 	}
 
-	g_pFullFileSystem->AddSearchPath( szAbsPath, "game", PATH_ADD_TO_HEAD );
-	intp nLenAbsPath = V_strlen( szAbsPath );
-	intp iLastShownPct = -1;
-	FOR_EACH_VEC( vecFilenames, idxFilename )
 	{
-		const char *pszFilename = vecFilenames[ idxFilename ];
-		if ( V_strnicmp( pszFilename, szAbsPath, nLenAbsPath ) != 0 )
-		{
-			Warning( "Sound %s doesn't begin with search path %s\n", pszFilename, szAbsPath );
-			Assert( false );
-			continue;
-		}
-		const char *pszRelName = pszFilename + nLenAbsPath;
-		if ( *pszRelName == '/' || *pszRelName == '\\' )
-			++pszRelName;
-		if ( V_strnicmp( pszRelName, "sound" CORRECT_PATH_SEPARATOR_S, 6 ) != 0 )
-		{
-			Warning( "Relative name %s doesn't begin with leading 'sound' directory?\n", pszRelName );
-			Assert( false );
-			continue;
-		}
-		const char *pszName = pszRelName + 6;
+		g_pFullFileSystem->AddSearchPath( szAbsPath, "game", PATH_ADD_TO_HEAD );
+		RunCodeAtScopeExit(	g_pFullFileSystem->RemoveSearchPath( szAbsPath, "game" ) );
 
-		// Show progress
-		intp iPct = idxFilename * 100 / vecFilenames.Count();
-		if ( iPct != iLastShownPct )
+		intp nLenAbsPath = V_strlen( szAbsPath );
+		intp iLastShownPct = -1;
+		FOR_EACH_VEC( vecFilenames, idxFilename )
 		{
-			Msg( "  %3zd%% %s\n", iPct, pszName );
-			iLastShownPct = iPct;
-		}
+			const char *pszFilename = vecFilenames[ idxFilename ];
+			if ( V_strnicmp( pszFilename, szAbsPath, nLenAbsPath ) != 0 )
+			{
+				Warning( "Sound %s doesn't begin with search path %s\n", pszFilename, szAbsPath );
+				Assert( false );
+				continue;
+			}
+			const char *pszRelName = pszFilename + nLenAbsPath;
+			if ( *pszRelName == '/' || *pszRelName == '\\' )
+				++pszRelName;
+			if ( V_strnicmp( pszRelName, "sound" CORRECT_PATH_SEPARATOR_S, 6 ) != 0 )
+			{
+				Warning( "Relative name %s doesn't begin with leading 'sound' directory?\n", pszRelName );
+				Assert( false );
+				continue;
+			}
+			const char *pszName = pszRelName + 6;
 
-		CAudioSourceCachedInfo::s_bIsPrecacheSound = true;
-		CAudioSourceCachedInfo::s_CurrentType = CAudioSource::AUDIO_SOURCE_WAV;
-		char szExt[ 10 ] = { 0 };
-		V_ExtractFileExtension( pszFilename, szExt );
-		if ( V_strieq( szExt, "mp3" ) )
-		{
-			CAudioSourceCachedInfo::s_CurrentType = CAudioSource::AUDIO_SOURCE_MP3;
-		}
-		CAudioSourceCachedInfo::s_pSfx = S_DummySfx( pszName );
+			// Show progress
+			intp iPct = idxFilename * 100 / vecFilenames.Count();
+			if ( iPct != iLastShownPct )
+			{
+				Msg( "  %3zd%% %s\n", iPct, pszName );
+				iLastShownPct = iPct;
+			}
 
-		const CAudioSourceCachedInfo *pInfo = pCache->Get( pszRelName );
-		if ( !pInfo )
-		{
-			Warning( "Failed to cache info for %s\n", pszFilename );
+			CAudioSourceCachedInfo::s_bIsPrecacheSound = true;
+			CAudioSourceCachedInfo::s_CurrentType = CAudioSource::AUDIO_SOURCE_WAV;
+			char szExt[ 10 ] = { 0 };
+			V_ExtractFileExtension( pszFilename, szExt );
+			if ( V_strieq( szExt, "mp3" ) )
+			{
+				CAudioSourceCachedInfo::s_CurrentType = CAudioSource::AUDIO_SOURCE_MP3;
+			}
+			CAudioSourceCachedInfo::s_pSfx = S_DummySfx( pszName );
+
+			const CAudioSourceCachedInfo *pInfo = pCache->Get( pszRelName );
+			if ( !pInfo )
+			{
+				Warning( "Failed to cache info for %s\n", pszFilename );
+			}
 		}
 	}
-	g_pFullFileSystem->RemoveSearchPath( szAbsPath, "game" );
 
 	if ( pCache->IsDirty() )
 	{
@@ -2472,7 +2475,7 @@ CON_COMMAND( snd_buildcache, "<directory or VPK filename>  Rebulds sound cache f
 		return;
 	}
 
-	// Allow them to eitehr specify multiple args, or comma-seperated list.
+	// Allow them to either specify multiple args, or comma-seperated list.
 	// You cannot easily pas multiple args on the (OS) command line.
 	for ( int idxArg = 1 ; idxArg < args.ArgC() ; ++idxArg )
 	{
