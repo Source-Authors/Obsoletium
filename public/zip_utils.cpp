@@ -886,7 +886,7 @@ HANDLE CZipFile::ParseFromDisk( const char *pFilename )
 
 		char fileName[MAX_PATH] = { 0 };
 		zipDirBuff.Get( fileName, Min( (size_t)zipFileHeader.fileNameLength, sizeof( fileName ) - 1 ) );
-		Q_strlower( fileName );
+		V_strlower( fileName );
 
 		// can determine actual filepos, assuming a well formed zip
 		CZipEntry e;
@@ -1156,9 +1156,9 @@ bool CZipFile::ReadFileFromZip( const char *pRelativeName, bool bTextMode, CUtlB
 bool CZipFile::ReadFileFromZip( HANDLE hZipFile, const char *pRelativeName, bool bTextMode, CUtlBuffer &buf )
 {
 	// Lower case only
-	char pName[512];
-	Q_strncpy( pName, pRelativeName, 512 );
-	Q_strlower( pName );
+	char pName[MAX_FILEPATH];
+	V_strcpy_safe( pName, pRelativeName );
+	V_strlower( pName );
 
 	// See if entry is in list already
 	CZipEntry e;
