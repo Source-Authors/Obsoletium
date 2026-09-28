@@ -1757,9 +1757,12 @@ void CBugUIPanel::OnSubmit()
 	char driverinfo[ 2048 ];
 
 	char const *dxlevel = "Unk";
+	int nDxLevel = 0;
 	if ( g_pMaterialSystemHardwareConfig )
 	{
-		dxlevel = COM_DXLevelToString( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() ) ;
+		// dimhotepus: init dx level int and string in the same place.
+		nDxLevel = g_pMaterialSystemHardwareConfig->GetDXSupportLevel();
+		dxlevel = COM_DXLevelToString( nDxLevel ) ;
 	}
 
 	char osversion[ 256 ];
@@ -1982,7 +1985,6 @@ void CBugUIPanel::OnSubmit()
 
 	m_pBugReporter->SetProcessor( pi.m_szProcessorID );
 
-	int nDxLevel = g_pMaterialSystemHardwareConfig->GetDXSupportLevel();
 	int vHigh = nDxLevel / 10;
 	int vLow = nDxLevel - vHigh * 10;
 
