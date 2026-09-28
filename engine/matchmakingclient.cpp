@@ -390,7 +390,7 @@ void CMatchmaking::JoinInviteSession( XSESSION_INFO *pHostInfo )
 			}
 		}
 		// otherwise fall through to join
-
+		[[fallthrough]];
 	case INVITE_PENDING:
 		// While the invite is pending and user changed an invite, obey the user
 		if ( pHostInfo != &m_InviteSessionInfo )
@@ -406,7 +406,7 @@ void CMatchmaking::JoinInviteSession( XSESSION_INFO *pHostInfo )
 		// Accept the invite right away
 		m_InviteState = INVITE_ACCEPTING;
 		// fall through
-
+		[[fallthrough]];
 	case INVITE_ACCEPTING:
 		// Everything will finish this frame
 		Msg( "[JoinInviteSession:INVITE_ACCEPTING] Accepting the invite.\n" );

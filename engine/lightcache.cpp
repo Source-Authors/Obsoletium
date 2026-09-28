@@ -1112,6 +1112,7 @@ static float LightIntensityAndDirectionInBox( dworldlight_t* pLight,
 				if ( !IsSphereIntersectingCone( mid, sphereRadius, pLight->origin, pLight->normal, sinAngle, pLight->stopdot2 ) )
 					return 0;
 			}
+			[[fallthrough]];
 			// NOTE: fall through to radius check in point case
 		case emit_point:
 			{
