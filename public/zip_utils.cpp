@@ -297,7 +297,8 @@ abstract_class IWriteStream
 {
 public:
 	virtual void Put( const void* pMem, unsigned size ) = 0;
-	virtual unsigned Tell( void ) = 0;
+	// dimhotepus: Add const.
+	[[nodiscard]] virtual unsigned Tell() const = 0;
 };
 
 //-----------------------------------------------------------------------------
@@ -306,16 +307,18 @@ public:
 class CBufferStream final : public IWriteStream
 {
 public:
-	CBufferStream( CUtlBuffer& buff ) : IWriteStream(), m_buff( &buff ) {}
+	explicit CBufferStream( CUtlBuffer& buff ) : m_buff( buff ) {}
 
 	// Implementing IWriteStream method
-	void Put( const void* pMem, unsigned size ) override {m_buff->Put( pMem, size );}
+	void Put( const void* pMem, unsigned size ) override { m_buff.Put( pMem, size ); }
 
 	// Implementing IWriteStream method
-	unsigned Tell() override { return m_buff->TellPut(); }
+	// dimhotepus: Add const.
+	[[nodiscard]] unsigned Tell() const override { return m_buff.TellPut(); }
 
 private:
-	CUtlBuffer *m_buff;
+	// dimhotepus: Use reference instead of pointer.
+	CUtlBuffer &m_buff;
 };
 
 //-----------------------------------------------------------------------------
@@ -333,7 +336,8 @@ public:
 	}
 
 	// Implementing IWriteStream method
-	unsigned Tell( void ) override
+	// dimhotepus: Add const.
+	unsigned Tell() const override
 	{ 
 		return CWin32File::FileTell( m_hFile );
 	}
