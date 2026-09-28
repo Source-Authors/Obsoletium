@@ -430,6 +430,11 @@ CpuCoreInfo GetProcessorCoresInfo( bool is_popcnt_supported )
 	auto *buffer =
 		static_cast<SYSTEM_LOGICAL_PROCESSOR_INFORMATION*>(
 			::HeapAlloc( heap, 0, size ) );
+	if ( !buffer )
+	{
+		// Allocation failure.
+		return { 1, 1 };
+	}
 
 	while ( true )
 	{
