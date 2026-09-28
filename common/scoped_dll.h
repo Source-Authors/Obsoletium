@@ -13,6 +13,7 @@
 #ifdef _WIN32
 
 #include <sal.h>
+#include <specstrings.h>
 
 FORWARD_DECLARE_HANDLE(HINSTANCE);
 using HMODULE = HINSTANCE;
@@ -28,7 +29,9 @@ __declspec(dllimport) int __stdcall FreeLibrary(_In_ HMODULE hLibModule);
 __declspec(dllimport) FARPROC __stdcall GetProcAddress(
     _In_ HMODULE hModule, _In_ const char *lpProcName);
 
-__declspec(dllimport) _Check_return_ unsigned long __stdcall GetLastError();
+__declspec(dllimport) 
+_Check_return_
+_Post_equals_last_error_ unsigned long __stdcall GetLastError();
 
 }  // extern "C"
 
