@@ -200,7 +200,9 @@ class CAudioXAudio2 : public CAudioDeviceBase, AudioXAudio2Callback {
  public:
   friend IAudioDevice * ::Audio_CreateXAudioDevice();
 
-  CAudioXAudio2() : xaudio2_voice_callback_{this} {}
+  CAudioXAudio2() : xaudio2_voice_callback_{this} {
+    BitwiseClear(audio_buffers_);
+  }
   CAudioXAudio2(CAudioXAudio2 &) = delete;
   CAudioXAudio2 &operator=(CAudioXAudio2 &) = delete;
   ~CAudioXAudio2() = default;
@@ -236,27 +238,27 @@ class CAudioXAudio2 : public CAudioDeviceBase, AudioXAudio2Callback {
       unsigned char *out_buffer);
 
   // Channels per hardware output buffer (6 for 5.1, 2 for stereo)
-  unsigned short device_channels_count_;
+  unsigned short device_channels_count_{0};
   // Bits per sample (16).
-  unsigned short device_bits_per_sample_;
+  unsigned short device_bits_per_sample_{0};
   // Count of mono samples in output buffer.
-  unsigned device_samples_count_;
+  unsigned device_samples_count_{0};
   // Samples per second per output buffer.
-  unsigned device_sample_rate_;
+  unsigned device_sample_rate_{0};
 
-  unsigned device_clock_divider_;
+  unsigned device_clock_divider_{0};
 
   se::win::com::com_ptr<IMMDeviceEnumerator> mm_device_enumerator_;
   se::win::com::com_ptr<IMMNotificationClient> mm_notification_client_;
 
   se::win::com::com_ptr<IXAudio2> xaudio2_engine_;
-  IXAudio2MasteringVoice *xaudio2_mastering_voice_;
-  IXAudio2SourceVoice *xaudio2_source_voice_;
+  IXAudio2MasteringVoice* xaudio2_mastering_voice_{nullptr};
+  IXAudio2SourceVoice *xaudio2_source_voice_{nullptr};
 
   XAUDIO2_BUFFER audio_buffers_[kMaxXAudio2DeviceBuffersCount];
-  BYTE *all_audio_buffers_;
+  BYTE* all_audio_buffers_{nullptr};
   // Size of a single hardware output buffer, in bytes.
-  unsigned audio_buffer_size_;
+  unsigned audio_buffer_size_{0};
 
   CInterlockedUInt audio_buffer_tail_pos_;
   CInterlockedUInt audio_buffer_head_pos_;
