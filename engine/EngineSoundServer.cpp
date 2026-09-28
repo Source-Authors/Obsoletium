@@ -150,21 +150,20 @@ CEngineSoundServer::~CEngineSoundServer()
 //-----------------------------------------------------------------------------
 bool CEngineSoundServer::PrecacheSound( const char *pSample, bool bPreload, bool bIsUISound )
 {
-	int		i;
-
 	if ( pSample && TestSoundChar( pSample, CHAR_SENTENCE ) )
 	{
 		return true;
 	}
 
-	if ( pSample[0] <= ' ' )
+	// dimhotepus: Check sample is set.
+	if ( pSample && pSample[0] <= ' ' )
 	{
 		Host_Error( "CEngineSoundServer::PrecacheSound:  Bad string: %s", pSample );
 	}
 	
 	// add the sound to the precache list
 	// Start at 1, since 0 is used to indicate an error in the sound precache
-	i = SV_FindOrAddSound( pSample, bPreload );
+	int i = SV_FindOrAddSound( pSample, bPreload );
 	if ( i >= 0 )
 		return true;
 
