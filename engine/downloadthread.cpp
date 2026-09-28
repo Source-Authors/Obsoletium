@@ -417,6 +417,9 @@ DWORD __stdcall DownloadThread( void *voidPtr )
 				rc.cachedTimestamp, rc.nBytesCached );
 		}
 		headerPtr = headers;
+		// If this parameter is -1L and lpszHeaders is not NULL,
+		// lpszHeaders is assumed to be zero-terminated (ASCIIZ)
+		// and the length is calculated.
 		headerLen = (DWORD)-1L; // the DWORD cast is because we get a signed/unsigned mismatch even with an L on the -1.
 		//Thread_DPrintf( "Requesting partial download\n%s", headers );
 	}
@@ -424,6 +427,9 @@ DWORD __stdcall DownloadThread( void *voidPtr )
 	{
 		V_sprintf_safe( headers, "Referer: hl2://%s\n", rc.serverURL );
 		headerPtr = headers;
+		// If this parameter is -1L and lpszHeaders is not NULL,
+		// lpszHeaders is assumed to be zero-terminated (ASCIIZ)
+		// and the length is calculated.
 		headerLen = (DWORD)-1L; // the DWORD cast is because we get a signed/unsigned mismatch even with an L on the -1.
 		//Thread_DPrintf( "Requesting full download\n%s", headers );
 	}
