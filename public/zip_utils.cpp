@@ -722,8 +722,7 @@ void CZipFile::ParseFromBuffer( void *buffer, int bufferlength )
 	auto newfiles = std::make_unique<TmpFileInfo_t[]>( numzipfiles );
 
 	// build directory
-	int i;
-	for ( i = 0; i < rec.nCentralDirectoryEntries_Total; i++ )
+	for ( int i = 0; i < rec.nCentralDirectoryEntries_Total; i++ )
 	{
 		ZIP_FileHeader zipFileHeader;
 		buf.GetObjects( &zipFileHeader );
@@ -763,7 +762,7 @@ void CZipFile::ParseFromBuffer( void *buffer, int bufferlength )
 	}
 
 	// Insert current data into rb tree
-	for ( i=0; i<numzipfiles; i++ )
+	for ( int i=0; i<numzipfiles; i++ )
 	{
 		CZipEntry e;
 		e.m_Name = newfiles[i].m_Name;
