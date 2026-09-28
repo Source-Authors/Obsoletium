@@ -37,11 +37,13 @@ class ScopedPowerSuspendResumeNotificationsRegistrator {
     if (handle_) {
       [[maybe_unused]] const bool ok{
           ::UnregisterSuspendResumeNotification(handle_) != FALSE};
+#ifdef _DEBUG
+      const auto message = std::error_code{static_cast<int>(::GetLastError()),
+                                           std::system_category()}
+                               .message();
       AssertMsg(ok, "UnregisterSuspendResumeNotification failed w/e %s.\n",
-                std::error_code{static_cast<int>(::GetLastError()),
-                                std::system_category()}
-                    .message()
-                    .c_str());
+                message.c_str());
+#endif
     }
   }
 
