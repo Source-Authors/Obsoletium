@@ -4754,8 +4754,8 @@ void ChannelSetVol( channel_t *pch, int ivol, int vol )
 }
 
 // copy current channel volumes into target array, starting at ivol, copying cvol entries
-
-void ChannelCopyVolumes( channel_t *pch, int *pvolume_dest, int ivol_start, int cvol )
+// dimhotepus: Bounds-safe volumes.
+void ChannelCopyVolumes( channel_t *pch, int (&pvolume_dest)[CCHANVOLUMES], int ivol_start, int cvol )
 {
 	Assert (ivol_start < CCHANVOLUMES);
 	Assert (ivol_start + cvol <= CCHANVOLUMES);

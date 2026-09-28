@@ -16,7 +16,8 @@ extern Vector		listener_right;
 
 extern void DEBUG_StartSoundMeasure(int type, int samplecount );
 extern void DEBUG_StopSoundMeasure(int type, int samplecount );
-extern bool MIX_ScaleChannelVolume( paintbuffer_t *pPaint, channel_t *pChannel, int volume[CCHANVOLUMES], int mixchans );
+// dimhotepus: Bounds-safe volumes.
+extern bool MIX_ScaleChannelVolume( paintbuffer_t *pPaint, channel_t *pChannel, int (&volume)[CCHANVOLUMES], int mixchans );
 
 inline bool FVolumeFrontNonZero( int *pvol )
 {

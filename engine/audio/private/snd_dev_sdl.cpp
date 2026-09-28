@@ -25,7 +25,8 @@
 #include "tier0/memdbgon.h"
 
 extern bool snd_firsttime;
-extern bool MIX_ScaleChannelVolume( paintbuffer_t *ppaint, channel_t *pChannel, int volume[CCHANVOLUMES], int mixchans );
+// dimhotepus: Bounds-safe volumes.
+extern bool MIX_ScaleChannelVolume( paintbuffer_t *ppaint, channel_t *pChannel, int (&volume)[CCHANVOLUMES], int mixchans );
 extern void S_SpatializeChannel( /*int nSlot,*/ int volume[6], int master_vol, const Vector *psourceDir, float gain, float mono );
 
 // 64K is about 1/3 second at 16-bit, stereo, 44100 Hz

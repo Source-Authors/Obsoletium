@@ -18,7 +18,8 @@
 #ifndef DEDICATED  // have to test this because VPC is forcing us to compile this file.
 
 extern bool snd_firsttime;
-extern bool MIX_ScaleChannelVolume( paintbuffer_t *ppaint, channel_t *pChannel, int volume[CCHANVOLUMES], int mixchans );
+// dimhotepus: Bounds-safe volumes.
+extern bool MIX_ScaleChannelVolume( paintbuffer_t *ppaint, channel_t *pChannel, int (&volume)[CCHANVOLUMES], int mixchans );
 extern void S_SpatializeChannel( int volume[6], int master_vol, const Vector *psourceDir, float gain, float mono );
 
 #define NUM_BUFFERS_SOURCES		128

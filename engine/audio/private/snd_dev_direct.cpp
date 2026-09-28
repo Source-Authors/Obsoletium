@@ -41,7 +41,8 @@ typedef enum {SIS_SUCCESS, SIS_FAILURE, SIS_NOTAVAIL} sndinitstat;
 #define SECONDARY_BUFFER_SIZE_SURROUND	0x04000		// output buffer size in bytes, one per channel
 
 extern void ReleaseSurround();
-extern bool MIX_ScaleChannelVolume( paintbuffer_t *ppaint, channel_t *pChannel, int volume[CCHANVOLUMES], int mixchans );
+// dimhotepus: Bounds-safe volumes.
+extern bool MIX_ScaleChannelVolume( paintbuffer_t *ppaint, channel_t *pChannel, int (&volume)[CCHANVOLUMES], int mixchans );
 
 void OnSndSurroundCvarChanged( IConVar *var, const char *pOldString, float flOldValue );
 void OnSndSurroundLegacyChanged( IConVar *var, const char *pOldString, float flOldValue );

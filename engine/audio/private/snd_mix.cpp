@@ -45,7 +45,8 @@ bool Con_IsVisible( void );
 void SND_RecordBuffer( void );
 bool DSP_RoomDSPIsOff( void );
 bool BChannelLowVolume( channel_t *pch, int vol_min );
-void ChannelCopyVolumes( channel_t *pch, int *pvolume_dest, int ivol_start, int cvol );
+// dimhotepus: Bounds-safe volumes.
+void ChannelCopyVolumes( channel_t *pch, int (&pvolume_dest)[CCHANVOLUMES], int ivol_start, int cvol );
 float ChannelLoudestCurVolume( const channel_t * RESTRICT pch );
 
 extern int g_soundtime;
@@ -2466,8 +2467,8 @@ void MIX_PaintChannels( int endtime, bool bIsUnderwater )
 // d) If SURROUND_ON, but buffer is not surround, recombined front/rear volumes
 
 // returns false if channel is to be entirely skipped. 
-
-bool MIX_ScaleChannelVolume( paintbuffer_t *ppaint, channel_t *pChannel, int volume[CCHANVOLUMES], int mixchans )
+// dimhotepus: Bounds-safe volumes.
+bool MIX_ScaleChannelVolume( paintbuffer_t *ppaint, channel_t *pChannel, int (&volume)[CCHANVOLUMES], int mixchans )
 {
 	int i;
 	SoundBussType mixflag = ppaint->flags;
