@@ -1917,7 +1917,8 @@ public:
 	void Initialize( CChannelList &list );
 
 	// returns true if a given channel number has been marked for culling
-	inline bool ShouldCull( int channelNum )
+	// dimhotepus: Add const.
+	inline bool ShouldCull( int channelNum ) const
 	{
 		return (m_numChans > channelNum) ? m_bShouldCull[channelNum] : false;
 	}
