@@ -431,7 +431,9 @@ private:
 
 	unsigned short	CalculatePadding( unsigned int filenameLen, unsigned int pos );
 	void			SaveDirectory( IWriteStream& stream );
-	unsigned short	MakeXZipCommentString( char *pComment );
+	// dimhotepus: Bounds-safe.
+	template<size_t size>
+	unsigned short	MakeXZipCommentString( char (&pComment)[size] ) const;
 	void			ParseXZipCommentString( const char *pComment );
 	
 	// Internal entry for faster searching, etc.
@@ -1325,19 +1327,18 @@ unsigned short CZipFile::CalculatePadding( unsigned int filenameLen, unsigned in
 // Purpose: Create the XZIP identifying comment string
 // Output : Length
 //-----------------------------------------------------------------------------
-unsigned short CZipFile::MakeXZipCommentString( char *pCommentString )
+// dimhotepus: Bounds-safe.
+ template <size_t size>
+unsigned short CZipFile::MakeXZipCommentString( char (&pComment)[size] ) const
 {
 	char tempString[XZIP_COMMENT_LENGTH];
 
-	BitwiseClear( tempString );
 	V_sprintf_safe( tempString, "XZP%c %d", m_bCompatibleFormat ? '1' : '2', m_AlignmentSize );
-	if ( pCommentString )
-	{
-		memcpy( pCommentString, tempString, sizeof( tempString ) );
-	}
+	// dimhotepus: Bounds-safe.
+	V_strcpy_safe( pComment, tempString );
 
 	// expected fixed length
-	return XZIP_COMMENT_LENGTH;
+	return static_cast<unsigned short>( ssize( tempString ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1406,7 +1407,7 @@ uintp CZipFile::CalculateSize( void )
 	size += dirHeaders;
 
 	// All processed zip files will have a comment string
-	size += sizeof( ZIP_EndOfCentralDirRecord ) + MakeXZipCommentString( NULL );
+	size += sizeof( ZIP_EndOfCentralDirRecord ) + XZIP_COMMENT_LENGTH;
 
 	return size;
 }
