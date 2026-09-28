@@ -314,7 +314,7 @@ public:
 
 	// Implementing IWriteStream method
 	// dimhotepus: Add const.
-	[[nodiscard]] unsigned Tell() const override { return m_buff.TellPut(); }
+	[[nodiscard]] unsigned Tell() const override { return size_cast<unsigned>( m_buff.TellPut() ); }
 
 private:
 	// dimhotepus: Use reference instead of pointer.
@@ -384,7 +384,7 @@ public:
 	HANDLE			ParseFromDisk( const char *pFilename );
 
 	// Estimate the size of the zip file (including header, padding, etc.)
-	uintp	EstimateSize();
+	uintp			EstimateSize();
 
 	// Print out a directory of files in the zip.
 	void			PrintDirectory( void );
@@ -398,7 +398,7 @@ public:
 	// Write the zip to a filestream
 	void			SaveToDisk( HANDLE hOutFile );
 
-	uintp	CalculateSize( void );
+	uintp			CalculateSize( void );
 
 	void			ForceAlignment( bool aligned, bool bCompatibleFormat, unsigned int alignmentSize );
 
@@ -1200,7 +1200,7 @@ bool CZipFile::ReadFileFromZip( HANDLE hZipFile, const char *pRelativeName, bool
 			unsigned int nCompressedBytesRead = 0;
 			unsigned int nOutputBytesWritten = 0;
 			bool bSuccess = decompressStream.Read( (unsigned char *)pData, pEntry->m_nCompressedSize,
-												   decompressTransform.Base<unsigned char>(), decompressTransform.Size(),
+												   decompressTransform.Base<unsigned char>(), size_cast<unsigned>( decompressTransform.Size() ),
 												   nCompressedBytesRead, nOutputBytesWritten );
 			if ( !bSuccess ||
 			     (int)nCompressedBytesRead != pEntry->m_nCompressedSize ||
@@ -1521,7 +1521,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 	}
 
 	// Might be writing a zip into a larger stream
-	uintp zipOffsetInStream = stream.Tell();
+	uint zipOffsetInStream = stream.Tell();
 
 	for ( auto i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
 	{
@@ -1529,7 +1529,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 		Assert( e );
 
 		// Fix up the offset
-		e->m_ZipOffset = size_cast<unsigned>( stream.Tell() - zipOffsetInStream );
+		e->m_ZipOffset = stream.Tell() - zipOffsetInStream;
 
 		if ( e->m_nCompressedSize > 0 && ( m_hDiskCacheWriteFile != INVALID_HANDLE_VALUE ) )
 		{
@@ -1591,12 +1591,12 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 		CWin32File::FileSeek( m_hDiskCacheWriteFile, 0, FILE_END );
 	}
 
-	uintp centralDirStart = stream.Tell() - zipOffsetInStream;
+	uint centralDirStart = stream.Tell() - zipOffsetInStream;
 	if ( m_AlignmentSize )
 	{
 		// align the central directory starting position
-		uintp newDirStart = AlignValue( centralDirStart, m_AlignmentSize );
-		unsigned padLength = size_cast<unsigned>( newDirStart - centralDirStart );
+		uint newDirStart = AlignValue( centralDirStart, m_AlignmentSize );
+		uint padLength = size_cast<uint>( newDirStart - centralDirStart );
 		if ( padLength )
 		{
 			stream.Put( pPaddingBuffer, padLength );
@@ -1661,12 +1661,12 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 		}
 	}
 
-	uintp centralDirEnd = stream.Tell() - zipOffsetInStream;
+	uint centralDirEnd = stream.Tell() - zipOffsetInStream;
 	if ( m_AlignmentSize )
 	{
 		// align the central directory starting position
-		uintp newDirEnd = AlignValue( centralDirEnd, m_AlignmentSize );
-		unsigned padLength = size_cast<unsigned>( newDirEnd - centralDirEnd );
+		uint newDirEnd = AlignValue( centralDirEnd, m_AlignmentSize );
+		uint padLength = size_cast<uint>( newDirEnd - centralDirEnd );
 		if ( padLength )
 		{
 			stream.Put( pPaddingBuffer, padLength );
@@ -1681,8 +1681,8 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 
 	Assert(realNumFiles <= USHRT_MAX);
 
-	rec.nCentralDirectoryEntries_ThisDisk = static_cast<unsigned short>(realNumFiles);
-	rec.nCentralDirectoryEntries_Total = static_cast<unsigned short>(realNumFiles);
+	rec.nCentralDirectoryEntries_ThisDisk = size_cast<unsigned short>(realNumFiles);
+	rec.nCentralDirectoryEntries_Total = size_cast<unsigned short>(realNumFiles);
 	rec.centralDirectorySize = size_cast<unsigned>( centralDirEnd - centralDirStart );
 	rec.startOfCentralDirOffset = size_cast<unsigned>( centralDirStart );
 
