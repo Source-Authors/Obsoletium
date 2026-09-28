@@ -1906,7 +1906,11 @@ class CChannelCullList
 {
 public:
 	// default constructor
-	CChannelCullList() : m_numChans(0) {}; 
+	CChannelCullList() : m_numChans(0)
+	{
+		BitwiseClear(m_channelInfo);
+		BitwiseClear(m_bShouldCull);
+	}; 
 
 	// call if you plan on culling channels - and not otherwise, it's a little expensive
 	// (that's why it's not in the constructor)
