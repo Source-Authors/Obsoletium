@@ -354,6 +354,9 @@ bool Plat_IsUserAnAdmin() {
 	return value > 0;
 }
 
+PLATFORM_INTERFACE void* Plat_Alloc( unsigned long size );
+PLATFORM_INTERFACE void Plat_Free( void *ptr );
+
 // dimhotepus: Apply system Mica materials to window.
 // See https://learn.microsoft.com/en-us/windows/apps/design/style/mica
 bool Plat_ApplySystemTitleBarTheme(void *window,
@@ -379,12 +382,17 @@ bool Plat_ApplySystemTitleBarTheme(void *window,
 	if (FAILED(hr)) {
 		const int windowTextSize =
 			GetWindowTextLengthA(static_cast<HWND>(window)) + 1;
-		char *windowText = stackallocT(char, windowTextSize);
-		GetWindowTextA(static_cast<HWND>(window), windowText, windowTextSize);
+		char *windowText = static_cast<char*>(Plat_Alloc(windowTextSize));
+		RunCodeAtScopeExit(Plat_Free(windowText));
+
+		if (windowText)
+		{
+			GetWindowTextA(static_cast<HWND>(window), windowText, windowTextSize);
+		}
 
 		Warning(
 			"Unable to apply user Color Mode preferences to window 0x%p (%s): %s\n",
-			window, windowText,
+			window, windowText ? windowText : "N/A",
 			se::win::com::com_error_category().message(hr).c_str());
 
 		ok = false;
@@ -404,12 +412,17 @@ bool Plat_ApplySystemTitleBarTheme(void *window,
 	if (FAILED(hr)) {
 		const int windowTextSize =
 			GetWindowTextLengthA(static_cast<HWND>(window)) + 1;
-		char *windowText = stackallocT(char, windowTextSize);
-		GetWindowTextA(static_cast<HWND>(window), windowText, windowTextSize);
+		char *windowText = static_cast<char*>(Plat_Alloc(windowTextSize));
+		RunCodeAtScopeExit(Plat_Free(windowText));
+
+		if (windowText)
+		{
+			GetWindowTextA(static_cast<HWND>(window), windowText, windowTextSize);
+		}
 
 		Warning(
 			"Unable to apply backdrop material effect to window 0x%p (%s): %s\n",
-			window, windowText,
+			window, windowText ? windowText : "N/A",
 			se::win::com::com_error_category().message(hr).c_str());
 
 		ok = false;
