@@ -3979,7 +3979,11 @@ const char *ResolveStaticPropToModel( const char *pPropName )
 	const char *pPropNumber = V_strrchr( pPropName, '_' );
 	if ( pPropNumber )
 	{
-		sscanf( pPropNumber+1, "%d.vhv", &iProp );
+		// dimhotepus: Check prop number is integer as VRAD writes.
+		if ( sscanf( pPropNumber+1, "%d.vhv", &iProp ) == 0 )
+		{
+			return nullptr;
+		}
 	}
 	else
 	{
