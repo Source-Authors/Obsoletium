@@ -5301,7 +5301,7 @@ public:
 
 private:
 
-	BGRA8888_t	*m_pPreviewImage;
+	BGRA8888_t	*m_pPreviewImage{nullptr};
 };
 
 static CColorCorrectionTools g_ColorCorrectionTools;
