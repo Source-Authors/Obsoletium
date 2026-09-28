@@ -300,7 +300,7 @@ void CCountedStringPool::SpewStrings()
 	{
 		char* string = m_Elements[i].pString;
 
-		Msg("String %d: ref:%d %s", i, m_Elements[i].nReferenceCount, string == nullptr? "EMPTY - ok for slot zero only!" : string);
+		Msg("String %zd: ref:%d %s", i, m_Elements[i].nReferenceCount, string == nullptr? "EMPTY - ok for slot zero only!" : string);
 	}
 
 	Msg("\n%zd total counted strings.", m_Elements.Count());
