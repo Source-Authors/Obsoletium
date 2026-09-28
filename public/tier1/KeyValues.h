@@ -303,9 +303,9 @@ private:
 	[[nodiscard]] KeyValues* CreateKeyUsingKnownLastChild( const char *keyName, KeyValues *pLastChild );
 
 	void CopyKeyValuesFromRecursive( const KeyValues& src );
-	void CopyKeyValue( const KeyValues& src, size_t tmpBufferSizeB, OUT_Z_CAP_OPT(tmpBufferSizeB) char* tmpBuffer );
+	void CopyKeyValue( const KeyValues& src, size_t tmpBufferSizeB, IN_BYTECAP(tmpBufferSizeB) char* tmpBuffer );
 	template<size_t size>
-	void CopyKeyValue( const KeyValues& src, OUT_Z_CAP_OPT(size) char (&tmpBuffer)[size] )
+	void CopyKeyValue( const KeyValues& src, IN_BYTECAP(size) char (&tmpBuffer)[size] )
 	{
 		CopyKeyValue( src, size, tmpBuffer );
 	}

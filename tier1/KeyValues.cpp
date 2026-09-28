@@ -1912,7 +1912,7 @@ void KeyValues::CopyKeyValuesFromRecursive( const KeyValues& rootSrc )
 // Purpose: Copies a single KeyValue from src to this, using the provided temporary
 // buffer if the keytype requires it. Does NOT recurse.
 //-----------------------------------------------------------------------------
-void KeyValues::CopyKeyValue( const KeyValues& src, size_t tmpBufferSizeB, OUT_Z_CAP_OPT(tmpBufferSizeB) char* tmpBuffer )
+void KeyValues::CopyKeyValue( const KeyValues& src, size_t tmpBufferSizeB, IN_BYTECAP(tmpBufferSizeB) char* tmpBuffer )
 {
 	m_iKeyName = src.GetNameSymbol();
 
