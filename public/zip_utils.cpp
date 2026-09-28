@@ -1383,10 +1383,12 @@ uintp CZipFile::CalculateSize( void )
 
 		// local file header
 		size += sizeof( ZIP_LocalFileHeader );
-		size += strlen( e->m_Name.String() );
+		const intp nameLen = V_strlen( e->m_Name.String() );
+		Assert( nameLen <= std::numeric_limits<unsigned short>::max() );
+		size += size_cast<unsigned short>( nameLen );
 
 		// every file has a directory header that duplicates the filename 
-		dirHeaders += sizeof( ZIP_FileHeader ) + strlen( e->m_Name.String() );
+		dirHeaders += sizeof( ZIP_FileHeader ) + size_cast<unsigned short>( nameLen );
 
 		// calculate padding
 		if ( m_AlignmentSize != 0 )
@@ -1474,11 +1476,12 @@ void CZipFile::SaveToBuffer( CUtlBuffer& buf )
 		CZipEntry *e = &m_Files[i];
 		Assert( e );
 
-		intp nameLen = V_strlen( e->m_Name.String() );
+		const intp nameLen = V_strlen( e->m_Name.String() );
+		Assert( nameLen <= std::numeric_limits<unsigned short>::max() );
 		// Both the per-file header and central directory have these
 		sizeEstimate += 2 * sizeof( ZIP_LocalFileHeader );
-		sizeEstimate += 2 * nameLen;
-		sizeEstimate += 2 * CalculatePadding( nameLen, e->m_ZipOffset );
+		sizeEstimate += 2 * size_cast<unsigned short>( nameLen );
+		sizeEstimate += 2 * CalculatePadding( size_cast<unsigned short>( nameLen ), e->m_ZipOffset );
 		sizeEstimate += sizeof( ZIP_EndOfCentralDirRecord );
 		sizeEstimate += e->m_nCompressedSize;
 		// XZip comment string, max 128
@@ -1560,7 +1563,8 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 			const char *pFilename = e->m_Name.String();
 			hdr.compressedSize = e->m_nCompressedSize;
 			hdr.uncompressedSize = e->m_nUncompressedSize;
-			size_t nFilenameLen = strlen( pFilename );
+			const intp nFilenameLen = V_strlen( pFilename );
+			Assert( nFilenameLen <= std::numeric_limits<unsigned short>::max() );
 			hdr.fileNameLength = size_cast<unsigned short>( nFilenameLen );
 			hdr.extraFieldLength = CalculatePadding( hdr.fileNameLength, e->m_ZipOffset );
 			int extraFieldLength = hdr.extraFieldLength;
@@ -1568,7 +1572,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 			// Swap header in place
 			m_Swap.SwapFieldsToTargetEndian( &hdr );
 			stream.Put( &hdr, sizeof( hdr ) );
-			stream.Put( pFilename, size_cast<unsigned>( strlen( pFilename ) ) );
+			stream.Put( pFilename, size_cast<unsigned short>( nFilenameLen ) );
 			stream.Put( pPaddingBuffer, extraFieldLength );
 			stream.Put( e->m_pData, e->m_nCompressedSize );
 
@@ -1627,7 +1631,8 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 
 			hdr.compressedSize = e->m_nCompressedSize;
 			hdr.uncompressedSize = e->m_nUncompressedSize;
-			size_t nFilenameLen = strlen( e->m_Name.String() );
+			const intp nFilenameLen = V_strlen( e->m_Name.String() );
+			Assert( nFilenameLen <= std::numeric_limits<unsigned short>::max() );
 			hdr.fileNameLength = size_cast<unsigned short>( nFilenameLen );
 			hdr.extraFieldLength = CalculatePadding( hdr.fileNameLength, e->m_ZipOffset );
 			hdr.fileCommentLength = 0;
@@ -1640,7 +1645,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 			// Swap the header in place
 			m_Swap.SwapFieldsToTargetEndian( &hdr );
 			stream.Put( &hdr, sizeof( hdr ) );
-			stream.Put( e->m_Name.String(), size_cast<unsigned>( strlen( e->m_Name.String() ) ) );
+			stream.Put( e->m_Name.String(), size_cast<unsigned short>( nFilenameLen ) );
 			if ( m_bCompatibleFormat )
 			{
 				stream.Put( pPaddingBuffer, extraFieldLength );
