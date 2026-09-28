@@ -58,7 +58,8 @@ public:
 
 	// Writes out zip file to a filestream - uses current alignment size
 	// (set by file's previous alignment, or a call to ForceAlignment)
-	virtual void			SaveToDisk			( FILE *fout ) = 0;
+	// dimhotepus: Dropped as not used.
+	virtual void			SaveToDisk			( FILE *fout ) { Error( "ZIP save to disk for FILE is not implemented" ); }
 	virtual void			SaveToDisk			( HANDLE hFileOut ) = 0;
 
 	// Reads a zip file from a buffer into memory - sets current alignment size to

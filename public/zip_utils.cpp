@@ -14,7 +14,7 @@
 #ifdef IS_WINDOWS_PC
 #include "winlite.h"
 #else
-#define INVALID_HANDLE_VALUE (void *)nullptr
+#define INVALID_HANDLE_VALUE nullptr
 #define FILE_BEGIN SEEK_SET
 #define FILE_END SEEK_END
 #endif
@@ -114,7 +114,15 @@ public:
 		return hFile;
 	}
 
-	static HANDLE CreateTempFile( const CUtlString &WritePath, CUtlString &FileName )
+	// dimhotepus: Create abstraction to unify interface.
+	static bool CloseFile( HANDLE &hFile )
+	{
+		const BOOL rc{ CloseHandle( hFile ) };
+		hFile = INVALID_HANDLE_VALUE;
+		return rc != FALSE;
+	}
+
+	[[nodiscard]] static HANDLE CreateTempFile( const CUtlString &WritePath, CUtlString &FileName )
 	{
 		char tempFileName[MAX_PATH];
 		if ( WritePath.IsEmpty() )
@@ -140,15 +148,13 @@ public:
 			// generate safe name at the desired prefix
 			char uniqueFilename[MAX_PATH];
 			SYSTEMTIME sysTime;
-			GetLocalTime( &sysTime );   
+			GetLocalTime( &sysTime );
 			V_sprintf_safe( uniqueFilename, "%d_%d_%d_%d_%d.tmp", sysTime.wDay, sysTime.wHour, sysTime.wMinute, sysTime.wSecond, sysTime.wMilliseconds );
 			V_ComposeFileName( WritePath.String(), uniqueFilename, tempFileName );
 		}
 
 		FileName = tempFileName;
-		HANDLE hFile = CreateFile( tempFileName, GENERIC_READ|GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
-		
-		return hFile;
+		return CreateFile( tempFileName, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
 	}
 
 	static unsigned int FileSeek( HANDLE hFile, unsigned int distance, DWORD MoveMethod )
@@ -165,7 +171,7 @@ public:
 		return ( unsigned int )li.QuadPart;
 	}
 
-	static unsigned int FileTell( HANDLE hFile )
+	[[nodiscard]] static unsigned int FileTell( HANDLE hFile )
 	{
 		return FileSeek( hFile, 0, FILE_CURRENT );
 	}
@@ -183,6 +189,12 @@ public:
 		BOOL bSuccess = WriteFile( hFile, pBuffer, size, &numBytesWritten, NULL );
 		return bSuccess && ( numBytesWritten == size );
 	}
+
+	// dimhotepus: Create abstraction to unify interface.
+	static bool FileFlushWrite( HANDLE hFile )
+	{
+		return FlushFileBuffers( hFile ) != FALSE;
+	}
 };
 #else
 class CWin32File
@@ -191,10 +203,23 @@ public:
 	// dimhotepus: Create abstraction to unify interface.
 	[[nodiscard]] static HANDLE OpenExistingFile( const char *pszFileName )
 	{
-		return fopen( pszFileName, "rw+" );
+		FILE *f{ fopen( pszFileName, "rw+" ) };
+		if ( !f )
+		{
+			return INVALID_HANDLE_VALUE;
+		}
+		return static_cast<HANDLE>( f );
 	}
 
-	static HANDLE CreateTempFile( CUtlString &WritePath, CUtlString &FileName )
+	// dimhotepus: Create abstraction to unify interface.
+	static bool CloseFile( HANDLE &hFile )
+	{
+		const int rc{ fclose( (FILE*)hFile ) };
+		hFile = INVALID_HANDLE_VALUE;
+		return rc == 0;
+	}
+
+	[[nodiscard]] static HANDLE CreateTempFile( CUtlString &WritePath, CUtlString &FileName )
 	{
 		char tempFileName[MAX_PATH];
 		if ( WritePath.IsEmpty() )
@@ -240,7 +265,7 @@ public:
 		return 0;
 	}
 
-	static unsigned int FileTell( HANDLE hFile )
+	[[nodiscard]] static unsigned int FileTell( HANDLE hFile )
 	{
 		return ftello( (FILE *)hFile );
 	}
@@ -255,6 +280,12 @@ public:
 	{
 		size_t bytesWrtitten = fwrite( pBuffer, 1, size, (FILE *)hFile );
 		return bytesWrtitten == size;
+	}
+
+	// dimhotepus: Create abstraction to unify interface.
+	static bool FileFlushWrite( HANDLE hFile )
+	{
+		return fflush( HFILE ) == 0;
 	}
 };
 #endif
@@ -294,42 +325,21 @@ private:
 class CFileStream final : public IWriteStream
 {
 public:
-	CFileStream( FILE *fout ) : IWriteStream(), m_file( fout ), m_hFile( INVALID_HANDLE_VALUE ) {}
-	CFileStream( HANDLE hOutFile ) : IWriteStream(), m_file( NULL ), m_hFile( hOutFile ) {}
+	explicit CFileStream( HANDLE hOutFile ) : IWriteStream(), m_hFile( hOutFile ) {}
 
 	// Implementing IWriteStream method
 	void Put( const void* pMem, unsigned size ) override
-	{ 
-		if ( m_file )
-		{
-			fwrite( pMem, size, 1, m_file ); 
-		}
-#ifdef WIN32
-		else
-		{
-			DWORD numBytesWritten;
-			WriteFile( m_hFile, pMem, size, &numBytesWritten, NULL );
-		}
-#endif
+	{
+		CWin32File::FileWrite( m_hFile, pMem, size );
 	}
 
 	// Implementing IWriteStream method
 	unsigned Tell( void ) override
 	{ 
-		if ( m_file )
-		{
-			return ftell( m_file );
-		}
-
-#ifdef WIN32
 		return CWin32File::FileTell( m_hFile );
-#else
-		return 0;
-#endif
 	}
 
 private:
-	FILE	*m_file;
 	HANDLE	m_hFile;
 };
 
@@ -382,7 +392,6 @@ public:
 	// Write the zip to a buffer
 	void			SaveToBuffer( CUtlBuffer& buffer );
 	// Write the zip to a filestream
-	void			SaveToDisk( FILE *fout );
 	void			SaveToDisk( HANDLE hOutFile );
 
 	uintp	CalculateSize( void );
@@ -564,11 +573,7 @@ void CZipFile::Reset( void )
 
 	if ( m_hDiskCacheWriteFile != INVALID_HANDLE_VALUE )
 	{
-#ifdef WIN32
-		CloseHandle( m_hDiskCacheWriteFile );
-#else
-		fclose( (FILE *)m_hDiskCacheWriteFile );
-#endif
+		CWin32File::CloseFile( m_hDiskCacheWriteFile );
 
 		if ( unlink( m_DiskCacheName.String() ) )
 		{
@@ -576,8 +581,6 @@ void CZipFile::Reset( void )
 				m_DiskCacheName.String(),
 				std::generic_category().message(errno).c_str() );
 		}
-
-		m_hDiskCacheWriteFile = INVALID_HANDLE_VALUE;
 	}
 
 	if ( m_bUseDiskCacheForWrites )
@@ -807,11 +810,7 @@ HANDLE CZipFile::ParseFromDisk( const char *pFilename )
 	if ( fileLen < sizeof( ZIP_EndOfCentralDirRecord ) )
 	{
 		// bad format
-#ifdef WIN32
-		CloseHandle( hFile );
-#else
-		fclose( (FILE *)hFile );
-#endif
+		CWin32File::CloseFile( hFile );
 		return NULL;
 	}
 
@@ -855,11 +854,7 @@ HANDLE CZipFile::ParseFromDisk( const char *pFilename )
 	if ( numZipFiles <= 0 )
 	{
 		// No files
-#ifdef WIN32
-		CloseHandle( hFile );
-#else
-		fclose( (FILE *)hFile );
-#endif
+		CWin32File::CloseFile( hFile );
 		return NULL;
 	}
 
@@ -882,11 +877,7 @@ HANDLE CZipFile::ParseFromDisk( const char *pFilename )
 		          && zipFileHeader.compressionMethod != IZip::eCompressionType_LZMA ) )
 		{
 			// bad contents
-#ifdef WIN32
-			CloseHandle( hFile );
-#else
-			fclose( (FILE *)hFile );
-#endif
+			CWin32File::CloseFile( hFile );
 			return NULL;
 		}
 
@@ -1451,12 +1442,6 @@ int CZipFile::GetNextFilename( int id, char *pBuffer, int bufferSize, int &fileS
 //-----------------------------------------------------------------------------
 // Purpose: Store data out to disk
 //-----------------------------------------------------------------------------
-void CZipFile::SaveToDisk( FILE *fout )
-{
-	CFileStream stream( fout );
-	SaveDirectory( stream );
-}
-
 void CZipFile::SaveToDisk( HANDLE hOutFile )
 {
 	CFileStream stream( hOutFile );
@@ -1521,11 +1506,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 
 	if ( m_hDiskCacheWriteFile != INVALID_HANDLE_VALUE )
 	{
-#ifdef WIN32
-		FlushFileBuffers( m_hDiskCacheWriteFile );
-#else
-		fflush( (FILE *)m_hDiskCacheWriteFile );
-#endif
+		CWin32File::FileFlushWrite( m_hDiskCacheWriteFile );
 	}
 
 	// Might be writing a zip into a larger stream
@@ -1747,7 +1728,6 @@ public:
 
 	// Writes out zip file to a filestream - uses current alignment size
 	// (set by file's previous alignment, or a call to ForceAlignment)
-	void			SaveToDisk( FILE *fout ) override;
 	void			SaveToDisk( HANDLE hOutFile ) override;
 
 	// Reads a zip file from a buffer into memory - sets current alignment size to
@@ -1851,11 +1831,6 @@ void CZip::AddBufferToZip( const char *relativename, void *data, int length, boo
 void CZip::SaveToBuffer( CUtlBuffer& outbuf )
 {
 	m_ZipFile.SaveToBuffer( outbuf );
-}
-
-void CZip::SaveToDisk( FILE *fout )
-{
-	m_ZipFile.SaveToDisk( fout );
 }
 
 void CZip::SaveToDisk( HANDLE hOutFile )
