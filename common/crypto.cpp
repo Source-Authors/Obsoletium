@@ -873,7 +873,7 @@ bool CCrypto::RSADecrypt( const uint8 *pubEncryptedData, size_t cubEncryptedData
 		// Ensure encrypted data is valid and has length that is exact multiple of 128 bytes
 		if ( 0 != ( cubEncryptedData % cubFixedCiphertextLength ) )
 		{
-			DMsg( SPEW_CRYPTO, 2, "CCrypto::RSADecrypt: invalid ciphertext length %d, needs to be a multiple of %d\n",
+			DMsg( SPEW_CRYPTO, 2, "CCrypto::RSADecrypt: invalid ciphertext length %zu, needs to be a multiple of %zu\n",
 				cubEncryptedData, cubFixedCiphertextLength );
 			return false;
 		}

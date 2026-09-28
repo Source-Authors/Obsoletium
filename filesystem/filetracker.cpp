@@ -588,7 +588,7 @@ intp CFileTracker2::ListOpenedFiles( bool bAllOpened, const char *pchFilenameFin
 	}
 
 	Msg( "cThreadedBlocks:%d cDupMD5s:%d\n", m_cThreadBlocks, m_cDupMD5s );
-	Msg( "TrackedVPKFiles:%zd AllOpenedFiles:%zd files VPKfiles:%d StringPoolCount:%d\n",
+	Msg( "TrackedVPKFiles:%d AllOpenedFiles:%d files VPKfiles:%d StringPoolCount:%zd\n",
 		m_treeTrackedVPKFiles.Count(), m_treeAllOpenedFiles.Count(), cPackFiles, m_stringPool.Count() );
 	return m_treeAllOpenedFiles.Count();
 }

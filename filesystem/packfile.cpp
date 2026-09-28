@@ -959,8 +959,8 @@ int CLZMAZipPackFileHandle::Seek( int nOffset, int nWhence )
 		else
 		{
 			// Seeking backwards beyond our backseek buffer. Have to restart stream. This kills the performance.
-			Warning( "LZMA file handle: seeking backwards beyond backseek buffer size ( %u ), "
-			         "replaying read & decompression of %u bytes. Should avoid large back seeks in compressed files or "
+			Warning( "LZMA file handle: seeking backwards beyond backseek buffer size ( %zd ), "
+			         "replaying read & decompression of %d bytes. Should avoid large back seeks in compressed files or "
 			         "increase backseek buffer sizing.",
 			         m_BackSeekBuffer.Size(), nNewPosition );
 
