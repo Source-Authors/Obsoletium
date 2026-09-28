@@ -95,10 +95,10 @@ static CUtlVector<char> g_SentenceFile;
 
 struct sentencegroup_t
 {
-	short count;
+	short count{0};
 
 public:
-	short lru;
+	short lru{0};
 	const char *GroupName() const;
 	CUtlSymbol GroupNameSymbol() const;
 	void SetGroupName( const char *pName );
