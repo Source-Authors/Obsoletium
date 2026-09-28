@@ -1004,9 +1004,10 @@ static void CopyTextData( char *pDst, const char *pSrc, int dstSize, int srcSize
 void CZipFile::AddBufferToZip( const char *relativename, void *data, int length, bool bTextMode, IZip::eCompressionType compressionType )
 {
 	// Lower case only
-	char name[512];
+	// dimhotepus: 512 -> MAX_PATH as same always expected when read back.
+	char name[MAX_PATH];
 	V_strcpy_safe( name, relativename );
-	Q_strlower( name );
+	V_strlower( name );
 
 	int outLength = length;
 	int uncompressedLength = length;
@@ -1153,7 +1154,8 @@ bool CZipFile::ReadFileFromZip( const char *pRelativeName, bool bTextMode, CUtlB
 bool CZipFile::ReadFileFromZip( HANDLE hZipFile, const char *pRelativeName, bool bTextMode, CUtlBuffer &buf )
 {
 	// Lower case only
-	char pName[MAX_FILEPATH];
+	// dimhotepus: 512 -> MAX_PATH as same always expected when read back.
+	char pName[MAX_PATH];
 	V_strcpy_safe( pName, pRelativeName );
 	V_strlower( pName );
 
@@ -1236,9 +1238,10 @@ bool CZipFile::ReadFileFromZip( HANDLE hZipFile, const char *pRelativeName, bool
 bool CZipFile::FileExistsInZip( const char *pRelativeName )
 {
 	// Lower case only
-	char pName[512];
-	Q_strncpy( pName, pRelativeName, 512 );
-	Q_strlower( pName );
+	// dimhotepus: 512 -> MAX_PATH as same always expected when read back.
+	char pName[MAX_PATH];
+	V_strcpy_safe( pName, pRelativeName );
+	V_strlower( pName );
 
 	// See if entry is in list already
 	CZipEntry e;
