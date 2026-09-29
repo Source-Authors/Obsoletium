@@ -54,7 +54,8 @@ extern void *CreateSDLMgr();
 namespace {
 
 template <size_t out_size>
-const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
+const char* PrefixMessageGroup(OUT_Z_ARRAY char (&out)[out_size],
+                               const char* group,
                                const char *message) {
   const char *out_group{GetSpewOutputGroup()};
 

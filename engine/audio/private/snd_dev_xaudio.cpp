@@ -44,7 +44,8 @@ namespace {
  * @return Result message.
  */
 template <size_t out_size>
-const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
+const char* PrefixMessageGroup(OUT_Z_ARRAY char (&out)[out_size],
+                               const char* group,
                                const char *message) {
   const size_t length{strlen(message)};
   if (length > 1 && message[length - 1] == '\n') {

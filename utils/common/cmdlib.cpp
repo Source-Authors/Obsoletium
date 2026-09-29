@@ -175,7 +175,7 @@ bool g_bSuppressPrintfOutput = false;
 
 template <size_t out_size>
 static const char *PrefixMessageGroup(
-    _Out_z_bytecapcount_(out_size) char (&out)[out_size], const char *group,
+    OUT_Z_ARRAY char (&out)[out_size], const char *group,
     const char *message) {
   const char *out_group{GetSpewOutputGroup()};
 

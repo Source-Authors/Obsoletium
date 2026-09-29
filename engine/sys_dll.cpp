@@ -727,7 +727,8 @@ void GetSpew( char *buf, size_t buflen )
 ConVar spew_consolelog_to_debugstring( "spew_consolelog_to_debugstring", "0", 0, "Send console log to PLAT_DebugString()" );
 
 template <size_t out_size>
-const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
+const char* PrefixMessageGroup(OUT_Z_ARRAY char (&out)[out_size],
+                               const char* group,
                                const char *message) {
   const char *out_group{GetSpewOutputGroup()};
 
