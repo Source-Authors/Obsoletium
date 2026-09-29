@@ -154,6 +154,7 @@ void CMultiplayerAdvancedDialog::GatherCurrentValues()
 	CScriptListItem *pItem;
 
 	char szValue[256];
+	szValue[0] = '\0';
 	char strValue[ 256 ];
 
 	pList = m_pList;
