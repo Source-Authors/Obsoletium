@@ -51,8 +51,13 @@ COptionsSubVoice::COptionsSubVoice(vgui::Panel *parent) : PropertyPage(parent, N
 
     m_pTestMicrophoneButton = new Button(this, "TestMicrophone", "#GameUI_TestMicrophone");
 
-	LoadControlSettings("Resource\\OptionsSubVoice.res");
+    m_nMicVolumeValue = -1;
+    m_bMicBoostSelected = false;
+    m_fReceiveVolume = -1;
+    m_nReceiveSliderValue = -1;
 
+	LoadControlSettings("Resource\\OptionsSubVoice.res");
+    
     m_bVoiceOn = false;
     m_pMicMeter2->SetVisible(false);
     // no voice tweak - then disable all buttons

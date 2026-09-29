@@ -65,7 +65,7 @@ private:
     float                   m_fReceiveVolume;
     int                     m_nReceiveSliderValue;
 
-    bool            m_bVoiceOn;
+    bool                    m_bVoiceOn;
 };
 
 
