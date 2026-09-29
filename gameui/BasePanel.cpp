@@ -2704,6 +2704,8 @@ CFooterPanel::CFooterPanel( Panel *parent, const char *panelName ) : BaseClass( 
 {
 	SetVisible( true );
 	SetAlpha( 0 );
+	m_hButtonFont = INVALID_FONT;
+	m_hTextFont = INVALID_FONT;
 	m_pHelpName = NULL;
 
 	m_pSizingLabel = new vgui::Label( this, "SizingLabel", "" );

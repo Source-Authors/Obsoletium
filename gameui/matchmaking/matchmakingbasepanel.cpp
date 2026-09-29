@@ -37,9 +37,12 @@ CMatchmakingBasePanel::CMatchmakingBasePanel( vgui::Panel *pParent ) : BaseClass
 	vgui::scheme()->LoadSchemeFromFile( "Resource/ClientScheme.res", "ClientScheme" );
 	SetScheme( "ClientScheme" );
 
-	m_pFooter = new CFooterPanel( this, "MatchmakingFooterPanel" );
-
+	m_nSessionType = 0;
 	m_nGameType = GAMETYPE_STANDARD_MATCH;
+    m_bPlayingOnline = false;
+	m_szMapLoadName[0] = '\0';
+	m_pSessionKeys = nullptr;
+	m_pFooter = new CFooterPanel( this, "MatchmakingFooterPanel" );
 }
 
 CMatchmakingBasePanel::~CMatchmakingBasePanel()

@@ -26,7 +26,8 @@ DECLARE_BUILD_FACTORY_CUSTOM( CCvarToggleCheckButton, CvarToggleCheckButton_Fact
 
 CCvarToggleCheckButton::CCvarToggleCheckButton( Panel *parent, const char *panelName, const char *text, 
 	char const *cvarname )
- : CheckButton( parent, panelName, text )
+ : CheckButton( parent, panelName, text ),
+   m_bStartValue{ false }
 {
 	m_pszCvarName = cvarname ? strdup( cvarname ) : NULL;
 
@@ -39,10 +40,7 @@ CCvarToggleCheckButton::CCvarToggleCheckButton( Panel *parent, const char *panel
 
 CCvarToggleCheckButton::~CCvarToggleCheckButton()
 {
-	if ( m_pszCvarName )
-	{
-		free( m_pszCvarName );
-	}
+	free( m_pszCvarName );
 }
 
 void CCvarToggleCheckButton::Paint()

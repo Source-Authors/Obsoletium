@@ -31,16 +31,14 @@ CMenuItem::CMenuItem( CDialogMenu *pParent, const char *pTitle, const char *pDes
 	SetSize( 10, 10 );
 
 	m_pParent = pParent;
+    m_pTitle = new vgui::Label( this, "MenuItemText", pTitle );
+	m_pDescription = pDescription ? new vgui::Label( this, "MenuItemDesc", pDescription ) : nullptr;
 
-	m_bEnabled = true;
 	m_nDisabledAlpha = 30;
+	m_nRightMargin = 0;
+	m_nBottomMargin = 0;
+	m_bEnabled = true;
 
-	m_pTitle = new vgui::Label( this, "MenuItemText", pTitle );
-	m_pDescription = NULL;
-	if ( pDescription )
-	{
-		m_pDescription = new vgui::Label( this, "MenuItemDesc", pDescription );
-	}
 }
 
 CMenuItem::~CMenuItem()

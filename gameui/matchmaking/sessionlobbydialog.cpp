@@ -29,31 +29,35 @@ CSessionLobbyDialog::CSessionLobbyDialog( vgui::Panel *pParent ) : BaseClass( pP
 	m_Menus[1].SetParent( this );
 	m_Menus[1].SetName( "RedPlayers" );
 
-	m_iLocalTeam = -1;
-	m_iActiveMenu = -1;
-	m_nHostId = 0;
-	m_bHostLobby = false;
-	m_bCenterOnScreen = true;
-
 	m_pLobbyStateBg = new vgui::Panel( this, "LobbyStateBg" );
 	m_pLobbyStateLabel = new CPropertyLabel( this, "LobbyStateLabel", "" );
 	m_pLobbyStateIcon = new CPropertyLabel( this, "LobbyStateIcon", "" );
 	m_pHostLabel = new CPropertyLabel( this, "HostLabel", "" );
 	m_pHostOptionsPanel = new vgui::EditablePanel( this, "HostOptions" );
+	
+	m_pDialogKeys = NULL;
 
 	m_pScenarioInfo = new CScenarioInfoPanel( this, "GameScenario" );
 	m_pTeamInfos[BLUE_TEAM_LOBBY] = new CScenarioInfoPanel( this, "BlueTeamDescription" );
 	m_pTeamInfos[RED_TEAM_LOBBY] = new CScenarioInfoPanel( this, "RedTeamDescription" );
-
-	m_pDialogKeys = NULL;
-
-	g_pLobbyDialog = this;
+	
+	m_nMinInfoHeight[BLUE_TEAM_LOBBY] = 0;
+	m_nMinInfoHeight[RED_TEAM_LOBBY] = 0;
+	
+	m_nHostId = 0;
+	m_bReady = false;
+	m_bHostLobby = false;
+	m_bCenterOnScreen = true;
+	m_iLocalTeam = -1;
+	m_iActiveMenu = -1;
+	m_nImageBorderWidth = 0;
+	m_nTeamspacing = 0;
+	m_szCommand[0] = '\0';
 
 	m_bStartingGame = false;
 	m_nLastPlayersNeeded = 0;
 
-	m_nMinInfoHeight[BLUE_TEAM_LOBBY] = 0;
-	m_nMinInfoHeight[RED_TEAM_LOBBY] = 0;
+	g_pLobbyDialog = this;
 }
 
 CSessionLobbyDialog::~CSessionLobbyDialog()
