@@ -368,8 +368,8 @@ void CTextConsoleWin32::ReceiveTab() {
         nCurrentColumn = 1;
       }
 
-      Q_snprintf(szFormatCmd, sizeof(szFormatCmd), "%-*s ", nLongestCmd,
-                 pszCurrentCmd);
+      V_sprintf_safe(szFormatCmd, "%-*s ", static_cast<unsigned>(nLongestCmd),
+                     pszCurrentCmd);
       PrintRaw(szFormatCmd);
 
       i++;
