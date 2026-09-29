@@ -134,7 +134,7 @@ int GetScreenAspectMode( int width, int height )
 //-----------------------------------------------------------------------------
 static void GetResolutionName( vmode_t *mode, char *sz, int sizeofsz, int desktopWidth, int desktopHeight )
 {
-	Q_snprintf( sz, sizeofsz, "%i x %i%s", mode->width, mode->height,
+	Q_snprintf( sz, sizeofsz, "%d x %d%s", mode->width, mode->height,
 				( mode->width == desktopWidth ) && ( mode->height == desktopHeight ) ? " (native)": "" );
 }
 
@@ -157,6 +157,7 @@ public:
 		m_pGammaSlider = new CCvarSlider( this, "Gamma", "#GameUI_Gamma", 1.6f, 2.6f, "mat_monitorgamma" );
 		m_pGammaLabel = new Label( this, "Gamma label", "#GameUI_Gamma" );
 		m_pGammaEntry = new TextEntry( this, "GammaEntry" );
+		m_flOriginalGamma = -1;
 
 		Button *ok = new Button( this, "OKButton", "#vgui_ok" );
 		ok->SetCommand( new KeyValues("OK") );
@@ -1423,7 +1424,11 @@ void COptionsSubVideo::PrepareResolutionList()
 	char sz[256];
 	m_pMode->GetText(sz);
 	int currentWidth = 0, currentHeight = 0;
-	sscanf( sz, "%i x %i", &currentWidth, &currentHeight );
+	if ( !Q_isempty( sz ))
+	{
+		[[maybe_unused]] const auto rc = sscanf( sz, "%d x %d", &currentWidth, &currentHeight );
+		Assert( rc == 2 );
+	}
 
 	// Clean up before filling the info again.
 	m_pMode->DeleteAllItems();
@@ -1785,7 +1790,8 @@ void COptionsSubVideo::OnApplyChanges()
 	}
 
 	int width = 0, height = 0;
-	sscanf( sz, "%i x %i", &width, &height );
+	[[maybe_unused]] const auto rc = sscanf( sz, "%d x %d", &width, &height );
+	Assert( rc == 2 );
 
 	// windowed
 	bool bConfigChanged = false;
@@ -1900,7 +1906,9 @@ void COptionsSubVideo::OnTextChanged(Panel *pPanel, const char *pszText)
 		m_nSelectedMode = m_pMode->GetActiveItem();
 
 		int w = 0, h = 0;
-		sscanf(pszText, "%i x %i", &w, &h);
+		[[maybe_unused]] const auto rc = sscanf( pszText, "%d x %d", &w, &h );
+		Assert( rc == 2 );
+
         if ( config.m_VideoMode.m_Width != w || config.m_VideoMode.m_Height != h )
         {
             OnDataChanged();
