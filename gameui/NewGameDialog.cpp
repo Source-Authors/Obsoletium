@@ -364,27 +364,34 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 	const char *unlockedChapter = var.IsValid() ? var.GetString() : "1";
 	int iUnlockedChapter = atoi(unlockedChapter);
 
+	char chapterID[32], chapterName[64];
+
 	// add chapters to combobox
 	for (int i = 0; i < chapterIndex; i++)
 	{
 		const char *fileName = chapters[i].filename;
-
-		char chapterID[32] = { 0 };
-		sscanf(fileName, "chapter%31s", chapterID);
-		chapterID[ssize(chapterID) - 1] = '\0';
-
 		V_strcpy_safe( szFullFileName, fileName );
+
+		chapterID[0] = '\0';
+		if ( sscanf( fileName, "chapter%31s", chapterID ) == 1 )
+		{
+			chapterID[ssize(chapterID) - 1] = '\0';
+		}
+		else
+		{
+			// dimhotepus: Handle invalid chapter ids.
+			Warning( "Chapter %s has no identifier, skipping...", fileName );
+			continue;
+		}
 
 		// strip the extension
 		char *ext = V_stristr(chapterID, ".cfg");
 		if (ext)
 		{
-			*ext = 0;
+			*ext = '\0';
 		}
 
 		const char *pGameDir = COM_GetModDirectory();
-
-		char chapterName[64];
 		V_sprintf_safe(chapterName, "#%s_Chapter%s_Title", pGameDir, chapterID);
 
 		CGameChapterPanel *chapterPanel = SETUP_PANEL( new CGameChapterPanel( this, NULL, chapterName, i, chapterID, szFullFileName, m_bCommentaryMode ) );
