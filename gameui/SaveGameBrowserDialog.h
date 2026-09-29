@@ -48,7 +48,6 @@ protected:
 
 	vgui::ImagePanel	*m_pLevelPicBorder;
 	vgui::ImagePanel	*m_pLevelPic;
-	vgui::ImagePanel	*m_pCommentaryIcon;
 	vgui::Label		*m_pChapterTitle;
 	vgui::Label		*m_pTime;
 	vgui::Label		*m_pElapsedTime;
