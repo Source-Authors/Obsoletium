@@ -92,16 +92,18 @@ int g_DirectXLevels[] =
 //-----------------------------------------------------------------------------
 // Purpose: returns the string name of a given dxlevel
 //-----------------------------------------------------------------------------
-void GetNameForDXLevel( int dxlevel, char *name, int bufferSize)
+template<size_t bufferSize>
+static const char* GetNameForDXLevel(int dxlevel, char (&name)[bufferSize])
 {
-	if ( ( dxlevel >= 92 ) && ( dxlevel <= 95 ) )
+	if ( dxlevel >= 92 && dxlevel <= 95 )
 	{
-		Q_snprintf( name, bufferSize, "DirectX v9.0+" );
+		V_sprintf_safe( name, "DirectX v9.0+" );
 	}
 	else
 	{
-		Q_snprintf( name, bufferSize, "DirectX v%.1f", dxlevel / 10.0f );
+		V_sprintf_safe( name, "DirectX v%.1f", dxlevel / 10.0f );
 	}
+	return name;
 }
 	
 //-----------------------------------------------------------------------------
@@ -289,8 +291,7 @@ public:
 			{
 				// add the configuration in the combo
 				char szDXLevelName[64];
-				GetNameForDXLevel( dxl, szDXLevelName, sizeof(szDXLevelName) );
-				m_pDXLevel->AddItem( szDXLevelName, KeyValuesAD( new KeyValues("dxlevel", "dxlevel", dxl) ) );
+				m_pDXLevel->AddItem( szDXLevelName, KeyValuesAD( new KeyValues("dxlevel", "dxlevel", GetNameForDXLevel( dxl, szDXLevelName )) ) );
 			}
 		}
 
@@ -964,8 +965,7 @@ public:
 
 		// get current hardware dx support level
 		char dxVer[64];
-		GetNameForDXLevel( mat_dxlevel.GetInt(), dxVer, sizeof( dxVer ) );
-		SetControlString("dxlabel", dxVer);
+		SetControlString("dxlabel", GetNameForDXLevel( mat_dxlevel.GetInt(), dxVer ));
 
 		// get installed version
 		char szVersion[64];
