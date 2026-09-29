@@ -3847,11 +3847,12 @@ void BuildClusterTable( void )
 			}
 		}
 
-		g_ClusterLeaves[i].leafCount = leafCount;
+		auto& clusterLeaf = g_ClusterLeaves[i];
+		clusterLeaf.leafCount = leafCount;
 		if ( leafCount )
 		{
-			g_ClusterLeaves[i].leafs.SetCount( leafCount );
-			memcpy( g_ClusterLeaves[i].leafs.Base(), leafList, sizeof(int) * leafCount );
+			clusterLeaf.leafs.SetCount( leafCount );
+			memcpy( clusterLeaf.leafs.Base(), leafList, sizeof(int) * leafCount );
 		}
 	}
 }
