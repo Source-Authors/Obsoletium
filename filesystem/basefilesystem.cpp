@@ -2840,6 +2840,9 @@ bool CBaseFileSystem::ExtractRootKeyName( KeyValuesPreloadType_t type, OUT_Z_CAP
 			// Not in cache, use fallback
 			bret = LookupKeyValuesRootKeyName( filename, pPathID, outbuf, bufsize );
 		}
+#else
+		// dimhotepus: Always zero-terminate.
+		if ( bufsize ) outbuf[0] = '\0';
 #endif
 	}
 	return bret;
