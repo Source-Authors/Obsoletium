@@ -592,10 +592,13 @@ GetToken
 */
 qboolean GetToken (qboolean crossline, char (&out)[MAXTOKEN])
 {
+	static char lastToken[MAXTOKEN] = {};
+
 	char    *token_p;
 
 	if (tokenready)                         // is a token allready waiting?
 	{
+		V_strcpy_safe( out, lastToken );
 		tokenready = false;
 		return true;
 	}
@@ -604,7 +607,9 @@ qboolean GetToken (qboolean crossline, char (&out)[MAXTOKEN])
 
 	if (script->script_p >= script->end_p)
 	{
-		return EndOfScript (crossline, out);
+		const auto rc = EndOfScript (crossline, out);
+		V_strcpy_safe( lastToken, out );
+		return rc;
 	}
 
 	tokenready = false;
@@ -615,7 +620,9 @@ skipspace:
 	{
 		if (script->script_p >= script->end_p)
 		{
-			return EndOfScript (crossline, out);
+			const auto rc = EndOfScript (crossline, out);
+			V_strcpy_safe( lastToken, out );
+			return rc;
 		}
 		if (*(script->script_p++) == '\n')
 		{
@@ -629,7 +636,9 @@ skipspace:
 
 	if (script->script_p >= script->end_p)
 	{
-		return EndOfScript (crossline, out);
+		const auto rc = EndOfScript (crossline, out);
+		V_strcpy_safe( lastToken, out );
+		return rc;
 	}
 
 	// strip single line comments
@@ -642,7 +651,9 @@ skipspace:
 		{
 			if (script->script_p >= script->end_p)
 			{
-				return EndOfScript (crossline, out);
+				const auto rc = EndOfScript (crossline, out);
+				V_strcpy_safe( lastToken, out );
+				return rc;
 			}
 		}
 		scriptline = ++script->line;
@@ -659,7 +670,9 @@ skipspace:
 			{
 				if (script->script_p >= script->end_p)
 				{
-					return EndOfScript (crossline, out);
+					const auto rc = EndOfScript (crossline, out);
+					V_strcpy_safe( lastToken, out );
+					return rc;
 				}
 
 				scriptline = ++script->line;
