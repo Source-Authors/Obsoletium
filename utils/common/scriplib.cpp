@@ -204,11 +204,19 @@ static void DefineVariable( char *variablename, char (&out)[MAXTOKEN] )
 
 	// dimhotepus: strdup -> V_strdup.
 	v.param = V_strdup( variablename );
+	if (!v.param)
+	{
+		Error( "Out of memory when allocating %s script var.\n", variablename );
+	}
 
 	GetToken( false, out );
 
 	// dimhotepus: strdup -> V_strdup.
 	v.value = V_strdup( out );
+	if (!v.value)
+	{
+		Error( "Out of memory when allocating %s script value.\n", out );
+	}
 
 	// dimhotepus: CS:GO backport.
 	for ( auto &dv : g_definevariable )
