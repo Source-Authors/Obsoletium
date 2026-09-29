@@ -318,8 +318,8 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 	m_pCenterBg->SetVisible( false );
 
 	// parse out the chapters off disk
-	constexpr int MAX_CHAPTERS = 32;
-	chapter_t chapters[MAX_CHAPTERS];
+	chapter_t chapters[32];
+	BitwiseClear( chapters );
 
 	char szFullFileName[MAX_PATH];
 	int chapterIndex = 0;
@@ -330,7 +330,7 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 
 		FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 		const char *fileName = g_pFullFileSystem->FindFirst( "cfg/chapter*.cfg", &findHandle );
-		while ( fileName && chapterIndex < MAX_CHAPTERS )
+		while ( fileName && chapterIndex < ssize(chapters) )
 		{
 			if ( fileName[0] )
 			{
