@@ -77,7 +77,27 @@ struct FileJob_t
 {
 	FileJob_t()
 	{
-		Q_memset( this, 0, sizeof( *this ) );
+		m_hFilename = FILENAMEHANDLE_INVALID;
+		m_pCallback = nullptr;
+		m_hAsyncControl = nullptr;
+		m_pContext = nullptr;
+		m_pContext2 = nullptr;
+		m_pTargetData = nullptr;
+		m_nBytesToRead = 0;
+		m_nStartOffset = 0;
+		m_Priority = LOADERPRIORITY_ANYTIME;
+
+		m_SubmitTime = 0;
+		m_FinishTime = 0;
+		m_SubmitTag = 0;
+		m_nActualBytesRead = 0;
+		m_LoaderError = LOADERERROR_NONE;
+		m_ThreadId = INVALID_THREAD_ID;
+
+		m_bFinished = false;
+		m_bFreeTargetAfterIO = false;
+		m_bFileExists = false;
+		m_bClaimed = false;
 	}
 
 	FileNameHandle_t		m_hFilename;
