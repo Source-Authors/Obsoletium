@@ -2275,7 +2275,7 @@ fmtlenreduce:
 		while ( chInfoText[ iTextLen[1] ] != ' ' )
 			++ iTextLen[1];
 		++ iTextLen[1];
-		iTextLen[2] = 2 + iTextLen[1] + iTxFormatLen + strlen( szTxFormatSuffix );
+		iTextLen[2] = 2 + iTextLen[1] + iTxFormatLen + V_strlen( szTxFormatSuffix );
 		iTextLen[3] = V_strlen( chInfoText );
 		for ( int k = 0; k < 4; ++ k )
 			iTextMargins[k] = g_pMatSystemSurface->DrawTextLen( GetFont(), "%.*s", iTextLen[k], chInfoText );
