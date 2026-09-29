@@ -1821,11 +1821,11 @@ void CRenderTextureEditor::Paint()
 			V_sprintfcat_safe( chLine1, "  Dimensions(%dx%d)", iTxWidth, iTxHeight );
 		if ( stricmp( szTxFormat, "DXT1" ) || stricmp( szTxFormat, "DXT5" ) )
 			V_sprintfcat_safe( chLine1, "  Format(%s)", szTxFormat );
-		if ( pMatTexture->GetFlags() & TEXTUREFLAGS_NOLOD )
+		if ( pMatTexture && ( pMatTexture->GetFlags() & TEXTUREFLAGS_NOLOD ) )
 			V_sprintfcat_safe( chLine1, "  NoLod" );
-		if ( pMatTexture->GetFlags() & TEXTUREFLAGS_NOMIP )
+		if ( pMatTexture && ( pMatTexture->GetFlags() & TEXTUREFLAGS_NOMIP ) )
 			V_sprintfcat_safe( chLine1, "  NoMip" );
-		if ( pMatTexture->GetFlags() & TEXTUREFLAGS_ONEBITALPHA )
+		if ( pMatTexture && ( pMatTexture->GetFlags() & TEXTUREFLAGS_ONEBITALPHA ) )
 			V_sprintfcat_safe( chLine1, "  OneBitAlpha" );
 
 		//
