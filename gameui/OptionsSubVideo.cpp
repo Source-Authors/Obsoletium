@@ -968,12 +968,25 @@ public:
 		SetControlString("dxlabel", GetNameForDXLevel( mat_dxlevel.GetInt(), dxVer ));
 
 		// get installed version
-		char szVersion[64];
-		szVersion[0] = 0;
-		system()->GetRegistryString( "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\DirectX\\Version", szVersion, sizeof(szVersion) );
-		int os = 0, majorVersion = 0, minorVersion = 0, subVersion = 0;
-		sscanf(szVersion, "%d.%d.%d.%d", &os, &majorVersion, &minorVersion, &subVersion);
-		Q_snprintf(dxVer, sizeof(dxVer), "DirectX v%d.%d", majorVersion, minorVersion);
+		if ( char szVersion[64] = {0};
+			 system()->GetRegistryString( "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\DirectX\\Version", szVersion, sizeof(szVersion) ) )
+		{
+			if ( int os = 0, majorVersion = 0, minorVersion = 0, subVersion = 0;
+				 sscanf(szVersion, "%d.%d.%d.%d", &os, &majorVersion, &minorVersion, &subVersion) == 4 )
+			{
+				V_sprintf_safe(dxVer, "DirectX v%d.%d", majorVersion, minorVersion);
+			}
+			else
+			{
+				// dimhotepus: Dump N/A version.
+				V_sprintf_safe(dxVer, "DirectX vX.X");
+			}
+		}
+		else
+		{
+			// dimhotepus: Dump N/A version.
+			V_sprintf_safe(dxVer, "DirectX vX.X");
+		}
 		SetControlString("dxinstalledlabel", dxVer);
 	}
 
