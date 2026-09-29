@@ -328,8 +328,8 @@ void COptionsSubKeyboard::ClearBindItems( void )
 //-----------------------------------------------------------------------------
 void COptionsSubKeyboard::RemoveKeyFromBindItems( KeyValues *org_item, const char *key )
 {
-	Assert( key && key[ 0 ] );
-	if ( !key || !key[ 0 ] )
+	Assert( !Q_isempty( key ) );
+	if ( Q_isempty( key ) )
 		return;
 
 	// dimhotepus: Allocate on stack for performance.
