@@ -76,9 +76,9 @@ class DedicatedExports : public CBaseAppSystem<IDedicatedExports> {
   }
 
  private:
-  ISystem *system_;
-  IDedicatedServerAPI *api_;
-  bool is_console_mode_;
+  ISystem* system_{nullptr};
+  IDedicatedServerAPI* api_{nullptr};
+  bool is_console_mode_{false};
 };
 
 EXPOSE_SINGLE_INTERFACE(DedicatedExports, IDedicatedExports,
