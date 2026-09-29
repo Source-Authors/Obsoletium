@@ -18,7 +18,7 @@
 
 // dimhotepus: Exclude in Multihreaded DLL mode as ucrt lib already has ones.
 #if !defined(_MT) || !defined(_DLL)
-void __cdecl srand(IN unsigned int)
+void __cdecl srand(IN_P unsigned int)
 {
 }
 

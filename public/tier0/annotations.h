@@ -27,7 +27,7 @@
 // to by a function parameter. Variations include in/out/inout,
 // CAP (elements) versus BYTECAP (bytes), and null termination or
 // not (_Z).
-#define IN _In_
+#define IN_P _In_
 #define IN_Z _In_z_
 #define IN_OPT _In_opt_
 #define IN_OPT_Z _In_opt_z_
@@ -81,7 +81,7 @@
 // to by a function parameter. Variations include in/out/inout,
 // CAP (elements) versus BYTECAP (bytes), and null termination or
 // not (_Z).
-#define IN
+#define IN_P
 #define IN_Z
 #define IN_OPT
 #define IN_OPT_Z
