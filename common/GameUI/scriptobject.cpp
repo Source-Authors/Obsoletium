@@ -120,10 +120,17 @@ CScriptListItem::CScriptListItem( char const *strItem, char const *strValue )
 CScriptObject::CScriptObject( )
 {
 	type = O_BOOL;
+	cvarname[0] = '\0';
+	prompt[0] = '\0';
+	tooltip[0] = '\0';
+	pListItems = nullptr;
+	fMin = fMax = -1.0f;
+	defValue[0] = '\0';
+	fdefValue = -1.0f;
+	curValue[0] = '\0';
+	fcurValue = -1.0f;
 	bSetInfo = false;  // Prepend "Setinfo" to keyvalue pair in config?
 	pNext = nullptr;
-	pListItems = nullptr;
-	tooltip[0] = '\0';
 }
 
 CScriptObject::~CScriptObject()
