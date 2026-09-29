@@ -175,12 +175,15 @@ void CGameSavePanel::SetDescription( SaveGameDescription_t *pDesc )
 //-----------------------------------------------------------------------------
 CSaveGameBrowserDialog::CSaveGameBrowserDialog( vgui::Panel *parent ) 
 :	BaseClass( parent, "SaveGameDialog" ),
+	m_ScrollSpeedSlow( 0.0f ),
+	m_ScrollSpeedFast( 0.0f ),
 	m_ScrollDirection( SCROLL_NONE ),
 	m_bFilterAutosaves( false ),
 	m_iSelectedSave( -1 ),
 	m_nDeletedPanel( INVALID_INDEX ),
 	m_nAddedPanel( INVALID_INDEX ),
 	m_nUsedStorageSpace( 0 ),
+	m_nCenterBgTallDefault( 0 ),
 	m_ScrollSpeed( 0.0f ),
 	m_ButtonPressed( SCROLL_NONE ),
 	m_ScrollCt( 0 ),
@@ -198,6 +201,13 @@ CSaveGameBrowserDialog::CSaveGameBrowserDialog( vgui::Panel *parent )
 
 	// Create our button footer
 	m_pFooter = new CFooterPanel( parent, "SaveGameFooter" );
+
+	BitwiseClear( m_NewSaveGameDesc );
+
+	BitwiseClear( m_PanelXPos );
+	BitwiseClear( m_PanelYPos );
+	BitwiseClear( m_PanelAlpha );
+	BitwiseClear( m_PanelIndex );
 
 	// Load our res files from the keyvalue we're holding
 	LoadControlSettings( "Resource/SaveGameDialog.res", NULL, nullptr );
