@@ -21,7 +21,6 @@
 #include "tier0/memdbgon.h"
 
 using namespace vgui;
-static char token[ 1024 ];
 
 extern IVEngineClient *engine;
 
@@ -456,6 +455,9 @@ objtype_t CScriptObject::GetType( char *pszType )
 
 bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 {
+	// dimhotepus: Inlined token to allow threaded access.
+	char token[ 1024 ];
+
 	// Get the first token.
 	// The cvar we are setting
 	*pBuffer = engine->ParseFile( *pBuffer, token );
@@ -683,7 +685,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 	SetCurValue( defValue );
 
 	// Parse the }
-		*pBuffer = engine->ParseFile( *pBuffer, token );
+	*pBuffer = engine->ParseFile( *pBuffer, token );
 	if ( Q_isempty( token ) )
 		return false;
 
@@ -787,6 +789,9 @@ void CDescription::AddObject( CScriptObject *pObj )
 
 bool CDescription::ReadFromBuffer( const char **pBuffer, bool bAllowNewObject )
 {
+	// dimhotepus: Inlined token to allow threaded access.
+	char token[ 1024 ];
+
 	// Get the first token.
 	*pBuffer = engine->ParseFile( *pBuffer, token );
 	if ( Q_isempty( token ) )
