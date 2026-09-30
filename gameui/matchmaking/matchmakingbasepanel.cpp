@@ -511,7 +511,7 @@ void CMatchmakingBasePanel::SessionNotification( const int notification, const i
 		break;
 
 	case SESSION_NOTIFY_DUMPSTATS:
-		Msg( "[MM] %d open dialogs\n", m_DialogStack.Count() );
+		Msg( "[MM] %zd open dialogs\n", m_DialogStack.Count() );
 		for ( int i = 0; i < m_DialogStack.Count(); ++i )
 		{
 			const char *pString = "NULL";

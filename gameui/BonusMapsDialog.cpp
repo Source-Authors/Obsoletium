@@ -304,7 +304,7 @@ bool CBonusMapsDialog::ImportZippedBonusMaps( const char *pchZippedFileName )
 		}
 
 		szOutFilename[ iOutFilenameLength ] = '\0';
-		V_sprintf_safe( szOutFilename, "%s%02i", szOutFilename, iSameFolderCount );
+		V_sprintf_safe( szOutFilename, "%s%02zd", szOutFilename, iSameFolderCount );
 	}
 
 	// Pull the files out of the zip
