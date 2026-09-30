@@ -5,10 +5,6 @@
 // $NoKeywords: $
 //=============================================================================//
 
-
-#include <stdio.h>
-#include <time.h>
-
 #include "CreateMultiplayerGameGameplayPage.h"
 
 using namespace vgui;
@@ -298,6 +294,7 @@ void CCreateMultiplayerGameGameplayPage::GatherCurrentValues()
 	CScriptListItem *pItem;
 
 	char szValue[256];
+	szValue[0] = '\0';
 	char strValue[256];
 	wchar_t w_szStrValue[256];
 
@@ -380,7 +377,7 @@ void CCreateMultiplayerGameGameplayPage::GatherCurrentValues()
 		// Remove double quotes and % characters
 		V_StripInvalidCharacters( szValue );
 
-		Q_strncpy( strValue, szValue, sizeof( strValue ) );
+		V_strcpy_safe( strValue, szValue );
 
 		pObj->SetCurValue( strValue );
 
