@@ -80,7 +80,6 @@ public:
 
 protected:
 	int				m_nBorderWidth;
-	int				m_nMinWide;
 
 	CDialogMenu		m_Menu;
 	vgui::Label		*m_pTitle;
