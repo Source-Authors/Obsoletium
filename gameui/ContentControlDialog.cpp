@@ -131,7 +131,7 @@ void CContentControlDialog::ApplyPassword()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CContentControlDialog::Explain( char const *fmt, ... )
+void CContentControlDialog::Explain( PRINTF_FORMAT_STRING char const *fmt, ... )
 {
 	if ( !m_pExplain )
 		return;
