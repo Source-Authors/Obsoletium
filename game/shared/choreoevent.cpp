@@ -1196,14 +1196,14 @@ CChoreoEvent& CChoreoEvent::operator=( const CChoreoEvent& src )
 	for ( auto newtag : src.m_RelativeTags )
 	{	
 		newtag.SetOwner( this );
-		m_RelativeTags.AddToTail( newtag );
+		m_RelativeTags.AddToTail( std::move( newtag ) );
 	}
 	
 	// copying.
 	for ( auto newtag : src.m_TimingTags )
 	{	
 		newtag.SetOwner( this );
-		m_TimingTags.AddToTail( newtag );
+		m_TimingTags.AddToTail( std::move( newtag ) );
 	}
 	for ( t = 0; t < NUM_ABS_TAG_TYPES; t++ )
 	{
@@ -1211,7 +1211,7 @@ CChoreoEvent& CChoreoEvent::operator=( const CChoreoEvent& src )
 		for ( auto newtag : src.m_AbsoluteTags[ t ] )
 		{
 			newtag.SetOwner( this );
-			m_AbsoluteTags[ t ].AddToTail( newtag );
+			m_AbsoluteTags[ t ].AddToTail( std::move( newtag ) );
 		}
 	}
 
