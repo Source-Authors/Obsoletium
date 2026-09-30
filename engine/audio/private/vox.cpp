@@ -1231,13 +1231,13 @@ void VOX_ReplaceVirtualNames( channel_t *pchan )
 				// '_map_' lookups relative to the mapname
 				if ( imap >= 10 )
 				{
-					pszmaptoken[4] = (imap/10) + '0';
-					pszmaptoken[5] = (imap%10) + '0';
+					pszmaptoken[4] = static_cast<char>( (imap/10) + '0' );
+					pszmaptoken[5] = static_cast<char>( (imap%10) + '0' );
 				}
 				else
 				{
 					pszmaptoken[4] = '0';
-					pszmaptoken[5] = imap + '0';
+					pszmaptoken[5] = static_cast<char>( imap + '0' );
 				}
 			}
 			
