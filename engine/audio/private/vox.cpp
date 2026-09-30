@@ -452,7 +452,6 @@ int VOX_ParseWordParams(char *psz, voxword_t *pvoxword, int fFirst)
 		if (ct == ')')
 			break;
 
-		BitwiseClear(sznum);
 		i = 0;
 
 		c = *(++psz);
@@ -466,6 +465,13 @@ int VOX_ParseWordParams(char *psz, voxword_t *pvoxword, int fFirst)
 			sznum[i++] = c;
 			c = *(++psz);
 		}
+
+		// dimhotepus: Correctly zero-terminate
+		if (i == static_cast<int>(sizeof(sznum)) - 1)
+		{
+			i = sizeof(sznum) - 1;
+		}
+		sznum[i] = '\0';
 
 		// get value of number
 		i = atoi(sznum);
