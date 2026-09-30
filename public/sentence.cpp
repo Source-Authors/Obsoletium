@@ -1293,7 +1293,7 @@ void CSentence::Append( float starttime, const CSentence& src )
 	{
 		s.time += starttime;
 
-		m_EmphasisSamples.AddToTail( s );
+		m_EmphasisSamples.AddToTail( std::move( s ) );
 	}
 
 	// Or in voice duck settings
