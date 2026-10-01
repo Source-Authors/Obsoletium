@@ -4,9 +4,12 @@
 #define SE_LAUNCHER_FILE_LOGGER_H
 
 #include "tier0/icommandline.h"
+#include "tier0/threadtools.h"
 #include "tier1/utlrbtree.h"
 #include "tier1/utlstring.h"
 #include "filesystem.h"
+
+#include <atomic>
 
 namespace se::launcher {
 
@@ -29,8 +32,10 @@ class FileLogger {
   IFileSystem *file_system_;
 
   FileHandle_t all_logs_file_;
-  bool is_active_;
+  std::atomic_bool is_active_;
 
+  // File system calls LogAccess from multiple threads (async I/O).
+  CThreadFastMutex log_mutex_;
   // persistent across restarts
   CUtlRBTree<CUtlString, int> logged_tree_;
   CUtlString resource_listing_dir_;
