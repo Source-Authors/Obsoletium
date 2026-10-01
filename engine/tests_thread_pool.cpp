@@ -92,13 +92,14 @@ void Test(IThreadPool *pool, bool should_distribute, bool should_sleep = true,
         CFastTimer timer, suspendTimer;
 
         if (!interleave) pool->SuspendExecution();
+
+        std::unique_ptr<CountJob> jobs[4000];
         {
           RunCodeAtScopeExitOpt( !interleave, pool->ResumeExecution() );
 
           suspendTimer.Start();
           timer.Start();
 
-          std::unique_ptr<CountJob> jobs[4000];
           for (size_t j{0}; j < std::size(jobs); j++) {
             jobs[j] = std::make_unique<CountJob>(
                 done_event, sleep_ms, static_cast<int>(ssize(jobs)), do_work);

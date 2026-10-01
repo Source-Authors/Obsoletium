@@ -1886,8 +1886,10 @@ void CThread::SuspendCooperative()
 {
 	if ( ThreadGetCurrentId() == m_threadId )
 	{
-		m_SuspendEventSignal.Set();
+		// dimhotepus: Fix resume suspend count assert.
+		// dimhotepus: Must follow sync protocol and set suspend count first.
 		m_nSuspendCount = 1;
+		m_SuspendEventSignal.Set();
 		m_SuspendEvent.Wait();
 		m_nSuspendCount = 0;
 	}
@@ -1901,8 +1903,7 @@ void CThread::SuspendCooperative()
 
 void CThread::ResumeCooperative()
 {
-	// TODO: dimhotepus: Sometimes Assert fires, investigate.
-	[[maybe_unused]] int suspendCount = m_nSuspendCount;
+	[[maybe_unused]] const int suspendCount = m_nSuspendCount;
 	AssertMsg( suspendCount == 1, "Suspend event count %d should be 1", suspendCount );
 	m_SuspendEvent.Set();
 }
