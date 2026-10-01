@@ -1197,11 +1197,12 @@ inline unsigned ThreadWaitForEvents( int nEvents, CThreadEvent * const *pEvents,
   else
 	return WAIT_TIMEOUT;
 #else
-	HANDLE handles[64];
+	// dimhotepus: Assume sane events count or we get stack overflow.
+	HANDLE *handles = stackallocT( HANDLE, nEvents );
 	// dimhotepus: Prevent overflow of handles buffer.
-	for ( intp i = 0; i < min( static_cast<intp>(nEvents), ssize(handles) ); i++ )
+	for ( intp i = 0; i < nEvents; i++ )
 		handles[i] = pEvents[i]->GetHandle();
-	return ThreadWaitForObjects( min( nEvents, static_cast<int>(ssize(handles)) ), handles, bWaitAll, timeout );
+	return ThreadWaitForObjects( nEvents, handles, bWaitAll, timeout );
 #endif
 }
 
