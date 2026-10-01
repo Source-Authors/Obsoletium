@@ -1601,7 +1601,8 @@ const wchar_t *KeyValues::GetWString( const char *keyName, const wchar_t *defaul
 		{
 			intp bufSize = Q_strlen(dat->m_sValue) + 1;
 			// dimhotepus: Speedup by using stack alloc. String is copied in SetWString.
-			auto *pWBuf = stackallocT( wchar_t, bufSize );
+			auto *pWBuf = bufSize < 1024 ? stackallocT( wchar_t, bufSize ) : new wchar_t[bufSize];
+			RunCodeAtScopeExitOpt( bufSize >= 1024, delete[] pWBuf );
 			intp result = Q_UTF8ToUnicode(dat->m_sValue, pWBuf, bufSize * sizeof( wchar_t ) );
 			if ( result >= 0 ) // may be a zero length string
 			{
