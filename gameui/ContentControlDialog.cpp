@@ -101,20 +101,29 @@ void CContentControlDialog::ResetPassword()
 {
 	// Set initial value
 #ifdef WIN32
+	constexpr char keyPath[] = "Software\\Valve\\Half-Life\\Settings";
+	constexpr char keyName[] = "User Token 2";
+
 	HKEY key;
-	if ( ERROR_SUCCESS == VCRHook_RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Valve\\Half-Life\\Settings", 0, KEY_READ, &key))
+	if ( ERROR_SUCCESS == VCRHook_RegOpenKeyEx(HKEY_CURRENT_USER, keyPath, 0, KEY_READ, &key))
 	{
 		RunCodeAtScopeExit(VCRHook_RegCloseKey( key ));
 
 		DWORD type;
 		DWORD bufSize = sizeof(m_szGorePW);
 
-		VCRHook_RegQueryValueEx(key, "User Token 2", NULL, &type, (unsigned char *)m_szGorePW, &bufSize );
+		if ( ERROR_SUCCESS != VCRHook_RegQueryValueEx(key, keyName, NULL, &type, (unsigned char *)m_szGorePW, &bufSize ) ||
+			 type != REG_SZ || bufSize == 0 )
+		{
+			Warning( "Unexpected registry key %s value under %s. Assume none.\n", keyName, keyPath );
+			// dimhotepus: Broken value.
+			m_szGorePW[ 0 ] = 0;
+		}
 	}
-    else
-    {
-        m_szGorePW[ 0 ] = 0;
-    }
+	else
+	{
+		m_szGorePW[ 0 ] = 0;
+	}
 #else
 	vgui::system()->SetRegistryString( "Software\\Valve\\Half-Life\\Settings\\User Token 2", m_szGorePW );
 #endif
