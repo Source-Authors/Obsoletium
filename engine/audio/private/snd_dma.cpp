@@ -726,6 +726,9 @@ void S_Init( void )
 // =======================================================================
 void S_Shutdown(void)
 {
+	// dimhotepus: Already takes lock in mix thread when update guts, so need to shutdown on its own.
+	S_ShutdownMixThread();
+
 	// dimhotepus: Device can be restarted in runtime by different thread.
 	THREAD_LOCK_SOUND();
 
@@ -735,7 +738,6 @@ void S_Shutdown(void)
 	}
 
 	S_StopAllSounds( true );
-	S_ShutdownMixThread();
 
 	TRACESHUTDOWN( audiosourcecache->Shutdown() );
 
