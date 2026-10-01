@@ -5,6 +5,7 @@
 
 #include <sys/stat.h>
 
+#define _FILE_OFFSET_BITS 64
 #include <cerrno>
 #include <cstdarg>
 #include <cstdio>
@@ -259,7 +260,11 @@ class posix_file_stream {
   // Moves the file pointer to a specified location.
   [[nodiscard]] io_result<bool> seek(const int64_t offset,
                                      const int origin) const noexcept {
+#ifdef _WIN32
     const int errno_code{_fseeki64(fd_, offset, origin)};
+#else
+    const int errno_code{fseeko(fd_, offset, origin)};
+#endif
     return {errno_code == 0,
             errno_code == 0 ? posix_error_ok : internal::posix_error_last()};
   }
@@ -295,7 +300,11 @@ class posix_file_stream {
 
   // Gets the current position of a file pointer.
   [[nodiscard]] io_result<int64_t> tell() const noexcept {
+#ifdef _WIN32
     const int64_t file_pos{_ftelli64(fd_)};
+#else
+    const int64_t file_pos{ftello(fd_)};
+#endif
     return {file_pos,
             file_pos != -1L ? posix_error_ok : internal::posix_error_last()};
   }
