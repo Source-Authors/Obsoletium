@@ -73,11 +73,11 @@ class posix_file_stream {
 #ifdef _WIN32
     struct _stat st = {};
     const bool exists{_stat(path, &st) == 0};
-    return {exists, internal::posix_error_last()};
+    return {exists, exists ? posix_error_ok : internal::posix_error_last()};
 #else
     struct stat st = {};
     const bool exists{stat(path, &st) == 0};
-    return {exists, internal::posix_error_last()};
+    return {exists, exists ? posix_error_ok : internal::posix_error_last()};
 #endif
   }
 
