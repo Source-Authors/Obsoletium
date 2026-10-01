@@ -88,26 +88,27 @@ void Test(IThreadPool *pool, bool should_distribute, bool should_sleep = true,
         params.fDistribute = should_distribute ? TRS_TRUE : TRS_FALSE;
         pool->Start(params, "CountTstJob");
 
-        if (!interleave) pool->SuspendExecution();
-
         CThreadEvent done_event;
-
         CFastTimer timer, suspendTimer;
-        suspendTimer.Start();
-        timer.Start();
 
-        std::unique_ptr<CountJob> jobs[4000];
-        for (size_t j{0}; j < std::size(jobs); j++) {
-          jobs[j] = std::make_unique<CountJob>(
-              done_event, sleep_ms, static_cast<int>(ssize(jobs)), do_work);
-          jobs[j]->SetFlags(JF_QUEUE);
+        if (!interleave) pool->SuspendExecution();
+        {
+          RunCodeAtScopeExitOpt( !interleave, pool->ResumeExecution() );
 
-          pool->AddJob(jobs[j].get());
+          suspendTimer.Start();
+          timer.Start();
 
-          if (should_sleep && j % 16 == 0) ThreadSleep(0);
+          std::unique_ptr<CountJob> jobs[4000];
+          for (size_t j{0}; j < std::size(jobs); j++) {
+            jobs[j] = std::make_unique<CountJob>(
+                done_event, sleep_ms, static_cast<int>(ssize(jobs)), do_work);
+            jobs[j]->SetFlags(JF_QUEUE);
+
+            pool->AddJob(jobs[j].get());
+
+            if (should_sleep && j % 16 == 0) ThreadSleep(0);
+          }
         }
-
-        if (!interleave) pool->ResumeExecution();
 
         if (should_finish && sleep_ms <= 1) {
           done_event.Wait();
@@ -117,9 +118,12 @@ void Test(IThreadPool *pool, bool should_distribute, bool should_sleep = true,
             CountJob::m_nCount.load(std::memory_order::memory_order_relaxed)};
         timer.End();
 
-        pool->SuspendExecution();
-        suspendTimer.End();
-        pool->ResumeExecution();
+        {
+          pool->SuspendExecution();
+          RunCodeAtScopeExit(pool->ResumeExecution());
+
+          suspendTimer.End();
+        }
 
         pool->Stop();
         done_event.Reset();

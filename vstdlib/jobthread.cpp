@@ -806,6 +806,7 @@ void CThreadPool::ChangePriority( CJob *pJob, JobPriority_t priority )
 int CThreadPool::ExecuteToPriority( JobPriority_t iToPriority, JobFilter_t pfnFilter )
 {
 	SuspendExecution();
+	RunCodeAtScopeExit(ResumeExecution());
 
 	CJob *pJob;
 	int nExecuted = 0;
@@ -871,8 +872,6 @@ int CThreadPool::ExecuteToPriority( JobPriority_t iToPriority, JobFilter_t pfnFi
 		j->Release();
 	}
 
-	ResumeExecution();
-
 	return nExecuted;
 }
 
@@ -883,6 +882,8 @@ int CThreadPool::ExecuteToPriority( JobPriority_t iToPriority, JobFilter_t pfnFi
 int CThreadPool::AbortAll()
 {
 	SuspendExecution();
+	RunCodeAtScopeExit(ResumeExecution());
+
 	CJob *pJob;
 
 	int iAborted = 0;
@@ -906,8 +907,6 @@ int CThreadPool::AbortAll()
 	}
 
 	m_nJobs = 0;
-
-	ResumeExecution();
 
 	return iAborted;
 }
