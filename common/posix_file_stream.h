@@ -277,8 +277,8 @@ class posix_file_stream {
     if (errc) {
       // For debugging.
       [[maybe_unused]] std::error_code errc2;
-      // Try to restore pointer.
-      std::tie(std::ignore, errc2) = seek(0, SEEK_END);
+      // Try to restore pointer to original.
+      std::tie(std::ignore, errc2) = seek(pos, SEEK_SET);
       // Return original error.
       return {-1, errc};
     }
