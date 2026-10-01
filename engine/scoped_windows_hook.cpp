@@ -19,8 +19,9 @@ ScopedWindowsHook::ScopedWindowsHook( int hook_type,
 	HINSTANCE instance,
 	unsigned long thread_id ) noexcept
 	: hook_{ ::SetWindowsHookExW( hook_type, hook_proc, instance, thread_id ) },
-	  errno_code_{ std::error_code{ static_cast<int>(::GetLastError()), std::system_category() } }
-{
+	  errno_code_{ hook_ ? std::error_code{}
+						 : std::error_code{ static_cast<int>( ::GetLastError() ),
+											std::system_category() } } {
 }
 
 // Destroys windows hook.
