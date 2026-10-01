@@ -214,9 +214,17 @@ void		V_qsort_s( INOUT_BYTECAP(num) void *base, size_t num, size_t width, int ( 
 
 // returns string immediately following prefix, (ie str+strlen(prefix)) or nullptr if prefix not found
 [[nodiscard]] RET_MAY_BE_NULL const char *StringAfterPrefix             ( IN_Z const char *str, IN_Z const char *prefix );
+// dimhotepus: returns string immediately following prefix, (ie str+strlen(prefix)) or nullptr if prefix not found
+[[nodiscard]] RET_MAY_BE_NULL const wchar_t *StringAfterPrefix           ( IN_Z const wchar_t *str, IN_Z const wchar_t *prefix );
 [[nodiscard]] RET_MAY_BE_NULL const char *StringAfterPrefixCaseSensitive( IN_Z const char *str, IN_Z const char *prefix );
+// dimhotepus: returns string immediately following prefix, (ie str+strlen(prefix)) or nullptr if prefix not found
+[[nodiscard]] RET_MAY_BE_NULL const wchar_t *StringAfterPrefixCaseSensitive( IN_Z const wchar_t *str, IN_Z const wchar_t *prefix );
 [[nodiscard]] inline bool	StringHasPrefix             ( IN_Z const char *str, IN_Z const char *prefix ) { return StringAfterPrefix             ( str, prefix ) != nullptr; }
+// dimhotepus: Check string has prefix.
+[[nodiscard]] inline bool	StringHasPrefix             ( IN_Z const wchar_t *str, IN_Z const wchar_t *prefix ) { return StringAfterPrefix             ( str, prefix ) != nullptr; }
 [[nodiscard]] inline bool	StringHasPrefixCaseSensitive( IN_Z const char *str, IN_Z const char *prefix ) { return StringAfterPrefixCaseSensitive( str, prefix ) != nullptr; }
+// dimhotepus: Check string has prefix.
+[[nodiscard]] inline bool	StringHasPrefixCaseSensitive( IN_Z const wchar_t *str, IN_Z const wchar_t *prefix ) { return StringAfterPrefixCaseSensitive( str, prefix ) != nullptr; }
 
 [[nodiscard]] inline bool V_streq(IN_Z const char *l, IN_Z const char *r) {
   return V_strcmp(l, r) == 0;

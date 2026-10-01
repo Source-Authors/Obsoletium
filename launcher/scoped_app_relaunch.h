@@ -34,10 +34,10 @@ class ScopedAppRelaunch {
 #endif
   }
 
-  ScopedAppRelaunch(const ScopedAppRelaunch &) = delete;
-  ScopedAppRelaunch(ScopedAppRelaunch &&) = delete;
-  ScopedAppRelaunch &operator=(const ScopedAppRelaunch &) = delete;
-  ScopedAppRelaunch &operator=(ScopedAppRelaunch &&) = delete;
+  ScopedAppRelaunch(const ScopedAppRelaunch&) = delete;
+  ScopedAppRelaunch(ScopedAppRelaunch&&) = delete;
+  ScopedAppRelaunch& operator=(const ScopedAppRelaunch&) = delete;
+  ScopedAppRelaunch& operator=(ScopedAppRelaunch&&) = delete;
 
   ~ScopedAppRelaunch() noexcept {
 #ifndef WIN32
@@ -71,18 +71,27 @@ class ScopedAppRelaunch {
     // here, exec it.  This supports the capability of immediately re-launching
     // the the game via Steam in a different audio language.
     HKEY key;
-    if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Valve\\Source", 0,
-                      KEY_ALL_ACCESS, &key) == ERROR_SUCCESS) {
-      RunCodeAtScopeExit(RegCloseKey(key));
+    if (::RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Valve\\Source", 0,
+                        KEY_ALL_ACCESS, &key) == ERROR_SUCCESS) {
+      RunCodeAtScopeExit(::RegCloseKey(key));
 
       wchar_t value[MAX_PATH];
-      DWORD value_size = std::size(value);
+      // in bytes + leave room for L'\0'
+      DWORD value_type, value_size = sizeof(value) - sizeof(wchar_t);
 
-      if (RegQueryValueExW(key, L"Relaunch URL", nullptr, nullptr,
-                           (unsigned char *)value,
-                           &value_size) == ERROR_SUCCESS) {
-        ShellExecuteW(nullptr, L"open", value, nullptr, nullptr, SW_SHOW);
-        RegDeleteValueW(key, L"Relaunch URL");
+      if (RegQueryValueExW(key, L"Relaunch URL", nullptr, &value_type,
+                           reinterpret_cast<unsigned char*>(value),
+                           &value_size) == ERROR_SUCCESS &&
+          value_type == REG_SZ) {
+        RunCodeAtScopeExit(RegDeleteValueW(key, L"Relaunch URL"));
+
+        // Ensure always zero-terminate.
+        value[value_size / sizeof(wchar_t)] = L'\0';
+
+        // dimhotepus: Only steam:// protocol allowed.
+        if (StringHasPrefix(value, L"steam://")) {
+          ::ShellExecuteW(nullptr, L"open", value, nullptr, nullptr, SW_SHOW);
+        }
       }
     }
 #endif

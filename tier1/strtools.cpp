@@ -326,10 +326,36 @@ RET_MAY_BE_NULL const char *StringAfterPrefix( IN_Z const char *str, IN_Z const 
 	return nullptr;
 }
 
+RET_MAY_BE_NULL const wchar_t *StringAfterPrefix( IN_Z const wchar_t *str, IN_Z const wchar_t *prefix )
+{
+	Assert( str );
+	Assert( prefix );
+	do
+	{
+		if ( !*prefix )
+			return str;
+	}
+	while ( towlower( *str++ ) == towlower( *prefix++ ) );
+	return nullptr;
+}
+
 RET_MAY_BE_NULL const char *StringAfterPrefixCaseSensitive( IN_Z const char *str, IN_Z const char *prefix )
 {
 	AssertValidStringPtr( str );
 	AssertValidStringPtr( prefix );
+	do
+	{
+		if ( !*prefix )
+			return str;
+	}
+	while ( *str++ == *prefix++ );
+	return nullptr;
+}
+
+RET_MAY_BE_NULL const wchar_t *StringAfterPrefixCaseSensitive( IN_Z const wchar_t *str, IN_Z const wchar_t *prefix )
+{
+	Assert( str );
+	Assert( prefix );
 	do
 	{
 		if ( !*prefix )
