@@ -1714,10 +1714,7 @@ void KeyValues::SetStringValue( char const *strValue )
 	}
 
 	// allocate memory for the new value and copy it in
-	intp len = Q_strlen( strValue );
-	m_sValue = new char[len + 1];
-	Q_memcpy( m_sValue, strValue, len+1 );
-
+	m_sValue = V_strdup( strValue );
 	m_iDataType = TYPE_STRING;
 }
 
@@ -1748,10 +1745,7 @@ void KeyValues::SetString( const char *keyName, const char *value )
 		}
 
 		// allocate memory for the new value and copy it in
-		intp len = Q_strlen( value );
-		dat->m_sValue = new char[len + 1];
-		Q_memcpy( dat->m_sValue, value, len+1 );
-
+		dat->m_sValue = V_strdup( value );
 		dat->m_iDataType = TYPE_STRING;
 	}
 }
@@ -1777,10 +1771,7 @@ void KeyValues::SetWString( const char *keyName, const wchar_t *value )
 		}
 
 		// allocate memory for the new value and copy it in
-		intp len = Q_wcslen( value );
-		dat->m_wsValue = new wchar_t[len + 1];
-		Q_memcpy( dat->m_wsValue, value, (len+1) * sizeof(wchar_t) );
-
+		dat->m_wsValue = V_wcsdup( value );
 		dat->m_iDataType = TYPE_WSTRING;
 	}
 }
@@ -2059,10 +2050,8 @@ KeyValues *KeyValues::MakeCopy( ) const
 		{
 			if ( m_sValue )
 			{
-				intp len = Q_strlen( m_sValue );
 				Assert( !newKeyValue->m_sValue );
-				newKeyValue->m_sValue = new char[len + 1];
-				Q_memcpy( newKeyValue->m_sValue, m_sValue, len+1 );
+				newKeyValue->m_sValue = V_strdup( m_sValue );
 			}
 		}
 		break;
@@ -2070,9 +2059,8 @@ KeyValues *KeyValues::MakeCopy( ) const
 		{
 			if ( m_wsValue )
 			{
-				intp len = Q_wcslen( m_wsValue );
-				newKeyValue->m_wsValue = new wchar_t[len+1];
-				Q_memcpy( newKeyValue->m_wsValue, m_wsValue, (len+1)*sizeof(wchar_t));
+				Assert( !newKeyValue->m_wsValue );
+				newKeyValue->m_wsValue = V_wcsdup( m_wsValue );
 			}
 		}
 		break;
@@ -2914,10 +2902,7 @@ bool KeyValues::ReadAsBinary( CUtlBuffer &buffer, int nStackDepth )
 				buffer.GetString( token );
 				token[KEYVALUES_TOKEN_SIZE-1] = 0;
 
-				intp len = Q_strlen( token );
-				dat->m_sValue = new char[len + 1];
-				Q_memcpy( dat->m_sValue, token, len+1 );
-
+				dat->m_sValue = V_strdup( token );
 				break;
 			}
 		case TYPE_WSTRING:
