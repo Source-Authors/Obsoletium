@@ -6346,39 +6346,39 @@ void S_Update_Guts( float mixAheadTime )
 	DEBUG_StopSoundMeasure( 4, samples );
 }
 
-constexpr inline int THREADED_MIX_TIME{33};
+constexpr inline int THREADED_MIX_TIME_MS{33};
 
 ConVar snd_showthreadframetime("snd_showthreadframetime", "0", 0, "Show sound mix thread update time", true, 0, true, 1);
 
 std::atomic_bool g_bMixThreadExit{false};
 ThreadHandle_t g_hMixThread;
-void S_Update_Thread()
+static void S_Update_Thread()
 {
-	float frameTime = THREADED_MIX_TIME * 0.001f;
-	double lastFrameTime = Plat_FloatTime();
+	float frameTimeSeconds = THREADED_MIX_TIME_MS * 0.001f;
+	double lastFrameTimeSeconds = Plat_FloatTime();
 
 	while ( !g_bMixThreadExit.load(std::memory_order::memory_order_relaxed) )
 	{
-		double t0 = Plat_FloatTime();
+		const double t0 = Plat_FloatTime();
 
-		S_Update_Guts( frameTime + snd_mixahead.GetFloat() );
+		S_Update_Guts( frameTimeSeconds + snd_mixahead.GetFloat() );
 
-		double updateTime = ( Plat_FloatTime() - t0 ) * 1000.0;
 		// try to maintain a steadier rate by compensating for fluctuating mix times
-		double sleepTime = THREADED_MIX_TIME - updateTime;
-		if ( sleepTime > 0 )
+		if ( const double updateTimeMs = ( Plat_FloatTime() - t0 ) * 1000.0,
+			 sleepTimeMs = THREADED_MIX_TIME_MS - updateTimeMs;
+			 sleepTimeMs > 0 )
 		{
-			ThreadSleep( (int)sleepTime );
+			ThreadSleep( (int)sleepTimeMs );
 		}
 
 		// mimic a frametime needed for sound update
-		double t1 = Plat_FloatTime();
-		frameTime = static_cast<float>(t1 - lastFrameTime);
-		lastFrameTime = t1;
+		const double t1 = Plat_FloatTime();
+		frameTimeSeconds = static_cast<float>(t1 - lastFrameTimeSeconds);
+		lastFrameTimeSeconds = t1;
 
 		if ( snd_showthreadframetime.GetBool() )
 		{
-			Msg( "S_Update_Thread: frameTime: %.2f ms\n", frameTime * 1000.0f );
+			Msg( "S_Update_Thread: frameTime: %.2fms\n", frameTimeSeconds * 1000.0f );
 		}
 	}
 }
