@@ -161,7 +161,7 @@ class ScopedAppMultiRun {
 #if defined(WIN32)
     return !!mutex_;
 #else
-    return lock_handle_ != -1
+    return lock_handle_ != -1;
 #endif
   }
 
