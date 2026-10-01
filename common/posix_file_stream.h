@@ -102,7 +102,8 @@ class posix_file_stream {
   // Like feof.
   [[nodiscard]] io_result<bool> eof() const noexcept {
     const int c{feof(fd_)};
-    return {c != 0, internal::posix_error_last()};
+    // feof doesn't set errno.
+    return {c != 0, posix_error_ok};
   }
 
   // Like fgetc, get char from file.
