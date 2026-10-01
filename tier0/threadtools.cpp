@@ -1921,12 +1921,7 @@ void CThread::BWaitForThreadSuspendCooperative()
 unsigned int CThread::Suspend()
 {
 #ifdef _WIN32
-  // dimhotepus: x64 support.
-#ifndef PLATFORM_64BITS
   return SuspendThread(m_hThread) != static_cast<DWORD>(-1); //-V720
-#else
-  return Wow64SuspendThread(m_hThread) != static_cast<DWORD>(-1);
-#endif
 #elif defined(OSX)
 	int susCount = m_nSuspendCount++;
 	while ( thread_suspend( pthread_mach_thread_np(m_threadId) ) != KERN_SUCCESS )
