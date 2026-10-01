@@ -1078,10 +1078,10 @@ intp CUtlBuffer::VaScanf( const char* pFmt, va_list list )
 				case 'h':
 				{
 					++shortModifier;
-						
-					AssertMsg( shortModifier > 2, "%s has more than 2 short modifiers.", pFmt );
 
-					if ( longModifier > 2 )
+					AssertMsg( shortModifier <= 2, "%s has more than 2 short modifiers.", pFmt );
+
+					if ( shortModifier > 2 )
 					{
 						return numScanned;
 					}
@@ -1091,8 +1091,8 @@ intp CUtlBuffer::VaScanf( const char* pFmt, va_list list )
 				case 'l':
 					{
 						++longModifier;
-						
-						AssertMsg( longModifier > 2, "%s has more than 2 long modifiers.", pFmt );
+
+						AssertMsg( longModifier <= 2, "%s has more than 2 long modifiers.", pFmt );
 
 						if ( longModifier > 2 )
 						{
@@ -1277,6 +1277,8 @@ intp CUtlBuffer::VaScanf( const char* pFmt, va_list list )
 				}
 
 				++numScanned;
+				shortModifier = 0;
+				longModifier = 0;
 			}
 			break;
 
