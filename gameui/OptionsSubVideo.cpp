@@ -29,6 +29,12 @@
 #include "vgui_controls/Tooltip.h"
 #include "sourcevr/isourcevirtualreality.h"
 #include "posix_file_stream.h"
+#include "scoped_dll.h"
+
+#ifdef _WIN32
+#include "winlite.h"
+#undef MessageBox
+#endif
 
 #if defined( USE_SDL )
 #include "include/SDL3/SDL.h"
@@ -97,13 +103,22 @@ static const char* GetNameForDXLevel(int dxlevel, char (&name)[bufferSize])
 {
 	if ( dxlevel >= 92 && dxlevel <= 95 )
 	{
-		V_sprintf_safe( name, "DirectX v9.0+" );
+		V_sprintf_safe( name, "DirectX 9.0+" );
 	}
 	else
 	{
-		V_sprintf_safe( name, "DirectX v%.1f", dxlevel / 10.0f );
+		V_sprintf_safe( name, "DirectX %.1f", dxlevel / 10.0f );
 	}
 	return name;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: returns the string name of a given dxlevel
+//-----------------------------------------------------------------------------
+static bool HasDirectXRuntime(const char* runtimeDllName)
+{
+	source::ScopedDll directxRuntime{runtimeDllName, LOAD_LIBRARY_SEARCH_SYSTEM32};
+	return !directxRuntime.error_code();
 }
 	
 //-----------------------------------------------------------------------------
@@ -968,27 +983,46 @@ public:
 		char dxVer[64];
 		SetControlString("dxlabel", GetNameForDXLevel( mat_dxlevel.GetInt(), dxVer ));
 
-		// get installed version
-		if ( char szVersion[64] = {0};
-			 system()->GetRegistryString( "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\DirectX\\Version", szVersion, sizeof(szVersion) ) )
+		// dimhotepus: Detect installed runtimes.
+		const char* dxRuntime;
+		if ( HasDirectXRuntime("d3d12.dll") )
 		{
-			if ( int os = 0, majorVersion = 0, minorVersion = 0, subVersion = 0;
-				 sscanf(szVersion, "%d.%d.%d.%d", &os, &majorVersion, &minorVersion, &subVersion) == 4 )
+			dxRuntime = "DirectX 12";
+		}
+		else if ( HasDirectXRuntime("d3d11.dll") )
+		{
+			dxRuntime = "DirectX 11";
+		}
+		else if ( HasDirectXRuntime("d3d10.dll") )
+		{
+			dxRuntime = "DirectX 10";
+		}
+		else
+		{
+			// get installed version
+			if ( char szVersion[64] = {0};
+				 system()->GetRegistryString( "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\DirectX\\Version", szVersion, sizeof(szVersion) ) )
 			{
-				V_sprintf_safe(dxVer, "DirectX v%d.%d", majorVersion, minorVersion);
+				if ( int os = 0, majorVersion = 0, minorVersion = 0, subVersion = 0;
+					 sscanf(szVersion, "%d.%d.%d.%d", &os, &majorVersion, &minorVersion, &subVersion) == 4 )
+				{
+					V_sprintf_safe(dxVer, "DirectX %d.%d", majorVersion, minorVersion);
+				}
+				else
+				{
+					// dimhotepus: Dump N/A version.
+					V_sprintf_safe(dxVer, "DirectX N/A");
+				}
 			}
 			else
 			{
 				// dimhotepus: Dump N/A version.
-				V_sprintf_safe(dxVer, "DirectX vX.X");
+				V_sprintf_safe(dxVer, "DirectX N/A");
 			}
+
+			dxRuntime = dxVer;
 		}
-		else
-		{
-			// dimhotepus: Dump N/A version.
-			V_sprintf_safe(dxVer, "DirectX vX.X");
-		}
-		SetControlString("dxinstalledlabel", dxVer);
+		SetControlString("dxinstalledlabel", dxRuntime);
 	}
 
 	void OnCommand( const char *command ) override
