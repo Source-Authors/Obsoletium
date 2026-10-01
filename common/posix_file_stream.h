@@ -15,6 +15,8 @@
 #include <system_error>
 #include <tuple>
 
+#include "tier0/annotations.h"
+
 namespace se::posix {
 
 // Input/output result.
@@ -83,7 +85,7 @@ class posix_file_stream {
 
   // Like fscanf_s, read from file by |format|.
   [[nodiscard]] io_result<size_t> scan(
-      _In_z_ _Scanf_s_format_string_ const char* format, ...) const noexcept {
+      IN_Z SCANF_FORMAT_STRING const char* format, ...) const noexcept {
     // fscanf_s analog.
     int fields_assigned_count;
     va_list arg_list;
@@ -117,7 +119,7 @@ class posix_file_stream {
   // Like fgets, get C string from file.
   template <size_t buffer_size>
   [[nodiscard]] io_result<char*> gets(
-      _Out_writes_z_(buffer_size) char (&buffer)[buffer_size]) const noexcept {
+      OUT_Z_CAP(buffer_size) char (&buffer)[buffer_size]) const noexcept {
     char* string{fgets(buffer, buffer_size, fd_)};
     return {string, string != nullptr ? posix_error_ok
                                       : internal::make_posix_error_from_result(
@@ -186,7 +188,7 @@ class posix_file_stream {
 
   // Like fprintf_s, write to file by |format|.
   [[nodiscard]] io_result<size_t> print(
-      _In_z_ _Printf_format_string_ const char* format, ...) const noexcept {
+      IN_Z PRINTF_FORMAT_STRING const char* format, ...) const noexcept {
     // fprintf_s analog.
     int bytes_written_count;
     va_list arg_list;
