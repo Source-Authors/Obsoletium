@@ -1815,7 +1815,12 @@ float CCurveData::GetIntensityArea( ICurveDataAccessor *data, float time )
 	CExpressionSample *esPre = GetBoundedSample( data, prev, bclamp[ 0 ] );
 	CExpressionSample *esNext = GetBoundedSample( data, next, bclamp[ 1 ] );
 
-	float dt = esEnd->time - esStart->time;
+	// dimhotepus: Check expression samples are present.
+	Assert( esStart );
+	Assert( esEnd );
+
+	// dimhotpeus: dt is 0 if no samples.
+	float dt = esStart && esEnd ? ( esEnd->time - esStart->time ) : 0.0f;
 
 	Vector vPre( esPre->time, esPre->value, 0 );
 	Vector vStart( esStart->time, esStart->value, 0 );
