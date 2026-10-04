@@ -17,6 +17,10 @@
 #include <io.h>
 #include <sys/stat.h>
 
+#ifdef _WIN32
+#include <direct.h>  // _mkdir.
+#endif
+
 #include "cmdlib.h"
 #include "scriplib.h"
 #include "mathlib/mathlib.h"
