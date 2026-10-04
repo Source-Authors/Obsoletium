@@ -242,16 +242,7 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 
 		success = AddFile( fileName, pPathID, bIncludeFallbackSearchPaths );
 
-		bool bValid;
-		if ( IsPC() )
-		{
-			bValid = vgui::g_pSystem->GetRegistryString( "HKEY_CURRENT_USER\\Software\\Valve\\Source\\Language", language, sizeof(language)-1 );
-		}
-		else
-		{
-			Q_strncpy( language, XBX_GetLanguageString(), sizeof( language ) );
-			bValid = true;
-		}
+		bool bValid = vgui::g_pSystem->GetRegistryString( "HKEY_CURRENT_USER\\Software\\Valve\\Source\\Language", language, sizeof(language)-1 );
 
 		// LOAD THE LOCALIZED FILE IF IT'S NOT ENGLISH
 		// append the language

@@ -397,16 +397,7 @@ InitReturnVal_t CMatSystemSurface::Init( void )
 
 	// fonts initialization
 	char language[64];
-	bool bValid;
-	if ( IsPC() )
-	{
-		bValid = system()->GetRegistryString( "HKEY_CURRENT_USER\\Software\\Valve\\Source\\Language", language, sizeof(language)-1 );
-	}
-	else
-	{
-		Q_strncpy( language, XBX_GetLanguageString(), sizeof( language ) );
-		bValid = true;
-	}
+	bool bValid = system()->GetRegistryString( "HKEY_CURRENT_USER\\Software\\Valve\\Source\\Language", language, sizeof(language)-1 );
 
 	if ( bValid )
 	{
