@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
 
   if (!module) {
     fprintf(stderr, "shadercompile error: Can't load '%s'.\n%s", module_name,
-            std::system_category().message(::GetLastError()).c_str());
+            module.error_code().message().c_str());
     return ENOENT;
   }
 
