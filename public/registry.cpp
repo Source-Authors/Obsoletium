@@ -226,6 +226,9 @@ const char *CRegistry::ReadString( const char *key, const char *defaultValue /* 
 		return defaultValue;
 	}
 
+	// dimhotepus: Harden, always zero terminate.
+	value[dwSize / sizeof(char)] = '\0';
+
 	return value;
 }
 

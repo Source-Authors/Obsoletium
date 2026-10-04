@@ -112,12 +112,18 @@ void CContentControlDialog::ResetPassword()
 		DWORD type;
 		DWORD bufSize = sizeof(m_szGorePW);
 
+		// dimhotepus: Harden, must be string.
 		if ( ERROR_SUCCESS != VCRHook_RegQueryValueEx(key, keyName, NULL, &type, (unsigned char *)m_szGorePW, &bufSize ) ||
-			 type != REG_SZ || bufSize == 0 )
+			 type != REG_SZ )
 		{
 			Warning( "Unexpected registry key %s value under %s. Assume none.\n", keyName, keyPath );
 			// dimhotepus: Broken value.
-			m_szGorePW[ 0 ] = 0;
+			m_szGorePW[0] = '\0';
+		}
+		else
+		{
+			// dimhotepus: Harden, always zero terminate.
+			m_szGorePW[bufSize / sizeof(char)] = '\0';
 		}
 	}
 	else

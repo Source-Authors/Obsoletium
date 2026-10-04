@@ -35,8 +35,13 @@ bool GetVConfigRegistrySetting( const char *pName, char *pReturn, unsigned long 
 	RunCodeAtScopeExit( RegCloseKey( hregkey ) );
 	
 	// Get the value
-	DWORD dwSize = size;
-	return RegQueryValueEx( hregkey, pName, nullptr, nullptr,(LPBYTE) pReturn, &dwSize ) == ERROR_SUCCESS;
+	DWORD dwType, dwSize = size;
+	bool isRead = RegQueryValueEx( hregkey, pName, nullptr, &dwType, (LPBYTE) pReturn, &dwSize ) == ERROR_SUCCESS;
+	// dimhotepus: Harden checks, must be string. 
+	AssertMsg( !isRead || dwType == REG_SZ, "Expected string in HKEY_CURRENT_USER\\%s\\%s, got %d\n", VPROJECT_REG_KEY, pName, dwType );
+	// dimhotepus: Ensure always zero-terminate.
+	pReturn[dwSize / sizeof(tchar)] = '\0';
+	return isRead && dwType == REG_SZ;
 }
 
 //-----------------------------------------------------------------------------
@@ -110,12 +115,20 @@ bool RemoveObsoleteVConfigRegistrySetting( const char *pValueName, char *pOldVal
 		// Return the old state if they've requested it
 		if ( pOldValue != nullptr )
 		{
-			DWORD dwSize = size;
+			DWORD dwType, dwSize = size;
 
 			// Get the value
-			if ( RegQueryValueEx( hregkey, pValueName, nullptr, nullptr, (LPBYTE) pOldValue, &dwSize ) != ERROR_SUCCESS )
+			if ( RegQueryValueEx( hregkey, pValueName, nullptr, &dwType, (LPBYTE) pOldValue, &dwSize ) != ERROR_SUCCESS ||
+				// dimhotepus: Harden checks, must be string.
+				dwType != REG_SZ )
 			{
+				pOldValue[0] = '\0';
 				return false;
+			}
+			else
+			{
+				// dimhotepus: Harden checks, zero terminate.
+				pOldValue[dwSize / sizeof(TCHAR)] = '\0';
 			}
 		}
 		

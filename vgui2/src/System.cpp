@@ -632,8 +632,13 @@ bool CSystem::GetRegistryString(const char *key, char *value, int valueLen)
 
 	RunCodeAtScopeExit(VCRHook_RegCloseKey(hKey));
 
-	unsigned long len=valueLen;
-	return VCRHook_RegQueryValueEx(hKey,key1,0,nullptr,(uchar*)value,&len)==ERROR_SUCCESS;
+	unsigned long type, len=valueLen;
+	bool isRead = VCRHook_RegQueryValueEx(hKey,key1,nullptr,&type,(uchar*)value,&len)==ERROR_SUCCESS;
+	// dimhotepus: Harden checks, must be string. 
+	AssertMsg( !isRead || type == REG_SZ, "Expected string in %s, got %d\n", key, type );
+	// dimhotepus: Ensure always zero-terminate.
+	value[valueLen / sizeof(tchar)] = '\0';
+	return isRead && type == REG_SZ;
 }
 
 bool CSystem::SetRegistryInteger(const char *key, int value)
@@ -695,8 +700,11 @@ bool CSystem::GetRegistryInteger(const char *key, int &value)
 
 	RunCodeAtScopeExit(VCRHook_RegCloseKey(hKey));
 
-	unsigned long len=4;
-	return VCRHook_RegQueryValueEx(hKey,key1,0,nullptr,(uchar*)&value,&len)==ERROR_SUCCESS;
+	unsigned long type, len=sizeof(value);
+	bool isRead = VCRHook_RegQueryValueEx(hKey,key1,nullptr,&type,(uchar*)&value,&len)==ERROR_SUCCESS;
+	// dimhotepus: Harden checks, must be DWORD. 
+	AssertMsg( !isRead || type == REG_DWORD, "Expected DWORD in %s, got %d\n", key, type );
+	return isRead && type == REG_DWORD;
 }
 
 //-----------------------------------------------------------------------------

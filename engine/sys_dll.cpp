@@ -1223,6 +1223,8 @@ void Sys_GetRegKeyValueUnderRoot( HKEY rootKey, const char *pszSubKey, const cha
 			// Only copy strings, and only copy as much data as requested.
 			if (dwType == REG_SZ)
 			{
+				// dimhotepus: Always zero-terminate.
+				szBuff[dwSize / sizeof(char)] = '\0';
 				Q_strncpy(pszReturnString, szBuff, nReturnLength);
 				pszReturnString[nReturnLength - 1] = '\0';
 			}
@@ -1280,7 +1282,8 @@ void Sys_GetRegKeyValueUnderRootInt( HKEY rootKey, const char *pszSubKey, const 
 		lResult = VCRHook_RegQueryValueEx( hKey, pszElement, 0, &dwType, (unsigned char *)plReturnValue, &dwSize );
 
 		// Success?
-		if (lResult != ERROR_SUCCESS)
+		// dimhotepus: Harden. If not REG_DWORD than overwrite with default.
+		if (lResult != ERROR_SUCCESS || dwType != REG_DWORD)
 			// Didn't find it, so write out new value
 		{
 			// Just Set the Values according to the defaults
