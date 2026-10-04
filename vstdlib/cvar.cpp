@@ -19,6 +19,9 @@
 // dimhotepus: CS:GO backport.
 #include "concommandhash.h"
 
+#include <array>
+#include <algorithm>
+
 #ifdef _X360
 #include "xbox/xbox_console.h"
 #endif
@@ -853,39 +856,59 @@ static bool ConVarSortFunc( ConCommandBase * const &lhs, ConCommandBase * const 
 //-----------------------------------------------------------------------------
 void CCvar::Find( const CCommand &args )
 {
-	const char *search;
-
-	if ( args.ArgC() != 2 )
+	// dimhotepus: Check matches all arguments. CS:GO backport.
+	const int searchCount{args.ArgC() - 1};
+	if ( searchCount < 1 )
 	{
-		ConMsg( "Usage:  find <string>\n" );
+		ConMsg( "Usage:  find <string> [<string>...]\n" );
 		return;
 	}
 
-	// Get substring to find
-	search = args[1];
+	// dimhotepus: Check matches all arguments. CS:GO backport.
+	std::array<const char*, 32> search;
+	if ( searchCount > search.size() )
+	{
+		ConMsg( "Too many arguments for find (%d > %zd max), sorry\n", searchCount, search.size() );
+		return;
+	}
+
+	// Get substrings to find
+	for ( int i = 0; i < searchCount; ++i )
+	{
+		search[i] = args[i + 1];
+	}
 
 	// dimhotepus: CS:GO backport. Sort commands.
 	CUtlRBTree< ConCommandBase *, int > sorted( 0, 0, ConVarSortFunc );
+	const auto end = search.begin() + searchCount;
 
 	// dimhotepus: CS:GO backport.
 	// Loop through vars and print out findings
 	for ( auto i = m_CommandHash.First() ;
-		m_CommandHash.IsValidIterator(i) ; 
+		m_CommandHash.IsValidIterator(i) ;
 		i = m_CommandHash.Next(i) )
 	{
 		ConCommandBase *var = m_CommandHash[ i ];
 		if ( var->IsFlagSet(FCVAR_DEVELOPMENTONLY) || var->IsFlagSet(FCVAR_HIDDEN) )
 			continue;
 
-		if ( !V_stristr( var->GetName(), search ) &&
-			!V_stristr( var->GetHelpText(), search ) )
-			continue;
+		// dimhotepus: Check matches all arguments. CS:GO backport.
+		const auto it = std::find_if_not(search.begin(), end, [=]( const char *word ) {
+			return V_stristr( var->GetName(), word ) ||
+				V_stristr( var->GetHelpText(), word );
+		});
 
-		sorted.Insert( var );
+		// dimhotepus: Check matches all arguments. CS:GO backport.
+		if ( it == end )
+		{
+			sorted.Insert( var );
+		}
 	}
 
 	// dimhotepus: CS:GO backport. Print sorted commands.
-	for ( auto i = sorted.FirstInorder(); i != sorted.InvalidIndex(); i = sorted.NextInorder( i ) )
+	for ( auto i = sorted.FirstInorder();
+		i != sorted.InvalidIndex();
+		i = sorted.NextInorder( i ) )
 	{
 		ConVar_PrintDescription( sorted[ i ] );
 	}
