@@ -161,6 +161,11 @@ public:
 		m_nMallocGrowSize = nGrowSize;
 	}
 
+	// dimhotepus: Ensure Swap is not used as it causes issues.
+	// The inherited CUtlMemory::Swap would exchange pointers to each other's
+	// inline buffers, leaving both objects pointing at the wrong storage.
+	void Swap( CUtlMemoryFixedGrowable & ) = delete;
+
 	void Grow( intp nCount = 1 )
 	{
 		if ( this->IsExternallyAllocated() )
