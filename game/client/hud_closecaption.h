@@ -49,6 +49,19 @@ struct AsyncCaption_t
 		}
 	};
 
+	// dimhotepus: Add explicit copy ctor.
+	AsyncCaption_t( const AsyncCaption_t& rhs )
+	{
+		m_CaptionDirectory = rhs.m_CaptionDirectory;
+		m_Header = rhs.m_Header;
+		m_DataBaseFile = rhs.m_DataBaseFile;
+
+		for ( auto i = rhs.m_RequestedBlocks.FirstInorder(); i != rhs.m_RequestedBlocks.InvalidIndex(); i = rhs.m_RequestedBlocks.NextInorder( i ) )
+		{
+			m_RequestedBlocks.Insert( rhs.m_RequestedBlocks[ i ] );
+		}
+	}
+
 	AsyncCaption_t& operator =( const AsyncCaption_t& rhs )
 	{
 		if ( this == &rhs )

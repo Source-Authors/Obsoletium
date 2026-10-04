@@ -52,7 +52,8 @@ struct ParticleEffectList_t
 		pParticleEffect = NULL;
 	}
 
-	CUtlVector<ParticleControlPoint_t>	pControlPoints;
+	// dimhotepus: CUtlVector -> CCopyableUtlVector as we should allow copies.
+	CCopyableUtlVector<ParticleControlPoint_t>	pControlPoints;
 	CSmartPtr<CNewParticleEffect>		pParticleEffect;
 };
 

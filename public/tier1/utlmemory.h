@@ -155,7 +155,7 @@ class CUtlMemoryFixedGrowable : public CUtlMemory< T, I >
 	using BaseClass = CUtlMemory<T, I>;
 
 public:
-	CUtlMemoryFixedGrowable( intp nGrowSize = 0, intp nInitSize = SIZE ) : BaseClass( m_pFixedMemory, SIZE )  //-V730 Buffer passed as pointer and not used in base ctor.
+	CUtlMemoryFixedGrowable( intp nGrowSize = 0, intp nInitSize = SIZE ) : BaseClass( reinterpret_cast<T*>( m_pFixedMemory ), SIZE )  //-V730 Buffer passed as pointer and not used in base ctor.
 	{
 		Assert( nInitSize == 0 || nInitSize == SIZE );
 		m_nMallocGrowSize = nGrowSize;
@@ -191,7 +191,11 @@ public:
 
 private:
 	intp m_nMallocGrowSize;
-	T m_pFixedMemory[ SIZE ];
+	// dimhotepus: Use raw storage so containers construct elements itself.
+	// Raw storage: containers construct/destruct elements themselves. A T[SIZE]
+	// array would default-construct SIZE objects up front and destroy them again
+	// in our destructor, on top of whatever the container did.
+	alignas( T ) unsigned char m_pFixedMemory[ SIZE * sizeof( T ) ];
 };
 
 //-----------------------------------------------------------------------------
@@ -266,7 +270,8 @@ public:
 	[[nodiscard]] constexpr Iterator_t InvalidIterator() const		{ return Iterator_t( InvalidIndex() ); }
 
 private:
-	char m_Memory[ SIZE*sizeof(T) + nAlignment ]; //-V104
+	// dimhotepus: Use raw storage so containers construct elements itself.
+	alignas( T ) char m_Memory[ SIZE*sizeof(T) + nAlignment ]; //-V104
 };
 
 #if defined(POSIX)
