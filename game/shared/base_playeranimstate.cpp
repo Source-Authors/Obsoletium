@@ -1010,16 +1010,16 @@ void CBasePlayerAnimState::DebugShowAnimState( int iStartLine )
 	{
 		CAnimationLayer *pLayer = m_pOuter->GetAnimOverlay( AIMSEQUENCE_LAYER + i );
 #ifdef CLIENT_DLL
-		AnimStatePrintf( iLine++, "%s(%d), weight: %.2f, cycle: %.2f, order (%d), aim (%d)", 
+		// dimhotepus: Drop unused aim arg.
+		AnimStatePrintf( iLine++, "%s(%d), weight: %.2f, cycle: %.2f, order (%d)", 
 			!pLayer->IsActive() ? "-- ": (pLayer->m_nSequence == 0 ? "-- " : GetSequenceName( m_pOuter->GetModelPtr(), pLayer->m_nSequence ) ), 
 			!pLayer->IsActive() ? 0 : (int)pLayer->m_nSequence, 
 			!pLayer->IsActive() ? 0 : (float)pLayer->m_flWeight, 
 			!pLayer->IsActive() ? 0 : (float)pLayer->m_flCycle, 
-			!pLayer->IsActive() ? 0 : (int)pLayer->m_nOrder,
-			i
-			);
+			!pLayer->IsActive() ? 0 : (int)pLayer->m_nOrder	);
 #else
-		AnimStatePrintf( iLine++, "%s(%d), flags (%d), weight: %.2f, cycle: %.2f, order (%d), aim (%d)", 
+		// dimhotepus: Drop unused aim arg.
+		AnimStatePrintf( iLine++, "%s(%d), flags (%d), weight: %.2f, cycle: %.2f, order (%d)", 
 			!pLayer->IsActive() ? "-- " : ( pLayer->m_nSequence == 0 ? "-- " : GetSequenceName( m_pOuter->GetModelPtr(), pLayer->m_nSequence ) ), 
 			!pLayer->IsActive() ? 0 : (int)pLayer->m_nSequence, 
 			!pLayer->IsActive() ? 0 : (int)pLayer->m_fFlags,// Doesn't exist on client
