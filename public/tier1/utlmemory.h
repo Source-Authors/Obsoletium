@@ -895,7 +895,8 @@ CUtlMemoryAligned<T, nAlignment>::CUtlMemoryAligned( intp nGrowSize, intp nInitA
 	{
 		UTLMEMORY_TRACK_ALLOC();
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = static_cast<T*>( _aligned_malloc( nInitAllocationCount * sizeof(T), nAlignment ) ); //-V106
+		// dimhotepus: Must match MemAlloc_ReallocAligned / MemAlloc_FreeAligned used by Grow / Purge.
+		CUtlMemory<T>::m_pMemory = static_cast<T*>( MemAlloc_AllocAligned( nInitAllocationCount * sizeof(T), nAlignment ) ); //-V106
 	}
 }
 
