@@ -7523,6 +7523,8 @@ void MXR_DebugShowMixVolumes( void )
 	{
 		if (pmixer->mapMixgroupidToValue[i] >= 0)
 		{
+			// dimhotepus: Ensure we zeroed all members.
+			BitwiseClear( groupvols[cgroups] );
 			groupvols[cgroups].mixgroupid = i;
 			groupvols[cgroups].psz = MXR_GetGroupnameFromId( i );
 			groupvols[cgroups].totalvol = 0.0;
@@ -7537,24 +7539,28 @@ void MXR_DebugShowMixVolumes( void )
 	CChannelList list;
 	g_ActiveChannels.GetActiveChannels( list );
 
-	for ( auto &ch : list )
+	// dimhotepus: Only if we have group volumes.
+	if ( cgroups > 0 )
 	{
-		if (ch.last_vol > 0.0f)
+		for ( auto &ch : list )
 		{
-			// find entry in groupvols
-			for (auto &vol : groupvols)
+			if (ch.last_vol > 0.0f)
 			{
-				if (ch.last_mixgroupid == vol.mixgroupid)
+				// find entry in groupvols
+				for ( auto &vol : groupvols )
 				{
-					vol.totalvol += ch.last_vol;
-					break;
+					if (ch.last_mixgroupid == vol.mixgroupid)
+					{
+						vol.totalvol += ch.last_vol;
+						break;
+					}
 				}
 			}
 		}
 	}
 
 	// groupvols is now fully initialized - just display it
-	MXR_DebugGraphMixVolumes( groupvols, cgroups);
+	MXR_DebugGraphMixVolumes( groupvols, cgroups );
 }
 
 #ifdef _DEBUG
