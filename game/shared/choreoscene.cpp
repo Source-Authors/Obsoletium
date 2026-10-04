@@ -3625,7 +3625,7 @@ bool CChoreoScene::Merge( CChoreoScene *other )
 		}
 	}
 
-	Msg( "Merged in (%i) actors, (%i) channels, and (%i) events\n",
+	Msg( "Merged in (%zd) actors, (%zd) channels, and (%zd) events\n",
 		acount, ccount, ecount );
 
 	return ( ecount || acount || ccount );
