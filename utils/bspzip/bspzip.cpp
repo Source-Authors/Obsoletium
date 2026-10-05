@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
   // [ -game foo ] -<action> <action specific args>
 
   // Skip -game foo
-  if (argc >= curArg + 2 && stricmp(argv[curArg], "-game") == 0) {
+  if (argc >= curArg + 2 && V_strieq(argv[curArg], "-game")) {
     // Handled by filesystem code
     curArg += 2;
   }
@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
   CommandLine()->CreateCmdLine(argc, argv);
   MathLib_Init(2.2f, 2.2f, 0.0f, 2);
 
-  if ((stricmp(pAction, "-extract") == 0) && nActionArgs == 2) {
+  if (V_strieq(pAction, "-extract") && nActionArgs == 2) {
     // bspzip -extract <bspfile> <blah.zip>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
     Q_DefaultExtension(zipName, ".zip");
 
     ExtractZipFileFromBSP(bspName, zipName);
-  } else if ((stricmp(pAction, "-extractfiles") == 0) && nActionArgs == 2) {
+  } else if (V_strieq(pAction, "-extractfiles") && nActionArgs == 2) {
     // bsipzip -extractfiles <bspfile> <targetpath>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -205,7 +205,7 @@ int main(int argc, char **argv) {
     }
 
     printf("%zi files extracted.\n", numFilesExtracted);
-  } else if ((stricmp(pAction, "-extractcubemaps") == 0) && nActionArgs == 2) {
+  } else if (V_strieq(pAction, "-extractcubemaps") && nActionArgs == 2) {
     // bspzip -extractcubemaps <bspfile> <targetPath>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -267,7 +267,7 @@ int main(int argc, char **argv) {
     }
 
     printf("%zi cubemaps extracted.\n", numFilesExtracted);
-  } else if ((stricmp(pAction, "-deletecubemaps") == 0) && nActionArgs == 1) {
+  } else if (V_strieq(pAction, "-deletecubemaps") && nActionArgs == 1) {
     // bspzip -deletecubemaps <bspfile>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -306,7 +306,7 @@ int main(int argc, char **argv) {
       printf("Updating bsp file: %s.\n", bspName);
       WriteBSPFile(bspName);
     }
-  } else if ((stricmp(pAction, "-addfiles") == 0) && nActionArgs == 4) {
+  } else if (V_strieq(pAction, "-addfiles") && nActionArgs == 4) {
     // bspzip -addfiles <bspfile> <relativePathPrefix> <listfile> <newbspfile>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -358,7 +358,7 @@ int main(int argc, char **argv) {
       printf("Writing new bsp file: %s.\n", newbspName);
       WriteBSPFile(newbspName);
     }
-  } else if ((stricmp(pAction, "-dir") == 0) && nActionArgs == 1) {
+  } else if (V_strieq(pAction, "-dir") && nActionArgs == 1) {
     // bspzip -dir <bspfile>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -368,7 +368,7 @@ int main(int argc, char **argv) {
 
     LoadBSPFile(bspName);
     PrintBSPPackDirectory();
-  } else if ((stricmp(pAction, "-addfile") == 0) && nActionArgs == 4) {
+  } else if (V_strieq(pAction, "-addfile") && nActionArgs == 4) {
     // bspzip -addfile <bspfile> <relativepathname> <fullpathname> <newbspfile>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -390,7 +390,7 @@ int main(int argc, char **argv) {
     LoadBSPFile(bspName);
     AddFileToPak(GetPakFile(), relativeName, fullpathName);
     WriteBSPFile(newbspName);
-  } else if ((stricmp(pAction, "-addlist") == 0) && nActionArgs == 3) {
+  } else if (V_strieq(pAction, "-addlist") && nActionArgs == 3) {
     // bspzip -addlist <bspfile> <listfile> <newbspfile>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -446,7 +446,7 @@ int main(int argc, char **argv) {
       printf("Writing new bsp file: %s.\n", newbspName);
       WriteBSPFile(newbspName);
     }
-  } else if ((stricmp(pAction, "-addorupdatelist") == 0) && nActionArgs == 3) {
+  } else if (V_strieq(pAction, "-addorupdatelist") && nActionArgs == 3) {
     // bspzip -addorupdatelist <bspfile> <listfile> <newbspfile>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -508,13 +508,13 @@ int main(int argc, char **argv) {
       printf("Writing new bsp file: %s.\n", newbspName);
       WriteBSPFile(newbspName);
     }
-  } else if ((stricmp(pAction, "-repack") == 0) &&
+  } else if (V_strieq(pAction, "-repack") &&
              (nActionArgs == 1 || nActionArgs == 2)) {
     // bspzip -repack [ -compress ] <bspfile>
     bool bCompress = false;
     const char *pFile = pActionArgs[0];
 
-    if (nActionArgs == 2 && stricmp(pActionArgs[0], "-compress") == 0) {
+    if (nActionArgs == 2 && V_strieq(pActionArgs[0], "-compress")) {
       pFile = pActionArgs[1];
       bCompress = true;
     } else if (nActionArgs == 2) {
