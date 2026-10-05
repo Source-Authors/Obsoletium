@@ -41,6 +41,8 @@ class CSoundSystem : public CTier2AppSystem< ISoundSystem >
 	using BaseClass = CTier2AppSystem< ISoundSystem >;
 
 public:
+	CSoundSystem() : m_pAudioDevice{nullptr}, m_flElapsedTime{-1.0f} {}
+
 	// Inherited from IAppSystem
 	bool Connect( CreateInterfaceFn factory ) override;
 	void Disconnect() override;

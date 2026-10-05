@@ -61,12 +61,6 @@ private:
 
 CAudioMixerWaveADPCM::CAudioMixerWaveADPCM( CWaveData *data ) : CAudioMixerWave( data ) 
 {
-	m_currentBlock = -1;
-	m_pSamples = NULL;
-	m_sampleCount = 0;
-	m_samplePosition = 0;
-	m_offset = 0;
-
 	m_pFormat = (const ADPCMWAVEFORMAT *)m_pData->Source().GetHeader();
 	if ( m_pFormat )
 	{
@@ -77,10 +71,21 @@ CAudioMixerWaveADPCM::CAudioMixerWaveADPCM( CWaveData *data ) : CAudioMixerWave(
 
 		// number of bytes for samples
 		m_blockSize = ((m_pFormat->wSamplesPerBlock - 2) * m_pFormat->wfx.nChannels ) / 2;
+
 		// size of channel header
 		m_blockSize += 7 * m_pFormat->wfx.nChannels;
-//		Assert(m_blockSize < MAX_BLOCK_SIZE);
 	}
+	else
+	{
+		m_pCoefficients = nullptr;
+		m_pSamples = nullptr;
+		m_blockSize = 0;
+	}
+	
+	m_sampleCount = 0;
+	m_samplePosition = 0;
+	m_offset = 0;
+	m_currentBlock = -1;
 }
 
 
