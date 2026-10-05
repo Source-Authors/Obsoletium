@@ -2118,7 +2118,11 @@ bool CMDLCache::HandleCacheNotification( const DataCacheNotification_t &notifica
 	case DC_FLUSH_DISCARD:
 	case DC_REMOVED:
 		{
-			MdlCacheMsg( "MDLCache: Data cache discard %s %s\n", g_ppszTypes[TypeFromCacheID( notification.clientId )], GetModelName( HandleFromCacheID( notification.clientId ) ) );
+			MDLCacheDataType_t type = TypeFromCacheID( notification.clientId );
+			MdlCacheMsg(
+				"MDLCache: Data cache discard %s %s\n",
+				type < ssize( g_ppszTypes ) ? g_ppszTypes[type] : "Unknown",
+				GetModelName( HandleFromCacheID( notification.clientId ) ) );
 
 			if ( (DataCacheClientID_t)notification.pItemData == notification.clientId ||
 				 TypeFromCacheID(notification.clientId) != MDLCACHE_STUDIOHWDATA )
@@ -2147,7 +2151,12 @@ bool CMDLCache::GetItemName( DataCacheClientID_t clientId, const void *pItem, ch
 	MDLHandle_t handle = HandleFromCacheID( clientId );
 	MDLCacheDataType_t type = TypeFromCacheID( clientId );
 
-	Q_snprintf( pDest, nMaxLen, "%s - %s", g_ppszTypes[type], GetModelName( handle ) );
+	Q_snprintf(
+		pDest,
+		nMaxLen,
+		"%s - %s",
+		type < ssize( g_ppszTypes ) ? g_ppszTypes[type] : "Unknown",
+		GetModelName( handle ) );
 
 	return false;
 }

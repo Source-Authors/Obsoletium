@@ -1337,12 +1337,12 @@ void CDataCache::OutputItemReport( memhandle_t hItem )
 
 	pSection->GetClient()->GetItemName( pItem->clientId, pItem->pItemData, name, DC_MAX_ITEM_NAME );
 
-	Msg( "\t%16.16s : %12s : 0x%08x, 0x%p, 0x%p : %s : %s\n", 
+	Msg( "\t%16.16s : %12s : 0x%08zx, 0x%p, 0x%p : %s : %s\n", 
 		Q_pretifymem( pItem->size, 2, true ), 
 		pSection->GetName(), 
 		pItem->clientId, pItem->pItemData, hItem,
 		( name[0] ) ? name : "unknown",
-		( m_LRU.LockCount( hItem ) ) ? CFmtStr( "Locked %d", m_LRU.LockCount( hItem ) ).operator const char*() : "" );
+		( m_LRU.LockCount( hItem ) ) ? static_cast<const char *>( CFmtStr( "Locked %d", m_LRU.LockCount( hItem ) ) ) : "" );
 }
 
 
