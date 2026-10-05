@@ -208,8 +208,9 @@ void CAttributeTextEntry::OnKeyCodeTyped(KeyCode code)
 			WriteInitialValueToAttribute( );
 			break;
 		}
-
+		
 		// NOTE: Fall through to default if it's not Ctrl-Z
+		[[fallthrough]];
 
 	default:
 		BaseClass::OnKeyCodeTyped(code);
