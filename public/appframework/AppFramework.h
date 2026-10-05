@@ -10,6 +10,7 @@
 #define APPFRAMEWORK_H
 
 #include "appframework/IAppSystemGroup.h"
+#include "tier0/annotations.h"
 
 
 //-----------------------------------------------------------------------------
@@ -44,7 +45,7 @@ void AppShutdown( CAppSystemGroup *pAppSystemGroup );
 //-----------------------------------------------------------------------------
 #ifdef WIN32
 #define DEFINE_WINDOWED_APPLICATION_OBJECT_GLOBALVAR( _globalVarName ) \
-	int __stdcall WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, char *lpCmdLine, int nCmdShow )	\
+	int __stdcall WinMain( IN_P HINSTANCE hInstance, IN_OPT HINSTANCE hPrevInstance, IN_P char *lpCmdLine, IN_P int nCmdShow )	\
 	{																							\
 		return AppMain( hInstance, hPrevInstance, lpCmdLine, nCmdShow, &_globalVarName );		\
 	}
