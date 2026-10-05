@@ -216,8 +216,8 @@ public:
 
 	void RemoveKv( KeyValues *kv )
 	{
-		int c = keys.Count();
-		for ( int i = 0; i < c; i++ )
+		intp c = keys.Count();
+		for ( intp i = 0; i < c; i++ )
 		{
 			if ( keys[i].kv == kv )
 			{
