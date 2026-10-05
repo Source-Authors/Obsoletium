@@ -1936,57 +1936,26 @@ void XM_CALLCONV QuaternionMatrix( const Quaternion &q, matrix3x4_t& matrix )
 	VPROF_BUDGET( "QuaternionMatrix", "Mathlib" );
 #endif
 
-// Original code
-// This should produce the same code as below with optimization, but looking at the assmebly,
-// it doesn't.  There are 7 extra multiplies in the release build of this, go figure.
-#if 1
-	matrix[0][0] = 1.0f - 2.0f * q.y * q.y - 2.0f * q.z * q.z;
-	matrix[1][0] = 2.0f * q.x * q.y + 2.0f * q.w * q.z;
-	matrix[2][0] = 2.0f * q.x * q.z - 2.0f * q.w * q.y;
+	// dimhotepus: Precompute a bit.
+	float qx2  = q.x * q.x, qy2  = q.y * q.y, qz2  = q.z * q.z;
+	float qxqy = q.x * q.y, qxqz = q.x * q.z, qxqw = q.x * q.w;
+	float qyqz = q.y * q.z, qyqw = q.y * q.w, qzqw = q.z * q.w;
 
-	matrix[0][1] = 2.0f * q.x * q.y - 2.0f * q.w * q.z;
-	matrix[1][1] = 1.0f - 2.0f * q.x * q.x - 2.0f * q.z * q.z;
-	matrix[2][1] = 2.0f * q.y * q.z + 2.0f * q.w * q.x;
+	matrix[0][0] = 1.0f - 2.0f * ( qy2 + qz2 );
+	matrix[1][0] = 2.0f * ( qxqy + qzqw );
+	matrix[2][0] = 2.0f * ( qxqz - qyqw );
 
-	matrix[0][2] = 2.0f * q.x * q.z + 2.0f * q.w * q.y;
-	matrix[1][2] = 2.0f * q.y * q.z - 2.0f * q.w * q.x;
-	matrix[2][2] = 1.0f - 2.0f * q.x * q.x - 2.0f * q.y * q.y;
+	matrix[0][1] = 2.0f * ( qxqy - qzqw );
+	matrix[1][1] = 1.0f - 2.0f * ( qx2 + qz2 );
+	matrix[2][1] = 2.0f * ( qyqz + qxqw );
 
-	matrix[0][3] = 0.0f;
-	matrix[1][3] = 0.0f;
-	matrix[2][3] = 0.0f;
-#else
-   float wx, wy, wz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
+	matrix[0][2] = 2.0f * ( qxqz + qyqw );
+	matrix[1][2] = 2.0f * ( qyqz - qxqw );
+	matrix[2][2] = 1.0f - 2.0f * ( qx2 + qy2 );
 
-    // precalculate common multiplitcations
-    x2 = q.x + q.x; 
-	y2 = q.y + q.y; 
-    z2 = q.z + q.z;
-    xx = q.x * x2;
-	xy = q.x * y2;
-	xz = q.x * z2;
-    yy = q.y * y2;
-	yz = q.y * z2;
-	zz = q.z * z2;
-    wx = q.w * x2;
-	wy = q.w * y2;
-	wz = q.w * z2;
-
-    matrix[0][0] = 1.0 - (yy + zz);
-    matrix[0][1] = xy - wz;
-	matrix[0][2] = xz + wy;
     matrix[0][3] = 0.0f;
-
-    matrix[1][0] = xy + wz;
-	matrix[1][1] = 1.0 - (xx + zz);
-    matrix[1][2] = yz - wx;
 	matrix[1][3] = 0.0f;
-
-    matrix[2][0] = xz - wy;
-	matrix[2][1] = yz + wx;
-    matrix[2][2] = 1.0 - (xx + yy);
 	matrix[2][3] = 0.0f;
-#endif
 }
 
 
