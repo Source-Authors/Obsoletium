@@ -1042,7 +1042,7 @@ void KeyValues::SaveKeyToFile( KeyValues *dat, IBaseFileSystem *filesystem, File
 				break;
 			}
 		case TYPE_COLOR:
-			DevMsg(1, "KeyValues::RecursiveSaveToFile: TODO, missing code for TYPE_COLOR.\n");
+			DevWarning(1, "KeyValues::RecursiveSaveToFile: TODO, missing code for TYPE_COLOR.\n");
 			break;
 
 		default:
@@ -2242,7 +2242,7 @@ void KeyValues::ParseIncludedKeys( char const *resourceName, const char *filetoi
 	}
 	else
 	{
-		DevMsg( "KeyValues::ParseIncludedKeys: Couldn't load included keyvalue file %s\n", fullpath );
+		DevWarning( "KeyValues::ParseIncludedKeys: Couldn't load included keyvalue file %s\n", fullpath );
 		newKV->deleteThis();
 	}
 
