@@ -863,11 +863,9 @@ void MakeSrcFileName( char (&pSrcName)[src_size], unsigned int flags, const char
 	char tempBuf[512];
 	if( bNormalToDUDV )
 	{
-		if ( Q_stristr( pFullNameWithoutExtension, "_dudv" ) )
+		V_strcpy_safe( tempBuf, pFullNameWithoutExtension );
+		if ( char *pNormalString = Q_stristr( tempBuf, "_dudv" ); pNormalString )
 		{
-			V_strcpy_safe( tempBuf, pFullNameWithoutExtension );
-
-			char *pNormalString = Q_stristr( tempBuf, "_dudv" );
 			V_strcpy( pNormalString, "_normal" );
 			pFullNameWithoutExtension = tempBuf;
 		}
