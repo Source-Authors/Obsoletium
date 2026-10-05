@@ -703,12 +703,18 @@ void ReadPortalFile(char *name) {
   glNewList(2, GL_COMPILE);
 
   // Read in header
-  fscanf(f, "%79s\n", szDummy);
+  if (fscanf(f, "%79s\n", szDummy) != 1) {
+    Error("Failed to read header from portal file '%s'.\n", name);
+  }
   // dimhotepus: Ensure zero-terminated read.
   szDummy[ssize(szDummy) - 1] = '\0';
 
-  fscanf(f, "%i\n", &nNumLeafs);
-  fscanf(f, "%i\n", &nNumPortals);
+  if (fscanf(f, "%i\n", &nNumLeafs) != 1) {
+    Error("Failed to read number of leafs from portal file '%s'.\n", name);
+  }
+  if (fscanf(f, "%i\n", &nNumPortals) != 1) {
+    Error("Failed to read number of portals from portal file '%s'.\n", name);
+  }
 
   glLineWidth(1.5);
 
