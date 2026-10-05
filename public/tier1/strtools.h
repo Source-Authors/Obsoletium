@@ -1172,8 +1172,8 @@ template <typename NameArray>
 
 	intp freeindex = startindex;
 
-	intp nNames = nameArray.Count();
-	for ( intp i = 0; i < nNames; ++i )
+	auto nNames = nameArray.Count();
+	for ( decltype(nNames) i = 0; i < nNames; ++i )
 	{
 		const char *pName = nameArray[ i ];
 		if ( !pName )
