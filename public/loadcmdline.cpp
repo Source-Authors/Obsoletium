@@ -19,10 +19,12 @@ static bool sFoundConfigArgs = false;
 static void AddArguments( int &argc, char **&argv, const char *str )
 {
 	char  **args	 = 0;
-	char   *argList	 = 0;
 	int		argCt	 = argc;
 
-	argList = V_strdup( str );
+	char *argList = V_strdup(str);
+	if ( !argList ) return;
+
+	RunCodeAtScopeExit(delete[] argList);
 
 	// Parse the arguments out of the string
 	char *token = strtok( argList, " " );
@@ -62,8 +64,6 @@ static void AddArguments( int &argc, char **&argv, const char *str )
 		argc = argCt;
 		argv = args;
 	}
-
-	delete [] argList;
 }
 
 //-----------------------------------------------------------------------------
