@@ -125,6 +125,7 @@ static void RecursiveHandleEvent( mxWindow *window, mxEvent *event )
 	}
 }
 
+#if 0
 static char const *translatecode( unsigned code )
 {
 	switch ( code )
@@ -177,6 +178,8 @@ static char const *translatecode( unsigned code )
 
 	return "Unknown!!!";
 }
+#endif
+
 static LRESULT CALLBACK WndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM lParam)
 {
 	static bool bDragging = false;
