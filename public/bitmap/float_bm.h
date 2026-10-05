@@ -9,7 +9,6 @@
 #ifndef FLOAT_BM_H
 #define FLOAT_BM_H
 
-#include <algorithm>  // clamp
 #include <cstring>
 #include <utility>    // min, max
 
@@ -126,8 +125,8 @@ public:
 	[[nodiscard]] inline float & PixelClamped(int x, int y, int comp) const
 	{
 		// like Pixel except wraps around to other side
-		x=std::clamp(x,0,Width-1);
-		y=std::clamp(y,0,Height-1);
+		x=Clamp(x,0,Width-1);
+		y=Clamp(y,0,Height-1);
 		return RGBAData[4*(x+Width*y)+comp];
 	}
 

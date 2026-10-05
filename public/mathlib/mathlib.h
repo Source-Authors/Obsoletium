@@ -8,7 +8,6 @@
 #define MATH_LIB_H
 
 #include <DirectXMath.h>
-#include <algorithm>
 #include <cmath>
 
 #include "minmax.h"

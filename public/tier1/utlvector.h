@@ -11,7 +11,6 @@
 #ifndef UTLVECTOR_H
 #define UTLVECTOR_H
 
-#include <algorithm>
 #include <cstddef>
 #include <cstring>
 #include <functional>
