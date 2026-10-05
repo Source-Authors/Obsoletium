@@ -245,7 +245,7 @@ private:
 
 	CDmeCombinationControlsPanel *m_pComboPanel;
 	vgui::TextEntry *m_pWrinkleEdit;
-	bool m_bIsWrinkle;
+	bool m_bIsWrinkle{false};
 };
 
 

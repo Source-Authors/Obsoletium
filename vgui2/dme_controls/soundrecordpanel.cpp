@@ -33,8 +33,6 @@ using namespace vgui;
 CSoundRecordPanel::CSoundRecordPanel( vgui::Panel *pParent, const char *pTitle ) : 
 	BaseClass( pParent, "SoundRecordPanel" )
 {
-	m_bIsRecording = false;
-	m_nPlayingSound = 0;
 	SetDeleteSelfOnClose( true );
 	m_pOkButton = new Button( this, "OkButton", "#FileOpenDialog_Open", this, "Ok" );
 	m_pCancelButton = new Button( this, "CancelButton", "#FileOpenDialog_Cancel", this, "Cancel" );
@@ -42,6 +40,10 @@ CSoundRecordPanel::CSoundRecordPanel( vgui::Panel *pParent, const char *pTitle )
 	m_pRecordButton = new Button( this, "Record", "Record", this, "ToggleRecord" );
 	m_pRecordTime = new TextEntry( this, "RecordTime" );
 	m_pFileName = new TextEntry( this, "FileName" );
+
+	m_nPlayingSound = 0;
+	m_flRecordStartTime = -1.0;
+	m_bIsRecording = false;
 
 	LoadControlSettingsAndUserConfig( "resource/soundrecordpanel.res" );
 

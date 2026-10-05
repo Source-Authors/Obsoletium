@@ -234,6 +234,7 @@ CBaseAnimSetAttributeSliderPanel::CBaseAnimSetAttributeSliderPanel( vgui::Panel 
 	m_flEstimatedValue( 0.0f ),
 	m_nFaderChangeFlags( 0 ),
 	m_bRequestedNewPreview( false ),
+	m_nActiveControlSetMode( -1 ),
 	m_ChannelToSliderLookup( 0, 0, ChannelToSliderLookup_t::Less ),
 	m_flRecomputePreviewTime( -1.0 ),
 	m_flPrevTime( 0.0 )

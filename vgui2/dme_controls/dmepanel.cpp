@@ -509,6 +509,11 @@ CBaseDmePanelFactory* CBaseDmePanelFactory::s_pFirstDmePanelFactory;
 //-----------------------------------------------------------------------------
 CBaseDmePanelFactory::CBaseDmePanelFactory( const char *pElementType, const char *pEditorName, 
 	const char *pEditorDisplayName, bool bIsDefault, bool bIsOverride )
+	: m_pElementType{pElementType},
+	m_pEditorName{pEditorName},
+	m_pEditorDisplayName{pEditorDisplayName},
+	m_bIsDefault{bIsDefault},
+	m_bIsOverride{bIsOverride}
 {
 	// Prior to linking this in, look to see if this has been overridden
 	CBaseDmePanelFactory *pPrevFactory = NULL;
@@ -541,12 +546,6 @@ CBaseDmePanelFactory::CBaseDmePanelFactory( const char *pElementType, const char
 
 	m_pNext = s_pFirstDmePanelFactory;
 	s_pFirstDmePanelFactory = this;
-
-	m_pElementType = pElementType;
-	m_pEditorName = pEditorName;
-	m_pEditorDisplayName = pEditorDisplayName;
-	m_bIsDefault = bIsDefault;
-	m_bIsOverride = bIsOverride;
 }
 
 

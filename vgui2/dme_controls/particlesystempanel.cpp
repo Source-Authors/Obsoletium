@@ -373,11 +373,8 @@ private:
 CControlPointPage::CControlPointPage( vgui::Panel *pParent, const char *pName, CParticleSystemPanel *pParticleSystemPanel ) :
 	BaseClass( pParent, pName )
 {
-	for ( intp i = 0; i < ssize(m_pControlPointName); ++i )
-	{
-		m_pControlPointName[i] = NULL;
-		m_pControlPointValue[i] = NULL;
-	}
+	BitwiseClear( m_pControlPointName );
+	BitwiseClear( m_pControlPointValue );
 
 	m_pParticleSystemPanel = pParticleSystemPanel;
 }

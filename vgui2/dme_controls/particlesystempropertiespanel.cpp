@@ -501,6 +501,8 @@ CParticleFunctionBrowser::CParticleFunctionBrowser( vgui::Panel *pParent, const 
 	m_pFunctionList->SetSortColumn( 0 );
 	m_pFunctionList->AddActionSignalTarget( this );
 
+	m_pParticleFunctionProperties = nullptr;
+
 	LoadControlSettings( "resource/particlefunctionbrowser.res" );
 }
 
@@ -932,6 +934,8 @@ CParticleSystemPropertiesPanel::CParticleSystemPropertiesPanel( IParticleSystemP
 	vgui::Panel *pSplitterRightSide = m_pSplitter->GetChild( 1 );
 
 	m_pFunctionBrowserArea = new vgui::EditablePanel( pSplitterLeftSide, "FunctionBrowserArea" );
+	BitwiseClear( m_pParticleFunctionBrowser );
+
 	m_pFunctionTypeCombo = new vgui::ComboBox( pSplitterLeftSide, "FunctionTypeCombo", PARTICLE_FUNCTION_COUNT+1, false );
 	m_pFunctionTypeCombo->AddItem( "Properties", new KeyValues( "choice", "index", -1 ) );
 	m_pFunctionTypeCombo->AddActionSignalTarget( this );
