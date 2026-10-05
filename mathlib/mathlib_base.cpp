@@ -481,16 +481,15 @@ void XM_CALLCONV MatrixVectors( const matrix3x4_t &matrix, Vector* pForward, Vec
 
 void XM_CALLCONV VectorVectors( const Vector &forward, Vector &right, Vector &up )
 {
-	Assert( s_bMathlibInitialized );
 	Vector tmp;
 
 	if (forward[0] == 0 && forward[1] == 0)
 	{
 		// pitch 90 degrees up/down from identity
-		right[0] = 0;	
-		right[1] = -1; 
+		right[0] = 0;
+		right[1] = -1;
 		right[2] = 0;
-		up[0] = -forward[2]; 
+		up[0] = -forward[2];
 		up[1] = 0; 
 		up[2] = 0;
 	}
@@ -506,7 +505,6 @@ void XM_CALLCONV VectorVectors( const Vector &forward, Vector &right, Vector &up
 
 void XM_CALLCONV VectorMatrix( const Vector &forward, matrix3x4_t& matrix)
 {
-	Assert( s_bMathlibInitialized );
 	Vector right, up;
 	VectorVectors(forward, right, up);
 
@@ -707,8 +705,6 @@ quotient must fit in 32 bits.
 void XM_CALLCONV FloorDivMod (float numer, float denom, int *quotient,
 		int *rem)
 {
-	Assert( s_bMathlibInitialized );
-
 #ifdef PARANOID
 	if (denom <= 0.0f)
 		Sys_Error ("FloorDivMod: bad denominator %f.\n", denom);
@@ -1055,7 +1051,6 @@ int XM_CALLCONV BoxOnPlaneSide ( Vector emins, Vector emaxs, const cplane_t *p )
 
 void XM_CALLCONV AngleVectors (const QAngle &angles, Vector *forward)
 {
-	Assert( s_bMathlibInitialized );
 	Assert( forward );
 	
 	float	sp, sy, cp, cy;
@@ -1073,8 +1068,6 @@ void XM_CALLCONV AngleVectors (const QAngle &angles, Vector *forward)
 //-----------------------------------------------------------------------------
 void XM_CALLCONV AngleVectors( const QAngle &angles, Vector *forward, Vector *right, Vector *up )
 {
-	Assert( s_bMathlibInitialized );
-	
 	fltx4 sine, cosine;
 	fltx4 radians = MulSIMD( DirectX::XMLoadFloat3( angles.XmBase() ), ReplicateX4( M_PI_F / 180.f ) );
 	SinCos3SIMD( sine, cosine, radians );
@@ -1110,8 +1103,6 @@ void XM_CALLCONV AngleVectors( const QAngle &angles, Vector *forward, Vector *ri
 
 void XM_CALLCONV AngleVectorsTranspose (const QAngle &angles, Vector *forward, Vector *right, Vector *up)
 {
-	Assert( s_bMathlibInitialized );
-
 	fltx4 sine, cosine;
 	fltx4 radians = MulSIMD( DirectX::XMLoadFloat3( angles.XmBase() ), ReplicateX4( M_PI_F / 180.f ) );
 	SinCos3SIMD( sine, cosine, radians );
@@ -1180,8 +1171,6 @@ void XM_CALLCONV VectorAngles( const Vector& forward, QAngle &angles )
 
 void XM_CALLCONV VectorAngles( const Vector &forward, const Vector &pseudoup, QAngle &angles )
 {
-	Assert( s_bMathlibInitialized );
-
 	Vector left;
 
 	CrossProduct( pseudoup, forward, left );
@@ -1339,8 +1328,6 @@ void XM_CALLCONV AngleMatrix( const QAngle &angles, matrix3x4_t& matrix )
 #ifdef _VPROF_MATHLIB
 	VPROF_BUDGET( "AngleMatrix", "Mathlib" );
 #endif
-	Assert( s_bMathlibInitialized );
-
 	fltx4 sine, cosine;
 	fltx4 radians = MulSIMD( DirectX::XMLoadFloat3( angles.XmBase() ), ReplicateX4( M_PI_F / 180.f ) );
 	SinCos3SIMD( sine, cosine, radians );
@@ -1379,7 +1366,6 @@ void XM_CALLCONV AngleIMatrix( const RadianEuler& angles, matrix3x4_t& matrix )
 
 void XM_CALLCONV AngleIMatrix (const QAngle& angles, matrix3x4_t& matrix )
 {
-	Assert( s_bMathlibInitialized );
 	float		sr, sp, sy, cr, cp, cy;
 	
 	SinCos( DEG2RAD( angles[YAW] ), &sy, &cy );
@@ -1570,7 +1556,6 @@ bool XM_CALLCONV SolveInverseReciprocalQuadratic( float x1, float y1, float x2, 
 // Rotate a vector around the Z axis (YAW)
 void XM_CALLCONV VectorYawRotate( const Vector &in, float flYaw, Vector &out)
 {
-	Assert( s_bMathlibInitialized );
 	if (&in == &out )
 	{
 		Vector tmp;
@@ -1680,7 +1665,6 @@ void XM_CALLCONV QuaternionAlign( const Quaternion &p, const Quaternion &q, Quat
 //-----------------------------------------------------------------------------
 void XM_CALLCONV QuaternionBlend( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt )
 {
-	Assert( s_bMathlibInitialized );
 #if ALLOW_SIMD_QUATERNION_MATH
 	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
 	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
@@ -1697,8 +1681,6 @@ void XM_CALLCONV QuaternionBlend( const Quaternion &p, const Quaternion &q, floa
 
 void XM_CALLCONV QuaternionBlendNoAlign( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt )
 {
-	Assert( s_bMathlibInitialized );
-
 	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
 	fltx4 qsimd = DirectX::XMLoadFloat4( q.XmBase() );
 	fltx4 qtsimd = QuaternionBlendNoAlignSIMD( psimd, qsimd, t );
@@ -1709,8 +1691,6 @@ void XM_CALLCONV QuaternionBlendNoAlign( const Quaternion &p, const Quaternion &
 
 void XM_CALLCONV QuaternionIdentityBlend( const Quaternion &p, float t, Quaternion &qt )
 {
-	Assert( s_bMathlibInitialized );
-
 	fltx4 psimd = DirectX::XMLoadFloat4( p.XmBase() );
 	fltx4 sclp = ReplicateX4( 1.0f - t );
 
@@ -1808,7 +1788,6 @@ void XM_CALLCONV QuaternionConjugate( const Quaternion &p, Quaternion &q )
 
 void XM_CALLCONV QuaternionInvert( const Quaternion &p, Quaternion &q )
 {
-	Assert( s_bMathlibInitialized );
 	Assert( q.IsValid() );
 
 	QuaternionConjugate( p, q );
@@ -1851,8 +1830,6 @@ void XM_CALLCONV QuaternionNormalize2( Quaternion &q )
 
 void XM_CALLCONV QuaternionScale( const Quaternion &p, float t, Quaternion &q )
 {
-	Assert( s_bMathlibInitialized );
-
 	float r;
 
 	// FIXME: nick, this isn't overly sensitive to accuracy, and it may be faster to 
@@ -1918,7 +1895,6 @@ float XM_CALLCONV QuaternionDotProduct( const Quaternion &p, const Quaternion &q
 // qt = p * q
 void XM_CALLCONV QuaternionMult( const Quaternion &p, const Quaternion &q, Quaternion &qt )
 {
-	Assert( s_bMathlibInitialized );
 	Assert( p.IsValid() );
 	Assert( q.IsValid() );
 
@@ -1954,7 +1930,6 @@ void XM_CALLCONV QuaternionMatrix( const Quaternion &q, const Vector &pos, matri
 
 void XM_CALLCONV QuaternionMatrix( const Quaternion &q, matrix3x4_t& matrix )
 {
-	Assert( s_bMathlibInitialized );
 	if ( !HushAsserts() )
 	{
 		Assert( q.IsValid() );
@@ -2025,7 +2000,6 @@ void XM_CALLCONV QuaternionMatrix( const Quaternion &q, matrix3x4_t& matrix )
 //-----------------------------------------------------------------------------
 void XM_CALLCONV QuaternionAngles( const Quaternion &q, QAngle &angles )
 {
-	Assert( s_bMathlibInitialized );
 	Assert( q.IsValid() );
 
 #ifdef _VPROF_MATHLIB
@@ -2200,7 +2174,6 @@ void XM_CALLCONV MatrixQuaternion( const matrix3x4_t &mat, Quaternion &q )
 //-----------------------------------------------------------------------------
 void XM_CALLCONV QuaternionAngles( const Quaternion &q, RadianEuler &angles )
 {
-	Assert( s_bMathlibInitialized );
 	Assert( q.IsValid() );
 
 	// FIXME: doing it this way calculates too much data, needs to do an optimized version...
@@ -2259,7 +2232,6 @@ void XM_CALLCONV Catmull_Rom_Spline(
 	float t, 
 	Vector& output )
 {
-	Assert( s_bMathlibInitialized );
 	float tSqr = t*t*0.5f;
 	float tSqrSqr = t*tSqr;
 	t *= 0.5f;
@@ -2314,7 +2286,6 @@ void XM_CALLCONV Catmull_Rom_Spline_Tangent(
 	float t, 
 	Vector& output )
 {
-	Assert( s_bMathlibInitialized );
 	float tOne = 3*t*t*0.5f;
 	float tTwo = 2*t*0.5f;
 	float tThree = 0.5;
@@ -2464,7 +2435,6 @@ void XM_CALLCONV Hermite_Spline(
 	float t, 
 	Vector& output )
 {
-	Assert( s_bMathlibInitialized );
 	float tSqr = t*t;
 	float tCube = t*tSqr;
 
@@ -2580,8 +2550,6 @@ void XM_CALLCONV Kochanek_Bartels_Spline(
 	float t, 
 	Vector& output )
 {
-	Assert( s_bMathlibInitialized );
-
 	float ffa, ffb, ffc, ffd;
 
 	ffa = ( 1.0f - tension ) * ( 1.0f + continuity ) * ( 1.0f + bias );
@@ -2665,8 +2633,6 @@ void XM_CALLCONV Cubic_Spline(
 	float t, 
 	Vector& output )
 {
-	Assert( s_bMathlibInitialized );
-
 	float tSqr = t*t;
 	float tSqrSqr = t*tSqr;
 
@@ -2723,8 +2689,6 @@ void XM_CALLCONV BSpline(
 	float t, 
 	Vector& output )
 {
-	Assert( s_bMathlibInitialized );
-
 	float oneOver6 = 1.0f / 6.0f;
 
 	float tSqr = t * t * oneOver6;
@@ -2800,8 +2764,6 @@ void XM_CALLCONV Parabolic_Spline(
 	float t, 
 	Vector& output )
 {
-	Assert( s_bMathlibInitialized );
-
 	float tSqr = t*t*0.5f;
 	t *= 0.5f;
 
@@ -3131,7 +3093,6 @@ void XM_CALLCONV CalcSqrDistAndClosestPointOnAABB( const Vector &mins, const Vec
 
 float CalcClosestPointToLineT( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vDir )
 {
-	Assert( s_bMathlibInitialized );
 	VectorSubtract( vLineB, vLineA, vDir );
 
 	// D dot [P - (A + D*t)] = 0
@@ -3149,7 +3110,6 @@ float CalcClosestPointToLineT( const Vector &P, const Vector &vLineA, const Vect
 
 void XM_CALLCONV CalcClosestPointOnLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *outT )
 {
-	Assert( s_bMathlibInitialized );
 	Vector vDir;
 	float t = CalcClosestPointToLineT( P, vLineA, vLineB, vDir );
 	if ( outT ) *outT = t;
@@ -3159,7 +3119,6 @@ void XM_CALLCONV CalcClosestPointOnLine( const Vector &P, const Vector &vLineA, 
 
 float XM_CALLCONV CalcDistanceToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *outT )
 {
-	Assert( s_bMathlibInitialized );
 	Vector vClosest;
 	CalcClosestPointOnLine( P, vLineA, vLineB, vClosest, outT );
 	return P.DistTo(vClosest);
@@ -3167,7 +3126,6 @@ float XM_CALLCONV CalcDistanceToLine( const Vector &P, const Vector &vLineA, con
 
 float XM_CALLCONV CalcDistanceSqrToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *outT )
 {
-	Assert( s_bMathlibInitialized );
 	Vector vClosest;
 	CalcClosestPointOnLine( P, vLineA, vLineB, vClosest, outT );
 	return P.DistToSqr(vClosest);
@@ -3188,7 +3146,6 @@ void XM_CALLCONV CalcClosestPointOnLineSegment( const Vector &P, const Vector &v
 
 float XM_CALLCONV CalcDistanceToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *outT )
 {
-	Assert( s_bMathlibInitialized );
 	Vector vClosest;
 	CalcClosestPointOnLineSegment( P, vLineA, vLineB, vClosest, outT );
 	return P.DistTo( vClosest );
@@ -3196,7 +3153,6 @@ float XM_CALLCONV CalcDistanceToLineSegment( const Vector &P, const Vector &vLin
 
 float XM_CALLCONV CalcDistanceSqrToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *outT )
 {
-	Assert( s_bMathlibInitialized );
 	Vector vClosest;
 	CalcClosestPointOnLineSegment( P, vLineA, vLineB, vClosest, outT );
 	return P.DistToSqr(vClosest);
@@ -3204,7 +3160,6 @@ float XM_CALLCONV CalcDistanceSqrToLineSegment( const Vector &P, const Vector &v
 
 float CalcClosestPointToLineT2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, Vector2D &vDir )
 {
-	Assert( s_bMathlibInitialized );
 	Vector2DSubtract( vLineB, vLineA, vDir );
 
 	// D dot [P - (A + D*t)] = 0
@@ -3222,7 +3177,6 @@ float CalcClosestPointToLineT2D( const Vector2D &P, const Vector2D &vLineA, cons
 
 void XM_CALLCONV CalcClosestPointOnLine2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, Vector2D &vClosest, float *outT )
 {
-	Assert( s_bMathlibInitialized );
 	Vector2D vDir;
 	float t = CalcClosestPointToLineT2D( P, vLineA, vLineB, vDir );
 	if ( outT ) *outT = t;
@@ -3231,7 +3185,6 @@ void XM_CALLCONV CalcClosestPointOnLine2D( const Vector2D &P, const Vector2D &vL
 
 float XM_CALLCONV CalcDistanceToLine2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, float *outT )
 {
-	Assert( s_bMathlibInitialized );
 	Vector2D vClosest;
 	CalcClosestPointOnLine2D( P, vLineA, vLineB, vClosest, outT );
 	return P.DistTo( vClosest );
@@ -3239,7 +3192,6 @@ float XM_CALLCONV CalcDistanceToLine2D( const Vector2D &P, const Vector2D &vLine
 
 float XM_CALLCONV CalcDistanceSqrToLine2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, float *outT )
 {
-	Assert( s_bMathlibInitialized );
 	Vector2D vClosest;
 	CalcClosestPointOnLine2D( P, vLineA, vLineB, vClosest, outT );
 	return P.DistToSqr(vClosest);
@@ -3260,7 +3212,6 @@ void XM_CALLCONV CalcClosestPointOnLineSegment2D( const Vector2D &P, const Vecto
 
 float XM_CALLCONV CalcDistanceToLineSegment2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, float *outT )
 {
-	Assert( s_bMathlibInitialized );
 	Vector2D vClosest;
 	CalcClosestPointOnLineSegment2D( P, vLineA, vLineB, vClosest, outT );
 	return P.DistTo( vClosest );
@@ -3268,7 +3219,6 @@ float XM_CALLCONV CalcDistanceToLineSegment2D( const Vector2D &P, const Vector2D
 
 float XM_CALLCONV CalcDistanceSqrToLineSegment2D( const Vector2D &P, const Vector2D &vLineA, const Vector2D &vLineB, float *outT )
 {
-	Assert( s_bMathlibInitialized );
 	Vector2D vClosest;
 	CalcClosestPointOnLineSegment2D( P, vLineA, vLineB, vClosest, outT );
 	return P.DistToSqr( vClosest );
