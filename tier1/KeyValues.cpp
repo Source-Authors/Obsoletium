@@ -49,7 +49,6 @@ static char s_pTokenBuf[KEYVALUES_TOKEN_SIZE];
 
 
 // a simple class to keep track of a stack of valid parsed symbols
-constexpr inline int MAX_ERROR_STACK = 64;
 class CKeyValuesErrorStack
 {
 public:
@@ -130,12 +129,14 @@ public:
 	}
 
 private:
+	static constexpr inline int MAX_ERROR_STACK = 64;
+
 	HKeySymbol		m_errorStack[MAX_ERROR_STACK];
-	const char *m_pFilename{"NULL"};
+	const char		*m_pFilename{"NULL"};
 	// dimhotepus: Add line #. CS:GO backport.
-	int		m_nLine{1};
-	int		m_errorIndex{0};
-	int		m_maxErrorIndex{0};
+	int				m_nLine{1};
+	int				m_errorIndex{0};
+	int				m_maxErrorIndex{0};
 };
 
 static CKeyValuesErrorStack g_KeyValuesErrorStack;
