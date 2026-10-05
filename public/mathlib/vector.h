@@ -2166,7 +2166,7 @@ class QAngleByValue : public QAngle
 {
 public:
 	// Construction/destruction:
-	QAngleByValue() : QAngle() {} 
+	QAngleByValue() = default;
 	QAngleByValue(vec_t X, vec_t Y, vec_t Z) : QAngle( X, Y, Z ) {}
 	QAngleByValue(const QAngleByValue& vOther) = default;
 };
