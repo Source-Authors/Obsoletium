@@ -144,22 +144,26 @@ static CKeyValuesErrorStack g_KeyValuesErrorStack;
 class CKeyErrorContext
 {
 public:
-	CKeyErrorContext( KeyValues *pKv )
+	// dimhotepus: Make error stack usage explicit.
+	CKeyErrorContext( CKeyValuesErrorStack &errorStack, KeyValues *pKv )
+		: CKeyErrorContext( errorStack, pKv->GetNameSymbol() )
 	{
-		Init( pKv->GetNameSymbol() );
 	}
 
 	~CKeyErrorContext()
 	{
-		g_KeyValuesErrorStack.Pop();
+		m_errorStack.Pop();
 	}
-	CKeyErrorContext( HKeySymbol symName )
+	
+	// dimhotepus: Make error stack usage explicit.
+	CKeyErrorContext( CKeyValuesErrorStack &errorStack, HKeySymbol symName )
+		: m_errorStack( errorStack )
 	{
 		Init( symName );
 	}
 	void Reset( HKeySymbol symName )
 	{
-		g_KeyValuesErrorStack.Reset( m_stackLevel, symName );
+		m_errorStack.Reset( m_stackLevel, symName );
 	}
 	[[nodiscard]] int GetStackLevel() const
 	{
@@ -168,9 +172,11 @@ public:
 private:
 	void Init( HKeySymbol symName )
 	{
-		m_stackLevel = g_KeyValuesErrorStack.Push( symName );
+		m_stackLevel = m_errorStack.Push( symName );
 	}
 
+	// dimhotepus: Make error stack usage explicit.
+	CKeyValuesErrorStack& m_errorStack;
 	int m_stackLevel;
 };
 
@@ -2552,7 +2558,8 @@ bool KeyValues::LoadFromBuffer( char const *resourceName, const char *pBuffer, I
 //-----------------------------------------------------------------------------
 void KeyValues::RecursiveLoadFromBuffer( char const *resourceName, CUtlBuffer &buf )
 {
-	CKeyErrorContext errorReport(this);
+	// dimhotepus: Make error stack usage explicit.
+	CKeyErrorContext errorReport( g_KeyValuesErrorStack, this );
 	bool wasQuoted;
 	bool wasConditional;
 	if ( errorReport.GetStackLevel() > 100 )
@@ -2561,8 +2568,9 @@ void KeyValues::RecursiveLoadFromBuffer( char const *resourceName, CUtlBuffer &b
 		return;
 	}
 
+	// dimhotepus: Make error stack usage explicit.
 	// keep this out of the stack until a key is parsed
-	CKeyErrorContext errorKey( INVALID_KEY_SYMBOL );
+	CKeyErrorContext errorKey( g_KeyValuesErrorStack, INVALID_KEY_SYMBOL );
 
 	// Locate the last child.  (Almost always, we will not have any children.)
 	// We maintain the pointer to the last child here, so we don't have to re-locate
