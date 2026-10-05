@@ -25,7 +25,7 @@ class CVguiMatSysApp : public CVguiSteamApp
 	using BaseClass = CVguiSteamApp;
 
 public:
-	CVguiMatSysApp() = default;
+	CVguiMatSysApp() : m_HWnd{nullptr}, m_nWidth{-1}, m_nHeight{-1} {}
 
 	// Methods of IApplication
 	bool Create() override;
