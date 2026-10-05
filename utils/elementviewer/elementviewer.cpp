@@ -229,7 +229,7 @@ void VGui_DrawPopups( void )
 
 		//Con_NPrintf( i, 
 		Msg( 
-			"%zd:  %s : %x, %s pos(%i,%i) w(%i) h(%i)\n",
+			"%zd:  %s : %zx, %s pos(%i,%i) w(%i) h(%i)\n",
 			i,
 			p,
 			popup,
