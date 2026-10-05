@@ -2620,11 +2620,11 @@ void CElementPropertiesTreeInternal::OnSetShared( KeyValues *params )
 		intp nCount = array.Count();
 		for ( intp j = 0; j < nCount; ++j )
 		{
-			CDmElement *pElement = array[ j ];
-			if ( !pElement )
+			CDmElement *pElement2 = array[ j ];
+			if ( !pElement2 )
 				continue;
 
-			pElement->SetShared( bShared );
+			pElement2->SetShared( bShared );
 		}
 	}
 
@@ -3127,23 +3127,23 @@ void CElementPropertiesTreeInternal::GenerateContextMenu( intp itemIndex, [[mayb
 		for ( intp i = 0; i < nSelected; ++i )
 		{
 			KeyValues *kv = selected[ i ];
-			CDmElement *pElement = GetElementKeyValue<CDmElement>( kv, "dmeelement" );
+			CDmElement *pElement2 = GetElementKeyValue<CDmElement>( kv, "dmeelement" );
 
 			// element attribute or element array item
-			if ( pElement )
+			if ( pElement2 )
 			{
 				++nElements;
-				if ( pElement->IsShared() )
+				if ( pElement2->IsShared() )
 				{
 					++nShared;
 				}
 				continue;
 			}
 
-			CDmElement *pOwner = GetElementKeyValue< CDmElement >( kv, "ownerelement" );
-			const char *pAttributeName = kv->GetString( "attributeName" );
+			CDmElement *pOwnerElement = GetElementKeyValue< CDmElement >( kv, "ownerelement" );
+			const char *pAttributeName2 = kv->GetString( "attributeName" );
 
-			const CDmrElementArray<> array( pOwner, pAttributeName );
+			const CDmrElementArray<> array( pOwnerElement, pAttributeName2 );
 			if ( !array.IsValid() )
 				continue; // value attribute, value array item, or value array
 
@@ -3151,12 +3151,12 @@ void CElementPropertiesTreeInternal::GenerateContextMenu( intp itemIndex, [[mayb
 			intp nCount = array.Count();
 			for ( intp j = 0; j < nCount; ++j )
 			{
-				CDmElement *pElement = array[ j ];
-				if ( !pElement )
+				CDmElement *pElement3 = array[ j ];
+				if ( !pElement3 )
 					continue;
 
 				++nElements;
-				if ( pElement->IsShared() )
+				if ( pElement3->IsShared() )
 				{
 					++nShared;
 				}
@@ -3881,13 +3881,13 @@ void CElementPropertiesTreeInternal::ExpandOpenItems( OpenItemTree_t &tree, int 
 			if ( info.m_nFlags & EP_SELECTED )
 			{
 				// Look for preserved item
-				intp nChildIndex = FindTreeItem( nItemIndex, info.m_Preserved );
-				if ( nChildIndex != -1 )
+				intp nChildIndex2 = FindTreeItem( nItemIndex, info.m_Preserved );
+				if ( nChildIndex2 != -1 )
 				{
-					m_pTree->GetTree()->AddSelectedItem( nChildIndex, false, false );
+					m_pTree->GetTree()->AddSelectedItem( nChildIndex2, false, false );
 					if ( makeVisible )
 					{
-						m_pTree->GetTree()->MakeItemVisible( nChildIndex );
+						m_pTree->GetTree()->MakeItemVisible( nChildIndex2 );
 					}
 				}
 			}

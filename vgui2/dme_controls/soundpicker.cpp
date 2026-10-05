@@ -54,7 +54,8 @@ static int __cdecl GameSoundSortFunc( vgui::ListPanel *pPanel, const ListPanelIt
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
 CSoundPicker::CSoundPicker( vgui::Panel *pParent, int nFlags ) : 
-	BaseClass( pParent, "Sound Files", "wav", "sound", "wavName" )
+	BaseClass( pParent, "Sound Files", "wav", "sound", "wavName" ),
+	m_GameSoundFilter{}
 {
 	m_nSoundSuppressionCount = 0;
 	m_nPlayingSound = 0;

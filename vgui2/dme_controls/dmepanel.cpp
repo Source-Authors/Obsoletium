@@ -513,7 +513,8 @@ CBaseDmePanelFactory::CBaseDmePanelFactory( const char *pElementType, const char
 	m_pEditorName{pEditorName},
 	m_pEditorDisplayName{pEditorDisplayName},
 	m_bIsDefault{bIsDefault},
-	m_bIsOverride{bIsOverride}
+	m_bIsOverride{bIsOverride},
+	m_pNext{nullptr}
 {
 	// Prior to linking this in, look to see if this has been overridden
 	CBaseDmePanelFactory *pPrevFactory = NULL;
