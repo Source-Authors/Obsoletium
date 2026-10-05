@@ -137,11 +137,11 @@ int main(int argc, char **argv) {
 
     char bspName[MAX_PATH] = {0};
     V_MakeAbsolutePath(bspName, pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp");
+    V_DefaultExtension(bspName, ".bsp");
 
     char zipName[MAX_PATH] = {0};
     V_strcpy_safe(zipName, pActionArgs[1]);
-    Q_DefaultExtension(zipName, ".zip");
+    V_DefaultExtension(zipName, ".zip");
 
     ExtractZipFileFromBSP(bspName, zipName);
   } else if (V_strieq(pAction, "-extractfiles") && nActionArgs == 2) {
@@ -235,7 +235,7 @@ int main(int argc, char **argv) {
                            fileSize);
       if (id == -1) break;
 
-      if (Q_stristr(relativeName, ".vtf")) {
+      if (V_stristr(relativeName, ".vtf")) {
         buf.EnsureCapacity(fileSize);
         buf.SeekPut(CUtlBuffer::SEEK_HEAD, 0);
 
@@ -290,7 +290,7 @@ int main(int argc, char **argv) {
                            fileSize);
       if (id == -1) break;
 
-      if (Q_stristr(relativeName, ".vtf")) {
+      if (V_stristr(relativeName, ".vtf")) {
         RemoveFileFromPak(GetPakFile(), relativeName);
 
         numFilesDeleted++;
@@ -312,7 +312,7 @@ int main(int argc, char **argv) {
 
     char bspName[MAX_PATH] = {0};
     V_MakeAbsolutePath(bspName, pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp");
+    V_DefaultExtension(bspName, ".bsp");
 
     char relativePrefixName[MAX_PATH] = {0};
     V_strcpy_safe(relativePrefixName, pActionArgs[1]);
@@ -322,7 +322,7 @@ int main(int argc, char **argv) {
 
     char newbspName[MAX_PATH] = {0};
     V_MakeAbsolutePath(newbspName, pActionArgs[3]);
-    Q_DefaultExtension(newbspName, ".bsp");
+    V_DefaultExtension(newbspName, ".bsp");
 
     char fullpathName[MAX_PATH] = {0};
     FILE *fp = fopen(filelistName, "r");
@@ -364,7 +364,7 @@ int main(int argc, char **argv) {
 
     char bspName[MAX_PATH] = {0};
     V_MakeAbsolutePath(bspName, pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp");
+    V_DefaultExtension(bspName, ".bsp");
 
     LoadBSPFile(bspName);
     PrintBSPPackDirectory();
@@ -374,7 +374,7 @@ int main(int argc, char **argv) {
 
     char bspName[MAX_PATH] = {0};
     V_MakeAbsolutePath(bspName, pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp");
+    V_DefaultExtension(bspName, ".bsp");
 
     char relativeName[MAX_PATH] = {0};
     V_strcpy_safe(relativeName, pActionArgs[1]);
@@ -384,7 +384,7 @@ int main(int argc, char **argv) {
 
     char newbspName[MAX_PATH] = {0};
     V_MakeAbsolutePath(newbspName, pActionArgs[3]);
-    Q_DefaultExtension(newbspName, ".bsp");
+    V_DefaultExtension(newbspName, ".bsp");
 
     // read it in, add pack file, write it back out
     LoadBSPFile(bspName);
@@ -396,14 +396,14 @@ int main(int argc, char **argv) {
 
     char bspName[MAX_PATH] = {0};
     V_MakeAbsolutePath(bspName, pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp");
+    V_DefaultExtension(bspName, ".bsp");
 
     char filelistName[MAX_PATH] = {0};
     V_strcpy_safe(filelistName, pActionArgs[1]);
 
     char newbspName[MAX_PATH] = {0};
     V_MakeAbsolutePath(newbspName, pActionArgs[2]);
-    Q_DefaultExtension(newbspName, ".bsp");
+    V_DefaultExtension(newbspName, ".bsp");
 
     // read it in, add pack file, write it back out
 
@@ -452,14 +452,14 @@ int main(int argc, char **argv) {
 
     char bspName[MAX_PATH] = {0};
     V_MakeAbsolutePath(bspName, pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp");
+    V_DefaultExtension(bspName, ".bsp");
 
     char filelistName[MAX_PATH] = {0};
     V_strcpy_safe(filelistName, pActionArgs[1]);
 
     char newbspName[MAX_PATH] = {0};
     V_MakeAbsolutePath(newbspName, pActionArgs[2]);
-    Q_DefaultExtension(newbspName, ".bsp");
+    V_DefaultExtension(newbspName, ".bsp");
 
     // read it in, add pack file, write it back out
 
@@ -525,7 +525,7 @@ int main(int argc, char **argv) {
 
     char szAbsBSPPath[MAX_PATH] = {0};
     V_MakeAbsolutePath(szAbsBSPPath, pFile);
-    Q_DefaultExtension(szAbsBSPPath, ".bsp");
+    V_DefaultExtension(szAbsBSPPath, ".bsp");
 
     return RepackBSP(szAbsBSPPath, bCompress) ? 0 : -1;
   } else {
