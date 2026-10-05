@@ -901,7 +901,6 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM
 			{
 				ShowWindow (hwnd, SW_HIDE);
 
-				mxWindow *window = (mxWindow *) GetWindowLongPtr (hwnd, GWLP_USERDATA);
 				if (window)
 				{
 					mxEvent event;
