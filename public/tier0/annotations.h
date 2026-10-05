@@ -38,6 +38,8 @@
 #define IN_BYTECAP(x) _In_bytecount_(x)
 // dimhotepus: Add in read bytes annotation.
 #define IN_READS_BYTES(x) _In_reads_bytes_(x)
+// dimhotepus: Add out annotation.
+#define OUT_ARG _Out_
 #define OUT_Z_CAP(x) _Out_z_cap_(x)
 #define OUT_Z_CAP_OPT(x) _Out_opt_z_cap_(x)
 #define OUT_CAP(x) _Out_cap_(x)
@@ -92,6 +94,8 @@
 #define IN_BYTECAP(x)
 // dimhotepus: Add in read bytes annotation.
 #define IN_READS_BYTES(x)
+// dimhotepus: Add out annotation.
+#define OUT_ARG
 #define OUT_Z_CAP(x)
 #define OUT_Z_CAP_OPT(x)
 #define OUT_CAP(x)
