@@ -52,7 +52,7 @@ private:
 	void UpdateMaxHammerId( KeyValues *pKeyValue );
 
 	// Max id read from the file
-	int m_nMaxHammerId;
+	int m_nMaxHammerId{0};
 };
 
 

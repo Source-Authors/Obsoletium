@@ -68,7 +68,7 @@ protected:
 	void PrintStringAttribute( CDmElement* pElement, CUtlBuffer &outBuf, const char *pKeyName, bool bSkipEmptryStrings = false, bool bPrintValueOnly = false );
 
 private:
-	const char *m_pFileName;
+	const char *m_pFileName{nullptr};
 };
 
 
