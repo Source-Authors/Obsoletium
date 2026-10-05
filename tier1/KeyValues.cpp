@@ -348,8 +348,8 @@ void KeyValues::SetUseGrowableStringTable( bool bUseGrowableTable )
 {
 	if ( bUseGrowableTable )
 	{
-		s_pfGetStringForSymbol = &(KeyValues::GetStringForSymbolGrowable);
-		s_pfGetSymbolForString = &(KeyValues::GetSymbolForStringGrowable);
+		s_pfGetStringForSymbol = &KeyValues::GetStringForSymbolGrowable;
+		s_pfGetSymbolForString = &KeyValues::GetSymbolForStringGrowable;
 
 		if ( nullptr == s_pGrowableStringTable )
 		{
@@ -358,8 +358,8 @@ void KeyValues::SetUseGrowableStringTable( bool bUseGrowableTable )
 	}
 	else
 	{
-		s_pfGetStringForSymbol = &(KeyValues::GetStringForSymbolClassic);
-		s_pfGetSymbolForString = &(KeyValues::GetSymbolForStringClassic);
+		s_pfGetStringForSymbol = &KeyValues::GetStringForSymbolClassic;
+		s_pfGetSymbolForString = &KeyValues::GetSymbolForStringClassic;
 
 		delete s_pGrowableStringTable;
 		s_pGrowableStringTable = nullptr;
