@@ -795,7 +795,7 @@ bool BuildFacesamples( lightinfo_t *pLightInfo, facelight_t *pFaceLight )
 	// statistics - warning?!
 	if( pFaceLight->numsamples == 0 )
 	{
-		Msg( "no samples %d\n", pLightInfo->face - g_pFaces );
+		Msg( "no samples %zd\n", pLightInfo->face - g_pFaces );
 	}
 
 	return true;

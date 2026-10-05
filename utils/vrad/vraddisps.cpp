@@ -1670,7 +1670,7 @@ bool CVRadDispMgr::BuildDispSamples( lightinfo_t *pLightInfo, facelight_t *pFace
 	// statistics - warning?!
 	if( pFaceLight->numsamples == 0 )
 	{
-		Msg( "BuildDispSamples: WARNING - no samples %d\n", pLightInfo->face - g_pFaces );
+		Msg( "BuildDispSamples: WARNING - no samples %zd\n", pLightInfo->face - g_pFaces );
 	}
 
 	return true;
