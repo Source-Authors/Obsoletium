@@ -177,8 +177,7 @@ int CDmxConvertApp::Main() {
   }
 
   // TODO - in theory, at some point, we may have converters from pInFormat to
-  // pOutFormat
-  //		  until then, treat it as a noop, and hope for the best
+  // pOutFormat. Until then, treat it as a noop, and hope for the best
 
   if (!g_pDataModel->SaveToFile(pOutFileName, nullptr, pOutEncoding, pOutFormat,
                                 pRoot)) {
