@@ -20,6 +20,7 @@
 #include "stdafx.h"
 
 #include <sal.h>
+#include <exception>
 
 #ifdef AFX_CORE1_SEG
 #pragma code_seg(AFX_CORE1_SEG)
@@ -320,7 +321,7 @@ AFX_STATIC_DATA const _PNH _pfnUninitialized = (_PNH)-1;
 #endif
   }
 
-  return nullptr;
+  throw new std::bad_alloc();
 }
 
 void __cdecl operator delete(void* p) {
@@ -369,7 +370,8 @@ void __cdecl operator delete[](void* p) { ::operator delete(p); }
     if (_afxNewHandler == nullptr || (*_afxNewHandler)(nSize) == 0) break;
 #endif
   }
-  return pResult;
+
+  throw new std::bad_alloc();
 #endif
 }
 
