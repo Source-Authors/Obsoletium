@@ -123,10 +123,10 @@ int main(int argc, char **argv) {
 
   // Pointers to the action, the file, and any action args so I can remove all
   // the messy argc pointer math this was using.
-  char *pAction = argv[curArg];
+  const char *pAction = argv[curArg];
   curArg++;
-  char **pActionArgs = &argv[curArg];
-  int nActionArgs = argc - curArg;
+  char * const *pActionArgs = &argv[curArg];
+  const int nActionArgs = argc - curArg;
 
   CommandLine()->CreateCmdLine(argc, argv);
   MathLib_Init(2.2f, 2.2f, 0.0f, 2);
@@ -143,8 +143,10 @@ int main(int argc, char **argv) {
     V_strcpy_safe(zipName, pActionArgs[1]);
     V_DefaultExtension(zipName, ".zip");
 
-    ExtractZipFileFromBSP(bspName, zipName);
-  } else if (V_strieq(pAction, "-extractfiles") && nActionArgs == 2) {
+    return ExtractZipFileFromBSP(bspName, zipName) ? 0 : 1;
+  }
+
+  if (V_strieq(pAction, "-extractfiles") && nActionArgs == 2) {
     // bsipzip -extractfiles <bspfile> <targetpath>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -197,8 +199,9 @@ int main(int argc, char **argv) {
         printf("Writing file: %s.\n", targetName);
         FILE *fp = fopen(targetName, "wb");
         if (!fp) {
-          fprintf(stderr, "Could not write '%s'.\n", targetName);
-          return 2;
+          const int rc = errno;
+          fprintf(stderr, "Could not write '%s': %s\n", targetName, strerror(rc));
+          return rc;
         }
         RunCodeAtScopeExit(fclose(fp));
 
@@ -209,7 +212,10 @@ int main(int argc, char **argv) {
     }
 
     printf("%zi files extracted.\n", numFilesExtracted);
-  } else if (V_strieq(pAction, "-extractcubemaps") && nActionArgs == 2) {
+    return 0;
+  }
+
+  if (V_strieq(pAction, "-extractcubemaps") && nActionArgs == 2) {
     // bspzip -extractcubemaps <bspfile> <targetPath>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -262,8 +268,9 @@ int main(int argc, char **argv) {
         printf("Writing vtf file: %s.\n", targetName);
         FILE *fp = fopen(targetName, "wb");
         if (!fp) {
-          fprintf(stderr, "Could not write '%s'.\n", targetName);
-          return 4;
+          const int rc = errno;
+          fprintf(stderr, "Could not write '%s': %s.\n", targetName, strerror(rc));
+          return rc;
         }
 
         RunCodeAtScopeExit(fclose(fp));
@@ -275,7 +282,10 @@ int main(int argc, char **argv) {
     }
 
     printf("%zi cubemaps extracted.\n", numFilesExtracted);
-  } else if (V_strieq(pAction, "-deletecubemaps") && nActionArgs == 1) {
+    return 0;
+  }
+
+  if (V_strieq(pAction, "-deletecubemaps") && nActionArgs == 1) {
     // bspzip -deletecubemaps <bspfile>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -318,7 +328,11 @@ int main(int argc, char **argv) {
       printf("Updating bsp file: %s.\n", bspName);
       WriteBSPFile(bspName);
     }
-  } else if (V_strieq(pAction, "-addfiles") && nActionArgs == 4) {
+
+    return 0;
+  }
+
+  if (V_strieq(pAction, "-addfiles") && nActionArgs == 4) {
     // bspzip -addfiles <bspfile> <relativePathPrefix> <listfile> <newbspfile>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -367,14 +381,22 @@ int main(int argc, char **argv) {
           AddFileToPak(GetPakFile(), relativeName, fullpathName);
         } else if (!feof(fp)) {
           fprintf(stderr, "Missing full path names.\n");
-          return 5;
+          return EINVAL;
         }
       }
 
       printf("Writing new bsp file: %s.\n", newbspName);
       WriteBSPFile(newbspName);
+    } else {
+      const int rc = errno;
+      fprintf(stderr, "Unable to open list file %s: %s.\n", filelistName, strerror(rc));
+      return rc;
     }
-  } else if (V_strieq(pAction, "-dir") && nActionArgs == 1) {
+
+    return 0;
+  }
+
+  if (V_strieq(pAction, "-dir") && nActionArgs == 1) {
     // bspzip -dir <bspfile>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -389,7 +411,11 @@ int main(int argc, char **argv) {
     RunCodeAtScopeExit(UnloadBSPFile());
 
     PrintBSPPackDirectory();
-  } else if (V_strieq(pAction, "-addfile") && nActionArgs == 4) {
+
+    return 0;
+  }
+
+  if (V_strieq(pAction, "-addfile") && nActionArgs == 4) {
     // bspzip -addfile <bspfile> <relativepathname> <fullpathname> <newbspfile>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -416,7 +442,11 @@ int main(int argc, char **argv) {
 
     AddFileToPak(GetPakFile(), relativeName, fullpathName);
     WriteBSPFile(newbspName);
-  } else if (V_strieq(pAction, "-addlist") && nActionArgs == 3) {
+
+    return 0;
+  }
+
+  if (V_strieq(pAction, "-addlist") && nActionArgs == 3) {
     // bspzip -addlist <bspfile> <listfile> <newbspfile>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -446,8 +476,8 @@ int main(int argc, char **argv) {
       }
 
       while (!feof(fp)) {
-        relativeName[0] = 0;
-        fullpathName[0] = 0;
+        relativeName[0] = '\0';
+        fullpathName[0] = '\0';
         if ((fgets(relativeName, sizeof(relativeName), fp) != NULL) &&
             (fgets(fullpathName, sizeof(fullpathName), fp) != NULL)) {
           intp l1 = V_strlen(relativeName);
@@ -474,8 +504,17 @@ int main(int argc, char **argv) {
 
       printf("Writing new bsp file: %s.\n", newbspName);
       WriteBSPFile(newbspName);
+    } else {
+      const int rc = errno;
+      fprintf(stderr, "Unable to open list file %s: %s.\n", filelistName,
+              strerror(rc));
+      return rc;
     }
-  } else if (V_strieq(pAction, "-addorupdatelist") && nActionArgs == 3) {
+
+    return 0;
+  }
+
+  if (V_strieq(pAction, "-addorupdatelist") && nActionArgs == 3) {
     // bspzip -addorupdatelist <bspfile> <listfile> <newbspfile>
     const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
@@ -505,8 +544,8 @@ int main(int argc, char **argv) {
       }
 
       while (!feof(fp)) {
-        relativeName[0] = 0;
-        fullpathName[0] = 0;
+        relativeName[0] = '\0';
+        fullpathName[0] = '\0';
         if ((fgets(relativeName, sizeof(relativeName), fp) != NULL) &&
             (fgets(fullpathName, sizeof(fullpathName), fp) != NULL)) {
           intp l1 = V_strlen(relativeName);
@@ -539,9 +578,18 @@ int main(int argc, char **argv) {
 
       printf("Writing new bsp file: %s.\n", newbspName);
       WriteBSPFile(newbspName);
+    } else {
+      const int rc = errno;
+      fprintf(stderr, "Unable to open list file %s: %s.\n", filelistName,
+              strerror(rc));
+      return rc;
     }
-  } else if (V_strieq(pAction, "-repack") &&
-             (nActionArgs == 1 || nActionArgs == 2)) {
+
+    return 0;
+  }
+
+  if (V_strieq(pAction, "-repack") &&
+              (nActionArgs == 1 || nActionArgs == 2)) {
     // bspzip -repack [ -compress ] <bspfile>
     bool bCompress = false;
     const char *pFile = pActionArgs[0];
@@ -559,10 +607,8 @@ int main(int argc, char **argv) {
     V_MakeAbsolutePath(szAbsBSPPath, pFile);
     V_DefaultExtension(szAbsBSPPath, ".bsp");
 
-    return RepackBSP(szAbsBSPPath, bCompress) ? 0 : -1;
-  } else {
-    return Usage();
+    return RepackBSP(szAbsBSPPath, bCompress) ? 0 : 1;
   }
 
-  return 0;
+  return Usage();
 }
