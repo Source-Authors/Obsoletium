@@ -1073,7 +1073,7 @@ KeyValues *KeyValues::FindKey(HKeySymbol keySymbol) const
 KeyValues *KeyValues::FindKey(const char *keyName, bool bCreate)
 {
 	// return the current key if a NULL subkey is asked for
-	if (!keyName || !keyName[0])
+	if (Q_isempty( keyName ))
 		return this;
 
 	// look for '/' characters deliminating sub fields
