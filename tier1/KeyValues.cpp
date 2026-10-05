@@ -3368,7 +3368,7 @@ bool IKeyValuesDumpContextAsText::KvEndKey( KeyValues *pKey, int nIndentLevel )
 
 bool IKeyValuesDumpContextAsText::KvWriteIndent( int nIndentLevel )
 {
-	int numIndentBytes = ( nIndentLevel * 2 + 1 );
+	const intp numIndentBytes = static_cast<intp>( nIndentLevel ) * 2 + 1;
 	char *pchIndent = stackallocT( char, numIndentBytes );
 	memset( pchIndent, ' ', sizeof(char) * ( numIndentBytes - 1 ) );
 	pchIndent[ numIndentBytes - 1 ] = '\0';
