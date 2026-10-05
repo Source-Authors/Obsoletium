@@ -208,7 +208,7 @@ public:
 	void AddKv( KeyValues *kv, char const *name )
 	{
 		kve k;
-		Q_strncpy( k.name, name ? name : "NULL", sizeof( k.name ) );
+		V_strcpy_safe( k.name, name ? name : "NULL" );
 		k.kv = kv;
 
 		keys.AddToTail( k );
