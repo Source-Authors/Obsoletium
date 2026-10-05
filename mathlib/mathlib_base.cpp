@@ -2181,6 +2181,7 @@ void XM_CALLCONV QuaternionAngles( const Quaternion &q, RadianEuler &angles )
 	Assert( angles.IsValid() );
 }
 
+
 //-----------------------------------------------------------------------------
 // Purpose: A helper function to normalize p2.x->p1.x and p3.x->p4.x to 
 //  be the same length as p2.x->p3.x
@@ -2686,7 +2687,7 @@ void XM_CALLCONV BSpline(
 	float t, 
 	Vector& output )
 {
-	 float oneOver6 = 1.0f / 6.0f;
+	constexpr float oneOver6 = 1.0f / 6.0f;
 
 	float tSqr = t * t * oneOver6;
 	float tSqrSqr = t*tSqr;
