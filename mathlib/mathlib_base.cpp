@@ -481,8 +481,6 @@ void XM_CALLCONV MatrixVectors( const matrix3x4_t &matrix, Vector* pForward, Vec
 
 void XM_CALLCONV VectorVectors( const Vector &forward, Vector &right, Vector &up )
 {
-	Vector tmp;
-
 	if (forward[0] == 0 && forward[1] == 0)
 	{
 		// pitch 90 degrees up/down from identity
@@ -495,7 +493,7 @@ void XM_CALLCONV VectorVectors( const Vector &forward, Vector &right, Vector &up
 	}
 	else
 	{
-		tmp[0] = 0; tmp[1] = 0; tmp[2] = 1.0;
+		Vector tmp{0.0f, 0.0f, 1.0f};
 		CrossProduct( forward, tmp, right );
 		VectorNormalize( right );
 		CrossProduct( right, forward, up );
@@ -1558,8 +1556,7 @@ void XM_CALLCONV VectorYawRotate( const Vector &in, float flYaw, Vector &out)
 {
 	if (&in == &out )
 	{
-		Vector tmp;
-		tmp = in;
+		Vector tmp = in;
 		VectorYawRotate( tmp, flYaw, out );
 		return;
 	}
@@ -2689,7 +2686,7 @@ void XM_CALLCONV BSpline(
 	float t, 
 	Vector& output )
 {
-	float oneOver6 = 1.0f / 6.0f;
+	 float oneOver6 = 1.0f / 6.0f;
 
 	float tSqr = t * t * oneOver6;
 	float tSqrSqr = t*tSqr;
