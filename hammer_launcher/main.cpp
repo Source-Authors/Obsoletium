@@ -177,7 +177,8 @@ bool HammerAppSystemGroup::Create() {
 
   if (scoped_winsock_.errc()) {
     Warning("Windows sockets 2.2 unavailable (%d): %s.\n",
-            scoped_winsock_.errc(), scoped_winsock_.errc().message().c_str());
+            scoped_winsock_.errc().value(),
+            scoped_winsock_.errc().message().c_str());
   }
 #endif
 
