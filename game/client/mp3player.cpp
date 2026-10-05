@@ -685,6 +685,17 @@ public:
 
 CMP3Player::CMP3Player( VPANEL parent, char const *panelName ) :
 	BaseClass( NULL, panelName ),
+	m_nFilesAdded( 0 ),
+	m_nCurrentPlaylistSong( 0 ),
+	m_bFirstTime( true ),
+	m_nCurrentSong( 0 ),
+	m_flCurrentVolume( 1.0f ),
+	m_bMuted( false ),
+	m_bPlaying( false ),
+	m_nSongGuid( 0 ),
+	m_SongStart( -1.0f ),
+	m_nSongMinutes( -1 ),
+	m_nSongSeconds( -1 ),
 	m_SelectionFrom( SONG_FROM_UNKNOWN ),
 	m_bDirty( false ),
 	m_bSettingsDirty( false ),
@@ -750,15 +761,6 @@ CMP3Player::CMP3Player( VPANEL parent, char const *panelName ) :
 
 	m_pCurrentSong->SetText( "#NoSong" );
 	m_pDuration->SetText( "" );
-
-	m_bFirstTime = true;
-	m_bPlaying = false;
-	m_SongStart = -1.0f;
-	m_nSongGuid = 0;
-	m_nCurrentSong = 0;
-	m_nCurrentPlaylistSong = 0;
-	m_flCurrentVolume = 1.0f;
-	m_bMuted = false;
 
 	vgui::ivgui()->AddTickSignal( GetVPanel(), 100 );
 }
