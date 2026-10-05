@@ -1454,7 +1454,7 @@ void CBaseAssetPicker::OnCheckButtonChecked( KeyValues *kv )
 //-----------------------------------------------------------------------------
 // Returns the selceted asset count
 //-----------------------------------------------------------------------------
-int CBaseAssetPicker::GetSelectedAssetCount()
+intp CBaseAssetPicker::GetSelectedAssetCount()
 {
 	return m_pAssetBrowser->GetSelectedItemsCount();
 }
@@ -1463,9 +1463,9 @@ int CBaseAssetPicker::GetSelectedAssetCount()
 //-----------------------------------------------------------------------------
 // Returns the selceted asset name
 //-----------------------------------------------------------------------------
-const char *CBaseAssetPicker::GetSelectedAsset( int nAssetIndex )
+const char *CBaseAssetPicker::GetSelectedAsset( intp nAssetIndex )
 {
-	int nSelectedAssetCount = m_pAssetBrowser->GetSelectedItemsCount();
+	intp nSelectedAssetCount = m_pAssetBrowser->GetSelectedItemsCount();
 	if ( nAssetIndex < 0 )
 	{
 		nAssetIndex = nSelectedAssetCount - 1;
@@ -1473,7 +1473,7 @@ const char *CBaseAssetPicker::GetSelectedAsset( int nAssetIndex )
 	if ( nSelectedAssetCount <= nAssetIndex || nAssetIndex < 0 )
 		return NULL;
 
-	int nIndex = m_pAssetBrowser->GetSelectedItem( nAssetIndex );
+	intp nIndex = m_pAssetBrowser->GetSelectedItem( nAssetIndex );
 	KeyValues *pItemKeyValues = m_pAssetBrowser->GetItem( nIndex );
 	return pItemKeyValues->GetString( "asset" );
 }

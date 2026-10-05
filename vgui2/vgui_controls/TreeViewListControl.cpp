@@ -121,7 +121,7 @@ int CTreeViewListControl::GetTreeItemAtRow( intp iRow )
 		return m_Rows[iRow];
 }
 
-void CTreeViewListControl::GetGridElementBounds( int iColumn, int iRow, int &left, int &top, int &right, int &bottom )
+void CTreeViewListControl::GetGridElementBounds( intp iColumn, intp iRow, int &left, int &top, int &right, int &bottom )
 {
 	left = m_Columns[iColumn].m_Left;
 	right = m_Columns[iColumn].m_Right;

@@ -134,7 +134,7 @@ void CDmeSourceDCCFilePanel::SetDmeElement( CDmeSourceDCCFile *pSourceDCCFile )
 //-----------------------------------------------------------------------------
 void CDmeSourceDCCFilePanel::OnItemSelectionChanged( )
 {
-	int nCount = m_pRootDCCObjects->GetSelectedItemsCount();
+	intp nCount = m_pRootDCCObjects->GetSelectedItemsCount();
 	bool bEnabled = ( nCount > 0 );
 	bool bMultiselect = ( nCount > 1 );
 	m_pDCCObjectBrowser->SetEnabled( bEnabled && !bMultiselect );
@@ -147,7 +147,7 @@ void CDmeSourceDCCFilePanel::OnItemSelectionChanged( )
 		return;
 	}
 
-	int nItemID = m_pRootDCCObjects->GetSelectedItem( 0 );
+	intp nItemID = m_pRootDCCObjects->GetSelectedItem( 0 );
 	KeyValues *pKeyValues = m_pRootDCCObjects->GetItem( nItemID );
 	m_pDCCObjectName->SetText( pKeyValues->GetString( "dccobject" ) );
 }
@@ -201,7 +201,7 @@ void CDmeSourceDCCFilePanel::OnTextNewLine( KeyValues *kv )
 //-----------------------------------------------------------------------------
 // Selects a particular DCC object
 //-----------------------------------------------------------------------------
-void CDmeSourceDCCFilePanel::SelectDCCObject( int nDCCObjectIndex )
+void CDmeSourceDCCFilePanel::SelectDCCObject( intp nDCCObjectIndex )
 {
 	if ( nDCCObjectIndex < 0 )
 	{
@@ -209,7 +209,7 @@ void CDmeSourceDCCFilePanel::SelectDCCObject( int nDCCObjectIndex )
 		return;
 	}
 
-	int nItemID = m_pRootDCCObjects->FirstItem();
+	intp nItemID = m_pRootDCCObjects->FirstItem();
 	for ( ; nItemID != m_pRootDCCObjects->InvalidItemID(); nItemID = m_pRootDCCObjects->NextItem( nItemID ) )
 	{
 		KeyValues *kv = m_pRootDCCObjects->GetItem( nItemID );
@@ -299,11 +299,11 @@ void CDmeSourceDCCFilePanel::OnAddDCCObject( )
 //-----------------------------------------------------------------------------
 void CDmeSourceDCCFilePanel::OnBrowseDCCObject( )
 {
-	int nCount = m_pRootDCCObjects->GetSelectedItemsCount();
+	intp nCount = m_pRootDCCObjects->GetSelectedItemsCount();
 	if ( nCount == 0 || !m_hSourceDCCFile.Get() )
 		return;
 
-	int nItemID = m_pRootDCCObjects->GetSelectedItem( 0 );
+	intp nItemID = m_pRootDCCObjects->GetSelectedItem( 0 );
 	KeyValues *pKeyValues = m_pRootDCCObjects->GetItem( nItemID );
 	int nDCCObjectIndex = pKeyValues->GetInt( "dccObjectIndex", -1 );
 
@@ -343,11 +343,11 @@ bool CDmeSourceDCCFilePanel::CheckForDuplicateNames( const char *pDCCObjectName,
 //-----------------------------------------------------------------------------
 void CDmeSourceDCCFilePanel::OnDCCObjectNameChanged()
 {
-	int nCount = m_pRootDCCObjects->GetSelectedItemsCount();
+	intp nCount = m_pRootDCCObjects->GetSelectedItemsCount();
 	if ( nCount == 0 || !m_hSourceDCCFile.Get() )
 		return;
 
-	int nItemID = m_pRootDCCObjects->GetSelectedItem( 0 );
+	intp nItemID = m_pRootDCCObjects->GetSelectedItem( 0 );
 	KeyValues *pKeyValues = m_pRootDCCObjects->GetItem( nItemID );
 	int nDCCObjectIndex = pKeyValues->GetInt( "dccObjectIndex", -1 );
 	if ( nDCCObjectIndex < 0 )

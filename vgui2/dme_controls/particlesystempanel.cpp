@@ -58,7 +58,7 @@ CParticleSystemPanel::CParticleSystemPanel( vgui::Panel *pParent, const char *pN
 
 	m_pLightmapTexture.Init( "//platform/materials/debug/defaultlightmap", "editor" );
 	m_DefaultEnvCubemap.Init( "editor/cubemap", "editor", true );
-	for ( int i = 0; i < MAX_PARTICLE_CONTROL_POINTS; ++i )
+	for ( int i = 0; i < ssize(m_pControlPointValue); ++i )
 	{
 		SetControlPointValue( i, Vector( 0, 0, 10.0f * i ) );
 	}
@@ -157,7 +157,7 @@ void CParticleSystemPanel::OnTick()
 	float flDt = static_cast<float>( flTime - m_flLastTime );
 	m_flLastTime = flTime;
 
-	for ( int i = 0; i < MAX_PARTICLE_CONTROL_POINTS; ++i )
+	for ( int i = 0; i < ssize(m_pControlPointValue); ++i )
 	{
 		if ( !m_pParticleSystem->ReadsControlPoint( i ) )
 			continue;
@@ -373,7 +373,7 @@ private:
 CControlPointPage::CControlPointPage( vgui::Panel *pParent, const char *pName, CParticleSystemPanel *pParticleSystemPanel ) :
 	BaseClass( pParent, pName )
 {
-	for ( int i = 0; i < MAX_PARTICLE_CONTROL_POINTS; ++i )
+	for ( intp i = 0; i < ssize(m_pControlPointName); ++i )
 	{
 		m_pControlPointName[i] = NULL;
 		m_pControlPointValue[i] = NULL;
@@ -389,7 +389,7 @@ CControlPointPage::CControlPointPage( vgui::Panel *pParent, const char *pName, C
 void CControlPointPage::OnTextChanged( KeyValues *pParams )
 {
 	vgui::Panel *pPanel = (vgui::Panel *)pParams->GetPtr( "panel" );
-	for ( int i = 0; i < MAX_PARTICLE_CONTROL_POINTS; ++i )
+	for ( int i = 0; i < ssize(m_pControlPointName); ++i )
 	{
 		if ( pPanel != m_pControlPointValue[i] )
 			continue;
@@ -398,8 +398,15 @@ void CControlPointPage::OnTextChanged( KeyValues *pParams )
 		m_pControlPointValue[i]->GetText( pBuf, sizeof(pBuf) );
 
 		Vector vecValue( 0, 0, 0 );
-		sscanf( pBuf, "%f %f %f", &vecValue.x, &vecValue.y, &vecValue.z );
-		m_pParticleSystemPanel->SetControlPointValue( i, vecValue );
+		if ( 3 == sscanf( pBuf, "%f %f %f", &vecValue.x, &vecValue.y, &vecValue.z ) )
+		{
+			m_pParticleSystemPanel->SetControlPointValue( i, vecValue );
+		}
+		else
+		{
+			Warning( "Control point #%d has invalid vector value %s. Assume zero vector.\n", i, pBuf );
+			m_pParticleSystemPanel->SetControlPointValue( i, vec3_origin );
+		}
 		break;
 	}
 }
@@ -411,7 +418,7 @@ void CControlPointPage::OnTextChanged( KeyValues *pParams )
 void CControlPointPage::OnNewLine( KeyValues *pParams )
 {
 	vgui::Panel *pPanel = (vgui::Panel *)pParams->GetPtr( "panel" );
-	for ( int i = 0; i < MAX_PARTICLE_CONTROL_POINTS; ++i )
+	for ( int i = 0; i < ssize(m_pControlPointName); ++i )
 	{
 		if ( pPanel != m_pControlPointValue[i] )
 			continue;
@@ -420,8 +427,16 @@ void CControlPointPage::OnNewLine( KeyValues *pParams )
 		m_pControlPointValue[i]->GetText( pBuf, sizeof(pBuf) );
 
 		Vector vecValue( 0, 0, 0 );
-		sscanf( pBuf, "%f %f %f", &vecValue.x, &vecValue.y, &vecValue.z );
-		m_pParticleSystemPanel->SetControlPointValue( i, vecValue );
+		// dimhotepus: Check we parse vector.
+		if ( 3 == sscanf( pBuf, "%f %f %f", &vecValue.x, &vecValue.y, &vecValue.z ) )
+		{
+			m_pParticleSystemPanel->SetControlPointValue( i, vecValue );
+		}
+		else
+		{
+			Warning( "Control point #%d has invalid vector value %s. Assume zero vector.\n", i, pBuf );
+			m_pParticleSystemPanel->SetControlPointValue( i, vec3_origin );
+		}
 
 		vecValue = m_pParticleSystemPanel->GetControlPointValue( i );
 		Q_snprintf( pBuf, sizeof(pBuf), "%.3f %.3f %.3f", vecValue.x, vecValue.y, vecValue.z );
@@ -451,7 +466,7 @@ void CControlPointPage::CreateControlPointControls()
 	if ( !pParticleSystem )
 		return;
 
-	for ( int i = 0; i < MAX_PARTICLE_CONTROL_POINTS; ++i )
+	for ( int i = 0; i < ssize(m_pControlPointName); ++i )
 	{
 		if ( !pParticleSystem->ReadsControlPoint( i ) )
 			continue;
@@ -481,7 +496,7 @@ void CControlPointPage::CreateControlPointControls()
 void CControlPointPage::LayoutControlPointControls()
 {
 	int nFoundControlCount = 0;
-	for ( int i = 0; i < MAX_PARTICLE_CONTROL_POINTS; ++i )
+	for ( intp i = 0; i < ssize(m_pControlPointName); ++i )
 	{
 		if ( !m_pControlPointName[i] )
 			continue;
@@ -500,7 +515,7 @@ void CControlPointPage::LayoutControlPointControls()
 //-----------------------------------------------------------------------------
 void CControlPointPage::CleanUpControlPointControls( )
 {
-	for ( int i = 0; i < MAX_PARTICLE_CONTROL_POINTS; ++i )
+	for ( intp i = 0; i < ssize(m_pControlPointName); ++i )
 	{
 		if ( m_pControlPointName[i] )
 		{

@@ -53,8 +53,8 @@ public:
 	void OnKeyCodePressed( vgui::KeyCode code ) override;
 
 	// Returns the selected asset name
-	int GetSelectedAssetCount();
-	const char *GetSelectedAsset( int nAssetIndex = -1 );
+	intp GetSelectedAssetCount();
+	const char *GetSelectedAsset( intp nAssetIndex = -1 );
 
 	// Is multiselect enabled?
 	bool IsMultiselectEnabled() const;

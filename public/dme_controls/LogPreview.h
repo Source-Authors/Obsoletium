@@ -44,7 +44,7 @@ struct LogPreview_t
 	{
 		if ( m_hControl != other.m_hControl )
 			return false;
-		for ( int i = 0; i < LOG_PREVIEW_MAX_CHANNEL_COUNT; ++i )
+		for ( intp i = 0; i < ssize( m_hChannels ); ++i )
 		{
 			if ( m_hChannels[ i ] != other.m_hChannels[ i ] )
 				return false;

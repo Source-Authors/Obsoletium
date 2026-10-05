@@ -74,8 +74,8 @@ public:
 
 private:
 	// Select animation by index
-	void SelectAnimation( int nIndex );
-	void SelectVertexAnimation( int nIndex );
+	void SelectAnimation( intp nIndex );
+	void SelectVertexAnimation( intp nIndex );
 
 	// paint it!
 	void OnPaint3D() override;

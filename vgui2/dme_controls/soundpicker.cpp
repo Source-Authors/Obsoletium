@@ -185,10 +185,10 @@ bool CSoundPicker::IsGameSoundVisible( int hGameSound )
 //-----------------------------------------------------------------------------
 // Updates the column header in the chooser
 //-----------------------------------------------------------------------------
-void CSoundPicker::UpdateGameSoundColumnHeader( int nMatchCount, int nTotalCount )
+void CSoundPicker::UpdateGameSoundColumnHeader( intp nMatchCount, intp nTotalCount )
 {
 	char pColumnTitle[512];
-	Q_snprintf( pColumnTitle, sizeof(pColumnTitle), "%s (%d/%d)",
+	Q_snprintf( pColumnTitle, sizeof(pColumnTitle), "%s (%zd/%zd)",
 		"Game Sound", nMatchCount, nTotalCount );
 	m_pGameSoundList->SetColumnHeaderText( 0, pColumnTitle );
 }
@@ -204,7 +204,7 @@ void CSoundPicker::BuildGameSoundList()
 
 	m_pGameSoundList->RemoveAll();
 
-	int nTotalCount = 0;
+	intp nTotalCount = 0;
 	auto i = SoundEmitterSystem()->First();
 	while ( i != SoundEmitterSystem()->InvalidIndex() )
 	{
@@ -215,7 +215,7 @@ void CSoundPicker::BuildGameSoundList()
 		kv->SetInt( "gameSoundHandle", size_cast<int>( i ) );
 		kv->SetInt( "root", bInRoot );
 
-		int nItemID = m_pGameSoundList->AddItem( kv, 0, false, false );
+		intp nItemID = m_pGameSoundList->AddItem( kv, 0, false, false );
 		m_pGameSoundList->SetItemVisible( nItemID, IsGameSoundVisible( size_cast<int>( i ) ) );
 		KeyValues *pDrag = new KeyValues( "drag", "text", pSoundName );
 		pDrag->SetString( "texttype", "gamesoundName" );
@@ -228,7 +228,7 @@ void CSoundPicker::BuildGameSoundList()
 	m_pGameSoundList->SortList();
 	if ( m_pGameSoundList->GetItemCount() > 0 )
 	{
-		int nItemID = m_pGameSoundList->GetItemIDFromRow( 0 );
+		intp nItemID = m_pGameSoundList->GetItemIDFromRow( 0 );
 
 		// This prevents the refreshing of the sound list from playing the sound
 		++m_nSoundSuppressionCount;
@@ -248,9 +248,9 @@ void CSoundPicker::RefreshGameSoundList()
 		return;
 
 	// Check the filter matches
-	int nMatchingGameSounds = 0;
-	int nTotalCount = 0;
-	for ( int nItemID = m_pGameSoundList->FirstItem(); nItemID != m_pGameSoundList->InvalidItemID(); nItemID = m_pGameSoundList->NextItem( nItemID ) )
+	intp nMatchingGameSounds = 0;
+	intp nTotalCount = 0;
+	for ( intp nItemID = m_pGameSoundList->FirstItem(); nItemID != m_pGameSoundList->InvalidItemID(); nItemID = m_pGameSoundList->NextItem( nItemID ) )
 	{
 		KeyValues *kv = m_pGameSoundList->GetItem( nItemID );
 		// dimhotepus: Use -1 as missed sound indicator. See CSoundPicker::BuildGameSoundList.
@@ -270,7 +270,7 @@ void CSoundPicker::RefreshGameSoundList()
 
 	if ( ( m_pGameSoundList->GetSelectedItemsCount() == 0 ) && ( m_pGameSoundList->GetItemCount() > 0 ) )
 	{
-		int nItemID = m_pGameSoundList->GetItemIDFromRow( 0 );
+		intp nItemID = m_pGameSoundList->GetItemIDFromRow( 0 );
 		// This prevents the refreshing of the sound list from playing the sound
 		++m_nSoundSuppressionCount;
 		m_pGameSoundList->SetSelectedCell( nItemID, 0 );
@@ -283,7 +283,7 @@ void CSoundPicker::RefreshGameSoundList()
 //-----------------------------------------------------------------------------
 void CSoundPicker::OnGameSoundFilterTextChanged( )
 {
-	int nLength = m_pGameSoundFilter->GetTextLength();
+	intp nLength = m_pGameSoundFilter->GetTextLength();
 	m_GameSoundFilter.SetLength( nLength );
 	if ( nLength > 0 )
 	{
@@ -453,7 +453,7 @@ CSoundPicker::PickType_t CSoundPicker::GetSelectedSoundType( )
 //-----------------------------------------------------------------------------
 // Returns the selected sound count
 //-----------------------------------------------------------------------------
-int CSoundPicker::GetSelectedSoundCount()
+intp CSoundPicker::GetSelectedSoundCount()
 {
 	if ( m_pGameSoundPage && ( m_pViewsSheet->GetActivePage() == m_pGameSoundPage ) )
 		return m_pGameSoundList->GetSelectedItemsCount();
@@ -468,11 +468,11 @@ int CSoundPicker::GetSelectedSoundCount()
 //-----------------------------------------------------------------------------
 // Returns the selected sound
 //-----------------------------------------------------------------------------
-const char *CSoundPicker::GetSelectedSoundName( int nSelectionIndex )
+const char *CSoundPicker::GetSelectedSoundName( intp nSelectionIndex )
 {
 	if ( m_pGameSoundPage && ( m_pViewsSheet->GetActivePage() == m_pGameSoundPage ) )
 	{
-		int nCount = m_pGameSoundList->GetSelectedItemsCount();
+		intp nCount = m_pGameSoundList->GetSelectedItemsCount();
 		if ( nCount == 0 )
 			return NULL;
 
@@ -480,7 +480,7 @@ const char *CSoundPicker::GetSelectedSoundName( int nSelectionIndex )
 		{
 			nSelectionIndex = nCount - 1;
 		}
-		int nIndex = m_pGameSoundList->GetSelectedItem( nSelectionIndex );
+		intp nIndex = m_pGameSoundList->GetSelectedItem( nSelectionIndex );
 		if ( nIndex >= 0 )
 		{
 			KeyValues *pkv = m_pGameSoundList->GetItem( nIndex );
@@ -547,7 +547,7 @@ void CSoundPickerFrame::OnCommand( const char *pCommand )
 			soundname[ 0 ] = '#'; // mark sound to bypass the dsp
 			V_strncpy( soundname + 1, pSoundName, len + 1 );
 
-			int nSoundCount = pPicker->GetSelectedSoundCount();
+			intp nSoundCount = pPicker->GetSelectedSoundCount();
 
 			KeyValues *pActionKeys = new KeyValues( "SoundSelected" );
 			pActionKeys->SetInt( "count", nSoundCount );
@@ -572,7 +572,7 @@ void CSoundPickerFrame::OnCommand( const char *pCommand )
 			if ( pSoundList )
 			{
 				// Adds them in selection order
-				for ( int i = 0; i < nSoundCount; ++i )
+				for ( intp i = 0; i < nSoundCount; ++i )
 				{
 					char pBuf[32];
 					V_to_chars( pBuf, i );

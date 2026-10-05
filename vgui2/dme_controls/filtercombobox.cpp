@@ -23,7 +23,7 @@ CFilterComboBox::CFilterComboBox( Panel *parent, const char *panelName, int numL
 //-----------------------------------------------------------------------------
 void CFilterComboBox::OnKillFocus()
 {
-	int nLength = GetTextLength();
+	intp nLength = GetTextLength();
 	char *pFilterText = (char*)_alloca( (nLength+1) * sizeof(char) );
 	GetText( pFilterText, nLength+1 );
 

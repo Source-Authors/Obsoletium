@@ -266,7 +266,7 @@ void CAttributeSlider::SetValue( AnimationControlType_t type, float flValue )
 
 void CAttributeSlider::SetValue( const AttributeValue_t& value )
 {
-	for ( int i = 0; i < ANIM_CONTROL_COUNT; ++i )
+	for ( intp i = 0; i < ssize( value.m_pValue ); ++i )
 	{
 		SetValue( (AnimationControlType_t)i, value.m_pValue[i] );
 	}

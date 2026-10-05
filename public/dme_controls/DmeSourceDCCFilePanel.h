@@ -71,7 +71,7 @@ private:
 	void OnDCCObjectNameChanged();
 
 	// Selects a particular DCC object
-	void SelectDCCObject( int nDCCObjectIndex );
+	void SelectDCCObject( intp nDCCObjectIndex );
 
 	// Called when a list panel's selection changes
 	void OnItemSelectionChanged( );

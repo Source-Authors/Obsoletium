@@ -42,7 +42,7 @@ public:
 	void AddChoice( int nValue, const char *pChoiceString );
 
 	// Gets the choices
-	int GetChoiceValue( int nIndex ) const;
+	int GetChoiceValue( intp nIndex ) const;
 };
 
 

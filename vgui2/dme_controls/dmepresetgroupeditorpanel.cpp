@@ -212,12 +212,12 @@ void CDmePresetRemapPanel::RefreshPresetList( )
 //-----------------------------------------------------------------------------
 void CDmePresetRemapPanel::OnPresetPicked( KeyValues *pParams )
 {
-	int nSelectedItemCount = m_pPresetRemapList->GetSelectedItemsCount();
+	intp nSelectedItemCount = m_pPresetRemapList->GetSelectedItemsCount();
 	if ( nSelectedItemCount != 1 )
 		return;
 
 	CDmePreset *pPreset = GetElementKeyValue< CDmePreset >( pParams, "preset" );
-	int nItemID = m_pPresetRemapList->GetSelectedItem( 0 );
+	intp nItemID = m_pPresetRemapList->GetSelectedItem( 0 );
 	KeyValues *kv = m_pPresetRemapList->GetItem( nItemID );
 	kv->SetString( "src", pPreset ? pPreset->GetName() : "" ); 
 	SetElementKeyValue( kv, "srcPreset", pPreset );
@@ -251,7 +251,7 @@ void CDmePresetRemapPanel::OnKeyCodeTyped( vgui::KeyCode code )
 //-----------------------------------------------------------------------------
 void CDmePresetRemapPanel::OnSelectPreset()
 {
-	int nSelectedItemCount = m_pPresetRemapList->GetSelectedItemsCount();
+	intp nSelectedItemCount = m_pPresetRemapList->GetSelectedItemsCount();
 	if ( nSelectedItemCount != 1 )
 		return;
 
@@ -262,11 +262,11 @@ void CDmePresetRemapPanel::OnSelectPreset()
 
 void CDmePresetRemapPanel::OnRemovePreset()
 {
-	int nSelectedItemCount = m_pPresetRemapList->GetSelectedItemsCount();
+	intp nSelectedItemCount = m_pPresetRemapList->GetSelectedItemsCount();
 	if ( nSelectedItemCount != 1 )
 		return;
 
-	int nItemID = m_pPresetRemapList->GetSelectedItem( 0 );
+	intp nItemID = m_pPresetRemapList->GetSelectedItem( 0 );
 	KeyValues *kv = m_pPresetRemapList->GetItem( nItemID );
 	kv->SetString( "src", "" ); 
 	SetElementKeyValue( kv, "srcPreset", NULL );
@@ -281,7 +281,7 @@ void CDmePresetRemapPanel::OnOpenContextMenu( KeyValues *kv )
 {
 	CleanupContextMenu();
 
-	int nSelectedItemCount = m_pPresetRemapList->GetSelectedItemsCount();
+	intp nSelectedItemCount = m_pPresetRemapList->GetSelectedItemsCount();
 	if ( nSelectedItemCount != 1 )
 		return;
 
@@ -344,7 +344,7 @@ void CDmePresetRemapPanel::DoModal( CDmeAnimationSet *pAnimationSet, CDmePresetG
 //-----------------------------------------------------------------------------
 void CDmePresetRemapPanel::ApplyChangesToPresetRemap()
 {
-	int nTextLength = m_pSourcePresetGroup->GetTextLength() + 1;
+	intp nTextLength = m_pSourcePresetGroup->GetTextLength() + 1;
 	char* pSourceName = (char*)_alloca( nTextLength * sizeof(char) );
 	m_pSourcePresetGroup->GetText( pSourceName, nTextLength );
 
@@ -352,7 +352,7 @@ void CDmePresetRemapPanel::ApplyChangesToPresetRemap()
 	CDmePresetRemap *pPresetRemap = m_hDestGroup->GetOrAddPresetRemap();
 	pPresetRemap->m_SourcePresetGroup = pSourceName;
 	pPresetRemap->RemoveAll();
-	for ( int nItemID = m_pPresetRemapList->FirstItem(); 
+	for ( intp nItemID = m_pPresetRemapList->FirstItem(); 
 		nItemID != m_pPresetRemapList->InvalidItemID(); 
 		nItemID = m_pPresetRemapList->NextItem( nItemID ) )
 	{
@@ -554,7 +554,7 @@ void CDmePresetGroupEditorPanel::RefreshAnimationSet()
 	
 	const CDmaElementArray< CDmePresetGroup > &presetGroupList = m_hAnimationSet->GetPresetGroups();
 	intp nCount = presetGroupList.Count();
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{ 
 		CDmePresetGroup *pPresetGroup = presetGroupList[i];
 		Assert( pPresetGroup );
@@ -569,7 +569,7 @@ void CDmePresetGroupEditorPanel::RefreshAnimationSet()
 		SetElementKeyValue( kv, "presetGroup", pPresetGroup );
 		kv->SetColor( "cellcolor", pPresetGroup->m_bIsReadOnly ? Color( 255, 0, 0, 255 ) : Color( 255, 255, 255, 255 ) ); 
 		kv->SetInt( "index", i );
-		int nItemID = m_pPresetGroupList->AddItem( kv, 0, false, false );
+		intp nItemID = m_pPresetGroupList->AddItem( kv, 0, false, false );
 
 		if ( pSelectedPresetGroup == pPresetGroup )
 		{
@@ -615,7 +615,7 @@ void CDmePresetGroupEditorPanel::RefreshPresetNames()
 		KeyValues *kv = new KeyValues( "node", "name", pPreset->GetName() );
 		SetElementKeyValue( kv, "preset", pPreset );
 		kv->SetInt( "index", i );
-		int nItemID = m_pPresetList->AddItem( kv, 0, false, false );
+		intp nItemID = m_pPresetList->AddItem( kv, 0, false, false );
 		if ( pSelectedPreset == pPreset )
 		{
 			m_pPresetList->AddSelectedItem( nItemID );
@@ -634,11 +634,11 @@ CDmePreset* CDmePresetGroupEditorPanel::GetSelectedPreset()
 	if ( !m_hAnimationSet.Get() )
 		return NULL;
 
-	int nSelectedPresetCount = m_pPresetList->GetSelectedItemsCount();
+	intp nSelectedPresetCount = m_pPresetList->GetSelectedItemsCount();
 	if ( nSelectedPresetCount != 1 )
 		return NULL;
 
-	int nItemID = m_pPresetList->GetSelectedItem( 0 );
+	intp nItemID = m_pPresetList->GetSelectedItem( 0 );
 	KeyValues *pKeyValues = m_pPresetList->GetItem( nItemID );
 
 	CDmePreset *pPreset = GetElementKeyValue< CDmePreset >( pKeyValues, "preset" );
@@ -652,7 +652,7 @@ CDmePreset* CDmePresetGroupEditorPanel::GetSelectedPreset()
 void CDmePresetGroupEditorPanel::SetSelectedPreset( CDmePreset* pPreset )
 {
 	m_pPresetList->ClearSelectedItems();
-	for ( int nItemID = m_pPresetList->FirstItem(); 
+	for ( intp nItemID = m_pPresetList->FirstItem(); 
 		nItemID != m_pPresetList->InvalidItemID(); 
 		nItemID = m_pPresetList->NextItem( nItemID ) )
 	{
@@ -674,11 +674,11 @@ CDmePresetGroup* CDmePresetGroupEditorPanel::GetSelectedPresetGroup()
 	if ( !m_hAnimationSet.Get() )
 		return NULL;
 
-	int nSelectedItemCount = m_pPresetGroupList->GetSelectedItemsCount();
+	intp nSelectedItemCount = m_pPresetGroupList->GetSelectedItemsCount();
 	if ( nSelectedItemCount != 1 )
 		return NULL;
 
-	int nItemID = m_pPresetGroupList->GetSelectedItem( 0 );
+	intp nItemID = m_pPresetGroupList->GetSelectedItem( 0 );
 	KeyValues *pKeyValues = m_pPresetGroupList->GetItem( nItemID );
 	CDmePresetGroup *pPresetGroup = GetElementKeyValue<CDmePresetGroup>( pKeyValues, "presetGroup" );
 	return pPresetGroup;
@@ -691,7 +691,7 @@ CDmePresetGroup* CDmePresetGroupEditorPanel::GetSelectedPresetGroup()
 void CDmePresetGroupEditorPanel::SetSelectedPresetGroup( CDmePresetGroup* pPresetGroup )
 {
 	m_pPresetGroupList->ClearSelectedItems();
-	for ( int nItemID = m_pPresetGroupList->FirstItem(); 
+	for ( intp nItemID = m_pPresetGroupList->FirstItem(); 
 		nItemID != m_pPresetGroupList->InvalidItemID(); 
 		nItemID = m_pPresetGroupList->NextItem( nItemID ) )
 	{
@@ -812,8 +812,8 @@ void CDmePresetGroupEditorPanel::OnRemovePreset()
 	if ( !pPreset )
 		return;
 
-	int nItemID = m_pPresetList->GetSelectedItem( 0 );
-	int nCurrentRow = m_pPresetList->GetItemCurrentRow( nItemID );
+	intp nItemID = m_pPresetList->GetSelectedItem( 0 );
+	intp nCurrentRow = m_pPresetList->GetItemCurrentRow( nItemID );
 
 	CPresetGroupUndoScopeGuard sg( NOTIFY_SETDIRTYFLAG, "Remove Preset" );
 	pPresetGroup->RemovePreset( pPreset );
@@ -1366,8 +1366,8 @@ void CDmePresetGroupEditorPanel::OnRemapPresets()
 
 	CPresetGroupUndoScopeGuard sg( NOTIFY_SETDIRTYFLAG, "Remap Presets" );
 
-	int nCount = pPresetRemap->GetRemapCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pPresetRemap->GetRemapCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		const char *pSourceName = pPresetRemap->GetRemapSource( i );
 		CDmePreset *pSourcePreset = pSourcePresetGroup->FindPreset( pSourceName );
@@ -1762,8 +1762,8 @@ void CDmePresetGroupEditorPanel::OnRemoveGroup()
 		return;
 	}
 
-	int nItemID = m_pPresetGroupList->GetSelectedItem( 0 );
-	int nCurrentRow = m_pPresetGroupList->GetItemCurrentRow( nItemID );
+	intp nItemID = m_pPresetGroupList->GetSelectedItem( 0 );
+	intp nCurrentRow = m_pPresetGroupList->GetItemCurrentRow( nItemID );
 
 	CPresetGroupUndoScopeGuard sg( NOTIFY_SETDIRTYFLAG, "Remove Preset Group" );
 	m_hAnimationSet->RemovePresetGroup( pPresetGroup );
@@ -1888,7 +1888,7 @@ void CDmePresetGroupListPanel::OnMouseDoublePressed( vgui::MouseCode code )
 		int x, y, row, column;
 		vgui::input()->GetCursorPos( x, y );
 		GetCellAtPos( x, y, row, column );
-		int itemId = GetItemIDFromRow( row );
+		intp itemId = GetItemIDFromRow( row );
 		KeyValues *pKeyValues = GetItem( itemId );
 		CDmePresetGroup *pPresetGroup = GetElementKeyValue< CDmePresetGroup >( pKeyValues, "presetGroup" );
 		m_pPresetGroupPanel->ToggleGroupVisibility( pPresetGroup );

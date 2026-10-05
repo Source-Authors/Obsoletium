@@ -70,7 +70,7 @@ CAddPresetDialog::CAddPresetDialog( vgui::Panel *parent ) : BaseClass( parent, "
 
 void CAddPresetDialog::DoModal( CDmeAnimationSet *pAnimationSet, KeyValues *pContextKeyValues )
 {
-	int nTextLength = m_pInput->GetTextLength() + 1;
+	intp nTextLength = m_pInput->GetTextLength() + 1;
 	char* pCurrentGroupName = (char*)_alloca( nTextLength * sizeof(char) );
 	m_pInput->GetText( pCurrentGroupName, nTextLength );
 
@@ -110,7 +110,7 @@ void CAddPresetDialog::OnCommand( const char *command )
 {
 	if ( V_strieq( command, "OK" ) )
 	{
-		int nTextLength = m_pInput->GetTextLength() + 1;
+		intp nTextLength = m_pInput->GetTextLength() + 1;
 		char* txt = (char*)_alloca( nTextLength * sizeof(char) );
 		m_pInput->GetText( txt, nTextLength );
 
@@ -1031,7 +1031,7 @@ CBaseAnimSetPresetFaderPanel::CBaseAnimSetPresetFaderPanel( vgui::Panel *parent,
 //-----------------------------------------------------------------------------
 void CBaseAnimSetPresetFaderPanel::OnTextChanged( )
 {
-	int nLength = m_pFilter->GetTextLength();
+	intp nLength = m_pFilter->GetTextLength();
 	m_Filter.SetLength( nLength );
 	if ( nLength > 0 )
 	{
@@ -1207,7 +1207,7 @@ void CBaseAnimSetPresetFaderPanel::GetPreviewFader( FaderPreview_t& fader )
 	// Walk through sliders and figure out which is under the mouse
 	CPresetSlider *mouseOver = NULL;
 
-	for ( int i = m_pSliders->FirstItem(); i != m_pSliders->InvalidItemID(); i = m_pSliders->NextItem(i) )
+	for ( auto i = m_pSliders->FirstItem(); i != m_pSliders->InvalidItemID(); i = m_pSliders->NextItem(i) )
 	{
 		CPresetSlider *slider = static_cast< CPresetSlider * >( m_pSliders->GetItemPanel( i ) );
 		if ( !slider || !slider->IsPreviewSlider() )
@@ -1298,7 +1298,7 @@ void CBaseAnimSetPresetFaderPanel::PopulateList( bool bChanged )
 		m_CurrentPresetList.RemoveAll();
 		m_pSliders->DeleteAllItems();
 
-		for ( int i = 0 ; i < c; ++i )
+		for ( intp i = 0 ; i < c; ++i )
 		{
 			CDmePresetGroup *pPresetGroup = presetGroups[ i ];
 			Assert( pPresetGroup );
@@ -1349,7 +1349,7 @@ void CBaseAnimSetPresetFaderPanel::ChangeAnimationSet( CDmeAnimationSet *newAnim
 
 void CBaseAnimSetPresetFaderPanel::UpdateControlValues()
 {
-	for ( int i = m_pSliders->FirstItem(); i != m_pSliders->InvalidItemID(); i = m_pSliders->NextItem(i) )
+	for ( auto i = m_pSliders->FirstItem(); i != m_pSliders->InvalidItemID(); i = m_pSliders->NextItem(i) )
 	{
 		CPresetSlider *pSlider = static_cast< CPresetSlider * >( m_pSliders->GetItemPanel( i ) );
 		if ( pSlider )

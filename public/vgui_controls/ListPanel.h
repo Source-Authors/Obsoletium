@@ -214,7 +214,7 @@ public:
 	void		SetIgnoreDoubleClick( bool state );
 
 	// set up a field for editing
-	virtual void EnterEditMode(int itemID, int column, vgui::Panel *editPanel);
+	virtual void EnterEditMode(intp itemID, int column, vgui::Panel *editPanel);
 
 	// leaves editing mode
 	virtual void LeaveEditMode();
@@ -362,7 +362,7 @@ private:
 	TextImage 	*m_pEmptyListText;
 
 	PHandle		m_hEditModePanel;
-	int			m_iEditModeItemID;
+	intp		m_iEditModeItemID;
 	int			m_iEditModeColumn;
 
 	void ResetColumnHeaderCommands();

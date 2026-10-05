@@ -147,7 +147,7 @@ void CBaseAnimationSetEditor::OnButtonToggled( KeyValues *params )
 	else
 	*/
 	{
-		for ( int i = 0; i < NUM_AS_RECORDING_STATES; ++i )
+		for ( intp i = 0; i < ssize(m_pState); ++i )
 		{
 			if ( ptr == m_pState[ i ] )
 			{
@@ -322,7 +322,7 @@ void CBaseAnimationSetEditor::PerformLayout()
 	// dimhotepus: Scale UI.
 	int xpos = w - QuickPropScale( 25 );
 	m_pSelectionModeType->SetBounds( xpos, ypos, QuickPropScale( 20 ), QuickPropScale( 20 ) );
-	for ( int i = NUM_AS_RECORDING_STATES - 1; i >= 0 ; --i  )
+	for ( intp i = ssize(m_pState) - 1; i >= 0 ; --i  )
 	{
 		xpos -= QuickPropScale( 23 );
 		m_pState[ i ]->SetBounds( xpos, ypos, QuickPropScale( 20 ), QuickPropScale( 20 ) );
@@ -412,7 +412,7 @@ void CBaseAnimationSetEditor::TransformImportedChannel( CDmeChannel *pChannel )
 	if ( !pGameModel )
 		return;
 
-	int nBoneIndex = pGameModel->FindBone( CastElement< CDmeTransform >( pTarget ) );
+	intp nBoneIndex = pGameModel->FindBone( CastElement< CDmeTransform >( pTarget ) );
 	if ( nBoneIndex < 0 )
 		return;
 
@@ -420,7 +420,7 @@ void CBaseAnimationSetEditor::TransformImportedChannel( CDmeChannel *pChannel )
 	pGameModel->m_bComputeBounds = true;
 
 	DmAttributeType_t logType = pChannel->GetLog()->GetDataType();
-	int nLayerCount = pChannel->GetLog()->GetNumLayers();
+	intp nLayerCount = pChannel->GetLog()->GetNumLayers();
 
 	bool bHasPreTransform = false;
 	bool bHasPostTransform = false;
@@ -454,7 +454,7 @@ void CBaseAnimationSetEditor::TransformImportedChannel( CDmeChannel *pChannel )
 	if ( !bHasPreTransform && !bHasPostTransform )
 		return;
 
-	for ( int i = 0; i < nLayerCount; ++i )
+	for ( intp i = 0; i < nLayerCount; ++i )
 	{
 		if ( logType == AT_VECTOR3 )
 		{
@@ -555,12 +555,12 @@ void CBaseAnimationSetEditor::OnImportConfirmed( KeyValues *pParams )
 	bool bVisibleOnly = pImportParams->GetInt( "visibleOnly" ) != 0;
 
 	CUtlVector< LogPreview_t > controls;
-	int nCount = bVisibleOnly ? BuildVisibleControlList( controls ) : BuildFullControlList( controls );
+	intp nCount = bVisibleOnly ? BuildVisibleControlList( controls ) : BuildFullControlList( controls );
 
 	CUndoScopeGuard guard( "Import Animation" );
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
-		for ( int k = 0; k < LOG_PREVIEW_MAX_CHANNEL_COUNT; ++k )
+		for ( intp k = 0; k < ssize(controls[i].m_hChannels); ++k )
 		{
 			CDmeChannel *pChannel = controls[i].m_hChannels[k];
 			if ( !pChannel )
@@ -596,7 +596,7 @@ void CBaseAnimationSetEditor::OnImportConfirmed( KeyValues *pParams )
 void CBaseAnimationSetEditor::ImportAnimation( CDmeChannelsClip *pChannelsClip, bool bVisibleOnly )
 {
 	CUtlVector< LogPreview_t > controls;
-	int nCount = bVisibleOnly ? BuildVisibleControlList( controls ) : BuildFullControlList( controls );
+	intp nCount = bVisibleOnly ? BuildVisibleControlList( controls ) : BuildFullControlList( controls );
 
 	COperationFileListFrame *pStatusFrame = new COperationFileListFrame( this, 
 		"Import the Following Channels?", "Target Control", false );
@@ -605,11 +605,11 @@ void CBaseAnimationSetEditor::ImportAnimation( CDmeChannelsClip *pChannelsClip, 
 
 	intp nSrcCount = pChannelsClip->m_Channels.Count();
 	CDmeChannel** ppFoundChannels = (CDmeChannel**)_alloca( nSrcCount * sizeof(CDmeChannel*) );
-	int nFoundCount = 0;
+	intp nFoundCount = 0;
 
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
-		for ( int k = 0; k < LOG_PREVIEW_MAX_CHANNEL_COUNT; ++k )
+		for ( intp k = 0; k < ssize(controls[i].m_hChannels); ++k )
 		{
 			CDmeChannel *pChannel = controls[i].m_hChannels[k];
 			if ( !pChannel || pChannel->GetToElement() == NULL )
@@ -639,7 +639,7 @@ void CBaseAnimationSetEditor::ImportAnimation( CDmeChannelsClip *pChannelsClip, 
 	{
 		CDmeChannel *pMissingChannel  = pChannelsClip->m_Channels[i];
 
-		int j;
+		intp j;
 		for ( j = 0; j < nFoundCount; ++j )
 		{
 			if ( ppFoundChannels[j] == pMissingChannel )
@@ -739,7 +739,7 @@ void CBaseAnimationSetEditor::OnFileSelected( KeyValues *kv )
 	if ( bVisibleOnly )
 	{
 		CUtlVector< LogPreview_t > controls;
-		int nCount = BuildVisibleControlList( controls );
+		intp nCount = BuildVisibleControlList( controls );
 		if ( nCount == 0 )
 		{
 			vgui::MessageBox *pMessageBox = new vgui::MessageBox( "Error Importing Animations\n", 
@@ -901,11 +901,8 @@ void CBaseAnimationSetEditor::OnOpenContextMenu( KeyValues *params )
 
 	m_hContextMenu = new Menu( this, "ActionMenu" );
 
-	int c = ARRAYSIZE( g_AnimSetLayout );
-	for ( int i = 0; i < c; ++i )
+	for ( const auto &data : g_AnimSetLayout )
 	{
-		const AnimSetLayout_t& data = g_AnimSetLayout[ i ];
-
 		m_hContextMenu->AddMenuItem( data.contextmenulabel, new KeyValues( "OnChangeLayout", "value", (int)data.type ), this );
 	}
 
@@ -951,7 +948,7 @@ void CBaseAnimationSetEditor::ApplySchemeSettings( vgui::IScheme *pScheme )
 	m_pSelectionModeType->ClearImages();
 	m_pSelectionModeType->AddImage( m_Images.GetImage( 1 ), 0 );
 
-	for ( int i = 0; i < NUM_AS_RECORDING_STATES; ++i )
+	for ( intp i = 0; i < ssize(m_pState); ++i )
 	{
 		m_pState[ i ]->ClearImages();
 		m_pState[ i ]->AddImage( m_Images.GetImage( i + 2 ), 0 );
@@ -1015,7 +1012,7 @@ void CBaseAnimationSetEditor::SetRecordingState( RecordingState_t state, bool /*
 	m_RecordingState = state;
 
 	// Reset buttons as needed
-	for ( int i = 0; i < NUM_AS_RECORDING_STATES; ++i )
+	for ( intp i = 0; i < ssize(m_pState); ++i )
 	{
 		if ( (RecordingState_t)i == state )
 		{
@@ -1040,12 +1037,12 @@ CDmeAnimationSet *CBaseAnimationSetEditor::GetAnimationSet()
 	return m_AnimSet;
 }
 
-int CBaseAnimationSetEditor::BuildVisibleControlList( CUtlVector< LogPreview_t >& list )
+intp CBaseAnimationSetEditor::BuildVisibleControlList( CUtlVector< LogPreview_t >& list )
 {
 	return m_hAttributeSlider->BuildVisibleControlList( list );
 }
 
-int CBaseAnimationSetEditor::BuildFullControlList( CUtlVector< LogPreview_t >& list )
+intp CBaseAnimationSetEditor::BuildFullControlList( CUtlVector< LogPreview_t >& list )
 {
 	return m_hAttributeSlider->BuildFullControlList( list );
 }

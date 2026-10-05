@@ -147,7 +147,7 @@ private:
 	CDmeHandle< CDmeEditorTypeDictionary >	m_hEditorTypeDict;
 
 	char m_szAttributeName[ 256 ];
-	int m_nArrayIndex;
+	intp m_nArrayIndex;
 	DmAttributeType_t m_AttributeType;
 	IDmNotify *m_pNotify;
 	int m_nFlags;
@@ -207,26 +207,26 @@ inline bool CBaseAttributePanel::IsArrayEntry() const
 }
 
 
-template< class T > inline const T& GetArrayAttributeValue( CDmElement *pElement, const char *pAttribute, int nArrayIndex )
+template< class T > inline const T& GetArrayAttributeValue( CDmElement *pElement, const char *pAttribute, intp nArrayIndex )
 {
 	const CDmrArray<T> array( pElement, pAttribute );
 	return array[ nArrayIndex ];
 }
 
-template<> inline const DmElementHandle_t& GetArrayAttributeValue<DmElementHandle_t>( CDmElement *pElement, const char *pAttribute, int nArrayIndex )
+template<> inline const DmElementHandle_t& GetArrayAttributeValue<DmElementHandle_t>( CDmElement *pElement, const char *pAttribute, intp nArrayIndex )
 {
 	const CDmrElementArray<> array( pElement, pAttribute );
 	return array.GetHandle( nArrayIndex );
 }
 
 
-template< class T > inline void SetArrayAttributeValue( CDmElement *pElement, const char *pAttribute, int nArrayIndex, const T& value )
+template< class T > inline void SetArrayAttributeValue( CDmElement *pElement, const char *pAttribute, intp nArrayIndex, const T& value )
 {
 	CDmrArray<T> array( pElement, pAttribute );
 	array.Set( nArrayIndex, value );
 }
 
-template<> inline void SetArrayAttributeValue<DmElementHandle_t>( CDmElement *pElement, const char *pAttribute, int nArrayIndex, const DmElementHandle_t& value )
+template<> inline void SetArrayAttributeValue<DmElementHandle_t>( CDmElement *pElement, const char *pAttribute, intp nArrayIndex, const DmElementHandle_t& value )
 {
 	CDmrElementArray<> array( pElement, pAttribute );
 	array.SetHandle( nArrayIndex, value );

@@ -54,8 +54,8 @@ public:
 	virtual ~CBaseAnimationSetEditor();
 
 	virtual void						CreateToolsSubPanels();
-	int									BuildVisibleControlList( CUtlVector< LogPreview_t >& list );
-	int									BuildFullControlList( CUtlVector< LogPreview_t >& list );
+	intp								BuildVisibleControlList( CUtlVector< LogPreview_t >& list );
+	intp								BuildFullControlList( CUtlVector< LogPreview_t >& list );
 	void								RecomputePreview();
 	virtual void						ChangeLayout( EAnimSetLayout_t newLayout );
 

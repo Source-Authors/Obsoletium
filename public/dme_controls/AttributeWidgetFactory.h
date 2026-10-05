@@ -51,7 +51,7 @@ struct AttributeWidgetInfo_t
 
 	CDmElement *m_pElement;
 	const char *m_pAttributeName;
-	int m_nArrayIndex;
+	intp m_nArrayIndex;
 	CDmeEditorTypeDictionary *m_pEditorTypeDictionary;
 	CDmeEditorAttributeInfo *m_pEditorInfo;
 

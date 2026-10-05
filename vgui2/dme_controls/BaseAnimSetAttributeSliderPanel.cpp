@@ -550,7 +550,7 @@ void CBaseAnimSetAttributeSliderPanel::ChangeAnimationSet( CDmeAnimationSet *new
 
 		CDmeChannel *ctrlChannels[ LOG_PREVIEW_MAX_CHANNEL_COUNT ];
 		GetChannelsForControl( control, ctrlChannels );
-		for ( int j = 0 ; j < LOG_PREVIEW_MAX_CHANNEL_COUNT; ++j )
+		for ( intp j = 0 ; j < ssize(ctrlChannels); ++j )
 		{
 			lookup.ch = ctrlChannels[ j ];
 			lookup.type	= (AnimationControlType_t)j;
@@ -687,7 +687,7 @@ bool CBaseAnimSetAttributeSliderPanel::ApplySliderValues( bool bForce )
 
 		bool bUsePreviewValue = pSlider->IsPreviewEnabled() && ( !pSlider->IsSimplePreview() || bForce );
 
-		for ( int j = 0; j < LOG_PREVIEW_MAX_CHANNEL_COUNT; ++j )
+		for ( intp j = 0; j < ssize(ctrlChannels); ++j )
 		{
 			AnimationControlType_t type = (AnimationControlType_t)j;
 			CDmeChannel *pChannel = ctrlChannels[ j ];
@@ -905,7 +905,7 @@ bool CBaseAnimSetAttributeSliderPanel::GetAttributeSliderValue( AttributeValue_t
 	return false;
 }
 
-void CBaseAnimSetAttributeSliderPanel::GetChannelsForControl( CDmElement *control, CDmeChannel *channels[LOG_PREVIEW_MAX_CHANNEL_COUNT] )
+void CBaseAnimSetAttributeSliderPanel::GetChannelsForControl( CDmElement *control, CDmeChannel * (&channels)[LOG_PREVIEW_MAX_CHANNEL_COUNT] )
 {
 	if ( control->GetValue< bool >( "transform" ) )
 	{
@@ -914,7 +914,7 @@ void CBaseAnimSetAttributeSliderPanel::GetChannelsForControl( CDmElement *contro
 
 		channels[ LOG_PREVIEW_POSITION ] = ch1;
 		channels[ LOG_PREVIEW_ORIENTATION ] = ch2;
-		for ( int i = 2; i < LOG_PREVIEW_MAX_CHANNEL_COUNT; ++i )
+		for ( intp i = 2; i < ssize(channels); ++i )
 		{
 			channels[i] = NULL;
 		}
@@ -940,7 +940,7 @@ void CBaseAnimSetAttributeSliderPanel::GetChannelsForControl( CDmElement *contro
 	{
 		channels[ LOG_PREVIEW_MULTILEVEL ] = NULL;
 	}
-	for ( int i = 3; i < LOG_PREVIEW_MAX_CHANNEL_COUNT; ++i ) //-V654 //-V621
+	for ( intp i = 3; i < ssize(channels); ++i ) //-V654 //-V621
 	{
 		channels[i] = NULL;
 	}
@@ -1129,8 +1129,8 @@ void CBaseAnimSetAttributeSliderPanel::SetTimeSelectionParametersForRecordingCha
 
 	SetupForPreset( fader, m_nFaderChangeFlags );
 
-	int c = g_pChannelRecordingMgr->GetLayerRecordingChannelCount();
-	for ( int i = 0; i < c; ++i )
+	intp c = g_pChannelRecordingMgr->GetLayerRecordingChannelCount();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeChannel *ch = g_pChannelRecordingMgr->GetLayerRecordingChannel( i );
 		if ( !ch )
@@ -1188,7 +1188,7 @@ void CBaseAnimSetAttributeSliderPanel::MaybeAddPreviewLog( CDmeFilmClip *shot, C
 	preview.m_bActiveLog = isActiveLog;
 	preview.m_bSelected = bSelected;
 
-	for ( int channel = 0; channel < LOG_PREVIEW_MAX_CHANNEL_COUNT; ++channel )
+	for ( intp channel = 0; channel < ssize(ctrlChannels); ++channel )
 	{
 		CDmeChannel *ch = ctrlChannels[ channel ];
 		if ( !ch )
@@ -1519,7 +1519,7 @@ CAttributeSlider *CBaseAnimSetAttributeSliderPanel::FindSliderForControl( CDmEle
 	return NULL;
 }
 
-bool CBaseAnimSetAttributeSliderPanel::GetSliderValues( AttributeValue_t *pValue, int nIndex )
+bool CBaseAnimSetAttributeSliderPanel::GetSliderValues( AttributeValue_t *pValue, intp nIndex )
 {
 	Assert( pValue );
 	Assert( nIndex >= 0 && nIndex < m_SliderList.Count() );

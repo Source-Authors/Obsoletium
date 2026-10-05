@@ -49,15 +49,15 @@ static void ImportCombinationControls( CDmeCombinationOperator *pDestComboOp, CD
 	// Iterate through all controls in the imported operator.
 	// For each control that contains at least 1 raw controls
 	// that also exist in this combination op, create a control here also.
-	int nCount = pSrcComboOp->GetControlCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pSrcComboOp->GetControlCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		const char *pControlName = pSrcComboOp->GetControlName( i );
 
-		int nRawControls = pSrcComboOp->GetRawControlCount( i );
-		int nMatchCount = 0; 
+		intp nRawControls = pSrcComboOp->GetRawControlCount( i );
+		intp nMatchCount = 0; 
 		bool *pFoundMatch = stackallocT( bool, nRawControls );
-		for ( int j = 0; j < nRawControls; ++j )
+		for ( intp j = 0; j < nRawControls; ++j )
 		{
 			const char *pRawControl = pSrcComboOp->GetRawControlName( i, j );
 			pFoundMatch[j] = pDestComboOp->DoesTargetContainDeltaState( pRawControl );
@@ -79,7 +79,7 @@ static void ImportCombinationControls( CDmeCombinationOperator *pDestComboOp, CD
 		bool bIsEyelid = pSrcComboOp->IsEyelidControl( i );
 		ControlIndex_t index = pDestComboOp->FindOrCreateControl( pControlName, bIsStereo );
 		pDestComboOp->SetEyelidControl( index, bIsEyelid );
-		for ( int j = 0; j < nRawControls; ++j )
+		for ( intp j = 0; j < nRawControls; ++j )
 		{
 			if ( pFoundMatch[j] )
 			{
@@ -102,15 +102,15 @@ static void ImportDominationRules( CDmeCombinationOperator *pDestComboOp, CDmeCo
 	pDestComboOp->RemoveAllDominationRules();
 
 	// Now deal with dominance rules
-	int nRuleCount = pSrcComboOp->DominationRuleCount();
-	for ( int i = 0; i < nRuleCount; ++i )
+	intp nRuleCount = pSrcComboOp->DominationRuleCount();
+	for ( intp i = 0; i < nRuleCount; ++i )
 	{
 		bool bMismatch = false;
 
 		// Only add dominance rule if *all* raw controls are present
 		CDmeCombinationDominationRule *pSrcRule = pSrcComboOp->GetDominationRule( i );
-		int nDominatorCount = pSrcRule->DominatorCount();
-		for ( int j = 0; j < nDominatorCount; ++j )
+		intp nDominatorCount = pSrcRule->DominatorCount();
+		for ( intp j = 0; j < nDominatorCount; ++j )
 		{
 			const char *pDominatorName = pSrcRule->GetDominator( j );
 			if ( !pDestComboOp->HasRawControl( pDominatorName ) )
@@ -121,8 +121,8 @@ static void ImportDominationRules( CDmeCombinationOperator *pDestComboOp, CDmeCo
 			}
 		}
 
-		int nSuppressedCount = pSrcRule->SuppressedCount();
-		for ( int j = 0; j < nSuppressedCount; ++j )
+		intp nSuppressedCount = pSrcRule->SuppressedCount();
+		for ( intp j = 0; j < nSuppressedCount; ++j )
 		{
 			const char *pSuppressedName = pSrcRule->GetSuppressed( j );
 			if ( !pDestComboOp->HasRawControl( pSuppressedName ) )
@@ -275,8 +275,8 @@ public:
 
 	void SetRawControlWrinkleValue( float flWrinkleValue );
 
-	int GetSelectedInputControlItemId();
-	void SelectedInputControlByItemId( int );
+	intp GetSelectedInputControlItemId();
+	void SelectedInputControlByItemId( intp );
 
 	MESSAGE_FUNC( OnMoveUpInputControl, "MoveUpInputControl" );
 	MESSAGE_FUNC( OnMoveDownInputControl, "MoveDownInputControl" );
@@ -451,8 +451,8 @@ void CDmeCombinationControlsPanel::RefreshCombinationOperator()
 	if ( !m_hCombinationOperator.Get() )
 		return;
 				  
-	int nCount = m_hCombinationOperator->GetControlCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_hCombinationOperator->GetControlCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		bool bIsMultiControl = m_hCombinationOperator->GetRawControlCount(i) > 1;
 		float flDefault = m_hCombinationOperator->GetRawControlCount(i) == 2 ? 0.5f : 0.0f;
@@ -462,7 +462,7 @@ void CDmeCombinationControlsPanel::RefreshCombinationOperator()
 		kv->SetString( "eyelid", m_hCombinationOperator->IsEyelidControl(i) ? "On" : "Off" ); 
 		kv->SetFloat( "default", flDefault ); 
 		kv->SetColor( "cellcolor", bIsMultiControl ? Color( 192, 192, 0, 255 ) : Color( 255, 255, 255, 255 ) ); 
-		const int nItemId = m_pControlList->AddItem( kv, 0, false, false );
+		const intp nItemId = m_pControlList->AddItem( kv, 0, false, false );
 
 		if ( V_streq( controlName.Get(), pName ) )
 		{
@@ -492,11 +492,11 @@ void CDmeCombinationControlsPanel::RefreshRawControlNames()
 	if ( !m_hCombinationOperator.Get() )
 		return;
 
-	int nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
+	intp nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
 	if ( nSelectedItemCount != 1 )
 		return;
 
-	int nItemID = m_pControlList->GetSelectedItem( 0 );
+	intp nItemID = m_pControlList->GetSelectedItem( 0 );
 
 	KeyValues *pKeyValues = m_pControlList->GetItem( nItemID );
 	const char *pControlName = pKeyValues->GetString( "name" );
@@ -504,8 +504,8 @@ void CDmeCombinationControlsPanel::RefreshRawControlNames()
 	if ( nControlIndex < 0 )
 		return;
 
-	int nCount = m_hCombinationOperator->GetRawControlCount( nControlIndex );
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_hCombinationOperator->GetRawControlCount( nControlIndex );
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		KeyValues *kv = new KeyValues( "node", "name", m_hCombinationOperator->GetRawControlName( nControlIndex, i ) );
 		switch( nCount )
@@ -544,15 +544,15 @@ const char* CDmeCombinationControlsPanel::GetSelectedRawControl( ControlIndex_t 
 
 	nControlIndex = -1;
 
-	int nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
+	intp nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
 	if ( nSelectedItemCount != 1 )
 		return NULL;
 
-	int nSelectedRawItemCount = m_pRawControlList->GetSelectedItemsCount();
+	intp nSelectedRawItemCount = m_pRawControlList->GetSelectedItemsCount();
 	if ( nSelectedRawItemCount != 1 )
 		return NULL;
 
-	int nItemID = m_pControlList->GetSelectedItem( 0 );
+	intp nItemID = m_pControlList->GetSelectedItem( 0 );
 	KeyValues *pKeyValues = m_pControlList->GetItem( nItemID );
 	const char *pControlName = pKeyValues->GetString( "name" );
 	nControlIndex = m_hCombinationOperator->FindControlIndex( pControlName );
@@ -571,11 +571,11 @@ const char *CDmeCombinationControlsPanel::GetSelectedControlName()
 	if ( !m_hCombinationOperator.Get() )
 		return NULL;
 
-	int nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
+	intp nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
 	if ( nSelectedItemCount != 1 )
 		return NULL;
 
-	const int nItemId = m_pControlList->GetSelectedItem( 0 );
+	const intp nItemId = m_pControlList->GetSelectedItem( 0 );
 	if ( !m_pControlList->IsValidItemID( nItemId ) )
 		return NULL;
 
@@ -590,7 +590,7 @@ const char *CDmeCombinationControlsPanel::GetSelectedControlName()
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-int CDmeCombinationControlsPanel::GetSelectedInputControlItemId()
+intp CDmeCombinationControlsPanel::GetSelectedInputControlItemId()
 {
 	return m_pControlList->GetSelectedItem( 0 );
 }
@@ -599,7 +599,7 @@ int CDmeCombinationControlsPanel::GetSelectedInputControlItemId()
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void CDmeCombinationControlsPanel::SelectedInputControlByItemId( int nItemId )
+void CDmeCombinationControlsPanel::SelectedInputControlByItemId( intp nItemId )
 {
 	m_pControlList->SetSingleSelectedItem( nItemId );
 }
@@ -716,11 +716,11 @@ void CDmeCombinationControlsPanel::OnOpenRawControlsContextMenu( )
 	if ( !m_hCombinationOperator.Get() )
 		return;
 
-	int nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
+	intp nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
 	if ( nSelectedItemCount != 1 )
 		return;
 
-	int nSelectedRawItemCount = m_pRawControlList->GetSelectedItemsCount();
+	intp nSelectedRawItemCount = m_pRawControlList->GetSelectedItemsCount();
 	if ( nSelectedRawItemCount != 1 )
 		return;
 
@@ -755,10 +755,10 @@ void CDmeCombinationControlsPanel::OnOpenContextMenu( KeyValues *kv )
 	bool bGroupedControls = false;
 	bool bStereoControls = false;
 	bool bEyelidControls = false;
-	int nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
-	for ( int i = 0; i < nSelectedItemCount; ++i )
+	intp nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
+	for ( intp i = 0; i < nSelectedItemCount; ++i )
 	{
-		int nItemID = m_pControlList->GetSelectedItem( i );
+		intp nItemID = m_pControlList->GetSelectedItem( i );
 
 		KeyValues *pKeyValues = m_pControlList->GetItem( nItemID );
 		const char *pControlName = pKeyValues->GetString( "name" );
@@ -866,10 +866,10 @@ void CDmeCombinationControlsPanel::BuildSelectedControlLists(
 {
 	bool bIsStereo = false;
 	bool bIsEyelid = false;
-	int nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
-	for ( int i = 0; i < nSelectedItemCount; ++i )
+	intp nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
+	for ( intp i = 0; i < nSelectedItemCount; ++i )
 	{
-		int nItemID = m_pControlList->GetSelectedItem( i );
+		intp nItemID = m_pControlList->GetSelectedItem( i );
 
 		KeyValues *pKeyValues = m_pControlList->GetItem( nItemID );
 		const char *pControlName = pKeyValues->GetString( "name" );
@@ -877,7 +877,7 @@ void CDmeCombinationControlsPanel::BuildSelectedControlLists(
 		if ( nControlIndex < 0 )
 			continue;
 
-		int nRawControlCount = m_hCombinationOperator->GetRawControlCount( nControlIndex );
+		intp nRawControlCount = m_hCombinationOperator->GetRawControlCount( nControlIndex );
 		if ( bOnlyGroupedControls && ( nRawControlCount <= 1 ) )
 			continue;
 
@@ -892,7 +892,7 @@ void CDmeCombinationControlsPanel::BuildSelectedControlLists(
 		}
 
 		controlNames.AddToTail( pControlName );
-		for ( int j = 0; j < nRawControlCount; ++j )
+		for ( intp j = 0; j < nRawControlCount; ++j )
 		{
 			rawControlNames.AddToTail( m_hCombinationOperator->GetRawControlName( nControlIndex, j ) );
 		}
@@ -941,7 +941,7 @@ bool CDmeCombinationControlsPanel::HasDuplicateControlName( const char *pControl
 //-----------------------------------------------------------------------------
 void CDmeCombinationControlsPanel::PerformGroupControls( const char *pGroupedControlName )
 {
-	int nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
+	intp nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
 	if ( nSelectedItemCount <= 1 )
 		return;
 
@@ -983,11 +983,11 @@ void CDmeCombinationControlsPanel::PerformGroupControls( const char *pGroupedCon
 //-----------------------------------------------------------------------------
 void CDmeCombinationControlsPanel::PerformRenameControl( const char *pNewControlName )
 {
-	int nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
+	intp nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
 	if ( nSelectedItemCount != 1 )
 		return;
 
-	int nItemID = m_pControlList->GetSelectedItem( 0 );
+	intp nItemID = m_pControlList->GetSelectedItem( 0 );
 	KeyValues *pKeyValues = m_pControlList->GetItem( nItemID );
 	const char *pControlName = pKeyValues->GetString( "name" );
 	ControlIndex_t nControlIndex = m_hCombinationOperator->FindControlIndex( pControlName );
@@ -1073,7 +1073,7 @@ void CDmeCombinationControlsPanel::OnUngroupControls( )
 	intp nGroupedControlCount = rawControlNames.Count();
 	for ( intp i = 0; i < nGroupedControlCount; ++i )
 	{
-		const int nControlIndex = m_hCombinationOperator->FindOrCreateControl( rawControlNames[i], bIsStereo, true );
+		const intp nControlIndex = m_hCombinationOperator->FindOrCreateControl( rawControlNames[i], bIsStereo, true );
 		m_hCombinationOperator->SetEyelidControl( nControlIndex, bIsEyelid );
 	}
 
@@ -1137,7 +1137,7 @@ void CDmeCombinationControlsPanel::OnToggleEyelidControl()
 //-----------------------------------------------------------------------------
 void CDmeCombinationControlsPanel::OnRenameControl()
 {
-	int nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
+	intp nSelectedItemCount = m_pControlList->GetSelectedItemsCount();
 	if ( nSelectedItemCount != 1 )
 		return;
 
@@ -1274,7 +1274,7 @@ void CDmeInputControlListPanel::OnKeyCodeTyped( vgui::KeyCode code )
 	{
 		if ( code == KEY_UP )
 		{
-			const int nItemId = m_pComboPanel->GetSelectedInputControlItemId();
+			const intp nItemId = m_pComboPanel->GetSelectedInputControlItemId();
 			m_pComboPanel->OnMoveUpInputControl();
 			vgui::ListPanel::OnKeyCodeTyped( code );
 			m_pComboPanel->SelectedInputControlByItemId( nItemId );
@@ -1282,7 +1282,7 @@ void CDmeInputControlListPanel::OnKeyCodeTyped( vgui::KeyCode code )
 		}
 		else if ( code == KEY_DOWN )
 		{
-			const int nItemId = m_pComboPanel->GetSelectedInputControlItemId();
+			const intp nItemId = m_pComboPanel->GetSelectedInputControlItemId();
 			m_pComboPanel->OnMoveDownInputControl();
 			vgui::ListPanel::OnKeyCodeTyped( code );
 			m_pComboPanel->SelectedInputControlByItemId( nItemId );
@@ -1342,7 +1342,7 @@ void CDmeRawControlListPanel::OnMouseDoublePressed( vgui::MouseCode code )
 		return;
 	}
 
-	int nNumSelected = GetSelectedItemsCount();
+	intp nNumSelected = GetSelectedItemsCount();
 	if ( IsInEditMode() || nNumSelected != 1 )
 		return;
 
@@ -1350,7 +1350,7 @@ void CDmeRawControlListPanel::OnMouseDoublePressed( vgui::MouseCode code )
 	m_pWrinkleEdit->SendNewLine( true );
 
 	// Always edit column 3, which contains the wrinkle amount
-	int nEditingItem = GetSelectedItem( 0 );
+	intp nEditingItem = GetSelectedItem( 0 );
 	KeyValues *pKeyValues = GetItem( nEditingItem );
 	float flWrinkleValue = pKeyValues->GetFloat( "wrinkle" );
 
@@ -1450,8 +1450,8 @@ void CRawControlPickerFrame::RefreshRawControlNames( CDmeCombinationOperator *pC
 	if ( !pCombinationOperator )
 		return;
 
-	int nCount = pCombinationOperator->GetRawControlCount( );
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pCombinationOperator->GetRawControlCount( );
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		const char *pRawControl = pCombinationOperator->GetRawControlName( i );
 
@@ -1463,7 +1463,7 @@ void CRawControlPickerFrame::RefreshRawControlNames( CDmeCombinationOperator *pC
 			continue;
 
 		KeyValues *kv = new KeyValues( "node", "name", pCombinationOperator->GetRawControlName( i ) );
-		int nItemID = m_pRawControlList->AddItem( kv, 0, false, false );
+		intp nItemID = m_pRawControlList->AddItem( kv, 0, false, false );
 		if ( ( bChooseSuppressed && bIsSuppressed ) || ( !bChooseSuppressed && bIsDominator ) )
 		{
 			m_pRawControlList->AddSelectedItem( nItemID );
@@ -1510,10 +1510,10 @@ void CRawControlPickerFrame::OnCommand( const char *pCommand )
 		KeyValues *pActionKeys = new KeyValues( "RawControlPicked" );
 		KeyValues *pControlList = pActionKeys->FindKey( "rawControls", true );
 
-		int nSelectedItemCount = m_pRawControlList->GetSelectedItemsCount();
-		for ( int i = 0; i < nSelectedItemCount; ++i )
+		intp nSelectedItemCount = m_pRawControlList->GetSelectedItemsCount();
+		for ( intp i = 0; i < nSelectedItemCount; ++i )
 		{
-			int nItemID = m_pRawControlList->GetSelectedItem( i );
+			intp nItemID = m_pRawControlList->GetSelectedItem( i );
 			KeyValues *pKeyValues = m_pRawControlList->GetItem( nItemID );
 			const char *pControlName = pKeyValues->GetString( "name" );
 
@@ -1668,23 +1668,23 @@ void CDmeCombinationDominationRulesPanel::RefreshCombinationOperator()
 		return;
 
 	char pTemp[1024];
-	int nCount = m_hCombinationOperator->DominationRuleCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_hCombinationOperator->DominationRuleCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeCombinationDominationRule *pRule = m_hCombinationOperator->GetDominationRule( i );
 
 		KeyValues *pItemKeys = new KeyValues( "node" );
 
 		int nLen = 0;
-		int nControlCount = pRule->DominatorCount();
+		intp nControlCount = pRule->DominatorCount();
 		pTemp[0] = 0;
 		const char **ppStrings = stackallocT( const char *, nControlCount );
-		for ( int j = 0; j < nControlCount; ++j )
+		for ( intp j = 0; j < nControlCount; ++j )
 		{
 			ppStrings[j] = pRule->GetDominator(j);
 		}
 		qsort( ppStrings, (size_t)nControlCount, (size_t)sizeof(char*), ControlNameSortFunc );
-		for ( int j = 0; j < nControlCount; ++j )
+		for ( intp j = 0; j < nControlCount; ++j )
 		{
 			nLen += Q_snprintf( &pTemp[nLen], sizeof(pTemp) - nLen, "%s ", ppStrings[j] );
 		}
@@ -1695,12 +1695,12 @@ void CDmeCombinationDominationRulesPanel::RefreshCombinationOperator()
 		nControlCount = pRule->SuppressedCount();
 		pTemp[0] = 0;
 		ppStrings = stackallocT( const char *, nControlCount );
-		for ( int j = 0; j < nControlCount; ++j )
+		for ( intp j = 0; j < nControlCount; ++j )
 		{
 			ppStrings[j] = pRule->GetSuppressed(j);
 		}
 		qsort( ppStrings, (size_t)nControlCount, (size_t)sizeof(char*), ControlNameSortFunc );
-		for ( int j = 0; j < nControlCount; ++j )
+		for ( intp j = 0; j < nControlCount; ++j )
 		{
 			nLen += Q_snprintf( &pTemp[nLen], sizeof(pTemp) - nLen, "%s ", ppStrings[j] );
 		}
@@ -1729,11 +1729,11 @@ CDmeCombinationDominationRule* CDmeCombinationDominationRulesPanel::GetSelectedR
 	if ( !m_hCombinationOperator.Get() )
 		return NULL;
 
-	int nSelectedItemCount = m_pDominationRulesList->GetSelectedItemsCount();
+	intp nSelectedItemCount = m_pDominationRulesList->GetSelectedItemsCount();
 	if ( nSelectedItemCount != 1 )
 		return NULL;
 
-	int nItemID = m_pDominationRulesList->GetSelectedItem( 0 );
+	intp nItemID = m_pDominationRulesList->GetSelectedItem( 0 );
 	KeyValues *pKeyValues = m_pDominationRulesList->GetItem( nItemID );
 	return GetElementKeyValue<CDmeCombinationDominationRule>( pKeyValues, "rule" );
 }
@@ -1808,7 +1808,7 @@ void CDmeCombinationDominationRulesPanel::OnOpenContextMenu( KeyValues *kv )
 	if ( pPanel != m_pDominationRulesList )
 		return;
 
-	int nSelectedItemCount = m_pDominationRulesList->GetSelectedItemsCount();
+	intp nSelectedItemCount = m_pDominationRulesList->GetSelectedItemsCount();
 
 	m_hContextMenu = new vgui::Menu( this, "ActionMenu" );
 	m_hContextMenu->AddMenuItem( "#DmeCombinationSystemEditor_AddDominationRule", new KeyValues( "AddDominationRule" ), this );
@@ -1841,7 +1841,7 @@ void CDmeCombinationDominationRulesPanel::OnOpenContextMenu( KeyValues *kv )
 //-----------------------------------------------------------------------------
 void CDmeCombinationDominationRulesPanel::SelectRule( CDmeCombinationDominationRule* pRule )
 {
-	for ( int nItemID = m_pDominationRulesList->FirstItem(); nItemID != m_pDominationRulesList->InvalidItemID(); nItemID = m_pDominationRulesList->NextItem( nItemID ) )
+	for ( intp nItemID = m_pDominationRulesList->FirstItem(); nItemID != m_pDominationRulesList->InvalidItemID(); nItemID = m_pDominationRulesList->NextItem( nItemID ) )
 	{
 		KeyValues *pKeyValues = m_pDominationRulesList->GetItem( nItemID );
 		if ( pRule == GetElementKeyValue<CDmeCombinationDominationRule>( pKeyValues, "rule" ) )
@@ -1877,7 +1877,7 @@ void CDmeCombinationDominationRulesPanel::OnDuplicateSuppressed()
 	CDmeCombinationDominationRule* pRule = m_hCombinationOperator->AddDominationRule();
 	RefreshCombinationOperator();
 	SelectRule( pRule );
-	for ( int i = 0; i < pSrcRule->SuppressedCount(); ++i )
+	for ( intp i = 0; i < pSrcRule->SuppressedCount(); ++i )
 	{
 		pRule->AddSuppressed( pSrcRule->GetSuppressed( i ) );
 	}
@@ -1894,7 +1894,7 @@ void CDmeCombinationDominationRulesPanel::OnDuplicateDominators()
 	CDmeCombinationDominationRule* pRule = m_hCombinationOperator->AddDominationRule();
 	RefreshCombinationOperator();
 	SelectRule( pRule );
-	for ( int i = 0; i < pSrcRule->DominatorCount(); ++i )
+	for ( intp i = 0; i < pSrcRule->DominatorCount(); ++i )
 	{
 		pRule->AddDominator( pSrcRule->GetDominator( i ) );
 	}
@@ -1908,10 +1908,10 @@ void CDmeCombinationDominationRulesPanel::OnDuplicateDominators()
 //-----------------------------------------------------------------------------
 void CDmeCombinationDominationRulesPanel::OnRemoveDominationRule( )
 {
-	int nSelectedItemCount = m_pDominationRulesList->GetSelectedItemsCount();
-	for ( int i = 0; i < nSelectedItemCount; ++i )
+	intp nSelectedItemCount = m_pDominationRulesList->GetSelectedItemsCount();
+	for ( intp i = 0; i < nSelectedItemCount; ++i )
 	{
-		int nItemID = m_pDominationRulesList->GetSelectedItem( i );
+		intp nItemID = m_pDominationRulesList->GetSelectedItem( i );
 		KeyValues *pKeyValues = m_pDominationRulesList->GetItem( nItemID );
 
 		CDmeCombinationDominationRule *pRule = GetElementKeyValue<CDmeCombinationDominationRule>( pKeyValues, "rule" );

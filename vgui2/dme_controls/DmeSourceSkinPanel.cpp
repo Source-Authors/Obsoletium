@@ -129,7 +129,8 @@ void CDmeSourceSkinPanel::OnTextChanged( KeyValues *kv )
 	{
 		char pTextBuf[256];
 		m_pScale->GetText( pTextBuf, sizeof( pTextBuf) );
-		float flScale = atoi( pTextBuf );
+		// dimhotepus: int -> float.
+		float flScale = V_atof( pTextBuf );
 		if ( flScale != m_hSourceSkin->m_flScale )
 		{
 			m_hSourceSkin->m_flScale = flScale;

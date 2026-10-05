@@ -86,8 +86,8 @@ private:
 	float NormalizedToValue( float flValue );
 	float ValueToNormalized( float flNormalized );
 
-	template< class T > int FindOrAddKey( DmeTime_t time, DmeTime_t tolerance, int nComps, float flValue );
-	template< class T > int ModifyKey( int nPoint, DmeTime_t initialTime, DmeTime_t time, int nComps, float flValue );
+	template< class T > intp FindOrAddKey( DmeTime_t time, DmeTime_t tolerance, int nComps, float flValue );
+	template< class T > intp ModifyKey( intp nPoint, DmeTime_t initialTime, DmeTime_t time, int nComps, float flValue );
 
 	CDmeHandle<CDmeLog> m_hLog;
 	int m_LogFieldMask{0};
@@ -103,7 +103,7 @@ private:
 // Finds or adds a key
 //-----------------------------------------------------------------------------
 template< class T > 
-int CDmeLogEditPanel::FindOrAddKey( DmeTime_t time, DmeTime_t tolerance, int nComps, float flValue )
+intp CDmeLogEditPanel::FindOrAddKey( DmeTime_t time, DmeTime_t tolerance, int nComps, float flValue )
 {
 	T vec = CastElement< CDmeTypedLog<T> >( m_hLog )->GetValue( time );
 	for ( int i = 0; i < nComps; ++i )
@@ -121,7 +121,7 @@ int CDmeLogEditPanel::FindOrAddKey( DmeTime_t time, DmeTime_t tolerance, int nCo
 // Modifies an existing key
 //-----------------------------------------------------------------------------
 template< class T > 
-int CDmeLogEditPanel::ModifyKey( int nPoint, DmeTime_t initialTime, DmeTime_t time, int nComps, float flValue )
+intp CDmeLogEditPanel::ModifyKey( intp nPoint, DmeTime_t initialTime, DmeTime_t time, int nComps, float flValue )
 {
 	T vec = CastElement< CDmeTypedLog<T> >( m_hLog )->GetValue( initialTime );
 	for ( int i = 0; i < nComps; ++i )

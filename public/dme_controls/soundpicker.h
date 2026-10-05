@@ -57,15 +57,15 @@ public:
 
 	// Returns the selceted sound name
 	PickType_t GetSelectedSoundType();
-	const char *GetSelectedSoundName( int nSelectionIndex = -1 );
-	int GetSelectedSoundCount();
+	const char *GetSelectedSoundName( intp nSelectionIndex = -1 );
+	intp GetSelectedSoundCount();
 
 private:
 	// Purpose: Called when a page is shown
 	void RequestGameSoundFilterFocus( );
 
 	// Updates the column header in the chooser
-	void UpdateGameSoundColumnHeader( int nMatchCount, int nTotalCount );
+	void UpdateGameSoundColumnHeader( intp nMatchCount, intp nTotalCount );
 
 	void BuildGameSoundList();
 	void RefreshGameSoundList();

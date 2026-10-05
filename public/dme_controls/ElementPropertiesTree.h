@@ -58,8 +58,8 @@ public:
 	CElementTreeViewListControl( Panel *pParent, const char *pName );
 
 	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
-	virtual int		AddItem( KeyValues *data, bool allowLabelEditing, int parentItemIndex, CUtlVector< vgui::Panel * >& columnPanels );
-	virtual void	RemoveItem( int nItemIndex ); 
+	virtual intp	AddItem( KeyValues *data, bool allowLabelEditing, intp parentItemIndex, CUtlVector< vgui::Panel * >& columnPanels );
+	virtual void	RemoveItem( intp nItemIndex ); 
 	void	PerformLayout() override;
 	virtual void	RemoveAll();
 	virtual vgui::HFont	GetFont( int size );
@@ -67,10 +67,10 @@ public:
 	virtual int		GetFontSize();
 	virtual void	SetFontSize( int size );
 	void	PostChildPaint() override;
-	virtual void	ExpandItem( int itemIndex, bool bExpand );
-	virtual bool	IsItemExpanded( int itemIndex );
-	virtual bool	IsItemSelected( int itemIndex );
-	virtual KeyValues *GetItemData( int itemIndex );
+	virtual void	ExpandItem( intp itemIndex, bool bExpand );
+	virtual bool	IsItemExpanded( intp itemIndex );
+	virtual bool	IsItemSelected( intp itemIndex );
+	virtual KeyValues *GetItemData( intp itemIndex );
 	virtual int		GetTreeColumnWidth();
 	virtual void	SetTreeColumnWidth( int w );
 	void	OnCursorMoved( int x, int y ) override;
@@ -118,7 +118,7 @@ private:
 	};
 
 	// Removes an item from the tree recursively
-	void RemoveItem_R( int nItemIndex );
+	void RemoveItem_R( intp nItemIndex );
 
 	void	 HideAll();
 
@@ -157,14 +157,14 @@ public:
 	virtual void Init( );
 	virtual void Refresh( RefreshType_t rebuild = REFRESH_TREE_VIEW, bool preservePrevSelectedItem = false );
 	virtual void ApplyChanges();
-	virtual void GenerateChildrenOfNode( int itemIndex );
-	virtual void GenerateContextMenu( int itemIndex, int x, int y );
-	virtual void GenerateDragDataForItem( int itemIndex, KeyValues *msg );
-	virtual void OnLabelChanged( int itemIndex, char const *oldString, char const *newString );
-	virtual bool IsItemDroppable( int itemIndex, CUtlVector< KeyValues * >& msglist );
-	virtual void OnItemDropped( int itemIndex, CUtlVector< KeyValues * >& msglist );
-	virtual bool GetItemDropContextMenu( int itemIndex, vgui::Menu *menu, CUtlVector< KeyValues * >& msglist );
-	virtual vgui::HCursor GetItemDropCursor( int itemIndex, CUtlVector< KeyValues * >& msglist );
+	virtual void GenerateChildrenOfNode( intp itemIndex );
+	virtual void GenerateContextMenu( intp itemIndex, int x, int y );
+	virtual void GenerateDragDataForItem( intp itemIndex, KeyValues *msg );
+	virtual void OnLabelChanged( intp itemIndex, char const *oldString, char const *newString );
+	virtual bool IsItemDroppable( intp itemIndex, CUtlVector< KeyValues * >& msglist );
+	virtual void OnItemDropped( intp itemIndex, CUtlVector< KeyValues * >& msglist );
+	virtual bool GetItemDropContextMenu( intp itemIndex, vgui::Menu *menu, CUtlVector< KeyValues * >& msglist );
+	virtual vgui::HCursor GetItemDropCursor( intp itemIndex, CUtlVector< KeyValues * >& msglist );
 	virtual void SetObject( CDmElement *object );
 	void OnCommand( const char *cmd ) override;
 
@@ -261,46 +261,46 @@ protected:
 	void FindMatchingElements_R( CUtlRBTree< CDmElement *, int >& visited, char const *searchstr, CDmElement *root, CUtlVector< SearchResult_t >& list );
 	void NavigateToSearchResult();
 
-	void SpewOpenItems( int depth, OpenItemTree_t &tree, int nOpenTreeIndex, int nItemIndex );
+	void SpewOpenItems( int depth, OpenItemTree_t &tree, int nOpenTreeIndex, intp nItemIndex );
 
 	// Finds the tree index of a child matching the particular element + attribute
-	int FindTreeItem( int nParentIndex, const TreeItem_t &info );
+	intp FindTreeItem( intp nParentIndex, const TreeItem_t &info );
 
 	// Expands all items in the open item tree if they exist
-	void ExpandOpenItems( OpenItemTree_t &tree, int nOpenTreeIndex, int nItemIndex, bool makeVisible );
+	void ExpandOpenItems( OpenItemTree_t &tree, int nOpenTreeIndex, intp nItemIndex, bool makeVisible );
 
 	// Builds a list of open items
-	void BuildOpenItemList( OpenItemTree_t &tree, int nParent, int nItemIndex, bool preservePrevSelectedItem );
+	void BuildOpenItemList( OpenItemTree_t &tree, int nParent, intp nItemIndex, bool preservePrevSelectedItem );
 
-	void FillInDataForItem( TreeItem_t &item, int nItemIndex );
+	void FillInDataForItem( TreeItem_t &item, intp nItemIndex );
 
 	// Removes an item from the tree
-	void RemoveItem( int nItemIndex );
+	void RemoveItem( intp nItemIndex );
 
 	// Removes an item recursively
-	void RemoveItem_R( int nItemIndex );
+	void RemoveItem_R( intp nItemIndex );
 
 	// Adds a single entry into the tree
-	void CreateTreeEntry( int parentNodeIndex, CDmElement* obj, CDmAttribute *pAttribute, intp nArrayIndex, AttributeWidgets_t &entry );
+	void CreateTreeEntry( intp parentNodeIndex, CDmElement* obj, CDmAttribute *pAttribute, intp nArrayIndex, AttributeWidgets_t &entry );
 
 	// Sets up the attribute widget init info for a particular attribute
-	void SetupWidgetInfo( AttributeWidgetInfo_t *pInfo, CDmElement *obj, CDmAttribute *pAttribute, int nArrayIndex = -1 );
+	void SetupWidgetInfo( AttributeWidgetInfo_t *pInfo, CDmElement *obj, CDmAttribute *pAttribute, intp nArrayIndex = -1 );
 
 	// Creates an attribute data widget using a specifically requested widget
 	vgui::Panel *CreateAttributeDataWidget( CDmElement *pElement, const char *pWidgetName, CDmElement *obj, CDmAttribute *pAttribute, int nArrayIndex = -1 );
 
 	void UpdateTree();
-	void InsertAttributes( int parentNodeIndex, CDmElement *obj );
-	void InsertAttributeArrayMembers( int parentNodeIndex, CDmElement *obj, CDmAttribute *array );
+	void InsertAttributes( intp parentNodeIndex, CDmElement *obj );
+	void InsertAttributeArrayMembers( intp parentNodeIndex, CDmElement *obj, CDmAttribute *array );
 
 	// Adds a single editable attribute of the element to the tree
-	void InsertSingleAttribute( int parentNodeIndex, CDmElement *obj, CDmAttribute *pAttribute, intp nArrayIndex = -1 );
+	void InsertSingleAttribute( intp parentNodeIndex, CDmElement *obj, CDmAttribute *pAttribute, intp nArrayIndex = -1 );
 
 	// Refreshes the tree view
 	void RefreshTreeView( bool preservePrevSelectedItem = false );
 
 	// Gets tree view text
-	void GetTreeViewText( CDmElement* obj, CDmAttribute *pAttribute, int nArrayIndex, char *pBuffer, int nMaxLen, bool& editableText );
+	void GetTreeViewText( CDmElement* obj, CDmAttribute *pAttribute, intp nArrayIndex, char *pBuffer, int nMaxLen, bool& editableText );
 
 	void	RemoveSelected( bool selectLeft );
 
@@ -360,7 +360,7 @@ protected:
 		DO_UNKNOWN,
 	};
 
-	DropOperation_t GetDropOperation( int itemIndex, CUtlVector< KeyValues * >& msglist );
+	DropOperation_t GetDropOperation( intp itemIndex, CUtlVector< KeyValues * >& msglist );
 
 	void						DropItemsIntoArray( CDmrElementArray<> &array,
 													CUtlVector< KeyValues* > &msglist,
@@ -378,13 +378,13 @@ protected:
 	void						OnExportElement( const char *pFullPath, KeyValues *pContext );
 
 	void GetPathToItem( CUtlVector< TreeItem_t > &path, intp itemIndex );
-	int OpenPath( const CUtlVector< TreeItem_t > &path );
+	intp OpenPath( const CUtlVector< TreeItem_t > &path );
 
 	// Refreshes the color state of the tree
-	void						RefreshTreeItemState( int nItemID );
+	void						RefreshTreeItemState( intp nItemID );
 
 	// Refreshes the color state of the tree
-	void						SetTreeItemColor( int nItemID, CDmElement *pEntryElement, bool bIsElementArrayItem, bool bEditableLabel );
+	void						SetTreeItemColor( intp nItemID, CDmElement *pEntryElement, bool bIsElementArrayItem, bool bEditableLabel );
 
 	CDmeHandle< CDmeEditorTypeDictionary >	m_hTypeDictionary;
 	CUtlVector< AttributeWidgets_t >		m_AttributeWidgets;

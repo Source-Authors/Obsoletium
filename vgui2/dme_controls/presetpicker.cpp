@@ -89,7 +89,7 @@ void CPresetPickerFrame::RefreshPresetList( CDmElement *pPresetGroup, bool bSele
 		kv->SetString( "name", pName ); 
 		SetElementKeyValue( kv, "preset", pPreset );
 
-		int nItemID = m_pPresetList->AddItem( kv, 0, false, false );
+		intp nItemID = m_pPresetList->AddItem( kv, 0, false, false );
 		if ( bSelectAll )
 		{
 			m_pPresetList->AddSelectedItem( nItemID );
@@ -131,7 +131,7 @@ void CPresetPickerFrame::OnCommand( const char *pCommand )
 {
 	if ( V_strieq( pCommand, "Ok" ) )
 	{
-		int nSelectedItemCount = m_pPresetList->GetSelectedItemsCount();
+		intp nSelectedItemCount = m_pPresetList->GetSelectedItemsCount();
 		if ( nSelectedItemCount == 0 )
 			return;
 
@@ -142,12 +142,12 @@ void CPresetPickerFrame::OnCommand( const char *pCommand )
 			pActionKeys->SetInt( "count", nSelectedItemCount );
 
 			// Adds them in selection order
-			for ( int i = 0; i < nSelectedItemCount; ++i )
+			for ( intp i = 0; i < nSelectedItemCount; ++i )
 			{
 				char pBuf[32];
 				V_to_chars( pBuf, i );
 
-				int nItemID = m_pPresetList->GetSelectedItem( i );
+				intp nItemID = m_pPresetList->GetSelectedItem( i );
 				KeyValues *pKeyValues = m_pPresetList->GetItem( nItemID );
 				CDmePreset *pPreset = GetElementKeyValue<CDmePreset>( pKeyValues, "preset" );
 
@@ -156,7 +156,7 @@ void CPresetPickerFrame::OnCommand( const char *pCommand )
 		}
 		else
 		{
-			int nItemID = m_pPresetList->GetSelectedItem( 0 );
+			intp nItemID = m_pPresetList->GetSelectedItem( 0 );
 			KeyValues *pKeyValues = m_pPresetList->GetItem( nItemID );
 			CDmePreset *pPreset = GetElementKeyValue<CDmePreset>( pKeyValues, "preset" );
 			SetElementKeyValue( pActionKeys, "preset", pPreset );

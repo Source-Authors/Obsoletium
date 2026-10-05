@@ -74,7 +74,8 @@ public:
 
 	CUtlVector< LogPreview_t >			*GetActiveTransforms();
 
-	void								GetChannelsForControl( CDmElement *control, CDmeChannel *channels[LOG_PREVIEW_MAX_CHANNEL_COUNT] );
+	// dimhotepus: Strongly sized array.
+	void								GetChannelsForControl( CDmElement *control, CDmeChannel* (&channels)[LOG_PREVIEW_MAX_CHANNEL_COUNT] );
 	void								SetTimeSelectionParametersForRecordingChannels( float flIntensity );
 	void								MoveToSlider( CAttributeSlider *pCurrentSlider, int nDirection );
 	void								SetLogPreviewControl( CDmElement *ctrl );
@@ -104,7 +105,7 @@ public:
 	void									GetVisibleControls( CUtlVector< VisItem_t >& list );
 
 	// Returns true if slider is visible
-	bool									GetSliderValues( AttributeValue_t *pValue, int nIndex );
+	bool									GetSliderValues( AttributeValue_t *pValue, intp nIndex );
 
 	virtual void SetupForPreset( FaderPreview_t &fader, int nChangeFlags );
 

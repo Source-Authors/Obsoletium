@@ -176,7 +176,7 @@ float GetDisplayIncrement( int windowpixels, int fontpixels, float valuerange, i
 	{
 		*pDecimalPlaces = max( 0, -nPower );
 	}
-	return powf( 10.0f, nPower );
+	return powf( 10.0f, static_cast<float>( nPower ) );
 }
 
 int CChannelGraphPanel::TimeToPixel( DmeTime_t time )
@@ -287,7 +287,7 @@ void CChannelGraphPanel::Paint()
 
 		int lastx = -1;
 		int lasty = -1;
-		for ( int k = 0; k < nKeys; ++k )
+		for ( intp k = 0; k < nKeys; ++k )
 		{
 			DmeTime_t t = pLog->GetKeyTime( k );
 			float f = pLog->GetComponent( t, i );

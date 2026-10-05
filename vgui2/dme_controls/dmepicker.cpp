@@ -88,7 +88,7 @@ void CDmePicker::Activate( const CUtlVector< DmePickerInfo_t >&vec )
 
 		KeyValues *kv = new KeyValues( "node", "dme", pItemName );
 		kv->SetInt( "dmeHandle", vec[i].m_hElement ); 
-		int nItemID = m_pDmeBrowser->AddItem( kv, 0, false, false );
+		intp nItemID = m_pDmeBrowser->AddItem( kv, 0, false, false );
 
 		KeyValues *pDrag = new KeyValues( "drag", "text", pElementName );
 		pDrag->SetString( "texttype", "dmeName" );
@@ -123,9 +123,9 @@ void CDmePicker::OnKeyCodePressed( KeyCode code )
 void CDmePicker::RefreshDmeList()
 {
 	// Check the filter matches
-	int nMatchingElements = 0;
-	int nTotalCount = 0;
-	for ( int nItemID = m_pDmeBrowser->FirstItem(); nItemID != m_pDmeBrowser->InvalidItemID(); nItemID = m_pDmeBrowser->NextItem( nItemID ) )
+	intp nMatchingElements = 0;
+	intp nTotalCount = 0;
+	for ( intp nItemID = m_pDmeBrowser->FirstItem(); nItemID != m_pDmeBrowser->InvalidItemID(); nItemID = m_pDmeBrowser->NextItem( nItemID ) )
 	{
 		KeyValues *kv = m_pDmeBrowser->GetItem( nItemID );
 		const char *pElementName = kv->GetString( "dme" );
@@ -140,13 +140,13 @@ void CDmePicker::RefreshDmeList()
 	m_pDmeBrowser->SortList();
 
 	char pColumnTitle[512];
-	Q_snprintf( pColumnTitle, sizeof(pColumnTitle), "%s (%d/%d)",
+	Q_snprintf( pColumnTitle, sizeof(pColumnTitle), "%s (%zd/%zd)",
 		"Dme Elements", nMatchingElements, nTotalCount );
 	m_pDmeBrowser->SetColumnHeaderText( 0, pColumnTitle );
 
 	if ( ( m_pDmeBrowser->GetItemCount() > 0 ) && ( m_pDmeBrowser->GetSelectedItemsCount() == 0 ) )
 	{
-		int nItemID = m_pDmeBrowser->GetItemIDFromRow( 0 );
+		intp nItemID = m_pDmeBrowser->GetItemIDFromRow( 0 );
 		m_pDmeBrowser->SetSelectedCell( nItemID, 0 );
 	}
 }
@@ -157,7 +157,7 @@ void CDmePicker::RefreshDmeList()
 //-----------------------------------------------------------------------------
 void CDmePicker::OnTextChanged( )
 {
-	int nLength = m_pFilterList->GetTextLength();
+	intp nLength = m_pFilterList->GetTextLength();
 	m_Filter.SetLength( nLength );
 	if ( nLength > 0 )
 	{
@@ -175,7 +175,7 @@ CDmElement *CDmePicker::GetSelectedDme( )
 	if ( m_pDmeBrowser->GetSelectedItemsCount() == 0 )
 		return NULL;
 
-	int nIndex = m_pDmeBrowser->GetSelectedItem( 0 );
+	intp nIndex = m_pDmeBrowser->GetSelectedItem( 0 );
 	KeyValues *pItemKeyValues = m_pDmeBrowser->GetItem( nIndex );
 	return GetElementKeyValue< CDmElement >( pItemKeyValues, "dmeHandle" );
 }

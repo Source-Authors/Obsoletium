@@ -223,7 +223,7 @@ static PickerList_t &BuildAssetSubTypeList( const char **ppSubTypes, PickerList_
 		CDmElement *pElement = GetElement< CDmElement >( g_pDataModel->CreateElement( s_AssetTypes[i].m_pChoiceValue, "temp" ) );
 		CDmeMakefile *pMakeFile = CastElement< CDmeMakefile >( pElement );
 
-		for ( int j = 0; ppSubTypes[j]; ++j )
+		for ( intp j = 0; ppSubTypes[j]; ++j )
 		{
 			if ( !pElement->IsA( ppSubTypes[j] ) )
 				continue;
@@ -598,7 +598,7 @@ void CAssetBuilder::RefreshSourceList( )
 		return;
 
 	DmeMakefileType_t *pSourceTypes = m_hMakefile->GetSourceTypes();
-	for ( int i = 0; pSourceTypes[i].m_pTypeName; ++i )
+	for ( intp i = 0; pSourceTypes[i].m_pTypeName; ++i )
 	{
 		CUtlVector< CDmeHandle< CDmeSource > > sources;
 		m_hMakefile->GetSources( pSourceTypes[i].m_pTypeName, sources );
@@ -656,7 +656,7 @@ void CAssetBuilder::RefreshOutputList()
 //-----------------------------------------------------------------------------
 void CAssetBuilder::SelectSource( CDmeSource *pSource )
 {
-	int nItemID = m_pSourcesList->FirstItem();
+	intp nItemID = m_pSourcesList->FirstItem();
 	for ( ; nItemID != m_pSourcesList->InvalidItemID(); nItemID = m_pSourcesList->NextItem( nItemID ) )
 	{
 		KeyValues *kv = m_pSourcesList->GetItem( nItemID );
@@ -740,7 +740,7 @@ void CAssetBuilder::OnAddSource( )
 	PickerList_t sourceType;
 
 	DmeMakefileType_t *pSourceTypes = m_hMakefile->GetSourceTypes();
-	for ( int i = 0; pSourceTypes[i].m_pTypeName; ++i )
+	for ( intp i = 0; pSourceTypes[i].m_pTypeName; ++i )
 	{
 		if ( pSourceTypes[i].m_bIsSingleton )
 		{
@@ -765,9 +765,9 @@ void CAssetBuilder::OnAddSource( )
 //-----------------------------------------------------------------------------
 // Returns the curerntly selected row
 //-----------------------------------------------------------------------------
-int CAssetBuilder::GetSelectedRow( )
+intp CAssetBuilder::GetSelectedRow( )
 {
-	int nItemID = m_pSourcesList->GetSelectedItem( 0 );
+	intp nItemID = m_pSourcesList->GetSelectedItem( 0 );
 	return ( nItemID != -1 ) ? m_pSourcesList->GetItemCurrentRow( nItemID ) : -1;
 }
 
@@ -775,9 +775,9 @@ int CAssetBuilder::GetSelectedRow( )
 //-----------------------------------------------------------------------------
 // Selects a particular row of the source list
 //-----------------------------------------------------------------------------
-void CAssetBuilder::SelectSourceListRow( int nRow )
+void CAssetBuilder::SelectSourceListRow( intp nRow )
 {
-	int nVisibleRowCount = m_pSourcesList->GetItemCount();
+	intp nVisibleRowCount = m_pSourcesList->GetItemCount();
 	if ( nVisibleRowCount == 0 || nRow < 0 )
 		return;
 
@@ -786,7 +786,7 @@ void CAssetBuilder::SelectSourceListRow( int nRow )
 		nRow = nVisibleRowCount - 1;
 	}
 
-	int nNewItemID = m_pSourcesList->GetItemIDFromRow( nRow );
+	intp nNewItemID = m_pSourcesList->GetItemIDFromRow( nRow );
 	m_pSourcesList->SetSingleSelectedItem( nNewItemID );
 }
 
@@ -796,18 +796,18 @@ void CAssetBuilder::SelectSourceListRow( int nRow )
 //-----------------------------------------------------------------------------
 void CAssetBuilder::OnRemoveSource( )
 {
-	int nCount = m_pSourcesList->GetSelectedItemsCount();
+	intp nCount = m_pSourcesList->GetSelectedItemsCount();
 	if ( nCount == 0 || !m_hMakefile.Get() )
 		return;
 
-	int nRow = GetSelectedRow();
+	intp nRow = GetSelectedRow();
 	Assert( nRow >= 0 );
 
 	// Update the selection to be reasonable after deletion
 	CDisableUndoScopeGuard guard;
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
-		int nItemID = m_pSourcesList->GetSelectedItem( i );
+		intp nItemID = m_pSourcesList->GetSelectedItem( i );
 		KeyValues *pKeyValues = m_pSourcesList->GetItem( nItemID );
 		CDmeSource *pSource = GetElementKeyValue< CDmeSource >( pKeyValues, "dmeSource" );
 		if ( pSource )
@@ -911,11 +911,11 @@ void CAssetBuilder::OnSourceFileAdded( const char *pFileName, const char *pTypeN
 //-----------------------------------------------------------------------------
 void CAssetBuilder::OnNewSourceFileSelected( const char *pFileName, KeyValues *kv )
 {
-	int nCount = m_pSourcesList->GetSelectedItemsCount();
+	intp nCount = m_pSourcesList->GetSelectedItemsCount();
 	if ( nCount != 1 || !m_hMakefile.Get() )
 		return;
 
-	int nItemID = m_pSourcesList->GetSelectedItem( 0 );
+	intp nItemID = m_pSourcesList->GetSelectedItem( 0 );
 	KeyValues *pKeyValues = m_pSourcesList->GetItem( nItemID );
 	CDmeSource *pSource =  GetElementKeyValue< CDmeSource >( pKeyValues, "dmeSource" );
 	if ( !pSource )
@@ -1068,7 +1068,7 @@ void CAssetBuilder::OnOpenContextMenu( KeyValues *kv )
 
 	m_hContextMenu = new Menu( this, "ActionMenu" );
 	m_hContextMenu->AddMenuItem( "Add...", new KeyValues( "AddSource" ), this );
-	int nCount = m_pSourcesList->GetSelectedItemsCount();
+	intp nCount = m_pSourcesList->GetSelectedItemsCount();
 	if ( nCount > 0 )
 	{
 		m_hContextMenu->AddMenuItem( "Remove", new KeyValues( "RemoveSource" ), this );
@@ -1133,14 +1133,14 @@ void CAssetBuilder::OnOpenContextMenu( KeyValues *kv )
 //-----------------------------------------------------------------------------
 void CAssetBuilder::OnSourceItemSelectionChanged( )
 {
-	int nCount = m_pSourcesList->GetSelectedItemsCount();
+	intp nCount = m_pSourcesList->GetSelectedItemsCount();
 	if ( nCount != 1 )
 	{
 		m_pDmePanel->SetDmeElement( NULL );
 		return;
 	}
 
-	int nItemID = m_pSourcesList->GetSelectedItem( 0 );
+	intp nItemID = m_pSourcesList->GetSelectedItem( 0 );
 	KeyValues *pKeyValues = m_pSourcesList->GetItem( nItemID );
 	CDmeSource *pSource = GetElementKeyValue< CDmeSource >( pKeyValues, "dmeSource" );
 	m_pDmePanel->SetDmeElement( pSource );
@@ -1180,22 +1180,22 @@ void CAssetBuilder::OnItemDeselected( KeyValues *kv )
 //-----------------------------------------------------------------------------
 CDmeSource *CAssetBuilder::GetSelectedSource( )
 {
-	int nCount = m_pSourcesList->GetSelectedItemsCount();
+	intp nCount = m_pSourcesList->GetSelectedItemsCount();
 	if ( nCount != 1 || !m_hMakefile.Get() )
 		return NULL;
 
-	int nItemID = m_pSourcesList->GetSelectedItem( 0 );
+	intp nItemID = m_pSourcesList->GetSelectedItem( 0 );
 	KeyValues *pKeyValues = m_pSourcesList->GetItem( nItemID );
 	return GetElementKeyValue< CDmeSource >( pKeyValues, "dmeSource" );
 }
 
 KeyValues *CAssetBuilder::GetSelectedSourceKeyvalues( )
 {
-	int nCount = m_pSourcesList->GetSelectedItemsCount();
+	intp nCount = m_pSourcesList->GetSelectedItemsCount();
 	if ( nCount != 1 || !m_hMakefile.Get() )
 		return NULL;
 
-	int nItemID = m_pSourcesList->GetSelectedItem( 0 );
+	intp nItemID = m_pSourcesList->GetSelectedItem( 0 );
 	return m_pSourcesList->GetItem( nItemID );
 }
 
@@ -1205,11 +1205,11 @@ KeyValues *CAssetBuilder::GetSelectedSourceKeyvalues( )
 //-----------------------------------------------------------------------------
 void CAssetBuilder::OnSourceFileNameChanged( const char *pFileName )
 {
-	int nCount = m_pSourcesList->GetSelectedItemsCount();
+	intp nCount = m_pSourcesList->GetSelectedItemsCount();
 	if ( nCount != 1 || !m_hMakefile.Get() )
 		return;
 
-	int nItemID = m_pSourcesList->GetSelectedItem( 0 );
+	intp nItemID = m_pSourcesList->GetSelectedItem( 0 );
 	KeyValues *pKeyValues = m_pSourcesList->GetItem( nItemID );
 	CDmeSource *pSource = GetElementKeyValue< CDmeSource >( pKeyValues, "dmeSource" );
 	if ( !pSource )
@@ -1279,7 +1279,7 @@ void CAssetBuilder::FinishCompilation( CompilationState_t state )
 	// Detach the source preview panel from the source and refresh the
 	// source list to get it to correctly reconnect to the new source elements
 	m_pDmePanel->SetDmeElement( NULL );
-	int nRow = GetSelectedRow();
+	intp nRow = GetSelectedRow();
 
 	m_pOututPreviewPanel->SetDmeElement( m_hMakefile, true, "DmeMakeFileOutputPreview" );
 	m_bIsCompiling = false;

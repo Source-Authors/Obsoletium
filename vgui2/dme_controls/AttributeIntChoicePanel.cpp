@@ -53,7 +53,7 @@ void CDmeEditorIntChoicesInfo::AddChoice( int nValue, const char *pChoiceString 
 //-----------------------------------------------------------------------------
 // Gets the choices
 //-----------------------------------------------------------------------------
-int CDmeEditorIntChoicesInfo::GetChoiceValue( int nIndex ) const
+int CDmeEditorIntChoicesInfo::GetChoiceValue( intp nIndex ) const
 {
 	Assert( ( nIndex < GetChoiceCount() ) && ( nIndex >= 0 ) );
 	CDmElement *pChoice = m_Choices[nIndex];

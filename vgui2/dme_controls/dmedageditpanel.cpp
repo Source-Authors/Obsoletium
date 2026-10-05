@@ -148,7 +148,7 @@ const char *CDmeAnimationListPanel::GetSelectedAnimation() const
 	if ( m_pAnimationList->GetSelectedItemsCount() == 0 )
 		return "";
 
-	int nIndex = m_pAnimationList->GetSelectedItem( 0 );
+	intp nIndex = m_pAnimationList->GetSelectedItem( 0 );
 	KeyValues *pItemKeyValues = m_pAnimationList->GetItem( nIndex );
 	return pItemKeyValues->GetString( "name" );
 }
@@ -431,7 +431,7 @@ void CDmeCombinationOperatorPanel::ModifyExistingAnimationSetControl( CDmElement
 	const char *pControlName = pControlElement->GetName();
 
 	// Look for a match
-	int nControlIndex = m_hCombinationOperator->FindControlIndex( pControlName );
+	intp nControlIndex = m_hCombinationOperator->FindControlIndex( pControlName );
 	Assert( nControlIndex >= 0 );
 
 	bool bIsStereoControl = m_hCombinationOperator->IsStereoControl( nControlIndex );
@@ -571,8 +571,8 @@ void CDmeCombinationOperatorPanel::AddNewAnimationSetControls()
 
 	// Remove all controls in the animation set and in presets that don't exist in the combination system
 	intp nFirstControl = controls.Count();
-	int nCombinationControlCount = m_hCombinationOperator->GetControlCount();
-	for ( int i = 0; i < nCombinationControlCount; ++i )
+	intp nCombinationControlCount = m_hCombinationOperator->GetControlCount();
+	for ( intp i = 0; i < nCombinationControlCount; ++i )
 	{
 		const char *pControlName = m_hCombinationOperator->GetControlName( i );
 		if ( pAnimationSet->FindControl( pControlName ) )
@@ -668,11 +668,11 @@ void CDmeCombinationOperatorPanel::SortAnimationSetControls()
 	if ( nControlCount == 0 )
 		return;
 
-	int nCombinationControlCount = m_hCombinationOperator->GetControlCount();
+	intp nCombinationControlCount = m_hCombinationOperator->GetControlCount();
 	Assert( nControlCount == nCombinationControlCount );
 
 	DmElementHandle_t *pElements = (DmElementHandle_t*)_alloca( nControlCount * sizeof(DmElementHandle_t) );
-	for ( int i = 0; i < nCombinationControlCount; ++i )
+	for ( intp i = 0; i < nCombinationControlCount; ++i )
 	{
 		const char *pControlName = m_hCombinationOperator->GetControlName( i );
 		CDmElement *pControl = m_AnimSet->FindControl( pControlName );
@@ -682,7 +682,7 @@ void CDmeCombinationOperatorPanel::SortAnimationSetControls()
 	controls.SetMultiple( 0, nControlCount, pElements );
 
 #ifdef _DEBUG
-	for ( int i = 0; i < nCombinationControlCount; ++i )
+	for ( intp i = 0; i < nCombinationControlCount; ++i )
 	{
 		const char *pControlName = controls[i]->GetName();
 		const char *pComboName = m_hCombinationOperator->GetControlName( i );
@@ -739,8 +739,8 @@ void CDmeCombinationOperatorPanel::OnTick()
 		{
 			CDisableUndoScopeGuard sg;
 
-			int c = m_hCombinationOperator->GetControlCount();
-			for ( int i = 0; i < c; ++i )
+			intp c = m_hCombinationOperator->GetControlCount();
+			for ( intp i = 0; i < c; ++i )
 			{
 				AttributeValue_t value;
 

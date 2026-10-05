@@ -214,7 +214,7 @@ void CDmeDagRenderPanel::SetDmeElement( CDmeDCCMakefile *pDCCMakefile )
 	m_hDag = pDag;
 	ComputeDefaultTangentData( m_hDag, false );
 	m_hAnimationList = pAnimationList;
-	SelectAnimation( 0 );
+	SelectAnimation( (intp)0 );
 	DrawJoints( pAnimationList != NULL );
 	DrawJointNames( pAnimationList != NULL );
 }
@@ -604,7 +604,7 @@ void CDmeDagRenderPanel::RebuildOperatorList( )
 //-----------------------------------------------------------------------------
 // Select animation by index
 //-----------------------------------------------------------------------------
-void CDmeDagRenderPanel::SelectAnimation( int nIndex )
+void CDmeDagRenderPanel::SelectAnimation( intp nIndex )
 {
 	m_hCurrentAnimation = NULL;
 	if ( m_hAnimationList.Get() && ( nIndex >= 0 ) )
@@ -615,7 +615,7 @@ void CDmeDagRenderPanel::SelectAnimation( int nIndex )
 	RebuildOperatorList();
 }
 
-void CDmeDagRenderPanel::SelectVertexAnimation( int nIndex )
+void CDmeDagRenderPanel::SelectVertexAnimation( intp nIndex )
 {
 	m_hCurrentVertexAnimation = NULL;
 	if ( m_hVertexAnimationList.Get() && ( nIndex >= 0 ) )
@@ -640,7 +640,7 @@ void CDmeDagRenderPanel::SelectAnimation( const char *pAnimName )
 
 	if ( m_hAnimationList )
 	{
-		int nIndex = m_hAnimationList->FindAnimation( pAnimName );
+		intp nIndex = m_hAnimationList->FindAnimation( pAnimName );
 		if ( nIndex >= 0 )
 		{
 			SelectAnimation( nIndex );
@@ -658,7 +658,7 @@ void CDmeDagRenderPanel::SelectVertexAnimation( const char *pAnimName )
 
 	if ( m_hVertexAnimationList )
 	{
-		int nIndex = m_hVertexAnimationList->FindAnimation( pAnimName );
+		intp nIndex = m_hVertexAnimationList->FindAnimation( pAnimName );
 		if ( nIndex >= 0 )
 		{
 			SelectVertexAnimation( nIndex );
@@ -680,7 +680,7 @@ void CDmeDagRenderPanel::SetAnimationList( CDmeAnimationList *pAnimationList )
 		return;
 	}
 
-	SelectAnimation( 0 );
+	SelectAnimation( (intp)0 );
 }
 
 
@@ -694,7 +694,7 @@ void CDmeDagRenderPanel::SetVertexAnimationList( CDmeAnimationList *pAnimationLi
 		return;
 	}
 
-	SelectVertexAnimation( 0 );
+	SelectVertexAnimation( (intp)0 );
 }
 
 

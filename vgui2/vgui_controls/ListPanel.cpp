@@ -3088,7 +3088,7 @@ void ListPanel::SetIgnoreDoubleClick( bool state )
 //-----------------------------------------------------------------------------
 // Purpose: set up a field for editing
 //-----------------------------------------------------------------------------
-void ListPanel::EnterEditMode(int itemID, int column, vgui::Panel *editPanel)
+void ListPanel::EnterEditMode(intp itemID, int column, vgui::Panel *editPanel)
 {
 	m_hEditModePanel = editPanel;
 	m_iEditModeItemID = itemID;

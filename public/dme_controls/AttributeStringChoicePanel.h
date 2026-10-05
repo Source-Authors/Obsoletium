@@ -42,7 +42,7 @@ public:
 	CDmElement *AddChoice( const char *pValueString, const char *pChoiceString );
 
 	// Gets the choices
-	const char *GetChoiceValue( int nIndex ) const;
+	const char *GetChoiceValue( intp nIndex ) const;
 };
 
 

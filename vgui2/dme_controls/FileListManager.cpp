@@ -108,7 +108,7 @@ CFileListManager::CFileListManager( vgui::Panel *parent ) : BaseClass( parent, "
 //	LoadControlSettings( "resource/BxFileListManager.res" );
 }
 
-intp CFileListManager::AddItem( DmFileId_t fileid, const char *pFilename, const char *pPath, bool bLoaded, int nElements, bool bChanged, bool bInPerforce, bool bOpenForEdit )
+intp CFileListManager::AddItem( DmFileId_t fileid, const char *pFilename, const char *pPath, bool bLoaded, intp nElements, bool bChanged, bool bInPerforce, bool bOpenForEdit )
 {
 	KeyValuesAD kv( new KeyValues( "", GetKey( CI_FILENAME ), pFilename, GetKey( CI_PATH ), pPath ) );
 	kv->SetInt   ( GetKey( CI_NUMELEMENTS ), nElements );
@@ -154,7 +154,7 @@ void CFileListManager::OnMousePressed( vgui::MouseCode code )
 		bool bIsFakeToggleButton = column == CI_LOADED;
 		if ( bIsFakeToggleButton && row >= 0 && row < GetItemCount() )
 		{
-			int itemID = GetItemIDFromRow( row );
+			intp itemID = GetItemIDFromRow( row );
 			KeyValues *kv = GetItem( itemID );
 
 			const char *pStr = kv->GetString( GetKey( ( ColumnIndex_t )column ), "" );
@@ -171,7 +171,7 @@ void CFileListManager::OnMousePressed( vgui::MouseCode code )
 	}
 	else if ( code == MOUSE_RIGHT )
 	{
-		int itemID = -1;
+		intp itemID = -1;
 		if ( row >= 0 && row < GetItemCount() )
 		{
 			itemID = GetItemIDFromRow( row );
@@ -190,9 +190,9 @@ void CFileListManager::OnMousePressed( vgui::MouseCode code )
 	BaseClass::OnMousePressed( code );
 }
 
-intp AddMenuItemHelper( vgui::Menu *pMenu, const char *pItemName, const char *pKVName, vgui::Panel *pTarget, bool bEnabled )
+static int AddMenuItemHelper( vgui::Menu *pMenu, const char *pItemName, const char *pKVName, vgui::Panel *pTarget, bool bEnabled )
 {
-	intp id = pMenu->AddMenuItem( pItemName, new KeyValues( pKVName ), pTarget );
+	int id = pMenu->AddMenuItem( pItemName, new KeyValues( pKVName ), pTarget );
 	pMenu->SetItemEnabled( id, bEnabled );
 	return id;
 }
@@ -207,8 +207,8 @@ void CFileListManager::OnOpenContextMenu( KeyValues *pParams )
 
 	m_hContextMenu = new vgui::Menu( this, "ContextMenu" );
 
-	int itemID = pParams->GetInt( "itemID", -1 );
-	if ( itemID < 0 )
+	uint64 itemID = pParams->GetUint64( "itemID", std::numeric_limits<uint64_t>::max() );
+	if ( itemID == std::numeric_limits<uint64_t>::max() )
 	{
 		AddMenuItemHelper( m_hContextMenu, "Open File...", "open", this, true ); // Is this how we should load other files???
 	}
@@ -217,15 +217,15 @@ void CFileListManager::OnOpenContextMenu( KeyValues *pParams )
 		// dimhotepus: Drop Perforce support.
 		// bool bP4Connected = p4->IsConnectedToServer();
 
-		int nSelected = GetSelectedItemsCount();
+		intp nSelected = GetSelectedItemsCount();
 		int nLoaded = 0;
 		int nChanged = 0;
 		int nOnDisk = 0;
 		int nInPerforce = 0;
 		int nOpenForEdit = 0;
-		for ( int i = 0; i < nSelected; ++i )
+		for ( intp i = 0; i < nSelected; ++i )
 		{
-			int itemId = GetSelectedItem( i );
+			intp itemId = GetSelectedItem( i );
 			DmFileId_t fileid = ( DmFileId_t )GetItemUserData( itemId );
 			if ( g_pDataModel->IsFileLoaded( fileid ) )
 			{
@@ -267,10 +267,10 @@ void CFileListManager::OnLoadFiles( KeyValues * )
 {
 	CNotifyScopeGuard notify( "CFileListManager::OnLoadFiles", NOTIFY_SOURCE_FILE_LIST_MANAGER, NOTIFY_SETDIRTYFLAG );
 
-	int nSelected = GetSelectedItemsCount();
-	for ( int i = 0; i < nSelected; ++i )
+	intp nSelected = GetSelectedItemsCount();
+	for ( intp i = 0; i < nSelected; ++i )
 	{
-		int itemId = GetSelectedItem( i );
+		intp itemId = GetSelectedItem( i );
 		DmFileId_t fileid = ( DmFileId_t )GetItemUserData( itemId );
 		if ( !g_pDataModel->IsFileLoaded( fileid ) )
 		{
@@ -285,10 +285,10 @@ void CFileListManager::OnUnloadFiles( KeyValues * )
 {
 	CNotifyScopeGuard notify( "CFileListManager::OnUnloadFiles", NOTIFY_SOURCE_FILE_LIST_MANAGER, NOTIFY_SETDIRTYFLAG );
 
-	int nSelected = GetSelectedItemsCount();
-	for ( int i = 0; i < nSelected; ++i )
+	intp nSelected = GetSelectedItemsCount();
+	for ( intp i = 0; i < nSelected; ++i )
 	{
-		int itemId = GetSelectedItem( i );
+		intp itemId = GetSelectedItem( i );
 		DmFileId_t fileid = ( DmFileId_t )GetItemUserData( itemId );
 		if ( g_pDataModel->IsFileLoaded( fileid ) )
 		{
@@ -301,10 +301,10 @@ void CFileListManager::OnUnloadFiles( KeyValues * )
 
 void CFileListManager::OnSaveFiles( KeyValues * )
 {
-	int nSelected = GetSelectedItemsCount();
-	for ( int i = 0; i < nSelected; ++i )
+	intp nSelected = GetSelectedItemsCount();
+	for ( intp i = 0; i < nSelected; ++i )
 	{
-		int itemId = GetSelectedItem( i );
+		intp itemId = GetSelectedItem( i );
 		DmFileId_t fileid = ( DmFileId_t )GetItemUserData( itemId );
 		if ( !g_pDataModel->IsFileLoaded( fileid ) )
 			continue;
@@ -339,7 +339,7 @@ void CFileListManager::OnOpenFile( KeyValues * )
 
 void CFileListManager::OnSaveFileAs( KeyValues * )
 {
-	int nSelected = GetSelectedItemsCount();
+	intp nSelected = GetSelectedItemsCount();
 	Assert( nSelected == 1 );
 	if ( nSelected != 1 )
 		return;
@@ -413,11 +413,11 @@ void CFileListManager::OnFileSelected( KeyValues *pParams )
 void CFileListManager::OnAddToPerforce( KeyValues * )
 {
 	//int nFileCount = 0;
-	int nSelected = GetSelectedItemsCount();
+	intp nSelected = GetSelectedItemsCount();
 	const char **ppFileNames = ( const char** )_alloca( nSelected * sizeof( char* ) );
-	for ( int i = 0; i < nSelected; ++i )
+	for ( intp i = 0; i < nSelected; ++i )
 	{
-		int itemId = GetSelectedItem( i );
+		intp itemId = GetSelectedItem( i );
 		DmFileId_t fileid = ( DmFileId_t )GetItemUserData( itemId );
 		const char *pFilename = g_pDataModel->GetFileName( fileid );
 		Assert( pFilename );
@@ -444,11 +444,11 @@ void CFileListManager::OnAddToPerforce( KeyValues * )
 void CFileListManager::OnOpenForEdit( KeyValues * )
 {
 	//int nFileCount = 0;
-	int nSelected = GetSelectedItemsCount();
+	intp nSelected = GetSelectedItemsCount();
 	const char **ppFileNames = ( const char** )_alloca( nSelected * sizeof( char* ) );
-	for ( int i = 0; i < nSelected; ++i )
+	for ( intp i = 0; i < nSelected; ++i )
 	{
-		int itemId = GetSelectedItem( i );
+		intp itemId = GetSelectedItem( i );
 		DmFileId_t fileid = ( DmFileId_t )GetItemUserData( itemId );
 		const char *pFilename = g_pDataModel->GetFileName( fileid );
 		Assert( pFilename );
@@ -488,14 +488,14 @@ void CFileListManager::OnDataChanged( KeyValues *pParams )
 		return;
 	}
 
-	int nCount = GetItemCount();
+	intp nCount = GetItemCount();
 	int nFiles = g_pDataModel->NumFileIds();
 	bool bPerformFullRefresh = ( nCount != nFiles );
 	if ( !bPerformFullRefresh )
 	{
 		const char *pNameKey = GetKey( CI_FILENAME );
 
-		for ( int i = 0; i < nCount; ++i )
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			DmFileId_t fileid = g_pDataModel->GetFileId( i );
 			const char *pFileName = g_pDataModel->GetFileName( fileid );
@@ -542,7 +542,7 @@ void CFileListManager::Refresh()
 			continue; // skip DMFILEID_INVALID and the default fileid ""
 
 		bool bLoaded = g_pDataModel->IsFileLoaded( fileid );
-		int nElements = g_pDataModel->NumElementsInFile( fileid );
+		intp nElements = g_pDataModel->NumElementsInFile( fileid );
 		bool bChanged = false; // TODO - find out for real
 		// dimhotepus: Drop Perforce support.
 		bool bInPerforce = bP4Connected && false; // p4->IsFileInPerforce( pFileName );

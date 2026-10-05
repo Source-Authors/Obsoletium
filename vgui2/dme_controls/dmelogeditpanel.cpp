@@ -73,7 +73,7 @@ intp CDmeLogEditPanel::FindOrAddControlPoint( float flIn, float flTolerance, flo
 	DmeTime_t tolerance = ( flTolerance >= 0 ) ? NormalizedToDuration( flTolerance ) : DmeTime_t( 0 );
 	float flValue = NormalizedToValue( flOut );
 
-	int nKeyIndex = -1;
+	intp nKeyIndex = -1;
 
 	Assert( m_hLog.Get() );
 	switch( m_hLog->GetDataType() )
@@ -152,7 +152,7 @@ intp CDmeLogEditPanel::ModifyControlPoint( intp nPoint, float flIn, float flOut 
 	DmeTime_t initialTime = m_hLog->GetKeyTime( nPoint ); 
 	float flValue = NormalizedToValue( flOut );
 
-	int nKeyIndex = -1;
+	intp nKeyIndex = -1;
 
 	Assert( m_hLog.Get() );
 	switch( m_hLog->GetDataType() )

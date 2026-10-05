@@ -129,10 +129,10 @@ private:
 	void BuildFileIDList( CDmeMakefile *pMakeFile, CUtlVector<DmFileId_t> &fileIds );
 
 	// Selects a particular row of the source list
-	void SelectSourceListRow( int nRow );
+	void SelectSourceListRow( intp nRow );
 
 	// Returns the curerntly selected row
-	int GetSelectedRow( );
+	intp GetSelectedRow( );
 
 	// Finishes compilation
 	void FinishCompilation( CompilationState_t state );
