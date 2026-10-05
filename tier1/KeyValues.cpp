@@ -306,7 +306,7 @@ private:
 	class CLookupFunctor
 	{
 	public:
-		CLookupFunctor() {}
+		CLookupFunctor() = default;
 
 		// Sets what we are currently inserting or looking for.
 		void SetCurString( const char *pchCurString ) { m_pchCurString = pchCurString; }
