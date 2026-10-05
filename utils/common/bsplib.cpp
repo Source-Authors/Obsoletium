@@ -5268,6 +5268,8 @@ bool GetBSPDependants( const char *pBSPFilename, CUtlVector< CUtlString > *pList
 		return false;
 	}
 
+	RunCodeAtScopeExit(UnloadBSPFile());
+
 	char szBspName[MAX_PATH];
 	V_FileBase( pBSPFilename, szBspName );
 	V_SetExtension( szBspName, ".bsp" );
@@ -5344,8 +5346,6 @@ bool GetBSPDependants( const char *pBSPFilename, CUtlVector< CUtlString > *pList
 			}
 		}
 	}
-
-	UnloadBSPFile();
 
 	return true;
 }
