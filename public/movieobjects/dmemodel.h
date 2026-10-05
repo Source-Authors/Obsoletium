@@ -40,8 +40,8 @@ public:
 	intp GetJointTransformIndex( CDmeDag *pJoint ) const;
 
 	// Determines joint transform index	given a joint name
-	CDmeTransform *GetJointTransform( int nIndex );
-	const CDmeTransform *GetJointTransform( int nIndex ) const;
+	CDmeTransform *GetJointTransform( intp nIndex );
+	const CDmeTransform *GetJointTransform( intp nIndex ) const;
 
 	// Captures the current joint transforms into a base state
 	void CaptureJointsToBaseState( const char *pBaseStateName );

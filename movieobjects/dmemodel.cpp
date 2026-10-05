@@ -111,12 +111,12 @@ intp CDmeModel::GetJointTransformIndex( CDmeDag *pJoint ) const
 //-----------------------------------------------------------------------------
 // Determines joint transform index	given a joint name
 //-----------------------------------------------------------------------------
-CDmeTransform *CDmeModel::GetJointTransform( int nIndex )
+CDmeTransform *CDmeModel::GetJointTransform( intp nIndex )
 {
 	return m_JointTransforms[ nIndex ];
 }
 
-const CDmeTransform *CDmeModel::GetJointTransform( int nIndex ) const
+const CDmeTransform *CDmeModel::GetJointTransform( intp nIndex ) const
 {
 	return m_JointTransforms[ nIndex ];
 }
