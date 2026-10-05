@@ -31,7 +31,8 @@ public:
 	qboolean	ispoint;
 
 private:
-	 CToolTrace( const CToolTrace& );
+	 CToolTrace( const CToolTrace& ) = delete;
+	 CToolTrace& operator=( const CToolTrace& ) = delete;
 };
 
 
