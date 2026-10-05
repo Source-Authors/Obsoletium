@@ -250,7 +250,7 @@ class CBSPDispRayDistanceEnumerator final : public IBSPTreeDataEnumerator
 {
 public:
 	CBSPDispRayDistanceEnumerator() : m_Distance(1.0f), m_pSurface(nullptr),
-		m_pDispTested{nullptr}, m_pRay{nullptr} {}
+		m_pDispTested{nullptr}, m_pRay{nullptr}, m_Normal{0, 0, 0} {}
 
 	// IBSPTreeDataEnumerator
 	bool FASTCALL EnumerateElement( int userId, intp context ) override

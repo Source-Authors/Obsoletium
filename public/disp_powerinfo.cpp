@@ -306,6 +306,8 @@ CPowerInfo::CPowerInfo(
 	m_pSideVertCorners = pSideVertCorners;
 	m_pErrorEdges = pErrorEdges;
 	m_pTriInfos = pTriInfos;
+	m_nTriInfos = -1;
+	m_Power = -1;
 }
 
 static void InitPowerInfoTriInfos_R( 

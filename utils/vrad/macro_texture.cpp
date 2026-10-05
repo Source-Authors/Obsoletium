@@ -14,10 +14,9 @@
 #include "bitmap/imageformat.h"
 
 
-class CMacroTextureData
+struct CMacroTextureData
 {
-public:
-	int m_Width, m_Height;
+	int m_Width{0}, m_Height{0};
 	CUtlMemory<unsigned char> m_ImageData;
 };
 

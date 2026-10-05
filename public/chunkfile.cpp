@@ -161,11 +161,7 @@ CChunkFile::CChunkFile(void)
 	m_DefaultChunkHandler = NULL;
 	m_pDefaultChunkHandlerData = NULL;
 
-	for (auto &h : m_HandlerStack)
-	{
-		h = nullptr;
-	}
-
+	BitwiseClear( m_HandlerStack );
 	m_nHandlerStackDepth = 0;
 }
 

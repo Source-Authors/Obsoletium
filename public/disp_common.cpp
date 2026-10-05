@@ -502,6 +502,7 @@ bool CDispEdgeIterator::Next()
 // ------------------------------------------------------------------------------------ //
 
 CDispCircumferenceIterator::CDispCircumferenceIterator( int sideLength )
+	: m_VertIndex{-1, -1}
 {
 	m_iCurEdge = -1;
 	m_SideLengthM1 = sideLength - 1;
