@@ -161,7 +161,11 @@ int main(int argc, char **argv) {
     V_AppendSlash(targetPathName);
 
     printf("\nOpening bsp file: %s.\n", bspName);
-    LoadBSPFile(bspName);
+    if (!LoadBSPFile(bspName)) {
+      fprintf(stderr, "Unable to open bsp file: %s.\n", bspName);
+      return 1;
+    }
+    RunCodeAtScopeExit(UnloadBSPFile());
 
     CUtlBuffer buf;
     char relativeName[MAX_PATH] = {0};
@@ -222,7 +226,11 @@ int main(int argc, char **argv) {
     V_AppendSlash(targetPathName);
 
     printf("\nOpening bsp file: %s.\n", bspName);
-    LoadBSPFile(bspName);
+    if (!LoadBSPFile(bspName)) {
+      fprintf(stderr, "Unable to open bsp file: %s.\n", bspName);
+      return 1;
+    }
+    RunCodeAtScopeExit(UnloadBSPFile());
 
     CUtlBuffer buf;
     char relativeName[MAX_PATH] = {0};
@@ -278,7 +286,11 @@ int main(int argc, char **argv) {
     V_DefaultExtension(bspName, ".bsp");
 
     printf("\nOpening bsp file: %s.\n", bspName);
-    LoadBSPFile(bspName);
+    if (!LoadBSPFile(bspName)) {
+      fprintf(stderr, "Unable to open bsp file: %s.\n", bspName);
+      return 1;
+    }
+    RunCodeAtScopeExit(UnloadBSPFile());
 
     CUtlBuffer buf;
     char relativeName[MAX_PATH] = {0};
@@ -330,7 +342,11 @@ int main(int argc, char **argv) {
       RunCodeAtScopeExit(fclose(fp));
 
       printf("Opening bsp file: %s.\n", bspName);
-      LoadBSPFile(bspName);
+      if (!LoadBSPFile(bspName)) {
+        fprintf(stderr, "Unable to open bsp file: %s.\n", bspName);
+        return 1;
+      }
+      RunCodeAtScopeExit(UnloadBSPFile());
 
       while (!feof(fp)) {
         if ((fgets(fullpathName, sizeof(fullpathName), fp) != NULL)) {
@@ -366,7 +382,12 @@ int main(int argc, char **argv) {
     V_MakeAbsolutePath(bspName, pActionArgs[0]);
     V_DefaultExtension(bspName, ".bsp");
 
-    LoadBSPFile(bspName);
+    if (!LoadBSPFile(bspName)) {
+      fprintf(stderr, "Unable to open bsp file: %s.\n", bspName);
+      return 1;
+    }
+    RunCodeAtScopeExit(UnloadBSPFile());
+
     PrintBSPPackDirectory();
   } else if (V_strieq(pAction, "-addfile") && nActionArgs == 4) {
     // bspzip -addfile <bspfile> <relativepathname> <fullpathname> <newbspfile>
@@ -387,7 +408,12 @@ int main(int argc, char **argv) {
     V_DefaultExtension(newbspName, ".bsp");
 
     // read it in, add pack file, write it back out
-    LoadBSPFile(bspName);
+    if (!LoadBSPFile(bspName)) {
+      fprintf(stderr, "Unable to open bsp file: %s.\n", bspName);
+      return 1;
+    }
+    RunCodeAtScopeExit(UnloadBSPFile());
+
     AddFileToPak(GetPakFile(), relativeName, fullpathName);
     WriteBSPFile(newbspName);
   } else if (V_strieq(pAction, "-addlist") && nActionArgs == 3) {
@@ -414,7 +440,10 @@ int main(int argc, char **argv) {
       RunCodeAtScopeExit(fclose(fp));
 
       printf("Opening bsp file: %s.\n", bspName);
-      LoadBSPFile(bspName);
+      if (!LoadBSPFile(bspName)) {
+        fprintf(stderr, "Unable to open bsp file: %s.\n", bspName);
+        return 1;
+      }
 
       while (!feof(fp)) {
         relativeName[0] = 0;
@@ -470,7 +499,10 @@ int main(int argc, char **argv) {
       RunCodeAtScopeExit(fclose(fp));
 
       printf("Opening bsp file: %s.\n", bspName);
-      LoadBSPFile(bspName);
+      if (!LoadBSPFile(bspName)) {
+        fprintf(stderr, "Unable to open bsp file: %s.\n", bspName);
+        return 1;
+      }
 
       while (!feof(fp)) {
         relativeName[0] = 0;
