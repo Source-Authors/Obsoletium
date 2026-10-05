@@ -18,10 +18,10 @@
 #include <cinttypes>
 
 #include "filesystem.h"
+#include "Color.h"
 #include "vstdlib/IKeyValuesSystem.h"
 #include "tier0/icommandline.h"
 #include "tier0/vprof_telemetry.h"
-#include "Color.h"
 #include "tier0/dbg.h"
 #include "tier0/mem.h"
 #include "tier1/utlbuffer.h"
