@@ -3305,9 +3305,9 @@ void XM_CALLCONV MathLib_Init( float gamma, float texGamma, float brightness, in
 	s_bSSEEnabled = bAllowSSE && pi.m_bSSE;
 	s_bSSE2Enabled = bAllowSSE2 && pi.m_bSSE2;
 
-	s_bMathlibInitialized = true;
-
 	BuildGammaTable( gamma, texGamma, brightness, overbright );
+
+	s_bMathlibInitialized = true;
 }
 
 bool XM_CALLCONV MathLib_3DNowEnabled( )
