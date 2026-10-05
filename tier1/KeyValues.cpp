@@ -1392,10 +1392,17 @@ int KeyValues::GetInt( const char *keyName, int defaultValue )
 			return wcstol(dat->m_wsValue, nullptr, 10);
 		case TYPE_FLOAT:
 			return (int)dat->m_flValue;
-		case TYPE_UINT64:
-			// can't convert, since it would lose data
-			Assert(0);
-			return 0;
+		case TYPE_UINT64: {
+			// dimhotepus: Support reading of ints from uint64.
+			uint64 value;
+			V_memcpy( &value, dat->m_sValue, sizeof(uint64) );
+			if ( value >= std::numeric_limits<int>::max() )
+			{
+				AssertMsg( false, "Unable to get kv uint64 (%" PRIu64 ") as int.", value );
+				return 0;
+			}
+			return static_cast<int>( value );
+		}
 		// dimhotepus: Correctly read int from pointer.
 		case TYPE_PTR:
 			return static_cast<int>(reinterpret_cast<intp>(dat->m_pValue));
