@@ -319,19 +319,19 @@ int main(int argc, char **argv) {
   PrintCommandLine(argc, argv);
 
   if (argc == 1) {
-    printf("vbspinfo:  Build " __DATE__ "\n");
+    fprintf(stderr, "vbspinfo:  Build " __DATE__ "\n");
 
-    printf("usage: vbspinfo [parameters] bspfile [bspfiles]\n");
-    printf("   -treeinfo            \n");
+    fprintf(stderr, "usage: vbspinfo [parameters] bspfile [bspfiles]\n");
+    fprintf(stderr, "   -treeinfo            \n");
     //		printf("   -drawtree            \n"); Remove for now until the
     // option can be fixed
-    printf("   -worldtexturestats   \n");
-    printf("   -modelstats          \n");
-    printf("   -liststaticprops     \n");
-    printf(
+    fprintf(stderr, "   -worldtexturestats   \n");
+    fprintf(stderr, "   -modelstats          \n");
+    fprintf(stderr, "   -liststaticprops     \n");
+    fprintf(stderr,
         "   -X[lump ID]          Extract BSP lump to file. i.e -X0 extracts "
         "entity lump.\n");
-    printf(
+    fprintf(stderr,
         "   -size				Show .bsp worldmodel bounds\n");
     return EINVAL;
   }
