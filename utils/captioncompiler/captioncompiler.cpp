@@ -107,7 +107,7 @@ void printusage(bool uselogfile) {
         \ne.g.:  kvc -l u:/xbox/game/hl2x/resource/closecaption_english.txt");
 
   // Exit app
-  exit(1);
+  exit(EINVAL);
 }
 
 void CheckLogFile(bool uselogfile) {

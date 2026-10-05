@@ -115,7 +115,7 @@ void MdlWarning(const char *fmt, ...) {
   va_start(args, fmt);
   vprint(stderr, 0, fmt, args);
 
-  exit(1);
+  exit(EINVAL);
 }
 
 int OpenGlobalFile(char *src) {

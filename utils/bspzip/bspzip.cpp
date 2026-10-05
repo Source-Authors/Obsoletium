@@ -88,7 +88,7 @@ bool RepackBSP(const char *pszMapFile, bool bCompress) {
           "decompress\n");
   fprintf(stderr, "  a compressed BSP.\n");
 
-  return 1;
+  return EINVAL;
 }
 
 }  // namespace

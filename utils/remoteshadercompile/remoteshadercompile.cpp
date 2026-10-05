@@ -790,7 +790,7 @@ int main(int argc, char *argv[]) {
         ++i;
       } else {
         PrintfUsage(argv[0]);
-        return 1;
+        return EINVAL;
       }
     } else if (streq(argv[i], "--no-logo")) {
       show_logo = false;
@@ -802,7 +802,7 @@ int main(int argc, char *argv[]) {
       fprintf(stderr, "%s error: Unknown command line arg '%s'.", argv[0],
               argv[i]);
       PrintfUsage(argv[0]);
-      return 1;
+      return EINVAL;
     }
   }
 

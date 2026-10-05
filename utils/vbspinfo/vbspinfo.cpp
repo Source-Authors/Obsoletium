@@ -333,7 +333,7 @@ int main(int argc, char **argv) {
         "entity lump.\n");
     printf(
         "   -size				Show .bsp worldmodel bounds\n");
-    Error("Incorrect syntax.");
+    return EINVAL;
   }
 
   bool bWorldTextureStats = false;
