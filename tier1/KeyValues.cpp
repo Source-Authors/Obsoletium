@@ -6,12 +6,6 @@
 //
 //=============================================================================//
 
-#if defined(POSIX)
-#include <wchar.h> // wcslen()
-#define _wtoi(arg) wcstol(arg, NULL, 10)
-#define _wtoi64(arg) wcstoll(arg, NULL, 10)
-#endif
-
 #include "tier1/KeyValues.h"
 
 #include <cstdlib>
@@ -1395,7 +1389,7 @@ int KeyValues::GetInt( const char *keyName, int defaultValue )
 			// dimhotepus: atoi -> V_atoi.
 			return V_atoi(dat->m_sValue);
 		case TYPE_WSTRING:
-			return _wtoi(dat->m_wsValue);
+			return wcstol(dat->m_wsValue, nullptr, 10);
 		case TYPE_FLOAT:
 			return (int)dat->m_flValue;
 		case TYPE_UINT64:
@@ -1428,7 +1422,7 @@ uint64 KeyValues::GetUint64( const char *keyName, uint64 defaultValue )
 			// dimhotepus: V_atoi64 -> V_atoui64
 			return V_atoui64(dat->m_sValue);
 		case TYPE_WSTRING:
-			return _wtoi64(dat->m_wsValue);
+			return wcstoll(dat->m_wsValue, nullptr, 10);
 		case TYPE_FLOAT:
 			return (int)dat->m_flValue;
 		case TYPE_UINT64: {
