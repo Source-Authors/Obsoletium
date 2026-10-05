@@ -41,7 +41,7 @@ HKeySymbol (*KeyValues::s_pfGetSymbolForString)( const char *name, bool bCreate 
 const char *(*KeyValues::s_pfGetStringForSymbol)( HKeySymbol symbol ) = &KeyValues::GetStringForSymbolClassic;
 CKeyValuesGrowableStringTable *KeyValues::s_pGrowableStringTable = nullptr;
 
-#define KEYVALUES_TOKEN_SIZE	4096
+constexpr inline int KEYVALUES_TOKEN_SIZE{4096};
 static char s_pTokenBuf[KEYVALUES_TOKEN_SIZE];
 
 
