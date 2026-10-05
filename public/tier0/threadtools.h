@@ -878,10 +878,13 @@ private:
 class ALIGN128 CAlignedThreadFastMutex : public CAlignedNewDelete<128, CThreadFastMutex>
 {
 public:
+MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+MSVC_DISABLE_WARNING(26495)  // No need to initialize padding.
 	CAlignedThreadFastMutex()
 	{
 		Assert( reinterpret_cast<size_t>(this) % 128 == 0 && sizeof(*this) == 128 );
 	}
+MSVC_END_WARNING_OVERRIDE_SCOPE()
 
 private:
 	[[maybe_unused]] uint8 pad[128-sizeof(CThreadFastMutex)];  //-V730_NOINIT
