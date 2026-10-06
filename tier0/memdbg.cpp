@@ -1192,8 +1192,11 @@ int CDbgMemAlloc::GetAllocatonLineNumber( void *pMem )
 		return 0;
 
 #ifndef __SANITIZE_ADDRESS__
-	CrtDbgMemHeader_t *pHeader = GetCrtDbgMemHeader( pMem );
-	return pHeader->m_nLineNumber;
+	// dimhotepus: As for GetAllocatonFileName, line number is valid only if file name is set.
+	if ( CrtDbgMemHeader_t *pHeader = GetCrtDbgMemHeader( pMem ); pHeader->m_pFileName )
+		return pHeader->m_nLineNumber;
+
+	return 0;
 #else
 	return 0;
 #endif
