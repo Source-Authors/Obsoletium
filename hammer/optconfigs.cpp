@@ -403,14 +403,17 @@ void COPTConfigs::OnSelchangeConfigurations(void)
 	// save info from controls into last selected config
 	SaveInfo(m_pLastSelConfig);
 
-	m_pLastSelConfig = NULL;
+	m_pLastSelConfig = nullptr;
 
 	// load info from newly selected config into controls
 	int iCurSel = m_cConfigs.GetCurSel();
-	CGameConfig *pConfig = Options.configs.FindConfig(size_cast<DWORD>(m_cConfigs.GetItemData(iCurSel)));
+	// dimhotepus: Handle case when no configs are present.
+	CGameConfig *pConfig = iCurSel != CB_ERR
+		? Options.configs.FindConfig(size_cast<DWORD>(m_cConfigs.GetItemData(iCurSel)))
+		: nullptr;
 
 	BOOL bKillFields = FALSE;
-	if (pConfig == NULL)
+	if (pConfig == nullptr)
 	{
 		bKillFields = TRUE;
 	}
@@ -425,7 +428,7 @@ void COPTConfigs::OnSelchangeConfigurations(void)
 	m_cMapDir.EnableWindow(!bKillFields);
 	m_cCordonTexture.EnableWindow(!bKillFields);
 
-	if (pConfig == NULL)
+	if (pConfig == nullptr)
 	{
 		return;
 	}
@@ -639,12 +642,10 @@ BOOL COPTConfigs::OnInitDialog(void)
 {
 	__super::OnInitDialog();
 
-	int nIndex;
-
 	//
 	// Add map formats.
 	//
-	nIndex = m_cMapFormat.AddString("Half-Life 2");
+	int nIndex = m_cMapFormat.AddString("Half-Life 2");
 	m_cMapFormat.SetItemData(nIndex, mfHalfLife2);
 
 	nIndex = m_cMapFormat.AddString("Half-Life / TFC");
@@ -662,7 +663,10 @@ BOOL COPTConfigs::OnInitDialog(void)
 	UpdateConfigList();
 
 	int nCurSel = m_cConfigs.GetCurSel();
-	m_pInitialSelectedConfig = Options.configs.FindConfig(size_cast<DWORD>(m_cConfigs.GetItemData(nCurSel)));
+	// dimhtotepus: Handle case when no configs are present.
+	m_pInitialSelectedConfig = nCurSel != CB_ERR
+		? Options.configs.FindConfig(size_cast<DWORD>(m_cConfigs.GetItemData(nCurSel)))
+		: nullptr;
 
 	m_strInitialGameDir.Empty();
 	if (m_pInitialSelectedConfig)
@@ -705,7 +709,10 @@ BOOL COPTConfigs::OnApply(void)
 	SaveInfo(m_pLastSelConfig);
 
 	int nCurSel = m_cConfigs.GetCurSel();
-	CGameConfig *pConfig = Options.configs.FindConfig(size_cast<DWORD>(m_cConfigs.GetItemData(nCurSel)));
+	// dimhotepus: Handle case when no configs are present.
+	CGameConfig *pConfig = nCurSel != CB_ERR
+		? Options.configs.FindConfig(size_cast<DWORD>(m_cConfigs.GetItemData(nCurSel)))
+		: nullptr;
 
 	if ( pConfig != NULL && ConfigChanged( pConfig ) )
 	{

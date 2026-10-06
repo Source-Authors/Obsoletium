@@ -151,7 +151,7 @@ void CEditGameConfigs::FillConfigList(DWORD dwSelectID)
 	DWORD dwCurID = dwSelectID;
 	int iNewIndex = -1;
 	
-	if(m_cConfigs.GetCurSel() != LB_ERR && dwCurID == 0xFFFFFFFF)
+	if(m_cConfigs.GetCurSel() != CB_ERR && dwCurID == 0xFFFFFFFF)
 	{
 		dwCurID = size_cast<DWORD>(m_cConfigs.GetItemData(m_cConfigs.GetCurSel()));
 	}
@@ -185,7 +185,7 @@ void CEditGameConfigs::FillConfigList(DWORD dwSelectID)
 void CEditGameConfigs::OnSelchangeConfigs() 
 {
 	int iCurSel = m_cConfigs.GetCurSel();
-	if(iCurSel == LB_ERR)
+	if(iCurSel == CB_ERR)
 		return;
 
 	m_pSelectedGame = Options.configs.FindConfig(size_cast<DWORD>(
