@@ -448,7 +448,7 @@ void AnimationBrowser::redraw()
 	rcText.top = 8;
 	rcText.bottom = rcText.top + 15;
 
-	helper.DrawColoredText( "Arial", 9, FW_NORMAL, RGB( 63, 63, 63 ), rcText, "%i sequences", 
+	helper.DrawColoredText( "Arial", 9, FW_NORMAL, RGB( 63, 63, 63 ), rcText, "%zd sequences", 
 		curcount );
 
 }

@@ -907,7 +907,7 @@ void CWaveBrowser::PopulateTree( char const *subdirectory )
 		if ( wav->HasLoadedSentenceInfo() )
 		{
 			m_pListView->setLabel( slot, COL_DUCKED, wav->GetVoiceDuck() ? "yes" : "no" );
-			m_pListView->setLabel( slot, COL_PHONEMES, wav->GetPhonemeCount() || wav->GetWordCount() ? va( "%i [ %i ]", wav->GetWordCount(), wav->GetPhonemeCount() ) : "" );
+			m_pListView->setLabel( slot, COL_PHONEMES, wav->GetPhonemeCount() || wav->GetWordCount() ? va( "%zd [ %zd ]", wav->GetWordCount(), wav->GetPhonemeCount() ) : "" );
 			m_pListView->setLabel( slot, COL_SENTENCE, wav->GetSentenceText() );
 		}
 		else

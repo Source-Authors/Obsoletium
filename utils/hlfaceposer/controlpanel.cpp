@@ -642,7 +642,7 @@ ControlPanel::setModelInfo()
 		"Bones: %d\n"
 		"Bone Controllers: %d\n"
 		"Hit Boxes: %d in %d sets\n"
-		"Sequences: %d\n",
+		"Sequences: %zd\n",
 		hdr->numbones(),
 		hdr->numbonecontrollers(),
 		hbcount,
@@ -656,7 +656,7 @@ ControlPanel::setModelInfo()
 		"Textures: %d\n"
 		"Skin Families: %d\n"
 		"Bodyparts: %d\n"
-		"Attachments: %d\n",
+		"Attachments: %zd\n",
 		hdr->numtextures(),
 		hdr->numskinfamilies(),
 		hdr->numbodyparts(),

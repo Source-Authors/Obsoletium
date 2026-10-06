@@ -785,7 +785,7 @@ void CChoreoView::redraw()
 	if ( m_UndoStack.Count() > 0 )
 	{
 		int length = drawHelper.CalcTextWidth( "Arial", 9, FW_NORMAL, 
-			"undo %i/%zi", m_nUndoLevel, m_UndoStack.Count() );
+			"undo %zd/%zd", m_nUndoLevel, m_UndoStack.Count() );
 		RECT rcText = rc;
 		rcText.top = rc.top + 48;
 		rcText.bottom = rcText.top + 10;
@@ -793,7 +793,7 @@ void CChoreoView::redraw()
 		rcText.right = rcText.left + length;
 
 		drawHelper.DrawColoredText( "Arial", 9, FW_NORMAL, RGB( 100, 180, 100 ), rcText,
-			"undo %i/%zi", m_nUndoLevel, m_UndoStack.Count() );
+			"undo %zd/%zd", m_nUndoLevel, m_UndoStack.Count() );
 	}
 
 	DrawScrubHandle( drawHelper );
@@ -10939,7 +10939,7 @@ void CChoreoView::OnCombineSpeakEvents()
 	// Redraw
 	InvalidateLayout();
 
-	Con_Printf( "Changed %i events to use close caption token '%s'\n", c, params.m_szCCToken );
+	Con_Printf( "Changed %zd events to use close caption token '%s'\n", c, params.m_szCCToken );
 
 	// Sort the sounds by start time
 
@@ -11109,7 +11109,7 @@ void CChoreoView::OnRemoveSpeakEventFromGroup()
 
 	// Redraw
 	InvalidateLayout();
-	Con_Printf( "Reverted %i events to use default close caption token\n", c );
+	Con_Printf( "Reverted %zd events to use default close caption token\n", c );
 }
 
 bool CChoreoView::AreSelectedEventsCombinable()

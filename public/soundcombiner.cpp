@@ -29,7 +29,11 @@ public:
 	CSoundCombiner() :
 		m_pWaveOutput( NULL ),
 		m_pOutRIFF( NULL ),
-		m_pOutIterator( NULL )
+		m_pOutIterator( NULL ),
+		m_nSampleRate( -1 ),
+		m_nNumChannels( 0 ),
+		m_nBitsPerSample( -1 ),
+		m_nBytesPerSample( -1 )
 	{
 		m_szOutFile[ 0 ] = 0;
 	}

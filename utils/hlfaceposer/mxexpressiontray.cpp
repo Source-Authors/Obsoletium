@@ -481,7 +481,7 @@ void mxExpressionTray::DrawThumbNail( CExpClass *active, CExpression *current, C
 			rc.bottom = rc.top + 15;
 
 			helper.DrawColoredText( "Arial", 9, FW_NORMAL, RGB( 200, 200, 200 ), rc, 
-				"%i/%i", current->UndoCurrent(), current->UndoLevels() );
+				"%zd/%zd", current->UndoCurrent(), current->UndoLevels() );
 		}
 
 	}
