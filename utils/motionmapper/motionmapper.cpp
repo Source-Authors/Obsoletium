@@ -52,6 +52,7 @@ void vprint(FILE *stream, int depth, const char *fmt, ...) {
   va_end(va);
 
   FILE *fp = uselogfile ? fopen("motion-mapper-log.txt", "ab") : nullptr;
+  RunCodeAtScopeExitOpt(fp, fclose(fp));
 
   while (depth-- > 0) {
     vprint(stream, 0, "  ");
@@ -64,8 +65,6 @@ void vprint(FILE *stream, int depth, const char *fmt, ...) {
   Plat_DebugString(string);
 
   if (fp) {
-    RunCodeAtScopeExit(fclose(fp));
-
     char *p = string;
     while (*p) {
       if (*p == '\n') fputc('\r', fp);
