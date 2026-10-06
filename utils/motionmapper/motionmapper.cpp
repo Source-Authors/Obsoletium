@@ -303,6 +303,7 @@ void Grab_Animation(s_source_t *psource) {
 
       clip_rotations(rot);  // !!!
     } else if (sscanf(g_szLine, "%1023s %d", cmd, &index)) {
+      cmd[ssize(cmd) - 1] = '\0';
       // get time
       if (strcmp(cmd, "time") == 0) {
         // again time IS an index
