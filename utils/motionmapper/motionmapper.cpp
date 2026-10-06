@@ -2468,7 +2468,7 @@ s_source_t* MotionMap(const Args& args, s_source_t* pSource,
 #endif
 }
 
-char templates[] =
+constexpr char templates[] =
     "\n\
 #\n\
 # default template file is analogus to not specifying a template file at all\n\
