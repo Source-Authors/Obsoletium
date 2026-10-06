@@ -24,14 +24,7 @@ namespace {
 bool g_NoPause = false;
 bool g_Quiet = false;
 
-void Pause() {
-  if (!g_NoPause) {
-    printf("Hit a key to continue\n");
-    getch();
-  }
-}
-
-[[nodiscard]] bool ImageRGBA8888HasAlpha(unsigned char *pImage, int numTexels) {
+[[nodiscard]] bool ImageRGBA8888HasAlpha(unsigned char* pImage, int numTexels) {
   for (int i = 0; i < numTexels; i++) {
     if (pImage[i * 4 + 3] != 255) return true;
   }
@@ -39,13 +32,13 @@ void Pause() {
   return false;
 }
 
-[[nodiscard]] bool GetKeyValueFromBuffer(CUtlBuffer &buf, char **key,
-                                         char **val) {
+[[nodiscard]] bool GetKeyValueFromBuffer(CUtlBuffer& buf, char** key,
+                                         char** val) {
   char stringBuf[2048];
   while (buf.IsValid()) {
     buf.GetLine(stringBuf);
 
-    char *scan = stringBuf;
+    char* scan = stringBuf;
     // search for the first quote for the key.
     while (1) {
       if (*scan == '\"') {
@@ -117,8 +110,8 @@ void Pause() {
   return false;
 }
 
-[[nodiscard]] bool LoadConfigFile(const char *pFileName, float *bumpScale,
-                                  int *startFrame, int *endFrame) {
+[[nodiscard]] bool LoadConfigFile(const char* pFileName, float* bumpScale,
+                                  int* startFrame, int* endFrame) {
   CUtlBuffer buf((intp)0, 0, CUtlBuffer::TEXT_BUFFER);
   if (!g_pFullFileSystem->ReadFile(pFileName, nullptr, buf)) return false;
 
@@ -147,11 +140,10 @@ void Pause() {
   fprintf(stderr,
           "-quiet   : don't print anything out, don't pause for input\n"
           "-nopause : don't pause for input\n");
-  Pause();
   exit(EINVAL);
 }
 
-void ProcessFiles(const char *normalFileNameWithoutExtension, int startFrame,
+void ProcessFiles(const char* normalFileNameWithoutExtension, int startFrame,
                   int endFrame, float bumpScale) {
   static char heightTGAFileName[1024], normalTGAFileName[1024], buffer[1024];
 
@@ -170,7 +162,7 @@ void ProcessFiles(const char *normalFileNameWithoutExtension, int startFrame,
     V_strcpy_safe(buffer, normalFileNameWithoutExtension);
 
     // Strip '_normal' off the end because we're looking for '_height'
-    char *underscore = Q_stristr(buffer, "_normal");
+    char* underscore = Q_stristr(buffer, "_normal");
     if (!underscore) {
       fprintf(stderr, "config file '%s' name must end in _normal.txt\n",
               buffer);
@@ -255,7 +247,7 @@ void ProcessFiles(const char *normalFileNameWithoutExtension, int startFrame,
 
 }  // namespace
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   // Install an exception handler.
   const se::utils::common::ScopedDefaultMinidumpHandler
       scoped_default_minidumps;
@@ -274,16 +266,15 @@ int main(int argc, char **argv) {
 
   int i = 1;
   while (i < argc) {
-    if (stricmp(argv[i], "-quiet") == 0) {
+    if (V_strieq(argv[i], "-quiet")) {
       i++;
       g_Quiet = true;
-      // no point in pausing if we aren't going to print anything out.
-      g_NoPause = true;
     }
 
-    if (stricmp(argv[i], "-nopause") == 0) {
+    // dimhotepus: -nopause is not used in the code anymore, but it is still
+    // accepted as a valid argument.
+    if (V_strieq(argv[i], "-nopause")) {
       i++;
-      g_NoPause = true;
     } else {
       break;
     }
@@ -302,7 +293,7 @@ int main(int argc, char **argv) {
   for (; i < argc; i++) {
     static char normalFileNameWithoutExtension[1024];
 
-    char *fileName;
+    char* fileName;
     if (!V_IsAbsolutePath(argv[i])) {
       V_sprintf_safe(normalFileNameWithoutExtension, "%s\\%s", cwd, argv[i]);
 
@@ -318,13 +309,11 @@ int main(int argc, char **argv) {
     int endFrame = -1;
     if (!LoadConfigFile(fileName, &bumpScale, &startFrame, &endFrame)) {
       fprintf(stderr, "unable to load '%s'.\n", fileName);
-      Pause();
       return EIO;
     }
 
     if (bumpScale == -1.0f) {
       fprintf(stderr, "must specify \"bumpscale\" in config file.\n");
-      Pause();
       continue;
     }
 
@@ -333,7 +322,6 @@ int main(int argc, char **argv) {
       fprintf(
           stderr,
           "if you use startframe, you must use endframe, and vice versa.\n");
-      Pause();
       continue;
     }
 
