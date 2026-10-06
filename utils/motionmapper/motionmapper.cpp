@@ -2906,8 +2906,11 @@ int main(int argc, char **argv) {
 
   // Init filesystem hooey
   const ScopedFileSystem scoped_file_system{g_outfile};
+  char pszFile[ssize(g_outfile)];
   // ??
-  Q_FileBase(g_outfile, g_outfile);
+  V_FileBase(g_outfile, pszFile);
+  // dimhotepus: Fix V_FileBase can't accept same arg.
+  V_strcpy_safe(g_outfile, pszFile);
 
   // Verbose stuff
   if (!g_quiet) {
