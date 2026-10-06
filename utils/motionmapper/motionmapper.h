@@ -264,7 +264,7 @@ EXTERN int numvlist;
 
 int SortAndBalanceBones(int iCount, int iMaxCount, int bones[],
                         float weights[]);
-void Grab_Vertexanimation(s_source_t *psource);
+void Grab_Vertexanimation(FILE *in, s_source_t *psource);
 void BuildIndividualMeshes(s_source_t *psource);
 
 #endif  // SE_UTILS_MOTIONMAPPER_MOTIONMAPPER_H_

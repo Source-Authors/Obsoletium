@@ -38,7 +38,6 @@ char g_outfile[1024];
 constexpr inline bool uselogfile = false;
 
 char g_szFilename[1024];
-FILE *g_fpInput;
 char g_szLine[4096];
 int g_iLinecount;
 
@@ -114,50 +113,46 @@ void MdlWarning(const char *fmt, ...) {
   exit(EINVAL);
 }
 
-int OpenGlobalFile(char *src) {
-  time_t time1;
-  char filename[1024];
-
+FILE* OpenGlobalFile(char* src) {
+  char filename[MAX_FILEPATH];
   // local copy of string
   V_strcpy_safe(filename, ExpandPath(src));
 
   // Ummm, path sanity checking
-  intp pathLength;
-  intp numBasePaths = CmdLib_GetNumBasePaths();
+  const intp numBasePaths = CmdLib_GetNumBasePaths();
   // This is kinda gross. . . doing the same work in cmdlib on SafeOpenRead.
-  if (CmdLib_HasBasePath(filename, pathLength)) {
-    char tmp[1024];
-    int i;
+  if (intp pathLength; CmdLib_HasBasePath(filename, pathLength)) {
+    char tmp[MAX_FILEPATH];
 
-    for (i = 0; i < numBasePaths; i++) {
+    for (intp i = 0; i < numBasePaths; i++) {
       V_strcpy_safe(tmp, CmdLib_GetBasePath(i));
       V_strcat_safe(tmp, filename + pathLength);
 
-      time1 = FileTime(tmp);
-      if (time1 != -1) {
-        if ((g_fpInput = fopen(tmp, "r")) == 0) {
-          MdlWarning("reader: could not open file '%s'\n", src);
-
-          return 0;
+      const time_t time = FileTime(tmp);
+      if (time != -1) {
+        if (FILE* in = fopen(tmp, "r"); in) {
+          return in;
         }
 
-        return 1;
+        MdlWarning("reader: could not open file '%s': %s\n", src,
+                   strerror(errno));
+        return nullptr;
       }
     }
 
-    return 0;
-  } else {
-    time1 = FileTime(filename);
-    if (time1 == -1) return 0;
+    return nullptr;
+  } 
 
-    // Whoohooo, FOPEN!
-    if ((g_fpInput = fopen(filename, "r")) == 0) {
-      MdlWarning("reader: could not open file '%s'\n", src);
-      return 0;
-    }
+  const time_t time = FileTime(filename);
+  if (time == -1) return nullptr;
 
-    return 1;
+  // Whoohooo, FOPEN!
+  if (FILE* in = fopen(filename, "r"); in) {
+    return in;
   }
+
+  MdlWarning("reader: could not open file '%s': %s\n", src, strerror(errno));
+  return nullptr;
 }
 
 bool IsEnd(char const *pLine) {
@@ -180,18 +175,14 @@ void clip_rotations(RadianEuler &rot) {
 }
 
 void clip_rotations(Vector &rot) {
-  int j;
   // clip everything to : -180 <= x < 180
-
-  for (j = 0; j < 3; j++) {
+  for (int j = 0; j < 3; j++) {
     while (rot[j] >= 180) rot[j] -= 180 * 2;
     while (rot[j] < -180) rot[j] += 180 * 2;
   }
 }
 
 void Build_Reference(s_source_t *psource) {
-  int parent;
-
   for (int i = 0; i < psource->numbones; i++) {
     matrix3x4_t m;
     AngleMatrix(psource->rawanim[0][i].rot, m);
@@ -199,7 +190,7 @@ void Build_Reference(s_source_t *psource) {
     m[1][3] = psource->rawanim[0][i].pos[1];
     m[2][3] = psource->rawanim[0][i].pos[2];
 
-    parent = psource->localBone[i].parent;
+    int parent = psource->localBone[i].parent;
     if (parent == -1) {
       // scale the done pos.
       // calc rotational matrices
@@ -221,25 +212,25 @@ void Build_Reference(s_source_t *psource) {
   }
 }
 
-int Grab_Nodes(s_node_t *pnodes) {
+int Grab_Nodes(FILE *in, s_node_t *pnodes) {
   //
   // s_node_t structure: index is index!!
   //
   int index;
-  char name[1024];
-  int parent;
   int numbones = 0;
 
   // Init parent to none
   for (index = 0; index < MAXSTUDIOSRCBONES; index++) {
     pnodes[index].parent = -1;
   }
-
+  
+  int parent;
   // March through nodes lines
-  while (fgets(g_szLine, sizeof(g_szLine), g_fpInput) != NULL) {
+  while (fgets(g_szLine, sizeof(g_szLine), in) != NULL) {
     g_iLinecount++;
     // get tokens
-    if (sscanf(g_szLine, "%d \"%1023[^\"]\" %d", &index, name, &parent) == 3) {
+    if (char name[1024];
+        sscanf(g_szLine, "%d \"%1023[^\"]\" %d", &index, name, &parent) == 3) {
       // check for duplicated bones
       /*
       if (!Q_isempty(pnodes[index].name))
@@ -264,22 +255,21 @@ int Grab_Nodes(s_node_t *pnodes) {
   return 0;
 }
 
-void Grab_Animation(s_source_t *psource) {
+void Grab_Animation(FILE *in, s_source_t *psource) {
   Vector pos;
   RadianEuler rot;
   char cmd[1024];
   int index;
   int t = -99999999;
-  int size;
 
   // Init startframe
   psource->startframe = -1;
 
   // size per frame
-  size = psource->numbones * sizeof(s_bone_t);
+  int size = psource->numbones * sizeof(s_bone_t);
 
   // march through animation
-  while (fgets(g_szLine, sizeof(g_szLine), g_fpInput) != NULL) {
+  while (fgets(g_szLine, sizeof(g_szLine), in) != NULL) {
     // linecount
     g_iLinecount++;
     // split if big enoough
@@ -389,7 +379,7 @@ int lookup_index(s_source_t *psource, int material, Vector &vertex,
   return i;
 }
 
-void ParseFaceData(s_source_t *psource, int material, s_face_t *pFace) {
+void ParseFaceData(FILE *in, s_source_t *psource, int material, s_face_t *pFace) {
   int index[3];
   int i, j;
   Vector p;
@@ -402,7 +392,7 @@ void ParseFaceData(s_source_t *psource, int material, s_face_t *pFace) {
   for (j = 0; j < 3; j++) {
     memset(g_szLine, 0, sizeof(g_szLine));
 
-    if (fgets(g_szLine, sizeof(g_szLine), g_fpInput) == NULL) {
+    if (fgets(g_szLine, sizeof(g_szLine), in) == NULL) {
       MdlError("%s: error on g_szLine %d: %s", g_szFilename, g_iLinecount,
                g_szLine);
     }
@@ -800,11 +790,20 @@ void CalcModelTangentSpaces(s_source_t *pSrc) {
   }
 }
 
-void Grab_Triangles(s_source_t *psource) {
-  Vector vmin, vmax;
-
-  vmin[0] = vmin[1] = vmin[2] = 99999;
-  vmax[0] = vmax[1] = vmax[2] = -99999;
+void Grab_Triangles(FILE* in, s_source_t* psource) {
+  // dimhtepus: changed to std::numeric_limits<float>::max() and
+  // std::numeric_limits<float>::min() as 99999/-99999 is magic
+  // consts.
+  Vector vmin{
+      std::numeric_limits<float>::max(),
+      std::numeric_limits<float>::max(),
+      std::numeric_limits<float>::max(),
+  },
+      vmax{
+      std::numeric_limits<float>::min(),
+      std::numeric_limits<float>::min(),
+      std::numeric_limits<float>::min()
+  };
 
   g_numfaces = 0;
   numvlist = 0;
@@ -817,7 +816,7 @@ void Grab_Triangles(s_source_t *psource) {
   char texturename[64];
 
   while (1) {
-    if (fgets(g_szLine, sizeof(g_szLine), g_fpInput) == NULL) break;
+    if (fgets(g_szLine, sizeof(g_szLine), in) == NULL) break;
 
     g_iLinecount++;
 
@@ -856,9 +855,9 @@ void Grab_Triangles(s_source_t *psource) {
 
     if (texturename[0] == '\0') {
       // weird source problem, skip them
-      fgets(g_szLine, sizeof(g_szLine), g_fpInput);
-      fgets(g_szLine, sizeof(g_szLine), g_fpInput);
-      fgets(g_szLine, sizeof(g_szLine), g_fpInput);
+      fgets(g_szLine, sizeof(g_szLine), in);
+      fgets(g_szLine, sizeof(g_szLine), in);
+      fgets(g_szLine, sizeof(g_szLine), in);
       g_iLinecount += 3;
       continue;
     }
@@ -866,9 +865,9 @@ void Grab_Triangles(s_source_t *psource) {
     if (stricmp(texturename, "null.bmp") == 0 ||
         stricmp(texturename, "null.tga") == 0) {
       // skip all faces with the null texture on them.
-      fgets(g_szLine, sizeof(g_szLine), g_fpInput);
-      fgets(g_szLine, sizeof(g_szLine), g_fpInput);
-      fgets(g_szLine, sizeof(g_szLine), g_fpInput);
+      fgets(g_szLine, sizeof(g_szLine), in);
+      fgets(g_szLine, sizeof(g_szLine), in);
+      fgets(g_szLine, sizeof(g_szLine), in);
       g_iLinecount += 3;
       continue;
     }
@@ -878,7 +877,7 @@ void Grab_Triangles(s_source_t *psource) {
     material = use_texture_as_material(texture);
 
     s_face_t f;
-    ParseFaceData(psource, material, &f);
+    ParseFaceData(in, psource, material, &f);
 
     g_src_uface[g_numfaces] = f;
     g_face[g_numfaces].material = material;
@@ -895,8 +894,10 @@ int Load_SMD(s_source_t *psource) {
   char cmd[1024];
   int option;
 
+  FILE* in;
   // Open file
-  if (!OpenGlobalFile(psource->filename)) return 0;
+  if (in = OpenGlobalFile(psource->filename); !in) return 0;
+  RunCodeAtScopeExit(fclose(in));
 
   // verbose
   if (!g_quiet) {
@@ -905,7 +906,7 @@ int Load_SMD(s_source_t *psource) {
 
   // March through lines
   g_iLinecount = 0;
-  while (fgets(g_szLine, sizeof(g_szLine), g_fpInput) != NULL) {
+  while (fgets(g_szLine, sizeof(g_szLine), in) != NULL) {
     g_iLinecount++;
     int numRead = sscanf(g_szLine, "%1023s %d", cmd, &option);
     cmd[std::size(cmd) - 1] = '\0';
@@ -920,24 +921,23 @@ int Load_SMD(s_source_t *psource) {
     }
     // Get hierarchy?
     else if (V_streq(cmd, "nodes")) {
-      psource->numbones = Grab_Nodes(psource->localBone);
+      psource->numbones = Grab_Nodes(in, psource->localBone);
     }
     // Get animation??
     else if (V_streq(cmd, "skeleton")) {
-      Grab_Animation(psource);
+      Grab_Animation(in, psource);
     }
     // Geo?
     else if (V_streq(cmd, "triangles")) {
-      Grab_Triangles(psource);
+      Grab_Triangles(in, psource);
     }
     // Geo animation
     else if (V_streq(cmd, "vertexanimation")) {
-      Grab_Vertexanimation(psource);
+      Grab_Vertexanimation(in, psource);
     } else {
       MdlWarning("unknown studio command\n");
     }
   }
-  fclose(g_fpInput);
 
   is_v1support = true;
 
@@ -1661,11 +1661,13 @@ s_template_t *Load_Template(char *name) {
   s_template_t *pTemplate = New_Template();
 
   // Open file
-  if (!OpenGlobalFile(name)) return 0;
+  FILE *in;
+  if (in = OpenGlobalFile(name); !in) return 0;
+  RunCodeAtScopeExit(fclose(in));
 
   // March through lines
   g_iLinecount = 0;
-  while (fgets(g_szLine, sizeof(g_szLine), g_fpInput) != NULL) {
+  while (fgets(g_szLine, sizeof(g_szLine), in) != NULL) {
     g_iLinecount++;
     if (g_szLine[0] == '#') continue;
 
@@ -1758,7 +1760,6 @@ s_template_t *Load_Template(char *name) {
       MdlWarning("unknown studio command\n");
     }
   }
-  fclose(g_fpInput);
   return pTemplate;
 }
 
@@ -2652,7 +2653,7 @@ void BuildIndividualMeshes(s_source_t *psource) {
   CalcModelTangentSpaces(psource);
 }
 
-void Grab_Vertexanimation(s_source_t *psource) {
+void Grab_Vertexanimation(FILE *in, s_source_t *psource) {
   char cmd[1024];
   int index;
   Vector pos{vec3_origin};
@@ -2661,7 +2662,7 @@ void Grab_Vertexanimation(s_source_t *psource) {
   int count = 0;
   static s_vertanim_t tmpvanim[MAXSTUDIOVERTS * 4];
 
-  while (fgets(g_szLine, sizeof(g_szLine), g_fpInput) != NULL) {
+  while (fgets(g_szLine, sizeof(g_szLine), in) != NULL) {
     g_iLinecount++;
     if (sscanf(g_szLine, "%d %f %f %f %f %f %f", &index, &pos[0], &pos[1],
                &pos[2], &normal[0], &normal[1], &normal[2]) == 7) {
