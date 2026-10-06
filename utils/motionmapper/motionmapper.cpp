@@ -540,8 +540,8 @@ int lookup_texture(const Args& args, INOUT_Z_ARRAY char (&texturename)[maxlen]) 
     }
   }
 
-  if (i >= MAXSTUDIOSKINS)
-    MdlError(args, "Too many materials used, max %d\n", MAXSTUDIOSKINS);
+  if (i >= ssize(g_texture))
+    MdlError(args, "Too many materials used, max %zd\n", ssize(g_texture));
 
   //	vprint( 0,  "texture %d = %s\n", i, texturename );
   V_strcpy_safe(g_texture[i].name, texturename);
