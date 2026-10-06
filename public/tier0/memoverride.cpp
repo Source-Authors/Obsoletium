@@ -444,10 +444,10 @@ void *__cdecl operator new( size_t nSize )
 }
 
 [[nodiscard]] _Ret_maybenull_ _Success_(return != NULL)
-_Post_writable_byte_size_(size) __declspec(allocator)
-void *__cdecl operator new( size_t size, ::std::nothrow_t const & ) noexcept //-V835
+_Post_writable_byte_size_(nSize) __declspec(allocator)
+void *__cdecl operator new( size_t nSize, ::std::nothrow_t const & ) noexcept //-V835
 {
-	return AllocUnattributed( size );
+	return AllocUnattributed( nSize );
 }
 
 #ifdef OSX
