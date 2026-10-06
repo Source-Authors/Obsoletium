@@ -1144,6 +1144,60 @@ inline uint64_t Plat_MeasureRtscpOverhead()
 	return median;
 }
 
+enum class Plat_MessageBoxButton
+{
+	// Function call failed.
+	None = 0,
+	// Cancel button was selected, Alt-F4 was pressed,
+	// Escape was pressed or the user clicked on the
+	// close window button.
+	Cancel = 0x1,
+	// No button.
+	No = 0x2,
+	// OK button.
+	Ok = 0x4,
+	// Retry button.
+	Retry = 0x8,
+	// Yes button.
+	Yes = 0x10
+};
+
+enum class Plat_MessageBoxIcon
+{
+	// No icon.
+	None = 0,
+	// Information icon.
+	Information = 0x1,
+	// Warning icon.
+	Warning = 0x2,
+	// Error icon.
+	Error = 0x4
+};
+
+[[nodiscard]] constexpr Plat_MessageBoxButton operator |(
+	Plat_MessageBoxButton left,
+	Plat_MessageBoxButton right)
+{
+	return static_cast<Plat_MessageBoxButton>(
+		static_cast<std::underlying_type_t<decltype(left)>>(left) |
+		static_cast<std::underlying_type_t<decltype(right)>>(right));
+}
+
+[[nodiscard]] constexpr Plat_MessageBoxButton operator &(
+    Plat_MessageBoxButton left,
+	Plat_MessageBoxButton right) {
+	return static_cast<Plat_MessageBoxButton>(
+		static_cast<std::underlying_type_t<decltype(left)>>(left) &
+		static_cast<std::underlying_type_t<decltype(right)>>(right));
+}
+
+// dimhotepus: Crossplatform message box.
+PLATFORM_INTERFACE Plat_MessageBoxButton Plat_MessageBox( IN_Z const char* title,
+										 IN_Z const char* mainInstruction,
+										 IN_Z const char* content,
+										 Plat_MessageBoxButton buttons,
+										 Plat_MessageBoxIcon icon );
+
 // b/w compatibility
 #define Sys_FloatTime Plat_FloatTime
 

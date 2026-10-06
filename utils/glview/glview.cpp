@@ -94,8 +94,12 @@ void DrawDisplacementData();
   V_vsprintf_safe(text, error, argptr);
   va_end(argptr);
 
-  MessageBox(nullptr, text, "Visleaf Camera View - Error",
-             MB_OK | MB_ICONERROR);
+  Plat_MessageBox(
+    "Visleaf Camera View - Error",
+    "Camera View Error",
+    text,
+    Plat_MessageBoxButton::Ok,
+    Plat_MessageBoxIcon::Error);
 
   exit(1);
 }

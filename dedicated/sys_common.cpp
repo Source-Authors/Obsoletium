@@ -153,8 +153,8 @@ SpewRetval_t DedicatedSpewOutputFunc(SpewType_t spewType, char const *pMsg) {
     // In Windows vgui mode, make a message box or they won't ever see the
     // error.
     if (!g_is_console_mode) {
-      MessageBoxA(nullptr, message, "SRCDS - Fatal Error",
-                  MB_OK | MB_TASKMODAL | MB_ICONERROR);
+      Plat_MessageBox("SRCDS - Fatal Error", "SRCDS Error", message,
+                      Plat_MessageBoxButton::Ok, Plat_MessageBoxIcon::Error);
     }
     // dimhotepus: 1 -> ENOTRECOVERABLE
     ::TerminateProcess(::GetCurrentProcess(), ENOTRECOVERABLE);

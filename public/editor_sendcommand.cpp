@@ -198,7 +198,7 @@ EditorSendResult_t Editor_SendCommand(const char *pszCommand, bool bShowUI)
 			{
 				char szError[1024];
 				V_sprintf_safe(szError, "Hammer did not accept the command: \n\n\"%s\"\n\n Make sure the command is valid and that Hammer is still running properly.", pszCommand);
-				MessageBoxA(nullptr, szError, "Hammer - Send Shell Command Error", MB_OK | MB_ICONERROR);
+				Plat_MessageBox("Hammer - Error", "Send Shell Command Error", szError, Plat_MessageBoxButton::Ok, Plat_MessageBoxIcon::Error );
 			}
 		
 			return(Editor_BadCommand);
@@ -210,7 +210,7 @@ EditorSendResult_t Editor_SendCommand(const char *pszCommand, bool bShowUI)
 		{
 			char szError[1024];
 			V_sprintf_safe(szError, "Could not contact Hammer to send the command: \n\n\"%s\"\n\n Hammer does not appear to be running.", pszCommand);
-			MessageBoxA(nullptr, szError, "Hammer - Send Shell Command Error", MB_OK | MB_ICONERROR);
+			Plat_MessageBox("Hammer - Error", "Send Shell Command Error", szError, Plat_MessageBoxButton::Ok, Plat_MessageBoxIcon::Error );
 		}
 
 		return(Editor_NotRunning);

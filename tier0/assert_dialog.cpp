@@ -6,9 +6,7 @@
 
 #if defined( _WIN32 )
 #include "winlite.h"
-#include <CommCtrl.h>
 #include "windows/dpi_wnd_behavior.h"
-#include "windows/com_error_category.h"
 
 // dimhotepus: Launcher icon id.
 #include "../launcher_main/resource.h"
@@ -475,25 +473,6 @@ static void SpewBacktrace()
 
 #endif
 
-#ifdef _WIN32
-
-template<intp size>
-wchar_t* Utf8ToWide( const char *utf8, wchar_t (&buffer)[size] ) noexcept
-{
-	const int written_chars{ ::MultiByteToWideChar( CP_UTF8, 0, utf8, -1, buffer, size ) };
-
-	if ( !written_chars )
-	{
-		wcsncpy( buffer, L"N/A", size - 1 );
-	}
-
-	buffer[ size - 1] = L'\0';
-
-	return buffer;
-}
-
-#endif
-
 DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tchar *pExpression )
 {
 	LOCAL_THREAD_LOCK();
@@ -546,28 +525,18 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 
 	if ( !ThreadInMainThread() )
 	{
-		int nButtonPressed;
-		wchar_t wideExpression[512];
+		const auto buttonPressed = Plat_MessageBox(
+			"Source - Assertion Failed",
+			"Assert Failed",
+			pExpression,
+			Plat_MessageBoxButton::Cancel & Plat_MessageBoxButton::Retry,
+			Plat_MessageBoxIcon::Information );
 
-		const HRESULT hr{ TaskDialog( nullptr,
-			nullptr,
-			L"Source - Assertion Failed",
-			L"Assert Failed",
-			Utf8ToWide( pExpression, wideExpression ),
-			TDCBF_CANCEL_BUTTON | TDCBF_RETRY_BUTTON,
-			TD_INFORMATION_ICON,
-			&nButtonPressed ) };
-		if ( FAILED(hr) )
-		{
-			// If nice dialog fail (ex. out of memory), then use message box as fallback.
-			nButtonPressed = MessageBox( nullptr, pExpression, "Source - Assertion Failed", MB_SYSTEMMODAL | MB_RETRYCANCEL | MB_ICONQUESTION );
-		}
-
-		if ( IDRETRY == nButtonPressed )
+		if ( Plat_MessageBoxButton::Retry == buttonPressed )
 		{
 			g_bBreak.store(true, std::memory_order::memory_order_relaxed);
 		}
-		else if ( IDCANCEL == nButtonPressed )
+		else if ( Plat_MessageBoxButton::Cancel == buttonPressed )
 		{
 			IgnoreAssertsNearby( 0 );
 		}

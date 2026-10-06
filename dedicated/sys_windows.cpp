@@ -72,9 +72,8 @@ class WindowsSystem : public ISystem {
 };
 
 void WindowsSystem::ErrorMessage(int level, const char *msg) {
-  MessageBoxA(nullptr, msg, "SRCDS - Fatal Error",
-              MB_OK | MB_ICONERROR | MB_TASKMODAL);
-
+  Plat_MessageBox("SRCDS - Fatal Error", "SRCDS Error", msg,
+                  Plat_MessageBoxButton::Ok, Plat_MessageBoxIcon::Error);
   PostQuitMessage(0);
 }
 

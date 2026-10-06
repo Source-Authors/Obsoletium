@@ -110,6 +110,205 @@ double Plat_FloatTime()
 	return g_FakeBenchmarkTime;
 }
 
+#ifdef _WIN32
+template<intp size>
+static wchar_t* Utf8ToWide( IN_Z const char *utf8, OUT_Z_ARRAY wchar_t (&buffer)[size] ) noexcept
+{
+	buffer[0] = L'\0';
+
+	const int written_chars{ ::MultiByteToWideChar( CP_UTF8, 0, utf8, -1, buffer, size ) };
+	if ( !written_chars )
+	{
+		wcsncpy( buffer, L"N/A", size - 1 );
+	}
+
+	buffer[ size - 1] = L'\0';
+	return buffer;
+}
+
+template <typename TEnum>
+using IsEnum = std::enable_if_t<std::is_enum_v<TEnum>, bool>;
+
+template<typename TEnum>
+[[nodiscard]] constexpr static IsEnum<TEnum> HasFlag( TEnum value, TEnum flag )
+{
+	return ( value & flag ) == flag;
+}
+
+[[nodiscard]] constexpr static TASKDIALOG_COMMON_BUTTON_FLAGS GetTaskDialogButtons(
+	Plat_MessageBoxButton buttons )
+{
+	TASKDIALOG_COMMON_BUTTON_FLAGS taskDialogButtons = 0;
+
+	if ( HasFlag( buttons, Plat_MessageBoxButton::Ok ) )
+	{
+		taskDialogButtons |= TDCBF_OK_BUTTON;
+	}
+
+	if ( HasFlag( buttons, Plat_MessageBoxButton::Yes ) )
+	{
+		taskDialogButtons |= TDCBF_YES_BUTTON;
+	}
+
+	if ( HasFlag( buttons, Plat_MessageBoxButton::No ) )
+	{
+		taskDialogButtons |= TDCBF_NO_BUTTON;
+	}
+
+	if ( HasFlag( buttons, Plat_MessageBoxButton::Cancel ) )
+	{
+		taskDialogButtons |= TDCBF_CANCEL_BUTTON;
+	}
+	
+	if ( HasFlag( buttons, Plat_MessageBoxButton::Retry ) )
+	{
+		taskDialogButtons |= TDCBF_RETRY_BUTTON;
+	}
+
+	return taskDialogButtons;
+}
+
+[[nodiscard]] constexpr static int GetMessageBoxButtons(
+	Plat_MessageBoxButton buttons )
+{
+	int messageBoxButtons = 0;
+
+	if ( HasFlag( buttons, Plat_MessageBoxButton::Ok ) )
+	{
+		messageBoxButtons = MB_OK;
+	}
+	else if ( HasFlag( buttons, Plat_MessageBoxButton::Yes ) ||
+		      HasFlag( buttons, Plat_MessageBoxButton::No ) )
+	{
+		messageBoxButtons = MB_YESNO;
+	}
+	else if ( HasFlag( buttons, Plat_MessageBoxButton::Cancel ) )
+	{
+		messageBoxButtons = MB_OKCANCEL;
+	}
+	else if ( HasFlag( buttons, Plat_MessageBoxButton::Retry ) )
+	{
+		messageBoxButtons = MB_RETRYCANCEL;
+	}
+
+	return messageBoxButtons;
+}
+
+[[nodiscard]] static Plat_MessageBoxButton GetPressedButton( int button )
+{
+	if ( button == 0 )
+	{
+		return Plat_MessageBoxButton::None;
+	}
+
+	if ( button == IDOK )
+	{
+		return Plat_MessageBoxButton::Ok;
+	}
+
+	if ( button == IDYES )
+	{
+		return Plat_MessageBoxButton::Yes;
+	}
+
+	if ( button == IDNO )
+	{
+		return Plat_MessageBoxButton::No;
+	}
+
+	if ( button == IDCANCEL )
+	{
+		return Plat_MessageBoxButton::Cancel;
+	}
+
+	if ( button == IDRETRY )
+	{
+		return Plat_MessageBoxButton::Retry;
+	}
+
+	AssertMsg( false, "Unknown message box button pressed 0x%x.", static_cast<int>( button ) );
+	return Plat_MessageBoxButton::None;
+}
+
+[[nodiscard]] static const wchar_t * GetTaskDialogIcon( Plat_MessageBoxIcon icon )
+{
+	switch (icon)
+	{
+		case Plat_MessageBoxIcon::None:
+			return nullptr;
+		case Plat_MessageBoxIcon::Information:
+			return TD_INFORMATION_ICON;
+		case Plat_MessageBoxIcon::Warning:
+			return TD_WARNING_ICON;
+		case Plat_MessageBoxIcon::Error:
+			return TD_ERROR_ICON;
+		default:
+			AssertMsg( false, "Unknown message box icon 0x%x.", static_cast<int>( icon ) );
+			return nullptr;
+	}
+}
+
+[[nodiscard]] static int GetMessageBoxIcon( Plat_MessageBoxIcon icon )
+{
+	switch (icon)
+	{
+		case Plat_MessageBoxIcon::None:
+			return 0;
+		case Plat_MessageBoxIcon::Information:
+			return MB_ICONINFORMATION;
+		case Plat_MessageBoxIcon::Warning:
+			return MB_ICONWARNING;
+		case Plat_MessageBoxIcon::Error:
+			return MB_ICONERROR;
+		default:
+			AssertMsg( false, "Unknown message box icon 0x%x.", static_cast<int>( icon ) );
+			return 0;
+	}
+}
+#endif  // _WIN32
+
+Plat_MessageBoxButton Plat_MessageBox( IN_Z const char* title,
+									   IN_Z const char* mainInstruction,
+									   IN_Z const char* content,
+									   Plat_MessageBoxButton buttons,
+									   Plat_MessageBoxIcon icon )
+{
+#ifdef _WIN32
+	int nButtonPressed;
+	wchar_t wideTitle[512], wideMainInstruction[512], wideContent[512];
+
+	const HRESULT hr{ ::TaskDialog( nullptr,
+		nullptr,
+		Utf8ToWide( title, wideTitle ),
+		Utf8ToWide( mainInstruction, wideMainInstruction ),
+		Utf8ToWide( content, wideContent ),
+		GetTaskDialogButtons( buttons ),
+		GetTaskDialogIcon( icon ),
+		&nButtonPressed ) };
+	if ( SUCCEEDED(hr) )
+	{
+		return GetPressedButton( nButtonPressed );
+	}
+
+	wchar_t wideCombinedContent[512 * 2 + 2];
+	wideCombinedContent[0] = L'\0';
+
+	wcscpy_s( wideCombinedContent, wideMainInstruction );
+	wcscat_s( wideCombinedContent, L"\n\n" );
+	wcscat_s( wideCombinedContent, wideContent );
+
+	// If nice dialog fail (ex. out of memory), then use message box as fallback.
+	nButtonPressed = MessageBoxW(
+		nullptr,
+		wideCombinedContent,
+		wideTitle,
+		MB_SYSTEMMODAL | GetMessageBoxIcon( icon ) | GetMessageBoxButtons( buttons ) );
+	return GetPressedButton( nButtonPressed );
+#else
+
+#endif
+}
+
 uint32 Plat_MSTime()
 {
 	if ( !g_bBenchmarkMode.load(std::memory_order::memory_order_relaxed) )
@@ -305,11 +504,11 @@ static BOOL IsUserAdmin() {
       0, 0, 0, 0, 0, &administratorsGroup);
 
   if (ok) {
+    RunCodeAtScopeExit(FreeSid(administratorsGroup));
+
     if (!CheckTokenMembership(nullptr, administratorsGroup, &ok)) {
       ok = FALSE;
     }
-
-    FreeSid(administratorsGroup);
   }
 
   return ok;

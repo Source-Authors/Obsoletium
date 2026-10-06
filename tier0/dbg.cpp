@@ -5,7 +5,6 @@
 
 #if defined( _WIN32 ) && !defined( _X360 )
 #include "tier0/valve_off.h"
-#pragma comment(lib,"user32.lib")	// For MessageBox
 #endif
 
 #ifdef POSIX

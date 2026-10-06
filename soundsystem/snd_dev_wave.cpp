@@ -219,13 +219,14 @@ void CAudioDeviceWave::OpenWaveOut( void )
 			return;
 		}
 
-		int nRetVal = MessageBox( NULL,
-			"The sound hardware is in use by another app.\n\n"
-			"Select Retry to try to start sound again or Cancel to run with no sound.",
+		const auto pressedButton = Plat_MessageBox(
 			"Game - Sound Not Available Warning",
-			MB_RETRYCANCEL | MB_SETFOREGROUND | MB_ICONEXCLAMATION);
+			"The sound hardware is in use by another app.\n\n",
+			"Select Retry to try to start sound again or close to run with no sound.",
+			Plat_MessageBoxButton::Retry,
+			Plat_MessageBoxIcon::Warning );
 
-		if ( nRetVal != IDRETRY )
+		if ( pressedButton != Plat_MessageBoxButton::Retry )
 		{
 			DWarning( "soundsystem", 1, "waveOutOpen failure: hardware already in use\n" );
 			m_waveOutHandle = 0;
