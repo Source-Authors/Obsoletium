@@ -1468,13 +1468,24 @@ void CStudioHdr::RunFlexRules( const float *src, float *dest )
 
 			switch (pops->op)
 			{
-			case STUDIO_ADD: stack[k-2] = stack[k-2] + stack[k-1]; k--; break;
-			case STUDIO_SUB: stack[k-2] = stack[k-2] - stack[k-1]; k--; break;
-			case STUDIO_MUL: stack[k-2] = stack[k-2] * stack[k-1]; k--; break;
+			case STUDIO_ADD: {
+				Assert(k >= 2);
+				stack[k-2] += stack[k-1]; k--; break;
+			}
+			case STUDIO_SUB: {
+				Assert(k >= 2);
+				stack[k-2] -= stack[k-1]; k--; break;
+			}
+			case STUDIO_MUL: {
+				Assert(k >= 2);
+				stack[k-2] *= stack[k-1]; k--; break;
+			}
 			case STUDIO_DIV:
-				if (stack[k-1] > 0.0001)
+			{
+				Assert(k >= 2);
+				if (stack[k-1] > 0.0001f)
 				{
-					stack[k-2] = stack[k-2] / stack[k-1];
+					stack[k-2] /= stack[k-1];
 				}
 				else
 				{
@@ -1482,9 +1493,19 @@ void CStudioHdr::RunFlexRules( const float *src, float *dest )
 				}
 				k--; 
 				break;
-			case STUDIO_NEG: stack[k-1] = -stack[k-1]; break;
-			case STUDIO_MAX: stack[k-2] = max( stack[k-2], stack[k-1] ); k--; break;
-			case STUDIO_MIN: stack[k-2] = min( stack[k-2], stack[k-1] ); k--; break;
+			}
+			case STUDIO_NEG: {
+				Assert(k >= 1);
+				stack[k-1] = -stack[k-1]; break;
+			}
+			case STUDIO_MAX: {
+				Assert(k >= 2);
+				stack[k-2] = max( stack[k-2], stack[k-1] ); k--; break;
+			}
+			case STUDIO_MIN:  {
+				Assert(k >= 2);
+				stack[k-2] = min( stack[k-2], stack[k-1] ); k--; break;
+			}
 			case STUDIO_CONST: stack[k] = pops->d.value; k++; break;
 			case STUDIO_FETCH1: 
 				{ 
