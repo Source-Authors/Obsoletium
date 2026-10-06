@@ -168,9 +168,7 @@ bool IsEnd(char const *pLine) {
 
 // Wrong name for the use of it.
 void scale_vertex(Vector &org) {
-  org[0] = org[0] * g_currentscale;
-  org[1] = org[1] * g_currentscale;
-  org[2] = org[2] * g_currentscale;
+  org *= g_currentscale;
 }
 
 void clip_rotations(RadianEuler &rot) {
