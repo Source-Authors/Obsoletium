@@ -118,7 +118,7 @@ bool CSoundCombiner::CreateWorkList( IFileSystem *pFilesystem, CUtlVector< Combi
 
 		if ( !LoadSentenceFromWavFile( fullpath, workitem->sentence ) )
 		{
-			Warning( "CSoundCombiner::CreateWorkList couldn't load %s for work item (%d)\n",
+			Warning( "CSoundCombiner::CreateWorkList couldn't load %s for work item (%zd)\n",
 				fullpath, i );
 			// dimhotepus: Delete work item on error.
 			delete workitem;
