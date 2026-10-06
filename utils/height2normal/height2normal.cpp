@@ -281,7 +281,7 @@ int main(int argc, char** argv) {
   }
 
   char cwd[MAX_PATH];
-  if (!_getcwd(cwd, ssize(cwd))) {
+  if (!_getcwd(cwd, static_cast<int>(ssize(cwd)))) {
     fprintf(stderr, "unable to get the current directory: %s.\n",
             std::generic_category().message(errno).c_str());
     return -1;
