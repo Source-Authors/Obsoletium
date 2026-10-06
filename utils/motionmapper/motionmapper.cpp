@@ -301,7 +301,7 @@ void Grab_Animation(s_source_t *psource) {
     } else if (sscanf(g_szLine, "%1023s %d", cmd, &index)) {
       cmd[ssize(cmd) - 1] = '\0';
       // get time
-      if (strcmp(cmd, "time") == 0) {
+      if (V_streq(cmd, "time")) {
         // again time IS an index
         t = index;
         if (psource->startframe == -1) {
@@ -335,7 +335,7 @@ void Grab_Animation(s_source_t *psource) {
         } else {
           // MdlError( "%s has duplicated frame %d\n", psource->filename, t );
         }
-      } else if (strcmp(cmd, "end") == 0) {
+      } else if (V_streq(cmd, "end")) {
         psource->numframes = psource->endframe - psource->startframe + 1;
 
         for (t = 0; t < psource->numframes; t++) {
@@ -915,25 +915,25 @@ int Load_SMD(s_source_t *psource) {
     // Blank line
     if ((numRead == EOF) || (numRead == 0)) continue;
 
-    if (strcmp(cmd, "version") == 0) {
+    if (V_streq(cmd, "version")) {
       if (option != 1) {
         MdlError("bad version\n");
       }
     }
     // Get hierarchy?
-    else if (strcmp(cmd, "nodes") == 0) {
+    else if (V_streq(cmd, "nodes")) {
       psource->numbones = Grab_Nodes(psource->localBone);
     }
     // Get animation??
-    else if (strcmp(cmd, "skeleton") == 0) {
+    else if (V_streq(cmd, "skeleton")) {
       Grab_Animation(psource);
     }
     // Geo?
-    else if (strcmp(cmd, "triangles") == 0) {
+    else if (V_streq(cmd, "triangles")) {
       Grab_Triangles(psource);
     }
     // Geo animation
-    else if (strcmp(cmd, "vertexanimation") == 0) {
+    else if (V_streq(cmd, "vertexanimation")) {
       Grab_Vertexanimation(psource);
     } else {
       MdlWarning("unknown studio command\n");
@@ -1642,7 +1642,7 @@ void split(char *str, char *sep, char **sp) {
 }
 
 int checkCommand(char *str, char *cmd, int numOptions, int numSplit) {
-  if (strcmp(str, cmd) == 0) {
+  if (V_streq(str, cmd)) {
     if (numOptions <= numSplit)
       return 1;
     else {
@@ -1769,7 +1769,7 @@ s_template_t *Load_Template(char *name) {
 //-----------------------------------------------------------------------------
 int GetNodeIndex(s_source_t *psource, char *nodeName) {
   for (int i = 0; i < psource->numbones; i++) {
-    if (strcmp(nodeName, psource->localBone[i].name) == 0) {
+    if (V_streq(nodeName, psource->localBone[i].name)) {
       return i;
     }
   }
@@ -1885,7 +1885,7 @@ void ScaleJointsFrame(s_source_t *pSkeleton, s_jointScale_t *jointScale,
   for (int i = 0; i < numBones; i++) {
     s_node_t pNode = pSkeleton->localBone[i];
     s_bone_t *pSkelBone = &pSkeleton->rawanim[t][i];
-    if (strcmp(jointScale->jointNameString, pNode.name) == 0) {
+    if (V_streq(jointScale->jointNameString, pNode.name)) {
       // printf("Scaling joint %s\n", pNode.name);
       pSkelBone->pos = pSkelBone->pos * jointScale->scale;
     }
@@ -2697,7 +2697,7 @@ void Grab_Vertexanimation(s_source_t *psource) {
       // next command
       if (sscanf(g_szLine, "%1023s %d", cmd, &index)) {
         cmd[ssize(cmd) - 1] = '\0';
-        if (strcmp(cmd, "time") == 0) {
+        if (V_streq(cmd, "time")) {
           t = index;
           count = 0;
 
@@ -2709,7 +2709,7 @@ void Grab_Vertexanimation(s_source_t *psource) {
           }
 
           t -= psource->startframe;
-        } else if (strcmp(cmd, "end") == 0) {
+        } else if (V_streq(cmd, "end")) {
           psource->numframes = psource->endframe - psource->startframe + 1;
           return;
         } else {
