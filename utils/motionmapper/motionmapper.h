@@ -56,8 +56,6 @@ EXTERN int numrep;
 EXTERN int flip_triangles;
 EXTERN float normal_blend;
 
-RESTRICT_FUNC void *kalloc(size_t num, size_t size);
-
 struct s_trianglevert_t {
   int vertindex;
   int normindex;  // index into normal array
@@ -261,10 +259,5 @@ struct v_unify_t {
 EXTERN v_unify_t *v_list[MAXSTUDIOVERTS];
 EXTERN v_unify_t v_listdata[MAXSTUDIOVERTS];
 EXTERN int numvlist;
-
-int SortAndBalanceBones(int iCount, int iMaxCount, int bones[],
-                        float weights[]);
-void Grab_Vertexanimation(FILE *in, s_source_t *psource);
-void BuildIndividualMeshes(s_source_t *psource);
 
 #endif  // SE_UTILS_MOTIONMAPPER_MOTIONMAPPER_H_
