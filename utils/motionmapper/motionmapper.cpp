@@ -1543,10 +1543,10 @@ struct s_template_t {
 //-----------------------------------------------------------------------------
 s_template_t* New_Template() {
   s_template_t* pTemplate = (s_template_t*)kalloc(1, sizeof(s_template_t));
-  pTemplate->rootScaleAmount = 1.0;
+  pTemplate->rootScaleAmount = 1.0f;
   pTemplate->numIKSolves = 0;
   pTemplate->numJointScales = 0;
-  pTemplate->toeFloorZ = 2.802277;
+  pTemplate->toeFloorZ = 2.802277f;
   pTemplate->numPlaneConstraints = 0;
   pTemplate->doSkeletonScale = 0;
   pTemplate->skeletonScale = 1.0;
@@ -1555,11 +1555,11 @@ s_template_t* New_Template() {
 s_iksolve_t* New_IKSolve() {
   s_iksolve_t* pIKSolve = (s_iksolve_t*)kalloc(1, sizeof(s_iksolve_t));
   pIKSolve->reverseSolve = 0;
-  pIKSolve->extremityScale = 1.0;
+  pIKSolve->extremityScale = 1.0f;
   pIKSolve->limbRootOffsetScale[0] = pIKSolve->limbRootOffsetScale[1] =
       pIKSolve->limbRootOffsetScale[2] = 0.0;
   pIKSolve->doRelativeLock = 0;
-  pIKSolve->relativeLockScale = 1.0;
+  pIKSolve->relativeLockScale = 1.0f;
   return pIKSolve;
 }
 
