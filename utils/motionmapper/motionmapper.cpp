@@ -81,12 +81,10 @@ static bool g_bFirstWarning = true;
 
 void MdlWarning(const char *fmt, ...) {
   va_list args;
-  static char output[1024];
 
   if (g_quiet) {
     if (g_bFirstWarning) {
       vprint(stderr, 0, "%s :\n", fullpath);
-
       g_bFirstWarning = false;
     }
 
