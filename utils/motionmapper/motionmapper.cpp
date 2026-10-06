@@ -37,15 +37,13 @@ struct Args {
   bool isVerbose;
 };
 
-char g_outfile[1024];
-constexpr inline bool uselogfile = false;
+struct ParseContext {
+  char fileName[1024];
+  int lineCount;
+};
 
-char g_szFilename[1024];
-char g_szLine[4096];
-int g_iLinecount;
-
-bool g_bZBrush = false;
-bool g_bGaveMissingBoneWarning = false;
+constexpr inline bool g_bUseLogFile = false;
+constexpr inline bool g_bZBrush = false;
 
 void vprint(FILE* stream, int depth, const char* fmt, ...) {
   char string[8192];
@@ -54,7 +52,7 @@ void vprint(FILE* stream, int depth, const char* fmt, ...) {
   V_vsprintf_safe(string, fmt, va);
   va_end(va);
 
-  FILE* fp = uselogfile ? fopen("motion-mapper-log.txt", "ab") : nullptr;
+  FILE* fp = g_bUseLogFile ? fopen("motion-mapper-log.txt", "ab") : nullptr;
   RunCodeAtScopeExitOpt(fp, fclose(fp));
 
   while (depth-- > 0) {
@@ -217,7 +215,8 @@ void Build_Reference(s_source_t* psource) {
   }
 }
 
-int Grab_Nodes(const Args& args, FILE* in, s_node_t* pnodes) {
+int Grab_Nodes(const Args& args, FILE* in, s_node_t* pnodes,
+               ParseContext& context) {
   //
   // s_node_t structure: index is index!!
   //
@@ -229,13 +228,14 @@ int Grab_Nodes(const Args& args, FILE* in, s_node_t* pnodes) {
     pnodes[index].parent = -1;
   }
 
+  char line[4096];
   int parent;
   // March through nodes lines
-  while (fgets(g_szLine, sizeof(g_szLine), in) != NULL) {
-    g_iLinecount++;
+  while (fgets(line, sizeof(line), in) != NULL) {
+    context.lineCount++;
     // get tokens
     if (char name[1024];
-        sscanf(g_szLine, "%d \"%1023[^\"]\" %d", &index, name, &parent) == 3) {
+        sscanf(line, "%d \"%1023[^\"]\" %d", &index, name, &parent) == 3) {
       // check for duplicated bones
       /*
       if (!Q_isempty(pnodes[index].name))
@@ -256,11 +256,12 @@ int Grab_Nodes(const Args& args, FILE* in, s_node_t* pnodes) {
       return numbones + 1;
     }
   }
-  MdlError(args, "Unexpected EOF at line %d\n", g_iLinecount);
+  MdlError(args, "Unexpected EOF at line %d\n", context.lineCount);
   return 0;
 }
 
-void Grab_Animation(const Args& args, FILE* in, s_source_t* psource) {
+void Grab_Animation(const Args& args, FILE* in, s_source_t* psource,
+                    ParseContext& context) {
   Vector pos;
   RadianEuler rot;
   char cmd[1024];
@@ -273,16 +274,17 @@ void Grab_Animation(const Args& args, FILE* in, s_source_t* psource) {
   // size per frame
   int size = psource->numbones * sizeof(s_bone_t);
 
+  char line[4096];
   // march through animation
-  while (fgets(g_szLine, sizeof(g_szLine), in) != NULL) {
+  while (fgets(line, sizeof(line), in) != NULL) {
     // linecount
-    g_iLinecount++;
+    context.lineCount++;
     // split if big enoough
-    if (sscanf(g_szLine, "%d %f %f %f %f %f %f", &index, &pos[0], &pos[1],
-               &pos[2], &rot[0], &rot[1], &rot[2]) == 7) {
+    if (sscanf(line, "%d %f %f %f %f %f %f", &index, &pos[0], &pos[1], &pos[2],
+               &rot[0], &rot[1], &rot[2]) == 7) {
       // startframe is sanity check for having determined time
       if (psource->startframe < 0) {
-        MdlError(args, "Missing frame start(%d) : %s", g_iLinecount, g_szLine);
+        MdlError(args, "Missing frame start(%d) : %s", context.lineCount, line);
       }
 
       // scale if pertinent
@@ -291,7 +293,7 @@ void Grab_Animation(const Args& args, FILE* in, s_source_t* psource) {
       VectorCopy(rot, psource->rawanim[t][index].rot);
 
       clip_rotations(rot);  // !!!
-    } else if (sscanf(g_szLine, "%1023s %d", cmd, &index)) {
+    } else if (sscanf(line, "%1023s %d", cmd, &index)) {
       cmd[ssize(cmd) - 1] = '\0';
       // get time
       if (V_streq(cmd, "time")) {
@@ -302,7 +304,7 @@ void Grab_Animation(const Args& args, FILE* in, s_source_t* psource) {
         }
         // sanity check time (little funny logic here, see previous IF)
         if (t < psource->startframe) {
-          MdlError(args, "Frame MdlError(%d) : %s", g_iLinecount, g_szLine);
+          MdlError(args, "Frame MdlError(%d) : %s", context.lineCount, line);
         }
         // bump up endframe?
         if (t > psource->endframe) {
@@ -341,10 +343,10 @@ void Grab_Animation(const Args& args, FILE* in, s_source_t* psource) {
         Build_Reference(psource);
         return;
       } else {
-        MdlError(args, "MdlError(%d) : %s", g_iLinecount, g_szLine);
+        MdlError(args, "MdlError(%d) : %s", context.lineCount, line);
       }
     } else {
-      MdlError(args, "MdlError(%d) : %s", g_iLinecount, g_szLine);
+      MdlError(args, "MdlError(%d) : %s", context.lineCount, line);
     }
   }
 
@@ -388,7 +390,7 @@ int SortAndBalanceBones(int iCount, int iMaxCount, int bones[],
                         float weights[]);
 
 void ParseFaceData(const Args& args, FILE* in, s_source_t* psource,
-                   int material, s_face_t* pFace) {
+                   int material, s_face_t* pFace, ParseContext& context) {
   int index[3];
   int i, j;
   Vector p;
@@ -398,28 +400,28 @@ void ParseFaceData(const Args& args, FILE* in, s_source_t* psource,
   float weights[MAXSTUDIOSRCBONES];
   int bone;
 
+  char line[4096];
   for (j = 0; j < 3; j++) {
-    memset(g_szLine, 0, sizeof(g_szLine));
+    memset(line, 0, sizeof(line));
 
-    if (fgets(g_szLine, sizeof(g_szLine), in) == NULL) {
-      MdlError(args, "%s: error on g_szLine %d: %s", g_szFilename, g_iLinecount,
-               g_szLine);
+    if (fgets(line, sizeof(line), in) == NULL) {
+      MdlError(args, "%s: error on line %d: %s", context.fileName,
+               context.lineCount, line);
     }
 
     iCount = 0;
 
-    g_iLinecount++;
-    i = sscanf(g_szLine,
-               "%d %f %f %f %f %f %f %f %f %d %d %f %d %f %d %f %d %f", &bone,
-               &p[0], &p[1], &p[2], &normal[0], &normal[1], &normal[2], &t[0],
-               &t[1], &iCount, &bones[0], &weights[0], &bones[1], &weights[1],
-               &bones[2], &weights[2], &bones[3], &weights[3]);
+    context.lineCount++;
+    i = sscanf(line, "%d %f %f %f %f %f %f %f %f %d %d %f %d %f %d %f %d %f",
+               &bone, &p[0], &p[1], &p[2], &normal[0], &normal[1], &normal[2],
+               &t[0], &t[1], &iCount, &bones[0], &weights[0], &bones[1],
+               &weights[1], &bones[2], &weights[2], &bones[3], &weights[3]);
 
     if (i < 9) continue;
 
     if (bone < 0 || bone >= psource->numbones) {
-      MdlError(args, "bogus bone index\n%d %s :\n%s", g_iLinecount,
-               g_szFilename, g_szLine);
+      MdlError(args, "bogus bone index\n%d %s :\n%s", context.lineCount,
+               context.fileName, line);
     }
 
     // Scale face pos
@@ -431,22 +433,22 @@ void ParseFaceData(const Args& args, FILE* in, s_source_t* psource,
       int k;
       intp ctr = 0;
       for (k = 0; k < 18; k++) {
-        while (g_szLine[ctr] == ' ') {
+        while (line[ctr] == ' ') {
           ctr++;
         }
-        char* tok = strtok(&g_szLine[ctr], " ");
+        char* tok = strtok(&line[ctr], " ");
         ctr += V_strlen(tok) + 1;
       }
       for (k = 4; k < iCount && k < MAXSTUDIOSRCBONES; k++) {
-        while (g_szLine[ctr] == ' ') {
+        while (line[ctr] == ' ') {
           ctr++;
         }
-        char* tok = strtok(&g_szLine[ctr], " ");
+        char* tok = strtok(&line[ctr], " ");
         ctr += V_strlen(tok) + 1;
 
         bones[k] = atoi(tok);
 
-        tok = strtok(&g_szLine[ctr], " ");
+        tok = strtok(&line[ctr], " ");
         ctr += V_strlen(tok) + 1;
 
         weights[k] = strtof(tok, nullptr);
@@ -801,7 +803,8 @@ void CalcModelTangentSpaces(s_source_t* pSrc) {
 
 void BuildIndividualMeshes(s_source_t* psource);
 
-void Grab_Triangles(const Args& args, FILE* in, s_source_t* psource) {
+void Grab_Triangles(const Args& args, FILE* in, s_source_t* psource,
+                    ParseContext& context) {
   // dimhtepus: changed to std::numeric_limits<float>::max() and
   // std::numeric_limits<float>::min() as 99999/-99999 is magic
   // consts.
@@ -822,28 +825,29 @@ void Grab_Triangles(const Args& args, FILE* in, s_source_t* psource) {
   int texture;
   int material;
   char texturename[64];
+  char line[4096];
 
   while (1) {
-    if (fgets(g_szLine, sizeof(g_szLine), in) == NULL) break;
+    if (fgets(line, sizeof(line), in) == NULL) break;
 
-    g_iLinecount++;
+    context.lineCount++;
 
     // check for end
-    if (IsEnd(g_szLine)) break;
+    if (IsEnd(line)) break;
 
     // Look for extra junk that we may want to avoid...
-    intp nLineLength = V_strlen(g_szLine);
+    intp nLineLength = V_strlen(line);
     if (nLineLength >= 64) {
       MdlWarning(
           args,
           "Unexpected data at line %d, (need a texture name) ignoring...\n",
-          g_iLinecount);
+          context.lineCount);
       continue;
     }
 
     intp i;
     // strip off trailing smag
-    V_strcpy_safe(texturename, g_szLine);
+    V_strcpy_safe(texturename, line);
     // dimhotepus: isgraph -> V_isgraph.
     for (i = V_strlen(texturename) - 1; i >= 0 && !V_isgraph(texturename[i]);
          i--) {
@@ -864,20 +868,20 @@ void Grab_Triangles(const Args& args, FILE* in, s_source_t* psource) {
 
     if (texturename[0] == '\0') {
       // weird source problem, skip them
-      fgets(g_szLine, sizeof(g_szLine), in);
-      fgets(g_szLine, sizeof(g_szLine), in);
-      fgets(g_szLine, sizeof(g_szLine), in);
-      g_iLinecount += 3;
+      fgets(line, sizeof(line), in);
+      fgets(line, sizeof(line), in);
+      fgets(line, sizeof(line), in);
+      context.lineCount += 3;
       continue;
     }
 
     if (stricmp(texturename, "null.bmp") == 0 ||
         stricmp(texturename, "null.tga") == 0) {
       // skip all faces with the null texture on them.
-      fgets(g_szLine, sizeof(g_szLine), in);
-      fgets(g_szLine, sizeof(g_szLine), in);
-      fgets(g_szLine, sizeof(g_szLine), in);
-      g_iLinecount += 3;
+      fgets(line, sizeof(line), in);
+      fgets(line, sizeof(line), in);
+      fgets(line, sizeof(line), in);
+      context.lineCount += 3;
       continue;
     }
 
@@ -886,7 +890,7 @@ void Grab_Triangles(const Args& args, FILE* in, s_source_t* psource) {
     material = use_texture_as_material(texture);
 
     s_face_t f;
-    ParseFaceData(args, in, psource, material, &f);
+    ParseFaceData(args, in, psource, material, &f, context);
 
     g_src_uface[g_numfaces] = f;
     g_face[g_numfaces].material = material;
@@ -896,12 +900,13 @@ void Grab_Triangles(const Args& args, FILE* in, s_source_t* psource) {
   BuildIndividualMeshes(psource);
 }
 
-void Grab_Vertexanimation(const Args& args, FILE* in, s_source_t* psource);
+void Grab_Vertexanimation(const Args& args, FILE* in, s_source_t* psource,
+                          ParseContext& context);
 
 //--------------------------------------------------------------------
 // Load a SMD file
 //--------------------------------------------------------------------
-int Load_SMD(const Args& args, s_source_t* psource) {
+int Load_SMD(const Args& args, s_source_t* psource, ParseContext& context) {
   char cmd[1024];
   int option;
 
@@ -916,10 +921,11 @@ int Load_SMD(const Args& args, s_source_t* psource) {
   }
 
   // March through lines
-  g_iLinecount = 0;
-  while (fgets(g_szLine, sizeof(g_szLine), in) != NULL) {
-    g_iLinecount++;
-    int numRead = sscanf(g_szLine, "%1023s %d", cmd, &option);
+  char line[4096];
+  context.lineCount = 0;
+  while (fgets(line, sizeof(line), in) != NULL) {
+    context.lineCount++;
+    int numRead = sscanf(line, "%1023s %d", cmd, &option);
     cmd[std::size(cmd) - 1] = '\0';
 
     // Blank line
@@ -932,19 +938,19 @@ int Load_SMD(const Args& args, s_source_t* psource) {
     }
     // Get hierarchy?
     else if (V_streq(cmd, "nodes")) {
-      psource->numbones = Grab_Nodes(args, in, psource->localBone);
+      psource->numbones = Grab_Nodes(args, in, psource->localBone, context);
     }
     // Get animation??
     else if (V_streq(cmd, "skeleton")) {
-      Grab_Animation(args, in, psource);
+      Grab_Animation(args, in, psource, context);
     }
     // Geo?
     else if (V_streq(cmd, "triangles")) {
-      Grab_Triangles(args, in, psource);
+      Grab_Triangles(args, in, psource, context);
     }
     // Geo animation
     else if (V_streq(cmd, "vertexanimation")) {
-      Grab_Vertexanimation(args, in, psource);
+      Grab_Vertexanimation(args, in, psource, context);
     } else {
       MdlWarning(args, "unknown studio command\n");
     }
@@ -974,7 +980,8 @@ static void FlipFacing(s_source_t* pSrc) {
 //-----------------------------------------------------------------------------
 
 s_source_t* Load_Source(const Args& args, char const* name, const char* ext,
-                        bool reverse, bool isActiveModel) {
+                        bool reverse, bool isActiveModel,
+                        ParseContext& context) {
   // Sanity check number of source files
   if (g_numsources >= MAXSTUDIOSEQUENCES)
     MdlError(args, "Load_Source( %s ) - overflowed g_numsources.", name);
@@ -998,7 +1005,7 @@ s_source_t* Load_Source(const Args& args, char const* name, const char* ext,
 
   // allocate space and whatnot
   g_source[g_numsources] = (s_source_t*)kalloc(1, sizeof(s_source_t));
-  V_strcpy_safe(g_source[g_numsources]->filename, g_szFilename);
+  V_strcpy_safe(g_source[g_numsources]->filename, context.fileName);
 
   // legacy stuff
   if (isActiveModel) {
@@ -1007,24 +1014,12 @@ s_source_t* Load_Source(const Args& args, char const* name, const char* ext,
 
   // more ext sanity check
   if ((!result && xext[0] == '\0') || stricmp(xext, "smd") == 0) {
-    V_sprintf_safe(g_szFilename, "%s%s.smd", cddir[numdirs], pTempName);
-    V_strcpy_safe(g_source[g_numsources]->filename, g_szFilename);
+    V_sprintf_safe(context.fileName, "%s%s.smd", cddir[numdirs], pTempName);
+    V_strcpy_safe(g_source[g_numsources]->filename, context.fileName);
 
     // Import part, load smd file
-    result = Load_SMD(args, g_source[g_numsources]);
+    result = Load_SMD(args, g_source[g_numsources], context);
   }
-
-  /*
-  if ( ( !result && xext[0] == '\0' ) || stricmp( xext, "dmx" ) == 0)
-  {
-          Q_snprintf( g_szFilename, sizeof(g_szFilename), "%s%s.dmx",
-  cddir[numdirs], pTempName ); V_strcpy_safe( g_source[g_numsources]->filename,
-  g_szFilename );
-
-          // Import part, load smd file
-          result = Load_DMX( g_source[g_numsources] );
-  }
-  */
 
   // Oops
   if (!result) {
@@ -1667,7 +1662,8 @@ int checkCommand(const Args& args, char* str, char* cmd, int numOptions,
   return 0;
 }
 
-s_template_t* Load_Template(const Args& args, char* name) {
+s_template_t* Load_Template(const Args& args, char* name,
+                            ParseContext& context) {
   // Sanity check file and init
   Assert(name);
 
@@ -1679,19 +1675,20 @@ s_template_t* Load_Template(const Args& args, char* name) {
   RunCodeAtScopeExit(fclose(in));
 
   // March through lines
-  g_iLinecount = 0;
-  while (fgets(g_szLine, sizeof(g_szLine), in) != NULL) {
-    g_iLinecount++;
-    if (g_szLine[0] == '#') continue;
+  char line[4096];
+  context.lineCount = 0;
+  while (fgets(line, sizeof(line), in) != NULL) {
+    context.lineCount++;
+    if (line[0] == '#') continue;
 
-    char* endP = strrchr(g_szLine, '\n');
+    char* endP = strrchr(line, '\n');
     if (endP != NULL) *endP = '\0';
 
     char* sp[128];
     char** spp = sp;
 
     char sep[] = " ";
-    split(g_szLine, sep, sp);
+    split(line, sep, sp);
     int numSplit = 0;
 
     while (*spp != NULL) {
@@ -1928,7 +1925,7 @@ void ScaleSkeleton(s_source_t* pSkeleton, float scale) {
 
 void CombineSkeletonAnimationFrame(const Args& args, s_source_t* pSkeleton,
                                    s_source_t* pAnimation, s_bone_t** ppAnim,
-                                   int t) {
+                                   int t, bool& bGaveMissingBoneWarning) {
   int numBones = pAnimation->numbones;
   int size = numBones * sizeof(s_bone_t);
   ppAnim[t] = (s_bone_t*)kalloc(1, size);
@@ -1941,8 +1938,9 @@ void CombineSkeletonAnimationFrame(const Args& args, s_source_t* pSkeleton,
         s_bone_t pSkelBone = pSkeleton->rawanim[0][i];
         ppAnim[t][i].pos = pSkelBone.pos;
       } else {
-        if (!g_bGaveMissingBoneWarning) {
-          g_bGaveMissingBoneWarning = true;
+        if (!bGaveMissingBoneWarning) {
+          bGaveMissingBoneWarning = true;
+
           MdlWarning(args,
                      "Target skeleton has less bones than source animation. "
                      "Reverting to source data for extra bones.\n");
@@ -1958,10 +1956,12 @@ void CombineSkeletonAnimationFrame(const Args& args, s_source_t* pSkeleton,
   }
 }
 void CombineSkeletonAnimation(const Args& args, s_source_t* pSkeleton,
-                              s_source_t* pAnimation, s_bone_t** ppAnim) {
+                              s_source_t* pAnimation, s_bone_t** ppAnim,
+                              bool& bGaveMissingBoneWarning) {
   int numFrames = pAnimation->numframes;
   for (int t = 0; t < numFrames; t++) {
-    CombineSkeletonAnimationFrame(args, pSkeleton, pAnimation, ppAnim, t);
+    CombineSkeletonAnimationFrame(args, pSkeleton, pAnimation, ppAnim, t,
+                                  bGaveMissingBoneWarning);
   }
 }
 
@@ -2010,12 +2010,15 @@ s_source_t* MotionMap(const Args& args, s_source_t* pSource,
   Vector rootScaleOrigin = pSource->rawanim[0][rootIndex].pos;
   rootScaleOrigin[2] = toeFloorZ;
 
+  bool bGaveMissingBoneWarning = false;
   // setup workspace
   s_bone_t* combinedRefAnimation[MAXSTUDIOANIMFRAMES];
   s_bone_t* combinedAnimation[MAXSTUDIOANIMFRAMES];
   s_bone_t* sourceAnimation[MAXSTUDIOANIMFRAMES];
-  CombineSkeletonAnimation(args, pTarget, pSource, combinedAnimation);
-  CombineSkeletonAnimation(args, pTarget, pSource, combinedRefAnimation);
+  CombineSkeletonAnimation(args, pTarget, pSource, combinedAnimation,
+                           bGaveMissingBoneWarning);
+  CombineSkeletonAnimation(args, pTarget, pSource, combinedRefAnimation,
+                           bGaveMissingBoneWarning);
 
   // do source and target sanity checking
   int sourceNumFrames = pSource->numframes;
@@ -2508,8 +2511,9 @@ limbRootOffsetScale 0.0 0.0 1.0\n\
 \n\
 ";
 
-[[noreturn]] void UsageAndExit(const Args &args) {
-  MdlError(args,
+[[noreturn]] void UsageAndExit(const Args& args) {
+  MdlError(
+      args,
       "usage: motionmapper [-quiet] [-verbose] [-templateFile filename] [-printTemplates] sourceanim.smd targetskeleton.smd output.smd\n\
 \tsourceanim:  should contain ref pose and animation data\n\
 \ttargetsekeleton:  should contain new ref pose, animation data ignored/can be absent\n\
@@ -2659,7 +2663,8 @@ void BuildIndividualMeshes(s_source_t* psource) {
   CalcModelTangentSpaces(psource);
 }
 
-void Grab_Vertexanimation(const Args &args, FILE* in, s_source_t* psource) {
+void Grab_Vertexanimation(const Args& args, FILE* in, s_source_t* psource,
+                          ParseContext& context) {
   char cmd[1024];
   int index;
   Vector pos{vec3_origin};
@@ -2668,16 +2673,18 @@ void Grab_Vertexanimation(const Args &args, FILE* in, s_source_t* psource) {
   int count = 0;
   static s_vertanim_t tmpvanim[MAXSTUDIOVERTS * 4];
 
+  char g_szLine[4096];
   while (fgets(g_szLine, sizeof(g_szLine), in) != NULL) {
-    g_iLinecount++;
+    context.lineCount++;
     if (sscanf(g_szLine, "%d %f %f %f %f %f %f", &index, &pos[0], &pos[1],
                &pos[2], &normal[0], &normal[1], &normal[2]) == 7) {
       if (psource->startframe < 0) {
-        MdlError(args, "Missing frame start(%d) : %s", g_iLinecount, g_szLine);
+        MdlError(args, "Missing frame start(%d) : %s", context.lineCount,
+                 g_szLine);
       }
 
       if (t < 0) {
-        MdlError(args, "VTA Frame Sync (%d) : %s", g_iLinecount, g_szLine);
+        MdlError(args, "VTA Frame Sync (%d) : %s", context.lineCount, g_szLine);
       }
 
       tmpvanim[count].vertex = index;
@@ -2707,10 +2714,12 @@ void Grab_Vertexanimation(const Args &args, FILE* in, s_source_t* psource) {
           count = 0;
 
           if (t < psource->startframe) {
-            MdlError(args, "Frame MdlError(%d) : %s", g_iLinecount, g_szLine);
+            MdlError(args, "Frame MdlError(%d) : %s", context.lineCount,
+                     g_szLine);
           }
           if (t > psource->endframe) {
-            MdlError(args, "Frame MdlError(%d) : %s", g_iLinecount, g_szLine);
+            MdlError(args, "Frame MdlError(%d) : %s", context.lineCount,
+                     g_szLine);
           }
 
           t -= psource->startframe;
@@ -2718,11 +2727,11 @@ void Grab_Vertexanimation(const Args &args, FILE* in, s_source_t* psource) {
           psource->numframes = psource->endframe - psource->startframe + 1;
           return;
         } else {
-          MdlError(args, "MdlError(%d) : %s", g_iLinecount, g_szLine);
+          MdlError(args, "MdlError(%d) : %s", context.lineCount, g_szLine);
         }
 
       } else {
-        MdlError(args, "MdlError(%d) : %s", g_iLinecount, g_szLine);
+        MdlError(args, "MdlError(%d) : %s", context.lineCount, g_szLine);
       }
     }
   }
@@ -2902,28 +2911,29 @@ int main(int argc, char** argv) {
   }
 
   // Filename arg indexes
-  int sourceanim = 0;
-  int targetskel = 1;
-  int outputanim = 2;
+  constexpr int sourceanim = 0;
+  constexpr int targetskel = 1;
+  constexpr int outputanim = 2;
 
+  char outfile[1024];
   // Copy arg string to global variable
-  V_strcpy_safe(g_outfile, filenames[outputanim].String());
+  V_strcpy_safe(outfile, filenames[outputanim].String());
 
   // Init filesystem hooey
-  const ScopedFileSystem scoped_file_system{g_outfile};
-  char pszFile[ssize(g_outfile)];
+  const ScopedFileSystem scoped_file_system{outfile};
+  char pszFile[ssize(outfile)];
   // ??
-  V_FileBase(g_outfile, pszFile);
+  V_FileBase(outfile, pszFile);
   // dimhotepus: Fix V_FileBase can't accept same arg.
-  V_strcpy_safe(g_outfile, pszFile);
+  V_strcpy_safe(outfile, pszFile);
 
   // Verbose stuff
   if (!args.isQuiet) {
-    vprint(stdout, 0, "%s, %s, %s\n", qdir, gamedir, g_outfile);
+    vprint(stdout, 0, "%s, %s, %s\n", qdir, gamedir, outfile);
   }
 
   // ??
-  Q_DefaultExtension(g_outfile, ".smd");
+  Q_DefaultExtension(outfile, ".smd");
 
   // Verbose stuff
   if (!args.isQuiet) {
@@ -2931,24 +2941,26 @@ int main(int argc, char** argv) {
            filenames[sourceanim].String());
     vprint(stdout, 0, "Target skeleton:  %s\n", filenames[targetskel].String());
 
-    vprint(stdout, 0, "Creating on \"%s\"\n", g_outfile);
+    vprint(stdout, 0, "Creating on \"%s\"\n", outfile);
   }
 
   // fullpath = EXTERNAL GLOBAL!!!???
-  V_strcpy_safe(fullpath, g_outfile);
+  V_strcpy_safe(fullpath, outfile);
   V_strcpy_safe(fullpath, ExpandPath(fullpath));
   V_strcpy_safe(fullpath, ExpandArg(fullpath));
 
+  ParseContext parseContext = {};
+
   // Load source and target data
-  s_source_t* pSource =
-      Load_Source(args, filenames[sourceanim].String(), "smd", false, false);
-  s_source_t* pTarget =
-      Load_Source(args,filenames[targetskel].String(), "smd", false, false);
+  s_source_t* pSource = Load_Source(args, filenames[sourceanim].String(), "smd",
+                                    false, false, parseContext);
+  s_source_t* pTarget = Load_Source(args, filenames[targetskel].String(), "smd",
+                                    false, false, parseContext);
 
   //
   s_template_t* pTemplate = NULL;
   if (!Q_isempty(templateFileName)) {
-    pTemplate = Load_Template(args, templateFileName);
+    pTemplate = Load_Template(args, templateFileName, parseContext);
   } else {
     printf("Note: No template file specified, using defaults settings.\n");
 
@@ -2962,10 +2974,8 @@ int main(int argc, char** argv) {
   // Save output (ref skeleton & animation data);
   Save_SMD(args, fullpath, pMappedAnimation);
 
-  Q_StripExtension(filenames[outputanim].String(), outname);
-
   // Verbose stuff
-  if (!args.isQuiet) vprint(stdout, 0, "\nCompleted \"%s\"\n", g_outfile);
+  if (!args.isQuiet) vprint(stdout, 0, "\nCompleted \"%s\"\n", outfile);
 
   return 0;
 }

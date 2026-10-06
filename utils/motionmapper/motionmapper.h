@@ -15,14 +15,6 @@
 
 struct LodScriptData_t;
 
-// little-endian "IDST"
-constexpr inline int IDSTUDIOHEADER = MAKEID('I', 'D', 'S', 'T');
-
-// little-endian "IDAG"
-constexpr inline int IDSTUDIOANIMGROUPHEADER = MAKEID('I', 'D', 'A', 'G');
-
-constexpr inline int STUDIO_QUADRATIC_MOTION{0x00002000};
-
 // max frames per animation
 constexpr inline int MAXSTUDIOANIMFRAMES{2000};
 // total sequences
@@ -39,7 +31,6 @@ constexpr inline int MAXSTUDIONAME{128};
 #define EXTERN
 #endif
 
-EXTERN char outname[1024];
 EXTERN int numdirs;
 EXTERN char cddir[32][MAX_PATH];
 EXTERN char fullpath[1024];
@@ -55,13 +46,6 @@ EXTERN int numrep;
 
 EXTERN int flip_triangles;
 EXTERN float normal_blend;
-
-struct s_trianglevert_t {
-  int vertindex;
-  int normindex;  // index into normal array
-  int s, t;
-  float u, v;
-};
 
 struct s_boneweight_t {
   int numbones;
@@ -256,7 +240,6 @@ struct v_unify_t {
   v_unify_t *next;
 };
 
-EXTERN v_unify_t *v_list[MAXSTUDIOVERTS];
 EXTERN v_unify_t v_listdata[MAXSTUDIOVERTS];
 EXTERN int numvlist;
 
