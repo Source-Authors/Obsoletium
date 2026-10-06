@@ -21,8 +21,6 @@
 
 namespace {
 
-bool g_Quiet = false;
-
 [[nodiscard]] bool ImageRGBA8888HasAlpha(unsigned char* pImage, int numTexels) {
   for (int i = 0; i < numTexels; i++) {
     if (pImage[i * 4 + 3] != 255) return true;
@@ -263,11 +261,12 @@ int main(int argc, char** argv) {
 
   const ScopedDefaultFileSystem scoped_default_file_system;
 
+  bool isQuiet = false;
   int i = 1;
   while (i < argc) {
     if (V_strieq(argv[i], "-quiet")) {
       i++;
-      g_Quiet = true;
+      isQuiet = true;
     }
 
     // dimhotepus: -nopause is not used in the code anymore, but it is still
@@ -301,7 +300,7 @@ int main(int argc, char** argv) {
       fileName = argv[i];
     }
 
-    if (!g_Quiet) printf("file: %s\n", fileName);
+    if (!isQuiet) printf("file: %s\n", fileName);
 
     float bumpScale = -1.0f;
     int startFrame = -1;
@@ -324,7 +323,7 @@ int main(int argc, char** argv) {
       continue;
     }
 
-    if (!g_Quiet) printf("\tbumpscale: %f\n", bumpScale);
+    if (!isQuiet) printf("\tbumpscale: %f\n", bumpScale);
 
     V_StripExtension(fileName, normalFileNameWithoutExtension);
     ProcessFiles(normalFileNameWithoutExtension, startFrame, endFrame,
