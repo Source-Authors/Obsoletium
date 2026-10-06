@@ -1123,7 +1123,7 @@ void Save_SMD(char const *filename, s_source_t *source) {
 
     g_pFileSystem->Write(buf.Base(), size_cast<int>(buf.TellPut()), fh);
   } else {
-    Warning("Warning: Unable to save SMD %s.\n", filename);
+    MdlWarning("Unable to save SMD %s.\n", filename);
   }
 }
 
@@ -1643,10 +1643,9 @@ int checkCommand(char *str, char *cmd, int numOptions, int numSplit) {
     if (numOptions <= numSplit)
       return 1;
     else {
-      fprintf(stderr,
-          "Error: Number or argument mismatch in template file cmd %s, "
-          "requires %i, found %i\n",
-          cmd, numOptions, numSplit);
+      MdlError("Number or argument mismatch in template file cmd %s, "
+               "requires %i, found %i\n",
+               cmd, numOptions, numSplit);
       return 0;
     }
   }
@@ -1928,8 +1927,8 @@ void CombineSkeletonAnimationFrame(s_source_t *pSkeleton,
       } else {
         if (!g_bGaveMissingBoneWarning) {
           g_bGaveMissingBoneWarning = true;
-          Warning(
-              "Warning: Target skeleton has less bones than source animation. "
+          MdlWarning(
+              "Target skeleton has less bones than source animation. "
               "Reverting to source data for extra bones.\n");
         }
 
@@ -1976,8 +1975,7 @@ s_source_t *MotionMap(s_source_t *pSource, s_source_t *pTarget,
   if (rootScaleIndex > -1) {
     GetNodePath(pSource, rootIndex, rootScaleIndex, rootScalePath);
   } else {
-    fprintf(stderr, "Error: Can't find node\n");
-    exit(1);
+    MdlError("Can't find node\n");
   }
   float rootScaleLengthSrc = pSource->rawanim[0][rootScaleIndex].pos[BONEDIR];
   float rootScaleParentLengthSrc =
@@ -2025,8 +2023,7 @@ s_source_t *MotionMap(s_source_t *pSource, s_source_t *pTarget,
       if (thisJointIndex > -1) {
         GetNodePath(pSource, rootIndex, thisJointIndex, thisJointPathInRoot);
       } else {
-        fprintf(stderr, "Error: Can't find node: %s\n", thisJointNameString);
-        exit(1);
+        MdlError("Can't find node: %s\n", thisJointNameString);
       }
 
       // leg "root" or thigh pointers
@@ -2144,9 +2141,7 @@ s_source_t *MotionMap(s_source_t *pSource, s_source_t *pTarget,
           GetNodePath(pSource, rootIndex, relativeJointIndex,
                       relativeJointPathInRoot);
         } else {
-          fprintf(stderr, "Error: Can't find node: %s\n",
-                  relativeJointNameString);
-          exit(1);
+          MdlError("Can't find node: %s\n", relativeJointNameString);
         }
         // get the source relative joint
         M_matrix4x4_t relativeJointInRootMatSrc,
@@ -2357,8 +2352,7 @@ s_source_t *MotionMap(s_source_t *pSource, s_source_t *pTarget,
       if (thisJointIndex > -1) {
         GetNodePath(pSource, -1, thisJointIndex, thisJointPath);
       } else {
-        fprintf(stderr, "Error: Can't find node: %s\n", thisJointNameString);
-        exit(1);
+        MdlError("Can't find node: %s\n", thisJointNameString);
       }
       int parentIndex = thisJointPath[1];
       int *parentPath = thisJointPath + 1;
@@ -2375,9 +2369,8 @@ s_source_t *MotionMap(s_source_t *pSource, s_source_t *pTarget,
         // printf("-- broken plane: %f\n",
         // thisJointGlobalMat[3][thisSolve->axis]);
         if (parentJointGlobalMat[3][thisSolve->axis] < thisSolve->floor) {
-          fprintf(stderr,
-              "Error: Constraint parent has broken the plane, this frame's "
-              "plane constraint unsolvable!\n");
+          MdlError("Constraint parent has broken the plane, this frame's "
+                   "plane constraint unsolvable!\n");
         } else {
           Vector parentJointAtPlane(parentJointGlobalMat[3][0],
                                     parentJointGlobalMat[3][1],
