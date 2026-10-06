@@ -528,11 +528,12 @@ int material_to_texture(int material) {
 }
 
 template <intp maxlen>
-int lookup_texture(const Args& args, OUT_Z_ARRAY char (&texturename)[maxlen]) {
+int lookup_texture(const Args& args, INOUT_Z_ARRAY char (&texturename)[maxlen]) {
+  char temp[maxlen];
+  V_StripExtension(texturename, temp);
+  V_strcpy_safe(texturename, temp);
+
   int i;
-
-  V_StripExtension(texturename, texturename);
-
   for (i = 0; i < g_numtextures; i++) {
     if (V_strieq(g_texture[i].name, texturename)) {
       return i;
@@ -546,14 +547,6 @@ int lookup_texture(const Args& args, OUT_Z_ARRAY char (&texturename)[maxlen]) {
   V_strcpy_safe(g_texture[i].name, texturename);
 
   g_texture[i].material = -1;
-  /*
-  if (stristr( texturename, "chrome" ) != NULL) {
-          texture[i].flags = STUDIO_NF_FLATSHADE | STUDIO_NF_CHROME;
-  }
-  else {
-          texture[i].flags = 0;
-  }
-  */
   g_numtextures++;
   return i;
 }
@@ -2673,18 +2666,18 @@ void Grab_Vertexanimation(const Args& args, FILE* in, s_source_t* psource,
   int count = 0;
   static s_vertanim_t tmpvanim[MAXSTUDIOVERTS * 4];
 
-  char g_szLine[4096];
-  while (fgets(g_szLine, sizeof(g_szLine), in) != NULL) {
+  char line[4096];
+  while (fgets(line, sizeof(line), in) != NULL) {
     context.lineCount++;
-    if (sscanf(g_szLine, "%d %f %f %f %f %f %f", &index, &pos[0], &pos[1],
+    if (sscanf(line, "%d %f %f %f %f %f %f", &index, &pos[0], &pos[1],
                &pos[2], &normal[0], &normal[1], &normal[2]) == 7) {
       if (psource->startframe < 0) {
         MdlError(args, "Missing frame start(%d) : %s", context.lineCount,
-                 g_szLine);
+                 line);
       }
 
       if (t < 0) {
-        MdlError(args, "VTA Frame Sync (%d) : %s", context.lineCount, g_szLine);
+        MdlError(args, "VTA Frame Sync (%d) : %s", context.lineCount, line);
       }
 
       tmpvanim[count].vertex = index;
@@ -2707,7 +2700,7 @@ void Grab_Vertexanimation(const Args& args, FILE* in, s_source_t* psource,
       }
 
       // next command
-      if (sscanf(g_szLine, "%1023s %d", cmd, &index)) {
+      if (sscanf(line, "%1023s %d", cmd, &index)) {
         cmd[ssize(cmd) - 1] = '\0';
         if (V_streq(cmd, "time")) {
           t = index;
@@ -2715,11 +2708,11 @@ void Grab_Vertexanimation(const Args& args, FILE* in, s_source_t* psource,
 
           if (t < psource->startframe) {
             MdlError(args, "Frame MdlError(%d) : %s", context.lineCount,
-                     g_szLine);
+                     line);
           }
           if (t > psource->endframe) {
             MdlError(args, "Frame MdlError(%d) : %s", context.lineCount,
-                     g_szLine);
+                     line);
           }
 
           t -= psource->startframe;
@@ -2727,11 +2720,11 @@ void Grab_Vertexanimation(const Args& args, FILE* in, s_source_t* psource,
           psource->numframes = psource->endframe - psource->startframe + 1;
           return;
         } else {
-          MdlError(args, "MdlError(%d) : %s", context.lineCount, g_szLine);
+          MdlError(args, "MdlError(%d) : %s", context.lineCount, line);
         }
 
       } else {
-        MdlError(args, "MdlError(%d) : %s", context.lineCount, g_szLine);
+        MdlError(args, "MdlError(%d) : %s", context.lineCount, line);
       }
     }
   }
