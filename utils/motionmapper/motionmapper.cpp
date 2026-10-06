@@ -1761,7 +1761,7 @@ s_template_t* Load_Template(const Args& args, char* name,
       pTemplate->doSkeletonScale = 1;
       pTemplate->skeletonScale = strtof(sp[1], nullptr);
     } else {
-      MdlWarning(args, "unknown studio command\n");
+      MdlWarning(args, "unknown studio command %s\n", cmd);
     }
   }
   return pTemplate;
