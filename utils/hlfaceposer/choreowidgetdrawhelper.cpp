@@ -204,7 +204,7 @@ HDC CChoreoWidgetDrawHelper::GrabDC( void )
 //			*fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CChoreoWidgetDrawHelper::CalcTextRect( const char *font, int pointsize, int weight, int maxwidth, RECT& rcText, const char *fmt, ... )
+void CChoreoWidgetDrawHelper::CalcTextRect( const char *font, int pointsize, int weight, int maxwidth, RECT& rcText, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list args;
 	static char output[1024];
@@ -245,7 +245,7 @@ void CChoreoWidgetDrawHelper::CalcTextRect( const char *font, int pointsize, int
 //			... - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CChoreoWidgetDrawHelper::CalcTextWidth( const char *font, int pointsize, int weight, const char *fmt, ... )
+int CChoreoWidgetDrawHelper::CalcTextWidth( const char *font, int pointsize, int weight, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list args;
 	static char output[1024];
@@ -296,7 +296,7 @@ int CChoreoWidgetDrawHelper::CalcTextWidth( const char *font, int pointsize, int
 //			... - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CChoreoWidgetDrawHelper::CalcTextWidthW( const char *font, int pointsize, int weight, const wchar_t *fmt, ... )
+int CChoreoWidgetDrawHelper::CalcTextWidthW( const char *font, int pointsize, int weight, PRINTF_FORMAT_STRING const wchar_t *fmt, ... )
 {
 	va_list args;
 	static wchar_t output[1024];
@@ -344,7 +344,7 @@ int CChoreoWidgetDrawHelper::CalcTextWidthW( const char *font, int pointsize, in
 //			... - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CChoreoWidgetDrawHelper::CalcTextWidth( HFONT fnt, const char *fmt, ... )
+int CChoreoWidgetDrawHelper::CalcTextWidth( HFONT fnt, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list args;
 	static char output[1024];
@@ -369,7 +369,7 @@ int CChoreoWidgetDrawHelper::CalcTextWidth( HFONT fnt, const char *fmt, ... )
 	return rcText.right;
 }
 
-int CChoreoWidgetDrawHelper::CalcTextWidthW( HFONT fnt, const wchar_t *fmt, ... )
+int CChoreoWidgetDrawHelper::CalcTextWidthW( HFONT fnt, PRINTF_FORMAT_STRING const wchar_t *fmt, ... )
 {
 	va_list args;
 	static wchar_t output[1024];
@@ -403,7 +403,7 @@ int CChoreoWidgetDrawHelper::CalcTextWidthW( HFONT fnt, const wchar_t *fmt, ... 
 //			*fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CChoreoWidgetDrawHelper::DrawColoredText( const char *font, int pointsize, int weight, COLORREF clr, RECT& rcText, const char *fmt, ... )
+void CChoreoWidgetDrawHelper::DrawColoredText( const char *font, int pointsize, int weight, COLORREF clr, RECT& rcText, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list args;
 	static char output[1024];
@@ -425,7 +425,7 @@ void CChoreoWidgetDrawHelper::DrawColoredText( const char *font, int pointsize, 
 //			*fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CChoreoWidgetDrawHelper::DrawColoredTextW( const char *font, int pointsize, int weight, COLORREF clr, RECT& rcText, const wchar_t *fmt, ... )
+void CChoreoWidgetDrawHelper::DrawColoredTextW( const char *font, int pointsize, int weight, COLORREF clr, RECT& rcText, PRINTF_FORMAT_STRING const wchar_t *fmt, ... )
 {
 	va_list args;
 	static wchar_t output[1024];
@@ -446,7 +446,7 @@ void CChoreoWidgetDrawHelper::DrawColoredTextW( const char *font, int pointsize,
 //			*fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CChoreoWidgetDrawHelper::DrawColoredText( HFONT font, COLORREF clr, RECT& rcText, const char *fmt, ... )
+void CChoreoWidgetDrawHelper::DrawColoredText( HFONT font, COLORREF clr, RECT& rcText, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list args;
 	static char output[1024];
@@ -478,7 +478,7 @@ void CChoreoWidgetDrawHelper::DrawColoredText( HFONT font, COLORREF clr, RECT& r
 //			*fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CChoreoWidgetDrawHelper::DrawColoredTextW( HFONT font, COLORREF clr, RECT& rcText, const wchar_t *fmt, ... )
+void CChoreoWidgetDrawHelper::DrawColoredTextW( HFONT font, COLORREF clr, RECT& rcText, PRINTF_FORMAT_STRING const wchar_t *fmt, ... )
 {
 	va_list args;
 	static wchar_t output[1024];
@@ -511,7 +511,7 @@ void CChoreoWidgetDrawHelper::DrawColoredTextW( HFONT font, COLORREF clr, RECT& 
 //			*fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CChoreoWidgetDrawHelper::DrawColoredTextCharset( const char *font, int pointsize, int weight, DWORD charset, COLORREF clr, RECT& rcText, const char *fmt, ... )
+void CChoreoWidgetDrawHelper::DrawColoredTextCharset( const char *font, int pointsize, int weight, DWORD charset, COLORREF clr, RECT& rcText, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list args;
 	static char output[1024];
@@ -552,7 +552,7 @@ void CChoreoWidgetDrawHelper::DrawColoredTextCharset( const char *font, int poin
 	DrawText( m_dcMemory, output, -1, &rcTextOffset, DT_LEFT | DT_NOPREFIX | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS );
 }
 
-void CChoreoWidgetDrawHelper::DrawColoredTextCharsetW( const char *font, int pointsize, int weight, DWORD charset, COLORREF clr, RECT& rcText, const wchar_t *fmt, ... )
+void CChoreoWidgetDrawHelper::DrawColoredTextCharsetW( const char *font, int pointsize, int weight, DWORD charset, COLORREF clr, RECT& rcText, PRINTF_FORMAT_STRING const wchar_t *fmt, ... )
 {
 	va_list args;
 	static wchar_t output[1024];
@@ -604,7 +604,7 @@ void CChoreoWidgetDrawHelper::DrawColoredTextCharsetW( const char *font, int poi
 //			*fmt - 
 //			... - 
 //-----------------------------------------------------------------------------
-void CChoreoWidgetDrawHelper::DrawColoredTextMultiline( const char *font, int pointsize, int weight, COLORREF clr, RECT& rcText, const char *fmt, ... )
+void CChoreoWidgetDrawHelper::DrawColoredTextMultiline( const char *font, int pointsize, int weight, COLORREF clr, RECT& rcText, PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list args;
 	static char output[1024];

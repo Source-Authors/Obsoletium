@@ -11,6 +11,7 @@
 #pragma once
 #endif
 
+#include "tier0/annotations.h"
 #include "basedialogparams.h"
 
 class CChoreoScene;
@@ -81,7 +82,7 @@ using LPARAM = long;
 #endif
 
 extern "C" __declspec(dllimport) HWND
-__stdcall GetDlgItem(HWND hDlg, int nIDDlgItem);
+__stdcall GetDlgItem(IN_OPT HWND hDlg, IN_P int nIDDlgItem);
 
 intp EventProperties( CEventParams *params );
 
