@@ -2508,11 +2508,11 @@ limbRootOffsetScale 0.0 0.0 1.0\n\
   MdlError(
       args,
       "usage: motionmapper [-quiet] [-verbose] [-templateFile filename] [-printTemplates] sourceanim.smd targetskeleton.smd output.smd\n\
-\tsourceanim:  should contain ref pose and animation data\n\
-\ttargetsekeleton:  should contain new ref pose, animation data ignored/can be absent\n\
-\toutput:  animation from source mapped onto target skeleton (contains new ref pose)\n\
-\t-templateFile filename : specifies a template file for guiding the mapping of motion\n\
-\t-printTemplate: Causes motionmapper to output the contents of an example template file, which can be used in conjunction with the -templateFile argument to create various motion effects.\n\
+\tsourceanim:             should contain ref pose and animation data\n\
+\ttargetsekeleton:        should contain new ref pose, animation data ignored/can be absent\n\
+\toutput:                 animation from source mapped onto target skeleton (contains new ref pose)\n\
+\t-templateFile filename: specifies a template file for guiding the mapping of motion\n\
+\t-printTemplate:         causes motionmapper to output the contents of an example template file, which can be used in conjunction with the -templateFile argument to create various motion effects.\n\
 \n");
 }
 
@@ -2522,6 +2522,7 @@ void PrintHeader() {
 #else
   vprint(stdout, 0, "Valve Software - motionmapper (%s)\n", __DATE__);
 #endif
+
   vprint(stdout, 0,
          "--- Maps motion from one animation/skeleton onto another skeleton "
          "---\n");
