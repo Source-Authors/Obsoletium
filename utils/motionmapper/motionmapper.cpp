@@ -77,8 +77,6 @@ void vprint(FILE *stream, int depth, const char *fmt, ...) {
   }
 }
 
-void kmemset(void *ptr, int value, size_t size) { memset(ptr, value, size); }
-
 static bool g_bFirstWarning = true;
 
 void MdlWarning(const char *fmt, ...) {
