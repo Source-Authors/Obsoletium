@@ -2961,6 +2961,7 @@ int main(int argc, char** argv) {
     pTemplate = New_Template();
     Set_DefaultTemplate(pTemplate);
   }
+  RunCodeAtScopeExit(free(pTemplate));
 
   // Process skeleton
   s_source_t* pMappedAnimation = MotionMap(args, pSource, pTarget, pTemplate);
