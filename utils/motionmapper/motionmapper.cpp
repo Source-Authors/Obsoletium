@@ -35,7 +35,7 @@ namespace {
 bool g_quiet = false;
 bool g_verbose = false;
 char g_outfile[1024];
-bool uselogfile = false;
+constexpr inline bool uselogfile = false;
 
 char g_szFilename[1024];
 FILE *g_fpInput;
