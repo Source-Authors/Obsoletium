@@ -21,7 +21,6 @@
 
 namespace {
 
-bool g_NoPause = false;
 bool g_Quiet = false;
 
 [[nodiscard]] bool ImageRGBA8888HasAlpha(unsigned char* pImage, int numTexels) {
