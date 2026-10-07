@@ -286,6 +286,10 @@ int LoadFile (const char *filename, void **bufferptr)
 
 	int length = filesystem->Size( f );
 	void *buffer = malloc (length+1);
+	if ( !buffer )
+	{
+		Error ("File '%s' context OOM.\n", filename);
+	}
 	((char *)buffer)[length] = 0;
 	if ( filesystem->Read (buffer, length, f) != (int)length )
 	{
