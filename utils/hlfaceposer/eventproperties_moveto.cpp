@@ -298,7 +298,8 @@ BOOL CEventPropertiesMoveToDialog::HandleMessage( HWND hwndDlg, UINT uMsg, WPARA
 					{
 						char buf1[ 256 ];
 						SendMessage( GetControl( IDC_EVENTCHOICES2 ), WM_GETTEXT, (WPARAM)sizeof( buf1 ), (LPARAM)buf1 );
-
+						
+						buf1[ ssize(buf1) - 1 ] = '\0';
 						V_strcpy_safe( g_Params.m_szParameters2, buf1 );
 					}
 				}
@@ -318,6 +319,7 @@ BOOL CEventPropertiesMoveToDialog::HandleMessage( HWND hwndDlg, UINT uMsg, WPARA
 						char buf1[ 256 ];
 						SendMessage( GetControl( IDC_EVENTCHOICES3 ), WM_GETTEXT, (WPARAM)sizeof( buf1 ), (LPARAM)buf1 );
 
+						buf1[ ssize(buf1) - 1 ] = '\0';
 						V_strcpy_safe( g_Params.m_szParameters3, buf1 );
 					}
 				}

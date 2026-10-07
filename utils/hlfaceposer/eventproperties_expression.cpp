@@ -255,6 +255,7 @@ BOOL CEventPropertiesExpressionDialog::HandleMessage( HWND hwndDlg, UINT uMsg, W
 
 						SendMessage( GetControl( IDC_EVENTCHOICES2 ), WM_GETTEXT, (WPARAM)sizeof( buf1 ), (LPARAM)buf1 );
 
+						buf1[ ssize(buf1) - 1 ] = '\0';
 						V_strcpy_safe( g_Params.m_szParameters2, buf1 );
 					}
 				}

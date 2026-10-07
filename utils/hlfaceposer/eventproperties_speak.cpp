@@ -92,6 +92,7 @@ void CEventPropertiesSpeakDialog::PopulateFilterList(  bool resetCurrent )
 
 	char oldf[ 256 ];
 	SendMessage( control, WM_GETTEXT, (WPARAM)sizeof( oldf ), (LPARAM)oldf );
+	oldf[ ssize(oldf) - 1 ] = '\0';
 
 	SendMessage( control, CB_RESETCONTENT, 0, 0 );
 
@@ -123,6 +124,7 @@ void CEventPropertiesSpeakDialog::OnCheckFilterUpdate()
 	char curfilter[ 256 ];
 	HWND control = GetControl( IDC_FILTER );
 	SendMessage( control, WM_GETTEXT, (WPARAM)sizeof( curfilter), (LPARAM)curfilter );
+	curfilter[ ssize(curfilter) - 1 ] = '\0';
 
 	if ( Q_stricmp( curfilter, m_szLastFilter ) )
 	{
