@@ -196,7 +196,7 @@ void CEventPropertiesSpeakDialog::PopulateVolumeLevels( HWND control, CEventPara
 	if ( !Q_stristr( params->m_szParameters, ".wav" ) )
 	{
 		// Look up the sound level from the soundemitter system
-		int soundindex = soundemitter->GetSoundIndex( params->m_szParameters );
+		auto soundindex = soundemitter->GetSoundIndex( params->m_szParameters );
 		if ( soundindex >= 0 )
 		{
 			// Look up the sound level from the soundemitter system
@@ -236,8 +236,8 @@ void CEventPropertiesSpeakDialog::PopulateSoundList( char const *current, HWND w
 
 	CUtlRBTree< char const *, int >		m_SortedNames( 0, 0, NameLessFunc );
 
-	int c = soundemitter->GetSoundCount();
-	for ( int i = 0; i < c; i++ )
+	intp c = soundemitter->GetSoundCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		char const *name = soundemitter->GetSoundName( i );
 
@@ -316,8 +316,8 @@ void CEventPropertiesSpeakDialog::ShowControlsForEventType( CEventParams *params
 
 void CEventPropertiesSpeakDialog::FindWaveInSoundEntries( CUtlVector< int >& entryList, char const *search )
 {
-	int c = soundemitter->GetSoundCount();
-	for ( int i = 0; i < c; i++ )
+	intp c = soundemitter->GetSoundCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		CSoundParametersInternal *params = soundemitter->InternalGetParametersForSound( i );
 		if ( !params )
@@ -350,7 +350,7 @@ void CEventPropertiesSpeakDialog::OnCheckChangedVolumeLevel( CEventParams *param
 		return;
 	}
 
-	int soundindex = soundemitter->GetSoundIndex( params->m_szParameters );
+	auto soundindex = soundemitter->GetSoundIndex( params->m_szParameters );
 	if ( soundindex < 0 )
 		return;
 
@@ -415,7 +415,7 @@ void CEventPropertiesSpeakDialog::OnSoundSelected( CEventParams *params )
 	SendMessage( scriptname, WM_SETTEXT, (WPARAM)1, (LPARAM)"" );
 	SendMessage( wavename, WM_SETTEXT, (WPARAM)1, (LPARAM)"" );
 
-	int soundindex = soundemitter->GetSoundIndex( params->m_szParameters );
+	auto soundindex = soundemitter->GetSoundIndex( params->m_szParameters );
 	if ( soundindex >= 0 )
 	{
 		char const *script = soundemitter->GetSourceFileForSound( soundindex );
@@ -556,7 +556,7 @@ BOOL CEventPropertiesSpeakDialog::HandleMessage( HWND hwndDlg, UINT uMsg, WPARAM
 		case IDC_OPENSOURCE:
 			{
 				// Look up the sound level from the soundemitter system
-				int soundindex = soundemitter->GetSoundIndex( g_Params.m_szParameters );
+				auto soundindex = soundemitter->GetSoundIndex( g_Params.m_szParameters );
 				if ( soundindex >= 0 )
 				{
 					// Look up the sound level from the soundemitter system

@@ -2655,7 +2655,7 @@ bool CChoreoView::DefaultGestureLength( CChoreoEvent *e, bool bCheckOnly )
 	if ( !model->GetStudioHdr() )
 		return false;
 
-	int iSequence = model->LookupSequence( e->GetParameters() );
+	intp iSequence = model->LookupSequence( e->GetParameters() );
 	if ( iSequence < 0 )
 		return false;
 
@@ -5055,7 +5055,7 @@ void CChoreoView::ProcessGesture( CChoreoScene *scene, CChoreoEvent *event )
 
 	Assert( a );
 
-	int iSequence = model->LookupSequence( event->GetParameters() );
+	intp iSequence = model->LookupSequence( event->GetParameters() );
 	if (iSequence < 0)
 		return;
 
@@ -5100,7 +5100,7 @@ void CChoreoView::ProcessSequence( CChoreoScene *scene, CChoreoEvent *event )
 
 	Assert( a );
 
-	int iSequence = model->LookupSequence( event->GetParameters() );
+	intp iSequence = model->LookupSequence( event->GetParameters() );
 	if (iSequence < 0)
 		return;
 
@@ -11332,8 +11332,8 @@ void CChoreoView::OnPlaceNextSpeakEvent()
 
 	CUtlRBTree< char const *, int >		m_SortedNames( 0, 0, NameLessFunc );
 
-	int c = soundemitter->GetSoundCount();
-	for ( int i = 0; i < c; i++ )
+	intp c = soundemitter->GetSoundCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		char const *name = soundemitter->GetSoundName( i );
 		if ( name && name[ 0 ] )

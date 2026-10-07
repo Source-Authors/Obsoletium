@@ -3421,10 +3421,10 @@ void PhonemeEditor::EditInsertWordBefore( void )
 		return;
 	}
 
-	int wordCount = CSentence::CountWords( params.m_szInputText );
+	intp wordCount = CSentence::CountWords( params.m_szInputText );
 	if ( wordCount > 1 )
 	{
-		Con_Printf( "Can only insert one word at a time, %s has %i words in it!\n",
+		Con_Printf( "Can only insert one word at a time, %s has %zd words in it!\n",
 			params.m_szInputText, wordCount );
 		return;
 	}
@@ -3521,10 +3521,10 @@ void PhonemeEditor::EditInsertWordAfter( void )
 		return;
 	}
 
-	int wordCount = CSentence::CountWords( params.m_szInputText );
+	intp wordCount = CSentence::CountWords( params.m_szInputText );
 	if ( wordCount > 1 )
 	{
-		Con_Printf( "Can only insert one word at a time, %s has %i words in it!\n",
+		Con_Printf( "Can only insert one word at a time, %s has %zd words in it!\n",
 			params.m_szInputText, wordCount );
 		return;
 	}
@@ -6946,7 +6946,7 @@ void PhonemeEditor::EditInsertFirstPhonemeOfWord( void )
 		return;
 	}
 
-	int phonemeCount = CSentence::CountWords( params.m_szName );
+	intp phonemeCount = CSentence::CountWords( params.m_szName );
 	if ( phonemeCount <= 0 )
 	{
 		return;
@@ -8096,11 +8096,11 @@ CEmphasisSample *PhonemeEditor::Emphasis_GetSampleUnderMouse( mxEvent *event )
 	float closest_dist = 999999.0f;
 	CEmphasisSample *bestsample = NULL;
 
-	int samples = m_Tags.GetNumSamples();
+	intp samples = m_Tags.GetNumSamples();
 
 	float clickTime = GetTimeForPixel( (short)event->x );
 
-	for ( int i = 0; i < samples; i++ )
+	for ( intp i = 0; i < samples; i++ )
 	{
 		CEmphasisSample *sample = m_Tags.GetSample( i );
 
@@ -8166,7 +8166,7 @@ void PhonemeEditor::Emphasis_Delete( void )
 
 	PushUndo();
 
-	for ( int i = m_Tags.GetNumSamples() - 1; i >= 0 ; i-- )
+	for ( intp i = m_Tags.GetNumSamples() - 1; i >= 0 ; i-- )
 	{
 		CEmphasisSample *sample = m_Tags.GetSample( i );
 		if ( !sample->selected )
@@ -8373,9 +8373,9 @@ void PhonemeEditor::Emphasis_Redraw( CChoreoWidgetDrawHelper& drawHelper, RECT& 
 
 	}
 
-	int numsamples = m_Tags.GetNumSamples();
+	intp numsamples = m_Tags.GetNumSamples();
 
-	for ( int sample = 0; sample < numsamples; sample++ )
+	for ( intp sample = 0; sample < numsamples; sample++ )
 	{
 		CEmphasisSample *start = m_Tags.GetSample( sample );
 
