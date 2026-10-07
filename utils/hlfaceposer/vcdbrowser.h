@@ -69,7 +69,7 @@ public:
 
 	HIMAGELIST		CreateImageList();
 
-	void		SetCurrent( char const *fn );
+	void		SetCurrent( IN_Z char const *fn );
 
 private:
 

@@ -92,7 +92,7 @@ public:
 	void	_PopulateTree( int pathId, char const *path )
 	{
 		char sz[ 512 ];
-		Q_strcpy( sz, path );
+		V_strcpy_safe( sz, path );
 		char *p = sz;
 
 		// Start at root
@@ -840,18 +840,17 @@ char const *CVCDBrowser::GetSearchString()
 	return m_pOptions->GetSearchString();
 }
 
-void CVCDBrowser::SetCurrent( char const *filename )
+void CVCDBrowser::SetCurrent( IN_Z char const *filename )
 {
 // Get sound name and look up .vcd from it
 	char const *p = filename;
-	if ( p && 
-		( !Q_strnicmp( p, "sound/", 6 ) || !Q_strnicmp( p, "sound\\", 6 ) ) )
+	if ( ( !Q_strnicmp( p, "sound/", 6 ) || !Q_strnicmp( p, "sound\\", 6 ) ) )
 	{
 		p += 6;
 	}
 
 	char fn[ 512 ];
-	Q_strncpy( fn, p, sizeof( fn ) );
+	V_strcpy_safe( fn, p );
 	Q_FixSlashes( fn );
 
 	int i;

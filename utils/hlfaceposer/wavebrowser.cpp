@@ -247,7 +247,7 @@ public:
 	void	_PopulateTree( int pathId, char const *path )
 	{
 		char sz[ 512 ];
-		Q_strcpy( sz, path );
+		V_strcpy_safe( sz, path );
 		char *p = sz;
 
 		// Start at root
@@ -1142,18 +1142,17 @@ void CWaveBrowser::SetEvent( CChoreoEvent *event )
 	SetCurrent( FacePoser_TranslateSoundName( event->GetParameters() ) );
 }
 
-void CWaveBrowser::SetCurrent( char const *filename )
+void CWaveBrowser::SetCurrent( IN_Z char const *filename )
 {
 // Get sound name and look up .wav from it
 	char const *p = filename;
-	if ( p && 
-		( !Q_strnicmp( p, "sound/", 6 ) || !Q_strnicmp( p, "sound\\", 6 ) ) )
+	if ( ( !Q_strnicmp( p, "sound/", 6 ) || !Q_strnicmp( p, "sound\\", 6 ) ) )
 	{
 		p += 6;
 	}
 
 	char fn[ 512 ];
-	Q_strncpy( fn, p, sizeof( fn ) );
+	V_strcpy_safe( fn, p );
 	Q_FixSlashes( fn );
 
 	int i;

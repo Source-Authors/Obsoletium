@@ -74,7 +74,7 @@ public:
 	HIMAGELIST		CreateImageList();
 
 	void		SetEvent( CChoreoEvent *event );
-	void		SetCurrent( char const *fn );
+	void		SetCurrent( IN_Z char const *fn );
 
 private:
 
