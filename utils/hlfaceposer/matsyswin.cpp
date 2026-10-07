@@ -98,6 +98,7 @@ MatSysWindow::MatSysWindow (mxWindow *parent, int x, int y, int w, int h, const 
 	setLabel( MATSYSWIN_NAME );
 
 	m_bSuppressSwap = false;
+	m_hPrevCursor = nullptr;
 
 	m_hWnd = (HWND)getHandle();
 

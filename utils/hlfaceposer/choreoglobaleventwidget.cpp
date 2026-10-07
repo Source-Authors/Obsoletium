@@ -23,6 +23,9 @@ CChoreoGlobalEventWidget::CChoreoGlobalEventWidget( CChoreoWidget *parent )
 
 	m_bDragging			= false;
 	m_xStart			= 0;
+
+	BitwiseClear( m_rcFocus );
+	BitwiseClear( m_rcOrig );
 	m_hPrevCursor		= 0;
 }
 

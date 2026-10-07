@@ -63,8 +63,8 @@ SceneRampTool::SceneRampTool( mxWindow *parent )
 
 	m_hPrevCursor		= 0;
 	
-	m_nStartX			= 0;
-	m_nStartY			= 0;
+	m_nStartX			= m_nLastX = 0;
+	m_nStartY			= m_nLastY = 0;
 
 	m_nMousePos[ 0 ] = m_nMousePos[ 1 ] = 0;
 

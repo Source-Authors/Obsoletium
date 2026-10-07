@@ -86,6 +86,9 @@ void ChunkError( unsigned int id )
 //-----------------------------------------------------------------------------
 CAudioSourceWave::CAudioSourceWave( void )
 {
+	m_bits = 0;
+	m_rate = 0;
+	m_channels = 0;
 	m_format = 0;
 	m_pHeader = NULL;
 	// no looping

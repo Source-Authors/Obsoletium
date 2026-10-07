@@ -50,6 +50,11 @@ typedef struct
 class CAudioDeviceSWMix : public IAudioDevice
 {
 public:
+	CAudioDeviceSWMix()
+	{
+		BitwiseClear( m_paintbuffer );
+	}
+
 	virtual void	Mix8Mono( channel_t *pChannel, char *pData, int outputOffset, int inputOffset, int rateScaleFix, int outCount, int timecompress, bool forward = true );
 	virtual void	Mix8Stereo( channel_t *pChannel, char *pData, int outputOffset, int inputOffset, int rateScaleFix, int outCount, int timecompress, bool forward = true );
 	virtual void	Mix16Mono( channel_t *pChannel, short *pData, int outputOffset, int inputOffset, int rateScaleFix, int outCount, int timecompress, bool forward = true );

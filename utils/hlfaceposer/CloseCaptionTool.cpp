@@ -89,6 +89,8 @@ private:
 };
 
 CCloseCaptionWorkUnit::CCloseCaptionWorkUnit() :
+	m_nX(0),
+	m_nY(0),
 	m_nWidth(0),
 	m_nHeight(0),
 	m_bBold(false),

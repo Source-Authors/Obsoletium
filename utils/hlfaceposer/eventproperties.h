@@ -114,7 +114,7 @@ protected:
 
 protected:
 
-	HWND		m_hDialog;
+	HWND		m_hDialog{nullptr};
 };
 
 #endif // EVENTPROPERTIES_H

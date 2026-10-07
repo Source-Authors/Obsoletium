@@ -28,19 +28,20 @@ CExpression::CExpression( void )
 	name[ 0 ] = 0;
 	index = 0;
 	description[ 0 ] = 0;
-	memset( setting, 0, sizeof( setting ) );
 
 	for ( int i = 0; i < MAX_FP_MODELS; i++ )
 	{
 		m_Bitmap[ i ].valid = false;
 	}
-
-	m_nUndoCurrent = 0;
+	
 	m_bModified = false;
+	m_nUndoCurrent = 0;
 
 	m_bSelected = false;
-
 	m_bDirty = false;
+
+	BitwiseClear( setting );
+	BitwiseClear( weight );
 
 	expressionclass[ 0 ] = 0;
 }

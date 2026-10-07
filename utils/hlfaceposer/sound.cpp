@@ -1072,9 +1072,9 @@ private:
 
 	CAudioSource	*FindOrAddSound( const char *filename );
 
-	CAudioOutput *m_pAudio;
+	CAudioOutput* m_pAudio{nullptr};
 
-	float		m_flElapsedTime;
+	float		  m_flElapsedTime{0.0f};
 
 	CUtlVector < CSoundFile > m_ActiveSounds;
 };
