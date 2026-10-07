@@ -77,7 +77,6 @@ class ControlPanel : public mxWindow, public IFacePoserToolWindow
 	mxChoice *cSkin;
 	mxLabel *lModelInfo1, *lModelInfo2;
 
-	mxLineEdit *leMeshScale, *leBoneScale;
 	mxSlider *slModelGap;
 
 	mxCheckBox *cbAllWindowsDriveSpeech;
