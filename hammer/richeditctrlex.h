@@ -104,7 +104,7 @@ class CTextAttributes
 		operator CString() const
 		{
 			CString s;
-			s.Format("\\plain%s%s%s%s\\f%d\\fs%d\\cb%d\\cf%d ",
+			s.Format("\\plain%s%s%s%s\\f%d\\fs%d\\cb%zd\\cf%zd ",
 					((CString)m_bsBold).GetBuffer(),
 					((CString)m_bsUnderline).GetBuffer(), ((CString)m_bsItalic).GetBuffer(), ((CString)m_bsStrike).GetBuffer(),
 					m_nFontNumber ,
