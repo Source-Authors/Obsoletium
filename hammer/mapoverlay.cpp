@@ -2117,7 +2117,7 @@ bool CMapOverlay::BuildEdgePlanes( Vector const *pPoints, intp nPointCount,
 //-----------------------------------------------------------------------------
 void CMapOverlay::Disp_ClipFragments( CMapDisp *pDisp, ClipFaces_t &aDispFragments )
 {
-	cplane_t clipPlane;
+	cplane_t clipPlane = {};
 
 	// Cache the displacement interval.
 	int nInterval = pDisp->GetWidth() - 1;

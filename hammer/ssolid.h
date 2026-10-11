@@ -36,7 +36,14 @@ class C2DHandle
 {
 	public:
 
-		C2DHandle(void) { m_bVisible = FALSE; m_bSelected = FALSE; m_bUse = TRUE; m_x = -1; m_y = -1; }
+		C2DHandle() : m_r{}
+		{
+			m_bVisible = FALSE;
+			m_bSelected = FALSE;
+			m_bUse = TRUE;
+			m_x = -1;
+			m_y = -1;
+		}
 
 		BOOL m_bVisible;				// visible?
 		BOOL m_bSelected;				// selected?

@@ -245,14 +245,9 @@ void CMapSweptPlayerHull::Render2D(CRender2D *pRender)
 		pRender->SetDrawColor( GetRValue(Options.colors.clrToolHandle), GetGValue(Options.colors.clrToolHandle), GetBValue(Options.colors.clrToolHandle) );
 	}
 
-	Vector line1[2];
-	Vector line2[2];
+	Vector line1[2] = {};
+	Vector line2[2] = {};
 	
-	line1[0].Init();
-	line1[1].Init();
-	line2[0].Init();
-	line2[1].Init();
-
 	if ( dx > 0 )
 	{
 		if ( dy > 0 )

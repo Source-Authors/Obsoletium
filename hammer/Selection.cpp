@@ -24,6 +24,8 @@ CSelection::CSelection(void)
 	m_pDocument = NULL;
 	// dimhotepus: Init selection mode.
 	m_eSelectMode = selectGroups;
+	m_bBoundsDirty = false;
+	m_iCurHit = -1;
 }
 
 CSelection::~CSelection(void)

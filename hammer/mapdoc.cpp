@@ -309,7 +309,7 @@ static CProgressDlg *pProgDlg;
 class CHammerClipboard : public IHammerClipboard
 {
 public:
-	CHammerClipboard(){}
+	CHammerClipboard() : pSourceWorld{nullptr} {}
 
 public:
 	virtual void Destroy() { delete this; }
