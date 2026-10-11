@@ -1060,7 +1060,7 @@ void ComputeDetailPropLighting( int iThread )
 		UnserializeDetailPropLighting( GAMELUMP_DETAIL_PROP_LIGHTING_HDR, GAMELUMP_DETAIL_PROP_LIGHTING_HDR_VERSION, s_DetailPropLightStyleLumpHDR );
 	}
 
-	StartPacifier("Computing detail prop lighting : ");
+	StartPacifier( "Computing detail prop lighting: " );
 
 	for (int i = 0; i < count; ++i)
 	{
