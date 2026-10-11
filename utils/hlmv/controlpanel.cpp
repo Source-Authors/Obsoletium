@@ -1068,7 +1068,7 @@ void CBoneControlWindow::OnGenerateQC( )
 void CBoneControlWindow::OnHitboxAddSet( void )
 {
 	char sz[ 32 ];
-	V_sprintf_safe( sz, "set%02i", g_pStudioModel->m_HitboxSets.Count() + 1 );
+	V_sprintf_safe( sz, "set%02zd", g_pStudioModel->m_HitboxSets.Count() + 1 );
 
 	int newsetnumber = g_pStudioModel->m_HitboxSets.AddToTail();
 	g_pStudioModel->m_HitboxSets[ newsetnumber ].m_Name = sz;
@@ -3496,7 +3496,7 @@ ControlPanel::setModelInfo()
 		"Batches: %d\n"
 		"Bone Controllers: %d\n"
 		"Hit Boxes: %d in %d sets\n"
-		"Sequences: %d\n",
+		"Sequences: %zd\n",
 		hdr->numbones(),
 		boneLODCount,
 		numBatches,
@@ -3512,7 +3512,7 @@ ControlPanel::setModelInfo()
 		"Materials: %d\n"
 		"Skin Families: %d\n"
 		"Bodyparts: %d\n"
-		"Attachments: %d\n",
+		"Attachments: %zd\n",
 		g_DrawModelResults.m_NumMaterials,
 		hdr->numskinfamilies(),
 		hdr->numbodyparts(),
