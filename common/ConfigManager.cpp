@@ -243,15 +243,14 @@ bool ReadUtlBufferFromFile( CUtlBuffer &buffer, const char *szPath )
 	if ( nFile == -1 )
 	{
 		return false;
-	} 
+	}
+	RunCodeAtScopeExit(_close( nFile ));
 
 	if ( _read( nFile, buffer.Base(), fileInfo.st_size ) != fileInfo.st_size )
 	{
-		_close( nFile );
 		return false;
 	}
 
-	_close( nFile );
 	buffer.SeekPut( CUtlBuffer::SEEK_HEAD, fileInfo.st_size );
 	return true;
 }
@@ -275,14 +274,13 @@ bool SaveUtlBufferToFile( CUtlBuffer &buffer, const char *szPath )
 	{
 		return false;
 	}
+	RunCodeAtScopeExit(close( nFile ));
 
 	if ( _write( nFile, buffer.Base(), size_cast<unsigned>( nSize ) ) < nSize )
 	{
-		_close( nFile );
 		return false;
 	}
 
-	_close( nFile );
 	return true;
 }
 
