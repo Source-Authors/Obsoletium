@@ -125,6 +125,8 @@ FileAssociation::handleEvent (mxEvent *event)
 
 	case IDC_OK:
 		saveAssociations ();
+		// dimhotepus: Add break.
+		break;
 
 	case IDC_CANCEL:
 		setVisible (false);
