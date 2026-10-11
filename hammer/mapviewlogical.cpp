@@ -287,11 +287,11 @@ void CMapViewLogical::OnTimer(UINT_PTR nIDEvent)
 	if ( nIDEvent == TIMER_CONNECTIONUPDATE )
 	{
 		// Make sure we don't blink too fast
-		static unsigned int	nLastUpdate = 0;
-		if ( GetTickCount() >= (nLastUpdate+TIMER_BLINK_INTERVAL/2) )
+		static unsigned long long nLastUpdate = 0;
+		if ( GetTickCount64() >= (nLastUpdate+TIMER_BLINK_INTERVAL/2) )
 		{
-			nLastUpdate = GetTickCount();
-            UpdateView( 0 ); // Force the view to redraw for blinking errors
+			nLastUpdate = GetTickCount64();
+			UpdateView( 0 ); // Force the view to redraw for blinking errors
 		}
 	}
 	else
@@ -325,7 +325,7 @@ const color32 & CMapViewLogical::GetWireColor(const char *pszName, const bool bS
 	else
 	{
 		// Only blink errors if nothing is selected, or this is selected
-		bool	bBlinkingState =  bSelected || !bAnySelected ? (GetTickCount() / TIMER_BLINK_INTERVAL) & 1 : bSelected;
+		bool	bBlinkingState =  bSelected || !bAnySelected ? (GetTickCount64() / TIMER_BLINK_INTERVAL) & 1 : bSelected;
 		return s_pBrokenWireColor[bBlinkingState];
 	}
 }
