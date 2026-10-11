@@ -190,7 +190,7 @@ void CSoundSystem::BuildFileListInDirectory( char const* pDirectoryName, const c
 	Assert( V_strlen( pExt ) <= 3 );
 
 	intp nDirectoryNameLen = V_strlen( pDirectoryName );
-	char *pWildCard = ( char * )stackalloc( nDirectoryNameLen + 7 );
+	char *pWildCard = stackallocT( char, nDirectoryNameLen + 7 );
 	Q_snprintf( pWildCard, nDirectoryNameLen + 7, "%s/*.%s", pDirectoryName, pExt );
 
 	FileFindHandle_t findHandle;
@@ -204,7 +204,7 @@ void CSoundSystem::BuildFileListInDirectory( char const* pDirectoryName, const c
 
 		// Strip off the 'sound/' part of the sound name.
 		intp nAllocSize = nDirectoryNameLen + V_strlen(pFileName) + 2;
-		char *pFileNameWithPath = (char *)stackalloc( nAllocSize );
+		char *pFileNameWithPath = stackallocT( char, nAllocSize );
 		
 		const char *pStartPos = max( strchr( pDirectoryName, '/' ), strchr( pDirectoryName, '\\' ) );
 		if ( pStartPos )
@@ -245,7 +245,7 @@ bool CSoundSystem::RecurseIntoDirectories( char const* pDirectoryName, pDirCallb
 				continue;
 
 			intp fileNameStrLen = V_strlen( pFileName );
-			char *pFileNameWithPath = ( char * )stackalloc( nPathStrLen + fileNameStrLen + 1 );
+			char *pFileNameWithPath = stackallocT( char, nPathStrLen + fileNameStrLen + 1 );
 			memcpy( pFileNameWithPath, pWildCard, nPathStrLen );
 			pFileNameWithPath[nPathStrLen] = '\0';
 			Q_strncat( pFileNameWithPath, pFileName, nPathStrLen + fileNameStrLen + 1 );

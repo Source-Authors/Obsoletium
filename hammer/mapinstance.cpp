@@ -300,7 +300,7 @@ void CMapInstance::ReplaceTargetname( const char *szOldName, const char *szNewNa
 			{
 				nLen++;
 
-				char	*pszResult = ( char * )stackalloc( nLen + strlen( szNewName ) + 1 );
+				char	*pszResult = stackallocT( char, nLen + strlen( szNewName ) + 1 );
 
 				strncpy( pszResult, pInstanceValue, nLen );
 				strcpy( &pszResult[ nLen ], szNewName );

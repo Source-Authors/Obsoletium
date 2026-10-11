@@ -457,7 +457,7 @@ bool CMaterial::LoadMaterialsInDirectory( char const* pDirectoryName, intp nDire
 			// Strip off the 'materials/' part of the material name.
 			char *pFileNameWithPath;
 			intp nAllocSize = nDirectoryNameLen + Q_strlen(pFileName) + 2;
-			pFileNameWithPath = (char *)stackalloc( nAllocSize );
+			pFileNameWithPath = stackallocT( char, nAllocSize );
 			Q_snprintf(	pFileNameWithPath, nAllocSize, "%s/%s", &pDirectoryName[MATERIAL_PREFIX_LEN], pFileName ); 
 			Q_strnlwr( pFileNameWithPath, nAllocSize );
 
@@ -512,7 +512,7 @@ bool CMaterial::InitDirectoryRecursive( char const* pDirectoryName,
 				if( g_pFullFileSystem->FindIsDirectory( findHandle ) )
 				{
 					intp fileNameStrLen = Q_strlen( pFileName );
-					char *pFileNameWithPath = ( char * )stackalloc( nPathStrLen + fileNameStrLen + 1 );
+					char *pFileNameWithPath = stackallocT( char, nPathStrLen + fileNameStrLen + 1 );
 					memcpy( pFileNameWithPath, pWildCard, nPathStrLen );
 					pFileNameWithPath[nPathStrLen] = '\0';
 					Q_strncat( pFileNameWithPath, pFileName, nPathStrLen + fileNameStrLen + 1 );

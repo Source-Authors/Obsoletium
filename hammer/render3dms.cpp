@@ -1991,7 +1991,7 @@ void CRender3D::RenderCone( Vector const &vBasePt, Vector const &vTipPt, float f
 	//
 	int size = nSlices * sizeof( Vector );
 	size += 16 + sizeof( Vector* );
-	byte *ptr = ( byte* )_alloca( size );
+	byte *ptr = stackallocT( byte, size );
 	ptrdiff_t data = ( ptrdiff_t )ptr;
 	
 	data += 16 + sizeof( Vector* ) - 1;

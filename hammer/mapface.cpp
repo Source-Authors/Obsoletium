@@ -1877,7 +1877,7 @@ void CMapFace::RenderGridsIfCloseEnough( CRender3D* pRender, int nCount, CMapFac
 
 	Vector viewPoint; pRender->GetCamera()->GetViewPoint( viewPoint );
 
-	CMapFace **ppFinalList = (CMapFace**)_alloca( nCount * sizeof(CMapFace*) );
+	CMapFace **ppFinalList = stackallocT( CMapFace *, nCount );
 	int nFinalCount = 0;
 	for ( int i = 0; i < nCount; ++i )
 	{
@@ -1958,7 +1958,7 @@ void CMapFace::RenderWireframeFaces( CRender3D* pRender, int nCount, MapFaceRend
 
 	// Draw the texture axes
 	int nAxesCount = 0;
-	CMapFace **ppAxesFaces = (CMapFace**)_alloca( nCount * sizeof(CMapFace*) );
+	CMapFace **ppAxesFaces = stackallocT( CMapFace *, nCount );
 	for ( int i = 0; i < nCount; ++i )
 	{
 		if ( ppFaces[i]->m_FaceSelectionState != SELECT_NONE )
@@ -1975,7 +1975,7 @@ void CMapFace::RenderWireframeFaces( CRender3D* pRender, int nCount, MapFaceRend
 	if ( pRender->IsEnabled(RENDER_GRID) )
 	{
 		// Draw the grid
-		CMapFace **ppGridFaces = (CMapFace**)_alloca( nCount * sizeof(CMapFace*) );
+		CMapFace **ppGridFaces = stackallocT( CMapFace *, nCount );
 		for ( int i = 0; i < nCount; ++i )
 		{
 			ppGridFaces[i] = ppFaces[i]->m_pMapFace;
@@ -2264,7 +2264,7 @@ void CMapFace::RenderOpaqueFaces( CRender3D* pRender )
 {
 	CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
 
-	MapFaceRender_t **ppMapFaces = (MapFaceRender_t**)_alloca( g_CurrentOpaqueFaces->Count() * sizeof( MapFaceRender_t* ) );
+	MapFaceRender_t **ppMapFaces = stackallocT( MapFaceRender_t*, g_CurrentOpaqueFaces->Count() );
 	int nFaceCount = 0;
 
 	int nLastRenderMode = RENDER_MODE_NONE;

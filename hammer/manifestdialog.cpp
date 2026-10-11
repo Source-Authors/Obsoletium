@@ -1148,7 +1148,7 @@ void CManifestCheckin::OnBnClickedOk()
 			return;
 		}
 
-		const char **ppFileNames = ( const char** )stackalloc( nFileCount * sizeof( char * ) );
+		const char **ppFileNames = stackallocT( const char*, nFileCount );
 
 		nFileCount = 0;
 		for( int i = 0; i < m_CheckinListCtrl.GetItemCount(); i++ )

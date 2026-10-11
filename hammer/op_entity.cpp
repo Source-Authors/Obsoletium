@@ -3913,7 +3913,7 @@ void COP_Entity::OnMarkAndAdd(void)
 	
 	// Build a temporary list of all the currently selected objects because this
 	// process will change the selected objects.
-	CMapEntity **pTemp = (CMapEntity**)stackalloc( m_pObjectList->Count() * sizeof(CMapEntity*) );
+	CMapEntity **pTemp = stackallocT( CMapEntity *, m_pObjectList->Count() );
 	CUtlVector<CMapEntity*> temp( pTemp, m_pObjectList->Count() );
 	
 	FOR_EACH_OBJ( *m_pObjectList, pos )
