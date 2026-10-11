@@ -52,7 +52,7 @@ matrix3x4_t		g_viewtransform;				// view transformation
 matrix3x4_t		g_mCachedViewTransform;			// copy of view transform for boneMerge passes
 
 static int			maxNumVertices;
-static int			first = 1;
+static int			g_first = 1;
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -802,9 +802,9 @@ void StudioModel::SetupModel ( int bodypart )
 
 	m_pmodel = pbodypart->pModel( index );
 
-	if(first){
+	if(g_first){
 		maxNumVertices = m_pmodel->numvertices;
-		first = 0;
+		g_first = 0;
 	}
 }
 
