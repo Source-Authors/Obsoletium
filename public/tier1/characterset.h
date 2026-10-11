@@ -27,7 +27,7 @@ struct characterset_t
 		}
 	 }
 
-	[[nodiscard]] constexpr bool HasChar(const char ch) const noexcept
+	[[nodiscard]] constexpr bool HasChar(const unsigned char ch) const noexcept
 	{
 		return set[static_cast<char_type>(ch)];
 	}
