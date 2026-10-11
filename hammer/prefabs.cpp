@@ -708,8 +708,13 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 		{
 			// change size of file first
 			int iHandle = _open(m_strOpenFileName, _O_BINARY | _O_WRONLY);
-			_chsize(iHandle, m_dwDirOffset);
-			_close(iHandle);
+			RunCodeAtScopeExit( iHandle != -1, _close( iHandle ));
+
+			// dimhotepus: Dump warning if size not changed.
+			if ( iHandle != -1 && _chsize(iHandle, m_dwDirOffset) != 0 )
+			{
+				Warning( "Unable to change file %s size to %d: %s.\n", m_strOpenFileName.operator LPCSTR(), m_dwDirOffset, strerror(errno) );
+			}
 		}
 
 		std::fstream file(m_strOpenFileName, std::ios::binary | std::ios::out);
