@@ -62,7 +62,7 @@ BOOL CBaseToolBar::LoadToolBarForDpi(LPCTSTR lpszResourceName,
   if (pData == nullptr) return FALSE;
   ASSERT(pData->wVersion == 1);
 
-  auto* pItems = static_cast<UINT*>(alloca(sizeof(UINT) * pData->wItemCount));
+  auto* pItems = stackallocT( UINT, pData->wItemCount );
   for (int i = 0; i < pData->wItemCount; i++) pItems[i] = pData->items()[i];
   BOOL bResult = SetButtons(pItems, pData->wItemCount);
 
