@@ -305,10 +305,7 @@ BOOL COPTTextures::BrowseForFolder( char *pszTitle, char *pszDirectory )
 	HRESULT hr = SHGetDesktopFolder( &pshDesktop );
 	if ( SUCCEEDED( hr ) )
 	{
-		ULONG ulEaten;
-		ULONG ulAttributes;
-
-		hr = pshDesktop->ParseDisplayName( NULL, NULL, A2OLE( s_szStartFolder ), &ulEaten, &pidlStartFolder, &ulAttributes );
+		hr = pshDesktop->ParseDisplayName( NULL, NULL, A2OLE( s_szStartFolder ), nullptr, &pidlStartFolder, nullptr );
 	}
 
 	RunCodeAtScopeExit(::CoTaskMemFree(pidlStartFolder));
