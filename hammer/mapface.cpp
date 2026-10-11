@@ -276,10 +276,22 @@ CMapFace *CMapFace::CopyFrom(const CMapFace *pObject, DWORD dwFlags, bool bUpdat
 			{
 				AllocatePoints(nPoints);
 				AllocTangentSpaceAxes( nPoints );
-				memcpy(Points, pFrom->Points, sizeof(Vector) * nPoints);
-				memcpy(m_pTextureCoords, pFrom->m_pTextureCoords, sizeof(Vector2D) * nPoints);
-				memcpy(m_pLightmapCoords, pFrom->m_pLightmapCoords, sizeof(Vector2D) * nPoints);
-				memcpy(m_pTangentAxes, pFrom->m_pTangentAxes, sizeof(TangentSpaceAxes_t) * nPoints);
+				if ( Points )
+				{
+					memcpy(Points, pFrom->Points, sizeof(Vector) * nPoints);
+				}
+				if ( m_pTextureCoords )
+				{
+					memcpy(m_pTextureCoords, pFrom->m_pTextureCoords, sizeof(Vector2D) * nPoints);
+				}
+				if ( m_pLightmapCoords )
+				{
+					memcpy(m_pLightmapCoords, pFrom->m_pLightmapCoords, sizeof(Vector2D) * nPoints);
+				}
+				if ( m_pTangentAxes )
+				{
+					memcpy(m_pTangentAxes, pFrom->m_pTangentAxes, sizeof(TangentSpaceAxes_t) * nPoints);
+				}
 			}
 		}
 		else
