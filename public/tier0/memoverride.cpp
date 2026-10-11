@@ -1342,15 +1342,38 @@ int __cdecl _CrtDbgReport
 
 int __cdecl _CrtDbgReportW
 (
-	_In_       int ,
-	_In_opt_z_ const wchar_t *,
-	_In_       int ,
-	_In_opt_z_ const wchar_t *,
-	_In_opt_z_ const wchar_t *,
+	_In_       int level,
+	_In_opt_z_ const wchar_t * fileName,
+	_In_       int line,
+	_In_opt_z_ const wchar_t * moduleName,
+	_In_opt_z_ const wchar_t * fmt,
 	...
 )
 {
-	Assert(0);
+	wchar_t buffer[1024];
+
+	if ( fmt )
+	{
+		va_list va;
+		va_start( va, fmt );
+		vswprintf_s( buffer, fmt, va );
+		va_end( va );
+	}
+	else
+	{
+		swprintf_s( buffer, L"%s(%d) - %s: N/A trace", fileName, line, moduleName );
+	}
+	
+	// Hammer is MFC app and MFC uses TRACE to write traces which calls us.
+	if ( level == _CRT_WARN || level == _CRT_ERROR )
+	{
+		Warning( "%S\n", buffer );
+	}
+	else if ( level == _CRT_ASSERT )
+	{
+		AssertMsg( false, "%S", buffer );
+	}
+
 	return 0;
 }
 
