@@ -4761,10 +4761,12 @@ bool COP_Entity::CustomDrawItemValue( const LPDRAWITEMSTRUCT p, const RECT *pRec
 			}
 
 			HBRUSH hBrush = CreateSolidBrush( RGB( r, g, b ) );
+			RunCodeAtScopeExit(DeleteObject( hBrush ));
 			HGDIOBJ hOldBrush = SelectObject( p->hDC, hBrush );
 			RunCodeAtScopeExit(SelectObject( p->hDC, hOldBrush ));
 
 			HPEN hPen = CreatePen( PS_SOLID, 0, RGB(0,0,0) );
+			RunCodeAtScopeExit(DeleteObject( hPen ));
 			HGDIOBJ hOldPen = SelectObject( p->hDC, hPen );
 			RunCodeAtScopeExit(SelectObject( p->hDC, hOldPen ));
 
