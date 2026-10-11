@@ -2981,7 +2981,7 @@ int SortSequenceFunc( const void *p1, const void *p2 )
 void ControlPanel::CreateSortedSequenceList( CStudioHdr* hdr, int *pSequence )
 {
 	int nSequenceCount = hdr->GetNumSeq();
-	SortInfo_t *pSort = (SortInfo_t*)_alloca( nSequenceCount * sizeof(SortInfo_t) );
+	SortInfo_t *pSort = stackallocT( SortInfo_t, nSequenceCount );
 
 	// Set up sort info
 	for ( int j = 0; j < nSequenceCount; j++ )
@@ -3039,7 +3039,7 @@ void ControlPanel::initSequenceChoices()
 	if (hdr)
 	{
 		int nSequenceCount = hdr->GetNumSeq();
-		int *pSequence = (int*)_alloca( nSequenceCount * sizeof(int) );
+		int *pSequence = stackallocT( int, nSequenceCount );
 		CreateSortedSequenceList( hdr, pSequence );
 
 		if (iSelectionToSequence)
