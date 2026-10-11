@@ -156,9 +156,8 @@ void CModelBrowser::SaveLoadSettings( bool bSave )
 
 		if (!str.IsEmpty())
 		{
-			sscanf(str, "%d %d %d %d", &rect.left, &rect.top, &rect.right, &rect.bottom);
-
-			if (rect.left < 0)
+			// dimhotepus: Check we loaded entire rectangle.
+			if (4 != sscanf(str, "%d %d %d %d", &rect.left, &rect.top, &rect.right, &rect.bottom) || rect.left < 0)
 			{
 				ShowWindow(SW_SHOWMAXIMIZED);
 			}
