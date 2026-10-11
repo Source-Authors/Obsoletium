@@ -222,8 +222,8 @@ public:
 				CLightingPreviewLightDescription &l=(*m_pLightList)[i];
 				CIncrementalLightInfo *l_info=l.m_pIncrementalInfo;
 				if ( l_info &&
-					( l_info->m_eIncrState==INCR_STATE_HAVE_FULL_RESULTS ) ||
-					( l_info->m_eIncrState==INCR_STATE_PARTIAL_RESULTS) )
+					( l_info->m_eIncrState==INCR_STATE_HAVE_FULL_RESULTS ||
+					  l_info->m_eIncrState==INCR_STATE_PARTIAL_RESULTS ) )
 				{
 					sum_weights+=l_info->m_fTotalContribution;
 					sum_colors.x+=l_info->m_fTotalContribution*l.m_Color.x;
