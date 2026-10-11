@@ -590,9 +590,9 @@ void StudioModel::SetFlexController( LocalFlexController_t iFlex, float flValue 
 		}
 
 		// dimhotepus: Check bounds.
-		if (iFlex < ssize(m_flexweight))
+		if (to_underlying(iFlex) < ssize(m_flexweight))
 		{
-			m_flexweight[iFlex] = clamp( flValue, 0.0f, 1.0f );
+			m_flexweight[to_underlying(iFlex)] = clamp( flValue, 0.0f, 1.0f );
 		}
 		else
 		{
