@@ -13,6 +13,7 @@
 
 #include <cstdlib>  // rand
 
+#include "tier0/annotations.h"
 #include "tier0/basetypes.h"  // vec_t
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
@@ -1973,8 +1974,8 @@ public:
 };
 
 
-extern void XM_CALLCONV AngleQuaternion( RadianEuler const &angles, Quaternion &qt );
-extern void XM_CALLCONV QuaternionAngles( Quaternion const &q, RadianEuler &angles );
+extern void XM_CALLCONV AngleQuaternion( RadianEuler const &angles, OUT_ARG Quaternion &qt );
+extern void XM_CALLCONV QuaternionAngles( Quaternion const &q, OUT_ARG RadianEuler &angles );
 
 FORCEINLINE void XM_CALLCONV NetworkVarConstruct( Quaternion &q ) { q.x = q.y = q.z = q.w = 0.0f; }
 

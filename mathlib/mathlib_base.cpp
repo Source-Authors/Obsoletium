@@ -109,10 +109,8 @@ void XM_CALLCONV MatrixAngles( const matrix3x4_t &matrix, Quaternion &q, Vector 
 
 #if 0
 	// check against the angle version
-	RadianEuler ang;
-	MatrixAngles( matrix, ang );
-	Quaternion test;
-	AngleQuaternion( ang, test );
+	RadianEuler ang = MatrixEulerAngles( matrix );
+	Quaternion test = AngleQuaternion( ang );
 	float d = QuaternionDotProduct( q, test );
 	Assert( fabs(d) > 0.99 && fabs(d) < 1.01 );
 #endif
@@ -331,9 +329,7 @@ QAngle XM_CALLCONV TransformAnglesToLocalSpace( const QAngle &angles, const matr
 	AngleMatrix( angles, angToWorld );
 	ConcatTransforms( worldToParent, angToWorld, localMatrix );
 	
-	QAngle out;
-	MatrixAngles( localMatrix, out );
-	return out;
+	return MatrixAngles( localMatrix );
 }
 
 // transform a set of angles in the input space of parentMatrix to the output space
@@ -342,9 +338,7 @@ QAngle XM_CALLCONV TransformAnglesToWorldSpace( const QAngle &angles, const matr
 	matrix3x4_t angToParent, angToWorld;
 	AngleMatrix( angles, angToParent );
 	ConcatTransforms( parentMatrix, angToParent, angToWorld );
-	QAngle out;
-	MatrixAngles( angToWorld, out );
-	return out;
+	return MatrixAngles( angToWorld );
 }
 
 #endif // VECTOR_NO_SLOW_OPERATIONS
@@ -1953,9 +1947,30 @@ void XM_CALLCONV QuaternionMatrix( const Quaternion &q, matrix3x4_t& matrix )
 	matrix[1][2] = 2.0f * ( qyqz - qxqw );
 	matrix[2][2] = 1.0f - 2.0f * ( qx2 + qy2 );
 
-    matrix[0][3] = 0.0f;
+	matrix[0][3] = 0.0f;
 	matrix[1][3] = 0.0f;
 	matrix[2][3] = 0.0f;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Converts a quaternion into engine angles
+// Input  : *quaternion - q3 + q0.i + q1.j + q2.k
+// Output : PITCH, YAW, ROLL
+//-----------------------------------------------------------------------------
+[[nodiscard]] QAngle XM_CALLCONV QuaternionAngles( const Quaternion& q )
+{
+	Assert( q.IsValid() );
+
+#ifdef _VPROF_MATHLIB
+	VPROF_BUDGET( "QuaternionAngles", "Mathlib" );
+#endif
+
+	// FIXME: doing it this way calculates too much data, needs to do an optimized version...
+	matrix3x4_t matrix;
+	QuaternionMatrix( q, matrix );
+
+	return MatrixAngles( matrix );
 }
 
 
@@ -1966,33 +1981,7 @@ void XM_CALLCONV QuaternionMatrix( const Quaternion &q, matrix3x4_t& matrix )
 //-----------------------------------------------------------------------------
 void XM_CALLCONV QuaternionAngles( const Quaternion &q, QAngle &angles )
 {
-	Assert( q.IsValid() );
-
-#ifdef _VPROF_MATHLIB
-	VPROF_BUDGET( "QuaternionAngles", "Mathlib" );
-#endif
-
-#if 1
-	// FIXME: doing it this way calculates too much data, needs to do an optimized version...
-	matrix3x4_t matrix;
-	QuaternionMatrix( q, matrix );
-	MatrixAngles( matrix, angles );
-#else
-	float m11, m12, m13, m23, m33;
-
-	m11 = ( 2.0f * q.w * q.w ) + ( 2.0f * q.x * q.x ) - 1.0f;
-	m12 = ( 2.0f * q.x * q.y ) + ( 2.0f * q.w * q.z );
-	m13 = ( 2.0f * q.x * q.z ) - ( 2.0f * q.w * q.y );
-	m23 = ( 2.0f * q.y * q.z ) + ( 2.0f * q.w * q.x );
-	m33 = ( 2.0f * q.w * q.w ) + ( 2.0f * q.z * q.z ) - 1.0f;
-
-	// FIXME: this code has a singularity near PITCH +-90
-	angles[YAW] = RAD2DEG( atan2f(m12, m11) );
-	angles[PITCH] = RAD2DEG( asinf(-m13) );
-	angles[ROLL] = RAD2DEG( atan2f(m23, m33) );
-#endif
-
-	Assert( angles.IsValid() );
+	angles = QuaternionAngles( q );
 }
 
 //-----------------------------------------------------------------------------
@@ -2015,25 +2004,24 @@ void XM_CALLCONV QuaternionAxisAngle( const Quaternion &q, Vector &axis, float &
 //-----------------------------------------------------------------------------
 // Purpose: Converts an exponential map (ang/axis) to a quaternion
 //-----------------------------------------------------------------------------
-void XM_CALLCONV AxisAngleQuaternion( const Vector &axis, float angle, Quaternion &q )
+[[nodiscard]] Quaternion XM_CALLCONV AxisAngleQuaternion( const Vector &axis, float angle )
 {
 	float sa, ca;
-	
 	SinCos( DEG2RAD(angle) * 0.5f, &sa, &ca );
-	
-	q.x = axis.x * sa;
-	q.y = axis.y * sa;
-	q.z = axis.z * sa;
-	q.w = ca;
+
+	return {axis.x * sa, axis.y * sa, axis.z * sa, ca};
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Converts an exponential map (ang/axis) to a quaternion
+//-----------------------------------------------------------------------------
+void XM_CALLCONV AxisAngleQuaternion( const Vector &axis, float angle, Quaternion &q )
+{
+	q = AxisAngleQuaternion( axis, angle );
 }
 
 
-//-----------------------------------------------------------------------------
-// Purpose: Converts radian-euler axis aligned angles to a quaternion
-// Input  : *pfAngles - Right-handed Euler angles in radians
-//			*outQuat - quaternion of form (i,j,k,real)
-//-----------------------------------------------------------------------------
-void XM_CALLCONV AngleQuaternion( const RadianEuler &angles, Quaternion &outQuat )
+[[nodiscard]] Quaternion XM_CALLCONV AngleQuaternion( const RadianEuler& angles )
 {
 #ifdef _VPROF_MATHLIB
 	VPROF_BUDGET( "AngleQuaternion", "Mathlib" );
@@ -2048,6 +2036,7 @@ void XM_CALLCONV AngleQuaternion( const RadianEuler &angles, Quaternion &outQuat
 	float sr = SubFloat( sine, 0 ), sp = SubFloat( sine, 1 ), sy = SubFloat( sine, 2 );
 	float cr = SubFloat( cosine, 0 ), cp = SubFloat( cosine, 1 ), cy = SubFloat( cosine, 2 );
 
+	Quaternion outQuat;
 	// NJS: for some reason VC6 wasn't recognizing the common subexpressions:
 	float srXcp = sr * cp, crXsp = cr * sp;
 	outQuat.x = srXcp*cy-crXsp*sy; // X
@@ -2056,18 +2045,31 @@ void XM_CALLCONV AngleQuaternion( const RadianEuler &angles, Quaternion &outQuat
 	float crXcp = cr * cp, srXsp = sr * sp;
 	outQuat.z = crXcp*sy-srXsp*cy; // Z
 	outQuat.w = crXcp*cy+srXsp*sy; // W (real component)
+
+	return outQuat;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Converts radian-euler axis aligned angles to a quaternion
+// Input  : *pfAngles - Right-handed Euler angles in radians
+//			*outQuat - quaternion of form (i,j,k,real)
+//-----------------------------------------------------------------------------
+void XM_CALLCONV AngleQuaternion( const RadianEuler &angles, OUT_ARG Quaternion &outQuat )
+{
+	outQuat = AngleQuaternion( angles );
 }
 
 
 //-----------------------------------------------------------------------------
 // Purpose: Converts engine-format euler angles to a quaternion
 // Input  : angles - Right-handed Euler angles in degrees as follows:
-//				[0]: PITCH: Clockwise rotation around the Y axis.
-//				[1]: YAW:	Counterclockwise rotation around the Z axis.
-//				[2]: ROLL:	Counterclockwise rotation around the X axis.
-//			*outQuat - quaternion of form (i,j,k,real)
+// [0]: PITCH: Clockwise rotation around the Y axis.
+// [1]: YAW:   Counterclockwise rotation around the Z axis.
+// [2]: ROLL:  Counterclockwise rotation around the X axis.
+// *outQuat - quaternion of form (i,j,k,real)
 //-----------------------------------------------------------------------------
-void XM_CALLCONV AngleQuaternion( const QAngle &angles, Quaternion &outQuat )
+[[nodiscard]] Quaternion XM_CALLCONV AngleQuaternion( const QAngle& angles )
 {
 #ifdef _VPROF_MATHLIB
 	VPROF_BUDGET( "AngleQuaternion", "Mathlib" );
@@ -2082,6 +2084,8 @@ void XM_CALLCONV AngleQuaternion( const QAngle &angles, Quaternion &outQuat )
 	float sp = SubFloat( sine, 0 ),	sy = SubFloat( sine, 1 ), sr = SubFloat( sine, 2 );
 	float cp = SubFloat( cosine, 0 ), cy = SubFloat( cosine, 1 ), cr = SubFloat( cosine, 2 );
 
+	Quaternion outQuat;
+
 	// NJS: for some reason VC6 wasn't recognizing the common subexpressions:
 	float srXcp = sr * cp, crXsp = cr * sp;
 	outQuat.x = srXcp*cy-crXsp*sy; // X
@@ -2090,6 +2094,22 @@ void XM_CALLCONV AngleQuaternion( const QAngle &angles, Quaternion &outQuat )
 	float crXcp = cr * cp, srXsp = sr * sp;
 	outQuat.z = crXcp*sy-srXsp*cy; // Z
 	outQuat.w = crXcp*cy+srXsp*sy; // W (real component)
+
+	return outQuat;
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Converts engine-format euler angles to a quaternion
+// Input  : angles - Right-handed Euler angles in degrees as follows:
+// [0]: PITCH: Clockwise rotation around the Y axis.
+// [1]: YAW:   Counterclockwise rotation around the Z axis.
+// [2]: ROLL:  Counterclockwise rotation around the X axis.
+// *outQuat - quaternion of form (i,j,k,real)
+//-----------------------------------------------------------------------------
+void XM_CALLCONV AngleQuaternion( const QAngle &angles, Quaternion &outQuat )
+{
+	outQuat = AngleQuaternion( angles );
 }
 
 
@@ -2112,24 +2132,39 @@ void XM_CALLCONV BasisToQuaternion( const Vector &vecForward, const Vector &vecR
 	MatrixSetColumn( vecLeft, 1, mat );
 	MatrixSetColumn( vecUp, 2, mat );
 
-	QAngle angles;
-	MatrixAngles( mat, angles );
+	QAngle angles = MatrixAngles( mat );
 
-//	Quaternion q2;
-	AngleQuaternion( angles, q );
-
-//	Assert( fabs(q.x - q2.x) < 1e-3 );
-//	Assert( fabs(q.y - q2.y) < 1e-3 );
-//	Assert( fabs(q.z - q2.z) < 1e-3 );
-//	Assert( fabs(q.w - q2.w) < 1e-3 );
+	q = AngleQuaternion( angles );
 }
 
+
 // FIXME: Optimize!
+[[nodiscard]] Quaternion XM_CALLCONV MatrixQuaternion( const matrix3x4_t& mat )
+{
+	QAngle angles = MatrixAngles( mat );
+	return AngleQuaternion( angles );
+}
+
 void XM_CALLCONV MatrixQuaternion( const matrix3x4_t &mat, Quaternion &q )
 {
-	QAngle angles;
-	MatrixAngles( mat, angles );
-	AngleQuaternion( angles, q );
+	q = MatrixQuaternion( mat ); 
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Converts a quaternion into engine angles
+// Input  : *quaternion - q3 + q0.i + q1.j + q2.k
+// Output : PITCH, YAW, ROLL
+//-----------------------------------------------------------------------------
+[[nodiscard]] RadianEuler XM_CALLCONV QuaternionEulerAngles( const Quaternion &q )
+{
+	Assert( q.IsValid() );
+
+	// FIXME: doing it this way calculates too much data, needs to do an optimized version...
+	matrix3x4_t matrix;
+	QuaternionMatrix( q, matrix );
+
+	return MatrixAngles( matrix );
 }
 
 
@@ -2138,16 +2173,9 @@ void XM_CALLCONV MatrixQuaternion( const matrix3x4_t &mat, Quaternion &q )
 // Input  : *quaternion - q3 + q0.i + q1.j + q2.k
 //			*outAngles - PITCH, YAW, ROLL
 //-----------------------------------------------------------------------------
-void XM_CALLCONV QuaternionAngles( const Quaternion &q, RadianEuler &angles )
+void XM_CALLCONV QuaternionAngles( const Quaternion &q, OUT_ARG RadianEuler &angles )
 {
-	Assert( q.IsValid() );
-
-	// FIXME: doing it this way calculates too much data, needs to do an optimized version...
-	matrix3x4_t matrix;
-	QuaternionMatrix( q, matrix );
-	MatrixAngles( matrix, angles );
-
-	Assert( angles.IsValid() );
+	angles = QuaternionEulerAngles( q );
 }
 
 
@@ -3414,9 +3442,9 @@ bool XM_CALLCONV AnglesAreEqual( float a, float b, float tolerance )
 
 void XM_CALLCONV RotationDeltaAxisAngle( const QAngle &srcAngles, const QAngle &destAngles, Vector &deltaAxis, float &deltaAngle )
 {
-	Quaternion srcQuat, destQuat, srcQuatInv, out;
-	AngleQuaternion( srcAngles, srcQuat );
-	AngleQuaternion( destAngles, destQuat );
+	Quaternion srcQuatInv, out;
+	Quaternion srcQuat = AngleQuaternion( srcAngles );
+	Quaternion destQuat = AngleQuaternion( destAngles );
 	QuaternionScale( srcQuat, -1, srcQuatInv );
 	QuaternionMult( destQuat, srcQuatInv, out );
 
@@ -3434,8 +3462,7 @@ void XM_CALLCONV RotationDelta( const QAngle &srcAngles, const QAngle &destAngle
 	MatrixInvert( src, srcInv );
 	matrix3x4_t xform;
 	ConcatTransforms( dest, srcInv, xform );
-	QAngle xformAngles;
-	MatrixAngles( xform, xformAngles );
+	QAngle xformAngles = MatrixAngles( xform );
 	if ( out )
 	{
 		*out = xformAngles;

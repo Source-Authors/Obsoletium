@@ -650,14 +650,26 @@ void XM_CALLCONV QuaternionAdd( const Quaternion &p, const Quaternion &q, Quater
 void XM_CALLCONV QuaternionMult( const Quaternion &p, const Quaternion &q, Quaternion &qt );
 void XM_CALLCONV QuaternionMatrix( const Quaternion &q, matrix3x4_t &matrix );
 void XM_CALLCONV QuaternionMatrix( const Quaternion &q, const Vector &pos, matrix3x4_t &matrix );
+// dimhotepus: Cleanup flow.
+[[nodiscard]] Quaternion XM_CALLCONV MatrixQuaternion( const matrix3x4_t& mat );
+void XM_CALLCONV MatrixQuaternion( const matrix3x4_t &mat, Quaternion &q );
+// dimhotepus: Cleanup flow.
+[[nodiscard]] QAngle XM_CALLCONV QuaternionAngles( const Quaternion& q );
 void XM_CALLCONV QuaternionAngles( const Quaternion &q, QAngle &angles );
+// dimhotepus: Cleanup flow.
+[[nodiscard]] Quaternion XM_CALLCONV AngleQuaternion( const QAngle& angles );
 void XM_CALLCONV AngleQuaternion( const QAngle& angles, Quaternion &qt );
-void XM_CALLCONV QuaternionAngles(const Quaternion &q, RadianEuler &angles);
-void XM_CALLCONV AngleQuaternion(RadianEuler const &angles, Quaternion &qt);
+// dimhotepus: Cleanup flow.
+[[nodiscard]] RadianEuler XM_CALLCONV QuaternionEulerAngles( const Quaternion &q );
+void XM_CALLCONV QuaternionAngles( const Quaternion &q, OUT_ARG RadianEuler &angles );
+// dimhotepus: Cleanup flow.
+[[nodiscard]] Quaternion XM_CALLCONV AngleQuaternion( const RadianEuler & angles );
+void XM_CALLCONV AngleQuaternion( const RadianEuler &angles, OUT_ARG Quaternion &qt );
 void XM_CALLCONV QuaternionAxisAngle( const Quaternion &q, Vector &axis, float &angle );
+// dimhotepus: Cleanup flow.
+[[nodiscard]] Quaternion XM_CALLCONV AxisAngleQuaternion( const Vector &axis, float angle );
 void XM_CALLCONV AxisAngleQuaternion( const Vector &axis, float angle, Quaternion &q );
 void XM_CALLCONV BasisToQuaternion( const Vector &vecForward, const Vector &vecRight, const Vector &vecUp, Quaternion &q );
-void XM_CALLCONV MatrixQuaternion( const matrix3x4_t &mat, Quaternion &q );
 
 // A couple methods to find the dot product of a vector with a matrix row or column...
 [[nodiscard]] inline float XM_CALLCONV MatrixRowDotProduct( const matrix3x4_t &in1, int row, const Vector& in2 )
@@ -750,9 +762,7 @@ template <>
 	QuaternionSlerp( src, dest, flPercent, result );
 
 	// Convert to euler
-	QAngle output;
-	QuaternionAngles( result, output );
-	return output;
+	return QuaternionAngles( result );
 }
 
 #else
@@ -766,11 +776,9 @@ template <>
 	if ( q1 == q2 )
 		return q1;
 
-	Quaternion src, dest;
-
 	// Convert to quaternions
-	AngleQuaternion( q1, src );
-	AngleQuaternion( q2, dest );
+	Quaternion src = AngleQuaternion( q1 );
+	Quaternion dest = AngleQuaternion( q2 );
 
 	Quaternion result;
 
@@ -925,9 +933,18 @@ void XM_CALLCONV VectorIRotate( Vector in1, const matrix3x4_t &in2, Vector &out 
 	);
 }
 
+// dimhotepus: Cleanup flow.
+[[nodiscard]] inline QAngle XM_CALLCONV MatrixAngles( const matrix3x4_t &matrix )
+{
+	QAngle angles;
+	MatrixAngles( matrix, &angles.x );
+	Assert( angles.IsValid() );
+	return angles;
+}
+
 inline void XM_CALLCONV MatrixAngles( const matrix3x4_t &matrix, QAngle &angles )
 {
-	MatrixAngles( matrix, &angles.x );
+	angles = MatrixAngles( matrix );
 }
 
 inline void XM_CALLCONV MatrixAngles( const matrix3x4_t &matrix, QAngle &angles, Vector &position )
@@ -936,11 +953,19 @@ inline void XM_CALLCONV MatrixAngles( const matrix3x4_t &matrix, QAngle &angles,
 	MatrixPosition( matrix, position );
 }
 
+// dimhotepus: Cleanup flow.
+[[nodiscard]] inline RadianEuler XM_CALLCONV MatrixEulerAngles( const matrix3x4_t &matrix )
+{
+	RadianEuler angles;
+	MatrixAngles( matrix, &angles.x );
+	Assert( angles.IsValid() );
+	angles.Init( DEG2RAD( angles.z ), DEG2RAD( angles.x ), DEG2RAD( angles.y ) );
+	return angles;
+}
+
 inline void XM_CALLCONV MatrixAngles( const matrix3x4_t &matrix, RadianEuler &angles )
 {
-	MatrixAngles( matrix, &angles.x );
-
-	angles.Init( DEG2RAD( angles.z ), DEG2RAD( angles.x ), DEG2RAD( angles.y ) );
+	angles = MatrixEulerAngles( matrix );
 }
 
 void XM_CALLCONV MatrixAngles( const matrix3x4_t &mat, RadianEuler &angles, Vector &position );
