@@ -175,6 +175,7 @@ MatSysWindow::MatSysWindow (mxWindow *parent, int x, int y, int w, int h, const 
 {
 	g_pMaterialSystem->SetMaterialProxyFactory( &g_DummyMaterialProxyFactory );
 
+	m_hMaterialSystemInst = nullptr;
 	m_pCubemapTexture = NULL;
 	m_hWnd = (HWND)getHandle();
 
