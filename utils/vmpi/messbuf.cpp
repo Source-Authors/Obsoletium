@@ -215,11 +215,17 @@ MessageBuffer::resize(ptrdiff_t minsize)
 
 	if (size * 2 > minsize) minsize = size * 2;
 
-	char * odata = data;
-	data = (char *) malloc(minsize);
-	memcpy(data, odata, len);
-	size = minsize;
-	free(odata);
+	char *odata;
+	free( std::exchange( odata, (char *) malloc(minsize) ) );
+	if ( odata )
+	{
+		memcpy(data, odata, len);
+		size = minsize;
+	}
+	else
+	{
+		size = 0;
+	}
 }
 
 
