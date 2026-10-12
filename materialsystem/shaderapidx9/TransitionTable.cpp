@@ -1126,12 +1126,12 @@ int CTransitionTable::CreateNormalTransitions( const ShadowState_t& fromState, c
 	}
 
 	int nSamplerCount = HardwareConfig()->GetSamplerCount();
-	for ( int i = 0; i < nSamplerCount; ++i )
+	for ( int j = 0; j < nSamplerCount; ++j )
 	{
-		ADD_SAMPLER_STATE_TRANSITION( i, SRGBReadEnable );
-		ADD_SAMPLER_STATE_TRANSITION( i, Fetch4Enable );
+		ADD_SAMPLER_STATE_TRANSITION( j, SRGBReadEnable );
+		ADD_SAMPLER_STATE_TRANSITION( j, Fetch4Enable );
 #ifdef DX_TO_GL_ABSTRACTION
-		ADD_SAMPLER_STATE_TRANSITION( i, ShadowFilterEnable );
+		ADD_SAMPLER_STATE_TRANSITION( j, ShadowFilterEnable );
 #endif
 	}
 
