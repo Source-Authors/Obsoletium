@@ -1064,8 +1064,9 @@ enum {
 };
 char *V_pretifymem( double value, int digitsafterdecimal /*= 2*/, bool usebinaryonek /*= false*/ )
 {
-	static char output[ NUM_PRETIFYMEM_BUFFERS ][ 32 ];
-	static intp  current;
+	// dimhotepus: Make thread-safe.
+	static thread_local char output[ NUM_PRETIFYMEM_BUFFERS ][ 32 ];
+	static thread_local intp  current;
 
 	double		onekb = usebinaryonek ? 1024.0 : 1000.0;
 	double		onemb = onekb * onekb;
@@ -1175,8 +1176,9 @@ enum {
 };
 char *V_pretifynum( int64 inputValue )
 {
-	static char output[ NUM_PRETIFYNUM_BUFFERS ][ 32 ];
-	static intp  current;
+	// dimhotepus: Make thread-safe.
+	static thread_local char output[ NUM_PRETIFYNUM_BUFFERS ][ 32 ];
+	static thread_local intp  current;
 
 	// Point to the output buffer.
 	char * const out = output[ current ];
