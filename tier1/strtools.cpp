@@ -70,7 +70,7 @@
 
 #include "tier0/memdbgon.h"
 
-static int FastToLower( char c )
+[[nodiscard]] static int FastToLower( char c )
 {
 	int i = (unsigned char) c;
 	if ( i < 0x80 )
@@ -1254,7 +1254,7 @@ char *V_pretifynum( int64 inputValue )
 //			characters in this set are removed from the beginning and/or end of strings
 //			by Q_AggressiveStripPrecedingAndTrailingWhitespaceW() 
 //-----------------------------------------------------------------------------
-static bool Q_IsMeanSpaceW( wchar_t wch )
+[[nodiscard]] static bool Q_IsMeanSpaceW( wchar_t wch )
 {
 	bool bIsMean = false;
 
@@ -1301,7 +1301,7 @@ static bool Q_IsMeanSpaceW( wchar_t wch )
 // which we don't want in persona names or chat strings as they're disruptive
 // to the user experience.
 //-----------------------------------------------------------------------------
-static wchar_t *StripWhitespaceWorker( intp cchLength, wchar_t *pwch, bool *pbStrippedWhitespace, bool bAggressive )
+[[nodiscard]] static wchar_t *StripWhitespaceWorker( intp cchLength, wchar_t *pwch, bool *pbStrippedWhitespace, bool bAggressive )
 {
 	// walk backwards from the end of the string, killing any whitespace
 	*pbStrippedWhitespace = false;
@@ -2553,7 +2553,7 @@ bool V_IsAbsolutePath( IN_Z const char *pStr )
 
 // Copies at most nCharsToCopy bytes from pIn into pOut.
 // Returns false if it would have overflowed pOut's buffer.
-static bool CopyToMaxChars( char *pOut, intp outSize, const char *pIn, intp nCharsToCopy )
+[[nodiscard]] static bool CopyToMaxChars( char *pOut, intp outSize, const char *pIn, intp nCharsToCopy )
 {
 	if ( outSize == 0 )
 		return false;
@@ -2645,7 +2645,7 @@ bool V_StrSubst(
 }
 
 
-static char* AllocString( const char *pStr, intp nMaxChars )
+[[nodiscard]] static char* AllocString( const char *pStr, intp nMaxChars )
 {
 	intp allocLen = (intp)strlen( pStr );
 	if ( nMaxChars == -1 )
@@ -2928,7 +2928,7 @@ char *V_AddBackSlashesToSpecialChars( IN_Z const char *pSrc )
 //-----------------------------------------------------------------------------
 // Purpose: Helper for converting a numeric value to a hex digit, value should be 0-15.
 //-----------------------------------------------------------------------------
-static constexpr char cIntToHexDigit( int nValue )
+[[nodiscard]] static constexpr char cIntToHexDigit( int nValue )
 {
 	Assert( nValue >= 0 && nValue <= 15 );
 	return "0123456789ABCDEF"[ nValue & 15 ];
@@ -2938,7 +2938,7 @@ static constexpr char cIntToHexDigit( int nValue )
 // Purpose: Helper for converting a hex char value to numeric, return -1 if the char
 //          is not a valid hex digit.
 //-----------------------------------------------------------------------------
-static constexpr int iHexCharToInt( char cValue )
+[[nodiscard]] static constexpr int iHexCharToInt( char cValue )
 {
 	int32 iValue = cValue;
 
@@ -3845,7 +3845,7 @@ bool V_BBCodeToHTML( OUT_Z_CAP( nDestSize ) char *pDest, const intp nDestSize, I
 //			characters in this set are removed from the beginning and/or end of strings
 //			by Q_AggressiveStripPrecedingAndTrailingWhitespaceW() 
 //-----------------------------------------------------------------------------
-static bool V_IsMeanUnderscoreW( wchar_t wch )
+[[nodiscard]] static bool V_IsMeanUnderscoreW( wchar_t wch )
 {
 	bool bIsMean = false;
 
