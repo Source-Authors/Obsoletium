@@ -1197,8 +1197,6 @@ MDLViewer::MDLViewer () :
 	// dimhotepus: Apply Dark mode if any and Mica styles to window title bar.
 	Plat_ApplySystemTitleBarTheme( getHandle(), SystemBackdropType::MainWindow );
 
-	intp i;
-
 	g_MDLViewer = this;
 
 	FacePoser_MakeToolWindow( this, false );
@@ -1402,7 +1400,7 @@ MDLViewer::MDLViewer () :
 	Con_Printf( "Add Tool Windows\n" );
 
 	intp c = IFacePoserToolWindow::GetToolCount();
-	for ( i = 0; i < c ; i++ )
+	for ( intp i = 0; i < c ; i++ )
 	{
 		IFacePoserToolWindow *tool = IFacePoserToolWindow::GetTool( i );
 		menuWindow->add( tool->GetToolName(), static_cast<int>(IDC_WINDOW_FIRSTTOOL + i) );
