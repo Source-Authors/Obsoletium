@@ -498,7 +498,11 @@ struct mstudiocompressedikerror_t
 	short	offset[6];
 	inline mstudioanimvalue_t *pAnimvalue( int i ) const { if (offset[i] > 0) return  (mstudioanimvalue_t *)(((byte *)this) + offset[i]); else return nullptr; }
 
-	mstudiocompressedikerror_t() { memset( scale, 0, sizeof(scale) ); memset( offset, 0, sizeof(offset) );}
+	mstudiocompressedikerror_t()
+	{
+		BitwiseClear( scale );
+		BitwiseClear( offset );
+	}
 	// No copy constructors allowed
 	mstudiocompressedikerror_t(const mstudiocompressedikerror_t& vOther) = delete;
 };
