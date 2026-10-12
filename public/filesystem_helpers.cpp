@@ -17,22 +17,28 @@ static constexpr characterset_t g_BreakSetIncludingColons{"{}()':"};
 
 const char* ParseFileInternal( const char* pFileBytes, OUT_Z_CAP(nMaxTokenLen) char* pTokenOut, bool* pWasQuoted, const characterset_t *pCharSet, size_t nMaxTokenLen )
 {
-	pTokenOut[0] = '\0';
-
-	if (pWasQuoted)
-		*pWasQuoted = false;
-
-	if (!pFileBytes)
+	if ( nMaxTokenLen == 0 )
 		return nullptr;
 
+	pTokenOut[0] = '\0';
+
+	if ( pWasQuoted )
+		*pWasQuoted = false;
+
 	// dimhotepus: TF2 backport.
-	if ( nMaxTokenLen <= 1 )
+	if ( nMaxTokenLen == 1 )
+		return nullptr;
+
+	if ( !pFileBytes )
 		return nullptr;
 
 	// YWB:  Ignore colons as token separators in COM_Parse
 	const characterset_t& breaks = pCharSet ? *pCharSet : g_BreakSetIncludingColons;
 	
-	char c;
+	// dimhotepus: char may be signed.  Bytes above 0x7F can compare as <= ' '
+	// and be treated as whitespace, or terminate a word unexpectedly.
+	unsigned char c;
+	const char *pInitialFileBytes = pFileBytes;
 	size_t len = 0, maxLen = nMaxTokenLen - 1;
 	
 // skip whitespace
@@ -84,9 +90,16 @@ skipwhite:
 		while (1)
 		{
 			c = *pFileBytes++;
-			if (c=='\"' || !c)
+			if (c=='\"')
 			{
 				pTokenOut[len] = '\0';
+				return pFileBytes;
+			}
+			if (!c)
+			{
+				pTokenOut[len] = '\0';
+				// dimhotepus: Reset pointer back to not point past '\0'
+				--pFileBytes;
 				return pFileBytes;
 			}
 			pTokenOut[len] = c;
@@ -96,7 +109,17 @@ skipwhite:
 			if ( len == maxLen )
 			{
 				pTokenOut[len] = '\0';
-				Assert(0);
+				AssertMsg(false,
+					"Quoted token overflow. %s token overflow at position %zd. Copied only %zu chars to %s",
+					pInitialFileBytes,
+					pFileBytes - pInitialFileBytes,
+					len,
+					pTokenOut );
+				Warning( "Quoted token overflow. %s token overflow at position %zd. Copied only %zu chars to %s",
+					pInitialFileBytes,
+					pFileBytes - pInitialFileBytes,
+					len,
+					pTokenOut );
 				return pFileBytes;
 			}
 		}
@@ -122,7 +145,17 @@ skipwhite:
 		if ( len == maxLen )
 		{
 			pTokenOut[len] = '\0';
-			Assert(0);
+			AssertMsg(false,
+				"Token overflow. %s token overflow at position %zd. Copied only %zu chars to %s",
+				pInitialFileBytes,
+				pFileBytes - pInitialFileBytes,
+				len,
+				pTokenOut );
+			Warning( "Token overflow. %s token overflow at position %zd. Copied only %zu chars to %s",
+				pInitialFileBytes,
+				pFileBytes - pInitialFileBytes,
+				len,
+				pTokenOut );
 			return pFileBytes;
 		}
 
