@@ -948,7 +948,7 @@ size_t AssembleWorkerReplyPackage(
 
   // Time to limit amount of prints
   static double s_fLastInfoTime = 0;
-  double fCurTime = Plat_FloatTime();
+  const double fCurTime{Plat_FloatTime()};
 
   GLOBAL_DATA_MTX_LOCK_AUTO;
   if (pStComboRec) pByteCodeArray->DeleteByKey(nComboOfEntry);
@@ -1536,7 +1536,7 @@ struct ParseCompileCommandsResult {
 
 std::tuple<ParseCompileCommandsResult, int> ParseListOfCompileCommands(
     const char *shader_path, IBaseFileSystem *file_system) {
-  const double parse_start_time = Plat_FloatTime();
+  const double parse_start_time{Plat_FloatTime()};
 
   char file_list_path[MAX_PATH];
   sprintf_s(file_list_path, "%s\\filelist.txt", shader_path);
