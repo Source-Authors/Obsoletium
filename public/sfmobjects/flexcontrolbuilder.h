@@ -168,7 +168,7 @@ private:
 	// Destination controls
 	CUtlVector< ControlInfo_t > m_ControlInfo;
 
-	CDmeFilmClip *m_pMovie;
+	CDmeFilmClip* m_pMovie{nullptr};
 };
 
 
