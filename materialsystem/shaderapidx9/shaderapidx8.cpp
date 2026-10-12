@@ -6407,7 +6407,6 @@ ShaderAPITextureHandle_t CShaderAPIDx8::CreateDepthTexture(
 				width,
 				height,
 				format,
-				multisampleType,
 				se::win::com::com_error_category().message(hr).c_str() );
 		}
 

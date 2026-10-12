@@ -546,7 +546,7 @@ se::win::com::com_ptr<IDirect3DVertexDeclaration9> FindOrCreateVertexDecl(
 	if ( FAILED( hr ) )
 	{
 		Assert(false);
-		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::CreateVertexDeclaration(format = 0x%x, static = %s, flex = %s, morph = %s) failed w/e %s. You'll probably see messed-up mesh rendering - to diagnose, build shaderapidx9.dll in debug.\n",
+		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::CreateVertexDeclaration(format = 0x%zx, static = %s, flex = %s, morph = %s) failed w/e %s. You'll probably see messed-up mesh rendering - to diagnose, build shaderapidx9.dll in debug.\n",
 			fmt,
 			bStaticLit ? "true" : "false",
 			bUsingFlex ? "true" : "false",
