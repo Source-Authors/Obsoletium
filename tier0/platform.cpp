@@ -569,6 +569,10 @@ bool Plat_ApplySystemTitleBarTheme(void *window,
 	static_assert(to_underlying(SystemBackdropType::TabbedWindow) ==
 	              DWMSBT_TABBEDWINDOW);
 	
+	// Restore last error code. We can fail a lot, not needed to pollute global one.
+	const auto lastErrorCode = GetLastError();
+	RunCodeAtScopeExit(SetLastError(lastErrorCode));
+
 	bool ok = true;
 	
 	// dimhotepus: Since Windows 11 21H1 (22000) SDK
