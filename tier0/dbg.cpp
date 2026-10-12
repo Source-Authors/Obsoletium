@@ -55,6 +55,18 @@ static const char *SkipToFname( const tchar* pFile )
 	return pSlash ? pSlash + 1: pFile;
 }
 
+// dimhotepus: Is string uniform?
+[[nodiscard]] static inline bool V_isuniform(IN_Z const char* string, char value) {
+  if (!string || !*string) return false;
+  while (*string) {
+    if (*string != value) {
+      return false;
+    }
+    ++string;
+  }
+  return true;
+}
+
 template <size_t out_size>
 const char *PrefixMessageGroup(OUT_Z_ARRAY char (&out)[out_size], const char *group,
                                const char *message) {
@@ -63,7 +75,7 @@ const char *PrefixMessageGroup(OUT_Z_ARRAY char (&out)[out_size], const char *gr
   out_group = out_group && out_group[0] ? out_group : group;
 
   const size_t length{strlen(message)};
-  if (length > 1 && message[length - 1] == '\n') {
+  if (length > 1 && message[length - 1] == '\n' && !V_isuniform(message, '\n')) {
     snprintf(out, std::size(out) - 1, "[%.3f][%s] %s", Plat_FloatTime(), out_group, message);
   } else {
     snprintf(out, std::size(out) - 1, "%s", message);

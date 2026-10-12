@@ -71,7 +71,7 @@ const char *PrefixMessageGroup(
   out_group = out_group && out_group[0] ? out_group : group;
 
   const size_t length{strlen(message)};
-  if (length > 1 && message[length - 1] == '\n') {
+  if (length > 1 && message[length - 1] == '\n' && !V_isuniform(message, '\n')) {
     V_sprintf_safe(out, "[%s] %s", out_group, message);
   } else {
     V_strcpy_safe(out, message);

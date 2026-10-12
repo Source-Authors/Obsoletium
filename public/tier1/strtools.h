@@ -254,7 +254,6 @@ template< bool CASE_SENSITIVE >
 [[nodiscard]] inline bool V_strEndsWith(  IN_Z const char *pStr, IN_Z const char *pSuffix ) { return _V_strEndsWithInner<TRUE>(  pStr, pSuffix ); }
 [[nodiscard]] inline bool V_striEndsWith( IN_Z const char *pStr, IN_Z const char *pSuffix ) { return _V_strEndsWithInner<FALSE>( pStr, pSuffix ); }
 
-
 // Normalizes a float string in place.  
 // (removes leading zeros, trailing zeros after the decimal point, and the decimal point itself where possible)
 void V_normalizeFloatString( INOUT_Z char* pFloat );
@@ -1593,6 +1592,21 @@ template<size_t size>
 
 template<size_t size>
 [[nodiscard]] constexpr inline bool Q_isempty(IN_Z_ARRAY wchar_t (&v)[size]) { return v[0] == L'\0'; }
+
+// dimhotepus: Is string uniform?
+[[nodiscard]] inline bool V_isuniform( IN_Z const char *string, char value )
+{
+	if ( Q_isempty( string )) return false;
+	while (*string)
+	{
+		if (*string != value)
+		{
+			return false;
+		}
+		++string;
+	}
+	return true;
+}
 
 // dimhotepus: Fast integral -> char conversion.
 template<size_t size, typename TIntegral>
