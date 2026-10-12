@@ -1501,7 +1501,8 @@ intp CBaseAssetPicker::GetSelectedAssetModIndex( )
 CBaseAssetPickerFrame::CBaseAssetPickerFrame( vgui::Panel *pParent ) : 
 	BaseClass( pParent, "AssetPickerFrame" )
 {
-	m_pContextKeyValues = NULL;
+	m_pPicker = nullptr;
+	m_pContextKeyValues = nullptr;
 	SetDeleteSelfOnClose( true );
 	m_pOpenButton = new Button( this, "OpenButton", "#FileOpenDialog_Open", this, "Open" );
 	m_pCancelButton = new Button( this, "CancelButton", "#FileOpenDialog_Cancel", this, "Cancel" );

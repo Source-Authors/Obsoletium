@@ -43,6 +43,7 @@ CPicker::CPicker( vgui::Panel *pParent, const char *pColumnHeader, const char *p
 {
 	m_pPickerType = pColumnHeader;
 	m_pPickerTextType = pTextType;
+	m_Type = PickerChoiceType_t::PICKER_CHOICE_STRING;
 
 	// FIXME: Make this an image browser
 	m_pPickerBrowser = new vgui::ListPanel( this, "Browser" );

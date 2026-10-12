@@ -46,6 +46,8 @@ CVMTPanel::CVMTPanel( vgui::Panel *pParent, const char *pName ) : BaseClass( pPa
 	m_pVerticalBar->AddActionSignalTarget(this);
 	m_pVerticalBar->SetVisible(false);
 
+	m_iViewableWidth = m_iViewableHeight = -1;
+
 	LookAt( SPHERE_RADIUS );
 
 	m_pLightmapTexture.Init( "//platform/materials/debug/defaultlightmap", "editor" );

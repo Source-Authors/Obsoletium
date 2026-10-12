@@ -96,6 +96,8 @@ CMDLPicker::CMDLPicker( vgui::Panel *pParent, int nFlags ) :
 
 	m_pSequencesList = NULL;
 	m_pActivitiesList = NULL;
+	m_pSkinsList = NULL;
+	m_pPropDataList = NULL;
 
 	m_hDirectorySelectDialog = NULL;
 
