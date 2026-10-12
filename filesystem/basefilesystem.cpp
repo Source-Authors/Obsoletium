@@ -3603,8 +3603,13 @@ bool CBaseFileSystem::IsDirectory( const char *pFileName, const char *pathID )
 			CUtlStringList outDir, outFile;
 			pSearchPath->GetPackedStore()->GetFileAndDirLists( outDir, outFile, false );
 
+			char pTmpDir[MAX_FILEPATH];
 			for ( auto *dir : outDir )
 			{
+				// dimhotepus: Normalize dirs so we search for VPKs, too.
+				V_strcpy_safe( pTmpDir, dir );
+				V_FixSlashes( dir );
+
 				if ( V_strieq( dir, pFileName ) )
 					return true;
 			}

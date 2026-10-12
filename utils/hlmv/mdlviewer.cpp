@@ -609,8 +609,7 @@ const char* MDLViewer::SteamGetOpenFilename()
 	// dimhotepus: Support jpeg, too.
 	pDlg->AddFileMask( "*.jpeg" );
 	pDlg->AddFileMask( "*.mdl" );
-	// dimhotepus: Drop "GAME" path id as we want to go to inner directories.
-	pDlg->SetInitialDir( "models", nullptr ); // "game" );
+	pDlg->SetInitialDir( "models", "game" );
 	pDlg->SetFilterMdlAndJpgFiles( true );
 	RunCodeAtScopeExit(pDlg->Release());
 
