@@ -656,13 +656,13 @@ FileHandle_t SafeOpenRead(const char *filename) {
 }
 
 void SafeRead(FileHandle_t f, void *buffer, int count) {
-  if (g_pFileSystem->Read(buffer, count, f) != count)
-    Error("File read failure");
+  if (const int readBytes{g_pFileSystem->Read(buffer, count, f)}; readBytes != count)
+    Error("File read failure. Expected %d bytes, read %d.", count, readBytes);
 }
 
 void SafeWrite(FileHandle_t f, void *buffer, int count) {
-  if (g_pFileSystem->Write(buffer, count, f) != count)
-    Error("File write failure");
+  if (const int writeBytes{g_pFileSystem->Write(buffer, count, f)}; writeBytes != count)
+    Error("File write failure. Expected %d bytes, wrote %d.", count, writeBytes);
 }
 
 qboolean FileExists(const char *filename) {
