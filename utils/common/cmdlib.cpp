@@ -247,6 +247,8 @@ SpewRetval_t CmdLib_SpewOutputFunc(SpewType_t type, char const *pMsg) {
       retVal = SPEW_CONTINUE;
     }
 
+    RunCodeAtScopeExit(RestoreConsoleTextColor(old));
+
     if (!g_bSuppressPrintfOutput || type == SPEW_ERROR)
       fprintf(stderr, "%s", message);
 
@@ -263,10 +265,9 @@ SpewRetval_t CmdLib_SpewOutputFunc(SpewType_t type, char const *pMsg) {
     }
 
     // Dispatch to other spew hooks.
-    FOR_EACH_LL(g_ExtraSpewHooks, i)
-    g_ExtraSpewHooks[i](message);
-
-    RestoreConsoleTextColor(old);
+    FOR_EACH_LL(g_ExtraSpewHooks, i) {
+      g_ExtraSpewHooks[i](message);
+    }
   }
 
   // dimhotepus: 1 -> ENOTRECOVERABLE.

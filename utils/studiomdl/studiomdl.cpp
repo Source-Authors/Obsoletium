@@ -333,6 +333,7 @@ void MdlWarning( PRINTF_FORMAT_STRING const char *fmt, ... )
 		return;
 
 	WORD old = SetConsoleTextColor( 1, 1, 0, 1 );
+	RunCodeAtScopeExit(RestoreConsoleTextColor( old ));
 
 	if (g_quiet)
 	{
@@ -361,8 +362,6 @@ void MdlWarning( PRINTF_FORMAT_STRING const char *fmt, ... )
 		}
 		fprintf(stderr, "suppressing further warnings...\n");
 	}
-
-	RestoreConsoleTextColor( old );
 }
 
 SpewRetval_t MdlSpewOutputFunc( SpewType_t type, char const *pMsg )
