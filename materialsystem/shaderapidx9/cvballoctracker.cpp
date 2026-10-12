@@ -44,14 +44,8 @@ class CounterData
 public:
 	CounterData() : m_memCount( 0 ), m_vertCount( 0 )
 	{
-		for ( auto &e : m_elementsCompressed )
-		{
-			e = 0;
-		}
-		for ( auto &e : m_elementsUncompressed )
-		{
-			e = 0;
-		}
+		BitwiseClear( m_elementsCompressed );
+		BitwiseClear( m_elementsUncompressed );
 
 		m_AllocatorName[ 0 ] = 0;
 	}
