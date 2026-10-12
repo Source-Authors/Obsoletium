@@ -1884,7 +1884,7 @@ int MDLViewer::handleEvent (mxEvent *event)
 			case IDC_HELP_ABOUT:
 				// dimhotepus: Adjust about text.
 				mxMessageBox (this,
-					"Valve Face Poser v" SE_PRODUCT_FILE_VERSION_INFO_STRING " (c0 1996-2025, Valve Corp. All rights reserved.\r\nBuild Date: " __DATE__ "",
+					"Valve Face Poser v" SE_PRODUCT_FILE_VERSION_INFO_STRING " (c) 1996-2025, Valve Corp. All rights reserved.\r\nBuild Date: " __DATE__ "",
 					"Valve Face Poser", 
 					MX_MB_OK | MX_MB_INFORMATION);
 				break;
