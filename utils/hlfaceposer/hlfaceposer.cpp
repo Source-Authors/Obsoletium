@@ -328,6 +328,9 @@ bool FacePoser_HasWindowExStyle( mxWidget *w, int bits )
 
 static bool FacePoser_SetWindowLong( HWND wnd, int index, LONG newLong )
 {
+	const auto prevErrorCode = GetLastError();
+	RunCodeAtScopeExit(SetLastError(prevErrorCode));
+
 	// https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-setwindowlonga
 	// If the previous value of the specified 32-bit integer is zero, and the function succeeds,
 	// the return value is zero, but the function does not clear the last error information.
