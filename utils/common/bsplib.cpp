@@ -722,7 +722,8 @@ CUtlVector<doccluderpolydata_t>	g_OccluderPolyData( 1024, 1024 );
 CUtlVector<int>	g_OccluderVertexIndices( 2048, 2048 );
  
 template <class T> static void WriteData( FileHandle_t file, T *pData, int count = 1 );
-template <class T> static void WriteData( FileHandle_t file, int fieldType, T *pData, int count = 1 );
+// dimhotepus: int -> fieldtype_t.
+template <class T> static void WriteData( FileHandle_t file, fieldtype_t fieldType, T *pData, int count = 1 );
 template< class T > static void AddLump( dheader_t *header, FileHandle_t file, int lumpnum, T *pData, intp count, int version = 0 );
 template< class T > static void AddLump( dheader_t *header, FileHandle_t file, int lumpnum, CUtlVector<T> &data, int version = 0 );
 
@@ -2614,21 +2615,23 @@ static void SwapInPlace( T *pData, int count )
 	g_Swap.SwapFieldsToTargetEndian<T>( (T*)pData, pData, count );
 }
 
+// dimhotepus: int -> fieldtype_t.
 template< class T >
-static void SwapInPlace( int fieldType, T *pData, int count )
+static void SwapInPlace( fieldtype_t fieldType, T *pData, int count )
 {
 	if ( !pData )
 		return;
 
 	// swap the data in place
-	g_Swap.SwapBufferToTargetEndian<T>( (T*)pData, (T*)pData, count );
+	g_Swap.SwapBufferToTargetEndian( pData, pData, count );
 }
 
 //-----------------------------------------------------------------------------
 //	Add raw data chunk to file (not a lump)
 //-----------------------------------------------------------------------------
+// dimhotepus: int -> fieldtype_t.
 template< class T >
-static void WriteData( FileHandle_t file, int fieldType, T *pData, int count )
+static void WriteData( FileHandle_t file, fieldtype_t fieldType, T *pData, int count )
 {
 	if ( g_bSwapOnWrite )
 	{
