@@ -899,7 +899,7 @@ void LoadVolumeTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int i
 		sliceInfo.m_nHeight = h;
 		for ( int iSlice = 0; iSlice < d; ++iSlice )
 		{
-			sliceInfo.m_nZOffset = iSlice;
+			sliceInfo.m_nZOffset = size_cast<int16>( iSlice );
 			sliceInfo.m_pSrcData = pVTF->ImageData( iVTFFrame, 0, iMip, 0, 0, iSlice );
 			BlitTextureBits( sliceInfo, 0, 0, 0 );
 		}

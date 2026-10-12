@@ -2253,7 +2253,7 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 					pUnpackBuffer.get(),
 					MAX_SHADER_UNPACKED_BLOCK_SIZE );
 				pCompressedShaders += nBlockSize;
-				nBlockSize = nOutsize;		// how much data there is
+				nBlockSize = size_cast<unsigned>( nOutsize );		// how much data there is
 			}
 			break;
 			

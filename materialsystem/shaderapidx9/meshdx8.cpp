@@ -1422,7 +1422,7 @@ bool CIndexBufferDx8::Lock( int nMaxIndexCount, bool bAppend, IndexDesc_t &desc 
 	}
 
 	desc.m_pIndices = (unsigned short*)( pLockedData );
-	desc.m_nIndexSize = IndexSize() >> 1;
+	desc.m_nIndexSize = size_cast<unsigned char>( IndexSize() >> 1 );
 	if ( g_pHardwareConfig->SupportsStreamOffset() )
 	{
 		desc.m_nFirstIndex = 0;
@@ -2738,7 +2738,7 @@ void CMeshDX8::UnlockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& desc )
 	}
 																	    
 	// The actual # we wrote
-	m_NumVertices = nVertexCount;
+	m_NumVertices = size_cast<unsigned short>( nVertexCount );
 	m_NumIndices = nIndexCount;
 
 	CBaseMeshDX8::m_bMeshLocked = false;
@@ -3825,7 +3825,7 @@ bool CTempMeshDX8::IsDynamic() const
 void CTempMeshDX8::SetVertexFormat( VertexFormat_t format )
 {
 	CBaseMeshDX8::SetVertexFormat(format);
-	m_VertexSize = g_MeshMgr.VertexFormatSize( format );
+	m_VertexSize = size_cast<unsigned short>( g_MeshMgr.VertexFormatSize( format ) );
 }
 
 //-----------------------------------------------------------------------------

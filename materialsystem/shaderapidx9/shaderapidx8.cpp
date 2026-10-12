@@ -6355,8 +6355,8 @@ ShaderAPITextureHandle_t CShaderAPIDx8::CreateDepthTexture(
 	}
 
 	pTexture->m_DebugName = pDebugName;
-	pTexture->m_Width = width;
-	pTexture->m_Height = height;
+	pTexture->m_Width = size_cast<short>( width );
+	pTexture->m_Height = size_cast<short>( height );
 	pTexture->m_Depth = 1;			// fake
 	pTexture->m_Count = 1;			// created single texture
 	pTexture->m_CountIndex = 0;		// created single texture
@@ -6552,11 +6552,11 @@ void CShaderAPIDx8::CreateTextures(
 		Texture_t *pTexture = arrTxp[ idxFrame ];
 		pTexture->m_Flags = Texture_t::IS_ALLOCATED;
 		pTexture->m_DebugName = pDebugName;
-		pTexture->m_Width = width;
-		pTexture->m_Height = height;
-		pTexture->m_Depth = depth;
-		pTexture->m_Count = count;
-		pTexture->m_CountIndex = idxFrame;
+		pTexture->m_Width = size_cast<short>( width );
+		pTexture->m_Height = size_cast<short>( height );
+		pTexture->m_Depth = size_cast<short>( depth );
+		pTexture->m_Count = size_cast<short>( count );
+		pTexture->m_CountIndex = size_cast<short>( idxFrame );
 
 		pTexture->m_CreationFlags = creationFlags;
 		pTexture->m_Flags |= usSetFlags;
@@ -6590,7 +6590,7 @@ void CShaderAPIDx8::CreateTextures(
 		{
 			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - CreateD3DTexture", __FUNCTION__ );
 
-			pTexture->m_NumCopies = numCopies;
+			pTexture->m_NumCopies = size_cast<unsigned char>( numCopies );
 			{
 				// dimhotepus: Add MEM_ALLOC_D3D_CREDIT
 				MEM_ALLOC_D3D_CREDIT();
@@ -6630,7 +6630,7 @@ void CShaderAPIDx8::CreateTextures(
 		}
 		else
 		{
-			pTexture->m_NumLevels = pD3DTex ? pD3DTex->GetLevelCount() : 1;
+			pTexture->m_NumLevels = pD3DTex ? size_cast<unsigned char>( pD3DTex->GetLevelCount() ) : 1;
 			pTexture->m_MipFilter = (pTexture->m_NumLevels != 1) ? D3DTEXF_LINEAR : D3DTEXF_NONE;
 			pTexture->m_MinFilter = pTexture->m_MagFilter = D3DTEXF_LINEAR;
 		}
@@ -7300,8 +7300,8 @@ bool CShaderAPIDx8::TexLock( int level, int cubeFaceID, int xOffset, int yOffset
 		level, (D3DCUBEMAP_FACES)cubeFaceID, xOffset, yOffset, width, height, false, writer );
 	if ( bOK )
 	{
-		m_ModifyTextureLockedLevel = level;
-		m_ModifyTextureLockedFace = cubeFaceID;
+		m_ModifyTextureLockedLevel = size_cast<char>( level );
+		m_ModifyTextureLockedFace = size_cast<unsigned char>( cubeFaceID );
 	}
 	return bOK;
 }
@@ -7376,7 +7376,7 @@ void CShaderAPIDx8::TexImage2D(
 	info.m_CubeFaceID = (D3DCUBEMAP_FACES)cubeFaceID;
 	info.m_nWidth = width;
 	info.m_nHeight = height;
-	info.m_nZOffset = z;
+	info.m_nZOffset = size_cast<int16>( z );
 	info.m_SrcFormat = srcFormat;
 	info.m_pSrcData = (unsigned char *)pSrcData;
 	info.m_bTextureIsLockable = ( tex.m_Flags & Texture_t::IS_LOCKABLE ) != 0;
@@ -7451,7 +7451,7 @@ void CShaderAPIDx8::TexSubImage2D(
 	info.m_CubeFaceID = (D3DCUBEMAP_FACES)cubeFaceID;
 	info.m_nWidth = width;
 	info.m_nHeight = height;
-	info.m_nZOffset = zOffset;
+	info.m_nZOffset = size_cast<int16>( zOffset ) ;
 	info.m_SrcFormat = srcFormat;
 	info.m_pSrcData = (unsigned char *)pSrcData;
 	info.m_bTextureIsLockable = ( tex.m_Flags & Texture_t::IS_LOCKABLE ) != 0;
@@ -8972,7 +8972,7 @@ void CShaderAPIDx8::UpdateMatrixTransform( TransformType_t type )
 		}
 	}
 
-	m_DynamicState.m_TransformType[m_CurrStack] = type;
+	m_DynamicState.m_TransformType[m_CurrStack] = size_cast<unsigned char>( type );
 	m_DynamicState.m_TransformChanged[m_CurrStack] = STATE_CHANGED;
 
 #ifdef _DEBUG
