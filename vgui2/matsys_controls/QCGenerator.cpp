@@ -617,8 +617,8 @@ bool CQCGenerator::GenerateQCFile()
 	}
 	else
 	{
-		RunCodeAtScopeExit( CloseHandle( process.hThread ) );
-		RunCodeAtScopeExit( CloseHandle( process.hProcess ) );
+		CloseHandle( process.hThread );
+		CloseHandle( process.hProcess );
 	}
 #else
 	AssertMsg( false, "Implement me, why aren't we using a thread tool abstraction?" );
