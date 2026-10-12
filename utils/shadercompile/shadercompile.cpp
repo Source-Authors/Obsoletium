@@ -1149,9 +1149,12 @@ void CWorkerAccumState<TMutexType>::TryToPackageData(uint64_t iCommandNumber) {
 
   se::shader_compile::shader_combo_processor::ComboHandle hChBegin =
       se::shader_compile::shader_combo_processor::Combo_GetCombo(iLastFinished);
+  RunCodeAtScopeExit(Combo_Free(hChBegin));
+
   se::shader_compile::shader_combo_processor::ComboHandle hChEnd =
       se::shader_compile::shader_combo_processor::Combo_GetCombo(
           iFinishedByNow);
+  RunCodeAtScopeExit(Combo_Free(hChEnd));
 
   Assert(hChBegin && hChEnd);
 
@@ -1196,9 +1199,6 @@ void CWorkerAccumState<TMutexType>::TryToPackageData(uint64_t iCommandNumber) {
       }
     }
   }
-
-  Combo_Free(hChBegin);
-  Combo_Free(hChEnd);
 }
 
 template <typename TMutexType>
@@ -1212,6 +1212,7 @@ bool CWorkerAccumState<TMutexType>::OnProcess() {
     hThreadCombo = m_hCombo ? Combo_Alloc(m_hCombo) : nullptr;
     iCurrentId = &m_arrSubProcessInfos[m_arrSubProcessInfos.AddToTail()];
   }
+  RunCodeAtScopeExit(Combo_Free(hThreadCombo));
 
   uint64_t iThreadCommand = ~0ULL;
 
@@ -1236,7 +1237,6 @@ bool CWorkerAccumState<TMutexType>::OnProcess() {
       break;
   }
 
-  Combo_Free(hThreadCombo);
   return false;
 }
 
@@ -1302,6 +1302,8 @@ void ParseShaderInfoFromCompileCommands(
     ShaderInfo_t &shaderInfo) {
   if (auto hCombo = se::shader_compile::shader_combo_processor::Combo_GetCombo(
           pEntry->m_iCommandStart)) {
+    RunCodeAtScopeExit(Combo_Free(hCombo));
+
     char cmd[4096];
     Combo_FormatCommand(hCombo, cmd);
 
@@ -1341,8 +1343,6 @@ void ParseShaderInfoFromCompileCommands(
       shaderInfo.m_pShaderName = pEntry->m_szName;
       shaderInfo.m_pShaderSrc = pEntry->m_szShaderFileName;
     }
-
-    Combo_Free(hCombo);
   }
 }
 
