@@ -678,7 +678,7 @@ void CMDLPicker::CaptureScreenCaps( void )
 
 	Label		*m_pResults;
 
-	V_sprintf_safe( temp, "Captured %d items", nNumItems );
+	V_sprintf_safe( temp, "Captured %zd items", nNumItems );
 	m_pResults = ( Label * )m_pScreenCapsPage->FindChildByName( "CaptureResults" );
 	m_pResults->SetText( temp );
 }

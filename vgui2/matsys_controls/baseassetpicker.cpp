@@ -1285,7 +1285,7 @@ void CBaseAssetPicker::OnCommand( const char *pCommand )
 void CBaseAssetPicker::UpdateAssetColumnHeader( )
 {
 	char pColumnTitle[512];
-	Q_snprintf( pColumnTitle, sizeof(pColumnTitle), "%s (%d/%d)%s",
+	V_sprintf_safe( pColumnTitle, "%s (%d/%zd)%s",
 		m_pAssetType, m_nMatchingAssets, m_AssetList.Count(), m_bFinishedAssetListScan ? "" : " ..." );
 	m_pAssetBrowser->SetColumnHeaderText( 1, pColumnTitle );
 }
