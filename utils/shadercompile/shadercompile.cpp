@@ -1319,9 +1319,18 @@ void ParseShaderInfoFromCompileCommands(
         return;
       }
 
-      sscanf(pCentroidMask + ssize("/DCENTROIDMASK=") - 1, "%u",
-             &shaderInfo.m_CentroidMask);
-      sscanf(pFlags + ssize("/DFLAGS=0x") - 1, "%x", &shaderInfo.m_Flags);
+      if (1 != sscanf(pCentroidMask + ssize("/DCENTROIDMASK=") - 1, "%u",
+                      &shaderInfo.m_CentroidMask)) {
+        // dimhotepus: Warn on missed centroid mask.
+        Warning("Missed centroid mask (uint32_t) value for shader %s.\n",
+                shaderInfo.m_pShaderName);
+      }
+      if (1 !=
+          sscanf(pFlags + ssize("/DFLAGS=0x") - 1, "%x", &shaderInfo.m_Flags)) {
+        // dimhotepus: Warn on missed flags.
+        Warning("Missed flags (uint32_t) value for shader %s.\n",
+                shaderInfo.m_pShaderName);
+      }
 
       // Copy shader model
       pShaderModel += ssize("/DSHADER_MODEL_") - 1;
