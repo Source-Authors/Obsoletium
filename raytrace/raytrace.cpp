@@ -294,7 +294,7 @@ void RayTracingEnvironment::Trace4Rays(const FourRays &rays, fltx4 TMin, fltx4 T
 		// time, we will have to cover up the undesired rays with the desired ray
 
 		//!! speed!! there is room for some sse-ization here
-		FourRays tmprays;
+		FourRays tmprays = {};
 		tmprays.origin=rays.origin;
 
 		uint8 need_trace[4]={1,1,1,1};

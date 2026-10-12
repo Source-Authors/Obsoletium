@@ -73,11 +73,11 @@ void RayTracingEnvironment::RenderScene(
 	// dimhotepus: LoadAndSwizzle -> LoadAndSwizzleAligned
 	block_offsets.LoadAndSwizzleAligned(VectorAligned(0,0,0),dxvector,dyvector,VectorAligned(dxvector+dyvector));
 	
-	FourRays myrays;
+	FourRays myrays = {};
 	myrays.origin.DuplicateVector(CameraOrigin);
 	
 	// tmprays is used fo rthe case when we cannot trace 4 rays at once.
-	FourRays tmprays;
+	FourRays tmprays = {};
 	tmprays.origin.DuplicateVector(CameraOrigin);
 
 	// now, we will ray trace pixels. we will do the rays in a 2x2 pattern
