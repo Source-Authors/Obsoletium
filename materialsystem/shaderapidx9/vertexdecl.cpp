@@ -431,15 +431,15 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 (&pDecl)[declSize]
 		pDecl[i].Type = (BYTE)(bUseWrinkle ? D3DDECLTYPE_FLOAT4 : D3DDECLTYPE_FLOAT3);
 		++i;
 
-		WORD normalOffset = GetVertexElementSize( VERTEX_ELEMENT_POSITION, compressionType );
+		WORD normalOffset2 = GetVertexElementSize( VERTEX_ELEMENT_POSITION, compressionType );
 		if ( bUseWrinkle )
 		{
-			normalOffset += GetVertexElementSize( VERTEX_ELEMENT_WRINKLE, compressionType );
+			normalOffset2 += GetVertexElementSize( VERTEX_ELEMENT_WRINKLE, compressionType );
 		}
 
 		// Normal deltas
 		pDecl[i].Stream = 2;
-		pDecl[i].Offset = normalOffset;
+		pDecl[i].Offset = normalOffset2;
 		pDecl[i].Method = D3DDECLMETHOD_DEFAULT;
 		pDecl[i].Usage = D3DDECLUSAGE_NORMAL;
 		pDecl[i].UsageIndex = 1;
