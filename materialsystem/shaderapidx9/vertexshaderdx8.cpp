@@ -892,11 +892,10 @@ void CShaderManager::Init()
 void CShaderManager::Shutdown()
 {
 #ifdef DYNAMIC_SHADER_COMPILE
-	if ( m_pShaderCompiler )
-	{
-		Sys_UnloadModule( m_pShaderCompiler );
-		m_pShaderCompiler = 0;
-	}
+#ifdef REMOTE_DYNAMIC_SHADER_COMPILE
+	// dimhotepus: Correctly shutdown.
+	DeinitRemoteShaderCompile();
+#endif
 #endif
 
 #ifdef DX_TO_GL_ABSTRACTION
