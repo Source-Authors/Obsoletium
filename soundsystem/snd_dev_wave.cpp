@@ -122,18 +122,18 @@ private:
 	void	ComputeSampleAheadAmount( void );
 
 	// This is a single allocation for all wave headers (there are OUTPUT_BUFFER_COUNT of them)
-	HGLOBAL			m_hWaveHdr;
+	HGLOBAL			m_hWaveHdr{nullptr};
 
 	// This is a single allocation for all wave data (there are OUTPUT_BUFFER_COUNT of them)
-	HANDLE			m_hWaveData;
+	HANDLE			m_hWaveData{nullptr};
 
-	HWAVEOUT		m_waveOutHandle;
-	float			m_mixTime;
-	float			m_baseTime;
-	int				m_sampleIndex;
+	HWAVEOUT		m_waveOutHandle{nullptr};
+	float			m_mixTime{-1.0f};
+	float			m_baseTime{-1.0f};
+	int				m_sampleIndex{0};
 	CAudioBuffer	m_buffers[ OUTPUT_BUFFER_COUNT ];
 	CAudioMixer		*m_sourceList[MAX_CHANNELS];
-	int				m_nEstimatedSamplesAhead;
+	int				m_nEstimatedSamplesAhead{0};
 
 	portable_samplepair_t		m_paintbuffer[ PAINTBUFFER_SIZE ];
 };

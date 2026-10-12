@@ -118,13 +118,15 @@ CAudioMixer *CreateWaveMixer( CWaveData *data, int format, int channels, int bit
 // Purpose: Init the base WAVE mixer.
 // Input  : *data - data access object
 //-----------------------------------------------------------------------------
-CAudioMixerWave::CAudioMixerWave( CWaveData *data ) : m_pData(data), m_pChannel(NULL)
+CAudioMixerWave::CAudioMixerWave( CWaveData *data ) : m_pData(data)
 {
-	m_loop = 0;
 	m_sample = 0;
 	m_absoluteSample = 0;
 	m_scubSample = -1;
+	m_startpos = 0;
+	m_loop = 0;
 	m_fracOffset = 0;
+	m_absoluteStartPos = 0;
 	m_bActive = false;
 	m_nModelIndex = -1;
 	m_bForward = true;
