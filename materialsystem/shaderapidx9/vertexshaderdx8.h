@@ -60,8 +60,8 @@ abstract_class IShaderManager
 protected:
 
 	// The current vertex and pixel shader index
-	int m_nVertexShaderIndex;
-	int m_nPixelShaderIndex;
+	int m_nVertexShaderIndex{-1};
+	int m_nPixelShaderIndex{-1};
 
 public:
 	// Initialize, shutdown
