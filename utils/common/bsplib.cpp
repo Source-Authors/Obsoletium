@@ -1351,9 +1351,10 @@ static void AddOcclusionLump( dheader_t *dheader, FileHandle_t file )
 {
 	g_Lumps.size[LUMP_OCCLUSION] = 0;	// mark it written
 
-	intp nOccluderCount = g_OccluderData.Count();
-	intp nOccluderPolyDataCount = g_OccluderPolyData.Count();
-	intp nOccluderVertexIndices = g_OccluderVertexIndices.Count();
+	// darkx1us: Do not use intp here as we do templated write and expect int (4 bytes). 
+	int nOccluderCount = g_OccluderData.Count();
+	int nOccluderPolyDataCount = g_OccluderPolyData.Count();
+	int nOccluderVertexIndices = g_OccluderVertexIndices.Count();
 
 	intp nLumpLength = nOccluderCount * sizeof(doccluderdata_t) +
 		nOccluderPolyDataCount * sizeof(doccluderpolydata_t) +
