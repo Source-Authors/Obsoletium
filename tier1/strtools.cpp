@@ -2603,8 +2603,8 @@ bool V_StrSubst(
 	bool bCaseSensitive
 	)
 {
-	intp replaceFromLen = strlen( pMatch );
-	intp replaceToLen = strlen( pReplaceWith );
+	intp replaceFromLen = V_strlen( pMatch );
+	intp replaceToLen = V_strlen( pReplaceWith );
 
 	const char *pInStart = pIn;
 	char *pOutPos = pOut;
@@ -2639,7 +2639,7 @@ bool V_StrSubst(
 		else
 		{
 			// We're at the end of pIn. Copy whatever remains and get out.
-			intp copyLen = strlen( pInStart );
+			intp copyLen = V_strlen( pInStart );
 			V_strncpy( pOutPos, pInStart, nRemainingOut );
 			return ( copyLen <= nRemainingOut-1 );
 		}
@@ -2649,7 +2649,7 @@ bool V_StrSubst(
 
 [[nodiscard]] static char* AllocString( const char *pStr, intp nMaxChars )
 {
-	intp allocLen = (intp)strlen( pStr );
+	intp allocLen = V_strlen( pStr );
 	if ( nMaxChars == -1 )
 		allocLen += 1;
 	else
@@ -2682,7 +2682,7 @@ void V_SplitString2( IN_Z const char *pString, const char **pSeparators, intp nS
 		if ( pFirstSeparator )
 		{
 			// Split on this separator and continue on.
-			intp separatorLen = strlen( pSeparators[iFirstSeparator] );
+			intp separatorLen = V_strlen( pSeparators[iFirstSeparator] );
 			if ( pFirstSeparator > pCurPos )
 			{
 				outStrings.AddToTail( AllocString( pCurPos, pFirstSeparator-pCurPos ) );
@@ -2693,7 +2693,7 @@ void V_SplitString2( IN_Z const char *pString, const char **pSeparators, intp nS
 		else
 		{
 			// Copy the rest of the string
-			if ( strlen( pCurPos ) )
+			if ( V_strlen( pCurPos ) )
 			{
 				outStrings.AddToTail( AllocString( pCurPos, -1 ) );
 			}
@@ -2730,7 +2730,7 @@ void V_StrSlice( IN_Z const char *pStr, intp firstChar, intp lastCharNonInclusiv
 	if ( outSize == 0 )
 		return;
 	
-	intp length = strlen( pStr );
+	intp length = V_strlen( pStr );
 
 	// Fixup the string indices.
 	if ( firstChar < 0 )
@@ -2788,14 +2788,14 @@ void V_StrLeft( IN_Z const char *pStr, intp nChars, OUT_Z_CAP(outSize) char *pOu
 
 void V_StrRight( IN_Z const char *pStr, intp nChars, OUT_Z_CAP(outSize) char *pOut, intp outSize )
 {
-	intp len = strlen( pStr );
+	intp len = V_strlen( pStr );
 	if ( nChars >= len )
 	{
 		V_strncpy( pOut, pStr, outSize );
 	}
 	else
 	{
-		V_StrSlice( pStr, -nChars, strlen( pStr ), pOut, outSize );
+		V_StrSlice( pStr, -nChars, V_strlen( pStr ), pOut, outSize );
 	}
 }
 
