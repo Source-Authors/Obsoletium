@@ -2267,9 +2267,9 @@ float CTraceSolver::SolveMeshIntersection( simplex_t &simplex )
 		VectorNormalize(v);
 		vert.testIndex = m_sweepObject->SupportMap( v, &vert.position );
 		vert.sweepIndex = m_ray->SupportMap( v, &tmp );
-		VectorAdd( vert.position, tmp, vert.position );
+		vert.position += tmp;
 		vert.obstacleIndex = m_obstacle->SupportMap( -v, &tmp );
-		VectorSubtract( vert.position, tmp, vert.position );
+		vert.position -= tmp;
 
 		// map the new separating axis (NOTE: This test is inverted from the GJK - we are trying to get out, not in)
 		// found a separating axis, we've moved the sweep back enough
