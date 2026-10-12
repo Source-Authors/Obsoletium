@@ -1031,11 +1031,18 @@ void CShaderManager::CreateStaticShaders()
 			#endif
 		};
 		// create default shader
-#if defined(_X360) || !defined(DX_TO_GL_ABSTRACTION)
-		Dx9Device()->CreatePixelShader( psIllegalMaterial, ( IDirect3DPixelShader9 ** )&s_pIllegalMaterialPS );
+#if !defined(DX_TO_GL_ABSTRACTION)
+		const HRESULT hr = Dx9Device()->CreatePixelShader( psIllegalMaterial, ( IDirect3DPixelShader9 ** )&s_pIllegalMaterialPS );
 #else
-		Dx9Device()->CreatePixelShader( psIllegalMaterial, ( IDirect3DPixelShader9 ** )&s_pIllegalMaterialPS, NULL );
+		const HRESULT hr = Dx9Device()->CreatePixelShader( psIllegalMaterial, ( IDirect3DPixelShader9 ** )&s_pIllegalMaterialPS, NULL );
 #endif
+		if ( FAILED( hr ))
+		{
+			Assert(false);
+			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::CreatePixelShader(function = 0x%p) failed w/e %s.\n",
+				psIllegalMaterial,
+				se::win::com::com_error_category().message(hr).c_str() );
+		}
 	}
 }
 
