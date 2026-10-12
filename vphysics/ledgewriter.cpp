@@ -251,6 +251,7 @@ void CVPhysicsVirtualMeshWriter::UnpackCompactLedgeFromHull( IVP_Compact_Ledge *
 
 	// keep track of which triangle edge referenced this edge (so the next one can swap the order and point to the first one)
 	intp forwardEdgeIndex[255] = {};
+	Assert(ssize(forwardEdgeIndex) <= pHull->edgeCount);
 	for ( int i = 0; i < pHull->edgeCount; i++ )
 	{
 		forwardEdgeIndex[i] = -1;
@@ -269,7 +270,7 @@ void CVPhysicsVirtualMeshWriter::UnpackCompactLedgeFromHull( IVP_Compact_Ledge *
 		int edges[3] = {pPackedTris[i].e0, pPackedTris[i].e1, pPackedTris[i].e2};
 		for ( int j = 0; j < ssize(edges); j++ )
 		{
-			Assert(edges[j]<pHull->edgeCount);
+			Assert(edges[j] < ssize(forwardEdgeIndex));
 			if ( forwardEdgeIndex[edges[j]] < 0 )
 			{
 				// this is the first triangle to use this edge, so it's forward (and the other triangle sharing (opposite edge pointer) is unknown)
