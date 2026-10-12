@@ -4310,7 +4310,7 @@ void CTempMeshDX8::TestSelection()
 	DirectX::XMVECTOR edge[2];
 	DirectX::XMVECTOR normal;
 
-	int numTriangles;
+	intp numTriangles;
 	if (m_Type == MATERIAL_TRIANGLES)
 		numTriangles = m_IndexData.Count() / 3;
 	else
@@ -4331,8 +4331,8 @@ void CTempMeshDX8::TestSelection()
 	transformedVert.AddMultipleToTail( transformedVertSize );
 	memset( transformedVert.Base(), 0, transformedVertSize );
 
-	int indexPos;
-	for (int i = 0; i < numTriangles; ++i)
+	intp indexPos;
+	for (intp i = 0; i < numTriangles; ++i)
 	{
 		// Get the three indices
 		if (m_Type == MATERIAL_TRIANGLES)
@@ -4415,7 +4415,6 @@ void CTempMeshDX8::BeginPass( )
 		nFirstIndex = s_FirstIndex;
 	}
 	
-	int i;
 	int nVertexCount = m_VertexData.Count() / m_VertexSize;
 	pMeshBuilder->Begin( pMesh, m_Type, nVertexCount, nIndexCount );
 
@@ -4426,7 +4425,7 @@ void CTempMeshDX8::BeginPass( )
 	memcpy( pMeshBuilder->BaseVertexData(), m_VertexData.Base(), m_VertexData.Count() );
 	pMeshBuilder->AdvanceVertices( m_VertexData.Count() / m_VertexSize );
 
-	for ( i = 0; i < nIndexCount; ++i )
+	for ( int i = 0; i < nIndexCount; ++i )
 	{
 		pMeshBuilder->Index( m_IndexData[nFirstIndex+i] );
 		pMeshBuilder->AdvanceIndex();
@@ -5022,7 +5021,7 @@ void CMeshMgr::DiscardVertexBuffers()
 
 	if ( !g_pShaderDeviceDx8->IsDeactivated() )
 	{
-		for (int i = m_DynamicVertexBuffers.Count(); --i >= 0; )
+		for (intp i = m_DynamicVertexBuffers.Count(); --i >= 0; )
 		{
 			m_DynamicVertexBuffers[i].m_pBuffer->FlushAtFrameStart();
 		}
@@ -5065,7 +5064,7 @@ void CMeshMgr::DestroyVertexBuffers()
 	RECORD_INT( 0 );
 	D3DSetStreamSource( 3, 0, 0, 0 );
 
-	for (int i = m_DynamicVertexBuffers.Count(); --i >= 0; )
+	for (intp i = m_DynamicVertexBuffers.Count(); --i >= 0; )
 	{
 		delete m_DynamicVertexBuffers[i].m_pBuffer;
 	}

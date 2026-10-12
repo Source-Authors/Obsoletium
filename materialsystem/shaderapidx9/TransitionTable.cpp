@@ -1335,8 +1335,8 @@ unsigned int CTransitionTable::FindIdenticalTransitionList( unsigned int firstEl
 	// Look for a common list
 	const TransitionOp_t &op = m_TransitionOps[firstElem];
 
-	int nCount = m_UniqueTransitions.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_UniqueTransitions.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		const TransitionList_t &list = m_UniqueTransitions[i];
 
