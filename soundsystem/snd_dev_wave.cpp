@@ -76,15 +76,15 @@ public:
 	CAudioMixer		*GetMixerForSource( CAudioSource *source );
 
 private:
-	class CAudioMixerState
+	// dimhotepus: class -> struct.
+	struct CAudioMixerState
 	{
-	public:
 		CAudioMixer		*mixer;
 	};
-
-	class CAudioBuffer
+	
+	// dimhotepus: class -> struct.
+	struct CAudioBuffer
 	{
-	public:
 		WAVEHDR			*hdr;
 		bool			submitted;
 		int				submit_sample_count;
