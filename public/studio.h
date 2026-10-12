@@ -1061,8 +1061,8 @@ struct mstudiovertanim_wrinkle_t : public mstudiovertanim_t
 
 	inline void SetWrinkleFixed( float flWrinkle, float flVertAnimFixedPointScale )
 	{
-		int nWrinkleDeltaInt = int(flWrinkle / flVertAnimFixedPointScale);
-		wrinkledelta = (short)clamp( nWrinkleDeltaInt, -32767, 32767 );
+		int nWrinkleDeltaInt = static_cast<int>( flWrinkle / flVertAnimFixedPointScale );
+		wrinkledelta = static_cast<short>( clamp( nWrinkleDeltaInt, -32767, 32767 ) );
 	}
 
 	inline Vector4D GetDeltaFixed( float flVertAnimFixedPointScale )
