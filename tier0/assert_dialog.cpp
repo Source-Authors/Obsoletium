@@ -529,7 +529,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 			"Source - Assertion Failed",
 			"Assert Failed",
 			pExpression,
-			Plat_MessageBoxButton::Cancel & Plat_MessageBoxButton::Retry,
+			Plat_MessageBoxButton::Cancel | Plat_MessageBoxButton::Retry,
 			Plat_MessageBoxIcon::Information );
 
 		if ( Plat_MessageBoxButton::Retry == buttonPressed )

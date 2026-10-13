@@ -56,7 +56,7 @@ bool Plat_VerifyHardwareKeyPrompt()
 		if ( Plat_MessageBoxButton::Cancel == Plat_MessageBox("Platform - Error",
 			"No Driver Detected",
 			"No drivers detected for the hardware key, please install them and re-run the application.\n",
-			Plat_MessageBoxButton::Ok & Plat_MessageBoxButton::Cancel,
+			Plat_MessageBoxButton::Ok | Plat_MessageBoxButton::Cancel,
 			Plat_MessageBoxIcon::Error ) )
 		{
 			return false;
@@ -68,7 +68,7 @@ bool Plat_VerifyHardwareKeyPrompt()
 		if ( Plat_MessageBoxButton::Cancel == Plat_MessageBox("Platform - Error",
 			"Insert Hardware Key",
 			"Please insert the hardware key and hit 'ok'.\n",
-			Plat_MessageBoxButton::Ok & Plat_MessageBoxButton::Cancel,
+			Plat_MessageBoxButton::Ok | Plat_MessageBoxButton::Cancel,
 			Plat_MessageBoxIcon::Error ) )
 		{
 			return false;
