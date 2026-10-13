@@ -686,9 +686,9 @@ static void FreeCurrentModelVertexes()
 {
 	Assert( g_pActiveStudioHdr );
 
-	if ( g_pActiveStudioHdr->GetVertexBase() )
+	if ( g_pActiveStudioHdr->VertexBase() )
 	{
-		free( g_pActiveStudioHdr->GetVertexBase() );
+		free( g_pActiveStudioHdr->VertexBase() );
 		g_pActiveStudioHdr->SetVertexBase(nullptr);
 	}
 }
@@ -698,9 +698,9 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void * pModelData )
 	Assert( pModelData == NULL );
 	Assert( g_pActiveStudioHdr );
 
-	if ( g_pActiveStudioHdr->GetVertexBase() )
+	if ( g_pActiveStudioHdr->VertexBase() )
 	{
-		return (vertexFileHeader_t *)g_pActiveStudioHdr->GetVertexBase();
+		return (vertexFileHeader_t *)g_pActiveStudioHdr->VertexBase();
 	}
 
 	char fileName[MAX_PATH] = "models" CORRECT_PATH_SEPARATOR_S;

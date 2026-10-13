@@ -100,6 +100,38 @@ struct mstudiodata_t
 #define STUDIO_PROC_AIMATATTACH 4
 #define STUDIO_PROC_JIGGLE 5
 
+// dimhotepus: x86-64 support. TF2 backport.
+// If you want to embed a pointer into one of the structures that is serialized,
+// use this class! It will ensure that the pointers consume the right amount of
+// space and work correctly across 32 and 64 bit. It also makes sure that there
+// is no surprise about how large the structure is when placed in the middle of
+// another structure, and supports Intel's desired behavior on 64-bit that
+// pointers are always 8-byte aligned.
+#pragma pack(push, 4)
+template <typename T>
+struct alignas(4) serializedstudioptr_t
+{
+	T* m_pData;
+#ifndef PLATFORM_64BITS
+	int32_t padding;
+#endif
+
+	serializedstudioptr_t() : m_pData{nullptr}
+	{ 
+#if _DEBUG && !defined( PLATFORM_64BITS )
+		padding = 0; 
+#endif
+	}
+
+	[[nodiscard]] inline operator       T*()             { return m_pData; }
+	[[nodiscard]] inline operator const T*() const       { return m_pData; }
+
+	[[nodiscard]] inline       T* operator->( )          { return m_pData; }
+	[[nodiscard]] inline const T* operator->( ) const    { return m_pData; }
+
+	inline T* operator=(T* ptr)            { return m_pData = ptr; }
+};
+#pragma pack(pop)
 
 struct mstudioaxisinterpbone_t
 {
@@ -1176,7 +1208,8 @@ struct mstudiotexture_t
 	int						unused1;
 	mutable IMaterial		*material;  // fixme: this needs to go away . .isn't used by the engine, but is used by studiomdl
 	mutable void			*clientmaterial;	// gary, replace with client material pointer if used
-#if PLATFORM_64BITS
+	// dimhotepus: x86-64 support. TF2 backport.
+#ifdef PLATFORM_64BITS
 	int						unused[8];
 #else
 	int						unused[10];
@@ -1269,13 +1302,6 @@ struct mstudio_modelvertexdata_t
 	// base of external vertex data stores
 	const void			*pVertexData;
 	const void			*pTangentData;
-
-    const void	*GetVertexData() const {
-        return pVertexData;
-    }
-    const void	*GetTangentData() const {
-        return pTangentData;
-    }
 };
 
 #ifdef PLATFORM_64BITS
@@ -1296,25 +1322,22 @@ struct mstudio_meshvertexdata_t
 	int					GetModelVertexIndex( int i ) const;
 	int					GetGlobalVertexIndex( int i ) const;
 
-#ifdef PLATFORM_64BITS
-	// 64 bit requires 4 byte value here to match 32 bit definition
-    int                index_modelvertexdata;
-#else
 	// indirection to this mesh's model's vertex data
+	// dimhotepus: x86-64 support. TF2 backport.
+#ifndef PLATFORM_64BITS
 	const mstudio_modelvertexdata_t	*modelvertexdata;
+#else
+	int unused_modelvertexdata;
 #endif
 
 	// used for fixup calcs when culling top level lods
 	// expected number of mesh verts at desired lod
 	int					numLODVertexes[MAX_NUM_LODS];
-
-	const mstudio_modelvertexdata_t	*pModelVertexData() const {
+	
+	// dimhotepus: x86-64 support. TF2 backport.
 #ifdef PLATFORM_64BITS
-        return *(const mstudio_modelvertexdata_t **)((byte *)this + index_modelvertexdata);
-#else
-        return modelvertexdata;
+	serializedstudioptr_t<const mstudio_modelvertexdata_t>	modelvertexdata;
 #endif
-    }
 };
 
 struct mstudiomesh_t
@@ -1347,9 +1370,8 @@ struct mstudiomesh_t
 
 	mstudio_meshvertexdata_t vertexdata;
 
+	// dimhotepus: x86-64 support. TF2 backport.
 #ifdef PLATFORM_64BITS
-	const mstudio_modelvertexdata_t *modelvertexdata;
-
     int					unused[6]; // remove as appropriate //-V730_NOINIT
 #else
 	int					unused[8]; // remove as appropriate //-V730_NOINIT
@@ -1396,6 +1418,7 @@ struct mstudiomodel_t
 
 	mstudio_modelvertexdata_t vertexdata;
 
+	// dimhotepus: x86-64 support. TF2 backport.
 #ifdef PLATFORM_64BITS
 	// sizeof(vertexdata) == 16
 	int					unused[6];		// remove as appropriate
@@ -1430,7 +1453,7 @@ inline int mstudio_modelvertexdata_t::GetGlobalTangentIndex( int i ) const
 
 inline mstudiovertex_t *mstudio_modelvertexdata_t::Vertex( int i ) const 
 {
-	return (mstudiovertex_t *)GetVertexData() + GetGlobalVertexIndex( i );
+	return (mstudiovertex_t *)pVertexData + GetGlobalVertexIndex( i );
 }
 
 inline Vector *mstudio_modelvertexdata_t::Position( int i ) const 
@@ -1448,7 +1471,7 @@ inline Vector4D *mstudio_modelvertexdata_t::TangentS( int i ) const
 	// NOTE: The tangents vector is 16-bytes in a separate array
 	// because it only exists on the high end, and if I leave it out
 	// of the mstudiovertex_t, the vertex is 64-bytes (good for low end)
-	return (Vector4D *)GetTangentData() + GetGlobalTangentIndex( i );
+	return (Vector4D *)pTangentData + GetGlobalTangentIndex( i );
 }
 
 inline Vector2D *mstudio_modelvertexdata_t::Texcoord( int i ) const 
@@ -1468,7 +1491,7 @@ inline mstudiomodel_t *mstudiomesh_t::pModel() const
 
 inline bool mstudio_meshvertexdata_t::HasTangentData( void ) const
 {
-	return pModelVertexData()->HasTangentData();
+	return modelvertexdata->HasTangentData();
 }
 
 inline const mstudio_meshvertexdata_t *mstudiomesh_t::GetVertexData( void *pModelData )
@@ -1476,15 +1499,9 @@ inline const mstudio_meshvertexdata_t *mstudiomesh_t::GetVertexData( void *pMode
 	// get this mesh's model's vertex data (allow for mstudiomodel_t::GetVertexData
 	// returning nullptr if the data has been converted to 'thin' vertices)
 	this->pModel()->GetVertexData( pModelData );
-#ifdef PLATFORM_64BITS
-	modelvertexdata = &this->pModel()->vertexdata;
-	// Distance must fit int.
-	vertexdata.index_modelvertexdata = size_cast<int>((byte *)&modelvertexdata - (byte *)&vertexdata);
-#else
-	vertexdata.modelvertexdata = &this->pModel()->vertexdata;
-#endif
+	vertexdata.modelvertexdata = &( this->pModel()->vertexdata );
 
-	if ( !vertexdata.pModelVertexData()->pVertexData )
+	if ( !vertexdata.modelvertexdata->pVertexData )
 		return nullptr;
 
 	return &vertexdata;
@@ -1504,37 +1521,37 @@ inline int mstudio_meshvertexdata_t::GetModelVertexIndex( int i ) const
 
 inline int mstudio_meshvertexdata_t::GetGlobalVertexIndex( int i ) const
 {
-	return pModelVertexData()->GetGlobalVertexIndex( GetModelVertexIndex( i ) );
+	return modelvertexdata->GetGlobalVertexIndex( GetModelVertexIndex( i ) );
 }
 
 inline Vector *mstudio_meshvertexdata_t::Position( int i ) const 
 {
-	return pModelVertexData()->Position( GetModelVertexIndex( i ) ); 
+	return modelvertexdata->Position( GetModelVertexIndex( i ) ); 
 };
 
 inline Vector *mstudio_meshvertexdata_t::Normal( int i ) const 
 {
-	return pModelVertexData()->Normal( GetModelVertexIndex( i ) ); 
+	return modelvertexdata->Normal( GetModelVertexIndex( i ) ); 
 };
 
 inline Vector4D *mstudio_meshvertexdata_t::TangentS( int i ) const
 {
-	return pModelVertexData()->TangentS( GetModelVertexIndex( i ) );
+	return modelvertexdata->TangentS( GetModelVertexIndex( i ) );
 }
 
 inline Vector2D *mstudio_meshvertexdata_t::Texcoord( int i ) const 
 {
-	return pModelVertexData()->Texcoord( GetModelVertexIndex( i ) ); 
+	return modelvertexdata->Texcoord( GetModelVertexIndex( i ) ); 
 };
 
 inline mstudioboneweight_t *mstudio_meshvertexdata_t::BoneWeights( int i ) const 
 {
-	return pModelVertexData()->BoneWeights( GetModelVertexIndex( i ) ); 
+	return modelvertexdata->BoneWeights( GetModelVertexIndex( i ) ); 
 };
 
 inline mstudiovertex_t *mstudio_meshvertexdata_t::Vertex( int i ) const
 {
-	return pModelVertexData()->Vertex( GetModelVertexIndex( i ) );
+	return modelvertexdata->Vertex( GetModelVertexIndex( i ) );
 }
 
 // a group of studio model data
@@ -2047,11 +2064,6 @@ struct vertexFileFixup_t
 // flagged on load to indicate no animation events on this model
 #define STUDIOHDR_FLAGS_VERT_ANIM_FIXED_POINT_SCALE			0x00200000
 
-#ifdef PLATFORM_64BITS
-// Ensure packing on x64 and x86 is same.
-#pragma pack(push, 4)
-#endif
-
 // NOTE! Next time we up the .mdl file format, remove studiohdr2_t
 // and insert all fields in this structure into studiohdr_t.
 struct studiohdr2_t
@@ -2079,19 +2091,19 @@ struct studiohdr2_t
 	int m_nBoneFlexDriverIndex;
 	inline mstudioboneflexdriver_t *pBoneFlexDriver( int i ) const { Assert( i >= 0 && i < m_nBoneFlexDriverCount ); return (mstudioboneflexdriver_t *)(((byte *)this) + m_nBoneFlexDriverIndex) + i; }
 
+	// dimhotepus: x86-64 support. TF2 backport.
 #ifdef PLATFORM_64BITS
-	void* pVertexBase;
-	void* pIndexBase;
+	mutable serializedstudioptr_t<void> virtualModel;
+	mutable serializedstudioptr_t<void> animblockModel;
 
-	int reserved[52];
+	serializedstudioptr_t<void> pVertexBase;
+	serializedstudioptr_t<void> pIndexBase;
+
+	int reserved[56 - 4 * sizeof( serializedstudioptr_t<void> ) / sizeof( int ) ];
 #else
 	int reserved[56];
 #endif
 };
-
-#ifdef PLATFORM_64BITS
-#pragma pack(pop)
-#endif
 
 struct studiohdr_t
 {
@@ -2288,8 +2300,13 @@ struct studiohdr_t
 	// implementation specific call to get a named model
 	const studiohdr_t	*FindModel( void **cache, char const *modelname ) const;
 
-	// implementation specific back pointer to virtual data
-	int					virtualModel;
+	// dimhotepus: x86-64 support. TF2 backport.
+#ifdef PLATFORM_64BITS
+	// implementation specific back pointer to virtual data. Relocated to studiohdr2_t
+	int					unused_virtualModel;
+#else
+	mutable void		*virtualModel;
+#endif
 	virtualmodel_t		*GetVirtualModel( void ) const;
 
 	// for demand loaded animation blocks
@@ -2298,7 +2315,13 @@ struct studiohdr_t
 	int					numanimblocks;
 	int					animblockindex;
 	inline mstudioanimblock_t *pAnimBlock( intp i ) const { Assert( i > 0 && i < numanimblocks); return (mstudioanimblock_t *)(((byte *)this) + animblockindex) + i; }
-	int					animblockModel;
+	// dimhotepus: x86-64 support. TF2 backport.
+#ifdef PLATFORM_64BITS
+	// implementation specific back pointer to virtual data. Relocated to studiohdr2_t
+	int					unused_animblockModel;
+#else
+	mutable void		*animblockModel;
+#endif
 	byte *				GetAnimBlock( intp i ) const;
 
 	int					bonetablebynameindex;
@@ -2306,13 +2329,14 @@ struct studiohdr_t
 
 	// used by tools only that don't cache, but persist mdl's peer data
 	// engine uses virtualModel to back link to cache pointers
+	// dimhotepus: x86-64 support. TF2 backport.
 #ifdef PLATFORM_64BITS
-	// dimhotepus: Backward-compat with 32 bit format. 
-	int					pVertexBase_index;
-	int					pIndexBase_index;
+	// implementation specific back pointer to virtual data. Relocated to studiohdr2_t
+	int					unused_pVertexBase;
+	int					unused_pIndexBase;
 #else
-	void*				pVertexBase;
-	void*				pIndexBase;
+	mutable void		*pVertexBase;
+	mutable void		*pIndexBase;
 #endif
 
 	// if STUDIOHDR_FLAGS_CONSTANT_DIRECTIONAL_LIGHT_DOT is set,
@@ -2361,54 +2385,83 @@ struct studiohdr_t
 	inline int			BoneFlexDriverCount() const { return studiohdr2index ? pStudioHdr2()->m_nBoneFlexDriverCount : 0; }
 	inline const mstudioboneflexdriver_t* BoneFlexDriver( int i ) const { Assert( i >= 0 && i < BoneFlexDriverCount() ); return studiohdr2index ? pStudioHdr2()->pBoneFlexDriver( i ) : nullptr; }
 
-	void* 				VirtualModel() const { return (void*)(intp)virtualModel; }
+	// dimhotepus: x86-64 support. TF2 backport.
+#ifdef PLATFORM_64BITS
+	[[nodiscard]] void* VirtualModel() const
+	{
+		return studiohdr2index
+			? static_cast<void *>( pStudioHdr2()->virtualModel )
+			: reinterpret_cast<void*>( static_cast<intp>( unused_virtualModel ) );
+	}
 	void				SetVirtualModel( void* ptr )
 	{
-		// dimhotepus: Check we are in range.
-		virtualModel = size_cast<int>((intp)ptr); //-V221
+		if ( studiohdr2index )
+		{
+			pStudioHdr2()->virtualModel = ptr;
+		}
+		else
+		{
+			// dimhotepus: Check we are in range.
+			unused_virtualModel = size_cast<int>( reinterpret_cast<intp>( ptr ) ); //-V221
+		}
 	}
 
+	[[nodiscard]] void*	VertexBase() const
+	{
+		return studiohdr2index
+			? static_cast<void *>( pStudioHdr2()->pVertexBase )
+			// dimhotepus: x86-64. Many HL2 models miss studio2hdr, so use 2 ints to store pointer.
+			: reinterpret_cast<void*>( (static_cast<uintp>( unused_pVertexBase ) << 32) | static_cast<uintp>( unused_pIndexBase ) );
+	}
+	void				SetVertexBase( void* pVertexBase )
+	{
+		if ( studiohdr2index )
+		{
+			pStudioHdr2()->pVertexBase = pVertexBase;
+		}
+		else
+		{
+			// dimhotepus: x86-64. Many HL2 models miss studio2hdr, so use 2 ints to store pointer.
+			const uintp value = reinterpret_cast<uintp>( pVertexBase );
+			unused_pVertexBase = static_cast<int>( ( value >> 32 ) & static_cast<uintp>( 0xFFFFFFFF ) );
+			unused_pIndexBase = static_cast<int>( value & static_cast<uintp>( 0xFFFFFFFF ) );
+		}
+	}
+	[[nodiscard]] void*	IndexBase() const
+	{
+		return studiohdr2index
+			? static_cast<void *>( pStudioHdr2()->pIndexBase )
+			// dimhotepus: x86-64. Many HL2 models miss studio2hdr, so use 2 ints to store pointer.
+			: reinterpret_cast<void*>( (static_cast<uintp>( unused3[0] ) << 32) | static_cast<uintp>( unused2[0] ) );
+	}
+	void				SetIndexBase( void* pIndexBase )
+	{
+		if ( studiohdr2index )
+		{
+			pStudioHdr2()->pIndexBase  = pIndexBase;
+		}
+		else
+		{
+			// dimhotepus: x86-64. Many HL2 models miss studio2hdr, so use 2 ints to store pointer.
+			const uintp value = reinterpret_cast<uintp>( pIndexBase );
+			unused3[0] = static_cast<int>( ( value >> 32 ) & static_cast<uintp>( 0xFFFFFFFF ) );
+			unused2[0] = static_cast<int>( value & static_cast<uintp>( 0xFFFFFFFF ) );
+		}
+	}
+#else
+	[[nodiscard]] void* VirtualModel() const { return virtualModel; }
+	void				SetVirtualModel( void* ptr ) { virtualModel = ptr; }
+
+	[[nodiscard]] void* VertexBase() const { return pVertexBase; }
+	void				SetVertexBase( void* _pVertexBase ) const { pVertexBase = _pVertexBase; }
+	[[nodiscard]] void*	IndexBase() const { return pIndexBase; }
+	void				SetIndexBase( void* _pIndexBase ) const { pIndexBase = _pIndexBase; }
+#endif
 
 	// NOTE: No room to add stuff? Up the .mdl file format version 
 	// [and move all fields in studiohdr2_t into studiohdr_t and kill studiohdr2_t],
 	// or add your stuff to studiohdr2_t. See NumSrcBoneTransforms/SrcBoneTransform for the pattern to use.
 	int					unused2[1]; //-V730_NOINIT
-
-	[[nodiscard]] void* GetVertexBase()
-	{
-#ifdef PLATFORM_64BITS
-        return pStudioHdr2()->pVertexBase;
-#else
-		return pVertexBase;
-#endif
-	}
-
-	void SetVertexBase(void *base)
-	{
-#ifdef PLATFORM_64BITS
-		pStudioHdr2()->pVertexBase = base;
-#else
-		pVertexBase = base;
-#endif
-	}
-
-	[[nodiscard]] void* GetIndexBase()
-	{
-#ifdef PLATFORM_64BITS
-        return pStudioHdr2()->pIndexBase;
-#else
-		return pIndexBase;
-#endif
-	}
-
-	void SetIndexBase(void *base)
-	{
-#ifdef PLATFORM_64BITS
-		pStudioHdr2()->pIndexBase = base;
-#else
-		pIndexBase = base;
-#endif
-	}
 
 	studiohdr_t() = default;
 

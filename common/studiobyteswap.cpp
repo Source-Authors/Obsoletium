@@ -1108,6 +1108,7 @@ intp ByteswapANIFile( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, 
 			FIXUP_OFFSETS( pData, pAnimDesc, animblockikruleindex )
 
 			int numikrules = SrcNative( &pAnimDesc->numikrules );
+			// dimhotepus: Use byte-swapped numikrules instead of raw value.
 			ByteswapIKRules( pHdrSrc, numikrules, pAnimDesc->numframes, pDataSrc, pDataDest, fixedFileSize, fileSize );
 		}
 
@@ -2512,15 +2513,26 @@ BEGIN_BYTESWAP_DATADESC( studiohdr_t )
 	DEFINE_FIELD( contents, FIELD_INTEGER ),
 	DEFINE_FIELD( numincludemodels, FIELD_INTEGER ),
 	DEFINE_INDEX( includemodelindex, FIELD_INTEGER ),
+	// dimhotepus: x86-64 support. TF2 backport.
+#ifdef PLATFORM_64BITS
+	DEFINE_FIELD( unused_virtualModel, FIELD_INTEGER ),			// void*
+#else
 	DEFINE_FIELD( virtualModel, FIELD_INTEGER ),				// void*
+#endif
 	DEFINE_INDEX( szanimblocknameindex, FIELD_INTEGER ),	
 	DEFINE_FIELD( numanimblocks, FIELD_INTEGER ),
 	DEFINE_INDEX( animblockindex, FIELD_INTEGER ),
-	DEFINE_FIELD( animblockModel, FIELD_INTEGER ),				// void*
-	DEFINE_INDEX( bonetablebynameindex, FIELD_INTEGER ),
+	// dimhotepus: x86-64 support. TF2 backport.
 #ifdef PLATFORM_64BITS
-	DEFINE_FIELD( pVertexBase_index, FIELD_INTEGER ),					// int
-	DEFINE_FIELD( pIndexBase_index, FIELD_INTEGER ),					// int
+	DEFINE_FIELD( unused_animblockModel, FIELD_INTEGER ),		// void*
+#else
+	DEFINE_FIELD( animblockModel, FIELD_INTEGER ),				// void*
+#endif
+	DEFINE_INDEX( bonetablebynameindex, FIELD_INTEGER ),
+	// dimhotepus: x86-64 support. TF2 backport.
+#ifdef PLATFORM_64BITS
+	DEFINE_FIELD( unused_pVertexBase, FIELD_INTEGER ),			// void*
+	DEFINE_FIELD( unused_pIndexBase, FIELD_INTEGER ),			// void*
 #else
 	DEFINE_FIELD( pVertexBase, FIELD_INTEGER ),					// void*
 	DEFINE_FIELD( pIndexBase, FIELD_INTEGER ),					// void*
@@ -2976,6 +2988,7 @@ BEGIN_BYTESWAP_DATADESC( mstudiomesh_t )
 	DEFINE_FIELD( meshid, FIELD_INTEGER ),
 	DEFINE_FIELD( center, FIELD_VECTOR ),
 	DEFINE_EMBEDDED( vertexdata ),
+	// dimhotepus: x86-64 support. Note it differs from TF2 x86-64!
 #ifdef PLATFORM_64BITS
 	DEFINE_ARRAY( unused, FIELD_INTEGER, 6 ),	// vertexdata has additional 8 bytes (2 pointers upped by 4 bytes)
 #else
@@ -2984,12 +2997,13 @@ BEGIN_BYTESWAP_DATADESC( mstudiomesh_t )
 END_BYTESWAP_DATADESC()
 
 BEGIN_BYTESWAP_DATADESC( mstudio_meshvertexdata_t )
+	// dimhotepus: x86-64 support. Note it differs from TF2 x86-64!
 #ifdef PLATFORM_64BITS
-	DEFINE_FIELD( index_modelvertexdata, FIELD_INTEGER ),		// mstudio_modelvertexdata_t*
+	DEFINE_FIELD( unused_modelvertexdata, FIELD_INTEGER ),	// mstudio_modelvertexdata_t*
 #else
-	DEFINE_FIELD( modelvertexdata, FIELD_INTEGER ),		// mstudio_modelvertexdata_t*
+	DEFINE_FIELD( modelvertexdata, FIELD_INTEGER ),			// mstudio_modelvertexdata_t*
 #endif
-	DEFINE_ARRAY(numLODVertexes, FIELD_INTEGER, MAX_NUM_LODS),
+	DEFINE_ARRAY( numLODVertexes, FIELD_INTEGER, MAX_NUM_LODS ),
 END_BYTESWAP_DATADESC()
 
 BEGIN_BYTESWAP_DATADESC( mstudioeyeball_t )
@@ -3055,6 +3069,7 @@ BEGIN_BYTESWAP_DATADESC( mstudiotexture_t )
 	DEFINE_FIELD( unused1, FIELD_INTEGER ),
 	DEFINE_FIELD( material, FIELD_INTEGER ),		// IMaterial*
 	DEFINE_FIELD( clientmaterial, FIELD_INTEGER ),	// void*
+	// dimhotepus: x86-64 support. Note it differs from TF2 x86-64!
 #ifdef PLATFORM_64BITS
 	DEFINE_ARRAY( unused, FIELD_INTEGER, 8 ),		// -(sizeof(IMaterial*) + sizeof(void*))
 #else
