@@ -20,7 +20,6 @@
 
 #include "windows/com_error_category.h"
 #include "tier0/dbg.h"
-#include "tier1/strtools.h"
 
 #include "tier0/memdbgon.h"
 
@@ -30,6 +29,10 @@ constexpr inline int kDefaultSendBufferSize{40000};
 constexpr inline int kDefaultReceiveBufferSize{40000};
 
 constexpr inline char kDefaultSharedPort[]{"20000"};
+
+[[nodiscard]] inline bool V_streq(IN_Z const char* l, IN_Z const char* r) {
+  return strcmp(l, r) == 0;
+}
 
 [[nodiscard]] std::error_code GetSystemError(int errc) noexcept {
   return std::error_code{errc, std::system_category()};
