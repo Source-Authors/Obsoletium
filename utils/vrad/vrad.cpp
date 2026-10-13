@@ -2326,6 +2326,9 @@ void VRAD_Finish()
 	Msg( "%s elapsed\n", str );
 
 	ReleasePakFileLumps();
+
+	// dimhotepus: Reset texture lights count so -both work correctly.
+	num_texlights = 0;
 }
 
 
