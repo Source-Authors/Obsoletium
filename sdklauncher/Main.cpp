@@ -612,7 +612,7 @@ bool CSDKLauncherApp::PreInit()
 
 	// winsock aware
 	WSAData wsaData;
-	WSAStartup( MAKEWORD(2,0), &wsaData );
+	WSAStartup( WINSOCK_VERSION, &wsaData );
 
 	// Create a window to capture messages
 	CreateMessageWindow();

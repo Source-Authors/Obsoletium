@@ -9,7 +9,7 @@
 
 #include "windows/scoped_com.h"
 #include "windows/scoped_timer_resolution.h"
-#include "windows/scoped_winsock.h"
+#include "windows/scoped_winsock_initializer.h"
 #endif
 
 #include "appframework/AppFramework.h"
@@ -139,7 +139,7 @@ class HammerAppSystemGroup final : public CAppSystemGroup {
   const se::ScopedAppLocale scoped_app_locale_;
   const se::common::windows::ScopedCom scoped_com_;
   const se::common::windows::ScopedTimerResolution scoped_timer_resolution_;
-  const se::common::windows::ScopedWinsock scoped_winsock_;
+  const se::common::windows::ScopedWinsockInitializer scoped_winsock_;
 };
 
 // Create all singleton systems
@@ -177,10 +177,10 @@ bool HammerAppSystemGroup::Create() {
         static_cast<long long>(kSystemTimerResolution.count()));
   }
 
-  if (scoped_winsock_.errc()) {
-    Warning("Windows sockets 2.2 unavailable (%d): %s.\n",
-            scoped_winsock_.errc().value(),
-            scoped_winsock_.errc().message().c_str());
+  if (scoped_winsock_.error_code()) {
+    Warning("Windows sockets 2.2+ unavailable (%d): %s.\n",
+            scoped_winsock_.error_code().value(),
+            scoped_winsock_.error_code().message().c_str());
   }
 #endif
 

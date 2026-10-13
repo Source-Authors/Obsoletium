@@ -14,10 +14,10 @@
 #include "tier1/utlvector.h"
 #include "tier1/strtools.h"
 
-#include "windows/scoped_winsock.h"
+#include "windows/scoped_winsock_initializer.h"
 
 // This automatically calls WSAStartup for the app at startup.
-static se::common::windows::ScopedWinsock g_scoped_winsock{WINSOCK_VERSION};
+static se::common::windows::ScopedWinsockInitializer g_scoped_winsock{WINSOCK_VERSION};
 
 unsigned long SampleMilliseconds() {
   CCycleCount cnt;

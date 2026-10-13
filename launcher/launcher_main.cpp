@@ -7,6 +7,7 @@
 
 #include <direct.h>  // _chdir
 #include <comdef.h>  // _com_error
+#include <WinSock2.h>
 #endif
 
 #include <thread>
@@ -22,7 +23,7 @@
 #ifdef _WIN32
 #include "windows/scoped_com.h"
 #include "windows/scoped_timer_resolution.h"
-#include "windows/scoped_winsock.h"
+#include "windows/scoped_winsock_initializer.h"
 #endif
 
 #include "appframework/AppFramework.h"
@@ -486,11 +487,11 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
         static_cast<long long>(kSystemTimerResolution.count()));
   }
 
-  const se::common::windows::ScopedWinsock scoped_winsock{MAKEWORD(2, 0)};
-  if (scoped_winsock.errc()) {
-    Warning("Windows sockets 2.0 unavailable (%d): %s.\n",
-            scoped_winsock.errc().value(),
-            scoped_winsock.errc().message().c_str());
+  const se::common::windows::ScopedWinsockInitializer scoped_winsock{WINSOCK_VERSION};
+  if (scoped_winsock.error_code()) {
+    Warning("Windows sockets 2.2+ unavailable (%d): %s.\n",
+            scoped_winsock.error_code().value(),
+            scoped_winsock.error_code().message().c_str());
   }
 
   if (!ApplyProcessPriorityClass(command_line)) {

@@ -69,7 +69,7 @@ $Project "launcher"
 		$File	"$SRCDIR/common/scoped_app_locale.h"
 		$File	"$SRCDIR/common/windows/scoped_com.h" [$WINDOWS]
 		$File	"$SRCDIR/common/windows/scoped_timer_resolution.h" [$WINDOWS]
-		$File	"$SRCDIR/common/windows/scoped_winsock.h" [$WINDOWS]
+		$File	"$SRCDIR/common/windows/scoped_winsock_initializer.h" [$WINDOWS]
 	}
 
 	$folder	"Link Libraries"

@@ -10,7 +10,7 @@
 #include <squirrel.h>
 
 #ifndef POSIX
-#include <winsock.h>
+#include <winsock2.h>
 using socklen_t = int;
 #endif
 
@@ -26,7 +26,7 @@ HSQREMOTEDBG sq_rdbg_init(HSQUIRRELVM v, unsigned short port,
                           SQBool autoupdate) {
 #ifdef _WIN32
   WSADATA wsadata;
-  if (WSAStartup(MAKEWORD(2, 0), &wsadata) != 0) {
+  if (WSAStartup(WINSOCK_VERSION, &wsadata) != 0) {
     return nullptr;
   }
 #endif

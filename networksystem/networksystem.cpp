@@ -10,7 +10,7 @@
 #include "sm_protocol.h"
 #include "NetChannel.h"
 #include "UDP_Process.h"
-#include <winsock.h>
+#include <winsock2.h>
 #include "networkclient.h"
 #include "networkserver.h"
 #include "networksystem/inetworkmessage.h"
@@ -55,12 +55,12 @@ InitReturnVal_t CNetworkSystem::Init()
 	if ( nRetVal != INIT_OK )
 		return nRetVal;
 
-	// initialize winsock 2.0
+	// initialize winsock 
 	WSAData wsaData;
 	
-	if ( WSAStartup( MAKEWORD(2,0), &wsaData ) != 0 )
+	if ( WSAStartup( WINSOCK_VERSION, &wsaData ) != 0 )
 	{
-		Warning( "Error! Failed to load network socket library.\n");
+		Warning( "Error! Windows sockets 2.2+ unavailable.\n");
 		return INIT_OK;
 	}
 	else

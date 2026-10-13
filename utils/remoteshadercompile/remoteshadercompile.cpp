@@ -19,9 +19,12 @@
 #include <vector>
 
 #include "windows/com_error_category.h"
+#include "windows/scoped_winsock_initializer.h"
 #include "tier0/dbg.h"
 
 #include "tier0/memdbgon.h"
+
+using namespace se::common::windows;
 
 namespace {
 
@@ -33,41 +36,6 @@ constexpr inline char kDefaultSharedPort[]{"20000"};
 [[nodiscard]] inline bool V_streq(IN_Z const char* l, IN_Z const char* r) {
   return strcmp(l, r) == 0;
 }
-
-[[nodiscard]] std::error_code GetSystemError(int errc) noexcept {
-  return std::error_code{errc, std::system_category()};
-}
-
-class ScopedWinsockInitializer {
- public:
-  ScopedWinsockInitializer(unsigned short major, unsigned short minor) noexcept
-      : rc_{GetSystemError(WSAStartup(MAKEWORD(minor, major), &wsaData_))} {
-    if (LOBYTE(wsaData_.wVersion) != minor ||
-        HIBYTE(wsaData_.wVersion) != major) {
-      rc_ = GetSystemError(ERROR_SVHDX_VERSION_MISMATCH);
-    }
-  }
-  ~ScopedWinsockInitializer() noexcept {
-    if (!rc_.value() || rc_.value() == ERROR_SVHDX_VERSION_MISMATCH) {
-      if (WSACleanup() == SOCKET_ERROR) {
-        rc_ = GetSystemError(WSAGetLastError());
-
-        fprintf(stderr, "WSACleanup failed: %s\n", rc_.message().c_str());
-
-        exit(rc_.value());
-      }
-    }
-  }
-
-  ScopedWinsockInitializer(ScopedWinsockInitializer &) = delete;
-  ScopedWinsockInitializer &operator=(ScopedWinsockInitializer &) = delete;
-
-  [[nodiscard]] std::error_code error_code() const noexcept { return rc_; }
-
- private:
-  WSADATA wsaData_;
-  std::error_code rc_;
-};
 
 class ScopedAcceptSocket {
  public:
@@ -425,19 +393,16 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
     return;
   }
 
-  constexpr unsigned short kWinsockMajor{2}, kWinsockMinor{2};
-
   // Signal main thread child exited.
   const ScopedSetIsServerExitFlag scoped_set_is_server_exit_flag{
       args.is_server_exit};
 
-  const ScopedWinsockInitializer scoped_winsock_initializer{kWinsockMajor,
-                                                            kWinsockMinor};
+  const ScopedWinsockInitializer scoped_winsock_initializer{WINSOCK_VERSION};
   rc = scoped_winsock_initializer.error_code();
   if (rc) {
     args.exit_code = rc;
-    fprintf(stderr, "WSAStartup v %hu.%hu failed with error: %s\n",
-            kWinsockMajor, kWinsockMinor, rc.message().c_str());
+    fprintf(stderr, "WSAStartup v %hu failed with error: %s\n",
+            WINSOCK_VERSION, rc.message().c_str());
     return;
   }
 

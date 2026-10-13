@@ -4,6 +4,7 @@
 #include <chrono>
 
 #include "winlite.h"
+#include <WinSock2.h>
 #include <DbgHelp.h>
 #include <eh.h>
 
@@ -27,7 +28,7 @@
 #include "filesystem.h"
 #include "filesystem/IQueuedLoader.h"
 #include "windows/scoped_timer_resolution.h"
-#include "windows/scoped_winsock.h"
+#include "windows/scoped_winsock_initializer.h"
 
 #include "isystem.h"
 #include "dedicated.h"
@@ -316,11 +317,11 @@ DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
         static_cast<long long>(kSystemTimerResolution.count()));
   }
 
-  const se::common::windows::ScopedWinsock scoped_winsock{MAKEWORD(2, 0)};
-  if (scoped_winsock.errc()) {
-    Warning("Windows sockets 2.0 unavailable (%d): %s.\n",
-            scoped_winsock.errc().value(),
-            scoped_winsock.errc().message().c_str());
+  const se::common::windows::ScopedWinsockInitializer scoped_winsock{WINSOCK_VERSION};
+  if (scoped_winsock.error_code()) {
+    Warning("Windows sockets 2.2+ unavailable (%d): %s.\n",
+            scoped_winsock.error_code().value(),
+            scoped_winsock.error_code().message().c_str());
   }
 
   const bool is_console_mode{command_line->HasParm("-console")};
