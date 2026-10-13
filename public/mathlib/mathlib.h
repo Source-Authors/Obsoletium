@@ -750,11 +750,9 @@ template <>
 	if ( q1 == q2 )
 		return q1;
 
-	Quaternion src, dest;
-
 	// Convert to quaternions
-	AngleQuaternion( q1, src );
-	AngleQuaternion( q2, dest );
+	Quaternion src = AngleQuaternion( q1 );
+	Quaternion dest = AngleQuaternion( q2 );
 
 	Quaternion result;
 
