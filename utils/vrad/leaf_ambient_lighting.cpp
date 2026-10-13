@@ -190,8 +190,11 @@ public:
 	// do a couple of tracing heuristics to eliminate points that are inside detail brushes 
 	// or underneath displacement surfaces in the leaf
 	// return once we have a valid point, use the center if one can't be computed quickly
-	void GenerateLeafSamplePosition( int leafIndex, const CUtlVector<dplane_t> &leafPlanes, Vector &samplePosition )
+	// dimhotepus: Return generated vector for simplicity.
+	[[nodiscard]] Vector GenerateLeafSamplePosition( int leafIndex, const CUtlVector<dplane_t> &leafPlanes )
 	{
+		Vector samplePosition = vec3_origin;
+
 		dleaf_t *pLeaf = dleafs + leafIndex;
 
 		float dx = pLeaf->maxs[0] - pLeaf->mins[0];
@@ -249,6 +252,8 @@ public:
 			// didn't generate a valid sample point, just use the center of the leaf bbox
 			samplePosition = ( Vector( pLeaf->mins[0], pLeaf->mins[1], pLeaf->mins[2] ) + Vector( pLeaf->maxs[0], pLeaf->maxs[1], pLeaf->maxs[2] ) ) * 0.5f;
 		}
+
+		return samplePosition;
 	}
 
 private:
@@ -257,9 +262,10 @@ private:
 };
 
 // gets a list of the planes pointing into a leaf
-void GetLeafBoundaryPlanes( CUtlVector<dplane_t> &list, int leafIndex )
+// dimhotepus: Use NRVO for simplicity.
+[[nodiscard]] static CUtlVector<dplane_t> GetLeafBoundaryPlanes( int leafIndex )
 {
-	list.RemoveAll();
+	CUtlVector<dplane_t> list;
 	int nodeIndex = leafparents[leafIndex];
 	int child = -(leafIndex + 1);
 	while ( nodeIndex >= 0 )
@@ -282,6 +288,7 @@ void GetLeafBoundaryPlanes( CUtlVector<dplane_t> &list, int leafIndex )
 		child = nodeIndex;
 		nodeIndex = nodeparents[child];
 	}
+	return list;
 }
 
 // this stores each sample of the ambient lighting
@@ -508,13 +515,14 @@ static void LeafBounds( int leafIndex, Vector &mins, Vector &maxs )
 
 CUtlVector< CUtlVector<ambientsample_t> > g_LeafAmbientSamples;
 
-void ComputeAmbientForLeaf( int iThread, int leafID, CUtlVector<ambientsample_t> &list )
+// dimhotepus: Use NRVO for simplicity.
+static CUtlVector<ambientsample_t> ComputeAmbientForLeaf( int iThread, int leafID )
 {
-	CUtlVector<dplane_t> leafPlanes;
+	CUtlVector<ambientsample_t> list;
+
 	CLeafSampler sampler( iThread );
 
-	GetLeafBoundaryPlanes( leafPlanes, leafID );
-	list.RemoveAll();
+	CUtlVector<dplane_t> leafPlanes = GetLeafBoundaryPlanes( leafID );
 	// this heuristic tries to generate at least one sample per volume (chosen to be similar to the size of a player) in the space
 	int xSize = (dleafs[leafID].maxs[0] - dleafs[leafID].mins[0]) / 32;
 	int ySize = (dleafs[leafID].maxs[1] - dleafs[leafID].mins[1]) / 32;
@@ -534,14 +542,13 @@ void ComputeAmbientForLeaf( int iThread, int leafID, CUtlVector<ambientsample_t>
 	{
 		// don't generate any samples in solid leaves
 		// NOTE: We copy the nearest non-solid leaf sample pointers into this leaf at the end
-		return;
+		return list;
 	}
 	Vector cube[6];
 	for ( int i = 0; i < sampleCount; i++ )
 	{
 		// compute each candidate sample and add to the list
-		Vector samplePosition;
-		sampler.GenerateLeafSamplePosition( leafID, leafPlanes, samplePosition );
+		Vector samplePosition = sampler.GenerateLeafSamplePosition( leafID, leafPlanes );
 		ComputeAmbientFromSphericalSamples( iThread, samplePosition, cube );
 		// note this will remove the least valuable sample once the limit is reached
 		AddSampleToList( list, samplePosition, cube );
@@ -549,32 +556,29 @@ void ComputeAmbientForLeaf( int iThread, int leafID, CUtlVector<ambientsample_t>
 
 	// remove any samples that can be reconstructed with the remaining data
 	CompressAmbientSampleList( list );
+
+	return list;
 }
 
 static void ThreadComputeLeafAmbient( int iThread, void *pUserData )
 {
-	CUtlVector<ambientsample_t> list;
 	while (1)
 	{
 		int leafID = GetThreadWork();
 		if (leafID == -1)
 			break;
-		list.RemoveAll();
-		ComputeAmbientForLeaf(iThread, leafID, list);
+		// dimhotepus: Move for speed.
+		auto list = ComputeAmbientForLeaf(iThread, leafID);
 		// copy to the output array
-		g_LeafAmbientSamples[leafID].SetCount( list.Count() );
-		for ( intp i = 0; i < list.Count(); i++ )
-		{
-			g_LeafAmbientSamples[leafID].Element(i) = list.Element(i);
-		}
+		// dimhotepus: Move for speed.
+		g_LeafAmbientSamples[leafID] = std::move( list );
 	}
 }
 
 #ifdef MPI
 void VMPI_ProcessLeafAmbient( int iThread, uint64 iLeaf, MessageBuffer *pBuf )
 {
-	CUtlVector<ambientsample_t> list;
-	ComputeAmbientForLeaf(iThread, (int)iLeaf, list);
+	CUtlVector<ambientsample_t> list = ComputeAmbientForLeaf(iThread, (int)iLeaf);
 
 	VMPI_SetCurrentStage( "EncodeLeafAmbientResults" );
 
