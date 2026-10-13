@@ -364,7 +364,7 @@ public:
 	CLightSurface(int iThread) : m_pSurface(0), m_HitFrac(1.0f), m_bHasLuxel(false), m_iThread(iThread) {}
 
 	// call back with a node and a context
-	bool EnumerateNode( int node, Ray_t const& ray, float f, intp context )
+	bool EnumerateNode( int node, Ray_t const& ray, float f, intp context ) override
 	{
 		dface_t* pSkySurface = 0;
 
@@ -413,7 +413,7 @@ public:
 	}
 
 	// call back with a leaf and a context
-	virtual bool EnumerateLeaf( int leaf, Ray_t const& ray, float start, float end, intp context )
+	bool EnumerateLeaf( int leaf, Ray_t const& ray, float start, float end, intp context ) override
 	{
 		bool hit = false;
 		dleaf_t* pLeaf = &dleafs[leaf];
