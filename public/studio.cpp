@@ -380,9 +380,21 @@ int studiohdr_t::GetSharedPoseParameter( intp iSequence, int iLocalPose ) const
 	const virtualmodel_t *pVModel = GetVirtualModel();
 	Assert( pVModel );
 
-	const virtualgroup_t &pGroup = pVModel->m_group[ pVModel->m_seq[iSequence].group ];
+	const int group = pVModel->m_seq[iSequence].group;
+	const virtualgroup_t* pGroup = pVModel->m_group.IsValidIndex( group ) ? &pVModel->m_group[group] : nullptr;
 
-	return pGroup.masterPose[iLocalPose];
+	// Josh: This used to return iLocalPose when it was out of bounds
+	// but that is not correct, this should return -1 because
+	// otherwise it's just some random unrelated index. 
+	if ( !pGroup )
+		return -1;
+
+	// Josh: Sometimes the Sniper can try to eat a gun and we hit this.
+	// Model pose group data is just complete garbage out of studiomdl, woo!
+	if ( !pGroup->masterPose.IsValidIndex( iLocalPose ) )
+		return -1;
+
+	return pGroup->masterPose[iLocalPose];
 }
 
 
@@ -1103,14 +1115,20 @@ int CStudioHdr::GetSharedPoseParameter( intp iSequence, int iLocalPose ) const
 	Assert( m_pVModel );
 
 	const int group = m_pVModel->m_seq[iSequence].group;
+	const virtualgroup_t *pGroup = m_pVModel->m_group.IsValidIndex( group ) ? &m_pVModel->m_group[ group ] : nullptr;
 
-	if (m_pVModel->m_group.IsValidIndex( group ))
-	{
-		const virtualgroup_t &pGroup = m_pVModel->m_group[ group ];
-		return pGroup.masterPose[iLocalPose];
-	}
+	// Josh: This used to return iLocalPose when it was out of bounds
+	// but that is not correct, this should return -1 because
+	// otherwise it's just some random unrelated index. 
+	if ( !pGroup )
+		return -1;
 
-	return iLocalPose;
+	// Josh: Sometimes the Sniper can try to eat a gun and we hit this.
+	// Model pose group data is just complete garbage out of studiomdl, woo!
+	if ( !pGroup->masterPose.IsValidIndex( iLocalPose ) )
+		return -1;
+
+	return pGroup->masterPose[iLocalPose];
 }
 
 
