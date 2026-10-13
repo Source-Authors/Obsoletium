@@ -1801,6 +1801,7 @@ void CVradStaticPropMgr::ComputeLighting( int iThread )
 	}
 
 	StartPacifier( "Computing static prop lighting: " );
+	RunCodeAtScopeExit( EndPacifier( true ) );
 
 	// ensure any traces against us are ignored because we have no inherit lighting contribution
 	m_bIgnoreStaticPropTrace = true;
@@ -1828,8 +1829,6 @@ void CVradStaticPropMgr::ComputeLighting( int iThread )
 
 	// save data to bsp
 	SerializeLighting();
-
-	EndPacifier( true );
 }
 
 //-----------------------------------------------------------------------------

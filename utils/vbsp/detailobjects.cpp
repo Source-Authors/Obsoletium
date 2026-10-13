@@ -831,6 +831,7 @@ static void SetLumpData( )
 void EmitDetailModels()
 {
 	StartPacifier( "Placing detail props: " );
+	RunCodeAtScopeExit( EndPacifier( true ) );
 
 	// Place stuff on each face
 	dface_t* pFace = dfaces;
@@ -940,8 +941,6 @@ void EmitDetailModels()
 			continue;
 		}
 	}
-
-	EndPacifier( true );
 }
 
 

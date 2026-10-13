@@ -597,6 +597,7 @@ void EmitDispLMAlphaAndNeighbors()
 	}
 
 	StartPacifier( "Displacement Alpha: ");
+	RunCodeAtScopeExit( EndPacifier() );
 
 	// Build lightmap alphas.
 	int dispCount = 0;	// How many we've processed.
@@ -612,8 +613,6 @@ void EmitDispLMAlphaAndNeighbors()
 		
 		++dispCount;
 	}
-
-	EndPacifier();
 }
 
 

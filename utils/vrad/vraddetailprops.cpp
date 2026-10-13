@@ -1065,6 +1065,7 @@ void ComputeDetailPropLighting( int iThread )
 	}
 
 	StartPacifier( "Computing detail prop lighting: " );
+	RunCodeAtScopeExit( EndPacifier( true ) );
 
 	for (int i = 0; i < count; ++i)
 	{
@@ -1074,5 +1075,4 @@ void ComputeDetailPropLighting( int iThread )
 
 	// Write detail prop lightstyle lump...
 	WriteDetailLightingLumps();
-	EndPacifier( true );
 }
