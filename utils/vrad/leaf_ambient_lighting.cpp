@@ -18,7 +18,7 @@
 #include "vmpi.h"
 #include "vmpi_distribute_work.h"
 
-static TableVector g_BoxDirections[6] = 
+static constexpr inline TableVector g_BoxDirections[6] = 
 {
 	{  1,  0,  0 }, 
 	{ -1,  0,  0 },
