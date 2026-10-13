@@ -119,45 +119,45 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  // If it didn't load the module above, then use the
+  if (!module) {
+    V_strcpy_safe(module_name, kModuleName);
+
+    module = source::ScopedDll{module_name, 0};
+  }
+
+  if (!module) {
+    fprintf(stderr, "vrad error: Can't load '%s'.\n%s", module_name,
+            module.error_code().message().c_str());
+    return ENOENT;
+  }
+
+  const auto kFactoryName = CREATEINTERFACE_PROCNAME;
+  CreateInterfaceFnT<IVRadDLL> factory{nullptr};
+
+  std::tie(factory, err) =
+      module.GetFunction<CreateInterfaceFnT<IVRadDLL>>(kFactoryName);
+  if (!factory) {
+    fprintf(stderr, "vrad error: Can't get '%s' factory from '%s'.\n",
+            kFactoryName, kModuleName);
+    return EINVAL;
+  }
+
+  int ret{0};
+  const auto kInterfaceName = VRAD_INTERFACE_VERSION;
+
+  IVRadDLL *vrad{factory(kInterfaceName, &ret)};
+  if (!vrad) {
+    fprintf(stderr, "vrad error: Can't get '%s' interface from '%s'.\n",
+            kModuleName, kInterfaceName);
+    return EINVAL;
+  }
+
   int rc{0};
 
   // Try ldr and hdr.
   for (int mode = 0; mode < 2; mode++) {
     if (mode && !both_arg) continue;
-
-    // If it didn't load the module above, then use the
-    if (!module) {
-      V_strcpy_safe(module_name, kModuleName);
-
-      module = source::ScopedDll{module_name, 0};
-    }
-
-    if (!module) {
-      fprintf(stderr, "vrad error: Can't load '%s'.\n%s", module_name,
-              module.error_code().message().c_str());
-      return ENOENT;
-    }
-
-    const auto kFactoryName = CREATEINTERFACE_PROCNAME;
-    CreateInterfaceFnT<IVRadDLL> factory{nullptr};
-
-    std::tie(factory, err) =
-        module.GetFunction<CreateInterfaceFnT<IVRadDLL>>(kFactoryName);
-    if (!factory) {
-      fprintf(stderr, "vrad error: Can't get '%s' factory from '%s'.\n",
-              kFactoryName, kModuleName);
-      return EINVAL;
-    }
-
-    int ret{0};
-    const auto kInterfaceName = VRAD_INTERFACE_VERSION;
-
-    IVRadDLL *vrad{factory(kInterfaceName, &ret)};
-    if (!vrad) {
-      fprintf(stderr, "vrad error: Can't get '%s' interface from '%s'.\n",
-              kModuleName, kInterfaceName);
-      return EINVAL;
-    }
 
     // Replace -both with -hdr or -ldr.
     if (both_arg) V_strcpy(argv[both_arg], mode ? "-hdr" : "-ldr");
