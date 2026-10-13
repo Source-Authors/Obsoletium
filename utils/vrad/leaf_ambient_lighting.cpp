@@ -115,12 +115,15 @@ static void AddEmitSurfaceLights( const Vector &vStart, Vector (&lightBoxColor)[
 static void ComputeAmbientFromSphericalSamples( int iThread, const Vector &vStart, Vector (&lightBoxColor)[6] )
 {
 	// Figure out the color that rays hit when shot out from this position.
-	Vector radcolor[NUMVERTEXNORMALS];
-	float tanTheta = tan(VERTEXNORMAL_CONE_INNER_ANGLE);
+	Vector radcolor[ssize(g_anorms)];
+	const float tanTheta = tan(VERTEXNORMAL_CONE_INNER_ANGLE);
 
-	for ( int i = 0; i < NUMVERTEXNORMALS; i++ )
+	static_assert(ssize(radcolor) == ssize(g_anorms));
+	for ( intp i = 0; i < ssize(radcolor); i++ )
 	{
-		Vector vEnd = vStart + g_anorms[i] * (COORD_EXTENT * 1.74);
+		constexpr float extent = COORD_EXTENT * 1.74f;
+
+		Vector vEnd = vStart + g_anorms[i] * extent;
 
 		// Now that we've got a ray, see what surface we've hit
 		Vector lightStyleColors[MAX_LIGHTSTYLES];
@@ -131,13 +134,15 @@ static void ComputeAmbientFromSphericalSamples( int iThread, const Vector &vStar
 	}
 
 	// accumulate samples into radiant box
-	for ( int j = 6; --j >= 0; )
+	static_assert(ssize(lightBoxColor) == ssize(g_BoxDirections));
+	for ( intp j = ssize(lightBoxColor); --j >= 0; )
 	{
 		float t = 0;
 
 		lightBoxColor[j].Init();
 
-		for (int i = 0; i < NUMVERTEXNORMALS; i++)
+		static_assert(ssize(radcolor) == ssize(g_anorms));
+		for ( intp i = 0; i < std::size(g_anorms); i++ )
 		{
 			float c = DotProduct( g_anorms[i], g_BoxDirections[j] );
 			if (c > 0)

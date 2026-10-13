@@ -622,7 +622,7 @@ void CalcRayAmbientLighting( int iThread, const Vector &vStart, const Vector &vE
 //-----------------------------------------------------------------------------
 // Compute ambient lighting component at specified position.
 //-----------------------------------------------------------------------------
-static void ComputeAmbientLightingAtPoint( int iThread, const Vector &origin, Vector (&radcolor)[NUMVERTEXNORMALS], Vector (&color)[MAX_LIGHTSTYLES] )
+static void ComputeAmbientLightingAtPoint( int iThread, const Vector &origin, Vector (&radcolor)[ssize(g_anorms)], Vector (&color)[MAX_LIGHTSTYLES] )
 {
 	// NOTE: I'm not dealing with shadow-casting static props here
 	// This is for speed, although we can add it if it turns out to
@@ -637,10 +637,12 @@ static void ComputeAmbientLightingAtPoint( int iThread, const Vector &origin, Ve
 		color[j].Init( 0,0,0 );
 	}
 
-	float tanTheta = tan(VERTEXNORMAL_CONE_INNER_ANGLE);
-	for (int i = 0; i < NUMVERTEXNORMALS; i++)
+	const float tanTheta = tan(VERTEXNORMAL_CONE_INNER_ANGLE);
+	for ( auto &anorm : g_anorms )
 	{
-		VectorMA( origin, COORD_EXTENT * 1.74, g_anorms[i], upend );
+		constexpr float extent = COORD_EXTENT * 1.74f;
+
+		VectorMA( origin, extent, anorm, upend );
 
 		// Now that we've got a ray, see what surface we've hit
 		CalcRayAmbientLighting( iThread, origin, upend, tanTheta, color );
@@ -648,9 +650,11 @@ static void ComputeAmbientLightingAtPoint( int iThread, const Vector &origin, Ve
 //		DumpRayToGlView( ray, surfEnum.m_HitFrac, &color[0], "test.out" );
 	}
 
-	for ( j = 0; j < MAX_LIGHTSTYLES; ++j)
+	constexpr float factor = 255.0f / ssize(g_anorms);
+
+	for ( auto &c : color )
 	{
-		VectorMultiply( color[j], 255.0f / (float)NUMVERTEXNORMALS, color[j] );
+		c *= factor;
 	}
 }
 
@@ -667,7 +671,7 @@ void ComputeIndirectLightingAtPoint( Vector &position, Vector &normal, Vector &o
 	outColor.Init();
 
 	
-	int nSamples = NUMVERTEXNORMALS;
+	int nSamples = ssize(g_anorms);
 	if ( do_fast || force_fast )
 		nSamples /= 4;
 	else
@@ -807,7 +811,7 @@ static void ComputeAmbientLighting( int iThread, DetailObjectLump_t& prop, Vecto
 		return;
 	}
 
-	Vector radcolor[NUMVERTEXNORMALS];
+	Vector radcolor[ssize(g_anorms)];
 	ComputeAmbientLightingAtPoint( iThread, origin, radcolor, color );
 }
 
