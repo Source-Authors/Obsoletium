@@ -216,7 +216,12 @@ void RunThreadsOn(int workcnt, qboolean showpacifier, RunThreadsFn fn,
 
   dispatch = 0;
   workcount = workcnt;
-  StartPacifier("");
+
+  // dimhotepus: Start pacifier only if it is set.
+  if (pacifier) {
+    StartPacifier("");
+  }
+
   pacifier = showpacifier;
 
 #ifdef _PROFILE
