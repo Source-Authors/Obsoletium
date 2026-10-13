@@ -201,7 +201,8 @@ public:
 		float dy = pLeaf->maxs[1] - pLeaf->mins[1];
 		float dz = pLeaf->maxs[2] - pLeaf->mins[2];
 		bool bValid = false;
-		for ( int i = 0; i < 1000 && !bValid; i++ )
+		// dimhotepus: 1000 -> 1024
+		for ( int i = 0; i < 1024 && !bValid; i++ )
 		{
 			samplePosition.x = pLeaf->mins[0] + m_random.RandomFloat(0, dx);
 			samplePosition.y = pLeaf->mins[1] + m_random.RandomFloat(0, dy);
