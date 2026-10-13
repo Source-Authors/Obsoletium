@@ -607,8 +607,8 @@ void PortalFlow (int iThread, int portalnum)
 
 	const int c_might = CountBits (p->portalflood, g_numportals*2);
 	
-	threaddata_t	data;
-	memset (&data, 0, sizeof(data));
+	threaddata_t data;
+	BitwiseClear (data);
 	data.base = p;
 	
 	data.pstack_head.portal = p;
