@@ -102,7 +102,7 @@ private:
 // Returns a clamped value in the range [min, max].
 //
 template<typename T>
-[[nodiscard]] inline T clamp( T val, T minVal, T maxVal )
+[[nodiscard]] constexpr inline T clamp( T val, T minVal, T maxVal )
 {
 	return std::clamp( val, minVal, maxVal );
 }
@@ -687,21 +687,21 @@ void XM_CALLCONV BasisToQuaternion( const Vector &vecForward, const Vector &vecR
 // dimhotepus: Too unsafe. Use safer overload.
 int __cdecl BoxOnPlaneSide (const float *emins, const float *emaxs, const cplane_t *plane) = delete;
 
-[[nodiscard]] inline float XM_CALLCONV anglemod(float a)
+[[nodiscard]] constexpr inline float XM_CALLCONV anglemod(float a)
 {
 	a = (360.f/65536) * (static_cast<int>(a*(65536.f/360.0f)) & 65535);
 	return a;
 }
 
 // Remap a value in the range [A,B] to [C,D].
-[[nodiscard]] inline float XM_CALLCONV RemapVal( float val, float A, float B, float C, float D)
+[[nodiscard]] constexpr inline float XM_CALLCONV RemapVal( float val, float A, float B, float C, float D)
 {
 	if ( A == B )
 		return val >= B ? D : C;
 	return C + (D - C) * (val - A) / (B - A);
 }
 
-[[nodiscard]] inline float XM_CALLCONV RemapValClamped( float val, float A, float B, float C, float D)
+[[nodiscard]] constexpr inline float XM_CALLCONV RemapValClamped( float val, float A, float B, float C, float D)
 {
 	if ( A == B )
 		return val >= B ? D : C;
@@ -714,12 +714,12 @@ int __cdecl BoxOnPlaneSide (const float *emins, const float *emaxs, const cplane
 // Returns A + (B-A)*flPercent.
 // float Lerp( float flPercent, float A, float B );
 template <class T>
-[[nodiscard]] FORCEINLINE T Lerp( float flPercent, T const &A, T const &B )
+[[nodiscard]] constexpr FORCEINLINE T Lerp( float flPercent, T const &A, T const &B )
 {
 	return A + (B - A) * flPercent;
 }
 
-[[nodiscard]] FORCEINLINE float XM_CALLCONV Sqr( float f )
+[[nodiscard]] constexpr FORCEINLINE float XM_CALLCONV Sqr( float f )
 {
 	return f*f;
 }
@@ -734,7 +734,7 @@ template <class T>
 //   If you know a function f(x)'s value (f1) at position i1, and its value (f2) at position i2,
 //   the function can be linearly interpolated with FLerp(f1,f2,i1,i2,x)
 //    i2=i1 will cause a divide by zero.
-[[nodiscard]] static inline float XM_CALLCONV FLerp(float f1, float f2, float i1, float i2, float x)
+[[nodiscard]] static constexpr inline float XM_CALLCONV FLerp(float f1, float f2, float i1, float i2, float x)
 {
   return f1+(f2-f1)*(x-i1)/(i2-i1);
 }
