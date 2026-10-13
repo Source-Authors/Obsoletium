@@ -415,9 +415,10 @@ static void Mod_LeafAmbientColorAtPos( Vector (&pOut)[6], const Vector &pos, con
 			pOut[j] += list[i].cube[j] * factor;
 		}
 	}
+	const float factor = 1.0f / totalFactor;
 	for ( auto &o : pOut )
 	{
-		o *= (1.0f / totalFactor);
+		o *= factor;
 	}
 }
 
@@ -493,7 +494,7 @@ static void LeafBounds( int leafIndex, Vector &mins, Vector &maxs )
 
 		Vector testMins, testMaxs;
 		LeafBounds( testIndex, testMins, testMaxs );
-		float dist = AABBDistance( mins, maxs, testMins, testMaxs );
+		const float dist = AABBDistance( mins, maxs, testMins, testMaxs );
 		if ( dist < bestDist )
 		{
 			bestDist = dist;
