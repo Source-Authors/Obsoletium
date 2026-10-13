@@ -280,6 +280,7 @@ static void ComputeLightmapColorFromAverage( dface_t* pFace, directlight_t* pSky
 		return;
 	}
 
+	static_assert(ssize(pColor) >= MAXLIGHTMAPS);
 	for (int maps = 0 ; maps < MAXLIGHTMAPS && pFace->styles[maps] != 255 ; ++maps)
 	{
 		ColorRGBExp32* pAvgColor = dface_AvgLightColor( pFace, maps );
@@ -337,6 +338,8 @@ static void ComputeLightmapColorPointSample( dface_t* pFace, directlight_t* pSky
 
 	ColorRGBExp32* pLightmap = (ColorRGBExp32*)&pdlightdata->Base()[pFace->lightofs];
 	pLightmap += dt * smax + ds;
+
+	static_assert(ssize(pColor) >= MAXLIGHTMAPS);
 	for (int maps = 0 ; maps < MAXLIGHTMAPS && pFace->styles[maps] != 255 ; ++maps)
 	{
 		int style = pFace->styles[maps];
@@ -631,10 +634,9 @@ static void ComputeAmbientLightingAtPoint( int iThread, const Vector &origin, Ve
 	// sample world by casting N rays distributed across a sphere
 	Vector upend;
 
-	int j;
-	for ( j = 0; j < MAX_LIGHTSTYLES; ++j)
+	for ( auto &c : color )
 	{
-		color[j].Init( 0,0,0 );
+		c.Init( 0,0,0 );
 	}
 
 	const float tanTheta = tan(VERTEXNORMAL_CONE_INNER_ANGLE);
@@ -649,7 +651,7 @@ static void ComputeAmbientLightingAtPoint( int iThread, const Vector &origin, Ve
 
 //		DumpRayToGlView( ray, surfEnum.m_HitFrac, &color[0], "test.out" );
 	}
-
+	
 	constexpr float factor = 255.0f / ssize(g_anorms);
 
 	for ( auto &c : color )
@@ -804,9 +806,9 @@ static void ComputeAmbientLighting( int iThread, DetailObjectLump_t& prop, Vecto
 		}
 
 		// fill with debug color
-		for ( int i = 0; i < MAX_LIGHTSTYLES; ++i)
+		for ( auto &c : color )
 		{
-			color[i].Init(1,0,0);
+			c.Init(1, 0, 0);
 		}
 		return;
 	}

@@ -100,7 +100,8 @@ static void AddEmitSurfaceLights( const Vector &vStart, Vector (&lightBoxColor)[
 		if ( ratio == 0 )
 			continue;
 
-		for ( int i=0; i < 6; i++ )
+		static_assert(ssize(lightBoxColor) == ssize(g_BoxDirections));
+		for ( int i = 0; i < ssize(lightBoxColor); i++ )
 		{
 			float t = DotProduct( g_BoxDirections[i], vDeltaNorm );
 			if ( t > 0 )
@@ -163,7 +164,7 @@ static void ComputeAmbientFromSphericalSamples( int iThread, const Vector &vStar
 
 [[nodiscard]] static bool IsLeafAmbientSurfaceLight( const dworldlight_t *wl )
 {
-	static const float g_flWorldLightMinEmitSurface = 0.005f;
+	constexpr float g_flWorldLightMinEmitSurface = 0.005f;
 	static const float g_flWorldLightMinEmitSurfaceDistanceRatio = ( InvRSquared( Vector( 0, 0, 512 ) ) );
 
 	if ( wl->type != emit_surface )
@@ -204,7 +205,7 @@ public:
 			samplePosition.z = pLeaf->mins[2] + m_random.RandomFloat(0, dz);
 			bValid = true;
 
-			for ( int j = leafPlanes.Count(); --j >= 0 && bValid; )
+			for ( intp j = leafPlanes.Count(); --j >= 0 && bValid; )
 			{
 				float d = DotProduct(leafPlanes[j].normal, samplePosition) - leafPlanes[j].dist;
 				if ( d < DIST_EPSILON )
@@ -294,11 +295,14 @@ struct ambientsample_t
 // be discarded.  This has the effect of converging on the best samples when enough are added.
 static void AddSampleToList( CUtlVector<ambientsample_t> &list, const Vector &samplePosition, Vector (&pCube)[6] )
 {
-	const int MAX_SAMPLES = 16;
+	constexpr int MAX_SAMPLES = 16;
 
 	intp index = list.AddToTail();
 	list[index].pos = samplePosition;
-	for ( int i = 0; i < 6; i++ )
+
+	static_assert(ssize(pCube) == 6);
+	static_assert(sizeof(ambientsample_t::cube) == 6 * sizeof(Vector));
+	for ( intp i = 0; i < ssize(pCube); i++ )
 	{
 		list[index].cube[i] = pCube[i];
 	}
@@ -306,15 +310,15 @@ static void AddSampleToList( CUtlVector<ambientsample_t> &list, const Vector &sa
 	if ( list.Count() <= MAX_SAMPLES )
 		return;
 
-	int nearestNeighborIndex = 0;
-	float nearestNeighborDist = FLT_MAX;
+	intp nearestNeighborIndex = 0;
+	float nearestNeighborDist = std::numeric_limits<float>::max();
 	float nearestNeighborTotal = 0;
-	for ( int i = 0; i < list.Count(); i++ )
+	for ( intp i = 0; i < list.Count(); i++ )
 	{
-		int closestIndex = 0;
-		float closestDist = FLT_MAX;
+		intp closestIndex = 0;
+		float closestDist = std::numeric_limits<float>::max();
 		float totalDC = 0;
-		for ( int j = 0; j < list.Count(); j++ )
+		for ( intp j = 0; j < list.Count(); j++ )
 		{
 			if ( j == i )
 				continue;
@@ -366,8 +370,9 @@ static void AddSampleToList( CUtlVector<ambientsample_t> &list, const Vector &sa
 [[nodiscard]] static int CubeDeltaGammaSpace( Vector (&pCube0)[6], Vector (&pCube1)[6] )
 {
 	int maxDelta = 0;
+	static_assert(ssize(pCube0) == ssize(pCube1));
 	// do this comparison in gamma space to try and get a perceptual basis for the compare
-	for ( int i = 0; i < 6; i++ )
+	for ( int i = 0; i < ssize(pCube0); i++ )
 	{
 		for ( int j = 0; j < 3; j++ )
 		{
@@ -384,12 +389,12 @@ static void AddSampleToList( CUtlVector<ambientsample_t> &list, const Vector &sa
 // optionally skip one of the entries in the list
 static void Mod_LeafAmbientColorAtPos( Vector (&pOut)[6], const Vector &pos, const CUtlVector<ambientsample_t> &list, intp skipIndex )
 {
-	for ( int i = 0; i < 6; i++ )
+	for ( auto &o : pOut )
 	{
-		pOut[i].Init();
+		o.Init();
 	}
 	float totalFactor = 0;
-	for ( int i = 0; i < list.Count(); i++ )
+	for ( intp i = 0; i < list.Count(); i++ )
 	{
 		if ( i == skipIndex )
 			continue;
@@ -403,9 +408,9 @@ static void Mod_LeafAmbientColorAtPos( Vector (&pOut)[6], const Vector &pos, con
 			pOut[j] += list[i].cube[j] * factor;
 		}
 	}
-	for ( int i = 0; i < 6; i++ )
+	for ( auto &o : pOut )
 	{
-		pOut[i] *= (1.0f / totalFactor);
+		o *= (1.0f / totalFactor);
 	}
 }
 
@@ -413,7 +418,7 @@ static void Mod_LeafAmbientColorAtPos( Vector (&pOut)[6], const Vector &pos, con
 static void CompressAmbientSampleList( CUtlVector<ambientsample_t> &list )
 {
 	Vector testCube[6];
-	for ( int i = 0; i < list.Count(); i++ )
+	for ( intp i = 0; i < list.Count(); i++ )
 	{
 		if ( list.Count() > 1 )
 		{
@@ -473,7 +478,7 @@ static void LeafBounds( int leafIndex, Vector &mins, Vector &maxs )
 	ToolBSPTree()->EnumerateLeavesInBox( mins-size, maxs+size, &leafList, 0 );
 	float bestDist = FLT_MAX;
 	int bestIndex = leafID;
-	for ( int i = 0; i < leafList.m_list.Count(); i++ )
+	for ( intp i = 0; i < leafList.m_list.Count(); i++ )
 	{
 		int testIndex = leafList.m_list[i];
 		if ( !g_pLeafAmbientIndex->Element(testIndex).ambientSampleCount )
