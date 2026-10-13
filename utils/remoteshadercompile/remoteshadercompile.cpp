@@ -48,17 +48,13 @@ class ScopedAcceptSocket {
       if (shutdown(s_, SD_SEND) == SOCKET_ERROR) {
         rc_ = GetSystemError(WSAGetLastError());
 
-        fprintf(stderr, "shutdown failed: %s\n", rc_.message().c_str());
-
-        exit(rc_.value());
+        AssertMsg(false, "shutdown failed: %s\n", rc_.message().c_str());
       }
 
       if (closesocket(s_) == SOCKET_ERROR) {
         rc_ = GetSystemError(WSAGetLastError());
 
-        fprintf(stderr, "closesocket failed: %s\n", rc_.message().c_str());
-
-        exit(rc_.value());
+        AssertMsg(false, "closesocket failed: %s\n", rc_.message().c_str());
       }
     }
   }
@@ -139,9 +135,7 @@ class ScopedListenSocket {
       if (closesocket(s_) == SOCKET_ERROR) {
         rc_ = GetSystemError(WSAGetLastError());
 
-        fprintf(stderr, "closesocket failed: %s\n", rc_.message().c_str());
-
-        exit(rc_.value());
+        AssertMsg(false, "closesocket failed: %s\n", rc_.message().c_str());
       }
     }
   }
@@ -231,7 +225,8 @@ class ScopedThreadName {
           SetThreadDescription(thread_, old_thread_name_)));
 
       if (rc_) {
-        fprintf(stderr,
+        AssertMsg(
+            false,
                 "SetThreadDescription failed to restore old thread name %ls.\n",
                 old_thread_name_);
       }
