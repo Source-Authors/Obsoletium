@@ -328,7 +328,7 @@ class posix_file_stream {
   }
 
   // Opens file stream from file path |file_path| and mode |mode|.
-  posix_file_stream(_In_opt_ FILE* fd) noexcept : fd_{fd} {}
+  posix_file_stream(IN_OPT FILE* fd) noexcept : fd_{fd} {}
 
   // Empty file stream, invalid.
   [[nodiscard]] static posix_file_stream empty() noexcept {
