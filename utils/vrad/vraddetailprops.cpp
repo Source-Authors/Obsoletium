@@ -160,7 +160,7 @@ static void ComputeWorldCenter( DetailObjectLump_t& prop, Vector& center, Vector
 //-----------------------------------------------------------------------------
 // Computes max direct lighting for a single detal prop
 //-----------------------------------------------------------------------------
-static void ComputeMaxDirectLighting( DetailObjectLump_t& prop, Vector* maxcolor, int iThread )
+static void ComputeMaxDirectLighting( DetailObjectLump_t& prop, Vector (&maxcolor)[MAX_LIGHTSTYLES], int iThread )
 {
 	// The max direct lighting must be along the direction to one
 	// of the static lights....
@@ -266,7 +266,7 @@ static void ComputeAmbientFromSurface( dface_t* pFace, directlight_t* pSkylight,
 // Computes the lightmap color at a particular point
 //-----------------------------------------------------------------------------
 
-static void ComputeLightmapColorFromAverage( dface_t* pFace, directlight_t* pSkylight, float scale, Vector pColor[MAX_LIGHTSTYLES] )
+static void ComputeLightmapColorFromAverage( dface_t* pFace, directlight_t* pSkylight, float scale, Vector (&pColor)[MAX_LIGHTSTYLES] )
 {
 	texinfo_t* pTex = &texinfo[pFace->texinfo];
 	if (pTex->flags & SURF_SKY)
@@ -317,7 +317,7 @@ static bool SurfHasBumpedLightmaps( dface_t *pSurf )
 // Computes the lightmap color at a particular point
 //-----------------------------------------------------------------------------
 
-static void ComputeLightmapColorPointSample( dface_t* pFace, directlight_t* pSkylight, Vector2D const& luv, float scale, Vector pColor[MAX_LIGHTSTYLES] )
+static void ComputeLightmapColorPointSample( dface_t* pFace, directlight_t* pSkylight, Vector2D const& luv, float scale, Vector (&pColor)[MAX_LIGHTSTYLES] )
 {
 	// face unaffected by light
 	if (pFace->lightofs == -1 )
@@ -579,7 +579,7 @@ bool CastRayInLeaf( int iThread, const Vector &start, const Vector &end, int lea
 // Computes ambient lighting along a specified ray.  
 // Ray represents a cone, tanTheta is the tan of the inner cone angle
 //-----------------------------------------------------------------------------
-void CalcRayAmbientLighting( int iThread, const Vector &vStart, const Vector &vEnd, float tanTheta, Vector color[MAX_LIGHTSTYLES] )
+void CalcRayAmbientLighting( int iThread, const Vector &vStart, const Vector &vEnd, float tanTheta, Vector (&color)[MAX_LIGHTSTYLES] )
 {
 	Ray_t ray;
 	ray.Init( vStart, vEnd, vec3_origin, vec3_origin );
@@ -622,7 +622,7 @@ void CalcRayAmbientLighting( int iThread, const Vector &vStart, const Vector &vE
 //-----------------------------------------------------------------------------
 // Compute ambient lighting component at specified position.
 //-----------------------------------------------------------------------------
-static void ComputeAmbientLightingAtPoint( int iThread, const Vector &origin, Vector radcolor[NUMVERTEXNORMALS], Vector color[MAX_LIGHTSTYLES] )
+static void ComputeAmbientLightingAtPoint( int iThread, const Vector &origin, Vector (&radcolor)[NUMVERTEXNORMALS], Vector (&color)[MAX_LIGHTSTYLES] )
 {
 	// NOTE: I'm not dealing with shadow-casting static props here
 	// This is for speed, although we can add it if it turns out to
@@ -785,7 +785,7 @@ void ComputeIndirectLightingAtPoint( Vector &position, Vector &normal, Vector &o
 	}
 }
 
-static void ComputeAmbientLighting( int iThread, DetailObjectLump_t& prop, Vector color[MAX_LIGHTSTYLES] )
+static void ComputeAmbientLighting( int iThread, DetailObjectLump_t& prop, Vector (&color)[MAX_LIGHTSTYLES] )
 {
 	Vector origin, normal;
 	ComputeWorldCenter( prop, origin, normal );

@@ -31,7 +31,7 @@ static constexpr inline TableVector g_BoxDirections[6] =
 
 
 // TODO: it's CRAZY how much lighting code we share with the engine. It should all be shared code.
-float Engine_WorldLightAngle( const dworldlight_t *wl, const Vector& lnormal, const Vector& snormal, const Vector& delta )
+[[nodiscard]] static float Engine_WorldLightAngle( const dworldlight_t *wl, const Vector& lnormal, const Vector& snormal, const Vector& delta )
 {
 	float dot, dot2;
 
@@ -50,7 +50,7 @@ float Engine_WorldLightAngle( const dworldlight_t *wl, const Vector& lnormal, co
 
 
 // TODO: it's CRAZY how much lighting code we share with the engine. It should all be shared code.
-float Engine_WorldLightDistanceFalloff( const dworldlight_t *wl, const Vector& delta )
+[[nodiscard]] static float Engine_WorldLightDistanceFalloff( const dworldlight_t *wl, const Vector& delta )
 {
 	Assert( wl->type == emit_surface );
 
@@ -65,7 +65,7 @@ float Engine_WorldLightDistanceFalloff( const dworldlight_t *wl, const Vector& d
 }
 
 
-void AddEmitSurfaceLights( const Vector &vStart, Vector lightBoxColor[6] )
+static void AddEmitSurfaceLights( const Vector &vStart, Vector (&lightBoxColor)[6] )
 {
 	fltx4 fractionVisible;
 
@@ -112,7 +112,7 @@ void AddEmitSurfaceLights( const Vector &vStart, Vector lightBoxColor[6] )
 }
 
 
-void ComputeAmbientFromSphericalSamples( int iThread, const Vector &vStart, Vector lightBoxColor[6] )
+static void ComputeAmbientFromSphericalSamples( int iThread, const Vector &vStart, Vector (&lightBoxColor)[6] )
 {
 	// Figure out the color that rays hit when shot out from this position.
 	Vector radcolor[NUMVERTEXNORMALS];
@@ -156,7 +156,7 @@ void ComputeAmbientFromSphericalSamples( int iThread, const Vector &vStart, Vect
 }
 
 
-bool IsLeafAmbientSurfaceLight( dworldlight_t *wl )
+[[nodiscard]] static bool IsLeafAmbientSurfaceLight( const dworldlight_t *wl )
 {
 	static const float g_flWorldLightMinEmitSurface = 0.005f;
 	static const float g_flWorldLightMinEmitSurfaceDistanceRatio = ( InvRSquared( Vector( 0, 0, 512 ) ) );
@@ -287,7 +287,7 @@ struct ambientsample_t
 
 // add the sample to the list.  If we exceed the maximum number of samples, the worst sample will
 // be discarded.  This has the effect of converging on the best samples when enough are added.
-void AddSampleToList( CUtlVector<ambientsample_t> &list, const Vector &samplePosition, Vector *pCube )
+static void AddSampleToList( CUtlVector<ambientsample_t> &list, const Vector &samplePosition, Vector (&pCube)[6] )
 {
 	const int MAX_SAMPLES = 16;
 
@@ -358,7 +358,7 @@ void AddSampleToList( CUtlVector<ambientsample_t> &list, const Vector &samplePos
 }
 
 // max number of units in gamma space of per-side delta
-int CubeDeltaGammaSpace( Vector *pCube0, Vector *pCube1 )
+[[nodiscard]] static int CubeDeltaGammaSpace( Vector (&pCube0)[6], Vector (&pCube1)[6] )
 {
 	int maxDelta = 0;
 	// do this comparison in gamma space to try and get a perceptual basis for the compare
@@ -377,7 +377,7 @@ int CubeDeltaGammaSpace( Vector *pCube0, Vector *pCube1 )
 }
 // reconstruct the ambient lighting for a leaf at the given position in worldspace
 // optionally skip one of the entries in the list
-void Mod_LeafAmbientColorAtPos( Vector *pOut, const Vector &pos, const CUtlVector<ambientsample_t> &list, int skipIndex )
+static void Mod_LeafAmbientColorAtPos( Vector (&pOut)[6], const Vector &pos, const CUtlVector<ambientsample_t> &list, intp skipIndex )
 {
 	for ( int i = 0; i < 6; i++ )
 	{
@@ -405,7 +405,7 @@ void Mod_LeafAmbientColorAtPos( Vector *pOut, const Vector &pos, const CUtlVecto
 }
 
 // this samples the lighting at each sample and removes any unnecessary samples
-void CompressAmbientSampleList( CUtlVector<ambientsample_t> &list )
+static void CompressAmbientSampleList( CUtlVector<ambientsample_t> &list )
 {
 	Vector testCube[6];
 	for ( int i = 0; i < list.Count(); i++ )
@@ -423,7 +423,7 @@ void CompressAmbientSampleList( CUtlVector<ambientsample_t> &list )
 }
 
 // basically this is an intersection routine that returns a distance between the boxes
-float AABBDistance( const Vector &mins0, const Vector &maxs0, const Vector &mins1, const Vector &maxs1 )
+[[nodiscard]] static float AABBDistance( const Vector &mins0, const Vector &maxs0, const Vector &mins1, const Vector &maxs1 )
 {
 	Vector delta;
 	for ( int i = 0; i < 3; i++ )
@@ -459,7 +459,7 @@ static void LeafBounds( int leafIndex, Vector &mins, Vector &maxs )
 }
 
 // returns the index of the nearest leaf with ambient samples
-int NearestNeighborWithLight(int leafID)
+[[nodiscard]] static int NearestNeighborWithLight( int leafID )
 {
 	Vector mins, maxs;
 	LeafBounds( leafID, mins, maxs );
@@ -487,7 +487,7 @@ int NearestNeighborWithLight(int leafID)
 }
 
 // maps a float to a byte fraction between min & max
-static byte Fixed8Fraction( float t, float tMin, float tMax )
+[[nodiscard]] static byte Fixed8Fraction( float t, float tMin, float tMax )
 {
 	if ( tMax <= tMin )
 		return 0;

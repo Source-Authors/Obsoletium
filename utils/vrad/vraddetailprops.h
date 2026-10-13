@@ -23,7 +23,7 @@ void CalcRayAmbientLighting(
 	const Vector &vStart,
 	const Vector &vEnd,
 	float tanTheta,			// tangent of the inner angle of the cone
-	Vector color[MAX_LIGHTSTYLES]	// The color contribution from each lightstyle.
+	Vector (&color)[MAX_LIGHTSTYLES]	// The color contribution from each lightstyle.
 	);
 
 bool CastRayInLeaf( int iThread, const Vector &start, const Vector &end, int leafIndex, float *pFraction, Vector *pNormal );
