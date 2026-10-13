@@ -72,7 +72,7 @@ static byte g_FrameMissCount = 0;
 static int g_FrameIndex = 0;
 ConVar lightcache_maxmiss("lightcache_maxmiss","2", FCVAR_CHEAT);
 
-static const Vector	s_raddir[] = {
+static constexpr inline Vector	s_raddir[] = {
 #include "randomnormals.h"
 };
 
@@ -89,7 +89,7 @@ ConVar r_ambientlightingonly(
 ConVar r_oldlightselection("r_oldlightselection", "0", FCVAR_CHEAT, "Set this to revert to HL2's method of selecting lights"); 
 
 static void ComputeAmbientFromSphericalSamples( const Vector& start, 
-						Vector* lightBoxColor );
+						Vector (&lightBoxColor)[6] );
 
 
 //-----------------------------------------------------------------------------
@@ -640,7 +640,7 @@ static void ComputeAmbientFromSurface( SurfaceHandle_t surfID, dworldlight_t* pS
 //-----------------------------------------------------------------------------
 
 static void ComputeAmbientFromSphericalSamples( const Vector& start, 
-						Vector* lightBoxColor )
+						Vector (&lightBoxColor)[6] )
 {
 	VPROF( "ComputeAmbientFromSphericalSamples" );
 	// find any ambient lights
@@ -690,7 +690,7 @@ static void ComputeAmbientFromSphericalSamples( const Vector& start,
 }
 
 
-static void ComputeAmbientFromLeaf( const Vector &start, int leafID, Vector *lightBoxColor, bool *bAddedLeafAmbientCube )
+static void ComputeAmbientFromLeaf( const Vector &start, int leafID, Vector (&lightBoxColor)[6], bool *bAddedLeafAmbientCube )
 {
 	if( leafID >= 0 )
 	{
@@ -700,10 +700,9 @@ static void ComputeAmbientFromLeaf( const Vector &start, int leafID, Vector *lig
 	}
 	else
 	{
-		int i;
-		for( i = 0; i < 6; i++ )
+		for( auto &c : lightBoxColor )
 		{
-			lightBoxColor[i].Init( 0.0f, 0.0f, 0.0f );
+			c.Init( 0.0f, 0.0f, 0.0f );
 		}
 	}
 }
@@ -712,7 +711,7 @@ static void ComputeAmbientFromLeaf( const Vector &start, int leafID, Vector *lig
 // Computes the ambient term from 6 cardinal directions
 //-----------------------------------------------------------------------------
 static void ComputeAmbientFromAxisAlignedSamples( const Vector& start, 
-						Vector* lightBoxColor )
+						Vector (&lightBoxColor)[6] )
 {
 	Vector upend;
 
@@ -721,9 +720,11 @@ static void ComputeAmbientFromAxisAlignedSamples( const Vector& start,
 
 	// sample world only along cardinal axes
 	const Vector* pBoxDirs = g_pStudioRender->GetAmbientLightDirections();
-	for (int i = 0; i < 6; i++)
+	for (intp i = 0; i < ssize(lightBoxColor); i++)
 	{
-		VectorMA( start, COORD_EXTENT * 1.74, pBoxDirs[i], upend );
+		constexpr float extent = COORD_EXTENT * 1.74f;
+
+		VectorMA( start, extent, pBoxDirs[i], upend );
 
 		// Now that we've got a ray, see what surface we've hit
 		SurfaceHandle_t surfID = R_LightVec (start, upend, false, lightBoxColor[i] );
@@ -731,7 +732,6 @@ static void ComputeAmbientFromAxisAlignedSamples( const Vector& start,
 			continue;
 
 		ComputeAmbientFromSurface( surfID, pSkylight, lightBoxColor[i] );
-
 	}
 }
 
@@ -742,17 +742,16 @@ static void ComputeAmbientFromAxisAlignedSamples( const Vector& start,
 static void R_StudioGetAmbientLightForPoint( 
 	int leafID, 
 	const Vector& start, 
-	Vector* pLightBoxColor, 
+	Vector (&pLightBoxColor)[6], 
 	bool bIsStaticProp,
 	bool *bAddedLeafAmbientCube )
 {
 	*bAddedLeafAmbientCube = false;
 
 	VPROF( "R_StudioGetAmbientLightForPoint" );
-	int i;
 	if ( g_pMaterialSystemConfig->nFullbright == 1 )
 	{
-		for (i = g_pStudioRender->GetNumAmbientLightSamples(); --i >= 0; )
+		for (int i = g_pStudioRender->GetNumAmbientLightSamples(); --i >= 0; )
 		{
 			VectorFill( pLightBoxColor[i], 1.0 );
 		}
@@ -785,7 +784,7 @@ static void R_StudioGetAmbientLightForPoint(
 
 	default:
 		// assume no bounced light from the world
-		for (i = g_pStudioRender->GetNumAmbientLightSamples(); --i >= 0; )
+		for (int i = g_pStudioRender->GetNumAmbientLightSamples(); --i >= 0; )
 		{
 			VectorFill( pLightBoxColor[i], 0 );
 		}

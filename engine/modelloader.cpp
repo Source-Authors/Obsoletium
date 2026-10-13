@@ -5857,11 +5857,11 @@ void CModelLoader::ForceUnloadNonClientDynamicModels()
 
 
 // reconstruct the ambient lighting for a leaf at the given position in worldspace
-void Mod_LeafAmbientColorAtPos( Vector *pOut, const Vector &pos, int leafIndex )
+void Mod_LeafAmbientColorAtPos( Vector (&pOut)[6], const Vector &pos, int leafIndex )
 {
-	for ( int i = 0; i < 6; i++ )
+	for ( auto &o : pOut )
 	{
-		pOut[i].Init();
+		o.Init();
 	}
 	mleafambientindex_t *pAmbient = &host_state.worldbrush->m_pLeafAmbient[leafIndex];
 	if ( !pAmbient->ambientSampleCount && pAmbient->firstAmbientSample )
@@ -5898,9 +5898,10 @@ void Mod_LeafAmbientColorAtPos( Vector *pOut, const Vector &pos, int leafIndex )
 				pOut[j] += v * factor;
 			}
 		}
-		for ( int i = 0; i < 6; i++ )
+		const float factor = 1.0f / totalFactor;
+		for ( auto &o : pOut )
 		{
-			pOut[i] *= (1.0f / totalFactor);
+			o *= factor;
 		}
 	}
 }
