@@ -3299,6 +3299,13 @@ inline int Studio_LoadVertexes( const vertexFileHeader_t *pTempVvdHdr, vertexFil
 			continue;
 		}
 
+		// dimhotepus: Verify fixups. TF2 backport.
+		if ( ( pFixupTable[ i ].numVertexes < 0 ) || ( target + pFixupTable[ i ].numVertexes > numVertexes ) )
+		{
+			AssertMsg( false, "Malicious map attempting to write off the end of our fixup verts. Sad face." );
+			Error( "Map is corrupted. Fixup vertexes count less than 0 or greater than total." );
+		}
+
 		// copy vertexes
 		memcpy(
 			(mstudiovertex_t *)((byte *)pNewVvdHdr+pNewVvdHdr->vertexDataStart) + target,
