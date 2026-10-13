@@ -251,7 +251,7 @@ void CVPhysicsVirtualMeshWriter::UnpackCompactLedgeFromHull( IVP_Compact_Ledge *
 
 	// keep track of which triangle edge referenced this edge (so the next one can swap the order and point to the first one)
 	intp forwardEdgeIndex[255] = {};
-	Assert(ssize(forwardEdgeIndex) <= pHull->edgeCount);
+	Assert(ssize(forwardEdgeIndex) >= pHull->edgeCount);
 	for ( int i = 0; i < pHull->edgeCount; i++ )
 	{
 		forwardEdgeIndex[i] = -1;
