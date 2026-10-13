@@ -553,7 +553,7 @@ void EmitDispLMAlphaAndNeighbors()
 	memset( pSwappedTexInfos, 0xFF, nMemSize );
 	for( i = 0; i < numfaces; i++ )
 	{
-        dface_t *pFace = &dfaces[i];
+		dface_t *pFace = &dfaces[i];
 
 		if( pFace->dispinfo == -1 )
 			continue;
@@ -600,18 +600,15 @@ void EmitDispLMAlphaAndNeighbors()
 	RunCodeAtScopeExit( EndPacifier() );
 
 	// Build lightmap alphas.
-	int dispCount = 0;	// How many we've processed.
 	for( i = 0; i < nummapdispinfo; i++ )
 	{
-        dface_t *pFace = faces[i];
+		dface_t *pFace = faces[i];
 
 		Assert( pFace->dispinfo == i );
 		ddispinfo_t *pDisp = &g_dispinfo[pFace->dispinfo];
 
 		// Allocate space for the alpha values.
 		pDisp->m_iLightmapAlphaStart = 0; // not used anymore
-		
-		++dispCount;
 	}
 }
 
