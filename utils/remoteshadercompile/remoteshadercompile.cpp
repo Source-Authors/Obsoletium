@@ -107,14 +107,15 @@ class ScopedAcceptSocket {
   }
 
   template <int max_size>
-  [[nodiscard]] std::error_code Send(uint32_t (&buffer)[max_size], int size,
-                                     int flags, int& send_bytes) noexcept {
-    Assert(size <= max_size);
-    if (size > max_size) {
+  [[nodiscard]] std::error_code Send(const char (&buffer)[max_size],
+                                     int send_size, int flags,
+                                     int& send_bytes) noexcept {
+    Assert(send_size <= max_size);
+    if (send_size > max_size) {
       return std::error_code{EINVAL, std::generic_category()};
     }
 
-    send_bytes = send(s_, reinterpret_cast<const char*>(buffer), size, flags);
+    send_bytes = send(s_, buffer, send_size, flags);
     return send_bytes != SOCKET_ERROR ? std::error_code{}
                                       : GetSystemError(WSAGetLastError());
   }
@@ -310,7 +311,7 @@ struct ShaderCompileClientArgs {
   // Text in command file from game.
   char receive_buffer[kDefaultReceiveBufferSize];
   // Error string or binary shader blob in reply.
-  uint32_t send_buffer[kDefaultSendBufferSize];
+  char send_buffer[kDefaultSendBufferSize * sizeof(uint32_t)];
   // Base path to search shaders for.
   char path_base[MAX_PATH];
   // Default port to use for accepting shader compilation requests.
@@ -387,7 +388,7 @@ template <int buffer_size>
 
 template <int buffer_size>
 [[nodiscard]] int Send(ScopedAcceptSocket& scoped_accept_socket,
-                       uint32_t (&send_buffer)[buffer_size], int send_size,
+                       const char (&send_buffer)[buffer_size], int send_size,
                        const std::atomic_bool& should_exit, bool is_blocking,
                        std::error_code& rc) noexcept {
   do {
@@ -589,7 +590,7 @@ void ShaderCompileClient(ShaderCompileClientArgs& args) {
             shader_model, flags1, 0, &shader, &errors)};
         if (FAILED(hr)) {
           // Send 0 on error.
-          args.send_buffer[0] = 0;
+          memset(args.send_buffer, 0, sizeof(uint32_t));
 
           fprintf(stderr, "%s compilation error 0x%.8lx: %s!\n",
                   shader_file_name, hr,
@@ -599,23 +600,26 @@ void ShaderCompileClient(ShaderCompileClientArgs& args) {
             // Null-terminated string
             const size_t buffer_size{
                 min(errors->GetBufferSize(),
-                    static_cast<ULONG_PTR>((std::size(args.send_buffer) - 1) *
-                                           sizeof(args.send_buffer[0])))};
+                    sizeof(args.send_buffer) - sizeof(uint32_t))};
 
-            memcpy(args.send_buffer + 1, errors->GetBufferPointer(),
-                   buffer_size);
+            memcpy(args.send_buffer + sizeof(uint32_t),
+                   errors->GetBufferPointer(), buffer_size);
 
-            byte* buffer = reinterpret_cast<byte*>(&args.send_buffer[0] + 1);
+            byte* buffer = reinterpret_cast<byte*>(&args.send_buffer[0] +
+                                                   sizeof(uint32_t));
             buffer[buffer_size - 1] = '\0';
 
             fprintf(stderr, "%s\n",
-                    reinterpret_cast<const char*>(args.send_buffer + 1));
+                    reinterpret_cast<const char*>(args.send_buffer +
+                                                  sizeof(uint32_t)));
 
             // account for uint32_t at front of the buffer
             send_buffer_size = static_cast<int>(buffer_size + sizeof(uint32_t));
           } else {
-            reinterpret_cast<uint8_t*>(args.send_buffer + 1)[0] = '?';
-            reinterpret_cast<uint8_t*>(args.send_buffer + 1)[1] = '\0';
+            reinterpret_cast<uint8_t*>(args.send_buffer + sizeof(uint32_t))[0] =
+                '?';
+            reinterpret_cast<uint8_t*>(args.send_buffer + sizeof(uint32_t))[1] =
+                '\0';
 
             // account for uint32_t at front of the buffer
             send_buffer_size = static_cast<int>(2 + sizeof(uint32_t));
@@ -623,18 +627,19 @@ void ShaderCompileClient(ShaderCompileClientArgs& args) {
         } else {
           // Success!
           size_t expected_buffer_size{shader->GetBufferSize()};
-          const size_t actual_buffer_size{static_cast<ULONG_PTR>(
-              (std::size(args.send_buffer) - 1) * sizeof(args.send_buffer[0]))};
+          const size_t actual_buffer_size{sizeof(args.send_buffer) -
+                                          sizeof(uint32_t)};
 
           if (expected_buffer_size > actual_buffer_size) {
             expected_buffer_size = actual_buffer_size;
 
             // Not enough room for shader.
-            memcpy(args.send_buffer + 1,
+            memcpy(args.send_buffer + sizeof(uint32_t),
                    "err: Compiled shader doesn't fit response buffer.\n",
                    expected_buffer_size);
 
-            byte* buffer = reinterpret_cast<byte*>(&args.send_buffer[0] + 1);
+            auto* buffer = reinterpret_cast<byte*>(&args.send_buffer[0] +
+                                                   sizeof(uint32_t));
             buffer[expected_buffer_size - 1] = '\0';
 
             fprintf(stderr,
@@ -645,10 +650,13 @@ void ShaderCompileClient(ShaderCompileClientArgs& args) {
           }
 
           // Send size on success.
-          args.send_buffer[0] = static_cast<uint32_t>(expected_buffer_size);
+          const auto casted_expected_buffer_size =
+              static_cast<uint32_t>(expected_buffer_size);
+          memcpy(args.send_buffer, &casted_expected_buffer_size,
+                 sizeof(casted_expected_buffer_size));
           // Send compiled shader.
-          memcpy(args.send_buffer + 1, shader->GetBufferPointer(),
-                 expected_buffer_size);
+          memcpy(args.send_buffer + sizeof(uint32_t),
+                 shader->GetBufferPointer(), expected_buffer_size);
 
           // account for uint32_t at front of the buffer
           send_buffer_size =
