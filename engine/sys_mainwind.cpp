@@ -30,7 +30,7 @@
 // dimhotepus: Notify when system power settings changed (battery, AC, power plan, etc.).
 #include "scoped_power_settings_notifications_registrator.h"
 // dimhotepus: Do not disable display during video playback when no user input.
-#include "scoped_thread_execution_state.h"
+#include "windows/scoped_thread_execution_state.h"
 #endif
 
 #if defined( IS_WINDOWS_PC ) && !defined( USE_SDL )
@@ -1522,8 +1522,9 @@ void CGame::PlayStartupVideos( void )
 #endif
 
 	// dimhotepus: Ensure display is not disabled by powersaver when playing startup videos.
-	const source::engine::win::ScopedThreadExecutionState
-		scoped_display_required_state{ES_DISPLAY_REQUIRED};
+	const se::common::windows::ScopedThreadExecutionState
+		scoped_display_required_state{
+			se::common::windows::ThreadExecutionState::DisplayRequired};
 	if (!scoped_display_required_state.is_success())
 	{
 		Warning("Unable to signal system display is required. Display may disable during video playback.\n");

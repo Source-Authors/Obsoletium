@@ -31,6 +31,9 @@
 #include "ilaunchabledll.h"
 
 #include "posix_file_stream.h"
+
+#include "windows/scoped_console_ctrl_handler.h"
+#include "windows/scoped_thread_execution_state.h"
 #include "winlite.h"
 
 // Type conversions should be controlled by programmer explicitly -
@@ -1683,66 +1686,6 @@ void CompileShaders(
   Msg("\r                                                                \r");
 }
 
-class ScopedConsoleCtrlHandler {
- public:
-  explicit ScopedConsoleCtrlHandler(PHANDLER_ROUTINE handler) noexcept
-      : handler_{handler}, ok_{::SetConsoleCtrlHandler(handler, TRUE)} {
-    AssertMsg(ok_, "Unable to set console ctrl handler for process.");
-  }
-  ~ScopedConsoleCtrlHandler() noexcept {
-    ok_ = ::SetConsoleCtrlHandler(handler_, FALSE);
-    AssertMsg(ok_, "Unable to reset console ctrl handler for process.");
-  }
-
-  ScopedConsoleCtrlHandler(ScopedConsoleCtrlHandler &) = delete;
-  ScopedConsoleCtrlHandler &operator=(ScopedConsoleCtrlHandler &) = delete;
-
- private:
-  const PHANDLER_ROUTINE handler_;
-  BOOL ok_;
-};
-
-enum class ThreadExecutionState : unsigned long {
-  Error = 0x00000000,
-  // ES_CONTINUOUS
-  None = 0x80000000,
-  SystemRequired = 0x00000001,
-  DisplayRequired = 0x00000002,
-  AwayModeRequired = 0x00000040
-};
-
-static_assert(to_underlying(ThreadExecutionState::None) == ES_CONTINUOUS);
-
-class ScopedThreadExecutionState {
- public:
-  explicit ScopedThreadExecutionState(ThreadExecutionState new_state) noexcept
-      : old_state_{static_cast<ThreadExecutionState>(::SetThreadExecutionState(
-            to_underlying(ThreadExecutionState::None) |
-            to_underlying(new_state)))},
-        new_state_{new_state} {}
-  ~ScopedThreadExecutionState() noexcept {
-    const auto expected_old_state =
-        to_underlying(ThreadExecutionState::None) | to_underlying(new_state_);
-    const auto actual_old_state =
-        ::SetThreadExecutionState(to_underlying(ThreadExecutionState::None) |
-                                  ((old_state_ == ThreadExecutionState::None)
-                                       ? 0
-                                       : to_underlying(old_state_)));
-    AssertMsg(actual_old_state == expected_old_state,
-              "Unbalanced SetThreadExecutionState, smth changed it from "
-              "expected 0x%lu to actual 0x%lu.",
-              expected_old_state, actual_old_state);
-  }
-
-  ScopedThreadExecutionState(ScopedThreadExecutionState&) = delete;
-  ScopedThreadExecutionState& operator=(ScopedThreadExecutionState&) = delete;
-  ScopedThreadExecutionState(ScopedThreadExecutionState&&) = delete;
-  ScopedThreadExecutionState& operator=(ScopedThreadExecutionState&&) = delete;
-
- private:
-  const ThreadExecutionState old_state_, new_state_;
-};
-
 IThreadPool *StartThreadPool(const CPUInformation *cpu) {
   ThreadPoolStartParams_t args;
   args.bIOThreads = false;
@@ -1778,7 +1721,7 @@ int ShaderCompileMain(int argc, char *argv[]) {
 
   // Setting up the minidump handler.
   const se::utils::common::ScopedDefaultMinidumpHandler scoped_minidump_handler;
-  const ScopedConsoleCtrlHandler scoped_ctrl_handler{OnCtrlBreak};
+  const se::common::windows::ScopedConsoleCtrlHandler scoped_ctrl_handler{OnCtrlBreak};
 
   EnableCrashingOnCrashes();
 
@@ -1788,8 +1731,8 @@ int ShaderCompileMain(int argc, char *argv[]) {
   ThreadSetDebugName("ShaderCompile_Main");
 
   // Do not go to sleep when compiling.
-  const ScopedThreadExecutionState scoped_execution_state{
-      ThreadExecutionState::SystemRequired};
+  const se::common::windows::ScopedThreadExecutionState scoped_execution_state{
+      se::common::windows::ThreadExecutionState::SystemRequired};
 
   ICommandLine *cmd_line{CommandLine()};
   cmd_line->CreateCmdLine(argc, argv);
