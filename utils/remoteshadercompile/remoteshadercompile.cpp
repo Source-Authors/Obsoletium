@@ -37,6 +37,43 @@ constexpr inline char kDefaultSharedPort[]{"20000"};
   return strcmp(l, r) == 0;
 }
 
+[[nodiscard]] std::error_code GetSystemError(int errc) noexcept {
+  return std::error_code{errc, std::system_category()};
+}
+
+class ScopedWinsockInitializer {
+ public:
+  ScopedWinsockInitializer(unsigned char major, unsigned char minor) noexcept
+      : rc_{GetSystemError(WSAStartup(MAKEWORD(major, minor), &wsa_data_))},
+        is_started_{!rc_.value()} {
+    if (!is_started_) return;
+
+    if (LOBYTE(wsa_data_.wVersion) != major ||
+        HIBYTE(wsa_data_.wVersion) != minor) {
+      rc_ = GetSystemError(WSAVERNOTSUPPORTED);
+    }
+  }
+  ~ScopedWinsockInitializer() noexcept {
+    if (is_started_ && WSACleanup() == SOCKET_ERROR) {
+      rc_ = GetSystemError(WSAGetLastError());
+
+      AssertMsg(false, "WSACleanup failed: %s\n", rc_.message().c_str());
+    }
+  }
+
+  ScopedWinsockInitializer(ScopedWinsockInitializer&) = delete;
+  ScopedWinsockInitializer(ScopedWinsockInitializer&&) = delete;
+  ScopedWinsockInitializer& operator=(ScopedWinsockInitializer&) = delete;
+  ScopedWinsockInitializer& operator=(ScopedWinsockInitializer&&) = delete;
+
+  [[nodiscard]] std::error_code error_code() const noexcept { return rc_; }
+
+ private:
+  WSADATA wsa_data_;
+  std::error_code rc_;
+  const bool is_started_;
+};
+
 class ScopedAcceptSocket {
  public:
   ScopedAcceptSocket(SOCKET listen_socket) noexcept
@@ -63,7 +100,7 @@ class ScopedAcceptSocket {
 
   template <int size>
   [[nodiscard]] std::error_code Receive(char (&buffer)[size], int flags,
-                                        int &received_bytes) noexcept {
+                                        int& received_bytes) noexcept {
     received_bytes = recv(s_, buffer, size, flags);
     return received_bytes != SOCKET_ERROR ? std::error_code{}
                                           : GetSystemError(WSAGetLastError());
@@ -71,29 +108,29 @@ class ScopedAcceptSocket {
 
   template <int max_size>
   [[nodiscard]] std::error_code Send(uint32_t (&buffer)[max_size], int size,
-                                     int flags, int &send_bytes) noexcept {
+                                     int flags, int& send_bytes) noexcept {
     Assert(size <= max_size);
     if (size > max_size) {
       return std::error_code{EINVAL, std::generic_category()};
     }
 
-    send_bytes = send(s_, reinterpret_cast<const char *>(buffer), size, flags);
+    send_bytes = send(s_, reinterpret_cast<const char*>(buffer), size, flags);
     return send_bytes != SOCKET_ERROR ? std::error_code{}
                                       : GetSystemError(WSAGetLastError());
   }
 
-  ScopedAcceptSocket(ScopedAcceptSocket &&s) noexcept : s_{s.s_}, rc_{s.rc_} {
+  ScopedAcceptSocket(ScopedAcceptSocket&& s) noexcept : s_{s.s_}, rc_{s.rc_} {
     s.s_ = INVALID_SOCKET;
     s.rc_ = {};
   }
-  ScopedAcceptSocket &operator=(ScopedAcceptSocket &&s) noexcept {
+  ScopedAcceptSocket& operator=(ScopedAcceptSocket&& s) noexcept {
     std::swap(s.s_, s_);
     std::swap(s.rc_, rc_);
     return *this;
   }
 
-  ScopedAcceptSocket(ScopedAcceptSocket &) = delete;
-  ScopedAcceptSocket &operator=(ScopedAcceptSocket &) = delete;
+  ScopedAcceptSocket(ScopedAcceptSocket&) = delete;
+  ScopedAcceptSocket& operator=(ScopedAcceptSocket&) = delete;
 
  private:
   SOCKET s_;
@@ -102,7 +139,7 @@ class ScopedAcceptSocket {
 
 class ScopedListenSocket {
  public:
-  ScopedListenSocket(addrinfo *info, bool is_blocking, int backlog) noexcept
+  ScopedListenSocket(addrinfo* info, bool is_blocking, int backlog) noexcept
       : s_{socket(info->ai_family, info->ai_socktype, info->ai_protocol)},
         rc_{s_ != INVALID_SOCKET ? std::error_code{}
                                  : GetSystemError(WSAGetLastError())} {
@@ -146,8 +183,8 @@ class ScopedListenSocket {
     return ScopedAcceptSocket{s_};
   }
 
-  ScopedListenSocket(ScopedListenSocket &) = delete;
-  ScopedListenSocket &operator=(ScopedListenSocket &) = delete;
+  ScopedListenSocket(ScopedListenSocket&) = delete;
+  ScopedListenSocket& operator=(ScopedListenSocket&) = delete;
 
  private:
   SOCKET s_;
@@ -156,7 +193,7 @@ class ScopedListenSocket {
 
 class ScopedAddressInfo {
  public:
-  ScopedAddressInfo(const char *port, int family, int socket_type,
+  ScopedAddressInfo(const char* port, int family, int socket_type,
                     IPPROTO proto, int flags) noexcept {
     Assert(port);
 
@@ -179,27 +216,27 @@ class ScopedAddressInfo {
     return ScopedListenSocket{info_, is_blocking, backlog};
   }
 
-  ScopedAddressInfo(ScopedAddressInfo &) = delete;
-  ScopedAddressInfo &operator=(ScopedAddressInfo &) = delete;
+  ScopedAddressInfo(ScopedAddressInfo&) = delete;
+  ScopedAddressInfo& operator=(ScopedAddressInfo&) = delete;
 
  private:
-  addrinfo *info_;
+  addrinfo* info_;
   std::error_code rc_;
 };
 
 class ScopedSetIsServerExitFlag {
  public:
-  explicit ScopedSetIsServerExitFlag(std::atomic_bool &is_server_exit) noexcept
+  explicit ScopedSetIsServerExitFlag(std::atomic_bool& is_server_exit) noexcept
       : is_server_exit_{is_server_exit} {
     Assert(is_server_exit == false);
   }
   ~ScopedSetIsServerExitFlag() noexcept { is_server_exit_ = true; }
 
-  ScopedSetIsServerExitFlag(ScopedSetIsServerExitFlag &) = delete;
-  ScopedSetIsServerExitFlag &operator=(ScopedSetIsServerExitFlag &) = delete;
+  ScopedSetIsServerExitFlag(ScopedSetIsServerExitFlag&) = delete;
+  ScopedSetIsServerExitFlag& operator=(ScopedSetIsServerExitFlag&) = delete;
 
  private:
-  std::atomic_bool &is_server_exit_;
+  std::atomic_bool& is_server_exit_;
 };
 
 [[nodiscard]] inline std::error_code get_com_error_code(
@@ -209,7 +246,7 @@ class ScopedSetIsServerExitFlag {
 
 class ScopedThreadName {
  public:
-  ScopedThreadName(HANDLE thread, const wchar_t *new_thread_name) noexcept
+  ScopedThreadName(HANDLE thread, const wchar_t* new_thread_name) noexcept
       : thread_{thread},
         old_thread_name_{nullptr},
         rc_{get_com_error_code(TransformGetSetNameResult(
@@ -227,8 +264,8 @@ class ScopedThreadName {
       if (rc_) {
         AssertMsg(
             false,
-                "SetThreadDescription failed to restore old thread name %ls.\n",
-                old_thread_name_);
+            "SetThreadDescription failed to restore old thread name %ls.\n",
+            old_thread_name_);
       }
     }
 
@@ -237,12 +274,12 @@ class ScopedThreadName {
 
   [[nodiscard]] std::error_code error_code() const noexcept { return rc_; }
 
-  ScopedThreadName(ScopedThreadName &) = delete;
-  ScopedThreadName &operator=(ScopedThreadName &) = delete;
+  ScopedThreadName(ScopedThreadName&) = delete;
+  ScopedThreadName& operator=(ScopedThreadName&) = delete;
 
  private:
   HANDLE thread_;
-  wchar_t *old_thread_name_;
+  wchar_t* old_thread_name_;
   std::error_code rc_;
 
   static [[nodiscard]] HRESULT TransformGetSetNameResult(HRESULT hr) noexcept {
@@ -256,8 +293,8 @@ class ScopedThreadName {
   }
 };
 
-[[nodiscard]] std::error_code GetMultibyteAsWide(const char *mb,
-                                                 std::wstring &result) {
+[[nodiscard]] std::error_code GetMultibyteAsWide(const char* mb,
+                                                 std::wstring& result) {
   Assert(mb);
 
   const size_t required_size{mbstowcs(nullptr, mb, 0)};
@@ -291,9 +328,9 @@ struct ShaderCompileClientArgs {
 };
 
 [[nodiscard]] ScopedAcceptSocket AcceptConnection(
-    const ScopedListenSocket &scoped_listen_socket,
-    const std::atomic_bool &should_exit, bool is_blocking,
-    std::error_code &rc) noexcept {
+    const ScopedListenSocket& scoped_listen_socket,
+    const std::atomic_bool& should_exit, bool is_blocking,
+    std::error_code& rc) noexcept {
   do {
     // Accept a client socket
     ScopedAcceptSocket scoped_accept_client_socket{
@@ -319,10 +356,10 @@ struct ShaderCompileClientArgs {
 }
 
 template <int buffer_size>
-[[nodiscard]] int Receive(ScopedAcceptSocket &scoped_accept_socket,
+[[nodiscard]] int Receive(ScopedAcceptSocket& scoped_accept_socket,
                           char (&receive_buffer)[buffer_size],
-                          const std::atomic_bool &should_exit, bool is_blocking,
-                          std::error_code &rc) noexcept {
+                          const std::atomic_bool& should_exit, bool is_blocking,
+                          std::error_code& rc) noexcept {
   do {
     int received_bytes{-1};
 
@@ -349,10 +386,10 @@ template <int buffer_size>
 }
 
 template <int buffer_size>
-[[nodiscard]] int Send(ScopedAcceptSocket &scoped_accept_socket,
+[[nodiscard]] int Send(ScopedAcceptSocket& scoped_accept_socket,
                        uint32_t (&send_buffer)[buffer_size], int send_size,
-                       const std::atomic_bool &should_exit, bool is_blocking,
-                       std::error_code &rc) noexcept {
+                       const std::atomic_bool& should_exit, bool is_blocking,
+                       std::error_code& rc) noexcept {
   do {
     int send_bytes{-1};
 
@@ -378,7 +415,7 @@ template <int buffer_size>
 }
 
 // This guy just spins and compiles when a command comes in from the game.
-void ShaderCompileClient(ShaderCompileClientArgs &args) {
+void ShaderCompileClient(ShaderCompileClientArgs& args) {
   const ScopedThreadName scoped_thread_name{GetCurrentThread(),
                                             L"Rshc_ClientThread"};
   std::error_code rc{scoped_thread_name.error_code()};
@@ -442,7 +479,7 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
                                      args.should_exit, is_blocking, rc)};
 
     if (received_bytes > 0) {
-      const char *shader_file_name{strtok(args.receive_buffer, "\n")};
+      const char* shader_file_name{strtok(args.receive_buffer, "\n")};
       if (!shader_file_name) {
         fprintf(stderr,
                 "Received unexpected data instead of shader file name.\n");
@@ -460,7 +497,7 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
         shader_file_name = full_file_name;
       }
 
-      const char *shader_model{strtok(nullptr, "\n")};
+      const char* shader_model{strtok(nullptr, "\n")};
       if (!shader_model) {
         fprintf(stderr, "Received unexpected data instead of shader model.\n");
         continue;
@@ -469,7 +506,7 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
       int send_buffer_size = 0;
 
       {
-        char *num_macroses_ptr{strtok(nullptr, "\n")};
+        char* num_macroses_ptr{strtok(nullptr, "\n")};
         if (!num_macroses_ptr) {
           fprintf(stderr,
                   "Received unexpected data instead of macroses count.\n");
@@ -486,7 +523,7 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
         // Start from 1 as num_macroses may be 0.
         for (unsigned long i = 1; i < num_macroses; i++) {
           // Allocate and populate strings
-          const char *name{strtok(nullptr, "\n")};
+          const char* name{strtok(nullptr, "\n")};
           if (!name) {
             fprintf(stderr,
                     "Received unexpected data instead of macros #%lu name.\n",
@@ -494,7 +531,7 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
             continue;
           }
 
-          const char *definition{strtok(nullptr, "\n")};
+          const char* definition{strtok(nullptr, "\n")};
           if (!definition) {
             fprintf(stderr,
                     "Received unexpected data instead of macros #%lu %s "
@@ -568,17 +605,17 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
             memcpy(args.send_buffer + 1, errors->GetBufferPointer(),
                    buffer_size);
 
-            byte *buffer = reinterpret_cast<byte *>(&args.send_buffer[0] + 1);
+            byte* buffer = reinterpret_cast<byte*>(&args.send_buffer[0] + 1);
             buffer[buffer_size - 1] = '\0';
 
             fprintf(stderr, "%s\n",
-                    reinterpret_cast<const char *>(args.send_buffer + 1));
+                    reinterpret_cast<const char*>(args.send_buffer + 1));
 
             // account for uint32_t at front of the buffer
             send_buffer_size = static_cast<int>(buffer_size + sizeof(uint32_t));
           } else {
-            reinterpret_cast<uint8_t *>(args.send_buffer + 1)[0] = '?';
-            reinterpret_cast<uint8_t *>(args.send_buffer + 1)[1] = '\0';
+            reinterpret_cast<uint8_t*>(args.send_buffer + 1)[0] = '?';
+            reinterpret_cast<uint8_t*>(args.send_buffer + 1)[1] = '\0';
 
             // account for uint32_t at front of the buffer
             send_buffer_size = static_cast<int>(2 + sizeof(uint32_t));
@@ -597,7 +634,7 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
                    "err: Compiled shader doesn't fit response buffer.\n",
                    expected_buffer_size);
 
-            byte *buffer = reinterpret_cast<byte *>(&args.send_buffer[0] + 1);
+            byte* buffer = reinterpret_cast<byte*>(&args.send_buffer[0] + 1);
             buffer[expected_buffer_size - 1] = '\0';
 
             fprintf(stderr,
@@ -637,9 +674,8 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
               fprintf(stderr, "Disassembly error 0x%.8lx: %s\n", hr,
                       se::win::com::com_error_category().message(hr).c_str());
             } else {
-              printf(
-                  "Disassembled shader:\n%s\n",
-                  static_cast<const char *>(disassembly->GetBufferPointer()));
+              printf("Disassembled shader:\n%s\n",
+                     static_cast<const char*>(disassembly->GetBufferPointer()));
             }
           }
         }
@@ -703,7 +739,7 @@ void AppendPathSeparator(char (&path)[size]) {
   }
 }
 
-void PrintfUsage(const char *argv0) {
+void PrintfUsage(const char* argv0) {
   fprintf(
       stderr,
       "Usage:\n%s --base-path "
@@ -714,7 +750,7 @@ void PrintfUsage(const char *argv0) {
 
 }  // namespace
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   const ScopedThreadName scoped_thread_name{GetCurrentThread(),
                                             L"Rshc_MainThread"};
   std::error_code rc{scoped_thread_name.error_code()};
