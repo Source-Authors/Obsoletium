@@ -124,7 +124,7 @@ void ComputeAmbientFromSphericalSamples( int iThread, const Vector &vStart, Vect
 
 		// Now that we've got a ray, see what surface we've hit
 		Vector lightStyleColors[MAX_LIGHTSTYLES];
-		lightStyleColors[0] = Vector{0, 0, 0};	// We only care about light style 0 here.
+		lightStyleColors[0] = vec3_origin;	// We only care about light style 0 here.
 		CalcRayAmbientLighting( iThread, vStart, vEnd, tanTheta, lightStyleColors );
 	
 		radcolor[i] = lightStyleColors[0];
