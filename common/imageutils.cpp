@@ -1654,7 +1654,7 @@ ConversionErrorType	ImgUtl_ConvertToVTFAndDumpVMT( const char *pInPath, const ch
 		//g_pFullFileSystem->CreateDirHierarchy("materials/VGUI/logos/", "GAME");
 
 		// write out the spray VMT file.
-		if ( strcmp(vtfPath, finalPath) != 0 )  // If they're not already the same
+		if ( !V_streq(vtfPath, finalPath) )  // If they're not already the same
 		{
 			nErrorCode = ImgUtl_WriteGenericVMT(finalPath, pMaterialsSubDir);
 			if (nErrorCode != CE_SUCCESS)

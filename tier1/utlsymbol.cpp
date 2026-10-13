@@ -100,7 +100,7 @@ bool CUtlSymbol::operator==( const char* pStr ) const
 {
 	if (m_Id == UTL_INVAL_SYMBOL) 
 		return false;
-	return strcmp( String(), pStr ) == 0;
+	return V_streq( String(), pStr );
 }
 
 

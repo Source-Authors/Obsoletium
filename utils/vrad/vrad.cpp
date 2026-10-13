@@ -285,9 +285,9 @@ void ReadLightFile (char *filename)
 			int j = 0;
 			for( j; j < num_texlights; j ++ )
 			{
-				if ( strcmp( texlights[j].name, szTexlight ) == 0 )
+				if ( V_streq( texlights[j].name, szTexlight ) )
 				{
-					if ( strcmp( texlights[j].filename, filename ) == 0 )
+					if ( V_streq( texlights[j].filename, filename ) )
 					{
 						Warning( "Duplication of '%s' in file '%s'!\n",
 							 texlights[j].name, texlights[j].filename );

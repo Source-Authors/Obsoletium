@@ -420,7 +420,7 @@ void RandomlyChangeStringGeneric(char *str, int size)
 
 bool CompareTestSubString0(DTTestClient *pClient, DTTestServer *pServer)
 {
-	return strcmp(pClient->m_Sub.m_Strings[0], pServer->m_Sub.m_Strings[0]) == 0;
+	return V_streq(pClient->m_Sub.m_Strings[0], pServer->m_Sub.m_Strings[0]);
 }
 void RandomlyChangeSubString0(DTTestServer *pServer)
 {
@@ -430,7 +430,7 @@ void RandomlyChangeSubString0(DTTestServer *pServer)
 
 bool CompareTestSubString1(DTTestClient *pClient, DTTestServer *pServer)
 {
-	return strcmp(pClient->m_Sub.m_Strings[1], pServer->m_Sub.m_Strings[1]) == 0;
+	return V_streq(pClient->m_Sub.m_Strings[1], pServer->m_Sub.m_Strings[1]);
 }
 void RandomlyChangeSubString1(DTTestServer *pServer)
 {
@@ -462,7 +462,7 @@ void RandomlyChangeVector(DTTestServer *pServer)
 
 bool CompareString(DTTestClient *pClient, DTTestServer *pServer)
 {
-	return strcmp(pClient->m_String, pServer->m_String) == 0;
+	return V_streq(pClient->m_String, pServer->m_String);
 }
 void RandomlyChangeString(DTTestServer *pServer)
 {

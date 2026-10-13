@@ -277,7 +277,7 @@ void FloatToSpin(float fValue, CSpinButtonCtrl *pSpin, BOOL bMantissa)
 
 	char szCurrent[128];
 	pEdit->GetWindowText(szCurrent, 128);
-	if (strcmp(szNew, szCurrent) != 0)
+	if (!V_streq(szNew, szCurrent))
 	{
 		pEdit->SetWindowText(szNew);
 	}
@@ -309,7 +309,7 @@ void IntegerToSpin(int nValue, CSpinButtonCtrl *pSpin)
 
 	char szCurrent[128];
 	pEdit->GetWindowText(szCurrent, 128);
-	if (strcmp(szNew, szCurrent) != 0)
+	if (!V_streq(szNew, szCurrent))
 	{
 		pEdit->SetWindowText(szNew);
 	}
@@ -337,7 +337,7 @@ void FloatToWnd(float fValue, CWnd *pWnd)
 	}
 
 	pWnd->GetWindowText(szCurrent, 128);
-	if(strcmp(szNew, szCurrent) != 0)
+	if(!V_streq(szNew, szCurrent))
 		pWnd->SetWindowText(szNew);
 }
 

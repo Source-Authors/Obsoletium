@@ -4569,8 +4569,8 @@ void CMaterialSystem::ScanDirForReplacements( const char *pszPathName )
 	{
 		if ( g_pFullFileSystem->FindIsDirectory( FindHandle ) )
 		{
-			if ( strcmp( pFindFileName, "." ) != 0 && 
-				 strcmp( pFindFileName, ".." ) != 0 )
+			if ( !V_streq( pFindFileName, "." ) && 
+				 !V_streq( pFindFileName, ".." ) )
 			{
 				V_sprintf_safe( szNextBaseName, "%s/%s", pszPathName, pFindFileName );
 

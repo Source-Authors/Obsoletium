@@ -451,7 +451,7 @@ bool IsFuncOccluder( int id )
 {
 	entity_t *mapent = &entities[id];
 	const char *pClassName = ValueForKey( mapent, "classname" );
-	return (strcmp("func_occluder", pClassName) == 0);
+	return V_streq("func_occluder", pClassName);
 }
 
 

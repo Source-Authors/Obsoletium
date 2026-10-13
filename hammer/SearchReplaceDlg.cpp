@@ -450,7 +450,7 @@ BOOL CSearchReplaceDlg::OnFindReplace(UINT uCmd)
 	UpdateData();
 	GetFindCriteria(TempFindObject, pDoc);
 
-	if ( strcmp(TempFindObject.strFindText, FindObject.strFindText) != 0 )
+	if ( !V_streq(TempFindObject.strFindText, FindObject.strFindText) )
 	{
 		m_bNewSearch = true;
 	}

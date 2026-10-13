@@ -296,7 +296,7 @@ void CMapInstance::ReplaceTargetname( const char *szOldName, const char *szNewNa
 
 			intp nLen = InstancePos - pInstanceValue;
 
-			if ( strcmp( szOldName, InstancePos + 1 ) == 0 )
+			if ( V_streq( szOldName, InstancePos + 1 ) )
 			{
 				nLen++;
 

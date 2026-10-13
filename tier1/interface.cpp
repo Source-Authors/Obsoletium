@@ -68,7 +68,7 @@ static void* CreateInterfaceInternal( const char *pName, int *pReturnCode )
 {
 	for (auto *pCur=InterfaceReg::s_pInterfaceRegs; pCur; pCur=pCur->m_pNext)
 	{
-		if (strcmp(pCur->m_pName, pName) == 0)
+		if (V_streq(pCur->m_pName, pName))
 		{
 			if (pReturnCode)
 			{

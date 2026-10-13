@@ -4545,7 +4545,7 @@ void TagProceduralBones( )
 
 		for ( int ai( 0 ); ai < g_numattachments; ++ai )
 		{
-			if ( strcmp( g_attachment[ ai ].name, g_aimatbones[j].aimname ) == 0 )
+			if ( V_streq( g_attachment[ ai ].name, g_aimatbones[j].aimname ) )
 			{
 				g_aimatbones[j].aimAttach = ai;
 				break;
@@ -4731,7 +4731,7 @@ void RemapProceduralBones( )
 
 		for ( int ai( 0 ); ai < g_numattachments; ++ai )
 		{
-			if ( strcmp( g_attachment[ ai ].name, pAimAtBone->aimname ) == 0 )
+			if ( V_streq( g_attachment[ ai ].name, pAimAtBone->aimname ) )
 			{
 				origAim = ai;
 				break;

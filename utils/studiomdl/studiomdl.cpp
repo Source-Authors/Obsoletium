@@ -514,7 +514,7 @@ float verify_atof( const char *in )
 
 float verify_atof_with_null( const char *in )
 {
-	if (strcmp( in, ".." ) == 0)
+	if (V_streq( in, ".." ))
 		return -1;
 
 	if (in[0] != '-' && in[0] != '.' && (in[0] < '0' || in[0] > '9'))

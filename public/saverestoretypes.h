@@ -486,7 +486,7 @@ inline unsigned short CSaveRestoreSegment::FindCreateSymbol( const char *pszToke
 		if ( index >= tokenCount )
 			index %= tokenCount;
 
-		if ( !pTokens[index] || strcmp( pszToken, pTokens[index] ) == 0 )
+		if ( !pTokens[index] || V_streq( pszToken, pTokens[index] ) )
 		{
 			pTokens[index] = (char *)pszToken;
 			Assert( index <= USHRT_MAX );

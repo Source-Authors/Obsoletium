@@ -889,7 +889,7 @@ void COP_Entity::UpdateData( int Mode, PVOID pData, bool bCanEdit )
 		//
 		char szComments[1024];
 		m_Comments.GetWindowText(szComments, sizeof(szComments));
-		if (strcmp(szComments, pEdit->GetComments()) != 0)
+		if (!V_streq(szComments, pEdit->GetComments()))
 		{
 			m_Comments.SetWindowText(VALUE_DIFFERENT_STRING);
 		}
@@ -1145,7 +1145,7 @@ bool COP_Entity::SaveData(void)
 			char szComments[1024];
 			szComments[0] = '\0';
 			m_Comments.GetWindowText(szComments, sizeof(szComments));
-			if (strcmp(szComments, VALUE_DIFFERENT_STRING) != 0)
+			if (!V_streq(szComments, VALUE_DIFFERENT_STRING))
 			{
 				pEdit->SetComments(szComments);
 			}
@@ -2071,7 +2071,7 @@ void COP_Entity::CreateSmartControls_Choices( GDinputvariable *pVar, CRect &ctrl
 	LPCTSTR pszValue = m_kv.GetValue(pVar->GetName());
 	if (pszValue != NULL)
 	{
-		if (strcmp(pszValue, VALUE_DIFFERENT_STRING) == 0)
+		if (V_streq(pszValue, VALUE_DIFFERENT_STRING))
 		{
 			pCombo->SelectString(-1, VALUE_DIFFERENT_STRING);
 		}

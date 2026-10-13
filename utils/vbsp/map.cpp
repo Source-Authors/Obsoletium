@@ -2318,7 +2318,7 @@ void CMapFile::ReplaceInstancePair( epair_t *pPair, entity_t *pInstanceEntity )
 		}
 	}
 
-	if ( !Overwritten && strcmp( pPair->value, NewValue ) != 0 )
+	if ( !Overwritten && !V_streq( pPair->value, NewValue ) )
 	{
 		free( pPair->value );
 		pPair->value = copystring( NewValue );
