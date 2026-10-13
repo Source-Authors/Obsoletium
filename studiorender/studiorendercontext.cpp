@@ -1566,7 +1566,7 @@ void CStudioRenderContext::SetEyeViewTarget( const studiohdr_t *, int, const Vec
 //-----------------------------------------------------------------------------
 // Returns information about the ambient light samples
 //-----------------------------------------------------------------------------
-static TableVector s_pAmbientLightDir[6] = 
+static constexpr inline TableVector s_pAmbientLightDir[6] = 
 {
 	{  1,  0,  0 }, 
 	{ -1,  0,  0 },
