@@ -3,7 +3,7 @@ class portal_refract_ps11_Static_Index
 {
 private:
 	int m_nSTAGE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bSTAGE;
 #endif
 public:
@@ -11,21 +11,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nSTAGE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSTAGE = true;
 #endif
 	}
 	void SetSTAGE( bool i )
 	{
 		m_nSTAGE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSTAGE = true;
 #endif
 	}
 public:
 	portal_refract_ps11_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSTAGE = false;
 #endif // _DEBUG
 		m_nSTAGE = 0;
@@ -34,7 +34,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bSTAGE;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -52,7 +52,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}

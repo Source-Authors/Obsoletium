@@ -3,7 +3,7 @@ class shatteredglass_ps20b_Static_Index
 {
 private:
 	int m_nCONVERT_TO_SRGB;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCONVERT_TO_SRGB;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCONVERT_TO_SRGB = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
 #endif
 	}
 	void SetCONVERT_TO_SRGB( bool i )
 	{
 		m_nCONVERT_TO_SRGB = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
 #endif
 	}
 private:
 	int m_nCUBEMAP;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCUBEMAP;
 #endif
 public:
@@ -32,20 +32,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCUBEMAP = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCUBEMAP = true;
 #endif
 	}
 	void SetCUBEMAP( bool i )
 	{
 		m_nCUBEMAP = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCUBEMAP = true;
 #endif
 	}
 private:
 	int m_nVERTEXCOLOR;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bVERTEXCOLOR;
 #endif
 public:
@@ -53,20 +53,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nVERTEXCOLOR = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEXCOLOR = true;
 #endif
 	}
 	void SetVERTEXCOLOR( bool i )
 	{
 		m_nVERTEXCOLOR = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEXCOLOR = true;
 #endif
 	}
 private:
 	int m_nENVMAPMASK;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bENVMAPMASK;
 #endif
 public:
@@ -74,20 +74,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nENVMAPMASK = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bENVMAPMASK = true;
 #endif
 	}
 	void SetENVMAPMASK( bool i )
 	{
 		m_nENVMAPMASK = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bENVMAPMASK = true;
 #endif
 	}
 private:
 	int m_nBASEALPHAENVMAPMASK;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bBASEALPHAENVMAPMASK;
 #endif
 public:
@@ -95,20 +95,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBASEALPHAENVMAPMASK = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBASEALPHAENVMAPMASK = true;
 #endif
 	}
 	void SetBASEALPHAENVMAPMASK( bool i )
 	{
 		m_nBASEALPHAENVMAPMASK = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBASEALPHAENVMAPMASK = true;
 #endif
 	}
 private:
 	int m_nHDRTYPE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHDRTYPE;
 #endif
 public:
@@ -116,41 +116,41 @@ public:
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nHDRTYPE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRTYPE = true;
 #endif
 	}
 	void SetHDRTYPE( bool i )
 	{
 		m_nHDRTYPE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRTYPE = true;
 #endif
 	}
 public:
 	shatteredglass_ps20b_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
 #endif // _DEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCUBEMAP = false;
 #endif // _DEBUG
 		m_nCUBEMAP = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEXCOLOR = false;
 #endif // _DEBUG
 		m_nVERTEXCOLOR = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bENVMAPMASK = false;
 #endif // _DEBUG
 		m_nENVMAPMASK = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBASEALPHAENVMAPMASK = false;
 #endif // _DEBUG
 		m_nBASEALPHAENVMAPMASK = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRTYPE = false;
 #endif // _DEBUG
 		m_nHDRTYPE = 0;
@@ -159,7 +159,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bCUBEMAP && m_bVERTEXCOLOR && m_bENVMAPMASK && m_bBASEALPHAENVMAPMASK && m_bHDRTYPE;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -171,7 +171,7 @@ class shatteredglass_ps20b_Dynamic_Index
 {
 private:
 	int m_nHDRENABLED;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHDRENABLED;
 #endif
 public:
@@ -179,20 +179,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHDRENABLED = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRENABLED = true;
 #endif
 	}
 	void SetHDRENABLED( bool i )
 	{
 		m_nHDRENABLED = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRENABLED = true;
 #endif
 	}
 private:
 	int m_nPIXELFOGTYPE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bPIXELFOGTYPE;
 #endif
 public:
@@ -200,25 +200,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nPIXELFOGTYPE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = true;
 #endif
 	}
 	void SetPIXELFOGTYPE( bool i )
 	{
 		m_nPIXELFOGTYPE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = true;
 #endif
 	}
 public:
 	shatteredglass_ps20b_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRENABLED = false;
 #endif // _DEBUG
 		m_nHDRENABLED = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
 #endif // _DEBUG
 		m_nPIXELFOGTYPE = 0;
@@ -227,7 +227,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bHDRENABLED && m_bPIXELFOGTYPE;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

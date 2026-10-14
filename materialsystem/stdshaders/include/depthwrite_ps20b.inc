@@ -3,7 +3,7 @@ class depthwrite_ps20b_Static_Index
 {
 private:
 	int m_nCOLOR_DEPTH;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCOLOR_DEPTH;
 #endif
 public:
@@ -11,21 +11,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCOLOR_DEPTH = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOLOR_DEPTH = true;
 #endif
 	}
 	void SetCOLOR_DEPTH( bool i )
 	{
 		m_nCOLOR_DEPTH = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOLOR_DEPTH = true;
 #endif
 	}
 public:
 	depthwrite_ps20b_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOLOR_DEPTH = false;
 #endif // _DEBUG
 		m_nCOLOR_DEPTH = 0;
@@ -34,7 +34,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCOLOR_DEPTH;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -46,7 +46,7 @@ class depthwrite_ps20b_Dynamic_Index
 {
 private:
 	int m_nALPHACLIP;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bALPHACLIP;
 #endif
 public:
@@ -54,21 +54,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nALPHACLIP = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bALPHACLIP = true;
 #endif
 	}
 	void SetALPHACLIP( bool i )
 	{
 		m_nALPHACLIP = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bALPHACLIP = true;
 #endif
 	}
 public:
 	depthwrite_ps20b_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bALPHACLIP = false;
 #endif // _DEBUG
 		m_nALPHACLIP = 0;
@@ -77,7 +77,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bALPHACLIP;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

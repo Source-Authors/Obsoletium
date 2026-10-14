@@ -9,7 +9,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}
@@ -19,7 +19,7 @@ class eyes_ps20b_Dynamic_Index
 {
 private:
 	int m_nWRITE_DEPTH_TO_DESTALPHA;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bWRITE_DEPTH_TO_DESTALPHA;
 #endif
 public:
@@ -27,20 +27,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nWRITE_DEPTH_TO_DESTALPHA = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bWRITE_DEPTH_TO_DESTALPHA = true;
 #endif
 	}
 	void SetWRITE_DEPTH_TO_DESTALPHA( bool i )
 	{
 		m_nWRITE_DEPTH_TO_DESTALPHA = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bWRITE_DEPTH_TO_DESTALPHA = true;
 #endif
 	}
 private:
 	int m_nPIXELFOGTYPE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bPIXELFOGTYPE;
 #endif
 public:
@@ -48,25 +48,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nPIXELFOGTYPE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = true;
 #endif
 	}
 	void SetPIXELFOGTYPE( bool i )
 	{
 		m_nPIXELFOGTYPE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = true;
 #endif
 	}
 public:
 	eyes_ps20b_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bWRITE_DEPTH_TO_DESTALPHA = false;
 #endif // _DEBUG
 		m_nWRITE_DEPTH_TO_DESTALPHA = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
 #endif // _DEBUG
 		m_nPIXELFOGTYPE = 0;
@@ -75,7 +75,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bWRITE_DEPTH_TO_DESTALPHA && m_bPIXELFOGTYPE;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

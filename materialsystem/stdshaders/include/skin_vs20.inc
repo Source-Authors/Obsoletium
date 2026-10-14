@@ -12,7 +12,7 @@
 class skin_vs20_Static_Index
 {
 	unsigned int m_nUSE_STATIC_CONTROL_FLOW : 2;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bUSE_STATIC_CONTROL_FLOW : 1;
 #endif	// _DEBUG
 public:
@@ -20,7 +20,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nUSE_STATIC_CONTROL_FLOW = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bUSE_STATIC_CONTROL_FLOW = true;
 #endif	// _DEBUG
 	}
@@ -28,7 +28,7 @@ public:
 	skin_vs20_Static_Index()
 	{
 		m_nUSE_STATIC_CONTROL_FLOW = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bUSE_STATIC_CONTROL_FLOW = false;
 #endif	// _DEBUG
 	}
@@ -50,7 +50,7 @@ class skin_vs20_Dynamic_Index
 	unsigned int m_nSKINNING : 2;
 	unsigned int m_nLIGHTING_PREVIEW : 2;
 	unsigned int m_nNUM_LIGHTS : 2;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCOMPRESSED_VERTS : 1;
 	bool m_bDOWATERFOG : 1;
 	bool m_bSKINNING : 1;
@@ -62,7 +62,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCOMPRESSED_VERTS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOMPRESSED_VERTS = true;
 #endif	// _DEBUG
 	}
@@ -71,7 +71,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDOWATERFOG = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = true;
 #endif	// _DEBUG
 	}
@@ -80,7 +80,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSKINNING = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = true;
 #endif	// _DEBUG
 	}
@@ -89,7 +89,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nLIGHTING_PREVIEW = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTING_PREVIEW = true;
 #endif	// _DEBUG
 	}
@@ -98,7 +98,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nNUM_LIGHTS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_LIGHTS = true;
 #endif	// _DEBUG
 	}
@@ -110,7 +110,7 @@ public:
 		m_nSKINNING = 0;
 		m_nLIGHTING_PREVIEW = 0;
 		m_nNUM_LIGHTS = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOMPRESSED_VERTS = false;
 		m_bDOWATERFOG = false;
 		m_bSKINNING = false;

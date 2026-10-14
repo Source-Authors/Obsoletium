@@ -22,7 +22,7 @@ class vertexlit_and_unlit_generic_vs20_Static_Index
 	unsigned int m_nSEPARATE_DETAIL_UVS : 2;
 	unsigned int m_nUSE_STATIC_CONTROL_FLOW : 2;
 	unsigned int m_nDONT_GAMMA_CONVERT_VERTEX_COLOR : 2;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bVERTEXCOLOR : 1;
 	bool m_bCUBEMAP : 1;
 	bool m_bHALFLAMBERT : 1;
@@ -38,7 +38,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nVERTEXCOLOR = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEXCOLOR = true;
 #endif	// _DEBUG
 	}
@@ -47,7 +47,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCUBEMAP = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCUBEMAP = true;
 #endif	// _DEBUG
 	}
@@ -56,7 +56,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHALFLAMBERT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = true;
 #endif	// _DEBUG
 	}
@@ -65,7 +65,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFLASHLIGHT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHT = true;
 #endif	// _DEBUG
 	}
@@ -74,7 +74,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSEAMLESS_BASE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSEAMLESS_BASE = true;
 #endif	// _DEBUG
 	}
@@ -83,7 +83,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSEAMLESS_DETAIL = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSEAMLESS_DETAIL = true;
 #endif	// _DEBUG
 	}
@@ -92,7 +92,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSEPARATE_DETAIL_UVS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSEPARATE_DETAIL_UVS = true;
 #endif	// _DEBUG
 	}
@@ -101,7 +101,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nUSE_STATIC_CONTROL_FLOW = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bUSE_STATIC_CONTROL_FLOW = true;
 #endif	// _DEBUG
 	}
@@ -110,7 +110,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDONT_GAMMA_CONVERT_VERTEX_COLOR = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDONT_GAMMA_CONVERT_VERTEX_COLOR = true;
 #endif	// _DEBUG
 	}
@@ -126,7 +126,7 @@ public:
 		m_nSEPARATE_DETAIL_UVS = 0;
 		m_nUSE_STATIC_CONTROL_FLOW = 0;
 		m_nDONT_GAMMA_CONVERT_VERTEX_COLOR = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEXCOLOR = false;
 		m_bCUBEMAP = false;
 		m_bHALFLAMBERT = false;
@@ -158,7 +158,7 @@ class vertexlit_and_unlit_generic_vs20_Dynamic_Index
 	unsigned int m_nSKINNING : 2;
 	unsigned int m_nLIGHTING_PREVIEW : 2;
 	unsigned int m_nNUM_LIGHTS : 2;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCOMPRESSED_VERTS : 1;
 	bool m_bDYNAMIC_LIGHT : 1;
 	bool m_bSTATIC_LIGHT : 1;
@@ -172,7 +172,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCOMPRESSED_VERTS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOMPRESSED_VERTS = true;
 #endif	// _DEBUG
 	}
@@ -181,7 +181,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDYNAMIC_LIGHT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDYNAMIC_LIGHT = true;
 #endif	// _DEBUG
 	}
@@ -190,7 +190,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSTATIC_LIGHT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSTATIC_LIGHT = true;
 #endif	// _DEBUG
 	}
@@ -199,7 +199,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDOWATERFOG = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = true;
 #endif	// _DEBUG
 	}
@@ -208,7 +208,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSKINNING = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = true;
 #endif	// _DEBUG
 	}
@@ -217,7 +217,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nLIGHTING_PREVIEW = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTING_PREVIEW = true;
 #endif	// _DEBUG
 	}
@@ -226,7 +226,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nNUM_LIGHTS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_LIGHTS = true;
 #endif	// _DEBUG
 	}
@@ -240,7 +240,7 @@ public:
 		m_nSKINNING = 0;
 		m_nLIGHTING_PREVIEW = 0;
 		m_nNUM_LIGHTS = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOMPRESSED_VERTS = false;
 		m_bDYNAMIC_LIGHT = false;
 		m_bSTATIC_LIGHT = false;

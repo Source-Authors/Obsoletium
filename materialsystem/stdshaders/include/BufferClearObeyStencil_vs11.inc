@@ -8,7 +8,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}
@@ -23,7 +23,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}

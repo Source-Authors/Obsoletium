@@ -2,7 +2,7 @@ class vertexlitgeneric_flashlight_vs11_Static_Index
 {
 private:
 	int m_nTEETH;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bTEETH;
 #endif
 public:
@@ -10,21 +10,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nTEETH = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bTEETH = true;
 #endif
 	}
 	void SetTEETH( bool i )
 	{
 		m_nTEETH = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bTEETH = true;
 #endif
 	}
 public:
 	vertexlitgeneric_flashlight_vs11_Static_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bTEETH = false;
 #endif // _DEBUG
 		m_nTEETH = 0;
@@ -33,7 +33,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bTEETH;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -44,7 +44,7 @@ class vertexlitgeneric_flashlight_vs11_Dynamic_Index
 {
 private:
 	int m_nDOWATERFOG;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDOWATERFOG;
 #endif
 public:
@@ -52,20 +52,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDOWATERFOG = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = true;
 #endif
 	}
 	void SetDOWATERFOG( bool i )
 	{
 		m_nDOWATERFOG = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = true;
 #endif
 	}
 private:
 	int m_nSKINNING;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bSKINNING;
 #endif
 public:
@@ -73,25 +73,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSKINNING = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = true;
 #endif
 	}
 	void SetSKINNING( bool i )
 	{
 		m_nSKINNING = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = true;
 #endif
 	}
 public:
 	vertexlitgeneric_flashlight_vs11_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = false;
 #endif // _DEBUG
 		m_nDOWATERFOG = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = false;
 #endif // _DEBUG
 		m_nSKINNING = 0;
@@ -100,7 +100,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bDOWATERFOG && m_bSKINNING;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

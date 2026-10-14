@@ -3,7 +3,7 @@ class watercheap_vs20_Static_Index
 {
 private:
 	int m_nBLEND;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bBLEND;
 #endif
 public:
@@ -11,21 +11,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBLEND = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBLEND = true;
 #endif
 	}
 	void SetBLEND( bool i )
 	{
 		m_nBLEND = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBLEND = true;
 #endif
 	}
 public:
 	watercheap_vs20_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBLEND = false;
 #endif // _DEBUG
 		m_nBLEND = 0;
@@ -34,7 +34,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bBLEND;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -52,7 +52,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}

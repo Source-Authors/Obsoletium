@@ -2,7 +2,7 @@ class particlelit_generic_ps30_Static_Index
 {
 private:
 	int m_nHALFLAMBERT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHALFLAMBERT;
 #endif
 public:
@@ -10,20 +10,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHALFLAMBERT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = true;
 #endif
 	}
 	void SetHALFLAMBERT( bool i )
 	{
 		m_nHALFLAMBERT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = true;
 #endif
 	}
 private:
 	int m_nHDRTYPE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHDRTYPE;
 #endif
 public:
@@ -31,25 +31,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nHDRTYPE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRTYPE = true;
 #endif
 	}
 	void SetHDRTYPE( bool i )
 	{
 		m_nHDRTYPE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRTYPE = true;
 #endif
 	}
 public:
 	particlelit_generic_ps30_Static_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = false;
 #endif // _DEBUG
 		m_nHALFLAMBERT = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRTYPE = false;
 #endif // _DEBUG
 		m_nHDRTYPE = 0;
@@ -58,7 +58,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bHALFLAMBERT && m_bHDRTYPE;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -70,7 +70,7 @@ class particlelit_generic_ps30_Dynamic_Index
 {
 private:
 	int m_nLIGHT_COMBO;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bLIGHT_COMBO;
 #endif
 public:
@@ -78,20 +78,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 21 );
 		m_nLIGHT_COMBO = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHT_COMBO = true;
 #endif
 	}
 	void SetLIGHT_COMBO( bool i )
 	{
 		m_nLIGHT_COMBO = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHT_COMBO = true;
 #endif
 	}
 private:
 	int m_nWRITEWATERFOGTODESTALPHA;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bWRITEWATERFOGTODESTALPHA;
 #endif
 public:
@@ -99,20 +99,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nWRITEWATERFOGTODESTALPHA = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = true;
 #endif
 	}
 	void SetWRITEWATERFOGTODESTALPHA( bool i )
 	{
 		m_nWRITEWATERFOGTODESTALPHA = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = true;
 #endif
 	}
 private:
 	int m_nFOGTYPE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bFOGTYPE;
 #endif
 public:
@@ -120,20 +120,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nFOGTYPE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFOGTYPE = true;
 #endif
 	}
 	void SetFOGTYPE( bool i )
 	{
 		m_nFOGTYPE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFOGTYPE = true;
 #endif
 	}
 private:
 	int m_nHDRENABLED;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHDRENABLED;
 #endif
 public:
@@ -141,33 +141,33 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHDRENABLED = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRENABLED = true;
 #endif
 	}
 	void SetHDRENABLED( bool i )
 	{
 		m_nHDRENABLED = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRENABLED = true;
 #endif
 	}
 public:
 	particlelit_generic_ps30_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHT_COMBO = false;
 #endif // _DEBUG
 		m_nLIGHT_COMBO = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = false;
 #endif // _DEBUG
 		m_nWRITEWATERFOGTODESTALPHA = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFOGTYPE = false;
 #endif // _DEBUG
 		m_nFOGTYPE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRENABLED = false;
 #endif // _DEBUG
 		m_nHDRENABLED = 0;
@@ -176,7 +176,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bLIGHT_COMBO && m_bWRITEWATERFOGTODESTALPHA && m_bFOGTYPE && m_bHDRENABLED;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

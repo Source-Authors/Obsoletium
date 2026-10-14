@@ -3,7 +3,7 @@ class cloak_blended_pass_ps20_Static_Index
 {
 private:
 	int m_nBUMPMAP;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bBUMPMAP;
 #endif
 public:
@@ -11,21 +11,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBUMPMAP = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBUMPMAP = true;
 #endif
 	}
 	void SetBUMPMAP( bool i )
 	{
 		m_nBUMPMAP = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBUMPMAP = true;
 #endif
 	}
 public:
 	cloak_blended_pass_ps20_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBUMPMAP = false;
 #endif // _DEBUG
 		m_nBUMPMAP = 0;
@@ -34,7 +34,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bBUMPMAP;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -52,7 +52,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}

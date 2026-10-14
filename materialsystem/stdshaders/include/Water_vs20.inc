@@ -3,7 +3,7 @@ class water_vs20_Static_Index
 {
 private:
 	int m_nBASETEXTURE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bBASETEXTURE;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBASETEXTURE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBASETEXTURE = true;
 #endif
 	}
 	void SetBASETEXTURE( bool i )
 	{
 		m_nBASETEXTURE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBASETEXTURE = true;
 #endif
 	}
 private:
 	int m_nMULTITEXTURE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bMULTITEXTURE;
 #endif
 public:
@@ -32,25 +32,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nMULTITEXTURE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bMULTITEXTURE = true;
 #endif
 	}
 	void SetMULTITEXTURE( bool i )
 	{
 		m_nMULTITEXTURE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bMULTITEXTURE = true;
 #endif
 	}
 public:
 	water_vs20_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBASETEXTURE = false;
 #endif // _DEBUG
 		m_nBASETEXTURE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bMULTITEXTURE = false;
 #endif // _DEBUG
 		m_nMULTITEXTURE = 0;
@@ -59,7 +59,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bBASETEXTURE && m_bMULTITEXTURE;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -77,7 +77,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}

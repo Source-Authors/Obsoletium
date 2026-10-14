@@ -9,7 +9,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}
@@ -19,7 +19,7 @@ class motion_blur_ps20_Dynamic_Index
 {
 private:
 	int m_nQUALITY;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bQUALITY;
 #endif
 public:
@@ -27,21 +27,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 3 );
 		m_nQUALITY = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bQUALITY = true;
 #endif
 	}
 	void SetQUALITY( bool i )
 	{
 		m_nQUALITY = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bQUALITY = true;
 #endif
 	}
 public:
 	motion_blur_ps20_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bQUALITY = false;
 #endif // _DEBUG
 		m_nQUALITY = 0;
@@ -50,7 +50,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bQUALITY;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

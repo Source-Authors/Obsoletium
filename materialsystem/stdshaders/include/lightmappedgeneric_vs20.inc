@@ -3,7 +3,7 @@ class lightmappedgeneric_vs20_Static_Index
 {
 private:
 	int m_nENVMAP_MASK;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bENVMAP_MASK;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nENVMAP_MASK = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bENVMAP_MASK = true;
 #endif
 	}
 	void SetENVMAP_MASK( bool i )
 	{
 		m_nENVMAP_MASK = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bENVMAP_MASK = true;
 #endif
 	}
 private:
 	int m_nTANGENTSPACE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bTANGENTSPACE;
 #endif
 public:
@@ -32,20 +32,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nTANGENTSPACE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bTANGENTSPACE = true;
 #endif
 	}
 	void SetTANGENTSPACE( bool i )
 	{
 		m_nTANGENTSPACE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bTANGENTSPACE = true;
 #endif
 	}
 private:
 	int m_nBUMPMAP;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bBUMPMAP;
 #endif
 public:
@@ -53,20 +53,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBUMPMAP = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBUMPMAP = true;
 #endif
 	}
 	void SetBUMPMAP( bool i )
 	{
 		m_nBUMPMAP = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBUMPMAP = true;
 #endif
 	}
 private:
 	int m_nDIFFUSEBUMPMAP;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDIFFUSEBUMPMAP;
 #endif
 public:
@@ -74,20 +74,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDIFFUSEBUMPMAP = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDIFFUSEBUMPMAP = true;
 #endif
 	}
 	void SetDIFFUSEBUMPMAP( bool i )
 	{
 		m_nDIFFUSEBUMPMAP = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDIFFUSEBUMPMAP = true;
 #endif
 	}
 private:
 	int m_nVERTEXCOLOR;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bVERTEXCOLOR;
 #endif
 public:
@@ -95,20 +95,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nVERTEXCOLOR = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEXCOLOR = true;
 #endif
 	}
 	void SetVERTEXCOLOR( bool i )
 	{
 		m_nVERTEXCOLOR = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEXCOLOR = true;
 #endif
 	}
 private:
 	int m_nVERTEXALPHATEXBLENDFACTOR;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bVERTEXALPHATEXBLENDFACTOR;
 #endif
 public:
@@ -116,20 +116,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nVERTEXALPHATEXBLENDFACTOR = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEXALPHATEXBLENDFACTOR = true;
 #endif
 	}
 	void SetVERTEXALPHATEXBLENDFACTOR( bool i )
 	{
 		m_nVERTEXALPHATEXBLENDFACTOR = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEXALPHATEXBLENDFACTOR = true;
 #endif
 	}
 private:
 	int m_nRELIEF_MAPPING;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bRELIEF_MAPPING;
 #endif
 public:
@@ -137,20 +137,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 0 );
 		m_nRELIEF_MAPPING = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bRELIEF_MAPPING = true;
 #endif
 	}
 	void SetRELIEF_MAPPING( bool i )
 	{
 		m_nRELIEF_MAPPING = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bRELIEF_MAPPING = true;
 #endif
 	}
 private:
 	int m_nSEAMLESS;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bSEAMLESS;
 #endif
 public:
@@ -158,20 +158,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSEAMLESS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSEAMLESS = true;
 #endif
 	}
 	void SetSEAMLESS( bool i )
 	{
 		m_nSEAMLESS = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSEAMLESS = true;
 #endif
 	}
 private:
 	int m_nBUMPMASK;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bBUMPMASK;
 #endif
 public:
@@ -179,53 +179,53 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBUMPMASK = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBUMPMASK = true;
 #endif
 	}
 	void SetBUMPMASK( bool i )
 	{
 		m_nBUMPMASK = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBUMPMASK = true;
 #endif
 	}
 public:
 	lightmappedgeneric_vs20_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bENVMAP_MASK = false;
 #endif // _DEBUG
 		m_nENVMAP_MASK = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bTANGENTSPACE = false;
 #endif // _DEBUG
 		m_nTANGENTSPACE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBUMPMAP = false;
 #endif // _DEBUG
 		m_nBUMPMAP = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDIFFUSEBUMPMAP = false;
 #endif // _DEBUG
 		m_nDIFFUSEBUMPMAP = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEXCOLOR = false;
 #endif // _DEBUG
 		m_nVERTEXCOLOR = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEXALPHATEXBLENDFACTOR = false;
 #endif // _DEBUG
 		m_nVERTEXALPHATEXBLENDFACTOR = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bRELIEF_MAPPING = false;
 #endif // _DEBUG
 		m_nRELIEF_MAPPING = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSEAMLESS = false;
 #endif // _DEBUG
 		m_nSEAMLESS = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBUMPMASK = false;
 #endif // _DEBUG
 		m_nBUMPMASK = 0;
@@ -234,7 +234,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bENVMAP_MASK && m_bTANGENTSPACE && m_bBUMPMAP && m_bDIFFUSEBUMPMAP && m_bVERTEXCOLOR && m_bVERTEXALPHATEXBLENDFACTOR && m_bRELIEF_MAPPING && m_bSEAMLESS && m_bBUMPMASK;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -246,7 +246,7 @@ class lightmappedgeneric_vs20_Dynamic_Index
 {
 private:
 	int m_nFASTPATH;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bFASTPATH;
 #endif
 public:
@@ -254,20 +254,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFASTPATH = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFASTPATH = true;
 #endif
 	}
 	void SetFASTPATH( bool i )
 	{
 		m_nFASTPATH = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFASTPATH = true;
 #endif
 	}
 private:
 	int m_nDOWATERFOG;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDOWATERFOG;
 #endif
 public:
@@ -275,20 +275,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDOWATERFOG = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = true;
 #endif
 	}
 	void SetDOWATERFOG( bool i )
 	{
 		m_nDOWATERFOG = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = true;
 #endif
 	}
 private:
 	int m_nLIGHTING_PREVIEW;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bLIGHTING_PREVIEW;
 #endif
 public:
@@ -296,29 +296,29 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nLIGHTING_PREVIEW = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTING_PREVIEW = true;
 #endif
 	}
 	void SetLIGHTING_PREVIEW( bool i )
 	{
 		m_nLIGHTING_PREVIEW = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTING_PREVIEW = true;
 #endif
 	}
 public:
 	lightmappedgeneric_vs20_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFASTPATH = false;
 #endif // _DEBUG
 		m_nFASTPATH = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = false;
 #endif // _DEBUG
 		m_nDOWATERFOG = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTING_PREVIEW = false;
 #endif // _DEBUG
 		m_nLIGHTING_PREVIEW = 0;
@@ -327,7 +327,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bFASTPATH && m_bDOWATERFOG && m_bLIGHTING_PREVIEW;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

@@ -2,7 +2,7 @@ class skin_ps20_Static_Index
 {
 private:
 	int m_nBASETEXTURE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bBASETEXTURE;
 #endif
 public:
@@ -10,20 +10,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBASETEXTURE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBASETEXTURE = true;
 #endif
 	}
 	void SetBASETEXTURE( bool i )
 	{
 		m_nBASETEXTURE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBASETEXTURE = true;
 #endif
 	}
 private:
 	int m_nBUMPTEXTURE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bBUMPTEXTURE;
 #endif
 public:
@@ -31,20 +31,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBUMPTEXTURE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBUMPTEXTURE = true;
 #endif
 	}
 	void SetBUMPTEXTURE( bool i )
 	{
 		m_nBUMPTEXTURE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBUMPTEXTURE = true;
 #endif
 	}
 private:
 	int m_nDIFFUSELIGHTING;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDIFFUSELIGHTING;
 #endif
 public:
@@ -52,20 +52,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDIFFUSELIGHTING = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDIFFUSELIGHTING = true;
 #endif
 	}
 	void SetDIFFUSELIGHTING( bool i )
 	{
 		m_nDIFFUSELIGHTING = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDIFFUSELIGHTING = true;
 #endif
 	}
 private:
 	int m_nSELFILLUM;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bSELFILLUM;
 #endif
 public:
@@ -73,20 +73,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSELFILLUM = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSELFILLUM = true;
 #endif
 	}
 	void SetSELFILLUM( bool i )
 	{
 		m_nSELFILLUM = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSELFILLUM = true;
 #endif
 	}
 private:
 	int m_nHALFLAMBERT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHALFLAMBERT;
 #endif
 public:
@@ -94,20 +94,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHALFLAMBERT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = true;
 #endif
 	}
 	void SetHALFLAMBERT( bool i )
 	{
 		m_nHALFLAMBERT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = true;
 #endif
 	}
 private:
 	int m_nFLASHLIGHT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bFLASHLIGHT;
 #endif
 public:
@@ -115,41 +115,41 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFLASHLIGHT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHT = true;
 #endif
 	}
 	void SetFLASHLIGHT( bool i )
 	{
 		m_nFLASHLIGHT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHT = true;
 #endif
 	}
 public:
 	skin_ps20_Static_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBASETEXTURE = false;
 #endif // _DEBUG
 		m_nBASETEXTURE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBUMPTEXTURE = false;
 #endif // _DEBUG
 		m_nBUMPTEXTURE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDIFFUSELIGHTING = false;
 #endif // _DEBUG
 		m_nDIFFUSELIGHTING = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSELFILLUM = false;
 #endif // _DEBUG
 		m_nSELFILLUM = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = false;
 #endif // _DEBUG
 		m_nHALFLAMBERT = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHT = false;
 #endif // _DEBUG
 		m_nFLASHLIGHT = 0;
@@ -158,7 +158,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bBASETEXTURE && m_bBUMPTEXTURE && m_bDIFFUSELIGHTING && m_bSELFILLUM && m_bHALFLAMBERT && m_bFLASHLIGHT;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -170,7 +170,7 @@ class skin_ps20_Dynamic_Index
 {
 private:
 	int m_nLIGHT_COMBO;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bLIGHT_COMBO;
 #endif
 public:
@@ -178,20 +178,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 21 );
 		m_nLIGHT_COMBO = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHT_COMBO = true;
 #endif
 	}
 	void SetLIGHT_COMBO( bool i )
 	{
 		m_nLIGHT_COMBO = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHT_COMBO = true;
 #endif
 	}
 private:
 	int m_nWRITEWATERFOGTODESTALPHA;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bWRITEWATERFOGTODESTALPHA;
 #endif
 public:
@@ -199,20 +199,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nWRITEWATERFOGTODESTALPHA = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = true;
 #endif
 	}
 	void SetWRITEWATERFOGTODESTALPHA( bool i )
 	{
 		m_nWRITEWATERFOGTODESTALPHA = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = true;
 #endif
 	}
 private:
 	int m_nFOGTYPE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bFOGTYPE;
 #endif
 public:
@@ -220,29 +220,29 @@ public:
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nFOGTYPE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFOGTYPE = true;
 #endif
 	}
 	void SetFOGTYPE( bool i )
 	{
 		m_nFOGTYPE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFOGTYPE = true;
 #endif
 	}
 public:
 	skin_ps20_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHT_COMBO = false;
 #endif // _DEBUG
 		m_nLIGHT_COMBO = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = false;
 #endif // _DEBUG
 		m_nWRITEWATERFOGTODESTALPHA = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFOGTYPE = false;
 #endif // _DEBUG
 		m_nFOGTYPE = 0;
@@ -251,7 +251,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bLIGHT_COMBO && m_bWRITEWATERFOGTODESTALPHA && m_bFOGTYPE;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

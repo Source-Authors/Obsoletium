@@ -3,7 +3,7 @@ class vertexlit_and_unlit_generic_bump_ps20b_Static_Index
 {
 private:
 	int m_nCUBEMAP;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCUBEMAP;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCUBEMAP = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCUBEMAP = true;
 #endif
 	}
 	void SetCUBEMAP( bool i )
 	{
 		m_nCUBEMAP = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCUBEMAP = true;
 #endif
 	}
 private:
 	int m_nDIFFUSELIGHTING;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDIFFUSELIGHTING;
 #endif
 public:
@@ -32,20 +32,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDIFFUSELIGHTING = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDIFFUSELIGHTING = true;
 #endif
 	}
 	void SetDIFFUSELIGHTING( bool i )
 	{
 		m_nDIFFUSELIGHTING = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDIFFUSELIGHTING = true;
 #endif
 	}
 private:
 	int m_nLIGHTWARPTEXTURE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bLIGHTWARPTEXTURE;
 #endif
 public:
@@ -53,20 +53,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nLIGHTWARPTEXTURE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTWARPTEXTURE = true;
 #endif
 	}
 	void SetLIGHTWARPTEXTURE( bool i )
 	{
 		m_nLIGHTWARPTEXTURE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTWARPTEXTURE = true;
 #endif
 	}
 private:
 	int m_nSELFILLUM;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bSELFILLUM;
 #endif
 public:
@@ -74,20 +74,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSELFILLUM = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSELFILLUM = true;
 #endif
 	}
 	void SetSELFILLUM( bool i )
 	{
 		m_nSELFILLUM = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSELFILLUM = true;
 #endif
 	}
 private:
 	int m_nSELFILLUMFRESNEL;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bSELFILLUMFRESNEL;
 #endif
 public:
@@ -95,20 +95,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSELFILLUMFRESNEL = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSELFILLUMFRESNEL = true;
 #endif
 	}
 	void SetSELFILLUMFRESNEL( bool i )
 	{
 		m_nSELFILLUMFRESNEL = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSELFILLUMFRESNEL = true;
 #endif
 	}
 private:
 	int m_nNORMALMAPALPHAENVMAPMASK;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bNORMALMAPALPHAENVMAPMASK;
 #endif
 public:
@@ -116,20 +116,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nNORMALMAPALPHAENVMAPMASK = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNORMALMAPALPHAENVMAPMASK = true;
 #endif
 	}
 	void SetNORMALMAPALPHAENVMAPMASK( bool i )
 	{
 		m_nNORMALMAPALPHAENVMAPMASK = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNORMALMAPALPHAENVMAPMASK = true;
 #endif
 	}
 private:
 	int m_nHALFLAMBERT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHALFLAMBERT;
 #endif
 public:
@@ -137,20 +137,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHALFLAMBERT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = true;
 #endif
 	}
 	void SetHALFLAMBERT( bool i )
 	{
 		m_nHALFLAMBERT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = true;
 #endif
 	}
 private:
 	int m_nFLASHLIGHT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bFLASHLIGHT;
 #endif
 public:
@@ -158,20 +158,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFLASHLIGHT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHT = true;
 #endif
 	}
 	void SetFLASHLIGHT( bool i )
 	{
 		m_nFLASHLIGHT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHT = true;
 #endif
 	}
 private:
 	int m_nDETAILTEXTURE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDETAILTEXTURE;
 #endif
 public:
@@ -179,20 +179,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDETAILTEXTURE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDETAILTEXTURE = true;
 #endif
 	}
 	void SetDETAILTEXTURE( bool i )
 	{
 		m_nDETAILTEXTURE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDETAILTEXTURE = true;
 #endif
 	}
 private:
 	int m_nDETAIL_BLEND_MODE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDETAIL_BLEND_MODE;
 #endif
 public:
@@ -200,20 +200,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 6 );
 		m_nDETAIL_BLEND_MODE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDETAIL_BLEND_MODE = true;
 #endif
 	}
 	void SetDETAIL_BLEND_MODE( bool i )
 	{
 		m_nDETAIL_BLEND_MODE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDETAIL_BLEND_MODE = true;
 #endif
 	}
 private:
 	int m_nFLASHLIGHTDEPTHFILTERMODE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bFLASHLIGHTDEPTHFILTERMODE;
 #endif
 public:
@@ -221,20 +221,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nFLASHLIGHTDEPTHFILTERMODE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = true;
 #endif
 	}
 	void SetFLASHLIGHTDEPTHFILTERMODE( bool i )
 	{
 		m_nFLASHLIGHTDEPTHFILTERMODE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = true;
 #endif
 	}
 private:
 	int m_nBLENDTINTBYBASEALPHA;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bBLENDTINTBYBASEALPHA;
 #endif
 public:
@@ -242,65 +242,65 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBLENDTINTBYBASEALPHA = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBLENDTINTBYBASEALPHA = true;
 #endif
 	}
 	void SetBLENDTINTBYBASEALPHA( bool i )
 	{
 		m_nBLENDTINTBYBASEALPHA = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBLENDTINTBYBASEALPHA = true;
 #endif
 	}
 public:
 	vertexlit_and_unlit_generic_bump_ps20b_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCUBEMAP = false;
 #endif // _DEBUG
 		m_nCUBEMAP = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDIFFUSELIGHTING = false;
 #endif // _DEBUG
 		m_nDIFFUSELIGHTING = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTWARPTEXTURE = false;
 #endif // _DEBUG
 		m_nLIGHTWARPTEXTURE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSELFILLUM = false;
 #endif // _DEBUG
 		m_nSELFILLUM = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSELFILLUMFRESNEL = false;
 #endif // _DEBUG
 		m_nSELFILLUMFRESNEL = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNORMALMAPALPHAENVMAPMASK = false;
 #endif // _DEBUG
 		m_nNORMALMAPALPHAENVMAPMASK = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = false;
 #endif // _DEBUG
 		m_nHALFLAMBERT = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHT = false;
 #endif // _DEBUG
 		m_nFLASHLIGHT = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDETAILTEXTURE = false;
 #endif // _DEBUG
 		m_nDETAILTEXTURE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDETAIL_BLEND_MODE = false;
 #endif // _DEBUG
 		m_nDETAIL_BLEND_MODE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = false;
 #endif // _DEBUG
 		m_nFLASHLIGHTDEPTHFILTERMODE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBLENDTINTBYBASEALPHA = false;
 #endif // _DEBUG
 		m_nBLENDTINTBYBASEALPHA = 0;
@@ -309,7 +309,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCUBEMAP && m_bDIFFUSELIGHTING && m_bLIGHTWARPTEXTURE && m_bSELFILLUM && m_bSELFILLUMFRESNEL && m_bNORMALMAPALPHAENVMAPMASK && m_bHALFLAMBERT && m_bFLASHLIGHT && m_bDETAILTEXTURE && m_bDETAIL_BLEND_MODE && m_bFLASHLIGHTDEPTHFILTERMODE && m_bBLENDTINTBYBASEALPHA;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -321,7 +321,7 @@ class vertexlit_and_unlit_generic_bump_ps20b_Dynamic_Index
 {
 private:
 	int m_nNUM_LIGHTS;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bNUM_LIGHTS;
 #endif
 public:
@@ -329,20 +329,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 4 );
 		m_nNUM_LIGHTS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_LIGHTS = true;
 #endif
 	}
 	void SetNUM_LIGHTS( bool i )
 	{
 		m_nNUM_LIGHTS = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_LIGHTS = true;
 #endif
 	}
 private:
 	int m_nAMBIENT_LIGHT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bAMBIENT_LIGHT;
 #endif
 public:
@@ -350,20 +350,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nAMBIENT_LIGHT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bAMBIENT_LIGHT = true;
 #endif
 	}
 	void SetAMBIENT_LIGHT( bool i )
 	{
 		m_nAMBIENT_LIGHT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bAMBIENT_LIGHT = true;
 #endif
 	}
 private:
 	int m_nFLASHLIGHTSHADOWS;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bFLASHLIGHTSHADOWS;
 #endif
 public:
@@ -371,29 +371,29 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFLASHLIGHTSHADOWS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHTSHADOWS = true;
 #endif
 	}
 	void SetFLASHLIGHTSHADOWS( bool i )
 	{
 		m_nFLASHLIGHTSHADOWS = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHTSHADOWS = true;
 #endif
 	}
 public:
 	vertexlit_and_unlit_generic_bump_ps20b_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_LIGHTS = false;
 #endif // _DEBUG
 		m_nNUM_LIGHTS = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bAMBIENT_LIGHT = false;
 #endif // _DEBUG
 		m_nAMBIENT_LIGHT = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHTSHADOWS = false;
 #endif // _DEBUG
 		m_nFLASHLIGHTSHADOWS = 0;
@@ -402,7 +402,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bNUM_LIGHTS && m_bAMBIENT_LIGHT && m_bFLASHLIGHTSHADOWS;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

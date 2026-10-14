@@ -46,7 +46,7 @@ class skin_ps30_Static_Index
 	unsigned int m_nFLASHLIGHTDEPTHFILTERMODE : 2;
 	unsigned int m_nFASTPATH_NOBUMP : 2;
 	unsigned int m_nBLENDTINTBYBASEALPHA : 2;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCONVERT_TO_SRGB : 1;
 	bool m_bCUBEMAP : 1;
 	bool m_bSELFILLUM : 1;
@@ -67,7 +67,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 0 );
 		m_nCONVERT_TO_SRGB = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
 #endif	// _DEBUG
 	}
@@ -76,7 +76,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCUBEMAP = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCUBEMAP = true;
 #endif	// _DEBUG
 	}
@@ -85,7 +85,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSELFILLUM = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSELFILLUM = true;
 #endif	// _DEBUG
 	}
@@ -94,7 +94,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSELFILLUMFRESNEL = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSELFILLUMFRESNEL = true;
 #endif	// _DEBUG
 	}
@@ -103,7 +103,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFLASHLIGHT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHT = true;
 #endif	// _DEBUG
 	}
@@ -112,7 +112,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nLIGHTWARPTEXTURE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTWARPTEXTURE = true;
 #endif	// _DEBUG
 	}
@@ -121,7 +121,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nPHONGWARPTEXTURE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPHONGWARPTEXTURE = true;
 #endif	// _DEBUG
 	}
@@ -130,7 +130,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nWRINKLEMAP = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bWRINKLEMAP = true;
 #endif	// _DEBUG
 	}
@@ -139,7 +139,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 6 );
 		m_nDETAIL_BLEND_MODE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDETAIL_BLEND_MODE = true;
 #endif	// _DEBUG
 	}
@@ -148,7 +148,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDETAILTEXTURE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDETAILTEXTURE = true;
 #endif	// _DEBUG
 	}
@@ -157,7 +157,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nRIMLIGHT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bRIMLIGHT = true;
 #endif	// _DEBUG
 	}
@@ -166,7 +166,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nFLASHLIGHTDEPTHFILTERMODE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = true;
 #endif	// _DEBUG
 	}
@@ -175,7 +175,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFASTPATH_NOBUMP = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFASTPATH_NOBUMP = true;
 #endif	// _DEBUG
 	}
@@ -184,7 +184,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBLENDTINTBYBASEALPHA = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBLENDTINTBYBASEALPHA = true;
 #endif	// _DEBUG
 	}
@@ -205,7 +205,7 @@ public:
 		m_nFLASHLIGHTDEPTHFILTERMODE = 0;
 		m_nFASTPATH_NOBUMP = 0;
 		m_nBLENDTINTBYBASEALPHA = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = false;
 		m_bCUBEMAP = false;
 		m_bSELFILLUM = false;
@@ -240,7 +240,7 @@ class skin_ps30_Dynamic_Index
 	unsigned int m_nNUM_LIGHTS : 3;
 	unsigned int m_nWRITE_DEPTH_TO_DESTALPHA : 2;
 	unsigned int m_nFLASHLIGHTSHADOWS : 2;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bWRITEWATERFOGTODESTALPHA : 1;
 	bool m_bPIXELFOGTYPE : 1;
 	bool m_bNUM_LIGHTS : 1;
@@ -252,7 +252,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nWRITEWATERFOGTODESTALPHA = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = true;
 #endif	// _DEBUG
 	}
@@ -261,7 +261,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nPIXELFOGTYPE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = true;
 #endif	// _DEBUG
 	}
@@ -270,7 +270,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 4 );
 		m_nNUM_LIGHTS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_LIGHTS = true;
 #endif	// _DEBUG
 	}
@@ -279,7 +279,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nWRITE_DEPTH_TO_DESTALPHA = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bWRITE_DEPTH_TO_DESTALPHA = true;
 #endif	// _DEBUG
 	}
@@ -288,7 +288,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFLASHLIGHTSHADOWS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHTSHADOWS = true;
 #endif	// _DEBUG
 	}
@@ -300,7 +300,7 @@ public:
 		m_nNUM_LIGHTS = 0;
 		m_nWRITE_DEPTH_TO_DESTALPHA = 0;
 		m_nFLASHLIGHTSHADOWS = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = false;
 		m_bPIXELFOGTYPE = false;
 		m_bNUM_LIGHTS = false;

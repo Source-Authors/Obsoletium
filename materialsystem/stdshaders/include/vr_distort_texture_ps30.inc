@@ -9,7 +9,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}
@@ -19,7 +19,7 @@ class vr_distort_texture_ps30_Dynamic_Index
 {
 private:
 	int m_nCMBO_USERENDERTARGET;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCMBO_USERENDERTARGET;
 #endif
 public:
@@ -27,21 +27,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCMBO_USERENDERTARGET = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCMBO_USERENDERTARGET = true;
 #endif
 	}
 	void SetCMBO_USERENDERTARGET( bool i )
 	{
 		m_nCMBO_USERENDERTARGET = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCMBO_USERENDERTARGET = true;
 #endif
 	}
 public:
 	vr_distort_texture_ps30_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCMBO_USERENDERTARGET = false;
 #endif // _DEBUG
 		m_nCMBO_USERENDERTARGET = 0;
@@ -50,7 +50,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bCMBO_USERENDERTARGET;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

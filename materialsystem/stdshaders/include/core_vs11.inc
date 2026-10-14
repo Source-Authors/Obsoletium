@@ -9,7 +9,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}
@@ -19,7 +19,7 @@ class core_vs11_Dynamic_Index
 {
 private:
 	int m_nSKINNING;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bSKINNING;
 #endif
 public:
@@ -27,21 +27,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSKINNING = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = true;
 #endif
 	}
 	void SetSKINNING( bool i )
 	{
 		m_nSKINNING = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = true;
 #endif
 	}
 public:
 	core_vs11_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = false;
 #endif // _DEBUG
 		m_nSKINNING = 0;
@@ -50,7 +50,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bSKINNING;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

@@ -29,7 +29,7 @@ class vertexlit_and_unlit_generic_ps20b_Static_Index
 	unsigned int m_nBLENDTINTBYBASEALPHA : 2;
 	unsigned int m_nSRGB_INPUT_ADAPTER : 2;
 	unsigned int m_nCUBEMAP_SPHERE_LEGACY : 2;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDETAILTEXTURE : 1;
 	bool m_bCUBEMAP : 1;
 	bool m_bDIFFUSELIGHTING : 1;
@@ -58,7 +58,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDETAILTEXTURE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDETAILTEXTURE = true;
 #endif	// _DEBUG
 	}
@@ -67,7 +67,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCUBEMAP = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCUBEMAP = true;
 #endif	// _DEBUG
 	}
@@ -76,7 +76,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDIFFUSELIGHTING = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDIFFUSELIGHTING = true;
 #endif	// _DEBUG
 	}
@@ -85,7 +85,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nENVMAPMASK = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bENVMAPMASK = true;
 #endif	// _DEBUG
 	}
@@ -94,7 +94,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBASEALPHAENVMAPMASK = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBASEALPHAENVMAPMASK = true;
 #endif	// _DEBUG
 	}
@@ -103,7 +103,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSELFILLUM = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSELFILLUM = true;
 #endif	// _DEBUG
 	}
@@ -112,7 +112,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nVERTEXCOLOR = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEXCOLOR = true;
 #endif	// _DEBUG
 	}
@@ -121,7 +121,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFLASHLIGHT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHT = true;
 #endif	// _DEBUG
 	}
@@ -130,7 +130,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSELFILLUM_ENVMAPMASK_ALPHA = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSELFILLUM_ENVMAPMASK_ALPHA = true;
 #endif	// _DEBUG
 	}
@@ -139,7 +139,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 9 );
 		m_nDETAIL_BLEND_MODE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDETAIL_BLEND_MODE = true;
 #endif	// _DEBUG
 	}
@@ -148,7 +148,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSEAMLESS_BASE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSEAMLESS_BASE = true;
 #endif	// _DEBUG
 	}
@@ -157,7 +157,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSEAMLESS_DETAIL = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSEAMLESS_DETAIL = true;
 #endif	// _DEBUG
 	}
@@ -166,7 +166,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDISTANCEALPHA = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDISTANCEALPHA = true;
 #endif	// _DEBUG
 	}
@@ -175,7 +175,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDISTANCEALPHAFROMDETAIL = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDISTANCEALPHAFROMDETAIL = true;
 #endif	// _DEBUG
 	}
@@ -184,7 +184,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSOFT_MASK = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSOFT_MASK = true;
 #endif	// _DEBUG
 	}
@@ -193,7 +193,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nOUTLINE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bOUTLINE = true;
 #endif	// _DEBUG
 	}
@@ -202,7 +202,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nOUTER_GLOW = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bOUTER_GLOW = true;
 #endif	// _DEBUG
 	}
@@ -211,7 +211,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nFLASHLIGHTDEPTHFILTERMODE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = true;
 #endif	// _DEBUG
 	}
@@ -220,7 +220,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDEPTHBLEND = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDEPTHBLEND = true;
 #endif	// _DEBUG
 	}
@@ -229,7 +229,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBLENDTINTBYBASEALPHA = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBLENDTINTBYBASEALPHA = true;
 #endif	// _DEBUG
 	}
@@ -238,7 +238,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSRGB_INPUT_ADAPTER = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSRGB_INPUT_ADAPTER = true;
 #endif	// _DEBUG
 	}
@@ -247,7 +247,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCUBEMAP_SPHERE_LEGACY = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCUBEMAP_SPHERE_LEGACY = true;
 #endif	// _DEBUG
 	}
@@ -276,7 +276,7 @@ public:
 		m_nBLENDTINTBYBASEALPHA = 0;
 		m_nSRGB_INPUT_ADAPTER = 0;
 		m_nCUBEMAP_SPHERE_LEGACY = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDETAILTEXTURE = false;
 		m_bCUBEMAP = false;
 		m_bDIFFUSELIGHTING = false;
@@ -316,7 +316,7 @@ class vertexlit_and_unlit_generic_ps20b_Dynamic_Index
 {
 	unsigned int m_nLIGHTING_PREVIEW : 2;
 	unsigned int m_nFLASHLIGHTSHADOWS : 2;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bLIGHTING_PREVIEW : 1;
 	bool m_bFLASHLIGHTSHADOWS : 1;
 #endif	// _DEBUG
@@ -325,7 +325,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nLIGHTING_PREVIEW = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTING_PREVIEW = true;
 #endif	// _DEBUG
 	}
@@ -334,7 +334,7 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFLASHLIGHTSHADOWS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHTSHADOWS = true;
 #endif	// _DEBUG
 	}
@@ -343,7 +343,7 @@ public:
 	{
 		m_nLIGHTING_PREVIEW = 0;
 		m_nFLASHLIGHTSHADOWS = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTING_PREVIEW = false;
 		m_bFLASHLIGHTSHADOWS = false;
 #endif	// _DEBUG

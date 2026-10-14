@@ -3,7 +3,7 @@ class pyro_vision_ps20_Static_Index
 {
 private:
 	int m_nEFFECT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bEFFECT;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 3 );
 		m_nEFFECT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bEFFECT = true;
 #endif
 	}
 	void SetEFFECT( bool i )
 	{
 		m_nEFFECT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bEFFECT = true;
 #endif
 	}
 private:
 	int m_nVERTEX_LIT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bVERTEX_LIT;
 #endif
 public:
@@ -32,20 +32,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nVERTEX_LIT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEX_LIT = true;
 #endif
 	}
 	void SetVERTEX_LIT( bool i )
 	{
 		m_nVERTEX_LIT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEX_LIT = true;
 #endif
 	}
 private:
 	int m_nBASETEXTURE2;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bBASETEXTURE2;
 #endif
 public:
@@ -53,20 +53,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBASETEXTURE2 = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBASETEXTURE2 = true;
 #endif
 	}
 	void SetBASETEXTURE2( bool i )
 	{
 		m_nBASETEXTURE2 = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBASETEXTURE2 = true;
 #endif
 	}
 private:
 	int m_nFANCY_BLENDING;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bFANCY_BLENDING;
 #endif
 public:
@@ -74,20 +74,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFANCY_BLENDING = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFANCY_BLENDING = true;
 #endif
 	}
 	void SetFANCY_BLENDING( bool i )
 	{
 		m_nFANCY_BLENDING = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFANCY_BLENDING = true;
 #endif
 	}
 private:
 	int m_nSELFILLUM;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bSELFILLUM;
 #endif
 public:
@@ -95,20 +95,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSELFILLUM = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSELFILLUM = true;
 #endif
 	}
 	void SetSELFILLUM( bool i )
 	{
 		m_nSELFILLUM = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSELFILLUM = true;
 #endif
 	}
 private:
 	int m_nCOLOR_BAR;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCOLOR_BAR;
 #endif
 public:
@@ -116,20 +116,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCOLOR_BAR = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOLOR_BAR = true;
 #endif
 	}
 	void SetCOLOR_BAR( bool i )
 	{
 		m_nCOLOR_BAR = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOLOR_BAR = true;
 #endif
 	}
 private:
 	int m_nSTRIPES;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bSTRIPES;
 #endif
 public:
@@ -137,20 +137,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSTRIPES = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSTRIPES = true;
 #endif
 	}
 	void SetSTRIPES( bool i )
 	{
 		m_nSTRIPES = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSTRIPES = true;
 #endif
 	}
 private:
 	int m_nSTRIPES_USE_NORMAL2;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bSTRIPES_USE_NORMAL2;
 #endif
 public:
@@ -158,49 +158,49 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSTRIPES_USE_NORMAL2 = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSTRIPES_USE_NORMAL2 = true;
 #endif
 	}
 	void SetSTRIPES_USE_NORMAL2( bool i )
 	{
 		m_nSTRIPES_USE_NORMAL2 = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSTRIPES_USE_NORMAL2 = true;
 #endif
 	}
 public:
 	pyro_vision_ps20_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bEFFECT = false;
 #endif // _DEBUG
 		m_nEFFECT = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEX_LIT = false;
 #endif // _DEBUG
 		m_nVERTEX_LIT = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBASETEXTURE2 = false;
 #endif // _DEBUG
 		m_nBASETEXTURE2 = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFANCY_BLENDING = false;
 #endif // _DEBUG
 		m_nFANCY_BLENDING = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSELFILLUM = false;
 #endif // _DEBUG
 		m_nSELFILLUM = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOLOR_BAR = false;
 #endif // _DEBUG
 		m_nCOLOR_BAR = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSTRIPES = false;
 #endif // _DEBUG
 		m_nSTRIPES = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSTRIPES_USE_NORMAL2 = false;
 #endif // _DEBUG
 		m_nSTRIPES_USE_NORMAL2 = 0;
@@ -209,7 +209,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bEFFECT && m_bVERTEX_LIT && m_bBASETEXTURE2 && m_bFANCY_BLENDING && m_bSELFILLUM && m_bCOLOR_BAR && m_bSTRIPES && m_bSTRIPES_USE_NORMAL2;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -221,7 +221,7 @@ class pyro_vision_ps20_Dynamic_Index
 {
 private:
 	int m_nPIXELFOGTYPE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bPIXELFOGTYPE;
 #endif
 public:
@@ -229,20 +229,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nPIXELFOGTYPE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = true;
 #endif
 	}
 	void SetPIXELFOGTYPE( bool i )
 	{
 		m_nPIXELFOGTYPE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = true;
 #endif
 	}
 private:
 	int m_nVISUALIZE_DOF;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bVISUALIZE_DOF;
 #endif
 public:
@@ -250,20 +250,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nVISUALIZE_DOF = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVISUALIZE_DOF = true;
 #endif
 	}
 	void SetVISUALIZE_DOF( bool i )
 	{
 		m_nVISUALIZE_DOF = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVISUALIZE_DOF = true;
 #endif
 	}
 private:
 	int m_nHEATHAZE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHEATHAZE;
 #endif
 public:
@@ -271,29 +271,29 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHEATHAZE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHEATHAZE = true;
 #endif
 	}
 	void SetHEATHAZE( bool i )
 	{
 		m_nHEATHAZE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHEATHAZE = true;
 #endif
 	}
 public:
 	pyro_vision_ps20_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
 #endif // _DEBUG
 		m_nPIXELFOGTYPE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVISUALIZE_DOF = false;
 #endif // _DEBUG
 		m_nVISUALIZE_DOF = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHEATHAZE = false;
 #endif // _DEBUG
 		m_nHEATHAZE = 0;
@@ -302,7 +302,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE && m_bVISUALIZE_DOF && m_bHEATHAZE;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

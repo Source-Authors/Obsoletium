@@ -2,7 +2,7 @@ class teeth_Static_Index
 {
 private:
 	int m_nINTRO;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bINTRO;
 #endif
 public:
@@ -10,20 +10,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nINTRO = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bINTRO = true;
 #endif
 	}
 	void SetINTRO( bool i )
 	{
 		m_nINTRO = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bINTRO = true;
 #endif
 	}
 private:
 	int m_nHALF_LAMBERT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHALF_LAMBERT;
 #endif
 public:
@@ -31,25 +31,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHALF_LAMBERT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALF_LAMBERT = true;
 #endif
 	}
 	void SetHALF_LAMBERT( bool i )
 	{
 		m_nHALF_LAMBERT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALF_LAMBERT = true;
 #endif
 	}
 public:
 	teeth_Static_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bINTRO = false;
 #endif // _DEBUG
 		m_nINTRO = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALF_LAMBERT = false;
 #endif // _DEBUG
 		m_nHALF_LAMBERT = 0;
@@ -58,7 +58,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bINTRO && m_bHALF_LAMBERT;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -69,7 +69,7 @@ class teeth_Dynamic_Index
 {
 private:
 	int m_nDOWATERFOG;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDOWATERFOG;
 #endif
 public:
@@ -77,20 +77,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDOWATERFOG = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = true;
 #endif
 	}
 	void SetDOWATERFOG( bool i )
 	{
 		m_nDOWATERFOG = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = true;
 #endif
 	}
 private:
 	int m_nLIGHT_COMBO;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bLIGHT_COMBO;
 #endif
 public:
@@ -98,20 +98,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 21 );
 		m_nLIGHT_COMBO = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHT_COMBO = true;
 #endif
 	}
 	void SetLIGHT_COMBO( bool i )
 	{
 		m_nLIGHT_COMBO = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHT_COMBO = true;
 #endif
 	}
 private:
 	int m_nSKINNING;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bSKINNING;
 #endif
 public:
@@ -119,29 +119,29 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSKINNING = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = true;
 #endif
 	}
 	void SetSKINNING( bool i )
 	{
 		m_nSKINNING = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = true;
 #endif
 	}
 public:
 	teeth_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = false;
 #endif // _DEBUG
 		m_nDOWATERFOG = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHT_COMBO = false;
 #endif // _DEBUG
 		m_nLIGHT_COMBO = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = false;
 #endif // _DEBUG
 		m_nSKINNING = 0;
@@ -150,7 +150,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bDOWATERFOG && m_bLIGHT_COMBO && m_bSKINNING;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

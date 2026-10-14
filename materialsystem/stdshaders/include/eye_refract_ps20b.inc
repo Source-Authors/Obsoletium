@@ -3,7 +3,7 @@ class eye_refract_ps20b_Static_Index
 {
 private:
 	int m_nFLASHLIGHT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bFLASHLIGHT;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFLASHLIGHT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHT = true;
 #endif
 	}
 	void SetFLASHLIGHT( bool i )
 	{
 		m_nFLASHLIGHT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHT = true;
 #endif
 	}
 private:
 	int m_nLIGHTWARPTEXTURE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bLIGHTWARPTEXTURE;
 #endif
 public:
@@ -32,20 +32,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nLIGHTWARPTEXTURE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTWARPTEXTURE = true;
 #endif
 	}
 	void SetLIGHTWARPTEXTURE( bool i )
 	{
 		m_nLIGHTWARPTEXTURE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTWARPTEXTURE = true;
 #endif
 	}
 private:
 	int m_nSPHERETEXKILLCOMBO;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bSPHERETEXKILLCOMBO;
 #endif
 public:
@@ -53,20 +53,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSPHERETEXKILLCOMBO = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSPHERETEXKILLCOMBO = true;
 #endif
 	}
 	void SetSPHERETEXKILLCOMBO( bool i )
 	{
 		m_nSPHERETEXKILLCOMBO = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSPHERETEXKILLCOMBO = true;
 #endif
 	}
 private:
 	int m_nRAYTRACESPHERE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bRAYTRACESPHERE;
 #endif
 public:
@@ -74,20 +74,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nRAYTRACESPHERE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bRAYTRACESPHERE = true;
 #endif
 	}
 	void SetRAYTRACESPHERE( bool i )
 	{
 		m_nRAYTRACESPHERE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bRAYTRACESPHERE = true;
 #endif
 	}
 private:
 	int m_nFLASHLIGHTDEPTHFILTERMODE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bFLASHLIGHTDEPTHFILTERMODE;
 #endif
 public:
@@ -95,37 +95,37 @@ public:
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nFLASHLIGHTDEPTHFILTERMODE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = true;
 #endif
 	}
 	void SetFLASHLIGHTDEPTHFILTERMODE( bool i )
 	{
 		m_nFLASHLIGHTDEPTHFILTERMODE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = true;
 #endif
 	}
 public:
 	eye_refract_ps20b_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHT = false;
 #endif // _DEBUG
 		m_nFLASHLIGHT = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTWARPTEXTURE = false;
 #endif // _DEBUG
 		m_nLIGHTWARPTEXTURE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSPHERETEXKILLCOMBO = false;
 #endif // _DEBUG
 		m_nSPHERETEXKILLCOMBO = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bRAYTRACESPHERE = false;
 #endif // _DEBUG
 		m_nRAYTRACESPHERE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = false;
 #endif // _DEBUG
 		m_nFLASHLIGHTDEPTHFILTERMODE = 0;
@@ -134,7 +134,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bFLASHLIGHT && m_bLIGHTWARPTEXTURE && m_bSPHERETEXKILLCOMBO && m_bRAYTRACESPHERE && m_bFLASHLIGHTDEPTHFILTERMODE;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -146,7 +146,7 @@ class eye_refract_ps20b_Dynamic_Index
 {
 private:
 	int m_nNUM_LIGHTS;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bNUM_LIGHTS;
 #endif
 public:
@@ -154,20 +154,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 4 );
 		m_nNUM_LIGHTS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_LIGHTS = true;
 #endif
 	}
 	void SetNUM_LIGHTS( bool i )
 	{
 		m_nNUM_LIGHTS = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_LIGHTS = true;
 #endif
 	}
 private:
 	int m_nFLASHLIGHTSHADOWS;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bFLASHLIGHTSHADOWS;
 #endif
 public:
@@ -175,25 +175,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFLASHLIGHTSHADOWS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHTSHADOWS = true;
 #endif
 	}
 	void SetFLASHLIGHTSHADOWS( bool i )
 	{
 		m_nFLASHLIGHTSHADOWS = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHTSHADOWS = true;
 #endif
 	}
 public:
 	eye_refract_ps20b_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_LIGHTS = false;
 #endif // _DEBUG
 		m_nNUM_LIGHTS = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFLASHLIGHTSHADOWS = false;
 #endif // _DEBUG
 		m_nFLASHLIGHTSHADOWS = 0;
@@ -202,7 +202,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bNUM_LIGHTS && m_bFLASHLIGHTSHADOWS;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

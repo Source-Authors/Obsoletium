@@ -3,7 +3,7 @@ class portalstaticoverlay_ps20_Static_Index
 {
 private:
 	int m_nHASALPHAMASK;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHASALPHAMASK;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHASALPHAMASK = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHASALPHAMASK = true;
 #endif
 	}
 	void SetHASALPHAMASK( bool i )
 	{
 		m_nHASALPHAMASK = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHASALPHAMASK = true;
 #endif
 	}
 private:
 	int m_nHASSTATICTEXTURE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHASSTATICTEXTURE;
 #endif
 public:
@@ -32,25 +32,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHASSTATICTEXTURE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHASSTATICTEXTURE = true;
 #endif
 	}
 	void SetHASSTATICTEXTURE( bool i )
 	{
 		m_nHASSTATICTEXTURE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHASSTATICTEXTURE = true;
 #endif
 	}
 public:
 	portalstaticoverlay_ps20_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHASALPHAMASK = false;
 #endif // _DEBUG
 		m_nHASALPHAMASK = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHASSTATICTEXTURE = false;
 #endif // _DEBUG
 		m_nHASSTATICTEXTURE = 0;
@@ -59,7 +59,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bHASALPHAMASK && m_bHASSTATICTEXTURE;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -71,7 +71,7 @@ class portalstaticoverlay_ps20_Dynamic_Index
 {
 private:
 	int m_nHDRENABLED;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHDRENABLED;
 #endif
 public:
@@ -79,20 +79,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHDRENABLED = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRENABLED = true;
 #endif
 	}
 	void SetHDRENABLED( bool i )
 	{
 		m_nHDRENABLED = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRENABLED = true;
 #endif
 	}
 private:
 	int m_nPIXELFOGTYPE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bPIXELFOGTYPE;
 #endif
 public:
@@ -100,25 +100,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nPIXELFOGTYPE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = true;
 #endif
 	}
 	void SetPIXELFOGTYPE( bool i )
 	{
 		m_nPIXELFOGTYPE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = true;
 #endif
 	}
 public:
 	portalstaticoverlay_ps20_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRENABLED = false;
 #endif // _DEBUG
 		m_nHDRENABLED = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
 #endif // _DEBUG
 		m_nPIXELFOGTYPE = 0;
@@ -127,7 +127,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bHDRENABLED && m_bPIXELFOGTYPE;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

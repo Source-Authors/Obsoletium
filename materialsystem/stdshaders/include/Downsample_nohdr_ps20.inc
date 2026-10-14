@@ -3,7 +3,7 @@ class downsample_nohdr_ps20_Static_Index
 {
 private:
 	int m_nCSTRIKE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCSTRIKE;
 #endif
 public:
@@ -11,21 +11,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCSTRIKE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCSTRIKE = true;
 #endif
 	}
 	void SetCSTRIKE( bool i )
 	{
 		m_nCSTRIKE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCSTRIKE = true;
 #endif
 	}
 public:
 	downsample_nohdr_ps20_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCSTRIKE = false;
 #endif // _DEBUG
 		m_nCSTRIKE = 0;
@@ -34,7 +34,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCSTRIKE;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -52,7 +52,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}

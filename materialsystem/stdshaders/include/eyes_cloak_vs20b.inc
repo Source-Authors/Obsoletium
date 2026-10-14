@@ -3,7 +3,7 @@ class eyes_cloak_vs20b_Static_Index
 {
 private:
 	int m_nINTRO;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bINTRO;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nINTRO = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bINTRO = true;
 #endif
 	}
 	void SetINTRO( bool i )
 	{
 		m_nINTRO = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bINTRO = true;
 #endif
 	}
 private:
 	int m_nHALFLAMBERT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHALFLAMBERT;
 #endif
 public:
@@ -32,25 +32,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHALFLAMBERT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = true;
 #endif
 	}
 	void SetHALFLAMBERT( bool i )
 	{
 		m_nHALFLAMBERT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = true;
 #endif
 	}
 public:
 	eyes_cloak_vs20b_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bINTRO = false;
 #endif // _DEBUG
 		m_nINTRO = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = false;
 #endif // _DEBUG
 		m_nHALFLAMBERT = 0;
@@ -59,7 +59,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bINTRO && m_bHALFLAMBERT;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -71,7 +71,7 @@ class eyes_cloak_vs20b_Dynamic_Index
 {
 private:
 	int m_nNUM_BONES;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bNUM_BONES;
 #endif
 public:
@@ -79,20 +79,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 3 );
 		m_nNUM_BONES = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_BONES = true;
 #endif
 	}
 	void SetNUM_BONES( bool i )
 	{
 		m_nNUM_BONES = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_BONES = true;
 #endif
 	}
 private:
 	int m_nDOWATERFOG;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDOWATERFOG;
 #endif
 public:
@@ -100,20 +100,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDOWATERFOG = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = true;
 #endif
 	}
 	void SetDOWATERFOG( bool i )
 	{
 		m_nDOWATERFOG = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = true;
 #endif
 	}
 private:
 	int m_nDYNAMIC_LIGHT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDYNAMIC_LIGHT;
 #endif
 public:
@@ -121,20 +121,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDYNAMIC_LIGHT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDYNAMIC_LIGHT = true;
 #endif
 	}
 	void SetDYNAMIC_LIGHT( bool i )
 	{
 		m_nDYNAMIC_LIGHT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDYNAMIC_LIGHT = true;
 #endif
 	}
 private:
 	int m_nSTATIC_LIGHT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bSTATIC_LIGHT;
 #endif
 public:
@@ -142,33 +142,33 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSTATIC_LIGHT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSTATIC_LIGHT = true;
 #endif
 	}
 	void SetSTATIC_LIGHT( bool i )
 	{
 		m_nSTATIC_LIGHT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSTATIC_LIGHT = true;
 #endif
 	}
 public:
 	eyes_cloak_vs20b_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_BONES = false;
 #endif // _DEBUG
 		m_nNUM_BONES = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = false;
 #endif // _DEBUG
 		m_nDOWATERFOG = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDYNAMIC_LIGHT = false;
 #endif // _DEBUG
 		m_nDYNAMIC_LIGHT = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSTATIC_LIGHT = false;
 #endif // _DEBUG
 		m_nSTATIC_LIGHT = 0;
@@ -177,7 +177,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bNUM_BONES && m_bDOWATERFOG && m_bDYNAMIC_LIGHT && m_bSTATIC_LIGHT;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

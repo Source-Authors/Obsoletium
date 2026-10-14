@@ -3,7 +3,7 @@ class showz_ps20b_Static_Index
 {
 private:
 	int m_nDEPTH_IN_ALPHA;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDEPTH_IN_ALPHA;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDEPTH_IN_ALPHA = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDEPTH_IN_ALPHA = true;
 #endif
 	}
 	void SetDEPTH_IN_ALPHA( bool i )
 	{
 		m_nDEPTH_IN_ALPHA = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDEPTH_IN_ALPHA = true;
 #endif
 	}
 private:
 	int m_nCONVERT_TO_SRGB;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCONVERT_TO_SRGB;
 #endif
 public:
@@ -32,25 +32,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCONVERT_TO_SRGB = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
 #endif
 	}
 	void SetCONVERT_TO_SRGB( bool i )
 	{
 		m_nCONVERT_TO_SRGB = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
 #endif
 	}
 public:
 	showz_ps20b_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDEPTH_IN_ALPHA = false;
 #endif // _DEBUG
 		m_nDEPTH_IN_ALPHA = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
 #endif // _DEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
@@ -59,7 +59,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bDEPTH_IN_ALPHA && m_bCONVERT_TO_SRGB;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -77,7 +77,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}

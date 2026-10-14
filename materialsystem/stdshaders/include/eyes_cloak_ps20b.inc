@@ -3,7 +3,7 @@ class eyes_cloak_ps20b_Static_Index
 {
 private:
 	int m_nCONVERT_TO_SRGB;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCONVERT_TO_SRGB;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCONVERT_TO_SRGB = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
 #endif
 	}
 	void SetCONVERT_TO_SRGB( bool i )
 	{
 		m_nCONVERT_TO_SRGB = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
 #endif
 	}
 private:
 	int m_nHDRTYPE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHDRTYPE;
 #endif
 public:
@@ -32,20 +32,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nHDRTYPE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRTYPE = true;
 #endif
 	}
 	void SetHDRTYPE( bool i )
 	{
 		m_nHDRTYPE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRTYPE = true;
 #endif
 	}
 private:
 	int m_nBLUR;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bBLUR;
 #endif
 public:
@@ -53,20 +53,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBLUR = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBLUR = true;
 #endif
 	}
 	void SetBLUR( bool i )
 	{
 		m_nBLUR = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBLUR = true;
 #endif
 	}
 private:
 	int m_nFADEOUTONSILHOUETTE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bFADEOUTONSILHOUETTE;
 #endif
 public:
@@ -74,20 +74,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFADEOUTONSILHOUETTE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFADEOUTONSILHOUETTE = true;
 #endif
 	}
 	void SetFADEOUTONSILHOUETTE( bool i )
 	{
 		m_nFADEOUTONSILHOUETTE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFADEOUTONSILHOUETTE = true;
 #endif
 	}
 private:
 	int m_nCUBEMAP;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCUBEMAP;
 #endif
 public:
@@ -95,20 +95,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCUBEMAP = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCUBEMAP = true;
 #endif
 	}
 	void SetCUBEMAP( bool i )
 	{
 		m_nCUBEMAP = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCUBEMAP = true;
 #endif
 	}
 private:
 	int m_nREFRACTTINTTEXTURE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bREFRACTTINTTEXTURE;
 #endif
 public:
@@ -116,20 +116,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nREFRACTTINTTEXTURE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bREFRACTTINTTEXTURE = true;
 #endif
 	}
 	void SetREFRACTTINTTEXTURE( bool i )
 	{
 		m_nREFRACTTINTTEXTURE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bREFRACTTINTTEXTURE = true;
 #endif
 	}
 private:
 	int m_nMASKED;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bMASKED;
 #endif
 public:
@@ -137,45 +137,45 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nMASKED = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bMASKED = true;
 #endif
 	}
 	void SetMASKED( bool i )
 	{
 		m_nMASKED = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bMASKED = true;
 #endif
 	}
 public:
 	eyes_cloak_ps20b_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
 #endif // _DEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRTYPE = false;
 #endif // _DEBUG
 		m_nHDRTYPE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bBLUR = false;
 #endif // _DEBUG
 		m_nBLUR = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bFADEOUTONSILHOUETTE = false;
 #endif // _DEBUG
 		m_nFADEOUTONSILHOUETTE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCUBEMAP = false;
 #endif // _DEBUG
 		m_nCUBEMAP = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bREFRACTTINTTEXTURE = false;
 #endif // _DEBUG
 		m_nREFRACTTINTTEXTURE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bMASKED = false;
 #endif // _DEBUG
 		m_nMASKED = 0;
@@ -184,7 +184,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bHDRTYPE && m_bBLUR && m_bFADEOUTONSILHOUETTE && m_bCUBEMAP && m_bREFRACTTINTTEXTURE && m_bMASKED;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -196,7 +196,7 @@ class eyes_cloak_ps20b_Dynamic_Index
 {
 private:
 	int m_nHDRENABLED;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHDRENABLED;
 #endif
 public:
@@ -204,20 +204,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHDRENABLED = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRENABLED = true;
 #endif
 	}
 	void SetHDRENABLED( bool i )
 	{
 		m_nHDRENABLED = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRENABLED = true;
 #endif
 	}
 private:
 	int m_nPIXELFOGTYPE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bPIXELFOGTYPE;
 #endif
 public:
@@ -225,25 +225,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nPIXELFOGTYPE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = true;
 #endif
 	}
 	void SetPIXELFOGTYPE( bool i )
 	{
 		m_nPIXELFOGTYPE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = true;
 #endif
 	}
 public:
 	eyes_cloak_ps20b_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHDRENABLED = false;
 #endif // _DEBUG
 		m_nHDRENABLED = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
 #endif // _DEBUG
 		m_nPIXELFOGTYPE = 0;
@@ -252,7 +252,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bHDRENABLED && m_bPIXELFOGTYPE;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

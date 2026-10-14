@@ -3,7 +3,7 @@ class refract_vs20_Static_Index
 {
 private:
 	int m_nMODEL;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bMODEL;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nMODEL = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bMODEL = true;
 #endif
 	}
 	void SetMODEL( bool i )
 	{
 		m_nMODEL = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bMODEL = true;
 #endif
 	}
 private:
 	int m_nCOLORMODULATE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCOLORMODULATE;
 #endif
 public:
@@ -32,25 +32,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCOLORMODULATE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOLORMODULATE = true;
 #endif
 	}
 	void SetCOLORMODULATE( bool i )
 	{
 		m_nCOLORMODULATE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOLORMODULATE = true;
 #endif
 	}
 public:
 	refract_vs20_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bMODEL = false;
 #endif // _DEBUG
 		m_nMODEL = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOLORMODULATE = false;
 #endif // _DEBUG
 		m_nCOLORMODULATE = 0;
@@ -59,7 +59,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bMODEL && m_bCOLORMODULATE;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -71,7 +71,7 @@ class refract_vs20_Dynamic_Index
 {
 private:
 	int m_nCOMPRESSED_VERTS;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCOMPRESSED_VERTS;
 #endif
 public:
@@ -79,20 +79,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCOMPRESSED_VERTS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOMPRESSED_VERTS = true;
 #endif
 	}
 	void SetCOMPRESSED_VERTS( bool i )
 	{
 		m_nCOMPRESSED_VERTS = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOMPRESSED_VERTS = true;
 #endif
 	}
 private:
 	int m_nSKINNING;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bSKINNING;
 #endif
 public:
@@ -100,25 +100,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSKINNING = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = true;
 #endif
 	}
 	void SetSKINNING( bool i )
 	{
 		m_nSKINNING = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = true;
 #endif
 	}
 public:
 	refract_vs20_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOMPRESSED_VERTS = false;
 #endif // _DEBUG
 		m_nCOMPRESSED_VERTS = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = false;
 #endif // _DEBUG
 		m_nSKINNING = 0;
@@ -127,7 +127,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bCOMPRESSED_VERTS && m_bSKINNING;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

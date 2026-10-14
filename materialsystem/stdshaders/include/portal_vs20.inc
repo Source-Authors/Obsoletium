@@ -3,7 +3,7 @@ class portal_vs20_Static_Index
 {
 private:
 	int m_nHASALPHAMASK;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHASALPHAMASK;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHASALPHAMASK = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHASALPHAMASK = true;
 #endif
 	}
 	void SetHASALPHAMASK( bool i )
 	{
 		m_nHASALPHAMASK = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHASALPHAMASK = true;
 #endif
 	}
 private:
 	int m_nHASSTATICTEXTURE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHASSTATICTEXTURE;
 #endif
 public:
@@ -32,20 +32,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHASSTATICTEXTURE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHASSTATICTEXTURE = true;
 #endif
 	}
 	void SetHASSTATICTEXTURE( bool i )
 	{
 		m_nHASSTATICTEXTURE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHASSTATICTEXTURE = true;
 #endif
 	}
 private:
 	int m_nUSEALTERNATEVIEW;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bUSEALTERNATEVIEW;
 #endif
 public:
@@ -53,29 +53,29 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nUSEALTERNATEVIEW = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bUSEALTERNATEVIEW = true;
 #endif
 	}
 	void SetUSEALTERNATEVIEW( bool i )
 	{
 		m_nUSEALTERNATEVIEW = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bUSEALTERNATEVIEW = true;
 #endif
 	}
 public:
 	portal_vs20_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHASALPHAMASK = false;
 #endif // _DEBUG
 		m_nHASALPHAMASK = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHASSTATICTEXTURE = false;
 #endif // _DEBUG
 		m_nHASSTATICTEXTURE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bUSEALTERNATEVIEW = false;
 #endif // _DEBUG
 		m_nUSEALTERNATEVIEW = 0;
@@ -84,7 +84,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bHASALPHAMASK && m_bHASSTATICTEXTURE && m_bUSEALTERNATEVIEW;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -96,7 +96,7 @@ class portal_vs20_Dynamic_Index
 {
 private:
 	int m_nSKINNING;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bSKINNING;
 #endif
 public:
@@ -104,20 +104,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSKINNING = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = true;
 #endif
 	}
 	void SetSKINNING( bool i )
 	{
 		m_nSKINNING = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = true;
 #endif
 	}
 private:
 	int m_nADDSTATIC;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bADDSTATIC;
 #endif
 public:
@@ -125,25 +125,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nADDSTATIC = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bADDSTATIC = true;
 #endif
 	}
 	void SetADDSTATIC( bool i )
 	{
 		m_nADDSTATIC = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bADDSTATIC = true;
 #endif
 	}
 public:
 	portal_vs20_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSKINNING = false;
 #endif // _DEBUG
 		m_nSKINNING = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bADDSTATIC = false;
 #endif // _DEBUG
 		m_nADDSTATIC = 0;
@@ -152,7 +152,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bSKINNING && m_bADDSTATIC;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

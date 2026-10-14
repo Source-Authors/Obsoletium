@@ -9,7 +9,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}
@@ -19,7 +19,7 @@ class vr_distort_hud_ps20b_Dynamic_Index
 {
 private:
 	int m_nCMBO_HUDUNDISTORT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCMBO_HUDUNDISTORT;
 #endif
 public:
@@ -27,21 +27,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCMBO_HUDUNDISTORT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCMBO_HUDUNDISTORT = true;
 #endif
 	}
 	void SetCMBO_HUDUNDISTORT( bool i )
 	{
 		m_nCMBO_HUDUNDISTORT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCMBO_HUDUNDISTORT = true;
 #endif
 	}
 public:
 	vr_distort_hud_ps20b_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCMBO_HUDUNDISTORT = false;
 #endif // _DEBUG
 		m_nCMBO_HUDUNDISTORT = 0;
@@ -50,7 +50,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bCMBO_HUDUNDISTORT;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

@@ -3,7 +3,7 @@ class morphaccumulate_ps30_Static_Index
 {
 private:
 	int m_nCONSTANTBASEDMORPH;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCONSTANTBASEDMORPH;
 #endif
 public:
@@ -11,21 +11,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCONSTANTBASEDMORPH = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONSTANTBASEDMORPH = true;
 #endif
 	}
 	void SetCONSTANTBASEDMORPH( bool i )
 	{
 		m_nCONSTANTBASEDMORPH = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONSTANTBASEDMORPH = true;
 #endif
 	}
 public:
 	morphaccumulate_ps30_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONSTANTBASEDMORPH = false;
 #endif // _DEBUG
 		m_nCONSTANTBASEDMORPH = 0;
@@ -34,7 +34,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCONSTANTBASEDMORPH;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -52,7 +52,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}

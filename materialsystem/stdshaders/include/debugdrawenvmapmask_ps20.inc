@@ -9,7 +9,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}
@@ -19,7 +19,7 @@ class debugdrawenvmapmask_ps20_Dynamic_Index
 {
 private:
 	int m_nSHOWALPHA;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bSHOWALPHA;
 #endif
 public:
@@ -27,21 +27,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSHOWALPHA = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSHOWALPHA = true;
 #endif
 	}
 	void SetSHOWALPHA( bool i )
 	{
 		m_nSHOWALPHA = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSHOWALPHA = true;
 #endif
 	}
 public:
 	debugdrawenvmapmask_ps20_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bSHOWALPHA = false;
 #endif // _DEBUG
 		m_nSHOWALPHA = 0;
@@ -50,7 +50,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bSHOWALPHA;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

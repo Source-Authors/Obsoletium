@@ -3,7 +3,7 @@ class spritecard_vs11_Static_Index
 {
 private:
 	int m_nZOOM_ANIMATE_SEQ2;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bZOOM_ANIMATE_SEQ2;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 0 );
 		m_nZOOM_ANIMATE_SEQ2 = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bZOOM_ANIMATE_SEQ2 = true;
 #endif
 	}
 	void SetZOOM_ANIMATE_SEQ2( bool i )
 	{
 		m_nZOOM_ANIMATE_SEQ2 = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bZOOM_ANIMATE_SEQ2 = true;
 #endif
 	}
 private:
 	int m_nDUALSEQUENCE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDUALSEQUENCE;
 #endif
 public:
@@ -32,20 +32,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 0 );
 		m_nDUALSEQUENCE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDUALSEQUENCE = true;
 #endif
 	}
 	void SetDUALSEQUENCE( bool i )
 	{
 		m_nDUALSEQUENCE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDUALSEQUENCE = true;
 #endif
 	}
 private:
 	int m_nEXTRACTGREENALPHA;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bEXTRACTGREENALPHA;
 #endif
 public:
@@ -53,29 +53,29 @@ public:
 	{
 		Assert( i >= 0 && i <= 0 );
 		m_nEXTRACTGREENALPHA = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bEXTRACTGREENALPHA = true;
 #endif
 	}
 	void SetEXTRACTGREENALPHA( bool i )
 	{
 		m_nEXTRACTGREENALPHA = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bEXTRACTGREENALPHA = true;
 #endif
 	}
 public:
 	spritecard_vs11_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bZOOM_ANIMATE_SEQ2 = false;
 #endif // _DEBUG
 		m_nZOOM_ANIMATE_SEQ2 = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDUALSEQUENCE = false;
 #endif // _DEBUG
 		m_nDUALSEQUENCE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bEXTRACTGREENALPHA = false;
 #endif // _DEBUG
 		m_nEXTRACTGREENALPHA = 0;
@@ -84,7 +84,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bZOOM_ANIMATE_SEQ2 && m_bDUALSEQUENCE && m_bEXTRACTGREENALPHA;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -96,7 +96,7 @@ class spritecard_vs11_Dynamic_Index
 {
 private:
 	int m_nORIENTATION;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bORIENTATION;
 #endif
 public:
@@ -104,21 +104,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nORIENTATION = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bORIENTATION = true;
 #endif
 	}
 	void SetORIENTATION( bool i )
 	{
 		m_nORIENTATION = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bORIENTATION = true;
 #endif
 	}
 public:
 	spritecard_vs11_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bORIENTATION = false;
 #endif // _DEBUG
 		m_nORIENTATION = 0;
@@ -127,7 +127,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bORIENTATION;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

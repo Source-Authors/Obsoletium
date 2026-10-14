@@ -2,7 +2,7 @@ class particlelit_generic_vs30_Static_Index
 {
 private:
 	int m_nHALFLAMBERT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHALFLAMBERT;
 #endif
 public:
@@ -10,21 +10,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHALFLAMBERT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = true;
 #endif
 	}
 	void SetHALFLAMBERT( bool i )
 	{
 		m_nHALFLAMBERT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = true;
 #endif
 	}
 public:
 	particlelit_generic_vs30_Static_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = false;
 #endif // _DEBUG
 		m_nHALFLAMBERT = 0;
@@ -33,7 +33,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bHALFLAMBERT;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -51,7 +51,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}

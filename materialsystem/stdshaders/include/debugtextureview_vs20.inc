@@ -9,7 +9,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}
@@ -19,7 +19,7 @@ class debugtextureview_vs20_Dynamic_Index
 {
 private:
 	int m_nCOMPRESSED_VERTS;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCOMPRESSED_VERTS;
 #endif
 public:
@@ -27,21 +27,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCOMPRESSED_VERTS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOMPRESSED_VERTS = true;
 #endif
 	}
 	void SetCOMPRESSED_VERTS( bool i )
 	{
 		m_nCOMPRESSED_VERTS = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOMPRESSED_VERTS = true;
 #endif
 	}
 public:
 	debugtextureview_vs20_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCOMPRESSED_VERTS = false;
 #endif // _DEBUG
 		m_nCOMPRESSED_VERTS = 0;
@@ -50,7 +50,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bCOMPRESSED_VERTS;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

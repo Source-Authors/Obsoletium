@@ -3,7 +3,7 @@ class vertexlit_lighting_only_ps20_Static_Index
 {
 private:
 	int m_nDIFFUSELIGHTING;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDIFFUSELIGHTING;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDIFFUSELIGHTING = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDIFFUSELIGHTING = true;
 #endif
 	}
 	void SetDIFFUSELIGHTING( bool i )
 	{
 		m_nDIFFUSELIGHTING = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDIFFUSELIGHTING = true;
 #endif
 	}
 private:
 	int m_nHALFLAMBERT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bHALFLAMBERT;
 #endif
 public:
@@ -32,25 +32,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nHALFLAMBERT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = true;
 #endif
 	}
 	void SetHALFLAMBERT( bool i )
 	{
 		m_nHALFLAMBERT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = true;
 #endif
 	}
 public:
 	vertexlit_lighting_only_ps20_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDIFFUSELIGHTING = false;
 #endif // _DEBUG
 		m_nDIFFUSELIGHTING = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bHALFLAMBERT = false;
 #endif // _DEBUG
 		m_nHALFLAMBERT = 0;
@@ -59,7 +59,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bDIFFUSELIGHTING && m_bHALFLAMBERT;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -71,7 +71,7 @@ class vertexlit_lighting_only_ps20_Dynamic_Index
 {
 private:
 	int m_nAMBIENT_LIGHT;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bAMBIENT_LIGHT;
 #endif
 public:
@@ -79,20 +79,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nAMBIENT_LIGHT = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bAMBIENT_LIGHT = true;
 #endif
 	}
 	void SetAMBIENT_LIGHT( bool i )
 	{
 		m_nAMBIENT_LIGHT = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bAMBIENT_LIGHT = true;
 #endif
 	}
 private:
 	int m_nNUM_LIGHTS;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bNUM_LIGHTS;
 #endif
 public:
@@ -100,25 +100,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nNUM_LIGHTS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_LIGHTS = true;
 #endif
 	}
 	void SetNUM_LIGHTS( bool i )
 	{
 		m_nNUM_LIGHTS = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_LIGHTS = true;
 #endif
 	}
 public:
 	vertexlit_lighting_only_ps20_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bAMBIENT_LIGHT = false;
 #endif // _DEBUG
 		m_nAMBIENT_LIGHT = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_LIGHTS = false;
 #endif // _DEBUG
 		m_nNUM_LIGHTS = 0;
@@ -127,7 +127,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bAMBIENT_LIGHT && m_bNUM_LIGHTS;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

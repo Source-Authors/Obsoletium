@@ -3,7 +3,7 @@ class particlesphere_ps20b_Static_Index
 {
 private:
 	int m_nCONVERT_TO_SRGB;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCONVERT_TO_SRGB;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCONVERT_TO_SRGB = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
 #endif
 	}
 	void SetCONVERT_TO_SRGB( bool i )
 	{
 		m_nCONVERT_TO_SRGB = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
 #endif
 	}
 private:
 	int m_nDEPTHBLEND;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDEPTHBLEND;
 #endif
 public:
@@ -32,25 +32,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDEPTHBLEND = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDEPTHBLEND = true;
 #endif
 	}
 	void SetDEPTHBLEND( bool i )
 	{
 		m_nDEPTHBLEND = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDEPTHBLEND = true;
 #endif
 	}
 public:
 	particlesphere_ps20b_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
 #endif // _DEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDEPTHBLEND = false;
 #endif // _DEBUG
 		m_nDEPTHBLEND = 0;
@@ -59,7 +59,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bDEPTHBLEND;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -71,7 +71,7 @@ class particlesphere_ps20b_Dynamic_Index
 {
 private:
 	int m_nPIXELFOGTYPE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bPIXELFOGTYPE;
 #endif
 public:
@@ -79,21 +79,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nPIXELFOGTYPE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = true;
 #endif
 	}
 	void SetPIXELFOGTYPE( bool i )
 	{
 		m_nPIXELFOGTYPE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = true;
 #endif
 	}
 public:
 	particlesphere_ps20b_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
 #endif // _DEBUG
 		m_nPIXELFOGTYPE = 0;
@@ -102,7 +102,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

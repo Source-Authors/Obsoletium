@@ -2,7 +2,7 @@ class lightmappedgeneric_vs11_Static_Index
 {
 private:
 	int m_nDETAIL;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDETAIL;
 #endif
 public:
@@ -10,20 +10,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDETAIL = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDETAIL = true;
 #endif
 	}
 	void SetDETAIL( bool i )
 	{
 		m_nDETAIL = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDETAIL = true;
 #endif
 	}
 private:
 	int m_nENVMAP;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bENVMAP;
 #endif
 public:
@@ -31,20 +31,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nENVMAP = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bENVMAP = true;
 #endif
 	}
 	void SetENVMAP( bool i )
 	{
 		m_nENVMAP = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bENVMAP = true;
 #endif
 	}
 private:
 	int m_nENVMAPCAMERASPACE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bENVMAPCAMERASPACE;
 #endif
 public:
@@ -56,7 +56,7 @@ public:
 	}
 private:
 	int m_nENVMAPSPHERE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bENVMAPSPHERE;
 #endif
 public:
@@ -64,20 +64,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nENVMAPSPHERE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bENVMAPSPHERE = true;
 #endif
 	}
 	void SetENVMAPSPHERE( bool i )
 	{
 		m_nENVMAPSPHERE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bENVMAPSPHERE = true;
 #endif
 	}
 private:
 	int m_nVERTEXCOLOR;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bVERTEXCOLOR;
 #endif
 public:
@@ -85,37 +85,37 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nVERTEXCOLOR = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEXCOLOR = true;
 #endif
 	}
 	void SetVERTEXCOLOR( bool i )
 	{
 		m_nVERTEXCOLOR = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEXCOLOR = true;
 #endif
 	}
 public:
 	lightmappedgeneric_vs11_Static_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDETAIL = false;
 #endif // _DEBUG
 		m_nDETAIL = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bENVMAP = false;
 #endif // _DEBUG
 		m_nENVMAP = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bENVMAPCAMERASPACE = true;
 #endif // _DEBUG
 		m_nENVMAPCAMERASPACE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bENVMAPSPHERE = false;
 #endif // _DEBUG
 		m_nENVMAPSPHERE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bVERTEXCOLOR = false;
 #endif // _DEBUG
 		m_nVERTEXCOLOR = 0;
@@ -124,7 +124,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bDETAIL && m_bENVMAP && m_bENVMAPCAMERASPACE && m_bENVMAPSPHERE && m_bVERTEXCOLOR;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -135,7 +135,7 @@ class lightmappedgeneric_vs11_Dynamic_Index
 {
 private:
 	int m_nDOWATERFOG;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bDOWATERFOG;
 #endif
 public:
@@ -143,21 +143,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDOWATERFOG = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = true;
 #endif
 	}
 	void SetDOWATERFOG( bool i )
 	{
 		m_nDOWATERFOG = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = true;
 #endif
 	}
 public:
 	lightmappedgeneric_vs11_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bDOWATERFOG = false;
 #endif // _DEBUG
 		m_nDOWATERFOG = 0;
@@ -166,7 +166,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bDOWATERFOG;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

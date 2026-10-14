@@ -3,7 +3,7 @@ class cloak_ps30_Static_Index
 {
 private:
 	int m_nCONVERT_TO_SRGB;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bCONVERT_TO_SRGB;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCONVERT_TO_SRGB = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
 #endif
 	}
 	void SetCONVERT_TO_SRGB( bool i )
 	{
 		m_nCONVERT_TO_SRGB = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
 #endif
 	}
 private:
 	int m_nLIGHTWARPTEXTURE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bLIGHTWARPTEXTURE;
 #endif
 public:
@@ -32,25 +32,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nLIGHTWARPTEXTURE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTWARPTEXTURE = true;
 #endif
 	}
 	void SetLIGHTWARPTEXTURE( bool i )
 	{
 		m_nLIGHTWARPTEXTURE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTWARPTEXTURE = true;
 #endif
 	}
 public:
 	cloak_ps30_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
 #endif // _DEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bLIGHTWARPTEXTURE = false;
 #endif // _DEBUG
 		m_nLIGHTWARPTEXTURE = 0;
@@ -59,7 +59,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bLIGHTWARPTEXTURE;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -71,7 +71,7 @@ class cloak_ps30_Dynamic_Index
 {
 private:
 	int m_nPIXELFOGTYPE;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bPIXELFOGTYPE;
 #endif
 public:
@@ -79,20 +79,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nPIXELFOGTYPE = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = true;
 #endif
 	}
 	void SetPIXELFOGTYPE( bool i )
 	{
 		m_nPIXELFOGTYPE = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = true;
 #endif
 	}
 private:
 	int m_nWRITEWATERFOGTODESTALPHA;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bWRITEWATERFOGTODESTALPHA;
 #endif
 public:
@@ -100,20 +100,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nWRITEWATERFOGTODESTALPHA = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = true;
 #endif
 	}
 	void SetWRITEWATERFOGTODESTALPHA( bool i )
 	{
 		m_nWRITEWATERFOGTODESTALPHA = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = true;
 #endif
 	}
 private:
 	int m_nNUM_LIGHTS;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bNUM_LIGHTS;
 #endif
 public:
@@ -121,29 +121,29 @@ public:
 	{
 		Assert( i >= 0 && i <= 4 );
 		m_nNUM_LIGHTS = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_LIGHTS = true;
 #endif
 	}
 	void SetNUM_LIGHTS( bool i )
 	{
 		m_nNUM_LIGHTS = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_LIGHTS = true;
 #endif
 	}
 public:
 	cloak_ps30_Dynamic_Index()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
 #endif // _DEBUG
 		m_nPIXELFOGTYPE = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = false;
 #endif // _DEBUG
 		m_nWRITEWATERFOGTODESTALPHA = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNUM_LIGHTS = false;
 #endif // _DEBUG
 		m_nNUM_LIGHTS = 0;
@@ -152,7 +152,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE && m_bWRITEWATERFOGTODESTALPHA && m_bNUM_LIGHTS;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG

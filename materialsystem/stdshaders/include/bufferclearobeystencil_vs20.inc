@@ -3,7 +3,7 @@ class bufferclearobeystencil_vs20_Static_Index
 {
 private:
 	int m_nUSESCOLOR;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bUSESCOLOR;
 #endif
 public:
@@ -11,21 +11,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nUSESCOLOR = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bUSESCOLOR = true;
 #endif
 	}
 	void SetUSESCOLOR( bool i )
 	{
 		m_nUSESCOLOR = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bUSESCOLOR = true;
 #endif
 	}
 public:
 	bufferclearobeystencil_vs20_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bUSESCOLOR = false;
 #endif // _DEBUG
 		m_nUSESCOLOR = 0;
@@ -34,7 +34,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bUSESCOLOR;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -52,7 +52,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}

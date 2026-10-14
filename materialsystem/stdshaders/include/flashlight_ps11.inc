@@ -3,7 +3,7 @@ class flashlight_ps11_Static_Index
 {
 private:
 	int m_nNORMALMAP;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bNORMALMAP;
 #endif
 public:
@@ -11,20 +11,20 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nNORMALMAP = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNORMALMAP = true;
 #endif
 	}
 	void SetNORMALMAP( bool i )
 	{
 		m_nNORMALMAP = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNORMALMAP = true;
 #endif
 	}
 private:
 	int m_nNOCULL;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bNOCULL;
 #endif
 public:
@@ -32,25 +32,25 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nNOCULL = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNOCULL = true;
 #endif
 	}
 	void SetNOCULL( bool i )
 	{
 		m_nNOCULL = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNOCULL = true;
 #endif
 	}
 public:
 	flashlight_ps11_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNORMALMAP = false;
 #endif // _DEBUG
 		m_nNORMALMAP = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bNOCULL = false;
 #endif // _DEBUG
 		m_nNOCULL = 0;
@@ -59,7 +59,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bNORMALMAP && m_bNOCULL;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -77,7 +77,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}

@@ -3,7 +3,7 @@ class debugmrttexture_ps20_Static_Index
 {
 private:
 	int m_nMRTINDEX;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool m_bMRTINDEX;
 #endif
 public:
@@ -11,21 +11,21 @@ public:
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nMRTINDEX = i;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bMRTINDEX = true;
 #endif
 	}
 	void SetMRTINDEX( bool i )
 	{
 		m_nMRTINDEX = i ? 1 : 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bMRTINDEX = true;
 #endif
 	}
 public:
 	debugmrttexture_ps20_Static_Index( )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_bMRTINDEX = false;
 #endif // _DEBUG
 		m_nMRTINDEX = 0;
@@ -34,7 +34,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bMRTINDEX;
 		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
@@ -52,7 +52,7 @@ public:
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #endif // _DEBUG
 		return 0;
 	}
