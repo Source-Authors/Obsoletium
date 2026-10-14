@@ -10,7 +10,7 @@
 #include "tier0/platform.h"
 
 #include "scoped_dll.h"
-#include "scoped_process_error_mode.h"
+#include "windows/scoped_process_error_mode.h"
 #include "winlite.h"
 
 extern "C" {
@@ -202,7 +202,7 @@ int Run(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   }
 
   // Do not show fault error boxes, etc.
-  const source::ScopedProcessErrorMode scoped_process_error_mode{
+  const se::common::windows::ScopedProcessErrorMode scoped_process_error_mode{
 #ifdef NDEBUG
       // The system does not display the critical-error-handler message box.
       // Instead, the system sends the error to the calling process.

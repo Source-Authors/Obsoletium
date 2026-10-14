@@ -64,7 +64,7 @@ $Project "launcher_main"
 	$Folder "Header Files"
 	{
 		$File	"$SRCDIR\common\scoped_dll.h"
-		$File	"$SRCDIR\common\scoped_process_error_mode.h" [$WINDOWS]
+		$File	"$SRCDIR\common\windows\scoped_process_error_mode.h" [$WINDOWS]
 	}
 
 	$Folder "Resources" [$WINDOWS]
