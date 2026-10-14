@@ -8003,7 +8003,7 @@ bool CEconItemSchema::BInitRecipes( KeyValues *pKVRecipes, CUtlVector<CUtlString
 				Assert( i != nRecipeIndex );
 				Assert( m_mapRecipes[i] != recipeDef );
 			}
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 			// Store this recipe.
 			m_mapRecipes.Insert( nRecipeIndex, recipeDef );

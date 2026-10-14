@@ -27,7 +27,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bTEXTURE2 = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nTEXTURE2 = 0;
 	}
 	int GetIndex()
@@ -37,7 +37,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bTEXTURE2;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 2 * m_nTEXTURE2 ) + 0;
 	}
 };
@@ -70,7 +70,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 	}
 	int GetIndex()
@@ -80,7 +80,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nPIXELFOGTYPE ) + 0;
 	}
 };

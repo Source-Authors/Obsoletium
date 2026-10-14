@@ -27,7 +27,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bSHOWALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSHOWALPHA = 0;
 	}
 	int GetIndex()
@@ -37,7 +37,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bSHOWALPHA;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 2 * m_nSHOWALPHA ) + 0;
 	}
 };
@@ -70,7 +70,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bISCUBEMAP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nISCUBEMAP = 0;
 	}
 	int GetIndex()
@@ -80,7 +80,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bISCUBEMAP;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nISCUBEMAP ) + 0;
 	}
 };

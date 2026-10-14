@@ -153,31 +153,31 @@ public:
 	{
 #ifndef NDEBUG
 		m_bNORMALMAP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nNORMALMAP = 0;
 #ifndef NDEBUG
 		m_bNORMALMAP2 = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nNORMALMAP2 = 0;
 #ifndef NDEBUG
 		m_bWORLDVERTEXTRANSITION = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nWORLDVERTEXTRANSITION = 0;
 #ifndef NDEBUG
 		m_bSEAMLESS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSEAMLESS = 0;
 #ifndef NDEBUG
 		m_bDETAILTEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDETAILTEXTURE = 0;
 #ifndef NDEBUG
 		m_bDETAIL_BLEND_MODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDETAIL_BLEND_MODE = 0;
 #ifndef NDEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFLASHLIGHTDEPTHFILTERMODE = 0;
 	}
 	int GetIndex()
@@ -187,7 +187,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bNORMALMAP && m_bNORMALMAP2 && m_bWORLDVERTEXTRANSITION && m_bSEAMLESS && m_bDETAILTEXTURE && m_bDETAIL_BLEND_MODE && m_bFLASHLIGHTDEPTHFILTERMODE;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 4 * m_nNORMALMAP ) + ( 12 * m_nNORMALMAP2 ) + ( 24 * m_nWORLDVERTEXTRANSITION ) + ( 48 * m_nSEAMLESS ) + ( 96 * m_nDETAILTEXTURE ) + ( 192 * m_nDETAIL_BLEND_MODE ) + ( 384 * m_nFLASHLIGHTDEPTHFILTERMODE ) + 0;
 	}
 };
@@ -241,11 +241,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 #ifndef NDEBUG
 		m_bFLASHLIGHTSHADOWS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFLASHLIGHTSHADOWS = 0;
 	}
 	int GetIndex()
@@ -255,7 +255,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE && m_bFLASHLIGHTSHADOWS;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nPIXELFOGTYPE ) + ( 2 * m_nFLASHLIGHTSHADOWS ) + 0;
 	}
 };

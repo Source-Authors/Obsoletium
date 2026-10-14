@@ -26,7 +26,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bTEETH = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nTEETH = 0;
 	}
 	int GetIndex()
@@ -36,7 +36,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bTEETH;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 4 * m_nTEETH ) + 0;
 	}
 };
@@ -89,11 +89,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bDOWATERFOG = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDOWATERFOG = 0;
 #ifndef NDEBUG
 		m_bSKINNING = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSKINNING = 0;
 	}
 	int GetIndex()
@@ -103,7 +103,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bDOWATERFOG && m_bSKINNING;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nDOWATERFOG ) + ( 2 * m_nSKINNING ) + 0;
 	}
 };

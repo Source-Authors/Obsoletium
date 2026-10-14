@@ -90,19 +90,19 @@ public:
 	{
 #ifndef NDEBUG
 		m_bINTRO = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nINTRO = 0;
 #ifndef NDEBUG
 		m_bHALFLAMBERT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nHALFLAMBERT = 0;
 #ifndef NDEBUG
 		m_bFLASHLIGHT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFLASHLIGHT = 0;
 #ifndef NDEBUG
 		m_bLIGHTWARPTEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nLIGHTWARPTEXTURE = 0;
 	}
 	int GetIndex()
@@ -112,7 +112,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bINTRO && m_bHALFLAMBERT && m_bFLASHLIGHT && m_bLIGHTWARPTEXTURE;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 160 * m_nINTRO ) + ( 320 * m_nHALFLAMBERT ) + ( 640 * m_nFLASHLIGHT ) + ( 1280 * m_nLIGHTWARPTEXTURE ) + 0;
 	}
 };
@@ -250,27 +250,27 @@ public:
 	{
 #ifndef NDEBUG
 		m_bCOMPRESSED_VERTS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCOMPRESSED_VERTS = 0;
 #ifndef NDEBUG
 		m_bSKINNING = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSKINNING = 0;
 #ifndef NDEBUG
 		m_bDOWATERFOG = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDOWATERFOG = 0;
 #ifndef NDEBUG
 		m_bDYNAMIC_LIGHT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDYNAMIC_LIGHT = 0;
 #ifndef NDEBUG
 		m_bSTATIC_LIGHT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSTATIC_LIGHT = 0;
 #ifndef NDEBUG
 		m_bNUM_LIGHTS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nNUM_LIGHTS = 0;
 	}
 	int GetIndex()
@@ -280,7 +280,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bCOMPRESSED_VERTS && m_bSKINNING && m_bDOWATERFOG && m_bDYNAMIC_LIGHT && m_bSTATIC_LIGHT && m_bNUM_LIGHTS;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nCOMPRESSED_VERTS ) + ( 2 * m_nSKINNING ) + ( 4 * m_nDOWATERFOG ) + ( 8 * m_nDYNAMIC_LIGHT ) + ( 16 * m_nSTATIC_LIGHT ) + ( 32 * m_nNUM_LIGHTS ) + 0;
 	}
 };

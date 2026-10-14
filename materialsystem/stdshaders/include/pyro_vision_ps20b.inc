@@ -174,35 +174,35 @@ public:
 	{
 #ifndef NDEBUG
 		m_bEFFECT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nEFFECT = 0;
 #ifndef NDEBUG
 		m_bVERTEX_LIT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nVERTEX_LIT = 0;
 #ifndef NDEBUG
 		m_bBASETEXTURE2 = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nBASETEXTURE2 = 0;
 #ifndef NDEBUG
 		m_bFANCY_BLENDING = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFANCY_BLENDING = 0;
 #ifndef NDEBUG
 		m_bSELFILLUM = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSELFILLUM = 0;
 #ifndef NDEBUG
 		m_bCOLOR_BAR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCOLOR_BAR = 0;
 #ifndef NDEBUG
 		m_bSTRIPES = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSTRIPES = 0;
 #ifndef NDEBUG
 		m_bSTRIPES_USE_NORMAL2 = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSTRIPES_USE_NORMAL2 = 0;
 	}
 	int GetIndex()
@@ -212,7 +212,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bEFFECT && m_bVERTEX_LIT && m_bBASETEXTURE2 && m_bFANCY_BLENDING && m_bSELFILLUM && m_bCOLOR_BAR && m_bSTRIPES && m_bSTRIPES_USE_NORMAL2;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 8 * m_nEFFECT ) + ( 32 * m_nVERTEX_LIT ) + ( 64 * m_nBASETEXTURE2 ) + ( 128 * m_nFANCY_BLENDING ) + ( 256 * m_nSELFILLUM ) + ( 512 * m_nCOLOR_BAR ) + ( 1024 * m_nSTRIPES ) + ( 2048 * m_nSTRIPES_USE_NORMAL2 ) + 0;
 	}
 };
@@ -287,15 +287,15 @@ public:
 	{
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 #ifndef NDEBUG
 		m_bVISUALIZE_DOF = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nVISUALIZE_DOF = 0;
 #ifndef NDEBUG
 		m_bHEATHAZE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nHEATHAZE = 0;
 	}
 	int GetIndex()
@@ -305,7 +305,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE && m_bVISUALIZE_DOF && m_bHEATHAZE;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nPIXELFOGTYPE ) + ( 2 * m_nVISUALIZE_DOF ) + ( 4 * m_nHEATHAZE ) + 0;
 	}
 };

@@ -247,7 +247,7 @@ void CItemUploadSubPanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 		}
 	}
 
-#endif // _DEBUG
+#endif  // !NDEBUG
 	*/
 
 }

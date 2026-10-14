@@ -3306,7 +3306,7 @@ bool CTargetDMX::Compile()
 	const bool bRet = g_pDataModel->SaveToFile( sAbsPath.String(), NULL, "keyvalues2", "model", m_pDmRoot );
 #else // ifdef _DEBUG
 	const bool bRet = g_pDataModel->SaveToFile( sAbsPath.String(), NULL, "binary", "model", m_pDmRoot );
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 	undo.Abort();
 

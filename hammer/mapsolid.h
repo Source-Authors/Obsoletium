@@ -145,7 +145,7 @@ public:
 
 #ifndef NDEBUG
 	void DebugSolid(void);
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 protected:
 

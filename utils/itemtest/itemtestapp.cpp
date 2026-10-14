@@ -149,7 +149,7 @@ bool CItemTestApp::PreInit()
 			Msg( "// Bin:      %s\n", sTmp.String() );
 		}
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 	return ( nRetVal == INIT_OK );
 }

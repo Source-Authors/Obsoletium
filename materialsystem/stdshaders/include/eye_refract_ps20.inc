@@ -48,11 +48,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bFLASHLIGHT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFLASHLIGHT = 0;
 #ifndef NDEBUG
 		m_bLIGHTWARPTEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nLIGHTWARPTEXTURE = 0;
 	}
 	int GetIndex()
@@ -62,7 +62,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bFLASHLIGHT && m_bLIGHTWARPTEXTURE;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 3 * m_nFLASHLIGHT ) + ( 6 * m_nLIGHTWARPTEXTURE ) + 0;
 	}
 };
@@ -95,7 +95,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bNUM_LIGHTS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nNUM_LIGHTS = 0;
 	}
 	int GetIndex()
@@ -105,7 +105,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bNUM_LIGHTS;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nNUM_LIGHTS ) + 0;
 	}
 };

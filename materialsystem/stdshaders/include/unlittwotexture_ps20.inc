@@ -10,7 +10,7 @@ public:
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifndef NDEBUG
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return 0;
 	}
 };
@@ -64,11 +64,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 #ifndef NDEBUG
 		m_bLIGHTING_PREVIEW = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nLIGHTING_PREVIEW = 0;
 	}
 	int GetIndex()
@@ -78,7 +78,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE && m_bLIGHTING_PREVIEW;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nPIXELFOGTYPE ) + ( 2 * m_nLIGHTING_PREVIEW ) + 0;
 	}
 };

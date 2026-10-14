@@ -146,7 +146,7 @@ CON_COMMAND_F( tf_add_bombhead, "Add Merasmus Bomb Head Condition", 0 )
 }
 
 ConVar tf_debug_bullets( "tf_debug_bullets", "0", FCVAR_DEVELOPMENTONLY, "Visualize bullet traces." );
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 ConVar tf_damage_events_track_for( "tf_damage_events_track_for", "30",  FCVAR_DEVELOPMENTONLY );
 
@@ -203,7 +203,7 @@ extern ConVar tf_flamethrower_flametime;
 extern ConVar weapon_medigun_chargerelease_rate;
 #if !defined(NDEBUG) || defined( STAGING_ONLY )
 extern ConVar mp_developer;
-#endif // _DEBUG || STAGING_ONLY
+#endif  // !NDEBUG || STAGING_ONLY
 
 //ConVar tf_spy_stealth_blink_time( "tf_spy_stealth_blink_time", "0.3", FCVAR_DEVELOPMENTONLY, "time after being hit the spy blinks into view" );
 //ConVar tf_spy_stealth_blink_scale( "tf_spy_stealth_blink_scale", "0.85", FCVAR_DEVELOPMENTONLY, "percentage visible scalar after being hit the spy blinks into view" );
@@ -9964,7 +9964,7 @@ void CTFPlayer::FireBullet( CTFWeaponBase *pWpn, const FireBulletsInfo_t &info, 
 	{
 		NDebugOverlay::Line( vecStart, trace.endpos, 0,255,0, true, 30 );
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 #endif
 
 	if ( trace.fraction < 1.0 )
@@ -10251,7 +10251,7 @@ bool CTFPlayer::CanPlayerMove() const
 #if !defined(NDEBUG) || defined( STAGING_ONLY )
 		if ( mp_developer.GetBool() )
 			bFreezeOnRestart = false;
-#endif // _DEBUG || STAGING_ONLY
+#endif  // !NDEBUG || STAGING_ONLY
 
 	if ( TFGameRules() && TFGameRules()->UsePlayerReadyStatusMode() && ( TFGameRules()->State_Get() == GR_STATE_BETWEEN_RNDS ) )
 		bFreezeOnRestart = false;

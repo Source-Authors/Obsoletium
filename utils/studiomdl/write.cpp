@@ -2288,7 +2288,7 @@ static void WriteModel( studiohdr_t *phdr )
 	{
 		Assert( pControllerHandled[ j ] );
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 	// write ik chains
 	mstudioikchain_t *pikchain = (mstudioikchain_t *)pData;

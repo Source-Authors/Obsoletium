@@ -875,7 +875,7 @@ void CMapView2DBase::Dump(CDumpContext& dc) const
 {
 	CView::Dump(dc);
 }
-#endif //_DEBUG
+#endif  // !NDEBUG
 
 
 //-----------------------------------------------------------------------------

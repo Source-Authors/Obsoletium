@@ -983,7 +983,7 @@ CON_COMMAND_F( mat_suppress, "Supress a material from drawing", FCVAR_CHEAT )
 
 	materials->ToggleSuppressMaterial( args[1] );
 }
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 static ITexture *CreatePowerOfTwoFBTexture( void )
 {

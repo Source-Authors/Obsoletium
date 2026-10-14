@@ -632,7 +632,7 @@ public:
 	// Verifies that the data description is valid in debug builds.
 	#ifndef NDEBUG
 	void ValidateDataDescription(void);
-	#endif // _DEBUG
+	#endif  // !NDEBUG
 
 	// handles an input (usually caused by outputs)
 	// returns true if the the value in the pass in should be set, false if the input is to be ignored
@@ -1122,7 +1122,7 @@ public:
 		return func;
 	}
 
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 	virtual void	ModifyOrAppendCriteria( AI_CriteriaSet& set );
 	void			AppendContextToCriteria( AI_CriteriaSet& set, const char *prefix = "" );

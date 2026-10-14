@@ -100,7 +100,7 @@ public:
 				used[i] = name;
 			}
 		}
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 		Append( data, size );
 	}

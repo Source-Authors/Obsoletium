@@ -10,7 +10,7 @@ public:
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifndef NDEBUG
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return 0;
 	}
 };
@@ -43,7 +43,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bDISTORT_TYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDISTORT_TYPE = 0;
 	}
 	int GetIndex()
@@ -53,7 +53,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bDISTORT_TYPE;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nDISTORT_TYPE ) + 0;
 	}
 };

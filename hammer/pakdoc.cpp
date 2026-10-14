@@ -58,7 +58,7 @@ void CPakDoc::Dump(CDumpContext& dc) const
 {
 	CDocument::Dump(dc);
 }
-#endif //_DEBUG
+#endif  // !NDEBUG
 
 /////////////////////////////////////////////////////////////////////////////
 // CPakDoc serialization

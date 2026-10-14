@@ -11,7 +11,7 @@
 
 #ifndef NDEBUG
 static ConVar tf_debug_weapontrail( "tf_debug_weapontrail", "0", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY );
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 // Network table.
 IMPLEMENT_CLIENTCLASS_DT( C_TFAmmoPack, DT_AmmoPack, CTFAmmoPack )
@@ -48,7 +48,7 @@ int C_TFAmmoPack::DrawModel( int flags )
 			debugoverlay->AddBoxOverlay( GetAbsOrigin(), Vector( -2, -2, -2 ), Vector( 2, 2, 2 ), QAngle( 0, 0, 0 ), 255, 255, 0, 32, 5.0 );
 		}
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 	return BaseClass::DrawModel( flags );
 }
@@ -67,7 +67,7 @@ void C_TFAmmoPack::OnDataChanged( DataUpdateType_t updateType )
 	{
 		Msg( "AbsOrigin (%f %f %f), LocalOrigin(%f %f %f)\n", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z, GetLocalOrigin().x, GetLocalOrigin().y, GetLocalOrigin().z );
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 	if ( updateType == DATA_UPDATE_CREATED )
 	{ 
@@ -77,7 +77,7 @@ void C_TFAmmoPack::OnDataChanged( DataUpdateType_t updateType )
 		{
 			Msg( "Origin (%f %f %f)\n", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z );
 		}
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 		float flChangeTime = GetLastChangeTime( LATCH_SIMULATION_VAR );
 		Vector vecCurOrigin = GetLocalOrigin();

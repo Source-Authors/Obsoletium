@@ -146,7 +146,7 @@ void CUtlMemoryPool::ReportLeaks()
 	}
 
 	g_ReportFunc("\'\n");
-#endif // _DEBUG
+#endif  // !NDEBUG
 }
 
 
@@ -296,7 +296,7 @@ void CUtlMemoryPool::Free( void *memBlock )
 		}
 	}
 	Assert (bOK);
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 #ifndef NDEBUG	
 	// invalidate the memory

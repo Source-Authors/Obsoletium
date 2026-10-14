@@ -321,4 +321,4 @@ CON_COMMAND( open_navpanel_test, "" )
 	pPanel->Activate();
 }
 
-#endif // _DEBUG
+#endif  // !NDEBUG

@@ -27,7 +27,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
 	}
 	int GetIndex()
@@ -37,7 +37,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 40 * m_nCONVERT_TO_SRGB ) + 0;
 	}
 };
@@ -133,19 +133,19 @@ public:
 	{
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 #ifndef NDEBUG
 		m_bNUM_LIGHTS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nNUM_LIGHTS = 0;
 #ifndef NDEBUG
 		m_bAMBIENT_LIGHT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nAMBIENT_LIGHT = 0;
 #ifndef NDEBUG
 		m_bWRITE_DEPTH_TO_DESTALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nWRITE_DEPTH_TO_DESTALPHA = 0;
 	}
 	int GetIndex()
@@ -155,7 +155,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE && m_bNUM_LIGHTS && m_bAMBIENT_LIGHT && m_bWRITE_DEPTH_TO_DESTALPHA;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nPIXELFOGTYPE ) + ( 2 * m_nNUM_LIGHTS ) + ( 10 * m_nAMBIENT_LIGHT ) + ( 20 * m_nWRITE_DEPTH_TO_DESTALPHA ) + 0;
 	}
 };

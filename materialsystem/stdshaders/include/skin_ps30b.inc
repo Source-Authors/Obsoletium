@@ -237,47 +237,47 @@ public:
 	{
 #ifndef NDEBUG
 		m_bCUBEMAP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCUBEMAP = 0;
 #ifndef NDEBUG
 		m_bSELFILLUM = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSELFILLUM = 0;
 #ifndef NDEBUG
 		m_bSELFILLUMFRESNEL = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSELFILLUMFRESNEL = 0;
 #ifndef NDEBUG
 		m_bFLASHLIGHT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFLASHLIGHT = 0;
 #ifndef NDEBUG
 		m_bLIGHTWARPTEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nLIGHTWARPTEXTURE = 0;
 #ifndef NDEBUG
 		m_bPHONGEXPONENTTEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPHONGEXPONENTTEXTURE = 0;
 #ifndef NDEBUG
 		m_bPHONGWARPTEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPHONGWARPTEXTURE = 0;
 #ifndef NDEBUG
 		m_bWRINKLEMAP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nWRINKLEMAP = 0;
 #ifndef NDEBUG
 		m_bDETAIL_BLEND_MODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDETAIL_BLEND_MODE = 0;
 #ifndef NDEBUG
 		m_bDETAILTEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDETAILTEXTURE = 0;
 #ifndef NDEBUG
 		m_bRIMLIGHT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nRIMLIGHT = 0;
 	}
 	int GetIndex()
@@ -287,7 +287,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCUBEMAP && m_bSELFILLUM && m_bSELFILLUMFRESNEL && m_bFLASHLIGHT && m_bLIGHTWARPTEXTURE && m_bPHONGEXPONENTTEXTURE && m_bPHONGWARPTEXTURE && m_bWRINKLEMAP && m_bDETAIL_BLEND_MODE && m_bDETAILTEXTURE && m_bRIMLIGHT;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 20 * m_nCUBEMAP ) + ( 40 * m_nSELFILLUM ) + ( 80 * m_nSELFILLUMFRESNEL ) + ( 160 * m_nFLASHLIGHT ) + ( 320 * m_nLIGHTWARPTEXTURE ) + ( 640 * m_nPHONGEXPONENTTEXTURE ) + ( 1280 * m_nPHONGWARPTEXTURE ) + ( 2560 * m_nWRINKLEMAP ) + ( 5120 * m_nDETAIL_BLEND_MODE ) + ( 35840 * m_nDETAILTEXTURE ) + ( 71680 * m_nRIMLIGHT ) + 0;
 	}
 };
@@ -362,15 +362,15 @@ public:
 	{
 #ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nWRITEWATERFOGTODESTALPHA = 0;
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 #ifndef NDEBUG
 		m_bNUM_LIGHTS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nNUM_LIGHTS = 0;
 	}
 	int GetIndex()
@@ -380,7 +380,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bWRITEWATERFOGTODESTALPHA && m_bPIXELFOGTYPE && m_bNUM_LIGHTS;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nWRITEWATERFOGTODESTALPHA ) + ( 2 * m_nPIXELFOGTYPE ) + ( 4 * m_nNUM_LIGHTS ) + 0;
 	}
 };

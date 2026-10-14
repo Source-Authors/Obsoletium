@@ -620,7 +620,7 @@ void CMatLightmaps::InitLightmapBits( int lightmap )
 				{
 					writer.WritePixelF( 0.0f, 0.0f, 0.0f );
 				}
-#endif // _DEBUG
+#endif  // !NDEBUG
 			}
 		}
 	}
@@ -644,7 +644,7 @@ void CMatLightmaps::InitLightmapBits( int lightmap )
 				{
 					writer.WritePixel( 0, 0, 0 );
 				}
-#endif // _DEBUG
+#endif  // !NDEBUG
 			}
 		}
 	}

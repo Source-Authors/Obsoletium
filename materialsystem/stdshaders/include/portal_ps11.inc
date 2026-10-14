@@ -69,15 +69,15 @@ public:
 	{
 #ifndef NDEBUG
 		m_bMAXTEXTURESTAGES = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nMAXTEXTURESTAGES = 0;
 #ifndef NDEBUG
 		m_bHASALPHAMASK = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nHASALPHAMASK = 0;
 #ifndef NDEBUG
 		m_bHASSTATICTEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nHASSTATICTEXTURE = 0;
 	}
 	int GetIndex()
@@ -87,7 +87,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bMAXTEXTURESTAGES && m_bHASALPHAMASK && m_bHASSTATICTEXTURE;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 4 * m_nMAXTEXTURESTAGES ) + ( 12 * m_nHASALPHAMASK ) + ( 24 * m_nHASSTATICTEXTURE ) + 0;
 	}
 };
@@ -141,11 +141,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bADDSTATIC = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nADDSTATIC = 0;
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 	}
 	int GetIndex()
@@ -155,7 +155,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bADDSTATIC && m_bPIXELFOGTYPE;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nADDSTATIC ) + ( 2 * m_nPIXELFOGTYPE ) + 0;
 	}
 };

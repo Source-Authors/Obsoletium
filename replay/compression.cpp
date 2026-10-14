@@ -222,6 +222,6 @@ CON_COMMAND( replay_testcompress, "Test compression" )
 	}
 }
 
-#endif	// _DEBUG
+#endif  // !NDEBUG
 
 //----------------------------------------------------------------------------------------

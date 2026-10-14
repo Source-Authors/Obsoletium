@@ -153,31 +153,31 @@ public:
 	{
 #ifndef NDEBUG
 		m_bFLASHLIGHT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFLASHLIGHT = 0;
 #ifndef NDEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFLASHLIGHTDEPTHFILTERMODE = 0;
 #ifndef NDEBUG
 		m_bLIGHTMAPPED = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nLIGHTMAPPED = 0;
 #ifndef NDEBUG
 		m_bUSEENVAMBIENT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nUSEENVAMBIENT = 0;
 #ifndef NDEBUG
 		m_bEMISSIVE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nEMISSIVE = 0;
 #ifndef NDEBUG
 		m_bSPECULAR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSPECULAR = 0;
 #ifndef NDEBUG
 		m_bPARALLAXOCCLUSION = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPARALLAXOCCLUSION = 0;
 	}
 	int GetIndex()
@@ -187,7 +187,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bFLASHLIGHT && m_bFLASHLIGHTDEPTHFILTERMODE && m_bLIGHTMAPPED && m_bUSEENVAMBIENT && m_bEMISSIVE && m_bSPECULAR && m_bPARALLAXOCCLUSION;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 80 * m_nFLASHLIGHT ) + ( 160 * m_nFLASHLIGHTDEPTHFILTERMODE ) + ( 480 * m_nLIGHTMAPPED ) + ( 960 * m_nUSEENVAMBIENT ) + ( 1920 * m_nEMISSIVE ) + ( 3840 * m_nSPECULAR ) + ( 7680 * m_nPARALLAXOCCLUSION ) + 0;
 	}
 };
@@ -304,23 +304,23 @@ public:
 	{
 #ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nWRITEWATERFOGTODESTALPHA = 0;
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 #ifndef NDEBUG
 		m_bNUM_LIGHTS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nNUM_LIGHTS = 0;
 #ifndef NDEBUG
 		m_bWRITE_DEPTH_TO_DESTALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nWRITE_DEPTH_TO_DESTALPHA = 0;
 #ifndef NDEBUG
 		m_bFLASHLIGHTSHADOWS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFLASHLIGHTSHADOWS = 0;
 	}
 	int GetIndex()
@@ -330,7 +330,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bWRITEWATERFOGTODESTALPHA && m_bPIXELFOGTYPE && m_bNUM_LIGHTS && m_bWRITE_DEPTH_TO_DESTALPHA && m_bFLASHLIGHTSHADOWS;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nWRITEWATERFOGTODESTALPHA ) + ( 2 * m_nPIXELFOGTYPE ) + ( 4 * m_nNUM_LIGHTS ) + ( 20 * m_nWRITE_DEPTH_TO_DESTALPHA ) + ( 40 * m_nFLASHLIGHTSHADOWS ) + 0;
 	}
 };

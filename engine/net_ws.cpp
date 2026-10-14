@@ -1933,7 +1933,7 @@ void NET_StorePacket( char const *filename, byte const *buf, int len )
 	}
 }
 
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 struct SendQueueItem_t
 {

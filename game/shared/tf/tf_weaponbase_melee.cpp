@@ -52,7 +52,7 @@ ConVar tf_meleeattackforcescale( "tf_meleeattackforcescale", "80.0", FCVAR_CHEAT
 
 #ifndef NDEBUG
 extern ConVar tf_weapon_criticals_force_random;
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 //=============================================================================
 //
@@ -1107,7 +1107,7 @@ bool CTFWeaponBaseMelee::CalcIsAttackCriticalHelper( void )
 	{
 		bCrit = true;
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 	if ( bCrit )
 	{

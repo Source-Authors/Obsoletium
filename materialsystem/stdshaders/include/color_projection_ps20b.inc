@@ -10,7 +10,7 @@ public:
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifndef NDEBUG
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return 0;
 	}
 };
@@ -85,15 +85,15 @@ public:
 	{
 #ifndef NDEBUG
 		m_bNEED_BLINDMK = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nNEED_BLINDMK = 0;
 #ifndef NDEBUG
 		m_bNEED_ANOMYLIZE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nNEED_ANOMYLIZE = 0;
 #ifndef NDEBUG
 		m_bNEED_MONOCHROME = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nNEED_MONOCHROME = 0;
 	}
 	int GetIndex()
@@ -103,7 +103,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bNEED_BLINDMK && m_bNEED_ANOMYLIZE && m_bNEED_MONOCHROME;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nNEED_BLINDMK ) + ( 2 * m_nNEED_ANOMYLIZE ) + ( 4 * m_nNEED_MONOCHROME ) + 0;
 	}
 };

@@ -589,7 +589,7 @@ ConVar	coop( "coop","0", FCVAR_NOTIFY, "Cooperative play." );			// 0 or 1
 
 #ifndef NDEBUG
 ConVar	r_ForceRestore( "r_ForceRestore", "0", 0 );
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 ConVar vcr_verbose( "vcr_verbose", "0", 0, "Write extra information into .vcr file." );
 
@@ -1789,7 +1789,7 @@ static void Host_UpdateScreen( void )
 		ForceMatSysRestore();
 		r_ForceRestore.SetValue(0);
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 	// Refresh the screen
 	SCR_UpdateScreen ();

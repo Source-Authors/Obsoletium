@@ -52,7 +52,7 @@ class vertexlit_and_unlit_generic_ps20b_Static_Index
 	bool m_bBLENDTINTBYBASEALPHA : 1;
 	bool m_bSRGB_INPUT_ADAPTER : 1;
 	bool m_bCUBEMAP_SPHERE_LEGACY : 1;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 public:
 	void SetDETAILTEXTURE( int i )
 	{
@@ -60,7 +60,7 @@ public:
 		m_nDETAILTEXTURE = i;
 #ifndef NDEBUG
 		m_bDETAILTEXTURE = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetCUBEMAP( int i )
@@ -69,7 +69,7 @@ public:
 		m_nCUBEMAP = i;
 #ifndef NDEBUG
 		m_bCUBEMAP = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetDIFFUSELIGHTING( int i )
@@ -78,7 +78,7 @@ public:
 		m_nDIFFUSELIGHTING = i;
 #ifndef NDEBUG
 		m_bDIFFUSELIGHTING = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetENVMAPMASK( int i )
@@ -87,7 +87,7 @@ public:
 		m_nENVMAPMASK = i;
 #ifndef NDEBUG
 		m_bENVMAPMASK = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetBASEALPHAENVMAPMASK( int i )
@@ -96,7 +96,7 @@ public:
 		m_nBASEALPHAENVMAPMASK = i;
 #ifndef NDEBUG
 		m_bBASEALPHAENVMAPMASK = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetSELFILLUM( int i )
@@ -105,7 +105,7 @@ public:
 		m_nSELFILLUM = i;
 #ifndef NDEBUG
 		m_bSELFILLUM = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetVERTEXCOLOR( int i )
@@ -114,7 +114,7 @@ public:
 		m_nVERTEXCOLOR = i;
 #ifndef NDEBUG
 		m_bVERTEXCOLOR = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetFLASHLIGHT( int i )
@@ -123,7 +123,7 @@ public:
 		m_nFLASHLIGHT = i;
 #ifndef NDEBUG
 		m_bFLASHLIGHT = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetSELFILLUM_ENVMAPMASK_ALPHA( int i )
@@ -132,7 +132,7 @@ public:
 		m_nSELFILLUM_ENVMAPMASK_ALPHA = i;
 #ifndef NDEBUG
 		m_bSELFILLUM_ENVMAPMASK_ALPHA = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetDETAIL_BLEND_MODE( int i )
@@ -141,7 +141,7 @@ public:
 		m_nDETAIL_BLEND_MODE = i;
 #ifndef NDEBUG
 		m_bDETAIL_BLEND_MODE = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetSEAMLESS_BASE( int i )
@@ -150,7 +150,7 @@ public:
 		m_nSEAMLESS_BASE = i;
 #ifndef NDEBUG
 		m_bSEAMLESS_BASE = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetSEAMLESS_DETAIL( int i )
@@ -159,7 +159,7 @@ public:
 		m_nSEAMLESS_DETAIL = i;
 #ifndef NDEBUG
 		m_bSEAMLESS_DETAIL = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetDISTANCEALPHA( int i )
@@ -168,7 +168,7 @@ public:
 		m_nDISTANCEALPHA = i;
 #ifndef NDEBUG
 		m_bDISTANCEALPHA = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetDISTANCEALPHAFROMDETAIL( int i )
@@ -177,7 +177,7 @@ public:
 		m_nDISTANCEALPHAFROMDETAIL = i;
 #ifndef NDEBUG
 		m_bDISTANCEALPHAFROMDETAIL = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetSOFT_MASK( int i )
@@ -186,7 +186,7 @@ public:
 		m_nSOFT_MASK = i;
 #ifndef NDEBUG
 		m_bSOFT_MASK = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetOUTLINE( int i )
@@ -195,7 +195,7 @@ public:
 		m_nOUTLINE = i;
 #ifndef NDEBUG
 		m_bOUTLINE = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetOUTER_GLOW( int i )
@@ -204,7 +204,7 @@ public:
 		m_nOUTER_GLOW = i;
 #ifndef NDEBUG
 		m_bOUTER_GLOW = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetFLASHLIGHTDEPTHFILTERMODE( int i )
@@ -213,7 +213,7 @@ public:
 		m_nFLASHLIGHTDEPTHFILTERMODE = i;
 #ifndef NDEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetDEPTHBLEND( int i )
@@ -222,7 +222,7 @@ public:
 		m_nDEPTHBLEND = i;
 #ifndef NDEBUG
 		m_bDEPTHBLEND = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetBLENDTINTBYBASEALPHA( int i )
@@ -231,7 +231,7 @@ public:
 		m_nBLENDTINTBYBASEALPHA = i;
 #ifndef NDEBUG
 		m_bBLENDTINTBYBASEALPHA = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetSRGB_INPUT_ADAPTER( int i )
@@ -240,7 +240,7 @@ public:
 		m_nSRGB_INPUT_ADAPTER = i;
 #ifndef NDEBUG
 		m_bSRGB_INPUT_ADAPTER = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetCUBEMAP_SPHERE_LEGACY( int i )
@@ -249,7 +249,7 @@ public:
 		m_nCUBEMAP_SPHERE_LEGACY = i;
 #ifndef NDEBUG
 		m_bCUBEMAP_SPHERE_LEGACY = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	vertexlit_and_unlit_generic_ps20b_Static_Index( )
@@ -299,7 +299,7 @@ public:
 		m_bBLENDTINTBYBASEALPHA = false;
 		m_bSRGB_INPUT_ADAPTER = false;
 		m_bCUBEMAP_SPHERE_LEGACY = false;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	int GetIndex() const
@@ -319,7 +319,7 @@ class vertexlit_and_unlit_generic_ps20b_Dynamic_Index
 #ifndef NDEBUG
 	bool m_bLIGHTING_PREVIEW : 1;
 	bool m_bFLASHLIGHTSHADOWS : 1;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 public:
 	void SetLIGHTING_PREVIEW( int i )
 	{
@@ -327,7 +327,7 @@ public:
 		m_nLIGHTING_PREVIEW = i;
 #ifndef NDEBUG
 		m_bLIGHTING_PREVIEW = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetFLASHLIGHTSHADOWS( int i )
@@ -336,7 +336,7 @@ public:
 		m_nFLASHLIGHTSHADOWS = i;
 #ifndef NDEBUG
 		m_bFLASHLIGHTSHADOWS = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	vertexlit_and_unlit_generic_ps20b_Dynamic_Index( )
@@ -346,7 +346,7 @@ public:
 #ifndef NDEBUG
 		m_bLIGHTING_PREVIEW = false;
 		m_bFLASHLIGHTSHADOWS = false;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	int GetIndex() const

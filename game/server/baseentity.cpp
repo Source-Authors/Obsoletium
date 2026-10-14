@@ -582,7 +582,7 @@ void CBaseEntity::ValidateDataDescription(void)
 		}
 	}
 }
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 
 //-----------------------------------------------------------------------------

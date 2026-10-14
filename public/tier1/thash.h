@@ -615,7 +615,7 @@ void CTHash<Data,I>::Validate( CValidator &validator, const char *pchName )
 	// then ask the mempool to verify this
 	if ( m_pMemoryPoolRecord )
 		m_pMemoryPoolRecord->LeakCheck( cItems );
-#endif // _DEBUG
+#endif  // !NDEBUG
 }
 #endif // DBGFLAG_VALIDATE
 

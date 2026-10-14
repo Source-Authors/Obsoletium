@@ -27,7 +27,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFLASHLIGHTDEPTHFILTERMODE = 0;
 	}
 	int GetIndex()
@@ -37,7 +37,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bFLASHLIGHTDEPTHFILTERMODE;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 4 * m_nFLASHLIGHTDEPTHFILTERMODE ) + 0;
 	}
 };
@@ -91,11 +91,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 #ifndef NDEBUG
 		m_bFLASHLIGHTSHADOWS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFLASHLIGHTSHADOWS = 0;
 	}
 	int GetIndex()
@@ -105,7 +105,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE && m_bFLASHLIGHTSHADOWS;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nPIXELFOGTYPE ) + ( 2 * m_nFLASHLIGHTSHADOWS ) + 0;
 	}
 };

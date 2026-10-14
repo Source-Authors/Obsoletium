@@ -293,7 +293,7 @@ void CBaseEntity::ParseMapData( CEntityMapData *mapData )
 	#ifdef GAME_DLL
 	ValidateDataDescription();
 	#endif // GAME_DLL
-	#endif // _DEBUG
+	#endif  // !NDEBUG
 
 	// loop through all keys in the data block and pass the info back into the object
 	if ( mapData->GetFirstKey(keyName, value) )

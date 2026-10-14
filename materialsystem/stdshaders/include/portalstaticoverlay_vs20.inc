@@ -27,7 +27,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bMODEL = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nMODEL = 0;
 	}
 	int GetIndex()
@@ -37,7 +37,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bMODEL;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 2 * m_nMODEL ) + 0;
 	}
 };
@@ -70,7 +70,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bSKINNING = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSKINNING = 0;
 	}
 	int GetIndex()
@@ -80,7 +80,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bSKINNING;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nSKINNING ) + 0;
 	}
 };

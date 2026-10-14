@@ -53,6 +53,6 @@
 #define DBGFLAG_ASSERTFATAL		// note: fatal asserts are enabled in release builds
 #define DBGFLAG_ASSERTDLG
 
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 #endif  // !SE_PUBLIC_TIER0_DBGFLAG_H_

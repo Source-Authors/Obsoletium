@@ -101,23 +101,23 @@ public:
 	{
 #ifndef NDEBUG
 		m_bDETAIL = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDETAIL = 0;
 #ifndef NDEBUG
 		m_bENVMAP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nENVMAP = 0;
 #ifndef NDEBUG
 		m_bENVMAPCAMERASPACE = true;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nENVMAPCAMERASPACE = 0;
 #ifndef NDEBUG
 		m_bENVMAPSPHERE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nENVMAPSPHERE = 0;
 #ifndef NDEBUG
 		m_bVERTEXCOLOR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nVERTEXCOLOR = 0;
 	}
 	int GetIndex()
@@ -127,7 +127,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bDETAIL && m_bENVMAP && m_bENVMAPCAMERASPACE && m_bENVMAPSPHERE && m_bVERTEXCOLOR;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 2 * m_nDETAIL ) + ( 4 * m_nENVMAP ) + ( 8 * m_nENVMAPCAMERASPACE ) + ( 8 * m_nENVMAPSPHERE ) + ( 16 * m_nVERTEXCOLOR ) + 0;
 	}
 };
@@ -159,7 +159,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bDOWATERFOG = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDOWATERFOG = 0;
 	}
 	int GetIndex()
@@ -169,7 +169,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bDOWATERFOG;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nDOWATERFOG ) + 0;
 	}
 };

@@ -27,7 +27,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bENVMAP_MASK = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nENVMAP_MASK = 0;
 	}
 	int GetIndex()
@@ -37,7 +37,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bENVMAP_MASK;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 2 * m_nENVMAP_MASK ) + 0;
 	}
 };
@@ -70,7 +70,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bDOWATERFOG = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDOWATERFOG = 0;
 	}
 	int GetIndex()
@@ -80,7 +80,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bDOWATERFOG;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nDOWATERFOG ) + 0;
 	}
 };

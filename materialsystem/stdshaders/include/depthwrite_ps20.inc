@@ -27,7 +27,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bCOLOR_DEPTH = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCOLOR_DEPTH = 0;
 	}
 	int GetIndex()
@@ -37,7 +37,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCOLOR_DEPTH;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 2 * m_nCOLOR_DEPTH ) + 0;
 	}
 };
@@ -70,7 +70,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bALPHACLIP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nALPHACLIP = 0;
 	}
 	int GetIndex()
@@ -80,7 +80,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bALPHACLIP;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nALPHACLIP ) + 0;
 	}
 };

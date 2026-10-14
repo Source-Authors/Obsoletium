@@ -48,11 +48,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bDIFFUSELIGHTING = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDIFFUSELIGHTING = 0;
 #ifndef NDEBUG
 		m_bHALFLAMBERT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nHALFLAMBERT = 0;
 	}
 	int GetIndex()
@@ -62,7 +62,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bDIFFUSELIGHTING && m_bHALFLAMBERT;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 6 * m_nDIFFUSELIGHTING ) + ( 12 * m_nHALFLAMBERT ) + 0;
 	}
 };
@@ -116,11 +116,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bAMBIENT_LIGHT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nAMBIENT_LIGHT = 0;
 #ifndef NDEBUG
 		m_bNUM_LIGHTS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nNUM_LIGHTS = 0;
 	}
 	int GetIndex()
@@ -130,7 +130,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bAMBIENT_LIGHT && m_bNUM_LIGHTS;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nAMBIENT_LIGHT ) + ( 2 * m_nNUM_LIGHTS ) + 0;
 	}
 };

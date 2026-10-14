@@ -455,4 +455,4 @@ void Open_EconUICrafting( const CCommand &args )
 	EconUI()->OpenEconUI( ECONUI_CRAFTING );	
 }
 ConCommand open_econui_crafting( "open_econui_crafting", Open_EconUICrafting, "Open the crafting screen.", FCVAR_NONE );
-#endif // _DEBUG
+#endif  // !NDEBUG

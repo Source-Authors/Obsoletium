@@ -69,15 +69,15 @@ public:
 	{
 #ifndef NDEBUG
 		m_bADDBASETEXTURE2 = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nADDBASETEXTURE2 = 0;
 #ifndef NDEBUG
 		m_bADDSELF = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nADDSELF = 0;
 #ifndef NDEBUG
 		m_bUSEALPHAASRGB = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nUSEALPHAASRGB = 0;
 	}
 	int GetIndex()
@@ -87,7 +87,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bADDBASETEXTURE2 && m_bADDSELF && m_bUSEALPHAASRGB;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nADDBASETEXTURE2 ) + ( 2 * m_nADDSELF ) + ( 4 * m_nUSEALPHAASRGB ) + 0;
 	}
 };
@@ -103,7 +103,7 @@ public:
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifndef NDEBUG
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return 0;
 	}
 };

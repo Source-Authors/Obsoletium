@@ -544,7 +544,7 @@ void CMainFrame::Dump(CDumpContext& dc) const
 	CMDIFrameWnd::Dump(dc);
 }
 
-#endif //_DEBUG
+#endif  // !NDEBUG
 
 
 //-----------------------------------------------------------------------------

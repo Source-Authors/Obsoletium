@@ -90,19 +90,19 @@ public:
 	{
 #ifndef NDEBUG
 		m_bNORMALMAP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nNORMALMAP = 0;
 #ifndef NDEBUG
 		m_bWORLDVERTEXTRANSITION = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nWORLDVERTEXTRANSITION = 0;
 #ifndef NDEBUG
 		m_bSEAMLESS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSEAMLESS = 0;
 #ifndef NDEBUG
 		m_bDETAIL = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDETAIL = 0;
 	}
 	int GetIndex()
@@ -112,7 +112,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bNORMALMAP && m_bWORLDVERTEXTRANSITION && m_bSEAMLESS && m_bDETAIL;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 2 * m_nNORMALMAP ) + ( 4 * m_nWORLDVERTEXTRANSITION ) + ( 8 * m_nSEAMLESS ) + ( 16 * m_nDETAIL ) + 0;
 	}
 };
@@ -145,7 +145,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bDOWATERFOG = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDOWATERFOG = 0;
 	}
 	int GetIndex()
@@ -155,7 +155,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bDOWATERFOG;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nDOWATERFOG ) + 0;
 	}
 };

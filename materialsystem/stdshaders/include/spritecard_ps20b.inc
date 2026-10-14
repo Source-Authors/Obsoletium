@@ -237,47 +237,47 @@ public:
 	{
 #ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
 #ifndef NDEBUG
 		m_bDUALSEQUENCE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDUALSEQUENCE = 0;
 #ifndef NDEBUG
 		m_bSEQUENCE_BLEND_MODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSEQUENCE_BLEND_MODE = 0;
 #ifndef NDEBUG
 		m_bADDBASETEXTURE2 = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nADDBASETEXTURE2 = 0;
 #ifndef NDEBUG
 		m_bMAXLUMFRAMEBLEND1 = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nMAXLUMFRAMEBLEND1 = 0;
 #ifndef NDEBUG
 		m_bMAXLUMFRAMEBLEND2 = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nMAXLUMFRAMEBLEND2 = 0;
 #ifndef NDEBUG
 		m_bEXTRACTGREENALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nEXTRACTGREENALPHA = 0;
 #ifndef NDEBUG
 		m_bCOLORRAMP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCOLORRAMP = 0;
 #ifndef NDEBUG
 		m_bANIMBLEND = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nANIMBLEND = 0;
 #ifndef NDEBUG
 		m_bADDSELF = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nADDSELF = 0;
 #ifndef NDEBUG
 		m_bDEPTHBLEND = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDEPTHBLEND = 0;
 	}
 	int GetIndex()
@@ -287,7 +287,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bDUALSEQUENCE && m_bSEQUENCE_BLEND_MODE && m_bADDBASETEXTURE2 && m_bMAXLUMFRAMEBLEND1 && m_bMAXLUMFRAMEBLEND2 && m_bEXTRACTGREENALPHA && m_bCOLORRAMP && m_bANIMBLEND && m_bADDSELF && m_bDEPTHBLEND;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nCONVERT_TO_SRGB ) + ( 2 * m_nDUALSEQUENCE ) + ( 4 * m_nSEQUENCE_BLEND_MODE ) + ( 12 * m_nADDBASETEXTURE2 ) + ( 24 * m_nMAXLUMFRAMEBLEND1 ) + ( 48 * m_nMAXLUMFRAMEBLEND2 ) + ( 96 * m_nEXTRACTGREENALPHA ) + ( 192 * m_nCOLORRAMP ) + ( 384 * m_nANIMBLEND ) + ( 768 * m_nADDSELF ) + ( 1536 * m_nDEPTHBLEND ) + 0;
 	}
 };
@@ -303,7 +303,7 @@ public:
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifndef NDEBUG
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return 0;
 	}
 };

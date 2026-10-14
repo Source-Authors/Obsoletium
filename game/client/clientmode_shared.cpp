@@ -175,7 +175,7 @@ CON_COMMAND_F( crash, "Crash the client. Optional parameter -- type of crash:\n 
 			break;
 	}
 }
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 static void __MsgFunc_Rumble( bf_read &msg )
 {

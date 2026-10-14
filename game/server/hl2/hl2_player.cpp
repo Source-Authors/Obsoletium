@@ -1655,7 +1655,7 @@ void CHL2_Player::CommanderExecute( CommanderCommand_t command )
 	{
 		DevMsg( 1, "**ERROR: Someone sent an invalid goal to CommanderExecute!\n" );
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 	AISquadIter_t iter;
 	for ( CAI_BaseNPC *pAllyNpc = m_pPlayerAISquad->GetFirstMember(&iter); pAllyNpc; pAllyNpc = m_pPlayerAISquad->GetNextMember(&iter) )

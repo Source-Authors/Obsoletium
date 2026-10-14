@@ -61,7 +61,7 @@ void CPakViewDirec::Dump(CDumpContext& dc) const
 {
 	CTreeView::Dump(dc);
 }
-#endif //_DEBUG
+#endif  // !NDEBUG
 
 /////////////////////////////////////////////////////////////////////////////
 // CPakViewDirec message handlers

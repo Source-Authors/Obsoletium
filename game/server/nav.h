@@ -427,7 +427,7 @@ inline bool IsEntityWalkable( CBaseEntity *entity, unsigned int flags )
 			CBaseDoor *door = (CBaseDoor *)entity;
 			return door->m_toggle_state == TS_AT_TOP;
 		}
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 		return (flags & WALK_THRU_FUNC_DOORS) ? true : false;
 	}

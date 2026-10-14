@@ -174,35 +174,35 @@ public:
 	{
 #ifndef NDEBUG
 		m_bEFFECT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nEFFECT = 0;
 #ifndef NDEBUG
 		m_bVERTEXCOLOR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nVERTEXCOLOR = 0;
 #ifndef NDEBUG
 		m_bHALFLAMBERT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nHALFLAMBERT = 0;
 #ifndef NDEBUG
 		m_bVERTEX_LIT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nVERTEX_LIT = 0;
 #ifndef NDEBUG
 		m_bFULLBRIGHT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFULLBRIGHT = 0;
 #ifndef NDEBUG
 		m_bBASETEXTURE2 = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nBASETEXTURE2 = 0;
 #ifndef NDEBUG
 		m_bSTRIPES = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSTRIPES = 0;
 #ifndef NDEBUG
 		m_bSTRIPES_USE_NORMAL2 = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSTRIPES_USE_NORMAL2 = 0;
 	}
 	int GetIndex()
@@ -212,7 +212,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bEFFECT && m_bVERTEXCOLOR && m_bHALFLAMBERT && m_bVERTEX_LIT && m_bFULLBRIGHT && m_bBASETEXTURE2 && m_bSTRIPES && m_bSTRIPES_USE_NORMAL2;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 16 * m_nEFFECT ) + ( 64 * m_nVERTEXCOLOR ) + ( 128 * m_nHALFLAMBERT ) + ( 256 * m_nVERTEX_LIT ) + ( 512 * m_nFULLBRIGHT ) + ( 1024 * m_nBASETEXTURE2 ) + ( 2048 * m_nSTRIPES ) + ( 4096 * m_nSTRIPES_USE_NORMAL2 ) + 0;
 	}
 };
@@ -308,19 +308,19 @@ public:
 	{
 #ifndef NDEBUG
 		m_bCOMPRESSED_VERTS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCOMPRESSED_VERTS = 0;
 #ifndef NDEBUG
 		m_bSKINNING = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSKINNING = 0;
 #ifndef NDEBUG
 		m_bDYNAMIC_LIGHT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDYNAMIC_LIGHT = 0;
 #ifndef NDEBUG
 		m_bSTATIC_LIGHT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSTATIC_LIGHT = 0;
 	}
 	int GetIndex()
@@ -330,7 +330,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bCOMPRESSED_VERTS && m_bSKINNING && m_bDYNAMIC_LIGHT && m_bSTATIC_LIGHT;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nCOMPRESSED_VERTS ) + ( 2 * m_nSKINNING ) + ( 4 * m_nDYNAMIC_LIGHT ) + ( 8 * m_nSTATIC_LIGHT ) + 0;
 	}
 };

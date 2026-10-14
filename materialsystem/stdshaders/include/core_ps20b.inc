@@ -111,23 +111,23 @@ public:
 	{
 #ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
 #ifndef NDEBUG
 		m_bCUBEMAP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCUBEMAP = 0;
 #ifndef NDEBUG
 		m_bFLOWMAP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFLOWMAP = 0;
 #ifndef NDEBUG
 		m_bCORECOLORTEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCORECOLORTEXTURE = 0;
 #ifndef NDEBUG
 		m_bREFRACT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nREFRACT = 0;
 	}
 	int GetIndex()
@@ -137,7 +137,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bCUBEMAP && m_bFLOWMAP && m_bCORECOLORTEXTURE && m_bREFRACT;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 2 * m_nCONVERT_TO_SRGB ) + ( 4 * m_nCUBEMAP ) + ( 8 * m_nFLOWMAP ) + ( 16 * m_nCORECOLORTEXTURE ) + ( 32 * m_nREFRACT ) + 0;
 	}
 };
@@ -170,7 +170,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 	}
 	int GetIndex()
@@ -180,7 +180,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nPIXELFOGTYPE ) + 0;
 	}
 };

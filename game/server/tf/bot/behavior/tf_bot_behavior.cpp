@@ -381,7 +381,7 @@ EventDesiredResult< CTFBot > CTFBotMainAction::OnInjured( CTFBot *me, const CTak
 			}
 		}
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 	return TryContinue();
 }

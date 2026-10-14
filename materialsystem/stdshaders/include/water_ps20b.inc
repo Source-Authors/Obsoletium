@@ -174,35 +174,35 @@ public:
 	{
 #ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
 #ifndef NDEBUG
 		m_bBASETEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nBASETEXTURE = 0;
 #ifndef NDEBUG
 		m_bMULTITEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nMULTITEXTURE = 0;
 #ifndef NDEBUG
 		m_bREFLECT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nREFLECT = 0;
 #ifndef NDEBUG
 		m_bREFRACT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nREFRACT = 0;
 #ifndef NDEBUG
 		m_bABOVEWATER = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nABOVEWATER = 0;
 #ifndef NDEBUG
 		m_bBLURRY_REFRACT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nBLURRY_REFRACT = 0;
 #ifndef NDEBUG
 		m_bNORMAL_DECODE_MODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nNORMAL_DECODE_MODE = 0;
 	}
 	int GetIndex()
@@ -212,7 +212,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bBASETEXTURE && m_bMULTITEXTURE && m_bREFLECT && m_bREFRACT && m_bABOVEWATER && m_bBLURRY_REFRACT && m_bNORMAL_DECODE_MODE;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 4 * m_nCONVERT_TO_SRGB ) + ( 8 * m_nBASETEXTURE ) + ( 16 * m_nMULTITEXTURE ) + ( 32 * m_nREFLECT ) + ( 64 * m_nREFRACT ) + ( 128 * m_nABOVEWATER ) + ( 256 * m_nBLURRY_REFRACT ) + ( 512 * m_nNORMAL_DECODE_MODE ) + 0;
 	}
 };
@@ -266,11 +266,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 #ifndef NDEBUG
 		m_bWRITE_DEPTH_TO_DESTALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nWRITE_DEPTH_TO_DESTALPHA = 0;
 	}
 	int GetIndex()
@@ -280,7 +280,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE && m_bWRITE_DEPTH_TO_DESTALPHA;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nPIXELFOGTYPE ) + ( 2 * m_nWRITE_DEPTH_TO_DESTALPHA ) + 0;
 	}
 };

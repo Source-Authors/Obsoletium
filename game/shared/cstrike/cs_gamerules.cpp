@@ -3477,7 +3477,7 @@ ConVar cl_autohelp(
 		}
 	}
 	ConCommand test_freezepanel( "test_freezepanel", TestFreezePanel, "", FCVAR_DEVELOPMENTONLY | FCVAR_CHEAT );
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 	static void PrintToConsole( CBasePlayer *player, const char *text )
 	{

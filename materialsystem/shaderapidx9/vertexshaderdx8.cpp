@@ -1881,7 +1881,7 @@ retry_compile:
 		Error( "Failed dynamic shader '%S' compile.\n", wfilename );
 #else
 		Assert( 0 );
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 		return INVALID_HARDWARE_SHADER;
 	}

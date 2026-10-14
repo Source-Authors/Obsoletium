@@ -395,7 +395,7 @@ void CMapView3D::Dump(CDumpContext& dc) const
 {
 	CView::Dump(dc);
 }
-#endif //_DEBUG
+#endif  // !NDEBUG
  
 
 //-----------------------------------------------------------------------------

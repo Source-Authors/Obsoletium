@@ -186,7 +186,7 @@ ConVar	sk_player_leg( "sk_player_leg","1" );
 ConVar	sv_player_usercommand_timeout( "sv_player_usercommand_timeout", "3", FCVAR_CHEAT, "After this many seconds without a usercommand from a player, the server will RunNullCommand as if client sends an empty command." );
 #ifndef NDEBUG
 ConVar  sv_player_net_suppress_usercommands( "sv_player_net_suppress_usercommands", "0", FCVAR_CHEAT, "For testing usercommand hacking sideeffects. DO NOT SHIP" );
-#endif // _DEBUG
+#endif  // !NDEBUG
 ConVar  sv_player_display_usercommand_errors( "sv_player_display_usercommand_errors", "0", FCVAR_CHEAT, "1 = Display warning when command values are out-of-range. 2 = Spew invalid ranges." );
 
 ConVar  player_debug_print_damage( "player_debug_print_damage", "0", FCVAR_CHEAT, "When true, print amount and type of all damage received by player to console." );
@@ -3326,7 +3326,7 @@ void CBasePlayer::PhysicsSimulate( void )
 	{
 		commandsToRun = 0;
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 	int numUsrCmdProcessTicksMax = sv_maxusrcmdprocessticks.GetInt();
 	if ( gpGlobals->maxClients != 1 && numUsrCmdProcessTicksMax ) // don't apply this filter in SP games
@@ -6351,7 +6351,7 @@ bool CBasePlayer::ClientCommand( const CCommand &args )
 		}
 	}
 	else
-#endif // _DEBUG
+#endif  // !NDEBUG
 	if( stricmp( cmd, "vehicleRole" ) == 0 )
 	{
 		// Get the vehicle role value.

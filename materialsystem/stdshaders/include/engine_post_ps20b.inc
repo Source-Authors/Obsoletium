@@ -69,15 +69,15 @@ public:
 	{
 #ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
 #ifndef NDEBUG
 		m_bLINEAR_INPUT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nLINEAR_INPUT = 0;
 #ifndef NDEBUG
 		m_bLINEAR_OUTPUT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nLINEAR_OUTPUT = 0;
 	}
 	int GetIndex()
@@ -87,7 +87,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bLINEAR_INPUT && m_bLINEAR_OUTPUT;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 40 * m_nCONVERT_TO_SRGB ) + ( 80 * m_nLINEAR_INPUT ) + ( 160 * m_nLINEAR_OUTPUT ) + 0;
 	}
 };
@@ -183,19 +183,19 @@ public:
 	{
 #ifndef NDEBUG
 		m_bAA_ENABLE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nAA_ENABLE = 0;
 #ifndef NDEBUG
 		m_bAA_QUALITY_MODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nAA_QUALITY_MODE = 0;
 #ifndef NDEBUG
 		m_bAA_REDUCE_ONE_PIXEL_LINE_BLUR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nAA_REDUCE_ONE_PIXEL_LINE_BLUR = 0;
 #ifndef NDEBUG
 		m_bCOL_CORRECT_NUM_LOOKUPS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCOL_CORRECT_NUM_LOOKUPS = 0;
 	}
 	int GetIndex()
@@ -205,7 +205,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bAA_ENABLE && m_bAA_QUALITY_MODE && m_bAA_REDUCE_ONE_PIXEL_LINE_BLUR && m_bCOL_CORRECT_NUM_LOOKUPS;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nAA_ENABLE ) + ( 2 * m_nAA_QUALITY_MODE ) + ( 4 * m_nAA_REDUCE_ONE_PIXEL_LINE_BLUR ) + ( 8 * m_nCOL_CORRECT_NUM_LOOKUPS ) + 0;
 	}
 };

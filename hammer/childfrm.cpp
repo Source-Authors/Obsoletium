@@ -333,7 +333,7 @@ void CChildFrame::Dump(CDumpContext& dc) const
 	__super::Dump(dc);
 }
 
-#endif //_DEBUG
+#endif  // !NDEBUG
 
 
 //-----------------------------------------------------------------------------

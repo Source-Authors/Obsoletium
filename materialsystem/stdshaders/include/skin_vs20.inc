@@ -14,7 +14,7 @@ class skin_vs20_Static_Index
 	unsigned int m_nUSE_STATIC_CONTROL_FLOW : 2;
 #ifndef NDEBUG
 	bool m_bUSE_STATIC_CONTROL_FLOW : 1;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 public:
 	void SetUSE_STATIC_CONTROL_FLOW( int i )
 	{
@@ -22,7 +22,7 @@ public:
 		m_nUSE_STATIC_CONTROL_FLOW = i;
 #ifndef NDEBUG
 		m_bUSE_STATIC_CONTROL_FLOW = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	skin_vs20_Static_Index()
@@ -30,7 +30,7 @@ public:
 		m_nUSE_STATIC_CONTROL_FLOW = 0;
 #ifndef NDEBUG
 		m_bUSE_STATIC_CONTROL_FLOW = false;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	int GetIndex() const
@@ -56,7 +56,7 @@ class skin_vs20_Dynamic_Index
 	bool m_bSKINNING : 1;
 	bool m_bLIGHTING_PREVIEW : 1;
 	bool m_bNUM_LIGHTS : 1;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 public:
 	void SetCOMPRESSED_VERTS( int i )
 	{
@@ -64,7 +64,7 @@ public:
 		m_nCOMPRESSED_VERTS = i;
 #ifndef NDEBUG
 		m_bCOMPRESSED_VERTS = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetDOWATERFOG( int i )
@@ -73,7 +73,7 @@ public:
 		m_nDOWATERFOG = i;
 #ifndef NDEBUG
 		m_bDOWATERFOG = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetSKINNING( int i )
@@ -82,7 +82,7 @@ public:
 		m_nSKINNING = i;
 #ifndef NDEBUG
 		m_bSKINNING = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetLIGHTING_PREVIEW( int i )
@@ -91,7 +91,7 @@ public:
 		m_nLIGHTING_PREVIEW = i;
 #ifndef NDEBUG
 		m_bLIGHTING_PREVIEW = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetNUM_LIGHTS( int i )
@@ -100,7 +100,7 @@ public:
 		m_nNUM_LIGHTS = i;
 #ifndef NDEBUG
 		m_bNUM_LIGHTS = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	skin_vs20_Dynamic_Index()
@@ -116,7 +116,7 @@ public:
 		m_bSKINNING = false;
 		m_bLIGHTING_PREVIEW = false;
 		m_bNUM_LIGHTS = false;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	int GetIndex() const

@@ -90,19 +90,19 @@ public:
 	{
 #ifndef NDEBUG
 		m_bMAXTEXTURESTAGES = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nMAXTEXTURESTAGES = 0;
 #ifndef NDEBUG
 		m_bHASALPHAMASK = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nHASALPHAMASK = 0;
 #ifndef NDEBUG
 		m_bHASSTATICTEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nHASSTATICTEXTURE = 0;
 #ifndef NDEBUG
 		m_bUSEALTERNATEVIEW = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nUSEALTERNATEVIEW = 0;
 	}
 	int GetIndex()
@@ -112,7 +112,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bMAXTEXTURESTAGES && m_bHASALPHAMASK && m_bHASSTATICTEXTURE && m_bUSEALTERNATEVIEW;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 4 * m_nMAXTEXTURESTAGES ) + ( 12 * m_nHASALPHAMASK ) + ( 24 * m_nHASSTATICTEXTURE ) + ( 48 * m_nUSEALTERNATEVIEW ) + 0;
 	}
 };
@@ -166,11 +166,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bSKINNING = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSKINNING = 0;
 #ifndef NDEBUG
 		m_bADDSTATIC = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nADDSTATIC = 0;
 	}
 	int GetIndex()
@@ -180,7 +180,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bSKINNING && m_bADDSTATIC;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nSKINNING ) + ( 2 * m_nADDSTATIC ) + 0;
 	}
 };

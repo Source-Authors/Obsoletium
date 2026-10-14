@@ -69,15 +69,15 @@ public:
 	{
 #ifndef NDEBUG
 		m_bSRGB_ADAPTER = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSRGB_ADAPTER = 0;
 #ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
 #ifndef NDEBUG
 		m_bCSTRIKE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCSTRIKE = 0;
 	}
 	int GetIndex()
@@ -87,7 +87,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bSRGB_ADAPTER && m_bCONVERT_TO_SRGB && m_bCSTRIKE;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nSRGB_ADAPTER ) + ( 2 * m_nCONVERT_TO_SRGB ) + ( 4 * m_nCSTRIKE ) + 0;
 	}
 };
@@ -103,7 +103,7 @@ public:
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifndef NDEBUG
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return 0;
 	}
 };

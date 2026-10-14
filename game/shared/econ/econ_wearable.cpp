@@ -854,7 +854,7 @@ void Dbg_TestDynamicWearableGibs( void )
 	pPhysicsObject->AddVelocity( &rndVel, &vec3_origin );
 }
 static ConCommand dbg_testdynamicwearablegib( "dbg_testdynamicwearablegib", Dbg_TestDynamicWearableGibs, "", FCVAR_CHEAT );
-#endif // _DEBUG
+#endif  // !NDEBUG
 #endif
 
 #endif // client only

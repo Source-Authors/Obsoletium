@@ -26,7 +26,7 @@
 
 #ifndef NDEBUG
 ConVar tf_debug_projectile( "tf_debug_projectile", "0", FCVAR_REPLICATED | FCVAR_DEVELOPMENTONLY | FCVAR_CHEAT );
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 IMPLEMENT_NETWORKCLASS_ALIASED( TFBaseProjectile, DT_TFBaseProjectile )
 
@@ -465,7 +465,7 @@ void CTFBaseProjectile::FlyThink( void )
 	{
 		NDebugOverlay::Box( GetAbsOrigin(), Vector( 0.5, 0.5, 0.5 ), -Vector( 0.5, 0.5, 0.5 ), 0, 255, 0, 100, 0.1 );
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 }
 
 void CTFBaseProjectile::SetScorer( CBaseEntity *pScorer )

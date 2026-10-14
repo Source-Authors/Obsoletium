@@ -216,43 +216,43 @@ public:
 	{
 #ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
 #ifndef NDEBUG
 		m_bBLUR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nBLUR = 0;
 #ifndef NDEBUG
 		m_bFADEOUTONSILHOUETTE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFADEOUTONSILHOUETTE = 0;
 #ifndef NDEBUG
 		m_bCUBEMAP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCUBEMAP = 0;
 #ifndef NDEBUG
 		m_bREFRACTTINTTEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nREFRACTTINTTEXTURE = 0;
 #ifndef NDEBUG
 		m_bMASKED = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nMASKED = 0;
 #ifndef NDEBUG
 		m_bCOLORMODULATE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCOLORMODULATE = 0;
 #ifndef NDEBUG
 		m_bSECONDARY_NORMAL = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSECONDARY_NORMAL = 0;
 #ifndef NDEBUG
 		m_bNORMAL_DECODE_MODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nNORMAL_DECODE_MODE = 0;
 #ifndef NDEBUG
 		m_bSHADER_SRGB_READ = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSHADER_SRGB_READ = 0;
 	}
 	int GetIndex()
@@ -262,7 +262,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bBLUR && m_bFADEOUTONSILHOUETTE && m_bCUBEMAP && m_bREFRACTTINTTEXTURE && m_bMASKED && m_bCOLORMODULATE && m_bSECONDARY_NORMAL && m_bNORMAL_DECODE_MODE && m_bSHADER_SRGB_READ;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 4 * m_nCONVERT_TO_SRGB ) + ( 8 * m_nBLUR ) + ( 16 * m_nFADEOUTONSILHOUETTE ) + ( 32 * m_nCUBEMAP ) + ( 64 * m_nREFRACTTINTTEXTURE ) + ( 128 * m_nMASKED ) + ( 256 * m_nCOLORMODULATE ) + ( 512 * m_nSECONDARY_NORMAL ) + ( 1024 * m_nNORMAL_DECODE_MODE ) + ( 1024 * m_nSHADER_SRGB_READ ) + 0;
 	}
 };
@@ -316,11 +316,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 #ifndef NDEBUG
 		m_bWRITE_DEPTH_TO_DESTALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nWRITE_DEPTH_TO_DESTALPHA = 0;
 	}
 	int GetIndex()
@@ -330,7 +330,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE && m_bWRITE_DEPTH_TO_DESTALPHA;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nPIXELFOGTYPE ) + ( 2 * m_nWRITE_DEPTH_TO_DESTALPHA ) + 0;
 	}
 };

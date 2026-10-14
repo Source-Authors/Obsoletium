@@ -1129,7 +1129,7 @@ bool PathFollower::FindClimbLedge( INextBot *bot, Vector startTracePos, Vector l
 						bot->GetBodyInterface()->GetSolidMask(), &filter, &result );	
 	}
 }
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 
 //--------------------------------------------------------------------------------------------------------------

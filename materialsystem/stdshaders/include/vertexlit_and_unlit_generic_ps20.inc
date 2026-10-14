@@ -405,79 +405,79 @@ public:
 	{
 #ifndef NDEBUG
 		m_bDETAILTEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDETAILTEXTURE = 0;
 #ifndef NDEBUG
 		m_bCUBEMAP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCUBEMAP = 0;
 #ifndef NDEBUG
 		m_bDIFFUSELIGHTING = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDIFFUSELIGHTING = 0;
 #ifndef NDEBUG
 		m_bENVMAPMASK = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nENVMAPMASK = 0;
 #ifndef NDEBUG
 		m_bBASEALPHAENVMAPMASK = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nBASEALPHAENVMAPMASK = 0;
 #ifndef NDEBUG
 		m_bSELFILLUM = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSELFILLUM = 0;
 #ifndef NDEBUG
 		m_bVERTEXCOLOR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nVERTEXCOLOR = 0;
 #ifndef NDEBUG
 		m_bFLASHLIGHT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFLASHLIGHT = 0;
 #ifndef NDEBUG
 		m_bSELFILLUM_ENVMAPMASK_ALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSELFILLUM_ENVMAPMASK_ALPHA = 0;
 #ifndef NDEBUG
 		m_bDETAIL_BLEND_MODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDETAIL_BLEND_MODE = 0;
 #ifndef NDEBUG
 		m_bSEAMLESS_BASE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSEAMLESS_BASE = 0;
 #ifndef NDEBUG
 		m_bSEAMLESS_DETAIL = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSEAMLESS_DETAIL = 0;
 #ifndef NDEBUG
 		m_bDISTANCEALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDISTANCEALPHA = 0;
 #ifndef NDEBUG
 		m_bDISTANCEALPHAFROMDETAIL = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDISTANCEALPHAFROMDETAIL = 0;
 #ifndef NDEBUG
 		m_bSOFT_MASK = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSOFT_MASK = 0;
 #ifndef NDEBUG
 		m_bOUTLINE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nOUTLINE = 0;
 #ifndef NDEBUG
 		m_bOUTER_GLOW = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nOUTER_GLOW = 0;
 #ifndef NDEBUG
 		m_bBLENDTINTBYBASEALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nBLENDTINTBYBASEALPHA = 0;
 #ifndef NDEBUG
 		m_bCUBEMAP_SPHERE_LEGACY = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCUBEMAP_SPHERE_LEGACY = 0;
 	}
 	int GetIndex()
@@ -487,7 +487,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bDETAILTEXTURE && m_bCUBEMAP && m_bDIFFUSELIGHTING && m_bENVMAPMASK && m_bBASEALPHAENVMAPMASK && m_bSELFILLUM && m_bVERTEXCOLOR && m_bFLASHLIGHT && m_bSELFILLUM_ENVMAPMASK_ALPHA && m_bDETAIL_BLEND_MODE && m_bSEAMLESS_BASE && m_bSEAMLESS_DETAIL && m_bDISTANCEALPHA && m_bDISTANCEALPHAFROMDETAIL && m_bSOFT_MASK && m_bOUTLINE && m_bOUTER_GLOW && m_bBLENDTINTBYBASEALPHA && m_bCUBEMAP_SPHERE_LEGACY;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 6 * m_nDETAILTEXTURE ) + ( 12 * m_nCUBEMAP ) + ( 24 * m_nDIFFUSELIGHTING ) + ( 48 * m_nENVMAPMASK ) + ( 96 * m_nBASEALPHAENVMAPMASK ) + ( 192 * m_nSELFILLUM ) + ( 384 * m_nVERTEXCOLOR ) + ( 768 * m_nFLASHLIGHT ) + ( 1536 * m_nSELFILLUM_ENVMAPMASK_ALPHA ) + ( 3072 * m_nDETAIL_BLEND_MODE ) + ( 30720 * m_nSEAMLESS_BASE ) + ( 61440 * m_nSEAMLESS_DETAIL ) + ( 122880 * m_nDISTANCEALPHA ) + ( 245760 * m_nDISTANCEALPHAFROMDETAIL ) + ( 491520 * m_nSOFT_MASK ) + ( 983040 * m_nOUTLINE ) + ( 1966080 * m_nOUTER_GLOW ) + ( 3932160 * m_nBLENDTINTBYBASEALPHA ) + ( 7864320 * m_nCUBEMAP_SPHERE_LEGACY ) + 0;
 	}
 };
@@ -541,11 +541,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 #ifndef NDEBUG
 		m_bLIGHTING_PREVIEW = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nLIGHTING_PREVIEW = 0;
 	}
 	int GetIndex()
@@ -555,7 +555,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE && m_bLIGHTING_PREVIEW; // && m_bSTATIC_LIGHT_LIGHTMAP
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nPIXELFOGTYPE ) + ( 2 * m_nLIGHTING_PREVIEW ) + 0;
 	}
 };

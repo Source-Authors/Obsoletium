@@ -647,7 +647,7 @@ extern ConVar tf_arena_preround_time;
 extern ConVar tf_arena_max_streak;
 #if !defined(NDEBUG) || defined( STAGING_ONLY )
 extern ConVar mp_developer;
-#endif // _DEBUG || STAGING_ONLY
+#endif  // !NDEBUG || STAGING_ONLY
 
 //=============================================================================
 // HPE_BEGIN
@@ -872,7 +872,7 @@ ConVar tf_bot_count( "tf_bot_count", "0", FCVAR_NOTIFY | FCVAR_DEVELOPMENTONLY )
 
 #ifndef NDEBUG
 ConVar tf_debug_ammo_and_health( "tf_debug_ammo_and_health", "0", FCVAR_CHEAT );
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 static Vector s_BotSpawnPosition;
 
@@ -882,7 +882,7 @@ ConVar tf_ctf_bonus_time ( "tf_ctf_bonus_time", "10", FCVAR_NOTIFY, "Length of t
 
 #ifndef NDEBUG
 ConVar mp_scrambleteams_debug( "mp_scrambleteams_debug", "0", FCVAR_NONE, "Debug spew." );
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 #ifdef STAGING_ONLY
 ConVar mp_tournament_readymode_bots_allowed( "mp_tournament_readymode_bots_allowed", "0", FCVAR_ARCHIVE, "Allow bot data to go through the system for debugging." );
@@ -7951,7 +7951,7 @@ void CTFGameRules::Think()
 			}
 		}
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 	if ( g_voteController )
 	{
@@ -15677,7 +15677,7 @@ void CTFGameRules::HandleScrambleTeams( void )
 						nTeamScoreBlue, 
 						nDelta );
 			}
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 			// Try swapping players to bring scores closer
 			if ( nDelta > 1 )
@@ -15698,7 +15698,7 @@ void CTFGameRules::HandleScrambleTeams( void )
 								nTeamScoreBlue, 
 								FindScoreDifferenceBetweenTeams( playerVector, pPR, nTeamScoreRed, nTeamScoreBlue ) );
 					}
-#endif // _DEBUG
+#endif  // !NDEBUG
 				}
 			
 				mp_teams_unbalance_limit.SetValue( nOrigValue );
@@ -18090,7 +18090,7 @@ bool CTFGameRules::ShouldRespawnQuickly( CBasePlayer *pPlayer )
 #if !defined(NDEBUG) || defined( STAGING_ONLY )
 	if ( mp_developer.GetBool() )
 		return true;
-#endif // _DEBUG || STAGING_ONLY
+#endif  // !NDEBUG || STAGING_ONLY
 
 	if ( IsCompetitiveMode() && State_Get() == GR_STATE_BETWEEN_RNDS )
 		return true;

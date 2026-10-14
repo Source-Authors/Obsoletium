@@ -26,7 +26,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bVERTEXCOLOR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nVERTEXCOLOR = 0;
 	}
 	int GetIndex()
@@ -36,7 +36,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bVERTEXCOLOR;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 2 * m_nVERTEXCOLOR ) + 0;
 	}
 };
@@ -80,11 +80,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bSKINNING = true;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSKINNING = 0;
 #ifndef NDEBUG
 		m_bDOWATERFOG = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDOWATERFOG = 0;
 	}
 	int GetIndex()
@@ -94,7 +94,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bSKINNING && m_bDOWATERFOG;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nSKINNING ) + ( 1 * m_nDOWATERFOG ) + 0;
 	}
 };

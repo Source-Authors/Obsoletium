@@ -72,7 +72,7 @@ CThreadSafeMultiMemoryPool::CThreadSafeMultiMemoryPool( const MemPoolConfig_t *p
 			}
 		}
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 }
 
 

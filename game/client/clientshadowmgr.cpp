@@ -2826,7 +2826,7 @@ void ShadowBreak_f()
 
 static ConCommand r_shadowbreak("r_shadowbreak", ShadowBreak_f);
 
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 
 bool CClientShadowMgr::WillParentRenderBlobbyShadow( IClientRenderable *pRenderable )

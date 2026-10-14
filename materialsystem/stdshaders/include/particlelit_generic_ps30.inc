@@ -47,11 +47,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bHALFLAMBERT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nHALFLAMBERT = 0;
 #ifndef NDEBUG
 		m_bHDRTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nHDRTYPE = 0;
 	}
 	int GetIndex()
@@ -61,7 +61,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bHALFLAMBERT && m_bHDRTYPE;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 264 * m_nHALFLAMBERT ) + ( 528 * m_nHDRTYPE ) + 0;
 	}
 };
@@ -157,19 +157,19 @@ public:
 	{
 #ifndef NDEBUG
 		m_bLIGHT_COMBO = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nLIGHT_COMBO = 0;
 #ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nWRITEWATERFOGTODESTALPHA = 0;
 #ifndef NDEBUG
 		m_bFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFOGTYPE = 0;
 #ifndef NDEBUG
 		m_bHDRENABLED = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nHDRENABLED = 0;
 	}
 	int GetIndex()
@@ -179,7 +179,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bLIGHT_COMBO && m_bWRITEWATERFOGTODESTALPHA && m_bFOGTYPE && m_bHDRENABLED;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nLIGHT_COMBO ) + ( 22 * m_nWRITEWATERFOGTODESTALPHA ) + ( 44 * m_nFOGTYPE ) + ( 132 * m_nHDRENABLED ) + 0;
 	}
 };

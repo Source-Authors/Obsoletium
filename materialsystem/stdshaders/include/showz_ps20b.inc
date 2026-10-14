@@ -48,11 +48,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bDEPTH_IN_ALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDEPTH_IN_ALPHA = 0;
 #ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
 	}
 	int GetIndex()
@@ -62,7 +62,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bDEPTH_IN_ALPHA && m_bCONVERT_TO_SRGB;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nDEPTH_IN_ALPHA ) + ( 2 * m_nCONVERT_TO_SRGB ) + 0;
 	}
 };
@@ -78,7 +78,7 @@ public:
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifndef NDEBUG
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return 0;
 	}
 };

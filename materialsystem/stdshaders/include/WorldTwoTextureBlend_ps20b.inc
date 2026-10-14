@@ -216,43 +216,43 @@ public:
 	{
 #ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
 #ifndef NDEBUG
 		m_bDETAILTEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDETAILTEXTURE = 0;
 #ifndef NDEBUG
 		m_bBUMPMAP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nBUMPMAP = 0;
 #ifndef NDEBUG
 		m_bVERTEXCOLOR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nVERTEXCOLOR = 0;
 #ifndef NDEBUG
 		m_bSELFILLUM = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSELFILLUM = 0;
 #ifndef NDEBUG
 		m_bDIFFUSEBUMPMAP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDIFFUSEBUMPMAP = 0;
 #ifndef NDEBUG
 		m_bDETAIL_ALPHA_MASK_BASE_TEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDETAIL_ALPHA_MASK_BASE_TEXTURE = 0;
 #ifndef NDEBUG
 		m_bFLASHLIGHT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFLASHLIGHT = 0;
 #ifndef NDEBUG
 		m_bSEAMLESS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSEAMLESS = 0;
 #ifndef NDEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFLASHLIGHTDEPTHFILTERMODE = 0;
 	}
 	int GetIndex()
@@ -262,7 +262,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bDETAILTEXTURE && m_bBUMPMAP && m_bVERTEXCOLOR && m_bSELFILLUM && m_bDIFFUSEBUMPMAP && m_bDETAIL_ALPHA_MASK_BASE_TEXTURE && m_bFLASHLIGHT && m_bSEAMLESS && m_bFLASHLIGHTDEPTHFILTERMODE;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 16 * m_nCONVERT_TO_SRGB ) + ( 32 * m_nDETAILTEXTURE ) + ( 64 * m_nBUMPMAP ) + ( 128 * m_nVERTEXCOLOR ) + ( 256 * m_nSELFILLUM ) + ( 512 * m_nDIFFUSEBUMPMAP ) + ( 1024 * m_nDETAIL_ALPHA_MASK_BASE_TEXTURE ) + ( 2048 * m_nFLASHLIGHT ) + ( 4096 * m_nSEAMLESS ) + ( 8192 * m_nFLASHLIGHTDEPTHFILTERMODE ) + 0;
 	}
 };
@@ -358,19 +358,19 @@ public:
 	{
 #ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nWRITEWATERFOGTODESTALPHA = 0;
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 #ifndef NDEBUG
 		m_bWRITE_DEPTH_TO_DESTALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nWRITE_DEPTH_TO_DESTALPHA = 0;
 #ifndef NDEBUG
 		m_bFLASHLIGHTSHADOWS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFLASHLIGHTSHADOWS = 0;
 	}
 	int GetIndex()
@@ -380,7 +380,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bWRITEWATERFOGTODESTALPHA && m_bPIXELFOGTYPE && m_bWRITE_DEPTH_TO_DESTALPHA && m_bFLASHLIGHTSHADOWS;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nWRITEWATERFOGTODESTALPHA ) + ( 2 * m_nPIXELFOGTYPE ) + ( 4 * m_nWRITE_DEPTH_TO_DESTALPHA ) + ( 8 * m_nFLASHLIGHTSHADOWS ) + 0;
 	}
 };

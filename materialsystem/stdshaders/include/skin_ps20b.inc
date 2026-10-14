@@ -61,7 +61,7 @@ class skin_ps20b_Static_Index
 	bool m_bFLASHLIGHTDEPTHFILTERMODE : 1;
 	bool m_bFASTPATH_NOBUMP : 1;
 	bool m_bBLENDTINTBYBASEALPHA : 1;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 public:
 	void SetCONVERT_TO_SRGB( int i )
 	{
@@ -69,7 +69,7 @@ public:
 		m_nCONVERT_TO_SRGB = i;
 #ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetCUBEMAP( int i )
@@ -78,7 +78,7 @@ public:
 		m_nCUBEMAP = i;
 #ifndef NDEBUG
 		m_bCUBEMAP = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetSELFILLUM( int i )
@@ -87,7 +87,7 @@ public:
 		m_nSELFILLUM = i;
 #ifndef NDEBUG
 		m_bSELFILLUM = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetSELFILLUMFRESNEL( int i )
@@ -96,7 +96,7 @@ public:
 		m_nSELFILLUMFRESNEL = i;
 #ifndef NDEBUG
 		m_bSELFILLUMFRESNEL = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetFLASHLIGHT( int i )
@@ -105,7 +105,7 @@ public:
 		m_nFLASHLIGHT = i;
 #ifndef NDEBUG
 		m_bFLASHLIGHT = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetLIGHTWARPTEXTURE( int i )
@@ -114,7 +114,7 @@ public:
 		m_nLIGHTWARPTEXTURE = i;
 #ifndef NDEBUG
 		m_bLIGHTWARPTEXTURE = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetPHONGWARPTEXTURE( int i )
@@ -123,7 +123,7 @@ public:
 		m_nPHONGWARPTEXTURE = i;
 #ifndef NDEBUG
 		m_bPHONGWARPTEXTURE = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetWRINKLEMAP( int i )
@@ -132,7 +132,7 @@ public:
 		m_nWRINKLEMAP = i;
 #ifndef NDEBUG
 		m_bWRINKLEMAP = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetDETAIL_BLEND_MODE( int i )
@@ -141,7 +141,7 @@ public:
 		m_nDETAIL_BLEND_MODE = i;
 #ifndef NDEBUG
 		m_bDETAIL_BLEND_MODE = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetDETAILTEXTURE( int i )
@@ -150,7 +150,7 @@ public:
 		m_nDETAILTEXTURE = i;
 #ifndef NDEBUG
 		m_bDETAILTEXTURE = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetRIMLIGHT( int i )
@@ -159,7 +159,7 @@ public:
 		m_nRIMLIGHT = i;
 #ifndef NDEBUG
 		m_bRIMLIGHT = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetFLASHLIGHTDEPTHFILTERMODE( int i )
@@ -168,7 +168,7 @@ public:
 		m_nFLASHLIGHTDEPTHFILTERMODE = i;
 #ifndef NDEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetFASTPATH_NOBUMP( int i )
@@ -177,7 +177,7 @@ public:
 		m_nFASTPATH_NOBUMP = i;
 #ifndef NDEBUG
 		m_bFASTPATH_NOBUMP = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetBLENDTINTBYBASEALPHA( int i )
@@ -186,7 +186,7 @@ public:
 		m_nBLENDTINTBYBASEALPHA = i;
 #ifndef NDEBUG
 		m_bBLENDTINTBYBASEALPHA = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	skin_ps20b_Static_Index()
@@ -220,7 +220,7 @@ public:
 		m_bFLASHLIGHTDEPTHFILTERMODE = false;
 		m_bFASTPATH_NOBUMP = false;
 		m_bBLENDTINTBYBASEALPHA = false;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	int GetIndex() const
@@ -246,7 +246,7 @@ class skin_ps20b_Dynamic_Index
 	bool m_bNUM_LIGHTS : 1;
 	bool m_bWRITE_DEPTH_TO_DESTALPHA : 1;
 	bool m_bFLASHLIGHTSHADOWS : 1;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 public:
 	void SetWRITEWATERFOGTODESTALPHA( int i )
 	{
@@ -254,7 +254,7 @@ public:
 		m_nWRITEWATERFOGTODESTALPHA = i;
 #ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetPIXELFOGTYPE( int i )
@@ -263,7 +263,7 @@ public:
 		m_nPIXELFOGTYPE = i;
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetNUM_LIGHTS( int i )
@@ -272,7 +272,7 @@ public:
 		m_nNUM_LIGHTS = i;
 #ifndef NDEBUG
 		m_bNUM_LIGHTS = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetWRITE_DEPTH_TO_DESTALPHA( int i )
@@ -281,7 +281,7 @@ public:
 		m_nWRITE_DEPTH_TO_DESTALPHA = i;
 #ifndef NDEBUG
 		m_bWRITE_DEPTH_TO_DESTALPHA = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetFLASHLIGHTSHADOWS( int i )
@@ -290,7 +290,7 @@ public:
 		m_nFLASHLIGHTSHADOWS = i;
 #ifndef NDEBUG
 		m_bFLASHLIGHTSHADOWS = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	skin_ps20b_Dynamic_Index()
@@ -306,7 +306,7 @@ public:
 		m_bNUM_LIGHTS = false;
 		m_bWRITE_DEPTH_TO_DESTALPHA = false;
 		m_bFLASHLIGHTSHADOWS = false;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	int GetIndex() const

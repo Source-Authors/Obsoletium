@@ -2163,7 +2163,7 @@ void CBaseMeshDX8::Spew( int nVertexCount, int nIndexCount, const MeshDesc_t &sp
 		Plat_DebugString( ( const char * )m_pMaterial->GetName() );
 		Plat_DebugString( "\n" );
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 	
 	// This is needed so buffering can just use this
 	VertexFormat_t fmt = m_VertexFormat;
@@ -2351,7 +2351,7 @@ void CBaseMeshDX8::ValidateData( int nVertexCount, int nIndexCount, const MeshDe
 			Assert( IsFinite( tangentT.x ) && IsFinite( tangentT.y ) && IsFinite( tangentT.z ) );
 		}
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 }
 
 void CBaseMeshDX8::Draw( CPrimList *pLists, int nLists )

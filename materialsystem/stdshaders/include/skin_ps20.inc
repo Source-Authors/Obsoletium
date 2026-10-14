@@ -131,27 +131,27 @@ public:
 	{
 #ifndef NDEBUG
 		m_bBASETEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nBASETEXTURE = 0;
 #ifndef NDEBUG
 		m_bBUMPTEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nBUMPTEXTURE = 0;
 #ifndef NDEBUG
 		m_bDIFFUSELIGHTING = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDIFFUSELIGHTING = 0;
 #ifndef NDEBUG
 		m_bSELFILLUM = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSELFILLUM = 0;
 #ifndef NDEBUG
 		m_bHALFLAMBERT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nHALFLAMBERT = 0;
 #ifndef NDEBUG
 		m_bFLASHLIGHT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFLASHLIGHT = 0;
 	}
 	int GetIndex()
@@ -161,7 +161,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bBASETEXTURE && m_bBUMPTEXTURE && m_bDIFFUSELIGHTING && m_bSELFILLUM && m_bHALFLAMBERT && m_bFLASHLIGHT;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 132 * m_nBASETEXTURE ) + ( 264 * m_nBUMPTEXTURE ) + ( 528 * m_nDIFFUSELIGHTING ) + ( 1056 * m_nSELFILLUM ) + ( 2112 * m_nHALFLAMBERT ) + ( 4224 * m_nFLASHLIGHT ) + 0;
 	}
 };
@@ -236,15 +236,15 @@ public:
 	{
 #ifndef NDEBUG
 		m_bLIGHT_COMBO = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nLIGHT_COMBO = 0;
 #ifndef NDEBUG
 		m_bWRITEWATERFOGTODESTALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nWRITEWATERFOGTODESTALPHA = 0;
 #ifndef NDEBUG
 		m_bFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFOGTYPE = 0;
 	}
 	int GetIndex()
@@ -254,7 +254,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bLIGHT_COMBO && m_bWRITEWATERFOGTODESTALPHA && m_bFOGTYPE;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nLIGHT_COMBO ) + ( 22 * m_nWRITEWATERFOGTODESTALPHA ) + ( 44 * m_nFOGTYPE ) + 0;
 	}
 };

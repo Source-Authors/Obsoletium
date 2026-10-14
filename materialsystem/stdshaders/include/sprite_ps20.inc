@@ -90,19 +90,19 @@ public:
 	{
 #ifndef NDEBUG
 		m_bVERTEXCOLOR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nVERTEXCOLOR = 0;
 #ifndef NDEBUG
 		m_bCONSTANTCOLOR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCONSTANTCOLOR = 0;
 #ifndef NDEBUG
 		m_bHDRTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nHDRTYPE = 0;
 #ifndef NDEBUG
 		m_bSRGB = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSRGB = 0;
 	}
 	int GetIndex()
@@ -112,7 +112,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bVERTEXCOLOR && m_bCONSTANTCOLOR && m_bHDRTYPE && m_bSRGB;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 4 * m_nVERTEXCOLOR ) + ( 8 * m_nCONSTANTCOLOR ) + ( 16 * m_nHDRTYPE ) + ( 48 * m_nSRGB ) + 0;
 	}
 };
@@ -166,11 +166,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bHDRENABLED = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nHDRENABLED = 0;
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 	}
 	int GetIndex()
@@ -180,7 +180,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bHDRENABLED && m_bPIXELFOGTYPE;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nHDRENABLED ) + ( 2 * m_nPIXELFOGTYPE ) + 0;
 	}
 };

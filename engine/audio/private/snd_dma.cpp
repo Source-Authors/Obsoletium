@@ -106,7 +106,7 @@ int MXR_GetMixgroupFromName( const char *pszgroupname );
 void MXR_DebugShowMixVolumes( void );
 #ifndef NDEBUG
 static void MXR_DebugSetMixGroupVolume( const CCommand &args );
-#endif //_DEBUG
+#endif  // !NDEBUG
 void MXR_UpdateAllDuckerVolumes( void );
 
 void ChannelSetVolTargets( channel_t *pch, int *pvolumes, int ivol_offset, int cvol );
@@ -7588,7 +7588,7 @@ static void MXR_DebugSetMixGroupVolume( const CCommand &args )
 	pmixer->mapMixgroupidToValue[imixgroup] = vol;
 }
 
-#endif //_DEBUG
+#endif  // !NDEBUG
 
 // given array of groupids (ie: the sound is in these groups),
 // return a mix volume.

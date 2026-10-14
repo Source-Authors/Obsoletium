@@ -292,7 +292,7 @@ CVGui::~CVGui()
 	{
 		Msg("Memory leak: panels left in CVGui::m_PanelList: %d\n", nActualCount );
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 }
 
 //-----------------------------------------------------------------------------

@@ -174,35 +174,35 @@ public:
 	{
 #ifndef NDEBUG
 		m_bBLUR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nBLUR = 0;
 #ifndef NDEBUG
 		m_bFADEOUTONSILHOUETTE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFADEOUTONSILHOUETTE = 0;
 #ifndef NDEBUG
 		m_bCUBEMAP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCUBEMAP = 0;
 #ifndef NDEBUG
 		m_bREFRACTTINTTEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nREFRACTTINTTEXTURE = 0;
 #ifndef NDEBUG
 		m_bMASKED = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nMASKED = 0;
 #ifndef NDEBUG
 		m_bCOLORMODULATE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCOLORMODULATE = 0;
 #ifndef NDEBUG
 		m_bSECONDARY_NORMAL = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSECONDARY_NORMAL = 0;
 #ifndef NDEBUG
 		m_bNORMAL_DECODE_MODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nNORMAL_DECODE_MODE = 0;
 	}
 	int GetIndex()
@@ -212,7 +212,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bBLUR && m_bFADEOUTONSILHOUETTE && m_bCUBEMAP && m_bREFRACTTINTTEXTURE && m_bMASKED && m_bCOLORMODULATE && m_bSECONDARY_NORMAL && m_bNORMAL_DECODE_MODE;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 2 * m_nBLUR ) + ( 4 * m_nFADEOUTONSILHOUETTE ) + ( 8 * m_nCUBEMAP ) + ( 16 * m_nREFRACTTINTTEXTURE ) + ( 32 * m_nMASKED ) + ( 64 * m_nCOLORMODULATE ) + ( 128 * m_nSECONDARY_NORMAL ) + ( 256 * m_nNORMAL_DECODE_MODE ) + 0;
 	}
 };
@@ -245,7 +245,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 	}
 	int GetIndex()
@@ -255,7 +255,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nPIXELFOGTYPE ) + 0;
 	}
 };

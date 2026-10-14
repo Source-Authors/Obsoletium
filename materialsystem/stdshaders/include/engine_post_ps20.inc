@@ -10,7 +10,7 @@ public:
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifndef NDEBUG
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return 0;
 	}
 };
@@ -106,19 +106,19 @@ public:
 	{
 #ifndef NDEBUG
 		m_bAA_ENABLE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nAA_ENABLE = 0;
 #ifndef NDEBUG
 		m_bAA_QUALITY_MODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nAA_QUALITY_MODE = 0;
 #ifndef NDEBUG
 		m_bAA_REDUCE_ONE_PIXEL_LINE_BLUR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nAA_REDUCE_ONE_PIXEL_LINE_BLUR = 0;
 #ifndef NDEBUG
 		m_bCOL_CORRECT_NUM_LOOKUPS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCOL_CORRECT_NUM_LOOKUPS = 0;
 	}
 	int GetIndex()
@@ -128,7 +128,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bAA_ENABLE && m_bAA_QUALITY_MODE && m_bAA_REDUCE_ONE_PIXEL_LINE_BLUR && m_bCOL_CORRECT_NUM_LOOKUPS;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nAA_ENABLE ) + ( 2 * m_nAA_QUALITY_MODE ) + ( 2 * m_nAA_REDUCE_ONE_PIXEL_LINE_BLUR ) + ( 2 * m_nCOL_CORRECT_NUM_LOOKUPS ) + 0;
 	}
 };

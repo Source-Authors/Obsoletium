@@ -302,7 +302,7 @@ struct datamap_t
 
 #if !defined(NDEBUG)
 	bool				bValidityChecked = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 };
 
 

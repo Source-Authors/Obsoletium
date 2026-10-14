@@ -593,7 +593,7 @@ void CMapSolid::DebugSolid(void)
 		[[maybe_unused]] CMapFace *pFace = GetFace(nFace);
 	}
 }
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 
 //-----------------------------------------------------------------------------

@@ -977,7 +977,7 @@ CON_COMMAND( cl_newitem_test, "Tests the new item ui notification." )
 	NotificationQueue_Add( pNotification );
 }
 #endif
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1748,7 +1748,7 @@ CON_COMMAND_F( item_dumpinv_other, "Dumps the contents of a specified client inv
 	Msg("Couldn't find specified player.\nFormat: item_dumpinv_other <player index>\n");
 }
 #endif
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 #ifndef NDEBUG
 #if defined(CLIENT_DLL)

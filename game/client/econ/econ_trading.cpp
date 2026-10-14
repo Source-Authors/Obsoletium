@@ -330,7 +330,7 @@ CON_COMMAND( cl_trading_test, "Tests the trade ui notification." )
 	NotificationQueue_Add( new CTFTradeRequestNotification( steamID.ConvertToUint64(), steamID.ConvertToUint64(), "Biff" ) );
 }
 #endif
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 /**
  * Remove notification that matches the trade request

@@ -132,27 +132,27 @@ public:
 	{
 #ifndef NDEBUG
 		m_bBASETEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nBASETEXTURE = 0;
 #ifndef NDEBUG
 		m_bMULTITEXTURE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nMULTITEXTURE = 0;
 #ifndef NDEBUG
 		m_bREFLECT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nREFLECT = 0;
 #ifndef NDEBUG
 		m_bREFRACT = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nREFRACT = 0;
 #ifndef NDEBUG
 		m_bABOVEWATER = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nABOVEWATER = 0;
 #ifndef NDEBUG
 		m_bNORMAL_DECODE_MODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nNORMAL_DECODE_MODE = 0;
 	}
 	int GetIndex()
@@ -162,7 +162,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bBASETEXTURE && m_bMULTITEXTURE && m_bREFLECT && m_bREFRACT && m_bABOVEWATER && m_bNORMAL_DECODE_MODE;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 2 * m_nBASETEXTURE ) + ( 4 * m_nMULTITEXTURE ) + ( 8 * m_nREFLECT ) + ( 16 * m_nREFRACT ) + ( 32 * m_nABOVEWATER ) + ( 64 * m_nNORMAL_DECODE_MODE ) + 0;
 	}
 };
@@ -195,7 +195,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 	}
 	int GetIndex()
@@ -205,7 +205,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nPIXELFOGTYPE ) + 0;
 	}
 };

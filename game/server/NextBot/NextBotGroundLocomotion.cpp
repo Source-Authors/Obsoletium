@@ -290,7 +290,7 @@ void NextBotGroundLocomotion::Update( void )
 	lean.y += ( desiredSideLean - lean.y ) * NextBotLeanRate.GetFloat() * deltaT;
 
 	SetDesiredLean( lean );
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 
 	// reset acceleration accumulation
@@ -886,7 +886,7 @@ Vector NextBotGroundLocomotion::ResolveZombieCollisions( const Vector &pos )
 
 	return adjustedNewPos;
 }
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 
 //----------------------------------------------------------------------------------------------------------

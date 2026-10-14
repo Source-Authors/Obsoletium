@@ -69,15 +69,15 @@ public:
 	{
 #ifndef NDEBUG
 		m_bZOOM_ANIMATE_SEQ2 = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nZOOM_ANIMATE_SEQ2 = 0;
 #ifndef NDEBUG
 		m_bDUALSEQUENCE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDUALSEQUENCE = 0;
 #ifndef NDEBUG
 		m_bEXTRACTGREENALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nEXTRACTGREENALPHA = 0;
 	}
 	int GetIndex()
@@ -87,7 +87,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bZOOM_ANIMATE_SEQ2 && m_bDUALSEQUENCE && m_bEXTRACTGREENALPHA;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 3 * m_nZOOM_ANIMATE_SEQ2 ) + ( 3 * m_nDUALSEQUENCE ) + ( 3 * m_nEXTRACTGREENALPHA ) + 0;
 	}
 };
@@ -120,7 +120,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bORIENTATION = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nORIENTATION = 0;
 	}
 	int GetIndex()
@@ -130,7 +130,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bORIENTATION;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nORIENTATION ) + 0;
 	}
 };

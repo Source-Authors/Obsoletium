@@ -65,7 +65,7 @@ ConVar item_inventory_debug( "item_inventory_debug", "0", FCVAR_REPLICATED | FCV
 #ifdef CLIENT_DLL
 ConVar item_debug_clientacks( "item_debug_clientacks", "0", FCVAR_CLIENTDLL | FCVAR_ARCHIVE );
 #endif
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 // Result codes strings for GC results.
 const char* GCResultString[8] =

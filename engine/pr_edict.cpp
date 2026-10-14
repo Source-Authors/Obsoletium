@@ -33,7 +33,7 @@
 
 #ifndef NDEBUG
 #include <malloc.h>
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 static ConVar		sv_useexplicitdelete( "sv_useexplicitdelete", "1", FCVAR_DEVELOPMENTONLY, "Explicitly delete dormant client entities caused by AllowImmediateReuse()." );
 static ConVar		sv_lowedict_threshold( "sv_lowedict_threshold", "8", FCVAR_NONE, "When only this many edicts are free, take the action specified by sv_lowedict_action.", true, 0, true, MAX_EDICTS );

@@ -61,7 +61,7 @@ void CPakViewFiles::Dump(CDumpContext& dc) const
 {
 	CListView::Dump(dc);
 }
-#endif //_DEBUG
+#endif  // !NDEBUG
 
 /////////////////////////////////////////////////////////////////////////////
 // CPakViewFiles message handlers

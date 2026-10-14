@@ -27,7 +27,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bCOMBINE_MODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCOMBINE_MODE = 0;
 	}
 	int GetIndex()
@@ -37,7 +37,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCOMBINE_MODE;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 2 * m_nCOMBINE_MODE ) + 0;
 	}
 };
@@ -70,7 +70,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bDEBUG_MODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDEBUG_MODE = 0;
 	}
 	int GetIndex()
@@ -80,7 +80,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bDEBUG_MODE;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nDEBUG_MODE ) + 0;
 	}
 };

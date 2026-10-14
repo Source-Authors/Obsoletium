@@ -340,7 +340,7 @@ void CVertexBufferBase::ValidateData( [[maybe_unused]] int nVertexCount, [[maybe
 			Assert( IsFinite( tangentT.x ) && IsFinite( tangentT.y ) && IsFinite( tangentT.z ) );
 		}
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 }
 
 

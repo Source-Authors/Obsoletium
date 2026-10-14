@@ -195,39 +195,39 @@ public:
 	{
 #ifndef NDEBUG
 		m_bENVMAP_MASK = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nENVMAP_MASK = 0;
 #ifndef NDEBUG
 		m_bTANGENTSPACE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nTANGENTSPACE = 0;
 #ifndef NDEBUG
 		m_bBUMPMAP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nBUMPMAP = 0;
 #ifndef NDEBUG
 		m_bDIFFUSEBUMPMAP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDIFFUSEBUMPMAP = 0;
 #ifndef NDEBUG
 		m_bVERTEXCOLOR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nVERTEXCOLOR = 0;
 #ifndef NDEBUG
 		m_bVERTEXALPHATEXBLENDFACTOR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nVERTEXALPHATEXBLENDFACTOR = 0;
 #ifndef NDEBUG
 		m_bRELIEF_MAPPING = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nRELIEF_MAPPING = 0;
 #ifndef NDEBUG
 		m_bSEAMLESS = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSEAMLESS = 0;
 #ifndef NDEBUG
 		m_bBUMPMASK = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nBUMPMASK = 0;
 	}
 	int GetIndex()
@@ -237,7 +237,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bENVMAP_MASK && m_bTANGENTSPACE && m_bBUMPMAP && m_bDIFFUSEBUMPMAP && m_bVERTEXCOLOR && m_bVERTEXALPHATEXBLENDFACTOR && m_bRELIEF_MAPPING && m_bSEAMLESS && m_bBUMPMASK;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 8 * m_nENVMAP_MASK ) + ( 16 * m_nTANGENTSPACE ) + ( 32 * m_nBUMPMAP ) + ( 64 * m_nDIFFUSEBUMPMAP ) + ( 128 * m_nVERTEXCOLOR ) + ( 256 * m_nVERTEXALPHATEXBLENDFACTOR ) + ( 512 * m_nRELIEF_MAPPING ) + ( 512 * m_nSEAMLESS ) + ( 1024 * m_nBUMPMASK ) + 0;
 	}
 };
@@ -312,15 +312,15 @@ public:
 	{
 #ifndef NDEBUG
 		m_bFASTPATH = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nFASTPATH = 0;
 #ifndef NDEBUG
 		m_bDOWATERFOG = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nDOWATERFOG = 0;
 #ifndef NDEBUG
 		m_bLIGHTING_PREVIEW = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nLIGHTING_PREVIEW = 0;
 	}
 	int GetIndex()
@@ -330,7 +330,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bFASTPATH && m_bDOWATERFOG && m_bLIGHTING_PREVIEW;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nFASTPATH ) + ( 2 * m_nDOWATERFOG ) + ( 4 * m_nLIGHTING_PREVIEW ) + 0;
 	}
 };

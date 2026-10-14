@@ -102,7 +102,7 @@ bool CTFAutobalance::ShouldBeActive() const
 #if !defined(NDEBUG) || defined( STAGING_ONLY )
 	if ( mp_developer.GetBool() )
 		return false;
-#endif // _DEBUG || STAGING_ONLY
+#endif  // !NDEBUG || STAGING_ONLY
 
 	if ( mp_teams_unbalance_limit.GetInt() <= 0 )
 		return false;

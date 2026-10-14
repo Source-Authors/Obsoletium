@@ -505,7 +505,7 @@ bool CEconEntity::ValidateEntityAttachedToPlayer( bool &bShouldRetry )
 	// Always valid in debug if item_debug_validation is disabled
 	if ( !bItemDebugValidation )
 		return true;
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 #if defined( TF_CLIENT_DLL )
 	// Always valid in item testing mode

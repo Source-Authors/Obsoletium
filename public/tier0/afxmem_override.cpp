@@ -259,7 +259,7 @@ void AFXAPI AfxDoForAllObjects(void(AFX_CDECL* pfn)(CObject*, void*),
 BOOL AFXAPI AfxDumpMemoryLeaks() { return _CrtDumpMemoryLeaks(); }
 
 #endif  // _AFX_NO_DEBUG_CRT
-#endif  // _DEBUG
+#endif  // !NDEBUG
 
 /////////////////////////////////////////////////////////////////////////////
 // Non-diagnostic memory routines
@@ -396,6 +396,6 @@ void __cdecl operator delete[](void* p, int nType, LPCSTR lpszFileName,
   ::operator delete(p, nType, lpszFileName, nLine);
 }
 
-#endif  //_DEBUG
+#endif  // !NDEBUG
 
 /////////////////////////////////////////////////////////////////////////////

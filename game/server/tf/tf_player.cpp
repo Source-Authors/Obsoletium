@@ -329,7 +329,7 @@ extern ConVar tf_tournament_classchange_allowed;
 extern ConVar tf_tournament_classchange_ready_allowed;
 #if !defined(NDEBUG) || defined( STAGING_ONLY )
 extern ConVar mp_developer;
-#endif // _DEBUG || STAGING_ONLY 
+#endif  // !NDEBUG || STAGING_ONLY 
 #ifdef STAGING_ONLY
 extern ConVar tf_skillrating_debug_bots_allowed;
 #endif // STAGING_ONLY
@@ -6189,7 +6189,7 @@ void CTFPlayer::HandleCommand_JoinTeam( const char *pTeamName )
 #ifdef NDEBUG
 		TFGameRules()->SetPlayerReadyState( entindex(), false );
 		TFGameRules()->SetTeamReadyState( false, GetTeamNumber() );
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 		ChangeTeam( iTeam, bAutoTeamed, bSilent );
 
@@ -6662,7 +6662,7 @@ void CTFPlayer::HandleCommand_JoinClass( const char *pClassName, bool bAllowSpaw
 		Teleport( &vPos, &qAngle, &vec3_origin );
 		return;
 	}
-#endif // _DEBUG || STAGING_ONLY
+#endif  // !NDEBUG || STAGING_ONLY
 
 	// joining the same class?
 	if ( iClass != TF_CLASS_RANDOM && iClass == GetDesiredPlayerClassIndex() )
@@ -8544,7 +8544,7 @@ int CTFPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 #if !defined(NDEBUG) || defined( STAGING_ONLY )
 	if ( mp_developer.GetInt() > 1 && !IsBot() )
 		bBuddha = true;
-#endif // _DEBUG || STAGING_ONLY
+#endif  // !NDEBUG || STAGING_ONLY
 
 	if ( bBuddha )
 	{
@@ -9285,7 +9285,7 @@ int CTFPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 	CTF_GameStats.Event_PlayerDamage( this, info, info.GetDamage() );
 #else
 	CTF_GameStats.Event_PlayerDamage( this, info, m_iHealthBefore - GetHealth() );
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 	// if we take damage after we leave the ground, update the health if its less
 	if ( bTookDamage && m_iLeftGroundHealth > 0 )
@@ -13656,7 +13656,7 @@ void CTFPlayer::RemoveAmmo( int iCount, int iAmmoIndex )
 #if !defined(NDEBUG) || defined( STAGING_ONLY )
 	if ( mp_developer.GetInt() > 1 && !IsBot() )
 		return;
-#endif // _DEBUG || STAGING_ONLY
+#endif  // !NDEBUG || STAGING_ONLY
 
 	if ( m_Shared.InCond( TF_COND_HALLOWEEN_GIANT ) )
 	{
@@ -19463,7 +19463,7 @@ CON_COMMAND_F( tf_crashclients, "testing only, crashes about 50 percent of the c
 		}
 	}
 }
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 //-----------------------------------------------------------------------------
 // Purpose: 

@@ -2598,7 +2598,7 @@ void CMapDoc::Dump(CDumpContext& dc) const
 {
 	CDocument::Dump(dc);
 }
-#endif //_DEBUG
+#endif  // !NDEBUG
 
 
 

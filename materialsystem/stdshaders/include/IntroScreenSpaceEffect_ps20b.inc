@@ -48,11 +48,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
 #ifndef NDEBUG
 		m_bLINEAR_TO_SRGB = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nLINEAR_TO_SRGB = 0;
 	}
 	int GetIndex()
@@ -62,7 +62,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bLINEAR_TO_SRGB;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 10 * m_nCONVERT_TO_SRGB ) + ( 20 * m_nLINEAR_TO_SRGB ) + 0;
 	}
 };
@@ -95,7 +95,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bMODE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nMODE = 0;
 	}
 	int GetIndex()
@@ -105,7 +105,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bMODE;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nMODE ) + 0;
 	}
 };

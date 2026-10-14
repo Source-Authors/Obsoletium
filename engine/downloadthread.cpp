@@ -78,7 +78,7 @@ void Thread_DPrintf (char *fmt, ...)
 	V_vsprintf_safe( msg, fmt, argptr );
 	va_end( argptr );
 	Plat_DebugString( msg );
-#endif // _DEBUG
+#endif  // !NDEBUG
 }
 
 //--------------------------------------------------------------------------------------------------------------

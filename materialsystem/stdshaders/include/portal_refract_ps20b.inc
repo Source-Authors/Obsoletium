@@ -69,15 +69,15 @@ public:
 	{
 #ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
 #ifndef NDEBUG
 		m_bSTAGE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSTAGE = 0;
 #ifndef NDEBUG
 		m_bSHADER_SRGB_READ = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSHADER_SRGB_READ = 0;
 	}
 	int GetIndex()
@@ -87,7 +87,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bSTAGE && m_bSHADER_SRGB_READ;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 2 * m_nCONVERT_TO_SRGB ) + ( 4 * m_nSTAGE ) + ( 12 * m_nSHADER_SRGB_READ ) + 0;
 	}
 };
@@ -120,7 +120,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 	}
 	int GetIndex()
@@ -130,7 +130,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nPIXELFOGTYPE ) + 0;
 	}
 };

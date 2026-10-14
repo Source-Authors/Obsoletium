@@ -132,27 +132,27 @@ public:
 	{
 #ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
 #ifndef NDEBUG
 		m_bVERTEXCOLOR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nVERTEXCOLOR = 0;
 #ifndef NDEBUG
 		m_bCONSTANTCOLOR = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCONSTANTCOLOR = 0;
 #ifndef NDEBUG
 		m_bHDRTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nHDRTYPE = 0;
 #ifndef NDEBUG
 		m_bSRGB = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSRGB = 0;
 #ifndef NDEBUG
 		m_bSRGB_OUTPUT_ADAPTER = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSRGB_OUTPUT_ADAPTER = 0;
 	}
 	int GetIndex()
@@ -162,7 +162,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bVERTEXCOLOR && m_bCONSTANTCOLOR && m_bHDRTYPE && m_bSRGB && m_bSRGB_OUTPUT_ADAPTER;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 4 * m_nCONVERT_TO_SRGB ) + ( 8 * m_nVERTEXCOLOR ) + ( 16 * m_nCONSTANTCOLOR ) + ( 32 * m_nHDRTYPE ) + ( 96 * m_nSRGB ) + ( 192 * m_nSRGB_OUTPUT_ADAPTER ) + 0;
 	}
 };
@@ -216,11 +216,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bHDRENABLED = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nHDRENABLED = 0;
 #ifndef NDEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nPIXELFOGTYPE = 0;
 	}
 	int GetIndex()
@@ -230,7 +230,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bHDRENABLED && m_bPIXELFOGTYPE;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nHDRENABLED ) + ( 2 * m_nPIXELFOGTYPE ) + 0;
 	}
 };

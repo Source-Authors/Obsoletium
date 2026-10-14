@@ -237,7 +237,7 @@ ConVar mp_forceautoteam( "mp_forceautoteam", "0", FCVAR_REPLICATED | FCVAR_NOTIF
 
 #if !defined(NDEBUG) || defined( STAGING_ONLY )
 ConVar mp_developer( "mp_developer", "0", FCVAR_ARCHIVE | FCVAR_REPLICATED | FCVAR_NOTIFY, "1: basic conveniences (instant respawn and class change, etc).  2: add combat conveniences (infinite ammo, buddha, etc)" );
-#endif // _DEBUG || STAGING_ONLY
+#endif  // !NDEBUG || STAGING_ONLY
 
 #ifdef GAME_DLL
 ConVar mp_showroundtransitions( "mp_showroundtransitions", "0", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY, "Show gamestate round transitions." );
@@ -944,7 +944,7 @@ void CTeamplayRoundBasedRules::CheckWaitingForPlayers( void )
 #if !defined(NDEBUG) || defined( STAGING_ONLY )
 	if ( mp_developer.GetBool() )
 		bCancelWait = true;
-#endif // _DEBUG || STAGING_ONLY
+#endif  // !NDEBUG || STAGING_ONLY
 
 	if ( bCancelWait )
 	{
@@ -3044,7 +3044,7 @@ void CTeamplayRoundBasedRules::BalanceTeams( bool bRequireSwitcheesToBeDead )
 #if !defined(NDEBUG) || defined( STAGING_ONLY )
 	if ( mp_developer.GetBool() )
 		return;
-#endif // _DEBUG || STAGING_ONLY
+#endif  // !NDEBUG || STAGING_ONLY
 
 	if ( IsInTraining() || IsInItemTestingMode() )
 	{
@@ -3534,7 +3534,7 @@ bool CTeamplayRoundBasedRules::ShouldBalanceTeams( void )
 #if !defined(NDEBUG) || defined( STAGING_ONLY )
 	if ( mp_developer.GetBool() )
 		return false;
-#endif // _DEBUG || STAGING_ONLY
+#endif  // !NDEBUG || STAGING_ONLY
 
 	if ( mp_teams_unbalance_limit.GetInt() <= 0 )
 		return false;
@@ -3563,7 +3563,7 @@ bool CTeamplayRoundBasedRules::WouldChangeUnbalanceTeams( int iNewTeam, int iCur
 #if !defined(NDEBUG) || defined( STAGING_ONLY )
 	if ( mp_developer.GetBool() )
 		return false;
-#endif // _DEBUG || STAGING_ONLY
+#endif  // !NDEBUG || STAGING_ONLY
 
 	// if they are joining a non-playing team, allow
 	if ( iNewTeam < FIRST_GAME_TEAM )

@@ -85,7 +85,7 @@ ConVar tf_weapon_criticals_nopred( "tf_weapon_criticals_nopred", "1.0", FCVAR_RE
 ConVar tf_weapon_criticals_anticheat( "tf_weapon_criticals_anticheat", "1.0", FCVAR_REPLICATED );
 ConVar tf_weapon_criticals_debug( "tf_weapon_criticals_debug", "0.0", FCVAR_REPLICATED );
 extern ConVar tf_weapon_criticals_force_random;
-#endif // _DEBUG
+#endif  // !NDEBUG
 extern ConVar tf_weapon_criticals_bucket_cap;
 extern ConVar tf_weapon_criticals_bucket_bottom;
 
@@ -1548,7 +1548,7 @@ bool CTFWeaponBase::CalcIsAttackCriticalHelper()
 	{
 		bCrit = true;
 	}
-#endif // _DEBUG
+#endif  // !NDEBUG
 	
 	// Track each check
 #ifdef GAME_DLL
@@ -1566,7 +1566,7 @@ bool CTFWeaponBase::CalcIsAttackCriticalHelper()
 		bool bAntiCheat = true;
 #ifndef NDEBUG
 		bAntiCheat = tf_weapon_criticals_anticheat.GetBool();
-#endif // _DEBUG
+#endif  // !NDEBUG
 
 		// Monitor and enforce long-term random crit rate - via stats
 		if ( bAntiCheat )

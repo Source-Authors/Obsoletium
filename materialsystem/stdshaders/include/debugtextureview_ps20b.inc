@@ -48,11 +48,11 @@ public:
 	{
 #ifndef NDEBUG
 		m_bCONVERT_TO_SRGB = true;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
 #ifndef NDEBUG
 		m_bSHOWALPHA = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nSHOWALPHA = 0;
 	}
 	int GetIndex()
@@ -62,7 +62,7 @@ public:
 #ifndef NDEBUG
 		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bSHOWALPHA;
 		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 2 * m_nCONVERT_TO_SRGB ) + ( 4 * m_nSHOWALPHA ) + 0;
 	}
 };
@@ -95,7 +95,7 @@ public:
 	{
 #ifndef NDEBUG
 		m_bISCUBEMAP = false;
-#endif // _DEBUG
+#endif  // !NDEBUG
 		m_nISCUBEMAP = 0;
 	}
 	int GetIndex()
@@ -105,7 +105,7 @@ public:
 #ifndef NDEBUG
 		bool bAllDynamicVarsDefined = m_bISCUBEMAP;
 		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+#endif  // !NDEBUG
 		return ( 1 * m_nISCUBEMAP ) + 0;
 	}
 };

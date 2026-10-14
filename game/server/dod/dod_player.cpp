@@ -2330,7 +2330,7 @@ bool CDODPlayer::ClientCommand( const CCommand &args )
 		return true;
 	}
 
-#endif //_DEBUG
+#endif  // !NDEBUG
 
 	return BaseClass::ClientCommand( args );
 }

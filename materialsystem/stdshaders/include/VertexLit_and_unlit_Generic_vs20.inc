@@ -32,7 +32,7 @@ class vertexlit_and_unlit_generic_vs20_Static_Index
 	bool m_bSEPARATE_DETAIL_UVS : 1;
 	bool m_bUSE_STATIC_CONTROL_FLOW : 1;
 	bool m_bDONT_GAMMA_CONVERT_VERTEX_COLOR : 1;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 public:
 	void SetVERTEXCOLOR( int i )
 	{
@@ -40,7 +40,7 @@ public:
 		m_nVERTEXCOLOR = i;
 #ifndef NDEBUG
 		m_bVERTEXCOLOR = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetCUBEMAP( int i )
@@ -49,7 +49,7 @@ public:
 		m_nCUBEMAP = i;
 #ifndef NDEBUG
 		m_bCUBEMAP = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetHALFLAMBERT( int i )
@@ -58,7 +58,7 @@ public:
 		m_nHALFLAMBERT = i;
 #ifndef NDEBUG
 		m_bHALFLAMBERT = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetFLASHLIGHT( int i )
@@ -67,7 +67,7 @@ public:
 		m_nFLASHLIGHT = i;
 #ifndef NDEBUG
 		m_bFLASHLIGHT = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetSEAMLESS_BASE( int i )
@@ -76,7 +76,7 @@ public:
 		m_nSEAMLESS_BASE = i;
 #ifndef NDEBUG
 		m_bSEAMLESS_BASE = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetSEAMLESS_DETAIL( int i )
@@ -85,7 +85,7 @@ public:
 		m_nSEAMLESS_DETAIL = i;
 #ifndef NDEBUG
 		m_bSEAMLESS_DETAIL = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetSEPARATE_DETAIL_UVS( int i )
@@ -94,7 +94,7 @@ public:
 		m_nSEPARATE_DETAIL_UVS = i;
 #ifndef NDEBUG
 		m_bSEPARATE_DETAIL_UVS = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetUSE_STATIC_CONTROL_FLOW( int i )
@@ -103,7 +103,7 @@ public:
 		m_nUSE_STATIC_CONTROL_FLOW = i;
 #ifndef NDEBUG
 		m_bUSE_STATIC_CONTROL_FLOW = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetDONT_GAMMA_CONVERT_VERTEX_COLOR( int i )
@@ -112,7 +112,7 @@ public:
 		m_nDONT_GAMMA_CONVERT_VERTEX_COLOR = i;
 #ifndef NDEBUG
 		m_bDONT_GAMMA_CONVERT_VERTEX_COLOR = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	vertexlit_and_unlit_generic_vs20_Static_Index( )
@@ -136,7 +136,7 @@ public:
 		m_bSEPARATE_DETAIL_UVS = false;
 		m_bUSE_STATIC_CONTROL_FLOW = false;
 		m_bDONT_GAMMA_CONVERT_VERTEX_COLOR = false;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	int GetIndex() const
@@ -166,7 +166,7 @@ class vertexlit_and_unlit_generic_vs20_Dynamic_Index
 	bool m_bSKINNING : 1;
 	bool m_bLIGHTING_PREVIEW : 1;
 	bool m_bNUM_LIGHTS : 1;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 public:
 	void SetCOMPRESSED_VERTS( int i )
 	{
@@ -174,7 +174,7 @@ public:
 		m_nCOMPRESSED_VERTS = i;
 #ifndef NDEBUG
 		m_bCOMPRESSED_VERTS = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetDYNAMIC_LIGHT( int i )
@@ -183,7 +183,7 @@ public:
 		m_nDYNAMIC_LIGHT = i;
 #ifndef NDEBUG
 		m_bDYNAMIC_LIGHT = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetSTATIC_LIGHT( int i )
@@ -192,7 +192,7 @@ public:
 		m_nSTATIC_LIGHT = i;
 #ifndef NDEBUG
 		m_bSTATIC_LIGHT = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetDOWATERFOG( int i )
@@ -201,7 +201,7 @@ public:
 		m_nDOWATERFOG = i;
 #ifndef NDEBUG
 		m_bDOWATERFOG = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetSKINNING( int i )
@@ -210,7 +210,7 @@ public:
 		m_nSKINNING = i;
 #ifndef NDEBUG
 		m_bSKINNING = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetLIGHTING_PREVIEW( int i )
@@ -219,7 +219,7 @@ public:
 		m_nLIGHTING_PREVIEW = i;
 #ifndef NDEBUG
 		m_bLIGHTING_PREVIEW = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	void SetNUM_LIGHTS( int i )
@@ -228,7 +228,7 @@ public:
 		m_nNUM_LIGHTS = i;
 #ifndef NDEBUG
 		m_bNUM_LIGHTS = true;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	vertexlit_and_unlit_generic_vs20_Dynamic_Index()
@@ -248,7 +248,7 @@ public:
 		m_bSKINNING = false;
 		m_bLIGHTING_PREVIEW = false;
 		m_bNUM_LIGHTS = false;
-#endif	// _DEBUG
+#endif  // !NDEBUG
 	}
 
 	int GetIndex() const
