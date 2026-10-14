@@ -12,7 +12,7 @@
 //			To take advantage of this pattern a DLL or EXE should add code 
 //			at global scope similar to the following in one of its modules:
 //
-//			#if !defined(_DEBUG)
+//			#if defined(NDEBUG)
 //			extern int bitmap_lib_is_a_release_build;
 //
 //			void DebugTestFunction()

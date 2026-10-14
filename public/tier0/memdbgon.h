@@ -54,13 +54,13 @@
 	#else // defined(POSIX)
 	
 		// Include crtdbg.h and make sure _DEBUG is set to 1.
-		#if !defined(_DEBUG)
+		#if defined(NDEBUG)
 			#define _DEBUG 1
 			#include <crtdbg.h>
 			#undef _DEBUG
 		#else
 			#include <crtdbg.h>
-		#endif // !defined(_DEBUG)
+		#endif // defined(NDEBUG)
 	
 	#endif // defined(POSIX)
 #endif

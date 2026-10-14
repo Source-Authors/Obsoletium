@@ -36,7 +36,7 @@
 #define ALLOW_PROCESS_HEAP
 #endif
 
-#if (!defined(_DEBUG) && !defined(USE_MEM_DEBUG))
+#if (defined(NDEBUG) && !defined(USE_MEM_DEBUG))
 // Track this to decide how to handle out-of-memory.
 static bool s_bPageHeapEnabled = false;
 #endif
@@ -69,7 +69,7 @@ void PrintAllocTimes()
 #define PrintAllocTimes() ((void)0)
 #endif
 
-#if (!defined(_DEBUG) && !defined(USE_MEM_DEBUG))
+#if (defined(NDEBUG) && !defined(USE_MEM_DEBUG))
 
 // Support for CHeapMemAlloc for easy switching to using the process heap.
 #ifdef ALLOW_PROCESS_HEAP

@@ -1646,11 +1646,11 @@ bool ShouldEnableWindowsShortcutKeys() noexcept
 //-----------------------------------------------------------------------------
 CGame::CGame()
 	// dimhotepus: Disable Win key.
-#if !defined(_DEBUG) && defined(IS_WINDOWS_PC)
+#if defined(NDEBUG) && defined(IS_WINDOWS_PC)
 	: m_windowsShortcutKeysToggler{ ::GetModuleHandleW( L"engine.dll" ), ShouldEnableWindowsShortcutKeys }
 #endif
 {
-#if !defined(_DEBUG) && defined(IS_WINDOWS_PC)
+#if defined(NDEBUG) && defined(IS_WINDOWS_PC)
 	// dimhotepus: Disable Win key.
 	if ( m_windowsShortcutKeysToggler.errno_code() )
 	{

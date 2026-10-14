@@ -26,7 +26,7 @@
 #include <climits>
 #include "tier0/threadtools.h"
 
-#if ( !defined(_DEBUG) && defined(USE_MEM_DEBUG) )
+#if ( defined(NDEBUG) && defined(USE_MEM_DEBUG) )
 #pragma message ("USE_MEM_DEBUG is enabled in a release build. Don't commit this!")
 #endif
 #if (defined(_DEBUG) || defined(USE_MEM_DEBUG))
@@ -400,7 +400,7 @@ static inline size_t InternalMSize( void *pMem )
 #if defined(POSIX)
 	DbgMemHeader_t *pInternalMem = GetCrtDbgMemHeader( pMem );
 	return pInternalMem->nLogicalSize;
-#elif !defined(_DEBUG)
+#elif defined(NDEBUG)
 	DbgMemHeader_t *pInternalMem = GetCrtDbgMemHeader( pMem );
 	return _msize( pInternalMem ) - sizeof(DbgMemHeader_t);
 #else
@@ -413,7 +413,7 @@ static inline size_t InternalLogicalSize( void *pMem )
 {
 #if defined(POSIX)
 	DbgMemHeader_t *pInternalMem = GetCrtDbgMemHeader( pMem );
-#elif !defined(_DEBUG)
+#elif defined(NDEBUG)
 	DbgMemHeader_t *pInternalMem = (DbgMemHeader_t *)pMem - 1;
 #else
 	DbgMemHeader_t *pInternalMem = (DbgMemHeader_t *)pMem - 1;
