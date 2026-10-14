@@ -762,7 +762,7 @@ bool CShaderDeviceDx11::InitDevice(void *hwnd, unsigned adapter_no,
   }
 
   UINT device_flags{0};
-#if defined(DEBUG) || defined(_DEBUG)
+#if !defined(NDEBUG)
   device_flags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 

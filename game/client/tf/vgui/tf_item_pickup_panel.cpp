@@ -321,7 +321,7 @@ void CTFItemDiscardPanel::OnCommand( const char *command )
 	}
 }
 
-#if defined(DEBUG)
+#if !defined(NDEBUG)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -380,5 +380,5 @@ void Test_ItemDiscardPanel( const CCommand &args )
 }
 
 ConCommand test_itemdiscardpanel( "test_itemdiscardpanel", Test_ItemDiscardPanel, "Debugging tool to test the item discard panel. Usage: test_itemdiscardpanel <weapon name>\n   <weapon id>: 0 = primary, 1 = secondary, 2 = melee.", FCVAR_CHEAT );
-#endif // defined(DEBUG)
+#endif // !defined(NDEBUG)
 

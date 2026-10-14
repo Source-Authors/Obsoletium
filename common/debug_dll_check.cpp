@@ -4,7 +4,7 @@
 // "%DLLNAME%.dll is built debug!". We can search for this string via
 // a Perforce trigger to ensure that debug LIBs are not checked in.
 
-#if defined(DEBUG) || defined(_DEBUG)
+#if !defined(NDEBUG)
 #include "tier0/platform.h"
 
 #define _DEBUGONLYSTRING(x) #x

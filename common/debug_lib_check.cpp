@@ -23,7 +23,7 @@
 //
 //=============================================================================//
 
-#if defined(DEBUG) || defined(_DEBUG)
+#if !defined(NDEBUG)
 #define SE_DEBUGONLYSTRING_WORKER(x) #x
 #define SE_DEBUGONLYSTRING(x) SE_DEBUGONLYSTRING_WORKER(x)
 [[maybe_unused]] static volatile char const pDebugString[] = SE_DEBUGONLYSTRING(LIBNAME) ".lib is built debug!";

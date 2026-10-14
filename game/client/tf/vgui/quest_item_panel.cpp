@@ -1377,7 +1377,7 @@ void CQuestItemPanel::OnCollapsedGlowEnd( void )
 //-----------------------------------------------------------------------------
 void CQuestItemPanel::OnDiscardQuest( void )
 {
-#if !defined(STAGING_ONLY) && !defined(DEBUG)
+#if !defined(STAGING_ONLY) && defined(NDEBUG)
 	// Not in public!
 	return;
 #endif
