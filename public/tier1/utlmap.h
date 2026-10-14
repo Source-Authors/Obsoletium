@@ -69,28 +69,28 @@ public:
 	void EnsureCapacity( intp num )							{ m_Tree.EnsureCapacity( num ); }
 
 	// gets particular elements
-	ElemType_t &		Element( IndexType_t i )			{ return m_Tree.Element( i ).elem; }
-	const ElemType_t &	Element( IndexType_t i ) const		{ return m_Tree.Element( i ).elem; }
-	ElemType_t &		operator[]( IndexType_t i )			{ return m_Tree.Element( i ).elem; }
-	const ElemType_t &	operator[]( IndexType_t i ) const	{ return m_Tree.Element( i ).elem; }
-	KeyType_t &			Key( IndexType_t i )				{ return m_Tree.Element( i ).key; }
-	const KeyType_t &	Key( IndexType_t i ) const			{ return m_Tree.Element( i ).key; }
+	[[nodiscard]] ElemType_t &			Element( IndexType_t i )			{ return m_Tree.Element( i ).elem; }
+	[[nodiscard]] const ElemType_t &	Element( IndexType_t i ) const		{ return m_Tree.Element( i ).elem; }
+	[[nodiscard]] ElemType_t &			operator[]( IndexType_t i )			{ return m_Tree.Element( i ).elem; }
+	[[nodiscard]] const ElemType_t &	operator[]( IndexType_t i ) const	{ return m_Tree.Element( i ).elem; }
+	[[nodiscard]] KeyType_t &			Key( IndexType_t i )				{ return m_Tree.Element( i ).key; }
+	[[nodiscard]] const KeyType_t &		Key( IndexType_t i ) const			{ return m_Tree.Element( i ).key; }
 
 	
 	// Num elements
-	I Count() const								{ return m_Tree.Count(); }
+	[[nodiscard]] I Count() const										{ return m_Tree.Count(); }
 	
 	// Max "size" of the vector
-	IndexType_t  MaxElement() const							{ return m_Tree.MaxElement(); }
+	[[nodiscard]] IndexType_t MaxElement() const						{ return m_Tree.MaxElement(); }
 	
 	// Checks if a node is valid and in the map
-	bool  IsValidIndex( IndexType_t i ) const				{ return m_Tree.IsValidIndex( i ); }
+	[[nodiscard]] bool IsValidIndex( IndexType_t i ) const				{ return m_Tree.IsValidIndex( i ); }
 	
 	// Checks if the map as a whole is valid
-	[[nodiscard]] bool  IsValid() const									{ return m_Tree.IsValid(); }
+	[[nodiscard]] bool IsValid() const									{ return m_Tree.IsValid(); }
 	
 	// Invalid index
-	static constexpr IndexType_t InvalidIndex()				{ return CTree::InvalidIndex(); }
+	[[nodiscard]] static constexpr IndexType_t InvalidIndex()			{ return CTree::InvalidIndex(); }
 	
 	// Sets the less func
 	void SetLessFunc( LessFunc_t func )
@@ -115,7 +115,7 @@ public:
 	}
 
 	// Find method
-	IndexType_t  Find( const KeyType_t &key ) const
+	[[nodiscard]] IndexType_t Find( const KeyType_t &key ) const
 	{
 		Node_t dummyNode;
 		dummyNode.key = key;
@@ -138,10 +138,10 @@ public:
 	void PurgeAndDeleteElements();
 		
 	// Iteration
-	IndexType_t  FirstInorder() const						{ return m_Tree.FirstInorder(); }
-	IndexType_t  NextInorder( IndexType_t i ) const			{ return m_Tree.NextInorder( i ); }
-	IndexType_t  PrevInorder( IndexType_t i ) const			{ return m_Tree.PrevInorder( i ); }
-	IndexType_t  LastInorder() const						{ return m_Tree.LastInorder(); }		
+	[[nodiscard]] IndexType_t  FirstInorder() const						{ return m_Tree.FirstInorder(); }
+	[[nodiscard]] IndexType_t  NextInorder( IndexType_t i ) const		{ return m_Tree.NextInorder( i ); }
+	[[nodiscard]] IndexType_t  PrevInorder( IndexType_t i ) const		{ return m_Tree.PrevInorder( i ); }
+	[[nodiscard]] IndexType_t  LastInorder() const						{ return m_Tree.LastInorder(); }		
 	
 	// If you change the search key, this can be used to reinsert the 
 	// element into the map.
@@ -190,12 +190,12 @@ public:
 	public:
 		CKeyLess( LessFunc_t lessFunc ) : m_LessFunc(lessFunc) {}
 
-		bool operator!() const
+		[[nodiscard]] bool operator!() const
 		{
 			return !m_LessFunc;
 		}
 
-		bool operator()( const Node_t &left, const Node_t &right ) const
+		[[nodiscard]] bool operator()( const Node_t &left, const Node_t &right ) const
 		{
 			return m_LessFunc( left.key, right.key );
 		}
@@ -205,7 +205,7 @@ public:
 
 	using CTree = CUtlRBTree<Node_t, I, CKeyLess>;
 
-	CTree *AccessTree()	{ return &m_Tree; }
+	[[nodiscard]] CTree *AccessTree()	{ return &m_Tree; }
 
 protected:
 	CTree 	   m_Tree;
