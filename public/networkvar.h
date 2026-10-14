@@ -53,7 +53,7 @@ inline int CheckDeclareClass_Access( T *, const char *pShouldBe )
 
 #ifndef _STATIC_LINKED
 #ifdef _MSC_VER
-#if defined(_DEBUG) && (_MSC_VER > 1200 )
+#if !defined(NDEBUG) && (_MSC_VER > 1200 )
 	#define VALIDATE_DECLARE_CLASS 1
 #endif
 #endif

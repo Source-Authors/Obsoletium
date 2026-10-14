@@ -29,7 +29,7 @@
 #if ( defined(NDEBUG) && defined(USE_MEM_DEBUG) )
 #pragma message ("USE_MEM_DEBUG is enabled in a release build. Don't commit this!")
 #endif
-#if (defined(_DEBUG) || defined(USE_MEM_DEBUG))
+#if (!defined(NDEBUG) || defined(USE_MEM_DEBUG))
 
 #if defined(_WIN32) && ( !defined(_X360) && !defined(_WIN64) )
 // #define USE_STACK_WALK
@@ -1908,6 +1908,6 @@ void *operator new[] ( size_t nSize, int nBlockUse, const char *pFileName, int n
 #endif // defined( OSX ) && !defined( NO_HOOK_MALLOC )
 
 
-#endif // (defined(_DEBUG) || defined(USE_MEM_DEBUG))
+#endif // (!defined(NDEBUG) || defined(USE_MEM_DEBUG))
 
 #endif // !STEAM && !NO_MALLOC_OVERRIDE

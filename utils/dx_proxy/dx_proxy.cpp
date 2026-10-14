@@ -78,7 +78,7 @@ BOOL WINAPI DllMain(HMODULE module, DWORD reason, void*) {
 
 // Obtain DLL version
 SE_DX_PROXY_API const char* WINAPI GetDllVersionLong() {
-#if defined(DX9_V00_PC) && defined(_DEBUG)
+#if defined(DX9_V00_PC) && !defined(NDEBUG)
   return "{DX_PROXY for DX9_V00_PC DEBUG}";
 #endif
 
@@ -86,7 +86,7 @@ SE_DX_PROXY_API const char* WINAPI GetDllVersionLong() {
   return "{DX_PROXY for DX9_V00_PC RELEASE}";
 #endif
 
-#if defined(DX9_V30_PC) && defined(_DEBUG)
+#if defined(DX9_V30_PC) && !defined(NDEBUG)
   return "{DX_PROXY for DX9_V30_PC DEBUG}";
 #endif
 
@@ -94,7 +94,7 @@ SE_DX_PROXY_API const char* WINAPI GetDllVersionLong() {
   return "{DX_PROXY for DX9_V30_PC RELEASE}";
 #endif
 
-#if defined(DX11_V00_PC) && defined(_DEBUG)
+#if defined(DX11_V00_PC) && !defined(NDEBUG)
   return "{DX_PROXY for DX11_V00_PC DEBUG}";
 #endif
 
@@ -104,7 +104,7 @@ SE_DX_PROXY_API const char* WINAPI GetDllVersionLong() {
 }
 
 SE_DX_PROXY_API const char* WINAPI GetDllVersion() {
-#if defined(DX9_V00_PC) && defined(_DEBUG)
+#if defined(DX9_V00_PC) && !defined(NDEBUG)
   return "DXPRX_DX9_V00_PC_d";
 #endif
 
@@ -112,7 +112,7 @@ SE_DX_PROXY_API const char* WINAPI GetDllVersion() {
   return "DXPRX_DX9_V00_PC_r";
 #endif
 
-#if defined(DX9_V30_PC) && defined(_DEBUG)
+#if defined(DX9_V30_PC) && !defined(NDEBUG)
   return "DXPRX_DX9_V30_PC_d";
 #endif
 
@@ -120,7 +120,7 @@ SE_DX_PROXY_API const char* WINAPI GetDllVersion() {
   return "DXPRX_DX9_V30_PC_r";
 #endif
 
-#if defined(DX11_V00_PC) && defined(_DEBUG)
+#if defined(DX11_V00_PC) && !defined(NDEBUG)
   return "DXPRX_DX11_V00_PC_d";
 #endif
 

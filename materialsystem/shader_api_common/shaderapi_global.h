@@ -64,7 +64,7 @@ extern bool g_bUseShaderMutex;
 //#define USE_SHADER_DISALLOW 1
 //#define STRICT_MT_SHADERAPI 1
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 #if !defined(STRICT_MT_SHADERAPI)
 #define UNCONDITIONAL_MT_SHADERAPI 1
 #endif

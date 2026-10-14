@@ -61,7 +61,7 @@ public:
 	vec_t x, y, z;
 
 	// Construction/destruction: 
-#if defined(_DEBUG) && defined(VECTOR_PARANOIA)
+#if !defined(NDEBUG) && defined(VECTOR_PARANOIA)
     // Initialize to NAN to catch errors
 	Vector() : x(VEC_T_NAN), y(VEC_T_NAN), z(VEC_T_NAN)
 	{
@@ -1773,7 +1773,7 @@ class RadianEuler;
 class alignas(vec_t) Quaternion
 {
 public:
-#if defined(_DEBUG) && defined(VECTOR_PARANOIA)
+#if !defined(NDEBUG) && defined(VECTOR_PARANOIA)
 	// Initialize to NAN to catch errors
 	Quaternion() : x(VEC_T_NAN), y(VEC_T_NAN), z(VEC_T_NAN), w(VEC_T_NAN)
 	{
@@ -2070,7 +2070,7 @@ public:
 	vec_t x, y, z;
 
 	// Construction/destruction
-#if defined(_DEBUG) && defined(VECTOR_PARANOIA)
+#if !defined(NDEBUG) && defined(VECTOR_PARANOIA)
     // Initialize to NAN to catch errors
 	QAngle() : x(VEC_T_NAN), y(VEC_T_NAN), z(VEC_T_NAN)
 	{

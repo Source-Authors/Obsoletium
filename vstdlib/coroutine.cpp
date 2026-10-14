@@ -18,7 +18,7 @@
 //=============================================================================
 
 //#include "pch_vstdlib.h"
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 // Verify that something is false
 #define DbgVerifyNot(x) Assert(!(x))
 #else

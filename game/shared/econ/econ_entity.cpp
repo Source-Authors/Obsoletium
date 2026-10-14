@@ -44,7 +44,7 @@ IMPLEMENT_NETWORKCLASS_ALIASED( BaseAttributableItem, DT_BaseAttributableItem )
 bool ParseItemKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, const char *szKeyName, const char *szValue );
 #endif
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 extern ConVar item_debug;
 extern ConVar item_debug_validation;
 #endif
@@ -1017,7 +1017,7 @@ void CEconEntity::OnDataChanged( DataUpdateType_t updateType )
 	{
 		CEconItemView *pItem = m_AttributeManager.GetItem();
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 		if ( item_debug.GetBool() )
 		{
 			DebugDescribe();

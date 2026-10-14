@@ -18,7 +18,7 @@
 CCriticalSection::CCriticalSection(unsigned spin_before_lock) {
   Assert(sizeof(CRITICAL_SECTION) == SIZEOF_CS);
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
   (void)InitializeCriticalSectionAndSpinCount(
       (CRITICAL_SECTION*)&m_DeadlockProtect, spin_before_lock);
 #endif
@@ -30,13 +30,13 @@ CCriticalSection::CCriticalSection(unsigned spin_before_lock) {
 CCriticalSection::~CCriticalSection() {
   DeleteCriticalSection((CRITICAL_SECTION*)&m_CS);
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
   DeleteCriticalSection((CRITICAL_SECTION*)&m_DeadlockProtect);
 #endif
 }
 
 void CCriticalSection::Lock() {
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
   // Check if this one is already locked.
   DWORD id = GetCurrentThreadId();
   EnterCriticalSection((CRITICAL_SECTION*)&m_DeadlockProtect);
@@ -49,7 +49,7 @@ void CCriticalSection::Lock() {
 }
 
 void CCriticalSection::Unlock() {
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
   // Check if this one is already locked.
   DWORD id = GetCurrentThreadId();
   EnterCriticalSection((CRITICAL_SECTION*)&m_DeadlockProtect);

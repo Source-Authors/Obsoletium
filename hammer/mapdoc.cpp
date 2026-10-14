@@ -10170,7 +10170,7 @@ void CMapDoc::SetUndoActive(bool bActive)
 //-----------------------------------------------------------------------------
 bool CMapDoc::ShouldObjectBeVisible(CMapClass *pObject, UpdateVisibilityData_t *pData)
 {
-#if defined(_DEBUG) && 0
+#if !defined(NDEBUG) && 0
 	CMapEntity	*pEntity = dynamic_cast<CMapEntity *>(pObject);
 	if (pEntity)
 	{

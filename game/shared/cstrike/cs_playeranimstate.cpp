@@ -326,7 +326,7 @@ int CCSPlayerAnimState::SelectWeightedSequence( Activity activity )
 		sequence = m_sequenceCache[ activity - 1 ] = GetOuter()->SelectWeightedSequence( activity );
 	}
 
-#if defined(CLIENT_DLL) && defined(_DEBUG)
+#if defined(CLIENT_DLL) && !defined(NDEBUG)
 	int realSequence = GetOuter()->SelectWeightedSequence( activity );
 	Assert( realSequence == sequence );
 #endif
@@ -363,7 +363,7 @@ int CCSPlayerAnimState::CalcSequenceIndex( const char *pBaseName, ... )
 		iSequence = m_namedSequence[iSequence];
 	}
 
-#if defined(CLIENT_DLL) && defined(_DEBUG)
+#if defined(CLIENT_DLL) && !defined(NDEBUG)
 	int realSequence = GetOuter()->LookupSequence( szFullName );
 	Assert( realSequence == iSequence );
 #endif

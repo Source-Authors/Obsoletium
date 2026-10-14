@@ -11,7 +11,7 @@
 
 // By default, only enable this alloc tracking for a debug shaderapidx*.dll
 // (it uses about 0.25MB to track ~7000 allocations)
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 #define ENABLE_VB_ALLOC_TRACKER 1
 #else
 #define ENABLE_VB_ALLOC_TRACKER 0

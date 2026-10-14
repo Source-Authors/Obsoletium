@@ -777,7 +777,7 @@ size_t __cdecl _msize_dbg( _Pre_notnull_ void *pMem, _In_ int )
 
 #ifdef _WIN32
 
-#if defined(_DEBUG) && _MSC_VER >= 1300
+#if !defined(NDEBUG) && _MSC_VER >= 1300
 // aligned base
 ALLOC_CALL void *__cdecl _aligned_malloc_base( size_t size, size_t align )
 {

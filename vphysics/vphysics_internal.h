@@ -18,7 +18,7 @@ extern class IPhysics *g_PhysicsInternal;
 //-----------------------------------------------------------------------------
 // Memory debugging 
 //-----------------------------------------------------------------------------
-#if defined(_DEBUG) || defined(USE_MEM_DEBUG)
+#if !defined(NDEBUG) || defined(USE_MEM_DEBUG)
 #define BEGIN_IVP_ALLOCATION()	MemAlloc_PushAllocDbgInfo("IVP: " __FILE__ , __LINE__ )
 #define END_IVP_ALLOCATION()	MemAlloc_PopAllocDbgInfo()
 #else

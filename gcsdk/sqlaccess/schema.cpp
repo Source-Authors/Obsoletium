@@ -1460,14 +1460,14 @@ void CSchema::Validate( CValidator &validator, const char *pchName )
 
 	// 2.
 	// Validate that our fields make sense
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	uint32 dubOffset = 0;
 	for ( int iField = 0; iField < m_VecField.Count(); iField++ )
 	{
 		Assert( dubOffset == m_VecField[iField].m_dubOffset );
 		dubOffset += m_VecField[iField].m_cubLength;
 	}
-#endif // defined(_DEBUG)
+#endif // !defined(NDEBUG)
 }
 
 

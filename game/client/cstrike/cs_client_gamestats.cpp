@@ -242,7 +242,7 @@ CON_COMMAND_F( stats_dump, "Dumps all player stats", FCVAR_DEVELOPMENTONLY )
 	}
 }
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 CON_COMMAND_F( stats_preload, "Load stats with data ripe for getting achievmenets", FCVAR_DEVELOPMENTONLY )
 {
 	struct DataSet
@@ -334,7 +334,7 @@ CON_COMMAND_F( stats_preload, "Load stats with data ripe for getting achievmenet
 }
 #endif
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 CON_COMMAND_F( stats_corrupt, "Load stats with corrupt values", FCVAR_DEVELOPMENTONLY )
 {
 	struct DataSet

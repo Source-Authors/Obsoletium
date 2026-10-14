@@ -4298,7 +4298,7 @@ void Panel::ApplyAutoResizeSettings(KeyValues *inResourceData)
 	{
 		if ( auto *kv = inResourceData->FindKey( "PinnedCornerOffsetX" ) )
 		{
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 			dimension2ParentSizeUsageMap[0] = false;
 #endif
 			nPinnedCornerOffsetX = kv->GetInt( "PinnedCornerOffsetX", nPinnedCornerOffsetX );
@@ -4312,7 +4312,7 @@ void Panel::ApplyAutoResizeSettings(KeyValues *inResourceData)
 		}
 		if ( auto *kv = inResourceData->FindKey( "UnpinnedCornerOffsetX" ) )
 		{
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 			dimension2ParentSizeUsageMap[2] = false;
 #endif
 			nUnpinnedCornerOffsetX = kv->GetInt( "UnpinnedCornerOffsetX", nUnpinnedCornerOffsetX );
@@ -4329,7 +4329,7 @@ void Panel::ApplyAutoResizeSettings(KeyValues *inResourceData)
 	if ( autoResize == AUTORESIZE_NO )
 	{
 		nUnpinnedCornerOffsetX = nUnpinnedCornerOffsetY = 0;
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 		dimension2ParentSizeUsageMap[2] = dimension2ParentSizeUsageMap[3] = false;
 #endif
 	}

@@ -395,7 +395,7 @@ void FileWeaponInfo_t::Parse( KeyValues *pKeyValuesData, const char *szWeaponNam
 	m_bAllowFlipping = ( pKeyValuesData->GetInt( "AllowFlipping", 1 ) != 0 ) ? true : false;
 	m_bMeleeWeapon = ( pKeyValuesData->GetInt( "MeleeWeapon", 0 ) != 0 ) ? true : false;
 
-#if defined(_DEBUG) && defined(HL2_CLIENT_DLL)
+#if !defined(NDEBUG) && defined(HL2_CLIENT_DLL)
 	// make sure two weapons aren't in the same slot & position
 	if ( iSlot >= MAX_WEAPON_SLOTS ||
 		iPosition >= MAX_WEAPON_POSITIONS )

@@ -22,7 +22,7 @@
 #include <dxgidebug.h>
 #endif
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 // dimhotepus: For WKPDID_D3DDebugObjectName
 #pragma comment(lib, "dxguid.lib")
 #endif

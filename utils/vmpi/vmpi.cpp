@@ -1414,7 +1414,7 @@ void VMPI_InitGlobals(int argc, char **argv, VMPIRunMode runMode) {
   g_VMPIMessagesEvent.Init(false, false);
   g_ErrorSocketsEvent.Init(false, false);
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 
   for (int iArg = 0; iArg < argc; iArg++) {
     Warning("%s\n", argv[iArg]);

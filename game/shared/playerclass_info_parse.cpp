@@ -224,7 +224,7 @@ void FilePlayerClassInfo_t::Parse( KeyValues *pKeyValuesData, const char *szPlay
 	Q_strncpy( m_szSelectCmd, pKeyValuesData->GetString( "selectcmd", "!! Missing selectcmd on Player Class" ), 32 );
 
 
-#if defined(_DEBUG) && defined(HL2_CLIENT_DLL)
+#if !defined(NDEBUG) && defined(HL2_CLIENT_DLL)
 
 	// Use this for class select keys
 

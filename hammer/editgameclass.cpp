@@ -62,7 +62,7 @@ CEditGameClass::~CEditGameClass(void)
 //-----------------------------------------------------------------------------
 void CEditGameClass::Connections_Add(CEntityConnection *pConnection)
 {
-#if	defined(_DEBUG) && 0
+#if	!defined(NDEBUG) && 0
 		LPCTSTR	pszTargetName = GetKeyValue("targetname");
 		if ( pszTargetName && V_streq(pszTargetName, "zapperpod7_rotator") )
 		{
@@ -155,7 +155,7 @@ void CEditGameClass::Connections_FixBad(bool bRelink)
 //-----------------------------------------------------------------------------
 void CEditGameClass::Upstream_Add(CEntityConnection *pConnection)
 {
-#if	defined(_DEBUG) && 0
+#if	!defined(NDEBUG) && 0
 		LPCTSTR	pszTargetName = GetKeyValue("targetname");
 		if ( pszTargetName && V_streq(pszTargetName, "zapperpod7_rotator") )
 		{
@@ -225,7 +225,7 @@ void CEditGameClass::Upstream_RemoveAll(void)
 //-----------------------------------------------------------------------------
 void CEditGameClass::Upstream_FixBad()
 {
-#if	defined(_DEBUG) && 0
+#if	!defined(NDEBUG) && 0
 		LPCTSTR	pszTargetName = GetKeyValue("targetname");
 		if ( pszTargetName && V_streq(pszTargetName, "cave_guard_seq1") )
 		{

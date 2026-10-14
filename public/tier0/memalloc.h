@@ -315,7 +315,7 @@ inline size_t MemAlloc_GetSizeAligned( void *pMemBlock )
 
 //-----------------------------------------------------------------------------
 
-#if (defined(_DEBUG) || defined(USE_MEM_DEBUG))
+#if (!defined(NDEBUG) || defined(USE_MEM_DEBUG))
 #define MEM_ALLOC_CREDIT_JOIN_AGAIN( a, b )							a ## b
 #define MEM_ALLOC_CREDIT_JOIN( a, b )								MEM_ALLOC_CREDIT_JOIN_AGAIN( a, b )
 #define MEM_ALLOC_CREDIT_(tag)										CMemAllocAttributeAlloction MEM_ALLOC_CREDIT_JOIN( memAllocAttributeAlloction, __LINE__ )( tag, __LINE__ )
@@ -364,7 +364,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-#if defined(_WIN32) && ( defined(_DEBUG) || defined(USE_MEM_DEBUG) )
+#if defined(_WIN32) && ( !defined(NDEBUG) || defined(USE_MEM_DEBUG) )
 
 	#include <typeinfo>
 
@@ -393,7 +393,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-#if (defined(_DEBUG) || defined(USE_MEM_DEBUG))
+#if (!defined(NDEBUG) || defined(USE_MEM_DEBUG))
 struct MemAllocFileLine_t
 {
 	const char *pszFile;

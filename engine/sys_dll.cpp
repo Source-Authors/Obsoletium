@@ -937,7 +937,7 @@ int Sys_InitGame( CreateInterfaceFn appSystemFactory, const char* pBaseDir, void
 	// Initialize clock
 	TRACEINIT( Sys_Init(), Sys_Shutdown() );
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	if( !CommandLine()->HasParm( "-nodttest" ) && !CommandLine()->HasParm( "-dti" ) )
 	{
 		RunDataTableTest();

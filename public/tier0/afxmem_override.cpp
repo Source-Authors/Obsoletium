@@ -302,7 +302,7 @@ AFX_STATIC_DATA const _PNH _pfnUninitialized = (_PNH)-1;
 #endif
 
   for (;;) {
-#if !defined(_AFX_NO_DEBUG_CRT) && defined(_DEBUG)
+#if !defined(_AFX_NO_DEBUG_CRT) && !defined(NDEBUG)
     pResult = _malloc_dbg(nSize, _NORMAL_BLOCK, nullptr, 0);
 #else
     pResult = malloc(nSize);
@@ -325,7 +325,7 @@ AFX_STATIC_DATA const _PNH _pfnUninitialized = (_PNH)-1;
 }
 
 void __cdecl operator delete(void* p) {
-#if !defined(_AFX_NO_DEBUG_CRT) && defined(_DEBUG)
+#if !defined(_AFX_NO_DEBUG_CRT) && !defined(NDEBUG)
   _free_dbg(p, _NORMAL_BLOCK);
 #else
   free(p);
@@ -377,7 +377,7 @@ void __cdecl operator delete[](void* p) { ::operator delete(p); }
 
 void __cdecl operator delete(void* p, int nType, LPCSTR /* lpszFileName */,
                              int /* nLine */) {
-#if !defined(_AFX_NO_DEBUG_CRT) && defined(_DEBUG)
+#if !defined(_AFX_NO_DEBUG_CRT) && !defined(NDEBUG)
   _free_dbg(p, nType);
 #else
   free(p);

@@ -37,7 +37,7 @@
 
 #ifndef _RETAIL
 #define THREAD_MUTEX_TRACING_SUPPORTED
-#if defined(_WIN32) && defined(_DEBUG)
+#if defined(_WIN32) && !defined(NDEBUG)
 #define THREAD_MUTEX_TRACING_ENABLED
 #endif
 #endif

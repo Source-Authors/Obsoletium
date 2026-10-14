@@ -22,11 +22,11 @@ class GCConVar;
 namespace GCSDK
 {
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 // this is restricted to debug builds due to the performance cost
 // that could be changed by removing the expensive sm_listAllJobs.Find() command
 #define DEBUG_JOB_LIST
-#endif // defined(_DEBUG)
+#endif // !defined(NDEBUG)
 
 struct JobStats_t
 {

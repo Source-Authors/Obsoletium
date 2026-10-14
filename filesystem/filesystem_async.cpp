@@ -285,7 +285,7 @@ public:
 		{
 			g_AsyncOpenedFiles.AddRef( hSpecificAsyncFile );
 		}
-#if (defined(_DEBUG) || defined(USE_MEM_DEBUG))
+#if (!defined(NDEBUG) || defined(USE_MEM_DEBUG))
 		m_pszAllocCreditFile = NULL;
 		m_nAllocCreditLine = 0;
 #endif
@@ -321,7 +321,7 @@ public:
 		bool oldState = BaseFileSystem()->SetAllowSynchronousLogging( false );
 #endif
 
-#if (defined(_DEBUG) || defined(USE_MEM_DEBUG))
+#if (!defined(NDEBUG) || defined(USE_MEM_DEBUG))
 		if ( m_pszAllocCreditFile )
 			MemAlloc_PushAllocDbgInfo( m_pszAllocCreditFile, m_nAllocCreditLine );
 #endif
@@ -347,7 +347,7 @@ public:
 			ThreadSetPriority( iPrevPriority );
 		}
 
-#if (defined(_DEBUG) || defined(USE_MEM_DEBUG))
+#if (!defined(NDEBUG) || defined(USE_MEM_DEBUG))
 		if ( m_pszAllocCreditFile )
 			MemAlloc_PopAllocDbgInfo();
 #endif
@@ -410,7 +410,7 @@ public:
 
 	void SetAllocCredit( const char *pszFile, int line )
 	{
-#if (defined(_DEBUG) || defined(USE_MEM_DEBUG))
+#if (!defined(NDEBUG) || defined(USE_MEM_DEBUG))
 		m_pszAllocCreditFile = pszFile;
 		m_nAllocCreditLine = line;
 #endif
@@ -427,7 +427,7 @@ private:
 #if defined( TRACK_BLOCKING_IO )
 	CFastTimer				m_Timer;
 #endif
-#if (defined(_DEBUG) || defined(USE_MEM_DEBUG))
+#if (!defined(NDEBUG) || defined(USE_MEM_DEBUG))
 	const char *			m_pszAllocCreditFile;
 	int						m_nAllocCreditLine;
 #endif
@@ -784,7 +784,7 @@ FSAsyncStatus_t CBaseFileSystem::AsyncReadMultipleCreditAlloc( const FileAsyncRe
 			pJob =  new CFileAsyncFileSizeJob( pRequests[i], this );
 		}
 
-#if (defined(_DEBUG) || defined(USE_MEM_DEBUG))
+#if (!defined(NDEBUG) || defined(USE_MEM_DEBUG))
 		pJob->SetAllocCredit( pszFile, line );
 #endif
 

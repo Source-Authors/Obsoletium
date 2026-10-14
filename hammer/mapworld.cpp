@@ -1696,7 +1696,7 @@ void CMapWorld::PostloadVisGroups()
 	FOR_EACH_OBJ( *pEntities, pos )
 	{
 		CMapEntity *pEntity = dynamic_cast< CMapEntity *>( (*pEntities)[pos] );
-#if	defined(_DEBUG) && 0
+#if	!defined(NDEBUG) && 0
 		LPCTSTR	pszTargetName = pEntity->GetKeyValue("targetname");
 		if ( pszTargetName && V_streq(pszTargetName, "relay_cancelVCDs") )
 		{

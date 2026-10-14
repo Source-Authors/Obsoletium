@@ -59,7 +59,7 @@ CThreadSafeMultiMemoryPool::CThreadSafeMultiMemoryPool( const MemPoolConfig_t *p
 		}
 	}
 
-#if defined(_DEBUG)
+#if !defined(NDEBUG)
 	// validate the lookup table
 	for ( int i = 1; i < (int)m_nBlockSizeMax; i++ )
 	{
