@@ -25,7 +25,12 @@
 
 #include "winlite.h"
 
-#define ALLOWDEBUGOPTIONS (0 || _DEBUG)
+#ifdef NDEBUG
+#define ALLOWDEBUGOPTIONS 0
+#else
+#define ALLOWDEBUGOPTIONS 1
+#endif
+
 
 static FileHandle_t pFpTrans = NULL;
 
