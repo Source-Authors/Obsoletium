@@ -11,7 +11,7 @@ __declspec(dllimport) unsigned __stdcall SetErrorMode(unsigned new_mode);
 
 }  // extern "C"
 
-namespace se::common::windows {
+namespace s1::win {
 
 // Scoped process error mode.
 class ScopedProcessErrorMode {
@@ -35,6 +35,6 @@ class ScopedProcessErrorMode {
   unsigned old_mode_, new_mode_;
 };
 
-}  // namespace se::common::windows
+}  // namespace s1::win
 
 #endif  // !SE_COMMON_WINDOWS_SCOPED_PROCESS_ERROR_MODE_H_

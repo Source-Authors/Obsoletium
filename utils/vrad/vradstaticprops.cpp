@@ -567,7 +567,7 @@ void DumpCollideToGlView( vcollide_t *pCollide, const char *pFilename )
 
 	Msg("Writing %s...\n", pFilename );
 
-	auto [fp, errc] = se::posix::posix_file_stream_factory::open(pFilename, "w");
+	auto [fp, errc] = s1::posix::posix_file_stream_factory::open(pFilename, "w");
 	if (errc)
 	{
 		Warning("Unable to open file to dump collide '%s': %s.\n",

@@ -9,10 +9,10 @@
 #include "posix_file_stream.h"
 #include "winlite.h"
 
-namespace se::dx_proxy {
+namespace s1::dx_proxy {
 
 CachedFileData *CachedFileData::Create(char const *file_path) {
-  auto [f, errc] = se::posix::posix_file_stream_factory::open(file_path, "rb");
+  auto [f, errc] = s1::posix::posix_file_stream_factory::open(file_path, "rb");
   if (errc) {
     char error[MAX_PATH * 2 + 32];
     sprintf_s(error, "Unable to read '%s' for caching: %s.\n", file_path,
@@ -148,4 +148,4 @@ void FileCache::Clear() {
   m_file_name_2_data_map.clear();
 }
 
-}  // namespace se::dx_proxy
+}  // namespace s1::dx_proxy

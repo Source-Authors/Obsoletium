@@ -6,7 +6,7 @@
 #include "winlite.h"
 #endif // #ifdef WIN32
 
-namespace se::dmxedit {
+namespace s1::dmxedit {
 
 //-----------------------------------------------------------------------------
 //
@@ -25,4 +25,4 @@ bool MyGetComputerName( char *pszBuf, unsigned long *pBufSiz )
 	return !!GetComputerName( pszBuf, pBufSiz );
 }
 
-}  // namespace se::dmxedit
+}  // namespace s1::dmxedit

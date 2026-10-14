@@ -1590,7 +1590,7 @@ static bool CHLModelViewerApp_SuggestGameInfoDirFn( CFSSteamSetupInfo const *pFs
 int main (int argc, char *argv[])
 {
 	// Install an exception handler.
-	const se::utils::common::ScopedDefaultMinidumpHandler scoped_default_minidumps;
+	const s1::utils::common::ScopedDefaultMinidumpHandler scoped_default_minidumps;
 
 	CommandLine()->CreateCmdLine( argc, argv );
 
@@ -1599,7 +1599,7 @@ int main (int argc, char *argv[])
 	constexpr std::chrono::milliseconds kSystemTimerResolution{2ms};
 
 	// System timer precision affects Sleep & friends performance.
-	const se::common::windows::ScopedTimerResolution scoped_timer_resolution{
+	const s1::win::ScopedTimerResolution scoped_timer_resolution{
 		kSystemTimerResolution};
 	if (!scoped_timer_resolution) {
 		Warning(

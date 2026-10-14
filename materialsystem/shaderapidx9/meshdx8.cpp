@@ -123,7 +123,7 @@ public:
 	void HandlePerFrameTextureStats( int nFrame );
 
 protected:
-	se::win::com::com_ptr<IDirect3DVertexBuffer9> m_pVertexBuffer;
+	s1::win::com::com_ptr<IDirect3DVertexBuffer9> m_pVertexBuffer;
 	VertexFormat_t m_VertexFormat;
 	int m_nVertexCount;
 	int m_nBufferSize;
@@ -197,7 +197,7 @@ public:
 #endif
 
 private:
-	se::win::com::com_ptr<IDirect3DIndexBuffer9> m_pIndexBuffer;
+	s1::win::com::com_ptr<IDirect3DIndexBuffer9> m_pIndexBuffer;
 	MaterialIndexFormat_t m_IndexFormat;
 	int m_nIndexCount;
 	int m_nBufferSize;
@@ -947,7 +947,7 @@ private:
 	unsigned int m_nUnusedTextureCoords;
 
 	// 4096 byte static VB containing all-zeros
-	se::win::com::com_ptr<IDirect3DVertexBuffer9> m_pZeroVertexBuffer;
+	s1::win::com::com_ptr<IDirect3DVertexBuffer9> m_pZeroVertexBuffer;
 };
 
 //-----------------------------------------------------------------------------
@@ -983,7 +983,7 @@ static inline void D3DSetStreamSource( unsigned int streamNumber, IDirect3DVerte
 	{
 		Warning( __FUNCTION__ ": IDirect3D9DeviceEx::SetStreamSource(stream_number = %u, stream_data = 0x%p, offset = 0x%x, stride = %u) failed w/e %s.\n",
 			streamNumber, pStreamData, nVertexOffsetInBytes, stride,
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 	}
 }
 
@@ -1142,7 +1142,7 @@ bool CIndexBufferDx8::Allocate( IDirect3DDevice9Ex *pD3D )
 			usage,
 			format,
 			pool,
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 		
 		if ( hr == D3DERR_OUTOFVIDEOMEMORY || hr == E_OUTOFMEMORY )
 		{
@@ -1152,7 +1152,7 @@ bool CIndexBufferDx8::Allocate( IDirect3DDevice9Ex *pD3D )
 			if ( FAILED( hr ) )
 			{
 				Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EvictManagedResources() failed w/e %s.\n",
-					se::win::com::com_error_category().message(hr).c_str() );
+					s1::win::com::com_error_category().message(hr).c_str() );
 			}
 
 			hr = pD3D->CreateIndexBuffer(
@@ -1169,7 +1169,7 @@ bool CIndexBufferDx8::Allocate( IDirect3DDevice9Ex *pD3D )
 					usage,
 					format,
 					pool,
-					se::win::com::com_error_category().message(hr).c_str() );
+					s1::win::com::com_error_category().message(hr).c_str() );
 			}
 		}
 	}
@@ -1417,7 +1417,7 @@ bool CIndexBufferDx8::Lock( int nMaxIndexCount, bool bAppend, IndexDesc_t &desc 
 			m_nFirstUnwrittenOffset,
 			nMemoryRequired,
 			nLockFlags,
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 		goto indexBufferLockFailed;
 	}
 
@@ -1475,7 +1475,7 @@ void CIndexBufferDx8::Unlock( int nWrittenIndexCount, IndexDesc_t &desc )
 		{
 			Assert(false);
 			Warning( __FUNCTION__ ": IDirect3DIndexBuffer9::Unlock() failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 	}
 
@@ -1593,7 +1593,7 @@ bool CVertexBufferDx8::Allocate( IDirect3DDevice9Ex *pD3D )
 			usage,
 			0,
 			pool,
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 
 		if ( hr == D3DERR_OUTOFVIDEOMEMORY || hr == E_OUTOFMEMORY )
 		{
@@ -1603,7 +1603,7 @@ bool CVertexBufferDx8::Allocate( IDirect3DDevice9Ex *pD3D )
 			if ( FAILED( hr ) )
 			{
 				Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EvictManagedResources() failed w/e %s.\n",
-					se::win::com::com_error_category().message(hr).c_str() );
+					s1::win::com::com_error_category().message(hr).c_str() );
 			}
 
 			hr = pD3D->CreateVertexBuffer( 
@@ -1620,7 +1620,7 @@ bool CVertexBufferDx8::Allocate( IDirect3DDevice9Ex *pD3D )
 					usage,
 					0,
 					pool,
-					se::win::com::com_error_category().message(hr).c_str() );
+					s1::win::com::com_error_category().message(hr).c_str() );
 				return false;
 			}
 		}
@@ -1844,7 +1844,7 @@ bool CVertexBufferDx8::Lock( int nMaxVertexCount, bool bAppend, VertexDesc_t &de
 			m_nFirstUnwrittenOffset,
 			nMemoryRequired,
 			nLockFlags,
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 		goto vertexBufferLockFailed;
 	}
 
@@ -1887,7 +1887,7 @@ void CVertexBufferDx8::Unlock( int nWrittenVertexCount, VertexDesc_t &desc )
 		{
 			Assert(false);
 			Warning( __FUNCTION__ ": IDirect3DVertexBuffer9::Unlock() failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 	}
 

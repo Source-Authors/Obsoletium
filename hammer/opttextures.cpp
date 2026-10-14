@@ -301,7 +301,7 @@ BOOL COPTTextures::BrowseForFolder( char *pszTitle, char *pszDirectory )
 
 	LPITEMIDLIST pidlStartFolder = NULL;
 
-	se::win::com::com_ptr<IShellFolder> pshDesktop;
+	s1::win::com::com_ptr<IShellFolder> pshDesktop;
 	HRESULT hr = SHGetDesktopFolder( &pshDesktop );
 	if ( SUCCEEDED( hr ) )
 	{

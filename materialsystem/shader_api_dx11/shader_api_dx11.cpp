@@ -16,7 +16,7 @@
 
 #include "windows/com_error_category.h"
 
-namespace se::shaderapidx11 {
+namespace s1::shaderapidx11 {
 
 // Methods related to queuing functions to be called prior to rendering
 CFunctionCommit::CFunctionCommit() {
@@ -77,7 +77,7 @@ void CFunctionCommit::CallCommitFuncs(ID3D11Device *pDevice,
   ClearAllCommitFuncs();
 }
 
-}  // namespace se::shaderapidx11
+}  // namespace s1::shaderapidx11
 
 // Helpers for commit functions
 #define ADD_COMMIT_FUNC(_func_name)                            \
@@ -101,8 +101,8 @@ void CFunctionCommit::CallCommitFuncs(ID3D11Device *pDevice,
 #define IMPLEMENT_RENDERSTATE_FUNC_1_ARG(_func_name, _state, _d3dFunc)   \
   static void _func_name(                                                \
       ID3D11Device *pDevice, ID3D11DeviceContext *pDeviceContext,        \
-      const se::shaderapidx11::ShaderStateDx11_t &desiredState,          \
-      se::shaderapidx11::ShaderStateDx11_t &currentState, bool bForce) { \
+      const s1::shaderapidx11::ShaderStateDx11_t &desiredState,          \
+      s1::shaderapidx11::ShaderStateDx11_t &currentState, bool bForce) { \
     if (bForce || (desiredState._state != currentState._state)) {        \
       pDeviceContext->_d3dFunc(desiredState._state);                     \
       currentState._state = desiredState._state;                         \
@@ -112,8 +112,8 @@ void CFunctionCommit::CallCommitFuncs(ID3D11Device *pDevice,
 #define IMPLEMENT_RENDERSTATE_FUNC_2_ARG(_func_name, _state, _d3dFunc, arg2) \
   static void _func_name(                                                    \
       ID3D11Device *pDevice, ID3D11DeviceContext *pDeviceContext,            \
-      const se::shaderapidx11::ShaderStateDx11_t &desiredState,              \
-      se::shaderapidx11::ShaderStateDx11_t &currentState, bool bForce) {     \
+      const s1::shaderapidx11::ShaderStateDx11_t &desiredState,              \
+      s1::shaderapidx11::ShaderStateDx11_t &currentState, bool bForce) {     \
     if (bForce || (desiredState._state != currentState._state)) {            \
       pDeviceContext->_d3dFunc(desiredState._state, arg2);                   \
       currentState._state = desiredState._state;                             \
@@ -124,8 +124,8 @@ void CFunctionCommit::CallCommitFuncs(ID3D11Device *pDevice,
                                          arg3)                               \
   static void _func_name(                                                    \
       ID3D11Device *pDevice, ID3D11DeviceContext *pDeviceContext,            \
-      const se::shaderapidx11::ShaderStateDx11_t &desiredState,              \
-      se::shaderapidx11::ShaderStateDx11_t &currentState, bool bForce) {     \
+      const s1::shaderapidx11::ShaderStateDx11_t &desiredState,              \
+      s1::shaderapidx11::ShaderStateDx11_t &currentState, bool bForce) {     \
     if (bForce || (desiredState._state != currentState._state)) {            \
       pDeviceContext->_d3dFunc(desiredState._state, arg2, arg3);             \
       currentState._state = desiredState._state;                             \
@@ -171,16 +171,16 @@ IMPLEMENT_RENDERSTATE_FUNC_3_ARG(CommitSetComputeShader, m_pComputeShader,
 
 void CommitSetInputLayout(
     ID3D11Device *pDevice, ID3D11DeviceContext *pDeviceContext,
-    const se::shaderapidx11::ShaderStateDx11_t &desiredState,
-    se::shaderapidx11::ShaderStateDx11_t &currentState, bool bForce) {
-  const se::shaderapidx11::ShaderInputLayoutStateDx11_t &newState =
+    const s1::shaderapidx11::ShaderStateDx11_t &desiredState,
+    s1::shaderapidx11::ShaderStateDx11_t &currentState, bool bForce) {
+  const s1::shaderapidx11::ShaderInputLayoutStateDx11_t &newState =
       desiredState.m_InputLayout;
   if (bForce ||
       memcmp(&newState, &currentState.m_InputLayout,
-             sizeof(se::shaderapidx11::ShaderInputLayoutStateDx11_t))) {
+             sizeof(s1::shaderapidx11::ShaderInputLayoutStateDx11_t))) {
     // FIXME: Deal with multiple streams
     ID3D11InputLayout *pInputLayout =
-        se::shaderapidx11::g_pShaderDeviceDx11->GetInputLayout(
+        s1::shaderapidx11::g_pShaderDeviceDx11->GetInputLayout(
             newState.m_hVertexShader, newState.m_pVertexDecl[0]);
     pDeviceContext->IASetInputLayout(pInputLayout);
 
@@ -190,8 +190,8 @@ void CommitSetInputLayout(
 
 void CommitSetViewports(
     ID3D11Device *pDevice, ID3D11DeviceContext *pDeviceContext,
-    const se::shaderapidx11::ShaderStateDx11_t &desiredState,
-    se::shaderapidx11::ShaderStateDx11_t &currentState, bool bForce) {
+    const s1::shaderapidx11::ShaderStateDx11_t &desiredState,
+    s1::shaderapidx11::ShaderStateDx11_t &currentState, bool bForce) {
   bool bChanged = bForce || (desiredState.m_nViewportCount !=
                              currentState.m_nViewportCount);
   if (!bChanged && desiredState.m_nViewportCount > 0) {
@@ -216,25 +216,25 @@ void CommitSetViewports(
 
 void CommitSetIndexBuffer(
     ID3D11Device *pDevice, ID3D11DeviceContext *pDeviceContext,
-    const se::shaderapidx11::ShaderStateDx11_t &desiredState,
-    se::shaderapidx11::ShaderStateDx11_t &currentState, bool bForce) {
-  const se::shaderapidx11::ShaderIndexBufferStateDx11_t &newState =
+    const s1::shaderapidx11::ShaderStateDx11_t &desiredState,
+    s1::shaderapidx11::ShaderStateDx11_t &currentState, bool bForce) {
+  const s1::shaderapidx11::ShaderIndexBufferStateDx11_t &newState =
       desiredState.m_IndexBuffer;
   bool bChanged =
       bForce || memcmp(&newState, &currentState.m_IndexBuffer,
-                       sizeof(se::shaderapidx11::ShaderIndexBufferStateDx11_t));
+                       sizeof(s1::shaderapidx11::ShaderIndexBufferStateDx11_t));
   if (!bChanged) return;
 
   pDeviceContext->IASetIndexBuffer(newState.m_pBuffer, newState.m_Format,
                                    newState.m_nOffset);
   memcpy(&currentState.m_IndexBuffer, &newState,
-         sizeof(se::shaderapidx11::ShaderIndexBufferStateDx11_t));
+         sizeof(s1::shaderapidx11::ShaderIndexBufferStateDx11_t));
 }
 
 void CommitSetVertexBuffer(
     ID3D11Device *pDevice, ID3D11DeviceContext *pDeviceContext,
-    const se::shaderapidx11::ShaderStateDx11_t &desiredState,
-    se::shaderapidx11::ShaderStateDx11_t &currentState, bool bForce) {
+    const s1::shaderapidx11::ShaderStateDx11_t &desiredState,
+    s1::shaderapidx11::ShaderStateDx11_t &currentState, bool bForce) {
   ID3D11Buffer *ppVertexBuffers[MAX_DX11_STREAMS];
   UINT pStrides[MAX_DX11_STREAMS];
   UINT pOffsets[MAX_DX11_STREAMS];
@@ -243,19 +243,19 @@ void CommitSetVertexBuffer(
   UINT nBufferCount = 0;
   bool bInMatch = true;
   for (int i = 0; i < MAX_DX11_STREAMS; ++i) {
-    const se::shaderapidx11::ShaderVertexBufferStateDx11_t &newState =
+    const s1::shaderapidx11::ShaderVertexBufferStateDx11_t &newState =
         desiredState.m_pVertexBuffer[i];
     bool bMatch =
         !bForce &&
         !memcmp(&newState, &currentState.m_pVertexBuffer[i],
-                sizeof(se::shaderapidx11::ShaderVertexBufferStateDx11_t));
+                sizeof(s1::shaderapidx11::ShaderVertexBufferStateDx11_t));
     if (!bMatch) {
       ppVertexBuffers[i] = newState.m_pBuffer;
       pStrides[i] = newState.m_nStride;
       pOffsets[i] = newState.m_nOffset;
       ++nBufferCount;
       memcpy(&currentState.m_pVertexBuffer[i], &newState,
-             sizeof(se::shaderapidx11::ShaderVertexBufferStateDx11_t));
+             sizeof(s1::shaderapidx11::ShaderVertexBufferStateDx11_t));
     }
 
     if (bInMatch) {
@@ -315,8 +315,8 @@ void GenerateRasterizerDesc(D3D11_RASTERIZER_DESC *pDesc,
 
 void CommitSetRasterState(
     ID3D11Device *pDevice, ID3D11DeviceContext *pDeviceContext,
-    const se::shaderapidx11::ShaderStateDx11_t &desiredState,
-    se::shaderapidx11::ShaderStateDx11_t &currentState, bool bForce) {
+    const s1::shaderapidx11::ShaderStateDx11_t &desiredState,
+    s1::shaderapidx11::ShaderStateDx11_t &currentState, bool bForce) {
   const ShaderRasterState_t &newState = desiredState.m_RasterState;
   if (bForce || memcmp(&newState, &currentState.m_RasterState,
                        sizeof(ShaderRasterState_t))) {
@@ -329,11 +329,11 @@ void CommitSetRasterState(
     GenerateRasterizerDesc(&desc, newState);
 
     // NOTE: This does a search for existing matching state objects
-    se::win::com::com_ptr<ID3D11RasterizerState> rasterizer_state;
+    s1::win::com::com_ptr<ID3D11RasterizerState> rasterizer_state;
     HRESULT hr = pDevice->CreateRasterizerState(&desc, &rasterizer_state);
     if (!FAILED(hr)) {
       Warning("ID3D11Device::CreateRasterizerState failed w/e %s.\n",
-              se::win::com::com_error_category().message(hr).c_str());
+              s1::win::com::com_error_category().message(hr).c_str());
     }
 
     pDeviceContext->RSSetState(rasterizer_state);
@@ -343,15 +343,15 @@ void CommitSetRasterState(
   }
 }
 
-static se::shaderapidx11::CShaderAPIDx11 s_ShaderAPIDx11;
+static s1::shaderapidx11::CShaderAPIDx11 s_ShaderAPIDx11;
 
 }  // namespace
 
-namespace se::shaderapidx11 {
+namespace s1::shaderapidx11 {
 
 CShaderAPIDx11 *g_pShaderAPIDx11 = &s_ShaderAPIDx11;
 
-}  // namespace se::shaderapidx11
+}  // namespace s1::shaderapidx11
 
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CShaderAPIDx11, IShaderAPI,
                                   SHADERAPI_INTERFACE_VERSION, s_ShaderAPIDx11)
@@ -359,7 +359,7 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CShaderAPIDx11, IShaderAPI,
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CShaderAPIDx11, IDebugTextureInfo,
                                   DEBUG_TEXTURE_INFO_VERSION, s_ShaderAPIDx11)
 
-namespace se::shaderapidx11 {
+namespace s1::shaderapidx11 {
 
 //-----------------------------------------------------------------------------
 // Constructor, destructor
@@ -1267,4 +1267,4 @@ void CShaderAPIDx11::SetBumpEnvMatrix(TextureStage_t textureStage, float m00,
 
 void CShaderAPIDx11::SyncToken(const char *pToken) {}
 
-}  // namespace se::shaderapidx11
+}  // namespace s1::shaderapidx11

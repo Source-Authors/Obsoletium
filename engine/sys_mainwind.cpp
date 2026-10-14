@@ -296,14 +296,14 @@ private:
 	// dimhotepus: Disable Win key.
 	// Only in Release builds as it slowdowns IDE typing a lot in debugging sessions.
 	// See https://github.com/Source-Authors/Obsoletium/issues/124
-	source::engine::win::WindowsShortcutKeysToggler m_windowsShortcutKeysToggler;
+	s1::engine::win::WindowsShortcutKeysToggler m_windowsShortcutKeysToggler;
 #endif
 	// dimhotepus: Disable accessibility keys (ex. five times Shift).
-	source::engine::win::AccessibilityShortcutKeysToggler m_accessibilityShortcutKeysToggler;
+	s1::engine::win::AccessibilityShortcutKeysToggler m_accessibilityShortcutKeysToggler;
 	// dimhotepus: Notify when system suspend / resume.
-	std::unique_ptr<source::engine::win::ScopedPowerSuspendResumeNotificationsRegistrator> m_powerSuspendResumeRegistrator;
+	std::unique_ptr<s1::engine::win::ScopedPowerSuspendResumeNotificationsRegistrator> m_powerSuspendResumeRegistrator;
 	// dimhotepus: Notify when active session display on / offs changed.
-	std::unique_ptr<source::engine::win::ScopedPowerSettingNotificationsRegistrator> m_sessionDisplayStatusChangedNotificationsRegistrator;
+	std::unique_ptr<s1::engine::win::ScopedPowerSettingNotificationsRegistrator> m_sessionDisplayStatusChangedNotificationsRegistrator;
 #endif  // IS_WINDOWS_PC
 
 	void			UpdateDesktopInformation();
@@ -1270,9 +1270,9 @@ void CGame::AttachToWindow()
 		return;
 
 	m_powerSuspendResumeRegistrator =
-		std::move(std::make_unique<source::engine::win::ScopedPowerSuspendResumeNotificationsRegistrator>(m_hWindow));
+		std::move(std::make_unique<s1::engine::win::ScopedPowerSuspendResumeNotificationsRegistrator>(m_hWindow));
 	m_sessionDisplayStatusChangedNotificationsRegistrator = std::move(
-		std::make_unique<source::engine::win::ScopedPowerSettingNotificationsRegistrator>(m_hWindow, GUID_SESSION_DISPLAY_STATUS));
+		std::make_unique<s1::engine::win::ScopedPowerSettingNotificationsRegistrator>(m_hWindow, GUID_SESSION_DISPLAY_STATUS));
 
 #if !defined( USE_SDL )
 	m_ChainedWindowProc = (WNDPROC)GetWindowLongPtrW( m_hWindow, GWLP_WNDPROC ); //-V204
@@ -1522,9 +1522,9 @@ void CGame::PlayStartupVideos( void )
 #endif
 
 	// dimhotepus: Ensure display is not disabled by powersaver when playing startup videos.
-	const se::common::windows::ScopedThreadExecutionState
+	const s1::win::ScopedThreadExecutionState
 		scoped_display_required_state{
-			se::common::windows::ThreadExecutionState::DisplayRequired};
+			s1::win::ThreadExecutionState::DisplayRequired};
 	if (!scoped_display_required_state.is_success())
 	{
 		Warning("Unable to signal system display is required. Display may disable during video playback.\n");

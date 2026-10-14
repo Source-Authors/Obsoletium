@@ -1529,7 +1529,7 @@ int main( int argc, const char **argv)
 	scope.Init( "TestScope" );
 	do 
 	{
-		auto [hFile, rc] = se::posix::posix_file_stream_factory::open( pszScript, "rb" );
+		auto [hFile, rc] = s1::posix::posix_file_stream_factory::open( pszScript, "rb" );
 		if ( rc )
 		{
 			fprintf( stderr, "Can't open \"%s\" (%d): %s.\n",

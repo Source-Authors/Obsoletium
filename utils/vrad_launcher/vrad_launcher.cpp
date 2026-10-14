@@ -67,10 +67,10 @@ int main(int argc, char *argv[]) {
   // supports using a UTF-8 code page.
   constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
 
-  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-  if (!V_strieq(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+  const s1::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (!V_strieq(s1::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
     fprintf(stderr, "setlocale('%s') failed, current locale is '%s'.\n",
-            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+            kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale());
   }
 
   // Need command line first.
@@ -94,20 +94,20 @@ int main(int argc, char *argv[]) {
   V_sprintf_safe(redirect_path, "%s" CORRECT_PATH_SEPARATOR_S "%s", full_path,
                  kRedirectFileName);
 
-  source::ScopedDll module{nullptr, 0};
+  s1::ScopedDll module{nullptr, 0};
   char module_name[MAX_FILEPATH];
 
   // First, look for vrad.redirect and load the dll specified in there if
   // possible.
   if (auto [f, err2] =
-          se::posix::posix_file_stream_factory::open(redirect_path, "rt");
+          s1::posix::posix_file_stream_factory::open(redirect_path, "rt");
       !err2) {
     char *name{nullptr};
     if (std::tie(name, err2) = f.gets(module_name); !err2) {
       char *end{strchr(name, '\n')};
       if (end) *end = '\0';
 
-      module = source::ScopedDll{name, 0};
+      module = s1::ScopedDll{name, 0};
       if (!module) {
         fprintf(stderr, "vrad warn: Can't find '%s' specified in '%s'.\n", name,
                 kRedirectFileName);
@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
   if (!module) {
     V_strcpy_safe(module_name, kModuleName);
 
-    module = source::ScopedDll{module_name, 0};
+    module = s1::ScopedDll{module_name, 0};
   }
 
   if (!module) {

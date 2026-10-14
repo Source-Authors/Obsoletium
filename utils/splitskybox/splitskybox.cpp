@@ -46,7 +46,7 @@ int ReadIntFromUtlBuffer(CUtlBuffer &buffer) {
 
 // Loads a file into a UTLBuffer
 bool LoadFile(const char *file_path, CUtlBuffer &buf) {
-  auto [f, errc] = se::posix::posix_file_stream_factory::open(file_path, "rb");
+  auto [f, errc] = s1::posix::posix_file_stream_factory::open(file_path, "rb");
   if (errc) {
     Warning("Unable to open '%s': %s.\n", file_path, errc.message().c_str());
     return false;
@@ -138,7 +138,7 @@ bool LoadFile(const char *file_path, CUtlBuffer &buf) {
 
 int main(int argc, char **argv) {
   // Install an exception handler.
-  const se::utils::common::ScopedDefaultMinidumpHandler
+  const s1::utils::common::ScopedDefaultMinidumpHandler
       scoped_default_minidumps;
 
   CommandLine()->CreateCmdLine(argc, argv);

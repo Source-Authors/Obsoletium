@@ -131,7 +131,7 @@ private:
 		if (FAILED(hr))
 		{
 			Warning( __FUNCTION__ ": IDirect3DVertexBuffer9::Unlock() failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 #endif
 	}
@@ -142,7 +142,7 @@ private:
 		LOCKFLAGS_APPEND = D3DLOCK_NOSYSLOCK | D3DLOCK_NOOVERWRITE
 	};
 
-	se::win::com::com_ptr<IDirect3DVertexBuffer9> m_pVB;
+	s1::win::com::com_ptr<IDirect3DVertexBuffer9> m_pVB;
 
 	VertexFormat_t	m_VertexBufferFormat;		// yes, Vertex, only used for allocation tracking
 	int				m_nBufferSize;
@@ -303,7 +303,7 @@ void CVertexBuffer::Create( IDirect3DDevice9Ex *pD3D )
 			desc.Usage,
 			desc.Format,
 			desc.Pool,
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 	
 		if ( hr == D3DERR_OUTOFVIDEOMEMORY || hr == E_OUTOFMEMORY )
 		{
@@ -313,7 +313,7 @@ void CVertexBuffer::Create( IDirect3DDevice9Ex *pD3D )
 			if ( FAILED( hr ) )
 			{
 				Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EvictManagedResources() failed w/e %s.\n",
-					se::win::com::com_error_category().message(hr).c_str() );
+					s1::win::com::com_error_category().message(hr).c_str() );
 			}
 
 			hr = pD3D->CreateVertexBuffer(
@@ -330,7 +330,7 @@ void CVertexBuffer::Create( IDirect3DDevice9Ex *pD3D )
 					desc.Usage,
 					desc.Format,
 					desc.Pool,
-					se::win::com::com_error_category().message(hr).c_str() );
+					s1::win::com::com_error_category().message(hr).c_str() );
 			}
 		}
 	}
@@ -356,7 +356,7 @@ void CVertexBuffer::Create( IDirect3DDevice9Ex *pD3D )
 		else
 		{
 			Warning( __FUNCTION__ ": IDirect3DVertexBuffer9::GetDesc() failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 	}
 #endif
@@ -524,7 +524,7 @@ inline unsigned char* CVertexBuffer::Lock( int numVerts, int& baseVertexIndex )
 				nLockOffset,
 				nBufferSize,
 				dwFlags,
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 	}
 
@@ -582,7 +582,7 @@ inline unsigned char* CVertexBuffer::Modify( bool bReadOnly, int firstVertex, in
 			firstVertex * m_VertexSize,
 			numVerts * m_VertexSize,
 			dwFlags,
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 	}
 	
 	m_Position = firstVertex * m_VertexSize;
@@ -666,7 +666,7 @@ inline void CVertexBuffer::HandleLateCreation( IDirect3DDevice9Ex *pD3D )
 			m_nSysmemBufferStartBytes,
 			dataToWriteBytes,
 			dwFlags,
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 		AssertMsg( false, "Failed to lock vertex buffer." );
 
 		// dimhotepus: Exit here to retry later, as pWritePtr is nullptr and we will crash.

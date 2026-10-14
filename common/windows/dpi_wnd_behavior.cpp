@@ -17,7 +17,7 @@
 namespace {
 
 HFONT ScaleFontByDpi(HFONT old_font, unsigned previousDpiY, unsigned newDpiY) {
-  using se::windows::ui::CDpiWindowBehavior;
+  using s1::win::ui::CDpiWindowBehavior;
 
   if (LOGFONT font_settings = {};
       ::GetObject(old_font, sizeof(font_settings), &font_settings)) {
@@ -116,7 +116,7 @@ void ApplyDpiToWindow(HWND parentWnd, unsigned previousDpiX,
         POINT child_pos{rc_child.left, rc_child.top};
         ::ScreenToClient(parent_window, &child_pos);
 
-        using se::windows::ui::CDpiWindowBehavior;
+        using s1::win::ui::CDpiWindowBehavior;
 
         const int scaled_x{
             CDpiWindowBehavior::ScaleByDpi(old_dpi_x, child_pos.x, new_x_dpi)};
@@ -140,7 +140,7 @@ void ApplyDpiToWindow(HWND parentWnd, unsigned previousDpiX,
 
 }  // namespace
 
-namespace se::windows::ui {
+namespace s1::win::ui {
 
 CDpiWindowBehavior::CDpiWindowBehavior(bool applyDpiOnCreate)
     : m_window_handle{nullptr},
@@ -251,4 +251,4 @@ int CDpiWindowBehavior::ScaleByDpi(unsigned oldDpi, int value,
   return ::MulDiv(value, newDpi, oldDpi);
 }
 
-}  // namespace se::windows::ui
+}  // namespace s1::win::ui

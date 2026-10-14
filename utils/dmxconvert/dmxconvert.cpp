@@ -44,7 +44,7 @@ SpewRetval_t DMXConvertOutputFunc(SpewType_t spewType, char const *pMsg) {
 
 }  // namespace
 
-namespace se::dmxconvert {
+namespace s1::dmxconvert {
 
 //-----------------------------------------------------------------------------
 // The application object
@@ -61,19 +61,19 @@ class CDmxConvertApp : public CDefaultAppSystemGroup<CSteamAppSystemGroup> {
 
  private:
   // Install an exception handler.
-  const se::utils::common::ScopedDefaultMinidumpHandler
+  const s1::utils::common::ScopedDefaultMinidumpHandler
       scoped_default_minidumps;
 
   const ScopedSpewOutputFunc scoped_spew_output_;
 };
 
-}  // namespace se::dmxconvert
+}  // namespace s1::dmxconvert
 
-using CDmxConvertApp = se::dmxconvert::CDmxConvertApp;
+using CDmxConvertApp = s1::dmxconvert::CDmxConvertApp;
 
 DEFINE_CONSOLE_STEAM_APPLICATION_OBJECT(CDmxConvertApp);
 
-namespace se::dmxconvert {
+namespace s1::dmxconvert {
 
 //-----------------------------------------------------------------------------
 // The application object
@@ -190,4 +190,4 @@ int CDmxConvertApp::Main() {
   return 0;
 }
 
-}  // namespace se::dmxconvert
+}  // namespace s1::dmxconvert

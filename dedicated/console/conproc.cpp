@@ -32,7 +32,7 @@ HANDLE std_in_handle;
 }
 
 BOOL SetConsoleWidthAndHeight(HANDLE std_out, short width, short height,
-                              se::dedicated::ISystem *system) {
+                              s1::dedicated::ISystem *system) {
   COORD max_coord = GetLargestConsoleWindowSize(std_out);
   if (max_coord.X == 0 && max_coord.Y == 0) {
     system->Printf("\n\nGetLargestConsoleWindowSize failed w/e: %s.\n",
@@ -108,7 +108,7 @@ BOOL GetScreenBufferLines(int *piLines) {
   return rc;
 }
 
-BOOL SetScreenBufferLines(short iLines, se::dedicated::ISystem *system) {
+BOOL SetScreenBufferLines(short iLines, s1::dedicated::ISystem *system) {
   return SetConsoleWidthAndHeight(std_out_handle, 80, iLines, system);
 }
 
@@ -181,7 +181,7 @@ unsigned __stdcall RemoteConsoleThread(void *ctx) {
   // dimhotepus: Add thread name to aid debugging.
   ThreadSetDebugName("RemoteConRead");
 
-  se::dedicated::ISystem *system = static_cast<se::dedicated::ISystem *>(ctx);
+  s1::dedicated::ISystem *system = static_cast<s1::dedicated::ISystem *>(ctx);
   Assert(system);
 
   HANDLE events_2_wait[2]{parent_send_event_handle, done_event_handle};
@@ -235,7 +235,7 @@ unsigned __stdcall RemoteConsoleThread(void *ctx) {
 
 }  // namespace
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 void ShutdownRemoteConsole() {
   if (done_event_handle) {
@@ -312,6 +312,6 @@ bool StartupRemoteConsole(ICommandLine *command_line, ISystem *system) {
   return true;
 }
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated
 
 #endif  // _WIN32

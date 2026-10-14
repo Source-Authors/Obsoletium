@@ -24,11 +24,11 @@ enum class ConsoleCommand : int {
   CCOM_SET_SCR_LINES = 0x5,
 };
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 bool StartupRemoteConsole(ICommandLine *command_line, ISystem *system);
 void ShutdownRemoteConsole();
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated
 
 #endif  // !SE_DEDICATED_CONSOLE_CONPROC_H_

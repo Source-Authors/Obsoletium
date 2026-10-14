@@ -7,7 +7,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-namespace se::launcher {
+namespace s1::launcher {
 
 void VCRHelpers::ErrorMessage(const char* message) {
 #if defined(WIN32) || defined(LINUX)
@@ -38,4 +38,4 @@ std::tuple<VCRHelpers, int> CreateVcrHelpers(const ICommandLine* command_line) {
   return {vcr_helpers, 0};
 }
 
-}  // namespace se::launcher
+}  // namespace s1::launcher

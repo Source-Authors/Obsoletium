@@ -37,7 +37,7 @@ constexpr inline int kEncoderDecoderChannelsNo{1};
 
 extern IVoiceCodec *CreateVoiceCodec_Frame(IFrameEncoder *pEncoder);
 
-namespace se::audio::voice_codecs::celt {
+namespace s1::audio::voice_codecs::celt {
 
 class VoiceEncoder_Celt : public IFrameEncoder {
  public:
@@ -255,13 +255,13 @@ void VoiceEncoder_Celt::TermStates() {
   }
 }
 
-}  // namespace se::audio::voice_codecs::celt
+}  // namespace s1::audio::voice_codecs::celt
 
 namespace {
 
 void *CreateCeltVoiceCodec() {
   return CreateVoiceCodec_Frame(
-      new se::audio::voice_codecs::celt::VoiceEncoder_Celt);
+      new s1::audio::voice_codecs::celt::VoiceEncoder_Celt);
 }
 
 }  // namespace

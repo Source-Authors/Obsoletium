@@ -479,7 +479,7 @@ struct VertexDeclLookup_t
 
 	VertexFormat_t				m_VertexFormat;
 	int							m_nFlags;
-	se::win::com::com_ptr<IDirect3DVertexDeclaration9> m_pDecl;
+	s1::win::com::com_ptr<IDirect3DVertexDeclaration9> m_pDecl;
 
 	bool operator==( const VertexDeclLookup_t &src ) const
 	{
@@ -506,7 +506,7 @@ static CUtlRBTree<VertexDeclLookup_t, int> s_VertexDeclDict( 0, 256, VertexDeclL
 //-----------------------------------------------------------------------------
 // Gets the declspec associated with a vertex format
 //-----------------------------------------------------------------------------
-se::win::com::com_ptr<IDirect3DVertexDeclaration9> FindOrCreateVertexDecl(
+s1::win::com::com_ptr<IDirect3DVertexDeclaration9> FindOrCreateVertexDecl(
 	IDirect3DDevice9Ex *pD3D,
 	VertexFormat_t fmt,
 	bool bStaticLit,
@@ -551,7 +551,7 @@ se::win::com::com_ptr<IDirect3DVertexDeclaration9> FindOrCreateVertexDecl(
 			bStaticLit ? "true" : "false",
 			bUsingFlex ? "true" : "false",
 			bUsingMorph ? "true" : "false",
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 	}
 
 	// NOTE: can't record until we have m_pDecl!

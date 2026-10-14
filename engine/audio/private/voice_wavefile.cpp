@@ -15,31 +15,31 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-[[nodiscard]] static se::posix::io_result<uint32_t> ReadDWord(se::posix::posix_file_stream &f) 
+[[nodiscard]] static s1::posix::io_result<uint32_t> ReadDWord(s1::posix::posix_file_stream &f) 
 {
 	uint32_t dword[1];
 	auto [num, errc] = f.read(dword);
 	return
-		se::posix::io_result<uint32_t>{errc || num != 1 ? 0 : dword[0], errc};
+		s1::posix::io_result<uint32_t>{errc || num != 1 ? 0 : dword[0], errc};
 }
 
-[[nodiscard]] static se::posix::io_result<uint16_t> ReadWord(se::posix::posix_file_stream &f) 
+[[nodiscard]] static s1::posix::io_result<uint16_t> ReadWord(s1::posix::posix_file_stream &f) 
 {
 	uint16_t word[1];
 	auto [num, errc] = f.read(word);
 	return 
-		se::posix::io_result<uint16_t>{errc || num != 1
+		s1::posix::io_result<uint16_t>{errc || num != 1
 			? static_cast<uint16_t>(0) : word[0], errc};
 }
 
-[[nodiscard]] static std::error_code WriteDWord(se::posix::posix_file_stream &f, uint32_t val) 
+[[nodiscard]] static std::error_code WriteDWord(s1::posix::posix_file_stream &f, uint32_t val) 
 {
 	uint32_t dword[]{ val };
 	auto [num, errc] = f.write(dword);
 	return errc;
 }
 
-[[nodiscard]] static std::error_code WriteWord(se::posix::posix_file_stream &f, uint16_t val) 
+[[nodiscard]] static std::error_code WriteWord(s1::posix::posix_file_stream &f, uint16_t val) 
 {
 	uint16_t word[]{ val };
 	auto [num, errc] = f.write(word);
@@ -57,7 +57,7 @@ bool ReadWaveFile(
 	int &nSamplesPerSec)
 {
 	auto [f, errc] =
-		se::posix::posix_file_stream_factory::open(pFilename, "rb");
+		s1::posix::posix_file_stream_factory::open(pFilename, "rb");
 	if (errc) return false; 
 
 	std::tie(std::ignore, errc) = f.seek(22, SEEK_SET);
@@ -111,7 +111,7 @@ bool WriteWaveFile(
 	int nSamplesPerSec)
 {
 	auto [f, errc] =
-		se::posix::posix_file_stream_factory::open(pFilename, "wb");
+		s1::posix::posix_file_stream_factory::open(pFilename, "wb");
 	if (errc) return false; 
 
 	// Write the RIFF chunk.

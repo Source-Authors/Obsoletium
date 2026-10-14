@@ -285,7 +285,7 @@ struct DynamicState_t
 
 	RECT  m_ScissorRect;
 
-	se::win::com::com_ptr<IDirect3DVertexDeclaration9> m_pVertexDecl;
+	s1::win::com::com_ptr<IDirect3DVertexDeclaration9> m_pVertexDecl;
 
 	bool	m_bSRGBWritesEnabled;
 	bool	m_bHWMorphingEnabled;
@@ -1408,9 +1408,9 @@ private:
 	int  FindPixelShader( char const* pFileName ) const;
 
 	// Returns copies of the front and back buffers
-	se::win::com::com_ptr<IDirect3DSurface9> GetFrontBufferImage( ImageFormat& format );
-	se::win::com::com_ptr<IDirect3DSurface9> GetBackBufferImage( Rect_t *pSrcRect, Rect_t *pDstRect, ImageFormat& format );
-	se::win::com::com_ptr<IDirect3DSurface9> GetBackBufferImageHDR( Rect_t *pSrcRect, Rect_t *pDstRect, ImageFormat& format );
+	s1::win::com::com_ptr<IDirect3DSurface9> GetFrontBufferImage( ImageFormat& format );
+	s1::win::com::com_ptr<IDirect3DSurface9> GetBackBufferImage( Rect_t *pSrcRect, Rect_t *pDstRect, ImageFormat& format );
+	s1::win::com::com_ptr<IDirect3DSurface9> GetBackBufferImageHDR( Rect_t *pSrcRect, Rect_t *pDstRect, ImageFormat& format );
 
 	// Copy bits from a host-memory surface
 	void CopyBitsFromHostSurface( IDirect3DSurface* pSurfaceBits, 
@@ -1492,8 +1492,8 @@ private:
 	void CommitFixedFunctionLighting();
 
 	// Gets the surface associated with a texture (refcount of surface is increased)
-	se::win::com::com_ptr<IDirect3DSurface9> GetTextureSurface( ShaderAPITextureHandle_t textureHandle );
-	se::win::com::com_ptr<IDirect3DSurface9> GetDepthTextureSurface( ShaderAPITextureHandle_t textureHandle );
+	s1::win::com::com_ptr<IDirect3DSurface9> GetTextureSurface( ShaderAPITextureHandle_t textureHandle );
+	s1::win::com::com_ptr<IDirect3DSurface9> GetDepthTextureSurface( ShaderAPITextureHandle_t textureHandle );
 
 	//
 	// Methods related to hardware config
@@ -1536,11 +1536,11 @@ private:
 
 	// "normal" back buffer and depth buffer.  Need to keep this around so that we
 	// know what to set the render target to when we are done rendering to a texture.
-	se::win::com::com_ptr<IDirect3DSurface9> m_pBackBufferSurface;
-	se::win::com::com_ptr<IDirect3DSurface9> m_pZBufferSurface;
+	s1::win::com::com_ptr<IDirect3DSurface9> m_pBackBufferSurface;
+	s1::win::com::com_ptr<IDirect3DSurface9> m_pZBufferSurface;
 
 	// Optimization for screenshots
-	se::win::com::com_ptr<IDirect3DSurface9> m_pSmallBackBufferFP16TempSurface;
+	s1::win::com::com_ptr<IDirect3DSurface9> m_pSmallBackBufferFP16TempSurface;
 
 	ShaderAPITextureHandle_t m_hFullScreenTexture;
 
@@ -1988,7 +1988,7 @@ void CShaderAPIDx8::AcquireInternalRenderTargets()
 		{
 			Assert(false);
 			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::GetRenderTarget(index = 0) failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 
 #ifdef ENABLE_NULLREF_DEVICE_SUPPORT
@@ -2010,7 +2010,7 @@ void CShaderAPIDx8::AcquireInternalRenderTargets()
 		{
 			Assert(false);
 			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::GetDepthStencilSurface() failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 		Assert( m_pZBufferSurface );
 	}
@@ -2107,7 +2107,7 @@ bool CShaderAPIDx8::OnDeviceInit()
 	{
 		Assert(false);
 		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::BeginScene failed w/e %s.\n",
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 	}
 
 	return true;
@@ -2125,7 +2125,7 @@ void CShaderAPIDx8::OnDeviceShutdown()
 	{
 		Assert(false);
 		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EndScene failed w/e %s.\n",
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 	}
 	
 	// Deallocate all textures
@@ -2458,7 +2458,7 @@ inline void CShaderAPIDx8::SetTextureStageState( int stage, D3DTEXTURESTAGESTATE
 	{
 		Assert(false);
 		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::SetTextureStageState(stage = %d, type = 0x%x, value = 0x%x) failed w/e %s.\n",
-			stage, state, val, se::win::com::com_error_category().message(hr).c_str() );
+			stage, state, val, s1::win::com::com_error_category().message(hr).c_str() );
 	}
 }
 
@@ -2492,7 +2492,7 @@ inline void CShaderAPIDx8::SetRenderState( D3DRENDERSTATETYPE state, DWORD val, 
 		{
 			Assert(false);
 			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::SetRenderState(state = %d, value = 0x%x) failed w/e %s.\n",
-				state, val, se::win::com::com_error_category().message(hr).c_str() );
+				state, val, s1::win::com::com_error_category().message(hr).c_str() );
 		}
 #endif
 		m_DynamicState.m_RenderState[state] = val;
@@ -3471,7 +3471,7 @@ inline void CShaderAPIDx8::SetVertexDecl( VertexFormat_t vertexFormat, bool bHas
 {
 	VPROF("CShaderAPIDx8::SetVertexDecl");
 
-	se::win::com::com_ptr<IDirect3DVertexDeclaration9> pDecl = FindOrCreateVertexDecl( Dx9Device(), vertexFormat, bHasColorMesh, bUsingFlex, bUsingMorph );
+	s1::win::com::com_ptr<IDirect3DVertexDeclaration9> pDecl = FindOrCreateVertexDecl( Dx9Device(), vertexFormat, bHasColorMesh, bUsingFlex, bUsingMorph );
 	Assert( pDecl );
 
 	if ( pDecl != m_DynamicState.m_pVertexDecl && pDecl )
@@ -3485,7 +3485,7 @@ inline void CShaderAPIDx8::SetVertexDecl( VertexFormat_t vertexFormat, bool bHas
 
 		Assert( false );
 		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::SetVertexDeclaration() failed w/e %s.\n",
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 	}
 }
 
@@ -6271,7 +6271,7 @@ void CShaderAPIDx8::ComputeStatsInfo( ShaderAPITextureHandle_t hTexture, bool is
 				{
 					Assert( false );
 					Warning( __FUNCTION__ ": IDirect3DCubeTexture9::GetLevelDesc(level = %d) failed w/e %s",
-						i, se::win::com::com_error_category().message(hr).c_str() );
+						i, s1::win::com::com_error_category().message(hr).c_str() );
 				}
 			}
 		}
@@ -6298,7 +6298,7 @@ void CShaderAPIDx8::ComputeStatsInfo( ShaderAPITextureHandle_t hTexture, bool is
 				{
 					Assert( false );
 					Warning( __FUNCTION__ ": IDirect3DVolumeTexture9::GetLevelDesc(level = %d) failed w/e %s",
-						i, se::win::com::com_error_category().message(hr).c_str() );
+						i, s1::win::com::com_error_category().message(hr).c_str() );
 				}
 			}
 		}
@@ -6325,7 +6325,7 @@ void CShaderAPIDx8::ComputeStatsInfo( ShaderAPITextureHandle_t hTexture, bool is
 				{
 					Assert( false );
 					Warning( __FUNCTION__ ": IDirect3DTexture9::GetLevelDesc(level = %d) failed w/e %s",
-						i, se::win::com::com_error_category().message(hr).c_str() );
+						i, s1::win::com::com_error_category().message(hr).c_str() );
 				}
 			}
 		}
@@ -6393,7 +6393,7 @@ ShaderAPITextureHandle_t CShaderAPIDx8::CreateDepthTexture(
 				height,
 				format,
 				multisampleType,
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 	}
 	else
@@ -6407,7 +6407,7 @@ ShaderAPITextureHandle_t CShaderAPIDx8::CreateDepthTexture(
 				width,
 				height,
 				format,
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 
 		pTexture->SetTexture( pTex );
@@ -6839,7 +6839,7 @@ void CShaderAPIDx8::WriteTextureToFile( ShaderAPITextureHandle_t hTexture, const
 	IDirect3DTexture *pD3DTexture = (IDirect3DTexture *)pTexInt->GetTexture();
 
 	// Get the level of the texture we want to read from
-	se::win::com::com_ptr<IDirect3DSurface> pTextureLevel;
+	s1::win::com::com_ptr<IDirect3DSurface> pTextureLevel;
 	HRESULT hr = pD3DTexture->GetSurfaceLevel( 0, &pTextureLevel );
 	if ( FAILED( hr ) )
 		return;
@@ -6854,7 +6854,7 @@ void CShaderAPIDx8::WriteTextureToFile( ShaderAPITextureHandle_t hTexture, const
 	//if( pTexInt->m_Flags & Texture_t::IS_RENDER_TARGET )
 	{
 		//render targets can't be locked, luckily we can copy the surface to system memory and lock that.
-		se::win::com::com_ptr<IDirect3DSurface> pSystemSurface;
+		s1::win::com::com_ptr<IDirect3DSurface> pSystemSurface;
 		hr = Dx9Device()->CreateOffscreenPlainSurface( surfaceDesc.Width, surfaceDesc.Height, surfaceDesc.Format, D3DPOOL_SYSTEMMEM, &pSystemSurface, NULL );
 		Assert( SUCCEEDED( hr ) );
 
@@ -6949,7 +6949,7 @@ bool CShaderAPIDx8::IsTexture( ShaderAPITextureHandle_t textureHandle )
 //-----------------------------------------------------------------------------
 // Gets the surface associated with a texture (refcount of surface is increased)
 //-----------------------------------------------------------------------------
-se::win::com::com_ptr<IDirect3DSurface9> CShaderAPIDx8::GetTextureSurface( ShaderAPITextureHandle_t textureHandle )
+s1::win::com::com_ptr<IDirect3DSurface9> CShaderAPIDx8::GetTextureSurface( ShaderAPITextureHandle_t textureHandle )
 {
 	MEM_ALLOC_D3D_CREDIT();
 
@@ -6969,7 +6969,7 @@ se::win::com::com_ptr<IDirect3DSurface9> CShaderAPIDx8::GetTextureSurface( Shade
 		return {};
 	}
 
-	se::win::com::com_ptr<IDirect3DSurface9> pSurface;
+	s1::win::com::com_ptr<IDirect3DSurface9> pSurface;
 	HRESULT hr = pTex->GetSurfaceLevel( 0, &pSurface );
 	Assert( SUCCEEDED( hr ) );
 
@@ -6979,7 +6979,7 @@ se::win::com::com_ptr<IDirect3DSurface9> CShaderAPIDx8::GetTextureSurface( Shade
 //-----------------------------------------------------------------------------
 // Gets the surface associated with a texture (refcount of surface is increased)
 //-----------------------------------------------------------------------------
-se::win::com::com_ptr<IDirect3DSurface9> CShaderAPIDx8::GetDepthTextureSurface( ShaderAPITextureHandle_t textureHandle )
+s1::win::com::com_ptr<IDirect3DSurface9> CShaderAPIDx8::GetDepthTextureSurface( ShaderAPITextureHandle_t textureHandle )
 {
 	AssertValidTextureHandle( textureHandle );
 	if ( !TextureIsAllocated( textureHandle ) )
@@ -6987,7 +6987,7 @@ se::win::com::com_ptr<IDirect3DSurface9> CShaderAPIDx8::GetDepthTextureSurface( 
 		return {};
 	}
 
-	return se::win::com::com_ptr<IDirect3DSurface9>{ GetTexture( textureHandle ).GetDepthStencilSurface() };
+	return s1::win::com::com_ptr<IDirect3DSurface9>{ GetTexture( textureHandle ).GetDepthStencilSurface() };
 }
 
 //-----------------------------------------------------------------------------
@@ -7052,7 +7052,7 @@ void CShaderAPIDx8::SetRenderTargetEx( int nRenderTargetID, ShaderAPITextureHand
 		depthTextureHandle = SHADER_RENDERTARGET_NONE;
 	}
 
-	se::win::com::com_ptr<IDirect3DSurface9> pColorSurface;
+	s1::win::com::com_ptr<IDirect3DSurface9> pColorSurface;
 	// NOTE!!!!  If this code changes, also change Dx8SetRenderTarget in playback.cpp
 	bool usingTextureTarget = false;
 
@@ -7076,7 +7076,7 @@ void CShaderAPIDx8::SetRenderTargetEx( int nRenderTargetID, ShaderAPITextureHand
 
 	HRESULT hr;
 
-	se::win::com::com_ptr<IDirect3DSurface9> pZSurface;
+	s1::win::com::com_ptr<IDirect3DSurface9> pZSurface;
 	if ( depthTextureHandle == SHADER_RENDERTARGET_DEPTHBUFFER )
 	{
 		// using the default depth buffer
@@ -8066,7 +8066,7 @@ void CShaderAPIDx8::CopyRenderTargetToTextureEx( ShaderAPITextureHandle_t textur
 	IDirect3DTexture *pD3DTexture = (IDirect3DTexture *)pTexture->GetTexture();
 	Assert( pD3DTexture );
 
-	se::win::com::com_ptr<IDirect3DSurface> pRenderTargetSurface;
+	s1::win::com::com_ptr<IDirect3DSurface> pRenderTargetSurface;
 	HRESULT hr = Dx9Device()->GetRenderTarget( nRenderTargetID, &pRenderTargetSurface );
 	if ( FAILED( hr ) )
 	{
@@ -8074,7 +8074,7 @@ void CShaderAPIDx8::CopyRenderTargetToTextureEx( ShaderAPITextureHandle_t textur
 		return;
 	}
 
-	se::win::com::com_ptr<IDirect3DSurface> pDstSurf;
+	s1::win::com::com_ptr<IDirect3DSurface> pDstSurf;
 	hr = pD3DTexture->GetSurfaceLevel( 0, &pDstSurf );
 	Assert( !FAILED( hr ) );
 	if ( FAILED( hr ) )
@@ -8111,7 +8111,7 @@ void CShaderAPIDx8::CopyRenderTargetToScratchTexture( ShaderAPITextureHandle_t s
 	IDirect3DTexture *pD3DSrcRt = ( IDirect3DTexture * ) pSrcRt->GetTexture();
 	Assert( pD3DSrcRt );
 
-	se::win::com::com_ptr<IDirect3DSurface9> srcSurf;
+	s1::win::com::com_ptr<IDirect3DSurface9> srcSurf;
 	HRESULT hr = pD3DSrcRt->GetSurfaceLevel( 0, &srcSurf );
 	Assert( SUCCEEDED( hr ) && srcSurf );
 
@@ -8121,7 +8121,7 @@ void CShaderAPIDx8::CopyRenderTargetToScratchTexture( ShaderAPITextureHandle_t s
 	IDirect3DTexture *pD3DDstTex = ( IDirect3DTexture * ) pDstTex->GetTexture();
 	Assert( pD3DDstTex );
 
-	se::win::com::com_ptr<IDirect3DSurface9> dstSurf;
+	s1::win::com::com_ptr<IDirect3DSurface9> dstSurf;
 	hr = pD3DDstTex->GetSurfaceLevel( 0, &dstSurf );
 	Assert( SUCCEEDED( hr ) && dstSurf );
 
@@ -8159,7 +8159,7 @@ void CShaderAPIDx8::LockRect( void** pOutBits, int* pOutPitch, ShaderAPITextureH
 	IDirect3DTexture *pD3DTex = ( IDirect3DTexture * ) pTex->GetTexture();
 	Assert( pD3DTex );
 	
-	se::win::com::com_ptr<IDirect3DSurface9> surf;
+	s1::win::com::com_ptr<IDirect3DSurface9> surf;
 	HRESULT hr = pD3DTex->GetSurfaceLevel( mipmap, &surf );
 	Assert( SUCCEEDED( hr ) && surf );
 
@@ -8196,7 +8196,7 @@ void CShaderAPIDx8::UnlockRect( ShaderAPITextureHandle_t texHandle, int mipmap )
 	IDirect3DTexture *pD3DTex = ( IDirect3DTexture * ) pTex->GetTexture();
 	Assert( pD3DTex );
 	
-	se::win::com::com_ptr<IDirect3DSurface9> surf;
+	s1::win::com::com_ptr<IDirect3DSurface9> surf;
 	HRESULT hr = pD3DTex->GetSurfaceLevel( mipmap, &surf );
 	Assert( SUCCEEDED( hr ) && surf );
 
@@ -8322,11 +8322,11 @@ void CShaderAPIDx8::CopyTextureToTexture( ShaderAPITextureHandle_t srcTex, Shade
 		int srcMipmap = srcFine + i;
 		int dstMipmap = dstFine + i;
 
-		se::win::com::com_ptr<IDirect3DSurface9> pSrcSurf;
+		s1::win::com::com_ptr<IDirect3DSurface9> pSrcSurf;
 		hr = pSrcD3DTex->GetSurfaceLevel( srcMipmap, &pSrcSurf );
 		Assert( SUCCEEDED( hr ) );
 		
-		se::win::com::com_ptr<IDirect3DSurface9> pDstSurf;
+		s1::win::com::com_ptr<IDirect3DSurface9> pDstSurf;
 		hr = pDstD3DTex->GetSurfaceLevel( dstMipmap, &pDstSurf );
 		Assert( SUCCEEDED( hr ) );
 
@@ -8361,7 +8361,7 @@ void CShaderAPIDx8::CopyTextureToRenderTargetEx( int nRenderTargetID, ShaderAPIT
 	IDirect3DTexture *pD3DTexture = (IDirect3DTexture *)pTexture->GetTexture();
 	Assert( pD3DTexture );
 
-	se::win::com::com_ptr<IDirect3DSurface> pRenderTargetSurface;
+	s1::win::com::com_ptr<IDirect3DSurface> pRenderTargetSurface;
 	HRESULT hr = Dx9Device()->GetRenderTarget( nRenderTargetID, &pRenderTargetSurface );
 	if ( FAILED( hr ) )
 	{
@@ -8369,7 +8369,7 @@ void CShaderAPIDx8::CopyTextureToRenderTargetEx( int nRenderTargetID, ShaderAPIT
 		return;
 	}
 
-	se::win::com::com_ptr<IDirect3DSurface> pDstSurf;
+	s1::win::com::com_ptr<IDirect3DSurface> pDstSurf;
 	hr = pD3DTexture->GetSurfaceLevel( 0, &pDstSurf );
 	Assert( !FAILED( hr ) );
 	if ( FAILED( hr ) )
@@ -10401,7 +10401,7 @@ void CShaderAPIDx8::FlushHardware( )
 	{
 		Assert(false);
 		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EndScene failed w/e %s.\n",
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 	}
 
 	DiscardVertexBuffers();
@@ -10411,7 +10411,7 @@ void CShaderAPIDx8::FlushHardware( )
 	{
 		Assert(false);
 		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::BeginScene failed w/e %s.\n",
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 	}
 	
 	ForceHardwareSync();
@@ -10439,7 +10439,7 @@ void CShaderAPIDx8::HandleDeviceLost()
 		{
 			Assert(false);
 			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EndScene failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 	}
 
@@ -10452,7 +10452,7 @@ void CShaderAPIDx8::HandleDeviceLost()
 		{
 			Assert(false);
 			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::BeginScene failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 	}
 }
@@ -10678,7 +10678,7 @@ void CShaderAPIDx8::BindPixelShader( PixelShaderHandle_t hPixelShader )
 //-----------------------------------------------------------------------------
 // Returns a copy of the front buffer
 //-----------------------------------------------------------------------------
-se::win::com::com_ptr<IDirect3DSurface> CShaderAPIDx8::GetFrontBufferImage( ImageFormat& format )
+s1::win::com::com_ptr<IDirect3DSurface> CShaderAPIDx8::GetFrontBufferImage( ImageFormat& format )
 {
 	// need to flush the dynamic buffer	and make sure the entire image is there
 	FlushBufferedPrimitives();
@@ -10686,7 +10686,7 @@ se::win::com::com_ptr<IDirect3DSurface> CShaderAPIDx8::GetFrontBufferImage( Imag
 	int w, h;
 	GetBackBufferDimensions( w, h );
 
-	se::win::com::com_ptr<IDirect3DSurface9> pFullScreenSurfaceBits;
+	s1::win::com::com_ptr<IDirect3DSurface9> pFullScreenSurfaceBits;
 	HRESULT hr = Dx9Device()->CreateOffscreenPlainSurface( w, h, 
 		D3DFMT_A8R8G8B8, D3DPOOL_SCRATCH, &pFullScreenSurfaceBits, NULL );
 	if (FAILED(hr))
@@ -10701,7 +10701,7 @@ se::win::com::com_ptr<IDirect3DSurface> CShaderAPIDx8::GetFrontBufferImage( Imag
 	int windowWidth, windowHeight;
 	GetWindowSize( windowWidth, windowHeight );
 	
-	se::win::com::com_ptr<IDirect3DSurface9> pSurfaceBits;
+	s1::win::com::com_ptr<IDirect3DSurface9> pSurfaceBits;
 	hr = Dx9Device()->CreateOffscreenPlainSurface( windowWidth, windowHeight,
 		D3DFMT_A8R8G8B8, D3DPOOL_SCRATCH, &pSurfaceBits, NULL );
 	Assert( SUCCEEDED( hr ) );
@@ -10771,10 +10771,10 @@ void CShaderAPIDx8::SetLinearToGammaConversionTextures( ShaderAPITextureHandle_t
 //-----------------------------------------------------------------------------
 // Returns a copy of the back buffer
 //-----------------------------------------------------------------------------
-se::win::com::com_ptr<IDirect3DSurface> CShaderAPIDx8::GetBackBufferImageHDR( Rect_t *pSrcRect, Rect_t *pDstRect, ImageFormat& format )
+s1::win::com::com_ptr<IDirect3DSurface> CShaderAPIDx8::GetBackBufferImageHDR( Rect_t *pSrcRect, Rect_t *pDstRect, ImageFormat& format )
 {
 	// Get the back buffer
-	se::win::com::com_ptr<IDirect3DSurface9> pBackBuffer;
+	s1::win::com::com_ptr<IDirect3DSurface9> pBackBuffer;
 	HRESULT hr = Dx9Device()->GetRenderTarget( 0, &pBackBuffer );
 	if (FAILED(hr))
 		return {};
@@ -10788,7 +10788,7 @@ se::win::com::com_ptr<IDirect3DSurface> CShaderAPIDx8::GetBackBufferImageHDR( Re
 	D3DTEXTUREFILTERTYPE filter = ((pDstRect->width != pSrcRect->width) ||
 		(pDstRect->height != pSrcRect->height)) ? D3DTEXF_LINEAR : D3DTEXF_NONE;
 	
-	se::win::com::com_ptr<IDirect3DSurface> pTmpSurface;
+	s1::win::com::com_ptr<IDirect3DSurface> pTmpSurface;
 	if ( ( pDstRect->x + pDstRect->width <= SMALL_BACK_BUFFER_SURFACE_WIDTH ) && 
 		 ( pDstRect->y + pDstRect->height <= SMALL_BACK_BUFFER_SURFACE_HEIGHT ) )
 	{
@@ -10827,7 +10827,7 @@ se::win::com::com_ptr<IDirect3DSurface> CShaderAPIDx8::GetBackBufferImageHDR( Re
 			return {};
 	}
 	
-	se::win::com::com_ptr<IDirect3DSurface> pSurfaceBits;
+	s1::win::com::com_ptr<IDirect3DSurface> pSurfaceBits;
 	// Create a buffer the same size and format
 	hr = Dx9Device()->CreateOffscreenPlainSurface( desc.Width, desc.Height, 
 		desc.Format, D3DPOOL_SYSTEMMEM, &pSurfaceBits, NULL );
@@ -10847,7 +10847,7 @@ se::win::com::com_ptr<IDirect3DSurface> CShaderAPIDx8::GetBackBufferImageHDR( Re
 //-----------------------------------------------------------------------------
 // Returns a copy of the back buffer
 //-----------------------------------------------------------------------------
-se::win::com::com_ptr<IDirect3DSurface> CShaderAPIDx8::GetBackBufferImage( Rect_t *pSrcRect, Rect_t *pDstRect, ImageFormat& format )
+s1::win::com::com_ptr<IDirect3DSurface> CShaderAPIDx8::GetBackBufferImage( Rect_t *pSrcRect, Rect_t *pDstRect, ImageFormat& format )
 {
 	if ( !m_pBackBufferSurface || ( m_hFullScreenTexture == INVALID_SHADERAPI_TEXTURE_HANDLE ) )
 		return {};
@@ -10855,7 +10855,7 @@ se::win::com::com_ptr<IDirect3DSurface> CShaderAPIDx8::GetBackBufferImage( Rect_
 	FlushBufferedPrimitives();
 
 	// Get the current render target
-	se::win::com::com_ptr<IDirect3DSurface9> pRenderTarget;
+	s1::win::com::com_ptr<IDirect3DSurface9> pRenderTarget;
 	HRESULT hr = Dx9Device()->GetRenderTarget( 0, &pRenderTarget );
 	if (FAILED(hr))
 		return {};
@@ -10869,7 +10869,7 @@ se::win::com::com_ptr<IDirect3DSurface> CShaderAPIDx8::GetBackBufferImage( Rect_
 	if ( desc.Format == D3DFMT_A16B16G16R16F || desc.Format == D3DFMT_A32B32G32R32F )
 		return GetBackBufferImageHDR( pSrcRect, pDstRect, format );
 
-	se::win::com::com_ptr<IDirect3DSurface9> pTmpSurface;
+	s1::win::com::com_ptr<IDirect3DSurface9> pTmpSurface;
 	if ( (desc.MultiSampleType == D3DMULTISAMPLE_NONE) && (pRenderTarget != m_pBackBufferSurface) && 
 		 (pSrcRect->width == pDstRect->width) && (pSrcRect->height == pDstRect->height) )
 	{
@@ -10921,7 +10921,7 @@ se::win::com::com_ptr<IDirect3DSurface> CShaderAPIDx8::GetBackBufferImage( Rect_
 	hr = pTmpSurface->GetDesc( &tmpDesc );
 	Assert( SUCCEEDED(hr) );
 	
-	se::win::com::com_ptr<IDirect3DSurface9> pSurfaceBits;
+	s1::win::com::com_ptr<IDirect3DSurface9> pSurfaceBits;
 	// Create a buffer the same size and format
 	hr = Dx9Device()->CreateOffscreenPlainSurface( tmpDesc.Width, tmpDesc.Height, 
 		desc.Format, D3DPOOL_SYSTEMMEM, &pSurfaceBits, NULL );
@@ -10993,7 +10993,7 @@ void CShaderAPIDx8::ReadPixels( Rect_t *pSrcRect, Rect_t *pDstRect, unsigned cha
 	}
 
 	ImageFormat format;
-	se::win::com::com_ptr<IDirect3DSurface> pSurfaceBits = GetBackBufferImage( pSrcRect, pDstRect, format );
+	s1::win::com::com_ptr<IDirect3DSurface> pSurfaceBits = GetBackBufferImage( pSrcRect, pDstRect, format );
 	if ( pSurfaceBits )
 	{
 		CopyBitsFromHostSurface( pSurfaceBits, *pDstRect, pData, format, dstFormat, nDstStride );
@@ -11013,7 +11013,7 @@ void CShaderAPIDx8::ReadPixels( int x, int y, int width, int height, unsigned ch
 	rect.height = height;
 
 	ImageFormat format;
-	se::win::com::com_ptr<IDirect3DSurface> pSurfaceBits = GetBackBufferImage( &rect, &rect, format );
+	s1::win::com::com_ptr<IDirect3DSurface> pSurfaceBits = GetBackBufferImage( &rect, &rect, format );
 	if (pSurfaceBits)
 	{
 		CopyBitsFromHostSurface( pSurfaceBits, rect, pData, format, dstFormat, 0 );
@@ -11440,7 +11440,7 @@ void CShaderAPIDx8::EvictManagedResourcesInternal()
 		if ( FAILED( hr ) )
 		{
 			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EvictManagedResources() failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 	}
 }

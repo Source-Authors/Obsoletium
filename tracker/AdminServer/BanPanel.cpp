@@ -392,7 +392,7 @@ void CBanPanel::OnFileSelected(const char *fullpath)
 
 	// we don't use filesystem() here because we want to let the user pick
 	// a file from anywhere on their filesystem... so we use stdio
-	auto [f, rc] = se::posix::posix_file_stream_factory::open(fullpath, "rb");
+	auto [f, rc] = s1::posix::posix_file_stream_factory::open(fullpath, "rb");
 	if (!rc)
 	{
 		while (std::get<char *>(f.gets(line)))

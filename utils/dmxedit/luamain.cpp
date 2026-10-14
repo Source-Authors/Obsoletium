@@ -74,7 +74,7 @@ int Sort_LuaFunc_s( const T_t *pA, const T_t *pB )
 
 }  // namespace
 
-namespace se::dmxedit {
+namespace s1::dmxedit {
 
 //-----------------------------------------------------------------------------
 // The application object
@@ -92,17 +92,17 @@ public:
 
 private:
 	// Install an exception handler.
-	const se::utils::common::ScopedDefaultMinidumpHandler
+	const s1::utils::common::ScopedDefaultMinidumpHandler
 		scoped_default_minidumps;
 };
 
-}  // namespace se::dmxedit
+}  // namespace s1::dmxedit
 
-using CDmxEditApp = se::dmxedit::CDmxEditApp;
+using CDmxEditApp = s1::dmxedit::CDmxEditApp;
 
 DEFINE_CONSOLE_STEAM_APPLICATION_OBJECT( CDmxEditApp );
 
-namespace se::dmxedit {
+namespace s1::dmxedit {
 
 //-----------------------------------------------------------------------------
 // The application object
@@ -419,4 +419,4 @@ void CDmxEditApp::PrintHelp( bool bWiki /* = false */ )
 	Msg( "\n" );
 }
 
-}  // namespace se::dmxedit
+}  // namespace s1::dmxedit

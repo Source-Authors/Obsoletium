@@ -246,7 +246,7 @@ void ProcessFiles(const char* normalFileNameWithoutExtension, int startFrame,
 
 int main(int argc, char** argv) {
   // Install an exception handler.
-  const se::utils::common::ScopedDefaultMinidumpHandler
+  const s1::utils::common::ScopedDefaultMinidumpHandler
       scoped_default_minidumps;
 
 #ifdef PLATFORM_64BITS

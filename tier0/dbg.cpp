@@ -937,7 +937,7 @@ void* Plat_SimpleLog( const tchar* file, int line )
 {
 	constexpr char kLogFileName[] = "simple.log";
 
-	auto [f, rc] = se::posix::posix_file_stream_factory::open( kLogFileName, "at+" );
+	auto [f, rc] = s1::posix::posix_file_stream_factory::open( kLogFileName, "at+" );
 	if (!rc)
 	{
 		size_t size;
@@ -1026,7 +1026,7 @@ void COM_TimestampedLog( PRINTF_FORMAT_STRING char const *fmt, ... )
 			is_first_write = true;
 		}
 
-		auto [file, rc] = se::posix::posix_file_stream_factory::open( kLogFileName, "at+" );
+		auto [file, rc] = s1::posix::posix_file_stream_factory::open( kLogFileName, "at+" );
 		if (!rc)
 		{
 			size_t size;

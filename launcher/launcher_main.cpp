@@ -281,14 +281,14 @@ int RunApp(ICommandLine *command_line, const char (&base_directory)[MAX_PATH],
   bool need_restart{false};
 
   do {
-    se::launcher::BootAppSystemGroup systems{command_line, base_directory,
+    s1::launcher::BootAppSystemGroup systems{command_line, base_directory,
                                              is_text_mode};
     CSteamApplication app{&systems};
 
     const int rc{app.Run()};
 
     need_restart = (app.GetErrorStage() ==
-                        se::launcher::BootAppSystemGroup::INITIALIZATION &&
+                        s1::launcher::BootAppSystemGroup::INITIALIZATION &&
                     rc == INIT_RESTART) ||
                    rc == RUN_RESTART;
 
@@ -389,10 +389,10 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   // slam things to en_US.UTF-8.
   constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
 
-  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-  if (Q_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+  const s1::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (Q_stricmp(s1::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
     Warning("setlocale('%s') failed, current locale is '%s'.\n",
-            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+            kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale());
   }
 
 #ifdef POSIX
@@ -445,7 +445,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
 #endif
 
   // Can only run one windowed source app at a time.
-  const se::launcher::ScopedAppMultiRun scoped_app_multi_run{CommandLine()};
+  const s1::launcher::ScopedAppMultiRun scoped_app_multi_run{CommandLine()};
   if (!scoped_app_multi_run.is_single_run()) {
     // Allow the user to explicitly say they want to be able to run multiple
     // instances of the source mutex.  Useful for side-by-side comparisons of
@@ -466,7 +466,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
 
 #ifdef WIN32
   // COM is required.
-  const se::common::windows::ScopedCom scoped_com{
+  const s1::win::ScopedCom scoped_com{
       static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE |
                           COINIT_SPEED_OVER_MEMORY)};
   if (FAILED(scoped_com.errc())) {
@@ -479,7 +479,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   constexpr std::chrono::milliseconds kSystemTimerResolution{2ms};
 
   // System timer precision affects Sleep & friends performance.
-  const se::common::windows::ScopedTimerResolution scoped_timer_resolution{
+  const s1::win::ScopedTimerResolution scoped_timer_resolution{
       kSystemTimerResolution};
   if (!scoped_timer_resolution) {
     Warning(
@@ -488,7 +488,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
         static_cast<long long>(kSystemTimerResolution.count()));
   }
 
-  const se::common::windows::ScopedWinsockInitializer scoped_winsock{WINSOCK_VERSION};
+  const s1::win::ScopedWinsockInitializer scoped_winsock{WINSOCK_VERSION};
   if (scoped_winsock.error_code()) {
     Warning("Windows sockets 2.2+ unavailable (%d): %s.\n",
             scoped_winsock.error_code().value(),
@@ -536,7 +536,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   // call has no effect on X360
   TryToLoadSteamOverlayDLL();
 
-  auto [vcr_helpers, rc] = se::launcher::CreateVcrHelpers(command_line);
+  auto [vcr_helpers, rc] = s1::launcher::CreateVcrHelpers(command_line);
   if (rc != 0) return rc;
 
   // See the function for why we do this.
@@ -549,9 +549,9 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   }
 
   // Relaunch app if needed.
-  const se::launcher::ScopedAppRelaunch scoped_app_relaunch;
+  const s1::launcher::ScopedAppRelaunch scoped_app_relaunch;
   // Dump heap leaks if needed.
-  const se::launcher::ScopedHeapLeakDumper scoped_heap_leak_dumper{
+  const s1::launcher::ScopedHeapLeakDumper scoped_heap_leak_dumper{
       !!command_line->HasParm("-leakcheck")};
 
   // Run in text mode (no graphics & sound)?

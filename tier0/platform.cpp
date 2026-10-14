@@ -596,7 +596,7 @@ bool Plat_ApplySystemTitleBarTheme(void *window,
 		Warning(
 			"Unable to apply user Color Mode preferences to window 0x%p (%s): %s\n",
 			window, windowText ? windowText : "N/A",
-			se::win::com::com_error_category().message(hr).c_str());
+			s1::win::com::com_error_category().message(hr).c_str());
 
 		ok = false;
 
@@ -626,7 +626,7 @@ bool Plat_ApplySystemTitleBarTheme(void *window,
 		Warning(
 			"Unable to apply backdrop material effect to window 0x%p (%s): %s\n",
 			window, windowText ? windowText : "N/A",
-			se::win::com::com_error_category().message(hr).c_str());
+			s1::win::com::com_error_category().message(hr).c_str());
 
 		ok = false;
 	}

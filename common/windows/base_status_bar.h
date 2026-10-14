@@ -24,7 +24,7 @@ class CBaseStatusBar : public CStatusBar {
   void ScaleHeight(int initialHeight);
 
  private:
-  se::windows::ui::CDpiWindowBehavior m_dpi_behavior;
+  s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
 
   int m_indicator_count;
 };

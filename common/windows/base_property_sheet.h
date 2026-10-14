@@ -32,7 +32,7 @@ class CBasePropertySheet : public CPropertySheet {
   afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
   DECLARE_MESSAGE_MAP()
 
-  se::windows::ui::CDpiWindowBehavior m_dpi_behavior;
+  s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
 };
 
 #endif  // !SE_COMMON_WINDOWS_BASE_PROPERTY_SHEET_H_

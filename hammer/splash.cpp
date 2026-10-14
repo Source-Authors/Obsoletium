@@ -316,7 +316,7 @@ BOOL CSplashWnd::Create(CWnd* pParentWnd /*= NULL*/)
 	BITMAP bm;
     m_bitmap.GetBitmap(&bm);
 
-	HBITMAP scaledBitmap = se::windows::ui::ScaleBitmapForDpi(
+	HBITMAP scaledBitmap = s1::win::ui::ScaleBitmapForDpi(
 		static_cast<HBITMAP>(m_bitmap.GetSafeHandle()),
 		USER_DEFAULT_SCREEN_DPI,
 		USER_DEFAULT_SCREEN_DPI,

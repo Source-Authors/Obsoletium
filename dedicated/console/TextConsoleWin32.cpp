@@ -21,7 +21,7 @@ BOOL WINAPI ConsoleHandlerRoutine(DWORD) { return TRUE; }
 
 }  // namespace
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 CTextConsoleWin32::CTextConsoleWin32() {
   m_szConsoleText[0] = '\0';
@@ -517,6 +517,6 @@ void CTextConsoleWin32::ReceiveRightArrow() {
   m_nCursorPosition++;
 }
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated
 
 #endif  // _WIN32

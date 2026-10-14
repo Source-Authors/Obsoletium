@@ -5,7 +5,7 @@
 
 using HRESULT = long;
 
-namespace se::smp {
+namespace s1::smp {
 
 // event logging.
 enum class SmpPlayerEvent {
@@ -46,6 +46,6 @@ enum class SmpPlayerEvent {
 
 bool FailedUI(HRESULT hr, const char* description);
 
-}  // namespace se::smp
+}  // namespace s1::smp
 
 #endif  // !SE_UTILS_SMP_STEAM_WMP_EVENT_H_

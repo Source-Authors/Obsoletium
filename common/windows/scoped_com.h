@@ -18,7 +18,7 @@ __declspec(dllimport) _Check_return_ HRESULT
 __declspec(dllimport) void __stdcall CoUninitialize();
 }
 
-namespace se::common::windows {
+namespace s1::win {
 
 // Scoped COM.
 class ScopedCom {
@@ -41,6 +41,6 @@ class ScopedCom {
   const HRESULT errc_;
 };
 
-}  // namespace se::common::windows
+}  // namespace s1::win
 
 #endif  // !SE_COMMON_WINDOWS_SCOPED_COM_H_

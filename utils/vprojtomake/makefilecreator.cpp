@@ -6,7 +6,7 @@
 
 #include <string_view>
 
-namespace se::vprojtomake {
+namespace s1::vprojtomake {
 
 CMakefileCreator::CMakefileCreator() {
   m_FileToBaseDirMapping.SetLessFunc(DefLessFunc(intp));
@@ -293,4 +293,4 @@ bool CMakefileCreator::OutputBuildTarget(FileHandle_t f) {
   return ok;
 }
 
-}  // namespace se::vprojtomake
+}  // namespace s1::vprojtomake

@@ -149,7 +149,7 @@ class CompileCaptionsApp : public CTier3SteamApp {
   void DescribeCaptions(char const *file) const;
 
   // Install an exception handler.
-  const se::utils::common::ScopedDefaultMinidumpHandler
+  const s1::utils::common::ScopedDefaultMinidumpHandler
       scoped_default_minidumps_;
   const ScopedSpewOutputFunc scoped_spew_output_;
 
@@ -160,7 +160,7 @@ class CompileCaptionsApp : public CTier3SteamApp {
   // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
   // supports using a UTF-8 code page.
   static constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
-  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  const s1::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
 
   bool m_UseLogFile;
 };
@@ -174,9 +174,9 @@ bool CompileCaptionsApp::Create() {
   //
   // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
   // supports using a UTF-8 code page.
-  if (!V_strieq(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+  if (!V_strieq(s1::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
     Warning("setlocale('%s') failed, current locale is '%s'.\n",
-            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+            kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale());
   }
 
   AppSystemInfo_t appSystems[] = {

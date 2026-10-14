@@ -30,7 +30,7 @@ CSysModule *g_hAdminServerModule = nullptr;
 
 }  // namespace
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 extern IAdminServer *g_pAdminServer;
 
@@ -51,7 +51,7 @@ CMainPanel::CMainPanel() : Panel(nullptr, "CMainPanel") {
 //-----------------------------------------------------------------------------
 // Purpose: Destructor
 //-----------------------------------------------------------------------------
-CMainPanel::~CMainPanel() { free(se::dedicated::gpszCvars); }
+CMainPanel::~CMainPanel() { free(s1::dedicated::gpszCvars); }
 
 //-----------------------------------------------------------------------------
 // Purpose: Called once to set up
@@ -115,7 +115,7 @@ void CMainPanel::StartServer(const char *cvars) {
   m_pConfigPage->SetVisible(false);
   m_pConfigPage->Close();
 
-  se::dedicated::gpszCvars = strdup(cvars);
+  s1::dedicated::gpszCvars = strdup(cvars);
 
   // show the basic progress box immediately
   m_pProgressBox = new ProgressBox("#Start_Server_Loading_Title",
@@ -249,6 +249,6 @@ MessageMapItem_t CMainPanel::m_MessageMap[] = {
 
 IMPLEMENT_PANELMAP(CMainPanel, BaseClass);
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated
 
 #endif  // _WIN32

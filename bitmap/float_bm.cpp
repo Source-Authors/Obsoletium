@@ -73,7 +73,7 @@ constexpr static inline float BiLinInterp(float Xfrac, float Yfrac, float UL, fl
 }
 
 [[nodiscard]] bool PFMWrite(float *img, const char *file_path, int width, int height) {
-  auto [f, errc] = se::posix::posix_file_stream_factory::open(file_path, "wb");
+  auto [f, errc] = s1::posix::posix_file_stream_factory::open(file_path, "wb");
   if (errc) {
     Warning("Unable to open PFM '%s' for writing: %s.\n", file_path,
             errc.message().c_str());

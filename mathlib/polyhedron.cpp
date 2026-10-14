@@ -37,8 +37,8 @@ CPolyhedron *ConvertLinkedGeometryToPolyhedron( GeneratePolyhedronFromPlanes_Uno
 #ifdef _DEBUG
 void DumpPolyhedronToGLView( const CPolyhedron *pPolyhedron, const char *pFilename, const VMatrix *pTransform );
 void DumpPlaneToGlView( const float *pPlane, float fGrayScale, const char *pszFileName, const VMatrix *pTransform );
-void DumpLineToGLView( const Vector &vPoint1, const Vector &vColor1, const Vector &vPoint2, const Vector &vColor2, float fThickness, se::posix::posix_file_stream &file );
-void DumpAABBToGLView( const Vector &vCenter, const Vector &vExtents, const Vector &vColor, se::posix::posix_file_stream &file );
+void DumpLineToGLView( const Vector &vPoint1, const Vector &vColor1, const Vector &vPoint2, const Vector &vColor2, float fThickness, s1::posix::posix_file_stream &file );
+void DumpAABBToGLView( const Vector &vCenter, const Vector &vExtents, const Vector &vColor, s1::posix::posix_file_stream &file );
 
 #if defined( ENABLE_DEBUG_POLYHEDRON_DUMPS ) && defined( WIN32 )
 #include "winlite.h"
@@ -793,7 +793,7 @@ void DumpPointListToGLView( GeneratePolyhedronFromPlanes_UnorderedPointLL *pHead
 	if( pTransform == NULL )
 		pTransform = &s_matIdentity;
 	
-	auto [file, rc] = se::posix::posix_file_stream_factory::open( szDumpFile, "ab" );
+	auto [file, rc] = s1::posix::posix_file_stream_factory::open( szDumpFile, "ab" );
 	if ( rc )
 	{
 		Warning( "Unable to dump point list to %s: %s.\n", szDumpFile, rc.message().c_str() );
@@ -850,7 +850,7 @@ const char * DumpPolyhedronCutHistory( const CUtlVector<CPolyhedron *> &DumpedHi
 		DumpPointListToGLView( pDeadPointCollection, POINT_DEAD, Vector( 0.1f, 0.1f, 0.1f ), szLastDumpFile, &matTransform );\
 		if( pStartPoint )\
 		{\
-			auto [file, rc] = se::posix::posix_file_stream_factory::open(szLastDumpFile, "ab"); \
+			auto [file, rc] = s1::posix::posix_file_stream_factory::open(szLastDumpFile, "ab"); \
 			if (rc) \
 			{ \
 			  Warning("Unable to dump point list to %s: %s.\n", szLastDumpFile, \
@@ -1996,7 +1996,7 @@ CPolyhedron *GeneratePolyhedronFromPlanes( const float *pOutwardFacingPlanes, in
 }
 
 #ifdef _DEBUG
-void DumpAABBToGLView( const Vector &vCenter, const Vector &vExtents, const Vector &vColor, se::posix::posix_file_stream &file )
+void DumpAABBToGLView( const Vector &vCenter, const Vector &vExtents, const Vector &vColor, s1::posix::posix_file_stream &file )
 {
 #ifdef ENABLE_DEBUG_POLYHEDRON_DUMPS
 	Vector vMins = vCenter - vExtents;
@@ -2088,7 +2088,7 @@ void DumpAABBToGLView( const Vector &vCenter, const Vector &vExtents, const Vect
 #endif
 }
 
-void DumpLineToGLView( const Vector &vPoint1, const Vector &vColor1, const Vector &vPoint2, const Vector &vColor2, float fThickness, se::posix::posix_file_stream &file )
+void DumpLineToGLView( const Vector &vPoint1, const Vector &vColor1, const Vector &vPoint2, const Vector &vColor2, float fThickness, s1::posix::posix_file_stream &file )
 {
 #ifdef ENABLE_DEBUG_POLYHEDRON_DUMPS
 	Vector vDirection = vPoint2 - vPoint1;
@@ -2160,7 +2160,7 @@ void DumpPolyhedronToGLView( const CPolyhedron *pPolyhedron, const char *pFilena
 
 	printf("Writing %s...\n", pFilename );
 
-	auto [file, rc] = se::posix::posix_file_stream_factory::open( pFilename, "ab" );
+	auto [file, rc] = s1::posix::posix_file_stream_factory::open( pFilename, "ab" );
 	if ( rc )
 	{
 		Warning( "Unable to dump polyhedron to %s: %s.\n", pFilename, rc.message().c_str() );
@@ -2218,7 +2218,7 @@ void DumpPlaneToGlView( const float *pPlane, float fGrayScale, const char *pszFi
 	if( pTransform == NULL )
 		pTransform = &s_matIdentity;
 
-	auto [file, rc] = se::posix::posix_file_stream_factory::open( pszFileName, "ab" );
+	auto [file, rc] = s1::posix::posix_file_stream_factory::open( pszFileName, "ab" );
 	if ( rc )
 	{
 		Warning( "Unable to dump plane to %s: %s.\n", pszFileName, rc.message().c_str() );

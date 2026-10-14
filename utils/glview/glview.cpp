@@ -1187,7 +1187,7 @@ SpewRetval_t GlViewSpew(SpewType_t type, const char *pMsg) {
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
                    _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
   // Install an exception handler.
-  const se::utils::common::ScopedDefaultMinidumpHandler
+  const s1::utils::common::ScopedDefaultMinidumpHandler
       scoped_default_minidumps;
 
   CommandLine()->CreateCmdLine(Plat_GetCommandLine());

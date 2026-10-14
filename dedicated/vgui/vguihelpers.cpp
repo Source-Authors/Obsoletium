@@ -29,7 +29,7 @@ IVGuiModule *g_pAdminVGuiModule = nullptr;
 
 }  // namespace
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 IAdminServer *g_pAdminServer = nullptr;
 CMainPanel *g_pMainPanel = nullptr;  // the main panel to show
@@ -185,6 +185,6 @@ void VGUIPrintf(const char *msg) {
   }
 }
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated
 
 #endif  // _WIN32

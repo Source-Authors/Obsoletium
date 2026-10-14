@@ -31,7 +31,7 @@ size_t GetVidMemBytes( unsigned nAdapter )
 
 	nBeenAdapter = nAdapter;
 
-	se::common::windows::ScopedCom scoped_com{
+	s1::win::ScopedCom scoped_com{
 		static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE | COINIT_SPEED_OVER_MEMORY)};
 	if ( FAILED(scoped_com.errc()) )
 	{
@@ -40,7 +40,7 @@ size_t GetVidMemBytes( unsigned nAdapter )
 	}
 
 	// Windows 7+.
-	se::win::com::com_ptr<IDXGIFactory1> pDXGIFactory;
+	s1::win::com::com_ptr<IDXGIFactory1> pDXGIFactory;
 	HRESULT hr = CreateDXGIFactory1( IID_PPV_ARGS(&pDXGIFactory) );
 	if ( FAILED( hr ) )
 	{
@@ -48,7 +48,7 @@ size_t GetVidMemBytes( unsigned nAdapter )
 		return 0;
 	}
 
-	se::win::com::com_ptr<IDXGIAdapter1> pAdapter;
+	s1::win::com::com_ptr<IDXGIAdapter1> pAdapter;
 	hr = pDXGIFactory->EnumAdapters1( nAdapter, &pAdapter );
 	if ( FAILED( hr ) )
 	{

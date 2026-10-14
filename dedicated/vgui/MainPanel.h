@@ -15,7 +15,7 @@
 
 class IAdminServer;
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 // Root panel for dedicated server GUI
 class CMainPanel : public vgui::Panel {
@@ -77,6 +77,6 @@ class CMainPanel : public vgui::Panel {
   DECLARE_PANELMAP_OVERRIDE();
 };
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated
 
 #endif  // !SE_DEDICATED_VGUI_MAIN_PANEL_H_

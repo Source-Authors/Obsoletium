@@ -9,7 +9,7 @@
 #include <cstdio>
 #include "tier1/utlbuffer.h"
 
-namespace se::shader_compile::command_sink {
+namespace s1::shader_compile::command_sink {
 
 /**
  * @brief Interface to give back command execution results.
@@ -94,6 +94,6 @@ struct CResponseError : public IResponse {
   const char *GetListing() override { return nullptr; }
 };
 
-};  // namespace se::shader_compile::command_sink
+};  // namespace s1::shader_compile::command_sink
 
 #endif  // !SE_UTILS_SHADERCOMPILE_CMDSINK_H_

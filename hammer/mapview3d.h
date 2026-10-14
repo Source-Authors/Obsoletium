@@ -176,7 +176,7 @@ private:
 	bool m_bCameraPosChanged;
 	bool m_bClippingChanged;
 
-	se::windows::ui::CDpiWindowBehavior m_dpiWindowBehavior;
+	s1::win::ui::CDpiWindowBehavior m_dpiWindowBehavior;
 
 	//{{AFX_MSG(CMapView3D)
 protected:

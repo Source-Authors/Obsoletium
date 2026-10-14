@@ -390,7 +390,7 @@ void SetupDependencyFilename(CDependencyInfo *pInfo,
 }
 
 template <size_t maxLen>
-bool ReadString(char (&pOut)[maxLen], se::posix::posix_file_stream &fp) {
+bool ReadString(char (&pOut)[maxLen], s1::posix::posix_file_stream &fp) {
   auto [str, errc] = fp.gets(pOut);
   if (errc || pOut[0] == 0) return false;
 
@@ -402,7 +402,7 @@ bool ReadString(char (&pOut)[maxLen], se::posix::posix_file_stream &fp) {
 
 void ParseDependencyFile(CDependencyInfo *pInfo, const char *pDepFilename) {
   auto [fp, errc] =
-      se::posix::posix_file_stream_factory::open(pDepFilename, "rt");
+      s1::posix::posix_file_stream_factory::open(pDepFilename, "rt");
   if (errc) Error("Can't open %s: %s", pDepFilename, errc.message().c_str());
 
   const char *pOptionalPrefix = "optional ";

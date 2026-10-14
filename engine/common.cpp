@@ -894,7 +894,7 @@ bool BLoadHDContent( const char *pchModDir, const char *pchBaseDir )
 	char szFullPath[ 1024 ];
 	V_MakeAbsolutePath( szFullPath, szModSteamInfPath, pchBaseDir );
 
-	auto [f, errc] = se::posix::posix_file_stream_factory::open(szFullPath, "rb");
+	auto [f, errc] = s1::posix::posix_file_stream_factory::open(szFullPath, "rb");
 	return !errc;
 }
 

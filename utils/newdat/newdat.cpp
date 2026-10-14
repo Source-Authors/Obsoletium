@@ -24,7 +24,7 @@ namespace {
 [[nodiscard]] bool MD5HashFile(byte (&digest)[MD5_DIGEST_LENGTH],
                                const char *file_name,
                                std::ostream &err) noexcept {
-  auto [f, errc] = se::posix::posix_file_stream_factory::open(file_name, "rb");
+  auto [f, errc] = s1::posix::posix_file_stream_factory::open(file_name, "rb");
   if (errc) {
     err << "Can't open file " << file_name << " to md5: " << errc.message()
         << ".\n";
@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
 
   // Write MD5 hash as the signature ".md5" file
   auto [f, errc] =
-      se::posix::posix_file_stream_factory::open(md5_file_name, "wb");
+      s1::posix::posix_file_stream_factory::open(md5_file_name, "wb");
   if (!errc) {
     for (byte b : digest) {
       std::tie(std::ignore, errc) = f.print("%hhx", b);

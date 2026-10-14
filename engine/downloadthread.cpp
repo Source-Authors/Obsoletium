@@ -41,7 +41,7 @@ static void WriteFileFromRequestContext( const RequestContext_t &rc )
 	int rt = stat(rc.absLocalPath, &buf);
 	if ( rt == -1 && !rc.bSuppressFileWrite )
 	{
-		auto [fp, errc] = se::posix::posix_file_stream_factory::open( rc.absLocalPath, "wb" );
+		auto [fp, errc] = s1::posix::posix_file_stream_factory::open( rc.absLocalPath, "wb" );
 		if ( !errc )
 		{
 			if ( rc.data )

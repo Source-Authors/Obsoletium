@@ -46,8 +46,8 @@ CComModule atl_com;
 size_t g_nTimingIndex = 0;
 double g_timings[65536];
 
-const char *GetEventName(se::smp::SmpPlayerEvent event) {
-  using namespace se::smp;
+const char *GetEventName(s1::smp::SmpPlayerEvent event) {
+  using namespace s1::smp;
 
   switch (event) {
     case SmpPlayerEvent::AppLaunch:
@@ -118,7 +118,7 @@ const char *GetEventName(se::smp::SmpPlayerEvent event) {
 
 }  // namespace
 
-namespace se::smp {
+namespace s1::smp {
 
 HWND g_hBlackFadingWindow = nullptr;
 bool g_bFrameCreated = false;
@@ -144,7 +144,7 @@ bool ShowFadeWindow(bool bShow) {
 
     ::SetTimer(g_hBlackFadingWindow, ID_DRAW_TIMER, 10, nullptr);
 
-    if (se::smp::g_pFrame) se::smp::g_pFrame->ShowWindow(SW_HIDE);
+    if (s1::smp::g_pFrame) s1::smp::g_pFrame->ShowWindow(SW_HIDE);
 
     ::SetWindowPos(g_hBlackFadingWindow, HWND_TOPMOST, 0, 0, 0, 0,
                    SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
@@ -158,13 +158,13 @@ bool ShowFadeWindow(bool bShow) {
   return true;
 }
 
-}  // namespace se::smp
+}  // namespace s1::smp
 
 namespace {
 
 LRESULT CALLBACK SnmpWindowProc(HWND hWnd, UINT msg, WPARAM wparam,
                                 LPARAM lparam) {
-  using namespace se::smp;
+  using namespace s1::smp;
 
   switch (msg) {
     case WM_CREATE: {
@@ -306,7 +306,7 @@ LRESULT CALLBACK SnmpWindowProc(HWND hWnd, UINT msg, WPARAM wparam,
 
 HWND CreateFullscreenWindow(HINSTANCE instance, HMONITOR monitor, bool bFadeIn,
                             const std::string &url) {
-  if (se::smp::g_hBlackFadingWindow) return se::smp::g_hBlackFadingWindow;
+  if (s1::smp::g_hBlackFadingWindow) return s1::smp::g_hBlackFadingWindow;
 
   static bool s_bRegistered = false;
 
@@ -343,16 +343,16 @@ HWND CreateFullscreenWindow(HINSTANCE instance, HMONITOR monitor, bool bFadeIn,
   constexpr DWORD windowStyle =
       WS_POPUP | WS_MAXIMIZE | WS_EX_TOPMOST | WS_VISIBLE;
 
-  se::smp::g_hBlackFadingWindow =
+  s1::smp::g_hBlackFadingWindow =
       CreateWindow(wnd_class_name, title, windowStyle, mi.rcMonitor.left,
                    mi.rcMonitor.top, mi.rcMonitor.right - mi.rcMonitor.left,
                    mi.rcMonitor.bottom - mi.rcMonitor.top, nullptr, nullptr,
                    instance, nullptr);
-  ShowWindow(se::smp::g_hBlackFadingWindow, SW_SHOWMAXIMIZED);
+  ShowWindow(s1::smp::g_hBlackFadingWindow, SW_SHOWMAXIMIZED);
 
   while (ShowCursor(FALSE) >= 0);
 
-  return se::smp::g_hBlackFadingWindow;
+  return s1::smp::g_hBlackFadingWindow;
 }
 
 bool CreateDesktopBitmaps(HMONITOR monitor) {
@@ -476,7 +476,7 @@ class ScopedRegistryValue {
     LONG rc{RegCreateKeyEx(root, key_name, 0, nullptr, REG_OPTION_NON_VOLATILE,
                            KEY_ALL_ACCESS, nullptr, &key, nullptr)};
     if (rc != ERROR_SUCCESS) {
-      se::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
+      s1::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
                         "Unable to open registry key: ");
       OutputDebugString(key_name);
       OutputDebugString("\n");
@@ -496,7 +496,7 @@ class ScopedRegistryValue {
     rc = RegSetValueEx(key, value_name, 0, REG_DWORD, (CONST BYTE *)&value,
                        sizeof(value));
     if (rc != ERROR_SUCCESS) {
-      se::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
+      s1::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
                         "Unable to write registry value: ");
 
       OutputDebugString(value_name);
@@ -506,7 +506,7 @@ class ScopedRegistryValue {
     }
 
     if (RegCloseKey(key) != ERROR_SUCCESS) {
-      se::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
+      s1::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
                         "Unable to close registry key: ");
     }
 
@@ -520,7 +520,7 @@ class ScopedRegistryValue {
     LONG rc{RegCreateKeyEx(root, key_name, 0, nullptr, REG_OPTION_NON_VOLATILE,
                            KEY_ALL_ACCESS, nullptr, &key, nullptr)};
     if (rc != ERROR_SUCCESS) {
-      se::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
+      s1::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
                         "Unable to open registry key: ");
 
       OutputDebugString(key_name);
@@ -532,19 +532,19 @@ class ScopedRegistryValue {
       rc = RegSetValueEx(key, value_name, 0, REG_DWORD,
                          (CONST BYTE *)&old_value, sizeof(old_value));
       if (rc != ERROR_SUCCESS) {
-        se::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
+        s1::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
                           "RegSetValueEx w/e: ");
       }
     } else {
       rc = RegDeleteValue(key, value_name);
       if (rc != ERROR_SUCCESS) {
-        se::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
+        s1::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
                           "RegDeleteValue w/e: ");
       }
     }
 
     if (RegCloseKey(key) != ERROR_SUCCESS) {
-      se::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
+      s1::smp::FailedUI(HRESULT_FROM_WIN32(GetLastError()),
                         "Unable to close registry key: ");
     }
 
@@ -565,7 +565,7 @@ class ScopedRegistryValue {
 
 int WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE,
                    _In_ LPSTR cmd_line, _In_ int) {
-  using namespace se::smp;
+  using namespace s1::smp;
 
   if (*cmd_line == '\0') {
     FailedUI(HRESULT_FROM_WIN32(ERROR_INVALID_COMMAND_LINE),

@@ -121,7 +121,7 @@ BOOL CBaseToolBar::LoadBitmapForDpi(LPCTSTR lpszResourceName,
     RunCodeAtScopeExit(::DeleteObject(hbmImageWell));
 
     // scale the bitmap
-    HBITMAP scaledBitmap{se::windows::ui::ScaleBitmapForDpi(
+    HBITMAP scaledBitmap{s1::win::ui::ScaleBitmapForDpi(
         hbmImageWell, m_dpi_behavior.GetPreviousDpiX(),
         m_dpi_behavior.GetPreviousDpiY(), m_dpi_behavior.GetCurrentDpiX(),
         m_dpi_behavior.GetCurrentDpiY())};

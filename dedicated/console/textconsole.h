@@ -3,7 +3,7 @@
 #ifndef SE_DEDICATED_CONSOLE_TEXT_CONSOLE_H_
 #define SE_DEDICATED_CONSOLE_TEXT_CONSOLE_H_
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 class CTextConsole {
  public:
@@ -29,6 +29,6 @@ class CTextConsole {
   bool m_ConsoleVisible{true};
 };
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated
 
 #endif  // !SE_DEDICATED_CONSOLE_TEXT_CONSOLE_H_

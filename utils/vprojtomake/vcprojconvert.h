@@ -9,7 +9,7 @@
 struct IXMLDOMDocument;
 struct IXMLDOMElement;
 
-namespace se::vprojtomake {
+namespace s1::vprojtomake {
 
 class CVCProjConvert {
  public:
@@ -112,6 +112,6 @@ class CVCProjConvert {
   bool m_bProjectLoaded;
 };
 
-}  // namespace se::vprojtomake
+}  // namespace s1::vprojtomake
 
 #endif  // !SE_UTILS_VPROJTOMAKE_VCPROJCONVERT_H_

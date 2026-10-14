@@ -44,7 +44,7 @@
 #include "console/TextConsoleUnix.h"
 #endif
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 void *FileSystemFactory(const char *pName, int *pReturnCode);
 int ProcessConsoleInput(ISystem *system, IDedicatedServerAPI *api);
@@ -55,7 +55,7 @@ CTextConsoleWin32 console;
 CTextConsoleUnix console;
 #endif
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated
 
 namespace {
 
@@ -72,9 +72,9 @@ struct VCRHelpers : public IVCRHelpers {
 bool DoRunVGUIFrame(bool is_console_mode, bool is_finished = false) {
 #ifdef _WIN32
   if (!is_console_mode) {
-    if (is_finished) se::dedicated::VGUIFinishedConfig();
+    if (is_finished) s1::dedicated::VGUIFinishedConfig();
 
-    se::dedicated::RunVGUIFrame();
+    s1::dedicated::RunVGUIFrame();
     return true;
   }
 #endif
@@ -108,18 +108,18 @@ bool HandleVCRHook() {
 bool ConsoleStartup(bool is_console_mode) {
 #ifdef _WIN32
   if (!is_console_mode) {
-    se::dedicated::RunVGUIFrame();
+    s1::dedicated::RunVGUIFrame();
 
     // Run the config screen
-    while (se::dedicated::VGUIIsInConfig() && se::dedicated::VGUIIsRunning())
-      se::dedicated::RunVGUIFrame();
+    while (s1::dedicated::VGUIIsInConfig() && s1::dedicated::VGUIIsRunning())
+      s1::dedicated::RunVGUIFrame();
 
-    if (se::dedicated::VGUIIsStopping()) return false;
+    if (s1::dedicated::VGUIIsStopping()) return false;
 
     return true;
   }
 
-  if (!se::dedicated::console.Init()) return false;
+  if (!s1::dedicated::console.Init()) return false;
 #endif  // _WIN32
 
   return true;
@@ -220,7 +220,7 @@ void DumpAppInformation(int argc, char **argv) {
 
 }  // namespace
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 #ifdef _WIN32
 bool g_is_console_mode = false;
@@ -502,4 +502,4 @@ int BootMain(int argc, char **argv, bool is_console_mode, ISystem *system) {
   return app.Run();
 }
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated

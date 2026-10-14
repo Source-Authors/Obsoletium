@@ -15,7 +15,7 @@
 #include "file_logger.h"
 #include "resource_listing.h"
 
-namespace se::launcher {
+namespace s1::launcher {
 
 // Inner loop: initialize, shutdown main systems, load steam to
 class BootAppSystemGroup : public CSteamAppSystemGroup {
@@ -54,6 +54,6 @@ class BootAppSystemGroup : public CSteamAppSystemGroup {
   static std::unique_ptr<FileLogger> file_logger_;
 };
 
-}  // namespace se::launcher
+}  // namespace s1::launcher
 
 #endif  // SE_LAUNCHER_BOOT_APP_SYSTEM_GROUP_H

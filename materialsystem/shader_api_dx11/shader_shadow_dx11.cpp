@@ -15,7 +15,7 @@
 
 namespace {
 
-se::shaderapidx11::CShaderShadowDx11 s_ShaderShadow;
+s1::shaderapidx11::CShaderShadowDx11 s_ShaderShadow;
 
 }  // namespace
 
@@ -23,7 +23,7 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CShaderShadowDx11, IShaderShadow,
                                   SHADERSHADOW_INTERFACE_VERSION,
                                   s_ShaderShadow)
 
-namespace se::shaderapidx11 {
+namespace s1::shaderapidx11 {
 
 CShaderShadowDx11 *g_pShaderShadowDx11 = &s_ShaderShadow;
 
@@ -161,4 +161,4 @@ void CShaderShadowDx11::BlendFuncSeparateAlpha(ShaderBlendFactor_t srcFactor,
 // indicates what per-vertex data we're providing
 void CShaderShadowDx11::DrawFlags(unsigned int drawFlags) {}
 
-}  // namespace se::shaderapidx11
+}  // namespace s1::shaderapidx11

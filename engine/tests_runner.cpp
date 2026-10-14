@@ -84,14 +84,14 @@ CON_COMMAND(thread_test_tslist,
             "Run thread-safe list tests. 10000 list size by default.") {
   const int tests_num{args.ArgC() == 1 ? 10000 : atoi(args.Arg(1))};
 
-  se::engine::tests::ts_collections::RunTSListTests(tests_num);
+  s1::engine::tests::ts_collections::RunTSListTests(tests_num);
 }
 
 CON_COMMAND(thread_test_tsqueue,
             "Run thread-safe queue tests. 10000 queue size by default.") {
   const int tests_num{args.ArgC() == 1 ? 10000 : atoi(args.Arg(1))};
 
-  se::engine::tests::ts_collections::RunTSQueueTests(tests_num);
+  s1::engine::tests::ts_collections::RunTSQueueTests(tests_num);
 }
 
 CON_COMMAND(threadpool_run_tests,
@@ -99,6 +99,6 @@ CON_COMMAND(threadpool_run_tests,
   const int tests_num{args.ArgC() == 1 ? 1 : atoi(args.Arg(1))};
 
   for (int i = 0; i < tests_num; i++) {
-    se::engine::tests::thread_pool::RunThreadPoolTests();
+    s1::engine::tests::thread_pool::RunThreadPoolTests();
   }
 }

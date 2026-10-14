@@ -10,7 +10,7 @@
 #include "winlite.h"
 #include "tier0/dbg.h"
 
-namespace source::engine::win {
+namespace s1::engine::win {
 
 // Creates Windows keys toggler by hooking module instance and function to control Windows keys toggle.
 WindowsShortcutKeysToggler::WindowsShortcutKeysToggler(
@@ -59,4 +59,4 @@ ShouldEnableWindowsShortcutKeysFunction
 	WindowsShortcutKeysToggler::should_enable_windows_shortcut_keys_fn_ =
 	nullptr;
 
-}  // namespace source::engine::win
+}  // namespace s1::engine::win

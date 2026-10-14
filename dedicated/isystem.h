@@ -8,7 +8,7 @@
 
 class IDedicatedServerAPI;
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 /**
  * @brief Low-level operating system abstractions.
@@ -42,6 +42,6 @@ abstract_class ISystem {
       FMTFUNCTION(2, 3) = 0;
 };
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated
 
 #endif  // SE_DEDICATED_ISYSTEM_H_

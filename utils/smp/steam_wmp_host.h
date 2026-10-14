@@ -11,7 +11,7 @@
 #include "steam_wmp_event_dispatch.h"
 #include "resource.h"
 
-namespace se::smp {
+namespace s1::smp {
 
 class SteamWmpHost
     : public CWindowImpl<
@@ -66,6 +66,6 @@ class SteamWmpHost
   std::string m_url;
 };
 
-}  // namespace se::smp
+}  // namespace s1::smp
 
 #endif  // !SE_UTILS_SMP_STEAM_WMP_HOST_H_

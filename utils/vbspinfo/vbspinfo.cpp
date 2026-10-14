@@ -281,7 +281,7 @@ void PrintCommandLine(int argc, char **argv) {
 
 int main(int argc, char **argv) {
   // Install an exception handler.
-  const se::utils::common::ScopedDefaultMinidumpHandler
+  const s1::utils::common::ScopedDefaultMinidumpHandler
       scoped_default_minidumps;
 
 #ifdef PLATFORM_64BITS
@@ -298,10 +298,10 @@ int main(int argc, char **argv) {
   // supports using a UTF-8 code page.
   constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
 
-  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-  if (!V_strieq(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+  const s1::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (!V_strieq(s1::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
     Warning("setlocale('%s') failed, current locale is '%s'.\n",
-            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+            kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale());
   }
 
   const ScopedCommandLineProgram scoped_command_line_program(argc, argv);
@@ -380,7 +380,7 @@ int main(int argc, char **argv) {
     V_strcpy_safe(source, ExpandPath(source));
 
     int64_t size = 0;
-    auto [f, errc] = se::posix::posix_file_stream_factory::open(source, "rb");
+    auto [f, errc] = s1::posix::posix_file_stream_factory::open(source, "rb");
     if (!errc) std::tie(size, errc) = f.size();
 
     if (!errc && !bWorldTextureStats && !bModelStats && !bListStaticProps) {

@@ -66,20 +66,20 @@ int main(int argc, char *argv[]) {
   V_sprintf_safe(redirect_path, "%s" CORRECT_PATH_SEPARATOR_S "%s", full_path,
                  kRedirectFileName);
 
-  source::ScopedDll module{nullptr, 0};
+  s1::ScopedDll module{nullptr, 0};
   char module_name[MAX_FILEPATH];
 
   // First, look for shadercompile.redirect and load the dll specified in there
   // if possible.
   if (auto [f, err2] =
-          se::posix::posix_file_stream_factory::open(redirect_path, "rt");
+          s1::posix::posix_file_stream_factory::open(redirect_path, "rt");
       !err2) {
     char *name{nullptr};
     if (std::tie(name, err2) = f.gets(module_name); !err2) {
       char *end{strchr(name, '\n')};
       if (end) *end = '\0';
 
-      module = source::ScopedDll{name, 0};
+      module = s1::ScopedDll{name, 0};
       if (!module) {
         fprintf(stderr,
                 "shadercompile warn: Can't find '%s' specified in '%s'.\n",
@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
   if (!module) {
     V_strcpy_safe(module_name, kModuleName);
 
-    module = source::ScopedDll{module_name, 0};
+    module = s1::ScopedDll{module_name, 0};
   }
 
   if (!module) {

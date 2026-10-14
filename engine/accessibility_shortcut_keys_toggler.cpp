@@ -42,7 +42,7 @@ is_system_key_t<TSystemKey, void> SystemKeysInfo(_In_ UINT action, _In_ TSystemK
 
 }  // namespace
 
-namespace source::engine::win {
+namespace s1::engine::win {
 
 // Toggles accessibility shortcut keys.  See
 // https://docs.microsoft.com/en-us/windows/desktop/dxtecharts/disabling-shortcut-keys-in-games#disable-the-accessibility-shortcut-keys
@@ -151,4 +151,4 @@ void AccessibilityShortcutKeysToggler::Toggle( bool toggle ) noexcept
     impl_->Toggle( toggle );
 }
 
-}  // namespace source::engine::win
+}  // namespace s1::engine::win

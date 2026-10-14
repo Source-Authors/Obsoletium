@@ -184,7 +184,7 @@ struct ShaderInfo_t {
 };
 
 void ParseShaderInfoFromCompileCommands(
-    se::shader_compile::shader_combo_processor::CfgEntryInfo const *pEntry,
+    s1::shader_compile::shader_combo_processor::CfgEntryInfo const *pEntry,
     ShaderInfo_t &shaderInfo);
 
 using CShaderMap = CUtlStringMap<StaticComboNodeHash_t *>;
@@ -597,7 +597,7 @@ int __cdecl CompareComboIds(const StaticComboAuxInfo_t *pA,
 void WriteShaderFiles(
     const char *shader_path, const char *shader_name,
     const std::unique_ptr<
-        se::shader_compile::shader_combo_processor::CfgEntryInfo[]> &configs,
+        s1::shader_compile::shader_combo_processor::CfgEntryInfo[]> &configs,
     CUtlStringMap<ShaderInfo_t> &shader_info_map, CShaderMap &byte_code,
     CompilerShaderStats &compiler_stats, uint64_t total_commands_num,
     uint64_t completed_commands_num, bool is_verbose) {
@@ -838,19 +838,19 @@ void WriteShaderFiles(
 }
 
 // same as "system", but doesn't pop up a window
-std::unique_ptr<se::shader_compile::command_sink::IResponse> MySystem(
+std::unique_ptr<s1::shader_compile::command_sink::IResponse> MySystem(
     char const *const pCommand, const char *temp_path) {
-  // Trap the command in se::shader_compile::fxc_intercept
+  // Trap the command in s1::shader_compile::fxc_intercept
   if (auto response =
-          se::shader_compile::fxc_intercept::TryExecuteCommand(pCommand)) {
+          s1::shader_compile::fxc_intercept::TryExecuteCommand(pCommand)) {
     SwitchToThread();
     return response;
   }
 
-  if (unlink(se::shader_compile::fxc_intercept::kShaderArtefactOutputName) &&
+  if (unlink(s1::shader_compile::fxc_intercept::kShaderArtefactOutputName) &&
       errno != ENOENT) {
     Warning("Unable to remove failed shader file '%s' (%d: %s).\n",
-            se::shader_compile::fxc_intercept::kShaderArtefactOutputName, errno,
+            s1::shader_compile::fxc_intercept::kShaderArtefactOutputName, errno,
             std::generic_category().message(errno).c_str());
   }
 
@@ -861,7 +861,7 @@ std::unique_ptr<se::shader_compile::command_sink::IResponse> MySystem(
 
   {
     auto [fp, rc] =
-        se::posix::posix_file_stream_factory::open(temp_file_name, "w");
+        s1::posix::posix_file_stream_factory::open(temp_file_name, "w");
     if (rc) {
       Error("Unable to create writable %s to execute commands (%d: %s).\n",
             temp_file_name, rc.value(), rc.message().c_str());
@@ -913,15 +913,15 @@ std::unique_ptr<se::shader_compile::command_sink::IResponse> MySystem(
             std::generic_category().message(errno).c_str());
   }
 
-  return std::make_unique<se::shader_compile::command_sink::CResponseFiles>(
-      se::shader_compile::fxc_intercept::kShaderArtefactOutputName,
+  return std::make_unique<s1::shader_compile::command_sink::CResponseFiles>(
+      s1::shader_compile::fxc_intercept::kShaderArtefactOutputName,
       kShaderCompilerOutputName);
 }
 
 // Assemble a reply package to the master from the compiled bytecode
 // return the length of the package.
 size_t AssembleWorkerReplyPackage(
-    se::shader_compile::shader_combo_processor::CfgEntryInfo const *pEntry,
+    s1::shader_compile::shader_combo_processor::CfgEntryInfo const *pEntry,
     uint64_t nComboOfEntry, CShaderMap &byte_code, MessageBuffer *pBuf) {
   CStaticCombo *pStComboRec;
   StaticComboNodeHash_t *pByteCodeArray;
@@ -990,10 +990,10 @@ class CWorkerAccumState
   void RangeFinished();
 
   void ExecuteCompileCommand(
-      se::shader_compile::shader_combo_processor::ComboHandle hCombo);
+      s1::shader_compile::shader_combo_processor::ComboHandle hCombo);
   void HandleCommandResponse(
-      se::shader_compile::shader_combo_processor::ComboHandle hCombo,
-      std::unique_ptr<se::shader_compile::command_sink::IResponse> pResponse);
+      s1::shader_compile::shader_combo_processor::ComboHandle hCombo,
+      std::unique_ptr<s1::shader_compile::command_sink::IResponse> pResponse);
 
  public:
   void Run() {
@@ -1020,7 +1020,7 @@ class CWorkerAccumState
 
   uint64_t m_iLastFinished;
 
-  se::shader_compile::shader_combo_processor::ComboHandle m_hCombo;
+  s1::shader_compile::shader_combo_processor::ComboHandle m_hCombo;
   CUtlString m_temp_path;
   CShaderMap *m_byte_code;
   CompilerShaderStats *m_compiler_stats;
@@ -1044,7 +1044,7 @@ void CWorkerAccumState<TMutexType>::RangeBegin(
   m_compiler_stats = &compiler_stats;
   m_is_verbose = is_verbose;
 
-  se::shader_compile::shader_combo_processor::Combo_GetNext(
+  s1::shader_compile::shader_combo_processor::Combo_GetNext(
       m_iNextCommand, m_hCombo, m_iEndCommand);
 }
 
@@ -1056,7 +1056,7 @@ void CWorkerAccumState<TMutexType>::RangeFinished() {
 
 template <typename TMutexType>
 void CWorkerAccumState<TMutexType>::ExecuteCompileCommand(
-    se::shader_compile::shader_combo_processor::ComboHandle hCombo) {
+    s1::shader_compile::shader_combo_processor::ComboHandle hCombo) {
   char chBuffer[4096] = {};
   Combo_FormatCommand(hCombo, chBuffer);
 
@@ -1067,10 +1067,10 @@ void CWorkerAccumState<TMutexType>::ExecuteCompileCommand(
 
 template <typename TMutexType>
 void CWorkerAccumState<TMutexType>::HandleCommandResponse(
-    se::shader_compile::shader_combo_processor::ComboHandle hCombo,
-    std::unique_ptr<se::shader_compile::command_sink::IResponse> pResponse) {
+    s1::shader_compile::shader_combo_processor::ComboHandle hCombo,
+    std::unique_ptr<s1::shader_compile::command_sink::IResponse> pResponse) {
   // Command info
-  se::shader_compile::shader_combo_processor::CfgEntryInfo const *pEntryInfo =
+  s1::shader_compile::shader_combo_processor::CfgEntryInfo const *pEntryInfo =
       Combo_GetEntryInfo(hCombo);
   uint64_t iComboIndex = Combo_GetComboNum(hCombo);
   uint64_t iCommandNumber = Combo_GetCommandNum(hCombo);
@@ -1150,20 +1150,20 @@ void CWorkerAccumState<TMutexType>::TryToPackageData(uint64_t iCommandNumber) {
     }
   }
 
-  se::shader_compile::shader_combo_processor::ComboHandle hChBegin =
-      se::shader_compile::shader_combo_processor::Combo_GetCombo(iLastFinished);
+  s1::shader_compile::shader_combo_processor::ComboHandle hChBegin =
+      s1::shader_compile::shader_combo_processor::Combo_GetCombo(iLastFinished);
   RunCodeAtScopeExit(Combo_Free(hChBegin));
 
-  se::shader_compile::shader_combo_processor::ComboHandle hChEnd =
-      se::shader_compile::shader_combo_processor::Combo_GetCombo(
+  s1::shader_compile::shader_combo_processor::ComboHandle hChEnd =
+      s1::shader_compile::shader_combo_processor::Combo_GetCombo(
           iFinishedByNow);
   RunCodeAtScopeExit(Combo_Free(hChEnd));
 
   Assert(hChBegin && hChEnd);
 
-  se::shader_compile::shader_combo_processor::CfgEntryInfo const *pInfoBegin =
+  s1::shader_compile::shader_combo_processor::CfgEntryInfo const *pInfoBegin =
       Combo_GetEntryInfo(hChBegin);
-  se::shader_compile::shader_combo_processor::CfgEntryInfo const *pInfoEnd =
+  s1::shader_compile::shader_combo_processor::CfgEntryInfo const *pInfoEnd =
       Combo_GetEntryInfo(hChEnd);
 
   uint64_t nComboBegin =
@@ -1195,7 +1195,7 @@ void CWorkerAccumState<TMutexType>::TryToPackageData(uint64_t iCommandNumber) {
     if (!nComboBegin--) {
       Combo_Free(hChBegin);
       if ((hChBegin =
-               se::shader_compile::shader_combo_processor::Combo_GetCombo(
+               s1::shader_compile::shader_combo_processor::Combo_GetCombo(
                    pInfoBegin->m_iCommandEnd)) != nullptr) {
         pInfoBegin = Combo_GetEntryInfo(hChBegin);
         nComboBegin = pInfoBegin->m_numStaticCombos - 1;
@@ -1206,7 +1206,7 @@ void CWorkerAccumState<TMutexType>::TryToPackageData(uint64_t iCommandNumber) {
 
 template <typename TMutexType>
 bool CWorkerAccumState<TMutexType>::OnProcess() {
-  se::shader_compile::shader_combo_processor::ComboHandle hThreadCombo;
+  s1::shader_compile::shader_combo_processor::ComboHandle hThreadCombo;
 
   uint64_t *iCurrentId;
 
@@ -1301,9 +1301,9 @@ void ProcessCommandRange(RangeProcessor &processor, uint64_t shaderStart,
 }
 
 void ParseShaderInfoFromCompileCommands(
-    se::shader_compile::shader_combo_processor::CfgEntryInfo const *pEntry,
+    s1::shader_compile::shader_combo_processor::CfgEntryInfo const *pEntry,
     ShaderInfo_t &shaderInfo) {
-  if (auto hCombo = se::shader_compile::shader_combo_processor::Combo_GetCombo(
+  if (auto hCombo = s1::shader_compile::shader_combo_processor::Combo_GetCombo(
           pEntry->m_iCommandStart)) {
     RunCodeAtScopeExit(Combo_Free(hCombo));
 
@@ -1407,7 +1407,7 @@ int GetLocalCopyOfFiles(const char *shader_path, const char *temp_path,
     DebugOut(is_verbose, "creating \"%s\".\n", files_to_copy_storage_path);
 
     {
-      auto [fp, rc] = se::posix::posix_file_stream_factory::open(
+      auto [fp, rc] = s1::posix::posix_file_stream_factory::open(
           files_to_copy_storage_path, "wb");
       if (rc) {
         Error("Can't open '%s' to write a copy to (%d: %s).",
@@ -1456,7 +1456,7 @@ int GetLocalCopyOfBinary(const char *exe_dir, const char *file_name,
     DebugOut(is_verbose, "trying to open: %s.\n", source_file_path);
 
     auto [fp, rc] =
-        se::posix::posix_file_stream_factory::open(source_file_path, "rb");
+        s1::posix::posix_file_stream_factory::open(source_file_path, "rb");
     if (rc) {
       Warning("Can't open '%s' to read (%d: %s)!\n", source_file_path,
               rc.value(), rc.message().c_str());
@@ -1495,7 +1495,7 @@ int GetLocalCopyOfBinary(const char *exe_dir, const char *file_name,
     // File may be already here by GetLocalCopyOfFiles and it is opened, so we
     // can't copy (EACCES).
     auto [fp, rc] =
-        se::posix::posix_file_stream_factory::open(dest_file_path, "wb");
+        s1::posix::posix_file_stream_factory::open(dest_file_path, "wb");
     if (rc) {
       if (rc.value() != EACCES) {
         Warning("Can't open '%s' to write copy to (%d: %s)!\n", dest_file_path,
@@ -1538,7 +1538,7 @@ int GetLocalCopyOfBinaries(const char *exe_dir, const char *temp_path,
 }
 
 struct ParseCompileCommandsResult {
-  std::unique_ptr<se::shader_compile::shader_combo_processor::CfgEntryInfo[]>
+  std::unique_ptr<s1::shader_compile::shader_combo_processor::CfgEntryInfo[]>
       configs;
 
   uint64_t static_combos_num;
@@ -1561,7 +1561,7 @@ std::tuple<ParseCompileCommandsResult, int> ParseListOfCompileCommands(
   }
 
   auto configs =
-      se::shader_compile::shader_combo_processor::ReadConfiguration(&buffer);
+      s1::shader_compile::shader_combo_processor::ReadConfiguration(&buffer);
 
   uint64_t shaders_num = 0;
   uint64_t static_combos_num = 0, dynamic_combos_num = 0,
@@ -1631,7 +1631,7 @@ int SetupTempPath(int argc, char **argv, char (&temp_path)[size]) {
 void CompileShaders(
     IThreadPool *thread_pool, const char *shader_path, const char *temp_path,
     const std::unique_ptr<
-        se::shader_compile::shader_combo_processor::CfgEntryInfo[]> &configs,
+        s1::shader_compile::shader_combo_processor::CfgEntryInfo[]> &configs,
     bool is_verbose, CompilerShaderStats &compiler_stats) {
   RangeProcessor processor{thread_pool};
 
@@ -1720,8 +1720,8 @@ int ShaderCompileMain(int argc, char *argv[]) {
   const double compile_start_time{Plat_FloatTime()};
 
   // Setting up the minidump handler.
-  const se::utils::common::ScopedDefaultMinidumpHandler scoped_minidump_handler;
-  const se::common::windows::ScopedConsoleCtrlHandler scoped_ctrl_handler{OnCtrlBreak};
+  const s1::utils::common::ScopedDefaultMinidumpHandler scoped_minidump_handler;
+  const s1::win::ScopedConsoleCtrlHandler scoped_ctrl_handler{OnCtrlBreak};
 
   EnableCrashingOnCrashes();
 
@@ -1731,8 +1731,8 @@ int ShaderCompileMain(int argc, char *argv[]) {
   ThreadSetDebugName("ShaderCompile_Main");
 
   // Do not go to sleep when compiling.
-  const se::common::windows::ScopedThreadExecutionState scoped_execution_state{
-      se::common::windows::ThreadExecutionState::SystemRequired};
+  const s1::win::ScopedThreadExecutionState scoped_execution_state{
+      s1::win::ThreadExecutionState::SystemRequired};
 
   ICommandLine *cmd_line{CommandLine()};
   cmd_line->CreateCmdLine(argc, argv);
@@ -1850,11 +1850,11 @@ int ShaderCompileMain(int argc, char *argv[]) {
 
     uint64_t iFirstCommand = strtoull(szFirstCmd, nullptr, 10);
 
-    se::shader_compile::shader_combo_processor::ComboHandle hCombo = nullptr;
-    se::shader_compile::shader_combo_processor::CfgEntryInfo const
+    s1::shader_compile::shader_combo_processor::ComboHandle hCombo = nullptr;
+    s1::shader_compile::shader_combo_processor::CfgEntryInfo const
         *pComboEntryInfo = nullptr;
 
-    if (se::shader_compile::shader_combo_processor::Combo_GetNext(
+    if (s1::shader_compile::shader_combo_processor::Combo_GetNext(
             iFirstCommand, hCombo, parseResult.compile_commands_num)) {
       Combo_FormatCommand(hCombo, command);
       pComboEntryInfo = Combo_GetEntryInfo(hCombo);

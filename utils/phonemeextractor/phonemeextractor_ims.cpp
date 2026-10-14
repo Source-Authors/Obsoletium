@@ -118,11 +118,11 @@ private:
 
 	int		m_nBytesPerSample;
 
-	source::ScopedDll m_ims_helper_dll;
+	s1::ScopedDll m_ims_helper_dll;
 };
 
 CPhonemeExtractorLipSinc::CPhonemeExtractorLipSinc()
-	: m_ims_helper_dll{ source::ScopedDll{ "ims_helper.dll", 0 } }
+	: m_ims_helper_dll{ s1::ScopedDll{ "ims_helper.dll", 0 } }
 {
 	m_pfnPrint = nullptr;
 

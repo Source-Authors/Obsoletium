@@ -208,9 +208,9 @@ template<typename TShader>
 class CShaderBuffer final : public IShaderBuffer
 {
 public:
-	using interface_concept = se::win::com::com_interface_concept<TShader>;
+	using interface_concept = s1::win::com::com_interface_concept<TShader>;
 
-	CShaderBuffer( se::win::com::com_ptr<TShader> &&pBlob ) : m_pBlob( std::move(pBlob) ) {}
+	CShaderBuffer( s1::win::com::com_ptr<TShader> &&pBlob ) : m_pBlob( std::move(pBlob) ) {}
 	~CShaderBuffer() = default;
 
 	size_t GetSize() const override
@@ -224,7 +224,7 @@ public:
 	}
 
 private:
-	se::win::com::com_ptr<TShader> m_pBlob;
+	s1::win::com::com_ptr<TShader> m_pBlob;
 };
 
 

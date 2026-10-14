@@ -66,7 +66,7 @@ class XStr {
 #include "tier1/utlvector.h"
 #include "tier1/strtools.h"
 
-namespace se::vprojtomake {
+namespace s1::vprojtomake {
 
 // Purpose:  constructor
 CVCProjConvert::CVCProjConvert()
@@ -747,4 +747,4 @@ CVCProjConvert::CConfiguration::FileType_e CVCProjConvert::GetFileType(
   return type;
 }
 
-}  // namespace se::vprojtomake
+}  // namespace s1::vprojtomake

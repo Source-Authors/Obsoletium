@@ -33,7 +33,7 @@
 
 class CUtlInplaceBuffer;
 
-namespace se::shader_compile::shader_combo_processor {
+namespace s1::shader_compile::shader_combo_processor {
 
 /**
  * @brief Config entry info.
@@ -77,6 +77,6 @@ ComboHandle Combo_Alloc(ComboHandle copy_from);
 void Combo_Assign(ComboHandle combo_dst, ComboHandle combo_src);
 void Combo_Free(ComboHandle &combo_free);
 
-};  // namespace se::shader_compile::shader_combo_processor
+};  // namespace s1::shader_compile::shader_combo_processor
 
 #endif  //  !SE_UTILS_SHADERCOMPILE_CFGPROCESSOR_H_

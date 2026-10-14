@@ -102,7 +102,7 @@ void printusage() { Warning("usage:  vcprojtomake <vcxproj filename> \n"); }
 
 // Debug helper, spits out a human readable keyvalues version of the various
 // configs
-bool OutputKeyValuesVersion(se::vprojtomake::CVCProjConvert &proj,
+bool OutputKeyValuesVersion(s1::vprojtomake::CVCProjConvert &proj,
                             const char *fileName) {
   auto kv = KeyValues::AutoDelete("project");
   if (!kv) return false;
@@ -118,7 +118,7 @@ bool OutputKeyValuesVersion(se::vprojtomake::CVCProjConvert &proj,
       const auto fileType = config.GetFileType(fileIdx);
 
       if (fileType ==
-          se::vprojtomake::CVCProjConvert::CConfiguration::FILE_SOURCE) {
+          s1::vprojtomake::CVCProjConvert::CConfiguration::FILE_SOURCE) {
         V_sprintf_safe(num, "%i", fileCount);
 
         ++fileCount;
@@ -148,7 +148,7 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  se::vprojtomake::CVCProjConvert converter;
+  s1::vprojtomake::CVCProjConvert converter;
   if (!converter.LoadProject(cmd->GetParm(1))) {
     Warning("Unable to load Visual Studio Project '%s'.\n", cmd->GetParm(1));
     return -1;
@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
 
   int rc = 0;
 
-  se::vprojtomake::CMakefileCreator makefile;
+  s1::vprojtomake::CMakefileCreator makefile;
   if (!makefile.CreateMakefiles(converter)) {
     Warning(
         "Unable to create one or more Makefile(s) for Visual Studio Project "

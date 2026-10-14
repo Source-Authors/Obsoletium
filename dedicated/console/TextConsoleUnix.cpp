@@ -246,7 +246,7 @@ static void *fgets_threadproc(void *arg) {
   return NULL;
 }
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 bool CTextConsoleUnix::Init() {
   if (g_threadid != (pthread_t)-1) {
@@ -363,6 +363,6 @@ int CTextConsoleUnix::GetWidth() {
   return nWidth;
 }
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated
 
 #endif  // !_WIN32

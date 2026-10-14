@@ -71,7 +71,7 @@ void CLightingPreviewResultsWindow::Create( CWnd *pParentWnd, const char *pszTit
 	format.Format("Lighting Preview - %s", pszTitle);
 
 	// dimhotepus: Scale manually by parent DPI as we are not created yet.
-	se::windows::ui::CDpiWindowBehavior dpiWindowBehavior{false};
+	s1::win::ui::CDpiWindowBehavior dpiWindowBehavior{false};
 
 	dpiWindowBehavior.OnCreateWindow(pParentWnd->GetSafeHwnd());
 	RunCodeAtScopeExit(dpiWindowBehavior.OnDestroyWindow());

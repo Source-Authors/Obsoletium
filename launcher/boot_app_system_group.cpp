@@ -36,7 +36,7 @@ constexpr inline char kDefaultHalfLife2GameDirectory[]{"hl2"};
 
 }  // namespace
 
-namespace se::launcher {
+namespace s1::launcher {
 
 std::unique_ptr<FileLogger> BootAppSystemGroup::file_logger_ = nullptr;
 
@@ -270,4 +270,4 @@ const char *BootAppSystemGroup::DetermineDefaultGame() {
                         : hammer_->GetDefaultGame();
 }
 
-}  // namespace se::launcher
+}  // namespace s1::launcher

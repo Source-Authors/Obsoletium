@@ -14,7 +14,7 @@
 using HANDLE = void *;
 using WORD = unsigned short;
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 class CTextConsoleWin32 : public CTextConsole {
  public:
@@ -73,6 +73,6 @@ class CTextConsoleWin32 : public CTextConsole {
   char statusline[81];  // first line in console is status line
 };
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated
 
 #endif  // !SE_DEDICATED_CONSOLE_TEXT_CONSOLE_WIN32_H_

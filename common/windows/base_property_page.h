@@ -33,7 +33,7 @@ class CBasePropertyPage : public CPropertyPage {
   DECLARE_MESSAGE_MAP()
 
  private:
-  se::windows::ui::CDpiWindowBehavior m_dpi_behavior;
+  s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
 };
 
 #endif  // !SE_COMMON_WINDOWS_BASE_PROPERTY_PAGE_H_

@@ -14,7 +14,7 @@
 namespace {
 
 std::atomic_bool g_bToolsWriteFullMinidumps{false};
-std::atomic<se::utils::common::ToolsExceptionHandler> g_pCustomExceptionHandler{
+std::atomic<s1::utils::common::ToolsExceptionHandler> g_pCustomExceptionHandler{
     nullptr};
 
 LONG __stdcall DefaultToolsExceptionFilter(EXCEPTION_POINTERS *ptrs) {
@@ -44,7 +44,7 @@ LONG __stdcall CallbackToolsExceptionFilter(EXCEPTION_POINTERS *ptrs) {
 
 }  // namespace
 
-namespace se::utils::common {
+namespace s1::utils::common {
 
 bool EnableFullMinidumps(bool enable) {
   return g_bToolsWriteFullMinidumps.exchange(
@@ -69,4 +69,4 @@ ToolsExceptionHandler SetupToolsMinidumpHandler(ToolsExceptionHandler fn) {
   return old_handler;
 }
 
-}  // namespace se::utils::common
+}  // namespace s1::utils::common

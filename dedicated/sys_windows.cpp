@@ -39,7 +39,7 @@
 
 #include "scoped_app_locale.h"
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 extern CTextConsoleWin32 console;
 
@@ -189,7 +189,7 @@ IDedicatedServerAPI *WindowsSystem::LoadModules(
 
 int BootMain(int argc, char **argv, bool is_console_mode, ISystem *system);
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated
 
 namespace {
 
@@ -262,10 +262,10 @@ DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
   // slam things to en_US.UTF-8.
   constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
 
-  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-  if (Q_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+  const s1::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (Q_stricmp(s1::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
     Warning("setlocale('%s') failed, current locale is '%s'.\n",
-            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+            kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale());
   }
 
   const CPUInformation *cpu_info{GetCPUInformation()};
@@ -292,15 +292,15 @@ DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
   }
 
   const auto args_result =
-      se::dedicated::Args::FromCommandLine(::GetCommandLineW());
+      s1::dedicated::Args::FromCommandLine(::GetCommandLineW());
   if (const auto *rc = std::get_if<std::error_code>(&args_result)) {
     Warning("Sorry, unable to parse command line arguments: %s",
             rc->message().c_str());
     return rc->value();
   }
 
-  const se::dedicated::Args *args{
-      std::get_if<se::dedicated::Args>(&args_result)};
+  const s1::dedicated::Args *args{
+      std::get_if<s1::dedicated::Args>(&args_result)};
   ICommandLine *command_line{CommandLine()};
   command_line->CreateCmdLine(VCRHook_GetCommandLine());
 
@@ -308,7 +308,7 @@ DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
   constexpr std::chrono::milliseconds kSystemTimerResolution{2ms};
 
   // System timer precision affects Sleep & friends performance.
-  const se::common::windows::ScopedTimerResolution scoped_timer_resolution{
+  const s1::win::ScopedTimerResolution scoped_timer_resolution{
       kSystemTimerResolution};
   if (!scoped_timer_resolution) {
     Warning(
@@ -317,7 +317,7 @@ DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
         static_cast<long long>(kSystemTimerResolution.count()));
   }
 
-  const se::common::windows::ScopedWinsockInitializer scoped_winsock{WINSOCK_VERSION};
+  const s1::win::ScopedWinsockInitializer scoped_winsock{WINSOCK_VERSION};
   if (scoped_winsock.error_code()) {
     Warning("Windows sockets 2.2+ unavailable (%d): %s.\n",
             scoped_winsock.error_code().value(),
@@ -325,7 +325,7 @@ DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
   }
 
   const bool is_console_mode{command_line->HasParm("-console")};
-  se::dedicated::WindowsSystem system{command_line, is_console_mode};
+  s1::dedicated::WindowsSystem system{command_line, is_console_mode};
 
   if (!Plat_IsInDebugSession() && !command_line->HasParm("-nominidumps")) {
     const ScopedThreadSEHTranslator scoped_thread_seh_translator{
@@ -333,13 +333,13 @@ DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
 
     // This try block allows the thread SEH translator to work.
     try {
-      return se::dedicated::BootMain(args->count(), args->values(),
+      return s1::dedicated::BootMain(args->count(), args->values(),
                                      is_console_mode, &system);
     } catch (...) {
       return -1;
     }
   }
 
-  return se::dedicated::BootMain(args->count(), args->values(), is_console_mode,
+  return s1::dedicated::BootMain(args->count(), args->values(), is_console_mode,
                                  &system);
 }

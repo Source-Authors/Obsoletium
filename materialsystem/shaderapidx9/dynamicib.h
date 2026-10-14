@@ -139,7 +139,7 @@ private:
 		if (FAILED(hr))
 		{
 			Warning( __FUNCTION__ ": IDirect3DIndexBuffer9::Unlock() failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 #endif
 	}
@@ -150,7 +150,7 @@ private:
 		LOCKFLAGS_APPEND = D3DLOCK_NOSYSLOCK | D3DLOCK_NOOVERWRITE
 	};
 
-	se::win::com::com_ptr<IDirect3DIndexBuffer9> m_pIB;
+	s1::win::com::com_ptr<IDirect3DIndexBuffer9> m_pIB;
 
 	int			m_IndexCount;
 	int			m_Position;
@@ -301,7 +301,7 @@ void CIndexBuffer::Create( IDirect3DDevice9Ex *pD3D )
 			desc.Usage,
 			desc.Format,
 			desc.Pool,
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 		
 		if ( hr == D3DERR_OUTOFVIDEOMEMORY || hr == E_OUTOFMEMORY )
 		{
@@ -311,7 +311,7 @@ void CIndexBuffer::Create( IDirect3DDevice9Ex *pD3D )
 			if ( FAILED( hr ) )
 			{
 				Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EvictManagedResources() failed w/e %s.\n",
-					se::win::com::com_error_category().message(hr).c_str() );
+					s1::win::com::com_error_category().message(hr).c_str() );
 			}
 
 			hr = pD3D->CreateIndexBuffer(
@@ -328,7 +328,7 @@ void CIndexBuffer::Create( IDirect3DDevice9Ex *pD3D )
 					desc.Usage,
 					desc.Format,
 					desc.Pool,
-					se::win::com::com_error_category().message(hr).c_str() );
+					s1::win::com::com_error_category().message(hr).c_str() );
 			}
 		}
 	}
@@ -354,7 +354,7 @@ void CIndexBuffer::Create( IDirect3DDevice9Ex *pD3D )
 		else
 		{
 			Warning( __FUNCTION__ ": IDirect3DIndexBuffer9::GetDesc() failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 	}
 #endif
@@ -542,7 +542,7 @@ inline unsigned short* CIndexBuffer::Lock( bool bReadOnly, int numIndices, int& 
 				position * IndexSize(),
 				numIndices * IndexSize(),
 				dwFlags,
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 	}
 
@@ -636,7 +636,7 @@ inline void CIndexBuffer::HandleLateCreation( IDirect3DDevice9Ex *pD3D )
 			m_nSysmemBufferStartBytes,
 			dataToWriteBytes,
 			dwFlags,
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 		AssertMsg( false, "Failed to lock index buffer." );
 
 		// dimhotepus: Exit here to retry later, as pWritePtr is nullptr and we will crash.

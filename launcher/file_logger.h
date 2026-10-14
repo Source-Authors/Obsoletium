@@ -11,7 +11,7 @@
 
 #include <atomic>
 
-namespace se::launcher {
+namespace s1::launcher {
 
 // create file to dump out to
 class FileLogger {
@@ -42,6 +42,6 @@ class FileLogger {
   CUtlString full_game_path_;
 };
 
-}  // namespace se::launcher
+}  // namespace s1::launcher
 
 #endif  // SE_LAUNCHER_FILE_LOGGER_H

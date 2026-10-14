@@ -2719,14 +2719,14 @@ static bool CHLFacePoserApp_SuggestGameInfoDirFn( CFSSteamSetupInfo const *pFsSt
 int main (int argc, char *argv[])
 {
 	// Install an exception handler.
-	const se::utils::common::ScopedDefaultMinidumpHandler scoped_default_minidumps;
+	const s1::utils::common::ScopedDefaultMinidumpHandler scoped_default_minidumps;
 
 	CommandLine()->CreateCmdLine( argc, argv );
 
 #ifdef _WIN32
 	constexpr COINIT comFlags{
 		static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE | COINIT_SPEED_OVER_MEMORY)};
-	se::common::windows::ScopedCom scopedCom{comFlags};
+	s1::win::ScopedCom scopedCom{comFlags};
 	if (FAILED(scopedCom.errc())) {
 		const _com_error com_error{scopedCom.errc()};
 		mxMessageBox(nullptr, va( "Unable to initialize COM (0x%x): %s.",
@@ -2739,7 +2739,7 @@ int main (int argc, char *argv[])
 	constexpr std::chrono::milliseconds kSystemTimerResolution{2ms};
 
 	// System timer precision affects Sleep & friends performance.
-	const se::common::windows::ScopedTimerResolution scoped_timer_resolution{
+	const s1::win::ScopedTimerResolution scoped_timer_resolution{
 		kSystemTimerResolution};
 	if (!scoped_timer_resolution) {
 		Warning(

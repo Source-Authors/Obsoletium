@@ -173,14 +173,14 @@ template class CShaderBuffer<ID3DBlob>;
 #ifdef MEASURE_DRIVER_ALLOCATIONS
 static CUtlMap< CRC32_t, int, int > s_UniqueVS( 0, 0, DefLessFunc( CRC32_t ) );
 static CUtlMap< CRC32_t, int, int > s_UniquePS( 0, 0, DefLessFunc( CRC32_t ) );
-static CUtlMap< se::win::com::com_ptr<IDirect3DVertexShader9>, CRC32_t, int > s_VSLookup( (intp)0, (intp)0, DefLessFunc( se::win::com::com_ptr<IDirect3DVertexShader9> ) );
-static CUtlMap< se::win::com::com_ptr<IDirect3DPixelShader9>, CRC32_t, int > s_PSLookup( (intp)0, (intp)0, DefLessFunc( se::win::com::com_ptr<IDirect3DPixelShader9> ) );
+static CUtlMap< s1::win::com::com_ptr<IDirect3DVertexShader9>, CRC32_t, int > s_VSLookup( (intp)0, (intp)0, DefLessFunc( s1::win::com::com_ptr<IDirect3DVertexShader9> ) );
+static CUtlMap< s1::win::com::com_ptr<IDirect3DPixelShader9>, CRC32_t, int > s_PSLookup( (intp)0, (intp)0, DefLessFunc( s1::win::com::com_ptr<IDirect3DPixelShader9> ) );
 #endif
 
 static int s_NumPixelShadersCreated = 0;
 static int s_NumVertexShadersCreated = 0;
 
-static void RegisterVS( const void* pShaderBits, intp nShaderSize, const se::win::com::com_ptr<IDirect3DVertexShader9> &pShader )
+static void RegisterVS( const void* pShaderBits, intp nShaderSize, const s1::win::com::com_ptr<IDirect3DVertexShader9> &pShader )
 {
 #ifdef MEASURE_DRIVER_ALLOCATIONS
 	CRC32_t crc;
@@ -206,7 +206,7 @@ static void RegisterVS( const void* pShaderBits, intp nShaderSize, const se::win
 #endif
 }
 
-static void RegisterPS( const void* pShaderBits, intp nShaderSize, const se::win::com::com_ptr<IDirect3DPixelShader9> &pShader )
+static void RegisterPS( const void* pShaderBits, intp nShaderSize, const s1::win::com::com_ptr<IDirect3DPixelShader9> &pShader )
 {
 #ifdef MEASURE_DRIVER_ALLOCATIONS
 	CRC32_t crc;
@@ -232,7 +232,7 @@ static void RegisterPS( const void* pShaderBits, intp nShaderSize, const se::win
 #endif
 }
 
-static void UnregisterVS( const se::win::com::com_ptr<IDirect3DVertexShader9> &pShader )
+static void UnregisterVS( const s1::win::com::com_ptr<IDirect3DVertexShader9> &pShader )
 {
 #ifdef MEASURE_DRIVER_ALLOCATIONS
 	auto nCRCIndex = s_VSLookup.Find( pShader );
@@ -257,7 +257,7 @@ static void UnregisterVS( const se::win::com::com_ptr<IDirect3DVertexShader9> &p
 #endif
 }
 
-static void UnregisterPS( const se::win::com::com_ptr<IDirect3DPixelShader9> &pShader )
+static void UnregisterPS( const s1::win::com::com_ptr<IDirect3DPixelShader9> &pShader )
 {
 #ifdef MEASURE_DRIVER_ALLOCATIONS
 	auto nCRCIndex = s_PSLookup.Find( pShader );
@@ -296,7 +296,7 @@ static HardwareShader_t CreateD3DVertexShader( const DWORD *pByteCode, intp numB
 	}
 
 	// Compute the vertex specification
-	se::win::com::com_ptr<IDirect3DVertexShader9> shader;
+	s1::win::com::com_ptr<IDirect3DVertexShader9> shader;
 
 #ifdef DX_TO_GL_ABSTRACTION
 	HRESULT hr = Dx9Device()->CreateVertexShader( pByteCode, &shader, pShaderName, debugLabel );
@@ -322,7 +322,7 @@ static HardwareShader_t CreateD3DVertexShader( const DWORD *pByteCode, intp numB
 	Assert(false);
 	Warning( __FUNCTION__ ": IDirect3DDevice9Ex::CreateVertexShader(function = 0x%p) failed w/e %s.\n",
 		pByteCode,
-		se::win::com::com_error_category().message(hr).c_str() );
+		s1::win::com::com_error_category().message(hr).c_str() );
 
 	return INVALID_HARDWARE_SHADER;
 }
@@ -404,7 +404,7 @@ static HardwareShader_t CreateD3DPixelShader( DWORD *pByteCode, unsigned int nCe
 		}
 	}
 
-	se::win::com::com_ptr<IDirect3DPixelShader> shader;
+	s1::win::com::com_ptr<IDirect3DPixelShader> shader;
 
 #if defined( DX_TO_GL_ABSTRACTION ) 
 #if defined( OSX ) 
@@ -434,7 +434,7 @@ static HardwareShader_t CreateD3DPixelShader( DWORD *pByteCode, unsigned int nCe
 	Assert(false);
 	Warning( __FUNCTION__ ": IDirect3DDevice9Ex::CreatePixelShader(function = 0x%p) failed w/e %s.\n",
 		pByteCode,
-		se::win::com::com_error_category().message(hr).c_str() );
+		s1::win::com::com_error_category().message(hr).c_str() );
 
 	return INVALID_HARDWARE_SHADER;
 }
@@ -712,8 +712,8 @@ private:
 	HardwareShader_t	m_HardwareVertexShader;
 	HardwareShader_t	m_HardwarePixelShader;
 
-	CUtlFixedLinkedList< se::win::com::com_ptr<IDirect3DVertexShader9> > m_RawVertexShaderDict;
-	CUtlFixedLinkedList< se::win::com::com_ptr<IDirect3DPixelShader9> > m_RawPixelShaderDict;
+	CUtlFixedLinkedList< s1::win::com::com_ptr<IDirect3DVertexShader9> > m_RawVertexShaderDict;
+	CUtlFixedLinkedList< s1::win::com::com_ptr<IDirect3DPixelShader9> > m_RawPixelShaderDict;
 
 	CUtlFixedLinkedList< ShaderFileCache_t > m_ShaderFileCache;
 
@@ -921,7 +921,7 @@ IShaderBuffer *CShaderManager::CompileShader( const char *pProgram, size_t nBufL
 	nCompileFlags |= D3DCOMPILE_DEBUG;
 #endif
 
-	se::win::com::com_ptr<ID3DBlob> pCompiledShader, pErrorMessages;
+	s1::win::com::com_ptr<ID3DBlob> pCompiledShader, pErrorMessages;
 	HRESULT hr = D3DCompile( pProgram, nBufLen,
 		nullptr, nullptr, nullptr, "main", pShaderVersion, nCompileFlags, 0,
 		&pCompiledShader, &pErrorMessages );
@@ -948,7 +948,7 @@ VertexShaderHandle_t CShaderManager::CreateVertexShader( IShaderBuffer* pShaderB
 	HardwareShader_t shader = CreateD3DVertexShader( (const DWORD*)pShaderBuffer->GetBits(), pShaderBuffer->GetSize(), nullptr, nullptr );
 
 	// Create the vertex shader
-	se::win::com::com_ptr<IDirect3DVertexShader9> pVertexShader;
+	s1::win::com::com_ptr<IDirect3DVertexShader9> pVertexShader;
 	pVertexShader.Attach(static_cast<IDirect3DVertexShader9*>(shader));
 
 	// Insert the shader into the dictionary of shaders
@@ -962,7 +962,7 @@ void CShaderManager::DestroyVertexShader( VertexShaderHandle_t hShader )
 		return;
 
 	VertexShaderIndex_t i = (VertexShaderIndex_t)hShader;
-	se::win::com::com_ptr<IDirect3DVertexShader9> &pVertexShader = m_RawVertexShaderDict[ i ];
+	s1::win::com::com_ptr<IDirect3DVertexShader9> &pVertexShader = m_RawVertexShaderDict[ i ];
 
 	UnregisterVS( pVertexShader );
 
@@ -975,7 +975,7 @@ PixelShaderHandle_t CShaderManager::CreatePixelShader( IShaderBuffer* pShaderBuf
 	HardwareShader_t shader = CreateD3DPixelShader( static_cast<DWORD *>(const_cast<void*>(pShaderBuffer->GetBits())), 0, pShaderBuffer->GetSize(), nullptr, nullptr );
 
 	// Create the vertex shader
-	se::win::com::com_ptr<IDirect3DPixelShader9> pPixelShader;
+	s1::win::com::com_ptr<IDirect3DPixelShader9> pPixelShader;
 	pPixelShader.Attach(static_cast<IDirect3DPixelShader9*>(shader));
 
 	// Insert the shader into the dictionary of shaders
@@ -989,7 +989,7 @@ void CShaderManager::DestroyPixelShader( PixelShaderHandle_t hShader )
 		return;
 
 	PixelShaderIndex_t i = (PixelShaderIndex_t)hShader;
-	se::win::com::com_ptr<IDirect3DPixelShader9> &pPixelShader = m_RawPixelShaderDict[ i ];
+	s1::win::com::com_ptr<IDirect3DPixelShader9> &pPixelShader = m_RawPixelShaderDict[ i ];
 
 	UnregisterPS( pPixelShader );
 
@@ -1041,7 +1041,7 @@ void CShaderManager::CreateStaticShaders()
 			Assert(false);
 			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::CreatePixelShader(function = 0x%p) failed w/e %s.\n",
 				psIllegalMaterial,
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 	}
 }
@@ -1816,8 +1816,8 @@ retry_compile:
 #endif
 
 #if defined( DYNAMIC_SHADER_COMPILE )
-	se::win::com::com_ptr<ID3DBlob> pShader;
-	se::win::com::com_ptr<ID3DBlob> pErrorMessages;
+	s1::win::com::com_ptr<ID3DBlob> pShader;
+	s1::win::com::com_ptr<ID3DBlob> pErrorMessages;
 
 	const bool b30Shader = V_strieq( pShaderProfile, "vs_3_0" ) || V_strieq( pShaderProfile, "ps_3_0" );
 	// dimhotepus: Shader model 4, 4.1, 5 support.
@@ -1908,7 +1908,7 @@ retry_compile:
 		V_strcat_safe( exampleCommandLine, filename );
 		V_strcat_safe( exampleCommandLine, "\n" );
 
-		se::win::com::com_ptr<ID3DBlob> d3dblob;
+		s1::win::com::com_ptr<ID3DBlob> d3dblob;
 
 #if defined( REMOTE_DYNAMIC_SHADER_COMPILE )
 		hr = D3DDisassemble( pRemotelyCompiledShader, nRemotelyCompiledShaderLength, 0, NULL, &d3dblob );
@@ -2050,7 +2050,7 @@ void CShaderManager::DisassembleShader( ShaderLookup_t *pLookup, int dynamicComb
 #if defined( WRITE_ASSEMBLY )
 	const char *pName = m_ShaderSymbolTable.String( pLookup->m_Name );
 
-	se::win::com::com_ptr<ID3DBlob> d3dblob;
+	s1::win::com::com_ptr<ID3DBlob> d3dblob;
 	HRESULT hr = D3DDisassemble( pByteCode, size, 0, NULL, &d3dblob );
 	Assert( SUCCEEDED( hr ) );
 
@@ -3116,7 +3116,7 @@ void CShaderManager::DestroyVertexShader( VertexShader_t vertexShader )
 	{
 		if ( combos.m_pHardwareShaders[i] != INVALID_HARDWARE_SHADER )
 		{
-			se::win::com::com_ptr<IDirect3DVertexShader9> shader;
+			s1::win::com::com_ptr<IDirect3DVertexShader9> shader;
 			shader.Attach(static_cast<IDirect3DVertexShader9*>(combos.m_pHardwareShaders[i]));
 
 			UnregisterVS( shader );
@@ -3142,7 +3142,7 @@ void CShaderManager::DestroyPixelShader( PixelShader_t pixelShader )
 	{
 		if ( combos.m_pHardwareShaders[i] != INVALID_HARDWARE_SHADER )
 		{
-			se::win::com::com_ptr<IDirect3DPixelShader> shader;
+			s1::win::com::com_ptr<IDirect3DPixelShader> shader;
 			shader.Attach(static_cast<IDirect3DPixelShader*>(combos.m_pHardwareShaders[i]));
 
 			UnregisterPS( shader );

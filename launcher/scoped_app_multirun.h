@@ -42,7 +42,7 @@ constexpr inline unsigned long kWaitAbandoned{0x00000080L};
 #include "tier0/icommandline.h"
 #include "tier1/strtools.h"
 
-namespace se::launcher {
+namespace s1::launcher {
 
 // App multirun.
 class ScopedAppMultiRun {
@@ -193,6 +193,6 @@ class ScopedAppMultiRun {
 #endif
 };
 
-}  // namespace se::launcher
+}  // namespace s1::launcher
 
 #endif  // SE_LAUNCHER_SCOPED_APP_MULTIRUN_H

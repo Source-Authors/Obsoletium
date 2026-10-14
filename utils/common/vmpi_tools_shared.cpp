@@ -276,7 +276,7 @@ struct {
 template <size_t size>
 const char *GetExceptionDescription(unsigned long code, const char *reason,
                                     char (&description)[size]) {
-  source::ScopedDll ntdll{"ntdll.dll", LOAD_LIBRARY_SEARCH_SYSTEM32};
+  s1::ScopedDll ntdll{"ntdll.dll", LOAD_LIBRARY_SEARCH_SYSTEM32};
 
   using RtlNtStatusToDosErrorFunction = ULONG (*)(LONG Status);
 

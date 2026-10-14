@@ -8,7 +8,7 @@
 extern IFileSystem *g_pFileSystem;
 extern IBaseFileSystem *g_pBaseFileSystem;
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 // Implement our own special factory that we don't export outside of the DLL, to
 // stop people being able to get a pointer to a FILESYSTEM_INTERFACE_VERSION
@@ -31,4 +31,4 @@ void *FileSystemFactory(const char *name, int *rc) {
   return nullptr;
 }
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated

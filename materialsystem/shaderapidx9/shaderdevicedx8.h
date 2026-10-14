@@ -119,7 +119,7 @@ private:
 	void ComputeDXSupportLevel( HardwareCaps_t &caps );
 
 	// Used to enumerate adapters, attach to windows
-	se::win::com::com_ptr<IDirect3D9Ex> m_pD3D;
+	s1::win::com::com_ptr<IDirect3D9Ex> m_pD3D;
 
 	bool m_bObeyDxCommandlineOverride : 1;
 	bool m_bAdapterInfoIntialized : 1;
@@ -222,7 +222,7 @@ protected:
 	bool CreateD3DDevice( void* pHWnd, unsigned nAdapter, const ShaderDeviceInfo_t &info );
 
 	// Actually creates the D3D Device once the present parameters are set up
-	se::win::com::com_ptr<IDirect3DDevice9Ex> InvokeCreateDevice( void* hWnd, unsigned nAdapter, DWORD deviceCreationFlags );
+	s1::win::com::com_ptr<IDirect3DDevice9Ex> InvokeCreateDevice( void* hWnd, unsigned nAdapter, DWORD deviceCreationFlags );
 
 	// Checks for CreateQuery support
 	void DetectQuerySupport( IDirect3DDevice9* pD3DDevice );
@@ -299,7 +299,7 @@ public:
 protected:
 #endif
 
-	se::win::com::com_ptr<IDirect3DDevice9Ex> m_d3d9_device_ex;
+	s1::win::com::com_ptr<IDirect3DDevice9Ex> m_d3d9_device_ex;
 
 	UINT				  m_DisplayAdapter;
 	D3DDEVTYPE			  m_DeviceType;
@@ -333,10 +333,10 @@ protected:
 	int					m_iStencilBufferBits;
 
 	// Frame sync objects
-	se::win::com::com_ptr<IDirect3DQuery9> m_pFrameSyncQueryObject[NUM_FRAME_SYNC_QUERIES];
+	s1::win::com::com_ptr<IDirect3DQuery9> m_pFrameSyncQueryObject[NUM_FRAME_SYNC_QUERIES];
 	bool				m_bQueryIssued[NUM_FRAME_SYNC_QUERIES];
 	int					m_currentSyncQuery;
-	se::win::com::com_ptr<IDirect3DTexture9> m_pFrameSyncTexture;
+	s1::win::com::com_ptr<IDirect3DTexture9> m_pFrameSyncTexture;
 
 	CUtlString			m_sDisplayDeviceName;
 

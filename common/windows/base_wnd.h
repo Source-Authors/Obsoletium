@@ -22,7 +22,7 @@ class CBaseWnd : public CWnd {
   DECLARE_MESSAGE_MAP()
 
  protected:
-  se::windows::ui::CDpiWindowBehavior m_dpi_behavior;
+  s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
 };
 
 #endif  // !SE_COMMON_WINDOWS_BASE_WND_

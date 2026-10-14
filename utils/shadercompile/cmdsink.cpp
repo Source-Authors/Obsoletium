@@ -4,7 +4,7 @@
 
 #include "cmdsink.h"
 
-namespace se::shader_compile::command_sink {
+namespace s1::shader_compile::command_sink {
 
 CResponseFiles::CResponseFiles(char const *szFileResult,
                                char const *szFileListing)
@@ -87,4 +87,4 @@ void CResponseFiles::ReadListingFile() {
   }
 }
 
-};  // namespace se::shader_compile::command_sink
+};  // namespace s1::shader_compile::command_sink

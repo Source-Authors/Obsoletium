@@ -10,7 +10,7 @@
 #include <cassert>
 #include <string>
 
-namespace se::smp {
+namespace s1::smp {
 
 extern HWND g_hBlackFadingWindow;
 extern bool g_bFrameCreated;
@@ -40,7 +40,7 @@ bool FailedUI(HRESULT hr, const char* description) {
   return is_failed;
 }
 
-}  // namespace se::smp
+}  // namespace s1::smp
 
 namespace {
 
@@ -50,7 +50,7 @@ int g_desiredVideoScaleMode = ID_STRETCH_TO_FIT;
 
 }  // namespace
 
-namespace se::smp {
+namespace s1::smp {
 
 void LogPlayerEvent(SmpPlayerEvent e) {
   double dpos = 0.0;
@@ -276,7 +276,7 @@ LRESULT SteamWmpHost::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam,
 
   CComPtr<IAxWinHostWindow> spHost;
   CComPtr<IConnectionPointContainer> spConnectionContainer;
-  se::smp::CComWMPEventDispatch* pEventListener = nullptr;
+  s1::smp::CComWMPEventDispatch* pEventListener = nullptr;
   CComPtr<IWMPEvents> spEventListener;
   CComPtr<IWMPSettings> spWMPSettings;
 
@@ -306,7 +306,7 @@ LRESULT SteamWmpHost::OnCreate(UINT uMsg, WPARAM wParam, LPARAM lParam,
 
   // start listening to events
 
-  hr = se::smp::CComWMPEventDispatch::CreateInstance(&pEventListener);
+  hr = s1::smp::CComWMPEventDispatch::CreateInstance(&pEventListener);
   if (FailedUI(hr, "Failed to create Steam Media Player Event Dispatcher."))
     goto FAILURE;
 
@@ -648,4 +648,4 @@ LRESULT SteamWmpHost::OnVideoScale(WORD wNotifyCode, WORD wID, HWND hWndCtl,
 
 void SteamWmpHost::SetUrl(const std::string& url) { m_url = url; }
 
-}  // namespace se::smp
+}  // namespace s1::smp

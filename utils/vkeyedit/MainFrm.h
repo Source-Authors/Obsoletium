@@ -38,7 +38,7 @@ class CMainFrame : public CFrameWnd {
   CBaseStatusBar m_wndStatusBar;
   CBaseToolBar m_wndToolBar;
 
-  se::windows::ui::CDpiWindowBehavior m_dpi_behavior;
+  s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
 
   // Generated message map functions
  protected:

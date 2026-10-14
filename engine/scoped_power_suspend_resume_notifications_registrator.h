@@ -8,7 +8,7 @@
 
 #include "tier0/dbg.h"
 
-namespace source::engine::win {
+namespace s1::engine::win {
 
 /**
  * @brief Allows to register WM_POWERBROADCAST notifications for specific power
@@ -54,6 +54,6 @@ class ScopedPowerSuspendResumeNotificationsRegistrator {
   const std::error_code rc_;
 };
 
-}  // namespace source::engine::win
+}  // namespace s1::engine::win
 
 #endif  // ENGINE_SCOPED_POWER_SUSPEND_RESUME_NOTIFICATIONS_REGISTRATOR_H_

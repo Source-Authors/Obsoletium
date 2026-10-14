@@ -93,7 +93,7 @@ public:
 	CLightingPreviewResultsWindow *m_pLightingPreviewOutputWindow;
 	bool					m_bLightingPreviewOutputWindowShowing;
 
-	se::windows::ui::CDpiWindowBehavior m_dpiBehavior;
+	s1::win::ui::CDpiWindowBehavior m_dpiBehavior;
 
 	//CMapAnimationDlg m_AnimationDlg;
 

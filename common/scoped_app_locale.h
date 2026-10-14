@@ -8,7 +8,7 @@
 
 #include "tier1/strtools.h"
 
-namespace se {
+namespace s1 {
 
 // Scoped app locale.
 class ScopedAppLocale {
@@ -47,6 +47,6 @@ class ScopedAppLocale {
   static constexpr char kEmptyLocale[1]{""};
 };
 
-}  // namespace se
+}  // namespace s1
 
 #endif  // SE_COMMON_SCOPED_APP_LOCALE_H_

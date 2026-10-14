@@ -31,7 +31,7 @@ CreateInterfaceFn s_SoundEmitterFactory;
 
 }  // namespace
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 int ProcessConsoleInput(ISystem *system, IDedicatedServerAPI *api) {
   int count = 0;
@@ -65,7 +65,7 @@ class DedicatedExports : public CBaseAppSystem<IDedicatedExports> {
   void RunServer() override {
     Assert(system_);
     Assert(api_);
-    se::dedicated::RunServer(system_, api_, is_console_mode_);
+    s1::dedicated::RunServer(system_, api_, is_console_mode_);
   }
 
   void Startup(void *ctx) override {
@@ -176,4 +176,4 @@ SpewRetval_t DedicatedSpewOutputFunc(SpewType_t spewType, char const *pMsg) {
   return SPEW_CONTINUE;
 }
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated

@@ -17,7 +17,7 @@
 #include <dxgi1_6.h>
 #include "com_ptr.h"
 
-namespace se::shaderapidx11 {
+namespace s1::shaderapidx11 {
 
 // Shader device manager on DirectX 11 hardware.
 class CShaderDeviceMgrDx11 final : public CShaderDeviceMgrBase {
@@ -182,7 +182,7 @@ class CShaderDeviceDx11 final : public CShaderDeviceBase {
 
  private:
   struct InputLayout_t {
-    se::win::com::com_ptr<ID3D11InputLayout> m_pInputLayout;
+    s1::win::com::com_ptr<ID3D11InputLayout> m_pInputLayout;
     VertexFormat_t m_VertexFormat;
   };
 
@@ -195,10 +195,10 @@ class CShaderDeviceDx11 final : public CShaderDeviceBase {
 
   template <typename TShader>
   struct BaseShader_t {
-    using interface_concept = se::win::com::com_interface_concept<TShader>;
+    using interface_concept = s1::win::com::com_interface_concept<TShader>;
 
-    se::win::com::com_ptr<TShader> m_pShader;
-    se::win::com::com_ptr<ID3D11ShaderReflection> m_pInfo;
+    s1::win::com::com_ptr<TShader> m_pShader;
+    s1::win::com::com_ptr<ID3D11ShaderReflection> m_pInfo;
   };
 
   struct VertexShader_t : public BaseShader_t<ID3D11VertexShader> {
@@ -330,6 +330,6 @@ inline void SetDebugName(ID3D11DeviceChild *child, const char (&name)[size]) {
 #endif
 }
 
-}  // namespace se::shaderapidx11
+}  // namespace s1::shaderapidx11
 
 #endif  // !SE_MATERIALSYSTEM_SHADERAPIDX11_SHADER_DEVICE_DX11_H_

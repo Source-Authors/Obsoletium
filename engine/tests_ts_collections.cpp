@@ -488,7 +488,7 @@ void SeqPushMTPop(ITestContainer<T> &container, bool bDistribute) {
 
 template <typename T>
 void RunSharedTests(int tests_num, ITestContainer<T> &container) {
-  using namespace se::engine::tests::ts_collections;
+  using namespace s1::engine::tests::ts_collections;
 
   NUM_PROCESSORS = GetCPUInformation()->m_nLogicalProcessors;
   int kMaxThreadsNum = NUM_PROCESSORS * 2;
@@ -528,10 +528,10 @@ void RunSharedTests(int tests_num, ITestContainer<T> &container) {
 
 }  // namespace
 
-namespace se::engine::tests::ts_collections {
+namespace s1::engine::tests::ts_collections {
 
 bool RunTSListTests(int list_size, int tests_num) {
-  using namespace se::engine::tests::ts_collections;
+  using namespace s1::engine::tests::ts_collections;
 
   NUM_TEST = list_size;
 
@@ -553,7 +553,7 @@ bool RunTSListTests(int list_size, int tests_num) {
 }
 
 bool RunTSQueueTests(int list_size, int tests_num) {
-  using namespace se::engine::tests::ts_collections;
+  using namespace s1::engine::tests::ts_collections;
 
   NUM_TEST = list_size;
 
@@ -567,4 +567,4 @@ bool RunTSQueueTests(int list_size, int tests_num) {
   return true;
 }
 
-}  // namespace se::engine::tests::ts_collections
+}  // namespace s1::engine::tests::ts_collections

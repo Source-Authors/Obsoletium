@@ -7,7 +7,7 @@
 #include "vgui_controls/Button.h"
 #include "vgui_controls/ComboBox.h"
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 // Data describing a single server
 struct serveritem_t {
@@ -115,6 +115,6 @@ class CCreateMultiplayerGameServerPage : public vgui::Frame {
   KeyValues *m_pGameInfo;
 };
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated
 
 #endif  // !SE_DEDICATED_VGUI_CREATE_MULTIPLAYER_GAME_SERVER_PAGE_H_

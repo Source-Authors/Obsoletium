@@ -19,7 +19,7 @@ class IDedicatedServerAPI;
 #define DEDICATED_BASECLASS CVguiSteamApp
 #endif
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 /**
  * @brief Initialize, shutdown main systems, load Steam to.
@@ -66,6 +66,6 @@ class DedicatedAppSystemGroup : public DEDICATED_BASECLASS {
   const bool is_console_mode_;
 };
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated
 
 #endif  // SE_DEDICATED_DEDICATED_H_

@@ -243,7 +243,7 @@ BOOL CFileSystemOpenDlg::OnInitDialog()
 		m_ImageList.Create( m_dpi_behavior.ScaleOnX( PREVIEW_IMAGE_SIZE ), m_dpi_behavior.ScaleOnY( PREVIEW_IMAGE_SIZE ), ILC_COLOR32, 0, 512 );
 	
 		m_BitmapFolder.LoadBitmap( IDB_LABEL_FOLDER );
-		HBITMAP bitmap = se::windows::ui::ScaleBitmapForDpi( static_cast<HBITMAP>( m_BitmapFolder ),
+		HBITMAP bitmap = s1::win::ui::ScaleBitmapForDpi( static_cast<HBITMAP>( m_BitmapFolder ),
 			m_dpi_behavior.GetPreviousDpiX(), m_dpi_behavior.GetPreviousDpiY(),
 			m_dpi_behavior.GetCurrentDpiX(), m_dpi_behavior.GetCurrentDpiY() );
 		m_BitmapFolder.DeleteObject();
@@ -252,7 +252,7 @@ BOOL CFileSystemOpenDlg::OnInitDialog()
 		m_iLabel_Folder = m_ImageList.Add( &m_BitmapFolder, nullptr );
 
 		m_BitmapMdl.LoadBitmap( IDB_LABEL_MDL );
-		bitmap = se::windows::ui::ScaleBitmapForDpi( static_cast<HBITMAP>( m_BitmapMdl ),
+		bitmap = s1::win::ui::ScaleBitmapForDpi( static_cast<HBITMAP>( m_BitmapMdl ),
 			m_dpi_behavior.GetPreviousDpiX(), m_dpi_behavior.GetPreviousDpiY(),
 			m_dpi_behavior.GetCurrentDpiX(), m_dpi_behavior.GetCurrentDpiY() );
 		m_BitmapMdl.DeleteObject();
@@ -261,7 +261,7 @@ BOOL CFileSystemOpenDlg::OnInitDialog()
 		m_iLabel_Mdl = m_ImageList.Add( &m_BitmapMdl, nullptr );
 
 		m_BitmapFile.LoadBitmap( IDB_LABEL_FILE );
-		bitmap = se::windows::ui::ScaleBitmapForDpi( static_cast<HBITMAP>( m_BitmapFile ),
+		bitmap = s1::win::ui::ScaleBitmapForDpi( static_cast<HBITMAP>( m_BitmapFile ),
 			m_dpi_behavior.GetPreviousDpiX(), m_dpi_behavior.GetPreviousDpiY(),
 			m_dpi_behavior.GetCurrentDpiX(), m_dpi_behavior.GetCurrentDpiY() );
 		m_BitmapFile.DeleteObject();

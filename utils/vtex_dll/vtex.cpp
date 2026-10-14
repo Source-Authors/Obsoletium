@@ -928,7 +928,7 @@ static void ComputeBufferHash( void const *pvBuffer, size_t numBytes, CRC32_t &u
 static bool LoadFile( const char *pFileName, CUtlBuffer &buf, bool bFailOnError, CRC32_t *puiHash )
 {
 	// dimhotepus: Use RAII FILE wrapper.
-	auto [f, errc] = se::posix::posix_file_stream_factory::open(pFileName, "rb");
+	auto [f, errc] = s1::posix::posix_file_stream_factory::open(pFileName, "rb");
 	if (errc)
 	{
 		if ( bFailOnError )
@@ -1959,7 +1959,7 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 	{
 		CP4AutoEditAddFile autop4( dstFileName );
 		// dimhotepus: Use RAII FILE wrapper.
-		auto [f, errc] = se::posix::posix_file_stream_factory::open( dstFileName, "wb" );
+		auto [f, errc] = s1::posix::posix_file_stream_factory::open( dstFileName, "wb" );
 		if ( errc )
 		{
 			VTexError( "Unable to open '%s': %s.\n", dstFileName, errc.message().c_str() );
@@ -2532,7 +2532,7 @@ static bool Process_File( char (&pInputBaseName)[maxlen] )
 		if ( !bRes )
 			VTexError( "Failed to write '%s'!\n", chFileNameConvert );
 
-		auto [fw, rc] = se::posix::posix_file_stream_factory::open(chFileNameConvert, "wb");
+		auto [fw, rc] = s1::posix::posix_file_stream_factory::open(chFileNameConvert, "wb");
 		if ( !rc )
 		{
 			const intp write = bufFile.TellPut();
@@ -2588,7 +2588,7 @@ static bool Process_File( char (&pInputBaseName)[maxlen] )
 		if( tmp )
 		{
 			// check if the file already exists.
-			auto [exists, rc] = se::posix::posix_file_stream::exists( buf );
+			auto [exists, rc] = s1::posix::posix_file_stream::exists( buf );
 			if( exists && !rc )
 			{
 				if ( !g_Quiet )
@@ -2596,7 +2596,7 @@ static bool Process_File( char (&pInputBaseName)[maxlen] )
 			}
 			else
 			{
-				auto [fp, rc2] = se::posix::posix_file_stream_factory::open( buf, "r" );
+				auto [fp, rc2] = s1::posix::posix_file_stream_factory::open( buf, "r" );
 				if( !rc2 )
 				{
 					if ( !g_Quiet )
@@ -2664,7 +2664,7 @@ public:
 	int main( int argc, char **argv ) override
 	{
 		// dimhotepus: Install an exception handler only when running as standalone executable.
-		const se::utils::common::ScopedDefaultMinidumpHandler scoped_default_minidumps;
+		const s1::utils::common::ScopedDefaultMinidumpHandler scoped_default_minidumps;
 
 		// dimhotepus: Store old spew to restore later.
 		const ScopedSpewOutputFunc scoped_spew_output{VTexOutputFunc};
@@ -2769,10 +2769,10 @@ int CVTex::VTex( int argc, char **argv )
 	// supports using a UTF-8 code page.
 	constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
 
-	const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-	if (!V_strieq(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+	const s1::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+	if (!V_strieq(s1::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
 		Warning("setlocale('%s') failed, current locale is '%s'.\n",
-			kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+			kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale());
 	}
 
 	MathLib_Init( 2.2f, 2.2f, 0.0f, 1, false, false, false, false );

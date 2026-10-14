@@ -54,8 +54,8 @@ protected:
 	CButton m_btnCopyAll;
 	
 	// Need additional one as controls created dynamically after DPI is applied.
-	se::windows::ui::CDpiWindowBehavior m_edit_dpi_behavior{false};
-	se::windows::ui::CDpiWindowBehavior m_copy_all_dpi_behavior{false};
+	s1::win::ui::CDpiWindowBehavior m_edit_dpi_behavior{false};
+	s1::win::ui::CDpiWindowBehavior m_copy_all_dpi_behavior{false};
 
 	//{{AFX_MSG(CProcessWnd)
 	afx_msg void OnTimer(UINT_PTR nIDEvent);

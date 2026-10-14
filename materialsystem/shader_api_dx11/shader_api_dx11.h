@@ -17,11 +17,11 @@ struct MaterialSystemHardwareIdentifier_t;
   D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE
 #define MAX_DX11_STREAMS D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT
 
-namespace se::shaderapidx11 {
+namespace s1::shaderapidx11 {
 
 // A record describing the state on the board
 struct ShaderIndexBufferStateDx11_t {
-  se::win::com::com_ptr<ID3D11Buffer> m_pBuffer;
+  s1::win::com::com_ptr<ID3D11Buffer> m_pBuffer;
   DXGI_FORMAT m_Format;
   UINT m_nOffset;
 
@@ -31,7 +31,7 @@ struct ShaderIndexBufferStateDx11_t {
 };
 
 struct ShaderVertexBufferStateDx11_t {
-  se::win::com::com_ptr<ID3D11Buffer> m_pBuffer;
+  s1::win::com::com_ptr<ID3D11Buffer> m_pBuffer;
   UINT m_nStride;
   UINT m_nOffset;
 };
@@ -46,13 +46,13 @@ struct ShaderStateDx11_t {
   D3D11_VIEWPORT m_pViewports[MAX_DX11_VIEWPORTS];
   FLOAT m_ClearColor[4];
   ShaderRasterState_t m_RasterState;
-  se::win::com::com_ptr<ID3D11RasterizerState> m_pRasterState;
-  se::win::com::com_ptr<ID3D11VertexShader> m_pVertexShader;
-  se::win::com::com_ptr<ID3D11GeometryShader> m_pGeometryShader;
-  se::win::com::com_ptr<ID3D11PixelShader> m_pPixelShader;
-  se::win::com::com_ptr<ID3D11HullShader> m_pHullShader;
-  se::win::com::com_ptr<ID3D11DomainShader> m_pDomainShader;
-  se::win::com::com_ptr<ID3D11ComputeShader> m_pComputeShader;
+  s1::win::com::com_ptr<ID3D11RasterizerState> m_pRasterState;
+  s1::win::com::com_ptr<ID3D11VertexShader> m_pVertexShader;
+  s1::win::com::com_ptr<ID3D11GeometryShader> m_pGeometryShader;
+  s1::win::com::com_ptr<ID3D11PixelShader> m_pPixelShader;
+  s1::win::com::com_ptr<ID3D11HullShader> m_pHullShader;
+  s1::win::com::com_ptr<ID3D11DomainShader> m_pDomainShader;
+  s1::win::com::com_ptr<ID3D11ComputeShader> m_pComputeShader;
   ShaderVertexBufferStateDx11_t m_pVertexBuffer[MAX_DX11_STREAMS];
   ShaderIndexBufferStateDx11_t m_IndexBuffer;
   ShaderInputLayoutStateDx11_t m_InputLayout;
@@ -879,6 +879,6 @@ class CShaderAPIDx11 final : public CShaderAPIBase, public IDebugTextureInfo {
 // Singleton global
 extern CShaderAPIDx11 *g_pShaderAPIDx11;
 
-}  // namespace se::shaderapidx11
+}  // namespace s1::shaderapidx11
 
 #endif  // !SE_MATERIALSYSTEM_SHADERAPIDX11_SHADER_API_DX11_H_

@@ -24,7 +24,7 @@
 
 #include "tier0/memdbgon.h"
 
-using namespace se::common::windows;
+using namespace s1::win;
 
 namespace {
 
@@ -292,7 +292,7 @@ class ScopedSetIsServerExitFlag {
 
 [[nodiscard]] inline std::error_code get_com_error_code(
     const HRESULT result) noexcept {
-  return std::error_code{result, se::win::com::com_error_category()};
+  return std::error_code{result, s1::win::com::com_error_category()};
 }
 
 class ScopedThreadName {
@@ -608,7 +608,7 @@ void ShaderCompileClient(ShaderCompileClientArgs& args) {
           return;
         }
 
-        se::win::com::com_ptr<ID3DBlob> shader, errors;
+        s1::win::com::com_ptr<ID3DBlob> shader, errors;
 
         constexpr unsigned kCommonFlags{D3DCOMPILE_WARNINGS_ARE_ERRORS |
                                         D3DCOMPILE_ENABLE_STRICTNESS |
@@ -645,7 +645,7 @@ void ShaderCompileClient(ShaderCompileClientArgs& args) {
 
           fprintf(stderr, "%s compilation error 0x%.8lx: %s!\n",
                   shader_file_name, hr,
-                  se::win::com::com_error_category().message(hr).c_str());
+                  s1::win::com::com_error_category().message(hr).c_str());
 
           if (errors) {
             // Null-terminated string
@@ -725,13 +725,13 @@ void ShaderCompileClient(ShaderCompileClientArgs& args) {
 
             printf("\n");
 
-            se::win::com::com_ptr<ID3DBlob> disassembly{nullptr};
+            s1::win::com::com_ptr<ID3DBlob> disassembly{nullptr};
             hr = D3DDisassemble(
                 shader->GetBufferPointer(), shader->GetBufferSize(),
                 D3D_DISASM_ENABLE_INSTRUCTION_NUMBERING, "", &disassembly);
             if (FAILED(hr)) {
               fprintf(stderr, "Disassembly error 0x%.8lx: %s\n", hr,
-                      se::win::com::com_error_category().message(hr).c_str());
+                      s1::win::com::com_error_category().message(hr).c_str());
             } else {
               printf("Disassembled shader:\n%s\n",
                      static_cast<const char*>(disassembly->GetBufferPointer()));

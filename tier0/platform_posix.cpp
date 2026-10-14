@@ -97,7 +97,7 @@ From https://man7.org/linux/man-pages/man5/proc.5.html:
 
 	constexpr char kStatsFilePath[] = "/proc/self/statm";
 
-	auto [file, rc] = se::posix::posix_file_stream_factory::open( kStatsFilePath, "r" );
+	auto [file, rc] = s1::posix::posix_file_stream_factory::open( kStatsFilePath, "r" );
 	if ( !rc )
 	{
 		size_t nSize, nResident, nShare, nText, nLib_Unused, nDataPlusStack, nDt_Unused;
@@ -130,7 +130,7 @@ static void InitTimeSystem( void )
 
 	// now, see if we can use rdtsc instead.
 	// If this is one of the chips with a separate constant clock for rdtsc, we can
-	auto [file, rc] = se::posix::posix_file_stream_factory::open("/proc/cpuinfo", "r");
+	auto [file, rc] = s1::posix::posix_file_stream_factory::open("/proc/cpuinfo", "r");
 	if ( !rc )
 	{
 		bool bAnyBadCores = false;

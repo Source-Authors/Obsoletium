@@ -22,7 +22,7 @@
 #include "winlite.h"
 #include <d3d11.h>
 
-namespace se::shaderapidx11 {
+namespace s1::shaderapidx11 {
 
 #ifdef _DEBUG
 uint32_t CVertexBufferDx11::s_nBufferCount = 0;
@@ -692,4 +692,4 @@ IMaterial *CMeshDx11::GetMaterial() {
   return 0;
 }
 
-}  // namespace se::shaderapidx11
+}  // namespace s1::shaderapidx11

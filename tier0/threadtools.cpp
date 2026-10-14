@@ -762,7 +762,7 @@ bool CThreadFullMutex::Release()
 // so use TlsGetValue as TlsGetValue2 is from Windows 11 24H2 SDK not installed for some users.
 using TlsGetValue2Function = decltype(&TlsGetValue);
 
-static const source::ScopedDll scopedKernel32Dll{ "kernel32.dll", LOAD_LIBRARY_SEARCH_SYSTEM32 };
+static const s1::ScopedDll scopedKernel32Dll{ "kernel32.dll", LOAD_LIBRARY_SEARCH_SYSTEM32 };
 // dimhotepus: TlsGetValue2 doesn't set GetLastError (involves thread local storage) so is faster.
 const auto [tlsGetValue2, tlsRc] = scopedKernel32Dll.GetFunction<TlsGetValue2Function>("TlsGetValue2");
 static const TlsGetValue2Function tlsGetValueFunction = !tlsRc && tlsGetValue2 ? tlsGetValue2 : &TlsGetValue;

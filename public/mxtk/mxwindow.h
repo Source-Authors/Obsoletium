@@ -33,7 +33,7 @@ using WPARAM = UINT_PTR;
 using LPARAM = LONG_PTR;
 using LRESULT = LONG_PTR;
 
-namespace se::windows::ui
+namespace s1::win::ui
 {
 class CDpiWindowBehavior;
 }
@@ -49,7 +49,7 @@ class mxWindow : public mxWidget
 
 protected:
 
-	std::unique_ptr<se::windows::ui::CDpiWindowBehavior> d_dpiWindowBehavior;
+	std::unique_ptr<s1::win::ui::CDpiWindowBehavior> d_dpiWindowBehavior;
 
 	int quickUIScale(int value);
 

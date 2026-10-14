@@ -10,7 +10,7 @@
 #include <d3d11_4.h>
 #include "com_ptr.h"
 
-namespace se::shaderapidx11 {
+namespace s1::shaderapidx11 {
 
 // Vertex buffer on DirectX 11 hardware.
 class CVertexBufferDx11 final : public CVertexBufferBase {
@@ -267,6 +267,6 @@ class CMeshDx11 final : public CMeshBase {
   unsigned char* m_pVertexMemory;
 };
 
-}  // namespace se::shaderapidx11
+}  // namespace s1::shaderapidx11
 
 #endif  // !SE_MATERIALSYSTEM_SHADERAPIDX11_MESH_DX11_H_

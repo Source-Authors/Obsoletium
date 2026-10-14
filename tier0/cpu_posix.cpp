@@ -77,7 +77,7 @@ static uint64 GetCPUFreqFromPROC()
 	// dimhotepus: Use RAII FILE wrapper.
 	/* open proc/cpuinfo */
 	auto [f, errc] =
-		se::posix::posix_file_stream_factory::open("/proc/cpuinfo", "r");
+		s1::posix::posix_file_stream_factory::open("/proc/cpuinfo", "r");
 	if (errc)
 	{
 		return 0;
@@ -119,7 +119,7 @@ uint64 CalculateCPUFreq()
 	// dimhotepus: Use RAII FILE wrapper.
 	// Try to open cpuinfo_max_freq. If the kernel was built with cpu scaling support disabled, this will fail.
 	auto [f, errc] =
-		se::posix::posix_file_stream_factory::open(
+		s1::posix::posix_file_stream_factory::open(
 			"/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq", "r");
 	if ( !errc )
 	{

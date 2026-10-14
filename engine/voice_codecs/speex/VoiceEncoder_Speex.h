@@ -7,7 +7,7 @@
 
 #include "speex/speex.h"
 
-namespace se::audio::voice_codecs::speex {
+namespace s1::audio::voice_codecs::speex {
 
 class VoiceEncoder_Speex : public IFrameEncoder {
  public:
@@ -35,6 +35,6 @@ class VoiceEncoder_Speex : public IFrameEncoder {
   [[nodiscard]] bool DecoderCtl(int request, void *arg, const char *arg_description);
 };
 
-}  // namespace se::audio::voice_codecs::speex
+}  // namespace s1::audio::voice_codecs::speex
 
 #endif  // !VOICEENCODER_SPEEX_H

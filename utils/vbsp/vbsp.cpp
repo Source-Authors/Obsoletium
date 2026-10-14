@@ -917,10 +917,10 @@ int RunVBSP( int argc, char **argv )
 	// supports using a UTF-8 code page.
 	constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
 
-	const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-	if (!V_strieq(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+	const s1::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+	if (!V_strieq(s1::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
 		Warning("setlocale('%s') failed, current locale is '%s'.\n",
-			kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+			kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale());
 	}
 
 	CommandLine()->CreateCmdLine( argc, argv );
@@ -1192,7 +1192,7 @@ int RunVBSP( int argc, char **argv )
 		else if ( V_strieq( argv[i], "-FullMinidumps" ) )
 		{
 			Msg( "--full-minidumps: true\n" );
-			se::utils::common::EnableFullMinidumps( true );
+			s1::utils::common::EnableFullMinidumps( true );
 		}
 		// dimhotepus: Check arg is in bounds first.
 		else if ( i < argc - 1 && V_strieq( argv[i], "-embed" ) )
@@ -1491,6 +1491,6 @@ int RunVBSP( int argc, char **argv )
 
 int main (int argc, char **argv)
 {
-	const se::utils::common::ScopedDefaultMinidumpHandler minidump;
+	const s1::utils::common::ScopedDefaultMinidumpHandler minidump;
 	return RunVBSP( argc, argv );
 }

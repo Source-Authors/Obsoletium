@@ -166,7 +166,7 @@ namespace {
   }
 }
 
-se::shaderapidx11::CShaderDeviceMgrDx11 g_ShaderDeviceMgrDx11;
+s1::shaderapidx11::CShaderDeviceMgrDx11 g_ShaderDeviceMgrDx11;
 
 }  // namespace
 
@@ -176,21 +176,21 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CShaderDeviceMgrDx11, IShaderDeviceMgr,
 
 namespace {
 
-se::shaderapidx11::CShaderDeviceDx11 g_ShaderDeviceDx11;
+s1::shaderapidx11::CShaderDeviceDx11 g_ShaderDeviceDx11;
 
 }  // namespace
 
-namespace se::shaderapidx11 {
+namespace s1::shaderapidx11 {
 
 CShaderDeviceDx11 *g_pShaderDeviceDx11 = &g_ShaderDeviceDx11;
 
-}  // namespace se::shaderapidx11
+}  // namespace s1::shaderapidx11
 
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CShaderDeviceDx11, IShaderDevice,
                                   SHADER_DEVICE_INTERFACE_VERSION,
                                   g_ShaderDeviceDx11)
 
-namespace se::shaderapidx11 {
+namespace s1::shaderapidx11 {
 
 CShaderDeviceMgrDx11::CShaderDeviceMgrDx11()
     : m_use_dx_level_from_command_line{true} {}
@@ -206,14 +206,14 @@ bool CShaderDeviceMgrDx11::Connect(CreateInterfaceFn factory) {
   HRESULT hr{CreateDXGIFactory1(IID_PPV_ARGS(&dxgi_factory))};
   if (FAILED(hr)) {
     Warning("CreateDXGIFactory1 failed w/e %s.\n",
-            se::win::com::com_error_category().message(hr).c_str());
+            s1::win::com::com_error_category().message(hr).c_str());
     return false;
   }
 
   hr = dxgi_factory.QueryInterface(IID_PPV_ARGS(&m_dxgi_factory));
   if (FAILED(hr)) {
     Warning("IDXGIFactory1::QueryInterface(IDXGIFactory6) failed w/e %s.\n",
-            se::win::com::com_error_category().message(hr).c_str());
+            s1::win::com::com_error_category().message(hr).c_str());
     return false;
   }
 
@@ -253,7 +253,7 @@ bool CShaderDeviceMgrDx11::InitGpuInfo() {
   m_Adapters.RemoveAll();
 
   bool has_any_adapter = false;
-  se::win::com::com_ptr<IDXGIAdapter4> adapter;
+  s1::win::com::com_ptr<IDXGIAdapter4> adapter;
 
   for (UINT adapter_idx{0}; m_dxgi_factory->EnumAdapterByGpuPreference(
                                 adapter_idx, KDxgiGpuPreference,
@@ -264,7 +264,7 @@ bool CShaderDeviceMgrDx11::InitGpuInfo() {
     memset(&info.m_ActualCaps, 0xDD, sizeof(info.m_ActualCaps));
 #endif
 
-    se::win::com::com_ptr<IDXGIOutput6> output{GetAdapterOutput(adapter_idx)};
+    s1::win::com::com_ptr<IDXGIOutput6> output{GetAdapterOutput(adapter_idx)};
 
     info.m_ActualCaps.m_bDeviceOk =
         ComputeCapsFromD3D(&info.m_ActualCaps, adapter, output);
@@ -420,26 +420,26 @@ void CShaderDeviceMgrDx11::GetAdapterInfo(unsigned adapter_no,
 }
 
 // Returns the adapter interface for a particular adapter.
-se::win::com::com_ptr<IDXGIAdapter4> CShaderDeviceMgrDx11::GetAdapter(
+s1::win::com::com_ptr<IDXGIAdapter4> CShaderDeviceMgrDx11::GetAdapter(
     unsigned adapter_no) const {
   LOCK_SHADERAPI();
 
   Assert(m_dxgi_factory && adapter_no < GetAdapterCount());
 
-  se::win::com::com_ptr<IDXGIAdapter4> adapter;
+  s1::win::com::com_ptr<IDXGIAdapter4> adapter;
   const HRESULT hr{m_dxgi_factory->EnumAdapterByGpuPreference(
       adapter_no, KDxgiGpuPreference, IID_PPV_ARGS(&adapter))};
 
   Assert(!FAILED(hr));
 
-  return SUCCEEDED(hr) ? adapter : se::win::com::com_ptr<IDXGIAdapter4>{};
+  return SUCCEEDED(hr) ? adapter : s1::win::com::com_ptr<IDXGIAdapter4>{};
 }
 
 // Returns the amount of video memory in bytes for a particular adapter.
 size_t CShaderDeviceMgrDx11::GetVidMemBytes(unsigned adapter_no) const {
   LOCK_SHADERAPI();
 
-  se::win::com::com_ptr<IDXGIAdapter4> adapter{GetAdapter(adapter_no)};
+  s1::win::com::com_ptr<IDXGIAdapter4> adapter{GetAdapter(adapter_no)};
   if (!adapter) return 0;
 
   DXGI_ADAPTER_DESC1 desc;
@@ -451,15 +451,15 @@ size_t CShaderDeviceMgrDx11::GetVidMemBytes(unsigned adapter_no) const {
 }
 
 // Returns the appropriate adapter output to use
-se::win::com::com_ptr<IDXGIOutput6> CShaderDeviceMgrDx11::GetAdapterOutput(
+s1::win::com::com_ptr<IDXGIOutput6> CShaderDeviceMgrDx11::GetAdapterOutput(
     unsigned adapter_no) const {
   LOCK_SHADERAPI();
 
-  se::win::com::com_ptr<IDXGIAdapter4> adapter{GetAdapter(adapter_no)};
+  s1::win::com::com_ptr<IDXGIAdapter4> adapter{GetAdapter(adapter_no)};
   if (!adapter) return {};
 
   DXGI_OUTPUT_DESC desc;
-  se::win::com::com_ptr<IDXGIOutput> output;
+  s1::win::com::com_ptr<IDXGIOutput> output;
 
   for (UINT i{0}; adapter->EnumOutputs(i, &output) != DXGI_ERROR_NOT_FOUND;
        ++i) {
@@ -470,7 +470,7 @@ se::win::com::com_ptr<IDXGIOutput6> CShaderDeviceMgrDx11::GetAdapterOutput(
     // like DXGI_MODE_ROTATION_IDENTITY?
     if (!desc.AttachedToDesktop) continue;
 
-    se::win::com::com_ptr<IDXGIOutput6> output6;
+    s1::win::com::com_ptr<IDXGIOutput6> output6;
     hr = output.QueryInterface(IID_PPV_ARGS(&output6));
     if (FAILED(hr)) continue;
 
@@ -485,7 +485,7 @@ unsigned CShaderDeviceMgrDx11::GetModeCount(unsigned adapter_no) const {
   LOCK_SHADERAPI();
   Assert(m_dxgi_factory && (adapter_no < GetAdapterCount()));
 
-  se::win::com::com_ptr<IDXGIOutput6> output{GetAdapterOutput(adapter_no)};
+  s1::win::com::com_ptr<IDXGIOutput6> output{GetAdapterOutput(adapter_no)};
   if (!output) return 0;
 
   constexpr DXGI_FORMAT format = kDxgiAdapterResourceFormat;
@@ -512,7 +512,7 @@ void CShaderDeviceMgrDx11::GetModeInfo(ShaderDisplayMode_t *info,
   LOCK_SHADERAPI();
   Assert(m_dxgi_factory && (adapter_no < GetAdapterCount()));
 
-  se::win::com::com_ptr<IDXGIOutput6> output{GetAdapterOutput(adapter_no)};
+  s1::win::com::com_ptr<IDXGIOutput6> output{GetAdapterOutput(adapter_no)};
   if (!output) return;
 
   constexpr DXGI_FORMAT format = kDxgiAdapterResourceFormat;
@@ -551,7 +551,7 @@ void CShaderDeviceMgrDx11::GetCurrentModeInfo(ShaderDisplayMode_t *info,
 
   Assert(m_dxgi_factory && (adapter_no < GetAdapterCount()));
 
-  se::win::com::com_ptr<IDXGIOutput6> output{GetAdapterOutput(adapter_no)};
+  s1::win::com::com_ptr<IDXGIOutput6> output{GetAdapterOutput(adapter_no)};
   if (!output) return;
 
   DXGI_OUTPUT_DESC1 output_desc;
@@ -708,7 +708,7 @@ bool CShaderDeviceDx11::InitDevice(void *hwnd, unsigned adapter_no,
       g_ShaderDeviceMgrDx11.GetHardwareCaps(adapter_no)};
   const bool is_present_allow_tearing{hardware_caps.m_bPresentAllowTearing};
 
-  se::win::com::com_ptr<IDXGIAdapter4> adapter{
+  s1::win::com::com_ptr<IDXGIAdapter4> adapter{
       g_ShaderDeviceMgrDx11.GetAdapter(adapter_no)};
   if (!adapter) return false;
 
@@ -792,7 +792,7 @@ bool CShaderDeviceDx11::InitDevice(void *hwnd, unsigned adapter_no,
   // automatic ALT+ENTER fullscreen switching using
   // IDXGIFactory::MakeWindowAssociation.
   if (m_present_flags & DXGI_PRESENT_ALLOW_TEARING) {
-    se::win::com::com_ptr<IDXGIFactory1> factory;
+    s1::win::com::com_ptr<IDXGIFactory1> factory;
 
     hr = swapChain->GetParent(IID_PPV_ARGS(&factory));
     Assert(SUCCEEDED(hr));
@@ -827,7 +827,7 @@ bool CShaderDeviceDx11::InitDevice(void *hwnd, unsigned adapter_no,
 
 // https://walbourn.github.io/dxgi-debug-device/
 #ifndef NDEBUG
-  se::win::com::com_ptr<IDXGIInfoQueue> dxgi_info_queue;
+  s1::win::com::com_ptr<IDXGIInfoQueue> dxgi_info_queue;
   if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&dxgi_info_queue)))) {
     hr = dxgi_info_queue->SetBreakOnSeverity(
         DXGI_DEBUG_ALL, DXGI_INFO_QUEUE_MESSAGE_SEVERITY_WARNING, true);
@@ -840,10 +840,10 @@ bool CShaderDeviceDx11::InitDevice(void *hwnd, unsigned adapter_no,
     Assert(SUCCEEDED(hr));
   }
 
-  se::win::com::com_ptr<ID3D11Debug> d3d11_debug;
+  s1::win::com::com_ptr<ID3D11Debug> d3d11_debug;
   hr = m_d3d11_device.QueryInterface(IID_PPV_ARGS(&d3d11_debug));
   if (SUCCEEDED(hr)) {
-    se::win::com::com_ptr<ID3D11InfoQueue> d3d11_info_queue;
+    s1::win::com::com_ptr<ID3D11InfoQueue> d3d11_info_queue;
     hr = d3d11_debug.QueryInterface(IID_PPV_ARGS(&d3d11_info_queue));
     if (SUCCEEDED(hr)) {
 #ifdef _DEBUG
@@ -874,7 +874,7 @@ bool CShaderDeviceDx11::InitDevice(void *hwnd, unsigned adapter_no,
 #endif
 
   // Create a render target view
-  se::win::com::com_ptr<ID3D11Texture2D> back_buffer_0;
+  s1::win::com::com_ptr<ID3D11Texture2D> back_buffer_0;
   hr = m_dxgi_swap_chain->GetBuffer(0, IID_PPV_ARGS(&back_buffer_0));
 
   if (FAILED(hr)) return false;
@@ -883,7 +883,7 @@ bool CShaderDeviceDx11::InitDevice(void *hwnd, unsigned adapter_no,
   if (mode.m_nBackBufferCount > 1) {
     Assert(mode.m_nBackBufferCount == 2);
 
-    se::win::com::com_ptr<ID3D11Texture2D> back_buffer_1;
+    s1::win::com::com_ptr<ID3D11Texture2D> back_buffer_1;
     hr = m_dxgi_swap_chain->GetBuffer(0, IID_PPV_ARGS(&back_buffer_1));
 
     if (FAILED(hr)) return false;
@@ -1167,7 +1167,7 @@ void CShaderDeviceDx11::Present() {
     }
   } else {
     Warning("IDXGISwapChain1::Present1 failed w/e %s.\n",
-            se::win::com::com_error_category().message(hr).c_str());
+            s1::win::com::com_error_category().message(hr).c_str());
   }
 }
 
@@ -1206,7 +1206,7 @@ void CShaderDeviceDx11::SetHardwareGammaRamp(float fGamma,
   HRESULT hr{m_dxgi_output->SetGammaControl(&gammaControl)};
   if (FAILED(hr))
     Warning("IDXGIOuput::SetGammaControl failed w/e %s.\n",
-            se::win::com::com_error_category().message(hr).c_str());
+            s1::win::com::com_error_category().message(hr).c_str());
 }
 
 // Compiles all manner of shaders.
@@ -1222,7 +1222,7 @@ IShaderBuffer *CShaderDeviceDx11::CompileShader(const char *program,
   compile_flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
 #endif
 
-  se::win::com::com_ptr<ID3DBlob> compiled_shader, error_messages;
+  s1::win::com::com_ptr<ID3DBlob> compiled_shader, error_messages;
   HRESULT hr = D3DCompile(program, program_size, nullptr, nullptr, nullptr,
                           "main", shader_version, compile_flags, 0,
                           &compiled_shader, &error_messages);
@@ -1263,12 +1263,12 @@ void CShaderDeviceDx11::ReleaseInputLayouts(VertexShaderIndex_t nIndex) {
 VertexShaderHandle_t CShaderDeviceDx11::CreateVertexShader(
     IShaderBuffer *pShaderBuffer) {
   // Create the vertex shader
-  se::win::com::com_ptr<ID3D11VertexShader> pShader;
+  s1::win::com::com_ptr<ID3D11VertexShader> pShader;
   HRESULT hr = m_d3d11_device->CreateVertexShader(
       pShaderBuffer->GetBits(), pShaderBuffer->GetSize(), nullptr, &pShader);
   if (FAILED(hr) || !pShader) return VERTEX_SHADER_HANDLE_INVALID;
 
-  se::win::com::com_ptr<ID3D11ShaderReflection> pInfo;
+  s1::win::com::com_ptr<ID3D11ShaderReflection> pInfo;
   hr = D3DReflect(pShaderBuffer->GetBits(), pShaderBuffer->GetSize(),
                   IID_PPV_ARGS(&pInfo));
   if (FAILED(hr) || !pInfo) return VERTEX_SHADER_HANDLE_INVALID;
@@ -1302,12 +1302,12 @@ void CShaderDeviceDx11::DestroyVertexShader(VertexShaderHandle_t hShader) {
 GeometryShaderHandle_t CShaderDeviceDx11::CreateGeometryShader(
     IShaderBuffer *pShaderBuffer) {
   // Create the geometry shader
-  se::win::com::com_ptr<ID3D11GeometryShader> pShader;
+  s1::win::com::com_ptr<ID3D11GeometryShader> pShader;
   HRESULT hr = m_d3d11_device->CreateGeometryShader(
       pShaderBuffer->GetBits(), pShaderBuffer->GetSize(), nullptr, &pShader);
   if (FAILED(hr) || !pShader) return GEOMETRY_SHADER_HANDLE_INVALID;
 
-  se::win::com::com_ptr<ID3D11ShaderReflection> pInfo;
+  s1::win::com::com_ptr<ID3D11ShaderReflection> pInfo;
   hr = D3DReflect(pShaderBuffer->GetBits(), pShaderBuffer->GetSize(),
                   IID_PPV_ARGS(&pInfo));
   if (FAILED(hr) || !pInfo) return GEOMETRY_SHADER_HANDLE_INVALID;
@@ -1334,12 +1334,12 @@ void CShaderDeviceDx11::DestroyGeometryShader(GeometryShaderHandle_t hShader) {
 PixelShaderHandle_t CShaderDeviceDx11::CreatePixelShader(
     IShaderBuffer *pShaderBuffer) {
   // Create the pixel shader
-  se::win::com::com_ptr<ID3D11PixelShader> pShader;
+  s1::win::com::com_ptr<ID3D11PixelShader> pShader;
   HRESULT hr = m_d3d11_device->CreatePixelShader(
       pShaderBuffer->GetBits(), pShaderBuffer->GetSize(), nullptr, &pShader);
   if (FAILED(hr) || !pShader) return PIXEL_SHADER_HANDLE_INVALID;
 
-  se::win::com::com_ptr<ID3D11ShaderReflection> pInfo;
+  s1::win::com::com_ptr<ID3D11ShaderReflection> pInfo;
   hr = D3DReflect(pShaderBuffer->GetBits(), pShaderBuffer->GetSize(),
                   IID_PPV_ARGS(&pInfo));
   if (FAILED(hr) || !pInfo) return PIXEL_SHADER_HANDLE_INVALID;
@@ -1366,12 +1366,12 @@ void CShaderDeviceDx11::DestroyPixelShader(PixelShaderHandle_t hShader) {
 HullShaderHandle_t CShaderDeviceDx11::CreateHullShader(
     IShaderBuffer *pShaderBuffer) {
   // Create the hull shader
-  se::win::com::com_ptr<ID3D11HullShader> pShader;
+  s1::win::com::com_ptr<ID3D11HullShader> pShader;
   HRESULT hr = m_d3d11_device->CreateHullShader(
       pShaderBuffer->GetBits(), pShaderBuffer->GetSize(), nullptr, &pShader);
   if (FAILED(hr) || !pShader) return HULL_SHADER_HANDLE_INVALID;
 
-  se::win::com::com_ptr<ID3D11ShaderReflection> pInfo;
+  s1::win::com::com_ptr<ID3D11ShaderReflection> pInfo;
   hr = D3DReflect(pShaderBuffer->GetBits(), pShaderBuffer->GetSize(),
                   IID_PPV_ARGS(&pInfo));
   if (FAILED(hr) || !pInfo) return HULL_SHADER_HANDLE_INVALID;
@@ -1397,12 +1397,12 @@ void CShaderDeviceDx11::DestroyHullShader(HullShaderHandle_t hShader) {
 DomainShaderHandle_t CShaderDeviceDx11::CreateDomainShader(
     IShaderBuffer *pShaderBuffer) {
   // Create the domain shader
-  se::win::com::com_ptr<ID3D11DomainShader> pShader;
+  s1::win::com::com_ptr<ID3D11DomainShader> pShader;
   HRESULT hr = m_d3d11_device->CreateDomainShader(
       pShaderBuffer->GetBits(), pShaderBuffer->GetSize(), nullptr, &pShader);
   if (FAILED(hr) || !pShader) return DOMAIN_SHADER_HANDLE_INVALID;
 
-  se::win::com::com_ptr<ID3D11ShaderReflection> pInfo;
+  s1::win::com::com_ptr<ID3D11ShaderReflection> pInfo;
   hr = D3DReflect(pShaderBuffer->GetBits(), pShaderBuffer->GetSize(),
                   IID_PPV_ARGS(&pInfo));
   if (FAILED(hr) || !pInfo) return DOMAIN_SHADER_HANDLE_INVALID;
@@ -1428,12 +1428,12 @@ void CShaderDeviceDx11::DestroyDomainShader(DomainShaderHandle_t hShader) {
 ComputeShaderHandle_t CShaderDeviceDx11::CreateComputeShader(
     IShaderBuffer *pShaderBuffer) {
   // Create the compute shader
-  se::win::com::com_ptr<ID3D11ComputeShader> pShader;
+  s1::win::com::com_ptr<ID3D11ComputeShader> pShader;
   HRESULT hr = m_d3d11_device->CreateComputeShader(
       pShaderBuffer->GetBits(), pShaderBuffer->GetSize(), nullptr, &pShader);
   if (FAILED(hr) || !pShader) return COMPUTE_SHADER_HANDLE_INVALID;
 
-  se::win::com::com_ptr<ID3D11ShaderReflection> pInfo;
+  s1::win::com::com_ptr<ID3D11ShaderReflection> pInfo;
   hr = D3DReflect(pShaderBuffer->GetBits(), pShaderBuffer->GetSize(),
                   IID_PPV_ARGS(&pInfo));
   if (FAILED(hr) || !pInfo) return COMPUTE_SHADER_HANDLE_INVALID;
@@ -1540,7 +1540,7 @@ IIndexBuffer *CShaderDeviceDx11::GetDynamicIndexBuffer(
 
 const char *CShaderDeviceDx11::GetDisplayDeviceName() {
   if (m_display_device_name.IsEmpty()) {
-    se::win::com::com_ptr<IDXGIOutput6> pOutput{
+    s1::win::com::com_ptr<IDXGIOutput6> pOutput{
         g_ShaderDeviceMgrDx11.GetAdapterOutput(m_dxgi_adapter_index)};
     if (pOutput) {
       DXGI_OUTPUT_DESC1 desc;
@@ -1562,9 +1562,9 @@ const char *CShaderDeviceDx11::GetDisplayDeviceName() {
 bool CShaderDeviceDx11::DetermineHardwareCaps() {
   HardwareCaps_t &actual_caps = g_pHardwareConfig->ActualCapsForEdit();
 
-  se::win::com::com_ptr<IDXGIAdapter4> adapter{
+  s1::win::com::com_ptr<IDXGIAdapter4> adapter{
       g_ShaderDeviceMgrDx11.GetAdapter(m_dxgi_adapter_index)};
-  se::win::com::com_ptr<IDXGIOutput6> output{
+  s1::win::com::com_ptr<IDXGIOutput6> output{
       g_ShaderDeviceMgrDx11.GetAdapterOutput(m_dxgi_adapter_index)};
 
   if (!g_ShaderDeviceMgrDx11.ComputeCapsFromD3D(&actual_caps, adapter,
@@ -1586,4 +1586,4 @@ bool CShaderDeviceDx11::DetermineHardwareCaps() {
   return true;
 }
 
-}  // namespace se::shaderapidx11
+}  // namespace s1::shaderapidx11

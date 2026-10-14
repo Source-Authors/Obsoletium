@@ -8,7 +8,7 @@
 #include "tier0/icommandline.h"
 #include "tier0/vcrmode.h"
 
-namespace se::launcher {
+namespace s1::launcher {
 
 // Implementation of VCRHelpers.
 struct VCRHelpers : public IVCRHelpers {
@@ -19,6 +19,6 @@ struct VCRHelpers : public IVCRHelpers {
 [[nodiscard]] std::tuple<VCRHelpers, int> CreateVcrHelpers(
     const ICommandLine *command_line);
 
-}  // namespace se::launcher
+}  // namespace s1::launcher
 
 #endif  // SE_LAUNCHER_VCR_HELPERS_H

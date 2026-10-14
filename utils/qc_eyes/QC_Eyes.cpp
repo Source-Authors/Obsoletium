@@ -30,7 +30,7 @@ CQC_EyesApp theApp;
 // CQC_EyesApp initialization
 BOOL CQC_EyesApp::InitInstance() {
   // Install an exception handler.
-  const se::utils::common::ScopedDefaultMinidumpHandler
+  const s1::utils::common::ScopedDefaultMinidumpHandler
       scoped_default_minidumps;
 
   AfxEnableControlContainer();

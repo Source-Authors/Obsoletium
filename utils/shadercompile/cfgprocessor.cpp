@@ -728,7 +728,7 @@ void ComboGenerator::RunAllCombos(CComplexExpression const &skipExpr) {
 
 };  // namespace
 
-namespace se::shader_compile::shader_combo_processor::internal {
+namespace s1::shader_compile::shader_combo_processor::internal {
 
 class CfgEntry {
  public:
@@ -753,7 +753,7 @@ class CfgEntry {
   std::string m_sPrefix;
   std::string m_sSuffix;
 
-  se::shader_compile::shader_combo_processor::CfgEntryInfo m_eiInfo;
+  s1::shader_compile::shader_combo_processor::CfgEntryInfo m_eiInfo;
 };
 
 QuickStrUnique s_uniqueSections, s_strPool;
@@ -1138,9 +1138,9 @@ void ProcessConfiguration(CUtlInplaceBuffer *in) {
   }
 }
 
-};  // namespace se::shader_compile::shader_combo_processor::internal
+};  // namespace s1::shader_compile::shader_combo_processor::internal
 
-namespace se::shader_compile::shader_combo_processor {
+namespace s1::shader_compile::shader_combo_processor {
 
 using CPCHI_t = internal::ComboHandleImpl;
 
@@ -1320,4 +1320,4 @@ void Combo_Free(ComboHandle &rhComboFree) {
   rhComboFree = nullptr;
 }
 
-};  // namespace se::shader_compile::shader_combo_processor
+};  // namespace s1::shader_compile::shader_combo_processor

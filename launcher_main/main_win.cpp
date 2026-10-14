@@ -202,7 +202,7 @@ int Run(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   }
 
   // Do not show fault error boxes, etc.
-  const se::common::windows::ScopedProcessErrorMode scoped_process_error_mode{
+  const s1::win::ScopedProcessErrorMode scoped_process_error_mode{
 #ifdef NDEBUG
       // The system does not display the critical-error-handler message box.
       // Instead, the system sends the error to the calling process.
@@ -232,7 +232,7 @@ int Run(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
 
   char user_error[1024];
   // STEAM OK ... filesystem not mounted yet.
-  const source::ScopedDll dll{dll_path, LOAD_WITH_ALTERED_SEARCH_PATH};
+  const s1::ScopedDll dll{dll_path, LOAD_WITH_ALTERED_SEARCH_PATH};
   if (!dll) {
     _snprintf_s(user_error, _TRUNCATE,
                 "Please check game installed in the folder with less "

@@ -487,11 +487,11 @@ SR_RESULT ExtractPhonemes( const char *wavname, CSpDynamicString& text, CSentenc
 	CUtlVector < WORDRULETYPE > wordRules;
 
 	// dimhotepus: Use our own com ptr.
-	se::win::com::com_ptr<ISpStream> cpInputStream;
-	se::win::com::com_ptr<ISpRecognizer> cpRecognizer;
-	se::win::com::com_ptr<ISpRecoContext> cpRecoContext;
-	se::win::com::com_ptr<ISpRecoGrammar> cpRecoGrammar;
-	se::win::com::com_ptr<ISpPhoneConverter>  cpPhoneConv;
+	s1::win::com::com_ptr<ISpStream> cpInputStream;
+	s1::win::com::com_ptr<ISpRecognizer> cpRecognizer;
+	s1::win::com::com_ptr<ISpRecoContext> cpRecoContext;
+	s1::win::com::com_ptr<ISpRecoGrammar> cpRecoGrammar;
+	s1::win::com::com_ptr<ISpPhoneConverter>  cpPhoneConv;
  
 	// Create basic SAPI stream object
 	// NOTE: The helper SpBindToFile can be used to perform the following operations
@@ -777,7 +777,7 @@ SR_RESULT ExtractPhonemes( const char *wavname, CSpDynamicString& text, CSentenc
 			case SPEI_RECOGNITION:
 			case SPEI_FALSE_RECOGNITION:
 				{
-					se::win::com::com_ptr<ISpRecoResult> cpResult{spEvent.RecoResult()};
+					s1::win::com::com_ptr<ISpRecoResult> cpResult{spEvent.RecoResult()};
 
                     CSpDynamicString dstrText;
                     if (spEvent.eEventId == SPEI_FALSE_RECOGNITION)

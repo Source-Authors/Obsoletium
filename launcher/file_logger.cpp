@@ -25,7 +25,7 @@ bool FilePathLess(CUtlString const& l, CUtlString const& r) {
 
 }  // namespace
 
-namespace se::launcher {
+namespace s1::launcher {
 
 FileLogger::FileLogger(ICommandLine* command_line, IFileSystem* file_system,
                        char (&base_directory)[MAX_PATH])
@@ -196,4 +196,4 @@ void FileLogger::LogAccess(const char* file_path, const char* options) {
   }
 }
 
-}  // namespace se::launcher
+}  // namespace s1::launcher

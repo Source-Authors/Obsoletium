@@ -561,7 +561,7 @@ BOOL CChildFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext *pContext)
 		// Calculate the size of each view within the splitter,
 		//
 		// Our DPI behavior is not initialized yet, so fallback to parent one.
-		const int scaled = se::windows::ui::CDpiWindowBehavior::ScaleByDpi
+		const int scaled = s1::win::ui::CDpiWindowBehavior::ScaleByDpi
 		(
 			USER_DEFAULT_SCREEN_DPI, 3, ::GetDpiForWindow(lpcs->hwndParent)
 		);

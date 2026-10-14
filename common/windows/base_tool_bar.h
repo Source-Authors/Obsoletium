@@ -39,7 +39,7 @@ class CBaseToolBar : public CToolBar {
   BOOL LoadBitmapForDpi(LPCTSTR lpszResourceName, bool isTransparent);
 
  private:
-  se::windows::ui::CDpiWindowBehavior m_dpi_behavior;
+  s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
 };
 
 #endif  // !SE_COMMON_WINDOWS_BASE_TOOL_BAR_

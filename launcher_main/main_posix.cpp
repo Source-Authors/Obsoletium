@@ -73,7 +73,7 @@ void WaitForDebuggerConnect(int argc, char *argv[], int time) {
 
 int main(int argc, char *argv[]) {
   const char kLauncherPath[] = PLATFORM_BIN_DIR "/launcher" DLL_EXT_STRING;
-  const source::ScopedDll launcher_dll {
+  const s1::ScopedDll launcher_dll {
      kLauncherPath, RTLD_NOW
   };
   if (!launcher_dll) {

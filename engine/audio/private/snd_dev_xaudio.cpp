@@ -133,7 +133,7 @@ enum class AudioDeviceFormFactor {
 
 }  // namespace
 
-namespace se::engine::audio::xaudio2 {
+namespace s1::engine::audio::xaudio2 {
 
 /**
  * @brief Callback for XAudio2 device events.
@@ -249,10 +249,10 @@ class CAudioXAudio2 : public CAudioDeviceBase, AudioXAudio2Callback {
 
   unsigned device_clock_divider_{0};
 
-  se::win::com::com_ptr<IMMDeviceEnumerator> mm_device_enumerator_;
-  se::win::com::com_ptr<IMMNotificationClient> mm_notification_client_;
+  s1::win::com::com_ptr<IMMDeviceEnumerator> mm_device_enumerator_;
+  s1::win::com::com_ptr<IMMNotificationClient> mm_notification_client_;
 
-  se::win::com::com_ptr<IXAudio2> xaudio2_engine_;
+  s1::win::com::com_ptr<IXAudio2> xaudio2_engine_;
   IXAudio2MasteringVoice* xaudio2_mastering_voice_{nullptr};
   IXAudio2SourceVoice *xaudio2_source_voice_{nullptr};
 
@@ -267,13 +267,13 @@ class CAudioXAudio2 : public CAudioDeviceBase, AudioXAudio2Callback {
   XAudio2VoiceCallback xaudio2_voice_callback_;
 };
 
-}  // namespace se::engine::audio::xaudio2
+}  // namespace s1::engine::audio::xaudio2
 
 // Create XAudio Device
 IAudioDevice *Audio_CreateXAudioDevice() {
   MEM_ALLOC_CREDIT();
 
-  auto device = std::make_unique<se::engine::audio::xaudio2::CAudioXAudio2>();
+  auto device = std::make_unique<s1::engine::audio::xaudio2::CAudioXAudio2>();
   if (!device->Init()) {
     return nullptr;
   }
@@ -281,7 +281,7 @@ IAudioDevice *Audio_CreateXAudioDevice() {
   return device.release();
 }
 
-namespace se::engine::audio::xaudio2 {
+namespace s1::engine::audio::xaudio2 {
 
 class ScopedPropVariant {
  public:
@@ -331,14 +331,14 @@ class ScopedPropVariant {
 };
 
 static bool GetAudioDeviceFormFactor(
-    se::win::com::com_ptr<IMMDeviceEnumerator> &mm_device_enumerator,
+    s1::win::com::com_ptr<IMMDeviceEnumerator> &mm_device_enumerator,
     EDataFlow device_data_flow, ERole device_role,
     _In_opt_ const wchar_t *endpoint_id,
     AudioDeviceFormFactor& form_factor) {
   // Default value.
   form_factor = AudioDeviceFormFactor::StereoSpeakers;
 
-  se::win::com::com_ptr<IMMDevice> audio_device;
+  s1::win::com::com_ptr<IMMDevice> audio_device;
   HRESULT hr;
 
   if (endpoint_id != nullptr) {
@@ -360,7 +360,7 @@ static bool GetAudioDeviceFormFactor(
     return false;
   }
 
-  se::win::com::com_ptr<IPropertyStore> props;
+  s1::win::com::com_ptr<IPropertyStore> props;
   hr = audio_device->OpenPropertyStore(STGM_READ, &props);
   if (FAILED(hr)) {
     DebugWarn("Get %S audio render endpoint props failed w/e 0x%8x.\n",
@@ -394,7 +394,7 @@ static bool GetAudioDeviceFormFactor(
   // physical speaker topology, which may differ from the channel layout
   // currently exposed to applications by the Windows audio mixer. Use the
   // endpoint's current shared-mode mix format instead.
-  se::win::com::com_ptr<IAudioClient> audio_client;
+  s1::win::com::com_ptr<IAudioClient> audio_client;
   hr = audio_device->Activate(__uuidof(IAudioClient), CLSCTX_ALL,
                               nullptr, reinterpret_cast<void**>(&audio_client));
   if (FAILED(hr)) {
@@ -502,7 +502,7 @@ class DefaultAudioDeviceChangedNotificationClient
  public:
   // Copy enumerator to ensure it is alive till client destructed.
   static HRESULT Create(
-      se::win::com::com_ptr<IMMDeviceEnumerator> mm_device_enumerator,
+      s1::win::com::com_ptr<IMMDeviceEnumerator> mm_device_enumerator,
       EDataFlow device_data_flow, ERole device_role,
       IMMNotificationClient **client) noexcept {
     if (!mm_device_enumerator || !client) return E_POINTER;
@@ -605,7 +605,7 @@ class DefaultAudioDeviceChangedNotificationClient
   }
 
  private:
-  se::win::com::com_ptr<IMMDeviceEnumerator> mm_device_enumerator_;
+  s1::win::com::com_ptr<IMMDeviceEnumerator> mm_device_enumerator_;
 
   const EDataFlow device_data_flow_;
   const ERole device_role_;
@@ -614,7 +614,7 @@ class DefaultAudioDeviceChangedNotificationClient
   HRESULT registration_hr_;
 
   DefaultAudioDeviceChangedNotificationClient(
-      se::win::com::com_ptr<IMMDeviceEnumerator> &&mm_device_enumerator,
+      s1::win::com::com_ptr<IMMDeviceEnumerator> &&mm_device_enumerator,
       EDataFlow device_data_flow, ERole device_role) noexcept
       : mm_device_enumerator_{std::move(mm_device_enumerator)},
         device_data_flow_{device_data_flow},
@@ -1177,4 +1177,4 @@ const char *CAudioXAudio2::DeviceName() {
   return "XAudio2 Speakers";
 }
 
-}  // namespace se::engine::audio::xaudio2
+}  // namespace s1::engine::audio::xaudio2

@@ -6,7 +6,7 @@
 #include "tier0/memalloc.h"
 #include "tier0/dbg.h"
 
-namespace se::launcher {
+namespace s1::launcher {
 
 // Dump heap leaks.
 class ScopedHeapLeakDumper {
@@ -27,6 +27,6 @@ class ScopedHeapLeakDumper {
   const bool should_check_leaks_;
 };
 
-}  // namespace se::launcher
+}  // namespace s1::launcher
 
 #endif  // SE_LAUNCHER_SCOPED_HEAP_LEAK_DUMPER_H

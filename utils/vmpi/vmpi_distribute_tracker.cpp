@@ -437,7 +437,7 @@ void VMPITracker_End()
 
 bool VMPITracker_WriteDebugFile( const char *pFilename )
 {
-	auto [fp, errc] = se::posix::posix_file_stream_factory::open( pFilename, "wt" );
+	auto [fp, errc] = s1::posix::posix_file_stream_factory::open( pFilename, "wt" );
 	if ( !errc )
 	{
 		std::tie(std::ignore, errc) = fp.print( "# work units: %zd\n", g_WorkUnits.Count() );

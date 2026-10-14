@@ -19,7 +19,7 @@
 #include "com_ptr.h"
 
 // Gets the declspec associated with a vertex format
-se::win::com::com_ptr<IDirect3DVertexDeclaration9> FindOrCreateVertexDecl(
+s1::win::com::com_ptr<IDirect3DVertexDeclaration9> FindOrCreateVertexDecl(
 	IDirect3DDevice9Ex *pD3D,
 	VertexFormat_t fmt,
 	bool bStaticLit,

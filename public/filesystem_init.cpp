@@ -282,7 +282,7 @@ const char *FileSystem_GetLastErrorString()
 static KeyValuesAD ReadKeyValuesFile( const char *pFilename )
 {
 	// Read in the gameinfo.txt file and null-terminate it.
-	auto [fp, errc] = se::posix::posix_file_stream_factory::open(pFilename, "rb");
+	auto [fp, errc] = s1::posix::posix_file_stream_factory::open(pFilename, "rb");
 	if ( errc )
 		return KeyValuesAD{ nullptr };
 	

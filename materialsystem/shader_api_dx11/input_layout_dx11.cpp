@@ -206,7 +206,7 @@ uint32_t ComputeInputDesc(VertexFormat_t fmt,
 
 }  // namespace
 
-namespace se::shaderapidx11 {
+namespace s1::shaderapidx11 {
 
 // Gets the input layout associated with a vertex format.
 win::com::com_ptr<ID3D11InputLayout> CreateInputLayout(
@@ -219,7 +219,7 @@ win::com::com_ptr<ID3D11InputLayout> CreateInputLayout(
   Assert(device);
   Assert(byte_code);
 
-  se::win::com::com_ptr<ID3D11InputLayout> input_layout;
+  s1::win::com::com_ptr<ID3D11InputLayout> input_layout;
   HRESULT hr = device->CreateInputLayout(descs, decs_count, byte_code,
                                          byte_code_size, &input_layout);
   if (FAILED(hr)) {
@@ -234,4 +234,4 @@ win::com::com_ptr<ID3D11InputLayout> CreateInputLayout(
   return input_layout;
 }
 
-}  // namespace se::shaderapidx11
+}  // namespace s1::shaderapidx11

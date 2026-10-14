@@ -74,7 +74,7 @@ static HRESULT GetLevelDesc( IDirect3DBaseTexture* pBaseTexture, UINT level, D3D
 		Warning( __FUNCTION__ ": IDirect3DBaseTexture(type = 0x%x)::GetLevelDesc(level = 0x%x) failed w/e %s.\n",
 			pBaseTexture->GetType(),
 			level,
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 	}
 
 	return hr;
@@ -135,7 +135,7 @@ static ImageFormat GetImageFormat( IDirect3DBaseTexture* pTexture )
 			Assert(false);
 			Warning( __FUNCTION__ ": IDirect3DVolumeTexture9::GetLevelDesc(level = 0x%x) failed w/e %s.\n",
 				0,
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 	}
 
@@ -255,7 +255,7 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 				usage,
 				d3dFormat,
 				pool,
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 			return nullptr;
 		}
 	}
@@ -297,7 +297,7 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 				usage,
 				d3dFormat,
 				pool,
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 			return nullptr;
 		}
 	}
@@ -353,7 +353,7 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 				usage,
 				d3dFormat,
 				pool,
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 			return nullptr;
 		}
 	}
@@ -444,7 +444,7 @@ bool LockTexture( ShaderAPITextureHandle_t bindId, int copy, IDirect3DBaseTextur
 {
 	Assert( !s_bInLock );
 	
-	se::win::com::com_ptr<IDirect3DSurface> pSurf;
+	s1::win::com::com_ptr<IDirect3DSurface> pSurf;
 	HRESULT hr = GetSurfaceFromTexture( pTexture, level, cubeFaceID, &pSurf );
 	if ( FAILED( hr ) )
 		return false;
@@ -485,7 +485,7 @@ void UnlockTexture( ShaderAPITextureHandle_t bindId, int copy, IDirect3DBaseText
 
 	Assert( s_bInLock );
 	
-	se::win::com::com_ptr<IDirect3DSurface> pSurf;
+	s1::win::com::com_ptr<IDirect3DSurface> pSurf;
 	HRESULT hr = GetSurfaceFromTexture( pTexture, level, cubeFaceID, &pSurf );
 	if (FAILED(hr))
 		return;
@@ -557,7 +557,7 @@ static void BlitSurfaceBits( TextureLoadInfo_t &info, int xOffset, int yOffset, 
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
 	// Get the level of the texture we want to write into
-	se::win::com::com_ptr<IDirect3DSurface> pTextureLevel;
+	s1::win::com::com_ptr<IDirect3DSurface> pTextureLevel;
 	HRESULT hr = GetSurfaceFromTexture( info.m_pTexture, info.m_nLevel, info.m_CubeFaceID, &pTextureLevel );
 	if ( FAILED( hr ) )
 		return;
@@ -581,7 +581,7 @@ static void BlitSurfaceBits( TextureLoadInfo_t &info, int xOffset, int yOffset, 
 		ImageFormat dstFormat = ImageLoader::D3DFormatToImageFormat( desc.Format );
 		D3DFORMAT dstFormatD3D = ImageLoader::ImageFormatToD3DFormat( dstFormat );
 
-		se::win::com::com_ptr<IDirect3DSurface> pSrcSurface;
+		s1::win::com::com_ptr<IDirect3DSurface> pSrcSurface;
 		bool bCopyBitsToSrcSurface = true;
 
 #if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
@@ -595,7 +595,7 @@ static void BlitSurfaceBits( TextureLoadInfo_t &info, int xOffset, int yOffset, 
 		{
 			if ( srcStride == 0 || srcStride == info.m_nWidth * ImageLoader::SizeInBytes( info.m_SrcFormat ) )
 			{
-				se::win::com::com_ptr<IDirect3DTexture9> pTempTex;
+				s1::win::com::com_ptr<IDirect3DTexture9> pTempTex;
 				if ( Dx9Device()->CreateTexture( info.m_nWidth, info.m_nHeight, 1, 0, dstFormatD3D, D3DPOOL_SYSTEMMEM, &pTempTex, (HANDLE*) &info.m_pSrcData ) == S_OK )
 				{
 					if ( pTempTex->GetSurfaceLevel( 0, &pSrcSurface ) == S_OK )
@@ -625,7 +625,7 @@ static void BlitSurfaceBits( TextureLoadInfo_t &info, int xOffset, int yOffset, 
 				tempH <<= mip;
 			}
 
-			se::win::com::com_ptr<IDirect3DTexture9> pTempTex;
+			s1::win::com::com_ptr<IDirect3DTexture9> pTempTex;
 			if ( Dx9Device()->CreateTexture( tempW, tempH, mip+1, 0, dstFormatD3D, D3DPOOL_SYSTEMMEM, &pTempTex, NULL ) == S_OK )
 			{
 				if ( pTempTex->GetSurfaceLevel( mip, &pSrcSurface ) == S_OK )
@@ -877,7 +877,7 @@ void LoadVolumeTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int i
 	TextureLoadInfo_t sliceInfo = info;
 
 #if !defined( DX_TO_GL_ABSTRACTION )
-	se::win::com::com_ptr<IDirect3DVolumeTexture9> pStagingTexture;
+	s1::win::com::com_ptr<IDirect3DVolumeTexture9> pStagingTexture;
 	if ( !info.m_bTextureIsLockable )
 	{
 		if ( Dx9Device()->CreateVolumeTexture( desc.Width, desc.Height, desc.Depth, iMipCount, 0, desc.Format, D3DPOOL_SYSTEMMEM, &pStagingTexture, NULL ) != S_OK )
@@ -943,7 +943,7 @@ void LoadCubeTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVT
 	TextureLoadInfo_t faceInfo = info;
 
 #if !defined( DX_TO_GL_ABSTRACTION )
-	se::win::com::com_ptr<IDirect3DCubeTexture9> pStagingTexture;
+	s1::win::com::com_ptr<IDirect3DCubeTexture9> pStagingTexture;
 	if ( !info.m_bTextureIsLockable )
 	{
 		if ( Dx9Device()->CreateCubeTexture( desc.Width, iMipCount, 0, desc.Format, D3DPOOL_SYSTEMMEM, &pStagingTexture, NULL ) != S_OK )
@@ -1021,7 +1021,7 @@ void LoadTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVTFFra
 	// If blitting more than one mip level of an unlockable texture, create a temporary
 	// texture for all mip levels only call UpdateTexture once. For textures with
 	// only a single mip level, fall back on the support in BlitSurfaceBits. -henryg
-	se::win::com::com_ptr<IDirect3DTexture9> pStagingTexture;
+	s1::win::com::com_ptr<IDirect3DTexture9> pStagingTexture;
 	if ( !info.m_bTextureIsLockable && iMipCount > 1 )
 	{
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - CreateSysmemTexture", __FUNCTION__ );
@@ -1082,11 +1082,11 @@ void LoadTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVTFFra
 			{
 				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - UpdateSurface - %d", __FUNCTION__, mip );
 
-				se::win::com::com_ptr<IDirect3DSurface9> pSrcSurf;
+				s1::win::com::com_ptr<IDirect3DSurface9> pSrcSurf;
 				if ( pStagingTexture->GetSurfaceLevel( mip, &pSrcSurf ) != S_OK )
 					Warning( "LoadTextureFromVTF: couldn't get surface level %d for system surface\n", mip );
 				
-				se::win::com::com_ptr<IDirect3DSurface9> pDstSurf;
+				s1::win::com::com_ptr<IDirect3DSurface9> pDstSurf;
 				if ( pTex->GetSurfaceLevel( mip, &pDstSurf ) != S_OK )
 					Warning( "LoadTextureFromVTF: couldn't get surface level %d for dest surface\n", mip );
 				{

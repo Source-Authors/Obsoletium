@@ -32,7 +32,7 @@ public:
 
 mxWindow::mxWindow (mxWindow *parent, int x, int y, int w, int h, const char *label, int style)
 : mxWidget (parent, x, y, w, h, label),
-  d_dpiWindowBehavior{std::make_unique<se::windows::ui::CDpiWindowBehavior>()}
+  d_dpiWindowBehavior{std::make_unique<s1::win::ui::CDpiWindowBehavior>()}
 {
 	d_this = new mxWindow_i;
 	d_this->d_uTimer = 0;

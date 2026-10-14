@@ -5,7 +5,7 @@
 
 #include "tier1/interface.h"
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 int StartVGUI(CreateInterfaceFn dedicatedFactory);
 void StopVGUI();
@@ -16,6 +16,6 @@ bool VGUIIsInConfig();
 void VGUIFinishedConfig();
 void VGUIPrintf(const char *msg);
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated
 
 #endif  // !SE_DEDICATED_VGUI_VGUI_HELPERS_H_

@@ -8,7 +8,7 @@
 #include <wmpids.h>
 #include <wmp.h>
 
-namespace se::smp {
+namespace s1::smp {
 
 class SteamWmpEventDispatch : public CComObjectRootEx<CComSingleThreadModel>,
                               public IWMPEvents,
@@ -104,6 +104,6 @@ class SteamWmpEventDispatch : public CComObjectRootEx<CComSingleThreadModel>,
 
 using CComWMPEventDispatch = CComObject<SteamWmpEventDispatch>;
 
-}  // namespace se::smp
+}  // namespace s1::smp
 
 #endif  // !SE_UTILS_SMP_STEAM_WMP_EVENT_DISPATCH_H_

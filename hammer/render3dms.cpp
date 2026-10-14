@@ -1496,8 +1496,8 @@ void CRender3D::EndRenderFrame(void)
 			
 			unsigned dpi = GetDpiForWindow(m_WinData.hWnd);
 			TextOut(m_WinData.hDC,
-				se::windows::ui::CDpiWindowBehavior::ScaleByDpi( USER_DEFAULT_SCREEN_DPI, 2, dpi ),
-				se::windows::ui::CDpiWindowBehavior::ScaleByDpi( USER_DEFAULT_SCREEN_DPI, 18, dpi ),
+				s1::win::ui::CDpiWindowBehavior::ScaleByDpi( USER_DEFAULT_SCREEN_DPI, 2, dpi ),
+				s1::win::ui::CDpiWindowBehavior::ScaleByDpi( USER_DEFAULT_SCREEN_DPI, 18, dpi ),
 				szText,
 				nLen);
 		}

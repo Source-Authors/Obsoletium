@@ -10,7 +10,7 @@
 
 #include "tier0/dbg.h"
 
-namespace se::common::windows {
+namespace s1::win {
 
 [[nodiscard]] std::error_code GetSystemError(int errc) noexcept {
   return std::error_code{errc, std::system_category()};
@@ -51,6 +51,6 @@ class ScopedWinsockInitializer {
   const bool is_started_;
 };
 
-}  // namespace se::common::windows
+}  // namespace s1::win
 
 #endif  // !SE_COMMON_WINDOWS_SCOPED_WINSOCK_INITIALIZER_H_

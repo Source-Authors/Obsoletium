@@ -24,7 +24,7 @@ class CBaseComboBox : public CComboBox {
   DECLARE_MESSAGE_MAP()
 
  protected:
-  se::windows::ui::CDpiWindowBehavior m_dpi_behavior;
+  s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
 
   bool m_dpi_behavior_created;
 };

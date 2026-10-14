@@ -43,7 +43,7 @@ _Post_equals_last_error_ unsigned long __stdcall GetLastError();
 
 #endif
 
-namespace source {
+namespace s1 {
 
 // Is function pointer?
 template <typename F>
@@ -143,6 +143,6 @@ class ScopedDll {
 #endif
 };
 
-}  // namespace source
+}  // namespace s1
 
 #endif  // !SE_COMMON_SCOPED_DLL_H_

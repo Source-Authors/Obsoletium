@@ -7,7 +7,7 @@
 #include "steam_wmp_host.h"
 #include "steam_wmp_event.h"
 
-namespace se::smp {
+namespace s1::smp {
 
 extern CComPtr<IWMPPlayer> g_spWMPPlayer;
 extern SteamWmpHost* g_pFrame;
@@ -518,4 +518,4 @@ void SteamWmpEventDispatch::MouseMove(short nButton, short nShiftState, long fX,
 void SteamWmpEventDispatch::MouseUp(short nButton, short nShiftState, long fX,
                                     long fY) {}
 
-}  // namespace se::smp
+}  // namespace s1::smp

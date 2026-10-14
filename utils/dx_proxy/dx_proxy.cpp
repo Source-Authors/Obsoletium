@@ -295,7 +295,7 @@ SE_DX_PROXY_API HRESULT WINAPI Proxy_D3DCompileFromFile(
     ID3DBlob** ppCode, ID3DBlob** ppErrorMsgs) {
   if (!pTarget || !ppCode) return E_POINTER;
 
-  static se::dx_proxy::D3DIncludeImpl include_impl;
+  static s1::dx_proxy::D3DIncludeImpl include_impl;
 
   if (!include) include = &include_impl;
 

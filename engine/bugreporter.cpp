@@ -229,7 +229,7 @@ MSVC_END_WARNING_OVERRIDE_SCOPE()
 		break;
 	}
 #elif defined(OSX)
-	auto [fpVersionInfo, rc] = se::posix::posix_file_stream_factory::open( "/usr/bin/sw_vers", "r" );
+	auto [fpVersionInfo, rc] = s1::posix::posix_file_stream_factory::open( "/usr/bin/sw_vers", "r" );
 	constexpr char pszSearchString[]{"ProductVersion:\t"};
 	constexpr intp cchSearchString = ssize( pszSearchString ) - 1;
 	char rgchVersionLine[1024];
@@ -271,7 +271,7 @@ MSVC_END_WARNING_OVERRIDE_SCOPE()
 		}
 	}
 #elif defined(LINUX)
-	auto [fpKernelVer, rc] = se::posix::posix_file_stream_factory::open( "/proc/version_signature", "r" );
+	auto [fpKernelVer, rc] = s1::posix::posix_file_stream_factory::open( "/proc/version_signature", "r" );
 
 	if ( rc )
 	{
@@ -2297,7 +2297,7 @@ bool CBugUIPanel::UploadFile( char const *local, char const *remote, bool bDelet
 	}
 	else
 	{
-		auto [r, rc] = se::posix::posix_file_stream_factory::open( va( "%s", remote ), "wb" );
+		auto [r, rc] = s1::posix::posix_file_stream_factory::open( va( "%s", remote ), "wb" );
 		if ( rc )
 		{
 			Warning( "CBugUIPanel::UploadFile:  Unable to open remote path '%s': %s\n", remote, rc.message().c_str() );

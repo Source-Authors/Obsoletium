@@ -2803,7 +2803,7 @@ int SortAndBalanceBones(int iCount, int iMaxCount, int bones[],
 
 int main(int argc, char** argv) {
   // Install an exception handler.
-  const se::utils::common::ScopedDefaultMinidumpHandler
+  const s1::utils::common::ScopedDefaultMinidumpHandler
       scoped_default_minidumps;
 
   // Header
@@ -2817,10 +2817,10 @@ int main(int argc, char** argv) {
   // supports using a UTF-8 code page.
   constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
 
-  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-  if (!V_strieq(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+  const s1::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (!V_strieq(s1::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
     fprintf(stderr, "setlocale('%s') failed, current locale is '%s'.\n",
-            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+            kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale());
   }
 
   // Init command line stuff

@@ -95,7 +95,7 @@ void MergeResLists(IFileSystem *file_system, CUtlVector<CUtlString> &fileNames,
 
 }  // namespace
 
-namespace se::launcher {
+namespace s1::launcher {
 
 enum class State { BuildingListing = 0, GeneratingCaches, Done };
 
@@ -450,4 +450,4 @@ void SortResourceListing(IFileSystem *file_system, const char *file_name,
   SaveResourceListing(file_system, sorted, file_name, search_path);
 }
 
-}  // namespace se::launcher
+}  // namespace s1::launcher

@@ -1001,7 +1001,7 @@ int ParseCommandLine( int argc, char **argv )
 		else if ( V_strieq( argv[i], "-FullMinidumps" ) )
 		{
 			Msg( "--full-minidumps: true\n" );
-			se::utils::common::EnableFullMinidumps( true );
+			s1::utils::common::EnableFullMinidumps( true );
 		}
 		else if ( V_strieq( argv[i], CMDLINEOPTION_NOVCONFIG ) )
 		{
@@ -1287,10 +1287,10 @@ int main (int argc, char **argv)
 	// supports using a UTF-8 code page.
 	constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
 
-	const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-	if (!V_strieq(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+	const s1::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+	if (!V_strieq(s1::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
 		Warning("setlocale('%s') failed, current locale is '%s'.\n",
-				kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+				kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale());
 	}
 
 	MathLib_Init( 2.2f, 2.2f, 0.0f, 1, false, false, false, false );
@@ -1304,11 +1304,11 @@ int main (int argc, char **argv)
 #ifdef MPI
 	if ( g_bUseMPI && !g_bMPIMaster )
 	{
-		const se::utils::common::ScopedMinidumpHandler minidump{VMPI_ExceptionFilter};
+		const s1::utils::common::ScopedMinidumpHandler minidump{VMPI_ExceptionFilter};
 		return RunVVis( argc, argv );
 	}
 #endif
-	const se::utils::common::ScopedDefaultMinidumpHandler minidump;
+	const s1::utils::common::ScopedDefaultMinidumpHandler minidump;
 	return RunVVis( argc, argv );
 }
 

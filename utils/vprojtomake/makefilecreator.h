@@ -10,7 +10,7 @@
 #include "vcprojconvert.h"
 #include "filesystem.h"
 
-namespace se::vprojtomake {
+namespace s1::vprojtomake {
 
 class CMakefileCreator {
  public:
@@ -52,6 +52,6 @@ class CMakefileCreator {
   CUtlSymbol m_BaseDir;
 };
 
-}  // namespace se::vprojtomake
+}  // namespace s1::vprojtomake
 
 #endif  // !SE_UTILS_VPROJTOMAKE_MAKEFILECREATOR_H_

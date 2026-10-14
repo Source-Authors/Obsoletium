@@ -677,7 +677,7 @@ bool CAudioDirectSound::SNDDMA_InitInterleaved( LPDIRECTSOUND8 lpDS, WAVEFORMATE
 		
 		dsbdesc.dwFlags |= DSBCAPS_GLOBALFOCUS;
 
-		se::win::com::com_ptr<IDirectSoundBuffer, &IID_IDirectSoundBuffer> buffer;
+		s1::win::com::com_ptr<IDirectSoundBuffer, &IID_IDirectSoundBuffer> buffer;
 		if(!FAILED(lpDS->CreateSoundBuffer(&dsbdesc, &buffer, NULL)) &&
 		   !FAILED(buffer.QueryInterface(IID_IDirectSoundBuffer8, &pDSBuf)))
 		{
@@ -919,7 +919,7 @@ sndinitstat CAudioDirectSound::SNDDMA_InitDirect( void )
 			buffer_desc.lpwfxFormat = &primary_format;
 			buffer_desc.dwFlags |= DSBCAPS_GLOBALFOCUS;
 
-			se::win::com::com_ptr<IDirectSoundBuffer, &IID_IDirectSoundBuffer> buffer;
+			s1::win::com::com_ptr<IDirectSoundBuffer, &IID_IDirectSoundBuffer> buffer;
 			if (FAILED(hr = pDS->CreateSoundBuffer(&buffer_desc, &buffer, nullptr)) || 
 				FAILED(hr = buffer.QueryInterface(IID_IDirectSoundBuffer8, &pDSBuf)))
 			{
@@ -1373,7 +1373,7 @@ bool CAudioDirectSound::SNDDMA_InitSurround(LPDIRECTSOUND8 lpDS, WAVEFORMATEX* l
 
 	dsbuf.lpwfxFormat = &wvex;
 
-	se::win::com::com_ptr<IDirectSoundBuffer, &IID_IDirectSoundBuffer> buffer;
+	s1::win::com::com_ptr<IDirectSoundBuffer, &IID_IDirectSoundBuffer> buffer;
 	
 	// create 4 mono buffers FL, FR, RL, RR
 	if (DS_OK != lpDS->CreateSoundBuffer(&dsbuf, &buffer, NULL) ||

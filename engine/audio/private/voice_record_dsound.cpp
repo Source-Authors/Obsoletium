@@ -75,10 +75,10 @@ private:
 
 
 private:
-	source::ScopedDll					m_hInstDS;
+	s1::ScopedDll					m_hInstDS;
 
-	se::win::com::com_ptr<IDirectSoundCapture8, &IID_IDirectSoundCapture8> m_pCapture;
-	se::win::com::com_ptr<IDirectSoundCaptureBuffer8, &IID_IDirectSoundCaptureBuffer8> m_pCaptureBuffer;
+	s1::win::com::com_ptr<IDirectSoundCapture8, &IID_IDirectSoundCapture8> m_pCapture;
+	s1::win::com::com_ptr<IDirectSoundCaptureBuffer8, &IID_IDirectSoundCaptureBuffer8> m_pCaptureBuffer;
 
 	// How many bytes our capture buffer has.
 	DWORD						m_nCaptureBufferBytes;
@@ -95,7 +95,7 @@ private:
 
 
 VoiceRecord_DSound::VoiceRecord_DSound()
-	: m_hInstDS{source::ScopedDll("N/A", 0)}
+	: m_hInstDS{s1::ScopedDll("N/A", 0)}
 {
 	m_nCaptureBufferBytes = 0;
 	Clear();
@@ -152,7 +152,7 @@ bool VoiceRecord_DSound::Init(int sampleRate)
 	DSCBUFFERDESC dscDesc;
 	DirectSoundCaptureCreate8Fn createFn;
 	const GUID FAR *pGuid;
-	se::win::com::com_ptr<IDirectSoundCaptureBuffer, &IID_IDirectSoundCaptureBuffer> captureBuffer;
+	s1::win::com::com_ptr<IDirectSoundCaptureBuffer, &IID_IDirectSoundCaptureBuffer> captureBuffer;
 	std::error_code rc;
 	
 	Term();
@@ -170,7 +170,7 @@ bool VoiceRecord_DSound::Init(int sampleRate)
 	};
 
 	// Load the DSound DLL.
-	m_hInstDS = source::ScopedDll( "dsound.dll", LOAD_LIBRARY_SEARCH_SYSTEM32 );
+	m_hInstDS = s1::ScopedDll( "dsound.dll", LOAD_LIBRARY_SEARCH_SYSTEM32 );
 	if(!m_hInstDS)
 	{
 		Warning( "Unable to load dsound.dll. Will continue without voice recording. %s ",

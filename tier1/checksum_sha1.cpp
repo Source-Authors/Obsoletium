@@ -186,7 +186,7 @@ bool CSHA1::HashFile(char *szFileName)
 	// dimhotepus: Safe file hashing.
 	if(!szFileName) return false;
 
-	auto [fIn, errc] = se::posix::posix_file_stream_factory::open(szFileName, "rb");
+	auto [fIn, errc] = s1::posix::posix_file_stream_factory::open(szFileName, "rb");
 	if(errc) return false;
 
 	int64_t ulFileSize;

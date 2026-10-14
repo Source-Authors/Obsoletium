@@ -10,7 +10,7 @@
 
 #include <type_traits>
 
-namespace se::win::com {
+namespace s1::win::com {
 
 /**
  * @brief COM interface concept.
@@ -29,6 +29,6 @@ class com_ptr : public _com_ptr_t<_com_IIID<TInterface, TIid>> {
   using interface_concept = com_interface_concept<TInterface>;
 };
 
-}  // namespace se::win::com
+}  // namespace s1::win::com
 
 #endif  // !SE_COMMON_COM_COM_PTR_H_

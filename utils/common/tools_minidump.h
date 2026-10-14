@@ -5,7 +5,7 @@
 #ifndef SE_UTILS_COMMON_TOOLS_MINIDUMP_H_
 #define SE_UTILS_COMMON_TOOLS_MINIDUMP_H_
 
-namespace se::utils::common {
+namespace s1::utils::common {
 
 /**
  * @brief Defaults to small minidumps.
@@ -75,6 +75,6 @@ class ScopedDefaultMinidumpHandler {
   const ScopedMinidumpHandler handler_;
 };
 
-}  // namespace se::utils::common
+}  // namespace s1::utils::common
 
 #endif  // !SE_UTILS_COMMON_TOOLS_MINIDUMP_H_

@@ -86,7 +86,7 @@ struct WideArgs {
 
 }  // namespace
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 // Parse command line and build command line arguments pack. |command_line|
 // Command line.
@@ -131,4 +131,4 @@ namespace se::dedicated {
   return Args{argv.release(), argc};
 }
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated

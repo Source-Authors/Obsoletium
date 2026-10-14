@@ -9,7 +9,7 @@
 
 FORWARD_DECLARE_HANDLE(HBITMAP);
 
-namespace se::windows::ui {
+namespace s1::win::ui {
 
 /**
  * @brief Scale bitmap from old DPI to a new one.
@@ -23,6 +23,6 @@ namespace se::windows::ui {
 HBITMAP ScaleBitmapForDpi(HBITMAP sourceBmp, unsigned oldDpiX, unsigned oldDpiY,
                           unsigned newDpiX, unsigned newDpiY);
 
-}  // namespace se::windows::ui
+}  // namespace s1::win::ui
 
 #endif  // !SE_COMMON_WINDOWS_BITMAP_SCALE_H_

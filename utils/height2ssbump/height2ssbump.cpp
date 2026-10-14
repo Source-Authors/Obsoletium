@@ -32,7 +32,7 @@ void PrintArgSummaryAndExit() {
 
 int main(int argc, char **argv) {
   // Install an exception handler.
-  const se::utils::common::ScopedDefaultMinidumpHandler
+  const s1::utils::common::ScopedDefaultMinidumpHandler
       scoped_default_minidumps;
 
   const ScopedCommandLineProgram scoped_command_line_program(argc, argv);

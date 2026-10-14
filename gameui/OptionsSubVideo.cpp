@@ -117,7 +117,7 @@ static const char* GetNameForDXLevel(int dxlevel, char (&name)[bufferSize])
 //-----------------------------------------------------------------------------
 static bool HasDirectXRuntime(const char* runtimeDllName)
 {
-	source::ScopedDll directxRuntime{runtimeDllName, LOAD_LIBRARY_SEARCH_SYSTEM32};
+	s1::ScopedDll directxRuntime{runtimeDllName, LOAD_LIBRARY_SEARCH_SYSTEM32};
 	return !directxRuntime.error_code();
 }
 	
@@ -1618,13 +1618,13 @@ COptionsSubVideo::~COptionsSubVideo()
 }
 
 
-[[nodiscard]] static se::posix::io_result<se::posix::posix_file_stream> FOpenGameHDFile( const char *pchMode )
+[[nodiscard]] static s1::posix::io_result<s1::posix::posix_file_stream> FOpenGameHDFile( const char *pchMode )
 {
 	const char *pGameDir = engine->GetGameDirectory();
 	char szModSteamInfPath[ 1024 ];
 	V_ComposeFileName( pGameDir, "game_hd.txt", szModSteamInfPath );
 
-	return se::posix::posix_file_stream_factory::open( szModSteamInfPath, pchMode );
+	return s1::posix::posix_file_stream_factory::open( szModSteamInfPath, pchMode );
 }
 
 

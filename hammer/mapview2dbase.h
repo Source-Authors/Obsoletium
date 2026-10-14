@@ -163,7 +163,7 @@ protected:
 	// mouse drag (space + leftbutton):
 	bool	m_bMouseDrag;	// status indicator
 
-	se::windows::ui::CDpiWindowBehavior m_dpiWindowBehavior;
+	s1::win::ui::CDpiWindowBehavior m_dpiWindowBehavior;
 
 	// Generated message map functions
 	//{{AFX_MSG(CMapView2DBase)

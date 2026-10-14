@@ -16,7 +16,7 @@
 
 using HRESULT = long;
 
-namespace se::win::com {
+namespace s1::win::com {
 
 #ifdef SHADERAPIDX9
 /**
@@ -271,6 +271,6 @@ inline const char* GetD3DErrorDescription(HRESULT hr) {
 }
 #endif
 
-}  // namespace se::win::com
+}  // namespace s1::win::com
 
 #endif  // !SE_COMMON_WINDOWS_COM_ERROR_CATEGORY_H_

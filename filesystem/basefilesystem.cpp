@@ -89,7 +89,7 @@ static void LogFileOpen( const char *vpk, const char *pFilename, const char *pAb
 		return;
 
 	// Open file for write or append
-	auto [f, rc] = se::posix::posix_file_stream_factory::open( "opened_files.txt", mode );
+	auto [f, rc] = s1::posix::posix_file_stream_factory::open( "opened_files.txt", mode );
 	Assert( !rc );
 	if ( !rc )
 	{

@@ -24,7 +24,7 @@ using WPARAM = UINT_PTR; //-V677
 using LPARAM = LONG_PTR; //-V677
 using LRESULT = LONG_PTR; //-V677
 
-namespace se::windows::ui {
+namespace s1::win::ui {
 
 /**
  * @brief Window behavior to handle DPI settings.
@@ -118,6 +118,6 @@ class CDpiWindowBehavior {
 #endif
 };
 
-}  // namespace se::windows::ui
+}  // namespace s1::win::ui
 
 #endif  // !SE_COMMON_WINDOWS_DPI_WND_BEHAVIOR_H_

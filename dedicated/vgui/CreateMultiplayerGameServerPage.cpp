@@ -90,7 +90,7 @@ const char *GetLiblistFallbackDir(const char *pszGameDir) {
 
 }  // namespace
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
@@ -768,6 +768,6 @@ void CCreateMultiplayerGameServerPage::OnTextChanged(Panel *panel) {
   }
 }
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated
 
 #endif  // _WIN32

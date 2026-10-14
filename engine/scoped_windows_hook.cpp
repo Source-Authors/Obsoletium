@@ -11,7 +11,7 @@
 #include "winlite.h"
 #include "tier0/dbg.h"
 
-namespace source::engine::win {
+namespace s1::engine::win {
 
 // Creates scoped windows hook by hook type, hook procedure, instance and thread id.
 ScopedWindowsHook::ScopedWindowsHook( int hook_type,
@@ -46,4 +46,4 @@ ScopedWindowsHook::~ScopedWindowsHook() noexcept
 	return ::CallNextHookEx( nullptr, hook_code, wide_param, low_param );
 }
 
-}  // namespace source::engine::win
+}  // namespace s1::engine::win

@@ -17,7 +17,7 @@
 #include "posix_file_stream.h"
 #endif
 
-namespace se::launcher {
+namespace s1::launcher {
 
 // Scoped app relaunch.
 class ScopedAppRelaunch {
@@ -47,7 +47,7 @@ class ScopedAppRelaunch {
     }
 
     auto [fp, rc] =
-        se::posix::posix_file_stream_factory::open(kRelaunchFilePath, "r");
+        s1::posix::posix_file_stream_factory::open(kRelaunchFilePath, "r");
     if (!rc) {
       char cmd[256];
       size_t read;
@@ -103,6 +103,6 @@ class ScopedAppRelaunch {
 #endif
 };
 
-}  // namespace se::launcher
+}  // namespace s1::launcher
 
 #endif  // SE_LAUNCHER_SCOPED_APP_RELAUNCH_H

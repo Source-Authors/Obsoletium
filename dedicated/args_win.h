@@ -5,7 +5,7 @@
 #include <system_error>
 #include <variant>
 
-namespace se::dedicated {
+namespace s1::dedicated {
 
 /**
  * @brief Command line arguments.
@@ -59,4 +59,4 @@ class Args {
       : values_{values}, count_{count} {}
 };
 
-}  // namespace se::dedicated
+}  // namespace s1::dedicated

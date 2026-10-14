@@ -9,7 +9,7 @@
 
 #include "filememcache.h"
 
-namespace se::dx_proxy {
+namespace s1::dx_proxy {
 
 class D3DIncludeImpl : public ID3DInclude {
  public:
@@ -44,6 +44,6 @@ class D3DIncludeImpl : public ID3DInclude {
   FileCache file_cache_;
 };
 
-}  // namespace se::dx_proxy
+}  // namespace s1::dx_proxy
 
 #endif  // !SE_UTILS_DX_PROXY_DXINCLUDEIMPL_H_

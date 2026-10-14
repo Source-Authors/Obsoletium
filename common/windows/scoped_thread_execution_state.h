@@ -12,7 +12,7 @@ using EXECUTION_STATE = unsigned long;
 extern "C" __declspec(dllimport) EXECUTION_STATE __stdcall
 SetThreadExecutionState(IN_P EXECUTION_STATE esFlags);
 
-namespace se::common::windows {
+namespace s1::win {
 
 /**
  * @brief Thread execution requirements.
@@ -103,6 +103,6 @@ class ScopedThreadExecutionState {
   const ThreadExecutionState old_state_, new_state_;
 };
 
-}  // namespace se::common::windows
+}  // namespace s1::win
 
 #endif  // !SE_COMMON_WINDOWS_SCOPED_THREAD_EXECUTION_STATE_H_

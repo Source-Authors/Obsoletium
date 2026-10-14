@@ -15,7 +15,7 @@
 #include "tier0/icommandline.h"
 #include "tier1/strtools.h"
 
-namespace se::shader_compile::fxc_intercept {
+namespace s1::shader_compile::fxc_intercept {
 
 // The command that is intercepted by this namespace routines
 static constexpr inline const char kFxcCommand[]{"fxc.exe "};
@@ -63,10 +63,10 @@ class ErrorD3DBlob final : public ID3DBlob {
 };
 
 class HLSLCompilerResponse final
-    : public se::shader_compile::command_sink::IResponse {
+    : public s1::shader_compile::command_sink::IResponse {
  public:
-  HLSLCompilerResponse(se::win::com::com_ptr<ID3DBlob> shader,
-                       se::win::com::com_ptr<ID3DBlob> errors, HRESULT hr);
+  HLSLCompilerResponse(s1::win::com::com_ptr<ID3DBlob> shader,
+                       s1::win::com::com_ptr<ID3DBlob> errors, HRESULT hr);
   virtual ~HLSLCompilerResponse() = default;
 
  public:
@@ -86,14 +86,14 @@ class HLSLCompilerResponse final
   }
 
  private:
-  se::win::com::com_ptr<ID3DBlob> shader_;
-  se::win::com::com_ptr<ID3DBlob> listing_;
+  s1::win::com::com_ptr<ID3DBlob> shader_;
+  s1::win::com::com_ptr<ID3DBlob> listing_;
   const HRESULT hr_;
 };
 
 HLSLCompilerResponse::HLSLCompilerResponse(
-    se::win::com::com_ptr<ID3DBlob> shader,
-    se::win::com::com_ptr<ID3DBlob> errors, HRESULT hr)
+    s1::win::com::com_ptr<ID3DBlob> shader,
+    s1::win::com::com_ptr<ID3DBlob> errors, HRESULT hr)
     : shader_(std::move(shader)), listing_(std::move(errors)), hr_(hr) {
   // dimhotepus: Report error if no errors blob.
   if (!listing_ && FAILED(hr)) {
@@ -109,11 +109,11 @@ HLSLCompilerResponse::HLSLCompilerResponse(
 // "debugdrawenvmapmask_vs20.fxc")
 // @param macroses null-terminated array of macro-defines
 // @param shader_model shader model for compilation
-static std::unique_ptr<se::shader_compile::command_sink::IResponse>
+static std::unique_ptr<s1::shader_compile::command_sink::IResponse>
 FastShaderCompile(const char *file_name, const D3D_SHADER_MACRO *macroses,
                   const char *shader_model) {
   // DxProxyModule.
-  static se::dx_proxy::DxProxyModule d3dProxyModule;
+  static s1::dx_proxy::DxProxyModule d3dProxyModule;
 
   constexpr unsigned kCommonFlags{
       /* D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_ENABLE_STRICTNESS  // |
@@ -136,7 +136,7 @@ FastShaderCompile(const char *file_name, const D3D_SHADER_MACRO *macroses,
 #endif
   };
 
-  se::win::com::com_ptr<ID3DBlob> shader, errors;
+  s1::win::com::com_ptr<ID3DBlob> shader, errors;
   HRESULT hr{d3dProxyModule.D3DCompileFromFile(file_name, macroses, nullptr,
                                                "main", shader_model, flags1, 0,
                                                &shader, &errors)};
@@ -155,7 +155,7 @@ FastShaderCompile(const char *file_name, const D3D_SHADER_MACRO *macroses,
 // /DNUMDYNAMICCOMBOS=4 /DFLAGS=0x0 /DNUM_BONES=1 /Dmain=main /Emain /Tvs_2_0
 // /DSHADER_MODEL_VS_2_0=1 /nologo /Foshader.o
 // debugdrawenvmapmask_vs20.fxc>output.txt 2>&1"
-static std::unique_ptr<se::shader_compile::command_sink::IResponse>
+static std::unique_ptr<s1::shader_compile::command_sink::IResponse>
 ExecuteCommand(const char *in_command) {
   // Expect that the command passed is exactly "fxc.exe"
   Assert(!strncmp(in_command, kFxcCommand, kFxcCommandSize));
@@ -244,19 +244,19 @@ ExecuteCommand(const char *in_command) {
   return FastShaderCompile(file_name, macros.Base(), out_shader_model);
 }
 
-std::unique_ptr<se::shader_compile::command_sink::IResponse> TryExecuteCommand(
+std::unique_ptr<s1::shader_compile::command_sink::IResponse> TryExecuteCommand(
     const char *command) {
   static int dummy{(Msg("Using new faster Vitaliy's implementation.\n"), 1)};
 
   const bool ok{!strncmp(command,
-                         se::shader_compile::fxc_intercept::kFxcCommand,
-                         se::shader_compile::fxc_intercept::kFxcCommandSize)};
+                         s1::shader_compile::fxc_intercept::kFxcCommand,
+                         s1::shader_compile::fxc_intercept::kFxcCommandSize)};
   if (ok) {
     // Trap "fxc.exe" so that we did not spawn extra process every time
-    return se::shader_compile::fxc_intercept::ExecuteCommand(command);
+    return s1::shader_compile::fxc_intercept::ExecuteCommand(command);
   }
 
   return nullptr;
 }
 
-};  // namespace se::shader_compile::fxc_intercept
+};  // namespace s1::shader_compile::fxc_intercept

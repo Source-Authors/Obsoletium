@@ -135,7 +135,7 @@ HBITMAP CQC_EyesDlg::GetCachedBitmap(UINT id) {
 
   CBitmapRef *pNew = new CBitmapRef;
   pNew->m_iResource = id;
-  pNew->m_hBitmap = se::windows::ui::ScaleBitmapForDpi
+  pNew->m_hBitmap = s1::win::ui::ScaleBitmapForDpi
   (
       ::LoadBitmap(AfxGetInstanceHandle(), MAKEINTRESOURCE(id)),
       m_dpi_behavior.GetPreviousDpiX(), m_dpi_behavior.GetPreviousDpiY(),

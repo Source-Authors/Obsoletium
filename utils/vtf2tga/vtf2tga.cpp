@@ -56,7 +56,7 @@ SpewRetval_t VTF2TGAOutputFunc(SpewType_t spewType, char const *pMsg) {
 
 int main(int argc, char **argv) {
   // Install an exception handler.
-  const se::utils::common::ScopedDefaultMinidumpHandler
+  const s1::utils::common::ScopedDefaultMinidumpHandler
       scoped_default_minidumps;
 
   const ScopedSpewOutputFunc scoped_spew_output{VTF2TGAOutputFunc};
@@ -69,10 +69,10 @@ int main(int argc, char **argv) {
   // supports using a UTF-8 code page.
   constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
 
-  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-  if (!V_strieq(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+  const s1::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (!V_strieq(s1::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
     fprintf(stderr, "setlocale('%s') failed, current locale is '%s'.\n",
-            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+            kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale());
   }
 
   CommandLine()->CreateCmdLine(argc, argv);
@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
   }
 
   auto [f, errc] =
-      se::posix::posix_file_stream_factory::open(actual_vtf_file_name, "rb");
+      s1::posix::posix_file_stream_factory::open(actual_vtf_file_name, "rb");
   if (errc) {
     Warning("unable to open '%s' for reading: %s.\n", actual_vtf_file_name,
             errc.message().c_str());

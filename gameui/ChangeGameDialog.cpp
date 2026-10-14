@@ -82,7 +82,7 @@ void CChangeGameDialog::LoadModList()
 				V_sprintf_safe(szDllDirectory, "%s" CORRECT_PATH_SEPARATOR_S "gameinfo.txt", wfd.cFileName);
 
 				// dimhotepus: Use posix streams.
-				auto [f, rc] = se::posix::posix_file_stream_factory::open(szDllDirectory, "rb");
+				auto [f, rc] = s1::posix::posix_file_stream_factory::open(szDllDirectory, "rb");
 				if (rc) continue;
 
 				// find the description

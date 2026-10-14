@@ -23,7 +23,7 @@ class CBaseDlg : public CDialog {
   afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
   DECLARE_MESSAGE_MAP()
 
-  se::windows::ui::CDpiWindowBehavior m_dpi_behavior;
+  s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
 };
 
 #endif  // !SE_COMMON_WINDOWS_BASE_DLG_H_

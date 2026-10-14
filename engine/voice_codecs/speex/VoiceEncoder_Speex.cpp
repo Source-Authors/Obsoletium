@@ -41,7 +41,7 @@ namespace {
 
 }  // namespace
 
-namespace se::audio::voice_codecs::speex {
+namespace s1::audio::voice_codecs::speex {
 
 constexpr inline int kSamplesPerSecond{8000};  // get 8000 samples/sec
 constexpr inline int kSamplesPerFrame{160};    // in 160 samples per frame
@@ -233,7 +233,7 @@ void VoiceEncoder_Speex::TermStates() {
   return false;
 }
 
-}  // namespace se::audio::voice_codecs::speex
+}  // namespace s1::audio::voice_codecs::speex
 
 extern IVoiceCodec *CreateVoiceCodec_Frame(IFrameEncoder *pEncoder);
 
@@ -241,7 +241,7 @@ namespace {
 
 void *CreateSpeexVoiceCodec() {
   return CreateVoiceCodec_Frame(
-      new se::audio::voice_codecs::speex::VoiceEncoder_Speex);
+      new s1::audio::voice_codecs::speex::VoiceEncoder_Speex);
 }
 
 }  // namespace

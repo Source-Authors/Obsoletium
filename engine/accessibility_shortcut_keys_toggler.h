@@ -13,7 +13,7 @@
 
 #include <memory>
 
-namespace source::engine::win {
+namespace s1::engine::win {
 
 // Toggles accessibility shortcut keys.  See
 // https://docs.microsoft.com/en-us/windows/desktop/dxtecharts/disabling-shortcut-keys-in-games#disable-the-accessibility-shortcut-keys
@@ -40,6 +40,6 @@ private:
 	std::unique_ptr<Impl> impl_;
 };
 
-}  // namespace source::engine::win
+}  // namespace s1::engine::win
 
 #endif  // ENGINE_ACCESSIBILITY_SHORTCUT_KEYS_TOGGLER_H_

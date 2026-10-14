@@ -19,7 +19,7 @@ __declspec(dllimport) MMRESULT __stdcall timeEndPeriod(_In_ unsigned uPeriod);
 
 }  // extern "C"
 
-namespace se::common::windows {
+namespace s1::win {
 
 // Changes minimum resolution for periodic timers and reverts back when
 // out of scope.
@@ -78,6 +78,6 @@ class ScopedTimerResolution {
   unsigned error_code_;
 };
 
-}  // namespace se::common::windows
+}  // namespace s1::win
 
 #endif  // SE_COMMON_WINDOWS_SCOPED_TIMER_RESOLUTION_H_

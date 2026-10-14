@@ -1399,7 +1399,7 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 	inbuf.SeekPut( CUtlBuffer::SEEK_HEAD, nBytesRead );
 
 	// load vtex_dll.dll and get the interface to it.
-	source::ScopedDll vtexmod{"vtex_dll" DLL_EXT_STRING, 0};
+	s1::ScopedDll vtexmod{"vtex_dll" DLL_EXT_STRING, 0};
 	if (vtexmod.error_code())
 	{
 		Warning( "Failed to open TGA conversion module vtex_dll %s: %s.\n",

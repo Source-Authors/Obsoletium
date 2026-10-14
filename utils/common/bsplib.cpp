@@ -2505,7 +2505,7 @@ bool ExtractZipFileFromBSP( char *pBSPFileName, char *pZipFileName )
 	int paksize = CopyVariableLump<byte>( header, FIELD_CHARACTER, LUMP_PAKFILE, ( void ** )&pakbuffer );
 	if ( paksize > 0 )
 	{
-		auto [fp, errc] = se::posix::posix_file_stream_factory::open( pZipFileName, "wb" );
+		auto [fp, errc] = s1::posix::posix_file_stream_factory::open( pZipFileName, "wb" );
 		if ( errc )
 		{
 			fprintf( stderr, "Can't open ZIP '%s': %s.\n", pZipFileName, errc.message().c_str() );
@@ -2536,7 +2536,7 @@ Only loads the texinfo lump, so qdata can scan for textures
 */
 bool LoadBSPFileTexinfo( const char *filename )
 {
-	auto [f, errc] = se::posix::posix_file_stream_factory::open( filename, "rb" );
+	auto [f, errc] = s1::posix::posix_file_stream_factory::open( filename, "rb" );
 	if ( errc )
 	{
 		Warning( "Unable to open BSP '%s': %s.\n", filename, errc.message().c_str() );

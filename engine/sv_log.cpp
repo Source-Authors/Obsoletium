@@ -719,7 +719,7 @@ static bool gzip_file_compress( const CUtlString &Filename )
 
 	Msg( "Compressing '%s' to '%s'...\n", Filename.Get(), info.Filename.Get() );
 
-	auto [in, errc] = se::posix::posix_file_stream_factory::open( Filename.Get(), "rb" );
+	auto [in, errc] = s1::posix::posix_file_stream_factory::open( Filename.Get(), "rb" );
 	if ( !errc )
 	{
 		char buf[ 16384 ];

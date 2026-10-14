@@ -18,7 +18,7 @@
 
 #include "tier0/annotations.h"
 
-namespace se::posix {
+namespace s1::posix {
 
 // Input/output result.
 template <typename T>
@@ -366,6 +366,6 @@ class posix_file_stream_factory {
   posix_file_stream_factory& operator=(posix_file_stream_factory&& f) = delete;
 };
 
-}  // namespace se::posix
+}  // namespace s1::posix
 
 #endif  // !SE_POSIX_FILE_STREAM_H_

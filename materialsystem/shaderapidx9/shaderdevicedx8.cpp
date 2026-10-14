@@ -141,7 +141,7 @@ bool CShaderDeviceMgrDx8::Connect( CreateInterfaceFn factory )
 	{
 		Warning( "Direct3DCreate9Ex(sdk version = 0x%x) failed w/e %s.\n",
 			D3D_SDK_VERSION, 
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 		return false;
 	}
 
@@ -518,7 +518,7 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 		Warning( "IDirect3D9Ex::GetDeviceCaps(adapter = %u, device type = 0x%x) failed w/e %s.\n",
 			nAdapter,
 			DX8_DEVTYPE,
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 		return false;
 	}
 	
@@ -529,7 +529,7 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 		Assert( false );
 		Warning( "IDirect3D9Ex::GetAdapterIdentifier(adapter = %u, flags = D3DENUM_WHQL_LEVEL) failed w/e %s.\n",
 			nAdapter, 
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 		return false;
 	}
 
@@ -1252,7 +1252,7 @@ void CShaderDeviceMgrDx8::GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAda
 			nAdapter,
 			m_AdapterImageFormat,
 			nMode,
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 	}
 
 	pInfo->m_nWidth      = mode.Width;
@@ -1282,7 +1282,7 @@ void CShaderDeviceMgrDx8::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsign
 	{
 		Error( "IDirect3D9Ex::GetAdapterDisplayModeEx(adapter = %u) failed w/e %s.\n",
 			nAdapter,
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 	}
 
 	pInfo->m_nWidth = mode.Width;
@@ -1771,7 +1771,7 @@ const char *CShaderDeviceDx8::GetDisplayDeviceName()
 			Assert(false);
 			Warning( "IDirect3D9Ex::GetAdapterIdentifier(adapter = %u) failed w/e %s.\n",
 				m_nAdapter,
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 			ident.DeviceName[0] = '\0';
 		}
 		m_sDisplayDeviceName = ident.DeviceName;
@@ -1800,7 +1800,7 @@ void CShaderDeviceDx8::SpewDriverInfo() const
 	{
 		Assert(false);
 		Warning( "IDirect3D9Ex::GetDeviceCaps() failed w/e %s.\n",
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 		return;
 	}
 
@@ -1810,7 +1810,7 @@ void CShaderDeviceDx8::SpewDriverInfo() const
 		Assert(false);
 		Warning( "IDirect3D9Ex::GetAdapterIdentifier(adapter = %u, flags = D3DENUM_WHQL_LEVEL) failed w/e %s.\n",
 			m_nAdapter,
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 		return;
 	}
 
@@ -1992,7 +1992,7 @@ void CShaderDeviceDx8::DetectQuerySupport( IDirect3DDevice9 *pD3DDevice )
 	if ( m_DeviceSupportsCreateQuery != -1 )
 		return;
 
-	se::win::com::com_ptr<IDirect3DQuery9> pQueryObject;
+	s1::win::com::com_ptr<IDirect3DQuery9> pQueryObject;
 	// Detect whether query is supported by creating and releasing:
 	HRESULT hr = pD3DDevice->CreateQuery( D3DQUERYTYPE_EVENT, &pQueryObject );
 	m_DeviceSupportsCreateQuery = SUCCEEDED(hr) ? 1 : 0;
@@ -2002,7 +2002,7 @@ void CShaderDeviceDx8::DetectQuerySupport( IDirect3DDevice9 *pD3DDevice )
 //-----------------------------------------------------------------------------
 // Actually creates the D3D Device once the present parameters are set up
 //-----------------------------------------------------------------------------
-se::win::com::com_ptr<IDirect3DDevice9Ex> CShaderDeviceDx8::InvokeCreateDevice( void* hWnd, unsigned nAdapter, DWORD deviceCreationFlags )
+s1::win::com::com_ptr<IDirect3DDevice9Ex> CShaderDeviceDx8::InvokeCreateDevice( void* hWnd, unsigned nAdapter, DWORD deviceCreationFlags )
 {
 #if !defined(NVPERFHUD)
 	D3DDEVTYPE devType{DX8_DEVTYPE};
@@ -2034,7 +2034,7 @@ se::win::com::com_ptr<IDirect3DDevice9Ex> CShaderDeviceDx8::InvokeCreateDevice( 
 	D3DDISPLAYMODEEX fullScreenDisplayMode = GetFullScreenDisplayModeFromPresentParameters( m_PresentParameters );
 	D3DDISPLAYMODEEX *pFullScreenDisplayMode = m_PresentParameters.Windowed ? nullptr : &fullScreenDisplayMode;
 
-	se::win::com::com_ptr<IDirect3DDevice9Ex> d3d9_ex_device;
+	s1::win::com::com_ptr<IDirect3DDevice9Ex> d3d9_ex_device;
 	HRESULT hr = D3D()->CreateDeviceEx( nAdapter, devType,
 		(VD3DHWND)hWnd, deviceCreationFlags, &m_PresentParameters, pFullScreenDisplayMode, &d3d9_ex_device );
 	if ( SUCCEEDED( hr ) )
@@ -2092,7 +2092,7 @@ se::win::com::com_ptr<IDirect3DDevice9Ex> CShaderDeviceDx8::InvokeCreateDevice( 
 			m_PresentParameters.FullScreen_RefreshRateInHz,
 			m_PresentParameters.PresentationInterval,
 			IsOpenGL() ? "OpenGL" : "Direct3D 9Ex",
-			se::win::com::com_error_category().message(hr).c_str(),
+			s1::win::com::com_error_category().message(hr).c_str(),
 			more_info );
 	}
 	else
@@ -2125,7 +2125,7 @@ se::win::com::com_ptr<IDirect3DDevice9Ex> CShaderDeviceDx8::InvokeCreateDevice( 
 			m_PresentParameters.FullScreen_RefreshRateInHz,
 			m_PresentParameters.PresentationInterval,
 			IsOpenGL() ? "OpenGL" : "Direct3D 9Ex",
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 	}
 
 	return {};
@@ -2156,7 +2156,7 @@ bool CShaderDeviceDx8::CreateD3DDevice( void* pHWnd, unsigned nAdapter, const Sh
 		Warning( "IDirect3D9Ex::GetDeviceCaps(adapter = %u, device type = 0x%x) failed w/e %s.\n",
 			m_nAdapter,
 			DX8_DEVTYPE, 
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 		return false;
 	}
 
@@ -2249,7 +2249,7 @@ void CShaderDeviceDx8::AllocFrameSyncTextureObject()
 	{
 		Assert( false );
 		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::CreateTexture(width = 1, height = 1, levels = 0, usage = D3DUSAGE_DYNAMIC, format = D3DFMT_A8R8G8B8, pool = D3DPOOL_DEFAULT) failed w/e %s.\n",
-			 se::win::com::com_error_category().message(hr).c_str() );
+			 s1::win::com::com_error_category().message(hr).c_str() );
 	}
 }
 
@@ -2371,7 +2371,7 @@ void CShaderDeviceDx8::OtherAppInitializing( bool initializing )
 		{
 			Assert(false);
 			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EndScene failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 	}
 
@@ -2386,7 +2386,7 @@ void CShaderDeviceDx8::OtherAppInitializing( bool initializing )
 		{
 			Assert(false);
 			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::BeginScene failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 	}
 }
@@ -2449,7 +2449,7 @@ bool CShaderDeviceDx8::TryDeviceReset( DeviceState_t deviceState )
 	{
 		// May fail, perfectly valid.
 		DMsg( "render", 0, "IDirect3DDevice9Ex::ResetEx failed w/e %s. Continue GPU resetting...\n",
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 	}
 
 #if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
@@ -2618,7 +2618,7 @@ bool CShaderDeviceDx8::ResizeWindow( const ShaderDeviceInfo_t &info )
 
 	// May fail, perfectly valid.
 	DMsg( "render", 0, "IDirect3DDevice9Ex::ResetEx failed w/e %s. Continue GPU resetting...\n",
-			se::win::com::com_error_category().message(hr).c_str() );
+			s1::win::com::com_error_category().message(hr).c_str() );
 	return false;
 }
 
@@ -2722,7 +2722,7 @@ void CShaderDeviceDx8::BeginPresent()
 		{
 			Assert(false);
 			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EndScene failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 	}
 }
@@ -2743,7 +2743,7 @@ void CShaderDeviceDx8::EndPresent()
 		{
 			Assert(false);
 			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::BeginScene failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
+				s1::win::com::com_error_category().message(hr).c_str() );
 		}
 	}
 }
@@ -2976,7 +2976,7 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 				if ( FAILED( hr2 ) )
 				{
 					Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EvictManagedResources() failed w/e %s.\n",
-						se::win::com::com_error_category().message(hr2).c_str() );
+						s1::win::com::com_error_category().message(hr2).c_str() );
 				}
 			}
 			// dimhotepus: Handle display mode change once before reset.
@@ -3173,7 +3173,7 @@ void CShaderDeviceDx8::Present()
 			if ( FAILED( hr ) )
 			{
 				Warning( "IDirect3DDevice9Ex::PresentEx() failed w/e %s.\n",
-					se::win::com::com_error_category().message(hr).c_str() );
+					s1::win::com::com_error_category().message(hr).c_str() );
 
 				// Sometimes the API calls get loaded into a command buffer and are batched up to be sent
 				// to the GPU (see https://learn.microsoft.com/en-us/windows/win32/direct3d9/accurately-profiling-direct3d-api-calls).

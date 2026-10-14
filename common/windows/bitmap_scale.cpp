@@ -12,7 +12,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-namespace se::windows::ui {
+namespace s1::win::ui {
 
 /**
  * @brief Scale bitmap from old DPI to a new one.
@@ -62,4 +62,4 @@ HBITMAP ScaleBitmapForDpi(HBITMAP sourceBmp, unsigned oldDpiX, unsigned oldDpiY,
   return scaledBmp;
 }
 
-}  // namespace se::windows::ui
+}  // namespace s1::win::ui

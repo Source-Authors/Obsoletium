@@ -86,7 +86,7 @@ private:
 	const char *GetAppName() override { return "ElementViewer"; }
 
 	// Install an exception handler.
-	const se::utils::common::ScopedDefaultMinidumpHandler scoped_default_minidumps_;
+	const s1::utils::common::ScopedDefaultMinidumpHandler scoped_default_minidumps_;
 	const ScopedSpewOutputFunc scoped_spew_output_;
 };
 

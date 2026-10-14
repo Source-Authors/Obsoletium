@@ -12,7 +12,7 @@ using ConsoleCtrlHandlerFn = int(__stdcall*)(IN_P unsigned long CtrlType);
 extern "C" __declspec(dllimport) int __stdcall SetConsoleCtrlHandler(
     IN_OPT ConsoleCtrlHandlerFn HandlerRoutine, IN_P int Add);
 
-namespace se::common::windows {
+namespace s1::win {
 
 /**
  * @brief Adds or removes an application-defined function from the list of
@@ -59,6 +59,6 @@ class ScopedConsoleCtrlHandler {
   const bool is_success_;
 };
 
-}  // namespace se::common::windows
+}  // namespace s1::win
 
 #endif  // !SE_COMMON_WINDOWS_SCOPED_CONSOLE_CTRL_HANDLER_H_

@@ -10,7 +10,7 @@
 
 #include <d3dcommon.h>
 
-namespace se::dx_proxy {
+namespace s1::dx_proxy {
 
 /**
  * @brief Uses a lazy-load technique to load the dx_proxy.dll module and acquire
@@ -106,6 +106,6 @@ inline HRESULT DxProxyModule::D3DCompileFromFile(
                Flags2, ppCode, ppErrorMsgs);
 }
 
-}  // namespace se::dx_proxy
+}  // namespace s1::dx_proxy
 
 #endif  // !SE_COMMON_DX_PROXY_H_

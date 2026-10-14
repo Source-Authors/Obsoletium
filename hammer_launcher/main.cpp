@@ -136,17 +136,17 @@ class HammerAppSystemGroup final : public CAppSystemGroup {
   IHammer *hammer_;
 
   const ScopedSpewOutputFunc scoped_spew_output_;
-  const se::ScopedAppLocale scoped_app_locale_;
-  const se::common::windows::ScopedCom scoped_com_;
-  const se::common::windows::ScopedTimerResolution scoped_timer_resolution_;
-  const se::common::windows::ScopedWinsockInitializer scoped_winsock_;
+  const s1::ScopedAppLocale scoped_app_locale_;
+  const s1::win::ScopedCom scoped_com_;
+  const s1::win::ScopedTimerResolution scoped_timer_resolution_;
+  const s1::win::ScopedWinsockInitializer scoped_winsock_;
 };
 
 // Create all singleton systems
 bool HammerAppSystemGroup::Create() {
-  if (Q_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+  if (Q_stricmp(s1::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
     Warning("setlocale('%s') failed, current locale is '%s'.\n",
-            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+            kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale());
   }
 
   // Save some memory so engine/hammer isn't so painful

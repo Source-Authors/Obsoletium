@@ -6,7 +6,7 @@
 #include "shaderapi/ishaderapi.h"
 #include "shaderapi/ishadershadow.h"
 
-namespace se::shaderapidx11 {
+namespace s1::shaderapidx11 {
 
 // Shader shadow on DirectX 11 hardware.
 class CShaderShadowDx11 final : public IShaderShadow {
@@ -134,6 +134,6 @@ class CShaderShadowDx11 final : public IShaderShadow {
 
 extern CShaderShadowDx11* g_pShaderShadowDx11;
 
-}  // namespace se::shaderapidx11
+}  // namespace s1::shaderapidx11
 
 #endif  // !SE_MATERIALSYSTEM_SHADERAPIDX11_SHADER_SHADOW_DX11_H_

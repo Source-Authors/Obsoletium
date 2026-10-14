@@ -13,7 +13,7 @@
 #include "tier0/threadtools.h"
 #include "tier1/strtools.h"
 
-namespace se::dx_proxy {
+namespace s1::dx_proxy {
 
 class CachedFileData final {
   friend class FileCache;
@@ -91,6 +91,6 @@ class FileCache final {
   CThreadMutex m_mutex;
 };
 
-}  // namespace se::dx_proxy
+}  // namespace s1::dx_proxy
 
 #endif  // !SE_UTILS_DX_PROXY_FILEMEMCACHE_H_

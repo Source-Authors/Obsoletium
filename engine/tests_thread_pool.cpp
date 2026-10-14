@@ -334,7 +334,7 @@ std::uintptr_t GetProcessAffinity() {
 
 }  // namespace
 
-namespace se::engine::tests::thread_pool {
+namespace s1::engine::tests::thread_pool {
 
 void RunThreadPoolTests() {
   ScopedThreadPool pool;
@@ -407,4 +407,4 @@ void RunThreadPoolTests() {
   TestForcedExecute(&pool);
 }
 
-}  // namespace se::engine::tests::thread_pool
+}  // namespace s1::engine::tests::thread_pool

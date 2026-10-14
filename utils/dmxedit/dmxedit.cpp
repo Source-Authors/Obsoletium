@@ -1593,7 +1593,7 @@ void CDmxEdit::UpdateMakefile( CDmElement *pRoot )
 	sources.AddToTail( CreateElement< CDmeSourceDCCFile >( m_filename, pRoot->GetFileId() ) );
 }
 
-namespace se::dmxedit {
+namespace s1::dmxedit {
 
 //-----------------------------------------------------------------------------
 // In winstuff.cpp
@@ -1601,7 +1601,7 @@ namespace se::dmxedit {
 bool MyGetUserName( char *pszBuf, unsigned long *pBufSiz );
 bool MyGetComputerName( char *pszBuf, unsigned long *pBufSiz );
 
-}  // se::dmxedit
+}  // s1::dmxedit
 
 //-----------------------------------------------------------------------------
 //
@@ -1624,12 +1624,12 @@ void CDmxEdit::AddExportTags( CDmElement *pRoot, const char *pFilename )
 	unsigned long dwSize( sizeof( szTmpBuf ) );
 
 	*szTmpBuf ='\0';
-	se::dmxedit::MyGetUserName( szTmpBuf, &dwSize);
+	s1::dmxedit::MyGetUserName( szTmpBuf, &dwSize);
 	pExportTags->SetValue( "user", szTmpBuf );
 
 	*szTmpBuf ='\0';
 	dwSize = sizeof( szTmpBuf );
-	se::dmxedit::MyGetComputerName( szTmpBuf, &dwSize);
+	s1::dmxedit::MyGetComputerName( szTmpBuf, &dwSize);
 	pExportTags->SetValue( "machine", szTmpBuf );
 
 	pExportTags->SetValue( "app", "dmxedit" );

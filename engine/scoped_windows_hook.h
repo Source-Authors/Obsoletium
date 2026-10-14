@@ -26,7 +26,7 @@ using LONG_PTR = _W64 long;
 
 using HOOKPROC = LONG_PTR(__stdcall* )( int code, uintptr_t wParam, LONG_PTR lParam );
 
-namespace source::engine::win {
+namespace s1::engine::win {
 
 // Scoped windows hook.
 class ScopedWindowsHook
@@ -61,6 +61,6 @@ private:
 	const std::error_code errno_code_;
 };
 
-}  // namespace source::engine::win
+}  // namespace s1::engine::win
 
 #endif  // ENGINE_SCOPED_WINDOWS_HOOK_H_

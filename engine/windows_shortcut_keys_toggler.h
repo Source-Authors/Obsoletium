@@ -24,7 +24,7 @@ using LONG_PTR = __int64;
 using LONG_PTR = _W64 long;
 #endif
 
-namespace source::engine::win {
+namespace s1::engine::win {
 
 // Should we enable window shortcut keys or not.
 using ShouldEnableWindowsShortcutKeysFunction = bool (*)() noexcept;
@@ -62,6 +62,6 @@ private:
 		LONG_PTR low_param );
 };
 
-}  // namespace source::engine::win
+}  // namespace s1::engine::win
 
 #endif  // ENGINE_WINDOWS_SHORTCUT_KEYS_TOGGLER_H_

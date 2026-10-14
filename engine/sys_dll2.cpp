@@ -305,7 +305,7 @@ static bool IsSourceModLoaded()
 			return true;
 	}
 #else
-	auto [fh, rc] = se::posix::posix_file_stream_factory::open( "/proc/self/maps", "r" );
+	auto [fh, rc] = s1::posix::posix_file_stream_factory::open( "/proc/self/maps", "r" );
 	if ( !rc )
 	{
 		char buf[ 1024 ];
@@ -611,7 +611,7 @@ public:
 
 		if ( nMaxLen <= 0 ) return;
 
-		auto [fh, rc] = se::posix::posix_file_stream_factory::open( filename, "r" );
+		auto [fh, rc] = s1::posix::posix_file_stream_factory::open( filename, "r" );
 		if ( rc )
 		{
 			Warning( "Unable to open file '%s' to add to comment: %s.\n", filename, rc.message().c_str() );
@@ -736,7 +736,7 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 		V_MakeAbsolutePath( szFullPath, szModSteamInfPath, pchBaseDir );
 
 		// Try opening steam.inf
-		auto [f, errc] = se::posix::posix_file_stream_factory::open( szFullPath, "rb" );
+		auto [f, errc] = s1::posix::posix_file_stream_factory::open( szFullPath, "rb" );
 		if ( !errc )
 		{
 			int64_t bufsize = -1;
@@ -817,7 +817,7 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 		V_MakeAbsolutePath( szFullPath, szModGameinfoPath, pchBaseDir );
 
 		// Try opening gameinfo.txt
-		auto [f, errc] = se::posix::posix_file_stream_factory::open( szFullPath, "rb" );
+		auto [f, errc] = s1::posix::posix_file_stream_factory::open( szFullPath, "rb" );
 		if ( !errc )
 		{
 			int64_t bufsize = -1;
@@ -856,7 +856,7 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 		// it accepts a steam_appid.txt in the root directory if the game is
 		// not started through Steam. So we create one there containing the
 		// current AppID
-		auto [fh, errc] = se::posix::posix_file_stream_factory::open( appidFile, "wb" );
+		auto [fh, errc] = s1::posix::posix_file_stream_factory::open( appidFile, "wb" );
 		if ( !errc )
 		{
 			std::tie(std::ignore, errc) = fh.print("%u\n", VerInfo.AppID);
@@ -2064,11 +2064,11 @@ int CModAppSystemGroup::Main()
 {
 	// dimhotepus: Always set locale to utf8 one.
 	const char kEnUsUtf8Locale[] = "en_US.UTF-8";
-	const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-	if (Q_stricmp(se::ScopedAppLocale::GetCurrentLocale(),
+	const s1::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+	if (Q_stricmp(s1::ScopedAppLocale::GetCurrentLocale(),
 					kEnUsUtf8Locale)) {
 		Warning("setlocale('%s') failed, current locale is '%s'.\n",
-				kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+				kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale());
 	}
 
 	int nRunResult = RUN_OK;
