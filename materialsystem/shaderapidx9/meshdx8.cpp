@@ -5166,7 +5166,8 @@ IMesh* CMeshMgr::GetDynamicMesh( IMaterial* pMaterial, VertexFormat_t vertexForm
 {
 	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
 
-	Assert( (pMaterial == NULL) || ((IMaterialInternal *)pMaterial)->IsRealTimeVersion() );
+	// dimhotepus: Material must not be nullptr.
+	Assert( (pMaterial != NULL) && ((IMaterialInternal *)pMaterial)->IsRealTimeVersion() );
 
 	// Can't be buffered if we're overriding the buffers
 	if ( pVertexOverride || pIndexOverride )
@@ -5410,7 +5411,8 @@ void CMeshMgr::GetMaxToRender( IMesh *pMesh, bool bMaxUntilFlush, int *pMaxVerts
 
 int CMeshMgr::GetMaxVerticesToRender( IMaterial *pMaterial )
 {
-	Assert( (pMaterial == NULL) || ((IMaterialInternal *)pMaterial)->IsRealTimeVersion() );
+	// dimhotepus: Material must not be nullptr.
+	Assert( (pMaterial != NULL) && ((IMaterialInternal *)pMaterial)->IsRealTimeVersion() );
 
 	// Be conservative, assume no compression (in here, we don't know if the caller will used a compressed VB or not)
 	// FIXME: allow the caller to specify which compression type should be used to compute size from the vertex format
