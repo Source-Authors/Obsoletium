@@ -88,6 +88,18 @@ class ScopedAcceptSocket {
         AssertMsg(false, "shutdown failed: %s\n", rc_.message().c_str());
       }
 
+      // Try to do graceful shutdown by receiving remainder.
+      if (!rc_.value()) {
+        using namespace std::chrono_literals;
+
+        TryGracefulShutdown(1000ms);
+      }
+
+      if (rc_) {
+        AssertMsg(false, "graceful shutdown failed: %s\n",
+                  rc_.message().c_str());
+      }
+
       if (closesocket(s_) == SOCKET_ERROR) {
         rc_ = GetSystemError(WSAGetLastError());
 
@@ -110,8 +122,9 @@ class ScopedAcceptSocket {
   [[nodiscard]] std::error_code Send(const char (&buffer)[max_size],
                                      int send_size, int flags,
                                      int& send_bytes) noexcept {
-    Assert(send_size <= max_size);
-    if (send_size > max_size) {
+    Assert(send_size >= 0 && send_size <= max_size);
+    if (send_size < 0 || send_size > max_size) {
+      send_bytes = 0;
       return std::error_code{EINVAL, std::generic_category()};
     }
 
@@ -136,6 +149,47 @@ class ScopedAcceptSocket {
  private:
   SOCKET s_;
   std::error_code rc_;
+
+  void TryGracefulShutdown(std::chrono::milliseconds duration) noexcept {
+    using Clock = std::chrono::steady_clock;
+    const auto deadline = Clock::now() + duration;
+
+    char buffer[64];
+    int received_bytes = 0;
+
+    while (Clock::now() < deadline) {
+      const auto us = std::chrono::duration_cast<std::chrono::microseconds>(
+                          deadline - Clock::now())
+                          .count();
+      timeval timeout{static_cast<long>(us / 1'000'000),
+                      static_cast<long>(us % 1'000'000)};
+
+      fd_set readable;
+      FD_ZERO(&readable);
+      FD_SET(s_, &readable);
+
+      const int ready{select(0, &readable, nullptr, nullptr, &timeout)};
+      if (ready == 0) break;  // Deadline expired.
+
+      if (ready == SOCKET_ERROR) {
+        rc_ = GetSystemError(WSAGetLastError());
+
+        break;
+      }
+
+      const auto ec = Receive(buffer, 0, received_bytes);
+      if (ec) {
+        if (ec.value() == WSAEWOULDBLOCK) {
+          continue;  // Readiness race; wait again.
+        }
+
+        rc_ = ec;
+        break;
+      }
+
+      if (received_bytes == 0) break;  // Peer closed.
+    }
+  }
 };
 
 class ScopedListenSocket {
