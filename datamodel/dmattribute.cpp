@@ -1850,7 +1850,7 @@ void CDmAttribute::DestroyAttribute( CDmAttribute *pAttribute )
 	default:
 		pAttribute->~CDmAttribute();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		memset( pAttribute, 0xDD, sizeof(CDmAttribute) );
 #endif
 
@@ -1977,7 +1977,7 @@ void CDmAttribute::SetElementTypeSymbol( UtlSymId_t typeSymbol )
 
 	case AT_ELEMENT_ARRAY:
 		{
-#ifdef _DEBUG
+#ifndef NDEBUG
 			CDmrElementArray<> array( this );
 			if ( array.GetElementType() != UTL_INVAL_SYMBOL )
 			{

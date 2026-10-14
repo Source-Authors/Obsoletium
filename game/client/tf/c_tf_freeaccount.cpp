@@ -237,7 +237,7 @@ public:
 	}
 };
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 CON_COMMAND( cl_free_trial_select_friend, "Bring up dialog to select most helpful friend" )
 {
 	OpenSelectMostHelpfulFriendDialog( NULL );

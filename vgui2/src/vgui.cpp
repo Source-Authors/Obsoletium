@@ -276,7 +276,7 @@ CVGui::CVGui() : m_DelayedMessageQueue( (intp)0, 4, PriorityQueueComp)
 //-----------------------------------------------------------------------------
 CVGui::~CVGui()
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int nCount = m_HandleTable.GetHandleCount();
 	int nActualCount = 0;
 	for ( int i = 0; i < nCount; ++i )

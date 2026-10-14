@@ -5735,7 +5735,7 @@ void CModelLoader::InternalUpdateDynamicModels( bool bIgnoreTime )
 
 	UpdateDynamicModelLoadQueue();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	extern CNetworkStringTableContainer *networkStringTableContainerServer;
 	bool bPrevStringTableLockState = networkStringTableContainerServer->Lock( false );
 #endif
@@ -5809,7 +5809,7 @@ void CModelLoader::InternalUpdateDynamicModels( bool bIgnoreTime )
 		i = m_DynamicModels.NextHandle(i);
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	networkStringTableContainerServer->Lock( bPrevStringTableLockState );
 #endif
 }

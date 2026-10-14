@@ -20,7 +20,7 @@
 
 // Must run with -gamestats to be able to turn on/off stats with ConVar below.
 static ConVar tf_stats_track( "tf_stats_track",
-#ifdef _DEBUG
+#ifndef NDEBUG
 							 "0",
 #else
 							 "1",

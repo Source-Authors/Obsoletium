@@ -513,7 +513,7 @@ class CMapDoc : public CDocument
 
 		void ExpandObjectKeywords(CMapClass *pObject, CMapWorld *pWorld);
 
-		#ifdef _DEBUG
+		#ifndef NDEBUG
 		virtual void AssertValid() const;
 		virtual void Dump(CDumpContext& dc) const;
 		#endif

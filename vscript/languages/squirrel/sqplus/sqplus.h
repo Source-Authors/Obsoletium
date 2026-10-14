@@ -1780,7 +1780,7 @@ inline void RegisterInstanceVarArgs(HSQUIRRELVM v,HSQOBJECT hclass,Callee & call
   if (ptm) { // If ptm == 0, don't check type.
     sq_setparamscheck(v,numParams,ptm); // Determine arg count from type string.
   } // if
-#ifdef _DEBUG
+#ifndef NDEBUG
   sq_setnativeclosurename(v,-1,name); // For debugging only.
 #endif
   sq_createslot(v,-3);

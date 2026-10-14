@@ -43,7 +43,7 @@ public:
 		{
 			gameeventmanager->AddListener( this, name, bServerSide );
 		}
-#ifdef _DEBUG
+#ifndef NDEBUG
 		else
 		{
 			AssertMsg( gameeventmanager, "Failed to subscribe to event %s!", name );

@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------------------
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar replay_simulate_expired_sessions( "replay_simulate_expired_sessions", "0", FCVAR_DONTRECORD,
 	"Simulate expired replay session data - the value of this cvar should be between 0 and 100 and is a probability - any cleanup done (via end of round cleanup or explicit replay_docleanup) will use this value to determine whether data is expired.  E.g, use a value of 100 to delete all sessions, or 50 for a 50 chance of a given session being considered expired.",
 	true, 0.0f, true, 100.0f );
@@ -99,7 +99,7 @@ bool CServerRecordingSession::ShouldDitchSession() const
 	return BaseClass::ShouldDitchSession() || !m_bReplaysRequested;
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 void CServerRecordingSession::VerifyLocks()
 {
 	const bool bLocked = IsLocked();
@@ -149,7 +149,7 @@ double CServerRecordingSession::GetSecondsToExpiration() const
 
 bool CServerRecordingSession::SessionExpired() const
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( ( 1+rand()%100 ) <= replay_simulate_expired_sessions.GetInt() )
 		return true;
 #endif

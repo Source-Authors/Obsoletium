@@ -1623,7 +1623,7 @@ void CGame::PlayVideoAndWait( const char *filename, bool bNeedHealthWarning )
 	}
 
 	// Debug Builds, we want an error looked at by a developer, Release builds just send a message to the spew
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Error( "Error %d occurred attempting to play video file %s\n", (int) status, filename );
 #else
 	Msg( "Error %d occurred attempting to play video file %s\n", (int) status, filename );

@@ -57,7 +57,7 @@
 //#define SUPPORT_ARRAYS_OF_DATATABLES
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 
 

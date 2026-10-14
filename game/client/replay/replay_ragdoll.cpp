@@ -104,7 +104,7 @@ bool _ComputeRagdollBones( const ragdoll_t *pRagdoll, matrix3x4_t &parentTransfo
 {
 	matrix3x4_t inverted, output;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	CBitVec<MAXSTUDIOBONES> vBonesComputed;
 	vBonesComputed.ClearAll();
 #endif
@@ -132,7 +132,7 @@ bool _ComputeRagdollBones( const ragdoll_t *pRagdoll, matrix3x4_t &parentTransfo
 		{
 			int parentIndex = pRagdoll->boneIndex[ element.parentIndex ];
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			// Make sure we computed the parent already
 			Assert( vBonesComputed.IsBitSet(parentIndex) );
 #endif
@@ -151,7 +151,7 @@ bool _ComputeRagdollBones( const ragdoll_t *pRagdoll, matrix3x4_t &parentTransfo
 			MatrixInvert( parentTransform, inverted );
 		}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		vBonesComputed.Set( boneIndex, true );
 #endif
 

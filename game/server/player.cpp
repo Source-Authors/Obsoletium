@@ -184,7 +184,7 @@ ConVar	sk_player_arm( "sk_player_arm","1" );
 ConVar	sk_player_leg( "sk_player_leg","1" );
 
 ConVar	sv_player_usercommand_timeout( "sv_player_usercommand_timeout", "3", FCVAR_CHEAT, "After this many seconds without a usercommand from a player, the server will RunNullCommand as if client sends an empty command." );
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar  sv_player_net_suppress_usercommands( "sv_player_net_suppress_usercommands", "0", FCVAR_CHEAT, "For testing usercommand hacking sideeffects. DO NOT SHIP" );
 #endif // _DEBUG
 ConVar  sv_player_display_usercommand_errors( "sv_player_display_usercommand_errors", "0", FCVAR_CHEAT, "1 = Display warning when command values are out-of-range. 2 = Spew invalid ranges." );
@@ -550,7 +550,7 @@ CBasePlayer::CBasePlayer( )
 {
 	AddEFlags( EFL_NO_AUTO_EDICT_ATTACH );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_vecAutoAim.Init();
 	m_vecAdditionalPVSOrigin.Init();
 	m_vecCameraPVSOrigin.Init();
@@ -3321,7 +3321,7 @@ void CBasePlayer::PhysicsSimulate( void )
 
 	float vphysicsArrivalTime = TICK_INTERVAL;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( sv_player_net_suppress_usercommands.GetBool() )
 	{
 		commandsToRun = 0;
@@ -6327,7 +6327,7 @@ void CBasePlayer::CheatImpulseCommands( int iImpulse )
 bool CBasePlayer::ClientCommand( const CCommand &args )
 {
 	const char *cmd = args[0];
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if( stricmp( cmd, "test_SmokeGrenade" ) == 0 )
 	{
 		if ( sv_cheats && sv_cheats->GetBool() )

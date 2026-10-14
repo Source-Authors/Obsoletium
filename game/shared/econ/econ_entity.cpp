@@ -499,7 +499,7 @@ bool CEconEntity::ValidateEntityAttachedToPlayer( bool &bShouldRetry )
 	bool bItemDebugValidation = false;
 #endif // defined( _DEBUG ) || defined( TF_CLIENT_DLL )
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bItemDebugValidation = item_debug_validation.GetBool();
 
 	// Always valid in debug if item_debug_validation is disabled
@@ -704,7 +704,7 @@ bool CEconEntity::ValidateEntityAttachedToPlayer( bool &bShouldRetry )
 			char szItemName[ MAX_ITEM_NAME_LENGTH ];
 			ILocalize::ConvertUnicodeToANSI( pwzItemName, szItemName, sizeof( szItemName ) );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			Warning("Item '%s' attached to %s, but it's not in his inventory.\n", szItemName, pOwner->GetPlayerName() );
 #endif
 			return false;

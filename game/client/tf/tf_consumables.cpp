@@ -1055,7 +1055,7 @@ public:
 	CUtlVector< CSteamID > m_vecSteamIDRecipients;
 };
 
-//#ifdef _DEBUG
+//#ifndef NDEBUG
 //CON_COMMAND( cl_gifts_test, "tests the gift ui." )
 //{
 //	if ( !engine->IsInGame() )

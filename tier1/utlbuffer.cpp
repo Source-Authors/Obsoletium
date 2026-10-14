@@ -243,7 +243,7 @@ CUtlBuffer::CUtlBuffer( const void *pBuffer, intp nSize, int nFlags ) :
 //-----------------------------------------------------------------------------
 void CUtlBuffer::SetBufferType( bool bIsText, bool bContainsCRLF )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// If the buffer is empty, there is no opportunity for this stuff to fail
 	if ( TellMaxPut() != 0 )
 	{

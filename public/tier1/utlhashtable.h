@@ -457,7 +457,7 @@ void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::BumpEntry( siz
 	// FLAG_LAST bit on the current slot because we didn't scan past it?
 	if ( table[idx].flags_and_hash & FLAG_LAST )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		Assert( new_flags_and_hash & FLAG_LAST );
 		// Verify logic: we must have moved to an earlier slot, right?
 		uintp offset = ((uintp)idx - chainid + slotmask + 1) & slotmask;

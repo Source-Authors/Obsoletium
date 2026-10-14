@@ -186,7 +186,7 @@ void CSteam3Client::GetAuthSessionTicket( void *pTicket, int cbMaxTicket, uint32
 	// Tell the steam backend about the server we are playing on - so that it can broadcast this to our friends and they can join.
 	// This may be something that you should NOT do if you are on a listen server - or you know that the game is not joinable
 	// for some reason.
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		Msg( "Sending AdvertiseGame %s %s (%s)\n", steamIDGS.Render(), netadr_t(unIP, usPort).ToString(), m_bGSSecure ? "secure" : "insecure" );
 	#endif
 	SteamUser()->AdvertiseGame( steamIDGS, unIP, usPort );
@@ -206,7 +206,7 @@ void CSteam3Client::CancelAuthTicket()
 #if !defined( NO_STEAM )
 	if ( m_hAuthTicket != k_HAuthTicketInvalid )
 		SteamUser()->CancelAuthTicket( m_hAuthTicket );
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		Msg( "Clearing auth ticket, sending void AdvertiseGame\n" );
 	#endif
 	CSteamID steamIDGS; // invalid steamID means not playing anywhere

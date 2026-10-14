@@ -533,7 +533,7 @@ void C_CSRagdoll::ComputeFxBlend( void )
 		flVal = clamp( flVal, 0, 255 );
 		m_nRenderFXBlend = (int)flVal;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_nFXComputeFrame = gpGlobals->framecount;
 #endif
 	}

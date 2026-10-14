@@ -584,7 +584,7 @@ CMapClass *CMapSolid::CopyFrom(CMapClass *pobj, bool bUpdateDependencies)
 //-----------------------------------------------------------------------------
 // Purpose: Walks the faces of a solid for debugging.
 //-----------------------------------------------------------------------------
-#ifdef _DEBUG
+#ifndef NDEBUG
 void CMapSolid::DebugSolid(void)
 {
 	short nFaceCount = Faces.GetCount();

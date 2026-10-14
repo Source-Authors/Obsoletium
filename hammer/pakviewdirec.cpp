@@ -13,7 +13,7 @@
 #include "PakDoc.h"
 #include "PakViewDirec.h"
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -51,7 +51,7 @@ void CPakViewDirec::OnDraw(CDC* pDC)
 /////////////////////////////////////////////////////////////////////////////
 // CPakViewDirec diagnostics
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 void CPakViewDirec::AssertValid() const
 {
 	CTreeView::AssertValid();

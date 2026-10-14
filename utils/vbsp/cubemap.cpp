@@ -159,7 +159,7 @@ static const char *FindDependentMaterial( const char *pMaterialName, const char 
 			*ppMaterialVar = s_pDependentMaterialVar[i];
 		}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		// FIXME: Note that this code breaks if a material has more than 1 dependent material
 		++i;
 		static char pDependentMaterialName2[MAX_MATERIAL_NAME];

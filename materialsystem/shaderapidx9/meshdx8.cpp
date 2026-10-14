@@ -63,7 +63,7 @@
 static bool g_bDrawSelection = true;	// only used in DRAW_SELECTION 
 #endif
 static unsigned short g_nScratchIndexBuffer[6]; // large enough for a fast quad; used when device is not active
-#ifdef _DEBUG
+#ifndef NDEBUG
 std::atomic_int CVertexBuffer::s_BufferCount = 0;
 std::atomic_int CIndexBuffer::s_BufferCount = 0;
 #endif
@@ -140,7 +140,7 @@ protected:
 	uintp	*m_pGlobalCounter;
 #endif
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	static int s_nBufferCount;
 #endif
 };
@@ -219,7 +219,7 @@ private:
 	int m_nVProfFrame;
 #endif
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	static int s_nBufferCount;
 #endif
 };
@@ -849,7 +849,7 @@ public:
 	// Returns the number of buffers...
 	int BufferCount() const
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		return CVertexBuffer::BufferCount() + CIndexBuffer::BufferCount();
 #else
 		return 0;
@@ -999,7 +999,7 @@ void Unbind( IDirect3DVertexBuffer9 *pVertexBuffer )
 {
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 //-----------------------------------------------------------------------------
 // Helpers to count texture coordinates
 //-----------------------------------------------------------------------------
@@ -1043,7 +1043,7 @@ static void ResetMeshRenderState()
 //-----------------------------------------------------------------------------
 // Globals
 //-----------------------------------------------------------------------------
-#ifdef _DEBUG
+#ifndef NDEBUG
 int CIndexBufferDx8::s_nBufferCount = 0;
 #endif
 
@@ -1196,7 +1196,7 @@ bool CIndexBufferDx8::Allocate( IDirect3DDevice9Ex *pD3D )
 	memset( m_pShadowIndices, 0xFF, m_nBufferSize );
 #endif // CHECK_INDICES
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	++s_nBufferCount;
 #endif
 
@@ -1208,7 +1208,7 @@ void CIndexBufferDx8::Free()
 // FIXME:	Unlock(0);
 	if ( m_pIndexBuffer )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		--s_nBufferCount;
 #endif
 
@@ -1495,7 +1495,7 @@ void CIndexBufferDx8::Unlock( int nWrittenIndexCount, IndexDesc_t &desc )
 //-----------------------------------------------------------------------------
 // globals
 //-----------------------------------------------------------------------------
-#ifdef _DEBUG
+#ifndef NDEBUG
 int CVertexBufferDx8::s_nBufferCount = 0;
 #endif
 
@@ -1637,7 +1637,7 @@ bool CVertexBufferDx8::Allocate( IDirect3DDevice9Ex *pD3D )
 	}
 #endif
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	++s_nBufferCount;
 #endif
 
@@ -1649,7 +1649,7 @@ void CVertexBufferDx8::Free()
 	// FIXME:	Unlock(0);
 	if ( m_pVertexBuffer )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		--s_nBufferCount;
 #endif
 
@@ -1993,7 +1993,7 @@ CBaseMeshDX8::~CBaseMeshDX8()
 //-----------------------------------------------------------------------------
 bool CBaseMeshDX8::DebugTrace() const
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if (m_pMaterial)
 		return m_pMaterial->PerformDebugTrace();
 #endif
@@ -2157,7 +2157,7 @@ void CBaseMeshDX8::Spew( int nVertexCount, int nIndexCount, const MeshDesc_t &sp
 	// FIXME: just fall back to the base class (CVertexBufferBase) version of this function!
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if( m_pMaterial )
 	{
 		Plat_DebugString( ( const char * )m_pMaterial->GetName() );
@@ -2506,7 +2506,7 @@ void CMeshDX8::SetColorMesh( IMesh *pColorMesh, int nVertexOffsetInBytes )
 	m_nColorMeshVertOffsetInBytes = nVertexOffsetInBytes;
 	Assert( m_pColorMesh || ( nVertexOffsetInBytes == 0 ) );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( pColorMesh )
 	{
 		int nVertexCount = VertexCount();
@@ -2881,7 +2881,7 @@ int CMeshDX8::NumPrimitives( int nVertexCount, int nIndexCount ) const
 //-----------------------------------------------------------------------------
 // Checks if it's a valid format
 //-----------------------------------------------------------------------------
-#ifdef _DEBUG
+#ifndef NDEBUG
 static void OutputVertexFormat( VertexFormat_t format )
 {
 	// FIXME: this is a duplicate of the function in meshdx8.cpp
@@ -3002,7 +3002,7 @@ bool CMeshDX8::IsValidVertexFormat( VertexFormat_t vertexFormat )
 		int nWeightCount = NumBoneWeights( m_VertexFormat );
 		bIsValid = bIsValid && ( nWeightCount >= ( g_pShaderAPI->GetCurrentNumBones() - 1 ) );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		if ( !bIsValid )
 		{
 			Warning( "Material Format:" );
@@ -3288,7 +3288,7 @@ void CMeshDX8::DrawInternal( CPrimList *pLists, int nLists )
 	s_pPrims = pLists;
 	s_nPrims = nLists;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for ( i = 0; i < nLists; ++i)
 	{
 		Assert( pLists[i].m_NumIndices > 0 );
@@ -3330,7 +3330,7 @@ void CMeshDX8::CheckIndices( CPrimList *pPrim, int numPrimitives )
 			{
 				const unsigned index = g_pLastIndex->GetShadowIndex(j + pPrim->m_FirstIndex);
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 				AssertMsg(index >= s_FirstVertex && index < s_FirstVertex + s_NumVertices,
 					"%s has invalid index: %u [%u..%u]\n", __FUNCTION__, index,
 					s_FirstVertex, s_FirstVertex + s_NumVertices - 1);

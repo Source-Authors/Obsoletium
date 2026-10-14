@@ -862,7 +862,7 @@ void CDmeExpressionOperator::OnConstruction()
 	m_expr.Init( this, "expr" );
 	m_bSpewResult.Init( this, "spewresult" );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	TestCalculator();
 #endif
 }

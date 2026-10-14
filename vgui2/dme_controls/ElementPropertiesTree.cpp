@@ -1996,7 +1996,7 @@ void CElementPropertiesTreeInternal::NavigateToSearchResult()
 		// Expand the item
 		m_pTree->ExpandItem( nIndex, true );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		intp children = m_pTree->GetTree()->GetNumChildren( nIndex );
 		if ( idx >= children ) 
 		{

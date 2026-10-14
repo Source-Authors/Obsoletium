@@ -149,7 +149,7 @@ public:
 	int				Restore( IRestore &restore );
 	DECLARE_SIMPLE_DATADESC();
 
-//#ifdef _DEBUG
+//#ifndef NDEBUG
 	void			DumpGlobals( void );
 //#endif
 
@@ -235,7 +235,7 @@ CON_COMMAND(dump_globals, "Dump all global entities/states")
 }
 
 // This is available all the time now on impulse 104, remove later
-//#ifdef _DEBUG
+//#ifndef NDEBUG
 void CGlobalState::DumpGlobals( void )
 {
 	static const char *estates[] = { "Off", "On", "Dead" };

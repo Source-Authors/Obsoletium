@@ -104,7 +104,7 @@ float MXR_GetVolFromMixGroup( int rgmixgroupid[8], int *plast_mixgroupid );
 char *MXR_GetGroupnameFromId( int mixgroupid );
 int MXR_GetMixgroupFromName( const char *pszgroupname );
 void MXR_DebugShowMixVolumes( void );
-#ifdef _DEBUG
+#ifndef NDEBUG
 static void MXR_DebugSetMixGroupVolume( const CCommand &args );
 #endif //_DEBUG
 void MXR_UpdateAllDuckerVolumes( void );
@@ -355,7 +355,7 @@ void CSfxTable::SetNamePoolIndex( unsigned short index )
 	{
 		OnNameChanged(getname());
 	}
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_pDebugName = strdup( getname() );
 #endif
 }
@@ -461,7 +461,7 @@ ConVar snd_musicvolume( "snd_musicvolume", "1.0", FCVAR_ARCHIVE, "Music volume",
 
 ConVar snd_mixahead( "snd_mixahead", "0.1", FCVAR_ARCHIVE );
 ConVar snd_mix_async( "snd_mix_async", "0", 0, "Perform sound mixing in dedicated thread", true, 0, true, 1 );
-#ifdef _DEBUG
+#ifndef NDEBUG
 static ConCommand snd_mixvol("snd_mixvol", MXR_DebugSetMixGroupVolume, "Set named Mixgroup to mix volume.");
 #endif
 
@@ -988,7 +988,7 @@ void S_ReloadSound( const char *name )
 		return;
 
 	CSfxTable *sfx = S_FindName( name, NULL );
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( sfx )
 	{
 		Assert( V_strieq( sfx->getname(), name ) );
@@ -7563,7 +7563,7 @@ void MXR_DebugShowMixVolumes( void )
 	MXR_DebugGraphMixVolumes( groupvols, cgroups );
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 // set the named mixgroup volume to vol for the current soundmixer
 static void MXR_DebugSetMixGroupVolume( const CCommand &args )

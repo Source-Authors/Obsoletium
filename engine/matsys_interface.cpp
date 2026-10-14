@@ -955,7 +955,7 @@ CON_COMMAND( mat_savechanges, "saves current video configuration to the registry
 	}
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 //-----------------------------------------------------------------------------
 // A console command to debug materials
 //-----------------------------------------------------------------------------

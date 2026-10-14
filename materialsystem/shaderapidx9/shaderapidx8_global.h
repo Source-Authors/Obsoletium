@@ -24,7 +24,7 @@
 // Use this to fill in structures with the current board state
 //-----------------------------------------------------------------------------
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define DEBUG_BOARD_STATE 0
 #endif
 

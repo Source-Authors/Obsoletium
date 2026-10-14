@@ -355,7 +355,7 @@ CBaseEntity::CBaseEntity( bool bServerOnly )
 	COMPILE_TIME_ASSERT( MOVETYPE_LAST < (1 << MOVETYPE_MAX_BITS) );
 	COMPILE_TIME_ASSERT( MOVECOLLIDE_COUNT < (1 << MOVECOLLIDE_MAX_BITS) );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// necessary since in debug, we initialize vectors to NAN for debugging
 	m_vecAngVelocity.Init();
 //	m_vecAbsAngVelocity.Init();
@@ -528,7 +528,7 @@ void CBaseEntity::PostClientActive( void )
 //-----------------------------------------------------------------------------
 // Purpose: Verifies that this entity's data description is valid in debug builds.
 //-----------------------------------------------------------------------------
-#ifdef _DEBUG
+#ifndef NDEBUG
 typedef CUtlVector< const char * >	KeyValueNameList_t;
 
 static void AddDataMapFieldNamesToList( KeyValueNameList_t &list, datamap_t *pDataMap )
@@ -3048,7 +3048,7 @@ static FORCEINLINE bool NamesMatchGood( const char *pszQuery, string_t nameToMat
 	return false;
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 static bool NamesMatchBad( const char *pszQuery, string_t nameToMatch )
 {
 	if ( nameToMatch == NULL_STRING )
@@ -3090,7 +3090,7 @@ static FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
 {
 	const bool good = NamesMatchGood( pszQuery, nameToMatch );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	const bool bad = NamesMatchBad( pszQuery, nameToMatch );
 
 	// dimhotepus: Detect cases when name matching is different. Inspect them.
@@ -3456,7 +3456,7 @@ void CBaseEntity::operator delete( void *pMem )
 #include "tier0/memdbgon.h"
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 void CBaseEntity::FunctionCheck( void *pFunction, const char *name )
 { 
 #ifdef USES_SAVERESTORE
@@ -3499,7 +3499,7 @@ void CBaseEntity::SetOwnerEntity( CBaseEntity* pOwner )
 
 void CBaseEntity::SetMoveType( MoveType_t val, MoveCollide_t moveCollide )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Make sure the move type + move collide are compatible...
 	if ((val != MOVETYPE_FLY) && (val != MOVETYPE_FLYGRAVITY))
 	{
@@ -6169,7 +6169,7 @@ void CBaseEntity::SetLocalOrigin( const Vector& origin )
 	if (m_vecOrigin != origin)
 	{
 		// Sanity check to make sure the origin is valid.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		float largeVal = 1024 * 128;
 		Assert( origin.x >= -largeVal && origin.x <= largeVal );
 		Assert( origin.y >= -largeVal && origin.y <= largeVal );

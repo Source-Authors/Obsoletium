@@ -1907,7 +1907,7 @@ void ParseIntoStruct( S* _outStruct, CUtlVector< KeyValues *>* _leftovers, KeyVa
 {
 	Assert( _leftovers );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	[[maybe_unused]] const char* keyName = _kv->GetName();
 #endif
 

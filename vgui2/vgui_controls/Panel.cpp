@@ -1228,7 +1228,7 @@ void Panel::PaintTraverse( bool repaint, bool allowForce )
 			surface()->PopMakeCurrent( vpanel );
 		}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		// IsBuildGroupEnabled recurses up all the parents and ends up being very expensive as it wanders all over memory
 		if ( GetBuildModeDialogCount() && IsBuildGroupEnabled() ) //&& HasFocus() )
 		{

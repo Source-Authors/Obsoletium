@@ -974,7 +974,7 @@ public:
 		{
 			g_StudioRender.R_InitLightEffectsWorld3();
 		}
-#ifdef _DEBUG
+#ifndef NDEBUG
 		// In debug, clear it out to ensure we aren't accidentially calling 
 		// the last setup for R_ComputeLightForPoint3.
 		else
@@ -1252,7 +1252,7 @@ public:
 		{
 			g_StudioRender.R_InitLightEffectsWorld3();
 		}
-#ifdef _DEBUG
+#ifndef NDEBUG
 		// In debug, clear it out to ensure we aren't accidentially calling 
 		// the last setup for R_ComputeLightForPoint3.
 		else
@@ -2201,7 +2201,7 @@ int CStudioRender::R_StudioDrawDynamicMesh( IMatRenderContext *pRenderContext, m
 
 	int numTrianglesRendered = 0;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	[[maybe_unused]] const char *pDebugMaterialName = NULL;
 	if ( pMaterial )
 	{
@@ -2724,7 +2724,7 @@ int CStudioRender::R_StudioDrawPoints( IMatRenderContext *pRenderContext, int sk
 		if ( !pMaterial )
 			continue;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		[[maybe_unused]] char const *materialName = pMaterial->GetName();
 #endif
 		// Set up flex data

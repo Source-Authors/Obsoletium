@@ -139,7 +139,7 @@ inline void CMorphBuilder::Begin( IMorph *pMorph, float flFloatToFixedScale )
 	m_pMorph = pMorph;
 	m_pMorph->Lock( flFloatToFixedScale );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_Info.m_PositionDelta.Init( VEC_T_NAN, VEC_T_NAN, VEC_T_NAN );
 	m_Info.m_NormalDelta.Init( VEC_T_NAN, VEC_T_NAN, VEC_T_NAN );
 	m_Info.m_flWrinkleDelta = VEC_T_NAN;
@@ -239,7 +239,7 @@ inline void CMorphBuilder::AdvanceMorph( int nSourceVertex, int nMorphTargetId )
 
 	m_pMorph->AddMorph( m_Info );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_Info.m_PositionDelta.Init( VEC_T_NAN, VEC_T_NAN, VEC_T_NAN );
 	m_Info.m_NormalDelta.Init( VEC_T_NAN, VEC_T_NAN, VEC_T_NAN );
 	m_Info.m_flWrinkleDelta = VEC_T_NAN;

@@ -204,7 +204,7 @@ public:
 			DMsg( "vscript:squirrel",
 				0,
 				"Enabled debug info due to "
-#ifdef _DEBUG
+#ifndef NDEBUG
 				"DEBUG build"
 #else
 				"developer convar set to non-zero"
@@ -1464,7 +1464,7 @@ private:
 			}
 		}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		for ( ; i < nFormalParams; i++ )
 		{
 			Assert( params[i].IsNull() );

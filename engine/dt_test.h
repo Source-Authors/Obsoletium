@@ -10,7 +10,7 @@
 #define DATATABLE_TEST_H
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 void RunDataTableTest();
 

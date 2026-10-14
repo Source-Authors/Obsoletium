@@ -2665,7 +2665,7 @@ int	CModelRender::DrawModelExStaticProp( ModelRenderInfo_t &pInfo )
 		drawFlags |= STUDIORENDER_SHADOWDEPTHTEXTURE;
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Vector tmp;
 	MatrixGetColumn( *pInfo.pModelToWorld, 3, &tmp );
 	Assert( VectorsAreEqual( pInfo.origin, tmp, 1e-3f ) );

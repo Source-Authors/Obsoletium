@@ -1746,7 +1746,7 @@ void CConfirmCustomizeTextureDialog::ApplySchemeSettings( vgui::IScheme *pScheme
 		//m_pFilterCombo->AddItem( "#ToolCustomizeTextureFilterPainterly", NULL );
 
 		COMPILE_TIME_ASSERT( eFilter_Identity == 1 );
-		#ifdef _DEBUG
+		#ifndef NDEBUG
 			m_pFilterCombo->AddItem( "None", NULL );
 		#endif
 

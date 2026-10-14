@@ -222,7 +222,7 @@ void Portal_Gamestats_LevelStats_t::LoadSubChunksFromBuffer( CUtlBuffer &LoadBuf
 
 		unsigned short iChunkID = LoadBuffer.GetUnsignedShort();
 		unsigned int iChunkSize = LoadBuffer.GetUnsignedInt() - sizeof( unsigned int ); //chunk size includes the chunk size data itself
-#ifdef _DEBUG
+#ifndef NDEBUG
 		unsigned int iChunkEndPosition = LoadBuffer.TellGet() + iChunkSize; //used in an assert later
 #endif
 
@@ -413,7 +413,7 @@ void CPortalGameStats::AppendCustomDataToSaveBuffer( CUtlBuffer &SaveBuffer )
 				int iChunkSize = SaveBuffer.TellPut() - iChunkSizePosition; 
 				Assert( iChunkSize >= sizeof( int ) ); //minimum sizeof( int )
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 				int iOldTellPut = SaveBuffer.TellPut(); //needed for an assert below
 #endif
 
@@ -431,7 +431,7 @@ void CPortalGameStats::AppendCustomDataToSaveBuffer( CUtlBuffer &SaveBuffer )
 
 void CPortalGameStats::LoadCustomDataFromBuffer( CUtlBuffer &LoadBuffer )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	unsigned short iSaveStatsVersion = LoadBuffer.GetUnsignedShort();
 	AssertOnce( iSaveStatsVersion <= PORTAL_GAMESTATS_VERSION ); //useful to know, but shouldn't be a failure case
 #else

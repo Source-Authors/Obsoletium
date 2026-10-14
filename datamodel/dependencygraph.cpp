@@ -122,7 +122,7 @@ void CDependencyGraph::Reset( const CUtlVector< IDmeOperator * > &operators )
 			pAttrNode->m_bIsOutputToOperator = true;
 			pOpNode->m_OutputAttributes.AddToTail( pAttrNode );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			// Look for dependent operators, add them if they are not in the array
 			// FIXME: Should this happen for input attributes too?
 			CDmElement* pElement = pAttrNode->m_attribute->GetOwner();

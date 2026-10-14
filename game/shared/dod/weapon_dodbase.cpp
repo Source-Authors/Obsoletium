@@ -232,7 +232,7 @@ void CWeaponDODBase::ItemPostFrame()
 	if ( !pPlayer )
 		return;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	CDODGameRules *mp = DODGameRules();
 #endif
 
@@ -325,7 +325,7 @@ const CDODWeaponInfo &CWeaponDODBase::GetDODWpnData() const
 	const FileWeaponInfo_t *pWeaponInfo = &GetWpnData();
 	const CDODWeaponInfo *pDODInfo;
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		pDODInfo = dynamic_cast< const CDODWeaponInfo* >( pWeaponInfo );
 		Assert( pDODInfo );
 	#else

@@ -57,7 +57,7 @@ CAudioMixerWaveADPCM::CAudioMixerWaveADPCM( IWaveData *data ) : CAudioMixerWave(
 
 	CAudioSourceWave &source = reinterpret_cast<CAudioSourceWave &>(m_pData->Source());
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	CAudioSource *pSource = NULL;
 	pSource = &m_pData->Source();
 	Assert( dynamic_cast<CAudioSourceWave *>(pSource) != NULL );

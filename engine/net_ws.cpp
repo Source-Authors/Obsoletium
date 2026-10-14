@@ -43,7 +43,7 @@ static ConVar fakejitter	( "net_fakejitter", "0", FCVAR_CHEAT, "Jitter fakelag p
 static ConVar net_compressvoice( "net_compressvoice", "0", 0, "Attempt to compress out of band voice payloads (360 only)." );
 ConVar net_usesocketsforloopback( "net_usesocketsforloopback", "0", 0, "Use network sockets layer even for listen server local player's packets (multiplayer only)." );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 static ConVar fakenoise		( "net_fakenoise", "0", FCVAR_CHEAT, "Simulate corrupt network packets (changes n bits per packet randomly)" ); 
 static ConVar fakeshuffle	( "net_fakeshuffle", "0", FCVAR_CHEAT, "Shuffles order of every nth packet (needs net_fakelag)" ); 
 static ConVar recvpackets	( "net_recvpackets", "-1", FCVAR_CHEAT, "Receive exactly next n packets if >= 0" ); 
@@ -1001,7 +1001,7 @@ bool NET_LagPacket (bool newdata, netpacket_t * packet)
 	if ( (p->received + (target/1000.0f)) > net_time )
 		return false;	// not time yet for this packet
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( fakeshuffle.GetInt() && p->pNext )
 	{
 		if ( !RandomInt( 0, fakeshuffle.GetInt() ) )
@@ -1457,7 +1457,7 @@ bool NET_ReceiveDatagram ( const intp sock, netpacket_t * packet )
 
 bool NET_ReceiveValidDatagram ( const intp sock, netpacket_t * packet )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( recvpackets.GetInt() >= 0 )
 	{
 		unsigned long bytes = 0;
@@ -1541,7 +1541,7 @@ netpacket_t *NET_GetPacket (intp sock, byte *scratch )
 	
 	Assert ( inpacket.size ); 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( fakenoise.GetInt() > 0 )
 	{
 		// dimhotepus: Restrict noise bound to packet size to prevent overflow.

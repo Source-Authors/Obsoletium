@@ -210,7 +210,7 @@ public:
 
 static void VCR_Error( const char *pFormat, ... )
 {
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		// Figure out which thread we're in, for the debugger.
 		DWORD curThreadId = GetCurrentThreadId();
 		[[maybe_unused]] int iCurThread = -1;
@@ -471,7 +471,7 @@ static void VCR_End()
 	if ( g_VCRMode == VCR_Playback )
 	{
 		// It's going to get screwy now, especially if we have threads, so just exit.
-#ifdef _DEBUG
+#ifndef NDEBUG
 		DebuggerBreakIfDebugging();
 #endif
 

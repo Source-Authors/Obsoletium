@@ -856,7 +856,7 @@ void C_ParticleSmokeGrenade::FillVolume()
 
 						
 
-						#ifdef _DEBUG
+						#ifndef NDEBUG
 							int testX, testY, testZ;
 							int index_ = GetSmokeParticleIndex(x,y,z);
 							GetParticleInfoXYZ( index_, testX, testY, testZ);

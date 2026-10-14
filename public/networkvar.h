@@ -22,7 +22,7 @@
 
 #define MyOffsetOf( type, var ) ( (intp)&((type*)0)->var )
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	extern bool g_bUseNetworkVars;
 	#define CHECK_USENETWORKVARS if(g_bUseNetworkVars)
 #else

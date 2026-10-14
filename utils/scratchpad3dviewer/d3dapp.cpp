@@ -107,7 +107,7 @@ SpewRetval_t D3DAppSpewFunc( SpewType_t spewType, char const *pMsg )
 
 	default:
 		OutputDebugString(pMsg);
-#ifdef _DEBUG
+#ifndef NDEBUG
 		return spewType == SPEW_ASSERT ? SPEW_DEBUGGER : SPEW_CONTINUE;
 #else
 		return SPEW_CONTINUE;

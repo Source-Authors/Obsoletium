@@ -19,7 +19,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 extern ConVar r_FadeProps;
 #endif
 

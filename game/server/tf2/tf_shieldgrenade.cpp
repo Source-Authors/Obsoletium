@@ -296,7 +296,7 @@ void CShieldGrenade::CreateShield( void )
 	// Construct a transform from shield to grenade (parent)
 	MatrixFromAngles( GetAngles(), parentMatrix );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool ok = 
 #endif
 		MatrixInverseGeneral( parentMatrix, parentInvMatrix );

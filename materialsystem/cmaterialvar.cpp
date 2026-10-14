@@ -1206,7 +1206,7 @@ void CMaterialVar::SetVecValueInternal( const Vector4D &vec, int nComps )
 	memcpy( m_VecVal.Base(), vec.Base(), 4 * sizeof(float) );
 	m_intVal = ( int ) m_VecVal[0];
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for (int i = m_nNumVectorComps; i < 4; ++i )
 		Assert( m_VecVal[i] == 0.0f );
 #endif
@@ -1297,7 +1297,7 @@ void CMaterialVar::SetVecComponentValue( float fVal, int nComponent )
 
 	m_VecVal[nComponent] = fVal;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for (int i = m_nNumVectorComps; i < 4; ++i )
 		Assert( m_VecVal[i] == 0.0f );
 #endif

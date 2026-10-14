@@ -99,7 +99,7 @@ CAudioSourceWave::CAudioSourceWave( CSfxTable *pSfx )
 	m_refCount = 0;
 
 	m_pSfx = pSfx;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( m_pSfx )
 		m_pDebugName = strdup( m_pSfx->getname() );
 	else
@@ -120,7 +120,7 @@ CAudioSourceWave::CAudioSourceWave( CSfxTable *pSfx )
 CAudioSourceWave::CAudioSourceWave( CSfxTable *pSfx, CAudioSourceCachedInfo *info )
 {
 	m_pSfx = pSfx;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( m_pSfx )
 		m_pDebugName = strdup( m_pSfx->getname() );
 	else
@@ -711,7 +711,7 @@ void CAudioSourceWave::ParseSamplerChunk( IterateRIFF &walk )
 		{
 			m_loopStart = LittleLong( samplerChunk.Loops[0].dwStart );
 		}
-#ifdef _DEBUG
+#ifndef NDEBUG
 		else
 		{
 			Msg("Unknown sampler chunk type %d on %s\n", LittleLong( samplerChunk.Loops[0].dwType ), m_pSfx->GetFileName() );

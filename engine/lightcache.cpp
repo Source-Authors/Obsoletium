@@ -2951,7 +2951,7 @@ public:
 			return ITERATION_CONTINUE;
 		}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		if( r_drawlightcache.GetInt() == 4 )
 		{
 			Vector mins( -5, -5, -5 );
@@ -2990,7 +2990,7 @@ void MarkDLightsOnStaticProps( void )
 		if ( (r_dlightactive & (1 << i)) == 0 )
 			continue;
 		
-#ifdef _DEBUG
+#ifndef NDEBUG
 		if( r_drawlightcache.GetInt() == 4 )
 		{
 			Vector mins( -5, -5, -5 );

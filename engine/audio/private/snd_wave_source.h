@@ -144,7 +144,7 @@ private:
 
 	int				m_refCount;
 	
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Only set in debug mode so you can see the name.
 	const char		*m_pDebugName;
 #endif

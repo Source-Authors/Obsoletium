@@ -685,7 +685,7 @@ static void InitWatchDogTimer( )
 {
 	if( !strstr( g_CmdLine, "-nowatchdog" ) )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		s_nWatchDogTimerTimeScale = 10;						// debug is slow
 #else
 		s_nWatchDogTimerTimeScale = 1;

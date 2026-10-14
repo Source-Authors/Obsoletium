@@ -176,7 +176,7 @@ void CMeshInstance::Init( const virtualmeshlist_t &list )
 	{
 		const int factor3 = i * 3;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		const Vector v0 = list.pVerts[list.indices[factor3+0]];
 		const Vector v1 = list.pVerts[list.indices[factor3+1]];
 		const Vector v2 = list.pVerts[list.indices[factor3+2]];

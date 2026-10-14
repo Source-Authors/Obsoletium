@@ -51,7 +51,7 @@ END_SEND_TABLE()
 //-----------------------------------------------------------------------------
 CWeaponMortar::CWeaponMortar( void )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_vecMortarOrigin.Init();
 	m_vecMortarAngles.Init();
 #endif

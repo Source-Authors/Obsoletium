@@ -322,7 +322,7 @@ inline void CWingedEdgeList::UnlinkActiveEdge( WingedEdge_t *pEdge )
 	pEdge->m_pPrevActiveEdge->m_pNextActiveEdge = pEdge->m_pNextActiveEdge;
 	pEdge->m_pNextActiveEdge->m_pPrevActiveEdge = pEdge->m_pPrevActiveEdge;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	pEdge->m_pPrevActiveEdge = pEdge->m_pNextActiveEdge = NULL;
 #endif
 }
@@ -1121,7 +1121,7 @@ inline void CEdgeList::UnlinkActiveEdge( Edge_t *pEdge )
 	pEdge->m_pPrevActiveEdge->m_pNextActiveEdge = pEdge->m_pNextActiveEdge;
 	pEdge->m_pNextActiveEdge->m_pPrevActiveEdge = pEdge->m_pPrevActiveEdge;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	pEdge->m_pPrevActiveEdge = pEdge->m_pNextActiveEdge = NULL;
 #endif
 }

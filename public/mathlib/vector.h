@@ -715,7 +715,7 @@ inline bool Vector::IsValid() const
 
 inline void Vector::Invalidate()
 {
-//#ifdef _DEBUG
+//#ifndef NDEBUG
 //#ifdef VECTOR_PARANOIA
 	DirectX::XMStoreFloat3( XmBase(), DirectX::XMVectorSplatQNaN() );
 //#endif
@@ -1991,7 +1991,7 @@ inline bool Quaternion::IsValid() const
 
 inline void Quaternion::Invalidate()
 {
-//#ifdef _DEBUG
+//#ifndef NDEBUG
 //#ifdef VECTOR_PARANOIA
 	DirectX::XMStoreFloat4( XmBase(), DirectX::XMVectorSplatQNaN() );
 //#endif
@@ -2030,7 +2030,7 @@ inline bool RadianEuler::IsValid() const
 
 inline void RadianEuler::Invalidate()
 {
-//#ifdef _DEBUG
+//#ifndef NDEBUG
 //#ifdef VECTOR_PARANOIA
 	DirectX::XMStoreFloat3( XmBase(), DirectX::XMVectorSplatQNaN() );
 //#endif
@@ -2362,7 +2362,7 @@ inline bool QAngle::IsValid() const
 
 inline void QAngle::Invalidate()
 {
-//#ifdef _DEBUG
+//#ifndef NDEBUG
 //#ifdef VECTOR_PARANOIA
 	DirectX::XMStoreFloat3( XmBase(), DirectX::XMVectorSplatQNaN() );
 //#endif

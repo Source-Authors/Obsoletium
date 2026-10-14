@@ -159,7 +159,7 @@ private:
 	CThreadMutex m_Mutex;
 	static CThreadSafeClassMemoryPool<CRecordInfo>		sm_MemPoolRecordInfo;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// validation tracking
 	static CUtlRBTree<CRecordInfo *, int >	sm_mapPMemPoolRecordInfo;
 	static CThreadMutex	sm_mutexMemPoolRecordInfo;

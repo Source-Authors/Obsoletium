@@ -118,7 +118,7 @@ const volatile auto secureMemset = &memset;
 
 void StudioModel::operator delete( void *pMem )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// set the memory to a known value
 	size_t size = _msize( pMem );
 	secureMemset( pMem, 0xcd, size );
@@ -137,7 +137,7 @@ void *StudioModel::operator new( size_t stAllocateBlock, int nBlockUse, const ch
 
 void StudioModel::operator delete( void *pMem, int nBlockUse, const char *pFileName, int nLine )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// set the memory to a known value
 	size_t size = _msize( pMem );
 	secureMemset( pMem, 0xcd, size );

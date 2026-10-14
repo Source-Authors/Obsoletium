@@ -508,7 +508,7 @@ inline unsigned short CStudioRender::AddVertexToDecal( DecalBuildInfo_t& build, 
 		// Copy over the data;
 		ConvertMeshVertexToDecalVertex( build, nMeshIndex, build.m_pDecalMaterial->m_Vertices[v], nGroupIndex );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		// Make sure clipped vertices are in the right range...
 		if (build.m_UseClipVert)
 		{
@@ -1788,7 +1788,7 @@ void CStudioRender::DrawDecalMaterial( IMatRenderContext *pRenderContext, DecalM
 			{
 				indicesRemaining = decalMaterial.m_Decals[decal].m_IndexCount;
 			}
-#ifdef _DEBUG
+#ifndef NDEBUG
 			else
 			{
 				Assert( i + 1 == indexCount );

@@ -40,7 +40,7 @@
 
 #define TEXTURES_PER_WORKUNIT	1
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 //#define DEBUGFP
 #endif
 

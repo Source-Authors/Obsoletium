@@ -85,7 +85,7 @@ void CMaterialDict::RemoveMaterialFromMaterialList( IMaterialInternal *pMaterial
 
 	Assert( i != InvalidMaterial() );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for ( i = iNext; i != InvalidMaterial(); i = NextMaterial(i) )
 	{
 		Assert( m_MaterialDict[i].m_pMaterial != pMaterial );

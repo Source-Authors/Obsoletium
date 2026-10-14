@@ -129,7 +129,7 @@ FastShaderCompile(const char *file_name, const D3D_SHADER_MACRO *macroses,
       D3DCOMPILE_OPTIMIZATION_LEVEL3};
 
   const unsigned flags1{kCommonFlags |
-#ifdef _DEBUG
+#ifndef NDEBUG
                         kDebugOnlyFlags
 #else
                         kReleaseOnlyFlags

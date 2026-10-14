@@ -980,7 +980,7 @@ static void SortSurfacesByLightmapID( SurfaceHandle_t *pToSort, int iSurfaceCoun
 
 void R_RedownloadAllLightmaps()
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	static bool initializedBlockLights = false;
 	if (!initializedBlockLights)
 	{

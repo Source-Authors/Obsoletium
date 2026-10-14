@@ -695,7 +695,7 @@ void CGenericPersistentManager< T >::UpdateHandleSeed( ReplayHandle_t hNewHandle
 {
 	m_nHandleSeed = (ReplayHandle_t)( GetHandleBase() + MAX( (uint32)m_nHandleSeed, (uint32)hNewHandle ) + 1 );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	FOR_EACH_VEC( m_vecObjs, i )
 	{
 		AssertMsg( m_nHandleSeed != m_vecObjs[ i ]->GetHandle(), "Handle seed collision!" );

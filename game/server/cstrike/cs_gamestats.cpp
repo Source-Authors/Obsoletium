@@ -319,7 +319,7 @@ void CCSGameStats::UploadRoundStats( void )
 	}
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 CON_COMMAND ( teststats, "Test command" )
 {
 	CFastTimer totalTimer;

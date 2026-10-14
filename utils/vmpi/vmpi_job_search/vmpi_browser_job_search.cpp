@@ -12,7 +12,7 @@
 #include "vmpi_browser_job_search.h"
 #include "JobSearchDlg.h"
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;

@@ -2432,7 +2432,7 @@ void C_OP_RenderScreenVelocityRotate::Render( IMatRenderContext *pRenderContext,
 //-----------------------------------------------------------------------------
 void AddBuiltInParticleRenderers( void )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	REGISTER_PARTICLE_OPERATOR( FUNCTION_RENDERER, C_OP_RenderPoints );
 #endif
 	REGISTER_PARTICLE_OPERATOR( FUNCTION_RENDERER, C_OP_RenderSprites );

@@ -58,7 +58,7 @@ void CAI_Node::AddLink(CAI_Link *newLink)
 		return;
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for (intp link=0;link<NumLinks();link++)
 	{
 		if (m_Links[link] == newLink)

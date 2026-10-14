@@ -2308,7 +2308,7 @@ void CTextureManager::RemoveUnusedTextures( void )
 	{
 		iNext = m_TextureList.Next( i );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		if ( m_TextureList[i]->GetReferenceCount() < 0 )
 		{
 			Warning( "RemoveUnusedTextures: pTexture->m_referenceCount < 0 for %s\n", m_TextureList[i]->GetName() );

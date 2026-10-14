@@ -28,7 +28,7 @@ public:
 protected:
 	inline void			AssertValid()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		Assert( this );
 		Assert( m_nSize > 0 );
 		Assert( m_nCount >= 0 );

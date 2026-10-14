@@ -31,7 +31,7 @@ public:
 	vec_t x, y;
 
 	// Construction/destruction
-#ifdef _DEBUG
+#ifndef NDEBUG
     // Initialize to NAN to catch errors
     Vector2D() : x{VEC_T_NAN}, y{VEC_T_NAN}
 	{

@@ -27,7 +27,7 @@ CTestScriptMgr g_TestScriptMgr;
 
 ConVar testscript_debug( "testscript_debug", "0", 0, "Debug test scripts." );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 // --------------------------------------------------------------------------------------------------- //
 // Global console commands the test script manager implements.
 // --------------------------------------------------------------------------------------------------- //

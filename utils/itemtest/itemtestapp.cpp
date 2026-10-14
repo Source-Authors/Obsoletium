@@ -121,7 +121,7 @@ bool CItemTestApp::PreInit()
 
 	const InitReturnVal_t nRetVal = InitDataModel();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 	{
 		g_pFullFileSystem->PrintSearchPaths();

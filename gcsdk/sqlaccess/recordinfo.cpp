@@ -18,7 +18,7 @@ namespace GCSDK
 // Memory pool for CRecordInfo
 CThreadSafeClassMemoryPool<CRecordInfo> CRecordInfo::sm_MemPoolRecordInfo( 10, UTLMEMORYPOOL_GROW_FAST );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 // validation tracking
 CUtlRBTree<CRecordInfo *, int > CRecordInfo::sm_mapPMemPoolRecordInfo( DefLessFunc( CRecordInfo *) );
 CThreadMutex CRecordInfo::sm_mutexMemPoolRecordInfo;
@@ -837,7 +837,7 @@ CRecordInfo *CRecordInfo::Alloc()
 { 
 	CRecordInfo *pRecordInfo = sm_MemPoolRecordInfo.Alloc();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	AUTO_LOCK( sm_mutexMemPoolRecordInfo );
 	sm_mapPMemPoolRecordInfo.Insert( pRecordInfo );
 #endif
@@ -848,7 +848,7 @@ CRecordInfo *CRecordInfo::Alloc()
 
 void CRecordInfo::DestroyThis() 
 { 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	AUTO_LOCK( sm_mutexMemPoolRecordInfo );
 	sm_mapPMemPoolRecordInfo.Remove( this );
 #endif
@@ -866,7 +866,7 @@ void CRecordInfo::ValidateStatics( CValidator &validator, const char *pchName )
 
 	ValidateObj( sm_MemPoolRecordInfo );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	AUTO_LOCK( sm_mutexMemPoolRecordInfo );
 	ValidateObj( sm_mapPMemPoolRecordInfo );
 	FOR_EACH_MAP_FAST( sm_mapPMemPoolRecordInfo, i )

@@ -803,7 +803,7 @@ private:
 public:
 	bool TryLock()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		if ( m_depth == INT_MAX )
 			DebuggerBreak();
 
@@ -825,7 +825,7 @@ public:
 			ThreadPause();
 			Lock( threadId, nSpinSleepTime );
 		}
-#ifdef _DEBUG
+#ifndef NDEBUG
 		if ( m_ownerID.GetRaw() != ThreadGetCurrentId() )
 			DebuggerBreak();
 
@@ -842,7 +842,7 @@ public:
 #endif
 	void Unlock()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		if ( m_ownerID.GetRaw() != ThreadGetCurrentId() )
 			DebuggerBreak();
 

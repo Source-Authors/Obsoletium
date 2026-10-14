@@ -156,7 +156,7 @@ void VisionMode_ChangeCallback( IConVar *pConVar, char const *pOldString, float 
 	}
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 CON_COMMAND_F ( tf_test_bomb, "Test halloween bomb", 0 )
 {
 	C_BasePlayer *pLocalPlayer = C_BasePlayer::GetLocalPlayer();
@@ -975,7 +975,7 @@ void C_TFRagdoll::CreateTFRagdoll()
 		m_frozenTimer.Start( RandomFloat( 9.0f, 11.0f ) );
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	DevMsg( 2, "CreateTFRagdoll %d %d\n", gpGlobals->framecount, pPlayer ? pPlayer->entindex() : 0 );
 #endif
 
@@ -2458,7 +2458,7 @@ public:
 EXPOSE_INTERFACE( CProxyHeartbeatScale, IMaterialProxy, "HeartbeatScale" IMATERIAL_PROXY_INTERFACE_VERSION );
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar tf_benefactor_gift_count( "tf_benefactor_gift_count", "-1", FCVAR_CHEAT, "For testing" );
 #endif
 
@@ -2495,7 +2495,7 @@ public:
 			if ( !pScriptItem->FindAttribute( pAttrDef_KillEater, &unKillCount ) )
 				return;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			int testCount = tf_benefactor_gift_count.GetInt();
 			if ( testCount >= 0 )
 			{
@@ -8441,7 +8441,7 @@ int C_TFPlayer::GetVisionFilterFlags( bool bWeaponsCheck /*= false */  )
 			return m_nForceVisionFilterFlags;
 		}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		int nFlags = 0;
 		if ( test_pyrovision.GetBool() )
 		{

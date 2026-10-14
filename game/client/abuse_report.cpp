@@ -496,7 +496,7 @@ bool CAbuseReportManager::PopulateIncident()
 	}
 
 	// Test harness: add in a handful of fake players
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		if ( m_bTestReport )
 		{
 			int arrayIndex = m_pIncidentData->m_vecPlayers.AddToTail();
@@ -702,7 +702,7 @@ CON_COMMAND_F( abuse_report_submit, "Activate UI to submit queued report.  Use a
 }
 
 // Test harness
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 CON_COMMAND_F( abuse_report_test, "Make a test abuse incident and activate UI", FCVAR_DONTRECORD )
 {

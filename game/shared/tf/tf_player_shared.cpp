@@ -129,7 +129,7 @@ ConVar tf_mvm_bot_flag_carrier_movement_penalty( "tf_mvm_bot_flag_carrier_moveme
 
 #ifdef GAME_DLL
 ConVar tf_boost_drain_time( "tf_boost_drain_time", "15.0", FCVAR_DEVELOPMENTONLY, "Time is takes for a full health boost to drain away from a player.", true, 0.1, false, 0 );
-#ifdef _DEBUG
+#ifndef NDEBUG
 CON_COMMAND_F( tf_add_bombhead, "Add Merasmus Bomb Head Condition", 0 )
 {
 	CUtlVector< CTFPlayer * > playerVector;
@@ -9959,7 +9959,7 @@ void CTFPlayer::FireBullet( CTFWeaponBase *pWpn, const FireBulletsInfo_t &info, 
 #endif
 
 #ifdef GAME_DLL
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( tf_debug_bullets.GetBool() )
 	{
 		NDebugOverlay::Line( vecStart, trace.endpos, 0,255,0, true, 30 );

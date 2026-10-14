@@ -276,7 +276,7 @@ public:
 	
 	CRC32_t GetShuffleCRC()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		static bool bCalcShuffleCRC = true;
 #else
 		static bool bCalcShuffleCRC = VMPI_IsParamUsed( EVMPICmdLineParam::mpi_CalcShuffleCRC );

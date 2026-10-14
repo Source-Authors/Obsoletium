@@ -10,7 +10,7 @@
 
 #include "tier0/memdbgon.h"
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 static CUtlDict<int,int> *g_STDict = nullptr;
 static CUtlDict<int,int> *g_RTDict = nullptr;
 #endif
@@ -262,7 +262,7 @@ char* AllocateUniqueDataTableName( bool bSendTable, PRINTF_FORMAT_STRING const c
 	va_end( marker );
 
 	// Make sure it's unique.
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Have to allocate them here because if they're declared as straight global variables,
 	// their constructors won't have been called yet by the time we get in here.
 	if ( !g_STDict )

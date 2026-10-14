@@ -841,7 +841,7 @@ void LoadTexture( TextureLoadInfo_t &info )
 	Assert( info.m_pSrcData );
 	Assert( info.m_pTexture );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	ImageFormat format = GetImageFormat( info.m_pTexture );
 	Assert( (format != -1) && (format == FindNearestSupportedFormat( format, false, false, false )) );
 #endif
@@ -1111,7 +1111,7 @@ void LoadSubTexture( TextureLoadInfo_t &info, int xOffset, int yOffset, int srcS
 	Assert( info.m_pSrcData );
 	Assert( info.m_pTexture );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	ImageFormat format = GetImageFormat( info.m_pTexture );
 	Assert( (format == FindNearestSupportedFormat(format, false, false, false )) && (format != -1) );
 #endif

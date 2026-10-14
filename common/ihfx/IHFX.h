@@ -545,7 +545,7 @@ struct NovintHFXCloseHelper
 		static bool ONE_INSTANCE_ONLY=true;
 		if(!ONE_INSTANCE_ONLY)
 		{
-#ifdef _DEBUG
+#ifndef NDEBUG
 			// look at the call stack and please remove whatever is calling this constructor.
 			// there should be only one HFX_INIT_VARS.
 			DebugBreak();

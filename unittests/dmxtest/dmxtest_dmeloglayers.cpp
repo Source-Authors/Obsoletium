@@ -559,7 +559,7 @@ DEFINE_TESTCASE_NOSUITE( DmxTestDmeLogLayers )
 {
 	Msg( "Running CDmeTypedLog<float> layering tests...\n" );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int nStartingCount = g_pDataModel->GetAllocatedElementCount();
 #endif
 
@@ -830,7 +830,7 @@ DEFINE_TESTCASE_NOSUITE( DmxTestDmeLogLayers )
 
 	g_pDataModel->RemoveFileId( fileid );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int nEndingCount = g_pDataModel->GetAllocatedElementCount();
 	AssertEquals( nEndingCount, nStartingCount );
 	if ( nEndingCount != nStartingCount )
@@ -854,7 +854,7 @@ DEFINE_TESTCASE_NOSUITE( DmxTestDmeLogLayersUndo )
 {
 	Msg( "Running CDmeTypedLog<float> layering UNDO tests...\n" );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int nStartingCount = g_pDataModel->GetAllocatedElementCount();
 #endif
 
@@ -887,7 +887,7 @@ DEFINE_TESTCASE_NOSUITE( DmxTestDmeLogLayersUndo )
 	g_pDataModel->ClearUndo();
 	g_pDataModel->RemoveFileId( fileid );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int nEndingCount = g_pDataModel->GetAllocatedElementCount();
 	AssertEquals( nEndingCount, nStartingCount );
 	if ( nEndingCount != nStartingCount )

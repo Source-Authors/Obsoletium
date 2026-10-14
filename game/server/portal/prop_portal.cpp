@@ -892,7 +892,7 @@ bool CProp_Portal::ShouldTeleportTouchingEntity( CBaseEntity *pOther )
 		//entity wants to go further into the plane
 		if( m_PortalSimulator.EntityIsInPortalHole( pOther ) )
 		{
-#ifdef _DEBUG
+#ifndef NDEBUG
 			static int iAntiRecurse = 0;
 			if( pOther->IsPlayer() && (iAntiRecurse == 0) )
 			{
@@ -1289,7 +1289,7 @@ void CProp_Portal::TeleportTouchingEntity( CBaseEntity *pOther )
 		MessageEnd();
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	{
 		Vector ptTestCenter = pOther->WorldSpaceCenter();
 

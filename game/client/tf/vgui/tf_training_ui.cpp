@@ -25,7 +25,7 @@
 
 //------------------------------------------------------------------------------------------------------
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define PRINT_KEY_VALUES( kv_ )	{ CUtlBuffer buf(0, 0, CUtlBuffer::TEXT_BUFFER); kv_->RecursiveSaveToFile( buf, 0 ); ConMsg( "---\n%s\n---\n", buf.String() ); }
 #else
 #define PRINT_KEY_VALUES( kv_ )	{ }
@@ -2187,7 +2187,7 @@ CON_COMMAND( cl_training_class_unlock_all, "Unlock all training" )
 
 //------------------------------------------------------------------------------------------------------
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 CON_COMMAND( training_set, 0 )
 {
 	if ( args.ArgC() != 3 )

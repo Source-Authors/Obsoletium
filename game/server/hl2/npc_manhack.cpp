@@ -212,7 +212,7 @@ END_SEND_TABLE()
 //------------------------------------------------------------------------------
 CNPC_Manhack::CNPC_Manhack()
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_vForceMoveTarget.Init();
 	m_vSwarmMoveTarget.Init();
 	m_vTargetBanking.Init();

@@ -1496,11 +1496,11 @@ void CTFStatsSummaryPanel::OnDeactivate()
 
 CON_COMMAND( showstatsdlg, "Shows the player stats dialog" )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	GStatsSummaryPanel()->InvalidateLayout( false, true );
 #endif
 	GStatsSummaryPanel()->ShowModal();
-#ifdef _DEBUG
+#ifndef NDEBUG
 	GStatsSummaryPanel()->OnMapLoad( "cp_coldfront" );
 #endif
 }

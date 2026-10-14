@@ -2815,7 +2815,7 @@ void CClientShadowMgr::UpdateBrushShadow( IClientRenderable *pRenderable, Client
 }
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 static bool s_bBreak = false;
 
@@ -3042,7 +3042,7 @@ void CClientShadowMgr::AddToDirtyShadowList( IClientRenderable *pRenderable, boo
 	if ( handle == CLIENTSHADOW_INVALID_HANDLE )
 		return;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Make sure everything's consistent
 	if ( handle != CLIENTSHADOW_INVALID_HANDLE )
 	{
@@ -3117,7 +3117,7 @@ void CClientShadowMgr::UpdateShadow( ClientShadowHandle_t handle, bool force )
 		return;
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if (s_bBreak)
 	{
 		s_bBreak = false;

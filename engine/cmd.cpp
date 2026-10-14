@@ -45,7 +45,7 @@
 #define CMDSTR_ADD_EXECUTION_MARKER "[$&*,`]"
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar cl_debug_respect_cheat_vars( "cl_debug_respect_cheat_vars", "0", 0, "(debug builds only) - when set to 0, the client can change cheat vars." );
 #endif
 

@@ -357,7 +357,7 @@ void COverlayMgr::CleanupMaterial( unsigned short nSortOrder )
 {
 	RenderQueueHead_t &renderQueue = m_RenderQueue[nSortOrder];
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for ( int i = 0; i < MAX_MAT_SORT_GROUPS; ++i )
 	{
 		// Shouldn't be cleaning up while we've got a render list

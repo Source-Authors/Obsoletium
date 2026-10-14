@@ -51,7 +51,7 @@
 
 using namespace GCSDK;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar item_inventory_debug( "item_inventory_debug", "0", FCVAR_REPLICATED | FCVAR_CHEAT );
 #endif
 
@@ -61,7 +61,7 @@ ConVar item_inventory_debug( "item_inventory_debug", "0", FCVAR_REPLICATED | FCV
 
 #define ITEM_CLIENTACK_FILE			"item_clientacks.txt"
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #ifdef CLIENT_DLL
 ConVar item_debug_clientacks( "item_debug_clientacks", "0", FCVAR_CLIENTDLL | FCVAR_ARCHIVE );
 #endif
@@ -1050,7 +1050,7 @@ void CInventoryManager::VerifyAckFileLoaded( void )
 					buf.SeekPut( CUtlBuffer::SEEK_HEAD, nFileSize );
 					m_pkvItemClientAckFile->ReadAsBinary( buf );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 					if ( item_debug_clientacks.GetBool() )
 					{
 						m_pkvItemClientAckFile->SaveToFile( g_pFullFileSystem, "cfg/tmp_readack.txt", "MOD" );
@@ -1117,7 +1117,7 @@ void CInventoryManager::SaveAckFile( void )
 		m_pkvItemClientAckFile->WriteAsBinary( buf );
 		pRemoteStorage->FileWrite( ITEM_CLIENTACK_FILE, buf.Base(), buf.TellPut() );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		if ( item_debug_clientacks.GetBool() )
 		{
 			m_pkvItemClientAckFile->SaveToFile( g_pFullFileSystem, "cfg/tmp_saveack.txt", "MOD" );
@@ -1576,7 +1576,7 @@ void CPlayerInventory::SOUpdated( const CSteamID & steamIDOwner, const GCSDK::CS
 		{
 			SendInventoryUpdateEvent();
 		}
-#ifdef _DEBUG
+#ifndef NDEBUG
 		if ( item_inventory_debug.GetBool() )
 		{
 			DumpInventoryToConsole( true );
@@ -1634,7 +1634,7 @@ void CPlayerInventory::SOCacheSubscribed( const CSteamID & steamIDOwner, GCSDK::
 	if ( steamIDOwner != m_OwnerID )
 		return;
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		Msg("CPlayerInventory::SOCacheSubscribed\n");
 	#endif
 
@@ -1852,7 +1852,7 @@ void CPlayerInventory::RemoveItem( itemid_t iItemID )
 
 		m_aInventoryItems.Remove(iIndex);
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		if ( item_inventory_debug.GetBool() )
 		{
 			DumpInventoryToConsole( true );

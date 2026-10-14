@@ -76,7 +76,7 @@ public:
 	CStorePanel( Panel *parent );
 	virtual ~CStorePanel();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	void		ReAddPage( int iPage );
 #endif
 

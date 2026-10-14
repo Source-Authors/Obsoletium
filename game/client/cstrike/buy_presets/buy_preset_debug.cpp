@@ -12,7 +12,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define BUY_PRESET_DEBUGGING 1
 #else
 #define BUY_PRESET_DEBUGGING 0

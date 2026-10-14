@@ -255,7 +255,7 @@ void CAI_BaseFlyingBot::TranslateNavGoal( CBaseEntity *pTarget, Vector &chasePos
 //------------------------------------------------------------------------------
 CAI_BaseFlyingBot::CAI_BaseFlyingBot()
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_vCurrentVelocity.Init();
 	m_vCurrentBanking.Init();
 	m_vLastPatrolDir.Init();

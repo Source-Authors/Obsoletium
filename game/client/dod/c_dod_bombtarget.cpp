@@ -74,7 +74,7 @@ int C_DODBombTarget::DrawModel( int flags )
 
 		int iOppositeTeam = ( m_iBombingTeam == TEAM_ALLIES ) ? TEAM_AXIS : TEAM_ALLIES;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		if ( m_iBombingTeam == TEAM_UNASSIGNED )
 			iOppositeTeam = TEAM_UNASSIGNED;
 #endif

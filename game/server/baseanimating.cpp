@@ -1986,7 +1986,7 @@ bool CBaseAnimating::GetAttachment( int iAttachment, matrix3x4_t &attachmentToWo
 	if (!pStudioHdr)
 	{
 		MatrixCopy(EntityToWorldTransform(), attachmentToWorld);
-#ifdef _DEBUG
+#ifndef NDEBUG
 		ExecuteOnce( AssertMsg( false, "Get attachment: model '%s' is missing.\n", STRING( GetModelName() ) ) );
 #endif
 		return false;
@@ -2027,7 +2027,7 @@ int CBaseAnimating::GetAttachmentBone( int iAttachment )
 	CStudioHdr *pStudioHdr = GetModelPtr( );
 	if (!pStudioHdr)
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		ExecuteOnce(AssertMsg( false, "Get attachment bone: model '%s' is missing.\n",
 			STRING( GetModelName() ) ));
 #endif
@@ -2036,7 +2036,7 @@ int CBaseAnimating::GetAttachmentBone( int iAttachment )
 
 	if (iAttachment < 1 || iAttachment > pStudioHdr->GetNumAttachments() )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		ExecuteOnce(AssertMsg( false, "Get attachment bone: model '%s' attachment %d is out of range [1..%d].\n",
 			STRING( GetModelName() ), iAttachment, pStudioHdr->GetNumAttachments() ));
 #endif
@@ -2768,7 +2768,7 @@ void CBaseAnimating::InitBoneControllers ( void ) // FIXME: rename
 	{
 		nBoneControllerCount = NUM_BONECTRLS;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		Warning( "Model %s has too many bone controllers! (Max %d allowed)\n", pStudioHdr->pszName(), NUM_BONECTRLS );
 #endif
 	}
@@ -2974,7 +2974,7 @@ void CBaseAnimating::GetInputDispatchEffectPosition( const char *sInputString, V
 //-----------------------------------------------------------------------------
 void CBaseAnimating::SetHitboxSet( int setnum )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	CStudioHdr *pStudioHdr = GetModelPtr();
 	if ( !pStudioHdr )
 		return;

@@ -193,7 +193,7 @@ LINK_ENTITY_TO_CLASS(npc_cscanner, CNPC_CScanner);
 //-----------------------------------------------------------------------------
 CNPC_CScanner::CNPC_CScanner()
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_vInspectPos.Init();
 	m_vSpotlightTargetPos.Init();
 	m_vSpotlightCurrentPos.Init();

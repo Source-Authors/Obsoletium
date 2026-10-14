@@ -964,7 +964,7 @@ void CTFPlayerInventory::OnHasNewQuest()
 #endif
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #ifdef CLIENT_DLL
 CON_COMMAND( cl_newitem_test, "Tests the new item ui notification." )
 {
@@ -1732,7 +1732,7 @@ CTFPlayerInventory	*CTFInventoryManager::GetLocalTFInventory( void )
 }
 #endif
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #if defined(CLIENT_DLL)
 CON_COMMAND_F( item_dumpinv_other, "Dumps the contents of a specified client inventory. Format: item_dumpinv_other <player index>", FCVAR_NONE )
 {
@@ -1750,7 +1750,7 @@ CON_COMMAND_F( item_dumpinv_other, "Dumps the contents of a specified client inv
 #endif
 #endif // _DEBUG
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #if defined(CLIENT_DLL)
 CON_COMMAND_F( item_dumpinv, "Dumps the contents of a specified client inventory. Format: item_dumpinv", FCVAR_CHEAT )
 #else
@@ -1776,7 +1776,7 @@ CON_COMMAND_F( item_dumpinv_sv, "Dumps the contents of a specified server invent
 }
 #endif
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #if defined(CLIENT_DLL)
 CON_COMMAND_F( item_deleteunknowns, "Deletes all items in your inventory that we don't have static data for. Useful for removing items that have been removed from the backend.", FCVAR_CHEAT )
 {

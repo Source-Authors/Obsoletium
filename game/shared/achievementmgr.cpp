@@ -260,7 +260,7 @@ bool CAchievementMgr::Init()
 	// (for single player), so register ourselves with the engine so UI has a uniform place 
 	// to go get the pointer to us
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// There can be only one achievement manager instance; no one else should be registered
 	IAchievementMgr *pAchievementMgr = engine->GetAchievementMgr();
 	Assert( NULL == pAchievementMgr );

@@ -15,7 +15,7 @@ public:
 	{
 		m_pData = new unsigned char[size];
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_pUsed = new const char *[size];
 		memset( m_pUsed, 0, size * sizeof( const char * ) );
 #endif
@@ -23,7 +23,7 @@ public:
 		m_Size = size;
 		m_pCurPos = m_pData;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		memset( m_pData, 0xbaadf00d, size );
 #endif
 	}
@@ -31,12 +31,12 @@ public:
 	{
 		delete [] m_pData;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		delete [] m_pUsed;
 #endif
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	void TestWritten( intp EndOfFileOffset )
 	{
 		if ( !g_quiet )
@@ -81,7 +81,7 @@ public:
 	{
 		m_pCurPos = m_pData + offset;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		const char **used = m_pUsed + offset;
 		bool bitched = false;
 		for( intp i = 0; i < size; i++ )
@@ -126,7 +126,7 @@ private:
 	unsigned char *m_pData;
 	unsigned char *m_pCurPos;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	const char **m_pUsed;
 #endif
 };

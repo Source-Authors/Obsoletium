@@ -209,7 +209,7 @@ bool CReportPlayerDialog::IsValidPlayerSelected()
 		KeyValues *pData = m_pPlayerList->GetItem( m_pPlayerList->GetSelectedItem( 0 ) );
 		player_info_t pi;
 		bIsValidPlayer = engine->GetPlayerInfo( pData->GetInt( "index" ), &pi );
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bIsValidPlayer = bIsValidPlayer && pData->GetInt( "index" ) != engine->GetLocalPlayer();
 #else
 		bIsValidPlayer = bIsValidPlayer && !pi.fakeplayer && pData->GetInt( "index" ) != engine->GetLocalPlayer();

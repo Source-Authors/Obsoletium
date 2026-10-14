@@ -672,7 +672,7 @@ bool IsPointInCone( const Vector &pt, const Vector &origin, const Vector &axis, 
 bool IsBoxIntersectingBox( const Vector& boxMin1, const Vector& boxMax1, 
 						const Vector& boxMin2, const Vector& boxMax2 )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	DirectX::XMVECTOR min1 = DirectX::XMLoadFloat3( boxMin1.XmBase() );
 	DirectX::XMVECTOR max1 = DirectX::XMLoadFloat3( boxMax1.XmBase() );
 

@@ -15,7 +15,7 @@
 #include <cstddef>  // std::ptrdiff_t
 
 #if !defined( _X360 ) && !defined( DX_TO_GL_ABSTRACTION )
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define D3D_DEBUG_INFO 1
 #endif
 #endif

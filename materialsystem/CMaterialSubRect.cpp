@@ -275,7 +275,7 @@ private:
 	// Used only by procedural materials; it essentially is an in-memory .VMT file
 	KeyValues					*m_pVMTKeyValues;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Makes it easier to see what's going on
 	char*						m_pDebugName;
 #endif
@@ -327,7 +327,7 @@ CMaterialSubRect::CMaterialSubRect( const char *pMaterialName, const char *pText
 	pTemp[ len - 4 ] = '\0';
 	m_symName = pTemp;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_pDebugName = new char[Q_strlen( pTemp ) + 1];
 	Q_strncpy( m_pDebugName, pTemp, Q_strlen( pTemp ) + 1 );
 #endif
@@ -394,7 +394,7 @@ CMaterialSubRect::~CMaterialSubRect()
 
 	// m_aMaterialVars is freed, purged, and lit on fire in Uncache() above.
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( m_pDebugName )
 	{
 		delete[] m_pDebugName;

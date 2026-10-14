@@ -1180,7 +1180,7 @@ void CDmeTestMesh::SetUpBones( CDmeTransform *pTransform, int nMaxBoneCount, mat
 	for ( int i = 0; i < nMaxBoneCount; i++ ) 
 	{
 		// If it's not being used, fill with NAN for errors
-#ifdef _DEBUG
+#ifndef NDEBUG
 		if ( !(studioHdr.pBone( i )->flags & BoneMask()))
 		{
 			int j, k;

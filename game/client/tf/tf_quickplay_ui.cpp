@@ -48,7 +48,7 @@ extern int g_iQuickplaySessionIndex;
 #include "tf_matchmaking_scoring.h"
 
 ConVar tf_matchmaking_debug( "tf_matchmaking_spew_level",
-#ifdef _DEBUG
+#ifndef NDEBUG
 	"3",
 #else
 	"1",

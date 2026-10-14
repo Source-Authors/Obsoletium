@@ -273,7 +273,7 @@ bool CShaderDeviceMgrDx8::InitGpuInfo()
 	for( unsigned i = 0; i < nCount; ++i )
 	{
 		AdapterInfo_t &info = m_Adapters[m_Adapters.AddToTail()];
-#ifdef _DEBUG
+#ifndef NDEBUG
 		memset( &info.m_ActualCaps, 0xDD, sizeof(info.m_ActualCaps) );
 #endif
 
@@ -2509,7 +2509,7 @@ void CShaderDeviceDx8::ReleaseResources()
 	MeshMgr()->ReleaseBuffers();
 	g_pShaderAPI->ReleaseShaderObjects();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	const int bufferCount = MeshMgr()->BufferCount();
 
 	for( int i = 0; i < bufferCount; i++ )
@@ -2809,7 +2809,7 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 {
 	m_bOtherAppInitializing = bOtherAppInitializing;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( mat_forcelostdevice.GetBool() )
 	{
 		mat_forcelostdevice.SetValue( 0 );

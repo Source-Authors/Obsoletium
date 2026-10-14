@@ -65,7 +65,7 @@ BEGIN_DATADESC( CTFBaseRocket )
 END_DATADESC()
 #endif
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar tf_rocket_show_radius( "tf_rocket_show_radius", "0", FCVAR_REPLICATED | FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY, "Render rocket radius." );
 #endif
 

@@ -130,7 +130,7 @@ C_BaseFlex::C_BaseFlex() :
 	m_iv_vecShift("C_BaseFlex:m_iv_vecShift" )
 #endif
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	((Vector&)m_viewtarget).Init();
 #endif
 

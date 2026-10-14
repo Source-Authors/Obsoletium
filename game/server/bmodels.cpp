@@ -540,7 +540,7 @@ void SendProxy_FuncRotatingAngle( const SendProp *pProp, const void *pStruct, co
 
 	vec_t const *qa = (vec_t *)pData;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	vec_t const *ea = entity->GetLocalAngles().Base();
 	// Assert its actually an index into m_angRotation if not this won't work
 

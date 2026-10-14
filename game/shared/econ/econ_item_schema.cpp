@@ -7995,7 +7995,7 @@ bool CEconItemSchema::BInitRecipes( KeyValues *pKVRecipes, CUtlVector<CUtlString
 			CEconCraftingRecipeDefinition *recipeDef = CreateCraftingRecipeDefinition();
 			SCHEMA_INIT_SUBSTEP( recipeDef->BInitFromKV( pKVRecipe, pVecErrors ) );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			// Sanity check in debug builds so that we know we aren't putting the same recipe in
 			// multiple times.
 			FOR_EACH_MAP_FAST( m_mapRecipes, i )

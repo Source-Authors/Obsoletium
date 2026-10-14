@@ -336,7 +336,7 @@ float CAI_Path::CurWaypointYaw() const
 void CAI_Path::SetGoalPosition(const Vector &goalPos) 
 {
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Make sure goal position isn't set more than once
 	if (m_bGoalPosSet == true)
 	{
@@ -355,7 +355,7 @@ void CAI_Path::SetGoalPosition(const Vector &goalPos)
 //-----------------------------------------------------------------------------
 void CAI_Path::SetLastNodeAsGoal(bool bReset)
 {
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		// Make sure goal position isn't set more than once
 		if (!bReset && m_bGoalPosSet == true)
 		{
@@ -400,7 +400,7 @@ void CAI_Path::ResetGoalPosition(const Vector &goalPos)
 //-----------------------------------------------------------------------------
 const Vector& CAI_Path::BaseGoalPosition() const
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Make sure goal position was set
 	if (m_bGoalPosSet == false)
 	{
@@ -420,7 +420,7 @@ const Vector& CAI_Path::BaseGoalPosition() const
 //-----------------------------------------------------------------------------
 const Vector & CAI_Path::ActualGoalPosition(void) const
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Make sure goal position was set
 	if (m_bGoalPosSet == false)
 	{
@@ -439,7 +439,7 @@ const Vector & CAI_Path::ActualGoalPosition(void) const
 void CAI_Path::SetGoalType(GoalType_t goalType) 
 {
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Make sure goal position isn't set more than once
 	if (m_goalType != GOALTYPE_NONE && goalType != GOALTYPE_NONE )
 	{
@@ -600,7 +600,7 @@ bool CAI_Path::CurWaypointIsGoal( void ) const
 
 	if ( GetCurWaypoint()->Flags() & bits_WP_TO_GOAL )
 	{
-		#ifdef _DEBUG
+		#ifndef NDEBUG
 			if (GetCurWaypoint()->GetNext())
 			{
 				DevMsg( "!!ERROR!! Goal is not last waypoint!\n");
@@ -616,7 +616,7 @@ bool CAI_Path::CurWaypointIsGoal( void ) const
 	{
 		// UNDONE: Refresh here or somewhere else?
 	}
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if (!GetCurWaypoint()->GetNext())
 	{
 		DevMsg( "!!ERROR!! GetCurWaypoint has no goal!\n");

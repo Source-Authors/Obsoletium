@@ -179,7 +179,7 @@ CRender3D::CRender3D(void) :
 
 	m_TranslucentRenderObjects.SetLessFunc( TranslucentObjectsLessFunc );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_bRenderFrustum = false;
 	m_bRecomputeFrustumRenderGeometry = false;
 #endif
@@ -326,7 +326,7 @@ float CRender3D::GetElapsedTime(void)
 
 void CRender3D::ComputeFrustumRenderGeometry(CCamera *pCamera)
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Vector viewPoint;
 	pCamera->GetViewPoint(viewPoint);
 
@@ -376,7 +376,7 @@ void CRender3D::ComputeFrustumRenderGeometry(CCamera *pCamera)
 
 void CRender3D::RenderFrustum( )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// dimhotepus: int -> unsigned short.
 	static unsigned short indices[] = 
 		{
@@ -755,7 +755,7 @@ void CRender3D::StartRenderFrame(void)
 	pCamera->GetFrustumPlanes( m_FrustumPlanes);
 
 	// For debugging frustum planes
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if (m_bRecomputeFrustumRenderGeometry)
 	{
 		ComputeFrustumRenderGeometry( pCamera );
@@ -1774,7 +1774,7 @@ void CRender3D::Render(void)
 	RenderPointsAndPortals();
 
     
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if (m_bRenderFrustum)
 	{
 		RenderFrustum();
@@ -2957,7 +2957,7 @@ void CRender3D::DebugHook1(void *pData)
 {
 	g_bShowStatistics = !g_bShowStatistics;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_bRecomputeFrustumRenderGeometry = true;
 	m_bRenderFrustum = true;
 #endif

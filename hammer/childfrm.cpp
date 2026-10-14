@@ -314,7 +314,7 @@ CView *CChildFrame::ReplaceView(CRuntimeClass *pViewClass)
 }
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : 

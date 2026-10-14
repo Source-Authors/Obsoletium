@@ -763,7 +763,7 @@ CShaderManager::CShaderManager() :
 #endif
 #endif
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	memset( &vshDebugName, 0, sizeof(vshDebugName) );
 	vshDebugIndex = 0;
 	memset( &pshDebugName, 0, sizeof(pshDebugName) );
@@ -917,7 +917,7 @@ IShaderBuffer *CShaderManager::CompileShader( const char *pProgram, size_t nBufL
 {
 	UINT nCompileFlags = D3DCOMPILE_AVOID_FLOW_CONTROL;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	nCompileFlags |= D3DCOMPILE_DEBUG;
 #endif
 
@@ -1537,7 +1537,7 @@ HardwareShader_t CShaderManager::CompileShader( const char *pShaderName,
 	}
 
 	const ShaderCombos_t &combos = m_ShaderNameToCombos[pShaderName];
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int numStaticCombos = combos.GetNumStaticCombos();
 	int numDynamicCombos = combos.GetNumDynamicCombos();
 #endif
@@ -2964,7 +2964,7 @@ void CShaderManager::SetVertexShader( VertexShader_t shader )
 		AssertMsg( false, "Can't load vertex shader '%s'.\n", m_ShaderSymbolTable.String( vshLookup.m_Name ) );
 		return;
 	}
-#ifdef _DEBUG
+#ifndef NDEBUG
 	vshDebugIndex = (vshDebugIndex + 1) % MAX_SHADER_HISTORY;
 	V_strcpy_safe( vshDebugName[vshDebugIndex], m_ShaderSymbolTable.String( vshLookup.m_Name ) );
 #endif
@@ -3057,7 +3057,7 @@ void CShaderManager::SetPixelShader( PixelShader_t shader )
 		AssertMsg( false, "Can't load pixel shader '%s'.\n", m_ShaderSymbolTable.String( pshLookup.m_Name ) );
 		return;
 	}
-#ifdef _DEBUG
+#ifndef NDEBUG
 	pshDebugIndex = (pshDebugIndex + 1) % MAX_SHADER_HISTORY;
 	V_strcpy_safe( pshDebugName[pshDebugIndex], m_ShaderSymbolTable.String( pshLookup.m_Name ) );
 #endif
@@ -3263,7 +3263,7 @@ void CShaderManager::FlushShaders( void )
 		{
 			if( combos.m_pHardwareShaders[i] != INVALID_HARDWARE_SHADER )
 			{
-#ifdef _DEBUG
+#ifndef NDEBUG
 				ULONG nRetVal=
 #endif
 					( ( IDirect3DVertexShader9 * )combos.m_pHardwareShaders[i] )->Release();
@@ -3282,7 +3282,7 @@ void CShaderManager::FlushShaders( void )
 		{
 			if( combos.m_pHardwareShaders[i] != INVALID_HARDWARE_SHADER )
 			{
-#ifdef _DEBUG
+#ifndef NDEBUG
 				ULONG nRetVal =
 #endif
 					( ( IDirect3DPixelShader * )combos.m_pHardwareShaders[i] )->Release();

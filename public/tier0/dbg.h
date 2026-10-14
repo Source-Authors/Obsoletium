@@ -591,7 +591,7 @@ public:
 // 1. You create an object of a low level type in a DLL, and it really gets created there.
 // 2. You pass it across a DLL boundary
 // 3. You use assert_cast to verify it in the second DLL boundary (where it also could've been created).
-#ifdef _DEBUG
+#ifndef NDEBUG
 template<typename DEST_POINTER_TYPE, typename SOURCE_POINTER_TYPE>
 inline std::enable_if_t<std::is_pointer_v<DEST_POINTER_TYPE>, DEST_POINTER_TYPE>
 assert_cast(SOURCE_POINTER_TYPE *pSource) {
@@ -632,7 +632,7 @@ FORCEINLINE void AssertValidReadWritePtr( const void*, [[maybe_unused]] intp cou
 //-----------------------------------------------------------------------------
 // Macro to protect functions that are not reentrant
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 class CReentryGuard
 {
 public:
@@ -695,7 +695,7 @@ private:
 //
 #if defined( _WIN32 ) && !defined( _X360 )
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		#pragma comment(compiler)
 	#endif
 
@@ -706,7 +706,7 @@ private:
 // Purpose: Wrap around a variable to create a simple place to put a breakpoint
 //
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 template< class Type >
 class CDataWatcher

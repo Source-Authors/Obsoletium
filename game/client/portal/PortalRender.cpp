@@ -735,7 +735,7 @@ bool CPortalRender::DrawPortalsUsingStencils( CViewRender *pViewRender )
 
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 extern bool g_bRenderingCameraView;
 #endif
 
@@ -758,7 +758,7 @@ void CPortalRender::DrawPortalsToTextures( CViewRender *pViewRender, const CView
 	m_RecursiveViewComplexFrustums[0].AddMultipleToTail( FRUSTUM_NUMPLANES, pViewRender->GetFrustum() );
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	g_bRenderingCameraView = true;
 #endif
 
@@ -807,7 +807,7 @@ void CPortalRender::DrawPortalsToTextures( CViewRender *pViewRender, const CView
 	m_pRenderingViewForPortal = NULL;
 	m_pRenderingViewExitPortal = NULL;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	g_bRenderingCameraView = false;
 #endif
 }
@@ -928,7 +928,7 @@ int	CPortalRender::GetRemainingPortalViewDepth() const
 int CPortalRender::GetCurrentViewId() const
 {
 	Assert( m_PortalViewIDNodeChain[m_iViewRecursionLevel] != NULL );
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for( int i = 0; i != m_iViewRecursionLevel; ++i )
 	{
 		Assert( m_PortalViewIDNodeChain[i]->iPrimaryViewID != m_PortalViewIDNodeChain[m_iViewRecursionLevel]->iPrimaryViewID );
@@ -1116,7 +1116,7 @@ void CPortalRender::HandlePortalPlaybackMessage( KeyValues *pKeyValues )
 
 void CPortalRender::AddPortalCreationFunc( const char *szPortalType, PortalRenderableCreationFunc creationFunc )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for( int i = m_PortalRenderableCreators.Count(); --i >= 0; )
 	{
 		AssertMsg( FStrEq( m_PortalRenderableCreators[i].portalType.String(), szPortalType ) == false, "Multiple portal renderable creation functions for same type of portal renderable."  );

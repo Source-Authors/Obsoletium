@@ -113,7 +113,7 @@ LINK_ENTITY_TO_CLASS(point_spotlight, CPointSpotlight);
 //-----------------------------------------------------------------------------
 CPointSpotlight::CPointSpotlight()
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_vSpotlightTargetPos.Init();
 	m_vSpotlightCurrentPos.Init();
 	m_vSpotlightDir.Init();

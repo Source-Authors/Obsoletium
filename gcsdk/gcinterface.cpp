@@ -599,7 +599,7 @@ bool CGCInterface::BAsyncInit( uint32 unAppID, const char *pchDebugName, int iGC
 	InstallExceptionHandlers( pHost->GetUniverse() != k_EUniverseDev );	
 
 	// Make sure we can't deploy debug GCs outside the dev environment
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( pHost->GetUniverse() != k_EUniverseDev )
 	{
 		pHost->EmitSpew( SPEW_GC.GetName(), SPEW_ERROR, SPEW_ALWAYS, LOG_ALWAYS, 

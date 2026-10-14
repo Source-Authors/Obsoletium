@@ -199,7 +199,7 @@ void SceneManager_ClientActive( CBasePlayer *player );
 class IMaterialSystem;
 class IStudioRender;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 static ConVar s_UseNetworkVars( "UseNetworkVars", "1", FCVAR_CHEAT, "For profiling, toggle network vars." );
 #endif
 
@@ -237,7 +237,7 @@ static int		g_nCommandClientIndex = 0;
 // The chapter number of the current
 static int		g_nCurrentChapterIndex = -1;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 static ConVar sv_showhitboxes( "sv_showhitboxes", "-1", FCVAR_CHEAT, "Send server-side hitboxes for specified entity to client (NOTE:  this uses lots of bandwidth, use on listen server only)." );
 #endif
 
@@ -1215,7 +1215,7 @@ void CServerGameDLL::GameFrame( bool simulating )
 
 	float oldframetime = gpGlobals->frametime;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// For profiling.. let them enable/disable the networkvar manual mode stuff.
 	g_bUseNetworkVars = s_UseNetworkVars.GetBool();
 #endif
@@ -1305,13 +1305,13 @@ void CServerGameDLL::PreClientUpdate( bool simulating )
 	}
 	*/
 
-//#ifdef _DEBUG  - allow this in release for now
+//#ifndef NDEBUG  - allow this in release for now
 	DrawAllDebugOverlays();
 //#endif
 	
 	IGameSystem::PreClientUpdateAllSystems();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( sv_showhitboxes.GetInt() == -1 )
 		return;
 

@@ -77,7 +77,7 @@ SpewRetval_t ModelBrowserSpewFunc( SpewType_t spewType, const tchar *pMsg )
 	{
 	case SPEW_ASSERT:
 		g_pCVar->ConsoleColorPrintf( Color( 255, 192, 0, 255 ), pMsg );
-#ifdef _DEBUG
+#ifndef NDEBUG
 		return SPEW_DEBUGGER;
 #else
 		return SPEW_CONTINUE;

@@ -220,7 +220,7 @@ PRECACHE_REGISTER( tf_halloween_item_pickup );
 
 static EHANDLE gHalloweenPickup;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 CON_COMMAND( cl_halloween_test_cheating, "Test cheating the halloween pickup" )
 {
 	GCSDK::CProtoBufMsg< CMsgGC_Halloween_GrantItem > msg( k_EMsgGC_Halloween_GrantItem );

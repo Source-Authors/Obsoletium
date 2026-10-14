@@ -20,7 +20,7 @@ static CUtlDict< FilePlayerClassInfo_t*, unsigned short > m_PlayerClassInfoDatab
 
 #define MAX_PLAYERCLASSES	32
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 // used to track whether or not two player classes have been mistakenly assigned the same slot
 bool g_bUsedPlayerClassSlots[MAX_PLAYERCLASSES] = { 0 };
@@ -101,7 +101,7 @@ void ResetFilePlayerClassInfoDatabase( void )
 {
 	m_PlayerClassInfoDatabase.PurgeAndDeleteElements();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	memset(g_bUsedPlayerClassSlots, 0, sizeof(g_bUsedPlayerClassSlots));
 #endif
 }

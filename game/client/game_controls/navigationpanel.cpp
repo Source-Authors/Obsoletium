@@ -285,7 +285,7 @@ void CNavigationPanel::UpdateButtonSelectionStates( int iButton )
 
 //-----------------------------------------------------------------------------
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 class CNavPanelTest : public Frame
 {

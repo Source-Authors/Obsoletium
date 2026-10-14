@@ -490,7 +490,7 @@ SquirrelObject SquirrelVM::CreateFunction(SQFUNCTION func,const SQChar * scriptF
     sq_setparamscheck(_VM,numParams,ptm); // Determine arg count from type string.
   } // if
 #endif
-#ifdef _DEBUG
+#ifndef NDEBUG
   sq_setnativeclosurename(_VM,-1,scriptFuncName); // For debugging only.
 #endif
   sq_createslot(_VM,-3); // Create slot in table or class (assigning function to slot at scriptNameFunc).

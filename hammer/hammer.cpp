@@ -823,7 +823,7 @@ static SpewRetval_t HammerDbgOutput( SpewType_t spewType, char const *pMsg )
 	{
 	case SPEW_ERROR:
 		MessageBox( NULL, pMsg, "Hammer - Fatal Error", MB_OK | MB_ICONERROR );
-#ifdef _DEBUG
+#ifndef NDEBUG
 		return SPEW_DEBUGGER;
 #else
 		TerminateProcess( GetCurrentProcess(), 1 );

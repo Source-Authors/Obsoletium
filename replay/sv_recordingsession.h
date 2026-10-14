@@ -42,7 +42,7 @@ public:
 	double			GetSecondsToExpiration() const;
 	bool			SessionExpired() const;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	void			VerifyLocks();
 #endif
 

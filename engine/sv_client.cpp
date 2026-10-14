@@ -945,7 +945,7 @@ bool CGameClient::SendSignonData( void )
 		bClientHasdifferentTables =  m_nSendtableCRC != SendTable_GetCRC();
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( sv_sendtables.GetInt() == 2 )
 	{
 		// force sending class tables, for debugging

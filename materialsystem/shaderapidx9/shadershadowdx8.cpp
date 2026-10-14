@@ -1748,7 +1748,7 @@ void CShaderShadowDX8::ComputeAggregateShadowState( )
 		ConfigureFVFVertexShader(flags);
 
 #if 0
-//#ifdef _DEBUG
+//#ifndef NDEBUG
 		// NOTE: This must be true for stateblocks to work
 		for ( i = 0; i < m_pHardwareConfig->GetTextureStageCount(); ++i )
 		{

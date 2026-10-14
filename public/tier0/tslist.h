@@ -494,7 +494,7 @@ public:
 	// Note: Purge, RemoveAll, and Validate are *not* threadsafe
 	void Purge()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		ValidateQueue();
 #endif
 
@@ -518,7 +518,7 @@ public:
 
 	void RemoveAll()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		ValidateQueue();
 #endif
 
@@ -531,7 +531,7 @@ public:
 
 	bool ValidateQueue()
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		{
 			bool bResult = true;
 			int nNodes = 0;
@@ -579,7 +579,7 @@ public:
 
 	Node_t *Push( Node_t *pNode )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		if ( reinterpret_cast<size_t>(pNode) % TSLIST_NODE_ALIGNMENT != 0 )
 		{
 			Error( "CTSQueue: Misaligned node %p.\n", pNode );

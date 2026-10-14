@@ -432,7 +432,7 @@ static void MaterialSystem_Error( char *fmt, ... )
 
 	MessageBox( NULL, (LPCTSTR)msg, "MaterialSystem Fatal Error", MB_OK | MB_ICONINFORMATION );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Assert( 0 );	
 #endif
 	exit( -1 );

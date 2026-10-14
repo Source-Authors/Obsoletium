@@ -386,7 +386,7 @@ const CPortalSWeaponInfo &CWeaponPortalBase::GetPortalWpnData() const
 	const FileWeaponInfo_t *pWeaponInfo = &GetWpnData();
 	const CPortalSWeaponInfo *pPortalInfo;
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		pPortalInfo = dynamic_cast< const CPortalSWeaponInfo* >( pWeaponInfo );
 		Assert( pPortalInfo );
 	#else

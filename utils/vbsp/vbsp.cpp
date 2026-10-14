@@ -591,7 +591,7 @@ static void EmitOccluderBrushes()
 	CUtlVector<side_t*> sideList( 1024, 1024 );
 	GenerateOccluderFaceList( pOccluderTree->headnode, faceList );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int *pEmitted = (int*)stackalloc( faceList.Count() * sizeof(int) );
 	memset( pEmitted, 0, faceList.Count() * sizeof(int) );
 #endif
@@ -640,7 +640,7 @@ static void EmitOccluderBrushes()
 				// not a final face
 				Assert ( !f->merged && !f->split[0] && !f->split[1] );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 				Assert( !pEmitted[i] );
 				pEmitted[i] = entity_num;
 #endif

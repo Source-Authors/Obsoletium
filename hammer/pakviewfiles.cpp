@@ -13,7 +13,7 @@
 #include "PakDoc.h"
 #include "PakViewFiles.h"
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -51,7 +51,7 @@ void CPakViewFiles::OnDraw(CDC* pDC)
 /////////////////////////////////////////////////////////////////////////////
 // CPakViewFiles diagnostics
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 void CPakViewFiles::AssertValid() const
 {
 	CListView::AssertValid();

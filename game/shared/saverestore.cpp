@@ -805,7 +805,7 @@ bool CSave::WriteBasicField( const char *pname, void *pData, datamap_t *pRootMap
 
 bool CSave::WriteField( const char *pname, void *pData, datamap_t *pRootMap, typedescription_t *pField )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Log( pname, (fieldtype_t)pField->fieldType, pData, pField->fieldSize );
 #endif
 

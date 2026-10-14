@@ -1375,7 +1375,7 @@ void CBaseFileSystem::AddSearchPath( const char *pPath, const char *pathID, Sear
 
 	AddSearchPathInternal( pPath, pathID, addType, true );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( oldPathsCount != m_SearchPaths.Count() )
 	{
 #if !defined( DEDICATED )
@@ -5007,7 +5007,7 @@ void CBaseFileSystem::DestroyFileCache( FileCacheHandle_t cacheId )
 
 bool CBaseFileSystem::IsFileCacheFileLoaded( FileCacheHandle_t cacheId, const char* pFileName )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	auto* pFileCache = static_cast< CFileCacheObject * >( cacheId );
 	bool bFileIsHeldByCache = false;
 	{

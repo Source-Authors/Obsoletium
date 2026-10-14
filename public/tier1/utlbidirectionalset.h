@@ -147,7 +147,7 @@ void CBidirectionalSet<CBucketHandle,CElementHandle,S,I>::Init( FirstElementFunc
 template< class CBucketHandle, class CElementHandle, class S, class I >
 void CBidirectionalSet<CBucketHandle,CElementHandle,S,I>::ValidateAddElementToBucket( CBucketHandlePram bucket, CElementHandlePram element )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Make sure that this element doesn't already exist in the list of elements in the bucket
 	I elementInBucket = m_FirstElement( bucket );
 	while( elementInBucket != m_ElementsInBucket.InvalidIndex() )

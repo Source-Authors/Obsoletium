@@ -113,7 +113,7 @@ class CDpiWindowBehavior {
 
   const bool m_apply_dpi_on_create;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
   bool m_is_destroyed;
 #endif
 };

@@ -428,7 +428,7 @@ CStorePanel	*CEconSampleRootUI::GetStorePanel( void )
 	return g_StorePanel;	
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

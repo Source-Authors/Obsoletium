@@ -980,7 +980,7 @@ int	CStaticProp::DrawModelSlow( int flags )
 		flags |= STUDIO_WIREFRAME;
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( r_DrawSpecificStaticProp.GetInt() >= 0 )
 	{
 		if ( (m_EntHandle.ToInt() & (~STATICPROP_EHANDLE_MASK) ) != r_DrawSpecificStaticProp.GetInt() )
@@ -991,7 +991,7 @@ int	CStaticProp::DrawModelSlow( int flags )
 	if ( (m_Alpha == 0) || !m_pModel )
 		return 0;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( m_pModel );
 	Assert( pStudioHdr );
 	if ( !( pStudioHdr->flags & STUDIOHDR_FLAGS_STATIC_PROP ) )

@@ -572,7 +572,7 @@ void C_FuncSmokeVolume::FillVolume()
 							pParticle->m_CurRotation = FRand( -m_RotationSpeed, m_RotationSpeed );
 						}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 						int testX, testY, testZ;
 						int index_ = GetSmokeParticleIndex(x,y,z);
 						GetParticleInfoXYZ( index_, testX, testY, testZ);

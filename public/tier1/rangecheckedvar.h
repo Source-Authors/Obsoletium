@@ -25,7 +25,7 @@ public:
 template< class T >
 inline void RangeCheck( const T &value, int, int )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	extern bool g_bDoRangeChecks;
 	if ( ThreadInMainThread() && g_bDoRangeChecks )
 	{
@@ -37,7 +37,7 @@ inline void RangeCheck( const T &value, int, int )
 
 inline void RangeCheck( [[maybe_unused]] const Vector &value, [[maybe_unused]] int minValue, [[maybe_unused]] int maxValue )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	RangeCheck( value.x, minValue, maxValue );
 	RangeCheck( value.y, minValue, maxValue );
 	RangeCheck( value.z, minValue, maxValue );

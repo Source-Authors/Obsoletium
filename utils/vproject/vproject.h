@@ -24,7 +24,7 @@
 #define VPROJECT_TITLE			"VProject"
 #define VPROJECT_MAGIC			"2\\"
 #define VPROJECT_REGISTRY		"HKEY_CURRENT_USER\\Software\\VProject\\" VPROJECT_MAGIC
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define VPROJECT_BUILDTYPE		"Debug"
 #else
 #define VPROJECT_BUILDTYPE		"Release"

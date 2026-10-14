@@ -407,7 +407,7 @@ void PlayImpactSound( CBaseEntity *pEntity, trace_t &tr, Vector &vecServerOrigin
 		return;
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Msg("***ERROR: PlayImpactSound() on a surface with 0 bulletImpactCount!\n");
 #endif //_DEBUG
 }

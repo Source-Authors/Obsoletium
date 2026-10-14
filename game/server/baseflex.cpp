@@ -102,7 +102,7 @@ LINK_ENTITY_TO_CLASS( funCBaseFlex, CBaseFlex ); // meaningless independant clas
 CBaseFlex::CBaseFlex( void ) : 
 	m_LocalToGlobal( 0, 0, FlexSettingLessFunc )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// default constructor sets the viewtarget to NAN
 	m_viewtarget.Init();
 #endif

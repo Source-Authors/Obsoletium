@@ -693,7 +693,7 @@ void CNetworkStringTable::ParseUpdate( bf_read &buf, int entries )
 		if ( entryIndex < GetNumStrings() )
 		{
 			SetStringUserData( entryIndex, nBytes, pUserData );
-#ifdef _DEBUG
+#ifndef NDEBUG
 			if ( pEntry )
 			{
 				Assert( V_streq( pEntry, GetString( entryIndex ) ) ); // make sure string didn't change
@@ -806,7 +806,7 @@ int CNetworkStringTable::AddString( bool bIsServer, const char *string, intp len
 		return INVALID_STRING_INDEX;
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( m_bLocked )
 	{
 		DevMsg("Warning! CNetworkStringTable::AddString: adding '%s' while locked.\n", string );
@@ -974,7 +974,7 @@ const char *CNetworkStringTable::GetString( int stringNumber )
 //-----------------------------------------------------------------------------
 void CNetworkStringTable::SetStringUserData( int stringNumber, intp length /*=0*/, const void *userdata /*= 0*/ )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( m_bLocked )
 	{
 		DevMsg("Warning! CNetworkStringTable::SetStringUserData (%s): changing entry %i while locked.\n", GetTableName(), stringNumber );

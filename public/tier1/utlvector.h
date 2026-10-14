@@ -86,7 +86,7 @@ namespace utlvector_detail
 	struct HasExternalBuffer< A, std::void_t< decltype( std::declval< const A & >().IsExternallyAllocated() ) > > : std::true_type {};
 
 	// In debug builds ::Destruct() poisons memory with 0xDD even for trivial types; keep that.
-#ifdef _DEBUG
+#ifndef NDEBUG
 	inline constexpr bool kAlwaysDestruct = true;
 #else
 	inline constexpr bool kAlwaysDestruct = false;
@@ -782,7 +782,7 @@ private:
 		{
 			Q_memmove( static_cast<void *>( std::addressof( Element(elem) ) ), static_cast<const void *>( std::addressof( Element(elem+num) ) ), numToMove * sizeof(T) );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			Q_memset( static_cast<void *>( std::addressof( Element(nSize-num) ) ), 0xDD, num * sizeof(T) );
 #endif
 		}
@@ -1431,7 +1431,7 @@ void CUtlVector<T, A>::ShiftElementsLeft( intp elem, intp num )
 		{
 			Q_memmove( static_cast<void *>( std::addressof( Element(elem) ) ), static_cast<const void *>( std::addressof( Element(elem+num) ) ), numToMove * sizeof(T) );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			Q_memset( static_cast<void *>( std::addressof( Element(m_Size-num) ) ), 0xDD, num * sizeof(T) );
 #endif
 		}
@@ -1441,7 +1441,7 @@ void CUtlVector<T, A>::ShiftElementsLeft( intp elem, intp num )
 			for ( intp i = elem; i < elem + numToMove; ++i )
 				memcpy( static_cast<void *>( SlotPtr( i ) ), static_cast<const void *>( SlotPtr( i + num ) ), sizeof(T) );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			for ( intp i = m_Size - num; i < m_Size; ++i )
 				Q_memset( static_cast<void *>( SlotPtr( i ) ), 0xDD, sizeof(T) );
 #endif
@@ -1983,7 +1983,7 @@ intp CUtlVector<T, A>::RemoveIf( F&& predicate )
 	}
 
 	const intp nRemoved = m_Size - nOut;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for ( intp i = nOut; i < m_Size; ++i )
 	{
 		Q_memset( static_cast<void *>( SlotPtr( i ) ), 0xDD, sizeof( T ) );

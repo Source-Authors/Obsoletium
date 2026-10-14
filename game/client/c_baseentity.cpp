@@ -916,7 +916,7 @@ C_BaseEntity::C_BaseEntity() :
 	m_bAnimatedEveryTick = false;
 	m_pPhysicsObject = NULL;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_vecAbsOrigin = vec3_origin;
 	m_angAbsRotation = vec3_angle;
 	m_vecNetworkOrigin.Init();
@@ -1610,7 +1610,7 @@ int	C_BaseEntity::entindex( void ) const
 
 int C_BaseEntity::GetSoundSourceIndex() const
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( index != -1 )
 	{
 		Assert( index == GetRefEHandle().GetEntryIndex() );
@@ -1769,7 +1769,7 @@ void C_BaseEntity::SetModelPointer( const model_t *pModel )
 void C_BaseEntity::SetMoveType( MoveType_t val, MoveCollide_t moveCollide /*= MOVECOLLIDE_DEFAULT*/ )
 {
 	// Make sure the move type + move collide are compatible...
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ((val != MOVETYPE_FLY) && (val != MOVETYPE_FLYGRAVITY))
 	{
 		Assert( moveCollide == MOVECOLLIDE_DEFAULT );
@@ -2224,7 +2224,7 @@ void C_BaseEntity::LinkChild( C_BaseEntity *pParent, C_BaseEntity *pChild )
 	Assert( !pChild->m_pMoveParent.IsValid() );
 	Assert( pParent != pChild );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Make sure the child isn't already in this list
 	C_BaseEntity *pExistingChild;
 	for ( pExistingChild = pParent->FirstMoveChild(); pExistingChild; pExistingChild = pExistingChild->NextMovePeer() )
@@ -4819,7 +4819,7 @@ C_BaseEntity *CreateEntityByName( const char *className )
 	return NULL;
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 CON_COMMAND( cl_sizeof, "Determines the size of the specified client class." )
 {
 	if ( args.ArgC() != 2 )

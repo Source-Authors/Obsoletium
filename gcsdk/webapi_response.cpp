@@ -1183,7 +1183,7 @@ CWebAPIValues * CWebAPIValues::CreateChildInternal( const char *pchName, EWebAPI
 
 		CWebAPIValues *pCurLastChild = m_pLastChild;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		// In debug, traverse all children so we can check for duplicate names, which will break JSON output!
 		pCurLastChild = m_pFirstChild;
 		if ( m_eValueType != k_EWebAPIValueType_NumericArray )

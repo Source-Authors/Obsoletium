@@ -20,7 +20,7 @@
 #pragma warning(disable : 4706)     // assignment within conditional expression
 #endif
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define DEBUG 1
 #endif
 

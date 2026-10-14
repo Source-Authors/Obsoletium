@@ -76,7 +76,7 @@ extern itemFlags_t g_ItemFlags[8];
 
 static CUtlDict< FileWeaponInfo_t*, unsigned short > m_WeaponInfoDatabase;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 struct UsedWeaponSlot_t
 {
   char szPrintName[MAX_WEAPON_STRING];

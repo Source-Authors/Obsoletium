@@ -274,7 +274,7 @@ const CHL2MPSWeaponInfo &CWeaponHL2MPBase::GetHL2MPWpnData() const
 	const FileWeaponInfo_t *pWeaponInfo = &GetWpnData();
 	const CHL2MPSWeaponInfo *pHL2MPInfo;
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		pHL2MPInfo = dynamic_cast< const CHL2MPSWeaponInfo* >( pWeaponInfo );
 		Assert( pHL2MPInfo );
 	#else

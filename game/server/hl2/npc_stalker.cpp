@@ -1396,7 +1396,7 @@ void CNPC_Stalker::AddZigZagToPath(void)
 //------------------------------------------------------------------------------
 CNPC_Stalker::CNPC_Stalker(void)
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_vLaserDir.Init();
 	m_vLaserTargetPos.Init();
 	m_vLaserCurPos.Init();

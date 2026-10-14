@@ -20,7 +20,7 @@ CCachedRenderData::CCachedRenderData()
 	m_CurrentTag(0), m_Body(-1), m_Model(-1), m_Mesh(-1),
 	m_pFirstFlexIndex(nullptr), m_pFirstThinFlexIndex(nullptr), m_pFirstWorldIndex(nullptr)
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	float val = VEC_T_NAN;
 	for( int i = 0; i < MAXSTUDIOFLEXVERTS; i++ )
 	{

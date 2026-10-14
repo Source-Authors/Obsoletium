@@ -37,7 +37,7 @@
 //
 //	Even though this is the case, there's no reason not to add test cases 
 //	directly into your shipping DLLs, as long as you surround the code with 
-//	#ifdef _DEBUG. To error check a project to make sure it's not compiling
+//	#ifndef NDEBUG. To error check a project to make sure it's not compiling
 //	in unit tests in Release build, just don't link in unitlib.lib in Release.
 //	You can of course also put your test suites into separate DLLs. 
 //

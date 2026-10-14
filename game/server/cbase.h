@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define DEBUG 1
 #endif
 

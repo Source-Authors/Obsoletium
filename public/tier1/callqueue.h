@@ -18,7 +18,7 @@ class CCallQueueT
 public:
 	CCallQueueT()
 		: m_bNoQueue{ false }
-#ifdef _DEBUG
+#ifndef NDEBUG
 		, m_nCurSerialNumber{ 0 }
 		, m_nBreakSerialNumber{ std::numeric_limits<unsigned>::max() }
 #endif
@@ -61,7 +61,7 @@ public:
 
 		while ( m_queue.PopItem( &pFunctor ) && pFunctor != nullptr )
 		{
-#ifdef _DEBUG
+#ifndef NDEBUG
 			if ( pFunctor->m_nUserID == m_nBreakSerialNumber)
 			{
 				m_nBreakSerialNumber = std::numeric_limits<unsigned>::max();
@@ -205,7 +205,7 @@ private:
 	{
 		if ( !m_bNoQueue )
 		{
-#ifdef _DEBUG
+#ifndef NDEBUG
 			pFunctor->m_nUserID = m_nCurSerialNumber++;
 #endif
 			m_queue.PushItem( pFunctor );

@@ -273,7 +273,7 @@ KeyValues *CHttpDownloader::GetOgsRow( int nErrorCounter ) const
 
 //----------------------------------------------------------------------------------------
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 CHttpDownloader *g_pTestDownload = NULL;
 ConVar replay_forcedownloadurl( "replay_forcedownloadurl", "" );

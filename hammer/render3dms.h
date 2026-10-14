@@ -280,7 +280,7 @@ protected:
 	bool m_bLightingPreview;
 
 	// for debugging... render the view frustum
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Vector m_FrustumRenderPoint[8];
 	bool m_bRenderFrustum;
 	bool m_bRecomputeFrustumRenderGeometry;

@@ -734,7 +734,7 @@ const CCSWeaponInfo &CWeaponCSBase::GetCSWpnData() const
 	const FileWeaponInfo_t *pWeaponInfo = &GetWpnData();
 	const CCSWeaponInfo *pCSInfo;
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		pCSInfo = dynamic_cast< const CCSWeaponInfo* >( pWeaponInfo );
 		Assert( pCSInfo );
 	#else

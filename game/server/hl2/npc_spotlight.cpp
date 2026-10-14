@@ -244,7 +244,7 @@ LINK_ENTITY_TO_CLASS(npc_spotlight, CNPC_Spotlight);
 
 CNPC_Spotlight::CNPC_Spotlight()
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_vInspectPos.Init();
 	m_vSpotlightTargetPos.Init();
 	m_vSpotlightCurrentPos.Init();

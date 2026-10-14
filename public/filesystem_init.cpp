@@ -756,7 +756,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 	initInfo.m_pFileSystem->MarkPathIDByRequestOnly( "game_write", true );
 	initInfo.m_pFileSystem->MarkPathIDByRequestOnly( "mod_write", true );
 
-#ifdef _DEBUG	
+#ifndef NDEBUG	
 	// initInfo.m_pFileSystem->PrintSearchPaths();
 #endif
 

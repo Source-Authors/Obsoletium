@@ -445,7 +445,7 @@ void C_DODRagdoll::CreateDODRagdoll()
 	// then we can make ourselves start out exactly where the player is.
 	C_DODPlayer *pPlayer = dynamic_cast< C_DODPlayer* >( m_hPlayer.Get() );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	DevMsg( 2, "CreateDODRagdoll %d %d\n", gpGlobals->framecount, pPlayer ? pPlayer->entindex() : 0 );
 #endif
 	

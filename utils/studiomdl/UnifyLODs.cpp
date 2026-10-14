@@ -47,7 +47,7 @@ static int g_NumBonesInLOD[MAX_NUM_LODS];
 //-----------------------------------------------------------------------------
 static void ValidateBoneWeight( const s_boneweight_t &boneWeight )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int i;
 	if( boneWeight.weight[0] == 1.0f )
 	{
@@ -1037,7 +1037,7 @@ static void CreateLODVertsInDictionary( int nLodID, const s_source_t *pRootLODSr
 		vertex.m_TexCoord   = srcVertex.texcoord;
 		vertex.m_TangentS   = srcVertex.tangentS;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		memset( &vertex.m_BoneWeight, 0xDD, sizeof( s_boneweight_t ) );
 #endif
 		// determine the best bone weight for the desired vertex within the root lod only
@@ -1227,7 +1227,7 @@ static void UnifyModelLODs( s_model_t *pSrcModel )
 		{
 			intp nVertexCount = pSrcModel->m_LodSources[nLodID]->m_GlobalVertices.Count();
 			pMeshVertIndexMaps[nLodID] = new int[ nVertexCount ];
-#ifdef _DEBUG
+#ifndef NDEBUG
 			memset( pMeshVertIndexMaps[nLodID], 0xDD, nVertexCount * sizeof(int) );
 #endif
 		}
@@ -1299,7 +1299,7 @@ static void UnifyModelLODs( s_model_t *pSrcModel )
 		}
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Msg( "Total vertex count: %d\n", vertexDictionary.VertexCount() );
 #endif
 

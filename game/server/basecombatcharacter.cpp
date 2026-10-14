@@ -706,7 +706,7 @@ bool CBaseCombatCharacter::HandleInteraction( int interactionType, void *data, C
 //-----------------------------------------------------------------------------
 CBaseCombatCharacter::CBaseCombatCharacter( void )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// necessary since in debug, we initialize vectors to NAN for debugging
 	m_HackedGunPos.Init();
 #endif

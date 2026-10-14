@@ -777,7 +777,7 @@ public:
 	}
 	FORCEINLINE void AssertValidTextureHandle( ShaderAPITextureHandle_t textureHandle )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		Assert( TextureIsAllocated( textureHandle ) );
 #endif
 	}
@@ -3968,7 +3968,7 @@ void CShaderAPIDx8::ReleaseShaderObjects()
 
 	// FIXME: Move into shaderdevice when textures move over.
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Helps to find the unreleased textures.
 	if ( TextureCount() > 0 )
 	{
@@ -5582,7 +5582,7 @@ void CShaderAPIDx8::GetSceneFogColor( unsigned char *r, unsigned char *g, unsign
 //-----------------------------------------------------------------------------
 D3DCOLOR CShaderAPIDx8::ComputeGammaCorrectedFogColor( unsigned char r, unsigned char g, unsigned char b, bool bSRGBWritesEnabled )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if( g_pHardwareConfig->GetHDRType() == HDR_TYPE_FLOAT && !bSRGBWritesEnabled )
 	{
 //		Assert( 0 );
@@ -7106,7 +7106,7 @@ void CShaderAPIDx8::SetRenderTargetEx( int nRenderTargetID, ShaderAPITextureHand
 		usingTextureTarget = true;
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( pZSurface )
 	{
 		D3DSURFACE_DESC zSurfaceDesc;
@@ -7421,7 +7421,7 @@ void CShaderAPIDx8::TexSubImage2D(
 	// being used to download the entire texture, cause last frame's partial update
 	// may be in a completely different texture! Sadly, I don't have all of the
 	// information I need, but I can at least check a couple things....
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( GetTexture( GetModifyTextureHandle() ).m_NumCopies > 1 )
 	{
 		Assert( (xOffset == 0) && (yOffset == 0) );
@@ -8424,7 +8424,7 @@ void CShaderAPIDx8::ModifyVertexData( )
 #endif
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 static const char *TextureArgToString( int arg )
 {
 	static char buf[128];
@@ -8975,7 +8975,7 @@ void CShaderAPIDx8::UpdateMatrixTransform( TransformType_t type )
 	m_DynamicState.m_TransformType[m_CurrStack] = size_cast<unsigned char>( type );
 	m_DynamicState.m_TransformChanged[m_CurrStack] = STATE_CHANGED;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Store off the board state
 	const DirectX::XMMATRIX *pSrc = &GetTransform(m_CurrStack);
 	DirectX::XMMATRIX *pDst = &m_DynamicState.m_Transform[m_CurrStack];
@@ -10146,7 +10146,7 @@ void CShaderAPIDx8::CommitUserClipPlanes( bool bUsingFixedFunction )
 		// Don't bother if it didn't change...
 		if ( (m_DynamicState.m_UserClipPlaneChanged & (1 << i)) == 0 )
 		{
-#ifdef _DEBUG
+#ifndef NDEBUG
 			//verify that the plane has not actually changed
 			DirectX::XMVECTOR clipPlaneProj{ DirectX::XMPlaneTransform( m_DynamicState.m_UserClipPlaneWorld[i], worldToProjectionInvTrans ) };
 			Assert ( memcmp( &clipPlaneProj, &m_DynamicState.m_UserClipPlaneProj[i], sizeof(clipPlaneProj) ) == 0 );

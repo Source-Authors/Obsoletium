@@ -6998,7 +6998,7 @@ bool CTFPlayer::ClientCommand( const CCommand &args )
 		}
 		return true;
 	}
-#ifdef _DEBUG
+#ifndef NDEBUG
 	else if ( FStrEq( pcmd, "burn" ) ) 
 	{
 		m_Shared.Burn( this, GetActiveTFWeapon() );
@@ -9279,7 +9279,7 @@ int CTFPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		ClearExpression();
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Report damage from the info in debug so damage against targetdummies goes
 	// through the system, as m_iHealthBefore - GetHealth() will always be 0.
 	CTF_GameStats.Event_PlayerDamage( this, info, info.GetDamage() );
@@ -19448,7 +19448,7 @@ void TestRR( const CCommand &args )
 }
 static ConCommand tf_testrr( "tf_testrr", TestRR, "Force the player under your crosshair to speak a response rule concept. Format is tf_testrr <concept>, or tf_testrr <player name> <concept>", FCVAR_CHEAT );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 CON_COMMAND_F( tf_crashclients, "testing only, crashes about 50 percent of the connected clients.", FCVAR_DEVELOPMENTONLY )
 {
 	for ( int i = 1; i < gpGlobals->maxClients; ++i )

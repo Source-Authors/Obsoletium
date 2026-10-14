@@ -475,7 +475,7 @@ int GetWeeklyBargain( void )
 	return iBestIndex;
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar cs_testbargain( "cs_testbargain", "1" );
 #endif
 

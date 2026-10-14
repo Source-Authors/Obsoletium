@@ -37,7 +37,7 @@ class ScopedPowerSuspendResumeNotificationsRegistrator {
     if (handle_) {
       [[maybe_unused]] const bool ok{
           ::UnregisterSuspendResumeNotification(handle_) != FALSE};
-#ifdef _DEBUG
+#ifndef NDEBUG
       const auto message = std::error_code{static_cast<int>(::GetLastError()),
                                            std::system_category()}
                                .message();

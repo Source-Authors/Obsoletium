@@ -63,7 +63,7 @@ const CDODPlayerClassInfo &CDODTeam::GetPlayerClassInfo( int iPlayerClass ) cons
 	const FilePlayerClassInfo_t *pPlayerClassInfo = GetFilePlayerClassInfoFromHandle( m_hPlayerClassInfoHandles[iPlayerClass] );
 	const CDODPlayerClassInfo *pDODInfo;
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		pDODInfo = dynamic_cast< const CDODPlayerClassInfo* >( pPlayerClassInfo );
 		Assert( pDODInfo );
 	#else

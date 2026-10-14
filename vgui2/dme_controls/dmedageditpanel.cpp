@@ -681,7 +681,7 @@ void CDmeCombinationOperatorPanel::SortAnimationSetControls()
 
 	controls.SetMultiple( 0, nControlCount, pElements );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for ( intp i = 0; i < nCombinationControlCount; ++i )
 	{
 		const char *pControlName = controls[i]->GetName();

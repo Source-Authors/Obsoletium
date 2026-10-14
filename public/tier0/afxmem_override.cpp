@@ -29,7 +29,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // Debug memory globals and implementation helpers
 
-#ifdef _DEBUG  // most of this file is for debugging
+#ifndef NDEBUG  // most of this file is for debugging
 
 [[nodiscard]] _Check_return_ _Ret_notnull_ _Post_writable_byte_size_(nSize)
     __declspec(allocator) void* __cdecl
@@ -128,7 +128,7 @@ int __cdecl _AfxAllocHookProxy(int nAllocType, void* pvData, size_t nSize,
                              szFilename, nLine);
 
     // dimhotepus: Fix checking of block use in debug mode.
-#ifdef _DEBUG
+#ifndef NDEBUG
   if ((pfnAllocHook)(nSize, nBlockUse == _AFX_CLIENT_BLOCK, lRequest))
 #else
   if ((pfnAllocHook)(nSize, _BLOCK_TYPE(nBlockUse) == _AFX_CLIENT_BLOCK,
@@ -339,7 +339,7 @@ void __cdecl operator delete(void* p) {
 
 void __cdecl operator delete[](void* p) { ::operator delete(p); }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 [[nodiscard]] _Check_return_ _Ret_notnull_ _Post_writable_byte_size_(nSize)
     __declspec(allocator) void* __cdecl operator new(_In_ size_t nSize,

@@ -31,7 +31,7 @@
 
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #include <malloc.h>
 #endif // _DEBUG
 
@@ -292,7 +292,7 @@ void ED_Free (edict_t *ed)
 {
 	if (ed->IsFree())
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 //		ConDMsg("duplicate free on '%s'\n", pr_strings + ed->classname );
 #endif
 		return;

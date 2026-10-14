@@ -245,7 +245,7 @@ inline intp CUtlFixedMemory<T>::NumAllocated() const
 template< class T >
 inline bool CUtlFixedMemory<T>::IsIdxValid( intp i ) const
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for ( BlockHeader_t *pbh = m_pBlocks; pbh; pbh = pbh->m_pNext )
 	{
 		if ( IsInBlock( i, pbh ) )

@@ -206,7 +206,7 @@ void CommitSetViewports(
                                  desiredState.m_pViewports);
   currentState.m_nViewportCount = desiredState.m_nViewportCount;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
   memset(currentState.m_pViewports, 0xDD, sizeof(currentState.m_pViewports));
 #endif
 

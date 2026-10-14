@@ -56,7 +56,7 @@ public:
 		m_FunctorFactory.SetAllocator( &m_Allocator );
 		m_pHead = m_pTail = nullptr;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_nCurSerialNumber = 0;
 		m_nBreakSerialNumber = 0;
 #endif
@@ -90,7 +90,7 @@ public:
 		while ( pCurrent )
 		{
 			CFunctor *pFunctor = pCurrent->pFunctor;
-#ifdef _DEBUG
+#ifndef NDEBUG
 			if ( pFunctor->m_nUserID == m_nBreakSerialNumber)
 			{
 				m_nBreakSerialNumber = std::numeric_limits<unsigned>::max();
@@ -246,7 +246,7 @@ public:
 private:
 	void QueueFunctorInternal( CFunctor *pFunctor )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		pFunctor->m_nUserID = m_nCurSerialNumber++;
 #endif
 		MEM_ALLOC_CREDIT_( "CMatCallQueue.m_Allocator" );
@@ -277,7 +277,7 @@ private:
 	CMemoryStack m_Allocator;
 	CCustomizedFunctorFactory<CMemoryStack, CRefCounted1<CFunctor, CRefCountServiceDestruct< CRefST > > > m_FunctorFactory;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	unsigned m_nCurSerialNumber;
 	unsigned m_nBreakSerialNumber;
 #endif

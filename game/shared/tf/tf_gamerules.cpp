@@ -845,7 +845,7 @@ ConVar tf_creep_wave_player_respawn_time( "tf_creep_wave_player_respawn_time", "
 #ifdef GAME_DLL
 // TF overrides the default value of this convar
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define WAITING_FOR_PLAYERS_FLAGS	0
 #else
 #define WAITING_FOR_PLAYERS_FLAGS	FCVAR_DEVELOPMENTONLY
@@ -870,7 +870,7 @@ ConVar tf_gamemode_misc ( "tf_gamemode_misc", "0", FCVAR_REPLICATED | FCVAR_NOTI
 
 ConVar tf_bot_count( "tf_bot_count", "0", FCVAR_NOTIFY | FCVAR_DEVELOPMENTONLY );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar tf_debug_ammo_and_health( "tf_debug_ammo_and_health", "0", FCVAR_CHEAT );
 #endif // _DEBUG
 
@@ -880,7 +880,7 @@ ConVar tf_gravetalk( "tf_gravetalk", "1", FCVAR_NOTIFY, "Allows living players t
 
 ConVar tf_ctf_bonus_time ( "tf_ctf_bonus_time", "10", FCVAR_NOTIFY, "Length of team crit time for CTF capture." );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar mp_scrambleteams_debug( "mp_scrambleteams_debug", "0", FCVAR_NONE, "Debug spew." );
 #endif // _DEBUG
 
@@ -7928,7 +7928,7 @@ void CTFGameRules::Think()
 	}
 
 #ifdef GAME_DLL
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( tf_debug_ammo_and_health.GetBool() )
 	{
 		CBaseEntity *ent;
@@ -15669,7 +15669,7 @@ void CTFGameRules::HandleScrambleTeams( void )
 			int nTeamScoreBlue = 0;
 			int nDelta = FindScoreDifferenceBetweenTeams( playerVector, pPR, nTeamScoreRed, nTeamScoreBlue );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			if ( mp_scrambleteams_debug.GetBool() )
 			{
 				DevMsg( "FIRST PASS -- Team1: %i || Team2: %i || Diff: %i\n", 
@@ -15688,7 +15688,7 @@ void CTFGameRules::HandleScrambleTeams( void )
 				static const int nPassLimit = 8;
 				for ( int i = 0; i < nPassLimit && FindAndSwapPlayersToBalanceTeams( playerVector, nDelta, pPR ); ++i )
 				{
-#ifdef _DEBUG
+#ifndef NDEBUG
 					if ( mp_scrambleteams_debug.GetBool() )
 					{
 						nTeamScoreRed = 0;
@@ -18014,7 +18014,7 @@ void CTFGameRules::InitCustomResponseRulesDicts()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-#ifdef _DEBUG
+#ifndef NDEBUG
 CON_COMMAND( hud_notify, "Show a hud notification." )
 {
 	if ( args.ArgC() < 2 )
@@ -19787,7 +19787,7 @@ public:
 };
 GC_REG_JOB( GCSDK::CGCClient, CGCUpdateServerModificationItemStateJob, "CGCUpdateServerModificationItemStateJob", k_EMsgGC_GameServer_ModificationItemState, GCSDK::k_EServerTypeGCClient );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 CON_COMMAND( coaching_stop, "Stop coaching" )
 {
 	CTFPlayer* pCoach = ToTFPlayer( UTIL_GetListenServerHost() );

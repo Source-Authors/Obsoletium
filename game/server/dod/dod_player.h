@@ -647,7 +647,7 @@ inline CDODPlayer *ToDODPlayer( CBaseEntity *pEntity )
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Assert( dynamic_cast<CDODPlayer*>( pEntity ) != 0 );
 #endif
 	return static_cast< CDODPlayer* >( pEntity );

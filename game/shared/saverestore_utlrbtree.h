@@ -52,7 +52,7 @@ public:
 			false,
 			false,
 			0,
-#ifdef _DEBUG
+#ifndef NDEBUG
 			true
 #endif
 		};
@@ -102,7 +102,7 @@ public:
 			false,
 			false,
 			0,
-#ifdef _DEBUG
+#ifndef NDEBUG
 			true
 #endif
 		};

@@ -38,7 +38,7 @@
 #include "choreoevent.h"
 #include <ctype.h>
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #include <windows.h>
 #undef GetCurrentDirectory
 #endif
@@ -51,7 +51,7 @@ static SpewRetval_t SpewStdout( SpewType_t spewType, char const *pMsg )
 	if ( !pMsg )
 		return SPEW_CONTINUE;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	OutputDebugString( pMsg );
 #endif
 

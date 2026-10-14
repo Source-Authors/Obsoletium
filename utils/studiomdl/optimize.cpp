@@ -197,7 +197,7 @@ public:
 		intp size = 0;
 		for( auto &s : m_Strings )
 		{
-#ifdef _DEBUG
+#ifndef NDEBUG
 			intp j = Q_strlen( s.Base() ) + 1;
 			intp k = s.Count();
 			Assert( j == k );
@@ -690,7 +690,7 @@ Triangle_t *COptimizedModel::GetNextTriangle( TriangleList_t& tris, bool allowNe
 
 void COptimizedModel::SanityCheckVertBones( VertexIndexList_t const& list, VertexList_t const& vertices )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Vertex_t const *pVert;
 	for( auto &l : list )
 	{
@@ -1490,7 +1490,7 @@ void COptimizedModel::PostProcessStripGroup( mstudiomodel_t *pStudioModel, mstud
 			}
 			pStripGroup->indices.AddToTail( newIndex );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			//	float GetOrigVertBoneWeightValue( mstudiomodel_t *pStudioModel, mstudiomesh_t *pStudioMesh, Vertex_t *pVert, int boneID );
 			float *pWeight = stackallocT( float, pVert->numBones );
 			for( int i = 0; i < pVert->numBones; i++ )
@@ -1646,7 +1646,7 @@ void COptimizedModel::SetupMeshProcessing( studiohdr_t *pHdr, int vertexCacheSiz
 	{
 		printf( "---------------------\n" );
 		printf( "Generating optimized mesh \"%s\":\n", fileName );
-#ifdef _DEBUG
+#ifndef NDEBUG
 		printf( "\tvertex cache size: %d\n", vertexCacheSize );
 		printf( "\tmax bones/tri:     %d\n", maxBonesPerTri );
 		printf( "\tmax bones/vert:    %d\n", maxBonesPerVert );
@@ -1852,7 +1852,7 @@ void COptimizedModel::CreateLODTriangleList( s_model_t *pSrcModel, int nLodID, s
 	if ( !pSrc || !pSrcModel )
 		return;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 //	const mstudio_modelvertexdata_t *vertData = pStudioModel->GetVertexData();
 //	Assert( vertData ); // This can only return NULL on X360 for now
 //	mstudiovertex_t *modelFirstVert = vertData->Vertex( 0 );
@@ -2023,7 +2023,7 @@ void COptimizedModel::ProcessModel( studiohdr_t *pHdr, s_bodypart_t *pSrcBodyPar
 
 				for ( meshID = 0; meshID < pStudioModel->nummeshes; meshID++, stats.m_TotalMeshes++ )
 				{
-#ifdef _DEBUG
+#ifndef NDEBUG
 //					printf( "bodyPart: %d model: %d modellod: %d mesh: %d\n", bodyPartID, modelID, lodID, meshID );
 #endif
 					mstudiomesh_t *pStudioMesh = pStudioModel->pMesh( meshID );
@@ -2035,7 +2035,7 @@ void COptimizedModel::ProcessModel( studiohdr_t *pHdr, s_bodypart_t *pSrcBodyPar
 					
 					if ( MeshNeedsRemoval( pHdr, pStudioMesh, scriptLOD ) )
 						continue;				
-#ifdef _DEBUG
+#ifndef NDEBUG
 //					int textureSearchID = material_to_texture( pStudioMesh->material );
 //					const char *pDebugName = pHdr->pTexture( textureSearchID )->pszName( );
 #endif
@@ -2196,7 +2196,7 @@ void COptimizedModel::WriteHeader( int vertCacheSize, int maxBonesPerVert,
 	fileHeader.numLODs = g_ScriptLODs.Count();
 	fileHeader.materialReplacementListOffset = m_MaterialReplacementsListOffset;
 	m_FileBuffer->WriteAt( 0, &fileHeader, sizeof( FileHeader_t ), "header" );
-#ifdef _DEBUG
+#ifndef NDEBUG
 //	FileHeader_t *debug = ( FileHeader_t * )m_FileBuffer->GetPointer( 0 );
 //	BodyPartHeader_t *pBodyPart = debug->pBodyPart( 0 );
 #endif
@@ -2211,7 +2211,7 @@ void COptimizedModel::WriteBodyPart( int bodyPartID, mstudiobodyparts_t *pBodyPa
 	int modelFileOffset = m_ModelsOffset + modelID * sizeof( ModelHeader_t );
 	bodyPart.modelOffset = modelFileOffset - bodyPartOffset;
 	m_FileBuffer->WriteAt( bodyPartOffset, &bodyPart, sizeof( BodyPartHeader_t ), "bodypart" );
-#ifdef _DEBUG
+#ifndef NDEBUG
 //	BodyPartHeader_t *debug = ( BodyPartHeader_t * )m_FileBuffer->GetPointer( bodyPartOffset );
 //	ModelHeader_t *pModel = debug->pModel( 0 );
 #endif
@@ -2225,7 +2225,7 @@ void COptimizedModel::WriteModel( int modelID, mstudiomodel_t *pModel, int lodID
 	int lodFileOffset = m_ModelLODsOffset + lodID * sizeof( ModelLODHeader_t );
 	model.lodOffset = lodFileOffset - modelFileOffset;
 	m_FileBuffer->WriteAt( modelFileOffset, &model, sizeof( ModelHeader_t ), "model" );
-#ifdef _DEBUG
+#ifndef NDEBUG
 //	ModelHeader_t *debug = ( ModelHeader_t * )m_FileBuffer->GetPointer( modelFileOffset );
 //	ModelLODHeader_t *pLOD = debug->pLOD( 0 );
 #endif
@@ -2240,7 +2240,7 @@ void COptimizedModel::WriteModelLOD( int lodID, ModelLOD_t *pLOD, int meshID )
 	lod.numMeshes = pLOD->meshes.Count();
 	lod.switchPoint = pLOD->switchPoint;
 	m_FileBuffer->WriteAt( lodFileOffset, &lod, sizeof( ModelLODHeader_t ), "modellod" );
-#ifdef _DEBUG
+#ifndef NDEBUG
 //	ModelLODHeader_t *debug = ( ModelLODHeader_t * )m_FileBuffer->GetPointer( lodFileOffset );
 //	MeshHeader_t *pMesh = debug->pMesh( 0 );
 #endif
@@ -2255,7 +2255,7 @@ void COptimizedModel::WriteMesh( int meshID, Mesh_t *pMesh, int stripGroupID )
 	mesh.stripGroupHeaderOffset = stripGroupFileOffset - meshFileOffset;
 	mesh.flags = pMesh->flags;
 	m_FileBuffer->WriteAt( meshFileOffset, &mesh, sizeof( MeshHeader_t ), "mesh" );
-#ifdef _DEBUG
+#ifndef NDEBUG
 //	MeshHeader_t *debug = ( MeshHeader_t * )m_FileBuffer->GetPointer( meshFileOffset );
 //	StripGroupHeader_t *pStripGroup = debug->pStripGroup( 0 );
 #endif
@@ -2277,7 +2277,7 @@ void COptimizedModel::WriteStripGroup( int stripGroupID, StripGroup_t *pStripGro
 	stripGroup.indexOffset = indicesFileOffset - stripGroupFileOffset;
 	stripGroup.stripOffset = stripsFileOffset - stripGroupFileOffset;
 	m_FileBuffer->WriteAt( stripGroupFileOffset, &stripGroup, sizeof( StripGroupHeader_t), "strip group" );
-#ifdef _DEBUG
+#ifndef NDEBUG
 //	StripGroupHeader_t *debug = ( StripGroupHeader_t * )m_FileBuffer->GetPointer( stripGroupFileOffset );
 //	unsigned short *pIndex = debug->pIndex( 0 );
 //	Vertex_t *pVert = debug->pVertex( 0 );
@@ -2290,7 +2290,7 @@ intp COptimizedModel::WriteVerts( int vertID, StripGroup_t *pStripGroup )
 	int vertFileOffset = m_VertsOffset + vertID * sizeof( Vertex_t );
 	intp numVerts = pStripGroup->verts.Count();
 	m_FileBuffer->WriteAt( vertFileOffset, &pStripGroup->verts[0], sizeof( Vertex_t ) * numVerts, "verts" );
-#ifdef _DEBUG
+#ifndef NDEBUG
 //	Vertex_t *debug = ( Vertex_t * )m_FileBuffer->GetPointer( vertFileOffset );
 #endif
 	return numVerts;
@@ -2301,7 +2301,7 @@ intp COptimizedModel::WriteIndices( int indexID, StripGroup_t *pStripGroup )
 	int indexFileOffset = m_IndicesOffset + indexID * sizeof( unsigned short );
 	intp numIndices = pStripGroup->indices.Count();
 	m_FileBuffer->WriteAt( indexFileOffset, &pStripGroup->indices[0], sizeof( unsigned short ) * numIndices, "indices" );
-#ifdef _DEBUG
+#ifndef NDEBUG
 //	unsigned short *debug = ( unsigned short * )m_FileBuffer->GetPointer( indexFileOffset );
 #endif
 	return numIndices;
@@ -2322,7 +2322,7 @@ void COptimizedModel::WriteStrip( int stripID, Strip_t *pStrip, int indexID, int
 	int stripFileOffset = m_StripsOffset + stripID * sizeof( StripHeader_t );
 	stripHeader.boneStateChangeOffset = IsInt24( boneFileOffset - stripFileOffset );
 	m_FileBuffer->WriteAt( stripFileOffset, &stripHeader, sizeof( StripHeader_t ), "strip" );
-#ifdef _DEBUG
+#ifndef NDEBUG
 //	StripHeader_t *debug = ( StripHeader_t* )m_FileBuffer->GetPointer( stripFileOffset );
 //	BoneStateChangeHeader_t *pBoneStateChange = debug->pBoneStateChange( 0 );
 #endif
@@ -2339,7 +2339,7 @@ void COptimizedModel::WriteBoneStateChange( int boneID, BoneStateChange_t *boneS
 		( int )boneHeader.newBoneID );
 #endif
 	m_FileBuffer->WriteAt( boneFileOffset, &boneHeader, sizeof( BoneStateChangeHeader_t ), "bone" );
-#ifdef _DEBUG
+#ifndef NDEBUG
 //	BoneStateChangeHeader_t *debug = ( BoneStateChangeHeader_t * )m_FileBuffer->GetPointer( boneFileOffset );
 #endif
 }
@@ -2597,7 +2597,7 @@ void COptimizedModel::WriteVTXFile( studiohdr_t *pHdr, const char *pFileName,
 	WriteHeader( m_VertexCacheSize, m_MaxBonesPerVert, m_MaxBonesPerTri, 
 		m_MaxBonesPerStrip, pHdr->numbodyparts, pHdr->checksum );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_FileBuffer->TestWritten( m_EndOfFileOffset );
 #endif
 	
@@ -2618,7 +2618,7 @@ void COptimizedModel::WriteVTXFile( studiohdr_t *pHdr, const char *pFileName,
 	}
 
 	// Show statistics
-#ifdef _DEBUG
+#ifndef NDEBUG
 //	ShowStats();
 #endif
 		
@@ -3540,7 +3540,7 @@ void COptimizedModel::CheckVert( Vertex_t *pVert, int maxBonesPerTri, int maxBon
 {
 #ifndef IGNORE_BONES
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int offset = ( int )( ( unsigned char * )pVert - ( unsigned char * )m_FileBuffer->GetPointer( 0 ) );
 	Assert( offset >= m_VertsOffset && offset < m_IndicesOffset );
 	Assert( ( ( offset - m_VertsOffset ) % sizeof( Vertex_t ) ) == 0 );

@@ -34,7 +34,7 @@ CPolyhedron *ConvertLinkedGeometryToPolyhedron( GeneratePolyhedronFromPlanes_Uno
 //#define ENABLE_DEBUG_POLYHEDRON_DUMPS //Dumps debug information to disk for use with glview. Requires that tier2 also be in all projects using debug mathlib
 //#define DEBUG_DUMP_POLYHEDRONS_TO_NUMBERED_GLVIEWS //dumps successfully generated polyhedrons
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 void DumpPolyhedronToGLView( const CPolyhedron *pPolyhedron, const char *pFilename, const VMatrix *pTransform );
 void DumpPlaneToGlView( const float *pPlane, float fGrayScale, const char *pszFileName, const VMatrix *pTransform );
 void DumpLineToGLView( const Vector &vPoint1, const Vector &vColor1, const Vector &vPoint2, const Vector &vColor2, float fThickness, s1::posix::posix_file_stream &file );
@@ -785,7 +785,7 @@ CPolyhedron *ConvertLinkedGeometryToPolyhedron( GeneratePolyhedronFromPlanes_Uno
 
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 void DumpPointListToGLView( GeneratePolyhedronFromPlanes_UnorderedPointLL *pHead, PolyhedronPointPlanarity planarity, const Vector &vColor, const char *szDumpFile, const VMatrix *pTransform )
 {
@@ -880,7 +880,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 {
 	const float fNegativeOnPlaneEpsilon = -fOnPlaneEpsilon;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	CUtlVector<CPolyhedron *> DebugCutHistory;
 	CUtlVector<const float *> PlaneCutHistory;
 	GeneratePolyhedronFromPlanes_Point *pStartPoint = nullptr;
@@ -1009,7 +1009,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 
 			if( bAllPointsDead ) //all the points either died or are on the plane, no polyhedron left at all
 			{
-#ifdef _DEBUG
+#ifndef NDEBUG
 				for( intp i = DebugCutHistory.Count(); --i >= 0; )
 				{
 					if( DebugCutHistory[i] )
@@ -1074,7 +1074,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 					pActivePointWalk = pActivePointWalk->pNext;
 				} while( pActivePointWalk );
 			}
-#ifdef _DEBUG
+#ifndef NDEBUG
 			PlaneCutHistory.AddToTail( &pOutwardFacingPlanes[iCurrentPlane * 4] );
 #endif
 		}
@@ -1082,7 +1082,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 		
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		//Run around the edges of all the polygons and ensure they don't have more than one point of lowered "alive" status (alive > onplane > dead) surrounded by higher status
 		//	It indicates a concave shape. It's impossible to have it occur in theoretical space. But floating point numbers introduce error.
 		{
@@ -1398,7 +1398,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 			GeneratePolyhedronFromPlanes_Polygon *pWorkPolygon;
 			GeneratePolyhedronFromPlanes_LineLL *pTestLine;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			GeneratePolyhedronFromPlanes_Polygon *pLastWorkPolygon = nullptr;
 #endif
 
@@ -1482,7 +1482,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 
 					Assert_DumpPolyhedron( pWorkPolygon->bMissingASide );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 					{
 						//ensure that the space between the gap lines is the only space where fixing is required
 						GeneratePolyhedronFromPlanes_LineLL *pDebugLineWalk = pGapLines[1]->pNext;
@@ -1600,7 +1600,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 
 					pWorkPolygon->bMissingASide = false; //repairs are finished
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 					pLastWorkPolygon = pWorkPolygon;
 #endif
 					//move to the next point
@@ -1658,7 +1658,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 					pTestLine->pLine->pPolygons[pTestLine->iReferenceIndex] = pNewPolygon;
 					pTestLine->pLine->pPolygonLineLinks[pTestLine->iReferenceIndex] = pNewLineLink;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 					pLastWorkPolygon = pWorkPolygon;
 #endif
 
@@ -1677,7 +1677,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 			} while( pWorkPoint != pStartPoint );
 		}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		//verify that repairs are complete
 		{
 			GeneratePolyhedronFromPlanes_UnorderedPolygonLL *pDebugPolygonWalk = pAllPolygons;
@@ -1703,7 +1703,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 #endif
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for( intp i = DebugCutHistory.Count(); --i >= 0; )
 	{
 		if( DebugCutHistory[i] )
@@ -1995,7 +1995,7 @@ CPolyhedron *GeneratePolyhedronFromPlanes( const float *pOutwardFacingPlanes, in
 	return ClipLinkedGeometry( StartingPolygonList, StartingLineList, StartingPointList, pOutwardFacingPlanes, iPlaneCount, fOnPlaneEpsilon, bUseTemporaryMemory );
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 void DumpAABBToGLView( const Vector &vCenter, const Vector &vExtents, const Vector &vColor, s1::posix::posix_file_stream &file )
 {
 #ifdef ENABLE_DEBUG_POLYHEDRON_DUMPS

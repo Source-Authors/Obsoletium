@@ -147,7 +147,7 @@ CKeyValuesSystem::CKeyValuesSystem()
 CKeyValuesSystem::~CKeyValuesSystem()
 {
 #ifdef KEYVALUES_USE_POOL
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// display any memory leaks
 	if (m_pMemPool && m_pMemPool->Count() > 0)
 	{
@@ -306,7 +306,7 @@ const char *CKeyValuesSystem::GetStringForSymbol(HKeySymbol symbol)
 //-----------------------------------------------------------------------------
 void CKeyValuesSystem::AddKeyValuesToMemoryLeakList(void *pMem, HKeySymbol name)
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// only track the memory leaks in debug builds
 	MemoryLeakTracker_t item = { name, pMem };
 	m_KeyValuesTrackingList.Insert(item);
@@ -318,7 +318,7 @@ void CKeyValuesSystem::AddKeyValuesToMemoryLeakList(void *pMem, HKeySymbol name)
 //-----------------------------------------------------------------------------
 void CKeyValuesSystem::RemoveKeyValuesFromMemoryLeakList(void *pMem)
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// only track the memory leaks in debug builds
 	MemoryLeakTracker_t item = { 0, pMem };
 	intp index = m_KeyValuesTrackingList.Find(item);

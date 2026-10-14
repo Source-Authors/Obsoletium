@@ -57,7 +57,7 @@ PRECACHE_REGISTER( trigger_resourcezone );
 //-----------------------------------------------------------------------------
 CResourceZone::CResourceZone()
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_vecGatherPoint.Init();
 	m_angGatherPoint.Init();
 #endif

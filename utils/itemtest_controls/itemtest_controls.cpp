@@ -232,7 +232,7 @@ void CItemUploadSubPanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 		return;
 
 	/*
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 	m_pLabel->SetBgColor( Color( 255, 127, 0, 255 ) );
 

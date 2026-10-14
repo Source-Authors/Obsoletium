@@ -400,7 +400,7 @@ public:
 		if ( !BaseClass::Memory().IsIdxValid( i ) )
 			return false;
 
-#ifdef _DEBUG // it's safe to skip this here, since the only way to get indices after m_LastAlloc is to use MaxElementIndex
+#ifndef NDEBUG // it's safe to skip this here, since the only way to get indices after m_LastAlloc is to use MaxElementIndex
 		if ( BaseClass::Memory().IsIdxAfter( i, this->m_LastAlloc ) )
 		{
 			Assert( 0 );

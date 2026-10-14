@@ -108,7 +108,7 @@ void CUtlMemoryPool::ReportLeaks()
 
 	g_ReportFunc("Memory leak: mempool blocks left in memory: %d\n", m_BlocksAllocated);
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// walk and destroy the free list so it doesn't intefere in the scan
 	while (m_pHeadOfFreeList != nullptr)
 	{
@@ -285,7 +285,7 @@ void CUtlMemoryPool::Free( void *memBlock )
 	if ( !memBlock )
 		return;  // trying to delete NULL pointer, ignore
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// check to see if the memory is from the allocated range
 	bool bOK = false;
 	for( CBlob *pCur=m_BlobHead.m_pNext; pCur != &m_BlobHead; pCur=pCur->m_pNext )
@@ -298,7 +298,7 @@ void CUtlMemoryPool::Free( void *memBlock )
 	Assert (bOK);
 #endif // _DEBUG
 
-#ifdef _DEBUG	
+#ifndef NDEBUG	
 	// invalidate the memory
 	memset( memBlock, 0xDD, m_BlockSize );
 #endif

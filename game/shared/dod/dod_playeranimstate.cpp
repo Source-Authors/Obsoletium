@@ -1418,7 +1418,7 @@ void CDODPlayerAnimState::DebugShowEyeYaw( void )
 //-----------------------------------------------------------------------------
 void CDODPlayerAnimState::DebugShowActivity( Activity activity )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 	const char *pszActivity = "other";
 

@@ -167,7 +167,7 @@ void CLocalNetworkBackdoor::EndEntityStateUpdate()
 	ClientDLL_FrameStageNotify( FRAME_NET_UPDATE_END );
 
 	/*
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 	for ( i=0; i <= highest_index; i++ )
 	{
 	if ( !( m_EntsAlive[i>>5] & (1 << (i & 31)) ) )

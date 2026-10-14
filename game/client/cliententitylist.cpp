@@ -288,7 +288,7 @@ void CClientEntityList::RemovePVSNotifier( IClientUnknown *pUnknown )
 
 	// If it didn't report itself as a notifier, let's hope it's not in the notifier list now
 	// (which would mean that it reported itself as a notifier earlier, but not now).
-#ifdef _DEBUG
+#ifndef NDEBUG
 	unsigned short index = m_PVSNotifierMap.Find( pUnknown );
 	Assert( !m_PVSNotifierMap.IsValidIndex( index ) );
 #endif

@@ -58,7 +58,7 @@ void CDmeTimeFrame::SetEndTime( DmeTime_t endTime, bool bChangeDuration )
 
 void CDmeTimeFrame::SetTimeScale( float flScale, DmeTime_t scaleCenter, bool bChangeDuration )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	DmeTime_t preCenterTime = ToChildMediaTime( scaleCenter, false );
 #endif
 
@@ -88,7 +88,7 @@ void CDmeTimeFrame::SetTimeScale( float flScale, DmeTime_t scaleCenter, bool bCh
 
 	SetTimeScale( flScale );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	DmeTime_t postCenterTime = ToChildMediaTime( scaleCenter, false );
 	Assert( abs( preCenterTime - postCenterTime ) <= DMETIME_MINDELTA );
 #endif

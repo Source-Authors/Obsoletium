@@ -53,7 +53,7 @@ DEFINE_TESTCASE_NOSUITE( DmxTestVcdToDme )
 {
 	Msg( "Running .vcd (faceposer) to dmx tests\n" );
 	
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int nStartingCount = g_pDataModel->GetAllocatedElementCount();
 #endif
 
@@ -89,7 +89,7 @@ DEFINE_TESTCASE_NOSUITE( DmxTestVcdToDme )
 
 	g_pDataModel->ClearUndo();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int nEndingCount = g_pDataModel->GetAllocatedElementCount();
 	AssertEquals( nEndingCount, nStartingCount );
 	if ( nEndingCount != nStartingCount )

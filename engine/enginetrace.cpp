@@ -48,7 +48,7 @@ enum
 //-----------------------------------------------------------------------------
 // Used to visualize raycasts going on
 //-----------------------------------------------------------------------------
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 ConVar debugrayenable( "debugrayenable", "0", NULL, "Use this to enable ray testing.  To reset: bind \"F1\" \"clearalloverlays; debugrayreset  0; host_framerate 66.66666667\"" );
 ConVar debugrayreset( "debugrayreset", "0" );
@@ -1140,7 +1140,7 @@ void CEngineTrace::ClipRayToCollideable( const Ray_t &ray, unsigned int fMask, I
 		SetTraceEntity( pEntity, pTrace );
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Vector vecOffset, vecEndTest;
 	VectorAdd( ray.m_Start, ray.m_StartOffset, vecOffset );
 	VectorMA( vecOffset, pTrace->fractionleftsolid, ray.m_Delta, vecEndTest );
@@ -1778,7 +1778,7 @@ void CEngineTrace::TraceRay( const Ray_t &ray, unsigned int fMask, ITraceFilter 
 		IHandleEntity *pHandleEntity = enumerator.m_EntityHandles[i];
 		HandleEntityToCollideable( pHandleEntity, &pCollideable, &pDebugName );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		// Check for error condition
 		if ( !IsSolid( pCollideable->GetSolid(), pCollideable->GetSolidFlags() ) )
 		{
@@ -1823,7 +1823,7 @@ void CEngineTrace::TraceRay( const Ray_t &ray, unsigned int fMask, ITraceFilter 
 	pTrace->fraction *= flWorldFraction;
 	pTrace->fractionleftsolid *= flWorldFractionLeftSolidScale;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Vector vecOffset, vecEndTest;
 	VectorAdd( ray.m_Start, ray.m_StartOffset, vecOffset );
 	VectorMA( vecOffset, pTrace->fractionleftsolid, ray.m_Delta, vecEndTest );
@@ -1839,7 +1839,7 @@ void CEngineTrace::TraceRay( const Ray_t &ray, unsigned int fMask, ITraceFilter 
 		VectorAdd( ray.m_Start, ray.m_StartOffset, pTrace->startpos );
 		pTrace->fractionleftsolid = 0;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		pTrace->fractionleftsolid = VEC_T_NAN;
 #endif
 	}
@@ -1958,7 +1958,7 @@ public:
 
 };
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 	//-----------------------------------------------------------------------------
 	// A method to test out sweeps

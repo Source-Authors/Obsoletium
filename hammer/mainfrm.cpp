@@ -533,7 +533,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 /////////////////////////////////////////////////////////////////////////////
 // CMainFrame diagnostics
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 void CMainFrame::AssertValid() const
 {
 	CMDIFrameWnd::AssertValid();

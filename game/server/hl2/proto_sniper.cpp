@@ -540,7 +540,7 @@ enum
 CProtoSniper::CProtoSniper( void ) : m_flKeyfieldPaintTime(SNIPER_DEFAULT_PAINT_ENEMY_TIME), 
 	m_flKeyfieldPaintTimeNoise(SNIPER_DEFAULT_PAINT_NPC_TIME_NOISE)
 { 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_vecPaintCursor.Init();
 	m_vecDecoyObjectTarget.Init();
 	m_vecFrustratedTarget.Init();

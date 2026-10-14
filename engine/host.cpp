@@ -587,7 +587,7 @@ ConVar	skill( "skill","1", FCVAR_ARCHIVE, "Game skill level (1-3).", true, 1, tr
 ConVar	deathmatch( "deathmatch","0", FCVAR_NOTIFY | FCVAR_INTERNAL_USE, "Running a deathmatch server." );	// 0, 1, or 2
 ConVar	coop( "coop","0", FCVAR_NOTIFY, "Cooperative play." );			// 0 or 1
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar	r_ForceRestore( "r_ForceRestore", "0", 0 );
 #endif // _DEBUG
 
@@ -1783,7 +1783,7 @@ static void Host_UpdateScreen( void )
 {
 #ifndef SWDS 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if( r_ForceRestore.GetInt() )
 	{
 		ForceMatSysRestore();
@@ -3592,7 +3592,7 @@ void Host_Init( bool bDedicated )
 		sv_cheats.SetValue( 1 );
 		developer.SetValue( 1 );
 	}
-#ifdef _DEBUG
+#ifndef NDEBUG
 	developer.SetValue( 1 );
 #endif
 
@@ -4363,7 +4363,7 @@ bool Host_AllowQueuedMaterialSystem( bool bAllow )
 }
 
 // dimhotepus: Moved from tier1 to not register twice.
-#ifdef _DEBUG
+#ifndef NDEBUG
 CON_COMMAND( test_stringpool, "Tests the class CStringPool" )
 {
 	CStringPool pool;

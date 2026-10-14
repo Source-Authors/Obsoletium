@@ -22,7 +22,7 @@
 
 struct DecalEntry
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	char		*m_pDebugName;	// only used in debug builds
 #endif
 	IMaterial	*material;
@@ -82,7 +82,7 @@ void Draw_DecalSetName( int decal, const char *name )
 	if ( lookup == g_DecalDictionary.InvalidIndex() )
 	{
 		DecalEntry entry;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		entry.m_pDebugName = V_strdup( name );
 #endif
 		entry.material = GL_LoadMaterial( name, TEXTURE_GROUP_DECAL );
@@ -155,7 +155,7 @@ void Decal_Shutdown( void )
 		{
 			GL_UnloadMaterial( mat );
 		}
-#ifdef _DEBUG
+#ifndef NDEBUG
 		delete[] g_DecalDictionary[index].m_pDebugName;
 #endif
 	}

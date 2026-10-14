@@ -385,7 +385,7 @@ BOOL CMapView3D::OnPreparePrinting(CPrintInfo* pInfo)
 //-----------------------------------------------------------------------------
 // Purpose: Debugging functions.
 //-----------------------------------------------------------------------------
-#ifdef _DEBUG
+#ifndef NDEBUG
 void CMapView3D::AssertValid() const
 {
 	CView::AssertValid();

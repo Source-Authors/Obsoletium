@@ -495,7 +495,7 @@ bool CDmeMakefileUtils::PerformCompilationStep( CDmeMDLMakefile *pMakeFile, Comp
 	Q_RemoveDotSlashes( pBinDirectory );
 
 	char pStudioMDLCmd[MAX_PATH];
-#ifdef _DEBUG
+#ifndef NDEBUG
 	V_sprintf_safe( pStudioMDLCmd, "%s\\studiomdl.exe -allowdebug %s", pBinDirectory, pMakeFile->GetFileName() );
 #else
 	V_sprintf_safe( pStudioMDLCmd, "%s\\studiomdl.exe %s", pBinDirectory, pMakeFile->GetFileName() );

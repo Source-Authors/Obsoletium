@@ -12,7 +12,7 @@
 #include "ModelCheckIn.h"
 #include "ModelCheckInDlg.h"
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;

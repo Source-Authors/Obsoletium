@@ -238,7 +238,7 @@ void CBaseMultiplayerPlayer::AwardAchievement( int iAchievement, int iCount )
 	MessageEnd();
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 	#include "utlbuffer.h"
 

@@ -96,7 +96,7 @@ RecvProp RecvPropFloat(
 {
 	RecvProp ret;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( varProxy == RecvProxy_FloatToFloat )
 	{
 		Assert( sizeofVar == 0 || sizeofVar == 4 );
@@ -122,7 +122,7 @@ RecvProp RecvPropVector(
 {
 	RecvProp ret;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( varProxy == RecvProxy_VectorToVector )
 	{
 		Assert( sizeofVar == sizeof( Vector ) );
@@ -148,7 +148,7 @@ RecvProp RecvPropVectorXY(
 {
 	RecvProp ret;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( varProxy == RecvProxy_VectorToVector )
 	{
 		Assert( sizeofVar == sizeof( Vector ) );
@@ -176,7 +176,7 @@ RecvProp RecvPropQuaternion(
 {
 	RecvProp ret;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( varProxy == RecvProxy_QuaternionToQuaternion )
 	{
 		Assert( sizeofVar == sizeof( Quaternion ) );

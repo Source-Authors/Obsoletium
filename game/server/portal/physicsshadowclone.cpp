@@ -104,7 +104,7 @@ void CPhysicsShadowClone::UpdateOnRemove( void )
 		}
 		s_SCLLManager.Free( pFind );
 	}
-#ifdef _DEBUG
+#ifndef NDEBUG
 	else
 	{
 		//verify that it didn't weasel into a list somewhere and get left behind
@@ -272,7 +272,7 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 			)
 		  )
 		{
-//#ifdef _DEBUG
+//#ifndef NDEBUG
 			SetMoveType( MOVETYPE_NONE ); //to kill an assert
 //#endif
 			//PUSH should be used sparingly, you can't stand on a MOVETYPE_PUSH object :/

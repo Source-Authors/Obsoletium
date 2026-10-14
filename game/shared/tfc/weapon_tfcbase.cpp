@@ -99,7 +99,7 @@ const CTFCWeaponInfo &CWeaponTFCBase::GetTFCWpnData() const
 	const FileWeaponInfo_t *pWeaponInfo = &GetWpnData();
 	const CTFCWeaponInfo *pTFCInfo;
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		pTFCInfo = dynamic_cast< const CTFCWeaponInfo* >( pWeaponInfo );
 		Assert( pTFCInfo );
 	#else

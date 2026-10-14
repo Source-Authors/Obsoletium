@@ -81,7 +81,7 @@ ConVar tf_scout_hype_pep_min_damage( "tf_scout_hype_pep_min_damage", "5.0", FCVA
 
 ConVar tf_weapon_criticals_nopred( "tf_weapon_criticals_nopred", "1.0", FCVAR_REPLICATED | FCVAR_CHEAT );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar tf_weapon_criticals_anticheat( "tf_weapon_criticals_anticheat", "1.0", FCVAR_REPLICATED );
 ConVar tf_weapon_criticals_debug( "tf_weapon_criticals_debug", "0.0", FCVAR_REPLICATED );
 extern ConVar tf_weapon_criticals_force_random;
@@ -1530,7 +1530,7 @@ bool CTFWeaponBase::CalcIsAttackCriticalHelper()
 		bCrit = ( iRandom < flCritChance * WEAPON_RANDOM_RANGE );
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( tf_weapon_criticals_debug.GetBool() )
 	{
 #ifdef GAME_DLL
@@ -1564,7 +1564,7 @@ bool CTFWeaponBase::CalcIsAttackCriticalHelper()
 	if ( bCrit )
 	{
 		bool bAntiCheat = true;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		bAntiCheat = tf_weapon_criticals_anticheat.GetBool();
 #endif // _DEBUG
 

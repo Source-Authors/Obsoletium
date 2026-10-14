@@ -100,7 +100,7 @@ char g_CurMasterName[512] = {0};
 // When the downloading is complete, we launch the app using these variables.
 //////
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	#define MAX_DOWNLOADER_TIME_ALLOWED	300000	// If the downloader takes longer than this, kill it.
 #else
 	#define MAX_DOWNLOADER_TIME_ALLOWED	30	// If the downloader takes longer than this, kill it.

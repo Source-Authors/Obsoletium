@@ -716,7 +716,7 @@ DEFINE_TESTCASE_NOSUITE( DmxUndoRedoTest )
 {
 	Msg( "Running undo tests...\n" );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int nStartingCount = g_pDataModel->GetAllocatedElementCount();
 #endif
 
@@ -745,7 +745,7 @@ DEFINE_TESTCASE_NOSUITE( DmxUndoRedoTest )
 
 	g_pDataModel->RemoveFileId( fileid );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int nEndingCount = g_pDataModel->GetAllocatedElementCount();
 	AssertEquals( nEndingCount, nStartingCount );
 	if ( nEndingCount != nStartingCount )
@@ -801,7 +801,7 @@ DEFINE_TESTCASE_NOSUITE( DmxExternalAttributeTest )
 
 	CDmeExternal *pOriginal = 0;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int nStartingCount = g_pDataModel->GetAllocatedElementCount();
 #endif
 
@@ -830,7 +830,7 @@ DEFINE_TESTCASE_NOSUITE( DmxExternalAttributeTest )
 
 	g_pDataModel->RemoveFileId( fileid );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int nEndingCount = g_pDataModel->GetAllocatedElementCount();
 	AssertEquals( nEndingCount, nStartingCount );
 	if ( nEndingCount != nStartingCount )

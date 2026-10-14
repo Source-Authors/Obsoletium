@@ -538,7 +538,7 @@ bool CGCBase::BInit( AppId_t unAppID, const char *pchAppPath, IGameCoordinatorHo
 	VPROF_BUDGET( "CGCBase::BInit", VPROF_BUDGETGROUP_STEAM );
 
 // Make sure we can't deploy debug GCs outside the dev environment
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( pHost->GetUniverse() != k_EUniverseDev )
 	{
 		//pHost->EmitMessage( SPEW_GC, SPEW_ERROR, SPEW_ALWAYS, LOG_ALWAYS, 
@@ -3138,7 +3138,7 @@ bool CGCBase::BYieldingRetrieveCacheVersion( CGCSharedObjectCache *pSOCache )
 	GCMemcachedGetResult_t data;
 	if ( !BYieldingMemcachedGet( key.Access(), data ) || !data.m_bKeyFound || sizeof( uint64 ) != data.m_bufValue.Count() )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		EmitInfo( SPEW_CONSOLE, 3, 3, "SOCacheVersion - Failed to retrieve SO Cache version for: %s\n", pSOCache->GetOwner().Render() );
 #endif
 		return false;
@@ -3147,7 +3147,7 @@ bool CGCBase::BYieldingRetrieveCacheVersion( CGCSharedObjectCache *pSOCache )
 	//we have a memcached version, so make sure that our version matches what was stored in memcache
 	uint64 unVersion = *( (uint64 *)data.m_bufValue.Base() );
 	pSOCache->SetVersion( unVersion );
-#ifdef _DEBUG
+#ifndef NDEBUG
 	EmitInfo( SPEW_CONSOLE, 3, 3, "SOCacheVersion::Load - Loaded version from memcached for %s (%llu)\n", pSOCache->GetOwner().Render(), pSOCache->GetVersion() );
 #endif
 	return true;
@@ -3195,7 +3195,7 @@ void CGCBase::UpdateSOCacheVersions()
 
 			bufData.PutInt64( pSOCache->GetVersion() );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			EmitInfo( SPEW_CONSOLE, 3, 3, "SOCacheVersion - storing version in memcached for %s (%llu).\n", steamID.Render(), pSOCache->GetVersion() );
 #endif
 		}
@@ -3205,7 +3205,7 @@ void CGCBase::UpdateSOCacheVersions()
 			CUtlString &strKey = vecDeleteKeys[ vecDeleteKeys.AddToTail() ];
 			strKey.Format( "SOCacheVersionV2_%llu", steamID.ConvertToUint64() );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			EmitInfo( SPEW_CONSOLE, 3, 3, "SOCacheVersion - no SO Cache, removing version in memcached for %s.\n", steamID.Render() );
 #endif
 		}

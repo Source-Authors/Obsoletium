@@ -136,7 +136,7 @@ void CHudHealth::OnThink()
 		return;
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	g_pClientMode->GetViewportAnimationController()->SetAutoReloadScript(true);
 #endif
 

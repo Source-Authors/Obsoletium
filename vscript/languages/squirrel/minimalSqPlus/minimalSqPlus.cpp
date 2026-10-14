@@ -34,7 +34,7 @@ using namespace SqPlus;
 #endif
 
 #ifdef _MSC_VER
-#ifdef _DEBUG
+#ifndef NDEBUG
 #pragma comment(lib,SQ_REL_PATH "lib/squirrelD" LIB)
 #pragma comment(lib,SQ_REL_PATH "lib/sqstdlibD" LIB)
 #ifdef USE_REMOTE_DEBUGGER

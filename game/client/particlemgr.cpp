@@ -102,7 +102,7 @@ CParticleSubTexture::CParticleSubTexture()
 	m_pGroup = &m_DefaultGroup;
 	m_pMaterial = NULL;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_szDebugName = NULL;
 #endif
 }
@@ -1202,7 +1202,7 @@ void CParticleMgr::RemoveEffectListener( IClientParticleListener *pListener )
 
 void CParticleMgr::RegisterEffect( const char *pEffectType, CreateParticleEffectFN func )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	auto i = m_effectFactories.Find( pEffectType );
 	Assert( !m_effectFactories.IsValidIndex( i ) );
 #endif
@@ -1249,7 +1249,7 @@ void CParticleMgr::AddEffect( CNewParticleEffect *pEffect )
 
 bool CParticleMgr::AddEffect( CParticleEffectBinding *pEffect, IParticleEffect *pSim )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	FOR_EACH_LL( m_Effects, i )
 	{
 		if( m_Effects[i]->m_pSim == pSim )
@@ -1998,7 +1998,7 @@ PMaterialHandle CParticleMgr::GetPMaterial( const char *pMaterialName )
 			m_SubTextures[hMat] = pSubTexture;
 			pSubTexture->m_pMaterial = pIMaterial;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			intp iNameLength = V_strlen( pMaterialName ) + 1;
 			pSubTexture->m_szDebugName = new char [iNameLength];
 			memcpy( pSubTexture->m_szDebugName, pMaterialName, iNameLength );

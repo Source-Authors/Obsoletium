@@ -35,7 +35,7 @@ void CReplayTime::SetDate( int nDay, int nMonth, int nYear )
 	m_fDate |= ( ( nMonth - 1 ) << 5 );
 	m_fDate |= ( ( nYear - 2009 ) << 9 );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int nDbgDay, nDbgMonth, nDbgYear;
 	GetDate( nDbgDay, nDbgMonth, nDbgYear );
 	Assert( nDay == nDbgDay );
@@ -65,7 +65,7 @@ void CReplayTime::SetTime( int nHour, int nMin, int nSec )
 	m_fTime |= ( ( nMin ) << 5 ); 
 	m_fTime |= ( ( nSec ) << 11 );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int nDbgHour, nDbgMin, nDbgSec;
 	GetTime( nDbgHour, nDbgMin, nDbgSec );
 	Assert( nHour == nDbgHour );

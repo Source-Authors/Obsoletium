@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 #include <bitbuf.h>
 

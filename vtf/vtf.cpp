@@ -1550,7 +1550,7 @@ unsigned char *CVTFTexture::ImageData( int iFrame, int iFace, int iMipLevel )
 //-----------------------------------------------------------------------------
 unsigned char *CVTFTexture::ImageData( int iFrame, int iFace, int iMipLevel, int x, int y, int z )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int nWidth, nHeight, nDepth;
 	ComputeMipLevelDimensions( iMipLevel, &nWidth, &nHeight, &nDepth );
 	Assert( (x >= 0) && (x <= nWidth) && (y >= 0) && (y <= nHeight) && (z >= 0) && (z <= nDepth) );

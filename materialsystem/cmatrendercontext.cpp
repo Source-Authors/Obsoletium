@@ -188,7 +188,7 @@ void CMatRenderContextBase::MarkRenderDataUnused( bool bFrameBegin )
 	{
 		sm_nRenderStack = 1 - sm_nRenderStack;
 		// Clear the new stack
-#ifdef _DEBUG
+#ifndef NDEBUG
 		memset( sm_RenderData[sm_nRenderStack].GetBase(), 0xFF, RenderDataSizeUsed() );
 #endif
 		sm_RenderData[ sm_nRenderStack ].FreeAll( false );

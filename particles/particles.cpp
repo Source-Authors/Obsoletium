@@ -1175,7 +1175,7 @@ void CParticleCollection::LinkIntoDefList( )
 		m_pNextDef->m_pPrevDef = this;
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	CParticleCollection *pCollection = m_pDef->FirstCollection();
 	while ( pCollection )
 	{
@@ -1208,7 +1208,7 @@ void CParticleCollection::UnlinkFromDefList( )
 
 	m_pNextDef = m_pPrevDef = NULL;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	CParticleCollection *pCollection = m_pDef->FirstCollection();
 	while ( pCollection )
 	{
@@ -1773,7 +1773,7 @@ void CParticleCollection::InitializeNewParticles( int nFirstParticle, int nParti
 {
 	VPROF_BUDGET( "CParticleCollection::InitializeNewParticles", VPROF_BUDGETGROUP_PARTICLE_SIMULATION );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_bIsRunningInitializers = true;
 #endif
 
@@ -1830,7 +1830,7 @@ void CParticleCollection::InitializeNewParticles( int nFirstParticle, int nParti
 		nAttrsLeftToInit &= ~nInitializerAttrMask;
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_bIsRunningInitializers = false;
 #endif
 
@@ -2013,7 +2013,7 @@ void CParticleCollection::Simulate( float dt, bool updateBboxOnly )
 			m_flCurTime += flDT_ThisStep;
 			m_fl4CurTime = ReplicateX4( m_flCurTime );
 		
-#ifdef _DEBUG
+#ifndef NDEBUG
 			m_bIsRunningOperators = true;
 #endif
 		
@@ -2037,7 +2037,7 @@ void CParticleCollection::Simulate( float dt, bool updateBboxOnly )
 					m_nOperatorRandomSampleOffset += 17;
 				}
 			}
-#ifdef _DEBUG
+#ifndef NDEBUG
 			m_bIsRunningOperators = false;
 #endif
 
@@ -2077,7 +2077,7 @@ void CParticleCollection::Simulate( float dt, bool updateBboxOnly )
 					*dtime = 1.0f;
 				}
 #endif
-#ifdef _DEBUG
+#ifndef NDEBUG
 				m_bIsRunningOperators = true;
 #endif
 				for( int i = 0; i < nCount; i++ )
@@ -2100,7 +2100,7 @@ void CParticleCollection::Simulate( float dt, bool updateBboxOnly )
 						m_nOperatorRandomSampleOffset += 17;
 					}
 				}
-#ifdef _DEBUG
+#ifndef NDEBUG
 				m_bIsRunningOperators = false;
 #endif
 			}
@@ -2744,7 +2744,7 @@ void CParticleCollection::ApplyKillList( void )
 	int nParticlesActiveNow = m_nActiveParticles;
 	const int *pCurKillListSlot = m_pParticleKillList;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// This algorithm assumes the particles listed in the kill list are in ascending order
 	for ( int i = 1; i < nLeftInKillList; ++i )
 	{

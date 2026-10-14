@@ -464,7 +464,7 @@ void CBaseAnimationSetEditor::TransformImportedChannel( CDmeChannel *pChannel )
 				RotatePositionLog( pPositionLog, preTransform );
 			}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			// At the moment, we don't support anything but prerotation.
 			// This would be tricky because we'd need to read the quat logs
 			// to figure out how to translate in local space.

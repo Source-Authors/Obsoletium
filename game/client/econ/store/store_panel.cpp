@@ -577,7 +577,7 @@ bool CGCClientJobGetUserData::BYieldingRunJob( void *pvStartParam )
 		return false;
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Msg( "CGCClientJobGetUserData - Result: %d\n", msgResponse.Body().result() );
 #endif
 
@@ -717,7 +717,7 @@ bool CStorePanel::LoadPricesheet( KeyValuesAD* pKVPricesheet )
 	return true;
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -1163,7 +1163,7 @@ bool CGCClientJobInitPurchase::BYieldingRunJob( void *pvStartParam )
 		return false;
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Msg( "CGCClientJobInitPurchase - Result: %d, TxnID: %llu\n", msgResponse.Body().result(), msgResponse.Body().txn_id());
 #endif
 
@@ -1235,7 +1235,7 @@ bool CGCClientJobCancelPurchase::BYieldingRunJob( void *pvStartParam )
 		return false;
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Msg( "CGCClientJobCancelPurchase Result: %d\n", msgResponse.Body().result() );
 #endif
 
@@ -1971,7 +1971,7 @@ void CloseStoreStatusDialog( void )
 	}
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 CON_COMMAND( re_add_store_page, "" )
 {
 	CStorePanel *pStorePanel = EconUI()->GetStorePanel();

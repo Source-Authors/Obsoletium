@@ -16,7 +16,7 @@
 
 // If DEBUG_NAV_NODES is true, nav_show_nodes controls drawing node positions, and
 // nav_show_node_id allows you to show the IDs of nodes that didn't get used to create areas.
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define DEBUG_NAV_NODES 1
 #else
 #define DEBUG_NAV_NODES 0

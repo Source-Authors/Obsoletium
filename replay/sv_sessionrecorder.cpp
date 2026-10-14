@@ -161,7 +161,7 @@ void CSessionRecorder::UpdateSessionLocks()
 
 		if ( pCurManager->IsDone() )
 		{
-#ifdef _DEBUG
+#ifndef NDEBUG
 			pCurManager->Validate();
 #endif
 

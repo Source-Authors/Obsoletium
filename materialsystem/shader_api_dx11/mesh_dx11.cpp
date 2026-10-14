@@ -24,7 +24,7 @@
 
 namespace s1::shaderapidx11 {
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 uint32_t CVertexBufferDx11::s_nBufferCount = 0;
 #endif
 
@@ -89,7 +89,7 @@ bool CVertexBufferDx11::Allocate() {
       // Dynamic meshes should never be compressed (slows down writing to them)
       Assert(CompressionType(GetVertexFormat()) == VERTEX_COMPRESSION_NONE);
     }
-#ifdef _DEBUG
+#ifndef NDEBUG
     ++s_nBufferCount;
 #endif
   }
@@ -99,7 +99,7 @@ bool CVertexBufferDx11::Allocate() {
 
 void CVertexBufferDx11::Free() {
   if (m_pVertexBuffer) {
-#ifdef _DEBUG
+#ifndef NDEBUG
     --s_nBufferCount;
 #endif
 
@@ -297,7 +297,7 @@ void CVertexBufferDx11::Unlock(int nWrittenVertexCount, VertexDesc_t &desc) {
 // shove indices into this if you don't actually want indices
 static unsigned int s_nScratchIndexBuffer = 0;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 uint32_t CIndexBufferDx11::s_nBufferCount = 0;
 #endif
 
@@ -367,7 +367,7 @@ bool CIndexBufferDx11::Allocate() {
           "TexGroup_global_" TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER,
           COUNTER_GROUP_TEXTURE_GLOBAL, m_nBufferSize);
     }
-#ifdef _DEBUG
+#ifndef NDEBUG
     ++s_nBufferCount;
 #endif
   }
@@ -377,7 +377,7 @@ bool CIndexBufferDx11::Allocate() {
 
 void CIndexBufferDx11::Free() {
   if (m_pIndexBuffer) {
-#ifdef _DEBUG
+#ifndef NDEBUG
     --s_nBufferCount;
 #endif
 

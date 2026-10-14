@@ -1367,7 +1367,7 @@ CON_COMMAND( cl_decline_first_notification, "Tries to decline/remove the first n
 	}
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 #include "confirm_dialog.h"
 

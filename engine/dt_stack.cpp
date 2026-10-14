@@ -23,7 +23,7 @@ CDatatableStack::CDatatableStack( CSendTablePrecalc *pPrecalc, unsigned char *pS
 
 	m_bInitted = false;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	BitwiseSet( m_pProxies, 0xFF );
 #endif
 }

@@ -76,7 +76,7 @@ void CStaticCollisionPolyhedronCache::LevelInitPreEntity( void )
 //		// No need for a full update, but we need to remap static prop ICollideable's in the old system to the new system
 //		for( int i = m_CollideableIndicesMap.Count(); --i >= 0; )
 //		{
-//#ifdef _DEBUG
+//#ifndef NDEBUG
 //			StaticPropPolyhedronCacheInfo_t cacheInfo = m_CollideableIndicesMap.Element(i);
 //#endif
 //			m_CollideableIndicesMap.Reinsert( staticpropmgr->GetStaticPropByIndex( m_CollideableIndicesMap.Element(i).iStaticPropIndex ), i );
@@ -368,7 +368,7 @@ void CStaticCollisionPolyhedronCache::Update( void )
 
 								m_StaticPropPolyhedrons.AddToTail( pWorkSpacePolyhedron );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 								CPhysConvex *pConvex = physcollision->ConvexFromConvexPolyhedron( *pTempPolyhedron );
 								AssertMsg( pConvex != NULL, "Conversion from Convex to Polyhedron was unreversable" );
 								if( pConvex )

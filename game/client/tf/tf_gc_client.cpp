@@ -44,7 +44,7 @@
 
 void SelectGroup( EMatchmakingGroupType eGroup, bool bSelected );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	#define GCMATCHMAKING_DEBUG_LEVEL 4
 #else
 	#define GCMATCHMAKING_DEBUG_LEVEL 1
@@ -1840,7 +1840,7 @@ void CTFGCClientSystem::DumpLobby()
 	pLobby->SpewDebug();
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 static ConVar mm_debug_ignore_connect( "mm_debug_ignore_connect", "0", FCVAR_ARCHIVE, "Debug command to discard matchmaking commands to connect to server" );
 #endif
 
@@ -1891,7 +1891,7 @@ void CTFGCClientSystem::ConnectToServer( const char *connect )
 		return;
 
 	// !TEST! Check convar to stub connection
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		if ( mm_debug_ignore_connect.GetBool() )
 		{
 			Warning(" IGNORING request to connect to %s as per mm_debug_ignore_connect\n", connect );

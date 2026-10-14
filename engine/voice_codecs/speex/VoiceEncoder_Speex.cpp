@@ -124,7 +124,7 @@ void VoiceEncoder_Speex::EncodeFrame(const char *in, char *out) {
   /*Encode the frame*/
   speex_encode_int(encoder_state_, input, &bits_);
 
-#ifdef _DEBUG
+#ifndef NDEBUG
   // Ensure our frame size is enough to write all.
   const int out_expected_bytes{speex_bits_nbytes(&bits_)};
   Assert(out_expected_bytes <= kEncodedFrameSizes[quality_]);
@@ -133,7 +133,7 @@ void VoiceEncoder_Speex::EncodeFrame(const char *in, char *out) {
   /*Copy the bits to an array of char that can be written*/
   [[maybe_unused]] int out_written_bytes{
       speex_bits_write(&bits_, out, kEncodedFrameSizes[quality_])};
-#ifdef _DEBUG
+#ifndef NDEBUG
   if (out_written_bytes != out_expected_bytes) {
     Warning(
         "Speex encoder write failure: real written bytes (%d) != expected ones "

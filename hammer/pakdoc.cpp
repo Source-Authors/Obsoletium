@@ -12,7 +12,7 @@
 #include "hammer.h"
 #include "PakDoc.h"
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
@@ -48,7 +48,7 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // CPakDoc diagnostics
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 void CPakDoc::AssertValid() const
 {
 	CDocument::AssertValid();

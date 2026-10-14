@@ -32,7 +32,7 @@
 
 CTFPasstimeLogic *g_pPasstimeLogic;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define SECRETROOM_LOG Warning
 #else
 #define SECRETROOM_LOG (void)

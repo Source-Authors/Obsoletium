@@ -574,7 +574,7 @@ private:
 			// This should have been cleaned up in write-to-disk phase if we're in publish phase
 			Assert( m_nPhase != PHASE_PUBLISH || m_pInData == NULL );
 		}
-#ifdef _DEBUG
+#ifndef NDEBUG
 		else
 		{
 			AssertMsg( 0, "Shouldn't reach here" );

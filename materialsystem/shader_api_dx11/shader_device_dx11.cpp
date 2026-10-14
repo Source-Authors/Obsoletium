@@ -260,7 +260,7 @@ bool CShaderDeviceMgrDx11::InitGpuInfo() {
                                 IID_PPV_ARGS(&adapter)) != DXGI_ERROR_NOT_FOUND;
        ++adapter_idx) {
     AdapterInfo_t &info{m_Adapters[m_Adapters.AddToTail()]};
-#ifdef _DEBUG
+#ifndef NDEBUG
     memset(&info.m_ActualCaps, 0xDD, sizeof(info.m_ActualCaps));
 #endif
 
@@ -846,7 +846,7 @@ bool CShaderDeviceDx11::InitDevice(void *hwnd, unsigned adapter_no,
     s1::win::com::com_ptr<ID3D11InfoQueue> d3d11_info_queue;
     hr = d3d11_debug.QueryInterface(IID_PPV_ARGS(&d3d11_info_queue));
     if (SUCCEEDED(hr)) {
-#ifdef _DEBUG
+#ifndef NDEBUG
       hr = d3d11_info_queue->SetBreakOnSeverity(
           D3D11_MESSAGE_SEVERITY_CORRUPTION, true);
       Assert(SUCCEEDED(hr));
@@ -1216,7 +1216,7 @@ IShaderBuffer *CShaderDeviceDx11::CompileShader(const char *program,
   unsigned compile_flags = D3DCOMPILE_AVOID_FLOW_CONTROL;
   compile_flags |= D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
   compile_flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_OPTIMIZATION_LEVEL0;
 #else
   compile_flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;

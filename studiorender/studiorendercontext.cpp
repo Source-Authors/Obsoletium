@@ -1483,7 +1483,7 @@ bool CStudioRenderContext::LoadModel( studiohdr_t *pStudioHdr, void *pVtxBuffer,
 	pStudioHdr->flags &= ~STUDIOHDR_FLAGS_USES_FB_TEXTURE;
 	pStudioHdr->flags &= ~STUDIOHDR_FLAGS_USES_BUMPMAPPING;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int totalNumMeshGroups = 0;
 #endif
 	int nColorMeshID = 0;
@@ -1503,7 +1503,7 @@ bool CStudioRenderContext::LoadModel( studiohdr_t *pStudioHdr, void *pVtxBuffer,
 		// save off the lod switch point
 		pStudioHWData->m_pLODs[nLodID].m_SwitchPoint = pVertexHdr->pBodyPart( 0 )->pModel( 0 )->pLOD( nLodID )->switchPoint;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		studioloddata_t *pLOD = &pStudioHWData->m_pLODs[nLodID];
 		for ( int meshID = 0; meshID < pStudioHWData->m_NumStudioMeshes; ++meshID )
 		{
@@ -1512,7 +1512,7 @@ bool CStudioRenderContext::LoadModel( studiohdr_t *pStudioHdr, void *pVtxBuffer,
 #endif
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Assert( nColorMeshID == totalNumMeshGroups );
 #endif
 

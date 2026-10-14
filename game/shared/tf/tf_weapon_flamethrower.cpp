@@ -1048,7 +1048,7 @@ Vector CTFFlameThrower::GetDeflectionSize()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar tf_pushbackscalescale( "tf_pushbackscalescale", "1.0" );
 ConVar tf_pushbackscalescale_vertical( "tf_pushbackscalescale_vertical", "1.0" );
 #endif
@@ -1186,7 +1186,7 @@ bool CTFFlameThrower::DeflectPlayer( CTFPlayer *pTarget, CTFPlayer *pOwner, Vect
 
 		CALL_ATTRIB_HOOK_FLOAT( flForce, airblast_pushback_scale );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		Vector vecForce = vecToTarget * flForce * tf_pushbackscalescale.GetFloat();
 #else
 		Vector vecForce = vecToTarget * flForce;	
@@ -1211,7 +1211,7 @@ bool CTFFlameThrower::DeflectPlayer( CTFPlayer *pTarget, CTFPlayer *pOwner, Vect
 			CALL_ATTRIB_HOOK_FLOAT( flVerticalPushbackScale, airblast_vertical_pushback_scale );
 		}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		vecForce.z += flVerticalPushbackScale * tf_pushbackscalescale_vertical.GetFloat();
 
 		/*

@@ -70,7 +70,7 @@ static void WriteFileFromRequestContext( const RequestContext_t &rc )
  */
 void Thread_DPrintf (char *fmt, ...)
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	va_list		argptr;
 	char		msg[4096];
 		
@@ -296,7 +296,7 @@ void CleanUpDownload( RequestContext_t& rc, HTTPStatus_t status, HTTPError_t err
 //--------------------------------------------------------------------------------------------------------------
 //static void DumpHeaders( RequestContext_t& rc )
 //{
-//#ifdef _DEBUG
+//#ifndef NDEBUG
 //	DWORD dwSize;
 //
 //	// First time we will find out the size of the headers.

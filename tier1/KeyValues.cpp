@@ -1235,7 +1235,7 @@ void KeyValues::AddSubkeyUsingKnownLastChild( KeyValues *pSubkey, KeyValues *pLa
 		Assert( pLastChild->m_pPeer == nullptr );
 
 //		// In debug, make sure that they really do know which child is the last one
-//		#ifdef _DEBUG
+//		#ifndef NDEBUG
 //			KeyValues *pTempDat = m_pSub;
 //			while ( pTempDat->GetNextKey() != NULL )
 //			{

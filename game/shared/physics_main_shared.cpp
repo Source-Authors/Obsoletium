@@ -61,7 +61,7 @@ int linksallocated = 0;
 int groundlinksallocated = 0;
 
 // Prints warnings if any entity think functions take longer than this many milliseconds
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define DEF_THINK_LIMIT "20"
 #else
 #define DEF_THINK_LIMIT "10"
@@ -1258,7 +1258,7 @@ void CBaseEntity::PhysicsCheckVelocity( void )
 
 		if ( vecAbsVelocity[i] > sv_maxvelocity.GetFloat() ) 
 		{
-#ifdef _DEBUG
+#ifndef NDEBUG
 			DevWarning( 2, "Got a velocity too high on %s\n", GetClassname() );
 #endif
 			vecAbsVelocity[i] = sv_maxvelocity.GetFloat();
@@ -1266,7 +1266,7 @@ void CBaseEntity::PhysicsCheckVelocity( void )
 		}
 		else if ( vecAbsVelocity[i] < -sv_maxvelocity.GetFloat() )
 		{
-#ifdef _DEBUG
+#ifndef NDEBUG
 			DevWarning( 2, "Got a velocity too low on %s\n", GetClassname() );
 #endif
 			vecAbsVelocity[i] = -sv_maxvelocity.GetFloat();
@@ -1922,14 +1922,14 @@ bool CBaseEntity::PhysicsRunThink( thinkmethods_t thinkMethod )
 	// Fire the rest of 'em
 	for ( int i = 0; i < m_aThinkFunctions.Count(); i++ )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		// Set the context
 		m_iCurrentThinkContext = i;
 #endif
 
 		bAlive = PhysicsRunSpecificThink( i, m_aThinkFunctions[i].m_pfnThink );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		// Clear our context
 		m_iCurrentThinkContext = NO_THINK_CONTEXT;
 #endif

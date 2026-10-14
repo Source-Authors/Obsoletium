@@ -1049,7 +1049,7 @@ bool CVoxelHash::EnumerateElementsAlongRay( SpatialPartitionListMask_t listMask,
 bool CVoxelHash::EnumerateElementsAlongRay_Ray( SpatialPartitionListMask_t listMask, 
 	const Ray_t &ray, const Vector &vecInvDelta, const Vector &vecEnd, IPartitionEnumerator *pIterator )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// For drawing debug objects.
 	static int nRenderRayEnumId = 4;
 #endif

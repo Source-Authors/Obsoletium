@@ -630,7 +630,7 @@ public:
 	virtual int	ObjectCaps( void );
 
 	// Verifies that the data description is valid in debug builds.
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 	void ValidateDataDescription(void);
 	#endif // _DEBUG
 
@@ -837,7 +837,7 @@ protected:
 	intp	GetIndexForThinkContext( const char *pszContext );
 	CUtlVector< thinkfunc_t >	m_aThinkFunctions;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int							m_iCurrentThinkContext;
 #endif
 
@@ -1091,7 +1091,7 @@ public:
 	float HealthFraction() const;
 
 	// Ugly code to lookup all functions to make sure they are in the table when set.
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 #ifdef GNUC
 #define ENTITYFUNCPTR_SIZE	8
@@ -1826,7 +1826,7 @@ EXTERN_SEND_TABLE(DT_BaseEntity);
 // Normally it's illegal to cast a pointer to a member function of a derived class to a pointer to a 
 // member function of a base class.  static_cast is a sleezy way around that problem.
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 #define SetTouch( a ) TouchSet( static_cast <void (CBaseEntity::*)(CBaseEntity *)> (a), #a )
 #define SetUse( a ) UseSet( static_cast <void (CBaseEntity::*)(	CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )> (a), #a )
@@ -2627,7 +2627,7 @@ inline void CBaseEntity::FireBullets( int cShots, const Vector &vecSrc,
 #define SetThink( a ) ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), 0, NULL )
 #define SetContextThink( a, b, context ) ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), (b), context )
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define SetMoveDone( a ) \
 	do \
 	{ \

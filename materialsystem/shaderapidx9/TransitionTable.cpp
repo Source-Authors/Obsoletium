@@ -542,7 +542,7 @@ void CTransitionTable::ApplySRGBWriteEnable( const ShadowState_t& shaderState  )
 		}
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	BoardState().m_SRGBWriteEnable = shaderState.m_SRGBWriteEnable;
 	if (g_SpewTransitions)											
 	{																
@@ -1464,7 +1464,7 @@ void CTransitionTable::ApplyTransition( TransitionList_t& list, StateSnapshot_t 
 	m_BoardState.m_UsingFixedFunction = CurrentShadowState()->m_UsingFixedFunction;
 
 	// State blocks bypass the code that sets the board state
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// NOTE: A memcmp here isn't enough since we don't set alpha args in cases where the op is nothing.
 	// Assert( !memcmp( &m_BoardState, &CurrentShadowState(), sizeof(m_BoardState) ) );
 	const ShadowState_t &testState1 = *CurrentShadowState();
@@ -1620,7 +1620,7 @@ void CTransitionTable::UseSnapshot( StateSnapshot_t snapshotId )
 	// Followed by things that are not
 	ApplyShaderState( m_ShadowStateList[id], m_SnapshotList[snapshotId].m_ShaderState );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// NOTE: We can't ship with this active because mod makers may well violate this rule
 	// We don't want no stinking fixed-function on hardware that has vertex and pixel shaders. . 
 	// This could cause a serious perf hit. 

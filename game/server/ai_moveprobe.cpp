@@ -121,7 +121,7 @@ void CAI_MoveProbe::TraceLine( const Vector &vecStart, const Vector &vecEnd, uns
 
 	AI_TraceLine( vecStart, vecEnd, mask, &traceFilter, pResult );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Just to make sure; I'm not sure that this is always the case but it should be
 	if (pResult->allsolid)
 	{

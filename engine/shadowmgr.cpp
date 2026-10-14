@@ -1180,7 +1180,7 @@ void CShadowMgr::RemoveSurfaceFromShadow( ShadowHandle_t handle, SurfaceHandle_t
 		i = m_ShadowSurfaces.Next(i);
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Here, the shadow didn't have the surface in its list
 	// let's make sure the surface doesn't think it's got the shadow in its list
 	ShadowDecalHandle_t	dh = MSurf_ShadowDecals( surfID );

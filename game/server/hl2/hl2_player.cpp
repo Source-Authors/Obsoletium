@@ -1650,7 +1650,7 @@ void CHL2_Player::CommanderExecute( CommanderCommand_t command )
 		}
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if( goal.m_pGoalEntity == NULL && goal.m_vecGoalLocation == vec3_invalid )
 	{
 		DevMsg( 1, "**ERROR: Someone sent an invalid goal to CommanderExecute!\n" );

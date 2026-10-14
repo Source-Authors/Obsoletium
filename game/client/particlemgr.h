@@ -230,7 +230,7 @@ public:
 	CParticleSubTextureGroup m_DefaultGroup;	// This is used as the group if a particle's material
 												// isn't using a group.
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	char *m_szDebugName;
 #endif
 	

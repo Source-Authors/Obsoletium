@@ -162,7 +162,7 @@ inline wchar_t *_wcsupr( wchar_t *start )
 #endif // POSIX
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 #define V_memset(dest, fill, count)		_V_memset   (__FILE__, __LINE__, (dest), (fill), (count))
 #define V_memcpy(dest, src, count)		_V_memcpy	(__FILE__, __LINE__, (dest), (src), (count))
@@ -1624,7 +1624,7 @@ V_to_chars(OUT_Z_ARRAY char (&buffer)[size], TIntegral value, int base = 10)
 			return std::errc{};
 		}
 	}
-#ifdef _DEBUG
+#ifndef NDEBUG
 	const std::string message = std::make_error_code
 	(
 		result.ec != std::errc{} ? result.ec : std::errc::value_too_large
@@ -1652,7 +1652,7 @@ V_to_chars(OUT_Z_ARRAY char (&buffer)[size], TFloat value)
 			return std::errc{};
 		}
 	}
-#ifdef _DEBUG
+#ifndef NDEBUG
 	const std::string message = std::make_error_code
 	(
 		result.ec != std::errc{} ? result.ec : std::errc::value_too_large

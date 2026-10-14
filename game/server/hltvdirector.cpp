@@ -622,7 +622,7 @@ void CHLTVDirector::RemoveEventsFromHistory(int tick)
 		}
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	CheckHistory();
 #endif
 }

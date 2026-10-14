@@ -143,7 +143,7 @@ public:
 
 	virtual void AddShadowingTriangles( CUtlVector<Vector> &tri_list );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	void DebugSolid(void);
 #endif // _DEBUG
 

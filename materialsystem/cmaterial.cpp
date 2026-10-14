@@ -1622,7 +1622,7 @@ KeyValues* CMaterial::InitializeShader( KeyValues &keyValues, KeyValues &patchKe
 	m_pShaderParams = (IMaterialVar**)malloc( varCount * sizeof(IMaterialVar*) );
 	memcpy( m_pShaderParams, ppVars, varCount * sizeof(IMaterialVar*) );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for (int i = 0; i < varCount; ++i)
 	{
 		Assert( ppVars[i] );
@@ -3051,7 +3051,7 @@ void CMaterial::DrawMesh( VertexCompressionType_t vertexCompression )
 {
 	if ( m_pShader )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		if ( GetMaterialVarFlags() & MATERIAL_VAR_DEBUG )
 		{
 			// Putcher breakpoint here to catch the rendering of a material

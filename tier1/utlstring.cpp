@@ -75,11 +75,11 @@ void CUtlString::SetLength( intp nLen )
 {
 	if ( nLen > 0 )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		intp prevLen = m_pString ? Length() : 0;
 #endif
 		AllocMemory( nLen );
-#ifdef _DEBUG
+#ifndef NDEBUG
 		if ( nLen > prevLen )
 		{
 			V_memset( m_pString + prevLen, 0xEB, nLen - prevLen );

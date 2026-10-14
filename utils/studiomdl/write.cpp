@@ -1930,7 +1930,7 @@ static void WriteVertices( studiohdr_t *phdr )
 		for (j = 0; j < pLodData->numvertices; j++)
 		{
 			Vector4DCopy( pLodData->vertex[j].tangentS, ptangents[j] );
-#ifdef _DEBUG
+#ifndef NDEBUG
 			float w = ptangents[j].w;
 			Assert( w == 1.0f || w == -1.0f );
 #endif
@@ -2283,7 +2283,7 @@ static void WriteModel( studiohdr_t *phdr )
 	}
 	ALIGN4( pData );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for ( j = 0; j < g_numflexcontrollers; ++j )
 	{
 		Assert( pControllerHandled[ j ] );
@@ -3030,7 +3030,7 @@ void WriteModelFiles(void)
 		// vertex accessors hide shifting vertex data
 		WriteVertices( phdr );
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		int bodyPartID;
 		for( bodyPartID = 0; bodyPartID < phdr->numbodyparts; bodyPartID++ )
 		{

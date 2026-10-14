@@ -91,7 +91,7 @@ inline CSDKPlayer *ToSDKPlayer( CBaseEntity *pEntity )
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Assert( dynamic_cast<CSDKPlayer*>( pEntity ) != 0 );
 #endif
 	return static_cast< CSDKPlayer* >( pEntity );

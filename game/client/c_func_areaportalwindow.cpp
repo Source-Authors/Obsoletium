@@ -63,7 +63,7 @@ void C_FuncAreaPortalWindow::ComputeFxBlend()
 	// We reset our blend down below so pass anything except 0 to the renderer.
 	m_nRenderFXBlend = 255;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_nFXComputeFrame = gpGlobals->framecount;
 #endif
 

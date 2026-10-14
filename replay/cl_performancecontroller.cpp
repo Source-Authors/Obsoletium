@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------------------
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar replay_simulate_long_save( "replay_simulate_long_save", "0", FCVAR_DONTRECORD, "Simulate a long save.  Seconds." );
 #endif
 
@@ -53,7 +53,7 @@ public:
 		if ( Q_isempty( m_szFullFilename ) )
 			return JOB_FAILED;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		const int nDelay = replay_simulate_long_save.GetInt();
 		if ( nDelay )
 		{

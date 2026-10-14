@@ -73,7 +73,7 @@ extern bool g_fTestSteering;
 //-----------------------------------------------------------------------------
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 extern ConVar ai_debug_doors;
 #define AIIsDebuggingDoors( pNPC ) ( ai_debug_doors.GetBool() && pNPC->m_bSelected )
 #define AIDoorDebugMsg( pNPC, msg )	if ( !AIIsDebuggingDoors( pNPC ) ) ; else Msg( msg )

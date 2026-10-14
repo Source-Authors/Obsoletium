@@ -24,7 +24,7 @@
 #include "tf_player.h"
 #endif
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar tf_debug_projectile( "tf_debug_projectile", "0", FCVAR_REPLICATED | FCVAR_DEVELOPMENTONLY | FCVAR_CHEAT );
 #endif // _DEBUG
 
@@ -460,7 +460,7 @@ void CTFBaseProjectile::FlyThink( void )
 
 	SetNextThink( gpGlobals->curtime + 0.1f );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( tf_debug_projectile.GetBool() )
 	{
 		NDebugOverlay::Box( GetAbsOrigin(), Vector( 0.5, 0.5, 0.5 ), -Vector( 0.5, 0.5, 0.5 ), 0, 255, 0, 100, 0.1 );

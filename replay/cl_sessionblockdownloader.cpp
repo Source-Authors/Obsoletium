@@ -112,7 +112,7 @@ void CSessionBlockDownloader::Think()
 			// Begin the download
 			CHttpDownloader *pDownloader = new CHttpDownloader( this );
 			const char *pFilename = V_UnqualifiedFileName( pBlock->m_szFullFilename );
-#ifdef _DEBUG
+#ifndef NDEBUG
 			extern ConVar replay_forcedownloadurl;
 			const char *pForceURL = replay_forcedownloadurl.GetString();
 			const char *pURL = pForceURL[0] ? pForceURL : Replay_va( "%s%s", pSession->m_strBaseDownloadURL.Get(), pFilename );

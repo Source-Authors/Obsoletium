@@ -60,7 +60,7 @@ void CUtlBinaryBlock::SetLength( intp nLength )
 		}
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( m_Memory.NumAllocated() > m_nActualLength )
 	{
 		memset( ( ( char * )m_Memory.Base() ) + m_nActualLength, 0xEB, m_Memory.NumAllocated() - m_nActualLength );

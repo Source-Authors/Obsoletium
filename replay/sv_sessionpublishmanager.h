@@ -61,7 +61,7 @@ public:
 	// Abort publishing
 	void				AbortPublish();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	void				Validate();
 #endif
 

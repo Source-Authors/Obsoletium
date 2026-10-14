@@ -414,7 +414,7 @@ C_BasePlayer::C_BasePlayer() : m_iv_vecViewOffset( "C_BasePlayer::m_iv_vecViewOf
 {
 	AddVar( &m_vecViewOffset, &m_iv_vecViewOffset, LATCH_SIMULATION_VAR );
 	
-#ifdef _DEBUG																
+#ifndef NDEBUG																
 	m_vecLadderNormal.Init();
 	m_vecOldViewAngles.Init();
 #endif

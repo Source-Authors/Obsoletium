@@ -1223,7 +1223,7 @@ public:
 			for ( int i = 0; i < m_hLayers.Count(); ++i )
 			{
 				m_hLayers[ i ] = DMELEMENT_HANDLE_INVALID;
-#ifdef _DEBUG
+#ifndef NDEBUG
 				CDmElement *pElement = g_pDataModel->GetElement( m_hLayers[ i ] );
 				Assert( !pElement || pElement->IsStronglyReferenced() );
 #endif
@@ -3340,7 +3340,7 @@ template< class T >
 static const T& GetActiveLayerValue( CUtlVector< ActiveLayer_t< T > > &layerlist, DmeTime_t t, intp nTopmostLayer )
 {
 	intp nCount = layerlist.Count();
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Assert( nCount >= nTopmostLayer );
 #endif
 

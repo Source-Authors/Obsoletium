@@ -149,7 +149,7 @@ CDpiWindowBehavior::CDpiWindowBehavior(bool applyDpiOnCreate)
       m_current_dpi_x{USER_DEFAULT_SCREEN_DPI},
       m_current_dpi_y{USER_DEFAULT_SCREEN_DPI},
       m_apply_dpi_on_create{applyDpiOnCreate}
-#ifdef _DEBUG
+#ifndef NDEBUG
       ,
       m_is_destroyed{false}
 #endif
@@ -160,7 +160,7 @@ BOOL CDpiWindowBehavior::OnCreateWindow(HWND window) {
   Assert(window);
 
   m_window_handle = window;
-#ifdef _DEBUG
+#ifndef NDEBUG
   m_is_destroyed = false;
 #endif
   // Windows docs say DPI is same for X and Y.
@@ -180,7 +180,7 @@ void CDpiWindowBehavior::OnDestroyWindow() {
 
   DeleteWindowFont(m_window_handle);
   m_window_handle = nullptr;
-#ifdef _DEBUG
+#ifndef NDEBUG
   m_is_destroyed = true;
 #endif
 }

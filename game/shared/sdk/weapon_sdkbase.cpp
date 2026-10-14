@@ -115,7 +115,7 @@ const CSDKWeaponInfo &CWeaponSDKBase::GetSDKWpnData() const
 	const FileWeaponInfo_t *pWeaponInfo = &GetWpnData();
 	const CSDKWeaponInfo *pSDKInfo;
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		pSDKInfo = dynamic_cast< const CSDKWeaponInfo* >( pWeaponInfo );
 		Assert( pSDKInfo );
 	#else

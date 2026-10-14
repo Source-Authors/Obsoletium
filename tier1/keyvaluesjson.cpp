@@ -659,7 +659,7 @@ const char *KeyValuesJSONParser::GetTokenDebugText()
 	return "<parse error>";
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 static void JSONTest_ParseValid( const char *pszData )
 {

@@ -441,7 +441,7 @@ bool CSessionBlockPublisher::IsDone() const
 	return m_lstPublishingBlocks.Count() == 0;
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 void CSessionBlockPublisher::Validate()
 {
 	FOR_EACH_LL( m_lstPublishingBlocks, i )

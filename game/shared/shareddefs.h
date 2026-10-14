@@ -716,7 +716,7 @@ struct FireBulletsInfo_t
 		m_pAdditionalIgnoreEnt = NULL;
 		m_flDamageForceScale = 1.0f;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		m_iAmmoType = -1;
 		m_vecSrc.Init( VEC_T_NAN, VEC_T_NAN, VEC_T_NAN );
 		m_vecDirShooting.Init( VEC_T_NAN, VEC_T_NAN, VEC_T_NAN );

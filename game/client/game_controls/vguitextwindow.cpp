@@ -159,7 +159,7 @@ void CTextWindow::ShowText( const char *text )
 
 void CTextWindow::ShowURL( const char *URL, bool bAllowUserToDisable )
 {
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		Msg( "CTextWindow::ShowURL( %s )\n", URL );
 	#endif
 

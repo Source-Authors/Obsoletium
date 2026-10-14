@@ -241,7 +241,7 @@ void CL_PrintWhitelistInfo()
 }
 
 // Console command to force a whitelist on the system.
-#ifdef _DEBUG
+#ifndef NDEBUG
 void whitelist_f( const CCommand &args )
 {
 	int pureLevel = 2;

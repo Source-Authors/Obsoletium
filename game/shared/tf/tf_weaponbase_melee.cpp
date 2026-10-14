@@ -50,7 +50,7 @@ END_DATADESC()
 ConVar tf_meleeattackforcescale( "tf_meleeattackforcescale", "80.0", FCVAR_CHEAT | FCVAR_GAMEDLL | FCVAR_DEVELOPMENTONLY );
 #endif
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 extern ConVar tf_weapon_criticals_force_random;
 #endif // _DEBUG
 
@@ -1101,7 +1101,7 @@ bool CTFWeaponBaseMelee::CalcIsAttackCriticalHelper( void )
 
 	bool bCrit = ( RandomInt( 0, WEAPON_RANDOM_RANGE-1 ) < ( flCritChance ) * WEAPON_RANDOM_RANGE );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Force seed to always say yes
 	if ( tf_weapon_criticals_force_random.GetInt() )
 	{

@@ -173,7 +173,7 @@ private:
 	// Standard console commands -- DO NOT PLACE ANY HIGHER THAN HERE BECAUSE THESE MUST BE THE FIRST TO DESTRUCT
 	CON_COMMAND_MEMBER_F( CCvar, "find", Find, "Find concommands with the specified string in their name/help text.", 0 )
 	// dimhotepus: CS:GO backport.
-#ifdef _DEBUG
+#ifndef NDEBUG
 	CON_COMMAND_MEMBER_F( CCvar, "ccvar_hash_report", HashReport, "report info on bucket distribution of internal hash.", 0 )
 #endif
 };
@@ -914,7 +914,7 @@ void CCvar::Find( const CCommand &args )
 	}
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 void CCvar::HashReport( const CCommand & )
 {
 	m_CommandHash.Report();
@@ -1101,7 +1101,7 @@ CConCommandHash::CCommandHashHandle_t CConCommandHash::Find( const ConCommandBas
 }
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 // Dump a report to MSG
 void CConCommandHash::Report()
 {

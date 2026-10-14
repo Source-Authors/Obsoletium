@@ -9,7 +9,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 static ConVar tf_debug_weapontrail( "tf_debug_weapontrail", "0", FCVAR_CHEAT | FCVAR_DEVELOPMENTONLY );
 #endif // _DEBUG
 
@@ -38,7 +38,7 @@ C_TFAmmoPack::~C_TFAmmoPack( void )
 //-----------------------------------------------------------------------------
 int C_TFAmmoPack::DrawModel( int flags )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Debug!
 	if ( tf_debug_weapontrail.GetBool() )
 	{
@@ -61,7 +61,7 @@ void C_TFAmmoPack::OnDataChanged( DataUpdateType_t updateType )
 {
 	BaseClass::OnDataChanged( updateType );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Debug!
 	if ( tf_debug_weapontrail.GetBool() )
 	{
@@ -71,7 +71,7 @@ void C_TFAmmoPack::OnDataChanged( DataUpdateType_t updateType )
 
 	if ( updateType == DATA_UPDATE_CREATED )
 	{ 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		// Debug!
 		if ( tf_debug_weapontrail.GetBool() )
 		{

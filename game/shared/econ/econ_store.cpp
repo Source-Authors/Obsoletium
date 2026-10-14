@@ -136,7 +136,7 @@ void econ_store_entry_t::InitCategoryTags( const char *pTags )
 	V_SplitString( pTags, "+", vecTokens );
 
 	// Sanity check the results of V_SplitString()
-#ifdef _DEBUG
+#ifndef NDEBUG
 	const int nTagsLength = V_strlen( pTags );
 	int nSepCount = 0;	// # of separators
 	for ( int i = 0; i < nTagsLength; ++i )

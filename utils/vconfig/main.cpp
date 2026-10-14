@@ -480,7 +480,7 @@ void SetPathSettings( )
 //-----------------------------------------------------------------------------
 SpewRetval_t VConfig_SpewOutputFunc( SpewType_t type, char const *pMsg )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	OutputDebugString( pMsg );
 #endif
 

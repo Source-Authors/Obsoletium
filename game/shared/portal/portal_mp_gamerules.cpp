@@ -230,7 +230,7 @@ void CPortalMPGameRules::CreateStandardEntities( void )
 
 	BaseClass::CreateStandardEntities();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	CBaseEntity *pEnt = 
 #endif
 		CBaseEntity::Create( "portalmp_gamerules", vec3_origin, vec3_angle );

@@ -113,7 +113,7 @@ protected:
 
 public:
 	virtual ~CMapView3D();
-#ifdef _DEBUG
+#ifndef NDEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
 #endif

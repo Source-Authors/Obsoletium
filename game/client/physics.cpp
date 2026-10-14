@@ -444,7 +444,7 @@ void CPhysicsSystem::PhysicsSimulate()
 
 		g_Collisions.BufferTouchEvents( true );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		physenv->DebugCheckContacts();
 #endif
 		physenv->Simulate( frametime * cl_phys_timescale.GetFloat() );

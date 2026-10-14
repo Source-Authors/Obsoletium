@@ -161,7 +161,7 @@ inline void CParticleSphereRenderer::RenderParticle(
 	float flAngle )
 {
 	// Make sure they called StartRender on us so we were able to set the directional light parameters.
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( pDraw->GetMeshBuilder() )
 	{
 		Assert( m_iLastTickStartRenderCalled == gpGlobals->tickcount );
@@ -199,7 +199,7 @@ inline void CParticleSphereRenderer::RenderParticle_AddColor(
 	)
 {
 	// Make sure they called StartRender on us so we were able to set the directional light parameters.
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( pDraw->GetMeshBuilder() )
 	{
 		Assert( m_iLastTickStartRenderCalled == gpGlobals->tickcount );

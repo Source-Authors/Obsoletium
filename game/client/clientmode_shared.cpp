@@ -152,7 +152,7 @@ CON_COMMAND( hud_reloadscheme, "Reloads hud layout and animation scripts." )
 	mode->ReloadScheme(true);
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 CON_COMMAND_F( crash, "Crash the client. Optional parameter -- type of crash:\n 0: read from 0x0\n 1: write to 0x0", FCVAR_CHEAT )
 {
 	int crashtype = 0;

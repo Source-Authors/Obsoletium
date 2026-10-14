@@ -382,7 +382,7 @@ CPackedStore::CPackedStore( char const *pFileBasename, char *pszFName, intp fnam
 			int ctHashes = cbVecHashes/sizeof(m_vecChunkHashFraction[0]);
 			m_vecChunkHashFraction.EnsureCount( ctHashes );
 			dirFile.MustRead( m_vecChunkHashFraction.Base(), cbVecHashes );
-#ifdef _DEBUG
+#ifndef NDEBUG
 			FOR_EACH_VEC( m_vecChunkHashFraction, i )
 			{
 				Assert ( m_vecChunkHashFraction.Find( m_vecChunkHashFraction[i] ) == i );

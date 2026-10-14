@@ -865,7 +865,7 @@ void CMapView2DBase::SetZoom(float fNewZoom)
 }
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 void CMapView2DBase::AssertValid() const
 {
 	CView::AssertValid();

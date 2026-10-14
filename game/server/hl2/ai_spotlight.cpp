@@ -46,7 +46,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 CAI_Spotlight::CAI_Spotlight()
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_vSpotlightTargetPos.Init();
 	m_vSpotlightDir.Init();
 #endif

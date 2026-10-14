@@ -1165,7 +1165,7 @@ int DispInfo_AddShadowsToMeshBuilder( CMeshBuilder& meshBuilder, DispShadowHandl
 	// It had better be computed by now...
 	Assert( pShadowDecal->m_Flags & CDispDecalBase::FRAGMENTS_COMPUTED );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int triCount = 0;
 	int vertCount = 0;
 #endif
@@ -1217,13 +1217,13 @@ int DispInfo_AddShadowsToMeshBuilder( CMeshBuilder& meshBuilder, DispShadowHandl
 		baseIndex += fragment.m_nVerts;
 		f = s_DispShadowFragments.Next(f);
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		triCount += fragment.m_nVerts - 2;
 		vertCount += fragment.m_nVerts;
 #endif
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Assert( triCount == pShadowDecal->m_nTris );
 	Assert( vertCount == pShadowDecal->m_nVerts );
 #endif
@@ -1326,7 +1326,7 @@ void DispInfo_ClearAllTags( HDISPINFOARRAY hArray )
 static void DispInfo_DrawChainNormals( SurfaceHandle_t *pList, int listCount )
 {
 #ifndef SWDS
-#ifdef _DEBUG
+#ifndef NDEBUG
 	CMatRenderContextPtr pRenderContext( materials );
 
 	// Only do it in debug because we're only storing the info then

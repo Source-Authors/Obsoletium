@@ -455,7 +455,7 @@ SQLRETURN CJobUpdateSchema::YieldingEnsureDatabaseSchemaCorrect( ESchemaCatalog 
 	EmitAndAppend( sDetail, SPEW_GC, 2, 2, "[GC]: # of specified tables that differ from schema in database: %d\n",
 		vecPRecordInfoActualDifferent.Count() );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// are some different? if so, list their names only for now.
 	// This is in _debug only because it's useful for debugging the below loop,
 	// but spewey for everyday life (as long as the below loop is working).

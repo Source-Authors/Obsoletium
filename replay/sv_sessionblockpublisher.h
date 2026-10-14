@@ -48,7 +48,7 @@ public:
 	// Get the handle for the associated session
 	ReplayHandle_t		GetSessionHandle() const;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	void				Validate();
 #endif
 

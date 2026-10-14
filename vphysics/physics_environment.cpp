@@ -374,7 +374,7 @@ public:
 			IVP_BOOL check = pEnvironment->get_collision_filter()->check_objects_for_collision_detection( obj[0], obj[1] );
 			if ( !check )
 			{
-#ifdef _DEBUG
+#ifndef NDEBUG
 				AssertMsg(check,
 					"Changed collision rules for %s vs. %s without calling recheck!\n",
 					obj[0]->get_name(),

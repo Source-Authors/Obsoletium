@@ -1699,7 +1699,7 @@ void PhysFrame( float deltaTime )
 		simRealTime = engine->Time();
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	physenv->DebugCheckContacts();
 #endif
 

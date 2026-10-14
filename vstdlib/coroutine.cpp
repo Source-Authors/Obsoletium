@@ -197,7 +197,7 @@ static constexpr inline int k_cubCoroutineStackGap = (64 * 1024);
 static constexpr inline int k_cubCoroutineStackGapSmall = 64;
 
 // Warning size for allocated stacks
-#ifdef _DEBUG
+#ifndef NDEBUG
 // In debug builds, we'll end up with much more stack usage in some scenarios that isn't representative of release
 // builds.  We should still warn if we're going way above what we could expect the optimizer to save us from, but the
 // warning is more salient in release.

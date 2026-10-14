@@ -254,7 +254,7 @@ namespace // internal use only
 				nOut += EncodeDstLen( uVal );
 				if ( bErr )
 				{
-#ifdef _DEBUG
+#ifndef NDEBUG
 					AssertMsg( !(ePolicy & _STRINGCONVERTFLAG_ASSERT), "invalid Unicode byte sequence" );
 #endif
 					if ( ePolicy & _STRINGCONVERTFLAG_SKIP )
@@ -286,7 +286,7 @@ namespace // internal use only
 				nOut += EncodeDst( uVal, pOut + nOut );
 				if ( bErr )
 				{
-#ifdef _DEBUG
+#ifndef NDEBUG
 					AssertMsg( !(ePolicy & _STRINGCONVERTFLAG_ASSERT), "invalid Unicode byte sequence" );
 #endif
 					if ( ePolicy & _STRINGCONVERTFLAG_SKIP )

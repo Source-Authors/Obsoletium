@@ -123,7 +123,7 @@ const char *GetCompressorNameSafe( CompressorType_t nType )
 
 //----------------------------------------------------------------------------------------
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 CON_COMMAND( replay_testcompress, "Test compression" )
 {

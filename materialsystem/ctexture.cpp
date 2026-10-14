@@ -432,7 +432,7 @@ protected:
 	void OnStreamingJobComplete( ResidencyType_t newResidenceCurrent );
 
 protected:
-#ifdef _DEBUG
+#ifndef NDEBUG
 	char *m_pDebugName;
 #endif
 
@@ -710,7 +710,7 @@ public:
 	virtual void SetErrorTexture( bool isErrorTexture ) { }
 
 protected:
-#ifdef _DEBUG
+#ifndef NDEBUG
 	char *m_pDebugName;
 #endif
 
@@ -742,7 +742,7 @@ public:
 };
 
 CReferenceToHandleTexture::CReferenceToHandleTexture() :
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_pDebugName( NULL ),
 #endif
 	m_hTexture( INVALID_SHADERAPI_TEXTURE_HANDLE ),
@@ -752,7 +752,7 @@ CReferenceToHandleTexture::CReferenceToHandleTexture() :
 
 CReferenceToHandleTexture::~CReferenceToHandleTexture()
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( m_nRefCount != 0 )
 	{
 		Warning( "Reference Count(%d) != 0 in ~CReferenceToHandleTexture for texture \"%s\"\n", m_nRefCount, m_Name.String() );
@@ -770,7 +770,7 @@ void CReferenceToHandleTexture::SetName( char const *szName )
 	char szCleanName[MAX_PATH];
 	m_Name = NormalizeTextureName( szName, szCleanName, sizeof( szCleanName ) );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	delete [] m_pDebugName;
 	m_pDebugName = V_strdup( szCleanName );
 #endif
@@ -980,7 +980,7 @@ CTexture::CTexture() : m_ImageFormat( IMAGE_FORMAT_UNKNOWN )
 
 	memset( &m_cachedFileLodSettings, 0, sizeof( m_cachedFileLodSettings ) );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_pDebugName = NULL;
 #endif
 
@@ -990,7 +990,7 @@ CTexture::CTexture() : m_ImageFormat( IMAGE_FORMAT_UNKNOWN )
 
 CTexture::~CTexture()
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( m_nRefCount != 0 )
 	{
 		Warning( "Reference Count(%d) != 0 in ~CTexture for texture \"%s\"\n", (int)m_nRefCount, m_Name.String() );
@@ -999,7 +999,7 @@ CTexture::~CTexture()
 
 	Shutdown();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( m_pDebugName )
 	{
 		// delete[] m_pDebugName;
@@ -1007,7 +1007,7 @@ CTexture::~CTexture()
 #endif
 
 	// dimhotepus: Allow UB only in DEBUG.
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Deliberately stomp our VTable so that we can detect cases where code tries to access freed materials.
 	uintp *p = (uintp *)this;
 #ifdef PLATFORM_64BITS
@@ -2573,7 +2573,7 @@ void CTexture::SetName( const char* pName )
 	char szCleanName[MAX_PATH];
 	m_Name = NormalizeTextureName( pName, szCleanName, sizeof( szCleanName ) );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	delete [] m_pDebugName;
 	m_pDebugName = V_strdup( szCleanName );
 #endif

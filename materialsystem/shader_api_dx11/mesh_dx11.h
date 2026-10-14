@@ -59,7 +59,7 @@ class CVertexBufferDx11 final : public CVertexBufferBase {
   // Used only for dynamic buffers, indicates to discard the next time.
   bool m_bFlush : 1;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
   static uint32_t s_nBufferCount;
 #endif
 };
@@ -123,7 +123,7 @@ class CIndexBufferDx11 final : public CIndexBufferBase {
   // Used only for dynamic buffers, indicates to discard the next time.
   bool m_bFlush : 1;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
   static uint32_t s_nBufferCount;
 #endif
 };

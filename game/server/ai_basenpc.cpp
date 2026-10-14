@@ -3684,7 +3684,7 @@ bool CAI_BaseNPC::PreNPCThink()
 
 	bool bUseThinkLimits = ( !m_bInChoreo && ShouldUseFrameThinkLimits() );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	constexpr float NPC_THINK_LIMIT = 30.0f / 1000.0f;
 #else
 	constexpr float NPC_THINK_LIMIT = 10.0f / 1000.0f;
@@ -4820,7 +4820,7 @@ void CAI_BaseNPC::RunAI( void )
 		NDebugOverlay::Line( vecPoint, vecPoint + Vector( 0, 0, 32 ) - right * 32, 255, 0, 0, false , 0.1f );
 	}
 	
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_bSelected = ( (m_debugOverlays & OVERLAY_NPC_SELECTED_BIT) != 0 );
 #endif
 
@@ -6784,7 +6784,7 @@ void CAI_BaseNPC::NPCInit ( void )
 		AddFlag( FL_FLY );
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Make sure that the bounding box is appropriate for the hull size...
 	// FIXME: We can't test vphysics objects because NPCInit occurs before VPhysics is set up
 	if ( GetSolid() != SOLID_VPHYSICS && !IsSolidFlagSet(FSOLID_NOT_SOLID) )
@@ -11321,7 +11321,7 @@ CAI_BaseNPC::CAI_BaseNPC(void)
 	m_pSchedule = NULL;
 	m_IdealSchedule = SCHED_NONE;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// necessary since in debug, we initialize vectors to NAN for debugging
 	m_vecLastPosition.Init();
 	m_vSavePosition.Init();

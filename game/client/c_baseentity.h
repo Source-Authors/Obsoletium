@@ -1158,7 +1158,7 @@ public:
 
 	int		GetCreationTick() const;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	void FunctionCheck( void *pFunction, const char *name );
 
 	ENTITYFUNCPTR TouchSet( ENTITYFUNCPTR func, const char *name ) 
@@ -1729,7 +1729,7 @@ inline bool FClassnameIs( C_BaseEntity *pEntity, const char *szClassname )
 #define SetThink( a ) ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), 0, NULL )
 #define SetContextThink( a, b, context ) ThinkSet( static_cast <void (CBaseEntity::*)(void)> (a), (b), context )
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define SetTouch( a ) TouchSet( static_cast <void (C_BaseEntity::*)(C_BaseEntity *)> (a), #a )
 
 #else

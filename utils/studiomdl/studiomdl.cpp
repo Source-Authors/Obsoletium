@@ -1917,7 +1917,7 @@ void AddFlexControllers(
 		}
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for ( int j = 0; j != nRawControlCount; ++j )
 	{
 		Assert( r2s[ j ] != -1 );

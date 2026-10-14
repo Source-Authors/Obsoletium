@@ -49,7 +49,7 @@ SpewRetval_t SceneManagerSpewFunc( SpewType_t spewType, char const *pMsg )
 		{
 			Con_ColorPrintf( 255, 0, 0, pMsg );
 		}
-#ifdef _DEBUG
+#ifndef NDEBUG
 		return SPEW_DEBUGGER;
 #else
 		return SPEW_CONTINUE;

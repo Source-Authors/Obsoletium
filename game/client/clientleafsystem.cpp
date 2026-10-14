@@ -1496,7 +1496,7 @@ void CClientLeafSystem::ComputeTranslucentRenderLeaf( int count, const LeafIndex
 inline void AddRenderableToRenderList( CClientRenderablesList &renderList, IClientRenderable *pRenderable, 
 	int iLeaf, RenderGroup_t group,	ClientRenderHandle_t renderHandle, bool bTwoPass = false )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if (cl_drawleaf.GetInt() >= 0)
 	{
 		if (iLeaf != cl_drawleaf.GetInt())

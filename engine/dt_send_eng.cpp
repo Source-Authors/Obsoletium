@@ -996,7 +996,7 @@ CRC32_t SendTable_GetCRC()
 //-----------------------------------------------------------------------------
 bool SendTable_CheckIntegrity( SendTable *pTable, const void *pData, const int nDataBits )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( pData == NULL && nDataBits == 0 )
 		return true;
 

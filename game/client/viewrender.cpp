@@ -3255,7 +3255,7 @@ void CViewRender::DrawMonitors( const CViewSetup &cameraView )
 	}
 
 	// dimhotepus: Make debug only.
-#ifdef _DEBUG
+#ifndef NDEBUG
 	g_bRenderingCameraView = false;
 #endif
 

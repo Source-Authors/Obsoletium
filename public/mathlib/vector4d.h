@@ -38,7 +38,7 @@ public:
 	vec_t x, y, z, w;
 
 	// Construction/destruction
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Vector4D()
 		: x{VEC_T_NAN}, y{VEC_T_NAN}, z{VEC_T_NAN}, w{VEC_T_NAN}
 	{

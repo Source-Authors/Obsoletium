@@ -714,7 +714,7 @@ CBaseHandle CPortalGameMovement::TestPlayerPosition( const Vector& pos, int coll
 	//UTIL_TraceRay( ray, MASK_PLAYERSOLID, mv->m_nPlayerHandle.Get(), collisionGroup, &pm );
 	if( pm.startsolid && pm.m_pEnt && (pm.contents & MASK_PLAYERSOLID) )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		AssertMsgOnce( false, "The player got stuck on something. Break to investigate." ); //happens enough to just leave in a perma-debugger
 		//this next trace is PURELY for tracking down how the player got stuck. Nothing new is discovered over the same trace about 10 lines up
         TracePlayerBBox( pos, pos, MASK_PLAYERSOLID, collisionGroup, pm );		

@@ -203,7 +203,7 @@ void CAnimationLayer::MarkActive( void )
 
 void CBaseAnimatingOverlay::VerifyOrder( void )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int i, j;
 	// test sorting of the layers
 	int layer[MAX_OVERLAYS];

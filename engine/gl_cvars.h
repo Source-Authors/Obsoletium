@@ -32,7 +32,7 @@ static inline bool CanCheat()
 	extern	ConVar	sv_cheats;
 	extern	ConVar	cl_debug_respect_cheat_vars;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	bool bRespectCheatVars = cl_debug_respect_cheat_vars.GetBool() && !Cmd_IsRptActive();
 	if ( bRespectCheatVars )
 		return sv_cheats.GetBool();

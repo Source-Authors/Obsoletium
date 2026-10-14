@@ -624,7 +624,7 @@ void CPlayerController::Update( const Vector& position, const Vector& velocity, 
 	m_targetPosition.set( &targetPositionIVP );
 	m_secondsToArrival = secondsToArrival < 0 ? 0 : secondsToArrival;
 	// Sanity check to make sure the position is good.
-#ifdef _DEBUG
+#ifndef NDEBUG
 	float large = 1024 * 512;
 	Assert( m_targetPosition.k[0] >= -large && m_targetPosition.k[0] <= large );
 	Assert( m_targetPosition.k[1] >= -large && m_targetPosition.k[1] <= large );

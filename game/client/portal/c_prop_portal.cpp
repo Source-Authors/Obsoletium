@@ -34,7 +34,7 @@
 
 #include "simple_keys.h"
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #include "filesystem.h"
 #endif
 

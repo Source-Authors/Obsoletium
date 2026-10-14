@@ -23,7 +23,7 @@
 ConVar ai_find_lateral_cover( "ai_find_lateral_cover", "1" );
 ConVar ai_find_lateral_los( "ai_find_lateral_los", "1" );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar ai_debug_cover( "ai_debug_cover", "0" );
 int g_AIDebugFindCoverNode = -1;
 #define DebugFindCover( node, from, to, r, g, b ) \

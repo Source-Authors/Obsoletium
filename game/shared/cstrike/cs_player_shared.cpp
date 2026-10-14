@@ -40,7 +40,7 @@ ConVar sv_showplayerhitboxes( "sv_showplayerhitboxes", "0", FCVAR_REPLICATED, "S
 void DispatchEffect( const char *pName, const CEffectData &data );
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 	// This is some extra code to collect weapon accuracy stats:
 
@@ -437,7 +437,7 @@ void CCSPlayer::FireBullet(
 		if ( tr.fraction == 1.0f )
 			break; // we didn't hit anything, stop tracing shoot
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		if ( bFirstHit )
 			AddBulletStat( gpGlobals->realtime, VectorLength( vecSrc-tr.endpos), tr.endpos );
 #endif

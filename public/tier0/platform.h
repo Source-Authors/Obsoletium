@@ -43,7 +43,7 @@
 #define IsRetail() false
 #endif
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #define IsRelease() false
 #define IsDebug() true
 #else
@@ -618,7 +618,7 @@ static FORCEINLINE double fsel(double fComparand, double fValGE, double fLT)
 
 #else
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		FORCEINLINE bool IsFPUControlWordSet()
 		{
 			float f = 0.996f;
@@ -1540,7 +1540,7 @@ inline void Destruct( T* pMemory )
 
 	pMemory->~T();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	memset( reinterpret_cast<void*>( pMemory ), 0xDD, sizeof(T) );
 #endif
 }
@@ -1555,7 +1555,7 @@ inline void Destruct( T (*pMemory)[N] )
 		(pMemory[i])->~T();
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	memset( reinterpret_cast<void*>( pMemory ), 0xDD, sizeof(*pMemory) );
 #endif
 }

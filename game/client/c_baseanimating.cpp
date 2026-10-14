@@ -1123,7 +1123,7 @@ CStudioHdr *C_BaseAnimating::OnNewModel()
 		{
 			m_Attachments[i].m_bAnglesComputed = false;
 			m_Attachments[i].m_nLastFramecount = 0;
-#ifdef _DEBUG
+#ifndef NDEBUG
 			m_Attachments[i].m_AttachmentToWorld.Invalidate();
 			m_Attachments[i].m_angRotation.Init( VEC_T_NAN, VEC_T_NAN, VEC_T_NAN );
 			m_Attachments[i].m_vOriginVelocity.Init( VEC_T_NAN, VEC_T_NAN, VEC_T_NAN );
@@ -2083,7 +2083,7 @@ bool C_BaseAnimating::PutAttachment( int number, const matrix3x4_t &attachmentTo
 	pAtt->m_bAnglesComputed = false;
 	pAtt->m_AttachmentToWorld = attachmentToWorld;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	pAtt->m_angRotation.Init( VEC_T_NAN, VEC_T_NAN, VEC_T_NAN );
 #endif
 
@@ -5730,7 +5730,7 @@ void C_BaseAnimating::SetHitboxSet( int setnum )
 	if ( IsDynamicModelLoading() )
 		return;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	CStudioHdr *pStudioHdr = GetModelPtr();
 	if ( !pStudioHdr )
 		return;

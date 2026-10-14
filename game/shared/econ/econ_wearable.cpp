@@ -780,7 +780,7 @@ void C_EconWearableGib::ImpactTrace( trace_t *pTrace, int iDamageType, const cha
 }
 
 #if 0
-#ifdef _DEBUG
+#ifndef NDEBUG
 #include "econ_item_system.h"
 
 static CUtlVector< const char * > s_possibleModels;

@@ -1146,7 +1146,7 @@ int CInputSystem::ButtonMaskFromMouseWParam( WPARAM wParam, ButtonCode_t code, b
 	}
 #endif
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( code != BUTTON_CODE_INVALID )
 	{
 		auto nMsgMask = 1 << ( to_underlying(code) - to_underlying(MOUSE_FIRST) );

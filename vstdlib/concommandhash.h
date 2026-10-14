@@ -64,7 +64,7 @@ public:
 	[[nodiscard]] inline ConCommandBase * &operator[]( CCommandHashHandle_t hHash );
 	[[nodiscard]] inline ConCommandBase *const &operator[]( CCommandHashHandle_t hHash ) const;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Dump a report to MSG
 	void Report();
 #endif

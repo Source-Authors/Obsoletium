@@ -470,7 +470,7 @@ bool CJobMgr::BYieldingWaitTime( CJob &job, uint32 cMicrosecondsToSleep )
 	// sleep of zero causes an infinite loop
 	Assert( 0 != cMicrosecondsToSleep );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for ( int i = 0; i < m_QueueJobSleeping.Count(); i++ )
 	{
 		Assert( m_QueueJobSleeping.Element(i).m_JobID != job.GetJobID() );
@@ -744,7 +744,7 @@ bool CJobMgr::BRouteWorkItemCompletedInternal( JobID_t jobID, bool bWorkItemCanc
 //-----------------------------------------------------------------------------
 void CJobMgr::AddToYieldList( CJob &job )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	FOR_EACH_LL( m_ListJobsYieldingRegPri, i )
 	{
 		Assert( m_ListJobsYieldingRegPri[i].m_JobID != job.GetJobID() );

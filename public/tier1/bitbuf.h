@@ -400,7 +400,7 @@ inline void	bf_write::WriteOneBitAt( int iBit, int nValue )
 
 BITBUF_INLINE void bf_write::WriteUBitLong( uint32 curData, int numbits, [[maybe_unused]] bool bCheckRange )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Make sure it doesn't overflow.
 	if ( bCheckRange && numbits < 32 )
 	{

@@ -715,7 +715,7 @@ void CBaseVSShader::SetColorPixelShaderConstant( int nPixelReg, int colorVar, in
 	s_pShaderAPI->SetPixelShaderConstant( nPixelReg, color.Base() );
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar mat_envmaptintoverride( "mat_envmaptintoverride", "-1" );
 ConVar mat_envmaptintscale( "mat_envmaptintscale", "-1" );
 #endif
@@ -740,7 +740,7 @@ void CBaseVSShader::SetEnvMapTintPixelShaderDynamicState( int pixelReg, int tint
 		}
 
 		IMaterialVar* pTintVar = s_ppParams[tintVar];
-#ifdef _DEBUG
+#ifndef NDEBUG
 		pTintVar->GetVecValue( color, 3 );
 
 		float envmapTintOverride = mat_envmaptintoverride.GetFloat();

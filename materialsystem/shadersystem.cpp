@@ -337,7 +337,7 @@ void CShaderSystem::LoadAllShaderDLLs( )
 	}
 
 	const char *pShaderName = NULL;
-#ifdef _DEBUG
+#ifndef NDEBUG
 	pShaderName = CommandLine()->ParmValue( "-shader" );
 #endif
 	if ( !pShaderName )
@@ -349,7 +349,7 @@ void CShaderSystem::LoadAllShaderDLLs( )
 		LoadShaderDLL( pShaderName );
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// For fast-iteration debugging
 	if ( CommandLine()->HasParm( "-testshaders" ) )
 	{
@@ -1128,7 +1128,7 @@ void CShaderSystem::ComputeRenderStateFlagsFromSnapshot( ShaderRenderState_t* pR
 		}
 	}
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if( pRenderState->m_Flags & SHADER_OPACITY_TRANSLUCENT )
 	{
 		Assert( !( pRenderState->m_Flags & SHADER_OPACITY_ALPHATEST ) );
@@ -1167,7 +1167,7 @@ int CShaderSystem::GetModulationSnapshotCount( IMaterialVar **params )
 
 void CShaderSystem::InitStateSnapshots( IShader *pShader, IMaterialVar **params, ShaderRenderState_t* pRenderState )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( IsFlagSet( params, MATERIAL_VAR_DEBUG ) )
 	{
 		// Putcher breakpoint here to catch the rendering of a material
@@ -1292,7 +1292,7 @@ void CShaderSystem::InitStateSnapshots( IShader *pShader, IMaterialVar **params,
 	}
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 static bool IsVertexFormatSubsetOfVertexformat( VertexFormat_t subset, VertexFormat_t superset )
 {
 	subset &= ~VERTEX_FORMAT_USE_EXACT_FORMAT;
@@ -1374,7 +1374,7 @@ bool CShaderSystem::ComputeVertexFormatFromSnapshot( IMaterialVar **params, Shad
 	pRenderState->m_VertexUsage = g_pShaderAPI->ComputeVertexUsage( numSnapshots, pSnapshots );
 	pRenderState->m_MorphFormat = g_pShaderAPI->ComputeMorphFormat( numSnapshots, pSnapshots );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	// Make sure all modulation combinations match vertex usage
 	for ( int mod = 1; mod < nModulationSnapshotCount; ++mod )
 	{

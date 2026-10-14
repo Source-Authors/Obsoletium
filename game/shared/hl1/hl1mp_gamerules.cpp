@@ -208,7 +208,7 @@ void CHL1MPRules::CreateStandardEntities( void )
 
 	BaseClass::CreateStandardEntities();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	CBaseEntity *pEnt = 
 #endif
 	CBaseEntity::Create( "hl1mp_gamerules", vec3_origin, vec3_angle );

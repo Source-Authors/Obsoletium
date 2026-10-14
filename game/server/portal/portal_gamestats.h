@@ -115,7 +115,7 @@ public:
 	virtual bool StatTrackingEnabledForMod( void ) { return true; }
 	virtual bool UserPlayedAllTheMaps( void );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	virtual bool AutoUpload_OnShutdown( void ) { return false; } //don't upload while we're debugging
 #endif
 

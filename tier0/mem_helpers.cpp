@@ -144,7 +144,7 @@ void DoApplyMemoryInitializations( void *pMem, size_t nSize )
 		}
 		else
 		{
-#ifdef _DEBUG
+#ifndef NDEBUG
 			// Ok, it's already set to 0xcdcdcdcd, but we want something that will make floating-point #'s NANs.
 			InitializeToFeeFee( pMem, nSize );
 #endif

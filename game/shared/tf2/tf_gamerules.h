@@ -115,7 +115,7 @@ private:
 
 inline CTeamFortress* TFGameRules()
 {
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		Assert( dynamic_cast< CTeamFortress* >( g_pGameRules ) );
 	#endif
 

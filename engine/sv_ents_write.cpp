@@ -357,7 +357,7 @@ static bool SV_NeedsExplicitCreate( CEntityWriteInfo &u )
 
 	bool bNeedsExplicitCreate = (pFromEnt->m_pClass == NULL) || pFromEnt->m_nSerialNumber != pToEnt->m_nSerialNumber;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( !bNeedsExplicitCreate )
 	{
 		// If it doesn't need explicit create, then the classnames should match.

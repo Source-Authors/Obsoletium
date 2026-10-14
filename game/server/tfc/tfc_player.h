@@ -238,7 +238,7 @@ inline CTFCPlayer *ToTFCPlayer( CBaseEntity *pEntity )
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Assert( dynamic_cast<CTFCPlayer*>( pEntity ) != 0 );
 #endif
 	return static_cast< CTFCPlayer* >( pEntity );

@@ -224,7 +224,7 @@ void CUtlQueue<T, M>::Insert( T const &element )
 			{
 				// if the queue wraps around the end of m_memory, move the part at the end of memory to the new end of memory
 				Q_memmove( &m_memory[ m_head + nGrowAmount ], &m_memory[ m_head ], ( nOldAllocCount - m_head ) * sizeof( T ) );
-#ifdef _DEBUG
+#ifndef NDEBUG
 				Q_memset( &m_memory[ m_head ], 0xdd, nGrowAmount * sizeof( T ) );
 #endif
 				m_head = QueueIter_t( m_head + nGrowAmount );
@@ -262,7 +262,7 @@ void CUtlQueue<T, M>::Insert( T&& element )
 			{
 				// if the queue wraps around the end of m_memory, move the part at the end of memory to the new end of memory
 				Q_memmove( &m_memory[ m_head + nGrowAmount ], &m_memory[ m_head ], ( nOldAllocCount - m_head ) * sizeof( T ) );
-#ifdef _DEBUG
+#ifndef NDEBUG
 				Q_memset( &m_memory[ m_head ], 0xdd, nGrowAmount * sizeof( T ) );
 #endif
 				m_head = QueueIter_t( m_head + nGrowAmount );

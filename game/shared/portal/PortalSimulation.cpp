@@ -748,7 +748,7 @@ void CPortalSimulator::TakePhysicsOwnership( CBaseEntity *pEntity )
 
 	//physics cloning
 	{	
-#ifdef _DEBUG
+#ifndef NDEBUG
 		{
 			intp iDebugIndex;
 			for( iDebugIndex = m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
@@ -945,7 +945,7 @@ void CPortalSimulator::ReleasePhysicsOwnership( CBaseEntity *pEntity, bool bCont
 	
 	//physics cloning
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		{
 			intp iDebugIndex;
 			for( iDebugIndex = m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
@@ -1044,7 +1044,7 @@ void CPortalSimulator::StartCloningEntity( CBaseEntity *pEntity )
 	if( (m_InternalData.Simulation.Dynamic.EntFlags[pEntity->entindex()] & PSEF_CLONES_ENTITY_FROM_MAIN) != 0 )
 		return; //already cloned, no work to do
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for( intp i = m_InternalData.Simulation.Dynamic.ShadowClones.ShouldCloneFromMain.Count(); --i >= 0; )
 		Assert( m_InternalData.Simulation.Dynamic.ShadowClones.ShouldCloneFromMain[i] != pEntity );
 #endif
@@ -1083,7 +1083,7 @@ void CPortalSimulator::MarkAsOwned( CBaseEntity *pEntity )
 	Assert( pEntity != NULL );
 	int iEntIndex = pEntity->entindex();
 	Assert( s_OwnedEntityMap[iEntIndex] == NULL );
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for( intp i = m_InternalData.Simulation.Dynamic.OwnedEntities.Count(); --i >= 0; )
 		Assert( m_InternalData.Simulation.Dynamic.OwnedEntities[i] != pEntity );
 #endif
@@ -1214,7 +1214,7 @@ void CPortalSimulator::CreateLocalPhysics( void )
 		}
 
 		//Assert( m_InternalData.Simulation.Static.World.StaticProps.PhysicsObjects.Count() == 0 ); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
-#ifdef _DEBUG
+#ifndef NDEBUG
 		for( intp i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
 		{
 			Assert( m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i].pPhysicsObject == NULL ); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
@@ -1648,7 +1648,7 @@ void CPortalSimulator::CreateLocalCollision( void )
 
 	CREATEDEBUGTIMER( worldPropTimer );
 	STARTDEBUGTIMER( worldPropTimer );
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for( intp i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
 	{
 		Assert( m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i].pCollide == NULL );
@@ -2252,7 +2252,7 @@ void CPortalSimulator::ClearPolyhedrons( void )
 
 		m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.RemoveAll();		
 	}
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for( intp i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
 	{
 #ifndef CLIENT_DLL
@@ -2488,7 +2488,7 @@ int CPortalSimulator::GetMoveableOwnedEntities( CBaseEntity **pEntsOut, int iEnt
 
 CPortalSimulator *CPortalSimulator::GetSimulatorThatOwnsEntity( const CBaseEntity *pEntity )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	int iEntIndex = pEntity->entindex();
 	CPortalSimulator *pOwningSimulatorCheck = NULL;
 
@@ -2745,7 +2745,7 @@ void CPortalSimulator::Post_UTIL_Remove( CBaseEntity *pEntity )
 	g_pShadowEntities = PhysicsStackEntry.pShadowList;
 	s_UTIL_Remove_PhysicsStack.FastRemove(index);
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	for( intp i = CPhysicsShadowClone::g_ShadowCloneList.Count(); --i >= 0; )
 	{
 		Assert( CPhysicsShadowClone::g_ShadowCloneList[i]->GetClonedEntity() != pEntity ); //shouldn't be any clones of this object anymore

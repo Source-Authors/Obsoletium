@@ -133,7 +133,7 @@ bool GetSpringAttachments( CBaseEntity *pEntity, CBaseEntity *pAttachOut[2], IPh
 
 CPhysicsSpring::CPhysicsSpring( void )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_start.Init();
 	m_end.Init();
 #endif

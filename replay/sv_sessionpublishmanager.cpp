@@ -75,7 +75,7 @@ void CSessionPublishManager::Think()
 	m_pBlockPublisher->Think();
 	m_pSessionInfoPublisher->Think();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_pSession->VerifyLocks();
 #endif
 }
@@ -97,7 +97,7 @@ void CSessionPublishManager::AbortPublish()
 	m_pSessionInfoPublisher->AbortPublish();
 }
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 void CSessionPublishManager::Validate()
 {
 	m_pBlockPublisher->Validate();

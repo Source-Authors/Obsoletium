@@ -368,7 +368,7 @@ private:
 		waitHandles[SHARED_QUEUE]		= m_SharedQueue.GetEventHandle().GetHandle();
 		waitHandles[DIRECT_QUEUE] 		= m_DirectQueue.GetEventHandle().GetHandle();
 		
-#ifdef _DEBUG
+#ifndef NDEBUG
 		static_assert(NUM_EVENTS <= std::numeric_limits<DWORD>::max());
 
 		while ( ( waitResult = WaitForMultipleObjects( static_cast<DWORD>(ssize(waitHandles)), waitHandles, FALSE, 10 ) ) == WAIT_TIMEOUT )

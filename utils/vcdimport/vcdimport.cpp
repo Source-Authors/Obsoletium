@@ -33,7 +33,7 @@
 #include "materialsystem/imaterialsystem.h"
 #include "istudiorender.h"
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 #include <windows.h>
 #endif
 
@@ -45,7 +45,7 @@ class CDmElement;
 //-----------------------------------------------------------------------------
 static SpewRetval_t VcdImportOutputFunc( SpewType_t spewType, const char *pMsg )
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	OutputDebugString( pMsg );
 #endif
 

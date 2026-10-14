@@ -84,7 +84,7 @@ ITempEnts *tempents = ( ITempEnts * )&g_TempEnts;
 
 C_LocalTempEntity::C_LocalTempEntity()
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	tentOffset.Init();
 	m_vecTempEntVelocity.Init();
 	m_vecTempEntAngVelocity.Init();
@@ -2014,7 +2014,7 @@ C_LocalTempEntity *CTempEnts::TempEntAlloc( const Vector& org, const model_t *mo
 
 	if ( CommandLine()->HasParm( "-tools" ) )
 	{
-#ifdef _DEBUG
+#ifndef NDEBUG
 		static bool first = true;
 		if ( first )
 		{

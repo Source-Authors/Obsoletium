@@ -2386,7 +2386,7 @@ SpewRetval_t HLFacePoserSpewFunc( SpewType_t spewType, char const *pMsg )
 	default:
 		Con_Printf(pMsg);
 		g_bInError = false;
-#ifdef _DEBUG
+#ifndef NDEBUG
 		return spewType == SPEW_ASSERT ? SPEW_DEBUGGER : SPEW_CONTINUE;
 #else
 		return SPEW_CONTINUE;

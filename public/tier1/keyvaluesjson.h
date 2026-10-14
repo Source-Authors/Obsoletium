@@ -59,7 +59,7 @@ private:
 	[[nodiscard]] const char *GetTokenDebugText();
 };
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 extern void TestKeyValuesJSONParser();
 #endif
 

@@ -345,7 +345,7 @@ private:
 	int m_nTextureWidth;
 	int m_nTextureHeight;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	CUtlString m_pDebugName;
 #endif
 
@@ -509,7 +509,7 @@ void CMorph::Init( MorphFormat_t format, const char *pDebugName )
 {
 	m_Format = format;
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_pDebugName = pDebugName;
 #endif
 }
@@ -796,7 +796,7 @@ void CMorph::DisplayMorphStats()
 	ITexture *pDest = g_pMorphMgr->MorphAccumulator( );
 	int nDestTextureHeight = pDest->GetActualHeight();
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	Msg( "Morph %s:\n", m_pDebugName.Get() );
 #else
 	Msg( "Morph :\n" );
@@ -1470,7 +1470,7 @@ void CMorph::RenderMorphQuads( IMatRenderContext *pRenderContext, int nRenderId,
 		{
 			const MorphQuad_t &quad = quadList[j];
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 			static int s_nMinDest = -1, s_nMaxDest = -1;
 			if ( s_nMinDest >= 0 && quad.m_nFirstDest + quad.m_nCount <= s_nMinDest )
 				continue;
@@ -1714,7 +1714,7 @@ bool CMorphMgr::ShouldAllocateScratchTextures()
 void CMorphMgr::AllocateScratchTextures()
 {
 	// Debug using 32323232F because we can read that back reasonably.
-#ifdef _DEBUG
+#ifndef NDEBUG
 	ImageFormat fmt = IMAGE_FORMAT_RGBA32323232F;
 #else
 	ImageFormat fmt = IMAGE_FORMAT_RGBA16161616F;
@@ -2068,7 +2068,7 @@ void CMorphMgr::DebugMorphWeights( IMatRenderContext *pRenderContext )
 //-----------------------------------------------------------------------------
 // Draws the morph accumulator
 //-----------------------------------------------------------------------------
-#ifdef _DEBUG
+#ifndef NDEBUG
 ConVar mat_drawmorphaccumulator( "mat_drawmorphaccumulator", "0", FCVAR_CHEAT );
 ConVar mat_drawmorphweights( "mat_drawmorphweights", "0", FCVAR_CHEAT );
 #endif
@@ -2183,7 +2183,7 @@ void CMorphMgr::BeginMorphAccumulation( IMorphMgrRenderContext *pIRenderContext 
 		// were sent down
 		pRenderContext->PushRenderTargetAndViewport( m_pMorphWeightTexture );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 		// NOTE: No need to clear the texture; we will only be reading out of that
 		// texture at points where we've rendered to in this pass. 
 		// But, we'll do it for debugging reasons.
@@ -2208,7 +2208,7 @@ void CMorphMgr::EndMorphAccumulation( IMorphMgrRenderContext *pIRenderContext )
 
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( !m_bUsingConstantRegisters )
 	{
 		DebugMorphWeights( pRenderContext );
@@ -2235,12 +2235,12 @@ void CMorphMgr::EndMorphAccumulation( IMorphMgrRenderContext *pIRenderContext )
 	{
 		pMorphRenderContext->m_pMorphsToAccumulate[i]->AccumulateMorph( i );
 	}
-#ifdef _DEBUG
+#ifndef NDEBUG
 	DebugMorphAccumulator( pRenderContext );
 #endif
 	pRenderContext->PopRenderTargetAndViewport();
 	 
-#ifdef _DEBUG
+#ifndef NDEBUG
 	if ( mat_drawmorphweights.GetInt() )
 	{
 		if ( !m_bUsingConstantRegisters )

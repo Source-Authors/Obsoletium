@@ -275,7 +275,7 @@ AI_NavPathProgress_t CAI_BasePhysicsFlyingBot::ProgressFlyPath(
 //------------------------------------------------------------------------------
 CAI_BasePhysicsFlyingBot::CAI_BasePhysicsFlyingBot()
 {
-#ifdef _DEBUG
+#ifndef NDEBUG
 	m_vCurrentVelocity.Init();
 	m_vCurrentBanking.Init();
 	m_vLastPatrolDir.Init();

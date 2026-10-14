@@ -381,7 +381,7 @@ template <class BASE_REFCOUNTED, int FINAL_REFS, const char *pszName>
 class CRefDebug : public BASE_REFCOUNTED
 {
 public:
-#ifdef _DEBUG
+#ifndef NDEBUG
 	CRefDebug()
 	{
 		AssertMsg( this->GetRefCount() == 1, "Expected initial ref count of 1" );
