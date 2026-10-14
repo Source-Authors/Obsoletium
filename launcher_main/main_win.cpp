@@ -47,7 +47,7 @@ template <size_t buffer_size>
   strcpy_s(out_base_directory, buffer);
 
   char* separator{strrchr(out_base_directory, '\\')};
-  if (separator) *(separator + 1) = L'\0';
+  if (separator) *(separator + 1) = '\0';
 
   const size_t size{strlen(out_base_directory)};
   if (size > 0) {
