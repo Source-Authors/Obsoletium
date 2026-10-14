@@ -2,7 +2,7 @@
 
 #include "vcr_helpers.h"
 
-#include "include/SDL3/SDL.h"
+#include "tier0/platform.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -10,10 +10,9 @@
 namespace s1::launcher {
 
 void VCRHelpers::ErrorMessage(const char* message) {
-#if defined(WIN32) || defined(LINUX)
-  NOVCR(SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "VCR Error", message,
-                                 nullptr));
-#endif
+  NOVCR(Plat_MessageBox(V_STRINGIFY(VPCGAME) " - VCR Error",
+                        "VCR Error occurred", message,
+                        Plat_MessageBoxButton::Ok, Plat_MessageBoxIcon::Error));
 }
 
 void* VCRHelpers::GetMainWindow() { return nullptr; }

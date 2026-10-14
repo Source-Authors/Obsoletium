@@ -39,8 +39,6 @@
 #define VERSION_SAFE_STEAM_API_INTERFACES
 #include "steam/steam_api.h"
 
-#include "include/SDL3/SDL.h"
-
 #ifdef __GLIBC__
 #include <gnu/libc-version.h>
 #endif
@@ -76,7 +74,6 @@ const char* PrefixMessageGroup(OUT_Z_ARRAY char (&out)[out_size],
 // Spew function!
 SpewRetval_t DefaultSpew(SpewType_t spew_type, const char *raw) {
   char message[4096];
-
   Plat_DebugString(PrefixMessageGroup(message, "launcher", raw));
 
   switch (spew_type) {
@@ -86,22 +83,25 @@ SpewRetval_t DefaultSpew(SpewType_t spew_type, const char *raw) {
 
     case SPEW_WARNING:
       if (V_strieq(GetSpewOutputGroup(), "init")) {
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING,
-                                 "Source Launcher - Warning", message, nullptr);
+        Plat_MessageBox(V_STRINGIFY(VPCGAME) " - Warning", "Warning occurred",
+                        message, Plat_MessageBoxButton::Ok,
+                        Plat_MessageBoxIcon::Warning);
       }
       return SPEW_CONTINUE;
 
     case SPEW_ASSERT:
       if (!ShouldUseNewAssertDialog()) {
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
-                                 "Source Launcher - Assert", message, nullptr);
+        Plat_MessageBox(V_STRINGIFY(VPCGAME) " - Assert", "Assert occurred",
+                        message, Plat_MessageBoxButton::Ok,
+                        Plat_MessageBoxIcon::Information);
       }
       return SPEW_DEBUGGER;
 
     case SPEW_ERROR:
     default:
-      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Source Launcher - Error",
-                               message, nullptr);
+      Plat_MessageBox(V_STRINGIFY(VPCGAME) " - Error", "Assert occurred",
+                      message, Plat_MessageBoxButton::Ok,
+                      Plat_MessageBoxIcon::Error);
       // dimhotepus: Try to run destructors! 1 -> ENOTRECOVERABLE
       exit(ENOTRECOVERABLE);
   }
