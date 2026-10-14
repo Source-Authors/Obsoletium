@@ -12464,7 +12464,7 @@ void CTFGameRules::DeathNotice( CBasePlayer *pVictim, const CTakeDamageInfo &inf
 		{
 			if ( !FStrEq( eventName, "fish_notice" ) && !FStrEq( eventName, "fish_notice__arm" ) && !FStrEq( eventName, "throwable_hit" ) )
 			{
-#ifndef _DEBUG
+#ifdef NDEBUG
 				if ( GetGlobalTeam( pVictim->GetTeamNumber() ) && GetGlobalTeam( pVictim->GetTeamNumber() )->GetNumPlayers() > 1 )
 #endif // !DEBUG
 				{
@@ -20956,7 +20956,7 @@ bool CTFGameRules::CanUpgradeWithAttrib( CTFPlayer *pPlayer, int iWeaponSlot, at
 				{
 					return ( pPlayer->IsPlayerClass( TF_CLASS_ENGINEER ) );
 				}
-#ifndef _DEBUG
+#ifdef NDEBUG
 			case 480:	// "radius stealth"
 				{
 					return ( pPlayer->IsPlayerClass( TF_CLASS_SPY ) );

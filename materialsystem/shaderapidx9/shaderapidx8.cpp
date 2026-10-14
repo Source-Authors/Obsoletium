@@ -4093,7 +4093,7 @@ void CShaderAPIDx8::EndPIXEvent( void )
 	}
 #endif
 #elif defined( _X360 )
-#ifndef _DEBUG
+#ifdef NDEBUG
 	PIXEndNamedEvent();
 #endif
 #else // PC
@@ -10108,7 +10108,7 @@ void CShaderAPIDx8::CommitUserClipPlanes( bool bUsingFixedFunction )
 
 	// dimhotepus: Add default init as var can be accessed.
 	DirectX::XMMATRIX worldToProjectionInvTrans = DirectX::XMMatrixIdentity();
-#ifndef _DEBUG
+#ifdef NDEBUG
 	if( m_DynamicState.m_UserClipPlaneChanged & m_DynamicState.m_UserClipPlaneEnabled & ((1 << g_pHardwareConfig->MaxUserClipPlanes()) - 1) )
 #endif
 	{

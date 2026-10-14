@@ -190,7 +190,7 @@ void CHardwareMatrixState::DumpState( void )
 	int i;
 	static char buf[256];
 
-//#ifndef _DEBUG
+//#ifdef NDEBUG
 	return;
 //#endif
 	

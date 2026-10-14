@@ -6186,7 +6186,7 @@ void CTFPlayer::HandleCommand_JoinTeam( const char *pTeamName )
 		DuelMiniGame_NotifyPlayerChangedTeam( this, iTeam, true );
 		bool bSilent = TFGameRules() && TFGameRules()->IsPVEModeActive() && IsBot();
 
-#ifndef _DEBUG
+#ifdef NDEBUG
 		TFGameRules()->SetPlayerReadyState( entindex(), false );
 		TFGameRules()->SetTeamReadyState( false, GetTeamNumber() );
 #endif // _DEBUG

@@ -401,7 +401,7 @@ void CAchievementMgr::Update( float frametime )
 	}
 #endif
 
-#ifndef _DEBUG
+#ifdef NDEBUG
 	// keep track if cheats have ever been turned on during this level
 	if ( !WereCheatsEverOn() )
 	{

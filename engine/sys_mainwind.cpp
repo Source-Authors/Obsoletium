@@ -21,7 +21,7 @@
 #include <imm.h>
 // dimhotepus: Disable accessibility keys (ex. five times Shift).
 #include "accessibility_shortcut_keys_toggler.h"
-#ifndef _DEBUG
+#ifdef NDEBUG
 // dimhotepus: Disable Win key.
 #include "windows_shortcut_keys_toggler.h"
 #endif
@@ -292,7 +292,7 @@ private:
 	int				m_iDesktopWidth, m_iDesktopHeight, m_iDesktopRefreshRate;
 
 #ifdef IS_WINDOWS_PC
-#ifndef _DEBUG
+#ifdef NDEBUG
 	// dimhotepus: Disable Win key.
 	// Only in Release builds as it slowdowns IDE typing a lot in debugging sessions.
 	// See https://github.com/Source-Authors/Obsoletium/issues/124

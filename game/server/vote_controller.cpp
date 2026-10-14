@@ -513,7 +513,7 @@ bool CVoteController::CreateVote( int iEntIndex, const char *pszTypeString, cons
 				m_nPotentialVotes = pCurrentIssue->CountPotentialVoters();
 				m_acceptingVotesTimer.Start( sv_vote_timer_duration.GetFloat() + random->RandomFloat( -1.f, 1.f ) );
 
-#ifndef _DEBUG
+#ifdef NDEBUG
 				// Force the vote holder to agree with a Yes/No vote
 				if ( pCurrentIssue->IsYesNoVote() && !bDedicatedServer && !sv_vote_holder_may_vote_no.GetBool() )
 				{

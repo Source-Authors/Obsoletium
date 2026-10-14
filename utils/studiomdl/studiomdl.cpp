@@ -383,7 +383,7 @@ SpewRetval_t MdlSpewOutputFunc( SpewType_t type, char const *pMsg )
 }
 
 
-#ifndef _DEBUG
+#ifdef NDEBUG
 
 void MdlHandleCrash( const char *pMessage, bool bAssert )
 {
@@ -9464,7 +9464,7 @@ void UsageAndExit()
 		);
 }
 
-#ifndef _DEBUG
+#ifdef NDEBUG
 
 LONG __stdcall VExceptionFilter( struct _EXCEPTION_POINTERS *ExceptionInfo )
 {
@@ -9550,7 +9550,7 @@ bool CStudioMDLApp::Create()
 {
  	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT, false, false, false, false );
 
-#ifndef _DEBUG
+#ifdef NDEBUG
 	SetUnhandledExceptionFilter( VExceptionFilter );
 #endif
 

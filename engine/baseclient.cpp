@@ -824,13 +824,13 @@ bool CBaseClient::ProcessSetConVar( NET_SetConVar *msg )
 		// exploits that send bogus data later, and catches bugs (why are new userinfo convars appearing later?)
 		if ( m_bInitialConVarsSet && !m_ConVars->FindKey( name ) )
 		{
-#ifndef _DEBUG	// warn all the time in debug build
+#ifdef NDEBUG	// warn all the time in debug build
 			static double s_dblLastWarned = 0.0;
 			double dblTimeNow = Plat_FloatTime();
 			if ( dblTimeNow - s_dblLastWarned > 10 )
 #endif
 			{
-#ifndef _DEBUG
+#ifdef NDEBUG
 				s_dblLastWarned = dblTimeNow;
 #endif
 				Warning( "Client \"%s\" userinfo ignored: \"%s\" = \"%s\"\n",

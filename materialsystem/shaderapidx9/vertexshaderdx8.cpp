@@ -1635,7 +1635,7 @@ HardwareShader_t CShaderManager::CompileShader( const char *pShaderName,
 
 	// Instead of erroring out, infinite-loop on shader compilation
 	// (i.e. give developers a chance to fix the shader code w/out restarting the game)
-#ifndef _DEBUG
+#ifdef NDEBUG
 	int retriesLeft = 20;
 retry_compile:
 #endif
@@ -1865,7 +1865,7 @@ retry_compile:
 		Plat_DebugString( pErrorMessageString );
 		Plat_DebugString( "\n" );
 
-#ifndef _DEBUG
+#ifdef NDEBUG
 		if ( retriesLeft-- > 0 )
 		{
 			DevMsg( 0, "Failed dynamic shader '%S' compile. Fix the shader while the debugger is at the breakpoint, then continue\n", wfilename );

@@ -384,7 +384,7 @@ bool CAbuseReportManager::PopulateIncident()
 	{
 		CBasePlayer *player = UTIL_PlayerByIndex( i );
 
-		#ifndef _DEBUG
+		#ifdef NDEBUG
 			// Skip local players
 			if ( player != NULL && player->IsLocalPlayer() )
 			{

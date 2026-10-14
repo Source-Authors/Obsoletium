@@ -40,7 +40,7 @@ public:
 	Vector2D() = default;
 #endif
 
-#ifndef _DEBUG
+#ifdef NDEBUG
 	constexpr
 #endif
 	inline Vector2D(vec_t X, vec_t Y)
@@ -165,14 +165,14 @@ private:
 //-----------------------------------------------------------------------------
 
 // dimhotepus: inline / constexpr
-#ifndef _DEBUG
+#ifdef NDEBUG
 constexpr
 #else
 const
 #endif
 inline Vector2D vec2_origin(0, 0);
 // dimhotepus: inline / constexpr
-#ifndef _DEBUG
+#ifdef NDEBUG
 constexpr
 #else
 const

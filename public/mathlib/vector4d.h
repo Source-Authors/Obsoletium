@@ -47,7 +47,7 @@ public:
 	Vector4D() = default;
 #endif
 
-#ifndef _DEBUG
+#ifdef NDEBUG
 constexpr
 #endif
 	inline Vector4D(vec_t X, vec_t Y, vec_t Z, vec_t W)
@@ -168,14 +168,14 @@ public:
 };
 
 // dimhotepus: inline / constexpr
-#ifndef _DEBUG
+#ifdef NDEBUG
 constexpr
 #else
 const
 #endif
 inline Vector4D vec4_origin(0.0f, 0.0f, 0.0f, 0.0f);
 // dimhotepus: inline / constexpr
-#ifndef _DEBUG
+#ifdef NDEBUG
 constexpr
 #else
 const

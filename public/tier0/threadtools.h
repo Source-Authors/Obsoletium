@@ -813,7 +813,7 @@ public:
 		return TryLockInline( ThreadGetCurrentId() );
 	}
 
-#ifndef _DEBUG 
+#ifdef NDEBUG 
 	FORCEINLINE 
 #endif
 	void Lock( unsigned int nSpinSleepTime = 0 )
@@ -837,7 +837,7 @@ public:
 #endif
 	}
 
-#ifndef _DEBUG
+#ifdef NDEBUG
 	FORCEINLINE 
 #endif
 	void Unlock()

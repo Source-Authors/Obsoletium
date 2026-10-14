@@ -1389,7 +1389,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 			}
 
 			//acquire iteration data
-#ifndef _DEBUG
+#ifdef NDEBUG
 			GeneratePolyhedronFromPlanes_Point *pStartPoint;
 			GeneratePolyhedronFromPlanes_Point *pWorkPoint;
 #endif

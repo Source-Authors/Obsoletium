@@ -1103,7 +1103,7 @@ void CTFSpectatorGUI::RecalculatePlayerPanels( void )
 
 			bool bHideBots = false;
 
-	#ifndef _DEBUG 
+	#ifdef NDEBUG 
 			if ( bMvM )
 			{
 				bHideBots = true;

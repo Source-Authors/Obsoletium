@@ -28,7 +28,7 @@
 
 using namespace vgui;
 
-#ifndef _DEBUG
+#ifdef NDEBUG
 #define PROPORTIONAL_CAREER_FRAMES 1
 #endif
 

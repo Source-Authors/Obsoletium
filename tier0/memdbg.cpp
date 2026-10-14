@@ -421,7 +421,7 @@ static inline size_t InternalLogicalSize( void *pMem )
 	return pInternalMem->nLogicalSize;
 }
 
-#ifndef _DEBUG
+#ifdef NDEBUG
 #define _CrtDbgReport( nRptType, szFile, nLine, szModule, pMsg ) 0
 #endif
 

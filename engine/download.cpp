@@ -696,7 +696,7 @@ void CDownloadManager::Queue( const char *baseURL, const char *urlPath, const ch
 	if ( g_pFileSystem->FileExists( gamePath ) )
 		return;
 
-#ifndef _DEBUG
+#ifdef NDEBUG
 	if ( sv.IsActive() )
 	{
 		return;	// don't try to download things for the local server (in case a map is missing sounds etc that
