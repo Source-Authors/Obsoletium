@@ -457,7 +457,7 @@ void CL_ReadPackets ( bool bFinalTick )
 	}
 
 	// check timeout, but not if running _DEBUG engine
-#if !defined( _DEBUG )
+#if defined(NDEBUG)
 	// Only check on final frame because that's when the server might send us a packet in single player.  This avoids
 	//  a bug where if you sit in the game code in the debugger then you get a timeout here on resuming the engine
 	//  because the timestep is > 1 tick because of the debugging delay but the server hasn't sent the next packet yet.  ywb 9/5/03

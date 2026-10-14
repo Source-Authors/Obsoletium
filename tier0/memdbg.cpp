@@ -273,7 +273,7 @@ struct CrtDbgMemHeader_t
 };
 
 struct DbgMemHeader_t
-#if !defined( _DEBUG ) || defined( POSIX )
+#if defined(NDEBUG) || defined( POSIX )
 	: CrtDbgMemHeader_t
 #endif
 {
@@ -383,7 +383,7 @@ static inline void InternalFree( void *pMem )
 		return;
 
 	DbgMemHeader_t *pInternalMem = (DbgMemHeader_t *)pMem - 1;
-#if !defined( _DEBUG ) || defined( POSIX )
+#if defined(NDEBUG) || defined( POSIX )
 #ifdef OSX
 	malloc_zone_free( malloc_default_zone(), pMem );
 #else

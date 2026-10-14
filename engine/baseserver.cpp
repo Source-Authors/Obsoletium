@@ -1230,7 +1230,7 @@ void CBaseServer::CheckTimeouts (void)
 {
 	VPROF_BUDGET( "CBaseServer::CheckTimeouts", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	// Don't timeout in _DEBUG builds
-#if !defined( _DEBUG )
+#if defined(NDEBUG)
 		
 	for ( auto *cl : m_Clients )
 	{
