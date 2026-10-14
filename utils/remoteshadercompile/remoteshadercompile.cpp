@@ -198,8 +198,6 @@ class ScopedListenSocket {
       : s_{socket(info->ai_family, info->ai_socktype, info->ai_protocol)},
         rc_{s_ != INVALID_SOCKET ? std::error_code{}
                                  : GetSystemError(WSAGetLastError())} {
-    Assert(info);
-
     if (!rc_) {
       // Setup the TCP listening socket
       rc_ = bind(s_, info->ai_addr, static_cast<int>(info->ai_addrlen)) !=
@@ -223,19 +221,17 @@ class ScopedListenSocket {
     }
   }
   ~ScopedListenSocket() noexcept {
-    if (s_ != INVALID_SOCKET) {
-      if (closesocket(s_) == SOCKET_ERROR) {
-        rc_ = GetSystemError(WSAGetLastError());
+    if (s_ != INVALID_SOCKET && closesocket(s_) == SOCKET_ERROR) {
+      rc_ = GetSystemError(WSAGetLastError());
 
-        AssertMsg(false, "closesocket failed: %s\n", rc_.message().c_str());
-      }
+      AssertMsg(false, "closesocket failed: %s\n", rc_.message().c_str());
     }
   }
 
   [[nodiscard]] std::error_code error_code() const noexcept { return rc_; }
 
   [[nodiscard]] ScopedAcceptSocket GetAcceptSocket() const noexcept {
-    return ScopedAcceptSocket{s_};
+    return ScopedAcceptSocket{!error_code() ? s_ : INVALID_SOCKET};
   }
 
   ScopedListenSocket(ScopedListenSocket&) = delete;
@@ -304,18 +300,19 @@ class ScopedThreadName {
   ScopedThreadName(HANDLE thread, const wchar_t* new_thread_name) noexcept
       : thread_{thread},
         old_thread_name_{nullptr},
-        rc_{get_com_error_code(TransformGetSetNameResult(
+        rc_{get_com_error_code(NormalizeHRESULT(
             GetThreadDescription(thread, &old_thread_name_)))} {
     if (!rc_) {
-      rc_ = get_com_error_code(TransformGetSetNameResult(
-          SetThreadDescription(thread, new_thread_name)));
+      rc_ = get_com_error_code(
+          NormalizeHRESULT(SetThreadDescription(thread, new_thread_name)));
     }
   }
   ~ScopedThreadName() noexcept {
-    if (!rc_ && old_thread_name_) {
-      rc_ = get_com_error_code(TransformGetSetNameResult(
-          SetThreadDescription(thread_, old_thread_name_)));
+    RunCodeAtScopeExit(LocalFree(old_thread_name_));
 
+    if (!rc_ && old_thread_name_) {
+      rc_ = get_com_error_code(
+          NormalizeHRESULT(SetThreadDescription(thread_, old_thread_name_)));
       if (rc_) {
         AssertMsg(
             false,
@@ -323,24 +320,24 @@ class ScopedThreadName {
             old_thread_name_);
       }
     }
-
-    LocalFree(old_thread_name_);
   }
 
   [[nodiscard]] std::error_code error_code() const noexcept { return rc_; }
 
-  ScopedThreadName(ScopedThreadName&) = delete;
-  ScopedThreadName& operator=(ScopedThreadName&) = delete;
+  ScopedThreadName(const ScopedThreadName&) = delete;
+  ScopedThreadName(ScopedThreadName&&) = delete;
+  ScopedThreadName& operator=(const ScopedThreadName&) = delete;
+  ScopedThreadName& operator=(ScopedThreadName&&) = delete;
 
  private:
   HANDLE thread_;
   wchar_t* old_thread_name_;
   std::error_code rc_;
 
-  static [[nodiscard]] HRESULT TransformGetSetNameResult(HRESULT hr) noexcept {
+  [[nodiscard]] static HRESULT NormalizeHRESULT(HRESULT hr) noexcept {
     if (hr == 0x10000000) {
-      // GetThreadDescription returns this code for empty thread name, assume it
-      // is ok.
+      // Windows sets FACILITY_NT_BIT (0x10000000) on the underlying NTSTATUS,
+      // and a successful status of zero therefore becomes 0x10000000.
       return S_OK;
     }
 
