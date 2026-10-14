@@ -23,7 +23,7 @@ template <typename T >
 class CDefOps
 {
 public:
-	static bool LessFunc( const T &lhs, const T &rhs )	{ return ( lhs < rhs );	}
+	[[nodiscard]] static bool LessFunc( const T &lhs, const T &rhs )	{ return ( lhs < rhs );	}
 };
 
 #define DefLessFunc( type ) CDefOps< type >::LessFunc
@@ -34,8 +34,8 @@ class CDefLess
 public:
 	CDefLess() = default;
 	CDefLess( int i ) {}
-	inline bool operator()( const T &lhs, const T &rhs ) const { return ( lhs < rhs );	}
-	inline bool operator!() const { return false; }
+	[[nodiscard]] inline bool operator()( const T &lhs, const T &rhs ) const { return ( lhs < rhs );	}
+	[[nodiscard]] inline bool operator!() const { return false; }
 };
 
 //-------------------------------------
@@ -154,48 +154,48 @@ public:
 	void CopyFrom( const CUtlRBTree<T, I, L, M> &other );
 
 	// gets particular elements
-	T&			Element( I i );
-	T const		&Element( I i ) const;
-	T&			operator[]( I i );
-	T const		&operator[]( I i ) const;
+	[[nodiscard]] T&			Element( I i );
+	[[nodiscard]] T const		&Element( I i ) const;
+	[[nodiscard]] T&			operator[]( I i );
+	[[nodiscard]] T const		&operator[]( I i ) const;
 
 	// Gets the root
-	I  Root() const;
+	[[nodiscard]] I Root() const;
 
 	// Num elements
-	I Count() const;
+	[[nodiscard]] I Count() const;
 
 	// Max "size" of the vector
 	// it's not generally safe to iterate from index 0 to MaxElement()-1
 	// it IS safe to do so when using CUtlMemory as the allocator,
 	// but we should really remove patterns using this anyways, for safety and generality
-	I  MaxElement() const;
+	[[nodiscard]] I MaxElement() const;
 
 	// Gets the children
-	I  Parent( I i ) const;
-	I  LeftChild( I i ) const;
-	I  RightChild( I i ) const;
+	[[nodiscard]] I Parent( I i ) const;
+	[[nodiscard]] I LeftChild( I i ) const;
+	[[nodiscard]] I RightChild( I i ) const;
 
 	// Tests if a node is a left or right child
-	bool  IsLeftChild( I i ) const;
-	bool  IsRightChild( I i ) const;
+	[[nodiscard]] bool IsLeftChild( I i ) const;
+	[[nodiscard]] bool IsRightChild( I i ) const;
 
 	// Tests if root or leaf
-	bool  IsRoot( I i ) const;
-	bool  IsLeaf( I i ) const;
+	[[nodiscard]] bool IsRoot( I i ) const;
+	[[nodiscard]] bool IsLeaf( I i ) const;
 
 	// Checks if a node is valid and in the tree
-	bool  IsValidIndex( I i ) const;
+	[[nodiscard]] bool IsValidIndex( I i ) const;
 
 	// Checks if the tree as a whole is valid
-	[[nodiscard]] bool  IsValid() const;
+	[[nodiscard]] bool IsValid() const;
 
 	// Invalid index
-	static constexpr I InvalidIndex();
+	[[nodiscard]] static constexpr I InvalidIndex();
 
 	// returns the tree depth (not a very fast operation)
-	intp   Depth( I node ) const;
-	[[nodiscard]] intp   Depth() const;
+	[[nodiscard]] intp Depth( I node ) const;
+	[[nodiscard]] intp Depth() const;
 
 	// Sets the less func
 	void SetLessFunc( const LessFunc_t &func );
@@ -211,7 +211,7 @@ public:
 	I  InsertIfNotFound( T&& insert );
 
 	// Find method
-	[[nodiscard]] I  Find( T const &search ) const;
+	[[nodiscard]] I Find( T const &search ) const;
 
 	// Remove methods
 	void     RemoveAt( I i );
@@ -219,24 +219,24 @@ public:
 	void     RemoveAll( );
 	void	 Purge();
 
-	bool HasElement( T const &search ) const { return Find( search ) != InvalidIndex(); }
+	[[nodiscard]] bool HasElement( T const &search ) const { return Find( search ) != InvalidIndex(); }
 
 	// Allocation, deletion
 	void  FreeNode( I i );
 
 	// Iteration
-	I  FirstInorder() const;
-	I  NextInorder( I i ) const;
-	I  PrevInorder( I i ) const;
-	I  LastInorder() const;
+	[[nodiscard]] I FirstInorder() const;
+	[[nodiscard]] I NextInorder( I i ) const;
+	[[nodiscard]] I PrevInorder( I i ) const;
+	[[nodiscard]] I LastInorder() const;
 
-	I  FirstPreorder() const;
-	I  NextPreorder( I i ) const;
-	I  PrevPreorder( I i ) const;
-	I  LastPreorder( ) const;
+	[[nodiscard]] I FirstPreorder() const;
+	[[nodiscard]] I NextPreorder( I i ) const;
+	[[nodiscard]] I PrevPreorder( I i ) const;
+	[[nodiscard]] I LastPreorder( ) const;
 
-	I  FirstPostorder() const;
-	I  NextPostorder( I i ) const;
+	[[nodiscard]] I FirstPostorder() const;
+	[[nodiscard]] I NextPostorder( I i ) const;
 
 	// If you change the search key, this can be used to reinsert the 
 	// element into the tree.
@@ -268,16 +268,16 @@ protected:
 	void  LinkToParent( I i, I parent, bool isLeft );
 
 	// Gets at the links
-	Links_t const	&Links( I i ) const;
-	Links_t			&Links( I i );      
+	[[nodiscard]] Links_t const	&Links( I i ) const;
+	[[nodiscard]] Links_t		&Links( I i );      
 
 	// Checks if a link is red or black
-	bool IsRed( I i ) const;
-	bool IsBlack( I i ) const;
+	[[nodiscard]] bool IsRed( I i ) const;
+	[[nodiscard]] bool IsBlack( I i ) const;
 
 	// Sets/gets node color
-	NodeColor_t Color( I i ) const;
-	void        SetColor( I i, NodeColor_t c );
+	[[nodiscard]] NodeColor_t Color( I i ) const;
+	void					  SetColor( I i, NodeColor_t c );
 
 	// operations required to preserve tree balance
 	void RotateLeft(I i);
@@ -306,7 +306,7 @@ protected:
 
 	Node_t* m_pElements;
 
-	FORCEINLINE M const &Elements( ) const
+	[[nodiscard]] FORCEINLINE M const& Elements() const
 	{
 		return m_Elements;
 	}
@@ -332,7 +332,7 @@ public:
 		: CUtlRBTree< T, I, L, CUtlFixedMemory< UtlRBTreeNode_t< T, I > > >( lessfunc ) {}
 
 	using BaseClass = CUtlRBTree<T, I, L, CUtlFixedMemory<UtlRBTreeNode_t<T, I>>>;
-	bool IsValidIndex( I i ) const
+	[[nodiscard]] bool IsValidIndex( I i ) const
 	{
 		if ( !BaseClass::Elements().IsIdxValid( i ) )
 			return false;
@@ -349,7 +349,7 @@ public:
 	}
 	
 	// this doesn't make sense for fixed rbtrees, since there's no useful max pointer, and the index space isn't contiguous anyways
-	I  MaxElement() const = delete;
+	[[nodiscard]] I MaxElement() const = delete;
 
 protected:
 	void ResetDbgInfo() {}
