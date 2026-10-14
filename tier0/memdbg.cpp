@@ -317,7 +317,7 @@ static inline void *InternalMalloc( size_t nSize, const char *pFileName, int nLi
 	return pAllocedMem;
 #else // LINUX || WIN32
 	DbgMemHeader_t *pInternalMem;
-#if defined( POSIX ) || !defined( _DEBUG )
+#if defined( POSIX ) || defined(NDEBUG)
 	pInternalMem = (DbgMemHeader_t *)malloc( nSize + sizeof(DbgMemHeader_t) );
 	if (!pInternalMem)
 	{
@@ -328,7 +328,7 @@ static inline void *InternalMalloc( size_t nSize, const char *pFileName, int nLi
 	*((int*)pInternalMem->m_Reserved) = 0xf00df00d;
 #else
 	pInternalMem = (DbgMemHeader_t *)_malloc_dbg( nSize + sizeof(DbgMemHeader_t), _NORMAL_BLOCK, pFileName, nLine );
-#endif // defined( POSIX ) || !defined( _DEBUG )
+#endif // defined( POSIX ) || defined(NDEBUG)
 
 	if ( pInternalMem )
 	{
@@ -359,7 +359,7 @@ static inline void *InternalRealloc( void *pMem, size_t nNewSize, const char *pF
 	return pNewAllocedMem;
 #else // LINUX || WIN32
 	DbgMemHeader_t *pInternalMem = (DbgMemHeader_t *)pMem - 1;
-#if defined( POSIX ) || !defined( _DEBUG )
+#if defined( POSIX ) || defined(NDEBUG)
 	pInternalMem = (DbgMemHeader_t *)realloc( pInternalMem, nNewSize + sizeof(DbgMemHeader_t) );
 	pInternalMem->m_pFileName = pFileName;
 	pInternalMem->m_nLineNumber = nLine;

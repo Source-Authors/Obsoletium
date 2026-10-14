@@ -982,7 +982,7 @@ inline void CVertexBuilder::Reset()
 	}
 	m_pCurrColor = m_pColor;
 
-#if ( defined( _DEBUG ) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
+#if ( !defined(NDEBUG) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
 	m_bWrittenNormal   = false;
 	m_bWrittenUserData = false;
 #endif
@@ -1062,7 +1062,7 @@ inline void CVertexBuilder::SelectVertex( int nIndex )
 	m_pCurrTexCoord[7] = OffsetFloatPointer( m_pTexCoord[7], m_nCurrentVertex, m_VertexSize_TexCoord[7] );
 	m_pCurrColor = m_pColor + m_nCurrentVertex * m_VertexSize_Color;
 
-#if ( defined( _DEBUG ) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
+#if ( !defined(NDEBUG) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
 	m_bWrittenNormal   = false;
 	m_bWrittenUserData = false;
 #endif
@@ -1105,7 +1105,7 @@ template<int nFlags, int nNumTexCoords> FORCEINLINE void CVertexBuilder::Advance
 	if ( nNumTexCoords > 7 )
 		IncrementFloatPointer( m_pCurrTexCoord[7], m_VertexSize_TexCoord[7] );
 
-#if ( defined( _DEBUG ) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
+#if ( !defined(NDEBUG) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
 	m_bWrittenNormal   = false;
 	m_bWrittenUserData = false;
 #endif
@@ -1139,7 +1139,7 @@ inline void CVertexBuilder::AdvanceVertices( int nVerts )
 	IncrementFloatPointer( m_pCurrTexCoord[7], m_VertexSize_TexCoord[7]*nVerts );
 	m_pCurrColor += m_VertexSize_Color*nVerts;
 
-#if ( defined( _DEBUG ) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
+#if ( !defined(NDEBUG) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
 	m_bWrittenNormal   = false;
 	m_bWrittenUserData = false;
 #endif
@@ -1168,7 +1168,7 @@ inline void CVertexBuilder::FastVertex( const ModelVertexDX7_t &vertex )
 	IncrementFloatPointer( m_pCurrPosition, m_VertexSize_Position );
 	//m_nVertexCount = ++m_nCurrentVertex;
 
-#if ( defined( _DEBUG ) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
+#if ( !defined(NDEBUG) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
 	m_bWrittenNormal   = false;
 	m_bWrittenUserData = false;
 #endif
@@ -1193,7 +1193,7 @@ inline void CVertexBuilder::FastVertexSSE( const ModelVertexDX7_t &vertex )
 	IncrementFloatPointer( m_pCurrPosition, m_VertexSize_Position );
 	//m_nVertexCount = ++m_nCurrentVertex;
 
-#if ( defined( _DEBUG ) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
+#if ( !defined(NDEBUG) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
 	m_bWrittenNormal   = false;
 	m_bWrittenUserData = false;
 #endif
@@ -1239,7 +1239,7 @@ inline void CVertexBuilder::Fast4VerticesSSE(
 
 	IncrementFloatPointer( m_pCurrPosition, 4*m_VertexSize_Position ); //-V112
 
-#if ( defined( _DEBUG ) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
+#if ( !defined(NDEBUG) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
 	m_bWrittenNormal   = false;
 	m_bWrittenUserData = false;
 #endif
@@ -1255,7 +1255,7 @@ inline void CVertexBuilder::FastVertex( const ModelVertexDX8_t &vertex )
 	IncrementFloatPointer( m_pCurrPosition, m_VertexSize_Position );
 	//	m_nVertexCount = ++m_nCurrentVertex;
 
-#if ( defined( _DEBUG ) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
+#if ( !defined(NDEBUG) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
 	m_bWrittenNormal   = false;
 	m_bWrittenUserData = false;
 #endif
@@ -1281,7 +1281,7 @@ inline void CVertexBuilder::FastVertexSSE( const ModelVertexDX8_t &vertex )
 	IncrementFloatPointer( m_pCurrPosition, m_VertexSize_Position );
 	//	m_nVertexCount = ++m_nCurrentVertex;
 
-#if ( defined( _DEBUG ) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
+#if ( !defined(NDEBUG) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
 	m_bWrittenNormal   = false;
 	m_bWrittenUserData = false;
 #endif

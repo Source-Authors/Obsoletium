@@ -32,7 +32,7 @@ ConVar snd_async_minsize("snd_async_minsize", "262144");
 //-----------------------------------------------------------------------------
 void ChunkError( unsigned int id )
 {
-#if defined( DEBUG_CHUNKS ) && defined( _DEBUG )
+#if defined( DEBUG_CHUNKS ) && !defined(NDEBUG)
 	if ( id == WAVE_LIST || id == WAVE_FACT )
 	{
 		// unused chunks, not an error

@@ -120,7 +120,7 @@ void *CBaseDemoAction::operator new( size_t sz )
 //-----------------------------------------------------------------------------
 void CBaseDemoAction::operator delete( void *pMem )
 {
-#if defined( WIN32 ) && defined( _DEBUG )
+#if defined( WIN32 ) && !defined(NDEBUG)
 	// set the memory to a known value
 	size_t size = _msize( pMem );
 	Q_memset( pMem, 0xcd, size );

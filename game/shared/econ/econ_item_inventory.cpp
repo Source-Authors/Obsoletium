@@ -2205,7 +2205,7 @@ void CEconItemHandle::UnsubscribeFromSOEvents()
 }
 
 
-#if defined( STAGING_ONLY ) || defined( _DEBUG )
+#if defined( STAGING_ONLY ) || !defined(NDEBUG)
 #if defined(CLIENT_DLL)
 CON_COMMAND_F( item_dumpinv, "Dumps the contents of a specified client inventory.", FCVAR_CHEAT )
 #else

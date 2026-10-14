@@ -30,7 +30,7 @@ class IMatchJoiningHandler;
 //class CDOTAGameAccountClient;
 //class CDOTABetaParticipation;
 
-#if !defined( TF_GC_PING_DEBUG ) && ( defined( STAGING_ONLY ) || defined( _DEBUG ) )
+#if !defined( TF_GC_PING_DEBUG ) && ( defined( STAGING_ONLY ) || !defined(NDEBUG) )
 	#define TF_GC_PING_DEBUG
 #endif
 

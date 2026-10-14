@@ -44,7 +44,7 @@ public:
 
 private:
 
-#if defined( CLIENT_DLL ) && defined( _DEBUG )
+#if defined( CLIENT_DLL ) && !defined(NDEBUG)
 	void SanityCheckBone( int iBone, bool bReadable ) const;
 #endif
 
@@ -98,7 +98,7 @@ inline void CBoneAccessor::SetWritableBones( int flags )
 
 inline const matrix3x4_t& CBoneAccessor::GetBone( int iBone ) const
 {
-#if defined( CLIENT_DLL ) && defined( _DEBUG )
+#if defined( CLIENT_DLL ) && !defined(NDEBUG)
 	SanityCheckBone( iBone, true );
 #endif
 	return m_pBones[iBone];
@@ -111,7 +111,7 @@ inline const matrix3x4_t& CBoneAccessor::operator[]( int iBone ) const
 
 inline matrix3x4_t& CBoneAccessor::GetBoneForWrite( int iBone )
 {
-#if defined( CLIENT_DLL ) && defined( _DEBUG )
+#if defined( CLIENT_DLL ) && !defined(NDEBUG)
 	SanityCheckBone( iBone, false );
 #endif
 	return m_pBones[iBone];

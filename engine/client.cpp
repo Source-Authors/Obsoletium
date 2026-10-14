@@ -74,7 +74,7 @@ static ConVar debug_clientstate_fake_hltv( "debug_clientstate_fake_hltv", "0", 0
 #if defined( REPLAY_ENABLED )
 static ConVar debug_clientstate_fake_replay( "debug_clientstate_fake_replay", "0", 0, "If set, spoof as REPLAY for testing purposes." );
 #endif // defined( REPLAY_ENABLED )
-#endif // defined( _DEBUG ) || defined( STAGING_ONLY )
+#endif // !defined(NDEBUG) || defined( STAGING_ONLY )
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -211,7 +211,7 @@ void CClientState::SendClientInfo( void )
 		info.m_bIsReplay = true;
 	}
 #endif // defined( REPLAY_ENABLED )
-#endif // defined( _DEBUG ) || defined( STAGING_ONLY )
+#endif // !defined(NDEBUG) || defined( STAGING_ONLY )
 	m_NetChannel->SendNetMsg( info );
 }
 

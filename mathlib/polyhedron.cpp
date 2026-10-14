@@ -994,7 +994,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 						pPoint->ptPosition.y = vPositionAsDouble[1] - (distAsDouble * vNormalAsDouble[1]);
 						pPoint->ptPosition.z = vPositionAsDouble[2] - (distAsDouble * vNormalAsDouble[2]);
 
-#if ( 0 && defined( _DEBUG ) )
+#if ( 0 && !defined(NDEBUG) )
 						float fDebugDist = vNormal.Dot( pPoint->ptPosition ) - fPlaneDist; //just for looking at in watch windows
 						AssertMsg( fabs( fDebugDist ) < fabs(fPointDist), "Projected point is further from plane than unprojected." );
 #endif

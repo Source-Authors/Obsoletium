@@ -102,7 +102,7 @@ static ConVar cl_LocalNetworkBackdoor( "cl_localnetworkbackdoor", "1", 0, "Enabl
 static ConVar cl_ignorepackets( "cl_ignorepackets", "0", FCVAR_CHEAT, "Force client to ignore packets (for debugging)." );
 static ConVar cl_playback_screenshots( "cl_playback_screenshots", "0", 0, "Allows the client to playback screenshot and jpeg commands in demos." );
 
-#if defined( STAGING_ONLY ) || defined( _DEBUG )
+#if defined( STAGING_ONLY ) || !defined(NDEBUG)
 static ConVar cl_block_usercommand( "cl_block_usercommand", "0", FCVAR_CHEAT, "Force client to not send usercommand (for debugging)." );
 #endif // STAGING_ONLY || _DEBUG
 
@@ -1931,7 +1931,7 @@ Constructs the movement command and sends it to the server if it's time.
 */
 void CL_SendMove( void )
 {
-#if defined( STAGING_ONLY ) || defined( _DEBUG )
+#if defined( STAGING_ONLY ) || !defined(NDEBUG)
 	if ( cl_block_usercommand.GetBool() )
 		return;
 #endif // STAGING_ONLY || _DEBUG

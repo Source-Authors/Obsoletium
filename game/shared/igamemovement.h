@@ -85,7 +85,7 @@ inline const Vector &CMoveData::GetAbsOrigin() const
 	return m_vecAbsOrigin;
 }
 
-#if !defined( CLIENT_DLL ) && defined( _DEBUG )
+#if !defined( CLIENT_DLL ) && !defined(NDEBUG)
 // We only ever want this code path on the server side in a debug build
 //  and you have to uncomment the code below and rebuild to have the test operate.
 //#define PLAYER_GETTING_STUCK_TESTING

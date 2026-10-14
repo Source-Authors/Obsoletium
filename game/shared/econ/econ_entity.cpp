@@ -497,7 +497,7 @@ bool CEconEntity::ValidateEntityAttachedToPlayer( bool &bShouldRetry )
 	// We only use this variable in debug or on the client.
 #if !defined(NDEBUG) || defined( TF_CLIENT_DLL )
 	bool bItemDebugValidation = false;
-#endif // defined( _DEBUG ) || defined( TF_CLIENT_DLL )
+#endif // !defined(NDEBUG) || defined( TF_CLIENT_DLL )
 
 #ifndef NDEBUG
 	bItemDebugValidation = item_debug_validation.GetBool();

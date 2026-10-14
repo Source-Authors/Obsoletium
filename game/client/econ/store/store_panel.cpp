@@ -610,7 +610,7 @@ bool CGCClientJobGetUserData::BYieldingRunJob( void *pvStartParam )
 
 	// Allow a back-door for reading the local price sheet rather than the one from the GC.
 //#define READ_LOCAL_PRICE_SHEET // DO NOT CHECK IN
-#if defined( READ_LOCAL_PRICE_SHEET ) && defined( _DEBUG )
+#if defined( READ_LOCAL_PRICE_SHEET ) && !defined(NDEBUG)
 	pKVPricesheet->LoadFromFile( g_pFullFileSystem, "scripts/items/unencrypted/store.txt", "MOD" );
 #else
 	CUtlBuffer bufRawData( msgResponse.Body().price_sheet().data(), msgResponse.Body().price_sheet().size(), CUtlBuffer::READ_ONLY );

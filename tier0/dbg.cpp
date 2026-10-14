@@ -102,7 +102,7 @@ DBG_INTERFACE SpewRetval_t DefaultSpewFunc( SpewType_t type, const tchar *pMsg )
 		// Non-win32
 		bool bRaiseOnAssert = getenv( "RAISE_ON_ASSERT" ) || CommandLine()->HasParm( "-raiseonassert" );
 		return bRaiseOnAssert ? SPEW_DEBUGGER : SPEW_CONTINUE;
-#elif defined( _DEBUG )
+#elif !defined(NDEBUG)
 		// Win32 debug
 		return SPEW_DEBUGGER;
 #else

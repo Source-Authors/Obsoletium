@@ -1020,7 +1020,7 @@ CON_COMMAND( unpause, "Unpause the game." )
 }
 
 // No non-testing use for this at the moment, though server mods in public will expose similar functionality
-#if defined( STAGING_ONLY ) || defined( _DEBUG )
+#if defined( STAGING_ONLY ) || !defined(NDEBUG)
 //-----------------------------------------------------------------------------
 // Purpose: Send a string command to a client by userid
 //-----------------------------------------------------------------------------
@@ -1072,7 +1072,7 @@ CON_COMMAND( clientcmd, "Send a clientside command to a player by userid" )
 	NET_StringCmd cmdMsg( commandString ) ;
 	client->SendNetMsg( cmdMsg, true );
 }
-#endif // defined( STAGING_ONLY ) || defined( _DEBUG )
+#endif // defined( STAGING_ONLY ) || !defined(NDEBUG)
 
 //-----------------------------------------------------------------------------
 // Kicks a user off of the server using their userid or uniqueid
@@ -2166,7 +2166,7 @@ CON_COMMAND( namelockid, "Prevent name changes for this userID." )
 	}
 }
 
-#if defined( STAGING_ONLY ) || defined( _DEBUG )
+#if defined( STAGING_ONLY ) || !defined(NDEBUG)
 CON_COMMAND( fs_find, "Run virtual filesystem find" )
 {
 	if ( args.ArgC() != 3 )
@@ -2191,4 +2191,4 @@ CON_COMMAND( fs_find, "Run virtual filesystem find" )
 
 	ConMsg( "  %zu matching files/directories\n", matches );
 }
-#endif // defined( STAGING_ONLY ) || defined( _DEBUG )
+#endif // defined( STAGING_ONLY ) || !defined(NDEBUG)

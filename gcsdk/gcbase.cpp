@@ -130,7 +130,7 @@ SpewRetval_t ConsoleSpewFunc( SpewType_t type, const tchar *pMsg )
 #ifndef WIN32
 		// Non-win32
 		bool bRaiseOnAssert = getenv( "RAISE_ON_ASSERT" ) || CommandLine()->HasParm( "-raiseonassert" );
-#elif defined( _DEBUG )
+#elif !defined(NDEBUG)
 		// Win32 debug
 		bool bRaiseOnAssert = true;
 #else

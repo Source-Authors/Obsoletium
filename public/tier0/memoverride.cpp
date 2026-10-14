@@ -1114,7 +1114,7 @@ void __cdecl _invalid_parameter_noinfo()
 }
 #endif
 
-#endif /* defined( _DEBUG ) */
+#endif /* !defined(NDEBUG) */
 
 #if !defined(NDEBUG) || defined( USE_MEM_DEBUG )
 
@@ -1132,7 +1132,7 @@ int __cdecl _CrtDbgReportV( int , const wchar_t *, int ,
 	return 0;
 }
 
-#endif  /* defined( _DEBUG ) || defined( USE_MEM_DEBUG ) */
+#endif  /* !defined(NDEBUG) || defined( USE_MEM_DEBUG ) */
 
 _Success_(return != 0) _Check_return_ _Ret_maybenull_ _Post_writable_byte_size_(count * size)
 extern "C" __declspec(allocator) void * __cdecl _recalloc_dbg

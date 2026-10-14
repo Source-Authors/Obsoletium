@@ -27,7 +27,7 @@
 //-----------------------------------------------------------------------------
 // Default flags for debug builds
 //-----------------------------------------------------------------------------
-#if (defined( _DEBUG ) || defined( RELEASEASSERTS ) )
+#if (!defined(NDEBUG) || defined( RELEASEASSERTS ) )
 
 #define DBGFLAG_MEMORY
 #ifdef _SERVER	// only enable new & delete tracking for server; on client it conflicts with CRT mem leak tracking

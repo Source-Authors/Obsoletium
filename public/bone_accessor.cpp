@@ -8,7 +8,7 @@
 #include "bone_accessor.h"
 
 
-#if defined( CLIENT_DLL ) && defined( _DEBUG )
+#if defined( CLIENT_DLL ) && !defined(NDEBUG)
 
 	void CBoneAccessor::SanityCheckBone( int iBone, bool bReadable ) const
 	{

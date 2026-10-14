@@ -797,7 +797,7 @@ int64 CZipPackFileHandle::AbsoluteBaseOffset()
 #if !defined(NDEBUG) && !defined( OSX )
 #include <atomic>
 static std::atomic<int> sLZMAPackFileHandles( 0 );
-#endif // defined( _DEBUG ) && !defined( OSX )
+#endif // !defined(NDEBUG) && !defined( OSX )
 
 CLZMAZipPackFileHandle::CLZMAZipPackFileHandle( CZipPackFile* pOwner, int64 nBase, unsigned int nOriginalSize, unsigned int nCompressedSize,
                                                 unsigned int nIndex, unsigned int nFilePointer )
@@ -816,7 +816,7 @@ CLZMAZipPackFileHandle::CLZMAZipPackFileHandle( CZipPackFile* pOwner, int64 nBas
 		         "These carry large buffers around, and can cause high memory usage\n",
 		         PACKFILE_COMPRESSED_FILE_HANDLES_WARNING );
 	}
-#endif // defined( _DEBUG ) && !defined( OSX )
+#endif // !defined(NDEBUG) && !defined( OSX )
 }
 
 CLZMAZipPackFileHandle::~CLZMAZipPackFileHandle()
@@ -826,7 +826,7 @@ CLZMAZipPackFileHandle::~CLZMAZipPackFileHandle()
 #if !defined(NDEBUG) && !defined( OSX )
 	sLZMAPackFileHandles--;
 	Assert( sLZMAPackFileHandles >= 0 );
-#endif // defined( _DEBUG ) && !defined( OSX )
+#endif // !defined(NDEBUG) && !defined( OSX )
 }
 
 int CLZMAZipPackFileHandle::Read( void* pBuffer, int nDestSize, int nBytes )

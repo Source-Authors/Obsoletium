@@ -1563,7 +1563,7 @@ static ConVar mat_phong(			"mat_phong", "1" );
 static ConVar mat_parallaxmap(		"mat_parallaxmap", "1", FCVAR_HIDDEN | FCVAR_ALLOWED_IN_COMPETITIVE );
 static ConVar mat_reducefillrate(	"mat_reducefillrate", "0", FCVAR_ALLOWED_IN_COMPETITIVE );
 
-#if defined( OSX ) && !defined( STAGING_ONLY ) && !defined( _DEBUG )
+#if defined( OSX ) && !defined( STAGING_ONLY ) && defined(NDEBUG)
 // OSX users are currently running OOM. We limit them to texture quality high here, which avoids the problem while we come up with a real solution.
 static ConVar mat_picmip(			"mat_picmip", "1", FCVAR_ARCHIVE, "", true, 0, true, 2 );
 #else

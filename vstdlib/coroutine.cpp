@@ -204,7 +204,7 @@ static constexpr inline int k_cubCoroutineStackGapSmall = 64;
 static const int k_cubMaxCoroutineStackSize = (48 * 1024);
 #else
 static const int k_cubMaxCoroutineStackSize = (32 * 1024);
-#endif // defined( _DEBUG )
+#endif // !defined(NDEBUG)
 
 #ifdef _WIN64
 extern "C" byte *GetStackPtr64();

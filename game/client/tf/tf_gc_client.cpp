@@ -107,12 +107,12 @@ CON_COMMAND( cl_check_process_count, "cl_check_process_count" )
 #endif
 
 // This triggers a GC packet so isn't great to let clients misuse
-#if defined( STAGING_ONLY ) || defined( _DEBUG )
+#if defined( STAGING_ONLY ) || !defined(NDEBUG)
 CON_COMMAND( tf_datacenter_ping_refresh, "Force an immediate refresh of datacenter ping" )
 {
 	GTFGCClientSystem()->InvalidatePingData();
 }
-#endif // defined( STAGING_ONLY ) || defined( _DEBUG )
+#endif // defined( STAGING_ONLY ) || !defined(NDEBUG)
 
 CON_COMMAND( tf_datacenter_ping_dump, "Dump current datacenter ping values to console" )
 {
