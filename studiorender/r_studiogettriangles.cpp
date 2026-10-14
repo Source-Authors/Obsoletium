@@ -83,7 +83,7 @@ void CStudioRenderContext::GetTriangles( const DrawModelInfo_t& info, matrix3x4_
 				{
 					vert.m_TangentS = *vertData->TangentS( vertID );
 				}
-#if _DEBUG
+#ifndef NDEBUG
 				else
 				{
 					// ensure any unintended access faults

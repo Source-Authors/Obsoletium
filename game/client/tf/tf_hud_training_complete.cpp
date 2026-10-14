@@ -417,7 +417,7 @@ void CTFTrainingComplete::OnCommand( const char *command )
 	}
 }
 
-#if _DEBUG
+#ifndef NDEBUG
 //@note Tom Bui: For testing...
 CON_COMMAND( training_complete, "Test")
 {

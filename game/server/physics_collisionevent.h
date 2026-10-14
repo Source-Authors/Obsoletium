@@ -118,7 +118,7 @@ public:
 	bool IsInCallback() { return m_inCallback > 0 ? true : false; }
 
 private:
-#if _DEBUG
+#ifndef NDEBUG
 	int		ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pObj1, void *pGameData0, void *pGameData1 );
 #endif
 

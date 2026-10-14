@@ -89,7 +89,7 @@ void TimescaleChanged( IConVar *var, const char *pOldString, float flOldValue )
 
 ConVar phys_timescale( "phys_timescale", "1", 0, "Scale time for physics", TimescaleChanged );
 
-#if _DEBUG
+#ifndef NDEBUG
 ConVar phys_dontprintint( "phys_dontprintint", "1", FCVAR_NONE, "Don't print inter-penetration warnings." );
 #endif
 
@@ -453,7 +453,7 @@ CCollisionEvent::CCollisionEvent()
 }
 
 int CCollisionEvent::ShouldCollide( IPhysicsObject *pObj0, IPhysicsObject *pObj1, void *pGameData0, void *pGameData1 )
-#if _DEBUG
+#ifndef NDEBUG
 {
 	int x0 = ShouldCollide_2(pObj0, pObj1, pGameData0, pGameData1);
 	int x1 = ShouldCollide_2(pObj1, pObj0, pGameData1, pGameData0);
@@ -722,7 +722,7 @@ bool CCollisionEvent::ShouldFreezeContacts( IPhysicsObject **pObjectList, int ob
 	if ( m_lastTickFrictionError > gpGlobals->tickcount || m_lastTickFrictionError < (gpGlobals->tickcount-1) )
 	{
 		DevWarning("Performance Warning: large friction system (%d objects)!!!\n", objectCount );
-#if _DEBUG
+#ifndef NDEBUG
 		for ( int i = 0; i < objectCount; i++ )
 		{
 			CBaseEntity *pEntity = static_cast<CBaseEntity *>(pObjectList[i]->GetGameData());
@@ -1018,7 +1018,7 @@ int CCollisionEvent::ShouldSolvePenetration( IPhysicsObject *pObj0, IPhysicsObje
 			event.collisionState = COLLSTATE_TRYENTITYSOLVER;
 		}
 	}
-#if _DEBUG
+#ifndef NDEBUG
 	if ( phys_dontprintint.GetBool() == false )
 	{
 		const char *pName1 = STRING(pEntity0->GetModelName());

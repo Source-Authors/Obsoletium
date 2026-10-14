@@ -152,7 +152,7 @@ void C_NPC_Puppet::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quater
 
 					boneSetup.AccumulatePose( pos, q, nSequence, fCycle, fWeight, currentTime, NULL );
 
-#if _DEBUG
+#ifndef NDEBUG
 					if (Q_stristr( boneSetup.GetStudioHdr()->pszName(), r_sequence_debug.GetString()) != NULL)
 					{
 						DevMsgRT( "%6.2f : %30s : %5.3f : %4.2f : %1d\n", currentTime, boneSetup.GetStudioHdr()->pSeqdesc( nSequence ).pszLabel(), fCycle, fWeight, i );

@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------------------
 
-#if _DEBUG
+#ifndef NDEBUG
 ConVar replay_fileserver_simulate_delete( "replay_fileserver_simulate_delete", "0", FCVAR_GAMEDLL, "Don't delete any actual files during replay cleanup." );
 #endif
 

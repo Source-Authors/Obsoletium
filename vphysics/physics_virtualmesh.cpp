@@ -208,7 +208,7 @@ void CMeshInstance::Init( const virtualmeshlist_t &list )
 
 		byte *pMem = m_pMemory + m_hullOffset;
 
-#if _DEBUG
+#ifndef NDEBUG
 		const unsigned hullSize =
 			CVPhysicsVirtualMeshWriter::UnpackLedgeListFromHull( pMem, pHeader, pPoints );
 		Assert(m_hullOffset + hullSize == memSize);
@@ -552,7 +552,7 @@ IVP_Compact_Surface *CPhysCollideVirtualMesh::CreateBoundingSurfaceFromRange( co
 	params.build_root_convex_hull = IVP_TRUE;
 	IVP_Compact_Surface *pSurface = builder.compile( &params );
 
-#if _DEBUG
+#ifndef NDEBUG
 	const IVP_Compact_Ledgetree_Node *node = pSurface->get_compact_ledge_tree_root();
 	const IVP_Compact_Ledge *pLedge = node->get_compact_hull();	// we're going to write into client data on each vert before we throw this away
 	Assert(pLedge && !pLedge->is_terminal());

@@ -538,7 +538,7 @@ inline SurfaceHandle_t SurfaceHandleFromIndex( int surfaceIndex, worldbrushdata_
 	return &pData->surfaces2[surfaceIndex];
 }
 
-#if _DEBUG
+#ifndef NDEBUG
 #define ASSERT_SURF_VALID(surfID) MSurf_Index(surfID)
 #else
 #define ASSERT_SURF_VALID(surfID) ((void)0)

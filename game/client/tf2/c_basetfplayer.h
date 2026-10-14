@@ -376,7 +376,7 @@ inline C_BaseTFPlayer *ToBaseTFPlayer( C_BaseEntity *pEntity )
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;
 
-#if _DEBUG
+#ifndef NDEBUG
 	return dynamic_cast<C_BaseTFPlayer *>( pEntity );
 #else
 	return static_cast<C_BaseTFPlayer *>( pEntity );

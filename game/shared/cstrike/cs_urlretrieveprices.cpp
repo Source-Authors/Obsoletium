@@ -31,7 +31,7 @@
 #include "cs_gamerules.h"
 #include "cs_urlretrieveprices.h"
 
-#if _DEBUG
+#ifndef NDEBUG
 #define WEEKLY_PRICE_URL "http://gamestats/weeklyprices.dat"
 #else
 // dimhotepus: Need to update handling code to use httpS://

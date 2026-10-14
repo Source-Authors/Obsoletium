@@ -168,7 +168,7 @@ CAudioSourceWave::CAudioSourceWave( CSfxTable *pSfx, CAudioSourceCachedInfo *inf
 
 CAudioSourceWave::~CAudioSourceWave( void )
 {
-#if _DEBUG
+#ifndef NDEBUG
 	if ( !CanDelete() )
 		Assert(0);
 #endif

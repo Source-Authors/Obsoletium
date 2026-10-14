@@ -320,7 +320,7 @@ public:
 		m_pDispHullData = new byte[totalHullData];
 		byte *pData = (byte *)(pDataSize + pLump->numDisplacements);
 		memcpy( m_pDispHullData, pData, totalHullData );
-#if _DEBUG
+#ifndef NDEBUG
 		intp offset = pData - ((byte *)pLump);
 		Assert( offset + totalHullData == lumpSize );
 #endif

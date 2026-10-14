@@ -3195,7 +3195,7 @@ void CViewRender::DrawMonitors( const CViewSetup &cameraView )
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
 	// dimhotepus: Make debug only.
-#if _DEBUG
+#ifndef NDEBUG
 	g_bRenderingCameraView = true;
 #endif
 

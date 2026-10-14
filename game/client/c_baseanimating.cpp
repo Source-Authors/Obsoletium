@@ -2046,7 +2046,7 @@ void C_BaseAnimating::StandardBlendingRules( CStudioHdr *hdr, Vector pos[], Quat
 	UnragdollBlend( hdr, pos, q, currentTime );
 
 #ifdef STUDIO_ENABLE_PERF_COUNTERS
-#if _DEBUG
+#ifndef NDEBUG
 	if (Q_stristr( hdr->pszName(), r_sequence_debug.GetString()) != NULL)
 	{
 		DevMsgRT( "layers %4d : bones %4d : animated %4d\n", hdr->m_nPerfAnimationLayers, hdr->m_nPerfUsedBones, hdr->m_nPerfAnimatedBones );

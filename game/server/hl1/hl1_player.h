@@ -157,7 +157,7 @@ inline CHL1_Player *ToHL1Player( CBaseEntity *pEntity )
 {
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;
-#if _DEBUG
+#ifndef NDEBUG
 	return dynamic_cast<CHL1_Player *>( pEntity );
 #else
 	return static_cast<CHL1_Player *>( pEntity );

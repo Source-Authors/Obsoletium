@@ -130,7 +130,7 @@ CClientFrame *CClientFrameManager::GetClientFrame( int nTick, bool bExact )
 int	CClientFrameManager::CountClientFrames( void )
 {
 
-#if _DEBUG
+#ifndef NDEBUG
 	int count = 0;
 	CClientFrame *f = m_Frames;
 	while ( f )

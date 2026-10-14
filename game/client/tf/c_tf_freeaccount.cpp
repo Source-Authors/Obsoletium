@@ -314,7 +314,7 @@ GC_REG_JOB( GCSDK::CGCClient, CGCFreeTrialConvertedToPremium, "CGCFreeTrialConve
 //-----------------------------------------------------------------------------
 // External API
 
-#if _DEBUG
+#ifndef NDEBUG
 ConVar tf_forcetrialaccount( "tf_forcetrialaccount", "0", FCVAR_CLIENTDLL | FCVAR_ARCHIVE );
 #endif
 
@@ -324,7 +324,7 @@ ConVar tf_thank_a_friend_enabled( "tf_thank_a_friend_enabled", "1", FCVAR_CLIENT
 
 bool IsFreeTrialAccount()
 {
-#if _DEBUG
+#ifndef NDEBUG
 	if ( tf_forcetrialaccount.GetBool() )
 		return true;
 #endif

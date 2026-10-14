@@ -68,7 +68,7 @@ public:
 
 	// IPhysicsCollisionSolver
 	int		ShouldCollide( IPhysicsObject *pObj0, IPhysicsObject *pObj1, void *pGameData0, void *pGameData1 );
-#if _DEBUG
+#ifndef NDEBUG
 	int		ShouldCollide_2( IPhysicsObject *pObj0, IPhysicsObject *pObj1, void *pGameData0, void *pGameData1 );
 #endif
 	// debugging collision problem in TF2
@@ -200,7 +200,7 @@ void PhysicsReset()
 ConVar cl_ragdoll_collide( "cl_ragdoll_collide", "0" );
 
 int CCollisionEvent::ShouldCollide( IPhysicsObject *pObj0, IPhysicsObject *pObj1, void *pGameData0, void *pGameData1 )
-#if _DEBUG
+#ifndef NDEBUG
 {
 	int x0 = ShouldCollide_2(pObj0, pObj1, pGameData0, pGameData1);
 	int x1 = ShouldCollide_2(pObj1, pObj0, pGameData1, pGameData0);

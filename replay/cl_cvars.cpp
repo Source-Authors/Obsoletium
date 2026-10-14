@@ -46,7 +46,7 @@ ConVar replay_sentrycamoffset_updown( "replay_sentrycamoffset_updown", "22", FCV
 ConVar replay_maxconcurrentdownloads( "replay_maxconcurrentdownloads", "3", FCVAR_DONTRECORD, "The maximum number of concurrent downloads allowed.", true, 1.0f, true, 16.0f );
 ConVar replay_forcereconstruct( "replay_forcereconstruct", "0", FCVAR_DONTRECORD, "Force the reconstruction of replays each time." );
 
-#if _DEBUG
+#ifndef NDEBUG
 ConVar replay_simulate_size_discrepancy( "replay_simulate_size_discrepancy", "0", FCVAR_DONTRECORD, "(Client-side) Simulate a downloaded session info saying a block should be X bytes and the downloaded data being Y bytes" );
 ConVar replay_simulate_bad_hash( "replay_simulate_bad_hash", "0", FCVAR_DONTRECORD, "(Client-side) Simulate a downloaded session info specifying an MD5 digest that is different than what is calculated for a downloaded block on the client" );
 ConVar replay_simulate_evil_download_size( "replay_simulate_evil_download_size", "0", FCVAR_DONTRECORD, "(Client-side) Simulate a maliciously large block or session info file size." );

@@ -84,7 +84,7 @@ CViewRender g_DefaultViewRender;
 IViewRender *view = NULL;	// set in cldll_client_init.cpp if no mod creates their own
 
 // dimhotepus: Make debug only.
-#if _DEBUG
+#ifndef NDEBUG
 bool g_bRenderingCameraView = false;
 #endif
 

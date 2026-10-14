@@ -349,7 +349,7 @@ public:
 	}
 
 
-#if _DEBUG
+#ifndef NDEBUG
 	// Validate the integrity of the hashtable
 	void DbgCheckIntegrity() const;
 #endif
@@ -782,7 +782,7 @@ UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::Nex
 }
 
 
-#if _DEBUG
+#ifndef NDEBUG
 template <typename KeyT, typename ValueT, typename KeyHashT, typename KeyIsEqualT, typename AltKeyT>
 void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DbgCheckIntegrity() const
 {

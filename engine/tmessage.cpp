@@ -526,7 +526,7 @@ void TextMessageParse( byte *pMemFile, int fileSize )
 		pCurrentText += strlen( pCurrentText ) + 1;
 	}
 
-#if _DEBUG
+#ifndef NDEBUG
 	if ( (pCurrentText - (char *)gMessageTable) != (textHeapSize + nameHeapSize + messageSize) )
 		ConMsg("Overflow text message buffer!!!!!\n");
 #endif

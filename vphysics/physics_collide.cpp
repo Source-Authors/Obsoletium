@@ -1271,7 +1271,7 @@ void CPhysicsCollision::InitBBoxCache()
 		
 		m_bboxVertMap[i] = nearest;
 
-#if _DEBUG
+#ifndef NDEBUG
 		for ( int k = 0; k < i; k++ )
 		{
 			Assert( m_bboxVertMap[k] != m_bboxVertMap[i] );
@@ -1669,7 +1669,7 @@ void CPhysicsCollision::VCollideUnload( vcollide_t *pVCollide )
 {
 	for ( int i = 0; i < pVCollide->solidCount; i++ )
 	{
-#if _DEBUG
+#ifndef NDEBUG
 		// HACKHACK: 1024 is just "some big number"
 		// GetActiveEnvironmentByIndex() will eventually return NULL when there are no more environments.
 		// In HL2 & TF2, there are only 2 environments - so j > 1 is probably an error!

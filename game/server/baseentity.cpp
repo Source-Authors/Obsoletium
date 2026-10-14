@@ -386,7 +386,7 @@ CBaseEntity::CBaseEntity( bool bServerOnly )
 	m_nSimulationTick = -1;
 	SetIdentityMatrix( m_rgflCoordinateFrame );
 	m_pBlocker = NULL;
-#if _DEBUG
+#ifndef NDEBUG
 	m_iCurrentThinkContext = NO_THINK_CONTEXT;
 #endif
 	m_nWaterTouch = m_nSlimeTouch = 0;
@@ -3392,7 +3392,7 @@ void CBaseEntity::OnRestore()
 		}
 		if ( pChild != this )
 		{
-#if _DEBUG
+#ifndef NDEBUG
 			// generally this means you've got something marked FCAP_DONT_SAVE
 			// in a hierarchy.  That's probably ok given this fixup, but the hierarhcy
 			// linked list is just saved/loaded in-place

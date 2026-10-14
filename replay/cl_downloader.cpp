@@ -148,7 +148,7 @@ void CHttpDownloader::Think()
 		// Security measure: make sure the file size isn't outrageous
 		const bool bEvilFileSize = m_pThreadState->nBytesTotal &&
 			m_pThreadState->nBytesTotal >= DOWNLOAD_MAX_SIZE;
-#if _DEBUG
+#ifndef NDEBUG
 		extern ConVar replay_simulate_evil_download_size;
 		if ( replay_simulate_evil_download_size.GetBool() || bEvilFileSize )
 #else
@@ -161,7 +161,7 @@ void CHttpDownloader::Think()
 
 		bool bConnecting = false;	// For fall-through in HTTP_CONNECTING case.
 
-#if _DEBUG
+#ifndef NDEBUG
 		extern ConVar replay_simulatedownloadfailure;
 		if ( replay_simulatedownloadfailure.GetInt() == 1 )
 		{

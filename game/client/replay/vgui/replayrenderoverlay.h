@@ -47,7 +47,7 @@ private:
 private:
 	MESSAGE_FUNC_PTR( OnCheckButtonChecked, "CheckButtonChecked", pPanel );
 
-#if _DEBUG
+#ifndef NDEBUG
 	bool				m_bReloadScheme;
 #endif
 

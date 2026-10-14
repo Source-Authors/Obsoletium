@@ -980,7 +980,7 @@ void CReplayRenderer::ClearToBlack( CTextureReference &buf, int x, int y, int nW
 
 void CReplayRenderer::RenderVideo()
 {
-#if _DEBUG
+#ifndef NDEBUG
 	static ConVarRef replay_fake_render( "replay_fake_render" );
 	if ( replay_fake_render.IsValid() && replay_fake_render.GetBool() )
 		return;

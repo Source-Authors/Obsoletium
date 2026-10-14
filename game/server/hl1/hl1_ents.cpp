@@ -224,7 +224,7 @@ public:
 	void ManagerThink ( void );
 	void ManagerUse   ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 
-#if _DEBUG
+#ifndef NDEBUG
 	void ManagerReport( void );
 #endif
 
@@ -262,7 +262,7 @@ BEGIN_DATADESC( CMultiManager )
 	// Function Pointers
 	DEFINE_FUNCTION( ManagerThink ),
 	DEFINE_FUNCTION( ManagerUse ),
-#if _DEBUG
+#ifndef NDEBUG
 	DEFINE_FUNCTION( ManagerReport ),
 #endif
 
@@ -391,7 +391,7 @@ void CMultiManager::ManagerUse ( CBaseEntity *pActivator, CBaseEntity *pCaller, 
 }
 
 
-#if _DEBUG
+#ifndef NDEBUG
 void CMultiManager::ManagerReport ( void )
 {
 	int	cIndex;

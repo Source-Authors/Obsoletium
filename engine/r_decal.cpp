@@ -1863,7 +1863,7 @@ CDecalVert* R_DecalSetupVerts( decalcontext_t &context, decal_t *pDecal, Surface
 		if ( pDecal->clippedVertCount )
 		{
 
-#if _DEBUG
+#ifndef NDEBUG
 			// squash vector copy asserts in debug
 			int nextVert = NEXT_MULTIPLE_OF_4(pDecal->clippedVertCount);
 			if ( (nextVert - pDecal->clippedVertCount) < 4 )

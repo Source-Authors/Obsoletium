@@ -180,7 +180,7 @@ void CMapViewLogical::OnRenderListDirty()
 //-----------------------------------------------------------------------------
 void CMapViewLogical::AddToRenderLists( CMapClass *pObject )
 {
-#if _DEBUG && 0
+#if !defined(NDEBUG) && 0
 	CMapEntity	*pEntity = dynamic_cast<CMapEntity *>(pObject);
 	if (pEntity)
 	{

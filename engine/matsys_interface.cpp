@@ -2093,7 +2093,7 @@ void SurfComputeTextureCoordinate( SurfaceCtx_t const& ctx, SurfaceHandle_t surf
 	uv.y /= pTexInfo->material->GetMappingHeight();
 }
 
-#if _DEBUG
+#ifndef NDEBUG
 void CheckTexCoord( float coord )
 {
 	Assert(coord <= 1.0f );
@@ -2130,7 +2130,7 @@ void SurfComputeLightmapCoordinate( SurfaceCtx_t const& ctx, SurfaceHandle_t sur
 
 		Assert( uv.IsValid() );
 	}
-#if _DEBUG
+#ifndef NDEBUG
 	// This was here for check against displacements and they actually get calculated later correctly.
 //	CheckTexCoord( uv.x );
 //	CheckTexCoord( uv.y );

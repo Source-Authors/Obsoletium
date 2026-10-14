@@ -17,7 +17,7 @@
 #include "tier0/dbg.h"
 
 
-#if _DEBUG
+#ifndef NDEBUG
 #define BITBUF_INLINE inline
 #else
 #define BITBUF_INLINE FORCEINLINE

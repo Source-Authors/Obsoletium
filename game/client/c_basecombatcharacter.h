@@ -169,7 +169,7 @@ inline C_BaseCombatCharacter *ToBaseCombatCharacter( C_BaseEntity *pEntity )
 	if ( !pEntity || !pEntity->IsBaseCombatCharacter() )
 		return NULL;
 
-#if _DEBUG
+#ifndef NDEBUG
 	return dynamic_cast<C_BaseCombatCharacter *>( pEntity );
 #else
 	return static_cast<C_BaseCombatCharacter *>( pEntity );

@@ -7087,7 +7087,7 @@ void MXR_GetMixGroupFromSoundsource( channel_t *pchan, SoundSource soundsource, 
 		fmatch = true;
 
 		// check directory or name substring
-#if _DEBUG
+#ifndef NDEBUG
 		// check dir table is correct in CSfxTable cache
 		if ( prule->szdir[ 0 ] && Q_stristr( sndname, prule->szdir ) )
 		{

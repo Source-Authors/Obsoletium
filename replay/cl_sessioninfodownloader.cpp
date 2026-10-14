@@ -101,7 +101,7 @@ void CSessionInfoDownloader::OnDownloadComplete( CHttpDownloader *pDownloader, c
 
 	bool bUpdatedSomething = false;
 
-#if _DEBUG
+#ifndef NDEBUG
 	extern ConVar replay_simulatedownloadfailure;
 	const bool bForceError = replay_simulatedownloadfailure.GetInt() == 2;
 #else

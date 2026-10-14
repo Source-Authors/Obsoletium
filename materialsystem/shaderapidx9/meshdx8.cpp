@@ -4536,7 +4536,7 @@ VertexFormat_t CBufferedMeshDX8::GetVertexFormat( ) const
 
 void CBufferedMeshDX8::SetMaterial( IMaterial* pMaterial )
 {
-#if _DEBUG
+#ifndef NDEBUG
 	Assert( m_pMesh );
 	m_pMesh->SetMaterial( pMaterial );
 #endif
@@ -4544,7 +4544,7 @@ void CBufferedMeshDX8::SetMaterial( IMaterial* pMaterial )
 
 void CBufferedMeshDX8::ValidateData( int nVertexCount, int nIndexCount, const MeshDesc_t & spewDesc )
 {
-#if _DEBUG
+#ifndef NDEBUG
 	Assert( m_pMesh );
 	m_pMesh->ValidateData( nVertexCount, nIndexCount, spewDesc );
 #endif

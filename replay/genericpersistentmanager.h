@@ -291,7 +291,7 @@ void CGenericPersistentManager< T >::RemoveFromIndex( int it )
 	{
 		CUtlString strFullFilename = pObj->GetFullFilename();
 		bool bSimulateDelete = false;
-#if _DEBUG
+#ifndef NDEBUG
 		extern ConVar replay_fileserver_simulate_delete;
 		bSimulateDelete = replay_fileserver_simulate_delete.GetBool();
 #endif

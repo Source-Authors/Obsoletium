@@ -462,7 +462,7 @@ inline unsigned short CSaveRestoreSegment::FindCreateSymbol( const char *pszToke
 	// dimhotepus: unsigned short -> uintp.
 	uintp hash = HashString( pszToken ) % (uintp)tokenCount;
 	
-#if _DEBUG
+#ifndef NDEBUG
 	[[maybe_unused]] static int tokensparsed = 0;
 	tokensparsed++;
 	if ( !tokenCount || !pTokens )
@@ -473,7 +473,7 @@ inline unsigned short CSaveRestoreSegment::FindCreateSymbol( const char *pszToke
 
 	for ( intp i=0; i<tokenCount; i++ )
 	{
-#if _DEBUG
+#ifndef NDEBUG
 		static bool beentheredonethat = false;
 		if ( i > 50 && !beentheredonethat )
 		{

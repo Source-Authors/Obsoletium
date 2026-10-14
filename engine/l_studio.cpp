@@ -2347,7 +2347,7 @@ bool CModelRender::DrawModelSetup( ModelRenderInfo_t &pInfo, DrawModelState_t *p
 	return false;
 #endif
 
-#if _DEBUG
+#ifndef NDEBUG
 	if ( (char*)pInfo.pRenderable < (char*)1024 )
 	{
 		Error( "CModelRender::DrawModel: pRenderable == 0x%p", pInfo.pRenderable );
@@ -2495,7 +2495,7 @@ int	CModelRender::DrawModelExStaticProp( ModelRenderInfo_t &pInfo )
 #ifndef SWDS
 	bool bShadowDepth = ( pInfo.flags & STUDIO_SHADOWDEPTHTEXTURE ) != 0;
 
-#if _DEBUG
+#ifndef NDEBUG
 	if ( (char*)pInfo.pRenderable < (char*)1024 )
 	{
 		Error( "CModelRender::DrawModel: pRenderable == %p", pInfo.pRenderable );

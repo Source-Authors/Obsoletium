@@ -1960,7 +1960,7 @@ studiohdr_t *CMDLCache::GetStudioHdr( MDLHandle_t handle )
 	// Assert( m_pModelCacheSection->IsFrameLocking() );
 	// Assert( m_pMeshCacheSection->IsFrameLocking() );
 
-#if _DEBUG
+#ifndef NDEBUG
 	VPROF_INCREMENT_COUNTER( "GetStudioHdr", 1 );
 #endif
 	studiohdr_t *pHdr = (studiohdr_t*)CheckData( m_MDLDict[handle]->m_MDLCache, MDLCACHE_STUDIOHDR );

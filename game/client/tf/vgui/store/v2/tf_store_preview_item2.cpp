@@ -477,7 +477,7 @@ int CTFStorePreviewItemPanel2::PlaceControl( Panel *pParent, const char *pContro
 
 	pControlB->SetVisible( true );
 
-#if _DEBUG
+#ifndef NDEBUG
 	/*
 	Msg( "control A: %s  size: w=%i  h=%i   pos: (%i, %i)\n", pControlNameA, aSize[0], aSize[1], aPos[0], aPos[1] );
 	int x,y;

@@ -628,7 +628,7 @@ void CPerformanceController::RemoveDuplicateEventsFromQueue()
 
 		if ( bDitchEvent )
 		{
-#if _DEBUG
+#ifndef NDEBUG
 			CUtlBuffer buf;
 			pCurEvent->RecursiveSaveToFile( buf, 1 );
 			IF_REPLAY_DBG( Warning( "Ditching event of type %s\n...", buf.Base<const char>() ) );

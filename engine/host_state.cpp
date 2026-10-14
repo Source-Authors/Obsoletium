@@ -592,7 +592,7 @@ void CHostState::State_Restart()
 //-----------------------------------------------------------------------------
 void CHostState::FrameUpdate( float time )
 {
-#if _DEBUG
+#ifndef NDEBUG
 	int loopCount = 0;
 #endif
 
@@ -656,7 +656,7 @@ void CHostState::FrameUpdate( float time )
 		// Only HS_RUN is allowed to persist across loops!!!
 		// Also, detect circular state graphs (more than 8 cycling changes is probably a loop)
 		// NOTE: In the current graph, there are at most 2.
-#if _DEBUG
+#ifndef NDEBUG
 		if ( (m_currentState == oldState) || (++loopCount > 8) )
 		{
 			Host_Error( "state crash!\n" );

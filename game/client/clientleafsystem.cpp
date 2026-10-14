@@ -1293,7 +1293,7 @@ void CClientLeafSystem::RenderableChanged( ClientRenderHandle_t handle )
 		m_Renderables[handle].m_Flags |= RENDER_FLAGS_HASCHANGED;
 		m_DirtyRenderables.AddToTail( handle );
 	}
-#if _DEBUG
+#ifndef NDEBUG
 	else
 	{
 		// It had better be in the list

@@ -2659,7 +2659,7 @@ CReplayPerformanceEditorPanel *ReplayUI_GetPerformanceEditor()
 	return g_ReplayPerformanceEditorPanel;
 }
 
-#if _DEBUG
+#ifndef NDEBUG
 CON_COMMAND_F( replay_showperfeditor, "Show performance editor", FCVAR_CLIENTDLL )
 {
 	ReplayUI_ClosePerformanceEditor();

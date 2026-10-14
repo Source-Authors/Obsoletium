@@ -6574,7 +6574,7 @@ void CAI_BaseNPC::SetupVPhysicsHull()
 		{
 			pPhysObj->SetMass( mass );
 		}
-#if _DEBUG
+#ifndef NDEBUG
 		else
 		{
 			DevMsg("Warning: %s has no physical mass\n", STRING(GetModelName()));
@@ -8134,12 +8134,12 @@ void CAI_BaseNPC::HandleAnimEvent( animevent_t *pEvent )
 		{
 			m_lifeState = LIFE_DYING;
 			// Kill me now! (and fade out when CineCleanup() is called)
-#if _DEBUG
+#ifndef NDEBUG
 			DevMsg( 2, "Death event: %s\n", GetClassname() );
 #endif
 			m_iHealth = 0;
 		}
-#if _DEBUG
+#ifndef NDEBUG
 		else
 			DevWarning( 2, "INVALID death event:%s\n", GetClassname() );
 #endif

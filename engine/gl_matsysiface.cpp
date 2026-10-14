@@ -530,7 +530,7 @@ void MaterialSystem_CreateSortinfo( void )
 	{
 		SurfaceHandle_t surfID = SurfaceHandleFromIndex( surfaceIndex );
 		int sortID = MSurf_MaterialSortID( surfID );
-#if _DEBUG
+#ifndef NDEBUG
 		IMaterial *pMaterial = MSurf_TexInfo( surfID )->material;
 
 		if ( !HushAsserts() )

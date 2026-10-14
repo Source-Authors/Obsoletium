@@ -118,7 +118,7 @@ struct alignas(4) serializedstudioptr_t
 
 	serializedstudioptr_t() : m_pData{nullptr}
 	{ 
-#if _DEBUG && !defined( PLATFORM_64BITS )
+#if !defined(NDEBUG) && !defined( PLATFORM_64BITS )
 		padding = 0; 
 #endif
 	}

@@ -3213,7 +3213,7 @@ public:
 	{
 		m_pRef = GetTypedRef();
 		m_unSchemaGeneration = GEconItemSchema().GetResetCount();
-#if _DEBUG
+#ifndef NDEBUG
 		m_unVersion_Debug = GEconItemSchema().GetVersion();
 #endif
 	}
@@ -3225,12 +3225,12 @@ public:
 		{
 			m_pRef = GetTypedRef();
 			m_unSchemaGeneration = unSchemaGeneration;
-#if _DEBUG
+#ifndef NDEBUG
 			m_unVersion_Debug = GEconItemSchema().GetVersion();
 #endif
 		}
 
-#if _DEBUG
+#ifndef NDEBUG
 		Assert( m_unVersion_Debug == GEconItemSchema().GetVersion() );
 #endif
 		return m_pRef;
@@ -3254,7 +3254,7 @@ private:
 
 	mutable const T *m_pRef;
 	mutable uint32 m_unSchemaGeneration;
-#if _DEBUG
+#ifndef NDEBUG
 	mutable uint32 m_unVersion_Debug;
 #endif
 };

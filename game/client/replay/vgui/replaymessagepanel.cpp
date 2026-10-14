@@ -22,7 +22,7 @@
 
 //-----------------------------------------------------------------------------
 
-#if _DEBUG
+#ifndef NDEBUG
 CON_COMMAND( testreplaymessagepanel, "" )
 {
 	CReplayMessagePanel *pPanel = new CReplayMessagePanel( "#Replay_StartRecord", replay_msgduration_misc.GetFloat(), rand()%2==0);

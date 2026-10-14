@@ -650,7 +650,7 @@ inline C_BasePlayer *ToBasePlayer( C_BaseEntity *pEntity )
 	if ( !pEntity || !pEntity->IsPlayer() )
 		return NULL;
 
-#if _DEBUG
+#ifndef NDEBUG
 	Assert( dynamic_cast<C_BasePlayer *>( pEntity ) != NULL );
 #endif
 

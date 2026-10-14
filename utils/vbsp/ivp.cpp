@@ -521,7 +521,7 @@ CPhysConvex *CPlaneList::BuildConvexForBrush( int brushnumber, float shrink, CPh
 			// NOTE: The object must be at least "shrinkMinimum" inches wide on each axis
 			if ( fabs(thick) < shrinkMinimum )
 			{
-#if _DEBUG
+#ifndef NDEBUG
 				Warning("Can't shrink brush %d, plane %d (%.2f, %.2f, %.2f)\n", brushnumber, pside->planenum, pplane->normal[0], pplane->normal[1], pplane->normal[2] );
 #endif
 				shrinkThisPlane = 0;

@@ -563,7 +563,7 @@ public:
 	{
 		if ( !m_grid.Count() )
 		{
-#if _DEBUG
+#ifndef NDEBUG
 			Warning("Query before nav mesh is loaded! %d\n", TheNavAreas.Count() );
 #endif
 			return true;

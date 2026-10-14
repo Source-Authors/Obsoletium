@@ -204,7 +204,7 @@ void CSessionBlockDownloader::OnDownloadComplete( CHttpDownloader *pDownloader, 
 
 	HTTPStatus_t nStatus = pDownloader->GetStatus();
 
-#if _DEBUG
+#ifndef NDEBUG
 	extern ConVar replay_simulatedownloadfailure;
 	if ( replay_simulatedownloadfailure.GetInt() == 3 )
 	{
@@ -224,7 +224,7 @@ void CSessionBlockDownloader::OnDownloadComplete( CHttpDownloader *pDownloader, 
 		{
 			unsigned char aLocalHash[16];
 
-#if _DEBUG
+#ifndef NDEBUG
 			extern ConVar replay_simulate_size_discrepancy;
 			extern ConVar replay_simulate_bad_hash;
 
