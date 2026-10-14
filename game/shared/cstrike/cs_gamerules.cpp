@@ -3357,7 +3357,7 @@ ConVar cl_autohelp(
 		return 1;
 	}
 
-#if defined (_DEBUG)
+#if !defined(NDEBUG)
 	void TestRoundWinpanel( void )
 	{
 		IGameEvent *event = gameeventmanager->CreateEvent( "round_end" );

@@ -1347,7 +1347,7 @@ ICollideable *CEngineTraceServer::GetWorldCollideable()
 //-----------------------------------------------------------------------------
 void EngineTraceRenderRayCasts()
 {
-#if defined _DEBUG && !defined SWDS
+#if !defined(NDEBUG) && !defined(SWDS)
 	if( debugrayenable.GetBool() && s_FrameRays.Count() > debugraylimit.GetInt() && !debugrayreset.GetInt() )
 	{
 		Warning( "m_FrameRays.Count() == %zd\n", s_FrameRays.Count() );
@@ -1667,7 +1667,7 @@ CON_COMMAND_EXTERN( ray_bench, RayBench, "Time the rays" )
 //-----------------------------------------------------------------------------
 void CEngineTrace::TraceRay( const Ray_t &ray, unsigned int fMask, ITraceFilter *pTraceFilter, trace_t *pTrace )
 {	
-#if defined _DEBUG && !defined SWDS
+#if !defined(NDEBUG) && !defined(SWDS)
 	if( debugrayenable.GetBool() )
 	{
 		s_FrameRays.AddToTail( ray );

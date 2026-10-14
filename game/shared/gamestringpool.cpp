@@ -30,7 +30,7 @@ class CGameStringPool : public CBaseGameSystem
 
 	void FreeAll()
 	{
-#if 0 && _DEBUG
+#if 0 && !defined(NDEBUG)
 		m_Strings.DbgCheckIntegrity();
 		m_KeyLookupCache.DbgCheckIntegrity();
 #endif

@@ -1156,7 +1156,7 @@ extern "C" __declspec(allocator) void * __cdecl _recalloc_dbg
 // Most files include this file, so when it's used it adds an extra .ValveDbg section,
 // to help identify debug binaries.
 #ifdef _WIN32
-	#ifndef NDEBUG // _DEBUG
+	#ifndef NDEBUG
 		#pragma data_seg("ValveDBG") 
 		volatile const char* DBG = "*** DEBUG STUB ***";
 	#endif

@@ -6913,7 +6913,7 @@ public:
 };
 GC_REG_JOB( GCSDK::CGCClient, CGC_RespawnPostLoadoutChange, "CGC_RespawnPostLoadoutChange", k_EMsgGCRespawnPostLoadoutChange, GCSDK::k_EServerTypeGCClient );
 
-#if defined (_DEBUG)
+#if !defined(NDEBUG)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -20294,7 +20294,7 @@ CON_COMMAND_F( item_testitem, "Creates a server-side item of the specified type,
 			pNewItem->GiveTo( pPlayer );
 		}
 
-#if defined (_DEBUG)
+#if !defined(NDEBUG)
 		DebugEconItemView( "Generated", pScriptItem );
 #endif
 	}

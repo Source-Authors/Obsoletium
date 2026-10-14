@@ -396,7 +396,7 @@ public:
 
 	void Test()
 	{
-#if !defined( DEDICATED ) && _DEBUG
+#if !defined( DEDICATED ) && !defined(NDEBUG)
 		// This gets called after interfaces are hooked up, and before any of the 
 		// internal replay systems get init'd.
 		CTestManager::Test();

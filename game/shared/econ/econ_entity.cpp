@@ -726,7 +726,7 @@ bool CEconEntity::ValidateEntityAttachedToPlayer( bool &bShouldRetry )
 
 		if ( FStrEq( pszClientModel, pszScriptModel ) == false )
 		{
-#if defined( STAGING_ONLY ) && defined _DEBUG
+#if defined( STAGING_ONLY ) && !defined(NDEBUG)
 			CUtlString strScriptModel( pszScriptModel );
 			strScriptModel.FixSlashes();
 			CUtlString strClientModel( pszClientModel );
