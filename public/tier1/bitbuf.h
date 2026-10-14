@@ -50,7 +50,7 @@ enum BitBufErrorType {
 using BitBufErrorHandler = void (*)(BitBufErrorType errorType, const char *pDebugName );
 
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	extern void InternalBitBufErrorHandler( BitBufErrorType errorType, const char *pDebugName );
 	inline void CallErrorHandler( BitBufErrorType errorType, const char *pDebugName )
 	{

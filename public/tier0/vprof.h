@@ -938,7 +938,7 @@ inline void CVProfile::EnterScope( const tchar *pszName, int detailLevel, const 
 		}
 		m_pBudgetGroups[m_pCurNode->GetBudgetGroupID()].m_BudgetFlags |= budgetFlags;
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 		if ( bAssertAccounted )
 		{
 			// FIXME

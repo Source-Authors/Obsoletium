@@ -888,7 +888,7 @@ CWaveFile	*CWaveBrowser::FindEntry( char const *wavname, bool jump /*= false*/ )
 	if ( idx != m_AllSounds.InvalidIndex() )
 	{
 		CWaveFile *wav = m_AllSounds[ idx ];
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 		char const *name = wav->GetName();
 		NOTE_UNUSED( name );
 #endif

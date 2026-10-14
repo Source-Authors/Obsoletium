@@ -239,7 +239,7 @@ CMeasureSectionInstance::~CMeasureSectionInstance( void )
 //-----------------------------------------------------------------------------
 void ResetTimeMeasurements( void )
 {
-#if defined( _DEBUG ) || defined( FORCE_MEASURE )
+#if !defined(NDEBUG) || defined( FORCE_MEASURE )
 	bool sort_reset = false;
 
 	// Time to redo sort?

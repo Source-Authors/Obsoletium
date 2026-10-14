@@ -264,7 +264,7 @@ void CPrediction::OnReceivedUncompressedPacket( void )
 void CPrediction::PreEntityPacketReceived ( int commands_acknowledged, int current_world_update_packet )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	char sz[ 32 ];
 	V_sprintf_safe( sz, "preentitypacket%d", commands_acknowledged );
 	PREDICTION_TRACKVALUECHANGESCOPE( sz );
@@ -389,7 +389,7 @@ void CPrediction::PostNetworkDataReceived( int commands_acknowledged )
 	VPROF( "CPrediction::PostNetworkDataReceived" );
 
 	bool error_check = ( commands_acknowledged > 0 ) ? true : false;
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	char szDebug[32];
 	Q_snprintf( szDebug, sizeof( szDebug ), "postnetworkdata%d", commands_acknowledged );
 	PREDICTION_TRACKVALUECHANGESCOPE( szDebug );
@@ -802,7 +802,7 @@ void CPrediction::RunCommand( C_BasePlayer *player, CUserCmd *ucmd, IMoveHelper 
 {
 #if !defined( NO_ENTITY_PREDICTION )
 	VPROF( "CPrediction::RunCommand" );
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	char sz[ 32 ];
 	Q_snprintf( sz, sizeof( sz ), "runcommand%04d", ucmd->command_number );
 	PREDICTION_TRACKVALUECHANGESCOPE( sz );

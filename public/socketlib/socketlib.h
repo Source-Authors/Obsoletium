@@ -99,7 +99,7 @@ enum SocketState_t				// State of a given socket.
 	#define VDP_SUPPORT_ENABLED 0
 #endif
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	#define UNSECURE_SOCKETS_ENABLED 1
 #else
 	#define UNSECURE_SOCKETS_ENABLED 0

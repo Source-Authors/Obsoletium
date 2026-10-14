@@ -366,7 +366,7 @@ CDispUtilsHelper* TransformIntoNeighbor(
 	
 #if 0
 	// Debug check.. make sure it comes back to the same point from the other side.
-	#if defined( _DEBUG )
+	#if !defined(NDEBUG)
 		static bool bTesting = false;
 		if ( pRet && !bTesting )
 		{
@@ -849,7 +849,7 @@ void AddNeighbor( CCoreDispInfo *pMain,
 	pNeighborSub->m_Span = size_cast<unsigned char>(nbSpan);
 	pNeighborSub->m_NeighborSpan = size_cast<unsigned char>(span);
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	// Walk an iterator over the new connection to make sure it works.
 	CDispSubEdgeIterator it;
 	it.Start( pMain, iEdge, iSub );

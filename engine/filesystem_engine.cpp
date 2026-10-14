@@ -27,7 +27,7 @@ void fs_whitelist_spew_flags_changefn( IConVar *pConVar, const char *pOldValue, 
 	}
 }
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 ConVar fs_whitelist_spew_flags( "fs_whitelist_spew_flags", "0", 0,
 	"Set whitelist spew flags to a combination of these values:\n"
 	"   0x0001 - list files as they are added to the CRC tracker\n"
@@ -124,7 +124,7 @@ void FileSystem_UnloadModule(CSysModule *pModule)
 
 void FileSystem_SetWhitelistSpewFlags()
 {
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	if ( !g_pFileSystem )
 	{
 		AssertMsg( false, "FileSystem_InitSpewFlags - no filesystem." );

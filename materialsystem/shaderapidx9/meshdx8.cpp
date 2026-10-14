@@ -17,7 +17,7 @@
 #include "tier0/systeminformation.h"
 
 // fixme - stick this in a header file.
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 // define this if you want to range check all indices when drawing
 #define CHECK_INDICES
 #endif

@@ -1876,7 +1876,7 @@ int NET_SendTo( bool verbose, SOCKET s, const char FAR * buf, int len, const str
 		);
 	}
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	if ( verbose && 
 		( nSend > 0 ) && 
 		( len > MAX_ROUTABLE_PAYLOAD ) )
@@ -1887,7 +1887,7 @@ int NET_SendTo( bool verbose, SOCKET s, const char FAR * buf, int len, const str
 	return nSend;
 }
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 
 #include "filesystem.h"
 #include "filesystem_engine.h"
@@ -2086,7 +2086,7 @@ int NET_SendLong( INetChannel *chan, intp sock, socket_handle s, const char FAR 
 	
 	int nPacketCount = (sendlen + nSplitSizeMinusHeader - 1) / nSplitSizeMinusHeader;
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	if ( net_savelargesplits.GetInt() != -1 && nPacketCount >= net_savelargesplits.GetInt() )
 	{
 		char const *filename = NET_GetDebugFilename( "splitpacket" );

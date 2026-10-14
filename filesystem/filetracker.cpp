@@ -399,7 +399,7 @@ IFileList *CFileTracker2::GetFilesToUnloadForWhitelistChange( IPureServerWhiteli
 			}
 			else
 			{
-#if defined( _DEBUG ) && defined( PURE_SERVER_DEBUG_SPEW )
+#if !defined(NDEBUG) && defined( PURE_SERVER_DEBUG_SPEW )
 				Msg( "%s is OK.  Keeping\n", f.m_filename );
 #endif
 			}

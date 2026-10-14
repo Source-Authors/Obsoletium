@@ -121,7 +121,7 @@ bool CBitmapFont::Create( const char *pFontFilename, float scalex, float scaley,
 		Q_snprintf( textureName, MAX_PATH, "vgui/fonts/%s", fontName );
 		pFontTable->m_pTexture = FontManager().MaterialSystem()->FindTexture( textureName, TEXTURE_GROUP_VGUI );
 
-#if defined( _DEBUG ) && !defined( DX_TO_GL_ABSTRACTION )
+#if !defined(NDEBUG) && !defined( DX_TO_GL_ABSTRACTION )
 		if ( pFontTable->m_pBitmapFont->m_PageWidth != pFontTable->m_pTexture->GetActualWidth() ||
 			pFontTable->m_pBitmapFont->m_PageHeight != pFontTable->m_pTexture->GetActualHeight() )
 		{

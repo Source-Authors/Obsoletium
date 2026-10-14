@@ -46,7 +46,7 @@ int			g_bVCREnabled = 0;
 // ---------------------------------------------------------------------- //
 static void VCR_Error( const char *pFormat, ... )
 {
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	DebuggerBreak();
 #endif
 	char str[256];

@@ -649,7 +649,7 @@ public:
 	//
 	void FreeEntPrivateData( void *pEntity ) override
 	{
-#if defined( _DEBUG ) && defined( WIN32 )
+#if !defined(NDEBUG) && defined( WIN32 )
 		// set the memory to a known value
 		size_t size = _msize( pEntity );
 		memset( pEntity, 0xDD, size );

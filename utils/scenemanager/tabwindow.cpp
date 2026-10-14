@@ -102,7 +102,7 @@ void CTabWindow::DrawTab( CDrawHelper& drawHelper, RECT& rcClient, int tabnum, b
 	if ( tabnum < 0 || tabnum >= m_Items.Size() )
 		return;
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	CETItem *p = &m_Items[ tabnum ];
 	Assert( p );
 #endif

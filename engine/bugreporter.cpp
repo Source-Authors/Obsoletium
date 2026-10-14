@@ -109,7 +109,7 @@
 
 #define BUG_REPORTER_PUBLIC_DLLNAME "bugreporter_public" 
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 #define PUBLIC_BUGREPORT_WAIT_TIME	3
 #else
 #define PUBLIC_BUGREPORT_WAIT_TIME	15

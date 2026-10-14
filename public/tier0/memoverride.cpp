@@ -1104,7 +1104,7 @@ static ErrorHandlerRegistrar s_ErrorHandlerRegistration;
 
 }  // namespace
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
  
 // wrapper which passes no debug info; not available in debug
 #ifndef	SUPPRESS_INVALID_PARAMETER_NO_INFO
@@ -1116,7 +1116,7 @@ void __cdecl _invalid_parameter_noinfo()
 
 #endif /* defined( _DEBUG ) */
 
-#if defined( _DEBUG ) || defined( USE_MEM_DEBUG )
+#if !defined(NDEBUG) || defined( USE_MEM_DEBUG )
 
 int __cdecl __crtMessageWindowW( int , const wchar_t * , const wchar_t * ,
 								 const wchar_t * , const wchar_t *  )

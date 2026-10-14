@@ -327,7 +327,7 @@ extern ConVar mp_spectators_restricted;
 extern ConVar mp_teams_unbalance_limit;
 extern ConVar tf_tournament_classchange_allowed;
 extern ConVar tf_tournament_classchange_ready_allowed;
-#if defined( _DEBUG ) || defined( STAGING_ONLY )
+#if !defined(NDEBUG) || defined( STAGING_ONLY )
 extern ConVar mp_developer;
 #endif // _DEBUG || STAGING_ONLY 
 #ifdef STAGING_ONLY
@@ -6652,7 +6652,7 @@ void CTFPlayer::HandleCommand_JoinClass( const char *pClassName, bool bAllowSpaw
 		}
 	}
 
-#if defined( _DEBUG ) || defined( STAGING_ONLY )
+#if !defined(NDEBUG) || defined( STAGING_ONLY )
 	if ( mp_developer.GetBool() && !IsBot() )
 	{
 		Vector vPos = GetAbsOrigin();
@@ -8541,7 +8541,7 @@ int CTFPlayer::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 
 	bool bBuddha = ( m_debugOverlays & OVERLAY_BUDDHA_MODE ) ? true : false;
 
-#if defined( _DEBUG ) || defined( STAGING_ONLY )
+#if !defined(NDEBUG) || defined( STAGING_ONLY )
 	if ( mp_developer.GetInt() > 1 && !IsBot() )
 		bBuddha = true;
 #endif // _DEBUG || STAGING_ONLY
@@ -13653,7 +13653,7 @@ void CTFPlayer::RemoveAmmo( int iCount, int iAmmoIndex )
 	}
 #endif // STAGING_ONLY
 
-#if defined( _DEBUG ) || defined( STAGING_ONLY )
+#if !defined(NDEBUG) || defined( STAGING_ONLY )
 	if ( mp_developer.GetInt() > 1 && !IsBot() )
 		return;
 #endif // _DEBUG || STAGING_ONLY

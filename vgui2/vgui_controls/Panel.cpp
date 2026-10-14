@@ -4197,7 +4197,7 @@ void Panel::PerformApplySchemeSettings()
 //-----------------------------------------------------------------------------
 // Purpose: Loads panel details related to autoresize from the resource info
 //-----------------------------------------------------------------------------
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 static Panel *lastWarningParent = 0;
 #endif
 
@@ -4215,7 +4215,7 @@ void Panel::ApplyAutoResizeSettings(KeyValues *inResourceData)
 	PinCorner_e pinCorner = (PinCorner_e)inResourceData->GetInt( "PinCorner", PIN_TOPLEFT );
 
 	// dimhotepus: Correctly compute when child size depends on nonsized parent.
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	bool isParentSizeComputed = true;
 	// pinned x, pinned y, unpinned x, unpinned y.
 	bool dimension2ParentSizeUsageMap[] = {
@@ -4232,7 +4232,7 @@ void Panel::ApplyAutoResizeSettings(KeyValues *inResourceData)
 	if ( parent )
 	{
 		parent->GetSize( pw, pt );
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 		if ( pw == 64 && pt == 24 )
 		{
 			isParentSizeComputed = false;
@@ -4305,7 +4305,7 @@ void Panel::ApplyAutoResizeSettings(KeyValues *inResourceData)
 	}
 		if ( auto *kv = inResourceData->FindKey( "PinnedCornerOffsetY" ) )
 		{
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 			dimension2ParentSizeUsageMap[1] = false;
 #endif
 			nPinnedCornerOffsetY = kv->GetInt( "PinnedCornerOffsetY", nPinnedCornerOffsetY );
@@ -4319,7 +4319,7 @@ void Panel::ApplyAutoResizeSettings(KeyValues *inResourceData)
 		}
 		if ( auto *kv = inResourceData->FindKey( "UnpinnedCornerOffsetY" ) )
 		{
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 			dimension2ParentSizeUsageMap[3] = false;
 #endif
 			nUnpinnedCornerOffsetY = kv->GetInt( "UnpinnedCornerOffsetY", nUnpinnedCornerOffsetY );
@@ -4336,7 +4336,7 @@ void Panel::ApplyAutoResizeSettings(KeyValues *inResourceData)
 
 	// dimhotepus: Correctly compute when child size depends on nonsized
 	// parent.
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	if ( !isParentSizeComputed )
 	{
 		for ( bool isParentSizeUsed : dimension2ParentSizeUsageMap )
@@ -5078,7 +5078,7 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 	// iterate through the class hierarchy message maps
 	for ( ; panelMap != NULL && !bFound; panelMap = panelMap->baseMap )
 	{
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 //		[[maybe_unused]] char const *className = panelMap->pfnClassName();
 #endif
 

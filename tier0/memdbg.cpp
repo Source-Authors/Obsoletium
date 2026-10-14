@@ -283,7 +283,7 @@ struct DbgMemHeader_t
 
 //-----------------------------------------------------------------------------
 
-#if defined( _DEBUG ) && !defined( POSIX )
+#if !defined(NDEBUG) && !defined( POSIX )
 #define GetCrtDbgMemHeader( pMem ) ((CrtDbgMemHeader_t*)((DbgMemHeader_t*)pMem - 1) - 1)
 #elif defined( OSX )
 DbgMemHeader_t *GetCrtDbgMemHeader( void *pMem );
@@ -537,7 +537,7 @@ public:
 
 	void CompactHeap() override
 	{
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 		// dimhotepus: Cleanup caches and decommit if possible.
 		// If HeapSetInformation is called with HeapHandle set to NULL, then all heaps
 		// in the process with a low-fragmentation heap (LFH) will have their caches

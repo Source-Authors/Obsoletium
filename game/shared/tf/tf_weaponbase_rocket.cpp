@@ -514,7 +514,7 @@ void CTFBaseRocket::Explode( trace_t *pTrace, CBaseEntity *pOther )
 		TFGameRules()->RadiusDamage( radiusinfo );
 	}
 
-#if defined( _DEBUG ) && defined( STAGING_ONLY )
+#if !defined(NDEBUG) && defined( STAGING_ONLY )
 	// Debug!
 	if ( tf_rocket_show_radius.GetBool() )
 	{

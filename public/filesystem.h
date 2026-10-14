@@ -43,7 +43,7 @@ typedef int WaitForResourcesHandle_t;
 // Turn on some extra pure server debug spew in certain builds.
 // WARNING: This spew can be used by hackers to locate places to hack
 // the code to bypas sv_pure!  Be careful!
-#if defined( _DEBUG ) || defined( STAGING_ONLY )
+#if !defined(NDEBUG) || defined( STAGING_ONLY )
 	#define PURE_SERVER_DEBUG_SPEW
 #endif
 

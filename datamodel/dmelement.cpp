@@ -141,7 +141,7 @@ void CDmElement::Purge()
 
 	while ( m_pAttributes )
 	{
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 		// So you can see what attribute is being destroyed
 		[[maybe_unused]] const char *pName = m_pAttributes->GetName();
 #endif

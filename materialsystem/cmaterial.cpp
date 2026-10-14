@@ -341,7 +341,7 @@ private:
 	// Used only by procedural materials; it essentially is an in-memory .VMT file
 	KeyValues			*m_pVMTKeyValues;
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	// Makes it easier to see what's going on
 	char				*m_pDebugName;
 #endif
@@ -462,7 +462,7 @@ CMaterial::CMaterial( char const* materialName, const char *pTextureGroupName, K
 	// Convert it to a symbol
 	m_Name = pTemp;
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	m_pDebugName = V_strdup(pTemp);
 #endif
 
@@ -520,7 +520,7 @@ CMaterial::~CMaterial()
 
 	m_representativeTexture = NULL;
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	delete [] m_pDebugName;
 #endif
 

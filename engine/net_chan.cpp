@@ -1554,7 +1554,7 @@ inline unsigned short BufferToShortChecksum( const void *pvData, size_t nSize )
 
 // #define MIN_ROUTABLE_TESTING
 
-#if defined( _DEBUG ) || defined( MIN_ROUTABLE_TESTING )
+#if !defined(NDEBUG) || defined( MIN_ROUTABLE_TESTING )
 static ConVar net_minroutable( "net_minroutable", "16", 0, "Forces larger payloads." );
 #endif
 
@@ -1694,7 +1694,7 @@ int CNetChan::SendDatagram(bf_write *datagram)
 
 	int nMinRoutablePayload = MIN_ROUTABLE_PAYLOAD;
 
-#if defined( _DEBUG ) || defined( MIN_ROUTABLE_TESTING )
+#if !defined(NDEBUG) || defined( MIN_ROUTABLE_TESTING )
 	if ( m_Socket == NS_SERVER )
 	{
 		nMinRoutablePayload = net_minroutable.GetInt();

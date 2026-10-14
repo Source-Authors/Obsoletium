@@ -292,7 +292,7 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 	{
 		// full path failed, let LoadLibrary() try to search the PATH now
 		hDLL = Sys_LoadLibrary( pModuleName, flags );
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 		if ( !hDLL )
 		{
 			// So you can see what the error is in the debugger...

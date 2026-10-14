@@ -794,7 +794,7 @@ int64 CZipPackFileHandle::AbsoluteBaseOffset()
 	return m_pOwner->GetPackFileBaseOffset() + m_nBase;
 }
 
-#if defined( _DEBUG ) && !defined( OSX )
+#if !defined(NDEBUG) && !defined( OSX )
 #include <atomic>
 static std::atomic<int> sLZMAPackFileHandles( 0 );
 #endif // defined( _DEBUG ) && !defined( OSX )
@@ -807,7 +807,7 @@ CLZMAZipPackFileHandle::CLZMAZipPackFileHandle( CZipPackFile* pOwner, int64 nBas
 	  m_pLZMAStream( NULL ), m_nSeekPosition( 0 ), m_nOriginalSize( nOriginalSize )
 {
 	Reset();
-#if defined( _DEBUG ) && !defined( OSX )
+#if !defined(NDEBUG) && !defined( OSX )
 	if ( ++sLZMAPackFileHandles == PACKFILE_COMPRESSED_FILE_HANDLES_WARNING )
 	{
 		// By my count a live filehandle is currently around 270k, mostly due to the LZMA dictionary (256k) with the
@@ -823,7 +823,7 @@ CLZMAZipPackFileHandle::~CLZMAZipPackFileHandle()
 {
 	delete m_pLZMAStream;
 	m_pLZMAStream = NULL;
-#if defined( _DEBUG ) && !defined( OSX )
+#if !defined(NDEBUG) && !defined( OSX )
 	sLZMAPackFileHandles--;
 	Assert( sLZMAPackFileHandles >= 0 );
 #endif // defined( _DEBUG ) && !defined( OSX )

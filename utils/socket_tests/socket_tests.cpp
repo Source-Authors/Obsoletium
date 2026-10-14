@@ -18,7 +18,7 @@
 #include "tier0/fasttimer.h"
 
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	#if defined( assert )
 		#undef assert
 	#endif

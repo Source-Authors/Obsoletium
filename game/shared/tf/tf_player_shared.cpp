@@ -201,7 +201,7 @@ extern ConVar cam_idealdistright;
 
 extern ConVar tf_flamethrower_flametime;
 extern ConVar weapon_medigun_chargerelease_rate;
-#if defined( _DEBUG ) || defined( STAGING_ONLY )
+#if !defined(NDEBUG) || defined( STAGING_ONLY )
 extern ConVar mp_developer;
 #endif // _DEBUG || STAGING_ONLY
 
@@ -10248,7 +10248,7 @@ bool CTFPlayer::CanPlayerMove() const
 	bool bFreezeOnRestart = tf_player_movement_restart_freeze.GetBool();
 	if ( bFreezeOnRestart )
 	{
-#if defined( _DEBUG ) || defined( STAGING_ONLY )
+#if !defined(NDEBUG) || defined( STAGING_ONLY )
 		if ( mp_developer.GetBool() )
 			bFreezeOnRestart = false;
 #endif // _DEBUG || STAGING_ONLY

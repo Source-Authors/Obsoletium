@@ -513,7 +513,7 @@ public:
 			return;
 #endif
 
-#if defined( _DEBUG ) && !defined( CLIENT_DLL )
+#if !defined(NDEBUG) && !defined( CLIENT_DLL )
 		if ( !enginesound->IsSoundPrecached( params.soundname ) )
 		{
 			Msg( "Sound %s:%s was not precached\n", ep.m_pSoundName, params.soundname );
@@ -600,7 +600,7 @@ public:
 				WaveTrace( ep.m_pSoundName, "Emitsound" );
 			}
 
-#if defined( _DEBUG ) && !defined( CLIENT_DLL )
+#if !defined(NDEBUG) && !defined( CLIENT_DLL )
 			if ( !enginesound->IsSoundPrecached( ep.m_pSoundName ) )
 			{
 				Msg( "Sound %s was not precached\n", ep.m_pSoundName );

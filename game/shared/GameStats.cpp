@@ -63,7 +63,7 @@ extern const ConVar *sv_cheats;
 #define ONE_DAY_IN_SECONDS 86400
 
 // Lower threshold in debug for testing...
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 #define WALKED_AWAY_FROM_KEYBOARD_SECONDS 15.0f   // 15 seconds of movement == might be paused
 #else
 #define WALKED_AWAY_FROM_KEYBOARD_SECONDS 300.0f   // 5 minutes of no movement == might be paused

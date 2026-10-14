@@ -83,7 +83,7 @@ public:
 
 	void operator delete( void *pMem )				
 	{												
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 		size_t size = _msize( pMem );					
 		memset( pMem, 0xcd, size );					
 #endif

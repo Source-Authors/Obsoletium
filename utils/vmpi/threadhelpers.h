@@ -28,7 +28,7 @@ class CCriticalSection {
   char m_CS[SIZEOF_CS];
 
   // Used to protect against deadlock in debug mode.
-  // #if defined( _DEBUG )
+  // #if !defined(NDEBUG)
   CUtlLinkedList<unsigned long, int> m_Locks;
 
   char m_DeadlockProtect[SIZEOF_CS];

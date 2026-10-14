@@ -1508,7 +1508,7 @@ CAudioSource *CreateWave( CSfxTable *pSfx, bool bStreaming )
 {
 	Assert( pSfx );
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	// For some reason you can't usually do pSfx->getname() in the dev studio debugger, so for convenience we'll grab the name
 	// here in debug builds at least...
 	[[maybe_unused]] char const *pName = pSfx->getname();
@@ -2070,7 +2070,7 @@ void CAudioSourceCachedInfoHandle_t::InvalidateCache()
 //-----------------------------------------------------------------------------
 bool CAudioSourceCache::Init( size_t memSize )
 {
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	Msg( "CAudioSourceCache: Init\n" );
 #endif
 
@@ -2162,7 +2162,7 @@ CAudioSourceCache::SearchPathCache *CAudioSourceCache::CreateCacheForSearchPath(
 //-----------------------------------------------------------------------------
 void CAudioSourceCache::Shutdown()
 {
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	Msg( "CAudioSourceCache: Shutdown\n" );
 #endif
 

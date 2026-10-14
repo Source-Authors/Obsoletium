@@ -431,7 +431,7 @@ void IN_BreakDown( const CCommand &args ) { KeyDown( &in_break , args[1] );}
 void IN_BreakUp( const CCommand &args )
 { 
 	KeyUp( &in_break, args[1] ); 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	DebuggerBreak();
 #endif
 };

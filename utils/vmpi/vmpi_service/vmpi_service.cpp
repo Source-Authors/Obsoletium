@@ -1176,7 +1176,7 @@ bool StartDownloadingAppFiles(
 	
 	CUtlVector<char*> downloaderArgs;
 	downloaderArgs.AddToTail( fullExeFilename );
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	downloaderArgs.AddToTail( "-allowdebug" );
 #endif
 	downloaderArgs.AddToTail( "-CachePath" );		// Tell it where to download the files to.

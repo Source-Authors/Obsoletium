@@ -433,7 +433,7 @@ UnpackedDataCache_t *CFrameSnapshotManager::GetCachedUncompressedEntity( PackedE
 // CFrameSnapshot
 // ------------------------------------------------------------------------------------------------ //
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	int g_nAllocatedSnapshots = 0;
 #endif
 
@@ -444,7 +444,7 @@ CFrameSnapshot::CFrameSnapshot()
 	m_pTempEntities = NULL;
 	m_pValidEntities = NULL;
 	m_nReferences = 0;
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	++g_nAllocatedSnapshots;
 	Assert( g_nAllocatedSnapshots < 80000 ); // this probably would indicate a memory leak.
 #endif
@@ -472,7 +472,7 @@ CFrameSnapshot::~CFrameSnapshot()
 	delete [] m_pReplayEntityData;
 	Assert ( m_nReferences == 0 );
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	--g_nAllocatedSnapshots;
 	Assert( g_nAllocatedSnapshots >= 0 );
 #endif

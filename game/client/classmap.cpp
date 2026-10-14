@@ -102,7 +102,7 @@ C_BaseEntity *CClassMap::CreateEntity( const char *mapname )
 
 		if ( !lookup->factory )
 		{
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 			Msg( "No factory for %s/%s\n", lookup->GetMapName(), m_ClassDict.GetElementName( i ) );
 #endif
 			continue;

@@ -518,7 +518,7 @@ public:
 			else
 			{
 				// This case should never ever happen!
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 					__asm int 3;
 #endif
 
@@ -532,7 +532,7 @@ public:
 			m_AmountReceived += dwNumBytes;
 
 			// Sanity check.
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 			Assert( m_RecvDataSize == m_pIncomingData->m_Count );
 			Assert( m_AmountReceived <= m_RecvDataSize );	// TODO: make this threadsafe for multiple IO threads.
 #endif

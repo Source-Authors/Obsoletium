@@ -20,7 +20,7 @@
 class C_BaseEntity;
 typedef CHandle<C_BaseEntity> EHANDLE;
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 // #define COPY_CHECK_STRESSTEST
 class IGameSystem;
 IGameSystem* GetPredictionCopyTester( void );
@@ -275,7 +275,7 @@ private:
 	bool		m_bCallEndTrack;
 };
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 #define PREDICTION_TRACKVALUECHANGESCOPE( context )		CValueChangeTrackerScope scope( context );
 #define PREDICTION_TRACKVALUECHANGESCOPE_ENTITY( entity, context ) CValueChangeTrackerScope scope( entity, context );
 #define PREDICTION_STARTTRACKVALUE( context )			g_pChangeTracker->StartTrack( context );

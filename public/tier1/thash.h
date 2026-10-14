@@ -601,7 +601,7 @@ void CTHash<Data,I>::Validate( CValidator &validator, const char *pchName )
 	validator.ClaimMemory( m_pBucket );
 	ValidatePtr( m_pMemoryPoolRecord );
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	// first verify m_cRecordInUse
 	Data * pvRecord = PvRecordFirst();
 	int cItems = 0;

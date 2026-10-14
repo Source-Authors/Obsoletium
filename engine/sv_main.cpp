@@ -280,7 +280,7 @@ void SV_ForceSend()
 }
 
 // Prints important entity creation/deletion events to console
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 ConVar  sv_deltatrace( "sv_deltatrace", "0", 0, "For debugging, print entity creation/deletion info to console." );
 #define TRACE_DELTA( text ) if ( sv_deltatrace.GetInt() ) { ConMsg( text ); };
 #else

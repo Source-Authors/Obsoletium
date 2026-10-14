@@ -102,7 +102,7 @@ void SendProxy_AnimTime( const SendProp *pProp, const void *pStruct, const void 
 {
 	CBaseEntity *pEntity = (CBaseEntity *)pStruct;
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	CBaseAnimating *pAnimating = pEntity->GetBaseAnimating();
 	Assert( pAnimating );
 

@@ -235,7 +235,7 @@ ConVar mp_bonusroundtime( "mp_bonusroundtime", "15", FCVAR_REPLICATED, "Time aft
 ConVar mp_stalemate_meleeonly( "mp_stalemate_meleeonly", "0", FCVAR_REPLICATED | FCVAR_NOTIFY, "Restrict everyone to melee weapons only while in Sudden Death." );
 ConVar mp_forceautoteam( "mp_forceautoteam", "0", FCVAR_REPLICATED | FCVAR_NOTIFY, "Automatically assign players to teams when joining." );
 
-#if defined( _DEBUG ) || defined( STAGING_ONLY )
+#if !defined(NDEBUG) || defined( STAGING_ONLY )
 ConVar mp_developer( "mp_developer", "0", FCVAR_ARCHIVE | FCVAR_REPLICATED | FCVAR_NOTIFY, "1: basic conveniences (instant respawn and class change, etc).  2: add combat conveniences (infinite ammo, buddha, etc)" );
 #endif // _DEBUG || STAGING_ONLY
 
@@ -941,7 +941,7 @@ void CTeamplayRoundBasedRules::CheckWaitingForPlayers( void )
 
 	bool bCancelWait = ( mp_waitingforplayers_cancel.GetBool() || IsInItemTestingMode() ) && !IsInTournamentMode();
 
-#if defined( _DEBUG ) || defined( STAGING_ONLY )
+#if !defined(NDEBUG) || defined( STAGING_ONLY )
 	if ( mp_developer.GetBool() )
 		bCancelWait = true;
 #endif // _DEBUG || STAGING_ONLY
@@ -3041,7 +3041,7 @@ void CTeamplayRoundBasedRules::BalanceTeams( bool bRequireSwitcheesToBeDead )
 		return;
 	}
 
-#if defined( _DEBUG ) || defined( STAGING_ONLY )
+#if !defined(NDEBUG) || defined( STAGING_ONLY )
 	if ( mp_developer.GetBool() )
 		return;
 #endif // _DEBUG || STAGING_ONLY
@@ -3531,7 +3531,7 @@ bool CTeamplayRoundBasedRules::ShouldBalanceTeams( void )
 	if ( IsInTraining() || IsInItemTestingMode() )
 		return false;
 
-#if defined( _DEBUG ) || defined( STAGING_ONLY )
+#if !defined(NDEBUG) || defined( STAGING_ONLY )
 	if ( mp_developer.GetBool() )
 		return false;
 #endif // _DEBUG || STAGING_ONLY
@@ -3560,7 +3560,7 @@ bool CTeamplayRoundBasedRules::WouldChangeUnbalanceTeams( int iNewTeam, int iCur
 	if ( !ShouldBalanceTeams() )
 		return false;
 
-#if defined( _DEBUG ) || defined( STAGING_ONLY )
+#if !defined(NDEBUG) || defined( STAGING_ONLY )
 	if ( mp_developer.GetBool() )
 		return false;
 #endif // _DEBUG || STAGING_ONLY

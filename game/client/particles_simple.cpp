@@ -40,7 +40,7 @@ CParticleEffect::CParticleEffect( const char *pName )
 	m_RefCount = 0;
 	m_bSimulate = true;
 	ParticleMgr()->AddEffect( &m_ParticleEffect, this );
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	g_ParticleEffects.AddToTail( this );
 #endif
 }
@@ -50,7 +50,7 @@ CParticleEffect::CParticleEffect( const char *pName )
 //-----------------------------------------------------------------------------
 CParticleEffect::~CParticleEffect( void )
 {
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	int index = g_ParticleEffects.Find( this );
 	Assert( g_ParticleEffects.IsValidIndex(index) );
 	g_ParticleEffects.Remove( index );

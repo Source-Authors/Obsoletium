@@ -69,7 +69,7 @@ static ConVar cl_always_flush_models( "cl_always_flush_models", CONVAR_DEFAULT_A
 
 extern ConVar sv_downloadurl;
 
-#if defined( _DEBUG ) || defined( STAGING_ONLY )
+#if !defined(NDEBUG) || defined( STAGING_ONLY )
 static ConVar debug_clientstate_fake_hltv( "debug_clientstate_fake_hltv", "0", 0, "If set, spoof as HLTV for testing purposes." );
 #if defined( REPLAY_ENABLED )
 static ConVar debug_clientstate_fake_replay( "debug_clientstate_fake_replay", "0", 0, "If set, spoof as REPLAY for testing purposes." );
@@ -198,7 +198,7 @@ void CClientState::SendClientInfo( void )
 		info.m_nCustomFiles[i] = m_nCustomFiles[i].crc;
 
 	// Testing to ensure we don't blow up servers by faking our client info
-#if defined( _DEBUG ) || defined( STAGING_ONLY )
+#if !defined(NDEBUG) || defined( STAGING_ONLY )
 	if ( debug_clientstate_fake_hltv.GetBool() )
 	{
 		Msg( "!! Spoofing connect as HLTV in SendClientInfo\n" );

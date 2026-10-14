@@ -64,7 +64,7 @@ enum eGameState
 #define HEARTBEAT_INTERVAL_LONG		1.0		// send a heartbeat every second during gameplay
 #define HEARTBEAT_INTERVAL_SHORT	0.1		// send a heartbeat ten times a second in the lobby
 #define HEARTBEAT_TIMEOUT			10.0	// time out if a heartbeat isn't recieved for ten seconds 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 #define HEARTBEAT_TIMEOUT_LOADING	300		// in debug loads take much longer
 #else
 #define HEARTBEAT_TIMEOUT_LOADING	100		// allow for longer communication gaps during map load

@@ -721,7 +721,7 @@ private:
 	// true, creates on access, helps reduce d3d memory for tools, but causes i/o hitches.
 	bool m_bCreateShadersOnDemand;
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	// for debugging (can't resolve UtlSym)
 	// need some history because 360 d3d has rips related to sequencing
 	char	vshDebugName[MAX_SHADER_HISTORY][64];

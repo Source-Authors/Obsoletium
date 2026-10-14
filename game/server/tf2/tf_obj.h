@@ -39,7 +39,7 @@ struct animevent_t;
 extern ConVar object_verbose;
 extern ConVar obj_child_range_factor;
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 #define TRACE_OBJECT( str )										\
 if ( object_verbose.GetInt() )									\
 {																\

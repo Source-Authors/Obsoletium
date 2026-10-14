@@ -642,7 +642,7 @@ inline CVertexBuilder::CVertexBuilder()
 	m_bModify = false;
 #endif
 
-#if defined( _DEBUG ) && (COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4)
+#if !defined(NDEBUG) && (COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4)
 	// Debug checks to make sure we write userdata4/tangents AFTER normals
 	m_bWrittenNormal = false;
 	m_bWrittenUserData = false;
@@ -677,7 +677,7 @@ inline CVertexBuilder::CVertexBuilder( IVertexBuffer *pVertexBuffer, VertexForma
 	m_bModify = false;
 #endif
 
-#if defined( _DEBUG ) && (COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4)
+#if !defined(NDEBUG) && (COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4)
 	// Debug checks to make sure we write userdata4/tangents AFTER normals
 	m_bWrittenNormal = false;
 	m_bWrittenUserData = false;

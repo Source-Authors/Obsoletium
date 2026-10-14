@@ -344,7 +344,7 @@ void CVertexBuffer::Create( IDirect3DDevice9Ex *pD3D )
 	VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
 #endif
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	if ( m_pVB && !m_pSysmemBuffer )
 	{
 		D3DVERTEXBUFFER_DESC actual_desc;

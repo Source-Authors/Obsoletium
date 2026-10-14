@@ -1008,7 +1008,7 @@ void CInputSystem::UpdateMouseFocus(int x, int y)
 				// if we have a root panel, only consider popups that belong to it
 				continue;
 			}
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 			[[maybe_unused]] char const *pchName = popup->GetName();
 #endif
 			bool wantsMouse = panel->IsMouseInputEnabled() && IsChildOfModalSubTree( (VPANEL)panel );

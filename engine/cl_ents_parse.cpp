@@ -27,7 +27,7 @@
 static ConVar cl_flushentitypacket("cl_flushentitypacket", "0", FCVAR_CHEAT, "For debugging. Force the engine to flush an entity packet.");
 
 // Prints important entity creation/deletion events to console
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 static ConVar cl_deltatrace( "cl_deltatrace", "0", 0, "For debugging, print entity creation/deletion info to console." );
 #define TRACE_DELTA( text ) if ( cl_deltatrace.GetInt() ) { ConMsg( "%s", text ); };
 #else
@@ -146,7 +146,7 @@ void CL_DeleteDLLEntity( int iEnt, const char *reason, bool bOnRecreatingAllEnti
 //-----------------------------------------------------------------------------
 IClientNetworkable* CL_CreateDLLEntity( int iEnt, int iClass, int iSerialNum )
 {
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	IClientNetworkable *pOldNetworkable = entitylist->GetClientNetworkable( iEnt );
 	Assert( !pOldNetworkable );
 #endif

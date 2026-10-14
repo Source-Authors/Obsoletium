@@ -57,7 +57,7 @@ static int g_iPolyhedronDumpCounter = 0;
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#if defined( _DEBUG ) && defined( ENABLE_DEBUG_POLYHEDRON_DUMPS )
+#if !defined(NDEBUG) && defined( ENABLE_DEBUG_POLYHEDRON_DUMPS )
 void CreateDumpDirectory( const char *szDirectoryName )
 {
 #if defined( WIN32 )
@@ -769,7 +769,7 @@ CPolyhedron *ConvertLinkedGeometryToPolyhedron( GeneratePolyhedronFromPlanes_Uno
 		pActivePolygonWalk = pActivePolygonWalk->pNext;	
 	}
 
-#if defined( _DEBUG ) && defined( ENABLE_DEBUG_POLYHEDRON_DUMPS ) && defined( DEBUG_DUMP_POLYHEDRONS_TO_NUMBERED_GLVIEWS )
+#if !defined(NDEBUG) && defined( ENABLE_DEBUG_POLYHEDRON_DUMPS ) && defined( DEBUG_DUMP_POLYHEDRONS_TO_NUMBERED_GLVIEWS )
 	char szCollisionFile[128];
 	CreateDumpDirectory( "PolyhedronDumps" );
 	Q_snprintf( szCollisionFile, 128, "PolyhedronDumps/NewStyle_PolyhedronDump%i.txt", g_iPolyhedronDumpCounter );

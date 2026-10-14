@@ -19,7 +19,7 @@
 
 // This is the macro to use in your code to measure until the code goes
 //  out of scope
-#if defined( _DEBUG ) || defined( FORCE_MEASURE )
+#if !defined(NDEBUG) || defined( FORCE_MEASURE )
 #define MEASURECODE( description ) \
 	static CMeasureSection	_xxx_ms( description ); \
 	CMeasureSectionInstance _xxx_ms_inst( &_xxx_ms );

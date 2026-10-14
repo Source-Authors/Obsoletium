@@ -342,7 +342,7 @@ void CIndexBuffer::Create( IDirect3DDevice9Ex *pD3D )
 	VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
 #endif
 
-#if defined( _DEBUG )
+#if !defined(NDEBUG)
 	if ( m_pIB && !m_pSysmemBuffer )
 	{
 		D3DINDEXBUFFER_DESC actual_desc;

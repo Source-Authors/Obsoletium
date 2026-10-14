@@ -402,7 +402,7 @@ void CTFProjectile_Flare::Explode_Air( trace_t *pTrace, int bitsDamageType, bool
 			nSound = SPECIAL2;
 		}
 
-#if defined( _DEBUG ) && defined( STAGING_ONLY )
+#if !defined(NDEBUG) && defined( STAGING_ONLY )
 		// Debug!
 		ConVarRef tf_rocket_show_radius( "tf_rocket_show_radius" );
 		if ( tf_rocket_show_radius.GetBool() )
