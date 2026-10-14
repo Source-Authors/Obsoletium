@@ -611,7 +611,7 @@ void CMatLightmaps::InitLightmapBits( int lightmap )
 			{
 #ifdef NDEBUG
 				writer.WritePixel( 1.0f, 1.0f, 1.0f );
-#else // _DEBUG
+#else  // !NDEBUG
 				if( ( j + k ) & 1 )
 				{
 					writer.WritePixelF( 0.0f, 1.0f, 0.0f );
@@ -635,7 +635,7 @@ void CMatLightmaps::InitLightmapBits( int lightmap )
 				// note: make this white to find multisample centroid sampling problems.
 				//				writer.WritePixel( 255, 255, 255 );
 				writer.WritePixel( 0, 0, 0 );
-#else // _DEBUG
+#else  // !NDEBUG
 				if ( ( j + k ) & 1 )
 				{
 					writer.WritePixel( 0, 255, 0 );
