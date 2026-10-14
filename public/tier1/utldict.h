@@ -50,36 +50,36 @@ public:
 	void EnsureCapacity( intp );
 	
 	// gets particular elements
-	T&         Element( I i );
-	const T&   Element( I i ) const;
-	T&         operator[]( I i );
-	const T&   operator[]( I i ) const;
+	[[nodiscard]] T&         Element( I i );
+	[[nodiscard]] const T&   Element( I i ) const;
+	[[nodiscard]] T&         operator[]( I i );
+	[[nodiscard]] const T&   operator[]( I i ) const;
 
 	// gets element names
-	char	   *GetElementName( I i );
-	char const *GetElementName( I i ) const;
+	[[nodiscard]] char	   *GetElementName( I i );
+	[[nodiscard]] char const *GetElementName( I i ) const;
 
 	void		SetElementName( I i, char const *pName );
 
 	// Number of elements
-	I Count() const;
+	[[nodiscard]] I Count() const;
 
 	// Number of allocated slots
-	I MaxElement() const;
+	[[nodiscard]] I MaxElement() const;
 	
 	// Checks if a node is valid and in the tree
-	bool  IsValidIndex( I i ) const;
+	[[nodiscard]] bool IsValidIndex( I i ) const;
 	
 	// Invalid index
-	static constexpr I InvalidIndex();
+	[[nodiscard]] static constexpr I InvalidIndex();
 	
 	// Insert method (inserts in order)
 	I  Insert( const char *pName, const T &element );
 	I  Insert( const char *pName );
 	
 	// Find method
-	I  Find( const char *pName ) const;
-	bool HasElement( const char *pName ) const;
+	[[nodiscard]] I  Find( const char *pName ) const;
+	[[nodiscard]] bool HasElement( const char *pName ) const;
 	
 	// Remove methods
 	void	RemoveAt( I i );
@@ -91,8 +91,8 @@ public:
 	void	PurgeAndDeleteElements();	// Call delete on each element.
 
 	// Iteration methods
-	I		First() const;
-	I		Next( I i ) const;
+	[[nodiscard]] I		First() const;
+	[[nodiscard]] I		Next( I i ) const;
 
 	// Nested typedefs, for code that might need 
 	// to fish out the index type from a given dict
@@ -195,7 +195,7 @@ inline void CUtlDict<T, I>::SetElementName( I i, char const *pName )
 // Num elements
 //-----------------------------------------------------------------------------
 template <class T, class I>
-inline	I CUtlDict<T, I>::Count() const          
+inline	I CUtlDict<T, I>::Count() const
 { 
 	return m_Elements.Count(); 
 }
