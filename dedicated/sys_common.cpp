@@ -111,7 +111,8 @@ const char *PrefixMessageGroup(OUT_Z_ARRAY char (&out)[out_size], const char *gr
   out_group = !Q_isempty(out_group) ? out_group : group;
 
   const size_t length{strlen(message)};
-  if (length > 1 && message[length - 1] == '\n') {
+  if (length > 1 && message[length - 1] == '\n' &&
+      !V_isuniform(message, '\n')) {
     V_sprintf_safe(out, "[%.3f][%s] %s", Plat_FloatTime(), out_group, message);
   } else {
     V_strcpy_safe(out, message);
