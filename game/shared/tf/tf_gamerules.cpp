@@ -20961,7 +20961,7 @@ bool CTFGameRules::CanUpgradeWithAttrib( CTFPlayer *pPlayer, int iWeaponSlot, at
 				{
 					return ( pPlayer->IsPlayerClass( TF_CLASS_SPY ) );
 				}
-#endif // !_DEBUG
+#endif // NDEBUG
 		}
 			return true;
 		}

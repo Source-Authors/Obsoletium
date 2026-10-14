@@ -2335,6 +2335,6 @@ CON_COMMAND_F( item_generate_all_descriptions, "Generate full item descriptions 
 }
 #endif // CLIENT_DLL
 
-#endif // STAGING_ONLY || _DEBUG
+#endif // STAGING_ONLY || !NDEBUG
 
 

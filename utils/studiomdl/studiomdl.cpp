@@ -1923,7 +1923,7 @@ void AddFlexControllers(
 		Assert( r2s[ j ] != -1 );
 		Assert( r2l[ j ] != -1 );
 	}
-#endif // def _DEBUG
+#endif // !NDEBUG
 }
 
 

@@ -546,14 +546,14 @@ DBG_INTERFACE void COM_TimestampedLog( PRINTF_FORMAT_STRING char const *fmt, ...
 #define DBG_DCODE( _g, _l, _code )   if (IsSpewActive( _g, _l )) { _code } else {}
 #define DBG_BREAK()                  DebuggerBreak()	/* defined in platform.h */ 
 
-#else /* not _DEBUG */
+#else /* NDEBUG */
 
 #define DBG_CODE( _code )            ((void)0)
 #define DBG_CODE_NOSCOPE( _code )	 
 #define DBG_DCODE( _g, _l, _code )   ((void)0)
 #define DBG_BREAK()                  ((void)0)
 
-#endif /* _DEBUG */
+#endif /* !NDEBUG */
 
 //-----------------------------------------------------------------------------
 

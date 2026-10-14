@@ -3304,9 +3304,9 @@ bool CTargetDMX::Compile()
 
 #ifndef NDEBUG
 	const bool bRet = g_pDataModel->SaveToFile( sAbsPath.String(), NULL, "keyvalues2", "model", m_pDmRoot );
-#else // ifdef _DEBUG
+#else // !NDEBUG
 	const bool bRet = g_pDataModel->SaveToFile( sAbsPath.String(), NULL, "binary", "model", m_pDmRoot );
-#endif  // !NDEBUG
+#endif  // NDEBUG
 
 	undo.Abort();
 

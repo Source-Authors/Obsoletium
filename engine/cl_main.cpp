@@ -104,7 +104,7 @@ static ConVar cl_playback_screenshots( "cl_playback_screenshots", "0", 0, "Allow
 
 #if defined( STAGING_ONLY ) || !defined(NDEBUG)
 static ConVar cl_block_usercommand( "cl_block_usercommand", "0", FCVAR_CHEAT, "Force client to not send usercommand (for debugging)." );
-#endif // STAGING_ONLY || _DEBUG
+#endif // STAGING_ONLY || !NDEBUG
 
 ConVar dev_loadtime_map_start( "dev_loadtime_map_start", "0.0", FCVAR_HIDDEN);
 ConVar dev_loadtime_map_elapsed( "dev_loadtime_map_elapsed", "0.0", FCVAR_HIDDEN );
@@ -456,7 +456,7 @@ void CL_ReadPackets ( bool bFinalTick )
 		}
 	}
 
-	// check timeout, but not if running _DEBUG engine
+	// check timeout, but not if running !NDEBUG engine
 #if defined(NDEBUG)
 	// Only check on final frame because that's when the server might send us a packet in single player.  This avoids
 	//  a bug where if you sit in the game code in the debugger then you get a timeout here on resuming the engine
@@ -1934,7 +1934,7 @@ void CL_SendMove( void )
 #if defined( STAGING_ONLY ) || !defined(NDEBUG)
 	if ( cl_block_usercommand.GetBool() )
 		return;
-#endif // STAGING_ONLY || _DEBUG
+#endif // STAGING_ONLY || !NDEBUG
 
 	byte data[ MAX_CMD_BUFFER ];
 	

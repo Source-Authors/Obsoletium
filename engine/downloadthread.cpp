@@ -66,7 +66,7 @@ static void WriteFileFromRequestContext( const RequestContext_t &rc )
  * is threadsafe, so this should be fine.
  *
  * Since I don't want to be playing with the developer cvar in the other thread, I'll use
- * the presence of _DEBUG as my developer flag.
+ * the presence of !NDEBUG as my developer flag.
  */
 void Thread_DPrintf (char *fmt, ...)
 {
