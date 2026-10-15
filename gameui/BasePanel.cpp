@@ -1621,9 +1621,7 @@ void CBasePanel::RunMenuCommand(const char *command)
 		// Set Steam URL for re-launch in registry. Launcher will check this
 		// registry key and exec it in order to re-load the game in the proper language
 #if defined( WIN32 )
-		HKEY hKey;
-
-		if ( RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Valve\\Source", NULL, KEY_WRITE, &hKey) == ERROR_SUCCESS )
+		if ( HKEY hKey; RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Valve\\Source", NULL, KEY_WRITE, &hKey) == ERROR_SUCCESS )
 		{
 			RunCodeAtScopeExit(RegCloseKey(hKey));
 
