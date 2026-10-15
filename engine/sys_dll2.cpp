@@ -1745,13 +1745,22 @@ InitReturnVal_t CEngineAPI::HandleSetModeError()
 	// show an error, see if the user wants to restart
 	if ( CommandLine()->HasParm( "-safe" ) )
 	{
-		Sys_MessageBox( "Failed to set video mode.\n\nThis game has a minimum requirement of DirectX 7.0 compatible hardware.\n", "Video mode error", false );
+		Sys_MessageBox(
+			V_STRINGIFY(VPCGAME) " - Video mode error",
+			"Failed to set video mode.\n\n"
+			"This game has a minimum requirement of DirectX 9.0 compatible hardware.\n",
+			false,
+			true );
 		return INIT_FAILED;
 	}
 	
 	if ( CommandLine()->HasParm( "-autoconfig" ) )
 	{
-		if ( Sys_MessageBox( "Failed to set video mode - falling back to safe mode settings.\n\nGame will now restart with the new video settings.", "Video - safe mode fallback", true ))
+		if ( Sys_MessageBox( 
+			V_STRINGIFY(VPCGAME) " - Video mode fallback",
+			"Failed to set video mode - falling back to safe mode settings.\n\n"
+			"Game will now restart with the new video settings.",
+			true ))
 		{
 			CommandLine()->AppendParm( "-safe", NULL );
 			return (InitReturnVal_t)INIT_RESTART;
@@ -1759,7 +1768,11 @@ InitReturnVal_t CEngineAPI::HandleSetModeError()
 		return INIT_FAILED;
 	}
 
-	if ( Sys_MessageBox( "Failed to set video mode - resetting to defaults.\n\nGame will now restart with the new video settings.", "Video mode warning", true ) )
+	if ( Sys_MessageBox(
+			V_STRINGIFY(VPCGAME) " - Video mode warning",
+			"Failed to set video mode - resetting to defaults.\n\n"
+			"Game will now restart with the new video settings.",
+			true ) )
 	{
 		CommandLine()->AppendParm( "-autoconfig", NULL );
 		return (InitReturnVal_t)INIT_RESTART;

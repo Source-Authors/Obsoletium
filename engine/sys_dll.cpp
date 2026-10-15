@@ -422,7 +422,7 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 		!CommandLine()->HasParm( "-nocrashdialog" ) )
 	{
 		// dimhotepus: Use common message box.
-		Sys_MessageBox( "Source Engine - Error", text, false, true );
+		Sys_MessageBox( V_STRINGIFY(VPCGAME) " - Error", text, false, true );
 	}
 
 	DebuggerBreakIfDebugging();
@@ -814,8 +814,8 @@ SpewRetval_t Sys_SpewFunc( SpewType_t spewType, const char *pMsg )
 	}
 	if (spewType == SPEW_ASSERT)
 	{
-    	return CommandLine()->HasParm("-noassert") ? SPEW_CONTINUE
-        	                                       : SPEW_DEBUGGER;
+		return CommandLine()->HasParm("-noassert") ? SPEW_CONTINUE
+													: SPEW_DEBUGGER;
 	}
 	return SPEW_CONTINUE;
 }
