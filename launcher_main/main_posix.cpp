@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
      kLauncherPath, RTLD_NOW
   };
   if (!launcher_dll) {
-    fprintf(stderr, "Failed to load the %s: %s.\n",
+    fprintf(stderr, "dlopen %s failed: %s.\n",
             kLauncherPath, ::dlerror());
     return 1;
   }
@@ -87,8 +87,8 @@ int main(int argc, char *argv[]) {
   const auto main =
       launcher_dll.GetFunction<LauncherMainFunction>("LauncherMain");
   if (!main) {
-    fprintf(stderr, "Failed to get the launcher LauncherMain entry proc: %s.\n",
-            ::dlerror());
+    fprintf(stderr, "dlsym(%s, LauncherMain) entry proc failed: %s.\n",
+            kLauncherPath, ::dlerror());
     return 2;
   }
 
