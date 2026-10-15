@@ -1517,7 +1517,7 @@ template <VertexCompressionType_t T> inline void CVertexBuilder::CompressedNorma
 	//float lengthSqd = nx*nx + ny*ny + nz*nz;
 	//Assert( lengthSqd >= 0.95f && lengthSqd <= 1.05f );
 
-	if ( T == VERTEX_COMPRESSION_ON )
+	if constexpr ( T == VERTEX_COMPRESSION_ON )
 	{
 #if		( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_SEPARATETANGENTS_SHORT2 )
 		PackNormal_SHORT2( nx, ny, nz, (unsigned int *)m_pCurrNormal );
@@ -2022,7 +2022,7 @@ template <VertexCompressionType_t T> inline void CVertexBuilder::CompressedBoneW
 
 	float *pDestWeights = OffsetFloatPointer( m_pBoneWeight, m_nCurrentVertex, m_VertexSize_BoneWeight );
 
-	if ( T == VERTEX_COMPRESSION_ON )
+	if constexpr ( T == VERTEX_COMPRESSION_ON )
 	{
 		// Quantize to 15 bits per weight (we use D3DDECLTYPE_SHORT2)
 		// NOTE: we perform careful normalization (weights sum to 1.0f in the vertex shader), so
@@ -2109,7 +2109,7 @@ template <VertexCompressionType_t T> inline void CVertexBuilder::CompressedUserD
 	//float lengthSqd = pData[0]*pData[0] + pData[1]*pData[1] + pData[2]*pData[2];
 	//Assert( lengthSqd >= 0.95f && lengthSqd <= 1.05f );
 
-	if ( T == VERTEX_COMPRESSION_ON )
+	if constexpr ( T == VERTEX_COMPRESSION_ON )
 	{
 		float binormalSign = pData[3];
 
