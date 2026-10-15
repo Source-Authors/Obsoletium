@@ -2055,7 +2055,7 @@ inline float Clip( const Vector &dir, const Vector &pos, const Vector &normal )
 		return dist / cosTheta;
 
 	// parallel or not facing the plane
-	return 1e16f;
+	return P_FLOAT_MAX;
 }
 
 // This is the first iteration of solving time of intersection.
@@ -2240,7 +2240,7 @@ float simplex_t::ClipRayToTriangle( const Vector &dir, float epsilon )
 	}
 	float dot = DotProduct( dir, *normals[best] );
 	if ( dot <= 0 )
-		return 1e16f;
+		return P_FLOAT_MAX;
 	dmin += epsilon/dot;
 
 	return dmin;
