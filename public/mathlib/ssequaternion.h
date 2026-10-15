@@ -76,6 +76,12 @@ FORCEINLINE void XM_CALLCONV StoreAlignedSIMD( QuaternionAligned * RESTRICT pSIM
 
 [[nodiscard]] FORCEINLINE fltx4 XM_CALLCONV QuaternionNormalizeSIMD( fltx4 q )
 {
+	// dimhotepus: Zero quaternion is zero.
+	if ( DirectX::XMVector4Equal( q, Four_Zeros ) )
+	{
+		return Four_Zeros;
+	}
+
 	fltx4 radiusSq = DirectX::XMVector4Dot( q, q );
 	fltx4 zeroMask = DirectX::XMVectorEqual( radiusSq, Four_Zeros ); // all ones iff radius = 0
 	fltx4 result = DirectX::XMVectorMultiply( ReciprocalSqrtSIMD( radiusSq ), q );
