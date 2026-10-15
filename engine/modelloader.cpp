@@ -1339,7 +1339,8 @@ void Mod_LoadTexinfo( void )
 
 		// assume that the scale is the same on both s and t.
 		out->luxelsPerWorldUnit = VectorLength( out->lightmapVecsLuxelsPerWorldUnits[0].AsVector3D() );
-		out->worldUnitsPerLuxel = 1.0f / out->luxelsPerWorldUnit;
+		// dimhotepus: Fix float zero divide when luxelsPerWorldUnit is 0.
+		out->worldUnitsPerLuxel = out->luxelsPerWorldUnit != 0.0f ? 1.0f / out->luxelsPerWorldUnit : 0.0f;
 
 		out->flags = in->flags;
 		out->texinfoFlags = 0;
