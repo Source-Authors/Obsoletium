@@ -88,7 +88,8 @@ private:
 	float			m_lastBatteryPercent;
 };
 
-#define FPS_PANEL_WIDTH 300
+// dimhotepus: 300 -> 320 to fit large maps when cl_showfps 2 (like d1_trainstation_01.bsp)
+#define FPS_PANEL_WIDTH 320
 
 //-----------------------------------------------------------------------------
 // Purpose: 
