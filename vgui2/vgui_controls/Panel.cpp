@@ -9018,7 +9018,8 @@ int ComputePos( Panel* pPanel, const char *pszInput, int &nPos, const int& nSize
 		{
 			int nOldPos = nNewPos;
 			nNewPos = scheme()->GetProportionalScaledValueEx( pPanel->GetScheme(), nNewPos );
-			flProportion = (float)nNewPos / (float)nOldPos;
+			// dimhotepus: Fix zero division when input is "0".
+			flProportion = nOldPos != 0.0f ? (float)nNewPos / (float)nOldPos : 1.f;
 		}
 
 		if (nFlags & nFlagProportionalSelf)
