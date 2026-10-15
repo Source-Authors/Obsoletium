@@ -257,6 +257,9 @@ public:
 	[[nodiscard]] VMatrix		Transpose3x3() const;
 #endif
 
+	// dimhotepus: Check for nasty NANs
+	[[nodiscard]] bool			IsValid() const;
+
 public:
 	// The matrix.
 	vec_t		m[4][4];
@@ -406,6 +409,8 @@ inline void MatrixRotate( VMatrix& dst, const Vector& vAxisOfRot, float angleDeg
 	MatrixBuildRotationAboutAxis( rotation, vAxisOfRot, angleDegrees );
 	MatrixMultiply( dst, rotation, temp );
 	dst = temp;
+
+	Assert( dst.IsValid() );
 }
 
 // Builds a rotation matrix that rotates one direction vector into another
@@ -554,6 +559,8 @@ inline void VMatrix::Init(
 	m[3][1] = m31;
 	m[3][2] = m32;
 	m[3][3] = m33;
+
+	Assert( IsValid() );
 }
 
 
@@ -568,6 +575,8 @@ inline void VMatrix::Init( const matrix3x4_t& matrix3x4 )
 	m[3][1] = 0.0f;
 	m[3][2] = 0.0f;
 	m[3][3] = 1.0f;
+
+	Assert( IsValid() );
 }
 
 
@@ -659,7 +668,7 @@ inline void VMatrix::SetTranslation(const Vector &vTrans)
 
 		  
 //-----------------------------------------------------------------------------
-// appply translation to this matrix in the input space
+// apply translation to this matrix in the input space
 //-----------------------------------------------------------------------------
 inline void VMatrix::PreTranslate(const Vector &vTrans)
 {
@@ -672,7 +681,7 @@ inline void VMatrix::PreTranslate(const Vector &vTrans)
 
 
 //-----------------------------------------------------------------------------
-// appply translation to this matrix in the output space
+// apply translation to this matrix in the output space
 //-----------------------------------------------------------------------------
 inline void VMatrix::PostTranslate(const Vector &vTrans)
 {

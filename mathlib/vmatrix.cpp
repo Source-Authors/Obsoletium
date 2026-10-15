@@ -8,9 +8,8 @@
 
 #if !defined(_STATIC_LINKED) || defined(_SHARED_LIB)
 
-#include <cstring>
-
 #include "mathlib/vmatrix.h"
+
 #include "mathlib/mathlib.h"
 #include "mathlib/vector4d.h"
 #include "tier0/basetypes.h"
@@ -279,6 +278,7 @@ bool MatrixInverseGeneral(const VMatrix& src, VMatrix& dst)
 		// They're all too small.. sorry.
 		if(iLargest == -1)
 		{
+			Assert( dst.IsValid() );
 			return false;
 		}
 
@@ -327,6 +327,7 @@ bool MatrixInverseGeneral(const VMatrix& src, VMatrix& dst)
 		}
 	}
 
+	Assert( dst.IsValid() );
 	return true;
 }
 
@@ -351,6 +352,8 @@ void MatrixInverseTR( const VMatrix& src, VMatrix &dst )
 	// Fill in the bottom row.
 	dst.m[3][0] = dst.m[3][1] = dst.m[3][2] = 0.0f;
 	dst.m[3][3] = 1.0f;
+
+	Assert( dst.IsValid() );
 }
 
 
@@ -454,6 +457,15 @@ VMatrix VMatrix::Transpose3x3() const
 
 #endif // VECTOR_NO_SLOW_OPERATIONS
 
+// dimhotepus: Check for nasty NANs
+bool VMatrix::IsValid() const
+{
+	return
+		!DirectX::XMVector4IsNaN( DirectX::XMLoadFloat4( XmBase() ) ) &&
+		!DirectX::XMVector4IsNaN( DirectX::XMLoadFloat4( XmBase() + 1 ) ) &&
+		!DirectX::XMVector4IsNaN( DirectX::XMLoadFloat4( XmBase() + 2 ) ) &&
+		!DirectX::XMVector4IsNaN( DirectX::XMLoadFloat4( XmBase() + 3 ) );
+}
 
 bool VMatrix::IsRotationMatrix() const
 {
@@ -510,6 +522,8 @@ void VMatrix::SetupMatrixOrgAngles( const Vector &origin, const QAngle &vAngles 
 	m[3][1] = 0.0f;
 	m[3][2] = 0.0f;
 	m[3][3] = 1.0f;
+
+	Assert( IsValid() );
 }
 
 
@@ -900,6 +914,8 @@ void MatrixBuildTranslation( VMatrix& dst, float x, float y, float z )
 	dst[0][3] = x;
 	dst[1][3] = y;
 	dst[2][3] = z;
+
+	Assert( dst.IsValid() );
 }
 
 void MatrixBuildTranslation( VMatrix& dst, const Vector &translation )
@@ -908,6 +924,8 @@ void MatrixBuildTranslation( VMatrix& dst, const Vector &translation )
 	dst[0][3] = translation[0];
 	dst[1][3] = translation[1];
 	dst[2][3] = translation[2];
+	
+	Assert( dst.IsValid() );
 }
 
 
@@ -929,6 +947,8 @@ void MatrixBuildRotationAboutAxis( VMatrix &dst, const Vector &vAxisOfRot, float
 	dst[3][1] = 0;
 	dst[3][2] = 0;
 	dst[3][3] = 1;
+	
+	Assert( dst.IsValid() );
 }
 
 
@@ -983,6 +1003,8 @@ void MatrixBuildRotation( VMatrix &dst, const Vector& initialDirection, const Ve
 	test -= finalDirection;
 	Assert( test.LengthSqr() < 1e-3 );
 #endif
+
+	Assert( dst.IsValid() );
 }
 
 //-----------------------------------------------------------------------------
@@ -998,6 +1020,8 @@ void MatrixBuildRotateZ( VMatrix &dst, float angleDegrees )
 	dst[1][0] = fSin; dst[1][1] =  fCos; dst[1][2] = 0.0f; dst[1][3] = 0.0f;
 	dst[2][0] = 0.0f; dst[2][1] =  0.0f; dst[2][2] = 1.0f; dst[2][3] = 0.0f;
 	dst[3][0] = 0.0f; dst[3][1] =  0.0f; dst[3][2] = 0.0f; dst[3][3] = 1.0f;
+	
+	Assert( dst.IsValid() );
 }
 
 // Builds a scale matrix
@@ -1007,6 +1031,8 @@ void MatrixBuildScale( VMatrix &dst, float x, float y, float z )
 	dst[1][0] = 0.0f;	dst[1][1] = y;		dst[1][2] = 0.0f;	dst[1][3] = 0.0f;
 	dst[2][0] = 0.0f;	dst[2][1] = 0.0f;	dst[2][2] = z;		dst[2][3] = 0.0f;
 	dst[3][0] = 0.0f;	dst[3][1] = 0.0f;	dst[3][2] = 0.0f;	dst[3][3] = 1.0f;
+
+	Assert( dst.IsValid() );
 }
 
 void MatrixBuildScale( VMatrix &dst, const Vector& scale )
@@ -1046,6 +1072,8 @@ void MatrixBuildPerspective( VMatrix &dst, float fovX, float fovY, float zNear, 
 	scaleHalf[0][0] = 0.5f;
 	scaleHalf[1][1] = 0.5f;
 	MatrixMultiply( scaleHalf, dst, dst );
+
+	Assert( dst.IsValid() );
 }
 
 static inline void CalculateAABBForNormalizedFrustum_Helper( float x, float y, float z, const VMatrix &volumeToWorld, Vector &mins, Vector &maxs )

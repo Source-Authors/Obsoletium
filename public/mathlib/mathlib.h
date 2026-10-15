@@ -209,6 +209,8 @@ struct matrix3x4_t
 		m_flMatVal[0][0] = m00;	m_flMatVal[0][1] = m01; m_flMatVal[0][2] = m02; m_flMatVal[0][3] = m03;
 		m_flMatVal[1][0] = m10;	m_flMatVal[1][1] = m11; m_flMatVal[1][2] = m12; m_flMatVal[1][3] = m13;
 		m_flMatVal[2][0] = m20;	m_flMatVal[2][1] = m21; m_flMatVal[2][2] = m22; m_flMatVal[2][3] = m23;
+
+		Assert( IsValid() );
 	}
 
 	//-----------------------------------------------------------------------------
@@ -220,6 +222,8 @@ struct matrix3x4_t
 		m_flMatVal[0][0] = xAxis.x; m_flMatVal[0][1] = yAxis.x; m_flMatVal[0][2] = zAxis.x; m_flMatVal[0][3] = vecOrigin.x;
 		m_flMatVal[1][0] = xAxis.y; m_flMatVal[1][1] = yAxis.y; m_flMatVal[1][2] = zAxis.y; m_flMatVal[1][3] = vecOrigin.y;
 		m_flMatVal[2][0] = xAxis.z; m_flMatVal[2][1] = yAxis.z; m_flMatVal[2][2] = zAxis.z; m_flMatVal[2][3] = vecOrigin.z;
+
+		Assert( IsValid() );
 	}
 
 	//-----------------------------------------------------------------------------
@@ -272,6 +276,15 @@ struct matrix3x4_t
 		static_assert(sizeof(DirectX::XMFLOAT3X4) == sizeof(m_flMatVal));
 		static_assert(alignof(DirectX::XMFLOAT3X4) == alignof(decltype(m_flMatVal)));
 		return reinterpret_cast<DirectX::XMFLOAT3X4 const*>(&m_flMatVal[0][0]);
+	}
+
+	// dimhotepus: Check for nasty NANs
+	[[nodiscard]] bool IsValid() const
+	{
+		return
+			!DirectX::XMVector4IsNaN( DirectX::XMLoadFloat4( XmBase() ) ) &&
+			!DirectX::XMVector4IsNaN( DirectX::XMLoadFloat4( XmBase() + 1 ) ) &&
+			!DirectX::XMVector4IsNaN( DirectX::XMLoadFloat4( XmBase() + 2 ) );
 	}
 
 	float m_flMatVal[3][4];
