@@ -1505,8 +1505,9 @@ static void InitObjectTemplate( IVP_Template_Real_Object &objectTemplate, intp m
 	if ( inertia <= 0 )
 		inertia = 1.0;
 
-	if ( inertia > 1e14f )
-		inertia = 1e14f;
+	// dimhotepus: Use float max instead of 1e14.
+	if ( inertia > P_FLOAT_MAX )
+		inertia = P_FLOAT_MAX;
 
 	objectTemplate.rot_inertia.set(inertia, inertia, inertia);
 	objectTemplate.rot_speed_damp_factor.set(pParams->rotdamping, pParams->rotdamping, pParams->rotdamping);

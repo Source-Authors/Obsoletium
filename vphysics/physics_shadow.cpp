@@ -1065,7 +1065,8 @@ void CShadowController::AttachObject( void )
 
 	if ( !m_allowsRotation )
 	{
-		IVP_U_Float_Point ri( 1e14f, 1e14f, 1e14f );
+		// dimhotepus: Use float max instead of 1e14f.
+		IVP_U_Float_Point ri( P_FLOAT_MAX, P_FLOAT_MAX, P_FLOAT_MAX );
 		pCore->set_rotation_inertia( &ri );
 	}
 	if ( !m_allowsTranslation )
