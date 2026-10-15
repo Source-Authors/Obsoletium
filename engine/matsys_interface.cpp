@@ -183,8 +183,7 @@ ConVar mat_hdr_level( "mat_hdr_level", "0", 0,
 					 mat_hdr_level_Callback );
 #else
 // dimhotepus: Add note for 3 mode (float HDR) and restrict to allowed range.
-// dimhotepus: Apply extended float HDR by default (2 -> 3).
-ConVar mat_hdr_level( "mat_hdr_level", "3", FCVAR_ARCHIVE, 
+ConVar mat_hdr_level( "mat_hdr_level", "2", FCVAR_ARCHIVE, 
 					  "Set to 0 for no HDR, 1 for LDR+bloom on HDR maps, 2 for full HDR (int) on HDR maps, 3 for full HDR (float) on HDR maps.",
 					  true, 0,
 					  true, 3,
