@@ -2508,20 +2508,20 @@ bool ExtractZipFileFromBSP( char *pBSPFileName, char *pZipFileName )
 		auto [fp, errc] = s1::posix::posix_file_stream_factory::open( pZipFileName, "wb" );
 		if ( errc )
 		{
-			fprintf( stderr, "Can't open ZIP '%s': %s.\n", pZipFileName, errc.message().c_str() );
+			Warning( "Can't open ZIP '%s': %s.\n", pZipFileName, errc.message().c_str() );
 			return false;
 		}
 
 		std::tie(std::ignore, errc) = fp.write( pakbuffer, 1, paksize );
 		if ( errc )
 		{
-			fprintf( stderr, "Can't write %d bytes to ZIP '%s': %s.\n", paksize, pZipFileName, errc.message().c_str() );
+			Warning( "Can't write %d bytes to ZIP '%s': %s.\n", paksize, pZipFileName, errc.message().c_str() );
 			return false;
 		}
 	}
 	else
 	{
-		fprintf( stderr, "'%s' zip file is zero length!\n", pBSPFileName );
+		Warning( "'%s' zip file is zero length!\n", pBSPFileName );
 	}
 
 	return true;
