@@ -1797,6 +1797,8 @@ ClientShadowHandle_t CClientShadowMgr::CreateProjectedTexture( ClientEntityHandl
 	shadow.m_Entity = entity;
 	shadow.m_ClientLeafShadowHandle = ClientLeafSystem()->AddShadow( h, flags );
 	shadow.m_Flags = flags;
+	// dimhotepus: Initialize world to shadow matrix, as nans cause issues later.
+	MatrixSetIdentity( shadow.m_WorldToShadow );
 	shadow.m_nRenderFrame = -1;
 	shadow.m_LastOrigin.Init( FLT_MAX, FLT_MAX, FLT_MAX );
 	shadow.m_LastAngles.Init( FLT_MAX, FLT_MAX, FLT_MAX );
