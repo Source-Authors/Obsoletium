@@ -18,6 +18,8 @@
 
 #include <vgui_controls/Controls.h>
 
+#include "posix_file_stream.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
@@ -113,21 +115,27 @@ void TextImage::SetText(const char *text)
 			{
 				// write out error to unfound.txt log file
 				static bool first = true;
-				FILE *f;
-				if (first)
+
+				constexpr char kFileName[]{"unfound.txt"};
+				auto [f, errc] = s1::posix::posix_file_stream_factory::open(
+					kFileName, first ? "wt" : "at" );
+				if (errc)
 				{
-					first = false;
-					f = fopen("unfound.txt", "wt");
+					Warning("Unable to open unlocalized strings log '%s' for writing: %s.\n",
+							kFileName,
+							errc.message().c_str());
 				}
 				else
 				{
-					f = fopen("unfound.txt", "at");
+					std::tie(std::ignore, errc) = f.print( "\"%s\"\n", text );
+					Warning("Write to unlocalized strings log '%s' failed: %s.\n",
+							kFileName,
+							errc.message().c_str());
 				}
-
-				if (f)
+				
+				if (first)
 				{
-					fprintf(f, "\"%s\"\n", text);
-					fclose(f);
+					first = false;
 				}
 			}
 #endif // LOG_UNLOCALIZED_STRINGS
@@ -141,20 +149,27 @@ void TextImage::SetText(const char *text)
 		{
 			// setting a label to be ANSI text, write out error to unlocalized.txt log file
 			static bool first = true;
-			FILE *f;
-			if (first)
+
+			constexpr char kFileName[]{"unlocalized.txt"};
+			auto [f, errc] = s1::posix::posix_file_stream_factory::open(
+				kFileName, first ? "wt" : "at" );
+			if (errc)
 			{
-				first = false;
-				f = fopen("unlocalized.txt", "wt");
+				Warning("Unable to open unlocalized strings log '%s' for writing: %s.\n",
+						kFileName,
+						errc.message().c_str());
 			}
 			else
 			{
-				f = fopen("unlocalized.txt", "at");
+				std::tie(std::ignore, errc) = f.print( "\"%s\"\n", text );
+				Warning("Write to unlocalized strings log '%s' failed: %s.\n",
+						kFileName,
+						errc.message().c_str());
 			}
-			if (f)
+				
+			if (first)
 			{
-				fprintf(f, "\"%s\"\n", text);
-				fclose(f);
+				first = false;
 			}
 		}
 #endif // LOG_UNLOCALIZED_STRINGS
