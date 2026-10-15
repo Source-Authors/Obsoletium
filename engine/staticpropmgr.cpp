@@ -1211,7 +1211,8 @@ void CStaticProp::CreateVPhysics( IPhysicsEnvironment *pPhysEnv, IVPhysicsKeyHan
 	solid.params.pName = "prop_static";
 
 	intp surfaceData = physprop->GetSurfaceIndex( solid.surfaceprop );
-	pPhysEnv->CreatePolyObjectStatic( pPhysCollide, 
+	// dimhotepus: Object stored in internal list, no var needed.
+	(void)pPhysEnv->CreatePolyObjectStatic( pPhysCollide, 
 		surfaceData, m_Origin, m_Angles, &solid.params );
 	//PhysCheckAdd( pPhys, "Static" );
 }
