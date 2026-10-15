@@ -1,14 +1,10 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: Simple class to make it easier to deal with flags
-//
-//=============================================================================
-
 #ifndef UTLFLAGS_H
 #define UTLFLAGS_H
 
 #include "tier0/dbg.h"
 
+#include <limits>
+#include <type_traits>
 
 //-----------------------------------------------------------------------------
 // Simple class to make it easier to deal with flags
@@ -16,106 +12,131 @@
 template< class T >
 class CUtlFlags
 {
+	static_assert(std::is_integral_v<T> && !std::is_same_v<T, bool>,
+		"CUtlFlags requires a non-bool integral type");
+
 public:
-	CUtlFlags( int nInitialFlags = 0 );
+	explicit CUtlFlags( int nInitialFlags = 0 )
+		: m_nFlags{}
+	{
+		T flags{};
+		// dimhotepus: Check int -> T works.
+		if ( !TryConvert( nInitialFlags, flags ) )
+		{
+			Assert(false);
+			return;
+		}
+		m_nFlags = flags;
+	}
 
-	// Flag setting
-	void SetFlag( int nFlagMask );
-	void SetFlag( int nFlagMask, bool bEnable );
+	void SetFlag( int nFlagMask )
+	{
+		T mask{};
+		// dimhotepus: Check int -> T works.
+		if ( !TryConvert( nFlagMask, mask ) )
+		{
+			Assert(false);
+			return;
+		}
+		m_nFlags = static_cast<T>( m_nFlags | mask );
+	}
 
-	// Flag clearing
-	void ClearFlag( int nFlagMask );
-	void ClearAllFlags();
-	[[nodiscard]] bool IsFlagSet( int nFlagMask ) const;
+	void SetFlag( int nFlagMask, bool bEnable )
+	{
+		T mask{};
+		// dimhotepus: Check int -> T works.
+		if ( !TryConvert( nFlagMask, mask ) )
+		{
+			Assert(false);
+			return;
+		}
 
-	// Is any flag set?
-	[[nodiscard]] bool IsAnyFlagSet() const;
+		if ( bEnable )
+			m_nFlags = static_cast<T>( m_nFlags | mask );
+		else
+			m_nFlags = static_cast<T>( m_nFlags & static_cast<T>( ~mask ) );
+	}
+
+	void ClearFlag( int nFlagMask )
+	{
+		T mask{};
+		// dimhotepus: Check int -> T works.
+		if ( !TryConvert( nFlagMask, mask ) )
+		{
+			Assert(false);
+			return;
+		}
+		m_nFlags = static_cast<T>( m_nFlags & static_cast<T>( ~mask ) );
+	}
+
+	void ClearAllFlags()
+	{
+		m_nFlags = T{};
+	}
+
+	// true if any requested bit is set.
+	[[nodiscard]] bool IsFlagSet( int nFlagMask ) const
+	{
+		T mask{};
+		// dimhotepus: Check int -> T works.
+		if ( !TryConvert( nFlagMask, mask ) )
+		{
+			Assert(false);
+			return false;
+		}
+		return (m_nFlags & mask) != 0;
+	}
+
+	// True only if every requested bit is set. A zero mask is vacuously true.
+	[[nodiscard]] bool AreAllFlagsSet( int nFlagMask ) const
+	{
+		T mask{};
+		// dimhotepus: Check int -> T works.
+		if ( !TryConvert( nFlagMask, mask ) )
+		{
+			Assert(false);
+			return false;
+		}
+		return (m_nFlags & mask) == mask;
+	}
+
+	[[nodiscard]] bool IsAnyFlagSet() const
+	{
+		return m_nFlags != T{};
+	}
 
 private:
+	// dimhotepus: Check int -> T works.
+	[[nodiscard]] static bool TryConvert( int value, T &result )
+	{
+		if constexpr (std::is_signed_v<T>)
+		{
+			if constexpr (std::numeric_limits<T>::digits <
+						  std::numeric_limits<int>::digits)
+			{
+				if ( value < static_cast<int>( std::numeric_limits<T>::min() ) ||
+					 value > static_cast<int>( std::numeric_limits<T>::max() ) )
+					return false;
+			}
+		}
+		else
+		{
+			if ( value < 0 )
+				return false;
+
+			if constexpr (std::numeric_limits<T>::digits <
+						  std::numeric_limits<int>::digits)
+			{
+				if ( value > static_cast<int>( std::numeric_limits<T>::max() ) )
+					return false;
+			}
+		}
+
+		result = static_cast<T>( value );
+		return true;
+	}
+
 	T m_nFlags;
 };
-
-
-//-----------------------------------------------------------------------------
-// Constructor
-//-----------------------------------------------------------------------------
-template< class T >
-CUtlFlags<T>::CUtlFlags( int nInitialFlags )
-{
-	// Makes sure we didn't truncate
-	Assert( nInitialFlags == static_cast<T>(nInitialFlags) );
-
-	m_nFlags = static_cast<T>(nInitialFlags);
-}
-
-
-//-----------------------------------------------------------------------------
-// Set flags
-//-----------------------------------------------------------------------------
-template< class T >
-void CUtlFlags<T>::SetFlag( int nFlagMask )
-{
-	// Makes sure we didn't truncate
-	Assert( nFlagMask == static_cast<T>(nFlagMask) );
-
-	m_nFlags |= static_cast<T>(nFlagMask);
-}
-
-template< class T >
-void CUtlFlags<T>::SetFlag( int nFlagMask, bool bEnable )
-{
-	// Makes sure we didn't truncate
-	Assert( nFlagMask == static_cast<T>(nFlagMask) );
-
-	if ( bEnable )
-	{
-		m_nFlags |= static_cast<T>(nFlagMask);
-	}
-	else
-	{
-		m_nFlags &= ~static_cast<T>(nFlagMask);
-	}
-}
-
-
-//-----------------------------------------------------------------------------
-// Clear flags
-//-----------------------------------------------------------------------------
-template< class T >
-void CUtlFlags<T>::ClearFlag( int nFlagMask )
-{
-	// Makes sure we didn't truncate
-	Assert( nFlagMask == static_cast<T>(nFlagMask) );
-	m_nFlags &= ~static_cast<T>(nFlagMask);
-}
-
-template< class T >
-void CUtlFlags<T>::ClearAllFlags()
-{
-	m_nFlags = 0;
-}
-
-
-//-----------------------------------------------------------------------------
-// Is a flag set?
-//-----------------------------------------------------------------------------
-template< class T >
-bool CUtlFlags<T>::IsFlagSet( int nFlagMask ) const
-{
-	// Makes sure we didn't truncate
-	Assert( nFlagMask == static_cast<T>(nFlagMask) );
-	return ( m_nFlags & nFlagMask ) != 0;
-}
-
-
-//-----------------------------------------------------------------------------
-// Is any flag set?
-//-----------------------------------------------------------------------------
-template< class T >
-bool CUtlFlags<T>::IsAnyFlagSet() const
-{
-	return m_nFlags != 0;
-}
-
 
 #endif // UTLFLAGS_H
