@@ -370,7 +370,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
 #endif
 
   // Hook the debug output stuff.
-  const ScopedSpewOutputFunc scoped_spew_output(DefaultSpew);
+  const ScopedSpewOutputFunc scoped_spew_output{DefaultSpew};
 
   // Dump compiler / libs / app versions.
 #ifdef WIN32
@@ -555,8 +555,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
       !!command_line->HasParm("-leakcheck")};
 
   // Run in text mode (no graphics & sound)?
-  const bool is_text_mode{command_line->HasParm("-textmode") &&
-                          InitTextMode()};
+  const bool is_text_mode{command_line->HasParm("-textmode") && InitTextMode()};
 
   rc = RunApp(command_line, base_directory, is_text_mode);
 
