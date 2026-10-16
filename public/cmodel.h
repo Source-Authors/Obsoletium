@@ -70,31 +70,52 @@ struct Ray_t
 	void Init( Vector const& start, Vector const& end )
 	{
 		VectorSubtract( end, start, m_Delta );
+		// dimhotepus: Set to 1 as nan causes floating point issues when computing. 
+		m_Delta.w = 1;
 
 		m_IsSwept = (m_Delta.LengthSqr() != 0);
 
 		VectorClear( m_Extents );
+		// dimhotepus: Set to 1 as nan causes floating point issues when computing. 
+		m_Extents.w = 1;
+
 		m_IsRay = true;
 
 		// Offset m_Start to be in the center of the box...
 		VectorClear( m_StartOffset );
+		// dimhotepus: Set to 1 as nan causes floating point issues when computing. 
+		m_StartOffset.w = 1;
+
 		VectorCopy( start, m_Start );
+		// dimhotepus: Set to 1 as nan causes floating point issues when computing. 
+		m_Start.w = 1;
 	}
 
 	void Init( Vector const& start, Vector const& end, Vector const& mins, Vector const& maxs )
 	{
 		VectorSubtract( end, start, m_Delta );
+		// dimhotepus: Set to 1 as nan causes floating point issues when computing. 
+		m_Delta.w = 1;
 
 		m_IsSwept = (m_Delta.LengthSqr() != 0);
 
 		VectorSubtract( maxs, mins, m_Extents );
+		// dimhotepus: Set to 1 as nan causes floating point issues when computing. 
+		m_Extents.w = 1;
+
 		m_Extents *= 0.5f;
 		m_IsRay = (m_Extents.LengthSqr() < 1e-6);
 
 		// Offset m_Start to be in the center of the box...
 		VectorAdd( mins, maxs, m_StartOffset );
+		// dimhotepus: Set to 1 as nan causes floating point issues when computing. 
+		m_StartOffset.w = 1;
+
 		m_StartOffset *= 0.5f;
 		VectorAdd( start, m_StartOffset, m_Start );
+		// dimhotepus: Set to 1 as nan causes floating point issues when computing. 
+		m_Start.w = 1;
+
 		m_StartOffset *= -1.0f;
 	}
 
