@@ -328,7 +328,8 @@ void CShaderSystem::LoadAllShaderDLLs( )
 	Assert( dxSupportLevel >= 60 );
 	dxSupportLevel /= 10;
 
-	int dxStart = 6;
+	// dimhotepus: DirectX 10+ has entirely different shader models, so load only needed.
+	int dxStart = dxSupportLevel < 10 ? 6 : dxSupportLevel;
 	char buf[32];
 	for ( i = dxStart; i <= dxSupportLevel; ++i )
 	{
