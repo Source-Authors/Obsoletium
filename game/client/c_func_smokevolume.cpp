@@ -567,6 +567,8 @@ void C_FuncSmokeVolume::FillVolume()
 						if(pParticle)
 						{
 							pParticle->m_Pos = vPos;
+							// dimhotepus: Set no fade by default as nan causes issues later.
+							pParticle->m_FadeAlpha = 1.0f;
 							pParticle->m_ColorInterp = (unsigned char)((rand() * 255) / VALVE_RAND_MAX);
 							pParticle->m_RotationFactor = FRand( -1.0f, 1.0f ); // Rotation factor.
 							pParticle->m_CurRotation = FRand( -m_RotationSpeed, m_RotationSpeed );
