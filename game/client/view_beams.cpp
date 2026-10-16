@@ -2273,7 +2273,8 @@ void CViewRenderBeams::DrawBeam( C_Beam* pbeam, ITraceFilter *pEntityBeamTraceFi
 	if ( pbeam->m_nHaloIndex > 0 )
 	{
 		// HACKHACK: heuristic to estimate proxy size.  Revisit this!
-		float size = 1.0f + (pbeam->m_fHaloScale * pbeam->m_fWidth / pbeam->m_fEndWidth);
+		// dimhotepus: m_fEndWidth may be 0.0f so it causes issues when computing size.
+		float size = 1.0f + (pbeam->m_fHaloScale * pbeam->m_fWidth / (pbeam->m_fEndWidth ? pbeam->m_fEndWidth : MAX_BEAM_WIDTH));
 		size = clamp( size, 1.0f, 8.0f );
 		beam.m_queryHandleHalo = &pbeam->m_queryHandleHalo;
 		beam.m_haloProxySize = size;
