@@ -12,33 +12,38 @@ using HRESULT = _Return_type_success_(return >= 0) long;
 
 extern "C" {
 
-__declspec(dllimport) _Check_return_ HRESULT
-    __stdcall CoInitializeEx(_In_opt_ void *pvReserved,
-                             _In_ unsigned long dwCoInit);
+__declspec(dllimport) _Check_return_ HRESULT __stdcall CoInitializeEx(
+    _In_opt_ void* pvReserved, _In_ unsigned long dwCoInit);
 __declspec(dllimport) void __stdcall CoUninitialize();
-}
+
+}  // extern "C"
 
 namespace s1::win {
 
-// Scoped COM.
+/**
+ * @brief Initializes COM for this scope and uninitializes it on successful
+ * setup.  Construct and destroy this object on the same thread.
+ */
 class ScopedCom {
  public:
   explicit ScopedCom(COINIT com_type) noexcept
-      : errc_{CoInitializeEx(nullptr, to_underlying(com_type))} {}
+      : result_{CoInitializeEx(nullptr, to_underlying(com_type))} {}
 
-  ScopedCom(const ScopedCom &) = delete;
-  ScopedCom(ScopedCom &&) = delete;
-  ScopedCom &operator=(const ScopedCom &) = delete;
-  ScopedCom &operator=(ScopedCom &&) = delete;
+  ScopedCom(const ScopedCom&) = delete;
+  ScopedCom(ScopedCom&&) = delete;
+  ScopedCom& operator=(const ScopedCom&) = delete;
+  ScopedCom& operator=(ScopedCom&&) = delete;
 
-  [[nodiscard]] HRESULT errc() const noexcept { return errc_; }
+  [[nodiscard]] HRESULT error_code() const noexcept { return result_; }
 
   ~ScopedCom() noexcept {
-    if (SUCCEEDED(errc_)) CoUninitialize();
+    if (SUCCEEDED(result_)) {
+      CoUninitialize();
+    }
   }
 
  private:
-  const HRESULT errc_;
+  const HRESULT result_;
 };
 
 }  // namespace s1::win

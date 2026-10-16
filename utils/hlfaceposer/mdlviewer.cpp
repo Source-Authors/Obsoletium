@@ -2727,10 +2727,10 @@ int main (int argc, char *argv[])
 	constexpr COINIT comFlags{
 		static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE | COINIT_SPEED_OVER_MEMORY)};
 	s1::win::ScopedCom scopedCom{comFlags};
-	if (FAILED(scopedCom.errc())) {
-		const _com_error com_error{scopedCom.errc()};
+	if (FAILED(scopedCom.error_code())) {
+		const _com_error com_error{scopedCom.error_code()};
 		mxMessageBox(nullptr, va( "Unable to initialize COM (0x%x): %s.",
-			scopedCom.errc(), com_error.ErrorMessage() ),
+			scopedCom.error_code(), com_error.ErrorMessage() ),
 			g_appTitle, MX_MB_OK | MX_MB_ERROR );
 		return 1;
 	}

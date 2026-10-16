@@ -33,7 +33,7 @@ size_t GetVidMemBytes( unsigned nAdapter )
 
 	s1::win::ScopedCom scoped_com{
 		static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE | COINIT_SPEED_OVER_MEMORY)};
-	if ( FAILED(scoped_com.errc()) )
+	if ( FAILED(scoped_com.error_code()) )
 	{
 		Warning( "Unable to get GPU VRAM size: COM initialization failure.\n" );
 		return 0;

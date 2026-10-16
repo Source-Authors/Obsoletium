@@ -163,9 +163,9 @@ bool HammerAppSystemGroup::Create() {
 
 #ifdef WIN32
   // COM is required.
-  if (FAILED(scoped_com_.errc())) {
-    const _com_error com_error{scoped_com_.errc()};
-    Error("Unable to initialize COM (0x%x): %s.\n\n", scoped_com_.errc(),
+  if (FAILED(scoped_com_.error_code())) {
+    const _com_error com_error{scoped_com_.error_code()};
+    Error("Unable to initialize COM (0x%x): %s.\n\n", scoped_com_.error_code(),
           com_error.ErrorMessage());
   }
 

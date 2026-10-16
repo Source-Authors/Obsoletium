@@ -469,9 +469,9 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   const s1::win::ScopedCom scoped_com{
       static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE |
                           COINIT_SPEED_OVER_MEMORY)};
-  if (FAILED(scoped_com.errc())) {
-    const _com_error com_error{scoped_com.errc()};
-    Error("Unable to initialize COM (0x%x): %s.\n\n", scoped_com.errc(),
+  if (FAILED(scoped_com.error_code())) {
+    const _com_error com_error{scoped_com.error_code()};
+    Error("Unable to initialize COM (0x%x): %s.\n\n", scoped_com.error_code(),
           com_error.ErrorMessage());
   }
 
