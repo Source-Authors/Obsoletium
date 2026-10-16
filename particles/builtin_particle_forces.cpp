@@ -58,6 +58,7 @@ void C_OP_RandomForce::AddForces( FourVectors *pAccumulatedForces,
 	box_max.DuplicateVector( m_MaxForce * flStrength);
 	box_max -= box_min;
 	int nContext = GetSIMDRandContext();
+	RunCodeAtScopeExit(ReleaseSIMDRandContext( nContext ));
 	for(int i=0;i<nBlocks;i++)
 	{
 		pAccumulatedForces->x = AddSIMD(
@@ -68,7 +69,6 @@ void C_OP_RandomForce::AddForces( FourVectors *pAccumulatedForces,
 			pAccumulatedForces->z, MaddSIMD( box_max.z, RandSIMD( nContext), box_min.z ) );
 		pAccumulatedForces++;
 	}
-	ReleaseSIMDRandContext( nContext );
 }
 
 DEFINE_PARTICLE_OPERATOR( C_OP_RandomForce, "random force", OPERATOR_GENERIC );

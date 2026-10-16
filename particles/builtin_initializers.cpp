@@ -32,13 +32,12 @@ void CParticleOperatorInstance::InitScalarAttributeRandomRangeBlock(
 	fltx4 val0 = ReplicateX4( fMin );
 	fltx4 val_d = ReplicateX4( fMax - fMin );
 	int nRandContext = GetSIMDRandContext();
+	RunCodeAtScopeExit(ReleaseSIMDRandContext( nRandContext ));
 	while( n_blocks-- )
 	{
 		*( pAttr ) = MaddSIMD( RandSIMD( nRandContext ), val_d, val0 );
 		pAttr += attr_stride;
 	}
-	ReleaseSIMDRandContext( nRandContext );
-
 }
 
 void CParticleOperatorInstance::InitScalarAttributeRandomRangeExpBlock( 
@@ -53,12 +52,12 @@ void CParticleOperatorInstance::InitScalarAttributeRandomRangeExpBlock(
 	//fltx4 val_e = ReplicateX4( fExp );
 	int nExp = (int)(4.0f * fExp);
 	int nRandContext = GetSIMDRandContext();
+	RunCodeAtScopeExit(ReleaseSIMDRandContext( nRandContext ));
 	while( n_blocks-- )
 	{
 		*( pAttr ) = MaddSIMD( Pow_FixedPoint_Exponent_SIMD( RandSIMD( nRandContext ), nExp ), val_d, val0 );
 		pAttr += attr_stride;
 	}
-	ReleaseSIMDRandContext( nRandContext );
 }
 
 void CParticleOperatorInstance::AddScalarAttributeRandomRangeBlock( 
@@ -71,6 +70,7 @@ void CParticleOperatorInstance::AddScalarAttributeRandomRangeBlock(
 	fltx4 val0 = ReplicateX4( fMin );
 	fltx4 val_d = ReplicateX4( fMax - fMin );
 	int nRandContext = GetSIMDRandContext();
+	RunCodeAtScopeExit(ReleaseSIMDRandContext( nRandContext ));
 	if ( !bRandomlyInvert )
 	{
 		if ( fExp != 1.0f )
@@ -116,7 +116,6 @@ void CParticleOperatorInstance::AddScalarAttributeRandomRangeBlock(
 			}
 		}
 	}
-	ReleaseSIMDRandContext( nRandContext );
 }
 
 
@@ -479,6 +478,7 @@ void C_INIT_CreateWithinSphere::InitNewParticlesBlock( CParticleCollection *pPar
 		fltx4 fl4OODt = ReplicateX4( flOODT );
 		fltx4 fl4PrevTime = ReplicateX4( pParticles->m_flCurTime - pParticles->m_flDt );
 		int nContext = GetSIMDRandContext();
+		RunCodeAtScopeExit(ReleaseSIMDRandContext( nContext ));
 
 		FourVectors v4DistanceBias;
 		v4DistanceBias.DuplicateVector( m_vecDistanceBias );
@@ -586,8 +586,6 @@ void C_INIT_CreateWithinSphere::InitNewParticlesBlock( CParticleCollection *pPar
 			++pPrevXYZ;
 			++pCT;
 		}
-		ReleaseSIMDRandContext( nContext );
-
 	}
 	else
 		CParticleOperatorInstance::InitNewParticlesBlock( pParticles, start_block, n_blocks, nAttributeWriteMask, pContext );
@@ -1770,6 +1768,7 @@ class C_INIT_RandomColor : public CParticleOperatorInstance
 		fvColorWidth.DuplicateVector( Vector (m_flNormColorMax[0] - m_flNormColorMin[0], m_flNormColorMax[1] - m_flNormColorMin[1], m_flNormColorMax[2] - m_flNormColorMin[2] ) );
 
 		int nRandContext = GetSIMDRandContext();
+		RunCodeAtScopeExit(ReleaseSIMDRandContext( nRandContext ));
 
 		// If we're factoring in luminosity or tint, then get our lighting info for this position
 		if ( m_flTintPerc )
@@ -1832,7 +1831,6 @@ class C_INIT_RandomColor : public CParticleOperatorInstance
 				pColor += attr_stride;
 			}
 		}
-		ReleaseSIMDRandContext( nRandContext );
 	}
 
 	virtual uint64 GetReadControlPointMask() const

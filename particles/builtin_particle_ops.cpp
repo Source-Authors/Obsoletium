@@ -2015,6 +2015,7 @@ void C_OP_PositionLock::Operate( CParticleCollection *pParticles, float flStreng
 	}
 
 	int nContext = GetSIMDRandContext();
+	RunCodeAtScopeExit(ReleaseSIMDRandContext( nContext ));
 
 	// Control point movement delta - not full transform
 	vDelta 	= vecControlPoint - pCtx->m_vPrevPosition;
@@ -2167,7 +2168,6 @@ void C_OP_PositionLock::Operate( CParticleCollection *pParticles, float flStreng
 	{
 		pCtx->m_matPrevTransform = matCurrentTransform;
 	}
-	ReleaseSIMDRandContext( nContext );
 };
 #endif
 
