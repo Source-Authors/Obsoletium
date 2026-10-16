@@ -40,6 +40,8 @@
 #define IN_READS_BYTES(x) _In_reads_bytes_(x)
 // dimhotepus: Add out annotation.
 #define OUT_ARG _Out_
+// dimhotepus: Add out opt annotation.
+#define OUT_OPT_ARG _Out_opt_
 #define OUT_Z_CAP(x) _Out_z_cap_(x)
 #define OUT_Z_CAP_OPT(x) _Out_opt_z_cap_(x)
 #define OUT_CAP(x) _Out_cap_(x)
@@ -96,6 +98,8 @@
 #define IN_READS_BYTES(x)
 // dimhotepus: Add out annotation.
 #define OUT_ARG
+// dimhotepus: Add out opt annotation.
+#define OUT_OPT_ARG
 #define OUT_Z_CAP(x)
 #define OUT_Z_CAP_OPT(x)
 #define OUT_CAP(x)
