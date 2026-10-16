@@ -2770,7 +2770,7 @@ int CVTex::VTex( int argc, char **argv )
 	constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
 
 	const s1::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-	if (!V_strieq(s1::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+	if (!scoped_app_locale.IsSuccess()) {
 		Warning("setlocale('%s') failed, current locale is '%s'.\n",
 			kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale());
 	}

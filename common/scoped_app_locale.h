@@ -6,47 +6,58 @@
 #include <clocale>
 #include <string>
 
+#include "tier0/annotations.h"
+#include "tier0/dbg.h"
 #include "tier1/strtools.h"
 
 namespace s1 {
 
-// Scoped app locale.
+/**
+ * @brief Set locale for process in scope and revert back out of scope.
+ */
 class ScopedAppLocale {
  public:
-  explicit ScopedAppLocale(const char *new_locale) noexcept
-      : old_locale_{GetCurrentLocale()}, new_locale_{new_locale} {
-#ifdef LINUX
-    setenv("LC_ALL", new_locale, 1);
-#endif
-
-    if (!V_streq(new_locale, old_locale_.c_str())) {
-      std::setlocale(LC_ALL, new_locale);
-    }
-  }
-
-  ScopedAppLocale(const ScopedAppLocale &) = delete;
-  ScopedAppLocale(ScopedAppLocale &&) = delete;
-  ScopedAppLocale &operator=(const ScopedAppLocale &) = delete;
-  ScopedAppLocale &operator=(ScopedAppLocale &&) = delete;
+  explicit ScopedAppLocale(IN_P const char* new_locale)
+      : old_locale_{GetCurrentLocale()},
+        new_locale_{new_locale ? SetCurrentLocale(new_locale) : kEmptyLocale} {}
 
   ~ScopedAppLocale() noexcept {
-    const char *locale{GetCurrentLocale()};
-    if (V_streq(locale, new_locale_.c_str())) {
-      std::setlocale(LC_ALL, old_locale_.c_str());
+    if (!new_locale_.empty()) {
+      const char* current_locale{GetCurrentLocale()};
+      if (V_streq(current_locale, new_locale_.c_str())) {
+        const char* actual_locale{std::setlocale(LC_ALL, old_locale_.c_str())};
+        if (V_isempty(actual_locale)) {
+          Warning("Failed to reset locale from %s to %s.\n", current_locale,
+                  old_locale_.c_str());
+        }
+      }
     }
   }
 
-  static const char *GetCurrentLocale() noexcept {
-    const char *locale{std::setlocale(LC_ALL, nullptr)};
+  [[nodiscard]] bool IsSuccess() const noexcept { return !new_locale_.empty(); }
+
+  [[nodiscard]] static const char* GetCurrentLocale() noexcept {
+    const char* locale{std::setlocale(LC_ALL, nullptr)};
     return locale ? locale : kEmptyLocale;
   }
 
+  ScopedAppLocale(const ScopedAppLocale&) = delete;
+  ScopedAppLocale(ScopedAppLocale&&) = delete;
+  ScopedAppLocale& operator=(const ScopedAppLocale&) = delete;
+  ScopedAppLocale& operator=(ScopedAppLocale&&) = delete;
+
  private:
   std::string old_locale_, new_locale_;
+
+  [[nodiscard]] static const char* SetCurrentLocale(
+      const char* locale) noexcept {
+    const char* actual_locale{std::setlocale(LC_ALL, locale)};
+    return actual_locale ? actual_locale : kEmptyLocale;
+  }
 
   static constexpr char kEmptyLocale[1]{""};
 };
 
 }  // namespace s1
 
-#endif  // SE_COMMON_SCOPED_APP_LOCALE_H_
+#endif  // !SE_COMMON_SCOPED_APP_LOCALE_H_

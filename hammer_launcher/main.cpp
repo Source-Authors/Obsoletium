@@ -144,7 +144,7 @@ class HammerAppSystemGroup final : public CAppSystemGroup {
 
 // Create all singleton systems
 bool HammerAppSystemGroup::Create() {
-  if (Q_stricmp(s1::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+  if (!scoped_app_locale_.IsSuccess()) {
     Warning("setlocale('%s') failed, current locale is '%s'.\n",
             kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale());
   }
