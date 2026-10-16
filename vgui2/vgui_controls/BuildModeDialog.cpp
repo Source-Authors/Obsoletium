@@ -997,7 +997,7 @@ void BuildModeDialog::ApplyDataToControls()
 
 	// create a section to store settings
 	// m_pPanelList->m_pResourceData->getSection( m_pCurrentPanel->GetName(), true );
-	// dimhteopus: Fix KeyValues leak.
+	// dimhotepus: Fix KeyValues leak.
 	KeyValuesAD dat( m_pCurrentPanel->GetName() );
 
 	// loop through the textedit filling in settings
