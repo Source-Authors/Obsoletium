@@ -261,96 +261,56 @@ void MakeSkyVec( float s, float t, int axis, float zFar, Vector& position, Vecto
 //-----------------------------------------------------------------------------
 void R_DrawSkyBox( float zFar, int nDrawFlags /*= 0x3F*/  )
 {
-	VPROF("R_DrawSkyBox");
-	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s %x", __FUNCTION__, nDrawFlags );
+  VPROF("R_DrawSkyBox");
+  tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s %x", __FUNCTION__, nDrawFlags );
 
-	int		i;
-	Vector	normal;
+  int i;
 
-	if ( !r_drawskybox.GetInt() || !mat_loadtextures.GetInt() )
+  if ( !r_drawskybox.GetInt() || !mat_loadtextures.GetInt() )
+  {
+    return;
+  }
+
+  CMatRenderContextPtr pRenderContext(materials);
+
+  for (i=0 ; i<6 ; i++, nDrawFlags >>= 1 )
+  {
+    // Don't draw this panel of the skybox if the flag isn't set:
+    if (!(nDrawFlags & 1)) continue;
+
+    // Draw every enabled skybox face and let the GPU clip invisible geometry.
+
+    Vector positionArray[4];
+    Vector2D texCoordArray[4];
+	if (skyboxMaterials[skytexorder[i]])
 	{
-		return;
-	}
+	  pRenderContext->Bind( skyboxMaterials[skytexorder[i]] );
 
-	CMatRenderContextPtr pRenderContext( materials );
+	  MakeSkyVec( -1.0f, -1.0f, i, zFar, positionArray[0], texCoordArray[0] );
+	  MakeSkyVec( -1.0f, 1.0f, i, zFar, positionArray[1], texCoordArray[1] );
+	  MakeSkyVec( 1.0f, 1.0f, i, zFar, positionArray[2], texCoordArray[2] );
+	  MakeSkyVec( 1.0f, -1.0f, i, zFar, positionArray[3], texCoordArray[3] );
 
-	for (i=0 ; i<6 ; i++, nDrawFlags >>= 1 )
-	{
-		// Don't draw this panel of the skybox if the flag isn't set:
-		if ( !(nDrawFlags & 1) )
-			continue;
+      IMesh* pMesh = pRenderContext->GetDynamicMesh();
 
-		VectorCopy( vec3_origin, normal );
-		switch( gFakePlaneType[i] )
-		{
-		case 1:
-			normal[0] = 1;
-			break;
+      CMeshBuilder meshBuilder;
+	  meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, 4, 6 );
 
-		case -1:
-			normal[0] = -1;
-			break;
+	  // meshbuilder Begin can fail if dynamic mesh is not available (eg, alt-tabbed away)
+	  if ( meshBuilder.BaseVertexData() == NULL )
+		continue;
 
-		case 2:
-			normal[1] = 1;
-			break;
+	  for (int j = 0; j < 4; ++j)
+	  {
+		meshBuilder.Position3fv( positionArray[j].Base() );
+		meshBuilder.TexCoord2fv( 0, texCoordArray[j].Base() );
+		meshBuilder.AdvanceVertex();
+	  }
+	  CIndexBuilder &indexBuilder = meshBuilder;
+	  indexBuilder.FastQuad( 0 );
 
-		case -2:
-			normal[1] = -1;
-			break;
-
-		case 3:
-			normal[2] = 1;
-			break;
-
-		case -3:
-			normal[2] = -1;
-			break;
-		}
-
-		// dimhotepus: Fix skybox culling on low and high FOVs.
-		ConVarRef fov_desired("fov_desired");
-		Assert( fov_desired.IsValid() );
-
-		const float fovDegrees = fov_desired.GetFloat();
-
-		// Normals are reversed so looking at face dots to 1.0, looking away from is -1.0
-		// Reject backfacing surfaces on the inside of the cube to avoid binding their texture
-		// Assuming a 90 fov looking at face is 0 degrees, so reject at fov + 26
-		if ( DotProduct( CurrentViewForward(), normal ) < cosf( DEG2RAD( min( 180.0f, fovDegrees + 26.0f ) ) ) ) // < cos(DEG2RAD(107.0311))
-			continue;
-
-		Vector positionArray[4];
-		Vector2D texCoordArray[4];
-		if (skyboxMaterials[skytexorder[i]])
-		{
-			pRenderContext->Bind( skyboxMaterials[skytexorder[i]] );
-
-			MakeSkyVec( -1.0f, -1.0f, i, zFar, positionArray[0], texCoordArray[0] );
-			MakeSkyVec( -1.0f, 1.0f, i, zFar, positionArray[1], texCoordArray[1] );
-			MakeSkyVec( 1.0f, 1.0f, i, zFar, positionArray[2], texCoordArray[2] );
-			MakeSkyVec( 1.0f, -1.0f, i, zFar, positionArray[3], texCoordArray[3] );
-
-			IMesh* pMesh = pRenderContext->GetDynamicMesh();
-
-			CMeshBuilder meshBuilder;
-			meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, 4, 6 );
-
-			// meshbuilder Begin can fail if dynamic mesh is not available (eg, alt-tabbed away)
-			if ( meshBuilder.BaseVertexData() == NULL )
-				continue;
-
-			for (int j = 0; j < 4; ++j)
-			{
-				meshBuilder.Position3fv( positionArray[j].Base() );
-				meshBuilder.TexCoord2fv( 0, texCoordArray[j].Base() );
-				meshBuilder.AdvanceVertex();
-			}
-			CIndexBuilder &indexBuilder = meshBuilder;
-			indexBuilder.FastQuad( 0 );
-		
-			meshBuilder.End();
-			pMesh->Draw();
-		}
-	}
+      meshBuilder.End();
+      pMesh->Draw();
+    }
+  }
 }
