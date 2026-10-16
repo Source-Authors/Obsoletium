@@ -2795,8 +2795,12 @@ void CDetailObjectSystem::BuildDetailObjectRenderLists( const Vector &vViewOrigi
 	{
 		m_flCurFadeSqDist = 0;
 	}
-	m_flCurFadeSqDist = MIN( m_flCurFadeSqDist, m_flCurMaxSqDist -1  );
-	m_flCurFalloffFactor = 255.0f / ( m_flCurMaxSqDist - m_flCurFadeSqDist );
+	m_flCurFadeSqDist = MIN( m_flCurFadeSqDist, m_flCurMaxSqDist - 1 );
+	// dimhotepus: Fix divide by zero when m_flCurMaxSqDist == m_flCurFadeSqDist.
+	m_flCurFalloffFactor = 255.0f / (
+		m_flCurMaxSqDist != m_flCurFadeSqDist
+			? m_flCurMaxSqDist - m_flCurFadeSqDist
+			: 1.0f );
 
 
 	ISpatialQuery* pQuery = engine->GetBSPTreeQuery();
