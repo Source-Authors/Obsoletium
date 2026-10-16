@@ -1864,17 +1864,18 @@ CDecalVert* R_DecalSetupVerts( decalcontext_t &context, decal_t *pDecal, Surface
 		{
 
 #ifndef NDEBUG
+			// dimhotepus: Not needed anymore. Let's catch nans here.
 			// squash vector copy asserts in debug
-			int nextVert = NEXT_MULTIPLE_OF_4(pDecal->clippedVertCount);
-			if ( (nextVert - pDecal->clippedVertCount) < 4 )
-			{
-				for ( int i = pDecal->clippedVertCount; i < nextVert; i++ )
-				{
-					v[i].m_cLMCoords.Init();
-					v[i].m_ctCoords.Init();
-					v[i].m_vPos.Init();
-				}
-			}
+			// int nextVert = NEXT_MULTIPLE_OF_4(pDecal->clippedVertCount);
+			// if ( (nextVert - pDecal->clippedVertCount) < 4 )
+			// {
+			// 	for ( int i = pDecal->clippedVertCount; i < nextVert; i++ )
+			// 	{
+			// 		v[i].m_cLMCoords.Init();
+			// 		v[i].m_ctCoords.Init();
+			// 		v[i].m_vPos.Init();
+			// 	}
+			// }
 #endif
 			R_DecalVertsLight( v, context, surfID, pDecal->clippedVertCount );
 			g_DecalVertCache.StoreVertsInCache( pDecal, v );
