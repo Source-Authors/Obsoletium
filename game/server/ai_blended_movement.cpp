@@ -300,9 +300,14 @@ void CAI_BlendedMotor::SetMoveScriptAnim( float flNewSpeed )
 	SetPlaybackRate( m_flCurrRate );
 	// calc weight of idle animation layer that suppresses the run animation
 	float flWeight = 0.0f;
-	if (GetIdealSpeed() > 0.0f)
+	if (float flIdealSpeed{GetIdealSpeed()}; flIdealSpeed > 0.0f)
 	{
-		flWeight = 1.0f - (flNewSpeed / (GetIdealSpeed()  * GetPlaybackRate()));
+		// dimhotepus: When animations are played, ensire we have nonzero playback rate.
+		// dimhotepus: Otherwise we got nasty nans causing issues.
+		float flPlaybackRate = GetPlaybackRate();
+		if (flPlaybackRate == 0.0f) flPlaybackRate = 1.0f;
+
+		flWeight = 1.0f - (flNewSpeed / (GetIdealSpeed() * flPlaybackRate));
 	}
 	if (flWeight < 0.0f)
 	{
