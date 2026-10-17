@@ -131,6 +131,10 @@ void C_Flare::RestoreResources( void )
 		
 		if ( m_pParticle[0] != NULL )
 		{
+			// dimhotepus: Ensure particle pos and velocity were init as we run simuluation even on invisible and nans cause issues.
+			m_pParticle[0]->m_Pos			= GetAbsOrigin();
+			m_pParticle[0]->m_vecVelocity.Init();
+
 			m_pParticle[0]->m_uchColor[0] = m_pParticle[0]->m_uchColor[1] = m_pParticle[0]->m_uchColor[2] = 0;
 			m_pParticle[0]->m_flRoll		= random->RandomInt( 0, 360 );
 			m_pParticle[0]->m_flRollDelta	= random->RandomFloat( 1.0f, 4.0f );
@@ -149,6 +153,10 @@ void C_Flare::RestoreResources( void )
 		
 		if ( m_pParticle[1] != NULL )
 		{
+			// dimhotepus: Ensure particle pos and velocity were init as we run simuluation even on invisible and nans cause issues.
+			m_pParticle[1]->m_Pos			= GetAbsOrigin();
+			m_pParticle[1]->m_vecVelocity.Init();
+
 			m_pParticle[1]->m_uchColor[0] = m_pParticle[1]->m_uchColor[1] = m_pParticle[1]->m_uchColor[2] = 0;
 			m_pParticle[1]->m_flRoll		= random->RandomInt( 0, 360 );
 			m_pParticle[1]->m_flRollDelta	= random->RandomFloat( 1.0f, 4.0f );
