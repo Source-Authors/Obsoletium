@@ -22,6 +22,7 @@
 
 #ifdef _WIN32
 #include "windows/scoped_com.h"
+#include "windows/scoped_floating_point_exception_mode.h"
 #include "windows/scoped_timer_resolution.h"
 #include "windows/scoped_winsock_initializer.h"
 #endif
@@ -355,6 +356,29 @@ void DumpAppInformation(
 #endif
 }
 
+[[nodiscard]] s1::win::FloatingPointExceptionMode GetFloatingPointExceptionMode(
+    ICommandLine* command_line) {
+  s1::win::FloatingPointExceptionMode mode{s1::win::FloatingPointExceptionMode::None};
+
+  if (command_line->HasParm("-check-float-underflow")) {
+    mode = mode | s1::win::FloatingPointExceptionMode::Underflow;
+  }
+
+  if (command_line->HasParm("-check-float-overflow")) {
+    mode = mode | s1::win::FloatingPointExceptionMode::Overflow;
+  }
+
+  if (command_line->HasParm("-check-float-zerodivide")) {
+    mode = mode | s1::win::FloatingPointExceptionMode::ZeroDivide;
+  }
+
+  if (command_line->HasParm("-check-float-invalid")) {
+    mode = mode | s1::win::FloatingPointExceptionMode::Invalid;
+  }
+
+  return mode;
+}
+
 }  // namespace
 
 // Entry point for the application.
@@ -418,6 +442,13 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
 
     std::this_thread::sleep_for(5000ms);
   }
+
+#ifdef _WIN32
+  // dimhotepus: Allow to catch floating point exceptions which are usually bugs
+  // in code.
+  const s1::win::ScopedFloatingPointExceptionMode
+    scoped_floating_point_exception_mode{GetFloatingPointExceptionMode(command_line)};
+#endif
 
   const CPUInformation *cpu_info{GetCPUInformation()};
   if (!cpu_info->m_bSSE || !cpu_info->m_bSSE2 || !cpu_info->m_bSSE3 ||
