@@ -10,7 +10,7 @@
 #include <VersionHelpers.h>  // IsWindows10OrGreater
 #include <WinSock2.h>
 #else
-#include <unistd.h>       // chdir, readlink
+#include <unistd.h>  // chdir, readlink
 #ifdef __APPLE__
 #include <mach-o/dyld.h>  // _NSGetExecutablePath
 #endif
@@ -18,6 +18,13 @@
 
 #include <atomic>
 #include <cerrno>
+#include <chrono>
+#include <climits>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <string>
+#include <system_error>
 #include <thread>
 
 #include "app_version_config.h"
@@ -30,10 +37,10 @@
 
 #ifdef _WIN32
 #include "windows/scoped_com.h"
+#include "windows/scoped_console_ctrl_handler.h"
 #include "windows/scoped_floating_point_exception_mode.h"
 #include "windows/scoped_timer_resolution.h"
 #include "windows/scoped_winsock_initializer.h"
-#include "windows/scoped_console_ctrl_handler.h"
 #endif
 
 #include "appframework/AppFramework.h"
