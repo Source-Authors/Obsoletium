@@ -71,8 +71,9 @@ class WindowsSystem : public ISystem {
   void Printf(PRINTF_FORMAT_STRING const char *fmt, ...) override;
 
  private:
-  ICommandLine *command_line_;
-  IDedicatedServerAPI *api_{nullptr};
+  ICommandLine* command_line_;
+  IDedicatedServerAPI* api_{nullptr};
+  double last_status_update_time_{0.0};
   const bool is_console_mode_;
 };
 
@@ -84,22 +85,18 @@ void WindowsSystem::ErrorMessage([[maybe_unused]] int level, const char* msg) {
 }
 
 void WindowsSystem::UpdateStatus(int force) {
-  static double last_update_time = 0.0;
-
   if (!api_) return;
 
   const double now_time{Plat_FloatTime()};
 
-  if (!force) {
-    if (now_time - last_update_time < 0.5) return;
-  }
+  if (!force && now_time - last_status_update_time_ < 0.5) return;
 
-  last_update_time = now_time;
+  last_status_update_time_ = now_time;
 
-  int active_players, max_players;
-  char map_name[64];
-  char host_name[128];
-  float fps;
+  int active_players{0}, max_players{0};
+  char map_name[64]{};
+  char host_name[128]{};
+  float fps{0.0f};
 
   api_->UpdateStatus(&fps, &active_players, &max_players, map_name,
                      sizeof(map_name));
@@ -107,10 +104,8 @@ void WindowsSystem::UpdateStatus(int force) {
 
 #ifdef PLATFORM_64BITS
   V_strcat_safe(host_name, " - 64 Bit");
-  console.SetTitle(host_name);
-#else
-  console.SetTitle(host_name);
 #endif
+  console.SetTitle(host_name);
 
   char prompt[256];
   V_sprintf_safe(prompt, "%.1f fps %2i/%2i on map %16s", fps, active_players,
