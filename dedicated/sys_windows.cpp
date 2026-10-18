@@ -39,6 +39,10 @@
 
 #include "scoped_app_locale.h"
 
+#ifndef NO_STEAM
+#include "steam/steam_api.h"
+#endif
+
 namespace s1::dedicated {
 
 extern CTextConsoleWin32 console;
@@ -207,13 +211,15 @@ namespace {
  * @brief Write minidump.
  * @param ex_code Exception code.
  * @param exception_pointers Exception pointers.
+ *
+ * Requires /EHa so catch(...) below sees structured exceptions.
  */
 void MiniDumpFunction(unsigned int ex_code,
-                      EXCEPTION_POINTERS *exception_pointers) {
-  // dimhotepus: Write minidump when not under Steam.
+                      EXCEPTION_POINTERS* exception_pointers) {
 #ifndef NO_STEAM
-  SteamAPI_WriteMiniDump(nExceptionCode, pException, 0);
+  SteamAPI_WriteMiniDump(ex_code, exception_pointers, 0);
 #else
+  // dimhotepus: Write minidump when not under Steam.
   WriteMiniDumpUsingExceptionInfo(ex_code, exception_pointers,
                                   MiniDumpWithFullMemory, "dedicated_crash");
 #endif
@@ -240,10 +246,11 @@ class ScopedThreadSEHTranslator {
               "Somebody changed SEH translator between calls.\n");
   }
 
-  ScopedThreadSEHTranslator(ScopedThreadSEHTranslator &) = delete;
-  ScopedThreadSEHTranslator(ScopedThreadSEHTranslator &&) = delete;
-  ScopedThreadSEHTranslator &operator=(ScopedThreadSEHTranslator &) = delete;
-  ScopedThreadSEHTranslator &operator=(ScopedThreadSEHTranslator &&) = delete;
+  ScopedThreadSEHTranslator(const ScopedThreadSEHTranslator&) = delete;
+  ScopedThreadSEHTranslator(ScopedThreadSEHTranslator&&) = delete;
+  ScopedThreadSEHTranslator& operator=(const ScopedThreadSEHTranslator&) =
+      delete;
+  ScopedThreadSEHTranslator& operator=(ScopedThreadSEHTranslator&&) = delete;
 
  private:
   const _se_translator_function old_se_translator_;
