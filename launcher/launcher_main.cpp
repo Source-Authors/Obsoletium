@@ -366,6 +366,22 @@ void DumpAppInformation(
   return mode;
 }
 
+// Points a CRT standard stream at the console.
+//
+// The stream stays owned by the CRT and must not be fclose()d: spew, atexit
+// handlers and static destructors keep writing to it after LauncherMain
+// returns.
+[[nodiscard]] int RedirectStdStream(FILE* stream, const char* device,
+                                    const char* mode, const char* name) {
+  FILE* reopened{nullptr};
+  if (const errno_t rc{freopen_s(&reopened, device, mode, stream)}; rc != 0) {
+    Warning("Unable to redirect %s to console: %s.\n", name,
+            std::generic_category().message(rc).c_str());
+    return rc;
+  }
+  return 0;
+}
+
 }  // namespace
 
 // Entry point for the application.
@@ -595,30 +611,15 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
     // Continue, not fatal.
   }
 
-  FILE *con_stdin, *con_stdout, *con_stderr;
-  // reopen stdin handle as console window input
-  if (con_stdin = freopen("CONIN$", "rb", stdin); !con_stdin) {
-    Warning("Unable to redirect stdin to console, run as is: %s.\n",
-            std::generic_category().message(errno).c_str());
-    // Continue, not fatal.
+  if (rc = RedirectStdStream(stdin, "CONIN$", "r", "stdin"); rc != 0) {
+    return rc;
   }
-  RunCodeAtScopeExitOpt(con_stdin, fclose(con_stdin));
-
-  // reopen stout handle as console window output
-  if (con_stdout = freopen("CONOUT$", "wb", stdout); !con_stdout) {
-    Warning("Unable to redirect stdout to console, run as is: %s.\n",
-            std::generic_category().message(errno).c_str());
-    // Continue, not fatal.
+  if (rc = RedirectStdStream(stdout, "CONOUT$", "w", "stdout"); rc != 0) {
+    return rc;
   }
-  RunCodeAtScopeExitOpt(con_stdout, fclose(con_stdout));
-
-  // reopen stderr handle as console window output
-  if (con_stderr = freopen("CONOUT$", "wb", stderr); !con_stderr) {
-    Warning("Unable to redirect stderr to console, run as is: %s.\n",
-            std::generic_category().message(errno).c_str());
-    // Continue, not fatal.
+  if (rc = RedirectStdStream(stderr, "CONOUT$", "w", "stderr"); rc != 0) {
+    return rc;
   }
-  RunCodeAtScopeExitOpt(con_stderr, fclose(con_stderr));
 #endif
 
   return RunApp(command_line, base_directory, is_text_mode);
