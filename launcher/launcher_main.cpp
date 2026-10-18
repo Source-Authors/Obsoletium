@@ -527,7 +527,7 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
   if (!scoped_timer_resolution) {
     Warning(
         "Unable to set Windows timer resolution to %lld ms. Will use default "
-        "one.",
+        "one.\n",
         static_cast<long long>(kSystemTimerResolution.count()));
   }
 
@@ -539,7 +539,7 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
   }
 
   if (!ApplyProcessPriorityClass(command_line)) {
-    Warning("Unable to change game process priority. Will run as is: %s.",
+    Warning("Unable to change game process priority. Will run as is: %s.\n",
             std::system_category().message(::GetLastError()).c_str());
   }
 #endif
