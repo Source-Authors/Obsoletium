@@ -604,13 +604,17 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
   }
 
 #ifdef WIN32
-  if (AllocConsole() == FALSE) {
-    const auto rc = ::GetLastError();
-    Warning("Unable to create console for text mode: %s.\n",
-            std::system_category().message(rc).c_str());
-    return rc;
+  // ERROR_ACCESS_DENIED means the process already has a console: use it.
+  const bool is_console_owned{::AllocConsole() != FALSE};
+  if (!is_console_owned) {
+    if (const DWORD console_rc{::GetLastError()};
+        console_rc != ERROR_ACCESS_DENIED) {
+      Warning("Unable to create console for text mode: %s.\n",
+              std::system_category().message(console_rc).c_str());
+      return static_cast<int>(console_rc);
+    }
   }
-  RunCodeAtScopeExit(FreeConsole());
+  RunCodeAtScopeExitOpt(is_console_owned, FreeConsole());
 
   const s1::win::ScopedConsoleCtrlHandler scoped_console_ctrl_handler{
       ConsoleCtrlHandler};
