@@ -564,11 +564,15 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
   // Figure out the directory the executable is running from.
   GetBaseDirectory(command_line, base_directory);
 
-  // Figure out the directory the executable is running from and make that be
-  // the current working directory.
-  if (chdir(base_directory)) {
-    int rc = errno;
-    Warning("Unable to change current directory to %s: %s.", base_directory,
+  // Make the executable's directory the current working directory.
+#ifdef _WIN32
+  const int chdir_rc{_chdir(base_directory)};
+#else
+  const int chdir_rc{chdir(base_directory)};
+#endif
+  if (chdir_rc != 0) {
+    const int rc{errno};
+    Warning("Unable to change current directory to '%s': %s.\n", base_directory,
             std::generic_category().message(rc).c_str());
     return rc;
   }
