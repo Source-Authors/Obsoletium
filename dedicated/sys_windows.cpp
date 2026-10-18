@@ -72,10 +72,11 @@ class WindowsSystem : public ISystem {
   const bool is_console_mode_;
 };
 
-void WindowsSystem::ErrorMessage(int level, const char *msg) {
+void WindowsSystem::ErrorMessage([[maybe_unused]] int level, const char* msg) {
   Plat_MessageBox("SRCDS - Fatal Error", "SRCDS Error", msg,
                   Plat_MessageBoxButton::Ok, Plat_MessageBoxIcon::Error);
-  PostQuitMessage(0);
+  // Fatal error: do not report success to the parent process.
+  PostQuitMessage(1);
 }
 
 void WindowsSystem::UpdateStatus(int force) {
