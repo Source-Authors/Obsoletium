@@ -34,6 +34,11 @@
 #include "tier0/memalloc.h"
 #include "tier0/threadtools.h"
 
+#if defined(_WIN32)
+#include "windows/scoped_invalid_parameter_handler.h"
+#include "windows/scoped_purecall_handler.h"
+#endif
+
 #include <cstring>
 #include <cstdio>
 
@@ -1086,18 +1091,13 @@ namespace {
 class ErrorHandlerRegistrar {
  public:
   ErrorHandlerRegistrar() noexcept
-      : old_pure_{_set_purecall_handler(VPureCall)},
-        old_invalid_{_set_invalid_parameter_handler(VInvalidParameterHandler)} {
-  }
-  // dimhotepus: Restore old handlers on exit.
-  ~ErrorHandlerRegistrar() noexcept {
-    _set_invalid_parameter_handler(old_invalid_);
-    _set_purecall_handler(old_pure_);
-  }
+      : purecall_handler_{VPureCall},
+        invalid_parameter_handler_{VInvalidParameterHandler} {}
 
  private:
-  _purecall_handler old_pure_;
-  _invalid_parameter_handler old_invalid_;
+  // dimhotepus: Restore old handlers on exit.
+  const s1::win::ScopedPurecallHandler purecall_handler_;
+  const s1::win::ScopedInvalidParameterHandler invalid_parameter_handler_;
 };
 
 static ErrorHandlerRegistrar s_ErrorHandlerRegistration;
