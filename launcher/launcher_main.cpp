@@ -164,31 +164,36 @@ BOOL WINAPI ConsoleCtrlHandler(DWORD ctrl_type) {
 void TryToLoadSteamOverlayDLL() {
 // dimhotepus: NO_STEAM
 #if defined(WIN32) && !defined(NO_STEAM)
+  // The overlay DLL is architecture-specific.
+#ifdef _WIN64
+  constexpr char kOverlayDll[]{"GameOverlayRenderer64" DLL_EXT_STRING};
+#else
+  constexpr char kOverlayDll[]{"GameOverlayRenderer" DLL_EXT_STRING};
+#endif
+
   // First, check if the module is already loaded, perhaps because we were run
   // from Steam directly
-  HMODULE hMod = GetModuleHandle("GameOverlayRenderer" DLL_EXT_STRING);
-  if (hMod) return;
+  HMODULE module{GetModuleHandle(kOverlayDll)};
+  if (module) return;
 
-  if (0 == GetEnvironmentVariableA("SteamGameId", NULL, 0)) {
+  if (0 == GetEnvironmentVariableW(L"SteamGameId", nullptr, 0)) {
     // Initializing the Steam client API has the side effect of setting up the
     // AppId which is immediately queried in GameOverlayRenderer.dll's DllMain
     // entry point
     if (SteamAPI_InitSafe()) {
-      const char* pchSteamInstallPath = SteamAPI_GetSteamInstallPath();
-      if (pchSteamInstallPath) {
-        char rgchSteamPath[MAX_PATH];
-        V_ComposeFileName(pchSteamInstallPath,
-                          "GameOverlayRenderer" DLL_EXT_STRING, rgchSteamPath);
+      RunCodeAtScopeExit(SteamAPI_Shutdown());
+
+      const char* steam_install_path{SteamAPI_GetSteamInstallPath()};
+      if (steam_install_path) {
+        char full_dll_path[MAX_PATH];
+        V_ComposeFileName(steam_install_path, kOverlayDll, full_dll_path);
 
         // This could fail, but we can't fix it if it does so just ignore
         // failures
-        LoadLibrary(rgchSteamPath);
+        LoadLibrary(full_dll_path);
       }
-
-      SteamAPI_Shutdown();
     }
   }
-
 #endif
 }
 
