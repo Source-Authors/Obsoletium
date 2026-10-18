@@ -1,142 +1,195 @@
 // Copyright Valve Corporation, All rights reserved.
 //
-// Return the cpu usage as a float value.
+// Return the system-wide CPU usage as a value from 0.0 to 1.0, measured
+// between the previous call and this one.
 //
-// On win32 this is 0.0 to 1.0 indicating the amount of CPU time used
-// On posix its the load avg from the last minute.
-// 
-// On win32 you need to call this once in a while.  Every few seconds.
-// First call returns zero.
+// Call this once in a while (every few seconds). The first call returns zero.
+// Calls closer together than the OS clock granularity return the previous value.
 
 #include "stdafx.h"
 
 #include "tier0/platform.h"
 
-#ifdef WIN32
+#include <cstdint>
+#include <mutex>
 
+#if defined(WIN32)
 #include "winlite.h"
+#elif defined(POSIX)
+#include <cstdlib>
+#include <cstdio>
+#include <unistd.h>
+#if defined(OSX)
+#include <mach/mach.h>
+#elif defined(_LINUX)
+#include <system_error>
+#include <tuple>
+#include "posix_file_stream.h"
+#endif
+#endif
 
-#define SystemBasicInformation 0
-#define SystemPerformanceInformation 2
-#define SystemTimeInformation 3
-
-[[nodiscard]] static constexpr inline double Li2Double(LARGE_INTEGER x)
+namespace
 {
-	return static_cast<double>(x.HighPart) * 4.294967296E9 + static_cast<double>(x.LowPart);
-}
 
-using SYSTEM_BASIC_INFORMATION = struct 
+// Cumulative CPU time summed over all processors, in OS-specific units.
+struct CpuTimes
 {
-	DWORD dwUnknown1;
-	ULONG uKeMaximumIncrement;
-	ULONG uPageSize;
-	ULONG uMmNumberOfPhysicalPages;
-	ULONG uMmLowestPhysicalPage;
-	ULONG uMmHighestPhysicalPage;
-	ULONG uAllocationGranularity;
-	PVOID pLowestUserAddress;
-	PVOID pMmHighestUserAddress;
-	ULONG uKeActiveProcessors;
-	BYTE bKeNumberProcessors;
-	BYTE bUnknown2;
-	WORD wUnknown3;
+	uint64_t idle;
+	uint64_t total;  // Includes idle.
 };
 
-using SYSTEM_PERFORMANCE_INFORMATION = struct
+#if defined(WIN32)
+
+[[nodiscard]] constexpr uint64_t FileTimeToU64( const FILETIME& ft ) noexcept
 {
-	LARGE_INTEGER liIdleTime;
-	DWORD dwSpare[80];
-};
-
-using SYSTEM_TIME_INFORMATION = struct
-{
-	LARGE_INTEGER liKeBootTime;
-	LARGE_INTEGER liKeSystemTime;
-	LARGE_INTEGER liExpTimeZoneBias;
-	ULONG uCurrentTimeZoneId;
-	DWORD dwReserved;
-};
-
-using PROCNTQSI = LONG (__stdcall *)(UINT, PVOID, ULONG, PULONG);
-
-static PROCNTQSI NtQuerySystemInformation;
-
-float GetCPUUsage() 
-{
-	SYSTEM_PERFORMANCE_INFORMATION SysPerfInfo;
-	SYSTEM_TIME_INFORMATION SysTimeInfo;
-	SYSTEM_BASIC_INFORMATION SysBaseInfo;
-	double dbIdleTime;
-	double dbSystemTime;
-	LONG status;
-	static LARGE_INTEGER liOldIdleTime = {};
-	static LARGE_INTEGER liOldSystemTime = {};
-
-	if ( !NtQuerySystemInformation)
-	{
-		auto ntdll = GetModuleHandle("ntdll");
-		if ( !ntdll )
-			return(0);
-
-SE_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
-SE_GCC_DISABLE_CAST_FUNCTION_TYPE_STRICT_WARNING()
-		NtQuerySystemInformation = reinterpret_cast<PROCNTQSI>(GetProcAddress( ntdll, "NtQuerySystemInformation" ));
-SE_GCC_END_WARNING_OVERRIDE_SCOPE()
-
-		if ( !NtQuerySystemInformation )
-			return(0);
-	}
-
-	// get number of processors in the system
-	status = NtQuerySystemInformation( SystemBasicInformation,&SysBaseInfo,sizeof(SysBaseInfo),nullptr );
-	if ( status != NO_ERROR )
-		return(0);
-
-	// get new system time
-	status = NtQuerySystemInformation( SystemTimeInformation,&SysTimeInfo,sizeof(SysTimeInfo),nullptr );
-	if ( status!=NO_ERROR )
-		return(0);
-
-	// get new CPU's idle time
-	status = NtQuerySystemInformation( SystemPerformanceInformation,&SysPerfInfo,sizeof(SysPerfInfo),nullptr );
-	if ( status != NO_ERROR )
-		return(0);
-
-	// if it's a first call - skip it
-	if ( liOldIdleTime.QuadPart != 0 )
-	{
-		// CurrentValue = NewValue - OldValue
-		dbIdleTime = Li2Double(SysPerfInfo.liIdleTime) - Li2Double(liOldIdleTime);
-		dbSystemTime = Li2Double(SysTimeInfo.liKeSystemTime) - Li2Double(liOldSystemTime);
-
-		// CurrentCpuIdle = IdleTime / SystemTime
-		dbIdleTime = dbIdleTime / dbSystemTime / static_cast<double>(SysBaseInfo.bKeNumberProcessors);
-
-		// CurrentCpuUsage% = 100 - (CurrentCpuIdle * 100) / NumberOfProcessors
-		// dbIdleTime = 100.0 - dbIdleTime * 100.0 / (double)SysBaseInfo.bKeNumberProcessors + 0.5;
-	}
-	else
-	{
-		dbIdleTime = 1.0;
-	}
-
-	// store new CPU's idle and system time
-	liOldIdleTime = SysPerfInfo.liIdleTime;
-	liOldSystemTime = SysTimeInfo.liKeSystemTime;
-
-	return static_cast<float>(1.0 - dbIdleTime);
+	return ( static_cast<uint64_t>( ft.dwHighDateTime ) << 32U ) | ft.dwLowDateTime;
 }
 
-#endif // WIN32
-
-#ifdef POSIX
-#include <stdlib.h>
-
-float GetCPUUsage() 
+// GetSystemTimes is documented (XP SP1+), covers all processor groups and
+// needs no processor count: the times are already summed over all CPUs.
+[[nodiscard]] bool ReadCpuTimes( CpuTimes& out ) noexcept
 {
-	double loadavg[3];
+	FILETIME idle, kernel, user;
+	if ( !::GetSystemTimes( &idle, &kernel, &user ) )
+	{
+		return false;
+	}
 
-	getloadavg( loadavg, 3 );
-	return loadavg[0];
+	// Kernel time includes idle time.
+	out.idle = FileTimeToU64( idle );
+	out.total = FileTimeToU64( kernel ) + FileTimeToU64( user );
+	return true;
 }
-#endif //POSIX
+
+#elif defined(OSX)
+
+[[nodiscard]] bool ReadCpuTimes( CpuTimes& out ) noexcept
+{
+	// mach_host_self() adds a send right on every call; take it once.
+	static const mach_port_t host{ mach_host_self() };
+
+	host_cpu_load_info_data_t info;
+	mach_msg_type_number_t count{ HOST_CPU_LOAD_INFO_COUNT };
+	if ( host_statistics( host, HOST_CPU_LOAD_INFO,
+			reinterpret_cast<host_info_t>( &info ), &count ) != KERN_SUCCESS )
+	{
+		return false;
+	}
+
+	const uint64_t user{ info.cpu_ticks[CPU_STATE_USER] };
+	const uint64_t system{ info.cpu_ticks[CPU_STATE_SYSTEM] };
+	const uint64_t nice{ info.cpu_ticks[CPU_STATE_NICE] };
+	const uint64_t idle{ info.cpu_ticks[CPU_STATE_IDLE] };
+
+	out.idle = idle;
+	out.total = user + system + nice + idle;
+	return true;
+}
+
+#elif defined(_LINUX)
+
+// First line of /proc/stat:
+// cpu  user nice system idle iowait irq softirq steal guest guest_nice
+// guest/guest_nice are already included in user/nice, so they are not summed.
+[[nodiscard]] bool ReadCpuTimes( CpuTimes& out ) noexcept
+{
+	auto [f, errc] = s1::posix::posix_file_stream_factory::open( "/proc/stat", "r" );
+	if ( errc )
+	{
+		return false;
+	}
+
+	char line[512];
+	if ( std::get<std::error_code>( f.gets( line ) ) )
+	{
+		return false;
+	}
+
+	unsigned long long user = 0, nice = 0, system = 0, idle = 0,
+		iowait = 0, irq = 0, softirq = 0, steal = 0;
+	// Older kernels may report fewer fields; the first four always exist.
+	const int fields{ std::sscanf( line, "cpu %llu %llu %llu %llu %llu %llu %llu %llu",
+		&user, &nice, &system, &idle, &iowait, &irq, &softirq, &steal ) };
+	if ( fields < 4 )
+	{
+		return false;
+	}
+
+	out.idle = idle + iowait;
+	out.total = user + nice + system + idle + iowait + irq + softirq + steal;
+	return true;
+}
+
+#else
+
+[[nodiscard]] bool ReadCpuTimes( CpuTimes& ) noexcept
+{
+	return false;
+}
+
+#endif
+
+#if defined(POSIX)
+// Fallback when per-CPU times are unavailable: 1-minute load average
+// normalized by the number of online CPUs and clamped to [0, 1].
+// Approximate: load counts runnable (and on Linux, blocked-on-IO) tasks.
+[[nodiscard]] float LoadAverageUsage() noexcept
+{
+	double loadavg[1];
+	if ( getloadavg( loadavg, 1 ) < 1 )
+	{
+		return 0.0f;
+	}
+
+	const long cpus{ sysconf( _SC_NPROCESSORS_ONLN ) };
+	const double usage{ loadavg[0] / static_cast<double>( cpus > 0 ? cpus : 1 ) };
+	return static_cast<float>( usage < 0.0 ? 0.0 : usage > 1.0 ? 1.0 : usage );
+}
+#endif
+
+}  // namespace
+
+float GetCPUUsage()
+{
+	static std::mutex mutex;
+	static CpuTimes previous{};
+	static bool hasPrevious{ false };
+	static float lastUsage{ 0.0f };
+
+	CpuTimes current;
+	if ( !ReadCpuTimes( current ) )
+	{
+#if defined(POSIX)
+		return LoadAverageUsage();
+#else
+		return 0.0f;
+#endif
+	}
+
+	std::scoped_lock lock{ mutex };
+
+	if ( !hasPrevious )
+	{
+		// First call: no interval to measure yet.
+		previous = current;
+		hasPrevious = true;
+		return 0.0f;
+	}
+
+	// Counters are monotonic; anything else (no tick elapsed, counter reset)
+	// means there is no valid interval, so keep the previous sample and value.
+	if ( current.total <= previous.total || current.idle < previous.idle )
+	{
+		return lastUsage;
+	}
+
+	const uint64_t totalDelta{ current.total - previous.total };
+	const uint64_t idleDelta{ current.idle - previous.idle };
+
+	lastUsage = idleDelta >= totalDelta
+		? 0.0f
+		: static_cast<float>( 1.0 - static_cast<double>( idleDelta ) / static_cast<double>( totalDelta ) );
+	previous = current;
+
+	return lastUsage;
+}
