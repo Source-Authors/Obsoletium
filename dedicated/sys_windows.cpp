@@ -323,6 +323,8 @@ DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
     Warning("Windows sockets 2.2+ unavailable (%d): %s.\n",
             scoped_winsock.error_code().value(),
             scoped_winsock.error_code().message().c_str());
+    // Can't run without sockets.
+    return scoped_winsock.error_code().value();
   }
 
   const bool is_console_mode{command_line->HasParm("-console")};
