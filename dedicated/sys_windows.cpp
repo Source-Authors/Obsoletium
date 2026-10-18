@@ -145,7 +145,13 @@ void WindowsSystem::WriteStatusText(char *status) { SetConsoleTitleA(status); }
 bool WindowsSystem::CreateConsoleWindow() {
   if (!::AllocConsole()) return false;
 
-  return StartupRemoteConsole(command_line_, this);
+  if (!StartupRemoteConsole(command_line_, this)) {
+    // Do not leak the console we just allocated.
+    ::FreeConsole();
+    return false;
+  }
+
+  return true;
 }
 
 void WindowsSystem::DestroyConsoleWindow() {
