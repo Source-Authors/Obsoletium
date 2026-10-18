@@ -1735,7 +1735,8 @@ void CAI_ScriptedSchedule::StartSchedule( CAI_BaseNPC *pTarget )
 		CHintCriteria hintCriteria;
 		hintCriteria.SetGroup( m_sGoalEnt );
 		hintCriteria.SetHintType( HINT_ANY );
-		hintCriteria.AddIncludePosition( pTarget->GetAbsOrigin(), FLT_MAX );
+		// dimhotepus: radius is squared inside, so use sqrt to prevent overflows.
+		hintCriteria.AddIncludePosition( pTarget->GetAbsOrigin(), std::sqrt( FLT_MAX ) );
 		CAI_Hint *pHint = CAI_HintManager::FindHint( pTarget->GetAbsOrigin(), hintCriteria );
 		if ( !pHint )
 		{
