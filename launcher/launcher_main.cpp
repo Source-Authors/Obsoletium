@@ -223,7 +223,7 @@ void GetBaseDirectory(ICommandLine* command_line,
 }
 
 #ifdef WIN32
-BOOL WINAPI ConsoleCtrlHandler(DWORD ctrl_type) {
+BOOL WINAPI ConsoleCtrlHandler([[maybe_unused]] DWORD ctrl_type) {
   // dimhotepus: 2 -> ERROR_CONTROL_C_EXIT
   TerminateProcess(GetCurrentProcess(), ERROR_CONTROL_C_EXIT);
   return TRUE;
@@ -569,7 +569,7 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
 #endif
 
   // Can only run one windowed source app at a time.
-  const s1::launcher::ScopedAppMultiRun scoped_app_multi_run{CommandLine()};
+  const s1::launcher::ScopedAppMultiRun scoped_app_multi_run{command_line};
   if (!scoped_app_multi_run.is_single_run()) {
     // Allow the user to explicitly say they want to be able to run multiple
     // instances of the source mutex.  Useful for side-by-side comparisons of
@@ -678,7 +678,7 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
   const s1::launcher::ScopedAppRelaunch scoped_app_relaunch;
   // Dump heap leaks if needed.
   const s1::launcher::ScopedHeapLeakDumper scoped_heap_leak_dumper{
-      !!command_line->HasParm("-leakcheck")};
+      command_line->HasParm("-leakcheck")};
 
   // Run in text mode (no graphics & sound)?
   const bool is_text_mode{command_line->HasParm("-textmode")};
