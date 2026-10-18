@@ -328,19 +328,22 @@ DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
   const bool is_console_mode{command_line->HasParm("-console")};
   s1::dedicated::WindowsSystem system{command_line, is_console_mode};
 
+  const auto boot = [&]() {
+    return s1::dedicated::BootMain(args->count(), args->values(),
+                                   is_console_mode, &system);
+  };
+
   if (!Plat_IsInDebugSession() && !command_line->HasParm("-nominidumps")) {
     const ScopedThreadSEHTranslator scoped_thread_seh_translator{
         MiniDumpFunction};
 
-    // This try block allows the thread SEH translator to work.
+    // This try block allows the thread SEH translator to work (needs /EHa).
     try {
-      return s1::dedicated::BootMain(args->count(), args->values(),
-                                     is_console_mode, &system);
+      return boot();
     } catch (...) {
       return -1;
     }
   }
 
-  return s1::dedicated::BootMain(args->count(), args->values(), is_console_mode,
-                                 &system);
+  return boot();
 }
