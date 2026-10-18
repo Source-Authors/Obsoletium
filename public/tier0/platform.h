@@ -461,7 +461,7 @@ constexpr inline std::enable_if_t<std::is_pointer_v<T>, R> POINTER_TO_INT(T p) n
 #endif
 
 // dimhotepus: TF2 backport.
-#if ( defined(__SANITIZE_ADDRESS__) && __SANITIZE_ADDRESS__ )
+#if defined( PLATFORM_HAS_ASAN )
 	#define NO_ASAN __attribute__((no_sanitize("address")))
 	#define NO_ASAN_FORCEINLINE NO_ASAN inline
 #else

@@ -1521,7 +1521,7 @@ void CGame::PlayStartupVideos( void )
 	extern IVAudio *vaudio;
 	// dimhotepus: Use Miles audio device.
 	// ASAN breaks inside Miles in x64 mode, so disable sound.
-#if !defined(__SANITIZE_ADDRESS__) || !defined(PLATFORM_64BITS)
+#if !defined(PLATFORM_HAS_ASAN) || !defined(PLATFORM_64BITS)
 	const ScopedMilesAudioDevice scoped_miles_audio_device{vaudio, g_pVideo};
 #endif
 

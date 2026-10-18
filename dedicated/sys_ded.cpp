@@ -212,7 +212,7 @@ void DumpAppInformation(int argc, char **argv) {
   }
 #endif
 
-#ifdef __SANITIZE_ADDRESS__
+#ifdef PLATFORM_HAS_ASAN
   Msg("%s running under AddressSanitizer.\n",
       SE_PRODUCT_FILE_DESCRIPTION_STRING);
 #endif

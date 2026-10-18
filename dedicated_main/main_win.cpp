@@ -166,7 +166,7 @@ template <size_t buffer_size>
   }
 
   // Address Sanitizer generates dynamic code.
-#ifndef __SANITIZE_ADDRESS__
+#ifndef PLATFORM_HAS_ASAN
   {
     // Prohibit dynamic code generation as no shaders in dedicated server.
     PROCESS_MITIGATION_DYNAMIC_CODE_POLICY policy = {};

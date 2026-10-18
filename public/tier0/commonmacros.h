@@ -40,6 +40,15 @@
 #error "Please define your processor architecture."
 #endif
 
+// dimhotepus: AddressSanitizer support.
+#if defined(__SANITIZE_ADDRESS__)
+#define PLATFORM_HAS_ASAN 1
+#elif defined(__has_feature)
+#if __has_feature(address_sanitizer)
+#define PLATFORM_HAS_ASAN 1
+#endif
+#endif
+
 #if defined(__GCC__) || defined(__GNUC__)
 /**
  * @brief Defined when GCC compiler used.

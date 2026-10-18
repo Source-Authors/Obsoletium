@@ -32,7 +32,7 @@
 #include "tier1/utlvector.h"
 #include <csetjmp>
 
-#ifdef __SANITIZE_ADDRESS__
+#ifdef PLATFORM_HAS_ASAN
 #include <sanitizer/asan_interface.h>
 #endif
 
@@ -300,7 +300,7 @@ public:
 	FORCEINLINE void RestoreStack()
 	{
 		// dimhotepus: AddressSanitizer and dynamic stack doesn't work well.
-#ifdef __SANITIZE_ADDRESS__
+#ifdef PLATFORM_HAS_ASAN
 		__asan_handle_no_return();
 #endif
 
@@ -375,7 +375,7 @@ public:
 	FORCEINLINE void SaveStack()
 	{
 		// dimhotepus: AddressSanitizer and dynamic stack doesn't work well.
-#ifdef __SANITIZE_ADDRESS__
+#ifdef PLATFORM_HAS_ASAN
 		__asan_handle_no_return();
 #endif
 

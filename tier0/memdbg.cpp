@@ -1094,7 +1094,7 @@ void CDbgMemAlloc::RegisterDeallocation( const char *pFileName, int nLine, size_
 
 void CDbgMemAlloc::RegisterAllocation( MemInfo_t &info, size_t nLogicalSize, size_t nActualSize, unsigned nTime )
 {
-#ifndef __SANITIZE_ADDRESS__
+#ifndef PLATFORM_HAS_ASAN
 	++info.m_nCurrentCount;
 	++info.m_nTotalCount;
 	if (info.m_nCurrentCount > info.m_nPeakCount)
@@ -1133,7 +1133,7 @@ void CDbgMemAlloc::RegisterAllocation( MemInfo_t &info, size_t nLogicalSize, siz
 
 void CDbgMemAlloc::RegisterDeallocation( MemInfo_t &info, size_t nLogicalSize, size_t nActualSize, unsigned nTime )
 {
-#ifndef __SANITIZE_ADDRESS__
+#ifndef PLATFORM_HAS_ASAN
 	// Check for decrementing these counters below zero. The checks
 	// must be done here because these unsigned counters will wrap-around and
 	// still be positive.
@@ -1173,7 +1173,7 @@ const char *CDbgMemAlloc::GetAllocatonFileName( void *pMem )
 	if (!pMem)
 		return "";
 
-#ifndef __SANITIZE_ADDRESS__
+#ifndef PLATFORM_HAS_ASAN
 	if ( CrtDbgMemHeader_t *pHeader = GetCrtDbgMemHeader( pMem ); pHeader->m_pFileName )
 		return pHeader->m_pFileName;
 
@@ -1191,7 +1191,7 @@ int CDbgMemAlloc::GetAllocatonLineNumber( void *pMem )
 	if ( !pMem )
 		return 0;
 
-#ifndef __SANITIZE_ADDRESS__
+#ifndef PLATFORM_HAS_ASAN
 	// dimhotepus: As for GetAllocatonFileName, line number is valid only if file name is set.
 	if ( CrtDbgMemHeader_t *pHeader = GetCrtDbgMemHeader( pMem ); pHeader->m_pFileName )
 		return pHeader->m_nLineNumber;

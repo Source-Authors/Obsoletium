@@ -34,7 +34,7 @@ bool VGui_InitInterfacesList( const char *moduleName, CreateInterfaceFn *, intp 
 	if ( _heapmin() != 1 )
 	{
 // dimhotepus: ASAN doesn't play well with our custom allocators.
-#ifndef __SANITIZE_ADDRESS__
+#ifndef PLATFORM_HAS_ASAN
 		Assert( false );
 		Error( "Must include memoverride.cpp in your project." );
 #endif

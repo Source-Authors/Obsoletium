@@ -67,13 +67,6 @@
 extern void* CreateSDLMgr();
 #endif
 
-#if defined(__SANITIZE_ADDRESS__)
-#define SE_LAUNCHER_HAS_ASAN 1
-#elif defined(__has_feature)
-#if __has_feature(address_sanitizer)
-#define SE_LAUNCHER_HAS_ASAN 1
-#endif
-#endif
 
 namespace {
 
@@ -429,7 +422,7 @@ void DumpAppInformation(
   }
 #endif
 
-#ifdef SE_LAUNCHER_HAS_ASAN
+#ifdef PLATFORM_HAS_ASAN
   Msg("%s running under AddressSanitizer.\n",
       SE_PRODUCT_FILE_DESCRIPTION_STRING);
 #endif

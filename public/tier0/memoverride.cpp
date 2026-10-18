@@ -7,7 +7,7 @@
 //=============================================================================//
 
 // dimhotepus: ASAN doesn't support default alloc functions replacement.
-#if !defined(__SANITIZE_ADDRESS__) && !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
+#if !defined(PLATFORM_HAS_ASAN) && !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 
 #if defined( _WIN32 )
 #include "winlite.h"
