@@ -62,6 +62,16 @@ extern void* CreateSDLMgr();
 
 namespace {
 
+// Exit codes for startup failures.
+#ifdef _WIN32
+constexpr int kExitCodeUnsupportedCpu{
+    static_cast<int>(STATUS_ILLEGAL_INSTRUCTION)};
+constexpr int kExitCodeAlreadyRunning{ERROR_SINGLE_INSTANCE_APP};
+#else
+constexpr int kExitCodeUnsupportedCpu{ENOTSUP};
+constexpr int kExitCodeAlreadyRunning{EEXIST};
+#endif
+
 template <size_t out_size>
 const char* PrefixMessageGroup(OUT_Z_ARRAY char (&out)[out_size],
                                const char* group, const char* message) {
@@ -168,7 +178,20 @@ BOOL WINAPI ConsoleCtrlHandler(DWORD ctrl_type) {
 }
 #endif
 
-// Figure out if Steam is running, then load the GameOverlayRenderer.dll
+// Reports a startup failure and returns exit_code.
+//
+// Unlike Error(), which ends in exit() from DefaultSpew, the caller can return
+// a specific exit code and the scoped objects already constructed in
+// LauncherMain are destroyed normally.
+[[nodiscard]] int FatalError(int exit_code, const char* message) {
+  Warning("%s\n", message);
+  Plat_MessageBox(V_STRINGIFY(VPCGAME) " - Error", "Unable to start the game",
+                  message, Plat_MessageBoxButton::Ok,
+                  Plat_MessageBoxIcon::Error);
+  return exit_code;
+}
+
+// Figure out if Steam is running, then load the GameOverlayRenderer<64>.dll
 void TryToLoadSteamOverlayDLL() {
 // dimhotepus: NO_STEAM
 #if defined(WIN32) && !defined(NO_STEAM)
@@ -465,25 +488,23 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
   const CPUInformation* cpu_info{GetCPUInformation()};
   if (!cpu_info->m_bSSE || !cpu_info->m_bSSE2 || !cpu_info->m_bSSE3 ||
       !cpu_info->m_bSSE41 || !cpu_info->m_bSSE42) {
-    Error(
+    return FatalError(
+        kExitCodeUnsupportedCpu,
         "Sorry, your CPU missed SSE / SSE2 / SSE3 / SSE4.1 / SSE4.2 "
         "instructions required for the game.\n\nPlease upgrade your CPU.");
-    return STATUS_ILLEGAL_INSTRUCTION;
   }
 
   if (!cpu_info->m_bRDTSC) {
-    Error(
-        "Sorry, your CPU missed RDTSC instruction required for the "
-        "game.\n\nPlease upgrade your CPU.");
-    return STATUS_ILLEGAL_INSTRUCTION;
+    return FatalError(kExitCodeUnsupportedCpu,
+                      "Sorry, your CPU missed RDTSC instruction required for "
+                      "the game.\n\nPlease upgrade your CPU.");
   }
 
 #ifdef WIN32
   if (!IsWindows10OrGreater()) {
-    Error(
-        "Sorry, Windows 10+ required to run the game.\n\nPlease update your "
-        "operating system.");
-    return ERROR_OLD_WIN_VERSION;
+    return FatalError(ERROR_OLD_WIN_VERSION,
+                      "Sorry, Windows 10+ required to run the game.\n\nPlease "
+                      "update your operating system.");
   }
 #endif
 
@@ -495,15 +516,9 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
     // different renderers.
     const bool allow_multirun{command_line->HasParm("-multirun")};
     if (!allow_multirun) {
-      Error(
-          "Oops, the game is already launched.\n\nSorry, but only single game "
-          "can run at the same time.");
-
-#ifdef WIN32
-      return ERROR_SINGLE_INSTANCE_APP;
-#else
-      return EEXIST;
-#endif
+      return FatalError(kExitCodeAlreadyRunning,
+                        "Oops, the game is already launched.\n\nSorry, but "
+                        "only single game can run at the same time.");
     }
   }
 
@@ -514,8 +529,12 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
                           COINIT_SPEED_OVER_MEMORY)};
   if (FAILED(scoped_com.error_code())) {
     const _com_error com_error{scoped_com.error_code()};
-    Error("Unable to initialize COM (0x%x): %s.\n\n", scoped_com.error_code(),
-          com_error.ErrorMessage());
+
+    char message[512];
+    V_sprintf_safe(message, "Unable to initialize COM (0x%lx): %s.",
+                   static_cast<unsigned long>(scoped_com.error_code()),
+                   com_error.ErrorMessage());
+    return FatalError(static_cast<int>(scoped_com.error_code()), message);
   }
 
   using namespace std::chrono_literals;
