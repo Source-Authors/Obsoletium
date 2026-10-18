@@ -16,6 +16,8 @@
 #endif
 #endif
 
+#include <atomic>
+#include <cerrno>
 #include <thread>
 
 #include "app_version_config.h"
@@ -80,7 +82,8 @@ constexpr int kExitCodeAlreadyRunning{EEXIST};
 
 template <size_t out_size>
 const char* PrefixMessageGroup(OUT_Z_ARRAY char (&out)[out_size],
-                               const char* group, const char* message) {
+                               IN_Z const char* group,
+                               IN_Z const char* message) {
   const char* out_group{GetSpewOutputGroup()};
 
   out_group = !Q_isempty(out_group) ? out_group : group;
@@ -123,12 +126,21 @@ SpewRetval_t DefaultSpew(SpewType_t spew_type, const char* raw) {
       return SPEW_DEBUGGER;
 
     case SPEW_ERROR:
-    default:
-      Plat_MessageBox(V_STRINGIFY(VPCGAME) " - Error", "Assert occurred",
+    default: {
+      // exit() runs atexit handlers and static destructors. If one of them (or
+      // another thread) reports an error meanwhile we would call exit() again,
+      // which is undefined behavior: terminate immediately instead.
+      static std::atomic_flag is_exiting{ATOMIC_FLAG_INIT};
+      if (is_exiting.test_and_set()) {
+        std::_Exit(ENOTRECOVERABLE);
+      }
+
+      Plat_MessageBox(V_STRINGIFY(VPCGAME) " - Error", "Error occurred",
                       message, Plat_MessageBoxButton::Ok,
                       Plat_MessageBoxIcon::Error);
       // dimhotepus: Try to run destructors! 1 -> ENOTRECOVERABLE
-      exit(ENOTRECOVERABLE);
+      std::exit(ENOTRECOVERABLE);
+    }
   }
 }
 
