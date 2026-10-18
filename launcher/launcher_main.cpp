@@ -304,8 +304,11 @@ bool ApplyProcessPriorityClass(const ICommandLine* command_line) {
 }
 #endif
 
+// Runs the app, restarting it as requested.  Returns the exit code of the last
+// run.
 int RunApp(ICommandLine* command_line, const char (&base_directory)[MAX_PATH],
            bool is_text_mode) {
+  int rc{0};
   bool need_restart{false};
 
   do {
@@ -313,22 +316,22 @@ int RunApp(ICommandLine* command_line, const char (&base_directory)[MAX_PATH],
                                              is_text_mode};
     CSteamApplication app{&systems};
 
-    const int rc{app.Run()};
+    rc = app.Run();
 
     need_restart = (app.GetErrorStage() ==
                         s1::launcher::BootAppSystemGroup::INITIALIZATION &&
                     rc == INIT_RESTART) ||
                    rc == RUN_RESTART;
 
-    bool is_reslist_gen =
-        !need_restart && systems.ShouldContinueGenerateReslist();
+    const bool is_reslist_gen{!need_restart &&
+                              systems.ShouldContinueGenerateReslist()};
 
     if (!need_restart) need_restart = is_reslist_gen;
 
     if (!is_reslist_gen) RemoveParametersOverrides(command_line);
   } while (need_restart);
 
-  return 0;
+  return rc == RUN_OK ? 0 : 1;
 }
 
 void DumpAppInformation(
