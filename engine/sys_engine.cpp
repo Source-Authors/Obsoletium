@@ -100,14 +100,15 @@ extern ConVar host_timer_spin_ms;
 extern float host_nexttick;
 extern IVEngineClient *engineClient;
 
-#ifdef WIN32
 static void cpu_frequency_monitoring_callback( IConVar *var, const char *pOldValue, float flOldValue )
 {
 	// Set the specified interval for CPU frequency monitoring
-	SetCPUMonitoringInterval( (unsigned)( ( (ConVar *)var)->GetFloat() * 1000 ) );
+	if ( !SetCPUMonitoringInterval( (unsigned)( ( (ConVar *)var)->GetFloat() * 1000 ) ) )
+	{
+		Warning( "Failed to enable CPU monitoring.\n" );
+	}
 }
 ConVar cpu_frequency_monitoring( "cpu_frequency_monitoring", "0", 0, "Set CPU frequency monitoring interval in seconds. Zero means disabled.", true, 0.0f, true, 10.0f, cpu_frequency_monitoring_callback );
-#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: 
