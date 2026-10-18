@@ -2,21 +2,28 @@
 
 #include "stdafx.h"
 
-#ifdef _MSC_VER
+#if defined(__x86_64__) || defined(__i386__) || defined(_M_X64) || defined(_M_IX86)
+#define PLAT_CPU_X86 1
+#endif
+
+#if defined(PLAT_CPU_X86) && defined(_MSC_VER)
 #include <intrin.h>
 #endif
 
-#if (defined(__clang__) || defined(__GNUC__)) && (defined(__x86_64__) || defined(__i386__))
+#if defined(PLAT_CPU_X86) && (defined(__clang__) || defined(__GNUC__))
 #include <cpuid.h>
 #endif
 
-#include <array>
-#include <vector>
+#include <bitset>
+#include <cctype>
+#include <climits>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <iterator>
 
 #if defined(_WIN32)
 #include "winlite.h"
-#elif defined(_LINUX)
-#include <cstdlib>
 #elif defined(OSX)
 #include <sys/sysctl.h>
 #endif
@@ -27,361 +34,273 @@
 namespace
 {
 
-bool cpuid(unsigned int function,
-	unsigned int& out_eax,
-	unsigned int& out_ebx,
-	unsigned int& out_ecx,
-	unsigned int& out_edx)
+// Executes cpuid without any validation. Returns false on non-x86.
+bool RawCpuid( unsigned function, unsigned subfunction, unsigned ( &regs )[4] )
 {
-	int CPUInfo[4] = { -1, -1, -1, -1 };
-#if (defined(__clang__) || defined(__GNUC__)) && defined(__cpuid)
-	__cpuid(function, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
-#else
-	__cpuid(CPUInfo, (int)function);
-#endif
-
-	out_eax = CPUInfo[0];
-	out_ebx = CPUInfo[1];
-	out_ecx = CPUInfo[2];
-	out_edx = CPUInfo[3];
-	
+#if !defined(PLAT_CPU_X86)
+	regs[0] = regs[1] = regs[2] = regs[3] = 0;
+	return false;
+#elif (defined(__clang__) || defined(__GNUC__)) && defined(__cpuid_count)
+	__cpuid_count( function, subfunction, regs[0], regs[1], regs[2], regs[3] );
 	return true;
+#else
+	int info[4];
+	__cpuidex( info, static_cast<int>( function ), static_cast<int>( subfunction ) );
+	for ( int i = 0; i < 4; ++i ) regs[i] = static_cast<unsigned>( info[i] );
+	return true;
+#endif
 }
 
-bool cpuidex(unsigned int function,
-	unsigned int subfunction,
-	unsigned int& out_eax,
-	unsigned int& out_ebx,
-	unsigned int& out_ecx,
-	unsigned int& out_edx)
+// Highest supported leaf for the range the function belongs to. Querying a leaf
+// above it returns undefined data (Intel echoes the highest basic leaf).
+unsigned MaxCpuidLeaf( unsigned function )
 {
-	int CPUInfo[4] = { -1, -1, -1, -1 };
-#if (defined(__clang__) || defined(__GNUC__)) && defined(__cpuid)
-	__cpuid_count(function, subfunction, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
-#else
-	__cpuidex(CPUInfo, (int)function, (int)subfunction);
-#endif
+	static const unsigned maxBasic = []
+	{
+		unsigned regs[4];
+		return RawCpuid( 0, 0, regs ) ? regs[0] : 0U;
+	}();
+	static const unsigned maxExtended = []
+	{
+		unsigned regs[4];
+		// No extended range if the result is not itself an extended leaf.
+		return RawCpuid( 0x80000000U, 0, regs ) && regs[0] >= 0x80000000U ? regs[0] : 0U;
+	}();
 
-	out_eax = CPUInfo[0];
-	out_ebx = CPUInfo[1];
-	out_ecx = CPUInfo[2];
-	out_edx = CPUInfo[3];
-	
-	return true;
+	return ( function & 0x80000000U ) ? maxExtended : maxBasic;
+}
+
+bool cpuidex( unsigned function,
+	unsigned subfunction,
+	unsigned& out_eax,
+	unsigned& out_ebx,
+	unsigned& out_ecx,
+	unsigned& out_edx )
+{
+	unsigned regs[4]{ 0, 0, 0, 0 };
+	const bool ok{ function <= MaxCpuidLeaf( function ) && RawCpuid( function, subfunction, regs ) };
+
+	out_eax = regs[0];
+	out_ebx = regs[1];
+	out_ecx = regs[2];
+	out_edx = regs[3];
+
+	return ok;
+}
+
+bool cpuid( unsigned function,
+	unsigned& out_eax,
+	unsigned& out_ebx,
+	unsigned& out_ecx,
+	unsigned& out_edx )
+{
+	return cpuidex( function, 0, out_eax, out_ebx, out_ecx, out_edx );
+}
+
+constexpr const char* GenericCpuName()
+{
+#if !defined(_WIN64) && !defined(__x86_64__)
+	return "Generic_x86";
+#else
+	return "Generic_x86_64";
+#endif
+}
+
+// Copies |in| to |out| without leading/trailing whitespace, truncating to fit.
+template <size_t outSize>
+void TrimSpaces( const char* in, char ( &out )[outSize] )
+{
+	static_assert( outSize > 0 );
+
+	const char* begin{ in };
+	while ( *begin && std::isspace( static_cast<unsigned char>( *begin ) ) ) ++begin;
+
+	const char* end{ begin + std::strlen( begin ) };
+	while ( end > begin && std::isspace( static_cast<unsigned char>( end[-1] ) ) ) --end;
+
+	size_t length{ static_cast<size_t>( end - begin ) };
+	if ( length > outSize - 1 ) length = outSize - 1;
+
+	std::memcpy( out, begin, length );
+	out[length] = '\0';
 }
 
 // Return the Processor's vendor identification string,
 // or "Generic_x86{_64}" if it doesn't exist on this CPU.
+// Not thread-safe by itself; only called from ComputeCPUInformation().
 const char* GetProcessorVendorId()
 {
-#if defined( _PS3 )
-	return "PPC";
-#else
 	static char vendorId[16];
-	if (vendorId[0] != '\0')
+	if ( vendorId[0] != '\0' )
 	{
 		return vendorId;
 	}
-	
+
 #ifndef OSX
-	unsigned int unused, regs[3];
+	unsigned unused, regs[3];
 	BitwiseClear( vendorId );
 
-	if ( !cpuid(0,unused, regs[0], regs[2], regs[1] ) )
+	// Vendor string is EBX, EDX, ECX.
+	if ( !cpuid( 0, unused, regs[0], regs[2], regs[1] ) )
 	{
-		if ( IsPC() )
-		{
-#if !defined(_WIN64) && !defined(__x86_64__)
-			strcpy( vendorId, "Generic_x86" );
-#else
-			strcpy( vendorId, "Generic_x86_64" );
-#endif
-		}
+		strcpy( vendorId, GenericCpuName() );
 	}
 	else
 	{
-		memcpy( vendorId+0, &regs[0], sizeof( regs[0] ) );
-		memcpy( vendorId+4, &regs[1], sizeof( regs[1] ) ); //-V112
-		memcpy( vendorId+8, &regs[2], sizeof( regs[2] ) );
+		std::memcpy( vendorId, regs, sizeof( regs ) );
 	}
-#else
-	// Works both on Intel Macs and M1+
-	size_t len = sizeof(vendorId);
 
-	if (sysctlbyname("machdep.cpu.vendor",
-		vendorId, &len, nullptr, 0) == 0)
+	return vendorId;
+#else
+	size_t len{ sizeof( vendorId ) - 1 };
+	if ( sysctlbyname( "machdep.cpu.vendor", vendorId, &len, nullptr, 0 ) == 0 )
 	{
+		vendorId[sizeof( vendorId ) - 1] = '\0';
 		return vendorId;
 	}
 
+	vendorId[0] = '\0';
 	return "N/A";
 #endif
-
-	return vendorId;
-#endif
-}
-
-// Trim spaces around data.
-void TrimSpaces( char (&in)[128], char (&out)[128] )
-{
-	size_t i{0};
-	// Trim leading space.
-	while (std::isspace( static_cast<unsigned char>( in[i] ) )) ++i;
-	
-	if (in[i] == '\0')
-	{
-	  out[0] = '\0';
-	  return;
-	}
-	
-	// Trim trailing space.
-	char *end{in + strlen( in ) - 1};
-	while (end > in && std::isspace( static_cast<unsigned char>( *end ) )) end--;
-	
-	// Write new null terminator character.
-	end[1] = '\0';
-	
-#ifdef _WIN32
-	strncpy_s( out, &in[0] + i, end + 1 - in + i );
-#else
-	const size_t size{static_cast<size_t>(end + 1 - in) + i};
-	strncpy( out, &in[0] + i, size );
-
-	out[ std::size(out) - 1 ] = '\0';
-#endif  // _WIN32
-}
-
-// Get CPU brand.
-const char* GetCpuBrand
-(
-	const std::vector<std::array<unsigned, 4>> &in,
-	char (&brand)[128]
-)
-{
-	char brand_raw[128]{'\0'};
-
-	std::memcpy(brand_raw, in[2].data(), sizeof(in[2]));
-	std::memcpy(brand_raw + sizeof(in[2]), in[3].data(), sizeof(in[3]));
-	std::memcpy(brand_raw + sizeof(in[2]) + sizeof(in[3]), in[4].data(),  //-V119
-				sizeof(in[4]));
-
-	TrimSpaces(brand_raw, brand);
-
-	return brand;
 }
 
 // Return the Processor's brand.
+// Not thread-safe by itself; only called from ComputeCPUInformation().
 const char* GetProcessorBrand()
 {
-#if defined( _PS3 )
-	return "PPC";
-#else
-	static char cpuBrand[128]{'\0'};
-	if (cpuBrand[0] != '\0')
+	static char cpuBrand[128];
+	if ( cpuBrand[0] != '\0' )
 	{
 		return cpuBrand;
 	}
 
 #ifdef OSX
-	char brand_raw[128]{'\0'};
+	char brandRaw[128]{};
 	// Works both on Intel Macs and M1+
-	size_t len = sizeof(brand_raw);
+	size_t len{ sizeof( brandRaw ) - 1 };
 
-	if (sysctlbyname("machdep.cpu.brand_string",
-		brand_raw, &len, nullptr, 0) == 0)
+	if ( sysctlbyname( "machdep.cpu.brand_string", brandRaw, &len, nullptr, 0 ) == 0 )
 	{
-		TrimSpaces(brand_raw, cpuBrand);
+		TrimSpaces( brandRaw, cpuBrand );
 		return cpuBrand;
 	}
 
 	return "N/A";
 #else
-	// Calling cpuid with 0x80000000 as the function_id argument gets the
-	// number of the highest valid extended ID.
-	unsigned eax, ebx, ecx, edx;
-	if ( !cpuid(0x80000000U, eax, ebx, ecx, edx) )
+	// Brand string is 48 bytes spread over leaves 0x80000002..0x80000004.
+	// cpuid() fails if any of them is above the highest extended leaf.
+	char brandRaw[3 * 16 + 1]{};
+	bool ok{ true };
+
+	for ( unsigned i = 0; i < 3 && ok; ++i )
 	{
-		if ( IsPC() )
-		{
-#if !defined(_WIN64) && !defined(__x86_64__)
-			strcpy( cpuBrand, "Generic_x86" );
-#else
-			strcpy( cpuBrand, "Generic_x86_64" );
-#endif
-		}
-
-		return cpuBrand;
+		unsigned regs[4];
+		ok = cpuid( 0x80000002U + i, regs[0], regs[1], regs[2], regs[3] );
+		std::memcpy( brandRaw + i * sizeof( regs ), regs, sizeof( regs ) );
 	}
 
-	const unsigned extFuncsCount = eax;
-
-	std::vector<std::array<unsigned, 4>> extendedData;
-	extendedData.reserve(
-		std::max(extFuncsCount - 0x80000000U, 0U) + 1U);
-
-	for (unsigned i = 0x80000000U; i <= extFuncsCount; ++i) {
-		cpuidex( i, 0, eax, ebx, ecx, edx );
-
-		extendedData.emplace_back(std::array<unsigned, 4>{ eax, ebx, ecx, edx });
+	if ( ok )
+	{
+		TrimSpaces( brandRaw, cpuBrand );
 	}
 
-	return GetCpuBrand( extendedData, cpuBrand );
-#endif
+	if ( cpuBrand[0] == '\0' )
+	{
+		strcpy( cpuBrand, GenericCpuName() );
+	}
+
+	return cpuBrand;
 #endif
 }
 
 bool CheckMMXTechnology( unsigned edx )
 {
-#if defined( _PS3 ) 
-	return true;
-#else
 	return ( edx & ( 1U << 23U ) ) != 0;
-#endif
 }
 
 bool CheckSSETechnology( unsigned edx )
 {
-#if defined( _PS3 )
-	return true;
-#else
 	return ( edx & ( 1U << 25U ) ) != 0;
-#endif
 }
 
 bool CheckSSE2Technology( unsigned edx )
 {
-#if defined( _PS3 )
-	return false;
-#else
 	return ( edx & ( 1U << 26U ) ) != 0;
-#endif
 }
 
 bool CheckSSE3Technology( unsigned ecx )
 {
-#if defined( _PS3 )
-	return false;
-#else
 	return ( ecx & 1U ) != 0;
-#endif
 }
 
 bool CheckSSSE3Technology( unsigned ecx )
 {
-#if defined( _PS3 )
-	return false;
-#else
-	// SSSE 3 is implemented by both Intel and AMD
-	// detection is done the same way for both vendors
 	return ( ecx & ( 1U << 9U ) ) != 0;	// bit 9 of ECX
-#endif
 }
 
 bool CheckSSE41Technology( unsigned ecx )
 {
-#if defined( _PS3 )
-	return false;
-#else
-	// SSE 4.1 is implemented by both Intel and AMD
-	// detection is done the same way for both vendors
 	return ( ecx & ( 1U << 19U ) ) != 0;	// bit 19 of ECX
-#endif
 }
 
 bool CheckSSE42Technology( unsigned ecx )
 {
-#if defined( _PS3 )
-	return false;
-#else
-	// SSE 4.2 is implemented by both Intel and AMD
-	// detection is done the same way for both vendors
 	return ( ecx & ( 1U << 20U ) ) != 0;	// bit 20 of ECX
-#endif
 }
 
 bool CheckSSE4aTechnology()
 {
-#if defined( _PS3 )
-	return false;
-#else
-	// SSE 4a is an AMD-only feature
-	const char *vendorId = GetProcessorVendorId();
-	if ( 0 != V_tier0_stricmp( vendorId, "AuthenticAMD" ) )
+	// SSE4a: CPUID 0x80000001 ECX bit 6. Reserved (zero) on Intel, set on
+	// AMD and Hygon, so no vendor check is needed.
+	unsigned eax, ebx, ecx, edx;
+	if ( !cpuid( 0x80000001U, eax, ebx, ecx, edx ) )
 		return false;
 
-	unsigned int eax,ebx,edx,ecx;
-	if( !cpuid( 0x80000001U,eax,ebx,ecx,edx) )
-		return false;
-
-	return ( ecx & ( 1U << 6U ) ) != 0;	// bit 6 of ECX
-#endif
+	return ( ecx & ( 1U << 6U ) ) != 0;
 }
 
 bool Check3DNowTechnology()
 {
-#if defined( _PS3 )
-	return false;
-#else
-	unsigned int eax, unused;
-	if ( !cpuid(0x80000000U,eax,unused,unused,unused) ) //-V112
+	unsigned eax, ebx, ecx, edx;
+	if ( !cpuid( 0x80000001U, eax, ebx, ecx, edx ) )
 		return false;
 
-	if ( eax > 0x80000000U ) //-V112
-	{
-		if ( !cpuid(0x80000001U,unused,unused,unused,eax) )
-			return false;
-
-		return ( eax & 1U << 31U ) != 0;
-	}
-
-	return false;
-#endif
+	return ( edx & ( 1U << 31U ) ) != 0;
 }
 
 bool CheckCMOVTechnology( unsigned edx )
 {
-#if defined( _PS3 )
-	return false;
-#else
-	return ( edx & (1U << 15U) ) != 0;
-#endif
+	return ( edx & ( 1U << 15U ) ) != 0;
 }
 
 bool CheckFCMOVTechnology( unsigned edx )
 {
-#if defined( _PS3 )
-	return false;
-#else
 	// Has x87 FPU and CMOV => have FCMOV.
 	return ( edx & 1U ) != 0 && CheckCMOVTechnology( edx );
-#endif
 }
 
 bool CheckRDTSCTechnology( unsigned edx )
 {
-#if defined( _PS3 )
-	return false;
-#else
-	return ( edx & (1U << 4U) ) != 0;
-#endif
+	return ( edx & ( 1U << 4U ) ) != 0;
 }
 
-bool CheckPopcntTechnology( unsigned int ecx )
+bool CheckHTTTechnology( unsigned edx )
 {
-#if defined( _PS3 )
-	return false;
-#else
-	return ( ecx & ( 1U << 23U ) ) != 0;	// bit 23 of ECX
-#endif
+	return ( edx & ( 1U << 28U ) ) != 0;
 }
 
-// Returns the number of logical processors per physical processors.
-uint8 LogicalProcessorsPerPackage( unsigned ebx )
+// EBX[23:16] of leaf 1 is the max number of logical processors per package.
+// Only meaningful when the HTT bit is set.
+unsigned LogicalProcessorsPerPackage( unsigned ebx )
 {
-	// EBX[23:16] indicate number of logical processors per package
-	constexpr unsigned NUM_LOGICAL_BITS = 0x00FF0000U;
+	return ( ebx >> 16U ) & 0xFFU;
+}
 
-	return static_cast<uint8>((ebx & NUM_LOGICAL_BITS) >> 16U);
+// Clamp a processor count into [1, 255].
+uint8 ClampProcessorCount( unsigned count )
+{
+	if ( count == 0 ) return 1;
+	return static_cast<uint8>( count > UCHAR_MAX ? UCHAR_MAX : count );
 }
 
 #ifdef _WIN32
@@ -392,103 +311,65 @@ struct CpuCoreInfo
 	unsigned logical_cores;
 };
 
-// Helper function to count set bits in the processor mask.
-unsigned CountSetBits( ULONG_PTR mask, bool is_popcnt_supported )
+unsigned CountSetBits( KAFFINITY mask )
 {
-#if !(defined(_M_ARM) || defined(_M_ARM64) || defined(_WIN64))
-	if ( is_popcnt_supported )
-	{
-		return __popcnt(mask);
-	}
-#elif defined(_WIN64)
-	if ( is_popcnt_supported )
-	{
-		// Requires CPU support.
-		return static_cast<unsigned>(__popcnt64(mask));
-	}
-#endif
-
-	constexpr size_t kLeftShift{sizeof(ULONG_PTR) * 8 - 1};
-	size_t bit_test{static_cast<size_t>(1U) << kLeftShift};
-
-	unsigned bits_num{0};
-	for (size_t i = 0; i <= kLeftShift; ++i)
-	{
-		bits_num += ((mask & bit_test) ? 1U : 0U);
-
-		bit_test /= 2;
-	}
-
-	return bits_num;
+	return static_cast<unsigned>( std::bitset<sizeof( KAFFINITY ) * CHAR_BIT>( mask ).count() );
 }
 
-CpuCoreInfo GetProcessorCoresInfo( bool is_popcnt_supported )
+// Uses the Ex variant so systems with more than 64 logical processors
+// (multiple processor groups) are counted fully.  Requires Windows 7+.
+CpuCoreInfo GetProcessorCoresInfo()
 {
-	HANDLE heap = ::GetProcessHeap();
-	
-	DWORD size{sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION) * 36};
-	auto *buffer =
-		static_cast<SYSTEM_LOGICAL_PROCESSOR_INFORMATION*>(
-			::HeapAlloc( heap, 0, size ) );
-	if ( !buffer )
+	DWORD size{ 0 };
+	if ( ::GetLogicalProcessorInformationEx( RelationProcessorCore, nullptr, &size ) ||
+		 ::GetLastError() != ERROR_INSUFFICIENT_BUFFER )
 	{
-		// Allocation failure.
 		return { 1, 1 };
 	}
 
-	while ( true )
+	HANDLE heap{ ::GetProcessHeap() };
+	auto* buffer = static_cast<BYTE*>( ::HeapAlloc( heap, 0, size ) );
+	if ( !buffer )
 	{
-		const BOOL rc{ ::GetLogicalProcessorInformation( buffer, &size ) };
-		if ( rc ) break;
- 
-		if ( ::GetLastError() == ERROR_INSUFFICIENT_BUFFER )
-		{
-			if ( buffer ) ::HeapFree( heap, 0, buffer );
+		return { 1, 1 };
+	}
 
-			buffer = static_cast<SYSTEM_LOGICAL_PROCESSOR_INFORMATION*>(
-				::HeapAlloc( heap, 0, static_cast<size_t>( size ) ) );
-			if ( !buffer )
+	RunCodeAtScopeExit( ::HeapFree( heap, 0, buffer ) );
+
+	if ( !::GetLogicalProcessorInformationEx( RelationProcessorCore,
+			reinterpret_cast<PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX>( buffer ), &size ) )
+	{
+		return { 1, 1 };
+	}
+
+	unsigned physical{ 0 }, logical{ 0 };
+
+	for ( DWORD offset = 0; offset < size; )
+	{
+		const auto* info =
+			reinterpret_cast<const SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*>( buffer + offset );
+		if ( info->Size == 0 )
+		{
+			break;
+		}
+
+		if ( info->Relationship == RelationProcessorCore )
+		{
+			++physical;
+			// A hyperthreaded core supplies more than one logical processor.
+			for ( WORD group = 0; group < info->Processor.GroupCount; ++group )
 			{
-				// Allocation failure.
-				return { 1, 1 };
+				logical += CountSetBits( info->Processor.GroupMask[group].Mask );
 			}
 		}
-		else
-		{
-			// Error GetLastError()
-			return { 1, 1 };
-		}
+
+		offset += info->Size;
 	}
 
-	SYSTEM_LOGICAL_PROCESSOR_INFORMATION *it{buffer};
-	size_t offset{0};
-	unsigned logical_cores_num{0}, physical_cores_num{0};
-
-	while ( offset + sizeof(*it) <= static_cast<size_t>(size) )
-	{
-		switch (it->Relationship)
-		{
-			case RelationProcessorCore:
-				physical_cores_num++;
-				// A hyperthreaded core supplies more than one logical processor.
-				logical_cores_num += CountSetBits( it->ProcessorMask, is_popcnt_supported );
-				break;
-
-			default:
-				// Unsupported LOGICAL_PROCESSOR_RELATIONSHIP value.
-				break;
-		}
-
-		offset += sizeof(*it);
-		++it;
-	}
-
-	::HeapFree( heap, 0, buffer );
-
-	return { physical_cores_num, logical_cores_num };
+	return { physical, logical };
 }
 
-#endif
+#endif  // _WIN32
 
 #if defined(POSIX)
 // Move this declaration out of the QueryCurrentCpuFrequency() function because
@@ -506,42 +387,54 @@ int64 QueryCurrentCpuFrequency();
 int64 QueryCurrentCpuFrequency()
 {
 #if defined(_WIN32)
-	LARGE_INTEGER waitTime, startCount, curCount;
-	uint32_t cpu_id_start, cpu_id_end;
+	LARGE_INTEGER qpcFrequency;
+	::QueryPerformanceFrequency( &qpcFrequency );
 
-	// Take 1/128 of a second for the measurement.
-	QueryPerformanceFrequency( &waitTime );
-	constexpr unsigned scale = 7;
-	waitTime.QuadPart >>= scale;
+	// Take ~1/128 of a second for the measurement.
+	const LONGLONG waitQpc{ qpcFrequency.QuadPart >> 7 };
+	const uint64_t overhead{ static_cast<uint64_t>( Plat_MeasureRtscpOverhead() ) };
 
-	QueryPerformanceCounter( &startCount );
-	const uint64_t startTicks = Plat_Rdtscp(cpu_id_start);
-	do
+	constexpr int kMaxAttempts{ 16 };
+	for ( int attempt = 0; attempt < kMaxAttempts; ++attempt )
 	{
-		QueryPerformanceCounter( &curCount );
-	}
-	while ( curCount.QuadPart - startCount.QuadPart < waitTime.QuadPart );
-	const uint64_t endTicks = Plat_Rdtscp(cpu_id_end);
+		LARGE_INTEGER startQpc, curQpc;
+		uint32_t cpuIdStart, cpuIdEnd;
 
-	if (cpu_id_start != cpu_id_end)
-	{
+		::QueryPerformanceCounter( &startQpc );
+		const uint64_t startTicks{ Plat_Rdtscp( cpuIdStart ) };
+		do
+		{
+			::QueryPerformanceCounter( &curQpc );
+		}
+		while ( curQpc.QuadPart - startQpc.QuadPart < waitQpc );
+		const uint64_t endTicks{ Plat_Rdtscp( cpuIdEnd ) };
+
 		// dimhotepus: Thread migrated to another CPU core, results are
-		// approximate.  Retry till thread executed on the same CPU core.
-		return QueryCurrentCpuFrequency();
+		// approximate. Retry, but accept the last attempt anyway.
+		if ( cpuIdStart != cpuIdEnd && attempt + 1 < kMaxAttempts )
+		{
+			continue;
+		}
+
+		const uint64_t elapsedTicks{ endTicks - startTicks };
+		if ( elapsedTicks <= overhead )
+		{
+			// Steam was seeing Divide-by-zero crashes on some Windows machines due to
+			// WIN64_AMD_DUALCORE_TIMER_WORKAROUND that can cause rdtsc to effectively
+			// stop. Return a plausible speed below and get on with our day.
+			break;
+		}
+
+		// Scale by the time that actually elapsed, not the requested wait:
+		// the loop overshoots and the thread may be preempted.
+		const uint64_t elapsedQpc{ static_cast<uint64_t>( curQpc.QuadPart - startQpc.QuadPart ) };
+		return static_cast<int64>( ( elapsedTicks - overhead ) *
+			static_cast<uint64_t>( qpcFrequency.QuadPart ) / elapsedQpc );
 	}
 
-	int64_t freq = (endTicks - startTicks - Plat_MeasureRtscpOverhead()) << scale;
-	if ( freq == 0 )
-	{
-		// Steam was seeing Divide-by-zero crashes on some Windows machines due to
-		// WIN64_AMD_DUALCORE_TIMER_WORKAROUND that can cause rdtsc to effectively
-		// stop.  Staging doesn't have the workaround but I'm checking in the fix
-		// anyway.  Return a plausible speed and get on with our day.
-		freq = 2000000000;
-	}
-	return freq;
+	return 2000000000;
 #elif defined(POSIX)
-	int64 freq = (int64)CalculateCPUFreq();
+	const int64 freq{ static_cast<int64>( CalculateCPUFreq() ) };
 	if ( freq == 0 )  // Couldn't calculate clock speed.
 	{
 		Error( "Unable to determine CPU Frequency.\n" );
@@ -550,100 +443,98 @@ int64 QueryCurrentCpuFrequency()
 #endif  // POSIX
 }
 
-const CPUInformation* GetCPUInformation()
+namespace
 {
-	static CPUInformation pi;
 
-	// Has the structure already been initialized and filled out?
-	if ( pi.m_Size == sizeof(pi) )
-		return &pi;
-
-	// Redundant, but just in case the user somehow messes with the size.
-	memset(&pi, 0x0, sizeof(pi));
+CPUInformation ComputeCPUInformation()
+{
+	CPUInformation pi;
+	memset( &pi, 0, sizeof( pi ) );
 
 	// Grab the processor frequency:
 	pi.m_Speed = QueryCurrentCpuFrequency();
 
-	unsigned int eax, ebx, edx, ecx;
-	if (cpuid(1, eax, ebx, ecx, edx))
+	unsigned eax{ 0 }, ebx{ 0 }, ecx{ 0 }, edx{ 0 };
+	if ( cpuid( 1, eax, ebx, ecx, edx ) )
 	{
 		pi.m_nModel = eax; // full CPU model info
 		pi.m_nFeatures[0] = edx; // x87+ features
 		pi.m_nFeatures[1] = ecx; // sse3+ features
 		pi.m_nFeatures[2] = ebx; // some additional features
 	}
-	
-	// Get the logical and physical processor counts:
-	pi.m_nLogicalProcessors = LogicalProcessorsPerPackage( ebx );
+
+	// Default for platforms without a better source below.
+	pi.m_nLogicalProcessors =
+		ClampProcessorCount( CheckHTTTechnology( edx ) ? LogicalProcessorsPerPackage( ebx ) : 1U );
 	pi.m_nPhysicalProcessors = 1U;
 
 #if defined(_WIN32)
 	// dimhotepus: Correctly compute CPU cores count.
-	CpuCoreInfo cpu_core_info{ GetProcessorCoresInfo( CheckPopcntTechnology( ecx ) ) };
+	const CpuCoreInfo coreInfo{ GetProcessorCoresInfo() };
 
-	// Ensure 256+ CPUs are at least 256.
-	pi.m_nPhysicalProcessors =
-		static_cast<uint8>( min( cpu_core_info.physical_cores, static_cast<unsigned>(UCHAR_MAX) ) );
-	pi.m_nLogicalProcessors =
-		static_cast<uint8>( min( cpu_core_info.logical_cores, static_cast<unsigned>(UCHAR_MAX) ) );
+	pi.m_nPhysicalProcessors = ClampProcessorCount( coreInfo.physical_cores );
+	pi.m_nLogicalProcessors = ClampProcessorCount( coreInfo.logical_cores );
 
-	// Make sure I always report at least one, when running WinXP with the /ONECPU switch, 
-	// it likes to report 0 processors for some reason.
-	if ( pi.m_nPhysicalProcessors == 0 && pi.m_nLogicalProcessors == 0 )
-	{
-		pi.m_nPhysicalProcessors = 1;
-		pi.m_nLogicalProcessors  = 1;
-	}
 #elif defined(_LINUX)
-	// TODO: poll /dev/cpuinfo when we have some benefits from multithreading
 	FILE *fpCpuInfo = fopen( "/proc/cpuinfo", "r" );
+	RunCodeAtScopeExitOpt( fpCpuInfo, fclose( fpCpuInfo ) );
 	if ( fpCpuInfo )
 	{
-		int nLogicalProcs = 0;
+		unsigned nLogicalProcs = 0;
 		int nProcId = -1, nCoreId = -1;
-		constexpr int kMaxPhysicalCores = 128;
+		constexpr unsigned kMaxPhysicalCores = 1024;
 		int anKnownIds[kMaxPhysicalCores];
-		int nKnownIdCount = 0;
-		char buf[255];
-		while ( fgets( buf, std::size(buf), fpCpuInfo ) )
-		{
-			if ( char *value = strchr( buf, ':' ) )
-			{
-				for ( char *p = value - 1; p > buf && std::isspace(static_cast<unsigned char>(*p)); --p )
-				{
-					*p = 0;
-				}
-				for ( char *p = buf; p < value && *p; ++p )
-				{
-					*p = static_cast<char>(tolower((unsigned char)*p));
-				}
-				if ( !strcmp( buf, "processor" ) )
-				{
-					++nLogicalProcs;
-					nProcId = nCoreId = -1;
-				}
-				else if ( !strcmp( buf, "physical id" ) )
-				{
-					nProcId = atoi( value+1 );
-				}
-				else if ( !strcmp( buf, "core id" ) )
-				{
-					nCoreId = atoi( value+1 );
-				}
+		unsigned nKnownIdCount = 0;
+		char buf[512];
 
-				if (nProcId != -1 && nCoreId != -1) // as soon as we have a complete id, process it
-				{
-					int i = 0, nId = (nProcId << 16) + nCoreId;
-					while ( i < nKnownIdCount && anKnownIds[i] != nId ) { ++i; }
-					if ( i == nKnownIdCount && nKnownIdCount < kMaxPhysicalCores )
-						anKnownIds[nKnownIdCount++] = nId;
-					nProcId = nCoreId = -1;
-				}
+		while ( fgets( buf, static_cast<int>( std::size( buf ) ), fpCpuInfo ) )
+		{
+			char *value = strchr( buf, ':' );
+			if ( !value )
+			{
+				continue;
+			}
+
+			// Terminate the key at ':' and strip trailing whitespace.
+			*value = '\0';
+			for ( char *p = value - 1; p >= buf && std::isspace( static_cast<unsigned char>( *p ) ); --p )
+			{
+				*p = '\0';
+			}
+			for ( char *p = buf; *p; ++p )
+			{
+				*p = static_cast<char>( std::tolower( static_cast<unsigned char>( *p ) ) );
+			}
+
+			if ( !strcmp( buf, "processor" ) )
+			{
+				++nLogicalProcs;
+				nProcId = nCoreId = -1;
+			}
+			else if ( !strcmp( buf, "physical id" ) )
+			{
+				nProcId = atoi( value + 1 );
+			}
+			else if ( !strcmp( buf, "core id" ) )
+			{
+				nCoreId = atoi( value + 1 );
+			}
+
+			if ( nProcId != -1 && nCoreId != -1 ) // as soon as we have a complete id, process it
+			{
+				const int nId = ( nProcId << 16 ) + nCoreId;
+				unsigned i = 0;
+				while ( i < nKnownIdCount && anKnownIds[i] != nId ) { ++i; }
+				if ( i == nKnownIdCount && nKnownIdCount < kMaxPhysicalCores )
+					anKnownIds[nKnownIdCount++] = nId;
+				nProcId = nCoreId = -1;
 			}
 		}
-		fclose( fpCpuInfo );
-		pi.m_nLogicalProcessors = MAX( 1, nLogicalProcs );
-		pi.m_nPhysicalProcessors = MAX( 1, nKnownIdCount );
+
+		pi.m_nLogicalProcessors = ClampProcessorCount( nLogicalProcs );
+		// No "physical id"/"core id" (e.g. many ARM kernels): assume no SMT.
+		pi.m_nPhysicalProcessors =
+			ClampProcessorCount( nKnownIdCount ? nKnownIdCount : nLogicalProcs );
 	}
 	else
 	{
@@ -652,19 +543,18 @@ const CPUInformation* GetCPUInformation()
 		AssertMsg( false, "couldn't read cpu information from /proc/cpuinfo" );
 	}
 #elif defined(OSX)
-	uint32_t physical_core_count = 1, logical_core_count = 1;
-	size_t len = sizeof(uint32_t);
+	// hw.physicalcpu / hw.logicalcpu are available on both Intel and Apple Silicon.
+	int physicalCount = 1, logicalCount = 1;
+	size_t len = sizeof( physicalCount );
+	if ( sysctlbyname( "hw.physicalcpu", &physicalCount, &len, nullptr, 0 ) != 0 )
+		physicalCount = 1;
 
-	// Works both for Intel Macs and M1+
-	// See https://discussions.apple.com/thread/252285216?sortBy=best
-	pi.m_nPhysicalProcessors =
-		sysctlbyname("machdep.cpu.core_count",
-			&physical_core_count, &len, nullptr, 0) == 0
-		? physical_core_count : 1;
-	pi.m_nLogicalProcessors =
-		sysctlbyname("machdep.cpu.thread_count",
-			&logical_core_count, &len, nullptr, 0) == 0
-		? logical_core_count : 1;
+	len = sizeof( logicalCount );
+	if ( sysctlbyname( "hw.logicalcpu", &logicalCount, &len, nullptr, 0 ) != 0 )
+		logicalCount = 1;
+
+	pi.m_nPhysicalProcessors = ClampProcessorCount( static_cast<unsigned>( physicalCount > 0 ? physicalCount : 1 ) );
+	pi.m_nLogicalProcessors = ClampProcessorCount( static_cast<unsigned>( logicalCount > 0 ? logicalCount : 1 ) );
 #endif
 
 	// Determine Processor Features:
@@ -676,7 +566,7 @@ const CPUInformation* GetCPUInformation()
 	pi.m_b3DNow           = Check3DNowTechnology();
 	pi.m_bMMX             = CheckMMXTechnology( edx );
 	// dimhotepus: Correctly check HyperThreading support.
-	pi.m_bHT              = pi.m_nPhysicalProcessors != pi.m_nLogicalProcessors;
+	pi.m_bHT              = pi.m_nLogicalProcessors > pi.m_nPhysicalProcessors;
 	pi.m_bSSE3            = CheckSSE3Technology( ecx );
 	pi.m_bSSSE3           = CheckSSSE3Technology( ecx );
 	pi.m_bSSE4a           = CheckSSE4aTechnology();
@@ -685,8 +575,17 @@ const CPUInformation* GetCPUInformation()
 	pi.m_szProcessorID    = GetProcessorVendorId();
 	pi.m_szProcessorBrand = GetProcessorBrand();
 
-	// Mark struct as ready and filled, return it:
-	pi.m_Size = sizeof(pi);
+	// Mark struct as ready and filled.
+	pi.m_Size = sizeof( pi );
 
+	return pi;
+}
+
+}  // namespace
+
+const CPUInformation* GetCPUInformation()
+{
+	// Thread-safe one-time initialization.
+	static const CPUInformation pi{ ComputeCPUInformation() };
 	return &pi;
 }

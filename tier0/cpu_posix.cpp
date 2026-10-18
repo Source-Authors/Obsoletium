@@ -1,14 +1,16 @@
 // Copyright Valve Corporation, All rights reserved.
-// 
-// Determine CPU speed under linux
+//
+// Determine CPU speed under Linux / macOS.
 
-#include <sys/types.h>
-#include <sys/time.h>
-#include <unistd.h>
-
+#include <algorithm>
+#include <cctype>
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <system_error>
+#include <tuple>
 
 #include "tier0/platform.h"
 #include "posix_file_stream.h"
@@ -17,177 +19,195 @@
 #include <sys/sysctl.h>
 #endif
 
-#define rdtsc(x) \
-	__asm__ __volatile__ ("rdtsc" : "=A" (x))
+#if defined(__x86_64__) || defined(__i386__)
+#define PLAT_HAS_TSC 1
+#endif
 
 namespace
 {
 
-struct TimeVal
+// Parses a non-negative decimal integer. Returns 0 on any error.
+uint64 ParseUint64( const char* text )
 {
-	TimeVal() = default;
+	if ( !text ) return 0;
 
-	TimeVal& operator=(const TimeVal &val) { m_TimeVal = val.m_TimeVal; return *this; }
+	while ( std::isspace( static_cast<unsigned char>( *text ) ) ) ++text;
 
-	inline double operator-(const TimeVal &left) const
-	{
-		uint64 left_us = (uint64) left.m_TimeVal.tv_sec * 1000000 + left.m_TimeVal.tv_usec;
-		uint64 right_us = (uint64) m_TimeVal.tv_sec * 1000000 + m_TimeVal.tv_usec;
-		uint64 diff_us = right_us - left_us;
-		return diff_us * ( 1.0 / 1000000.0 );
-	}
+	// strtoull silently accepts and negates a leading '-'.
+	if ( !std::isdigit( static_cast<unsigned char>( *text ) ) ) return 0;
 
-	timeval m_TimeVal;
-};
+	errno = 0;
+	char* end = nullptr;
+	const unsigned long long value{ std::strtoull( text, &end, 10 ) };
+	if ( errno == ERANGE || end == text ) return 0;
 
-// Compute the positive difference between two 64 bit numbers.
-constexpr inline uint64 diff(uint64 v1, uint64 v2)
-{
-	return v1 > v2 ? v1 - v2 : v2 - v1;
+	return static_cast<uint64>( value );
 }
 
-}  // namespace
+#ifdef PLAT_HAS_TSC
+
+uint64 MonotonicNs()
+{
+	timespec ts;
+#ifdef CLOCK_MONOTONIC_RAW
+	// Not slewed by NTP.
+	clock_gettime( CLOCK_MONOTONIC_RAW, &ts );
+#else
+	clock_gettime( CLOCK_MONOTONIC, &ts );
+#endif
+	return static_cast<uint64>( ts.tv_sec ) * 1000000000ULL + static_cast<uint64>( ts.tv_nsec );
+}
+
+// Measures the TSC rate in Hz against the monotonic clock: the same quantity
+// the Windows path measures, and what rdtsc-based timers need.
+// Takes a handful of short samples and returns the median, which is robust
+// against preemption without needing all samples to agree.
+uint64 MeasureTscFrequency()
+{
+	constexpr int kSamples{ 5 };
+	constexpr long kSampleNs{ 5 * 1000 * 1000 };  // 5 ms
+
+	double samples[kSamples];
+	int count{ 0 };
+	uint32 coreId;
+
+	for ( int attempt = 0; attempt < kSamples * 2 && count < kSamples; ++attempt )
+	{
+		const uint64 startNs{ MonotonicNs() };
+		const uint64 startTsc{ Plat_Rdtsc() };
+
+		const timespec sleepFor{ 0, kSampleNs };
+		nanosleep( &sleepFor, nullptr );  // Early wakeup (EINTR) is fine: we measure.
+
+		const uint64 endNs{ MonotonicNs() };
+		const uint64 endTsc{ Plat_Rdtscp(coreId) };
+
+		if ( endNs <= startNs || endTsc <= startTsc )
+		{
+			continue;
+		}
+
+		samples[count++] =
+			static_cast<double>( endTsc - startTsc ) * 1e9 / static_cast<double>( endNs - startNs );
+	}
+
+	if ( count < 3 )
+	{
+		return 0;
+	}
+
+	std::sort( samples, samples + count );
+	const uint64 median{ static_cast<uint64>( samples[count / 2] ) };
+
+	// Some old CPUs have broken TSCs that increment very slowly or unevenly.
+	constexpr uint64 kMinPlausibleHz{ 10000000 };
+	return median >= kMinPlausibleHz ? median : 0;
+}
+
+#endif  // PLAT_HAS_TSC
 
 #ifdef OSX
 
-// Mac
-static uint64 GetCPUFreqFromPROC()
+uint64 GetCPUFreqFromOS()
 {
-	uint64_t frequency = 0;
-	size_t len = sizeof(frequency);
+	uint64_t frequency{ 0 };
+	size_t len{ sizeof( frequency ) };
 
 	// Only for Intel Macs. M1+ have multiple CPUs with different frequency.
-	if (sysctlbyname("hw.cpufrequency", &frequency, &len, NULL, 0) == 0)
+	if ( sysctlbyname( "hw.cpufrequency", &frequency, &len, nullptr, 0 ) == 0 && frequency )
 	{
 		return frequency;
 	}
 
 	// Assume 2.4 GHz for M1+ for now.
-	return 2400000000;
+	return 2400000000ULL;
 }
 
 #else
 
-// Linux
-static uint64 GetCPUFreqFromPROC()
+// cpufreq reports kHz. Fails if the kernel has no CPU scaling support
+// (common in VMs and containers).
+uint64 GetCPUFreqFromSysfs()
 {
-	double mhz = 0;
-	char line[1024], search_str[] = "cpu MHz";
-
-	// dimhotepus: Use RAII FILE wrapper.
-	/* open proc/cpuinfo */
-	auto [f, errc] =
-		s1::posix::posix_file_stream_factory::open("/proc/cpuinfo", "r");
-	if (errc)
+	auto [f, errc] = s1::posix::posix_file_stream_factory::open(
+		"/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq", "r" );
+	if ( errc )
 	{
 		return 0;
 	}
 
-	/* ignore all lines until we reach MHz information */
-	while (!std::get<std::error_code>(f.gets(line))) 
-	{ 
-		if (strstr(line, search_str) != nullptr) 
+	char buf[64]{};
+	if ( std::get<std::error_code>( f.gets( buf ) ) )
+	{
+		return 0;
+	}
+
+	const uint64 khz{ ParseUint64( buf ) };
+	return khz <= UINT64_MAX / 1000 ? khz * 1000 : 0;
+}
+
+// "cpu MHz" from /proc/cpuinfo: the *current* frequency of the first CPU,
+// so it varies with scaling. Last resort only. Absent on most ARM kernels.
+uint64 GetCPUFreqFromProc()
+{
+	auto [f, errc] = s1::posix::posix_file_stream_factory::open( "/proc/cpuinfo", "r" );
+	if ( errc )
+	{
+		return 0;
+	}
+
+	char line[1024];
+	while ( !std::get<std::error_code>( f.gets( line ) ) )
+	{
+		if ( std::strncmp( line, "cpu MHz", 7 ) != 0 )
 		{
-			char *s;
+			continue;
+		}
 
-			/* ignore all characters in line up to : */
-			for (s = line; *s && (*s != ':'); ++s)
-				;
-
-			/* get MHz number */
-			if ( *s && ( sscanf( s + 1, "%lf", &mhz) == 1 ) )
-				break;
+		const char* colon{ std::strchr( line, ':' ) };
+		double mhz{ 0 };
+		if ( colon && std::sscanf( colon + 1, "%lf", &mhz ) == 1 && mhz > 0 )
+		{
+			return static_cast<uint64>( mhz * 1000000.0 );
 		}
 	}
 
-	return ( uint64 )( mhz * 1000000 );
+	return 0;
 }
 
-#endif
+uint64 GetCPUFreqFromOS()
+{
+	const uint64 sysfs{ GetCPUFreqFromSysfs() };
+	return sysfs ? sysfs : GetCPUFreqFromProc();
+}
 
+#endif  // OSX
+
+}  // namespace
+
+// Returns the CPU (TSC) frequency in Hz, or 0 if it could not be determined.
 uint64 CalculateCPUFreq()
 {
-#ifdef LINUX
-	const char *cpu_mhz{getenv( "CPU_MHZ" )};
-	if ( cpu_mhz )
+#ifdef _LINUX
+	// Manual override, in MHz.
+	if ( const char* cpuMhz{ std::getenv( "CPU_MHZ" ) } )
 	{
-		constexpr uint64 factor = 1000000;
-		return factor * atoi( cpu_mhz );
+		constexpr uint64 kMaxMhz{ 1000000 };  // 1 THz, sanity cap.
+		const uint64 mhz{ ParseUint64( cpuMhz ) };
+		if ( mhz > 0 && mhz <= kMaxMhz )
+		{
+			return mhz * 1000000;
+		}
+		// Invalid value: ignore and detect normally.
 	}
 #endif
 
-	// dimhotepus: Use RAII FILE wrapper.
-	// Try to open cpuinfo_max_freq. If the kernel was built with cpu scaling support disabled, this will fail.
-	auto [f, errc] =
-		s1::posix::posix_file_stream_factory::open(
-			"/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq", "r");
-	if ( !errc )
+#ifdef PLAT_HAS_TSC
+	if ( const uint64 measured{ MeasureTscFrequency() } )
 	{
-		char buf[ 256 ];
-		buf[ 0 ] = '\0';
-
-		uint64 retVal = 0;
-
-		std::tie(std::ignore, errc) = f.read( buf );
-		if ( !errc )
-		{
-			retVal = ( uint64 )atoll( buf );
-		}
-
-		if ( retVal )
-		{
-			return retVal * 1000;
-		}
+		return measured;
 	}
+#endif
 
-	// Compute the period. Loop until we get 3 consecutive periods that
-	// are the same to within a small error. The error is chosen
-	// to be +/- 0.02% on a P-200.
-	constexpr uint64 error = 40000;
-	constexpr int max_iterations = 600;
-	int count;
-	uint64 period, period1 = error * 2, period2 = 0,  period3 = 0;
-
-	for (count = 0; count < max_iterations; count++)
-	{
-		TimeVal start_time, end_time;
-		uint64 start_tsc, end_tsc;
-
-		gettimeofday( &start_time.m_TimeVal, 0 );
-		rdtsc( start_tsc );
-		usleep( 5000 ); // sleep for 5 msec
-		gettimeofday( &end_time.m_TimeVal, 0 );
-		rdtsc( end_tsc );
-	
-		// end_time - start_time calls into the overloaded TimeVal operator- way above, and returns a double.
-		period3 = ( end_tsc - start_tsc ) / ( end_time - start_time );
-
-		if (diff ( period1, period2 ) <= error &&
-			diff ( period2, period3 ) <= error &&
-			diff ( period1, period3 ) <= error )
-		{
-			break;
-		}
-
-		period1 = period2;
-		period2 = period3;
-    }
-
-	if ( count == max_iterations )
-    {
-		return GetCPUFreqFromPROC(); // fall back to /proc
-    }
-
-	// Set the period to the average period measured.
-	period = ( period1 + period2 + period3 ) / 3;
-
-	// Some Pentiums have broken TSCs that increment very
-	// slowly or unevenly. 
-	if (period < 10000000)
-	{
-		return GetCPUFreqFromPROC(); // fall back to /proc
-	}
-
-	return period;
+	return GetCPUFreqFromOS();
 }
-
