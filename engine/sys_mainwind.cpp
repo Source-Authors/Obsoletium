@@ -737,6 +737,10 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 							 new_battery_status_flags != m_last_battery_status_flags ||
 							 new_battery_saver_status != m_last_battery_saver_status )
 						{
+							m_last_ac_line_status = new_ac_line_status;
+							m_last_battery_status_flags = new_battery_status_flags;
+							m_last_battery_saver_status = new_battery_saver_status;
+
 							Msg("System power status changed: AC power '%s', battery charge '%s', battery saver '%s'.\n",
 								GetAcLineStatusDescription(new_ac_line_status),
 								GetBatteryChargeStatusDescription(new_battery_status_flags),
