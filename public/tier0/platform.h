@@ -1144,33 +1144,25 @@ inline uint64_t Plat_MeasureRtscpOverhead()
 	return median;
 }
 
-enum class Plat_MessageBoxButton
+enum class Plat_MessageBoxButton : unsigned
 {
-	// Function call failed.
+	// Function call failed / no button.
 	None = 0,
-	// Cancel button was selected, Alt-F4 was pressed,
-	// Escape was pressed or the user clicked on the
-	// close window button.
+	// Cancel button was selected, or the dialog was dismissed (Esc, Alt-F4,
+	// close button).  Dismissal is only possible when Cancel is offered.
 	Cancel = 0x1,
-	// No button.
 	No = 0x2,
-	// OK button.
 	Ok = 0x4,
-	// Retry button.
 	Retry = 0x8,
-	// Yes button.
 	Yes = 0x10
 };
 
-enum class Plat_MessageBoxIcon
+// NOTE: these are exclusive values, not flags.
+enum class Plat_MessageBoxIcon : unsigned
 {
-	// No icon.
 	None = 0,
-	// Information icon.
 	Information = 0x1,
-	// Warning icon.
 	Warning = 0x2,
-	// Error icon.
 	Error = 0x4
 };
 
@@ -1179,16 +1171,16 @@ enum class Plat_MessageBoxIcon
 	Plat_MessageBoxButton right)
 {
 	return static_cast<Plat_MessageBoxButton>(
-		static_cast<std::underlying_type_t<decltype(left)>>(left) |
-		static_cast<std::underlying_type_t<decltype(right)>>(right));
+		to_underlying(left) |
+		to_underlying(right));
 }
 
 [[nodiscard]] constexpr Plat_MessageBoxButton operator &(
     Plat_MessageBoxButton left,
 	Plat_MessageBoxButton right) {
 	return static_cast<Plat_MessageBoxButton>(
-		static_cast<std::underlying_type_t<decltype(left)>>(left) &
-		static_cast<std::underlying_type_t<decltype(right)>>(right));
+		to_underlying(left) &
+		to_underlying(right));
 }
 
 // dimhotepus: Crossplatform message box.

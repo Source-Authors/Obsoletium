@@ -8,6 +8,8 @@ $MacroRequired "PLATSUBDIR"
 
 $Macro SRCDIR		".."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro SDL3SRCDIR	"$SRCDIR\thirdparty\SDL"
+$Macro SDL3OUTDIR	"$SDL3SRCDIR\out"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
@@ -15,6 +17,7 @@ $Configuration
 {
 	$Compiler
 	{
+		$AdditionalIncludeDirectories	"$BASE;$SDL3SRCDIR;$SDL3SRCDIR/include"	[!$SDL]
 		$PreprocessorDefinitions		"$BASE;TIER0_DLL_EXPORT"
 		$Create/UsePrecompiledHeader	"Use Precompiled Header (/Yu)"
 		$Create/UsePCHThroughFile		"stdafx.h"
@@ -24,28 +27,38 @@ $Configuration
 	
 	$Linker
 	{
-		$AdditionalDependencies			"$BASE Advapi32.lib gdi32.lib ws2_32.lib Comctl32.lib Dwmapi.lib"						[$WINDOWS]
+		$AdditionalDependencies			"$BASE Advapi32.lib gdi32.lib ws2_32.lib Comctl32.lib Dwmapi.lib"	[$WINDOWS]
 
 		// pc publishes the import library directly
-		$ImportLibrary					"$LIBPUBLIC\$(TargetName).lib"				[$WINDOWS]
+		$ImportLibrary					"$LIBPUBLIC\$(TargetName).lib"	[$WINDOWS]
 
 		$ImportLibrary					"$LIBPUBLIC\$_IMPLIB_PREFIX$OUTBINNAME$_IMPLIB_EXT"	[$POSIX]
 
-		$SystemLibraries                 "rt" [$LINUXALL]
+		$SystemLibraries				"rt" [$LINUXALL]
 
 		// dimhotepus: Delay load user32 only when needed.  Useful when no GDI mode and ProcessSystemCallDisablePolicy enabled.
-		$DelayLoadedDLL					"$BASE User32.dll"
+		$DelayLoadedDLL					"$BASE User32.dll"	[$WINDOWS]
 	}
 
 	// tier0/vstdlib traditionally used "lib" prefix though nobody else seems to.
 	$General [$POSIX]
 	{
-		$GameOutputFile                                 "$OUTBINDIR/$_IMPLIB_PREFIX$OUTBINNAME$_DLL_EXT"
+		$GameOutputFile					"$OUTBINDIR/$_IMPLIB_PREFIX$OUTBINNAME$_DLL_EXT"
 	}
 
 	$Linker [$POSIX]
 	{
-		$OutputFile                                 "$(OBJ_DIR)/$_IMPLIB_PREFIX$OUTBINNAME$_DLL_EXT"
+		$OutputFile						"$(OBJ_DIR)/$_IMPLIB_PREFIX$OUTBINNAME$_DLL_EXT"
+	}
+
+	$PostBuildEvent [!$ANALYZE && $SDL]
+	{
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n" \
+							"COPY $SDL3OUTDIR\SDL3.dll $OUTBINDIR\SDL3.dll" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"IF EXIST $SDL3OUTDIR\SDL3.pdb COPY $SDL3OUTDIR\SDL3.pdb $OUTBINDIR\SDL3.pdb" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"$BASE"
 	}
 }
 
@@ -154,12 +167,10 @@ $Project "tier0"
 		$File	"$SRCDIR\public\tier0\minidump.h"
 		$File	"$SRCDIR\public\tier0\P4PerformanceCounters.h"
 		$File	"$SRCDIR\public\tier0\P5P6PerformanceCounters.h"
-		$File	"stdafx.h"
 		$File	"$SRCDIR\public\tier0\platform.h"
 		$File	"$SRCDIR\public\tier0\PMELib.h"
 		$File	"$SRCDIR\public\tier0\progressbar.h"
 		$File	"$SRCDIR\public\tier0\protected_things.h"
-		$File	"resource.h"
 		$File	"$SRCDIR\public\tier0\systeminformation.h"
 		$File	"$SRCDIR\public\tier0\threadtools.h"
 		$File	"$SRCDIR\public\tier0\tslist.h"
@@ -172,6 +183,8 @@ $Project "tier0"
 		$File	"$SRCDIR\public\tier0\vprof.h"
 		$File	"$SRCDIR\public\tier0\wchartypes.h"
 		$File	"$SRCDIR\public\tier0\xbox_codeline_defines.h"
+		$File	"stdafx.h"
+		$File	"resource.h"
 		$File	"mem_helpers.h"
 	}
 
@@ -194,5 +207,10 @@ $Project "tier0"
 				}
 			}
 		}
+	}
+
+	$Folder	"Link Libraries"
+	{
+		$Libexternal	"$SDL3OUTDIR/SDL3" [!$SDL]
 	}
 }

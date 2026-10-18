@@ -12,6 +12,8 @@
 
 // dimhotepus: COM errors.
 #include "windows/com_error_category.h"
+#else
+#include "include/SDL3/SDL.h"
 #endif
 
 #if defined(POSIX)
@@ -110,161 +112,142 @@ double Plat_FloatTime()
 	return g_FakeBenchmarkTime;
 }
 
-#ifdef _WIN32
-template<intp size>
-static wchar_t* Utf8ToWide( IN_Z const char *utf8, OUT_Z_ARRAY wchar_t (&buffer)[size] ) noexcept
-{
-	buffer[0] = L'\0';
-
-	const int written_chars{ ::MultiByteToWideChar( CP_UTF8, 0, utf8, -1, buffer, size ) };
-	if ( !written_chars )
-	{
-		wcsncpy( buffer, L"N/A", size - 1 );
-	}
-
-	buffer[ size - 1] = L'\0';
-	return buffer;
-}
-
+namespace {
+	
 template <typename TEnum>
 using IsEnum = std::enable_if_t<std::is_enum_v<TEnum>, bool>;
 
 template<typename TEnum>
-[[nodiscard]] constexpr static IsEnum<TEnum> HasFlag( TEnum value, TEnum flag )
+[[nodiscard]] constexpr IsEnum<TEnum> HasFlag( TEnum value, TEnum flag )
 {
-	return ( value & flag ) == flag;
+	// value == flag to handle 0 == 0.
+	return value == flag || ( value & flag ) == flag;
 }
 
-[[nodiscard]] constexpr static TASKDIALOG_COMMON_BUTTON_FLAGS GetTaskDialogButtons(
-	Plat_MessageBoxButton buttons )
+}  // namespace
+
+#ifdef _WIN32
+
+namespace {
+
+// Converts UTF-8 to UTF-16, truncating (at a code point boundary) instead of
+// failing when the text is too long for the buffer.
+template <std::size_t size>
+wchar_t* Utf8ToWide( IN_Z const char* utf8, OUT_Z_ARRAY wchar_t ( &buffer )[size] ) noexcept
 {
-	TASKDIALOG_COMMON_BUTTON_FLAGS taskDialogButtons = 0;
-
-	if ( HasFlag( buttons, Plat_MessageBoxButton::Ok ) )
+	static_assert( size > 1 && size <= INT_MAX );
+ 
+	buffer[0] = L'\0';
+	if ( !utf8 || !*utf8 )
 	{
-		taskDialogButtons |= TDCBF_OK_BUTTON;
+		return buffer;
 	}
-
-	if ( HasFlag( buttons, Plat_MessageBoxButton::Yes ) )
+ 
+	// Every UTF-8 byte produces at most one UTF-16 code unit (4-byte sequences
+	// produce 2 units), so feeding at most size - 1 bytes always fits.
+	std::size_t length = std::strlen( utf8 );
+	if ( length > size - 1 )
 	{
-		taskDialogButtons |= TDCBF_YES_BUTTON;
+		length = size - 1;
+		// Do not split a multi-byte sequence: back off while the first
+		// excluded byte is a continuation byte (10xxxxxx).
+		while ( length > 0 && ( static_cast<unsigned char>( utf8[length] ) & 0xC0 ) == 0x80 )
+		{
+			--length;
+		}
 	}
-
-	if ( HasFlag( buttons, Plat_MessageBoxButton::No ) )
+ 
+	const int written{ ::MultiByteToWideChar( CP_UTF8, 0, utf8, static_cast<int>( length ),
+		buffer, static_cast<int>( size - 1 ) ) };
+	if ( written <= 0 )
 	{
-		taskDialogButtons |= TDCBF_NO_BUTTON;
+		wcscpy_s( buffer, L"N/A" );
+		return buffer;
 	}
+ 
+	// With an explicit input length, no terminator is written for us.
+	buffer[written] = L'\0';
+	return buffer;
+}
 
-	if ( HasFlag( buttons, Plat_MessageBoxButton::Cancel ) )
+[[nodiscard]] constexpr TASKDIALOG_COMMON_BUTTON_FLAGS GetTaskDialogButtons(
+	Plat_MessageBoxButton buttons ) noexcept
+{
+	TASKDIALOG_COMMON_BUTTON_FLAGS flags = 0;
+ 
+	if ( HasFlag( buttons, Plat_MessageBoxButton::Ok ) )     flags |= TDCBF_OK_BUTTON;
+	if ( HasFlag( buttons, Plat_MessageBoxButton::Yes ) )    flags |= TDCBF_YES_BUTTON;
+	if ( HasFlag( buttons, Plat_MessageBoxButton::No ) )     flags |= TDCBF_NO_BUTTON;
+	if ( HasFlag( buttons, Plat_MessageBoxButton::Cancel ) ) flags |= TDCBF_CANCEL_BUTTON;
+	if ( HasFlag( buttons, Plat_MessageBoxButton::Retry ) )  flags |= TDCBF_RETRY_BUTTON;
+ 
+	return flags;
+}
+
+// MessageBoxW only supports fixed combinations; pick the closest superset.
+[[nodiscard]] constexpr UINT GetMessageBoxButtons( Plat_MessageBoxButton buttons ) noexcept
+{
+	const bool cancel{ HasFlag( buttons, Plat_MessageBoxButton::Cancel ) };
+ 
+	if ( HasFlag( buttons, Plat_MessageBoxButton::Yes ) ||
+		 HasFlag( buttons, Plat_MessageBoxButton::No ) )
 	{
-		taskDialogButtons |= TDCBF_CANCEL_BUTTON;
+		return cancel ? MB_YESNOCANCEL : MB_YESNO;
 	}
-	
+ 
 	if ( HasFlag( buttons, Plat_MessageBoxButton::Retry ) )
 	{
-		taskDialogButtons |= TDCBF_RETRY_BUTTON;
+		return MB_RETRYCANCEL;
 	}
-
-	return taskDialogButtons;
+ 
+	return cancel ? MB_OKCANCEL : MB_OK;
 }
 
-[[nodiscard]] constexpr static int GetMessageBoxButtons(
-	Plat_MessageBoxButton buttons )
+[[nodiscard]] Plat_MessageBoxButton GetPressedButton( int button ) noexcept
 {
-	int messageBoxButtons = 0;
-
-	if ( HasFlag( buttons, Plat_MessageBoxButton::Ok ) )
+	switch ( button )
 	{
-		messageBoxButtons = MB_OK;
-	}
-	else if ( HasFlag( buttons, Plat_MessageBoxButton::Yes ) ||
-		      HasFlag( buttons, Plat_MessageBoxButton::No ) )
-	{
-		messageBoxButtons = MB_YESNO;
-	}
-	else if ( HasFlag( buttons, Plat_MessageBoxButton::Cancel ) )
-	{
-		messageBoxButtons = MB_OKCANCEL;
-	}
-	else if ( HasFlag( buttons, Plat_MessageBoxButton::Retry ) )
-	{
-		messageBoxButtons = MB_RETRYCANCEL;
-	}
-
-	return messageBoxButtons;
-}
-
-[[nodiscard]] static Plat_MessageBoxButton GetPressedButton( int button )
-{
-	if ( button == 0 )
-	{
-		return Plat_MessageBoxButton::None;
-	}
-
-	if ( button == IDOK )
-	{
-		return Plat_MessageBoxButton::Ok;
-	}
-
-	if ( button == IDYES )
-	{
-		return Plat_MessageBoxButton::Yes;
-	}
-
-	if ( button == IDNO )
-	{
-		return Plat_MessageBoxButton::No;
-	}
-
-	if ( button == IDCANCEL )
-	{
-		return Plat_MessageBoxButton::Cancel;
-	}
-
-	if ( button == IDRETRY )
-	{
-		return Plat_MessageBoxButton::Retry;
-	}
-
-	AssertMsg( false, "Unknown message box button pressed 0x%x.", static_cast<int>( button ) );
-	return Plat_MessageBoxButton::None;
-}
-
-[[nodiscard]] static const wchar_t * GetTaskDialogIcon( Plat_MessageBoxIcon icon )
-{
-	switch (icon)
-	{
-		case Plat_MessageBoxIcon::None:
-			return nullptr;
-		case Plat_MessageBoxIcon::Information:
-			return TD_INFORMATION_ICON;
-		case Plat_MessageBoxIcon::Warning:
-			return TD_WARNING_ICON;
-		case Plat_MessageBoxIcon::Error:
-			return TD_ERROR_ICON;
+		case 0:        return Plat_MessageBoxButton::None;
+		case IDOK:     return Plat_MessageBoxButton::Ok;
+		case IDYES:    return Plat_MessageBoxButton::Yes;
+		case IDNO:     return Plat_MessageBoxButton::No;
+		case IDCANCEL: return Plat_MessageBoxButton::Cancel;
+		case IDRETRY:  return Plat_MessageBoxButton::Retry;
 		default:
-			AssertMsg( false, "Unknown message box icon 0x%x.", static_cast<int>( icon ) );
-			return nullptr;
+			AssertMsg( false, "Unknown message box button pressed 0x%x.", button );
+			return Plat_MessageBoxButton::None;
 	}
+}
+ 
+[[nodiscard]] PCWSTR GetTaskDialogIcon( Plat_MessageBoxIcon icon ) noexcept
+{
+	switch ( icon )
+	{
+		case Plat_MessageBoxIcon::None:        return nullptr;
+		case Plat_MessageBoxIcon::Information: return TD_INFORMATION_ICON;
+		case Plat_MessageBoxIcon::Warning:     return TD_WARNING_ICON;
+		case Plat_MessageBoxIcon::Error:       return TD_ERROR_ICON;
+	}
+ 
+	AssertMsg( false, "Unknown message box icon 0x%x.", static_cast<unsigned>( icon ) );
+	return nullptr;
 }
 
-[[nodiscard]] static int GetMessageBoxIcon( Plat_MessageBoxIcon icon )
+[[nodiscard]] UINT GetMessageBoxIcon( Plat_MessageBoxIcon icon ) noexcept
 {
-	switch (icon)
+	switch ( icon )
 	{
-		case Plat_MessageBoxIcon::None:
-			return 0;
-		case Plat_MessageBoxIcon::Information:
-			return MB_ICONINFORMATION;
-		case Plat_MessageBoxIcon::Warning:
-			return MB_ICONWARNING;
-		case Plat_MessageBoxIcon::Error:
-			return MB_ICONERROR;
-		default:
-			AssertMsg( false, "Unknown message box icon 0x%x.", static_cast<int>( icon ) );
-			return 0;
+		case Plat_MessageBoxIcon::None:        return 0;
+		case Plat_MessageBoxIcon::Information: return MB_ICONINFORMATION;
+		case Plat_MessageBoxIcon::Warning:     return MB_ICONWARNING;
+		case Plat_MessageBoxIcon::Error:       return MB_ICONERROR;
 	}
+ 
+	AssertMsg( false, "Unknown message box icon 0x%x.", static_cast<unsigned>( icon ) );
+	return 0;
 }
+
+}  // namespace
 #endif  // _WIN32
 
 Plat_MessageBoxButton Plat_MessageBox( IN_Z const char* title,
@@ -274,38 +257,118 @@ Plat_MessageBoxButton Plat_MessageBox( IN_Z const char* title,
 									   Plat_MessageBoxIcon icon )
 {
 #ifdef _WIN32
-	int nButtonPressed;
 	wchar_t wideTitle[512], wideMainInstruction[512], wideContent[512];
+	int pressed{ 0 };
 
-	const HRESULT hr{ ::TaskDialog( nullptr,
+	const HRESULT hr{ ::TaskDialog(
+		nullptr,
 		nullptr,
 		Utf8ToWide( title, wideTitle ),
 		Utf8ToWide( mainInstruction, wideMainInstruction ),
 		Utf8ToWide( content, wideContent ),
 		GetTaskDialogButtons( buttons ),
 		GetTaskDialogIcon( icon ),
-		&nButtonPressed ) };
-	if ( SUCCEEDED(hr) )
+		&pressed ) };
+	if ( SUCCEEDED( hr ) )
 	{
-		return GetPressedButton( nButtonPressed );
+		return GetPressedButton( pressed );
 	}
-
-	wchar_t wideCombinedContent[512 * 2 + 2];
-	wideCombinedContent[0] = L'\0';
-
-	wcscpy_s( wideCombinedContent, wideMainInstruction );
-	wcscat_s( wideCombinedContent, L"\n\n" );
-	wcscat_s( wideCombinedContent, wideContent );
-
-	// If nice dialog fail (ex. out of memory), then use message box as fallback.
-	nButtonPressed = MessageBoxW(
-		nullptr,
-		wideCombinedContent,
-		wideTitle,
-		MB_SYSTEMMODAL | GetMessageBoxIcon( icon ) | GetMessageBoxButtons( buttons ) );
-	return GetPressedButton( nButtonPressed );
+ 
+	// Fallback: TaskDialog failed (e.g. out of memory).
+	wchar_t combined[std::size( wideMainInstruction ) + 2 + std::size( wideContent )];
+	combined[0] = L'\0';
+ 
+	if ( wideMainInstruction[0] != L'\0' )
+	{
+		wcscpy_s( combined, wideMainInstruction );
+		if ( wideContent[0] != L'\0' )
+		{
+			wcscat_s( combined, L"\n\n" );
+		}
+	}
+	wcscat_s( combined, wideContent );
+ 
+	pressed = ::MessageBoxW( nullptr, combined, wideTitle,
+		MB_SYSTEMMODAL | MB_SETFOREGROUND |
+		GetMessageBoxIcon( icon ) | GetMessageBoxButtons( buttons ) );
+	return GetPressedButton( pressed );
 #else
-
+	SDL_MessageBoxButtonData sdlButtons[5];
+	int count{ 0 };
+ 
+	const bool hasCancel{ HasFlag( buttons, Plat_MessageBoxButton::Cancel ) };
+	const bool hasNo{ HasFlag( buttons, Plat_MessageBoxButton::No ) };
+	bool returnKeyAssigned{ false };
+ 
+	const auto add = [&]( Plat_MessageBoxButton button, const char* text )
+	{
+		if ( !HasFlag( buttons, button ) )
+		{
+			return;
+		}
+ 
+		SDL_MessageBoxButtonFlags flags{ 0 };
+		const bool affirmative{ button == Plat_MessageBoxButton::Ok ||
+			button == Plat_MessageBoxButton::Yes ||
+			button == Plat_MessageBoxButton::Retry };
+		if ( affirmative && !returnKeyAssigned )
+		{
+			flags |= SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
+			returnKeyAssigned = true;
+		}
+		if ( button == Plat_MessageBoxButton::Cancel ||
+			 ( !hasCancel && button == Plat_MessageBoxButton::No ) ||
+			 ( !hasCancel && !hasNo && button == Plat_MessageBoxButton::Ok ) )
+		{
+			flags |= SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT;
+		}
+ 
+		sdlButtons[count++] = { flags, static_cast<int>( to_underlying( button ) ), text };
+	};
+ 
+	add( Plat_MessageBoxButton::Yes, "Yes" );
+	add( Plat_MessageBoxButton::No, "No" );
+	add( Plat_MessageBoxButton::Ok, "OK" );
+	add( Plat_MessageBoxButton::Retry, "Retry" );
+	add( Plat_MessageBoxButton::Cancel, "Cancel" );
+ 
+	if ( count == 0 )
+	{
+		sdlButtons[count++] = {
+			SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT | SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT,
+			static_cast<int>( to_underlying( Plat_MessageBoxButton::Ok ) ), "OK" };
+	}
+ 
+	SDL_MessageBoxFlags flags{ SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT };
+	switch ( icon )
+	{
+		case Plat_MessageBoxIcon::Information: flags |= SDL_MESSAGEBOX_INFORMATION; break;
+		case Plat_MessageBoxIcon::Warning:     flags |= SDL_MESSAGEBOX_WARNING; break;
+		case Plat_MessageBoxIcon::Error:       flags |= SDL_MESSAGEBOX_ERROR; break;
+		case Plat_MessageBoxIcon::None:        break;
+	}
+ 
+	char message[2048];
+	const bool hasMain{ mainInstruction && *mainInstruction };
+	const bool hasContent{ content && *content };
+	std::snprintf( message, sizeof( message ), "%s%s%s",
+		hasMain ? mainInstruction : "",
+		hasMain && hasContent ? "\n\n" : "",
+		hasContent ? content : "" );
+ 
+	const SDL_MessageBoxData data{ flags, nullptr, title ? title : "", message,
+		count, sdlButtons, nullptr };
+ 
+	int buttonId{ -1 };
+	if ( !SDL_ShowMessageBox( &data, &buttonId ) )
+	{
+		return Plat_MessageBoxButton::None;
+	}
+ 
+	// -1 means the window was closed without pressing a button.
+	return buttonId < 0
+		? Plat_MessageBoxButton::Cancel
+		: static_cast<Plat_MessageBoxButton>( buttonId );
 #endif
 }
 
