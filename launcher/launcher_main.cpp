@@ -331,26 +331,29 @@ void DumpAppInformation(
 #if defined(POSIX)
 #if defined(__clang__)
   const std::string kCompilerVersion{"Clang " __clang_version__};
-#elif defined(__GCC__)
-  const std::string kCompilerVersion{std::to_string(__GNUC__) + "." +
+#elif defined(__GNUC__)
+  const std::string kCompilerVersion{"GCC " + std::to_string(__GNUC__) + "." +
                                      std::to_string(__GNUC_MINOR__) + "." +
                                      std::to_string(__GNUC_PATCHLEVEL__)};
 #else
 #error "Please, add your compiler build version here."
-#endif  // __GCC__
+#endif
 
 #ifdef __GLIBCXX__
-  Msg("%s v.%s build with %s on glibc v.%u.%u [compiled], %s [runtime]. "
-      "glibc++ v.%u, ABI v.%u.\n",
+  Msg("%s v.%s build with %s on libstdc++ v.%d (%d).\n",
       SE_PRODUCT_FILE_DESCRIPTION_STRING, SE_PRODUCT_FILE_VERSION_INFO_STRING,
-      kCompilerVersion.c_str(), __GLIBC__, __GLIBC_MINOR__,
-      gnu_get_libc_version(), _GLIBCXX_RELEASE, __GLIBCXX__);
+      kCompilerVersion.c_str(), _GLIBCXX_RELEASE, __GLIBCXX__);
 #endif
 
 #ifdef _LIBCPP_VERSION
-  Msg("%s v.%s build with %s on libc++ v.%u, ABI v.%u.\n",
+  Msg("%s v.%s build with %s on libc++ v.%d, ABI v.%d.\n",
       SE_PRODUCT_FILE_DESCRIPTION_STRING, SE_PRODUCT_FILE_VERSION_INFO_STRING,
       kCompilerVersion.c_str(), _LIBCPP_VERSION, _LIBCPP_ABI_VERSION);
+#endif
+
+#ifdef __GLIBC__
+  Msg("glibc v.%d.%d [compiled], %s [runtime].\n", __GLIBC__, __GLIBC_MINOR__,
+      gnu_get_libc_version());
 #endif
 #endif  // POSIX
 
