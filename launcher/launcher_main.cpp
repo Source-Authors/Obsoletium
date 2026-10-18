@@ -373,6 +373,7 @@ void DumpAppInformation(
 #endif
 }
 
+#ifdef _WIN32
 [[nodiscard]] s1::win::FloatingPointExceptionMode GetFloatingPointExceptionMode(
     ICommandLine* command_line) {
   s1::win::FloatingPointExceptionMode mode{
@@ -412,6 +413,7 @@ void DumpAppInformation(
   }
   return 0;
 }
+#endif
 
 }  // namespace
 
