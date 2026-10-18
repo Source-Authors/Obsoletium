@@ -178,12 +178,21 @@ IDedicatedServerAPI *WindowsSystem::LoadModules(
 
   if (!app_system_group->AddSystems(appSystems)) return nullptr;
 
+  auto* material_system = app_system_group->FindSystem<IMaterialSystem>(
+      MATERIAL_SYSTEM_INTERFACE_VERSION);
+  if (!material_system) {
+    Warning("Unable to find material system interface '%s'.\n",
+            MATERIAL_SYSTEM_INTERFACE_VERSION);
+    return nullptr;
+  }
+  material_system->SetShaderAPI("shaderapiempty" DLL_EXT_STRING);
+
   api_ = app_system_group->FindSystem<IDedicatedServerAPI>(
       VENGINE_HLDS_API_VERSION);
-
-  auto *material_system = app_system_group->FindSystem<IMaterialSystem>(
-      MATERIAL_SYSTEM_INTERFACE_VERSION);
-  material_system->SetShaderAPI("shaderapiempty.dll");
+  if (!api_) {
+    Warning("Unable to find dedicated server interface '%s'.\n",
+            VENGINE_HLDS_API_VERSION);
+  }
 
   return api_;
 }
