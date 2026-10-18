@@ -2,12 +2,18 @@
 //
 // Defines the entry point for the application.
 
-#if defined(_WIN32)
+#ifdef _WIN32
 #include "winlite.h"
 
-#include <direct.h>  // _chdir
-#include <comdef.h>  // _com_error
+#include <direct.h>          // _chdir
+#include <comdef.h>          // _com_error
+#include <VersionHelpers.h>  // IsWindows10OrGreater
 #include <WinSock2.h>
+#else
+#include <unistd.h>       // chdir, readlink
+#ifdef __APPLE__
+#include <mach-o/dyld.h>  // _NSGetExecutablePath
+#endif
 #endif
 
 #include <thread>
@@ -126,38 +132,72 @@ SpewRetval_t DefaultSpew(SpewType_t spew_type, const char* raw) {
   }
 }
 
-// Gets the executable name
-template <DWORD out_size>
+// Gets the full path of the executable.
+template <size_t out_size>
 bool GetExecutableName(char (&out)[out_size]) {
-#ifdef WIN32
-  if (HMODULE module{nullptr};
-      !::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                           nullptr, &module) ||
-      !::GetModuleFileName(module, out, out_size)) {
+  static_assert(out_size > 1);
+
+#if defined(_WIN32)
+  HMODULE module{nullptr};
+  if (!::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                           nullptr, &module)) {
     return false;
   }
+
+  // A truncated path is reported as success with length == size.
+  const DWORD length{
+      ::GetModuleFileName(module, out, static_cast<DWORD>(out_size))};
+  return length > 0 && length < out_size;
+#elif defined(_LINUX)
+  // readlink does not null-terminate; length == size - 1 may be truncated.
+  const ssize_t length{readlink("/proc/self/exe", out, out_size - 1)};
+  if (length <= 0 || static_cast<size_t>(length) >= out_size - 1) {
+    return false;
+  }
+
+  out[length] = '\0';
+  return true;
+#elif defined(OSX)
+  char path[PATH_MAX];
+  uint32_t size{sizeof(path)};
+  if (_NSGetExecutablePath(path, &size) != 0) {
+    return false;
+  }
+
+  // May contain symlinks and "..".
+  char resolved[PATH_MAX];
+  if (!realpath(path, resolved) || strlen(resolved) >= out_size) {
+    return false;
+  }
+
+  strcpy(out, resolved);
   return true;
 #else
+  out[0] = '\0';
   return false;
 #endif
 }
 
+// Last '\\' or '/' in path, or nullptr.
+[[nodiscard]] char* FindLastPathSeparator(char* path) {
+  char* last{nullptr};
+  for (char* it{path}; *it; ++it) {
+    if (*it == CORRECT_PATH_SEPARATOR) last = it;
+  }
+  return last;
+}
+
 // Determine the directory where this .exe is running from
 void GetBaseDirectory(ICommandLine* command_line,
-                      __out_z char (&base_directory)[MAX_PATH]) {
+                      OUT_Z_ARRAY char (&base_directory)[MAX_PATH]) {
   base_directory[0] = '\0';
 
   if (GetExecutableName(base_directory)) {
-    char* buffer = strrchr(base_directory, '\\');
-
-    if (buffer && *buffer) *(buffer + 1) = '\0';
-
-    const size_t length{strlen(base_directory)};
-
-    if (length > 0) {
-      char& end = base_directory[length - 1];
-
-      if (end == '\\' || end == '/') end = '\0';
+    // Strip the file name and the separator before it, but keep the separator
+    // of a root directory: "C:" or "" would not mean the root.
+    if (char* separator{FindLastPathSeparator(base_directory)}) {
+      const bool is_root{separator == base_directory || separator[-1] == ':'};
+      separator[is_root ? 1 : 0] = '\0';
     }
   }
 
