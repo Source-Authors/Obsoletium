@@ -64,7 +64,6 @@
 extern void* CreateSDLMgr();
 #endif
 
-
 namespace {
 
 // Exit codes for startup failures.
@@ -572,10 +571,10 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
   }
 
   const s1::win::ScopedWinsockInitializer scoped_winsock{WINSOCK_VERSION};
-  if (scoped_winsock.error_code()) {
-    Warning("Windows sockets 2.2+ unavailable (%d): %s.\n",
-            scoped_winsock.error_code().value(),
-            scoped_winsock.error_code().message().c_str());
+  if (const auto rc = scoped_winsock.error_code(); rc) {
+    Warning("Windows sockets 2.2+ unavailable (%d): %s.\n", rc.value(),
+            rc.message().c_str());
+    return FatalError(rc.value(), "Unable to initialize Windows sockets 2.2+.");
   }
 
   if (!ApplyProcessPriorityClass(command_line)) {
@@ -663,7 +662,8 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
   const s1::win::ScopedConsoleCtrlHandler scoped_console_ctrl_handler{
       ConsoleCtrlHandler};
   if (!scoped_console_ctrl_handler.is_success()) {
-    Warning("Unable to set console break handler, run without one.\n");
+    Warning(
+        "Unable to set text mode console break handler, run without one.\n");
     // Continue, not fatal.
   }
 
