@@ -80,7 +80,10 @@ SE_GCC_END_WARNING_OVERRIDE_SCOPE()
 			#ifdef TCHAR_IS_WCHAR
 				::GetModuleFileNameW( nullptr, rgchModuleName, std::size(rgchModuleName) );
 			#else
-				Plat_GetModuleFilename( rgchModuleName, static_cast<int>( ssize(rgchModuleName) ) );
+				if ( !Plat_GetModuleFilename( rgchModuleName, static_cast<int>( ssize(rgchModuleName) ) ) )
+				{
+					return bReturnValue;
+				}
 			#endif
 
 			// strip off the rest of the path from the .exe name

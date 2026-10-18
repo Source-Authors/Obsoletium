@@ -17,7 +17,10 @@
 #endif
 
 #if defined(POSIX)
-#include <unistd.h>
+#include <unistd.h>  // chdir, readlink
+#ifdef __APPLE__
+#include <mach-o/dyld.h>  // _NSGetExecutablePath
+#endif
 #endif
 
 #include <system_error>
@@ -423,18 +426,46 @@ char *Plat_ctime( const time_t *timep, char *buf, size_t bufsize )
 		return buf;
 }
 
-void Plat_GetModuleFilename( char *pOut, int nMaxBytes )
+bool Plat_GetModuleFilename( char *pOut, int nMaxBytes )
 {
-#ifdef PLATFORM_WINDOWS_PC
-	SetLastError( ERROR_SUCCESS ); // clear the error code
-	GetModuleFileName( nullptr, pOut, nMaxBytes );
-	if ( GetLastError() != ERROR_SUCCESS )
-		Error( "Plat_GetModuleFilename: Unable to read exe file name: %s.", 
-			std::system_category().message(GetLastError()).c_str());
+#ifdef _WIN32
+	HMODULE module{nullptr};
+	if (!::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+			nullptr, &module)) {
+		return false;
+	}
+
+	// A truncated path is reported as success with length == size.
+	const DWORD length{
+		::GetModuleFileName(module, pOut, static_cast<DWORD>(nMaxBytes))};
+	return length > 0 && length < static_cast<DWORD>(nMaxBytes);
+#elif defined(_LINUX)
+	// readlink does not null-terminate; length == size - 1 may be truncated.
+	const ssize_t length{readlink("/proc/self/exe", pOut, nMaxBytes - 1)};
+	if (length <= 0 || length >= nMaxBytes - 1) {
+		return false;
+	}
+
+	pOut[length] = '\0';
+	return true;
+#elif defined(OSX)
+	char path[PATH_MAX];
+	uint32_t size{sizeof(path)};
+	if (_NSGetExecutablePath(path, &size) != 0) {
+		return false;
+	}
+
+	// May contain symlinks and "..".
+	char resolved[PATH_MAX];
+	if (!realpath(path, resolved) || strlen(resolved) >= nMaxBytes) {
+		return false;
+	}
+
+	strcpy(pOut, resolved);
+	return true;
 #else
-	if ( -1 == readlink( "/proc/self/exe", pOut, nMaxBytes ) )
-		Error( "Plat_GetModuleFilename: Unable to read exe file name: %s.", 
-			std::system_category().message(errno).c_str() );
+	pOut[0] = '\0';
+	return false;
 #endif
 }
 

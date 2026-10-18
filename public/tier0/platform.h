@@ -1033,7 +1033,8 @@ PLATFORM_INTERFACE double			Plat_FloatTime();		// Returns time in seconds since 
 PLATFORM_INTERFACE uint32			Plat_MSTime();			// Time in milliseconds.
 PLATFORM_INTERFACE uint64			Plat_USTime();			// Time in microseconds.
 PLATFORM_INTERFACE char *			Plat_ctime( const time_t *timep, char *buf, size_t bufsize );
-PLATFORM_INTERFACE void				Plat_GetModuleFilename( char *pOut, int nMaxBytes );
+// dimhotepus: true on success, false on failure.
+PLATFORM_INTERFACE [[nodiscard]] bool	Plat_GetModuleFilename( char *pOut, int nMaxBytes );
 
 PLATFORM_INTERFACE void				Plat_ExitProcess( int nCode );
 

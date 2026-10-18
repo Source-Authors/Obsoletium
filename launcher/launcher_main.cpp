@@ -10,10 +10,7 @@
 #include <VersionHelpers.h>  // IsWindows10OrGreater
 #include <WinSock2.h>
 #else
-#include <unistd.h>  // chdir, readlink
-#ifdef __APPLE__
-#include <mach-o/dyld.h>  // _NSGetExecutablePath
-#endif
+#include <unistd.h>  // chdir
 #endif
 
 #include <atomic>
@@ -145,52 +142,13 @@ SpewRetval_t DefaultSpew(SpewType_t spew_type, const char* raw) {
 }
 
 // Gets the full path of the executable.
-template <size_t out_size>
+template <int out_size>
 bool GetExecutableName(char (&out)[out_size]) {
   static_assert(out_size > 1);
-
-#if defined(_WIN32)
-  HMODULE module{nullptr};
-  if (!::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                           nullptr, &module)) {
-    return false;
-  }
-
-  // A truncated path is reported as success with length == size.
-  const DWORD length{
-      ::GetModuleFileName(module, out, static_cast<DWORD>(out_size))};
-  return length > 0 && length < out_size;
-#elif defined(_LINUX)
-  // readlink does not null-terminate; length == size - 1 may be truncated.
-  const ssize_t length{readlink("/proc/self/exe", out, out_size - 1)};
-  if (length <= 0 || static_cast<size_t>(length) >= out_size - 1) {
-    return false;
-  }
-
-  out[length] = '\0';
-  return true;
-#elif defined(OSX)
-  char path[PATH_MAX];
-  uint32_t size{sizeof(path)};
-  if (_NSGetExecutablePath(path, &size) != 0) {
-    return false;
-  }
-
-  // May contain symlinks and "..".
-  char resolved[PATH_MAX];
-  if (!realpath(path, resolved) || strlen(resolved) >= out_size) {
-    return false;
-  }
-
-  strcpy(out, resolved);
-  return true;
-#else
-  out[0] = '\0';
-  return false;
-#endif
+  return Plat_GetModuleFilename(out, out_size);
 }
 
-// Last '\\' or '/' in path, or nullptr.
+// Last path separator or nullptr.
 [[nodiscard]] char* FindLastPathSeparator(char* path) {
   char* last{nullptr};
   for (char* it{path}; *it; ++it) {
