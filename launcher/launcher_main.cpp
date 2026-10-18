@@ -25,6 +25,7 @@
 #include "windows/scoped_floating_point_exception_mode.h"
 #include "windows/scoped_timer_resolution.h"
 #include "windows/scoped_winsock_initializer.h"
+#include "windows/scoped_console_ctrl_handler.h"
 #endif
 
 #include "appframework/AppFramework.h"
@@ -48,16 +49,15 @@
 #include "tier0/memdbgon.h"
 
 #if defined(USE_SDL)
-extern void *CreateSDLMgr();
+extern void* CreateSDLMgr();
 #endif
 
 namespace {
 
 template <size_t out_size>
 const char* PrefixMessageGroup(OUT_Z_ARRAY char (&out)[out_size],
-                               const char* group,
-                               const char *message) {
-  const char *out_group{GetSpewOutputGroup()};
+                               const char* group, const char* message) {
+  const char* out_group{GetSpewOutputGroup()};
 
   out_group = !Q_isempty(out_group) ? out_group : group;
 
@@ -73,7 +73,7 @@ const char* PrefixMessageGroup(OUT_Z_ARRAY char (&out)[out_size],
 }
 
 // Spew function!
-SpewRetval_t DefaultSpew(SpewType_t spew_type, const char *raw) {
+SpewRetval_t DefaultSpew(SpewType_t spew_type, const char* raw) {
   char message[4096];
   Plat_DebugString(PrefixMessageGroup(message, "launcher", raw));
 
@@ -125,25 +125,25 @@ bool GetExecutableName(char (&out)[out_size]) {
 }
 
 // Determine the directory where this .exe is running from
-void GetBaseDirectory(ICommandLine *command_line,
+void GetBaseDirectory(ICommandLine* command_line,
                       __out_z char (&base_directory)[MAX_PATH]) {
   base_directory[0] = '\0';
 
   if (GetExecutableName(base_directory)) {
-    char *buffer = strrchr(base_directory, '\\');
+    char* buffer = strrchr(base_directory, '\\');
 
     if (buffer && *buffer) *(buffer + 1) = '\0';
 
     const size_t length{strlen(base_directory)};
 
     if (length > 0) {
-      char &end = base_directory[length - 1];
+      char& end = base_directory[length - 1];
 
       if (end == '\\' || end == '/') end = '\0';
     }
   }
 
-  const char *override_directory{command_line->CheckParm("-basedir")};
+  const char* override_directory{command_line->CheckParm("-basedir")};
   if (override_directory) V_strcpy_safe(base_directory, override_directory);
 
 #ifdef WIN32
@@ -160,25 +160,6 @@ BOOL WINAPI ConsoleCtrlHandler(DWORD ctrl_type) {
 }
 #endif
 
-bool InitTextMode() {
-  bool ok{true};
-
-#ifdef WIN32
-  ok = AllocConsole() != 0;
-  if (ok) {
-    ok = SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE) != 0;
-  }
-
-  // reopen stdin handle as console window input
-  // reopen stout handle as console window output
-  // reopen stderr handle as console window output
-  ok = !!freopen("CONIN$", "rb", stdin) && !!freopen("CONOUT$", "wb", stdout) &&
-       !!freopen("CONOUT$", "wb", stderr);
-#endif
-
-  return ok;
-}
-
 // Figure out if Steam is running, then load the GameOverlayRenderer.dll
 void TryToLoadSteamOverlayDLL() {
 // dimhotepus: NO_STEAM
@@ -193,7 +174,7 @@ void TryToLoadSteamOverlayDLL() {
     // AppId which is immediately queried in GameOverlayRenderer.dll's DllMain
     // entry point
     if (SteamAPI_InitSafe()) {
-      const char *pchSteamInstallPath = SteamAPI_GetSteamInstallPath();
+      const char* pchSteamInstallPath = SteamAPI_GetSteamInstallPath();
       if (pchSteamInstallPath) {
         char rgchSteamPath[MAX_PATH];
         V_ComposeFileName(pchSteamInstallPath,
@@ -216,7 +197,7 @@ void TryToLoadSteamOverlayDLL() {
 // -applaunch 320 -game c:\steam\steamapps\sourcemods\modname', but applaunch
 // inserts its own -game parameter, which would supercede the one we really want
 // if we didn't intercede here.
-void RemoveDuplicatedGameParameters(ICommandLine *command_line) {
+void RemoveDuplicatedGameParameters(ICommandLine* command_line) {
   // Find the last -game parameter.
   int game_args_count = 0;
   char last_game_arg[MAX_PATH];
@@ -238,7 +219,7 @@ void RemoveDuplicatedGameParameters(ICommandLine *command_line) {
   }
 }
 
-void RemoveParametersOverrides(ICommandLine *command_line) {
+void RemoveParametersOverrides(ICommandLine* command_line) {
   // Remove any overrides in case settings changed
   command_line->RemoveParm("-w");
   command_line->RemoveParm("-h");
@@ -258,7 +239,7 @@ void RemoveParametersOverrides(ICommandLine *command_line) {
 }
 
 #ifdef WIN32
-bool ApplyProcessPriorityClass(const ICommandLine *command_line) {
+bool ApplyProcessPriorityClass(const ICommandLine* command_line) {
   // Make low priority?
   if (command_line->HasParm("-low")) {
     return !!SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
@@ -277,7 +258,7 @@ bool ApplyProcessPriorityClass(const ICommandLine *command_line) {
 }
 #endif
 
-int RunApp(ICommandLine *command_line, const char (&base_directory)[MAX_PATH],
+int RunApp(ICommandLine* command_line, const char (&base_directory)[MAX_PATH],
            bool is_text_mode) {
   bool need_restart{false};
 
@@ -308,7 +289,7 @@ void DumpAppInformation(
 #ifdef _WIN32
     LPSTR cmd_line
 #else
-    int argc, char **argv
+    int argc, char** argv
 #endif
 ) {
 #if defined(POSIX)
@@ -358,7 +339,8 @@ void DumpAppInformation(
 
 [[nodiscard]] s1::win::FloatingPointExceptionMode GetFloatingPointExceptionMode(
     ICommandLine* command_line) {
-  s1::win::FloatingPointExceptionMode mode{s1::win::FloatingPointExceptionMode::None};
+  s1::win::FloatingPointExceptionMode mode{
+      s1::win::FloatingPointExceptionMode::None};
 
   if (command_line->HasParm("-check-float-underflow")) {
     mode = mode | s1::win::FloatingPointExceptionMode::Underflow;
@@ -386,7 +368,7 @@ void DumpAppInformation(
 DLL_EXPORT int LauncherMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
                             [[maybe_unused]] int window_show_flags)
 #else
-DLL_EXPORT int LauncherMain(int argc, char **argv)
+DLL_EXPORT int LauncherMain(int argc, char** argv)
 #endif
 {
 #ifdef WIN32
@@ -424,7 +406,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   Plat_SetCommandLine(BuildCmdLine(argc, argv, false));
 #endif
 
-  ICommandLine *command_line{CommandLine()};
+  ICommandLine* command_line{CommandLine()};
 
 #ifdef WIN32
   command_line->CreateCmdLine(IsPC() ? VCRHook_GetCommandLine() : cmd_line);
@@ -447,10 +429,11 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
   // dimhotepus: Allow to catch floating point exceptions which are usually bugs
   // in code.
   const s1::win::ScopedFloatingPointExceptionMode
-    scoped_floating_point_exception_mode{GetFloatingPointExceptionMode(command_line)};
+      scoped_floating_point_exception_mode{
+          GetFloatingPointExceptionMode(command_line)};
 #endif
 
-  const CPUInformation *cpu_info{GetCPUInformation()};
+  const CPUInformation* cpu_info{GetCPUInformation()};
   if (!cpu_info->m_bSSE || !cpu_info->m_bSSE2 || !cpu_info->m_bSSE3 ||
       !cpu_info->m_bSSE41 || !cpu_info->m_bSSE42) {
     Error(
@@ -586,9 +569,52 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
       !!command_line->HasParm("-leakcheck")};
 
   // Run in text mode (no graphics & sound)?
-  const bool is_text_mode{command_line->HasParm("-textmode") && InitTextMode()};
+  const bool is_text_mode{command_line->HasParm("-textmode")};
+  if (!is_text_mode) {
+    return RunApp(command_line, base_directory, is_text_mode);
+  }
 
-  rc = RunApp(command_line, base_directory, is_text_mode);
+#ifdef WIN32
+  if (AllocConsole() == FALSE) {
+    const auto rc = ::GetLastError();
+    Warning("Unable to create console for text mode: %s.\n",
+            std::system_category().message(rc).c_str());
+    return rc;
+  }
+  RunCodeAtScopeExit(FreeConsole());
 
-  return rc;
+  const s1::win::ScopedConsoleCtrlHandler scoped_console_ctrl_handler{
+      ConsoleCtrlHandler};
+  if (!scoped_console_ctrl_handler.is_success()) {
+    Warning("Unable to set console break handler, run without one.\n");
+    // Continue, not fatal.
+  }
+
+  FILE *con_stdin, *con_stdout, *con_stderr;
+  // reopen stdin handle as console window input
+  if (con_stdin = freopen("CONIN$", "rb", stdin); !con_stdin) {
+    Warning("Unable to redirect stdin to console, run as is: %s.\n",
+            std::generic_category().message(errno).c_str());
+    // Continue, not fatal.
+  }
+  RunCodeAtScopeExitOpt(con_stdin, fclose(con_stdin));
+
+  // reopen stout handle as console window output
+  if (con_stdout = freopen("CONOUT$", "wb", stdout); !con_stdout) {
+    Warning("Unable to redirect stdout to console, run as is: %s.\n",
+            std::generic_category().message(errno).c_str());
+    // Continue, not fatal.
+  }
+  RunCodeAtScopeExitOpt(con_stdout, fclose(con_stdout));
+
+  // reopen stderr handle as console window output
+  if (con_stderr = freopen("CONOUT$", "wb", stderr); !con_stderr) {
+    Warning("Unable to redirect stderr to console, run as is: %s.\n",
+            std::generic_category().message(errno).c_str());
+    // Continue, not fatal.
+  }
+  RunCodeAtScopeExitOpt(con_stderr, fclose(con_stderr));
+#endif
+
+  return RunApp(command_line, base_directory, is_text_mode);
 }
