@@ -487,6 +487,8 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
           GetFloatingPointExceptionMode(command_line)};
 #endif
 
+  // SSE / RDTSC requirements only apply to x86 builds.
+#ifdef PLATFORM_INTEL
   const CPUInformation* cpu_info{GetCPUInformation()};
   if (!cpu_info->m_bSSE || !cpu_info->m_bSSE2 || !cpu_info->m_bSSE3 ||
       !cpu_info->m_bSSE41 || !cpu_info->m_bSSE42) {
@@ -501,6 +503,7 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
                       "Sorry, your CPU missed RDTSC instruction required for "
                       "the game.\n\nPlease upgrade your CPU.");
   }
+#endif
 
 #ifdef WIN32
   if (!IsWindows10OrGreater()) {
