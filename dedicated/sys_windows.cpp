@@ -1,11 +1,14 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#include <system_error>
 #include <chrono>
+#include <cstdarg>
+#include <system_error>
+#include <variant>
 
 #include "winlite.h"
 #include <WinSock2.h>
 #include <DbgHelp.h>
+#include <VersionHelpers.h>
 #include <eh.h>
 
 #include "args_win.h"
@@ -50,25 +53,27 @@ extern CTextConsoleWin32 console;
 // Loose implementation for operating system specific layer.
 class WindowsSystem : public ISystem {
  public:
-  explicit WindowsSystem(ICommandLine *command_line, bool is_console_mode)
-      : command_line_{command_line},
-        is_console_mode_{is_console_mode} {}
+  explicit WindowsSystem(ICommandLine* command_line, bool is_console_mode)
+      : command_line_{command_line}, is_console_mode_{is_console_mode} {}
   ~WindowsSystem() override = default;
 
-  IDedicatedServerAPI *LoadModules(
-      DedicatedAppSystemGroup *app_system_group) override;
+  WindowsSystem(const WindowsSystem&) = delete;
+  WindowsSystem& operator=(const WindowsSystem&) = delete;
 
-  void ErrorMessage(int level, const char *msg) override;
+  IDedicatedServerAPI* LoadModules(
+      DedicatedAppSystemGroup* app_system_group) override;
 
-  void WriteStatusText(char *status_text) override;
+  void ErrorMessage(int level, const char* msg) override;
+
+  void WriteStatusText(char* status_text) override;
   void UpdateStatus(int force) override;
 
   bool CreateConsoleWindow() override;
   void DestroyConsoleWindow() override;
 
-  void ConsoleOutput(char *string) override;
-  char *ConsoleInput(int index, char *buf, size_t size) override;
-  void Printf(PRINTF_FORMAT_STRING const char *fmt, ...) override;
+  void ConsoleOutput(char* string) override;
+  char* ConsoleInput(int index, char* buf, size_t size) override;
+  void Printf(PRINTF_FORMAT_STRING const char* fmt, ...) override;
 
  private:
   ICommandLine* command_line_;
@@ -115,7 +120,7 @@ void WindowsSystem::UpdateStatus(int force) {
   console.UpdateStatus();
 }
 
-void WindowsSystem::ConsoleOutput(char *string) {
+void WindowsSystem::ConsoleOutput(char* string) {
   if (!is_console_mode_) {
     VGUIPrintf(string);
   } else {
@@ -123,7 +128,7 @@ void WindowsSystem::ConsoleOutput(char *string) {
   }
 }
 
-void WindowsSystem::Printf(PRINTF_FORMAT_STRING const char *fmt, ...) {
+void WindowsSystem::Printf(PRINTF_FORMAT_STRING const char* fmt, ...) {
   // Dump text to debugging console.
   va_list argptr;
   char message[1024];
@@ -132,15 +137,14 @@ void WindowsSystem::Printf(PRINTF_FORMAT_STRING const char *fmt, ...) {
   V_vsprintf_safe(message, fmt, argptr);
   va_end(argptr);
 
-  // Get current text and append it.
   ConsoleOutput(message);
 }
 
-char *WindowsSystem::ConsoleInput(int index, char *buf, size_t buflen) {
+char* WindowsSystem::ConsoleInput(int index, char* buf, size_t buflen) {
   return console.GetLine(index, buf, buflen);
 }
 
-void WindowsSystem::WriteStatusText(char *status) { SetConsoleTitleA(status); }
+void WindowsSystem::WriteStatusText(char* status) { SetConsoleTitleA(status); }
 
 bool WindowsSystem::CreateConsoleWindow() {
   if (!::AllocConsole()) return false;
@@ -162,8 +166,8 @@ void WindowsSystem::DestroyConsoleWindow() {
 }
 
 // Loading modules used by the dedicated server.
-IDedicatedServerAPI *WindowsSystem::LoadModules(
-    DedicatedAppSystemGroup *app_system_group) {
+IDedicatedServerAPI* WindowsSystem::LoadModules(
+    DedicatedAppSystemGroup* app_system_group) {
   AppSystemInfo_t appSystems[] = {
       // NOTE: This one must be first!!
       {"engine" DLL_EXT_STRING, CVAR_QUERY_INTERFACE_VERSION},
@@ -202,7 +206,7 @@ IDedicatedServerAPI *WindowsSystem::LoadModules(
   return api_;
 }
 
-int BootMain(int argc, char **argv, bool is_console_mode, ISystem *system);
+int BootMain(int argc, char** argv, bool is_console_mode, ISystem* system);
 
 }  // namespace s1::dedicated
 
@@ -254,20 +258,21 @@ class ScopedThreadSEHTranslator {
   ScopedThreadSEHTranslator& operator=(ScopedThreadSEHTranslator&&) = delete;
 
  private:
-  const _se_translator_function old_se_translator_;
-  const _se_translator_function new_se_translator_;
+  const _se_translator_function old_se_translator_, new_se_translator_;
 };
 
 }  // namespace
 
 /**
  * @brief Entry point.
- * @param argc Arguments count.
- * @param argv Arguments.
+ * @param instance Dedicated server module instance.
+ * @param cmd_line Command line (unused, full command line is re-read).
+ * @param cmd_show Show window state (unused).
  * @return Exit code.
  */
-DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
-                             int cmd_show) {
+DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE,
+                             [[maybe_unused]] LPSTR cmd_line,
+                             [[maybe_unused]] int cmd_show) {
   SetAppInstance(instance);
 
   // Printf/sscanf functions expect en_US UTF8 localization.  Mac OSX also sets
@@ -286,7 +291,7 @@ DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
             kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale());
   }
 
-  const CPUInformation *cpu_info{GetCPUInformation()};
+  const CPUInformation* cpu_info{GetCPUInformation()};
   if (!cpu_info->m_bSSE || !cpu_info->m_bSSE2 || !cpu_info->m_bSSE3 ||
       !cpu_info->m_bSSE41 || !cpu_info->m_bSSE42) {
     Warning(
@@ -311,15 +316,15 @@ DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
 
   const auto args_result =
       s1::dedicated::Args::FromCommandLine(::GetCommandLineW());
-  if (const auto *rc = std::get_if<std::error_code>(&args_result)) {
-    Warning("Sorry, unable to parse command line arguments: %s",
+  if (const auto* rc = std::get_if<std::error_code>(&args_result)) {
+    Warning("Sorry, unable to parse command line arguments: %s.\n",
             rc->message().c_str());
     return rc->value();
   }
 
-  const s1::dedicated::Args *args{
+  const s1::dedicated::Args* args{
       std::get_if<s1::dedicated::Args>(&args_result)};
-  ICommandLine *command_line{CommandLine()};
+  ICommandLine* command_line{CommandLine()};
   command_line->CreateCmdLine(VCRHook_GetCommandLine());
 
   using namespace std::chrono_literals;
@@ -331,7 +336,7 @@ DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
   if (!scoped_timer_resolution) {
     Warning(
         "Unable to set Windows timer resolution to %lld ms. Will use default "
-        "one.",
+        "one.\n",
         static_cast<long long>(kSystemTimerResolution.count()));
   }
 
