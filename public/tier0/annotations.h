@@ -17,11 +17,15 @@
 // Include the annotation header file.
 #include <sal.h>
 
-// For temporarily suppressing warnings -- the warnings are suppressed for the next source line.
-#define ANALYZE_SUPPRESS(wnum) __pragma(warning(suppress: wnum))
-#define ANALYZE_SUPPRESS2(wnum1, wnum2) __pragma(warning(supress: wnum1  wnum2))
-#define ANALYZE_SUPPRESS3(wnum1, wnum2, wnum3) __pragma(warning(suppress: wnum1 wnum2 wnum3))
-#define ANALYZE_SUPPRESS4(wnum1, wnum2, wnum3, wnum4) __pragma(warning(suppress: wnum1 wnum2 wnum3 wnum4))
+// For temporarily suppressing code analysis warnings -- the warnings are
+// suppressed for the next source line only.
+#define ANALYZE_SUPPRESS(wnum) __pragma(warning(suppress : wnum))
+#define ANALYZE_SUPPRESS2(wnum1, wnum2) \
+  __pragma(warning(suppress : wnum1 wnum2))
+#define ANALYZE_SUPPRESS3(wnum1, wnum2, wnum3) \
+  __pragma(warning(suppress : wnum1 wnum2 wnum3))
+#define ANALYZE_SUPPRESS4(wnum1, wnum2, wnum3, wnum4) \
+  __pragma(warning(suppress : wnum1 wnum2 wnum3 wnum4))
 
 // Tag all printf style format strings with this
 #define PRINTF_FORMAT_STRING _Printf_format_string_
