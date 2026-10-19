@@ -12,13 +12,9 @@
 #include "appframework/IAppSystem.h"
 #include "KeyValues.h"
 
-// unicode character type
-// for more unicode manipulation functions #include <wchar.h>
-#if !defined(_WCHAR_T_DEFINED) && !defined(GNUC)
-typedef unsigned short wchar_t;
-#define _WCHAR_T_DEFINED
-#endif
-
+// dimhotepus: wchar_t is a built-in type in C++; it must never be typedef'd
+// here.  The old "GNUC" guard was a typo for __GNUC__ and only compiled by
+// accident when <cstddef> happened to be included first.
 
 // direct references to localized strings
 using StringIndex_t = unsigned long;
