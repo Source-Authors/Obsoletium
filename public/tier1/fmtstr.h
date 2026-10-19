@@ -300,7 +300,8 @@ public:
 	explicit CNumStr( int64 n64 )	{ SetInt64( n64 ); }
 	explicit CNumStr( uint64 un64 )	{ SetUint64( un64 ); }
 
-#if defined(COMPILER_GCC) && defined(PLATFORM_64BITS)
+	// dimhotepus: Add Clang support.
+#if (defined(COMPILER_GCC) || defined(COMPILER_CLANG)) && defined(PLATFORM_64BITS)
 	explicit CNumStr( lint64 n64 )		{ SetInt64( (int64)n64 ); }
 	explicit CNumStr( ulint64 un64 )	{ SetUint64( (uint64)un64 ); }
 #endif

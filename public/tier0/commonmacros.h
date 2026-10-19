@@ -49,14 +49,15 @@
 #endif
 #endif
 
-#if defined(__GCC__) || defined(__GNUC__)
+// dimhotepus: Clang also defines __GNUC__ (as 4), so exclude it explicitly.
+#if defined(__GNUC__) && !defined(__clang__)
 /**
  * @brief Defined when GCC compiler used.
  */
 #define COMPILER_GCC 1
 
 // dimhotepus: Require GCC 8+ for C++17 support.
-// Only Clang 8 has full C++17 support.
+// Only GCC 8 has full C++17 support.
 // See https://gcc.gnu.org/projects/cxx-status.html#cxx17
 #if __GNUC__ < 8
 #error "Please install GCC 8+ to support C++ 17"
@@ -195,11 +196,11 @@ inline bool STRING_MATCHES_ID(const char* s, unsigned id) noexcept {
  */
 template <typename T>
 [[deprecated("Unsafe buffer access.")]] void ID_TO_STRING(
-    T id, const char* p) noexcept {
-  p[3] = (id >> 24) & 0xFF;
-  p[2] = (id >> 16) & 0xFF;
-  p[1] = (id >> 8) & 0xFF;
-  p[0] = (id >> 0) & 0xFF;
+    T id, char* p) noexcept {
+  p[3] = static_cast<char>((id >> 24) & 0xFF);
+  p[2] = static_cast<char>((id >> 16) & 0xFF);
+  p[1] = static_cast<char>((id >> 8) & 0xFF);
+  p[0] = static_cast<char>((id >> 0) & 0xFF);
 }
 
 /**
