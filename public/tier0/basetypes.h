@@ -341,9 +341,7 @@ struct interval_t
 // Declares a type-safe handle type; you can't assign one handle to the next
 //-----------------------------------------------------------------------------
 
-// 32-bit pointer handles.
-
-// Typesafe 8-bit and 16-bit handles.
+// Typesafe 16-bit and 32-bit handles.
 template< class HandleType >
 class CBaseIntHandle
 {
@@ -365,7 +363,7 @@ protected:
 };
 
 template< class DummyType >
-class CIntHandle16 : public CBaseIntHandle< unsigned short >
+class CIntHandle16 : public CBaseIntHandle< uint16 >
 {
 public:
 	inline CIntHandle16() = default;
@@ -384,7 +382,7 @@ protected:
 
 
 template< class DummyType >
-class CIntHandle32 : public CBaseIntHandle< unsigned long >
+class CIntHandle32 : public CBaseIntHandle< uint32 >
 {
 public:
 	inline			CIntHandle32() = default;
