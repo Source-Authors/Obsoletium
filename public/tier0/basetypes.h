@@ -6,15 +6,26 @@
 #include "commonmacros.h"
 #include "wchartypes.h"
 
-#include <cstdint>
-#include <cstddef>  // std::ptrdiff_t
-#include <limits>   // std::numeric_limits
 
+// wchartypes.h ends by turning Valve defines back on, so turn them off again
+// before any standard header can see the malloc/free/char overrides.
 #include "valve_off.h"
 
+// Standard headers next, so that any M_PI / endian definitions they provide
+// are visible before our fallbacks below.
 #include <cmath>        // fabsf, M_PI (when the platform provides it)
 #include <cstdint>
 #include <cstddef>      // std::ptrdiff_t, std::size_t
+#include <cstring>      // memcpy
+#include <limits>       // std::numeric_limits
+#include <type_traits>  // std::is_pointer_v, std::underlying_type_t
+#if __has_include(<version>)
+#include <version>      // __cpp_lib_* feature-test macros
+#endif
+#if defined(__cpp_lib_endian) || defined(__cpp_lib_bit_cast)
+#include <bit>          // std::endian, std::bit_cast
+#endif
+
 // This is a trick to get the DLL extension off the -D option on the command line.
 #define DLLExtTokenPaste(x) #x
 #define DLLExtTokenPaste2(x) DLLExtTokenPaste(x)
@@ -227,24 +238,28 @@ static_assert(sizeof(vec_t) == sizeof(unsigned), "FloatBits assumes 32-bit unsig
 
 [[nodiscard]] inline unsigned FloatBits( vec_t f )
 {
+#ifdef __cpp_lib_bit_cast
+	return std::bit_cast<unsigned>( f );
+#else
 	unsigned r;
-	static_assert(sizeof(r) == sizeof(f));
-	memcpy( &r, &f, sizeof(unsigned) );
+	memcpy( &r, &f, sizeof(r) );
 	return r;
+#endif
 }
 
 [[nodiscard]] inline vec_t BitsToFloat( unsigned i )
 {
+#ifdef __cpp_lib_bit_cast
+	return std::bit_cast<vec_t>( i );
+#else
 	vec_t r;
-	static_assert(sizeof(r) == sizeof(i));
-	memcpy( &r, &i, sizeof(unsigned) );
+	memcpy( &r, &i, sizeof(r) );
 	return r;
+#endif
 }
 
 [[nodiscard]] inline bool IsNaN( vec_t f )
 {
-	static_assert(sizeof(f) == 4u); //-V112
-
 	// NaN check.
 	// std::isnan is slower on MSVC due to call to fpclassify.
 
