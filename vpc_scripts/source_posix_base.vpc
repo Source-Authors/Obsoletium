@@ -39,7 +39,8 @@ $Configuration
 	{
 		$AdditionalIncludeDirectories		"$SRCDIR\common;$SRCDIR\public;$SRCDIR\public\tier0;$SRCDIR\public\tier1"
 		$AdditionalLibraryDirectories		"$LIBCOMMON;$LIBPUBLIC" [$OSXALL]
-		$PreprocessorDefinitions		"$BASE;GNUC;POSIX;COMPILER_GCC;_DLL_EXT=$_DLL_EXT"
+		// dimhotepus: Do not define COMPILER_GCC as it may be COMPILER_CLANG.
+		$PreprocessorDefinitions		"$BASE;GNUC;POSIX;_DLL_EXT=$_DLL_EXT"
 		$PreprocessorDefinitions		"$BASE;DEDICATED" [$DEDICATED]
 		// the 10240 in the following line is the output of `sysctl -n kern.maxfilesperproc`
 		$PreprocessorDefinitions		"$BASE;_OSX;OSX;_DARWIN_UNLIMITED_SELECT;FD_SETSIZE=10240;" [$OSXALL]
