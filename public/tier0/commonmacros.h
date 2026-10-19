@@ -378,12 +378,18 @@ inline
 #define RTL_NUMBER_OF_V0(A) (sizeof(A) / sizeof((A)[0]))
 #endif
 
+#ifndef RTL_NUMBER_OF_V1
+#define RTL_NUMBER_OF_V1(A) RTL_NUMBER_OF_V0(A)
+#endif
+
+// dimhotepus: The template form works on every C++17 compiler, not just MSVC,
+// so use it everywhere: it rejects pointers at compile time.
 #if defined(__cplusplus) && !defined(MIDL_PASS) && !defined(RC_INVOKED) && \
-    (_MSC_FULL_VER >= 13009466) && !defined(SORTPP_PASS)
+    !defined(SORTPP_PASS)
 
 // From crtdefs.h
 #if !defined(UNALIGNED)
-#if defined(_M_IA64) || defined(_M_AMD64)
+#if defined(_MSC_VER) && (defined(_M_IA64) || defined(_M_AMD64))
 #define UNALIGNED __unaligned
 #else
 #define UNALIGNED
