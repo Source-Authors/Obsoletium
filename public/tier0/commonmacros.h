@@ -349,7 +349,7 @@ inline
 #endif  // !__cpp_lib_unreachable
 
 #ifndef REFERENCE
-#define REFERENCE(arg) ((void)arg)
+#define REFERENCE(arg) ((void)(arg))
 #endif
 
 // Wraps the integer in quotes, allowing us to form constant strings with it.
