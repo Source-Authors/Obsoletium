@@ -24,13 +24,9 @@ using ushort = unsigned short;
 using uint = unsigned int;
 using ulong = unsigned long;
 
-#ifndef _WCHAR_T_DEFINED
-// DAL - wchar_t is a built in define in gcc 3.2 with a size of 4 bytes
-#if !defined( __x86_64__ ) && !defined( __WCHAR_TYPE__  )
-typedef unsigned short wchar_t;
-#define _WCHAR_T_DEFINED
-#endif
-#endif
+// dimhotepus: wchar_t is a built-in type in C++; it must never be typedef'd
+// here.  The old "GNUC" guard was a typo for __GNUC__ and only compiled by
+// accident when <cstddef> happened to be included first.
 
 // do this in GOLDSRC only!!!
 //#define Assert assert
