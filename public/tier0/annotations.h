@@ -29,7 +29,7 @@
 
 // Tag all printf style format strings with this
 #define PRINTF_FORMAT_STRING _Printf_format_string_
-#define SCANF_FORMAT_STRING _Scanf_format_string_impl_
+#define SCANF_FORMAT_STRING _Scanf_format_string_
 // Various macros for specifying the capacity of the buffer pointed
 // to by a function parameter. Variations include in/out/inout,
 // CAP (elements) versus BYTECAP (bytes), and null termination or
