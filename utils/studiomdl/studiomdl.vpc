@@ -22,7 +22,7 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE winmm.lib User32.lib"
+		$AdditionalDependencies				"$BASE WinMM.lib User32.lib"
 	}
 }
 

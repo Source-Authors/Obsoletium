@@ -19,7 +19,7 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE wsock32.lib shell32.lib"
+		$AdditionalDependencies				"$BASE Ws2_32.lib Shell32.lib"
 	}
 }
 

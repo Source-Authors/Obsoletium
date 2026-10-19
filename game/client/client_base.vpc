@@ -54,8 +54,8 @@ $Configuration
 		$SystemFrameworks				"Carbon" [$OSXALL]
 		$SystemLibraries				"rt" [$LINUXALL]
 		$IgnoreImportLibrary			"TRUE"
-		$AdditionalDependencies			"$BASE winmm.lib User32.lib Shell32.lib"	[$WINDOWS]
-		$AdditionalDependencies			"$BASE wsock32.lib Ws2_32.lib" [$BUILD_REPLAY&&$WINDOWS]
+		$AdditionalDependencies			"$BASE WinMM.lib User32.lib Shell32.lib"	[$WINDOWS]
+		$AdditionalDependencies			"$BASE Ws2_32.lib" [$BUILD_REPLAY&&$WINDOWS]
 	}
 }
 

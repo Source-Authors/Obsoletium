@@ -20,7 +20,7 @@ $Configuration	"Debug"
 
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE winmm.lib"
+		$AdditionalDependencies				"$BASE WinMM.lib"
 	}
 }
 

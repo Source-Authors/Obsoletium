@@ -47,7 +47,7 @@ copy &quot;$(TargetDir)&quot;sqlwrapper.lib ..\..\..\src\lib\common\
 				Outputs="..\..\..\game\bin\&quot;$(TargetName)&quot;.dll"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mswsock.lib winmm.lib ws2_32.lib libmySQL.lib tier0.lib tier1.lib vstdlib.lib"
+				AdditionalDependencies="mswsock.lib WinMM.lib ws2_32.lib libmySQL.lib tier0.lib tier1.lib vstdlib.lib"
 				OutputFile="$(OutDir)/sqlwrapper.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;../../common/$(IntDir)&quot;;../../lib/public;../vmpi_private/mysql/lib/opt"
@@ -119,7 +119,7 @@ copy &quot;$(TargetDir)&quot;sqlwrapper.lib ..\..\..\src\lib\common\sqlwrapper.l
 				Outputs="..\..\..\game\bin\&quot;$(TargetName)&quot;.dll"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="mswsock.lib winmm.lib ws2_32.lib libmySQL.lib tier0.lib tier1.lib vstdlib.lib"
+				AdditionalDependencies="mswsock.lib WinMM.lib ws2_32.lib libmySQL.lib tier0.lib tier1.lib vstdlib.lib"
 				OutputFile="$(OutDir)/sqlwrapper.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;../../common/$(IntDir)&quot;;../../lib/public;../vmpi_private/mysql/lib/opt"

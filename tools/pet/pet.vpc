@@ -19,7 +19,7 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE psapi.lib shell32.lib user32.lib"
+		$AdditionalDependencies				"$BASE Psapi.lib Shell32.lib User32.lib"
 	}
 }
 

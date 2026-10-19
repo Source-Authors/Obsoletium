@@ -18,7 +18,7 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE winmm.lib odbc32.lib odbccp32.lib"
+		$AdditionalDependencies				"$BASE WinMM.lib odbc32.lib odbccp32.lib"
 	}
 }
 

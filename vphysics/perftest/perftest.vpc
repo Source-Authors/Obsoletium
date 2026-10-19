@@ -19,7 +19,7 @@ $Configuration
 
 	$Linker
 	{
-//		$AdditionalDependencies				"comctl32.lib winmm.lib"
+//		$AdditionalDependencies				"comctl32.lib WinMM.lib"
 	}
 }
 

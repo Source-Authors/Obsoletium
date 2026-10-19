@@ -66,7 +66,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /map /debug /machine:I386 /def:".\hl.def"
 # SUBTRACT BASE LINK32 /profile
-# ADD LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_hl2/server.dll" /libpath:"..\lib\public"
+# ADD LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_hl2/server.dll" /libpath:"..\lib\public"
 # SUBTRACT LINK32 /pdb:none
 # Begin Custom Build - Copying to HL2
 TargetDir=.\Release_hl2
@@ -113,7 +113,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 user32.lib advapi32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /def:".\hl.def" /implib:".\Debug\server.lib"
 # SUBTRACT BASE LINK32 /profile
-# ADD LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_hl2/server.dll" /implib:".\Debug_hl2\server.lib" /libpath:"..\lib\public"
+# ADD LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_hl2/server.dll" /implib:".\Debug_hl2\server.lib" /libpath:"..\lib\public"
 # SUBTRACT LINK32 /verbose /pdb:none
 # Begin Custom Build - Copying to HL2
 TargetDir=.\Debug_hl2
@@ -150,9 +150,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 user32.lib advapi32.lib winmm.lib ivp/ivp_lib.lib /nologo /subsystem:windows /dll /debug /machine:I386 /def:".\hl.def" /implib:".\Debug\server.lib"
+# ADD BASE LINK32 user32.lib advapi32.lib WinMM.lib ivp/ivp_lib.lib /nologo /subsystem:windows /dll /debug /machine:I386 /def:".\hl.def" /implib:".\Debug\server.lib"
 # SUBTRACT BASE LINK32 /profile
-# ADD LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /out:"Debug_tf2/server.dll" /implib:".\Debug_hl2\server.lib" /libpath:"..\lib\public"
+# ADD LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /out:"Debug_tf2/server.dll" /implib:".\Debug_hl2\server.lib" /libpath:"..\lib\public"
 # SUBTRACT LINK32 /pdb:none
 # Begin Custom Build - Copying to tf2
 TargetDir=.\Debug_tf2
@@ -189,9 +189,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib winmm.lib ivp/ivp_lib.lib /nologo /subsystem:windows /dll /map /debug /machine:I386 /def:".\hl.def"
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib WinMM.lib ivp/ivp_lib.lib /nologo /subsystem:windows /dll /map /debug /machine:I386 /def:".\hl.def"
 # SUBTRACT BASE LINK32 /profile
-# ADD LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_tf2/server.dll" /libpath:"..\lib\public"
+# ADD LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_tf2/server.dll" /libpath:"..\lib\public"
 # SUBTRACT LINK32 /pdb:none
 # Begin Custom Build - Copying to tf2
 TargetDir=.\Release_tf2
@@ -236,9 +236,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_hl1/server.dll" /libpath:"..\lib\public"
+# ADD BASE LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_hl1/server.dll" /libpath:"..\lib\public"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_hl1/server.dll" /libpath:"..\lib\public"
+# ADD LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_hl1/server.dll" /libpath:"..\lib\public"
 # SUBTRACT LINK32 /pdb:none
 # Begin Custom Build - Copying to HL1
 TargetDir=.\Release_hl1
@@ -283,9 +283,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_hl1/server.dll" /implib:".\Debug_hl1\server.lib" /libpath:"..\lib\public"
+# ADD BASE LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_hl1/server.dll" /implib:".\Debug_hl1\server.lib" /libpath:"..\lib\public"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_hl1/server.dll" /implib:".\Debug_hl1\server.lib" /libpath:"..\lib\public"
+# ADD LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_hl1/server.dll" /implib:".\Debug_hl1\server.lib" /libpath:"..\lib\public"
 # SUBTRACT LINK32 /pdb:none
 # Begin Custom Build - Copying to HL1
 TargetDir=.\Debug_hl1
@@ -322,9 +322,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_hl1/server.dll" /implib:".\Debug_hl1\server.lib" /libpath:"..\lib\public"
+# ADD BASE LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_hl1/server.dll" /implib:".\Debug_hl1\server.lib" /libpath:"..\lib\public"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_CounterStrike/server.dll" /implib:".\Debug_hl1\server.lib" /libpath:"..\lib\public"
+# ADD LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_CounterStrike/server.dll" /implib:".\Debug_hl1\server.lib" /libpath:"..\lib\public"
 # SUBTRACT LINK32 /pdb:none
 # Begin Custom Build - Copying to cstrike\bin
 TargetDir=.\Debug_CounterStrike
@@ -361,9 +361,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_hl1/server.dll" /libpath:"..\lib\public"
+# ADD BASE LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_hl1/server.dll" /libpath:"..\lib\public"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_CounterStrike/server.dll" /libpath:"..\lib\public"
+# ADD LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_CounterStrike/server.dll" /libpath:"..\lib\public"
 # SUBTRACT LINK32 /pdb:none
 # Begin Custom Build - Copying to HL1
 TargetDir=.\Release_CounterStrike
@@ -408,9 +408,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_CounterStrike/server.dll" /implib:".\Debug_hl1\server.lib" /libpath:"..\lib\public"
+# ADD BASE LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_CounterStrike/server.dll" /implib:".\Debug_hl1\server.lib" /libpath:"..\lib\public"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_CounterStrike/server.dll" /implib:".\Debug_hl1\server.lib" /libpath:"..\lib\public"
+# ADD LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_CounterStrike/server.dll" /implib:".\Debug_hl1\server.lib" /libpath:"..\lib\public"
 # SUBTRACT LINK32 /pdb:none
 # Begin Custom Build - Copying to dod\bin
 TargetDir=.\Debug_CounterStrike
@@ -447,9 +447,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_CounterStrike/server.dll" /libpath:"..\lib\public"
+# ADD BASE LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_CounterStrike/server.dll" /libpath:"..\lib\public"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_CounterStrike/server.dll" /libpath:"..\lib\public"
+# ADD LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_CounterStrike/server.dll" /libpath:"..\lib\public"
 # SUBTRACT LINK32 /pdb:none
 # Begin Custom Build - Copying to dod\bin
 TargetDir=.\Release_CounterStrike
@@ -494,9 +494,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_CounterStrike/server.dll" /libpath:"..\lib\public"
+# ADD BASE LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_CounterStrike/server.dll" /libpath:"..\lib\public"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_CounterStrike/server.dll" /libpath:"..\lib\public"
+# ADD LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_CounterStrike/server.dll" /libpath:"..\lib\public"
 # SUBTRACT LINK32 /pdb:none
 # Begin Custom Build - Copying to HL1
 TargetDir=.\Release_CounterStrike
@@ -541,9 +541,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_CounterStrike/server.dll" /implib:".\Debug_hl1\server.lib" /libpath:"..\lib\public"
+# ADD BASE LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_CounterStrike/server.dll" /implib:".\Debug_hl1\server.lib" /libpath:"..\lib\public"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_CounterStrike/server.dll" /implib:".\Debug_hl1\server.lib" /libpath:"..\lib\public"
+# ADD LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_CounterStrike/server.dll" /implib:".\Debug_hl1\server.lib" /libpath:"..\lib\public"
 # SUBTRACT LINK32 /pdb:none
 # Begin Custom Build - Copying to cstrike\bin
 TargetDir=.\Debug_CounterStrike
@@ -580,9 +580,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_hl2/server.dll" /implib:".\Debug_hl2\server.lib" /libpath:"..\lib\public"
+# ADD BASE LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_hl2/server.dll" /implib:".\Debug_hl2\server.lib" /libpath:"..\lib\public"
 # SUBTRACT BASE LINK32 /verbose /pdb:none
-# ADD LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_hl2mp/server.dll" /implib:".\Debug_hl2\server.lib" /libpath:"..\lib\public"
+# ADD LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /debug /machine:I386 /out:"Debug_hl2mp/server.dll" /implib:".\Debug_hl2\server.lib" /libpath:"..\lib\public"
 # SUBTRACT LINK32 /verbose /pdb:none
 # Begin Custom Build - Copying to HL2MP
 TargetDir=.\Debug_hl2mp
@@ -619,9 +619,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_hl2/server.dll" /libpath:"..\lib\public"
+# ADD BASE LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"Release_hl2/server.dll" /libpath:"..\lib\public"
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 user32.lib advapi32.lib winmm.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"hl___Win32_Release_HL2MP/server.dll" /libpath:"..\lib\public"
+# ADD LINK32 user32.lib advapi32.lib WinMM.lib /nologo /base:"0x22000000" /subsystem:windows /dll /map /debug /machine:I386 /nodefaultlib:"LIBCD" /out:"hl___Win32_Release_HL2MP/server.dll" /libpath:"..\lib\public"
 # SUBTRACT LINK32 /pdb:none
 # Begin Custom Build - Copying to HL2MP
 TargetDir=.\hl___Win32_Release_HL2MP

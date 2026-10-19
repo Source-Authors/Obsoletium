@@ -31,7 +31,7 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies			"$BASE Shell32.lib wsock32.lib odbc32.lib odbccp32.lib winmm.lib User32.lib"
+		$AdditionalDependencies			"$BASE Shell32.lib Ws2_32.lib odbc32.lib odbccp32.lib WinMM.lib User32.lib"
 		$SystemLibraries			"iconv;edit;curses" [$OSXALL]
 		$SystemFrameworks			"AppKit" [$OSXALL]
 		// dimhotepus: Delay load user32 only when needed.

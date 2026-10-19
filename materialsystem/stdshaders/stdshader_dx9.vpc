@@ -25,7 +25,7 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies			"$BASE version.lib winmm.lib"	[$WINDOWS]
+		$AdditionalDependencies			"$BASE version.lib WinMM.lib"	[$WINDOWS]
 	}
 
 	$Resources

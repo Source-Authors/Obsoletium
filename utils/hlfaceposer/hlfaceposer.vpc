@@ -19,7 +19,7 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE Advapi32.lib Comctl32.lib Comdlg32.lib Ole32.lib Gdi32.lib Msimg32.lib Shell32.lib User32.lib winmm.lib"
+		$AdditionalDependencies				"$BASE Advapi32.lib Comctl32.lib Comdlg32.lib Ole32.lib Gdi32.lib Msimg32.lib Shell32.lib User32.lib WinMM.lib"
 		$EntryPoint							"mainCRTStartup"
 	}
 }

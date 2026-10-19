@@ -25,7 +25,7 @@ $Configuration
 	$Linker
 	{
 		// Deprecated MBCS MFC libraries for VS 2013 (nafxcw.lib and nafxcwd.lib) can be downloaded from http://go.microsoft.com/?linkid=9832071
-		$AdditionalDependencies				"$BASE winmm.lib rpcrt4.lib"
+		$AdditionalDependencies				"$BASE WinMM.lib rpcrt4.lib"
 	}
 }
 

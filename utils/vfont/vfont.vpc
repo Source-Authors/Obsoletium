@@ -19,7 +19,7 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies				"winmm.lib comctl32.lib"
+		$AdditionalDependencies				"WinMM.lib comctl32.lib"
 //		$IgnoreSpecificLibrary				"libc;libcd;libcmtd;libcp"
 //		$AdditionalOptions					"/FORCE"
 	}

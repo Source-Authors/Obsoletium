@@ -24,7 +24,7 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies			"$BASE Gdi32.lib Imm32.lib Ole32.lib Shell32.lib Shlwapi.lib winmm.lib User32.lib" [$WINDOWS]
+		$AdditionalDependencies			"$BASE Gdi32.lib Imm32.lib Ole32.lib Shell32.lib Shlwapi.lib WinMM.lib User32.lib" [$WINDOWS]
 		$SystemLibraries				"iconv" [$OSXALL] //||$LINUXALL]
 		$SystemFrameworks				"Carbon" [$OSXALL]
 	}

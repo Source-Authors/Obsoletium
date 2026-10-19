@@ -6,7 +6,7 @@
 #include <chrono>
 #include <sal.h>
 
-#pragma comment(lib, "winmm.lib")
+#pragma comment(lib, "WinMM.lib")
 
 #include "tier0/dbg.h"
 
