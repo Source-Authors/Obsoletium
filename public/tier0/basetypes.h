@@ -352,7 +352,7 @@ public:
 
 	// Only the code that doles out these handles should use these functions.
 	// Everyone else should treat them as a transparent type.
-	[[nodiscard]] inline HandleType	GetHandleValue()					{ return m_Handle; }
+	[[nodiscard]] inline HandleType	GetHandleValue() const				{ return m_Handle; }
 	inline void			SetHandleValue( HandleType val )	{ m_Handle = val; }
 
 	using HANDLE_TYPE = HandleType;
@@ -374,7 +374,8 @@ public:
 	}
 
 protected:
-	inline CIntHandle16( HANDLE_TYPE val )
+	// dimhotepus: Mark explicit.
+	explicit inline CIntHandle16( HANDLE_TYPE val )
 	{
 		m_Handle = val;
 	}
@@ -393,7 +394,8 @@ public:
 	}
 
 protected:
-	inline CIntHandle32( HANDLE_TYPE val )
+	// dimhotepus: Mark explicit.
+	explicit inline CIntHandle32( HANDLE_TYPE val )
 	{
 		m_Handle = val;
 	}
