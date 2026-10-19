@@ -12,6 +12,9 @@
 
 #include "valve_off.h"
 
+#include <cmath>        // fabsf, M_PI (when the platform provides it)
+#include <cstdint>
+#include <cstddef>      // std::ptrdiff_t, std::size_t
 // This is a trick to get the DLL extension off the -D option on the command line.
 #define DLLExtTokenPaste(x) #x
 #define DLLExtTokenPaste2(x) DLLExtTokenPaste(x)
@@ -276,26 +279,17 @@ using vec_t = float;
 
 // Given today's processors, I cannot think of any circumstance
 // where bit tricks would be faster than fabs. henryg 8/16/2011
-#ifdef _MSC_VER
-#ifndef _In_
-#define _In_
-#endif
-extern "C" _Check_return_ float fabsf(_In_ float);
-#else
-#include <cmath>
-#endif
-
-[[nodiscard]] inline float FloatMakeNegative( vec_t f )
+[[nodiscard]] inline vec_t FloatMakeNegative( vec_t f )
 {
-	return -fabsf(f);
+	return -std::fabs(f);
 }
 
-[[nodiscard]] inline float FloatMakePositive( vec_t f )
+[[nodiscard]] inline vec_t FloatMakePositive( vec_t f )
 {
-	return fabsf(f);
+	return std::fabs(f);
 }
 
-[[nodiscard]] inline float FloatNegate( vec_t f )
+[[nodiscard]] inline vec_t FloatNegate( vec_t f )
 {
 	return -f;
 }
