@@ -657,6 +657,11 @@ BitwiseClear(OUT_WRITES_ALL_BYTES(size) T* src, size_t size) noexcept {
   MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()                    \
   MSVC_DISABLE_WARNING(warning_level)                    \
   code MSVC_END_WARNING_OVERRIDE_SCOPE()
+#else
+#define MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+#define MSVC_DISABLE_WARNING(warning_level)
+#define MSVC_END_WARNING_OVERRIDE_SCOPE()
+#define MSVC_SCOPED_DISABLE_WARNING(warning_level, code) code
 #endif
 
 #if defined(__clang__) || defined(__GCC__)
