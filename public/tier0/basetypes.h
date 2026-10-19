@@ -419,7 +419,7 @@ protected:
 #define UID_CAT1(a,c) a ## c
 #define UID_CAT2(a,c) UID_CAT1(a,c)
 #define EXPAND_CONCAT(a,c) UID_CAT1(a,c)
-#ifdef _MSC_VER
+#ifdef __COUNTER__  // MSVC, GCC and Clang all provide it.
 #define UNIQUE_ID UID_CAT2(UID_PREFIX,__COUNTER__)
 #else
 #define UNIQUE_ID UID_CAT2(UID_PREFIX,__LINE__)
