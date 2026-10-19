@@ -320,7 +320,7 @@ to_underlying(T value) noexcept {
 #endif  // !__cpp_lib_to_underlying
 
 #ifdef __cpp_lib_unreachable
-// C++23 to_underlying
+// C++23 unreachable
 using std::unreachable;
 #else
 [[noreturn]]
@@ -534,7 +534,7 @@ std::enable_if_t<std::is_trivially_copyable_v<T>> BitwiseCopy(
  * @brief std::copy_n.
  * @tparam InputIt Input iterator type.
  * @tparam Size Count type.
- * @tparam OutputIt Ouput iterator type.
+ * @tparam OutputIt Output iterator type.
  * @param first Input iterator.
  * @param count Size.
  * @param result Output iterator.
