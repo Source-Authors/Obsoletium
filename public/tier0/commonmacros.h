@@ -151,19 +151,6 @@
 #define abstract_class class NO_VTABLE
 
 /**
- * @brief Makes a signed 4-byte "packed ID" int out of 4 characters.
- * @param d Byte.
- * @param c Byte.
- * @param b Byte.
- * @param a Byte.
- * @return Packed ID.
- */
-constexpr inline int MAKEID(char d, char c, char b, char a) noexcept {
-  return (static_cast<int>(a) << 24) | (static_cast<int>(b) << 16) |
-         (static_cast<int>(c) << 8) | static_cast<int>(d);
-}
-
-/**
  * @brief Makes a unsigned 4-byte "packed ID" int out of 4 characters.
  * @param d Byte.
  * @param c Byte.
@@ -177,6 +164,19 @@ constexpr inline unsigned MAKEUID(char d, char c, char b, char a) noexcept {
          (static_cast<unsigned>(static_cast<unsigned char>(b)) << 16) |
          (static_cast<unsigned>(static_cast<unsigned char>(c)) << 8) |
          static_cast<unsigned>(static_cast<unsigned char>(d));
+}
+
+/**
+ * @brief Makes a signed 4-byte "packed ID" int out of 4 characters.
+ * @param d Byte.
+ * @param c Byte.
+ * @param b Byte.
+ * @param a Byte.
+ * @return Packed ID.
+ */
+constexpr inline int MAKEID(char d, char c, char b, char a) noexcept {
+  return (static_cast<int>(a) << 24) | (static_cast<int>(b) << 16) |
+         (static_cast<int>(c) << 8) | static_cast<int>(d);
 }
 
 /**
