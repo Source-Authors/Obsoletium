@@ -453,10 +453,10 @@ static void SetupBoneTransform( CDmeFilmClip *shot, CDmeChannelsClip *srcChannel
 
 // dimhotepus: Catch uninit vars.
 #if defined(FP_EXCEPTIONS_ENABLED) || defined(DBGFLAG_ASSERT)
-	// Having these uninitialized means that some bugs are very hard
-	// to reproduce. A memset of 0xFF is a simple way of getting NaNs.
-	memset( pos, 0xFF, sizeof(pos) );
-	memset( q, 0xFF, sizeof(q) );
+		// Having these uninitialized means that some bugs are very hard
+		// to reproduce. A memset of 0xFF is a simple way of getting NaNs.
+		memset( pos, 0xFF, sizeof(pos) );
+		memset( q, 0xFF, sizeof(q) );
 #endif
 
 		float poseparameter[ MAXSTUDIOPOSEPARAM ];
