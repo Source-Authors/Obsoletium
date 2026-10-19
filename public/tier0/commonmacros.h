@@ -669,11 +669,22 @@ BitwiseClear(OUT_WRITES_ALL_BYTES(size) T* src, size_t size) noexcept {
 #define MSVC_SCOPED_DISABLE_WARNING(warning_level, code) code
 #endif
 
-#if defined(__clang__) || defined(__GCC__)
+#if defined(__clang__) || defined(__GNUC__)
 /*
- * @brief Begins GCC / Clang warning override scope.
+ * @brief Begins GCC / Clang warning override scope.  Also silences warnings
+ * about warning names this compiler version doesn't know (some below are
+ * Clang-only or newer than the minimum supported compiler).
  */
-#define SE_GCC_BEGIN_WARNING_OVERRIDE_SCOPE() _Pragma("GCC diagnostic push")
+#ifdef __clang__
+#define SE_GCC_BEGIN_WARNING_OVERRIDE_SCOPE() \
+  _Pragma("GCC diagnostic push")              \
+      _Pragma("GCC diagnostic ignored \"-Wunknown-warning-option\"")
+#else
+#define SE_GCC_BEGIN_WARNING_OVERRIDE_SCOPE() \
+  _Pragma("GCC diagnostic push") _Pragma(     \
+      "GCC diagnostic ignored "               \
+      "\"-Wpragmas\"")
+#endif
 
 /*
  * @brief Disables GCC / Clang cast-function-type-mismatch.
