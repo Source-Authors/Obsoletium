@@ -1,4 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 
 #ifndef SE_PUBLIC_TIER0_ANNOTATIONS_H_
 #define SE_PUBLIC_TIER0_ANNOTATIONS_H_
@@ -14,7 +14,6 @@
     error : 4789)  // warning C4789: destination of memory copy is too small
 #endif
 
-// Suppress some code analysis warnings
 // Include the annotation header file.
 #include <sal.h>
 
@@ -63,17 +62,23 @@
 #define INOUT_Z_BYTECAP(x) _Inout_z_bytecap_(x)
 // dimhotepus: Add return may be null annotation.
 #define RET_MAY_BE_NULL _Ret_maybenull_
-// These macros are use for annotating array reference parameters, typically used in functions
-// such as V_strcpy_safe. Because they are array references the capacity is already known.
+// These macros are used for annotating array reference parameters, typically
+// used in functions such as V_strcpy_safe. Because they are array references
+// the capacity is already known.
 #define IN_Z_ARRAY _Pre_z_
 #define OUT_Z_ARRAY _Post_z_
 #define INOUT_Z_ARRAY _Prepost_z_
 // Used for annotating functions to describe their return types.
 #define MUST_CHECK_RETURN _Check_return_
-// Use the macros above to annotate string functions that fill buffers as shown here,
-// in order to give VS's /analyze more opportunities to find bugs.
-// void V_wcsncpy( OUT_Z_BYTECAP(maxLenInBytes) wchar_t *pDest, wchar_t const *pSrc, int maxLenInBytes );
-// int V_snwprintf( OUT_Z_CAP(maxLenInCharacters) wchar_t *pDest, int maxLenInCharacters, PRINTF_FORMAT_STRING const wchar_t *pFormat, ... );
+// Use the macros above to annotate string functions that fill buffers as shown
+// here, in order to give VS's /analyze more opportunities to find bugs.
+//
+// void V_wcsncpy( OUT_Z_BYTECAP(maxLenInBytes) wchar_t *pDest, wchar_t const
+// *pSrc, int maxLenInBytes );
+//
+// int V_snwprintf( OUT_Z_CAP(maxLenInCharacters) wchar_t
+// *pDest, int maxLenInCharacters, PRINTF_FORMAT_STRING const wchar_t
+// *pFormat, ... );
 
 #else
 
@@ -121,7 +126,7 @@
 #define INOUT_Z_BYTECAP(x)
 // dimhotepus: Add return may be null annotation.
 #define RET_MAY_BE_NULL
-// These macros are use for annotating array reference parameters, typically
+// These macros are used for annotating array reference parameters, typically
 // used in functions such as V_strcpy_safe. Because they are array references
 // the capacity is already known.
 #define IN_Z_ARRAY
