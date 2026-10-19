@@ -35,6 +35,7 @@
 #define XBOX_CODELINE_ONLY() Error_Compiling_Code_Only_Valid_in_Xbox_Codeline
 #endif
 
+// dimhotepus: Not thread-safe; the counter is a plain static.
 #define ExecuteNTimes( nTimes, x )	   \
 	{								   \
 		static int executeCount__{0};  \
@@ -46,6 +47,7 @@
 	}
 #define ExecuteOnce( x )			ExecuteNTimes( 1, x )
 
+// Round val up to a multiple of alignment.  Alignment must be a power of two.
 template <typename T>
 [[nodiscard]] constexpr inline T AlignValue( T val, uintptr_t alignment )
 {
@@ -154,10 +156,10 @@ using uint32 = uint32_t;
 using int64 = int64_t;
 using uint64 = uint64_t;
 
-// intp is an integer that can accomodate a pointer
+// intp is an integer that can accommodate a pointer
 // (ie, sizeof(intp) >= sizeof(int) && sizeof(intp) >= sizeof(void *)
 using intp = std::ptrdiff_t;
-// uintp is an unsigned integer that can accomodate a pointer
+// uintp is an unsigned integer that can accommodate a pointer
 // (ie, sizeof(uintp) >= sizeof(unsigned int) && sizeof(uintp) >= sizeof(void *)
 using uintp = std::size_t;
 
@@ -220,20 +222,8 @@ using vec_t = float;
 // look for NANs, infinities, and underflows. 
 // This assumes the ANSI/IEEE 754-1985 standard
 //-----------------------------------------------------------------------------
-// dimhotepus: Fix UB reintrepret casts.
-//[[deprecated("UB in reinterpret cast. Use non-ref overload.")]] inline unsigned& FloatBits( vec_t& f )
-//{
-//	static_assert(alignof(vec_t) == alignof(unsigned));
-//	static_assert(sizeof(f) == sizeof(unsigned));
-//	return *reinterpret_cast<unsigned*>(&f);
-//}
-//
-//[[deprecated("UB in reinterpret cast. Use non-ref overload.")]] inline unsigned const& FloatBits( vec_t const& f )
-//{
-//	static_assert(alignof(vec_t) == alignof(unsigned));
-//	static_assert(sizeof(f) == sizeof(unsigned));
-//	return *reinterpret_cast<unsigned const*>(&f);
-//}
+static_assert(std::numeric_limits<vec_t>::is_iec559, "vec_t must be IEEE 754 binary32");
+static_assert(sizeof(vec_t) == sizeof(unsigned), "FloatBits assumes 32-bit unsigned"); //-V112
 
 [[nodiscard]] inline unsigned FloatBits( vec_t f )
 {
@@ -259,11 +249,11 @@ using vec_t = float;
 	// std::isnan is slower on MSVC due to call to fpclassify.
 
 	// & 0x7FFFFFFF to ignore sign bit.  The sign bit does not matter for NaN.
-	// 0x7F800000 is the mask for NaN bits of the exponential field.
+	// 0x7F800000 is the mask for the exponent field.
 
-	// > 0x7F800000 because for NaN:
+	// > 0x7F800000 because for NaN the exponent is all ones and
 	// "The state/value of the remaining bits [...] are not defined by the standard
-	// except that they must not be all zero."
+	// except that they must not be all zero."  (== 0x7F800000 is infinity.)
 	return (FloatBits(f) & 0x7FFFFFFFu) > 0x7F800000u; //-V112
 }
 
@@ -312,11 +302,11 @@ struct vrect_t
 
 
 //-----------------------------------------------------------------------------
-// MaterialRect_t struct - used for DrawDebugText
+// Rect_t struct - used for DrawDebugText
 //-----------------------------------------------------------------------------
 struct Rect_t
 {
-    int x, y;
+	int x, y;
 	int width, height;
 };
 
