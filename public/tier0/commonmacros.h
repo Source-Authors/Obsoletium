@@ -161,8 +161,11 @@ constexpr inline int MAKEID(char d, char c, char b, char a) noexcept {
  * @return Packed ID.
  */
 constexpr inline unsigned MAKEUID(char d, char c, char b, char a) noexcept {
-  return (static_cast<unsigned>(a) << 24) | (static_cast<unsigned>(b) << 16) |
-         (static_cast<unsigned>(c) << 8) | static_cast<unsigned>(d);
+  // dimhotepus: Go through unsigned char so chars >= 0x80 don't sign-extend.
+  return (static_cast<unsigned>(static_cast<unsigned char>(a)) << 24) |
+         (static_cast<unsigned>(static_cast<unsigned char>(b)) << 16) |
+         (static_cast<unsigned>(static_cast<unsigned char>(c)) << 8) |
+         static_cast<unsigned>(static_cast<unsigned char>(d));
 }
 
 /**
