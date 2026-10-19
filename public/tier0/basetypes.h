@@ -272,9 +272,10 @@ static_assert(sizeof(vec_t) == sizeof(unsigned), "FloatBits assumes 32-bit unsig
 	return (FloatBits(f) & 0x7FFFFFFFu) > 0x7F800000u; //-V112
 }
 
+// dimhotepus: True for normal, subnormal and zero values; false for NaN and +/-Inf.
 [[nodiscard]] inline bool IsFinite( vec_t f )
 {
-	return !IsNaN(f);
+	return (FloatBits(f) & 0x7F800000u) != 0x7F800000u; //-V112
 }
 
 [[nodiscard]] inline unsigned FloatAbsBits( vec_t f )
