@@ -96,7 +96,7 @@
 #endif
 
 #if (defined(_M_IX86) || defined(_M_X64) || defined(__i386__) || \
-     defined(__x86_64__)) && \
+     defined(__x86_64__)) &&                                     \
     !defined(_M_HYBRID_X86_ARM64) && !defined(_M_ARM64EC)
 #define PLATFORM_SSE_INTRINSICS
 #elif defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || \
@@ -199,8 +199,8 @@ inline bool STRING_MATCHES_ID(const char* s, unsigned id) noexcept {
  * @param p String.
  */
 template <typename T>
-[[deprecated("Unsafe buffer access.")]] void ID_TO_STRING(
-    T id, char* p) noexcept {
+[[deprecated("Unsafe buffer access.")]] void ID_TO_STRING(T id,
+                                                          char* p) noexcept {
   p[3] = static_cast<char>((id >> 24) & 0xFF);
   p[2] = static_cast<char>((id >> 16) & 0xFF);
   p[1] = static_cast<char>((id >> 8) & 0xFF);
@@ -603,7 +603,8 @@ BitwiseClear(T& src) noexcept {
 template <typename T, size_t size>
 std::enable_if_t<std::is_trivially_copyable_v<T> &&
                  std::is_trivially_constructible_v<T>>
-BitwiseSet(OUT_WRITES_ALL_BYTES(sizeof(src)) T (&src)[size], unsigned char byte) noexcept {
+BitwiseSet(OUT_WRITES_ALL_BYTES(sizeof(src)) T (&src)[size],
+           unsigned char byte) noexcept {
   std::memset(src, byte, sizeof(src));
 }
 
