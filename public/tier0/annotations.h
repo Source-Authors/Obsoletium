@@ -10,7 +10,8 @@
 //-----------------------------------------------------------------------------
 // dimhotepus: clang-cl defines _MSC_VER but doesn't use MSVC warning numbers.
 #ifndef __clang__
-#pragma warning(error : 4789) // warning C4789: destination of memory copy is too small
+#pragma warning( \
+    error : 4789)  // warning C4789: destination of memory copy is too small
 #endif
 
 // Suppress some code analysis warnings
@@ -127,7 +128,13 @@
 #define OUT_Z_ARRAY
 #define INOUT_Z_ARRAY
 // Used for annotating functions to describe their return types.
+// dimhotepus: On GCC/Clang warn_unused_result is accepted anywhere among the
+// decl-specifiers, so it fits every place _Check_return_ does.
+#if defined(__GNUC__) || defined(__clang__)
+#define MUST_CHECK_RETURN __attribute__((warn_unused_result))
+#else
 #define MUST_CHECK_RETURN
+#endif
 // Use the macros above to annotate string functions that fill buffers as shown
 // here, in order to give VS's /analyze more opportunities to find bugs. void
 // V_wcsncpy( OUT_Z_BYTECAP(maxLenInBytes) wchar_t *pDest, wchar_t const *pSrc,
