@@ -6,10 +6,8 @@
 #ifndef SE_PUBLIC_TIER0_COMMONMACROS_H_
 #define SE_PUBLIC_TIER0_COMMONMACROS_H_
 
-#include <cassert>  // assert
-#include <cstddef>  // memcmp, std::ptrdiff_t
-#include <cstring>  // strlen
-#include <utility>  // std::to_underlying, std::unreachable
+// dimhotepus: Standard headers must not see Valve's malloc/free/char overrides.
+#include "valve_off.h"
 
 #include <cassert>      // assert
 #include <cstddef>      // std::ptrdiff_t, std::size_t
@@ -23,6 +21,9 @@
 
 // dimhotepus: Add SAL annotations.
 #include "tier0/annotations.h"
+
+// dimhotepus: Standard headers must not see Valve's malloc/free/char overrides.
+#include "valve_on.h"
 
 // dimhotepus: Backport from TF2. Detect the architecture we are running on
 #if defined(__aarch64__) || defined(_M_ARM64)
