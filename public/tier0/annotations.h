@@ -8,7 +8,10 @@
 //-----------------------------------------------------------------------------
 // Upgrading important helpful warnings to errors
 //-----------------------------------------------------------------------------
+// dimhotepus: clang-cl defines _MSC_VER but doesn't use MSVC warning numbers.
+#ifndef __clang__
 #pragma warning(error : 4789) // warning C4789: destination of memory copy is too small
+#endif
 
 // Suppress some code analysis warnings
 // Include the annotation header file.
