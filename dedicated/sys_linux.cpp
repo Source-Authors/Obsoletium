@@ -32,6 +32,7 @@
 #include "vphysics_interface.h"
 #include "icvar.h"
 #include "filesystem/IQueuedLoader.h"
+#include "tier0/scoped_breakpad_handler.h"
 #include "vscript/ivscript.h"
 
 #include "scoped_app_locale.h"
@@ -45,24 +46,24 @@ class UnixSystem : public ISystem {
  public:
   ~UnixSystem() override;
 
-  IDedicatedServerAPI *LoadModules(DedicatedAppSystemGroup *group) override;
+  IDedicatedServerAPI* LoadModules(DedicatedAppSystemGroup* group) override;
 
-  void ErrorMessage(int level, const char *msg) override;
+  void ErrorMessage(int level, const char* msg) override;
 
-  void WriteStatusText(char *szText) override;
+  void WriteStatusText(char* szText) override;
   void UpdateStatus(int force) override;
 
   bool CreateConsoleWindow() override;
   void DestroyConsoleWindow() override;
 
-  void ConsoleOutput(char *string) override;
-  char *ConsoleInput(int index, char *buf, size_t buflen) override;
-  void Printf(PRINTF_FORMAT_STRING const char *fmt, ...) override;
+  void ConsoleOutput(char* string) override;
+  char* ConsoleInput(int index, char* buf, size_t buflen) override;
+  void Printf(PRINTF_FORMAT_STRING const char* fmt, ...) override;
 };
 
 UnixSystem::~UnixSystem() = default;
 
-void UnixSystem::ErrorMessage(int level, const char *msg) {
+void UnixSystem::ErrorMessage(int level, const char* msg) {
   Error("%s\n", msg);
   // dimhotepus: 1 -> EOTHER.
   exit(EOTHER);
@@ -70,9 +71,9 @@ void UnixSystem::ErrorMessage(int level, const char *msg) {
 
 void UnixSystem::UpdateStatus(int force) {}
 
-void UnixSystem::ConsoleOutput(char *string) { console.Print(string); }
+void UnixSystem::ConsoleOutput(char* string) { console.Print(string); }
 
-void UnixSystem::Printf(PRINTF_FORMAT_STRING const char *fmt, ...) {
+void UnixSystem::Printf(PRINTF_FORMAT_STRING const char* fmt, ...) {
   // Dump text to debugging console.
   va_list argptr;
   char message[1024];
@@ -85,18 +86,18 @@ void UnixSystem::Printf(PRINTF_FORMAT_STRING const char *fmt, ...) {
   ConsoleOutput(message);
 }
 
-char *UnixSystem::ConsoleInput(int index, char *buf, size_t buflen) {
+char* UnixSystem::ConsoleInput(int index, char* buf, size_t buflen) {
   return console.GetLine(index, buf, buflen);
 }
 
-void UnixSystem::WriteStatusText(char *szText) {}
+void UnixSystem::WriteStatusText(char* szText) {}
 
 bool UnixSystem::CreateConsoleWindow() { return true; }
 
 void UnixSystem::DestroyConsoleWindow() {}
 
-IDedicatedServerAPI *UnixSystem::LoadModules(
-    DedicatedAppSystemGroup *pAppSystemGroup) {
+IDedicatedServerAPI* UnixSystem::LoadModules(
+    DedicatedAppSystemGroup* pAppSystemGroup) {
   AppSystemInfo_t appSystems[] = {
       {"engine" DLL_EXT_STRING, CVAR_QUERY_INTERFACE_VERSION},
       // loaded for backwards compatability, prevents crash on exit for old game
@@ -117,17 +118,17 @@ IDedicatedServerAPI *UnixSystem::LoadModules(
 
   if (!pAppSystemGroup->AddSystems(appSystems)) return nullptr;
 
-  auto *api = pAppSystemGroup->FindSystem<IDedicatedServerAPI>(
+  auto* api = pAppSystemGroup->FindSystem<IDedicatedServerAPI>(
       VENGINE_HLDS_API_VERSION);
 
-  auto *material_system = pAppSystemGroup->FindSystem<IMaterialSystem>(
+  auto* material_system = pAppSystemGroup->FindSystem<IMaterialSystem>(
       MATERIAL_SYSTEM_INTERFACE_VERSION);
   material_system->SetShaderAPI("shaderapiempty" DLL_EXT_STRING);
 
   return api;
 }
 
-int BootMain(int argc, char **argv, bool is_console_mode, ISystem *system);
+int BootMain(int argc, char** argv, bool is_console_mode, ISystem* system);
 
 }  // namespace s1::dedicated
 
@@ -137,7 +138,11 @@ int BootMain(int argc, char **argv, bool is_console_mode, ISystem *system);
  * @param argv Arguments.
  * @return Exit code.
  */
-DLL_EXPORT int DedicatedMain(int argc, char *argv[]) {
+DLL_EXPORT int DedicatedMain(int argc, char* argv[]) {
+  // Handle crashes and write dumps.
+  [[maybe_unused]] auto& scoped_breakpad_handler =
+      s1::breakpad::ScopedBreakpadHandler::Instance();
+
   // Printf/sscanf functions expect en_US UTF8 localization.  Mac OSX also sets
   // LANG to en_US.UTF-8 before starting up (in info.plist I believe).
   //

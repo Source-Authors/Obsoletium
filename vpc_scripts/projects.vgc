@@ -1522,6 +1522,12 @@ $Project "socketlib"
 	"socketlib/socketlib.vpc" [$WINDOWS]
 }
 
+// dimhotepus: breakpad.
+$Project "breakpad"
+{
+	"breakpad\breakpad.vpc"
+}
+
 // dimhotepus: thirdparty.
 //$Project "zlib"
 //{

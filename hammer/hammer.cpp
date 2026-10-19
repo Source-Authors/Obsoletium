@@ -145,41 +145,6 @@ bool IsRunningInEngine()
 	return g_pEngineAPI != NULL;
 }
 
-struct MinidumpWrapperHelper_t
-{
-	int (*m_pfn)(void *pParam);
-	void *m_pParam;
-	int m_iRetVal;
-};
-
-static void MinidumpWrapperHelper( void *arg )
-{
-	auto *info = (MinidumpWrapperHelper_t *)arg;
-	info->m_iRetVal = info->m_pfn( info->m_pParam );
-}
-
-static int WrapFunctionWithMinidumpHandler( int (*pfn)(void *pParam), void *pParam )
-{
-	int nRetVal;
-
-	if ( !Plat_IsInDebugSession() && !CommandLine()->HasParm( "-nominidumps") )
-	{
-		MinidumpWrapperHelper_t info;
-		info.m_pfn = pfn;
-		info.m_pParam = pParam;
-		info.m_iRetVal = 0;
-		CatchAndWriteMiniDumpForVoidPtrFn( MinidumpWrapperHelper, &info, true );
-		nRetVal = info.m_iRetVal;
-	}
-	else
-	{
-		nRetVal = pfn( pParam );
-	}
-
-	return nRetVal;
-}
-
-
 //-----------------------------------------------------------------------------
 // Purpose: Outputs a formatted debug string.
 // Input  : fmt - format specifier.
@@ -1029,13 +994,8 @@ bool CHammer::Check16BitColor()
 //-----------------------------------------------------------------------------
 InitReturnVal_t CHammer::Init()
 {
-	return (InitReturnVal_t)WrapFunctionWithMinidumpHandler( &CHammer::StaticHammerInternalInit, this );
-}
-
-
-int CHammer::StaticHammerInternalInit( void *pParam )
-{
-	return (int)((CHammer*)pParam)->HammerInternalInit();
+	// dimhotepus: Now breakpad handles crashes, no wrapping is needed.
+	return HammerInternalInit();
 }
 
 
@@ -1255,15 +1215,9 @@ InitReturnVal_t CHammer::HammerInternalInit()
 
 int CHammer::MainLoop()
 {
-	return WrapFunctionWithMinidumpHandler( StaticInternalMainLoop, this );
+	// dimhotepus: Now breakpad handles crashes, no wrapping is needed.
+	return InternalMainLoop();
 }
-
-
-int CHammer::StaticInternalMainLoop( void *pParam )
-{
-	return ((CHammer*)pParam)->InternalMainLoop();
-}
-
 
 int CHammer::InternalMainLoop()
 {

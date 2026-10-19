@@ -405,19 +405,6 @@ $Project "engine"
 		$File	"$SRCDIR\public\studio.cpp"
 		$File	"sys_dll.cpp"
 		$File	"sys_dll2.cpp"
-		{
-			$Configuration
-			{
-				$Compiler
-				{
-					// This file uses _set_se_translator which requires C++ exceptions to be enabled,
-					// which also means it can't use the precompiled header because it is built
-					// without precompiled headers.
-					$Create/UsePrecompiledHeader "Not Using Precompiled Headers"
-					$EnableC++Exceptions "Yes with SEH Exceptions (/EHa)" [$WINDOWS]
-				}
-			}
-		}
 		$File	"sys_engine.cpp"
 		$File	"sys_mainwind.cpp" [!$DEDICATED]
 		$File	"sys_linuxwind.cpp" [$POSIX]

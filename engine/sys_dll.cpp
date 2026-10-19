@@ -11,10 +11,6 @@
 #include <fcntl.h>
 #endif
 
-#if defined( USE_SDL )
-#include "include/SDL3/SDL.h"
-#endif
-
 #include "quakedef.h"
 #include "igame.h"
 #include "errno.h"
@@ -49,6 +45,7 @@
 #include "eiface.h"
 #include "cl_steamauth.h"
 #include "tier0/etwprof.h"
+#include "tier0/scoped_breakpad_handler.h"
 #include "tier2/tier2.h"
 #include "vstdlib/coroutine.h"
 
@@ -342,7 +339,6 @@ void Sys_Printf(const char *fmt, ...)
 
 bool Sys_MessageBox(const char *title, const char *info, bool bShowOkAndCancel, bool bError)
 {
-#ifdef _WIN32
 	// dimhotepus: Use modern looking dialog.
 	return Plat_MessageBox(
 		title,
@@ -350,36 +346,8 @@ bool Sys_MessageBox(const char *title, const char *info, bool bShowOkAndCancel, 
 		info,
 		Plat_MessageBoxButton::Ok | ( bShowOkAndCancel ? Plat_MessageBoxButton::Cancel : Plat_MessageBoxButton::Ok ),
 		bError ? Plat_MessageBoxIcon::Error : Plat_MessageBoxIcon::Warning ) == Plat_MessageBoxButton::Ok;
-#elif defined( USE_SDL )
-
-	int buttonid = 0;
-	SDL_MessageBoxData messageboxdata = { 0 };
-	SDL_MessageBoxButtonData buttondata[] =
-	{
-		{ SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT,	1,	"OK"		},
-		{ SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT,	0,	"Cancel"	},
-	};
-
-	messageboxdata.window = GetAssertDialogParent();
-	messageboxdata.title = title;
-	messageboxdata.message = info;
-	messageboxdata.numbuttons = bShowOkAndCancel ? 2 : 1;
-	messageboxdata.buttons = buttondata;
-
-	SDL_ShowMessageBox( &messageboxdata, &buttonid );
-	return ( buttonid == 1 );
-
-#elif defined( POSIX )
-
-	Warning( "%s\n", info );
-	return true;
-
-#else
-#error "implement me"
-#endif
 }
 
-bool g_bUpdateMinidumpComment = true;
 void BuildMinidumpComment( char const *pchSysErrorText, bool bRealCrash );
 
 void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
@@ -428,51 +396,17 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 	DebuggerBreakIfDebugging();
 
 	BuildMinidumpComment( text, true );
-	g_bUpdateMinidumpComment = false;
 
 	if ( bMinidump && !Plat_IsInDebugSession() && !CommandLine()->HasParm( "-nominidumps") )
 	{
-#if defined( WIN32 )
-		// MiniDumpWrite() has problems capturing the calling thread's context 
-		// unless it is called with an exception context.  So fake an exception.
-		__try
+		// dimhotepus: Crossplatform minidumps by breakpad.
+		if ( !s1::breakpad::ScopedBreakpadHandler::Instance().WriteMinidump() )
 		{
-			RaiseException
-				(
-				0,							// dwExceptionCode
-				EXCEPTION_NONCONTINUABLE,	// dwExceptionFlags
-				0,							// nNumberOfArguments,
-				NULL						// const ULONG_PTR* lpArguments
-				);
-
-			// Never get here (non-continuable exception)
+			Plat_DebugString( "Failed to write minidump on engine error.\n" );
 		}
-		// Write the minidump from inside the filter (GetExceptionInformation() is only 
-		// valid in the filter)
-		__except ( 
-#ifndef NO_STEAM
-			SteamAPI_WriteMiniDump( 0, GetExceptionInformation(), build_number() )
-#else
-			// dimhotepus: Write dump via tier0 if no Steam.
-			WriteMiniDumpUsingExceptionInfo( GetExceptionCode(), GetExceptionInformation(), 0x00000002 /* MiniDumpWithFullMemory */, "engine_error" )
-#endif
-			, EXCEPTION_EXECUTE_HANDLER )
-		{
 
-			// We always get here because the above filter evaluates to EXCEPTION_EXECUTE_HANDLER
-		}
-#elif defined( POSIX )
-		// Doing this doesn't quite work the way we want because there is no "crashing" thread
-		// and we see "No thread was identified as the cause of the crash; No signature could be created because we do not know which thread crashed" on the back end
-		//SteamAPI_WriteMiniDump( 0, NULL, build_number() );
-		// dimhotepus: Write to stderr instead ouf stdout
-		fprintf( stderr, "\n ##### Sys_Error: %s", text );
+#ifdef POSIX
 		fflush( stdout );
-
-		// dimhotepus: Fix UB on nullptr dereference.
-		raise( SIGTRAP );
-#else
-#warning "need minidump impl on sys_error"
 #endif
 	}
 

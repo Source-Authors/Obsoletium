@@ -60,6 +60,7 @@
 #include "inputsystem/iinputsystem.h"
 #include "appframework/IAppSystemGroup.h"
 #include "tier0/systeminformation.h"
+#include "tier0/scoped_breakpad_handler.h"
 #include "host_cmd.h"
 #include "posix_file_stream.h"
 #ifdef _WIN32
@@ -87,7 +88,6 @@
 #include "scoped_app_locale.h"
 
 #if defined(_WIN32)
-#include <eh.h>
 #include <thread>
 #endif
 
@@ -244,7 +244,6 @@ CON_COMMAND( bigalloc, "huge alloc crash" )
 extern void S_ClearBuffer();
 extern char g_minidumpinfo[ 4096 ];
 extern PAGED_POOL_INFO_t g_pagedpoolinfo;
-extern bool g_bUpdateMinidumpComment;
 void GetSpew( char *buf, size_t buflen );
 
 extern int gHostSpawnCount;
@@ -264,28 +263,6 @@ extern "C" void __cdecl FailSafe( unsigned int, struct _EXCEPTION_POINTERS * )
 }
 
 #endif
-
-#if defined( POSIX )
-
-static sigjmp_buf g_mark;
-static void posix_signal_handler( int i )
-{
-	siglongjmp( g_mark, -1 );
-}
-
-#define DO_TRY		if ( sigsetjmp( g_mark, 1 ) == 0 )
-#define DO_CATCH	else
-
-#if defined( OSX )
-#define __sighandler_t sig_t
-#endif
-
-#else
-
-#define DO_TRY		try
-#define DO_CATCH	catch ( ... )
-
-#endif // POSIX
 
 //-----------------------------------------------------------------------------
 // Purpose: Check whether any mods are loaded.
@@ -377,14 +354,6 @@ public:
 			}
 		}
 
-#ifdef IS_WINDOWS_PC
-		_se_translator_function curfilter = _set_se_translator( &FailSafe );
-#elif defined( POSIX )
-		// Only need to worry about this function crashing when we're dealing with a real crash.
-		__sighandler_t curfilter = bRealCrash ? signal( SIGSEGV, posix_signal_handler ) : 0;
-#endif
-
-		DO_TRY
 		{
 			Q_memset( m_errorText, 0x00, sizeof( m_errorText ) );
 
@@ -460,17 +429,6 @@ public:
 #endif
 			}
 		}
-		DO_CATCH
-		{
-			// Oh oh
-		}
-		
-#ifdef IS_WINDOWS_PC
-		_set_se_translator( curfilter );
-#elif defined( POSIX )
-		if ( bRealCrash )
-			signal( SIGSEGV, curfilter );
-#endif
 	}
 
 	void BuildCommentMemStatus()
@@ -1821,53 +1779,6 @@ int CEngineAPI::RunListenServer()
 	return nRunResult;
 }
 
-static void StaticRunListenServer( void *arg )
-{
-	*(int *)arg = s_EngineAPI.RunListenServer();
-}
-
-
-
-// This function is set as the crash handler for unhandled exceptions and as the minidump
-// handler for to be used by all of tier0's crash recording. This function
-// adds a game-specific minidump comment and ensures that the SteamAPI function is
-// used to save the minidump so that crashes are uploaded. SteamAPI has previously
-// been configured to use breakpad by calling SteamAPI_UseBreakpadCrashHandler.
-extern "C" void __cdecl WriteSteamMiniDumpWithComment( unsigned int uStructuredExceptionCode,
-			struct _EXCEPTION_POINTERS * pExceptionInfo,
-			[[maybe_unused]] const char *pszFilenameSuffix )
-{
-	// TODO: dynamically set the minidump comment from contextual info about the crash (i.e current VPROF node)?
-#if !defined( NO_STEAM )
-
-	if ( g_bUpdateMinidumpComment )
-	{
-		BuildMinidumpComment( NULL, true );
-	}
-
-	SteamAPI_WriteMiniDump( uStructuredExceptionCode, pExceptionInfo, build_number() );
-	// Clear DSound Buffers so the sound doesn't loop while the game shuts down
-	try
-	{
-		S_ClearBuffer();
-	}
-	catch ( ... )
-	{
-	}
-#else
-	// dimhotepus: Write dump via tier0 if no Steam.
-	if ( g_bUpdateMinidumpComment )
-	{
-		BuildMinidumpComment( NULL, true );
-	}
-
-	SetMinidumpComment(errorText.m_errorText);
-
-	WriteMiniDumpUsingExceptionInfo( uStructuredExceptionCode, pExceptionInfo, 0x00000002 /* MiniDumpWithFullMemory */, "engine_crash" );
-#endif
-} 
-
- 
 //-----------------------------------------------------------------------------
 // Purpose: Main 
 //-----------------------------------------------------------------------------
@@ -1878,50 +1789,15 @@ int CEngineAPI::Run()
 		Host_DisallowSecureServers();
 	}
 
-#if defined (_WIN32)
+#ifdef _WIN32
 	// Ensure that we crash when we do something naughty in a callback
 	// such as a window proc. Otherwise on a 64-bit OS the crashes will be
 	// silently swallowed.
 	EnableCrashingOnCrashes();
-
-	// Set the default minidump handling function. This is necessary so that Steam
-	// will upload crashes, with comments.
-	const auto oldMiniDump = SetMiniDumpFunction( WriteSteamMiniDumpWithComment );
-	// dimhotepus: Restore old mindump on exit.
-	RunCodeAtScopeExit(SetMiniDumpFunction( oldMiniDump ));
-
-	// Catch unhandled crashes. A normal __try/__except block will not work across
-	// the kernel callback boundary, but this does. To be clear, __try/__except
-	// and try/catch will usually not catch exceptions in a WindowProc or other
-	// callback that is called from kernel mode because 64-bit Windows cannot handle
-	// throwing exceptions across that boundary. See this article for details:
-	// https://randomascii.wordpress.com/2012/07/05/when-even-crashing-doesnt-work/
-	// Note that the unhandled exception function is not called when running
-	// under a debugger, but that's fine because in that case we don't care about
-	// recording minidumps.
-	// The try/catch block still makes sense because it is a more reliable way
-	// of catching exceptions that aren't in callbacks.
-	// The unhandled exception filter will also catch crashes in threads that
-	// don't have a try/catch or __try/__except block.
-	bool hasMinidumps = !CommandLine()->HasParm( "-nominidumps");
-	if ( hasMinidumps )
-	{
-		const auto oldUnhandled = MinidumpSetUnhandledExceptionFunction2( WriteSteamMiniDumpWithComment );
-		// dimhotepus: Restore old unhandled exception function.
-		RunCodeAtScopeExit(MinidumpSetUnhandledExceptionFunction2( oldUnhandled ));
-
-		if ( !Plat_IsInDebugSession() )
-		{
-			int nRetVal = RUN_OK;
-			CatchAndWriteMiniDumpForVoidPtrFn( StaticRunListenServer, &nRetVal, true );
-			return nRetVal;
-		}
-	}
-
-	return RunListenServer();
-#else
-	return RunListenServer();
 #endif
+
+	// dimhotepus: Now crashes are handled by breakpad.
+	return RunListenServer();
 }
 #endif // SWDS
 
@@ -2228,7 +2104,10 @@ void LongTickWatcherThread()
 					}
 
 					// If you're debugging a minidump and you ended up here, you probably want to switch to the main thread.
-					WriteMiniDump( "longtick" );
+					if ( !s1::breakpad::ScopedBreakpadHandler::Instance().WriteMinidump() )
+					{
+						Plat_DebugString( "Failed to write minidump on long tick.\n" );
+					}
 				}
 			}
 

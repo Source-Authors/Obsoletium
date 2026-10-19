@@ -178,11 +178,7 @@ public:
 
 protected:
 
-	// These execute inside a minidump handler.
-	static int StaticHammerInternalInit( void *pParam );
 	InitReturnVal_t HammerInternalInit();
-
-	static int StaticInternalMainLoop( void *pParam );
 	int InternalMainLoop();
 
 	static bool	m_bIsNewDocumentVisible;

@@ -33,6 +33,7 @@
 #include "vphysics_interface.h"
 
 #include "scoped_app_locale.h"
+#include "tier0/scoped_breakpad_handler.h"
 
 // dimhotepus: Drop Perforce support
 // #include "p4lib/ip4.h"
@@ -110,6 +111,8 @@ class HammerAppSystemGroup final : public CAppSystemGroup {
         input_system_{nullptr},
         material_system_{nullptr},
         hammer_{nullptr},
+        // Ensure breakpad created and set up.
+        scoped_breakpad_handler_{s1::breakpad::ScopedBreakpadHandler::Instance()},
         scoped_spew_output_{HammerSpewFunc},
         scoped_app_locale_{kEnUsUtf8Locale},
         scoped_com_{static_cast<COINIT>(COINIT_APARTMENTTHREADED |
@@ -135,6 +138,7 @@ class HammerAppSystemGroup final : public CAppSystemGroup {
   IMaterialSystem *material_system_;
   IHammer *hammer_;
 
+  const s1::breakpad::ScopedBreakpadHandler& scoped_breakpad_handler_;
   const ScopedSpewOutputFunc scoped_spew_output_;
   const s1::ScopedAppLocale scoped_app_locale_;
   const s1::win::ScopedCom scoped_com_;

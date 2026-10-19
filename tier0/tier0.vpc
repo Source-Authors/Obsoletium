@@ -17,6 +17,7 @@ $Configuration
 {
 	$Compiler
 	{
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR/thirdparty/breakpad/src"
 		$AdditionalIncludeDirectories	"$BASE;$SDL3SRCDIR;$SDL3SRCDIR/include"	[!$SDL]
 		$PreprocessorDefinitions		"$BASE;TIER0_DLL_EXPORT"
 		$Create/UsePrecompiledHeader	"Use Precompiled Header (/Yu)"
@@ -27,7 +28,7 @@ $Configuration
 	
 	$Linker
 	{
-		$AdditionalDependencies			"$BASE Advapi32.lib gdi32.lib ws2_32.lib Comctl32.lib Dwmapi.lib"	[$WINDOWS]
+		$AdditionalDependencies			"$BASE Advapi32.lib gdi32.lib ws2_32.lib Comctl32.lib Dwmapi.lib Wininet.lib"	[$WINDOWS]
 
 		// pc publishes the import library directly
 		$ImportLibrary					"$LIBPUBLIC\$(TargetName).lib"	[$WINDOWS]
@@ -143,7 +144,7 @@ $Project "tier0"
 		$File	"../tier1/pathmatch.cpp" [$LINUXALL]
 	}
 
-	$Folder	"Header Files"
+	$Folder	"Public Header Files"
 	{
 		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.h"
 		$File	"$SRCDIR\public\tier0\basetypes.h"
@@ -171,6 +172,7 @@ $Project "tier0"
 		$File	"$SRCDIR\public\tier0\PMELib.h"
 		$File	"$SRCDIR\public\tier0\progressbar.h"
 		$File	"$SRCDIR\public\tier0\protected_things.h"
+		$File	"$SRCDIR\public\tier0\scoped_breakpad_handler.h"
 		$File	"$SRCDIR\public\tier0\systeminformation.h"
 		$File	"$SRCDIR\public\tier0\threadtools.h"
 		$File	"$SRCDIR\public\tier0\tslist.h"
@@ -183,6 +185,11 @@ $Project "tier0"
 		$File	"$SRCDIR\public\tier0\vprof.h"
 		$File	"$SRCDIR\public\tier0\wchartypes.h"
 		$File	"$SRCDIR\public\tier0\xbox_codeline_defines.h"
+	}
+
+	$Folder	"Header Files"
+	{
+		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.h"
 		$File	"stdafx.h"
 		$File	"resource.h"
 		$File	"mem_helpers.h"
@@ -212,5 +219,6 @@ $Project "tier0"
 	$Folder	"Link Libraries"
 	{
 		$Libexternal	"$SDL3OUTDIR/SDL3" [!$SDL]
+		$Lib	"$LIBCOMMON/breakpad"
 	}
 }
