@@ -45,6 +45,7 @@
 
 #include "tier0/dbg.h"
 #include "tier0/icommandline.h"
+#include "tier0/scoped_breakpad_handler.h"
 
 #include "boot_app_system_group.h"
 #include "file_logger.h"
@@ -452,6 +453,10 @@ DLL_EXPORT int LauncherMain(HINSTANCE instance, HINSTANCE, LPSTR cmd_line,
 DLL_EXPORT int LauncherMain(int argc, char** argv)
 #endif
 {
+  // Handle crashes and write dumps.
+  [[maybe_unused]] auto& scoped_breakpad_handler =
+      s1::breakpad::ScopedBreakpadHandler::Instance();
+
 #ifdef WIN32
   SetAppInstance(instance);
 #endif

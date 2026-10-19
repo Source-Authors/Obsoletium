@@ -118,6 +118,8 @@ $Group "game"
 	"adminserver"
 	"appframework"
 	"bitmap"
+// dimhotepus: Use Google Breakpad.
+	"breakpad"
 	"bsppack"
 // dimhotepus: Required for bug UI.
 	"bugreporter_public"
@@ -212,6 +214,8 @@ $Group "hammer"
 {
 	"appframework"
 	"bitmap"
+// dimhotepus: Use Google Breakpad.
+	"breakpad"
 	"bspzip"
 	"captioncompiler"
 	"choreoobjects"

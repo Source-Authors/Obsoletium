@@ -9,7 +9,6 @@
 #include <WinSock2.h>
 #include <DbgHelp.h>
 #include <VersionHelpers.h>
-#include <eh.h>
 
 #include "args_win.h"
 #include "engine_hlds_api.h"
@@ -29,6 +28,7 @@
 #include "datacache/imdlcache.h"
 #include "vphysics_interface.h"
 #include "filesystem.h"
+#include "tier0/scoped_breakpad_handler.h"
 #include "filesystem/IQueuedLoader.h"
 #include "windows/scoped_timer_resolution.h"
 #include "windows/scoped_winsock_initializer.h"
@@ -41,10 +41,6 @@
 #include "vscript/ivscript.h"
 
 #include "scoped_app_locale.h"
-
-#ifndef NO_STEAM
-#include "steam/steam_api.h"
-#endif
 
 namespace s1::dedicated {
 
@@ -212,54 +208,6 @@ int BootMain(int argc, char** argv, bool is_console_mode, ISystem* system);
 
 namespace {
 
-/**
- * @brief Write minidump.
- * @param ex_code Exception code.
- * @param exception_pointers Exception pointers.
- *
- * Requires /EHa so catch(...) below sees structured exceptions.
- */
-void MiniDumpFunction(unsigned int ex_code,
-                      EXCEPTION_POINTERS* exception_pointers) {
-#ifndef NO_STEAM
-  SteamAPI_WriteMiniDump(ex_code, exception_pointers, 0);
-#else
-  // dimhotepus: Write minidump when not under Steam.
-  WriteMiniDumpUsingExceptionInfo(ex_code, exception_pointers,
-                                  MiniDumpWithFullMemory, "dedicated_crash");
-#endif
-}
-
-/**
- * @brief Set a per-thread callback function to translate Win32 exceptions
- * (C structured exceptions) into C++ typed exceptions.
- */
-class ScopedThreadSEHTranslator {
- public:
-  /**
-   * @brief Ctor.
-   * @param new_se_translator Set new SEH to C++ exception translator.
-   */
-  explicit ScopedThreadSEHTranslator(
-      _se_translator_function new_se_translator) noexcept
-      : old_se_translator_{_set_se_translator(new_se_translator)},
-        new_se_translator_{new_se_translator} {}
-  ~ScopedThreadSEHTranslator() noexcept {
-    [[maybe_unused]] const _se_translator_function replacement_se_translator{
-        _set_se_translator(old_se_translator_)};
-    AssertMsg(replacement_se_translator == new_se_translator_,
-              "Somebody changed SEH translator between calls.\n");
-  }
-
-  ScopedThreadSEHTranslator(const ScopedThreadSEHTranslator&) = delete;
-  ScopedThreadSEHTranslator(ScopedThreadSEHTranslator&&) = delete;
-  ScopedThreadSEHTranslator& operator=(const ScopedThreadSEHTranslator&) =
-      delete;
-  ScopedThreadSEHTranslator& operator=(ScopedThreadSEHTranslator&&) = delete;
-
- private:
-  const _se_translator_function old_se_translator_, new_se_translator_;
-};
 
 }  // namespace
 
@@ -273,6 +221,10 @@ class ScopedThreadSEHTranslator {
 DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE,
                              [[maybe_unused]] LPSTR cmd_line,
                              [[maybe_unused]] int cmd_show) {
+  // Handle crashes and write dumps.
+  [[maybe_unused]] auto& scoped_breakpad_handler =
+      s1::breakpad::ScopedBreakpadHandler::Instance();
+
   SetAppInstance(instance);
 
   // Printf/sscanf functions expect en_US UTF8 localization.  Mac OSX also sets
@@ -352,22 +304,8 @@ DLL_EXPORT int DedicatedMain(HINSTANCE instance, HINSTANCE,
   const bool is_console_mode{command_line->HasParm("-console")};
   s1::dedicated::WindowsSystem system{command_line, is_console_mode};
 
-  const auto boot = [&]() {
-    return s1::dedicated::BootMain(args->count(), args->values(),
-                                   is_console_mode, &system);
-  };
+  // dimhotepus: Now we write dumps using breakpad.
 
-  if (!Plat_IsInDebugSession() && !command_line->HasParm("-nominidumps")) {
-    const ScopedThreadSEHTranslator scoped_thread_seh_translator{
-        MiniDumpFunction};
-
-    // This try block allows the thread SEH translator to work (needs /EHa).
-    try {
-      return boot();
-    } catch (...) {
-      return -1;
-    }
-  }
-
-  return boot();
+  return s1::dedicated::BootMain(args->count(), args->values(), is_console_mode,
+                                 &system);
 }

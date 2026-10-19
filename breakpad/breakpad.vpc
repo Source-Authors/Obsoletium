@@ -1,0 +1,109 @@
+//-----------------------------------------------------------------------------
+//	BREAKPAD.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$Macro SRCDIR		".."
+$Macro OUTLIBDIR	"$LIBCOMMON"
+
+$include "$SRCDIR/vpc_scripts/source_lib_base.vpc"
+
+$Configuration
+{
+	$General
+	{
+		// Project Defaults
+		$CharacterSet					"Use Unicode Character Set"	[$WINDOWS]
+	}
+
+	$Compiler
+	{
+		// General
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR/thirdparty/breakpad/src"
+		$PreprocessorDefinitions		"$BASE;HAVE_A_OUT_H;BPLOG_MINIMUM_SEVERITY=SEVERITY_ERROR"	[$LINUX]
+		$PreprocessorDefinitions		"$BASE;HAVE_MACH_O_NLIST_H;BPLOG_MINIMUM_SEVERITY=SEVERITY_ERROR"	[$OSX]
+
+		// Language
+		$LanguageStandard				"ISO C++20 Standard (std:c++20)"	[$WINDOWS]
+		$EnableC++Exceptions			"Yes (/EHsc)"	[$WINDOWS]
+	}
+}
+
+$Project "breakpad"
+{
+	$Folder	"Source Files" [$WINDOWS]
+	{
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/windows/guid_string.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/windows/http_upload.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/windows/string_utils.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/windows/crash_generation/client_info.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/windows/crash_generation/crash_generation_client.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/windows/crash_generation/crash_generation_server.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/windows/crash_generation/minidump_generator.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/windows/handler/exception_handler.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/windows/sender/crash_report_sender.cc"
+	}
+
+	$Folder	"Source Files" [$LINUX]
+	{
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/convert_UTF.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/md5.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/string_conversion.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/linux/elf_core_dump.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/linux/elfutils.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/linux/file_id.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/linux/guid_creator.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/linux/linux_libc_support.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/linux/memory_mapped_file.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/linux/safe_readlink.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/linux/breakpad_getcontext.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/linux/scoped_tmpfile.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/linux/crash_generation/crash_generation_client.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/linux/crash_generation/crash_generation_server.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/linux/dump_writer_common/thread_info.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/linux/dump_writer_common/ucontext_reader.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/linux/handler/exception_handler.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/linux/handler/minidump_descriptor.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/linux/log/log.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/linux/microdump_writer/microdump_writer.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/linux/minidump_writer/linux_core_dumper.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/linux/minidump_writer/linux_dumper.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/linux/minidump_writer/linux_ptrace_dumper.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/linux/minidump_writer/minidump_writer.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/linux/minidump_writer/pe_file.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/minidump_file_writer.cc"
+	}
+
+	$Folder	"Source Files" [$OSX]
+	{
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/convert_UTF.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/md5.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/string_conversion.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/mac/bootstrap_compat.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/mac/file_id.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/mac/macho_id.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/mac/macho_utilities.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/mac/macho_walker.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/mac/arch_utilities.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/mac/string_utilities.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/common/mac/MachIPC.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/minidump_file_writer.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/mac/crash_generation/crash_generation_client.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/mac/handler/dynamic_images.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/mac/handler/exception_handler.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/mac/handler/minidump_generator.cc"
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/mac/handler/breakpad_nlist_64.cc"
+	}
+
+	$Folder	"Header Files"
+	{
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/windows/handler/exception_handler.h"	[$WINDOWS]
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/windows/sender/crash_report_sender.h"	[$WINDOWS]
+
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/linux/handler/exception_handler.h"	[$LINUX]
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/linux/handler/minidump_descriptor.h"	[$LINUX]
+
+		$File	"$SRCDIR/thirdparty/breakpad/src/client/mac/handler/exception_handler.h"	[$OSX]
+	}
+}

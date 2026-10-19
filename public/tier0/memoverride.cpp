@@ -34,11 +34,6 @@
 #include "tier0/memalloc.h"
 #include "tier0/threadtools.h"
 
-#if defined(_WIN32)
-#include "windows/scoped_invalid_parameter_handler.h"
-#include "windows/scoped_purecall_handler.h"
-#endif
-
 #include <cstring>
 #include <cstdio>
 
@@ -987,122 +982,6 @@ long* AFNAME(_crtBreakAlloc) (void)
 // Methods in dbgrpt.cpp 
 //-----------------------------------------------------------------------------
 #if _MSC_VER >= 1400
-
-// Configure VS so that it will record crash dumps on pure-call violations
-// and invalid parameter handlers.
-// If you manage to call a pure-virtual function (easily done if you indirectly
-// call a pure-virtual function from the base-class constructor or destructor)
-// or if you invoke the invalid parameter handler (printf(nullptr); is one way)
-// then no crash dump will be created.
-// This crash redirects the handlers for these two events so that crash dumps
-// are created.
-//
-// The ErrorHandlerRegistrar object must be in memoverride.cpp so that it will
-// be placed in every DLL and EXE. This is required because each DLL and EXE
-// gets its own copy of the C run-time and these overrides are set on a per-CRT
-// basis.
-
-#include <cstdlib>
-#include "minidump.h"
-
-// Disable compiler optimizations. If we don't do this then VC++ generates code
-// that confuses the Visual Studio debugger and causes it to display completely
-// random call stacks. That makes the minidumps excruciatingly hard to understand.
-#pragma optimize("", off)
-
-// Write a minidump file, unless running under the debugger in which case break
-// into the debugger.
-// The "int dummy" parameter is so that the callers can be unique so that the
-// linker won't use its /opt:icf optimization to collapse them together. This
-// makes reading the call stack easier.
-void __cdecl WriteMiniDumpOrBreak( int , const char *pchName )
-{
-	if ( Plat_IsInDebugSession() )
-	{
-		__debugbreak();
-		// Continue at your peril...
-	}
-	else
-	{
-		WriteMiniDump( pchName );
-		// Call Plat_ExitProcess so we don't continue in a bad state. 
-		// dimhotepus: 1 -> EINVAL as it is EINVAL case.
-		TerminateProcess(GetCurrentProcess(), EINVAL);
-	}
-}
-
-void __cdecl VPureCall()
-{
-	WriteMiniDumpOrBreak( 0, "PureClass" );
-}
-
-// dimhotepus: wchar_t -> mbcs.
-char *Wide2Multibyte( const wchar_t* wide )
-{
-	if ( wide != nullptr )
-	{
-		const size_t expected_count{ wcstombs( nullptr, wide, 0 ) };
-		char *mb{ new char[expected_count] };
-		[[maybe_unused]] const size_t actual_count{ wcstombs( mb, wide, expected_count ) };
-
-		Assert(expected_count == actual_count);
-		if (expected_count == actual_count)
-		{
-			return mb;
-		}
-	}
-
-	return new char[4]{"NA"}; //-V112
-}
-
-void VInvalidParameterHandler( const wchar_t* expression,
-   const wchar_t* function, 
-   const wchar_t* file, 
-   unsigned int line, 
-   [[maybe_unused]] uintptr_t pReserved)
-{
-	char *mb_expression{ Wide2Multibyte( expression ) };
-	char *mb_function{ Wide2Multibyte( function ) };
-	char *mb_file{ Wide2Multibyte( file ) };
-
-	char buffer[1024];
-	snprintf( buffer,
-		std::size(buffer),
-		"%s(%u)_%s_%s_InvalidParameterHandler",
-		mb_file,
-		line,
-		mb_function,
-		mb_expression );
-
-	// dimhtepus: Better prefix for invalid parameter handler.
-	WriteMiniDumpOrBreak( 1, buffer );
-
-	delete[] mb_file;
-	delete[] mb_function;
-	delete[] mb_expression;
-}
-
-// Restore compiler optimizations.
-#pragma optimize("", on)
-
-namespace {
-
-// Helper class for registering error callbacks. See above for details.
-class ErrorHandlerRegistrar {
- public:
-  ErrorHandlerRegistrar() noexcept
-      : purecall_handler_{VPureCall},
-        invalid_parameter_handler_{VInvalidParameterHandler} {}
-
- private:
-  // dimhotepus: Restore old handlers on exit.
-  const s1::win::ScopedPurecallHandler purecall_handler_;
-  const s1::win::ScopedInvalidParameterHandler invalid_parameter_handler_;
-};
-
-static ErrorHandlerRegistrar s_ErrorHandlerRegistration;
-
-}  // namespace
 
 #if !defined(NDEBUG)
  

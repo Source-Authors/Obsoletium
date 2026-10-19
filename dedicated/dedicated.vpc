@@ -25,8 +25,6 @@ $Configuration
 		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\out\build;.\;$SRCDIR\engine"
 		$AdditionalIncludeDirectories		"$BASE;$SDL3SRCDIR;$SDL3SRCDIR\include" [$SDL]
 		$PreprocessorDefinitions		"$BASE;DEDICATED;LAUNCHERONLY;SUPPORT_PACKED_STORE"
-		// dimhotepus: Enable exceptions + SEH as we use them in a single place
-		$EnableC++Exceptions			"Yes with SEH Exceptions (/EHa)"
 	}
 
 	$Linker
@@ -68,16 +66,6 @@ $Project "dedicated"
 		$File	"sys_windows.cpp" [$WINDOWS]
 		$File	"args_win.cpp" [$WINDOWS]
 		$File	"sys_linux.cpp" [$POSIX]
-		{
-			$Configuration
-			{
-				$Compiler
-				{
-					$AdditionalOptions				"/EHa"
-					$EnableC++Exceptions				"Yes (/EHsc)"
-				}
-			}
-		}
 
 		$File	"$SRCDIR\public\filesystem_init.cpp"
 		$File	"$SRCDIR\common\netapi.cpp"

@@ -93,3 +93,6 @@
 	path = thirdparty/squirrel
 	url = git@github.com:Source-Authors/squirrel.git
 	ignore = dirty
+[submodule "thirdparty/breakpad"]
+	path = thirdparty/breakpad
+	url = git@github.com:Source-Authors/breakpad.git
