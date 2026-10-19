@@ -53,7 +53,8 @@
 #define OUT_Z_CAP_OPT(x) _Out_opt_z_cap_(x)
 #define OUT_CAP(x) _Out_cap_(x)
 #define OUT_CAP_OPT(x) _Out_opt_cap_(x)
-#define OUT_CAP_C(x) _Out_cap_c_(x) // Output buffer with specified *constant* capacity in elements
+// Output buffer with specified *constant* capacity in elements
+#define OUT_CAP_C(x) _Out_cap_c_(x)
 #define OUT_BYTECAP(x) _Out_bytecap_(x)
 #define OUT_BYTECAP_C(x) _Out_bytecap_c_(x)
 #define OUT_OPT_BYTECAP(x) _Out_opt_bytecap_(x)
