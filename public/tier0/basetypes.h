@@ -39,7 +39,7 @@
 #define ExecuteNTimes( nTimes, x )	   \
 	{								   \
 		static int executeCount__{0};  \
-		if ( executeCount__ < nTimes ) \
+		if ( executeCount__ < (nTimes) ) \
 		{							   \
 			x;						   \
 			++executeCount__;		   \
