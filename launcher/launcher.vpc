@@ -72,7 +72,7 @@ $Project "launcher"
 		$File	"$SRCDIR/common/windows/scoped_winsock_initializer.h" [$WINDOWS]
 	}
 
-	$folder	"Link Libraries"
+	$Folder	"Link Libraries"
 	{
 		$Lib	appframework
 		$Lib	tier2

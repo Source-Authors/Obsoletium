@@ -2,14 +2,7 @@
 //
 // Defines the entry point for the application.
 
-#ifdef _WIN32
-#include "winlite.h"
-
-#include <direct.h>          // _chdir
-#include <comdef.h>          // _com_error
-#include <VersionHelpers.h>  // IsWindows10OrGreater
-#include <WinSock2.h>
-#else
+#ifndef _WIN32
 #include <unistd.h>  // chdir
 #endif
 
@@ -33,6 +26,13 @@
 #include "scoped_heap_leak_dumper.h"
 
 #ifdef _WIN32
+#include "winlite.h"
+
+#include <direct.h>          // _chdir
+#include <comdef.h>          // _com_error
+#include <VersionHelpers.h>  // IsWindows10OrGreater
+#include <WinSock2.h>
+
 #include "windows/scoped_com.h"
 #include "windows/scoped_console_ctrl_handler.h"
 #include "windows/scoped_floating_point_exception_mode.h"
@@ -50,8 +50,10 @@
 #include "file_logger.h"
 #include "vcr_helpers.h"
 
+#ifndef NO_STEAM
 #define VERSION_SAFE_STEAM_API_INTERFACES
 #include "steam/steam_api.h"
+#endif
 
 #ifdef __GLIBC__
 #include <gnu/libc-version.h>
@@ -284,22 +286,32 @@ void RemoveParametersOverrides(ICommandLine* command_line) {
 }
 
 #ifdef WIN32
-bool ApplyProcessPriorityClass(const ICommandLine* command_line) {
+[[nodiscard]] std::error_code ApplyProcessPriorityClass(
+    const ICommandLine* command_line) {
   // Make low priority?
   if (command_line->HasParm("-low")) {
-    return !!SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
+    return SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS)
+               ? std::error_code{}
+               : std::error_code{static_cast<int>(::GetLastError()),
+                                 std::system_category()};
   }
 
   if (command_line->HasParm("-high")) {
-    return !!SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+    return SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS)
+               ? std::error_code{}
+               : std::error_code{static_cast<int>(::GetLastError()),
+                                 std::system_category()};
   }
 
   if (!command_line->HasParm("-normal")) {
     // dimhotepus: Above normal by default.
-    return !!SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS);
+    return SetPriorityClass(GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS)
+               ? std::error_code{}
+               : std::error_code{static_cast<int>(::GetLastError()),
+                                 std::system_category()};
   }
 
-  return true;
+  return {};
 }
 #endif
 
@@ -489,9 +501,7 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
     //
     // Add a -sleepatstartup command line and sleep for 5 seconds which should
     // allow time to attach a debugger.
-    using namespace std::chrono_literals;
-
-    std::this_thread::sleep_for(5000ms);
+    ThreadSleep(5000);
   }
 
 #ifdef _WIN32
@@ -577,9 +587,9 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
     return FatalError(rc.value(), "Unable to initialize Windows sockets 2.2+.");
   }
 
-  if (!ApplyProcessPriorityClass(command_line)) {
+  if (const auto rc = ApplyProcessPriorityClass(command_line); rc) {
     Warning("Unable to change game process priority. Will run as is: %s.\n",
-            std::system_category().message(::GetLastError()).c_str());
+            rc.message().c_str());
   }
 #endif
 

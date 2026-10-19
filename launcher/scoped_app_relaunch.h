@@ -4,18 +4,53 @@
 #define SE_LAUNCHER_SCOPED_APP_RELAUNCH_H
 
 #ifdef _WIN32
-#include <winerror.h>
-#include <winreg.h>
-#include <WinUser.h>
-#include <shellapi.h>
+#include <sal.h>
+#include <specstrings.h>  // __out_data_source
 
-#include <array>  // For std::size
+#include <array>  // std::size
 #elif defined(LINUX) || defined(OSX)
 #include <sys/stat.h>
 #include <sys/types.h>
 
 #include "posix_file_stream.h"
 #endif
+
+#if defined(_WIN64)
+using ULONG_PTR = unsigned __int64;
+#else
+using ULONG_PTR = unsigned long;
+#endif
+
+FORWARD_DECLARE_HANDLE(HINSTANCE);
+FORWARD_DECLARE_HANDLE(HKEY);
+FORWARD_DECLARE_HANDLE(HWND);
+
+using REGSAM = unsigned long;
+
+extern "C" {
+
+__declspec(dllimport) long __stdcall RegOpenKeyExW(
+    _In_ HKEY hKey, _In_opt_ const wchar_t* lpSubKey,
+    _In_opt_ unsigned long ulOptions, _In_ REGSAM samDesired,
+    _Out_ HKEY* phkResult);
+__declspec(dllimport) long __stdcall RegCloseKey(_In_ HKEY hKey);
+
+__declspec(dllimport) long __stdcall RegQueryValueExW(
+    _In_ HKEY hKey, _In_opt_ const wchar_t* lpValueName,
+    _Reserved_ unsigned long* lpReserved, _Out_opt_ unsigned long* lpType,
+    _Out_writes_bytes_to_opt_(*lpcbData, *lpcbData)
+        __out_data_source(REGISTRY) unsigned char* lpData,
+    _When_(lpData == NULL, _Out_opt_)
+        _When_(lpData != NULL, _Inout_opt_) unsigned long* lpcbData);
+__declspec(dllimport) long __stdcall RegDeleteValueW(
+    _In_ HKEY hKey, _In_opt_ const wchar_t* lpValueName);
+
+__declspec(dllimport) HINSTANCE __stdcall ShellExecuteW(
+    _In_opt_ HWND hwnd, _In_opt_ const wchar_t* lpOperation,
+    _In_ const wchar_t* lpFile, _In_opt_ const wchar_t* lpParameters,
+    _In_opt_ const wchar_t* lpDirectory, _In_ int nShowCmd);
+
+}  // extern "C"
 
 namespace s1::launcher {
 
@@ -70,19 +105,19 @@ class ScopedAppRelaunch {
     // HKEY_CURRENT_USER\Software\Valve\Source\Relaunch URL.  If there is a URL
     // here, exec it.  This supports the capability of immediately re-launching
     // the the game via Steam in a different audio language.
-    HKEY key;
-    if (::RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Valve\\Source", 0,
-                        KEY_ALL_ACCESS, &key) == ERROR_SUCCESS) {
+    if (HKEY key;
+        ::RegOpenKeyExW(kHKEY_CURRENT_USER, L"Software\\Valve\\Source", 0,
+                        kKEY_READ | kKEY_WRITE, &key) == kERROR_SUCCESS) {
       RunCodeAtScopeExit(::RegCloseKey(key));
 
       wchar_t value[MAX_PATH];
       // in bytes + leave room for L'\0'
-      DWORD value_type, value_size = sizeof(value) - sizeof(wchar_t);
+      unsigned long value_type, value_size = sizeof(value) - sizeof(wchar_t);
 
       if (RegQueryValueExW(key, L"Relaunch URL", nullptr, &value_type,
                            reinterpret_cast<unsigned char*>(value),
-                           &value_size) == ERROR_SUCCESS &&
-          value_type == REG_SZ) {
+                           &value_size) == kERROR_SUCCESS &&
+          value_type == kREG_SZ) {
         RunCodeAtScopeExit(RegDeleteValueW(key, L"Relaunch URL"));
 
         // Ensure always zero-terminate.
@@ -90,7 +125,7 @@ class ScopedAppRelaunch {
 
         // dimhotepus: Only steam:// protocol allowed.
         if (StringHasPrefix(value, L"steam://")) {
-          ::ShellExecuteW(nullptr, L"open", value, nullptr, nullptr, SW_SHOW);
+          ::ShellExecuteW(nullptr, L"open", value, nullptr, nullptr, kSW_SHOW);
         }
       }
     }
@@ -100,6 +135,15 @@ class ScopedAppRelaunch {
  private:
 #ifndef WIN32
   static constexpr char kRelaunchFilePath[18] = {"/tmp/hl2_relaunch"};
+#else
+  static constexpr HKEY kHKEY_CURRENT_USER{
+      ((HKEY)(ULONG_PTR)((long)0x80000001))};
+  static constexpr long kERROR_SUCCESS{0L};
+  static constexpr int kSW_SHOW{5};
+
+  static constexpr unsigned long kREG_SZ{1ul};  // Unicode nul terminated string
+  static constexpr long kKEY_READ{131097L};
+  static constexpr unsigned long kKEY_WRITE{131078L};
 #endif
 };
 

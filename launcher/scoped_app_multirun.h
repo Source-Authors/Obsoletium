@@ -7,15 +7,16 @@
 #include <sal.h>
 
 using BOOL = int;
-using HANDLE = void *;
+using HANDLE = void*;
 
 using SECURITY_ATTRIBUTES = struct _SECURITY_ATTRIBUTES;
-using LPSECURITY_ATTRIBUTES = SECURITY_ATTRIBUTES *;
+using LPSECURITY_ATTRIBUTES = SECURITY_ATTRIBUTES*;
 
 extern "C" {
+
 __declspec(dllimport) _Ret_maybenull_ HANDLE __stdcall CreateMutexW(
     _In_opt_ LPSECURITY_ATTRIBUTES lpMutexAttributes, _In_ BOOL bInitialOwner,
-    _In_opt_ const wchar_t *lpName);
+    _In_opt_ const wchar_t* lpName);
 
 __declspec(dllimport) BOOL __stdcall ReleaseMutex(_In_ HANDLE hMutex);
 
@@ -24,7 +25,8 @@ __declspec(dllimport) BOOL __stdcall CloseHandle(
 
 __declspec(dllimport) unsigned long __stdcall WaitForSingleObject(
     _In_ HANDLE hHandle, _In_ unsigned long dwMilliseconds);
-}
+
+}  // extern "C"
 
 constexpr inline unsigned long kWaitObject0{0};
 constexpr inline unsigned long kWaitAbandoned{0x00000080L};
@@ -47,7 +49,7 @@ namespace s1::launcher {
 // App multirun.
 class ScopedAppMultiRun {
  public:
-  explicit ScopedAppMultiRun(ICommandLine *command_line) noexcept
+  explicit ScopedAppMultiRun(ICommandLine* command_line) noexcept
 #if defined(WIN32)
       // don't allow more than one instance to run
       : mutex_{::CreateMutexW(nullptr, 0, L"hl2_singleton_mutex")}
@@ -67,7 +69,7 @@ class ScopedAppMultiRun {
 #else
     // Under OSX use flock in /tmp/source_engine_<game>.lock, create
     // the file if it doesn't exist
-    const char *game_arg{command_line->ParmValue("-game", DEFAULT_HL2_GAMEDIR)};
+    const char* game_arg{command_line->ParmValue("-game", DEFAULT_HL2_GAMEDIR)};
 
     CRC32_t gameCRC;
     CRC32_Init(&gameCRC);
@@ -76,7 +78,7 @@ class ScopedAppMultiRun {
 
 #if defined(LINUX)
     // Check TMPDIR environment variable for temp directory.
-    const char *tmp_directory{getenv("TMPDIR")};
+    const char* tmp_directory{getenv("TMPDIR")};
 
     // If it's NULL, or it doesn't exist, or it isn't a directory,
     // fallback to /tmp.
@@ -152,10 +154,10 @@ class ScopedAppMultiRun {
 #endif  // !WIN32
   }
 
-  ScopedAppMultiRun(const ScopedAppMultiRun &) = delete;
-  ScopedAppMultiRun(ScopedAppMultiRun &&) = delete;
-  ScopedAppMultiRun &operator=(const ScopedAppMultiRun &) = delete;
-  ScopedAppMultiRun &operator=(ScopedAppMultiRun &&) = delete;
+  ScopedAppMultiRun(const ScopedAppMultiRun&) = delete;
+  ScopedAppMultiRun(ScopedAppMultiRun&&) = delete;
+  ScopedAppMultiRun& operator=(const ScopedAppMultiRun&) = delete;
+  ScopedAppMultiRun& operator=(ScopedAppMultiRun&&) = delete;
 
   [[nodiscard]] bool is_single_run() const noexcept {
 #if defined(WIN32)
@@ -195,4 +197,4 @@ class ScopedAppMultiRun {
 
 }  // namespace s1::launcher
 
-#endif  // SE_LAUNCHER_SCOPED_APP_MULTIRUN_H
+#endif  // !SE_LAUNCHER_SCOPED_APP_MULTIRUN_H
