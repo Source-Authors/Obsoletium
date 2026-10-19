@@ -11,6 +11,16 @@
 #include <cstring>  // strlen
 #include <utility>  // std::to_underlying, std::unreachable
 
+#include <cassert>      // assert
+#include <cstddef>      // std::ptrdiff_t, std::size_t
+#include <cstring>      // strlen, memcmp, memcpy, memset
+#include <iterator>     // std::ssize (C++20)
+#include <type_traits>  // std::enable_if_t, std::is_*_v
+#include <utility>      // std::to_underlying, std::unreachable
+#if __has_include(<version>)
+#include <version>  // __cpp_lib_* feature-test macros
+#endif
+
 // dimhotepus: Add SAL annotations.
 #include "tier0/annotations.h"
 
@@ -403,7 +413,7 @@ inline
 // Attempts to pass pointers instead of arrays to this macro result in compile
 // time errors. That is the point.
 extern "C++"  // templates cannot be declared to have 'C' linkage
-    template <typename T, size_t N>
+    template <typename T, std::size_t N>
     char (*RtlpNumberOf(UNALIGNED T (&)[N]))[N];
 
 #ifdef _PREFAST_
@@ -476,10 +486,19 @@ extern "C++"  // templates cannot be declared to have 'C' linkage
  * @param index Index to clamp.
  * @return Clamped array index.
  */
-template <typename IndexType, typename T, size_t N>
+template <typename IndexType, typename T, std::size_t N>
 constexpr IndexType ClampedArrayIndex([[maybe_unused]] const T (&buffer)[N],
                                       IndexType index) noexcept {
-  return clamp(index, 0, static_cast<IndexType>(N) - 1);
+  static_assert(std::is_integral_v<IndexType>);
+  static_assert(N > 0);
+
+  if constexpr (std::is_signed_v<IndexType>) {
+    if (index < 0) return 0;
+  }
+  if (static_cast<std::make_unsigned_t<IndexType>>(index) >= N)
+    return static_cast<IndexType>(N - 1);
+
+  return index;
 }
 
 /**
@@ -490,8 +509,9 @@ constexpr IndexType ClampedArrayIndex([[maybe_unused]] const T (&buffer)[N],
  * @param index Index to clamp.
  * @return Array element.
  */
-template <typename T, size_t N>
-constexpr T ClampedArrayElement(const T (&buffer)[N], size_t index) noexcept {
+template <typename T, std::size_t N>
+constexpr T ClampedArrayElement(const T (&buffer)[N],
+                                std::size_t index) noexcept {
   // Put index in an unsigned type to halve the clamping.
   if (index >= N) index = N - 1;
 
@@ -510,8 +530,7 @@ constexpr T ClampedArrayElement(const T (&buffer)[N], size_t index) noexcept {
 template <typename T>
 std::enable_if_t<std::is_trivially_copyable_v<T>> BitwiseCopy(
     IN_READS_BYTES(sizeof(T) * size) const T* src,
-    OUT_WRITES_ALL_BYTES(sizeof(T) * size) T* dest,
-    size_t size) noexcept {
+    OUT_WRITES_ALL_BYTES(sizeof(T) * size) T* dest, size_t size) noexcept {
   static_assert(sizeof(*src) == sizeof(*dest));
   std::memcpy(dest, src, sizeof(T) * size);
 }
@@ -561,8 +580,10 @@ constexpr OutputIt copy_n(InputIt first, Size count, OutputIt result) {
  */
 template <typename T>
 std::enable_if_t<!std::is_trivially_copyable_v<T>> constexpr BitwiseCopy(
-    const T* src, T* dest, size_t size = 1) noexcept {
-  copy_n(src, size, dest);
+    const T* src, T* dest,
+    std::size_t size = 1) noexcept(std::is_nothrow_copy_assignable_v<T>) {
+  // dimhotepus: for T in namespace std, ADL would also find std::copy_n.
+  ::copy_n(src, size, dest);
 }
 
 /**
