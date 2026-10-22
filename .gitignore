@@ -400,6 +400,9 @@ FodyWeavers.xsd
 # Ignore locally build vpc
 devtools/bin/vpc.exe
 devtools/bin/vpc.pdb
+devtools/LICENSE
+devtools/README.md
+devtools/SECURITY.md
 
 # Ignore VS solution files
 *.vcxproj
