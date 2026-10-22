@@ -16,15 +16,9 @@ if ERRORLEVEL 1 (
   EXIT /B 1
 )
 
-COPY /V /Y vpc.exe /B ..\..\..\devtools\bin\vpc.exe /B
+cmake --install . --prefix ../../../devtools
 if ERRORLEVEL 1 (
-  ECHO No vpc.exe to copy to devtools\bin\.
-  EXIT /B 1
-)
-
-COPY /V /Y vpc.pdb /B ..\..\..\devtools\bin\vpc.pdb /B
-if ERRORLEVEL 1 (
-  ECHO No vpc.pdb to copy to devtools\bin\.
+  ECHO Unable to install vpc.exe to devtools\bin\.
   EXIT /B 1
 )
 POPD
