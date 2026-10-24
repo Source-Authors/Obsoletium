@@ -1465,7 +1465,10 @@ void CVideoMode_Common::TakeSnapshotPFMRect( const char *pFilename, int x, int y
 
     // bitmap bits
     float16 *pImage = ( float16 * )malloc( w * h * ImageLoader::SizeInBytes( IMAGE_FORMAT_RGBA16161616F ) );
+    RunCodeAtScopeExit( free( pImage ) );
+
     float *pImage1 = ( float * )malloc( w * h * ImageLoader::SizeInBytes( IMAGE_FORMAT_RGB323232F ) );
+    RunCodeAtScopeExit( free( pImage1 ) );
 
     CMatRenderContextPtr pRenderContext( materials );
 
@@ -1501,6 +1504,7 @@ void CVideoMode_Common::TakeSnapshotPFMRect( const char *pFilename, int x, int y
     Assert( w == h ); // garymcthack - this only works for square images
 
     float *pFloatImage = ( float * )malloc( resampleWidth * resampleHeight * ImageLoader::SizeInBytes( IMAGE_FORMAT_RGB323232F ) );
+    RunCodeAtScopeExit( free( pFloatImage ) );
 
     ImageLoader::ResampleInfo_t info;
     info.m_pSrc = ( unsigned char * )pImage1;
@@ -1521,10 +1525,6 @@ void CVideoMode_Common::TakeSnapshotPFMRect( const char *pFilename, int x, int y
     {
         Warning( "Unable to write %dx%d PFM to '%s'.\n", resampleWidth, resampleHeight, pFilename );
     }
-
-    free( pImage1 );
-    free( pImage );
-    free( pFloatImage );
 }
 
 
