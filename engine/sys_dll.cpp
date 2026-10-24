@@ -350,10 +350,10 @@ bool Sys_MessageBox(const char *title, const char *info, bool bShowOkAndCancel, 
 
 void BuildMinidumpComment( char const *pchSysErrorText, bool bRealCrash );
 
-void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
+[[noreturn]] static void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 {
 	char		text[1024];
-	static      bool bReentry = false; // Don't meltdown
+	static		bool bReentry = false; // Don't meltdown
 
 	V_vsprintf_safe( text, error, argsList );
 
@@ -361,7 +361,17 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 	{
 		// dimhotepus: Write by default printf instead of stderr only.
 		Sys_Printf( "%s\n", text );
-		return;
+		
+		// dimhotepus: Replicate termination on reeentry.
+#if defined(_WIN32)
+		// We don't want global destructors in our process OR in any DLL to get executed.
+		// _exit() avoids calling global destructors in our module, but not in other DLLs.
+		// dimhotepus: 100 -> ENOTRECOVERABLE
+		TerminateProcess( GetCurrentProcess(), ENOTRECOVERABLE );
+#else
+		// dimhotepus: 100 -> ENOTRECOVERABLE
+		_exit( ENOTRECOVERABLE );
+#endif
 	}
 
 	bReentry = true;

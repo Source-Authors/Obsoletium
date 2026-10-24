@@ -9,10 +9,7 @@
 #define SYS_H
 #pragma once
 
-#ifndef SYSEXTERNAL_H
 #include "sysexternal.h"
-#endif
-
 #include "tier0/annotations.h"
 
 // sys.h -- non-portable functions

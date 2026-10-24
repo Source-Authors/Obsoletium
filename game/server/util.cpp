@@ -1806,7 +1806,8 @@ float UTIL_ScaleForGravity( float desiredGravity )
 	return worldGravity > 0 ? desiredGravity / worldGravity : 0;
 }
 
-
+// dimhotepus: mathlib defines it only for PARANOID mode.
+#ifdef PARANOID
 //-----------------------------------------------------------------------------
 // Purpose: Implemented for mathlib.c error handling
 // Input  : *error - 
@@ -1823,6 +1824,7 @@ extern "C" void Sys_Error( char *error, ... )
 	Warning( "%s", string );
 	Assert(0);
 }
+#endif
 
 
 //-----------------------------------------------------------------------------
