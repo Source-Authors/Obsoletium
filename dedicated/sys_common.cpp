@@ -157,8 +157,8 @@ SpewRetval_t DedicatedSpewOutputFunc(SpewType_t spewType, char const *pMsg) {
       Plat_MessageBox("SRCDS - Fatal Error", "SRCDS Error", message,
                       Plat_MessageBoxButton::Ok, Plat_MessageBoxIcon::Error);
     }
-    // dimhotepus: 1 -> ENOTRECOVERABLE
-    ::TerminateProcess(::GetCurrentProcess(), ENOTRECOVERABLE);
+    // dimhotepus: 1 -> ENOTRECOVERABLE and write minidump.
+    Plat_ExitProcessWithError( ENOTRECOVERABLE );
 #elif POSIX
     fflush(stdout);
     // dimhotepus: Try to run destructors! 1 -> ENOTRECOVERABLE
