@@ -268,13 +268,13 @@ constexpr inline float k_flMaxEntitySpinRate = k_flMaxAngularVelocity * 10.0f;
 
 inline bool IsEntityCoordinateReasonable ( const vec_t c )
 {
-	float r = k_flMaxEntityPosCoord;
+	constexpr float r = k_flMaxEntityPosCoord;
 	return c > -r && c < r;
 }
 
 inline bool IsEntityPositionReasonable( const Vector &v )
 {
-	float r = k_flMaxEntityPosCoord;
+	constexpr float r = k_flMaxEntityPosCoord;
 	return
 		v.x > -r && v.x < r &&
 		v.y > -r && v.y < r &&
@@ -289,7 +289,7 @@ extern int CheckEntityVelocity( Vector &v );
 
 inline bool IsEntityQAngleReasonable( const QAngle &q )
 {
-	float r = k_flMaxEntityEulerAngle;
+	constexpr float r = k_flMaxEntityEulerAngle;
 	return
 		q.x > -r && q.x < r &&
 		q.y > -r && q.y < r &&
@@ -299,7 +299,7 @@ inline bool IsEntityQAngleReasonable( const QAngle &q )
 // Angular velocity in exponential map form
 inline bool IsEntityAngularVelocityReasonable( const Vector &q )
 {
-	float r = k_flMaxEntitySpinRate;
+	constexpr float r = k_flMaxEntitySpinRate;
 	return
 		q.x > -r && q.x < r &&
 		q.y > -r && q.y < r &&
@@ -309,7 +309,7 @@ inline bool IsEntityAngularVelocityReasonable( const Vector &q )
 // Angular velocity of each Euler angle.
 inline bool IsEntityQAngleVelReasonable( const QAngle &q )
 {
-	float r = k_flMaxEntitySpinRate;
+	constexpr float r = k_flMaxEntitySpinRate;
 	return
 		q.x > -r && q.x < r &&
 		q.y > -r && q.y < r &&

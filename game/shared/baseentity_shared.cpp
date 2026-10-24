@@ -1104,7 +1104,7 @@ int	CBaseEntity::GetNextThinkTick( int nContextIndex ) const
 
 int CheckEntityVelocity( Vector &v )
 {
-	float r = k_flMaxEntitySpeed;
+	constexpr float r = k_flMaxEntitySpeed;
 	if (
 		v.x > -r && v.x < r &&
 		v.y > -r && v.y < r &&
