@@ -1635,10 +1635,6 @@ void CVideoMode_Common::WriteMovieFrame( const MovieInfo_t& info )
 
     int imagesize = GetModeStereoWidth() * GetModeStereoHeight();
     BGR888_t *hp = new BGR888_t[ imagesize ];
-    if ( hp == NULL )
-    {
-        Sys_Error( "Couldn't allocate bitmap header to snapshot.\n" );
-    }
 
     // Get Bits from material system
     ReadScreenPixels( 0, 0, GetModeStereoWidth(), GetModeStereoHeight(), hp, IMAGE_FORMAT_BGR888 );
