@@ -359,20 +359,15 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 
 	if ( bReentry )
 	{
-		fprintf( stderr, "%s\n", text );
+		// dimhotepus: Write by default printf instead of stderr only.
+		Sys_Printf( "%s\n", text );
 		return;
 	}
 
 	bReentry = true;
 
-	if ( s_bIsDedicated )
-	{
-		fprintf( stderr, "%s\n", text );
-	}
-	else
-	{
-		Sys_Printf( "%s\n", text );
-	}
+	// dimhotepus: Dedicated now uses it, too, as it basically same + dev debug printf.
+	Sys_Printf( "%s\n", text );
 
 	// Write the error to the log and ensure the log contents get written to disk
 	g_Log.Printf( "Engine error: %s\n", text );
