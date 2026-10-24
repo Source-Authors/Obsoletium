@@ -464,7 +464,10 @@ CGib *CGibShooter::CreateGib ( void )
 		DevWarning( 2, "GibShooter Body is <= 1!\n" );
 	}
 
-	pGib->m_nBody = random->RandomInt ( 1, m_nMaxGibModelFrame - 1 );// avoid throwing random amounts of the 0th gib. (skull).
+	// dimhotepus: m_nMaxGibModelFrame <= 1 result in skull. 
+	pGib->m_nBody = m_nMaxGibModelFrame <= 1
+		? 1
+		: random->RandomInt ( 1, m_nMaxGibModelFrame - 1 );// avoid throwing random amounts of the 0th gib. (skull).
 
 	if ( m_iszLightingOrigin != NULL_STRING )
 	{
