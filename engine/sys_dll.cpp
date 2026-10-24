@@ -45,7 +45,6 @@
 #include "eiface.h"
 #include "cl_steamauth.h"
 #include "tier0/etwprof.h"
-#include "tier0/scoped_breakpad_handler.h"
 #include "tier2/tier2.h"
 #include "vstdlib/coroutine.h"
 
@@ -350,6 +349,22 @@ bool Sys_MessageBox(const char *title, const char *info, bool bShowOkAndCancel, 
 
 void BuildMinidumpComment( char const *pchSysErrorText, bool bRealCrash );
 
+// dimhotepus: Support graceful shutdown.
+[[noreturn]] static void Sys_FatalExit_Internal( bool bGracefulExit )
+{
+	if ( bGracefulExit )
+	{
+		// Normal exit, run destructors, etc.
+		std::exit( ENOTRECOVERABLE );
+	}
+	else
+	{
+		// Don't run global destructors, so abrupt and bad to use.
+		// Generates minidump, too.
+		Plat_ExitProcessWithError( ENOTRECOVERABLE, true );
+	}
+}
+
 [[noreturn]] static void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 {
 	char		text[1024];
@@ -362,16 +377,8 @@ void BuildMinidumpComment( char const *pchSysErrorText, bool bRealCrash );
 		// dimhotepus: Write by default printf instead of stderr only.
 		Sys_Printf( "%s\n", text );
 		
-		// dimhotepus: Replicate termination on reeentry.
-#if defined(_WIN32)
-		// We don't want global destructors in our process OR in any DLL to get executed.
-		// _exit() avoids calling global destructors in our module, but not in other DLLs.
-		// dimhotepus: 100 -> ENOTRECOVERABLE
-		TerminateProcess( GetCurrentProcess(), ENOTRECOVERABLE );
-#else
-		// dimhotepus: 100 -> ENOTRECOVERABLE
-		_exit( ENOTRECOVERABLE );
-#endif
+		// dimhotepus: If no minidump we shutdown gracefully.
+		Sys_FatalExit_Internal( bMinidump );
 	}
 
 	bReentry = true;
@@ -402,30 +409,15 @@ void BuildMinidumpComment( char const *pchSysErrorText, bool bRealCrash );
 
 	BuildMinidumpComment( text, true );
 
-	if ( bMinidump && !Plat_IsInDebugSession() && !CommandLine()->HasParm( "-nominidumps") )
-	{
-		// dimhotepus: Crossplatform minidumps by breakpad.
-		if ( !s1::breakpad::ScopedBreakpadHandler::Instance().WriteMinidump() )
-		{
-			Plat_DebugString( "Failed to write minidump on engine error.\n" );
-		}
-
+	
 #ifdef POSIX
-		fflush( stdout );
+	fflush( stdout );
 #endif
-	}
 
 	host_initialized = false;
 
-#if defined(_WIN32)
-	// We don't want global destructors in our process OR in any DLL to get executed.
-	// _exit() avoids calling global destructors in our module, but not in other DLLs.
-	// dimhotepus: 100 -> ENOTRECOVERABLE
-	TerminateProcess( GetCurrentProcess(), ENOTRECOVERABLE );
-#else
-	// dimhotepus: 100 -> ENOTRECOVERABLE
-	_exit( ENOTRECOVERABLE );
-#endif
+	// dimhotepus: If no minidump we shutdown gracefully.
+	Sys_FatalExit_Internal( bMinidump );
 }
 
 //-----------------------------------------------------------------------------

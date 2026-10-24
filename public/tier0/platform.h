@@ -1036,11 +1036,15 @@ PLATFORM_INTERFACE char *			Plat_ctime( const time_t *timep, char *buf, size_t b
 // dimhotepus: true on success, false on failure.
 PLATFORM_INTERFACE [[nodiscard]] bool	Plat_GetModuleFilename( char *pOut, int nMaxBytes );
 
-PLATFORM_INTERFACE void				Plat_ExitProcess( int nCode );
+// dimhotepus: Abrupts process, no graceful shutdown.  Use with care.
+// dimhotepus: Use extern "C" [[noreturn]] PLATFORM_CLASS hack for [[noreturn]] application.
+extern "C" [[noreturn]] PLATFORM_CLASS void Plat_ExitProcess(int nCode);
 
-//called to exit the process due to a fatal error. This allows for the application to handle providing a hook as well which can be called
-//before exiting
-PLATFORM_INTERFACE void				Plat_ExitProcessWithError( int nCode, bool bGenerateMinidump = false );
+// called to exit the process due to a fatal error. This allows for the application
+// to handle providing a hook as well which can be called before exiting
+// dimhotepus: Abrupts process, no graceful shutdown.  Use with care.
+// dimhotepus: Use extern "C" [[noreturn]] PLATFORM_CLASS hack for [[noreturn]] application.
+extern "C" [[noreturn]] PLATFORM_CLASS void Plat_ExitProcessWithError( int nCode, bool bGenerateMinidump = false );
 
 //sets the callback that will be triggered by Plat_ExitProcessWithError. NULL is valid. The return value true indicates that
 //the exit has been handled and no further processing should be performed. False will cause a minidump to be generated, and the process

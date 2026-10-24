@@ -26,8 +26,8 @@
 #include <system_error>
 
 #include "tier0/platform.h"
-#include "tier0/minidump.h"
 #include "tier0/vcrmode.h"
+#include "tier0/scoped_breakpad_handler.h"
 
 #include <atomic>
 
@@ -499,7 +499,11 @@ void Plat_ExitProcessWithError( int nCode, bool bGenerateMinidump )
 		//don't generate mini dumps in the debugger
 		if( !Plat_IsInDebugSession() )
 		{
-			WriteMiniDump();
+			// dimhotepus: Use cross-platform minidump.
+			if ( !s1::breakpad::ScopedBreakpadHandler::Instance().WriteMinidump() )
+			{
+				Plat_DebugString( "Unable to write minidump on exit process by error.\n" );
+			}
 		}
 	}
 
