@@ -7,22 +7,23 @@
 
 #include "windows/dpi_wnd_behavior.h"
 
-class CBaseWnd : public CWnd {
-  DECLARE_DYNCREATE(CBaseWnd)
+class CBaseWnd : public CWnd
+{
+	DECLARE_DYNCREATE( CBaseWnd )
 
- public:
-  CBaseWnd();
-  
-  void CalcWindowRect(LPRECT lpClientRect, UINT nAdjustType = adjustBorder) override;
+public:
+	CBaseWnd();
 
- protected:
-  afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-  afx_msg void OnDestroy();
-  afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
-  DECLARE_MESSAGE_MAP()
+	void CalcWindowRect( LPRECT lpClientRect, UINT nAdjustType = adjustBorder ) override;
 
- protected:
-  s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
+protected:
+	afx_msg int     OnCreate( LPCREATESTRUCT lpCreateStruct );
+	afx_msg void    OnDestroy();
+	afx_msg LRESULT OnDpiChanged( WPARAM wParam, LPARAM lParam );
+	DECLARE_MESSAGE_MAP()
+
+protected:
+	s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
 };
 
-#endif  // !SE_COMMON_WINDOWS_BASE_WND_
+#endif // !SE_COMMON_WINDOWS_BASE_WND_

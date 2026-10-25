@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //=============================================================================//
@@ -12,8 +12,7 @@
 #include "tcpsocket_helpers.h"
 
 
-#define SERVICECONNMGR_CONNECT_ATTEMPT_INTERVAL	1000
-
+#define SERVICECONNMGR_CONNECT_ATTEMPT_INTERVAL 1000
 
 
 // ------------------------------------------------------------------------------------------- //
@@ -57,9 +56,9 @@ bool CServiceConnMgr::InitServer()
 	Term();
 
 	m_bServer = true;
-	
+
 	// Create a socket to listen on.
-	for ( int iPort=VMPI_SERVICE_FIRST_UI_PORT; iPort <= VMPI_SERVICE_LAST_UI_PORT; iPort++ )
+	for ( int iPort = VMPI_SERVICE_FIRST_UI_PORT; iPort <= VMPI_SERVICE_LAST_UI_PORT; iPort++ )
 	{
 		m_pListenSocket = CreateTCPListenSocketEmu( iPort, 5 );
 		if ( m_pListenSocket )
@@ -85,7 +84,7 @@ bool CServiceConnMgr::InitClient()
 
 void CServiceConnMgr::Term()
 {
-	m_bShuttingDown = true;	// This prevents some reentrancy.
+	m_bShuttingDown = true; // This prevents some reentrancy.
 
 	// Get rid of our registry key.
 	if ( m_pListenSocket )
@@ -118,7 +117,7 @@ void CServiceConnMgr::Update()
 			// Listen for more connections.
 			while ( 1 )
 			{
-				CIPAddr addr;
+				CIPAddr     addr;
 				ITCPSocket *pSocket = m_pListenSocket->UpdateListen( &addr );
 				if ( !pSocket )
 					break;
@@ -142,21 +141,21 @@ void CServiceConnMgr::Update()
 
 	// Check for timeouts and send acks.
 	int iNext;
-	for ( int iCur=m_Connections.Head(); iCur != m_Connections.InvalidIndex(); iCur=iNext )
+	for ( int iCur = m_Connections.Head(); iCur != m_Connections.InvalidIndex(); iCur = iNext )
 	{
 		iNext = m_Connections.Next( iCur );
 		CServiceConn *pConn = m_Connections[iCur];
 
 		if ( pConn->m_pSocket->IsConnected() )
 		{
-			DWORD startTime = GetTickCount();
-			CUtlVector<unsigned char> data;
+			DWORD                       startTime = GetTickCount();
+			CUtlVector< unsigned char > data;
 			while ( pConn->m_pSocket->Recv( data ) )
 			{
-				HandlePacket( (char*)data.Base(), data.Count() );
-				
+				HandlePacket( (char *)data.Base(), data.Count() );
+
 				// Don't sit in this loop too long.
-				if ( (GetTickCount() - startTime) > 50 )
+				if ( ( GetTickCount() - startTime ) > 50 )
 					break;
 			}
 		}
@@ -192,7 +191,7 @@ void CServiceConnMgr::AttemptConnect()
 
 
 	ITCPSocket *pSocket = NULL;
-	for ( int iPort=VMPI_SERVICE_FIRST_UI_PORT; iPort <= VMPI_SERVICE_LAST_UI_PORT; iPort++ )
+	for ( int iPort = VMPI_SERVICE_FIRST_UI_PORT; iPort <= VMPI_SERVICE_LAST_UI_PORT; iPort++ )
 	{
 		pSocket = CreateTCPSocketEmu();
 		if ( !pSocket || !pSocket->BindToAny( 0 ) )
@@ -231,4 +230,3 @@ void CServiceConnMgr::OnTerminateConnection( int id )
 void CServiceConnMgr::HandlePacket( const char *pData, int len )
 {
 }
-

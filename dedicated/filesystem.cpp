@@ -5,30 +5,37 @@
 #include "tier1/interface.h"
 #include "tier1/strtools.h"
 
-extern IFileSystem *g_pFileSystem;
+extern IFileSystem     *g_pFileSystem;
 extern IBaseFileSystem *g_pBaseFileSystem;
 
-namespace s1::dedicated {
+namespace s1::dedicated
+{
 
 // Implement our own special factory that we don't export outside of the DLL, to
 // stop people being able to get a pointer to a FILESYSTEM_INTERFACE_VERSION
 // stdio interface.
-void *FileSystemFactory(const char *name, int *rc) {
-  if (V_strieq(name, FILESYSTEM_INTERFACE_VERSION)) {
-    if (rc) *rc = IFACE_OK;
+void *FileSystemFactory( const char *name, int *rc )
+{
+	if ( V_strieq( name, FILESYSTEM_INTERFACE_VERSION ) )
+	{
+		if ( rc )
+			*rc = IFACE_OK;
 
-    return g_pFileSystem;
-  }
+		return g_pFileSystem;
+	}
 
-  if (V_strieq(name, BASEFILESYSTEM_INTERFACE_VERSION)) {
-    if (rc) *rc = IFACE_OK;
+	if ( V_strieq( name, BASEFILESYSTEM_INTERFACE_VERSION ) )
+	{
+		if ( rc )
+			*rc = IFACE_OK;
 
-    return g_pBaseFileSystem;
-  }
+		return g_pBaseFileSystem;
+	}
 
-  if (rc) *rc = IFACE_FAILED;
+	if ( rc )
+		*rc = IFACE_FAILED;
 
-  return nullptr;
+	return nullptr;
 }
 
-}  // namespace s1::dedicated
+} // namespace s1::dedicated

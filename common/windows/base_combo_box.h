@@ -7,26 +7,27 @@
 
 #include "windows/dpi_wnd_behavior.h"
 
-class CBaseComboBox : public CComboBox {
-  DECLARE_DYNAMIC(CBaseComboBox)
+class CBaseComboBox : public CComboBox
+{
+	DECLARE_DYNAMIC( CBaseComboBox )
 
- public:
-  CBaseComboBox();
+public:
+	CBaseComboBox();
 
-  BOOL Create(DWORD dwStyle, const RECT& rect, CWnd* pParentWnd,
-              UINT nID) override;
-  void SubclassDlgItem(UINT nID, CWnd* pParent);
+	BOOL Create( DWORD dwStyle, const RECT &rect, CWnd *pParentWnd,
+	             UINT nID ) override;
+	void SubclassDlgItem( UINT nID, CWnd *pParent );
 
- protected:
-  afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-  afx_msg void OnDestroy();
-  afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
-  DECLARE_MESSAGE_MAP()
+protected:
+	afx_msg int     OnCreate( LPCREATESTRUCT lpCreateStruct );
+	afx_msg void    OnDestroy();
+	afx_msg LRESULT OnDpiChanged( WPARAM wParam, LPARAM lParam );
+	DECLARE_MESSAGE_MAP()
 
- protected:
-  s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
+protected:
+	s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
 
-  bool m_dpi_behavior_created;
+	bool m_dpi_behavior_created;
 };
 
-#endif  // !SE_COMMON_WINDOWS_BASE_MDI_CHILD_WND_
+#endif // !SE_COMMON_WINDOWS_BASE_MDI_CHILD_WND_

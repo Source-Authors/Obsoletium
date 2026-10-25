@@ -7,117 +7,119 @@
 
 #include "tier0/basetypes.h"
 
-FORWARD_DECLARE_HANDLE(HWND);
+FORWARD_DECLARE_HANDLE( HWND );
 
-#if defined(_WIN64)
+#if defined( _WIN64 )
 using UINT_PTR = unsigned long long;
-using PUINT_PTR = UINT_PTR*;
+using PUINT_PTR = UINT_PTR *;
 using LONG_PTR = long long;
-using PLONG_PTR = LONG_PTR*;
+using PLONG_PTR = LONG_PTR *;
 #else
 typedef unsigned int UINT_PTR, *PUINT_PTR; //-V677
-typedef long LONG_PTR, *PLONG_PTR; //-V677
+typedef long         LONG_PTR, *PLONG_PTR; //-V677
 #endif
 
 /* Types use for passing & returning polymorphic values */
-using WPARAM = UINT_PTR; //-V677
-using LPARAM = LONG_PTR; //-V677
+using WPARAM = UINT_PTR;  //-V677
+using LPARAM = LONG_PTR;  //-V677
 using LRESULT = LONG_PTR; //-V677
 
-namespace s1::win::ui {
+namespace s1::win::ui
+{
 
 /**
  * @brief Window behavior to handle DPI settings.
  */
-class CDpiWindowBehavior {
- public:
-  explicit CDpiWindowBehavior(bool applyDpiOnCreate = true);
+class CDpiWindowBehavior
+{
+public:
+	explicit CDpiWindowBehavior( bool applyDpiOnCreate = true );
 
-  /**
+	/**
    * @brief Callback on WM_CREATE.
    * @param window Window.
    * @return TRUE if success, FALSE otherwise.
    */
-  BOOL OnCreateWindow(HWND window);
+	BOOL OnCreateWindow( HWND window );
 
-  /**
+	/**
    * @brief Callback on WM_DESTROY.
    */
-  void OnDestroyWindow();
+	void OnDestroyWindow();
 
-  /**
+	/**
    * @brief Callback on WM_DPICHANGED.
    * @param wParam WPARAM.
    * @param lParam LPARAM.
    * @return 0 on handled, non 0 otherwise.
    */
-  LRESULT OnWindowDpiChanged(WPARAM wParam, LPARAM lParam);
+	LRESULT OnWindowDpiChanged( WPARAM wParam, LPARAM lParam );
 
-  /**
+	/**
    * @brief Apply current DPI to window and children.
    */
-  BOOL ApplyDpiToWindow(bool recompute_window_size);
+	BOOL ApplyDpiToWindow( bool recompute_window_size );
 
-  /**
+	/**
    * @brief Scale value from old DPI to new one.
    * @param odlDpi Old DPI.
    * @param value Value.
    * @param newDpi New DPI.
    * @return Scaled value.
    */
-  [[nodiscard]] static int ScaleByDpi(unsigned odlDpi, int value, unsigned newDpi);
+	[[nodiscard]] static int ScaleByDpi( unsigned odlDpi, int value, unsigned newDpi );
 
-  /**
+	/**
    * @brief Previous X DPI.
    * @return X DPI.
    */
-  [[nodiscard]] unsigned GetPreviousDpiX() const { return m_previous_dpi_x; }
+	[[nodiscard]] unsigned GetPreviousDpiX() const { return m_previous_dpi_x; }
 
-  /**
+	/**
    * @brief Previous Y DPI.
    * @return Y DPI.
    */
-  [[nodiscard]] unsigned GetPreviousDpiY() const { return m_previous_dpi_y; }
+	[[nodiscard]] unsigned GetPreviousDpiY() const { return m_previous_dpi_y; }
 
-  /**
+	/**
    * @brief Current X DPI.
    * @return X DPI.
    */
-  [[nodiscard]] unsigned GetCurrentDpiX() const { return m_current_dpi_x; }
+	[[nodiscard]] unsigned GetCurrentDpiX() const { return m_current_dpi_x; }
 
-  /**
+	/**
    * @brief Current Y DPI.
    * @return Y DPI.
    */
-  [[nodiscard]] unsigned GetCurrentDpiY() const { return m_current_dpi_y; }
+	[[nodiscard]] unsigned GetCurrentDpiY() const { return m_current_dpi_y; }
 
-  /**
+	/**
    * @brief Apply scaling on X axis.
    * @param value Value to scale.
    * @return Scaled value.
    */
-  [[nodiscard]] int ScaleOnX(int value) const;
+	[[nodiscard]] int ScaleOnX( int value ) const;
 
-  /**
+	/**
    * @brief Apply scaling on Y axis.
    * @param value Value to scale.
    * @return Scaled value.
    */
-  [[nodiscard]] int ScaleOnY(int value) const;
+	[[nodiscard]] int ScaleOnY( int value ) const;
 
- private:
-  HWND m_window_handle;
+private:
+	HWND m_window_handle;
 
-  unsigned m_previous_dpi_x, m_previous_dpi_y;
-  unsigned m_current_dpi_x, m_current_dpi_y;
+	unsigned m_previous_dpi_x, m_previous_dpi_y;
+	unsigned m_current_dpi_x, m_current_dpi_y;
 
-  const bool m_apply_dpi_on_create;
+	const bool m_apply_dpi_on_create;
 
 #ifndef NDEBUG
-  bool m_is_destroyed;
+	bool m_is_destroyed;
 #endif
 };
 
-}  // namespace s1::win::ui
+} // namespace s1::win::ui
 
-#endif  // !SE_COMMON_WINDOWS_DPI_WND_BEHAVIOR_H_
+#endif // !SE_COMMON_WINDOWS_DPI_WND_BEHAVIOR_H_

@@ -5,9 +5,9 @@
 #ifndef SE_UTILS_SHADERCOMPILE_CFGPROCESSOR_H_
 #define SE_UTILS_SHADERCOMPILE_CFGPROCESSOR_H_
 
-#include <cstdio>   // FILE
-#include <cstdint>  // uint64_t
-#include <memory>   // std::unique_ptr
+#include <cstdio>  // FILE
+#include <cstdint> // uint64_t
+#include <memory>  // std::unique_ptr
 
 #include "tier0/platform.h"
 #include "tier1/smartptr.h"
@@ -33,50 +33,54 @@
 
 class CUtlInplaceBuffer;
 
-namespace s1::shader_compile::shader_combo_processor {
+namespace s1::shader_compile::shader_combo_processor
+{
 
 /**
  * @brief Config entry info.
  */
-struct CfgEntryInfo {
-  char const *m_szName;  // Name of the shader, e.g. "shader_ps20b"
-  // Name of the src file, e.g. "shader_psxx.fxc"
-  char const *m_szShaderFileName;
+struct CfgEntryInfo
+{
+	char const *m_szName; // Name of the shader, e.g. "shader_ps20b"
+	// Name of the src file, e.g. "shader_psxx.fxc"
+	char const *m_szShaderFileName;
 
-  uint64_t m_numCombos;         // Total possible num of combos, e.g. 1024
-  uint64_t m_numDynamicCombos;  // Num of dynamic combos, e.g. 4
-  uint64_t m_numStaticCombos;   // Num of static combos, e.g. 256
-  uint64_t m_iCommandStart;     // Start command, e.g. 0
-  uint64_t m_iCommandEnd;       // End command, e.g. 1024
+	uint64_t m_numCombos;        // Total possible num of combos, e.g. 1024
+	uint64_t m_numDynamicCombos; // Num of dynamic combos, e.g. 4
+	uint64_t m_numStaticCombos;  // Num of static combos, e.g. 256
+	uint64_t m_iCommandStart;    // Start command, e.g. 0
+	uint64_t m_iCommandEnd;      // End command, e.g. 1024
 };
 
 // Working with configuration
-std::unique_ptr<CfgEntryInfo[]> ReadConfiguration(CUtlInplaceBuffer *in);
+std::unique_ptr< CfgEntryInfo[] > ReadConfiguration( CUtlInplaceBuffer *in );
 
 // Working with combos
-using ComboHandle = struct {
+using ComboHandle = struct
+{
 } *;
 
-ComboHandle Combo_GetCombo(uint64_t command_no);
-ComboHandle Combo_GetNext(uint64_t &command_no, ComboHandle &rhCombo,
-                          uint64_t iCommandEnd);
-void Combo_FormatCommand(ComboHandle combo, OUT_Z_CAP(buffer_size) char *buffer,
-                         intp buffer_size);
+ComboHandle Combo_GetCombo( uint64_t command_no );
+ComboHandle Combo_GetNext( uint64_t &command_no, ComboHandle &rhCombo,
+                           uint64_t iCommandEnd );
+void        Combo_FormatCommand( ComboHandle combo, OUT_Z_CAP( buffer_size ) char *buffer,
+                                 intp buffer_size );
 
-template <intp bufferSize>
-void Combo_FormatCommand(ComboHandle combo,
-                         OUT_Z_ARRAY char (&buffer)[bufferSize]) {
-  Combo_FormatCommand(combo, buffer, bufferSize);
+template< intp bufferSize >
+void Combo_FormatCommand( ComboHandle combo,
+                          OUT_Z_ARRAY char ( &buffer )[bufferSize] )
+{
+	Combo_FormatCommand( combo, buffer, bufferSize );
 }
 
-uint64_t Combo_GetCommandNum(ComboHandle combo);
-uint64_t Combo_GetComboNum(ComboHandle combo);
-CfgEntryInfo const *Combo_GetEntryInfo(ComboHandle combo);
+uint64_t            Combo_GetCommandNum( ComboHandle combo );
+uint64_t            Combo_GetComboNum( ComboHandle combo );
+CfgEntryInfo const *Combo_GetEntryInfo( ComboHandle combo );
 
-ComboHandle Combo_Alloc(ComboHandle copy_from);
-void Combo_Assign(ComboHandle combo_dst, ComboHandle combo_src);
-void Combo_Free(ComboHandle &combo_free);
+ComboHandle Combo_Alloc( ComboHandle copy_from );
+void        Combo_Assign( ComboHandle combo_dst, ComboHandle combo_src );
+void        Combo_Free( ComboHandle &combo_free );
 
-};  // namespace s1::shader_compile::shader_combo_processor
+}; // namespace s1::shader_compile::shader_combo_processor
 
-#endif  //  !SE_UTILS_SHADERCOMPILE_CFGPROCESSOR_H_
+#endif //  !SE_UTILS_SHADERCOMPILE_CFGPROCESSOR_H_

@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //=============================================================================//
@@ -16,7 +16,7 @@
 bool CWindowAnchor::Init( CWnd *pParentWnd, CWnd *pChildWnd, int aLeft, int aTop, int aRight, int aBottom )
 {
 	m_pWnd = pChildWnd;
-	
+
 	m_aLeft = aLeft;
 	m_aTop = aTop;
 	m_aRight = aRight;
@@ -46,9 +46,9 @@ void AnchorElement( long *pOut, CRect &rcParent, int startElement, CRect &rcPare
 	else if ( flags == ANCHOR_BOTTOM )
 		*pOut = rcParent.bottom - ( rcParentStart.bottom - startElement );
 	else if ( flags == ANCHOR_WIDTH_PERCENT )
-		*pOut = rcParent.left + (rcParent.Width() * ( startElement - rcParentStart.left )) / rcParentStart.Width();
+		*pOut = rcParent.left + ( rcParent.Width() * ( startElement - rcParentStart.left ) ) / rcParentStart.Width();
 	else if ( flags == ANCHOR_HEIGHT_PERCENT )
-		*pOut = rcParent.top + (rcParent.Height() * ( startElement - rcParentStart.top )) / rcParentStart.Height();
+		*pOut = rcParent.top + ( rcParent.Height() * ( startElement - rcParentStart.top ) ) / rcParentStart.Height();
 }
 
 
@@ -61,16 +61,15 @@ void CWindowAnchor::Update( CWnd *pParentWnd )
 	pParentWnd->GetWindowRect( rcParent );
 
 	CRect rcNew;
-	AnchorElement( &rcNew.left,   rcParent, m_Rect.left,   m_ParentRect, m_aLeft );
-	AnchorElement( &rcNew.top,    rcParent, m_Rect.top,    m_ParentRect, m_aTop );
-	AnchorElement( &rcNew.right,  rcParent, m_Rect.right,  m_ParentRect, m_aRight );
+	AnchorElement( &rcNew.left, rcParent, m_Rect.left, m_ParentRect, m_aLeft );
+	AnchorElement( &rcNew.top, rcParent, m_Rect.top, m_ParentRect, m_aTop );
+	AnchorElement( &rcNew.right, rcParent, m_Rect.right, m_ParentRect, m_aRight );
 	AnchorElement( &rcNew.bottom, rcParent, m_Rect.bottom, m_ParentRect, m_aBottom );
 
 	pParentWnd->ScreenToClient( rcNew );
 	m_pWnd->SetWindowPos( NULL, rcNew.left, rcNew.top, rcNew.Width(), rcNew.Height(), SWP_NOZORDER );
 	m_pWnd->InvalidateRect( NULL );
 }
-
 
 
 // ------------------------------------------------------------------------------------ //
@@ -91,4 +90,3 @@ void CWindowAnchorMgr::UpdateAnchors( CWnd *pParentWnd )
 		m_Anchors[i].Update( pParentWnd );
 	}
 }
-

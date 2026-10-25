@@ -2,11 +2,13 @@
 
 #include "textconsole.h"
 
-namespace s1::dedicated {
+namespace s1::dedicated
+{
 
-bool CTextConsole::Init() {
-  m_ConsoleVisible = true;
-  return true;
+bool CTextConsole::Init()
+{
+	m_ConsoleVisible = true;
+	return true;
 }
 
-}  // namespace s1::dedicated
+} // namespace s1::dedicated

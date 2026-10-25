@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 //=============================================================================
 
@@ -26,8 +26,7 @@
 #include "vmpi_distribute_work_internal.h"
 
 
-#define DW_SUBPACKETID_WU_ASSIGNMENT	(VMPI_DISTRIBUTE_WORK_EXTRA_SUBPACKET_BASE+0)
-
+#define DW_SUBPACKETID_WU_ASSIGNMENT ( VMPI_DISTRIBUTE_WORK_EXTRA_SUBPACKET_BASE + 0 )
 
 
 static int s_numWusToDeal = -1;
@@ -48,12 +47,17 @@ public:
 class CWULookupInfo
 {
 public:
-	CWULookupInfo() : m_iWUInfo( -1 ), m_iPartition( -222222 ), m_iPartitionListIndex( -1 ) {}
+	CWULookupInfo() :
+		m_iWUInfo( -1 ),
+		m_iPartition( -222222 ),
+		m_iPartitionListIndex( -1 )
+	{
+	}
 
 public:
-	int m_iWUInfo;				// Index into m_WUInfo.
-	int m_iPartition;			// Which partition it's in.
-	int m_iPartitionListIndex;	// Index into its partition's m_WUs.
+	int m_iWUInfo;             // Index into m_WUInfo.
+	int m_iPartition;          // Which partition it's in.
+	int m_iPartitionListIndex; // Index into its partition's m_WUs.
 };
 
 
@@ -63,9 +67,9 @@ public:
 	typedef CUtlLinkedList< WUIndexType, int > PartitionWUs;
 
 public:
-	int m_iPartition;	// Index into m_Partitions.
-	int m_iWorker; // Who owns this partition?
-	PartitionWUs m_WUs;	// Which WUs are in this partition?
+	int          m_iPartition; // Index into m_Partitions.
+	int          m_iWorker;    // Who owns this partition?
+	PartitionWUs m_WUs;        // Which WUs are in this partition?
 };
 
 
@@ -86,7 +90,12 @@ public:
 	uint64 WorkUnitFinished( uint64 iWorkUnit );
 
 public:
-	enum WUInfo { kNone, kTrigger, kDone };
+	enum WUInfo
+	{
+		kNone,
+		kTrigger,
+		kDone
+	};
 	CVisibleWindowVector< uint8 > m_arrInfo;
 };
 
@@ -118,19 +127,19 @@ uint64 CWorkUnitsTracker::WorkUnitFinished( uint64 iWorkUnit )
 		if ( kTrigger == chThere )
 		{
 			// Go along all "done" work units and trigger the last found one
-			while ( ( ( ++ iWorkUnit ) < m_arrInfo.PastVisibleIndex() ) &&
-				( kDone == m_arrInfo.Get( iWorkUnit ) ) )
+			while ( ( ( ++iWorkUnit ) < m_arrInfo.PastVisibleIndex() ) &&
+			        ( kDone == m_arrInfo.Get( iWorkUnit ) ) )
 				continue;
 
 			m_arrInfo.Get( iWorkUnit ) = kTrigger;
 			m_arrInfo.ShrinkWindow( iWorkUnit - 1 );
 			uiResult = iWorkUnit;
 		}
-		else if( iWorkUnit == m_arrInfo.FirstPossibleIndex() )
+		else if ( iWorkUnit == m_arrInfo.FirstPossibleIndex() )
 		{
 			// Go along all "done" work units and shrink including the last found one
-			while ( ( ( ++ iWorkUnit ) < m_arrInfo.PastVisibleIndex() ) &&
-				( kDone == m_arrInfo.Get( iWorkUnit ) ) )
+			while ( ( ( ++iWorkUnit ) < m_arrInfo.PastVisibleIndex() ) &&
+			        ( kDone == m_arrInfo.Get( iWorkUnit ) ) )
 				continue;
 
 			m_arrInfo.ShrinkWindow( iWorkUnit - 1 );
@@ -143,27 +152,26 @@ uint64 CWorkUnitsTracker::WorkUnitFinished( uint64 iWorkUnit )
 CWorkUnitsTracker g_MasterWorkUnitsTracker;
 
 
-
-static bool CompareSoonestWorkUnitSets( CPartitionInfo::PartitionWUs * const &x, CPartitionInfo::PartitionWUs * const &y )
+static bool CompareSoonestWorkUnitSets( CPartitionInfo::PartitionWUs *const &x, CPartitionInfo::PartitionWUs *const &y )
 {
 	// Compare by fourth/second/first job in the partitions
-	WUIndexType missing = ~WUIndexType(0);
+	WUIndexType missing = ~WUIndexType( 0 );
 	WUIndexType jobsX[4] = { missing, missing, missing, missing };
 	WUIndexType jobsY[4] = { missing, missing, missing, missing };
-	int counter = 0;
+	int         counter = 0;
 
 	counter = 0;
-	FOR_EACH_LL( (*x), i )
+	FOR_EACH_LL( ( *x ), i )
 	{
-		jobsX[ counter ++ ] = (*x)[i];
+		jobsX[counter++] = ( *x )[i];
 		if ( counter >= 4 )
 			break;
 	}
 
 	counter = 0;
-	FOR_EACH_LL( (*y), i )
+	FOR_EACH_LL( ( *y ), i )
 	{
-		jobsY[ counter ++ ] = (*y)[i];
+		jobsY[counter++] = ( *y )[i];
 		if ( counter >= 4 )
 			break;
 	}
@@ -179,7 +187,6 @@ static bool CompareSoonestWorkUnitSets( CPartitionInfo::PartitionWUs * const &x,
 }
 
 
-
 class CDistributor_DefaultMaster final : public IWorkUnitDistributorMaster
 {
 public:
@@ -187,19 +194,19 @@ public:
 	{
 		delete this;
 	}
-	
+
 	virtual void DistributeWork_Master( CDSInfo *pInfo )
 	{
 		m_pInfo = pInfo;
 		g_MasterWorkUnitsTracker.PrepareForWorkUnits( m_pInfo->m_nWorkUnits );
-		
+
 		m_WULookup.Reset( pInfo->m_nWorkUnits );
 		while ( m_WULookup.FirstPossibleIndex() < m_WULookup.PastPossibleIndex() )
 		{
 			VMPI_DispatchNextMessage( 200 );
 
 			VMPITracker_HandleDebugKeypresses();
-		
+
 			if ( g_pDistributeWorkCallbacks && g_pDistributeWorkCallbacks->Update() )
 				break;
 		}
@@ -218,14 +225,14 @@ public:
 
 		if ( !pLookup || pLookup->m_iWUInfo == -1 )
 			return false;
-		
+
 		// Mark this WU finished and remove it from the list of pending WUs.
 		m_WUInfo.Remove( pLookup->m_iWUInfo );
-		pLookup->m_iWUInfo = -1;	
+		pLookup->m_iWUInfo = -1;
 
 
 		// Get rid of the WU from its partition.
-		int iPartition = pLookup->m_iPartition;
+		int             iPartition = pLookup->m_iPartition;
 		CPartitionInfo *pPartition = m_Partitions[iPartition];
 		pPartition->m_WUs.Remove( pLookup->m_iPartitionListIndex );
 
@@ -233,7 +240,7 @@ public:
 		if ( iWorkUnit == m_WULookup.FirstPossibleIndex() )
 		{
 			WUIndexType kwu = iWorkUnit;
-			for ( WUIndexType kwuEnd = m_WULookup.PastVisibleIndex(); kwu < kwuEnd; ++ kwu )
+			for ( WUIndexType kwuEnd = m_WULookup.PastVisibleIndex(); kwu < kwuEnd; ++kwu )
 			{
 				if ( -1 != m_WULookup.Get( kwu ).m_iWUInfo && kwu > iWorkUnit )
 					break;
@@ -247,7 +254,7 @@ public:
 			int iPartitionWorker = pPartition->m_iWorker;
 			delete pPartition;
 			m_Partitions.Remove( iPartition );
-	
+
 			// If there are any more WUs remaining, give the worker from this partition some more of them.
 			if ( m_WULookup.FirstPossibleIndex() < m_WULookup.PastPossibleIndex() )
 			{
@@ -275,7 +282,7 @@ public:
 		}
 	}
 
-	CPartitionInfo* AddPartition( int iWorker )
+	CPartitionInfo *AddPartition( int iWorker )
 	{
 		CPartitionInfo *pNew = new CPartitionInfo;
 		pNew->m_iPartition = m_Partitions.AddToTail( pNew );
@@ -283,18 +290,18 @@ public:
 		return pNew;
 	}
 
-	bool SplitWUsPartition( CPartitionInfo *pPartitionLarge,
-						CPartitionInfo **ppFirstHalf, CPartitionInfo **ppSecondHalf,
-						int iFirstHalfWorker, int iSecondHalfWorker )
+	bool SplitWUsPartition( CPartitionInfo  *pPartitionLarge,
+	                        CPartitionInfo **ppFirstHalf, CPartitionInfo **ppSecondHalf,
+	                        int iFirstHalfWorker, int iSecondHalfWorker )
 	{
 		int nCount = pPartitionLarge->m_WUs.Count();
-		
-		if ( nCount > 1 )	// Allocate the partitions for the two workers
+
+		if ( nCount > 1 ) // Allocate the partitions for the two workers
 		{
 			*ppFirstHalf = AddPartition( iFirstHalfWorker );
 			*ppSecondHalf = AddPartition( iSecondHalfWorker );
 		}
-		else				// Specially transfer a partition with too few work units
+		else // Specially transfer a partition with too few work units
 		{
 			*ppFirstHalf = NULL;
 			*ppSecondHalf = AddPartition( iSecondHalfWorker );
@@ -302,16 +309,16 @@ public:
 
 		// Prepare for transfer
 		CPartitionInfo *arrNewParts[2] = { *ppFirstHalf ? *ppFirstHalf : *ppSecondHalf, *ppSecondHalf };
-		
+
 		// Transfer the work units:
 		// alternate first/second halves
 		// don't put more than "half deal units" tasks into the second half
 		// e.g.               { 1, 2, 3, 4 }
 		// becomes: 1st half { 1, 2 }, 2nd half { 3, 4 }
-		for ( int k = 0; k < nCount; ++ k )
+		for ( int k = 0; k < nCount; ++k )
 		{
-			int iHead = pPartitionLarge->m_WUs.Head();
-			WUIndexType iWU = pPartitionLarge->m_WUs[ iHead ];
+			int         iHead = pPartitionLarge->m_WUs.Head();
+			WUIndexType iWU = pPartitionLarge->m_WUs[iHead];
 			pPartitionLarge->m_WUs.Remove( iHead );
 
 			/*
@@ -319,8 +326,8 @@ public:
 			if ( k == 5 ) // no more than 2 jobs to branch off
 				arrNewParts[ 1 ] = arrNewParts[ 0 ];
 				*/
-			int nHalf = !( k < nCount/2 );
-			CPartitionInfo *pTo = arrNewParts[ nHalf ];
+			int             nHalf = !( k < nCount / 2 );
+			CPartitionInfo *pTo = arrNewParts[nHalf];
 
 			CWULookupInfo &li = m_WULookup.Get( iWU );
 			li.m_iPartition = pTo->m_iPartition;
@@ -351,7 +358,7 @@ public:
 			Warning( "\n\n-mpi_NoScheduler found: Warning - this should only be used for testing and with 1 worker!\n\n" );
 			vlkup.ExpandWindow( m_pInfo->m_nWorkUnits );
 			CPartitionInfo *pPartition = AddPartition( iWorker );
-			for ( WUIndexType i=0; i < m_pInfo->m_nWorkUnits; i++ )
+			for ( WUIndexType i = 0; i < m_pInfo->m_nWorkUnits; i++ )
 			{
 				CWorkUnitInfo info;
 				info.m_iWorkUnit = i;
@@ -365,17 +372,17 @@ public:
 			SendPartitionToWorker( pPartition, iWorker );
 			return;
 		}
-		
+
 
 		// Any partitions abandoned by workers?
 		int iAbandonedPartition = FindPartitionByWorker( -1 );
 		if ( -1 != iAbandonedPartition )
 		{
-			CPartitionInfo *pPartition = m_Partitions[ iAbandonedPartition ];
+			CPartitionInfo *pPartition = m_Partitions[iAbandonedPartition];
 			pPartition->m_iWorker = iWorker;
 			SendPartitionToWorker( pPartition, iWorker );
 		}
-		
+
 		// Any absolutely untouched partitions yet?
 		else if ( vlkup.PastVisibleIndex() < vlkup.PastPossibleIndex() )
 		{
@@ -384,8 +391,8 @@ public:
 			if ( numWusToDeal <= 0 )
 			{
 				uint64 uiFraction = vlkup.PastPossibleIndex() / g_nMaxWorkerCount;
-				Assert( uiFraction < INT_MAX/2 );
-				
+				Assert( uiFraction < INT_MAX / 2 );
+
 				numWusToDeal = int( uiFraction );
 				if ( numWusToDeal <= 0 )
 					numWusToDeal = 8;
@@ -397,21 +404,21 @@ public:
 			vlkup.ExpandWindow( iEnd - 1 );
 
 			// Allocate a partition
-			size_t numPartitions = min( ( size_t )(iEnd - iBegin), ( size_t )g_nMaxWorkerCount );
-			CArrayAutoPtr< CPartitionInfo * > spArrPartitions( new CPartitionInfo* [ numPartitions ] );
-			CPartitionInfo **arrPartitions = spArrPartitions.Get();
+			size_t                            numPartitions = min( (size_t)( iEnd - iBegin ), (size_t)g_nMaxWorkerCount );
+			CArrayAutoPtr< CPartitionInfo * > spArrPartitions( new CPartitionInfo *[numPartitions] );
+			CPartitionInfo                  **arrPartitions = spArrPartitions.Get();
 
 			arrPartitions[0] = AddPartition( iWorker );
-			for ( size_t k = 1; k < numPartitions; ++ k )
+			for ( size_t k = 1; k < numPartitions; ++k )
 				arrPartitions[k] = AddPartition( -1 );
 
 			// Assign upcoming work units to the partitions.
-			for ( WUIndexType i = iBegin ; i < iEnd; ++ i )
+			for ( WUIndexType i = iBegin; i < iEnd; ++i )
 			{
 				CWorkUnitInfo info;
 				info.m_iWorkUnit = i;
 
-				CPartitionInfo *pPartition = arrPartitions[ size_t( (i - iBegin) % numPartitions ) ];
+				CPartitionInfo *pPartition = arrPartitions[size_t( ( i - iBegin ) % numPartitions )];
 
 				CWULookupInfo &li = vlkup.Get( i );
 				li.m_iPartition = pPartition->m_iPartition;
@@ -430,10 +437,10 @@ public:
 			int iPartToSplit = FindSoonestPartition();
 			if ( iPartToSplit >= 0 )
 			{
-				CPartitionInfo *pPartition = m_Partitions[ iPartToSplit ];
+				CPartitionInfo *pPartition = m_Partitions[iPartToSplit];
 
 				CPartitionInfo *pOldHalf = NULL, *pNewHalf = NULL;
-				int iOldWorker = pPartition->m_iWorker, iNewWorker = iWorker;
+				int             iOldWorker = pPartition->m_iWorker, iNewWorker = iWorker;
 				if ( SplitWUsPartition( pPartition, &pOldHalf, &pNewHalf, iOldWorker, iNewWorker ) )
 				{
 					if ( pOldHalf )
@@ -452,10 +459,10 @@ public:
 
 	int FindSoonestPartition()
 	{
-		CUtlLinkedList < CPartitionInfo *, int > &lst = m_Partitions;
+		CUtlLinkedList< CPartitionInfo *, int > &lst = m_Partitions;
 
 		// Sorted partitions
-		CUtlMap< CPartitionInfo::PartitionWUs *, int > sortedPartitions ( CompareSoonestWorkUnitSets );
+		CUtlMap< CPartitionInfo::PartitionWUs *, int > sortedPartitions( CompareSoonestWorkUnitSets );
 		sortedPartitions.EnsureCapacity( lst.Count() );
 		FOR_EACH_LL( lst, i )
 		{
@@ -485,12 +492,12 @@ public:
 		// Stuff the next nWUs work units into the buffer.
 		MessageBuffer mb;
 		PrepareDistributeWorkHeader( &mb, DW_SUBPACKETID_WU_ASSIGNMENT );
-		
+
 		FOR_EACH_LL( pPartition->m_WUs, i )
 		{
 			WUIndexType iWU = pPartition->m_WUs[i];
 			mb.write( &iWU, sizeof( iWU ) );
-			VMPITracker_WorkUnitSentToWorker( ( int ) iWU, iWorker );
+			VMPITracker_WorkUnitSentToWorker( (int)iWU, iWorker );
 		}
 
 		VMPI_SendData( mb.data, mb.getLen(), iWorker );
@@ -500,16 +507,14 @@ public:
 	{
 		return false;
 	}
-	
+
 private:
-	
 	CDSInfo *m_pInfo;
 
-	CUtlLinkedList<CPartitionInfo*,int> m_Partitions;	
-	CVisibleWindowVector<CWULookupInfo> m_WULookup;		// Map work unit index to CWorkUnitInfo.
-	CUtlLinkedList<CWorkUnitInfo,int> m_WUInfo;			// Sorted with most elegible WU at the head.
+	CUtlLinkedList< CPartitionInfo *, int > m_Partitions;
+	CVisibleWindowVector< CWULookupInfo >   m_WULookup; // Map work unit index to CWorkUnitInfo.
+	CUtlLinkedList< CWorkUnitInfo, int >    m_WUInfo;   // Sorted with most elegible WU at the head.
 };
-
 
 
 class CDistributor_DefaultWorker final : public IWorkUnitDistributorWorker
@@ -523,7 +528,7 @@ public:
 	virtual void Init( CDSInfo *pInfo )
 	{
 	}
-	
+
 	virtual bool GetNextWorkUnit( WUIndexType *pWUIndex )
 	{
 		CCriticalSectionLock csLock( &m_CS );
@@ -536,7 +541,7 @@ public:
 		}
 		else
 		{
-			*pWUIndex = m_WorkUnits[ m_WorkUnits.Head() ];
+			*pWUIndex = m_WorkUnits[m_WorkUnits.Head()];
 			m_WorkUnits.Remove( m_WorkUnits.Head() );
 			return true;
 		}
@@ -554,7 +559,7 @@ public:
 			if ( bIgnoreContents )
 				return true;
 
-			if ( ((pBuf->getLen() - pBuf->getOffset()) % sizeof( WUIndexType )) != 0 )
+			if ( ( ( pBuf->getLen() - pBuf->getOffset() ) % sizeof( WUIndexType ) ) != 0 )
 			{
 				Error( "DistributeWork: invalid work units packet from master" );
 			}
@@ -563,18 +568,18 @@ public:
 			CCriticalSectionLock csLock( &m_CS );
 			csLock.Lock();
 
-				m_WorkUnits.Purge();
+			m_WorkUnits.Purge();
 
-				ptrdiff_t nIndices = (pBuf->getLen() - pBuf->getOffset()) / static_cast<ptrdiff_t>(sizeof( WUIndexType ));
-				for ( ptrdiff_t i=0; i < nIndices; i++ )
-				{
-					WUIndexType iWU;
-					pBuf->read( &iWU, sizeof( iWU ) );
+			ptrdiff_t nIndices = ( pBuf->getLen() - pBuf->getOffset() ) / static_cast< ptrdiff_t >( sizeof( WUIndexType ) );
+			for ( ptrdiff_t i = 0; i < nIndices; i++ )
+			{
+				WUIndexType iWU;
+				pBuf->read( &iWU, sizeof( iWU ) );
 
-					// Add the index to the list.
-					m_WorkUnits.AddToTail( iWU );
-				}
-			
+				// Add the index to the list.
+				m_WorkUnits.AddToTail( iWU );
+			}
+
 			csLock.Unlock();
 
 			return true;
@@ -586,18 +591,16 @@ public:
 	}
 
 	// Threads eat up the list of WUs in here.
-	CCriticalSection m_CS;
-	CUtlLinkedList<WUIndexType, int> m_WorkUnits;			// A list of work units assigned to this worker
+	CCriticalSection                   m_CS;
+	CUtlLinkedList< WUIndexType, int > m_WorkUnits; // A list of work units assigned to this worker
 };
 
 
-
-
-IWorkUnitDistributorMaster* CreateWUDistributor_DefaultMaster()
+IWorkUnitDistributorMaster *CreateWUDistributor_DefaultMaster()
 {
 	return new CDistributor_DefaultMaster;
 }
-IWorkUnitDistributorWorker* CreateWUDistributor_DefaultWorker()
+IWorkUnitDistributorWorker *CreateWUDistributor_DefaultWorker()
 {
 	return new CDistributor_DefaultWorker;
 }

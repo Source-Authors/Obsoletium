@@ -11,37 +11,39 @@
 
 #include <atomic>
 
-namespace s1::launcher {
+namespace s1::launcher
+{
 
 // create file to dump out to
-class FileLogger {
- public:
-  FileLogger(ICommandLine *command_line, IFileSystem *file_system,
-             char (&base_directory)[MAX_PATH]);
+class FileLogger
+{
+public:
+	FileLogger( ICommandLine *command_line, IFileSystem *file_system,
+	            char ( &base_directory )[MAX_PATH] );
 
-  void Shutdown();
-  void LogAccess(const char *file_path, const char *options);
+	void Shutdown();
+	void LogAccess( const char *file_path, const char *options );
 
- private:
-  void Init();
-  void LogAllResources(const char *line);
+private:
+	void Init();
+	void LogAllResources( const char *line );
 
-  char current_dir_[MAX_PATH];
-  char base_dir_[MAX_PATH];
-  ICommandLine *command_line_;
-  IFileSystem *file_system_;
+	char          current_dir_[MAX_PATH];
+	char          base_dir_[MAX_PATH];
+	ICommandLine *command_line_;
+	IFileSystem  *file_system_;
 
-  FileHandle_t all_logs_file_;
-  std::atomic_bool is_active_;
+	FileHandle_t     all_logs_file_;
+	std::atomic_bool is_active_;
 
-  // File system calls LogAccess from multiple threads (async I/O).
-  CThreadFastMutex log_mutex_;
-  // persistent across restarts
-  CUtlRBTree<CUtlString, int> logged_tree_;
-  CUtlString resource_listing_dir_;
-  CUtlString full_game_path_;
+	// File system calls LogAccess from multiple threads (async I/O).
+	CThreadFastMutex log_mutex_;
+	// persistent across restarts
+	CUtlRBTree< CUtlString, int > logged_tree_;
+	CUtlString                    resource_listing_dir_;
+	CUtlString                    full_game_path_;
 };
 
-}  // namespace s1::launcher
+} // namespace s1::launcher
 
-#endif  // SE_LAUNCHER_FILE_LOGGER_H
+#endif // SE_LAUNCHER_FILE_LOGGER_H

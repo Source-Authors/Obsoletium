@@ -1,13 +1,12 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //=============================================================================//
 
 #include "tier1/strtools.h"
 #include "vmpi_browser_helpers.h"
-
 
 
 void FormatTimeString( unsigned long nInputSeconds, char *timeStr, int outLen )
@@ -37,7 +36,5 @@ void FormatTimeString( unsigned long nInputSeconds, char *timeStr, int outLen )
 	else
 	{
 		Q_snprintf( timeStr, outLen, "%d seconds", nSeconds );
-	}		
+	}
 }
-
-

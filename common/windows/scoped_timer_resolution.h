@@ -6,20 +6,21 @@
 #include <chrono>
 #include <sal.h>
 
-#pragma comment(lib, "WinMM.lib")
+#pragma comment( lib, "WinMM.lib" )
 
 #include "tier0/dbg.h"
 
 using MMRESULT = unsigned int;
 
-extern "C" {
+extern "C"
+{
+__declspec( dllimport ) MMRESULT __stdcall timeBeginPeriod( _In_ unsigned uPeriod );
+__declspec( dllimport ) MMRESULT __stdcall timeEndPeriod( _In_ unsigned uPeriod );
 
-__declspec(dllimport) MMRESULT __stdcall timeBeginPeriod(_In_ unsigned uPeriod);
-__declspec(dllimport) MMRESULT __stdcall timeEndPeriod(_In_ unsigned uPeriod);
+} // extern "C"
 
-}  // extern "C"
-
-namespace s1::win {
+namespace s1::win
+{
 
 // Changes minimum resolution for periodic timers and reverts back when
 // out of scope.
@@ -47,37 +48,44 @@ namespace s1::win {
 //
 // See
 // https://docs.microsoft.com/en-us/windows/win32/api/timeapi/nf-timeapi-timebeginperiod
-class ScopedTimerResolution {
- public:
-  // Changes minimum resolution for periodic timers.  |resolution_ms| Minimum
-  // timers resolution in milliseconds to request.
-  explicit ScopedTimerResolution(
-      std::chrono::milliseconds resolution_ms) noexcept
-      : new_resolution_{resolution_ms},
-        error_code_{
-            ::timeBeginPeriod(static_cast<unsigned>(resolution_ms.count()))} {
-    AssertMsg(!operator!(), "Unable to set windows timer resolution.");
-  }
+class ScopedTimerResolution
+{
+public:
+	// Changes minimum resolution for periodic timers.  |resolution_ms| Minimum
+	// timers resolution in milliseconds to request.
+	explicit ScopedTimerResolution(
+	std::chrono::milliseconds resolution_ms ) noexcept
+		:
+		new_resolution_{ resolution_ms },
+		error_code_{
+			::timeBeginPeriod( static_cast< unsigned >( resolution_ms.count() ) )
+		}
+	{
+		AssertMsg( !operator!(), "Unable to set windows timer resolution." );
+	}
 
-  // Restores previous minimum timer resolution.
-  ~ScopedTimerResolution() noexcept {
-    if (!operator!()) {
-      [[maybe_unused]] const bool is_ok{
-          ::timeEndPeriod(static_cast<unsigned>(new_resolution_.count())) == 0};
-      AssertMsg(is_ok, "Unable to restore windows timer resolution.");
-    }
-  }
+	// Restores previous minimum timer resolution.
+	~ScopedTimerResolution() noexcept
+	{
+		if ( !operator!() )
+		{
+			[[maybe_unused]] const bool is_ok{
+				::timeEndPeriod( static_cast< unsigned >( new_resolution_.count() ) ) == 0
+			};
+			AssertMsg( is_ok, "Unable to restore windows timer resolution." );
+		}
+	}
 
-  // Is set minimum timers resolution succeeded?
-  [[nodiscard]] bool operator!() const noexcept { return error_code_ != 0; }
+	// Is set minimum timers resolution succeeded?
+	[[nodiscard]] bool operator!() const noexcept { return error_code_ != 0; }
 
- private:
-  // New minimum timer resolution in ms.
-  std::chrono::milliseconds new_resolution_;
-  // Minimum timer resolution creation error_code.
-  unsigned error_code_;
+private:
+	// New minimum timer resolution in ms.
+	std::chrono::milliseconds new_resolution_;
+	// Minimum timer resolution creation error_code.
+	unsigned error_code_;
 };
 
-}  // namespace s1::win
+} // namespace s1::win
 
-#endif  // SE_COMMON_WINDOWS_SCOPED_TIMER_RESOLUTION_H_
+#endif // SE_COMMON_WINDOWS_SCOPED_TIMER_RESOLUTION_H_

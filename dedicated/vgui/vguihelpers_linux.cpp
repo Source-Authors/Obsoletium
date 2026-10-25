@@ -1,11 +1,11 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 //=============================================================================//
 #include "interface.h"
 
-bool InitializeVGui(CreateInterfaceFn *factorylist, int factorycount)
+bool InitializeVGui( CreateInterfaceFn *factorylist, int factorycount )
 {
 }
 
@@ -36,4 +36,3 @@ bool VGUIIsInConfig()
 void VGUIFinishedConfig()
 {
 }
-

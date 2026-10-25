@@ -14,186 +14,204 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-namespace {
+namespace
+{
 
-constexpr inline char kAllResourceListingName[]{"all.lst"};
-constexpr inline char kEngineResourceListingName[]{"engine.lst"};
+constexpr inline char kAllResourceListingName[]{ "all.lst" };
+constexpr inline char kEngineResourceListingName[]{ "engine.lst" };
 
-bool FilePathLess(CUtlString const& l, CUtlString const& r) {
-  return CaselessStringLessThan(l.Get(), r.Get());
+bool FilePathLess( CUtlString const &l, CUtlString const &r )
+{
+	return CaselessStringLessThan( l.Get(), r.Get() );
 }
 
-}  // namespace
+} // namespace
 
-namespace s1::launcher {
+namespace s1::launcher
+{
 
-FileLogger::FileLogger(ICommandLine* command_line, IFileSystem* file_system,
-                       char (&base_directory)[MAX_PATH])
-    : command_line_{command_line},
-      file_system_{file_system},
-      all_logs_file_(FILESYSTEM_INVALID_HANDLE),
-      is_active_(false),
-      logged_tree_(0, 0, FilePathLess) {
-  MEM_ALLOC_CREDIT();
+FileLogger::FileLogger( ICommandLine *command_line, IFileSystem *file_system,
+                        char ( &base_directory )[MAX_PATH] ) :
+	command_line_{ command_line },
+	file_system_{ file_system },
+	all_logs_file_( FILESYSTEM_INVALID_HANDLE ),
+	is_active_( false ),
+	logged_tree_( 0, 0, FilePathLess )
+{
+	MEM_ALLOC_CREDIT();
 
-  V_strcpy_safe(base_dir_, base_directory);
+	V_strcpy_safe( base_dir_, base_directory );
 
-  current_dir_[0] = '\0';
-  resource_listing_dir_ = "reslists";
+	current_dir_[0] = '\0';
+	resource_listing_dir_ = "reslists";
 
-  Init();
+	Init();
 }
 
-void FileLogger::Init() {
-  // Can't do this in edit mode
-  if (command_line_->HasParm("-edit") ||
-      !command_line_->HasParm("-makereslists")) {
-    return;
-  }
+void FileLogger::Init()
+{
+	// Can't do this in edit mode
+	if ( command_line_->HasParm( "-edit" ) ||
+	     !command_line_->HasParm( "-makereslists" ) )
+	{
+		return;
+	}
 
-  is_active_.store(true, std::memory_order::memory_order_relaxed);
+	is_active_.store( true, std::memory_order::memory_order_relaxed );
 
-  const char* resource_listing_dir{nullptr};
-  if (command_line_->CheckParm("-reslistdir", &resource_listing_dir) &&
-      resource_listing_dir) {
-    char override_dir[MAX_PATH];
-    V_strcpy_safe(override_dir, resource_listing_dir);
-    Q_StripTrailingSlash(override_dir);
+	const char *resource_listing_dir{ nullptr };
+	if ( command_line_->CheckParm( "-reslistdir", &resource_listing_dir ) &&
+	     resource_listing_dir )
+	{
+		char override_dir[MAX_PATH];
+		V_strcpy_safe( override_dir, resource_listing_dir );
+		Q_StripTrailingSlash( override_dir );
 
 #ifdef WIN32
-    Q_strlower(override_dir);
+		Q_strlower( override_dir );
 #endif
 
-    Q_FixSlashes(override_dir);
+		Q_FixSlashes( override_dir );
 
-    if (!Q_isempty(override_dir)) {
-      resource_listing_dir_ = override_dir;
-    }
-  }
+		if ( !Q_isempty( override_dir ) )
+		{
+			resource_listing_dir_ = override_dir;
+		}
+	}
 
-  // game directory has not been established yet, must derive ourselves
-  char path[MAX_PATH];
-  V_sprintf_safe(path, "%s/%s", base_dir_,
-                 command_line_->ParmValue("-game", "hl2"));
-  Q_FixSlashes(path);
+	// game directory has not been established yet, must derive ourselves
+	char path[MAX_PATH];
+	V_sprintf_safe( path, "%s/%s", base_dir_,
+	                command_line_->ParmValue( "-game", "hl2" ) );
+	Q_FixSlashes( path );
 
 #ifdef WIN32
-  Q_strlower(path);
+	Q_strlower( path );
 #endif
 
-  full_game_path_ = path;
+	full_game_path_ = path;
 
-  // create file to dump out to
-  char directory[MAX_PATH];
-  V_sprintf_safe(directory, "%s\\%s", full_game_path_.String(),
-                 resource_listing_dir_.String());
+	// create file to dump out to
+	char directory[MAX_PATH];
+	V_sprintf_safe( directory, "%s\\%s", full_game_path_.String(),
+	                resource_listing_dir_.String() );
 
-  file_system_->CreateDirHierarchy(directory, "GAME");
+	file_system_->CreateDirHierarchy( directory, "GAME" );
 
-  if (!command_line_->HasParm("-startmap") &&
-      !command_line_->HasParm("-startstage")) {
-    {
-      // dimhotepus: Threaded access.
-      AUTO_LOCK(log_mutex_);
+	if ( !command_line_->HasParm( "-startmap" ) &&
+	     !command_line_->HasParm( "-startstage" ) )
+	{
+		{
+			// dimhotepus: Threaded access.
+			AUTO_LOCK( log_mutex_ );
 
-      logged_tree_.RemoveAll();
-    }
+			logged_tree_.RemoveAll();
+		}
 
-    file_system_->RemoveFile(
-        CFmtStr("%s\\%s\\%s", full_game_path_.String(),
-                resource_listing_dir_.String(), kAllResourceListingName),
-        "GAME");
-  }
+		file_system_->RemoveFile(
+		CFmtStr( "%s\\%s\\%s", full_game_path_.String(),
+		         resource_listing_dir_.String(), kAllResourceListingName ),
+		"GAME" );
+	}
 
 #ifdef WIN32
-  ::GetCurrentDirectory(sizeof(current_dir_), current_dir_);
-  V_strcat_safe(current_dir_, "\\");
+	::GetCurrentDirectory( sizeof( current_dir_ ), current_dir_ );
+	V_strcat_safe( current_dir_, "\\" );
 
-  _strlwr(current_dir_);
+	_strlwr( current_dir_ );
 #else
-  getcwd(current_dir_, sizeof(current_dir_));
-  V_strcat_safe(current_dir_, "/");
+	getcwd( current_dir_, sizeof( current_dir_ ) );
+	V_strcat_safe( current_dir_, "/" );
 #endif
 
-  // Open for append
-  all_logs_file_ = file_system_->Open(
-      CFmtStr("%s\\%s\\%s", full_game_path_.String(),
-              resource_listing_dir_.String(), kAllResourceListingName),
-      "at", "GAME");
+	// Open for append
+	all_logs_file_ = file_system_->Open(
+	CFmtStr( "%s\\%s\\%s", full_game_path_.String(),
+	         resource_listing_dir_.String(), kAllResourceListingName ),
+	"at", "GAME" );
 }
 
-void FileLogger::Shutdown() {
-  if (!is_active_.load(std::memory_order::memory_order_acquire)) return;
+void FileLogger::Shutdown()
+{
+	if ( !is_active_.load( std::memory_order::memory_order_acquire ) )
+		return;
 
-  is_active_.store(false, std::memory_order::memory_order_release);
+	is_active_.store( false, std::memory_order::memory_order_release );
 
-  // Now load and sort all.lst
-  SortResourceListing(
-      file_system_,
-      CFmtStr("%s\\%s\\%s", full_game_path_.String(),
-              resource_listing_dir_.String(), kAllResourceListingName),
-      "GAME");
+	// Now load and sort all.lst
+	SortResourceListing(
+	file_system_,
+	CFmtStr( "%s\\%s\\%s", full_game_path_.String(),
+	         resource_listing_dir_.String(), kAllResourceListingName ),
+	"GAME" );
 
-  // Now load and sort engine.lst
-  SortResourceListing(
-      file_system_,
-      CFmtStr("%s\\%s\\%s", full_game_path_.String(),
-              resource_listing_dir_.String(), kEngineResourceListingName),
-      "GAME");
+	// Now load and sort engine.lst
+	SortResourceListing(
+	file_system_,
+	CFmtStr( "%s\\%s\\%s", full_game_path_.String(),
+	         resource_listing_dir_.String(), kEngineResourceListingName ),
+	"GAME" );
 
-  {
-    // dimhotepus: Threaded access.
-    AUTO_LOCK(log_mutex_);
+	{
+		// dimhotepus: Threaded access.
+		AUTO_LOCK( log_mutex_ );
 
-    logged_tree_.Purge();
+		logged_tree_.Purge();
 
-    if (all_logs_file_ != FILESYSTEM_INVALID_HANDLE) {
-      file_system_->Close(all_logs_file_);
-      all_logs_file_ = FILESYSTEM_INVALID_HANDLE;
-    }
-  }
+		if ( all_logs_file_ != FILESYSTEM_INVALID_HANDLE )
+		{
+			file_system_->Close( all_logs_file_ );
+			all_logs_file_ = FILESYSTEM_INVALID_HANDLE;
+		}
+	}
 }
 
-void FileLogger::LogAllResources(const char* line) {
-  if (all_logs_file_ != FILESYSTEM_INVALID_HANDLE) {
-    file_system_->Write("\"", 1, all_logs_file_);
-    file_system_->Write(line, static_cast<int>(Q_strlen(line)), all_logs_file_);
-    file_system_->Write("\"\n", 2, all_logs_file_);
-  }
+void FileLogger::LogAllResources( const char *line )
+{
+	if ( all_logs_file_ != FILESYSTEM_INVALID_HANDLE )
+	{
+		file_system_->Write( "\"", 1, all_logs_file_ );
+		file_system_->Write( line, static_cast< int >( Q_strlen( line ) ), all_logs_file_ );
+		file_system_->Write( "\"\n", 2, all_logs_file_ );
+	}
 }
 
-void FileLogger::LogAccess(const char* file_path, const char* options) {
-  if (!is_active_.load(std::memory_order::memory_order_acquire)) return;
+void FileLogger::LogAccess( const char *file_path, const char *options )
+{
+	if ( !is_active_.load( std::memory_order::memory_order_acquire ) )
+		return;
 
-  {
-    // dimhotepus: Threaded access.
-    AUTO_LOCK(log_mutex_);
+	{
+		// dimhotepus: Threaded access.
+		AUTO_LOCK( log_mutex_ );
 
-    // write out to log file
-    Assert(file_path[1] == ':');
+		// write out to log file
+		Assert( file_path[1] == ':' );
 
-    const auto idx = logged_tree_.Find(file_path);
-    if (idx != logged_tree_.InvalidIndex()) return;
+		const auto idx = logged_tree_.Find( file_path );
+		if ( idx != logged_tree_.InvalidIndex() )
+			return;
 
-    logged_tree_.Insert(file_path);
+		logged_tree_.Insert( file_path );
 
-    // make it relative to our root directory
-    const char* relative{Q_stristr(file_path, base_dir_)};
-    if (relative) {
-      relative += Q_strlen(base_dir_) + 1;
+		// make it relative to our root directory
+		const char *relative{ Q_stristr( file_path, base_dir_ ) };
+		if ( relative )
+		{
+			relative += Q_strlen( base_dir_ ) + 1;
 
-      char rel[MAX_PATH];
-      V_strcpy_safe(rel, relative);
+			char rel[MAX_PATH];
+			V_strcpy_safe( rel, relative );
 
 #ifdef WIN32
-      Q_strlower(rel);
+			Q_strlower( rel );
 #endif
 
-      Q_FixSlashes(rel);
+			Q_FixSlashes( rel );
 
-      LogAllResources(rel);
-    }
-  }
+			LogAllResources( rel );
+		}
+	}
 }
 
-}  // namespace s1::launcher
+} // namespace s1::launcher

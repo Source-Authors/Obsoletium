@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //=============================================================================//
@@ -12,11 +12,11 @@
 #endif
 
 
-#define MSGMGR_VERSION						52314
-#define MSGMGR_BROADCAST_PORT				22511
+#define MSGMGR_VERSION        52314
+#define MSGMGR_BROADCAST_PORT 22511
 
-#define MSGMGR_PACKETID_MSG					0
-#define MSGMGR_PACKETID_ANNOUNCE_PRESENCE	1	// followed by version # and port
+#define MSGMGR_PACKETID_MSG               0
+#define MSGMGR_PACKETID_ANNOUNCE_PRESENCE 1 // followed by version # and port
 
 
 // IMessageMgr provides a simple interface apps can use to generate output. Apps
@@ -24,16 +24,16 @@
 class IMessageMgr
 {
 public:
-	virtual bool	Init() = 0;
-	virtual void	Term() = 0;
+	virtual bool Init() = 0;
+	virtual void Term() = 0;
 
-	virtual void	Print( const char *pMsg ) = 0;
+	virtual void Print( const char *pMsg ) = 0;
 };
 
 
 // Get the message manager. It's a global singleton so this will always
 // return the same value (null if the manager can't initialize).
-IMessageMgr* GetMessageMgr();
+IMessageMgr *GetMessageMgr();
 
 
 #endif // MESSAGEMGR_H

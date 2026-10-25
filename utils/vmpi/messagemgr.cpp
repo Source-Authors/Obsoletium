@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //=============================================================================//
@@ -13,66 +13,59 @@
 #include "threadhelpers.h"
 
 
-#define MSGMGR_LISTEN_PORT_FIRST			22512
-#define MSGMGR_LISTEN_PORT_LAST				22520
+#define MSGMGR_LISTEN_PORT_FIRST 22512
+#define MSGMGR_LISTEN_PORT_LAST  22520
 
 
+#define BROADCAST_INTERVAL 2 // Broadcast our presence every N seconds.
 
-#define BROADCAST_INTERVAL	2	// Broadcast our presence every N seconds.
-
-#define NUM_QUEUED_MESSAGES	200
-
+#define NUM_QUEUED_MESSAGES 200
 
 
 class CMessageMgr : public IMessageMgr
 {
 public:
-					CMessageMgr();
-					~CMessageMgr();
+	CMessageMgr();
+	~CMessageMgr();
 
-	bool			Init();
-	void			Term();
+	bool Init();
+	void Term();
 
 
-// IMessageMgr overrides.
+	// IMessageMgr overrides.
 public:
-	
-	virtual void	Print( const char *pMsg );
+	virtual void Print( const char *pMsg );
 
 
 
 private:
-
-	DWORD				ThreadFn();
+	DWORD               ThreadFn();
 	static DWORD WINAPI StaticThreadFn( LPVOID pParameter );
 
 
 private:
-
 	// Only our thread touches this, NOT the main thread.
-	CUtlLinkedList<ITCPSocket*,int>	m_Sockets;
+	CUtlLinkedList< ITCPSocket *, int > m_Sockets;
 
-	HANDLE							m_hThread;
-	DWORD							m_dwThreadID;
+	HANDLE m_hThread;
+	DWORD  m_dwThreadID;
 
-	HANDLE							m_hExitObj;			// This is signalled when we want the thread to exit.
-	HANDLE							m_hExitResponseObj;	// The thread sets this when it exits.
-	
-	HANDLE							m_hMessageObj;		// This signals to the thread that there's a message to send.
-	HANDLE							m_hMessageSentObj;	// This signals back to the main thread that the message was sent.
-	const char						*m_pMessageText;	// The text to send.
+	HANDLE m_hExitObj;         // This is signalled when we want the thread to exit.
+	HANDLE m_hExitResponseObj; // The thread sets this when it exits.
+
+	HANDLE      m_hMessageObj;     // This signals to the thread that there's a message to send.
+	HANDLE      m_hMessageSentObj; // This signals back to the main thread that the message was sent.
+	const char *m_pMessageText;    // The text to send.
 
 	// This is only touched by the thread.
-	CUtlLinkedList<char*,int>		m_MessageQ;			// FIFO of NUM_QUEUED_MESSAGES.
+	CUtlLinkedList< char *, int > m_MessageQ; // FIFO of NUM_QUEUED_MESSAGES.
 
-	ITCPListenSocket				*m_pListenSocket;
-	int								m_iListenPort;
-	
-	ISocket							*m_pBroadcastSocket;
-	double							m_flLastBroadcast;
+	ITCPListenSocket *m_pListenSocket;
+	int               m_iListenPort;
 
+	ISocket *m_pBroadcastSocket;
+	double   m_flLastBroadcast;
 };
-
 
 
 CMessageMgr::CMessageMgr()
@@ -107,10 +100,10 @@ bool CMessageMgr::Init()
 	if ( !m_pBroadcastSocket->BindToAny( 0 ) )
 		return false;
 
-	
+
 	// Create the listen socket.
 	m_pListenSocket = NULL;
-	for ( m_iListenPort=MSGMGR_LISTEN_PORT_FIRST; m_iListenPort <= MSGMGR_LISTEN_PORT_LAST; m_iListenPort++ )
+	for ( m_iListenPort = MSGMGR_LISTEN_PORT_FIRST; m_iListenPort <= MSGMGR_LISTEN_PORT_LAST; m_iListenPort++ )
 	{
 		m_pListenSocket = CreateTCPListenSocket( m_iListenPort );
 		if ( m_pListenSocket )
@@ -122,13 +115,13 @@ bool CMessageMgr::Init()
 
 	// Create our broadcast/connection thread.
 	m_flLastBroadcast = 0;
-	m_hThread = CreateThread( 
-		NULL,
-		0,
-		&CMessageMgr::StaticThreadFn,
-		this,
-		0,
-		&m_dwThreadID );
+	m_hThread = CreateThread(
+	NULL,
+	0,
+	&CMessageMgr::StaticThreadFn,
+	this,
+	0,
+	&m_dwThreadID );
 
 	if ( !m_hThread )
 		return false;
@@ -149,7 +142,7 @@ void CMessageMgr::Term()
 			SetEvent( m_hExitObj );
 			WaitForSingleObject( m_hExitResponseObj, INFINITE );
 		}
-		
+
 		CloseHandle( m_hThread );
 		m_hThread = NULL;
 	}
@@ -199,16 +192,16 @@ DWORD CMessageMgr::ThreadFn()
 			// Broadcast our presence.
 			char msg[9];
 			msg[0] = MSGMGR_PACKETID_ANNOUNCE_PRESENCE;
-			*((int*)&msg[1]) = MSGMGR_VERSION;
-			*((int*)&msg[5]) = m_iListenPort;
+			*( (int *)&msg[1] ) = MSGMGR_VERSION;
+			*( (int *)&msg[5] ) = m_iListenPort;
 			m_pBroadcastSocket->Broadcast( msg, sizeof( msg ), MSGMGR_BROADCAST_PORT );
 
 			m_flLastBroadcast = flCurTime;
 		}
 
-		
+
 		// Accept new connections.
-		CIPAddr addr;
+		CIPAddr     addr;
 		ITCPSocket *pConn = m_pListenSocket->UpdateListen( &addr );
 		if ( pConn )
 		{
@@ -216,28 +209,28 @@ DWORD CMessageMgr::ThreadFn()
 			FOR_EACH_LL( m_MessageQ, iQ )
 			{
 				char *pMsg = m_MessageQ[iQ];
-				int bufLen = strlen( pMsg ) + 1;
-				
-				char packetID = MSGMGR_PACKETID_MSG;
+				int   bufLen = strlen( pMsg ) + 1;
+
+				char        packetID = MSGMGR_PACKETID_MSG;
 				const void *data[2] = { &packetID, pMsg };
-				int len[2] = { 1, bufLen };
+				int         len[2] = { 1, bufLen };
 
 				// Send it out to our sockets.
 				pConn->SendChunks( data, len, 2 );
-			}				
+			}
 
 			m_Sockets.AddToTail( pConn );
 		}
 
-		
+
 		// Should we exit?
-		HANDLE handles[2] = {m_hExitObj, m_hMessageObj};
-		DWORD ret = WaitForMultipleObjects( 2, handles, FALSE, 200 );
+		HANDLE handles[2] = { m_hExitObj, m_hMessageObj };
+		DWORD  ret = WaitForMultipleObjects( 2, handles, FALSE, 200 );
 		if ( ret == WAIT_OBJECT_0 )
 		{
 			break;
 		}
-		else if ( ret == (WAIT_OBJECT_0+1) )
+		else if ( ret == ( WAIT_OBJECT_0 + 1 ) )
 		{
 			// Add it to the queue.
 			int index;
@@ -251,11 +244,11 @@ DWORD CMessageMgr::ThreadFn()
 				index = m_MessageQ.AddToTail();
 			}
 			m_MessageQ[index] = V_strdup( m_pMessageText );
-			
+
 			// Ok, send out the message.
-			char packetID = MSGMGR_PACKETID_MSG;
+			char        packetID = MSGMGR_PACKETID_MSG;
 			const void *data[2] = { &packetID, m_pMessageText };
-			int len[2] = { 1, bufLen };
+			int         len[2] = { 1, bufLen };
 
 			// Send it out to our sockets.
 			FOR_EACH_LL( m_Sockets, i )
@@ -270,10 +263,10 @@ DWORD CMessageMgr::ThreadFn()
 
 	// Cleanup all our sockets (the main thread should never touch them).
 	FOR_EACH_LL( m_Sockets, i )
-		m_Sockets[i]->Release();
+	m_Sockets[i]->Release();
 
 	m_Sockets.Purge();
-	
+
 	m_MessageQ.PurgeAndDeleteElements();
 
 	SetEvent( m_hExitResponseObj );
@@ -283,14 +276,13 @@ DWORD CMessageMgr::ThreadFn()
 
 DWORD CMessageMgr::StaticThreadFn( LPVOID pParameter )
 {
-	return ((CMessageMgr*)pParameter)->ThreadFn();
+	return ( (CMessageMgr *)pParameter )->ThreadFn();
 }
 
 
 static CMessageMgr g_MessageMgr;
 
-IMessageMgr* GetMessageMgr()
+IMessageMgr *GetMessageMgr()
 {
 	return &g_MessageMgr;
 }
-

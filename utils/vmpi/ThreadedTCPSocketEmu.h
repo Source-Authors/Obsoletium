@@ -9,9 +9,9 @@
 
 // This creates a class that's based on IThreadedTCPSocket, but emulates the old
 // ITCPSocket interface.  This is used for stress-testing IThreadedTCPSocket.
-ITCPSocket* CreateTCPSocketEmu();
+ITCPSocket *CreateTCPSocketEmu();
 
-ITCPListenSocket* CreateTCPListenSocketEmu(const unsigned short port,
-                                           int nQueueLength = -1);
+ITCPListenSocket *CreateTCPListenSocketEmu( const unsigned short port,
+                                            int                  nQueueLength = -1 );
 
-#endif  // !SE_UTILS_VMPI_THREADEDTCPSOCKETEMU_H_
+#endif // !SE_UTILS_VMPI_THREADEDTCPSOCKETEMU_H_

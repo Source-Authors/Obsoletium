@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //
@@ -15,12 +15,11 @@
 class CSocketInfo
 {
 public:
-
 	bool IsValid()
 	{
 		return m_pSocket != 0;
 	}
-	
+
 	void Term();
 
 	void ThreadFn();
@@ -28,31 +27,30 @@ public:
 
 
 public:
-	ITCPSocket			*m_pSocket;
-	int					m_iListenPort;
+	ITCPSocket *m_pSocket;
+	int         m_iListenPort;
 
-	DWORD				m_CreateTime;		// When this socket was created.
-	DWORD				m_ExpireTime;
+	DWORD m_CreateTime; // When this socket was created.
+	DWORD m_ExpireTime;
 };
 
 
-
-CSocketInfo g_Infos[132];
-CRITICAL_SECTION g_CS, g_PrintCS;
-HANDLE g_hThreads[ ARRAYSIZE( g_Infos ) ];
-bool g_bShouldExit = false;
-CUtlLinkedList<int,int> g_ListenPorts;
+CSocketInfo                g_Infos[132];
+CRITICAL_SECTION           g_CS, g_PrintCS;
+HANDLE                     g_hThreads[ARRAYSIZE( g_Infos )];
+bool                       g_bShouldExit = false;
+CUtlLinkedList< int, int > g_ListenPorts;
 
 
 SpewRetval_t StressTestSpew( SpewType_t type, char const *pMsg )
 {
 	EnterCriticalSection( &g_PrintCS );
-		printf( "%s", pMsg );
+	printf( "%s", pMsg );
 	LeaveCriticalSection( &g_PrintCS );
 
-	if( type == SPEW_ASSERT )
+	if ( type == SPEW_ASSERT )
 		return SPEW_DEBUGGER;
-	else if( type == SPEW_ERROR )
+	else if ( type == SPEW_ERROR )
 		return SPEW_ABORT;
 	else
 		return SPEW_CONTINUE;
@@ -69,11 +67,11 @@ void CSocketInfo::Term()
 }
 
 
-CSocketInfo* FindOldestSocketInfo( CSocketInfo *pInfos, int nInfos )
+CSocketInfo *FindOldestSocketInfo( CSocketInfo *pInfos, int nInfos )
 {
-	int iOldest = 0;
+	int   iOldest = 0;
 	DWORD oldestTime = 0xFFFFFFFF;
-	for ( int i=0; i < nInfos; i++ )
+	for ( int i = 0; i < nInfos; i++ )
 	{
 		if ( !pInfos[i].IsValid() )
 			return &pInfos[i];
@@ -108,23 +106,23 @@ void CSocketInfo::ThreadFn()
 		if ( m_pSocket )
 		{
 			EnterCriticalSection( &g_CS );
-				if ( g_iNextExpire == -1 )
-				{
-					g_iNextExpire = iInfo;
-					LeaveCriticalSection( &g_CS );
+			if ( g_iNextExpire == -1 )
+			{
+				g_iNextExpire = iInfo;
+				LeaveCriticalSection( &g_CS );
 
-					Msg( "%02d: forcing an expire.\n", iInfo, m_iListenPort );
-					Sleep( 16000 );
-					
-					EnterCriticalSection( &g_CS );
-						g_iNextExpire = -1;
-				}
+				Msg( "%02d: forcing an expire.\n", iInfo, m_iListenPort );
+				Sleep( 16000 );
+
+				EnterCriticalSection( &g_CS );
+				g_iNextExpire = -1;
+			}
 			LeaveCriticalSection( &g_CS );
 
 			if ( m_pSocket->IsConnected() )
 			{
 				// Receive whatever data it has waiting for it.
-				CUtlVector<unsigned char> data;
+				CUtlVector< unsigned char > data;
 				while ( m_pSocket->Recv( data ) )
 				{
 					Msg( "%02d: recv %d.\n", iInfo, data.Count() );
@@ -145,22 +143,22 @@ void CSocketInfo::ThreadFn()
 		{
 			// Not initialized.. either listen or connect.
 			int iConnectPort = -1;
-			if ( rand() > VALVE_RAND_MAX/2 )
+			if ( rand() > VALVE_RAND_MAX / 2 )
 			{
 				if ( rand() % 100 < 50 )
 					Sleep( 500 );
 
 				EnterCriticalSection( &g_CS );
-					int iHead = g_ListenPorts.Head();
-					if ( iHead != g_ListenPorts.InvalidIndex() )
-						iConnectPort = g_ListenPorts[iHead];
-				LeaveCriticalSection( &g_CS );				
+				int iHead = g_ListenPorts.Head();
+				if ( iHead != g_ListenPorts.InvalidIndex() )
+					iConnectPort = g_ListenPorts[iHead];
+				LeaveCriticalSection( &g_CS );
 			}
 
 			if ( iConnectPort != -1 )
 			{
 				CIPAddr addr( 127, 0, 0, 1, iConnectPort );
-				
+
 				m_pSocket = CreateTCPSocket();
 				m_pSocket->BindToAny( 0 );
 				m_CreateTime = curTime;
@@ -172,9 +170,9 @@ void CSocketInfo::ThreadFn()
 			}
 			else
 			{
-				for ( int iTry=0; iTry < 32; iTry++ )
+				for ( int iTry = 0; iTry < 32; iTry++ )
 				{
-					m_iListenPort = 100 + rand() % (VALVE_RAND_MAX/2);
+					m_iListenPort = 100 + rand() % ( VALVE_RAND_MAX / 2 );
 					ITCPListenSocket *pListenSocket = CreateTCPListenSocket( m_iListenPort );
 					if ( pListenSocket )
 					{
@@ -182,7 +180,7 @@ void CSocketInfo::ThreadFn()
 
 						// Add us to the list of ports to connect to.
 						EnterCriticalSection( &g_CS );
-							g_ListenPorts.AddToTail( m_iListenPort );
+						g_ListenPorts.AddToTail( m_iListenPort );
 						LeaveCriticalSection( &g_CS );
 
 						// Listen for a connection.
@@ -191,7 +189,7 @@ void CSocketInfo::ThreadFn()
 
 						// Remove us from the list of ports to connect to.
 						EnterCriticalSection( &g_CS );
-							g_ListenPorts.Remove( g_ListenPorts.Find( m_iListenPort ) );
+						g_ListenPorts.Remove( g_ListenPorts.Find( m_iListenPort ) );
 						LeaveCriticalSection( &g_CS );
 
 						pListenSocket->Release();
@@ -217,7 +215,7 @@ void CSocketInfo::ThreadFn()
 
 DWORD WINAPI ThreadFn( LPVOID lpParameter )
 {
-	CSocketInfo *pInfo = (CSocketInfo*)lpParameter;
+	CSocketInfo *pInfo = (CSocketInfo *)lpParameter;
 	pInfo->ThreadFn();
 	return 0;
 }
@@ -229,7 +227,7 @@ void AllocError( unsigned long size )
 }
 
 
-int main(int argc, char* argv[])
+int main( int argc, char *argv[] )
 {
 	memset( g_Infos, 0, sizeof( g_Infos ) );
 	memset( g_hThreads, 0, sizeof( g_hThreads ) );
@@ -242,16 +240,16 @@ int main(int argc, char* argv[])
 
 	SetPriorityClass( GetCurrentProcess(), IDLE_PRIORITY_CLASS );
 
-	for ( int i=0; i < ARRAYSIZE( g_Infos ); i++ )
+	for ( int i = 0; i < ARRAYSIZE( g_Infos ); i++ )
 	{
 		DWORD dwThreadID = 0;
-		g_hThreads[i] = CreateThread( 
-			NULL, 
-			0,
-			ThreadFn,
-			&g_Infos[i],
-			0,
-			&dwThreadID );
+		g_hThreads[i] = CreateThread(
+		NULL,
+		0,
+		ThreadFn,
+		&g_Infos[i],
+		0,
+		&dwThreadID );
 	}
 
 
@@ -260,15 +258,14 @@ int main(int argc, char* argv[])
 	}
 
 	g_bShouldExit = true;
-	
-	HANDLE hZeroArray[ ARRAYSIZE( g_Infos ) ];
+
+	HANDLE hZeroArray[ARRAYSIZE( g_Infos )];
 	memset( hZeroArray, 0, sizeof( hZeroArray ) );
 
 	while ( memcmp( hZeroArray, g_hThreads, sizeof( hZeroArray ) ) != 0 )
 	{
 		Sleep( 10 );
 	}
-	
+
 	return 0;
 }
-

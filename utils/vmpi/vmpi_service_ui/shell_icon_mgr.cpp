@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //=============================================================================//
@@ -12,8 +12,7 @@
 #include "shellapi.h"
 
 
-#define SHELLICONMGR_CLASSNAME	"VMPI_ShellIconMgr"
-
+#define SHELLICONMGR_CLASSNAME "VMPI_ShellIconMgr"
 
 
 CShellIconMgr::CShellIconMgr()
@@ -32,18 +31,18 @@ CShellIconMgr::~CShellIconMgr()
 }
 
 
-bool CShellIconMgr::Init( 
-	IShellIconMgrHelper *pHelper, 
-	const char *pToolTip, 
-	int iCallbackMessage, 
-	int iIconResourceID )
+bool CShellIconMgr::Init(
+IShellIconMgrHelper *pHelper,
+const char          *pToolTip,
+int                  iCallbackMessage,
+int                  iIconResourceID )
 {
 	Term();
 
 	m_pHelper = pHelper;
 	m_iCallbackMessage = iCallbackMessage;
 	m_pToolTip = pToolTip;
-	
+
 	// Create the window class.
 	WNDCLASS wndclass;
 	memset( &wndclass, 0, sizeof( wndclass ) );
@@ -66,15 +65,15 @@ bool CShellIconMgr::Init(
 
 	// Create the window.
 	m_hWnd = CreateWindow(
-		SHELLICONMGR_CLASSNAME,
-		SHELLICONMGR_CLASSNAME,
-		WS_DISABLED,	// we only want shell notify messages
-		0, 0, 0, 0,		// position
-		NULL,			// parent
-		NULL,			// menu
-		pHelper->GetHInstance(),	// hInstance
-		this			// lpParam
-		);
+	SHELLICONMGR_CLASSNAME,
+	SHELLICONMGR_CLASSNAME,
+	WS_DISABLED,             // we only want shell notify messages
+	0, 0, 0, 0,              // position
+	NULL,                    // parent
+	NULL,                    // menu
+	pHelper->GetHInstance(), // hInstance
+	this                     // lpParam
+	);
 	if ( !m_hWnd )
 	{
 		Assert( false );
@@ -110,7 +109,7 @@ void CShellIconMgr::Term()
 		data.cbSize = sizeof( data );
 		data.hWnd = m_hWnd;
 		Shell_NotifyIcon( NIM_DELETE, &data );
-		
+
 		DestroyWindow( m_hWnd );
 		m_hWnd = NULL;
 	}
@@ -120,15 +119,15 @@ void CShellIconMgr::Term()
 void CShellIconMgr::ChangeIcon( int iIconResourceID )
 {
 	NOTIFYICONDATA data;
-	
+
 	memset( &data, 0, sizeof( data ) );
 	data.cbSize = sizeof( data );
 	data.uFlags = NIF_ICON;
 	data.hWnd = m_hWnd;
 	data.hIcon = LoadIcon( m_pHelper->GetHInstance(), MAKEINTRESOURCE( iIconResourceID ) );
-	
+
 	Shell_NotifyIcon( NIM_MODIFY, &data );
-	
+
 	m_iCurIconResourceID = iIconResourceID;
 }
 
@@ -137,7 +136,7 @@ void CShellIconMgr::CreateTrayIcon()
 {
 	// Now create the shell icon.
 	NOTIFYICONDATA data;
-	
+
 	memset( &data, 0, sizeof( data ) );
 	data.cbSize = sizeof( data );
 	data.uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE;
@@ -168,13 +167,13 @@ LRESULT CShellIconMgr::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
 
 
 LRESULT CShellIconMgr::StaticWindowProc(
-	HWND hwnd,      // handle to window
-	UINT uMsg,      // message identifier
-	WPARAM wParam,  // first message parameter
-	LPARAM lParam   // second message parameter
-	)
+HWND   hwnd,   // handle to window
+UINT   uMsg,   // message identifier
+WPARAM wParam, // first message parameter
+LPARAM lParam  // second message parameter
+)
 {
-	CShellIconMgr *pMgr = (CShellIconMgr*)GetWindowLong( hwnd, GWL_USERDATA );
+	CShellIconMgr *pMgr = (CShellIconMgr *)GetWindowLong( hwnd, GWL_USERDATA );
 	if ( pMgr )
 	{
 		return pMgr->WindowProc( hwnd, uMsg, wParam, lParam );
@@ -184,4 +183,3 @@ LRESULT CShellIconMgr::StaticWindowProc(
 		return DefWindowProc( hwnd, uMsg, wParam, lParam );
 	}
 }
-

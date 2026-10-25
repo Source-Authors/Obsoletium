@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //
@@ -20,9 +20,8 @@ CCriticalSection g_MsgCS;
 IThreadedTCPSocket *g_pClientSocket = NULL;
 IThreadedTCPSocket *g_pServerSocket = NULL;
 
-CEvent g_ClientPacketEvent;
-CUtlVector<char> g_ClientPacket;
-
+CEvent             g_ClientPacketEvent;
+CUtlVector< char > g_ClientPacket;
 
 
 SpewRetval_t MySpewFunc( SpewType_t type, char const *pMsg )
@@ -30,14 +29,14 @@ SpewRetval_t MySpewFunc( SpewType_t type, char const *pMsg )
 	CCriticalSectionLock csLock( &g_MsgCS );
 	csLock.Lock();
 
-		printf( "%s", pMsg );
-		OutputDebugString( pMsg );
+	printf( "%s", pMsg );
+	OutputDebugString( pMsg );
 
-	csLock.Unlock();	
+	csLock.Unlock();
 
-	if( type == SPEW_ASSERT )
+	if ( type == SPEW_ASSERT )
 		return SPEW_DEBUGGER;
-	else if( type == SPEW_ERROR )
+	else if ( type == SPEW_ERROR )
 		return SPEW_ABORT;
 	else
 		return SPEW_CONTINUE;
@@ -50,7 +49,7 @@ public:
 	virtual void Init( IThreadedTCPSocket *pSocket )
 	{
 	}
-	
+
 	virtual void OnPacketReceived( CTCPPacket *pPacket )
 	{
 		// Echo the data back.
@@ -65,19 +64,18 @@ public:
 };
 
 
-
 class CHandler_Client : public ITCPSocketHandler
 {
 public:
 	virtual void Init( IThreadedTCPSocket *pSocket )
 	{
 	}
-	
+
 	virtual void OnPacketReceived( CTCPPacket *pPacket )
 	{
 		if ( g_ClientPacket.Count() < pPacket->GetLen() )
 			g_ClientPacket.SetSize( pPacket->GetLen() );
-		
+
 		memcpy( g_ClientPacket.Base(), pPacket->GetData(), pPacket->GetLen() );
 		g_ClientPacketEvent.SetEvent();
 		pPacket->Release();
@@ -90,11 +88,10 @@ public:
 };
 
 
-
 class CHandlerCreator_Server : public IHandlerCreator
 {
 public:
-	virtual ITCPSocketHandler* CreateNewHandler()
+	virtual ITCPSocketHandler *CreateNewHandler()
 	{
 		return new CHandler_Server;
 	}
@@ -103,15 +100,14 @@ public:
 class CHandlerCreator_Client : public IHandlerCreator
 {
 public:
-	virtual ITCPSocketHandler* CreateNewHandler()
+	virtual ITCPSocketHandler *CreateNewHandler()
 	{
 		return new CHandler_Client;
 	}
 };
 
 
-
-int main(int argc, char* argv[])
+int main( int argc, char *argv[] )
 {
 	SpewOutputFunc( MySpewFunc );
 
@@ -125,22 +121,22 @@ int main(int argc, char* argv[])
 
 	g_ClientPacketEvent.Init( false, false );
 
-	
+
 	// Setup the "server".
 	CHandlerCreator_Server serverHandler;
-	CIPAddr addr( 127, 0, 0, 1, iPort );
+	CIPAddr                addr( 127, 0, 0, 1, iPort );
 
-	ITCPConnectSocket *pListener = ThreadedTCP_CreateListener( 
-		&serverHandler,
-		(unsigned short)iPort );
+	ITCPConnectSocket *pListener = ThreadedTCP_CreateListener(
+	&serverHandler,
+	(unsigned short)iPort );
 
-	
+
 	// Setup the "client".
 	CHandlerCreator_Client clientCreator;
-	ITCPConnectSocket *pConnector = ThreadedTCP_CreateConnector( 
-		CIPAddr( 127, 0, 0, 1, iPort ),
-		CIPAddr(),
-		&clientCreator );
+	ITCPConnectSocket     *pConnector = ThreadedTCP_CreateConnector(
+	CIPAddr( 127, 0, 0, 1, iPort ),
+	CIPAddr(),
+	&clientCreator );
 
 
 	// Wait for them to connect.
@@ -163,16 +159,16 @@ int main(int argc, char* argv[])
 
 
 	// Send some data.
-	__int64 totalBytes = 0;
+	__int64     totalBytes = 0;
 	CCycleCount startTime;
-	int iPacket = 1;
+	int         iPacket = 1;
 
 	startTime.Sample();
-	CUtlVector<char> buf;
+	CUtlVector< char > buf;
 
-	while ( (GetAsyncKeyState( VK_SHIFT ) & 0x8000) == 0 )
+	while ( ( GetAsyncKeyState( VK_SHIFT ) & 0x8000 ) == 0 )
 	{
-		int size = randomStream.RandomInt( 1024*0, 1024*320 );
+		int size = randomStream.RandomInt( 1024 * 0, 1024 * 320 );
 		if ( buf.Count() < size )
 			buf.SetSize( size );
 
@@ -187,12 +183,11 @@ int main(int argc, char* argv[])
 			curTime.Sample();
 			CCycleCount::Sub( curTime, startTime, elapsed );
 			double flSeconds = elapsed.GetSeconds();
-			Msg( "Packet %d, %d bytes, %dk/sec\n", iPacket++, size, (int)(((totalBytes+511)/1024) / flSeconds) );
+			Msg( "Packet %d, %d bytes, %dk/sec\n", iPacket++, size, (int)( ( ( totalBytes + 511 ) / 1024 ) / flSeconds ) );
 		}
 	}
-	
+
 	g_pClientSocket->Release();
 	g_pServerSocket->Release();
 	return 0;
 }
-

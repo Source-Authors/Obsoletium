@@ -3,32 +3,34 @@
 #ifndef SE_DEDICATED_CONSOLE_TEXT_CONSOLE_H_
 #define SE_DEDICATED_CONSOLE_TEXT_CONSOLE_H_
 
-namespace s1::dedicated {
+namespace s1::dedicated
+{
 
-class CTextConsole {
- public:
-  CTextConsole() = default;
-  virtual ~CTextConsole()= default;
+class CTextConsole
+{
+public:
+	CTextConsole() = default;
+	virtual ~CTextConsole() = default;
 
-  virtual bool Init();
-  virtual void ShutDown() = 0;
-  virtual void Print(const char *pszMsg) = 0;
+	virtual bool Init();
+	virtual void ShutDown() = 0;
+	virtual void Print( const char *pszMsg ) = 0;
 
-  virtual void SetTitle(const char *pszTitle) = 0;
-  virtual void SetStatusLine(const char *pszStatus) = 0;
-  virtual void UpdateStatus() = 0;
+	virtual void SetTitle( const char *pszTitle ) = 0;
+	virtual void SetStatusLine( const char *pszStatus ) = 0;
+	virtual void UpdateStatus() = 0;
 
-  // Must be provided by children
-  virtual char *GetLine(int index, char *buf, size_t buflen) = 0;
-  virtual int GetWidth() = 0;
+	// Must be provided by children
+	virtual char *GetLine( int index, char *buf, size_t buflen ) = 0;
+	virtual int   GetWidth() = 0;
 
-  virtual void SetVisible(bool visible) { m_ConsoleVisible = visible; }
-  virtual bool IsVisible() { return m_ConsoleVisible; }
+	virtual void SetVisible( bool visible ) { m_ConsoleVisible = visible; }
+	virtual bool IsVisible() { return m_ConsoleVisible; }
 
- protected:
-  bool m_ConsoleVisible{true};
+protected:
+	bool m_ConsoleVisible{ true };
 };
 
-}  // namespace s1::dedicated
+} // namespace s1::dedicated
 
-#endif  // !SE_DEDICATED_CONSOLE_TEXT_CONSOLE_H_
+#endif // !SE_DEDICATED_CONSOLE_TEXT_CONSOLE_H_

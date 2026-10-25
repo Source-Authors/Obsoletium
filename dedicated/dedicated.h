@@ -19,53 +19,61 @@ class IDedicatedServerAPI;
 #define DEDICATED_BASECLASS CVguiSteamApp
 #endif
 
-namespace s1::dedicated {
+namespace s1::dedicated
+{
 
 /**
  * @brief Initialize, shutdown main systems, load Steam to.
  */
-class DedicatedAppSystemGroup : public DEDICATED_BASECLASS {
-  using BaseClass = DEDICATED_BASECLASS;
+class DedicatedAppSystemGroup : public DEDICATED_BASECLASS
+{
+	using BaseClass = DEDICATED_BASECLASS;
 
- public:
-  DedicatedAppSystemGroup(ISystem *system, ICommandLine *command_line,
-                          bool is_console_mode)
-      : system_{system},
-        command_line_{command_line},
-        is_console_mode_{is_console_mode} {}
+public:
+	DedicatedAppSystemGroup( ISystem *system, ICommandLine *command_line,
+	                         bool is_console_mode ) :
+		system_{ system },
+		command_line_{ command_line },
+		is_console_mode_{ is_console_mode }
+	{
+	}
 
-  bool Create() override;
-  bool PreInit() override;
-  int Main() override;
-  void PostShutdown() override;
-  void Destroy() override;
+	bool Create() override;
+	bool PreInit() override;
+	int  Main() override;
+	void PostShutdown() override;
+	void Destroy() override;
 
-  // Used to chain to base class
-  AppModule_t LoadModule(CreateInterfaceFn factory) {
-    return CSteamAppSystemGroup::LoadModule(factory);
-  }
+	// Used to chain to base class
+	AppModule_t LoadModule( CreateInterfaceFn factory )
+	{
+		return CSteamAppSystemGroup::LoadModule( factory );
+	}
 
-  // Method to add various global singleton systems
-  bool AddSystems(AppSystemInfo_t *systems) {
-    return CSteamAppSystemGroup::AddSystems(systems);
-  }
+	// Method to add various global singleton systems
+	bool AddSystems( AppSystemInfo_t *systems )
+	{
+		return CSteamAppSystemGroup::AddSystems( systems );
+	}
 
-  void *FindSystem(const char *interface_name) {
-    return CSteamAppSystemGroup::FindSystem(interface_name);
-  }
+	void *FindSystem( const char *interface_name )
+	{
+		return CSteamAppSystemGroup::FindSystem( interface_name );
+	}
 
-  template <typename TSystem>
-  TSystem *FindSystem(const char *interface_name) {
-    return CSteamAppSystemGroup::FindSystem<TSystem>(interface_name);
-  }
+	template< typename TSystem >
+	TSystem *FindSystem( const char *interface_name )
+	{
+		return CSteamAppSystemGroup::FindSystem< TSystem >( interface_name );
+	}
 
- private:
-  ISystem *system_;
-  ICommandLine *command_line_;
-  IDedicatedServerAPI *api_{nullptr};
-  const bool is_console_mode_;
+private:
+	ISystem             *system_;
+	ICommandLine        *command_line_;
+	IDedicatedServerAPI *api_{ nullptr };
+	const bool           is_console_mode_;
 };
 
-}  // namespace s1::dedicated
+} // namespace s1::dedicated
 
-#endif  // SE_DEDICATED_DEDICATED_H_
+#endif // SE_DEDICATED_DEDICATED_H_

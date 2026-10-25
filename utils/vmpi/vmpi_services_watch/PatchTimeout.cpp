@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //
@@ -21,28 +21,28 @@ static char THIS_FILE[] = __FILE__;
 // CPatchTimeout dialog
 
 
-CPatchTimeout::CPatchTimeout(CWnd* pParent /*=NULL*/)
-	: CDialog(CPatchTimeout::IDD, pParent)
+CPatchTimeout::CPatchTimeout( CWnd *pParent /*=NULL*/ ) :
+	CDialog( CPatchTimeout::IDD, pParent )
 {
 	//{{AFX_DATA_INIT(CPatchTimeout)
 	//}}AFX_DATA_INIT
 }
 
 
-void CPatchTimeout::DoDataExchange(CDataExchange* pDX)
+void CPatchTimeout::DoDataExchange( CDataExchange *pDX )
 {
-	CDialog::DoDataExchange(pDX);
+	CDialog::DoDataExchange( pDX );
 	//{{AFX_DATA_MAP(CPatchTimeout)
-	DDX_Text(pDX, IDC_COMMAND_LINE, m_PatchDirectory);
-	DDX_Text(pDX, IDC_VMPI_TRANSFER_DIRECTORY, m_VMPITransferDirectory);
-	DDX_Check(pDX, IDC_FORCE_PATCH, m_bForcePatch);
+	DDX_Text( pDX, IDC_COMMAND_LINE, m_PatchDirectory );
+	DDX_Text( pDX, IDC_VMPI_TRANSFER_DIRECTORY, m_VMPITransferDirectory );
+	DDX_Check( pDX, IDC_FORCE_PATCH, m_bForcePatch );
 	//}}AFX_DATA_MAP
 }
 
 
-BEGIN_MESSAGE_MAP(CPatchTimeout, CDialog)
+BEGIN_MESSAGE_MAP( CPatchTimeout, CDialog )
 	//{{AFX_MSG_MAP(CPatchTimeout)
-		// NOTE: the ClassWizard will add message map macros here
+	// NOTE: the ClassWizard will add message map macros here
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 

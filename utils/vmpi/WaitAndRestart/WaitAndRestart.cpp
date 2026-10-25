@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //
@@ -16,15 +16,15 @@
 void PrintLog( const char *pMsg, ... )
 {
 #ifdef VMPI_SERVICE_LOGS
-	char str[4096];
+	char    str[4096];
 	va_list marker;
-	
+
 	va_start( marker, pMsg );
 	_vsnprintf( str, sizeof( str ), pMsg, marker );
 	va_end( marker );
-	
+
 	printf( "%s", str );
-	
+
 	static FILE *fp = fopen( "c:\\vmpi_WaitAndRestart.log", "wt" );
 	if ( fp )
 	{
@@ -35,23 +35,23 @@ void PrintLog( const char *pMsg, ... )
 }
 
 
-char* GetLastErrorString()
+char *GetLastErrorString()
 {
 	static char err[2048];
-	
+
 	LPVOID lpMsgBuf;
-	FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL );
-	strncpy( err, (char*)lpMsgBuf, sizeof( err ) );
+	FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, GetLastError(), MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ), (LPTSTR)&lpMsgBuf, 0, NULL );
+	strncpy( err, (char *)lpMsgBuf, sizeof( err ) );
 	LocalFree( lpMsgBuf );
 
-	err[ sizeof( err ) - 1 ] = 0;
+	err[sizeof( err ) - 1] = 0;
 	return err;
 }
 
 
-int main( int argc, char* argv[] )
+int main( int argc, char *argv[] )
 {
-Sleep(5000);
+	Sleep( 5000 );
 	if ( argc < 4 )
 	{
 		PrintLog( "WaitAndRestart <seconds to wait> <working directory> command line...\n" );
@@ -63,16 +63,16 @@ Sleep(5000);
 
 	const char *pTimeToWait = argv[1];
 	const char *pWorkingDir = argv[2];
-	
+
 	// If a * precedes the time-to-wait arg, then it's a process ID and we wait for that process to exit.
 	if ( pTimeToWait[0] == '*' )
 	{
 		++pTimeToWait;
 		DWORD dwProcessId;
 		sscanf( pTimeToWait, "%lu", &dwProcessId );
-		
+
 		PrintLog( "Waiting for process %lu to exit. Press a key to cancel...\n", dwProcessId );
-		
+
 		HANDLE hProcess = OpenProcess( PROCESS_QUERY_INFORMATION | SYNCHRONIZE, false, dwProcessId );
 		if ( hProcess )
 		{
@@ -105,34 +105,34 @@ Sleep(5000);
 	else
 	{
 		DWORD timeToWait = (DWORD)atoi( argv[1] );
-		
+
 		PrintLog( "\n\nWaiting for %d seconds to launch ' ", timeToWait );
 		PrintLog( "%s> ", pWorkingDir );
-		for ( int i=3; i < argc; i++ )
+		for ( int i = 3; i < argc; i++ )
 		{
 			PrintLog( "%s ", argv[i] );
 		}
 		PrintLog( "'\n\nPress a key to cancel... " );
 
 		DWORD startTime = GetTickCount();
-		while ( GetTickCount() - startTime < (timeToWait*1000) )
+		while ( GetTickCount() - startTime < ( timeToWait * 1000 ) )
 		{
 			if ( kbhit() )
 				return 2;
-			
+
 			Sleep( 100 );
 		}
 	}
 
 	// Ok, launch it!
-	char commandLine[1024] = {0};
-	for ( int i=3; i < argc; i++ )
+	char commandLine[1024] = { 0 };
+	for ( int i = 3; i < argc; i++ )
 	{
 		Q_strncat( commandLine, "\"", sizeof( commandLine ), COPY_ALL_CHARACTERS );
 		Q_strncat( commandLine, argv[i], sizeof( commandLine ), COPY_ALL_CHARACTERS );
 		Q_strncat( commandLine, "\" ", sizeof( commandLine ), COPY_ALL_CHARACTERS );
 	}
-	
+
 	STARTUPINFO si;
 	memset( &si, 0, sizeof( si ) );
 	si.cb = sizeof( si );
@@ -140,17 +140,17 @@ Sleep(5000);
 	PROCESS_INFORMATION pi;
 	memset( &pi, 0, sizeof( pi ) );
 
-	if ( CreateProcess( 
-		NULL, 
-		commandLine, 
-		NULL,						// security
-		NULL,
-		FALSE,
-		0,							// flags
-		NULL,						// environment
-		pWorkingDir,						// current directory
-		&si,
-		&pi ) )
+	if ( CreateProcess(
+		 NULL,
+		 commandLine,
+		 NULL, // security
+		 NULL,
+		 FALSE,
+		 0,           // flags
+		 NULL,        // environment
+		 pWorkingDir, // current directory
+		 &si,
+		 &pi ) )
 	{
 		RunCodeAtScopeExit( CloseHandle( pi.hThread ) );
 		RunCodeAtScopeExit( CloseHandle( pi.hProcess ) );
@@ -164,4 +164,3 @@ Sleep(5000);
 
 	return 0;
 }
-

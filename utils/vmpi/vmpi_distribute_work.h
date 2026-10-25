@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 //=============================================================================//
 
@@ -51,15 +51,14 @@ extern IWorkUnitDistributorCallbacks *g_pDistributeWorkCallbacks;
 
 // You must append data to pBuf with the work unit results.
 // Note: pBuf will be NULL if this is a local thread doing work on the master.
-typedef void (*ProcessWorkUnitFn)( int iThread, uint64 iWorkUnit, MessageBuffer *pBuf );
+typedef void ( *ProcessWorkUnitFn )( int iThread, uint64 iWorkUnit, MessageBuffer *pBuf );
 
 // pBuf is ready to read the results written to the buffer in ProcessWorkUnitFn.
-typedef void (*ReceiveWorkUnitFn)( uint64 iWorkUnit, MessageBuffer *pBuf, int iWorker );
+typedef void ( *ReceiveWorkUnitFn )( uint64 iWorkUnit, MessageBuffer *pBuf, int iWorker );
 
 
 // Use a CDispatchReg to register this function with whatever packet ID you give to DistributeWork.
 bool DistributeWorkDispatch( MessageBuffer *pBuf, int iSource, int iPacketID );
-
 
 
 // This is the function vrad and vvis use to divide the work units and send them out.
@@ -72,13 +71,13 @@ bool DistributeWorkDispatch( MessageBuffer *pBuf, int iSource, int iPacketID );
 // The masters implement receiveFn to receive a work unit's results.
 //
 // Returns time it took to finish the work.
-double DistributeWork( 
-	uint64 nWorkUnits,				// how many work units to dole out
-	char cPacketID,					// This packet ID must be reserved for DistributeWork and DistributeWorkDispatch
-									// must be registered with it.
-	ProcessWorkUnitFn processFn,	// workers implement this to process a work unit and send results back
-	ReceiveWorkUnitFn receiveFn		// the master implements this to receive a work unit
-	);
+double DistributeWork(
+uint64 nWorkUnits,           // how many work units to dole out
+char   cPacketID,            // This packet ID must be reserved for DistributeWork and DistributeWorkDispatch
+							 // must be registered with it.
+ProcessWorkUnitFn processFn, // workers implement this to process a work unit and send results back
+ReceiveWorkUnitFn receiveFn  // the master implements this to receive a work unit
+);
 
 
 // VMPI calls this before shutting down because any threads that DistributeWork has running must stop,

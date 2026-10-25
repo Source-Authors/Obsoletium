@@ -1,11 +1,11 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //
 //=============================================================================//
-#if !defined(AFX_SERVICEINSTALLDLG_H__761BDEEF_D549_4F10_817C_1C1FAF9FCA47__INCLUDED_)
+#if !defined( AFX_SERVICEINSTALLDLG_H__761BDEEF_D549_4F10_817C_1C1FAF9FCA47__INCLUDED_ )
 #define AFX_SERVICEINSTALLDLG_H__761BDEEF_D549_4F10_817C_1C1FAF9FCA47__INCLUDED_
 
 #if _MSC_VER > 1000
@@ -19,37 +19,38 @@
 #include "tier1/utlvector.h"
 
 
-
 /////////////////////////////////////////////////////////////////////////////
 // CJobWatchDlg dialog
 
 class CServiceInstallDlg : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CServiceInstallDlg( CWnd* pParent = NULL);   // standard constructor
+	CServiceInstallDlg( CWnd *pParent = NULL ); // standard constructor
 	virtual ~CServiceInstallDlg();
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CJobWatchDlg)
-	enum { IDD = IDD_SERVICE_INSTALL_DIALOG};
+	enum
+	{
+		IDD = IDD_SERVICE_INSTALL_DIALOG
+	};
 	//}}AFX_DATA
 
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CJobWatchDlg)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange( CDataExchange *pDX ); // DDX/DDV support
+													   //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	SC_HANDLE m_hSCManager;
-	
+
 	void VerifyInstallFiles();
-	
+
 	bool DoStartExisting();
 	bool NukeDirectory( const char *pDir, char errorFile[MAX_PATH] );
 	bool DoUninstall( bool bShowMessage );

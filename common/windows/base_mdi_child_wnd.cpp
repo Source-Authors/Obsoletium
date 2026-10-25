@@ -8,30 +8,34 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-IMPLEMENT_DYNCREATE(CBaseMDIChildWnd, CMDIChildWnd)
+IMPLEMENT_DYNCREATE( CBaseMDIChildWnd, CMDIChildWnd )
 
-BEGIN_MESSAGE_MAP(CBaseMDIChildWnd, CMDIChildWnd)
-  ON_WM_CREATE()
-  ON_WM_DESTROY()
-  ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
+BEGIN_MESSAGE_MAP( CBaseMDIChildWnd, CMDIChildWnd )
+	ON_WM_CREATE()
+	ON_WM_DESTROY()
+	ON_MESSAGE( WM_DPICHANGED, OnDpiChanged )
 END_MESSAGE_MAP()
 
 CBaseMDIChildWnd::CBaseMDIChildWnd() = default;
 
-int CBaseMDIChildWnd::OnCreate(LPCREATESTRUCT lpCreateStruct) {
-  const int rc{__super::OnCreate(lpCreateStruct)};
-  if (!rc) {
-    m_dpi_behavior.OnCreateWindow(m_hWnd);
-  }
-  return rc;
+int CBaseMDIChildWnd::OnCreate( LPCREATESTRUCT lpCreateStruct )
+{
+	const int rc{ __super::OnCreate( lpCreateStruct ) };
+	if ( !rc )
+	{
+		m_dpi_behavior.OnCreateWindow( m_hWnd );
+	}
+	return rc;
 }
 
-void CBaseMDIChildWnd::OnDestroy() {
-  m_dpi_behavior.OnDestroyWindow();
+void CBaseMDIChildWnd::OnDestroy()
+{
+	m_dpi_behavior.OnDestroyWindow();
 
-  __super::OnDestroy();
+	__super::OnDestroy();
 }
 
-LRESULT CBaseMDIChildWnd::OnDpiChanged(WPARAM wParam, LPARAM lParam) {
-  return m_dpi_behavior.OnWindowDpiChanged(wParam, lParam);
+LRESULT CBaseMDIChildWnd::OnDpiChanged( WPARAM wParam, LPARAM lParam )
+{
+	return m_dpi_behavior.OnWindowDpiChanged( wParam, lParam );
 }

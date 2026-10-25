@@ -15,51 +15,55 @@
 // --------------------------------------------------------------------------------
 // //
 
-CCriticalSection::CCriticalSection(unsigned spin_before_lock) {
-  Assert(sizeof(CRITICAL_SECTION) == SIZEOF_CS);
+CCriticalSection::CCriticalSection( unsigned spin_before_lock )
+{
+	Assert( sizeof( CRITICAL_SECTION ) == SIZEOF_CS );
 
-#if !defined(NDEBUG)
-  (void)InitializeCriticalSectionAndSpinCount(
-      (CRITICAL_SECTION*)&m_DeadlockProtect, spin_before_lock);
+#if !defined( NDEBUG )
+	(void)InitializeCriticalSectionAndSpinCount(
+	(CRITICAL_SECTION *)&m_DeadlockProtect, spin_before_lock );
 #endif
 
-  (void)InitializeCriticalSectionAndSpinCount((CRITICAL_SECTION*)&m_CS,
-                                              spin_before_lock);
+	(void)InitializeCriticalSectionAndSpinCount( (CRITICAL_SECTION *)&m_CS,
+	                                             spin_before_lock );
 }
 
-CCriticalSection::~CCriticalSection() {
-  DeleteCriticalSection((CRITICAL_SECTION*)&m_CS);
+CCriticalSection::~CCriticalSection()
+{
+	DeleteCriticalSection( (CRITICAL_SECTION *)&m_CS );
 
-#if !defined(NDEBUG)
-  DeleteCriticalSection((CRITICAL_SECTION*)&m_DeadlockProtect);
+#if !defined( NDEBUG )
+	DeleteCriticalSection( (CRITICAL_SECTION *)&m_DeadlockProtect );
 #endif
 }
 
-void CCriticalSection::Lock() {
-#if !defined(NDEBUG)
-  // Check if this one is already locked.
-  DWORD id = GetCurrentThreadId();
-  EnterCriticalSection((CRITICAL_SECTION*)&m_DeadlockProtect);
-  Assert(m_Locks.Find(id) == m_Locks.InvalidIndex());
-  m_Locks.AddToTail(id);
-  LeaveCriticalSection((CRITICAL_SECTION*)&m_DeadlockProtect);
+void CCriticalSection::Lock()
+{
+#if !defined( NDEBUG )
+	// Check if this one is already locked.
+	DWORD id = GetCurrentThreadId();
+	EnterCriticalSection( (CRITICAL_SECTION *)&m_DeadlockProtect );
+	Assert( m_Locks.Find( id ) == m_Locks.InvalidIndex() );
+	m_Locks.AddToTail( id );
+	LeaveCriticalSection( (CRITICAL_SECTION *)&m_DeadlockProtect );
 #endif
 
-  EnterCriticalSection((CRITICAL_SECTION*)&m_CS);
+	EnterCriticalSection( (CRITICAL_SECTION *)&m_CS );
 }
 
-void CCriticalSection::Unlock() {
-#if !defined(NDEBUG)
-  // Check if this one is already locked.
-  DWORD id = GetCurrentThreadId();
-  EnterCriticalSection((CRITICAL_SECTION*)&m_DeadlockProtect);
-  int index = m_Locks.Find(id);
-  Assert(index != m_Locks.InvalidIndex());
-  m_Locks.Remove(index);
-  LeaveCriticalSection((CRITICAL_SECTION*)&m_DeadlockProtect);
+void CCriticalSection::Unlock()
+{
+#if !defined( NDEBUG )
+	// Check if this one is already locked.
+	DWORD id = GetCurrentThreadId();
+	EnterCriticalSection( (CRITICAL_SECTION *)&m_DeadlockProtect );
+	int index = m_Locks.Find( id );
+	Assert( index != m_Locks.InvalidIndex() );
+	m_Locks.Remove( index );
+	LeaveCriticalSection( (CRITICAL_SECTION *)&m_DeadlockProtect );
 #endif
 
-  LeaveCriticalSection((CRITICAL_SECTION*)&m_CS);
+	LeaveCriticalSection( (CRITICAL_SECTION *)&m_CS );
 }
 
 // --------------------------------------------------------------------------------
@@ -67,25 +71,30 @@ void CCriticalSection::Unlock() {
 // --------------------------------------------------------------------------------
 // //
 
-CCriticalSectionLock::CCriticalSectionLock(CCriticalSection* pCS) {
-  m_pCS = pCS;
-  m_bLocked = false;
+CCriticalSectionLock::CCriticalSectionLock( CCriticalSection *pCS )
+{
+	m_pCS = pCS;
+	m_bLocked = false;
 }
 
-CCriticalSectionLock::~CCriticalSectionLock() {
-  if (m_bLocked) m_pCS->Unlock();
+CCriticalSectionLock::~CCriticalSectionLock()
+{
+	if ( m_bLocked )
+		m_pCS->Unlock();
 }
 
-void CCriticalSectionLock::Lock() {
-  Assert(!m_bLocked);
-  m_bLocked = true;
-  m_pCS->Lock();
+void CCriticalSectionLock::Lock()
+{
+	Assert( !m_bLocked );
+	m_bLocked = true;
+	m_pCS->Lock();
 }
 
-void CCriticalSectionLock::Unlock() {
-  Assert(m_bLocked);
-  m_bLocked = false;
-  m_pCS->Unlock();
+void CCriticalSectionLock::Unlock()
+{
+	Assert( m_bLocked );
+	m_bLocked = false;
+	m_pCS->Unlock();
 }
 
 // --------------------------------------------------------------------------------
@@ -93,35 +102,47 @@ void CCriticalSectionLock::Unlock() {
 // --------------------------------------------------------------------------------
 // //
 
-CEvent::CEvent() { m_hEvent = NULL; }
-
-CEvent::~CEvent() { Term(); }
-
-bool CEvent::Init(bool bManualReset, bool bInitialState) {
-  Term();
-
-  m_hEvent = (void*)CreateEvent(NULL, bManualReset, bInitialState, NULL);
-  return (m_hEvent != NULL);
+CEvent::CEvent()
+{
+	m_hEvent = NULL;
 }
 
-void CEvent::Term() {
-  if (m_hEvent) {
-    CloseHandle((HANDLE)m_hEvent);
-    m_hEvent = NULL;
-  }
+CEvent::~CEvent()
+{
+	Term();
 }
 
-void* CEvent::GetEventHandle() const {
-  Assert(m_hEvent);
-  return m_hEvent;
+bool CEvent::Init( bool bManualReset, bool bInitialState )
+{
+	Term();
+
+	m_hEvent = (void *)CreateEvent( NULL, bManualReset, bInitialState, NULL );
+	return ( m_hEvent != NULL );
 }
 
-bool CEvent::SetEvent() {
-  Assert(m_hEvent);
-  return ::SetEvent((HANDLE)m_hEvent) != 0;
+void CEvent::Term()
+{
+	if ( m_hEvent )
+	{
+		CloseHandle( (HANDLE)m_hEvent );
+		m_hEvent = NULL;
+	}
 }
 
-bool CEvent::ResetEvent() {
-  Assert(m_hEvent);
-  return ::ResetEvent((HANDLE)m_hEvent) != 0;
+void *CEvent::GetEventHandle() const
+{
+	Assert( m_hEvent );
+	return m_hEvent;
+}
+
+bool CEvent::SetEvent()
+{
+	Assert( m_hEvent );
+	return ::SetEvent( (HANDLE)m_hEvent ) != 0;
+}
+
+bool CEvent::ResetEvent()
+{
+	Assert( m_hEvent );
+	return ::ResetEvent( (HANDLE)m_hEvent ) != 0;
 }

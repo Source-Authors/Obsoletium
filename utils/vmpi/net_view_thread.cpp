@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 //=============================================================================//
 
@@ -9,7 +9,7 @@
 #include "tier1/strtools.h"
 
 
-char* CopyAlloc( const char *pStr )
+char *CopyAlloc( const char *pStr )
 {
 	return V_strdup( pStr );
 }
@@ -37,13 +37,13 @@ void CNetViewThread::Init()
 	m_hThreadExitEvent = CreateEvent( NULL, false, false, NULL );
 
 	DWORD dwThreadID = 0;
-	m_hThread = CreateThread( 
-		NULL,
-		0,
-		&CNetViewThread::StaticThreadFn,
-		this,
-		0,
-		&dwThreadID );
+	m_hThread = CreateThread(
+	NULL,
+	0,
+	&CNetViewThread::StaticThreadFn,
+	this,
+	0,
+	&dwThreadID );
 }
 
 
@@ -65,12 +65,12 @@ void CNetViewThread::Term()
 }
 
 
-void CNetViewThread::GetComputerNames( CUtlVector<char*> &computerNames )
+void CNetViewThread::GetComputerNames( CUtlVector< char * > &computerNames )
 {
 	EnterCriticalSection( &m_ComputerNamesCS );
 
 	computerNames.Purge();
-	for ( int i=0; i < m_ComputerNames.Count(); i++ )
+	for ( int i = 0; i < m_ComputerNames.Count(); i++ )
 	{
 		computerNames.AddToTail( CopyAlloc( m_ComputerNames[i] ) );
 	}
@@ -81,73 +81,73 @@ void CNetViewThread::GetComputerNames( CUtlVector<char*> &computerNames )
 
 void CNetViewThread::UpdateServicesFromNetView()
 {
-    HANDLE hChildStdoutRd, hChildStdoutWr;
-    
-	// Set the bInheritHandle flag so pipe handles are inherited.
-    SECURITY_ATTRIBUTES saAttr = {}; 
-	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
-    saAttr.bInheritHandle = TRUE; 
-    saAttr.lpSecurityDescriptor = NULL; 
+	HANDLE hChildStdoutRd, hChildStdoutWr;
 
-	if( CreatePipe( &hChildStdoutRd, &hChildStdoutWr, &saAttr, 0 ) )
+	// Set the bInheritHandle flag so pipe handles are inherited.
+	SECURITY_ATTRIBUTES saAttr = {};
+	saAttr.nLength = sizeof( SECURITY_ATTRIBUTES );
+	saAttr.bInheritHandle = TRUE;
+	saAttr.lpSecurityDescriptor = NULL;
+
+	if ( CreatePipe( &hChildStdoutRd, &hChildStdoutWr, &saAttr, 0 ) )
 	{
 		RunCodeAtScopeExit( CloseHandle( hChildStdoutRd ) );
 		RunCodeAtScopeExit( CloseHandle( hChildStdoutWr ) );
 
 		STARTUPINFO si;
-		memset(&si, 0, sizeof si);
-		si.cb = sizeof(si);
+		memset( &si, 0, sizeof si );
+		si.cb = sizeof( si );
 		si.dwFlags = STARTF_USESTDHANDLES;
 		si.hStdOutput = hChildStdoutWr;
-		
+
 		PROCESS_INFORMATION pi;
 
-		if( CreateProcess( 
-			NULL, 
-			"net view", 
-			NULL,	// lpProcessAttributes
-			NULL,	// lpThreadAttributes
-			TRUE,	// bInheritHandls
-			DETACHED_PROCESS,	// dwCreationFlags
-			NULL,				// lpEnvironment
-			NULL,				// lpCurrentDirectory
-			&si,				// lpStartupInfo
-			&pi					// lpProcessInformation
-			) )
+		if ( CreateProcess(
+			 NULL,
+			 "net view",
+			 NULL,             // lpProcessAttributes
+			 NULL,             // lpThreadAttributes
+			 TRUE,             // bInheritHandls
+			 DETACHED_PROCESS, // dwCreationFlags
+			 NULL,             // lpEnvironment
+			 NULL,             // lpCurrentDirectory
+			 &si,              // lpStartupInfo
+			 &pi               // lpProcessInformation
+			 ) )
 		{
 			RunCodeAtScopeExit( CloseHandle( pi.hThread ) );
 			RunCodeAtScopeExit( CloseHandle( pi.hProcess ) );
-			
-			// read from pipe..
-			#define BUFFER_SIZE 8192
-			char buffer[BUFFER_SIZE];
-			BOOL bDone = FALSE;
-			CUtlVector<char> totalBuffer;
-			
-			while(1)
+
+// read from pipe..
+#define BUFFER_SIZE 8192
+			char               buffer[BUFFER_SIZE];
+			BOOL               bDone = FALSE;
+			CUtlVector< char > totalBuffer;
+
+			while ( 1 )
 			{
 				DWORD dwCount = 0;
 				DWORD dwRead = 0;
-				
+
 				// read from input handle
-				PeekNamedPipe(hChildStdoutRd, NULL, NULL, NULL, &dwCount, NULL);
-				if (dwCount)
+				PeekNamedPipe( hChildStdoutRd, NULL, NULL, NULL, &dwCount, NULL );
+				if ( dwCount )
 				{
-					dwCount = min (dwCount, (DWORD)BUFFER_SIZE - 1);
-					ReadFile(hChildStdoutRd, buffer, dwCount, &dwRead, NULL);
+					dwCount = min( dwCount, (DWORD)BUFFER_SIZE - 1 );
+					ReadFile( hChildStdoutRd, buffer, dwCount, &dwRead, NULL );
 				}
-				if(dwRead)
+				if ( dwRead )
 				{
 					buffer[dwRead] = 0;
 					totalBuffer.AddMultipleToTail( dwRead, buffer );
 				}
 				// check process termination
-				else if( WaitForSingleObject( pi.hProcess, 1000 ) != WAIT_TIMEOUT )
+				else if ( WaitForSingleObject( pi.hProcess, 1000 ) != WAIT_TIMEOUT )
 				{
 					if ( bDone )
 						break;
-					
-					bDone = TRUE;	// next time we get it
+
+					bDone = TRUE; // next time we get it
 				}
 			}
 
@@ -164,18 +164,18 @@ void CNetViewThread::ParseComputerNames( const char *pNetViewOutput )
 	EnterCriticalSection( &m_ComputerNamesCS );
 
 	m_ComputerNames.PurgeAndDeleteElements();
-	
+
 	const char *pCur = pNetViewOutput;
 	while ( *pCur != 0 )
 	{
 		// If we get a \\, then it's a computer name followed by whitespace.
 		if ( pCur[0] == '\\' && pCur[1] == '\\' )
 		{
-			char curComputerName[512];
+			char  curComputerName[512];
 			char *pOutPos = curComputerName;
 
 			pCur += 2;
-			while ( *pCur && !V_isspace( *pCur ) && (pOutPos-curComputerName < 510) )
+			while ( *pCur && !V_isspace( *pCur ) && ( pOutPos - curComputerName < 510 ) )
 			{
 				*pOutPos++ = *pCur++;
 			}
@@ -204,7 +204,5 @@ DWORD CNetViewThread::ThreadFn()
 
 DWORD CNetViewThread::StaticThreadFn( LPVOID lpParameter )
 {
-	return ((CNetViewThread*)lpParameter)->ThreadFn();
+	return ( (CNetViewThread *)lpParameter )->ThreadFn();
 }
-
-

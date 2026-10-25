@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $Workfile:     $
 // $Date:         $
@@ -17,17 +17,17 @@ class IFileSystem;
 //-----------------------------------------------------------------------------
 // Loads, unloads the file system DLL
 //-----------------------------------------------------------------------------
-bool FileSystem_LoadFileSystemModule( );
-void FileSystem_UnloadFileSystemModule( );
+bool FileSystem_LoadFileSystemModule();
+void FileSystem_UnloadFileSystemModule();
 
-CSysModule * FileSystem_LoadModule( const char* path );
-void FileSystem_UnloadModule( CSysModule *pModule );
+CSysModule *FileSystem_LoadModule( const char *path );
+void        FileSystem_UnloadModule( CSysModule *pModule );
 
-bool FileSystem_Init( );
-void FileSystem_Shutdown( );
+bool FileSystem_Init();
+void FileSystem_Shutdown();
 
 // Sets the file system search path based on the game directory
-bool FileSystem_SetGameDirectory( char const* pGameDir );
+bool FileSystem_SetGameDirectory( char const *pGameDir );
 
 extern IFileSystem *g_pFileSystem;
 

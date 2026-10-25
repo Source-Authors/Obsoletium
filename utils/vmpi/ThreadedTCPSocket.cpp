@@ -16,14 +16,14 @@
 #include "iphelpers.h"
 
 
-#define SEND_KEEPALIVE_INTERVAL	3000
-#define KEEPALIVE_TIMEOUT		25000	// The sockets timeout after this long.
+#define SEND_KEEPALIVE_INTERVAL 3000
+#define KEEPALIVE_TIMEOUT       25000 // The sockets timeout after this long.
 
-#define KEEPALIVE_SENTINEL		-12345	// When first 4 bytes of a packet = this, then it's just a keepalive.
+#define KEEPALIVE_SENTINEL -12345 // When first 4 bytes of a packet = this, then it's just a keepalive.
 
 
 static int g_KeepaliveSentinel = KEEPALIVE_SENTINEL;
-bool g_bHandleTimeouts = true;
+bool       g_bHandleTimeouts = true;
 
 // If true, it'll set the socket thread priorities lower than normal.
 bool g_bSetTCPSocketThreadPriorities = true;
@@ -31,14 +31,13 @@ bool g_bSetTCPSocketThreadPriorities = true;
 // We get crashes at runtime if they don't link in the multithreaded runtime libraries,
 // so raise a ruckus if they're using singlethreaded libraries.
 #ifndef _MT
-	#pragma message( "**** WARNING **** ThreadedTCPSocket requires multithreaded runtime libraries to be used.\n" )
-	class MTChecker
-	{
-	public:
-		MTChecker() { Assert( false ); }
-	} g_MTChecker;
+#pragma message( "**** WARNING **** ThreadedTCPSocket requires multithreaded runtime libraries to be used.\n" )
+class MTChecker
+{
+public:
+	MTChecker() { Assert( false ); }
+} g_MTChecker;
 #endif
-
 
 
 // ------------------------------------------------------------------------------------------------ //
@@ -58,7 +57,7 @@ static SOCKET TCPBind( const IpV4 *pAddr )
 	sockaddr_in addr;
 	IPAddrToSockAddr( pAddr, &addr );
 
-	int status = bind( sock, (sockaddr*)&addr, sizeof(addr) );
+	int status = bind( sock, (sockaddr *)&addr, sizeof( addr ) );
 	if ( status == 0 )
 	{
 		return sock;
@@ -69,7 +68,6 @@ static SOCKET TCPBind( const IpV4 *pAddr )
 		return INVALID_SOCKET;
 	}
 }
-
 
 
 // ------------------------------------------------------------------------------------------------ //
@@ -98,8 +96,7 @@ void CTCPPacket::Release()
 class CThreadedTCPSocket : public IThreadedTCPSocket
 {
 public:
-	
-	static IThreadedTCPSocket* Create( SOCKET iSocket, IpV4 remoteAddr, ITCPSocketHandler *pHandler )
+	static IThreadedTCPSocket *Create( SOCKET iSocket, IpV4 remoteAddr, ITCPSocketHandler *pHandler )
 	{
 		CThreadedTCPSocket *pRet = new CThreadedTCPSocket;
 		if ( pRet->Init( iSocket, remoteAddr, pHandler ) )
@@ -114,9 +111,8 @@ public:
 	}
 
 
-// IThreadedTCPSocket implementation.
+	// IThreadedTCPSocket implementation.
 public:
-
 	virtual void Release()
 	{
 		delete this;
@@ -138,7 +134,7 @@ public:
 		return SendChunks( pChunks, &len, 1 );
 	}
 
-	virtual bool SendChunks( void const * const *pChunks, const ptrdiff_t *pChunkLengths, ptrdiff_t nChunks )
+	virtual bool SendChunks( void const *const *pChunks, const ptrdiff_t *pChunkLengths, ptrdiff_t nChunks )
 	{
 		if ( CheckErrorSignal() )
 			return false;
@@ -147,9 +143,8 @@ public:
 	}
 
 
-// Initialization.
+	// Initialization.
 private:
-
 	CThreadedTCPSocket()
 	{
 		m_Socket = INVALID_SOCKET;
@@ -159,7 +154,7 @@ private:
 		m_bWaitingForSendCompletion = false;
 		m_nBytesToReceive = -1;
 		m_bWaitingForSize = false;
-		m_bErrorSignal.store(false, std::memory_order::memory_order_relaxed);
+		m_bErrorSignal.store( false, std::memory_order::memory_order_relaxed );
 		m_pRecvBuffer = NULL;
 	}
 
@@ -199,7 +194,7 @@ private:
 			SetThreadPriority( m_hSendThread, THREAD_PRIORITY_LOWEST );
 			SetThreadPriority( m_hRecvThread, THREAD_PRIORITY_LOWEST );
 		}
-		
+
 		// Make sure to init the handler before the threads actually run, so it isn't handed data before initializing.
 		m_pHandler->Init( this );
 
@@ -219,7 +214,7 @@ private:
 			CloseHandle( m_hSendThread );
 			m_hSendThread = NULL;
 		}
-		
+
 		if ( m_hRecvThread )
 		{
 			WaitForSingleObject( m_hRecvThread, INFINITE );
@@ -241,25 +236,24 @@ private:
 	{
 		// Set nodelay to improve latency.
 		BOOL val = TRUE;
-		setsockopt( m_Socket, IPPROTO_TCP, TCP_NODELAY, (const char FAR *)&val, sizeof(BOOL) );
+		setsockopt( m_Socket, IPPROTO_TCP, TCP_NODELAY, (const char FAR *)&val, sizeof( BOOL ) );
 
 		// Make it linger for 3 seconds when it exits.
 		LINGER linger = {};
 		linger.l_onoff = 1;
 		linger.l_linger = 3;
-		setsockopt( m_Socket, SOL_SOCKET, SO_LINGER, (char*)&linger, sizeof( linger ) );
+		setsockopt( m_Socket, SOL_SOCKET, SO_LINGER, (char *)&linger, sizeof( linger ) );
 	}
 
 
-// Send thread functionality.
+	// Send thread functionality.
 private:
-
 	// This function copies off the payload and adds a SendChunk_t to the list of chunks to be sent.
 	// It also fires the ReadyToSend event so the thread will pick it up.
-	bool InternalSend( void const * const *pChunks, const ptrdiff_t *pChunkLengths, ptrdiff_t nChunks, bool bPrependLength )
+	bool InternalSend( void const *const *pChunks, const ptrdiff_t *pChunkLengths, ptrdiff_t nChunks, bool bPrependLength )
 	{
 		ptrdiff_t totalLength = 0;
-		for ( ptrdiff_t i=0; i < nChunks; i++ )
+		for ( ptrdiff_t i = 0; i < nChunks; i++ )
 			totalLength += pChunkLengths[i];
 
 		if ( bPrependLength )
@@ -271,18 +265,19 @@ private:
 		}
 
 		// Copy all the data into a SendData_t.
-		SendData_t *pSendData = (SendData_t*)malloc( sizeof( SendData_t ) - 1 + totalLength );
-		if (!pSendData) return false;
+		SendData_t *pSendData = (SendData_t *)malloc( sizeof( SendData_t ) - 1 + totalLength );
+		if ( !pSendData )
+			return false;
 
 		pSendData->m_Len = totalLength;
 
 		char *pOut = pSendData->m_Payload;
 		if ( bPrependLength )
 		{
-			*((int*)pOut) = totalLength - 4;	// The length we prepend is the size of the data, not data size + integer for length.
+			*( (int *)pOut ) = totalLength - 4; // The length we prepend is the size of the data, not data size + integer for length.
 			pOut += 4;
 		}
-		for ( ptrdiff_t i=0; i < nChunks; i++ )
+		for ( ptrdiff_t i = 0; i < nChunks; i++ )
 		{
 			memcpy( pOut, pChunks[i], pChunkLengths[i] );
 			pOut += pChunkLengths[i];
@@ -293,7 +288,7 @@ private:
 
 		m_SendDatas.AddToTail( pSendData );
 		m_hReadyToSendEvent.SetEvent(); // Notify the thread that there is data to send.
-		
+
 		csLock.Unlock();
 
 		return true;
@@ -301,7 +296,7 @@ private:
 
 	void SendThread_HandleTimeout()
 	{
-		// Timeout.. send a keepalive.			
+		// Timeout.. send a keepalive.
 		// But only if we're not already sending something.
 		CCriticalSectionLock csLock( &m_SendCS );
 		csLock.Lock();
@@ -310,7 +305,7 @@ private:
 
 		if ( count == 0 )
 		{
-			void *pBuf[1] = { &g_KeepaliveSentinel };
+			void     *pBuf[1] = { &g_KeepaliveSentinel };
 			ptrdiff_t len[1] = { sizeof( g_KeepaliveSentinel ) };
 			InternalSend( pBuf, len, 1, false );
 		}
@@ -341,15 +336,15 @@ private:
 		CCriticalSectionLock csLock( &m_SendCS );
 		csLock.Lock();
 
-			SendData_t *pSendData = m_SendDatas[ m_SendDatas.Head() ];
-			free( pSendData );
-			m_SendDatas.Remove( m_SendDatas.Head() );
-			
-			m_bWaitingForSendCompletion = false;
-			
-			// Set our send event if there's anything else to send.
-			if ( m_SendDatas.Count() > 0 )
-				m_hReadyToSendEvent.SetEvent();
+		SendData_t *pSendData = m_SendDatas[m_SendDatas.Head()];
+		free( pSendData );
+		m_SendDatas.Remove( m_SendDatas.Head() );
+
+		m_bWaitingForSendCompletion = false;
+
+		// Set our send event if there's anything else to send.
+		if ( m_SendDatas.Count() > 0 )
+			m_hReadyToSendEvent.SetEvent();
 
 		csLock.Unlock();
 		return true;
@@ -361,27 +356,27 @@ private:
 		// NOTE: don't send anything until our current send is completed.
 		CCriticalSectionLock csLock( &m_SendCS );
 		csLock.Lock();
-			
+
 		Assert( !m_bWaitingForSendCompletion );
 
 		// Send it off!
-		SendData_t *pSendData = m_SendDatas[ m_SendDatas.Head() ];
-		WSABUF buf = { static_cast<ULONG>(pSendData->m_Len), pSendData->m_Payload };
+		SendData_t *pSendData = m_SendDatas[m_SendDatas.Head()];
+		WSABUF      buf = { static_cast< ULONG >( pSendData->m_Len ), pSendData->m_Payload };
 
 		m_nBytesToTransfer = pSendData->m_Len;
 		m_bWaitingForSendCompletion = true;
-		
+
 		csLock.Unlock();
 
 		DWORD dwNumBytesSent = 0;
 		DWORD ret = WSASend( m_Socket, &buf, 1, &dwNumBytesSent, 0, &m_SendOverlapped, NULL );
 		DWORD err = WSAGetLastError();
-		if ( ret == 0 || ( ret == static_cast<DWORD>(SOCKET_ERROR) && err == WSA_IO_PENDING ) )
+		if ( ret == 0 || ( ret == static_cast< DWORD >( SOCKET_ERROR ) && err == WSA_IO_PENDING ) )
 		{
 			// Either way, the operation completed successfully, and m_hSendCompletionEvent is now set.
 			return true;
 		}
-		else 
+		else
 		{
 			HandleError( err );
 			return false;
@@ -389,19 +384,18 @@ private:
 
 		return true;
 	}
-	
+
 	DWORD SendThreadFn()
 	{
 		while ( 1 )
 		{
-			HANDLE handles[]  =
-			{
+			HANDLE handles[] = {
 				m_hExitThreadsEvent.GetEventHandle(),
 				m_hSendCompletionEvent.GetEventHandle(),
 				m_hReadyToSendEvent.GetEventHandle()
 			};
 			int nHandles = ARRAYSIZE( handles );
-			
+
 			// While waiting for send completion, don't handle "ready to send" events.
 			if ( m_bWaitingForSendCompletion )
 				--nHandles;
@@ -409,7 +403,7 @@ private:
 			DWORD waitValue = WaitForMultipleObjects( nHandles, handles, FALSE, SEND_KEEPALIVE_INTERVAL );
 			switch ( waitValue )
 			{
-				case WAIT_TIMEOUT:
+			case WAIT_TIMEOUT:
 				{
 					if ( g_bHandleTimeouts )
 					{
@@ -419,34 +413,34 @@ private:
 				}
 				break;
 
-				case WAIT_OBJECT_0:
+			case WAIT_OBJECT_0:
 				{
 					// The main thread is signaling us to exit.
 					return 0;
 				}
 
-				case WAIT_OBJECT_0 + 1:
+			case WAIT_OBJECT_0 + 1:
 				{
 					if ( !SendThread_HandleSendCompletionEvent() )
 						return 1;
 				}
 				break;
-			
-				case WAIT_OBJECT_0 + 2:
+
+			case WAIT_OBJECT_0 + 2:
 				{
 					if ( !SendThread_HandleReadyToSendEvent() )
 						return 1;
 				}
 				break;
 
-				case WAIT_FAILED:
+			case WAIT_FAILED:
 				{
 					// Uh oh. We're dead. Cleanup and signal an error.
 					HandleError( GetLastError() );
 					return 1;
 				}
 
-				default:
+			default:
 				{
 					char str[512];
 					Q_snprintf( str, sizeof( str ), "Unknown return value (%lu) from WaitForMultipleObjects", waitValue );
@@ -462,15 +456,14 @@ private:
 	static DWORD WINAPI StaticSendThreadFn( LPVOID pParameter )
 	{
 		// dimhotepus: Add thread name to aid debugging.
-		ThreadSetDebugName("TcpSender");
+		ThreadSetDebugName( "TcpSender" );
 
-		return ((CThreadedTCPSocket*)pParameter)->SendThreadFn();
+		return ( (CThreadedTCPSocket *)pParameter )->SendThreadFn();
 	}
 
 
-// Receive thread functionality.
+	// Receive thread functionality.
 private:
-
 	bool RecvThread_WaitToReceiveSize()
 	{
 		return RecvThread_InternalRecv( &m_NextPacketLen, sizeof( m_NextPacketLen ), false, true );
@@ -492,8 +485,8 @@ private:
 		{
 			// We have to reissue the receive command because it didn't receive all the data.
 			m_nBytesReceivedSoFar += cbTransfer;
-			
-			char *pDest = (char*)&m_NextPacketLen;
+
+			char *pDest = (char *)&m_NextPacketLen;
 			if ( !m_bWaitingForSize )
 			{
 				Assert( m_pRecvBuffer );
@@ -513,7 +506,7 @@ private:
 			}
 			else
 			{
-				if ( m_NextPacketLen < 1 || m_NextPacketLen > 1024*1024*75 )
+				if ( m_NextPacketLen < 1 || m_NextPacketLen > 1024 * 1024 * 75 )
 				{
 					char str[512];
 					Q_snprintf( str, sizeof( str ), "Invalid packet size in RecvThread (size = %d)", m_NextPacketLen );
@@ -523,8 +516,8 @@ private:
 				else
 				{
 					Assert( !m_pRecvBuffer );
-					m_pRecvBuffer = (CTCPPacket*)malloc( sizeof( CTCPPacket ) - 1 + m_NextPacketLen );
-					
+					m_pRecvBuffer = (CTCPPacket *)malloc( sizeof( CTCPPacket ) - 1 + m_NextPacketLen );
+
 					{
 						char str[512];
 						Q_snprintf( str, sizeof( str ), "Unable to allocate TCP packet (size = %zu)", sizeof( CTCPPacket ) - 1 + m_NextPacketLen );
@@ -535,7 +528,7 @@ private:
 					m_pRecvBuffer->m_Len = m_NextPacketLen;
 
 					return RecvThread_InternalRecv( m_pRecvBuffer->m_Data, m_pRecvBuffer->m_Len, false, false );
-				}					
+				}
 			}
 		}
 		else
@@ -563,11 +556,11 @@ private:
 
 	bool RecvThread_InternalRecv( void *pDest, int destSize, bool bContinuation, bool bWaitingForSize = false )
 	{
-		WSABUF buf = { static_cast<ULONG>(destSize), (char*)pDest };
+		WSABUF buf = { static_cast< ULONG >( destSize ), (char *)pDest };
 
 		if ( !bContinuation )
 		{
-			// If this is not a continuation of whatever we were receiving before, then 
+			// If this is not a continuation of whatever we were receiving before, then
 			m_bWaitingForSize = bWaitingForSize;
 			m_nBytesToReceive = destSize;
 			m_nBytesReceivedSoFar = 0;
@@ -577,7 +570,7 @@ private:
 		DWORD nBytesReceived = 0;
 		DWORD ret = WSARecv( m_Socket, &buf, 1, &nBytesReceived, &dwFlags, &m_RecvOverlapped, NULL );
 		DWORD dwLastError = WSAGetLastError();
-		if ( ret == 0 || ( ret == static_cast<DWORD>(SOCKET_ERROR) && dwLastError == WSA_IO_PENDING ) )
+		if ( ret == 0 || ( ret == static_cast< DWORD >( SOCKET_ERROR ) && dwLastError == WSA_IO_PENDING ) )
 		{
 			// Note: m_hRecvEvent is in a signaled state, so the RecvThread will pick up the results next time around.
 			return true;
@@ -586,19 +579,17 @@ private:
 		{
 			HandleError( dwLastError );
 			return false;
-		}			
+		}
 	}
-		
 
-	
+
 	DWORD RecvThreadFn()
 	{
 		// Start us off by setting up to receive the first packet size.
 		if ( !RecvThread_WaitToReceiveSize() )
 			return 1;
 
-		HANDLE handles[] =
-		{
+		HANDLE handles[] = {
 			m_hExitThreadsEvent.GetEventHandle(),
 			m_hRecvEvent.GetEventHandle()
 		};
@@ -608,7 +599,7 @@ private:
 			DWORD waitValue = WaitForMultipleObjects( ARRAYSIZE( handles ), handles, FALSE, KEEPALIVE_TIMEOUT );
 			switch ( waitValue )
 			{
-				case WAIT_TIMEOUT:
+			case WAIT_TIMEOUT:
 				{
 					if ( g_bHandleTimeouts )
 					{
@@ -618,13 +609,13 @@ private:
 				}
 				break;
 
-				case WAIT_OBJECT_0:
+			case WAIT_OBJECT_0:
 				{
 					// We're being told to exit.
 					return 0;
 				}
 
-				case WAIT_OBJECT_0 + 1:
+			case WAIT_OBJECT_0 + 1:
 				{
 					// Just finished receiving something.
 					if ( !RecvThread_HandleRecvCompletionEvent() )
@@ -632,14 +623,14 @@ private:
 				}
 				break;
 
-				case WAIT_FAILED:
+			case WAIT_FAILED:
 				{
 					// Uh oh. We're dead. Cleanup and signal an error.
 					HandleError( GetLastError() );
 					return 1;
 				}
 
-				default:
+			default:
 				{
 					char str[512];
 					Q_snprintf( str, sizeof( str ), "Unknown return value (%lu) from WaitForMultipleObjects", waitValue );
@@ -655,90 +646,87 @@ private:
 	static DWORD WINAPI StaticRecvThreadFn( LPVOID pParameter )
 	{
 		// dimhotepus: Add thread name to aid debugging.
-		ThreadSetDebugName("TcpReceiver");
+		ThreadSetDebugName( "TcpReceiver" );
 
-		return ((CThreadedTCPSocket*)pParameter)->RecvThreadFn();
+		return ( (CThreadedTCPSocket *)pParameter )->RecvThreadFn();
 	}
 
 
-
-// Error handling.
+	// Error handling.
 private:
-
 	// This checks to see if either thread has signaled an error. If so, it shuts down the socket and returns true.
 	bool CheckErrorSignal() const
 	{
-		return m_bErrorSignal.load(std::memory_order_seq_cst);
+		return m_bErrorSignal.load( std::memory_order_seq_cst );
 	}
 
 	// This is called from any of the threads and signals that something went awry. It shuts down the object
 	// and makes it return false from all of its functions.
 	void HandleError( DWORD errorValue )
 	{
-		HandleError( ITCPSocketHandler::SocketError, std::system_category().message(errorValue).c_str() );
+		HandleError( ITCPSocketHandler::SocketError, std::system_category().message( errorValue ).c_str() );
 	}
 
 
 	void HandleError( int errorCode, const char *pErrorString )
 	{
 		//Assert( false );
-		
+
 		// Tell the app.
 		m_pHandler->OnError( errorCode, pErrorString );
 
 		// Tell the threads to exit.
 		m_hExitThreadsEvent.SetEvent();
-		
+
 		// Notify the main thread so it can call Term() when it gets a chance.
-		m_bErrorSignal.store(true, std::memory_order::memory_order_acq_rel);
+		m_bErrorSignal.store( true, std::memory_order::memory_order_acq_rel );
 	}
 
 
 private:
-
 	// Data for the send thread.
 	typedef struct
 	{
 		//WSAOVERLAPPED m_Overlapped;
 		ptrdiff_t m_Len;
-		char m_Payload[1];
+		char      m_Payload[1];
 	} SendData_t;
 
-	HANDLE m_hSendThread;
-		WSAOVERLAPPED m_SendOverlapped;
-		CEvent m_hReadyToSendEvent;
-		CEvent m_hSendCompletionEvent;
-		
-		CCriticalSection m_SendCS;
-			DWORD m_nBytesToTransfer;
-			bool m_bWaitingForSendCompletion;
-			CUtlLinkedList<SendData_t*, int> m_SendDatas;	// Added to the tail, popped off the head for sending.
+	HANDLE        m_hSendThread;
+	WSAOVERLAPPED m_SendOverlapped;
+	CEvent        m_hReadyToSendEvent;
+	CEvent        m_hSendCompletionEvent;
+
+	CCriticalSection                    m_SendCS;
+	DWORD                               m_nBytesToTransfer;
+	bool                                m_bWaitingForSendCompletion;
+	CUtlLinkedList< SendData_t *, int > m_SendDatas; // Added to the tail, popped off the head for sending.
 
 
 	// Data for the recv thread.
 	HANDLE m_hRecvThread;
-		int m_nBytesToReceive;			// This stores how many bytes we want to receive for the next packet.
-		int m_nBytesReceivedSoFar;		// This stores how many bytes we've received so far.
-		bool m_bWaitingForSize;			// This tells if we're trying to receive the next packet length or the next packet's data.
+	int    m_nBytesToReceive;     // This stores how many bytes we want to receive for the next packet.
+	int    m_nBytesReceivedSoFar; // This stores how many bytes we've received so far.
+	bool   m_bWaitingForSize;     // This tells if we're trying to receive the next packet length or the next packet's data.
 
-		int m_NextPacketLen;			// Data is received INTO here before it receives each packet. This 
-										// holds the length of each incoming packet.
+	int m_NextPacketLen; // Data is received INTO here before it receives each packet. This
+						 // holds the length of each incoming packet.
 
-		WSAOVERLAPPED m_RecvOverlapped;
-		CEvent m_hRecvEvent;
-		CTCPPacket *m_pRecvBuffer;		// This is allocated for each packet we're receiving and given to the
-										// app when the packet is done being received.
+	WSAOVERLAPPED m_RecvOverlapped;
+	CEvent        m_hRecvEvent;
+	CTCPPacket   *m_pRecvBuffer; // This is allocated for each packet we're receiving and given to the
+								 // app when the packet is done being received.
 
 	// dimhotepus: volatile bool -> atomic_bool
 	std::atomic_bool m_bErrorSignal;
 
-	
+
 	CEvent m_hExitThreadsEvent;
 
 	ITCPSocketHandler *m_pHandler;
 
 	SOCKET m_Socket;
-	IpV4 m_RemoteAddr;
+	IpV4   m_RemoteAddr;
 };
 
 
@@ -748,27 +736,26 @@ private:
 class CTCPConnectSocket_Listener : public ITCPConnectSocket
 {
 public:
-						CTCPConnectSocket_Listener()
-						{
-							m_Socket = INVALID_SOCKET;
-						}
+	CTCPConnectSocket_Listener()
+	{
+		m_Socket = INVALID_SOCKET;
+	}
 
 
-	virtual				~CTCPConnectSocket_Listener()
+	virtual ~CTCPConnectSocket_Listener()
 	{
 		if ( m_Socket != INVALID_SOCKET )
 		{
 			closesocket( m_Socket );
 		}
-	}	
+	}
 
 
 	// The main function to create one of these suckers.
-	static ITCPConnectSocket* Create( 
-		IHandlerCreator *pHandlerCreator,
-		const unsigned short port,
-		int nQueueLength
-		)
+	static ITCPConnectSocket *Create(
+	IHandlerCreator     *pHandlerCreator,
+	const unsigned short port,
+	int                  nQueueLength )
 	{
 		CTCPConnectSocket_Listener *pRet = new CTCPConnectSocket_Listener;
 		if ( !pRet )
@@ -782,8 +769,8 @@ public:
 		// Bind it to a socket and start listening.
 		IpV4 addr( 0, 0, 0, 0, port ); // INADDR_ANY
 		pRet->m_Socket = TCPBind( &addr );
-		if ( pRet->m_Socket == INVALID_SOCKET || 
-			listen( pRet->m_Socket, nQueueLength == -1 ? SOMAXCONN : nQueueLength ) != 0 )
+		if ( pRet->m_Socket == INVALID_SOCKET ||
+		     listen( pRet->m_Socket, nQueueLength == -1 ? SOMAXCONN : nQueueLength ) != 0 )
 		{
 			pRet->Release();
 			return nullptr;
@@ -794,14 +781,13 @@ public:
 	}
 
 
-// ITCPConnectSocket implementation.
+	// ITCPConnectSocket implementation.
 public:
-
 	virtual void Release()
 	{
 		delete this;
 	}
-	
+
 	virtual bool Update( IThreadedTCPSocket **pSocket, unsigned long milliseconds )
 	{
 		*pSocket = NULL;
@@ -812,17 +798,17 @@ public:
 		fd_set readSet = {};
 		readSet.fd_count = 1;
 		readSet.fd_array[0] = m_Socket;
-		TIMEVAL timeVal = {0, static_cast<long>(min(LONG_MAX, static_cast<long>(milliseconds*1000)))};
+		TIMEVAL timeVal = { 0, static_cast< long >( min( LONG_MAX, static_cast< long >( milliseconds * 1000 ) ) ) };
 
 		// Wait until it connects.
 		int status = select( 0, &readSet, NULL, NULL, &timeVal );
 		if ( status > 0 )
 		{
 			sockaddr_in addr = {};
-			int addrSize = sizeof( addr );
+			int         addrSize = sizeof( addr );
 
 			// Now accept the final connection.
-			SOCKET newSock = accept( m_Socket, (struct sockaddr*)&addr, &addrSize );
+			SOCKET newSock = accept( m_Socket, (struct sockaddr *)&addr, &addrSize );
 			if ( newSock == INVALID_SOCKET )
 			{
 				Assert( false );
@@ -860,22 +846,19 @@ public:
 
 
 private:
-	SOCKET m_Socket;	
-	
+	SOCKET m_Socket;
+
 	IHandlerCreator *m_pHandler;
-};	
+};
 
 
-
-ITCPConnectSocket* ThreadedTCP_CreateListener( 
-	IHandlerCreator *pHandlerCreator,
-	const unsigned short port,
-	int nQueueLength
-	)
+ITCPConnectSocket *ThreadedTCP_CreateListener(
+IHandlerCreator     *pHandlerCreator,
+const unsigned short port,
+int                  nQueueLength )
 {
 	return CTCPConnectSocket_Listener::Create( pHandlerCreator, port, nQueueLength );
 }
-
 
 
 // ------------------------------------------------------------------------------------------------ //
@@ -884,7 +867,6 @@ ITCPConnectSocket* ThreadedTCP_CreateListener(
 class CTCPConnectSocket_Connector : public ITCPConnectSocket
 {
 public:
-	
 	CTCPConnectSocket_Connector()
 	{
 		m_bConnected = false;
@@ -900,14 +882,13 @@ public:
 		}
 	}
 
-	static ITCPConnectSocket* Create(
-		const IpV4 &connectAddr,
-		const IpV4 &localAddr,
-		IHandlerCreator *pHandlerCreator
-		)
+	static ITCPConnectSocket *Create(
+	const IpV4      &connectAddr,
+	const IpV4      &localAddr,
+	IHandlerCreator *pHandlerCreator )
 	{
 		CTCPConnectSocket_Connector *pRet = new CTCPConnectSocket_Connector;
-	
+
 		pRet->m_Socket = TCPBind( &localAddr );
 		if ( pRet->m_Socket == INVALID_SOCKET )
 		{
@@ -919,8 +900,8 @@ public:
 		IPAddrToSockAddr( &connectAddr, &addr );
 
 		// We don't want the connect() call to block.
-		DWORD val = 1;	   
-		int status = ioctlsocket( pRet->m_Socket, FIONBIO, &val );
+		DWORD val = 1;
+		int   status = ioctlsocket( pRet->m_Socket, FIONBIO, &val );
 		if ( status != 0 )
 		{
 			Assert( false );
@@ -931,7 +912,7 @@ public:
 		pRet->m_RemoteAddr = connectAddr;
 		pRet->m_pHandlerCreator = pHandlerCreator;
 
-		int ret = connect( pRet->m_Socket, (struct sockaddr*)&addr, sizeof( addr ) );
+		int ret = connect( pRet->m_Socket, (struct sockaddr *)&addr, sizeof( addr ) );
 		if ( ret == 0 )
 		{
 			pRet->m_bConnected = true;
@@ -946,18 +927,17 @@ public:
 			Assert( false );
 			pRet->Release();
 			return NULL;
-		}		
-	}	
+		}
+	}
 
 
-// ITCPConnectSocket implementation.
+	// ITCPConnectSocket implementation.
 public:
-
 	virtual void Release()
 	{
 		delete this;
 	}
-	
+
 
 	virtual bool Update( IThreadedTCPSocket **pSocket, unsigned long milliseconds )
 	{
@@ -974,8 +954,8 @@ public:
 		// Ok, see if we're connected now.
 		if ( !m_bConnected )
 		{
-			TIMEVAL timeVal = { 0, static_cast<long>(min(LONG_MAX, static_cast<long>(milliseconds*1000))) };
-			
+			TIMEVAL timeVal = { 0, static_cast< long >( min( LONG_MAX, static_cast< long >( milliseconds * 1000 ) ) ) };
+
 			fd_set writeSet = {};
 			writeSet.fd_count = 1;
 			writeSet.fd_array[0] = m_Socket;
@@ -994,10 +974,10 @@ public:
 		if ( m_bConnected )
 		{
 			// Ok, return a connected socket for them.
-			
+
 			// Make our socket blocking again.
 			DWORD val = 0;
-			int status = ioctlsocket( m_Socket, FIONBIO, &val );
+			int   status = ioctlsocket( m_Socket, FIONBIO, &val );
 			if ( status != 0 )
 			{
 				Assert( false );
@@ -1038,22 +1018,20 @@ public:
 
 
 private:
-	
 	bool m_bError;
 	bool m_bConnected;
 
 	SOCKET m_Socket;
-	IpV4 m_RemoteAddr;
+	IpV4   m_RemoteAddr;
 
 	IHandlerCreator *m_pHandlerCreator;
 };
 
 
-ITCPConnectSocket* ThreadedTCP_CreateConnector( 
-	const IpV4 &addr,
-	const IpV4 &localAddr,
-	IHandlerCreator *pHandlerCreator
-	)
+ITCPConnectSocket *ThreadedTCP_CreateConnector(
+const IpV4      &addr,
+const IpV4      &localAddr,
+IHandlerCreator *pHandlerCreator )
 {
 	return CTCPConnectSocket_Connector::Create( addr, localAddr, pHandlerCreator );
 }
@@ -1069,4 +1047,3 @@ void ThreadedTCP_SetTCPSocketThreadPriorities( bool bSetTCPSocketThreadPrioritie
 {
 	g_bSetTCPSocketThreadPriorities = bSetTCPSocketThreadPriorities;
 }
-

@@ -10,25 +10,27 @@
 
 #include <type_traits>
 
-namespace s1::win::com {
+namespace s1::win::com
+{
 
 /**
  * @brief COM interface concept.
  * @tparam TInterface Interface which should be COM one.
  */
-template <typename TInterface>
+template< typename TInterface >
 using com_interface_concept =
-    std::enable_if_t<std::is_abstract_v<TInterface> &&
-                     std::is_base_of_v<IUnknown, TInterface>>;
+std::enable_if_t< std::is_abstract_v< TInterface > &&
+                  std::is_base_of_v< IUnknown, TInterface > >;
 
 /**
  * @brief COM smart pointer with automatic IID deducing from TInterface.
  */
-template <typename TInterface, const IID* TIid = &__uuidof(TInterface)>
-class com_ptr : public _com_ptr_t<_com_IIID<TInterface, TIid>> {
-  using interface_concept = com_interface_concept<TInterface>;
+template< typename TInterface, const IID *TIid = &__uuidof( TInterface ) >
+class com_ptr : public _com_ptr_t< _com_IIID< TInterface, TIid > >
+{
+	using interface_concept = com_interface_concept< TInterface >;
 };
 
-}  // namespace s1::win::com
+} // namespace s1::win::com
 
-#endif  // !SE_COMMON_WINDOWS_COM_PTR_H_
+#endif // !SE_COMMON_WINDOWS_COM_PTR_H_

@@ -1,11 +1,11 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //
 //=============================================================================//
-#if !defined(AFX_GRAPHCONTROL_H__9B50B827_F24D_4C5A_BA6E_A591A64E404D__INCLUDED_)
+#if !defined( AFX_GRAPHCONTROL_H__9B50B827_F24D_4C5A_BA6E_A591A64E404D__INCLUDED_ )
 #define AFX_GRAPHCONTROL_H__9B50B827_F24D_4C5A_BA6E_A591A64E404D__INCLUDED_
 
 #if _MSC_VER > 1000
@@ -21,15 +21,15 @@ class CGraphEntry
 {
 public:
 	CGraphEntry() :
-	  m_msTime( 0 ),
-	  m_nBytesSent( 0 ),
-	  m_nBytesReceived( 0 )
+		m_msTime( 0 ),
+		m_nBytesSent( 0 ),
+		m_nBytesReceived( 0 )
 	{
 	}
 
-	int	m_msTime;
-	int	m_nBytesSent;
-	int	m_nBytesReceived;
+	int m_msTime;
+	int m_nBytesSent;
+	int m_nBytesReceived;
 };
 
 
@@ -38,37 +38,34 @@ public:
 
 class CGraphControl : public CWnd
 {
-// Construction
+	// Construction
 public:
 	CGraphControl();
 
-// Attributes
+	// Attributes
 public:
-
-// Operations
+	// Operations
 public:
-
-	void		Clear();
+	void Clear();
 
 	// This function assumes you've already run the query and the graph_entry's are selected in.
-	void		Fill( CUtlVector<CGraphEntry> &entries );
+	void Fill( CUtlVector< CGraphEntry > &entries );
 
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CGraphControl)
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 public:
 	virtual ~CGraphControl();
 
 
 protected:
+	void Render( CDC *pDC );
 
-	void	Render( CDC *pDC );
-
-	CUtlVector<CGraphEntry>	m_Entries;
+	CUtlVector< CGraphEntry > m_Entries;
 
 	// Generated message map functions
 protected:

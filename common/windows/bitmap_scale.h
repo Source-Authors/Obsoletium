@@ -7,9 +7,10 @@
 
 #include "tier0/basetypes.h"
 
-FORWARD_DECLARE_HANDLE(HBITMAP);
+FORWARD_DECLARE_HANDLE( HBITMAP );
 
-namespace s1::win::ui {
+namespace s1::win::ui
+{
 
 /**
  * @brief Scale bitmap from old DPI to a new one.
@@ -20,9 +21,9 @@ namespace s1::win::ui {
  * @param newDpiY New DPI Y.
  * @return Scaled bitmap.
  */
-HBITMAP ScaleBitmapForDpi(HBITMAP sourceBmp, unsigned oldDpiX, unsigned oldDpiY,
-                          unsigned newDpiX, unsigned newDpiY);
+HBITMAP ScaleBitmapForDpi( HBITMAP sourceBmp, unsigned oldDpiX, unsigned oldDpiY,
+                           unsigned newDpiX, unsigned newDpiY );
 
-}  // namespace s1::win::ui
+} // namespace s1::win::ui
 
-#endif  // !SE_COMMON_WINDOWS_BITMAP_SCALE_H_
+#endif // !SE_COMMON_WINDOWS_BITMAP_SCALE_H_

@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //
@@ -22,26 +22,26 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 
-#define IMPLEMENT_SORT_NUMBER_FN( FnName, VarName ) \
+#define IMPLEMENT_SORT_NUMBER_FN( FnName, VarName )                            \
 	static int CALLBACK FnName( LPARAM iItem1, LPARAM iItem2, LPARAM lpParam ) \
-	{ \
-		CWorkerInfo *pInfo1 = (CWorkerInfo*)iItem1; \
-		CWorkerInfo *pInfo2 = (CWorkerInfo*)iItem2; \
-		return pInfo1->VarName > pInfo2->VarName; \
+	{                                                                          \
+		CWorkerInfo *pInfo1 = (CWorkerInfo *)iItem1;                           \
+		CWorkerInfo *pInfo2 = (CWorkerInfo *)iItem2;                           \
+		return pInfo1->VarName > pInfo2->VarName;                              \
 	}
 
 static int CALLBACK SortByName( LPARAM iItem1, LPARAM iItem2, LPARAM lpParam )
 {
-	CWorkerInfo *pInfo1 = (CWorkerInfo*)iItem1;
-	CWorkerInfo *pInfo2 = (CWorkerInfo*)iItem2;
+	CWorkerInfo *pInfo1 = (CWorkerInfo *)iItem1;
+	CWorkerInfo *pInfo2 = (CWorkerInfo *)iItem2;
 
 	return strcmp( pInfo1->m_ComputerName, pInfo2->m_ComputerName );
 }
 
 static int CALLBACK SortByCurrentStage( LPARAM iItem1, LPARAM iItem2, LPARAM lpParam )
 {
-	CWorkerInfo *pInfo1 = (CWorkerInfo*)iItem1;
-	CWorkerInfo *pInfo2 = (CWorkerInfo*)iItem2;
+	CWorkerInfo *pInfo1 = (CWorkerInfo *)iItem1;
+	CWorkerInfo *pInfo2 = (CWorkerInfo *)iItem2;
 
 	return strcmp( pInfo1->m_CurrentStage, pInfo2->m_CurrentStage );
 }
@@ -54,35 +54,34 @@ IMPLEMENT_SORT_NUMBER_FN( SortByThread1WU, m_ThreadWUs[1] );
 IMPLEMENT_SORT_NUMBER_FN( SortByThread2WU, m_ThreadWUs[2] );
 IMPLEMENT_SORT_NUMBER_FN( SortByThread3WU, m_ThreadWUs[3] );
 
-typedef int (CALLBACK *ServicesSortFn)( LPARAM iItem1, LPARAM iItem2, LPARAM lpParam );
+typedef int( CALLBACK *ServicesSortFn )( LPARAM iItem1, LPARAM iItem2, LPARAM lpParam );
 
 struct
 {
-	char			*pText;
-	int				width;
-	ServicesSortFn	sortFn;
-} g_ColumnInfos[] =
-{
-	{"Computer Name", 150, SortByName},
-	{"Connected", 70, SortByConnected},
-	{"Work Units Done", 100, SortByWorkUnitsDone},
-	{"Running Time", 80, SortByRunningTime},
-	{"Current Stage", 180, SortByCurrentStage},
-	{"Thread 0", 70, SortByThread0WU},
-	{"Thread 1", 70, SortByThread1WU},
-	{"Thread 2", 70, SortByThread2WU},
-	{"Thread 3", 70, SortByThread3WU}
+	char          *pText;
+	int            width;
+	ServicesSortFn sortFn;
+} g_ColumnInfos[] = {
+	{ "Computer Name", 150, SortByName },
+	{ "Connected", 70, SortByConnected },
+	{ "Work Units Done", 100, SortByWorkUnitsDone },
+	{ "Running Time", 80, SortByRunningTime },
+	{ "Current Stage", 180, SortByCurrentStage },
+	{ "Thread 0", 70, SortByThread0WU },
+	{ "Thread 1", 70, SortByThread1WU },
+	{ "Thread 2", 70, SortByThread2WU },
+	{ "Thread 3", 70, SortByThread3WU }
 };
 
-#define COLUMN_COMPUTER_NAME	0
-#define COLUMN_CONNECTED		1
-#define COLUMN_WORK_UNITS_DONE	2
-#define COLUMN_RUNNING_TIME		3
-#define COLUMN_CURRENT_STAGE	4
-#define COLUMN_THREAD0_WU		5
-#define COLUMN_THREAD1_WU		6
-#define COLUMN_THREAD2_WU		7
-#define COLUMN_THREAD3_WU		8
+#define COLUMN_COMPUTER_NAME   0
+#define COLUMN_CONNECTED       1
+#define COLUMN_WORK_UNITS_DONE 2
+#define COLUMN_RUNNING_TIME    3
+#define COLUMN_CURRENT_STAGE   4
+#define COLUMN_THREAD0_WU      5
+#define COLUMN_THREAD1_WU      6
+#define COLUMN_THREAD2_WU      7
+#define COLUMN_THREAD3_WU      8
 
 int g_iSortColumn = 0;
 
@@ -91,8 +90,8 @@ int g_iSortColumn = 0;
 // CJobWatchDlg dialog
 
 
-CJobWatchDlg::CJobWatchDlg(CWnd* pParent /*=NULL*/)
-	: CIdleDialog(CJobWatchDlg::IDD, pParent)
+CJobWatchDlg::CJobWatchDlg( CWnd *pParent /*=NULL*/ ) :
+	CIdleDialog( CJobWatchDlg::IDD, pParent )
 {
 	m_CurMessageIndex = 0;
 	m_CurGraphTime = 0;
@@ -102,7 +101,7 @@ CJobWatchDlg::CJobWatchDlg(CWnd* pParent /*=NULL*/)
 	m_LastQueryTime = 0;
 
 	//{{AFX_DATA_INIT(CJobWatchDlg)
-		// NOTE: the ClassWizard will add member initialization here
+	// NOTE: the ClassWizard will add member initialization here
 	//}}AFX_DATA_INIT
 }
 
@@ -121,36 +120,36 @@ CJobWatchDlg::~CJobWatchDlg()
 }
 
 
-void CJobWatchDlg::DoDataExchange(CDataExchange* pDX)
+void CJobWatchDlg::DoDataExchange( CDataExchange *pDX )
 {
-	CDialog::DoDataExchange(pDX);
+	CDialog::DoDataExchange( pDX );
 	//{{AFX_DATA_MAP(CJobWatchDlg)
-	DDX_Control(pDX, IDC_WORKERS, m_Workers);
-	DDX_Control(pDX, IDC_TEXTOUTPUT, m_TextOutput);
+	DDX_Control( pDX, IDC_WORKERS, m_Workers );
+	DDX_Control( pDX, IDC_TEXTOUTPUT, m_TextOutput );
 	//}}AFX_DATA_MAP
 }
 
 
-BEGIN_MESSAGE_MAP(CJobWatchDlg, CIdleDialog)
+BEGIN_MESSAGE_MAP( CJobWatchDlg, CIdleDialog )
 	//{{AFX_MSG_MAP(CJobWatchDlg)
-	ON_LBN_SELCHANGE(IDC_WORKERS, OnSelChangeWorkers)
+	ON_LBN_SELCHANGE( IDC_WORKERS, OnSelChangeWorkers )
 	ON_WM_SIZE()
-	ON_NOTIFY(LVN_ODSTATECHANGED, IDC_WORKERS, OnOdstatechangedWorkers)
-	ON_NOTIFY(LVN_ITEMCHANGED, IDC_WORKERS, OnItemchangedWorkers)
+	ON_NOTIFY( LVN_ODSTATECHANGED, IDC_WORKERS, OnOdstatechangedWorkers )
+	ON_NOTIFY( LVN_ITEMCHANGED, IDC_WORKERS, OnItemchangedWorkers )
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 // CJobWatchDlg message handlers
 
-const char* FindArg( const char *pArgName, const char *pDefault="" )
+const char *FindArg( const char *pArgName, const char *pDefault = "" )
 {
-	for ( int i=1; i < __argc; i++ )
+	for ( int i = 1; i < __argc; i++ )
 	{
 		if ( Q_stricmp( pArgName, __argv[i] ) == 0 )
 		{
-			if ( (i+1) < __argc )
-				return __argv[i+1];
+			if ( ( i + 1 ) < __argc )
+				return __argv[i + 1];
 			else
 				return pDefault;
 		}
@@ -161,11 +160,11 @@ const char* FindArg( const char *pArgName, const char *pDefault="" )
 
 bool ReadStringFromFile( FILE *fp, char *pStr, int strSize )
 {
-	int i=0;
-	for ( i; i < strSize-2; i++ )
+	int i = 0;
+	for ( i; i < strSize - 2; i++ )
 	{
 		if ( fread( &pStr[i], 1, 1, fp ) != 1 ||
-			pStr[i] == '\n' )
+		     pStr[i] == '\n' )
 		{
 			break;
 		}
@@ -176,15 +175,15 @@ bool ReadStringFromFile( FILE *fp, char *pStr, int strSize )
 }
 
 
-BOOL CJobWatchDlg::OnInitDialog() 
+BOOL CJobWatchDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
 
 	m_Workers.SetExtendedStyle( LVS_EX_FULLROWSELECT );
-	
+
 	// Setup the headers.
-	for ( int i=0; i < ARRAYSIZE( g_ColumnInfos ); i++ )
+	for ( int i = 0; i < ARRAYSIZE( g_ColumnInfos ); i++ )
 	{
 		m_Workers.InsertColumn( i, g_ColumnInfos[i].pText, LVCFMT_LEFT, g_ColumnInfos[i].width, i );
 	}
@@ -214,9 +213,9 @@ BOOL CJobWatchDlg::OnInitDialog()
 	{
 		char errString[512];
 
-		// If they don't specify the DB info, get it from where 
+		// If they don't specify the DB info, get it from where
 		const char *pFilename = "dbinfo_job_search.txt";
-		FILE *fp = fopen( pFilename, "rt" );
+		FILE       *fp = fopen( pFilename, "rt" );
 		if ( !fp )
 		{
 			Q_snprintf( errString, sizeof( errString ), "Can't open '%s' for database info.", pFilename );
@@ -226,9 +225,8 @@ BOOL CJobWatchDlg::OnInitDialog()
 		}
 
 		if ( !ReadStringFromFile( fp, hostName, sizeof( hostName ) ) ||
-			 !ReadStringFromFile( fp, dbName, sizeof( dbName ) ) || 
-			 !ReadStringFromFile( fp, userName, sizeof( userName ) ) 
-			 )
+		     !ReadStringFromFile( fp, dbName, sizeof( dbName ) ) ||
+		     !ReadStringFromFile( fp, userName, sizeof( userName ) ) )
 		{
 			fclose( fp );
 			Q_snprintf( errString, sizeof( errString ), "'%s' has invalid format.", pFilename );
@@ -248,9 +246,9 @@ BOOL CJobWatchDlg::OnInitDialog()
 
 	// Get the mysql interface.
 	IMySQL *pSQL;
-	if ( !Sys_LoadInterface( "mysql_wrapper", MYSQL_WRAPPER_VERSION_NAME, &m_hMySQLDLL, (void**)&pSQL ) )
+	if ( !Sys_LoadInterface( "mysql_wrapper", MYSQL_WRAPPER_VERSION_NAME, &m_hMySQLDLL, (void **)&pSQL ) )
 		return false;
-	
+
 	if ( !pSQL->InitMySQL( pDBName, pHostName, pUserName ) )
 	{
 		pSQL->Release();
@@ -269,8 +267,8 @@ BOOL CJobWatchDlg::OnInitDialog()
 		EndDialog( 0 );
 		return FALSE;
 	}
-	
-	
+
+
 	memset( m_bQueriesInProgress, 0, sizeof( m_bQueriesInProgress ) );
 
 
@@ -280,7 +278,7 @@ BOOL CJobWatchDlg::OnInitDialog()
 	// Fill in the command line control.
 	char cmdLine[2048];
 	Q_snprintf( cmdLine, sizeof( cmdLine ), "vmpi_job_watch -JobID %s -hostname %s -dbname %s -username %s",
-		pJobID, pHostName, pDBName, pUserName );
+	            pJobID, pHostName, pDBName, pUserName );
 	SetDlgItemText( IDC_COMMAND_LINE, cmdLine );
 
 	// Setup anchors.
@@ -292,18 +290,18 @@ BOOL CJobWatchDlg::OnInitDialog()
 
 	m_AnchorMgr.AddAnchor( this, GetDlgItem( IDC_GRAPHS_PANEL ), ANCHOR_WIDTH_PERCENT, ANCHOR_TOP, ANCHOR_RIGHT, ANCHOR_HEIGHT_PERCENT );
 	m_AnchorMgr.AddAnchor( this, &m_GraphControl, ANCHOR_WIDTH_PERCENT, ANCHOR_TOP, ANCHOR_RIGHT, ANCHOR_HEIGHT_PERCENT );
-	
-	return TRUE;  // return TRUE unless you set the focus to a control
-	              // EXCEPTION: OCX Property Pages should return FALSE
+
+	return TRUE; // return TRUE unless you set the focus to a control
+				 // EXCEPTION: OCX Property Pages should return FALSE
 }
 
 
-CWorkerInfo* CJobWatchDlg::FindWorkerByID( unsigned long jobWorkerID )
+CWorkerInfo *CJobWatchDlg::FindWorkerByID( unsigned long jobWorkerID )
 {
 	int nIndex = -1;
 	while ( ( nIndex = m_Workers.GetNextItem( nIndex, LVNI_ALL ) ) != -1 )
 	{
-		CWorkerInfo *pInfo = (CWorkerInfo*)m_Workers.GetItemData( nIndex );
+		CWorkerInfo *pInfo = (CWorkerInfo *)m_Workers.GetItemData( nIndex );
 		if ( pInfo->m_JobWorkerID == jobWorkerID )
 			return pInfo;
 	}
@@ -312,12 +310,12 @@ CWorkerInfo* CJobWatchDlg::FindWorkerByID( unsigned long jobWorkerID )
 }
 
 
-CWorkerInfo* CJobWatchDlg::FindWorkerByMachineName( const char *pMachineName )
+CWorkerInfo *CJobWatchDlg::FindWorkerByMachineName( const char *pMachineName )
 {
 	int nIndex = -1;
 	while ( ( nIndex = m_Workers.GetNextItem( nIndex, LVNI_ALL ) ) != -1 )
 	{
-		CWorkerInfo *pInfo = (CWorkerInfo*)m_Workers.GetItemData( nIndex );
+		CWorkerInfo *pInfo = (CWorkerInfo *)m_Workers.GetItemData( nIndex );
 		if ( V_strieq( pInfo->m_ComputerName, pMachineName ) )
 			return pInfo;
 	}
@@ -339,8 +337,8 @@ void CJobWatchDlg::UpdateWorkersList()
 	int nIndex = -1;
 	while ( ( nIndex = m_Workers.GetNextItem( nIndex, LVNI_ALL ) ) != -1 )
 	{
-		CWorkerInfo *pInfo = (CWorkerInfo*)m_Workers.GetItemData( nIndex );
-	
+		CWorkerInfo *pInfo = (CWorkerInfo *)m_Workers.GetItemData( nIndex );
+
 		char *pConnectedStr = pInfo->m_bConnected ? "yes" : "no";
 		m_Workers.SetItemText( nIndex, COLUMN_CONNECTED, pConnectedStr );
 
@@ -352,7 +350,7 @@ void CJobWatchDlg::UpdateWorkersList()
 
 		// Current stage.
 		SetWorkerListItemInt( nIndex, COLUMN_WORK_UNITS_DONE, pInfo->m_nWorkUnitsDone );
-		
+
 		m_Workers.SetItemText( nIndex, COLUMN_CURRENT_STAGE, pInfo->m_CurrentStage );
 
 		SetWorkerListItemInt( nIndex, COLUMN_THREAD0_WU, pInfo->m_ThreadWUs[0] );
@@ -371,19 +369,19 @@ bool CJobWatchDlg::GetCurJobWorkerID( unsigned long &id )
 	if ( !pos )
 		return false;
 
-	int index = m_Workers.GetNextSelectedItem( pos );
-	CWorkerInfo *pInfo = (CWorkerInfo*)m_Workers.GetItemData( index );
+	int          index = m_Workers.GetNextSelectedItem( pos );
+	CWorkerInfo *pInfo = (CWorkerInfo *)m_Workers.GetItemData( index );
 	id = pInfo->m_JobWorkerID;
 	return true;
 }
 
 
-void CJobWatchDlg::OnSelChangeWorkers() 
+void CJobWatchDlg::OnSelChangeWorkers()
 {
 	// Clear the text output and invalidate any old queries for text.
 	int nLen = m_TextOutput.SendMessage( EM_GETLIMITTEXT, 0, 0 );
 	m_TextOutput.SendMessage( EM_SETSEL, 0, nLen );
-	m_TextOutput.SendMessage( EM_REPLACESEL, FALSE, (LPARAM)"" );
+	m_TextOutput.SendMessage( EM_REPLACESEL, FALSE, ( LPARAM ) "" );
 
 	m_CurMessageIndex = 0;
 	m_CurWorkerTextToken++;
@@ -400,7 +398,6 @@ void CJobWatchDlg::ResortItems()
 }
 
 
-
 void CJobWatchDlg::OnIdle()
 {
 	// Issue any queries that we need to.
@@ -409,31 +406,32 @@ void CJobWatchDlg::OnIdle()
 	{
 		m_LastQueryTime = curTime;
 		char query[2048];
-		
+
 		unsigned long jobWorkerID;
-		bool bJobWorkerIDValid = GetCurJobWorkerID( jobWorkerID );
-		
+		bool          bJobWorkerIDValid = GetCurJobWorkerID( jobWorkerID );
+
 		if ( !m_bQueriesInProgress[QUERY_TEXT] && bJobWorkerIDValid )
 		{
 			Q_snprintf( query, sizeof( query ), "select * from text_messages where JobWorkerID=%lu and MessageIndex >= %lu", jobWorkerID, m_CurMessageIndex );
-			m_pSQL->Execute( query, (void*)(QUERY_TEXT | (m_CurWorkerTextToken << 16)) );	
+			m_pSQL->Execute( query, (void *)( QUERY_TEXT | ( m_CurWorkerTextToken << 16 ) ) );
 			m_bQueriesInProgress[QUERY_TEXT] = true;
 		}
 
 		if ( !m_bQueriesInProgress[QUERY_GRAPH] && bJobWorkerIDValid )
 		{
 			Q_snprintf( query, sizeof( query ), "select * from graph_entry where JobWorkerID=%lu", jobWorkerID );
-			m_pSQL->Execute( query, (void*)QUERY_GRAPH );	
+			m_pSQL->Execute( query, (void *)QUERY_GRAPH );
 			m_bQueriesInProgress[QUERY_GRAPH] = true;
 		}
 
 		if ( !m_bQueriesInProgress[QUERY_WORKER_STATS] )
 		{
 			Q_snprintf( query, sizeof( query ), "select JobWorkerID, WorkerState, NumWorkUnits, "
-				"RunningTimeMS, CurrentStage, Thread0WU, Thread1WU, Thread2WU, Thread3WU, IsMaster, MachineName "
-				" from job_worker_start where JobID=%lu", m_JobID );
+			                                    "RunningTimeMS, CurrentStage, Thread0WU, Thread1WU, Thread2WU, Thread3WU, IsMaster, MachineName "
+			                                    " from job_worker_start where JobID=%lu",
+			            m_JobID );
 
-			m_pSQL->Execute( query, (void*)QUERY_WORKER_STATS );	
+			m_pSQL->Execute( query, (void *)QUERY_WORKER_STATS );
 			m_bQueriesInProgress[QUERY_WORKER_STATS] = true;
 		}
 	}
@@ -443,8 +441,8 @@ void CJobWatchDlg::OnIdle()
 	CQueryResults results;
 	while ( m_pSQL->GetNextResults( results ) && results.m_pResults )
 	{
-		int iQueryID = ((int)results.m_pUserData) & 0xFFFF;
-		int iExtraData = ((int)results.m_pUserData) >> 16;
+		int iQueryID = ( (int)results.m_pUserData ) & 0xFFFF;
+		int iExtraData = ( (int)results.m_pUserData ) >> 16;
 
 		if ( results.m_pResults )
 		{
@@ -463,7 +461,7 @@ void CJobWatchDlg::OnIdle()
 			{
 				ProcessQueryResults_WorkerStats( results.m_pResults );
 			}
-			
+
 			results.m_pResults->Release();
 		}
 
@@ -477,31 +475,30 @@ void CJobWatchDlg::ProcessQueryResults_WorkerStats( IMySQLRowSet *pSet )
 	bool bChange = false;
 	while ( pSet->NextRow() )
 	{
-		int iColumn = 0;
-		int workerID =  pSet->GetColumnValue_Int( iColumn++ );
-		int workerState = pSet->GetColumnValue_Int( iColumn++ );
-		int nWorkUnits = pSet->GetColumnValue_Int( iColumn++ );
+		int           iColumn = 0;
+		int           workerID = pSet->GetColumnValue_Int( iColumn++ );
+		int           workerState = pSet->GetColumnValue_Int( iColumn++ );
+		int           nWorkUnits = pSet->GetColumnValue_Int( iColumn++ );
 		unsigned long runningTimeMS = pSet->GetColumnValue_Int( iColumn++ );
-		const char *pCurrentStage = pSet->GetColumnValue_String( iColumn++ );
-		int iThread0WU = pSet->GetColumnValue_Int( iColumn++ );
-		int iThread1WU = pSet->GetColumnValue_Int( iColumn++ );
-		int iThread2WU = pSet->GetColumnValue_Int( iColumn++ );
-		int iThread3WU = pSet->GetColumnValue_Int( iColumn++ );
-		int bIsMaster = pSet->GetColumnValue_Int( iColumn++ );
-		const char *pMachineName = pSet->GetColumnValue_String( iColumn );
+		const char   *pCurrentStage = pSet->GetColumnValue_String( iColumn++ );
+		int           iThread0WU = pSet->GetColumnValue_Int( iColumn++ );
+		int           iThread1WU = pSet->GetColumnValue_Int( iColumn++ );
+		int           iThread2WU = pSet->GetColumnValue_Int( iColumn++ );
+		int           iThread3WU = pSet->GetColumnValue_Int( iColumn++ );
+		int           bIsMaster = pSet->GetColumnValue_Int( iColumn++ );
+		const char   *pMachineName = pSet->GetColumnValue_String( iColumn );
 
 		CWorkerInfo *pInfo = FindWorkerByID( workerID );
 		if ( pInfo )
 		{
-			if ( workerState != pInfo->m_bConnected || 
-				nWorkUnits != pInfo->m_nWorkUnitsDone ||
-				runningTimeMS != pInfo->m_RunningTimeMS ||
-				stricmp( pCurrentStage, pInfo->m_CurrentStage ) != 0 ||
-				iThread0WU != pInfo->m_ThreadWUs[0] ||
-				iThread1WU != pInfo->m_ThreadWUs[1] ||
-				iThread2WU != pInfo->m_ThreadWUs[2] ||
-				iThread3WU != pInfo->m_ThreadWUs[3]
-				)
+			if ( workerState != pInfo->m_bConnected ||
+			     nWorkUnits != pInfo->m_nWorkUnitsDone ||
+			     runningTimeMS != pInfo->m_RunningTimeMS ||
+			     stricmp( pCurrentStage, pInfo->m_CurrentStage ) != 0 ||
+			     iThread0WU != pInfo->m_ThreadWUs[0] ||
+			     iThread1WU != pInfo->m_ThreadWUs[1] ||
+			     iThread2WU != pInfo->m_ThreadWUs[2] ||
+			     iThread3WU != pInfo->m_ThreadWUs[3] )
 			{
 				bChange = true;
 				pInfo->m_bConnected = workerState;
@@ -528,7 +525,7 @@ void CJobWatchDlg::ProcessQueryResults_WorkerStats( IMySQLRowSet *pSet )
 			if ( bIsMaster )
 			{
 				char tempStr[512];
-				Q_snprintf( tempStr, sizeof( tempStr ), "%s [master]", (const char*)pInfo->m_ComputerName );
+				Q_snprintf( tempStr, sizeof( tempStr ), "%s [master]", (const char *)pInfo->m_ComputerName );
 				index = m_Workers.InsertItem( COLUMN_COMPUTER_NAME, tempStr, NULL );
 			}
 			else
@@ -550,12 +547,12 @@ void CJobWatchDlg::ProcessQueryResults_WorkerStats( IMySQLRowSet *pSet )
 
 void CJobWatchDlg::ProcessQueryResults_Text( IMySQLRowSet *pSet )
 {
-	CUtlVector<char> text;
+	CUtlVector< char > text;
 
 	while ( pSet->NextRow() )
 	{
 		const char *pTextStr = pSet->GetColumnValue( "text" ).String();
-		int len = strlen( pTextStr );
+		int         len = strlen( pTextStr );
 		text.AddMultipleToTail( len, pTextStr );
 
 		m_CurMessageIndex = pSet->GetColumnValue( "MessageIndex" ).Int32() + 1;
@@ -568,12 +565,12 @@ void CJobWatchDlg::ProcessQueryResults_Text( IMySQLRowSet *pSet )
 
 void CJobWatchDlg::ProcessQueryResults_Graph( IMySQLRowSet *pSet )
 {
-	int iMSTime = pSet->GetColumnIndex( "MSSinceJobStart" );	
+	int iMSTime = pSet->GetColumnIndex( "MSSinceJobStart" );
 	int iBytesSent = pSet->GetColumnIndex( "BytesSent" );
 	int iBytesReceived = pSet->GetColumnIndex( "BytesReceived" );
 
 	// See if there's anything new.
-	CUtlVector<CGraphEntry> entries;
+	CUtlVector< CGraphEntry > entries;
 
 	int highest = m_CurGraphTime;
 	while ( pSet->NextRow() )
@@ -590,24 +587,24 @@ void CJobWatchDlg::ProcessQueryResults_Graph( IMySQLRowSet *pSet )
 	if ( highest > m_CurGraphTime )
 	{
 		m_CurGraphTime = highest;
-		
+
 		m_GraphControl.Clear();
 		m_GraphControl.Fill( entries );
 	}
 }
- 
 
-void CJobWatchDlg::OnSize(UINT nType, int cx, int cy) 
+
+void CJobWatchDlg::OnSize( UINT nType, int cx, int cy )
 {
-	CIdleDialog::OnSize(nType, cx, cy);
-	
-	m_AnchorMgr.UpdateAnchors( this );	
+	CIdleDialog::OnSize( nType, cx, cy );
+
+	m_AnchorMgr.UpdateAnchors( this );
 }
 
 
-BOOL CJobWatchDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult) 
+BOOL CJobWatchDlg::OnNotify( WPARAM wParam, LPARAM lParam, LRESULT *pResult )
 {
-	NMHDR *pHdr = (NMHDR*)lParam;
+	NMHDR *pHdr = (NMHDR *)lParam;
 	if ( pHdr->idFrom == IDC_WORKERS )
 	{
 		if ( pHdr->code == LVN_COLUMNCLICK )
@@ -620,29 +617,29 @@ BOOL CJobWatchDlg::OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult)
 		}
 	}
 
-	return CIdleDialog::OnNotify(wParam, lParam, pResult);
+	return CIdleDialog::OnNotify( wParam, lParam, pResult );
 }
 
-void CJobWatchDlg::OnOdstatechangedWorkers(NMHDR* pNMHDR, LRESULT* pResult) 
+void CJobWatchDlg::OnOdstatechangedWorkers( NMHDR *pNMHDR, LRESULT *pResult )
 {
-	NMLVODSTATECHANGE* pStateChanged = (NMLVODSTATECHANGE*)pNMHDR;
+	NMLVODSTATECHANGE *pStateChanged = (NMLVODSTATECHANGE *)pNMHDR;
 
 	if ( !( pStateChanged->uOldState & LVIS_SELECTED ) && ( pStateChanged->uNewState & LVIS_SELECTED ) )
 	{
 		OnSelChangeWorkers();
 	}
-	
+
 	*pResult = 0;
 }
 
-void CJobWatchDlg::OnItemchangedWorkers(NMHDR* pNMHDR, LRESULT* pResult) 
+void CJobWatchDlg::OnItemchangedWorkers( NMHDR *pNMHDR, LRESULT *pResult )
 {
-	NM_LISTVIEW* pNMListView = (NM_LISTVIEW*)pNMHDR;
+	NM_LISTVIEW *pNMListView = (NM_LISTVIEW *)pNMHDR;
 
 	if ( !( pNMListView->uOldState & LVIS_SELECTED ) && ( pNMListView->uNewState & LVIS_SELECTED ) )
 	{
 		OnSelChangeWorkers();
 	}
-	
+
 	*pResult = 0;
 }

@@ -6,27 +6,34 @@
 #include "tier0/memalloc.h"
 #include "tier0/dbg.h"
 
-namespace s1::launcher {
+namespace s1::launcher
+{
 
 // Dump heap leaks.
-class ScopedHeapLeakDumper {
- public:
-  explicit ScopedHeapLeakDumper(bool should_check_leaks) noexcept
-      : should_check_leaks_(should_check_leaks) {}
+class ScopedHeapLeakDumper
+{
+public:
+	explicit ScopedHeapLeakDumper( bool should_check_leaks ) noexcept
+		:
+		should_check_leaks_( should_check_leaks )
+	{
+	}
 
-  ScopedHeapLeakDumper(const ScopedHeapLeakDumper &) = delete;
-  ScopedHeapLeakDumper(ScopedHeapLeakDumper &&) = delete;
-  ScopedHeapLeakDumper &operator=(const ScopedHeapLeakDumper &) = delete;
-  ScopedHeapLeakDumper &operator=(ScopedHeapLeakDumper &&) = delete;
+	ScopedHeapLeakDumper( const ScopedHeapLeakDumper & ) = delete;
+	ScopedHeapLeakDumper( ScopedHeapLeakDumper && ) = delete;
+	ScopedHeapLeakDumper &operator=( const ScopedHeapLeakDumper & ) = delete;
+	ScopedHeapLeakDumper &operator=( ScopedHeapLeakDumper && ) = delete;
 
-  ~ScopedHeapLeakDumper() noexcept {
-    if (should_check_leaks_) MemAlloc_DumpStats();
-  }
+	~ScopedHeapLeakDumper() noexcept
+	{
+		if ( should_check_leaks_ )
+			MemAlloc_DumpStats();
+	}
 
- private:
-  const bool should_check_leaks_;
+private:
+	const bool should_check_leaks_;
 };
 
-}  // namespace s1::launcher
+} // namespace s1::launcher
 
-#endif  // SE_LAUNCHER_SCOPED_HEAP_LEAK_DUMPER_H
+#endif // SE_LAUNCHER_SCOPED_HEAP_LEAK_DUMPER_H

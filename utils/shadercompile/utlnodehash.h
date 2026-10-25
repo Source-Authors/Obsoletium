@@ -11,62 +11,71 @@
 // To use this class, your list node class must have a Key() function defined
 // which returns an integer type.  May add this class to main utl tier when i'm
 // happy with it.
-template <typename T, unsigned HASHSIZE = 7907, typename K = intp>
-class CUtlNodeHash {
- public:
-  CUtlIntrusiveDList<T> m_HashChains[HASHSIZE];
+template< typename T, unsigned HASHSIZE = 7907, typename K = intp >
+class CUtlNodeHash
+{
+public:
+	CUtlIntrusiveDList< T > m_HashChains[HASHSIZE];
 
-  CUtlNodeHash() { m_nNumNodes = 0; }
+	CUtlNodeHash() { m_nNumNodes = 0; }
 
-  T *FindByKey(K key, uintp *found_chain = nullptr) const {
-    uintp chain = (uintp)key;
+	T *FindByKey( K key, uintp *found_chain = nullptr ) const
+	{
+		uintp chain = (uintp)key;
 
-    chain %= HASHSIZE;
+		chain %= HASHSIZE;
 
-    if (found_chain) *found_chain = chain;
+		if ( found_chain )
+			*found_chain = chain;
 
-    for (auto *node = m_HashChains[chain].m_pHead; node; node = node->m_pNext)
-      if (node->Key() == key) return node;
+		for ( auto *node = m_HashChains[chain].m_pHead; node; node = node->m_pNext )
+			if ( node->Key() == key )
+				return node;
 
-    return nullptr;
-  }
+		return nullptr;
+	}
 
-  void Add(T *pNode) {
-    uintp nChain = (uintp)pNode->Key();
+	void Add( T *pNode )
+	{
+		uintp nChain = (uintp)pNode->Key();
 
-    nChain %= HASHSIZE;
+		nChain %= HASHSIZE;
 
-    m_HashChains[nChain].AddToHead(pNode);
-    ++m_nNumNodes;
-  }
+		m_HashChains[nChain].AddToHead( pNode );
+		++m_nNumNodes;
+	}
 
-  void Purge() {
-    m_nNumNodes = 0;
+	void Purge()
+	{
+		m_nNumNodes = 0;
 
-    // delete all nodes
-    for (unsigned i = 0; i < HASHSIZE; i++) {
-      m_HashChains[i].Purge();
-    }
-  }
+		// delete all nodes
+		for ( unsigned i = 0; i < HASHSIZE; i++ )
+		{
+			m_HashChains[i].Purge();
+		}
+	}
 
-  intp Count() const { return m_nNumNodes; }
+	intp Count() const { return m_nNumNodes; }
 
-  void DeleteByKey(K nMatchKey) {
-    uintp chain;
-    T *value = FindByKey(nMatchKey, &chain);
+	void DeleteByKey( K nMatchKey )
+	{
+		uintp chain;
+		T    *value = FindByKey( nMatchKey, &chain );
 
-    if (value) {
-      m_HashChains[chain].RemoveNode(value);
+		if ( value )
+		{
+			m_HashChains[chain].RemoveNode( value );
 
-      m_nNumNodes--;
-    }
-  }
+			m_nNumNodes--;
+		}
+	}
 
-  // delete all lists
-  ~CUtlNodeHash() { Purge(); }
+	// delete all lists
+	~CUtlNodeHash() { Purge(); }
 
- private:
-  intp m_nNumNodes;
+private:
+	intp m_nNumNodes;
 };
 
-#endif  // !SE_UTILS_SHADERCOMPILE_UTLNODEHASH_H_
+#endif // !SE_UTILS_SHADERCOMPILE_UTLNODEHASH_H_

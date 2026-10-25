@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //
@@ -17,14 +17,14 @@
 #include <stdlib.h>
 
 
-const char* FindArg( int argc, char **argv, const char *pName, const char *pDefault = "" )
+const char *FindArg( int argc, char **argv, const char *pName, const char *pDefault = "" )
 {
-	for ( int i=0; i < argc; i++ )
+	for ( int i = 0; i < argc; i++ )
 	{
 		if ( stricmp( argv[i], pName ) == 0 )
 		{
-			if ( (i+1) < argc )
-				return argv[i+1];
+			if ( ( i + 1 ) < argc )
+				return argv[i + 1];
 			else
 				return pDefault;
 		}
@@ -33,9 +33,9 @@ const char* FindArg( int argc, char **argv, const char *pName, const char *pDefa
 }
 
 
-int main(int argc, char* argv[])
+int main( int argc, char *argv[] )
 {
-	CUtlVector<CIPAddr> addrs;
+	CUtlVector< CIPAddr > addrs;
 
 	printf( "\n" );
 	printf( "vmpi_ping <option>\n" );
@@ -47,11 +47,11 @@ int main(int argc, char* argv[])
 	printf( "    -dns               ..  enable DNS lookups (slows the listing down)\n" );
 	printf( "    -ShowConsole       ..  show the console window\n" );
 	printf( "    -HideConsole       ..  hide the console window\n" );
-	
+
 	//Scary to show these to users...
 	//printf( "    -ShowCache         ..  show the cache directory and its capacity\n" );
 	//printf( "    -FlushCache        ..  flush the cache of ALL VMPI services\n" );
-	
+
 	printf( "\n" );
 
 
@@ -64,19 +64,19 @@ int main(int argc, char* argv[])
 
 	const char *pPassword = FindArg( argc, argv, "-mpi_pw" );
 
-	
+
 	// Figure out which action they want to take.
-	int timeout = 0;
+	int  timeout = 0;
 	char cRequest = VMPI_PING_REQUEST;
 	if ( FindArg( argc, argv, "-Stop" ) )
 	{
 		cRequest = VMPI_STOP_SERVICE;
-	}		
+	}
 	else if ( FindArg( argc, argv, "-Kill" ) )
 	{
 		cRequest = VMPI_KILL_PROCESS;
 	}
-/*
+	/*
 	else if ( FindArg( argc, argv, "-ShowConsole" ) )
 	{
 		cRequest = VMPI_SHOW_CONSOLE_WINDOW;
@@ -119,10 +119,10 @@ int main(int argc, char* argv[])
 	printf( "Pinging VMPI Services... press a key to stop.\n\n" );
 	while ( !kbhit() )
 	{
-		for ( int i=VMPI_SERVICE_PORT; i <= VMPI_LAST_SERVICE_PORT; i++ )
+		for ( int i = VMPI_SERVICE_PORT; i <= VMPI_LAST_SERVICE_PORT; i++ )
 		{
 			unsigned char data[256];
-			bf_write buf( data );
+			bf_write      buf( data );
 			buf.WriteByte( VMPI_PROTOCOL_VERSION );
 			buf.WriteString( pPassword );
 			buf.WriteByte( cRequest );
@@ -136,15 +136,15 @@ int main(int argc, char* argv[])
 		while ( 1 )
 		{
 			CIPAddr ipFrom;
-			char in[256];
-			int len = pSocket->RecvFrom( in, sizeof( in ), &ipFrom );
+			char    in[256];
+			int     len = pSocket->RecvFrom( in, sizeof( in ), &ipFrom );
 			if ( len == -1 )
 				break;
 
-			if ( len >= 2 && 
-				in[0] == VMPI_PROTOCOL_VERSION && 
-				in[1] == VMPI_PING_RESPONSE && 
-				addrs.Find( ipFrom ) == -1 )
+			if ( len >= 2 &&
+			     in[0] == VMPI_PROTOCOL_VERSION &&
+			     in[1] == VMPI_PING_RESPONSE &&
+			     addrs.Find( ipFrom ) == -1 )
 			{
 				char *pStateString = "(unknown)";
 				if ( len >= 3 )
@@ -160,26 +160,26 @@ int main(int argc, char* argv[])
 
 				if ( FindArg( argc, argv, "-dns" ) && ConvertIPAddrToString( &ipFrom, nameStr, sizeof( nameStr ) ) )
 				{
-					printf( "%02d. %s - %s:%d (%d.%d.%d.%d)", 
-						nMachines, pStateString, nameStr, ipFrom.port,
-						ipFrom.ip[0], ipFrom.ip[1], ipFrom.ip[2], ipFrom.ip[3] );
+					printf( "%02d. %s - %s:%d (%d.%d.%d.%d)",
+					        nMachines, pStateString, nameStr, ipFrom.port,
+					        ipFrom.ip[0], ipFrom.ip[1], ipFrom.ip[2], ipFrom.ip[3] );
 				}
 				else
 				{
-					printf( "%02d. %s - %d.%d.%d.%d:%d", 
-						nMachines, pStateString, ipFrom.ip[0], ipFrom.ip[1], ipFrom.ip[2], ipFrom.ip[3], ipFrom.port );
+					printf( "%02d. %s - %d.%d.%d.%d:%d",
+					        nMachines, pStateString, ipFrom.ip[0], ipFrom.ip[1], ipFrom.ip[2], ipFrom.ip[3], ipFrom.port );
 				}
 
 				if ( cRequest == VMPI_GET_CACHE_INFO )
 				{
 					// Next var is a 64-bit int with the size of the cache.
-					char *pCur = &in[3];
-					__int64 cacheSize = *((__int64*)pCur);
+					char   *pCur = &in[3];
+					__int64 cacheSize = *( (__int64 *)pCur );
 					pCur += sizeof( __int64 );
 
 					char *pCacheDir = pCur;
 
-					__int64 nMegs = cacheSize / (1024*1024);
+					__int64 nMegs = cacheSize / ( 1024 * 1024 );
 					printf( "\n\tCache dir: %s, size: %d megs", pCur, nMegs );
 				}
 
@@ -194,4 +194,3 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-

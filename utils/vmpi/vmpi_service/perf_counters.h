@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 //=============================================================================
 
@@ -16,13 +16,13 @@ class IPerfTracker
 public:
 	virtual void Init( unsigned long dwProcessID ) = 0;
 	virtual void Release() = 0;
-	
+
 	virtual unsigned long GetProcessID() = 0;
-	virtual void GetPerfData( int &processorPercentage, int &memoryUsageMegabytes ) = 0;
+	virtual void          GetPerfData( int &processorPercentage, int &memoryUsageMegabytes ) = 0;
 };
 
 
-IPerfTracker* CreatePerfTracker();
+IPerfTracker *CreatePerfTracker();
 
 
 #endif // PERF_COUNTERS_H

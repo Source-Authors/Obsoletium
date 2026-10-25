@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //
@@ -31,7 +31,7 @@ CGraphControl::~CGraphControl()
 }
 
 
-BEGIN_MESSAGE_MAP(CGraphControl, CWnd)
+BEGIN_MESSAGE_MAP( CGraphControl, CWnd )
 	//{{AFX_MSG_MAP(CGraphControl)
 	ON_WM_PAINT()
 	//}}AFX_MSG_MAP
@@ -45,7 +45,7 @@ void CGraphControl::Clear()
 
 	CDC *pDC = GetDC();
 
-	CBrush brush( RGB( 0, 0, 0 ) );
+	CBrush  brush( RGB( 0, 0, 0 ) );
 	CBrush *pOldBrush = pDC->SelectObject( &brush );
 	pDC->Rectangle( 0, 0, rcClient.Width(), rcClient.Height() );
 	pDC->SelectObject( pOldBrush );
@@ -60,40 +60,38 @@ void CGraphControl::Render( CDC *pDC )
 	GetClientRect( rcClient );
 
 
-	CBrush brush( RGB( 0, 0, 0 ) );
+	CBrush  brush( RGB( 0, 0, 0 ) );
 	CBrush *pOldBrush = pDC->SelectObject( &brush );
 	pDC->Rectangle( 0, 0, rcClient.Width(), rcClient.Height() );
 	pDC->SelectObject( pOldBrush );
 
 
-
 	// Work backwards from the right side to the left.
-	int nIntervals = rcClient.Width();
-	DWORD intervalMS = 500;	// one interval per pixel
+	int   nIntervals = rcClient.Width();
+	DWORD intervalMS = 500; // one interval per pixel
 	DWORD startTime = 0xFFFFFFFF, endTime = 0;
 
 	// First, find which order of magnitude to use on the vertical scale by finding the maximum value.
-	for ( int iEntry=0; iEntry < m_Entries.Count(); iEntry++ )
+	for ( int iEntry = 0; iEntry < m_Entries.Count(); iEntry++ )
 	{
 		DWORD msTime = m_Entries[iEntry].m_msTime;
 		startTime = min( startTime, msTime );
 		endTime = max( endTime, msTime );
 	}
 
-	int curTime = (int)endTime - nIntervals*intervalMS;
-	
+	int curTime = (int)endTime - nIntervals * intervalMS;
 
 
 	CGraphEntry prevEntry, curEntry;
-	prevEntry.m_msTime = curEntry.m_msTime = -1;	
+	prevEntry.m_msTime = curEntry.m_msTime = -1;
 
-	CUtlVector<POINT> sentPoints;
-	CUtlVector<POINT> receivedPoints;
+	CUtlVector< POINT > sentPoints;
+	CUtlVector< POINT > receivedPoints;
 
 	int iCurEntry = -1;
 	int nMaxBytesSent = -1, nMaxBytesReceived = -1;
 
-	for ( int x=0; x < nIntervals; x++ )
+	for ( int x = 0; x < nIntervals; x++ )
 	{
 		if ( curTime >= 0 )
 		{
@@ -111,37 +109,37 @@ void CGraphControl::Render( CDC *pDC )
 			if ( curTime >= prevEntry.m_msTime && curTime <= curEntry.m_msTime )
 			{
 				// Interpolate the bytes sent.
-				int nBytesSent = (int)RemapVal( 
-					curTime, 
-					prevEntry.m_msTime, curEntry.m_msTime,
-					prevEntry.m_nBytesSent, curEntry.m_nBytesSent );
+				int nBytesSent = (int)RemapVal(
+				curTime,
+				prevEntry.m_msTime, curEntry.m_msTime,
+				prevEntry.m_nBytesSent, curEntry.m_nBytesSent );
 
 				POINT sentPoint = { x, nBytesSent };
 				sentPoints.AddToTail( sentPoint );
 				nMaxBytesSent = max( nMaxBytesSent, nBytesSent );
 
-				
+
 				int nBytesReceived = (int)RemapVal(
-					curTime, 
-					prevEntry.m_msTime, curEntry.m_msTime,
-					prevEntry.m_nBytesReceived, curEntry.m_nBytesReceived );
-				
+				curTime,
+				prevEntry.m_msTime, curEntry.m_msTime,
+				prevEntry.m_nBytesReceived, curEntry.m_nBytesReceived );
+
 				POINT receivedPoint = { x, nBytesReceived };
 				receivedPoints.AddToTail( receivedPoint );
 				nMaxBytesReceived = max( nMaxBytesReceived, nBytesReceived );
 			}
-		}			
-		
+		}
+
 		curTime += intervalMS;
 	}
 
-	ENDLOOP:;
+ENDLOOP:;
 
 
 	// Now normalize all the values.
 	int largest = max( nMaxBytesSent, nMaxBytesReceived );
-	int topValue = (largest*11) / 10;
-/*
+	int topValue = ( largest * 11 ) / 10;
+	/*
 	DWORD nZeros;
 	for( nZeros = 1; nZeros < 20; nZeros++ )
 	{
@@ -161,25 +159,25 @@ void CGraphControl::Render( CDC *pDC )
 	}
 */
 
-	for ( int iSample=0; iSample < sentPoints.Count(); iSample++ )
+	for ( int iSample = 0; iSample < sentPoints.Count(); iSample++ )
 	{
 		double flHeight;
-		
-		flHeight = ((double)sentPoints[iSample].y / topValue) * (rcClient.Height() - 1);
+
+		flHeight = ( (double)sentPoints[iSample].y / topValue ) * ( rcClient.Height() - 1 );
 		sentPoints[iSample].y = (int)( rcClient.Height() - flHeight );
 
-		flHeight = ((double)receivedPoints[iSample].y / topValue) * (rcClient.Height() - 1);
+		flHeight = ( (double)receivedPoints[iSample].y / topValue ) * ( rcClient.Height() - 1 );
 		receivedPoints[iSample].y = (int)( rcClient.Height() - flHeight );
 	}
 
 
 	// Draw some horizontal lines dividing the space.
 	int nLines = 10;
-	for ( int iLine=0; iLine <= nLines; iLine++ )
+	for ( int iLine = 0; iLine <= nLines; iLine++ )
 	{
-		CPen penLine;
+		CPen     penLine;
 		COLORREF color;
-		if ( iLine == 0 || iLine == nLines/2 )
+		if ( iLine == 0 || iLine == nLines / 2 )
 			color = RGB( 0, 220, 0 );
 		else
 			color = RGB( 0, 100, 0 );
@@ -187,16 +185,16 @@ void CGraphControl::Render( CDC *pDC )
 		penLine.CreatePen( PS_SOLID, 1, color );
 		CPen *pOldPen = pDC->SelectObject( &penLine );
 
-		int y = (iLine * rcClient.Height()) / nLines;
+		int y = ( iLine * rcClient.Height() ) / nLines;
 		pDC->MoveTo( 0, y );
 		pDC->LineTo( rcClient.Width(), y );
-	
+
 		pDC->SelectObject( pOldPen );
 	}
 
 
 	// Now draw the lines for the data.
-	CPen penSent( PS_SOLID, 1, RGB( 0, 255, 0 ) );
+	CPen  penSent( PS_SOLID, 1, RGB( 0, 255, 0 ) );
 	CPen *pOldPen = pDC->SelectObject( &penSent );
 	pDC->Polyline( sentPoints.Base(), sentPoints.Count() );
 	pDC->SelectObject( pOldPen );
@@ -207,21 +205,20 @@ void CGraphControl::Render( CDC *pDC )
 	pDC->SelectObject( pOldPen );
 
 
-
 	// Draw text labels.
 	pDC->SetTextColor( RGB( 200, 200, 200 ) );
 	pDC->SetBkColor( 0 );
 
 	CString str;
-	str.Format( "%dk", (topValue+511) / 1024 );
+	str.Format( "%dk", ( topValue + 511 ) / 1024 );
 	pDC->ExtTextOut( 0, 1, 0, NULL, str, NULL );
 
-	str.Format( "%dk", (topValue+511) / 1024 / 2 );
-	pDC->ExtTextOut( 0, rcClient.Height()/2 + 1, 0, NULL, str, NULL );
+	str.Format( "%dk", ( topValue + 511 ) / 1024 / 2 );
+	pDC->ExtTextOut( 0, rcClient.Height() / 2 + 1, 0, NULL, str, NULL );
 }
 
 
-void CGraphControl::Fill( CUtlVector<CGraphEntry> &entries )
+void CGraphControl::Fill( CUtlVector< CGraphEntry > &entries )
 {
 	CDC *pDC = GetDC();
 	if ( !pDC )
@@ -238,9 +235,9 @@ void CGraphControl::Fill( CUtlVector<CGraphEntry> &entries )
 /////////////////////////////////////////////////////////////////////////////
 // CGraphControl message handlers
 
-void CGraphControl::OnPaint() 
+void CGraphControl::OnPaint()
 {
-	CPaintDC dc(this); // device context for painting
-	
+	CPaintDC dc( this ); // device context for painting
+
 	Render( &dc );
 }

@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //
@@ -10,7 +10,7 @@
 //      are changed infrequently
 //
 
-#if !defined(AFX_STDAFX_H__29316173_1244_4B6A_B361_1ADB126E69F2__INCLUDED_)
+#if !defined( AFX_STDAFX_H__29316173_1244_4B6A_B361_1ADB126E69F2__INCLUDED_ )
 #define AFX_STDAFX_H__29316173_1244_4B6A_B361_1ADB126E69F2__INCLUDED_
 
 #if _MSC_VER > 1000

@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //
@@ -21,12 +21,12 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CVMPIBrowserJobSearchApp
 
-BEGIN_MESSAGE_MAP(CVMPIBrowserJobSearchApp, CWinApp)
+BEGIN_MESSAGE_MAP( CVMPIBrowserJobSearchApp, CWinApp )
 	//{{AFX_MSG_MAP(CVMPIBrowserJobSearchApp)
-		// NOTE - the ClassWizard will add and remove mapping macros here.
-		//    DO NOT EDIT what you see in these blocks of generated code!
+	// NOTE - the ClassWizard will add and remove mapping macros here.
+	//    DO NOT EDIT what you see in these blocks of generated code!
 	//}}AFX_MSG
-	ON_COMMAND(ID_HELP, CWinApp::OnHelp)
+	ON_COMMAND( ID_HELP, CWinApp::OnHelp )
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
@@ -58,12 +58,12 @@ BOOL CVMPIBrowserJobSearchApp::InitInstance()
 	CJobSearchDlg dlg;
 	m_pMainWnd = &dlg;
 	int nResponse = dlg.DoModal();
-	if (nResponse == IDOK)
+	if ( nResponse == IDOK )
 	{
 		// TODO: Place code here to handle when the dialog is
 		//  dismissed with OK
 	}
-	else if (nResponse == IDCANCEL)
+	else if ( nResponse == IDCANCEL )
 	{
 		// TODO: Place code here to handle when the dialog is
 		//  dismissed with Cancel

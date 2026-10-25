@@ -19,7 +19,8 @@
 #include "idedicatedexports.h"
 #include "vgui/vguihelpers.h"
 
-namespace {
+namespace
+{
 
 CSysModule *s_hMatSystemModule = nullptr;
 CSysModule *s_hEngineModule = nullptr;
@@ -29,151 +30,173 @@ CreateInterfaceFn s_MaterialSystemFactory;
 CreateInterfaceFn s_EngineFactory;
 CreateInterfaceFn s_SoundEmitterFactory;
 
-}  // namespace
+} // namespace
 
-namespace s1::dedicated {
+namespace s1::dedicated
+{
 
-int ProcessConsoleInput(ISystem *system, IDedicatedServerAPI *api) {
-  int count = 0;
+int ProcessConsoleInput( ISystem *system, IDedicatedServerAPI *api )
+{
+	int count = 0;
 
-  if (api) {
-    char buffer[256];
-    char *s;
-    do {
-      s = system->ConsoleInput(count++, buffer, sizeof(buffer));
+	if ( api )
+	{
+		char  buffer[256];
+		char *s;
+		do
+		{
+			s = system->ConsoleInput( count++, buffer, sizeof( buffer ) );
 
-      if (s && s[0]) {
-        V_strcat_safe(buffer, "\n");
+			if ( s && s[0] )
+			{
+				V_strcat_safe( buffer, "\n" );
 
-        api->AddConsoleText(buffer);
-      }
-    } while (s);
-  }
+				api->AddConsoleText( buffer );
+			}
+		} while ( s );
+	}
 
-  return count;
+	return count;
 }
 
-void RunServer(ISystem *system, IDedicatedServerAPI *api, bool is_console_mode);
+void RunServer( ISystem *system, IDedicatedServerAPI *api, bool is_console_mode );
 
-class DedicatedExports : public CBaseAppSystem<IDedicatedExports> {
- public:
-  void Sys_Printf(char *text) override {
-    Assert(system_);
-    system_->Printf("%s", text);
-  }
+class DedicatedExports : public CBaseAppSystem< IDedicatedExports >
+{
+public:
+	void Sys_Printf( char *text ) override
+	{
+		Assert( system_ );
+		system_->Printf( "%s", text );
+	}
 
-  void RunServer() override {
-    Assert(system_);
-    Assert(api_);
-    s1::dedicated::RunServer(system_, api_, is_console_mode_);
-  }
+	void RunServer() override
+	{
+		Assert( system_ );
+		Assert( api_ );
+		s1::dedicated::RunServer( system_, api_, is_console_mode_ );
+	}
 
-  void Startup(void *ctx) override {
-    std::tie(system_, api_, is_console_mode_) =
-        *static_cast<std::tuple<ISystem *, IDedicatedServerAPI *, bool> *>(ctx);
-    Assert(system_);
-    Assert(api_);
-  }
+	void Startup( void *ctx ) override
+	{
+		std::tie( system_, api_, is_console_mode_ ) =
+		*static_cast< std::tuple< ISystem *, IDedicatedServerAPI *, bool > * >( ctx );
+		Assert( system_ );
+		Assert( api_ );
+	}
 
- private:
-  ISystem* system_{nullptr};
-  IDedicatedServerAPI* api_{nullptr};
-  bool is_console_mode_{false};
+private:
+	ISystem             *system_{ nullptr };
+	IDedicatedServerAPI *api_{ nullptr };
+	bool                 is_console_mode_{ false };
 };
 
-EXPOSE_SINGLE_INTERFACE(DedicatedExports, IDedicatedExports,
-                        VENGINE_DEDICATEDEXPORTS_API_VERSION);
+EXPOSE_SINGLE_INTERFACE( DedicatedExports, IDedicatedExports,
+                         VENGINE_DEDICATEDEXPORTS_API_VERSION );
 
-const char *get_consolelog_filename(ICommandLine *command_line) {
-  static bool is_initialized{false};
-  static char console_log[MAX_PATH];
+const char *get_consolelog_filename( ICommandLine *command_line )
+{
+	static bool is_initialized{ false };
+	static char console_log[MAX_PATH];
 
-  if (!is_initialized) {
-    is_initialized = true;
+	if ( !is_initialized )
+	{
+		is_initialized = true;
 
-    // Don't do the -consolelog thing if -consoledebug is present.
-    //  CTextConsoleUnix::Print() looks for -consoledebug.
-    const char *file_name = nullptr;
-    if (!command_line->HasParm("-consoledebug") &&
-        command_line->CheckParm("-consolelog", &file_name) && file_name) {
-      V_strcpy_safe(console_log, file_name);
-    }
-  }
+		// Don't do the -consolelog thing if -consoledebug is present.
+		//  CTextConsoleUnix::Print() looks for -consoledebug.
+		const char *file_name = nullptr;
+		if ( !command_line->HasParm( "-consoledebug" ) &&
+		     command_line->CheckParm( "-consolelog", &file_name ) && file_name )
+		{
+			V_strcpy_safe( console_log, file_name );
+		}
+	}
 
-  return console_log;
+	return console_log;
 }
 
-template <size_t out_size>
-const char *PrefixMessageGroup(OUT_Z_ARRAY char (&out)[out_size], const char *group,
-                               const char *message) {
-  const char *out_group{GetSpewOutputGroup()};
+template< size_t out_size >
+const char *PrefixMessageGroup( OUT_Z_ARRAY char ( &out )[out_size], const char *group,
+                                const char *message )
+{
+	const char *out_group{ GetSpewOutputGroup() };
 
-  out_group = !Q_isempty(out_group) ? out_group : group;
+	out_group = !Q_isempty( out_group ) ? out_group : group;
 
-  const size_t length{strlen(message)};
-  if (length > 1 && message[length - 1] == '\n' &&
-      !V_isuniform(message, '\n')) {
-    V_sprintf_safe(out, "[%.3f][%s] %s", Plat_FloatTime(), out_group, message);
-  } else {
-    V_strcpy_safe(out, message);
-  }
+	const size_t length{ strlen( message ) };
+	if ( length > 1 && message[length - 1] == '\n' &&
+	     !V_isuniform( message, '\n' ) )
+	{
+		V_sprintf_safe( out, "[%.3f][%s] %s", Plat_FloatTime(), out_group, message );
+	}
+	else
+	{
+		V_strcpy_safe( out, message );
+	}
 
-  return out;
+	return out;
 }
 
 extern ISystem *g_system;
-extern bool g_is_console_mode;
+extern bool     g_is_console_mode;
 
-SpewRetval_t DedicatedSpewOutputFunc(SpewType_t spewType, char const *pMsg) {
-  char message[4096];
-  PrefixMessageGroup(message, "swds", pMsg);
+SpewRetval_t DedicatedSpewOutputFunc( SpewType_t spewType, char const *pMsg )
+{
+	char message[4096];
+	PrefixMessageGroup( message, "swds", pMsg );
 
-  if (g_system) {
-    g_system->Printf("%s", message);
+	if ( g_system )
+	{
+		g_system->Printf( "%s", message );
 
-    // If they have specified -consolelog, log this message there.  Otherwise
-    // these wind up being lost because Sys_InitGame hasn't been called yet, and
-    // Sys_SpewFunc is the thing that logs stuff to -consolelog, etc.
-    const char *filename = get_consolelog_filename(CommandLine());
-    if (!Q_isempty(filename)) {
-      FileHandle_t fh = g_pFullFileSystem->Open(filename, "a");
-      if (fh) {
-        RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
+		// If they have specified -consolelog, log this message there.  Otherwise
+		// these wind up being lost because Sys_InitGame hasn't been called yet, and
+		// Sys_SpewFunc is the thing that logs stuff to -consolelog, etc.
+		const char *filename = get_consolelog_filename( CommandLine() );
+		if ( !Q_isempty( filename ) )
+		{
+			FileHandle_t fh = g_pFullFileSystem->Open( filename, "a" );
+			if ( fh )
+			{
+				RunCodeAtScopeExit( g_pFullFileSystem->Close( fh ) );
 
-        g_pFullFileSystem->Write(message, V_strlen(message), fh);
-      }
-    }
-  }
+				g_pFullFileSystem->Write( message, V_strlen( message ), fh );
+			}
+		}
+	}
 
 #ifdef _WIN32
-  Plat_DebugString(message);
+	Plat_DebugString( message );
 #endif
 
-  if (spewType == SPEW_ERROR) {
+	if ( spewType == SPEW_ERROR )
+	{
 #ifdef _WIN32
-    // In Windows vgui mode, make a message box or they won't ever see the
-    // error.
-    if (!g_is_console_mode) {
-      Plat_MessageBox("SRCDS - Fatal Error", "SRCDS Error", message,
-                      Plat_MessageBoxButton::Ok, Plat_MessageBoxIcon::Error);
-    }
-    // dimhotepus: 1 -> ENOTRECOVERABLE and write minidump.
-    Plat_ExitProcessWithError( ENOTRECOVERABLE );
+		// In Windows vgui mode, make a message box or they won't ever see the
+		// error.
+		if ( !g_is_console_mode )
+		{
+			Plat_MessageBox( "SRCDS - Fatal Error", "SRCDS Error", message,
+			                 Plat_MessageBoxButton::Ok, Plat_MessageBoxIcon::Error );
+		}
+		// dimhotepus: 1 -> ENOTRECOVERABLE and write minidump.
+		Plat_ExitProcessWithError( ENOTRECOVERABLE );
 #elif POSIX
-    fflush(stdout);
-    // dimhotepus: Try to run destructors! 1 -> ENOTRECOVERABLE
-    exit(ENOTRECOVERABLE);
+		fflush( stdout );
+		// dimhotepus: Try to run destructors! 1 -> ENOTRECOVERABLE
+		exit( ENOTRECOVERABLE );
 #endif
 
-    return SPEW_ABORT;
-  }
+		return SPEW_ABORT;
+	}
 
-  if (spewType == SPEW_ASSERT) {
-    return CommandLine()->HasParm("-noassert") ? SPEW_CONTINUE
-                                               : SPEW_DEBUGGER;
-  }
+	if ( spewType == SPEW_ASSERT )
+	{
+		return CommandLine()->HasParm( "-noassert" ) ? SPEW_CONTINUE : SPEW_DEBUGGER;
+	}
 
-  return SPEW_CONTINUE;
+	return SPEW_CONTINUE;
 }
 
-}  // namespace s1::dedicated
+} // namespace s1::dedicated

@@ -7,23 +7,24 @@
 
 #include "windows/dpi_wnd_behavior.h"
 
-class CBaseDlg : public CDialog {
-  DECLARE_DYNAMIC(CBaseDlg)
+class CBaseDlg : public CDialog
+{
+	DECLARE_DYNAMIC( CBaseDlg )
 
- public:
-  CBaseDlg();
-  explicit CBaseDlg(LPCTSTR lpszTemplateName, CWnd* pParentWnd = nullptr);
-  explicit CBaseDlg(UINT nIDTemplate, CWnd* pParentWnd = nullptr);
-  virtual ~CBaseDlg();
+public:
+	CBaseDlg();
+	explicit CBaseDlg( LPCTSTR lpszTemplateName, CWnd *pParentWnd = nullptr );
+	explicit CBaseDlg( UINT nIDTemplate, CWnd *pParentWnd = nullptr );
+	virtual ~CBaseDlg();
 
- protected:
-  BOOL OnInitDialog() override;
+protected:
+	BOOL OnInitDialog() override;
 
-  afx_msg void OnDestroy();
-  afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
-  DECLARE_MESSAGE_MAP()
+	afx_msg void    OnDestroy();
+	afx_msg LRESULT OnDpiChanged( WPARAM wParam, LPARAM lParam );
+	DECLARE_MESSAGE_MAP()
 
-  s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
+	s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
 };
 
-#endif  // !SE_COMMON_WINDOWS_BASE_DLG_H_
+#endif // !SE_COMMON_WINDOWS_BASE_DLG_H_

@@ -19,154 +19,183 @@
 
 #include "tier0/memdbgon.h"
 
-namespace {
+namespace
+{
 
-template <intp size>
-[[nodiscard]] std::error_code MakeFullPath(const char *in, char (&out)[size]) {
-  if (in[0] == CORRECT_PATH_SEPARATOR || in[0] == INCORRECT_PATH_SEPARATOR ||
-      in[1] == ':') {
-    // It's already a full path.
-    V_strcpy_safe(out, in);
-  } else {
-    try {
-      std::error_code rc;
-      std::filesystem::path cwd{std::filesystem::current_path(rc)};
+template< intp size >
+[[nodiscard]] std::error_code MakeFullPath( const char *in, char ( &out )[size] )
+{
+	if ( in[0] == CORRECT_PATH_SEPARATOR || in[0] == INCORRECT_PATH_SEPARATOR ||
+	     in[1] == ':' )
+	{
+		// It's already a full path.
+		V_strcpy_safe( out, in );
+	}
+	else
+	{
+		try
+		{
+			std::error_code       rc;
+			std::filesystem::path cwd{ std::filesystem::current_path( rc ) };
 
-      if (rc) return rc;
+			if ( rc )
+				return rc;
 
-      Q_WStringToUTF8(cwd.c_str(), out, size * sizeof(out[0]));
-    } catch (const std::bad_alloc &) {
-      return std::error_code{ENOMEM, std::generic_category()};
-    }
+			Q_WStringToUTF8( cwd.c_str(), out, size * sizeof( out[0] ) );
+		}
+		catch ( const std::bad_alloc & )
+		{
+			return std::error_code{ ENOMEM, std::generic_category() };
+		}
 
-    V_strcat_safe(out, CORRECT_PATH_SEPARATOR_S);
-    V_strcat_safe(out, in);
-  }
+		V_strcat_safe( out, CORRECT_PATH_SEPARATOR_S );
+		V_strcat_safe( out, in );
+	}
 
-  return std::error_code{};
+	return std::error_code{};
 }
 
-[[nodiscard]] int GetBothArgIndex(int argc, char *argv[]) {
-  int both_arg{0};
-  for (int arg{1}; arg < argc; arg++) {
-    if (V_strieq(argv[arg], "-both")) {
-      both_arg = arg;
-    }
-  }
-  return both_arg;
+[[nodiscard]] int GetBothArgIndex( int argc, char *argv[] )
+{
+	int both_arg{ 0 };
+	for ( int arg{ 1 }; arg < argc; arg++ )
+	{
+		if ( V_strieq( argv[arg], "-both" ) )
+		{
+			both_arg = arg;
+		}
+	}
+	return both_arg;
 }
 
-}  // namespace
+} // namespace
 
-int main(int argc, char *argv[]) {
-  // dimhotepus: Apply en_US UTF8 locale for printf/scanf.
-  //
-  // Printf/sscanf functions expect en_US UTF8 localization.
-  //
-  // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
-  // supports using a UTF-8 code page.
-  constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+int main( int argc, char *argv[] )
+{
+	// dimhotepus: Apply en_US UTF8 locale for printf/scanf.
+	//
+	// Printf/sscanf functions expect en_US UTF8 localization.
+	//
+	// Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+	// supports using a UTF-8 code page.
+	constexpr char kEnUsUtf8Locale[]{ "en_US.UTF-8" };
 
-  const s1::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
-  if (!scoped_app_locale.IsSuccess()) {
-    fprintf(stderr, "setlocale('%s') failed, current locale is '%s'.\n",
-            kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale());
-  }
+	const s1::ScopedAppLocale scoped_app_locale{ kEnUsUtf8Locale };
+	if ( !scoped_app_locale.IsSuccess() )
+	{
+		fprintf( stderr, "setlocale('%s') failed, current locale is '%s'.\n",
+		         kEnUsUtf8Locale, s1::ScopedAppLocale::GetCurrentLocale() );
+	}
 
-  // Need command line first.
-  CommandLine()->CreateCmdLine(argc, argv);
+	// Need command line first.
+	CommandLine()->CreateCmdLine( argc, argv );
 
-  // Check whether they used the -both switch.  If this is specified, vrad will
-  // be run twice, once with -hdr and once without.
-  const int both_arg{GetBothArgIndex(argc, argv)};
+	// Check whether they used the -both switch.  If this is specified, vrad will
+	// be run twice, once with -hdr and once without.
+	const int both_arg{ GetBothArgIndex( argc, argv ) };
 
-  constexpr char kRedirectFileName[]{"vrad.redirect"};
-  constexpr char kModuleName[]{"vrad_dll" DLL_EXT_STRING};
+	constexpr char kRedirectFileName[]{ "vrad.redirect" };
+	constexpr char kModuleName[]{ "vrad_dll" DLL_EXT_STRING };
 
-  char full_path[MAX_FILEPATH], redirect_path[MAX_FILEPATH];
-  std::error_code err{MakeFullPath(argv[0], full_path)};
-  if (err) {
-    fprintf(stderr, "vrad err: Can't get full path to '%s'.\n", argv[0]);
-    return err.value();
-  }
+	char            full_path[MAX_FILEPATH], redirect_path[MAX_FILEPATH];
+	std::error_code err{ MakeFullPath( argv[0], full_path ) };
+	if ( err )
+	{
+		fprintf( stderr, "vrad err: Can't get full path to '%s'.\n", argv[0] );
+		return err.value();
+	}
 
-  V_StripFilename(full_path);
-  V_sprintf_safe(redirect_path, "%s" CORRECT_PATH_SEPARATOR_S "%s", full_path,
-                 kRedirectFileName);
+	V_StripFilename( full_path );
+	V_sprintf_safe( redirect_path, "%s" CORRECT_PATH_SEPARATOR_S "%s", full_path,
+	                kRedirectFileName );
 
-  s1::ScopedDll module{nullptr, 0};
-  char module_name[MAX_FILEPATH];
+	s1::ScopedDll module{ nullptr, 0 };
+	char          module_name[MAX_FILEPATH];
 
-  // First, look for vrad.redirect and load the dll specified in there if
-  // possible.
-  if (auto [f, err2] =
-          s1::posix::posix_file_stream_factory::open(redirect_path, "rt");
-      !err2) {
-    char *name{nullptr};
-    if (std::tie(name, err2) = f.gets(module_name); !err2) {
-      char *end{strchr(name, '\n')};
-      if (end) *end = '\0';
+	// First, look for vrad.redirect and load the dll specified in there if
+	// possible.
+	if ( auto [f, err2] =
+	     s1::posix::posix_file_stream_factory::open( redirect_path, "rt" );
+	     !err2 )
+	{
+		char *name{ nullptr };
+		if ( std::tie( name, err2 ) = f.gets( module_name ); !err2 )
+		{
+			char *end{ strchr( name, '\n' ) };
+			if ( end )
+				*end = '\0';
 
-      module = s1::ScopedDll{name, 0};
-      if (!module) {
-        fprintf(stderr, "vrad warn: Can't find '%s' specified in '%s'.\n", name,
-                kRedirectFileName);
-        return module.error_code().value();
-      } else {
-        printf("vrad: Loaded alternate vrad module '%s' specified in '%s'.\n",
-               name, kRedirectFileName);
-      }
-    }
-  }
+			module = s1::ScopedDll{ name, 0 };
+			if ( !module )
+			{
+				fprintf( stderr, "vrad warn: Can't find '%s' specified in '%s'.\n", name,
+				         kRedirectFileName );
+				return module.error_code().value();
+			}
+			else
+			{
+				printf( "vrad: Loaded alternate vrad module '%s' specified in '%s'.\n",
+				        name, kRedirectFileName );
+			}
+		}
+	}
 
-  // If it didn't load the module above, then use the
-  if (!module) {
-    V_strcpy_safe(module_name, kModuleName);
+	// If it didn't load the module above, then use the
+	if ( !module )
+	{
+		V_strcpy_safe( module_name, kModuleName );
 
-    module = s1::ScopedDll{module_name, 0};
-  }
+		module = s1::ScopedDll{ module_name, 0 };
+	}
 
-  if (!module) {
-    fprintf(stderr, "vrad error: Can't load '%s'.\n%s", module_name,
-            module.error_code().message().c_str());
-    return ENOENT;
-  }
+	if ( !module )
+	{
+		fprintf( stderr, "vrad error: Can't load '%s'.\n%s", module_name,
+		         module.error_code().message().c_str() );
+		return ENOENT;
+	}
 
-  const auto kFactoryName = CREATEINTERFACE_PROCNAME;
-  CreateInterfaceFnT<IVRadDLL> factory{nullptr};
+	const auto                     kFactoryName = CREATEINTERFACE_PROCNAME;
+	CreateInterfaceFnT< IVRadDLL > factory{ nullptr };
 
-  std::tie(factory, err) =
-      module.GetFunction<CreateInterfaceFnT<IVRadDLL>>(kFactoryName);
-  if (!factory) {
-    fprintf(stderr, "vrad error: Can't get '%s' factory from '%s'.\n",
-            kFactoryName, kModuleName);
-    return EINVAL;
-  }
+	std::tie( factory, err ) =
+	module.GetFunction< CreateInterfaceFnT< IVRadDLL > >( kFactoryName );
+	if ( !factory )
+	{
+		fprintf( stderr, "vrad error: Can't get '%s' factory from '%s'.\n",
+		         kFactoryName, kModuleName );
+		return EINVAL;
+	}
 
-  int ret{0};
-  const auto kInterfaceName = VRAD_INTERFACE_VERSION;
+	int        ret{ 0 };
+	const auto kInterfaceName = VRAD_INTERFACE_VERSION;
 
-  IVRadDLL *vrad{factory(kInterfaceName, &ret)};
-  if (!vrad) {
-    fprintf(stderr, "vrad error: Can't get '%s' interface from '%s'.\n",
-            kModuleName, kInterfaceName);
-    return EINVAL;
-  }
+	IVRadDLL *vrad{ factory( kInterfaceName, &ret ) };
+	if ( !vrad )
+	{
+		fprintf( stderr, "vrad error: Can't get '%s' interface from '%s'.\n",
+		         kModuleName, kInterfaceName );
+		return EINVAL;
+	}
 
-  int rc{0};
+	int rc{ 0 };
 
-  // Try ldr and hdr.
-  for (int mode = 0; mode < 2; mode++) {
-    if (mode && !both_arg) continue;
+	// Try ldr and hdr.
+	for ( int mode = 0; mode < 2; mode++ )
+	{
+		if ( mode && !both_arg )
+			continue;
 
-    // Replace -both with -hdr or -ldr.
-    if (both_arg) V_strcpy(argv[both_arg], mode ? "-hdr" : "-ldr");
+		// Replace -both with -hdr or -ldr.
+		if ( both_arg )
+			V_strcpy( argv[both_arg], mode ? "-hdr" : "-ldr" );
 
-    rc = vrad->main(argc, argv);
+		rc = vrad->main( argc, argv );
 
-    // VRAD failed, return first failure code.
-    if (rc) return rc;
-  }
+		// VRAD failed, return first failure code.
+		if ( rc )
+			return rc;
+	}
 
-  return rc;
+	return rc;
 }

@@ -1,11 +1,11 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //
 //=============================================================================//
-#if !defined(AFX_SETPASSWORDDLG_H__A349B943_49B8_4C7E_863B_BF1929AD5443__INCLUDED_)
+#if !defined( AFX_SETPASSWORDDLG_H__A349B943_49B8_4C7E_863B_BF1929AD5443__INCLUDED_ )
 #define AFX_SETPASSWORDDLG_H__A349B943_49B8_4C7E_863B_BF1929AD5443__INCLUDED_
 
 #if _MSC_VER > 1000
@@ -21,29 +21,28 @@
 
 class CSetPasswordDlg : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CSetPasswordDlg(int dlgID, CWnd* pParent = NULL);   // standard constructor
+	CSetPasswordDlg( int dlgID, CWnd *pParent = NULL ); // standard constructor
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CSetPasswordDlg)
-	CString	m_Password;
+	CString m_Password;
 	//}}AFX_DATA
 
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CSetPasswordDlg)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange( CDataExchange *pDX ); // DDX/DDV support
+													   //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CSetPasswordDlg)
-		// NOTE: the ClassWizard will add member functions here
+	// NOTE: the ClassWizard will add member functions here
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

@@ -9,173 +9,210 @@
 bool g_bDisableFileAccess = false;
 
 CBaseVMPIFileSystem *g_pBaseVMPIFileSystem = NULL;
-IFileSystem *g_pOriginalPassThruFileSystem = NULL;
+IFileSystem         *g_pOriginalPassThruFileSystem = NULL;
 
-void *GetVMPIFileSystem() { return g_pBaseVMPIFileSystem; }
-
-EXPOSE_INTERFACE_FN(GetVMPIFileSystem, IBaseFileSystem,
-                    BASEFILESYSTEM_INTERFACE_VERSION)
-
-IFileSystem *VMPI_FileSystem_Init(int maxMemoryUsage, IFileSystem *pPassThru) {
-  Assert(g_bUseMPI);
-  Assert(!g_pBaseVMPIFileSystem);
-  g_pOriginalPassThruFileSystem = pPassThru;
-
-  if (g_bMPIMaster) {
-    extern CBaseVMPIFileSystem *CreateMasterVMPIFileSystem(
-        int maxMemoryUsage, IFileSystem *pPassThru);
-    CreateMasterVMPIFileSystem(maxMemoryUsage, pPassThru);
-  } else {
-    extern CBaseVMPIFileSystem *CreateWorkerVMPIFileSystem();
-    CreateWorkerVMPIFileSystem();
-  }
-
-  // The Create function should have set this. Normally, we'd set
-  // g_pBaseVMPIFileSystem right here, but the create functions may want to
-  // receive some messages, in which case they need to set g_pBaseVMPIFileSystem
-  // so the packets get routed appropriately.
-  Assert(g_pBaseVMPIFileSystem);
-  return g_pBaseVMPIFileSystem;
+void *GetVMPIFileSystem()
+{
+	return g_pBaseVMPIFileSystem;
 }
 
-IFileSystem *VMPI_FileSystem_Term() {
-  if (g_pBaseVMPIFileSystem) {
-    g_pBaseVMPIFileSystem->Release();
-    g_pBaseVMPIFileSystem = NULL;
+EXPOSE_INTERFACE_FN( GetVMPIFileSystem, IBaseFileSystem,
+                     BASEFILESYSTEM_INTERFACE_VERSION )
 
-    if (g_iVMPIVerboseLevel >= 1) {
-      if (g_bMPIMaster)
-        Msg("Multicast send: %dk\n", (g_nMulticastBytesSent + 511) / 1024);
-      else
-        Msg("Multicast recv: %dk\n", (g_nMulticastBytesReceived + 511) / 1024);
-    }
-  }
+IFileSystem *VMPI_FileSystem_Init( int maxMemoryUsage, IFileSystem *pPassThru )
+{
+	Assert( g_bUseMPI );
+	Assert( !g_pBaseVMPIFileSystem );
+	g_pOriginalPassThruFileSystem = pPassThru;
 
-  IFileSystem *pRet = g_pOriginalPassThruFileSystem;
-  g_pOriginalPassThruFileSystem = NULL;
-  return pRet;
+	if ( g_bMPIMaster )
+	{
+		extern CBaseVMPIFileSystem *CreateMasterVMPIFileSystem(
+		int maxMemoryUsage, IFileSystem *pPassThru );
+		CreateMasterVMPIFileSystem( maxMemoryUsage, pPassThru );
+	}
+	else
+	{
+		extern CBaseVMPIFileSystem *CreateWorkerVMPIFileSystem();
+		CreateWorkerVMPIFileSystem();
+	}
+
+	// The Create function should have set this. Normally, we'd set
+	// g_pBaseVMPIFileSystem right here, but the create functions may want to
+	// receive some messages, in which case they need to set g_pBaseVMPIFileSystem
+	// so the packets get routed appropriately.
+	Assert( g_pBaseVMPIFileSystem );
+	return g_pBaseVMPIFileSystem;
 }
 
-void VMPI_FileSystem_DisableFileAccess() { g_bDisableFileAccess = true; }
+IFileSystem *VMPI_FileSystem_Term()
+{
+	if ( g_pBaseVMPIFileSystem )
+	{
+		g_pBaseVMPIFileSystem->Release();
+		g_pBaseVMPIFileSystem = NULL;
 
-CreateInterfaceFn VMPI_FileSystem_GetFactory() { return Sys_GetFactoryThis(); }
+		if ( g_iVMPIVerboseLevel >= 1 )
+		{
+			if ( g_bMPIMaster )
+				Msg( "Multicast send: %dk\n", ( g_nMulticastBytesSent + 511 ) / 1024 );
+			else
+				Msg( "Multicast recv: %dk\n", ( g_nMulticastBytesReceived + 511 ) / 1024 );
+		}
+	}
 
-void VMPI_FileSystem_CreateVirtualFile(const char *pFilename, const void *pData,
-                                       unsigned long fileLength) {
-  g_pBaseVMPIFileSystem->CreateVirtualFile(pFilename, pData, fileLength);
+	IFileSystem *pRet = g_pOriginalPassThruFileSystem;
+	g_pOriginalPassThruFileSystem = NULL;
+	return pRet;
+}
+
+void VMPI_FileSystem_DisableFileAccess()
+{
+	g_bDisableFileAccess = true;
+}
+
+CreateInterfaceFn VMPI_FileSystem_GetFactory()
+{
+	return Sys_GetFactoryThis();
+}
+
+void VMPI_FileSystem_CreateVirtualFile( const char *pFilename, const void *pData,
+                                        unsigned long fileLength )
+{
+	g_pBaseVMPIFileSystem->CreateVirtualFile( pFilename, pData, fileLength );
 }
 
 // Register our packet ID.
-bool FileSystemRecv(MessageBuffer *pBuf, int iSource, int iPacketID) {
-  if (g_pBaseVMPIFileSystem)
-    return g_pBaseVMPIFileSystem->HandleFileSystemPacket(pBuf, iSource,
-                                                         iPacketID);
+bool FileSystemRecv( MessageBuffer *pBuf, int iSource, int iPacketID )
+{
+	if ( g_pBaseVMPIFileSystem )
+		return g_pBaseVMPIFileSystem->HandleFileSystemPacket( pBuf, iSource,
+		                                                      iPacketID );
 
-  return false;
+	return false;
 }
 
-CDispatchReg g_DispatchReg_FileSystem(VMPI_PACKETID_FILESYSTEM, FileSystemRecv);
+CDispatchReg g_DispatchReg_FileSystem( VMPI_PACKETID_FILESYSTEM, FileSystemRecv );
 
 // ------------------------------------------------------------------------------------------------------------------------
 // // CVMPIFile_Memory implementation.
 // ------------------------------------------------------------------------------------------------------------------------
 // //
 
-CVMPIFile_Memory::CVMPIFile_Memory(const char *pData, ptrdiff_t len,
-                                   char chMode /* = 'b' */) {
-  m_pData = pData;
-  m_DataLen = len;
-  m_iCurPos = 0;
-  m_chMode = chMode;
+CVMPIFile_Memory::CVMPIFile_Memory( const char *pData, ptrdiff_t len,
+                                    char chMode /* = 'b' */ )
+{
+	m_pData = pData;
+	m_DataLen = len;
+	m_iCurPos = 0;
+	m_chMode = chMode;
 }
 
-void CVMPIFile_Memory::Close() { delete this; }
-
-void CVMPIFile_Memory::Seek(ptrdiff_t pos, FileSystemSeek_t seekType) {
-  if (seekType == FILESYSTEM_SEEK_HEAD)
-    m_iCurPos = pos;
-  else if (seekType == FILESYSTEM_SEEK_CURRENT)
-    m_iCurPos += pos;
-  else
-    m_iCurPos = m_DataLen - pos;
+void CVMPIFile_Memory::Close()
+{
+	delete this;
 }
 
-unsigned int CVMPIFile_Memory::Tell() { return m_iCurPos; }
+void CVMPIFile_Memory::Seek( ptrdiff_t pos, FileSystemSeek_t seekType )
+{
+	if ( seekType == FILESYSTEM_SEEK_HEAD )
+		m_iCurPos = pos;
+	else if ( seekType == FILESYSTEM_SEEK_CURRENT )
+		m_iCurPos += pos;
+	else
+		m_iCurPos = m_DataLen - pos;
+}
 
-unsigned int CVMPIFile_Memory::Size() { return m_DataLen; }
+unsigned int CVMPIFile_Memory::Tell()
+{
+	return m_iCurPos;
+}
+
+unsigned int CVMPIFile_Memory::Size()
+{
+	return m_DataLen;
+}
 
 void CVMPIFile_Memory::Flush() {}
 
-ptrdiff_t CVMPIFile_Memory::Read(void *pOutput, ptrdiff_t size) {
-  Assert(m_iCurPos >= 0);
-  ptrdiff_t nToRead = min(m_DataLen - m_iCurPos, size);
+ptrdiff_t CVMPIFile_Memory::Read( void *pOutput, ptrdiff_t size )
+{
+	Assert( m_iCurPos >= 0 );
+	ptrdiff_t nToRead = min( m_DataLen - m_iCurPos, size );
 
-  if (m_chMode != 't') {
-    memcpy(pOutput, &m_pData[m_iCurPos], nToRead);
-    m_iCurPos += nToRead;
+	if ( m_chMode != 't' )
+	{
+		memcpy( pOutput, &m_pData[m_iCurPos], nToRead );
+		m_iCurPos += nToRead;
 
-    return nToRead;
-  }
+		return nToRead;
+	}
 
-  {
-    ptrdiff_t iRead = 0;
-    const char *pData = m_pData + m_iCurPos;
-    ptrdiff_t len = m_DataLen - m_iCurPos;
+	{
+		ptrdiff_t   iRead = 0;
+		const char *pData = m_pData + m_iCurPos;
+		ptrdiff_t   len = m_DataLen - m_iCurPos;
 
-    // Perform crlf translation
-    while (const char *crlf = (const char *)memchr(pData, '\r', len)) {
-      ptrdiff_t canCopy = min(size, crlf - pData);
-      memcpy(pOutput, pData, canCopy);
+		// Perform crlf translation
+		while ( const char *crlf = (const char *)memchr( pData, '\r', len ) )
+		{
+			ptrdiff_t canCopy = min( size, crlf - pData );
+			memcpy( pOutput, pData, canCopy );
 
-      m_iCurPos += canCopy;
-      pData += canCopy;
-      len -= canCopy;
+			m_iCurPos += canCopy;
+			pData += canCopy;
+			len -= canCopy;
 
-      iRead += canCopy;
-      (char *&)pOutput += canCopy;
-      size -= canCopy;
+			iRead += canCopy;
+			(char *&)pOutput += canCopy;
+			size -= canCopy;
 
-      if (size && len) {
-        if ((len > 1) && (pData[1] == '\n')) {
-          ++m_iCurPos;
-          ++pData;
-          --len;
-        }
+			if ( size && len )
+			{
+				if ( ( len > 1 ) && ( pData[1] == '\n' ) )
+				{
+					++m_iCurPos;
+					++pData;
+					--len;
+				}
 
-        *(char *&)pOutput = *pData;
+				*(char *&)pOutput = *pData;
 
-        ++m_iCurPos;
-        ++pData;
-        --len;
+				++m_iCurPos;
+				++pData;
+				--len;
 
-        ++iRead;
-        ++(char *&)pOutput;
-        --size;
-      } else
-        break;
-    }
+				++iRead;
+				++(char *&)pOutput;
+				--size;
+			}
+			else
+				break;
+		}
 
-    if (size && len) {
-      // No crlf characters left
-      ptrdiff_t canCopy = min(size, len);
-      memcpy(pOutput, pData, canCopy);
+		if ( size && len )
+		{
+			// No crlf characters left
+			ptrdiff_t canCopy = min( size, len );
+			memcpy( pOutput, pData, canCopy );
 
-      m_iCurPos += canCopy;
-      pData += canCopy;
-      len -= canCopy;
+			m_iCurPos += canCopy;
+			pData += canCopy;
+			len -= canCopy;
 
-      iRead += canCopy;
-      (char *&)pOutput += canCopy;
-      size -= canCopy;
-    }
+			iRead += canCopy;
+			(char *&)pOutput += canCopy;
+			size -= canCopy;
+		}
 
-    return iRead;
-  }
+		return iRead;
+	}
 }
 
-ptrdiff_t CVMPIFile_Memory::Write(void const *pInput, ptrdiff_t size) {
-  Assert(false);
-  return 0;
+ptrdiff_t CVMPIFile_Memory::Write( void const *pInput, ptrdiff_t size )
+{
+	Assert( false );
+	return 0;
 }
 
 // ------------------------------------------------------------------------------------------------------------------------
@@ -185,61 +222,77 @@ ptrdiff_t CVMPIFile_Memory::Write(void const *pInput, ptrdiff_t size) {
 
 CBaseVMPIFileSystem::~CBaseVMPIFileSystem() {}
 
-void CBaseVMPIFileSystem::Release() { delete this; }
-
-void CBaseVMPIFileSystem::Close(FileHandle_t file) {
-  if (file) ((IVMPIFile *)file)->Close();
+void CBaseVMPIFileSystem::Release()
+{
+	delete this;
 }
 
-int CBaseVMPIFileSystem::Read(void *pOutput, int size, FileHandle_t file) {
-  return ((IVMPIFile *)file)->Read(pOutput, size);
+void CBaseVMPIFileSystem::Close( FileHandle_t file )
+{
+	if ( file )
+		( (IVMPIFile *)file )->Close();
 }
 
-int CBaseVMPIFileSystem::Write(void const *pInput, int size,
-                               FileHandle_t file) {
-  return ((IVMPIFile *)file)->Write(pInput, size);
+int CBaseVMPIFileSystem::Read( void *pOutput, int size, FileHandle_t file )
+{
+	return ( (IVMPIFile *)file )->Read( pOutput, size );
 }
 
-void CBaseVMPIFileSystem::Seek(FileHandle_t file, int pos,
-                               FileSystemSeek_t seekType) {
-  ((IVMPIFile *)file)->Seek(pos, seekType);
+int CBaseVMPIFileSystem::Write( void const *pInput, int size,
+                                FileHandle_t file )
+{
+	return ( (IVMPIFile *)file )->Write( pInput, size );
 }
 
-unsigned int CBaseVMPIFileSystem::Tell(FileHandle_t file) {
-  return ((IVMPIFile *)file)->Tell();
+void CBaseVMPIFileSystem::Seek( FileHandle_t file, int pos,
+                                FileSystemSeek_t seekType )
+{
+	( (IVMPIFile *)file )->Seek( pos, seekType );
 }
 
-unsigned int CBaseVMPIFileSystem::Size(FileHandle_t file) {
-  return ((IVMPIFile *)file)->Size();
+unsigned int CBaseVMPIFileSystem::Tell( FileHandle_t file )
+{
+	return ( (IVMPIFile *)file )->Tell();
 }
 
-unsigned int CBaseVMPIFileSystem::Size(const char *pFilename,
-                                       const char *pathID = 0) {
-  FileHandle_t hFile = Open(pFilename, "rb", NULL);
-  if (hFile == FILESYSTEM_INVALID_HANDLE) return 0;
-
-  unsigned int ret = Size(hFile);
-  Close(hFile);
-  return ret;
+unsigned int CBaseVMPIFileSystem::Size( FileHandle_t file )
+{
+	return ( (IVMPIFile *)file )->Size();
 }
 
-bool CBaseVMPIFileSystem::FileExists(const char *pFileName,
-                                     const char *pPathID) {
-  FileHandle_t hFile = Open(pFileName, "rb", NULL);
-  if (hFile) {
-    Close(hFile);
-    return true;
-  }
+unsigned int CBaseVMPIFileSystem::Size( const char *pFilename,
+                                        const char *pathID = 0 )
+{
+	FileHandle_t hFile = Open( pFilename, "rb", NULL );
+	if ( hFile == FILESYSTEM_INVALID_HANDLE )
+		return 0;
 
-  return false;
+	unsigned int ret = Size( hFile );
+	Close( hFile );
+	return ret;
 }
 
-void CBaseVMPIFileSystem::Flush(FileHandle_t file) {
-  ((IVMPIFile *)file)->Flush();
+bool CBaseVMPIFileSystem::FileExists( const char *pFileName,
+                                      const char *pPathID )
+{
+	FileHandle_t hFile = Open( pFileName, "rb", NULL );
+	if ( hFile )
+	{
+		Close( hFile );
+		return true;
+	}
+
+	return false;
 }
 
-bool CBaseVMPIFileSystem::Precache(const char *pFileName, const char *pPathID) {
-  return false;
+void CBaseVMPIFileSystem::Flush( FileHandle_t file )
+{
+	( (IVMPIFile *)file )->Flush();
+}
+
+bool CBaseVMPIFileSystem::Precache( const char *pFileName, const char *pPathID )
+{
+	return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -247,39 +300,45 @@ bool CBaseVMPIFileSystem::Precache(const char *pFileName, const char *pPathID) {
 // has to be here because they want to call
 // the implementation of Open/Size/Read/Write in CBaseVMPIFileSystem
 //-----------------------------------------------------------------------------
-bool CBaseVMPIFileSystem::ReadFile(const char *pFileName, const char *pPath,
-                                   CUtlBuffer &buf, int nMaxBytes,
-                                   int nStartingByte, FSAllocFunc_t pfnAlloc) {
-  const bool bBinary = !(buf.IsText() && !buf.ContainsCRLF());
+bool CBaseVMPIFileSystem::ReadFile( const char *pFileName, const char *pPath,
+                                    CUtlBuffer &buf, int nMaxBytes,
+                                    int nStartingByte, FSAllocFunc_t pfnAlloc )
+{
+	const bool bBinary = !( buf.IsText() && !buf.ContainsCRLF() );
 
-  FileHandle_t fp = Open(pFileName, bBinary ? "rb" : "rt", pPath);
-  if (!fp) return false;
+	FileHandle_t fp = Open( pFileName, bBinary ? "rb" : "rt", pPath );
+	if ( !fp )
+		return false;
 
-  int nBytesToRead = Size(fp);
-  if (nMaxBytes > 0) nBytesToRead = min(nMaxBytes, nBytesToRead);
+	int nBytesToRead = Size( fp );
+	if ( nMaxBytes > 0 )
+		nBytesToRead = min( nMaxBytes, nBytesToRead );
 
-  buf.EnsureCapacity(nBytesToRead + buf.TellPut());
+	buf.EnsureCapacity( nBytesToRead + buf.TellPut() );
 
-  if (nStartingByte != 0) {
-    Seek(fp, nStartingByte, FILESYSTEM_SEEK_HEAD);
-  }
+	if ( nStartingByte != 0 )
+	{
+		Seek( fp, nStartingByte, FILESYSTEM_SEEK_HEAD );
+	}
 
-  int nBytesRead = Read(buf.PeekPut(), nBytesToRead, fp);
-  buf.SeekPut(CUtlBuffer::SEEK_CURRENT, nBytesRead);
+	int nBytesRead = Read( buf.PeekPut(), nBytesToRead, fp );
+	buf.SeekPut( CUtlBuffer::SEEK_CURRENT, nBytesRead );
 
-  Close(fp);
-  return (nBytesRead != 0);
+	Close( fp );
+	return ( nBytesRead != 0 );
 }
 
-bool CBaseVMPIFileSystem::WriteFile(const char *pFileName, const char *pPath,
-                                    CUtlBuffer &buf) {
-  const bool bBinary = !(buf.IsText() && !buf.ContainsCRLF());
+bool CBaseVMPIFileSystem::WriteFile( const char *pFileName, const char *pPath,
+                                     CUtlBuffer &buf )
+{
+	const bool bBinary = !( buf.IsText() && !buf.ContainsCRLF() );
 
-  FileHandle_t fp = Open(pFileName, bBinary ? "wb" : "wt", pPath);
-  if (!fp) return false;
+	FileHandle_t fp = Open( pFileName, bBinary ? "wb" : "wt", pPath );
+	if ( !fp )
+		return false;
 
-  int nBytesWritten = Write(buf.Base(), buf.TellPut(), fp);
+	int nBytesWritten = Write( buf.Base(), buf.TellPut(), fp );
 
-  Close(fp);
-  return (nBytesWritten != 0);
+	Close( fp );
+	return ( nBytesWritten != 0 );
 }

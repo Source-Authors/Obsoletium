@@ -5,4 +5,4 @@
 
 // Just empty to allow MFC things compile.
 
-#endif  // !SE_UTILS_VOICE_TWEAK_STDAFX_H_
+#endif // !SE_UTILS_VOICE_TWEAK_STDAFX_H_

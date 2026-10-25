@@ -1,11 +1,11 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //
 //=============================================================================//
-#if !defined(AFX_JOBWATCHDLG_H__761BDEEF_D549_4F10_817C_1C1FAF9FCA47__INCLUDED_)
+#if !defined( AFX_JOBWATCHDLG_H__761BDEEF_D549_4F10_817C_1C1FAF9FCA47__INCLUDED_ )
 #define AFX_JOBWATCHDLG_H__761BDEEF_D549_4F10_817C_1C1FAF9FCA47__INCLUDED_
 
 #if _MSC_VER > 1000
@@ -35,16 +35,15 @@ public:
 		m_RunningTimeMS = 0;
 		m_ThreadWUs[0] = m_ThreadWUs[1] = m_ThreadWUs[2] = m_ThreadWUs[3] = -1;
 	}
-	
-	CString m_ComputerName;
-	int m_bConnected;
-	int m_nWorkUnitsDone;
+
+	CString       m_ComputerName;
+	int           m_bConnected;
+	int           m_nWorkUnitsDone;
 	unsigned long m_JobWorkerID;
 	unsigned long m_RunningTimeMS;
-	CString m_CurrentStage;
-	int m_ThreadWUs[4];
+	CString       m_CurrentStage;
+	int           m_ThreadWUs[4];
 };
-
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -52,46 +51,48 @@ public:
 
 class CJobWatchDlg : public CIdleDialog
 {
-// Construction
+	// Construction
 public:
-	CJobWatchDlg( CWnd* pParent = NULL);   // standard constructor
+	CJobWatchDlg( CWnd *pParent = NULL ); // standard constructor
 	virtual ~CJobWatchDlg();
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CJobWatchDlg)
-	enum { IDD = IDD_JOB_WATCH };
-	CListCtrl	m_Workers;
-	CEdit	m_TextOutput;
+	enum
+	{
+		IDD = IDD_JOB_WATCH
+	};
+	CListCtrl m_Workers;
+	CEdit     m_TextOutput;
 	//}}AFX_DATA
 
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CJobWatchDlg)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
+protected:
+	virtual void DoDataExchange( CDataExchange *pDX ); // DDX/DDV support
+	virtual BOOL OnNotify( WPARAM wParam, LPARAM lParam, LRESULT *pResult );
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 protected:
-
 	virtual void OnIdle();
-	void RefreshWorkerStats();
-	CWorkerInfo* FindWorkerByID( unsigned long jobWorkerID );
-	CWorkerInfo* FindWorkerByMachineName( const char *pMachineName );
-	void SetWorkerListItemInt( int nIndex, int iColumn, int value );
-	void UpdateWorkersList();
-	void ResortItems();
+	void         RefreshWorkerStats();
+	CWorkerInfo *FindWorkerByID( unsigned long jobWorkerID );
+	CWorkerInfo *FindWorkerByMachineName( const char *pMachineName );
+	void         SetWorkerListItemInt( int nIndex, int iColumn, int value );
+	void         UpdateWorkersList();
+	void         ResortItems();
 
 	// Query IDs.
 	enum
 	{
-		QUERY_TEXT=0,
+		QUERY_TEXT = 0,
 		QUERY_GRAPH,
 		QUERY_WORKER_STATS,
 		NUM_QUERIES
-	};	
+	};
 
 	void ProcessQueryResults_Graph( IMySQLRowSet *pSet );
 	void ProcessQueryResults_Text( IMySQLRowSet *pSet );
@@ -101,29 +102,29 @@ protected:
 
 	// This is our connection to the mysql database.
 	IMySQLAsync *m_pSQL;
-	CSysModule *m_hMySQLDLL;
+	CSysModule  *m_hMySQLDLL;
 
-	CWindowAnchorMgr	m_AnchorMgr;
+	CWindowAnchorMgr m_AnchorMgr;
 
 
 	bool GetCurJobWorkerID( unsigned long &id );
 
-	CGraphControl	m_GraphControl;
-	unsigned long	m_JobID;
-	int				m_CurGraphTime;
+	CGraphControl m_GraphControl;
+	unsigned long m_JobID;
+	int           m_CurGraphTime;
 
-	int				m_CurMessageIndex;
-	int				m_CurWorkerTextToken; // used to let it ignore old text in the thread's queue
+	int m_CurMessageIndex;
+	int m_CurWorkerTextToken; // used to let it ignore old text in the thread's queue
 
-	DWORD			m_LastQueryTime;	// Last time we made a query.
+	DWORD m_LastQueryTime; // Last time we made a query.
 
 	// Generated message map functions
 	//{{AFX_MSG(CJobWatchDlg)
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSelChangeWorkers();
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg void OnOdstatechangedWorkers(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnItemchangedWorkers(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnSize( UINT nType, int cx, int cy );
+	afx_msg void OnOdstatechangedWorkers( NMHDR *pNMHDR, LRESULT *pResult );
+	afx_msg void OnItemchangedWorkers( NMHDR *pNMHDR, LRESULT *pResult );
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

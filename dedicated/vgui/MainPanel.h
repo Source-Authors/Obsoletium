@@ -15,68 +15,70 @@
 
 class IAdminServer;
 
-namespace s1::dedicated {
+namespace s1::dedicated
+{
 
 // Root panel for dedicated server GUI
-class CMainPanel : public vgui::Panel {
-  using BaseClass = vgui::Panel;
+class CMainPanel : public vgui::Panel
+{
+	using BaseClass = vgui::Panel;
 
- public:
-  // Construction/destruction
-  CMainPanel();
-  ~CMainPanel() override;
+public:
+	// Construction/destruction
+	CMainPanel();
+	~CMainPanel() override;
 
-  virtual void Initialize();
-  // dimhotepus: Pair with Initialize.
-  virtual void Shutdown();
+	virtual void Initialize();
+	// dimhotepus: Pair with Initialize.
+	virtual void Shutdown();
 
-  // displays the dialog, moves it into focus, updates if it has to
-  virtual void Open();
-  // dimhotepus: Pair with Open.
-  virtual void Close();
+	// displays the dialog, moves it into focus, updates if it has to
+	virtual void Open();
+	// dimhotepus: Pair with Open.
+	virtual void Close();
 
-  // returns a pointer to a static instance of this dialog
-  // valid for use only in sort functions
-  static CMainPanel *GetInstance();
-  virtual void StartServer(const char *cvars);
+	// returns a pointer to a static instance of this dialog
+	// valid for use only in sort functions
+	static CMainPanel *GetInstance();
+	virtual void       StartServer( const char *cvars );
 
-  void ActivateBuildMode();
+	void ActivateBuildMode();
 
-  void *GetShutdownHandle() { return m_hShutdown; }
+	void *GetShutdownHandle() { return m_hShutdown; }
 
-  void AddConsoleText(const char *msg);
+	void AddConsoleText( const char *msg );
 
-  [[nodiscard]] bool Stopping() const { return m_bClosing; }
+	[[nodiscard]] bool Stopping() const { return m_bClosing; }
 
-  [[nodiscard]] bool IsInConfig() const { return m_bIsInConfig; }
+	[[nodiscard]] bool IsInConfig() const { return m_bIsInConfig; }
 
- private:
-  // called when dialog is shut down
-  virtual void OnClose();
-  void OnTick() override;
-  void DoStop();
+private:
+	// called when dialog is shut down
+	virtual void OnClose();
+	void         OnTick() override;
+	void         DoStop();
 
-  // GUI elements
-  IManageServer *m_pGameServer;
+	// GUI elements
+	IManageServer *m_pGameServer;
 
-  // the popup menu
-  vgui::DHANDLE<vgui::ProgressBox> m_pProgressBox;
-  CCreateMultiplayerGameServerPage *m_pConfigPage;
+	// the popup menu
+	vgui::DHANDLE< vgui::ProgressBox > m_pProgressBox;
+	CCreateMultiplayerGameServerPage  *m_pConfigPage;
 
-  // Event that lets the thread tell the main window it shutdown
-  void *m_hShutdown;
+	// Event that lets the thread tell the main window it shutdown
+	void *m_hShutdown;
 
-  bool m_bStarting;  // whether the server is currently starting
-  bool m_bStarted;   // whether the server has been started or not
-  bool m_bClosing;   // whether we are shutting down
-  bool m_bIsInConfig;
-  serveritem_t s1;
-  int m_hResourceWaitHandle;
-  float m_flPreviousSteamProgress;
+	bool         m_bStarting; // whether the server is currently starting
+	bool         m_bStarted;  // whether the server has been started or not
+	bool         m_bClosing;  // whether we are shutting down
+	bool         m_bIsInConfig;
+	serveritem_t s1;
+	int          m_hResourceWaitHandle;
+	float        m_flPreviousSteamProgress;
 
-  DECLARE_PANELMAP_OVERRIDE();
+	DECLARE_PANELMAP_OVERRIDE();
 };
 
-}  // namespace s1::dedicated
+} // namespace s1::dedicated
 
-#endif  // !SE_DEDICATED_VGUI_MAIN_PANEL_H_
+#endif // !SE_DEDICATED_VGUI_MAIN_PANEL_H_

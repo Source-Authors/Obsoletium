@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //
@@ -20,22 +20,22 @@
 class CTextConsoleUnix : public CTextConsole
 {
 public:
-	virtual ~CTextConsoleUnix() { }
+	virtual ~CTextConsoleUnix() {}
 
 	// CTextConsole
-	bool		Init();
-	void		ShutDown();
-	void		Print( char * pszMsg );
+	bool Init();
+	void ShutDown();
+	void Print( char *pszMsg );
 
-	void		SetTitle( char *pszTitle );
-	void		SetStatusLine( char *pszStatus );
-	void		UpdateStatus();
+	void SetTitle( char *pszTitle );
+	void SetStatusLine( char *pszStatus );
+	void UpdateStatus();
 
-	char *		GetLine( int index, char *buf, size_t buflen );
-	int			GetWidth();
+	char *GetLine( int index, char *buf, size_t buflen );
+	int   GetWidth();
 
 private:
-	bool m_bConDebug;
+	bool  m_bConDebug;
 	FILE *m_tty;
 };
 

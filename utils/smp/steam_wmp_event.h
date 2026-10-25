@@ -5,47 +5,49 @@
 
 using HRESULT = long;
 
-namespace s1::smp {
+namespace s1::smp
+{
 
 // event logging.
-enum class SmpPlayerEvent {
-  AppLaunch,
-  AppExit,
-  AppClose,
-  FadeOut,
+enum class SmpPlayerEvent
+{
+	AppLaunch,
+	AppExit,
+	AppClose,
+	FadeOut,
 
-  BeginMedia,
-  EndMedia,
+	BeginMedia,
+	EndMedia,
 
-  Jump2Home,
-  Jump2End,
+	Jump2Home,
+	Jump2End,
 
-  Buffering,
-  Waiting,
-  Transitioning,
-  Ready,
-  Reconnecting,
+	Buffering,
+	Waiting,
+	Transitioning,
+	Ready,
+	Reconnecting,
 
-  Play,
-  Pause,
-  Stop,
-  ScrubFrom,
-  ScrubTo,
-  StepForward,
-  StepBack,
-  JumpFroward,
-  JumpBack,
-  Repeat,
+	Play,
+	Pause,
+	Stop,
+	ScrubFrom,
+	ScrubTo,
+	StepForward,
+	StepBack,
+	JumpFroward,
+	JumpBack,
+	Repeat,
 
-  Maximize,
-  Minimize,
-  Restore,
+	Maximize,
+	Minimize,
+	Restore,
 
-  Error
+	Error
 };
 
-bool FailedUI(HRESULT hr, const char* description);
+bool FailedUI( HRESULT hr, const char *description );
 
-}  // namespace s1::smp
+} // namespace s1::smp
 
-#endif  // !SE_UTILS_SMP_STEAM_WMP_EVENT_H_
+#endif // !SE_UTILS_SMP_STEAM_WMP_EVENT_H_

@@ -16,27 +16,27 @@
 struct LodScriptData_t;
 
 // max frames per animation
-constexpr inline int MAXSTUDIOANIMFRAMES{2000};
+constexpr inline int MAXSTUDIOANIMFRAMES{ 2000 };
 // total sequences
-constexpr inline int MAXSTUDIOSEQUENCES{1524};
+constexpr inline int MAXSTUDIOSEQUENCES{ 1524 };
 // bones allowed at source movement
-constexpr inline int MAXSTUDIOSRCBONES{512};
-constexpr inline int MAXSTUDIOBONEWEIGHTS{3};
-constexpr inline int MAXSTUDIONAME{128};
+constexpr inline int MAXSTUDIOSRCBONES{ 512 };
+constexpr inline int MAXSTUDIOBONEWEIGHTS{ 3 };
+constexpr inline int MAXSTUDIONAME{ 128 };
 
 #ifndef EXTERN
 #define EXTERN extern
-#elif (EXTERN == 1)
+#elif ( EXTERN == 1 )
 #undef EXTERN
 #define EXTERN
 #endif
 
-EXTERN int numdirs;
+EXTERN int  numdirs;
 EXTERN char cddir[32][MAX_PATH];
 EXTERN char fullpath[1024];
 
-EXTERN float g_defaultscale;
-EXTERN float g_currentscale;
+EXTERN float       g_defaultscale;
+EXTERN float       g_currentscale;
 EXTERN RadianEuler g_defaultrotation;
 
 EXTERN char defaulttexture[16][MAX_PATH];
@@ -44,203 +44,215 @@ EXTERN char sourcetexture[16][MAX_PATH];
 
 EXTERN int numrep;
 
-EXTERN int flip_triangles;
+EXTERN int   flip_triangles;
 EXTERN float normal_blend;
 
-struct s_boneweight_t {
-  int numbones;
+struct s_boneweight_t
+{
+	int numbones;
 
-  int bone[MAXSTUDIOBONEWEIGHTS];
-  float weight[MAXSTUDIOBONEWEIGHTS];
+	int   bone[MAXSTUDIOBONEWEIGHTS];
+	float weight[MAXSTUDIOBONEWEIGHTS];
 };
 
-struct s_vertexinfo_t {
-  // wtf is this doing here?
-  int material;
+struct s_vertexinfo_t
+{
+	// wtf is this doing here?
+	int material;
 
-  int firstref;
-  int lastref;
+	int firstref;
+	int lastref;
 
-  int flexmask;
-  int numflex;
-  int flexoffset;
+	int flexmask;
+	int numflex;
+	int flexoffset;
 };
 
-struct s_tmpface_t {
-  int material;
-  // dimhotepus: unsigned long -> uint32
-  uint32 a, b, c;
-  uint32 ta, tb, tc;
-  uint32 na, nb, nc;
+struct s_tmpface_t
+{
+	int material;
+	// dimhotepus: unsigned long -> uint32
+	uint32 a, b, c;
+	uint32 ta, tb, tc;
+	uint32 na, nb, nc;
 };
 
-struct s_face_t {
-  // dimhotepus: unsigned long -> uint32
-  uint32 a, b, c;
+struct s_face_t
+{
+	// dimhotepus: unsigned long -> uint32
+	uint32 a, b, c;
 };
 
-struct s_node_t {
-  char name[MAXSTUDIONAME];
-  int parent;
+struct s_node_t
+{
+	char name[MAXSTUDIONAME];
+	int  parent;
 };
 
-struct s_bone_t {
-  Vector pos;
-  RadianEuler rot;
+struct s_bone_t
+{
+	Vector      pos;
+	RadianEuler rot;
 };
 
-struct s_texture_t {
-  char name[MAX_PATH];
-  int flags;
-  int parent;
-  int material;
-  float width;
-  float height;
-  float dPdu;
-  float dPdv;
+struct s_texture_t
+{
+	char  name[MAX_PATH];
+	int   flags;
+	int   parent;
+	int   material;
+	float width;
+	float height;
+	float dPdu;
+	float dPdv;
 };
 EXTERN s_texture_t g_texture[MAXSTUDIOSKINS];
-EXTERN int g_numtextures;
-EXTERN int g_material[MAXSTUDIOSKINS];  // link into texture array
-EXTERN int g_nummaterials;
+EXTERN int         g_numtextures;
+EXTERN int         g_material[MAXSTUDIOSKINS]; // link into texture array
+EXTERN int         g_nummaterials;
 
 EXTERN float g_gamma;
-EXTERN int g_numskinref;
-EXTERN int g_numskinfamilies;
-EXTERN int g_skinref[256]
-                    [MAXSTUDIOSKINS];  // [skin][skinref], returns texture index
-EXTERN int g_numtexturegroups;
-EXTERN int g_numtexturelayers[32];
-EXTERN int g_numtexturereps[32];
-EXTERN int g_texturegroup[32][32][32];
+EXTERN int   g_numskinref;
+EXTERN int   g_numskinfamilies;
+EXTERN int   g_skinref[256]
+					  [MAXSTUDIOSKINS]; // [skin][skinref], returns texture index
+EXTERN int   g_numtexturegroups;
+EXTERN int   g_numtexturelayers[32];
+EXTERN int   g_numtexturereps[32];
+EXTERN int   g_texturegroup[32][32][32];
 
-struct s_mesh_t {
-  int numvertices;
-  int vertexoffset;
+struct s_mesh_t
+{
+	int numvertices;
+	int vertexoffset;
 
-  int numfaces;
-  int faceoffset;
+	int numfaces;
+	int faceoffset;
 };
 
-struct s_vertanim_t {
-  int vertex;
-  float speed;
-  float side;
-  Vector pos;
-  Vector normal;
+struct s_vertanim_t
+{
+	int    vertex;
+	float  speed;
+	float  side;
+	Vector pos;
+	Vector normal;
 };
 
 // processed aggregate lod pools
-struct s_loddata_t {
-  int numvertices;
-  s_boneweight_t *globalBoneweight;
-  s_vertexinfo_t *vertexInfo;
-  Vector *vertex;
-  Vector *normal;
-  Vector4D *tangentS;
-  Vector2D *texcoord;
+struct s_loddata_t
+{
+	int             numvertices;
+	s_boneweight_t *globalBoneweight;
+	s_vertexinfo_t *vertexInfo;
+	Vector         *vertex;
+	Vector         *normal;
+	Vector4D       *tangentS;
+	Vector2D       *texcoord;
 
-  int numfaces;
-  s_face_t *face;
+	int       numfaces;
+	s_face_t *face;
 
-  s_mesh_t mesh[MAXSTUDIOSKINS];
+	s_mesh_t mesh[MAXSTUDIOSKINS];
 
-  // remaps verts from an lod's source mesh to this all-lod processed aggregate
-  // pool
-  int *pMeshVertIndexMaps[MAX_NUM_LODS];
+	// remaps verts from an lod's source mesh to this all-lod processed aggregate
+	// pool
+	int *pMeshVertIndexMaps[MAX_NUM_LODS];
 };
 
 // raw off-disk source files.  Raw data should be not processed.
-struct s_source_t {
-  char filename[MAX_PATH];
-  int time;  // time stamp
+struct s_source_t
+{
+	char filename[MAX_PATH];
+	int  time; // time stamp
 
-  bool isActiveModel;
+	bool isActiveModel;
 
-  // local skeleton hierarchy
-  int numbones;
-  s_node_t localBone[MAXSTUDIOSRCBONES];
-  matrix3x4_t boneToPose[MAXSTUDIOSRCBONES];  // converts bone local data into
-                                              // initial pose data
+	// local skeleton hierarchy
+	int         numbones;
+	s_node_t    localBone[MAXSTUDIOSRCBONES];
+	matrix3x4_t boneToPose[MAXSTUDIOSRCBONES]; // converts bone local data into
+											   // initial pose data
 
-  // bone remapping
-  int boneflags[MAXSTUDIOSRCBONES];  // attachment, vertex, etc flags for this
-                                     // bone
-  int boneref[MAXSTUDIOSRCBONES];    // flags for this and child bones
-  int boneLocalToGlobal[MAXSTUDIOSRCBONES];  // bonemap : local bone to world
-                                             // bone mapping
-  int boneGlobalToLocal[MAXSTUDIOSRCBONES];  // boneimap : world bone to local
-                                             // bone mapping
+	// bone remapping
+	int boneflags[MAXSTUDIOSRCBONES];         // attachment, vertex, etc flags for this
+											  // bone
+	int boneref[MAXSTUDIOSRCBONES];           // flags for this and child bones
+	int boneLocalToGlobal[MAXSTUDIOSRCBONES]; // bonemap : local bone to world
+											  // bone mapping
+	int boneGlobalToLocal[MAXSTUDIOSRCBONES]; // boneimap : world bone to local
+											  // bone mapping
 
-  int texmap[MAXSTUDIOSKINS * 4];  // map local MAX materials to unique textures
+	int texmap[MAXSTUDIOSKINS * 4]; // map local MAX materials to unique textures
 
-  // per material mesh
-  int nummeshes;
-  int meshindex[MAXSTUDIOSKINS];  // mesh to skin index
-  s_mesh_t mesh[MAXSTUDIOSKINS];
+	// per material mesh
+	int      nummeshes;
+	int      meshindex[MAXSTUDIOSKINS]; // mesh to skin index
+	s_mesh_t mesh[MAXSTUDIOSKINS];
 
-  // model global copy of vertices
-  int numvertices;
-  s_boneweight_t *localBoneweight;   // vertex info about local bone weighting
-  s_boneweight_t *globalBoneweight;  // vertex info about global bone weighting
-  s_vertexinfo_t *vertexInfo;        // generic vertex info
-  Vector *vertex;
-  Vector *normal;
-  Vector4D *tangentS;
-  Vector2D *texcoord;
+	// model global copy of vertices
+	int             numvertices;
+	s_boneweight_t *localBoneweight;  // vertex info about local bone weighting
+	s_boneweight_t *globalBoneweight; // vertex info about global bone weighting
+	s_vertexinfo_t *vertexInfo;       // generic vertex info
+	Vector         *vertex;
+	Vector         *normal;
+	Vector4D       *tangentS;
+	Vector2D       *texcoord;
 
-  int numfaces;
-  s_face_t *face;  // vertex indexs per face
+	int       numfaces;
+	s_face_t *face; // vertex indexs per face
 
-  // raw skeletal animation
-  int numframes;
-  int startframe;
-  int endframe;
-  s_bone_t *rawanim[MAXSTUDIOANIMFRAMES];  // [frame][bones];
+	// raw skeletal animation
+	int       numframes;
+	int       startframe;
+	int       endframe;
+	s_bone_t *rawanim[MAXSTUDIOANIMFRAMES]; // [frame][bones];
 
-  // vertex animation
-  int *vanim_mapcount;  // local verts map to N target verts
-  int **vanim_map;      // local vertices to target vertices mapping list
-  int *vanim_flag;      // local vert does animate
+	// vertex animation
+	int  *vanim_mapcount; // local verts map to N target verts
+	int **vanim_map;      // local vertices to target vertices mapping list
+	int  *vanim_flag;     // local vert does animate
 
-  int numvanims[MAXSTUDIOANIMFRAMES];
-  s_vertanim_t *vanim[MAXSTUDIOANIMFRAMES];  // [frame][vertex]
+	int           numvanims[MAXSTUDIOANIMFRAMES];
+	s_vertanim_t *vanim[MAXSTUDIOANIMFRAMES]; // [frame][vertex]
 
-  // processed aggregate lod data
-  s_loddata_t *pLodData;
+	// processed aggregate lod data
+	s_loddata_t *pLodData;
 };
 
-EXTERN int g_numsources;
+EXTERN int         g_numsources;
 EXTERN s_source_t *g_source[MAXSTUDIOSEQUENCES];
 
 EXTERN int is_v1support;
 
-EXTERN int g_numverts;
-EXTERN Vector g_vertex[MAXSTUDIOVERTS];
+EXTERN int            g_numverts;
+EXTERN Vector         g_vertex[MAXSTUDIOVERTS];
 EXTERN s_boneweight_t g_bone[MAXSTUDIOVERTS];
 
-EXTERN int g_numnormals;
+EXTERN int    g_numnormals;
 EXTERN Vector g_normal[MAXSTUDIOVERTS];
 
-EXTERN int g_numtexcoords;
+EXTERN int      g_numtexcoords;
 EXTERN Vector2D g_texcoord[MAXSTUDIOVERTS];
 
-EXTERN int g_numfaces;
+EXTERN int         g_numfaces;
 EXTERN s_tmpface_t g_face[MAXSTUDIOTRIANGLES];
-EXTERN s_face_t g_src_uface[MAXSTUDIOTRIANGLES];  // max res unified faces
+EXTERN s_face_t    g_src_uface[MAXSTUDIOTRIANGLES]; // max res unified faces
 
-struct v_unify_t {
-  int refcount;
-  int lastref;
-  int firstref;
-  int v;
-  int m;
-  int n;
-  int t;
-  v_unify_t *next;
+struct v_unify_t
+{
+	int        refcount;
+	int        lastref;
+	int        firstref;
+	int        v;
+	int        m;
+	int        n;
+	int        t;
+	v_unify_t *next;
 };
 
 EXTERN v_unify_t v_listdata[MAXSTUDIOVERTS];
-EXTERN int numvlist;
+EXTERN int       numvlist;
 
-#endif  // SE_UTILS_MOTIONMAPPER_MOTIONMAPPER_H_
+#endif // SE_UTILS_MOTIONMAPPER_MOTIONMAPPER_H_

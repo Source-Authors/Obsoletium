@@ -5,6 +5,6 @@
 
 #include "iwaveout.h"
 
-IWaveOut* CreateWaveOut(unsigned long sampleRate);
+IWaveOut *CreateWaveOut( unsigned long sampleRate );
 
-#endif  // !SE_UTILS_VOICE_TWEAK_WAVEOUT_H_
+#endif // !SE_UTILS_VOICE_TWEAK_WAVEOUT_H_

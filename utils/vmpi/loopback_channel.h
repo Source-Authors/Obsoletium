@@ -8,6 +8,6 @@
 #include "ichannel.h"
 
 // Loopback sockets receive the same data they send.
-IChannel* CreateLoopbackChannel();
+IChannel *CreateLoopbackChannel();
 
-#endif  // !SE_UTILS_VMPI_LOOPBACK_CHANNEL_H_
+#endif // !SE_UTILS_VMPI_LOOPBACK_CHANNEL_H_

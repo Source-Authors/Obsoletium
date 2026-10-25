@@ -5,12 +5,12 @@
 //      are changed infrequently
 //
 
-#if !defined(AFX_STDAFX_H__50E4147E_A508_4D85_BF0A_BA26676063F0__INCLUDED_)
+#if !defined( AFX_STDAFX_H__50E4147E_A508_4D85_BF0A_BA26676063F0__INCLUDED_ )
 #define AFX_STDAFX_H__50E4147E_A508_4D85_BF0A_BA26676063F0__INCLUDED_
 
 #if _MSC_VER > 1000
 #pragma once
-#endif  // _MSC_VER > 1000
+#endif // _MSC_VER > 1000
 
 // TODO: reference additional headers your program requires here
 
@@ -18,4 +18,4 @@
 // Microsoft Visual C++ will insert additional declarations immediately before
 // the previous line.
 
-#endif  // !defined(AFX_STDAFX_H__50E4147E_A508_4D85_BF0A_BA26676063F0__INCLUDED_)
+#endif // !defined(AFX_STDAFX_H__50E4147E_A508_4D85_BF0A_BA26676063F0__INCLUDED_)

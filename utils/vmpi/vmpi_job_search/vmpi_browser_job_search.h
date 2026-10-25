@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //
@@ -8,7 +8,7 @@
 // vmpi_browser_job_search.h : main header file for the VMPI_BROWSER_JOB_SEARCH application
 //
 
-#if !defined(AFX_VMPI_BROWSER_JOB_SEARCH_H__96197957_586A_4F10_ACEA_EBBB9E6FD619__INCLUDED_)
+#if !defined( AFX_VMPI_BROWSER_JOB_SEARCH_H__96197957_586A_4F10_ACEA_EBBB9E6FD619__INCLUDED_ )
 #define AFX_VMPI_BROWSER_JOB_SEARCH_H__96197957_586A_4F10_ACEA_EBBB9E6FD619__INCLUDED_
 
 #if _MSC_VER > 1000
@@ -16,10 +16,10 @@
 #endif // _MSC_VER > 1000
 
 #ifndef __AFXWIN_H__
-	#error include 'stdafx.h' before including this file for PCH
+#error include 'stdafx.h' before including this file for PCH
 #endif
 
-#include "resource.h"		// main symbols
+#include "resource.h" // main symbols
 
 /////////////////////////////////////////////////////////////////////////////
 // CVMPIBrowserJobSearchApp:
@@ -31,18 +31,18 @@ class CVMPIBrowserJobSearchApp : public CWinApp
 public:
 	CVMPIBrowserJobSearchApp();
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CVMPIBrowserJobSearchApp)
-	public:
+public:
 	virtual BOOL InitInstance();
 	//}}AFX_VIRTUAL
 
-// Implementation
+	// Implementation
 
 	//{{AFX_MSG(CVMPIBrowserJobSearchApp)
-		// NOTE - the ClassWizard will add and remove member functions here.
-		//    DO NOT EDIT what you see in these blocks of generated code !
+	// NOTE - the ClassWizard will add and remove member functions here.
+	//    DO NOT EDIT what you see in these blocks of generated code !
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

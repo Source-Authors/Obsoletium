@@ -7,20 +7,21 @@
 
 #include "windows/dpi_wnd_behavior.h"
 
-class CBaseMDIChildWnd : public CMDIChildWnd {
-  DECLARE_DYNCREATE(CBaseMDIChildWnd)
+class CBaseMDIChildWnd : public CMDIChildWnd
+{
+	DECLARE_DYNCREATE( CBaseMDIChildWnd )
 
- public:
-  CBaseMDIChildWnd();
+public:
+	CBaseMDIChildWnd();
 
- protected:
-  afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-  afx_msg void OnDestroy();
-  afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
-  DECLARE_MESSAGE_MAP()
+protected:
+	afx_msg int     OnCreate( LPCREATESTRUCT lpCreateStruct );
+	afx_msg void    OnDestroy();
+	afx_msg LRESULT OnDpiChanged( WPARAM wParam, LPARAM lParam );
+	DECLARE_MESSAGE_MAP()
 
- protected:
-  s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
+protected:
+	s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
 };
 
-#endif  // !SE_COMMON_WINDOWS_BASE_MDI_CHILD_WND_
+#endif // !SE_COMMON_WINDOWS_BASE_MDI_CHILD_WND_

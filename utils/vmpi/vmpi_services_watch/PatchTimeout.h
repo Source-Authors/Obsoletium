@@ -1,11 +1,11 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //
 //=============================================================================//
-#if !defined(AFX_PATCHTIMEOUT_H__2D87CBF2_AC88_4F23_BB43_CC8A5C248B64__INCLUDED_)
+#if !defined( AFX_PATCHTIMEOUT_H__2D87CBF2_AC88_4F23_BB43_CC8A5C248B64__INCLUDED_ )
 #define AFX_PATCHTIMEOUT_H__2D87CBF2_AC88_4F23_BB43_CC8A5C248B64__INCLUDED_
 
 #if _MSC_VER > 1000
@@ -21,32 +21,34 @@
 
 class CPatchTimeout : public CDialog
 {
-// Construction
+	// Construction
 public:
-	CPatchTimeout(CWnd* pParent = NULL);   // standard constructor
+	CPatchTimeout( CWnd *pParent = NULL ); // standard constructor
 
-// Dialog Data
+	// Dialog Data
 	//{{AFX_DATA(CPatchTimeout)
-	enum { IDD = IDD_TIMEOUT };
+	enum
+	{
+		IDD = IDD_TIMEOUT
+	};
 	CString m_PatchDirectory;
 	CString m_VMPITransferDirectory;
-	int m_bForcePatch;
+	int     m_bForcePatch;
 	//}}AFX_DATA
 
 
-// Overrides
+	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CPatchTimeout)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
-
-// Implementation
 protected:
+	virtual void DoDataExchange( CDataExchange *pDX ); // DDX/DDV support
+													   //}}AFX_VIRTUAL
 
+	// Implementation
+protected:
 	// Generated message map functions
 	//{{AFX_MSG(CPatchTimeout)
-		// NOTE: the ClassWizard will add member functions here
+	// NOTE: the ClassWizard will add member functions here
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };

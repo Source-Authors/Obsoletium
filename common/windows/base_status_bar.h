@@ -7,26 +7,27 @@
 
 #include "windows/dpi_wnd_behavior.h"
 
-class CBaseStatusBar : public CStatusBar {
-  DECLARE_DYNCREATE(CBaseStatusBar)
+class CBaseStatusBar : public CStatusBar
+{
+	DECLARE_DYNCREATE( CBaseStatusBar )
 
- public:
-  CBaseStatusBar();
-  BOOL SetIndicators(const UINT* lpIDArray, int nIDCount);
+public:
+	CBaseStatusBar();
+	BOOL SetIndicators( const UINT *lpIDArray, int nIDCount );
 
- protected:
-  afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-  afx_msg void OnDestroy();
-  afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
-  DECLARE_MESSAGE_MAP()
+protected:
+	afx_msg int     OnCreate( LPCREATESTRUCT lpCreateStruct );
+	afx_msg void    OnDestroy();
+	afx_msg LRESULT OnDpiChanged( WPARAM wParam, LPARAM lParam );
+	DECLARE_MESSAGE_MAP()
 
-  [[nodiscard]] int GetHeight() const;
-  void ScaleHeight(int initialHeight);
+	[[nodiscard]] int GetHeight() const;
+	void              ScaleHeight( int initialHeight );
 
- private:
-  s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
+private:
+	s1::win::ui::CDpiWindowBehavior m_dpi_behavior;
 
-  int m_indicator_count;
+	int m_indicator_count;
 };
 
-#endif  // !SE_COMMON_WINDOWS_BASE_STATUS_BAR_
+#endif // !SE_COMMON_WINDOWS_BASE_STATUS_BAR_

@@ -13,7 +13,7 @@
 // See these sources for detailed information regarding the
 // Active Template Library product.
 
-#if !defined(AFX_STDAFX_H__48C9E972_76B0_11D1_B293_0040053089AE__INCLUDED_)
+#if !defined( AFX_STDAFX_H__48C9E972_76B0_11D1_B293_0040053089AE__INCLUDED_ )
 #define AFX_STDAFX_H__48C9E972_76B0_11D1_B293_0040053089AE__INCLUDED_
 
 #ifndef STRICT
@@ -36,4 +36,4 @@
 // Microsoft Visual C++ will insert additional declarations immediately before
 // the previous line.
 
-#endif  // !defined(AFX_STDAFX_H__48C9E972_76B0_11D1_B293_0040053089AE__INCLUDED)
+#endif // !defined(AFX_STDAFX_H__48C9E972_76B0_11D1_B293_0040053089AE__INCLUDED)

@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //=============================================================================//
@@ -20,7 +20,7 @@ void ServiceHelpers_Init();
 // The service will run in a thread. If the service starts successfully, then
 // it will call pFn and pass in pParam. Inside there, you should loop until
 // ShouldServiceExit() returns true.
-bool ServiceHelpers_StartService( const char *pServiceName, void (*pFn)( void *pParam ), void *pParam );
+bool ServiceHelpers_StartService( const char *pServiceName, void ( *pFn )( void *pParam ), void *pParam );
 
 
 // Call this to exit the service early. This will make ShouldServiceExit() return true,
@@ -37,7 +37,7 @@ bool ServiceHelpers_ShouldExit();
 
 
 // This function wants a better home.
-char* GetLastErrorString();
+char *GetLastErrorString();
 
 
 #endif // SERVICE_HELPERS_H

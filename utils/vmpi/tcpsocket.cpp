@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //=============================================================================//
@@ -9,8 +9,8 @@
 //#define PARANOID
 
 #if defined( PARANOID )
-	#include <stdlib.h>
-	#include <crtdbg.h>
+#include <stdlib.h>
+#include <crtdbg.h>
 #endif
 
 #include <winsock2.h>
@@ -22,21 +22,20 @@
 #include "tier0/dbg.h"
 
 
-
 #error "I am TCPSocket and I suck. Use IThreadedTCPSocket or ThreadedTCPSocketEmu instead."
 
 
 extern TIMEVAL SetupTimeVal( double flTimeout );
-extern void IPAddrToSockAddr( const CIPAddr *pIn, sockaddr_in *pOut );
-extern void SockAddrToIPAddr( const sockaddr_in *pIn, CIPAddr *pOut );
+extern void    IPAddrToSockAddr( const CIPAddr *pIn, sockaddr_in *pOut );
+extern void    SockAddrToIPAddr( const sockaddr_in *pIn, CIPAddr *pOut );
 
 
-#define SENTINEL_DISCONNECT	-1
-#define SENTINEL_KEEPALIVE	-2
+#define SENTINEL_DISCONNECT -1
+#define SENTINEL_KEEPALIVE  -2
 
 
-#define KEEPALIVE_INTERVAL_MS		3000	// keepalives are sent every N MS
-#define KEEPALIVE_TIMEOUT_SECONDS	15.0	// connections timeout after this long
+#define KEEPALIVE_INTERVAL_MS     3000 // keepalives are sent every N MS
+#define KEEPALIVE_TIMEOUT_SECONDS 15.0 // connections timeout after this long
 
 
 static bool g_bEnableTCPTimeout = true;
@@ -45,10 +44,9 @@ static bool g_bEnableTCPTimeout = true;
 class CRecvData
 {
 public:
-	int				m_Count;
-	unsigned char	m_Data[1];
+	int           m_Count;
+	unsigned char m_Data[1];
 };
-	
 
 
 SOCKET TCPBind( const CIPAddr *pAddr )
@@ -65,7 +63,7 @@ SOCKET TCPBind( const CIPAddr *pAddr )
 	sockaddr_in addr;
 	IPAddrToSockAddr( pAddr, &addr );
 
-	int status = bind( sock, (sockaddr*)&addr, sizeof(addr) );
+	int status = bind( sock, (sockaddr *)&addr, sizeof( addr ) );
 	if ( status == 0 )
 	{
 		return sock;
@@ -78,14 +76,13 @@ SOCKET TCPBind( const CIPAddr *pAddr )
 }
 
 
-
 // ---------------------------------------------------------------------------------------- //
 // TCP sockets.
 // ---------------------------------------------------------------------------------------- //
 
 enum
 {
-	OP_RECV=111,
+	OP_RECV = 111,
 	OP_SEND
 };
 
@@ -93,20 +90,20 @@ enum
 class COverlappedPlus : public WSAOVERLAPPED
 {
 public:
-				COverlappedPlus()
-				{
-					memset( this, 0, sizeof( WSAOVERLAPPED ) );
-				}
+	COverlappedPlus()
+	{
+		memset( this, 0, sizeof( WSAOVERLAPPED ) );
+	}
 
-	int					m_OPType;		// One of the OP_ defines.
+	int m_OPType; // One of the OP_ defines.
 };
 
 typedef struct SendBuf_t
 {
-	COverlappedPlus		m_Overlapped;
-	int					m_Index;		// Index into m_SendBufs.
-	int					m_DataLength;
-	char				m_Data[1];
+	COverlappedPlus m_Overlapped;
+	int             m_Index; // Index into m_SendBufs.
+	int             m_DataLength;
+	char            m_Data[1];
 } SendBuf_s;
 
 
@@ -117,40 +114,38 @@ void AddGlobalTCPSocket( CTCPSocket *pSocket );
 void RemoveGlobalTCPSocket( CTCPSocket *pSocket );
 
 
-
 // ------------------------------------------------------------------------------------------ //
 // CTCPSocket implementation.
 // ------------------------------------------------------------------------------------------ //
 
 class CTCPSocket : public ITCPSocket
 {
-friend class CTCPListenSocket;
+	friend class CTCPListenSocket;
 
 public:
+	CTCPSocket()
+	{
+		m_Socket = INVALID_SOCKET;
+		m_bConnected = false;
 
-					CTCPSocket()
-					{
-						m_Socket = INVALID_SOCKET;
-						m_bConnected = false;
-						
-						m_hIOCP = NULL;
-						
-						m_bShouldExitThreads = false;
-						m_bConnectionLost = false;
-						m_nSizeBytesReceived = 0;
+		m_hIOCP = NULL;
 
-						m_pIncomingData = NULL;
+		m_bShouldExitThreads = false;
+		m_bConnectionLost = false;
+		m_nSizeBytesReceived = 0;
 
-						memset( &m_RecvOverlapped, 0, sizeof( m_RecvOverlapped ) );
-						m_RecvOverlapped.m_OPType = OP_RECV;
+		m_pIncomingData = NULL;
 
-						m_hRecvSignal = CreateEvent( NULL, FALSE, FALSE, NULL );
-						m_RecvStage = -1;
+		memset( &m_RecvOverlapped, 0, sizeof( m_RecvOverlapped ) );
+		m_RecvOverlapped.m_OPType = OP_RECV;
 
-						m_MainThreadID = GetCurrentThreadId();
-					}
-	
-	virtual			~CTCPSocket()
+		m_hRecvSignal = CreateEvent( NULL, FALSE, FALSE, NULL );
+		m_RecvStage = -1;
+
+		m_MainThreadID = GetCurrentThreadId();
+	}
+
+	virtual ~CTCPSocket()
 	{
 		Term();
 		CloseHandle( m_hRecvSignal );
@@ -165,7 +160,7 @@ public:
 		if ( m_Socket != SOCKET_ERROR && !m_bConnectionLost )
 		{
 			SendDisconnectSentinel();
-	
+
 			// Give the sends a second to complete. SO_LINGER is having trouble for some reason.
 			WaitForSendsToComplete( 1 );
 		}
@@ -188,7 +183,7 @@ public:
 		m_bConnected = false;
 		m_bConnectionLost = true;
 		m_RecvStage = -1;
-		
+
 		FOR_EACH_LL( m_SendBufs, i )
 		{
 			SendBuf_t *pSendBuf = m_SendBufs[i];
@@ -213,7 +208,7 @@ public:
 		}
 	}
 
-	virtual void	Release()
+	virtual void Release()
 	{
 		delete this;
 	}
@@ -233,8 +228,8 @@ public:
 #endif
 	}
 
-	
-	virtual bool	BindToAny( const unsigned short port )
+
+	virtual bool BindToAny( const unsigned short port )
 	{
 		Term();
 
@@ -251,19 +246,19 @@ public:
 		}
 	}
 
-	
+
 	// Set the initial socket options that we want.
 	void SetInitialSocketOptions()
 	{
 		// Set nodelay to improve latency.
 		BOOL val = TRUE;
-		setsockopt( m_Socket, IPPROTO_TCP, TCP_NODELAY, (const char FAR *)&val, sizeof(BOOL) );
+		setsockopt( m_Socket, IPPROTO_TCP, TCP_NODELAY, (const char FAR *)&val, sizeof( BOOL ) );
 
 		// Make it linger for 3 seconds when it exits.
 		LINGER linger;
 		linger.l_onoff = 1;
 		linger.l_linger = 3;
-		setsockopt( m_Socket, SOL_SOCKET, SO_LINGER, (char*)&linger, sizeof( linger ) );
+		setsockopt( m_Socket, SOL_SOCKET, SO_LINGER, (char *)&linger, sizeof( linger ) );
 	}
 
 
@@ -277,7 +272,7 @@ public:
 			return true;
 
 		// Have we timed out?
-		if ( g_bEnableTCPTimeout && (Plat_FloatTime() - m_LastRecvTime > KEEPALIVE_TIMEOUT_SECONDS) )
+		if ( g_bEnableTCPTimeout && ( Plat_FloatTime() - m_LastRecvTime > KEEPALIVE_TIMEOUT_SECONDS ) )
 		{
 			SetConnectionLost( "Connection timed out." );
 		}
@@ -301,7 +296,7 @@ public:
 	{
 		CCriticalSectionLock postLock( &m_ConnectionLostCS );
 		postLock.Lock();
-			m_bConnectionLost = true;
+		m_bConnectionLost = true;
 		postLock.Unlock();
 
 		// Handle it right away if we're in the main thread. If we're in an IO thread,
@@ -310,7 +305,7 @@ public:
 		{
 			Term();
 		}
-		
+
 		if ( pErrorString )
 		{
 			m_ErrorString.CopyArray( pErrorString, strlen( pErrorString ) + 1 );
@@ -318,23 +313,22 @@ public:
 		else
 		{
 			char *lpMsgBuf;
-			FormatMessage( 
-				FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-				FORMAT_MESSAGE_FROM_SYSTEM | 
-				FORMAT_MESSAGE_IGNORE_INSERTS,
-				NULL,
-				err,
-				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-				(LPTSTR) &lpMsgBuf,
-				0,
-				NULL 
-			);
+			FormatMessage(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER |
+			FORMAT_MESSAGE_FROM_SYSTEM |
+			FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			err,
+			MAKELANGID( LANG_NEUTRAL, SUBLANG_DEFAULT ), // Default language
+			(LPTSTR)&lpMsgBuf,
+			0,
+			NULL );
 
 			m_ErrorString.CopyArray( lpMsgBuf, strlen( lpMsgBuf ) + 1 );
 			LocalFree( lpMsgBuf );
 		}
 	}
-		
+
 
 	// -------------------------------------------------------------------------------------------------- //
 	// The receive code.
@@ -350,21 +344,21 @@ public:
 		if ( bFresh )
 			m_nSizeBytesReceived = 0;
 
-		DWORD dwNumBytesReceived = 0;
-		WSABUF buf = { sizeof( &m_RecvDataSize ) - m_nSizeBytesReceived, ((char*)&m_RecvDataSize) + m_nSizeBytesReceived };
-		DWORD dwFlags = 0;
+		DWORD  dwNumBytesReceived = 0;
+		WSABUF buf = { sizeof( &m_RecvDataSize ) - m_nSizeBytesReceived, ( (char *)&m_RecvDataSize ) + m_nSizeBytesReceived };
+		DWORD  dwFlags = 0;
 
-		int status = WSARecv( 
-			m_Socket,
-			&buf,
-			1,
-			&dwNumBytesReceived,
-			&dwFlags,
-			&m_RecvOverlapped,
-			NULL );
+		int status = WSARecv(
+		m_Socket,
+		&buf,
+		1,
+		&dwNumBytesReceived,
+		&dwFlags,
+		&m_RecvOverlapped,
+		NULL );
 
 		int err = -1;
-		if ( status == SOCKET_ERROR && (err = WSAGetLastError()) != ERROR_IO_PENDING )
+		if ( status == SOCKET_ERROR && ( err = WSAGetLastError() ) != ERROR_IO_PENDING )
 		{
 			SetConnectionLost( NULL, err );
 			return false;
@@ -378,21 +372,21 @@ public:
 
 	bool PostNextDataPart()
 	{
-		DWORD dwNumBytesReceived = 0;
-		WSABUF buf = { m_RecvDataSize - m_AmountReceived, (char*)m_pIncomingData->m_Data + m_AmountReceived }; 
-		DWORD dwFlags = 0;
+		DWORD  dwNumBytesReceived = 0;
+		WSABUF buf = { m_RecvDataSize - m_AmountReceived, (char *)m_pIncomingData->m_Data + m_AmountReceived };
+		DWORD  dwFlags = 0;
 
-		int status = WSARecv( 
-			m_Socket,
-			&buf,
-			1,
-			&dwNumBytesReceived,
-			&dwFlags,
-			&m_RecvOverlapped,
-			NULL );
+		int status = WSARecv(
+		m_Socket,
+		&buf,
+		1,
+		&dwNumBytesReceived,
+		&dwFlags,
+		&m_RecvOverlapped,
+		NULL );
 
 		int err = -1;
-		if ( status == SOCKET_ERROR && (err = WSAGetLastError()) != ERROR_IO_PENDING )
+		if ( status == SOCKET_ERROR && ( err = WSAGetLastError() ) != ERROR_IO_PENDING )
 		{
 			SetConnectionLost( NULL, err );
 			return false;
@@ -415,7 +409,7 @@ public:
 
 		// Add a CRecvData element.
 		ParanoidMemoryCheck();
-		m_pIncomingData = (CRecvData*)malloc( sizeof( CRecvData ) - 1 + m_RecvDataSize );
+		m_pIncomingData = (CRecvData *)malloc( sizeof( CRecvData ) - 1 + m_RecvDataSize );
 		if ( !m_pIncomingData )
 		{
 			char str[512];
@@ -431,13 +425,13 @@ public:
 		return PostNextDataPart();
 	}
 
-	virtual bool	Recv( CUtlVector<unsigned char> &data, double flTimeout )
+	virtual bool Recv( CUtlVector< unsigned char > &data, double flTimeout )
 	{
 		if ( CheckConnectionLost() )
 			return false;
 
 		// Wait in 50ms chunks, checking for disconnections along the way.
-		bool bGotData = false;
+		bool  bGotData = false;
 		DWORD msToWait = (DWORD)( flTimeout * 1000.0 );
 		do
 		{
@@ -455,17 +449,17 @@ public:
 
 			msToWait -= curWaitTime;
 		} while ( msToWait );
-		
+
 		// If we never got a WAIT_OBJECT_0, then we never received anything.
 		if ( !bGotData )
 			return false;
-		
-		
+
+
 		CCriticalSectionLock csLock( &m_RecvDataCS );
 		csLock.Lock();
 
 		// Pickup the head m_RecvDatas element.
-		CRecvData *pRecvData = m_RecvDatas[ m_RecvDatas.Head() ];
+		CRecvData *pRecvData = m_RecvDatas[m_RecvDatas.Head()];
 		data.CopyArray( pRecvData->m_Data, pRecvData->m_Count );
 
 		// Now free it.
@@ -518,8 +512,8 @@ public:
 			else
 			{
 				// This case should never ever happen!
-#if !defined(NDEBUG)
-					__asm int 3;
+#if !defined( NDEBUG )
+				__asm int 3;
 #endif
 
 				SetConnectionLost( "Received too much data in a packet!" );
@@ -532,24 +526,24 @@ public:
 			m_AmountReceived += dwNumBytes;
 
 			// Sanity check.
-#if !defined(NDEBUG)
+#if !defined( NDEBUG )
 			Assert( m_RecvDataSize == m_pIncomingData->m_Count );
-			Assert( m_AmountReceived <= m_RecvDataSize );	// TODO: make this threadsafe for multiple IO threads.
+			Assert( m_AmountReceived <= m_RecvDataSize ); // TODO: make this threadsafe for multiple IO threads.
 #endif
 
 			if ( m_AmountReceived == m_RecvDataSize )
 			{
 				m_RecvStage = 2;
-				
+
 				// Add the data to the list of packets waiting to be picked up.
 				CCriticalSectionLock csLock( &m_RecvDataCS );
 				csLock.Lock();
-				
+
 				m_RecvDatas.AddToTail( m_pIncomingData );
 				m_pIncomingData = NULL;
 
 				if ( m_RecvDatas.Count() == 1 )
-					SetEvent( m_hRecvSignal );	// Notify the Recv() function.
+					SetEvent( m_hRecvSignal ); // Notify the Recv() function.
 
 				StartWaitingForSize( true );
 			}
@@ -563,21 +557,21 @@ public:
 			Assert( false );
 		}
 	}
-	
+
 
 	// -------------------------------------------------------------------------------------------------- //
 	// The send code.
 	// -------------------------------------------------------------------------------------------------- //
 
-	virtual void	WaitForSendsToComplete( double flTimeout )
+	virtual void WaitForSendsToComplete( double flTimeout )
 	{
 		CWaitTimer waitTimer( flTimeout );
 		while ( 1 )
 		{
 			CCriticalSectionLock sendBufLock( &m_SendCS );
 			sendBufLock.Lock();
-				if( m_SendBufs.Count() == 0 )
-					return;
+			if ( m_SendBufs.Count() == 0 )
+				return;
 			sendBufLock.Unlock();
 
 			if ( waitTimer.ShouldKeepWaiting() )
@@ -593,7 +587,7 @@ public:
 	{
 		// Send a message saying we're exiting.
 		ParanoidMemoryCheck();
-		SendBuf_t *pBuf = (SendBuf_t*)malloc( sizeof( SendBuf_t ) - 1 + sizeof( int ) );
+		SendBuf_t *pBuf = (SendBuf_t *)malloc( sizeof( SendBuf_t ) - 1 + sizeof( int ) );
 		if ( !pBuf )
 		{
 			SetConnectionLost( "malloc() in SendKeepalive() failed." );
@@ -601,7 +595,7 @@ public:
 		}
 
 		pBuf->m_DataLength = sizeof( int );
-		*((int*)pBuf->m_Data) = SENTINEL_KEEPALIVE;
+		*( (int *)pBuf->m_Data ) = SENTINEL_KEEPALIVE;
 		InternalSendDataBuf( pBuf );
 	}
 
@@ -610,38 +604,38 @@ public:
 	{
 		// Send a message saying we're exiting.
 		ParanoidMemoryCheck();
-		SendBuf_t *pBuf = (SendBuf_t*)malloc( sizeof( SendBuf_t ) - 1 + sizeof( int ) );
+		SendBuf_t *pBuf = (SendBuf_t *)malloc( sizeof( SendBuf_t ) - 1 + sizeof( int ) );
 		if ( pBuf )
 		{
 			pBuf->m_DataLength = sizeof( int );
-			*((int*)pBuf->m_Data) = SENTINEL_DISCONNECT;	// This signifies that we're exiting.
+			*( (int *)pBuf->m_Data ) = SENTINEL_DISCONNECT; // This signifies that we're exiting.
 			InternalSendDataBuf( pBuf );
 		}
 	}
 
 
-	virtual bool	Send( const void *pData, int len )
+	virtual bool Send( const void *pData, int len )
 	{
 		const void *pChunks[1] = { pData };
-		int chunkLengths[1] = { len };
+		int         chunkLengths[1] = { len };
 		return SendChunks( pChunks, chunkLengths, 1 );
 	}
 
-	
-	virtual bool	SendChunks( void const * const *pChunks, const int *pChunkLengths, int nChunks )
+
+	virtual bool SendChunks( void const *const *pChunks, const int *pChunkLengths, int nChunks )
 	{
 		if ( CheckConnectionLost() )
 			return false;
-		
+
 		CChunkWalker walker( pChunks, pChunkLengths, nChunks );
-		int totalLength = walker.GetTotalLength();
+		int          totalLength = walker.GetTotalLength();
 
 		if ( !totalLength )
 			return true;
 
 		// Create a buffer to hold the data and copy the data in.
 		ParanoidMemoryCheck();
-		SendBuf_t *pBuf = (SendBuf_t*)malloc( sizeof( SendBuf_t ) - 1 + totalLength + sizeof( int ) );
+		SendBuf_t *pBuf = (SendBuf_t *)malloc( sizeof( SendBuf_t ) - 1 + totalLength + sizeof( int ) );
 		if ( !pBuf )
 		{
 			char str[512];
@@ -652,15 +646,15 @@ public:
 
 		pBuf->m_DataLength = totalLength + sizeof( int );
 
-		int *pByteCountPos = (int*)pBuf->m_Data;
+		int *pByteCountPos = (int *)pBuf->m_Data;
 		*pByteCountPos = totalLength;
 
-		char *pDataPos = &pBuf->m_Data[ sizeof( int ) ];
+		char *pDataPos = &pBuf->m_Data[sizeof( int )];
 		walker.CopyTo( pDataPos, totalLength );
 
 		int status = InternalSendDataBuf( pBuf );
 		int err = -1;
-		if ( status == SOCKET_ERROR && (err = WSAGetLastError()) != ERROR_IO_PENDING )
+		if ( status == SOCKET_ERROR && ( err = WSAGetLastError() ) != ERROR_IO_PENDING )
 		{
 			SetConnectionLost( NULL, err );
 			return false;
@@ -687,16 +681,16 @@ public:
 
 		// Tell Winsock to send it.
 		WSABUF buf = { pBuf->m_DataLength, pBuf->m_Data };
-		
+
 		DWORD dwNumBytesSent = 0;
 		return WSASend(
-			m_Socket,
-			&buf,
-			1,
-			&dwNumBytesSent,
-			0,
-			&pBuf->m_Overlapped,
-			NULL );
+		m_Socket,
+		&buf,
+		1,
+		&dwNumBytesSent,
+		0,
+		&pBuf->m_Overlapped,
+		NULL );
 	}
 
 
@@ -710,12 +704,12 @@ public:
 		}
 
 		// Just free the buffer.
-		SendBuf_t *pBuf = (SendBuf_t*)pInfo;
+		SendBuf_t *pBuf = (SendBuf_t *)pInfo;
 		Assert( dwNumBytes == (DWORD)pBuf->m_DataLength );
 
 		CCriticalSectionLock sendBufLock( &m_SendCS );
 		sendBufLock.Lock();
-			m_SendBufs.Remove( pBuf->m_Index );
+		m_SendBufs.Remove( pBuf->m_Index );
 		sendBufLock.Unlock();
 
 		ParanoidMemoryCheck( pBuf );
@@ -733,8 +727,8 @@ public:
 		IPAddrToSockAddr( &inputAddr, &addr );
 
 		m_bConnected = false;
-		int ret = connect( m_Socket, (struct sockaddr*)&addr, sizeof( addr ) );
-		ret=ret;
+		int ret = connect( m_Socket, (struct sockaddr *)&addr, sizeof( addr ) );
+		ret = ret;
 
 		return true;
 	}
@@ -764,7 +758,7 @@ public:
 	{
 		m_bConnected = true;
 		m_bConnectionLost = false;
-		m_LastRecvTime = Plat_FloatTime(); 
+		m_LastRecvTime = Plat_FloatTime();
 
 		CreateThreads();
 		StartWaitingForSize( true );
@@ -772,14 +766,14 @@ public:
 	}
 
 
-	virtual bool	IsConnected()
+	virtual bool IsConnected()
 	{
 		CheckConnectionLost();
 		return m_bConnected;
 	}
 
 
-	virtual void GetDisconnectReason( CUtlVector<char> &reason )
+	virtual void GetDisconnectReason( CUtlVector< char > &reason )
 	{
 		reason = m_ErrorString;
 	}
@@ -795,22 +789,22 @@ public:
 		int nThreads = 1;
 		SetShouldExitThreads( false );
 
-        // Create our IO completion port and hook it to our socket.
-		m_hIOCP = CreateIoCompletionPort(        
-            INVALID_HANDLE_VALUE, NULL, 0, 0); 
+		// Create our IO completion port and hook it to our socket.
+		m_hIOCP = CreateIoCompletionPort(
+		INVALID_HANDLE_VALUE, NULL, 0, 0 );
 
-		m_hIOCP = CreateIoCompletionPort( (HANDLE)m_Socket, m_hIOCP, (unsigned long)this, nThreads ); 
+		m_hIOCP = CreateIoCompletionPort( (HANDLE)m_Socket, m_hIOCP, (unsigned long)this, nThreads );
 
-		for ( int i=0; i < nThreads; i++ )
+		for ( int i = 0; i < nThreads; i++ )
 		{
-			DWORD dwThreadID = 0;
-			HANDLE hThread = CreateThread( 
-				NULL,
-				0,
-				&CTCPSocket::StaticThreadFn,
-				this,
-				0,
-				&dwThreadID );
+			DWORD  dwThreadID = 0;
+			HANDLE hThread = CreateThread(
+			NULL,
+			0,
+			&CTCPSocket::StaticThreadFn,
+			this,
+			0,
+			&dwThreadID );
 
 			if ( hThread )
 			{
@@ -823,18 +817,18 @@ public:
 				return false;
 			}
 		}
-	
+
 		return true;
 	}
 
-	
+
 	void StopThreads()
 	{
 		// Tell the threads to exit, then wait for them to do so.
 		SetShouldExitThreads( true );
 		WaitForMultipleObjects( m_Threads.Count(), m_Threads.Base(), TRUE, INFINITE );
 
-		for ( int i=0; i < m_Threads.Count(); i++ )
+		for ( int i = 0; i < m_Threads.Count(); i++ )
 		{
 			CloseHandle( m_Threads[i] );
 		}
@@ -864,21 +858,21 @@ public:
 	{
 		while ( 1 )
 		{
-			DWORD dwNumBytes = 0;
+			DWORD         dwNumBytes = 0;
 			unsigned long pInputTCPSocket;
-			LPOVERLAPPED pOverlapped;
+			LPOVERLAPPED  pOverlapped;
 
-			if ( GetQueuedCompletionStatus( 
-				m_hIOCP,		// the port we're listening on
-				&dwNumBytes,	// # bytes received on the port
-				&pInputTCPSocket,// "completion key" = CTCPSocket*
-				&pOverlapped,	// the overlapped info that was passed into AcceptEx, WSARecv, or WSASend.
-				100				// listen for 100ms at a time so we can exit gracefully when the socket is deleted.
-				) )
+			if ( GetQueuedCompletionStatus(
+				 m_hIOCP,          // the port we're listening on
+				 &dwNumBytes,      // # bytes received on the port
+				 &pInputTCPSocket, // "completion key" = CTCPSocket*
+				 &pOverlapped,     // the overlapped info that was passed into AcceptEx, WSARecv, or WSASend.
+				 100               // listen for 100ms at a time so we can exit gracefully when the socket is deleted.
+				 ) )
 			{
-				COverlappedPlus *pInfo = (COverlappedPlus*)pOverlapped;
+				COverlappedPlus *pInfo = (COverlappedPlus *)pOverlapped;
 				ParanoidMemoryCheck( pInfo );
-				
+
 				if ( pInfo->m_OPType == OP_RECV )
 				{
 					Assert( pInfo == &m_RecvOverlapped );
@@ -890,73 +884,72 @@ public:
 					HandleSendCompletion( pInfo, dwNumBytes );
 				}
 			}
-			
+
 			if ( ShouldExitThreads() )
 				break;
 		}
 
 		return 0;
 	}
-	
+
 
 	static DWORD WINAPI StaticThreadFn( LPVOID pParameter )
 	{
-		return ((CTCPSocket*)pParameter)->ThreadFn();
+		return ( (CTCPSocket *)pParameter )->ThreadFn();
 	}
 
-	
+
 
 private:
-
-	SOCKET		m_Socket;
-	bool		m_bConnected;
+	SOCKET m_Socket;
+	bool   m_bConnected;
 
 
 	// m_RecvOverlapped is setup to first wait for the size, then the data.
 	// Then it is not posted until the app grabs the data.
-	HANDLE						m_hRecvSignal;	// Tells Recv() when we have data.
-	COverlappedPlus				m_RecvOverlapped;
-	int							m_RecvStage;	// -1 = not initialized
-												//  0 = waiting for size
-												//  1 = waiting for data
-												//  2 = waiting for app to pickup the data
+	HANDLE          m_hRecvSignal; // Tells Recv() when we have data.
+	COverlappedPlus m_RecvOverlapped;
+	int             m_RecvStage; // -1 = not initialized
+								 //  0 = waiting for size
+								 //  1 = waiting for data
+								 //  2 = waiting for app to pickup the data
 
-	CUtlLinkedList<CRecvData*,int>	m_RecvDatas;	// The head element is the next one to be picked up.
-	CRecvData					*m_pIncomingData;	// The packet we're currently receiving.
-	CCriticalSection			m_RecvDataCS;		// This protects adds and removes in the list.
+	CUtlLinkedList< CRecvData *, int > m_RecvDatas;     // The head element is the next one to be picked up.
+	CRecvData                         *m_pIncomingData; // The packet we're currently receiving.
+	CCriticalSection                   m_RecvDataCS;    // This protects adds and removes in the list.
 
-	// These reference the element at the tail of m_RecvData. It is the current one getting 
-	volatile int				m_nSizeBytesReceived;	// How much of m_RecvDataSize have we received yet?
-	int							m_RecvDataSize;			// this is received over the network
-	int							m_AmountReceived;		// How much we've received so far.
+	// These reference the element at the tail of m_RecvData. It is the current one getting
+	volatile int m_nSizeBytesReceived; // How much of m_RecvDataSize have we received yet?
+	int          m_RecvDataSize;       // this is received over the network
+	int          m_AmountReceived;     // How much we've received so far.
 
-	// Last time we received anything from this connection. Used to determine if the connection is 
+	// Last time we received anything from this connection. Used to determine if the connection is
 	// still active.
-	double						m_LastRecvTime;
+	double m_LastRecvTime;
 
 
 	// Outgoing send buffers.
-	CUtlLinkedList<SendBuf_t*,int>	m_SendBufs;
-	CCriticalSection				m_SendCS;
-	
+	CUtlLinkedList< SendBuf_t *, int > m_SendBufs;
+	CCriticalSection                   m_SendCS;
+
 
 	// All the threads waiting for IO.
-	CUtlVector<HANDLE>		m_Threads;
-	HANDLE					m_hIOCP;
+	CUtlVector< HANDLE > m_Threads;
+	HANDLE               m_hIOCP;
 
 	// Used during shutdown.
-	volatile bool			m_bShouldExitThreads;
-	CCriticalSection		m_ThreadsCS;
+	volatile bool    m_bShouldExitThreads;
+	CCriticalSection m_ThreadsCS;
 
 	// For debugging.
-	DWORD					m_MainThreadID;
+	DWORD m_MainThreadID;
 
 	// Set by the main thread or IO threads to signal connection lost.
-	bool					m_bConnectionLost;
-	CCriticalSection		m_ConnectionLostCS;
+	bool             m_bConnectionLost;
+	CCriticalSection m_ConnectionLostCS;
 
 	// This is set when we get disconnected.
-	CUtlVector<char>		m_ErrorString;
+	CUtlVector< char > m_ErrorString;
 };
 
 
@@ -967,24 +960,23 @@ private:
 class CTCPListenSocket : public ITCPListenSocket
 {
 public:
+	CTCPListenSocket()
+	{
+		m_Socket = INVALID_SOCKET;
+	}
 
-						CTCPListenSocket()
-						{
-							m_Socket = INVALID_SOCKET;
-						}
 
-
-	virtual				~CTCPListenSocket()
+	virtual ~CTCPListenSocket()
 	{
 		if ( m_Socket != INVALID_SOCKET )
 		{
 			closesocket( m_Socket );
 		}
-	}	
+	}
 
 
 	// The main function to create one of these suckers.
-	static ITCPListenSocket*	Create( const unsigned short port, int nQueueLength )
+	static ITCPListenSocket *Create( const unsigned short port, int nQueueLength )
 	{
 		CTCPListenSocket *pRet = new CTCPListenSocket;
 		if ( !pRet )
@@ -993,8 +985,8 @@ public:
 		// Bind it to a socket and start listening.
 		CIPAddr addr( 0, 0, 0, 0, port ); // INADDR_ANY
 		pRet->m_Socket = TCPBind( &addr );
-		if ( pRet->m_Socket == INVALID_SOCKET || 
-			listen( pRet->m_Socket, nQueueLength == -1 ? SOMAXCONN : nQueueLength ) != 0 )
+		if ( pRet->m_Socket == INVALID_SOCKET ||
+		     listen( pRet->m_Socket, nQueueLength == -1 ? SOMAXCONN : nQueueLength ) != 0 )
 		{
 			pRet->Release();
 			return false;
@@ -1004,13 +996,13 @@ public:
 	}
 
 
-	virtual void		Release()
+	virtual void Release()
 	{
 		delete this;
 	}
 
 
-	virtual ITCPSocket*	UpdateListen( CIPAddr *pAddr )
+	virtual ITCPSocket *UpdateListen( CIPAddr *pAddr )
 	{
 		// We're still ok.. just wait until the socket becomes writable (is connected) or we timeout.
 		fd_set readSet;
@@ -1023,10 +1015,10 @@ public:
 		if ( status > 0 )
 		{
 			sockaddr_in addr;
-			int addrSize = sizeof( addr );
+			int         addrSize = sizeof( addr );
 
 			// Now accept the final connection.
-			SOCKET newSock = accept( m_Socket, (struct sockaddr*)&addr, &addrSize );
+			SOCKET newSock = accept( m_Socket, (struct sockaddr *)&addr, &addrSize );
 			if ( newSock == INVALID_SOCKET )
 			{
 				Assert( false );
@@ -1056,18 +1048,17 @@ public:
 
 
 private:
-	SOCKET		m_Socket;	
+	SOCKET m_Socket;
 };
 
 
-
-ITCPListenSocket* CreateTCPListenSocket( const unsigned short port, int nQueueLength )
+ITCPListenSocket *CreateTCPListenSocket( const unsigned short port, int nQueueLength )
 {
 	return CTCPListenSocket::Create( port, nQueueLength );
 }
 
 
-ITCPSocket* CreateTCPSocket()
+ITCPSocket *CreateTCPSocket()
 {
 	return new CTCPSocket;
 }
@@ -1079,15 +1070,15 @@ void TCPSocket_EnableTimeout( bool bEnable )
 }
 
 
-// --------------------------------------------------------------------------------- //	
+// --------------------------------------------------------------------------------- //
 // This thread sends keepalives on all active TCP sockets.
-// --------------------------------------------------------------------------------- //	
+// --------------------------------------------------------------------------------- //
 
-HANDLE							g_hKeepaliveThread;
-HANDLE							g_hKeepaliveThreadSignal;
-HANDLE							g_hKeepaliveThreadReply;
-CUtlLinkedList<CTCPSocket*,int>	g_TCPSockets;
-CCriticalSection				g_TCPSocketsCS;
+HANDLE                              g_hKeepaliveThread;
+HANDLE                              g_hKeepaliveThreadSignal;
+HANDLE                              g_hKeepaliveThreadReply;
+CUtlLinkedList< CTCPSocket *, int > g_TCPSockets;
+CCriticalSection                    g_TCPSocketsCS;
 
 
 DWORD WINAPI TCPKeepaliveThread( LPVOID pParameter )
@@ -1116,7 +1107,7 @@ void AddGlobalTCPSocket( CTCPSocket *pSocket )
 {
 	CCriticalSectionLock csLock( &g_TCPSocketsCS );
 	csLock.Lock();
-	
+
 	Assert( g_TCPSockets.Find( pSocket ) == g_TCPSockets.InvalidIndex() );
 	g_TCPSockets.AddToTail( pSocket );
 
@@ -1128,20 +1119,19 @@ void AddGlobalTCPSocket( CTCPSocket *pSocket )
 
 		DWORD dwThreadID = 0;
 		g_hKeepaliveThread = CreateThread(
-			NULL,
-			0,
-			TCPKeepaliveThread,
-			NULL,
-			0,
-			&dwThreadID
-			);
+		NULL,
+		0,
+		TCPKeepaliveThread,
+		NULL,
+		0,
+		&dwThreadID );
 	}
 }
 
 
 void RemoveGlobalTCPSocket( CTCPSocket *pSocket )
 {
-	bool bThreadRunning = false;
+	bool  bThreadRunning = false;
 	DWORD dwExitCode = 0;
 	if ( GetExitCodeThread( g_hKeepaliveThread, &dwExitCode ) && dwExitCode == STILL_ACTIVE )
 	{
@@ -1150,7 +1140,7 @@ void RemoveGlobalTCPSocket( CTCPSocket *pSocket )
 
 	CCriticalSectionLock csLock( &g_TCPSocketsCS );
 	csLock.Lock();
-	
+
 	int index = g_TCPSockets.Find( pSocket );
 	if ( index != g_TCPSockets.InvalidIndex() )
 	{

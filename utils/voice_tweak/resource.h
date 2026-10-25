@@ -103,15 +103,15 @@
 #define IDC_VOICEINPUTFRAME             1005
 #define IDC_VOLUMELABEL                 1006
 
-#define SE_PRODUCT_FILE_DESCRIPTION_STRING "Valve Voice Tweaker" 
+#define SE_PRODUCT_FILE_DESCRIPTION_STRING "Valve Voice Tweaker"
 
 // Next default values for new objects
-// 
+//
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        133
-#define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1007
-#define _APS_NEXT_SYMED_VALUE           103
+#define _APS_NEXT_RESOURCE_VALUE 133
+#define _APS_NEXT_COMMAND_VALUE  32771
+#define _APS_NEXT_CONTROL_VALUE  1007
+#define _APS_NEXT_SYMED_VALUE    103
 #endif
 #endif

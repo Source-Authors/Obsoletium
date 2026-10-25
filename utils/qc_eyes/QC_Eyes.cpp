@@ -14,46 +14,53 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 // CQC_EyesApp
-BEGIN_MESSAGE_MAP(CQC_EyesApp, CWinApp)
-  //{{AFX_MSG_MAP(CQC_EyesApp)
-  // NOTE - the ClassWizard will add and remove mapping macros here.
-  //    DO NOT EDIT what you see in these blocks of generated code!
-  //}}AFX_MSG
-  ON_COMMAND(ID_HELP, CWinApp::OnHelp)
+BEGIN_MESSAGE_MAP( CQC_EyesApp, CWinApp )
+	//{{AFX_MSG_MAP(CQC_EyesApp)
+	// NOTE - the ClassWizard will add and remove mapping macros here.
+	//    DO NOT EDIT what you see in these blocks of generated code!
+	//}}AFX_MSG
+	ON_COMMAND( ID_HELP, CWinApp::OnHelp )
 END_MESSAGE_MAP()
 
-CQC_EyesApp::CQC_EyesApp() : CWinApp{"QC Eyes"} {}
+CQC_EyesApp::CQC_EyesApp() :
+	CWinApp{ "QC Eyes" }
+{
+}
 
 // The one and only CQC_EyesApp object
 CQC_EyesApp theApp;
 
 // CQC_EyesApp initialization
-BOOL CQC_EyesApp::InitInstance() {
-  // Install an exception handler.
-  const s1::utils::common::ScopedDefaultMinidumpHandler
-      scoped_default_minidumps;
+BOOL CQC_EyesApp::InitInstance()
+{
+	// Install an exception handler.
+	const s1::utils::common::ScopedDefaultMinidumpHandler
+	scoped_default_minidumps;
 
-  AfxEnableControlContainer();
+	AfxEnableControlContainer();
 
-  // Standard initialization
-  // If you are not using these features and wish to reduce the size
-  //  of your final executable, you should remove from the following
-  //  the specific initialization routines you do not need.
+	// Standard initialization
+	// If you are not using these features and wish to reduce the size
+	//  of your final executable, you should remove from the following
+	//  the specific initialization routines you do not need.
 
-  CQC_EyesDlg dlg;
-  m_pMainWnd = &dlg;
+	CQC_EyesDlg dlg;
+	m_pMainWnd = &dlg;
 
-  INT_PTR nResponse = dlg.DoModal();
+	INT_PTR nResponse = dlg.DoModal();
 
-  if (nResponse == IDOK) {
-    // TODO: Place code here to handle when the dialog is
-    //  dismissed with OK
-  } else if (nResponse == IDCANCEL) {
-    // TODO: Place code here to handle when the dialog is
-    //  dismissed with Cancel
-  }
+	if ( nResponse == IDOK )
+	{
+		// TODO: Place code here to handle when the dialog is
+		//  dismissed with OK
+	}
+	else if ( nResponse == IDCANCEL )
+	{
+		// TODO: Place code here to handle when the dialog is
+		//  dismissed with Cancel
+	}
 
-  // Since the dialog has been closed, return FALSE so that we exit the
-  //  application, rather than start the application's message pump.
-  return FALSE;
+	// Since the dialog has been closed, return FALSE so that we exit the
+	//  application, rather than start the application's message pump.
+	return FALSE;
 }

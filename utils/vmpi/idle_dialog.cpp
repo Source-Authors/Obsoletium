@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //=============================================================================//
@@ -9,18 +9,18 @@
 #include "idle_dialog.h"
 
 
-#define WM_STARTIDLE					(WM_USER + 565)
+#define WM_STARTIDLE ( WM_USER + 565 )
 
 
-BEGIN_MESSAGE_MAP(CIdleDialog, CDialog)
+BEGIN_MESSAGE_MAP( CIdleDialog, CDialog )
 	//{{AFX_MSG_MAP(CVMPIBrowserDlg)
-	ON_MESSAGE(WM_STARTIDLE, OnStartIdle)
+	ON_MESSAGE( WM_STARTIDLE, OnStartIdle )
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 
-CIdleDialog::CIdleDialog( int id, CWnd *pParent )
-	: CDialog( id, pParent )
+CIdleDialog::CIdleDialog( int id, CWnd *pParent ) :
+	CDialog( id, pParent )
 {
 }
 
@@ -35,12 +35,10 @@ void CIdleDialog::StartIdleProcessing( DWORD msInterval )
 LONG CIdleDialog::OnStartIdle( UINT, LONG )
 {
 	MSG msg;
-	
-	if ( !PeekMessage( &msg, GetSafeHwnd(), 0,0, PM_NOREMOVE ) )
+
+	if ( !PeekMessage( &msg, GetSafeHwnd(), 0, 0, PM_NOREMOVE ) )
 		OnIdle();
-	
+
 	m_cWinIdle.NextIdle();
 	return 0;
 }
-
-

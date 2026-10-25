@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 //=============================================================================
 
@@ -24,7 +24,7 @@ void DownloadFile( const char *pCachePath, const char *pRemoteFileBase, const ch
 	// Setup local and remote filenames.
 	char remoteFilename[MAX_PATH];
 	V_ComposeFileName( pRemoteFileBase, pFilename, remoteFilename );
-	
+
 	char localFilename[MAX_PATH];
 	V_ComposeFileName( pCachePath, pFilename, localFilename );
 
@@ -34,11 +34,11 @@ void DownloadFile( const char *pCachePath, const char *pRemoteFileBase, const ch
 	{
 		Error( "Unable to open %s on master.\n", remoteFilename );
 	}
-	RunCodeAtScopeExit(g_pFileSystem->Close( fpSrc ));
+	RunCodeAtScopeExit( g_pFileSystem->Close( fpSrc ) );
 
 	unsigned int fileSize = g_pFileSystem->Size( fpSrc );
 
-	CUtlVector<char> data;
+	CUtlVector< char > data;
 	data.SetSize( fileSize );
 
 	g_pFileSystem->Read( data.Base(), fileSize, fpSrc );
@@ -49,21 +49,21 @@ void DownloadFile( const char *pCachePath, const char *pRemoteFileBase, const ch
 	{
 		Error( "Can't open %s for writing.\n", localFilename );
 	}
-	RunCodeAtScopeExit(fclose( fpDest ));
+	RunCodeAtScopeExit( fclose( fpDest ) );
 
 	fwrite( data.Base(), 1, data.Count(), fpDest );
 
 	Warning( "Got file: %s\n", pFilename );
 }
 
-int RunVMPITransferWorker( int argc, char  **argv )
+int RunVMPITransferWorker( int argc, char **argv )
 {
 	if ( !VMPI_Init( argc, argv, NULL, MyDisconnectHandler, VMPI_RUN_NETWORKED, true ) )
 	{
 		return 1;
 	}
 
-	SetupToolsMinidumpHandler( VMPI_ExceptionFilter );	
+	SetupToolsMinidumpHandler( VMPI_ExceptionFilter );
 
 	if ( !FileSystem_Init( ".", 0, FS_INIT_COMPATIBILITY_MODE ) )
 		return 1;
@@ -71,21 +71,21 @@ int RunVMPITransferWorker( int argc, char  **argv )
 	ICommandLine *pCommandLine = CommandLine();
 
 	// Look for the cache path and file base args.
-	const char *pCachePath = pCommandLine->ParmValue( "-CachePath", (char*)NULL );
+	const char *pCachePath = pCommandLine->ParmValue( "-CachePath", (char *)NULL );
 	if ( !pCachePath )
 		Error( "No -CachePath specified." );
 
-	const char *pRemoteFileBase = pCommandLine->ParmValue( "-mpi_filebase", (char*)NULL );
+	const char *pRemoteFileBase = pCommandLine->ParmValue( "-mpi_filebase", (char *)NULL );
 	if ( !pRemoteFileBase )
 		Error( "No -mpi_filebase specified." );
-	
+
 	// Now just ask the master for each file.
-	for ( int i=1; i < pCommandLine->ParmCount()-1; i++ )
+	for ( int i = 1; i < pCommandLine->ParmCount() - 1; i++ )
 	{
 		const char *pParm = pCommandLine->GetParm( i );
 		if ( V_strieq( pParm, "-mpi_file" ) )
 		{
-			const char *pNextParm = pCommandLine->GetParm( i+1 );
+			const char *pNextParm = pCommandLine->GetParm( i + 1 );
 			DownloadFile( pCachePath, pRemoteFileBase, pNextParm );
 			++i;
 		}
@@ -97,7 +97,7 @@ int RunVMPITransferWorker( int argc, char  **argv )
 	FILE *fp = fopen( statusFilename, "wb" );
 	fclose( fp );
 
-	return 0;										   
+	return 0;
 }
 
 
@@ -125,14 +125,14 @@ int RunVMPITransferMaster( int argc, char **argv )
 				break;
 		}
 	}
-	
+
 	return 0;
 }
 
 
 // --------------------------------------------------------------------------------- //
-// Purpose: This app is used by vmpi_service to acquire the executables for 
-// a VMPI job. When the service is asked to join a job, it runs this program 
+// Purpose: This app is used by vmpi_service to acquire the executables for
+// a VMPI job. When the service is asked to join a job, it runs this program
 // to connect to the VMPI master and download all the exes for the job.
 //
 // This app is ALSO used to do patches. vmpi_browser_services runs it with a list
@@ -157,5 +157,3 @@ int main( int argc, char **argv )
 	CmdLib_Cleanup();
 	return ret;
 }
-
-
