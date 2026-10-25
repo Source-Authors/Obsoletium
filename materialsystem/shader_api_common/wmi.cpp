@@ -13,7 +13,7 @@
 #include "tier0/dbg.h"
 
 #include <dxgi.h>
-#include "com_ptr.h"
+#include "windows/com_ptr.h"
 #include "windows/scoped_com_initializer.h"
 
 // NOTE: This has to be the last file included!

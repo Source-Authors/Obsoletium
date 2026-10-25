@@ -11,7 +11,7 @@
 #include "cmd.h"
 
 #include "winlite.h"
-#include "com_ptr.h"
+#include "windows/com_ptr.h"
 
 #include <xaudio2.h>
 #include <initguid.h>

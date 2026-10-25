@@ -91,7 +91,7 @@ typedef int SOCKET;
 
 #include <d3dcompiler.h>
 #include "bzip2/bzlib.h"
-#include "com_ptr.h"
+#include "windows/com_ptr.h"
 #include "windows/com_error_category.h"
 
 #else

@@ -12,7 +12,7 @@
 
 #include <system_error>
 
-#include "com_ptr.h"
+#include "windows/com_ptr.h"
 #include "iprediction.h"
 #include "eax.h"
 #include "tier0/icommandline.h"

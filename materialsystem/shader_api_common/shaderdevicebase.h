@@ -21,7 +21,7 @@
 #include "materialsystem/imaterialsystem.h"
 #include "hardwareconfig.h"
 
-#include <com_ptr.h>
+#include "windows/com_ptr.h"
 
 
 //-----------------------------------------------------------------------------

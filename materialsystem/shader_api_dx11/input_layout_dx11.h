@@ -7,7 +7,7 @@
 #include <cstdint>
 
 #define NOMINMAX
-#include "com_ptr.h"
+#include "windows/com_ptr.h"
 
 #include <d3d11_4.h>
 #include <d3d11shader.h>

@@ -8,7 +8,7 @@
 
 #define NOMINMAX
 #include <d3d11_4.h>
-#include "com_ptr.h"
+#include "windows/com_ptr.h"
 
 namespace s1::shaderapidx11 {
 

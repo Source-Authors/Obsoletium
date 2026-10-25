@@ -13,7 +13,7 @@
 #include "tier1/strtools.h"
 
 #include <shlobj.h>
-#include "com_ptr.h"
+#include "windows/com_ptr.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>

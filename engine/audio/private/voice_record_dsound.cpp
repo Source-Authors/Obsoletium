@@ -13,7 +13,7 @@
 #include <dsound.h>
 #include <VersionHelpers.h>
 
-#include "com_ptr.h"
+#include "windows/com_ptr.h"
 #include "scoped_dll.h"
 #include "voice.h"
 #include "tier0/vcrmode.h"

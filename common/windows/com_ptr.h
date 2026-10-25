@@ -2,8 +2,8 @@
 //
 // COM interface smart pointer.
 
-#ifndef SE_COMMON_COM_COM_PTR_H_
-#define SE_COMMON_COM_COM_PTR_H_
+#ifndef SE_COMMON_WINDOWS_COM_PTR_H_
+#define SE_COMMON_WINDOWS_COM_PTR_H_
 
 #include <objbase.h>
 #include <comip.h>
@@ -24,11 +24,11 @@ using com_interface_concept =
 /**
  * @brief COM smart pointer with automatic IID deducing from TInterface.
  */
-template <typename TInterface, const IID *TIid = &__uuidof(TInterface)>
+template <typename TInterface, const IID* TIid = &__uuidof(TInterface)>
 class com_ptr : public _com_ptr_t<_com_IIID<TInterface, TIid>> {
   using interface_concept = com_interface_concept<TInterface>;
 };
 
 }  // namespace s1::win::com
 
-#endif  // !SE_COMMON_COM_COM_PTR_H_
+#endif  // !SE_COMMON_WINDOWS_COM_PTR_H_

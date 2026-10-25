@@ -24,7 +24,7 @@ MSVC_END_WARNING_OVERRIDE_SCOPE()
 
 #include <atlconv.h>
 
-#include "com_ptr.h"
+#include "windows/com_ptr.h"
 
 // Extract phoneme grammar id
 #define EP_GRAM_ID			101

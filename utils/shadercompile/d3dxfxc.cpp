@@ -10,7 +10,7 @@
 
 #include <d3dcompiler.h>
 #include <comdef.h>
-#include "com_ptr.h"
+#include "windows/com_ptr.h"
 
 #include "tier0/icommandline.h"
 #include "tier1/strtools.h"

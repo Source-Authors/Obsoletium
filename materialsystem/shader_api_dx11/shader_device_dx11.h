@@ -15,7 +15,7 @@
 #include <d3d11_4.h>
 #include <d3d11shader.h>
 #include <dxgi1_6.h>
-#include "com_ptr.h"
+#include "windows/com_ptr.h"
 
 namespace s1::shaderapidx11 {
 

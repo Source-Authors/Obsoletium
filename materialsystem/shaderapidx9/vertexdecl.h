@@ -16,7 +16,7 @@
 #include "locald3dtypes.h"
 #include "materialsystem/imaterial.h"
 
-#include "com_ptr.h"
+#include "windows/com_ptr.h"
 
 // Gets the declspec associated with a vertex format
 s1::win::com::com_ptr<IDirect3DVertexDeclaration9> FindOrCreateVertexDecl(

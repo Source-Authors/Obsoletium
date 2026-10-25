@@ -19,7 +19,7 @@
 #include "tier1/utlvector.h"
 
 #ifdef _WIN32
-#include "com_ptr.h"
+#include "windows/com_ptr.h"
 #endif
 
 

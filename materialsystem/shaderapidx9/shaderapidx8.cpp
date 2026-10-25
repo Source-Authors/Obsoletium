@@ -85,7 +85,7 @@ mat_fullbright 1 doesn't work properly on alpha materials in testroom_standards
 #include "vtf/vtf.h"
 #include "datacache/idatacache.h"
 #include "renderparm.h"
-#include "com_ptr.h"
+#include "windows/com_ptr.h"
 #include "wmi.h"
 #include "filesystem/IQueuedLoader.h"
 #include "togl/rendermechanism.h"

@@ -3,7 +3,7 @@
 // Remote HLSL shaders compiler client.
 
 #include "winlite.h"
-#include "com_ptr.h"
+#include "windows/com_ptr.h"
 
 #include <comdef.h>
 #include <conio.h>
