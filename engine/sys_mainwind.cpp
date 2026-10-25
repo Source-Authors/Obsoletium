@@ -1703,16 +1703,16 @@ void *CGame::GetMainWindow()
 void *CGame::GetMainDeviceWindow()
 {
 #if defined( DX_TO_GL_ABSTRACTION ) && defined( USE_SDL )
-	return (void*)m_pSDLWindow;
+	return m_pSDLWindow;
 #else
-	return (void*)m_hWindow;
+	return m_hWindow;
 #endif
 }
 
 void *CGame::GetMainWindowPlatformSpecificHandle()
 {
 #ifdef WIN32
-	return (void*)m_hWindow;
+	return m_hWindow;
 #else
 #ifdef OSX
 	SDL_SysWMinfo pInfo;
