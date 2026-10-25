@@ -16,7 +16,7 @@
 #include "iprediction.h"
 #include "eax.h"
 #include "tier0/icommandline.h"
-#include "video//ivideoservices.h"
+#include "video/ivideoservices.h"
 #include "../../sys_dll.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
