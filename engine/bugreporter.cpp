@@ -2027,9 +2027,11 @@ void CBugUIPanel::OnSubmit()
 
 		intp maxlen = buginfo.TellPut() * 2 + 1;
 		char *fixed = new char [ maxlen ];
-		Assert( fixed );
+		// dimhotepus: Just skip if allocation failed.
 		if ( fixed )
 		{
+			RunCodeAtScopeExit( delete[] fixed );
+
 			Q_memset( fixed, 0, maxlen );
 
 			char *i = buginfo.Base<char>();
@@ -2045,12 +2047,6 @@ void CBugUIPanel::OnSubmit()
 			*o = '\0';
 
 			AddBugTextToZip( "info.txt", fixed, Q_strlen( fixed ) + 1 );
-
-			delete[] fixed;
-		}
-		else
-		{
-			Sys_Error( "Unable to allocate %zd bytes for bug description\n", maxlen );
 		}
 
 		// Only attach .sav files in single player
