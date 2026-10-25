@@ -552,7 +552,7 @@ public:
 
 		// Fuzzy match in map list and check file
 		char match[1][64] = { {0} };
-		if ( MapList_ListMaps( pMapName, false, false, 1, sizeof( match[0] ), match ) && *(match[0]) )
+		if ( MapList_ListMaps( pMapName, false, false, 1, sizeof( match[0] ), match ) && !Q_isempty(match[0]) )
 		{
 			Host_DefaultMapFileName( match[0], szDiskName );
 			if ( modelloader->Map_IsValid( szDiskName, true ) )
