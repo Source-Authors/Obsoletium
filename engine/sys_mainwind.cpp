@@ -1608,6 +1608,8 @@ void CGame::PlayVideoAndWait( const char *filename, bool bNeedHealthWarning )
 }
 
 // dimhotepus: Disable Win key.
+#if defined(NDEBUG) && defined(IS_WINDOWS_PC)
+// dimhotepus: Disable Win key.
 //-----------------------------------------------------------------------------
 // Purpose: Enable Windows shortcut keys when app is inactive.
 //-----------------------------------------------------------------------------
@@ -1615,7 +1617,7 @@ static bool ShouldEnableWindowsShortcutKeys() noexcept
 {
 	return !game->IsActiveApp();
 }
-
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
