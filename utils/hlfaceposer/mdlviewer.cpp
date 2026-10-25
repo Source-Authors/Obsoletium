@@ -72,11 +72,10 @@
 #ifdef _WIN32
 #include <direct.h>
 
-#include "windows/scoped_com.h"
+#include "windows/scoped_com_initializer.h"
 #include "windows/scoped_timer_resolution.h"
 
 #undef null
-#include <comdef.h>  // _com_error
 #include <shellapi.h>
 #endif
 
@@ -2726,11 +2725,10 @@ int main (int argc, char *argv[])
 #ifdef _WIN32
 	constexpr COINIT comFlags{
 		static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE | COINIT_SPEED_OVER_MEMORY)};
-	s1::win::ScopedCom scopedCom{comFlags};
-	if (FAILED(scopedCom.error_code())) {
-		const _com_error com_error{scopedCom.error_code()};
-		mxMessageBox(nullptr, va( "Unable to initialize COM (0x%x): %s.",
-			scopedCom.error_code(), com_error.ErrorMessage() ),
+	s1::win::ScopedComInitializer scopedComInitializer{comFlags};
+	if (auto rc = scopedComInitializer.error_code(); rc) {
+		mxMessageBox(nullptr, va( "Unable to initialize COM (0x%ulx): %s.",
+			rc.value(), rc.message().c_str() ),
 			g_appTitle, MX_MB_OK | MX_MB_ERROR );
 		return 1;
 	}

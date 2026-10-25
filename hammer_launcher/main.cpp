@@ -4,10 +4,9 @@
 
 #ifdef _WIN32
 #include "winlite.h"
-#include <comdef.h>  // _com_error
 #include <WinSock2.h>
 
-#include "windows/scoped_com.h"
+#include "windows/scoped_com_initializer.h"
 #include "windows/scoped_timer_resolution.h"
 #include "windows/scoped_winsock_initializer.h"
 #endif
@@ -72,7 +71,8 @@ const char *PrefixMessageGroup(
   out_group = out_group && out_group[0] ? out_group : group;
 
   const size_t length{strlen(message)};
-  if (length > 1 && message[length - 1] == '\n' && !V_isuniform(message, '\n')) {
+  if (length > 1 && message[length - 1] == '\n' &&
+      !V_isuniform(message, '\n')) {
     V_sprintf_safe(out, "[%s] %s", out_group, message);
   } else {
     V_strcpy_safe(out, message);
@@ -112,7 +112,8 @@ class HammerAppSystemGroup final : public CAppSystemGroup {
         material_system_{nullptr},
         hammer_{nullptr},
         // Ensure breakpad created and set up.
-        scoped_breakpad_handler_{s1::breakpad::ScopedBreakpadHandler::Instance()},
+        scoped_breakpad_handler_{
+            s1::breakpad::ScopedBreakpadHandler::Instance()},
         scoped_spew_output_{HammerSpewFunc},
         scoped_app_locale_{kEnUsUtf8Locale},
         scoped_com_{static_cast<COINIT>(COINIT_APARTMENTTHREADED |
@@ -141,7 +142,7 @@ class HammerAppSystemGroup final : public CAppSystemGroup {
   const s1::breakpad::ScopedBreakpadHandler& scoped_breakpad_handler_;
   const ScopedSpewOutputFunc scoped_spew_output_;
   const s1::ScopedAppLocale scoped_app_locale_;
-  const s1::win::ScopedCom scoped_com_;
+  const s1::win::ScopedComInitializer scoped_com_initializer_;
   const s1::win::ScopedTimerResolution scoped_timer_resolution_;
   const s1::win::ScopedWinsockInitializer scoped_winsock_;
 };
@@ -167,10 +168,9 @@ bool HammerAppSystemGroup::Create() {
 
 #ifdef WIN32
   // COM is required.
-  if (FAILED(scoped_com_.error_code())) {
-    const _com_error com_error{scoped_com_.error_code()};
-    Error("Unable to initialize COM (0x%x): %s.\n\n", scoped_com_.error_code(),
-          com_error.ErrorMessage());
+  if (auto rc = scoped_com_initializer_.error_code(); rc) {
+    Error("Unable to initialize COM (0x%ulx): %s.\n\n",
+          static_cast<unsigned long>(rc.value()), rc.message().c_str());
   }
 
   // System timer precision affects Sleep & friends performance.
@@ -272,7 +272,9 @@ bool HammerAppSystemGroup::PreInit() {
   search_paths_init.m_pDirectoryName = hammer_->GetDefaultModFullPath();
 
   if (FileSystem_LoadSearchPaths(search_paths_init) != FS_OK) {
-    Error("File system unable to load search paths!\n\nPlease check GameConfig.txt is present and valid.\n");
+    Error(
+        "File system unable to load search paths!\n\nPlease check "
+        "GameConfig.txt is present and valid.\n");
   }
 
   // Required to run through the editor

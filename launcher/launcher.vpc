@@ -68,7 +68,7 @@ $Project "launcher"
 		$File	"scoped_app_relaunch.h"
 		$File	"scoped_heap_leak_dumper.h"
 		$File	"$SRCDIR/common/scoped_app_locale.h"
-		$File	"$SRCDIR/common/windows/scoped_com.h" [$WINDOWS]
+		$File	"$SRCDIR/common/windows/scoped_com_initializer.h" [$WINDOWS]
 		$File	"$SRCDIR/common/windows/scoped_timer_resolution.h" [$WINDOWS]
 		$File	"$SRCDIR/common/windows/scoped_winsock_initializer.h" [$WINDOWS]
 	}

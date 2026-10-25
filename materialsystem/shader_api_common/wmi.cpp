@@ -14,7 +14,7 @@
 
 #include <dxgi.h>
 #include "com_ptr.h"
-#include "windows/scoped_com.h"
+#include "windows/scoped_com_initializer.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -31,11 +31,12 @@ size_t GetVidMemBytes( unsigned nAdapter )
 
 	nBeenAdapter = nAdapter;
 
-	s1::win::ScopedCom scoped_com{
+	s1::win::ScopedComInitializer scoped_com_initializer{
 		static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE | COINIT_SPEED_OVER_MEMORY)};
-	if ( FAILED(scoped_com.error_code()) )
+	if ( auto rc = scoped_com_initializer.error_code(); rc )
 	{
-		Warning( "Unable to get GPU VRAM size: COM initialization failure.\n" );
+		Warning( "Unable to get GPU VRAM size. COM initialize failed (0x%ulx): %s.\n",
+    		static_cast<unsigned long>(rc.value()), rc.message().c_str() );
 		return 0;
 	}
 

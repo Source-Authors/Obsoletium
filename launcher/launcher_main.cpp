@@ -29,11 +29,10 @@
 #include "winlite.h"
 
 #include <direct.h>          // _chdir
-#include <comdef.h>          // _com_error
 #include <VersionHelpers.h>  // IsWindows10OrGreater
 #include <WinSock2.h>
 
-#include "windows/scoped_com.h"
+#include "windows/scoped_com_initializer.h"
 #include "windows/scoped_console_ctrl_handler.h"
 #include "windows/scoped_floating_point_exception_mode.h"
 #include "windows/scoped_timer_resolution.h"
@@ -559,17 +558,15 @@ DLL_EXPORT int LauncherMain(int argc, char** argv)
 
 #ifdef WIN32
   // COM is required.
-  const s1::win::ScopedCom scoped_com{
+  const s1::win::ScopedComInitializer scoped_com_initializer{
       static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE |
                           COINIT_SPEED_OVER_MEMORY)};
-  if (FAILED(scoped_com.error_code())) {
-    const _com_error com_error{scoped_com.error_code()};
-
+  if (auto rc = scoped_com_initializer.error_code(); rc) {
     char message[512];
-    V_sprintf_safe(message, "Unable to initialize COM (0x%lx): %s.",
-                   static_cast<unsigned long>(scoped_com.error_code()),
-                   com_error.ErrorMessage());
-    return FatalError(static_cast<int>(scoped_com.error_code()), message);
+    V_sprintf_safe(message, "Unable to initialize COM (0x%ulx): %s.",
+                   static_cast<unsigned long>(rc.value()),
+                   rc.message().c_str());
+    return FatalError(static_cast<int>(rc.value()), message);
   }
 
   using namespace std::chrono_literals;
