@@ -249,7 +249,14 @@ struct ikcontextikrule_t
 	Vector		kneeDir;
 	Vector		kneePos;
 
-	ikcontextikrule_t() : szLabel() {}
+	// dimhotepus: Set all to -1 to cathc unitialized usage issues.
+	ikcontextikrule_t()
+		: index(-1), type{-1}, chain{-1}, bone{-1}, slot{-1},
+		height{-1},	radius{-1},	floor{-1},
+		start{-1}, peak{-1}, tail{-1}, end{-1}, top{-1},
+		drop{-1}, commit{-1}, release{-1},
+		flWeight{-1}, flRuleWeight{-1}, latched{-1},
+		szLabel() {}
 
 	// No copy constructors allowed
 	ikcontextikrule_t(const ikcontextikrule_t&) = delete;
