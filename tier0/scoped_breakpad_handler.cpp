@@ -30,6 +30,7 @@ class ScopedBreakpadHandler::Impl final {
             // Exception, invalid parameter and pure call.
             google_breakpad::ExceptionHandler::HANDLER_ALL,
             static_cast<MINIDUMP_TYPE>(MiniDumpNormal | MiniDumpWithDataSegs |
+                                       MiniDumpWithThreadInfo |
                                        MiniDumpWithIndirectlyReferencedMemory),
             L"", nullptr}
 #elif defined(_LINUX)
