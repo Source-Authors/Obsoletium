@@ -1,33 +1,162 @@
 # Copyright Valve Corporation, All rights reserved.
+#
+# .clang-format approximating Valve's Source SDK 2013 code style
+# Requires clang-format 17+ (SpacesInParens / Macros options).
+#
+# Target look:
+#
+#   //-----------------------------------------------------------------------------
+#   // Purpose:
+#   //-----------------------------------------------------------------------------
+#   void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
+#   {
+#   	if ( !pAttacker )
+#   		return;
+#
+#   	for ( int i = 0; i < info.m_iShots; ++i )
+#   	{
+#   		CBasePlayer *pPlayer = ToBasePlayer( GetOwnerEntity() );
+#   	}
+#   }
+---
+Language: Cpp
+Standard: Latest
 
-# Defines the Chromium style for automatic reformatting.
-# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
-BasedOnStyle: Google
-# This defaults to 'Auto'. Explicitly set it for a while, so that
-# 'vector<vector<int> >' in existing files gets formatted to
-# 'vector<vector<int>>'. ('Auto' means that clang-format will only use
-# 'int>>' if the file already contains at least one such instance.)
-Standard: Cpp11
+# --- Indentation: hard tabs, width 4 -----------------------------------------
+UseTab: AlignWithSpaces         # tabs for indentation, spaces for alignment (survives any tab width)
+TabWidth: 4
+IndentWidth: 4
+ContinuationIndentWidth: 0       # table entries ("DEFINE_FIELD( ... ),") are one comma-joined
+                                 # statement to clang-format; 0 keeps every entry at block level
+ConstructorInitializerIndentWidth: 4
+AccessModifierOffset: -4        # public:/private: flush with the class keyword
+IndentAccessModifiers: false
+IndentCaseLabels: false         # case labels at switch level
+IndentCaseBlocks: true          # case X:\n\t{ ... }\n\tbreak;
+IndentGotoLabels: false
+IndentPPDirectives: None        # #ifdef CLIENT_DLL / #include at column 0
+IndentWrappedFunctionNames: false
+NamespaceIndentation: None
+IndentExternBlock: NoIndent
 
-# Includes order matters
-SortIncludes: false
+# --- Braces: Allman everywhere -----------------------------------------------
+BreakBeforeBraces: Allman
+InsertBraces: false             # Valve frequently omits braces on one-line bodies
+RemoveBracesLLVM: false
 
-# Make sure code like:
-# IPC_BEGIN_MESSAGE_MAP()
-#   IPC_MESSAGE_HANDLER(WidgetHostViewHost_Update, OnUpdate)
-# IPC_END_MESSAGE_MAP()
-# gets correctly indented.
-MacroBlockBegin: "^\
-BEGIN_.*(.*)|\
-MSL_FOREACH_GROUP_BEGIN|\
-MSL_FOREACH_SURFACE_BEGIN|\
-MSL_FOREACH_SURFACE_IN_GROUP_BEGIN|\
-BEGIN_MESSAGE_MAP\
-$"
-MacroBlockEnd: "^\
-END_.*()|\
-MSL_FOREACH_GROUP_END|\
-MSL_FOREACH_SURFACE_END|\
-MSL_FOREACH_SURFACE_IN_GROUP_END|\
-END_MESSAGE_MAP\
-$"
+# --- Spacing: the signature "( padded parens )" -------------------------------
+SpaceBeforeParens: ControlStatements      # if ( x ), Foo( x )
+SpacesInParens: Custom
+SpacesInParensOptions:
+  InConditionalStatements: true           # if ( x ), while ( x ), for ( ... )
+  Other: true                             # Foo( a, b ), sizeof( x )
+  InEmptyParentheses: false               # Foo()
+  InCStyleCasts: false                    # (CBaseEntity *)pEnt
+SpaceAfterCStyleCast: false
+SpacesInSquareBrackets: false             # m_hEntities[i]
+SpacesInAngles: Always                    # CHandle< CBaseEntity >, CUtlVector< int >
+SpaceAfterTemplateKeyword: false          # template< class T >
+SpaceInEmptyBlock: false                  # virtual void Foo() {}
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceAfterLogicalNot: false               # !pPlayer
+SpacesBeforeTrailingComments: 1
+Cpp11BracedListStyle: false               # Vector v = { 0, 0, 0 };
+
+# --- Pointers / references: bound to the name -------------------------------
+PointerAlignment: Right                   # const char *pszName
+ReferenceAlignment: Pointer               # const Vector &vecOrigin
+DerivePointerAlignment: false
+
+# --- Line breaking: Valve has no real column limit ---------------------------
+ColumnLimit: 0                            # keep the author's line breaks
+AlignAfterOpenBracket: Align              # wrapped call arguments line up after '('
+BinPackArguments: true
+BinPackParameters: true
+BreakBeforeBinaryOperators: None
+BreakBeforeTernaryOperators: false
+BreakConstructorInitializers: AfterColon  # CFoo::CFoo() :\n\tm_a( 0 ),\n\tm_b( 1 )
+PackConstructorInitializers: Never
+BreakInheritanceList: AfterColon
+AlwaysBreakTemplateDeclarations: Yes      # template< class T >\nclass CUtlVector
+AlwaysBreakAfterReturnType: None
+BreakStringLiterals: false
+
+# --- Short forms --------------------------------------------------------------
+AllowShortFunctionsOnASingleLine: Inline  # int GetHealth() const { return m_iHealth; }
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortLambdasOnASingleLine: Inline
+
+# --- Alignment: column-aligned member/method declarations in headers ---------
+#   virtual void		Spawn( void );
+#   int					m_iHealth;
+AlignConsecutiveDeclarations:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: false
+AlignConsecutiveMacros:
+  Enabled: true
+  AcrossEmptyLines: false
+  AcrossComments: true
+AlignConsecutiveAssignments: false
+AlignConsecutiveBitFields: true
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 0
+AlignEscapedNewlines: Left
+AlignOperands: DontAlign
+
+# --- Blank lines / comments ---------------------------------------------------
+MaxEmptyLinesToKeep: 2
+KeepEmptyLinesAtTheStartOfBlocks: false
+EmptyLineBeforeAccessModifier: Leave
+EmptyLineAfterAccessModifier: Never
+SeparateDefinitionBlocks: Leave
+ReflowComments: false                     # leave the //---- Purpose: banners alone
+FixNamespaceComments: false
+InsertNewlineAtEOF: true
+
+# --- Includes: NEVER reorder (cbase.h first, tier0/memdbgon.h last) ----------
+SortIncludes: Never
+IncludeBlocks: Preserve
+SortUsingDeclarations: Never
+
+# --- Source engine macros -----------------------------------------------------
+# Indent the bodies of datadesc / network table blocks:
+#   BEGIN_DATADESC( CFoo )
+#   	DEFINE_FIELD( m_iBar, FIELD_INTEGER ),
+#   END_DATADESC()
+MacroBlockBegin: "^(\
+BEGIN_[A-Z0-9_]+|IMPLEMENT_SERVERCLASS_ST(_NOBASE)?|IMPLEMENT_CLIENTCLASS_DT(_NOBASE)?|IMPLEMENT_CLIENTCLASS_NULL|\
+MSL_FOREACH_[A-Z0-9_]+_BEGIN\
+)$"
+MacroBlockEnd: "^(\
+END_[A-Z0-9_]+|\
+MSL_FOREACH_[A-Z0-9_]+_END\
+)$"
+
+# Teach clang-format what Valve's keyword-ish macros mean.
+Macros:
+  - abstract_class=class
+  - FORCEINLINE=inline
+  - FORCEINLINE_CVAR=inline
+AttributeMacros:
+  - DLL_EXPORT
+  - DLL_IMPORT
+  - DLL_CLASS_EXPORT
+  - DLL_CLASS_IMPORT
+  - DLL_GLOBAL_EXPORT
+  - DLL_GLOBAL_IMPORT
+  - PLATFORM_CLASS
+  - PLATFORM_INTERFACE
+  - PLATFORM_OVERLOAD
+  - TIER0_DLL_EXPORT
+  - TIER0_DLL_IMPORT
+...
