@@ -38,7 +38,7 @@ bool CDmMeshUtils::RemoveLargeAxisAlignedPlanarFaces( CDmeMesh *pMesh )
 	if ( !pBase )
 		return false;
 
-	const int posIndex = pBase->FindFieldIndex( CDmeVertexData::FIELD_POSITION );
+	const FieldIndex_t posIndex = pBase->FindFieldIndex( CDmeVertexData::FIELD_POSITION );
 	if ( posIndex < 0 )
 		return false;
 
@@ -52,10 +52,10 @@ bool CDmMeshUtils::RemoveLargeAxisAlignedPlanarFaces( CDmeMesh *pMesh )
 
 	bool bMeshChanged = false;
 
-	CUtlVector< int > emptyFaceSets;
+	CUtlVector< intp > emptyFaceSets;
 
-	int faceStartIndex = 0;
-	int faceCurrentIndex = 0;
+	intp faceStartIndex = 0;
+	intp faceCurrentIndex = 0;
 
 	int faceVertexCount = 0;
 
@@ -65,14 +65,14 @@ bool CDmMeshUtils::RemoveLargeAxisAlignedPlanarFaces( CDmeMesh *pMesh )
 
 	Vector p;
 
-	CUtlVector< int > removeStart;
-	CUtlVector< int > removeCount;
+	CUtlVector< intp > removeStart;
+	CUtlVector< intp > removeCount;
 
-	const int nFaceSets = pMesh->FaceSetCount();
-	for ( int i = 0; i < nFaceSets; ++i )
+	const intp nFaceSets = pMesh->FaceSetCount();
+	for ( intp i = 0; i < nFaceSets; ++i )
 	{
 		CDmeFaceSet *pFaceSet = pMesh->GetFaceSet( i );
-		const int nFaceIndices = pFaceSet->NumIndices();
+		const intp nFaceIndices = pFaceSet->NumIndices();
 		if ( nFaceIndices <= 0 )
 			continue;
 
@@ -93,7 +93,7 @@ bool CDmMeshUtils::RemoveLargeAxisAlignedPlanarFaces( CDmeMesh *pMesh )
 		
 		p = posData[ posIndices[ faceCurrentIndex ] ];
 
-		for ( int j = 1; j < nFaceIndices; ++j )
+		for ( intp j = 1; j < nFaceIndices; ++j )
 		{
 			faceCurrentIndex = pFaceSet->GetIndex( j );
 
@@ -140,7 +140,7 @@ bool CDmMeshUtils::RemoveLargeAxisAlignedPlanarFaces( CDmeMesh *pMesh )
 		}
 
 		Assert( removeStart.Count() == removeCount.Count() );
-		for ( int j = removeStart.Count() - 1; j >= 0; --j )
+		for ( intp j = removeStart.Count() - 1; j >= 0; --j )
 		{
 			pFaceSet->RemoveMultiple( removeStart[ j ], removeCount[ j ] );
 			bMeshChanged = true;
@@ -152,7 +152,7 @@ bool CDmMeshUtils::RemoveLargeAxisAlignedPlanarFaces( CDmeMesh *pMesh )
 		}
 	}
 
-	for ( int i = emptyFaceSets.Count() - 1; i >= 0; --i )
+	for ( intp i = emptyFaceSets.Count() - 1; i >= 0; --i )
 	{
 		pMesh->RemoveFaceSet( emptyFaceSets[ i ] );
 		bMeshChanged = true;
@@ -175,10 +175,10 @@ bool CDmMeshUtils::RemoveFacesWithMaterial( CDmeMesh *pMesh, const char *pMateri
 {
 	bool bMeshChanged = false;
 
-	CUtlVector< int > emptyFaceSets;
+	CUtlVector< intp > emptyFaceSets;
 
-	const int nFaceSets = pMesh->FaceSetCount();
-	for ( int i = 0; i < nFaceSets; ++i )
+	const intp nFaceSets = pMesh->FaceSetCount();
+	for ( intp i = 0; i < nFaceSets; ++i )
 	{
 		CDmeFaceSet *pFaceSet = pMesh->GetFaceSet( i );
 		if ( V_streq( pFaceSet->GetMaterial()->GetMaterialName(), pMaterialName ) )
@@ -188,7 +188,7 @@ bool CDmMeshUtils::RemoveFacesWithMaterial( CDmeMesh *pMesh, const char *pMateri
 		}
 	}
 
-	for ( int i = emptyFaceSets.Count() - 1; i >= 0; --i )
+	for ( intp i = emptyFaceSets.Count() - 1; i >= 0; --i )
 	{
 		pMesh->RemoveFaceSet( emptyFaceSets[ i ] );
 		bMeshChanged = true;
@@ -207,7 +207,7 @@ bool CDmMeshUtils::RemoveFacesWithMaterial( CDmeMesh *pMesh, const char *pMateri
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CDmMeshUtils::RemoveFacesWithMoreThanNVerts( CDmeMesh *pMesh, const int nVertexCount )
+bool CDmMeshUtils::RemoveFacesWithMoreThanNVerts( CDmeMesh *pMesh, const intp nVertexCount )
 {
 	CDmeVertexData *pBase( pMesh->FindBaseState( "bind" ) );
 	if ( !pBase )
@@ -215,21 +215,21 @@ bool CDmMeshUtils::RemoveFacesWithMoreThanNVerts( CDmeMesh *pMesh, const int nVe
 
 	bool bMeshChanged = false;
 
-	CUtlVector< int > emptyFaceSets;
+	CUtlVector< intp > emptyFaceSets;
 
-	int faceStartIndex = 0;
-	int faceCurrentIndex = 0;
+	intp faceStartIndex = 0;
+	intp faceCurrentIndex = 0;
 
-	int faceVertexCount = 0;
+	intp faceVertexCount = 0;
 
-	CUtlVector< int > removeStart;
-	CUtlVector< int > removeCount;
+	CUtlVector< intp > removeStart;
+	CUtlVector< intp > removeCount;
 
-	const int nFaceSets = pMesh->FaceSetCount();
-	for ( int i = 0; i < nFaceSets; ++i )
+	const intp nFaceSets = pMesh->FaceSetCount();
+	for ( intp i = 0; i < nFaceSets; ++i )
 	{
 		CDmeFaceSet *pFaceSet = pMesh->GetFaceSet( i );
-		const int nFaceIndices = pFaceSet->NumIndices();
+		const intp nFaceIndices = pFaceSet->NumIndices();
 		if ( nFaceIndices <= 0 )
 			continue;
 
@@ -244,7 +244,7 @@ bool CDmMeshUtils::RemoveFacesWithMoreThanNVerts( CDmeMesh *pMesh, const int nVe
 		removeStart.RemoveAll();
 		removeCount.RemoveAll();
 		
-		for ( int j = 1; j < nFaceIndices; ++j )
+		for ( intp j = 1; j < nFaceIndices; ++j )
 		{
 			faceCurrentIndex = pFaceSet->GetIndex( j );
 
@@ -269,7 +269,7 @@ bool CDmMeshUtils::RemoveFacesWithMoreThanNVerts( CDmeMesh *pMesh, const int nVe
 		}
 
 		Assert( removeStart.Count() == removeCount.Count() );
-		for ( int j = removeStart.Count() - 1; j >= 0; --j )
+		for ( intp j = removeStart.Count() - 1; j >= 0; --j )
 		{
 			pFaceSet->RemoveMultiple( removeStart[ j ], removeCount[ j ] );
 			bMeshChanged = true;
@@ -281,7 +281,7 @@ bool CDmMeshUtils::RemoveFacesWithMoreThanNVerts( CDmeMesh *pMesh, const int nVe
 		}
 	}
 
-	for ( int i = emptyFaceSets.Count() - 1; i >= 0; --i )
+	for ( intp i = emptyFaceSets.Count() - 1; i >= 0; --i )
 	{
 		pMesh->RemoveFaceSet( emptyFaceSets[ i ] );
 		bMeshChanged = true;
@@ -308,12 +308,12 @@ void ComputeVertexIndexMap( CDmeMesh *pMesh, int nMaxVertexCount, CUtlVector< in
 	memset( pVertexFound, 0, nMaxVertexCount * sizeof( bool ) );
 
 	// Loop through all the face sets to find out the highest vertex index
-	const int nFaceSetCount = pMesh->FaceSetCount();
-	for ( int i = 0; i < nFaceSetCount; ++i )
+	const intp nFaceSetCount = pMesh->FaceSetCount();
+	for ( intp i = 0; i < nFaceSetCount; ++i )
 	{
 		const CDmeFaceSet *pFaceSet = pMesh->GetFaceSet( i );
-		const int nFaceSetIndices = pFaceSet->NumIndices();
-		for ( int j = 0; j < nFaceSetIndices; ++j )
+		const intp nFaceSetIndices = pFaceSet->NumIndices();
+		for ( intp j = 0; j < nFaceSetIndices; ++j )
 		{
 			const int &nIndex = pFaceSet->GetIndex( j );
 			if ( nIndex >= 0 )
@@ -349,7 +349,7 @@ void ComputeVertexIndexMap( CDmeMesh *pMesh, int nMaxVertexCount, CUtlVector< in
 
 	// Build up the reverse map
 	int *pReverseVertexIndexMap = reinterpret_cast< int * >( alloca( nMaxVertexCount * sizeof( int ) ) );
-	for ( int i = 0; i < nFaceSetCount; ++i )
+	for ( intp i = 0; i < nFaceSetCount; ++i )
 	{
 		pReverseVertexIndexMap[ i ] = -1;
 	}
@@ -360,11 +360,11 @@ void ComputeVertexIndexMap( CDmeMesh *pMesh, int nMaxVertexCount, CUtlVector< in
 	}
 
 	// Fix up the face set indices to compensate for the ones which are going to be removed
-	for ( int i = 0; i < nFaceSetCount; ++i )
+	for ( intp i = 0; i < nFaceSetCount; ++i )
 	{
 		CDmeFaceSet *pFaceSet = pMesh->GetFaceSet( i );
-		const int nFaceSetIndices = pFaceSet->NumIndices();
-		for ( int j = 0; j < nFaceSetIndices; ++j )
+		const intp nFaceSetIndices = pFaceSet->NumIndices();
+		for ( intp j = 0; j < nFaceSetIndices; ++j )
 		{
 			const int &nIndex = pFaceSet->GetIndex( j );
 			if ( nIndex >= 0 )
@@ -385,12 +385,12 @@ int GetMaxVertexCount( const CDmeMesh *pMesh )
 	int nMaxVertexIndex = 0;
 
 	// Loop through all the face sets to find out the highest vertex index
-	const int nFaceSetCount = pMesh->FaceSetCount();
-	for ( int i = 0; i < nFaceSetCount; ++i )
+	const intp nFaceSetCount = pMesh->FaceSetCount();
+	for ( intp i = 0; i < nFaceSetCount; ++i )
 	{
 		const CDmeFaceSet *pFaceSet = pMesh->GetFaceSet( i );
-		const int nFaceSetIndices = pFaceSet->NumIndices();
-		for ( int j = 0; j < nFaceSetIndices; ++j )
+		const intp nFaceSetIndices = pFaceSet->NumIndices();
+		for ( intp j = 0; j < nFaceSetIndices; ++j )
 		{
 			const int &nIndex = pFaceSet->GetIndex( j );
 
@@ -413,10 +413,10 @@ void RemapData(
 	CDmrArray< T_t > data,
 	const CUtlVector< int > &newToOldMap )
 {
-	const int nNewToOldMapCount = newToOldMap.Count();
+	const intp nNewToOldMapCount = newToOldMap.Count();
 
 	T_t *pNewData = reinterpret_cast< T_t * >( alloca( nNewToOldMapCount * sizeof( T_t ) ) );
-	for ( int i = 0; i < nNewToOldMapCount; ++i )
+	for ( intp i = 0; i < nNewToOldMapCount; ++i )
 	{
 		pNewData[ i ] = data.Get( newToOldMap[ i ] );
 	}
@@ -438,7 +438,7 @@ void RemoveUnusedData(
 	int nIndicesCount,
 	CDmrGenericArray &data )
 {
-	const int nDataCount = data.Count();
+	const intp nDataCount = data.Count();
 
 	bool *pDataIndexFound = reinterpret_cast< bool * >( alloca( nDataCount * sizeof( bool ) ) );
 	memset( pDataIndexFound, 0, nDataCount * sizeof( bool ) );
@@ -524,8 +524,8 @@ void RemoveUnusedData(
 	// TODO: Fix up "jointWeight & "jointIndices" if this is "position"
 	if ( V_streq( pFieldName, "position" ) )
 	{
-		const int nFields = pVertexData->FieldCount();
-		for ( int i = 0; i < nFields; ++i )
+		const intp nFields = pVertexData->FieldCount();
+		for ( intp i = 0; i < nFields; ++i )
 		{
 
 		}
@@ -958,7 +958,7 @@ void MirrorVertexData(
 	Assert( mirrorMap.Count() == nOrigVertexCount );
 	Assert( dataMirrorMap.Count() == origData.Count() );
 
-	const int nData = origData.Count();
+	const intp nData = origData.Count();
 	T_t *pMirrorData = reinterpret_cast< T_t * >( alloca( nMirrorCount * sizeof( T_t ) ) );
 	int *pMirrorIndices = reinterpret_cast< int * >( alloca( nMirrorCount * sizeof( int ) ) );
 
@@ -1123,7 +1123,7 @@ void MirrorDeltaData(
 {
 	Assert( origData.Count() == origIndices.Count() );
 
-	const int nOrigDataCount = origData.Count();
+	const intp nOrigDataCount = origData.Count();
 
 	T_t *pMirrorData = reinterpret_cast< T_t * >( alloca( nOrigDataCount * sizeof( T_t ) ) );
 	int *pMirrorIndices = reinterpret_cast< int * >( alloca( nOrigDataCount * sizeof( int ) ) );
@@ -1250,9 +1250,9 @@ bool CDmMeshUtils::RemapMaterial( CDmeMesh *pMesh, const CUtlString &src, const 
 //-----------------------------------------------------------------------------
 // Replaces the nth material found with the specified material name
 //-----------------------------------------------------------------------------
-bool CDmMeshUtils::RemapMaterial( CDmeMesh *pMesh, const int nMaterialIndex, const CUtlString &dst )
+bool CDmMeshUtils::RemapMaterial( CDmeMesh *pMesh, const intp nMaterialIndex, const CUtlString &dst )
 {
-	const int nFaceSets = pMesh->FaceSetCount();
+	const intp nFaceSets = pMesh->FaceSetCount();
 	if ( nMaterialIndex >= nFaceSets )
 		return false;
 
@@ -1404,8 +1404,8 @@ void AppendData(
 	CDmrArray< T_t > &dstData,
 	const matrix3x4_t *pMat = NULL )
 {
-	const int nSrcCount = srcData.Count();
-	const int nDstCount = dstData.Count();
+	const intp nSrcCount = srcData.Count();
+	const intp nDstCount = dstData.Count();
 
 	dstData.AddMultipleToTail( nSrcCount );
 	dstData.SetMultiple( nDstCount, nSrcCount, srcData.Base() );
@@ -2133,7 +2133,7 @@ void CopyFieldData(
 	FieldIndex_t dstFieldIndex,
 	const CUtlVector< VertexWeightMap_s > &vertexWeightMap )
 {
-	const int nDstData = vertexWeightMap.Count();
+	const intp nDstData = vertexWeightMap.Count();
 
 	T_t sum;
 
@@ -2820,8 +2820,8 @@ bool CDmMeshUtils::CreateWrinkleDeltaFromBaseState(
 		// NOTE: This will produce bad behavior in cases where two positions share the
 		// same texcoord, which shouldn't theoretically happen.
 		const CUtlVector< int > &baseVerts = pBind->FindVertexIndicesFromDataIndex( CDmeVertexData::FIELD_POSITION, pWrinkleIndices[ i ] );
-		const int nBaseVertCount = baseVerts.Count();
-		for ( int j = 0; j < nBaseVertCount; ++j )
+		const intp nBaseVertCount = baseVerts.Count();
+		for ( intp j = 0; j < nBaseVertCount; ++j )
 		{
 			// See if we have a delta for this texcoord...
 			int nTexCoordIndex = baseTexCoordIndices[ baseVerts[j] ];
@@ -2835,7 +2835,7 @@ bool CDmMeshUtils::CreateWrinkleDeltaFromBaseState(
 				flWrinkleDelta += pOldWrinkleData[ nTexCoordIndex ];
 			}
 
-			int nDeltaIndex = pDelta->AddVertexData( nWrinkleIndex, 1 );
+			intp nDeltaIndex = pDelta->AddVertexData( nWrinkleIndex, 1 );
 			pDelta->SetVertexIndices( nWrinkleIndex, nDeltaIndex, 1, &nTexCoordIndex );
 			pDelta->SetVertexData( nWrinkleIndex, nDeltaIndex, 1, AT_FLOAT, &flWrinkleDelta );
 		}
@@ -3154,19 +3154,19 @@ void CDmMeshUtils::CreateDeltasFromPresetGroup(
 	CUtlStringMap< CDmePreset * > &presetMap )
 {
 	const CDmaElementArray< CDmePreset > &presets = pPresetGroup->GetPresets();
-	const int nPresetsCount = presets.Count();
+	const intp nPresetsCount = presets.Count();
 
 	if ( nPresetsCount <= 0 )
 		return;
 
-	for ( int i = 0; i < nPresetsCount; ++i )
+	for ( intp i = 0; i < nPresetsCount; ++i )
 	{
 		pComboOp->SetToBase();
 		CDmePreset *pPreset = presets[ i ];
 
 		CDmaElementArray< CDmElement > &controlValues = pPreset->GetControlValues();
-		const int nControlValues = controlValues.Count();
-		for ( int j = 0; j < nControlValues; ++j )
+		const intp nControlValues = controlValues.Count();
+		for ( intp j = 0; j < nControlValues; ++j )
 		{
 			CDmElement *pControlPreset = controlValues[ j ];
 

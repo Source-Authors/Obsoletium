@@ -32,7 +32,7 @@ public:
 
 	static bool RemoveFacesWithMaterial( CDmeMesh *pMesh, const char *pMaterialName );
 
-	static bool RemoveFacesWithMoreThanNVerts( CDmeMesh *pMesh, const int nVertexCount );
+	static bool RemoveFacesWithMoreThanNVerts( CDmeMesh *pMesh, const intp nVertexCount );
 
 	enum Axis_t
 	{
@@ -45,7 +45,7 @@ public:
 
 	static bool RemapMaterial( CDmeMesh *pMesh, const CUtlString &src, const CUtlString &dst );
 
-	static bool RemapMaterial( CDmeMesh *pMesh, const int nMaterialIndex, const CUtlString &dst );
+	static bool RemapMaterial( CDmeMesh *pMesh, const intp nMaterialIndex, const CUtlString &dst );
 
 	// Merge the specified mesh onto the first mesh under pRoot that fits it
 	static bool Merge( CDmeMesh *pSrcMesh, CDmElement *pRoot );
