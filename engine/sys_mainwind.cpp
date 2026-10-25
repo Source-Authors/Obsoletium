@@ -189,7 +189,7 @@ enum class SystemPowerBatterySaverStatus : unsigned char {
 //-----------------------------------------------------------------------------
 // Purpose: Main game interface, including message pump and window creation
 //-----------------------------------------------------------------------------
-class CGame : public IGame
+class CGame final : public IGame
 {
 public:
 					CGame();
