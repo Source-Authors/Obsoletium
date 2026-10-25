@@ -1554,15 +1554,15 @@ void CGame::PlayStartupVideos()
 //-----------------------------------------------------------------------------
 void CGame::PlayVideoAndWait( const char *filename, bool bNeedHealthWarning )
 {
-	// do we have a filename and a video system, and not on a console?
+	// Do we have a filename and a video system, and not on a console?
 	if ( Q_isempty( filename ) || g_pVideo == NULL )
 		return;
 
-	// is it the valve logo file?		
-	bool bIsValveLogo = ( Q_strstr( filename, "valve.") != NULL );
+	// Is it the valve logo file?
+	const bool bIsValveLogo = !!Q_strstr( filename, "valve.");
 
-	//Chinese health messages appears for 11 seconds, so we force a minimum delay time for those
-	float forcedMinTime = ( bIsValveLogo && bNeedHealthWarning ) ? 11.0f : -1.0f;
+	// Chinese health messages appears for 11 seconds, so we force a minimum delay time for those
+	const float forcedMinTimeSeconds = bIsValveLogo && bNeedHealthWarning ? 11.0f : -1.0f;
 
 #if defined( WIN32 ) && !defined( USE_SDL )
 	{
@@ -1579,13 +1579,12 @@ void CGame::PlayVideoAndWait( const char *filename, bool bNeedHealthWarning )
 		::FillRect( dc, &rect, hBlackBrush );
 	}
 #else
-	// need OS specific way to clear screen
-    
+	// Need OS specific way to clear screen.
 #endif
 
 	VideoResult_t status = 	g_pVideo->PlayVideoFileFullScreen( filename, "GAME", GetMainWindowPlatformSpecificHandle (),
-	                                                           m_width, m_height, m_iDesktopWidth, m_iDesktopHeight, videomode->IsWindowedMode() || videomode->IsBorderlessMode(),
-	                                                           forcedMinTime, VideoPlaybackFlags::DEFAULT_FULLSCREEN_OPTIONS | VideoPlaybackFlags::FILL_WINDOW );
+		m_width, m_height, m_iDesktopWidth, m_iDesktopHeight, videomode->IsWindowedMode() || videomode->IsBorderlessMode(),
+		forcedMinTimeSeconds, VideoPlaybackFlags::DEFAULT_FULLSCREEN_OPTIONS | VideoPlaybackFlags::FILL_WINDOW );
 
 	// Everything ok?
 	if ( status == VideoResult::SUCCESS )
@@ -1593,13 +1592,13 @@ void CGame::PlayVideoAndWait( const char *filename, bool bNeedHealthWarning )
 		return;
 	}
 
-	// We don't worry if it could not find something to could play
-	if ( status == VideoResult::VIDEO_FILE_NOT_FOUND )	
+	// We don't worry if it could not find something to could play.
+	if ( status == VideoResult::VIDEO_FILE_NOT_FOUND )
 	{
 		return;
 	}
 
-	// Debug Builds, we want an error looked at by a developer, Release builds just send a message to the spew
+	// Debug Builds, we want an error looked at by a developer, Release builds just send a message to the spew.
 #ifndef NDEBUG
 	Error( "Error %d occurred attempting to play video file %s\n", (int) status, filename );
 #else
