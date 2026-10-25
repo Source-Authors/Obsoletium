@@ -1612,9 +1612,9 @@ void CGame::PlayVideoAndWait( const char *filename, bool bNeedHealthWarning )
 //-----------------------------------------------------------------------------
 // Purpose: Enable Windows shortcut keys when app is inactive.
 //-----------------------------------------------------------------------------
-bool ShouldEnableWindowsShortcutKeys() noexcept
+static bool ShouldEnableWindowsShortcutKeys() noexcept
 {
-  return !game->IsActiveApp();
+	return !game->IsActiveApp();
 }
 
 
