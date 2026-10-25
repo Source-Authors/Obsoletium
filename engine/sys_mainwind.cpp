@@ -193,7 +193,7 @@ class CGame : public IGame
 {
 public:
 					CGame();
-	virtual			~CGame();
+	virtual			~CGame() = default;
 
 	bool			Init( void *pvInstance );
 	bool			Shutdown();
@@ -1659,13 +1659,6 @@ CGame::CGame()
 	m_iDesktopRefreshRate = 0;
 	m_rcLastRestoredClientRect.left = m_rcLastRestoredClientRect.right =
 	m_rcLastRestoredClientRect.top = m_rcLastRestoredClientRect.bottom = 0;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Destructor
-//-----------------------------------------------------------------------------
-CGame::~CGame()
-{
 }
 
 //-----------------------------------------------------------------------------
