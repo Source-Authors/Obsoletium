@@ -33,17 +33,18 @@ class ScopedConsoleCtrlHandler {
       IN_OPT ConsoleCtrlHandlerFn handler) noexcept
       : handler_{handler},
         is_success_{::SetConsoleCtrlHandler(handler, TRUE) != FALSE} {
-    AssertMsg(is_success_,
-              "Unable to set console ctrl handler 0x%p for process.",
+    if (!is_success_) {
+      Warning("Unable to set console ctrl handler 0x%p for process.",
               static_cast<void*>(handler));
+    }
   }
   ~ScopedConsoleCtrlHandler() noexcept {
     if (is_success_) {
-      [[maybe_unused]] const bool ok{::SetConsoleCtrlHandler(handler_, FALSE) !=
-                                     FALSE};
-      AssertMsg(ok,
-                "Unable to reset console ctrl handler from 0x%p for process.",
+      const bool ok{::SetConsoleCtrlHandler(handler_, FALSE) != FALSE};
+      if (!ok) {
+        Warning("Unable to reset console ctrl handler from 0x%p for process.",
                 static_cast<void*>(handler_));
+      }
     }
   }
 

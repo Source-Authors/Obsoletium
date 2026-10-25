@@ -295,7 +295,7 @@ $Project "engine"
 	$Folder	"Source Files"
 	{
 		// dimhotepus: Disable accessibility shortcut keys.
-		$File	"accessibility_shortcut_keys_toggler.cpp"	[$WINDOWS]
+		$File	"$SRCDIR/common/windows/accessibility_shortcut_keys_toggler.cpp"	[$WINDOWS]
 		$File	"baseautocompletefilelist.cpp"
 		$File	"baseserver.cpp"
 		$File	"bitbuf_errorhandler.cpp"
@@ -409,7 +409,7 @@ $Project "engine"
 		$File	"sys_mainwind.cpp" [!$DEDICATED]
 		$File	"sys_linuxwind.cpp" [$POSIX]
 		// dimhotepus: Keyboard hook to disable Win key.
-		$File	"scoped_windows_hook.cpp"	[$WINDOWS]
+		$File	"$SRCDIR/common/windows/scoped_windows_hook.cpp"	[$WINDOWS]
 		$File	"testscriptmgr.cpp"
 		$File	"traceinit.cpp"
 		$File	"$SRCDIR\public\vallocator.cpp"
@@ -418,7 +418,7 @@ $Project "engine"
 		$File	"vprof_record.cpp"
 		$File	"world.cpp"
 		// dimhotepus: Disable Win key.
-		$File	"windows_shortcut_keys_toggler.cpp"	[$WINDOWS]
+		$File	"$SRCDIR/common/windows/windows_shortcut_keys_toggler.cpp"	[$WINDOWS]
 		$File	"zone.cpp"
 		$File	"bugreporter.cpp" [!$DEDICATED]
 		$File	"cheatcodes.cpp"
@@ -640,7 +640,7 @@ $Project "engine"
 	$Folder	"Header Files"
 	{
 		// dimhotepus: Disable accessibility shortcut keys.
-		$File	"accessibility_shortcut_keys_toggler.h"	[$WINDOWS]
+		$File	"$SRCDIR/common/windows/accessibility_shortcut_keys_toggler.h"	[$WINDOWS]
 		$File	"baseclient.h"
 		$File	"baseclientstate.h"
 		$File	"baseserver.h"
@@ -836,7 +836,11 @@ $Project "engine"
 		$File	"$SRCDIR\public\scratchpad3d.h"
 		$File	"screen.h"
 		// dimhotepus: Keyboard hook to disable Win key.
-		$File	"scoped_windows_hook.h"	[$WINDOWS]
+		$File	"$SRCDIR/common/windows/scoped_windows_hook.h"	[$WINDOWS]
+		// dimhotepus: Handle power settings change notifications.
+		$File	"$SRCDIR/common/windows/scoped_power_settings_notifications_registrator.h"	[$WINDOWS]
+		// dimhotepus: Handle ssupend/resume power notifications.
+		$File	"$SRCDIR/common/windows/scoped_power_suspend_resume_notifications_registrator.h"	[$WINDOWS]
 		$File	"server.h"
 		$File	"Session.h"
 		$File	"shadowmgr.h"
@@ -886,7 +890,8 @@ $Project "engine"
 		$File	"vprof_engine.h"
 		$File	"vprof_record.h"
 		// dimhotepus: Disable Win key.
-		$File	"windows_shortcut_keys_toggler.h"	[$WINDOWS]
+		$File	"$SRCDIR/common/windows/windows_shortcut_keys_toggler.h"	[$WINDOWS]
+		$File	"$SRCDIR/common/windows/scoped_show_cursor.h"	[$WINDOWS]
 		$File	"world.h"
 		$File	"zone.h"
 		$File	"baseautocompletefilelist.h"

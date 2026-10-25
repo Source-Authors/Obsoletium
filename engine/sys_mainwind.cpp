@@ -20,17 +20,19 @@
 #include <combaseapi.h>
 #include <imm.h>
 // dimhotepus: Disable accessibility keys (ex. five times Shift).
-#include "accessibility_shortcut_keys_toggler.h"
+#include "windows/accessibility_shortcut_keys_toggler.h"
 #ifdef NDEBUG
 // dimhotepus: Disable Win key.
-#include "windows_shortcut_keys_toggler.h"
+#include "windows/windows_shortcut_keys_toggler.h"
 #endif
 // dimhotepus: Notify when system suspend / resume. Save game when suspend.
-#include "scoped_power_suspend_resume_notifications_registrator.h"
+#include "windows/scoped_power_suspend_resume_notifications_registrator.h"
 // dimhotepus: Notify when system power settings changed (battery, AC, power plan, etc.).
-#include "scoped_power_settings_notifications_registrator.h"
+#include "windows/scoped_power_settings_notifications_registrator.h"
 // dimhotepus: Do not disable display during video playback when no user input.
 #include "windows/scoped_thread_execution_state.h"
+// dimhotepus: Hide cursor while playing videos.
+#include "windows/scoped_show_cursor.h"
 #endif
 
 #if defined( IS_WINDOWS_PC ) && !defined( USE_SDL )
@@ -296,14 +298,14 @@ private:
 	// dimhotepus: Disable Win key.
 	// Only in Release builds as it slowdowns IDE typing a lot in debugging sessions.
 	// See https://github.com/Source-Authors/Obsoletium/issues/124
-	s1::engine::win::WindowsShortcutKeysToggler m_windowsShortcutKeysToggler;
+	s1::win::WindowsShortcutKeysToggler m_windowsShortcutKeysToggler;
 #endif
 	// dimhotepus: Disable accessibility keys (ex. five times Shift).
-	s1::engine::win::AccessibilityShortcutKeysToggler m_accessibilityShortcutKeysToggler;
+	s1::win::AccessibilityShortcutKeysToggler m_accessibilityShortcutKeysToggler;
 	// dimhotepus: Notify when system suspend / resume.
-	std::unique_ptr<s1::engine::win::ScopedPowerSuspendResumeNotificationsRegistrator> m_powerSuspendResumeRegistrator;
+	std::unique_ptr<s1::win::ScopedPowerSuspendResumeNotificationsRegistrator> m_powerSuspendResumeRegistrator;
 	// dimhotepus: Notify when active session display on / offs changed.
-	std::unique_ptr<s1::engine::win::ScopedPowerSettingNotificationsRegistrator> m_sessionDisplayStatusChangedNotificationsRegistrator;
+	std::unique_ptr<s1::win::ScopedPowerSettingNotificationsRegistrator> m_sessionDisplayStatusChangedNotificationsRegistrator;
 #endif  // IS_WINDOWS_PC
 
 	void			UpdateDesktopInformation();
@@ -1274,9 +1276,9 @@ void CGame::AttachToWindow()
 		return;
 
 	m_powerSuspendResumeRegistrator =
-		std::move(std::make_unique<s1::engine::win::ScopedPowerSuspendResumeNotificationsRegistrator>(m_hWindow));
+		std::move(std::make_unique<s1::win::ScopedPowerSuspendResumeNotificationsRegistrator>(m_hWindow));
 	m_sessionDisplayStatusChangedNotificationsRegistrator = std::move(
-		std::make_unique<s1::engine::win::ScopedPowerSettingNotificationsRegistrator>(m_hWindow, GUID_SESSION_DISPLAY_STATUS));
+		std::make_unique<s1::win::ScopedPowerSettingNotificationsRegistrator>(m_hWindow, GUID_SESSION_DISPLAY_STATUS));
 
 #if !defined( USE_SDL )
 	m_ChainedWindowProc = (WNDPROC)GetWindowLongPtrW( m_hWindow, GWLP_WNDPROC ); //-V204
@@ -1432,28 +1434,6 @@ class ScopedMilesAudioDevice
   void *m_miles_sound_device;
 };
 
-#ifdef _WIN32
-class ScopedShowCursor
-{
- public:
-  ScopedShowCursor(bool is_shown) noexcept : m_is_shown{is_shown}
-  {
-	  ::ShowCursor(is_shown ? TRUE : FALSE);
-  }
-  ~ScopedShowCursor() noexcept
-  {
-	  ::ShowCursor(m_is_shown ? FALSE : TRUE);
-  }
-
-  ScopedShowCursor(ScopedShowCursor &) = delete;
-  ScopedShowCursor& operator=(ScopedShowCursor &) = delete;
-  ScopedShowCursor(ScopedShowCursor &&) = delete;
-  ScopedShowCursor& operator=(ScopedShowCursor &&) = delete;
-
- private:
-  const bool m_is_shown;
-};
-#endif
 
 void CGame::PlayStartupVideos( void )
 {
@@ -1513,6 +1493,7 @@ void CGame::PlayStartupVideos( void )
 	{
 		return;
 	}
+	RunCodeAtScopeExit( free(buffer) );
 
 	// dimhotepus: Need to play startup videos sound, but sound devices are not ready.
 	extern void VAudioInit();
@@ -1538,7 +1519,7 @@ void CGame::PlayStartupVideos( void )
   #if defined( USE_SDL )
 	g_pLauncherMgr->SetMouseVisible( false );
   #elif defined( WIN32 )
-	const ScopedShowCursor scoped_show_cursor{false};
+	const s1::win::ScopedShowCursor scoped_show_cursor{false};
   #endif
 
 #if defined( LINUX )
@@ -1568,10 +1549,6 @@ void CGame::PlayStartupVideos( void )
   #if defined( USE_SDL )
 	g_pLauncherMgr->SetMouseVisible( true );
   #endif
-
-	// call free on the buffer since the buffer was malloc'd in COM_LoadFile
-	free( buffer );
-
 #endif // SWDS
 }
 

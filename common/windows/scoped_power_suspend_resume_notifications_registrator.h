@@ -1,14 +1,13 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
+// Copyright Valve Corporation, All rights reserved.
 
-#ifndef ENGINE_SCOPED_POWER_SUSPEND_RESUME_NOTIFICATIONS_REGISTRATOR_H_
-#define ENGINE_SCOPED_POWER_SUSPEND_RESUME_NOTIFICATIONS_REGISTRATOR_H_
+#ifndef SE_COMMON_WINDOWS_SCOPED_POWER_SUSPEND_RESUME_NOTIFICATIONS_REGISTRATOR_H_
+#define SE_COMMON_WINDOWS_SCOPED_POWER_SUSPEND_RESUME_NOTIFICATIONS_REGISTRATOR_H_
 
 #include <system_error>
 
 #include "tier0/dbg.h"
 
-namespace s1::engine::win {
+namespace s1::win {
 
 /**
  * @brief Allows to register WM_POWERBROADCAST notifications for specific power
@@ -16,7 +15,8 @@ namespace s1::engine::win {
  */
 class ScopedPowerSuspendResumeNotificationsRegistrator {
  public:
-  ScopedPowerSuspendResumeNotificationsRegistrator(HWND recipient) noexcept
+  explicit ScopedPowerSuspendResumeNotificationsRegistrator(
+      HWND recipient) noexcept
       : handle_{::RegisterSuspendResumeNotification(
             recipient, DEVICE_NOTIFY_WINDOW_HANDLE)},
         rc_{handle_ ? std::error_code{}
@@ -24,14 +24,14 @@ class ScopedPowerSuspendResumeNotificationsRegistrator {
                                       std::system_category()}} {}
 
   ScopedPowerSuspendResumeNotificationsRegistrator(
-      const ScopedPowerSuspendResumeNotificationsRegistrator &) = delete;
+      const ScopedPowerSuspendResumeNotificationsRegistrator&) = delete;
   ScopedPowerSuspendResumeNotificationsRegistrator(
-      ScopedPowerSuspendResumeNotificationsRegistrator &&) = delete;
+      ScopedPowerSuspendResumeNotificationsRegistrator&&) = delete;
 
-  ScopedPowerSuspendResumeNotificationsRegistrator &operator=(
-      const ScopedPowerSuspendResumeNotificationsRegistrator &) = delete;
-  ScopedPowerSuspendResumeNotificationsRegistrator &operator=(
-      ScopedPowerSuspendResumeNotificationsRegistrator &&) = delete;
+  ScopedPowerSuspendResumeNotificationsRegistrator& operator=(
+      const ScopedPowerSuspendResumeNotificationsRegistrator&) = delete;
+  ScopedPowerSuspendResumeNotificationsRegistrator& operator=(
+      ScopedPowerSuspendResumeNotificationsRegistrator&&) = delete;
 
   ~ScopedPowerSuspendResumeNotificationsRegistrator() noexcept {
     if (handle_) {
@@ -41,8 +41,10 @@ class ScopedPowerSuspendResumeNotificationsRegistrator {
       const auto message = std::error_code{static_cast<int>(::GetLastError()),
                                            std::system_category()}
                                .message();
-      AssertMsg(ok, "UnregisterSuspendResumeNotification failed w/e %s.\n",
+      if (!ok) {
+        Warning("UnregisterSuspendResumeNotification failed w/e %s.\n",
                 message.c_str());
+      }
 #endif
     }
   }
@@ -54,6 +56,6 @@ class ScopedPowerSuspendResumeNotificationsRegistrator {
   const std::error_code rc_;
 };
 
-}  // namespace s1::engine::win
+}  // namespace s1::win
 
-#endif  // ENGINE_SCOPED_POWER_SUSPEND_RESUME_NOTIFICATIONS_REGISTRATOR_H_
+#endif  // !SE_COMMON_WINDOWS_SCOPED_POWER_SUSPEND_RESUME_NOTIFICATIONS_REGISTRATOR_H_
