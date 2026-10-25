@@ -1435,40 +1435,37 @@ class ScopedMilesAudioDevice
 };
 
 
-void CGame::PlayStartupVideos( void )
+void CGame::PlayStartupVideos()
 {
 	if ( Plat_IsInBenchmarkMode() )
 		return;
 
 #ifndef SWDS
-	
 	// Wait for the mode to change and stabilized
-	// FIXME: There's really no way to know when this is completed, so we have to guess a time that will mostly be correct
-	if ( videomode->IsWindowedMode() == false && videomode->IsBorderlessMode() == false )
+	// FIXME: There's really no way to know when this is completed, so we have to
+	// guess a time that will mostly be correct
+	if ( !videomode->IsWindowedMode() && !videomode->IsBorderlessMode() )
 	{
-		// dimhotepus: Reduce mode stabilization time to 300ms as CRTs are rarely used anymore.
-		Sys_Sleep( 300 );
+		// dimhotepus: Reduce mode stabilization time to 300ms as CRTs are rarely
+		// used anymore.
+		ThreadSleep( 300 );
 	}
 
-	bool bEndGame = CommandLine()->HasParm( "-endgamevid" );
-	bool bRecap = CommandLine()->HasParm( "-recapvid" );	// FIXME: This is a temp addition until the movie playback is centralized -- jdw
+	const bool bEndGame = CommandLine()->HasParm( "-endgamevid" );
+	// FIXME: This is a temp addition until the movie playback is centralized -- jdw
+	const bool bRecap = CommandLine()->HasParm( "-recapvid" );
+
+	FileHandle_t hFile;
+	COM_OpenFile( "media/HealthWarning.txt", &hFile );
+	RunCodeAtScopeExitOpt( hFile, COM_CloseFile( hFile ) );
 	
-	bool bNeedHealthWarning = false;
-
-	const char *HealthFile = "media/HealthWarning.txt";
-
-	FileHandle_t	hFile;
-
-	COM_OpenFile( HealthFile, &hFile );
-		
-	//There is no access to steam at this point so we are checking for the presence of an empty file that will only exist in the chinese depot
-	if ( hFile )
-	{
-		bNeedHealthWarning = true;
-		COM_CloseFile( hFile );
-	}
-
-	if (!bNeedHealthWarning && !bEndGame && !bRecap && (CommandLine()->HasParm("-dev") || CommandLine()->HasParm("-novid") || CommandLine()->HasParm("-allowdebug")))
+	// There is no access to Steam at this point so we are checking for the presence of an
+	// empty file that will only exist in the chinese depot.
+	const bool bNeedHealthWarning = !!hFile;
+	if (!bNeedHealthWarning && !bEndGame && !bRecap &&
+		(CommandLine()->HasParm("-dev") ||
+		 CommandLine()->HasParm("-novid") ||
+		 CommandLine()->HasParm("-allowdebug")))
 		return;
 
 	const char *pszFile = "media/StartupVids.txt";
@@ -1486,14 +1483,13 @@ void CGame::PlayStartupVideos( void )
 	}
 	
 	int vidFileLength;
-
 	// have to use the malloc memory allocation option in COM_LoadFile since the memory system isn't set up at this point.
 	char *buffer = (char *) COM_LoadFile( pszFile, 5, &vidFileLength );
-	if ((buffer == NULL) || (vidFileLength == 0))
+	if ( !buffer || !vidFileLength )
 	{
 		return;
 	}
-	RunCodeAtScopeExit( free(buffer) );
+	RunCodeAtScopeExit( free( buffer ) );
 
 	// dimhotepus: Need to play startup videos sound, but sound devices are not ready.
 	extern void VAudioInit();
@@ -1515,12 +1511,14 @@ void CGame::PlayStartupVideos( void )
 		Warning("Unable to signal system display is required. Display may disable during video playback.\n");
 	}
 
-	// hide cursor while playing videos
-  #if defined( USE_SDL )
+#if defined( USE_SDL )
+	// Hide cursor while playing videos.
 	g_pLauncherMgr->SetMouseVisible( false );
-  #elif defined( WIN32 )
+	// Show cursor again.
+	RunCodeAtScopeExit( g_pLauncherMgr->SetMouseVisible( true ) );
+#elif defined( WIN32 )
 	const s1::win::ScopedShowCursor scoped_show_cursor{false};
-  #endif
+#endif
 
 #if defined( LINUX )
 	Audio_CreateSDLAudioDevice();
@@ -1531,7 +1529,7 @@ void CGame::PlayStartupVideos( void )
 
 	while( true )
 	{
-		start = COM_Parse(start, token);
+		start = COM_Parse( start, token );
 		if ( Q_isempty( token ) )
 		{
 			break;
@@ -1539,16 +1537,14 @@ void CGame::PlayStartupVideos( void )
 
 		// get the path to the media file and play it.
 		char localPath[MAX_PATH];
- 		g_pFileSystem->GetLocalPath_safe( token, localPath );
- 		
-		PlayVideoAndWait( localPath, bNeedHealthWarning );
-		localPath[0] = 0; // just to make sure we don't play the same avi file twice in the case that one movie is there but another isn't.
-	}
+		g_pFileSystem->GetLocalPath_safe( token, localPath );
 
-	// show cursor again
-  #if defined( USE_SDL )
-	g_pLauncherMgr->SetMouseVisible( true );
-  #endif
+		PlayVideoAndWait( localPath, bNeedHealthWarning );
+
+		// Just to make sure we don't play the same avi file twice
+		// in the case that one movie is there but another isn't.
+		localPath[0] = '\0';
+	}
 #endif // SWDS
 }
 
