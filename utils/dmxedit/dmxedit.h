@@ -470,9 +470,9 @@ public:
 
 	bool ListDeltas();
 
-	int DeltaCount();
+	intp DeltaCount();
 
-	const char *DeltaName( int nDeltaIndex );
+	const char *DeltaName( intp nDeltaIndex );
 
 	void Unload();
 
@@ -494,9 +494,9 @@ public:
 
 	bool SelectHalf( const CHalfType &halfType, CDmeSingleIndexedComponent *pPassedSelection = NULL, CDmeMesh *pPassedMesh = NULL );
 
-	bool GrowSelection( int nSize = 1 );
+	bool GrowSelection( intp nSize = 1 );
 
-	bool ShrinkSelection( int nSize = 1 );
+	bool ShrinkSelection( intp nSize = 1 );
 
 	enum AddType { kRaw, kCorrected };
 
@@ -553,13 +553,13 @@ public:
 	void CreateWork();
 	bool Merge( const char *pInFilename, const char *pOutFilename );
 
-	bool RemapMaterial( int nMaterialIndex, const char *pNewMaterialName );
+	bool RemapMaterial( intp nMaterialIndex, const char *pNewMaterialName );
 
 	bool RemapMaterial( const char *pOldMaterialName, const char *pNewMaterialName );
 
 	bool RemoveFacesWithMaterial( const char *pMaterialName );
 
-	bool RemoveFacesWithMoreThanNVerts( int nVertexCount );
+	bool RemoveFacesWithMoreThanNVerts( intp nVertexCount );
 
 	bool Mirror( CAxisType = XAXIS );
 

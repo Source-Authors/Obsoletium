@@ -154,7 +154,7 @@ bool CDmxEdit::Load( const char *pFilename, const CObjType &loadType /* = DIST_A
 				if ( !pDag )
 					continue;
 				
-				for ( int i = pDag->GetChildCount() - 1; i >= 0; --i )
+				for ( intp i = pDag->GetChildCount() - 1; i >= 0; --i )
 				{
 					traverseStack.Push( pDag->GetChild( i ) );
 				}
@@ -309,14 +309,14 @@ bool CDmxEdit::Import( const char *pFilename, const char *pParentName )
 		return SetErrorString( "Can't Find \"model\" Element On Root Node In DMX File" );
 	}
 
-	int nSkinningJointIndex = -1;
+	intp nSkinningJointIndex = -1;
 
 	if ( pParentName )
 	{
 		CDmeTransform *pJoint = NULL;
 
-		const int nJointTransformCount = pDstModel->GetJointTransformCount();
-		for ( int i = 0; i < nJointTransformCount; ++i )
+		const intp nJointTransformCount = pDstModel->GetJointTransformCount();
+		for ( intp i = 0; i < nJointTransformCount; ++i )
 		{
 			pJoint = pDstModel->GetJointTransform( i );
 			if ( V_strieq( pJoint->GetName(), pParentName ) )
@@ -338,7 +338,7 @@ bool CDmxEdit::Import( const char *pFilename, const char *pParentName )
 
 	// Initialize traversal stack to just model's children (don't want to touch model)
 	CUtlStack< CDmeDag * > traverseStack;
-	for ( int i = pSrcModel->GetChildCount() - 1; i >= 0; --i )
+	for ( intp i = pSrcModel->GetChildCount() - 1; i >= 0; --i )
 	{
 		traverseStack.Push( pSrcModel->GetChild( i ) );
 	}
@@ -350,7 +350,7 @@ bool CDmxEdit::Import( const char *pFilename, const char *pParentName )
 		if ( !pDag )
 			continue;
 
-		for ( int i = pDag->GetChildCount() - 1; i >= 0; --i )
+		for ( intp i = pDag->GetChildCount() - 1; i >= 0; --i )
 		{
 			traverseStack.Push( pDag->GetChild( i ) );
 		}
@@ -398,13 +398,13 @@ bool CDmxEdit::ListDeltas()
 	if ( !m_pMesh )
 		return SetErrorString( "No Mesh" );
 
-	const int nDeltas( m_pMesh->DeltaStateCount() );
+	const intp nDeltas( m_pMesh->DeltaStateCount() );
 	if ( nDeltas <= 0 )
 		return SetErrorString( "No Deltas Defined On Mesh: %s", m_pMesh->GetName() );
 
-	for ( int i( 0 ); i < nDeltas; ++i )
+	for ( intp i( 0 ); i < nDeltas; ++i )
 	{
-		Msg( "// Delta %d: %s\n", i, m_pMesh->GetDeltaState( i )->GetName() );
+		Msg( "// Delta %zd: %s\n", i, m_pMesh->GetDeltaState( i )->GetName() );
 	}
 
 	return true;
@@ -431,7 +431,7 @@ LUA_COMMAND(
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-int CDmxEdit::DeltaCount()
+intp CDmxEdit::DeltaCount()
 {
 	if ( !m_pMesh )
 		return SetErrorString( "No Mesh" );
@@ -459,7 +459,7 @@ LUA_COMMAND(
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-const char *CDmxEdit::DeltaName( int nDeltaStateIndex )
+const char *CDmxEdit::DeltaName( intp nDeltaStateIndex )
 {
 	if ( !m_pMesh )
 	{
@@ -487,7 +487,7 @@ LUA_COMMAND(
 {
 	LuaFunc_s::m_dmxEdit.SetFuncString( pLuaState );
 
-	const int nDeltaIndex = luaL_checknumber( pLuaState, 1 );
+	const intp nDeltaIndex = luaL_checknumber( pLuaState, 1 );
 
 	const char *pDeltaName = LuaFunc_s::m_dmxEdit.DeltaName( nDeltaIndex );
 	if ( pDeltaName )
@@ -620,15 +620,15 @@ void CDmxEdit::ImportDominationRules( CDmeCombinationOperator *pDestComboOp, CDm
 	// TODO: Detect conflicts if not overwriting
 
 	// Now deal with dominance rules
-	int nRuleCount = pSrcComboOp->DominationRuleCount();
-	for ( int i = 0; i < nRuleCount; ++i )
+	intp nRuleCount = pSrcComboOp->DominationRuleCount();
+	for ( intp i = 0; i < nRuleCount; ++i )
 	{
 		bool bMismatch = false;
 
 		// Only add dominance rule if *all* raw controls are present and the rule doesn't already exist
 		CDmeCombinationDominationRule *pSrcRule = pSrcComboOp->GetDominationRule( i );
-		int nDominatorCount = pSrcRule->DominatorCount();
-		for ( int j = 0; j < nDominatorCount; ++j )
+		intp nDominatorCount = pSrcRule->DominatorCount();
+		for ( intp j = 0; j < nDominatorCount; ++j )
 		{
 			const char *pDominatorName = pSrcRule->GetDominator( j );
 			if ( !pDestComboOp->HasRawControl( pDominatorName ) )
@@ -638,8 +638,8 @@ void CDmxEdit::ImportDominationRules( CDmeCombinationOperator *pDestComboOp, CDm
 			}
 		}
 
-		int nSuppressedCount = pSrcRule->SuppressedCount();
-		for ( int j = 0; j < nSuppressedCount; ++j )
+		intp nSuppressedCount = pSrcRule->SuppressedCount();
+		for ( intp j = 0; j < nSuppressedCount; ++j )
 		{
 			const char *pSuppressedName = pSrcRule->GetSuppressed( j );
 			if ( !pDestComboOp->HasRawControl( pSuppressedName ) )
@@ -675,16 +675,16 @@ bool IsDefaultControl( CDmeCombinationOperator *pCombo, int nIndex )
 //-----------------------------------------------------------------------------
 bool IsASubsetOfB( CDmeCombinationOperator *pComboA, int nIndexA, CDmeCombinationOperator *pComboB, int nIndexB )
 {
-	const int nCountA = pComboA->GetRawControlCount( nIndexA );
-	const int nCountB = pComboB->GetRawControlCount( nIndexB );
+	const intp nCountA = pComboA->GetRawControlCount( nIndexA );
+	const intp nCountB = pComboB->GetRawControlCount( nIndexB );
 
-	for ( int i = 0; i < nCountA; ++i )
+	for ( intp i = 0; i < nCountA; ++i )
 	{
 		bool bFound = false;
 
 		const char *pNameA = pComboA->GetRawControlName( nIndexA, i );
 
-		for ( int j = 0; j < nCountB; ++j )
+		for ( intp j = 0; j < nCountB; ++j )
 		{
 			if ( V_strieq( pNameA, pComboB->GetRawControlName( nIndexB, j ) ) )
 			{
@@ -705,8 +705,8 @@ bool IsASubsetOfB( CDmeCombinationOperator *pComboA, int nIndexA, CDmeCombinatio
 //-----------------------------------------------------------------------------
 bool AreControlsTheSame( CDmeCombinationOperator *pComboA, int nIndexA, CDmeCombinationOperator *pComboB, int nIndexB )
 {
-	const int nCountA = pComboA->GetRawControlCount( nIndexA );
-	const int nCountB = pComboB->GetRawControlCount( nIndexB );
+	const intp nCountA = pComboA->GetRawControlCount( nIndexA );
+	const intp nCountB = pComboB->GetRawControlCount( nIndexB );
 
 	if ( nCountA != nCountB )
 		return false;
@@ -719,13 +719,13 @@ bool AreControlsTheSame( CDmeCombinationOperator *pComboA, int nIndexA, CDmeComb
 //-----------------------------------------------------------------------------
 // -1 for failure
 //-----------------------------------------------------------------------------
-int FindControlIndexFromRawControlName( CDmeCombinationOperator *pCombo, const char *pRawControlName )
+intp FindControlIndexFromRawControlName( CDmeCombinationOperator *pCombo, const char *pRawControlName )
 {
-	const int nControlCount = pCombo->GetControlCount();
-	for ( int i = 0; i < nControlCount; ++i )
+	const intp nControlCount = pCombo->GetControlCount();
+	for ( intp i = 0; i < nControlCount; ++i )
 	{
-		const int nRawCount = pCombo->GetRawControlCount( i );
-		for ( int j = 0; j < nRawCount; ++j )
+		const intp nRawCount = pCombo->GetRawControlCount( i );
+		for ( intp j = 0; j < nRawCount; ++j )
 		{
 			if ( V_strieq( pRawControlName, pCombo->GetRawControlName( i, j ) ) )
 			{
@@ -761,14 +761,14 @@ void CDmxEdit::ImportCombinationControls( CDmeCombinationOperator *pSrcComboOp, 
 
 			// Remove all controls from dst that conflict with src
 
-			for ( int i = 0; !bConflict && i < pSrcComboOp->GetControlCount(); ++i )
+			for ( intp i = 0; !bConflict && i < pSrcComboOp->GetControlCount(); ++i )
 			{
-				const int nSrcRawCount = pSrcComboOp->GetRawControlCount( i );
-				for ( int j = 0; !bConflict && j < nSrcRawCount; ++j )
+				const intp nSrcRawCount = pSrcComboOp->GetRawControlCount( i );
+				for ( intp j = 0; !bConflict && j < nSrcRawCount; ++j )
 				{
 					const char *pSrcRawControlName = pSrcComboOp->GetRawControlName( i, j );
 
-					const int nDstControlIndex = FindControlIndexFromRawControlName( pDstComboOp, pSrcRawControlName );
+					const intp nDstControlIndex = FindControlIndexFromRawControlName( pDstComboOp, pSrcRawControlName );
 					if ( nDstControlIndex < 0 )
 						continue;
 
@@ -787,7 +787,7 @@ void CDmxEdit::ImportCombinationControls( CDmeCombinationOperator *pSrcComboOp, 
 		{
 			bConflict = false;
 
-			for ( int i = 0; !bConflict && i < pDstComboOp->GetControlCount(); ++i )
+			for ( intp i = 0; !bConflict && i < pDstComboOp->GetControlCount(); ++i )
 			{
 				if ( pDstComboOp->GetRawControlCount( i ) == 0 )
 				{
@@ -806,14 +806,14 @@ void CDmxEdit::ImportCombinationControls( CDmeCombinationOperator *pSrcComboOp, 
 
 	CUtlVectorFixedGrowable< bool, 256 > foundMatch;
 
-	for ( int i = 0; i < pSrcComboOp->GetControlCount(); ++i )
+	for ( intp i = 0; i < pSrcComboOp->GetControlCount(); ++i )
 	{
 		const char *pControlName = pSrcComboOp->GetControlName( i );
 
-		int nRawControls = pSrcComboOp->GetRawControlCount( i );
-		int nMatchCount = 0; 
+		intp nRawControls = pSrcComboOp->GetRawControlCount( i );
+		intp nMatchCount = 0; 
 		foundMatch.EnsureCount( nRawControls );
-		for ( int j = 0; j < nRawControls; ++j )
+		for ( intp j = 0; j < nRawControls; ++j )
 		{
 			const char *pRawControl = pSrcComboOp->GetRawControlName( i, j );
 			foundMatch[j] = pDstComboOp->DoesTargetContainDeltaState( pRawControl );
@@ -833,7 +833,7 @@ void CDmxEdit::ImportCombinationControls( CDmeCombinationOperator *pSrcComboOp, 
 		bool bIsStereo = pSrcComboOp->IsStereoControl( i );
 		ControlIndex_t index = pDstComboOp->FindOrCreateControl( pControlName, bIsStereo );
 		pDstComboOp->SetEyelidControl( index, pSrcComboOp->IsEyelidControl( i ) );
-		for ( int j = 0; j < nRawControls; ++j )
+		for ( intp j = 0; j < nRawControls; ++j )
 		{
 			if ( foundMatch[j] )
 			{
@@ -1215,7 +1215,7 @@ LUA_COMMAND(
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CDmxEdit::GrowSelection( int nSize /* = 1 */ )
+bool CDmxEdit::GrowSelection( intp nSize /* = 1 */ )
 {
 	if ( !m_pMesh )
 		return SetErrorString( "No Mesh" );
@@ -1255,7 +1255,7 @@ LUA_COMMAND(
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CDmxEdit::ShrinkSelection( int nSize /* = 1 */ )
+bool CDmxEdit::ShrinkSelection( intp nSize /* = 1 */ )
 {
 	if ( !m_pMesh )
 		return SetErrorString( "No Mesh" );
@@ -1872,7 +1872,7 @@ LUA_COMMAND(
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CDmxEdit::RemapMaterial( int nMaterialIndex, const char *pNewMaterialName )
+bool CDmxEdit::RemapMaterial( intp nMaterialIndex, const char *pNewMaterialName )
 {
 	return CDmMeshUtils::RemapMaterial( m_pMesh, nMaterialIndex, pNewMaterialName );
 }
@@ -1951,7 +1951,7 @@ LUA_COMMAND(
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CDmxEdit::RemoveFacesWithMoreThanNVerts( int nVertexCount )
+bool CDmxEdit::RemoveFacesWithMoreThanNVerts( intp nVertexCount )
 {
 	CDmMeshUtils::RemoveFacesWithMoreThanNVerts( m_pMesh, nVertexCount );
 
@@ -2098,11 +2098,11 @@ bool CDmxEdit::ComputeWrinkle( const char *pDeltaName, float flScale, const char
 
 	CDmMeshUtils::WrinkleOp wrinkleOp = StringHasPrefix( pOperation, "r" ) ? CDmMeshUtils::kReplace : CDmMeshUtils::kAdd;
 
-	const int nControlCount = pDmeCombo->GetControlCount();
-	for ( int nControlIndex = 0; nControlIndex < nControlCount; ++nControlIndex )
+	const intp nControlCount = pDmeCombo->GetControlCount();
+	for ( intp nControlIndex = 0; nControlIndex < nControlCount; ++nControlIndex )
 	{
-		const int nRawControlCount = pDmeCombo->GetRawControlCount( nControlIndex );
-		for ( int nRawControlIndex = 0; nRawControlIndex < nRawControlCount; ++nRawControlIndex )
+		const intp nRawControlCount = pDmeCombo->GetRawControlCount( nControlIndex );
+		for ( intp nRawControlIndex = 0; nRawControlIndex < nRawControlCount; ++nRawControlIndex )
 		{
 			if ( Q_strcmp( pDeltaName, pDmeCombo->GetRawControlName( nControlIndex, nRawControlIndex ) ) )
 				continue;
