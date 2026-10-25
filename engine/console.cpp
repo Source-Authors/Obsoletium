@@ -466,7 +466,9 @@ Handles cursor positioning, line wrapping, etc
 */
 static bool g_fColorPrintf = false;
 static bool g_bInColorPrint = false;
-extern CThreadLocalInt<> g_bInSpew;
+// dimhotepus: CThreadLocalInt<> -> threadlocal as former asserts on failure
+// which causes recursive spew and stack overflow.
+extern thread_local bool g_bInSpew;
 
 void Con_Printf( const char *fmt, ... );
 

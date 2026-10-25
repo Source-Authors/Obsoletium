@@ -152,31 +152,6 @@ CON_COMMAND( hud_reloadscheme, "Reloads hud layout and animation scripts." )
 	mode->ReloadScheme(true);
 }
 
-#ifndef NDEBUG
-CON_COMMAND_F( crash, "Crash the client. Optional parameter -- type of crash:\n 0: read from 0x0\n 1: write to 0x0", FCVAR_CHEAT )
-{
-	int crashtype = 0;
-	int dummy;
-	if ( args.ArgC() > 1 )
-	{
-		 crashtype = Q_atoi( args[1] );
-	}
-	switch (crashtype)
-	{
-		case 0:
-			dummy = *((volatile int *)nullptr);
-			Msg("Crashed! %d\n", dummy); // keeps dummy from optimizing out
-			break;
-		case 1:
-			*((volatile int *)nullptr) = 42;
-			break;
-		default:
-			Msg("Unknown variety of crash. You have now failed to crash. I hope you're happy.\n");
-			break;
-	}
-}
-#endif  // !NDEBUG
-
 static void __MsgFunc_Rumble( bf_read &msg )
 {
 	unsigned char waveformIndex;

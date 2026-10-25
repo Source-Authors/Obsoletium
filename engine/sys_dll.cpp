@@ -380,7 +380,7 @@ void BuildMinidumpComment( char const *pchSysErrorText, bool bRealCrash );
 		Sys_Printf( "%s\n", text );
 		
 		// dimhotepus: If no minidump we shutdown gracefully.
-		Sys_FatalExit_Internal( bMinidump );
+		Sys_FatalExit_Internal( !bMinidump );
 	}
 
 	bReentry = true;
@@ -419,7 +419,7 @@ void BuildMinidumpComment( char const *pchSysErrorText, bool bRealCrash );
 	host_initialized = false;
 
 	// dimhotepus: If no minidump we shutdown gracefully.
-	Sys_FatalExit_Internal( bMinidump );
+	Sys_FatalExit_Internal( !bMinidump );
 }
 
 //-----------------------------------------------------------------------------
@@ -581,7 +581,8 @@ void Sys_ShutdownAuthentication( void )
 //-----------------------------------------------------------------------------
 // Debug library spew output
 //-----------------------------------------------------------------------------
-CThreadLocalInt<> g_bInSpew;
+// dimhotepus: CThreadLocalInt<> -> threadlocal as former asserts on failure which causes recursive spew and stack overflow.
+thread_local bool g_bInSpew;
 
 #include "tier1/fmtstr.h"
 

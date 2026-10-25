@@ -1936,7 +1936,8 @@ static ConCommand togglevoicerecord("voicerecord_toggle", Host_VoiceToggle_f);
 #endif // SWDS
 
 
-#if defined( STAGING_ONLY )
+// dimhotepus: STAGING_ONLY -> !NDEBUG. Add enhanced crash command support in DEBUG instead of client's one.
+#ifndef NDEBUG
 
 // From Kyle: For the GC we added this so we could call it over and
 //  over until we got the crash reporter fixed.
@@ -1944,6 +1945,7 @@ static ConCommand togglevoicerecord("voicerecord_toggle", Host_VoiceToggle_f);
 // Visual studio optimizes this away unless we disable optimizations.
 #pragma optimize( "", off )
 
+#ifdef _WIN32
 class PureCallBase
 {
 public:
@@ -1960,13 +1962,14 @@ public:
 	}
 };
  
-class PureCallDerived : public PureCallBase
+class PureCallDerived final : public PureCallBase
 {
 public:
 	void PureFunction() override
 	{
 	}
 };
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Force various crashes. useful for testing minidumps.
@@ -1974,9 +1977,16 @@ public:
 //  crash sys_error : Call Sys_Error().
 //  crash hang : Hang.
 //  crash purecall : Call virtual function in ctor.
+//  crash invalidparam : Call CRT function with invalid param.
 //-----------------------------------------------------------------------------
-CON_COMMAND( crash, "[ sys_error | hang | purecall | segfault | minidump ]: Cause the engine to crash." )
-{ 
+#ifdef _WIN32
+	CON_COMMAND( crash,
+		"[ sys_error | hang | purecall | invalidparam | segfault | minidump ]: Cause the engine to crash." )
+#else
+	CON_COMMAND( crash,
+		"[ sys_error | hang | segfault | minidump ]: Cause the engine to crash." )
+#endif
+{
 	if ( cmd_source != src_command )
 		return;
 
@@ -1992,11 +2002,18 @@ CON_COMMAND( crash, "[ sys_error | hang | purecall | segfault | minidump ]: Caus
 			ThreadSleep( 5000 );
 		}
 	}
+#ifdef _WIN32
 	else if ( cmd == "purecall" )
 	{
 		Msg( "Instantiating PureCallDerived_derived...\n" );
 		PureCallDerived derived;
 	}
+	else if ( cmd == "invalidparam" )
+	{
+		Msg( "_memicmp(nullptr, nullptr, 1)...\n" );
+		_memicmp(nullptr, nullptr, 1);
+	}
+#endif
 	else if ( cmd == "sys_error" )
 	{
 		Msg( "Calling Sys_Error...\n" );
@@ -2018,14 +2035,14 @@ CON_COMMAND( crash, "[ sys_error | hang | purecall | segfault | minidump ]: Caus
 	else
 	{
 		Msg( "Segfault...\n" );
-		// dimhotepus: Raise SIGSEGV instead of UB.
-		raise(SIGSEGV);
+		volatile int *p = nullptr;
+		[[maybe_unused]] volatile int v = *p;
 	}
 }
 
 #pragma optimize( "", on )
 
-#endif // STAGING_ONLY
+#endif // !NDEBUG
 
 CON_COMMAND_F( flush, "Flush unlocked cache memory.", FCVAR_CHEAT )
 {
