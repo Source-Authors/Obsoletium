@@ -12,6 +12,9 @@
 #pragma once
 #endif
 
+#include "tier0/commonmacros.h"
+#include "tier1/KeyValues.h"
+
 class CSaveRestoreData;
 
 abstract_class ISaveRestore
