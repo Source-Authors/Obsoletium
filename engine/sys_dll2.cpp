@@ -970,28 +970,46 @@ bool CEngineAPI::Connect( CreateInterfaceFn factory )
 	g_AppSystemFactory = factory;
 
 	if ( !BaseClass::Connect( factory ) )
-		return false;
-
-	g_pFileSystem = g_pFullFileSystem;
-	if ( !g_pFileSystem )
-		return false;
-
-	g_pFileSystem->SetWarningFunc( Warning );
-
-	if ( !Shader_Connect( true ) )
-		return false;
-
-	g_pPhysics = (IPhysics*)factory( VPHYSICS_INTERFACE_VERSION, NULL );
-
-	if ( !g_pStudioRender || !g_pDataCache || !g_pPhysics || !g_pMDLCache || !g_pMatSystemSurface || !g_pInputSystem /* || !g_pVideo */ )
 	{
-		Warning( "Engine wasn't able to acquire required interfaces!\n" );
+		// dimhotepus: Dump warning when base connection fails.
+		Warning( "Unable to connect base tier3 interfaces!" );
 		return false;
 	}
 
-	if (!g_pStudioRender)
+	g_pFileSystem = g_pFullFileSystem;
+	if ( !g_pFileSystem )
 	{
-		Sys_Error( "Unable to init studio render system version %s\n", STUDIO_RENDER_INTERFACE_VERSION );
+		// dimhotepus: Dump warning when file system find fails.
+		Warning( "Unable to find file system interface!" );
+		return false;
+	}
+	g_pFileSystem->SetWarningFunc( Warning );
+
+	if ( !Shader_Connect( true ) )
+	{
+		// dimhotepus: Dump warning when unable to connect shaders.
+		Warning( "Unable to connect shader system!" );
+		return false;
+	}
+
+	g_pPhysics = (IPhysics*)factory( VPHYSICS_INTERFACE_VERSION, NULL );
+	if ( !g_pPhysics)
+	{
+		// dimhotepus: Dump warning when unable to find vphysics.
+		Warning( "Unable to find interface %s!", VPHYSICS_INTERFACE_VERSION );
+		return false;
+	}
+
+	if ( !g_pStudioRender)
+	{
+		// dimhotepus: Dump warning when unable to find studiorender.
+		Warning( "Unable to find interface %s!", STUDIO_RENDER_INTERFACE_VERSION );
+		return false;
+	}
+
+	if ( !g_pDataCache || !g_pMDLCache || !g_pMatSystemSurface || !g_pInputSystem /* || !g_pVideo */ )
+	{
+		Warning( "Engine wasn't able to acquire required interfaces (datacache / mdlcache / materialsystem / inputsystem)!" );
 		return false;
 	}
 
@@ -1003,10 +1021,10 @@ bool CEngineAPI::Connect( CreateInterfaceFn factory )
 	
 	ConnectMDLCacheNotify();
 
-	return true; 
+	return true;
 }
 
-void CEngineAPI::Disconnect() 
+void CEngineAPI::Disconnect()
 {
 	DisconnectMDLCacheNotify();
 
@@ -2185,34 +2203,59 @@ bool CDedicatedServerAPI::Connect( CreateInterfaceFn factory )
 	g_AppSystemFactory = factory;
 
 	if ( !BaseClass::Connect( factory ) )
+	{
+		// dimhotepus: Dump warning when base connection fails.
+		Warning( "Unable to connect base tier3 interfaces!" );
 		return false;
+	}
 
 	dedicated = ( IDedicatedExports * )factory( VENGINE_DEDICATEDEXPORTS_API_VERSION, NULL );
 	if ( !dedicated )
+	{
+		// dimhotepus: Dump warning when no exports.
+		Warning( "Unable to find %s interface!", VENGINE_DEDICATEDEXPORTS_API_VERSION );
 		return false;
+	}
 
 	g_pFileSystem = g_pFullFileSystem;
+	if ( !g_pFileSystem )
+	{
+		// dimhotepus: Dump warning when file system find fails.
+		Warning( "Unable to find file system interface!" );
+		return false;
+	}
 	g_pFileSystem->SetWarningFunc( Warning );
 
 	if ( !Shader_Connect( false ) )
+	{
+		// dimhotepus: Dump warning when unable to connect shaders.
+		Warning( "Unable to connect shader system!" );
 		return false;
+	}
 
 	if ( !g_pStudioRender )
 	{
-		Sys_Error( "Unable to init studio render system version %s\n", STUDIO_RENDER_INTERFACE_VERSION );
+		// dimhotepus: Sys_Error -> Warning
+		Warning( "Unable to find interface %s!", STUDIO_RENDER_INTERFACE_VERSION );
 		return false;
 	}
 
 	g_pPhysics = (IPhysics*)factory( VPHYSICS_INTERFACE_VERSION, NULL );
-
-	if ( !g_pDataCache || !g_pPhysics || !g_pMDLCache )
+	// dimhotepus: Explicitly error about vphysics.
+	if ( !g_pPhysics )
 	{
-		Warning( "Engine wasn't able to acquire required interfaces!\n" );
+		Warning( "Unable to find interface %s!", VPHYSICS_INTERFACE_VERSION );
+		return false;
+	}
+
+	if ( !g_pDataCache || !g_pMDLCache )
+	{
+		Warning( "Engine wasn't able to acquire required interfaces (datacache / mdlcache)!" );
 		return false;
 	}
 
 	ConnectMDLCacheNotify();
-	return true; 
+	return true;
 }
 
 void CDedicatedServerAPI::Disconnect() 
