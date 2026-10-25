@@ -4,9 +4,9 @@
 //
 //=============================================================================//
  
+#include "host_cmd.h"
 #include "tier0/vprof.h"
 #include "server.h"
-#include "host_cmd.h"
 #include "keys.h"
 #include "screen.h"
 #include "vengineserver_impl.h"
