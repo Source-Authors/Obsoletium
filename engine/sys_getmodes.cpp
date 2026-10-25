@@ -1518,7 +1518,7 @@ void CVideoMode_Common::TakeSnapshotPFMRect( const char *pFilename, int x, int y
 
     if( !ImageLoader::ResampleRGB323232F( info ) )
     {
-        Sys_Error( "Can't resample\n" );
+        Sys_Error( "Unable to resample GPU screenshot RGB323232F image.\n" );
     }
 
     if ( !PFMWrite( g_pFullFileSystem, pFloatImage, pFilename, resampleWidth, resampleHeight ) )
@@ -1560,7 +1560,7 @@ void CVideoMode_Common::TakeSnapshotTGARect( const char *pFilename, int x, int y
 
     if( !ImageLoader::ResampleRGBA8888( info ) )
     {
-        Sys_Error( "Can't resample\n" );
+        Sys_Error( "Unable to resample GPU screenshot RGBA8888 image.\n" );
     }
     
     CUtlBuffer outBuf;

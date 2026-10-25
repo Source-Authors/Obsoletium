@@ -188,7 +188,7 @@ void R_LoadWorldGeometry( bool bDXChange )
 			// create the displacement surfaces for the map
 			modelloader->Map_LoadDisplacements( host_state.worldmodel, false );
 			//if( !DispInfo_CreateStaticBuffers( host_state.worldmodel, materialSortInfoArray, false ) )
-			//	Sys_Error( "Can't create static meshes for displacements" );
+			//	Sys_Error( "Can't create static meshes for displacements." );
 			
 			modelloader->Map_SetRenderInfoAllocated( true );
 		}

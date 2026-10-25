@@ -29,7 +29,7 @@ byte COM_BlockSequenceCRCByte( byte *base, int length, int sequence )
 
 	if (sequence < 0)
 	{
-		Sys_Error("sequence < 0, in COM_BlockSequenceCRCByte\n");
+		Sys_Error( "Unable to compute CRC. sequence < 0, in COM_BlockSequenceCRCByte." );
 	}
 
 	CRC32_t entry = CRC32_GetTableEntry( ( sequence + 1 ) % ( 256 * sizeof(CRC32_t) - 4 ) );

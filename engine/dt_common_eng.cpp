@@ -188,7 +188,7 @@ void DataTable_CreateClientTablesFromServerTables()
 {
 	if ( !serverGameDLL )
 	{
-		Sys_Error( "DataTable_CreateClientTablesFromServerTables:  No serverGameDLL loaded!" );
+		Sys_Error( "DataTable_CreateClientTablesFromServerTables: No serverGameDLL loaded!" );
 	}
 
 	ServerClass *pClasses = serverGameDLL->GetAllServerClasses();
@@ -215,7 +215,7 @@ void DataTable_CreateClientClassInfosFromServerClasses( CBaseClientState *pState
 {
 	if ( !serverGameDLL )
 	{
-		Sys_Error( "DataTable_CreateClientClassInfosFromServerClasses:  No serverGameDLL loaded!" );
+		Sys_Error( "DataTable_CreateClientClassInfosFromServerClasses: No serverGameDLL loaded!" );
 	}
 
 	ServerClass *pClasses = serverGameDLL->GetAllServerClasses();

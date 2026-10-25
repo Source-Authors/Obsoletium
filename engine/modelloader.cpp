@@ -102,7 +102,8 @@ static ConVar mod_dynamicloadspew( "mod_dynamicloadspew", "0", FCVAR_HIDDEN | FC
 	if ( destVal != retVal )
 	{
 		AssertMsg( false, "Found a malicious map. Attempted integer overflow bug is present, we're about to shutdown." );
-		Sys_Error( "Map %s is corrupted and cannot be loaded: %s overlow (max %lld > map %d bytes)", mapName, structName, destVal, retVal );
+		Sys_Error( "Map %s is corrupted and cannot be loaded: %s overlow (max %lld > map %d bytes).",
+			mapName, structName, destVal, retVal );
 	}
 
 	return retVal;
@@ -689,7 +690,7 @@ CMapLoadHelper::CMapLoadHelper( int lumpToLoad )
 {
 	if ( lumpToLoad < 0 || lumpToLoad >= HEADER_LUMPS )
 	{
-		Sys_Error( "Can't load lump %d, range is [0...%d]", lumpToLoad, HEADER_LUMPS - 1 );
+		Sys_Error( "Can't load lump %d, range is [0...%d).", lumpToLoad, HEADER_LUMPS );
 	}
 
 	m_szLumpFilename[0] = '\0';
@@ -737,7 +738,7 @@ CMapLoadHelper::CMapLoadHelper( int lumpToLoad )
 	{
 		if ( s_MapFileHandle == FILESYSTEM_INVALID_HANDLE )
 		{
-			Sys_Error( "Can't load map '%s' from invalid file handle", s_szMapName );
+			Sys_Error( "Can't load map '%s' from invalid file handle.", s_szMapName );
 		}
 
 		unsigned nOffsetAlign, nSizeAlign, nBufferAlign;
@@ -756,7 +757,8 @@ CMapLoadHelper::CMapLoadHelper( int lumpToLoad )
 		m_pRawData = (byte *)g_pFileSystem->AllocOptimalReadBuffer( fileToUse, alignedBytesToRead, alignedOffset );
 		if ( !m_pRawData && m_nLumpSize )
 		{
-			Sys_Error( "Can't load map's '%s' lump %d, out of memory when allocating %d bytes", s_szMapName, lumpToLoad, m_nLumpSize + 1 );
+			Sys_Error( "Can't load map's '%s' lump %d, out of memory when allocating %d bytes.",
+				s_szMapName, lumpToLoad, m_nLumpSize + 1 );
 		}
 
 		if ( m_nLumpSize )
@@ -1502,7 +1504,7 @@ static void CalcSurfaceExtents ( CMapLoadHelper& lh, SurfaceHandle_t surfID )
 
 		if ( !(tex->flags & SURF_NOLIGHT) && MSurf_LightmapExtents( surfID, pBrushData )[i] > MSurf_MaxLightmapSizeWithBorder( surfID ) )
 		{
-			Sys_Error ("Bad surface extents on texture %s", tex->material->GetName() );
+			Sys_Error ("Bad surface extents on texture %s.", tex->material->GetName() );
 		}
 	}
 	CheckSurfaceLighting( surfID, pBrushData );
@@ -2329,7 +2331,7 @@ void Mod_LoadCubemapSamples( void )
 	{
 		if ( CommandLine()->HasParm( "-requirecubemaps" ) )
 		{
-			Sys_Error( "Map \"%s\" does not have cubemaps!", lh.GetMapName() );
+			Sys_Error( "Map %s does not have cubemaps!", lh.GetMapName() );
 		}
 
 		ITexture *pTexture;
@@ -3285,7 +3287,7 @@ model_t *CModelLoader::FindModel( const char *pName )
 {
 	if ( !pName || !pName[0] )
 	{
-		Sys_Error( "CModelLoader::FindModel: NULL name" );
+		Sys_Error( "CModelLoader::FindModel: NULL name." );
 	}
 
 	// inline models are grabbed only from worldmodel
@@ -3294,12 +3296,13 @@ model_t *CModelLoader::FindModel( const char *pName )
 		int modelNum = atoi( pName + 1 );
 		if ( !IsWorldModelSet() )
 		{
-			Sys_Error( "bad inline model number %i, worldmodel not yet setup", modelNum );
+			Sys_Error( "Bad inline model number %d, worldmodel not setup yet.", modelNum );
 		}
 
 		if ( modelNum < 1 || modelNum >= GetNumWorldSubmodels() )
 		{
-			Sys_Error( "bad inline model number %i", modelNum );
+			Sys_Error( "Bad inline model number %d not in [1..%d).",
+				modelNum, GetNumWorldSubmodels() );
 		}
 		return &m_InlineModels[modelNum];
 	}
@@ -4539,7 +4542,8 @@ void CModelLoader::SetupSubModels( model_t *mod, CUtlVector<mmodel_t> &list )
 		starmod->brush.firstnode = bm->headnode;
 		if ( starmod->brush.firstnode >= m_worldBrushData.numnodes )
 		{
-			Sys_Error( "Inline model %i has bad firstnode", i );
+			Sys_Error( "Inline model %d has bad firstnode %d >= %d max.",
+				i, starmod->brush.firstnode, m_worldBrushData.numnodes );
 		}
 
 		VectorCopy(bm->maxs, starmod->maxs);

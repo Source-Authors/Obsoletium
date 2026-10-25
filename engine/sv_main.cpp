@@ -586,21 +586,21 @@ void SetupMaxPlayers( int iDesiredMaxPlayers )
 
 		if ( minmaxplayers < 1 )
 		{
-			Sys_Error( "GetPlayerLimits:  min maxplayers must be >= 1 (%i)", minmaxplayers );
+			Sys_Error( "SetupMaxPlayers: min maxplayers %d must be >= 1!", minmaxplayers );
 		}
 		else if ( defaultmaxplayers < 1 )
 		{
-			Sys_Error( "GetPlayerLimits:  default maxplayers must be >= 1 (%i)", minmaxplayers );
+			Sys_Error( "SetupMaxPlayers: default maxplayers %d must be >= 1!", minmaxplayers );
 		}
 
 		if ( minmaxplayers > maxmaxplayers || defaultmaxplayers > maxmaxplayers )
 		{
-			Sys_Error( "GetPlayerLimits:  min maxplayers %i > max %i", minmaxplayers, maxmaxplayers );
+			Sys_Error( "SetupMaxPlayers: min maxplayers %d > max %d!", minmaxplayers, maxmaxplayers );
 		}
 
 		if ( maxmaxplayers > ABSOLUTE_PLAYER_LIMIT )
 		{
-			Sys_Error( "GetPlayerLimits:  max players limited to %i", ABSOLUTE_PLAYER_LIMIT );
+			Sys_Error( "SetupMaxPlayers: max players (%d) are limited to %d!", maxmaxplayers, ABSOLUTE_PLAYER_LIMIT );
 		}
 	}
 
@@ -837,8 +837,8 @@ void SV_InitGameDLL( void )
 	if ( host_state.interval_per_tick < MINIMUM_TICK_INTERVAL ||
 		 host_state.interval_per_tick > MAXIMUM_TICK_INTERVAL )
 	{
-		Sys_Error( "GetTickInterval returned bogus tick interval (%f)[%f to %f is valid range]", host_state.interval_per_tick,
-			MINIMUM_TICK_INTERVAL, MAXIMUM_TICK_INTERVAL );
+		Sys_Error( "GetTickInterval returned bogus tick interval (%f) not in [%f..%f].",
+			host_state.interval_per_tick, MINIMUM_TICK_INTERVAL, MAXIMUM_TICK_INTERVAL );
 	}
 
 	// set maxclients limit based on Mod or commandline settings
@@ -853,12 +853,12 @@ void SV_InitGameDLL( void )
 	{
 		if ( !serverGameDLL->ReplayInit( g_fnReplayFactory ) )
 		{
-			Sys_Error( "Server replay init failed" );
+			Sys_Error( "Server ReplayInit() failed!" );
 		}
 
 		if ( sv.IsDedicated() && !g_pReplay->SV_Init( g_ServerFactory ) )
 		{
-			Sys_Error( "Replay system server init failed!" ); 
+			Sys_Error( "Dedicated server replay system SV_Init() failed!" );
 		}
 	}
 #endif
@@ -1372,7 +1372,7 @@ void SV_ResetPVS( byte* pvs, int pvssize )
 
 	if ( s_FatBytes > pvssize )
 	{
-		Sys_Error( "SV_ResetPVS:  Size %i too big for buffer %i\n", s_FatBytes, pvssize );
+		Sys_Error( "SV_ResetPVS: Size %d too big for buffer %d.", s_FatBytes, pvssize );
 	}
 
 	Q_memset (s_pFatPVS, 0, s_FatBytes);
@@ -2054,7 +2054,8 @@ bool SV_ActivateServer()
 	if ( host_state.interval_per_tick < MINIMUM_TICK_INTERVAL ||
 		host_state.interval_per_tick > MAXIMUM_TICK_INTERVAL )
 	{
-		Sys_Error( "GetTickInterval returned bogus tick interval (%f)[%f to %f is valid range]", host_state.interval_per_tick,
+		Sys_Error( "GetTickInterval returned bogus tick interval (%f) not in [%f..%f].",
+			host_state.interval_per_tick,
 			MINIMUM_TICK_INTERVAL, MAXIMUM_TICK_INTERVAL );
 	}
 

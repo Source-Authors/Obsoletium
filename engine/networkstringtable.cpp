@@ -1314,7 +1314,7 @@ INetworkStringTable *CNetworkStringTableContainer::CreateStringTableEx( const ch
 {
 	if ( !m_bAllowCreation )
 	{
-		Sys_Error( "Tried to create string table '%s' at wrong time\n", tableName );
+		Sys_Error( "Tried to create string table %s at wrong time.", tableName );
 		return NULL;
 	}
 
@@ -1322,13 +1322,13 @@ INetworkStringTable *CNetworkStringTableContainer::CreateStringTableEx( const ch
 
 	if ( pTable != NULL )
 	{
-		Sys_Error( "Tried to create string table '%s' twice\n", tableName );
+		Sys_Error( "Tried to create string table %s twice.", tableName );
 		return NULL;
 	}
 
 	if ( m_Tables.Count() >= MAX_TABLES )
 	{
-		Sys_Error( "Only %i string tables allowed, can't create'%s'", MAX_TABLES, tableName);
+		Sys_Error( "Only %d string tables allowed, can't create %s.", MAX_TABLES, tableName);
 		return NULL;
 	}
 

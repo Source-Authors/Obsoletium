@@ -1732,10 +1732,10 @@ bool ClientDLL_Load()
 			g_bClientGameDLLGreaterThanV13 = false;
 			if ( !g_ClientDLL )
 			{
-				Sys_Error( "Could not get " "client" DLL_EXT_STRING " interface from library client" );
+				Sys_Error( "Could not get %s interface from client" DLL_EXT_STRING ".", CLIENT_DLL_INTERFACE_VERSION );
 			}
 
-			if( g_pSourceVR )
+			if ( g_pSourceVR )
 			{
 				g_pClientVR = (IClientVirtualReality *)g_ClientFactory( CLIENTVIRTUALREALITY_INTERFACE_VERSION, NULL );
 				if( !g_pClientVR )
@@ -1746,7 +1746,7 @@ bool ClientDLL_Load()
 		}
 		else
 		{
-			Sys_Error( "Could not find factory interface in library client" );
+			Sys_Error( "Could not find %s factory function in client" DLL_EXT_STRING ".", CREATEINTERFACE_PROCNAME );
 		}
 	}
 	else
@@ -1756,7 +1756,7 @@ bool ClientDLL_Load()
 			Steam3Client().SteamApps()->MarkContentCorrupt( true );
 
 		// library failed to load
-		Sys_Error( "Could not load client" DLL_EXT_STRING " library. Try restarting. If that doesn't work, verify the cache." );
+		Sys_Error( "Could not load client" DLL_EXT_STRING ". Try restarting. If that doesn't work, verify the cache." );
 	}
 
 	// Load the client render targets interface from the client .dll
@@ -1846,7 +1846,7 @@ void ClientDLL_Init( void )
 
 		if ( !g_ClientDLL->Init(g_AppSystemFactory, g_AppSystemFactory, &g_ClientGlobalVariables ) )
 		{
-			Sys_Error("Client" DLL_EXT_STRING " Init() in library client failed.");
+			Sys_Error( "Failed %s Init() in client" DLL_EXT_STRING ".", CLIENT_DLL_INTERFACE_VERSION );
 		}
 
 		if ( g_ClientFactory )
@@ -1854,23 +1854,23 @@ void ClientDLL_Init( void )
 			COM_TimestampedLog( "g_pClientSidePrediction->Init" );
 
 			// Load the prediction interface from the client .dll
-			g_pClientSidePrediction = (IPrediction *)g_ClientFactory( VCLIENT_PREDICTION_INTERFACE_VERSION, NULL );
+			g_pClientSidePrediction = ( IPrediction * )g_ClientFactory( VCLIENT_PREDICTION_INTERFACE_VERSION, NULL );
 			if ( !g_pClientSidePrediction )
 			{
-				Sys_Error( "Could not get IPrediction interface from library client" );
+				Sys_Error( "Could not get %s interface from client" DLL_EXT_STRING ".", VCLIENT_PREDICTION_INTERFACE_VERSION );
 			}
 			g_pClientSidePrediction->Init();
 
-			entitylist = ( IClientEntityList  *)g_ClientFactory( VCLIENTENTITYLIST_INTERFACE_VERSION, NULL );
+			entitylist = ( IClientEntityList *)g_ClientFactory( VCLIENTENTITYLIST_INTERFACE_VERSION, NULL );
 			if ( !entitylist )
 			{
-				Sys_Error( "Could not get client entity list interface from library client" );
+				Sys_Error( "Could not get %s interface from client" DLL_EXT_STRING ".", VCLIENTENTITYLIST_INTERFACE_VERSION );
 			}
 
 			centerprint = ( ICenterPrint * )g_ClientFactory( VCENTERPRINT_INTERFACE_VERSION, NULL );
 			if ( !centerprint )
 			{
-				Sys_Error( "Could not get center print interface from library client" );
+				Sys_Error( "Could not get %s interface from client" DLL_EXT_STRING ".", VCENTERPRINT_INTERFACE_VERSION );
 			}
 
 			clientleafsystem = ( IClientLeafSystemEngine *)g_ClientFactory( CLIENTLEAFSYSTEM_INTERFACE_VERSION, NULL );
@@ -1883,7 +1883,8 @@ void ClientDLL_Init( void )
 				clientleafsystem = ( IClientLeafSystemEngine *)g_ClientFactory( CLIENTLEAFSYSTEM_INTERFACE_VERSION_1, NULL );
 				if ( !clientleafsystem )
 				{
-					Sys_Error( "Could not get client leaf system interface from library client" );
+					Sys_Error( "Could not get any of %s or %s interfaces from client" DLL_EXT_STRING ".",
+						CLIENTLEAFSYSTEM_INTERFACE_VERSION_1, CLIENTLEAFSYSTEM_INTERFACE_VERSION );
 				}
 				else
 				{
@@ -1897,32 +1898,32 @@ void ClientDLL_Init( void )
 				// Replay dll should be loaded by this point
 				if ( !g_pReplay )
 				{
-					Sys_Error( "Replay" DLL_EXT_STRING " was not loaded" );
+					Sys_Error( "%s interface is not found or related module already unloaded.", REPLAY_INTERFACE_VERSION );
 				}
 
 				// Get pointer to client-side replay interface implementation
 				g_pClientReplay = (IClientReplay *)g_ClientFactory( CLIENT_REPLAY_INTERFACE_VERSION, NULL );
 				if ( !g_pClientReplay )
 				{
-					Sys_Error( "Could not get the replay interface from library client" );
+					Sys_Error( "Could not get the %s interface from client" DLL_EXT_STRING ".", CLIENT_REPLAY_INTERFACE_VERSION );
 				}
 
 				// Allow the client dll to setup pointers to replay interfaces
 				extern CreateInterfaceFn g_fnReplayFactory;
 				if ( !g_ClientDLL->ReplayInit( g_fnReplayFactory ) )
 				{
-					Sys_Error( "Client ReplayInit() failed!" );
+					Sys_Error( "ReplayInit() failed in client" DLL_EXT_STRING "!" );
 				}
 
 				// Allow the replay dll to setup pointers to client interfaces
 				if ( !g_pReplay->CL_Init( g_ClientFactory ) )
 				{
-					Sys_Error( "Replay system ClientInit() failed" );
+					Sys_Error( "Replay system CL_Init() failed!" );
 				}
 
 				if ( !g_ClientDLL->ReplayPostInit() )
 				{
-					Sys_Error( "Client ReplayPostInit() failed!" );
+					Sys_Error( "ReplayPostInit() failed in client" DLL_EXT_STRING "!" );
 				}
 
 #if !defined( DEDICATED )
@@ -1947,7 +1948,8 @@ void ClientDLL_Init( void )
 
 		if ( g_pMaterialSystemHardwareConfig && g_pMaterialSystemHardwareConfig->GetDXSupportLevel() < 80 )
 		{
-			Sys_Error( "Your GPU must support at least pixel shader version 1.1 to run this game!" );
+			Sys_Error( "Sorry, your GPU must support pixel shader version 1.1 or greater.\n\n"
+				"Try to set '+mat_dxlevel 80' in command line and restart." );
 		}
 	}
 

@@ -564,20 +564,22 @@ void CEngineVGui::Init()
 	m_GameUIFactory = Sys_GetFactory(m_hStaticGameUIModule);
 	if ( !m_GameUIFactory )
 	{
-		Error( "Could not load %s. Try restarting. If that doesn't work, verify the cache.\n", szDllName );
+		// dimhotepus: Error -> Sys_Error.
+		Sys_Error( "Could not load %s. Try restarting. If that doesn't work, verify the cache.", szDllName );
 	}
 	
 	// get the initialization func
 	staticGameUIFuncs = (IGameUI *)m_GameUIFactory(GAMEUI_INTERFACE_VERSION, NULL);
 	if (!staticGameUIFuncs )
 	{
-		Error( "Could not get IGameUI interface %s from %s.\n", GAMEUI_INTERFACE_VERSION, szDllName );
+		// dimhotepus: Error -> Sys_Error.
+		Sys_Error( "Could not get %s interface from %s.", GAMEUI_INTERFACE_VERSION, szDllName );
 	}
 
 	staticGameConsole = (IGameConsole *)m_GameUIFactory(GAMECONSOLE_INTERFACE_VERSION, NULL);
 	if ( !staticGameConsole )
 	{
-		Sys_Error( "Could not get IGameConsole interface %s from %s.\n", GAMECONSOLE_INTERFACE_VERSION, szDllName );
+		Sys_Error( "Could not get %s interface from %s.", GAMECONSOLE_INTERFACE_VERSION, szDllName );
 	}
 
 	vgui::VGui_InitMatSysInterfacesList( m_UiModuleName, &g_AppSystemFactory, 1 );
@@ -600,7 +602,7 @@ void CEngineVGui::Init()
 	constexpr char pStr[]{"Resource/SourceScheme.res"};
 	if ( !vgui::scheme()->LoadSchemeFromFile( pStr, "Tracker" ))
 	{
-		Sys_Error( "Error loading file %s.\n", pStr );
+		Sys_Error( "Unable to load required VGUI scheme file %s.", pStr );
 		return;
 	}
 

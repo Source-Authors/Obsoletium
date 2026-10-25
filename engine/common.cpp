@@ -716,7 +716,7 @@ byte *COM_LoadFile (IN_Z const char *path, int usehunk, int *pLength)
 		buf = (byte *)malloc(bufSize);  // YWB:  FIXME, this is evil.
 		break;
 	default:
-		Sys_Error ("COM_LoadFile: bad usehunk");
+		Sys_Error ("COM_LoadFile: bad usehunk %d.", usehunk);
 	}
 
 	if ( !buf )

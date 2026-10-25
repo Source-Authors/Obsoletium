@@ -52,12 +52,12 @@ static void Shader_ConnectOtherMatSysInterfaces( )
 	if ( !g_pMaterialSystemHardwareConfig )
 	{
 		Shader_Disconnect();
-		Sys_Error( "Could not get the material system hardware config interface! (2)" );
+		Sys_Error( "Could not get the material system hardware config interface!" );
 	}
 	if ( !g_pMaterialSystemDebugTextureInfo )
 	{
 		Shader_Disconnect();
-		Sys_Error( "Could not get the debug texture info interface!" );
+		Sys_Error( "Could not get the material system debug texture info interface!" );
 	}
 }
 

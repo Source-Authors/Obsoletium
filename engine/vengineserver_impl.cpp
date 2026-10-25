@@ -189,7 +189,7 @@ public:
 	{
 		if ( !s1 )
 		{
-			Sys_Error( "CVEngineServer::Changelevel with NULL s1\n" );
+			Sys_Error( "CVEngineServer::Changelevel with NULL s1." );
 		}
 
 		char cmd[ 256 ];
@@ -214,7 +214,7 @@ public:
 
 		if ( !cmdLen || cmdLen >= static_cast<int>(sizeof( cmd )) )
 		{
-			Warning( "Paramter overflow in ChangeLevel\n" );
+			Warning( "Parameter overflow in ChangeLevel\n" );
 			return;
 		}
 
@@ -383,7 +383,8 @@ public:
 		{
 			if ( outputpvslength < length )
 			{
-				Sys_Error( "GetPVSForOrigin called with inusfficient sized pvs array, need %i bytes!", length );
+				Sys_Error( "GetPVSForOrigin: Called with insufficiently sized pvs array (%d), need %d bytes!",
+					outputpvslength, length );
 				return length;
 			}
 			
@@ -410,7 +411,7 @@ public:
 		int offset = clusterIndex>>3;
 		if ( offset > checkpvssize )
 		{
-			Sys_Error( "CheckOriginInPVS:  cluster would read past end of pvs data (%i:%i)\n",
+			Sys_Error( "CheckOriginInPVS: Cluster offset (%d) would read past end of pvs data (%d).",
 				offset, checkpvssize );
 			return false;
 		}
@@ -574,7 +575,7 @@ public:
 		int index = (int) ( pEdict - sv.edicts );
 		if ( index < 0 || index > sv.max_edicts )
 		{
-			Sys_Error( "Bad entity in IndexOfEdict() index %i pEdict %p sv.edicts %p\n",
+			Sys_Error( "Bad entity in IndexOfEdict() index %d pEdict %p sv.edicts %p.",
 				index, pEdict, sv.edicts );
 		}
 		
@@ -744,7 +745,7 @@ public:
 			 // write into signon buffer
 			if ( !sndmsg.WriteToBuffer( sv.m_Signon ) )
 			{
-				Sys_Error( "EmitAmbientSound: Init message would overflow signon buffer!\n" );
+				Sys_Error( "EmitAmbientSound: Init message would overflow signon buffer!" );
 				return;
 			}
 		}
@@ -793,7 +794,7 @@ public:
 	{
 		if ( !name )
 		{
-			Sys_Error( "SentenceGroupPick with NULL name\n" );
+			Sys_Error( "SentenceGroupPick with NULL name!" );
 		}
 		
 		Assert( nameLen > 0 );
@@ -806,7 +807,7 @@ public:
 	{
 		if ( !name )
 		{
-			Sys_Error( "SentenceGroupPickSequential with NULL name\n" );
+			Sys_Error( "SentenceGroupPickSequential with NULL name!" );
 		}
 		
 		Assert( nameLen > 0 );
@@ -818,7 +819,7 @@ public:
 	{
 		if ( !pSentenceName )
 		{
-			Sys_Error( "SentenceIndexFromName with NULL pSentenceName\n" );
+			Sys_Error( "SentenceIndexFromName with NULL pSentenceName!" );
 		}
 		
 		int sentenceIndex = -1;
@@ -838,7 +839,7 @@ public:
 	{
 		if ( !pGroupName )
 		{
-			Sys_Error( "SentenceGroupIndexFromName with NULL pGroupName\n" );
+			Sys_Error( "SentenceGroupIndexFromName with NULL pGroupName!" );
 		}
 		
 		return VOX_GroupIndexFromName( pGroupName );
@@ -874,7 +875,7 @@ public:
 	{
 		if ( !str )
 		{
-			Sys_Error( "ServerCommand with NULL string\n" );
+			Sys_Error( "ServerCommand with NULL string!" );
 		}
 		if ( ValidCmd( str ) )
 		{
@@ -971,7 +972,7 @@ public:
 	{
 		if ( !val )
 		{
-			Sys_Error( "LightStyle with NULL value!\n" );
+			Sys_Error( "LightStyle with NULL value!" );
 		}
 
 		// change the string in string table
@@ -1018,7 +1019,7 @@ public:
 	{
 		if ( s_MsgData.started )
 		{
-			Sys_Error( "EntityMessageBegin:  New message started before matching call to EndMessage.\n " );
+			Sys_Error( "EntityMessageBegin: New message started before matching call to EndMessage." );
 			return NULL;
 		}
 		
@@ -1044,7 +1045,7 @@ public:
 	{
 		if ( s_MsgData.started )
 		{
-			Sys_Error( "UserMessageBegin:  New message started before matching call to EndMessage.\n " );
+			Sys_Error( "UserMessageBegin: New message started before matching call to EndMessage." );
 			return NULL;
 		}
 		
@@ -1126,7 +1127,7 @@ public:
 	{
 		if ( !s_MsgData.started )
 		{
-			Sys_Error( "MESSAGE_END called with no active message\n" );
+			Sys_Error( "MessageEnd called with no active message." );
 			return;
 		}
 		
@@ -1485,7 +1486,7 @@ public:
 	{
 		if ( !str )
 		{
-			Sys_Error( "InsertServerCommand with NULL string\n" );
+			Sys_Error( "InsertServerCommand with NULL string." );
 		}
 		if ( ValidCmd( str ) )
 		{

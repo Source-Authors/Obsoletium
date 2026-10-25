@@ -674,7 +674,7 @@ void R_DecalUnlink( decal_t *pdecal, worldbrushdata_t *pData )
 		{
 			tmp = MSurf_DecalPointer( pdecal->surfID );
 			if ( !tmp )
-				Sys_Error("Bad decal list");
+				Sys_Error( "No required decals list for surface 0x%p!", pdecal->surfID );
 			while ( tmp->pnext ) 
 			{
 				if ( tmp->pnext == pdecal ) 

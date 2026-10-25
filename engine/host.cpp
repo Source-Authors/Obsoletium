@@ -472,7 +472,7 @@ static inline void CheckHeap( bool bEnabled, const char *pszFunction )
 
 	if ( _heapchk() != _HEAPOK )
 	{
-		Sys_Error( "%s:  _heapchk() != _HEAPOK\n", pszFunction );
+		Sys_Error( "%s: _heapchk() != _HEAPOK.", pszFunction );
 	}
 }
 #endif
@@ -707,7 +707,7 @@ void Host_EndGame (bool bShowMainMenu, PRINTF_FORMAT_STRING const char *message,
 
 	if ( sv.IsDedicated() )
 	{
-		Sys_Error ("Host_EndGame: %s\n",string);	// dedicated servers exit
+		Sys_Error ("Host_EndGame: %s.", string);	// dedicated servers exit
 		return;
 	}
 
@@ -762,7 +762,7 @@ void Host_Error ( PRINTF_FORMAT_STRING const char *error, ...) FMTFUNCTION( 1, 2
 	if ( sv.IsDedicated() )
 	{
 		// dedicated servers just exit
-		Sys_Error( "Host_Error: %s\n", string );
+		Sys_Error( "Host_Error: %s.", string );
 		return;
 	}
 
@@ -1182,7 +1182,7 @@ void Host_ReadConfiguration()
 	// Rebind keys and set cvars
 	if ( !g_pFileSystem )
 	{
-		Sys_Error( "Host_ReadConfiguration:  g_pFileSystem == NULL\n" );
+		Sys_Error( "Host_ReadConfiguration: g_pFileSystem == NULL." );
 	}
 
 	bool saveconfig = false;
@@ -1699,7 +1699,7 @@ void Host_BuildConVarUpdateMessage( NET_SetConVar *cvarMsg, int flags, bool nonD
 	// Too many to send, error out and have mod author get a clue.
 	if ( count > 255 )
 	{
-		Sys_Error( "Engine only supports 255 ConVars marked %i\n", flags );
+		Sys_Error( "Engine only supports <= 255 ConVars marked with 0x%x flags!", flags );
 		return;
 	}
 

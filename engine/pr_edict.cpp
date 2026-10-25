@@ -210,8 +210,8 @@ edict_t *ED_Alloc( int iForceEdictIndex )
 		SpewEdicts(); // Log the entities we have before we die
 
 		if ( sv.max_edicts == 0 )
-			Sys_Error( "ED_Alloc: No edicts yet" );
-		Sys_Error ("ED_Alloc: no free edicts");
+			Sys_Error( "ED_Alloc: No edicts yet." );
+		Sys_Error ("ED_Alloc: no free edicts. All %d taken.", sv.max_edicts);
 	}
 
 	// Do this before clearing since clear now needs to call back into the edict to deduce the index so can get the changeinfo data in the parallel structure
@@ -332,16 +332,17 @@ int NUM_FOR_EDICT(const edict_t *e)
 {
 	if ( &sv.edicts[e->m_EdictIndex] == e ) // NOTE: old server.dll may stomp m_EdictIndex
 		return e->m_EdictIndex;
-	int index = e - sv.edicts;
-	if ( (unsigned int) index >= (unsigned int) sv.num_edicts )
-		Sys_Error ("NUM_FOR_EDICT: bad pointer");
+	intp index = e - sv.edicts;
+	if ( (uintp) index >= (uintp) sv.num_edicts )
+		Sys_Error ("NUM_FOR_EDICT: Bad edict number %zd not in range [0..%d).",
+			index, sv.num_edicts);
 	return index;
 }
 
 edict_t *EDICT_NUM(int n)
 {
 	if ((unsigned int) n >= (unsigned int) sv.max_edicts)
-		Sys_Error ("EDICT_NUM: bad number %i", n);
+		Sys_Error ("EDICT_NUM: Bad edict number %d not in range [0..%d).", n, sv.num_edicts);
 	return &sv.edicts[n];
 }
 
@@ -350,9 +351,10 @@ static inline int NUM_FOR_EDICTINFO(const edict_t *e)
 {
 	if ( &sv.edicts[e->m_EdictIndex] == e ) // NOTE: old server.dll may stomp m_EdictIndex
 		return e->m_EdictIndex;
-	int index = e - sv.edicts;
-	if ( (unsigned int) index >= (unsigned int) sv.max_edicts )
-		Sys_Error ("NUM_FOR_EDICTINFO: bad pointer");
+	intp index = e - sv.edicts;
+	if ( (uintp) index >= (uintp) sv.max_edicts )
+		Sys_Error ("NUM_FOR_EDICTINFO: bad edict number %zd not in range [0..%d).",
+			index, sv.num_edicts);
 	return index;
 }
 

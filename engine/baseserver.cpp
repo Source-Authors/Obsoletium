@@ -2141,7 +2141,7 @@ void CBaseServer::BroadcastMessage( INetMessage &msg, IRecipientFilter &filter )
 		
 		if ( !msg.WriteToBuffer( m_Signon ) )
 		{
-			Sys_Error( "SV_BroadcastMessage: Init message would overflow signon buffer!\n" );
+			Sys_Error( "SV_BroadcastMessage: Init message would overflow signon buffer!" );
 			return;
 		}
 	}

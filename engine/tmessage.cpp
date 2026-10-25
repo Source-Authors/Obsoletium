@@ -383,7 +383,8 @@ void TextMessageParse( byte *pMemFile, int fileSize )
 	{
 		if(messageCount>=MAX_MESSAGES)
 		{
-			Sys_Error("tmessage::TextMessageParse : messageCount>=MAX_MESSAGES");
+			Sys_Error("tmessage::TextMessageParse: messageCount (%d) >= MAX_MESSAGES (%d).",
+				messageCount, MAX_MESSAGES);
 		}
 
 		TrimSpace( buf, trim );

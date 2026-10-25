@@ -74,7 +74,7 @@ static void PlaneList( int leafIndex, model_t *model, CUtlVector<cplane_t> &plan
 {
 	// dimhotepus: Check leafs is not nullptr as it is dereferenced below.
 	if (!model || !model->brush.pShared || !model->brush.pShared->leafs)
-		Sys_Error ("PlaneList: bad model");
+		Sys_Error ("PlaneList: Bad model, either NULL, not shared or has no leafs.");
 
 	mleaf_t *pLeaf = &model->brush.pShared->leafs[leafIndex];
 	mnode_t *pNode = pLeaf->parent;

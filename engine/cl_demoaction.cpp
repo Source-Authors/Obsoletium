@@ -181,7 +181,8 @@ void CBaseDemoAction::AddFactory( DEMOACTION actionType, DEMOACTIONFACTORY_FUNC 
 	int idx = (int)actionType;
 	if ( idx < 0 || idx >= NUM_DEMO_ACTIONS )
 	{
-		Sys_Error( "CBaseDemoAction::AddFactory: Bogus factory type %i\n", idx );
+		// dimhotepus: Sys_Error -> Warning.
+		Warning( "CBaseDemoAction::AddFactory: Bogus factory type %i.", idx );
 		return;
 	}
 
@@ -197,7 +198,8 @@ CBaseDemoAction	*CBaseDemoAction::CreateDemoAction( DEMOACTION actionType )
 	int idx = (int)actionType;
 	if ( idx < 0 || idx >= NUM_DEMO_ACTIONS )
 	{
-		Sys_Error( "CBaseDemoAction::AddFactory: Bogus factory type %i\n", idx );
+		// dimhotepus: Sys_Error -> Warning.
+		Warning( "CBaseDemoAction::AddFactory: Bogus factory type %i.", idx );
 		return NULL;
 	}
 
@@ -222,7 +224,8 @@ void CBaseDemoAction::AddEditorFactory( DEMOACTION actionType, DEMOACTIONEDIT_FU
 	int idx = (int)actionType;
 	if ( idx < 0 || idx >= NUM_DEMO_ACTIONS )
 	{
-		Sys_Error( "CBaseDemoAction::AddEditorFactory: Bogus factory type %i\n", idx );
+		// dimhotepus: Sys_Error -> Warning.
+		Warning( "CBaseDemoAction::AddEditorFactory: Bogus factory type %i.", idx );
 		return;
 	}
 
@@ -242,7 +245,8 @@ CBaseActionEditDialog *CBaseDemoAction::CreateActionEditor( DEMOACTION actionTyp
 	int idx = (int)actionType;
 	if ( idx < 0 || idx >= NUM_DEMO_ACTIONS )
 	{
-		Sys_Error( "CBaseDemoAction::AddFactory: Bogus factory type %i\n", idx );
+		// dimhotepus: Sys_Error -> Warning.
+		Warning( "CBaseDemoAction::AddFactory: Bogus factory type %i.", idx );
 		return NULL;
 	}
 

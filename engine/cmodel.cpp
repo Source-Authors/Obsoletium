@@ -158,12 +158,13 @@ cmodel_t *CM_InlineModel( const char *name )
 
 	// check for valid name
 	if( name[0] != '*' )
-		Sys_Error( "CM_InlineModel: bad model name!" );
+		Sys_Error( "CM_InlineModel: Bad model name %s!", name );
 
 	// check for valid model
 	int ndxModel = atoi( name + 1 );
 	if( ( ndxModel < 1 ) || ( ndxModel >= GetCollisionBSPData()->numcmodels ) )
-		Sys_Error( "CM_InlineModel: bad model number!" );
+		Sys_Error( "CM_InlineModel: Bad model number %d not in [1..%d)!",
+			ndxModel, GetCollisionBSPData()->numcmodels );
 
 	return CM_InlineModelNumber( ndxModel );
 }
@@ -2257,7 +2258,7 @@ const byte *CM_Vis( byte *dest, int destlen, int cluster, int visType )
 
 	if ( !dest || visType > DVIS_PAS || visType < DVIS_PVS )
 	{
-		Sys_Error( "CM_Vis: Vis type %d is unknown", visType );
+		Sys_Error( "CM_Vis: Vis type %d is unknown.", visType );
 		return NULL;
 	}
 
@@ -2266,7 +2267,7 @@ const byte *CM_Vis( byte *dest, int destlen, int cluster, int visType )
 		int len = (pBSPData->numclusters+7)>>3;
 		if ( len > destlen )
 		{
-			Sys_Error( "CM_Vis:  buffer not big enough (%i but need %i)\n",
+			Sys_Error( "CM_Vis: Buffer not big enough (%d but need %d).",
 				destlen, len );
 		}
 		memset( dest, 0, (pBSPData->numclusters+7)>>3 );
@@ -2308,7 +2309,8 @@ void FloodArea_r (CCollisionBSPData *pBSPData, carea_t *area, int floodnum)
 	{
 		if (area->floodnum == floodnum)
 			return;
-		Sys_Error( "FloodArea_r: reflooded");
+		Sys_Error( "FloodArea_r: reflooded, areas floodnums %d != %d so not connected.",
+			area->floodnum, floodnum );
 	}
 
 	area->floodnum = floodnum;
@@ -2360,7 +2362,8 @@ void CM_SetAreaPortalState( int portalnum, int isOpen )
 	// Portalnums in the BSP file are 1-based instead of 0-based
 	if (portalnum > pBSPData->numareaportals)
 	{
-		Sys_Error( "portalnum > numareaportals");
+		Sys_Error( "Unable to get portal: portalnum (%d) > numareaportals (%d).",
+			portalnum, pBSPData->numareaportals );
 	}
 
 	pBSPData->portalopen[portalnum] = (isOpen != 0);
@@ -2379,7 +2382,8 @@ void CM_SetAreaPortalStates( const int *portalnums, const int *isOpen, int nPort
 	{
 		// Portalnums in the BSP file are 1-based instead of 0-based
 		if (portalnums[i] > pBSPData->numareaportals)
-			Sys_Error( "portalnum > numareaportals");
+			Sys_Error( "Unable to get portal: portalnum (%d) > numareaportals (%d).",
+				portalnums[i], pBSPData->numareaportals );
 
 		pBSPData->portalopen[portalnums[i]] = (isOpen[i] != 0);
 	}
@@ -2397,7 +2401,9 @@ bool	CM_AreasConnected (int area1, int area2)
 
 	if (area1 >= pBSPData->numareas || area2 >= pBSPData->numareas)
 	{
-		Sys_Error( "area(1==%i, 2==%i) >= numareas (%i):  Check if engine->ResetPVS() was called from ClientSetupVisibility", area1, area2,  pBSPData->numareas );
+		Sys_Error( "area 1 (%d) or area 2 (%d) >= numareas (%d).\n\n"
+			"Check if engine->ResetPVS() was called from ClientSetupVisibility.",
+			area1, area2, pBSPData->numareas );
 	}
 
 	return (pBSPData->map_areas[area1].floodnum == pBSPData->map_areas[area2].floodnum);
@@ -2434,7 +2440,7 @@ int CM_WriteAreaBits ( byte *buffer, int buflen, int area )
 	{
 		if ( buflen < 32 )
 		{
-			Sys_Error( "CM_WriteAreaBits with buffer size < 32\n" );
+			Sys_Error( "CM_WriteAreaBits with buffer size (%d) < 32.", buflen );
 		}
 
 		Q_memset( buffer, 0, 32 );
@@ -2545,7 +2551,7 @@ int	CM_BoxVisible( const Vector& mins, const Vector& maxs, const byte *visbits, 
 
 		if ( offset > vissize || offset < 0 )
 		{
-			Sys_Error( "CM_BoxVisible:  cluster %i, offset %i out of bounds %i\n", cluster, offset, vissize );
+			Sys_Error( "CM_BoxVisible: Cluster %d, offset %d out of bounds %d!", cluster, offset, vissize );
 		}
 
 		if (visbits[cluster>>3] & (1<<(cluster&7)))

@@ -2469,7 +2469,7 @@ static bool OpenSocketInternal( intp nModule, int nSetPort, int nDefaultPort, co
 	}
 	else
 	{
-		Sys_Error( "Unrecognized protocol type %d", nProtocol );
+		Sys_Error( "Unrecognized protocol type %d. Only TCP and UDP are supported.", nProtocol );
 		return false;
 	}
 

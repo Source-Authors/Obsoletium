@@ -224,8 +224,9 @@ const char *Sys_FindFirst(const char *path, char *basename, int namelength )
 {
 	if (g_hfind != FILESYSTEM_INVALID_FIND_HANDLE)
 	{
-		Sys_Error ("Sys_FindFirst without close");
-		g_pFileSystem->FindClose(g_hfind);	
+		// dimhotepus: Sys_Error -> Warning.
+		Warning("Sys_FindFirst(%s) without closing old find handle!", path);
+		g_pFileSystem->FindClose(g_hfind);
 	}
 
 	const char* psz = g_pFileSystem->FindFirst(path, &g_hfind);
@@ -244,7 +245,8 @@ const char *Sys_FindFirstEx( const char *pWildcard, const char *pPathID, char *b
 {
 	if (g_hfind != FILESYSTEM_INVALID_FIND_HANDLE)
 	{
-		Sys_Error ("Sys_FindFirst without close");
+		// dimhotepus: Sys_Error -> Warning.
+		Warning("Sys_FindFirst(%s, %s) without closing old find handle!", pWildcard, pPathID);
 		g_pFileSystem->FindClose(g_hfind);
 	}
 
@@ -524,7 +526,8 @@ void Sys_InitMemory()
 
 	if ( host_parms.memsize < ONE_HUNDRED_TWENTY_EIGHT_MIB )
 	{
-		Sys_Error( "Host available memory %s is less than %s.\n",
+		Sys_Error( "Host available memory %s is less than required %s.\n\n"
+			"Please close other apps and try again.",
 			Q_pretifymem( host_parms.memsize, 2, true ),
 			Q_pretifymem( ONE_HUNDRED_TWENTY_EIGHT_MIB, 2, true ) );
 	}
