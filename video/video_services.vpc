@@ -5,8 +5,8 @@
 //  Created by: 		Matt Pritchard
 //
 //  Description:		Centralized & abstracted cross-platform video services
-//                      Provides a central interface where the game can 
-//                      handle video requests and query video capabilities
+//						Provides a central interface where the game can 
+//						handle video requests and query video capabilities
 // 
 //-----------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ $Configuration
 	$Linker
 	{
 		$AdditionalDependencies				"$BASE User32.lib" [$WINDOWS]
-		$SystemLibraries                    "iconv" [$OSXALL]
+		$SystemLibraries					"iconv" [$OSXALL]
 		$SystemFrameworks					"Carbon" [$OSXALL]
 	}
 }
@@ -42,9 +42,9 @@ $Project "video_services"
 
 	$Folder	"Header Files"
 	{
-		$file   "video_macros.h"
+		$file	"video_macros.h"
 		$file	"videoservices.h"
-		$file   "videosubsystem.h"
+		$file	"videosubsystem.h"
 	}
 
 	$Folder	"Interface"

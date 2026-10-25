@@ -50,26 +50,6 @@ $Configuration
 	}
 }
 
-
-$Configuration  "Debug"
-{
-		$General
-		{
-				$OutputDirectory			"Debug_Video_Bink"
-				$IntermediateDirectory		"Debug_Video_Bink"
-		}
-}
-
-$Configuration  "Release"
-{
-		$General
-		{
-				$OutputDirectory			"Release_Video_Bink"
-				$IntermediateDirectory		"Release_Video_Bink"
-		}
-}
-
-
 $Project "video_bink"
 {
 	$Folder	"Source Files"	[$WINDOWS]
