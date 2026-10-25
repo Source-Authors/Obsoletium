@@ -29,9 +29,11 @@ class ScopedBreakpadHandler::Impl final {
             nullptr,
             // Exception, invalid parameter and pure call.
             google_breakpad::ExceptionHandler::HANDLER_ALL,
-            static_cast<MINIDUMP_TYPE>(MiniDumpNormal | MiniDumpWithDataSegs |
-                                       MiniDumpWithThreadInfo |
-                                       MiniDumpWithIndirectlyReferencedMemory),
+            static_cast<MINIDUMP_TYPE>(
+                MiniDumpNormal | MiniDumpWithDataSegs | MiniDumpWithHandleData |
+                MiniDumpWithThreadInfo | MiniDumpWithProcessThreadData |
+                MiniDumpWithUnloadedModules |
+                MiniDumpWithIndirectlyReferencedMemory),
             L"", nullptr}
 #elif defined(_LINUX)
         minidump_descriptor_{dump_path},
