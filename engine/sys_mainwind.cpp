@@ -1053,7 +1053,7 @@ static LRESULT WINAPI HLEngineWindowProc( HWND hWnd, UINT uMsg, WPARAM  wParam, 
 
 #endif
 
-bool CGame::CreateGameWindow( void )
+bool CGame::CreateGameWindow()
 {
 	// get the window name
 	char utf8_window_name[256];
@@ -1683,7 +1683,7 @@ bool CGame::Init( void *pvInstance )
 }
 
 
-bool CGame::Shutdown( void )
+bool CGame::Shutdown()
 {
 #if defined( WIN32 ) && !defined( USE_SDL )
 	m_hInstance = nullptr;
@@ -1691,7 +1691,7 @@ bool CGame::Shutdown( void )
 	return true;
 }
 
-void *CGame::GetMainWindow( void )
+void *CGame::GetMainWindow()
 {
 #ifdef USE_SDL
 	return (void*)m_pSDLWindow;
@@ -1700,7 +1700,7 @@ void *CGame::GetMainWindow( void )
 #endif
 }
 
-void *CGame::GetMainDeviceWindow( void )
+void *CGame::GetMainDeviceWindow()
 {
 #if defined( DX_TO_GL_ABSTRACTION ) && defined( USE_SDL )
 	return (void*)m_pSDLWindow;
@@ -1709,7 +1709,7 @@ void *CGame::GetMainDeviceWindow( void )
 #endif
 }
 
-void *CGame::GetMainWindowPlatformSpecificHandle( void )
+void *CGame::GetMainWindowPlatformSpecificHandle()
 {
 #ifdef WIN32
 	return (void*)m_hWindow;
@@ -1736,7 +1736,7 @@ void *CGame::GetMainWindowPlatformSpecificHandle( void )
 }
 
 
-void** CGame::GetMainWindowAddress( void )
+void** CGame::GetMainWindowAddress()
 {
 #ifdef WIN32
 	return (void**)&m_hWindow;
@@ -1889,7 +1889,7 @@ void CGame::GetWindowRect( int *x, int *y, int *w, int *h )
 	}
 }
 
-bool CGame::IsActiveApp( void )
+bool CGame::IsActiveApp()
 {
 	return m_bActiveApp;
 }
