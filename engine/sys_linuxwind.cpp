@@ -6,54 +6,52 @@
 // $Date:         $
 // $NoKeywords: $
 //=============================================================================//
-#include "iengine.h"
-#include <stdlib.h>
 
-#include "engine_launcher_api.h"
-#include "basetypes.h"
-#include "ivideomode.h"
 #include "igame.h"
 
-#define UINT unsigned int
-#define WPARAM int
-#define LPARAM int
+#include <cstdlib>
 
+#include "tier0/basetypes.h"
+
+#include "iengine.h"
+#include "engine_launcher_api.h"
+#include "ivideomode.h"
 #include "profile.h"
 #include "server.h"
 #include "cdll_int.h"
 
 #ifdef SWDS
-void ForceReloadProfile( void );
+void ForceReloadProfile();
 
-void ClearIOStates( void );
+void ClearIOStates();
 //-----------------------------------------------------------------------------
 // Purpose: Main game interface, including message pump and window creation
 //-----------------------------------------------------------------------------
-class CGame : public IGame
+class CGame final : public IGame
 {
 public:
-					CGame( void );
-	virtual			~CGame( void );
+					CGame();
+	virtual			~CGame() = default;
 
 	bool			Init( void *pvInstance );
-	bool			Shutdown( void );
+	bool			Shutdown();
 
-	bool			CreateGameWindow( void );
-	virtual void	DestroyGameWindow( void );
+	bool			CreateGameWindow();
+	virtual void	DestroyGameWindow();
 	virtual void	SetGameWindow( void *hWnd );
 
 	virtual bool	InputAttachToGameWindow();
 	virtual void	InputDetachFromGameWindow();
 
-	void*			GetMainWindow( void );
-	void*			GetMainDeviceWindow( void );
-	void**			GetMainWindowAddress( void );
+	void*			GetMainWindow();
+	void*			GetMainDeviceWindow();
+	void**			GetMainWindowAddress();
 
 	void			SetWindowXY( int x, int y );
 	void			SetWindowSize( int w, int h );
 	void			GetWindowRect( int *x, int *y, int *w, int *h );
 
-	bool			IsActiveApp( void );
+	bool			IsActiveApp();
 	virtual void		DispatchAllStoredGameMessages();
 	virtual void		PlayStartupVideos() {}
 	virtual void		GetDesktopInfo( int &width, int &height, int &refreshRate );
@@ -67,7 +65,7 @@ private:
 };
 
 static CGame g_Game;
-IGame *game = ( IGame * )&g_Game;
+IGame *game = &g_Game;
 
 const char CGame::CLASSNAME[] = "Valve001";
 
@@ -107,12 +105,12 @@ void VCR_EnterPausedState()
 }
 
 
-bool CGame::CreateGameWindow( void )
+bool CGame::CreateGameWindow()
 {
 	return true;
 }
 
-void CGame::DestroyGameWindow( void )
+void CGame::DestroyGameWindow()
 {
 }
 
@@ -132,13 +130,9 @@ void CGame::SetGameWindow( void *hWnd )
 	return;
 }
 
-CGame::CGame( void )
+CGame::CGame()
 {
 	m_bActiveApp = true;
-}
-
-CGame::~CGame( void )
-{
 }
 
 bool CGame::Init( void *pvInstance )
@@ -146,22 +140,22 @@ bool CGame::Init( void *pvInstance )
 	return true;
 }
 
-bool CGame::Shutdown( void )
+bool CGame::Shutdown()
 {
 	return true;
 }
 
-void *CGame::GetMainWindow( void )
+void *CGame::GetMainWindow()
 {
 	return 0;
 }
 
-void *CGame::GetMainDeviceWindow( void )
+void *CGame::GetMainDeviceWindow()
 {
 	return 0;
 }
 
-void **CGame::GetMainWindowAddress( void )
+void **CGame::GetMainWindowAddress()
 {
 	return NULL;
 }
@@ -194,7 +188,7 @@ void CGame::GetWindowRect( int *x, int *y, int *w, int *h )
 	}
 }
 
-bool CGame::IsActiveApp( void )
+bool CGame::IsActiveApp()
 {
 	return m_bActiveApp;
 }
@@ -212,7 +206,7 @@ void CGame::GetDesktopInfo( int &width, int &height, int &refreshRate )
 {
     width = 0;
     height = 0;
-	refreshRate = 0;
+    refreshRate = 0;
 }
 
 #endif
