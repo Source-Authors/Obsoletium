@@ -5,7 +5,6 @@
 //=============================================================================//
  
 #include "host_cmd.h"
-#include "tier0/vprof.h"
 #include "server.h"
 #include "keys.h"
 #include "screen.h"
@@ -25,7 +24,6 @@
 #include "networkstringtableclient.h"
 #include "host_state.h"
 #include "string_t.h"
-#include "tier0/dbg.h"
 #include "testscriptmgr.h"
 #include "r_local.h"
 #include "PlayerState.h"
@@ -40,6 +38,9 @@
 #include "sys_dll.h"
 #include "cmd.h"
 #include "tier0/icommandline.h"
+#include "tier0/dbg.h"
+#include "tier0/vprof.h"
+#include "tier0/scoped_breakpad_handler.h"
 #include "filesystem.h"
 #include "filesystem_engine.h"
 #include "icliententitylist.h"
@@ -2004,7 +2005,15 @@ CON_COMMAND( crash, "[ sys_error | hang | purecall | segfault | minidump ]: Caus
 	else if ( cmd == "minidump" )
 	{
 		Msg( "Forcing minidump. build_number: %d.\n", build_number() );
+#ifndef NO_STEAM
 		SteamAPI_WriteMiniDump( 0, NULL, build_number() );
+#else
+		// dimhotepus: Crossplatform crash dumps.
+		if ( !s1::breakpad::ScopedBreakpadHandler::Instance().WriteMinidump() )
+		{
+			Warning( "Failed to write minidump when attempting to crash.\n" );
+		}
+#endif
 	}
 	else
 	{
