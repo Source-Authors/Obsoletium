@@ -519,7 +519,7 @@ abstract_class IVideoServices : public IAppSystem
 		// Create/destroy a video encoder		
 		virtual VideoResult_t			IsRecordCodecAvailable( VideoSystem_t videoSystem, VideoEncodeCodec_t codec ) = 0;
 		
-		virtual IVideoRecorder		   *CreateVideoRecorder( VideoSystem_t videoSystem ) = 0;
+		virtual IVideoRecorder			*CreateVideoRecorder( VideoSystem_t videoSystem ) = 0;
 		virtual VideoResult_t			DestroyVideoRecorder( IVideoRecorder *pVideoRecorder ) = 0;
 
 		// Plays a given video file until it completes or the user presses ESC, SPACE, or ENTER
