@@ -25,6 +25,9 @@
 
 #if defined( WIN32 )
 	#include "winlite.h"
+
+	// dimhotepus: Do not disable display during video playback when no user input.
+	#include "windows/scoped_thread_execution_state.h"
 #elif defined( OSX )
 	#include <Carbon/Carbon.h>
 #endif
@@ -701,6 +704,15 @@ VideoResult_t CValveVideoServices::DestroyVideoRecorder( IVideoRecorder *pVideoR
 // ===========================================================================	
 VideoResult_t CValveVideoServices::PlayVideoFileFullScreen( const char *pFileName, const char *pPathID, void *mainWindow, int windowWidth, int windowHeight, int desktopWidth, int desktopHeight, bool windowed, float forcedMinTime, VideoPlaybackFlags_t playbackFlags, VideoSystem_t videoSystem, bool PlayAlternateIfNotAvailable )
 {
+	// dimhotepus: Ensure display is not disabled by powersaver when playing startup videos.
+	const s1::win::ScopedThreadExecutionState
+		scoped_display_required_state{
+			s1::win::ThreadExecutionState::DisplayRequired};
+	if (!scoped_display_required_state.is_success())
+	{
+		Warning("Unable to signal system display is required. Display may disable during %s playback.\n", pFileName);
+	}
+
 	SetResult( VideoResult::BAD_INPUT_PARAMETERS );
 	AssertExitV( IS_NOT_EMPTY( pFileName ), VideoResult::BAD_INPUT_PARAMETERS );
 	AssertExitV( videoSystem == VideoSystem::DETERMINE_FROM_FILE_EXTENSION || IS_IN_RANGECOUNT( videoSystem, VideoSystem::VIDEO_SYSTEM_FIRST, VideoSystem::VIDEO_SYSTEM_COUNT ), VideoResult::BAD_INPUT_PARAMETERS );

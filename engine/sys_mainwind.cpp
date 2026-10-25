@@ -29,8 +29,6 @@
 #include "windows/scoped_power_suspend_resume_notifications_registrator.h"
 // dimhotepus: Notify when system power settings changed (battery, AC, power plan, etc.).
 #include "windows/scoped_power_settings_notifications_registrator.h"
-// dimhotepus: Do not disable display during video playback when no user input.
-#include "windows/scoped_thread_execution_state.h"
 // dimhotepus: Hide cursor while playing videos.
 #include "windows/scoped_show_cursor.h"
 #endif
@@ -1501,15 +1499,6 @@ void CGame::PlayStartupVideos()
 #if !defined(PLATFORM_HAS_ASAN) || !defined(PLATFORM_64BITS)
 	const ScopedMilesAudioDevice scoped_miles_audio_device{vaudio, g_pVideo};
 #endif
-
-	// dimhotepus: Ensure display is not disabled by powersaver when playing startup videos.
-	const s1::win::ScopedThreadExecutionState
-		scoped_display_required_state{
-			s1::win::ThreadExecutionState::DisplayRequired};
-	if (!scoped_display_required_state.is_success())
-	{
-		Warning("Unable to signal system display is required. Display may disable during video playback.\n");
-	}
 
 #if defined( USE_SDL )
 	// Hide cursor while playing videos.
