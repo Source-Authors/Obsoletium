@@ -1026,7 +1026,13 @@ bool CEngineAPI::Connect( CreateInterfaceFn factory )
 
 void CEngineAPI::Disconnect()
 {
+	// dimhotepus: In reverse to connect order.
 	DisconnectMDLCacheNotify();
+
+#if defined( USE_SDL )
+	// dimhotepus: Reset launcher manager.
+	g_pLauncherMgr = nullptr;
+#endif
 
 #if !defined( SWDS )
 	TRACESHUTDOWN( Steam3Client().Shutdown() );
