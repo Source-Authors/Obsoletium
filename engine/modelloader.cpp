@@ -4628,13 +4628,13 @@ static void GetSpriteInfo( const char *pName, bool bIsVideo, int &nWidth, int &n
 	if ( bIsVideo && g_pVideo != NULL )
 	{
 		pVideoMaterial = g_pVideo->CreateVideoMaterial( pName, pName, "GAME", VideoPlaybackFlags::DEFAULT_MATERIAL_OPTIONS, VideoSystem::DETERMINE_FROM_FILE_EXTENSION, false );
+		RunCodeAtScopeExitOpt( pVideoMaterial, g_pVideo->DestroyVideoMaterial( pVideoMaterial ) );
+
 		if ( pVideoMaterial )
 		{
 			pVideoMaterial->GetVideoImageSize( &nWidth, &nHeight );
 			nFrameCount = pVideoMaterial->GetFrameCount();
 			pMaterial = pVideoMaterial->GetMaterial();
-			
-			g_pVideo->DestroyVideoMaterial( pVideoMaterial );
 		}
 	}
 	else
