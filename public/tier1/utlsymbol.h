@@ -41,16 +41,16 @@ public:
 	CUtlSymbol& operator=( CUtlSymbol const& src ) = default;
 	
 	// operator==
-	bool operator==( CUtlSymbol const& src ) const { return m_Id == src.m_Id; }
-	bool operator==( const char* pStr ) const;
+	[[nodiscard]] bool operator==( CUtlSymbol const& src ) const { return m_Id == src.m_Id; }
+	[[nodiscard]] bool operator==( const char *pStr ) const;
 	// dimhotepus: Compare with nullptr.
-	bool operator==( std::nullptr_t ) const { return m_Id == UTL_INVAL_SYMBOL; }
+	[[nodiscard]] bool operator==( std::nullptr_t ) const { return m_Id == UTL_INVAL_SYMBOL; }
 	
 	// Is valid?
 	[[nodiscard]] bool IsValid() const { return m_Id != UTL_INVAL_SYMBOL; }
 	
 	// Gets at the symbol
-	operator UtlSymId_t const() const { return m_Id; }
+	[[nodiscard]] operator UtlSymId_t const() const { return m_Id; }
 	
 	// Gets the string associated with the symbol
 	[[nodiscard]] const char* String( ) const;
@@ -96,10 +96,10 @@ public:
 	CUtlSymbol AddString( const char* pString );
 
 	// Finds the symbol for pString
-	CUtlSymbol Find( const char* pString ) const;
+	[[nodiscard]] CUtlSymbol Find( const char *pString ) const;
 	
 	// Look up the string associated with a particular symbol
-	const char* String( CUtlSymbol id ) const;
+	[[nodiscard]] const char *String( CUtlSymbol id ) const;
 	
 	// Remove all symbols in the table.
 	void  RemoveAll();
@@ -123,7 +123,7 @@ protected:
 		{
 		}
 
-		constexpr inline bool operator==( const CStringPoolIndex &other ) const
+		[[nodiscard]] constexpr inline bool operator==( const CStringPoolIndex &other ) const
 		{
 			return m_iPool == other.m_iPool && m_iOffset == other.m_iOffset;
 		}
@@ -148,8 +148,8 @@ protected:
 	{
 	public:
 		CLess( [[maybe_unused]] int ignored = 0 ) {} // permits default initialization to NULL in CUtlRBTree
-		bool operator!() const { return false; }
-		bool operator()( const CStringPoolIndex &left, const CStringPoolIndex &right ) const;
+		[[nodiscard]] bool operator!() const { return false; }
+		[[nodiscard]] bool operator()( const CStringPoolIndex &left, const CStringPoolIndex &right ) const;
 	};
 
 	// Stores the symbol lookup
@@ -197,7 +197,7 @@ public:
 		return CUtlSymbolTable::AddString( pString );
 	}
 
-	CUtlSymbol Find( const char* pString ) const
+	[[nodiscard]] CUtlSymbol Find( const char *pString ) const
 	{
 		m_lock.LockForRead();
 		RunCodeAtScopeExit(m_lock.UnlockRead());
@@ -205,7 +205,7 @@ public:
 		return CUtlSymbolTable::Find( pString );
 	}
 
-	const char* String( CUtlSymbol id ) const
+	[[nodiscard]] const char *String( CUtlSymbol id ) const
 	{
 		m_lock.LockForRead();
 		RunCodeAtScopeExit(m_lock.UnlockRead());
@@ -273,7 +273,7 @@ public:
 	CUtlFilenameSymbolTable();
 	~CUtlFilenameSymbolTable();
 	FileNameHandle_t	FindOrAddFileName( const char *pFileName );
-	FileNameHandle_t	FindFileName( const char *pFileName );
+	[[nodiscard]] FileNameHandle_t FindFileName( const char *pFileName );
 	intp				PathIndex(const FileNameHandle_t &handle) { return (( const FileNameHandleInternal_t * )&handle)->path; }
 	bool				String( const FileNameHandle_t& handle, OUT_Z_CAP(buflen) char *buf, intp buflen );
 	template<intp bufferSize>
