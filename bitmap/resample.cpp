@@ -541,6 +541,9 @@ bool ResampleRGBA8888( const ResampleInfo_t& info )
 	if( !IsPowerOfTwo(info.m_nSrcWidth) || !IsPowerOfTwo(info.m_nSrcHeight) || !IsPowerOfTwo(info.m_nSrcDepth) ||
 		!IsPowerOfTwo(info.m_nDestWidth) || !IsPowerOfTwo(info.m_nDestHeight) || !IsPowerOfTwo(info.m_nDestDepth) )
 	{
+		AssertMsg( !IsPowerOfTwo( info.m_nSrcWidth ) || !IsPowerOfTwo( info.m_nSrcHeight ) || !IsPowerOfTwo( info.m_nSrcDepth ) ||
+			!IsPowerOfTwo( info.m_nDestWidth ) || !IsPowerOfTwo( info.m_nDestHeight ) || !IsPowerOfTwo( info.m_nDestDepth ),
+			"Must be power of 2 to ResampleRGBA8888." );
 		return false;
 	}
 
@@ -678,10 +681,10 @@ bool ResampleRGBA16161616( const ResampleInfo_t& info )
 	// HDRFIXME: This is some lame shit right here. (We need to get NICE working, etc, etc.)
 
 	// Make sure everything is power of two.
-	Assert( IsPowerOfTwo( info.m_nSrcWidth ) == 0 );
-	Assert( IsPowerOfTwo( info.m_nSrcHeight ) == 0 );
-	Assert( IsPowerOfTwo( info.m_nDestWidth ) == 0 );
-	Assert( IsPowerOfTwo( info.m_nDestHeight ) == 0 );
+	Assert( IsPowerOfTwo( info.m_nSrcWidth ) );
+	Assert( IsPowerOfTwo( info.m_nSrcHeight ) );
+	Assert( IsPowerOfTwo( info.m_nDestWidth ) );
+	Assert( IsPowerOfTwo( info.m_nDestHeight ) );
 
 	// Make sure that we aren't upscsaling the image. . .we do`n't support that very well.
 	Assert( info.m_nSrcWidth >= info.m_nDestWidth );

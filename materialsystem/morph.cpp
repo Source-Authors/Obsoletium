@@ -1727,7 +1727,7 @@ void CMorphMgr::AllocateScratchTextures()
 	m_nAccumulatorHeight = 256;
 	Assert( m_nAccumulatorWidth * m_nAccumulatorHeight == MAX_MORPH_ACCUMULATOR_VERTICES * MORPH_ACCUMULATOR_4TUPLES );
 
-	Assert( IsPowerOfTwo( CMorphMgrRenderContext::MAX_MODEL_MORPHS ) );
+	static_assert( IsPowerOfTwo( CMorphMgrRenderContext::MAX_MODEL_MORPHS ) );
 	int nMultFactor = sqrt( (float)CMorphMgrRenderContext::MAX_MODEL_MORPHS );
 	m_nSubrectVerticalCount = nMultFactor;
 

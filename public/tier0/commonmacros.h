@@ -175,8 +175,9 @@ constexpr inline unsigned MAKEUID(char d, char c, char b, char a) noexcept {
  * @return Packed ID.
  */
 constexpr inline int MAKEID(char d, char c, char b, char a) noexcept {
-  return (static_cast<int>(a) << 24) | (static_cast<int>(b) << 16) |
-         (static_cast<int>(c) << 8) | static_cast<int>(d);
+  // dimhotepus: Shifting into the sign bit of an int is UB before C++20, and a
+  // negative char would sign-extend over the other bytes.
+  return static_cast<int>(MAKEUID(d, c, b, a));
 }
 
 /**
@@ -263,9 +264,19 @@ constexpr inline auto FBitSet(T vector, Y bits) noexcept {
  * @param value Value.
  * @return true if value is power of two.
  */
-template <typename T>
-constexpr inline bool IsPowerOfTwo(T value) noexcept {
-  return (value & (value - static_cast<T>(1))) == T{};
+template <typename T, std::enable_if_t<
+  (std::is_integral_v<std::remove_cv_t<T>> &&
+   !std::is_same_v<std::remove_cv_t<T>, bool>) ||
+  std::is_enum_v<std::remove_cv_t<T>>,
+  int> = 0>
+[[nodiscard]] constexpr inline bool IsPowerOfTwo(T value) noexcept {
+  if constexpr (std::is_enum_v<std::remove_cv_t<T>>) {
+    using U = std::underlying_type_t<std::remove_cv_t<T>>;
+    const U n = static_cast<U>(value);
+    return n > 0 && (n & (n - 1)) == 0;
+  } else {
+    return value > 0 && (value & (value - 1)) == 0;
+  }
 }
 
 /**
