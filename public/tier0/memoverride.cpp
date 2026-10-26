@@ -35,9 +35,12 @@
 #include "tier0/threadtools.h"
 #include "tier0/scoped_breakpad_handler.h"
 
+// dimhotepus: Exclude in Multihreaded DLL mode as ucrt is shared and Google Breakpad already set handlers.
+#if !defined( _MT ) || !defined( _DLL )
 #if defined(_WIN32)
 #include "windows/scoped_invalid_parameter_handler.h"
 #include "windows/scoped_purecall_handler.h"
+#endif
 #endif
 
 #include <cstring>
@@ -989,6 +992,9 @@ long* AFNAME(_crtBreakAlloc) (void)
 //-----------------------------------------------------------------------------
 #if _MSC_VER >= 1400
 
+// dimhotepus: Exclude in Multihreaded DLL mode as ucrt is shared and Google Breakpad already set handlers.
+#if !defined( _MT ) || !defined( _DLL )
+
 // Configure VS so that it will record crash dumps on pure-call violations
 // and invalid parameter handlers.
 // If you manage to call a pure-virtual function (easily done if you indirectly
@@ -1110,6 +1116,8 @@ class ErrorHandlerRegistrar {
 static ErrorHandlerRegistrar s_ErrorHandlerRegistration;
 
 }  // namespace
+
+#endif  // !defined( _MT ) || !defined( _DLL )
 
 #if !defined(NDEBUG)
  
