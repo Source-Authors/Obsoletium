@@ -136,6 +136,7 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 	FILE *infile = fopen(jpegpath, "rb");
 	if (!infile)
 	{
+		Warning( "Failed to open JPEG %s: %s.\n", jpegpath, strerror(errno) );
 		return CE_CANT_OPEN_SOURCE_FILE;
 	}
 
@@ -153,6 +154,7 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 
 	if ( setjmp( jerr.m_ErrorContext ) )
 	{
+		Warning( "Failed to parse JPEG %s.\n", jpegpath );
 		return CE_ERROR_PARSING_SOURCE;
 	}
 
@@ -161,12 +163,14 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 	// read in the jpeg header and make sure that's all good.
 	if (jpeg_read_header(&jpegInfo, TRUE) != JPEG_HEADER_OK)
 	{
+		Warning( "JPEG %s header is broken.\n", jpegpath );
 		return CE_ERROR_PARSING_SOURCE;
 	}
 
 	// start the decompress with the jpeg engine.
 	if ( !jpeg_start_decompress(&jpegInfo) )
 	{
+		Warning( "JPEG %s body is broken.\n", jpegpath );
 		return CE_ERROR_PARSING_SOURCE;
 	}
 
@@ -176,6 +180,8 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 	if ( ( bRequirePowerOfTwo && ( !IsPowerOfTwo(jpegInfo.image_height) || !IsPowerOfTwo(jpegInfo.image_width) ) )
 		|| jpegInfo.output_components != 3 )
 	{
+		Warning( "JPEG %s size dimensions (%d, %d) are not power of 2 or output components (%d) are not 3.\n",
+			jpegpath, jpegInfo.image_width, jpegInfo.image_height, jpegInfo.output_components );
 		return CE_SOURCE_FILE_SIZE_NOT_SUPPORTED;
 	}
 
@@ -190,6 +196,7 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 	std::unique_ptr<byte[]> buf = std::make_unique<byte[]>(mem_required);
 	if (!buf)
 	{
+		Warning( "Out of memory (%d bytes) for JPEG %s.\n", mem_required, jpegpath );
 		return CE_MEMORY_ERROR;
 	}
 
@@ -207,6 +214,7 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 
 	if (!working)
 	{
+		Warning( "Failed to read JPEG %s scanlines.\n", jpegpath );
 		return CE_ERROR_PARSING_SOURCE;
 	}
 
@@ -217,6 +225,7 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 	{
 		if ( !g_pFullFileSystem->WriteFile( tgaPath, nullptr, outBuf ) )
 		{
+			Warning( "Failed to write TGA %s from JPEG %s.\n", tgaPath, jpegpath );
 			bRetVal = false;
 		}
 	}
@@ -248,6 +257,7 @@ ConversionErrorType ImgUtl_ConvertBMPToTGA(const char *bmpPath, const char *tgaP
 	{
 		if ( !g_pFullFileSystem->WriteFile( tgaPath, nullptr, outBuf ) )
 		{
+			Warning( "Failed to write TGA %s from BMP %s.\n", tgaPath, bmpPath );
 			retval = false;
 		}
 	}
@@ -265,6 +275,7 @@ unsigned char *ImgUtl_ReadVTFAsRGBA( const char *vtfPath, int &width, int &heigh
 	CUtlBuffer bufFileContents;
 	if ( !g_pFullFileSystem->ReadFile( vtfPath, nullptr, bufFileContents ) )
 	{
+		Warning( "Failed to read VTF %s.\n", vtfPath );
 		errcode = CE_CANT_OPEN_SOURCE_FILE;
 		return nullptr;
 	}
@@ -274,6 +285,7 @@ unsigned char *ImgUtl_ReadVTFAsRGBA( const char *vtfPath, int &width, int &heigh
 
 	if ( !pVTFTexture->Unserialize( bufFileContents ) )
 	{
+		Warning( "VTF %s body is broken.\n", vtfPath );
 		errcode = CE_ERROR_PARSING_SOURCE;
 		return nullptr;
 	}
@@ -286,6 +298,7 @@ unsigned char *ImgUtl_ReadVTFAsRGBA( const char *vtfPath, int &width, int &heigh
 	auto *pMemImage = (unsigned char *)malloc(nMemSize);
 	if ( pMemImage == nullptr )
 	{
+		Warning( "Out of memory (%zd bytes) for VTF %s body.\n", nMemSize, vtfPath );
 		errcode = CE_MEMORY_ERROR;
 		return nullptr;
 	}
@@ -296,75 +309,75 @@ unsigned char *ImgUtl_ReadVTFAsRGBA( const char *vtfPath, int &width, int &heigh
 }
 
 // read a TGA header from the current point in the file stream.
-static [[nodiscard]] bool ImgUtl_ReadTGAHeader(FILE *infile, TGAHeader &header)
+static [[nodiscard]] int ImgUtl_ReadTGAHeader(FILE *infile, TGAHeader &header)
 {
 	if (infile == nullptr)
 	{
-		return false;
+		return EINVAL;
 	}
 
 	size_t read = fread(&header.identsize, sizeof(header.identsize), 1, infile);
-	if (read != 1) return false;
+	if (read != 1) return errno;
 	read = fread(&header.colourmaptype, sizeof(header.colourmaptype), 1, infile);
-	if (read != 1) return false;
+	if (read != 1) return errno;
 	read = fread(&header.imagetype, sizeof(header.imagetype), 1, infile);
-	if (read != 1) return false;
+	if (read != 1) return errno;
 	read = fread(&header.colourmapstart, sizeof(header.colourmapstart), 1, infile);
-	if (read != 1) return false;
+	if (read != 1) return errno;
 	read = fread(&header.colourmaplength, sizeof(header.colourmaplength), 1, infile);
-	if (read != 1) return false;
+	if (read != 1) return errno;
 	read = fread(&header.colourmapbits, sizeof(header.colourmapbits), 1, infile);
-	if (read != 1) return false;
+	if (read != 1) return errno;
 	read = fread(&header.xstart, sizeof(header.xstart), 1, infile);
-	if (read != 1) return false;
+	if (read != 1) return errno;
 	read = fread(&header.ystart, sizeof(header.ystart), 1, infile);
-	if (read != 1) return false;
+	if (read != 1) return errno;
 	read = fread(&header.width, sizeof(header.width), 1, infile);
-	if (read != 1) return false;
+	if (read != 1) return errno;
 	read = fread(&header.height, sizeof(header.height), 1, infile);
-	if (read != 1) return false;
+	if (read != 1) return errno;
 	read = fread(&header.bits, sizeof(header.bits), 1, infile);
-	if (read != 1) return false;
+	if (read != 1) return errno;
 	read = fread(&header.descriptor, sizeof(header.descriptor), 1, infile);
-	if (read != 1) return false;
+	if (read != 1) return errno;
 
-	return true;
+	return EXIT_SUCCESS;
 }
 
 // write a TGA header to the current point in the file stream.
-static [[nodiscard]] bool WriteTGAHeader(FILE *outfile, TGAHeader &header)
+static [[nodiscard]] int WriteTGAHeader(FILE *outfile, TGAHeader &header)
 {
 	if (outfile == nullptr)
 	{
-		return false;
+		return EINVAL;
 	}
 
 	size_t write = fwrite(&header.identsize, sizeof(header.identsize), 1, outfile);
-	if (write != 1) return false;
+	if (write != 1) return errno;
 	write = fwrite(&header.colourmaptype, sizeof(header.colourmaptype), 1, outfile);
-	if (write != 1) return false;
+	if (write != 1) return errno;
 	write = fwrite(&header.imagetype, sizeof(header.imagetype), 1, outfile);
-	if (write != 1) return false;
+	if (write != 1) return errno;
 	write = fwrite(&header.colourmapstart, sizeof(header.colourmapstart), 1, outfile);
-	if (write != 1) return false;
+	if (write != 1) return errno;
 	write = fwrite(&header.colourmaplength, sizeof(header.colourmaplength), 1, outfile);
-	if (write != 1) return false;
+	if (write != 1) return errno;
 	write = fwrite(&header.colourmapbits, sizeof(header.colourmapbits), 1, outfile);
-	if (write != 1) return false;
+	if (write != 1) return errno;
 	write = fwrite(&header.xstart, sizeof(header.xstart), 1, outfile);
-	if (write != 1) return false;
+	if (write != 1) return errno;
 	write = fwrite(&header.ystart, sizeof(header.ystart), 1, outfile);
-	if (write != 1) return false;
+	if (write != 1) return errno;
 	write = fwrite(&header.width, sizeof(header.width), 1, outfile);
-	if (write != 1) return false;
+	if (write != 1) return errno;
 	write = fwrite(&header.height, sizeof(header.height), 1, outfile);
-	if (write != 1) return false;
+	if (write != 1) return errno;
 	write = fwrite(&header.bits, sizeof(header.bits), 1, outfile);
-	if (write != 1) return false;
+	if (write != 1) return errno;
 	write = fwrite(&header.descriptor, sizeof(header.descriptor), 1, outfile);
-	if (write != 1) return false;
+	if (write != 1) return errno;
 
-	return true;
+	return EXIT_SUCCESS;
 }
 
 // reads in a TGA file and converts it to 32 bit RGBA color values in a memory buffer.
@@ -373,7 +386,7 @@ unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &heigh
 	FILE *tgaFile = fopen(tgaPath, "rb");
 	if (!tgaFile)
 	{
-		Warning( "Unable to read TGA %s: %s.\n", tgaPath, strerror(errno));
+		Warning( "Unable to read TGA %s: %s.\n", tgaPath, strerror(errno) );
 		errcode = CE_CANT_OPEN_SOURCE_FILE;
 		return nullptr;
 	}
@@ -382,9 +395,9 @@ unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &heigh
 
 	// read header for TGA file.
 	// dimhotepus: Check header is read.
-	if (!ImgUtl_ReadTGAHeader(tgaFile, tgaHeader))
+	if (const int rc{ImgUtl_ReadTGAHeader(tgaFile, tgaHeader)}; rc)
 	{
-		Warning( "Unable to read TGA header from file: %s.\n", tgaPath);
+		Warning( "Unable to read TGA %s header: %s.\n", tgaPath, strerror(rc) );
 		errcode = CE_SOURCE_FILE_TGA_FORMAT_NOT_SUPPORTED;
 		return nullptr;
 	}
@@ -395,7 +408,7 @@ unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &heigh
 		|| ( tgaHeader.bits != 24 && tgaHeader.bits != 32 ) // Must be 24- ot 32-bit
 	)
 	{
-		Warning( "Invalid TGA file format: %s.\n", tgaPath);
+		Warning( "Unsupported TGA %s.\n", tgaPath);
 		errcode = CE_SOURCE_FILE_TGA_FORMAT_NOT_SUPPORTED;
 		return nullptr;
 	}
@@ -404,7 +417,7 @@ unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &heigh
 	auto *tgaData = (unsigned char *)malloc(tgaDataSize);
 	if (!tgaData)
 	{
-		Warning( "Out of memory (%d bytes) when read TGA file data: %s.\n", tgaDataSize, tgaPath);
+		Warning( "Out of memory (%d bytes) for TGA %s body.\n", tgaDataSize, tgaPath);
 		errcode = CE_MEMORY_ERROR;
 		return nullptr;
 	}
@@ -413,7 +426,7 @@ unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &heigh
 	if (size_cast<int>(readDataSize) != tgaDataSize)
 	{
 		free(tgaData);
-		Warning( "Invalid TGA file format: %s.\n", tgaPath);
+		Warning( "Invalid TGA %s format.\n", tgaPath);
 		errcode = CE_SOURCE_FILE_TGA_FORMAT_NOT_SUPPORTED;
 		return nullptr;
 	}
@@ -424,14 +437,14 @@ unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &heigh
 
 	if (tgaHeader.bits == 24)
 	{
+		RunCodeAtScopeExit( free( tgaData ) );
+
 		// image needs to be converted to a 32-bit image.
 
 		auto *retBuf = (unsigned char *)malloc(numPixels * 4);
 		if (retBuf == nullptr)
 		{
-			free(tgaData);
-			
-			Warning( "Out of memory (%d bytes) when read TGA file data: %s.\n", numPixels * 4, tgaPath);
+			Warning( "Out of memory (%d bytes) when read TGA %s.\n", numPixels * 4, tgaPath);
 			errcode = CE_MEMORY_ERROR;
 			return nullptr;
 		}
@@ -445,7 +458,6 @@ unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &heigh
 			retBuf[index * 4 + 3] = 0xff;
 		}
 
-		free(tgaData);
 		tgaData = retBuf;
 		tgaHeader.bits = 32;
 	}
@@ -517,6 +529,7 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 
 	if ( setjmp( jerr.m_ErrorContext ) )
 	{
+		Warning( "Failed to parse JPEG %s.\n", jpegPath );
 		// Get here if there is any error
 		errcode = CE_ERROR_PARSING_SOURCE;
 		return nullptr;
@@ -528,6 +541,7 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	// read in the jpeg header and make sure that's all good.
 	if (jpeg_read_header(&jpegInfo, TRUE) != JPEG_HEADER_OK)
 	{
+		Warning( "JPEG %s header is broken.\n", jpegPath );
 		errcode = CE_ERROR_PARSING_SOURCE;
 		return nullptr;
 	}
@@ -535,6 +549,7 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	// start the decompress with the jpeg engine.
 	if ( !jpeg_start_decompress(&jpegInfo) )
 	{
+		Warning( "JPEG %s body is broken.\n", jpegPath );
 		errcode = CE_ERROR_PARSING_SOURCE;
 		return nullptr;
 	}
@@ -544,6 +559,8 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	// We only support 24-bit JPEG's
 	if ( jpegInfo.out_color_space != JCS_RGB || jpegInfo.output_components != 3 )
 	{
+		Warning( "JPEG %s color space (%d) is not 24 bit or output components (%d) are not 3.\n",
+			jpegPath, jpegInfo.out_color_space, jpegInfo.output_components );
 		errcode = CE_SOURCE_FILE_SIZE_NOT_SUPPORTED;
 		return nullptr;
 	}
@@ -559,6 +576,7 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	auto *buf = (unsigned char *)malloc(mem_required);
 	if (!buf)
 	{
+		Warning( "Out of memory (%d bytes) for JPEG %s.\n", mem_required, jpegPath );
 		errcode = CE_MEMORY_ERROR;
 		return nullptr;
 	}
@@ -591,6 +609,7 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	// Check success status
 	if (!working)
 	{
+		Warning( "Failed to read JPEG %s scanlines.\n", jpegPath );
 		free(buf);
 		errcode = CE_ERROR_PARSING_SOURCE;
 		return nullptr;
@@ -628,53 +647,60 @@ unsigned char *ImgUtl_ReadPNGAsRGBA( const char *pngPath, int &width, int &heigh
 	CUtlBuffer bufFileContents;
 	if ( !g_pFullFileSystem->ReadFile( pngPath, nullptr, bufFileContents ) )
 	{
+		Warning( "Failed to open PNG %s.\n", pngPath );
 		errcode = CE_CANT_OPEN_SOURCE_FILE;
 		return nullptr;
 	}
 
+	// dimhotepus: Add pngPath to simplify failure tracking.
 	// Load it
-	return ImgUtl_ReadPNGAsRGBAFromBuffer( bufFileContents, width, height, errcode );
+	return ImgUtl_ReadPNGAsRGBAFromBuffer( bufFileContents, width, height, errcode, pngPath );
 }
 
-unsigned char *ImgUtl_ReadPNGAsRGBAFromBuffer( CUtlBuffer &buffer, int &width, int &height, ConversionErrorType &errcode )
+// dimhotepus: Add pngPath to simplify failure tracking.
+unsigned char *ImgUtl_ReadPNGAsRGBAFromBuffer( CUtlBuffer &buffer, int &width, int &height, ConversionErrorType &errcode, const char *pngPath )
 {
 	png_const_bytep pngData = buffer.Base<const png_byte>();
 	if (png_sig_cmp( pngData, 0, 8))
 	{
+		Warning( "Failed to read PNG %s body.\n", pngPath );
 		errcode = CE_ERROR_PARSING_SOURCE;
 		return nullptr;
 	}
 
     /* could pass pointers to user-defined error handlers instead of NULLs: */
 
-    png_structp png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
-    if (!png_ptr)
-    {
-        errcode = CE_MEMORY_ERROR;
+	png_structp png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
+	if (!png_ptr)
+	{
+		Warning( "Out of memory allocating PNG %s read struct.\n", pngPath );
+		errcode = CE_MEMORY_ERROR;
 		return nullptr;
 	}
 
-    png_infop info_ptr = png_create_info_struct( png_ptr );
-    if ( !info_ptr ) 
+	png_infop info_ptr = png_create_info_struct( png_ptr );
+	if ( !info_ptr ) 
 	{
-        errcode = CE_MEMORY_ERROR;
-        png_destroy_read_struct( &png_ptr, &info_ptr, nullptr );
-        return nullptr;
-    }
+		Warning( "Out of memory allocating PNG %s info struct.\n", pngPath );
+		errcode = CE_MEMORY_ERROR;
+		png_destroy_read_struct( &png_ptr, &info_ptr, nullptr );
+		return nullptr;
+	}
 
 	RunCodeAtScopeExit(png_destroy_read_struct( &png_ptr, &info_ptr, nullptr ));
 
     /* setjmp() must be called in every function that calls a PNG-reading
      * libpng function */
 
-    if ( setjmp( png_jmpbuf(png_ptr) ) ) 
+	if ( setjmp( png_jmpbuf(png_ptr) ) ) 
 	{
-        errcode = CE_ERROR_PARSING_SOURCE;
+		Warning( "Failed to parse PNG %s body.\n", pngPath );
+		errcode = CE_ERROR_PARSING_SOURCE;
 		return nullptr;
-    }
+	}
 
 	png_set_read_fn( png_ptr, &buffer, ReadPNGData );
-    png_read_info( png_ptr, info_ptr );  /* read all PNG info up to image data */
+	png_read_info( png_ptr, info_ptr );  /* read all PNG info up to image data */
 
 
     /* alternatively, could make separate calls to png_get_image_width(),
@@ -729,20 +755,29 @@ unsigned char *ImgUtl_ReadPNGAsRGBAFromBuffer( CUtlBuffer &buffer, int &width, i
     png_byte channels = png_get_channels( png_ptr, info_ptr );
 	if ( channels != 4 )
 	{
+		Warning( "Unsupported PNG %s. Supproted 4 channels PNGs, got %hhu.\n", pngPath, channels );
 		Assert( channels == 4 );
-        errcode = CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
-        return nullptr;
+		errcode = CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
+		return nullptr;
 	}
 
 	png_bytepp row_pointers = (png_bytepp)malloc( height*sizeof(png_bytep) );
+	if ( row_pointers == nullptr )
+	{
+		Warning( "Out of memory (%zu bytes) for PNG %s.\n", height * sizeof(png_bytep), pngPath );
+		errcode = CE_MEMORY_ERROR;
+		return nullptr;
+	}
+
 	RunCodeAtScopeExit(free( row_pointers ));
 
 	unsigned char *pResultData = (unsigned char *)malloc(rowbytes * height);
 	if ( row_pointers == nullptr || pResultData == nullptr ) 
 	{
-        errcode = CE_MEMORY_ERROR;
-        return nullptr;
-    }
+		Warning( "Out of memory (%zu bytes) for PNG %s.\n", rowbytes * height, pngPath );
+		errcode = CE_MEMORY_ERROR;
+		return nullptr;
+	}
 
     /* set the individual row_pointers to point at the correct offsets */
 
@@ -774,12 +809,14 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 		FILE *fp = fopen( bmpPath, "rb" );
 		if (!fp)
 		{
+			Warning( "Failed to open BMP %s: %s.\n", bmpPath, strerror(errno) );
 			errcode = CE_CANT_OPEN_SOURCE_FILE;
 		}
 		else
 		{
 			// dimhotepus: Do not leak file resource.
-			RunCodeAtScopeExit(fclose( fp ));
+			RunCodeAtScopeExit( fclose( fp ) );
+			Warning( "BMP %s is broken.\n", bmpPath );
 			errcode = CE_ERROR_PARSING_SOURCE;
 		}
 		return nullptr;
@@ -796,6 +833,12 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 	if (bitmap.bmBitsPixel == 24 || bitmap.bmBitsPixel == 32)
 	{
 		bitmapInfo = (BITMAPINFO *)malloc(sizeof(BITMAPINFO));
+		if (!bitmapInfo)
+		{
+			Warning( "Out of memory (%zu bytes) for BMP %s.\n", sizeof(BITMAPINFO), bmpPath );
+			errcode = CE_MEMORY_ERROR;
+		}
+
 		BitwiseClear(*bitmapInfo);
 	}
 	else if (bitmap.bmBitsPixel == 8 || bitmap.bmBitsPixel == 4 || bitmap.bmBitsPixel == 1)
@@ -803,11 +846,18 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 		int colorsUsed = 1 << bitmap.bmBitsPixel;
 		intp size = colorsUsed * sizeof(RGBQUAD) + sizeof(BITMAPINFO);
 		bitmapInfo = (BITMAPINFO *)malloc(size);
+		if (!bitmapInfo)
+		{
+			Warning( "Out of memory (%zd bytes) for BMP %s.\n", size, bmpPath );
+			errcode = CE_MEMORY_ERROR;
+		}
+
 		BitwiseClear(bitmapInfo, size);
 		bUseColorTable = true;
 	}
 	else
 	{
+		Warning( "BMP %s has unsupported bits per pixel setting %hu. Supported {1,4,8,24,32}.\n", bmpPath, bitmap.bmBitsPixel );
 		errcode = CE_SOURCE_FILE_BMP_FORMAT_NOT_SUPPORTED;
 		return nullptr;
 	}
@@ -828,6 +878,7 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 		if (retcode == 0)
 		{
 			// error getting the bitmap info for some reason.
+			Warning( "BMP %s body is broken.\n", bmpPath );
 			errcode = CE_SOURCE_FILE_BMP_FORMAT_NOT_SUPPORTED;
 			return nullptr;
 		}
@@ -839,6 +890,7 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 	auto *buf = (unsigned char *)malloc(mem_required);
 	if (buf == nullptr)
 	{
+		Warning( "Out of memory (%d bytes) for BMP %s body.\n", mem_required, bmpPath );
 		errcode = CE_MEMORY_ERROR;
 		return nullptr;
 	}
@@ -1013,6 +1065,8 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 	else
 	{
 		free(buf);
+		// Should not be here.
+		Assert( false );
 		errcode = CE_SOURCE_FILE_BMP_FORMAT_NOT_SUPPORTED;
 		return nullptr;
 	}
@@ -1023,6 +1077,7 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 	errcode = CE_SUCCESS;
 	return buf;
 #else
+	Warning( "BMP %s file format is not supported.\n", bmpPath );
 	errcode = CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
 	return NULL;
 #endif
@@ -1057,6 +1112,12 @@ unsigned char *ImgUtl_ReadImageAsRGBA( const char *path, int &width, int &height
 		}
 	}
 
+#ifdef _WIN32
+	Warning( "Unsupported image %s. Supported {vtf,bmp,jpg,jpeg,png,tga}.\n", path );
+#else
+	// dimhotepus: Bmp is not supported on !windows.
+	Warning( "Unsupported image %s. Supported {vtf,jpg,jpeg,png,tga}.\n", path );
+#endif
 	errcode = CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
 	return nullptr;
 }
@@ -1081,6 +1142,7 @@ ConversionErrorType ImgUtl_ConvertTGA(const char *tgaPath, int nMaxWidth/*=-1*/,
 
 	if ((tgaWidth <= 0) || (tgaHeight <= 0))
 	{
+		Warning( "TGA %s has invalid width (%d) or height (%d).\n", tgaPath, tgaWidth, tgaHeight );
 		return CE_ERROR_PARSING_SOURCE;
 	}
 
@@ -1165,6 +1227,7 @@ ConversionErrorType ImgUtl_ConvertTGA(const char *tgaPath, int nMaxWidth/*=-1*/,
 	FILE *outfile = fopen(tgaPath, "wb");
 	if (!outfile)
 	{
+		Warning( "Failed to open TGA %s for writing: %s.\n", tgaPath, strerror(errno) );
 		return CE_ERROR_WRITING_OUTPUT_FILE;
 	}
 
@@ -1174,8 +1237,9 @@ ConversionErrorType ImgUtl_ConvertTGA(const char *tgaPath, int nMaxWidth/*=-1*/,
 	tgaHeader.height = paddedImageHeight;
 
 	// dimhotepus: Check header is written.
-	if (!WriteTGAHeader(outfile, tgaHeader))
+	if (const int rc{WriteTGAHeader(outfile, tgaHeader)}; rc)
 	{
+		Warning( "Failed to write TGA header to %s: %s.\n", tgaPath, strerror( rc ) );
 		return CE_ERROR_WRITING_OUTPUT_FILE;
 	}
 
@@ -1369,9 +1433,9 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 	// read out the header of the image.
 	TGAHeader header;
 	// dimhotepus: Check TGA header was read.
-	if (!ImgUtl_ReadTGAHeader(infile, header))
+	if (const int rc{ImgUtl_ReadTGAHeader(infile, header)}; rc)
 	{
-		Warning( "Failed to read TGA header: %s\n", tgaPath);
+		Warning( "Failed to read TGA %s header: %s.\n", tgaPath, strerror(rc) );
 		return CE_SOURCE_FILE_TGA_FORMAT_NOT_SUPPORTED;
 	}
 
@@ -1454,9 +1518,7 @@ static void DoDeleteFile( const char *filename )
 {
 	if ( unlink( filename ) )
 	{
-		Warning( "Unable to remove image file '%s': %s.\n",
-			filename,
-			std::generic_category().message(errno).c_str() );
+		Warning( "Unable to remove image file '%s': %s.\n", filename, strerror(errno) );
 	}
 }
 
@@ -1732,6 +1794,7 @@ ConversionErrorType ImgUtl_WriteGenericVMT( const char *vtfPath, const char *pMa
 	FILE *vmtFile = fopen(vmtPath, "w");
 	if (!vmtFile)
 	{
+		Warning( "Failed to open VMT %s for writing: %s.\n", vmtPath, strerror(errno) );
 		return CE_ERROR_WRITING_OUTPUT_FILE;
 	}
 
@@ -1745,10 +1808,10 @@ ConversionErrorType ImgUtl_WriteGenericVMT( const char *vtfPath, const char *pMa
 	// fix slashes
 	V_FixSlashes( szMaterialsSubDir );
 
+	// dimhotepus: Check write success.
 	// write the contents of the file.
-	fprintf(vmtFile, "\"UnlitGeneric\"\n{\n\t\"$basetexture\"	\"%s%c%s\"\n\t\"$translucent\" \"1\"\n\t\"$ignorez\" \"1\"\n\t\"$vertexcolor\" \"1\"\n\t\"$vertexalpha\" \"1\"\n}\n", szMaterialsSubDir, CORRECT_PATH_SEPARATOR, filename);
-
-	return CE_SUCCESS;
+	return fprintf(vmtFile, "\"UnlitGeneric\"\n{\n\t\"$basetexture\"	\"%s%c%s\"\n\t\"$translucent\" \"1\"\n\t\"$ignorez\" \"1\"\n\t\"$vertexcolor\" \"1\"\n\t\"$vertexalpha\" \"1\"\n}\n", szMaterialsSubDir, CORRECT_PATH_SEPARATOR, filename) > 0
+		? CE_SUCCESS : CE_ERROR_WRITING_OUTPUT_FILE;
 }
 
 static void WritePNGData( png_structp png_ptr, png_bytep inBytes, png_size_t byteCountToWrite )
@@ -1777,7 +1840,7 @@ ConversionErrorType ImgUtl_WriteRGBAAsPNGToBuffer( const unsigned char *pRGBADat
 		nStride = nWidth*4;
 	}
 
-    /* could pass pointers to user-defined error handlers instead of NULLs: */
+	/* could pass pointers to user-defined error handlers instead of NULLs: */
 	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
 		NULL, NULL, NULL);
 	if (!png_ptr)
@@ -1786,21 +1849,21 @@ ConversionErrorType ImgUtl_WriteRGBAAsPNGToBuffer( const unsigned char *pRGBADat
 	}
 
 	png_infop info_ptr = png_create_info_struct(png_ptr);
-    if ( !info_ptr ) 
+	if ( !info_ptr ) 
 	{
-        png_destroy_write_struct( &png_ptr, &info_ptr );
-        return CE_MEMORY_ERROR;
-    }
+		png_destroy_write_struct( &png_ptr, &info_ptr );
+		return CE_MEMORY_ERROR;
+	}
 
 	RunCodeAtScopeExit(png_destroy_write_struct(&png_ptr, &info_ptr));
 
 	// We'll use the default setjmp / longjmp error handling.
-    if ( setjmp( png_jmpbuf(png_ptr) ) ) 
+	if ( setjmp( png_jmpbuf(png_ptr) ) ) 
 	{
 		// Error "writing".  But since we're writing to a memory bufferm,
 		// that just means we must have run out of memory
-        return CE_MEMORY_ERROR;
-    }
+		return CE_MEMORY_ERROR;
+	}
 
 	// Setup stream writing callbacks
 	png_set_write_fn(png_ptr, &bufOutData, WritePNGData, FlushPNGData);
@@ -1819,8 +1882,8 @@ ConversionErrorType ImgUtl_WriteRGBAAsPNGToBuffer( const unsigned char *pRGBADat
 	std::unique_ptr<png_bytep[]> row_pointers = std::make_unique<png_bytep[]>( nHeight );
 	if ( !row_pointers ) 
 	{
-        return CE_MEMORY_ERROR;
-    }
+		return CE_MEMORY_ERROR;
+	}
 
 	/* set the individual row_pointers to point at the correct offsets */
 	for ( int i = 0;  i < nHeight;  ++i)

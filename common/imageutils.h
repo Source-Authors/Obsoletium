@@ -60,7 +60,8 @@ unsigned char		*ImgUtl_ReadTGAAsRGBA( const char *tgaPath, int &width, int &heig
 unsigned char		*ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &height, ConversionErrorType &errcode );
 unsigned char		*ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &height, ConversionErrorType &errcode );
 unsigned char		*ImgUtl_ReadPNGAsRGBA( const char *bmpPath, int &width, int &height, ConversionErrorType &errcode );
-unsigned char		*ImgUtl_ReadPNGAsRGBAFromBuffer( CUtlBuffer &buffer, int &width, int &height, ConversionErrorType &errcode );
+// dimhotepus: Add pngPath to simplify failure tracking.
+unsigned char       *ImgUtl_ReadPNGAsRGBAFromBuffer( CUtlBuffer &buffer, int &width, int &height, ConversionErrorType &errcode, const char *pngPath = nullptr );
 unsigned char		*ImgUtl_ReadImageAsRGBA( const char *path, int &width, int &height, ConversionErrorType &errcode );
 ConversionErrorType ImgUtl_StretchRGBAImage( const unsigned char *srcBuf, const int srcWidth, const int srcHeight, unsigned char *destBuf, const int destWidth, const int destHeight );
 ConversionErrorType ImgUtl_PadRGBAImage( const unsigned char *srcBuf, const int srcWidth, const int srcHeight, unsigned char *destBuf, const int destWidth, const int destHeight );
