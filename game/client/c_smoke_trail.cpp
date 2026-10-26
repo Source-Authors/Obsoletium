@@ -717,8 +717,11 @@ void C_RocketTrail::Update( float fTimeDelta )
 
 		//debugoverlay->AddLineOverlay( m_vecLastPosition, GetAbsOrigin(), 255, 0, 0, true, 2.0f ); 
 		
+		// dimhotepus: Fix zero divide on start.
+		if ( numPuffs <= 0 )
+			numPuffs = 1;
 		//FIXME: More rational cap here, perhaps
-		if ( numPuffs > 50 )
+		else if ( numPuffs > 50 )
 			numPuffs = 50;
 
 		Vector			offsetColor;
