@@ -6145,7 +6145,7 @@ void CShaderAPIDx8::SetTextureState( Sampler_t sampler, ShaderAPITextureHandle_t
 				"TexGroup_global_%s counter overflow. %s (total) + %s (texture) > %s (max).",
 				tex.m_TextureGroupName.String(),
 				V_pretifymem( size_cast<double>( *tex.m_pTextureGroupCounterGlobal ), 2, true ),
-				V_pretifymem( tex.GetMemUsage(), 2, true ),
+				V_pretifymem( size_cast<double>( tex.GetMemUsage() ), 2, true ),
 				V_pretifymem( maxCounterValue, 2, true ) );
 
 			// Update the per-frame texture group counter.
