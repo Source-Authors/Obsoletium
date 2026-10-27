@@ -38,11 +38,6 @@
 #include "tier0/memdbgon.h"
 #endif
 
-//our global error callback function. Note that this is not initialized, but static space guarantees this is NULL at app start.
-//If you initialize, it will set to zero again when the CPP runs its static initializers, which could stomp the value if another
-//CPP sets this value while initializing its static space
-static ExitProcessWithErrorCBFn g_pfnExitProcessWithErrorCB; //= NULL
-
 extern VCRMode_t g_VCRMode;
 static LARGE_INTEGER g_PerformanceFrequency;
 static double g_PerformanceCounterToS;
@@ -488,11 +483,6 @@ void Plat_ExitProcess( int nCode )
 
 void Plat_ExitProcessWithError( int nCode, bool bGenerateMinidump )
 {
-	//try to delegate out if they have registered a callback
-	const auto cb = g_pfnExitProcessWithErrorCB;
-	if( cb && cb( nCode ) )
-		return;
-
 	//handle default behavior
 	if( bGenerateMinidump )
 	{
@@ -509,11 +499,6 @@ void Plat_ExitProcessWithError( int nCode, bool bGenerateMinidump )
 
 	//and exit our process
 	Plat_ExitProcess( nCode );
-}
-
-void Plat_SetExitProcessWithErrorCB( ExitProcessWithErrorCBFn pfnCB )
-{
-	g_pfnExitProcessWithErrorCB = pfnCB;	
 }
 
 // Wraps the thread-safe versions of gmtime

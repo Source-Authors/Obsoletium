@@ -1049,8 +1049,10 @@ extern "C" [[noreturn]] PLATFORM_CLASS void Plat_ExitProcessWithError( int nCode
 //sets the callback that will be triggered by Plat_ExitProcessWithError. NULL is valid. The return value true indicates that
 //the exit has been handled and no further processing should be performed. False will cause a minidump to be generated, and the process
 //to be terminated
-using ExitProcessWithErrorCBFn = bool (*)(int);
-PLATFORM_INTERFACE void				Plat_SetExitProcessWithErrorCB( ExitProcessWithErrorCBFn pfnCB );
+// dimhotepus: Dropped as not used.
+// using ExitProcessWithErrorCBFn = bool (*)(int);
+// dimhotepus: Dropped as not used.
+// PLATFORM_INTERFACE void				Plat_SetExitProcessWithErrorCB( ExitProcessWithErrorCBFn pfnCB );
 
 PLATFORM_INTERFACE struct tm *		Plat_gmtime( const time_t *timep, struct tm *result );
 PLATFORM_INTERFACE time_t			Plat_timegm( struct tm *timeptr );
