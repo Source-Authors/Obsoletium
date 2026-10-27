@@ -1429,7 +1429,7 @@ int CBaseFileSystem::GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_
 	}
 
 	// Return 1 extra for the nullptr terminator
-	return sResult.size()+1;
+	return size_cast<int>( sResult.size()+1 );
 }
 
 
