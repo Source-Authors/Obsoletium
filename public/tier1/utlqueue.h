@@ -26,17 +26,17 @@ public:
 	CUtlQueue( T *pMemory, intp numElements );
 
 	// return the item from the front of the queue and delete it
-	T RemoveAtHead();
-	bool RemoveAtHead( T &removedElement );
+	[[nodiscard]] T RemoveAtHead();
+	[[nodiscard]] bool RemoveAtHead( T &removedElement );
 
 	// return the item from the end of the queue and delete it
-	T RemoveAtTail();
-	bool RemoveAtTail( T &removedElement );
+	[[nodiscard]] T RemoveAtTail();
+	[[nodiscard]] bool RemoveAtTail( T &removedElement );
 
 	// return item at the front of the queue
-	T const& Head() const;
+	[[nodiscard]] T const &Head() const;
 	// return item at the end of the queue
-	T const& Tail() const;
+	[[nodiscard]] T const &Tail() const;
 
 	// Add a new item to the end of the queue
 	void	Insert( T const &element );
@@ -45,7 +45,7 @@ public:
 	void	Insert( T &&element );
 
 	// checks if an element of this value already exists on the stack, returns true if it does
-	bool		Check( T const element ) const;
+	[[nodiscard]] bool Check( T const element ) const;
 
 	// iterators may be invalidated by Insert()
 	[[nodiscard]] QueueIter_t First() const;
@@ -53,7 +53,7 @@ public:
 	[[nodiscard]] QueueIter_t Last() const;
 	[[nodiscard]] QueueIter_t Previous( QueueIter_t it ) const;
 	[[nodiscard]] bool IsValid( QueueIter_t it ) const;
-	T const& Element( QueueIter_t it ) const;
+	[[nodiscard]] T const    &Element( QueueIter_t it ) const;
 
 	// Returns the count of elements in the queue
 	[[nodiscard]] intp		Count() const;
@@ -113,7 +113,9 @@ template <class T, class M>
 inline T CUtlQueue<T, M>::RemoveAtHead()
 {
 	T temp;
-	RemoveAtHead( temp );
+	// dimhotepus: Check element is removed.
+	[[maybe_unused]] const bool ok = RemoveAtHead( temp );
+	Assert( ok );
 	return temp;
 }
 
@@ -145,7 +147,9 @@ template <class T, class M>
 inline T CUtlQueue<T, M>::RemoveAtTail()
 {
 	T temp;
-	RemoveAtTail( temp );
+	// dimhotepus: Check element is removed.
+	[[maybe_unused]] const bool ok = RemoveAtTail( temp );
+	Assert( ok );
 	return temp;
 }
 

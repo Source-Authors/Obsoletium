@@ -262,7 +262,7 @@ public:
 	// (skipping whitespace that leads + trails both delimiters).
 	// If successful, the get index is advanced and the function returns true,
 	// otherwise the index is not advanced and the function returns false.
-	[[nodiscard]] bool			ParseToken( const char *pStartingDelim, const char *pEndingDelim, OUT_Z_CAP(nMaxLen) char* pString, intp nMaxLen );
+	[[nodiscard]] bool ParseToken( const char *pStartingDelim, const char *pEndingDelim, OUT_Z_CAP(nMaxLen) char* pString, intp nMaxLen );
 
 	// (For text buffers only)
 	// Parse a token from the buffer:

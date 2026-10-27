@@ -56,12 +56,12 @@ public:
 	void RemoveAll();
 
 	// retrieval methods
-	UtlHashHandle_t Find( Data const &src ) const;
+	[[nodiscard]] UtlHashHandle_t Find( Data const &src ) const;
 
-	Data &Element( UtlHashHandle_t handle );
-	Data const &Element( UtlHashHandle_t handle ) const;
-	Data &operator[]( UtlHashHandle_t handle );
-	Data const &operator[]( UtlHashHandle_t handle ) const;
+	[[nodiscard]] Data &Element( UtlHashHandle_t handle );
+	[[nodiscard]] Data const &Element( UtlHashHandle_t handle ) const;
+	[[nodiscard]] Data &operator[]( UtlHashHandle_t handle );
+	[[nodiscard]] Data const &operator[]( UtlHashHandle_t handle ) const;
 
 	[[nodiscard]] UtlHashHandle_t GetFirstHandle() const;
 	[[nodiscard]] UtlHashHandle_t GetNextHandle( UtlHashHandle_t h ) const;
@@ -75,7 +75,7 @@ protected:
 	[[nodiscard]] intp GetKeyDataIndex( UtlHashHandle_t handle ) const;
 	[[nodiscard]] UtlHashHandle_t BuildHandle( intp ndxBucket, intp ndxKeyData ) const;
 
-	bool DoFind( Data const &src, uintp *pBucket, intp *pIndex ) const;
+	[[nodiscard]] bool DoFind( Data const &src, uintp *pBucket, intp *pIndex ) const;
 
 protected:
 
@@ -518,13 +518,13 @@ public:
 	void Purge();
 
 	// Invalid handle.
-	static UtlHashFastHandle_t InvalidHandle()	{ return ( UtlHashFastHandle_t )~0; }
+	[[nodiscard]] constexpr static UtlHashFastHandle_t InvalidHandle() { return (UtlHashFastHandle_t)~0; }
 
 	// Initialize.
 	bool Init( intp nBucketCount );
 
 	// Size.
-	intp Count();
+	[[nodiscard]] intp Count();
 
 	// Insertion.
 	UtlHashFastHandle_t Insert( uintp uiKey, const Data &data );
@@ -535,12 +535,12 @@ public:
 	void RemoveAll();
 
 	// Retrieval.
-	UtlHashFastHandle_t Find( uintp uiKey );
+	[[nodiscard]] UtlHashFastHandle_t Find( uintp uiKey );
 
-	Data &Element( UtlHashFastHandle_t hHash );
-	Data const &Element( UtlHashFastHandle_t hHash ) const;
-	Data &operator[]( UtlHashFastHandle_t hHash );
-	Data const &operator[]( UtlHashFastHandle_t hHash ) const;
+	[[nodiscard]] Data &Element( UtlHashFastHandle_t hHash );
+	[[nodiscard]] Data const &Element( UtlHashFastHandle_t hHash ) const;
+	[[nodiscard]] Data &operator[]( UtlHashFastHandle_t hHash );
+	[[nodiscard]] Data const &operator[]( UtlHashFastHandle_t hHash ) const;
 
 //protected:
 
@@ -784,10 +784,10 @@ public:
 	void Purge();
 
 	// Invalid handle.
-	static UtlHashFixedHandle_t InvalidHandle()	{ return ( UtlHashFixedHandle_t )~0; }
+	[[nodiscard]] static constexpr UtlHashFixedHandle_t InvalidHandle() { return (UtlHashFixedHandle_t)~0; }
 
 	// Size.
-	intp Count();
+	[[nodiscard]] intp Count();
 
 	// Insertion.
 	UtlHashFixedHandle_t Insert( uintp uiKey, const Data &data );
@@ -798,12 +798,12 @@ public:
 	void RemoveAll();
 
 	// Retrieval.
-	UtlHashFixedHandle_t Find( uintp uiKey );
+	[[nodiscard]] UtlHashFixedHandle_t Find( uintp uiKey );
 
-	Data &Element( UtlHashFixedHandle_t hHash );
-	Data const &Element( UtlHashFixedHandle_t hHash ) const;
-	Data &operator[]( UtlHashFixedHandle_t hHash );
-	Data const &operator[]( UtlHashFixedHandle_t hHash ) const;
+	[[nodiscard]] Data &Element( UtlHashFixedHandle_t hHash );
+	[[nodiscard]] Data const &Element( UtlHashFixedHandle_t hHash ) const;
+	[[nodiscard]] Data &operator[]( UtlHashFixedHandle_t hHash );
+	[[nodiscard]] Data const &operator[]( UtlHashFixedHandle_t hHash ) const;
 
 	//protected:
 

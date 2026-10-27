@@ -19,7 +19,7 @@
 #ifndef wcsdup
 // The mem override tools may provide a copy of this if active, otherwise it is not available in OS X's libc due to
 // being introduced in POSIX-20008
-inline wchar_t *wcsdup(const wchar_t *pString)
+[[nodiscard]] inline wchar_t *wcsdup( const wchar_t *pString )
 {
 	if (!pString)
 		return nullptr;
@@ -34,7 +34,7 @@ inline wchar_t *wcsdup(const wchar_t *pString)
 }
 #endif
 
-inline size_t strnlen(const char *s, size_t n)
+[[nodiscard]] inline size_t strnlen( const char *s, size_t n )
 {
 	const char *p = (const char *)memchr(s, 0, n);
 	return (p ? p - s : n);
@@ -89,14 +89,14 @@ public:
 	[[nodiscard]] const char	*Get() const;
 	void		Set( const char *pValue );
 
-	operator const char*() const;
-	operator std::string_view() const;
+	[[nodiscard]] operator const char*() const;
+	[[nodiscard]] operator std::string_view() const;
 
 	// STL compatible member functions.  These allow easier use of std::sort
 	// and they are forward compatible with the C++ 11 range-based for loops.
-	char* begin()					{ return GetForModify(); }
+	[[nodiscard]] char       *begin() { return GetForModify(); }
 	[[nodiscard]] const char* begin() const		{ return Get(); }
-	char* end()						{ return GetForModify() + Length(); }
+	[[nodiscard]] char       *end() { return GetForModify() + Length(); }
 	[[nodiscard]] const char* end() const			{ return Get() + Length(); }
 
 	// Set directly and don't look for a null terminator in pValue.
@@ -147,8 +147,8 @@ public:
 	CUtlString &operator=( const char *src );
 
 	// Test for equality
-	bool operator==( const CUtlString &src ) const;
-	bool operator!=( const CUtlString &src ) const { return !operator==( src ); }
+	[[nodiscard]] bool operator==( const CUtlString &src ) const;
+	[[nodiscard]] bool operator!=( const CUtlString &src ) const { return !operator==( src ); }
 
 	CUtlString &operator+=( const CUtlString &rhs );
 	CUtlString &operator+=( const char *rhs );
@@ -162,7 +162,7 @@ public:
 
 	[[nodiscard]] bool MatchesPattern( const CUtlString &Pattern, int nFlags = 0 ) const;		// case SENSITIVE, use * for wildcard in pattern string
 
-	char operator[]( intp i ) const;
+	[[nodiscard]] char operator[]( intp i ) const;
 
 #if ! defined(SWIG)
 	// Don't let SWIG see the PRINTF_FORMAT_STRING attribute or it will complain.
@@ -190,10 +190,10 @@ public:
 	[[nodiscard]] CUtlString Replace( char cFrom, char cTo ) const;
 
 	// Replace all instances of specified string with another.
-	CUtlString Replace( const char *pszFrom, const char *pszTo ) const;
+	[[nodiscard]] CUtlString Replace( const char *pszFrom, const char *pszTo ) const;
 
 	// Get this string as an absolute path (calls right through to V_MakeAbsolutePath).
-	CUtlString AbsPath( const char *pStartingDir=nullptr ) const;	
+	[[nodiscard]] CUtlString AbsPath( const char *pStartingDir = nullptr ) const;
 
 	// Gets the filename (everything except the path.. c:\a\b\c\somefile.txt -> somefile.txt).
 	[[nodiscard]] CUtlString UnqualifiedFilename() const;
@@ -214,7 +214,7 @@ public:
 	[[nodiscard]] CUtlString GetExtension() const;
 
 	// Works like V_ComposeFileName.
-	static CUtlString PathJoin( const char *pStr1, const char *pStr2 );
+	[[nodiscard]] static CUtlString PathJoin( const char *pStr1, const char *pStr2 );
 
 	// These can be used for utlvector sorts.
 	static int __cdecl SortCaseInsensitive( const CUtlString *pString1, const CUtlString *pString2 );
@@ -223,7 +223,7 @@ public:
 	// Empty string for those times when you need to return an empty string and
 	// either don't want to pay the construction cost, or are returning a
 	// const CUtlString& and cannot just return "".
-	static const CUtlString &GetEmptyString();
+	[[nodiscard]] static const CUtlString &GetEmptyString();
 
 private:
 	// INTERNALS
@@ -242,22 +242,22 @@ private:
 //	inline friend bool operator==( const T *lhs, const CUtlConstStringBase &rhs ) { return rhs.Compare( lhs ) == 0; }
 //	inline friend bool operator!=( const T *lhs, const CUtlConstStringBase &rhs ) { return rhs.Compare( lhs ) != 0; }
 
-inline bool operator==( const char *pString, const CUtlString &utlString )
+[[nodiscard]] inline bool operator==( const char *pString, const CUtlString &utlString )
 {
 	return utlString.IsEqual_CaseSensitive( pString );
 }
 
-inline bool operator!=( const char *pString, const CUtlString &utlString )
+[[nodiscard]] inline bool operator!=( const char *pString, const CUtlString &utlString )
 {	
 	return !utlString.IsEqual_CaseSensitive( pString );
 }
 
-inline bool operator==( const CUtlString &utlString, const char *pString )
+[[nodiscard]] inline bool operator==( const CUtlString &utlString, const char *pString )
 {
 	return utlString.IsEqual_CaseSensitive( pString );
 }
 
-inline bool operator!=( const CUtlString &utlString, const char *pString )
+[[nodiscard]] inline bool operator!=( const CUtlString &utlString, const char *pString )
 {
 	return !utlString.IsEqual_CaseSensitive( pString );
 }
@@ -339,45 +339,45 @@ template < typename T >
 class StringFuncs
 {
 public:
-	static T		*Duplicate( const T *pValue );
+	[[nodiscard]] static T *Duplicate( const T *pValue );
 	// Note that this function takes a character count, and does not guarantee null-termination.
-	static void		 Copy( T *out_pOut, const T *pIn, intp iLengthInChars );
-	static int		 Compare( const T *pLhs, const T *pRhs );
-	static int		 CaselessCompare( const T *pLhs, const T *pRhs );
-	static intp		 Length( const T *pValue );
-	static const T  *FindChar( const T *pStr, const T cSearch );
-	static const T	*EmptyString();
-	static const T	*NullDebugString();
+	static void	  Copy( T *out_pOut, const T *pIn, intp iLengthInChars );
+	[[nodiscard]] static int		 Compare( const T *pLhs, const T *pRhs );
+	[[nodiscard]] static int		 CaselessCompare( const T *pLhs, const T *pRhs );
+	[[nodiscard]] static intp		 Length( const T *pValue );
+	[[nodiscard]] static const T  *FindChar( const T *pStr, const T cSearch );
+	[[nodiscard]] static const T	*EmptyString();
+	[[nodiscard]] static const T	*NullDebugString();
 };
 
 template < >
 class StringFuncs<char>
 {
 public:
-	static char		  *Duplicate( const char *pValue ) { return strdup( pValue ); }
+	[[nodiscard]] static char *Duplicate( const char *pValue ) { return strdup( pValue ); }
 	// Note that this function takes a character count, and does not guarantee null-termination.
 	static void		   Copy( OUT_CAP(iLengthInChars) char *out_pOut, const char *pIn, intp iLengthInChars ) { strncpy( out_pOut, pIn, iLengthInChars ); }
-	static int		   Compare( const char *pLhs, const char *pRhs ) { return strcmp( pLhs, pRhs ); }
-	static int		   CaselessCompare( const char *pLhs, const char *pRhs ) { return V_stricmp( pLhs, pRhs ); }
-	static intp		   Length( const char *pValue ) { return strlen( pValue ); }
-	static const char *FindChar( const char *pStr, const char cSearch ) { return strchr( pStr, cSearch ); }
-	static const char *EmptyString() { return ""; }
-	static const char *NullDebugString() { return "(null)"; }
+	[[nodiscard]] static int		   Compare( const char *pLhs, const char *pRhs ) { return strcmp( pLhs, pRhs ); }
+	[[nodiscard]] static int		   CaselessCompare( const char *pLhs, const char *pRhs ) { return V_stricmp( pLhs, pRhs ); }
+	[[nodiscard]] static intp		   Length( const char *pValue ) { return strlen( pValue ); }
+	[[nodiscard]] static const char *FindChar( const char *pStr, const char cSearch ) { return strchr( pStr, cSearch ); }
+	[[nodiscard]] static const char *EmptyString() { return ""; }
+	[[nodiscard]] static const char *NullDebugString() { return "(null)"; }
 };
 
 template < >
 class StringFuncs<wchar_t>
 {
 public:
-	static wchar_t		 *Duplicate( const wchar_t *pValue ) { return wcsdup( pValue ); }
+	[[nodiscard]] static wchar_t *Duplicate( const wchar_t *pValue ) { return wcsdup( pValue ); }
 	// Note that this function takes a character count, and does not guarantee null-termination.
 	static void			  Copy( OUT_CAP(iLengthInChars) wchar_t *out_pOut, const wchar_t  *pIn, intp iLengthInChars ) { wcsncpy( out_pOut, pIn, iLengthInChars ); }
-	static int			  Compare( const wchar_t *pLhs, const wchar_t *pRhs ) { return wcscmp( pLhs, pRhs ); }
-	static int			  CaselessCompare( const wchar_t *pLhs, const wchar_t *pRhs ); // no implementation?
-	static intp			  Length( const wchar_t *pValue ) { return wcslen( pValue ); }
-	static const wchar_t *FindChar( const wchar_t *pStr, const wchar_t cSearch ) { return wcschr( pStr, cSearch ); }
-	static const wchar_t *EmptyString() { return L""; }
-	static const wchar_t *NullDebugString() { return L"(null)"; }
+	[[nodiscard]] static int			  Compare( const wchar_t *pLhs, const wchar_t *pRhs ) { return wcscmp( pLhs, pRhs ); }
+	[[nodiscard]] static int			  CaselessCompare( const wchar_t *pLhs, const wchar_t *pRhs ) = delete; // no implementation?
+	[[nodiscard]] static intp			  Length( const wchar_t *pValue ) { return wcslen( pValue ); }
+	[[nodiscard]] static const wchar_t *FindChar( const wchar_t *pStr, const wchar_t cSearch ) { return wcschr( pStr, cSearch ); }
+	[[nodiscard]] static const wchar_t *EmptyString() { return L""; }
+	[[nodiscard]] static const wchar_t *NullDebugString() { return L"(null)"; }
 };
 
 //-----------------------------------------------------------------------------
@@ -399,26 +399,26 @@ public:
 	void Set( const T *pValue );
 	void Clear() { Set( nullptr ); }
 
-	const T *Get() const { return m_pString ? m_pString : StringFuncs<T>::EmptyString(); }
+	[[nodiscard]] const T *Get() const { return m_pString ? m_pString : StringFuncs< T >::EmptyString(); }
 	operator const T*() const { return m_pString ? m_pString : StringFuncs<T>::EmptyString(); }
 
 	[[nodiscard]] bool IsEmpty() const { return m_pString == nullptr; } // Note: empty strings are never stored by Set
 
-	int Compare( const T *rhs ) const;
+	[[nodiscard]] int Compare( const T *rhs ) const;
 
 	// Logical ops
-	bool operator<( const T *rhs ) const { return Compare( rhs ) < 0; }
-	bool operator==( const T *rhs ) const { return Compare( rhs ) == 0; }
-	bool operator!=( const T *rhs ) const { return Compare( rhs ) != 0; }
-	bool operator<( const CUtlConstStringBase &rhs ) const { return Compare( rhs.m_pString ) < 0; }
-	bool operator==( const CUtlConstStringBase &rhs ) const { return Compare( rhs.m_pString ) == 0; }
-	bool operator!=( const CUtlConstStringBase &rhs ) const { return Compare( rhs.m_pString ) != 0; }
+	[[nodiscard]] bool operator<( const T *rhs ) const { return Compare( rhs ) < 0; }
+	[[nodiscard]] bool operator==( const T *rhs ) const { return Compare( rhs ) == 0; }
+	[[nodiscard]] bool operator!=( const T *rhs ) const { return Compare( rhs ) != 0; }
+	[[nodiscard]] bool operator<( const CUtlConstStringBase &rhs ) const { return Compare( rhs.m_pString ) < 0; }
+	[[nodiscard]] bool operator==( const CUtlConstStringBase &rhs ) const { return Compare( rhs.m_pString ) == 0; }
+	[[nodiscard]] bool operator!=( const CUtlConstStringBase &rhs ) const { return Compare( rhs.m_pString ) != 0; }
 
 	// If these are not defined, CUtlConstString as rhs will auto-convert
 	// to const char* and do logical operations on the raw pointers. Ugh.
-	inline friend bool operator<( const T *lhs, const CUtlConstStringBase &rhs ) { return rhs.Compare( lhs ) > 0; }
-	inline friend bool operator==( const T *lhs, const CUtlConstStringBase &rhs ) { return rhs.Compare( lhs ) == 0; }
-	inline friend bool operator!=( const T *lhs, const CUtlConstStringBase &rhs ) { return rhs.Compare( lhs ) != 0; }
+	[[nodiscard]] inline friend bool operator<( const T *lhs, const CUtlConstStringBase &rhs ) { return rhs.Compare( lhs ) > 0; }
+	[[nodiscard]] inline friend bool operator==( const T *lhs, const CUtlConstStringBase &rhs ) { return rhs.Compare( lhs ) == 0; }
+	[[nodiscard]] inline friend bool operator!=( const T *lhs, const CUtlConstStringBase &rhs ) { return rhs.Compare( lhs ) != 0; }
 
 	CUtlConstStringBase &operator=( const T *src ) { Set( src ); return *this; }
 	CUtlConstStringBase &operator=( const CUtlConstStringBase &src ) { Set( src.m_pString ); return *this; }
@@ -464,12 +464,12 @@ using CUtlConstWideString = CUtlConstStringBase<wchar_t>;
 // Helper functor objects.
 //-----------------------------------------------------------------------------
 
-template < typename T > struct UTLConstStringCaselessStringLessFunctor { bool operator()( const CUtlConstStringBase<T>& a, const char *b ) const { return StringFuncs<T>::CaselessCompare( a.Get(), b ) < 0; } };
-template < typename T > struct UTLConstStringCaselessStringEqualFunctor { bool operator()( const CUtlConstStringBase<T>& a, const char *b ) const { return StringFuncs<T>::CaselessCompare( a.Get(), b ) == 0; } };
+template < typename T > struct UTLConstStringCaselessStringLessFunctor { [[nodiscard]] bool operator()( const CUtlConstStringBase<T>& a, const char *b ) const { return StringFuncs<T>::CaselessCompare( a.Get(), b ) < 0; } };
+template < typename T > struct UTLConstStringCaselessStringEqualFunctor { [[nodiscard]] bool operator()( const CUtlConstStringBase<T>& a, const char *b ) const { return StringFuncs<T>::CaselessCompare( a.Get(), b ) == 0; } };
 
 // Helper function for CUtlMaps with a CUtlString key
-inline bool UtlStringLessFunc( const CUtlString &lhs, const CUtlString &rhs ) { return V_strcmp( lhs.Get(), rhs.Get() ) < 0; } 
-inline bool UtlStringCaseInsensitiveLessFunc( const CUtlString &lhs, const CUtlString &rhs ) { return V_stricmp( lhs.Get(), rhs.Get() ) < 0; } 
+[[nodiscard]] inline bool UtlStringLessFunc( const CUtlString &lhs, const CUtlString &rhs ) { return V_strcmp( lhs.Get(), rhs.Get() ) < 0; } 
+[[nodiscard]] inline bool UtlStringCaseInsensitiveLessFunc( const CUtlString &lhs, const CUtlString &rhs ) { return V_stricmp( lhs.Get(), rhs.Get() ) < 0; } 
 
 #include "tier0/memdbgoff.h"
 

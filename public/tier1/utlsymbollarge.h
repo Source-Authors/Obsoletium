@@ -113,7 +113,7 @@ private:
 
 using LargeSymbolTableHashDecoration_t = uint32; 
 
-inline LargeSymbolTableHashDecoration_t CUtlSymbolLarge_Hash( bool CASEINSENSITIVE, const char *pString, intp len )
+[[nodiscard]] inline LargeSymbolTableHashDecoration_t CUtlSymbolLarge_Hash( bool CASEINSENSITIVE, const char *pString, intp len )
 {
 	return ( CASEINSENSITIVE ? HashStringCaseless( pString ) : HashString( pString ) ); 
 }

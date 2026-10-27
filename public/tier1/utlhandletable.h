@@ -36,8 +36,8 @@ public:
 
 	// Set/get handle values
 	void SetHandle( UtlHandle_t h, T *pData );
-	T *GetHandle( UtlHandle_t h ) const;
-	T *GetHandle( UtlHandle_t h, bool checkValidity ) const;
+	[[nodiscard]] T *GetHandle( UtlHandle_t h ) const;
+	[[nodiscard]] T *GetHandle( UtlHandle_t h, bool checkValidity ) const;
 
 	// Is a handle valid?
 	[[nodiscard]] bool IsHandleValid( UtlHandle_t h ) const;
@@ -71,12 +71,12 @@ private:
 		T *m_pData;
 	};
 
-	static unsigned int GetSerialNumber( UtlHandle_t handle );
-	static int GetListIndex( UtlHandle_t handle );
-	static UtlHandle_t CreateHandle( unsigned int nSerial, unsigned int nIndex );
-	const EntryType_t *GetEntry( UtlHandle_t handle, bool checkValidity ) const;
+	[[nodiscard]] static unsigned int GetSerialNumber( UtlHandle_t handle );
+	[[nodiscard]] static int GetListIndex( UtlHandle_t handle );
+	[[nodiscard]] static UtlHandle_t CreateHandle( unsigned int nSerial, unsigned int nIndex );
+	[[nodiscard]] const EntryType_t *GetEntry( UtlHandle_t handle, bool checkValidity ) const;
 	// dimhotepus: Add non-const version to prevent const-away casts.
-	EntryType_t *GetEntry( UtlHandle_t handle, bool checkValidity );
+	[[nodiscard]] EntryType_t *GetEntry( UtlHandle_t handle, bool checkValidity );
 
 	int m_nValidHandles;
 	CUtlVector< EntryType_t > m_list;
@@ -390,26 +390,26 @@ public:
 	const CUtlHandle<T> &operator=( T *pObject );
 
 	// Retrieval
-	T *Get();					
-	const T* Get() const;
+	[[nodiscard]] T *Get();					
+	[[nodiscard]] const T* Get() const;
 
 	// Is the handle valid?
 	[[nodiscard]] bool IsValid() const;
 
 	// Casting
-	operator T*();
-	operator UtlHandle_t();
-	operator bool();
+	[[nodiscard]] operator T*();
+	[[nodiscard]] operator UtlHandle_t();
+	[[nodiscard]] operator bool();
 	T* operator->();
 	const T* operator->() const;
 
 	// Equality
-	bool operator==( CUtlHandle<T> h ) const;
-	bool operator==( T *pObject ) const;
-	bool operator==( UtlHandle_t h ) const;
-	bool operator!=( CUtlHandle<T> h ) const;
-	bool operator!=( T *pObject ) const;
-	bool operator!=( UtlHandle_t h ) const;
+	[[nodiscard]] bool operator==( CUtlHandle<T> h ) const;
+	[[nodiscard]] bool operator==( T *pObject ) const;
+	[[nodiscard]] bool operator==( UtlHandle_t h ) const;
+	[[nodiscard]] bool operator!=( CUtlHandle<T> h ) const;
+	[[nodiscard]] bool operator!=( T *pObject ) const;
+	[[nodiscard]] bool operator!=( UtlHandle_t h ) const;
 
 private:
 	UtlHandle_t m_handle;

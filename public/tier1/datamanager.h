@@ -30,7 +30,7 @@ public:
 	void					TouchResource( memhandle_t handle );
 	void					MarkAsStale( memhandle_t handle );		// move to head of LRU
 
-	[[nodiscard]] int						LockCount( memhandle_t handle );
+	[[nodiscard]] int		LockCount( memhandle_t handle );
 	int						BreakLock( memhandle_t handle );
 	int						BreakAllLocks();
 
@@ -69,11 +69,11 @@ public:
 
 protected:
 	// derived class must call these to implement public API
-	unsigned short			CreateHandle( bool bCreateLocked );
-	memhandle_t				StoreResourceInHandle( unsigned short memoryIndex, void *pStore, size_t realSize );
-	void					*GetResource_NoLock( memhandle_t handle );
-	void					*GetResource_NoLockNoLRUTouch( memhandle_t handle );
-	void					*LockResource( memhandle_t handle );
+	[[nodiscard]] unsigned short CreateHandle( bool bCreateLocked );
+	[[nodiscard]] memhandle_t    StoreResourceInHandle( unsigned short memoryIndex, void *pStore, size_t realSize );
+	[[nodiscard]] void			*GetResource_NoLock( memhandle_t handle );
+	[[nodiscard]] void			*GetResource_NoLockNoLRUTouch( memhandle_t handle );
+	[[nodiscard]] void			*LockResource( memhandle_t handle );
 
 	// NOTE: you must call this from the destructor of the derived class! (will assert otherwise)
 	void					FreeAllLists()	{ FlushAll(); m_listsAreFreed = true; }
@@ -88,13 +88,13 @@ protected:
 
 // Implemented by derived class:
 	virtual void			DestroyResourceStorage( void * ) = 0;
-	virtual size_t			GetRealSize( void * ) = 0;
+	[[nodiscard]] virtual size_t GetRealSize( void * ) = 0;
 
-	memhandle_t				ToHandle( unsigned short index );
-	unsigned short			FromHandle( memhandle_t handle );
+	[[nodiscard]] memhandle_t				ToHandle( unsigned short index );
+	[[nodiscard]] unsigned short			FromHandle( memhandle_t handle );
 	
 	void					TouchByIndex( unsigned short memoryIndex );
-	void *					GetForFreeByIndex( unsigned short memoryIndex );
+	[[nodiscard]] void *GetForFreeByIndex( unsigned short memoryIndex );
 
 	// One of these is stored per active allocation
 	struct resource_lru_element_t
@@ -226,7 +226,7 @@ public:
 	void Unlock() override { m_mutex.Unlock(); }
 
 private:
-	STORAGE_TYPE *StoragePointer( void *pMem )
+	[[nodiscard]] STORAGE_TYPE *StoragePointer( void *pMem )
 	{
 		return static_cast<STORAGE_TYPE *>(pMem);
 	}
@@ -236,7 +236,7 @@ private:
 		StoragePointer(pStore)->DestroyResource();
 	}
 	
-	size_t GetRealSize( void *pStore ) override
+	[[nodiscard]] size_t GetRealSize( void *pStore ) override
 	{
 		return StoragePointer(pStore)->Size();
 	}

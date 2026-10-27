@@ -60,17 +60,17 @@ public:
 	using IndexType_t = S; // should really be called IndexStorageType_t, but that would be a huge change
 	using IndexLocalType_t = I;
 	using MemoryAllocator_t = M;
-	static const bool IsUtlLinkedList = true; // Used to match this at compiletime 
+	static constexpr bool IsUtlLinkedList = true; // Used to match this at compiletime 
 
 	// constructor, destructor
 	CUtlLinkedList( intp growSize = 0, intp initSize = 0 );
 	~CUtlLinkedList();
 
 	// gets particular elements
-	T&         Element( I i );
-	T const&   Element( I i ) const;
-	T&         operator[]( I i );
-	T const&   operator[]( I i ) const;
+	[[nodiscard]] T&         Element( I i );
+	[[nodiscard]] T const&   Element( I i ) const;
+	[[nodiscard]] T&         operator[]( I i );
+	[[nodiscard]] T const&   operator[]( I i ) const;
 
 	// Make sure we have a particular amount of memory
 	void EnsureCapacity( intp num );
@@ -100,7 +100,7 @@ public:
 	I	AddToTail( T&& src );
 
 	// Find an element and return its index or InvalidIndex() if it couldn't be found.
-	I		Find( const T &src ) const;
+	[[nodiscard]] I Find( const T &src ) const;
 	
 	// Look for the element. If it exists, remove it and return true. Otherwise, return false.
 	bool	FindAndRemove( const T &src );
@@ -112,7 +112,7 @@ public:
 	// Allocation/deallocation methods
 	// If multilist == true, then list list may contain many
 	// non-connected lists, and IsInList and Head + Tail are meaningless...
-	I		Alloc( bool multilist = false );
+	[[nodiscard]] I Alloc( bool multilist = false );
 	void	Free( I elem );
 
 	// list modification
@@ -123,28 +123,28 @@ public:
 	void	LinkToTail( I elem );
 
 	// invalid index (M will never allocate an element at this index)
-	inline static constexpr S  InvalidIndex()  { return static_cast<S>(M::InvalidIndex()); }
+	[[nodiscard]] inline static constexpr S InvalidIndex() { return static_cast< S >( M::InvalidIndex() ); }
 
 	// Is a given index valid to use? (representible by S and not the invalid index)
-	static bool IndexInRange( I index );
+	[[nodiscard]] static bool IndexInRange( I index );
 
-	inline static constexpr size_t ElementSize() { return sizeof( ListElem_t ); }
+	[[nodiscard]] inline static constexpr size_t ElementSize() { return sizeof( ListElem_t ); }
 
 	// list statistics
-	I	Count() const;
+	[[nodiscard]] I           Count() const;
 	[[nodiscard]] inline bool IsEmpty( ) const
 	{
 		return ( Head() == InvalidIndex() );
 	}
 
-	I	MaxElementIndex() const;
-	I	NumAllocated( ) const { return m_NumAlloced; }
+	[[nodiscard]] I	MaxElementIndex() const;
+	[[nodiscard]] I	NumAllocated( ) const { return m_NumAlloced; }
 
 	// Traversing the list
-	I  Head() const;
-	I  Tail() const;
-	I  Previous( I i ) const;
-	I  Next( I i ) const;
+	[[nodiscard]] I  Head() const;
+	[[nodiscard]] I  Tail() const;
+	[[nodiscard]] I  Previous( I i ) const;
+	[[nodiscard]] I  Next( I i ) const;
 
 	// STL compatible const_iterator class
 	template < typename List_t >
@@ -211,19 +211,19 @@ public:
 			return temp;
 		}
 
-		bool operator==( const _CUtlLinkedList_constiterator_t& other) const
+		[[nodiscard]] bool operator==( const _CUtlLinkedList_constiterator_t &other ) const
 		{
 			Assert( m_list == other.m_list );
 			return m_index == other.m_index;
 		}
 
-		bool operator!=( const _CUtlLinkedList_constiterator_t& other) const
+		[[nodiscard]] bool operator!=( const _CUtlLinkedList_constiterator_t &other ) const
 		{
 			Assert( m_list == other.m_list );
 			return m_index != other.m_index;
 		}
 
-		const ElemType_t& operator*() const
+		[[nodiscard]] const ElemType_t &operator*() const
 		{
 			return m_list->Element( m_index );
 		}
@@ -302,7 +302,7 @@ public:
 			return temp;
 		}
 
-		ElemType_t& operator*() const
+		[[nodiscard]] ElemType_t &operator*() const
 		{
 			// Const_cast to allow sharing the implementation with the
 			// base class.
@@ -318,27 +318,27 @@ public:
 
 	using const_iterator = _CUtlLinkedList_constiterator_t<CUtlLinkedList<T, S, ML, I, M>>;
 	using iterator = _CUtlLinkedList_iterator_t<CUtlLinkedList<T, S, ML, I, M>>;
-	const_iterator begin() const
+	[[nodiscard]] const_iterator begin() const
 	{
 		return const_iterator( *this, Head() );
 	}
-	iterator begin()
+	[[nodiscard]] iterator begin()
 	{
 		return iterator( *this, Head() );
 	}
 
-	const_iterator end() const
+	[[nodiscard]] const_iterator end() const
 	{
 		return const_iterator( *this, InvalidIndex() );
 	}
-	iterator end()
+	[[nodiscard]] iterator end()
 	{
 		return iterator( *this, InvalidIndex() );
 	}
 
 	// Are nodes in the list or valid?
-	bool  IsValidIndex( I i ) const;
-	bool  IsInList( I i ) const;
+	[[nodiscard]] bool  IsValidIndex( I i ) const;
+	[[nodiscard]] bool  IsInList( I i ) const;
 
 	// copy constructors not allowed
 	CUtlLinkedList( CUtlLinkedList<T, S, ML, I, M> const& list ) = delete;
@@ -349,12 +349,12 @@ protected:
 	using ListElem_t = UtlLinkedListElem_t<T, S>;
 
 	// constructs the class
-	I		AllocInternal( bool multilist = false );
+	[[nodiscard]] I AllocInternal( bool multilist = false );
 	void ConstructList();
 	
 	// Gets at the list element....
-	ListElem_t& InternalElement( I i ) { return m_Memory[i]; }
-	ListElem_t const& InternalElement( I i ) const { return m_Memory[i]; }
+	[[nodiscard]] ListElem_t& InternalElement( I i ) { return m_Memory[i]; }
+	[[nodiscard]] ListElem_t const& InternalElement( I i ) const { return m_Memory[i]; }
 
 	M	m_Memory;
 	I	m_Head;
@@ -368,7 +368,7 @@ protected:
 	// it's in release builds so this can be used in libraries correctly
 	ListElem_t  *m_pElements;
 
-	FORCEINLINE M const &Memory( ) const
+	[[nodiscard]] FORCEINLINE M const &Memory() const
 	{
 		return m_Memory;
 	}
@@ -382,7 +382,7 @@ private:
 	// Faster version of Next that can only be used from tested code internal
 	// to this class, such as Find(). It avoids the cost of checking the index
 	// validity, which is a big win on debug builds.
-	I  PrivateNext( I i ) const;
+	[[nodiscard]] I PrivateNext( I i ) const;
 };
 
 
@@ -1142,17 +1142,17 @@ public:
 
 	using IndexType_t = UtlPtrLinkedListIndex_t;
 
-	T &operator[]( IndexType_t i )			
+	[[nodiscard]] T &operator[]( IndexType_t i )
 	{ 
 		return (( Node_t * )i)->elem; 
 	}
 
-	const T &operator[]( IndexType_t i ) const
+	[[nodiscard]] const T &operator[]( IndexType_t i ) const
 	{ 
 		return (( Node_t * )i)->elem; 
 	}
 
-	IndexType_t	AddToTail()								
+	IndexType_t	AddToTail()
 	{ 
 		return DoInsertBefore( (IndexType_t)m_pFirst, NULL );
 	}
@@ -1162,7 +1162,7 @@ public:
 		return DoInsertBefore( (IndexType_t)m_pFirst, &src );
 	}
 
-	IndexType_t	AddToHead()								
+	IndexType_t	AddToHead()
 	{ 
 		IndexType_t result = DoInsertBefore( (IndexType_t)m_pFirst, NULL );
 		m_pFirst = ((Node_t *)result);
@@ -1237,17 +1237,17 @@ public:
 		m_nElems = 0;
 	}
 
-	[[nodiscard]] intp	Count() const									
+	[[nodiscard]] intp	Count() const
 	{ 
 		return m_nElems; 
 	}
 
-	[[nodiscard]] IndexType_t Head() const							
+	[[nodiscard]] IndexType_t Head() const
 	{ 
 		return (IndexType_t)m_pFirst;
 	}
 
-	IndexType_t Next( IndexType_t i ) const				
+	[[nodiscard]] IndexType_t Next( IndexType_t i ) const
 	{ 
 		Node_t *p = ((Node_t *)i)->pNext;
 		if ( p != m_pFirst )
@@ -1257,13 +1257,13 @@ public:
 		return NULL; 
 	}
 
-	bool IsValidIndex( IndexType_t i ) const
+	[[nodiscard]] bool IsValidIndex( IndexType_t i ) const
 	{
 		Node_t *p = ((Node_t *)i);
 		return ( p && p->pNext && p->pPrev );
 	}
 
-	inline static constexpr IndexType_t  InvalidIndex()
+	[[nodiscard]] inline static constexpr IndexType_t InvalidIndex()
 	{ 
 		return nullptr; 
 	}
@@ -1278,7 +1278,7 @@ private:
 		Node_t *pPrev, *pNext;
 	};
 
-	Node_t *AllocNode( const T *pCopyFrom )
+	[[nodiscard]] Node_t *AllocNode( const T *pCopyFrom )
 	{
 		MEM_ALLOC_CREDIT_CLASS();
 		Node_t *p;

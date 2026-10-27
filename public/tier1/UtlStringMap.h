@@ -18,7 +18,7 @@ public:
 	}
 
 	// Get data by the string itself:
-	T& operator[]( const char *pString )
+	[[nodiscard]] T& operator[]( const char *pString )
 	{
 		CUtlSymbol symbol = m_SymbolTable.AddString( pString );
 		intp index = ( intp )( UtlSymId_t )symbol;
@@ -30,39 +30,39 @@ public:
 	}
 
 	// Get data by the string's symbol table ID - only used to retrieve a pre-existing symbol, not create a new one!
-	T& operator[]( UtlSymId_t n )
+	[[nodiscard]] T& operator[]( UtlSymId_t n )
 	{
 		Assert( n >=0 && n <= m_Vector.Count() );
 		return m_Vector[n];
 	}
 
-	const T& operator[]( UtlSymId_t n ) const
+	[[nodiscard]] const T& operator[]( UtlSymId_t n ) const
 	{
 		Assert( n >=0 && n <= m_Vector.Count() );
 		return m_Vector[n];
 	}
 
-	bool Defined( const char *pString ) const
+	[[nodiscard]] bool Defined( const char *pString ) const
 	{
 		return m_SymbolTable.Find( pString ) != UTL_INVAL_SYMBOL;
 	}
 
-	UtlSymId_t Find( const char *pString ) const
+	[[nodiscard]] UtlSymId_t Find( const char *pString ) const
 	{
 		return m_SymbolTable.Find( pString );
 	}
 
-	static UtlSymId_t InvalidIndex()
+	[[nodiscard]] static constexpr UtlSymId_t InvalidIndex()
 	{
 		return UTL_INVAL_SYMBOL;
 	}
 
-	unsigned short GetNumStrings( ) const
+	[[nodiscard]] unsigned short GetNumStrings( ) const
 	{
 		return m_SymbolTable.GetNumStrings();
 	}
 
-	const char *String( UtlSymId_t n )	const
+	[[nodiscard]] const char *String( UtlSymId_t n )	const
 	{
 		return m_SymbolTable.String( n );
 	}

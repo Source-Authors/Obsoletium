@@ -201,7 +201,7 @@ public:
 	void SetLessFunc( const LessFunc_t &func );
 
 	// Allocation method
-	I  NewNode();
+	[[nodiscard]] I NewNode();
 
 	// Insert method (inserts in order)
 	I  Insert( T const &insert );

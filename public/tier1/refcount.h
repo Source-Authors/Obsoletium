@@ -94,10 +94,10 @@ private:
 // Do a an inline AddRef then return the pointer, useful when returning an
 // object from a function.
 template<typename T>
-inline T* RetAddRef( T *p ) { p->AddRef(); return p; }
+[[nodiscard]] inline T* RetAddRef( T *p ) { p->AddRef(); return p; }
 
 template<typename T>
-inline T* InlineAddRef( T *p ) { p->AddRef(); return p; } //-V524
+[[nodiscard]] inline T* InlineAddRef( T *p ) { p->AddRef(); return p; } //-V524
 
 
 // A class to both hold a pointer to an object and its reference.  Base exists

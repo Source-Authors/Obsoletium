@@ -32,8 +32,8 @@ class CUtlSymbol
 {
 public:
 	// constructor, destructor
-	CUtlSymbol() : m_Id(UTL_INVAL_SYMBOL) {}
-	CUtlSymbol( UtlSymId_t id ) : m_Id(id) {}
+	constexpr CUtlSymbol() : m_Id(UTL_INVAL_SYMBOL) {}
+	constexpr CUtlSymbol( UtlSymId_t id ) : m_Id(id) {}
 	CUtlSymbol( const char* pStr );
 	CUtlSymbol( CUtlSymbol const& sym )  = default;
 	
@@ -41,16 +41,16 @@ public:
 	CUtlSymbol& operator=( CUtlSymbol const& src ) = default;
 	
 	// operator==
-	[[nodiscard]] bool operator==( CUtlSymbol const& src ) const { return m_Id == src.m_Id; }
+	[[nodiscard]] constexpr bool operator==( CUtlSymbol const& src ) const { return m_Id == src.m_Id; }
 	[[nodiscard]] bool operator==( const char *pStr ) const;
 	// dimhotepus: Compare with nullptr.
-	[[nodiscard]] bool operator==( std::nullptr_t ) const { return m_Id == UTL_INVAL_SYMBOL; }
+	[[nodiscard]] constexpr bool operator==( std::nullptr_t ) const { return m_Id == UTL_INVAL_SYMBOL; }
 	
 	// Is valid?
-	[[nodiscard]] bool IsValid() const { return m_Id != UTL_INVAL_SYMBOL; }
+	[[nodiscard]] constexpr bool IsValid() const { return m_Id != UTL_INVAL_SYMBOL; }
 	
 	// Gets at the symbol
-	[[nodiscard]] operator UtlSymId_t const() const { return m_Id; }
+	[[nodiscard]] constexpr operator UtlSymId_t const() const { return m_Id; }
 	
 	// Gets the string associated with the symbol
 	[[nodiscard]] const char* String( ) const;
@@ -148,7 +148,7 @@ protected:
 	{
 	public:
 		CLess( [[maybe_unused]] int ignored = 0 ) {} // permits default initialization to NULL in CUtlRBTree
-		[[nodiscard]] bool operator!() const { return false; }
+		[[nodiscard]] constexpr bool operator!() const { return false; }
 		[[nodiscard]] bool operator()( const CStringPoolIndex &left, const CStringPoolIndex &right ) const;
 	};
 

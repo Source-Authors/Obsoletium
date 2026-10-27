@@ -27,7 +27,7 @@ class CUtlBuffer;
 class CLZSS
 {
 public:
-	unsigned char*	Compress( IN_BYTECAP(inSize) const unsigned char *in, int inSize, unsigned int *outSize );
+	[[nodiscard]] unsigned char	*Compress( IN_BYTECAP( inSize ) const unsigned char *in, int inSize, unsigned int *outSize );
 	unsigned char*	CompressNoAlloc( IN_BYTECAP(inSize) const unsigned char *in, int inSize, OUT_BYTECAP(*outSize) unsigned char *out, unsigned int *outSize );
 	[[deprecated("Unsafe as no buffer size")]] unsigned int	Uncompress( const unsigned char *in, unsigned char *out );
 	unsigned int	SafeUncompress( const unsigned char *in, OUT_BYTECAP(outSize) unsigned char *out, unsigned int outSize );
@@ -57,7 +57,7 @@ private:
 	void			BuildHash( const unsigned char *pData );
 	lzss_list_t		*m_pHashTable;	
 	lzss_node_t		*m_pHashTarget;
-	int             m_nWindowSize;
+	int				m_nWindowSize;
 
 };
 

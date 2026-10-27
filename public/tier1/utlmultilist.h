@@ -51,10 +51,10 @@ public:
 	~CUtlMultiList( );
 
 	// gets particular elements
-	T&         Element( I i );
-	T const&   Element( I i ) const;
-	T&         operator[]( I i );
-	T const&   operator[]( I i ) const;
+	[[nodiscard]] T&         Element( I i );
+	[[nodiscard]] T const&   Element( I i ) const;
+	[[nodiscard]] T&         operator[]( I i );
+	[[nodiscard]] T const&   operator[]( I i ) const;
 
 	// Make sure we have a particular amount of memory
 	void EnsureCapacity( intp num );
@@ -65,7 +65,7 @@ public:
 	// List Creation/deletion
 	ListHandle_t	CreateList();
 	void			DestroyList( ListHandle_t list );
-	bool			IsValidList( ListHandle_t list ) const;
+	[[nodiscard]] bool IsValidList( ListHandle_t list ) const;
 
 	// Insertion methods (call default constructor)....
 	I	InsertBefore( ListHandle_t list, I before );
@@ -96,7 +96,7 @@ public:
 
 	// Allocation/deallocation methods
 	// NOTE: To free, it must *not* be in a list!
-	I		Alloc( );
+	[[nodiscard]] I Alloc();
 	void	Free( I elem );
 
 	// list modification
@@ -107,40 +107,40 @@ public:
 	void	LinkToTail( ListHandle_t list, I elem );
 
 	// invalid index
-	static constexpr I	InvalidIndex()		{ return (I)~0; }
-	static bool	IndexInRange( intp index );
-	static constexpr size_t ElementSize()	{ return sizeof(ListElem_t); }
+	[[nodiscard]] static constexpr I	InvalidIndex()		{ return (I)~0; }
+	[[nodiscard]] static bool	IndexInRange( intp index );
+	[[nodiscard]] static constexpr size_t ElementSize()	{ return sizeof(ListElem_t); }
 
 	// list statistics
 	// dimhotepus: Count type should be index one.
 	[[nodiscard]] I	Count( ListHandle_t list ) const;
 	// dimhotepus: Count type should be index one.
 	[[nodiscard]] I	TotalCount( ) const;
-	I	MaxElementIndex() const;
+	[[nodiscard]] I MaxElementIndex() const;
 
 	// Traversing the list
-	I  Head( ListHandle_t list ) const;
-	I  Tail( ListHandle_t list ) const;
-	I  Previous( I element ) const;
-	I  Next( I element ) const;
+	[[nodiscard]] I  Head( ListHandle_t list ) const;
+	[[nodiscard]] I  Tail( ListHandle_t list ) const;
+	[[nodiscard]] I  Previous( I element ) const;
+	[[nodiscard]] I  Next( I element ) const;
 
 	// Are nodes in a list or valid?
-	bool  IsValidIndex( I i ) const;
-	bool  IsInList( I i ) const;
+	[[nodiscard]] bool IsValidIndex( I i ) const;
+	[[nodiscard]] bool IsInList( I i ) const;
 
 	// copy constructors not allowed
 	CUtlMultiList( CUtlMultiList<T, I> const& list ) = delete;
-   
+
 protected:
 	// constructs the class
 	void ConstructList( );
 	
 	// Gets at the list element....
-	ListElem_t& InternalElement( I i ) { return m_Memory[i]; }
-	ListElem_t const& InternalElement( I i ) const { return m_Memory[i]; }
+	[[nodiscard]] ListElem_t& InternalElement( I i ) { return m_Memory[i]; }
+	[[nodiscard]] ListElem_t const& InternalElement( I i ) const { return m_Memory[i]; }
 
 	// A test for debug mode only...
-	bool IsElementInList( ListHandle_t list, I elem ) const;
+	[[nodiscard]] bool IsElementInList( ListHandle_t list, I elem ) const;
 
 	M							m_Memory;
 	CUtlLinkedList<List_t, I>	m_List;

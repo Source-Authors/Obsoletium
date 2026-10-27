@@ -37,26 +37,26 @@ public:
 	void CopyFrom( const CUtlStack<T, M> &from );
 
 	// element access
-	T& operator[]( intp i );
-	T const& operator[]( intp i ) const;
-	T& Element( intp i );
-	T const& Element( intp i ) const;
+	[[nodiscard]] T& operator[]( intp i );
+	[[nodiscard]] T const& operator[]( intp i ) const;
+	[[nodiscard]] T& Element( intp i );
+	[[nodiscard]] T const& Element( intp i ) const;
 
 	// Gets the base address (can change when adding elements!)
-	T* Base();
-	T const* Base() const;
+	[[nodiscard]] T* Base();
+	[[nodiscard]] T const* Base() const;
 
 	// STL compatible member functions. These allow easier use of std::sort
 	// and they are forward compatible with the C++ 11 range-based for loops.
-	T* begin()					{ return Base(); }
-	const T* begin() const		{ return Base(); }
+	[[nodiscard]] T* begin()					{ return Base(); }
+	[[nodiscard]] const T* begin() const		{ return Base(); }
 
-	T* end()					{ return Base() + Count(); }
-	const T* end() const		{ return Base() + Count(); }
+	[[nodiscard]] T* end()					{ return Base() + Count(); }
+	[[nodiscard]] const T* end() const		{ return Base() + Count(); }
 
 	// Looks at the stack top
-	T& Top();
-	T const& Top() const;
+	[[nodiscard]] T& Top();
+	[[nodiscard]] T const& Top() const;
 
 	// Size
 	[[nodiscard]] intp Count() const;

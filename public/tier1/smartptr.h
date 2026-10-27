@@ -110,7 +110,7 @@ public:
 	void Delete( )							{ delete [] CPlainAutoPtr < T >::Detach(); }
 
 public:
-	T & operator [] ( int k ) const				{ return CPlainAutoPtr < T >::Get()[ k ]; }
+	[[nodiscard]] T &operator[]( int k ) const { return CPlainAutoPtr< T >::Get()[k]; }
 };
 
 

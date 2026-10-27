@@ -1152,7 +1152,9 @@ public:
 				if ( IsJobCancelled( pMapped ) )
 				{
 					// Remove the head, which is pMapped
-					m_queuedMaps.RemoveAtHead();
+					// dimhotepus: Check it is really pMapped.
+					[[maybe_unused]] const auto *pShouldBeMapped = m_queuedMaps.RemoveAtHead();
+					Assert( pShouldBeMapped == pMapped );
 					delete pMapped;
 					continue;
 				}
@@ -1171,7 +1173,9 @@ public:
 					}
 					
 					// Remove the head, which is pMapped
-					m_queuedMaps.RemoveAtHead();
+					[[maybe_unused]] const auto *pShouldBeMapped = m_queuedMaps.RemoveAtHead();
+					// dimhotepus: Check it is really pMapped.
+					Assert( pShouldBeMapped == pMapped );
 				}
 
 				// Stop as soon as we complete one, regardless of success.

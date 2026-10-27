@@ -27,7 +27,7 @@ template <class T>
 class CUtlSortVectorDefaultLess
 {
 public:
-	bool Less( const T& lhs, const T& rhs, void * )
+	[[nodiscard]] bool Less( const T &lhs, const T &rhs, void * )
 	{
 		return lhs < rhs;
 	}
@@ -62,11 +62,11 @@ public:
 	/// Finds an element within the list using a binary search. These are templatized based upon the key
 	/// in which case the less function must handle the Less function for key, T and T, key
 	template< typename TKey >
-	intp		Find( const TKey& search ) const;
+	[[nodiscard]] intp Find( const TKey &search ) const;
 	template< typename TKey >
-	intp		FindLessOrEqual( const TKey& search ) const;
+	[[nodiscard]] intp FindLessOrEqual( const TKey &search ) const;
 	template< typename TKey >
-	intp		FindLess( const TKey& search ) const;
+	[[nodiscard]] intp FindLess( const TKey &search ) const;
 	
 	/// Removes a particular element
 	void	Remove( const T& search );
@@ -98,7 +98,7 @@ public:
 	/// finds a particular element using a linear search. Useful when used
 	/// in between calls to InsertNoSort and RedoSort
 	template< typename TKey >
-	intp	FindUnsorted( const TKey &src ) const;
+	[[nodiscard]] intp FindUnsorted( const TKey &src ) const;
 
 	// No copy constructor
 	CUtlSortVector( const CUtlSortVector<T, LessFunc> & ) = delete;
@@ -145,7 +145,7 @@ protected:
 
 private:
 	template< typename TKey >
-	intp	FindLessOrEqual( const TKey& search, bool *pFound ) const;
+	[[nodiscard]] intp FindLessOrEqual( const TKey &search, bool *pFound ) const;
 
 	void QuickSort( LessFunc& less, intp X, intp I );
 };

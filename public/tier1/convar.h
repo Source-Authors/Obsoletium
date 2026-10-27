@@ -132,7 +132,7 @@ protected:
 	void						Shutdown();
 
 	// Internal copy routine ( uses new operator from correct module )
-	char						*CopyString( const char *from );
+	[[nodiscard]] char			*CopyString( const char *from );
 
 private:
 	// Next ConVar in chain
@@ -491,7 +491,7 @@ public:
 	void Init( const char *pName, bool bIgnoreMissing );
 	[[nodiscard]] bool IsValid() const;
 	[[nodiscard]] bool IsFlagSet( int nFlags ) const;
-	IConVar *GetLinkedConVar();
+	[[nodiscard]] IConVar *GetLinkedConVar();
 
 	// Get/Set value
 	[[nodiscard]] float GetFloat( ) const;
@@ -499,8 +499,8 @@ public:
 	[[nodiscard]] bool GetBool() const { return !!GetInt(); }
 	[[nodiscard]] const char *GetString( ) const;
 	// True if it has a min/max setting
-	bool GetMin( float& minVal ) const;
-	bool GetMax( float& maxVal ) const;
+	[[nodiscard]] bool GetMin( float& minVal ) const;
+	[[nodiscard]] bool GetMax( float& maxVal ) const;
 
 	void SetValue( const char *pValue );
 	void SetValue( float flValue );

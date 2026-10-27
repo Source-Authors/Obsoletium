@@ -44,8 +44,8 @@ public:
 	void Init( intp nGrowSize = 0, intp nInitSize = 0 );
 
 	// here to match CUtlMemory, but only used by ResetDbgInfo, so it can just return NULL
-	T* Base() { return nullptr; }
-	const T* Base() const { return nullptr; }
+	[[nodiscard]] T* Base() { return nullptr; }
+	[[nodiscard]] const T* Base() const { return nullptr; }
 
 protected:
 	struct BlockHeader_t;
@@ -61,8 +61,8 @@ public:
 		constexpr bool operator==( const Iterator_t it ) const	{ return m_pBlockHeader == it.m_pBlockHeader && m_nIndex == it.m_nIndex; }
 		constexpr bool operator!=( const Iterator_t it ) const	{ return m_pBlockHeader != it.m_pBlockHeader || m_nIndex != it.m_nIndex; }
 	};
-	Iterator_t First() const							{ return m_pBlocks ? Iterator_t( m_pBlocks, 0 ) : InvalidIterator(); }
-	Iterator_t Next( const Iterator_t &it ) const
+	[[nodiscard]] Iterator_t First() const { return m_pBlocks ? Iterator_t( m_pBlocks, 0 ) : InvalidIterator(); }
+	[[nodiscard]] Iterator_t Next( const Iterator_t &it ) const
 	{
 		Assert( IsValidIterator( it ) );
 		if ( !IsValidIterator( it ) )
@@ -74,7 +74,7 @@ public:
 
 		return pHeader->m_pNext ? Iterator_t( pHeader->m_pNext, 0 ) : InvalidIterator();
 	}
-	intp GetIndex( const Iterator_t &it ) const
+	[[nodiscard]] intp GetIndex( const Iterator_t &it ) const
 	{
 		Assert( IsValidIterator( it ) );
 		if ( !IsValidIterator( it ) )
@@ -82,7 +82,7 @@ public:
 
 		return ( intp )( HeaderToBlock( it.m_pBlockHeader ) + it.m_nIndex );
 	}
-	bool IsIdxAfter( intp i, const Iterator_t &it ) const
+	[[nodiscard]] bool IsIdxAfter( intp i, const Iterator_t &it ) const
 	{
 		if ( !IsValidIterator( it ) )
 		{
@@ -100,21 +100,21 @@ public:
 		}
 		return false;
 	}
-	bool IsValidIterator( const Iterator_t &it ) const	{ return it.m_pBlockHeader && it.m_nIndex >= 0 && it.m_nIndex < it.m_pBlockHeader->m_nBlockSize; }
-	constexpr Iterator_t InvalidIterator() const		{ return Iterator_t( nullptr, INVALID_INDEX ); }
+	[[nodiscard]] bool IsValidIterator( const Iterator_t &it ) const { return it.m_pBlockHeader && it.m_nIndex >= 0 && it.m_nIndex < it.m_pBlockHeader->m_nBlockSize; }
+	[[nodiscard]] constexpr Iterator_t InvalidIterator() const { return Iterator_t( nullptr, INVALID_INDEX ); }
 
 	// element access
-	T& operator[]( intp i );
-	const T& operator[]( intp i ) const;
-	T& Element( intp i );
-	const T& Element( intp i ) const;
+	[[nodiscard]] T& operator[]( intp i );
+	[[nodiscard]] const T& operator[]( intp i ) const;
+	[[nodiscard]] T& Element( intp i );
+	[[nodiscard]] const T& Element( intp i ) const;
 
 	// Can we use this index?
 	[[nodiscard]] bool IsIdxValid( intp i ) const;
 
 	// Specify the invalid ('null') index that we'll only return on failure
 	static constexpr intp INVALID_INDEX = 0; // For use with COMPILE_TIME_ASSERT
-	static constexpr intp InvalidIndex() { return INVALID_INDEX; }
+	[[nodiscard]] static constexpr intp InvalidIndex() { return INVALID_INDEX; }
 
 	// Size
 	[[nodiscard]] intp NumAllocated() const;
@@ -133,7 +133,7 @@ protected:
 	// Fast swap - WARNING: Swap invalidates all ptr-based indices!!!
 	void Swap( CUtlFixedMemory< T > &mem );
 
-	bool IsInBlock( intp i, BlockHeader_t *pBlockHeader ) const
+	[[nodiscard]] bool IsInBlock( intp i, BlockHeader_t *pBlockHeader ) const
 	{
 		T *p = ( T* )i;
 		const T *p0 = HeaderToBlock( pBlockHeader );
@@ -146,8 +146,8 @@ protected:
 		intp m_nBlockSize;
 	};
 
-	const T *HeaderToBlock( const BlockHeader_t *pHeader ) const { return ( const T* )( pHeader + 1 ); }
-	const BlockHeader_t *BlockToHeader( const T *pBlock ) const { return ( const BlockHeader_t* )( pBlock ) - 1; }
+	[[nodiscard]] const T *HeaderToBlock( const BlockHeader_t *pHeader ) const { return ( const T* )( pHeader + 1 ); }
+	[[nodiscard]] const BlockHeader_t *BlockToHeader( const T *pBlock ) const { return ( const BlockHeader_t* )( pBlock ) - 1; }
 
 	BlockHeader_t* m_pBlocks;
 	intp m_nAllocationCount;

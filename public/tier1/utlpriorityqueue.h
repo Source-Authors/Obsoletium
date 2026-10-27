@@ -30,9 +30,9 @@ public:
 	CUtlPriorityQueue( T *pMemory, intp numElements, LessFunc_t lessfunc = 0 );
 
 	// gets particular elements
-	inline T const&	ElementAtHead() const { return m_heap.Element(0); }
+	[[nodiscard]] inline T const &ElementAtHead() const { return m_heap.Element( 0 ); }
 
-	inline bool IsValidIndex(intp index) { return m_heap.IsValidIndex(index); }
+	[[nodiscard]] inline bool IsValidIndex( intp index ) { return m_heap.IsValidIndex( index ); }
 
 	// O(lgn) to rebalance the heap
 	void		RemoveAtHead();
@@ -52,7 +52,7 @@ public:
 	// Memory deallocation
 	void		Purge() { m_heap.Purge(); }
 
-	inline const T &	Element( intp index ) const { return m_heap.Element(index); }
+	[[nodiscard]] inline const T &Element( intp index ) const { return m_heap.Element( index ); }
 
 protected:
 	CUtlVector<T>	m_heap;

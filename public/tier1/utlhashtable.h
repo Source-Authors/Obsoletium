@@ -309,22 +309,22 @@ public:
 
 	// Access functions. Note: if ValueT is empty_t, all functions return const keys.
 	using Element_t = typename KVPair::ValueReturn_t;
-	KeyT const &Key( handle_t idx ) const { return m_table[idx]->m_key; }
-	Element_t const &Element( handle_t idx ) const { return m_table[idx]->GetValue(); }
-	Element_t &Element(handle_t idx) { return m_table[idx]->GetValue(); }
-	Element_t const &operator[]( handle_t idx ) const { return m_table[idx]->GetValue(); }
-	Element_t &operator[]( handle_t idx ) { return m_table[idx]->GetValue(); }
+	[[nodiscard]] KeyT const &Key( handle_t idx ) const { return m_table[idx]->m_key; }
+	[[nodiscard]] Element_t const &Element( handle_t idx ) const { return m_table[idx]->GetValue(); }
+	[[nodiscard]] Element_t &Element(handle_t idx) { return m_table[idx]->GetValue(); }
+	[[nodiscard]] Element_t const &operator[]( handle_t idx ) const { return m_table[idx]->GetValue(); }
+	[[nodiscard]] Element_t &operator[]( handle_t idx ) { return m_table[idx]->GetValue(); }
 
 	void ReplaceKey( handle_t idx, KeyArg_t k ) { Assert( m_eq( m_table[idx]->m_key, k ) && m_hash( k ) == m_hash( m_table[idx]->m_key ) ); m_table[idx]->m_key = k; }
 	void ReplaceKey( handle_t idx, KeyAlt_t k ) { Assert( m_eq( m_table[idx]->m_key, k ) && m_hash( k ) == m_hash( m_table[idx]->m_key ) ); m_table[idx]->m_key = k; }
 
-	Element_t const &Get( KeyArg_t k, Element_t const &defaultValue ) const { handle_t h = Find( k ); if ( h != InvalidHandle() ) return Element( h ); return defaultValue; }
-	Element_t const &Get( KeyAlt_t k, Element_t const &defaultValue ) const { handle_t h = Find( k ); if ( h != InvalidHandle() ) return Element( h ); return defaultValue; }
+	[[nodiscard]] Element_t const &Get( KeyArg_t k, Element_t const &defaultValue ) const { handle_t h = Find( k ); if ( h != InvalidHandle() ) return Element( h ); return defaultValue; }
+	[[nodiscard]] Element_t const &Get( KeyAlt_t k, Element_t const &defaultValue ) const { handle_t h = Find( k ); if ( h != InvalidHandle() ) return Element( h ); return defaultValue; }
 
-	Element_t const *GetPtr( KeyArg_t k ) const { handle_t h = Find(k); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
-	Element_t const *GetPtr( KeyAlt_t k ) const { handle_t h = Find(k); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
-	Element_t *GetPtr( KeyArg_t k ) { handle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
-	Element_t *GetPtr( KeyAlt_t k ) { handle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	[[nodiscard]] Element_t const *GetPtr( KeyArg_t k ) const { handle_t h = Find(k); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	[[nodiscard]] Element_t const *GetPtr( KeyAlt_t k ) const { handle_t h = Find(k); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	[[nodiscard]] Element_t *GetPtr( KeyArg_t k ) { handle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	[[nodiscard]] Element_t *GetPtr( KeyAlt_t k ) { handle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
 
 	// Swap memory and contents with another identical hashtable
 	// (NOTE: if using function pointers or functors with state,
@@ -865,17 +865,17 @@ protected:
 
 public:
 
-	KeyHashT &GetHashRef() { return m_table.GetHashRef().m_hash; }
-	KeyIsEqualT &GetEqualRef() { return m_table.GetEqualRef().m_eq; }
-	KeyHashT const &GetHashRef() const { return m_table.GetHashRef().m_hash; }
-	KeyIsEqualT const &GetEqualRef() const { return m_table.GetEqualRef().m_eq; }
+	[[nodiscard]] KeyHashT &GetHashRef() { return m_table.GetHashRef().m_hash; }
+	[[nodiscard]] KeyIsEqualT &GetEqualRef() { return m_table.GetEqualRef().m_eq; }
+	[[nodiscard]] KeyHashT const &GetHashRef() const { return m_table.GetHashRef().m_hash; }
+	[[nodiscard]] KeyIsEqualT const &GetEqualRef() const { return m_table.GetEqualRef().m_eq; }
 
 	UtlHashHandle_t Insert( KeyArg_t k ) { return DoInsert<KeyArg_t>( k ); }
 	UtlHashHandle_t Insert( KeyAlt_t k ) { return DoInsert<KeyAlt_t>( k ); }
 	UtlHashHandle_t Insert( KeyArg_t k, ValueArg_t v ) { return DoInsert<KeyArg_t, ValueArg_t>( k, v ); }
 	UtlHashHandle_t Insert( KeyAlt_t k, ValueArg_t v ) { return DoInsert<KeyAlt_t, ValueArg_t>( k, v ); }
-	UtlHashHandle_t Find( KeyArg_t k ) const { return DoFind<KeyArg_t>( k ); }
-	UtlHashHandle_t Find( KeyAlt_t k ) const { return DoFind<KeyAlt_t>( k );  }
+	[[nodiscard]] UtlHashHandle_t Find( KeyArg_t k ) const { return DoFind<KeyArg_t>( k ); }
+	[[nodiscard]] UtlHashHandle_t Find( KeyAlt_t k ) const { return DoFind<KeyAlt_t>( k );  }
 	bool Remove( KeyArg_t k ) { return DoRemove<KeyArg_t>( k ); }
 	bool Remove( KeyAlt_t k ) { return DoRemove<KeyAlt_t>( k ); }
 
@@ -884,22 +884,22 @@ public:
 	[[nodiscard]] intp Count() const { return m_table.Count(); }
 
 	using Element_t = typename KVPair::ValueReturn_t;
-	KeyT const &Key( UtlHashHandle_t idx ) const { return m_data[idx].m_key; }
-	Element_t const &Element( UtlHashHandle_t idx ) const { return m_data[idx].GetValue(); }
-	Element_t &Element( UtlHashHandle_t idx ) { return m_data[idx].GetValue(); }
-	Element_t const &operator[]( UtlHashHandle_t idx ) const { return m_data[idx].GetValue(); }
-	Element_t &operator[]( UtlHashHandle_t idx ) { return m_data[idx].GetValue(); }
+	[[nodiscard]] KeyT const &Key( UtlHashHandle_t idx ) const { return m_data[idx].m_key; }
+	[[nodiscard]] Element_t const &Element( UtlHashHandle_t idx ) const { return m_data[idx].GetValue(); }
+	[[nodiscard]] Element_t &Element( UtlHashHandle_t idx ) { return m_data[idx].GetValue(); }
+	[[nodiscard]] Element_t const &operator[]( UtlHashHandle_t idx ) const { return m_data[idx].GetValue(); }
+	[[nodiscard]] Element_t &operator[]( UtlHashHandle_t idx ) { return m_data[idx].GetValue(); }
 
 	void ReplaceKey( UtlHashHandle_t idx, KeyArg_t k ) { Assert( GetEqualRef()( m_data[idx].m_key, k ) && GetHashRef()( k ) == GetHashRef()( m_data[idx].m_key ) ); m_data[idx].m_key = k; }
 	void ReplaceKey( UtlHashHandle_t idx, KeyAlt_t k ) { Assert( GetEqualRef()( m_data[idx].m_key, k ) && GetHashRef()( k ) == GetHashRef()( m_data[idx].m_key ) ); m_data[idx].m_key = k; }
 
-	Element_t const &Get( KeyArg_t k, Element_t const &defaultValue ) const { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return Element( h ); return defaultValue; }
-	Element_t const &Get( KeyAlt_t k, Element_t const &defaultValue ) const { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return Element( h ); return defaultValue; }
+	[[nodiscard]] Element_t const &Get( KeyArg_t k, Element_t const &defaultValue ) const { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return Element( h ); return defaultValue; }
+	[[nodiscard]] Element_t const &Get( KeyAlt_t k, Element_t const &defaultValue ) const { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return Element( h ); return defaultValue; }
 
-	Element_t const *GetPtr( KeyArg_t k ) const { UtlHashHandle_t h = Find(k); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
-	Element_t const *GetPtr( KeyAlt_t k ) const { UtlHashHandle_t h = Find(k); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
-	Element_t *GetPtr( KeyArg_t k ) { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
-	Element_t *GetPtr( KeyAlt_t k ) { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	[[nodiscard]] Element_t const *GetPtr( KeyArg_t k ) const { UtlHashHandle_t h = Find(k); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	[[nodiscard]] Element_t const *GetPtr( KeyAlt_t k ) const { UtlHashHandle_t h = Find(k); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	[[nodiscard]] Element_t *GetPtr( KeyArg_t k ) { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	[[nodiscard]] Element_t *GetPtr( KeyAlt_t k ) { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
 
 	[[nodiscard]] UtlHashHandle_t FirstHandle() const { return ExtendInvalidHandle( m_data.Head() ); }
 	[[nodiscard]] UtlHashHandle_t NextHandle( UtlHashHandle_t h ) const { return ExtendInvalidHandle( m_data.Next( h ) ); }
@@ -930,15 +930,18 @@ public:
 
 protected:
 	// Perform extension of 0xFFFF to 0xFFFFFFFF if necessary. Note: ( a < CONSTANT ) ? 0 : -1 is usually branchless
-	static UtlHashHandle_t ExtendInvalidHandle( uint64 x ) { return x; }
-	static UtlHashHandle_t ExtendInvalidHandle( uint32 x ) {
+	[[nodiscard]] static UtlHashHandle_t ExtendInvalidHandle( uint64 x ) { return x; }
+	[[nodiscard]] static UtlHashHandle_t ExtendInvalidHandle( uint32 x ) {
 #ifdef PLATFORM_64BITS
 		uint64 a = x; return ExtendInvalidHandle( a | ( ( a < 0xFFFFFFFFu ) ? 0 : -1 ) );
 #else
 		return x;
 #endif
 	}
-	static UtlHashHandle_t ExtendInvalidHandle( uint16 x ) { uint32 a = x; return ExtendInvalidHandle( a | ( ( a < 0xFFFFu ) ? 0 : -1 ) ); }
+	[[nodiscard]] static UtlHashHandle_t ExtendInvalidHandle( uint16 x )
+	{
+		uint32 a = x; return ExtendInvalidHandle( a | ( ( a < 0xFFFFu ) ? 0 : -1 ) );
+	}
 
 	struct IndirectIndex
 	{
@@ -949,32 +952,32 @@ protected:
 	struct HashProxy 
 	{
 		KeyHashT m_hash;
-		size_t operator()( IndirectIndex idx ) const
+		[[nodiscard]] size_t operator()( IndirectIndex idx ) const
 		{
 			const intp tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetHashRef()) - 1024;
 			const intp owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
 			CUtlStableHashtable* pOwner = (CUtlStableHashtable*)((uintptr_t)this - owneroffset);
 			return m_hash( pOwner->m_data[ idx.m_index ].m_key );
 		}
-		size_t operator()( KeyArg_t k ) const { return m_hash( k ); }
-		size_t operator()( KeyAlt_t k ) const { return m_hash( k ); }
+		[[nodiscard]] size_t operator()( KeyArg_t k ) const { return m_hash( k ); }
+		[[nodiscard]] size_t operator()( KeyAlt_t k ) const { return m_hash( k ); }
 	};
 
 	struct EqualProxy
 	{
 		KeyIsEqualT m_eq;
-		size_t operator()( IndirectIndex lhs, IndirectIndex rhs ) const
+		[[nodiscard]] size_t operator()( IndirectIndex lhs, IndirectIndex rhs ) const
 		{
 			return lhs.m_index == rhs.m_index;
 		}
-		size_t operator()( IndirectIndex lhs, KeyArg_t rhs ) const
+		[[nodiscard]] size_t operator()( IndirectIndex lhs, KeyArg_t rhs ) const
 		{
 			const intp tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetEqualRef()) - 1024;
 			const intp owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
 			CUtlStableHashtable* pOwner = (CUtlStableHashtable*)((uintptr_t)this - owneroffset);
 			return m_eq( pOwner->m_data[ lhs.m_index ].m_key, rhs );
 		}
-		size_t operator()( IndirectIndex lhs, KeyAlt_t rhs ) const
+		[[nodiscard]] size_t operator()( IndirectIndex lhs, KeyAlt_t rhs ) const
 		{
 			const intp tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetEqualRef()) - 1024;
 			const intp owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;

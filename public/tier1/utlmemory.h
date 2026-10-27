@@ -216,7 +216,7 @@ public:
 
 	// Specify the invalid ('null') index that we'll only return on failure
 	static constexpr intp INVALID_INDEX = -1; // For use with COMPILE_TIME_ASSERT
-	static constexpr intp InvalidIndex() { return INVALID_INDEX; }
+	[[nodiscard]] static constexpr intp InvalidIndex() { return INVALID_INDEX; }
 
 	// Gets the base address
 	[[nodiscard]] T* Base()									{ if constexpr ( nAlignment == 0 ) return (T*)(&m_Memory[0]); else return (T*)AlignValue( &m_Memory[0], nAlignment ); } //-V106

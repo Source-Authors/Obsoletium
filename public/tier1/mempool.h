@@ -179,9 +179,9 @@ public:
 	[[nodiscard]] intp BytesAllocated()	{ return NumAllocated() * BLOCK_SIZE; }
 	[[nodiscard]] intp BytesFree()		{ return NumFree() * BLOCK_SIZE; }
 
-	[[nodiscard]] intp ItemSize()			{ return ITEM_SIZE; }
-	[[nodiscard]] intp BlockSize()		{ return BLOCK_SIZE; }
-	[[nodiscard]] intp ChunkSize()		{ return CHUNK_SIZE; }
+	[[nodiscard]] constexpr intp ItemSize() const	{ return ITEM_SIZE; }
+	[[nodiscard]] constexpr intp BlockSize() const	{ return BLOCK_SIZE; }
+	[[nodiscard]] constexpr intp ChunkSize() const	{ return CHUNK_SIZE; }
 
 private:
 	struct FreeBlock_t

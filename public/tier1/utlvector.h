@@ -141,31 +141,31 @@ public:
 	CUtlVector<T, A>& operator=( CUtlVector<T, A> &&other ) noexcept;
 
 	// element access
-	T& operator[]( intp i );
-	const T& operator[]( intp i ) const;
-	T& Element( intp i );
+	[[nodiscard]] T& operator[]( intp i );
+	[[nodiscard]] const T& operator[]( intp i ) const;
+	[[nodiscard]] T& Element( intp i );
 	[[nodiscard]] const T& Element( intp i ) const;
-	T& Head();
+	[[nodiscard]] T &Head();
 	[[nodiscard]] const T& Head() const;
-	T& Tail();
+	[[nodiscard]] T &Tail();
 	[[nodiscard]] const T& Tail() const;
-	T& Random();
+	[[nodiscard]] T &Random();
 	[[nodiscard]] const T& Random() const;
 
 	// STL compatible member functions. These allow easier use of std::sort
 	// and they are forward compatible with the C++ 11 range-based for loops.
 	std::conditional_t<IsContiguous, iterator, void*>
-	begin()					{ return Base(); }
+	[[nodiscard]] begin()					{ return Base(); }
 	[[nodiscard]] std::conditional_t<IsContiguous, const_iterator, const void*>
 	begin() const			{ return Base(); }
 
 	std::conditional_t<IsContiguous, iterator, void*>
-	end()					{ return Base() + Count(); }
+	[[nodiscard]] end()					{ return Base() + Count(); }
 	[[nodiscard]] std::conditional_t<IsContiguous, const_iterator, const void*>
 	end() const				{ return Base() + Count(); }
 
 	// Gets the base address (can change when adding elements!)
-	T* Base()								{ return m_Memory.Base(); }
+	[[nodiscard]] T* Base()								{ return m_Memory.Base(); }
 	[[nodiscard]] const T* Base() const					{ return m_Memory.Base(); }
 
 	// Returns the number of elements in the vector
@@ -186,7 +186,7 @@ public:
 	// Adds an element, uses default constructor
 	intp AddToHead();
 	intp AddToTail();
-	T *AddToTailGetPtr();
+	[[nodiscard]] T *AddToTailGetPtr();
 	intp InsertBefore( intp elem );
 	intp InsertAfter( intp elem );
 
@@ -326,12 +326,12 @@ protected:
 
 private:
 	// Address of slot i, valid for any i < NumAllocated() (constructed or not).
-	T* SlotPtr( intp i )
+	[[nodiscard]] T* SlotPtr( intp i )
 	{
 		if constexpr ( IsContiguous ) return Base() + i;
 		else return std::addressof( m_Memory[ i ] );
 	}
-	const T* SlotPtr( intp i ) const
+	[[nodiscard]] const T *SlotPtr( intp i ) const
 	{
 		if constexpr ( IsContiguous ) return Base() + i;
 		else return std::addressof( m_Memory[ i ] );
@@ -526,7 +526,7 @@ public:
 		return m_pData->m_Size;
 	}
 
-	static constexpr intp InvalidIndex()
+	[[nodiscard]] static constexpr intp InvalidIndex()
 	{
 		return -1;
 	}
@@ -539,31 +539,31 @@ public:
 	// dimhotepus: Add STL compatible member functions. 
 	// STL compatible member functions. These allow easier use of std::sort
 	// and they are forward compatible with the C++ 11 range-based for loops.
-	T* begin()					{ return Base(); }
+	[[nodiscard]] T       *begin() { return Base(); }
 	[[nodiscard]] const T* begin() const		{ return Base(); }
 	
 	// dimhotepus: Add STL compatible member functions. 
-	T *end()					{ return Base() + Count(); }
+	[[nodiscard]] T       *end() { return Base() + Count(); }
 	[[nodiscard]] const T *end() const		{ return Base() + Count(); }
 
 	// dimhotepus: Add CUtlVector compatible member functions. 
 	// Gets the base address (can change when adding elements!)
-	T* Base()								{ return m_pData->m_Elements; }
+	[[nodiscard]] T       *Base() { return m_pData->m_Elements; }
 	[[nodiscard]] const T* Base() const					{ return m_pData->m_Elements; }
 
-	T& operator[]( intp i )
+	[[nodiscard]] T &operator[]( intp i )
 	{
 		Assert( IsValidIndex( i ) );
 		return m_pData->m_Elements[i];
 	}
 
-	const T& operator[]( intp i ) const
+	[[nodiscard]] const T &operator[]( intp i ) const
 	{
 		Assert( IsValidIndex( i ) );
 		return m_pData->m_Elements[i];
 	}
 
-	T& Element( intp i )
+	[[nodiscard]] T &Element( intp i )
 	{
 		Assert( IsValidIndex( i ) );
 		return m_pData->m_Elements[i];
@@ -756,12 +756,12 @@ public:
 	Data_t *m_pData;
 private:
 	// Byte offset of the first element after the header, honoring alignof(T).
-	static constexpr size_t ElementsOffset()
+	[[nodiscard]] static constexpr size_t ElementsOffset()
 	{
 		return ( sizeof( Data_t ) + alignof( T ) - 1 ) & ~( alignof( T ) - 1 );
 	}
 
-	static T *ElementsOf( Data_t *pData )
+	[[nodiscard]] static T *ElementsOf( Data_t *pData )
 	{
 		return reinterpret_cast<T *>( reinterpret_cast<char *>( pData ) + ElementsOffset() );
 	}
@@ -792,7 +792,7 @@ private:
 	// thread-safe-static guard check a function-local static costs on every call.
 	static inline Data_t s_StaticData{ 0, nullptr };
 
-	static Data_t *StaticData()
+	[[nodiscard]] static Data_t *StaticData()
 	{
 		Assert( s_StaticData.m_Size == 0 );
 		return &s_StaticData;
