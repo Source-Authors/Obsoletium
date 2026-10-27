@@ -100,7 +100,8 @@ public:
 			pReference->WorldToLocal( &ballsocket.constraintPosition[0], m_vWorld );
 			pPhysicsObject->WorldToLocal( &ballsocket.constraintPosition[1], tr.endpos );
 	
-			physenv->CreateBallsocketConstraint( pReference, pPhysicsObject, NULL, ballsocket );
+			// dimhotepus: Ok to discard as constraint linked to physics object internally.
+			(void)physenv->CreateBallsocketConstraint( pReference, pPhysicsObject, NULL, ballsocket );
 
 			//Play a sound
 			CPASAttenuationFilter filter( pEnt );
