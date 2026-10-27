@@ -123,7 +123,8 @@ DECLARE_FIELD_SIZE( FIELD_MATERIALINDEX,	sizeof(int) )
 
 
 #define ARRAYSIZE2D(p)		(sizeof(p)/sizeof(p[0][0]))
-#define SIZE_OF_ARRAY(p)	RTL_NUMBER_OF_V0(p)
+// dimhotepus: RTL_NUMBER_OF_V0 -> SE_RTL_NUMBER_OF_V0 to not clash with windows headers.
+#define SIZE_OF_ARRAY(p)	SE_RTL_NUMBER_OF_V0(p)
 
 // Normal offset of is invalid on non-array-types, this is dubious as hell. The rest of the codebase converted to the
 // legit offsetof from the C headers, so we'll use the old impl here to avoid exposing temptation to others

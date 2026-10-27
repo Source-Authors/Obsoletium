@@ -386,12 +386,14 @@ inline
 //   RTL_NUMBER_OF(Buffer) == 100
 // This is also popularly known as: NUMBER_OF, ARRSIZE, _countof, NELEM, etc.
 //
-#ifndef RTL_NUMBER_OF_V0
-#define RTL_NUMBER_OF_V0(A) (sizeof(A) / sizeof((A)[0]))
+// dimhotepus: RTL_NUMBER_OF_V0 -> SE_RTL_NUMBER_OF_V0 to not clash with windows headers.
+#ifndef SE_RTL_NUMBER_OF_V0
+#define SE_RTL_NUMBER_OF_V0(A) (sizeof(A) / sizeof((A)[0]))
 #endif
 
-#ifndef RTL_NUMBER_OF_V1
-#define RTL_NUMBER_OF_V1(A) RTL_NUMBER_OF_V0(A)
+// dimhotepus: RTL_NUMBER_OF_V1 -> SE_RTL_NUMBER_OF_V1 to not clash with windows headers.
+#ifndef SE_RTL_NUMBER_OF_V1
+#define SE_RTL_NUMBER_OF_V1(A) SE_RTL_NUMBER_OF_V0(A)
 #endif
 
 // dimhotepus: The template form works on every C++17 compiler, not just MSVC,
@@ -438,9 +440,11 @@ extern "C++"  // templates cannot be declared to have 'C' linkage
 // The +0 is so that we can go:
 // size = ARRAYSIZE(array) * sizeof(array[0]) without triggering a /analyze
 // warning about multiplying sizeof.
-#define RTL_NUMBER_OF_V2(A) (sizeof(*RtlpNumberOf(A)) + 0)
+// dimhotepus: RTL_NUMBER_OF_V2 -> SE_RTL_NUMBER_OF_V2 to not clash with windows headers.
+#define SE_RTL_NUMBER_OF_V2(A) (sizeof(*RtlpNumberOf(A)) + 0)
 #else
-#define RTL_NUMBER_OF_V2(A) (sizeof(*RtlpNumberOf(A)))
+// dimhotepus: RTL_NUMBER_OF_V2 -> SE_RTL_NUMBER_OF_V2 to not clash with windows headers.
+#define SE_RTL_NUMBER_OF_V2(A) (sizeof(*RtlpNumberOf(A)))
 #endif
 
 // This does not work with:
@@ -448,7 +452,7 @@ extern "C++"  // templates cannot be declared to have 'C' linkage
 // void Foo()
 // {
 //    struct { int x; } y[2];
-//    RTL_NUMBER_OF_V2(y); // illegal use of anonymous local type in template
+//    SE_RTL_NUMBER_OF_V2(y); // illegal use of anonymous local type in template
 //    instantiation
 // }
 //
@@ -459,7 +463,7 @@ extern "C++"  // templates cannot be declared to have 'C' linkage
 // void Foo()
 // {
 //    Foo1 y[2];
-//    RTL_NUMBER_OF_V2(y); // ok
+//    SE_RTL_NUMBER_OF_V2(y); // ok
 // }
 //
 // OR
@@ -467,7 +471,7 @@ extern "C++"  // templates cannot be declared to have 'C' linkage
 // void Foo()
 // {
 //    struct { int x; } y[2];
-//    RTL_NUMBER_OF_V0(y); // ok
+//    SE_RTL_NUMBER_OF_V0(y); // ok
 // }
 //
 // OR
@@ -479,15 +483,16 @@ extern "C++"  // templates cannot be declared to have 'C' linkage
 // }
 
 #else
-#define RTL_NUMBER_OF_V2(A) RTL_NUMBER_OF_V1(A)
+// dimhotepus: RTL_NUMBER_OF_V2 -> SE_RTL_NUMBER_OF_V2 to not clash with windows headers.
+#define SE_RTL_NUMBER_OF_V2(A) SE_RTL_NUMBER_OF_V1(A)
 #endif
 
-// ARRAYSIZE is more readable version of RTL_NUMBER_OF_V2.
-#define ARRAYSIZE(A) RTL_NUMBER_OF_V2(A)
+// ARRAYSIZE is more readable version of SE_RTL_NUMBER_OF_V2.
+#define ARRAYSIZE(A) SE_RTL_NUMBER_OF_V2(A)
 
 // dimhotepus: Try to hide this one. Looks like not used anymore.
 // _ARRAYSIZE is a version useful for anonymous types.
-// #define _ARRAYSIZE(A) RTL_NUMBER_OF_V0(A)
+// #define _ARRAYSIZE(A) SE_RTL_NUMBER_OF_V0(A)
 
 // dimhotepus: Deprecated.
 // #define Q_ARRAYSIZE(p) ARRAYSIZE(p)
