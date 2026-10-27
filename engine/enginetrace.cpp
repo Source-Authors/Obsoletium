@@ -555,7 +555,7 @@ static void FASTCALL GetBrushesInAABB_ParseLeaf( const Vector *pExtents, CCollis
 		}
 		else
 		{
-			unsigned int j;
+			int j;
 			for( j = 0; j != pBrush->numsides; ++j )
 			{
 				cplane_t *pPlane = pBSPData->map_brushsides[pBrush->firstbrushside + j].plane;
