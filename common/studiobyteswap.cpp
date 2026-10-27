@@ -1237,7 +1237,7 @@ intp ByteswapANI( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, cons
 			void *pInput = (byte *)pDestBase + pAnimBlock->datastart;
 			int inputSize = pAnimBlock->dataend - pAnimBlock->datastart;
 
-			pAnimBlock->datastart = (uintp)pNewDest - (uintp)pNewDestBase;
+			pAnimBlock->datastart = size_cast<int>( (uintp)pNewDest - (uintp)pNewDestBase );
 
 			void *pOutput;
 			int outputSize;
@@ -1258,7 +1258,7 @@ intp ByteswapANI( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, cons
 			padding -= (uintp)pNewDest - (uintp)pNewDestBase;
 			pNewDest += padding;
 
-			pAnimBlock->dataend = (uintp)pNewDest - (uintp)pNewDestBase;
+			pAnimBlock->dataend = size_cast<int>( (uintp)pNewDest - (uintp)pNewDestBase );
 		}
 
 		fixedFileSize = pNewDest - pNewDestBase;
