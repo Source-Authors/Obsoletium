@@ -51,8 +51,18 @@ public:
 	[[nodiscard]] T* begin()					{ return Base(); }
 	[[nodiscard]] const T* begin() const		{ return Base(); }
 
-	[[nodiscard]] T* end()					{ return Base() + Count(); }
-	[[nodiscard]] const T* end() const		{ return Base() + Count(); }
+	[[nodiscard]] T* end()
+	{
+		// dimhotepus: Avoid pointer arithmetic on a null Base() for an empty stack.
+		T* base = Base();
+		return Count() == 0 ? base : base + Count();
+	}
+	[[nodiscard]] const T* end() const
+	{
+		// dimhotepus: Avoid pointer arithmetic on a null Base() for an empty stack.
+		const T* base = Base();
+		return Count() == 0 ? base : base + Count();
+	}
 
 	// Looks at the stack top
 	[[nodiscard]] T& Top();
