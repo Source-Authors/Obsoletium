@@ -5,67 +5,72 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#include <stdlib.h>
-#include <stdlib.h>
+
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#include <cerrno>
+#include <cstdlib>
+
 #include "vtf/vtf.h"
-#include "UtlBuffer.h"
+#include "tier0/platform.h"
+#include "tier1/utlbuffer.h"
 
 int main( int argc, char **argv )
 {
 	if( argc != 5 )
 	{
 		fprintf( stderr, "Usage: vtfscreen blah.vtf 0 1 2\n" );
-		exit( -1 );
+		return EINVAL;
 	}
+
 	const char *pSrcFilename = argv[1];
 	int rOffset = atoi( argv[2] );
 	int gOffset = atoi( argv[3] );
 	int bOffset = atoi( argv[4] );
 	CUtlBuffer srcData;
 
-	struct	_stat buf;
+	_stat buf;
 	if( _stat( pSrcFilename, &buf ) == -1 )
 	{
-		fprintf( stderr, "Couldn't stat %s\n", pSrcFilename );
-		exit( -1 );
+		const int rc{errno};
+		fprintf( stderr, "Couldn't stat %s: %s.\n", pSrcFilename, strerror(rc) );
+		return rc;
 	}
 
-	int srcFileSize = buf.st_size;
-
+	intp srcFileSize = buf.st_size;
 	srcData.EnsureCapacity( srcFileSize );
 
 	FILE *fp = fopen( pSrcFilename, "rb" );
 	if( !fp )
 	{
-		fprintf( stderr, "Couldn't open %s\n", pSrcFilename );
-		exit( -1 );
-	}
+		const int rc{errno};
+		fprintf( stderr, "Couldn't open %s for reading: %s\n", pSrcFilename, strerror(rc) );
+		return rc;
+	}	
 
-	int nBytesRead = fread( srcData.Base(), 1, srcFileSize, fp );
+	intp nBytesRead = fread( srcData.Base(), 1, srcFileSize, fp );
 	fclose( fp );
 
 	srcData.SeekPut( CUtlBuffer::SEEK_HEAD, nBytesRead );
 
 	IVTFTexture *pSrcTexture = CreateVTFTexture();
+	RunCodeAtScopeExit( DestroyVTFTexture( pSrcTexture) );
 	
 	pSrcTexture->Unserialize( srcData );
 	ImageFormat srcFormat = pSrcTexture->Format();
 	pSrcTexture->ConvertImageFormat( IMAGE_FORMAT_DEFAULT, false );
 
-	int totalSize = pSrcTexture->ComputeTotalSize();
+	intp totalSize = pSrcTexture->ComputeTotalSize();
 
 	unsigned char *pImageData = pSrcTexture->ImageData();
-	int i;
-	for( i = 0; i < totalSize; i += 4 )
+	for( intp i = 0; i < totalSize; i += 4 )
 	{
 #if 0
 		// ATI BEFORE E32003
-		int r, g, b;
-		r = ( int )pImageData[i+0];
-		g = ( int )pImageData[i+1];
-		b = ( int )pImageData[i+2];
+		int r = ( int )pImageData[i+0];
+		int g = ( int )pImageData[i+1];
+		int b = ( int )pImageData[i+2];
 
 		int grey = r + g + b;
 		grey = grey / 3;
@@ -89,23 +94,29 @@ int main( int argc, char **argv )
 		pImageData[i+1] = pImageData[i+2];
 #endif
 		// leave alpha alone
-		int tmpR, tmpG, tmpB;
-		tmpR = pImageData[i+rOffset];
-		tmpG = pImageData[i+gOffset];
-		tmpB = pImageData[i+bOffset];
+		int tmpR = pImageData[i+rOffset];
+		int tmpG = pImageData[i+gOffset];
+		int tmpB = pImageData[i+bOffset];
 		pImageData[i+0] = tmpR;
 		pImageData[i+1] = tmpG;
 		pImageData[i+2] = tmpB;
 	}
 
 	pSrcTexture->ConvertImageFormat( srcFormat, false );
-	CUtlBuffer dstData;
 
+	CUtlBuffer dstData;
 	pSrcTexture->Serialize( dstData );
 
-	fp = fopen( pSrcFilename, "wb" );
+	if ( fp = fopen( pSrcFilename, "wb" ); !fp )
+	{
+		const int rc{errno};
+		fprintf( stderr, "Couldn't open %s for writing: %s\n", pSrcFilename, strerror(rc) );
+		return rc;
+	}
+
+	RunCodeAtScopeExit( fclose( fp ) );
+
 	fwrite( dstData.Base(), 1, dstData.TellPut(), fp );
-	fclose( fp );
 
 	return 0;
 }
