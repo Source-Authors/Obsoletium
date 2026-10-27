@@ -149,6 +149,7 @@ void CUtlStack<T,M>::CopyFrom( const CUtlStack<T, M> &from )
 	}
 }
 
+
 //-----------------------------------------------------------------------------
 // element access
 //-----------------------------------------------------------------------------
@@ -198,6 +199,7 @@ inline T const* CUtlStack<T,M>::Base() const
 	return m_Memory.Base();
 }
 
+
 //-----------------------------------------------------------------------------
 // Returns the top of the stack
 //-----------------------------------------------------------------------------
@@ -215,6 +217,7 @@ inline T const& CUtlStack<T,M>::Top() const
 	Assert( m_Size > 0 );
 	return Element(m_Size-1);
 }
+
 
 //-----------------------------------------------------------------------------
 // Size
@@ -237,6 +240,7 @@ inline bool CUtlStack<T,M>::IsIdxValid( intp i ) const
 	return (i >= 0) && (i < m_Size);
 }
  
+
 //-----------------------------------------------------------------------------
 // Grows the stack
 //-----------------------------------------------------------------------------
@@ -251,6 +255,7 @@ void CUtlStack<T,M>::GrowStack()
 
 	ResetDbgInfo();
 }
+
 
 //-----------------------------------------------------------------------------
 // Makes sure we have enough memory allocated to store a requested # of elements
@@ -276,6 +281,7 @@ intp CUtlStack<T,M>::Push()
 	return m_Size - 1;
 }
 
+
 //-----------------------------------------------------------------------------
 // Adds an element, uses copy constructor
 //-----------------------------------------------------------------------------
@@ -288,8 +294,10 @@ intp CUtlStack<T,M>::Push( T const& src )
 	return m_Size - 1;
 }
 
+
+
 //-----------------------------------------------------------------------------
-// Adds an element, uses copy constructor
+// Adds an element, uses move constructor
 //-----------------------------------------------------------------------------
 
 template< class T, class M >
@@ -299,6 +307,7 @@ intp CUtlStack<T,M>::Push( T&& src )
 	MoveConstruct( std::addressof( Element(m_Size-1) ), std::move( src ) );
 	return m_Size - 1;
 }
+
 
 
 //-----------------------------------------------------------------------------
@@ -327,6 +336,7 @@ void CUtlStack<T,M>::PopMultiple( intp num )
 	Assert( m_Size >= num );
 	for ( intp i = 0; i < num; ++i )
 		Destruct( std::addressof( Element( m_Size - i - 1 ) ) );
+
 	m_Size -= num;
 }
 
