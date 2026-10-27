@@ -107,12 +107,7 @@ public:
 	enum : storage_t
 	{
 		// must be high bit for IsValid and IdealIndex to work
-		FLAG_FREE =
-#ifdef PLATFORM_64BITS
-			INT64_STORAGE ? 0x8000000000000000 :
-#endif
-				(INT32_STORAGE ? 0x80000000 :
-					(INT16_STORAGE ? 0x8000 : -1)),
+		FLAG_FREE = -1,
 		FLAG_LAST =
 #ifdef PLATFORM_64BITS
 			INT64_STORAGE ? 0x4000000000000000 :
