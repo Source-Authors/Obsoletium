@@ -46,7 +46,7 @@ CUtlLinkedList<SpewHookFn, unsigned short> g_ExtraSpewHooks;
 bool g_bStopOnExit = false;
 void (*g_ExtraSpewHook)(const char *) = nullptr;
 
-#if defined(_WIN32) || defined(WIN32)
+#if defined(_WIN32)
 void CmdLib_FPrintf(FileHandle_t hFile,
                     PRINTF_FORMAT_STRING const char *pFormat, ...) {
   static CUtlVector<char> buf;
@@ -751,7 +751,7 @@ void CreatePath(char *path) {
   }
 }
 
-#if defined(_WIN32) || defined(WIN32)
+#if defined(_WIN32)
 // Creates a path, path may already exist. This is kinda janky, avoid.
 void SafeCreatePath(char *path) {
   char *ptr;
