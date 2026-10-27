@@ -131,24 +131,24 @@ void ImageBorder::Paint(int x, int y, int wide, int tall, int breakSide, int bre
 		int imageWide, imageTall;
 		g_pSurface->DrawGetTextureSize( m_iTextureID, imageWide, imageTall );
 
-		int y = 0;
-		while ( y < tall )
+		int ypos = 0;
+		while ( ypos < tall )
 		{
-			int x = 0;
-			while (x < wide)
+			int xpos = 0;
+			while (xpos < wide)
 			{
 				vgui::Vertex_t verts[4];
-				verts[0].Init( Vector2D( x, y ), uv11 );
-				verts[1].Init( Vector2D( x+imageWide, y ), uv21 );
-				verts[2].Init( Vector2D( x+imageWide, y+imageTall ), uv22 );
-				verts[3].Init( Vector2D( x, y+imageTall ), uv12  );
+				verts[0].Init( Vector2D( xpos, ypos ), uv11 );
+				verts[1].Init( Vector2D( xpos+imageWide, ypos ), uv21 );
+				verts[2].Init( Vector2D( xpos+imageWide, ypos+imageTall ), uv22 );
+				verts[3].Init( Vector2D( xpos, ypos+imageTall ), uv12  );
 
 				g_pSurface->DrawTexturedPolygon( 4, verts );	
 
-				x += imageWide;
+				xpos += imageWide;
 			}
 
-			y += imageTall;
+			ypos += imageTall;
 		}
 	}
 	else
