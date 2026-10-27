@@ -158,12 +158,12 @@ public:
 #else
 		undefined_t>;
 #endif
-	[[nodiscard]] static FORCEINLINE size_t IdealIndex( uint32_if16BitStorage h, size_t m )
+	[[nodiscard]] static constexpr FORCEINLINE size_t IdealIndex( uint32_if16BitStorage h, size_t m )
 	{
 		h &= MASK_HASH; h *= MASK_HASH + 2;
 		return h & m;
 	}
-	[[nodiscard]] static FORCEINLINE size_t IdealIndex( uint32_if32BitStorage h, size_t m )
+	[[nodiscard]] static constexpr FORCEINLINE size_t IdealIndex( uint32_if32BitStorage h, size_t m )
 	{
 		return h & m;
 	}
