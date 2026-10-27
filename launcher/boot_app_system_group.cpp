@@ -30,6 +30,10 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#if defined( USE_SDL )
+extern void *CreateSDLMgr();
+#endif
+
 namespace
 {
 
