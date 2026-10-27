@@ -36,6 +36,10 @@ public:
 	CUtlStack( intp growSize = 0, intp initSize = 0 );
 	~CUtlStack();
 
+	// dimhotepus: Prevent accidental shallow copies of the backing memory.
+	CUtlStack(const CUtlStack&) = delete;
+	CUtlStack& operator=(const CUtlStack&) = delete;
+
 	void CopyFrom( const CUtlStack<T, M> &from );
 
 	// element access
