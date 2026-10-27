@@ -526,7 +526,7 @@ protected:
 	// private data, generally from VTF resource extensions
 	struct DataChunk
 	{
-		void Allocate( unsigned int numBytes ) 
+		void Allocate( size_t numBytes ) 
 		{
 			m_pvData = new unsigned char[ numBytes ];
 			m_numBytes = numBytes;
@@ -534,7 +534,8 @@ protected:
 		void Deallocate() const { delete [] m_pvData; }
 		
 		unsigned int m_eType;
-		unsigned int m_numBytes;
+		// dimhotepus: unsigned -> size_t.
+		size_t       m_numBytes;
 		unsigned char *m_pvData;
 	};
 	CUtlVector< DataChunk > m_arrDataChunks;
