@@ -137,6 +137,10 @@ CUtlStack<T,M>::~CUtlStack()
 template< class T, class M >
 void CUtlStack<T,M>::CopyFrom( const CUtlStack<T, M> &from )
 {
+	// dimhotepus: Avoid clearing the source when copying from this object.
+	if (this == &from)
+		return;
+
 	Purge();
 	EnsureCapacity( from.Count() );
 	for ( intp i = 0; i < from.Count(); i++ )
