@@ -262,8 +262,8 @@ void CTextWindow::ShowFile( const char *filename )
 		RunCodeAtScopeExit(g_pFullFileSystem->Close(f));
 
 		char buffer[2048];
-			
-		int size = MIN( g_pFullFileSystem->Size( f ), sizeof(buffer) ); // just allow 2KB
+
+		unsigned size = MIN( g_pFullFileSystem->Size( f ), static_cast<unsigned>( sizeof(buffer) ) ); // just allow 2KB
 
 		g_pFullFileSystem->Read( buffer, size, f );
 
