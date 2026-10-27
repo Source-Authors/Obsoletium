@@ -862,6 +862,29 @@ inline uint32 BigDWord( uint32 val )
 	}
 }
 template <bool isLittleEndian = endian::native == endian::little>
+inline size_t BigSize_t( size_t val )
+{
+	if constexpr (isLittleEndian)
+	{
+		if constexpr (sizeof(val) == 8)
+		{
+			return QWordSwap( val );
+		}
+		else if constexpr (sizeof(val) == 4)
+		{
+			return DWordSwap( val );
+		}
+		else
+		{
+			unreachable();
+		}
+	}
+	else
+	{
+		return val;
+	}
+}
+template <bool isLittleEndian = endian::native == endian::little>
 inline int16 LittleShort( int16 val )
 {
 	if constexpr (isLittleEndian)
@@ -908,6 +931,29 @@ inline uint32 LittleDWord( uint32 val )
 		return DWordSwap(val);
 	}
 }
+template< bool isLittleEndian = endian::native == endian::little >
+inline size_t LittleSize_t( uint32 val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return val;
+	}
+	else
+	{
+		if constexpr (sizeof(val) == 8)
+		{
+			return QWordSwap( val );
+		}
+		else if constexpr (sizeof(val) == 4)
+		{
+			return DWordSwap( val );
+		}
+		else
+		{
+			unreachable();
+		}
+	}
+}
 template <bool isLittleEndian = endian::native == endian::little>
 inline uint64 LittleQWord( uint64 val )
 {
@@ -924,6 +970,21 @@ inline int16 SwapShort( int16 val )					{ return WordSwap( val ); }
 inline uint16 SwapWord( uint16 val )				{ return WordSwap( val ); }
 inline long SwapLong( long val )					{ return DWordSwap( val ); }
 inline uint32 SwapDWord( uint32 val )				{ return DWordSwap( val ); }
+inline size_t SwapSize_t( size_t val )
+{
+	if constexpr ( sizeof( val ) == 8 )
+	{
+		return QWordSwap( val );
+	}
+	else if constexpr ( sizeof( val ) == 4 )
+	{
+		return DWordSwap( static_cast<unsigned>( val ) );
+	}
+	else
+	{
+		unreachable();
+	}
+}
 
 // Pass floats by pointer for swapping to avoid truncation in the fpu
 template <bool isLittleEndian = endian::native == endian::little>
