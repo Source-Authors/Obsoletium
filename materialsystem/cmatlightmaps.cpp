@@ -923,7 +923,8 @@ void CMatLightmaps::LightmapBitsToPixelWriter_HDRI( float* RESTRICT pFloatImage,
 				int r = ColorSpace::LinearFloatToCorrectedShort( pSrc[0] );
 				int g = ColorSpace::LinearFloatToCorrectedShort( pSrc[1] );
 				int b = ColorSpace::LinearFloatToCorrectedShort( pSrc[2] );
-				int a = ColorSpace::LinearToUnsignedShort( pSrc[3], 16 );
+				// dimhotepus: Original code, not referenced.
+				[[maybe_unused]] int a = ColorSpace::LinearToUnsignedShort( pSrc[3], 16 );
 
 				constexpr float toFloat = ( 1.0f / ( float )( 1 << 16 ) );
 
