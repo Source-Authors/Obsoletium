@@ -154,12 +154,12 @@ acttable_t *CTFGrapplingHook::ActivityList( int &iActivityCount )
 	{
 		if ( pOwner->IsPlayerClass( TF_CLASS_ENGINEER ) )
 		{
-			iActivityCount = ARRAYSIZE( s_grapplinghook_engineer_acttable );
+			iActivityCount = SE_ARRAYSIZE( s_grapplinghook_engineer_acttable );
 			return s_grapplinghook_engineer_acttable;
 		}
 		else
 		{
-			iActivityCount = ARRAYSIZE( s_grapplinghook_normal_acttable );
+			iActivityCount = SE_ARRAYSIZE( s_grapplinghook_normal_acttable );
 			return s_grapplinghook_normal_acttable;
 		}
 	}
@@ -186,12 +186,12 @@ poseparamtable_t *CTFGrapplingHook::PoseParamList( int &iPoseParamCount )
 	{
 		if ( pOwner->IsPlayerClass( TF_CLASS_ENGINEER ) )
 		{
-			iPoseParamCount = ARRAYSIZE( s_grapplinghook_engineer_poseparamtable );
+			iPoseParamCount = SE_ARRAYSIZE( s_grapplinghook_engineer_poseparamtable );
 			return s_grapplinghook_engineer_poseparamtable;
 		}
 		else
 		{
-			iPoseParamCount = ARRAYSIZE( s_grapplinghook_normal_poseparamtable );
+			iPoseParamCount = SE_ARRAYSIZE( s_grapplinghook_normal_poseparamtable );
 			return s_grapplinghook_normal_poseparamtable;
 		}
 	}

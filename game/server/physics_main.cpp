@@ -442,10 +442,10 @@ void CPhysicsPushedEntities::StoreMovedEntities( physicspushlist_t &list )
 	list.localOrigin = m_rootPusherStartLocalOrigin;
 	list.localAngles = m_rootPusherStartLocalAngles;
 	list.pushedCount = CountMovedEntities();
-	Assert(list.pushedCount < static_cast<int>(ARRAYSIZE(list.pushedEnts)));
-	if ( list.pushedCount > static_cast<int>(ARRAYSIZE(list.pushedEnts)) )
+	Assert(list.pushedCount < static_cast<int>(SE_ARRAYSIZE(list.pushedEnts)));
+	if ( list.pushedCount > static_cast<int>(SE_ARRAYSIZE(list.pushedEnts)) )
 	{
-		list.pushedCount = static_cast<int>(ARRAYSIZE(list.pushedEnts));
+		list.pushedCount = static_cast<int>(SE_ARRAYSIZE(list.pushedEnts));
 	}
 	for ( int i = 0; i < list.pushedCount; i++ )
 	{
@@ -568,7 +568,7 @@ private:
 			if ( m_collisionGroups[i] == collisionGroup )
 				return;
 		}
-		if ( m_collisionGroupCount < static_cast<int>(ARRAYSIZE(m_collisionGroups)) )
+		if ( m_collisionGroupCount < static_cast<int>(SE_ARRAYSIZE(m_collisionGroups)) )
 		{
 			m_collisionGroups[m_collisionGroupCount] = collisionGroup;
 			m_collisionGroupCount++;

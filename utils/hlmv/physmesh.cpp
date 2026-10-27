@@ -224,7 +224,7 @@ public:
 			Q_strncpy( parentName, pWord, sizeof(parentName) );
 			pWord = strtok( NULL, "," );
 			Q_strncpy( childName, pWord, sizeof(childName) );
-			if ( pEdit->mergeCount < ARRAYSIZE(pEdit->mergeList) )
+			if ( pEdit->mergeCount < SE_ARRAYSIZE(pEdit->mergeList) )
 			{
 				merge_t *pMerge = &pEdit->mergeList[pEdit->mergeCount];
 				pEdit->mergeCount++;

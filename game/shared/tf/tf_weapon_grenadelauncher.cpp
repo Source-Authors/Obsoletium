@@ -39,7 +39,7 @@ const Vector cProceduralBarrelRotationAnimationPoints[] =
 	Vector( 1.0f,		60,			0 )
 };
 
-static_assert( ARRAYSIZE( cProceduralBarrelRotationAnimationPoints ) > 1, "cProceduralBarrelRotationAnimationPoints must have at least two elements." );
+static_assert( SE_ARRAYSIZE( cProceduralBarrelRotationAnimationPoints ) > 1, "cProceduralBarrelRotationAnimationPoints must have at least two elements." );
 
 const float cProceduralBarrelRotationTime = 0.2666f;
 
@@ -643,12 +643,12 @@ void CTFGrenadeLauncher::UpdateBarrelMovement( void )
 		if ( tVal < 1.0f )
 		{
 			Assert( cProceduralBarrelRotationAnimationPoints[ 0 ].x == 0.0f );
-			Assert( cProceduralBarrelRotationAnimationPoints[ ARRAYSIZE( cProceduralBarrelRotationAnimationPoints ) - 1 ].x == 1.0f );
+			Assert( cProceduralBarrelRotationAnimationPoints[ SE_ARRAYSIZE( cProceduralBarrelRotationAnimationPoints ) - 1 ].x == 1.0f );
 
 			const Vector* pFirst = NULL;
 			const Vector* pSecond  = NULL;
 
-			for ( int i = 1; i < ARRAYSIZE( cProceduralBarrelRotationAnimationPoints ); ++i ) 
+			for ( int i = 1; i < SE_ARRAYSIZE( cProceduralBarrelRotationAnimationPoints ); ++i ) 
 			{
 				// Need to be increasing in time, or we won't find the right span. 
 				Assert( cProceduralBarrelRotationAnimationPoints[ i - 1 ].x < cProceduralBarrelRotationAnimationPoints[ i ].x );

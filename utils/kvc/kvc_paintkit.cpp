@@ -328,14 +328,14 @@ void ProcessPaintKitKeyValuesFile( const char *pszPaintKitKeyValuesFile, bool bO
 			char szTmpA[MAX_PATH] = {};
 			char szTmpB[MAX_PATH] = {};
 
-			if ( !g_pFullFileSystem->GetCurrentDirectoryA( szTmpA, ARRAYSIZE( szTmpB ) ) )
+			if ( !g_pFullFileSystem->GetCurrentDirectoryA( szTmpA, SE_ARRAYSIZE( szTmpB ) ) )
 			{
 				Msg( "Error: non-resolvable, non-absolute path specified (%s) and couldn't determine current directory\n", pszPaintKitKeyValuesFile );
 				return;
 			}
 
-			V_ComposeFileName( szTmpA, pszPaintKitKeyValuesFile, szTmpB, ARRAYSIZE( szTmpB ) );
-			V_FixupPathName( szTmpA, ARRAYSIZE( szTmpA ), szTmpB );
+			V_ComposeFileName( szTmpA, pszPaintKitKeyValuesFile, szTmpB, SE_ARRAYSIZE( szTmpB ) );
+			V_FixupPathName( szTmpA, SE_ARRAYSIZE( szTmpA ), szTmpB );
 			g_pFullFileSystem->GetCaseCorrectFullPath( szTmpB, szFullPath );
 		}
 	}

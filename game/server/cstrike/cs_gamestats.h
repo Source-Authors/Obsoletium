@@ -88,11 +88,11 @@ struct SMarketPurchases : public BaseStatData
 	{
 		if ( pName )
 		{
-			Q_strncpy( ItemID, pName, ARRAYSIZE(ItemID) );
+			Q_strncpy( ItemID, pName, SE_ARRAYSIZE(ItemID) );
 		}
 		else
 		{
-			Q_strncpy( ItemID, "unknown", ARRAYSIZE(ItemID) );
+			Q_strncpy( ItemID, "unknown", SE_ARRAYSIZE(ItemID) );
 		}
 	}
 	uint64	m_nPlayerID;
@@ -121,11 +121,11 @@ struct SCSSWeaponData : public BaseStatData
 	{
 		if ( pWeaponName )
 		{
-			Q_strncpy( WeaponID, pWeaponName, ARRAYSIZE(WeaponID) );
+			Q_strncpy( WeaponID, pWeaponName, SE_ARRAYSIZE(WeaponID) );
 		}
 		else
 		{
-			Q_strncpy( WeaponID, "unknown", ARRAYSIZE(WeaponID) );
+			Q_strncpy( WeaponID, "unknown", SE_ARRAYSIZE(WeaponID) );
 		}
 
 		Shots = wpnData.shots;
@@ -191,7 +191,7 @@ struct SCSSDeathData : public BaseStatData
 		}
 
 		const char *pszMapName = gpGlobals->mapname.ToCStr() ? gpGlobals->mapname.ToCStr() : "unknown";
-		Q_strncpy( m_szMapName, pszMapName, ARRAYSIZE(m_szMapName) );
+		Q_strncpy( m_szMapName, pszMapName, SE_ARRAYSIZE(m_szMapName) );
 	}
 	Vector	m_DeathPos;
 	int		m_iVictimTeam;

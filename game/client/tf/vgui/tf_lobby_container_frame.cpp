@@ -506,12 +506,12 @@ void CBaseLobbyContainerFrame::WriteControls()
 					wchar_t wszDurationHours[16];
 					wchar_t wszDurationMinutes[16];
 
-					_snwprintf( wszDaysRemaining, ARRAYSIZE( wszDaysRemaining ), L"%d", nDaysRemaining );
-					_snwprintf( wszHoursRemaining, ARRAYSIZE( wszHoursRemaining ), L"%d", nHoursRemaining );
-					_snwprintf( wszMinutesRemaining, ARRAYSIZE( wszMinutesRemaining ), L"%d", nMinutesRemaining );
-					_snwprintf( wszDurationDays, ARRAYSIZE( wszDurationDays ), L"%d", nDurationDays );
-					_snwprintf( wszDurationHours, ARRAYSIZE( wszDurationHours ), L"%d", nDurationHours );
-					_snwprintf( wszDurationMinutes, ARRAYSIZE( wszDurationMinutes ), L"%d", nDurationMinutes );
+					_snwprintf( wszDaysRemaining, SE_ARRAYSIZE( wszDaysRemaining ), L"%d", nDaysRemaining );
+					_snwprintf( wszHoursRemaining, SE_ARRAYSIZE( wszHoursRemaining ), L"%d", nHoursRemaining );
+					_snwprintf( wszMinutesRemaining, SE_ARRAYSIZE( wszMinutesRemaining ), L"%d", nMinutesRemaining );
+					_snwprintf( wszDurationDays, SE_ARRAYSIZE( wszDurationDays ), L"%d", nDurationDays );
+					_snwprintf( wszDurationHours, SE_ARRAYSIZE( wszDurationHours ), L"%d", nDurationHours );
+					_snwprintf( wszDurationMinutes, SE_ARRAYSIZE( wszDurationMinutes ), L"%d", nDurationMinutes );
 
 					wchar_t wszLocalized[512];
 

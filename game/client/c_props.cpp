@@ -42,7 +42,7 @@ bool C_DynamicProp::TestBoneFollowers( const Ray_t &ray, unsigned int fContentsM
 	CBaseEntity	*pList[128];
 	Vector mins, maxs;
 	CollisionProp()->WorldSpaceAABB( &mins, &maxs );
-	int count = UTIL_EntitiesInBox( pList, ARRAYSIZE(pList), mins, maxs, 0, PARTITION_CLIENT_SOLID_EDICTS );
+	int count = UTIL_EntitiesInBox( pList, SE_ARRAYSIZE(pList), mins, maxs, 0, PARTITION_CLIENT_SOLID_EDICTS );
 	for ( int i = 0; i < count; i++ )
 	{
 		if ( pList[i]->GetOwnerEntity() == this )

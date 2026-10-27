@@ -503,7 +503,7 @@ void CMapCheckDlg::OnSelchangeErrors()
 
 	// Figure out which error string we're using.
 	int iErrorStr = (int)pError->Type;
-	iErrorStr = clamp( iErrorStr, 0, static_cast<int>( ARRAYSIZE( g_MapErrorStrings ) - 1 ) );
+	iErrorStr = clamp( iErrorStr, 0, static_cast<int>( SE_ARRAYSIZE( g_MapErrorStrings ) - 1 ) );
 	Assert( iErrorStr == (int)pError->Type );
 	
 	VERIFY(str.LoadString(g_MapErrorStrings[iErrorStr].m_DescriptionResourceID));
@@ -587,7 +587,7 @@ static void AddErrorToListBox(CListBox *pList, MapError *pError)
 
 	// Figure out which error string we're using.
 	int iErrorStr = (int)pError->Type;
-	iErrorStr = clamp( iErrorStr, 0, static_cast<int>( ARRAYSIZE( g_MapErrorStrings ) - 1 ) );
+	iErrorStr = clamp( iErrorStr, 0, static_cast<int>( SE_ARRAYSIZE( g_MapErrorStrings ) - 1 ) );
 	Assert( iErrorStr == (int)pError->Type );
 	
 	VERIFY(str.LoadString(g_MapErrorStrings[iErrorStr].m_StrResourceID));

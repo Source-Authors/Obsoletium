@@ -218,7 +218,7 @@ int C_TF_PlayerResource::GetNumPlayersForTeam( int iTeam, bool bAliveOnly )
 //-----------------------------------------------------------------------------
 int C_TF_PlayerResource::GetDamage( unsigned int nIndex )
 {
-	Assert( nIndex < ARRAYSIZE( m_aPlayerScoreStats ) );
+	Assert( nIndex < SE_ARRAYSIZE( m_aPlayerScoreStats ) );
 
 	return GetArrayValue( nIndex, m_iDamage, 0 ) + m_aPlayerScoreStats[nIndex].m_iPrevDamage;
 }
@@ -228,7 +228,7 @@ int C_TF_PlayerResource::GetDamage( unsigned int nIndex )
 //-----------------------------------------------------------------------------
 int C_TF_PlayerResource::GetDamageAssist( unsigned int nIndex )
 {
-	Assert( nIndex < ARRAYSIZE( m_aPlayerScoreStats ) );
+	Assert( nIndex < SE_ARRAYSIZE( m_aPlayerScoreStats ) );
 
 	return GetArrayValue( nIndex, m_iDamageAssist, 0 ) + m_aPlayerScoreStats[nIndex].m_iPrevDamageAssist;
 }
@@ -238,7 +238,7 @@ int C_TF_PlayerResource::GetDamageAssist( unsigned int nIndex )
 //-----------------------------------------------------------------------------
 int C_TF_PlayerResource::GetDamageBoss( unsigned int nIndex )
 {
-	Assert( nIndex < ARRAYSIZE( m_aPlayerScoreStats ) );
+	Assert( nIndex < SE_ARRAYSIZE( m_aPlayerScoreStats ) );
 
 	return GetArrayValue( nIndex, m_iDamageBoss, 0 ) + m_aPlayerScoreStats[nIndex].m_iPrevDamageBoss;
 }
@@ -248,7 +248,7 @@ int C_TF_PlayerResource::GetDamageBoss( unsigned int nIndex )
 //-----------------------------------------------------------------------------
 int C_TF_PlayerResource::GetHealing( unsigned int nIndex )
 {
-	Assert( nIndex < ARRAYSIZE( m_aPlayerScoreStats ) );
+	Assert( nIndex < SE_ARRAYSIZE( m_aPlayerScoreStats ) );
 
 	return GetArrayValue( nIndex, m_iHealing, 0 ) + m_aPlayerScoreStats[nIndex].m_iPrevHealing;
 }
@@ -258,7 +258,7 @@ int C_TF_PlayerResource::GetHealing( unsigned int nIndex )
 //-----------------------------------------------------------------------------
 int C_TF_PlayerResource::GetHealingAssist( unsigned int nIndex )
 {
-	Assert( nIndex < ARRAYSIZE( m_aPlayerScoreStats ) );
+	Assert( nIndex < SE_ARRAYSIZE( m_aPlayerScoreStats ) );
 
 	return GetArrayValue( nIndex, m_iHealingAssist, 0 ) + m_aPlayerScoreStats[nIndex].m_iPrevHealingAssist;
 }
@@ -268,7 +268,7 @@ int C_TF_PlayerResource::GetHealingAssist( unsigned int nIndex )
 //-----------------------------------------------------------------------------
 int C_TF_PlayerResource::GetDamageBlocked( unsigned int nIndex )
 {
-	Assert( nIndex < ARRAYSIZE( m_aPlayerScoreStats ) );
+	Assert( nIndex < SE_ARRAYSIZE( m_aPlayerScoreStats ) );
 
 	return GetArrayValue( nIndex, m_iDamageBlocked, 0 ) + m_aPlayerScoreStats[nIndex].m_iPrevDamageBlocked;
 }
@@ -278,7 +278,7 @@ int C_TF_PlayerResource::GetDamageBlocked( unsigned int nIndex )
 //-----------------------------------------------------------------------------
 int C_TF_PlayerResource::GetCurrencyCollected( unsigned int nIndex )
 {
-	Assert( nIndex < ARRAYSIZE( m_aPlayerScoreStats ) );
+	Assert( nIndex < SE_ARRAYSIZE( m_aPlayerScoreStats ) );
 
 	return GetArrayValue( nIndex, m_iCurrencyCollected, 0 ) + m_aPlayerScoreStats[nIndex].m_iPrevCurrencyCollected;
 }
@@ -288,7 +288,7 @@ int C_TF_PlayerResource::GetCurrencyCollected( unsigned int nIndex )
 //-----------------------------------------------------------------------------
 int C_TF_PlayerResource::GetBonusPoints( unsigned int nIndex )
 {
-	Assert( nIndex < ARRAYSIZE( m_aPlayerScoreStats ) );
+	Assert( nIndex < SE_ARRAYSIZE( m_aPlayerScoreStats ) );
 
 	return GetArrayValue( nIndex, m_iBonusPoints, 0 ) + m_aPlayerScoreStats[nIndex].m_iPrevBonusPoints;
 }
@@ -298,7 +298,7 @@ int C_TF_PlayerResource::GetBonusPoints( unsigned int nIndex )
 //-----------------------------------------------------------------------------
 void C_TF_PlayerResource::UpdatePlayerScoreStats( void )
 {
-	for ( int playerIndex = 0; playerIndex < ARRAYSIZE( m_aPlayerScoreStats ); playerIndex++ )
+	for ( int playerIndex = 0; playerIndex < SE_ARRAYSIZE( m_aPlayerScoreStats ); playerIndex++ )
 	{
 		// Add current round stats to the accumulator
 		m_aPlayerScoreStats[playerIndex].m_iPrevDamage += GetArrayValue( playerIndex, m_iDamage, 0 );
@@ -324,7 +324,7 @@ void C_TF_PlayerResource::ResetPlayerScoreStats( int playerIndex /*= -1*/ )
 	else
 	{
 		// valid playerIndex should be 1-33 (32 players)
-		Assert( playerIndex > 0 && playerIndex < ARRAYSIZE( m_aPlayerScoreStats ) );
+		Assert( playerIndex > 0 && playerIndex < SE_ARRAYSIZE( m_aPlayerScoreStats ) );
 		m_aPlayerScoreStats[playerIndex].m_iPrevDamage = 0;
 		m_aPlayerScoreStats[playerIndex].m_iPrevDamageAssist = 0;
 		m_aPlayerScoreStats[playerIndex].m_iPrevDamageBoss = 0;

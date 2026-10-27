@@ -616,21 +616,21 @@ public:
 		
 		if ( pNotification != NULL )
 		{
-			if ( !Q_strncmp( command, "delete", ARRAYSIZE( "delete" ) ) )
+			if ( !Q_strncmp( command, "delete", SE_ARRAYSIZE( "delete" ) ) )
 			{
 				pNotification->Deleted();
 				g_notificationQueue.RemoveNotification( m_iNotificationID );
 				return;
 			}
-			else if ( !Q_strncmp( command, "trigger", ARRAYSIZE( "trigger" ) ) )
+			else if ( !Q_strncmp( command, "trigger", SE_ARRAYSIZE( "trigger" ) ) )
 			{
 				pNotification->Trigger();
 			}
-			else if ( !Q_strncmp( command, "accept", ARRAYSIZE( "accept" ) ) )
+			else if ( !Q_strncmp( command, "accept", SE_ARRAYSIZE( "accept" ) ) )
 			{
 				pNotification->Accept();
 			}
-			else if ( !Q_strncmp( command, "decline", ARRAYSIZE( "decline" ) ) )
+			else if ( !Q_strncmp( command, "decline", SE_ARRAYSIZE( "decline" ) ) )
 			{
 				pNotification->Decline();
 			}

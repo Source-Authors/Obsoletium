@@ -40,7 +40,7 @@ const char *s_pszMatchGroups[] =
 	"MatchGroup_Casual_12v12",
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( s_pszMatchGroups ) == k_nMatchGroup_Count );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( s_pszMatchGroups ) == k_nMatchGroup_Count );
 
 #ifdef GC_DLL
 void On6v6MatchSizeChanged( IConVar *pConVar, const char *pOldString, float flOldValue )

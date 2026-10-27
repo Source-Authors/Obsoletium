@@ -1286,7 +1286,7 @@ static int RemapOverridePaintIndexToRGB( uint32 unIndex, uint32 unTeamIndex )
 		5000242, 4999990, 4868407, 4671291, 4539707, 4539709, 4605502, 4671041, 
 		4868420, 5000006, 5065799, 5131592, 5197385, 5263178, 5328971, 5263178, 
 	};
-	COMPILE_TIME_ASSERT( ARRAYSIZE( k_unWitchYellow ) == kSamplePoints );
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE( k_unWitchYellow ) == kSamplePoints );
 
 	static uint32 k_unDistinctiveLackOfSanity[] =
 	{
@@ -1323,7 +1323,7 @@ static int RemapOverridePaintIndexToRGB( uint32 unIndex, uint32 unTeamIndex )
 		5650013, 5781599, 6044003, 6175589, 6306920, 6504042, 6701167, 6898035, 
 		7029621, 7292279, 7489404, 7686526, 7752064, 8014722, 8080261, 8277127,
 	};
-	COMPILE_TIME_ASSERT( ARRAYSIZE( k_unDistinctiveLackOfSanity ) == kSamplePoints );
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE( k_unDistinctiveLackOfSanity ) == kSamplePoints );
 
 	static uint32 k_unOverabundanceOfRottingFlesh[] =
 	{
@@ -1360,7 +1360,7 @@ static int RemapOverridePaintIndexToRGB( uint32 unIndex, uint32 unTeamIndex )
 		12179981, 12246028, 12246028, 12311308, 12311308, 12311308, 12311308, 12377101, 
 		12377101, 12377101, 12377101, 12377101, 12377101, 12377101, 12377101, 12377101, 
 	};
-	COMPILE_TIME_ASSERT( ARRAYSIZE( k_unOverabundanceOfRottingFlesh ) == kSamplePoints );
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE( k_unOverabundanceOfRottingFlesh ) == kSamplePoints );
 
 	// orange_flash
 	static uint32 k_unTheFlamesBelow[] =
@@ -1398,7 +1398,7 @@ static int RemapOverridePaintIndexToRGB( uint32 unIndex, uint32 unTeamIndex )
 		14244391, 14047014, 13849893, 13652772, 13455395, 13258274, 13060897, 12863776, 
 		12666655, 12469278, 12337693, 12140572, 12008987, 11877659, 11746074, 11614745, 
 	};
-	COMPILE_TIME_ASSERT( ARRAYSIZE( k_unTheFlamesBelow ) == kSamplePoints );
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE( k_unTheFlamesBelow ) == kSamplePoints );
 
 	// green_pulse
 	static uint32 k_unThatQueesyFeeling[] =
@@ -1436,7 +1436,7 @@ static int RemapOverridePaintIndexToRGB( uint32 unIndex, uint32 unTeamIndex )
 		11192625, 10929200, 10666031, 10402606, 10073644, 9810219, 9546794, 9283369, 
 		9019943, 8756518, 8493349, 8295716, 8032547, 7900706, 7703329, 7571489, 
 	};
-	COMPILE_TIME_ASSERT( ARRAYSIZE( k_unThatQueesyFeeling ) == kSamplePoints );
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE( k_unThatQueesyFeeling ) == kSamplePoints );
 
 	// blue_pulse
 	static uint32 k_unBubbleBubble[] =
@@ -1474,7 +1474,7 @@ static int RemapOverridePaintIndexToRGB( uint32 unIndex, uint32 unTeamIndex )
 		11655916, 11524331, 11327466, 11130345, 10933479, 10736358, 10539237, 10342372, 
 		10145251, 10013922, 9816801, 9685472, 9554143, 9422814, 9291485, 9160156, 
 	};
-	COMPILE_TIME_ASSERT( ARRAYSIZE( k_unBubbleBubble ) == kSamplePoints );
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE( k_unBubbleBubble ) == kSamplePoints );
 
 	// purple_orange_rand
 	static uint32 k_unAfraidOfShadowsDark[] =
@@ -1512,7 +1512,7 @@ static int RemapOverridePaintIndexToRGB( uint32 unIndex, uint32 unTeamIndex )
 		9337455, 8877166, 8482670, 8153453, 7758957, 7430252, 7101291, 6772586, 
 		6509418, 6246505, 5983337, 5786216, 5588840, 5391719, 5194599, 5063014, 
 	};
-	COMPILE_TIME_ASSERT( ARRAYSIZE( k_unAfraidOfShadowsDark ) == kSamplePoints );
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE( k_unAfraidOfShadowsDark ) == kSamplePoints );
 
 	static uint32 *k_pPointSampleContent_Team0[] =
 	{
@@ -1533,9 +1533,9 @@ static int RemapOverridePaintIndexToRGB( uint32 unIndex, uint32 unTeamIndex )
 		&k_unThatQueesyFeeling[0],
 		&k_unAfraidOfShadowsDark[0],
 	};
-	COMPILE_TIME_ASSERT( ARRAYSIZE( k_pPointSampleContent_Team0 ) == ARRAYSIZE( k_pPointSampleContent_Team1 ) );
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE( k_pPointSampleContent_Team0 ) == SE_ARRAYSIZE( k_pPointSampleContent_Team1 ) );
 
-	if ( unIndex >= ARRAYSIZE( k_pPointSampleContent_Team0 ) )
+	if ( unIndex >= SE_ARRAYSIZE( k_pPointSampleContent_Team0 ) )
 		return 0;
 
 	if ( unTeamIndex > 1 )

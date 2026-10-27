@@ -677,7 +677,7 @@ void CNPC_RollerMine::WakeNeighbors()
 
 	CBaseEntity *entityList[64];
 	Vector range(ROLLERMINE_WAKEUP_DIST,ROLLERMINE_WAKEUP_DIST,64);
-	int boxCount = UTIL_EntitiesInBox( entityList, ARRAYSIZE(entityList), GetAbsOrigin()-range, GetAbsOrigin()+range, FL_NPC );
+	int boxCount = UTIL_EntitiesInBox( entityList, SE_ARRAYSIZE(entityList), GetAbsOrigin()-range, GetAbsOrigin()+range, FL_NPC );
 	//NDebugOverlay::Box( GetAbsOrigin(), -range, range, 255, 0, 0, 64, 10.0 );
 	int wakeCount = 0;
 	while ( boxCount > 0 )
@@ -2152,7 +2152,7 @@ int CNPC_RollerMine::CountRollersOnMyVehicle( CUtlVector<CNPC_RollerMine*> *pRol
 	CBaseEntity *entityList[64];
 	Vector range(256,256,256);
 	pRollerList->AddToTail( this );
-	int boxCount = UTIL_EntitiesInBox( entityList, ARRAYSIZE(entityList), GetAbsOrigin()-range, GetAbsOrigin()+range, FL_NPC );
+	int boxCount = UTIL_EntitiesInBox( entityList, SE_ARRAYSIZE(entityList), GetAbsOrigin()-range, GetAbsOrigin()+range, FL_NPC );
 	for ( int i = 0; i < boxCount; i++ )
 	{
 		CAI_BaseNPC *pNPC = entityList[i]->MyNPCPointer();

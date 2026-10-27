@@ -312,9 +312,9 @@ void CGameUI::BonusMapChallengeUpdate( const char *pchFileName, const char *pchM
 
 void CGameUI::BonusMapChallengeNames( char *pchFileName, char *pchMapName, char *pchChallengeName )
 {
-	BonusMapChallengeNames( pchFileName, ARRAYSIZE(BonusMapChallenge_t::szFileName),
-		pchMapName, ARRAYSIZE(BonusMapChallenge_t::szMapName),
-		pchChallengeName, ARRAYSIZE(BonusMapChallenge_t::szChallengeName) );
+	BonusMapChallengeNames( pchFileName, SE_ARRAYSIZE(BonusMapChallenge_t::szFileName),
+		pchMapName, SE_ARRAYSIZE(BonusMapChallenge_t::szMapName),
+		pchChallengeName, SE_ARRAYSIZE(BonusMapChallenge_t::szChallengeName) );
 }
 
 void CGameUI::BonusMapChallengeNames( OUT_Z_CAP(fileSize) char *pchFileName, intp fileSize,

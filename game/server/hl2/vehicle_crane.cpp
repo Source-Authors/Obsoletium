@@ -224,7 +224,7 @@ void CPropCrane::Activate( void )
 bool CPropCrane::CreateVPhysics( void )
 {
 	BaseClass::CreateVPhysics();
-	m_BoneFollowerManager.InitBoneFollowers( this, ARRAYSIZE(pCraneFollowerBoneNames), pCraneFollowerBoneNames );
+	m_BoneFollowerManager.InitBoneFollowers( this, SE_ARRAYSIZE(pCraneFollowerBoneNames), pCraneFollowerBoneNames );
 	return true;
 }
 

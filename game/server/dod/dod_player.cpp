@@ -2494,7 +2494,7 @@ CDODPlayerStateInfo* CDODPlayer::State_LookupInfo( DODPlayerState state )
 		{ STATE_OBSERVER_MODE,	"STATE_OBSERVER_MODE",	&CDODPlayer::State_Enter_OBSERVER_MODE,	NULL, &CDODPlayer::State_PreThink_OBSERVER_MODE }
 	};
 
-	for ( int i=0; i < ARRAYSIZE( playerStateInfos ); i++ )
+	for ( int i=0; i < SE_ARRAYSIZE( playerStateInfos ); i++ )
 	{
 		if ( playerStateInfos[i].m_iPlayerState == state )
 			return &playerStateInfos[i];

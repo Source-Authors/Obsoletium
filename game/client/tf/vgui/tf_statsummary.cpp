@@ -752,7 +752,7 @@ void CTFStatsSummaryPanel::UpdateLeaderboard()
 	{
 		bVisible = MapInfo_GetLeaderboardInfo( engine->GetLevelName(), scores, iNumLeaderboardEntries, kIdeallyNumVisible_Supporters );
 		wchar_t wzNumEntriesString[256];
-		_snwprintf( wzNumEntriesString, ARRAYSIZE( wzNumEntriesString ), L"%i", iNumLeaderboardEntries );
+		_snwprintf( wzNumEntriesString, SE_ARRAYSIZE( wzNumEntriesString ), L"%i", iNumLeaderboardEntries );
 		wchar_t wzTitle[256];
 		g_pVGuiLocalize->ConstructString_safe( wzTitle, g_pVGuiLocalize->Find( "#TF_MapDonators_Title" ), 1, wzNumEntriesString );
 		m_pMapInfoPanel->SetDialogVariable( "map_leaderboard_title", wzTitle );
@@ -982,7 +982,7 @@ void CTFStatsSummaryPanel::UpdateClassDetails( bool bIsMVM )
 	const wchar_t *wzWithoutClassFmt = L"%s1";
 
 	ClassDetails_t *pStatDetails = ( bIsMVM ? g_PerClassMVMStatDetails : g_PerClassStatDetails );
-	int nArraySize = ( bIsMVM ? ARRAYSIZE( g_PerClassMVMStatDetails ) : ARRAYSIZE( g_PerClassStatDetails ) );
+	int nArraySize = ( bIsMVM ? SE_ARRAYSIZE( g_PerClassMVMStatDetails ) : SE_ARRAYSIZE( g_PerClassStatDetails ) );
 
 	// display the record for each stat
 	int iRow = 0;
@@ -1036,7 +1036,7 @@ void CTFStatsSummaryPanel::UpdateClassDetails( bool bIsMVM )
 		else
 		{
 			// all other stats are just shown as a #
-			swprintf_s( wzStatNum, ARRAYSIZE( wzStatNum ), L"%d", iMaxVal );
+			swprintf_s( wzStatNum, SE_ARRAYSIZE( wzStatNum ), L"%d", iMaxVal );
 		}
 
 		if ( TF_CLASS_UNDEFINED == m_iSelectedClass && iMaxVal > 0 )
@@ -1177,14 +1177,14 @@ void CTFStatsSummaryPanel::InitBarChartComboBox( ComboBox *pComboBox )
 	pComboBox->SetFont( hFont );
 	pComboBox->RemoveAll();
 	// add all the options to the combo box
-	for ( int i=0; i < ARRAYSIZE( initData ); i++ )
+	for ( int i=0; i < SE_ARRAYSIZE( initData ); i++ )
 	{
 		KeyValues *pKeyValues = new KeyValues( "data" );
 		pKeyValues->SetInt( "stattype", initData[i].statType );
 		pKeyValues->SetInt( "statdisplay", initData[i].statDisplay );
 		pComboBox->AddItem(  g_pVGuiLocalize->Find( initData[i].szName ), pKeyValues );
 	}
-	pComboBox->SetNumberOfEditLines( ARRAYSIZE( initData ) );
+	pComboBox->SetNumberOfEditLines( SE_ARRAYSIZE( initData ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1199,7 +1199,7 @@ void CTFStatsSummaryPanel::SetValueAsClass( const char *pDialogVariable, int iVa
 		wchar_t *wzLocalizedClassName = g_pVGuiLocalize->Find( g_aPlayerClassNames[iPlayerClass] );
 		wchar_t wzVal[16];
 		wchar_t wzMsg[128];
-		swprintf( wzVal, ARRAYSIZE( wzVal ), L"%d", iValue );
+		swprintf( wzVal, SE_ARRAYSIZE( wzVal ), L"%d", iValue );
 		g_pVGuiLocalize->ConstructString_safe( wzMsg, wzScoreAsClassFmt, 2, wzVal, wzLocalizedClassName );
 		m_pPlayerData->SetDialogVariable( pDialogVariable, wzMsg );
 	}
@@ -1436,7 +1436,7 @@ const char *CTFStatsSummaryPanel::RenderValue( float flValue, TFStatType_t statT
 	else if ( SHOW_AVG == statDisplay )
 	{	
 		// if it's an average, render as a float w/2 decimal places
-		Q_snprintf( szValue, ARRAYSIZE( szValue ), "%.2f", flValue );
+		Q_snprintf( szValue, SE_ARRAYSIZE( szValue ), "%.2f", flValue );
 	}
 	else
 	{

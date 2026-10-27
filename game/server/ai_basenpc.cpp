@@ -1822,14 +1822,14 @@ void CAI_BaseNPC::SetScriptedScheduleIgnoreConditions( Interruptability_t interr
 		COND_RECEIVED_ORDERS,
 	};
 
-	ClearIgnoreConditions( g_GeneralConditions, ARRAYSIZE(g_GeneralConditions) );
-	ClearIgnoreConditions( g_DamageConditions, ARRAYSIZE(g_DamageConditions) );
+	ClearIgnoreConditions( g_GeneralConditions, SE_ARRAYSIZE(g_GeneralConditions) );
+	ClearIgnoreConditions( g_DamageConditions, SE_ARRAYSIZE(g_DamageConditions) );
 
 	if ( interrupt > GENERAL_INTERRUPTABILITY )
-		SetIgnoreConditions( g_GeneralConditions, ARRAYSIZE(g_GeneralConditions) );
+		SetIgnoreConditions( g_GeneralConditions, SE_ARRAYSIZE(g_GeneralConditions) );
 
 	if ( interrupt > DAMAGEORDEATH_INTERRUPTABILITY )
-		SetIgnoreConditions( g_DamageConditions, ARRAYSIZE(g_DamageConditions) );
+		SetIgnoreConditions( g_DamageConditions, SE_ARRAYSIZE(g_DamageConditions) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1985,7 +1985,7 @@ void CAI_BaseNPC::OnLooked( int iDistance )
 
 	bool bHadSeePlayer = HasCondition(COND_SEE_PLAYER);
 
-	ClearConditions( conditionsToClear, ARRAYSIZE( conditionsToClear ) );
+	ClearConditions( conditionsToClear, SE_ARRAYSIZE( conditionsToClear ) );
 
 	AISightIter_t iter;
 	CBaseEntity *pSightEnt;
@@ -2084,7 +2084,7 @@ void CAI_BaseNPC::OnListened()
 		COND_SMELL,
 	};
 
-	ClearConditions( conditionsToClear, ARRAYSIZE( conditionsToClear ) );
+	ClearConditions( conditionsToClear, SE_ARRAYSIZE( conditionsToClear ) );
 
 	pCurrentSound = GetSenses()->GetFirstHeardSound( &iter );
 
@@ -4483,7 +4483,7 @@ void CAI_BaseNPC::ClearSenseConditions( void )
 		COND_SMELL,
 	};
 
-	ClearConditions( conditionsToClear, ARRAYSIZE( conditionsToClear ) );
+	ClearConditions( conditionsToClear, SE_ARRAYSIZE( conditionsToClear ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -9005,7 +9005,7 @@ int CAI_BaseNPC::DrawDebugTextOverlays(void)
 		// Print State
 		// --------------
 		static const char *pStateNames[] = { "None", "Idle", "Alert", "Combat", "Scripted", "PlayDead", "Dead" };
-		if ( (int)m_NPCState < static_cast<int>(ARRAYSIZE(pStateNames)) )
+		if ( (int)m_NPCState < static_cast<int>(SE_ARRAYSIZE(pStateNames)) )
 		{
 			Q_snprintf(tempstr,sizeof(tempstr),"Stat: %s, ", pStateNames[m_NPCState] );
 			EntityText(text_offset,tempstr,0);
@@ -9037,8 +9037,8 @@ int CAI_BaseNPC::DrawDebugTextOverlays(void)
 		// -----------------
 		int navTypeIndex = (int)GetNavType() + 1;
 		static const char *pMoveNames[] = { "None", "Ground", "Jump", "Fly", "Climb" };
-		Assert( navTypeIndex >= 0 && navTypeIndex < static_cast<int>(ARRAYSIZE(pMoveNames)) );
-		if ( navTypeIndex < static_cast<int>(ARRAYSIZE(pMoveNames)) )
+		Assert( navTypeIndex >= 0 && navTypeIndex < static_cast<int>(SE_ARRAYSIZE(pMoveNames)) );
+		if ( navTypeIndex < static_cast<int>(SE_ARRAYSIZE(pMoveNames)) )
 		{
 			Q_snprintf(tempstr,sizeof(tempstr),"Move: %s, ", pMoveNames[navTypeIndex] );
 			EntityText(text_offset,tempstr,0);
@@ -9280,7 +9280,7 @@ void CAI_BaseNPC::ReportAIState( void )
 	static const char *pStateNames[] = { "None", "Idle", "Alert", "Combat", "Scripted", "PlayDead", "Dead" };
 
 	DevMsg( "%s: ", GetClassname() );
-	if ( (int)m_NPCState < static_cast<int>(ARRAYSIZE(pStateNames)) )
+	if ( (int)m_NPCState < static_cast<int>(SE_ARRAYSIZE(pStateNames)) )
 		DevMsg( "State: %s, ", pStateNames[m_NPCState] );
 
 	if( m_Activity != ACT_INVALID && m_IdealActivity != ACT_INVALID )

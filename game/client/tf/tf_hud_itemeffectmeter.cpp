@@ -888,7 +888,7 @@ void CHudItemEffectMeter_Weapon< CTFMinigun >::Update( C_TFPlayer* pPlayer, cons
 				assert_cast< ImagePanel* >( FindChildByName( "KillComboClassIcon3" ) )
 			};
 
-			for ( int i = 0; i < ARRAYSIZE( pImagePanel ); ++i )
+			for ( int i = 0; i < SE_ARRAYSIZE( pImagePanel ); ++i )
 			{
 				if ( !pImagePanel[i] )
 					continue;

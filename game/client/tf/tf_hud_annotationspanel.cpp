@@ -505,7 +505,7 @@ void CTFAnnotationsPanelCallout::PerformLayout( void )
 		const float kInchesToMeters = 0.0254f;
 		int distance = RoundFloatToInt( flDistance * kInchesToMeters );
 		wchar_t wzValue[32];
-		_snwprintf( wzValue, ARRAYSIZE( wzValue ), L"%u", distance );
+		_snwprintf( wzValue, SE_ARRAYSIZE( wzValue ), L"%u", distance );
 
 		wchar_t wzText[256];
 		if ( wzFollowEntityName == NULL )

@@ -603,7 +603,7 @@ void CBaseLobbyPanel::WriteStatusControls()
 			{ \
 				if ( progress.has_##protobufname() ) \
 				{ \
-					_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", progress.protobufname() ); \
+					_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", progress.protobufname() ); \
 					p##labelname->SetText( wszCount ); \
 					if ( bNearby ) bHasAnyNearbyData = true; \
 				} \
@@ -944,7 +944,7 @@ void CBaseLobbyPanel::UpdatePlayerList()
 				wchar_t wszOutString[128];
 				char szLocalized[512];
 				wchar_t wszCount[16];
-				_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", level.m_nLevelNum );
+				_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", level.m_nLevelNum );
 				const wchar_t *wpszFormat = g_pVGuiLocalize->Find( pMatchDesc->m_pProgressionDesc->m_pszLevelToken );
 				g_pVGuiLocalize->ConstructString_safe( wszOutString, wpszFormat, 2, wszCount, g_pVGuiLocalize->Find( level.m_pszLevelTitle ) );
 				g_pVGuiLocalize->ConvertUnicodeToANSI( wszOutString, szLocalized, sizeof( szLocalized ) );

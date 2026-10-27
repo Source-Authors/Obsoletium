@@ -52,8 +52,8 @@ impactdamagetable_t gZombiePassengerImpactDamageTable =
 		zombieLinearTable,
 		zombieAngularTable,
 
-		ARRAYSIZE(zombieLinearTable),
-		ARRAYSIZE(zombieAngularTable),
+		SE_ARRAYSIZE(zombieLinearTable),
+		SE_ARRAYSIZE(zombieAngularTable),
 
 		24*24,		// minimum linear speed squared
 		360*360,	// minimum angular speed squared (360 deg/s to cause spin/slice damage)

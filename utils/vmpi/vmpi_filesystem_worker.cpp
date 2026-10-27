@@ -161,7 +161,7 @@ public:
 		ptrdiff_t     chunkLengths[4] = { sizeof( packetID ), sizeof( requestID ),
 			                              V_strlen( pFilename ) + 1,
 			                              V_strlen( pPathID ) + 1 };
-		VMPI_SendChunks( pChunks, chunkLengths, ARRAYSIZE( pChunks ), 0 );
+		VMPI_SendChunks( pChunks, chunkLengths, SE_ARRAYSIZE( pChunks ), 0 );
 
 		// Wait for the file ID to come back.
 		CFileResponse response;
@@ -341,7 +341,7 @@ public:
 			V_strcpy_safe( printableFilename, "[...]" );
 			V_strcat_safe(
 			printableFilename,
-			&pFilename[V_strlen( pFilename ) - ARRAYSIZE( printableFilename ) + 1 +
+			&pFilename[V_strlen( pFilename ) - SE_ARRAYSIZE( printableFilename ) + 1 +
 			           V_strlen( printableFilename )] );
 		}
 		else

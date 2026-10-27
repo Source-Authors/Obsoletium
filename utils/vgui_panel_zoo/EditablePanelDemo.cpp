@@ -106,13 +106,13 @@ EditablePanelDemo::EditablePanelDemo(Panel *parent, const char *name) : DemoPage
 	// Set its maxchars to -1 since it is not editable
 	//m_pInternetSpeed->SetMaximumCharCount(-1);
 	// Set the number of items in the combo box menu
-	m_pInternetSpeed->SetNumberOfEditLines(ARRAYSIZE(g_Speeds));
+	m_pInternetSpeed->SetNumberOfEditLines(SE_ARRAYSIZE(g_Speeds));
 	// Set the drop down arrow button visible
 	m_pInternetSpeed->SetDropdownButtonVisible(true);
 
 
 	// Add menu items to this combo box.
-	for (int i = 0; i < ARRAYSIZE(g_Speeds); i++)
+	for (int i = 0; i < SE_ARRAYSIZE(g_Speeds); i++)
 	{
 		m_pInternetSpeed->AddItem(g_Speeds[i], NULL );
 	}

@@ -601,7 +601,7 @@ public:
 			"ColorSpecPhong"
 		};
 
-		if ( nColorAlphaType < 0 || nColorAlphaType >= ARRAYSIZE( pszColorAlphaTypeStr ) )
+		if ( nColorAlphaType < 0 || nColorAlphaType >= SE_ARRAYSIZE( pszColorAlphaTypeStr ) )
 		{
 			return "Unknown";
 		}
@@ -636,7 +636,7 @@ public:
 			"NormalSpecPhong"
 		};
 
-		if ( nNormalAlphaType < 0 || nNormalAlphaType >= ARRAYSIZE( pszNormalAlphaTypeStr ) )
+		if ( nNormalAlphaType < 0 || nNormalAlphaType >= SE_ARRAYSIZE( pszNormalAlphaTypeStr ) )
 		{
 			return "Unknown";
 		}

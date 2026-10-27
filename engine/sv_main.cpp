@@ -694,7 +694,7 @@ int SV_BuildSendTablesArray( ServerClass *pClasses, SendTable **pTables, int nMa
 void SV_InitSendTables( ServerClass *pClasses )
 {
 	SendTable *pTables[MAX_DATATABLES];
-	int nTables = SV_BuildSendTablesArray( pClasses, pTables, ARRAYSIZE( pTables ) );
+	int nTables = SV_BuildSendTablesArray( pClasses, pTables, SE_ARRAYSIZE( pTables ) );
 
 	SendTable_Init( pTables, nTables );
 }

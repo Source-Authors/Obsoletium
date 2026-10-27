@@ -222,10 +222,10 @@ void CTFParticlePanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 
 void CTFParticlePanel::OnCommand( const char *command )
 {
-	if ( !Q_strnicmp( command, "start", ARRAYSIZE("start") - 1 ) )
+	if ( !Q_strnicmp( command, "start", SE_ARRAYSIZE("start") - 1 ) )
 	{
 		// Check if they specified a particular one to turn on
-		const char* pszNum = command + ARRAYSIZE( "start" ) - 1;
+		const char* pszNum = command + SE_ARRAYSIZE( "start" ) - 1;
 		int nIndex = m_vecParticleEffects.InvalidIndex();
 
 		if( pszNum && pszNum[0] )
@@ -254,10 +254,10 @@ void CTFParticlePanel::OnCommand( const char *command )
 			pEffect->m_bForceStopped = false;
 		}
 	}
-	else if ( !Q_strnicmp( command, "stop", ARRAYSIZE("stop") - 1 ) )
+	else if ( !Q_strnicmp( command, "stop", SE_ARRAYSIZE("stop") - 1 ) )
 	{
 		// Check if they specified a specific one to turn off
-		const char* pszNum = command + ARRAYSIZE( "start" ) - 1;
+		const char* pszNum = command + SE_ARRAYSIZE( "start" ) - 1;
 		if( pszNum && pszNum[0] )
 		{
 			int iIndex = atoi(pszNum);

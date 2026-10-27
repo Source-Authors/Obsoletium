@@ -271,7 +271,7 @@ const char *m_pszRoundStateStrings[] =
 	"GR_STATE_BETWEEN_RNDS",
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( m_pszRoundStateStrings ) == GR_NUM_ROUND_STATES );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( m_pszRoundStateStrings ) == GR_NUM_ROUND_STATES );
 
 //-----------------------------------------------------------------------------
 // Purpose: 

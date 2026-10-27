@@ -1407,7 +1407,7 @@ CBaseEntity *CreateServerRagdoll( CBaseAnimating *pAnimating, int forceBone, con
 		// Get a list of bones with hitboxes below the plane of impact
 		int boxList[128];
 		Vector normal(0,0,-1);
-		int count = pAnimating->GetHitboxesFrontside( boxList, ARRAYSIZE(boxList), normal, DotProduct( normal, info.GetDamagePosition() ) );
+		int count = pAnimating->GetHitboxesFrontside( boxList, SE_ARRAYSIZE(boxList), normal, DotProduct( normal, info.GetDamagePosition() ) );
 		
 		// distribute force over mass of entire character
 		float massScale = Studio_GetMass(pAnimating->GetModelPtr());

@@ -353,8 +353,8 @@ void C_ObjectTeleporter::GetTargetIDDataString( OUT_Z_BYTECAP(iMaxLenInBytes) wc
 		float flPercent = clamp( ( m_flRechargeTime - gpGlobals->curtime ) / m_flCurrentRechargeDuration, 0.0f, 1.0f );
 
 		wchar_t wszRecharging[ 32 ];
-		_snwprintf( wszRecharging, ARRAYSIZE(wszRecharging) - 1, L"%.0f", 100 - (flPercent * 100) );
-		wszRecharging[ ARRAYSIZE(wszRecharging)-1 ] = '\0';
+		_snwprintf( wszRecharging, SE_ARRAYSIZE(wszRecharging) - 1, L"%.0f", 100 - (flPercent * 100) );
+		wszRecharging[ SE_ARRAYSIZE(wszRecharging)-1 ] = '\0';
 
 		const char *printFormatString = "#TF_playerid_object_recharging";
 

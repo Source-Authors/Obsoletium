@@ -626,8 +626,8 @@ void AddBrushesForRayTrace( void )
 			if ( j >= MAX_POINTS_ON_WINDING )
 				Error( "***** ERROR! MAX_POINTS_ON_WINDING reached!" );
 
-			if ( face->firstedge + j >= ARRAYSIZE( dsurfedges ) )
-				Error( "***** ERROR! face->firstedge + j >= ARRAYSIZE( dsurfedges )!" );
+			if ( face->firstedge + j >= SE_ARRAYSIZE( dsurfedges ) )
+				Error( "***** ERROR! face->firstedge + j >= SE_ARRAYSIZE( dsurfedges )!" );
 
 			int surfEdge = dsurfedges[face->firstedge + j];
 			unsigned short v;
@@ -637,8 +637,8 @@ void AddBrushesForRayTrace( void )
 			else
 				v = dedges[surfEdge].v[0];
 
-			if ( v >= ARRAYSIZE( dvertexes ) )
-				Error( "***** ERROR! v(%u) >= ARRAYSIZE( dvertexes(%zu) )!", ( unsigned int )v, ARRAYSIZE( dvertexes ) );
+			if ( v >= SE_ARRAYSIZE( dvertexes ) )
+				Error( "***** ERROR! v(%u) >= SE_ARRAYSIZE( dvertexes(%zu) )!", ( unsigned int )v, SE_ARRAYSIZE( dvertexes ) );
 
 			dvertex_t *dv = &dvertexes[v];
 			points[j] = dv->point;

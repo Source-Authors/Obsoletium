@@ -235,7 +235,7 @@ LRESULT CALLBACK SnmpWindowProc( HWND hWnd, UINT msg, WPARAM wparam,
 			LARGE_INTEGER time;
 			QueryPerformanceCounter( &time );
 
-			g_timings[g_nTimingIndex++ % ARRAYSIZE( g_timings )] =
+			g_timings[g_nTimingIndex++ % SE_ARRAYSIZE( g_timings )] =
 			time.QuadPart / double( s_nPerformanceFrequency.QuadPart );
 			double dt = time.QuadPart / double( s_nPerformanceFrequency.QuadPart - g_timeAtFadeStart );
 

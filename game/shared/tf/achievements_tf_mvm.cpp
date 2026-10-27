@@ -511,7 +511,7 @@ public:
 			"scripts/population/mvm_decoy.pop", "scripts/population/mvm_coaltown.pop", "scripts/population/mvm_mannworks.pop"
 		};		
 		m_pszComponentNames = szComponents;
-		m_iNumComponents = ARRAYSIZE( szComponents );
+		m_iNumComponents = SE_ARRAYSIZE( szComponents );
 		SetGoal( m_iNumComponents );
 
 		m_bPlayedEntireMission = false;

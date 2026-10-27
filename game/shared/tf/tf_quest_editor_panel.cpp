@@ -64,7 +64,7 @@ ConCommand tf_quest_editor( "tf_quest_editor", cc_tf_quest_editor );
 void WriteLocalizationData()
 {
 	char szQuestEnglishFile[MAX_PATH];
-	if ( !GenerateFullPath( g_skLocalizationFile, "MOD", szQuestEnglishFile, ARRAYSIZE( szQuestEnglishFile ) ) )
+	if ( !GenerateFullPath( g_skLocalizationFile, "MOD", szQuestEnglishFile, SE_ARRAYSIZE( szQuestEnglishFile ) ) )
 	{
 		Warning( "Failed to GenerateFullPath %s\n", g_skLocalizationFile );
 		return;
@@ -1391,7 +1391,7 @@ CEditorQuest::CEditorQuest( KeyValues *pKV, Panel* pParent, const IEditableDataT
 
 	CComboBoxEditorParam *pPrefabParam = new CComboBoxEditorParam( { this, "prefab", FLAGS_NONE }, "Prefab:" );
 	int nChosenIndex = -1;
-	for( int i=0; i < ARRAYSIZE( g_skQuestPrefabs ); ++i )
+	for( int i=0; i < SE_ARRAYSIZE( g_skQuestPrefabs ); ++i )
 	{
 		if ( FStrEq( g_skQuestPrefabs[i], pKV->GetString( "prefab" ) ) )
 		{

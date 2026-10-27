@@ -21,7 +21,7 @@ static const char *g_ProficiencyNames[] =
 
 const char *GetWeaponProficiencyName( WeaponProficiency_t proficiency )
 {
-	COMPILE_TIME_ASSERT( ARRAYSIZE(g_ProficiencyNames) == WEAPON_PROFICIENCY_PERFECT + 1 ); // Hey, update that there table!
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE(g_ProficiencyNames) == WEAPON_PROFICIENCY_PERFECT + 1 ); // Hey, update that there table!
 
 	if ( proficiency < 0 || proficiency > WEAPON_PROFICIENCY_PERFECT )
 		return "<<Invalid>>";

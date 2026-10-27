@@ -602,7 +602,7 @@ bool CEconEntity::ValidateEntityAttachedToPlayer( bool &bShouldRetry )
 	if ( pszClientModel && g_modelWhiteList[0] )
 	{
 		// Certain builder models are okay to have.
-		for ( int i=0; i<ARRAYSIZE( g_modelWhiteList ); ++i )
+		for ( int i=0; i<SE_ARRAYSIZE( g_modelWhiteList ); ++i )
 		{
 			if ( FStrEq( pszClientModel, g_modelWhiteList[i] ) )
 				return true;
@@ -1729,7 +1729,7 @@ void CEconEntity::UpdateSingleParticleSystem( bool bVisible, const attachedparti
 		if ( pEffect )
 		{
 			// update the control points if necessary
-			for ( int i=1; i<ARRAYSIZE( pSystem->pszControlPoints ); ++i )
+			for ( int i=1; i<SE_ARRAYSIZE( pSystem->pszControlPoints ); ++i )
 			{
 				const char *pszControlPointName = pSystem->pszControlPoints[i];
 				if ( pszControlPointName && pszControlPointName[0] != '\0' )

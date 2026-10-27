@@ -235,7 +235,7 @@ void CTFKnife::PrimaryAttack( void )
 	bool bSuccessfulBackstab = IsBackstab() && !m_hBackstabVictim->IsAlive();
 
 	ETFFlagType ignoreTypes[] = { TF_FLAGTYPE_PLAYER_DESTRUCTION };
-	if ( ShouldDisguiseOnBackstab() && bSuccessfulBackstab && !pPlayer->HasTheFlag( ignoreTypes, ARRAYSIZE( ignoreTypes ) ) )
+	if ( ShouldDisguiseOnBackstab() && bSuccessfulBackstab && !pPlayer->HasTheFlag( ignoreTypes, SE_ARRAYSIZE( ignoreTypes ) ) )
 	{
 		// Different rules in MvM when stabbing bots
 		bool bMvM = TFGameRules() && TFGameRules()->IsMannVsMachineMode() && m_hBackstabVictim->IsBot();

@@ -710,13 +710,13 @@ bool CTFTauntInfo::InitTauntInputRemap( KeyValues *pKV, CUtlVector<CUtlString> *
 		IN_FORWARD,
 		IN_BACK
 	};
-	COMPILE_TIME_ASSERT( ARRAYSIZE( s_pszAllowedTauntInputButtonNames ) == ARRAYSIZE( s_iAllowedTauntInputButtons ) );
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE( s_pszAllowedTauntInputButtonNames ) == SE_ARRAYSIZE( s_iAllowedTauntInputButtons ) );
 
 	FOR_EACH_SUBKEY( pKV, pButtonKey )
 	{
 		const char *pszButtonName = pButtonKey->GetName();
 		int iButton = 0;
-		for ( int i=0; i<ARRAYSIZE( s_pszAllowedTauntInputButtonNames ); i++ )
+		for ( int i=0; i<SE_ARRAYSIZE( s_pszAllowedTauntInputButtonNames ); i++ )
 		{
 			if ( V_streq( pszButtonName, s_pszAllowedTauntInputButtonNames[i] ) )
 			{
@@ -1122,7 +1122,7 @@ void CTFItemDefinition::InternalInitialize()
 	m_iAnimationSlot = -1;
 
 	m_vbClassUsability.ClearAll();
-	for ( int i = 0; i < ARRAYSIZE( m_iLoadoutSlots ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_iLoadoutSlots ); i++ )
 	{
 		m_iLoadoutSlots[i] = LOADOUT_POSITION_INVALID;
 		m_pszPlayerDisplayModel[i] = NULL;
@@ -1477,9 +1477,9 @@ void CTFStyleInfo::GeneratePrecacheModelStringsForStyle( CUtlVector<const char *
 {
 	Assert( out_pVecModelStrings );
 
-	for ( int i = 0; i < ARRAYSIZE( m_pszPlayerDisplayModel ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_pszPlayerDisplayModel ); i++ )
 	{
-		for ( int j = 0; j < ARRAYSIZE( m_pszPlayerDisplayModel[i] ); j++ )
+		for ( int j = 0; j < SE_ARRAYSIZE( m_pszPlayerDisplayModel[i] ); j++ )
 		{
 			const char* pszModelName = m_pszPlayerDisplayModel[i][j];
 			if ( pszModelName && *pszModelName )
@@ -1499,7 +1499,7 @@ void CTFStyleInfo::GeneratePrecacheModelStringsForStyle( CUtlVector<const char *
 const char *CTFStyleInfo::GetPlayerDisplayModel( int iClass, int iTeam ) const
 {
 	Assert( iClass >= 0 );
-	Assert( iClass < ARRAYSIZE( m_pszPlayerDisplayModel[0] ) );
+	Assert( iClass < SE_ARRAYSIZE( m_pszPlayerDisplayModel[0] ) );
 
 	const char *pszBlueModel = m_pszPlayerDisplayModel[1][iClass];
 	if ( iTeam == TF_TEAM_BLUE && pszBlueModel && *pszBlueModel )
@@ -1843,7 +1843,7 @@ static PlayerClassInfo_t gs_PlayerClassData[] =
 
 bool BIsPlayerClassValid( int iClass )
 {
-	return iClass >= 0 && iClass < ARRAYSIZE( gs_PlayerClassData );
+	return iClass >= 0 && iClass < SE_ARRAYSIZE( gs_PlayerClassData );
 }
 
 const char *GetPlayerClassName( int iClass )
@@ -1925,7 +1925,7 @@ const char *g_szLoadoutStrings[] =
 	"",				// LOADOUT_POSITION_BUILDING2,
 #endif // STAGING_ONLY
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_szLoadoutStrings ) <= CLASS_LOADOUT_POSITION_COUNT );	// we don't support mapping directly to slots like "misc2", "taunt2-8", etc.
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_szLoadoutStrings ) <= CLASS_LOADOUT_POSITION_COUNT );	// we don't support mapping directly to slots like "misc2", "taunt2-8", etc.
 
 // Loadout positions used to display loadout slots to players (localized)
 const char *g_szLoadoutStringsForDisplay[] =
@@ -1970,7 +1970,7 @@ const char *g_szLoadoutStringsForDisplay[] =
 	"#LoadoutSlot_Building",	// LOADOUT_POSITION_BUILDING2,
 #endif // STAGING_ONLY
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_szLoadoutStringsForDisplay ) == CLASS_LOADOUT_POSITION_COUNT );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_szLoadoutStringsForDisplay ) == CLASS_LOADOUT_POSITION_COUNT );
 
 // Loadout positions
 const char *g_szAccountLoadoutStrings[] = 
@@ -1979,7 +1979,7 @@ const char *g_szAccountLoadoutStrings[] =
 	""
 	""
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_szAccountLoadoutStrings ) <= ACCOUNT_LOADOUT_POSITION_COUNT );	// we don't support mapping directly to slots like "misc2", "taunt2-8", etc.
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_szAccountLoadoutStrings ) <= ACCOUNT_LOADOUT_POSITION_COUNT );	// we don't support mapping directly to slots like "misc2", "taunt2-8", etc.
 
 // Loadout positions used to display loadout slots to players (localized)
 const char *g_szAccountLoadoutStringsForDisplay[] =
@@ -1988,7 +1988,7 @@ const char *g_szAccountLoadoutStringsForDisplay[] =
 	"#LoadoutSlot_Account2",
 	"#LoadoutSlot_Account3",
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_szAccountLoadoutStringsForDisplay ) == ACCOUNT_LOADOUT_POSITION_COUNT );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_szAccountLoadoutStringsForDisplay ) == ACCOUNT_LOADOUT_POSITION_COUNT );
 
 // Weapon types
 const char *g_szWeaponTypeSubstrings[] =
@@ -2008,7 +2008,7 @@ const char *g_szWeaponTypeSubstrings[] =
 	"SECONDARY2",
 	"PRIMARY2"
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_szWeaponTypeSubstrings ) == TF_WPN_TYPE_COUNT );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_szWeaponTypeSubstrings ) == TF_WPN_TYPE_COUNT );
 
 CTFItemSchema::CTFItemSchema()
 	: m_mapQuestObjectiveConditions( DefLessFunc( ObjectiveConditionDefIndex_t ) )
@@ -2061,25 +2061,25 @@ bool CTFItemSchema::BInitSchema( KeyValues *pKVRawDefinition, CUtlVector<CUtlStr
 	if ( m_vecClassUsabilityStrings.Size() == 0 )
 	{
 		// Special case, since player class data is an array of structs, not an array of strings
-		for ( unsigned int i = 0; i < ARRAYSIZE( gs_PlayerClassData ); i++ )
+		for ( unsigned int i = 0; i < SE_ARRAYSIZE( gs_PlayerClassData ); i++ )
 		{
 			m_vecClassUsabilityStrings.AddToTail( gs_PlayerClassData[i].m_pchName );
 		}
 		Assert( m_vecClassUsabilityStrings.Size() == LOADOUT_COUNT );
 	
-		InitializeStringTable( &g_szLoadoutStrings[0],				ARRAYSIZE(g_szLoadoutStrings),				&m_vecClassLoadoutStrings );
+		InitializeStringTable( &g_szLoadoutStrings[0],				SE_ARRAYSIZE(g_szLoadoutStrings),				&m_vecClassLoadoutStrings );
 		Assert( m_vecClassLoadoutStrings.Size() <= CLASS_LOADOUT_POSITION_COUNT );
 
-		InitializeStringTable( &g_szLoadoutStringsForDisplay[0],	ARRAYSIZE(g_szLoadoutStringsForDisplay),	&m_vecClassLoadoutStringsForDisplay );
+		InitializeStringTable( &g_szLoadoutStringsForDisplay[0],	SE_ARRAYSIZE(g_szLoadoutStringsForDisplay),	&m_vecClassLoadoutStringsForDisplay );
 		Assert( m_vecClassLoadoutStringsForDisplay.Size() == CLASS_LOADOUT_POSITION_COUNT );
 
-		InitializeStringTable( &g_szAccountLoadoutStrings[0],		ARRAYSIZE(g_szAccountLoadoutStrings),				&m_vecAccountLoadoutStrings );
+		InitializeStringTable( &g_szAccountLoadoutStrings[0],		SE_ARRAYSIZE(g_szAccountLoadoutStrings),				&m_vecAccountLoadoutStrings );
 		Assert( m_vecAccountLoadoutStrings.Size() <= ACCOUNT_LOADOUT_POSITION_COUNT );
 
-		InitializeStringTable( &g_szAccountLoadoutStringsForDisplay[0],	ARRAYSIZE(g_szAccountLoadoutStringsForDisplay),	&m_vecAccountLoadoutStringsForDisplay );
+		InitializeStringTable( &g_szAccountLoadoutStringsForDisplay[0],	SE_ARRAYSIZE(g_szAccountLoadoutStringsForDisplay),	&m_vecAccountLoadoutStringsForDisplay );
 		Assert( m_vecAccountLoadoutStringsForDisplay.Size() == ACCOUNT_LOADOUT_POSITION_COUNT );
 
-		InitializeStringTable( &g_szWeaponTypeSubstrings[0],		ARRAYSIZE(g_szWeaponTypeSubstrings),		&m_vecWeaponTypeSubstrings );
+		InitializeStringTable( &g_szWeaponTypeSubstrings[0],		SE_ARRAYSIZE(g_szWeaponTypeSubstrings),		&m_vecWeaponTypeSubstrings );
 		Assert( m_vecWeaponTypeSubstrings.Size() == TF_WPN_TYPE_COUNT );
 	}
 
@@ -2162,7 +2162,7 @@ const char *s_pszGameModes[eNumGameCategories] =
 	"other",					// kGameCategory_Other
 	"halloween",				// kGameCategory_Halloween
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( s_pszGameModes ) == eNumGameCategories );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( s_pszGameModes ) == eNumGameCategories );
 
 static const char *s_pszQuickplayMatchTypes[] =
 {
@@ -2170,7 +2170,7 @@ static const char *s_pszQuickplayMatchTypes[] =
 	"all_users",				// kQuickplay_AllUsers
 	"disabled",					// kQuickplay_Disabled
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( s_pszQuickplayMatchTypes ) == kQuickplayTypeCount );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( s_pszQuickplayMatchTypes ) == kQuickplayTypeCount );
 
 static const char *s_pszMvMBadgeContractPointsAttributes[] =
 {
@@ -2180,7 +2180,7 @@ static const char *s_pszMvMBadgeContractPointsAttributes[] =
 	"mvm contract points expert",
 	NULL, // should we do haunted?
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( s_pszMvMBadgeContractPointsAttributes ) == k_EMvMChallengeDifficultyLastValid );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( s_pszMvMBadgeContractPointsAttributes ) == k_EMvMChallengeDifficultyLastValid );
 
 const char *CTFItemSchema::GetMvMBadgeContractPointsAttributeName( EMvMChallengeDifficulty difficulty )
 {
@@ -2198,7 +2198,7 @@ static const char *s_pszMvMBadgeContractLevelAttributes[] =
 	"mvm contract level expert",
 	NULL, // should we do haunted?
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( s_pszMvMBadgeContractLevelAttributes ) == k_EMvMChallengeDifficultyLastValid );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( s_pszMvMBadgeContractLevelAttributes ) == k_EMvMChallengeDifficultyLastValid );
 
 const char *CTFItemSchema::GetMvMBadgeContractLevelAttributeName( EMvMChallengeDifficulty difficulty )
 {
@@ -2215,7 +2215,7 @@ const char* s_pszMMTypes[kMatchmakingTypeCount] =
 	"alternative",
 	"competitive_6v6",
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( s_pszMMTypes ) == kMatchmakingTypeCount );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( s_pszMMTypes ) == kMatchmakingTypeCount );
 
 bool CTFItemSchema::BInitMMCategories( KeyValues *pKVCategories, CUtlVector<CUtlString> *pVecErrors )
 {
@@ -2223,7 +2223,7 @@ bool CTFItemSchema::BInitMMCategories( KeyValues *pKVCategories, CUtlVector<CUtl
 
 	FOR_EACH_TRUE_SUBKEY( pKVCategories, pKVCategory )
 	{
-		int nCatType = StringFieldToInt( pKVCategory->GetName(), s_pszMMTypes, ARRAYSIZE( s_pszMMTypes ) );
+		int nCatType = StringFieldToInt( pKVCategory->GetName(), s_pszMMTypes, SE_ARRAYSIZE( s_pszMMTypes ) );
 		SCHEMA_INIT_CHECK( nCatType != -1, "BInitMMCategories: unknown mm category type '%s'", pKVCategory->GetName() );
 		EMatchmakingGroupType eType = (EMatchmakingGroupType)nCatType;
 
@@ -2300,7 +2300,7 @@ bool CTFItemSchema::BInitGameModes( KeyValues *pKVMaps, CUtlVector<CUtlString> *
 
 	FOR_EACH_TRUE_SUBKEY( pKVMaps, pKVGameMode )
 	{
-		int iGameType = StringFieldToInt( pKVGameMode->GetName(), s_pszGameModes, ARRAYSIZE( s_pszGameModes ) );
+		int iGameType = StringFieldToInt( pKVGameMode->GetName(), s_pszGameModes, SE_ARRAYSIZE( s_pszGameModes ) );
 		SCHEMA_INIT_CHECK( iGameType != -1,
 			"BInitMaps(): unknown game type '%s'", pKVGameMode->GetName() );
 
@@ -2313,7 +2313,7 @@ bool CTFItemSchema::BInitGameModes( KeyValues *pKVMaps, CUtlVector<CUtlString> *
 		pGameMode->m_pszListImage	  = pKVGameMode->GetString( "list_image", NULL );
 		pGameMode->m_pszName		  = pKVGameMode->GetName();
 		pGameMode->m_pszMMType		  = pKVGameMode->GetString( "mm_type" );
-		int nMMType = StringFieldToInt( pKVGameMode->GetString( "mm_type" ), s_pszMMTypes, ARRAYSIZE( s_pszMMTypes ) );
+		int nMMType = StringFieldToInt( pKVGameMode->GetString( "mm_type" ), s_pszMMTypes, SE_ARRAYSIZE( s_pszMMTypes ) );
 		if ( nMMType != (int)kMatchmakingType_None )
 		{
 			EMatchmakingGroupType eMMType = (EMatchmakingGroupType)nMMType;

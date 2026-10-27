@@ -713,7 +713,7 @@ void C_Strider::ClientThink()
 		Vector vExtendedMaxs = vecMaxs + Vector( 50, 50, 50 );
 
 		C_RopeKeyframe *ropes[512];
-		int nRopes = C_RopeKeyframe::GetRopesIntersectingAABB( ropes, ARRAYSIZE( ropes ), GetAbsOrigin() + vExtendedMins, GetAbsOrigin() + vExtendedMaxs );
+		int nRopes = C_RopeKeyframe::GetRopesIntersectingAABB( ropes, SE_ARRAYSIZE( ropes ), GetAbsOrigin() + vExtendedMins, GetAbsOrigin() + vExtendedMaxs );
 		for ( int i=0; i < nRopes; i++ )
 		{
 			C_RopeKeyframe *pRope = ropes[i];

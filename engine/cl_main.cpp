@@ -1243,7 +1243,7 @@ static void screenshot_internal( const CCommand &args )
 		Warning( "__screenshot_internal - wrong number of arguments" );
 		return;
 	}
-	Q_strncpy( cl_snapshotname, args[1], ARRAYSIZE(cl_snapshotname) );
+	Q_strncpy( cl_snapshotname, args[1], SE_ARRAYSIZE(cl_snapshotname) );
 	cl_takesnapshot = true;
 	cl_takejpeg = true;
 	cl_jpegquality = 70;

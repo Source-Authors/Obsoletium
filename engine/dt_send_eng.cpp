@@ -388,7 +388,7 @@ int SendTable_WriteAllDeltaProps(
 		pToData,
 		nToDataBits,
 		deltaProps,
-		ARRAYSIZE( deltaProps ),
+		SE_ARRAYSIZE( deltaProps ),
 		nObjectID );
 
 	// Write the properties.

@@ -112,7 +112,7 @@ class SendTable;
 		\
 		if ( sizeof( predDesc ) > sizeof( predDesc[0] ) ) \
 		{ \
-			classNameTypedef::m_PredMap.dataNumFields = ARRAYSIZE( predDesc ) - 1; \
+			classNameTypedef::m_PredMap.dataNumFields = SE_ARRAYSIZE( predDesc ) - 1; \
 			classNameTypedef::m_PredMap.dataDesc 	  = &predDesc[1]; \
 		} \
 		else \

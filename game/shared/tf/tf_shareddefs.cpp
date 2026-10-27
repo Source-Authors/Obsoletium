@@ -433,11 +433,11 @@ static const char *g_aConditionNames[] =
 	"TF_COND_SPY_CLASS_STEAL",
 #endif // STAGING_ONLY
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_aConditionNames ) == TF_COND_LAST );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_aConditionNames ) == TF_COND_LAST );
 
 const char *GetTFConditionName( ETFCond eCond )
 {
-	if ( ( eCond >= ARRAYSIZE( g_aConditionNames ) ) || ( eCond < 0 ) )
+	if ( ( eCond >= SE_ARRAYSIZE( g_aConditionNames ) ) || ( eCond < 0 ) )
 		return NULL;
 
 	return g_aConditionNames[eCond];
@@ -473,7 +473,7 @@ static const char *s_aGameTypeNames[] =
 	"#GameType_Passtime",
 	"#GameType_PlayerDestruction",
 };
-COMPILE_TIME_ASSERT( TF_GAMETYPE_COUNT == ARRAYSIZE( s_aGameTypeNames ) );
+COMPILE_TIME_ASSERT( TF_GAMETYPE_COUNT == SE_ARRAYSIZE( s_aGameTypeNames ) );
 
 const char *GetGameTypeName( ETFGameType gameType )
 {
@@ -492,7 +492,7 @@ static const char *s_aEnumGameTypeName[] =
 	"TF_GAMETYPE_PASSTIME",
 	"TF_GAMETYPE_PD"
 };
-COMPILE_TIME_ASSERT( TF_GAMETYPE_COUNT == ARRAYSIZE( s_aEnumGameTypeName ) );
+COMPILE_TIME_ASSERT( TF_GAMETYPE_COUNT == SE_ARRAYSIZE( s_aEnumGameTypeName ) );
 
 const char *GetEnumGameTypeName( ETFGameType gameType )
 {
@@ -523,7 +523,7 @@ const char *g_aAmmoNames[] =
 	"TF_AMMO_GRENADES2",
 	"TF_AMMO_GRENADES3"
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_aAmmoNames ) == TF_AMMO_COUNT );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_aAmmoNames ) == TF_AMMO_COUNT );
 
 const char *GetAmmoName( int iAmmoType )
 {
@@ -540,7 +540,7 @@ const char *g_aCTFEventNames[] =
 	"TF_FLAGEVENT_DROPPED",
 	"TF_FLAGEVENT_RETURNED",
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_aCTFEventNames ) == TF_NUM_FLAG_EVENTS );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_aCTFEventNames ) == TF_NUM_FLAG_EVENTS );
 
 const char *GetCTFEventName( ETFFlagEventTypes iEventType )
 {
@@ -706,7 +706,7 @@ const char *g_aWeaponNames[] =
 #endif
 	"TF_WEAPON_CHARGED_SMG",
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_aWeaponNames ) == TF_WEAPON_COUNT );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_aWeaponNames ) == TF_WEAPON_COUNT );
 
 int g_aWeaponDamageTypes[] =
 {
@@ -900,11 +900,11 @@ const char *g_szSpecialDamageNames[] =
 	"TF_DMG_CUSTOM_GIANT_HAMMER",
 	"TF_DMG_CUSTOM_RUNE_REFLECT",
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_szSpecialDamageNames ) == TF_DMG_CUSTOM_END );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_szSpecialDamageNames ) == TF_DMG_CUSTOM_END );
 
 const char *GetCustomDamageName( ETFDmgCustom eDmgCustom )
 {
-	if ( ( eDmgCustom >= ARRAYSIZE( g_szSpecialDamageNames ) ) || ( eDmgCustom < 0 ) )
+	if ( ( eDmgCustom >= SE_ARRAYSIZE( g_szSpecialDamageNames ) ) || ( eDmgCustom < 0 ) )
 		return NULL;
 
 	return g_szSpecialDamageNames[eDmgCustom];
@@ -966,7 +966,7 @@ const char *g_szProjectileNames[] =
 	"projectile_jarate_bolt",
 #endif
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_szProjectileNames ) == TF_NUM_PROJECTILES );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_szProjectileNames ) == TF_NUM_PROJECTILES );
 
 // these map to the projectiles named in g_szProjectileNames
 int g_iProjectileWeapons[] = 
@@ -1013,7 +1013,7 @@ int g_iProjectileWeapons[] =
 #endif
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_szProjectileNames ) == ARRAYSIZE( g_iProjectileWeapons ) );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_szProjectileNames ) == SE_ARRAYSIZE( g_iProjectileWeapons ) );
 
 //-----------------------------------------------------------------------------
 // Taunt attacks
@@ -1058,13 +1058,13 @@ static const char* taunt_attack_name[] =
 	//
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( taunt_attack_name ) == TAUNTATK_COUNT );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( taunt_attack_name ) == TAUNTATK_COUNT );
 
 taunt_attack_t GetTauntAttackByName( const char* pszTauntAttackName )
 {
 	if ( pszTauntAttackName )
 	{
-		for ( int i=0; i<ARRAYSIZE( taunt_attack_name ); ++i )
+		for ( int i=0; i<SE_ARRAYSIZE( taunt_attack_name ); ++i )
 		{
 			if ( V_strieq( pszTauntAttackName, taunt_attack_name[i] ) )
 			{
@@ -1157,7 +1157,7 @@ const char *g_pszArrowModels[] =
 	"models/weapons/c_models/c_sd_cleaver/c_sd_cleaver.mdl"
 #endif
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_pszArrowModels ) == TF_ARROW_MODEL_COUNT );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_pszArrowModels ) == TF_ARROW_MODEL_COUNT );
 
 const char *g_pszCampaignMedalIcons[] =
 {
@@ -1188,7 +1188,7 @@ const char *g_pszCampaignMedalIcons[] =
 	"../HUD/stamp_winter2016_silver2",
 	"../HUD/stamp_winter2016_gold2",
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_pszCampaignMedalIcons ) == CAMPAIGN_MEDAL_DISPLAY_TYPE_COUNT );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_pszCampaignMedalIcons ) == CAMPAIGN_MEDAL_DISPLAY_TYPE_COUNT );
 
 //-----------------------------------------------------------------------------
 // Dead Calling Cards
@@ -1207,9 +1207,9 @@ const char *g_pszDeathCallingCardModels[] =
 int GetWeaponId( const char *pszWeaponName )
 {
 	// if this doesn't match, you need to add missing weapons to the array
-	COMPILE_TIME_ASSERT( TF_WEAPON_COUNT == ARRAYSIZE( g_aWeaponNames ) );
+	COMPILE_TIME_ASSERT( TF_WEAPON_COUNT == SE_ARRAYSIZE( g_aWeaponNames ) );
 
-	for ( int iWeapon = 0; iWeapon < ARRAYSIZE( g_aWeaponNames ); ++iWeapon )
+	for ( int iWeapon = 0; iWeapon < SE_ARRAYSIZE( g_aWeaponNames ); ++iWeapon )
 	{
 		if ( V_strieq( pszWeaponName, g_aWeaponNames[iWeapon] ) )
 			return iWeapon;
@@ -1225,9 +1225,9 @@ int GetWeaponId( const char *pszWeaponName )
 const char *WeaponIdToAlias( int iWeapon )
 {
 	// if this doesn't match, you need to add missing weapons to the array
-	COMPILE_TIME_ASSERT( TF_WEAPON_COUNT == ARRAYSIZE( g_aWeaponNames ) );
+	COMPILE_TIME_ASSERT( TF_WEAPON_COUNT == SE_ARRAYSIZE( g_aWeaponNames ) );
 
-	if ( ( iWeapon >= ARRAYSIZE( g_aWeaponNames ) ) || ( iWeapon < 0 ) )
+	if ( ( iWeapon >= SE_ARRAYSIZE( g_aWeaponNames ) ) || ( iWeapon < 0 ) )
 		return NULL;
 
 	return g_aWeaponNames[iWeapon];
@@ -1276,7 +1276,7 @@ int GetWeaponFromDamage( const CTakeDamageInfo &info )
 
 	if ( !Q_strnicmp( killer_weapon_name, "tf_projectile", 13 ) )
 	{
-		for( int i = 0; i < ARRAYSIZE( g_szProjectileNames ); i++ )
+		for( int i = 0; i < SE_ARRAYSIZE( g_szProjectileNames ); i++ )
 		{
 			if ( V_strieq( &killer_weapon_name[ 3 ], g_szProjectileNames[ i ] ) )
 			{
@@ -1376,7 +1376,7 @@ CObjectInfo g_ObjectInfos[OBJ_LAST] =
 	CObjectInfo( "OBJ_SPY_TRAP" ),
 #endif
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_ObjectInfos ) == OBJ_LAST );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_ObjectInfos ) == OBJ_LAST );
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -1419,7 +1419,7 @@ static void SpewFileInfo( IBaseFileSystem *pFileSystem, const char *resourceName
 
 	char cwd[ MAX_PATH ];
 	cwd[ 0 ] = 0;
-	pFS->GetCurrentDirectory( cwd, ARRAYSIZE( cwd ) );
+	pFS->GetCurrentDirectory( cwd, SE_ARRAYSIZE( cwd ) );
 
 	bool bAvailable = pFS->IsFileImmediatelyAvailable( resourceName );
 
@@ -1454,7 +1454,7 @@ void LoadObjectInfos( IBaseFileSystem *pFileSystem )
 	}
 
 	// Now read each class's information in.
-	for ( int iObj=0; iObj < ARRAYSIZE( g_ObjectInfos ); iObj++ )
+	for ( int iObj=0; iObj < SE_ARRAYSIZE( g_ObjectInfos ); iObj++ )
 	{
 		CObjectInfo *pInfo = &g_ObjectInfos[iObj];
 		KeyValues *pSub = pValues->FindKey( pInfo->m_pObjectName );
@@ -1765,7 +1765,7 @@ const char *TranslateWeaponEntForClass( const char *pszName, int iClass )
 {
 	if ( pszName )
 	{
-		for ( int i = 0; i < ARRAYSIZE(pszWpnEntTranslationList); i++ )
+		for ( int i = 0; i < SE_ARRAYSIZE(pszWpnEntTranslationList); i++ )
 		{
 			if ( V_strieq( pszName, pszWpnEntTranslationList[i].pszWpnString ) )
 			{
@@ -1849,7 +1849,7 @@ bool IsPlayingInvasionMap( void )
 {
 	const char *pszCurrentMap = engine->GetLevelName();
 
-	for ( int i = 0; i < ARRAYSIZE( g_pszInvasionMaps ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( g_pszInvasionMaps ); i++ )
 	{
 		if ( FStrEq( g_pszInvasionMaps[i], pszCurrentMap ) )
 			return true;
@@ -1957,7 +1957,7 @@ const char *g_pszCompetitiveMedalImages[] =
 	"competitive/competitive_coin_silver",
 	"competitive/competitive_coin_gold",
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_pszCompetitiveMedalImages ) == StatMedal_Max );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_pszCompetitiveMedalImages ) == StatMedal_Max );
 
 #endif // TF_CLIENT_DLL
 
@@ -1996,8 +1996,8 @@ static const char *s_pszRuneIcons[2][RUNE_TYPES_MAX] =
 		"powerup_icon_supernova_blue",
 	}
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( s_pszRuneIcons[0] ) == RUNE_TYPES_MAX );
-COMPILE_TIME_ASSERT( ARRAYSIZE( s_pszRuneIcons[1] ) == RUNE_TYPES_MAX );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( s_pszRuneIcons[0] ) == RUNE_TYPES_MAX );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( s_pszRuneIcons[1] ) == RUNE_TYPES_MAX );
 
 const char *GetPowerupIconName( RuneTypes_t type, int iTeam )
 {

@@ -1997,7 +1997,7 @@ bool VMPI_GetNextMessage( MessageBuffer *pBuf, int *pSource,
 	while ( 1 )
 	{
 		DWORD ret =
-		WaitForMultipleObjects( ARRAYSIZE( handles ), handles, FALSE, timeout );
+		WaitForMultipleObjects( SE_ARRAYSIZE( handles ), handles, FALSE, timeout );
 		if ( ret == WAIT_TIMEOUT )
 		{
 			return false;
@@ -2365,7 +2365,7 @@ bool VMPI_Send2Chunks( const void *pChunk1, ptrdiff_t chunk1Len,
 {
 	const void *pChunks[2] = { pChunk1, pChunk2 };
 	ptrdiff_t   len[2] = { chunk1Len, chunk2Len };
-	return VMPI_SendChunks( pChunks, len, ARRAYSIZE( pChunks ), iDest,
+	return VMPI_SendChunks( pChunks, len, SE_ARRAYSIZE( pChunks ), iDest,
 	                        fVMPISendFlags );
 }
 
@@ -2376,7 +2376,7 @@ bool VMPI_Send3Chunks( const void *pChunk1, ptrdiff_t chunk1Len,
 {
 	const void *pChunks[3] = { pChunk1, pChunk2, pChunk3 };
 	ptrdiff_t   len[3] = { chunk1Len, chunk2Len, chunk3Len };
-	return VMPI_SendChunks( pChunks, len, ARRAYSIZE( pChunks ), iDest,
+	return VMPI_SendChunks( pChunks, len, SE_ARRAYSIZE( pChunks ), iDest,
 	                        fVMPISendFlags );
 }
 

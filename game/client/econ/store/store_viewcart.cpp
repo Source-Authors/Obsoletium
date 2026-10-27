@@ -225,7 +225,7 @@ void CStoreViewCartPanel::UpdateCartItemList( void )
 
 	// Update the item count
 	wchar_t wszCount[16];
-	_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", pCart->GetTotalItems() );
+	_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", pCart->GetTotalItems() );
 	wchar_t wzLocalized[32];
 	g_pVGuiLocalize->ConstructString_safe( wzLocalized, g_pVGuiLocalize->Find( "#Store_CartItems" ), 1, wszCount );
 	m_pClientArea->SetDialogVariable("storecart", wzLocalized );
@@ -292,7 +292,7 @@ void CStoreViewCartPanel::UpdateCartItemList( void )
 	// Update total price
 	item_price_t unTotalPrice = pCart->GetTotalPrice();
 	wchar_t wzLocalizedPrice[ kLocalizedPriceSizeInChararacters ];
-	MakeMoneyString( wzLocalizedPrice, ARRAYSIZE( wzLocalizedPrice ), unTotalPrice, EconUI()->GetStorePanel()->GetCurrency() );
+	MakeMoneyString( wzLocalizedPrice, SE_ARRAYSIZE( wzLocalizedPrice ), unTotalPrice, EconUI()->GetStorePanel()->GetCurrency() );
 	m_pPurchaseFooter->SetDialogVariable( "totalprice", wzLocalizedPrice );
 }
 
@@ -367,7 +367,7 @@ void CCartViewItemEntry::SetEntry( cart_item_t *pEntry, int iEntryIndex )
 	int iSubTotal = pEntry->GetDisplayPrice();
 
 	wchar_t wzLocalizedPrice[ kLocalizedPriceSizeInChararacters ];
-	MakeMoneyString( wzLocalizedPrice, ARRAYSIZE( wzLocalizedPrice ), iSubTotal, EconUI()->GetStorePanel()->GetCurrency() );
+	MakeMoneyString( wzLocalizedPrice, SE_ARRAYSIZE( wzLocalizedPrice ), iSubTotal, EconUI()->GetStorePanel()->GetCurrency() );
 	SetDialogVariable("price", wzLocalizedPrice );
 
 	CItemModelPanel *pItemPanel = dynamic_cast<CItemModelPanel*>( FindChildByName("itempanel") );

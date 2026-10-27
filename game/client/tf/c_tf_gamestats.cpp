@@ -103,7 +103,7 @@ const char *g_ItemEventNames[] =
 	""	// IE_COUNT
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_ItemEventNames ) == IE_COUNT );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_ItemEventNames ) == IE_COUNT );
 
 C_CTFGameStats C_CTF_GameStats;
 
@@ -140,9 +140,9 @@ C_CTFGameStats::~C_CTFGameStats()
 //-----------------------------------------------------------------------------
 void C_CTFGameStats::Clear( void )
 {
-	V_strncpy( m_szCountryCode, "unknown", ARRAYSIZE( m_szCountryCode ) );
-	V_strncpy( m_szAudioLanguage, "unknown", ARRAYSIZE( m_szAudioLanguage ) );
-	V_strncpy( m_szTextLanguage, "unknown", ARRAYSIZE( m_szTextLanguage ) );
+	V_strncpy( m_szCountryCode, "unknown", SE_ARRAYSIZE( m_szCountryCode ) );
+	V_strncpy( m_szAudioLanguage, "unknown", SE_ARRAYSIZE( m_szAudioLanguage ) );
+	V_strncpy( m_szTextLanguage, "unknown", SE_ARRAYSIZE( m_szTextLanguage ) );
 
 	m_bRoundActive = false;
 	m_bIsDisconnecting = false;
@@ -201,7 +201,7 @@ bool C_CTFGameStats::Init( void )
 		const char * countryCode = steamapicontext->SteamUtils()->GetIPCountry();
 		if ( countryCode != NULL )
 		{
-			V_strncpy( m_szCountryCode, countryCode, ARRAYSIZE( m_szCountryCode ) );
+			V_strncpy( m_szCountryCode, countryCode, SE_ARRAYSIZE( m_szCountryCode ) );
 		}
 
 		// Now lets get the text language that Steam is in (If the game supports the language, then the UI is changed to that language).

@@ -2546,7 +2546,7 @@ void NET_OpenSockets (void)
 				27015, 27016, 27017, 27018, 27019, 27020
 			};
 
-			for ( size_t iport = 0; iport < ARRAYSIZE( s_ports ); iport++ )
+			for ( size_t iport = 0; iport < SE_ARRAYSIZE( s_ports ); iport++ )
 			{
 				bool bPortUsed = false;
 				for ( int i = NS_CLIENT; i < NS_SVLAN; i++ )

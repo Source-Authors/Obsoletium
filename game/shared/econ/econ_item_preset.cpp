@@ -80,7 +80,7 @@ bool CEconItemPerClassPresetData::BYieldingAddInsertToTransaction( GCSDK::CSQLAc
 	schItemPresetInstance.m_unAccountID = m_unAccountID;
 	schItemPresetInstance.m_unClassID = m_unClassID;
 
-	for ( int i = 0; i < ARRAYSIZE( m_PresetData ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_PresetData ); i++ )
 	{
 		schItemPresetInstance.m_unPresetID = i;
 
@@ -122,7 +122,7 @@ bool CEconItemPerClassPresetData::BYieldingAddWriteToTransaction( GCSDK::CSQLAcc
 		{
 			int iDirtyPreset = iField - kPerClassPresetDataDirtyField_PresetData_Base;
 			Assert( iDirtyPreset >= 0 );
-			Assert( iDirtyPreset < ARRAYSIZE( m_PresetData ) );
+			Assert( iDirtyPreset < SE_ARRAYSIZE( m_PresetData ) );
 
 			// First, remove any existing rows for this preset.
 			CSchItemPresetInstance schItemPresetInstance;
@@ -248,7 +248,7 @@ void CEconItemPerClassPresetData::Copy( const CSharedObject & soRHS )
 	m_unClassID		= rhs.m_unClassID;
 	m_unActivePreset = rhs.m_unActivePreset;
 
-	for ( int i = 0; i < ARRAYSIZE( m_PresetData ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_PresetData ); i++ )
 	{
 		m_PresetData[i].CopyArray( rhs.m_PresetData[i].Base(), rhs.m_PresetData[i].Count() );
 	}
@@ -268,7 +268,7 @@ void CEconItemPerClassPresetData::Dump() const
 //----------------------------------------------------------------------------
 const CUtlVector<PresetSlotItem_t> *CEconItemPerClassPresetData::FindItemsForPresetIndex( equipped_preset_t unPreset ) const
 {
-	if ( unPreset >= ARRAYSIZE( m_PresetData ) )
+	if ( unPreset >= SE_ARRAYSIZE( m_PresetData ) )
 		return NULL;
 
 	return &m_PresetData[ unPreset ];
@@ -279,7 +279,7 @@ const CUtlVector<PresetSlotItem_t> *CEconItemPerClassPresetData::FindItemsForPre
 //----------------------------------------------------------------------------
 void CEconItemPerClassPresetData::SetActivePreset( equipped_preset_t unPreset )
 {
-	if ( unPreset >= ARRAYSIZE( m_PresetData ) )
+	if ( unPreset >= SE_ARRAYSIZE( m_PresetData ) )
 		return;
 
 	m_unActivePreset = unPreset;
@@ -291,7 +291,7 @@ void CEconItemPerClassPresetData::SetActivePreset( equipped_preset_t unPreset )
 void CEconItemPerClassPresetData::EquipItemIntoActivePresetSlot( equipped_slot_t unSlot, itemid_t unOriginalItemID )
 {
 	Assert( GetItemSchema()->IsValidItemSlot( unSlot, EQUIP_TYPE_CLASS ) );
-	Assert( m_unActivePreset < ARRAYSIZE( m_PresetData ) );
+	Assert( m_unActivePreset < SE_ARRAYSIZE( m_PresetData ) );
 
 	auto& PresetData = m_PresetData[m_unActivePreset];
 
@@ -330,7 +330,7 @@ void CEconItemPerClassPresetData::EquipItemIntoActivePresetSlot( equipped_slot_t
 //----------------------------------------------------------------------------
 void CEconItemPerClassPresetData::RemoveAllItemsFromPresetIndex( equipped_preset_t unPreset )
 {
-	if ( unPreset >= ARRAYSIZE( m_PresetData ) )
+	if ( unPreset >= SE_ARRAYSIZE( m_PresetData ) )
 		return;
 
 	m_PresetData[unPreset].Purge();

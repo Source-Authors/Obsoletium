@@ -131,11 +131,11 @@ ConVar tf_test_hat_bodygroup( "tf_test_hat_bodygroup", "0", 0, "For testing body
 static int CalcBodyGroup( CBaseCombatCharacter* pOwner, CEconItemView *pItem, const char *pBodyGroup, codecontrolledbodygroupdata_t &ccbgd )
 {
 #ifdef CLIENT_DLL
-	if ( !Q_strnicmp( ccbgd.pFuncName, "test", ARRAYSIZE( "test" ) ) )
+	if ( !Q_strnicmp( ccbgd.pFuncName, "test", SE_ARRAYSIZE( "test" ) ) )
 	{
 		return tf_test_hat_bodygroup.GetInt();
 	}
-	else if ( !Q_strnicmp( ccbgd.pFuncName, "map_contributor", ARRAYSIZE( "map_contributor" ) ) )
+	else if ( !Q_strnicmp( ccbgd.pFuncName, "map_contributor", SE_ARRAYSIZE( "map_contributor" ) ) )
 	{
 		int iDonationAmount = MapInfo_GetDonationAmount( pItem->GetAccountID(), engine->GetLevelName() );
 		return MIN( iDonationAmount / 25, 4 );

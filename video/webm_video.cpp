@@ -41,7 +41,7 @@ VideoFileExtensionInfo_t s_WebMExtensions[] =
 	{ ".webm", VideoSystem::WEBM,  VideoSystemFeature::FULL_ENCODE },
 };
 
-const int s_WebMExtensionCount = ARRAYSIZE( s_WebMExtensions );
+const int s_WebMExtensionCount = SE_ARRAYSIZE( s_WebMExtensions );
 
 const VideoSystemFeature_t	CWebMVideoSubSystem::DEFAULT_FEATURE_SET = VideoSystemFeature::FULL_ENCODE;
 

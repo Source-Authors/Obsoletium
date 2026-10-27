@@ -3838,43 +3838,43 @@ acttable_t *CTFWeaponBase::ActivityList( int &iActivityCount )
 	{
 	case TF_WPN_TYPE_PRIMARY:
 	default:
-		iActivityCount = ARRAYSIZE( s_acttablePrimary );
+		iActivityCount = SE_ARRAYSIZE( s_acttablePrimary );
 		pTable = s_acttablePrimary;
 		break;
 	case TF_WPN_TYPE_SECONDARY:
-		iActivityCount = ARRAYSIZE( s_acttableSecondary );
+		iActivityCount = SE_ARRAYSIZE( s_acttableSecondary );
 		pTable = s_acttableSecondary;
 		break;
 	case TF_WPN_TYPE_MELEE:
-		iActivityCount = ARRAYSIZE( s_acttableMelee );
+		iActivityCount = SE_ARRAYSIZE( s_acttableMelee );
 		pTable = s_acttableMelee;
 		break;
 	case TF_WPN_TYPE_BUILDING:
-		iActivityCount = ARRAYSIZE( s_acttableBuilding );
+		iActivityCount = SE_ARRAYSIZE( s_acttableBuilding );
 		pTable = s_acttableBuilding;
 		break;
 	case TF_WPN_TYPE_PDA:
-		iActivityCount = ARRAYSIZE( s_acttablePDA );
+		iActivityCount = SE_ARRAYSIZE( s_acttablePDA );
 		pTable = s_acttablePDA;
 		break;
 	case TF_WPN_TYPE_ITEM1:
-		iActivityCount = ARRAYSIZE( s_acttableItem1 );
+		iActivityCount = SE_ARRAYSIZE( s_acttableItem1 );
 		pTable = s_acttableItem1;
 		break;
 	case TF_WPN_TYPE_ITEM2:
-		iActivityCount = ARRAYSIZE( s_acttableItem2 );
+		iActivityCount = SE_ARRAYSIZE( s_acttableItem2 );
 		pTable = s_acttableItem2;
 		break;
 	case TF_WPN_TYPE_MELEE_ALLCLASS:
-		iActivityCount = ARRAYSIZE( s_acttableMeleeAllclass );
+		iActivityCount = SE_ARRAYSIZE( s_acttableMeleeAllclass );
 		pTable = s_acttableMeleeAllclass;
 		break;
 	case TF_WPN_TYPE_SECONDARY2:
-		iActivityCount = ARRAYSIZE( s_acttableSecondary2 );
+		iActivityCount = SE_ARRAYSIZE( s_acttableSecondary2 );
 		pTable = s_acttableSecondary2;
 		break;
 	case TF_WPN_TYPE_PRIMARY2:
-		iActivityCount = ARRAYSIZE( s_acttablePrimary2 );
+		iActivityCount = SE_ARRAYSIZE( s_acttablePrimary2 );
 		pTable = s_acttablePrimary2;
 		break;
 	}
@@ -4095,7 +4095,7 @@ Activity CTFWeaponBase::TranslateViewmodelHandActivityInternal( Activity actBase
 	}
 
 	viewmodelacttable_t *pTable = s_viewmodelacttable;
-	for ( int i = 0; i < ARRAYSIZE(s_viewmodelacttable); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE(s_viewmodelacttable); i++ )
 	{
 		const viewmodelacttable_t &act = pTable[i];
 		if ( actBase == act.baseAct && act.weaponRole == iWeaponRole )

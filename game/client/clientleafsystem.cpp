@@ -1559,7 +1559,7 @@ static RenderGroup_t DetectBucketedRenderGroup( RenderGroup_t group, float fDime
 		80.f,	// player size
 		30.f,	// crate size
 	};
-	static_assert( ARRAYSIZE( arrThresholds ) + 1 >= RENDER_GROUP_CFG_NUM_OPAQUE_ENT_BUCKETS );
+	static_assert( SE_ARRAYSIZE( arrThresholds ) + 1 >= RENDER_GROUP_CFG_NUM_OPAQUE_ENT_BUCKETS );
 	Assert( group >= RENDER_GROUP_OPAQUE_STATIC && group <= RENDER_GROUP_OPAQUE_ENTITY );
 
 	int bucketedGroupIndex;

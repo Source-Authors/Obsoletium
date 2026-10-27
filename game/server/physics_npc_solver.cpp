@@ -131,7 +131,7 @@ void CPhysicsNPCSolver::BecomePenetrationSolver()
 	{
 		m_allowIntersection = true;
 		IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-		int listCount = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+		int listCount = pEntity->VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 		PhysDisableEntityCollisions( m_hNPC, pEntity );
 		m_pController = physenv->CreateMotionController( this );
 		for ( int i = 0; i < listCount; i++ )

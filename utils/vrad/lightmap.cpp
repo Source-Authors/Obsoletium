@@ -297,7 +297,7 @@ void PairEdges (void)
 					// add to neighbor list
 					tmpneighbor[m] = vertexface[n][k];
 					numneighbors++;
-					if ( numneighbors > ARRAYSIZE(tmpneighbor) )
+					if ( numneighbors > SE_ARRAYSIZE(tmpneighbor) )
 					{
 						Error("Stack overflow in neighbors\n");
 					}

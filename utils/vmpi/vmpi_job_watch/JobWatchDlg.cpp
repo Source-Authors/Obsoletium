@@ -183,7 +183,7 @@ BOOL CJobWatchDlg::OnInitDialog()
 	m_Workers.SetExtendedStyle( LVS_EX_FULLROWSELECT );
 
 	// Setup the headers.
-	for ( int i = 0; i < ARRAYSIZE( g_ColumnInfos ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( g_ColumnInfos ); i++ )
 	{
 		m_Workers.InsertColumn( i, g_ColumnInfos[i].pText, LVCFMT_LEFT, g_ColumnInfos[i].width, i );
 	}
@@ -612,7 +612,7 @@ BOOL CJobWatchDlg::OnNotify( WPARAM wParam, LPARAM lParam, LRESULT *pResult )
 			LPNMLISTVIEW pListView = (LPNMLISTVIEW)lParam;
 
 			// Now sort by this column.
-			g_iSortColumn = max( 0, min( pListView->iSubItem, (int)ARRAYSIZE( g_ColumnInfos ) - 1 ) );
+			g_iSortColumn = max( 0, min( pListView->iSubItem, (int)SE_ARRAYSIZE( g_ColumnInfos ) - 1 ) );
 			ResortItems();
 		}
 	}

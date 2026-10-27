@@ -748,7 +748,7 @@ void CBaseGameStats_Driver::LevelInitPreEntity()
 			if ( crcInput[0] && crcInput[1] )
 			{
 				CRC32_t crc = CRC32_ProcessSingleBuffer( crcInput, sizeof( crcInput ) );
-				Q_snprintf( s_szPseudoUniqueID, ARRAYSIZE( s_szPseudoUniqueID ), "H:%x", crc );
+				Q_snprintf( s_szPseudoUniqueID, SE_ARRAYSIZE( s_szPseudoUniqueID ), "H:%x", crc );
 			}
 		}
 	}

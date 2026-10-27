@@ -420,7 +420,7 @@ static void OnChangeTelemetryServer ( IConVar *var, const char *pOldValue, float
 {
 	const char *pServerAddress = (( ConVar* )var)->GetString();
 
-	Q_strncpy( g_Telemetry.ServerAddress, pServerAddress, ARRAYSIZE( g_Telemetry.ServerAddress ) );
+	Q_strncpy( g_Telemetry.ServerAddress, pServerAddress, SE_ARRAYSIZE( g_Telemetry.ServerAddress ) );
 	Msg( " TELEMETRY: Setting Telemetry server: '%s'\n", pServerAddress );
 }
 
@@ -2736,7 +2736,7 @@ static void _Host_RunFrame (float time)
 
 				// Track jitter (delta between ideal time and actual tick execution time)
 				host_jitterhistory[ host_jitterhistorypos ] = jitter;
-				host_jitterhistorypos = ( host_jitterhistorypos + 1 ) % ARRAYSIZE(host_jitterhistory);
+				host_jitterhistorypos = ( host_jitterhistorypos + 1 ) % SE_ARRAYSIZE(host_jitterhistory);
 
 				// Very slowly decay "ideal" towards current wall clock unless delta is large
 				if ( fabs( jitter ) > 1.0f )

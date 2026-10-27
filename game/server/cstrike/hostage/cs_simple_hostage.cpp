@@ -743,7 +743,7 @@ void CHostage::AvoidPhysicsProps( void )
 		return;
 
 	CBaseEntity *props[512];
-	int nEnts = GetPushawayEnts( this, props, ARRAYSIZE( props ), 0.0f, PARTITION_ENGINE_SOLID_EDICTS );
+	int nEnts = GetPushawayEnts( this, props, SE_ARRAYSIZE( props ), 0.0f, PARTITION_ENGINE_SOLID_EDICTS );
 
 	for ( int i=0; i < nEnts; i++ )
 	{

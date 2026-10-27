@@ -183,7 +183,7 @@ void CTFRobotDestruction_Robot::StaticPrecache()
 	PrecacheParticleSystem( DAMAGED_ROBOT_PARTICLE_EFFECT );
 	PrecacheScriptSound( ROBOT_DEATH_EXPLOSION );
 
-	for( int i=0; i < ARRAYSIZE( g_RobotData ); ++i )
+	for( int i=0; i < SE_ARRAYSIZE( g_RobotData ); ++i )
 	{
 		g_RobotData[i]->Precache();
 	}

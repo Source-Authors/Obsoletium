@@ -323,7 +323,7 @@ void CHudTournament::PreparePanel( void )
 			const char *szCountDown = m_bReadyStatusMode ? "Tournament_CountDownTime" : "Tournament_Countdown";
 			const char *szCountDownSec = m_bReadyStatusMode ? "Tournament_CountDownTime" : "Tournament_Countdown_Sec";
 
-			swprintf( wzVal, ARRAYSIZE( wzVal ), L"%d", nTime );
+			swprintf( wzVal, SE_ARRAYSIZE( wzVal ), L"%d", nTime );
 			wchar_t *pFormatString = g_pVGuiLocalize->Find( szCountDown );
 			if ( nTime == 1 )
 			{
@@ -433,7 +433,7 @@ void CHudTournament::PreparePanel( void )
 	m_bTeamReady[TF_TEAM_RED] = TFGameRules()->IsTeamReady( TF_TEAM_RED );
 
 	wchar_t szWindConditions[1024];
-	_snwprintf( szWindConditions, ARRAYSIZE( szWindConditions ), STRING_FMT, g_pVGuiLocalize->Find( "Tournament_WinConditions" ) );
+	_snwprintf( szWindConditions, SE_ARRAYSIZE( szWindConditions ), STRING_FMT, g_pVGuiLocalize->Find( "Tournament_WinConditions" ) );
 	
 	if ( mp_timelimit.GetInt() > 0 || mp_winlimit.GetInt() > 0 || mp_maxrounds.GetInt() )
 	{
@@ -441,7 +441,7 @@ void CHudTournament::PreparePanel( void )
 
 		if ( mp_timelimit.GetInt() > 0 )
 		{
-			_snwprintf( szWindConditions, ARRAYSIZE( szWindConditions ), STRING_FMT L"%d " STRING_FMT, szWindConditions, mp_timelimit.GetInt(), mp_timelimit.GetInt() == 1 ? g_pVGuiLocalize->Find( "Tournament_WinConditionsMinute" ) : g_pVGuiLocalize->Find( "Tournament_WinConditionsMinutes" ) );
+			_snwprintf( szWindConditions, SE_ARRAYSIZE( szWindConditions ), STRING_FMT L"%d " STRING_FMT, szWindConditions, mp_timelimit.GetInt(), mp_timelimit.GetInt() == 1 ? g_pVGuiLocalize->Find( "Tournament_WinConditionsMinute" ) : g_pVGuiLocalize->Find( "Tournament_WinConditionsMinutes" ) );
 			bPrev = true;
 		}
 
@@ -450,13 +450,13 @@ void CHudTournament::PreparePanel( void )
 			if ( bPrev )
 			{
 #ifdef WIN32
-				_snwprintf( szWindConditions, ARRAYSIZE( szWindConditions ), L"%s, ", szWindConditions );
+				_snwprintf( szWindConditions, SE_ARRAYSIZE( szWindConditions ), L"%s, ", szWindConditions );
 #else
-				_snwprintf( szWindConditions, ARRAYSIZE( szWindConditions ), L"%S, ", szWindConditions );
+				_snwprintf( szWindConditions, SE_ARRAYSIZE( szWindConditions ), L"%S, ", szWindConditions );
 #endif
 			}
 
-			_snwprintf( szWindConditions, ARRAYSIZE( szWindConditions ), STRING_FMT L"%d " STRING_FMT, szWindConditions, mp_winlimit.GetInt(), mp_winlimit.GetInt() == 1 ? g_pVGuiLocalize->Find( "Tournament_WinConditionsWin" ) : g_pVGuiLocalize->Find( "Tournament_WinConditionsWins" ) );
+			_snwprintf( szWindConditions, SE_ARRAYSIZE( szWindConditions ), STRING_FMT L"%d " STRING_FMT, szWindConditions, mp_winlimit.GetInt(), mp_winlimit.GetInt() == 1 ? g_pVGuiLocalize->Find( "Tournament_WinConditionsWin" ) : g_pVGuiLocalize->Find( "Tournament_WinConditionsWins" ) );
 			bPrev = true;
 		}
 
@@ -464,15 +464,15 @@ void CHudTournament::PreparePanel( void )
 		{
 			if ( bPrev )
 			{
-				_snwprintf( szWindConditions, ARRAYSIZE( szWindConditions ), STRING_FMT L", ", szWindConditions );
+				_snwprintf( szWindConditions, SE_ARRAYSIZE( szWindConditions ), STRING_FMT L", ", szWindConditions );
 			}
 
-			_snwprintf( szWindConditions, ARRAYSIZE( szWindConditions ), STRING_FMT L"%d " STRING_FMT, szWindConditions, mp_maxrounds.GetInt(), mp_maxrounds.GetInt() == 1 ? g_pVGuiLocalize->Find( "Tournament_WinConditionsRound" ) : g_pVGuiLocalize->Find( "Tournament_WinConditionsRounds" ) );
+			_snwprintf( szWindConditions, SE_ARRAYSIZE( szWindConditions ), STRING_FMT L"%d " STRING_FMT, szWindConditions, mp_maxrounds.GetInt(), mp_maxrounds.GetInt() == 1 ? g_pVGuiLocalize->Find( "Tournament_WinConditionsRound" ) : g_pVGuiLocalize->Find( "Tournament_WinConditionsRounds" ) );
 		}
 	}
 	else
 	{
-		_snwprintf( szWindConditions, ARRAYSIZE( szWindConditions ), STRING_FMT STRING_FMT, szWindConditions, g_pVGuiLocalize->Find( "Tournament_WinConditionsNone" ) );
+		_snwprintf( szWindConditions, SE_ARRAYSIZE( szWindConditions ), STRING_FMT STRING_FMT, szWindConditions, g_pVGuiLocalize->Find( "Tournament_WinConditionsNone" ) );
 	}
 
 	SetDialogVariable( "winconditions", szWindConditions );
@@ -1461,7 +1461,7 @@ void CHudStopWatch::OnTick( void )
 			wchar_t wzScoreVal[128];
 			static wchar_t wzScore[128];
 			wchar_t *pszPoints = NULL;
-			_snwprintf( wzScoreVal, ARRAYSIZE( wzScoreVal ), L"%i", iPoints );
+			_snwprintf( wzScoreVal, SE_ARRAYSIZE( wzScoreVal ), L"%i", iPoints );
 
 			if ( 1 == iPoints ) 
 			{
@@ -1518,7 +1518,7 @@ void CHudStopWatch::OnTick( void )
 			int iPoints = (pDefender->Get_Score() - pAttacker->Get_Score()) + 1;
 			wchar_t wzVal[16];
 
-			swprintf( wzVal, ARRAYSIZE( wzVal ), L"%x", iPoints );
+			swprintf( wzVal, SE_ARRAYSIZE( wzVal ), L"%x", iPoints );
 			
 			if ( pPlayer->GetTeam() == pAttacker )
 			{

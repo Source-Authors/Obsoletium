@@ -146,7 +146,7 @@ void SendDBInfo(const CDBInfo *pInfo, unsigned long jobPrimaryID) {
   const void *pChunks[] = {cPacketInfo, pInfo, &jobPrimaryID};
   intp chunkLengths[] = {2, sizeof(CDBInfo), sizeof(jobPrimaryID)};
 
-  VMPI_SendChunks(pChunks, chunkLengths, ARRAYSIZE(pChunks), VMPI_PERSISTENT);
+  VMPI_SendChunks(pChunks, chunkLengths, SE_ARRAYSIZE(pChunks), VMPI_PERSISTENT);
 }
 
 void RecvDBInfo(CDBInfo *pInfo, unsigned long *pJobPrimaryID) {

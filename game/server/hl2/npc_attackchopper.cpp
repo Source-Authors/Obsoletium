@@ -2499,7 +2499,7 @@ bool CNPC_AttackHelicopter::IsValidZapTarget( CBaseEntity *pTarget )
 
 	Assert( pTarget );
 	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int count = pTarget->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+	int count = pTarget->VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 	for ( int i = 0; i < count; i++ )
 	{
 		int material = pList[i]->GetMaterialIndex();
@@ -4831,7 +4831,7 @@ void CNPC_AttackHelicopter::InitBoneFollowers( void )
 		return;
 
 	// Init our followers
-	m_BoneFollowerManager.InitBoneFollowers( this, ARRAYSIZE(pFollowerBoneNames), pFollowerBoneNames );
+	m_BoneFollowerManager.InitBoneFollowers( this, SE_ARRAYSIZE(pFollowerBoneNames), pFollowerBoneNames );
 }
 #endif // HL2_EPISODIC
 

@@ -378,7 +378,7 @@ BOOL CJobSearchDlg::OnInitDialog()
 		{ "Running Time", 100 },
 		{ "Job ID", 100 }
 	};
-	for ( int i = 0; i < ARRAYSIZE( titles ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( titles ); i++ )
 	{
 		m_JobsList.InsertColumn( i, titles[i].pText, LVCFMT_LEFT, titles[i].width, i );
 	}

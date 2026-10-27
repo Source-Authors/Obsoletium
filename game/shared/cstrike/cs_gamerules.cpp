@@ -671,7 +671,7 @@ ConVar cl_autohelp(
 		m_bDontUploadStats = false;
 
 		// Create the team managers
-		for ( int i = 0; i < ARRAYSIZE( sTeamNames ); i++ )
+		for ( int i = 0; i < SE_ARRAYSIZE( sTeamNames ); i++ )
 		{
 			CTeam *pTeam = static_cast<CTeam*>(CreateEntityByName( "cs_team_manager" ));
 			pTeam->Init( sTeamNames[i], i );
@@ -5537,7 +5537,7 @@ void CCSGameRules::GetTaggedConVarList( KeyValues *pCvarTagList )
 {
 	BaseClass::GetTaggedConVarList( pCvarTagList );
 
-	for ( int i = 0; i < ARRAYSIZE(convars_to_check_for_tags); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE(convars_to_check_for_tags); i++ )
 	{
 		KeyValues *pKV = new KeyValues( "tag" );
 		pKV->SetString( "convar", convars_to_check_for_tags[i].pszConVar );

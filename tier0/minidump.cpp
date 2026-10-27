@@ -630,7 +630,7 @@ void MinidumpUserStreamInfoAppend( PRINTF_FORMAT_STRING const char *pFormat, ...
 {
 	va_list marker;
 	char *pData = g_UserStreamInfo[ g_UserStreamInfoIndex ];
-	constexpr int DataSize = ARRAYSIZE( g_UserStreamInfo[ g_UserStreamInfoIndex ] );
+	constexpr int DataSize = SE_ARRAYSIZE( g_UserStreamInfo[ g_UserStreamInfoIndex ] );
 
 	// Add tick count just so we have a general idea of when this event happened.
 	// dimhotepus: Use float seconds as uint ms overflows.

@@ -165,7 +165,7 @@ void CItemAdPanel::OnTick()
 			item_price_t unPrice = pEntry->GetCurrentPrice( eCurrency );
 			// Set that price into the button
 			wchar_t wzLocalizedPrice[ kLocalizedPriceSizeInChararacters ];
-			MakeMoneyString( wzLocalizedPrice, ARRAYSIZE( wzLocalizedPrice ), unPrice, eCurrency );
+			MakeMoneyString( wzLocalizedPrice, SE_ARRAYSIZE( wzLocalizedPrice ), unPrice, eCurrency );
 			SetDialogVariable( "price", wzLocalizedPrice );
 
 			// Don't need to tick anymore

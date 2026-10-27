@@ -1416,7 +1416,7 @@ void ConvertModelToPhysCollide( CUtlVector<CPhysCollisionEntry *> &collisionList
 			}
 		}
 
-		if ( (!numprops || j >= numprops) && numprops < ARRAYSIZE(proplist) )
+		if ( (!numprops || j >= numprops) && numprops < SE_ARRAYSIZE(proplist) )
 		{
 			proplist[numprops].prop = prop;
 			proplist[numprops].area = face->area;

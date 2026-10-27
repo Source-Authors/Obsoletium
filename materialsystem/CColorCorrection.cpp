@@ -828,7 +828,7 @@ void CColorCorrectionSystem::SetResetable( ColorCorrectionHandle_t handle, bool 
 //-----------------------------------------------------------------------------
 void CColorCorrectionSystem::GetCurrentColorCorrection( ShaderColorCorrectionInfo_t* pInfo )
 {
-	COMPILE_TIME_ASSERT( COLOR_CORRECTION_MAX_TEXTURES == ARRAYSIZE( pInfo->m_pLookupWeights ) );
+	COMPILE_TIME_ASSERT( COLOR_CORRECTION_MAX_TEXTURES == SE_ARRAYSIZE( pInfo->m_pLookupWeights ) );
 	pInfo->m_bIsEnabled = m_bEnabled && ( GetNumLookups() > 0 || m_DefaultColorCorrectionWeight != 0.0f );
 	pInfo->m_nLookupCount = GetNumLookups();
 	GetNormalizedWeights( &pInfo->m_flDefaultWeight, pInfo->m_pLookupWeights );

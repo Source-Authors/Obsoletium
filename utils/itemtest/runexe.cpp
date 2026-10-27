@@ -46,7 +46,7 @@ void RunExe()
 
 	// Invoked with no command-line args: run in GUI mode.
 	char szExeName[ MAX_PATH ];
-	GetModuleFileName( NULL, szExeName, ARRAYSIZE( szExeName ) );
-	V_SetExtension( szExeName, ".exe", ARRAYSIZE( szExeName ) );
+	GetModuleFileName( NULL, szExeName, SE_ARRAYSIZE( szExeName ) );
+	V_SetExtension( szExeName, ".exe", SE_ARRAYSIZE( szExeName ) );
 	ShellExecute( NULL, _T( "open" ), szExeName, sParameters.String(), NULL, SW_SHOWNORMAL );
 }

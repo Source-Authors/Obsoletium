@@ -37,7 +37,7 @@ void CHudBaseTimer::PaintTime(HFont font, int xpos, int ypos, int mins, int secs
 {
 	surface()->DrawSetTextFont(font);
 	wchar_t unicode[6];
-	V_snwprintf(unicode, ARRAYSIZE(unicode), L"%d:%.2d", mins, secs);
+	V_snwprintf(unicode, SE_ARRAYSIZE(unicode), L"%d:%.2d", mins, secs);
 	
 	surface()->DrawSetTextPos(xpos, ypos);
 	surface()->DrawUnicodeString( unicode );

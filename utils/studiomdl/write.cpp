@@ -4000,7 +4000,7 @@ bool FixupToSortedLODVertexes(studiohdr_t *pStudioHdr)
 		return false;
 	}
 
-	for (i=0; i<ARRAYSIZE(vtxPrefixes); i++)
+	for (i=0; i<SE_ARRAYSIZE(vtxPrefixes); i++)
 	{
 		// fixup ???.vtx
 		V_strcpy_safe( tmpFileName, filename );
@@ -4428,7 +4428,7 @@ bool Clamp_RootLOD( studiohdr_t *phdr )
 	V_strcat_safe( tmpFileName, ".vvd" );
 	Clamp_VVD_LODS( tmpFileName, rootLOD );
 
-	for (intp i=0; i<ARRAYSIZE(vtxPrefixes); i++)
+	for (intp i=0; i<SE_ARRAYSIZE(vtxPrefixes); i++)
 	{
 		// fixup ???.vtx
 		V_strcpy_safe( tmpFileName, filename );

@@ -87,7 +87,7 @@ const char *CExtraMapEntity::ValidateKeyName( const char *pszKey )
 {
 	if ( pszKey && pszKey[0] )
 	{
-		for ( int i = 0; i < ARRAYSIZE( g_szEntityWhiteList ); i++ )
+		for ( int i = 0; i < SE_ARRAYSIZE( g_szEntityWhiteList ); i++ )
 		{
 			if ( FStrEq( pszKey, g_szEntityWhiteList[i].pszKeyName ) )
 			{

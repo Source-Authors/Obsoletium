@@ -230,7 +230,7 @@ bool CItemUpload::GetCurrentExecutableFileName( CUtlString &sCurrentExecutableFi
 	char szModuleFileName[MAX_PATH];
 	szModuleFileName[0] = '\0';
 
-	if ( !::GetModuleFileName( (HMODULE)NULL, szModuleFileName, ARRAYSIZE( szModuleFileName ) ) )
+	if ( !::GetModuleFileName( (HMODULE)NULL, szModuleFileName, SE_ARRAYSIZE( szModuleFileName ) ) )
 		return false;
 
 	sCurrentExecutableFileName = szModuleFileName;

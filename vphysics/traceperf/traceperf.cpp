@@ -359,15 +359,15 @@ int CBenchmarkApp::Main()
 		"models\\props_c17\\gravestone003a.phy",
 		"models\\props_combine\\combineinnerwall001a.phy",
 	};
-	vcollide_t testModels[ARRAYSIZE(pFileNames)];
-	for ( int i = 0; i < ARRAYSIZE(pFileNames); i++ )
+	vcollide_t testModels[SE_ARRAYSIZE(pFileNames)];
+	for ( int i = 0; i < SE_ARRAYSIZE(pFileNames); i++ )
 	{
 		ReadPHYFile( pFileNames[i], testModels[i] );
 	}
 	SetPriorityClass( GetCurrentProcess(), REALTIME_PRIORITY_CLASS );
 	SetThreadPriority( GetCurrentThread(), THREAD_PRIORITY_HIGHEST );
 	float totalTime = 0.0f;
-	int loopCount = ARRAYSIZE(pFileNames);
+	int loopCount = SE_ARRAYSIZE(pFileNames);
 #if VPROF_LEVEL > 0
 //	loopCount = 3;
 #endif

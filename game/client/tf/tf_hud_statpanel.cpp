@@ -179,8 +179,8 @@ CTFStatPanel::CTFStatPanel( const char *pElementName )
 : EditablePanel( NULL, "StatPanel" ), CHudElement( pElementName )
 {
 	// Assert that all defined stats are in our prioritized list or explicitly unused
-	Assert( ARRAYSIZE( g_statPriority ) + ARRAYSIZE( g_statUnused ) == TFSTAT_TOTAL );
-	Assert( ARRAYSIZE( g_mapStatPriority ) + ARRAYSIZE( g_mapStatUnused ) == TFMAPSTAT_TOTAL );
+	Assert( SE_ARRAYSIZE( g_statPriority ) + SE_ARRAYSIZE( g_statUnused ) == TFSTAT_TOTAL );
+	Assert( SE_ARRAYSIZE( g_mapStatPriority ) + SE_ARRAYSIZE( g_mapStatUnused ) == TFMAPSTAT_TOTAL );
 
 	ResetDisplayedStat();
 	m_bStatsChanged = false;
@@ -302,7 +302,7 @@ void CTFStatPanel::UpdateStats( int iClass, const RoundStats_t &stats, bool bAli
 
 	// run through all stats we keep records for, update the max value, and if a record is set,
 	// remember the highest priority record
-	for ( int i= ARRAYSIZE( g_statPriority )-1; i >= 0; i-- )
+	for ( int i= SE_ARRAYSIZE( g_statPriority )-1; i >= 0; i-- )
 	{
 		TFStatType_t statType = g_statPriority[i];
 		if ( statType == TFSTAT_BONUS_POINTS )
@@ -728,8 +728,8 @@ void CTFStatPanel::ShowStatPanel( int iClass, int iTeam, int iCurStatValue, TFSt
 		// if we are displaying that the player got close to a record, show current & best values
 		char szCur[32],szBest[32];
 		wchar_t wzCur[32],wzBest[32];
-		GetStatValueAsString( iCurStatValue, statType, szCur, ARRAYSIZE( szCur ) );
-		GetStatValueAsString( bMVM ? classStats.maxMVM.m_iStat[statType] : classStats.max.m_iStat[statType], statType, szBest, ARRAYSIZE( szBest ) );
+		GetStatValueAsString( iCurStatValue, statType, szCur, SE_ARRAYSIZE( szCur ) );
+		GetStatValueAsString( bMVM ? classStats.maxMVM.m_iStat[statType] : classStats.max.m_iStat[statType], statType, szBest, SE_ARRAYSIZE( szBest ) );
 		g_pVGuiLocalize->ConvertANSIToUnicode( szCur, wzCur, sizeof( wzCur ) );
 		g_pVGuiLocalize->ConvertANSIToUnicode( szBest, wzBest, sizeof( wzBest ) );
 		wchar_t *wzFormat = g_pVGuiLocalize->Find( "#StatPanel_Format_Close" );
@@ -741,7 +741,7 @@ void CTFStatPanel::ShowStatPanel( int iClass, int iTeam, int iCurStatValue, TFSt
 	{
 		// player broke or tied a record, just show current value
 		char szValue[32];
-		GetStatValueAsString( iCurStatValue, statType, szValue, ARRAYSIZE( szValue ) );
+		GetStatValueAsString( iCurStatValue, statType, szValue, SE_ARRAYSIZE( szValue ) );
 		SetDialogVariable( "stattextlarge", szValue );
 	}
 

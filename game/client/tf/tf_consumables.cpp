@@ -399,10 +399,10 @@ void CEconTool_BackpackExpander::OnClientUseConsumable( CEconItemView *pItem, vg
 														  &UseItemConfirm );
 	pDialog->AddStringToken( "item_name", pItem->GetItemName() );
 	wchar_t wszUsesLeft[32];
-	_snwprintf( wszUsesLeft, ARRAYSIZE(wszUsesLeft), L"%d", pItem->GetItemQuantity() );
+	_snwprintf( wszUsesLeft, SE_ARRAYSIZE(wszUsesLeft), L"%d", pItem->GetItemQuantity() );
 	pDialog->AddStringToken( "uses_left", wszUsesLeft );
 	wchar_t wszNewSize[32];
-	_snwprintf( wszNewSize, ARRAYSIZE(wszNewSize), L"%d", unNewNumSlots );
+	_snwprintf( wszNewSize, SE_ARRAYSIZE(wszNewSize), L"%d", unNewNumSlots );
 	pDialog->AddStringToken( "new_size", wszNewSize );
 	pDialog->SetContext( new CUseItemConfirmContext( pItem, kServerPlayers_DontSend ) );
 }
@@ -427,7 +427,7 @@ void CEconTool_AccountUpgradeToPremium::OnClientUseConsumable( CEconItemView *pI
 														  &UseItemConfirm );
 	pDialog->AddStringToken( "item_name", pItem->GetItemName() );
 	wchar_t wszUsesLeft[32];
-	_snwprintf( wszUsesLeft, ARRAYSIZE(wszUsesLeft), L"%d", pItem->GetItemQuantity() );
+	_snwprintf( wszUsesLeft, SE_ARRAYSIZE(wszUsesLeft), L"%d", pItem->GetItemQuantity() );
 	pDialog->AddStringToken( "uses_left", wszUsesLeft );
 	pDialog->SetContext( new CUseItemConfirmContext( pItem, kServerPlayers_DontSend ) );
 }
@@ -471,7 +471,7 @@ static void ClientConsumableTool_Generic( CEconItemView *pItem, vgui::Panel *pPa
 														  &UseItemConfirm );
 	pDialog->AddStringToken( "item_name", pItem->GetItemName() );
 	wchar_t wszUsesLeft[32];
-	_snwprintf( wszUsesLeft, ARRAYSIZE(wszUsesLeft), L"%d", pItem->GetItemQuantity() );
+	_snwprintf( wszUsesLeft, SE_ARRAYSIZE(wszUsesLeft), L"%d", pItem->GetItemQuantity() );
 	pDialog->AddStringToken( "uses_left", wszUsesLeft );
 	pDialog->SetContext(
 		new CUseItemConfirmContext( pItem,
@@ -596,7 +596,7 @@ void CEconTool_GrantOperationPass::OnClientUseConsumable( CEconItemView *pItem, 
 		&OpenPass );
 	pDialog->AddStringToken( "item_name", pItem->GetItemName() );
 	wchar_t wszUsesLeft[32];
-	_snwprintf( wszUsesLeft, ARRAYSIZE( wszUsesLeft ), L"%d", pItem->GetItemQuantity() );
+	_snwprintf( wszUsesLeft, SE_ARRAYSIZE( wszUsesLeft ), L"%d", pItem->GetItemQuantity() );
 	pDialog->AddStringToken( "uses_left", wszUsesLeft );
 	pDialog->SetContext( new CUseItemConfirmContext( pItem, kServerPlayers_DontSend, "ui/quest_operation_pass_use.wav" ) );
 }
@@ -1440,9 +1440,9 @@ public:
 			g_pVGuiLocalize->ConvertANSIToUnicode( pTargetName, wszTargetName, sizeof(wszTargetName) );
 
 			wchar_t wszInitiatorScore[16];
-			_snwprintf( wszInitiatorScore, ARRAYSIZE( wszInitiatorScore ), L"%i", event->GetInt( "initiator_score", 0 ) );
+			_snwprintf( wszInitiatorScore, SE_ARRAYSIZE( wszInitiatorScore ), L"%i", event->GetInt( "initiator_score", 0 ) );
 			wchar_t wszTargetScore[16];
-			_snwprintf( wszTargetScore, ARRAYSIZE( wszTargetScore ), L"%i", event->GetInt( "target_score", 0 ) );
+			_snwprintf( wszTargetScore, SE_ARRAYSIZE( wszTargetScore ), L"%i", event->GetInt( "target_score", 0 ) );
 
 			enum
 			{
@@ -1629,7 +1629,7 @@ public:
 				"TF_Duel_Decline2",
 				"TF_Duel_Decline3"
 			};
-			pText = kDeclineStrings[ RandomInt( 0, ARRAYSIZE( kDeclineStrings ) - 1 ) ];
+			pText = kDeclineStrings[ RandomInt( 0, SE_ARRAYSIZE( kDeclineStrings ) - 1 ) ];
 			pSoundFilename = bIsClassDuel ? "ui/duel_challenge_rejected_with_restriction.wav" : "ui/duel_challenge_rejected.wav";
 		}
 
@@ -1824,15 +1824,15 @@ public:
 			pKeyValues->SetWString( "loser", steamIDWinner == steamIDInitiator ? wszPlayerName_Target : wszPlayerName_Initiator );
 			wchar_t wszScoreInitiator[16];
 			wchar_t wszScoreTarget[16];
-			_snwprintf( wszScoreInitiator, ARRAYSIZE( wszScoreInitiator ), L"%u", (uint32)msg.Body().m_usScoreInitiator );
-			_snwprintf( wszScoreTarget, ARRAYSIZE( wszScoreTarget ), L"%u", (uint32)msg.Body().m_usScoreTarget );
+			_snwprintf( wszScoreInitiator, SE_ARRAYSIZE( wszScoreInitiator ), L"%u", (uint32)msg.Body().m_usScoreInitiator );
+			_snwprintf( wszScoreTarget, SE_ARRAYSIZE( wszScoreTarget ), L"%u", (uint32)msg.Body().m_usScoreTarget );
 			pKeyValues->SetWString( "winner_score", steamIDWinner == steamIDInitiator ? wszScoreInitiator : wszScoreTarget );
 			pKeyValues->SetWString( "loser_score", steamIDWinner == steamIDInitiator ? wszScoreTarget : wszScoreInitiator );
 		}
 		else
 		{
 			wchar_t wszScoreInitiator[16];
-			_snwprintf( wszScoreInitiator, ARRAYSIZE( wszScoreInitiator ), L"%u", (uint32)msg.Body().m_usScoreInitiator );
+			_snwprintf( wszScoreInitiator, SE_ARRAYSIZE( wszScoreInitiator ), L"%u", (uint32)msg.Body().m_usScoreInitiator );
 			pKeyValues->SetWString( "score", wszScoreInitiator );
 			pKeyValues->SetWString( "initiator", wszPlayerName_Initiator );
 			pKeyValues->SetWString( "target", wszPlayerName_Target );
@@ -2152,7 +2152,7 @@ public:
 			g_pVGuiLocalize->ConvertANSIToUnicode( msg.Body().item_name_custom().c_str(), wszCustomName, sizeof( wszCustomName ) );
 
 			wchar_t wszItemRenamed[256];
-			_snwprintf( wszItemRenamed, ARRAYSIZE( wszItemRenamed ), L"%ls", g_pVGuiLocalize->Find( "#Item_Named" ) );
+			_snwprintf( wszItemRenamed, SE_ARRAYSIZE( wszItemRenamed ), L"%ls", g_pVGuiLocalize->Find( "#Item_Named" ) );
 
 			const char *pszQualityColorString = EconQuality_GetColorString( (EEconItemQuality)iItemQuality );
 			if ( pszQualityColorString )

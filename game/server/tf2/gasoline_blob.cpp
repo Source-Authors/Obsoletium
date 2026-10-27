@@ -210,7 +210,7 @@ void CGasolineBlob::Think()
 		// Look for nearby entities to burn.
 		CBaseEntity *ents[512];
 		float dists[512];
-		int nEnts = FindBurnableEntsInSphere( ents, dists, ARRAYSIZE( ents ), GetAbsOrigin(), FIRE_DAMAGE_SEARCH_DISTANCE, m_hOwner );
+		int nEnts = FindBurnableEntsInSphere( ents, dists, SE_ARRAYSIZE( ents ), GetAbsOrigin(), FIRE_DAMAGE_SEARCH_DISTANCE, m_hOwner );
 		
 		for ( int i=0; i < nEnts; i++ )
 		{

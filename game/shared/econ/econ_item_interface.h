@@ -509,7 +509,7 @@ public:
 	virtual IMaterial* GetMaterialOverride( int iTeam ) OVERRIDE
 	{
 		#ifdef CLIENT_DLL
-			Assert( iTeam >= 0 && iTeam < ARRAYSIZE( m_materialOverrides ) );
+			Assert( iTeam >= 0 && iTeam < SE_ARRAYSIZE( m_materialOverrides ) );
 
 			if ( m_materialOverrides[ iTeam ].IsValid() )
 				return m_materialOverrides[ iTeam ];

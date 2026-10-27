@@ -38,7 +38,7 @@ static FFEffectInfo_t g_EffectTypes[] =
 //-----------------------------------------------------------------------------
 char const *NameForForceFeedbackEffect( FORCEFEEDBACK_t effect )
 {
-	int c = ARRAYSIZE( g_EffectTypes );
+	int c = SE_ARRAYSIZE( g_EffectTypes );
 	if ( (int)effect < 0 || (int)effect >= c )
 		return "???";
 
@@ -54,7 +54,7 @@ char const *NameForForceFeedbackEffect( FORCEFEEDBACK_t effect )
 //-----------------------------------------------------------------------------
 FORCEFEEDBACK_t ForceFeedbackEffectForName( const char *name )
 {
-	int c = ARRAYSIZE( g_EffectTypes );
+	int c = SE_ARRAYSIZE( g_EffectTypes );
 	for ( int i = 0 ; i < c; ++i )
 	{
 		const FFEffectInfo_t& info = g_EffectTypes[ i ];

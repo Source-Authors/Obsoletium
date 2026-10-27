@@ -411,7 +411,7 @@ void CQuestItemPanel::LoadResFileForCurrentItem()
 		{
 			m_pRequestLoanerItemsButton = m_pLoanerContainerPanel->FindControl< CExButton >( "RequestLoanerItemsButton", true );
 			m_pEquipLoanerItemsButton = m_pLoanerContainerPanel->FindControl< CExButton >( "EquipLoanerItemsButton", true );
-			for ( int i = 0; i < ARRAYSIZE( m_pLoanerItemModelPanel ); ++i )
+			for ( int i = 0; i < SE_ARRAYSIZE( m_pLoanerItemModelPanel ); ++i )
 			{
 				m_pLoanerItemModelPanel[i] = m_pLoanerContainerPanel->FindControl< CItemModelPanel >( CFmtStr( "Loaner%dItemModelPanel", i + 1 ), true );
 			}
@@ -644,7 +644,7 @@ void CQuestItemPanel::PerformLayout( void )
 			m_pRequestLoanerItemsButton->SetVisible( !bAllGranted );
 			m_pEquipLoanerItemsButton->SetVisible( bAllGranted );
 
-			for ( int i = 0; i < ARRAYSIZE( m_pLoanerItemModelPanel ); ++i )
+			for ( int i = 0; i < SE_ARRAYSIZE( m_pLoanerItemModelPanel ); ++i )
 			{
 				// try to use the granted items first
 				if ( i < vecGrantedLoaners.Count() )
@@ -907,7 +907,7 @@ void CQuestItemPanel::CaptureAndEncodeStrings()
 	if ( m_pObjectiveExplanationLabel )
 	{
 		wchar_t wszBuff[512];	
-		m_pObjectiveExplanationLabel->GetText( wszBuff, ARRAYSIZE( wszBuff ) );
+		m_pObjectiveExplanationLabel->GetText( wszBuff, SE_ARRAYSIZE( wszBuff ) );
 		pKVDecoded->SetWString( "explanation", wszBuff );
 	}
 
@@ -939,7 +939,7 @@ void CQuestItemPanel::CaptureAndEncodeStrings()
 		// Go through the entire string and swap each character
 		// with another random character in the string
 		int i=0;
-		while( wszBuff[i] != 0 && i < ARRAYSIZE( wszBuff ) )
+		while( wszBuff[i] != 0 && i < SE_ARRAYSIZE( wszBuff ) )
 		{
 			// Dont scramble spaces to maintain line breaks
 			if ( !IsNonEncodeCharacter( wszBuff[i] )  )
@@ -1032,7 +1032,7 @@ void CQuestItemPanel::OnCommand( const char *command )
 
 				if ( m_strMatchmakingGroupName != 0 )
 				{
-					int iGroupType = StringFieldToInt( m_strMatchmakingGroupName.Get(), s_pszMMTypes, ARRAYSIZE( s_pszMMTypes ) );
+					int iGroupType = StringFieldToInt( m_strMatchmakingGroupName.Get(), s_pszMMTypes, SE_ARRAYSIZE( s_pszMMTypes ) );
 					if ( iGroupType > -1 )
 					{
 						SelectGroup( (EMatchmakingGroupType)iGroupType, true );
@@ -1041,7 +1041,7 @@ void CQuestItemPanel::OnCommand( const char *command )
 
 				if ( m_strMatchmakingCategoryName != 0 )
 				{
-					int iCategoryType = StringFieldToInt( m_strMatchmakingCategoryName.Get(), s_pszGameModes, ARRAYSIZE( s_pszGameModes ) );
+					int iCategoryType = StringFieldToInt( m_strMatchmakingCategoryName.Get(), s_pszGameModes, SE_ARRAYSIZE( s_pszGameModes ) );
 					if ( iCategoryType > -1 )
 					{
 						SelectCategory( (EGameCategory)iCategoryType, true );
@@ -1203,12 +1203,12 @@ void CQuestItemPanel::OnThink()
 
 			wchar_t wszTurningInText[64];
 			char szTurningInLocToken[128];
-			m_pTurningInLabel->GetTextImage()->GetUnlocalizedText( szTurningInLocToken, ARRAYSIZE( szTurningInLocToken ) );
-			V_snwprintf( wszTurningInText, ARRAYSIZE( wszTurningInText ), L"%ls", g_pVGuiLocalize->Find( szTurningInLocToken ) );
+			m_pTurningInLabel->GetTextImage()->GetUnlocalizedText( szTurningInLocToken, SE_ARRAYSIZE( szTurningInLocToken ) );
+			V_snwprintf( wszTurningInText, SE_ARRAYSIZE( wszTurningInText ), L"%ls", g_pVGuiLocalize->Find( szTurningInLocToken ) );
 
 			while ( nPeriods > 0 )
 			{
-				V_wcsncat( wszTurningInText, L".", ARRAYSIZE( wszTurningInText ) );
+				V_wcsncat( wszTurningInText, L".", SE_ARRAYSIZE( wszTurningInText ) );
 				--nPeriods;
 			}
 

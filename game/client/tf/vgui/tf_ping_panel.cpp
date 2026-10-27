@@ -89,7 +89,7 @@ void CTFPingPanel::ApplySchemeSettings( IScheme *pScheme )
 
 			CUniformRandomStream randomstream;
 			randomstream.SetSeed( tf_custom_ping_add_random_datacenters.GetInt() );
-			for( int i=0; i < ARRAYSIZE( pszDataCenterNames ); ++i )
+			for( int i=0; i < SE_ARRAYSIZE( pszDataCenterNames ); ++i )
 			{
 				auto pNewPingData = pingData.add_pingdata();
 				pNewPingData->set_name( pszDataCenterNames[ i ] );

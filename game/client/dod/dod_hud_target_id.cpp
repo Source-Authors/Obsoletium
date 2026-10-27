@@ -144,8 +144,8 @@ void CTargetID::Paint()
 			// Construct the wide char name string
 			g_pVGuiLocalize->ConvertANSIToUnicode( pPlayer->GetPlayerName(),  wszPlayerName, sizeof(wszPlayerName) );
 			
-			_snwprintf( wszHealthText, ARRAYSIZE(wszHealthText) - 1, L"%.0f", (float)pPlayer->GetHealth() );
-			wszHealthText[ ARRAYSIZE(wszHealthText)-1 ] = '\0';
+			_snwprintf( wszHealthText, SE_ARRAYSIZE(wszHealthText) - 1, L"%.0f", (float)pPlayer->GetHealth() );
+			wszHealthText[ SE_ARRAYSIZE(wszHealthText)-1 ] = '\0';
 
 			// Construct the string to display
 			g_pVGuiLocalize->ConstructString( sIDString, sizeof(sIDString), L"%s1 (%s2)", 2, wszPlayerName, wszHealthText );

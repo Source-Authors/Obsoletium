@@ -53,7 +53,7 @@ const char* g_ItemModelPanelRenderTargetNames[] =
 	"_rt_ItemModelPanel1",
 	"_rt_ItemModelPanel2"
 };
-COMPILE_TIME_ASSERT( ITEM_MODEL_IMAGE_CACHE_SIZE == ARRAYSIZE( g_ItemModelPanelRenderTargetNames ) );
+COMPILE_TIME_ASSERT( ITEM_MODEL_IMAGE_CACHE_SIZE == SE_ARRAYSIZE( g_ItemModelPanelRenderTargetNames ) );
 
 CItemMaterialCustomizationIconPanel::CItemMaterialCustomizationIconPanel( vgui::Panel *pParent, const char *pName ) 
 	: BaseClass( pParent, pName )
@@ -1152,7 +1152,7 @@ bool CEmbeddedItemModelPanel::UpdateParticle(
 	if ( !m_pItem->FindAttribute( pAttrDef_UseHead, &iUseHead ) || !iUseHead == 0 )
 	{
 		// not using head? try searching for attachment points
-		for ( int i=0; i<ARRAYSIZE( pParticleSystem->pszControlPoints ); ++i )
+		for ( int i=0; i<SE_ARRAYSIZE( pParticleSystem->pszControlPoints ); ++i )
 		{
 			const char *pszAttachmentName = pParticleSystem->pszControlPoints[i];
 			if ( pszAttachmentName && pszAttachmentName[0] )
@@ -2441,7 +2441,7 @@ bool CItemModelPanel::UpdateSeriesLabel()
 		if ( pAttrDef_CrateSeries && FindAttribute_UnsafeBitwiseCast<attrib_value_t>( &m_ItemData, pAttrDef_CrateSeries, &fCrateSeries ) && pAttrDef_HideSeries && !m_ItemData.FindAttribute( pAttrDef_HideSeries ) )
 		{
 			wchar_t wszSeries[16]=L"";
-			_snwprintf( wszSeries, ARRAYSIZE( wszSeries ), L"#%i", (int)fCrateSeries );
+			_snwprintf( wszSeries, SE_ARRAYSIZE( wszSeries ), L"#%i", (int)fCrateSeries );
 			m_pSeriesLabel->SetVisible( true );
 			m_pSeriesLabel->SetText( wszSeries );
 			
@@ -2557,7 +2557,7 @@ bool CItemModelPanel::CheckRecipeMatches()
 			}
 
 			// Fill out the actual number of matches
-			_snwprintf( wszMatches, ARRAYSIZE( wszMatches ), L"%i/%i", nMatchingAttribs, nTotalAttribs );
+			_snwprintf( wszMatches, SE_ARRAYSIZE( wszMatches ), L"%i/%i", nMatchingAttribs, nTotalAttribs );
 		}
 	
 		m_pMatchesLabel->SetVisible( true );
@@ -2832,7 +2832,7 @@ bool CItemModelPanel::UpdateQuantityLabel()
 			if ( pEconTool && pEconTool->ShouldDisplayQuantity( &m_ItemData ) )
 			{
 				wchar_t wszQuantity[16]=L"";
-				_snwprintf( wszQuantity, ARRAYSIZE( wszQuantity ), L"%i", m_ItemData.GetQuantity() );
+				_snwprintf( wszQuantity, SE_ARRAYSIZE( wszQuantity ), L"%i", m_ItemData.GetQuantity() );
 				m_pItemQuantityLabel->SetVisible( true );
 				m_pItemQuantityLabel->SetText( wszQuantity );
 			}

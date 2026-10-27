@@ -200,7 +200,7 @@ void CTFStorePage2::ApplySchemeSettings( IScheme *pScheme )
 		vgui::HFont hFont = pScheme->GetFont( "HudFontSmallestBold", true );
 		m_pSortByCombo->SetFont( hFont );
 		KeyValues *pKeyValues = new KeyValues( "data" );
-		for ( int i = 0; i < ARRAYSIZE(g_StoreSortTypes); i++ )
+		for ( int i = 0; i < SE_ARRAYSIZE(g_StoreSortTypes); i++ )
 		{
 			pKeyValues->SetInt( "sortby", i );
 			m_pSortByCombo->AddItem( g_StoreSortTypes[i].szSortDesc, pKeyValues );
@@ -274,7 +274,7 @@ void CTFStorePage2::ApplySchemeSettings( IScheme *pScheme )
 			AssertMsg( eCurrency >= k_ECurrencyUSD && eCurrency < k_ECurrencyMax, "Invalid currency!" );
 			int iPriceThreshold = pPromotion->m_rgusPriceThreshold[ eCurrency ];
 			wchar_t wszPriceThreshold[ kLocalizedPriceSizeInChararacters ];
-			MakeMoneyString( wszPriceThreshold, ARRAYSIZE( wszPriceThreshold ), iPriceThreshold, EconUI()->GetStorePanel()->GetCurrency() );
+			MakeMoneyString( wszPriceThreshold, SE_ARRAYSIZE( wszPriceThreshold ), iPriceThreshold, EconUI()->GetStorePanel()->GetCurrency() );
 		
 			static wchar_t wszText[512];
 			g_pVGuiLocalize->ConstructString_safe( wszText, pHomePageTitle, 2, pRedText, wszPriceThreshold );

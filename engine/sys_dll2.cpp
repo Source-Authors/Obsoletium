@@ -487,13 +487,13 @@ public:
 		#undef _XTAG
 		};
 
-		for ( size_t i = 0; i < ARRAYSIZE( s_ctl_names ); i++ )
+		for ( size_t i = 0; i < SE_ARRAYSIZE( s_ctl_names ); i++ )
 		{
 			uint64_t val = 0;
 			size_t len = sizeof( val );
 			int mib[] = { CTL_HW, s_ctl_names[ i ].ctl };
 
-			if ( sysctl( mib, ARRAYSIZE( mib ), &val, &len, NULL, 0 ) == 0 )
+			if ( sysctl( mib, SE_ARRAYSIZE( mib ), &val, &len, NULL, 0 ) == 0 )
 			{
 				CommentPrintf( " %s: %" PRIu64 "\n", s_ctl_names[ i ].name, val );
 			}

@@ -363,7 +363,7 @@ void CTFBotGenerator::SpawnBot( void )
 		{
 			for ( int i = 0; i < TF_TEAM_COUNT; ++i )
 			{
-				COMPILE_TIME_ASSERT( TF_TEAM_COUNT == ARRAYSIZE( g_aTeamNames ) );
+				COMPILE_TIME_ASSERT( TF_TEAM_COUNT == SE_ARRAYSIZE( g_aTeamNames ) );
 				if ( FStrEq( m_teamName.ToCStr(), g_aTeamNames[i] ) )
 				{
 					iTeam = i;

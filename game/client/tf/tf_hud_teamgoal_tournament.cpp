@@ -373,7 +373,7 @@ void CHudTeamGoalTournament::SetupStopWatchLabel( void )
 #endif
 	
 	wchar_t wszPoints[256];
-	_snwprintf( wszPoints, ARRAYSIZE( wszPoints ), INT_CHAR_FMT, iPoints, iPoints == 1 ? g_pVGuiLocalize->Find( "Tournament_StopWatch_Point" ) : g_pVGuiLocalize->Find( "Tournament_StopWatch_Points" ) );
+	_snwprintf( wszPoints, SE_ARRAYSIZE( wszPoints ), INT_CHAR_FMT, iPoints, iPoints == 1 ? g_pVGuiLocalize->Find( "Tournament_StopWatch_Point" ) : g_pVGuiLocalize->Find( "Tournament_StopWatch_Points" ) );
 
 	wchar_t wszTime[256];
 	wchar_t wszLabel[256];
@@ -384,14 +384,14 @@ void CHudTeamGoalTournament::SetupStopWatchLabel( void )
 	if ( iMinutes > 0 )
 	{
 #ifdef WIN32
-		_snwprintf( wszTime, ARRAYSIZE( wszTime ) , L"%d %s %d %s", iMinutes, iMinutes == 1 ? g_pVGuiLocalize->Find( "Tournament_WinConditionsMinute" ) : g_pVGuiLocalize->Find( "Tournament_WinConditionsMinutes" ), iSeconds, iSeconds == 1 ? g_pVGuiLocalize->Find( "Tournament_WinConditionsSecond" ) : g_pVGuiLocalize->Find( "Tournament_WinConditionsSeconds" ) );
+		_snwprintf( wszTime, SE_ARRAYSIZE( wszTime ) , L"%d %s %d %s", iMinutes, iMinutes == 1 ? g_pVGuiLocalize->Find( "Tournament_WinConditionsMinute" ) : g_pVGuiLocalize->Find( "Tournament_WinConditionsMinutes" ), iSeconds, iSeconds == 1 ? g_pVGuiLocalize->Find( "Tournament_WinConditionsSecond" ) : g_pVGuiLocalize->Find( "Tournament_WinConditionsSeconds" ) );
 #else
-		_snwprintf( wszTime, ARRAYSIZE( wszTime ) , L"%d %S %d %S", iMinutes, iMinutes == 1 ? g_pVGuiLocalize->Find( "Tournament_WinConditionsMinute" ) : g_pVGuiLocalize->Find( "Tournament_WinConditionsMinutes" ), iSeconds, iSeconds == 1 ? g_pVGuiLocalize->Find( "Tournament_WinConditionsSecond" ) : g_pVGuiLocalize->Find( "Tournament_WinConditionsSeconds" ) );
+		_snwprintf( wszTime, SE_ARRAYSIZE( wszTime ) , L"%d %S %d %S", iMinutes, iMinutes == 1 ? g_pVGuiLocalize->Find( "Tournament_WinConditionsMinute" ) : g_pVGuiLocalize->Find( "Tournament_WinConditionsMinutes" ), iSeconds, iSeconds == 1 ? g_pVGuiLocalize->Find( "Tournament_WinConditionsSecond" ) : g_pVGuiLocalize->Find( "Tournament_WinConditionsSeconds" ) );
 #endif
 	}
 	else
 	{
-		_snwprintf( wszTime, ARRAYSIZE( wszTime ), INT_CHAR_FMT, iSeconds, iSeconds == 1 ? g_pVGuiLocalize->Find( "Tournament_WinConditionsSecond" ) : g_pVGuiLocalize->Find( "Tournament_WinConditionsSeconds" ) );
+		_snwprintf( wszTime, SE_ARRAYSIZE( wszTime ), INT_CHAR_FMT, iSeconds, iSeconds == 1 ? g_pVGuiLocalize->Find( "Tournament_WinConditionsSecond" ) : g_pVGuiLocalize->Find( "Tournament_WinConditionsSeconds" ) );
 	}
 
 	if ( m_pStopWatchGoalText )
@@ -476,7 +476,7 @@ void CHudTeamGoalTournament::SetupStopWatchLabel( void )
 			}
 
 			iPoints += 1;
-			_snwprintf( wszPoints, ARRAYSIZE( wszPoints ), INT_CHAR_FMT, iPoints, iPoints == 1 ? g_pVGuiLocalize->Find( "Tournament_StopWatch_Point" ) : g_pVGuiLocalize->Find( "Tournament_StopWatch_Points" ) );
+			_snwprintf( wszPoints, SE_ARRAYSIZE( wszPoints ), INT_CHAR_FMT, iPoints, iPoints == 1 ? g_pVGuiLocalize->Find( "Tournament_StopWatch_Point" ) : g_pVGuiLocalize->Find( "Tournament_StopWatch_Points" ) );
 			g_pVGuiLocalize->ConstructString_safe( wzHelp, g_pVGuiLocalize->Find( "Tournament_StopWatch_GoalTextPointsAndTime2" ), 4, wszAttackersName, wszDefendersName, wszAttackersName, wszPoints );
 
 			if ( m_pStopWatchGoalText2 )

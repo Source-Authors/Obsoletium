@@ -161,7 +161,7 @@ private:
 		//
 		while ( 1 )
 		{
-			int ret = WaitForMultipleObjects( ARRAYSIZE( hEvents ), hEvents, false, INFINITE );
+			int ret = WaitForMultipleObjects( SE_ARRAYSIZE( hEvents ), hEvents, false, INFINITE );
 			if ( ret == WAIT_OBJECT_0 )
 				break;
 

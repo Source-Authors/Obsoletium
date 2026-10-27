@@ -246,7 +246,7 @@ void CTFProjectile_EnergyRing::ProjectileTouch( CBaseEntity *pOther )
 
 		CUtlVector<collidelist_t> collideList;
 		IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-		int physicsCount = pOther->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+		int physicsCount = pOther->VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 		vcollide_t *pVCollide = modelinfo->GetVCollide( pOther->GetModelIndex() );
 
 		if ( physicsCount )

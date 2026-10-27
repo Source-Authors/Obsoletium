@@ -171,7 +171,7 @@ struct ControllerDigitalActionState {
 	bool bAwaitingDebounce;
 };
 
-static ControllerDigitalActionState g_ControllerDigitalActionState[ARRAYSIZE(g_ControllerDigitalGameActions)];
+static ControllerDigitalActionState g_ControllerDigitalActionState[SE_ARRAYSIZE(g_ControllerDigitalGameActions)];
 
 static ControllerAnalogActionHandle_t g_ControllerMoveHandle;
 static ControllerAnalogActionHandle_t g_ControllerCameraHandle;

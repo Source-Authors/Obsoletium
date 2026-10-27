@@ -62,7 +62,7 @@ static CreateInterfaceFn s_pFactoryList[2];
 
 void *VGuiFactory( const char *pName, int *pReturnCode )
 {
-	for ( int i = 0; i < ARRAYSIZE( s_pFactoryList ); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE( s_pFactoryList ); ++i )
 	{
 		void *pInterface = s_pFactoryList[i]( pName, pReturnCode );
 		if ( pInterface )

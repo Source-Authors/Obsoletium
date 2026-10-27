@@ -58,11 +58,11 @@ static const char *g_aDemoEventNames[] =
 	"Bookmark",
 	"Killstreak",
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_aDemoEventNames ) == eDemoEvent_Last );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_aDemoEventNames ) == eDemoEvent_Last );
 
 const char *GetDemoEventName( EDemoEventType eEventType )
 {
-	if ( ( eEventType >= ARRAYSIZE( g_aDemoEventNames ) ) || ( eEventType < 0 ) )
+	if ( ( eEventType >= SE_ARRAYSIZE( g_aDemoEventNames ) ) || ( eEventType < 0 ) )
 		return NULL;
 
 	return g_aDemoEventNames[eEventType];

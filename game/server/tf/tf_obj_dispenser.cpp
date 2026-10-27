@@ -713,7 +713,7 @@ void CObjectDispenser::DispenseThink( void )
 		Vector vecOrigin = GetAbsOrigin() + Vector(0,0,32);
 
 		CBaseEntity *pListOfNearbyEntities[32];
-		int iNumberOfNearbyEntities = UTIL_EntitiesInSphere( pListOfNearbyEntities, ARRAYSIZE( pListOfNearbyEntities ), vecOrigin, flRadius, FL_CLIENT );
+		int iNumberOfNearbyEntities = UTIL_EntitiesInSphere( pListOfNearbyEntities, SE_ARRAYSIZE( pListOfNearbyEntities ), vecOrigin, flRadius, FL_CLIENT );
 		for ( int i=0;i<iNumberOfNearbyEntities;i++ )
 		{
 			CTFPlayer *pPlayer = ToTFPlayer( pListOfNearbyEntities[i] );

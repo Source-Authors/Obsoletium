@@ -304,7 +304,7 @@ void CItemPickupPanel::UpdateModelPanels( void )
 	int iFoundMethod = 0;
 	if ( m_bRandomizePickupMethods )
 	{
-		iFoundMethod = RandomInt( 0, ARRAYSIZE(g_pszItemPickupMethodStrings)-1 );
+		iFoundMethod = RandomInt( 0, SE_ARRAYSIZE(g_pszItemPickupMethodStrings)-1 );
 	}
 	else if ( m_iSelectedItem >= 0 && m_iSelectedItem < m_aItems.Count() )
 	{
@@ -312,7 +312,7 @@ void CItemPickupPanel::UpdateModelPanels( void )
 		bAllowDiscard = ( iFoundMethod <= UNACK_ITEM_DROPPED );
 		iFoundMethod--;
 
-		if ( iFoundMethod < 0 || iFoundMethod >= ARRAYSIZE(g_pszItemPickupMethodStrings) )
+		if ( iFoundMethod < 0 || iFoundMethod >= SE_ARRAYSIZE(g_pszItemPickupMethodStrings) )
 		{
 			iFoundMethod = 0;
 		}
@@ -358,14 +358,14 @@ void CItemPickupPanel::UpdateModelPanels( void )
 				}
 				wpszChar++;
 
-				if ( iOutPos >= (ARRAYSIZE(wszTmp) - 1) )
+				if ( iOutPos >= (SE_ARRAYSIZE(wszTmp) - 1) )
 				{
 					wszTmp[iOutPos] = L'\0';
 					break;
 				}
 			}
 
-			if ( iOutPos < (ARRAYSIZE(wszTmp) - 1) )
+			if ( iOutPos < (SE_ARRAYSIZE(wszTmp) - 1) )
 			{
 				wszTmp[iOutPos] = L'\0';
 			}

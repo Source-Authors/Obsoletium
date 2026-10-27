@@ -734,7 +734,7 @@ void C_BaseEntity::PushEnableAbsRecomputations( bool bEnable )
 {
 	if ( !ThreadInMainThread() )
 		return;
-	if ( g_iAbsRecomputationStackPos < ARRAYSIZE( g_bAbsRecomputationStack ) )
+	if ( g_iAbsRecomputationStackPos < SE_ARRAYSIZE( g_bAbsRecomputationStack ) )
 	{
 		g_bAbsRecomputationStack[g_iAbsRecomputationStackPos] = s_bAbsRecomputationEnabled;
 		++g_iAbsRecomputationStackPos;
@@ -1296,7 +1296,7 @@ int C_BaseEntity::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax )
 bool C_BaseEntity::VPhysicsIsFlesh( void )
 {
 	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int count = VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+	int count = VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 	for ( int i = 0; i < count; i++ )
 	{
 		int material = pList[i]->GetMaterialIndex();

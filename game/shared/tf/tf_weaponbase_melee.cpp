@@ -436,7 +436,7 @@ bool CTFWeaponBaseMelee::DoSwingTraceInternal( trace_t &trace, bool bCleave, CUt
 		Ray_t ray;
 		ray.Init( vecSwingStart, vecSwingEnd, vecSwingMins, vecSwingMaxs );
 		CBaseEntity *pList[256];
-		int nTargetCount = UTIL_EntitiesAlongRay( pList, ARRAYSIZE( pList ), ray, FL_CLIENT|FL_OBJECT );
+		int nTargetCount = UTIL_EntitiesAlongRay( pList, SE_ARRAYSIZE( pList ), ray, FL_CLIENT|FL_OBJECT );
 		
 		int nHitCount = 0;
 		for ( int i=0; i<nTargetCount; ++i )

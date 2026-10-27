@@ -299,9 +299,9 @@ public:
 				wchar_t wszPercentage[32];
 				wchar_t wszNow[32];
 				wchar_t wszTotal[32];
-				_snwprintf( wszPercentage, ARRAYSIZE( wszPercentage ), L"%u", iProgress );
-				_snwprintf( wszNow, ARRAYSIZE( wszNow ), L"%u", ulnow_kb );
-				_snwprintf( wszTotal, ARRAYSIZE( wszTotal ), L"%u", ultotal_kb );
+				_snwprintf( wszPercentage, SE_ARRAYSIZE( wszPercentage ), L"%u", iProgress );
+				_snwprintf( wszNow, SE_ARRAYSIZE( wszNow ), L"%u", ulnow_kb );
+				_snwprintf( wszTotal, SE_ARRAYSIZE( wszTotal ), L"%u", ultotal_kb );
 				g_pVGuiLocalize->ConstructString_safe( wszProgress, g_pVGuiLocalize->Find( "#YouTube_UploadProgress" ), 3, 
 												  wszPercentage,
 												  wszNow,

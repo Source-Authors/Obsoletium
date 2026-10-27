@@ -50,7 +50,7 @@ ConVarFlags s_flaggedConVars[] =
 //-----------------------------------------------------------------------------
 void CTFViewRender::Init()
 {
-	for ( int i=0; i<ARRAYSIZE( s_flaggedConVars ); ++i )
+	for ( int i=0; i<SE_ARRAYSIZE( s_flaggedConVars ); ++i )
 	{
 		ConVar *flaggedConVar = cvar->FindVar( s_flaggedConVars[i].name );
 		if ( flaggedConVar )

@@ -665,7 +665,7 @@ bool CModelInfo::IsUsingFBTexture( const model_t *model, int nSkin, int nBody, v
 			case mod_studio:
 			{
 				IMaterial *pMaterials[ 128 ];
-				int materialCount = g_pStudioRender->GetMaterialListFromBodyAndSkin( model->studio, nSkin, nBody, ARRAYSIZE( pMaterials ), pMaterials );
+				int materialCount = g_pStudioRender->GetMaterialListFromBodyAndSkin( model->studio, nSkin, nBody, SE_ARRAYSIZE( pMaterials ), pMaterials );
 				for ( int i = 0; i < materialCount; i++ )
 				{
 					if ( pMaterials[i] != NULL )
@@ -944,7 +944,7 @@ int CModelInfoServer::RegisterDynamicModel( const char *name, bool bClientSide )
 		return -1;
 
 	char buf[256];
-	V_strncpy( buf, name, ARRAYSIZE(buf) );
+	V_strncpy( buf, name, SE_ARRAYSIZE(buf) );
 	V_RemoveDotSlashes( buf, '/', true );
 	name = buf;
 
@@ -1073,7 +1073,7 @@ int CModelInfoClient::RegisterDynamicModel( const char *name, bool bClientSide )
 		return -1;
 
 	char buf[256];
-	V_strncpy( buf, name, ARRAYSIZE(buf) );
+	V_strncpy( buf, name, SE_ARRAYSIZE(buf) );
 	V_RemoveDotSlashes( buf, '/', true );
 	name = buf;
 

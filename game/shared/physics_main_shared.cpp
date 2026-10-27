@@ -307,7 +307,7 @@ int CWatcherList::GetCallbackObjects( IWatcherCallback **pList, int listMax )
 void CWatcherList::NotifyPositionChanged( CBaseEntity *pEntity )
 {
 	IWatcherCallback *pCallbacks[1024]; // HACKHACK: Assumes this list is big enough
-	int count = GetCallbackObjects( pCallbacks, ARRAYSIZE(pCallbacks) );
+	int count = GetCallbackObjects( pCallbacks, SE_ARRAYSIZE(pCallbacks) );
 	for ( int i = 0; i < count; i++ )
 	{
 		IPositionWatcher *pWatcher = assert_cast<IPositionWatcher *>(pCallbacks[i]);
@@ -321,7 +321,7 @@ void CWatcherList::NotifyPositionChanged( CBaseEntity *pEntity )
 void CWatcherList::NotifyVPhysicsStateChanged( IPhysicsObject *pPhysics, CBaseEntity *pEntity, bool bAwake )
 {
 	IWatcherCallback *pCallbacks[1024];	// HACKHACK: Assumes this list is big enough!
-	int count = GetCallbackObjects( pCallbacks, ARRAYSIZE(pCallbacks) );
+	int count = GetCallbackObjects( pCallbacks, SE_ARRAYSIZE(pCallbacks) );
 	for ( int i = 0; i < count; i++ )
 	{
 		IVPhysicsWatcher *pWatcher = assert_cast<IVPhysicsWatcher *>(pCallbacks[i]);

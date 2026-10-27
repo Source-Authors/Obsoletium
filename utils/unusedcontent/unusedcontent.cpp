@@ -880,7 +880,7 @@ void BuildCheckdirList()
 	}
 	else
 	{
-		int c = ARRAYSIZE( directories_to_check );
+		int c = SE_ARRAYSIZE( directories_to_check );
 		int i;
 		for ( i = 0; i < c; ++i )
 		{
@@ -888,7 +888,7 @@ void BuildCheckdirList()
 		}
 
 		// add the list of dirs to ignore from the others lists
-		c = ARRAYSIZE( directories_to_ignore );
+		c = SE_ARRAYSIZE( directories_to_ignore );
 		for ( i = 0; i < c; ++i )
 		{
 			AddIgnoredir( directories_to_ignore[ i ] );

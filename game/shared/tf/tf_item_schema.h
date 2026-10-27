@@ -406,9 +406,9 @@ class CTFStyleInfo : public CEconStyleInfo
 public:
 	CTFStyleInfo()
 	{
-		for ( int i = 0; i < ARRAYSIZE( m_pszPlayerDisplayModel ); i++ )
+		for ( int i = 0; i < SE_ARRAYSIZE( m_pszPlayerDisplayModel ); i++ )
 		{
-			for ( int j = 0; j < ARRAYSIZE( m_pszPlayerDisplayModel[i] ); j++ )
+			for ( int j = 0; j < SE_ARRAYSIZE( m_pszPlayerDisplayModel[i] ); j++ )
 			{
 				m_pszPlayerDisplayModel[i][j] = NULL;
 			}

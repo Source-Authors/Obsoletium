@@ -201,9 +201,9 @@ void AvoidPushawayProps( CBaseCombatCharacter *pPlayer, CUserCmd *pCmd )
 
 	CBaseEntity *props[512];
 #ifdef CLIENT_DLL
-	int nEnts = GetPushawayEnts( pPlayer, props, ARRAYSIZE( props ), 0.0f, PARTITION_CLIENT_SOLID_EDICTS, NULL );
+	int nEnts = GetPushawayEnts( pPlayer, props, SE_ARRAYSIZE( props ), 0.0f, PARTITION_CLIENT_SOLID_EDICTS, NULL );
 #else
-	int nEnts = GetPushawayEnts( pPlayer, props, ARRAYSIZE( props ), 0.0f, PARTITION_ENGINE_SOLID_EDICTS, NULL );
+	int nEnts = GetPushawayEnts( pPlayer, props, SE_ARRAYSIZE( props ), 0.0f, PARTITION_ENGINE_SOLID_EDICTS, NULL );
 #endif
 
 	const Vector & ourCenter = pPlayer->WorldSpaceCenter();
@@ -298,9 +298,9 @@ void PerformObstaclePushaway( CBaseCombatCharacter *pPushingEntity )
 	if ( (sv_pushaway_clientside.GetInt() == 1) && (!pPlayer || !pPlayer->IsLocalPlayer()) )
 		return;
 
-	int nEnts = GetPushawayEnts( pPushingEntity, props, ARRAYSIZE( props ), 3.0f, PARTITION_CLIENT_RESPONSIVE_EDICTS, NULL );
+	int nEnts = GetPushawayEnts( pPushingEntity, props, SE_ARRAYSIZE( props ), 3.0f, PARTITION_CLIENT_RESPONSIVE_EDICTS, NULL );
 #else
-	int nEnts = GetPushawayEnts( pPushingEntity, props, ARRAYSIZE( props ), 3.0f, PARTITION_ENGINE_SOLID_EDICTS, NULL );
+	int nEnts = GetPushawayEnts( pPushingEntity, props, SE_ARRAYSIZE( props ), 3.0f, PARTITION_ENGINE_SOLID_EDICTS, NULL );
 #endif
 	
 	for ( int i=0; i < nEnts; i++ )

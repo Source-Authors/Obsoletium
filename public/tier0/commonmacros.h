@@ -376,9 +376,9 @@ inline
 // dimhotepus: __LINE__AS_STRING -> LINE__AS_STRING
 #define LINE__AS_STRING HACK_LINE_AS_STRING(__LINE__)
 
-// Using ARRAYSIZE implementation from winnt.h:
-#ifdef ARRAYSIZE
-#undef ARRAYSIZE
+// dimhotepus: ARRAYSIZE -> SE_ARRAYSIZE to not clash with windows headers.
+#ifdef SE_ARRAYSIZE
+#undef SE_ARRAYSIZE
 #endif
 
 // Return the number of elements in a statically sized array.
@@ -438,7 +438,7 @@ extern "C++"  // templates cannot be declared to have 'C' linkage
 
 #ifdef _PREFAST_
 // The +0 is so that we can go:
-// size = ARRAYSIZE(array) * sizeof(array[0]) without triggering a /analyze
+// size = SE_ARRAYSIZE(array) * sizeof(array[0]) without triggering a /analyze
 // warning about multiplying sizeof.
 // dimhotepus: RTL_NUMBER_OF_V2 -> SE_RTL_NUMBER_OF_V2 to not clash with windows headers.
 #define SE_RTL_NUMBER_OF_V2(A) (sizeof(*RtlpNumberOf(A)) + 0)
@@ -487,18 +487,19 @@ extern "C++"  // templates cannot be declared to have 'C' linkage
 #define SE_RTL_NUMBER_OF_V2(A) SE_RTL_NUMBER_OF_V1(A)
 #endif
 
-// ARRAYSIZE is more readable version of SE_RTL_NUMBER_OF_V2.
-#define ARRAYSIZE(A) SE_RTL_NUMBER_OF_V2(A)
+// dimhotepus: ARRAYSIZE -> SE_ARRAYSIZE to not clash with windows headers.
+// SE_ARRAYSIZE is more readable version of SE_RTL_NUMBER_OF_V2.
+#define SE_ARRAYSIZE(A) SE_RTL_NUMBER_OF_V2(A)
 
 // dimhotepus: Try to hide this one. Looks like not used anymore.
 // _ARRAYSIZE is a version useful for anonymous types.
 // #define _ARRAYSIZE(A) SE_RTL_NUMBER_OF_V0(A)
 
 // dimhotepus: Deprecated.
-// #define Q_ARRAYSIZE(p) ARRAYSIZE(p)
+// #define Q_ARRAYSIZE(p) SE_ARRAYSIZE(p)
 
 // dimhotepus: Deprecated.
-// #define V_ARRAYSIZE(p) ARRAYSIZE(p)
+// #define V_ARRAYSIZE(p) SE_ARRAYSIZE(p)
 
 /**
  * @brief Clamp array index to be in bounds.

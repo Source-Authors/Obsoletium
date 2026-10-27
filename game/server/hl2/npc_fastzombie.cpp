@@ -579,7 +579,7 @@ void CFastZombie::SoundInit( void )
 	if( !m_pMoanSound )
 	{
 		// !!!HACKHACK - kickstart the moan sound. (sjb)
-		MoanSound( envFastZombieMoanVolume, ARRAYSIZE( envFastZombieMoanVolume ) );
+		MoanSound( envFastZombieMoanVolume, SE_ARRAYSIZE( envFastZombieMoanVolume ) );
 
 		// Clear the commands that the base class gave the moaning sound channel.
 		ENVELOPE_CONTROLLER.CommandClear( m_pMoanSound );
@@ -835,7 +835,7 @@ int CFastZombie::MeleeAttack1Conditions( float flDot, float flDist )
 //-----------------------------------------------------------------------------
 const char *CFastZombie::GetMoanSound( int nSound )
 {
-	return pMoanSounds[ nSound % ARRAYSIZE( pMoanSounds ) ];
+	return pMoanSounds[ nSound % SE_ARRAYSIZE( pMoanSounds ) ];
 }
 
 //-----------------------------------------------------------------------------
@@ -901,9 +901,9 @@ void CFastZombie::IdleSound( void )
 void CFastZombie::PainSound( const CTakeDamageInfo &info )
 {
 	if ( m_pLayer2 )
-		ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pLayer2, SOUNDCTRL_CHANGE_VOLUME, envFastZombieVolumePain, ARRAYSIZE(envFastZombieVolumePain) );
+		ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pLayer2, SOUNDCTRL_CHANGE_VOLUME, envFastZombieVolumePain, SE_ARRAYSIZE(envFastZombieVolumePain) );
 	if ( m_pMoanSound )
-		ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pMoanSound, SOUNDCTRL_CHANGE_VOLUME, envFastZombieInverseVolumePain, ARRAYSIZE(envFastZombieInverseVolumePain) );
+		ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pMoanSound, SOUNDCTRL_CHANGE_VOLUME, envFastZombieInverseVolumePain, SE_ARRAYSIZE(envFastZombieInverseVolumePain) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1053,7 +1053,7 @@ void CFastZombie::HandleAnimEvent( animevent_t *pEvent )
 		if( ++m_iClimbCount % 3 == 0 )
 		{
 			ENVELOPE_CONTROLLER.SoundChangePitch( m_pLayer2, random->RandomFloat( 100, 150 ), 0.0 );
-			ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pLayer2, SOUNDCTRL_CHANGE_VOLUME, envFastZombieVolumeClimb, ARRAYSIZE(envFastZombieVolumeClimb) );
+			ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pLayer2, SOUNDCTRL_CHANGE_VOLUME, envFastZombieVolumeClimb, SE_ARRAYSIZE(envFastZombieVolumeClimb) );
 		}
 
 		return;
@@ -1719,7 +1719,7 @@ void CFastZombie::BeginNavJump( void )
 	m_fIsNavJumping = true;
 	m_fHitApex = false;
 
-	ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pLayer2, SOUNDCTRL_CHANGE_VOLUME, envFastZombieVolumeJump, ARRAYSIZE(envFastZombieVolumeJump) );
+	ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pLayer2, SOUNDCTRL_CHANGE_VOLUME, envFastZombieVolumeJump, SE_ARRAYSIZE(envFastZombieVolumeJump) );
 }
 
 //=========================================================

@@ -155,7 +155,7 @@ bool CCheckUVCmd::CheckOverlap( const struct s_source_t *pSource ) const
 				pSource->vertex[fB.b].texcoord,
 				pSource->vertex[fB.c].texcoord };
 
-			for ( int k = 0; k < ARRAYSIZE( tB ); ++k )
+			for ( int k = 0; k < SE_ARRAYSIZE( tB ); ++k )
 			{
 				const Vector vCheck = Barycentric( tB[k], tAA, tAB, tAC );
 

@@ -53,7 +53,7 @@ const char* BannerModels[] =
 #define CLOSED_PARACHUTE_MDL "models/workshop/weapons/c_models/c_paratooper_pack/c_paratrooper_pack.mdl"
 #define OPEN_PARACHUTE_MDL "models/workshop/weapons/c_models/c_paratooper_pack/c_paratrooper_pack_open.mdl"
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( BannerModels ) == NUM_BUFF_ITEM_TYPES );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( BannerModels ) == NUM_BUFF_ITEM_TYPES );
 //=============================================================================
 //
 // Weapon Buff Item functions.
@@ -94,7 +94,7 @@ CTFBuffItem::~CTFBuffItem()
 void CTFBuffItem::Precache()
 {
 	// Need to make this dynamic, but the item data isn't available here?
-	for ( int i=0; i<ARRAYSIZE(BannerModels); i++ )
+	for ( int i=0; i<SE_ARRAYSIZE(BannerModels); i++ )
 	{
 		PrecacheModel( BannerModels[i] );
 	}
@@ -328,7 +328,7 @@ void CTFBuffItem::CreateBanner()
 			return;
 
 		//Assert( iBuffType > 0 );
-		//Assert( iBuffType <= ARRAYSIZE(BannerModels) );
+		//Assert( iBuffType <= SE_ARRAYSIZE(BannerModels) );
 		pBanner->m_nSkin = 0;
 		pBanner->InitializeAsClientEntity( BannerModels[GetBuffType()-1], RENDER_GROUP_OPAQUE_ENTITY );
 		pBanner->SetBuffItem( this );

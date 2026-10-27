@@ -526,7 +526,7 @@ void C_BaseTFPlayer::Clear()
 	m_pSapperAttachmentStatus = NULL;
 	
 	int i;
-	for ( i=0; i < ARRAYSIZE( m_BoostModelAngles ); i++ )
+	for ( i=0; i < SE_ARRAYSIZE( m_BoostModelAngles ); i++ )
 	{
 		m_BoostModelAngles[i] = RandomFloat( 0, 360 );
 	}

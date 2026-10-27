@@ -36,7 +36,7 @@ const char *g_szLadderLeaderboardNames[] =
 	"tf2_ladder_9v9",
 	"tf2_ladder_12v12",
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_szLadderLeaderboardNames ) == LADDER_LEADERBOARDS_MAX );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_szLadderLeaderboardNames ) == LADDER_LEADERBOARDS_MAX );
 
 void __MsgFunc_EOTLDuckEvent( bf_read &msg );
 

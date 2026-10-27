@@ -347,7 +347,7 @@ static bool FacePoser_SetWindowLong( HWND wnd, int index, LONG newLong )
 	char windowTitle[256];
 	AssertMsg(ok, "Failed to set 0x%p window (%s) index %d value to %ld.",
 		wnd,
-		wnd && GetWindowText(wnd, windowTitle, ARRAYSIZE(windowTitle)) ? windowTitle : "null",
+		wnd && GetWindowText(wnd, windowTitle, SE_ARRAYSIZE(windowTitle)) ? windowTitle : "null",
 		index,
 		newLong );
 	return ok;
@@ -473,7 +473,7 @@ void FacePoser_EnsurePhonemesLoaded( void )
 		"_weak",
 	};
 
-	for ( int i = 0 ; i < ARRAYSIZE( ext ); ++i )
+	for ( int i = 0 ; i < SE_ARRAYSIZE( ext ); ++i )
 	{
 		char clname[ 256 ];
 		V_sprintf_safe( clname, "%sphonemes%s", g_PhonemeRoot, ext[ i ] );

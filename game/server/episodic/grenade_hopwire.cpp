@@ -423,7 +423,7 @@ void CGrenadeHopwire::KillStriders( void )
 	// FIXME: It's probably much faster to simply iterate over the striders in the map, rather than any entity in the radius - jdw
 
 	// Find any striders in range of us
-	int numTargets = UTIL_EntitiesInBox( pEnts, ARRAYSIZE( pEnts ), GetAbsOrigin()+mins, GetAbsOrigin()+maxs, FL_NPC );
+	int numTargets = UTIL_EntitiesInBox( pEnts, SE_ARRAYSIZE( pEnts ), GetAbsOrigin()+mins, GetAbsOrigin()+maxs, FL_NPC );
 	float targetDistHorz, targetDistVert;
 
 	for ( int i = 0; i < numTargets; i++ )

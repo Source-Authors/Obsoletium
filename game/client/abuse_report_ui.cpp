@@ -352,7 +352,7 @@ CUtlString CAbuseReportDlg::GetAbuseDescription()
 	char buf[ 1024 ] = "";
 	if ( m_pDescriptionTextEntry )
 	{
-		m_pDescriptionTextEntry->GetText( buf, ARRAYSIZE(buf) );
+		m_pDescriptionTextEntry->GetText( buf, SE_ARRAYSIZE(buf) );
 	}
 
 	return CUtlString( buf );

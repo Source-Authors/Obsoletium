@@ -156,19 +156,19 @@ bool CFinalSubPanel::UpdateStatus()
 		CUtlString sDir;
 
 		asset.GetAbsoluteDir( sDir, "materialsrc", true );
-		V_FixupPathName( szBuf, ARRAYSIZE( szBuf ), sDir.Get() );
+		V_FixupPathName( szBuf, SE_ARRAYSIZE( szBuf ), sDir.Get() );
 		m_pExploreMaterialContentLabel->SetText( szBuf );
 
 		asset.GetAbsoluteDir( sDir, "materials", false );
-		V_FixupPathName( szBuf, ARRAYSIZE( szBuf ), sDir.Get() );
+		V_FixupPathName( szBuf, SE_ARRAYSIZE( szBuf ), sDir.Get() );
 		m_pExploreMaterialGameLabel->SetText( szBuf );
 
 		asset.GetAbsoluteDir( sDir, NULL, true );
-		V_FixupPathName( szBuf, ARRAYSIZE( szBuf ), sDir.Get() );
+		V_FixupPathName( szBuf, SE_ARRAYSIZE( szBuf ), sDir.Get() );
 		m_pExploreModelContentLabel->SetText( szBuf );
 
 		asset.GetAbsoluteDir( sDir, NULL, false );
-		V_FixupPathName( szBuf, ARRAYSIZE( szBuf ), sDir.Get() );
+		V_FixupPathName( szBuf, SE_ARRAYSIZE( szBuf ), sDir.Get() );
 		m_pExploreModelGameLabel->SetText( szBuf );
 
 		CFmtStrMax sCmd;
@@ -274,7 +274,7 @@ void CFinalSubPanel::OnHlmv()
 	}
 
 	char szBinLaunchDir[ MAX_PATH ];
-	V_ExtractFilePath( sBinDir.String(), szBinLaunchDir, ARRAYSIZE( szBinLaunchDir ) );
+	V_ExtractFilePath( sBinDir.String(), szBinLaunchDir, SE_ARRAYSIZE( szBinLaunchDir ) );
 
 	CFmtStrMax sCmd;
 	if ( !GetHlmvCmd( sCmd ) )
@@ -333,7 +333,7 @@ void CFinalSubPanel::OnExplore( bool bMaterial, bool bContent )
 	asset.GetAbsoluteDir( sDir, pszPrefix, bContent );
 
 	char szBuf[ MAX_PATH ];
-	V_FixupPathName( szBuf, ARRAYSIZE( szBuf ), sDir.Get() );
+	V_FixupPathName( szBuf, SE_ARRAYSIZE( szBuf ), sDir.Get() );
 	vgui::system()->ShellExecute( "open", szBuf );
 
 	pLabel->SetText( szBuf );

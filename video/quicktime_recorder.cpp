@@ -588,7 +588,7 @@ bool CQuickTimeVideoRecorder::EstimateMovieFileSize( size_t *pEstSize, int movie
 	float  Qlerp = 0.0f;
 	bool   bQLerp = true;
 	
-	for ( int i = 0; i < ARRAYSIZE( s_QualityPresets ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( s_QualityPresets ); i++ )
 	{
 		if ( s_QualityPresets[i] == videoQuality )
 		{
@@ -622,7 +622,7 @@ bool CQuickTimeVideoRecorder::EstimateMovieFileSize( size_t *pEstSize, int movie
 	int				R1pixels = RES1.X * RES1.Y;
 	int				R2pixels = RES2.X * RES2.Y;
 
-	for ( int i = 0; i < ARRAYSIZE( s_ResolutionPresets ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( s_ResolutionPresets ); i++ )
 	{
 		if ( s_ResolutionPresets[i].X == movieWidth && s_ResolutionPresets[i].Y == movieHeight )
 		{
@@ -712,7 +712,7 @@ bool CQuickTimeVideoRecorder::EstimateMovieFileSize( size_t *pEstSize, int movie
 
 float CQuickTimeVideoRecorder::GetDataRate( int quality, int width, int height )
 {
-	for (int i = 0; i < ARRAYSIZE( s_H264EncodeRates ); i++ )
+	for (int i = 0; i < SE_ARRAYSIZE( s_H264EncodeRates ); i++ )
 	{
 		if ( s_H264EncodeRates[i].m_QualitySetting == quality && s_H264EncodeRates[i].m_XResolution == width && s_H264EncodeRates[i].m_YResolution == height )
 		{

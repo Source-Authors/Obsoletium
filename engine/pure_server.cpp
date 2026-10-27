@@ -903,7 +903,7 @@ int CPureFileTracker::ListAllTrackedFiles( bool bListAll, const char *pchFilenam
 	do
 	{
 		CUnverifiedFileHash rgUnverifiedFiles[1];
-		count = g_pFileSystem->GetUnverifiedFileHashes( rgUnverifiedFiles, ARRAYSIZE( rgUnverifiedFiles ) );
+		count = g_pFileSystem->GetUnverifiedFileHashes( rgUnverifiedFiles, SE_ARRAYSIZE( rgUnverifiedFiles ) );
 
 		if ( count && ( bListAll || ( pchFilenameFind && Q_stristr( rgUnverifiedFiles[0].m_Filename, pchFilenameFind ) && rgUnverifiedFiles[0].m_nFileFraction >= nFileFractionMin && rgUnverifiedFiles[0].m_nFileFraction <= nFileFractionMax ) ) )
 		{

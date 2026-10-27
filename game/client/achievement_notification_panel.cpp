@@ -282,7 +282,7 @@ CON_COMMAND_F( achievement_notification_test, "Test the hud notification UI", FC
 	if ( event )
 	{
 		const char *szTestStr[] = { "TF_GET_HEADSHOTS", "TF_PLAY_GAME_EVERYMAP", "TF_PLAY_GAME_EVERYCLASS", "TF_GET_HEALPOINTS" };
-		event->SetString( "achievement_name", szTestStr[iCount%ARRAYSIZE(szTestStr)] );
+		event->SetString( "achievement_name", szTestStr[iCount%SE_ARRAYSIZE(szTestStr)] );
 		event->SetInt( "cur_val", ( iCount%9 ) + 1 );
 		event->SetInt( "max_val", 10 );
 		gameeventmanager->FireEvent( event );

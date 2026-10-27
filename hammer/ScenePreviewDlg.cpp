@@ -117,7 +117,7 @@ DWORD CScenePreviewDlg::IdleThread()
 		// Send the event to the window.
 		PostMessage( WM_SCENEPREVIEW_IDLE, 0, 0 );
 		
-		DWORD ret = WaitForMultipleObjects( ARRAYSIZE( handles ), handles, false, INFINITE );
+		DWORD ret = WaitForMultipleObjects( SE_ARRAYSIZE( handles ), handles, false, INFINITE );
 		if ( ret == WAIT_OBJECT_0 || ret == WAIT_TIMEOUT )
 			return 0;
 

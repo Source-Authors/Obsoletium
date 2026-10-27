@@ -1570,7 +1570,7 @@ void CDynamicRecipePanel::SetBorderForItem( CItemModelPanel *pItemPanel, bool bM
 
 		// The output panel greys out when any of the input panels are not fulfilled,
 		// and lights up when they are all fulfilled
-		if ( iRarity >= 0 && iRarity < ARRAYSIZE( g_szItemBorders ) )
+		if ( iRarity >= 0 && iRarity < SE_ARRAYSIZE( g_szItemBorders ) )
 		{
 			if( AllRecipePanelsFilled() )
 			{

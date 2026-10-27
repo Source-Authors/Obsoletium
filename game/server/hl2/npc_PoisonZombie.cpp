@@ -355,7 +355,7 @@ void CNPC_PoisonZombie::Spawn( void )
 //-----------------------------------------------------------------------------
 const char *CNPC_PoisonZombie::GetMoanSound( int nSound )
 {
-	return pMoanSounds[nSound % ARRAYSIZE( pMoanSounds )];
+	return pMoanSounds[nSound % SE_ARRAYSIZE( pMoanSounds )];
 }
 
 
@@ -632,11 +632,11 @@ void CNPC_PoisonZombie::BreatheOffShort( void )
 {
 	if ( m_bNearEnemy )
 	{
-		ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pFastBreathSound, SOUNDCTRL_CHANGE_VOLUME, envPoisonZombieBreatheVolumeOffShort, ARRAYSIZE(envPoisonZombieBreatheVolumeOffShort) );
+		ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pFastBreathSound, SOUNDCTRL_CHANGE_VOLUME, envPoisonZombieBreatheVolumeOffShort, SE_ARRAYSIZE(envPoisonZombieBreatheVolumeOffShort) );
 	}
 	else
 	{
-		ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pSlowBreathSound, SOUNDCTRL_CHANGE_VOLUME, envPoisonZombieBreatheVolumeOffShort, ARRAYSIZE(envPoisonZombieBreatheVolumeOffShort) );
+		ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pSlowBreathSound, SOUNDCTRL_CHANGE_VOLUME, envPoisonZombieBreatheVolumeOffShort, SE_ARRAYSIZE(envPoisonZombieBreatheVolumeOffShort) );
 	}
 }
 
@@ -1038,7 +1038,7 @@ void CNPC_PoisonZombie::FootstepSound( bool fRightFoot )
 	if( ShouldPlayFootstepMoan() )
 	{
 		m_flNextMoanSound = gpGlobals->curtime;
-		MoanSound( envPoisonZombieMoanVolumeFast, ARRAYSIZE( envPoisonZombieMoanVolumeFast ) );
+		MoanSound( envPoisonZombieMoanVolumeFast, SE_ARRAYSIZE( envPoisonZombieMoanVolumeFast ) );
 	}
 }
 

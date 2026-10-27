@@ -281,7 +281,7 @@ BOOL COP_Flags::OnInitDialog()
 	{
 		CAnchorDef( IDC_CHECKLIST, k_eSimpleAnchorAllSides )
 	};
-	m_AnchorMgr.Init( GetSafeHwnd(), anchorDefs, ARRAYSIZE( anchorDefs ) );
+	m_AnchorMgr.Init( GetSafeHwnd(), anchorDefs, SE_ARRAYSIZE( anchorDefs ) );
 	
 	return TRUE;	             
 }

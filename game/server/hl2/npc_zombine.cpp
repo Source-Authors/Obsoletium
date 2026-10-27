@@ -760,7 +760,7 @@ void CNPC_Zombine::InputPullGrenade ( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 const char *CNPC_Zombine::GetMoanSound( int nSound )
 {
-	return pMoanSounds[ nSound % ARRAYSIZE( pMoanSounds ) ];
+	return pMoanSounds[ nSound % SE_ARRAYSIZE( pMoanSounds ) ];
 }
 
 //-----------------------------------------------------------------------------

@@ -1230,7 +1230,7 @@ void ClientModeShared::FireGameEvent( IGameEvent *event )
 			wchar_t wszPlayerName[MAX_PLAYER_NAME_LENGTH];
 			g_pVGuiLocalize->ConvertANSIToUnicode( g_PR->GetPlayerName( iPlayerIndex ), wszPlayerName );
 
-			if ( iMethod < 0 || iMethod >= ARRAYSIZE( g_pszItemFoundMethodStrings ) )
+			if ( iMethod < 0 || iMethod >= SE_ARRAYSIZE( g_pszItemFoundMethodStrings ) )
 			{
 				iMethod = 0;
 			}

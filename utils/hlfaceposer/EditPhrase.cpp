@@ -49,7 +49,7 @@ static BOOL CALLBACK EditPhraseDialogProc( HWND hwndDlg, UINT uMsg, WPARAM wPara
 		{
 		case IDOK:
 			g_Params.m_szInputText[ 0 ] = 0;
-			GetDlgItemTextW( hwndDlg, IDC_INPUTSTRING, g_Params.m_szInputText, ARRAYSIZE( g_Params.m_szInputText ) );
+			GetDlgItemTextW( hwndDlg, IDC_INPUTSTRING, g_Params.m_szInputText, SE_ARRAYSIZE( g_Params.m_szInputText ) );
 			EndDialog( hwndDlg, 1 );
 			break;
         case IDCANCEL:

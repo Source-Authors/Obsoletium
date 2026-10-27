@@ -117,7 +117,7 @@ void CDODTeamMenu::OnTick( void )
 		else
 		{
 			wchar_t wnum[6];
-			_snwprintf( wnum, ARRAYSIZE(wnum), L"%d", iNumAllies );
+			_snwprintf( wnum, SE_ARRAYSIZE(wnum), L"%d", iNumAllies );
 			g_pVGuiLocalize->ConstructString( wbuf, sizeof(wbuf), g_pVGuiLocalize->Find("#teammenu_numAllies"), 1, wnum );
 		}
 
@@ -140,7 +140,7 @@ void CDODTeamMenu::OnTick( void )
 		else
 		{
 			wchar_t wnum[6];
-			_snwprintf( wnum, ARRAYSIZE(wnum), L"%d", iNumAxis );
+			_snwprintf( wnum, SE_ARRAYSIZE(wnum), L"%d", iNumAxis );
 			g_pVGuiLocalize->ConstructString( wbuf, sizeof(wbuf), g_pVGuiLocalize->Find("#teammenu_numAxis"), 1, wnum );
 		}
 

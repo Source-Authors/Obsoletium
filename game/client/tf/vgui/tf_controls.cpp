@@ -34,7 +34,7 @@ wchar_t* LocalizeNumberWithToken( const char* pszLocToken, int nValue )
 {
 	static wchar_t wszOutString[ 128 ];
 	wchar_t wszCount[ 16 ];
-	_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", nValue );
+	_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", nValue );
 	const wchar_t *wpszFormat = g_pVGuiLocalize->Find( pszLocToken );
 	g_pVGuiLocalize->ConstructString_safe( wszOutString, wpszFormat, 1, wszCount );
 	

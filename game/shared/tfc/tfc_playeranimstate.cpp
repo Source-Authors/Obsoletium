@@ -196,7 +196,7 @@ void CTFCPlayerAnimState::DoAnimationEvent( PlayerAnimEvent_t event, int nData )
 			ACT_DIE_GUTSHOT
 		};
 
-		m_DeathActivity = acts[ RandomInt( 0, ARRAYSIZE( acts ) - 1 ) ];
+		m_DeathActivity = acts[ RandomInt( 0, SE_ARRAYSIZE( acts ) - 1 ) ];
 		RestartMainSequence();	// Play a death animation.
 	}
 }

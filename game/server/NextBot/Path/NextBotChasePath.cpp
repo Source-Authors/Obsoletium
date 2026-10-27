@@ -102,7 +102,7 @@ Vector ChasePath::PredictSubjectPosition( INextBot *bot, CBaseEntity *subject ) 
 		bool bFound = false;
 		if ( iServer != gpGlobals->serverCount )
 		{
-			for ( i = 0; i < ARRAYSIZE(cache); i++ )
+			for ( i = 0; i < SE_ARRAYSIZE(cache); i++ )
 			{
 				cache[i].pArea = NULL;
 			}
@@ -110,7 +110,7 @@ Vector ChasePath::PredictSubjectPosition( INextBot *bot, CBaseEntity *subject ) 
 		}
 		else
 		{
-			for ( i = 0; i < ARRAYSIZE(cache); i++ )
+			for ( i = 0; i < SE_ARRAYSIZE(cache); i++ )
 			{
 				if ( cache[i].pArea && CloseEnough( cache[i].target, pathTarget, 2.0 ) )
 				{
@@ -129,7 +129,7 @@ Vector ChasePath::PredictSubjectPosition( INextBot *bot, CBaseEntity *subject ) 
 			{
 				cache[iNext].target = pathTarget;
 				cache[iNext].pArea = leadArea;
-				iNext = ( iNext + 1 ) % ARRAYSIZE( cache );
+				iNext = ( iNext + 1 ) % SE_ARRAYSIZE( cache );
 			}
 		}
 	}

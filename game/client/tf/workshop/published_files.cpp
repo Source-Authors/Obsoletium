@@ -342,7 +342,7 @@ static TagPair_t kOtherTags[] = {
 	{ "TagCheckbox_UnusualEffect", "Unusual Effect" },
 	{ "TagCheckbox_Jungle", "Jungle" },
 };
-static uint32 kNumOtherTags = ARRAYSIZE( kOtherTags );
+static uint32 kNumOtherTags = SE_ARRAYSIZE( kOtherTags );
 
 // Map Tags
 static TagPair_t kMapTags[] = {
@@ -365,7 +365,7 @@ static TagPair_t kMapTags[] = {
 	{ "MapsCheckbox_Night", "Night" },
 	{ "MapsCheckbox_Jungle", "Jungle" },
 };
-static uint32 kNumMapTags = ARRAYSIZE( kMapTags );
+static uint32 kNumMapTags = SE_ARRAYSIZE( kMapTags );
 
 static const char *kImportedTag = "Certified Compatible";
 

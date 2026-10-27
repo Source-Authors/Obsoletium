@@ -56,7 +56,7 @@ const char *g_szEquipSlotHeader[] =
 	"",						// LOADOUT_POSITION_BUILDING2,
 #endif // STAGING_ONLY
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_szEquipSlotHeader ) == CLASS_LOADOUT_POSITION_COUNT );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_szEquipSlotHeader ) == CLASS_LOADOUT_POSITION_COUNT );
 
 static bool ShouldItemNotStack( CEconItemView *pItemData )
 {
@@ -574,7 +574,7 @@ void CItemSelectionPanel::UpdateDuplicateCounts( void )
 		}
 
 		wchar_t wzCost[10];
-		_snwprintf( wzCost, ARRAYSIZE( wzCost ), L"x%d", m_DuplicateCounts[iIndex] );
+		_snwprintf( wzCost, SE_ARRAYSIZE( wzCost ), L"x%d", m_DuplicateCounts[iIndex] );
 		m_pDuplicateCountLabels[i]->SetText( wzCost );
 		m_pDuplicateCountLabels[i]->SetVisible( true );
 	}

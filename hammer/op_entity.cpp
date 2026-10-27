@@ -1289,7 +1289,7 @@ void COP_Entity::PresentProperties()
 		// Too many entity variables! Increase GD_MAX_VARIABLES if you get this assertion.
 		Assert(m_pDisplayClass->GetVariableCount() <= GD_MAX_VARIABLES);
 
-		for ( int i=0; i < ARRAYSIZE(m_VarMap); i++ )
+		for ( int i=0; i < SE_ARRAYSIZE(m_VarMap); i++ )
 		{
 			m_VarMap[i] = -1;
 		}
@@ -1420,7 +1420,7 @@ void COP_Entity::ClearVarList()
 	m_VarList.DeleteAllItems();
 	m_InstanceParmData.RemoveAll();
 	
-	for ( int i=0; i < ARRAYSIZE( m_VarMap ); i++ )
+	for ( int i=0; i < SE_ARRAYSIZE( m_VarMap ); i++ )
 		m_VarMap[i] = -1;
 }
 
@@ -1599,7 +1599,7 @@ void COP_Entity::UpdateAnchors()
 		CAnchorDef( IDC_REMOVEKEYVALUE, k_eSimpleAnchorRightSide )
 	};
 	CUtlVector<CAnchorDef> defs;
-	defs.CopyArray( anchorDefs, ARRAYSIZE( anchorDefs ) );
+	defs.CopyArray( anchorDefs, SE_ARRAYSIZE( anchorDefs ) );
 	
 	for ( intp i=0; i < m_SmartControls.Count(); i++ )
 	{
@@ -2953,7 +2953,7 @@ void COP_Entity::SetSmartedit(bool bSet)
 	//
 	// Hide or show all controls after and including "delete kv" button.
 	//
-	for (int i = 0; i < ARRAYSIZE(g_DumbEditControls); i++)
+	for (int i = 0; i < SE_ARRAYSIZE(g_DumbEditControls); i++)
 	{
 		CWnd *pWnd = GetDlgItem(g_DumbEditControls[i]);
 		if ( pWnd )
@@ -2982,7 +2982,7 @@ void COP_Entity::SetReadOnly(bool bReadOnly)
 	//
 	// Hide or show all controls after and including "delete kv" button.
 	//
-	for (int i = 0; i < ARRAYSIZE(g_DumbEditControls); i++)
+	for (int i = 0; i < SE_ARRAYSIZE(g_DumbEditControls); i++)
 	{
 		CWnd *pWnd = GetDlgItem(g_DumbEditControls[i]);
 		if ( pWnd )
@@ -4730,7 +4730,7 @@ void COP_Entity::GetItemColor( int iItem, COLORREF *pBackgroundColor, COLORREF *
 
 bool COP_Entity::CustomDrawItemValue( const LPDRAWITEMSTRUCT p, const RECT *pRect )
 {
-	if ( !m_bSmartedit || p->itemID < 0 || p->itemID >= ARRAYSIZE(m_VarMap) || m_VarMap[p->itemID] < 0 )
+	if ( !m_bSmartedit || p->itemID < 0 || p->itemID >= SE_ARRAYSIZE(m_VarMap) || m_VarMap[p->itemID] < 0 )
 		return false;
 
 	if ( !m_pDisplayClass )

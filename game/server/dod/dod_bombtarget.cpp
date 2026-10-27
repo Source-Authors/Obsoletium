@@ -188,7 +188,7 @@ CDODBombTargetStateInfo* CDODBombTarget::State_LookupInfo( BombTargetState state
 		{ BOMB_TARGET_ARMED,	"BOMB_TARGET_ARMED",		&CDODBombTarget::State_Enter_ARMED, &CDODBombTarget::State_Leave_Armed, &CDODBombTarget::State_Think_ARMED, &CDODBombTarget::State_Use_ARMED }
 	};
 
-	for ( int i=0; i < ARRAYSIZE( bombTargetStateInfos ); i++ )
+	for ( int i=0; i < SE_ARRAYSIZE( bombTargetStateInfos ); i++ )
 	{
 		if ( bombTargetStateInfos[i].m_iState == state )
 			return &bombTargetStateInfos[i];

@@ -82,7 +82,7 @@ END_DATADESC()
 //------------------------------------------------------------------------------
 void CWeaponBrickbat::Precache( void )
 {
-	for (int i=0;i<ARRAYSIZE(BrickBatAmmoArray);i++)
+	for (int i=0;i<SE_ARRAYSIZE(BrickBatAmmoArray);i++)
 	{
 		PrecacheModel(BrickBatAmmoArray[i].m_sWorldModel);
 		PrecacheModel(BrickBatAmmoArray[i].m_sViewModel);

@@ -73,7 +73,7 @@ void StatCard::UpdateInfo()
 	{
 		float killToDeath = kills / deaths;
 		
-		_snwprintf( numBuf, ARRAYSIZE( numBuf ), L"%.2f", killToDeath);
+		_snwprintf( numBuf, SE_ARRAYSIZE( numBuf ), L"%.2f", killToDeath);
 		g_pVGuiLocalize->ConstructString( buf, sizeof(buf),
 			g_pVGuiLocalize->Find( "#GameUI_Stats_LastMatch_KDRatio" ), 1, numBuf );		
 		m_pKillToDeathRatio->SetText( buf );
@@ -83,7 +83,7 @@ void StatCard::UpdateInfo()
 		m_pKillToDeathRatio->SetText("");
 	}
 
-	_snwprintf( numBuf, ARRAYSIZE( numBuf ), L"%i", stars);
+	_snwprintf( numBuf, SE_ARRAYSIZE( numBuf ), L"%i", stars);
 	g_pVGuiLocalize->ConstructString( buf, sizeof(buf),
 		g_pVGuiLocalize->Find( "#GameUI_Stats_LastMatch_MVPS" ), 1, numBuf );		
 	m_pStars->SetText( buf );

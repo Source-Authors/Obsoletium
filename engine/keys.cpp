@@ -711,7 +711,7 @@ void Key_Event( const InputEvent_t &event )
 #ifdef LINUX
 	// We're getting some crashes referencing s_pKeyInfo[ code ]. Let's try to
 	//	hard error here and see if we can get code and type at http://minidump.
-	if ( code < 0 || code >= ARRAYSIZE( s_pKeyInfo ) )
+	if ( code < 0 || code >= SE_ARRAYSIZE( s_pKeyInfo ) )
 	{
 		Error( "Key_Event: invalid code! type:%d code:%d\n", event.m_nType, code );
 	}

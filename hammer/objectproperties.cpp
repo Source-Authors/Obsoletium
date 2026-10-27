@@ -751,7 +751,7 @@ BOOL CObjectProperties::SetupPages(void)
 
 	// First, remove pages that we don't want visible.
 	// Also store if they're visible.
-	for ( int i=0; i < ARRAYSIZE( pages ); i++ )
+	for ( int i=0; i < SE_ARRAYSIZE( pages ); i++ )
 	{
 		pages[i].m_bIsVisible = ( GetPageIndex( pages[i].m_pPage ) != -1 );
 		if ( pages[i].m_bIsVisible && !pages[i].m_bWantVisible)
@@ -764,12 +764,12 @@ BOOL CObjectProperties::SetupPages(void)
 	
 	// We're about to add pages, but it'll only add them to the right of what's already there, 
 	// so we must get rid of anything to the right of our leftmost addition.
-	for ( int i=0; i < ARRAYSIZE( pages ); i++ )
+	for ( int i=0; i < SE_ARRAYSIZE( pages ); i++ )
 	{
 		if ( !pages[i].m_bIsVisible && pages[i].m_bWantVisible )
 		{
 			// Ok, page i needs to be on, so nuke everything to the right of it.
-			for ( int j=i+1; j < ARRAYSIZE( pages ); j++ )
+			for ( int j=i+1; j < SE_ARRAYSIZE( pages ); j++ )
 			{
 				if ( pages[j].m_bIsVisible )
 				{
@@ -781,7 +781,7 @@ BOOL CObjectProperties::SetupPages(void)
 		}
 	}
 	
-	for ( int i=0; i < ARRAYSIZE( pages ); i++ )
+	for ( int i=0; i < SE_ARRAYSIZE( pages ); i++ )
 	{
 		if ( !pages[i].m_bIsVisible && pages[i].m_bWantVisible )
 			AddPage( pages[i].m_pPage );
@@ -1192,7 +1192,7 @@ void CObjectProperties::UpdateAnchors( CWnd *pPage )
 		CAnchorDef( hTab, k_eSimpleAnchorAllSides ),
 		CAnchorDef( pPage ? pPage->GetSafeHwnd() : (HWND)NULL, k_eSimpleAnchorAllSides )
 	};
-	m_AnchorMgr.Init( GetSafeHwnd(), anchorDefs, ARRAYSIZE( anchorDefs ) );
+	m_AnchorMgr.Init( GetSafeHwnd(), anchorDefs, SE_ARRAYSIZE( anchorDefs ) );
 }
 
 

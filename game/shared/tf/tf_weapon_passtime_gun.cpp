@@ -303,7 +303,7 @@ static acttable_t s_acttablePasstime[] =
 //-----------------------------------------------------------------------------
 acttable_t* CPasstimeGun::ActivityList(int &iActivityCount)
 {
-	iActivityCount = ARRAYSIZE(s_acttablePasstime);
+	iActivityCount = SE_ARRAYSIZE(s_acttablePasstime);
 	return GetTFPlayerOwner() 
 		? s_acttablePasstime 
 		: BaseClass::ActivityList(iActivityCount);

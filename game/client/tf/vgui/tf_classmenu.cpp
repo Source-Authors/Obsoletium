@@ -565,7 +565,7 @@ void CTFClassMenu::ApplySchemeSettings( IScheme *pScheme )
 	m_pEditLoadoutButton = dynamic_cast<CExButton*>( FindChildByName( "EditLoadoutButton" ) );
 
 	const char *pTeamExtension = GetTeamNumber() == TF_TEAM_BLUE ? "blu" : "red";
-	for ( int i = 0; i < ARRAYSIZE( m_pClassButtons ); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_pClassButtons ); ++i )
 	{
 		if ( !m_pClassButtons[i] )
 			continue;
@@ -715,7 +715,7 @@ int g_iLegacyClassSelectWeaponSlots[TF_LAST_NORMAL_CLASS] =
 void CTFClassMenu::UpdateButtonSelectionStates( int iClass )
 {
 	// Set the correct button as selected, all other buttons as not selected
-	for ( int i = 0; i < ARRAYSIZE( m_pClassButtons ); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_pClassButtons ); ++i )
 	{
 		if ( !m_pClassButtons[ i ] )
 			continue;
@@ -1021,7 +1021,7 @@ void CTFClassMenu::OnThink()
 	vgui::input()->GetCursorPos( aCursorPos[0], aCursorPos[1] );
 
 	// Go through all buttons - if the mouse is within one, select that class
-	for ( int i = 0; i < ARRAYSIZE( m_pClassButtons ); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_pClassButtons ); ++i )
 	{
 		if ( !m_pClassButtons[ i ] )
 			continue;
@@ -1481,7 +1481,7 @@ void CTFClassMenu::UpdateNumClassLabels( int iTeam )
 				{
 					wchar_t	wTemp[32];
 					wchar_t wzCount[10];
-					_snwprintf( wzCount, ARRAYSIZE( wzCount ), L"%d", classCount );
+					_snwprintf( wzCount, SE_ARRAYSIZE( wzCount ), L"%d", classCount );
 					g_pVGuiLocalize->ConstructString_safe( wTemp, g_pVGuiLocalize->Find("TF_ClassLimitHit"), 1, wzCount );
 					SetDialogVariable( g_sDialogVariables[i], wTemp );
 				}
@@ -1494,9 +1494,9 @@ void CTFClassMenu::UpdateNumClassLabels( int iTeam )
 			{
 				wchar_t	wTemp[32];
 				wchar_t wzCount[10];
-				_snwprintf( wzCount, ARRAYSIZE( wzCount ), L"%d", classCount );
+				_snwprintf( wzCount, SE_ARRAYSIZE( wzCount ), L"%d", classCount );
 				wchar_t wzMax[10];
-				_snwprintf( wzMax, ARRAYSIZE( wzMax ), L"%d", iClassLimit );
+				_snwprintf( wzMax, SE_ARRAYSIZE( wzMax ), L"%d", iClassLimit );
 				g_pVGuiLocalize->ConstructString_safe( wTemp, g_pVGuiLocalize->Find("TF_ClassLimitUnder"), 2, wzCount, wzMax );
 				SetDialogVariable( g_sDialogVariables[i], wTemp );
 			}
@@ -1644,7 +1644,7 @@ int g_nNumUpgradeIconsForLastHint = 0;
 void CTFClassMenu::CheckMvMUpgrades()
 {
 	// Set MvM Icons invisible
-	for ( int icons = 0; icons < ARRAYSIZE( m_pMvmUpgradeImages ); ++icons )
+	for ( int icons = 0; icons < SE_ARRAYSIZE( m_pMvmUpgradeImages ); ++icons )
 	{
 		if ( m_pMvmUpgradeImages[icons] == NULL )
 			continue;

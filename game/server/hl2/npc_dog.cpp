@@ -264,7 +264,7 @@ bool CNPC_Dog::CreateVPhysics( void )
 
 	if ( m_bBoneFollowersActive == true && !m_BoneFollowerManager.GetNumBoneFollowers() )
 	{
-		m_BoneFollowerManager.InitBoneFollowers( this, ARRAYSIZE(pFollowerBoneNames), pFollowerBoneNames );
+		m_BoneFollowerManager.InitBoneFollowers( this, SE_ARRAYSIZE(pFollowerBoneNames), pFollowerBoneNames );
 	}
 	return true;
 }
@@ -1697,7 +1697,7 @@ void CNPC_Dog::InputTurnBoneFollowersOn( inputdata_t &inputdata )
 	if ( !m_bBoneFollowersActive )
 	{
 		m_bBoneFollowersActive = true;
-		m_BoneFollowerManager.InitBoneFollowers( this, ARRAYSIZE(pFollowerBoneNames), pFollowerBoneNames );
+		m_BoneFollowerManager.InitBoneFollowers( this, SE_ARRAYSIZE(pFollowerBoneNames), pFollowerBoneNames );
 	}
 }
 

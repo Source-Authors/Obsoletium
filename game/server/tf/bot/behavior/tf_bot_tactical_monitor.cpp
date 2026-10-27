@@ -515,7 +515,7 @@ EventDesiredResult< CTFBot > CTFBotTacticalMonitor::OnCommandString( CTFBot *me,
 		CAttributeList *pAttribList = me->GetAttributeList();
 		if ( pAttribList )
 		{
-			for ( int i = 0; i < ARRAYSIZE( sAttribs ); i++ )
+			for ( int i = 0; i < SE_ARRAYSIZE( sAttribs ); i++ )
 			{
 				const CEconItemAttributeDefinition *pDef = ItemSystem()->GetItemSchema()->GetAttributeDefinitionByName( sAttribs[i].szName );
 				if ( pDef )
@@ -559,7 +559,7 @@ EventDesiredResult< CTFBot > CTFBotTacticalMonitor::OnCommandString( CTFBot *me,
 		CAttributeList *pAttribList = me->GetAttributeList();
 		if ( pAttribList )
 		{
-			for ( int i = 0; i < ARRAYSIZE( sAttribs ); i++ )
+			for ( int i = 0; i < SE_ARRAYSIZE( sAttribs ); i++ )
 			{
 				const CEconItemAttributeDefinition *pDef = ItemSystem()->GetItemSchema()->GetAttributeDefinitionByName( sAttribs[i].szName );
 				if ( pDef )

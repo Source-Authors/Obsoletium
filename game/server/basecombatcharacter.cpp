@@ -2843,7 +2843,7 @@ CBaseEntity *CBaseCombatCharacter::Weapon_FindUsable( const Vector &range )
 
 	Vector mins = GetAbsOrigin() - range;
 	Vector maxs = GetAbsOrigin() + range;
-	int listCount = CBaseCombatWeapon::GetAvailableWeaponsInBox( weaponList, ARRAYSIZE(weaponList), mins, maxs );
+	int listCount = CBaseCombatWeapon::GetAvailableWeaponsInBox( weaponList, SE_ARRAYSIZE(weaponList), mins, maxs );
 
 	float fBestDist = 1e6;
 

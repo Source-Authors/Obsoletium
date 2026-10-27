@@ -2027,7 +2027,7 @@ void CNPC_CombineGunship::BeginDestruct( void )
 	// Create the crashing controller and attach it to the ragdoll physics objects
 	m_pCrashingController = physenv->CreateMotionController( &m_crashCallback );
 	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int count = m_hRagdoll->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+	int count = m_hRagdoll->VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 	for ( int i = 0; i < count; i++ )
 	{
 		m_pCrashingController->AttachObject( pList[i], false );

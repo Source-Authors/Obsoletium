@@ -57,7 +57,7 @@ char *CItemTestApp::s_pszFlags[][4] = {
 bool CItemTestApp::PreInit()
 {
 	// This just has to go in the right scope so it can access kFlagsCount
-	COMPILE_TIME_ASSERT( kFlagsCount == ARRAYSIZE( s_pszFlags ) );
+	COMPILE_TIME_ASSERT( kFlagsCount == SE_ARRAYSIZE( s_pszFlags ) );
 
 	if ( !BaseClass::PreInit() )
 		return false;
@@ -83,7 +83,7 @@ bool CItemTestApp::PreInit()
 		if ( CItemUpload::GetSourceSDKFromExe( sSourceSDKPath, sSourceSDKBin ) && CItemUpload::GetSteamAppInstallLocation( sSteamAppInstallLocation, nAppId ) )
 		{
 			char szGameDir[ MAX_PATH ] = "";
-			V_ComposeFileName( sSteamAppInstallLocation.String(), pszMod, szGameDir, ARRAYSIZE( szGameDir ) );
+			V_ComposeFileName( sSteamAppInstallLocation.String(), pszMod, szGameDir, SE_ARRAYSIZE( szGameDir ) );
 
 			if ( !SetupSearchPaths( szGameDir, true, true ) )
 			{
@@ -100,15 +100,15 @@ bool CItemTestApp::PreInit()
 
 	char szGameInfoParent[ MAX_PATH ] = "";
 
-	V_ExtractFilePath( pszGameInfoPath, szGameInfoParent, ARRAYSIZE( szGameInfoParent ) );
+	V_ExtractFilePath( pszGameInfoPath, szGameInfoParent, SE_ARRAYSIZE( szGameInfoParent ) );
 	char szPlatformDir[ MAX_PATH ] = "";
-	V_ComposeFileName( szGameInfoParent, "platform", szPlatformDir, ARRAYSIZE( szPlatformDir ) );
+	V_ComposeFileName( szGameInfoParent, "platform", szPlatformDir, SE_ARRAYSIZE( szPlatformDir ) );
 
 	g_pFullFileSystem->AddSearchPath( szPlatformDir, "PLATFORM" );
 
 	if ( !sSourceSDKPath.IsEmpty() )
 	{
-		V_ComposeFileName( sSourceSDKPath.String(), "platform", szPlatformDir, ARRAYSIZE( szPlatformDir ) );
+		V_ComposeFileName( sSourceSDKPath.String(), "platform", szPlatformDir, SE_ARRAYSIZE( szPlatformDir ) );
 		g_pFullFileSystem->AddSearchPath( szPlatformDir, "PLATFORM" );
 	}
 
@@ -572,7 +572,7 @@ void CItemTestApp::PrintHelp()
 	CUtlVector< char *, CUtlMemory< char *, int > > outStrings;
 	const char *pszSeparators[] = { " ", "\t", "\n", "\r", "\v", "\f" };
 
-	V_SplitString2( s_szDesc, pszSeparators, ARRAYSIZE( pszSeparators ), outStrings );
+	V_SplitString2( s_szDesc, pszSeparators, SE_ARRAYSIZE( pszSeparators ), outStrings );
 
 	for ( int j = 0; j < outStrings.Count(); ++j )
 	{
@@ -636,7 +636,7 @@ void CItemTestApp::PrintHelp()
 		sFmt.sprintf( "%%%ds", sLine.Length() + 1 );
 		sIndent.sprintf( sFmt, " " );
 
-		V_SplitString2( s_pszFlags[i][kFlagDesc], pszSeparators, ARRAYSIZE( pszSeparators ), outStrings );
+		V_SplitString2( s_pszFlags[i][kFlagDesc], pszSeparators, SE_ARRAYSIZE( pszSeparators ), outStrings );
 		for ( int j = 0; j < outStrings.Count(); ++j )
 		{
 			const int nSpaceLeft = nLineLength - sLine.Length();

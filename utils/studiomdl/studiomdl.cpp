@@ -713,7 +713,7 @@ void Cmd_BoneFlexDriver()
 	GetToken( false );
 	const char *ppszComponentTypeList[] = { "tx", "ty", "tz" };
 	int nBoneComponent = -1;
-	for ( int i = 0; i < ARRAYSIZE( ppszComponentTypeList ); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE( ppszComponentTypeList ); ++i )
 	{
 		if ( StringHasPrefix( token, ppszComponentTypeList[i] ) )
 		{
@@ -2085,10 +2085,10 @@ void AddBodyAttachments( s_source_t *pSource )
 		if ( bDuplicate )
 			continue;
 
-		if ( g_numattachments >= ARRAYSIZE( g_attachment ) )
+		if ( g_numattachments >= SE_ARRAYSIZE( g_attachment ) )
 		{
 			MdlWarning( "Too Many Attachments (Max %d), Ignoring Attachment %s:%s\n",
-				ARRAYSIZE( g_attachment ), pSource->filename, pSource->m_Attachments[i].name );
+				SE_ARRAYSIZE( g_attachment ), pSource->filename, pSource->m_Attachments[i].name );
 			continue;;
 		}
 
@@ -2648,7 +2648,7 @@ void ProcessSourceComment( s_source_t *psource, const char *pCommentString )
 	if ( char const *szSceneComment = StringAfterPrefix( pCommentString, "// SCENE=" ) )
 	{
 		char szScene[1024];
-		Q_strncpy( szScene, szSceneComment, ARRAYSIZE( szScene ) );
+		Q_strncpy( szScene, szSceneComment, SE_ARRAYSIZE( szScene ) );
 
 		Q_FixSlashes( szScene );
 
@@ -2801,8 +2801,8 @@ s_source_t *Load_Source( const char *name, const char *ext, bool reverse, bool i
 	constexpr char const * load_extensions[] = { "vrm", "smd", "sma", "phys", "vta", "obj", "dmx", "xml" };
 	int ( *load_procs[] )( s_source_t * ) = { Load_VRM, Load_SMD, Load_SMD, Load_SMD, Load_VTA, Load_OBJ, Load_DMX, Load_DMX };
 
-	Assert( ARRAYSIZE(load_extensions) == ARRAYSIZE(load_procs) );
-	for ( int kk = 0; kk < ARRAYSIZE( load_extensions ); ++ kk )
+	Assert( SE_ARRAYSIZE(load_extensions) == SE_ARRAYSIZE(load_procs) );
+	for ( int kk = 0; kk < SE_ARRAYSIZE( load_extensions ); ++ kk )
 	{
 		if ( ( !result && xext[0] == '\0' ) || Q_stricmp( xext, load_extensions[kk] ) == 0)
 		{
@@ -9143,7 +9143,7 @@ void ParseScript (void)
 
 		// Check all the commands we know about.
 		int i;
-		for ( i=0; i < ARRAYSIZE( g_Commands ); i++ )
+		for ( i=0; i < SE_ARRAYSIZE( g_Commands ); i++ )
 		{
 			if ( V_strieq( g_Commands[i].m_pName, token ) )
 			{
@@ -9151,7 +9151,7 @@ void ParseScript (void)
 				break;
 			}
 		}
-		if ( i == ARRAYSIZE( g_Commands ) )
+		if ( i == SE_ARRAYSIZE( g_Commands ) )
 		{
 			if( !g_bCreateMakefile )
 			{
@@ -10114,7 +10114,7 @@ int CStudioMDLApp::Main()
 	}
 	else if ( g_bMakeVsi )
 	{
-		Q_snprintf( g_path, ARRAYSIZE( g_path ), "%smodels/%s", gamedir, outname );
+		Q_snprintf( g_path, SE_ARRAYSIZE( g_path ), "%smodels/%s", gamedir, outname );
 		Main_MakeVsi();
 	}
 
@@ -10160,7 +10160,7 @@ bool WriteFileToDisk( const char *pFileName, const char *pPath, CUtlBuffer &buf 
 bool WriteBufferToFile( CUtlBuffer &buf, const char *szFilebase, const char *szExt )
 {
 	char szFilename[ 1024 ];
-	Q_snprintf( szFilename, ARRAYSIZE( szFilename ), "%s%s", szFilebase, szExt );
+	Q_snprintf( szFilename, SE_ARRAYSIZE( szFilename ), "%s%s", szFilebase, szExt );
 	return WriteFileToDisk( szFilename, NULL, buf );
 }
 
@@ -10173,7 +10173,7 @@ bool WriteBufferToFile( CUtlBuffer &buf, const char *szFilebase, const char *szE
 bool LoadBufferFromFile( CUtlBuffer &buffer, char const *szFilebase, char const *szExt, bool bError = true )
 {
 	char szFilename[1024];
-	Q_snprintf( szFilename, ARRAYSIZE( szFilename ), "%s%s", szFilebase, szExt );
+	Q_snprintf( szFilename, SE_ARRAYSIZE( szFilename ), "%s%s", szFilebase, szExt );
 
 	if ( g_pFullFileSystem->ReadFile( szFilename, NULL, buffer ) )
 		return true;

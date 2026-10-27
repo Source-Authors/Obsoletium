@@ -322,7 +322,7 @@ void CStatsSummary::UpdateStatsSummary()
 	{
 		winRatio = ((float)wins / (float)rounds) * 100.0f;
 	}
-	V_snwprintf(tempWNumString, ARRAYSIZE(tempWNumString), L"%.1f%%", winRatio);	
+	V_snwprintf(tempWNumString, SE_ARRAYSIZE(tempWNumString), L"%.1f%%", winRatio);	
 	SetDialogVariable("winratio", tempWNumString);
 
 	
@@ -334,7 +334,7 @@ void CStatsSummary::UpdateStatsSummary()
 	{
 		accuracy = ((float)hits / (float)shots) * 100.0f;
 	}
-	V_snwprintf(tempWNumString, ARRAYSIZE(tempWNumString), L"%.1f%%", accuracy);	
+	V_snwprintf(tempWNumString, SE_ARRAYSIZE(tempWNumString), L"%.1f%%", accuracy);	
 	SetDialogVariable("hitratio", tempWNumString);
 }
 
@@ -356,7 +356,7 @@ void CStatsSummary::UpdateKillHistory()
 	{
 		killDeathRatio = (float)kills / (float)deaths;
 	}
-	V_snwprintf(tempWNumString, ARRAYSIZE(tempWNumString), L"%.1f", killDeathRatio);	
+	V_snwprintf(tempWNumString, SE_ARRAYSIZE(tempWNumString), L"%.1f", killDeathRatio);	
 	SetDialogVariable("killdeathratio", tempWNumString);
 }
 //----------------------------------------------------------
@@ -408,7 +408,7 @@ void CStatsSummary::UpdateFavoriteWeaponData()
 				killsPerShot = (float)kills / (float)shots;
 			}
 			wchar_t tempWNumString[STAT_NUM_ARRAY_LENGTH];
-			V_snwprintf(tempWNumString, ARRAYSIZE(tempWNumString), L"%.1f", (killsPerShot));
+			V_snwprintf(tempWNumString, SE_ARRAYSIZE(tempWNumString), L"%.1f", (killsPerShot));
 			DisplayFormattedLabel("#GameUI_Stats_WeaponKillRatio", tempWNumString, "weaponkillratio");
 		}
 		else
@@ -468,7 +468,7 @@ void CStatsSummary::UpdateMapsData()
 			winRatio = ((float)wins / (float)rounds) * 100.0f;
 		}
 		wchar_t tempWNumString[STAT_NUM_ARRAY_LENGTH];
-		V_snwprintf(tempWNumString, ARRAYSIZE(tempWNumString), L"%.1f%%", winRatio);	
+		V_snwprintf(tempWNumString, SE_ARRAYSIZE(tempWNumString), L"%.1f%%", winRatio);	
 		DisplayFormattedLabel("#GameUI_Stats_MapWinRatio", tempWNumString, "mapwinratio");				
 	}
 	else
@@ -573,7 +573,7 @@ void CStatsSummary::UpdateLastMatchStats()
 	{
 		killDeathRatio = (float)kills / (float)deaths;
 	}	
-	V_snwprintf(tempWNumString, ARRAYSIZE(tempWNumString), L"%.1f", killDeathRatio);	
+	V_snwprintf(tempWNumString, SE_ARRAYSIZE(tempWNumString), L"%.1f", killDeathRatio);	
 	DisplayFormattedLabel("#GameUI_Stats_LastMatch_KDRatio", tempWNumString, "lastmatchkilldeathratio");		
 
 	//Calculate cost per kill
@@ -624,7 +624,7 @@ void CStatsSummary::UpdateLastMatchFavoriteWeaponStats()
 		{
 			accuracy = ((float)hits / (float)shots) * 100.0f;
 		}
-		V_snwprintf(tempWNumString, ARRAYSIZE(tempWNumString), L"%.1f%%", accuracy);
+		V_snwprintf(tempWNumString, SE_ARRAYSIZE(tempWNumString), L"%.1f%%", accuracy);
 		DisplayFormattedLabel("#GameUI_Stats_LastMatch_FavWeaponAccuracy", tempWNumString, "lastmatchfavweaponaccuracy");	
 	}
 	else

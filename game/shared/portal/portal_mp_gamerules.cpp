@@ -181,7 +181,7 @@ CPortalMPGameRules::CPortalMPGameRules()
 {
 #ifndef CLIENT_DLL
 	// Create the team managers
-	for ( int i = 0; i < ARRAYSIZE( sTeamNames ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( sTeamNames ); i++ )
 	{
 		CTeam *pTeam = static_cast<CTeam*>(CreateEntityByName( "team_manager" ));
 		pTeam->Init( sTeamNames[i], i );

@@ -320,7 +320,7 @@ CON_COMMAND_F( stats_preload, "Load stats with data ripe for getting achievmenet
 
 	StatsCollection_t& lifetimeStats = const_cast<StatsCollection_t&>(g_CSClientGameStats.GetLifetimeStats());
 
-	for ( int i = 0; i < ARRAYSIZE(statData); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE(statData); ++i )
 	{
 		CSStatType_t statId = statData[i].statId;
 		lifetimeStats[statId] = statData[i].value;
@@ -499,7 +499,7 @@ CON_COMMAND_F( stats_corrupt, "Load stats with corrupt values", FCVAR_DEVELOPMEN
 	};
 
 	StatsCollection_t& lifetimeStats = const_cast<StatsCollection_t&>(g_CSClientGameStats.GetLifetimeStats());
-	for ( int i = 0; i < ARRAYSIZE(badData); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE(badData); ++i )
 	{
 		CSStatType_t statId = badData[i].statId;
 		lifetimeStats[statId] = badData[i].value;

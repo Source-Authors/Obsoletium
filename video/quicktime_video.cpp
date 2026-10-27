@@ -59,7 +59,7 @@ VideoFileExtensionInfo_t s_QuickTimeExtensions[] =
 	{ ".mp4", VideoSystem::QUICKTIME,  VideoSystemFeature::FULL_PLAYBACK | VideoSystemFeature::FULL_ENCODE },
 };
 
-const int s_QuickTimeExtensionCount = ARRAYSIZE( s_QuickTimeExtensions );
+const int s_QuickTimeExtensionCount = SE_ARRAYSIZE( s_QuickTimeExtensions );
 
 const VideoSystemFeature_t	CQuickTimeVideoSubSystem::DEFAULT_FEATURE_SET = VideoSystemFeature::FULL_PLAYBACK | VideoSystemFeature::FULL_ENCODE;
 

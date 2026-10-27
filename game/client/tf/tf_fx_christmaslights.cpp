@@ -168,7 +168,7 @@ void CreateHolidayLight( const HolidayLightData_t &holidayLight )
 							   rgbaHolidayLightColors[ g_nHolidayLightColor ]->a() );
 
 		// Next color in the pattern
-		g_nHolidayLightColor = ( g_nHolidayLightColor + 1 ) % ARRAYSIZE( rgbaHolidayLightColors );
+		g_nHolidayLightColor = ( g_nHolidayLightColor + 1 ) % SE_ARRAYSIZE( rgbaHolidayLightColors );
 
 		// Animate if needed
 		pTemp->m_flFrameMax = modelinfo->GetModelFrameCount( pModel ) - 1;
@@ -185,8 +185,8 @@ void CreateHolidayLight( const HolidayLightData_t &holidayLight )
 		{
 			// Magic! Basically this makes the on/off cycle of each color different and offsets it by the segment index.
 			// That way it looks like a timed pattern but is also chaotic.
-			int nCycle = ( pTemp->hitSound + static_cast< int >( gpGlobals->curtime * 2.0f ) ) % ( pTemp->m_nHitboxSet + ARRAYSIZE( rgbaHolidayLightColors ) + 1 );
-			pTemp->SetRenderColorA( nCycle < ARRAYSIZE( rgbaHolidayLightColors ) ? 255 : 64 );
+			int nCycle = ( pTemp->hitSound + static_cast< int >( gpGlobals->curtime * 2.0f ) ) % ( pTemp->m_nHitboxSet + SE_ARRAYSIZE( rgbaHolidayLightColors ) + 1 );
+			pTemp->SetRenderColorA( nCycle < SE_ARRAYSIZE( rgbaHolidayLightColors ) ? 255 : 64 );
 		}
 
 		// Update the scale
@@ -206,7 +206,7 @@ void RopesHolidayLightColor( const CCommand &args )
 
 	int nLight = atoi( args[ 1 ] );
 
-	if ( nLight < 0 || nLight >= ARRAYSIZE( rgbaHolidayLightColors ) )
+	if ( nLight < 0 || nLight >= SE_ARRAYSIZE( rgbaHolidayLightColors ) )
 		return;
 
  	rgbaHolidayLightColors[ nLight ]->SetColor( atoi( args[ 2 ] ), atoi( args[ 3 ] ), atoi( args[ 4 ] ) );

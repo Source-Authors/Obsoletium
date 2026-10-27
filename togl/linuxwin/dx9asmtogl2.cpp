@@ -1918,7 +1918,7 @@ struct HighPrec
 	HighPrec()
 	{
 		memset(m_data, 0, sizeof(m_data));
-		m_nLowestNonZeroIndex = ARRAYSIZE(m_data);
+		m_nLowestNonZeroIndex = SE_ARRAYSIZE(m_data);
 	}
 
 	// Insert the bits from value into m_data, shifted in from the bottom (least
@@ -1940,16 +1940,16 @@ struct HighPrec
 
 		// Use an unsigned type so that negative numbers will become large,
 		// which makes the range checking below simpler.
-		unsigned highIndex = ARRAYSIZE(m_data) - 1 - bigShift;
+		unsigned highIndex = SE_ARRAYSIZE(m_data) - 1 - bigShift;
 		// Write the results to the data array. If the index is too large
 		// then that means that the data was shifted off the edge.
-		if ( (highIndex < ARRAYSIZE(m_data)) && ( resultHigh ) )
+		if ( (highIndex < SE_ARRAYSIZE(m_data)) && ( resultHigh ) )
 		{
 			m_data[highIndex] |= resultHigh;
 			m_nLowestNonZeroIndex = MIN( m_nLowestNonZeroIndex, highIndex );
 		}
 
-		if ( ( highIndex + 1 < ARRAYSIZE(m_data)) && ( resultLow ) )
+		if ( ( highIndex + 1 < SE_ARRAYSIZE(m_data)) && ( resultLow ) )
 		{
 			m_data[highIndex + 1] |= resultLow;
 			m_nLowestNonZeroIndex = MIN( m_nLowestNonZeroIndex, highIndex + 1 );
@@ -1964,16 +1964,16 @@ struct HighPrec
 	// in the most significant element of m_data, and so on.
 	void InsertTopBits(T value, int shiftAmount)
 	{
-		InsertLowBits(value, (ARRAYSIZE(m_data) + 1) * kWordShift - shiftAmount);
+		InsertLowBits(value, (SE_ARRAYSIZE(m_data) + 1) * kWordShift - shiftAmount);
 	}
 
 	// Return true if all elements of m_data are zero.
 	bool IsZero() const
 	{
-		bool bIsZero = ( m_nLowestNonZeroIndex == ARRAYSIZE(m_data) );
+		bool bIsZero = ( m_nLowestNonZeroIndex == SE_ARRAYSIZE(m_data) );
 
 #ifdef DEBUG
-		for (int i = 0; i < ARRAYSIZE(m_data); ++i)
+		for (int i = 0; i < SE_ARRAYSIZE(m_data); ++i)
 		{
 			if (m_data[i])
 			{
@@ -2000,8 +2000,8 @@ struct HighPrec
 		}
 #endif
 		
-		int nNewLowestNonZeroIndex = ARRAYSIZE(m_data);
-		for (int i = m_nLowestNonZeroIndex; i < ARRAYSIZE(m_data); ++i)
+		int nNewLowestNonZeroIndex = SE_ARRAYSIZE(m_data);
+		for (int i = m_nLowestNonZeroIndex; i < SE_ARRAYSIZE(m_data); ++i)
 		{
 			Product_t dividend = ((Product_t)remainder << kWordShift) + m_data[i];
 			Product_t result = dividend / divisor;
@@ -2009,7 +2009,7 @@ struct HighPrec
 
 			m_data[i] = T(result);
 
-			if ( ( result ) && ( nNewLowestNonZeroIndex == ARRAYSIZE(m_data) ) )
+			if ( ( result ) && ( nNewLowestNonZeroIndex == SE_ARRAYSIZE(m_data) ) )
 				nNewLowestNonZeroIndex = i;
 		}
 		m_nLowestNonZeroIndex = nNewLowestNonZeroIndex;
@@ -2473,7 +2473,7 @@ void D3DToGL::Handle_TEX( uint32 dwToken, bool bIsTexLDL )
 	DWORD dwSrc1Token = GetNextToken();
 	PrintParameterToString( dwSrc1Token, SRC_REGISTER, pSrc1Reg, sizeof( pSrc1Reg ), false, NULL );
 	
-	Assert( (dwSrc1Token & D3DSP_REGNUM_MASK) < ARRAYSIZE( m_dwSamplerTypes ) );
+	Assert( (dwSrc1Token & D3DSP_REGNUM_MASK) < SE_ARRAYSIZE( m_dwSamplerTypes ) );
 	uint32 nSamplerType = m_dwSamplerTypes[dwSrc1Token & D3DSP_REGNUM_MASK];
 	if ( nSamplerType == SAMPLER_TYPE_2D )
 	{
@@ -2877,7 +2877,7 @@ void D3DToGL::Handle_UnaryOp( uint32 nInstruction )
 void D3DToGL::WriteGLSLSamplerDefinitions()
 {
 	int nSamplersWritten = 0;
-	for ( int i=0; i < ARRAYSIZE( m_dwSamplerTypes ); i++ )
+	for ( int i=0; i < SE_ARRAYSIZE( m_dwSamplerTypes ); i++ )
 	{
 		if ( m_dwSamplerTypes[i] == SAMPLER_TYPE_2D )
 		{
@@ -2921,7 +2921,7 @@ void D3DToGL::WriteGLSLOutputVariableAssignments()
 			PrintToBuf( *m_pBufAttribCode, "\n// Now we're storing the oN variables from the output dcl_ statements back into their GLSL equivalents.\n" );
 		}
 				
-		for ( int i=0; i < ARRAYSIZE( m_DeclaredOutputs ); i++ )
+		for ( int i=0; i < SE_ARRAYSIZE( m_DeclaredOutputs ); i++ )
 		{
 			if ( m_DeclaredOutputs[i] == UNDECLARED_OUTPUT )
 				continue;
@@ -2967,7 +2967,7 @@ void D3DToGL::WriteGLSLInputVariableAssignments()
 	if ( m_bVertexShader )
 		return;
 		
-	for ( int i=0; i < ARRAYSIZE( m_DeclaredInputs ); i++ )
+	for ( int i=0; i < SE_ARRAYSIZE( m_DeclaredInputs ); i++ )
 	{
 		if ( m_DeclaredInputs[i] == UNDECLARED_INPUT )
 			continue;
@@ -3166,17 +3166,17 @@ int D3DToGL::TranslateShader( uint32* code, CUtlBuffer *pBufDisassembledCode, bo
 	m_bUseBindlessTexturing = ((options & D3DToGL_OptionUseBindlessTexturing) != 0);
 		
 	m_bUsedAtomicTempVar = false;
-	for ( int i=0; i < ARRAYSIZE( m_dwSamplerTypes ); i++ )
+	for ( int i=0; i < SE_ARRAYSIZE( m_dwSamplerTypes ); i++ )
 	{
 		m_dwSamplerTypes[i] = SAMPLER_TYPE_UNUSED;
 	}
 
-	for ( int i=0; i < ARRAYSIZE( m_DeclaredOutputs ); i++ )
+	for ( int i=0; i < SE_ARRAYSIZE( m_DeclaredOutputs ); i++ )
 	{
 		m_DeclaredOutputs[i] = UNDECLARED_OUTPUT;
 	}
 
-	for ( int i=0; i < ARRAYSIZE( m_DeclaredInputs ); i++ )
+	for ( int i=0; i < SE_ARRAYSIZE( m_DeclaredInputs ); i++ )
 	{
 		m_DeclaredInputs[i] = UNDECLARED_INPUT;
 	}

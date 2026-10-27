@@ -282,7 +282,7 @@ void CChannelGraphPanel::Paint()
 	// draw plotted graph
 	for ( int i = 0; i < nComponents; ++i )
 	{
-		Color &color = s_componentColors[ i % ARRAYSIZE( s_componentColors ) ];
+		Color &color = s_componentColors[ i % SE_ARRAYSIZE( s_componentColors ) ];
 		surface()->DrawSetColor( color );
 
 		int lastx = -1;

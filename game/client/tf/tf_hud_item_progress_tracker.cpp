@@ -114,7 +114,7 @@ void CItemAttributeProgressPanel::ApplySettings( KeyValues *inResourceData )
 		if ( !pLocalizedObjectiveName || !pLocalizedObjectiveName[0] )
 		{
 			// Couldn't localize it, just use it raw
-			GLocalizationProvider()->ConvertUTF8ToLocchar( pszDescriptionToken, loc_ItemDescription, ARRAYSIZE( loc_ItemDescription ) );
+			GLocalizationProvider()->ConvertUTF8ToLocchar( pszDescriptionToken, loc_ItemDescription, SE_ARRAYSIZE( loc_ItemDescription ) );
 		}
 		else
 		{

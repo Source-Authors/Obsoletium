@@ -1106,8 +1106,8 @@ impactdamagetable_t s_HunterImpactDamageTable =
 	s_HunterLinearTable,
 	s_HunterAngularTable,
 	
-	ARRAYSIZE(s_HunterLinearTable),
-	ARRAYSIZE(s_HunterAngularTable),
+	SE_ARRAYSIZE(s_HunterLinearTable),
+	SE_ARRAYSIZE(s_HunterAngularTable),
 
 	24*24,		// minimum linear speed squared
 	360*360,	// minimum angular speed squared (360 deg/s to cause spin/slice damage)

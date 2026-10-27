@@ -234,7 +234,7 @@ class CAchievementHL2FindAllLambdas : public CBaseAchievement
 		};		
 		SetFlags( ACH_HAS_COMPONENTS | ACH_LISTEN_COMPONENT_EVENTS | ACH_SAVE_GLOBAL );
 		m_pszComponentNames = szComponents;
-		m_iNumComponents = ARRAYSIZE( szComponents );
+		m_iNumComponents = SE_ARRAYSIZE( szComponents );
 		SetComponentPrefix( "HL2_LAMDACACHE" );
 		SetGoal( m_iNumComponents );
 	}

@@ -875,7 +875,7 @@ public:
 				if ( nPercent < 100 )
 				{
 					wchar_t wszNum[16] = L"";
-					V_snwprintf( wszNum, ARRAYSIZE( wszNum ), L"%i", nPercent );
+					V_snwprintf( wszNum, SE_ARRAYSIZE( wszNum ), L"%i", nPercent );
 					g_pVGuiLocalize->ConstructString_safe( wszLocalized, g_pVGuiLocalize->Find( "#TR_Progress" ), 1, wszNum );
 				}
 				else
@@ -1383,8 +1383,8 @@ public:
 			wchar_t wszLocalized[256];
 			wchar_t wszNum1[16]=L"";
 			wchar_t wszNum2[16]=L"";
-			V_snwprintf( wszNum1, ARRAYSIZE( wszNum1 ), L"%i", pCurMapInfo->m_aPlayerRange[0] );
-			V_snwprintf( wszNum2, ARRAYSIZE( wszNum2 ), L"%i", pCurMapInfo->m_aPlayerRange[1] );
+			V_snwprintf( wszNum1, SE_ARRAYSIZE( wszNum1 ), L"%i", pCurMapInfo->m_aPlayerRange[0] );
+			V_snwprintf( wszNum2, SE_ARRAYSIZE( wszNum2 ), L"%i", pCurMapInfo->m_aPlayerRange[1] );
 			g_pVGuiLocalize->ConstructString_safe( wszLocalized, g_pVGuiLocalize->Find( "#TF_OfflinePractice_NumPlayers" ), 2, wszNum1, wszNum2 );
 			pSuggestedPlayerCountLabel->SetText( wszLocalized );
 		}
@@ -1392,7 +1392,7 @@ public:
 		m_pDifficultyComboBox = dynamic_cast< ComboBox * >( FindChildByName( "DifficultyComboBox" ) );
 		if ( m_pDifficultyComboBox )
 		{
-			for ( int i = 0; i < ARRAYSIZE( g_pDifficultyModes ); ++i )
+			for ( int i = 0; i < SE_ARRAYSIZE( g_pDifficultyModes ); ++i )
 			{
 				m_pDifficultyComboBox->AddItem( g_pDifficultyModes[i], NULL );  
 			}
@@ -1437,7 +1437,7 @@ public:
 		{
 			if ( m_pDifficultyComboBox )
 			{
-				m_pDifficultyComboBox->SilentActivateItemByRow( ( m_pDifficultyComboBox->GetActiveItem() + 1 ) % ARRAYSIZE( g_pDifficultyModes ) );
+				m_pDifficultyComboBox->SilentActivateItemByRow( ( m_pDifficultyComboBox->GetActiveItem() + 1 ) % SE_ARRAYSIZE( g_pDifficultyModes ) );
 			}
 		}
 		else if ( nButtonCode == KEY_XBUTTON_UP || 
@@ -1623,7 +1623,7 @@ private:
 				if ( pDifficultyString )
 				{
 					static const char* difficulties [] = { "easy", "normal", "hard", "expert" };
-					for ( int i = 0, n = ARRAYSIZE(difficulties); i < n; ++i )
+					for ( int i = 0, n = SE_ARRAYSIZE(difficulties); i < n; ++i )
 					{
 						if ( Q_strcmp( difficulties[i], pDifficultyString ) == 0)
 						{

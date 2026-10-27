@@ -423,12 +423,12 @@ void CHL1MPClientScoreBoardDialog::UpdateTeamInfo()
 
 			if ( !HL1MPRules() || HL1MPRules()->IsTeamplay() == false )
 			{
-				_snwprintf( wNumPlayers, ARRAYSIZE(wNumPlayers), L"%i", iNumPlayersInGame );
+				_snwprintf( wNumPlayers, SE_ARRAYSIZE(wNumPlayers), L"%i", iNumPlayersInGame );
 
 #ifdef WIN32
-				_snwprintf( name, ARRAYSIZE(name), L"%s", g_pVGuiLocalize->Find("#ScoreBoard_Deathmatch") );
+				_snwprintf( name, SE_ARRAYSIZE(name), L"%s", g_pVGuiLocalize->Find("#ScoreBoard_Deathmatch") );
 #else
-				_snwprintf( name, ARRAYSIZE(name), L"%S", g_pVGuiLocalize->Find("#ScoreBoard_Deathmatch") );
+				_snwprintf( name, SE_ARRAYSIZE(name), L"%S", g_pVGuiLocalize->Find("#ScoreBoard_Deathmatch") );
 #endif
 				
 				teamName = name;
@@ -444,7 +444,7 @@ void CHL1MPClientScoreBoardDialog::UpdateTeamInfo()
 			}
 			else
 			{
-				_snwprintf(wNumPlayers, ARRAYSIZE(wNumPlayers), L"%i", team->Get_Number_Players());
+				_snwprintf(wNumPlayers, SE_ARRAYSIZE(wNumPlayers), L"%i", team->Get_Number_Players());
 
 				if (!teamName && team)
 				{

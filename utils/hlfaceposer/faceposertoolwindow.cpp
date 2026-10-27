@@ -189,7 +189,7 @@ static ToolTranslate s_ToolTranslate[]=
 
 static bool TranslateToolPos( char const *toolname, int workspacew, int workspaceh, int& x, int& y, int &w, int &h, bool& locked )
 {
-	int c = ARRAYSIZE( s_ToolTranslate );
+	int c = SE_ARRAYSIZE( s_ToolTranslate );
 
 	for ( int i = 0; i < c; ++i )
 	{

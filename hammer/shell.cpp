@@ -248,7 +248,7 @@ bool CShell::EntityRotateIncremental(const char *pszCommand, const char *pszArgu
 			pBuffer = ParseFile( pBuffer, token, NULL );
 			if ( pBuffer )
 			{
-				Q_strncpy( szArgs[arg], token, ARRAYSIZE(szArgs[arg]) );
+				Q_strncpy( szArgs[arg], token, SE_ARRAYSIZE(szArgs[arg]) );
 				arg++;
 			}
 		}
@@ -297,7 +297,7 @@ bool CShell::EntitySetKeyValue(const char *pszCommand, const char *pszArguments)
 			pBuffer = ParseFile( pBuffer, token, NULL );
 			if ( pBuffer )
 			{
-				Q_strncpy( szArgs[arg], token, ARRAYSIZE(szArgs[arg]) );
+				Q_strncpy( szArgs[arg], token, SE_ARRAYSIZE(szArgs[arg]) );
 				arg++;
 			}
 		}

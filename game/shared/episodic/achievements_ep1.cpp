@@ -29,7 +29,7 @@ protected:
 		// any model that passed previous filters and begins with "props_vehicles" is a physics car
 		const char *pszName = GetModelName( pInflictor );
 		const char szPrefix[] = "props_vehicles";
-		if ( 0 == Q_strncmp( pszName, szPrefix, ARRAYSIZE( szPrefix ) - 1 ) )
+		if ( 0 == Q_strncmp( pszName, szPrefix, SE_ARRAYSIZE( szPrefix ) - 1 ) )
 		{
 			IncrementCount();
 		}

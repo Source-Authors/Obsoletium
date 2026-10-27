@@ -339,7 +339,7 @@ void CStorePricePanel::SetPriceText( int iPrice, const char *pVariable, const ec
 	}
 
 	wchar_t wzLocalizedPrice[ kLocalizedPriceSizeInChararacters ];
-	MakeMoneyString( wzLocalizedPrice, ARRAYSIZE( wzLocalizedPrice ), iPrice, EconUI()->GetStorePanel()->GetCurrency() );
+	MakeMoneyString( wzLocalizedPrice, SE_ARRAYSIZE( wzLocalizedPrice ), iPrice, EconUI()->GetStorePanel()->GetCurrency() );
 	
 	if ( pEntry->m_bIsMarketItem )
 	{	
@@ -442,7 +442,7 @@ void CStorePricePanel::SetItem( const econ_store_entry_t *pEntry )
 			// set the discount and size
 			float flDiscountPercentage = 1.0f - ( float(unPrice) / float(unBasePrice) );
 			wchar_t wszDiscount[16];
-			_snwprintf( wszDiscount, ARRAYSIZE( wszDiscount ), L"-%.0f%%", flDiscountPercentage * 100.0f );
+			_snwprintf( wszDiscount, SE_ARRAYSIZE( wszDiscount ), L"-%.0f%%", flDiscountPercentage * 100.0f );
 			m_pDiscount->SetText( wszDiscount );
 
 			m_pDiscount->SetVisible( true );
@@ -998,7 +998,7 @@ void CStorePage::PerformLayout( void )
 		AssertMsg( eCurrency >= k_ECurrencyUSD && eCurrency < k_ECurrencyMax, "Invalid currency!" );
 
 		int iPriceThreshold = pPromotion->m_rgusPriceThreshold[ eCurrency ];
-		MakeMoneyString( wszPriceThreshold, ARRAYSIZE( wszPriceThreshold ), iPriceThreshold, EconUI()->GetStorePanel()->GetCurrency() );
+		MakeMoneyString( wszPriceThreshold, SE_ARRAYSIZE( wszPriceThreshold ), iPriceThreshold, EconUI()->GetStorePanel()->GetCurrency() );
 		bool bIsFreeTrial = false;
 #ifdef TF_CLIENT_DLL
 		bIsFreeTrial = IsFreeTrialAccount();
@@ -1826,7 +1826,7 @@ void CStorePage::UpdateSelectionInfoPanel( void )
 
 				wchar_t wzLocalizedPrice[ kLocalizedPriceSizeInChararacters ];
 				int iPrice = pEntry->GetCurrentPrice( EconUI()->GetStorePanel()->GetCurrency() );
-				MakeMoneyString( wzLocalizedPrice, ARRAYSIZE( wzLocalizedPrice ), iPrice, EconUI()->GetStorePanel()->GetCurrency() );
+				MakeMoneyString( wzLocalizedPrice, SE_ARRAYSIZE( wzLocalizedPrice ), iPrice, EconUI()->GetStorePanel()->GetCurrency() );
 				SetDialogVariable("selectionprice", wzLocalizedPrice );
 
 				if ( m_pAddToCartButtonPanel )
@@ -2097,7 +2097,7 @@ void CStorePage::UpdateCart( void )
 	// Update the item count
 	wchar_t wszCount[16];
 	wchar_t wzLocalized[512];
-	_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", pCart->GetTotalItems() );
+	_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", pCart->GetTotalItems() );
 	g_pVGuiLocalize->ConstructString_safe( wzLocalized, g_pVGuiLocalize->Find( "#Store_Cart" ), 1, wszCount );
 	SetDialogVariable("storecart", wzLocalized );
 }
@@ -2118,7 +2118,7 @@ void CStorePage::UpdateBackpackLabel( void )
 			  iCurItemCount = InventoryManager()->GetLocalInventory()->GetItemCount();
 	AssertMsg( iMaxItemCount - iCurItemCount >= 0, "You have a negative number of backpack slots available - fix me!" );
 	const int iBaseFreeSlots = MAX( 0, iMaxItemCount - iCurItemCount );
-	_snwprintf( wszBackpackSlotCount, ARRAYSIZE( wszBackpackSlotCount ), L"%d", iBaseFreeSlots );
+	_snwprintf( wszBackpackSlotCount, SE_ARRAYSIZE( wszBackpackSlotCount ), L"%d", iBaseFreeSlots );
 
 	// Breaking out bundles into individual items, etc., how many backpack slots will the
 	// items in our cart take up?
@@ -2131,13 +2131,13 @@ void CStorePage::UpdateBackpackLabel( void )
 	else
 	{
 		wchar_t wszCartCount[16];
-		_snwprintf( wszCartCount, ARRAYSIZE( wszCartCount ), L"%d", iItemsInCart );
+		_snwprintf( wszCartCount, SE_ARRAYSIZE( wszCartCount ), L"%d", iItemsInCart );
 
 #if defined( TF_CLIENT_DLL )
 		if ( IsFreeTrialAccount() )
 		{
 			wchar_t wszUpgradeSlotCount[16];
-			_snwprintf( wszUpgradeSlotCount, ARRAYSIZE( wszUpgradeSlotCount ), L"%d", DEFAULT_NUM_BACKPACK_SLOTS - DEFAULT_NUM_BACKPACK_SLOTS_FREE_TRIAL_ACCOUNT );
+			_snwprintf( wszUpgradeSlotCount, SE_ARRAYSIZE( wszUpgradeSlotCount ), L"%d", DEFAULT_NUM_BACKPACK_SLOTS - DEFAULT_NUM_BACKPACK_SLOTS_FREE_TRIAL_ACCOUNT );
 
 			// We're a free trial account so we show the number of backpack slots we really have,
 			// the number of slots we get as a bonus when purchasing, and then the number of items

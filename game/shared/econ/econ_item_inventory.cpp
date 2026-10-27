@@ -937,7 +937,7 @@ void CInventoryManager::AcknowledgeItem ( CEconItemView *pItem, bool bMoveToBack
 	SetAckedByClient( pItem );
 
 	int iMethod = GetUnacknowledgedReason( pItem->GetInventoryPosition() ) - 1;
-	if ( iMethod >= ARRAYSIZE( g_pszItemPickupMethodStringsUnloc ) || iMethod < 0 )
+	if ( iMethod >= SE_ARRAYSIZE( g_pszItemPickupMethodStringsUnloc ) || iMethod < 0 )
 		iMethod = 0;
 	EconUI()->Gamestats_ItemTransaction( IE_ITEM_RECEIVED, pItem, g_pszItemPickupMethodStringsUnloc[iMethod] );
 
@@ -1208,7 +1208,7 @@ const char *CInventoryManager::PersonaName_Get( uint32 unAccountID )
 					pszName = steamapicontext->SteamFriends()->GetFriendPersonaName( steamID );
 					Assert( pszName ); // Guaranteed by the steam api
 
-					if ( Q_strncmp( pszName, "[unknown]", ARRAYSIZE( "[unknown]" ) ) != 0 )
+					if ( Q_strncmp( pszName, "[unknown]", SE_ARRAYSIZE( "[unknown]" ) ) != 0 )
 					{
 						m_mapPersonaNamesCache.InsertOrReplace( unAccountID, pszName );
 						return pszName;
@@ -1228,7 +1228,7 @@ const char *CInventoryManager::PersonaName_Get( uint32 unAccountID )
 					pszName = steamapicontext->SteamFriends()->GetFriendPersonaName( steamID );
 					Assert( pszName ); // Guaranteed by the steam api
 
-					if ( Q_strncmp( pszName, "[unknown]", ARRAYSIZE( "[unknown]" ) ) != 0 )
+					if ( Q_strncmp( pszName, "[unknown]", SE_ARRAYSIZE( "[unknown]" ) ) != 0 )
 					{
 						m_mapPersonaNamesCache.InsertOrReplace( unAccountID, pszName );
 						return pszName;

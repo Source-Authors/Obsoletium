@@ -301,9 +301,9 @@ void FX_FireBullets( CTFWeaponBase *pWpn, int iPlayer, const Vector &vecOrigin, 
 		if ( bFixedSpread )
 		{
 			int iSpread = iBullet;
-			while ( iSpread >= ARRAYSIZE(g_vecFixedWpnSpreadPellets) )
+			while ( iSpread >= SE_ARRAYSIZE(g_vecFixedWpnSpreadPellets) )
 			{
-				iSpread -= ARRAYSIZE(g_vecFixedWpnSpreadPellets);
+				iSpread -= SE_ARRAYSIZE(g_vecFixedWpnSpreadPellets);
 			}
 			float flScalar = 0.5;
 			x = g_vecFixedWpnSpreadPellets[iSpread].x * flScalar;

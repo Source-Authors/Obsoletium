@@ -201,7 +201,7 @@ void CMerasmus::PrecacheMerasmus()
 	PrecacheGibsForModel( model );
 
 	// precache disguise prop list
-	for ( int i=0; i<ARRAYSIZE( s_pszDisguiseProps ); ++i )
+	for ( int i=0; i<SE_ARRAYSIZE( s_pszDisguiseProps ); ++i )
 	{
 		PrecacheModel( s_pszDisguiseProps[i] );
 	}
@@ -735,7 +735,7 @@ CTFWeaponBaseGrenadeProj* CMerasmus::CreateMerasmusGrenade( const Vector& vPosit
 
 const char* CMerasmus::GetRandomPropModelName()
 {
-	int which = RandomInt( 0, ARRAYSIZE( s_pszDisguiseProps ) - 1 );
+	int which = RandomInt( 0, SE_ARRAYSIZE( s_pszDisguiseProps ) - 1 );
 	return s_pszDisguiseProps[ which ];
 }
 

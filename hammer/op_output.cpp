@@ -1048,7 +1048,7 @@ BOOL COP_Output::OnInitDialog(void)
 		CAnchorDef( IDC_DELETE, k_eSimpleAnchorBottomSide ),
 		CAnchorDef( IDC_SHOWHIDDENTARGETS, k_eSimpleAnchorBottomRight )		
 	};
-	m_AnchorMgr.Init( GetSafeHwnd(), anchorDefs, ARRAYSIZE( anchorDefs ) );
+	m_AnchorMgr.Init( GetSafeHwnd(), anchorDefs, SE_ARRAYSIZE( anchorDefs ) );
 
 	// Set the last state this was at.
 	m_ctlShowHiddenTargetsAsBroken.SetCheck( ShouldShowHiddenTargets() );

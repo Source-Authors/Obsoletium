@@ -744,7 +744,7 @@ void CCharInfoLoadoutSubPanel::PerformLayout( void )
 	m_bClassLayoutDirty = false;
 
 	// Now Layout the class images. 
-	for ( int iPanel = 0; iPanel < ARRAYSIZE( g_nLoadoutClassOrder ); iPanel++ )
+	for ( int iPanel = 0; iPanel < SE_ARRAYSIZE( g_nLoadoutClassOrder ); iPanel++ )
 	{
 		int i = g_nLoadoutClassOrder[iPanel];
 
@@ -784,7 +784,7 @@ void CCharInfoLoadoutSubPanel::PerformLayout( void )
 	// cached pos might have come from the keyboard.
 	if( x < 0 )
 		vgui::input()->GetCursorPos(x, y);
-	for ( int iPanel = 0; iPanel < ARRAYSIZE( g_nLoadoutClassOrder ); iPanel++ )
+	for ( int iPanel = 0; iPanel < SE_ARRAYSIZE( g_nLoadoutClassOrder ); iPanel++ )
 	{
 		int i = g_nLoadoutClassOrder[iPanel];
 		m_pClassButtons[i]->SetArmed( false );
@@ -798,7 +798,7 @@ void CCharInfoLoadoutSubPanel::PerformLayout( void )
 		}
 	}
 
-	if ( iBestButton >= 0 && iBestButton < ARRAYSIZE( m_pClassButtons ) )
+	if ( iBestButton >= 0 && iBestButton < SE_ARRAYSIZE( m_pClassButtons ) )
 	{
 		m_pClassButtons[iBestButton]->SetArmed( true );
 
@@ -848,7 +848,7 @@ void CCharInfoLoadoutSubPanel::UpdateLabelFromClass( int nClass )
 	else
 	{
 		wchar_t wzCount[10];
-		_snwprintf( wzCount, ARRAYSIZE( wzCount ), L"%d", iNumItems );
+		_snwprintf( wzCount, SE_ARRAYSIZE( wzCount ), L"%d", iNumItems );
 		wchar_t	wTemp[32];
 		g_pVGuiLocalize->ConstructString_safe( wTemp, g_pVGuiLocalize->Find("ItemsFoundShort"), 1, wzCount );
 		m_pItemsLabel->SetText( wTemp );
@@ -901,7 +901,7 @@ void CCharInfoLoadoutSubPanel::UpdateLabelFromSubButton( int nButton )
 			else
 			{
 				wchar_t wzCount[10];
-				_snwprintf( wzCount, ARRAYSIZE( wzCount ), L"%d", iNumItems );
+				_snwprintf( wzCount, SE_ARRAYSIZE( wzCount ), L"%d", iNumItems );
 				wchar_t	wTemp[32];
 				g_pVGuiLocalize->ConstructString_safe( wTemp, g_pVGuiLocalize->Find("Loadout_OpenBackpackDesc"), 1, wzCount );
 				m_pItemsLabel->SetText( wTemp );
@@ -1095,7 +1095,7 @@ void CCharInfoLoadoutSubPanel::MoveCharacterSelection( int nDirection )
 
 	if ( m_iLabelSetToClass != -1 )
 	{
-		for ( int i = 0; i < ARRAYSIZE( g_nLoadoutClassOrder ); i++ )
+		for ( int i = 0; i < SE_ARRAYSIZE( g_nLoadoutClassOrder ); i++ )
 		{
 			if ( m_iLabelSetToClass == g_nLoadoutClassOrder[ i ] )
 			{
@@ -1108,15 +1108,15 @@ void CCharInfoLoadoutSubPanel::MoveCharacterSelection( int nDirection )
 
 		if ( nCurrent < 0 )
 		{
-			nCurrent = ARRAYSIZE( g_nLoadoutClassOrder ) - 1;
+			nCurrent = SE_ARRAYSIZE( g_nLoadoutClassOrder ) - 1;
 		}
-		else if ( nCurrent >= ARRAYSIZE( g_nLoadoutClassOrder ) )
+		else if ( nCurrent >= SE_ARRAYSIZE( g_nLoadoutClassOrder ) )
 		{
 			nCurrent = 0;
 		}
 	}
 
-	for ( int i = 0; i < ARRAYSIZE( g_nLoadoutClassOrder ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( g_nLoadoutClassOrder ); i++ )
 	{
 		m_pClassButtons[ g_nLoadoutClassOrder[ i ] ]->SetArmed( false );
 	}
@@ -1229,7 +1229,7 @@ void CCharInfoLoadoutSubPanel::OnKeyCodePressed(vgui::KeyCode code)
 			m_pClassLabel->SetVisible( false );
 			m_pItemsLabel->SetVisible( false );
 
-			for ( int iPanel = 0; iPanel < ARRAYSIZE( g_nLoadoutClassOrder ); iPanel++ )
+			for ( int iPanel = 0; iPanel < SE_ARRAYSIZE( g_nLoadoutClassOrder ); iPanel++ )
 			{
 				int i = g_nLoadoutClassOrder[iPanel];
 				m_pClassButtons[i]->SetArmed( false );

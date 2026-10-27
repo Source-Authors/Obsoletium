@@ -125,7 +125,7 @@ bool Replay_IsSupportedModAndPlatform()
 	if ( !IsPC() )
 		return false;
 
-	int nNumSupportedReplayGames = ARRAYSIZE( s_pSupportedReplayGames );
+	int nNumSupportedReplayGames = SE_ARRAYSIZE( s_pSupportedReplayGames );
 	for ( int i = 0; i < nNumSupportedReplayGames; ++i )
 	{
 		const char *pCurGame = s_pSupportedReplayGames[ i ];

@@ -806,7 +806,7 @@ public:
 		};
 		m_pszPlayerMethod = pKVItem->GetString( "get_player" );
 		bool bIsValidMethod = false;
-		for ( int i=0; i<ARRAYSIZE( s_pszValidGetMethod ); ++i )
+		for ( int i=0; i<SE_ARRAYSIZE( s_pszValidGetMethod ); ++i )
 		{
 			if ( FStrEq( m_pszPlayerMethod, s_pszValidGetMethod[i] ) )
 			{
@@ -2056,7 +2056,7 @@ static const char *s_loadout_position_names[] =
 	"LOADOUT_POSITION_BUILDING2",
 #endif // STAGING_ONLY
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( s_loadout_position_names ) == CLASS_LOADOUT_POSITION_COUNT );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( s_loadout_position_names ) == CLASS_LOADOUT_POSITION_COUNT );
 
 
 //-----------------------------------------------------------------------------
@@ -2107,7 +2107,7 @@ public:
 		GetValidParamsKeyFromEvent( "loadout_key", GetConditionName(), m_pszEventName, pRequiredKeys );
 
 		KeyValues *pLoadoutPositions = new KeyValues( "value" );
-		int iLoadoutPositionCount = ARRAYSIZE( s_loadout_position_names );
+		int iLoadoutPositionCount = SE_ARRAYSIZE( s_loadout_position_names );
 		for ( int i=0; i<iLoadoutPositionCount; ++i )
 		{
 			const char *pszLoadoutPosition = s_loadout_position_names[i];
@@ -2129,7 +2129,7 @@ public:
 private:
 	loadout_positions_t GetLoadoutPositionByName( const char *pszLoadoutPositionName )
 	{
-		int iLoadoutPositionCount = ARRAYSIZE( s_loadout_position_names );
+		int iLoadoutPositionCount = SE_ARRAYSIZE( s_loadout_position_names );
 		for ( int i=0; i<iLoadoutPositionCount; ++i )
 		{
 			if ( FStrEq( pszLoadoutPositionName, s_loadout_position_names[i] ) )

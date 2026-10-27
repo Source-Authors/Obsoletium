@@ -37,7 +37,7 @@ public:
 
 CSocketInfo                g_Infos[132];
 CRITICAL_SECTION           g_CS, g_PrintCS;
-HANDLE                     g_hThreads[ARRAYSIZE( g_Infos )];
+HANDLE                     g_hThreads[SE_ARRAYSIZE( g_Infos )];
 bool                       g_bShouldExit = false;
 CUtlLinkedList< int, int > g_ListenPorts;
 
@@ -240,7 +240,7 @@ int main( int argc, char *argv[] )
 
 	SetPriorityClass( GetCurrentProcess(), IDLE_PRIORITY_CLASS );
 
-	for ( int i = 0; i < ARRAYSIZE( g_Infos ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( g_Infos ); i++ )
 	{
 		DWORD dwThreadID = 0;
 		g_hThreads[i] = CreateThread(
@@ -259,7 +259,7 @@ int main( int argc, char *argv[] )
 
 	g_bShouldExit = true;
 
-	HANDLE hZeroArray[ARRAYSIZE( g_Infos )];
+	HANDLE hZeroArray[SE_ARRAYSIZE( g_Infos )];
 	memset( hZeroArray, 0, sizeof( hZeroArray ) );
 
 	while ( memcmp( hZeroArray, g_hThreads, sizeof( hZeroArray ) ) != 0 )

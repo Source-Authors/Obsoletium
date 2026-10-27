@@ -99,7 +99,7 @@ CCSWeaponInfo g_EquipmentInfo[MAX_EQUIPMENT];
 
 void PrepareEquipmentInfo( void )
 {
-	memset( g_EquipmentInfo, 0, ARRAYSIZE( g_EquipmentInfo ) );
+	memset( g_EquipmentInfo, 0, SE_ARRAYSIZE( g_EquipmentInfo ) );
 
 	g_EquipmentInfo[2].SetWeaponPrice( CSGameRules()->GetBlackMarketPriceForWeapon( WEAPON_KEVLAR ) );
 	g_EquipmentInfo[2].SetDefaultPrice( KEVLAR_PRICE );
@@ -165,7 +165,7 @@ CCSWeaponInfo * GetWeaponInfo( CSWeaponID weaponID )
 //--------------------------------------------------------------------------------------------------------
 const char* WeaponClassAsString( CSWeaponType weaponType )
 {
-	for ( int i = 0; i < ARRAYSIZE(s_weaponTypeInfo); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE(s_weaponTypeInfo); ++i )
 	{
 		if ( s_weaponTypeInfo[i].type == weaponType )
 		{
@@ -180,7 +180,7 @@ const char* WeaponClassAsString( CSWeaponType weaponType )
 //--------------------------------------------------------------------------------------------------------
 CSWeaponType WeaponClassFromString( const char* weaponType )
 {
-	for ( int i = 0; i < ARRAYSIZE(s_weaponTypeInfo); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE(s_weaponTypeInfo); ++i )
 	{
 		if ( V_strieq( s_weaponTypeInfo[i].name, weaponType ) )
 		{
@@ -217,7 +217,7 @@ CSWeaponType WeaponClassFromWeaponID( CSWeaponID weaponID )
 //--------------------------------------------------------------------------------------------------------
 const char * WeaponIdAsString( CSWeaponID weaponID )
 {
-	for ( int i = 0; i < ARRAYSIZE(s_weaponNameInfo); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE(s_weaponNameInfo); ++i )
 	{
 		if (s_weaponNameInfo[i].id == weaponID )
 			return s_weaponNameInfo[i].name;
@@ -230,7 +230,7 @@ const char * WeaponIdAsString( CSWeaponID weaponID )
 //--------------------------------------------------------------------------------------------------------
 CSWeaponID WeaponIdFromString( const char *szWeaponName )
 {
-	for ( int i = 0; i < ARRAYSIZE(s_weaponNameInfo); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE(s_weaponNameInfo); ++i )
 	{
 		if ( Q_stricmp(s_weaponNameInfo[i].name, szWeaponName) == 0 )
 			return s_weaponNameInfo[i].id;

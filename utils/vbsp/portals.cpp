@@ -1047,7 +1047,7 @@ int Convex2D( Vector2D const *pPoints, int nPoints, int *indices, int nMaxIndice
 
 	// If we don't collapse the points into a unique set, we can loop around forever
 	// and max out nMaxIndices.
-	nPoints = FindUniquePoints( pPoints, nPoints, indexMap, ARRAYSIZE( indexMap ), 0.1f );
+	nPoints = FindUniquePoints( pPoints, nPoints, indexMap, SE_ARRAYSIZE( indexMap ), 0.1f );
 	memset( touched, 0, nPoints*sizeof(touched[0]) );
 
 	// Find the (lower) left side.

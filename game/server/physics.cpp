@@ -804,7 +804,7 @@ static void UpdateEntityPenetrationFlag( CBaseEntity *pEntity, bool isPenetratin
 	if ( !pEntity )
 		return;
 	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int count = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+	int count = pEntity->VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 	for ( int i = 0; i < count; i++ )
 	{
 		if ( !pList[i]->IsStatic() )
@@ -1232,7 +1232,7 @@ void PhysGetMassCenterOverride( CBaseEntity *pEntity, vcollide_t *pCollide, soli
 float PhysGetEntityMass( CBaseEntity *pEntity )
 {
 	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int physCount = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+	int physCount = pEntity->VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 	float otherMass = 0;
 	for ( int i = 0; i < physCount; i++ )
 	{
@@ -1347,7 +1347,7 @@ static void OutputVPhysicsDebugInfo( CBaseEntity *pEntity )
 		}
 
 		IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-		int physCount = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+		int physCount = pEntity->VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 		if ( physCount )
 		{
 			if ( physCount > 1 )
@@ -1923,7 +1923,7 @@ void PhysForceEntityToSleep( CBaseEntity *pEntity, IPhysicsObject *pObject )
 	DevMsg(2, "Putting entity to sleep: %s\n", pEntity->GetClassname() );
 	MEM_ALLOC_CREDIT();
 	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int physCount = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+	int physCount = pEntity->VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 	for ( int i = 0; i < physCount; i++ )
 	{
 		PhysForceClearVelocity( pList[i] );
@@ -2385,7 +2385,7 @@ intp CCollisionEvent::AddDamageInflictor( IPhysicsObject *pInflictorPhysics, flo
 		if ( pEntity )
 		{
 			IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-			int physCount = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+			int physCount = pEntity->VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 			if ( physCount > 1 )
 			{
 				intp currentIndex = addIndex;
@@ -2469,7 +2469,7 @@ void CCollisionEvent::EndTouch( IPhysicsObject *pObject1, IPhysicsObject *pObjec
 
 	// contact point deleted, but entities are still touching?
 	IPhysicsObject *list[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int count = pEntity1->VPhysicsGetObjectList( list, ARRAYSIZE(list) );
+	int count = pEntity1->VPhysicsGetObjectList( list, SE_ARRAYSIZE(list) );
 
 	int contactCount = 0;
 	for ( int i = 0; i < count; i++ )
@@ -2788,7 +2788,7 @@ void PhysCallbackRemove(IServerNetworkable *pRemove)
 void PhysSetEntityGameFlags( CBaseEntity *pEntity, unsigned short flags )
 {
 	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int count = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+	int count = pEntity->VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 	for ( int i = 0; i < count; i++ )
 	{
 		PhysSetGameFlags( pList[i], flags );

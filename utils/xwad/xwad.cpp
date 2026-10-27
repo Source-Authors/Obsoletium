@@ -1097,7 +1097,7 @@ int main( int argc, char **argv )
 				if ( !( findData.attrib & _A_SUBDIR ) )
 				{
 					char fullFilename[512];
-					snprintf( fullFilename, ARRAYSIZE( fullFilename ), "%s\\%s", prefix,
+					snprintf( fullFilename, SE_ARRAYSIZE( fullFilename ), "%s\\%s", prefix,
 					          findData.name );
 
 					ProcessWadFile( fullFilename, pBaseDir, pSubDir, pOnlyTex, bVTex );
@@ -1145,7 +1145,7 @@ int main( int argc, char **argv )
 				if ( !( findData.attrib & _A_SUBDIR ) )
 				{
 					char fullFilename[512];
-					snprintf( fullFilename, ARRAYSIZE( fullFilename ), "%s\\%s", prefix,
+					snprintf( fullFilename, SE_ARRAYSIZE( fullFilename ), "%s\\%s", prefix,
 					          findData.name );
 
 					ProcessSPRFile( pBaseDir, pSubDir, fullFilename, bVTex );

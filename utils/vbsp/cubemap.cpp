@@ -184,7 +184,7 @@ static bool LoadSrcVTFFiles( IVTFTexture * (&pSrcVTFTextures)[6], const char *pS
 							int *pUnionTextureFlags, bool bHDR )
 {
 	constexpr char facingName[6][3] = {"rt", "lf", "bk", "ft", "up", "dn"};
-	static_assert(ARRAYSIZE(pSrcVTFTextures) == ssize(facingName));
+	static_assert(SE_ARRAYSIZE(pSrcVTFTextures) == ssize(facingName));
 	
 	char srcMaterialName[MAX_PATH], src0VTFFileName[MAX_PATH], srcVTFFileName[MAX_PATH];
 

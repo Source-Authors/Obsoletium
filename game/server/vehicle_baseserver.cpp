@@ -1744,7 +1744,7 @@ static int SoundStateIndexFromName( const char *pName )
 {
 	for ( int i = 0; i < SS_NUM_STATES; i++ )
 	{
-		Assert( i < static_cast<int>(ARRAYSIZE(pSoundStateNames)) );
+		Assert( i < static_cast<int>(SE_ARRAYSIZE(pSoundStateNames)) );
 		if ( V_strieq( pSoundStateNames[i], pName ) )
 			return i;
 	}

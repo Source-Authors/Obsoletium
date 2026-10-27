@@ -194,7 +194,7 @@ class CAchievementTFPlayGameEveryMap : public CTFAchievementFullRound
 			"cp_dustbowl", "cp_granary", "cp_gravelpit", "cp_well", "ctf_2fort", "tc_hydro"
 		};		
 		m_pszComponentNames = szComponents;
-		m_iNumComponents = ARRAYSIZE( szComponents );
+		m_iNumComponents = SE_ARRAYSIZE( szComponents );
 		SetGoal( m_iNumComponents );
 	}
 

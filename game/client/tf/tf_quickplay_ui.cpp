@@ -550,7 +550,7 @@ void CQuickListPanel::SetServerInfo ( KeyValues *pKV, int iListID, int iTotalSer
 
 	g_pVGuiLocalize->ConvertANSIToUnicode( pKV->GetString( "players", " " ), playercount,  sizeof( playercount ) );
 
-	_snwprintf( players, ARRAYSIZE( players ), L"%ls %ls",  playercount, pwszPlayers );
+	_snwprintf( players, SE_ARRAYSIZE( players ), L"%ls %ls",  playercount, pwszPlayers );
 	
 	m_pPlayerCountLabel->SetText( players );
 	m_pPlayerCountLabel->SetVisible( true );

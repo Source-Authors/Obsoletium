@@ -72,7 +72,7 @@ class CUserCmd;
 // activity table.
 // UNDONE: Cascade these?
 #define IMPLEMENT_ACTTABLE(className) \
-	acttable_t *className::ActivityList( int &iActivityCount ) { iActivityCount = ARRAYSIZE(m_acttable); return m_acttable; }
+	acttable_t *className::ActivityList( int &iActivityCount ) { iActivityCount = SE_ARRAYSIZE(m_acttable); return m_acttable; }
 
 typedef struct
 {
@@ -102,7 +102,7 @@ struct poseparamtable_t
 // The grapplinghook overrides the r_arm pose param, value to 2.
 
 #define IMPLEMENT_POSEPARAMTABLE(className)\
-	poseparamtable_t* className::PoseParamList( int &iPoseParamCount ) { iPoseParamCount = ARRAYSIZE(m_poseparamtable); return m_poseparamtable; }
+	poseparamtable_t* className::PoseParamList( int &iPoseParamCount ) { iPoseParamCount = SE_ARRAYSIZE(m_poseparamtable); return m_poseparamtable; }
 
 class CHudTexture;
 class Color;

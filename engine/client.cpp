@@ -709,7 +709,7 @@ void CClientState::Clear( void )
 
 void CClientState::ClearSounds()
 {
-	int c = ARRAYSIZE( sound_precache );
+	int c = SE_ARRAYSIZE( sound_precache );
 	for ( int i = 0; i < c; ++i )
 	{
 		sound_precache[ i ].SetSound( NULL );
@@ -1936,7 +1936,7 @@ void CClientState::ConsistencyCheck(bool bChanged )
 
 				// Check each texture
 				IMaterial *pMaterials[ 128 ];
-				int materialCount = Mod_GetModelMaterials( pModel, ARRAYSIZE( pMaterials ), pMaterials );
+				int materialCount = Mod_GetModelMaterials( pModel, SE_ARRAYSIZE( pMaterials ), pMaterials );
 
 				for ( int j = 0; j<materialCount; ++j )
 				{

@@ -195,7 +195,7 @@ void CEconItemDescription::YieldingFillOutAccountPersonaName( const CLocalizatio
 #endif
 
 #if defined( CLIENT_DLL )
-		m_bUnknownPlayer = Q_strncmp( utf8_PersonaName, "[unknown]", ARRAYSIZE( "[unknown]" ) ) == 0;
+		m_bUnknownPlayer = Q_strncmp( utf8_PersonaName, "[unknown]", SE_ARRAYSIZE( "[unknown]" ) ) == 0;
 #endif
  
 		// We should have filled this in with something by now, even if that something is "we couldn't
@@ -718,7 +718,7 @@ static bool GetLocalizedBaseItemName( locchar_t (&szItemName)[MAX_ITEM_NAME_LENG
 		if ( !pLocalizedItemName || !pLocalizedItemName[0] )
 		{
 			// Couldn't localize it, just use it raw
-			pLocalizationProvider->ConvertUTF8ToLocchar( pEconItemDefinition->GetItemBaseName(), szItemName, ARRAYSIZE( szItemName ) );
+			pLocalizationProvider->ConvertUTF8ToLocchar( pEconItemDefinition->GetItemBaseName(), szItemName, SE_ARRAYSIZE( szItemName ) );
 		}
 		else
 		{
@@ -1401,7 +1401,7 @@ void CEconItemDescription::Generate_ItemLevelDesc_Default( const CLocalizationPr
 			uint32 unOverrideItemLevelDescString = 0;
 			if ( pEconItem->FindAttribute( pAttrDef_OverrideItemLevelDescString, &unOverrideItemLevelDescString )
 				&& unOverrideItemLevelDescString != 0
-				&& unOverrideItemLevelDescString <= ARRAYSIZE( s_pszCustomItemLevelDescLocalizationTokens ) ) 
+				&& unOverrideItemLevelDescString <= SE_ARRAYSIZE( s_pszCustomItemLevelDescLocalizationTokens ) ) 
 			{
 				const char *pszLevelLocalizationToken = s_pszCustomItemLevelDescLocalizationTokens[ unOverrideItemLevelDescString - 1 ];
 				Assert( pszLevelLocalizationToken );
@@ -2044,7 +2044,7 @@ static bool IsDuelingMedal( const GameItemDefinition_t *pItemDef )
 
 	Assert( pItemDef );
 
-	for ( int i = 0; i < ARRAYSIZE( pAttrDef_DuelingMedals ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( pAttrDef_DuelingMedals ); i++ )
 		if ( pItemDef == pAttrDef_DuelingMedals[i] )
 			return true;
 
@@ -2136,7 +2136,7 @@ void CEconItemDescription::Generate_MapContributor( const CLocalizationProvider 
 		"#TF_MapDonationLevel_Australium3",
 		"#TF_MapDonationLevel_Unobtainium"
 	};
-	const int kNumDonationLevels = ARRAYSIZE( kDonationLevels );
+	const int kNumDonationLevels = SE_ARRAYSIZE( kDonationLevels );
 	const int kNumDonationsPerLevel = 25;
 
 	CUtlVector<const CTFMapContribution *> vecContributionsPerLevel[ kNumDonationLevels ];
@@ -3278,7 +3278,7 @@ void CEconItemDescription::Generate_MarketInformation( const CLocalizationProvid
 //		return;
 //
 //	locchar_t loc_Price[ kLocalizedPriceSizeInChararacters ];
-//	MakeMoneyString( loc_Price, ARRAYSIZE( loc_Price ), pClientMarketData->m_unLowestPrice, EconUI()->GetStorePanel()->GetCurrency() );
+//	MakeMoneyString( loc_Price, SE_ARRAYSIZE( loc_Price ), pClientMarketData->m_unLowestPrice, EconUI()->GetStorePanel()->GetCurrency() );
 //
 //	AddEmptyDescLine();
 //	AddDescLine( CConstructLocalizedString( pLocalizationProvider->Find( "#Econ_MarketTooltipFormat" ),

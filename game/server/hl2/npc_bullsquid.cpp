@@ -582,7 +582,7 @@ void CNPC_Bullsquid::OnListened( void )
 		COND_SQUID_SMELL_FOOD,
 	};
 
-	ClearConditions( conditionsToClear, ARRAYSIZE( conditionsToClear ) );
+	ClearConditions( conditionsToClear, SE_ARRAYSIZE( conditionsToClear ) );
 	
 	pCurrentSound = GetSenses()->GetFirstHeardSound( &iter );
 	

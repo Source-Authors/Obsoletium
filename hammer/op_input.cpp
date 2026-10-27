@@ -372,7 +372,7 @@ BOOL COP_Input::OnInitDialog(void)
 		CAnchorDef( IDC_MARK, k_eSimpleAnchorBottomSide ),
 		CAnchorDef( IDC_INFO_TEXT, k_eSimpleAnchorBottomSide )
 	};
-	m_AnchorMgr.Init( GetSafeHwnd(), anchorDefs, ARRAYSIZE( anchorDefs ) );
+	m_AnchorMgr.Init( GetSafeHwnd(), anchorDefs, SE_ARRAYSIZE( anchorDefs ) );
 
 	return(TRUE);
 }

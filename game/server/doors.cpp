@@ -466,7 +466,7 @@ void CBaseDoor::Activate( void )
 	m_bDoorGroup = true;
 
 	// force movement groups to sync!!!
-	int doorCount = GetDoorMovementGroup( pDoorList, ARRAYSIZE(pDoorList) );
+	int doorCount = GetDoorMovementGroup( pDoorList, SE_ARRAYSIZE(pDoorList) );
 	for ( int i = 0; i < doorCount; i++ )
 	{
 		if ( pDoorList[i]->m_vecMoveDir == m_vecMoveDir )
@@ -1236,7 +1236,7 @@ void CBaseDoor::Blocked( CBaseEntity *pOther )
 	if ( GetEntityName() != NULL_STRING )
 	{
 		CBaseDoor *pDoorList[64];
-		int doorCount = GetDoorMovementGroup( pDoorList, ARRAYSIZE(pDoorList) );
+		int doorCount = GetDoorMovementGroup( pDoorList, SE_ARRAYSIZE(pDoorList) );
 
 		for ( int i = 0; i < doorCount; i++ )
 		{

@@ -265,16 +265,16 @@ struct halloween_map_info
 
 static halloween_map_info g_HalloweenMapInfo[] =
 {
-	{ "cp_manor_event",			kValidPositions_MannManor,	ARRAYSIZE( kValidPositions_MannManor ) },
-	{ "koth_viaduct_event",		kValidPositions_Viaduct,	ARRAYSIZE( kValidPositions_Viaduct ) },
-	{ "koth_lakeside_event",	kValidPositions_Lakeside,	ARRAYSIZE( kValidPositions_Lakeside ) },
-	{ "plr_hightower_event",	kValidPositions_Hightower,	ARRAYSIZE( kValidPositions_Hightower ) },
+	{ "cp_manor_event",			kValidPositions_MannManor,	SE_ARRAYSIZE( kValidPositions_MannManor ) },
+	{ "koth_viaduct_event",		kValidPositions_Viaduct,	SE_ARRAYSIZE( kValidPositions_Viaduct ) },
+	{ "koth_lakeside_event",	kValidPositions_Lakeside,	SE_ARRAYSIZE( kValidPositions_Lakeside ) },
+	{ "plr_hightower_event",	kValidPositions_Hightower,	SE_ARRAYSIZE( kValidPositions_Hightower ) },
 };
 
 //
 void AddHalloweenGiftPositionsForMap( const char *pszMapName, CUtlVector<Vector> &vLocations )
 {
-	for ( int i = 0; i < ARRAYSIZE( g_HalloweenMapInfo ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( g_HalloweenMapInfo ); i++ )
 	{
 		if ( FStrEq( pszMapName, g_HalloweenMapInfo[i].m_pszMapName ) )
 		{

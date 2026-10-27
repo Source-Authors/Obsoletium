@@ -145,7 +145,7 @@ CCSGameStats::CCSGameStats()
 	m_fDisseminationTimerLow = m_fDisseminationTimerHigh = 0.0f;
 
 	// create table for mapping prop models to stats
-	for ( int i = 0; i < ARRAYSIZE(PropModelStatsTableInit); ++i)
+	for ( int i = 0; i < SE_ARRAYSIZE(PropModelStatsTableInit); ++i)
 	{
 		m_PropStatTable.Insert(PropModelStatsTableInit[i].szPropModelName, PropModelStatsTableInit[i].statType);
 	}
@@ -270,7 +270,7 @@ void CCSGameStats::UploadRoundStats( void )
 		if ( GetSteamWorksSGameStatsUploader().IsCollectingDetails() )
 		{
 			char pWeaponNameModified[64];
-			V_snprintf( pWeaponNameModified, ARRAYSIZE(pWeaponNameModified), "%s_bot", pWeaponName );
+			V_snprintf( pWeaponNameModified, SE_ARRAYSIZE(pWeaponNameModified), "%s_bot", pWeaponName );
 			m_WeaponData.AddToTail( new SCSSWeaponData( pWeaponNameModified, m_weaponStats[iWeapon][1] ) );
 		}
 	}
@@ -1296,7 +1296,7 @@ const StatsCollection_t& CCSGameStats::GetTeamStats( int iTeamIndex ) const
 //-----------------------------------------------------------------------------
 void CCSGameStats::ResetAllTeamStats()
 {
-	for ( int i = 0; i < ARRAYSIZE(m_aTeamStats); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE(m_aTeamStats); ++i )
 	{
 		m_aTeamStats[i].Reset();
 	}
@@ -1307,7 +1307,7 @@ void CCSGameStats::ResetAllTeamStats()
 //-----------------------------------------------------------------------------
 void CCSGameStats::ResetAllStats()
 {
-    for ( int i = 0; i < ARRAYSIZE( m_aPlayerStats ); i++ )
+    for ( int i = 0; i < SE_ARRAYSIZE( m_aPlayerStats ); i++ )
     {		
 		m_aPlayerStats[i].statsDelta.Reset();
         m_aPlayerStats[i].statsCurrentRound.Reset();
@@ -1359,7 +1359,7 @@ void CCSGameStats::ResetKillHistory( CBasePlayer* pPlayer )
 	PlayerStats_t& statsPlayer = m_aPlayerStats[iPlayerIndex];
 
 	// for every other player, set all all the kills with respect to this player to 0
-	for ( int i = 0; i < ARRAYSIZE( m_aPlayerStats ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_aPlayerStats ); i++ )
 	{
 		//reset their record of us.
 		PlayerStats_t &statsOther = m_aPlayerStats[i];
@@ -1379,7 +1379,7 @@ void CCSGameStats::ResetKillHistory( CBasePlayer* pPlayer )
 //-----------------------------------------------------------------------------
 void CCSGameStats::ResetRoundStats()
 {
-	for ( int i = 0; i < ARRAYSIZE( m_aPlayerStats ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_aPlayerStats ); i++ )
 	{		
 		m_aPlayerStats[i].statsCurrentRound.Reset();
 	}
@@ -1399,12 +1399,12 @@ void CCSGameStats::IncrementStat( CCSPlayer* pPlayer, CSStatType_t statId, int i
 
 		// increment team stat
 		int teamIndex = pPlayer->GetTeamNumber() - FIRST_GAME_TEAM;
-		if ( !bPlayerOnly && teamIndex >= 0 && teamIndex < ARRAYSIZE(m_aTeamStats) )
+		if ( !bPlayerOnly && teamIndex >= 0 && teamIndex < SE_ARRAYSIZE(m_aTeamStats) )
 		{
 			m_aTeamStats[teamIndex][statId] += iDelta;
 		}
 
-	    for (int i = 0; i < ARRAYSIZE(ServerStatBasedAchievements); ++i)
+	    for (int i = 0; i < SE_ARRAYSIZE(ServerStatBasedAchievements); ++i)
 	    {
 		    if (ServerStatBasedAchievements[i].statId == statId)
 		    {
@@ -1440,7 +1440,7 @@ void CCSGameStats::SetStat( CCSPlayer *pPlayer, CSStatType_t statId, int iValue 
 		stats.statsCurrentRound[statId] = iValue;
 		stats.statsCurrentMatch[statId] = iValue;
 
-		for (int i = 0; i < ARRAYSIZE(ServerStatBasedAchievements); ++i)
+		for (int i = 0; i < SE_ARRAYSIZE(ServerStatBasedAchievements); ++i)
 		{
 			if (ServerStatBasedAchievements[i].statId == statId)
 			{

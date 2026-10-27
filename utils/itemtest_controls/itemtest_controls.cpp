@@ -712,7 +712,7 @@ void CGeometrySubPanel::SetupFileOpenDialog(
 		"HKEY_CURRENT_USER\\Software\\Valve\\itemtest\\geometry\\opendir",
 		pszStartingDir, sizeof( pszStartingDir ) ) )
 	{
-		_getcwd( pszStartingDir, ARRAYSIZE( pszStartingDir ));
+		_getcwd( pszStartingDir, SE_ARRAYSIZE( pszStartingDir ));
 
 		CUtlString sVMod;
 		CUtlString sContentDir;
@@ -744,7 +744,7 @@ void CGeometrySubPanel::SetupFileOpenDialog(
 
 					// TODO: Add steam id?
 
-					V_FixupPathName( pszStartingDir, ARRAYSIZE( pszStartingDir ), sTmp.Get() );
+					V_FixupPathName( pszStartingDir, SE_ARRAYSIZE( pszStartingDir ), sTmp.Get() );
 				}
 			}
 		}
@@ -789,7 +789,7 @@ bool CGeometrySubPanel::OnReadFileFromDisk(
 		V_FixSlashes( szBuf0 );
 		V_StripFilename( szBuf0 );
 
-		_fullpath( szBuf1, szBuf0, ARRAYSIZE( szBuf1 ) );
+		_fullpath( szBuf1, szBuf0, SE_ARRAYSIZE( szBuf1 ) );
 
 		vgui::system()->SetRegistryString(
 			"HKEY_CURRENT_USER\\Software\\Valve\\itemtest\\geometry\\opendir",
@@ -797,7 +797,7 @@ bool CGeometrySubPanel::OnReadFileFromDisk(
 	}
 
 	// Get the full path
-	_fullpath( szBuf1, pszFileName, ARRAYSIZE( szBuf1 ) );
+	_fullpath( szBuf1, pszFileName, SE_ARRAYSIZE( szBuf1 ) );
 
 	CAsset &asset = pItemUploadWizard->Asset();
 
@@ -1461,7 +1461,7 @@ void CMaterialSubPanel::SetupFileOpenDialog(
 		"HKEY_CURRENT_USER\\Software\\Valve\\itemtest\\texture\\opendir",
 		pszStartingDir, sizeof( pszStartingDir ) ) )
 	{
-		_getcwd( pszStartingDir, ARRAYSIZE( pszStartingDir ));
+		_getcwd( pszStartingDir, SE_ARRAYSIZE( pszStartingDir ));
 
 		CUtlString sVMod;
 		CUtlString sContentDir;
@@ -1493,7 +1493,7 @@ void CMaterialSubPanel::SetupFileOpenDialog(
 
 					// TODO: Add steam id?
 
-					V_FixupPathName( pszStartingDir, ARRAYSIZE( pszStartingDir ), sTmp.Get() );
+					V_FixupPathName( pszStartingDir, SE_ARRAYSIZE( pszStartingDir ), sTmp.Get() );
 				}
 			}
 		}
@@ -1533,7 +1533,7 @@ bool CMaterialSubPanel::OnReadFileFromDisk(
 		V_FixSlashes( szBuf0 );
 		V_StripFilename( szBuf0 );
 
-		_fullpath( szBuf1, szBuf0, ARRAYSIZE( szBuf1 ) );
+		_fullpath( szBuf1, szBuf0, SE_ARRAYSIZE( szBuf1 ) );
 
 		vgui::system()->SetRegistryString(
 			"HKEY_CURRENT_USER\\Software\\Valve\\itemtest\\texture\\opendir",
@@ -1541,7 +1541,7 @@ bool CMaterialSubPanel::OnReadFileFromDisk(
 	}
 
 	// Get the full path
-	_fullpath( szBuf1, pszFileName, ARRAYSIZE( szBuf1 ) );
+	_fullpath( szBuf1, pszFileName, SE_ARRAYSIZE( szBuf1 ) );
 
 	CAsset &asset = pItemUploadWizard->Asset();
 

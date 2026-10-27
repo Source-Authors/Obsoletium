@@ -2092,7 +2092,7 @@ ControlPanel::handleEvent (mxEvent *event)
 				if ( pStudioR )
 				{
 					IMaterial *pMaterials[128];
-					g_pStudioRender->GetMaterialList( pStudioR, ARRAYSIZE( pMaterials ), &pMaterials[0] );
+					g_pStudioRender->GetMaterialList( pStudioR, SE_ARRAYSIZE( pMaterials ), &pMaterials[0] );
 
 					cShaderUsed->removeAll();
 					if ( pMaterials[index]->IsErrorMaterial() )
@@ -3528,7 +3528,7 @@ void ControlPanel::UpdateMaterialList( )
 	if ( pStudioR )
 	{
 		IMaterial *pMaterials[128];
-		int nMaterials = g_pStudioRender->GetMaterialList( pStudioR, ARRAYSIZE( pMaterials ), &pMaterials[0] );
+		int nMaterials = g_pStudioRender->GetMaterialList( pStudioR, SE_ARRAYSIZE( pMaterials ), &pMaterials[0] );
 
 		for ( int i = 0; i < nMaterials; i++ )
 		{

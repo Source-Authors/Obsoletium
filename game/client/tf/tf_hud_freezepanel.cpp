@@ -424,7 +424,7 @@ void CTFFreezePanel::FireGameEvent( IGameEvent * event )
 																	 , CSchemaItemDefHandle( "Powerup Plague" ) 
 																	 , CSchemaItemDefHandle( "Powerup Supernova" ) };
 
-					COMPILE_TIME_ASSERT( ARRAYSIZE( rgPowerupItems ) == RUNE_TYPES_MAX );
+					COMPILE_TIME_ASSERT( SE_ARRAYSIZE( rgPowerupItems ) == RUNE_TYPES_MAX );
 
 					// Get the item 
 					const CSchemaItemDefHandle& itemDef = rgPowerupItems[pTFPlayerKiller->m_Shared.GetCarryingRuneType()];
@@ -1286,7 +1286,7 @@ void CTFFreezePanelCallout::UpdateForGib( int iGib, int iCount )
 	if ( !m_pGibLabel )
 		return;
 
-	if ( iGib < ARRAYSIZE(pszCalloutGibNames) )
+	if ( iGib < SE_ARRAYSIZE(pszCalloutGibNames) )
 	{
 		if ( pszCalloutGibNames[iGib] )
 		{
@@ -1294,7 +1294,7 @@ void CTFFreezePanelCallout::UpdateForGib( int iGib, int iCount )
 		}
 		else
 		{
-			m_pGibLabel->SetText( pszCalloutRandomGibNames[ RandomInt(0,ARRAYSIZE(pszCalloutRandomGibNames)-1) ] );
+			m_pGibLabel->SetText( pszCalloutRandomGibNames[ RandomInt(0,SE_ARRAYSIZE(pszCalloutRandomGibNames)-1) ] );
 		}
 	}
 	else

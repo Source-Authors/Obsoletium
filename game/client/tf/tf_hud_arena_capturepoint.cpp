@@ -159,7 +159,7 @@ void CHudArenaCapPointCountdown::OnTick( void )
 	SetVisible( true );
 
 	wchar_t wzTimeLeft[128];
-	_snwprintf( wzTimeLeft, ARRAYSIZE( wzTimeLeft ), L"%i", iTimeLeft );
+	_snwprintf( wzTimeLeft, SE_ARRAYSIZE( wzTimeLeft ), L"%i", iTimeLeft );
 
 	SetDialogVariable( "capturetime", wzTimeLeft );
 

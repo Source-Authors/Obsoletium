@@ -3446,7 +3446,7 @@ void CTFGameMovement::CheckForDoubleTap( void )
 		// Add movetypes here
 	};
 
-	for ( int i = 0; i < ARRAYSIZE( aMoveType ); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE( aMoveType ); ++i )
 	{
 		// Record when they let go of the key
 		if ( ( mv->m_nOldButtons & aMoveType[i] ) && !( mv->m_nButtons & aMoveType[i] ) )

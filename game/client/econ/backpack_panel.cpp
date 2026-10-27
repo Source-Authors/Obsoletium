@@ -98,7 +98,7 @@ const char *g_szItemBorders[][5] =
 	{ "BackpackItemBorder_RarityAncient",	"BackpackItemMouseOverBorder_RarityAncient",	"BackpackItemSelectedBorder",	"BackpackItemGreyedOutBorder_RarityAncient",	"BackpackItemGreyedOutSelectedBorder_RarityAncient"		}, // AE_RARITY_ANCIENT,
 };	
 
-COMPILE_TIME_ASSERT( ARRAYSIZE(g_szItemBorders) == AE_MAX_TYPES );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE(g_szItemBorders) == AE_MAX_TYPES );
 
 enum { kNoUserData = -1 };
 
@@ -265,7 +265,7 @@ static bool HasResettableScoreAttributes ( const CEconItemView *pEconItemView, c
 //-----------------------------------------------------------------------------
 int GetRemovableAttributesCount()
 {
-	return ARRAYSIZE( g_RemoveableAttributes )
+	return SE_ARRAYSIZE( g_RemoveableAttributes )
 		 + GetKillEaterAttrCount()
 		 + GetMaxCardUpgradesPerItem()						// remove card upgrades
 		 + 1;												// strange quality item score reset
@@ -276,11 +276,11 @@ RefurbishableProperty RemovableAttributes_GetAttributeDetails( int i )
 	Assert( i >= 0 );
 	Assert( i < GetRemovableAttributesCount() );
 
-	if ( i < ARRAYSIZE( g_RemoveableAttributes ) )
+	if ( i < SE_ARRAYSIZE( g_RemoveableAttributes ) )
 		return g_RemoveableAttributes[i];
 	
 	// Which attribute in particular are we looking for?
-	int iStrangePartIndex = i - ARRAYSIZE( g_RemoveableAttributes );
+	int iStrangePartIndex = i - SE_ARRAYSIZE( g_RemoveableAttributes );
 	if ( iStrangePartIndex < GetKillEaterAttrCount() )
 	{
 		int iKillEaterAttrIndex = (GetKillEaterAttrCount() - GetKillEaterAttrCount()) + iStrangePartIndex;
@@ -492,14 +492,14 @@ void CBackpackPanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 		vgui::HFont hFont = pScheme->GetFont( "HudFontSmallestBold", true );
 		m_pSortByComboBox->SetFont( hFont );
 		KeyValues *pKeyValues = new KeyValues( "data" );
-		for ( int i = 0; i < ARRAYSIZE(g_BackpackSortTypes); i++ )
+		for ( int i = 0; i < SE_ARRAYSIZE(g_BackpackSortTypes); i++ )
 		{
 			pKeyValues->SetInt( "sortby", i );
 			m_pSortByComboBox->AddItem( g_BackpackSortTypes[i].szSortDesc, pKeyValues );
 		}
 		pKeyValues->deleteThis();
 		m_pSortByComboBox->ActivateItemByRow( 0 );
-		m_pSortByComboBox->GetMenu()->SetNumberOfVisibleItems( ARRAYSIZE(g_BackpackSortTypes) );
+		m_pSortByComboBox->GetMenu()->SetNumberOfVisibleItems( SE_ARRAYSIZE(g_BackpackSortTypes) );
 	}
 
 	// Create page buttons
@@ -1707,7 +1707,7 @@ bool CreateMarketPriceString( item_definition_index_t iDefIndex, wchar_t *pszStr
 
 	// Set that price into the button
 	wchar_t pszCurrencyString[kLocalizedPriceSizeInChararacters];
-	MakeMoneyString( pszCurrencyString, ARRAYSIZE( pszCurrencyString ), pClientMarketData->m_unLowestPrice, eCurrency );
+	MakeMoneyString( pszCurrencyString, SE_ARRAYSIZE( pszCurrencyString ), pClientMarketData->m_unLowestPrice, eCurrency );
 
 	wchar_t pszConstructed[kLocalizedPriceSizeInChararacters];
 	g_pVGuiLocalize->ConstructString_safe( pszConstructed, g_pVGuiLocalize->Find( "#TF_MarketPrice" ), 1, pszCurrencyString );
@@ -1733,7 +1733,7 @@ bool CreateStorePriceString( item_definition_index_t iDefIndex, wchar_t *pszStri
 
 	// Set that price into the button
 	wchar_t pszCurrencyString[kLocalizedPriceSizeInChararacters];
-	MakeMoneyString( pszCurrencyString, ARRAYSIZE( pszCurrencyString ), pEntry->GetCurrentPrice( eCurrency ), eCurrency );
+	MakeMoneyString( pszCurrencyString, SE_ARRAYSIZE( pszCurrencyString ), pEntry->GetCurrentPrice( eCurrency ), eCurrency );
 
 	wchar_t pszConstructed[kLocalizedPriceSizeInChararacters];
 	g_pVGuiLocalize->ConstructString_safe( pszConstructed, g_pVGuiLocalize->Find( "#TF_StorePrice" ), 1, pszCurrencyString );

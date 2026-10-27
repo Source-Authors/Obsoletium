@@ -559,10 +559,10 @@ void CAchievementsPage::CreateOrUpdateComboItems( bool bCreate )
             }
 
             wchar_t wzNumUnlocked[8];
-            V_snwprintf( wzNumUnlocked, ARRAYSIZE( wzNumUnlocked ), L"%d", numAwarded );
+            V_snwprintf( wzNumUnlocked, SE_ARRAYSIZE( wzNumUnlocked ), L"%d", numAwarded );
 
             wchar_t wzNumAchievements[8];
-            V_snwprintf( wzNumAchievements, ARRAYSIZE( wzNumAchievements ), L"%d", numTested );
+            V_snwprintf( wzNumAchievements, SE_ARRAYSIZE( wzNumAchievements ), L"%d", numTested );
 
             g_pVGuiLocalize->ConstructString( wzGroupTitle, sizeof( wzGroupTitle ), wzGroupName, 0 );
         }
@@ -903,10 +903,10 @@ void CAchievementsPageGroupPanel::UpdateAchievementInfo( vgui::IScheme* pScheme 
             }
 
             wchar_t wzNumUnlocked[8];
-            V_snwprintf( wzNumUnlocked, ARRAYSIZE( wzNumUnlocked ), L"%d", numAwarded );
+            V_snwprintf( wzNumUnlocked, SE_ARRAYSIZE( wzNumUnlocked ), L"%d", numAwarded );
 
             wchar_t wzNumAchievements[8];
-            V_snwprintf( wzNumAchievements,ARRAYSIZE( wzNumAchievements ), L"%d", numTested );
+            V_snwprintf( wzNumAchievements,SE_ARRAYSIZE( wzNumAchievements ), L"%d", numTested );
 
             g_pVGuiLocalize->ConstructString( wzGroupTitle, sizeof( wzGroupTitle ), wzGroupName, 2, wzNumUnlocked, wzNumAchievements );
         }

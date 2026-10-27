@@ -182,7 +182,7 @@ void CTFStorePageBase::UpdateFilterComboBox( void )
 	{
 		pKeyValues->SetInt( "filter", FILTER_ALLCLASS_ITEMS );
 
-		_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", nCount );
+		_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", nCount );
 		g_pVGuiLocalize->ConstructString_safe( wzLocalized, g_pVGuiLocalize->Find( "#Store_ClassFilter_AllClasses" ), 1, wszCount );
 		m_pFilterComboBox->AddItem( wzLocalized, pKeyValues );
 	}
@@ -196,7 +196,7 @@ void CTFStorePageBase::UpdateFilterComboBox( void )
 
 		pKeyValues->SetInt( "filter", iClass );
 
-		_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", nCount );
+		_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", nCount );
 		g_pVGuiLocalize->ConstructString_safe( wzLocalized, g_pVGuiLocalize->Find( g_szClassFilterStrings[iClass] ), 1, wszCount );
 		m_pFilterComboBox->AddItem( wzLocalized, pKeyValues );
 	}
@@ -207,7 +207,7 @@ void CTFStorePageBase::UpdateFilterComboBox( void )
 	{
 		pKeyValues->SetInt( "filter", FILTER_UNOWNED_ITEMS );
 
-		_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", nCount );
+		_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", nCount );
 		g_pVGuiLocalize->ConstructString_safe( wzLocalized, g_pVGuiLocalize->Find( "#Store_Items_Unowned" ), 1, wszCount );
 		m_pFilterComboBox->AddItem( wzLocalized, pKeyValues );
 	}
@@ -218,7 +218,7 @@ void CTFStorePageBase::UpdateFilterComboBox( void )
 	{
 		pKeyValues->SetInt( "filter", FILTER_ALLCLASS_ITEMS );
 
-		_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", m_vecFilterCounts[FILTER_ALLCLASS_ITEMS] );
+		_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", m_vecFilterCounts[FILTER_ALLCLASS_ITEMS] );
 		g_pVGuiLocalize->ConstructString_safe( wzLocalized, g_pVGuiLocalize->Find( "#Store_ClassFilter_AllClasses" ), 1, wszCount );
 		m_pFilterComboBox->AddItem( wzLocalized, pKeyValues );
 	}
@@ -231,7 +231,7 @@ void CTFStorePageBase::UpdateFilterComboBox( void )
 
 		pKeyValues->SetInt( "filter", iClass );
 
-		_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", m_vecFilterCounts[iClass] );
+		_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", m_vecFilterCounts[iClass] );
 		g_pVGuiLocalize->ConstructString_safe( wzLocalized, g_pVGuiLocalize->Find( g_szClassFilterStrings[iClass] ), 1, wszCount );
 		m_pFilterComboBox->AddItem( wzLocalized, pKeyValues );
 	}
@@ -241,7 +241,7 @@ void CTFStorePageBase::UpdateFilterComboBox( void )
 	{
 		pKeyValues->SetInt( "filter", FILTER_UNOWNED_ITEMS );
 
-		_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", m_vecFilterCounts[FILTER_UNOWNED_ITEMS] );
+		_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", m_vecFilterCounts[FILTER_UNOWNED_ITEMS] );
 		g_pVGuiLocalize->ConstructString_safe( wzLocalized, g_pVGuiLocalize->Find( "#Store_Items_Unowned" ), 1, wszCount );
 		m_pFilterComboBox->AddItem( wzLocalized, pKeyValues );
 	}

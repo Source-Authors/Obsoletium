@@ -255,7 +255,7 @@ BOOL COP_Groups::OnInitDialog()
 		CAnchorDef( IDC_GROUPS, k_eSimpleAnchorAllSides ),
 		CAnchorDef( IDC_EDITGROUPS, k_eSimpleAnchorBottomRight )
 	};
-	m_AnchorMgr.Init( GetSafeHwnd(), anchorDefs, ARRAYSIZE( anchorDefs ) );
+	m_AnchorMgr.Init( GetSafeHwnd(), anchorDefs, SE_ARRAYSIZE( anchorDefs ) );
 
 	return TRUE;
 }

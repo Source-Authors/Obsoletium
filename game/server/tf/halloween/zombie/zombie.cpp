@@ -102,7 +102,7 @@ void CZombie::PrecacheZombie()
 
 	if( TFGameRules()->GetHalloweenScenario() == CTFGameRules::HALLOWEEN_SCENARIO_DOOMSDAY )
 	{
-		for ( int i=0; i<ARRAYSIZE( s_skeletonHatModels ) ; ++i )
+		for ( int i=0; i<SE_ARRAYSIZE( s_skeletonHatModels ) ; ++i )
 		{
 			PrecacheModel( s_skeletonHatModels[i] );
 		}
@@ -363,7 +363,7 @@ void CZombie::SetSkeletonType( SkeletonType_t nType )
 
 		if( TFGameRules()->GetHalloweenScenario() == CTFGameRules::HALLOWEEN_SCENARIO_DOOMSDAY )
 		{
-			int iModelIndex = RandomInt( 0, ARRAYSIZE( s_skeletonHatModels ) - 1 );
+			int iModelIndex = RandomInt( 0, SE_ARRAYSIZE( s_skeletonHatModels ) - 1 );
 #ifdef STAGING_ONLY
 			iModelIndex = tf_halloween_skeleton_test_hat.GetInt() > 0 ? tf_halloween_skeleton_test_hat.GetInt() : iModelIndex;
 #endif // STAGING_ONLY

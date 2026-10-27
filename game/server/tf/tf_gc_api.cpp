@@ -99,7 +99,7 @@ public:
 		char szKeyBuffer[16];
 		int nKeyLength = V_sprintf_safe( szKeyBuffer, "%s", tf_server_identity_token.GetString() );
 
-		if ( nKeyLength <= 0 || nKeyLength >= ARRAYSIZE( szKeyBuffer ) )
+		if ( nKeyLength <= 0 || nKeyLength >= SE_ARRAYSIZE( szKeyBuffer ) )
 		{
 			Warning( "%s is not valid, or not set!  Not signing into gameserver account\n", tf_server_identity_token.GetName() );
 			UTIL_LogPrintf( "%s is not valid, or not set!  Not signing into gameserver account\n", tf_server_identity_token.GetName() );

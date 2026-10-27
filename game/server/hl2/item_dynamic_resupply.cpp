@@ -62,8 +62,8 @@ static DynamicResupplyItems_t g_DynamicResupplyAmmoItems[] =
 #define DS_ARMOR_INDEX		1
 #define DS_GRENADE_INDEX	6
 
-#define NUM_HEALTH_ITEMS	(ARRAYSIZE(g_DynamicResupplyHealthItems))
-#define NUM_AMMO_ITEMS		(ARRAYSIZE(g_DynamicResupplyAmmoItems))
+#define NUM_HEALTH_ITEMS	(SE_ARRAYSIZE(g_DynamicResupplyHealthItems))
+#define NUM_AMMO_ITEMS		(SE_ARRAYSIZE(g_DynamicResupplyAmmoItems))
 
 #define DYNAMIC_ITEM_THINK		1.0f
 

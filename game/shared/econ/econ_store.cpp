@@ -1549,7 +1549,7 @@ int MakeMoneyStringInternal( wchar_t *pchDest, uint32 nDest, item_price_t unPric
 
 	// BEGIN HACK GAME CLIENT CHARACTER SET CONVERSION
 	wchar_t wsSymbol[ 16 ];
-	V_UTF8ToUnicode( pchSymbol, wsSymbol, ARRAYSIZE( wsSymbol ) );
+	V_UTF8ToUnicode( pchSymbol, wsSymbol, SE_ARRAYSIZE( wsSymbol ) );
 	// END HACK GAME CLIENT CHARACTER SET CONVERSION
 
 	bool bFirstSymbolThenAmount = true;	// Whether to show "$5" or "5E"

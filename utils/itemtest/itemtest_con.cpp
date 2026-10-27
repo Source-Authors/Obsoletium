@@ -112,7 +112,7 @@ bool View( CAsset &asset )
 	}
 
 	char szBinLaunchDir[ MAX_PATH ];
-	V_ExtractFilePath( sBinDir.String(), szBinLaunchDir, ARRAYSIZE( szBinLaunchDir ) );
+	V_ExtractFilePath( sBinDir.String(), szBinLaunchDir, SE_ARRAYSIZE( szBinLaunchDir ) );
 
 	return CItemUpload::RunCommandLine( sHlmvCmd.String(), szBinLaunchDir, false );
 }
@@ -134,10 +134,10 @@ bool Explore( CAsset &asset )
 	asset.GetAbsoluteDir( sDir, NULL, &asset );
 
 	char szBuf[ MAX_PATH ];
-	V_FixupPathName( szBuf, ARRAYSIZE( szBuf ), sDir.Get() );
+	V_FixupPathName( szBuf, SE_ARRAYSIZE( szBuf ), sDir.Get() );
 
 	char szBinLaunchDir[ MAX_PATH ];
-	V_ExtractFilePath( sBinDir.String(), szBinLaunchDir, ARRAYSIZE( szBinLaunchDir ) );
+	V_ExtractFilePath( sBinDir.String(), szBinLaunchDir, SE_ARRAYSIZE( szBinLaunchDir ) );
 
 	ShellExecute( NULL, "explore", NULL, NULL, szBuf, SW_SHOWNORMAL );
 

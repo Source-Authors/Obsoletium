@@ -821,14 +821,14 @@ void CHudMenuEngyBuild::ReplaceBuildings( EngyConstructBuilding_t (&targetBuildi
 
 	int iOverrideType = -1;
 	CALL_ATTRIB_HOOK_INT_ON_OTHER( pLocalPlayer, iOverrideType, override_engineer_object_type );
-	if ( iOverrideType >= 0 && iOverrideType < ARRAYSIZE( s_alternateEngineerBuildings ) )
+	if ( iOverrideType >= 0 && iOverrideType < SE_ARRAYSIZE( s_alternateEngineerBuildings ) )
 	{
 		vecReplacements.AddToTail( &s_alternateEngineerBuildings[iOverrideType] );
 	}
 	
 	iOverrideType = -1;
 	CALL_ATTRIB_HOOK_INT_ON_OTHER( pLocalPlayer, iOverrideType, override_engineer_object_type_2 );
-	if ( iOverrideType >= 0 && iOverrideType < ARRAYSIZE( s_alternateEngineerBuildings ) )
+	if ( iOverrideType >= 0 && iOverrideType < SE_ARRAYSIZE( s_alternateEngineerBuildings ) )
 	{
 		vecReplacements.AddToTail( &s_alternateEngineerBuildings[iOverrideType] );
 	}
@@ -865,9 +865,9 @@ void CHudMenuEngyBuild::ReplaceBuildings( EngyConstructBuilding_t (&targetBuildi
 		}
 		
 		// no conflict, replace the building
-		for ( int j=0; j<ARRAYSIZE( flagSlots ); ++j )
+		for ( int j=0; j<SE_ARRAYSIZE( flagSlots ); ++j )
 		{
-			COMPILE_TIME_ASSERT( ARRAYSIZE( targetBuildings ) == ARRAYSIZE( flagSlots ) );
+			COMPILE_TIME_ASSERT( SE_ARRAYSIZE( targetBuildings ) == SE_ARRAYSIZE( flagSlots ) );
 			if ( flagSlots[j] & iReplacingSlots )
 			{
 				targetBuildings[j] = pReplace->m_building;

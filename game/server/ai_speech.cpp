@@ -849,7 +849,7 @@ void CAI_ExpresserHost_NPC_DoModifyOrAppendCriteria( CAI_BaseNPC *pSpeaker, AI_C
 	}
 
 	static const char *pStateNames[] = { "None", "Idle", "Alert", "Combat", "Scripted", "PlayDead", "Dead" };
-	if ( (int)pSpeaker->m_NPCState < static_cast<int>(ARRAYSIZE(pStateNames)) )
+	if ( (int)pSpeaker->m_NPCState < static_cast<int>(SE_ARRAYSIZE(pStateNames)) )
 	{
 		set.AppendCriteria( "npcstate", UTIL_VarArgs( "[NPCState::%s]", pStateNames[pSpeaker->m_NPCState] ) );
 	}

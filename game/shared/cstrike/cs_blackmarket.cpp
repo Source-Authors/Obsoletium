@@ -141,7 +141,7 @@ int GetRifleCount( void )
 		}
 	}
 
-	return iNumRifle + ARRAYSIZE( blackmarket_items );
+	return iNumRifle + SE_ARRAYSIZE( blackmarket_items );
 }
 
 #endif

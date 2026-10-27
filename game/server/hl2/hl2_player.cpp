@@ -138,8 +138,8 @@ static impactdamagetable_t gCappedPlayerImpactDamageTable =
 	cappedPlayerLinearTable,
 	cappedPlayerAngularTable,
 
-	ARRAYSIZE(cappedPlayerLinearTable),
-	ARRAYSIZE(cappedPlayerAngularTable),
+	SE_ARRAYSIZE(cappedPlayerLinearTable),
+	SE_ARRAYSIZE(cappedPlayerAngularTable),
 
 	24*24.0f,	// minimum linear speed
 	360*360.0f,	// minimum angular speed

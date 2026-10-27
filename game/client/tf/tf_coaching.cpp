@@ -404,7 +404,7 @@ public:
 				pDialog->AddStringToken( "coachname", szPlayerName );
 
 				wchar_t szNumLikes[32];
-				V_snwprintf( szNumLikes, ARRAYSIZE(szNumLikes), L"%d", msg.Body().num_likes() );
+				V_snwprintf( szNumLikes, SE_ARRAYSIZE(szNumLikes), L"%d", msg.Body().num_likes() );
 				pDialog->AddStringToken( "numlikes", szNumLikes );
 			}
 		}

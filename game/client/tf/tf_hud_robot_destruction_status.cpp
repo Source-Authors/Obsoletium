@@ -821,7 +821,7 @@ void CTFHUDRobotDestruction::PaintPDPlayerScore( const CTFPlayer* pPlayer )
 		}
 
 		wchar_t wszScore[3];
-		V_snwprintf( wszScore, ARRAYSIZE( wszScore ), L"%d", iCurrentLeadingPoint );
+		V_snwprintf( wszScore, SE_ARRAYSIZE( wszScore ), L"%d", iCurrentLeadingPoint );
 		const int nWidth = V_wcslen( wszScore ) * 15;
 	
  		// draw the name

@@ -121,7 +121,7 @@ void CHudArenaPlayerCount::UpdateCounts( void )
 			wchar_t wNumPlayers[6];
 			int nCount = g_TF_PR ? g_TF_PR->GetNumPlayersForTeam( teamIndex, true ) : 0;
 
-			_snwprintf( wNumPlayers, ARRAYSIZE( wNumPlayers ), L"%i", nCount );
+			_snwprintf( wNumPlayers, SE_ARRAYSIZE( wNumPlayers ), L"%i", nCount );
 
 			pPanel->SetDialogVariable( pDialogVar, wNumPlayers );
 		}

@@ -198,7 +198,7 @@ const char *g_pszMPConcepts[] =
 	"TLK_GAME_OVER_COMP",					// MP_CONCEPT_GAME_OVER_COMP
 	"TLK_MATCH_OVER_COMP",					// MP_CONCEPT_MATCH_OVER_COMP
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_pszMPConcepts ) == MP_TF_CONCEPT_COUNT );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_pszMPConcepts ) == MP_TF_CONCEPT_COUNT );
 
 //-----------------------------------------------------------------------------
 // Purpose:

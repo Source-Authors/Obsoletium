@@ -690,7 +690,7 @@ void CUpgrades::NotifyItemOnUpgrade( CTFPlayer *pTFPlayer, attrib_definition_ind
 				{ "ubercharge rate bonus", 2.f, LOADOUT_POSITION_SECONDARY },
 			};
 
-			ApplyUpgradeAttributeBlock( upgradeBlock, ARRAYSIZE( upgradeBlock ), pTFPlayer, bDowngrade );
+			ApplyUpgradeAttributeBlock( upgradeBlock, SE_ARRAYSIZE( upgradeBlock ), pTFPlayer, bDowngrade );
 		}
 		break;
 	case 605:	// master sniper
@@ -702,7 +702,7 @@ void CUpgrades::NotifyItemOnUpgrade( CTFPlayer *pTFPlayer, attrib_definition_ind
 				{ "faster reload rate", 0.6f, LOADOUT_POSITION_PRIMARY },
 			};
 
-			ApplyUpgradeAttributeBlock( upgradeBlock, ARRAYSIZE( upgradeBlock ), pTFPlayer, bDowngrade );
+			ApplyUpgradeAttributeBlock( upgradeBlock, SE_ARRAYSIZE( upgradeBlock ), pTFPlayer, bDowngrade );
 		}
 		break;
 	case 611:	// airborne infantry
@@ -714,7 +714,7 @@ void CUpgrades::NotifyItemOnUpgrade( CTFPlayer *pTFPlayer, attrib_definition_ind
 				{ "cancel falling damage", 1, LOADOUT_POSITION_PRIMARY },
 			};
 
-			ApplyUpgradeAttributeBlock( upgradeBlock, ARRAYSIZE( upgradeBlock ), pTFPlayer, bDowngrade );
+			ApplyUpgradeAttributeBlock( upgradeBlock, SE_ARRAYSIZE( upgradeBlock ), pTFPlayer, bDowngrade );
 		}
 		break;
 	case 624:	// construction expert
@@ -726,7 +726,7 @@ void CUpgrades::NotifyItemOnUpgrade( CTFPlayer *pTFPlayer, attrib_definition_ind
 				{ "engy building health penalty", 0.7f, LOADOUT_POSITION_MELEE },
 			};
 
-			ApplyUpgradeAttributeBlock( upgradeBlock, ARRAYSIZE( upgradeBlock ), pTFPlayer, bDowngrade );
+			ApplyUpgradeAttributeBlock( upgradeBlock, SE_ARRAYSIZE( upgradeBlock ), pTFPlayer, bDowngrade );
 		}
 		break;
 	case 626:	// support engineer
@@ -740,7 +740,7 @@ void CUpgrades::NotifyItemOnUpgrade( CTFPlayer *pTFPlayer, attrib_definition_ind
 				{ "engy dispenser radius increased", 3.f, LOADOUT_POSITION_INVALID },
 			};
 
-			ApplyUpgradeAttributeBlock( upgradeBlock, ARRAYSIZE( upgradeBlock ), pTFPlayer, bDowngrade );
+			ApplyUpgradeAttributeBlock( upgradeBlock, SE_ARRAYSIZE( upgradeBlock ), pTFPlayer, bDowngrade );
 		}
 		break;
 #endif // STAGING_ONLY

@@ -718,7 +718,7 @@ int UTIL_EntitiesAlongRay( C_BaseEntity **pList, int listMax, const Ray_t &ray, 
 CEntitySphereQuery::CEntitySphereQuery( const Vector &center, float radius, int flagMask, int partitionMask )
 {
 	m_listIndex = 0;
-	m_listCount = UTIL_EntitiesInSphere( m_pList, ARRAYSIZE(m_pList), center, radius, flagMask, partitionMask );
+	m_listCount = UTIL_EntitiesInSphere( m_pList, SE_ARRAYSIZE(m_pList), center, radius, flagMask, partitionMask );
 }
 
 CBaseEntity *CEntitySphereQuery::GetCurrentEntity()

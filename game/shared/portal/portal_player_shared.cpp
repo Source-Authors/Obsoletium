@@ -98,7 +98,7 @@ Activity CPortal_Player::TranslateActivity( Activity baseAct, bool *pRequired /*
 	else if ( unarmedActtable )
 	{
 		acttable_t *pTable = unarmedActtable;
-		int actCount = ARRAYSIZE(unarmedActtable);
+		int actCount = SE_ARRAYSIZE(unarmedActtable);
 
 		for ( int i = 0; i < actCount; i++, pTable++ )
 		{

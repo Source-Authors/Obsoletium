@@ -778,7 +778,7 @@ float CWebMVideoRecorder::GetVideoDataRate( int quality, int width, int height )
 #ifdef LOG_ENCODER_OPERATIONS
 	Msg("CWebMVideoRecorder::GetDataRate()\n");
 #endif
-	for(int i = 0; i< ARRAYSIZE( s_WebMEncodeRates ); i++ )
+	for(int i = 0; i< SE_ARRAYSIZE( s_WebMEncodeRates ); i++ )
 	{
 		if (s_WebMEncodeRates[i].m_XResolution == width && s_WebMEncodeRates[i].m_YResolution == height)
 		{
@@ -796,7 +796,7 @@ float CWebMVideoRecorder::GetAudioDataRate( int quality, int width, int height )
 #ifdef LOG_ENCODER_OPERATIONS
 	Msg("CWebMVideoRecorder::GetDataRate()\n");
 #endif
-	for(int i = 0; i< ARRAYSIZE( s_WebMEncodeRates ); i++ )
+	for(int i = 0; i< SE_ARRAYSIZE( s_WebMEncodeRates ); i++ )
 	{
 		if (s_WebMEncodeRates[i].m_XResolution == width && s_WebMEncodeRates[i].m_YResolution == height)
 		{

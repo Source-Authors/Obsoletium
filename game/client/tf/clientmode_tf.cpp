@@ -221,7 +221,7 @@ static bool TauntHandlesKeyInput( int down, ButtonCode_t keynum, const char *psz
 	{
 		if ( pPlayer->m_Shared.InCond( TF_COND_TAUNTING ) )
 		{
-			for ( int i=0; i<ARRAYSIZE( pszStopTauntKeys ); ++i )
+			for ( int i=0; i<SE_ARRAYSIZE( pszStopTauntKeys ); ++i )
 			{
 				if ( down && pszCurrentBinding && FStrEq( pszCurrentBinding, pszStopTauntKeys[i] ) )
 				{

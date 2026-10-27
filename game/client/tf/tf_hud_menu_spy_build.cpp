@@ -765,7 +765,7 @@ void CHudMenuSpyBuild::ReplaceBuildings( SpyConstructBuilding_t (&targetBuilding
 
 	CUtlVector< const SpyConstructBuildingReplacement_t* > vecReplacements;
 
-	if ( iOverrideType >= 0 && iOverrideType < ARRAYSIZE( s_alternateSpyBuildings ) )
+	if ( iOverrideType >= 0 && iOverrideType < SE_ARRAYSIZE( s_alternateSpyBuildings ) )
 	{
 		vecReplacements.AddToTail( &s_alternateSpyBuildings[iOverrideType] );
 	}
@@ -800,9 +800,9 @@ void CHudMenuSpyBuild::ReplaceBuildings( SpyConstructBuilding_t (&targetBuilding
 		}
 		
 		// no conflict, replace the building
-		for ( int j = 0; j < ARRAYSIZE( trapSlots ); ++j )
+		for ( int j = 0; j < SE_ARRAYSIZE( trapSlots ); ++j )
 		{
-			COMPILE_TIME_ASSERT( ARRAYSIZE( targetBuildings ) == ARRAYSIZE( trapSlots ) );
+			COMPILE_TIME_ASSERT( SE_ARRAYSIZE( targetBuildings ) == SE_ARRAYSIZE( trapSlots ) );
 			if ( trapSlots[j] & iReplacingSlots )
 			{
 				targetBuildings[j] = pReplace->m_building;

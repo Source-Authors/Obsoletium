@@ -686,7 +686,7 @@ int CNPC_Vortigaunt::NumAntlionsInRadius( float flRadius )
 {
 	CBaseEntity *sEnemySearch[16];
 	int nNumAntlions = 0;
-	int nNumEnemies = UTIL_EntitiesInBox( sEnemySearch, ARRAYSIZE(sEnemySearch), GetAbsOrigin()-Vector(flRadius,flRadius,flRadius), GetAbsOrigin()+Vector(flRadius,flRadius,flRadius), FL_NPC );
+	int nNumEnemies = UTIL_EntitiesInBox( sEnemySearch, SE_ARRAYSIZE(sEnemySearch), GetAbsOrigin()-Vector(flRadius,flRadius,flRadius), GetAbsOrigin()+Vector(flRadius,flRadius,flRadius), FL_NPC );
 	for ( int i = 0; i < nNumEnemies; i++ )
 	{
 		// We only care about antlions
@@ -1949,7 +1949,7 @@ void CNPC_Vortigaunt::StartHandGlow( int beamType, int nHand )
 	case VORTIGAUNT_BEAM_ZAP:
 		{
 			// Validate the hand's range
-			if ( nHand >= static_cast<int>(ARRAYSIZE( m_hHandEffect )) )
+			if ( nHand >= static_cast<int>(SE_ARRAYSIZE( m_hHandEffect )) )
 				return;
 
 			// Start up
@@ -2515,7 +2515,7 @@ void CNPC_Vortigaunt::DispelAntlions( const Vector &vecOrigin, float flRadius, b
 	// Make antlions flip all around us!
 	trace_t tr;
 	CBaseEntity *pEnemySearch[32];
-	int nNumEnemies = UTIL_EntitiesInBox( pEnemySearch, ARRAYSIZE(pEnemySearch), vecOrigin-Vector(flRadius,flRadius,flRadius), vecOrigin+Vector(flRadius,flRadius,flRadius), FL_NPC );
+	int nNumEnemies = UTIL_EntitiesInBox( pEnemySearch, SE_ARRAYSIZE(pEnemySearch), vecOrigin-Vector(flRadius,flRadius,flRadius), vecOrigin+Vector(flRadius,flRadius,flRadius), FL_NPC );
 	for ( int i = 0; i < nNumEnemies; i++ )
 	{
 		// We only care about antlions
@@ -2620,11 +2620,11 @@ void CNPC_Vortigaunt::SetScriptedScheduleIgnoreConditions( Interruptability_t in
 		COND_VORTIGAUNT_HEAL_VALID
 	};
 
-	ClearIgnoreConditions( g_VortConditions, ARRAYSIZE(g_VortConditions) );
+	ClearIgnoreConditions( g_VortConditions, SE_ARRAYSIZE(g_VortConditions) );
 
 	// Ignore these if we're damage only
  	if ( interrupt > GENERAL_INTERRUPTABILITY )
- 		SetIgnoreConditions( g_VortConditions, ARRAYSIZE(g_VortConditions) );
+ 		SetIgnoreConditions( g_VortConditions, SE_ARRAYSIZE(g_VortConditions) );
 }
 
 //-----------------------------------------------------------------------------

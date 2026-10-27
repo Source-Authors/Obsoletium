@@ -522,7 +522,7 @@ void CTFInventoryManager::AcknowledgeItem( CEconItemView *pItem, bool bMoveToBac
 	SetAckedByClient( pItem );
 
 	int iMethod = GetUnacknowledgedReason( pItem->GetInventoryPosition() ) - 1;
-	if ( iMethod >= ARRAYSIZE( g_pszItemPickupMethodStringsUnloc ) || iMethod < 0 )
+	if ( iMethod >= SE_ARRAYSIZE( g_pszItemPickupMethodStringsUnloc ) || iMethod < 0 )
 		iMethod = 0;
 	EconUI()->Gamestats_ItemTransaction( IE_ITEM_RECEIVED, pItem, g_pszItemPickupMethodStringsUnloc[iMethod] );
 
@@ -916,7 +916,7 @@ void CTFPlayerInventory::CheckSaxtonMaskAchievement( const CEconItem *pEconItem 
 //-----------------------------------------------------------------------------
 void CTFPlayerInventory::UpdateCachedServerLoadoutItems()
 {
-	V_memcpy( m_CachedServerLoadoutItems, m_LoadoutItems, sizeof( itemid_t ) * ARRAYSIZE( m_CachedServerLoadoutItems ) * ARRAYSIZE( m_CachedServerLoadoutItems[0] ) );
+	V_memcpy( m_CachedServerLoadoutItems, m_LoadoutItems, sizeof( itemid_t ) * SE_ARRAYSIZE( m_CachedServerLoadoutItems ) * SE_ARRAYSIZE( m_CachedServerLoadoutItems[0] ) );
 }
 #endif // CLIENT_DLL
 
@@ -1548,7 +1548,7 @@ void CTFPlayerInventory::ItemHasBeenUpdated( CEconItemView *pItem, bool bUpdateA
 
 		Assert( GetInventoryItemByItemID( pItem->GetItemID() ) );
 
-		bool bThisClassLoadoutChanged = UpdateEquipStateForClass( pItem->GetItemID(), unSlot, m_LoadoutItems[iClass], ARRAYSIZE( m_LoadoutItems[iClass] ) );
+		bool bThisClassLoadoutChanged = UpdateEquipStateForClass( pItem->GetItemID(), unSlot, m_LoadoutItems[iClass], SE_ARRAYSIZE( m_LoadoutItems[iClass] ) );
 
 		if ( bThisClassLoadoutChanged )
 		{
@@ -1569,7 +1569,7 @@ void CTFPlayerInventory::ItemHasBeenUpdated( CEconItemView *pItem, bool bUpdateA
 
 	// Update account items as well
 	equipped_slot_t unSlot = pEconItem ? pEconItem->GetEquippedPositionForClass( GEconItemSchema().GetAccountIndex() ) : INVALID_EQUIPPED_SLOT;
-	UpdateEquipStateForClass( pItem->GetItemID(), unSlot, m_AccountLoadoutItems, ARRAYSIZE( m_AccountLoadoutItems ) );
+	UpdateEquipStateForClass( pItem->GetItemID(), unSlot, m_AccountLoadoutItems, SE_ARRAYSIZE( m_AccountLoadoutItems ) );
 }
 
 //-----------------------------------------------------------------------------

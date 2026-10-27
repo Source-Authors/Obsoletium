@@ -142,7 +142,7 @@ int	CHudMenuTauntSelection::HudElementKeyInput( int down, ButtonCode_t keynum, c
 	};
 
 	// Handles specific key
-	for ( int i=0; i<ARRAYSIZE( s_tauntInput ); ++i )
+	for ( int i=0; i<SE_ARRAYSIZE( s_tauntInput ); ++i )
 	{
 		if ( keynum == gameuifuncs->GetButtonCodeForBind( s_tauntInput[i].m_pszCommand ) )
 		{
@@ -313,7 +313,7 @@ void CHudMenuTauntSelection::UpdateItemModelPanels()
 	int iClass = pPlayer->GetPlayerClass()->GetClassIndex();
 	vgui::IScheme *pScheme = vgui::scheme()->GetIScheme( GetScheme() );
 
-	for ( int i=0; i<ARRAYSIZE( m_pItemModelPanels ); ++i )
+	for ( int i=0; i<SE_ARRAYSIZE( m_pItemModelPanels ); ++i )
 	{
 		int iTauntSlot = LOADOUT_POSITION_TAUNT + i;
 

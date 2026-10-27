@@ -1810,7 +1810,7 @@ static bool TestEntityTriggerIntersection_Accurate( CBaseEntity *pTrigger, CBase
 
 				CUtlVector<collidelist_t> collideList;
 				IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-				int physicsCount = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+				int physicsCount = pEntity->VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 				if ( physicsCount )
 				{
 					for ( int i = 0; i < physicsCount; i++ )

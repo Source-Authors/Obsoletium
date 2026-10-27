@@ -2834,7 +2834,7 @@ void CMDLCacheNotify::ComputeModelFlags( model_t* pModel, MDLHandle_t handle )
 	}
 
 	IMaterial *pMaterials[ 128 ];
-	int materialCount = Mod_GetModelMaterials( pModel, ARRAYSIZE( pMaterials ), pMaterials );
+	int materialCount = Mod_GetModelMaterials( pModel, SE_ARRAYSIZE( pMaterials ), pMaterials );
 
 	for ( int i = 0; i < materialCount; ++i )
 	{
@@ -3705,7 +3705,7 @@ void CModelLoader::ReloadFilesInList( IFileList *pFilesToReload )
 					// Ok, we didn't have to do a full reload, but if any of our materials changed, flush out the studiohwdata because the
 					// vertex format may have changed.
 					IMaterial *pMaterials[128];
-					int nMaterials = g_pStudioRender->GetMaterialList( pStudioHdr, ARRAYSIZE( pMaterials ), &pMaterials[0] );
+					int nMaterials = g_pStudioRender->GetMaterialList( pStudioHdr, SE_ARRAYSIZE( pMaterials ), &pMaterials[0] );
 
 					for ( int iMat=0; iMat < nMaterials; iMat++ )
 					{
@@ -3912,7 +3912,7 @@ void Mod_RecomputeTranslucency( model_t* mod, int nSkin, int nBody, void /*IClie
 				return;
 
 			IMaterial *pMaterials[ 128 ];
-			int materialCount = g_pStudioRender->GetMaterialListFromBodyAndSkin( mod->studio, nSkin, nBody, ARRAYSIZE( pMaterials ), pMaterials );
+			int materialCount = g_pStudioRender->GetMaterialListFromBodyAndSkin( mod->studio, nSkin, nBody, SE_ARRAYSIZE( pMaterials ), pMaterials );
 			for ( int i = 0; i < materialCount; i++ )
 			{
 				if ( pMaterials[i] != NULL )
@@ -4053,7 +4053,7 @@ void Mod_SetMaterialVarFlag( model_t *pModel, unsigned int uiFlag, bool on )
 	IMaterial *pMaterials[ 128 ];
 	if ( pModel )
 	{
-		int materialCount = Mod_GetModelMaterials( pModel, ARRAYSIZE( pMaterials ), pMaterials );
+		int materialCount = Mod_GetModelMaterials( pModel, SE_ARRAYSIZE( pMaterials ), pMaterials );
 
 		for ( int i = 0; i < materialCount; ++i )
 		{
@@ -4937,7 +4937,7 @@ void CModelLoader::Studio_LoadModel( model_t *pModel, bool bTouchAllData )
 	}
 
 	IMaterial *pMaterials[128];
-	int nMaterials = Mod_GetModelMaterials( pModel, ARRAYSIZE( pMaterials ), pMaterials );
+	int nMaterials = Mod_GetModelMaterials( pModel, SE_ARRAYSIZE( pMaterials ), pMaterials );
 
 	if ( pModel->nLoadFlags & FMODELLOADER_DYNAMIC )
 	{
@@ -4988,7 +4988,7 @@ void CModelLoader::Studio_UnloadModel( model_t *pModel )
 	if ( pModel->nLoadFlags & FMODELLOADER_TOUCHED_MATERIALS )
 	{
 		IMaterial *pMaterials[128];
-		int nMaterials = Mod_GetModelMaterials( pModel, ARRAYSIZE( pMaterials ), &pMaterials[0] );
+		int nMaterials = Mod_GetModelMaterials( pModel, SE_ARRAYSIZE( pMaterials ), &pMaterials[0] );
 		for ( int j=0; j<nMaterials; j++ )
 		{
 			pMaterials[j]->DecrementReferenceCount();

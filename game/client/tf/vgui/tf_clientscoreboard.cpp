@@ -981,7 +981,7 @@ void CTFClientScoreBoardDialog::UpdateTeamInfo()
 			// update # of players on each team
 			wchar_t string1[1024];
 			wchar_t wNumPlayers[6];
-			_snwprintf( wNumPlayers, ARRAYSIZE( wNumPlayers ), L"%i", team->Get_Number_Players() );
+			_snwprintf( wNumPlayers, SE_ARRAYSIZE( wNumPlayers ), L"%i", team->Get_Number_Players() );
 			if ( team->Get_Number_Players() == 1 )
 			{
 				g_pVGuiLocalize->ConstructString_safe( string1, g_pVGuiLocalize->Find( "#TF_ScoreBoard_Player" ), 1, wNumPlayers );
@@ -1563,20 +1563,20 @@ void CTFClientScoreBoardDialog::UpdateSpectatorList()
 			{
 				if ( nCoaches > 0 )
 				{
-					Q_strncat( szCoachList, ", ", ARRAYSIZE( szCoachList ) );
+					Q_strncat( szCoachList, ", ", SE_ARRAYSIZE( szCoachList ) );
 				}
 
-				Q_strncat( szCoachList, g_PR->GetPlayerName( playerIndex ), ARRAYSIZE( szCoachList ) );
+				Q_strncat( szCoachList, g_PR->GetPlayerName( playerIndex ), SE_ARRAYSIZE( szCoachList ) );
 				nCoaches++;
 			}
 			else
 			{
 				if ( nSpectators > 0 )
 				{
-					Q_strncat( szSpectatorList, ", ", ARRAYSIZE( szSpectatorList ) );
+					Q_strncat( szSpectatorList, ", ", SE_ARRAYSIZE( szSpectatorList ) );
 				}
 
-				Q_strncat( szSpectatorList, g_PR->GetPlayerName( playerIndex ), ARRAYSIZE( szSpectatorList ) );
+				Q_strncat( szSpectatorList, g_PR->GetPlayerName( playerIndex ), SE_ARRAYSIZE( szSpectatorList ) );
 				nSpectators++;
 			}
 		}
@@ -1589,7 +1589,7 @@ void CTFClientScoreBoardDialog::UpdateSpectatorList()
 
 		wchar_t wzCount[16];
 		wchar_t wzList[1024];
-		_snwprintf( wzCount, ARRAYSIZE( wzCount ), L"%i", nCoaches );
+		_snwprintf( wzCount, SE_ARRAYSIZE( wzCount ), L"%i", nCoaches );
 		g_pVGuiLocalize->ConvertANSIToUnicode( szCoachList, wzList, sizeof( wzList ) );
 		g_pVGuiLocalize->ConstructString_safe( wzText, g_pVGuiLocalize->Find( pchFormat), 2, wzCount, wzList );
 	}
@@ -1600,7 +1600,7 @@ void CTFClientScoreBoardDialog::UpdateSpectatorList()
 		wchar_t wzSpectatorText[512] = L"";
 		wchar_t wzSpectatorCount[16];
 		wchar_t wzSpectatorList[1024];
-		_snwprintf( wzSpectatorCount, ARRAYSIZE( wzSpectatorCount ), L"%i", nSpectators );
+		_snwprintf( wzSpectatorCount, SE_ARRAYSIZE( wzSpectatorCount ), L"%i", nSpectators );
 		g_pVGuiLocalize->ConvertANSIToUnicode( szSpectatorList, wzSpectatorList, sizeof( wzSpectatorList ) );
 		g_pVGuiLocalize->ConstructString_safe( wzSpectatorText, g_pVGuiLocalize->Find( pchFormat), 2, wzSpectatorCount, wzSpectatorList );
 		if ( nCoaches > 0 )
@@ -1656,10 +1656,10 @@ void CTFClientScoreBoardDialog::UpdateArenaWaitingToPlayList()
 			{
 				if ( nSpectators > 0 )
 				{
-					Q_strncat( szSpectatorList, ", ", ARRAYSIZE( szSpectatorList ) );
+					Q_strncat( szSpectatorList, ", ", SE_ARRAYSIZE( szSpectatorList ) );
 				}
 
-				Q_strncat( szSpectatorList, g_PR->GetPlayerName( playerIndex ), ARRAYSIZE( szSpectatorList ) );
+				Q_strncat( szSpectatorList, g_PR->GetPlayerName( playerIndex ), SE_ARRAYSIZE( szSpectatorList ) );
 				nSpectators++;
 			}
 		}
@@ -1670,7 +1670,7 @@ void CTFClientScoreBoardDialog::UpdateArenaWaitingToPlayList()
 
 			wchar_t wzSpectatorCount[16];
 			wchar_t wzSpectatorList[1024];
-			_snwprintf( wzSpectatorCount, ARRAYSIZE( wzSpectatorCount ), L"%i", nSpectators );
+			_snwprintf( wzSpectatorCount, SE_ARRAYSIZE( wzSpectatorCount ), L"%i", nSpectators );
 			g_pVGuiLocalize->ConvertANSIToUnicode( szSpectatorList, wzSpectatorList, sizeof( wzSpectatorList ) );
 			g_pVGuiLocalize->ConstructString_safe( wzSpectators, g_pVGuiLocalize->Find( pchFormat), 2, wzSpectatorCount, wzSpectatorList );
 		}
@@ -1990,9 +1990,9 @@ void CTFClientScoreBoardDialog::UpdateServerTimeLeft()
 	iMinutes = ( iTimeLeft % 3600 ) / 60;
 	iSeconds = ( iTimeLeft % 60 );
 
-	_snwprintf( wzServerTimeHrsLeft, ARRAYSIZE( wzServerTimeHrsLeft ), L"%i", iHours );
-	_snwprintf( wzServerTimeMinLeft, ARRAYSIZE( wzServerTimeMinLeft ), L"%02i", iMinutes );
-	_snwprintf( wzServerTimeSecLeft, ARRAYSIZE( wzServerTimeSecLeft ), L"%02i", iSeconds );
+	_snwprintf( wzServerTimeHrsLeft, SE_ARRAYSIZE( wzServerTimeHrsLeft ), L"%i", iHours );
+	_snwprintf( wzServerTimeMinLeft, SE_ARRAYSIZE( wzServerTimeMinLeft ), L"%02i", iMinutes );
+	_snwprintf( wzServerTimeSecLeft, SE_ARRAYSIZE( wzServerTimeSecLeft ), L"%02i", iSeconds );
 
 	if ( m_pServerTimeLeftValue && m_pServerTimeLeftValue->IsVisible() && ( m_pFontTimeLeftNumbers != vgui::INVALID_FONT ) )
 	{
@@ -2121,7 +2121,7 @@ const wchar_t *GetPointsString( int iPoints )
 {
 	wchar_t wzScoreVal[128];
 	static wchar_t wzScore[128];
-	_snwprintf( wzScoreVal, ARRAYSIZE( wzScoreVal ), L"%i", iPoints );
+	_snwprintf( wzScoreVal, SE_ARRAYSIZE( wzScoreVal ), L"%i", iPoints );
 	if ( 1 == iPoints ) 
 	{
 		g_pVGuiLocalize->ConstructString_safe( wzScore, g_pVGuiLocalize->Find( "#TF_ScoreBoard_Point" ), 1, wzScoreVal );

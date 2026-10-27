@@ -119,7 +119,7 @@ void CDODPlayerStats::FireGameEvent( IGameEvent *event )
 						char szStatName[256];
 						int iData;
 
-						Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.%s.%s", g_pszShortTeamNames[iTeam], g_pszClassNames[iClass], g_pszStatNames[iStat] );
+						Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.%s.%s", g_pszShortTeamNames[iTeam], g_pszClassNames[iClass], g_pszStatNames[iStat] );
 
 						if ( steamapicontext->SteamUserStats()->GetStat( szStatName, &iData ) )
 						{
@@ -141,7 +141,7 @@ void CDODPlayerStats::FireGameEvent( IGameEvent *event )
 					char szStatName[256];
 					int iData;
 
-					Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.%s", s_WeaponAliasInfo[iWeapon], g_pszStatNames[iStat] );
+					Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.%s", s_WeaponAliasInfo[iWeapon], g_pszStatNames[iStat] );
 
 					if ( steamapicontext->SteamUserStats()->GetStat( szStatName, &iData ) )
 					{
@@ -252,7 +252,7 @@ void CDODPlayerStats::UploadStats()
 				{
 					if ( m_PlayerStats[iTeam][iClass].m_bDirty[iStat] )
 					{
-						Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.%s.%s", g_pszShortTeamNames[iTeam], g_pszClassNames[iClass], g_pszStatNames[iStat] );
+						Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.%s.%s", g_pszShortTeamNames[iTeam], g_pszClassNames[iClass], g_pszStatNames[iStat] );
 
 						steamapicontext->SteamUserStats()->SetStat( szStatName, m_PlayerStats[iTeam][iClass].m_iStat[iStat] );
 					}
@@ -270,7 +270,7 @@ void CDODPlayerStats::UploadStats()
 			{
 				if ( iValidWeaponStatBitMask & (1<<iStat) )
 				{
-					Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.%s", s_WeaponAliasInfo[iWeapon], g_pszStatNames[iStat] );
+					Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.%s", s_WeaponAliasInfo[iWeapon], g_pszStatNames[iStat] );
 
 					steamapicontext->SteamUserStats()->SetStat( szStatName, m_WeaponStats[iWeapon].m_iStat[iStat] );
 				}	

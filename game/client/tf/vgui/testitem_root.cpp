@@ -525,7 +525,7 @@ void CTestItemRoot::UpdateTestItems( void )
 				const char *pszModel = m_pItemTestKVs[i]->GetString("model_player", "#IT_TestingSlot_Empty");
 
 				char szModel[MAX_PATH+1]="";
-				Q_FileBase( pszModel, szModel, ARRAYSIZE( szModel ) );
+				Q_FileBase( pszModel, szModel, SE_ARRAYSIZE( szModel ) );
 				m_pItemTestLabels[i]->SetText( szModel );
 			}
 			m_pItemRemoveButtons[i]->SetEnabled( true );

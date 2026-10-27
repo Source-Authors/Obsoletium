@@ -165,7 +165,7 @@ static inline void SV_PackEntity(
 			packedData,	writeBuf.GetNumBitsWritten(),
 			
 			deltaProps,
-			ARRAYSIZE( deltaProps ),
+			SE_ARRAYSIZE( deltaProps ),
 
 			edictIdx
 			);

@@ -713,7 +713,7 @@ void CTFStreamPanel::SetPreviewImage( const char *pszPreviewImageFile )
 	}
 
 	char szImageAbsPath[MAX_PATH];
-	if ( !GenerateFullPath( pszPreviewImageFile, "MOD", szImageAbsPath, ARRAYSIZE( szImageAbsPath ) ) )
+	if ( !GenerateFullPath( pszPreviewImageFile, "MOD", szImageAbsPath, SE_ARRAYSIZE( szImageAbsPath ) ) )
 	{
 		Warning( "Failed to GenerateFullPath %s\n", pszPreviewImageFile );
 		return;
@@ -753,7 +753,7 @@ void CTFStreamPanel::SetPreviewImage( const char *pszPreviewImageFile )
 
 CTFStreamListPanel::CTFStreamListPanel( Panel *parent, const char *panelName ) : EditablePanel( parent, panelName )
 {
-	for ( int i=0; i<ARRAYSIZE( m_arrStreamPanels ); ++i )
+	for ( int i=0; i<SE_ARRAYSIZE( m_arrStreamPanels ); ++i )
 	{
 		m_arrStreamPanels[i] = new CTFStreamPanel( this, CFmtStr( "Stream%d", i + 1 ) );
 	}
@@ -796,7 +796,7 @@ void CTFStreamListPanel::FireGameEvent( IGameEvent *event )
 	if ( FStrEq( pszEventName, "top_streams_request_finished" ) )
 	{
 		// update each stream panel
-		for ( int i=0; i<ARRAYSIZE( m_arrStreamPanels ); ++i )
+		for ( int i=0; i<SE_ARRAYSIZE( m_arrStreamPanels ); ++i )
 		{
 			bool bVisible = i < g_streamManager.GetStreamInfoVec().Count();
 			m_arrStreamPanels[i]->SetVisible( bVisible );

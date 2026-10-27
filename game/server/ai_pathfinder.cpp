@@ -526,12 +526,12 @@ AI_Waypoint_t* CAI_Pathfinder::FindShortRandomPath(int startID, float minPathLen
 		pAInode[neighborID]->ShuffleLinks();
 		for (intp link=0; link < pAInode[neighborID]->NumLinks();link++) 
 		{
-			if ( numStaleNeighbors == ARRAYSIZE(pStaleNeighbor) )
+			if ( numStaleNeighbors == SE_ARRAYSIZE(pStaleNeighbor) )
 			{
 				AssertMsg( 0, "Array overflow" );
 				return NULL;
 			}
-			if ( numNeighbors == ARRAYSIZE(pStaleNeighbor) )
+			if ( numNeighbors == SE_ARRAYSIZE(pStaleNeighbor) )
 			{
 				AssertMsg( 0, "Array overflow" );
 				return NULL;
@@ -1286,22 +1286,22 @@ AI_Waypoint_t *CAI_Pathfinder::BuildOBBAvoidanceRoute(	const Vector &vStart, con
 	pObstruction->CollisionProp()->NormalizedToWorldSpace( Vector(  -flWidthPercX,  -flWidthPercY, 0.25f ), &vecPoints[3] );
 
 	// Find the two points nearest our goals
-	int nStartPoint = ClosestPointToPosition( vStart, vecPoints, ARRAYSIZE( vecPoints ) );
-	int nEndPoint = ClosestPointToPosition( vEnd, vecPoints, ARRAYSIZE( vecPoints ) );
+	int nStartPoint = ClosestPointToPosition( vStart, vecPoints, SE_ARRAYSIZE( vecPoints ) );
+	int nEndPoint = ClosestPointToPosition( vEnd, vecPoints, SE_ARRAYSIZE( vecPoints ) );
 
 	// We won't be able to build a route if we're moving no distance between points
 	if ( nStartPoint == nEndPoint )
 		return NULL;
 
 	// Find the shortest path around this wound polygon (direction is how to step through array)
-	int nDirection = ShortestDirectionThroughPoints( vStart, nStartPoint, nEndPoint, vecPoints, ARRAYSIZE( vecPoints ) );
+	int nDirection = ShortestDirectionThroughPoints( vStart, nStartPoint, nEndPoint, vecPoints, SE_ARRAYSIZE( vecPoints ) );
 
 	// Attempt to build a route in our direction
-	AI_Waypoint_t *pRoute = BuildRouteThroughPoints( vecPoints, ARRAYSIZE(vecPoints), nDirection, nStartPoint, nEndPoint, navType, (CBaseEntity *) pTarget );
+	AI_Waypoint_t *pRoute = BuildRouteThroughPoints( vecPoints, SE_ARRAYSIZE(vecPoints), nDirection, nStartPoint, nEndPoint, navType, (CBaseEntity *) pTarget );
 	if ( pRoute == NULL )
 	{
 		// Failed that way, so try the opposite
-		pRoute = BuildRouteThroughPoints( vecPoints, ARRAYSIZE(vecPoints), (-nDirection), nStartPoint, nEndPoint, navType, (CBaseEntity *) pTarget );
+		pRoute = BuildRouteThroughPoints( vecPoints, SE_ARRAYSIZE(vecPoints), (-nDirection), nStartPoint, nEndPoint, navType, (CBaseEntity *) pTarget );
 		if ( pRoute == NULL )
 			return NULL;
 	}

@@ -1936,7 +1936,7 @@ static inline void CM_UnsweptBoxTrace( TraceInfo_t *pTraceInfo, const Ray_t& ray
 	leafnums_t context;
 	context.pLeafList = leafs;
 	context.leafTopNode = -1;
-	context.leafMaxCount = ARRAYSIZE(leafs);
+	context.leafMaxCount = SE_ARRAYSIZE(leafs);
 	context.pBSPData = pTraceInfo->m_pBSPData;
 
 	bool bFoundNonSolidLeaf = false;

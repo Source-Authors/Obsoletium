@@ -186,13 +186,13 @@ static const int g_doomsdayNormalSpellIndexList[] =
 
 static const int g_doomsdayRareSpellIndexList[] =
 {
-	ARRAYSIZE( g_NormalSpellList ) + 0,		// Lightning
-	ARRAYSIZE( g_NormalSpellList ) + 1,		// Mini
-	ARRAYSIZE( g_NormalSpellList ) + 2,		// Meteor
-	ARRAYSIZE( g_NormalSpellList ) + 0,		// Lightning
-	ARRAYSIZE( g_NormalSpellList ) + 1,		// Mini
-	ARRAYSIZE( g_NormalSpellList ) + 2,		// Meteor
-	ARRAYSIZE( g_NormalSpellList ) + 3		// Boss / Monoculus.  Smaller chance
+	SE_ARRAYSIZE( g_NormalSpellList ) + 0,		// Lightning
+	SE_ARRAYSIZE( g_NormalSpellList ) + 1,		// Mini
+	SE_ARRAYSIZE( g_NormalSpellList ) + 2,		// Meteor
+	SE_ARRAYSIZE( g_NormalSpellList ) + 0,		// Lightning
+	SE_ARRAYSIZE( g_NormalSpellList ) + 1,		// Mini
+	SE_ARRAYSIZE( g_NormalSpellList ) + 2,		// Meteor
+	SE_ARRAYSIZE( g_NormalSpellList ) + 3		// Boss / Monoculus.  Smaller chance
 };
 
 // Regular SpellList
@@ -200,17 +200,17 @@ static const int g_doomsdayRareSpellIndexList[] =
 static const int g_generalSpellIndexList[] =
 {
 	0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 
-	ARRAYSIZE ( g_NormalSpellList ) + 0, 
-	ARRAYSIZE ( g_NormalSpellList ) + 1, 
-	ARRAYSIZE ( g_NormalSpellList ) + 2
+	SE_ARRAYSIZE ( g_NormalSpellList ) + 0, 
+	SE_ARRAYSIZE ( g_NormalSpellList ) + 1, 
+	SE_ARRAYSIZE ( g_NormalSpellList ) + 2
 };
 
 int GetTotalSpellCount( CTFPlayer *pPlayer )
 {
-	int iSpellCount = ARRAYSIZE( g_NormalSpellList ) + ARRAYSIZE( g_RareSpellList );
+	int iSpellCount = SE_ARRAYSIZE( g_NormalSpellList ) + SE_ARRAYSIZE( g_RareSpellList );
 	if ( pPlayer && pPlayer->m_Shared.InCond( TF_COND_HALLOWEEN_KART ) )
 	{
-		iSpellCount += ARRAYSIZE( g_KartSpellList );
+		iSpellCount += SE_ARRAYSIZE( g_KartSpellList );
 	}
 	return iSpellCount;
 }
@@ -222,7 +222,7 @@ bool IsRareSpell( int iSpellIndex )
 		iSpellIndex = tf_test_spellindex.GetInt();
 	}
 
-	return ( ( iSpellIndex >= ARRAYSIZE( g_NormalSpellList ) ) && ( iSpellIndex < ARRAYSIZE( g_NormalSpellList ) + ARRAYSIZE( g_RareSpellList ) ) );
+	return ( ( iSpellIndex >= SE_ARRAYSIZE( g_NormalSpellList ) ) && ( iSpellIndex < SE_ARRAYSIZE( g_NormalSpellList ) + SE_ARRAYSIZE( g_RareSpellList ) ) );
 }
 
 const spell_data_t* GetSpellData( int iSpellIndex )
@@ -235,15 +235,15 @@ const spell_data_t* GetSpellData( int iSpellIndex )
 	if ( iSpellIndex < 0 )
 		return NULL;
 
-	const int nNormalSpellCount = ARRAYSIZE( g_NormalSpellList );
+	const int nNormalSpellCount = SE_ARRAYSIZE( g_NormalSpellList );
 	if ( iSpellIndex < nNormalSpellCount )
 		return &g_NormalSpellList[ iSpellIndex ];
 
-	const int nRareSpellRange = nNormalSpellCount + ARRAYSIZE( g_RareSpellList );
+	const int nRareSpellRange = nNormalSpellCount + SE_ARRAYSIZE( g_RareSpellList );
 	if ( iSpellIndex < nRareSpellRange )
 		return &g_RareSpellList[ iSpellIndex - nNormalSpellCount ];
 
-	const int nKartSpellRange = nRareSpellRange + ARRAYSIZE( g_KartSpellList );
+	const int nKartSpellRange = nRareSpellRange + SE_ARRAYSIZE( g_KartSpellList );
 	if ( iSpellIndex < nKartSpellRange )
 		return &g_KartSpellList[ iSpellIndex - nRareSpellRange];
 
@@ -252,7 +252,7 @@ const spell_data_t* GetSpellData( int iSpellIndex )
 
 int GetSpellIndexFromContext( int iContext )
 {
-	const int nNormalSpellCount = ARRAYSIZE( g_NormalSpellList );
+	const int nNormalSpellCount = SE_ARRAYSIZE( g_NormalSpellList );
 	for ( int i=0; i<nNormalSpellCount; ++i )
 	{
 		if ( g_NormalSpellList[i].m_iSpellContext == iContext )
@@ -261,7 +261,7 @@ int GetSpellIndexFromContext( int iContext )
 		}
 	}
 
-	const int nRareSpellCount = ARRAYSIZE( g_RareSpellList );
+	const int nRareSpellCount = SE_ARRAYSIZE( g_RareSpellList );
 	for ( int i=0; i<nRareSpellCount; ++i )
 	{
 		if ( g_RareSpellList[i].m_iSpellContext == iContext )
@@ -726,7 +726,7 @@ void CTFSpellBook::ItemBusyFrame( void )
 	// Start the muzzle flash, if a system hasn't already been started.
 	if ( iAttachment > 0 )
 	{
-		const char *pszEffectName = GetHandEffect( GetAttributeContainer()->GetItem(), m_iSelectedSpellIndex >= ARRAYSIZE( g_NormalSpellList ) );
+		const char *pszEffectName = GetHandEffect( GetAttributeContainer()->GetItem(), m_iSelectedSpellIndex >= SE_ARRAYSIZE( g_NormalSpellList ) );
 		if ( pszEffectName )
 		{
 			m_hHandEffect = pBase->ParticleProp()->Create( pszEffectName, PATTACH_POINT_FOLLOW, iAttachment );
@@ -1077,24 +1077,24 @@ void CTFSpellBook::RollNewSpell( int iTier, bool bForceReroll /*= false*/ )
 	// This is dumb, make spell lists better somehow
 	if ( pPlayer->m_Shared.InCond( TF_COND_HALLOWEEN_KART ) )
 	{
-		iNextSpell = RandomInt( ARRAYSIZE( g_NormalSpellList ) + ARRAYSIZE( g_RareSpellList ), GetTotalSpellCount( pPlayer ) - 1 );
+		iNextSpell = RandomInt( SE_ARRAYSIZE( g_NormalSpellList ) + SE_ARRAYSIZE( g_RareSpellList ), GetTotalSpellCount( pPlayer ) - 1 );
 	}
 	else if ( iTier == 0 )
 	{
 		// Doomsday has special spell list
 		if ( TFGameRules() && TFGameRules()->GetHalloweenScenario( ) == CTFGameRules::HALLOWEEN_SCENARIO_DOOMSDAY )
 		{
-			iNextSpell = g_doomsdayNormalSpellIndexList[ RandomInt( 0, ARRAYSIZE( g_doomsdayNormalSpellIndexList ) - 1 ) ];
+			iNextSpell = g_doomsdayNormalSpellIndexList[ RandomInt( 0, SE_ARRAYSIZE( g_doomsdayNormalSpellIndexList ) - 1 ) ];
 		}
 		// Helltower has normal spell list
 		else if ( TFGameRules() && TFGameRules()->GetHalloweenScenario( ) == CTFGameRules::HALLOWEEN_SCENARIO_HIGHTOWER )
 		{
-			iNextSpell = RandomInt( 0, ARRAYSIZE( g_NormalSpellList ) - 1 );
+			iNextSpell = RandomInt( 0, SE_ARRAYSIZE( g_NormalSpellList ) - 1 );
 		}
 		// everyone else uses special list
 		else
 		{
-			iNextSpell = g_generalSpellIndexList[ RandomInt( 0, ARRAYSIZE( g_generalSpellIndexList ) - 1 ) ];
+			iNextSpell = g_generalSpellIndexList[ RandomInt( 0, SE_ARRAYSIZE( g_generalSpellIndexList ) - 1 ) ];
 		}
 	}
 	else // rare spell should not be the else
@@ -1102,7 +1102,7 @@ void CTFSpellBook::RollNewSpell( int iTier, bool bForceReroll /*= false*/ )
 		// Doomsday has special spell list
 		if ( TFGameRules() && TFGameRules()->GetHalloweenScenario( ) == CTFGameRules::HALLOWEEN_SCENARIO_DOOMSDAY )
 		{
-			iNextSpell = g_doomsdayRareSpellIndexList[ RandomInt( 0, ARRAYSIZE( g_doomsdayRareSpellIndexList ) - 1 ) ];
+			iNextSpell = g_doomsdayRareSpellIndexList[ RandomInt( 0, SE_ARRAYSIZE( g_doomsdayRareSpellIndexList ) - 1 ) ];
 		}
 		else
 		{
@@ -1113,7 +1113,7 @@ void CTFSpellBook::RollNewSpell( int iTier, bool bForceReroll /*= false*/ )
 			{
 				iIndexReduction += g_NavMeshSpells;
 			}
-			iNextSpell = RandomInt( ARRAYSIZE( g_NormalSpellList ), GetTotalSpellCount( pPlayer ) - 1 );
+			iNextSpell = RandomInt( SE_ARRAYSIZE( g_NormalSpellList ), GetTotalSpellCount( pPlayer ) - 1 );
 		}
 	}
 	
@@ -1139,7 +1139,7 @@ void CTFSpellBook::RollNewSpellFinish( void )
 		return;
 	}
 	int iConcept = MP_CONCEPT_NONE;
-	if ( m_iNextSpell < ARRAYSIZE( g_NormalSpellList ) )
+	if ( m_iNextSpell < SE_ARRAYSIZE( g_NormalSpellList ) )
 	{
 		iConcept = MP_CONCEPT_PLAYER_SPELL_PICKUP_COMMON;
 	}
@@ -2364,7 +2364,7 @@ public:
 				};
 
 				bool bFoundValidSpawnPos = false;
-				for ( int i=0; i<ARRAYSIZE( vTest ); ++i )
+				for ( int i=0; i<SE_ARRAYSIZE( vTest ); ++i )
 				{
 					trace_t result;
 					float bloat = 5.0f;

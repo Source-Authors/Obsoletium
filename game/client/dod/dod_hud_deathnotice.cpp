@@ -883,8 +883,8 @@ void CHudDeathNotice::AddAdditionalMsg( int iKillerID, int iVictimID, const char
 
 	msg.Killer.iEntIndex = iKillerID;
 	msg.Victim.iEntIndex = iVictimID;
-	Q_strncpy( msg.Killer.szName, g_PR->GetPlayerName( iKillerID ), ARRAYSIZE( msg.Killer.szName ) );
-	Q_strncpy( msg.Victim.szName, g_PR->GetPlayerName( iVictimID ), ARRAYSIZE( msg.Victim.szName ) );
+	Q_strncpy( msg.Killer.szName, g_PR->GetPlayerName( iKillerID ), SE_ARRAYSIZE( msg.Killer.szName ) );
+	Q_strncpy( msg.Victim.szName, g_PR->GetPlayerName( iVictimID ), SE_ARRAYSIZE( msg.Victim.szName ) );
 	msg.flDisplayTime = gpGlobals->curtime + hud_deathnotice_time.GetFloat();
 	msg.bSuicide = false;
 	msg.bCapMsg = false;

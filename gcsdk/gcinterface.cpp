@@ -618,7 +618,7 @@ bool CGCInterface::BAsyncInit( uint32 unAppID, const char *pchDebugName, int iGC
 	//get our machine name
 	{
 		char szMachineName[ MAX_COMPUTERNAME_LENGTH + 1 ];
-		DWORD nBufferSize = ARRAYSIZE( szMachineName );
+		DWORD nBufferSize = SE_ARRAYSIZE( szMachineName );
 		GetComputerName( szMachineName, &nBufferSize );
 		m_sMachineName = szMachineName;
 	}

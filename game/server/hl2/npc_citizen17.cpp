@@ -429,7 +429,7 @@ void CNPC_Citizen::PrecacheAllOfType( CitizenType_t type )
 	if ( m_Type == CT_UNIQUE )
 		return;
 
-	int nHeads = ARRAYSIZE( g_ppszRandomHeads );
+	int nHeads = SE_ARRAYSIZE( g_ppszRandomHeads );
 	int i;
 	for ( i = 0; i < nHeads; ++i )
 	{
@@ -643,7 +643,7 @@ void CNPC_Citizen::SelectModel()
 			for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 			{
 				CNPC_Citizen *pCitizen = dynamic_cast<CNPC_Citizen *>(g_AI_Manager.AccessAIs()[i]);
-				if ( pCitizen && pCitizen != this && pCitizen->m_iHead >= 0 && pCitizen->m_iHead < static_cast<int>(ARRAYSIZE(g_ppszRandomHeads)) )
+				if ( pCitizen && pCitizen != this && pCitizen->m_iHead >= 0 && pCitizen->m_iHead < static_cast<int>(SE_ARRAYSIZE(g_ppszRandomHeads)) )
 				{
 					headCounts[pCitizen->m_iHead]++;
 				}
@@ -696,7 +696,7 @@ void CNPC_Citizen::SelectModel()
 			pszModelName++;
 			if ( m_iHead == -1 )
 			{
-				for ( int i = 0; i < static_cast<int>(ARRAYSIZE(g_ppszRandomHeads)); i++ )
+				for ( int i = 0; i < static_cast<int>(SE_ARRAYSIZE(g_ppszRandomHeads)); i++ )
 				{
 					if ( Q_stricmp( g_ppszRandomHeads[i], pszModelName ) == 0 )
 					{

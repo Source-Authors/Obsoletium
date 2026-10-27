@@ -2813,7 +2813,7 @@ bool CBasePlayer::CanPickupObject( CBaseEntity *pObject, float massLimit, float 
 		return false;
 
 	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int count = pObject->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+	int count = pObject->VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 
 	//Must have a physics object
 	if (!count)

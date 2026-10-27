@@ -107,7 +107,7 @@ public:
 		item_price_t unPrice = pEntry->GetCurrentPrice( eCurrency );
 
 		wchar_t wzLocalizedPrice[ kLocalizedPriceSizeInChararacters ];
-		MakeMoneyString( wzLocalizedPrice, ARRAYSIZE( wzLocalizedPrice ), unPrice, EconUI()->GetStorePanel()->GetCurrency() );
+		MakeMoneyString( wzLocalizedPrice, SE_ARRAYSIZE( wzLocalizedPrice ), unPrice, EconUI()->GetStorePanel()->GetCurrency() );
 		SetDialogVariable( "price", wzLocalizedPrice );
 
 		Panel *pConfirmButton = FindChildByName( "ConfirmButton" );

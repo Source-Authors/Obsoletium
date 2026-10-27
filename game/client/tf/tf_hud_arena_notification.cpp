@@ -127,7 +127,7 @@ void CHudArenaNotification::FireGameEvent( IGameEvent * event )
 		CBaseHudChat *hudChat = (CBaseHudChat *)GET_HUDELEMENT( CHudChat );
 
 		wchar_t wStreak[6];
-		_snwprintf( wStreak, ARRAYSIZE( wStreak ), L"%i", iStreak );
+		_snwprintf( wStreak, SE_ARRAYSIZE( wStreak ), L"%i", iStreak );
 
 		wchar_t wszLocalized[100];
 		g_pVGuiLocalize->ConstructString_safe( wszLocalized, g_pVGuiLocalize->Find( "#TF_Arena_MaxStreak" ), 2, pTeam->Get_Localized_Name(), wStreak );

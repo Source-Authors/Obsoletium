@@ -249,10 +249,10 @@ void CHudBaseDeathNotice::Paint()
 
 		// draw a background panel for the message
 		Vertex_t vert[NUM_BACKGROUND_COORD];
-		GetBackgroundPolygonVerts( x, y+1, x+iTotalWide, y+iLineTall-1, ARRAYSIZE( vert ), vert );		
+		GetBackgroundPolygonVerts( x, y+1, x+iTotalWide, y+iLineTall-1, SE_ARRAYSIZE( vert ), vert );		
 		surface()->DrawSetTexture( -1 );
 		surface()->DrawSetColor( GetBackgroundColor ( i ) );
-		surface()->DrawTexturedPolygon( ARRAYSIZE( vert ), vert );
+		surface()->DrawTexturedPolygon( SE_ARRAYSIZE( vert ), vert );
 
 		x += xMargin;
 	
@@ -508,8 +508,8 @@ void CHudBaseDeathNotice::FireGameEvent( IGameEvent *event )
 		m_DeathNotices[iMsg].bLocalPlayerInvolved = bLocalPlayerInvolved;
 		m_DeathNotices[iMsg].Killer.iTeam = ( killer > 0 ) ? g_PR->GetTeam( killer ) : 0;
 		m_DeathNotices[iMsg].Victim.iTeam = g_PR->GetTeam( victim );
-		Q_strncpy( m_DeathNotices[iMsg].Killer.szName, killer_name, ARRAYSIZE( m_DeathNotices[iMsg].Killer.szName ) );
-		Q_strncpy( m_DeathNotices[iMsg].Victim.szName, victim_name, ARRAYSIZE( m_DeathNotices[iMsg].Victim.szName ) );
+		Q_strncpy( m_DeathNotices[iMsg].Killer.szName, killer_name, SE_ARRAYSIZE( m_DeathNotices[iMsg].Killer.szName ) );
+		Q_strncpy( m_DeathNotices[iMsg].Victim.szName, victim_name, SE_ARRAYSIZE( m_DeathNotices[iMsg].Victim.szName ) );
 		if ( killedwith && *killedwith )
 		{
 			Q_snprintf( m_DeathNotices[iMsg].szIcon, sizeof(m_DeathNotices[iMsg].szIcon), "d_%s", killedwith );
@@ -522,7 +522,7 @@ void CHudBaseDeathNotice::FireGameEvent( IGameEvent *event )
 			if ( event->GetInt( "death_flags" ) & TF_DEATH_PURGATORY )
 			{
 				// special case icon for dying in purgatory
-				Q_strncpy( m_DeathNotices[iMsg].szIcon, "d_purgatory", ARRAYSIZE( m_DeathNotices[iMsg].szIcon ) );
+				Q_strncpy( m_DeathNotices[iMsg].szIcon, "d_purgatory", SE_ARRAYSIZE( m_DeathNotices[iMsg].szIcon ) );
 			}
 			else if ( event->GetInt( "damagebits" ) & DMG_FALL )
 			{
@@ -532,7 +532,7 @@ void CHudBaseDeathNotice::FireGameEvent( IGameEvent *event )
 			else if ( ( event->GetInt( "damagebits" ) & DMG_VEHICLE ) || ( 0 == Q_stricmp( m_DeathNotices[iMsg].szIcon, "d_tracktrain" ) ) )
 			{
 				// special case icon for hit-by-vehicle death
-				Q_strncpy( m_DeathNotices[iMsg].szIcon, "d_vehicle", ARRAYSIZE( m_DeathNotices[iMsg].szIcon ) );
+				Q_strncpy( m_DeathNotices[iMsg].szIcon, "d_vehicle", SE_ARRAYSIZE( m_DeathNotices[iMsg].szIcon ) );
 			}			
 		}
 
@@ -582,7 +582,7 @@ void CHudBaseDeathNotice::FireGameEvent( IGameEvent *event )
 	} 
 	else if ( FStrEq( "teamplay_point_captured", pszEventName ) )
 	{
-		GetLocalizedControlPointName( event, m_DeathNotices[iMsg].Victim.szName, ARRAYSIZE( m_DeathNotices[iMsg].Victim.szName ) );
+		GetLocalizedControlPointName( event, m_DeathNotices[iMsg].Victim.szName, SE_ARRAYSIZE( m_DeathNotices[iMsg].Victim.szName ) );
 
 		// Array of capper indices
 		const char *cappers = event->GetString("cappers");
@@ -623,12 +623,12 @@ void CHudBaseDeathNotice::FireGameEvent( IGameEvent *event )
 	} 
 	else if ( FStrEq( "teamplay_capture_blocked", pszEventName ) )
 	{
-		GetLocalizedControlPointName( event, m_DeathNotices[iMsg].Victim.szName, ARRAYSIZE( m_DeathNotices[iMsg].Victim.szName ) );
+		GetLocalizedControlPointName( event, m_DeathNotices[iMsg].Victim.szName, SE_ARRAYSIZE( m_DeathNotices[iMsg].Victim.szName ) );
 		V_wcsncpy( m_DeathNotices[iMsg].wzInfoText, g_pVGuiLocalize->Find( "#Msg_Defended" ), sizeof( m_DeathNotices[iMsg].wzInfoText ) );
 
 		int iPlayerIndex = event->GetInt( "blocker" );
 		const char *blocker_name = g_PR->GetPlayerName( iPlayerIndex );
-		Q_strncpy( m_DeathNotices[iMsg].Killer.szName, blocker_name, ARRAYSIZE( m_DeathNotices[iMsg].Killer.szName ) );
+		Q_strncpy( m_DeathNotices[iMsg].Killer.szName, blocker_name, SE_ARRAYSIZE( m_DeathNotices[iMsg].Killer.szName ) );
 		m_DeathNotices[iMsg].Killer.iTeam = g_PR->GetTeam( iPlayerIndex );
 		if ( iLocalPlayerIndex == iPlayerIndex )
 			m_DeathNotices[iMsg].bLocalPlayerInvolved = true;
@@ -708,7 +708,7 @@ void CHudBaseDeathNotice::FireGameEvent( IGameEvent *event )
 
 		int iPlayerIndex = event->GetInt( "player" );
 		const char *szPlayerName = g_PR->GetPlayerName( iPlayerIndex );
-		Q_strncpy( m_DeathNotices[iMsg].Killer.szName, szPlayerName, ARRAYSIZE( m_DeathNotices[iMsg].Killer.szName ) );
+		Q_strncpy( m_DeathNotices[iMsg].Killer.szName, szPlayerName, SE_ARRAYSIZE( m_DeathNotices[iMsg].Killer.szName ) );
 		m_DeathNotices[iMsg].Killer.iTeam = g_PR->GetTeam( iPlayerIndex );
 		if ( iLocalPlayerIndex == iPlayerIndex )
 			m_DeathNotices[iMsg].bLocalPlayerInvolved = true;
@@ -723,7 +723,7 @@ void CHudBaseDeathNotice::FireGameEvent( IGameEvent *event )
 		{
 			pszScorer = "";
 		}
-		Q_strncpy( msg.Killer.szName, pszScorer, ARRAYSIZE( msg.Killer.szName ) );
+		Q_strncpy( msg.Killer.szName, pszScorer, SE_ARRAYSIZE( msg.Killer.szName ) );
 
 		m_DeathNotices[iMsg].Killer.iTeam = ( iScorer > 0 ) ? g_PR->GetTeam( iScorer ) : 0;
 		msg.bLocalPlayerInvolved = ( iScorer == GetLocalPlayerIndex() );
@@ -733,7 +733,7 @@ void CHudBaseDeathNotice::FireGameEvent( IGameEvent *event )
 		msg.bSpecialScore = true;
 		
 		wchar_t wzCount[10];
-		_snwprintf( wzCount, ARRAYSIZE( wzCount ), L"%d", ++msg.iCount );
+		_snwprintf( wzCount, SE_ARRAYSIZE( wzCount ), L"%d", ++msg.iCount );
 		g_pVGuiLocalize->ConstructString_safe( msg.wzInfoText, g_pVGuiLocalize->Find( "#SpecialScore_Count" ), 1, wzCount );
 	}
 	else if ( FStrEq( "team_leader_killed", pszEventName ) )
@@ -746,7 +746,7 @@ void CHudBaseDeathNotice::FireGameEvent( IGameEvent *event )
 		{
 			pszKiller = "";
 		}
-		Q_strncpy( msg.Killer.szName, pszKiller, ARRAYSIZE( msg.Killer.szName ) );
+		Q_strncpy( msg.Killer.szName, pszKiller, SE_ARRAYSIZE( msg.Killer.szName ) );
 		m_DeathNotices[iMsg].Killer.iTeam = ( iKiller > 0 ) ? g_PR->GetTeam( iKiller ) : 0;
 
 		int iVictim = event->GetInt( "victim" );
@@ -755,7 +755,7 @@ void CHudBaseDeathNotice::FireGameEvent( IGameEvent *event )
 		{
 			pszVictim = "";
 		}
-		Q_strncpy( msg.Victim.szName, pszVictim, ARRAYSIZE( msg.Victim.szName ) );
+		Q_strncpy( msg.Victim.szName, pszVictim, SE_ARRAYSIZE( msg.Victim.szName ) );
 		m_DeathNotices[iMsg].Victim.iTeam = ( iVictim > 0 ) ? g_PR->GetTeam( iVictim ) : 0;
 
 		msg.bLocalPlayerInvolved = ( ( iKiller == GetLocalPlayerIndex() ) || ( iVictim == GetLocalPlayerIndex() ) );
@@ -865,7 +865,7 @@ void CHudBaseDeathNotice::GetBackgroundPolygonVerts( int x0, int y0, int x1, int
 void CHudBaseDeathNotice::CalcRoundedCorners()
 {
 	// generate the offset geometry for upper left corner
-	int iMax = ARRAYSIZE( m_CornerCoord );
+	int iMax = SE_ARRAYSIZE( m_CornerCoord );
 	for ( int i = 0; i < iMax; i++ )
 	{
 		m_CornerCoord[i].x = m_flCornerRadius * ( 1 - cos( ( (float) i / (float) (iMax - 1 ) ) * ( M_PI / 2 ) ) );

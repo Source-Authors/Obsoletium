@@ -146,29 +146,29 @@ void CTFSteamStats::FireGameEvent( IGameEvent *event )
 		{
 			// Grab generic stats:
 			ClassStats_t &classStats = CTFStatPanel::GetClassStats( iClass );
-			for ( int iStat = 0; iStat < ARRAYSIZE( g_SteamStats ); iStat++ )
+			for ( int iStat = 0; iStat < SE_ARRAYSIZE( g_SteamStats ); iStat++ )
 			{
 				char szStatName[256];
 				int iData;
 
-				Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.accum.%s", g_aPlayerClassNames_NonLocalized[iClass], g_SteamStats[iStat].pszName );
+				Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.accum.%s", g_aPlayerClassNames_NonLocalized[iClass], g_SteamStats[iStat].pszName );
 				if ( steamapicontext->SteamUserStats()->GetStat( szStatName, &iData ) )
 				{					
 					classStats.accumulated.m_iStat[g_SteamStats[iStat].iStat] = iData;					
 				}
-				Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.max.%s", g_aPlayerClassNames_NonLocalized[iClass], g_SteamStats[iStat].pszName );
+				Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.max.%s", g_aPlayerClassNames_NonLocalized[iClass], g_SteamStats[iStat].pszName );
 				if ( steamapicontext->SteamUserStats()->GetStat( szStatName, &iData ) )
 				{		
 					classStats.max.m_iStat[g_SteamStats[iStat].iStat] = iData;
 				}
 
 				// MVM Stats
-				Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.mvm.accum.%s", g_aPlayerClassNames_NonLocalized[iClass], g_SteamStats[iStat].pszName );
+				Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.mvm.accum.%s", g_aPlayerClassNames_NonLocalized[iClass], g_SteamStats[iStat].pszName );
 				if ( steamapicontext->SteamUserStats()->GetStat( szStatName, &iData ) )
 				{					
 					classStats.accumulatedMVM.m_iStat[g_SteamStats[iStat].iStat] = iData;					
 				}
-				Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.mvm.max.%s", g_aPlayerClassNames_NonLocalized[iClass], g_SteamStats[iStat].pszName );
+				Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.mvm.max.%s", g_aPlayerClassNames_NonLocalized[iClass], g_SteamStats[iStat].pszName );
 				if ( steamapicontext->SteamUserStats()->GetStat( szStatName, &iData ) )
 				{		
 					classStats.maxMVM.m_iStat[g_SteamStats[iStat].iStat] = iData;
@@ -185,24 +185,24 @@ void CTFSteamStats::FireGameEvent( IGameEvent *event )
 					char szStatName[256];
 					int iData;
 
-					Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.accum.%s", g_aPlayerClassNames_NonLocalized[iClass], pClassStatMap[iStat].pszName );
+					Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.accum.%s", g_aPlayerClassNames_NonLocalized[iClass], pClassStatMap[iStat].pszName );
 					if ( steamapicontext->SteamUserStats()->GetStat( szStatName, &iData ) )
 					{					
 						classStats.accumulated.m_iStat[pClassStatMap[iStat].iStat] = iData;					
 					}
-					Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.max.%s", g_aPlayerClassNames_NonLocalized[iClass], pClassStatMap[iStat].pszName );
+					Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.max.%s", g_aPlayerClassNames_NonLocalized[iClass], pClassStatMap[iStat].pszName );
 					if ( steamapicontext->SteamUserStats()->GetStat( szStatName, &iData ) )
 					{		
 						classStats.max.m_iStat[pClassStatMap[iStat].iStat] = iData;
 					}
 
 					// MVM Stats
-					Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.mvm.accum.%s", g_aPlayerClassNames_NonLocalized[iClass], pClassStatMap[iStat].pszName );
+					Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.mvm.accum.%s", g_aPlayerClassNames_NonLocalized[iClass], pClassStatMap[iStat].pszName );
 					if ( steamapicontext->SteamUserStats()->GetStat( szStatName, &iData ) )
 					{					
 						classStats.accumulatedMVM.m_iStat[pClassStatMap[iStat].iStat] = iData;					
 					}
-					Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.mvm.max.%s", g_aPlayerClassNames_NonLocalized[iClass], pClassStatMap[iStat].pszName );
+					Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.mvm.max.%s", g_aPlayerClassNames_NonLocalized[iClass], pClassStatMap[iStat].pszName );
 					if ( steamapicontext->SteamUserStats()->GetStat( szStatName, &iData ) )
 					{		
 						classStats.maxMVM.m_iStat[pClassStatMap[iStat].iStat] = iData;
@@ -219,12 +219,12 @@ void CTFSteamStats::FireGameEvent( IGameEvent *event )
 
 			// Grab generic stats:
 			MapStats_t &mapStats = CTFStatPanel::GetMapStats( pMap->GetStatsIdentifier() );
-			for ( int iStat = 0; iStat < ARRAYSIZE( g_SteamMapStats ); iStat++ )
+			for ( int iStat = 0; iStat < SE_ARRAYSIZE( g_SteamMapStats ); iStat++ )
 			{
 				char szStatName[256];
 				int iData;
 
-				Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.accum.%s",  pMap->pszMapName, g_SteamMapStats[iStat].pszName );
+				Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.accum.%s",  pMap->pszMapName, g_SteamMapStats[iStat].pszName );
 				if ( steamapicontext->SteamUserStats()->GetStat( szStatName, &iData ) )
 				{					
 					mapStats.accumulated.m_iStat[g_SteamMapStats[iStat].iStat] = iData;					
@@ -269,21 +269,21 @@ void CTFSteamStats::UploadStats()
 	{
 		// Set generic stats:
 		ClassStats_t &classStats = CTFStatPanel::GetClassStats( iClass );
-		for ( int iStat = 0; iStat < ARRAYSIZE( g_SteamStats ); iStat++ )
+		for ( int iStat = 0; iStat < SE_ARRAYSIZE( g_SteamStats ); iStat++ )
 		{
 			char szStatName[256];
 
-			Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.accum.%s", g_aPlayerClassNames_NonLocalized[iClass], g_SteamStats[iStat].pszName );
+			Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.accum.%s", g_aPlayerClassNames_NonLocalized[iClass], g_SteamStats[iStat].pszName );
 			steamapicontext->SteamUserStats()->SetStat( szStatName, classStats.accumulated.m_iStat[g_SteamStats[iStat].iStat] );
 
-			Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.max.%s", g_aPlayerClassNames_NonLocalized[iClass], g_SteamStats[iStat].pszName );
+			Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.max.%s", g_aPlayerClassNames_NonLocalized[iClass], g_SteamStats[iStat].pszName );
 			steamapicontext->SteamUserStats()->SetStat( szStatName, classStats.max.m_iStat[g_SteamStats[iStat].iStat] );
 
 			// MVM Stats
-			Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.mvm.accum.%s", g_aPlayerClassNames_NonLocalized[iClass], g_SteamStats[iStat].pszName );
+			Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.mvm.accum.%s", g_aPlayerClassNames_NonLocalized[iClass], g_SteamStats[iStat].pszName );
 			steamapicontext->SteamUserStats()->SetStat( szStatName, classStats.accumulatedMVM.m_iStat[g_SteamStats[iStat].iStat] );
 
-			Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.mvm.max.%s", g_aPlayerClassNames_NonLocalized[iClass], g_SteamStats[iStat].pszName );
+			Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.mvm.max.%s", g_aPlayerClassNames_NonLocalized[iClass], g_SteamStats[iStat].pszName );
 			steamapicontext->SteamUserStats()->SetStat( szStatName, classStats.maxMVM.m_iStat[g_SteamStats[iStat].iStat] );
 		}
 
@@ -296,17 +296,17 @@ void CTFSteamStats::UploadStats()
 			{
 				char szStatName[256];
 
-				Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.accum.%s", g_aPlayerClassNames_NonLocalized[iClass], pClassStatMap[iStat].pszName );
+				Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.accum.%s", g_aPlayerClassNames_NonLocalized[iClass], pClassStatMap[iStat].pszName );
 				steamapicontext->SteamUserStats()->SetStat( szStatName, classStats.accumulated.m_iStat[pClassStatMap[iStat].iStat] );
 
-				Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.max.%s", g_aPlayerClassNames_NonLocalized[iClass], pClassStatMap[iStat].pszName );
+				Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.max.%s", g_aPlayerClassNames_NonLocalized[iClass], pClassStatMap[iStat].pszName );
 				steamapicontext->SteamUserStats()->SetStat( szStatName, classStats.max.m_iStat[pClassStatMap[iStat].iStat] );
 
 				// MVM Stats
-				Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.mvm.accum.%s", g_aPlayerClassNames_NonLocalized[iClass], pClassStatMap[iStat].pszName );
+				Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.mvm.accum.%s", g_aPlayerClassNames_NonLocalized[iClass], pClassStatMap[iStat].pszName );
 				steamapicontext->SteamUserStats()->SetStat( szStatName, classStats.accumulatedMVM.m_iStat[pClassStatMap[iStat].iStat] );
 
-				Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.mvm.max.%s", g_aPlayerClassNames_NonLocalized[iClass], pClassStatMap[iStat].pszName );
+				Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.mvm.max.%s", g_aPlayerClassNames_NonLocalized[iClass], pClassStatMap[iStat].pszName );
 				steamapicontext->SteamUserStats()->SetStat( szStatName, classStats.maxMVM.m_iStat[pClassStatMap[iStat].iStat] );
 
 				iStat++;
@@ -322,11 +322,11 @@ void CTFSteamStats::UploadStats()
 
 		// Set generic stats:
 		MapStats_t &mapStats = CTFStatPanel::GetMapStats( pMap->GetStatsIdentifier() );
-		for ( int iStat = 0; iStat < ARRAYSIZE( g_SteamMapStats ); iStat++ )
+		for ( int iStat = 0; iStat < SE_ARRAYSIZE( g_SteamMapStats ); iStat++ )
 		{
 			char szStatName[256];
 
-			Q_snprintf( szStatName, ARRAYSIZE( szStatName ), "%s.accum.%s", pMap->pszMapName, g_SteamMapStats[iStat].pszName );
+			Q_snprintf( szStatName, SE_ARRAYSIZE( szStatName ), "%s.accum.%s", pMap->pszMapName, g_SteamMapStats[iStat].pszName );
 			steamapicontext->SteamUserStats()->SetStat( szStatName, mapStats.accumulated.m_iStat[g_SteamMapStats[iStat].iStat] );
 		}
 	}
@@ -343,20 +343,20 @@ void CTFSteamStats::UploadStats()
 //-----------------------------------------------------------------------------
 void CTFSteamStats::ReportLiveStats()
 {
-	int statsTotals[ARRAYSIZE( g_SteamStats )];
+	int statsTotals[SE_ARRAYSIZE( g_SteamStats )];
 	Q_memset( &statsTotals, 0, sizeof( statsTotals ) );
 
 	for ( int iClass = TF_FIRST_NORMAL_CLASS; iClass <= TF_LAST_NORMAL_CLASS; iClass++ )
 	{
 		ClassStats_t &classStats = CTFStatPanel::GetClassStats( iClass );
-		for ( int iStat = 0; iStat < ARRAYSIZE( g_SteamStats ); iStat++ )
+		for ( int iStat = 0; iStat < SE_ARRAYSIZE( g_SteamStats ); iStat++ )
 		{
 			statsTotals[iStat] = MAX( statsTotals[iStat], classStats.max.m_iStat[g_SteamStats[iStat].iStat] );
 		}
 	}
 
 	// send the stats to matchmaking
-	for ( int i = 0; i < ARRAYSIZE( g_SteamStats ); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE( g_SteamStats ); ++i )
 	{
 		// Points scored is looked up by the stats reporting function
 		if ( g_SteamStats[i].iLiveStat == PROPERTY_POINTS_SCORED )

@@ -601,8 +601,8 @@ impactdamagetable_t gAntlionGuardImpactDamageTable =
 	antlionGuardLinearTable,
 	antlionGuardAngularTable,
 	
-	ARRAYSIZE(antlionGuardLinearTable),
-	ARRAYSIZE(antlionGuardAngularTable),
+	SE_ARRAYSIZE(antlionGuardLinearTable),
+	SE_ARRAYSIZE(antlionGuardAngularTable),
 
 	200*200,// minimum linear speed squared
 	180*180,// minimum angular speed squared (360 deg/s to cause spin/slice damage)
@@ -1932,7 +1932,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 
 		if ( random->RandomInt( 0, 10 ) < 6 )
 		{
-			duration = ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pGrowlHighSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardFastGrowl, ARRAYSIZE(envAntlionGuardFastGrowl) );
+			duration = ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pGrowlHighSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardFastGrowl, SE_ARRAYSIZE(envAntlionGuardFastGrowl) );
 		}
 		else
 		{
@@ -1957,8 +1957,8 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 	{
 		StartSounds();
 
-		float duration = ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pGrowlHighSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardBark1, ARRAYSIZE(envAntlionGuardBark1) );
-		ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pConfusedSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardBark2, ARRAYSIZE(envAntlionGuardBark2) );
+		float duration = ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pGrowlHighSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardBark1, SE_ARRAYSIZE(envAntlionGuardBark1) );
+		ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pConfusedSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardBark2, SE_ARRAYSIZE(envAntlionGuardBark2) );
 		
 		m_flAngerNoiseTime = gpGlobals->curtime + duration + random->RandomFloat( 2.0f, 4.0f );
 
@@ -1973,7 +1973,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 	{
 		StartSounds();
 
-		float duration = ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pGrowlHighSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardFastGrowl, ARRAYSIZE(envAntlionGuardFastGrowl) );
+		float duration = ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pGrowlHighSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardFastGrowl, SE_ARRAYSIZE(envAntlionGuardFastGrowl) );
 		
 		m_flAngerNoiseTime = gpGlobals->curtime + duration + random->RandomFloat( 2.0f, 4.0f );
 
@@ -1990,8 +1990,8 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 	{
 		StartSounds();
 
-		float duration = ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pConfusedSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardPain1, ARRAYSIZE(envAntlionGuardPain1) );
-		ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pGrowlHighSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardBark2, ARRAYSIZE(envAntlionGuardBark2) );
+		float duration = ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pConfusedSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardPain1, SE_ARRAYSIZE(envAntlionGuardPain1) );
+		ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pGrowlHighSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardBark2, SE_ARRAYSIZE(envAntlionGuardBark2) );
 		
 		ENVELOPE_CONTROLLER.SoundChangeVolume( m_pBreathSound, 0.0f, 0.1f );
 		ENVELOPE_CONTROLLER.SoundChangeVolume( m_pGrowlIdleSound, 0.0f, 0.1f );
@@ -2004,7 +2004,7 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 	{	
 		StartSounds();
 
-		float duration = ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pGrowlHighSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardSqueeze, ARRAYSIZE(envAntlionGuardSqueeze) );
+		float duration = ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pGrowlHighSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardSqueeze, SE_ARRAYSIZE(envAntlionGuardSqueeze) );
 		
 		ENVELOPE_CONTROLLER.SoundChangeVolume( m_pBreathSound, 0.6f, random->RandomFloat( 2.0f, 4.0f ) );
 		ENVELOPE_CONTROLLER.SoundChangePitch( m_pBreathSound, random->RandomFloat( 60, 80 ), random->RandomFloat( 2.0f, 4.0f ) );
@@ -2038,8 +2038,8 @@ void CNPC_AntlionGuard::HandleAnimEvent( animevent_t *pEvent )
 	{	
 		StartSounds();
 
-		float duration = ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pConfusedSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardGrunt, ARRAYSIZE(envAntlionGuardGrunt) );
-		ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pGrowlHighSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardGrunt2, ARRAYSIZE(envAntlionGuardGrunt2) );
+		float duration = ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pConfusedSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardGrunt, SE_ARRAYSIZE(envAntlionGuardGrunt) );
+		ENVELOPE_CONTROLLER.SoundPlayEnvelope( m_pGrowlHighSound, SOUNDCTRL_CHANGE_VOLUME, envAntlionGuardGrunt2, SE_ARRAYSIZE(envAntlionGuardGrunt2) );
 		
 		ENVELOPE_CONTROLLER.SoundChangeVolume( m_pBreathSound, 0.0f, 0.1f );
 		ENVELOPE_CONTROLLER.SoundChangeVolume( m_pGrowlIdleSound, 0.0f, 0.1f );
@@ -3150,7 +3150,7 @@ void CNPC_AntlionGuard::SummonAntlions( void )
 
 	// Only spawn up to our max count
 	int iSpawnPoint = 0;
-	for ( int i = 0; (m_iNumLiveAntlions < ANTLIONGUARD_SUMMON_COUNT) && (iSpawnPoint < static_cast<int>(ARRAYSIZE(sAntlionSpawnPositions))); i++ )
+	for ( int i = 0; (m_iNumLiveAntlions < ANTLIONGUARD_SUMMON_COUNT) && (iSpawnPoint < static_cast<int>(SE_ARRAYSIZE(sAntlionSpawnPositions))); i++ )
 	{
 		// Determine spawn position for the antlion
 		Vector vecSpawn = GetAbsOrigin() + ( sAntlionSpawnPositions[iSpawnPoint].flForward * vecForward ) + ( sAntlionSpawnPositions[iSpawnPoint].flRight * vecRight );

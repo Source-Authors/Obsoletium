@@ -636,7 +636,7 @@ void CNPC_Strider::InitBoneFollowers( void )
 		return;
 
 	// Init our followers
-	m_BoneFollowerManager.InitBoneFollowers( this, ARRAYSIZE(pFollowerBoneNames), pFollowerBoneNames );
+	m_BoneFollowerManager.InitBoneFollowers( this, SE_ARRAYSIZE(pFollowerBoneNames), pFollowerBoneNames );
 }
 
 //---------------------------------------------------------

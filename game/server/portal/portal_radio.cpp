@@ -495,7 +495,7 @@ void CSpawnDinosaurHack::LevelInitPostEntity()
 		return;
 	}
 
-	for ( int i = 0; i < ARRAYSIZE( s_radiolocs ); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE( s_radiolocs ); ++i )
 	{
 		radiolocs loc = s_radiolocs[i];
 		if ( V_streq( STRING(gpGlobals->mapname), loc.mapname ) )

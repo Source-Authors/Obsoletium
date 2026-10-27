@@ -234,7 +234,7 @@ const LoadoutPanelPositioningInstance *g_VisibleLoadoutSlotsPerClass[] =
 	&g_LoadoutPanelPositioning_Engineer,		// TF_CLASS_ENGINEER
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_VisibleLoadoutSlotsPerClass ) == TF_LAST_NORMAL_CLASS );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_VisibleLoadoutSlotsPerClass ) == TF_LAST_NORMAL_CLASS );
 
 //-----------------------------------------------------------------------------
 // Particle Effect Slider
@@ -1484,7 +1484,7 @@ void CClassLoadoutPanel::UpdatePassiveAttributes( void )
 		FOR_EACH_VEC( vecAttribsToPrint, i )
 		{
 			CEconAttributeDescription AttrDesc( GLocalizationProvider(), vecAttribsToPrint[i].m_pAttrDef, vecAttribsToPrint[i].m_value );
-			AddAttribPassiveText( AttrDesc, wszPassiveDesc, ARRAYSIZE(wszPassiveDesc) );
+			AddAttribPassiveText( AttrDesc, wszPassiveDesc, SE_ARRAYSIZE(wszPassiveDesc) );
 		}
 	}
 	else

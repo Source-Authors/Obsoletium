@@ -177,7 +177,7 @@ void CFleshInteriorMaterialProxy::OnBind( C_BaseEntity *pEnt )
 	};
 
 	float vEffectCenterRadius[4];
-	for ( int i = 0; i < ARRAYSIZE( pParams ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( pParams ); i++ )
 	{
 		if ( i < g_FleshProxyTargets.Count() )
 		{

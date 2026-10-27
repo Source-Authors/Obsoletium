@@ -124,7 +124,7 @@ bool AbuseIncidentData_t::Poll()
 
 		// Just load the whole file into a memory buffer
 		char szFullPath[ MAX_PATH ] = "";
-		if ( !g_pFullFileSystem->RelativePathToFullPath( CAbuseReportManager::k_rchScreenShotFilename, NULL, szFullPath, ARRAYSIZE(szFullPath) ) )
+		if ( !g_pFullFileSystem->RelativePathToFullPath( CAbuseReportManager::k_rchScreenShotFilename, NULL, szFullPath, SE_ARRAYSIZE(szFullPath) ) )
 		{
 			Assert( false ); // ???
 		}

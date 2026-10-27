@@ -75,7 +75,7 @@ void CDrawingPanel::ApplySettings( KeyValues *inResourceData )
 
 void CDrawingPanel::Paint()
 {
-	for ( int iIndex = 0; iIndex < ARRAYSIZE( m_vecDrawnLines ); iIndex++ )
+	for ( int iIndex = 0; iIndex < SE_ARRAYSIZE( m_vecDrawnLines ); iIndex++ )
 	{
 		//Draw the lines
 		for ( int i = 0; i < m_vecDrawnLines[iIndex].Count(); i++ )
@@ -206,7 +206,7 @@ void CDrawingPanel::OnThink()
 	if ( m_iPanelType == DRAWING_PANEL_TYPE_MATCH_SUMMARY )
 	{
 		// clean up any segments that have faded out
-		for ( int iIndex = 0; iIndex < ARRAYSIZE( m_vecDrawnLines ); iIndex++ )
+		for ( int iIndex = 0; iIndex < SE_ARRAYSIZE( m_vecDrawnLines ); iIndex++ )
 		{
 			for ( int i = m_vecDrawnLines[iIndex].Count() - 1; i >= 0; i-- )
 			{
@@ -285,7 +285,7 @@ void CDrawingPanel::ClearLines( int iIndex )
 
 void CDrawingPanel::ClearAllLines()
 {
-	for ( int iIndex = 0; iIndex < ARRAYSIZE( m_vecDrawnLines ); iIndex++ )
+	for ( int iIndex = 0; iIndex < SE_ARRAYSIZE( m_vecDrawnLines ); iIndex++ )
 	{
 		m_vecDrawnLines[iIndex].Purge();
 	}

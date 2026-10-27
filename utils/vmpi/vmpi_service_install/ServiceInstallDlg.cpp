@@ -865,7 +865,7 @@ void CServiceInstallDlg::OnInstall()
 	char chDir[MAX_PATH];
 	GetModuleFileName( NULL, chDir, sizeof( chDir ) );
 	V_StripFilename( chDir );
-	for ( int i = 0; i < ARRAYSIZE( g_pInstallFiles ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( g_pInstallFiles ); i++ )
 	{
 		char srcFilename[MAX_PATH], destFilename[MAX_PATH];
 		V_ComposeFileName( chDir, g_pInstallFiles[i], srcFilename, sizeof( srcFilename ) );
@@ -1022,7 +1022,7 @@ void CServiceInstallDlg::VerifyInstallFiles()
 	GetModuleFileName( NULL, chDir, sizeof( chDir ) );
 	V_StripFilename( chDir );
 
-	for ( int i = 0; i < ARRAYSIZE( g_pInstallFiles ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( g_pInstallFiles ); i++ )
 	{
 		char filename[MAX_PATH];
 		V_ComposeFileName( chDir, g_pInstallFiles[i], filename, sizeof( filename ) );

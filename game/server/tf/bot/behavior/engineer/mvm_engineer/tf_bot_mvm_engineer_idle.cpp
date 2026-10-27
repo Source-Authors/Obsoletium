@@ -504,7 +504,7 @@ bool CTFBotMvMEngineerHintFinder::FindHint( bool bShouldCheckForBlockingObjects,
 			{
 				// check for blocking players and objects
 				CBaseEntity *pList[256];
-				int count = UTIL_EntitiesInBox( pList, ARRAYSIZE( pList ), vNestPosition + VEC_HULL_MIN, vNestPosition + VEC_HULL_MAX, FL_CLIENT|FL_OBJECT );
+				int count = UTIL_EntitiesInBox( pList, SE_ARRAYSIZE( pList ), vNestPosition + VEC_HULL_MIN, vNestPosition + VEC_HULL_MAX, FL_CLIENT|FL_OBJECT );
 				if ( count > 0 )
 				{
 					continue;

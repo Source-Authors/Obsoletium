@@ -586,7 +586,7 @@ void    GLMDisplayInfo::PopulateModes( void )
                 { 3456, 2234 }, // Native
         };
 
-        for ( int i = 0; i < ARRAYSIZE( s_Resolutions ); i++ )
+        for ( int i = 0; i < SE_ARRAYSIZE( s_Resolutions ); i++ )
         {
                 uint w = s_Resolutions[ i ].w;
                 uint h = s_Resolutions[ i ].h;

@@ -821,7 +821,7 @@ template <class T> [[nodiscard]] FORCEINLINE T AVG(T a, T b)
 
 // number of elements in an array of static size
 // dimhotepus: Deprecated, use std::size / std::ssize
-#define NELEMS(x) ARRAYSIZE(x)
+#define NELEMS(x) SE_ARRAYSIZE(x)
 
 // XYZ macro, for printf type functions - ex printf("%f %f %f",XYZ(myvector));
 #define XYZ(v) (v).x,(v).y,(v).z

@@ -423,7 +423,7 @@ const WeaponProficiencyInfo_t *CBaseHLCombatWeapon::GetDefaultProficiencyValues(
 		{ 1.00, 1.0	},
 	};
 
-	COMPILE_TIME_ASSERT( ARRAYSIZE(g_BaseWeaponProficiencyTable) == WEAPON_PROFICIENCY_PERFECT + 1);
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE(g_BaseWeaponProficiencyTable) == WEAPON_PROFICIENCY_PERFECT + 1);
 
 	return g_BaseWeaponProficiencyTable;
 }

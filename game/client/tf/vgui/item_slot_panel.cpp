@@ -278,15 +278,15 @@ void CItemSlotPanel::SetItem( CEconItem* pItem )
 	{
 		CSchemaAttributeDefHandle( "item slot criteria 1" ),
 	};
-	COMPILE_TIME_ASSERT( ARRAYSIZE( s_itemSlotCriteriaAttributes ) == NUM_MAX_SLOTS );
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE( s_itemSlotCriteriaAttributes ) == NUM_MAX_SLOTS );
 
 	static CSchemaAttributeDefHandle s_itemInSlotAttributes[] =
 	{
 		CSchemaAttributeDefHandle( "item in slot 1" ),
 	};
-	COMPILE_TIME_ASSERT( ARRAYSIZE( s_itemInSlotAttributes ) == NUM_MAX_SLOTS );
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE( s_itemInSlotAttributes ) == NUM_MAX_SLOTS );
 
-	for ( int i=0; i<ARRAYSIZE( s_itemSlotCriteriaAttributes ); ++i )
+	for ( int i=0; i<SE_ARRAYSIZE( s_itemSlotCriteriaAttributes ); ++i )
 	{
 		m_itemSlots[i].m_bHasSlot = false;
 		if ( m_pItem->FindAttribute( s_itemSlotCriteriaAttributes[i], &m_itemSlots[i].m_slotCriteriaAttribute ) )

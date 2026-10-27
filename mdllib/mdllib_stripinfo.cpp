@@ -293,7 +293,7 @@ bool CMdlStripInfo::StripModelBuffer( CUtlBuffer &mdlBuffer )
 				mdlMesh->numvertices -= mdlMesh->vertexoffset - 1;
 
 				// Truncate the number of vertexes
-				for ( int k = 0; k < ARRAYSIZE( mdlMesh->vertexdata.numLODVertexes ); ++ k )
+				for ( int k = 0; k < SE_ARRAYSIZE( mdlMesh->vertexdata.numLODVertexes ); ++ k )
 					mdlMesh->vertexdata.numLODVertexes[ k ] = mdlMesh->numvertices;
 
 			ITERATE_END
@@ -354,7 +354,7 @@ bool CMdlStripInfo::StripVertexDataBuffer( CUtlBuffer &vvdBuffer )
 	int mdlNumVerticesOld = vvdHdr->numLODVertexes[ 0 ];
 
 	vvdHdr->numLODs = 1;
-	for ( int k = 0; k < ARRAYSIZE( vvdHdr->numLODVertexes ); ++ k )
+	for ( int k = 0; k < SE_ARRAYSIZE( vvdHdr->numLODVertexes ); ++ k )
 		vvdHdr->numLODVertexes[ k ] = srcIndices.Count();
 
 	DECLARE_PTR( mstudiovertex_t, vvdVertexSrc, BYTE_OFF_PTR( vvdHdr, vvdHdr->vertexDataStart ) );

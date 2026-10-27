@@ -263,12 +263,12 @@ CHudScope::CHudScope( const char *pElementName ) : CHudElement(pElementName), Ba
 	
 	SetHiddenBits( HIDEHUD_PLAYERDEAD );
 
-	for ( int i = 0; i < ARRAYSIZE( m_iScopeTexture ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_iScopeTexture ); i++ )
 	{
 		m_iScopeTexture[ i ] = -1;
 	}
 
-	for ( int i = 0; i < ARRAYSIZE( m_iScopeTextureAlt ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_iScopeTextureAlt ); i++ )
 	{
 		m_iScopeTextureAlt[i] = -1;
 	}
@@ -280,7 +280,7 @@ CHudScope::~CHudScope( void )
 {
 	if ( vgui::surface() )
 	{
-		for ( int i = 0; i < ARRAYSIZE( m_iScopeTexture ); i++ )
+		for ( int i = 0; i < SE_ARRAYSIZE( m_iScopeTexture ); i++ )
 		{
 			if ( m_iScopeTexture[ i ] != -1 )
 			{
@@ -289,7 +289,7 @@ CHudScope::~CHudScope( void )
 			}
 		}
 
-		for ( int i = 0; i < ARRAYSIZE( m_iScopeTextureAlt ); i++ )
+		for ( int i = 0; i < SE_ARRAYSIZE( m_iScopeTextureAlt ); i++ )
 		{
 			if ( m_iScopeTextureAlt[i] != -1 )
 			{
@@ -305,7 +305,7 @@ CHudScope::~CHudScope( void )
 //-----------------------------------------------------------------------------
 void CHudScope::Init( void )
 {
-	for ( int i = 0; i < ARRAYSIZE( m_iScopeTexture ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_iScopeTexture ); i++ )
 	{
 		if ( m_iScopeTexture[ i ] == -1 )
 		{
@@ -318,7 +318,7 @@ void CHudScope::Init( void )
 	vgui::surface()->DrawSetTextureFile( m_iScopeTexture[2], "HUD/scope_sniper_lr", true, false );
 	vgui::surface()->DrawSetTextureFile( m_iScopeTexture[3], "HUD/scope_sniper_ll", true, false );
 
-	for ( int i = 0; i < ARRAYSIZE( m_iScopeTextureAlt ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_iScopeTextureAlt ); i++ )
 	{
 		if ( m_iScopeTextureAlt[i] == -1 )
 		{

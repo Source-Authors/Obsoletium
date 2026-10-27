@@ -520,7 +520,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 	SetTargetPosition( position, angles );
 	m_attachedEntity = pEntity;
 	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int count = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+	int count = pEntity->VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 	m_flLoadWeight = 0;
 	float damping = 10;
 	float flFactor = count / 7.5f;
@@ -598,7 +598,7 @@ void CGrabController::DetachEntity( bool bClearVelocity )
 		// Restore the LS blocking state
 		pEntity->SetBlocksLOS( m_bCarriedEntityBlocksLOS );
 		IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-		int count = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+		int count = pEntity->VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 
 		for ( int i = 0; i < count; i++ )
 		{
@@ -692,7 +692,7 @@ float CGrabController::GetSavedMass( IPhysicsObject *pObject )
 		if ( pObject->GetGameData() == (void*)pHeld )
 		{
 			IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-			int count = pHeld->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+			int count = pHeld->VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 			for ( int i = 0; i < count; i++ )
 			{
 				if ( pList[i] == pObject )
@@ -1652,7 +1652,7 @@ void CWeaponPhysCannon::PuntVPhysics( CBaseEntity *pEntity, const Vector &vecFor
 	if ( Pickup_OnAttemptPhysGunPickup( pEntity, pOwner, PUNTED_BY_CANNON ) )
 	{
 		IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-		int listCount = pEntity->VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+		int listCount = pEntity->VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 		if ( !listCount )
 		{
 			//FIXME: Do we want to do this if there's no physics object?

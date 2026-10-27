@@ -220,13 +220,13 @@ void Grab_Materiallist( s_source_t *psource )
 				{
 					psource->texmap[j] = -1;
 				}
-				else if (j < ARRAYSIZE(psource->texmap))
+				else if (j < SE_ARRAYSIZE(psource->texmap))
 				{
 					psource->texmap[j] = LookupTexture( path );
 				}
 				else
 				{
-					MdlError( "Too many materials, max %d\n", ARRAYSIZE(psource->texmap) );
+					MdlError( "Too many materials, max %d\n", SE_ARRAYSIZE(psource->texmap) );
 				}
 			}
 		}

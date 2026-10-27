@@ -348,7 +348,7 @@ void CMatchMakingPanel::OnThink()
 									{ \
 				if ( progress.has_##protobufname() ) \
 												{ \
-					_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", progress.protobufname() ); \
+					_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", progress.protobufname() ); \
 					p##labelname->SetText( wszCount ); \
 					if ( bNearby ) bHasAnyNearbyData = true; \
 												} \

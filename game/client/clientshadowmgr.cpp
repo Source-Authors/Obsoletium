@@ -1351,7 +1351,7 @@ void CClientShadowMgr::InitDepthTextureShadows()
 			bool bFalse = false;
 
 			char strRTName[64];
-			Q_snprintf( strRTName, ARRAYSIZE( strRTName ), "_rt_ShadowDepthTexture_%d", i );
+			Q_snprintf( strRTName, SE_ARRAYSIZE( strRTName ), "_rt_ShadowDepthTexture_%d", i );
 
 			depthTex.InitRenderTarget( m_nDepthTextureResolution, m_nDepthTextureResolution, RT_SIZE_OFFSCREEN, dstFormat, MATERIAL_RT_DEPTH_NONE, false, strRTName );
 
@@ -3936,7 +3936,7 @@ void CClientShadowMgr::ComputeShadowDepthTextures( const CViewSetup &viewSetup )
 
 	// Build list of active render-to-texture shadows
 	ClientShadowHandle_t pActiveDepthShadows[1024];
-	int nActiveDepthShadowCount = BuildActiveShadowDepthList( viewSetup, ARRAYSIZE( pActiveDepthShadows ), pActiveDepthShadows );
+	int nActiveDepthShadowCount = BuildActiveShadowDepthList( viewSetup, SE_ARRAYSIZE( pActiveDepthShadows ), pActiveDepthShadows );
 
 	// Iterate over all existing textures and allocate shadow textures
 	bool bDebugFrustum = r_flashlightdrawfrustum.GetBool();

@@ -1306,7 +1306,7 @@ CHintData g_HintDatas[] =
 
 int GetNumHintDatas()
 {
-	return ARRAYSIZE( g_HintDatas );
+	return SE_ARRAYSIZE( g_HintDatas );
 }
 
 

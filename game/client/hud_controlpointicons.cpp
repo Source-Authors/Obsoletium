@@ -654,7 +654,7 @@ CHudControlPointIcons::CHudControlPointIcons( const char *pName ) : vgui::Panel(
 	Reset();
 
 	// Initialize textures to invalid
-	for( int i = 0; i < ARRAYSIZE( m_iCPTextures ); i++ )
+	for( int i = 0; i < SE_ARRAYSIZE( m_iCPTextures ); i++ )
 	{
 		m_iCPTextures[i] = -1;
 		m_iCPCappingTextures[i] = -1;
@@ -678,7 +678,7 @@ CHudControlPointIcons::~CHudControlPointIcons( void )
 	if ( vgui::surface() )
 	{
 		// Clear out all the texture IDs
-		for( int i = 0; i < ARRAYSIZE( m_iCPTextures ); i++ )
+		for( int i = 0; i < SE_ARRAYSIZE( m_iCPTextures ); i++ )
 		{
 			if ( m_iCPTextures[i] != -1 )
 			{
@@ -709,7 +709,7 @@ CHudControlPointIcons::~CHudControlPointIcons( void )
 //-----------------------------------------------------------------------------
 void CHudControlPointIcons::Init( void )
 {
-	for( int i = 0; i < ARRAYSIZE( m_iCPTextures ); i++ )
+	for( int i = 0; i < SE_ARRAYSIZE( m_iCPTextures ); i++ )
 	{
 		if ( m_iCPTextures[i] == -1 )
 		{
@@ -1867,7 +1867,7 @@ void CControlPointCountdown::OnTick( void )
 	}
 
 	wchar_t wzTimeLeft[128];
-	_snwprintf( wzTimeLeft, ARRAYSIZE( wzTimeLeft ), L"%i", iTimeLeft );
+	_snwprintf( wzTimeLeft, SE_ARRAYSIZE( wzTimeLeft ), L"%i", iTimeLeft );
 
 	SetDialogVariable( "capturetime", wzTimeLeft );
 

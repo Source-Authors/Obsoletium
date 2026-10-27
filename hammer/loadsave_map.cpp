@@ -441,7 +441,7 @@ int CMapFace::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 
         if( uMapVersion >= 340 )
         {
-			COMPILE_TIME_ASSERT( ARRAYSIZE(szTexName) == 128 );
+			COMPILE_TIME_ASSERT( SE_ARRAYSIZE(szTexName) == 128 );
 			nRead = sscanf(szBuf,
 				"( %f %f %f ) ( %f %f %f ) ( %f %f %f ) "
 				"%127s "
@@ -467,7 +467,7 @@ int CMapFace::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 				&q2surface,
 				&nLightmapScale);
 			// Guarantee null-termination to keep /analyze happy.
-			szTexName[ ARRAYSIZE(szTexName) - 1 ] = 0;
+			szTexName[ SE_ARRAYSIZE(szTexName) - 1 ] = 0;
 
 			if (nRead < 21)
 			{
@@ -502,7 +502,7 @@ int CMapFace::SerializeMAP(std::fstream& file, BOOL fIsStoring)
         }
 		else if (uMapVersion >= 220 )
 		{
-			COMPILE_TIME_ASSERT( ARRAYSIZE(szTexName) == 128 );
+			COMPILE_TIME_ASSERT( SE_ARRAYSIZE(szTexName) == 128 );
 			nRead = sscanf(szBuf,
 				"( %f %f %f ) ( %f %f %f ) ( %f %f %f ) "
 				"%127s "
@@ -528,7 +528,7 @@ int CMapFace::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 				&q2surface,
 				&nDummy);		// Pre-340 didn't have lightmap scale.
 			// Guarantee null-termination to keep /analyze happy.
-			szTexName[ ARRAYSIZE(szTexName) - 1 ] = 0;
+			szTexName[ SE_ARRAYSIZE(szTexName) - 1 ] = 0;
 
 			if (nRead < 21)
 			{
@@ -543,7 +543,7 @@ int CMapFace::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 		}
 		else
 		{
-			COMPILE_TIME_ASSERT( ARRAYSIZE(szTexName) == 128 );
+			COMPILE_TIME_ASSERT( SE_ARRAYSIZE(szTexName) == 128 );
 			nRead = sscanf(szBuf,
 				"( %f %f %f ) ( %f %f %f ) ( %f %f %f ) "
 				"%127s "
@@ -566,7 +566,7 @@ int CMapFace::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 				&q2surface,
 				&nDummy);		// Pre-340 didn't have lightmap scale.
 			// Guarantee null-termination to keep /analyze happy.
-			szTexName[ ARRAYSIZE(szTexName) - 1 ] = 0;
+			szTexName[ SE_ARRAYSIZE(szTexName) - 1 ] = 0;
 
 			if (nRead < 15)
 			{

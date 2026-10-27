@@ -143,7 +143,7 @@ void CTFArenaWinPanel::FireGameEvent( IGameEvent * event )
 
 			wchar_t wzStreaNum[16];
 			wchar_t wzStreakString[256]=L"";
-			_snwprintf( wzStreaNum, ARRAYSIZE( wzStreaNum ), L"%i", tf_arena_max_streak.GetInt() );
+			_snwprintf( wzStreaNum, SE_ARRAYSIZE( wzStreaNum ), L"%i", tf_arena_max_streak.GetInt() );
 
 			g_pVGuiLocalize->ConstructString_safe( wzStreakString, g_pVGuiLocalize->Find( "#TF_Arena_PlayingTo" ), 1, wzStreaNum );
 
@@ -279,10 +279,10 @@ void CTFArenaWinPanel::FireGameEvent( IGameEvent * event )
 				wchar_t wzCapMsg[512]=L"";
 				for ( int i = 0; i < iCappers; i++ )
 				{
-					Q_strncat( szPlayerNames, g_PR->GetPlayerName( (int) pCappers[i] ), ARRAYSIZE( szPlayerNames ) );
+					Q_strncat( szPlayerNames, g_PR->GetPlayerName( (int) pCappers[i] ), SE_ARRAYSIZE( szPlayerNames ) );
 					if ( i < iCappers - 1 )
 					{
-						Q_strncat( szPlayerNames, ", ", ARRAYSIZE( szPlayerNames ) );
+						Q_strncat( szPlayerNames, ", ", SE_ARRAYSIZE( szPlayerNames ) );
 					}
 				}
 				g_pVGuiLocalize->ConvertANSIToUnicode( szPlayerNames, wzPlayerNames, sizeof( wzPlayerNames ) );
@@ -366,11 +366,11 @@ void CTFArenaWinPanel::FireGameEvent( IGameEvent * event )
 
 			char szPlayerIndexVal[64]="", szPlayerDamageVal[64]="", szPlayerHealingVal[64]="", szPlayerTimeAliveVal[64]="", szPlayerKillingBlowsVal[64]="";
 			// get player index and round points from the event
-			Q_snprintf( szPlayerIndexVal, ARRAYSIZE( szPlayerIndexVal ), "player_%d", i );
-			Q_snprintf( szPlayerDamageVal, ARRAYSIZE( szPlayerDamageVal ), "player_%d_damage", i );
-			Q_snprintf( szPlayerHealingVal, ARRAYSIZE( szPlayerHealingVal ), "player_%d_healing", i );
-			Q_snprintf( szPlayerTimeAliveVal, ARRAYSIZE( szPlayerTimeAliveVal ), "player_%d_lifetime", i );
-			Q_snprintf( szPlayerKillingBlowsVal, ARRAYSIZE( szPlayerKillingBlowsVal ), "player_%d_kills", i );
+			Q_snprintf( szPlayerIndexVal, SE_ARRAYSIZE( szPlayerIndexVal ), "player_%d", i );
+			Q_snprintf( szPlayerDamageVal, SE_ARRAYSIZE( szPlayerDamageVal ), "player_%d_damage", i );
+			Q_snprintf( szPlayerHealingVal, SE_ARRAYSIZE( szPlayerHealingVal ), "player_%d_healing", i );
+			Q_snprintf( szPlayerTimeAliveVal, SE_ARRAYSIZE( szPlayerTimeAliveVal ), "player_%d_lifetime", i );
+			Q_snprintf( szPlayerKillingBlowsVal, SE_ARRAYSIZE( szPlayerKillingBlowsVal ), "player_%d_kills", i );
 
 			int iPlayerIndex = event->GetInt( szPlayerIndexVal, 0 );
 

@@ -468,7 +468,7 @@ void CAchievementMgr::LevelInitPreEntity()
 #ifdef CLIENT_DLL	
 	V_FileBase( engine->GetLevelName(), m_szMap );
 #else
-	Q_strncpy( m_szMap, gpGlobals->mapname.ToCStr(), ARRAYSIZE( m_szMap ) );
+	Q_strncpy( m_szMap, gpGlobals->mapname.ToCStr(), SE_ARRAYSIZE( m_szMap ) );
 #endif // CLIENT_DLL
 
 	// look through all achievements, see which ones we want to have listen for events

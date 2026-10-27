@@ -789,7 +789,7 @@ void CustomTextureStencilGradientMapWidget::ComputeGradient()
 		// !FIXME! Nudge color towards neighbors
 
 		// Insert interpolation points
-		Assert( nGradPoints+2 <= ARRAYSIZE( rGradPoints ) );
+		Assert( nGradPoints+2 <= SE_ARRAYSIZE( rGradPoints ) );
 		rGradPoints[ nGradPoints ].m_iVal = lVal;
 		rGradPoints[ nGradPoints ].m_color = lColor;
 		++nGradPoints;
@@ -801,7 +801,7 @@ void CustomTextureStencilGradientMapWidget::ComputeGradient()
 	// Now fill in gradient
 	Assert( m_iMinVal == 0 );
 	Assert( m_iMaxVal == 255 );
-	COMPILE_TIME_ASSERT( ARRAYSIZE( m_colorGradient ) == 256 );
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE( m_colorGradient ) == 256 );
 
 	int iRightIndex = 1; // current interpolation point on right hand side
 	for ( int i = 0 ; i < 256 ; ++i )
@@ -2372,7 +2372,7 @@ void CConfirmCustomizeTextureDialog::PerformPainterlyFilter()
 				Vector rgb2((float)c.r(), (float)c.g(), (float)c.b());
 				float totalWeight = selfWeight;
 				rgb2 *= selfWeight;
-				for ( int i = 0 ; i < ARRAYSIZE(swatches) ; ++i )
+				for ( int i = 0 ; i < SE_ARRAYSIZE(swatches) ; ++i )
 				{
 					float similarity = 1.0f - ApproxColorDist( c, swatches[i] ) - thresh;
 					if ( similarity > 0.0f )
@@ -2473,7 +2473,7 @@ void CConfirmCustomizeTextureDialog::TestFilters()
 		"d:/custom_images/elliot_and_travis.tga",
 		"d:/custom_images/give_peace_a_chance.jpg",
 	};
-	const int k_nTestImages = ARRAYSIZE(szTestImageFilenames);
+	const int k_nTestImages = SE_ARRAYSIZE(szTestImageFilenames);
 
 	Bitmap_t imageOutput;
 	imageOutput.Init( k_nCustomImageSize*3, k_nCustomImageSize*k_nTestImages, IMAGE_FORMAT_RGBA8888 );

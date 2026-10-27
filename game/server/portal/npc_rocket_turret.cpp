@@ -416,7 +416,7 @@ void CNPC_RocketTurret::Spawn( void )
 
 bool CNPC_RocketTurret::CreateVPhysics( void )
 {
-	m_BoneFollowerManager.InitBoneFollowers( this, ARRAYSIZE(pRocketTurretFollowerBoneNames), pRocketTurretFollowerBoneNames );
+	m_BoneFollowerManager.InitBoneFollowers( this, SE_ARRAYSIZE(pRocketTurretFollowerBoneNames), pRocketTurretFollowerBoneNames );
 	BaseClass::CreateVPhysics();
 	return true;
 }

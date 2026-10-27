@@ -793,9 +793,9 @@ void CTFHudTimeStatus::OnThink()
 					iMinutes = (iTimeLeft % 3600) / 60;
 					iSeconds = (iTimeLeft % 60);
 
-					_snwprintf( wzServerTimeHrsLeft, ARRAYSIZE( wzServerTimeHrsLeft ), L"%i", iHours );
-					_snwprintf( wzServerTimeMinLeft, ARRAYSIZE( wzServerTimeMinLeft ), L"%02i", iMinutes );
-					_snwprintf( wzServerTimeSecLeft, ARRAYSIZE( wzServerTimeSecLeft ), L"%02i", iSeconds );
+					_snwprintf( wzServerTimeHrsLeft, SE_ARRAYSIZE( wzServerTimeHrsLeft ), L"%i", iHours );
+					_snwprintf( wzServerTimeMinLeft, SE_ARRAYSIZE( wzServerTimeMinLeft ), L"%02i", iMinutes );
+					_snwprintf( wzServerTimeSecLeft, SE_ARRAYSIZE( wzServerTimeSecLeft ), L"%02i", iSeconds );
 
 					if (iHours == 0)
 					{

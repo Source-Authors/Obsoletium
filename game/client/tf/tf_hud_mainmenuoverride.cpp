@@ -417,7 +417,7 @@ public:
 															  , { "#TF_MM_NoGC",					NULL,				"gc_dc"		}		// DISABLED_NO_GC
 															  , { "#TF_Competitive_MatchRunning",			NULL,				NULL } };			// DISABLED_MATCH_RUNNING
 
-		COMPILE_TIME_ASSERT( ARRAYSIZE( s_DisabledStates ) == NUM_DISABLED_STATES );
+		COMPILE_TIME_ASSERT( SE_ARRAYSIZE( s_DisabledStates ) == NUM_DISABLED_STATES );
 
 		const DisabledStateDesc_t& stateDisabled = s_DisabledStates[ eReason ];
 

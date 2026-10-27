@@ -40,7 +40,7 @@ const char *g_szQualityStrings[] =
 	"ancient",		// AE_RARITY_ANCIENT,
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_szQualityStrings ) == AE_MAX_TYPES );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_szQualityStrings ) == AE_MAX_TYPES );
 
 const char *EconQuality_GetQualityString( EEconItemQuality eQuality )
 {
@@ -104,7 +104,7 @@ const char *g_szQualityColorStrings[] =
 	"ItemRarityAncient"		, // AE_RARITY_ANCIENT,
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_szQualityColorStrings ) == AE_MAX_TYPES );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_szQualityColorStrings ) == AE_MAX_TYPES );
 
 const char *EconQuality_GetColorString( EEconItemQuality eQuality )
 {
@@ -145,7 +145,7 @@ const char *g_szQualityLocalizationStrings[] =
 	"#Rarity_Ancient"
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_szQualityLocalizationStrings ) == AE_MAX_TYPES );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_szQualityLocalizationStrings ) == AE_MAX_TYPES );
 
 const char *EconQuality_GetLocalizationString( EEconItemQuality eQuality )
 {
@@ -185,7 +185,7 @@ int g_nRarityScores[] =
 	2,		// AE_RARITY_LEGENDARY,
 	1,		// AE_RARITY_ANCIENT,
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_nRarityScores ) == AE_MAX_TYPES );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_nRarityScores ) == AE_MAX_TYPES );
 
 //-----------------------------------------------------------------------------
 int EconQuality_GetRarityScore( EEconItemQuality eQuality )
@@ -288,7 +288,7 @@ CSchemaColorDefHandle g_AttribColorDefs[] =
 	CSchemaColorDefHandle( "desc_unusual" ),			// ATTRIB_COL_UNUSUAL
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_AttribColorDefs ) == NUM_ATTRIB_COLORS );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_AttribColorDefs ) == NUM_ATTRIB_COLORS );
 
 attrib_colors_t GetAttribColorIndexForName( const char* pszName )
 {
@@ -340,7 +340,7 @@ const char *g_szRecipeCategoryStrings[] =
 	"special",		// RECIPE_CATEGORY_SPECIAL,
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_szRecipeCategoryStrings ) == NUM_RECIPE_CATEGORIES );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_szRecipeCategoryStrings ) == NUM_RECIPE_CATEGORIES );
 
 //-----------------------------------------------------------------------------
 // Item acquisition.
@@ -380,7 +380,7 @@ const char *g_pszItemPickupMethodStrings[] =
 #endif
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_pszItemPickupMethodStrings ) == (UNACK_NUM_METHODS - 1) );		// -1 because UNACK_ITEM_DROPPED is index 1, not 0
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_pszItemPickupMethodStrings ) == (UNACK_NUM_METHODS - 1) );		// -1 because UNACK_ITEM_DROPPED is index 1, not 0
 
 const char *g_pszItemPickupMethodStringsUnloc[] = 
 {
@@ -415,7 +415,7 @@ const char *g_pszItemPickupMethodStringsUnloc[] =
 #endif
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_pszItemPickupMethodStringsUnloc ) == (UNACK_NUM_METHODS - 1) );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_pszItemPickupMethodStringsUnloc ) == (UNACK_NUM_METHODS - 1) );
 
 // Strings shown to other players in the chat dialog
 const char *g_pszItemFoundMethodStrings[] = 
@@ -452,7 +452,7 @@ const char *g_pszItemFoundMethodStrings[] =
 #endif
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_pszItemFoundMethodStrings ) == (UNACK_NUM_METHODS - 1) );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_pszItemFoundMethodStrings ) == (UNACK_NUM_METHODS - 1) );
 
 
 //-----------------------------------------------------------------------------
@@ -496,7 +496,7 @@ int GetKillEaterAttrCount()
 	// all of the user-customizable attributes.
 	bool bInUserCustomizableBlock = false;
 
-	for ( int i = 0; i < ARRAYSIZE( g_KillEaterAttr ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( g_KillEaterAttr ); i++ )
 	{
 		if ( bInUserCustomizableBlock )
 		{
@@ -507,7 +507,7 @@ int GetKillEaterAttrCount()
 	}
 #endif
 
-	return ARRAYSIZE( g_KillEaterAttr );
+	return SE_ARRAYSIZE( g_KillEaterAttr );
 }
 
 int GetKillEaterAttrCount_UserCustomizable()

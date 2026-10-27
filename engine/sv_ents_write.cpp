@@ -299,7 +299,7 @@ static inline void SV_WritePropsFromPackedEntity(
 		pTo->GetNumRecipients(),
 
 		pSendProps, 
-		ARRAYSIZE( pSendProps )
+		SE_ARRAYSIZE( pSendProps )
 		);
 	}
 	else
@@ -453,7 +453,7 @@ static inline void SV_DetermineUpdateType( CEntityWriteInfo &u )
 #endif
 
 	int checkProps[MAX_DATATABLE_PROPS];
-	int nCheckProps = u.m_pNewPack->GetPropsChangedAfterTick( u.m_pFromSnapshot->m_nTickCount, checkProps, ARRAYSIZE( checkProps ) );
+	int nCheckProps = u.m_pNewPack->GetPropsChangedAfterTick( u.m_pFromSnapshot->m_nTickCount, checkProps, SE_ARRAYSIZE( checkProps ) );
 	
 	if ( nCheckProps == -1 )
 	{
@@ -490,7 +490,7 @@ static inline void SV_DetermineUpdateType( CEntityWriteInfo &u )
 			pNewData,
 			nNewBits,
 			checkProps,
-			ARRAYSIZE( checkProps ),
+			SE_ARRAYSIZE( checkProps ),
 			u.m_nNewEntity
 			);
 	}

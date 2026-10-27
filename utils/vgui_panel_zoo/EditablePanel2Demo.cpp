@@ -112,10 +112,10 @@ EditablePanel2Demo::EditablePanel2Demo(Panel *parent, const char *name) : DemoPa
 	// Create a combo box with the name "InternetSpeed"
 	// The parameters of the resource file will be applied to this
 	// combo box.
-	m_pInternetSpeed = new ComboBox(this, "InternetSpeed", ARRAYSIZE(g_Speeds), false);
+	m_pInternetSpeed = new ComboBox(this, "InternetSpeed", SE_ARRAYSIZE(g_Speeds), false);
 
 	// Add menu items to this combo box.
-	for (int i = 0; i < ARRAYSIZE(g_Speeds); i++)
+	for (int i = 0; i < SE_ARRAYSIZE(g_Speeds); i++)
 	{
 		m_pInternetSpeed->AddItem(g_Speeds[i], NULL );
 	}

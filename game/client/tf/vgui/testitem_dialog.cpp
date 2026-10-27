@@ -40,7 +40,7 @@ static const char *g_pszTestItemHideBodygroup[] =
 	"rightarm",		//	TI_HIDEBG_RIGHTARM
 	"shoes_socks",	//	TI_HIDEBG_SHOES_SOCKS
 };
-COMPILE_TIME_ASSERT( ARRAYSIZE( g_pszTestItemHideBodygroup ) == TI_HIDEBG_COUNT );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( g_pszTestItemHideBodygroup ) == TI_HIDEBG_COUNT );
 
 static const char *g_pszClassSubdirectories[] =
 {
@@ -191,7 +191,7 @@ void CTestItemDialog::InitializeFromExistingKVs( KeyValues *pExistingKVs )
 						{
 							FOR_EACH_SUBKEY( pKVEntry, pKVSubEntry )
 							{
-								int iBG = StringFieldToInt( pKVSubEntry->GetName(), g_pszTestItemHideBodygroup, ARRAYSIZE(g_pszTestItemHideBodygroup) );
+								int iBG = StringFieldToInt( pKVSubEntry->GetName(), g_pszTestItemHideBodygroup, SE_ARRAYSIZE(g_pszTestItemHideBodygroup) );
 								if ( iBG >= 0 && iBG < TI_HIDEBG_COUNT )
 								{
 									m_pBodygroupCheckButtons[iBG]->SetSelected( pKVSubEntry->GetInt() == 0 );
@@ -305,7 +305,7 @@ void CTestItemDialog::CloseAndUpdateItem( void )
 	const char *pFilename = V_UnqualifiedFileName( m_szRelativePath );
 	if ( pFilename)
 	{
-		for ( int i = TF_FIRST_NORMAL_CLASS; i < ARRAYSIZE( g_pszClassSubdirectories ); i++ )
+		for ( int i = TF_FIRST_NORMAL_CLASS; i < SE_ARRAYSIZE( g_pszClassSubdirectories ); i++ )
 		{
 			if ( m_iClassUsage == 1 || ( m_iClassUsage & (1 << i) ) )
 			{
@@ -633,7 +633,7 @@ void CTestItemDialog::SetupUnusualEffectComboBox( void )
 		pKeyValues->SetInt( "unusual_index", mapParticleDefs[i].nSystemID );
 
 		char particleNameEntry[128];
-		Q_snprintf( particleNameEntry, ARRAYSIZE( particleNameEntry ), "#Attrib_Particle%i", mapParticleDefs[i].nSystemID );
+		Q_snprintf( particleNameEntry, SE_ARRAYSIZE( particleNameEntry ), "#Attrib_Particle%i", mapParticleDefs[i].nSystemID );
 		m_pUnusualEffectComboBox->AddItem( g_pVGuiLocalize->Find( particleNameEntry ), pKeyValues );
 	}
 

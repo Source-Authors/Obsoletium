@@ -61,7 +61,7 @@ static char const *ep1Maps[] =
 
 bool CEP1GameStats::UserPlayedAllTheMaps( void )
 {
-	int c = ARRAYSIZE( ep1Maps );
+	int c = SE_ARRAYSIZE( ep1Maps );
 	for ( int i = 0; i < c; ++i )
 	{
 		int idx = m_BasicStats.m_MapTotals.Find( ep1Maps[ i ] );

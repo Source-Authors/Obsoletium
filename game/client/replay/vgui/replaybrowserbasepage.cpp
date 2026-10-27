@@ -128,7 +128,7 @@ void CReplayBrowserBasePage::OnReplayItemDeleted( KeyValues *pParams )
 void CReplayBrowserBasePage::OnTextChanged( KeyValues *data )
 {
 	wchar_t wszText[256];
-	m_pSearchTextEntry->GetText( wszText, ARRAYSIZE( wszText ) );
+	m_pSearchTextEntry->GetText( wszText, SE_ARRAYSIZE( wszText ) );
 	m_pReplayList->ApplyFilter( wszText );
 	InvalidateLayout();
 }

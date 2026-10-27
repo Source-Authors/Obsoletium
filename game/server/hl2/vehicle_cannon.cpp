@@ -691,7 +691,7 @@ CPropCannon *CCannonServerVehicle::GetCannon( void )
 bool CPropCannon::CreateVPhysics( void )
 {
 	BaseClass::CreateVPhysics();
-	m_BoneFollowerManager.InitBoneFollowers( this, ARRAYSIZE(pCannonFollowerBoneNames), pCannonFollowerBoneNames );
+	m_BoneFollowerManager.InitBoneFollowers( this, SE_ARRAYSIZE(pCannonFollowerBoneNames), pCannonFollowerBoneNames );
 	return true;
 }
 

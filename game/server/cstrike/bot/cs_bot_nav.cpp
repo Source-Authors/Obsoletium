@@ -211,7 +211,7 @@ void CCSBot::PushawayTouch( CBaseEntity *pOther )
 
 	// See if it's breakable
 	CBaseEntity *props[1];
-	CBotBreakableEnumerator enumerator( props, ARRAYSIZE( props ) );
+	CBotBreakableEnumerator enumerator( props, SE_ARRAYSIZE( props ) );
 	enumerator.EnumElement( pOther );
 
 	if ( enumerator.m_nAlreadyHit == 1 )
@@ -242,7 +242,7 @@ void CCSBot::BreakablesCheck( void )
 		ray.Init( origin, origin, mins, maxs );
 
 		CBaseEntity *props[40];
-		CBotBreakableEnumerator enumerator( props, ARRAYSIZE( props ) );
+		CBotBreakableEnumerator enumerator( props, SE_ARRAYSIZE( props ) );
 		partition->EnumerateElementsAlongRay( PARTITION_ENGINE_SOLID_EDICTS, ray, false, &enumerator );
 		for ( int i=0; i<enumerator.m_nAlreadyHit; ++i )
 		{
@@ -273,7 +273,7 @@ void CCSBot::BreakablesCheck( void )
 		if ( IsUsingKnife() && m_enemy != NULL )
 		{
 			CBaseEntity *breakables[1];
-			CBotBreakableEnumerator enumerator( breakables, ARRAYSIZE( breakables ) );
+			CBotBreakableEnumerator enumerator( breakables, SE_ARRAYSIZE( breakables ) );
 
 			CBaseEntity *breakable = NULL;
 			Vector mins = Vector( -HalfHumanWidth, -HalfHumanWidth, -HalfHumanWidth );
@@ -302,7 +302,7 @@ void CCSBot::BreakablesCheck( void )
 
 	// Check just in front of us on the path
 	CBaseEntity *breakables[4];
-	CBotBreakableEnumerator enumerator( breakables, ARRAYSIZE( breakables ) );
+	CBotBreakableEnumerator enumerator( breakables, SE_ARRAYSIZE( breakables ) );
 	CBaseEntity *breakable = FindEntitiesOnPath( NearBreakableCheckDist, &enumerator, true );
 
 	// If we don't have an object right in front of us, check a ways out
@@ -333,7 +333,7 @@ void CCSBot::BreakablesCheck( void )
 			if ( !shouldShoot )
 			{
 				CBaseEntity *breakables[1];
-				CBotBreakableEnumerator LOSbreakable( breakables, ARRAYSIZE( breakables ) );
+				CBotBreakableEnumerator LOSbreakable( breakables, SE_ARRAYSIZE( breakables ) );
 
 				// compute the unit vector along our view
 				Vector aimDir = GetViewVector();
@@ -381,7 +381,7 @@ void CCSBot::DoorCheck( void )
 
 	// Find any doors that need a +use to open just in front of us along the path.
 	CBaseEntity *doors[4];
-	CBotDoorEnumerator enumerator( doors, ARRAYSIZE( doors ) );
+	CBotDoorEnumerator enumerator( doors, SE_ARRAYSIZE( doors ) );
 	CBaseEntity *door = FindEntitiesOnPath( NearBreakableCheckDist, &enumerator, false );
 
 	if ( door )

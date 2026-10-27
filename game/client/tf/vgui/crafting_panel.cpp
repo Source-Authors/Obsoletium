@@ -904,7 +904,7 @@ void CCraftingPanel::UpdateSelectedRecipe( bool bClearInputItems )
 		if ( bSelected )
 		{
 			wchar_t wszText[1024];
-			m_pRecipeButtons[i]->GetText( wszText, ARRAYSIZE( wszText ) );
+			m_pRecipeButtons[i]->GetText( wszText, SE_ARRAYSIZE( wszText ) );
 			m_pSelectedRecipeContainer->SetDialogVariable( "recipetitle", wszText );
 
 			if ( m_iCurrentlySelectedRecipe == RECIPE_CUSTOM )
@@ -1056,12 +1056,12 @@ void CCraftingPanel::OnItemPanelMousePressed( vgui::Panel *panel )
 
 			if ( m_iCurrentlySelectedRecipe == RECIPE_CUSTOM )
 			{
-				m_pSelectionPanel->UpdateOnShow( NULL, true, m_InputItems, ARRAYSIZE(m_InputItems) );
+				m_pSelectionPanel->UpdateOnShow( NULL, true, m_InputItems, SE_ARRAYSIZE(m_InputItems) );
 			}
 			else
 			{
 				// Clicked on an item in the crafting area. Open up the selection panel.
-				m_pSelectionPanel->UpdateOnShow( m_ItemPanelCriteria[iPos], false, m_InputItems, ARRAYSIZE(m_InputItems) );
+				m_pSelectionPanel->UpdateOnShow( m_ItemPanelCriteria[iPos], false, m_InputItems, SE_ARRAYSIZE(m_InputItems) );
 			}
 
 			m_pSelectionPanel->ShowDuplicateCounts( true );
@@ -1503,7 +1503,7 @@ public:
 			wchar_t szPlayerName[1024];
 			g_pVGuiLocalize->ConvertANSIToUnicode( msg.Body().user_name().c_str(), szPlayerName, sizeof(szPlayerName) );
 			wchar_t szWrenchNumber[16]=L"";
-			_snwprintf( szWrenchNumber, ARRAYSIZE( szWrenchNumber ), L"%i", msg.Body().wrench_number() );
+			_snwprintf( szWrenchNumber, SE_ARRAYSIZE( szWrenchNumber ), L"%i", msg.Body().wrench_number() );
 			wchar_t szNotification[1024]=L"";
 			g_pVGuiLocalize->ConstructString_safe( szNotification, 
 											  g_pVGuiLocalize->Find( bDeleted ? "#TF_HUD_Event_GoldenWrench_D": "#TF_HUD_Event_GoldenWrench_C" ), 

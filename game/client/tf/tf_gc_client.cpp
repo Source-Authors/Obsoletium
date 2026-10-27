@@ -3103,7 +3103,7 @@ void CTFGCClientSystem::SetMatchMakerStats( const CMsgGCMatchMakerStatsResponse 
 	}
 
 	// put data_center_population in dict so we don't have to loop over and strcmp everytime we ask for it
-	COMPILE_TIME_ASSERT( ARRAYSIZE( m_dictDataCenterPopulationRatio ) == k_nMatchGroup_Count );
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE( m_dictDataCenterPopulationRatio ) == k_nMatchGroup_Count );
 	Assert( m_MatchMakerStats.matchgroup_data_center_population_size() == k_nMatchGroup_Count );
 	for ( int iMatchGroup=0; iMatchGroup<k_nMatchGroup_Count; ++iMatchGroup )
 	{

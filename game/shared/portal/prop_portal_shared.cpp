@@ -60,7 +60,7 @@ bool CProp_Portal_Shared::IsEntityTeleportable( CBaseEntity *pEntity )
 #else
 		//server
 		
-		for( int i = 0; i != ARRAYSIZE(g_pszPortalNonTeleportable); ++i )
+		for( int i = 0; i != SE_ARRAYSIZE(g_pszPortalNonTeleportable); ++i )
 		{
 			if( FClassnameIs( pEntity, g_pszPortalNonTeleportable[i] ) )
 				return false;

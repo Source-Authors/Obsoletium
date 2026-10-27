@@ -116,7 +116,7 @@ CTFPlayerModelPanel::CTFPlayerModelPanel( vgui::Panel *pParent, const char *pNam
 
 	SetIgnoreDoubleClick( true );
 
-	for ( int i = 0; i < ARRAYSIZE( m_aParticleSystems ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_aParticleSystems ); i++ )
 	{
 		m_aParticleSystems[i] = NULL;
 	}
@@ -136,7 +136,7 @@ CTFPlayerModelPanel::~CTFPlayerModelPanel( void )
 	m_vecItemsLoaded.PurgeAndDeleteElements();
 	m_ItemsToCarry.PurgeAndDeleteElements();
 
-	for ( int i = 0; i < ARRAYSIZE( m_aParticleSystems ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_aParticleSystems ); i++ )
 	{
 		SafeDeleteParticleData( &m_aParticleSystems[i] );
 	}
@@ -1305,7 +1305,7 @@ void CTFPlayerModelPanel::PostPaint3D( IMatRenderContext *pRenderContext )
 	m_bPlaySparks = false;
 
 	// remove all particles that are not up-to-date before simulating the updated ones in the base
-	for ( int i = 0; i < ARRAYSIZE( m_aParticleSystems ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_aParticleSystems ); i++ )
 	{
 		if ( m_aParticleSystems[i] && !m_aParticleSystems[i]->m_bIsUpdateToDate )
 		{
@@ -1391,7 +1391,7 @@ void CTFPlayerModelPanel::RenderingMergedModel( IMatRenderContext *pRenderContex
 	modelpanel_particle_system_t iSystem = SYSTEM_HEAD;
 	loadout_positions_t iPosition = LOADOUT_POSITION_INVALID;
 	CEconItemView *pEconItem = NULL;
-	int count = ARRAYSIZE( s_mergeModelSlot );
+	int count = SE_ARRAYSIZE( s_mergeModelSlot );
 	for ( int i=0; i<count; ++i )
 	{
 		// find the item for this model
@@ -1435,7 +1435,7 @@ IMaterial* CTFPlayerModelPanel::GetOverrideMaterial( MDLHandle_t mdlHandle )
 		LOADOUT_POSITION_MELEE
 	};
 
-	int count = ARRAYSIZE( s_iPosition );
+	int count = SE_ARRAYSIZE( s_iPosition );
 	for ( int i = 0; i < count; ++i ) 
 	{
 		CEconItemView *pEconItem = GetLoadoutItemFromMDLHandle( s_iPosition[ i ], mdlHandle );
@@ -1557,7 +1557,7 @@ bool CTFPlayerModelPanel::UpdateCosmeticParticles(
 	if ( !pEconItem->FindAttribute( pAttrDef_UseHead, &iUseHead ) || !iUseHead == 0 )
 	{
 		// not using head? try searching for attachment points
-		for ( int i=0; i<ARRAYSIZE( pParticleSystem->pszControlPoints ); ++i )
+		for ( int i=0; i<SE_ARRAYSIZE( pParticleSystem->pszControlPoints ); ++i )
 		{
 			const char *pszAttachmentName = pParticleSystem->pszControlPoints[i];
 			if ( pszAttachmentName && pszAttachmentName[0] )
@@ -1790,7 +1790,7 @@ void CTFPlayerModelPanel::SetEyeGlowEffect( const char *pEffectName, Vector vCol
 //-----------------------------------------------------------------------------
 void CTFPlayerModelPanel::InvalidateParticleEffects()
 {
-	for ( int i=0; i<ARRAYSIZE(m_aParticleSystems); ++i )
+	for ( int i=0; i<SE_ARRAYSIZE(m_aParticleSystems); ++i )
 	{
 		if ( m_aParticleSystems[i] )
 		{

@@ -178,7 +178,7 @@ void WinPanel_Round::FireGameEvent( IGameEvent* event )
 		int seconds = clamp( iTimerTime % 60, 0, 59 );
 
 		wchar_t time[8];
-		_snwprintf( time, ARRAYSIZE( time ), L"%d:%02d", minutes, seconds );
+		_snwprintf( time, SE_ARRAYSIZE( time ), L"%d:%02d", minutes, seconds );
 
 		SetDialogVariable("TIMER_TEXT", time);
 
@@ -205,19 +205,19 @@ void WinPanel_Round::FireGameEvent( IGameEvent* event )
 				else
 				{
 #ifdef WIN32
-					_snwprintf( playerText, ARRAYSIZE( playerText ), L"%s", LocalizeFindSafe( "#winpanel_former_player" ) );
+					_snwprintf( playerText, SE_ARRAYSIZE( playerText ), L"%s", LocalizeFindSafe( "#winpanel_former_player" ) );
 #else
-					_snwprintf( playerText, ARRAYSIZE( playerText ), L"%S", LocalizeFindSafe( "#winpanel_former_player" ) );
+					_snwprintf( playerText, SE_ARRAYSIZE( playerText ), L"%S", LocalizeFindSafe( "#winpanel_former_player" ) );
 #endif
 				}
 			}
 			else
 			{
-				_snwprintf( playerText, ARRAYSIZE( playerText ), L"" );
+				_snwprintf( playerText, SE_ARRAYSIZE( playerText ), L"" );
 			}
-			_snwprintf( dataText1, ARRAYSIZE( dataText1 ), L"%i", param1 );
-			_snwprintf( dataText2, ARRAYSIZE( dataText2 ), L"%i", param2 );
-			_snwprintf( dataText3, ARRAYSIZE( dataText3 ), L"%i", param3 );
+			_snwprintf( dataText1, SE_ARRAYSIZE( dataText1 ), L"%i", param1 );
+			_snwprintf( dataText2, SE_ARRAYSIZE( dataText2 ), L"%i", param2 );
+			_snwprintf( dataText3, SE_ARRAYSIZE( dataText3 ), L"%i", param3 );
 			g_pVGuiLocalize->ConstructString( funFactText, sizeof(funFactText), (wchar_t *)LocalizeFindSafe(funfactToken), 4,
 				playerText, dataText1, dataText2, dataText3 );
 			SetFunFactLabel(funFactText);

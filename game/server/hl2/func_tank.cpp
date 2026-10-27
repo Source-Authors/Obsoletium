@@ -725,7 +725,7 @@ const static Vector gTankSpread[] =
 	Vector( 0.1f, 0.1f, 0.1f ),	// large cone
 	Vector( 0.25f, 0.25f, 0.25f ),	// extra-large cone
 };
-#define MAX_FIRING_SPREADS static_cast<int>(ARRAYSIZE(gTankSpread))
+#define MAX_FIRING_SPREADS static_cast<int>(SE_ARRAYSIZE(gTankSpread))
 
 
 //-----------------------------------------------------------------------------

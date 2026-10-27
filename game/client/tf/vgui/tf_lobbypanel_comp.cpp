@@ -323,7 +323,7 @@ bool CLadderLobbyLeaderboard::UpdateLeaderboards()
 				wchar_t wszOutString[ 128 ];
 				char szLocalized[512];
 				wchar_t wszCount[ 16 ];
-				_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", levelInfo.m_nLevelNum );
+				_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", levelInfo.m_nLevelNum );
 				const wchar_t *wpszFormat = g_pVGuiLocalize->Find( pMatchDesc->m_pProgressionDesc->m_pszLevelToken );
 				g_pVGuiLocalize->ConstructString_safe( wszOutString, wpszFormat, 2, wszCount, g_pVGuiLocalize->Find( levelInfo.m_pszLevelTitle ) );
 				g_pVGuiLocalize->ConvertUnicodeToANSI( wszOutString, szLocalized, sizeof( szLocalized ) );
@@ -780,7 +780,7 @@ void CLobbyPanel_Comp::UpdateMatchDataForLocalPlayer()
 			return;
 
 		// Update controls
-		for( int i=0; i<ARRAYSIZE( sortMethods ); ++i )
+		for( int i=0; i<SE_ARRAYSIZE( sortMethods ); ++i )
 		{
 			if( sortMethods[ i ].m_pSortButton )
 			{

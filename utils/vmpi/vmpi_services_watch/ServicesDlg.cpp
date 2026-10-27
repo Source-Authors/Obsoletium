@@ -374,7 +374,7 @@ BOOL CServicesDlg::OnInitDialog()
 	m_ServicesList.SetExtendedStyle( LVS_EX_FULLROWSELECT );
 
 	// Setup the headers.
-	for ( int i = 0; i < ARRAYSIZE( g_ColumnInfos ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( g_ColumnInfos ); i++ )
 	{
 		m_ServicesList.InsertColumn( i, g_ColumnInfos[i].pText, LVCFMT_LEFT, g_ColumnInfos[i].width, i );
 	}
@@ -1071,7 +1071,7 @@ BOOL CServicesDlg::OnNotify( WPARAM wParam, LPARAM lParam, LRESULT *pResult )
 			LPNMLISTVIEW pListView = (LPNMLISTVIEW)lParam;
 
 			// Now sort by this column.
-			int iSortColumn = max( 0, min( pListView->iSubItem, (int)ARRAYSIZE( g_ColumnInfos ) - 1 ) );
+			int iSortColumn = max( 0, min( pListView->iSubItem, (int)SE_ARRAYSIZE( g_ColumnInfos ) - 1 ) );
 			PushSortColumn( iSortColumn );
 			ResortItems();
 		}

@@ -618,7 +618,7 @@ public:
 
 		ScriptVariant_t vars[size] = {std::forward(args)...};
 		
-		return ExecuteFunction( hFunction, vars, ARRAYSIZE(vars), pReturn, hScope, bWait );
+		return ExecuteFunction( hFunction, vars, SE_ARRAYSIZE(vars), pReturn, hScope, bWait );
 	}
 };
 
@@ -787,7 +787,7 @@ public:
 
 		ScriptVariant_t vars[size] = {std::forward(args)...};
 
-		return GetVM()->ExecuteFunction( hFunction, vars, ARRAYSIZE(vars), pReturn, m_hScope, true );
+		return GetVM()->ExecuteFunction( hFunction, vars, SE_ARRAYSIZE(vars), pReturn, m_hScope, true );
 	}
 
 	ScriptStatus_t Call( const char *pszFunction, ScriptVariant_t *pReturn = nullptr )
@@ -810,7 +810,7 @@ public:
 		HSCRIPT hFunction = GetVM()->LookupFunction( pszFunction, m_hScope );
 		if ( !hFunction )
 			return SCRIPT_ERROR;
-		ScriptStatus_t status = GetVM()->ExecuteFunction( hFunction, vars, ARRAYSIZE(vars), pReturn, m_hScope, true );
+		ScriptStatus_t status = GetVM()->ExecuteFunction( hFunction, vars, SE_ARRAYSIZE(vars), pReturn, m_hScope, true );
 		GetVM()->ReleaseFunction( hFunction );
 		return status;
 	}

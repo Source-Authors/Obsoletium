@@ -167,7 +167,7 @@ void CMvMWaveLossPanel::ShowPanel()
 		int iWaveNumber = TFObjectiveResource()->GetMannVsMachineWaveCount();
 
 		wchar_t wszWaveNumber[16];
-		_snwprintf( wszWaveNumber, ARRAYSIZE( wszWaveNumber ), L"%d", MAX( 1, iWaveNumber ) );
+		_snwprintf( wszWaveNumber, SE_ARRAYSIZE( wszWaveNumber ), L"%d", MAX( 1, iWaveNumber ) );
 
 		wchar_t wszLocalizedWave[512];
 		g_pVGuiLocalize->ConstructString_safe( wszLocalizedWave, g_pVGuiLocalize->Find( "#TF_PVE_WaveCountFail" ), 1, wszWaveNumber );

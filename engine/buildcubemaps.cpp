@@ -549,7 +549,7 @@ CON_COMMAND( lightprobe,
 
 static bool LoadSrcVTFFiles( IVTFTexture * (&pSrcVTFTextures)[6], const char *pSkyboxBaseName )
 {
-	static_assert(ARRAYSIZE(pSrcVTFTextures) == ssize(facingName));
+	static_assert(SE_ARRAYSIZE(pSrcVTFTextures) == ssize(facingName));
 	
 	char src0VTFFileName[MAX_PATH], srcVTFFileName[MAX_PATH];
 

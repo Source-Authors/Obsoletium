@@ -1487,7 +1487,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 		{
 			// If you let this code run while a zombie is burning, it will stop wailing. 
 			m_flNextMoanSound = gpGlobals->curtime;
-			MoanSound( envDefaultZombieMoanVolumeFast, ARRAYSIZE( envDefaultZombieMoanVolumeFast ) );
+			MoanSound( envDefaultZombieMoanVolumeFast, SE_ARRAYSIZE( envDefaultZombieMoanVolumeFast ) );
 		}
 		return;
 	}

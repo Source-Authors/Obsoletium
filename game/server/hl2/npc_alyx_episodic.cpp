@@ -573,7 +573,7 @@ void CNPC_Alyx::ReadinessLevelChanged( int iPriorLevel )
 			{ AIRL_STIMULATED, AIRL_RELAXED, ACT_IDLE, ACT_READINESS_STIMULATED_TO_RELAXED, }
 		};
 
-		for ( int i = 0; i < ARRAYSIZE( readinessTransitions ); i++ )
+		for ( int i = 0; i < SE_ARRAYSIZE( readinessTransitions ); i++ )
 		{
 			if ( GetIdealActivity() != readinessTransitions[i].requiredActivity )
 				continue;

@@ -411,7 +411,7 @@ void CZombie::AlertSound( void )
 //-----------------------------------------------------------------------------
 const char *CZombie::GetMoanSound( int nSound )
 {
-	return pMoanSounds[ nSound % ARRAYSIZE( pMoanSounds ) ];
+	return pMoanSounds[ nSound % SE_ARRAYSIZE( pMoanSounds ) ];
 }
 
 //-----------------------------------------------------------------------------
@@ -550,7 +550,7 @@ void CZombie::GatherConditions( void )
 		COND_ZOMBIE_CHARGE_TARGET_MOVED,
 	};
 
-	ClearConditions( conditionsToClear, ARRAYSIZE( conditionsToClear ) );
+	ClearConditions( conditionsToClear, SE_ARRAYSIZE( conditionsToClear ) );
 
 	if ( m_hBlockingDoor == NULL || 
 		 ( m_hBlockingDoor->m_toggle_state == TS_AT_TOP || 
@@ -791,7 +791,7 @@ void CZombie::Ignite( float flFlameLifetime, bool bNPCOnly, float flSize, bool b
 		{
 			RemoveSpawnFlags( SF_NPC_GAG );
 
-			MoanSound( envZombieMoanIgnited, ARRAYSIZE( envZombieMoanIgnited ) );
+			MoanSound( envZombieMoanIgnited, SE_ARRAYSIZE( envZombieMoanIgnited ) );
 
 			if ( m_pMoanSound )
 			{

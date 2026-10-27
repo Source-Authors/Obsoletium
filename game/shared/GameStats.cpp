@@ -875,7 +875,7 @@ void CBaseGameStats_Driver::LevelInitPreEntity()
 			if ( crcInput[0] && crcInput[1] )
 			{
 				CRC32_t crc = CRC32_ProcessSingleBuffer( crcInput, sizeof( crcInput ) );
-				Q_snprintf( s_szPseudoUniqueID, ARRAYSIZE( s_szPseudoUniqueID ), "H:%x", crc );
+				Q_snprintf( s_szPseudoUniqueID, SE_ARRAYSIZE( s_szPseudoUniqueID ), "H:%x", crc );
 			}
 		}
 	}
@@ -1005,7 +1005,7 @@ void CBaseGameStats_Driver::CollectData( StatSendType_t sendType )
 #ifdef CLIENT_DLL	
 			V_FileBase( MapName(), szMap );
 #else
-			Q_strncpy( szMap, gpGlobals->mapname.ToCStr(), ARRAYSIZE( szMap ) );
+			Q_strncpy( szMap, gpGlobals->mapname.ToCStr(), SE_ARRAYSIZE( szMap ) );
 #endif // CLIENT_DLL
 			if ( !szMap[0] )
 				return;

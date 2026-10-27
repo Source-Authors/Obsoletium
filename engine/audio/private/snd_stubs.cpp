@@ -151,8 +151,8 @@ bool CEngineVoiceSteam::VoiceUpdateData( int iController )
 
 void CEngineVoiceSteam::GetVoiceData( int iController, const byte **ppvVoiceDataBuffer, unsigned int *pnumVoiceDataBytes )
 {
-	const int size = ARRAYSIZE( m_pbVoiceData ) / XUSER_MAX_COUNT;
-	byte *pbVoiceData = m_pbVoiceData + iController * ARRAYSIZE( m_pbVoiceData ) / XUSER_MAX_COUNT;
+	const int size = SE_ARRAYSIZE( m_pbVoiceData ) / XUSER_MAX_COUNT;
+	byte *pbVoiceData = m_pbVoiceData + iController * SE_ARRAYSIZE( m_pbVoiceData ) / XUSER_MAX_COUNT;
 	*ppvVoiceDataBuffer = pbVoiceData;
 	
 	EVoiceResult res = Steam3Client().SteamUser()->GetVoice( true, pbVoiceData, size, pnumVoiceDataBytes, false, NULL, 0, NULL, 0 );
@@ -170,8 +170,8 @@ void CEngineVoiceSteam::GetVoiceData( int iController, const byte **ppvVoiceData
 
 void CEngineVoiceSteam::VoiceResetLocalData( int iController )
 {
-	const int size = ARRAYSIZE( m_pbVoiceData ) / XUSER_MAX_COUNT;
-	byte *pbVoiceData = m_pbVoiceData + iController * ARRAYSIZE( m_pbVoiceData ) / XUSER_MAX_COUNT;
+	const int size = SE_ARRAYSIZE( m_pbVoiceData ) / XUSER_MAX_COUNT;
+	byte *pbVoiceData = m_pbVoiceData + iController * SE_ARRAYSIZE( m_pbVoiceData ) / XUSER_MAX_COUNT;
 	memset( pbVoiceData, 0, size );
 }
 
@@ -233,7 +233,7 @@ void CEngineVoiceSteam::RemoveAllTalkers()
 void CEngineVoiceSteam::AudioInitializationUpdate()
 {
 	bool bHasTalkers = ( m_arrRemoteVoice.Count() > 0 );
-	for ( int k = 0; k < ARRAYSIZE( m_bLocalVoice ); ++ k )
+	for ( int k = 0; k < SE_ARRAYSIZE( m_bLocalVoice ); ++ k )
 	{
 		if ( m_bLocalVoice[k] )
 		{

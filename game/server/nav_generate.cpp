@@ -2453,7 +2453,7 @@ void CNavMesh::FixCornerOnCornerAreas( void )
 			NavDirType dirsAlongOurEdge[2] = { dirToLeftTwice, dirToRightTwice };
 
 			// consider 2 potential new nav areas, to left and right of the corner we're considering
-			for ( int iDir = 0; iDir < ARRAYSIZE( dirsAlongOtherEdge ); iDir++ )
+			for ( int iDir = 0; iDir < SE_ARRAYSIZE( dirsAlongOtherEdge ); iDir++ )
 			{
 				NavDirType dirAlongOtherEdge = dirsAlongOtherEdge[iDir];
 				NavDirType dirAlongOurEdge = dirsAlongOurEdge[iDir];

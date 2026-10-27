@@ -144,7 +144,7 @@ int CHudBaseAccount::GetNumberWidth(HFont font, int number)
 
 	surface()->DrawSetTextFont(font);
 	wchar_t unicode[6];
-	V_snwprintf(unicode, ARRAYSIZE(unicode), L"%d", number);
+	V_snwprintf(unicode, SE_ARRAYSIZE(unicode), L"%d", number);
 
 	for (wchar_t *ch = unicode; *ch != 0; ch++)
 	{

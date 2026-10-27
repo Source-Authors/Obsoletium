@@ -2654,7 +2654,7 @@ GLMContext::GLMContext( IDirect3DDevice9 *pDevice, GLMDisplayParams *params )
 	memset( m_programParamsB , 0, sizeof( m_programParamsB ) );
 	memset( m_programParamsI , 0, sizeof( m_programParamsI ) );
 
-	for (uint i = 0; i < ARRAYSIZE(m_programParamsF); i++)
+	for (uint i = 0; i < SE_ARRAYSIZE(m_programParamsF); i++)
 	{
 		m_programParamsF[i].m_firstDirtySlotNonBone = 256;
 		m_programParamsF[i].m_dirtySlotHighWaterNonBone = 0;
@@ -3091,7 +3091,7 @@ void GLMContext::CleanupTex( GLenum texBind, GLMTexLayout* pLayout, GLuint tex )
 		{
 			const int chunks = ( mipDim + ( pLayout->m_format->m_chunkSize - 1 ) ) / pLayout->m_format->m_chunkSize;
 			const int dataSize = ( chunks * chunks ) * pLayout->m_format->m_bytesPerSquareChunk;
-			Assert( dataSize <= ( sizeof( uint32) * ARRAYSIZE( g_garbageTextureBits ) ) );
+			Assert( dataSize <= ( sizeof( uint32) * SE_ARRAYSIZE( g_garbageTextureBits ) ) );
 
 			gGL->glCompressedTexImage2D( texBind, i, pLayout->m_format->m_glIntFormat, mipDim, mipDim, 0, dataSize, 0 );
 		}

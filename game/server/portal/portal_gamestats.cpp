@@ -669,7 +669,7 @@ static char const *portalMaps[] =
 
 bool CPortalGameStats::UserPlayedAllTheMaps( void )
 {
-	int c = ARRAYSIZE( portalMaps );
+	int c = SE_ARRAYSIZE( portalMaps );
 	for ( int i = 0; i < c; ++i )
 	{
 		int idx = m_BasicStats.m_MapTotals.Find( portalMaps[ i ] );

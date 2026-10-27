@@ -148,7 +148,7 @@ bool IsAmmoType( int iAmmoType, const char *pAmmoName )
 //
 const char * GetTranslatedWeaponAlias( const char *szAlias )
 {
-	for ( int i = 0; i < ARRAYSIZE(s_WeaponAliasTranslationInfo); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE(s_WeaponAliasTranslationInfo); ++i )
 	{
 		if ( Q_stricmp(s_WeaponAliasTranslationInfo[i].alias, szAlias) == 0 )
 		{
@@ -188,7 +188,7 @@ CSWeaponID AliasToWeaponID( const char *szAlias )
 {
 	if ( szAlias )
 	{
-		for ( int i=0; i < ARRAYSIZE(s_weaponAliasInfo); ++i)
+		for ( int i=0; i < SE_ARRAYSIZE(s_weaponAliasInfo); ++i)
 		{
 			if ( Q_stricmp( s_weaponAliasInfo[i].alias, szAlias) == 0 )
 				return s_weaponAliasInfo[i].id;
@@ -204,7 +204,7 @@ CSWeaponID AliasToWeaponID( const char *szAlias )
 //
 const char *WeaponIDToAlias( int id )
 {
-	for ( int i=0; i < ARRAYSIZE(s_weaponAliasInfo); ++i)
+	for ( int i=0; i < SE_ARRAYSIZE(s_weaponAliasInfo); ++i)
 	{
 		if ( s_weaponAliasInfo[i].id == id )
 			return s_weaponAliasInfo[i].alias;

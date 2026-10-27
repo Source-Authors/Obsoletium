@@ -94,8 +94,8 @@ bool CTFTeamManager::Init( void )
 	// Create the team list.
 	for ( int iTeam = 0; iTeam < TF_TEAM_COUNT; ++iTeam )
 	{
-		COMPILE_TIME_ASSERT( TF_TEAM_COUNT == ARRAYSIZE( g_aTeamNames ) );
-		COMPILE_TIME_ASSERT( TF_TEAM_COUNT == ARRAYSIZE( g_aTeamColors ) );
+		COMPILE_TIME_ASSERT( TF_TEAM_COUNT == SE_ARRAYSIZE( g_aTeamNames ) );
+		COMPILE_TIME_ASSERT( TF_TEAM_COUNT == SE_ARRAYSIZE( g_aTeamColors ) );
 		int index = Create( g_aTeamNames[iTeam], g_aTeamColors[iTeam] );
 		Assert( index == iTeam );
 		if ( index != iTeam )

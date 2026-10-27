@@ -761,7 +761,7 @@ static void PrintCommand( const ConCommand *cmd, bool logging, FileHandle_t& f )
 
 		emptyflags[ 0 ] = 0;
 
-		int c = ARRAYSIZE( g_ConVarFlags );
+		int c = SE_ARRAYSIZE( g_ConVarFlags );
 		for ( int i = 0; i < c; ++i )
 		{
 			char csvf[ 64 ];

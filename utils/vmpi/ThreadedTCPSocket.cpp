@@ -394,7 +394,7 @@ private:
 				m_hSendCompletionEvent.GetEventHandle(),
 				m_hReadyToSendEvent.GetEventHandle()
 			};
-			int nHandles = ARRAYSIZE( handles );
+			int nHandles = SE_ARRAYSIZE( handles );
 
 			// While waiting for send completion, don't handle "ready to send" events.
 			if ( m_bWaitingForSendCompletion )
@@ -596,7 +596,7 @@ private:
 
 		while ( 1 )
 		{
-			DWORD waitValue = WaitForMultipleObjects( ARRAYSIZE( handles ), handles, FALSE, KEEPALIVE_TIMEOUT );
+			DWORD waitValue = WaitForMultipleObjects( SE_ARRAYSIZE( handles ), handles, FALSE, KEEPALIVE_TIMEOUT );
 			switch ( waitValue )
 			{
 			case WAIT_TIMEOUT:

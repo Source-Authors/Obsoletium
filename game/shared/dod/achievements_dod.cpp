@@ -173,7 +173,7 @@ class CAchievementDODCustomMaps : public CBaseAchievement
 		if ( pAttacker == pLocalPlayer && pVictim->GetTeamNumber() != pAttacker->GetTeamNumber() )
 		{
 			char szMap[MAX_PATH];
-			Q_FileBase( engine->GetLevelName(), szMap, ARRAYSIZE( szMap ) );
+			Q_FileBase( engine->GetLevelName(), szMap, SE_ARRAYSIZE( szMap ) );
 
 			if ( !IsOfficialMap( szMap ) && !HasPlayedThisCustomMap() )
 			{
@@ -196,7 +196,7 @@ class CAchievementDODCustomMaps : public CBaseAchievement
 	{
 		bool bFound = false;
 	
-		for ( int i=0;i<ARRAYSIZE(pszOfficialMaps);i++ )
+		for ( int i=0;i<SE_ARRAYSIZE(pszOfficialMaps);i++ )
 		{
 			if ( FStrEq( pszMapName, pszOfficialMaps[i] ) )
 			{
@@ -838,7 +838,7 @@ public:
 			"dod_kalt", "dod_colmar"
 		};	
 		m_pszComponentNames = szComponents;
-		m_iNumComponents = ARRAYSIZE( szComponents );
+		m_iNumComponents = SE_ARRAYSIZE( szComponents );
 		SetGoal( m_iNumComponents ); 
 
 		BaseClass::Init();

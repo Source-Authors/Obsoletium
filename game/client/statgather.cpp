@@ -139,7 +139,7 @@ char const *CStatsRecorder::GetPerfStatsString( int iType )
 		pRenderContext->GetRenderTargetDimensions( dest_width, dest_height );
 
 		char szMap[MAX_PATH+1]="";
-		Q_FileBase( engine->GetLevelName(), szMap, ARRAYSIZE( szMap ) );
+		Q_FileBase( engine->GetLevelName(), szMap, SE_ARRAYSIZE( szMap ) );
 
 		V_snprintf( s_cPerfString, sizeof( s_cPerfString ), 
 			"PERFDATA:AvgFps=%4.2f MinFps=%4.2f MaxFps=%4.2f CPUID=\"%s\" CPUGhz=%2.2f "

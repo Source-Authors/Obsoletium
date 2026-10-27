@@ -91,7 +91,7 @@ static s_PresenceTranslation s_PresenceValues[] = {
 //-----------------------------------------------------------------------------
 static unsigned int GetMapID( const char *pMapName )
 {
-	for ( int i = 0; i < ARRAYSIZE( s_Scenarios ); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE( s_Scenarios ); ++i )
 	{
 		if ( V_strieq( s_Scenarios[i].pDiskName, pMapName ) )
 		{
@@ -175,7 +175,7 @@ void CTF_Presence::GetPropertyDisplayString( uint id, uint value, char *pOutput,
 //-----------------------------------------------------------------------------
 const char *CTF_Presence::GetPropertyIdString( const uint id )
 {
-	for ( int i = 0; i < ARRAYSIZE( s_PresenceIds ); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE( s_PresenceIds ); ++i )
 	{
 		if ( s_PresenceIds[i].id == id )
 		{
@@ -190,7 +190,7 @@ const char *CTF_Presence::GetPropertyIdString( const uint id )
 //-----------------------------------------------------------------------------
 uint CTF_Presence::GetPresenceID( const char *pIDName )
 {
-	for ( int i = 0; i < ARRAYSIZE( s_PresenceIds ); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE( s_PresenceIds ); ++i )
 	{
 		if ( V_strieq( s_PresenceIds[i].pString, pIDName ) )
 		{
@@ -198,7 +198,7 @@ uint CTF_Presence::GetPresenceID( const char *pIDName )
 		}
 	}
 
-	for ( int i = 0; i < ARRAYSIZE( s_PresenceValues ); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE( s_PresenceValues ); ++i )
 	{
 		if ( V_strieq( s_PresenceValues[i].pString, pIDName ) )
 		{

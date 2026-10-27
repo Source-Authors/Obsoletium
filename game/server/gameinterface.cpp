@@ -1734,7 +1734,7 @@ static TITLECOMMENT gTitleComments[] =
 void CServerGameDLL::GetTitleName( const char *pMapName, char* pTitleBuff, int titleBuffSize )
 {
 	// Try to find a matching title comment for this mapname
-	for ( int i = 0; i < ARRAYSIZE(gTitleComments); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE(gTitleComments); i++ )
 	{
 		if ( !Q_strnicmp( pMapName, gTitleComments[i].pBSPName, strlen(gTitleComments[i].pBSPName) ) )
 		{
@@ -2971,7 +2971,7 @@ void CServerGameClients::ClientSetupVisibility( edict_t *pViewEntity, edict_t *p
 #endif
 
 		++iOutPortal;
-		if ( iOutPortal >= static_cast<int>(ARRAYSIZE( portalNums )) )
+		if ( iOutPortal >= static_cast<int>(SE_ARRAYSIZE( portalNums )) )
 		{
 			engine->SetAreaPortalStates( portalNums, isOpen, iOutPortal );
 			iOutPortal = 0;

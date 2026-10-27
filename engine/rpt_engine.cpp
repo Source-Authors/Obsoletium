@@ -295,7 +295,7 @@ static bool PlayerIsValveEmployee( int nClientSlot )
 		return false;
 	
 	CSteamID steamIDForPlayer( pi.friendsID, 1, k_EUniversePublic, k_EAccountTypeIndividual );
-	for ( int i = 0; i < ARRAYSIZE(s_pValveIDs); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE(s_pValveIDs); i++ )
 	{
 		if ( steamIDForPlayer.ConvertToUint64() == (s_pValveIDs[i] ^ s_ValveMask) )
 			return true;

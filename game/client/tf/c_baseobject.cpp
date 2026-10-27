@@ -974,8 +974,8 @@ void C_BaseObject::GetTargetIDDataString( OUT_Z_BYTECAP(iMaxLenInBytes) wchar_t 
 	wchar_t wszLevel[32];
 	if ( bShowLevel )
 	{
-		_snwprintf( wszLevel, ARRAYSIZE(wszLevel) - 1, L"%d", m_iUpgradeLevel );
-		wszLevel[ ARRAYSIZE(wszLevel)-1 ] = '\0';
+		_snwprintf( wszLevel, SE_ARRAYSIZE(wszLevel) - 1, L"%d", m_iUpgradeLevel );
+		wszLevel[ SE_ARRAYSIZE(wszLevel)-1 ] = '\0';
 	}
 
 	if ( m_iUpgradeLevel >= 3 )
@@ -1009,8 +1009,8 @@ void C_BaseObject::GetTargetIDDataString( OUT_Z_BYTECAP(iMaxLenInBytes) wchar_t 
 	// level 1 and 2 show upgrade progress
 	if ( !IsMiniBuilding() && !IsDisposableBuilding() )
 	{
-		_snwprintf( wszUpgradeProgress, ARRAYSIZE(wszUpgradeProgress) - 1, L"%d / %d", m_iUpgradeMetal, GetUpgradeMetalRequired() );
-		wszUpgradeProgress[ ARRAYSIZE(wszUpgradeProgress)-1 ] = '\0';
+		_snwprintf( wszUpgradeProgress, SE_ARRAYSIZE(wszUpgradeProgress) - 1, L"%d / %d", m_iUpgradeMetal, GetUpgradeMetalRequired() );
+		wszUpgradeProgress[ SE_ARRAYSIZE(wszUpgradeProgress)-1 ] = '\0';
 		if ( bShowLevel )
 		{
 			g_pVGuiLocalize->ConstructString( sDataString, iMaxLenInBytes, g_pVGuiLocalize->Find("#TF_playerid_object_upgrading_level"),

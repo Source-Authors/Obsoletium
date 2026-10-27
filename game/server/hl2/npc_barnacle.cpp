@@ -2265,8 +2265,8 @@ static impactdamagetable_t gBarnacleImpactDamageTable =
 	barnacleLinearTable,
 	barnacleAngularTable,
 
-	ARRAYSIZE(barnacleLinearTable),
-	ARRAYSIZE(barnacleAngularTable),
+	SE_ARRAYSIZE(barnacleLinearTable),
+	SE_ARRAYSIZE(barnacleAngularTable),
 
 	24*24,		// minimum linear speed squared
 	360*360,	// minimum angular speed squared (360 deg/s to cause spin/slice damage)

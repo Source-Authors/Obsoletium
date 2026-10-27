@@ -276,7 +276,7 @@ int FireSystem_GetFiresInSphere( CFire **pList, int listMax, bool onlyActiveFire
 bool FireSystem_IsValidFirePosition( const Vector &position, float testRadius )
 {
 	CFire *pList[1];
-	int count = FireSystem_GetFiresInSphere( pList, ARRAYSIZE(pList), true, position, testRadius );
+	int count = FireSystem_GetFiresInSphere( pList, SE_ARRAYSIZE(pList), true, position, testRadius );
 	if ( count > 0 )
 		return false;
 	return true;
@@ -396,7 +396,7 @@ bool FireSystem_StartFire( const Vector &position, float fireHeight, float attac
 	if ( FireSystem_CanAddFire( &testPos, 16.0f, type, flags ) == false )
 	{
 		CFire *pFires[16];
-		int fireCount = FireSystem_GetFiresInSphere( pFires, ARRAYSIZE(pFires), true, position, 16.0f );
+		int fireCount = FireSystem_GetFiresInSphere( pFires, SE_ARRAYSIZE(pFires), true, position, 16.0f );
 		for ( int i = 0; i < fireCount; i++ )
 		{
 			// add to this fire
@@ -447,7 +447,7 @@ bool FireSystem_StartFire( CBaseAnimating *pEntity, float fireHeight, float atta
 	{
 		// Contribute heat to all fires within 16 units of this fire.
 		CFire *pFires[16];
-		int fireCount = FireSystem_GetFiresInSphere( pFires, ARRAYSIZE(pFires), true, position, 16.0f );
+		int fireCount = FireSystem_GetFiresInSphere( pFires, SE_ARRAYSIZE(pFires), true, position, 16.0f );
 		for ( int i = 0; i < fireCount; i++ )
 		{
 			pFires[i]->AddHeat( fireHeight, false );
@@ -481,7 +481,7 @@ void FireSystem_ExtinguishInRadius( const Vector &origin, float radius, float ra
 	float heat = (1-rate) * fire_extscale.GetFloat();
 
 	CFire *pFires[32];
-	int fireCount = FireSystem_GetFiresInSphere( pFires, ARRAYSIZE(pFires), false, origin, radius );
+	int fireCount = FireSystem_GetFiresInSphere( pFires, SE_ARRAYSIZE(pFires), false, origin, radius );
 	for ( int i = 0; i < fireCount; i++ )
 	{
 		pFires[i]->Extinguish( heat );
@@ -500,7 +500,7 @@ void FireSystem_AddHeatInRadius( const Vector &origin, float radius, float heat 
 
 	CFire *pFires[32];
 
-	int fireCount = FireSystem_GetFiresInSphere( pFires, ARRAYSIZE(pFires), false, origin, radius );
+	int fireCount = FireSystem_GetFiresInSphere( pFires, SE_ARRAYSIZE(pFires), false, origin, radius );
 	for ( int i = 0; i < fireCount; i++ )
 	{
 		pFires[i]->AddHeat( heat );
@@ -970,7 +970,7 @@ void CFire::Update( float simTime )
 
 	CBaseEntity *pNearby[256];
 	CFire *pFires[16];
-	int nearbyCount = UTIL_EntitiesInBox( pNearby, ARRAYSIZE(pNearby), fireMins, fireMaxs, 0 );
+	int nearbyCount = UTIL_EntitiesInBox( pNearby, SE_ARRAYSIZE(pNearby), fireMins, fireMaxs, 0 );
 	int fireCount = 0;
 	int i;
 
@@ -997,7 +997,7 @@ void CFire::Update( float simTime )
 		}
 		else if ( FClassnameIs( pOther, "env_fire" ) )
 		{
-			if ( fireCount < static_cast<int>(ARRAYSIZE(pFires)) )
+			if ( fireCount < static_cast<int>(SE_ARRAYSIZE(pFires)) )
 			{
 				pFires[fireCount] = (CFire *)pOther;
 				fireCount++;
@@ -1269,7 +1269,7 @@ void CEnvFireSource::Think()
 	SetNextThink( gpGlobals->curtime + FIRESOURCE_THINK_TIME );
 
 	CFire *pFires[128];
-	int fireCount = FireSystem_GetFiresInSphere( pFires, ARRAYSIZE(pFires), false, GetAbsOrigin(), m_radius );
+	int fireCount = FireSystem_GetFiresInSphere( pFires, SE_ARRAYSIZE(pFires), false, GetAbsOrigin(), m_radius );
 
 	for ( int i = 0; i < fireCount; i++ )
 	{
@@ -1379,7 +1379,7 @@ void CEnvFireSensor::Think()
 
 	float heat = 0;
 	CFire *pFires[128];
-	int fireCount = FireSystem_GetFiresInSphere( pFires, ARRAYSIZE(pFires), true, GetAbsOrigin(), m_radius );
+	int fireCount = FireSystem_GetFiresInSphere( pFires, SE_ARRAYSIZE(pFires), true, GetAbsOrigin(), m_radius );
 	for ( int i = 0; i < fireCount; i++ )
 	{
 		heat += pFires[i]->GetHeatLevel();

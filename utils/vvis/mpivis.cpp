@@ -346,7 +346,7 @@ void ReceivePortalFlow( uint64 iWorkUnit, MessageBuffer *pBuf, int iWorker )
 			void *chunks[4] = { cPacketID, &g_PortalMCThreadUniqueID, &iWorkUnit, p->portalvis };
 			int chunkLengths[4] = { sizeof( cPacketID ), sizeof( g_PortalMCThreadUniqueID ), sizeof( iWorkUnit ), portalbytes };
 
-			g_pPortalMCSocket->SendChunksTo( &g_PortalMCAddr, chunks, chunkLengths, ARRAYSIZE( chunks ) );
+			g_pPortalMCSocket->SendChunksTo( &g_PortalMCAddr, chunks, chunkLengths, SE_ARRAYSIZE( chunks ) );
 		}
 	}
 }

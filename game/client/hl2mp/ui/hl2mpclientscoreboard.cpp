@@ -428,7 +428,7 @@ void CHL2MPClientScoreBoardDialog::UpdateTeamInfo()
 				}
 				else
 				{
-					V_snwprintf(val, ARRAYSIZE(val), L"%d", team->Get_Ping());
+					V_snwprintf(val, SE_ARRAYSIZE(val), L"%d", team->Get_Ping());
 					m_pPlayerList->ModifyColumn(sectionID, "ping", val);
 				}
 

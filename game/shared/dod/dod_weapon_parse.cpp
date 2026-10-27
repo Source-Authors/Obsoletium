@@ -155,7 +155,7 @@ void CDODWeaponInfo::Parse( KeyValues *pKeyValuesData, const char *szWeaponName 
 
 	m_iAltWpnCriteria = ALTWPN_CRITERIA_NONE;
 
-	for ( int i=0; i < ARRAYSIZE( g_AltWpnCritera ); i++ )
+	for ( int i=0; i < SE_ARRAYSIZE( g_AltWpnCritera ); i++ )
 	{
 		int iVal = pKeyValuesData->GetInt( g_AltWpnCritera[i].m_pCriteriaName, 0 );
 		if ( iVal == 1 )

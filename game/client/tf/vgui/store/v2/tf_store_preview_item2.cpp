@@ -340,7 +340,7 @@ void CTFStorePreviewItemPanel2::Clear()
 	m_bMouseWasDown = false;
 	m_bIsHalloweenOrFullmoonOnlyItem = false;
 
-	for ( int i = 0; i < ARRAYSIZE( m_pAddRentalToCartButtons ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_pAddRentalToCartButtons ); i++ )
 	{
 		m_pAddRentalToCartButtons[i] = NULL;
 	}
@@ -369,7 +369,7 @@ void CTFStorePreviewItemPanel2::ApplySchemeSettings( vgui::IScheme *pScheme )
 	m_pCycleTextLabel = dynamic_cast<CExLabel *>( FindChildByName( "CycleTextLabel" ) );
 	m_pGoFullscreenButton = dynamic_cast<CExImageButton *>( FindChildByName( "GoFullscreenButton" ) );
 
-	COMPILE_TIME_ASSERT( ARRAYSIZE( m_pAddRentalToCartButtons ) == 3 );
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE( m_pAddRentalToCartButtons ) == 3 );
 #ifdef ENABLE_STORE_RENTAL_BACKEND
 	m_pAddRentalToCartButtons[0] = dynamic_cast<CExButton *>( FindChildByName( "AddRentalToCartButton_1Day" ) );
 	m_pAddRentalToCartButtons[1] = dynamic_cast<CExButton *>( FindChildByName( "AddRentalToCartButton_3Day" ) );
@@ -968,14 +968,14 @@ void CTFStorePreviewItemPanel2::PreviewItem( int iClass, CEconItemView *pItem, c
 
 					int iTotalPrice = pEntry->GetCurrentPrice( eCurrency );
 					wchar_t wzLocalizedPrice[ kLocalizedPriceSizeInChararacters ];
-					MakeMoneyString( wzLocalizedPrice, ARRAYSIZE( wzLocalizedPrice ), iTotalPrice, eCurrency );
+					MakeMoneyString( wzLocalizedPrice, SE_ARRAYSIZE( wzLocalizedPrice ), iTotalPrice, eCurrency );
 
 #ifdef ENABLE_STORE_RENTAL_BACKEND
 					const wchar_t *pwsRentalPriceFormat = GLocalizationProvider()->Find( "#TF_Store_RentalPriceFormat" );
 					if ( pEntry->IsRentable() && pwsRentalPriceFormat )
 					{
 						wchar_t wzRentalLocalizedPrice[ kLocalizedPriceSizeInChararacters ];
-						MakeMoneyString( wzRentalLocalizedPrice, ARRAYSIZE( wzRentalLocalizedPrice ), pEntry->GetRentalPriceScale() * iTotalPrice, eCurrency )
+						MakeMoneyString( wzRentalLocalizedPrice, SE_ARRAYSIZE( wzRentalLocalizedPrice ), pEntry->GetRentalPriceScale() * iTotalPrice, eCurrency )
 
 						wchar_t wzLocalizedPriceString[96];
 						::ILocalize::ConstructString_safe( wzLocalizedPriceString, pwsRentalPriceFormat, 2, wzLocalizedPrice, wzRentalLocalizedPrice );
@@ -1012,7 +1012,7 @@ void CTFStorePreviewItemPanel2::PreviewItem( int iClass, CEconItemView *pItem, c
 				}
 
 				// Show/hide rental button.
-				for ( int i = 0; i < ARRAYSIZE( m_pAddRentalToCartButtons ); i++ )
+				for ( int i = 0; i < SE_ARRAYSIZE( m_pAddRentalToCartButtons ); i++ )
 				{
 					if ( m_pAddRentalToCartButtons[i] )
 					{

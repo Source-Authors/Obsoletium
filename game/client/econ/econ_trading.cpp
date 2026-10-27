@@ -390,7 +390,7 @@ public:
 	{
 		// If this assertion fails it probably means you added a new value to EGCMsgInitiateTradeResponse
 		// but didn't add a string to the array that tracks the user-facing response strings.
-		Assert( ARRAYSIZE( g_pszTradeResponseDescLocKeys ) == k_EGCMsgInitiateTradeResponse_Count );
+		Assert( SE_ARRAYSIZE( g_pszTradeResponseDescLocKeys ) == k_EGCMsgInitiateTradeResponse_Count );
 
 		CloseWaitingDialog();
 

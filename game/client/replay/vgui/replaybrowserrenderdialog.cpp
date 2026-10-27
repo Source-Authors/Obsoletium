@@ -578,7 +578,7 @@ void CReplayRenderDialog::OnThink()
 
 	// @todo Tom Bui: if this goes into hours, we are in trouble...
 	wchar_t wzFileSize[64];
-	_snwprintf( wzFileSize, ARRAYSIZE( wzFileSize ), L"%d", (int)flEstimatedFileSize );
+	_snwprintf( wzFileSize, SE_ARRAYSIZE( wzFileSize ), L"%d", (int)flEstimatedFileSize );
 	wchar_t wzTimeMin[64];
 	wchar_t wzTimeMax[64];
 	g_pVGuiLocalize->ConvertANSIToUnicode( CReplayTime::FormatTimeString( flEstimatedRenderTime_Min ), wzTimeMin, sizeof( wzTimeMin ) );

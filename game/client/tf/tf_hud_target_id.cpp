@@ -944,8 +944,8 @@ void CTargetID::UpdateID( void )
 						if ( FStrEq( pDroppedEconItem->GetStaticData()->GetItemClass(), "tf_weapon_medigun" ) )
 						{
 							wchar_t wszChargeLevel[10];
-							_snwprintf( wszChargeLevel, ARRAYSIZE( wszChargeLevel ) - 1, L"%.0f", pDroppedWeapon->GetChargeLevel() * 100 );
-							wszChargeLevel[ARRAYSIZE( wszChargeLevel ) - 1] = '\0';
+							_snwprintf( wszChargeLevel, SE_ARRAYSIZE( wszChargeLevel ) - 1, L"%.0f", pDroppedWeapon->GetChargeLevel() * 100 );
+							wszChargeLevel[SE_ARRAYSIZE( wszChargeLevel ) - 1] = '\0';
 
 							g_pVGuiLocalize->ConstructString_safe( sIDString, L"%s1 (%s2%)", 2, CEconItemLocalizedFullNameGenerator( GLocalizationProvider(), pDroppedEconItem->GetItemDefinition(), pDroppedEconItem->GetItemQuality() ).GetFullName(), wszChargeLevel );
 						}
@@ -1055,7 +1055,7 @@ void CTargetID::UpdateID( void )
 			// Target name
 			if ( sIDString[0] )
 			{
-				sIDString[ ARRAYSIZE(sIDString)-1 ] = '\0';
+				sIDString[ SE_ARRAYSIZE(sIDString)-1 ] = '\0';
 				m_pTargetNameLabel->SetVisible(true);
 				m_pTargetNameLabel->SetFgColor( colorName );
 
@@ -1071,7 +1071,7 @@ void CTargetID::UpdateID( void )
 			// Extra target data
 			if ( sDataString[0] )
 			{
-				sDataString[ ARRAYSIZE(sDataString)-1 ] = '\0';
+				sDataString[ SE_ARRAYSIZE(sDataString)-1 ] = '\0';
 				m_pTargetDataLabel->SetVisible(true);
 				m_pTargetDataLabel->SetFgColor( colorData );
 

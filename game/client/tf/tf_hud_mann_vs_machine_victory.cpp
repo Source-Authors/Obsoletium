@@ -741,7 +741,7 @@ void CMvMVictoryMannUpEntry::UpdatePlayerData()
 		bAnyThisRow = false;
 		pItemPanelRow = NULL;
 
-		for( int i = 0; i < ARRAYSIZE( nCategories ); i++ )
+		for( int i = 0; i < SE_ARRAYSIZE( nCategories ); i++ )
 		{
 			int nMapKey = mapItems.Find( nCategories[i] );
 			if ( nMapKey == mapItems.InvalidIndex() )
@@ -774,7 +774,7 @@ void CMvMVictoryMannUpEntry::UpdatePlayerData()
 
 	// Put all the items into our list in the order that we want to reveal them
 	m_vecLootPanels.Purge();
-	for( int i = 0; i < ARRAYSIZE( nCategories ); i++ )
+	for( int i = 0; i < SE_ARRAYSIZE( nCategories ); i++ )
 	{
 		int nMapKey = mapItems.Find( nCategories[i] );
 		if ( nMapKey == mapItems.InvalidIndex() )
@@ -849,9 +849,9 @@ bool CMvMVictoryMannUpEntry::AnimateProgressBar( void )
 			wchar_t wszTourLevel[ 10 ];
 
 			m_pTourProgress->SetDialogVariable( "level", g_pVGuiLocalize->Find( "#TF_MVM_Victory_TourComplete" ) );
-			_snwprintf( wszTourLevel, ARRAYSIZE(wszTourLevel) - 1, L"%d", m_nBadgeLevel );
+			_snwprintf( wszTourLevel, SE_ARRAYSIZE(wszTourLevel) - 1, L"%d", m_nBadgeLevel );
 
-			wszTourLevel[ ARRAYSIZE(wszTourLevel)-1 ] = '\0';
+			wszTourLevel[ SE_ARRAYSIZE(wszTourLevel)-1 ] = '\0';
 			g_pVGuiLocalize->ConstructString_safe( wszTourUp, g_pVGuiLocalize->Find( "#TF_MvM_TourCount" ), 1, wszTourLevel );
 			m_pTourProgress->SetDialogVariable( "level", wszTourUp);
 		}
@@ -1083,7 +1083,7 @@ bool CMvMVictoryMannUpEntry::AnimateLoot_Internal( CTFParticlePanel *pParticlePa
 			{
 				if ( pParticlePanel )
 				{
-					pParticlePanel->FireParticleEffect( pszParticles[ RandomInt(0,ARRAYSIZE(pszParticles)-1)], x, y, 1.25f, false );
+					pParticlePanel->FireParticleEffect( pszParticles[ RandomInt(0,SE_ARRAYSIZE(pszParticles)-1)], x, y, 1.25f, false );
 				}
 			}
 
@@ -1237,7 +1237,7 @@ void CMvMVictoryMannUpEntry::CheckBadgeLevel( const CMsgMvMVictoryInfo_Player& p
 
 	m_nBadgeLevel = player.badge_level();
 	int nBadgeOffset = player.badge_leveled() ? 1 : 0;
-	_snwprintf( wszTourLevel, ARRAYSIZE(wszTourLevel) - 1, L"%d", m_nBadgeLevel - nBadgeOffset );
+	_snwprintf( wszTourLevel, SE_ARRAYSIZE(wszTourLevel) - 1, L"%d", m_nBadgeLevel - nBadgeOffset );
 
 #ifdef USE_MVM_TOUR
 	int count = GetBadgeCompletionCount( player.badge_progress_bits() );
@@ -1303,7 +1303,7 @@ void CMvMVictoryMannUpEntry::CheckBadgeLevel( const CMsgMvMVictoryInfo_Player& p
 	}
 #endif // USE_MVM_TOUR
 
-	wszTourLevel[ ARRAYSIZE(wszTourLevel)-1 ] = '\0';
+	wszTourLevel[ SE_ARRAYSIZE(wszTourLevel)-1 ] = '\0';
 	g_pVGuiLocalize->ConstructString_safe( wszTourUp, g_pVGuiLocalize->Find( "#TF_MvM_TourCount" ), 1, wszTourLevel );
 	m_pTourProgress->SetDialogVariable( "level", wszTourUp );
 }
@@ -1829,9 +1829,9 @@ void CMvMVictoryMannUpPanel::SetTabActive( int nIndex )
 
 void CMvMVictoryMannUpPanel::OnCommand( const char *command )
 {
-	if ( !Q_strncmp( command, "switch_tab", ARRAYSIZE("switch_tab") - 1  ) )
+	if ( !Q_strncmp( command, "switch_tab", SE_ARRAYSIZE("switch_tab") - 1  ) )
 	{
-		int nIndex = atoi( command + ARRAYSIZE("switch_tab") - 1 ) - 1;
+		int nIndex = atoi( command + SE_ARRAYSIZE("switch_tab") - 1 ) - 1;
 
 		// Dont allow switching if we're still animating
 		if ( m_bAnimationComplete )

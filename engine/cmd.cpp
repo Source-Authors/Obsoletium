@@ -830,7 +830,7 @@ CON_COMMAND_AUTOCOMPLETEFILE( exec, Cmd_Exec_f, "Execute script file.", "cfg", c
 
 void Cmd_Init( void )
 {
-	Sys_CreateFileAssociations( ARRAYSIZE( g_FileAssociations ), g_FileAssociations );
+	Sys_CreateFileAssociations( SE_ARRAYSIZE( g_FileAssociations ), g_FileAssociations );
 }
 
 //-----------------------------------------------------------------------------

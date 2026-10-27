@@ -1580,7 +1580,7 @@ This is a very long string that I am going to attempt to paste into the cs hud c
 		// Let the game rules at it
 		if ( GameRules() )
 		{
-			GameRules()->ModifySentChat( ansi, ARRAYSIZE(ansi) );
+			GameRules()->ModifySentChat( ansi, SE_ARRAYSIZE(ansi) );
 		}
 
 		char szbuf[144];	// more than 128

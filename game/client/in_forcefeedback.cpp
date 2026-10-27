@@ -56,7 +56,7 @@ static EffectMap_t g_EffectMap[] =
 
 static void InitEffectMap()
 {
-	int c = ARRAYSIZE( g_EffectMap );
+	int c = SE_ARRAYSIZE( g_EffectMap );
 	for ( int i = 0; i < c; ++i )
 	{
 		g_EffectMap[ i ].pVecEffectPtr = new vecEffectPtr_t();
@@ -64,7 +64,7 @@ static void InitEffectMap()
 }
 static void ShutdownEffectMap()
 {
-	int c = ARRAYSIZE( g_EffectMap );
+	int c = SE_ARRAYSIZE( g_EffectMap );
 	for ( int i = 0; i < c; ++i )
 	{
 		if ( g_EffectMap[ i ].pVecEffectPtr )
@@ -461,7 +461,7 @@ static void LoadEffectFile( LPDIRECTINPUTDEVICE8 device, EffectMap_t &map )
 //-----------------------------------------------------------------------------
 static void LoadEffectFiles( LPDIRECTINPUTDEVICE8 device )
 {
-	int c = ARRAYSIZE( g_EffectMap );
+	int c = SE_ARRAYSIZE( g_EffectMap );
 	for ( int i = 0; i < c; ++i )
 	{
 		EffectMap_t& map = g_EffectMap[ i ];

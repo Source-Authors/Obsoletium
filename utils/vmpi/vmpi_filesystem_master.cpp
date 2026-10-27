@@ -1005,7 +1005,7 @@ int *pnBytesSent )
 	}
 	else
 	{
-		WSASendTo( m_Socket, bufs, ARRAYSIZE( bufs ), &nBytesSent, 0,
+		WSASendTo( m_Socket, bufs, SE_ARRAYSIZE( bufs ), &nBytesSent, 0,
 		           (sockaddr *)&m_MulticastAddr, sizeof( m_MulticastAddr ), NULL,
 		           NULL );
 		bSuccess = ( nBytesSent == nWantedBytes );
@@ -1595,7 +1595,7 @@ bool CMasterVMPIFileSystem::HandleFileSystemPacket( MessageBuffer *pBuf,
 			ptrdiff_t     chunkLen[4] = { sizeof( cPacket ), sizeof( requestID ),
 				                          sizeof( fileID ), sizeof( bZeroLength ) };
 
-			VMPI_SendChunks( pChunks, chunkLen, ARRAYSIZE( pChunks ), iSource );
+			VMPI_SendChunks( pChunks, chunkLen, SE_ARRAYSIZE( pChunks ), iSource );
 		}
 		return true;
 

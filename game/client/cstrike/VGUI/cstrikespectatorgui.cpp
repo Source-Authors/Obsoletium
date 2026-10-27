@@ -108,7 +108,7 @@ void CCSSpectatorGUI::UpdateSpectatorPlayerList()
 	if ( cts )
 	{
 		wchar_t frags[ 10 ];
-		_snwprintf( frags, ARRAYSIZE( frags ), L"%i",  cts->Get_Score()  );
+		_snwprintf( frags, SE_ARRAYSIZE( frags ), L"%i",  cts->Get_Score()  );
 
 		SetLabelText( "CTScoreValue", frags );
 	}
@@ -117,7 +117,7 @@ void CCSSpectatorGUI::UpdateSpectatorPlayerList()
 	if ( ts )
 	{
 		wchar_t frags[ 10 ];
-		_snwprintf( frags, ARRAYSIZE( frags ), L"%i", ts->Get_Score()  );
+		_snwprintf( frags, SE_ARRAYSIZE( frags ), L"%i", ts->Get_Score()  );
 		
 		SetLabelText( "TERScoreValue", frags );
 	}
@@ -198,7 +198,7 @@ void CCSSpectatorGUI::UpdateTimer()
 		 m_nLastTime  = 0;
 
 	wchar_t szText[ 63 ];
-	_snwprintf ( szText, ARRAYSIZE( szText ), L"%d:%02d", (m_nLastTime / 60), (m_nLastTime % 60) );
+	_snwprintf ( szText, SE_ARRAYSIZE( szText ), L"%d:%02d", (m_nLastTime / 60), (m_nLastTime % 60) );
 	szText[62] = 0;
 
 	SetLabelText("timerlabel", szText );
@@ -217,7 +217,7 @@ void CCSSpectatorGUI::UpdateAccount()
 	if ( (player->GetTeamNumber() == TEAM_TERRORIST) || (player->GetTeamNumber() == TEAM_CT) )
 	{
 		wchar_t szText[ 63 ];
-		_snwprintf ( szText, ARRAYSIZE( szText ), L"$%i", m_nLastAccount );
+		_snwprintf ( szText, SE_ARRAYSIZE( szText ), L"$%i", m_nLastAccount );
 		szText[62] = 0;
 
 		SetLabelText( "extrainfo", szText );

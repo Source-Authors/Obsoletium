@@ -60,7 +60,7 @@ static char const *ep2Maps[] =
 
 bool CEP2GameStats::UserPlayedAllTheMaps( void )
 {
-	int c = ARRAYSIZE( ep2Maps );
+	int c = SE_ARRAYSIZE( ep2Maps );
 	for ( int i = 0; i < c; ++i )
 	{
 		int idx = m_BasicStats.m_MapTotals.Find( ep2Maps[ i ] );

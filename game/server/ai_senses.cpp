@@ -266,7 +266,7 @@ CBaseEntity *CAI_Senses::GetFirstSeenEntity( AISightIter_t *pIter, seentype_t iS
 	pIterVal->SeenArray = (char)iSeenType;
 	int iFirstArray = ( iSeenType == SEEN_ALL ) ? 0 : iSeenType;
 
-	static_assert(std::numeric_limits<char>::max() >= ARRAYSIZE(m_SeenArrays));
+	static_assert(std::numeric_limits<char>::max() >= SE_ARRAYSIZE(m_SeenArrays));
 
 	for ( char i = iFirstArray; i < static_cast<char>(ssize( m_SeenArrays )); i++ )
 	{
@@ -290,7 +290,7 @@ CBaseEntity *CAI_Senses::GetNextSeenEntity( AISightIter_t *pIter ) const
 	{
 		AISightIterVal_t *pIterVal = (AISightIterVal_t *)pIter;
 		
-		static_assert(std::numeric_limits<char>::max() >= ARRAYSIZE(m_SeenArrays));
+		static_assert(std::numeric_limits<char>::max() >= SE_ARRAYSIZE(m_SeenArrays));
 
 		for ( char i = pIterVal->array;  i < static_cast<char>(ssize( m_SeenArrays )); i++ )
 		{

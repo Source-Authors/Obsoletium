@@ -2249,7 +2249,7 @@ static AI_FollowFormation_t g_SimpleFollowFormation =
 {
 	"Simple",
 	AIFF_DEFAULT | AIFF_USE_FOLLOW_POINTS,
-	ARRAYSIZE(g_SimpleFollowFormationSlots),
+	SE_ARRAYSIZE(g_SimpleFollowFormationSlots),
 	168,						// followPointTolerance
 	36,							// targetMoveTolerance
 	60,							// repathOnRouteTolerance
@@ -2287,7 +2287,7 @@ static AI_FollowFormation_t g_WideFollowFormation =
 {
 	"Wide",
 	AIFF_DEFAULT | AIFF_USE_FOLLOW_POINTS,
-	ARRAYSIZE(g_WideFollowFormationSlots),
+	SE_ARRAYSIZE(g_WideFollowFormationSlots),
 	168,						// followPointTolerance
 	72,							// targetMoveTolerance
 	60,							// repathOnRouteTolerance
@@ -2319,7 +2319,7 @@ static AI_FollowFormation_t g_AntlionFollowFormation =
 {
 	"Antlion",
 	AIFF_DEFAULT | AIFF_USE_FOLLOW_POINTS,
-	ARRAYSIZE(g_AntlionFollowFormationSlots),
+	SE_ARRAYSIZE(g_AntlionFollowFormationSlots),
 	168,						// followPointTolerance
 	36,							// targetMoveTolerance
 	60,							// repathOnRouteTolerance
@@ -2346,7 +2346,7 @@ static AI_FollowFormation_t g_CommanderFollowFormation =
 {
 	"Commander",
 	AIFF_DEFAULT | AIFF_USE_FOLLOW_POINTS,
-	ARRAYSIZE(g_CommanderFollowFormationSlots),
+	SE_ARRAYSIZE(g_CommanderFollowFormationSlots),
 	168,						// followPointTolerance
 	6,							// targetMoveTolerance
 	60,							// repathOnRouteTolerance
@@ -2371,7 +2371,7 @@ static AI_FollowFormation_t g_TightFollowFormation =
 {
 	"Tight",
 	AIFF_DEFAULT | AIFF_USE_FOLLOW_POINTS,
-	ARRAYSIZE(g_CommanderFollowFormationSlots),
+	SE_ARRAYSIZE(g_CommanderFollowFormationSlots),
 	48,							// followPointTolerance
 	6,							// targetMoveTolerance
 	60,							// repathOnRouteTolerance
@@ -2408,7 +2408,7 @@ static AI_FollowFormation_t g_MediumFollowFormation =
 {
 	"Medium",
 	AIFF_DEFAULT | AIFF_USE_FOLLOW_POINTS,
-	ARRAYSIZE(g_MediumFollowFormationSlots),
+	SE_ARRAYSIZE(g_MediumFollowFormationSlots),
 	168,						// followPointTolerance
 	36,							// targetMoveTolerance
 	60,							// repathOnRouteTolerance
@@ -2445,7 +2445,7 @@ static AI_FollowFormation_t g_SidekickFollowFormation =
 {
 	"Sidekick",
 	AIFF_DEFAULT | AIFF_USE_FOLLOW_POINTS | AIFF_REQUIRE_LOS_OUTSIDE_COMBAT,
-	ARRAYSIZE(g_SidekickFollowFormationSlots),
+	SE_ARRAYSIZE(g_SidekickFollowFormationSlots),
 	168,						// followPointTolerance
 	36,							// targetMoveTolerance
 	60,							// repathOnRouteTolerance
@@ -2472,7 +2472,7 @@ static AI_FollowFormation_t g_HunterFollowFormation =
 {
 	"Hunter",
 	AIFF_DEFAULT | AIFF_USE_FOLLOW_POINTS,
-	ARRAYSIZE(g_HunterFollowFormationSlots),
+	SE_ARRAYSIZE(g_HunterFollowFormationSlots),
 	48,							// followPointTolerance
 	48,							// targetMoveTolerance
 	60,//180,						// repathOnRouteTolerance
@@ -2510,7 +2510,7 @@ static AI_FollowFormation_t g_VortigauntFollowFormation =
 {
 	"Vortigaunt",
 	AIFF_DEFAULT | AIFF_USE_FOLLOW_POINTS | AIFF_REQUIRE_LOS_OUTSIDE_COMBAT,
-	ARRAYSIZE(g_VortigauntFollowFormationSlots),
+	SE_ARRAYSIZE(g_VortigauntFollowFormationSlots),
 	168,						// followPointTolerance
 	36,							// targetMoveTolerance
 	60,							// repathOnRouteTolerance
@@ -2542,8 +2542,8 @@ AI_FollowFormation_t *AIGetFormation( AI_Formations_t formation )
 {
 	if ( formation < 0 )
 		formation = (AI_Formations_t)0;
-	else if ( formation >= ARRAYSIZE( g_AI_Formations ) )
-		formation = (AI_Formations_t)(ARRAYSIZE( g_AI_Formations ) - 1 );
+	else if ( formation >= SE_ARRAYSIZE( g_AI_Formations ) )
+		formation = (AI_Formations_t)(SE_ARRAYSIZE( g_AI_Formations ) - 1 );
 		
 	return g_AI_Formations[formation];
 }

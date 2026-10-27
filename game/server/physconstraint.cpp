@@ -500,7 +500,7 @@ void FindPhysicsAnchor( string_t name, hl_constraint_info_t &info, int index, CB
 				if ( pAnim )
 				{
 					IPhysicsObject *list[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-					int listCount = pAnchor->hEntity->VPhysicsGetObjectList( list, ARRAYSIZE(list) );
+					int listCount = pAnchor->hEntity->VPhysicsGetObjectList( list, SE_ARRAYSIZE(list) );
 					int iPhysicsBone = pAnim->GetPhysicsBone( pAnim->GetAttachmentBone( pAnchor->parentAttachment ) );
 					if ( iPhysicsBone < listCount )
 					{

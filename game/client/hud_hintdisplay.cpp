@@ -489,13 +489,13 @@ bool CHudHintKeyDisplay::SetHintText( const char *text )
 		wchar_t *end = wcschr( ws, '%' );
 		if ( end )
 		{
-			wcsncpy( token, ws, MIN( end - ws, (intp)ARRAYSIZE(token)) );
+			wcsncpy( token, ws, MIN( end - ws, (intp)SE_ARRAYSIZE(token)) );
 			token[end - ws] = L'\0';	// force null termination
 		}
 		else
 		{
-			wcsncpy( token, ws, ARRAYSIZE(token) );
-			token[ ARRAYSIZE(token) - 1 ] = L'\0';	// force null termination
+			wcsncpy( token, ws, SE_ARRAYSIZE(token) );
+			token[ SE_ARRAYSIZE(token) - 1 ] = L'\0';	// force null termination
 		}
 
 		ws += wcslen( token );
@@ -656,7 +656,7 @@ bool CHudHintKeyDisplay::SetHintText( const char *text )
 		"lines"
 	};
 
-	for ( int i = 0; i < ARRAYSIZE(sampleText); ++i)
+	for ( int i = 0; i < SE_ARRAYSIZE(sampleText); ++i)
 	{
 		// put it in a label
 		vgui::Label *label = vgui::SETUP_PANEL(new vgui::Label(this, NULL, sampleText[i]));

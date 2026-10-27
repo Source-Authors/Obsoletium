@@ -1578,7 +1578,7 @@ private:
 		auto *pContext = (InstanceContext_t *)sa.GetInstanceUp(1,0);
 		char szBuf[64];
 
-		if ( pContext && pContext->pInstance && pContext->pClassDesc->pHelper && pContext->pClassDesc->pHelper->ToString( pContext->pInstance, szBuf, ARRAYSIZE(szBuf) ) )
+		if ( pContext && pContext->pInstance && pContext->pClassDesc->pHelper && pContext->pClassDesc->pHelper->ToString( pContext->pInstance, szBuf, SE_ARRAYSIZE(szBuf) ) )
 		{
 			sa.Return( szBuf );
 		}
@@ -1642,7 +1642,7 @@ private:
 	{
 		char szTypeMask[64];
 
-		if ( pScriptFunction->m_desc.m_Parameters.Count() > ARRAYSIZE(szTypeMask) - 1 )
+		if ( pScriptFunction->m_desc.m_Parameters.Count() > SE_ARRAYSIZE(szTypeMask) - 1 )
 		{
 			AssertMsg1( 0, "Too many agruments for script function %s\n", pScriptFunction->m_desc.m_pszFunction );
 			return;
@@ -1680,7 +1680,7 @@ private:
 				break;
 			}
 		}
-		Assert( pCurrent - szTypeMask < ARRAYSIZE(szTypeMask) - 1 );
+		Assert( pCurrent - szTypeMask < SE_ARRAYSIZE(szTypeMask) - 1 );
 		*pCurrent = 0;
 		sq_pushstring( m_hVM, pScriptFunction->m_desc.m_pszScriptName, -1 );
 		ScriptFunctionBinding_t **pVMScriptFunction = (ScriptFunctionBinding_t **)sq_newuserdata(m_hVM, sizeof(ScriptFunctionBinding_t *));

@@ -521,7 +521,7 @@ void C_EntityDissolve::ClientThink( void )
 	if (( !m_pController ) && ( m_nDissolveType == ENTITY_DISSOLVE_NORMAL ) && bIsRagdoll )
 	{
 		IPhysicsObject *ppList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-		int nCount = pEnt->VPhysicsGetObjectList( ppList, ARRAYSIZE(ppList) );
+		int nCount = pEnt->VPhysicsGetObjectList( ppList, SE_ARRAYSIZE(ppList) );
 		if ( nCount > 0 )
 		{
 			m_pController = physenv->CreateMotionController( this );

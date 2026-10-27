@@ -67,12 +67,12 @@ C_TFObjectiveResource::C_TFObjectiveResource()
 	memset( m_bMannVsMachineWaveClassActive2, 0, sizeof( m_bMannVsMachineWaveClassActive2 ) );
 
 	int i = 0;
-	for ( i = 0 ; i < ARRAYSIZE( m_iszMannVsMachineWaveClassNames ) ; ++i )
+	for ( i = 0 ; i < SE_ARRAYSIZE( m_iszMannVsMachineWaveClassNames ) ; ++i )
 	{
 		m_iszMannVsMachineWaveClassNames[ i ][ 0 ] = '\0';
 	}
 
-	for ( i = 0 ; i < ARRAYSIZE( m_iszMannVsMachineWaveClassNames2 ) ; ++i )
+	for ( i = 0 ; i < SE_ARRAYSIZE( m_iszMannVsMachineWaveClassNames2 ) ; ++i )
 	{
 		m_iszMannVsMachineWaveClassNames2[ i ][ 0 ] = '\0';
 	}
@@ -165,13 +165,13 @@ void C_TFObjectiveResource::SetCappingTeam( int index_, int team )
 //-----------------------------------------------------------------------------
 int C_TFObjectiveResource::GetMannVsMachineWaveClassCount( int nIndex )
 {
-	if ( nIndex < ARRAYSIZE( m_nMannVsMachineWaveClassCounts ) )
+	if ( nIndex < SE_ARRAYSIZE( m_nMannVsMachineWaveClassCounts ) )
 	{
 		return m_nMannVsMachineWaveClassCounts[ nIndex ]; 
 	}
-	nIndex -= ARRAYSIZE( m_nMannVsMachineWaveClassCounts );
+	nIndex -= SE_ARRAYSIZE( m_nMannVsMachineWaveClassCounts );
 
-	if ( nIndex < ARRAYSIZE( m_nMannVsMachineWaveClassCounts2 ) )
+	if ( nIndex < SE_ARRAYSIZE( m_nMannVsMachineWaveClassCounts2 ) )
 	{
 		return m_nMannVsMachineWaveClassCounts2[ nIndex ]; 
 	}
@@ -184,13 +184,13 @@ int C_TFObjectiveResource::GetMannVsMachineWaveClassCount( int nIndex )
 //-----------------------------------------------------------------------------
 const char *C_TFObjectiveResource::GetMannVsMachineWaveClassName( int nIndex )
 { 
-	if ( nIndex < ARRAYSIZE( m_iszMannVsMachineWaveClassNames ) )
+	if ( nIndex < SE_ARRAYSIZE( m_iszMannVsMachineWaveClassNames ) )
 	{
 		return m_iszMannVsMachineWaveClassNames[ nIndex ]; 
 	}
-	nIndex -= ARRAYSIZE( m_iszMannVsMachineWaveClassNames );
+	nIndex -= SE_ARRAYSIZE( m_iszMannVsMachineWaveClassNames );
 
-	if ( nIndex < ARRAYSIZE( m_iszMannVsMachineWaveClassNames2 ) )
+	if ( nIndex < SE_ARRAYSIZE( m_iszMannVsMachineWaveClassNames2 ) )
 	{
 		return m_iszMannVsMachineWaveClassNames2[ nIndex ]; 
 	}
@@ -203,13 +203,13 @@ const char *C_TFObjectiveResource::GetMannVsMachineWaveClassName( int nIndex )
 //-----------------------------------------------------------------------------
 unsigned int C_TFObjectiveResource::GetMannVsMachineWaveClassFlags( int nIndex ) 
 { 
-	if ( nIndex < ARRAYSIZE( m_nMannVsMachineWaveClassFlags ) )
+	if ( nIndex < SE_ARRAYSIZE( m_nMannVsMachineWaveClassFlags ) )
 	{
 		return m_nMannVsMachineWaveClassFlags[ nIndex ]; 
 	}
-	nIndex -= ARRAYSIZE( m_nMannVsMachineWaveClassFlags );
+	nIndex -= SE_ARRAYSIZE( m_nMannVsMachineWaveClassFlags );
 
-	if ( nIndex < ARRAYSIZE( m_nMannVsMachineWaveClassFlags2 ) )
+	if ( nIndex < SE_ARRAYSIZE( m_nMannVsMachineWaveClassFlags2 ) )
 	{
 		return m_nMannVsMachineWaveClassFlags2[ nIndex ]; 
 	}
@@ -222,13 +222,13 @@ unsigned int C_TFObjectiveResource::GetMannVsMachineWaveClassFlags( int nIndex )
 //-----------------------------------------------------------------------------
 bool C_TFObjectiveResource::GetMannVsMachineWaveClassActive( int nIndex )
 {
-	if ( nIndex < ARRAYSIZE( m_bMannVsMachineWaveClassActive ) )
+	if ( nIndex < SE_ARRAYSIZE( m_bMannVsMachineWaveClassActive ) )
 	{
 		return m_bMannVsMachineWaveClassActive[ nIndex ]; 
 	}
-	nIndex -= ARRAYSIZE( m_bMannVsMachineWaveClassActive );
+	nIndex -= SE_ARRAYSIZE( m_bMannVsMachineWaveClassActive );
 
-	if ( nIndex < ARRAYSIZE( m_bMannVsMachineWaveClassActive2 ) )
+	if ( nIndex < SE_ARRAYSIZE( m_bMannVsMachineWaveClassActive2 ) )
 	{
 		return m_bMannVsMachineWaveClassActive2[ nIndex ]; 
 	}

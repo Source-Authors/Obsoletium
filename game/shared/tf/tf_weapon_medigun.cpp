@@ -348,7 +348,7 @@ void CWeaponMedigun::Precache()
 	PrecacheScriptSound( "WeaponMedigun.HealingDisrupt" );
 	// PrecacheParticleSystem( "medicgun_beam_machinery" );
 
-	for( int i=0; i<ARRAYSIZE(g_MedigunEffects); ++i )
+	for( int i=0; i<SE_ARRAYSIZE(g_MedigunEffects); ++i )
 	{
 		if( g_MedigunEffects[i].pszChargeOnSound[0] )
 			PrecacheScriptSound( g_MedigunEffects[i].pszChargeOnSound );
@@ -1069,7 +1069,7 @@ void CWeaponMedigun::RecalcEffectOnTarget( CTFPlayer *pPlayer, bool bInstantRemo
 //-----------------------------------------------------------------------------
 const char *CWeaponMedigun::GetHealSound( void ) const
 {
-	COMPILE_TIME_ASSERT( ARRAYSIZE(g_pszMedigunHealSounds) == MEDIGUN_NUM_CHARGE_TYPES );
+	COMPILE_TIME_ASSERT( SE_ARRAYSIZE(g_pszMedigunHealSounds) == MEDIGUN_NUM_CHARGE_TYPES );
 	return g_pszMedigunHealSounds[ GetMedigunType() ];
 }
 

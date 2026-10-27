@@ -316,7 +316,7 @@ int UTIL_EntitiesInSphere( const Vector &center, float radius, CFlaggedEntitiesE
 CEntitySphereQuery::CEntitySphereQuery( const Vector &center, float radius, int flagMask )
 {
 	m_listIndex = 0;
-	m_listCount = UTIL_EntitiesInSphere( m_pList, ARRAYSIZE(m_pList), center, radius, flagMask );
+	m_listCount = UTIL_EntitiesInSphere( m_pList, SE_ARRAYSIZE(m_pList), center, radius, flagMask );
 }
 
 CBaseEntity *CEntitySphereQuery::GetCurrentEntity()

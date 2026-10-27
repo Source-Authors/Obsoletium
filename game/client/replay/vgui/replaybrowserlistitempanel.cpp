@@ -734,7 +734,7 @@ void CBaseThumbnailCollection::UpdateViewingPage( void )
 	int iNextReplays = clamp( m_vecReplays.Count() - iFirstReplayOnPage - iThumbnailsPerPage, 0, iThumbnailsPerPage );
 	if ( iNextReplays > 0 )
 	{
-		_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", iNextReplays );
+		_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", iNextReplays );
 		g_pVGuiLocalize->ConstructString_safe( wszTemp, g_pVGuiLocalize->Find("#Replay_NextX"), 1, wszCount );
 		SetDialogVariable( "nextbuttontext", wszTemp );
 		m_pShowNextButton->SetVisible( true );
@@ -747,7 +747,7 @@ void CBaseThumbnailCollection::UpdateViewingPage( void )
 	int iPrevReplays = clamp( iFirstReplayOnPage, 0, iThumbnailsPerPage );
 	if ( iPrevReplays > 0 )
 	{
-		_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", iPrevReplays );
+		_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", iPrevReplays );
 		g_pVGuiLocalize->ConstructString_safe( wszTemp, g_pVGuiLocalize->Find("#Replay_PrevX"), 1, wszCount );
 		SetDialogVariable( "prevbuttontext", wszTemp );
 		m_pShowPrevButton->SetVisible( true );
@@ -799,7 +799,7 @@ void CBaseThumbnailCollection::PerformLayout()
 
 	// Update the title count
 	wchar_t wszCount[10];
-	_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", m_vecReplays.Count() );
+	_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", m_vecReplays.Count() );
 	wchar_t wszTemp[256];
 	const char *pszLocString = IsMovieCollection() ? "#Replay_SavedMovies" : "#Replay_UnrenderedReplays";
 	g_pVGuiLocalize->ConstructString_safe( wszTemp, g_pVGuiLocalize->Find(pszLocString), 1, wszCount );
@@ -1022,7 +1022,7 @@ void CMovieThumbnailCollection::PerformLayout()
 	if ( g_pReplayMovieManager )
 	{
 		wchar_t wszCount[10];
-		_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", g_pReplayMovieManager->GetMovieCount() );
+		_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", g_pReplayMovieManager->GetMovieCount() );
 		wchar_t wszTemp[256];
 		g_pVGuiLocalize->ConstructString_safe( wszTemp, g_pVGuiLocalize->Find("#Replay_SavedMovies"), 1, wszCount );
 		SetDialogVariable( "titleandcount", wszTemp );

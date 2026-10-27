@@ -336,7 +336,7 @@ void CMdlInfoApp::PostShutdown()
 //-----------------------------------------------------------------------------
 bool CMdlInfoApp::CommandLineHasOpt( const char *pszOpt )
 {
-	for ( int ii = 0; ii < ARRAYSIZE( s_binaryOptions ); ++ii )
+	for ( int ii = 0; ii < SE_ARRAYSIZE( s_binaryOptions ); ++ii )
 	{
 		if ( V_strieq( pszOpt, s_binaryOptions[ii].m_pszShortName ) || V_strieq( pszOpt, s_binaryOptions[ii].m_pszLongName ) )
 		{
@@ -418,9 +418,9 @@ MDLHandle_t CMdlInfoApp::GetMDLHandle( const char *pszFilename )
 		return MDLHANDLE_INVALID;
 
 	char szFullPath[ MAX_PATH ];
-	if ( !GenerateFullPath( pszFilename, NULL, szFullPath, ARRAYSIZE( szFullPath ) ) )
+	if ( !GenerateFullPath( pszFilename, NULL, szFullPath, SE_ARRAYSIZE( szFullPath ) ) )
 	{
-		V_strncpy( szFullPath, pszFilename, ARRAYSIZE( szFullPath ) );
+		V_strncpy( szFullPath, pszFilename, SE_ARRAYSIZE( szFullPath ) );
 	}
 
 	MDLHandle_t hMdl = g_pMDLCache->FindMDL( szFullPath );
@@ -457,7 +457,7 @@ void CMdlInfoApp::PrintHelp()
 	Msg( "    mdlinfo [ options ] < -i filename.mdl >\n" );
 	Msg( "\n" );
 
-	for ( int ii = 0; ii < ARRAYSIZE( s_binaryOptions ); ++ii )
+	for ( int ii = 0; ii < SE_ARRAYSIZE( s_binaryOptions ); ++ii )
 	{
 		const CommandLineBinaryOpt_t &opt = s_binaryOptions[ii];
 		Msg( "    %s | %s : %s\n", opt.m_pszShortName, opt.m_pszLongName, opt.m_pszDoc );
@@ -547,7 +547,7 @@ static void PrintBoneFlags( const mstudiobone_t *pBone )
 
 	Msg( "//   + Bone Flags: 0x%08x\n", pBone->flags );
 
-	for ( int ii = 0; ii < ARRAYSIZE( boneFlags ); ++ii )
+	for ( int ii = 0; ii < SE_ARRAYSIZE( boneFlags ); ++ii )
 	{
 		if ( pBone->flags & boneFlags[ii].m_nMask )
 		{

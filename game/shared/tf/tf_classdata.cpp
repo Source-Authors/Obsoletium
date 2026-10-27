@@ -57,7 +57,7 @@ TFPlayerClassData_t::TFPlayerClassData_t()
 	m_nMaxArmor = 0;
 
 #ifdef GAME_DLL
-	for ( int i = 0; i < ARRAYSIZE( m_szDeathSound ); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_szDeathSound ); ++i )
 	{
 		m_szDeathSound[ i ][ 0 ] = '\0';
 	}
@@ -212,8 +212,8 @@ void TFPlayerClassData_t::AddAdditionalPlayerDeathSounds( void )
 #ifdef GAME_DLL	
 	for ( int i = DEATH_SOUND_FIRST; i <= DEATH_SOUND_LAST; ++i )
 	{
-		CopySoundNameWithModifierToken( m_szDeathSound[ i + DEATH_SOUND_MVM_FIRST ], m_szDeathSound[ i ], ARRAYSIZE( m_szDeathSound[0] ), "MVM_" );
-		CopySoundNameWithModifierToken( m_szDeathSound[ i + DEATH_SOUND_GIANT_MVM_FIRST ], m_szDeathSound[ i ], ARRAYSIZE( m_szDeathSound[0] ), "M_MVM_" );
+		CopySoundNameWithModifierToken( m_szDeathSound[ i + DEATH_SOUND_MVM_FIRST ], m_szDeathSound[ i ], SE_ARRAYSIZE( m_szDeathSound[0] ), "MVM_" );
+		CopySoundNameWithModifierToken( m_szDeathSound[ i + DEATH_SOUND_GIANT_MVM_FIRST ], m_szDeathSound[ i ], SE_ARRAYSIZE( m_szDeathSound[0] ), "M_MVM_" );
 	}
 #endif
 }
@@ -241,7 +241,7 @@ bool CTFPlayerClassDataMgr::Init( void )
 	// Initialize the classes.
 	for ( int iClass = 1; iClass < TF_CLASS_COUNT_ALL; ++iClass )
 	{
-		COMPILE_TIME_ASSERT( ARRAYSIZE( s_aPlayerClassFiles ) == TF_CLASS_COUNT_ALL );
+		COMPILE_TIME_ASSERT( SE_ARRAYSIZE( s_aPlayerClassFiles ) == TF_CLASS_COUNT_ALL );
 		pClassData = &m_aTFPlayerClassData[iClass];
 		Assert( pClassData );
 		pClassData->Parse( s_aPlayerClassFiles[iClass] );

@@ -644,7 +644,7 @@ const Vector CItemUploadGame< CItemUploadTF >::s_vBipHead[] =
 	Vector( 0,				75.679732, -2.87915  )	// spy
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( CItemUploadGame< CItemUploadTF >::s_vBipHead ) == CItemUploadTF::kClassCount );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( CItemUploadGame< CItemUploadTF >::s_vBipHead ) == CItemUploadTF::kClassCount );
 
 //-----------------------------------------------------------------------------
 //
@@ -662,7 +662,7 @@ const RadianEuler CItemUploadGame< CItemUploadTF >::s_eBipHead[] =
 	RadianEuler( DEG2RAD( -180.0 ),   0, 0 )	// spy
 };
 
-COMPILE_TIME_ASSERT( ARRAYSIZE( CItemUploadGame< CItemUploadTF >::s_eBipHead ) == CItemUploadTF::kClassCount );
+COMPILE_TIME_ASSERT( SE_ARRAYSIZE( CItemUploadGame< CItemUploadTF >::s_eBipHead ) == CItemUploadTF::kClassCount );
 
 
 //-----------------------------------------------------------------------------
@@ -720,7 +720,7 @@ bool CItemUpload::GetSteamId( CUtlString &sSteamId )
 		{
 			CSteamID cSteamID = pSteamUser->GetSteamID();
 			const uint32 nAccountID = cSteamID.GetAccountID();
-			V_snprintf( szBuf, ARRAYSIZE( szBuf ), "0x%08x", nAccountID );
+			V_snprintf( szBuf, SE_ARRAYSIZE( szBuf ), "0x%08x", nAccountID );
 
 			bRetVal = true;
 		}
@@ -744,7 +744,7 @@ bool CItemUpload::GetVProjectDir( CUtlString &sVProjectDir )
 {
 	char szVProject[ BUFSIZ ] = "";
 
-	GetModSubdirectory( "", szVProject, ARRAYSIZE( szVProject ) );
+	GetModSubdirectory( "", szVProject, SE_ARRAYSIZE( szVProject ) );
 	V_StripTrailingSlash( szVProject );
 
 	sVProjectDir = szVProject;
@@ -765,7 +765,7 @@ bool CItemUpload::GetVMod( CUtlString &sVMod )
 		return false;
 
 	char szBuf[ k64KB ];
-	V_FileBase( sVProjectDir.String(), szBuf, ARRAYSIZE( szBuf ) );
+	V_FileBase( sVProjectDir.String(), szBuf, SE_ARRAYSIZE( szBuf ) );
 
 	sVMod = szBuf;
 
@@ -803,7 +803,7 @@ bool CItemUpload::GetSourceSDKFromExe( CUtlString &sSourceSDK, CUtlString &sSour
 		sSourceSDK.SetDirect( sCurrentExecutableFileName.String(), pszBinOrangeBoxBin - sCurrentExecutableFileName.String() );
 
 		char szBinDir[ MAX_PATH ];
-		V_ExtractFilePath( sCurrentExecutableFileName.String(), szBinDir, ARRAYSIZE( szBinDir ) );
+		V_ExtractFilePath( sCurrentExecutableFileName.String(), szBinDir, SE_ARRAYSIZE( szBinDir ) );
 		sSourceSDKBin = szBinDir;
 		return true;
 	}
@@ -851,7 +851,7 @@ bool CItemUpload::GetSourceSDKFromExe( CUtlString &sSourceSDK, CUtlString &sSour
 static bool CheckContentPath( CUtlString &sContentDir )
 {
 	char szContentDir[ MAX_PATH ];
-	V_FixupPathName( szContentDir, ARRAYSIZE( szContentDir ), sContentDir );
+	V_FixupPathName( szContentDir, SE_ARRAYSIZE( szContentDir ), sContentDir );
 	V_StripTrailingSlash( szContentDir );
 	sContentDir = szContentDir;
 
@@ -878,7 +878,7 @@ bool CItemUpload::GetContentDir( CUtlString &sContentDir )
 		//		"u:/steambeta/steamapps/common/[staging] dota 2/dota"
 		// We need to trim off the game name, and append content.
 		V_strcpy_safe( szBuf, sVProject );
-		if ( !V_StripLastDir( szBuf, ARRAYSIZE( szBuf ) ) )
+		if ( !V_StripLastDir( szBuf, SE_ARRAYSIZE( szBuf ) ) )
 			return false;
 
 		sContentDir = szBuf;
@@ -902,7 +902,7 @@ bool CItemUpload::GetContentDir( CUtlString &sContentDir )
 			sContentDir += "/content/";
 			sContentDir += sVMod;
 
-			V_FixupPathName( szBuf, ARRAYSIZE( szBuf ), sContentDir.String() );
+			V_FixupPathName( szBuf, SE_ARRAYSIZE( szBuf ), sContentDir.String() );
 			sContentDir = szBuf;
 
 			if ( CheckContentPath( sContentDir ) )
@@ -916,7 +916,7 @@ bool CItemUpload::GetContentDir( CUtlString &sContentDir )
 			sContentDir = sVProject;
 			sContentDir += "/workshop/content";
 
-			V_FixupPathName( szBuf, ARRAYSIZE( szBuf ), sContentDir.String() );
+			V_FixupPathName( szBuf, SE_ARRAYSIZE( szBuf ), sContentDir.String() );
 			sContentDir = szBuf;
 
 			if ( CheckContentPath( sContentDir ) )
@@ -927,12 +927,12 @@ bool CItemUpload::GetContentDir( CUtlString &sContentDir )
 	}
 
 	// Check for the VCONTENT environment variable
-	if ( GetEnvironmentVariable( "VCONTENT", szBuf, ARRAYSIZE( szBuf ) ) != 0 )
+	if ( GetEnvironmentVariable( "VCONTENT", szBuf, SE_ARRAYSIZE( szBuf ) ) != 0 )
 	{
 		sContentDir = szBuf;
 		sContentDir += "/";
 		sContentDir += sVMod;
-		V_FixupPathName( szBuf, ARRAYSIZE( szBuf ), sContentDir.String() );
+		V_FixupPathName( szBuf, SE_ARRAYSIZE( szBuf ), sContentDir.String() );
 		sContentDir = szBuf;
 
 		if ( CheckContentPath( sContentDir ) )
@@ -948,7 +948,7 @@ bool CItemUpload::GetContentDir( CUtlString &sContentDir )
 		sContentDir += "_content\\";
 		sContentDir += sVMod;
 
-		V_FixupPathName( szBuf, ARRAYSIZE( szBuf ), sContentDir.String() );
+		V_FixupPathName( szBuf, SE_ARRAYSIZE( szBuf ), sContentDir.String() );
 		sContentDir = szBuf;
 
 		if ( CheckContentPath( sContentDir ) )
@@ -970,15 +970,15 @@ bool CItemUpload::GetContentDir( CUtlString &sContentDir )
 static bool CheckToolPath( CUtlString &sBinDir )
 {
 	char szBinDir[ MAX_PATH ];
-	V_FixupPathName( szBinDir, ARRAYSIZE( szBinDir ), sBinDir );
+	V_FixupPathName( szBinDir, SE_ARRAYSIZE( szBinDir ), sBinDir );
 	V_StripTrailingSlash( szBinDir );
 	sBinDir = szBinDir;
 
 	char szVtexFileName[ MAX_PATH ];
-	V_ComposeFileName( sBinDir, "vtex.exe", szVtexFileName, ARRAYSIZE( szVtexFileName ) );
+	V_ComposeFileName( sBinDir, "vtex.exe", szVtexFileName, SE_ARRAYSIZE( szVtexFileName ) );
 
 	char szStudiomdlFileName[ MAX_PATH ];
-	V_ComposeFileName( sBinDir, "studiomdl.exe", szStudiomdlFileName, ARRAYSIZE( szStudiomdlFileName ) );
+	V_ComposeFileName( sBinDir, "studiomdl.exe", szStudiomdlFileName, SE_ARRAYSIZE( szStudiomdlFileName ) );
 
 	return g_pFullFileSystem->FileExists( szVtexFileName ) && g_pFullFileSystem->FileExists( szStudiomdlFileName );
 }
@@ -992,7 +992,7 @@ bool CItemUpload::GetBinDirectory( CUtlString &sBinDir )
 	GetCurrentExecutableFileName( sCurrentExecutableFileName );
 
 	char szBinDir[ MAX_PATH ];
-	V_ExtractFilePath( sCurrentExecutableFileName.String(), szBinDir, ARRAYSIZE( szBinDir ) );
+	V_ExtractFilePath( sCurrentExecutableFileName.String(), szBinDir, SE_ARRAYSIZE( szBinDir ) );
 	sBinDir = szBinDir;
 
 	if ( CheckToolPath( sBinDir ) )
@@ -1023,7 +1023,7 @@ bool CItemUpload::GetBinDirectory( CUtlString &sBinDir )
 		//		"u:/steambeta/steamapps/common/[staging] dota 2/dota"
 		// We need to trim off the game name, and append bin.
 		V_strcpy_safe( szBinDir, sVProject );
-		if ( !V_StripLastDir( szBinDir, ARRAYSIZE( szBinDir ) ) )
+		if ( !V_StripLastDir( szBinDir, SE_ARRAYSIZE( szBinDir ) ) )
 			return false;
 
 		sBinDir = szBinDir;
@@ -1708,7 +1708,7 @@ bool CTargetBase::GetDirName(
 
 	char szBuf[ k64KB ];
 
-	V_FixupPathName( szBuf, ARRAYSIZE( szBuf ), sDirName.String() );
+	V_FixupPathName( szBuf, SE_ARRAYSIZE( szBuf ), sDirName.String() );
 	sDirName = szBuf;
 
 	return true;
@@ -2118,7 +2118,7 @@ bool CTargetTGA::Compile()
 
 	// store the output name to use it to output VTF file
 	char szFileName[FILENAME_MAX];
-	V_StripExtension( V_GetFileName( szVTEXConfigFilename ), szFileName, ARRAYSIZE( szFileName ) );
+	V_StripExtension( V_GetFileName( szVTEXConfigFilename ), szFileName, SE_ARRAYSIZE( szFileName ) );
 	SetCustomOutputName( szFileName );
 
 	return true;
@@ -2160,7 +2160,7 @@ bool CTargetTGA::SetInputFile( const char *pszFilename )
 
 	m_sInputFile = pszFilename;
 
-	V_FileBase( pszFilename, szBuf, ARRAYSIZE( szBuf ) );
+	V_FileBase( pszFilename, szBuf, SE_ARRAYSIZE( szBuf ) );
 	m_sFileBase = szBuf;
 
 	// Try to automatically handle the suffixes for properly named assets
@@ -2179,7 +2179,7 @@ bool CTargetTGA::SetInputFile( const char *pszFilename )
 
 	CUtlString sTmp;
 
-	for ( int i = 0; i < ARRAYSIZE( szSuffixes ); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE( szSuffixes ); ++i )
 	{
 		const char *pszSuffix = szSuffixes[i];
 
@@ -2191,7 +2191,7 @@ bool CTargetTGA::SetInputFile( const char *pszFilename )
 		}
 	}
 	
-	V_ExtractFileExtension( pszFilename, szBuf, ARRAYSIZE( szBuf ) );
+	V_ExtractFileExtension( pszFilename, szBuf, SE_ARRAYSIZE( szBuf ) );
 	m_sExtension = szBuf;
 
 	ImageFormat imageFormat;
@@ -2631,7 +2631,7 @@ bool CTargetVMT::Compile()
 
 					if ( sChildRelOutputPaths.Count() > 0 )
 					{
-						V_strncpy( szBuf, sChildRelOutputPaths.Element( 0 ).String(), ARRAYSIZE( szBuf ) );
+						V_strncpy( szBuf, sChildRelOutputPaths.Element( 0 ).String(), SE_ARRAYSIZE( szBuf ) );
 						V_FixSlashes( szBuf, '/' );
 
 						if ( pVMTKV->FindKey( pszVMTVar ) )
@@ -3594,7 +3594,7 @@ bool CTargetDMX::SetInputFile( const char *pszFilename )
 
 	char szBuf[ k64KB ];
 
-	V_ExtractFileExtension( pszFilename, szBuf, ARRAYSIZE( szBuf ) );
+	V_ExtractFileExtension( pszFilename, szBuf, SE_ARRAYSIZE( szBuf ) );
 	m_sExtension = szBuf;
 
 	DmFileId_t hRootFileId = g_pDataModel->GetFileId( pszFilename );
@@ -3868,7 +3868,7 @@ void CTargetDMX::ReplaceMaterials() const
 		CUtlString sMaterialPath;
 		pSrcTargetVMT->GetOutputPath( sMaterialPath, 0, PATH_FLAG_FILE | PATH_FLAG_EXTENSION | PATH_FLAG_PATH | PATH_FLAG_MODELS );
 
-		V_StripExtension( sMaterialPath, szBuf, ARRAYSIZE( szBuf ) );
+		V_StripExtension( sMaterialPath, szBuf, SE_ARRAYSIZE( szBuf ) );
 		sMaterialPath.FixSlashes( '/' );
 
 		sMaterialPath = szBuf;
@@ -5315,11 +5315,11 @@ const ExtensionList *CTargetMDL::GetExtensionsAndCount( void ) const
 
 	if ( s_ppszExtensions == s_szExtensions  )
 	{
-		nExtensionCount = ARRAYSIZE( s_szExtensions );
+		nExtensionCount = SE_ARRAYSIZE( s_szExtensions );
 	}
 	else
 	{
-		nExtensionCount = ARRAYSIZE( s_szExtensionsDX8 );
+		nExtensionCount = SE_ARRAYSIZE( s_szExtensionsDX8 );
 	}
 
 	return s_ppszExtensions;
@@ -6149,7 +6149,7 @@ bool CAsset::Mkdir( const char *pszPrefix, const CTargetBase *pTarget )
 		return false;
 
 	char szBuf[ k64KB ];
-	if ( _fullpath( szBuf, sAbsolute.String(), ARRAYSIZE( szBuf ) ) == NULL )
+	if ( _fullpath( szBuf, sAbsolute.String(), SE_ARRAYSIZE( szBuf ) ) == NULL )
 		return false;
 
 	return CItemUpload::CreateDirectory( szBuf );

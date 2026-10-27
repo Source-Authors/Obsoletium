@@ -1129,7 +1129,7 @@ void CTFSniperRifle::ExplosiveHeadShot( CTFPlayer *pAttacker, CTFPlayer *pVictim
 	float flDmg = 130.f + iExplosiveShot * 20.f;
 
 	CBaseEntity	*pObjects[ 32 ];
-	int nCount = UTIL_EntitiesInSphere( pObjects, ARRAYSIZE( pObjects ), pVictim->GetAbsOrigin(), flDmgRange, FL_CLIENT );
+	int nCount = UTIL_EntitiesInSphere( pObjects, SE_ARRAYSIZE( pObjects ), pVictim->GetAbsOrigin(), flDmgRange, FL_CLIENT );
 	for ( int i = 0; i < nCount; i++ )
 	{
 		if ( !pObjects[i] )

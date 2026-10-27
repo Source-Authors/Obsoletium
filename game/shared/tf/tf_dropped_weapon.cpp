@@ -386,7 +386,7 @@ void CTFDroppedWeapon::SetupParticleEffect()
 	m_effect = ParticleProp()->Create( pszSystemName, PATTACH_ABSORIGIN_FOLLOW );
 	if ( m_effect )
 	{
-		for ( int i=0; i<ARRAYSIZE( pParticleSystem->pszControlPoints ); ++i )
+		for ( int i=0; i<SE_ARRAYSIZE( pParticleSystem->pszControlPoints ); ++i )
 		{
 			const char *pszAttachmentName = pParticleSystem->pszControlPoints[i];
 			if ( pszAttachmentName && pszAttachmentName[0] != '\0' )

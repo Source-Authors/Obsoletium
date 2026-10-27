@@ -676,12 +676,12 @@ void CCSClientScoreBoardDialog::UpdateTeamInfo()
 
 			// Team score
             wchar_t wNumScore[16];
-            V_snwprintf( wNumScore, ARRAYSIZE( wNumScore ), L"%i", team->Get_Score() );
+            V_snwprintf( wNumScore, SE_ARRAYSIZE( wNumScore ), L"%i", team->Get_Score() );
             SetDialogVariable( pDialogVarTeamScore, wNumScore );
 
 			// Number of alive players
 			wchar_t numAliveString[32];
-            V_snwprintf( numAliveString, ARRAYSIZE( numAliveString ), L"%i / %i", numAlive, numPlayers);
+            V_snwprintf( numAliveString, SE_ARRAYSIZE( numAliveString ), L"%i / %i", numAlive, numPlayers);
             SetDialogVariable( pDialogVarAliveCount, numAliveString );
         }
     }
@@ -1174,7 +1174,7 @@ void CCSClientScoreBoardDialog::UpdateMvpElements()
 			{
 				const int mvpTextSize = 8;
 				wchar_t mvpText[mvpTextSize];
-				V_snwprintf( mvpText, ARRAYSIZE( mvpText ), L"%i", numMVPs );
+				V_snwprintf( mvpText, SE_ARRAYSIZE( mvpText ), L"%i", numMVPs );
 				playerDisplay.pMVPCountLabel->SetText( mvpText );
 				playerDisplay.pMVPCountLabel->SetVisible( true );
 
@@ -1454,7 +1454,7 @@ void CCSClientScoreBoardDialog::UpdateMatchEndText()
 			{
 				if ( m_pWinConditionLabel )
 				{
-					V_snwprintf( wzMatchEndCause, ARRAYSIZE( wzMatchEndCause ), L"%.2i:%.2i", timeTillEndOfMatch / 60, timeTillEndOfMatch % 60 );
+					V_snwprintf( wzMatchEndCause, SE_ARRAYSIZE( wzMatchEndCause ), L"%.2i:%.2i", timeTillEndOfMatch / 60, timeTillEndOfMatch % 60 );
 					g_pVGuiLocalize->ConstructString( wzMatchEndCausesLabel, sizeof( wzMatchEndCausesLabel ),
 						g_pVGuiLocalize->Find( "#Cstrike_Time_LeftVariable" ), 1, wzMatchEndCause );
 					m_pWinConditionLabel->SetText( wzMatchEndCausesLabel );
@@ -1483,7 +1483,7 @@ void CCSClientScoreBoardDialog::UpdateMatchEndText()
 					}
 				}
 
-				V_snwprintf( wzMatchEndCause, ARRAYSIZE( wzMatchEndCause ), L"%d", mp_maxrounds.GetInt() - roundsPlayed );
+				V_snwprintf( wzMatchEndCause, SE_ARRAYSIZE( wzMatchEndCause ), L"%d", mp_maxrounds.GetInt() - roundsPlayed );
 				g_pVGuiLocalize->ConstructString( wzMatchEndCausesLabel, sizeof( wzMatchEndCausesLabel ),
 					g_pVGuiLocalize->Find( "#Cstrike_Rounds_LeftVariable" ), 1, wzMatchEndCause );
 				m_pWinConditionLabel->SetText( wzMatchEndCausesLabel );
@@ -1495,7 +1495,7 @@ void CCSClientScoreBoardDialog::UpdateMatchEndText()
 		{
 			if ( m_pWinConditionLabel )
 			{
-				V_snwprintf( wzMatchEndCause, ARRAYSIZE( wzMatchEndCause ), L"%d", mp_winlimit.GetInt() );
+				V_snwprintf( wzMatchEndCause, SE_ARRAYSIZE( wzMatchEndCause ), L"%d", mp_winlimit.GetInt() );
 				g_pVGuiLocalize->ConstructString( wzMatchEndCausesLabel, sizeof( wzMatchEndCausesLabel ),
 					g_pVGuiLocalize->Find( "#Cstrike_Wins_NeededVariable" ), 1, wzMatchEndCause );
 				m_pWinConditionLabel->SetText( wzMatchEndCausesLabel );

@@ -1184,7 +1184,7 @@ void CTFHalloweenFortuneTeller::TellFortune()
 		m_pActiveFortune = NULL;
 	}
 
-	m_pActiveFortune = g_GlobalFortuneTellerEffects[ RandomInt( 0, ARRAYSIZE( g_GlobalFortuneTellerEffects ) - 1 ) ];
+	m_pActiveFortune = g_GlobalFortuneTellerEffects[ RandomInt( 0, SE_ARRAYSIZE( g_GlobalFortuneTellerEffects ) - 1 ) ];
 	if ( !m_pActiveFortune )
 		return;
 

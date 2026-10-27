@@ -313,7 +313,7 @@ void CTFTankBoss::InputDestroyIfAtCapturePoint( inputdata_t &inputdata )
 
 void CTFTankBoss::InputAddCaptureDestroyPostfix( inputdata_t &inputdata )
 {
-	V_strncpy( m_szDeathPostfix, inputdata.value.String(), ARRAYSIZE( m_szDeathPostfix ) );
+	V_strncpy( m_szDeathPostfix, inputdata.value.String(), SE_ARRAYSIZE( m_szDeathPostfix ) );
 }
 
 
@@ -990,7 +990,7 @@ void CTFTankBoss::Explode( void )
 		// Only do special capture point death if it was force killed by bomb drop
 		pDestruction->m_bIsAtCapturePoint = ( m_goalNode == NULL && !m_bIsPlayerKilled );
 		pDestruction->m_nDeathAnimPick = m_nDeathAnimPick;
-		V_strncpy( pDestruction->m_szDeathPostfix, m_szDeathPostfix, ARRAYSIZE( pDestruction->m_szDeathPostfix ) );
+		V_strncpy( pDestruction->m_szDeathPostfix, m_szDeathPostfix, SE_ARRAYSIZE( pDestruction->m_szDeathPostfix ) );
 
 		pDestruction->SetAbsOrigin( GetAbsOrigin() );
 		pDestruction->SetAbsAngles( GetAbsAngles() );

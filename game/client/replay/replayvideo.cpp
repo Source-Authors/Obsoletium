@@ -32,7 +32,7 @@ static ReplayCodec_t s_Codecs[] =
 {
 	{ VideoEncodeCodec::WEBM_CODEC, "#Replay_Codec_WEBM" },
 };
-static int s_nNumCodecs = ARRAYSIZE( s_Codecs );
+static int s_nNumCodecs = SE_ARRAYSIZE( s_Codecs );
 
 //-----------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ static ReplayQualityPreset_t s_QualityPresets[] =
 	{ "#Replay_RenderSetting_High", VideoEncodeCodec::WEBM_CODEC, 100, true, 2 },
 	{ "#Replay_RenderSetting_Max", VideoEncodeCodec::WEBM_CODEC, 100, true, 3 },
 };
-static int s_NumQualityPresets = ARRAYSIZE( s_QualityPresets );
+static int s_NumQualityPresets = SE_ARRAYSIZE( s_QualityPresets );
 static int s_DefaultQualityPreset = 1;
 
 #else
@@ -52,7 +52,7 @@ static ReplayCodec_t s_Codecs[] =
 	{ VideoEncodeCodec::MJPEG_A_CODEC, "#Replay_Codec_MJPEGA" },
 	{ VideoEncodeCodec::H264_CODEC, "#Replay_Codec_H264" },
 };
-static int s_nNumCodecs = ARRAYSIZE( s_Codecs );
+static int s_nNumCodecs = SE_ARRAYSIZE( s_Codecs );
 
 //-----------------------------------------------------------------------------
 
@@ -63,7 +63,7 @@ static ReplayQualityPreset_t s_QualityPresets[] =
 	{ "#Replay_RenderSetting_High", VideoEncodeCodec::MJPEG_A_CODEC, 100, true, 2 },
 	{ "#Replay_RenderSetting_Max", VideoEncodeCodec::H264_CODEC, 100, true, 3 },
 };
-static int s_NumQualityPresets = ARRAYSIZE( s_QualityPresets );
+static int s_NumQualityPresets = SE_ARRAYSIZE( s_QualityPresets );
 static int s_DefaultQualityPreset = 1;
 
 #endif

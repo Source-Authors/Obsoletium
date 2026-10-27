@@ -629,7 +629,7 @@ bool CompareVLA( DTTestClient *pClient, DTTestServer *pServer )
 
 void RandomlyChangeVLA( DTTestServer *pServer )
 {
-	pServer->m_VLALength = rand() % ARRAYSIZE( pServer->m_VLA );
+	pServer->m_VLALength = rand() % SE_ARRAYSIZE( pServer->m_VLA );
 	for ( int i=0; i < pServer->m_VLALength; i++ )
 		pServer->m_VLA[i] = rand() * rand();
 }
@@ -975,7 +975,7 @@ void RunDataTableTest()
 				prevEncoded, sizeof( prevEncoded ) * 8, 
 				fullEncoded, bfFullEncoded.GetNumBitsWritten(),
 				deltaProps,
-				ARRAYSIZE( deltaProps ),
+				SE_ARRAYSIZE( deltaProps ),
 				-1 );
 			
 			Assert( nDeltaProps != -1 ); // BAD: buffer overflow

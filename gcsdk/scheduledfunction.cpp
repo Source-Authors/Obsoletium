@@ -72,7 +72,7 @@ CScheduledFunctionMgr::CScheduledFunctionMgr()
 void CScheduledFunctionMgr::InitStartingTime()
 {
 	uint64 nCurrTime = CJobTime::LJobTimeCur();
-	for( uint32 nCurrBucket = 0; nCurrBucket < ARRAYSIZE( m_Resolutions ); nCurrBucket++ )
+	for( uint32 nCurrBucket = 0; nCurrBucket < SE_ARRAYSIZE( m_Resolutions ); nCurrBucket++ )
 	{
 		m_Resolutions[ nCurrBucket ].m_nAbsLastScheduleBucket = m_Resolutions[ nCurrBucket ].GetAbsScheduleBucketIndex( nCurrTime );
 	}
@@ -138,7 +138,7 @@ void CScheduledFunctionMgr::RunFunctions()
 	VPROF_BUDGET( "CGCBase::CallScheduledEvents", VPROF_BUDGETGROUP_STEAM );
 
 	uint64 nCurrTime = CJobTime::LJobTimeCur();
-	for( uint32 nCurrBucket = 0; nCurrBucket < ARRAYSIZE( m_Resolutions ); nCurrBucket++ )
+	for( uint32 nCurrBucket = 0; nCurrBucket < SE_ARRAYSIZE( m_Resolutions ); nCurrBucket++ )
 	{
 		m_Resolutions[ nCurrBucket ].RunFunctions( m_ScheduleList, nCurrTime );
 	}	

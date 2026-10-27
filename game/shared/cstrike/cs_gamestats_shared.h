@@ -340,7 +340,7 @@ struct StatsCollection_t
 
 	void Reset()
 	{
-		for ( int i = 0; i < ARRAYSIZE( m_iValue ); i++ )
+		for ( int i = 0; i < SE_ARRAYSIZE( m_iValue ); i++ )
 		{
 			m_iValue[i] = 0;
 		}
@@ -348,13 +348,13 @@ struct StatsCollection_t
 
 	int operator[] ( int index ) const
 	{
-		Assert(index >= 0 && index < ARRAYSIZE(m_iValue));
+		Assert(index >= 0 && index < SE_ARRAYSIZE(m_iValue));
 		return m_iValue[index];
 	}
 
 	int& operator[] ( int index )
 	{
-		Assert(index >= 0 && index < ARRAYSIZE(m_iValue));
+		Assert(index >= 0 && index < SE_ARRAYSIZE(m_iValue));
 		return m_iValue[index];
 	}
 
@@ -382,7 +382,7 @@ struct RoundStatsDirectAverage_t
 
 	void Reset()
 	{
-		for ( int i = 0; i < ARRAYSIZE( m_fStat ); i++ )
+		for ( int i = 0; i < SE_ARRAYSIZE( m_fStat ); i++ )
 		{
 			m_fStat[i] = 0;
 		}
@@ -390,7 +390,7 @@ struct RoundStatsDirectAverage_t
 
 	RoundStatsDirectAverage_t& operator +=( const StatsCollection_t &other )
 	{
-		for ( int i = 0; i < ARRAYSIZE( m_fStat ); i++ )
+		for ( int i = 0; i < SE_ARRAYSIZE( m_fStat ); i++ )
 		{
 			m_fStat[i] += other[i];
 		}
@@ -401,7 +401,7 @@ struct RoundStatsDirectAverage_t
 	{
 		if (divisor > 0)
 		{
-			for ( int i = 0; i < ARRAYSIZE( m_fStat ); i++ )
+			for ( int i = 0; i < SE_ARRAYSIZE( m_fStat ); i++ )
 			{
 				m_fStat[i] /= divisor;
 			}
@@ -411,7 +411,7 @@ struct RoundStatsDirectAverage_t
 
 	RoundStatsDirectAverage_t& operator *=( const float &divisor)
 	{
-		for ( int i = 0; i < ARRAYSIZE( m_fStat ); i++ )
+		for ( int i = 0; i < SE_ARRAYSIZE( m_fStat ); i++ )
 		{
 			m_fStat[i] *= divisor;
 		}
@@ -432,7 +432,7 @@ struct RoundStatsRollingAverage_t
 
     void Reset()
     {
-        for ( int i = 0; i < ARRAYSIZE( m_fStat ); i++ )
+        for ( int i = 0; i < SE_ARRAYSIZE( m_fStat ); i++ )
         {
             m_fStat[i] = 0;
         }
@@ -441,7 +441,7 @@ struct RoundStatsRollingAverage_t
 
     RoundStatsRollingAverage_t& operator +=( const RoundStatsRollingAverage_t &other )
     {
-        for ( int i = 0; i < ARRAYSIZE( m_fStat ); i++ )
+        for ( int i = 0; i < SE_ARRAYSIZE( m_fStat ); i++ )
         {
             m_fStat[i] += other.m_fStat[i];
         }
@@ -450,7 +450,7 @@ struct RoundStatsRollingAverage_t
 
     RoundStatsRollingAverage_t& operator +=( const StatsCollection_t &other )
     {
-        for ( int i = 0; i < ARRAYSIZE( m_fStat ); i++ )
+        for ( int i = 0; i < SE_ARRAYSIZE( m_fStat ); i++ )
         {
             m_fStat[i] += other[i];
         }
@@ -461,7 +461,7 @@ struct RoundStatsRollingAverage_t
     {
         if (divisor > 0)
         {
-            for ( int i = 0; i < ARRAYSIZE( m_fStat ); i++ )
+            for ( int i = 0; i < SE_ARRAYSIZE( m_fStat ); i++ )
             {
                 m_fStat[i] /= divisor;
             }
@@ -471,7 +471,7 @@ struct RoundStatsRollingAverage_t
 
     void RollDataSetIntoAverage ( const RoundStatsRollingAverage_t &other )
     {
-        for ( int i = 0; i < ARRAYSIZE( m_fStat ); i++ )
+        for ( int i = 0; i < SE_ARRAYSIZE( m_fStat ); i++ )
         {
             m_fStat[i] *= m_numberOfDataSets;
             m_fStat[i] += other.m_fStat[i];
@@ -619,10 +619,10 @@ void AddStringDataToKV( KeyValues* pKV, const char* name, const char *data );
 	AddPositionDataToKV(pKV, dbName, varName);
 
 #define REGISTER_STAT_ARRAY( varName ) \
-	AddArrayDataToKV( pKV, #varName, varName, ARRAYSIZE( varName ) );
+	AddArrayDataToKV( pKV, #varName, varName, SE_ARRAYSIZE( varName ) );
 
 #define REGISTER_STAT_ARRAY_NAMED( varName, dbName ) \
-	AddArrayDataToKV( pKV, dbName, varName, ARRAYSIZE( varName ) );
+	AddArrayDataToKV( pKV, dbName, varName, SE_ARRAYSIZE( varName ) );
 
 #define REGISTER_STAT_STRING( varName ) \
 	AddStringDataToKV( pKV, #varName, varName );

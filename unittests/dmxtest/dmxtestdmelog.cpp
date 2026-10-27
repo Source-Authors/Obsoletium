@@ -122,7 +122,7 @@ void ResetLog( CDmeFloatLog *log, bool useCurveTypes, int startIndex = 0, int en
 	int i;
 	int c;
 
-	c = ARRAYSIZE( data );
+	c = SE_ARRAYSIZE( data );
 	for ( i = startIndex; i < c; ++i )
 	{
 		log->SetKey( DmeTime_t( data[ i ].tms ), data[ i ].value, useCurveTypes ? data[ i ].curvetype : CURVE_DEFAULT ); 
@@ -288,7 +288,7 @@ void ResetChoreo( CFlexAnimationTrack *track, bool useCurveTypes, int startIndex
 	int i;
 	int c;
 
-	c = ARRAYSIZE( data );
+	c = SE_ARRAYSIZE( data );
 	for ( i = startIndex; i < c; ++i )
 	{
 		data_t *e = &data[ i ];

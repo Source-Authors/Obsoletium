@@ -2594,7 +2594,7 @@ void CNPC_CombineDropship::InputNPCFinishDustoff( inputdata_t &inputdata )
 			COND_PHYSICS_DAMAGE,
 			COND_REPEATED_DAMAGE,
 		};
-		pNPC->SetIgnoreConditions( g_Conditions, ARRAYSIZE(g_Conditions) );
+		pNPC->SetIgnoreConditions( g_Conditions, SE_ARRAYSIZE(g_Conditions) );
 	}
 
 	// Unload the next troop

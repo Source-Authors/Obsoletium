@@ -206,11 +206,11 @@ bool CModWizardSubPanel_CopyFiles_Source2006::BuildCopyFilesForMod_HL2()
 		"%modname%", m_ModName
 	};
 	
-	retVal = CopyWithReplacements("CreateModFiles\\hl2\\gameinfo_ep1.txt", replacements, ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
+	retVal = CopyWithReplacements("CreateModFiles\\hl2\\gameinfo_ep1.txt", replacements, SE_ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
 	
 	if ( retVal &&
-	     BuildCopyFilesForMappings( sources_mappings, ARRAYSIZE( sources_mappings ) ) &&
-		 BuildCopyFilesForMappings( content_mappings, ARRAYSIZE( content_mappings ) ) )
+	     BuildCopyFilesForMappings( sources_mappings, SE_ARRAYSIZE( sources_mappings ) ) &&
+		 BuildCopyFilesForMappings( content_mappings, SE_ARRAYSIZE( content_mappings ) ) )
 	{
 		retVal = true;
 	}
@@ -268,11 +268,11 @@ bool CModWizardSubPanel_CopyFiles_Source2009::BuildCopyFilesForMod_HL2()
 		"%modname%", m_ModName
 	};
 
-	retVal = CopyWithReplacements("CreateModFiles\\source2009\\gameinfo_sp.txt", replacements, ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
+	retVal = CopyWithReplacements("CreateModFiles\\source2009\\gameinfo_sp.txt", replacements, SE_ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
 
 	if ( retVal &&
-		BuildCopyFilesForMappings( sources_mappings, ARRAYSIZE( sources_mappings ) ) &&
-		BuildCopyFilesForMappings( content_mappings, ARRAYSIZE( content_mappings ) ) )
+		BuildCopyFilesForMappings( sources_mappings, SE_ARRAYSIZE( sources_mappings ) ) &&
+		BuildCopyFilesForMappings( content_mappings, SE_ARRAYSIZE( content_mappings ) ) )
 	{
 		retVal = true;
 	}
@@ -330,11 +330,11 @@ bool CModWizardSubPanel_CopyFiles_Source2007::BuildCopyFilesForMod_HL2()
 		"%modname%", m_ModName
 	};
 
-	retVal = CopyWithReplacements("CreateModFiles\\orangebox\\gameinfo_sp.txt", replacements, ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
+	retVal = CopyWithReplacements("CreateModFiles\\orangebox\\gameinfo_sp.txt", replacements, SE_ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
 
 	if ( retVal &&
-		BuildCopyFilesForMappings( sources_mappings, ARRAYSIZE( sources_mappings ) ) &&
-		BuildCopyFilesForMappings( content_mappings, ARRAYSIZE( content_mappings ) ) )
+		BuildCopyFilesForMappings( sources_mappings, SE_ARRAYSIZE( sources_mappings ) ) &&
+		BuildCopyFilesForMappings( content_mappings, SE_ARRAYSIZE( content_mappings ) ) )
 	{
 		retVal = true;
 	}
@@ -376,11 +376,11 @@ bool CModWizardSubPanel_CopyFiles_Source2006::BuildCopyFilesForMod_FromScratch()
 		"%modname%", m_ModName
 	};
 	
-	retVal = CopyWithReplacements( "CreateModFiles\\base\\gameinfo_ep1.txt", replacements, ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
+	retVal = CopyWithReplacements( "CreateModFiles\\base\\gameinfo_ep1.txt", replacements, SE_ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
 	
 	if ( retVal &&
-	     BuildCopyFilesForMappings( sources_mappings, ARRAYSIZE( sources_mappings ) ) &&
-		 BuildCopyFilesForMappings( content_mappings, ARRAYSIZE( content_mappings ) ) )
+	     BuildCopyFilesForMappings( sources_mappings, SE_ARRAYSIZE( sources_mappings ) ) &&
+		 BuildCopyFilesForMappings( content_mappings, SE_ARRAYSIZE( content_mappings ) ) )
 	{
 		retVal = true;
 	}
@@ -422,11 +422,11 @@ bool CModWizardSubPanel_CopyFiles_Source2009::BuildCopyFilesForMod_FromScratch()
 		"%modname%", m_ModName
 	};
 
-	retVal = CopyWithReplacements( "CreateModFiles\\source2009\\gameinfo_template.txt", replacements, ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
+	retVal = CopyWithReplacements( "CreateModFiles\\source2009\\gameinfo_template.txt", replacements, SE_ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
 
 	if ( retVal &&
-		BuildCopyFilesForMappings( sources_mappings, ARRAYSIZE( sources_mappings ) ) &&
-		BuildCopyFilesForMappings( content_mappings, ARRAYSIZE( content_mappings ) ) )
+		BuildCopyFilesForMappings( sources_mappings, SE_ARRAYSIZE( sources_mappings ) ) &&
+		BuildCopyFilesForMappings( content_mappings, SE_ARRAYSIZE( content_mappings ) ) )
 	{
 		retVal = true;
 	}
@@ -470,11 +470,11 @@ bool CModWizardSubPanel_CopyFiles_Source2007::BuildCopyFilesForMod_FromScratch()
 		"%modname%", m_ModName
 	};
 
-	retVal = CopyWithReplacements( "CreateModFiles\\orangebox\\gameinfo_template.txt", replacements, ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
+	retVal = CopyWithReplacements( "CreateModFiles\\orangebox\\gameinfo_template.txt", replacements, SE_ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
 
 	if ( retVal &&
-		BuildCopyFilesForMappings( sources_mappings, ARRAYSIZE( sources_mappings ) ) &&
-		BuildCopyFilesForMappings( content_mappings, ARRAYSIZE( content_mappings ) ) )
+		BuildCopyFilesForMappings( sources_mappings, SE_ARRAYSIZE( sources_mappings ) ) &&
+		BuildCopyFilesForMappings( content_mappings, SE_ARRAYSIZE( content_mappings ) ) )
 	{
 		retVal = true;
 	}
@@ -531,11 +531,11 @@ bool CModWizardSubPanel_CopyFiles_Source2006::BuildCopyFilesForMod_HL2MP()
 		"%modname%", m_ModName
 	};
 
-	retVal = CopyWithReplacements( "CreateModFiles\\hl2mp\\gameinfo_ep1.txt", replacements, ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
+	retVal = CopyWithReplacements( "CreateModFiles\\hl2mp\\gameinfo_ep1.txt", replacements, SE_ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
 
 	if ( retVal && 
-		BuildCopyFilesForMappings( sources_mappings, ARRAYSIZE( sources_mappings ) ) &&
-		BuildCopyFilesForMappings( content_mappings, ARRAYSIZE( content_mappings ) ) )
+		BuildCopyFilesForMappings( sources_mappings, SE_ARRAYSIZE( sources_mappings ) ) &&
+		BuildCopyFilesForMappings( content_mappings, SE_ARRAYSIZE( content_mappings ) ) )
 	{
 		retVal = true;
 	}
@@ -589,11 +589,11 @@ bool CModWizardSubPanel_CopyFiles_Source2009::BuildCopyFilesForMod_HL2MP()
 		"%modname%", m_ModName
 	};
 
-	retVal = CopyWithReplacements( "CreateModFiles\\source2009\\gameinfo_mp.txt", replacements, ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
+	retVal = CopyWithReplacements( "CreateModFiles\\source2009\\gameinfo_mp.txt", replacements, SE_ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
 
 	if ( retVal && 
-		BuildCopyFilesForMappings( sources_mappings, ARRAYSIZE( sources_mappings ) ) &&
-		BuildCopyFilesForMappings( content_mappings, ARRAYSIZE( content_mappings ) ) )
+		BuildCopyFilesForMappings( sources_mappings, SE_ARRAYSIZE( sources_mappings ) ) &&
+		BuildCopyFilesForMappings( content_mappings, SE_ARRAYSIZE( content_mappings ) ) )
 	{
 		retVal = true;
 	}
@@ -647,11 +647,11 @@ bool CModWizardSubPanel_CopyFiles_Source2007::BuildCopyFilesForMod_HL2MP()
 		"%modname%", m_ModName
 	};
 	
-	retVal = CopyWithReplacements( "CreateModFiles\\orangebox\\gameinfo_mp.txt", replacements, ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
+	retVal = CopyWithReplacements( "CreateModFiles\\orangebox\\gameinfo_mp.txt", replacements, SE_ARRAYSIZE( replacements ), "%s%s", m_OutModGamedirName, "gameinfo.txt" );
 	
 	if ( retVal && 
-	     BuildCopyFilesForMappings( sources_mappings, ARRAYSIZE( sources_mappings ) ) &&
-		 BuildCopyFilesForMappings( content_mappings, ARRAYSIZE( content_mappings ) ) )
+	     BuildCopyFilesForMappings( sources_mappings, SE_ARRAYSIZE( sources_mappings ) ) &&
+		 BuildCopyFilesForMappings( content_mappings, SE_ARRAYSIZE( content_mappings ) ) )
 	{
 		retVal = true;
 	}
@@ -677,7 +677,7 @@ bool CModWizardSubPanel_CopyFiles_Source2006::BuildCopyFilesForMod_SourceCodeOnl
 		"src_mod\\ep1", "*.*", outputSrcDirName
 	};
 
-	return BuildCopyFilesForMappings( sources_mappings, ARRAYSIZE( sources_mappings ) );
+	return BuildCopyFilesForMappings( sources_mappings, SE_ARRAYSIZE( sources_mappings ) );
 }
 
 
@@ -694,7 +694,7 @@ bool CModWizardSubPanel_CopyFiles_Source2009::BuildCopyFilesForMod_SourceCodeOnl
 		"src_mod\\source2009", "*.*", outputSrcDirName
 	};
 
-	return BuildCopyFilesForMappings( sources_mappings, ARRAYSIZE( sources_mappings ) );
+	return BuildCopyFilesForMappings( sources_mappings, SE_ARRAYSIZE( sources_mappings ) );
 }
 
 
@@ -711,7 +711,7 @@ bool CModWizardSubPanel_CopyFiles_Source2007::BuildCopyFilesForMod_SourceCodeOnl
 		"src_mod\\orangebox", "*.*", outputSrcDirName
 	};
 
-	return BuildCopyFilesForMappings( sources_mappings, ARRAYSIZE( sources_mappings ) );
+	return BuildCopyFilesForMappings( sources_mappings, SE_ARRAYSIZE( sources_mappings ) );
 }
 
 
@@ -817,12 +817,12 @@ void CModWizardSubPanel_CopyFiles::OnTick()
 				"run_studiomdl.bat",
 				"run_hammer.bat"	
 			};
-			for ( int iFilename=0; iFilename < ARRAYSIZE( filenames ); iFilename++ )
+			for ( int iFilename=0; iFilename < SE_ARRAYSIZE( filenames ); iFilename++ )
 			{
 				char srcFilename[MAX_PATH];
 				Q_snprintf( srcFilename, sizeof( srcFilename ), "CreateModFiles\\%s", filenames[iFilename] );
 				if ( !CopyWithReplacements( 
-						srcFilename, replacements, ARRAYSIZE( replacements ), 
+						srcFilename, replacements, SE_ARRAYSIZE( replacements ), 
 						"%s%s", m_OutputDirName, filenames[iFilename] ) )
 				{
 					vgui::ivgui()->RemoveTickSignal( GetVPanel() );
@@ -942,7 +942,7 @@ bool CModWizardSubPanel_CopyFiles_Source2009::HandleReplacements_GameProjectFile
 	{
 		bErrorStatus = true;
 		V_strcpy_safe( replaceWith, m_OutModGamedirName );
-		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
+		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, SE_ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 
 		return true;
 	}
@@ -954,7 +954,7 @@ bool CModWizardSubPanel_CopyFiles_Source2009::HandleReplacements_GameProjectFile
 		{
 			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 
-			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
+			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, SE_ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
 
 		return true;
@@ -968,7 +968,7 @@ bool CModWizardSubPanel_CopyFiles_Source2009::HandleReplacements_GameProjectFile
 		{
 			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 
-			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
+			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, SE_ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
 
 		return true;
@@ -981,7 +981,7 @@ bool CModWizardSubPanel_CopyFiles_Source2009::HandleReplacements_GameProjectFile
 		{
 			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 
-			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
+			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, SE_ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
 
 		return true;
@@ -1013,7 +1013,7 @@ bool CModWizardSubPanel_CopyFiles_Source2007::HandleReplacements_GameProjectFile
 	{
 		bErrorStatus = true;
 		V_strcpy_safe( replaceWith, m_OutModGamedirName );
-		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
+		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, SE_ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 
 		return true;
 	}
@@ -1025,7 +1025,7 @@ bool CModWizardSubPanel_CopyFiles_Source2007::HandleReplacements_GameProjectFile
 		{
 			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 
-			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
+			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, SE_ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
 
 		return true;
@@ -1039,7 +1039,7 @@ bool CModWizardSubPanel_CopyFiles_Source2007::HandleReplacements_GameProjectFile
 		{
 			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 
-			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
+			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, SE_ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
 
 		return true;
@@ -1052,7 +1052,7 @@ bool CModWizardSubPanel_CopyFiles_Source2007::HandleReplacements_GameProjectFile
 		{
 			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 
-			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
+			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, SE_ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
 
 		return true;
@@ -1084,7 +1084,7 @@ bool CModWizardSubPanel_CopyFiles_Source2006::HandleReplacements_GameProjectFile
 	{
 		bErrorStatus = true;
 		V_strcpy_safe( replaceWith, m_OutModGamedirName );
-		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
+		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, SE_ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 
 		return true;
 	}
@@ -1098,7 +1098,7 @@ bool CModWizardSubPanel_CopyFiles_Source2006::HandleReplacements_GameProjectFile
 		{
 			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 			
-			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
+			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, SE_ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
 
 		return true;
@@ -1113,7 +1113,7 @@ bool CModWizardSubPanel_CopyFiles_Source2006::HandleReplacements_GameProjectFile
 		{
 			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 
-			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
+			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, SE_ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
 		
 		return true;
@@ -1128,7 +1128,7 @@ bool CModWizardSubPanel_CopyFiles_Source2006::HandleReplacements_GameProjectFile
 		{
 			V_strcpy_safe( replaceWith, m_OutModGamedirName );
 
-			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
+			bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, SE_ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 		}
 		
 		return true;
@@ -1150,7 +1150,7 @@ bool CModWizardSubPanel_CopyFiles::HandleReplacements_GenericVCProj( CFileCopyIn
 			"..\\game\\" PLATFORM_BIN_DIR, "..\\" PLATFORM_BIN_DIR
 		};
 
-		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, vcxprojReplacements, ARRAYSIZE( vcxprojReplacements ), "%s", pInfo->m_OutFilename );
+		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, vcxprojReplacements, SE_ARRAYSIZE( vcxprojReplacements ), "%s", pInfo->m_OutFilename );
 		return true;
 	}
 
@@ -1290,7 +1290,7 @@ bool CModWizardSubPanel_CopyFiles_Source2009::HandleReplacements_TemplateOptions
 		};
 
 		bErrorStatus = true;
-		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
+		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, SE_ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 
 		return true;
 	}
@@ -1322,7 +1322,7 @@ bool CModWizardSubPanel_CopyFiles_Source2007::HandleReplacements_TemplateOptions
 		};
 
 		bErrorStatus = true;
-		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
+		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, replacements, SE_ARRAYSIZE( replacements ), "%s", pInfo->m_OutFilename );
 
 		return true;
 	}

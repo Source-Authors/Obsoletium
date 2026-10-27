@@ -906,7 +906,7 @@ AIMoveResult_t CAI_Motor::MoveNormalExecute( const AILocalMoveGoal_t &move )
 		AIMR_BLOCKED_WORLD,                      // AIM_PARTIAL_HIT_WORLD
 		AIMR_BLOCKED_WORLD,                      // AIM_PARTIAL_HIT_TARGET
 	};
-	Assert( ARRAYSIZE( moveResults ) == AIM_NUM_RESULTS &&
+	Assert( SE_ARRAYSIZE( moveResults ) == AIM_NUM_RESULTS &&
 		    fMotorResult >= 0 &&
 		    fMotorResult < ssize( moveResults ) );
 	

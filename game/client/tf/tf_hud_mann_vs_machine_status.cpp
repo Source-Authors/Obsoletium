@@ -1045,7 +1045,7 @@ bool CCurrencyStatusPanel::UpdateHUD( void )
 	m_nCurrency += delta;
 
 	char szTmp[16];
-	Q_snprintf( szTmp, ARRAYSIZE( szTmp ), "$%d", m_nCurrency );
+	Q_snprintf( szTmp, SE_ARRAYSIZE( szTmp ), "$%d", m_nCurrency );
 	SetDialogVariable( "currency", szTmp );
 	
 	return true;
@@ -1122,7 +1122,7 @@ void CInWorldCurrencyStatus::OnTick( void )
 	}
 
 	char szTmp[16];
-	Q_snprintf( szTmp, ARRAYSIZE( szTmp ), "$%d", nWorldMoney );
+	Q_snprintf( szTmp, SE_ARRAYSIZE( szTmp ), "$%d", nWorldMoney );
 	SetDialogVariable( "currency", szTmp );
 }
 //-----------------------------------------------------------------------------
@@ -1867,7 +1867,7 @@ void CTFHudMannVsMachineStatus::OnTick( void )
 		m_pServerChangeMessage->SetVisible( true );
 		int seconds = MAX(0, (int)(m_flServerEndTime - gpGlobals->curtime) );
 		wchar_t wszTime[16];
-		_snwprintf( wszTime, ARRAYSIZE( wszTime ), L"%d", seconds );
+		_snwprintf( wszTime, SE_ARRAYSIZE( wszTime ), L"%d", seconds );
 		wchar_t wszLocalizedMessage[512];
 
 		if ( !m_bIsServerKicking )

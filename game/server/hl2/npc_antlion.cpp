@@ -2618,7 +2618,7 @@ void CNPC_Antlion::CascadePush( const Vector &vecForce )
 
 	// Make antlions flip all around us!
 	CBaseEntity *pEnemySearch[32];
-	int nNumEnemies = UTIL_EntitiesInBox( pEnemySearch, ARRAYSIZE(pEnemySearch), vecPushBack-Vector(48,48,0), vecPushBack+Vector(48,48,64), FL_NPC );
+	int nNumEnemies = UTIL_EntitiesInBox( pEnemySearch, SE_ARRAYSIZE(pEnemySearch), vecPushBack-Vector(48,48,0), vecPushBack+Vector(48,48,64), FL_NPC );
 	for ( int i = 0; i < nNumEnemies; i++ )
 	{
 		// We only care about antlions

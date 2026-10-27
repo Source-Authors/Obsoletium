@@ -469,7 +469,7 @@ void CAmbientGeneric::ValidateSoundFile( void )
 			if ( !g_pFullFileSystem->FileExists( szPathTest ) )
 			{
 				V_strcpy_safe( szNewSoundFile, szSoundFile );
-				V_SetExtension( szNewSoundFile, ".mp3", ARRAYSIZE( szNewSoundFile ) );
+				V_SetExtension( szNewSoundFile, ".mp3", SE_ARRAYSIZE( szNewSoundFile ) );
 				V_sprintf_safe( szPathTest, "sound/%s", szNewSoundFile );
 				if ( g_pFullFileSystem->FileExists( szPathTest ) )
 				{

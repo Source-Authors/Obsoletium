@@ -131,7 +131,7 @@ IMPLEMENT_NETWORKCLASS_ALIASED( SDKGameRulesProxy, DT_SDKGameRulesProxy )
 	CSDKGameRules::CSDKGameRules()
 	{
 		// Create the team managers
-		for ( int i = 0; i < ARRAYSIZE( sTeamNames ); i++ )
+		for ( int i = 0; i < SE_ARRAYSIZE( sTeamNames ); i++ )
 		{
 			CTeam *pTeam = static_cast<CTeam*>(CreateEntityByName( "sdk_team_manager" ));
 			pTeam->Init( sTeamNames[i], i );

@@ -185,7 +185,7 @@ void CSteamWorksGameStatsUploader::UploadCvars()
 			"-dxlevel"
 		};
 	
-		for ( int hh=0; hh <ARRAYSIZE(csCLcvars) ; ++hh )
+		for ( int hh=0; hh <SE_ARRAYSIZE(csCLcvars) ; ++hh )
 		{
 			const char *pszParamValue = CommandLine()->ParmValue( csCLcvars[hh] );
 			if ( pszParamValue )
@@ -226,9 +226,9 @@ void CSteamWorksGameStatsUploader::Reset()
 	m_iAppID = 0;
 	m_iServerIP = 0;
 	m_nClientJoinMethod = k_ClientJoinMethod_Unknown;
-	memset( m_pzServerIP, 0, ARRAYSIZE(m_pzServerIP) );
-	memset( m_pzMapStart, 0, ARRAYSIZE(m_pzMapStart) );
-	memset( m_pzHostName, 0, ARRAYSIZE(m_pzHostName) );
+	memset( m_pzServerIP, 0, SE_ARRAYSIZE(m_pzServerIP) );
+	memset( m_pzMapStart, 0, SE_ARRAYSIZE(m_pzMapStart) );
+	memset( m_pzHostName, 0, SE_ARRAYSIZE(m_pzHostName) );
 	m_StartTime = 0;
 	m_EndTime = 0;
 	m_HumanCntInGame = 0;
@@ -295,7 +295,7 @@ void CSteamWorksGameStatsUploader::FireGameEvent( IGameEvent *event )
 			const char *pzAddress = event->GetString( "address" );
 			if ( pzAddress )
 			{
-				V_snprintf( m_pzServerIP, ARRAYSIZE(m_pzServerIP), "%s:%d", pzAddress, event->GetInt( "port" ) );
+				V_snprintf( m_pzServerIP, SE_ARRAYSIZE(m_pzServerIP), "%s:%d", pzAddress, event->GetInt( "port" ) );
 				ServerAddressToInt();
 			}
 			else

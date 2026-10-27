@@ -277,7 +277,7 @@ void CDODWinPanel::FireGameEvent( IGameEvent * event )
 			//		"Total Time Defended: 4:28"
 
 			wchar_t time[8];
-			_snwprintf( time, ARRAYSIZE( time ), L"%d:%02d", minutes, seconds );
+			_snwprintf( time, SE_ARRAYSIZE( time ), L"%d:%02d", minutes, seconds );
 
 			wchar_t timerText[128];
 			g_pVGuiLocalize->ConstructString( timerText, sizeof( timerText ), g_pVGuiLocalize->Find( "#winpanel_total_time" ), 1, time );
@@ -297,7 +297,7 @@ void CDODWinPanel::FireGameEvent( IGameEvent * event )
 			//		"Time Elapsed: 4:12"  
 
 			wchar_t time[8];
-			_snwprintf( time, ARRAYSIZE( time ), L"%d:%02d", minutes, seconds );
+			_snwprintf( time, SE_ARRAYSIZE( time ), L"%d:%02d", minutes, seconds );
 
 			wchar_t timerText[128];
 			g_pVGuiLocalize->ConstructString( timerText, sizeof( timerText ), g_pVGuiLocalize->Find( "#winpanel_attack_time" ), 1, time );

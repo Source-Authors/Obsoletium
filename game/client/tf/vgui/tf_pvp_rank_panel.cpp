@@ -226,7 +226,7 @@ public:
 
 		static wchar_t wszOutString[ 128 ];
 		wchar_t wszCount[ 16 ];
-		_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", m_source.amount() );
+		_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", m_source.amount() );
 		const wchar_t *wpszFormat = g_pVGuiLocalize->Find( g_XPSourceDefs[ m_source.type() ].m_pszFormattingLocToken );
 		g_pVGuiLocalize->ConstructString_safe( wszOutString, wpszFormat, 2, g_pVGuiLocalize->Find( g_XPSourceDefs[ m_source.type() ].m_pszTypeLocToken ), wszCount );
 
@@ -482,7 +482,7 @@ void CPvPRankPanel::UpdateControls( uint32 nPreviousXP, uint32 nCurrentXP, const
 
 		static wchar_t wszOutString[ 128 ];
 		wchar_t wszCount[ 16 ];
-		_snwprintf( wszCount, ARRAYSIZE( wszCount ), L"%d", levelCurrent.m_nLevelNum );
+		_snwprintf( wszCount, SE_ARRAYSIZE( wszCount ), L"%d", levelCurrent.m_nLevelNum );
 		const wchar_t *wpszFormat = g_pVGuiLocalize->Find( m_pProgressionDesc->m_pszLevelToken );
 		g_pVGuiLocalize->ConstructString_safe( wszOutString, wpszFormat, 2, wszCount, g_pVGuiLocalize->Find( levelCurrent.m_pszLevelTitle ) );
 

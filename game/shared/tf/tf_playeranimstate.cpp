@@ -231,23 +231,23 @@ Activity CTFPlayerAnimState::ActivityOverride( Activity baseAct, bool *pRequired
 	if ( pPlayer->m_Shared.InCond( TF_COND_HALLOWEEN_KART ) )
 	{
 		pTable = s_acttableKartState;
-		iActivityCount = ARRAYSIZE( s_acttableKartState );
+		iActivityCount = SE_ARRAYSIZE( s_acttableKartState );
 	}
 	else
 	{
 		if ( pPlayer->m_Shared.InCond( TF_COND_COMPETITIVE_LOSER ) )
 		{
-			iActivityCount = ARRAYSIZE( s_acttableCompetitiveLoserState );
+			iActivityCount = SE_ARRAYSIZE( s_acttableCompetitiveLoserState );
 			pTable = s_acttableCompetitiveLoserState;
 		}
 		else if ( pPlayer->m_Shared.IsLoser() )
 		{
-			iActivityCount = ARRAYSIZE( s_acttableLoserState );
+			iActivityCount = SE_ARRAYSIZE( s_acttableLoserState );
 			pTable = s_acttableLoserState;
 		}
 		else if ( pPlayer->m_Shared.IsCarryingObject() )
 		{
-			iActivityCount = ARRAYSIZE( s_acttableBuildingDeployed );
+			iActivityCount = SE_ARRAYSIZE( s_acttableBuildingDeployed );
 			pTable = s_acttableBuildingDeployed;
 		}
 	}

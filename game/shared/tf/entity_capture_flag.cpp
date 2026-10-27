@@ -248,7 +248,7 @@ CCaptureFlag::CCaptureFlag()
 	m_flTimeToSetPoisonous = 0.f;
 
 	// Team specific sound throttling for Special Delivery
-	for ( int i = 0; i < ARRAYSIZE( m_flNextTeamSoundTime ); i++ )
+	for ( int i = 0; i < SE_ARRAYSIZE( m_flNextTeamSoundTime ); i++ )
 	{
 		m_flNextTeamSoundTime[i] = 0.f;
 	}
@@ -1839,11 +1839,11 @@ void CCaptureFlag::Drop( CTFPlayer *pPlayer, bool bVisible,  bool bThrown /*= fa
 		const float fMultipliers[ 3 ] = { 0.0f, 1.0f, -1.0f };
 
 		// Wiggle it around on each axis to find a safe place
-		for ( int z = 0; z < ARRAYSIZE( fMultipliers ) && trace.startsolid; z++ )
+		for ( int z = 0; z < SE_ARRAYSIZE( fMultipliers ) && trace.startsolid; z++ )
 		{
-			for ( int y = 0; y < ARRAYSIZE( fMultipliers ) && trace.startsolid; y++ )
+			for ( int y = 0; y < SE_ARRAYSIZE( fMultipliers ) && trace.startsolid; y++ )
 			{
-				for ( int x = 0; x < ARRAYSIZE( fMultipliers ) && trace.startsolid; x++ )
+				for ( int x = 0; x < SE_ARRAYSIZE( fMultipliers ) && trace.startsolid; x++ )
 				{
 					vecStart = pPlayer->WorldSpaceCenter();
 					vecStart += Vector( fMultipliers[ x ] * 10.0f, fMultipliers[ y ] * 10.0f, fMultipliers[ z ] * 10.0f );

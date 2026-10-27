@@ -46,7 +46,7 @@ char *g_StriderFeet[] =
 	"right foot",
 	"back foot"
 };
-#define NUM_STRIDER_FEET ARRAYSIZE( g_StriderFeet )
+#define NUM_STRIDER_FEET SE_ARRAYSIZE( g_StriderFeet )
 
 
 CWalkerStrider::CWalkerStrider()

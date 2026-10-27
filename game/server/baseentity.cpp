@@ -1599,7 +1599,7 @@ int CBaseEntity::VPhysicsTakeDamage( const CTakeDamageInfo &info )
 		else if ( (gameFlags & FVPHYSICS_PART_OF_RAGDOLL) && (gameFlags & FVPHYSICS_CONSTRAINT_STATIC) )
 		{
 			IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-			int count = VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+			int count = VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 			for ( int i = 0; i < count; i++ )
 			{
 				if ( !(pList[i]->GetGameFlags() & FVPHYSICS_CONSTRAINT_STATIC) )
@@ -2751,7 +2751,7 @@ int CBaseEntity::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax )
 bool CBaseEntity::VPhysicsIsFlesh( void )
 {
 	IPhysicsObject *pList[VPHYSICS_MAX_OBJECT_LIST_COUNT];
-	int count = VPhysicsGetObjectList( pList, ARRAYSIZE(pList) );
+	int count = VPhysicsGetObjectList( pList, SE_ARRAYSIZE(pList) );
 	for ( int i = 0; i < count; i++ )
 	{
 		int material = pList[i]->GetMaterialIndex();

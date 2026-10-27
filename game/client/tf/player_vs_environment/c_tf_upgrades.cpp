@@ -693,7 +693,7 @@ void CHudUpgradePanel::PlayerInventoryChanged( C_TFPlayer *pPlayer )
 		if ( !pCurrentItem )
 			continue;
 
-		for ( int nPanelIndex = 0; nPanelIndex < ARRAYSIZE( m_ItemSlotBuyPanels ); ++nPanelIndex )
+		for ( int nPanelIndex = 0; nPanelIndex < SE_ARRAYSIZE( m_ItemSlotBuyPanels ); ++nPanelIndex )
 		{
 			ItemSlotBuyPanels *pItemSlotBuyPanel = &( m_ItemSlotBuyPanels[nPanelIndex] );
 			if ( !pItemSlotBuyPanel )
@@ -821,7 +821,7 @@ void CHudUpgradePanel::PerformLayout( void )
 		}
 	}
 
-	for ( int nSlotIndex = 0; nSlotIndex < ARRAYSIZE( m_ItemSlotBuyPanels ); ++nSlotIndex )
+	for ( int nSlotIndex = 0; nSlotIndex < SE_ARRAYSIZE( m_ItemSlotBuyPanels ); ++nSlotIndex )
 	{
 		ItemSlotBuyPanels *pItemSlotBuyPanel = &( m_ItemSlotBuyPanels[ nSlotIndex ] );
 
@@ -1029,7 +1029,7 @@ void CHudUpgradePanel::UpgradeItemInSlot( int iSlot )
 
 	if ( m_pMouseOverUpgradePanel )
 	{
-		for ( int nSlotIndex = 0; nSlotIndex < ARRAYSIZE( m_ItemSlotBuyPanels ); ++nSlotIndex )
+		for ( int nSlotIndex = 0; nSlotIndex < SE_ARRAYSIZE( m_ItemSlotBuyPanels ); ++nSlotIndex )
 		{
 			ItemSlotBuyPanels *pItemSlotBuyPanel = &( m_ItemSlotBuyPanels[ nSlotIndex ] );
 
@@ -1086,7 +1086,7 @@ void CHudUpgradePanel::UpdateUpgradeButtons( void )
 	if ( !m_hPlayer )
 		return;
 
-	for ( int nSlotIndex = 0; nSlotIndex < ARRAYSIZE( m_ItemSlotBuyPanels ); ++nSlotIndex )
+	for ( int nSlotIndex = 0; nSlotIndex < SE_ARRAYSIZE( m_ItemSlotBuyPanels ); ++nSlotIndex )
 	{
 		ItemSlotBuyPanels *pItemSlotBuyPanel = &( m_ItemSlotBuyPanels[ nSlotIndex ] );
 
@@ -1235,7 +1235,7 @@ void CHudUpgradePanel::UpdateJoystickControls( void )
 			nGridPosY += 1;
 		}
 
-		for ( int nSlotIndex = 0; nSlotIndex < ARRAYSIZE( m_ItemSlotBuyPanels ); ++nSlotIndex )
+		for ( int nSlotIndex = 0; nSlotIndex < SE_ARRAYSIZE( m_ItemSlotBuyPanels ); ++nSlotIndex )
 		{
 			ItemSlotBuyPanels *pItemSlotBuyPanel = &( m_ItemSlotBuyPanels[ nSlotIndex ] );
 
@@ -1282,7 +1282,7 @@ void CHudUpgradePanel::UpdateJoystickControls( void )
 			nGridPosX += 1;
 		}
 
-		for ( int nSlotIndex = 0; nSlotIndex < ARRAYSIZE( m_ItemSlotBuyPanels ); ++nSlotIndex )
+		for ( int nSlotIndex = 0; nSlotIndex < SE_ARRAYSIZE( m_ItemSlotBuyPanels ); ++nSlotIndex )
 		{
 			ItemSlotBuyPanels *pItemSlotBuyPanel = &( m_ItemSlotBuyPanels[ nSlotIndex ] );
 
@@ -1450,7 +1450,7 @@ void CHudUpgradePanel::UpdateHighlights( void )
 			m_pMouseOverTabPanel->SetVisible( false );
 		}
 
-		for ( int nSlotIndex = 0; nSlotIndex < ARRAYSIZE( m_ItemSlotBuyPanels ); ++nSlotIndex )
+		for ( int nSlotIndex = 0; nSlotIndex < SE_ARRAYSIZE( m_ItemSlotBuyPanels ); ++nSlotIndex )
 		{
 			ItemSlotBuyPanels *pItemSlotBuyPanel = &( m_ItemSlotBuyPanels[ nSlotIndex ] );
 
@@ -1512,7 +1512,7 @@ void CHudUpgradePanel::UpdateMouseOverHighlight( void )
 
 void CHudUpgradePanel::UpdateButtonStates( int nCurrentMoney, int nUpgrade /*= 0*/, int nNumPurchased /*= 0*/ )
 {	
-	for ( int nSlotIndex = 0; nSlotIndex < ARRAYSIZE( m_ItemSlotBuyPanels ); ++nSlotIndex )
+	for ( int nSlotIndex = 0; nSlotIndex < SE_ARRAYSIZE( m_ItemSlotBuyPanels ); ++nSlotIndex )
 	{
 		ItemSlotBuyPanels *pItemSlotBuyPanel = &( m_ItemSlotBuyPanels[ nSlotIndex ] );
 
@@ -1738,7 +1738,7 @@ void CHudUpgradePanel::UpdateButtonStates( int nCurrentMoney, int nUpgrade /*= 0
 		if ( m_iWeaponSlotBeingUpgraded == -1 )
 		{
 			m_bAwardMaxResistAchievement = true;
-			for ( int i = 0; i < ARRAYSIZE( bIsResistMax ); i++ )
+			for ( int i = 0; i < SE_ARRAYSIZE( bIsResistMax ); i++ )
 			{
 				if ( !bIsResistMax[i] )
 				{
@@ -1782,7 +1782,7 @@ void CHudUpgradePanel::UpdateButtonStates( int nCurrentMoney, int nUpgrade /*= 0
 
 	// Credits count
 	wchar_t wzCount[10];
-	_snwprintf( wzCount, ARRAYSIZE( wzCount ), L"%d", nCurrentMoney );
+	_snwprintf( wzCount, SE_ARRAYSIZE( wzCount ), L"%d", nCurrentMoney );
 	m_pSelectWeaponPanel->SetDialogVariable( "credits", wzCount );
 }
 
@@ -1825,7 +1825,7 @@ void CHudUpgradePanel::UpdateItemStatsLabel( void )
 		const econ_item_description_line_t& line = itemDesc.GetLine(i);
 		if ( line.unMetaType & kDescLineFlag_Attribute )
 		{
-			AddItemStatText( line.sText.Get(), line.eColor, wszAttribDesc, ARRAYSIZE( wszAttribDesc ) );
+			AddItemStatText( line.sText.Get(), line.eColor, wszAttribDesc, SE_ARRAYSIZE( wszAttribDesc ) );
 			++iOutputAttributeLineCount;
 		}
 	}
@@ -1839,7 +1839,7 @@ void CHudUpgradePanel::UpdateItemStatsLabel( void )
 		wchar_t *pNone = g_pVGuiLocalize->Find( "#TF_PassiveAttribs_None" );
 		if ( pNone )
 		{
-			wcsncat( wszAttribDesc, pNone, ARRAYSIZE(wszAttribDesc) );
+			wcsncat( wszAttribDesc, pNone, SE_ARRAYSIZE(wszAttribDesc) );
 		}
 	}
 
@@ -1852,7 +1852,7 @@ void CHudUpgradePanel::CancelUpgrades( void )
 
 	KeyValues *kv = new KeyValues( "MVM_Upgrade" );
 
-	for ( int nSlotIndex = 0; nSlotIndex < ARRAYSIZE( m_ItemSlotBuyPanels ); ++nSlotIndex )
+	for ( int nSlotIndex = 0; nSlotIndex < SE_ARRAYSIZE( m_ItemSlotBuyPanels ); ++nSlotIndex )
 	{
 		ItemSlotBuyPanels *pItemSlotBuyPanel = &( m_ItemSlotBuyPanels[ nSlotIndex ] );
 

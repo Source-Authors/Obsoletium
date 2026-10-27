@@ -698,7 +698,7 @@ void CNPC_Advisor::StartTask( const Task_t *pTask )
 					int m_nMaxMass;
 				};
 
-				CAdvisorLevitateEntitiesEnum levitateEnum( list, ARRAYSIZE( list ), 10, 220 );
+				CAdvisorLevitateEntitiesEnum levitateEnum( list, SE_ARRAYSIZE( list ), 10, 220 );
 
 				int nCount = UTIL_EntitiesInBox( GetAbsOrigin() - Vector( 554, 368, 188 ), GetAbsOrigin() + Vector( 92, 208, 168 ), &levitateEnum );
 				for ( int i = 0; i < nCount; i++ )
@@ -1955,8 +1955,8 @@ static impactdamagetable_t gAdvisorImpactDamageTable =
 	advisorLinearTable,
 	advisorAngularTable,
 	
-	ARRAYSIZE(advisorLinearTable),
-	ARRAYSIZE(advisorAngularTable),
+	SE_ARRAYSIZE(advisorLinearTable),
+	SE_ARRAYSIZE(advisorAngularTable),
 
 	200*200,// minimum linear speed squared
 	180*180,// minimum angular speed squared (360 deg/s to cause spin/slice damage)

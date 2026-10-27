@@ -297,7 +297,7 @@ void CDODClientScoreBoardDialog::UpdateTeamInfo()
 			wchar_t name[64];
 			wchar_t string1[1024];
 			wchar_t wNumPlayers[6];
-			_snwprintf( wNumPlayers, ARRAYSIZE( wNumPlayers ), L"%i", team->Get_Number_Players() );
+			_snwprintf( wNumPlayers, SE_ARRAYSIZE( wNumPlayers ), L"%i", team->Get_Number_Players() );
 			if ( !teamName && team )
 			{
 				g_pVGuiLocalize->ConvertANSIToUnicode( team->Get_Name(), name, sizeof( name ) );
@@ -319,8 +319,8 @@ void CDODClientScoreBoardDialog::UpdateTeamInfo()
 			wchar_t wTeamScore[128];
 			wchar_t wRoundsWon[8];
 			wchar_t wTickScore[8];
-			_snwprintf( wRoundsWon, ARRAYSIZE( wRoundsWon ), L"%i", team->GetRoundsWon() );
-			_snwprintf( wTickScore, ARRAYSIZE( wTickScore ), L"%i", team->Get_Score() );
+			_snwprintf( wRoundsWon, SE_ARRAYSIZE( wRoundsWon ), L"%i", team->GetRoundsWon() );
+			_snwprintf( wTickScore, SE_ARRAYSIZE( wTickScore ), L"%i", team->Get_Score() );
 			g_pVGuiLocalize->ConstructString( wTeamScore, sizeof(wTeamScore), g_pVGuiLocalize->Find( "#scoreboard_teamscore" ), 2, wRoundsWon, wTickScore );
 
 			// set team score in dialog
@@ -445,10 +445,10 @@ void CDODClientScoreBoardDialog::UpdateSpectatorList()
 		{
 			if ( nSpectators > 0 )
 			{
-				Q_strncat( szSpectatorList, ", ", ARRAYSIZE( szSpectatorList ) );
+				Q_strncat( szSpectatorList, ", ", SE_ARRAYSIZE( szSpectatorList ) );
 			}
 
-			Q_strncat( szSpectatorList, g_PR->GetPlayerName( playerIndex ), ARRAYSIZE( szSpectatorList ) );
+			Q_strncat( szSpectatorList, g_PR->GetPlayerName( playerIndex ), SE_ARRAYSIZE( szSpectatorList ) );
 			nSpectators++;
 		}
 	}
@@ -460,7 +460,7 @@ void CDODClientScoreBoardDialog::UpdateSpectatorList()
 
 		wchar_t wzSpectatorCount[16];
 		wchar_t wzSpectatorList[1024];
-		_snwprintf( wzSpectatorCount, ARRAYSIZE( wzSpectatorCount ), L"%i", nSpectators );
+		_snwprintf( wzSpectatorCount, SE_ARRAYSIZE( wzSpectatorCount ), L"%i", nSpectators );
 		g_pVGuiLocalize->ConvertANSIToUnicode( szSpectatorList, wzSpectatorList, sizeof( wzSpectatorList ) );
 		g_pVGuiLocalize->ConstructString( wzSpectators, sizeof(wzSpectators), g_pVGuiLocalize->Find( pchFormat), 2, wzSpectatorCount, wzSpectatorList );
 	}

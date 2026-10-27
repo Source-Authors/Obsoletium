@@ -2846,7 +2846,7 @@ static bool IsDynamicLight( dworldlight_t *pWorldLight )
 {
 	// NOTE: This only works because we're using some implementation details
 	// that the dynamic lights are stored in a little static array
-	return ( pWorldLight >= s_pDynamicLight && pWorldLight < &s_pDynamicLight[ARRAYSIZE(s_pDynamicLight)] );
+	return ( pWorldLight >= s_pDynamicLight && pWorldLight < &s_pDynamicLight[SE_ARRAYSIZE(s_pDynamicLight)] );
 }
 
 

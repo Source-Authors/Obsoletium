@@ -106,7 +106,7 @@ private:
 
 	UGCFileRequestStatus_t ThrowError( const char *lpszDesc )
 	{
-		V_strncpy( m_szErrorText, lpszDesc, ARRAYSIZE(m_szErrorText) );
+		V_strncpy( m_szErrorText, lpszDesc, SE_ARRAYSIZE(m_szErrorText) );
 		Warning( "%s", m_szErrorText );
 		Assert(0);
 		m_UGCStatus = UGCFILEREQUEST_ERROR;

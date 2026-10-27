@@ -341,14 +341,14 @@ bool CTFReplay::GetCurrentStats( RoundStats_t &out )
 
 const char *CTFReplay::GetStatString( int iStat ) const
 {
-	COMPILE_TIME_ASSERT( TFSTAT_TOTAL == ARRAYSIZE( s_pStatStrings ) );
+	COMPILE_TIME_ASSERT( TFSTAT_TOTAL == SE_ARRAYSIZE( s_pStatStrings ) );
 	Assert( iStat >= TFSTAT_UNDEFINED && iStat < TFSTAT_TOTAL );
 	return ClampedArrayElement( s_pStatStrings, iStat );
 }
 
 const char *CTFReplay::GetPlayerClass( int iClass ) const
 {
-	COMPILE_TIME_ASSERT( TF_CLASS_MENU_BUTTONS == ARRAYSIZE( g_aPlayerClassNames_NonLocalized ) );
+	COMPILE_TIME_ASSERT( TF_CLASS_MENU_BUTTONS == SE_ARRAYSIZE( g_aPlayerClassNames_NonLocalized ) );
 	Assert( iClass >= TF_CLASS_UNDEFINED && iClass < TF_CLASS_COUNT );
 	return ClampedArrayElement( g_aPlayerClassNames_NonLocalized, iClass );
 }

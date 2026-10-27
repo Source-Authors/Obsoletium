@@ -366,7 +366,7 @@ bool CWeaponUSP::SendWeaponAnim( int iActivity )
 	// Translate the activity?
 	if ( m_bSilencerOn )
 	{
-		for ( int i=0; i < ARRAYSIZE( g_SilencedTranslations ); i++ )
+		for ( int i=0; i < SE_ARRAYSIZE( g_SilencedTranslations ); i++ )
 		{
 			if ( g_SilencedTranslations[i][0] == iActivity )
 			{

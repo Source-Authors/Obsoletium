@@ -52,7 +52,7 @@ bool CCSFunFactMgr::Init()
 		pFunFactHelper = pFunFactHelper->m_pNext;
 	}
 
-	for (int i = 0; i < ARRAYSIZE(m_playerCooldown); ++i)
+	for (int i = 0; i < SE_ARRAYSIZE(m_playerCooldown); ++i)
 	{
 		m_playerCooldown[i] = 0.0f;
 	}

@@ -371,7 +371,7 @@ bool CFlexSceneFileManager::Init()
 	};
 
 	char fn[ MAX_PATH ];
-	for ( int i = 0; i < ARRAYSIZE( pTFClasses ); ++i )
+	for ( int i = 0; i < SE_ARRAYSIZE( pTFClasses ); ++i )
 	{
 		Q_snprintf( fn, sizeof( fn ), "player/%s/phonemes/phonemes", pTFClasses[i] );
 		FindSceneFile( NULL, fn, true );

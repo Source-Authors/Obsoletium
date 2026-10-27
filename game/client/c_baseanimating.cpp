@@ -1149,7 +1149,7 @@ CStudioHdr *C_BaseAnimating::OnNewModel()
 		}
 	}
 
-	int boneControllerCount = MIN( hdr->numbonecontrollers(), (int)ARRAYSIZE( m_flEncodedController ) );
+	int boneControllerCount = MIN( hdr->numbonecontrollers(), (int)SE_ARRAYSIZE( m_flEncodedController ) );
 
 	m_iv_flEncodedController.SetMaxCount( boneControllerCount );
 

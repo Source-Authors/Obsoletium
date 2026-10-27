@@ -956,7 +956,7 @@ static float CalcProgressFrac( const Vector& vecOrigin )
 	float flThisFrac = 0;
 	float flThisLen = 0;
 	float flThisDist = 0;
-	for ( int i = 1; i < ARRAYSIZE(arrTrackPoints); ++i )
+	for ( int i = 1; i < SE_ARRAYSIZE(arrTrackPoints); ++i )
 	{
 		vecThisPoint = arrTrackPoints[i];
 		if ( vecThisPoint.IsZero() )
