@@ -11,6 +11,8 @@
 #define UTLSTACK_H
 
 #include <cstring>
+#include <memory>   // dimhotepus: declares std::addressof
+#include <utility>  // dimhotepus: declares std::move
 
 #include "tier0/dbg.h"
 
