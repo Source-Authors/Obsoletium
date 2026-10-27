@@ -107,6 +107,9 @@ private:
 	// Grows the stack allocation
 	void GrowStack();
 
+	// dimhotepus: Detect whether a push source is an element of this stack.
+	bool IsElementAddress( const T* p ) const;
+
 	// For easier access to the elements through the debugger
 	void ResetDbgInfo();
 
@@ -127,6 +130,24 @@ inline void CUtlStack<T,M>::ResetDbgInfo()
 {
 	m_pElements = m_Memory.Base();
 }
+
+//-----------------------------------------------------------------------------
+// dimhotepus: Check for an exact address match without comparing unrelated
+// pointers, which could be undefined behavior.
+//-----------------------------------------------------------------------------
+
+template< class T, class M >
+bool CUtlStack<T,M>::IsElementAddress( const T* p ) const
+{
+	for ( intp i = 0; i < m_Size; ++i )
+	{
+		if ( std::addressof( Element(i) ) == p )
+			return true;
+	}
+
+	return false;
+}
+
 
 //-----------------------------------------------------------------------------
 // constructor, destructor
@@ -159,6 +180,7 @@ void CUtlStack<T,M>::CopyFrom( const CUtlStack<T, M> &from )
 
 	Purge();
 	EnsureCapacity( from.Count() );
+
 	for ( intp i = 0; i < from.Count(); i++ )
 	{
 		Push( from[i] );
@@ -255,7 +277,7 @@ inline bool CUtlStack<T,M>::IsIdxValid( intp i ) const
 {
 	return (i >= 0) && (i < m_Size);
 }
- 
+
 
 //-----------------------------------------------------------------------------
 // Grows the stack
@@ -264,10 +286,11 @@ inline bool CUtlStack<T,M>::IsIdxValid( intp i ) const
 template< class T, class M >
 void CUtlStack<T,M>::GrowStack()
 {
+	// dimhotepus: Grow capacity only. Push increments m_Size after construction
+	// succeeds, so a throwing constructor cannot leave an unconstructed
+	// element counted as part of the stack.
 	if (m_Size >= m_Memory.NumAllocated())
 		m_Memory.Grow();
-
-	++m_Size;
 
 	ResetDbgInfo();
 }
@@ -293,8 +316,10 @@ template< class T, class M >
 intp CUtlStack<T,M>::Push()
 {
 	GrowStack();
-	Construct( std::addressof( Element(m_Size-1) ) );
-	return m_Size - 1;
+
+	// dimhotepus: Construct first, then update m_Size.
+	Construct( std::addressof( m_Memory[m_Size]) );
+	return m_Size++;
 }
 
 
@@ -305,11 +330,20 @@ intp CUtlStack<T,M>::Push()
 template< class T, class M >
 intp CUtlStack<T,M>::Push( T const& src )
 {
-	GrowStack();
-	CopyConstruct( std::addressof( Element(m_Size-1) ), src );
-	return m_Size - 1;
-}
+	// dimhotepus: If growth would invalidate src, copy it to a temporary first.
+	if ( m_Size >= m_Memory.NumAllocated() &&
+		 IsElementAddress( std::addressof( src ) ) )
+	{
+		T temp{ src };
+		GrowStack();
+		CopyConstruct( std::addressof( m_Memory[m_Size] ), temp );
+		return m_Size++;
+	}
 
+	GrowStack();
+	CopyConstruct( std::addressof( m_Memory[m_Size] ), src );
+	return m_Size++;
+}
 
 
 //-----------------------------------------------------------------------------
@@ -319,11 +353,20 @@ intp CUtlStack<T,M>::Push( T const& src )
 template< class T, class M >
 intp CUtlStack<T,M>::Push( T&& src )
 {
-	GrowStack();
-	MoveConstruct( std::addressof( Element(m_Size-1) ), std::move( src ) );
-	return m_Size - 1;
-}
+	// dimhotepus: Preserve an aliased source before growth can invalidate it.
+	if ( m_Size >= m_Memory.NumAllocated() &&
+		 IsElementAddress( std::addressof( src ) ) )
+	{
+		T temp{std::move( src )};
+		GrowStack();
+		MoveConstruct( std::addressof( m_Memory[m_Size] ), std::move( temp ) );
+		return m_Size++;
+	}
 
+	GrowStack();
+	MoveConstruct( std::addressof( m_Memory[m_Size] ), std::forward<T>( src ) );
+	return m_Size++;
+}
 
 
 //-----------------------------------------------------------------------------
