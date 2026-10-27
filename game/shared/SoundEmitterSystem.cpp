@@ -348,7 +348,7 @@ public:
 		soundemitterbase->Flush();
 	}
 		
-	void InternalPrecacheWaves( int soundIndex )
+	void InternalPrecacheWaves( UtlHashHandle_t soundIndex )
 	{
 		CSoundParametersInternal *internal = soundemitterbase->InternalGetParametersForSound( soundIndex );
 		if ( !internal )
