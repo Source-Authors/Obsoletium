@@ -1352,7 +1352,7 @@ void CNPC_Barnacle::InputDropTongue( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 // Purpose: Grab the specified target with our tongue
 //-----------------------------------------------------------------------------
-void CNPC_Barnacle::AttachTongueToTarget( CBaseEntity *pTouchEnt, Vector vecGrabPos )
+void CNPC_Barnacle::AttachTongueToTarget( CBaseEntity *pTouchEnt, Vector vecGrabPosIn )
 {
 
 #if HL2_EPISODIC
@@ -1432,7 +1432,7 @@ void CNPC_Barnacle::AttachTongueToTarget( CBaseEntity *pTouchEnt, Vector vecGrab
 
 	m_nShakeCount = 6;
 	m_bLiftingPrey = true;// indicate that we should be lifting prey.
-	SetAltitude( (GetAbsOrigin().z - vecGrabPos.z) );
+	SetAltitude( (GetAbsOrigin().z - vecGrabPosIn.z) );
 	m_bPlayedPullSound  = false;
 
 	CBaseAnimating *pAnimating = dynamic_cast<CBaseAnimating*>(pTouchEnt);

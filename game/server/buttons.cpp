@@ -1327,18 +1327,18 @@ void CMomentaryRotButton::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, US
 			// Must be first!
 			g_EventQueue.AddEvent( this, "_DisableUpdateTarget", 0, this, this );
 
-			variant_t value;
-			value.SetFloat( flDist );
-			g_EventQueue.AddEvent( this, "SetPosition", value, 0.01f, this, this );
+			variant_t var;
+			var.SetFloat( flDist );
+			g_EventQueue.AddEvent( this, "SetPosition", var, 0.01f, this, this );
 
-			value.SetFloat( 0.0f );
-			g_EventQueue.AddEvent( this, "SetPosition", value, 0.1f, this, this );
+			var.SetFloat( 0.0f );
+			g_EventQueue.AddEvent( this, "SetPosition", var, 0.1f, this, this );
 
-			value.SetFloat( 0.5f * flDist );
-			g_EventQueue.AddEvent( this, "SetPosition", value, 0.2f, this, this );
+			var.SetFloat( 0.5f * flDist );
+			g_EventQueue.AddEvent( this, "SetPosition", var, 0.2f, this, this );
 
-			value.SetFloat( 0.0f );
-			g_EventQueue.AddEvent( this, "SetPosition", value, 0.3f, this, this );
+			var.SetFloat( 0.0f );
+			g_EventQueue.AddEvent( this, "SetPosition", var, 0.3f, this, this );
 
 			// Must be last! And must be late enough to cover the settling time.
 			g_EventQueue.AddEvent( this, "_EnableUpdateTarget", 0.5f, this, this );
