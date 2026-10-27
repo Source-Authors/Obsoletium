@@ -329,14 +329,14 @@ typedef void * HINSTANCE;
 // Convert int<-->pointer, avoiding 32/64-bit compiler warnings:
 //-----------------------------------------------------------------------------
 template<typename T>
-constexpr inline std::enable_if_t<std::is_integral_v<T>, void*> INT_TO_POINTER(T i) noexcept {
+[[nodiscard]] constexpr inline std::enable_if_t<std::is_integral_v<T>, void*> INT_TO_POINTER(T i) noexcept {
 	if constexpr (std::is_unsigned_v<T>) {
 		return reinterpret_cast<void*>(static_cast<uintp>(i));
 	}
 	return reinterpret_cast<void*>(static_cast<intp>(i));
 }
 template <typename R, typename T>
-constexpr inline std::enable_if_t<std::is_pointer_v<T>, R> POINTER_TO_INT(T p) noexcept {
+[[nodiscard]] constexpr inline std::enable_if_t<std::is_pointer_v<T>, R> POINTER_TO_INT(T p) noexcept {
 	if constexpr (std::is_unsigned_v<R>) {
 		return static_cast<uint>(reinterpret_cast<uintp>(p));
 	}
@@ -542,11 +542,11 @@ typedef void *HANDLE;
 //-----------------------------------------------------------------------------
 // fsel
 //-----------------------------------------------------------------------------
-static FORCEINLINE float fsel(float fComparand, float fValGE, float fLT)
+[[nodiscard]] static FORCEINLINE float fsel(float fComparand, float fValGE, float fLT)
 {
 	return fComparand >= 0 ? fValGE : fLT;
 }
-static FORCEINLINE double fsel(double fComparand, double fValGE, double fLT)
+[[nodiscard]] static FORCEINLINE double fsel(double fComparand, double fValGE, double fLT)
 {
 	return fComparand >= 0 ? fValGE : fLT;
 }
@@ -619,7 +619,7 @@ static FORCEINLINE double fsel(double fComparand, double fValGE, double fLT)
 #else
 
 	#ifndef NDEBUG
-		FORCEINLINE bool IsFPUControlWordSet()
+		[[nodiscard]] FORCEINLINE bool IsFPUControlWordSet()
 		{
 			float f = 0.996f;
 			union
@@ -711,19 +711,19 @@ static FORCEINLINE double fsel(double fComparand, double fValGE, double fLT)
 #endif
 
 template <typename T>
-inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 2 && alignof(T) == alignof(unsigned short), T> WordSwapC( T w )
+[[nodiscard]] inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 2 && alignof(T) == alignof(unsigned short), T> WordSwapC( T w )
 {
    return static_cast<T>( bswap_16( w ) );
 }
 
 template <typename T>
-inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 4 && alignof(T) == alignof(unsigned int), T> DWordSwapC( T dw )
+[[nodiscard]] inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 4 && alignof(T) == alignof(unsigned int), T> DWordSwapC( T dw )
 {
    return static_cast<T>( bswap_32( dw ) );
 }
 
 template <typename T>
-inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 8 && alignof(T) == alignof(unsigned long long), T> QWordSwapC( T qdw )
+[[nodiscard]] inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 8 && alignof(T) == alignof(unsigned long long), T> QWordSwapC( T qdw )
 {
    return static_cast<T>( bswap_64( qdw ) );
 }
@@ -754,13 +754,9 @@ inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 8 && alignof(T) == a
 // dimhotepus: Use safe swap instead of UB on casts. Also return float, not uint swap.
 inline float SafeSwapFloat( float *pOut, const float *pIn )
 {
-	uint tmp;
-	static_assert(sizeof(tmp) == sizeof(*pIn));
-	memcpy( &tmp, pIn, sizeof(*pIn) );
-
-	const uint swap{ DWordSwap( tmp ) };
-	static_assert(sizeof(swap) == sizeof(*pOut));
-	memcpy( pOut, &swap, sizeof(*pOut) );
+	const uint  bits{ DWordSwap( FloatBits( *pIn ) ) };
+	const float out{ BitsToFloat( bits ) };
+	BitwiseCopy( &out, pOut, 1 );
 
 	return *pOut;
 }
@@ -810,7 +806,7 @@ inline float SafeSwapFloat( float *pOut, const float *pIn )
 #else
 
 template <bool isLittleEndian = endian::native == endian::little>
-inline int16 BigShort( int16 val )
+[[nodiscard]] inline int16 BigShort( int16 val )
 {
 	if constexpr (isLittleEndian)
 	{
@@ -822,7 +818,7 @@ inline int16 BigShort( int16 val )
 	}
 }
 template <bool isLittleEndian = endian::native == endian::little>
-inline uint16 BigWord( uint16 val )
+[[nodiscard]] inline uint16 BigWord( uint16 val )
 {
 	if constexpr (isLittleEndian)
 	{
@@ -834,7 +830,7 @@ inline uint16 BigWord( uint16 val )
 	}
 }
 template <bool isLittleEndian = endian::native == endian::little>
-inline long BigLong( long val )
+[[nodiscard]] inline long BigLong( long val )
 {
 	if constexpr (isLittleEndian)
 	{
@@ -850,7 +846,7 @@ inline long BigLong( long val )
 	}
 }
 template <bool isLittleEndian = endian::native == endian::little>
-inline uint32 BigDWord( uint32 val )
+[[nodiscard]] inline uint32 BigDWord( uint32 val )
 {
 	if constexpr (isLittleEndian)
 	{
@@ -862,7 +858,7 @@ inline uint32 BigDWord( uint32 val )
 	}
 }
 template <bool isLittleEndian = endian::native == endian::little>
-inline size_t BigSize_t( size_t val )
+[[nodiscard]] inline size_t BigSize_t( size_t val )
 {
 	if constexpr (isLittleEndian)
 	{
@@ -885,7 +881,7 @@ inline size_t BigSize_t( size_t val )
 	}
 }
 template <bool isLittleEndian = endian::native == endian::little>
-inline int16 LittleShort( int16 val )
+[[nodiscard]] inline int16 LittleShort( int16 val )
 {
 	if constexpr (isLittleEndian)
 	{
@@ -897,7 +893,7 @@ inline int16 LittleShort( int16 val )
 	}
 }
 template <bool isLittleEndian = endian::native == endian::little>
-inline uint16 LittleWord( uint16 val )
+[[nodiscard]] inline uint16 LittleWord( uint16 val )
 {
 	if constexpr (isLittleEndian)
 	{
@@ -909,7 +905,7 @@ inline uint16 LittleWord( uint16 val )
 	}
 }
 template <bool isLittleEndian = endian::native == endian::little>
-inline long LittleLong( long val )
+[[nodiscard]] inline long LittleLong( long val )
 {
 	if constexpr (isLittleEndian)
 		return val;
@@ -920,7 +916,7 @@ inline long LittleLong( long val )
 		return QWordSwap( val );
 }
 template <bool isLittleEndian = endian::native == endian::little>
-inline uint32 LittleDWord( uint32 val )
+[[nodiscard]] inline uint32 LittleDWord( uint32 val )
 {
 	if constexpr (isLittleEndian)
 	{
@@ -932,7 +928,7 @@ inline uint32 LittleDWord( uint32 val )
 	}
 }
 template< bool isLittleEndian = endian::native == endian::little >
-inline size_t LittleSize_t( uint32 val )
+[[nodiscard]] inline size_t LittleSize_t( uint32 val )
 {
 	if constexpr (isLittleEndian)
 	{
@@ -955,7 +951,7 @@ inline size_t LittleSize_t( uint32 val )
 	}
 }
 template <bool isLittleEndian = endian::native == endian::little>
-inline uint64 LittleQWord( uint64 val )
+[[nodiscard]] inline uint64 LittleQWord( uint64 val )
 {
 	if constexpr (isLittleEndian)
 	{
@@ -966,11 +962,11 @@ inline uint64 LittleQWord( uint64 val )
 		return QWordSwap( val );
 	}
 }
-inline int16 SwapShort( int16 val )					{ return WordSwap( val ); }
-inline uint16 SwapWord( uint16 val )				{ return WordSwap( val ); }
-inline long SwapLong( long val )					{ return DWordSwap( val ); }
-inline uint32 SwapDWord( uint32 val )				{ return DWordSwap( val ); }
-inline size_t SwapSize_t( size_t val )
+[[nodiscard]] inline int16 SwapShort( int16 val )					{ return WordSwap( val ); }
+[[nodiscard]] inline uint16 SwapWord( uint16 val )				{ return WordSwap( val ); }
+[[nodiscard]] inline long SwapLong( long val )					{ return DWordSwap( val ); }
+[[nodiscard]] inline uint32 SwapDWord( uint32 val )				{ return DWordSwap( val ); }
+[[nodiscard]] inline size_t SwapSize_t( size_t val )
 {
 	if constexpr ( sizeof( val ) == 8 )
 	{
@@ -1015,7 +1011,7 @@ inline void SwapFloat( float *pOut, const float *pIn )		{ SafeSwapFloat( pOut, p
 
 #endif
 
-FORCEINLINE unsigned int LoadLittleDWord( const unsigned int *base, size_t dwordIndex )
+[[nodiscard]] FORCEINLINE unsigned int LoadLittleDWord( const unsigned int *base, size_t dwordIndex )
 {
 	return LittleDWord( base[dwordIndex] );
 }
@@ -1087,13 +1083,13 @@ template <typename Tdst, typename Tsrc>
 // It should not be changed after startup unless you really know what you're doing. The only place
 // that should do this is the benchmark code itself so it can output a legit duration.
 PLATFORM_INTERFACE void				Plat_SetBenchmarkMode( bool bBenchmarkMode );	
-PLATFORM_INTERFACE bool				Plat_IsInBenchmarkMode();
+PLATFORM_INTERFACE [[nodiscard]] bool				Plat_IsInBenchmarkMode();
 
 
-PLATFORM_INTERFACE double			Plat_FloatTime();		// Returns time in seconds since the module was loaded.
-PLATFORM_INTERFACE uint32			Plat_MSTime();			// Time in milliseconds.
-PLATFORM_INTERFACE uint64			Plat_USTime();			// Time in microseconds.
-PLATFORM_INTERFACE char *			Plat_ctime( const time_t *timep, char *buf, size_t bufsize );
+PLATFORM_INTERFACE [[nodiscard]] double			Plat_FloatTime();		// Returns time in seconds since the module was loaded.
+PLATFORM_INTERFACE [[nodiscard]] uint32			Plat_MSTime();			// Time in milliseconds.
+PLATFORM_INTERFACE [[nodiscard]] uint64			Plat_USTime();			// Time in microseconds.
+PLATFORM_INTERFACE char *						Plat_ctime( const time_t *timep, char *buf, size_t bufsize );
 // dimhotepus: true on success, false on failure.
 PLATFORM_INTERFACE [[nodiscard]] bool	Plat_GetModuleFilename( char *pOut, int nMaxBytes );
 
@@ -1131,8 +1127,8 @@ PLATFORM_INTERFACE struct tm *		Plat_localtime( const time_t *timep, struct tm *
 	#pragma intrinsic(__rdtsc)
 #endif
 
-FORCEINLINE uint64_t Plat_Rdtsc()
-{
+[[nodiscard]] FORCEINLINE uint64_t Plat_Rdtsc()
+	{
 	// See https://www.felixcloutier.com/x86/rdtsc
 	// 
 	// The RDTSC instruction is not a serializing instruction.  It does not
@@ -1161,7 +1157,7 @@ FORCEINLINE uint64_t Plat_Rdtsc()
 	return tsc;
 }
 
-FORCEINLINE uint64_t Plat_Rdtscp(uint32_t &coreId)
+[[nodiscard]] FORCEINLINE uint64_t Plat_Rdtscp( uint32_t &coreId )
 {
 	// See https://www.felixcloutier.com/x86/rdtscp
 	// 
@@ -1186,7 +1182,7 @@ FORCEINLINE uint64_t Plat_Rdtscp(uint32_t &coreId)
 	return tsc;
 }
 
-inline uint64_t Plat_MeasureRtscpOverhead()
+[[nodiscard]] inline uint64_t Plat_MeasureRtscpOverhead()
 {
 	uint32_t coreIdStart, coreIdEnd;
 	uint64_t overheads[64];
@@ -1312,7 +1308,7 @@ struct CPUInformation
 
 // Have to return a pointer, not a reference, because references are not compatible with the
 // extern "C" implied by PLATFORM_INTERFACE.
-PLATFORM_INTERFACE const CPUInformation* GetCPUInformation();
+PLATFORM_INTERFACE [[nodiscard]] const CPUInformation *GetCPUInformation();
 
 #define MEMORY_INFORMATION_VERSION 0
 
@@ -1338,9 +1334,11 @@ struct MemoryInformation
 };
 
 // Returns true if the passed in MemoryInformation structure was filled out, otherwise false.
-PLATFORM_INTERFACE bool GetMemoryInformation( MemoryInformation *pOutMemoryInfo );
+PLATFORM_INTERFACE [[nodiscard]] bool GetMemoryInformation( MemoryInformation *pOutMemoryInfo );
 
-PLATFORM_INTERFACE float GetCPUUsage();
+// Return the system-wide CPU usage as a value from 0.0 to 1.0, measured
+// between the previous call and this one.
+PLATFORM_INTERFACE [[nodiscard]] float GetCPUUsage();
 
 PLATFORM_INTERFACE void GetCurrentDate( int *pDay, int *pMonth, int *pYear );
 
@@ -1364,33 +1362,33 @@ PLATFORM_INTERFACE void	Plat_ApplyHardwareDataBreakpointsToNewThread( unsigned l
 //-----------------------------------------------------------------------------
 // Process related functions
 //-----------------------------------------------------------------------------
-PLATFORM_INTERFACE const tchar *Plat_GetCommandLine();
+PLATFORM_INTERFACE [[nodiscard]] const tchar *Plat_GetCommandLine();
 #ifndef _WIN32
 // helper function for OS's that don't have a ::GetCommandLine() call
 PLATFORM_INTERFACE void Plat_SetCommandLine( const char *cmdLine );
 #endif
-PLATFORM_INTERFACE const char *Plat_GetCommandLineA();
+PLATFORM_INTERFACE [[nodiscard]] const char *Plat_GetCommandLineA();
 
 //-----------------------------------------------------------------------------
 // Security related functions
 //-----------------------------------------------------------------------------
 // Ensure that the hardware key's drivers have been installed.
-PLATFORM_INTERFACE bool Plat_VerifyHardwareKeyDriver();
+PLATFORM_INTERFACE [[nodiscard]] bool Plat_VerifyHardwareKeyDriver();
 
 // Ok, so this isn't a very secure way to verify the hardware key for now.  It
 // is primarially depending on the fact that all the binaries have been wrapped
 // with the secure wrapper provided by the hardware keys vendor.
-PLATFORM_INTERFACE bool Plat_VerifyHardwareKey();
+PLATFORM_INTERFACE [[nodiscard]] bool Plat_VerifyHardwareKey();
 
 // The same as above, but notifies user with a message box when the key isn't in
 // and gives him an opportunity to correct the situation.
-PLATFORM_INTERFACE bool Plat_VerifyHardwareKeyPrompt();
+PLATFORM_INTERFACE [[nodiscard]] bool Plat_VerifyHardwareKeyPrompt();
 
 // Can be called in real time, doesn't perform the verify every frame.  Mainly just
 // here to allow the game to drop out quickly when the key is removed, rather than
 // allowing the wrapper to pop up it's own blocking dialog, which the engine doesn't
 // like much.
-PLATFORM_INTERFACE bool Plat_FastVerifyHardwareKey();
+PLATFORM_INTERFACE [[nodiscard]] bool Plat_FastVerifyHardwareKey();
 
 //-----------------------------------------------------------------------------
 // Just logs file and line to simple.log
@@ -1404,15 +1402,15 @@ PLATFORM_INTERFACE void* Plat_SimpleLog( const tchar* file, int line );
 // Returns true if debugger attached, false otherwise
 //-----------------------------------------------------------------------------
 #if defined(_WIN32) || defined(LINUX) || defined(OSX)
-PLATFORM_INTERFACE bool Plat_IsInDebugSession();
+PLATFORM_INTERFACE [[nodiscard]] bool Plat_IsInDebugSession();
 PLATFORM_INTERFACE void Plat_DebugString( const char * );
 #else
-inline bool Plat_IsInDebugSession( bool bForceRecheck = false ) { return false; }
+[[nodiscard]] inline bool Plat_IsInDebugSession( bool bForceRecheck = false ) { return false; }
 #define Plat_DebugString(s) ((void)0)
 #endif
 
 // dimhotepus: Check user is admin or priviledged one.
-PLATFORM_INTERFACE bool Plat_IsUserAnAdmin();
+PLATFORM_INTERFACE [[nodiscard]] bool Plat_IsUserAnAdmin();
 
 #ifdef _WIN32
 enum class SystemBackdropType
@@ -1432,7 +1430,7 @@ PLATFORM_INTERFACE bool Plat_ApplySystemTitleBarTheme( void *window, SystemBackd
 //-----------------------------------------------------------------------------
 // Returns true if running on a 64 bit (windows) OS
 //-----------------------------------------------------------------------------
-PLATFORM_INTERFACE bool Is64BitOS();
+PLATFORM_INTERFACE [[nodiscard]] bool Is64BitOS();
 
 
 //-----------------------------------------------------------------------------
@@ -1469,7 +1467,7 @@ PLATFORM_INTERFACE bool Is64BitOS();
 #define WM_XMP_PLAYBACKBEHAVIORCHANGED		(WM_USER + 122)
 #define WM_XMP_PLAYBACKCONTROLLERCHANGED	(WM_USER + 123)
 
-inline const char *GetPlatformExt( )
+[[nodiscard]] constexpr const char *GetPlatformExt()
 {
 	return IsX360() ? ".360" : "";
 }
@@ -1662,13 +1660,13 @@ private:
 
 //--------------------------------------------------------------------------------------------------
 template <typename LambdaType>
-CScopeGuardLambdaImpl< LambdaType > MakeScopeGuardLambda( LambdaType&& lambda )
+[[nodiscard]] CScopeGuardLambdaImpl< LambdaType > MakeScopeGuardLambda( LambdaType &&lambda )
 {
 	return CScopeGuardLambdaImpl< LambdaType >( std::move( lambda ) );
 }
 
 template <typename LambdaType>
-CScopeGuardLambdaImplOpt< LambdaType > MakeScopeGuardLambdaOpt( bool do_invoke, LambdaType&& lambda )
+[[nodiscard]] CScopeGuardLambdaImplOpt< LambdaType > MakeScopeGuardLambdaOpt( bool do_invoke, LambdaType &&lambda )
 {
 	return CScopeGuardLambdaImplOpt< LambdaType >( do_invoke, std::move( lambda ) );
 }
@@ -1766,7 +1764,7 @@ CScopeGuardLambdaImplOpt< LambdaType > MakeScopeGuardLambdaOpt( bool do_invoke, 
 	};
 */
 
-PLATFORM_INTERFACE bool vtune( bool resume );
+PLATFORM_INTERFACE [[nodiscard]] bool vtune( bool resume );
 
 
 #define TEMPLATE_FUNCTION_TABLE(RETURN_TYPE, NAME, ARGS, COUNT)			\
@@ -1824,7 +1822,7 @@ RETURN_TYPE FASTCALL __Function_##NAME<nArgument>::Run ARGS
 // thread, if desired.
 PLATFORM_INTERFACE void Plat_BeginWatchdogTimer( int nSecs );
 PLATFORM_INTERFACE void Plat_EndWatchdogTimer();
-PLATFORM_INTERFACE int Plat_GetWatchdogTime();
+PLATFORM_INTERFACE [[nodiscard]] int Plat_GetWatchdogTime();
 
 using Plat_WatchDogHandlerFunction_t = void (*)();
 PLATFORM_INTERFACE void Plat_SetWatchdogHandlerFunction( Plat_WatchDogHandlerFunction_t function );
@@ -1835,7 +1833,7 @@ PLATFORM_INTERFACE void Plat_SetWatchdogHandlerFunction( Plat_WatchDogHandlerFun
 #include "valve_on.h"
 
 #if defined(TIER0_DLL_EXPORT)
-extern "C" int V_tier0_stricmp(IN_Z const char *s1, IN_Z const char *s2 );
+extern "C" [[nodiscard]] int V_tier0_stricmp( IN_Z const char *s1, IN_Z const char *s2 );
 #undef stricmp
 #undef strcmpi
 #define stricmp(s1,s2) V_tier0_stricmp( s1, s2 )
