@@ -24,7 +24,10 @@ $Configuration
 	{
 		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\out\build;.\;$SRCDIR\engine"
 		$AdditionalIncludeDirectories		"$BASE;$SDL3SRCDIR;$SDL3SRCDIR\include" [$SDL]
-		$PreprocessorDefinitions		"$BASE;DEDICATED;LAUNCHERONLY;SUPPORT_PACKED_STORE"
+		$PreprocessorDefinitions			"$BASE;DEDICATED;LAUNCHERONLY;SUPPORT_PACKED_STORE"
+
+		// dimhotepus: Need this as referenced cryptopp uses exception handlers.
+		$EnableC++Exceptions				"Yes (/EHsc)"	[$WINDOWS]
 	}
 
 	$Linker
