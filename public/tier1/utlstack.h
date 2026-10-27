@@ -328,6 +328,11 @@ template< class T, class M >
 void CUtlStack<T,M>::Pop()
 {
 	Assert( m_Size > 0 );
+
+	// dimhotepus: Also guard release builds, where Assert may be disabled.
+	if ( m_Size <= 0 )
+		return;
+
 	Destruct( std::addressof( Element(m_Size-1) ) );
 	--m_Size;
 }
@@ -336,6 +341,11 @@ template< class T, class M >
 void CUtlStack<T,M>::Pop( T& oldTop )
 {
 	Assert( m_Size > 0 );
+
+	// dimhotepus: Also guard release builds.
+	if ( m_Size <= 0 )
+		return;
+
 	oldTop = Top();
 	Pop();
 }
@@ -343,7 +353,11 @@ void CUtlStack<T,M>::Pop( T& oldTop )
 template< class T, class M >
 void CUtlStack<T,M>::PopMultiple( intp num )
 {
-	Assert( m_Size >= num );
+	// dimhotepus: Reject negative counts as well as counts larger than the stack.
+	Assert( num >= 0 && num <= m_Size );
+	if ( num < 0 || num > m_Size )
+		return;
+
 	for ( intp i = 0; i < num; ++i )
 		Destruct( std::addressof( Element( m_Size - i - 1 ) ) );
 
