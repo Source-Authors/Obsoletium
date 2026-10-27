@@ -5358,7 +5358,8 @@ bool CFileHandle::EndOfFile()
 {
 	Assert( IsValid() );
 
-	return ( Tell() >= Size() );
+	// dimhotepus: Ok to use unsigned as Tell can return -1 which is converted to UINT_MAX.
+	return ( static_cast<unsigned>( Tell() ) >= Size() );
 }
 
 //-----------------------------------------------------------------------------
