@@ -165,7 +165,7 @@ inline bool CUtlQueue< T, M >::RemoveAtHead( T &removedElement )
 	Assert( m_head != QUEUE_ITERATOR_INVALID );
 	if ( m_head == QUEUE_ITERATOR_INVALID )
 	{
-		Construct( &removedElement );
+		// dimhotepus: Leave the caller's existing object unchanged.
 		return false;
 	}
 
@@ -209,7 +209,7 @@ inline bool CUtlQueue< T, M >::RemoveAtTail( T &removedElement )
 	Assert( m_tail != QUEUE_ITERATOR_INVALID );
 	if ( m_tail == QUEUE_ITERATOR_INVALID )
 	{
-		Construct( &removedElement );
+		// dimhotepus: Leave the caller's existing object unchanged.
 		return false;
 	}
 
