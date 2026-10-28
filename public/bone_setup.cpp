@@ -5608,7 +5608,11 @@ static bool Studio_AnimVelocity( const mstudioanimdesc_t *panim, float flCycle, 
 	float	prevframe = 0;
 
 	float	flFrame = flCycle * (panim->numframes - 1);
-	flFrame = flFrame - (int)(flFrame / (panim->numframes - 1));
+	if ( panim->numframes != 1 )
+	{
+		// dimhotepus: Normalize frame only if not 1 frames total (zero division).
+		flFrame = flFrame - (int)(flFrame / (panim->numframes - 1));
+	}
 
 	for (int i = 0; i < panim->nummovements; i++)
 	{
