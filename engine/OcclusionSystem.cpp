@@ -2368,25 +2368,41 @@ void COcclusionSystem::AddPolygonToEdgeList( CEdgeList &edgeList, Vector **ppPol
 
 	nClipCount1 = ClipPolygonToAxisAlignedPlane( ppClipVertex, nClipCount, aaPlane, ppClipVertex1 );
 	if ( nClipCount1 < 3 )
+	{
+		// dimhotepus: Ensure empty screen area as we later sort by it and nan causes issues.
+		edgeList.SetSurfaceArea( nSurfID, 0.0f );
 		return;
+	}
 	Assert( nClipCount1 < nMaxClipVerts );
 
 	aaPlane.m_flSign = 1;
 	nClipCount = ClipPolygonToAxisAlignedPlane( ppClipVertex1, nClipCount1, aaPlane, ppClipVertex );
 	if ( nClipCount < 3 )
+	{
+		// dimhotepus: Ensure empty screen area as we later sort by it and nan causes issues.
+		edgeList.SetSurfaceArea( nSurfID, 0.0f );
 		return;
+	}
 	Assert( nClipCount < nMaxClipVerts );
 
 	aaPlane.m_nAxis = 1;
 	nClipCount1 = ClipPolygonToAxisAlignedPlane( ppClipVertex, nClipCount, aaPlane, ppClipVertex1 );
 	if ( nClipCount1 < 3 )
+	{
+		// dimhotepus: Ensure empty screen area as we later sort by it and nan causes issues.
+		edgeList.SetSurfaceArea( nSurfID, 0.0f );
 		return;
+	}
 	Assert( nClipCount1 < nMaxClipVerts );
 
 	aaPlane.m_flSign = -1;
 	nClipCount = ClipPolygonToAxisAlignedPlane( ppClipVertex1, nClipCount1, aaPlane, ppClipVertex );
 	if ( nClipCount < 3 )
+	{
+		// dimhotepus: Ensure empty screen area as we later sort by it and nan causes issues.
+		edgeList.SetSurfaceArea( nSurfID, 0.0f );
 		return;
+	}
 	Assert( nClipCount < nMaxClipVerts );
 
 	// Compute the screen area...
