@@ -13,9 +13,9 @@
 #pragma once
 #endif
 
-#include <soundflags.h>
+#include "soundflags.h"
 #include "mathlib/vector.h"
-#include <shareddefs.h>
+#include "shareddefs.h"
 
 #include "shake.h"
 #include "qlimits.h"
@@ -24,8 +24,6 @@
 #include "materialsystem/MaterialSystemUtil.h"
 #include "inputsystem/InputEnums.h"
 
-class Vector;
-class QAngle;
 class IMaterial;
 class ITexture;
 class IClientEntity;
