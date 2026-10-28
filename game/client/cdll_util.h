@@ -46,9 +46,9 @@ namespace vgui
 extern bool g_MakingDevShots;
 
 // ScreenHeight returns the height of the screen, in pixels
-int		ScreenHeight( void );
+[[nodiscard]] int ScreenHeight( void );
 // ScreenWidth returns the width of the screen, in pixels
-int		ScreenWidth( void );
+[[nodiscard]] int ScreenWidth( void );
 
 [[nodiscard]] inline float XRES(float x) {
 	return x * ScreenWidth() / BASE_WIDTH;
@@ -59,7 +59,7 @@ int		ScreenWidth( void );
 
 int		UTIL_ComputeStringWidth( vgui::HFont& font, const char *str );
 int		UTIL_ComputeStringWidth( vgui::HFont& font, const wchar_t *str );
-float	UTIL_AngleDiff( float destAngle, float srcAngle );
+[[nodiscard]] float UTIL_AngleDiff( float destAngle, float srcAngle );
 void	UTIL_Bubbles( const Vector& mins, const Vector& maxs, int count );
 void	UTIL_Smoke( const Vector &origin, const float scale, const float framerate );
 void	UTIL_ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpactName = NULL );
@@ -67,7 +67,7 @@ int		UTIL_PrecacheDecal( const char *name, bool preload = false );
 void	UTIL_EmitAmbientSound( C_BaseEntity *entity, const Vector &vecOrigin, const char *samp, float vol, soundlevel_t soundlevel, int fFlags, int pitch );
 void	UTIL_SetOrigin( C_BaseEntity *entity, const Vector &vecOrigin );
 void	UTIL_ScreenShake( const Vector &center, float amplitude, float frequency, float duration, float radius, ShakeCommand_t eCommand, bool bAirShake=false );
-byte	*UTIL_LoadFileForMe( const char *filename, int *pLength );
+[[nodiscard]] byte *UTIL_LoadFileForMe( const char *filename, int *pLength );
 void	UTIL_FreeFile( byte *buffer );
 void	UTIL_MakeSafeName( const char *oldName, OUT_Z_CAP(newNameBufSize) char *newName, intp newNameBufSize );	///< Cleans up player names for putting in vgui controls (cleaned names can be up to original*2+1 in length)
 
@@ -77,7 +77,7 @@ void	UTIL_MakeSafeName( const char *oldName, OUT_Z_ARRAY char (&newName)[newSize
 	UTIL_MakeSafeName( oldName, newName, newSize );
 }
 
-const char *UTIL_SafeName( const char *oldName );	///< Wraps UTIL_MakeSafeName, and returns a static buffer
+[[nodiscard]] const char *UTIL_SafeName( const char *oldName ); ///< Wraps UTIL_MakeSafeName, and returns a static buffer
 void	UTIL_ReplaceKeyBindings( const wchar_t *inbuf, intp inbufsizebytes, OUT_Z_BYTECAP(outbufsizebytes) wchar_t *outbuf, int outbufsizebytes, GameActionSet_t action_set = GAME_ACTION_SET_NONE );
 
 template<intp outSize>
@@ -90,21 +90,21 @@ void	UTIL_ReplaceKeyBindings( const wchar_t *inbuf, intp inbufsizebytes, OUT_Z_A
 // Fade out an entity based on distance fades
 unsigned char UTIL_ComputeEntityFade( C_BaseEntity *pEntity, float flMinDist, float flMaxDist, float flFadeScale );
 
-client_textmessage_t	*TextMessageGet( const char *pName );
+[[nodiscard]] client_textmessage_t *TextMessageGet( const char *pName );
 
-char	*VarArgs( PRINTF_FORMAT_STRING const char *format, ... );
+[[nodiscard]] char *VarArgs( PRINTF_FORMAT_STRING const char *format, ... );
 	
 
 // Get the entity the local player is spectating (can be a player or a ragdoll entity).
-int		GetSpectatorTarget();
-int		GetSpectatorMode( void );
-bool	IsPlayerIndex( int index );
+[[nodiscard]] int  GetSpectatorTarget();
+[[nodiscard]] int  GetSpectatorMode( void );
+[[nodiscard]] bool IsPlayerIndex( int index );
 void	UpdateLocalPlayerVisionFlags();
-int		GetLocalPlayerIndex( void );
-int		GetLocalPlayerVisionFilterFlags( bool bWeaponsCheck = false );
-bool	IsLocalPlayerUsingVisionFilterFlags( int nFlags, bool bWeaponsCheck = false );
-int		GetLocalPlayerTeam( void );
-bool	IsLocalPlayerSpectator( void );
+[[nodiscard]] int  GetLocalPlayerIndex( void );
+[[nodiscard]] int  GetLocalPlayerVisionFilterFlags( bool bWeaponsCheck = false );
+[[nodiscard]] bool IsLocalPlayerUsingVisionFilterFlags( int nFlags, bool bWeaponsCheck = false );
+[[nodiscard]] int  GetLocalPlayerTeam( void );
+[[nodiscard]] bool IsLocalPlayerSpectator( void );
 void	NormalizeAngles( QAngle& angles );
 void	InterpolateAngles( const QAngle& start, const QAngle& end, QAngle& output, float frac );
 void	InterpolateVector( float frac, const Vector& src, const Vector& dest, Vector& output );
@@ -156,7 +156,7 @@ private:
 	C_BaseEntity *m_pList[MAX_SPHERE_QUERY];
 };
 
-C_BaseEntity *CreateEntityByName( const char *className );
+[[nodiscard]] C_BaseEntity *CreateEntityByName( const char *className );
 // creates an entity by name, and ensure it's correctness
 // does not spawn the entity
 // use the CREATE_ENTITY() macro which wraps this, instead of using it directly
@@ -177,7 +177,7 @@ T *_CreateEntity( T *newClass, const char *className )
 #define CREATE_UNSAVED_ENTITY( newClass, className ) _CreateEntityTemplate( (newClass*)NULL, className )
 
 // Misc useful
-inline bool FStrEq(const char *sz1, const char *sz2)
+[[nodiscard]] inline bool FStrEq(const char *sz1, const char *sz2)
 {
 	return sz1 == sz2 || V_strieq(sz1, sz2);
 }
@@ -191,9 +191,9 @@ void UTIL_IncrementMapKey( const char *pszCustomKey );
 
 // Gets the value of the passed key for the current map, eg "viewed" for number of times the player has viewed
 // the intro movie for this map
-int UTIL_GetMapKeyCount( const char *pszCustomKey );
+[[nodiscard]] int UTIL_GetMapKeyCount( const char *pszCustomKey );
 
 // Returns true if the user has loaded any maps, false otherwise.
-bool UTIL_HasLoadedAnyMap();
+[[nodiscard]] bool UTIL_HasLoadedAnyMap();
 
 #endif // !UTIL_H
