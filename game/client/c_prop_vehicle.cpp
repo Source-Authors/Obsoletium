@@ -287,12 +287,11 @@ void C_PropVehicleDriveable::DrawHudElements( )
 #endif
 			}
 
-
 			x -= pIcon->Width() / 2; 
 			y -= pIcon->Height() / 2; 
 			
 			Color	clr = ( m_bUnableToFire ) ? gHUD.m_clrCaution : gHUD.m_clrNormal;
-			pIcon->DrawSelf( x, y, clr );
+			pIcon->DrawSelf( static_cast<int>( x ), static_cast<int>( y ), clr );
 		}
 
 		if ( m_nScannerDisabledWeapons )
