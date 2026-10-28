@@ -710,8 +710,8 @@ void CMapReslistGenerator::OnResourcePrecachedFullPath(const char *fullPathFileN
 	if (strstr(fixed, ".mdl"))
 	{
 		// it's a model, get it's other files as well
-		char file[MAX_PATH];
-		Q_strncpy(file, fixed, sizeof(file) - 10);
+		char file[MAX_PATH + 10];
+		V_strcpy_safe(file, fixed);
 		char *ext = strstr(file, ".mdl");
 
 		Q_strncpy(ext, ".vvd", 10);
@@ -935,8 +935,8 @@ void CMapReslistGenerator::TrackDeletions( const char *fullPathFileName )
 	if (strstr(test, ".mdl"))
 	{
 		// it's a model, get it's other files as well
-		char file[MAX_PATH];
-		Q_strncpy(file, test, sizeof(file) - 10);
+		char file[MAX_PATH + 10];
+		V_strcpy_safe(file, test);
 		char *ext = strstr(file, ".mdl");
 
 		Q_strncpy(ext, ".vvd", 10);
