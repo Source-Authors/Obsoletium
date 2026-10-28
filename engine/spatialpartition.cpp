@@ -846,7 +846,8 @@ private:
 class CIntersectRay : public CPartitionVisitor
 {
 public:
-	CIntersectRay( CVoxelTree *pPartition, const Ray_t &ray, const Vector &vecInvDelta ) : CPartitionVisitor( pPartition ), m_Ray( ray ), m_vecInvDelta( vecInvDelta )
+	// dimhotepus: Drop invDelta, we compute it inside.
+	CIntersectRay( CVoxelTree *pPartition, const Ray_t &ray ) : CPartitionVisitor( pPartition ), m_Ray( ray )
 	{
 	}
 
@@ -858,19 +859,20 @@ public:
 		Assert( vecMins.z <= vecMaxs.z );
 
 		// Does the ray intersect the box?
-		return IsBoxIntersectingRay( vecMins, vecMaxs, m_Ray.m_Start, m_Ray.m_Delta, m_vecInvDelta );
+		// dimhotepus: Drop invDelta, we compute it inside.
+		return IsBoxIntersectingRay( vecMins, vecMaxs, m_Ray.m_Start, m_Ray.m_Delta );
 	}
 	 
 private:
 	const Ray_t &m_Ray;
-	const Vector &m_vecInvDelta;
 };
 
 
 class CIntersectSweptBox : public CPartitionVisitor
 {
 public:
-	CIntersectSweptBox( CVoxelTree *pPartition, const Ray_t &ray, const Vector &vecInvDelta ) : CPartitionVisitor( pPartition ), m_Ray( ray ), m_vecInvDelta( vecInvDelta )
+	// dimhotepus: Drop invDelta, we compute it inside.
+	CIntersectSweptBox( CVoxelTree *pPartition, const Ray_t &ray ) : CPartitionVisitor( pPartition ), m_Ray( ray )
 	{
 	}
 
@@ -886,12 +888,12 @@ public:
 		VectorAdd( vecMaxs, m_Ray.m_Extents, vecTestMax );
 
 		// Does the ray intersect the box?
-		return IsBoxIntersectingRay( vecTestMin, vecTestMax, m_Ray.m_Start, m_Ray.m_Delta, m_vecInvDelta );
+		// dimhotepus: Drop invDelta, we compute it inside.
+		return IsBoxIntersectingRay( vecTestMin, vecTestMax, m_Ray.m_Start, m_Ray.m_Delta );
 	}
 	 
 private:
 	const Ray_t &m_Ray;
-	const Vector &m_vecInvDelta;
 };
 
 
@@ -1059,7 +1061,8 @@ bool CVoxelHash::EnumerateElementsAlongRay_Ray( SpatialPartitionListMask_t listM
 	Voxel_t voxelEnd = VoxelIndexFromPoint( vecEnd );
 
 	bool bSingleVoxel = ( voxelStart.uiVoxel == voxelEnd.uiVoxel );
-	CIntersectRay intersectRay( m_pTree, ray, vecInvDelta );
+	// dimhotepus: Drop invDelta, we compute it inside.
+	CIntersectRay intersectRay( m_pTree, ray );
 
 	// Optimization: Look for single voxel rays
 	if ( bSingleVoxel )
@@ -1200,7 +1203,8 @@ bool CVoxelHash::EnumerateElementsAlongRay_ExtrudedRay( SpatialPartitionListMask
 	VoxelIndexFromPoint( vecMin, voxelMin );
 	VoxelIndexFromPoint( vecMax, voxelMax );
 
-	CIntersectSweptBox intersectSweptBox( m_pTree, ray, vecInvDelta );
+	// dimhotepus: Drop invDelta, we compute it inside.
+	CIntersectSweptBox intersectSweptBox( m_pTree, ray );
 
 	// Iterate over all voxels that intersect the box around the starting ray point
 	Voxel_t voxel;
@@ -1980,7 +1984,8 @@ bool CVoxelTree::EnumerateElementsAlongRay_Ray( SpatialPartitionListMask_t listM
 	Voxel_t voxelEnd = m_pVoxelHash[0].VoxelIndexFromPoint( vecEnd );
 
 	bool bSingleVoxel = ( voxelStart.uiVoxel == voxelEnd.uiVoxel );
-	CIntersectRay intersectRay( this, ray, vecInvDelta );
+	// dimhotepus: Drop invDelta, we compute it inside.
+	CIntersectRay intersectRay( this, ray );
 
 	// Optimization: Look for single voxel rays
 	if ( bSingleVoxel )
@@ -2134,7 +2139,8 @@ bool CVoxelTree::EnumerateElementsAlongRay_ExtrudedRay( SpatialPartitionListMask
 	m_pVoxelHash[0].VoxelIndexFromPoint( vecMin, voxelBounds[0][0] );
 	m_pVoxelHash[0].VoxelIndexFromPoint( vecMax, voxelBounds[0][1] );
 
-	CIntersectSweptBox intersectSweptBox( this, ray, vecInvDelta );
+	// dimhotepus: Drop invDelta, we compute it inside.
+	CIntersectSweptBox intersectSweptBox( this, ray );
 
 	// Iterate over all voxels that intersect the box around the starting ray point
 	for ( int i = 0; i < m_nLevelCount; ++i )

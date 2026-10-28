@@ -254,11 +254,31 @@ bool FASTCALL IsBoxIntersectingRay( const Vector& boxMin, const Vector& boxMax,
 bool FASTCALL IsBoxIntersectingRay( const Vector& boxMin, const Vector& boxMax, 
 									const Ray_t& ray, float flTolerance = 0.0f );
 
+[[deprecated( "Has issues with zeros in delta, so inv delta has infinity. Use version without invDelta." )]]
 bool FASTCALL IsBoxIntersectingRay( const Vector& boxMin, const Vector& boxMax, 
 									const Vector& origin, const Vector& delta,
 									const Vector& invDelta, float flTolerance = 0.0f );
 
+//-----------------------------------------------------------------------------
+// Ray (segment) vs. axis-aligned box test
+//
+// The ray is the segment  P(t) = origin + t * delta,  t in [0, 1].
+//
+// Robust against zero / near-zero delta components:
+//   - never divides by zero (safe with FP exceptions unmasked)
+//   - never produces 0 * inf = NaN (origin exactly on a slab plane)
+//   - tolerance is applied consistently on every axis, including parallel ones
+//
+// The reciprocal of delta is computed internally, so callers no longer pass it.
+//
+// dimhotepus: Has no issues with 0 in delta.
+bool XM_CALLCONV IsBoxIntersectingRayV2( DirectX::FXMVECTOR inBoxMin, DirectX::FXMVECTOR inBoxMax,
+									DirectX::FXMVECTOR origin, DirectX::GXMVECTOR delta,      // ray parameters
+									DirectX::HXMVECTOR vTolerance  ///< eg from ReplicateX4(flTolerance)
+									);
 
+// dimhotepus: Deprecate as has issues with zero in delta.
+[[deprecated("Has issues with zeros in delta, so inv delta has infinity. Use IsBoxIntersectingRayV2.")]]
 bool XM_CALLCONV IsBoxIntersectingRay( DirectX::FXMVECTOR boxMin, DirectX::FXMVECTOR boxMax, 
 								   DirectX::FXMVECTOR origin, DirectX::GXMVECTOR delta, DirectX::HXMVECTOR invDelta, // ray parameters
 								   DirectX::HXMVECTOR vTolerance = Four_Zeros ///< eg from ReplicateX4(flTolerance)
@@ -267,7 +287,7 @@ bool XM_CALLCONV IsBoxIntersectingRay( DirectX::FXMVECTOR boxMin, DirectX::FXMVE
 bool inline XM_CALLCONV IsBoxIntersectingRay( DirectX::FXMVECTOR boxMin, DirectX::FXMVECTOR boxMax, 
 								   DirectX::FXMVECTOR origin, DirectX::GXMVECTOR delta, float flTolerance = 0.0f )
 {
-	return IsBoxIntersectingRay( boxMin, boxMax, origin, delta, ReciprocalSIMD(delta), ReplicateX4(flTolerance) );
+	return IsBoxIntersectingRayV2( boxMin, boxMax, origin, delta, ReplicateX4( flTolerance ) );
 }
 
 

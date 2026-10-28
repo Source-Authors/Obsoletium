@@ -1108,7 +1108,7 @@ void FASTCALL CM_ClipBoxToBrush( TraceInfo_t * RESTRICT pTraceInfo, const cbrush
 		cplane_t *plane = side->plane;
 		const Vector &planeNormal = plane->normal;
 
-		if (!IS_POINT)
+		if constexpr (!IS_POINT)
 		{	
 			// general box case
 			// push the plane out apropriately for mins/maxs
@@ -1178,16 +1178,19 @@ void FASTCALL CM_ClipBoxToBrush( TraceInfo_t * RESTRICT pTraceInfo, const cbrush
 	// NOTE: We only do this test against points because fractionleftsolid is
 	// not possible to compute for brush sweeps without a *lot* more computation
 	// So, client code will never get fractionleftsolid for box sweeps
-	if (IS_POINT && startout)
-	{ 
-		// Add a little sludge.  The sludge should already be in the fractionleftsolid
-		// (for all intents and purposes is a leavefrac value) and enterfrac values.  
-		// Both of these values have +/- DIST_EPSILON values calculated in.  Thus, I 
-		// think the test should be against "0.0."  If we experience new "left solid"
-		// problems you may want to take a closer look here!
-//		if ((trace->fractionleftsolid - enterfrac) > -1e-6)
-		if ((trace->fractionleftsolid - enterfrac) > 0.0f )
-			startout = false;
+	if constexpr (IS_POINT)
+	{
+		if (startout)
+		{
+			// Add a little sludge.  The sludge should already be in the fractionleftsolid
+			// (for all intents and purposes is a leavefrac value) and enterfrac values.
+			// Both of these values have +/- DIST_EPSILON values calculated in.  Thus, I
+			// think the test should be against "0.0."  If we experience new "left solid"
+			// problems you may want to take a closer look here!
+			//		if ((trace->fractionleftsolid - enterfrac) > -1e-6)
+			if ((trace->fractionleftsolid - enterfrac) > 0.0f )
+				startout = false;
+		}
 	}
 
 	if (!startout)
@@ -1443,7 +1446,7 @@ void FASTCALL CM_TraceToLeaf( TraceInfo_t * RESTRICT pTraceInfo, int ndxLeaf, fl
 			static const fltx4 vecEpsilon = {DISPCOLL_DIST_EPSILON,DISPCOLL_DIST_EPSILON,DISPCOLL_DIST_EPSILON,DISPCOLL_DIST_EPSILON};
 			// only used in !IS_POINT version:
 			fltx4 extents;
-			if (!IS_POINT)
+			if constexpr (!IS_POINT)
 			{
 				extents = DirectX::XMLoadFloat3(pTraceInfo->m_extents.XmBase());
 			}
@@ -1468,19 +1471,19 @@ void FASTCALL CM_TraceToLeaf( TraceInfo_t * RESTRICT pTraceInfo, int ndxLeaf, fl
 						continue;
 				}
 
-				if ( IS_POINT )
+				if constexpr ( IS_POINT )
 				{
-					if (!IsBoxIntersectingRay( DirectX::XMLoadFloat4A(pDispBounds->mins.XmBase()),
+					if (!IsBoxIntersectingRayV2( DirectX::XMLoadFloat4A(pDispBounds->mins.XmBase()),
 											   DirectX::XMLoadFloat4A(pDispBounds->maxs.XmBase()), 
-											   traceStart, traceDelta, traceInvDelta, vecEpsilon ))
+											   traceStart, traceDelta, vecEpsilon ))
 						continue;
 				}
 				else
 				{
 					fltx4 mins = SubSIMD(DirectX::XMLoadFloat4A(pDispBounds->mins.XmBase()),extents);
 					fltx4 maxs = AddSIMD(DirectX::XMLoadFloat4A(pDispBounds->maxs.XmBase()),extents);
-					if (!IsBoxIntersectingRay( mins, maxs, 
-											   traceStart, traceDelta, traceInvDelta, vecEpsilon ))
+					if (!IsBoxIntersectingRayV2( mins, maxs, 
+											   traceStart, traceDelta, vecEpsilon ))
 						continue;
 				}
 
@@ -1509,15 +1512,20 @@ void FASTCALL CM_TraceToLeaf( TraceInfo_t * RESTRICT pTraceInfo, int ndxLeaf, fl
 						continue;
 				}
 		
-				if ( IS_POINT && !IsBoxIntersectingRay( pDispBounds->mins, pDispBounds->maxs, pTraceInfo->m_start, pTraceInfo->m_delta, pTraceInfo->m_invDelta, DISPCOLL_DIST_EPSILON ) )
+				if constexpr ( IS_POINT )
 				{
-					continue;
+					// dimhotepus: Ignore pTraceInfo->m_invDelta as it can be +Inf, so compute inside in a safe way.
+					if ( !IsBoxIntersectingRay( pDispBounds->mins, pDispBounds->maxs, pTraceInfo->m_start, pTraceInfo->m_delta, DISPCOLL_DIST_EPSILON ) )
+						continue;
 				}
-
-				if ( !IS_POINT && !IsBoxIntersectingRay( pDispBounds->mins - pTraceInfo->m_extents, pDispBounds->maxs + pTraceInfo->m_extents, 
-					pTraceInfo->m_start, pTraceInfo->m_delta, pTraceInfo->m_invDelta, DISPCOLL_DIST_EPSILON ) )
+				else
 				{
-					continue;
+					// dimhotepus: Ignore pTraceInfo->m_invDelta as it can be +Inf, so compute inside in a safe way.
+					if ( !IsBoxIntersectingRay( pDispBounds->mins - pTraceInfo->m_extents, pDispBounds->maxs + pTraceInfo->m_extents,
+					                            pTraceInfo->m_start, pTraceInfo->m_delta, DISPCOLL_DIST_EPSILON ) )
+					{
+						continue;
+					}
 				}
 				
 				CDispCollTree * RESTRICT pDispTree = &g_pDispCollTrees[dispIndex];
@@ -1822,7 +1830,7 @@ static void FASTCALL CM_RecursiveHullCheckImpl( TraceInfo_t *pTraceInfo, int num
 		{
 			t1 = DotProduct (plane->normal, p1) - dist;
 			t2 = DotProduct (plane->normal, p2) - dist;
-			if( IS_POINT )
+			if constexpr ( IS_POINT )
 			{
 				offset = 0;
 			}
@@ -2672,11 +2680,6 @@ bool FASTCALL IsBoxIntersectingRayNoLowest( fltx4 boxMin, fltx4  boxMax,
 	Assert( boxMin[1] <= boxMax[1] );
 	Assert( boxMin[2] <= boxMax[2] );
 	*/
-#if defined(_X360) && defined(DBGFLAG_ASSERT)
-	unsigned int r;
-	AssertMsg( (XMVectorGreaterOrEqualR(&r, SetWToZeroSIMD(boxMax),SetWToZeroSIMD(boxMin)), XMComparisonAllTrue(r)), "IsBoxIntersectingRay : boxmax < boxmin" );
-#endif
-
 	// test if delta is tiny along any dimension
 	fltx4 bvDeltaTinyComponents = CmpInBoundsSIMD( delta, Four_Epsilons );
 
@@ -2749,17 +2752,9 @@ bool FASTCALL IsBoxIntersectingRayNoLowest( fltx4 boxMin, fltx4  boxMax,
 	return ( IsAllZeros( SetWToZeroSIMD( failedComponents ) ) );
 }
 
-// function to time IsBoxIntersectingRay 
+// function to time IsBoxIntersectingRayV2
 #if 0
-/*
-//-----------------------------------------------------------------------------
-bool FASTCALL IsBoxIntersectingRay( fltx4 boxMin, fltx4 boxMax, 
-fltx4 origin, fltx4 delta, fltx4 invDelta, // ray parameters
-fltx4 vTolerance ///< eg from ReplicateX4(flTolerance)
-)
-{
-*/
-CON_COMMAND( opt_test_collision, "Quick timing test in IsBoxIntersectingRay" )
+CON_COMMAND( opt_test_collision, "Quick timing test in IsBoxIntersectingRayV2" )
 {
 	int numIters = 100000;
 	if (args.ArgC() >= 1)
@@ -2786,12 +2781,11 @@ CON_COMMAND( opt_test_collision, "Quick timing test in IsBoxIntersectingRay" )
 		fltx4 boxMax = {2,2,2,0};
 		fltx4 origin = {0,0,0,0};
 		fltx4 delta = {3,4,3,0};
-		fltx4 invdelta = {1.0f/3.0f, 1.0f/4.0f, 1.0f/3.0f,0};
 		fltx4 flTolerance = ReplicateX4(.0001f);
 
 		double startTime = Plat_FloatTime();
 		for (int i = numIters ; i > 0 ; --i)
-			IsBoxIntersectingRay(boxMin,boxMax,origin,delta,invdelta,flTolerance);
+			IsBoxIntersectingRayV2(boxMin,boxMax,origin,delta,flTolerance);
 		double endTime = Plat_FloatTime();
 		Msg("using FindLowest algorithm: %.4f secs for %d runs\n",endTime - startTime,numIters);
 	}

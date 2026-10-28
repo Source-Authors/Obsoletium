@@ -737,130 +737,22 @@ bool IsOBBIntersectingOBB( const Vector &vecOrigin1, const QAngle &vecAngles1, c
 	return (bFoundPlane == false);
 }
 
-// NOTE: This is only very slightly faster on high end PCs and x360
-#define USE_SIMD_RAY_CHECKS 1
 //-----------------------------------------------------------------------------
 // returns true if there's an intersection between box and ray
 //-----------------------------------------------------------------------------
 bool FASTCALL IsBoxIntersectingRay( const Vector& boxMin, const Vector& boxMax, 
 									const Vector& origin, const Vector& vecDelta, float flTolerance )
 {
-	
-#if USE_SIMD_RAY_CHECKS
+	// dimhotepus: Always use optimized version.
+
 	// Load the unaligned ray/box parameters into SIMD registers
-	fltx4 start = DirectX::XMLoadFloat3(origin.XmBase());
-	fltx4 delta = DirectX::XMLoadFloat3(vecDelta.XmBase());
-	fltx4 boxMins = DirectX::XMLoadFloat3(boxMin.XmBase());
-	fltx4 boxMaxs = DirectX::XMLoadFloat3(boxMax.XmBase());
-	fltx4 epsilon = ReplicateX4(flTolerance);
-	// compute the mins/maxs of the box expanded by the ray extents
-	// relocate the problem so that the ray start is at the origin.
-	fltx4 offsetMins = SubSIMD(boxMins, start);
-	fltx4 offsetMaxs = SubSIMD(boxMaxs, start);
-	fltx4 offsetMinsExpanded = SubSIMD(offsetMins, epsilon);
-	fltx4 offsetMaxsExpanded = AddSIMD(offsetMaxs, epsilon);
+	fltx4 boxMins = DirectX::XMLoadFloat3( boxMin.XmBase() );
+	fltx4 boxMaxs = DirectX::XMLoadFloat3( boxMax.XmBase() );
+	fltx4 start = DirectX::XMLoadFloat3( origin.XmBase() );
+	fltx4 delta = DirectX::XMLoadFloat3( vecDelta.XmBase() );
+	fltx4 epsilon = ReplicateX4( flTolerance );
 
-	// Check to see if both the origin (start point) and the end point (delta) are on the front side
-	// of any of the box sides - if so there can be no intersection
-	fltx4 startOutMins = CmpLtSIMD(Four_Zeros, offsetMinsExpanded);
-	fltx4 endOutMins = CmpLtSIMD(delta,offsetMinsExpanded);
-	fltx4 minsMask = AndSIMD( startOutMins, endOutMins );
-	fltx4 startOutMaxs = CmpGtSIMD(Four_Zeros, offsetMaxsExpanded);
-	fltx4 endOutMaxs = CmpGtSIMD(delta,offsetMaxsExpanded);
-	fltx4 maxsMask = AndSIMD( startOutMaxs, endOutMaxs );
-	if ( IsAnyNegative(SetWToZeroSIMD(OrSIMD(minsMask,maxsMask))))
-		return false;
-
-	// now build the per-axis interval of t for intersections
-	fltx4 invDelta = ReciprocalSaturateSIMD(delta);
-	fltx4 tmins = MulSIMD( offsetMinsExpanded, invDelta );
-	fltx4 tmaxs = MulSIMD( offsetMaxsExpanded, invDelta );
-	fltx4 crossPlane = OrSIMD(XorSIMD(startOutMins,endOutMins), XorSIMD(startOutMaxs,endOutMaxs));
-
-	// only consider axes where we crossed a plane
-	tmins = MaskedAssign( crossPlane, tmins, Four_Negative_FLT_MAX );
-	tmaxs = MaskedAssign( crossPlane, tmaxs, Four_FLT_MAX );
-
-	// now sort the interval per axis
-	fltx4 mint = MinSIMD( tmins, tmaxs );
-	fltx4 maxt = MaxSIMD( tmins, tmaxs );
-
-	// now find the intersection of the intervals on all axes
-	fltx4 firstOut = FindLowestSIMD3(maxt);
-	fltx4 lastIn = FindHighestSIMD3(mint);
-	// NOTE: This is really a scalar quantity now [t0,t1] == [lastIn,firstOut]
-	firstOut = MinSIMD(firstOut, Four_Ones);
-	lastIn = MaxSIMD(lastIn, Four_Zeros);
-
-	// If the final interval is valid lastIn<firstOut, check for separation
-	fltx4 separation = CmpGtSIMD(lastIn, firstOut);
-
-	return IsAllZeros(separation);
-#else
-	// On the x360, we force use of the SIMD functions.
-#if defined(_X360) 
-	if (IsX360())
-	{
-		fltx4 delta = DirectX::XMLoadFloat3(vecDelta.XmBase());
-		return IsBoxIntersectingRay( 
-			DirectX::XMLoadFloat3(boxMin.XmBase()), DirectX::XMLoadFloat3(boxMax.XmBase()),
-			DirectX::XMLoadFloat3(origin.XmBase()), delta, ReciprocalSIMD(delta), // ray parameters
-			ReplicateX4(flTolerance) ///< eg from ReplicateX4(flTolerance)
-			);
-	}
-#endif
-	Assert( boxMin[0] <= boxMax[0] );
-	Assert( boxMin[1] <= boxMax[1] );
-	Assert( boxMin[2] <= boxMax[2] );
-
-	// FIXME: Surely there's a faster way
-	float tmin = -FLT_MAX;
-	float tmax = FLT_MAX;
-
-	for (int i = 0; i < 3; ++i)
-	{
-		// Parallel case...
-		if (FloatMakePositive(vecDelta[i]) < 1e-8)
-		{
-			// Check that origin is in the box
-			// if not, then it doesn't intersect..
-			if ( (origin[i] < boxMin[i] - flTolerance) || (origin[i] > boxMax[i] + flTolerance) )
-				return false;
-
-			continue;
-		}
-
-		// non-parallel case
-		// Find the t's corresponding to the entry and exit of
-		// the ray along x, y, and z. The find the furthest entry
-		// point, and the closest exit point. Once that is done,
-		// we know we don't collide if the closest exit point
-		// is behind the starting location. We also don't collide if
-		// the closest exit point is in front of the furthest entry point
-
-		float invDelta = 1.0f / vecDelta[i];
-		float t1 = (boxMin[i] - flTolerance - origin[i]) * invDelta;
-		float t2 = (boxMax[i] + flTolerance - origin[i]) * invDelta;
-		if (t1 > t2)
-		{
-			float temp = t1;
-			t1 = t2;
-			t2 = temp;
-		}
-		if (t1 > tmin)
-			tmin = t1;
-		if (t2 < tmax)
-			tmax = t2;
-		if (tmin > tmax)
-			return false;
-		if (tmax < 0)
-			return false;
-		if (tmin > 1)
-			return false;
-	}
-
-	return true;
-#endif
+	return IsBoxIntersectingRayV2( boxMins, boxMaxs, start, delta, epsilon );
 }
 
 //-----------------------------------------------------------------------------
@@ -868,126 +760,19 @@ bool FASTCALL IsBoxIntersectingRay( const Vector& boxMin, const Vector& boxMax,
 //-----------------------------------------------------------------------------
 bool FASTCALL IsBoxIntersectingRay( const Vector& boxMin, const Vector& boxMax, 
 									const Vector& origin, const Vector& vecDelta,
-									const Vector& vecInvDelta, float flTolerance )
+									const Vector& , float flTolerance )
 {	
-#if USE_SIMD_RAY_CHECKS
+	// dimhotepus: Always use optimized version.
+
 	// Load the unaligned ray/box parameters into SIMD registers
-	fltx4 start = DirectX::XMLoadFloat3(origin.XmBase());
-	fltx4 delta = DirectX::XMLoadFloat3(vecDelta.XmBase());
 	fltx4 boxMins = DirectX::XMLoadFloat3( boxMin.XmBase() );
 	fltx4 boxMaxs = DirectX::XMLoadFloat3( boxMax.XmBase() );
-	// compute the mins/maxs of the box expanded by the ray extents
-	// relocate the problem so that the ray start is at the origin.
-	boxMins = SubSIMD(boxMins, start);
-	boxMaxs = SubSIMD(boxMaxs, start);
+	fltx4 start = DirectX::XMLoadFloat3( origin.XmBase() );
+	fltx4 delta = DirectX::XMLoadFloat3( vecDelta.XmBase() );
+	fltx4 epsilon = ReplicateX4( flTolerance );
 
-	// Check to see if both the origin (start point) and the end point (delta) are on the front side
-	// of any of the box sides - if so there can be no intersection
-	fltx4 startOutMins = CmpLtSIMD(Four_Zeros, boxMins);
-	fltx4 endOutMins = CmpLtSIMD(delta,boxMins);
-	fltx4 minsMask = AndSIMD( startOutMins, endOutMins );
-	fltx4 startOutMaxs = CmpGtSIMD(Four_Zeros, boxMaxs);
-	fltx4 endOutMaxs = CmpGtSIMD(delta,boxMaxs);
-	fltx4 maxsMask = AndSIMD( startOutMaxs, endOutMaxs );
-	if ( IsAnyNegative(SetWToZeroSIMD(OrSIMD(minsMask,maxsMask))))
-		return false;
-
-	// now build the per-axis interval of t for intersections
-	fltx4 epsilon = ReplicateX4(flTolerance);
-	fltx4 invDelta = DirectX::XMLoadFloat3(vecInvDelta.XmBase());
-	boxMins = SubSIMD(boxMins, epsilon);
-	boxMaxs = AddSIMD(boxMaxs, epsilon);
-
-	boxMins = MulSIMD( boxMins, invDelta );
-	boxMaxs = MulSIMD( boxMaxs, invDelta );
-
-	fltx4 crossPlane = OrSIMD(XorSIMD(startOutMins,endOutMins), XorSIMD(startOutMaxs,endOutMaxs));
-	// only consider axes where we crossed a plane
-	boxMins = MaskedAssign( crossPlane, boxMins, Four_Negative_FLT_MAX );
-	boxMaxs = MaskedAssign( crossPlane, boxMaxs, Four_FLT_MAX );
-
-	// now sort the interval per axis
-	fltx4 mint = MinSIMD( boxMins, boxMaxs );
-	fltx4 maxt = MaxSIMD( boxMins, boxMaxs );
-
-	// now find the intersection of the intervals on all axes
-	fltx4 firstOut = FindLowestSIMD3(maxt);
-	fltx4 lastIn = FindHighestSIMD3(mint);
-	// NOTE: This is really a scalar quantity now [t0,t1] == [lastIn,firstOut]
-	firstOut = MinSIMD(firstOut, Four_Ones);
-	lastIn = MaxSIMD(lastIn, Four_Zeros);
-
-	// If the final interval is valid lastIn<firstOut, check for separation
-	fltx4 separation = CmpGtSIMD(lastIn, firstOut);
-
-	return IsAllZeros(separation);
-#else
-	// On the x360, we force use of the SIMD functions.
-#if defined(_X360) && !defined(PARANOID_SIMD_ASSERTING)
-	if (IsX360())
-	{
-		return IsBoxIntersectingRay( 
-			DirectX::XMLoadFloat3(boxMin.XmBase()), DirectX::XMLoadFloat3(boxMax.XmBase()),
-			DirectX::XMLoadFloat3(origin.XmBase()), DirectX::XMLoadFloat3(vecDelta.XmBase()), DirectX::XMLoadFloat3(vecInvDelta.XmBase()), // ray parameters
-			ReplicateX4(flTolerance) ///< eg from ReplicateX4(flTolerance)
-			);
-	}
-#endif
-
-	Assert( boxMin[0] <= boxMax[0] );
-	Assert( boxMin[1] <= boxMax[1] );
-	Assert( boxMin[2] <= boxMax[2] );
-
-	// FIXME: Surely there's a faster way
-	float tmin = -FLT_MAX;
-	float tmax = FLT_MAX;
-
-	for ( int i = 0; i < 3; ++i )
-	{
-		// Parallel case...
-		if ( FloatMakePositive( vecDelta[i] ) < 1e-8 )
-		{
-			// Check that origin is in the box, if not, then it doesn't intersect..
-			if ( ( origin[i] < boxMin[i] - flTolerance ) || ( origin[i] > boxMax[i] + flTolerance ) )
-				return false;
-
-			continue;
-		}
-
-		// Non-parallel case
-		// Find the t's corresponding to the entry and exit of
-		// the ray along x, y, and z. The find the furthest entry
-		// point, and the closest exit point. Once that is done,
-		// we know we don't collide if the closest exit point
-		// is behind the starting location. We also don't collide if
-		// the closest exit point is in front of the furthest entry point
-		float t1 = ( boxMin[i] - flTolerance - origin[i] ) * vecInvDelta[i];
-		float t2 = ( boxMax[i] + flTolerance - origin[i] ) * vecInvDelta[i];
-		if ( t1 > t2 )
-		{
-			float temp = t1;
-			t1 = t2;
-			t2 = temp;
-		}
-
-		if (t1 > tmin)
-			tmin = t1;
-
-		if (t2 < tmax)
-			tmax = t2;
-
-		if (tmin > tmax)
-			return false;
-
-		if (tmax < 0)
-			return false;
-
-		if (tmin > 1)
-			return false;
-	}
-
-	return true;
-#endif
+	// dimhotepus: Ignore invDelta, we compute it inside in a correct way.
+	return IsBoxIntersectingRayV2( boxMins, boxMaxs, start, delta, epsilon );
 }
 
 //-----------------------------------------------------------------------------
@@ -1003,6 +788,82 @@ bool FASTCALL IsBoxIntersectingRay( const Vector& vecBoxMin, const Vector& vecBo
 		ray,
 		flTolerance
 	);
+}
+
+
+//-----------------------------------------------------------------------------
+// Ray (segment) vs. axis-aligned box test
+//
+// The ray is the segment  P(t) = origin + t * delta,  t in [0, 1].
+//
+// Robust against zero / near-zero delta components:
+//   - never divides by zero (safe with FP exceptions unmasked)
+//   - never produces 0 * inf = NaN (origin exactly on a slab plane)
+//   - tolerance is applied consistently on every axis, including parallel ones
+//
+// The reciprocal of delta is computed internally, so callers no longer pass it.
+bool XM_CALLCONV IsBoxIntersectingRayV2( DirectX::FXMVECTOR inBoxMin, DirectX::FXMVECTOR inBoxMax,
+                                         DirectX::FXMVECTOR origin, DirectX::GXMVECTOR delta, // ray parameters
+                                         DirectX::HXMVECTOR vTolerance                        ///< eg from ReplicateX4(flTolerance)
+)
+{
+	// Below this magnitude an axis is treated as parallel to the slabs.
+	// Must be well above ~3e-39 (where 1/x overflows to inf). The positional
+	// error introduced is at most this amount, in world units.
+	static const fltx4 kParallelEpsilon = ReplicateX4( 1e-12f );
+
+	// Relocate the problem so the ray start is at the origin, and expand the
+	// box by the tolerance.
+	fltx4 boxMin = SubSIMD( SubSIMD( inBoxMin, origin ), vTolerance );
+	fltx4 boxMax = AddSIMD( SubSIMD( inBoxMax, origin ), vTolerance );
+
+	// Cheap early-out: start (0) and end (delta) both on the outside of the
+	// same face on any axis -> no intersection.
+	fltx4 startOutMins = AndSIMD( CmpLtSIMD( Four_Zeros, boxMin ), CmpLtSIMD( delta, boxMin ) );
+	fltx4 startOutMaxs = AndSIMD( CmpGtSIMD( Four_Zeros, boxMax ), CmpGtSIMD( delta, boxMax ) );
+	if ( IsAnyNegative( SetWToZeroSIMD( OrSIMD( startOutMins, startOutMaxs ) ) ) )
+		return false;
+
+	// Axes where the ray is (nearly) parallel to the slabs.
+	fltx4 parallel = CmpLtSIMD( fabs( delta ), kParallelEpsilon );
+
+	// Parallel axis: the start point must lie inside the slab, otherwise the
+	// ray can never enter it.
+	fltx4 parallelOut = AndSIMD( parallel,
+	                             OrSIMD( CmpGtSIMD( boxMin, Four_Zeros ),
+	                                     CmpLtSIMD( boxMax, Four_Zeros ) ) );
+	if ( IsAnyNegative( SetWToZeroSIMD( parallelOut ) ) )
+		return false;
+
+	// Never divide by zero: substitute 1 on parallel lanes (their results are
+	// overwritten below anyway).
+	fltx4 safeDelta = MaskedAssign( parallel, Four_Ones, delta );
+	fltx4 invDelta = ReciprocalSIMD( safeDelta );
+
+	// Per-axis t values where the ray crosses the slab planes.
+	fltx4 t0 = MulSIMD( boxMin, invDelta );
+	fltx4 t1 = MulSIMD( boxMax, invDelta );
+
+	// Sort the interval per axis.
+	fltx4 mint = MinSIMD( t0, t1 );
+	fltx4 maxt = MaxSIMD( t0, t1 );
+
+	// Parallel axes (start already verified inside) don't constrain t.
+	mint = MaskedAssign( parallel, Four_Negative_FLT_MAX, mint );
+	maxt = MaskedAssign( parallel, Four_FLT_MAX, maxt );
+
+	// Intersect the intervals of x, y, z (w is ignored).
+	fltx4 firstOut = FindLowestSIMD3( maxt );
+	fltx4 lastIn = FindHighestSIMD3( mint );
+	// NOTE: This is really a scalar quantity now [t0,t1] == [lastIn,firstOut]
+
+	// Clip to the segment [0, 1].
+	firstOut = MinSIMD( firstOut, Four_Ones );
+	lastIn = MaxSIMD( lastIn, Four_Zeros );
+
+	// Valid if lastIn <= firstOut.
+	fltx4 separation = CmpGtSIMD( lastIn, firstOut );
+	return IsAllZeros( separation );
 }
 
 
@@ -1081,7 +942,8 @@ bool XM_CALLCONV IsBoxIntersectingRay(DirectX::FXMVECTOR boxMin, DirectX::FXMVEC
 	vecExpandedBoxMin = SubSIMD( boxMin, rayExtents );
 	vecExpandedBoxMax = AddSIMD( boxMax, rayExtents );
 
-	return IsBoxIntersectingRay( vecExpandedBoxMin, vecExpandedBoxMax, rayStart, rayDelta, ReciprocalSIMD(rayDelta), ReplicateX4(flTolerance) );
+	// dimhotepus: Use new version without issues with 0 in delta.
+	return IsBoxIntersectingRayV2( vecExpandedBoxMin, vecExpandedBoxMax, rayStart, rayDelta, ReplicateX4(flTolerance) );
 }
 
 
