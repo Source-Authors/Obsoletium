@@ -829,86 +829,23 @@ inline Vector VMatrix::VMul3x3Transpose(const Vector &vVec) const
 
 inline void VMatrix::V3Mul(const Vector &vIn, Vector &vOut) const
 {
-	DirectX::XMVECTOR vvin = DirectX::XMVectorSetW( DirectX::XMLoadFloat3( vIn.XmBase() ), 1.0f ); //-V2002
-	DirectX::XMVECTOR vden = DirectX::XMVectorSum
-	(
-		DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() + 3 ), vvin )
-	);
-	DirectX::XMVECTOR vrw  = DirectX::XMVectorDivide( DirectX::g_XMOne, vden );
+	// dimhotepus: Use SIMD.
+	const auto mat = DirectX::XMLoadFloat4x4( XmMBase() );
+	const auto result = DirectX::XMVector3TransformCoord(
+		DirectX::XMLoadFloat3( vIn.XmBase() ),
+		DirectX::XMMatrixTranspose( mat ) );
 
-	DirectX::XMStoreFloat3
-	(
-		vOut.XmBase(),
-		DirectX::XMVectorSet
-		(
-			DirectX::XMVectorGetX //-V2002
-			(
-				DirectX::XMVectorMultiply
-				(
-					DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() ), vvin ) ),
-					vrw
-				)
-			),
-			DirectX::XMVectorGetX //-V2002
-			(
-				DirectX::XMVectorMultiply
-				(
-					DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() + 1 ), vvin ) ),
-					vrw
-				)
-			),
-			DirectX::XMVectorGetX //-V2002
-			(
-				DirectX::XMVectorMultiply
-				(
-					DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() + 2 ), vvin ) ),
-					vrw
-				)
-			),
-			0.0f
-		)
-	);
+	DirectX::XMStoreFloat3(	vOut.XmBase(), result );
 }
 
 inline void VMatrix::V4Mul(const Vector4D &vIn, Vector4D &vOut) const
 {
-	DirectX::XMVECTOR vvin = DirectX::XMLoadFloat4( vIn.XmBase() );
+	// dimhotepus: Use SIMD.
+	const auto v = DirectX::XMLoadFloat4( vIn.XmBase() );
+	const auto mat = DirectX::XMLoadFloat4x4( XmMBase() );
+	const auto result = DirectX::XMVector4Transform( v, DirectX::XMMatrixTranspose( mat ) );
 
-	DirectX::XMStoreFloat4
-	(
-		vOut.XmBase(),
-		DirectX::XMVectorSet
-		(
-			DirectX::XMVectorGetX //-V2002
-			(
-				DirectX::XMVectorSum
-				(
-					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() ), vvin )
-				)
-			),
-			DirectX::XMVectorGetX //-V2002
-			(
-				DirectX::XMVectorSum
-				(
-					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() + 1 ), vvin )
-				)
-			),
-			DirectX::XMVectorGetX //-V2002
-			(
-				DirectX::XMVectorSum
-				(
-					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() + 2 ), vvin )
-				)
-			),
-			DirectX::XMVectorGetX //-V2002
-			(
-				DirectX::XMVectorSum
-				(
-					DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( XmBase() + 3 ), vvin )
-				)
-			)
-		)
-	);
+	DirectX::XMStoreFloat4( vOut.XmBase(), result );
 }
 
 
@@ -989,6 +926,16 @@ inline void MatrixSetRow( VMatrix &dst, int nRow, const Vector &row )
 	*(Vector*)dst[nRow] = row;
 }
 
+//-----------------------------------------------------------------------------
+// Vector3DMultiplyPosition treats src2 as if it's a point (adds the translation)
+//-----------------------------------------------------------------------------
+inline DirectX::XMVECTOR XM_CALLCONV Vector3DMultiplyPosition( DirectX::FXMMATRIX m,
+                                                               DirectX::HXMVECTOR position )
+{
+	// dimhotepus: Use SIMD.
+	auto pos = DirectX::XMVectorSetW( position, 1.0f );
+	return DirectX::XMVector3Transform( pos, DirectX::XMMatrixTranspose( m ) );
+}
 
 //-----------------------------------------------------------------------------
 // Vector3DMultiplyPosition treats src2 as if it's a point (adds the translation)
@@ -998,9 +945,11 @@ inline void MatrixSetRow( VMatrix &dst, int nRow, const Vector &row )
 // reference is the same as the dst reference ).
 inline void Vector3DMultiplyPosition( const VMatrix& src1, const VectorByValue src2, Vector& dst ) //-V801
 {
-	dst[0] = src1[0][0] * src2.x + src1[0][1] * src2.y + src1[0][2] * src2.z + src1[0][3];
-	dst[1] = src1[1][0] * src2.x + src1[1][1] * src2.y + src1[1][2] * src2.z + src1[1][3];
-	dst[2] = src1[2][0] * src2.x + src1[2][1] * src2.y + src1[2][2] * src2.z + src1[2][3];
+	auto vSrc1 = DirectX::XMLoadFloat4x4( src1.XmMBase() );
+	auto vSrc2 = DirectX::XMLoadFloat3( src2.XmBase() );
+	auto result = Vector3DMultiplyPosition( vSrc1, vSrc2 );
+
+	DirectX::XMStoreFloat3( dst.XmBase(), result );
 }
 
 

@@ -678,42 +678,29 @@ void MatrixMultiply( const VMatrix& src1, const VMatrix& src2, VMatrix& dst )
 
 void Vector4DMultiply( const VMatrix& src1, Vector4D const& src2, Vector4D& dst )
 {
-	// Make sure it works if src2 == dst
-	Vector4D tmp;
-	Vector4D const&v = (&src2 == &dst) ? tmp : src2;
+	// dimhotepus: Optimize SIMD.
+	const auto m = DirectX::XMLoadFloat4x4( src1.XmMBase() );
+	const auto v = DirectX::XMLoadFloat4( src2.XmBase() );
+	const auto r = DirectX::XMVector4Transform(
+		v,
+		DirectX::XMMatrixTranspose( m ) );
 
-	if (&src2 == &dst)
-	{
-		Vector4DCopy( src2, tmp );
-	}
-
-	dst[0] = src1[0][0] * v[0] + src1[0][1] * v[1] + src1[0][2] * v[2] + src1[0][3] * v[3];
-	dst[1] = src1[1][0] * v[0] + src1[1][1] * v[1] + src1[1][2] * v[2] + src1[1][3] * v[3];
-	dst[2] = src1[2][0] * v[0] + src1[2][1] * v[1] + src1[2][2] * v[2] + src1[2][3] * v[3];
-	dst[3] = src1[3][0] * v[0] + src1[3][1] * v[1] + src1[3][2] * v[2] + src1[3][3] * v[3];
+	DirectX::XMStoreFloat4(	dst.XmBase(), r );
 }
 
 //-----------------------------------------------------------------------------
 // Matrix/vector multiply
 //-----------------------------------------------------------------------------
 
-void Vector4DMultiplyPosition( const VMatrix& src1, Vector const& src2, Vector4D& dst )
+void Vector4DMultiplyPosition( const VMatrix &src1, const Vector &src2, Vector4D &dst )
 {
-	// Make sure it works if src2 == dst
-	Vector tmp;
-	Vector const&v = ( &src2 == &dst.AsVector3D() ) ? static_cast<const Vector&>(tmp) : src2;
+	// dimhotepus: Optimize SIMD.
+	const auto m = DirectX::XMLoadFloat4x4( src1.XmMBase() );
+	const auto v = DirectX::XMLoadFloat3( src2.XmBase() );
+	const auto r = DirectX::XMVector3Transform( v, DirectX::XMMatrixTranspose( m ) );
 
-	if (&src2 == &dst.AsVector3D())
-	{
-		VectorCopy( src2, tmp );
-	}
-
-	dst[0] = src1[0][0] * v[0] + src1[0][1] * v[1] + src1[0][2] * v[2] + src1[0][3];
-	dst[1] = src1[1][0] * v[0] + src1[1][1] * v[1] + src1[1][2] * v[2] + src1[1][3];
-	dst[2] = src1[2][0] * v[0] + src1[2][1] * v[1] + src1[2][2] * v[2] + src1[2][3];
-	dst[3] = src1[3][0] * v[0] + src1[3][1] * v[1] + src1[3][2] * v[2] + src1[3][3];
+	DirectX::XMStoreFloat4(	dst.XmBase(), r );
 }
-
 
 
 //-----------------------------------------------------------------------------
@@ -722,28 +709,12 @@ void Vector4DMultiplyPosition( const VMatrix& src1, Vector const& src2, Vector4D
 
 void Vector3DMultiply( const VMatrix &src1, const Vector &src2, Vector &dst )
 {
-	DirectX::XMVECTOR vsrc2 = DirectX::XMLoadFloat3( src2.XmBase() );
+	// dimhotepus: Optimize SIMD.
+	const auto v = DirectX::XMLoadFloat3( src2.XmBase() );
+	const auto m = DirectX::XMLoadFloat4x4( src1.XmMBase() );
+	const auto result = DirectX::XMVector3TransformNormal( v, DirectX::XMMatrixTranspose( m ) );
 
-	DirectX::XMStoreFloat3
-	(
-		dst.XmBase(),
-		DirectX::XMVectorSet
-		(
-			DirectX::XMVectorGetX //-V2002
-			(
-				DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() ), vsrc2 ) )
-			),
-			DirectX::XMVectorGetX //-V2002
-			(
-				DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() + 1 ), vsrc2 ) )
-			),
-			DirectX::XMVectorGetX //-V2002
-			(
-				DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() + 2 ), vsrc2 ) )
-			),
-			0.0f
-		)
-	);
+	DirectX::XMStoreFloat3( dst.XmBase(), result );
 }
 
 
@@ -751,43 +722,20 @@ void Vector3DMultiply( const VMatrix &src1, const Vector &src2, Vector &dst )
 // Vector3DMultiplyPositionProjective treats src2 as if it's a point 
 // and does the perspective divide at the end
 //-----------------------------------------------------------------------------
-void Vector3DMultiplyPositionProjective( const VMatrix& src1, const Vector &src2, Vector& dst )
+void Vector3DMultiplyPositionProjective( const VMatrix &src1, const Vector &src2, Vector &dst )
 {
-	DirectX::XMVECTOR vsrc2 = DirectX::XMVectorSetW( DirectX::XMLoadFloat3( src2.XmBase() ), 1.0f ); //-V2002
-	DirectX::XMVECTOR vwden = DirectX::XMVectorSum
-	(
-		DirectX::XMVectorMultiply
-		(
-			DirectX::XMLoadFloat4( src1.XmBase() + 3 ),
-			vsrc2
-		)
-	);
+	// dimhotepus: Optimize SIMD.
+	const auto m = DirectX::XMLoadFloat4x4( src1.XmMBase() );
+	const auto v = DirectX::XMLoadFloat3( src2.XmBase() );
 
-	if ( DirectX::XMVector3NotEqual( vwden, DirectX::g_XMZero ) )
-	{
-		vwden = DirectX::XMVectorDivide( DirectX::g_XMOne, vwden );
-	}
+	const auto transformed = DirectX::XMVector3Transform( v, DirectX::XMMatrixTranspose( m ) );
 
-	DirectX::XMVECTOR vdest = DirectX::XMVectorSet
-	(
-		DirectX::XMVectorGetX //-V2002
-		(
-			DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() ), vsrc2 ) )
-		),
-		DirectX::XMVectorGetX //-V2002
-		(
-			DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() + 1 ), vsrc2 ) )
-		),
-		DirectX::XMVectorGetX //-V2002
-		(
-			DirectX::XMVectorSum( DirectX::XMVectorMultiply( DirectX::XMLoadFloat4( src1.XmBase() + 2 ), vsrc2 ) )
-		),
-		0.0f
-	);
+	const float w = DirectX::XMVectorGetW( transformed );
+	const auto result = w != 0.0f
+		? DirectX::XMVectorScale( transformed, 1.0f / w )
+		: DirectX::XMVectorZero();
 
-	vdest = DirectX::XMVectorMultiply( vdest, vwden );
-
-	DirectX::XMStoreFloat3( dst.XmBase(), vdest );
+	DirectX::XMStoreFloat3( dst.XmBase(), result );
 }
 
 
@@ -795,74 +743,48 @@ void Vector3DMultiplyPositionProjective( const VMatrix& src1, const Vector &src2
 // Vector3DMultiplyProjective treats src2 as if it's a direction 
 // and does the perspective divide at the end
 //-----------------------------------------------------------------------------
-void Vector3DMultiplyProjective( const VMatrix& src1, const Vector &src2, Vector& dst )
+void Vector3DMultiplyProjective( const VMatrix &src1, const Vector &src2, Vector &dst )
 {
-	// Make sure it works if src2 == dst
-	Vector tmp;
-	const Vector &v = (&src2 == &dst) ? static_cast<const Vector&>(tmp) : src2;
-	if( &src2 == &dst )
-	{
-		VectorCopy( src2, tmp );
-	}
+	// dimhotepus: Optimize SIMD.
+	const auto m = DirectX::XMLoadFloat4x4( src1.XmMBase() );
+	const auto v = DirectX::XMVectorSetW( DirectX::XMLoadFloat3( src2.XmBase() ), 0.0f );
 
-	float w;
-	dst[0] = src1[0][0] * v[0] + src1[0][1] * v[1] + src1[0][2] * v[2];
-	dst[1] = src1[1][0] * v[0] + src1[1][1] * v[1] + src1[1][2] * v[2];
-	dst[2] = src1[2][0] * v[0] + src1[2][1] * v[1] + src1[2][2] * v[2];
-	w = src1[3][0] * v[0] + src1[3][1] * v[1] + src1[3][2] * v[2];
-	if (w != 0.0f)
-	{
-		dst /= w;
-	}
-	else
-	{
-		dst = vec3_origin;
-	}
+	const auto q = DirectX::XMVector4Transform( v, DirectX::XMMatrixTranspose( m ) );
+
+	const float w = DirectX::XMVectorGetW( q );
+	const auto result = w != 0.0f
+		? DirectX::XMVectorScale( q, 1.0f / w )
+		: DirectX::XMVectorZero();
+
+	DirectX::XMStoreFloat3( dst.XmBase(), result );
 }
 
 
 //-----------------------------------------------------------------------------
 // Multiplies the vector by the transpose of the matrix
 //-----------------------------------------------------------------------------
-void Vector4DMultiplyTranspose( const VMatrix& src1, Vector4D const& src2, Vector4D& dst )
+void Vector4DMultiplyTranspose( const VMatrix &src1, const Vector4D &src2, Vector4D &dst )
 {
-	// Make sure it works if src2 == dst
-	bool srcEqualsDst = (&src2 == &dst);
+	// dimhotepus: Optimize SIMD.
+	const auto m = DirectX::XMLoadFloat4x4( src1.XmMBase() );
+	const auto v = DirectX::XMLoadFloat4( src2.XmBase() );
+	const auto r = DirectX::XMVector4Transform( v, m );
 
-	Vector4D tmp;
-	Vector4D const&v = srcEqualsDst ? tmp : src2;
-
-	if (srcEqualsDst)
-	{
-		Vector4DCopy( src2, tmp );
-	}
-
-	dst[0] = src1[0][0] * v[0] + src1[1][0] * v[1] + src1[2][0] * v[2] + src1[3][0] * v[3];
-	dst[1] = src1[0][1] * v[0] + src1[1][1] * v[1] + src1[2][1] * v[2] + src1[3][1] * v[3];
-	dst[2] = src1[0][2] * v[0] + src1[1][2] * v[1] + src1[2][2] * v[2] + src1[3][2] * v[3];
-	dst[3] = src1[0][3] * v[0] + src1[1][3] * v[1] + src1[2][3] * v[2] + src1[3][3] * v[3];
+	DirectX::XMStoreFloat4(	dst.XmBase(), r );
 }
+
 
 //-----------------------------------------------------------------------------
 // Multiplies the vector by the transpose of the matrix
 //-----------------------------------------------------------------------------
-void Vector3DMultiplyTranspose( const VMatrix& src1, const Vector& src2, Vector& dst )
+void Vector3DMultiplyTranspose( const VMatrix &src1, const Vector &src2, Vector &dst )
 {
-	// Make sure it works if src2 == dst
-	bool srcEqualsDst = (&src2 == &dst);
+	// dimhotepus: Optimize SIMD.
+	const auto m = DirectX::XMLoadFloat4x4( src1.XmMBase() );
+	const auto v = DirectX::XMLoadFloat3( src2.XmBase() );
+	const auto r = DirectX::XMVector3TransformNormal( v, m );
 
-	// dimhotepus: Initialize to invalid vector.
-	Vector tmp{vec3_invalid};
-	const Vector&v = srcEqualsDst ? static_cast<const Vector&>(tmp) : src2;
-
-	if (srcEqualsDst)
-	{
-		VectorCopy( src2, tmp );
-	}
-
-	dst[0] = src1[0][0] * v[0] + src1[1][0] * v[1] + src1[2][0] * v[2];
-	dst[1] = src1[0][1] * v[0] + src1[1][1] * v[1] + src1[2][1] * v[2];
-	dst[2] = src1[0][2] * v[0] + src1[1][2] * v[1] + src1[2][2] * v[2];
+	DirectX::XMStoreFloat3(	dst.XmBase(), r );
 }
 
 
