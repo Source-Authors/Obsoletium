@@ -304,11 +304,11 @@ void CHUDQuickInfo::Paint()
 		UpdateEventTime();
 		m_lastAmmo	= ammo;
 
-		// Find how far through the current clip we are
-		float ammoPerc = (float) ammo / (float) pWeapon->GetMaxClip1();
-
 		// Warn if we're below a certain percentage of our clip's size
-		if (( pWeapon->GetMaxClip1() > 1 ) && ( ammoPerc <= ( 1.0f - CLIP_PERC_THRESHOLD )))
+		if (( pWeapon->GetMaxClip1() > 1 ) &&
+			// Find how far through the current clip we are.
+			// dimhotepus: Do not divide by zero when pWeapon->GetMaxClip1() is 0 (ex. bugbait).
+			( (float) ammo / (float) pWeapon->GetMaxClip1() <= ( 1.0f - CLIP_PERC_THRESHOLD )))
 		{
 			if ( m_warnAmmo == false )
 			{
