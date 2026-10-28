@@ -133,17 +133,17 @@ void CPlasmaSpray::SimulateParticles( CParticleSimulateIterator *pIterator )
 
 void CPlasmaSpray::RenderParticles( CParticleRenderIterator *pIterator )
 {
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const SimpleParticle *pParticle = (const SimpleParticle *)pIterator->GetFirst();
 	while ( pParticle )
 	{
 		float scale = random->RandomFloat( 0.02f, 0.08f );
 
 		// NOTE: We need to do everything in screen space
-		Vector  delta;
-		Vector	start;
-		TransformParticle(ParticleMgr()->GetModelView(), pParticle->m_Pos, start);
+		Vector	start = TransformParticleTransposed(transposedMat, pParticle->m_Pos);
 		float sortKey = start.z;
 
+		Vector delta;
 		Vector3DMultiply( CurrentWorldToViewMatrix(), pParticle->m_vecVelocity, delta );
 
 		delta[0] *= scale;

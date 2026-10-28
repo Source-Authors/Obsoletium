@@ -258,14 +258,14 @@ void C_EnvParticleScript::FireEvent( const Vector& origin, const QAngle& angles,
 //-----------------------------------------------------------------------------
 void C_EnvParticleScript::RenderParticles( CParticleRenderIterator *pIterator )
 {
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const ParticleScriptParticle_t* pParticle = (const ParticleScriptParticle_t*)pIterator->GetFirst();
 	while ( pParticle )
 	{
-		Vector vecRenderPos;
-		TransformParticle( ParticleMgr()->GetModelView(), pParticle->m_Pos, vecRenderPos );
+		Vector vecRenderPos = TransformParticleTransposed( transposedMat, pParticle->m_Pos );
 		float sortKey = vecRenderPos.z;
 
-		Vector color( 1, 1, 1 );
+		constexpr Vector color( 1, 1, 1 );
 		RenderParticle_ColorSize( pIterator->GetParticleDraw(), vecRenderPos, color, 1.0f, pParticle->m_flSize );
 		
 		pParticle = (const ParticleScriptParticle_t*)pIterator->GetNext( sortKey );

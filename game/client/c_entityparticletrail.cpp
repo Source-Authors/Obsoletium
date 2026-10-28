@@ -207,14 +207,14 @@ trailNoHitboxes:
 
 inline void C_EntityParticleTrail::RenderParticles( CParticleRenderIterator *pIterator )
 {
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const SimpleParticle *pParticle = (const SimpleParticle*)pIterator->GetFirst();
 	while ( pParticle )
 	{
 		float t = pParticle->m_flLifetime / pParticle->m_flDieTime;
 
 		// Render
-		Vector	tPos;
-		TransformParticle( ParticleMgr()->GetModelView(), pParticle->m_Pos, tPos );
+		Vector	tPos = TransformParticleTransposed( transposedMat, pParticle->m_Pos );
 		float sortKey = tPos.z;
 
 		Vector	color = Vector( pParticle->m_uchColor[0] / 255.0f, pParticle->m_uchColor[1] / 255.0f, pParticle->m_uchColor[2] / 255.0f );

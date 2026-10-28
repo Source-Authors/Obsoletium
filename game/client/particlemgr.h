@@ -382,7 +382,7 @@ public:
 	// That way, it can transform the bbox defined by Particle::m_Pos into world space correctly.
 	//
 	// It also sets up the matrix returned by CParticleMgr::GetModelView() to include this matrix, so you
-	// can do TransformParticle with it like any other particle system.
+	// can do TransformParticle/TransformParticleTransposed with it like any other particle system.
 	const matrix3x4_t&	GetLocalSpaceTransform() const;
 	void			SetLocalSpaceTransform( const matrix3x4_t &transform );
 
@@ -850,12 +850,23 @@ struct StandardParticle_t : public Particle
 // Transform a particle.
 // ------------------------------------------------------------------------ //
 
-inline void TransformParticle(const VMatrix &vMat, const Vector &vIn, Vector &vOut)
+inline void TransformParticle( const VMatrix& vMat, const Vector& vIn, Vector& vOut )
 {
-	//vOut = vMat.VMul4x3(vIn);
-	vOut.x = vMat.m[0][0]*vIn.x + vMat.m[0][1]*vIn.y + vMat.m[0][2]*vIn.z + vMat.m[0][3];
-	vOut.y = vMat.m[1][0]*vIn.x + vMat.m[1][1]*vIn.y + vMat.m[1][2]*vIn.z + vMat.m[1][3];
-	vOut.z = vMat.m[2][0]*vIn.x + vMat.m[2][1]*vIn.y + vMat.m[2][2]*vIn.z + vMat.m[2][3];
+	const auto v = DirectX::XMLoadFloat3(vIn.XmBase());
+	const auto m = DirectX::XMLoadFloat4x4(vMat.XmMBase());
+	const auto r = DirectX::XMVector3Transform(v, DirectX::XMMatrixTranspose(m));
+
+	DirectX::XMStoreFloat3(vOut.XmBase(), r);
+}
+
+[[nodiscard]] inline Vector XM_CALLCONV TransformParticleTransposed( DirectX::FXMMATRIX transposedMat, const Vector &vIn )
+{
+	const auto v = DirectX::XMLoadFloat3(vIn.XmBase());
+	const auto r = DirectX::XMVector3Transform(v, transposedMat);
+
+	Vector vOut;
+	DirectX::XMStoreFloat3(vOut.XmBase(), r);
+	return vOut;
 }
 
 

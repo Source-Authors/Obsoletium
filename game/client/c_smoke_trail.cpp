@@ -1356,15 +1356,15 @@ void C_SporeTrail::RenderParticles( CParticleRenderIterator *pIterator )
 	if ( m_bEmit == false )
 		return;
 
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const SimpleParticle *pParticle = (const SimpleParticle*)pIterator->GetFirst();
 	while ( pParticle )
 	{
 		//Render
-		Vector	tPos;
-		TransformParticle( m_pParticleMgr->GetModelView(), pParticle->m_Pos, tPos );
+		Vector	tPos = TransformParticleTransposed( transposedMat, pParticle->m_Pos );
 		float sortKey = tPos.z;
 
-		Vector	color = Vector( 1.0f, 1.0f, 1.0f );
+		constexpr Vector color( 1.0f, 1.0f, 1.0f );
 
 		//Render it
 		RenderParticle_ColorSize(

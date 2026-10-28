@@ -395,12 +395,12 @@ inline void RenderParticle_ColorSizePerturbNormal(
 
 void C_SteamJet::RenderParticles( CParticleRenderIterator *pIterator )
 {
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const SteamJetParticle *pParticle = (const SteamJetParticle*)pIterator->GetFirst();
 	while ( pParticle )
 	{
 		// Render.
-		Vector tPos;
-		TransformParticle(m_pParticleMgr->GetModelView(), pParticle->m_Pos, tPos);
+		Vector tPos = TransformParticleTransposed(transposedMat, pParticle->m_Pos);
 		float sortKey = tPos.z;
 
 		float lifetimeT = pParticle->m_Lifetime / (pParticle->m_DieTime + 0.001f);

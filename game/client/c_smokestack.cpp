@@ -395,12 +395,12 @@ void C_SmokeStack::QueueLightParametersInRenderer()
 
 void C_SmokeStack::RenderParticles( CParticleRenderIterator *pIterator )
 {
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const SmokeStackParticle *pParticle = (const SmokeStackParticle*)pIterator->GetFirst();
 	while ( pParticle )
 	{
-		// Transform.						   
-		Vector tPos;
-		TransformParticle( m_pParticleMgr->GetModelView(), pParticle->m_Pos, tPos );
+		// Transform.
+		Vector tPos = TransformParticleTransposed( transposedMat, pParticle->m_Pos );
 
 		// Figure out its alpha. Squaring it after it gets halfway through its lifetime
 		// makes it get translucent and fade out for a longer time.
@@ -450,6 +450,7 @@ void C_SmokeStack::SimulateParticles( CParticleSimulateIterator *pIterator )
 	if( bQuickTest == false && m_bEmit && (!m_ParticleEffect.WasDrawnPrevFrame() && !m_ParticleEffect.GetAlwaysSimulate()) )
 		return;
 
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	SmokeStackParticle *pParticle = (SmokeStackParticle*)pIterator->GetFirst();
 	while ( pParticle )
 	{
@@ -489,8 +490,7 @@ void C_SmokeStack::SimulateParticles( CParticleSimulateIterator *pIterator )
 
 			if ( bSortNow == true )
 			{
-				Vector tPos;
-				TransformParticle( m_pParticleMgr->GetModelView(), pParticle->m_Pos, tPos );
+				Vector tPos = TransformParticleTransposed( transposedMat, pParticle->m_Pos );
 				pParticle->m_flSortPos = tPos.z;
 			}
 		}

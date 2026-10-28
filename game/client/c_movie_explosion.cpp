@@ -170,12 +170,12 @@ void C_MovieExplosion::Update(float fTimeDelta)
 
 void C_MovieExplosion::RenderParticles( CParticleRenderIterator *pIterator )
 {
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const StandardParticle_t *pParticle = (const StandardParticle_t*)pIterator->GetFirst();
 	while ( pParticle )
 	{
 		// Draw.
-		Vector tPos;
-		TransformParticle(m_pParticleMgr->GetModelView(), pParticle->m_Pos, tPos);
+		Vector tPos = TransformParticleTransposed(transposedMat, pParticle->m_Pos);
 		float sortKey = tPos.z;
 
 		float lifetimePercent = pParticle->m_Lifetime / EMITTED_PARTICLE_LIFETIME;

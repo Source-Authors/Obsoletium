@@ -470,6 +470,7 @@ void C_FuncSmokeVolume::RenderParticles( CParticleRenderIterator *pIterator )
 	if ( m_CurrentDensity == 0 )
 		return;
 
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const SmokeGrenadeParticle *pParticle = (const SmokeGrenadeParticle*)pIterator->GetFirst();
 	while ( pParticle )
 	{
@@ -500,8 +501,7 @@ void C_FuncSmokeVolume::RenderParticles( CParticleRenderIterator *pIterator )
 			color.z *= pParticle->m_Color[2] / 255.0f;
 		}
 		
-		Vector tRenderPos;
-		TransformParticle( ParticleMgr()->GetModelView(), renderPos, tRenderPos );
+		Vector tRenderPos = TransformParticleTransposed( transposedMat, renderPos );
 		float sortKey = 1;//tRenderPos.z;
 
 		// If we're reducing particle cost, only render sufficiently opaque particles 

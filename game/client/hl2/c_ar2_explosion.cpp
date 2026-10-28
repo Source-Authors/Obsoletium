@@ -430,6 +430,7 @@ void C_AR2Explosion::SimulateParticles( CParticleSimulateIterator *pIterator )
 
 void C_AR2Explosion::RenderParticles( CParticleRenderIterator *pIterator )
 {
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const AR2ExplosionParticle *pParticle = (const AR2ExplosionParticle *)pIterator->GetFirst();
 	while ( pParticle )
 	{
@@ -442,8 +443,7 @@ void C_AR2Explosion::RenderParticles( CParticleRenderIterator *pIterator )
 			// FIXME: base color should be a dirty version of the material color
 			Vector color = g_AR2DustColor1 * (1.0f - lifetimePercent) + g_AR2DustColor2 * lifetimePercent;
 			
-			Vector tPos;
-			TransformParticle(m_pParticleMgr->GetModelView(), pParticle->m_Pos, tPos);
+			Vector tPos = TransformParticleTransposed(transposedMat, pParticle->m_Pos);
 			sortKey = tPos.z;
 			
 			float	alpha;

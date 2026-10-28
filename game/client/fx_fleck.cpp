@@ -177,11 +177,11 @@ void CFleckParticles::Setup( const Vector &origin, const Vector *direction, floa
 
 void CFleckParticles::RenderParticles( CParticleRenderIterator *pIterator )
 {
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const FleckParticle *pParticle = (const FleckParticle*)pIterator->GetFirst();
 	while ( pParticle )
 	{
-		Vector	tPos;
-		TransformParticle( ParticleMgr()->GetModelView(), pParticle->m_Pos, tPos );
+		Vector	tPos = TransformParticleTransposed( transposedMat, pParticle->m_Pos );
 		float sortKey = (int) tPos.z;
 		
 		Vector	color;

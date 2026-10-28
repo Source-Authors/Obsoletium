@@ -386,13 +386,12 @@ void CSimpleEmitter::SimulateParticles( CParticleSimulateIterator *pIterator )
 
 void CSimpleEmitter::RenderParticles( CParticleRenderIterator *pIterator )
 {
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const SimpleParticle *pParticle = (const SimpleParticle *)pIterator->GetFirst();
 	while ( pParticle )
 	{
 		//Render
-		Vector	tPos;
-
-		TransformParticle( ParticleMgr()->GetModelView(), pParticle->m_Pos, tPos );
+		Vector	tPos = TransformParticleTransposed( transposedMat, pParticle->m_Pos );
 		float sortKey = (int) tPos.z;
 
 		//Render it

@@ -288,6 +288,7 @@ void C_ParticleFire::Update(float fTimeDelta)
 
 void C_ParticleFire::RenderParticles( CParticleRenderIterator *pIterator )
 {
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const FireParticle *pParticle = (const FireParticle*)pIterator->GetFirst();
 	while ( pParticle )
 	{
@@ -298,8 +299,7 @@ void C_ParticleFire::RenderParticles( CParticleRenderIterator *pIterator )
 		Vector curColor = pRamp->m_Start + (pRamp->m_End - pRamp->m_Start) * smooth01;
 		
 		// Render.
-		Vector tPos;
-		TransformParticle(m_pParticleMgr->GetModelView(), pParticle->m_Pos, tPos);
+		Vector tPos = TransformParticleTransposed(transposedMat, pParticle->m_Pos);
 		float sortKey = (int)tPos.z;
 
 		RenderParticle_ColorSize(

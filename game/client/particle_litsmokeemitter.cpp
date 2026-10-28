@@ -88,15 +88,14 @@ void CLitSmokeEmitter::StartRender( VMatrix &effectMatrix )
 
 void CLitSmokeEmitter::RenderParticles( CParticleRenderIterator *pIterator )
 {
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const LitSmokeParticle *pParticle = (const LitSmokeParticle*)pIterator->GetFirst();
 	while ( pParticle )
 	{
 		float	tLifetime = pParticle->m_flLifetime / pParticle->m_flDieTime;
 
-		// Transform.						   
-		Vector tPos;
-
-		TransformParticle( ParticleMgr()->GetModelView(), pParticle->m_Pos, tPos );
+		// Transform.
+		Vector tPos = TransformParticleTransposed( transposedMat, pParticle->m_Pos );
 		float sortKey = tPos.z;
 		
 		float alpha255 = ( ( (float) pParticle->m_uchColor[3]/255.0f ) * sin( M_PI_F * tLifetime ) ) * 255.0f;

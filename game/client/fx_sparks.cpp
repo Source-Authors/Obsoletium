@@ -197,6 +197,7 @@ void CTrailParticles::Setup( const Vector &origin, const Vector *direction, floa
 
 void CTrailParticles::RenderParticles( CParticleRenderIterator *pIterator )
 {
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const TrailParticle *pParticle = (const TrailParticle*)pIterator->GetFirst();
 	while ( pParticle )
 	{
@@ -207,12 +208,11 @@ void CTrailParticles::RenderParticles( CParticleRenderIterator *pIterator )
 		if ( scale < 0.01f )
 			scale = 0.01f;
 
-		Vector	start, delta;
-
 		//NOTE: We need to do everything in screen space
-		TransformParticle( ParticleMgr()->GetModelView(), pParticle->m_Pos, start );
+		Vector start = TransformParticleTransposed( transposedMat, pParticle->m_Pos );
 		float sortKey = start.z;
 
+		Vector delta;
 		Vector3DMultiply( ParticleMgr()->GetModelView(), pParticle->m_vecVelocity, delta );
 		
 		float	color[4];

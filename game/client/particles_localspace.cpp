@@ -82,13 +82,13 @@ void CLocalSpaceEmitter::SimulateParticles( CParticleSimulateIterator *pIterator
 void CLocalSpaceEmitter::RenderParticles( CParticleRenderIterator *pIterator )
 {
 	const matrix3x4_t &mLocalToWorld = GetTransformMatrix();
-	const VMatrix &mModelView = ParticleMgr()->GetModelView();
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 
 	const SimpleParticle *pParticle = (const SimpleParticle *)pIterator->GetFirst();
 	while ( pParticle )
 	{
 		// Transform it
-		Vector screenPos, worldPos;
+		Vector worldPos;
 		VectorTransform( pParticle->m_Pos, mLocalToWorld, worldPos );
 		
 		// Correct viewmodel squashing
@@ -97,8 +97,7 @@ void CLocalSpaceEmitter::RenderParticles( CParticleRenderIterator *pIterator )
 			FormatViewModelAttachment( worldPos, false );
 		}
 
-		TransformParticle( mModelView, worldPos, screenPos );
-		
+		Vector screenPos = TransformParticleTransposed( transposedMat, worldPos );
 		float sortKey = (int) screenPos.z;
 
 		// Render it

@@ -43,6 +43,7 @@ END_RECV_TABLE()
 
 void CDustEffect::RenderParticles( CParticleRenderIterator *pIterator )
 {
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const CFuncDustParticle *pParticle = (const CFuncDustParticle*)pIterator->GetFirst();
 	while ( pParticle )
 	{
@@ -59,8 +60,7 @@ void CDustEffect::RenderParticles( CParticleRenderIterator *pIterator )
 			flAlpha = sin( flAngle - (M_PI_F * 0.5f) ) * 0.5f + 0.5f;
 		}
 
-		Vector tPos;
-		TransformParticle( ParticleMgr()->GetModelView(), pParticle->m_Pos, tPos );
+		Vector tPos = TransformParticleTransposed( transposedMat, pParticle->m_Pos );
 		float sortKey = (int) tPos.z;
 
 		if( -tPos.z <= m_pDust->m_DistMax )

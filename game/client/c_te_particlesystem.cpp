@@ -131,12 +131,12 @@ StandardParticle_t* CTEParticleRenderer::AddParticle()
 
 void CTEParticleRenderer::RenderParticles( CParticleRenderIterator *pIterator )
 {
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const StandardParticle_t *pParticle = (const StandardParticle_t*)pIterator->GetFirst();
 	while ( pParticle )
 	{
 		// Render.
-		Vector tPos;
-		TransformParticle(ParticleMgr()->GetModelView(), pParticle->m_Pos, tPos);
+		Vector tPos = TransformParticleTransposed(transposedMat, pParticle->m_Pos);
 		float sortKey = tPos.z;
 
 		Vector vColor(pParticle->m_Color[0]/255.9f, pParticle->m_Color[1]/255.9f, pParticle->m_Color[2]/255.9f);

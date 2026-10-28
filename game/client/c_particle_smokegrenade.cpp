@@ -659,6 +659,7 @@ inline void C_ParticleSmokeGrenade::ApplyDynamicLight( const Vector &vParticlePo
 
 void C_ParticleSmokeGrenade::RenderParticles( CParticleRenderIterator *pIterator )
 {
+	const auto transposedMat = DirectX::XMMatrixTranspose( DirectX::XMLoadFloat4x4( ParticleMgr()->GetModelView().XmMBase() ) );
 	const SmokeGrenadeParticle *pParticle = (const SmokeGrenadeParticle*)pIterator->GetFirst();
 	while ( pParticle )
 	{
@@ -670,9 +671,8 @@ void C_ParticleSmokeGrenade::RenderParticles( CParticleRenderIterator *pIterator
 		float len = pParticle->m_Pos.Length();
 		if ( len > m_ExpandRadius )
 		{
-			Vector vTemp;
-			TransformParticle(ParticleMgr()->GetModelView(), vWorldSpacePos, vTemp);
-			sortKey = vTemp.z;		
+			Vector vTemp = TransformParticleTransposed(transposedMat, vWorldSpacePos);
+			sortKey = vTemp.z;
 		}
 		else
 		{
@@ -720,8 +720,7 @@ void C_ParticleSmokeGrenade::RenderParticles( CParticleRenderIterator *pIterator
 
 			color = (color + Vector( 0.5, 0.5, 0.5 )) / 2;   //Desaturate
 			
-			Vector tRenderPos;
-			TransformParticle(ParticleMgr()->GetModelView(), renderPos, tRenderPos);
+			Vector tRenderPos = TransformParticleTransposed(transposedMat, renderPos);
 			sortKey = tRenderPos.z;
 
 			//debugoverlay->AddBoxOverlay( renderPos, Vector( -2, -2, -2), Vector( 2, 2, 2), vec3_angle, 255, 255, 255, 255, 1.0f );
