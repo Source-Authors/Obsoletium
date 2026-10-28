@@ -940,12 +940,7 @@ private:
         bool Less( const intp& src1, const intp& src2, void *pCtx );
 	};
 
-	static bool __cdecl SurfCompare( const intp elem1, const intp elem2 );
-
 private:
-	// Used to sort surfaces by screen area
-	static thread_local Surface_t *s_pSortSurfaces;
-
 	// List of all edges
 	EdgeList_t m_Edges;
 	CUtlSortVector<intp, EdgeLess> m_OrigSortIndices;
@@ -1237,19 +1232,6 @@ void CEdgeList::AddEdge( Vector **ppEdgeVertices, intp nSurfID )
 
 
 //-----------------------------------------------------------------------------
-// Used to sort the surfaces
-//-----------------------------------------------------------------------------
-thread_local CEdgeList::Surface_t *CEdgeList::s_pSortSurfaces = NULL;
-bool CEdgeList::SurfCompare( const intp nSurfID1, const intp nSurfID2 )
-{
-	float flArea1 = s_pSortSurfaces[nSurfID1].m_flArea;
-	float flArea2 = s_pSortSurfaces[nSurfID2].m_flArea;
-
-	return flArea1 > flArea2;
-}
-
-
-//-----------------------------------------------------------------------------
 // Removal of small occluders
 //-----------------------------------------------------------------------------
 void CEdgeList::CullSmallOccluders()
@@ -1257,8 +1239,15 @@ void CEdgeList::CullSmallOccluders()
 	// Cull out all surfaces with too small of a screen area...
 	// Sort the surfaces by screen area, in descending order
 	intp nSurfCount = m_Surfaces.Count();
-	s_pSortSurfaces = m_Surfaces.Base();
-	std::sort( m_SurfaceSort.begin(), m_SurfaceSort.end(), SurfCompare );
+	std::sort( m_SurfaceSort.begin(), m_SurfaceSort.end(),
+		// dimhotepus: Use stack var instead of slow thread_local.
+		[pSortSurfaces = m_Surfaces.Base()]( const intp nSurfID1, const intp nSurfID2 )
+	{
+		float flArea1 = pSortSurfaces[nSurfID1].m_flArea;
+		float flArea2 = pSortSurfaces[nSurfID2].m_flArea;
+
+		return flArea1 > flArea2;
+	} );
 
 	// We're going to keep the greater of r_occludermin + All surfaces with a screen area >= r_occluderarea
 	int nMinSurfaces = r_occludermincount.GetInt();
