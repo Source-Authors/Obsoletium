@@ -52,10 +52,10 @@ int		ScreenHeight( void );
 // ScreenWidth returns the width of the screen, in pixels
 int		ScreenWidth( void );
 
-inline float XRES(float x) {
+[[nodiscard]] inline float XRES(float x) {
 	return x * ScreenWidth() / BASE_WIDTH;
 }
-inline float YRES(float y) {
+[[nodiscard]] inline float YRES(float y) {
 	return y * ScreenHeight() / BASE_HEIGHT;
 }
 
