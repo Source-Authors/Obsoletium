@@ -698,6 +698,8 @@ inline bool IsBoxBrush( const cbrush_t &brush, dbrushside_t *pSides, cplane_t *p
 
 inline void ExtractBoxBrush( cboxbrush_t *pBox, const cbrush_t &brush, dbrushside_t *pSides, cplane_t *pPlanes, CUtlVector<unsigned short> &map_texinfo )
 {
+	// dimhotepus: Ensure w initialized as it causes issues in SIMD intersection code later.
+	pBox->mins.w = pBox->maxs.w = 0.0f;
 	// brush.numsides is no longer valid.  Assume numsides == 6
 	for ( int i = 0; i < 6; i++ )
 	{
