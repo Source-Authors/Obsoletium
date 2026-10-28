@@ -579,7 +579,7 @@ bool CZipPackFile::Prepare( int64 fileLen, int64 nFileOfs )
 	}
 
 	// Pack files are always little-endian
-	m_swap.ActivateByteSwapping( IsX360() );
+	m_swap.ActivateByteSwapping( false );
 
 	m_FileLength = fileLen;
 	m_nBaseOffset = nFileOfs;
@@ -624,7 +624,7 @@ bool CZipPackFile::Prepare( int64 fileLen, int64 nFileOfs )
 	// read central directory into memory and parse
 	CUtlBuffer zipDirBuff( (intp)0, rec.centralDirectorySize, 0 );
 	zipDirBuff.EnsureCapacity( rec.centralDirectorySize );
-	zipDirBuff.ActivateByteSwapping( IsX360() );
+	zipDirBuff.ActivateByteSwapping( false );
 	ReadFromPack( -1, zipDirBuff.Base(), -1, rec.centralDirectorySize, rec.startOfCentralDirOffset );
 	zipDirBuff.SeekPut( CUtlBuffer::SEEK_HEAD, rec.centralDirectorySize );
 
