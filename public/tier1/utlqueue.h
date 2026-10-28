@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //=============================================================================//
@@ -8,74 +8,91 @@
 #ifndef UTLQUEUE_H
 #define UTLQUEUE_H
 
+#include <limits> // QueueIter_t invalid value
+#include <memory> // std::addressof
+#include <type_traits>
+#include <utility> // std::move
+
 #include "utlmemory.h"
 
 //#define TEST_UTLQUEUE
 
-// dimhotepus: Do not use enum as assingning invalid values is UB.
+// dimhotepus: Do not use an enum for the invalid value: assigning an out-of-range value is UB.
 using QueueIter_t = intp;
-constexpr inline QueueIter_t QUEUE_ITERATOR_INVALID = std::numeric_limits<intp>::max();
+constexpr inline QueueIter_t QUEUE_ITERATOR_INVALID = std::numeric_limits< intp >::max();
 
-// T is the type stored in the queue
-template< class T, class M = CUtlMemory< T > > 
+// T is the type stored in the queue.
+template< class T, class M = CUtlMemory< T > >
 class CUtlQueue
 {
 public:
+	// Growth relocates elements as bytes, so T must support that operation.
+	static_assert( std::is_trivially_copyable< T >::value,
+	               "CUtlQueue byte-relocates elements during growth; T must be trivially copyable." );
+	static_assert( std::is_trivially_destructible< T >::value,
+	               "CUtlQueue does not destroy the old instances during byte relocation; "
+	               "T must be trivially destructible." );
 
 	CUtlQueue( intp growSize = 0, intp initSize = 0 );
 	CUtlQueue( T *pMemory, intp numElements );
 
-	// return the item from the front of the queue and delete it
-	[[nodiscard]] T RemoveAtHead();
+	// dimhotepus: Destroys elements still in the queue.
+	~CUtlQueue();
+
+	// dimhotepus: Prevent accidental shallow copies of the queue and its memory.
+	CUtlQueue( const CUtlQueue & ) = delete;
+	CUtlQueue &operator=( const CUtlQueue & ) = delete;
+
+	// Return the item from the front of the queue and delete it.
+	[[nodiscard]] T    RemoveAtHead();
 	[[nodiscard]] bool RemoveAtHead( T &removedElement );
 
-	// return the item from the end of the queue and delete it
-	[[nodiscard]] T RemoveAtTail();
+	// Return the item from the end of the queue and delete it.
+	[[nodiscard]] T    RemoveAtTail();
 	[[nodiscard]] bool RemoveAtTail( T &removedElement );
 
-	// return item at the front of the queue
+	// Return item at the front/end of the queue.
 	[[nodiscard]] T const &Head() const;
-	// return item at the end of the queue
 	[[nodiscard]] T const &Tail() const;
 
-	// Add a new item to the end of the queue
-	void	Insert( T const &element );
-	
-	// Add a new item to the end of the queue
-	void	Insert( T &&element );
+	// Add a new item to the end of the queue.
+	void Insert( T const &element );
+	void Insert( T &&element );
 
-	// checks if an element of this value already exists on the stack, returns true if it does
-	[[nodiscard]] bool Check( T const element ) const;
+	// Check if an element with this value already exists in the queue.
+	[[nodiscard]] bool Check( T const &element ) const;
 
-	// iterators may be invalidated by Insert()
+	// Iterators may be invalidated by Insert().
 	[[nodiscard]] QueueIter_t First() const;
 	[[nodiscard]] QueueIter_t Next( QueueIter_t it ) const;
 	[[nodiscard]] QueueIter_t Last() const;
 	[[nodiscard]] QueueIter_t Previous( QueueIter_t it ) const;
-	[[nodiscard]] bool IsValid( QueueIter_t it ) const;
+	[[nodiscard]] bool        IsValid( QueueIter_t it ) const;
 	[[nodiscard]] T const    &Element( QueueIter_t it ) const;
 
-	// Returns the count of elements in the queue
-	[[nodiscard]] intp		Count() const;
+	// Return the count of elements in the queue.
+	[[nodiscard]] intp Count() const;
 
 	// Return whether the queue is empty or not, faster than Count().
-	[[nodiscard]] bool		IsEmpty() const;
+	[[nodiscard]] bool IsEmpty() const;
 
-	// doesn't deallocate memory
-	void		RemoveAll();
+	// Doesn't deallocate memory.
+	void RemoveAll();
 
-	// Memory deallocation
-	void		Purge();
+	// Deallocate memory.
+	void Purge();
 
 protected:
 	[[nodiscard]] QueueIter_t Next_Unchecked( QueueIter_t it ) const;
 	[[nodiscard]] QueueIter_t Previous_Unchecked( QueueIter_t it ) const;
+	// dimhotepus: Check intersections.
+	[[nodiscard]] bool        ContainsElementAddress( const T *p ) const;
 
-	M					m_memory;
+	M m_memory;
 
-	// if m_head == m_tail == QUEUE_ITERATOR_INVALID, then the queue is empty
-	QueueIter_t			m_head;
-	QueueIter_t			m_tail;
+	// If m_head == m_tail == QUEUE_ITERATOR_INVALID, then the queue is empty.
+	QueueIter_t m_head;
+	QueueIter_t m_tail;
 
 #ifdef TEST_UTLQUEUE
 	friend void CUtlQueue_Test();
@@ -83,35 +100,55 @@ protected:
 };
 
 //-----------------------------------------------------------------------------
-// The CUtlQueueFixed class:
-// A queue class with a fixed allocation scheme
+// CUtlQueueFixed: a queue class with a fixed allocation scheme.
 //-----------------------------------------------------------------------------
 template< class T, size_t MAX_SIZE >
-class CUtlQueueFixed : public CUtlQueue< T, CUtlMemoryFixed<T, MAX_SIZE > >
+class CUtlQueueFixed : public CUtlQueue< T, CUtlMemoryFixed< T, MAX_SIZE > >
 {
-	using BaseClass = CUtlQueue<T, CUtlMemoryFixed<T, MAX_SIZE>>;
-public:
+	using BaseClass = CUtlQueue< T, CUtlMemoryFixed< T, MAX_SIZE > >;
 
-	// constructor, destructor
-	CUtlQueueFixed( intp growSize = 0, intp initSize = 0 ) : BaseClass( growSize, initSize ) {}
-	CUtlQueueFixed( T* pMemory, intp numElements ) : BaseClass( pMemory, numElements ) {}
+public:
+	CUtlQueueFixed( intp growSize = 0, intp initSize = 0 ) :
+		BaseClass( growSize, initSize )
+	{
+	}
+
+	CUtlQueueFixed( T *pMemory, intp numElements ) :
+		BaseClass( pMemory, numElements )
+	{
+	}
 };
 
 template< class T, class M >
-inline CUtlQueue<T, M>::CUtlQueue( intp growSize, intp initSize ) :
-	m_memory( growSize, initSize ), m_head( QUEUE_ITERATOR_INVALID ), m_tail( QUEUE_ITERATOR_INVALID )
+inline CUtlQueue< T, M >::CUtlQueue( intp growSize, intp initSize ) :
+	m_memory( growSize, initSize ),
+	m_head( QUEUE_ITERATOR_INVALID ),
+	m_tail( QUEUE_ITERATOR_INVALID )
 {
 }
 
 template< class T, class M >
-inline CUtlQueue<T, M>::CUtlQueue( T *pMemory, intp numElements ) : 
-	m_memory( pMemory, numElements ), m_head( QUEUE_ITERATOR_INVALID ), m_tail( QUEUE_ITERATOR_INVALID )
+inline CUtlQueue< T, M >::CUtlQueue( T *pMemory, intp numElements ) :
+	m_memory( pMemory, numElements ),
+	m_head( QUEUE_ITERATOR_INVALID ),
+	m_tail( QUEUE_ITERATOR_INVALID )
 {
 }
 
-template <class T, class M>
-inline T CUtlQueue<T, M>::RemoveAtHead()
+template< class T, class M >
+inline CUtlQueue< T, M >::~CUtlQueue()
 {
+	RemoveAll();
+}
+
+template< class T, class M >
+inline T CUtlQueue< T, M >::RemoveAtHead()
+{
+	static_assert( std::is_default_constructible< T >::value,
+	               "RemoveAtHead() requires a default-constructible T." );
+	static_assert( std::is_move_constructible< T >::value,
+	               "RemoveAtHead() requires T to be constructible from T&&." );
+
 	T temp;
 	// dimhotepus: Check element is removed.
 	[[maybe_unused]] const bool ok = RemoveAtHead( temp );
@@ -119,9 +156,12 @@ inline T CUtlQueue<T, M>::RemoveAtHead()
 	return temp;
 }
 
-template <class T, class M>
-inline bool CUtlQueue<T, M>::RemoveAtHead( T &removedElement )
+template< class T, class M >
+inline bool CUtlQueue< T, M >::RemoveAtHead( T &removedElement )
 {
+	static_assert( std::is_copy_assignable< T >::value,
+	               "RemoveAtHead(T&) requires copy-assignable T." );
+
 	Assert( m_head != QUEUE_ITERATOR_INVALID );
 	if ( m_head == QUEUE_ITERATOR_INVALID )
 	{
@@ -129,9 +169,10 @@ inline bool CUtlQueue<T, M>::RemoveAtHead( T &removedElement )
 		return false;
 	}
 
-	QueueIter_t it = m_head;
-	removedElement = m_memory[ it ];
-	Destruct( std::addressof( m_memory[ it ] ) );
+	const QueueIter_t it = m_head;
+	removedElement = m_memory[it];
+	Destruct( std::addressof( m_memory[it] ) );
+
 	if ( m_head == m_tail )
 	{
 		m_head = m_tail = QUEUE_ITERATOR_INVALID;
@@ -140,12 +181,18 @@ inline bool CUtlQueue<T, M>::RemoveAtHead( T &removedElement )
 	{
 		m_head = Next_Unchecked( m_head );
 	}
+
 	return true;
 }
 
-template <class T, class M>
-inline T CUtlQueue<T, M>::RemoveAtTail()
+template< class T, class M >
+inline T CUtlQueue< T, M >::RemoveAtTail()
 {
+	static_assert( std::is_default_constructible< T >::value,
+	               "RemoveAtTail() requires a default-constructible T." );
+	static_assert( std::is_move_constructible< T >::value,
+	               "RemoveAtTail() requires T to be constructible from T&&." );
+
 	T temp;
 	// dimhotepus: Check element is removed.
 	[[maybe_unused]] const bool ok = RemoveAtTail( temp );
@@ -153,9 +200,12 @@ inline T CUtlQueue<T, M>::RemoveAtTail()
 	return temp;
 }
 
-template <class T, class M>
-inline bool CUtlQueue<T, M>::RemoveAtTail( T &removedElement )
+template< class T, class M >
+inline bool CUtlQueue< T, M >::RemoveAtTail( T &removedElement )
 {
+	static_assert( std::is_copy_assignable< T >::value,
+	               "RemoveAtTail(T&) requires copy-assignable T." );
+
 	Assert( m_tail != QUEUE_ITERATOR_INVALID );
 	if ( m_tail == QUEUE_ITERATOR_INVALID )
 	{
@@ -163,8 +213,10 @@ inline bool CUtlQueue<T, M>::RemoveAtTail( T &removedElement )
 		return false;
 	}
 
-	removedElement = m_memory[ m_tail ];
-	Destruct( std::addressof( m_memory[ m_tail ] ) );
+	const QueueIter_t it = m_tail;
+	removedElement = m_memory[it];
+	Destruct( std::addressof( m_memory[it] ) );
+
 	if ( m_head == m_tail )
 	{
 		m_head = m_tail = QUEUE_ITERATOR_INVALID;
@@ -173,12 +225,16 @@ inline bool CUtlQueue<T, M>::RemoveAtTail( T &removedElement )
 	{
 		m_tail = Previous_Unchecked( m_tail );
 	}
+
 	return true;
 }
 
-template <class T, class M>
-inline T const& CUtlQueue<T, M>::Head() const
+template< class T, class M >
+inline T const &CUtlQueue< T, M >::Head() const
 {
+	static_assert( std::is_default_constructible< T >::value,
+	               "Head() requires a default-constructible T for its empty-queue fallback." );
+
 	Assert( m_head != QUEUE_ITERATOR_INVALID );
 	if ( m_head == QUEUE_ITERATOR_INVALID )
 	{
@@ -186,12 +242,15 @@ inline T const& CUtlQueue<T, M>::Head() const
 		return dummy;
 	}
 
-	return m_memory[ m_head ];
+	return m_memory[m_head];
 }
 
-template <class T, class M>
-inline T const& CUtlQueue<T, M>::Tail() const
+template< class T, class M >
+inline T const &CUtlQueue< T, M >::Tail() const
 {
+	static_assert( std::is_default_constructible< T >::value,
+	               "Tail() requires a default-constructible T for its empty-queue fallback." );
+
 	Assert( m_tail != QUEUE_ITERATOR_INVALID );
 	if ( m_tail == QUEUE_ITERATOR_INVALID )
 	{
@@ -199,217 +258,371 @@ inline T const& CUtlQueue<T, M>::Tail() const
 		return dummy;
 	}
 
-	return m_memory[ m_tail ];
+	return m_memory[m_tail];
 }
 
-template <class T, class M>
-void CUtlQueue<T, M>::Insert( T const &element )
+template< class T, class M >
+void CUtlQueue< T, M >::Insert( T const &element )
 {
+	static_assert( std::is_copy_constructible< T >::value,
+	               "Insert(const T&) requires copy-constructible T." );
+
 	if ( m_tail == QUEUE_ITERATOR_INVALID )
 	{
-		// empty
 		m_memory.EnsureCapacity( 1 );
+
+		// dimhotepus: Fixed or failed allocation may still have no usable slot.
+		if ( m_memory.NumAllocated() < 1 )
+		{
+			Assert( m_memory.NumAllocated() >= 1 );
+			return;
+		}
+
+		CopyConstruct( std::addressof( m_memory[0] ), element );
+		// dimhotepus: Commit only after construction.
 		m_head = m_tail = QueueIter_t( 0 );
+		return;
+	}
+
+	QueueIter_t nextTail = Next_Unchecked( m_tail );
+
+	if ( nextTail != m_head )
+	{
+		// Not full: construct first, then update the tail.
+		CopyConstruct( std::addressof( m_memory[nextTail] ), element );
+		m_tail = nextTail;
+		return;
+	}
+
+	// Full: stage the source before Grow(), which may relocate the queue.
+	T temp( element );
+
+	const intp oldAllocCount = m_memory.NumAllocated();
+	m_memory.Grow();
+	const intp newAllocCount = m_memory.NumAllocated();
+
+	// dimhotepus: Avoid writing out of bounds if this memory type cannot grow.
+	if ( newAllocCount <= oldAllocCount )
+	{
+		Assert( newAllocCount > oldAllocCount );
+		return;
+	}
+
+	const intp        growAmount = newAllocCount - oldAllocCount;
+	const QueueIter_t oldHead = m_head;
+
+	if ( oldHead != QueueIter_t( 0 ) )
+	{
+		// Relocate the wrapped segment into the newly added portion.
+		Q_memmove(
+		&m_memory[oldHead + growAmount],
+		&m_memory[oldHead],
+		( oldAllocCount - oldHead ) * sizeof( T ) );
+
+#ifndef NDEBUG
+		Q_memset( &m_memory[oldHead], 0xdd, growAmount * sizeof( T ) );
+#endif
+
+		m_head = QueueIter_t( oldHead + growAmount );
+	}
+
+	nextTail = Next_Unchecked( m_tail );
+	CopyConstruct( std::addressof( m_memory[nextTail] ), temp );
+
+	// dimhotepus: Commit only after construction.
+	m_tail = nextTail;
+}
+
+template< class T, class M >
+void CUtlQueue< T, M >::Insert( T &&element )
+{
+	static_assert( std::is_move_constructible< T >::value,
+	               "Insert(T&&) requires T to be constructible from T&&." );
+
+	if ( m_tail == QUEUE_ITERATOR_INVALID )
+	{
+		m_memory.EnsureCapacity( 1 );
+
+		// dimhotepus: Fixed or failed allocation may still have no usable slot.
+		if ( m_memory.NumAllocated() < 1 )
+		{
+			Assert( m_memory.NumAllocated() >= 1 );
+			return;
+		}
+
+		MoveConstruct( std::addressof( m_memory[0] ), std::move( element ) );
+		m_head = m_tail = QueueIter_t( 0 );
+		return;
+	}
+
+	QueueIter_t nextTail = Next_Unchecked( m_tail );
+
+	if ( nextTail != m_head )
+	{
+		MoveConstruct( std::addressof( m_memory[nextTail] ), std::move( element ) );
+		m_tail = nextTail;
+		return;
+	}
+
+	// dimhotepus: Full queue. If element aliases a queued item, remember its iterator
+	// before growth so the source can be found after relocation.
+	const bool  aliasesQueue = ContainsElementAddress( std::addressof( element ) );
+	QueueIter_t aliasedIt = QUEUE_ITERATOR_INVALID;
+
+	if ( aliasesQueue )
+	{
+		for ( QueueIter_t it = First();
+		      it != QUEUE_ITERATOR_INVALID;
+		      it = Next( it ) )
+		{
+			if ( std::addressof( m_memory[it] ) == std::addressof( element ) )
+			{
+				aliasedIt = it;
+				break;
+			}
+		}
+
+		Assert( aliasedIt != QUEUE_ITERATOR_INVALID );
+		if ( aliasedIt == QUEUE_ITERATOR_INVALID )
+		{
+			return;
+		}
+	}
+
+	const intp        oldAllocCount = m_memory.NumAllocated();
+	const QueueIter_t oldHead = m_head;
+
+	m_memory.Grow();
+	const intp newAllocCount = m_memory.NumAllocated();
+
+	if ( newAllocCount <= oldAllocCount )
+	{
+		Assert( newAllocCount > oldAllocCount );
+		return;
+	}
+
+	const intp growAmount = newAllocCount - oldAllocCount;
+
+	if ( oldHead != QueueIter_t( 0 ) )
+	{
+		Q_memmove(
+		&m_memory[oldHead + growAmount],
+		&m_memory[oldHead],
+		( oldAllocCount - oldHead ) * sizeof( T ) );
+
+#ifndef NDEBUG
+		Q_memset( &m_memory[oldHead], 0xdd, growAmount * sizeof( T ) );
+#endif
+
+		m_head = QueueIter_t( oldHead + growAmount );
+
+		// The high wrapped segment moved; adjust an aliased source iterator.
+		if ( aliasesQueue && aliasedIt >= oldHead )
+		{
+			aliasedIt = QueueIter_t( aliasedIt + growAmount );
+		}
+	}
+
+	nextTail = Next_Unchecked( m_tail );
+
+	if ( aliasesQueue )
+	{
+		// dimhotepus: Move only after growth succeeds, so a failed growth leaves the
+		// existing queued value unchanged.
+		MoveConstruct(
+		std::addressof( m_memory[nextTail] ),
+		std::move( m_memory[aliasedIt] ) );
 	}
 	else
 	{
-		// non-empty
-		QueueIter_t nextTail = Next_Unchecked( m_tail );
-		if ( nextTail == m_head ) // if non-empty, and growing by 1 appears to make the queue of length 1, then we were already full before the Insert
-		{
-			intp nOldAllocCount = m_memory.NumAllocated();
-			m_memory.Grow();
-			intp nNewAllocCount = m_memory.NumAllocated();
-			intp nGrowAmount = nNewAllocCount - nOldAllocCount;
-
-			nextTail = Next_Unchecked( m_tail ); // if nextTail was 0, then it now should be nOldAllocCount
-
-			if ( m_head != QueueIter_t( 0 ) )
-			{
-				// if the queue wraps around the end of m_memory, move the part at the end of memory to the new end of memory
-				Q_memmove( &m_memory[ m_head + nGrowAmount ], &m_memory[ m_head ], ( nOldAllocCount - m_head ) * sizeof( T ) );
-#ifndef NDEBUG
-				Q_memset( &m_memory[ m_head ], 0xdd, nGrowAmount * sizeof( T ) );
-#endif
-				m_head = QueueIter_t( m_head + nGrowAmount );
-			}
-		}
-		m_tail = nextTail;
+		MoveConstruct( std::addressof( m_memory[nextTail] ), std::move( element ) );
 	}
 
-	CopyConstruct( std::addressof( m_memory[ m_tail ] ), element );
+	m_tail = nextTail;
 }
 
-template <class T, class M>
-void CUtlQueue<T, M>::Insert( T&& element )
-{
-	if ( m_tail == QUEUE_ITERATOR_INVALID )
-	{
-		// empty
-		m_memory.EnsureCapacity( 1 );
-		m_head = m_tail = QueueIter_t( 0 );
-	}
-	else
-	{
-		// non-empty
-		QueueIter_t nextTail = Next_Unchecked( m_tail );
-		if ( nextTail == m_head ) // if non-empty, and growing by 1 appears to make the queue of length 1, then we were already full before the Insert
-		{
-			intp nOldAllocCount = m_memory.NumAllocated();
-			m_memory.Grow();
-			intp nNewAllocCount = m_memory.NumAllocated();
-			intp nGrowAmount = nNewAllocCount - nOldAllocCount;
-
-			nextTail = Next_Unchecked( m_tail ); // if nextTail was 0, then it now should be nOldAllocCount
-
-			if ( m_head != QueueIter_t( 0 ) )
-			{
-				// if the queue wraps around the end of m_memory, move the part at the end of memory to the new end of memory
-				Q_memmove( &m_memory[ m_head + nGrowAmount ], &m_memory[ m_head ], ( nOldAllocCount - m_head ) * sizeof( T ) );
-#ifndef NDEBUG
-				Q_memset( &m_memory[ m_head ], 0xdd, nGrowAmount * sizeof( T ) );
-#endif
-				m_head = QueueIter_t( m_head + nGrowAmount );
-			}
-		}
-		m_tail = nextTail;
-	}
-
-	MoveConstruct( std::addressof( m_memory[ m_tail ] ), std::move( element ) );
-}
-
-template <class T, class M>
-bool CUtlQueue<T, M>::Check( T const element ) const
+template< class T, class M >
+bool CUtlQueue< T, M >::Check( T const &element ) const
 {
 	for ( QueueIter_t it = First(); it != QUEUE_ITERATOR_INVALID; it = Next( it ) )
 	{
-		if ( m_memory[ it ] == element )
+		if ( m_memory[it] == element )
+		{
 			return true;
+		}
 	}
+
 	return false;
 }
 
-template <class T, class M>
-QueueIter_t CUtlQueue<T, M>::First() const
+template< class T, class M >
+QueueIter_t CUtlQueue< T, M >::First() const
 {
 	return m_head;
 }
 
-template <class T, class M>
-QueueIter_t CUtlQueue<T, M>::Next( QueueIter_t it ) const
+template< class T, class M >
+QueueIter_t CUtlQueue< T, M >::Next( QueueIter_t it ) const
 {
 	if ( it == QUEUE_ITERATOR_INVALID )
+	{
 		return QUEUE_ITERATOR_INVALID;
+	}
 
 	if ( it == m_tail )
+	{
 		return QUEUE_ITERATOR_INVALID;
+	}
 
 	Assert( IsValid( it ) );
 	if ( !IsValid( it ) )
+	{
 		return QUEUE_ITERATOR_INVALID;
+	}
 
 	return Next_Unchecked( it );
 }
 
-template <class T, class M>
-QueueIter_t CUtlQueue<T, M>::Last() const
+template< class T, class M >
+QueueIter_t CUtlQueue< T, M >::Last() const
 {
 	return m_tail;
 }
 
-template <class T, class M>
-QueueIter_t CUtlQueue<T, M>::Previous( QueueIter_t it ) const
+template< class T, class M >
+QueueIter_t CUtlQueue< T, M >::Previous( QueueIter_t it ) const
 {
 	if ( it == QUEUE_ITERATOR_INVALID )
+	{
 		return QUEUE_ITERATOR_INVALID;
+	}
 
 	if ( it == m_head )
+	{
 		return QUEUE_ITERATOR_INVALID;
+	}
 
 	Assert( IsValid( it ) );
 	if ( !IsValid( it ) )
+	{
 		return QUEUE_ITERATOR_INVALID;
+	}
 
 	return Previous_Unchecked( it );
 }
 
-template <class T, class M>
-QueueIter_t CUtlQueue<T, M>::Next_Unchecked( QueueIter_t it ) const
+template< class T, class M >
+QueueIter_t CUtlQueue< T, M >::Next_Unchecked( QueueIter_t it ) const
 {
 	return it == m_memory.Count() - 1 ? QueueIter_t( 0 ) : QueueIter_t( it + 1 );
 }
 
-template <class T, class M>
-QueueIter_t CUtlQueue<T, M>::Previous_Unchecked( QueueIter_t it ) const
+template< class T, class M >
+QueueIter_t CUtlQueue< T, M >::Previous_Unchecked( QueueIter_t it ) const
 {
 	return it == 0 ? QueueIter_t( m_memory.Count() - 1 ) : QueueIter_t( it - 1 );
 }
 
-template <class T, class M>
-bool CUtlQueue<T, M>::IsValid( QueueIter_t it ) const
+template< class T, class M >
+bool CUtlQueue< T, M >::ContainsElementAddress( const T *p ) const
 {
-	if ( it == QUEUE_ITERATOR_INVALID )
-		return false;
+	for ( QueueIter_t it = First(); it != QUEUE_ITERATOR_INVALID; it = Next( it ) )
+	{
+		if ( std::addressof( m_memory[it] ) == p )
+		{
+			return true;
+		}
+	}
 
-	if ( m_head == QUEUE_ITERATOR_INVALID )
+	return false;
+}
+
+template< class T, class M >
+bool CUtlQueue< T, M >::IsValid( QueueIter_t it ) const
+{
+	if ( it == QUEUE_ITERATOR_INVALID || m_head == QUEUE_ITERATOR_INVALID )
+	{
 		return false;
+	}
 
 	if ( m_head <= m_tail )
+	{
 		return it >= m_head && it <= m_tail;
+	}
 
 	return ( it >= m_head && it < m_memory.Count() ) || ( it >= 0 && it <= m_tail );
 }
 
-template <class T, class M>
-T const& CUtlQueue<T, M>::Element( QueueIter_t it ) const
+template< class T, class M >
+T const &CUtlQueue< T, M >::Element( QueueIter_t it ) const
 {
-	Assert( it != QUEUE_ITERATOR_INVALID );
-	if ( it == QUEUE_ITERATOR_INVALID )
+	static_assert( std::is_default_constructible< T >::value,
+	               "Element() requires a default-constructible T for its invalid-iterator fallback." );
+
+	Assert( IsValid( it ) );
+
+	// dimhotepus: Avoid out-of-range access in release builds.
+	if ( !IsValid( it ) )
 	{
 		static T dummy;
 		return dummy;
 	}
 
-	Assert( IsValid( it ) );
-	return m_memory[ it ];
+	return m_memory[it];
 }
 
-template <class T, class M>
-intp CUtlQueue<T, M>::Count() const
+template< class T, class M >
+intp CUtlQueue< T, M >::Count() const
 {
 	if ( m_head == QUEUE_ITERATOR_INVALID )
 	{
 		Assert( m_tail == QUEUE_ITERATOR_INVALID );
 		return 0;
 	}
+
 	Assert( m_tail != QUEUE_ITERATOR_INVALID );
 
 	if ( m_head <= m_tail )
+	{
 		return m_tail + 1 - m_head;
+	}
 
 	return m_tail + 1 - m_head + m_memory.Count();
 }
 
-template <class T, class M>
-bool CUtlQueue<T, M>::IsEmpty() const
+template< class T, class M >
+bool CUtlQueue< T, M >::IsEmpty() const
 {
-	Assert( ( m_head == QUEUE_ITERATOR_INVALID ) == ( m_tail == QUEUE_ITERATOR_INVALID ) );
-	return ( m_head == QUEUE_ITERATOR_INVALID );
+	Assert( ( m_head == QUEUE_ITERATOR_INVALID ) ==
+	        ( m_tail == QUEUE_ITERATOR_INVALID ) );
+
+	return m_head == QUEUE_ITERATOR_INVALID;
 }
 
-template <class T, class M>
-void CUtlQueue<T, M>::RemoveAll()
+template< class T, class M >
+void CUtlQueue< T, M >::RemoveAll()
 {
+	// dimhotepus: Destruct elements.
+	QueueIter_t it = m_head;
+
+	while ( it != QUEUE_ITERATOR_INVALID )
+	{
+		const QueueIter_t next =
+		( it == m_tail ) ? QUEUE_ITERATOR_INVALID : Next_Unchecked( it );
+
+		Destruct( std::addressof( m_memory[it] ) );
+		it = next;
+	}
+
 	m_head = m_tail = QUEUE_ITERATOR_INVALID;
 }
 
-template <class T, class M>
-void CUtlQueue<T, M>::Purge()
+template< class T, class M >
+void CUtlQueue< T, M >::Purge()
 {
-	m_head = m_tail = QUEUE_ITERATOR_INVALID;
+	RemoveAll();
 	m_memory.Purge();
 }
-
 
 #ifdef TEST_UTLQUEUE
 
@@ -417,10 +630,20 @@ void CUtlQueue<T, M>::Purge()
 
 struct Data_t
 {
-	Data_t( int i = 0xffffffff ) : m_id( i ) {}
-	Data_t( const Data_t &that ) : m_id( that.m_id ) {}
+	constexpr Data_t( int i = 0xffffffff ) :
+		m_id( i )
+	{
+	}
+	constexpr Data_t( const Data_t &that ) :
+		m_id( that.m_id )
+	{
+	}
 	~Data_t() { m_id = 0xdddddddd; }
-	Data_t &operator=( const Data_t &that ) { m_id = that.m_id; return *this; }
+	Data_t &operator=( const Data_t &that )
+	{
+		m_id = that.m_id;
+		return *this;
+	}
 
 	int m_id;
 };
@@ -485,7 +708,7 @@ inline void CUtlQueue_Test()
 
 			for ( int i = 0; i < j; ++i )
 			{
-				int id = queue.m_memory[ i ].m_id;
+				int id = queue.m_memory[i].m_id;
 				if ( queue.IsValid( QueueIter_t( i ) ) )
 				{
 					Assert( ( id & 0xff000000 ) == 0 );
@@ -571,7 +794,7 @@ inline void CUtlQueue_Test()
 
 			for ( int i = 0; i < j; ++i )
 			{
-				int id = queue.m_memory[ i ].m_id;
+				int id = queue.m_memory[i].m_id;
 				if ( queue.IsValid( QueueIter_t( i ) ) )
 				{
 					Assert( ( id & 0xff000000 ) == 0 );
