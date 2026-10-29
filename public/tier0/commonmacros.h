@@ -22,9 +22,6 @@
 // dimhotepus: Add SAL annotations.
 #include "tier0/annotations.h"
 
-// dimhotepus: Standard headers must not see Valve's malloc/free/char overrides.
-#include "valve_on.h"
-
 // dimhotepus: Backport from TF2. Detect the architecture we are running on
 #if defined(__aarch64__) || defined(_M_ARM64)
 #define PLATFORM_ARM 1
@@ -790,5 +787,12 @@ BitwiseClear(OUT_WRITES_ALL_BYTES(size) T* src, size_t size) noexcept {
  */
 #define SE_GCC_END_WARNING_OVERRIDE_SCOPE()
 #endif
+
+// dimhotepus: Turn Valve defines back on only at the end of the header.  It
+// used to happen right after the standard includes, so with STEAM +
+// ENFORCE_WCHAR (see wchartypes.h) every "char" below - MAKEUID, MAKEID,
+// STRING_MATCHES_ID, ID_TO_STRING, RtlpNumberOf, BitwiseSet - was rewritten to
+// DontUseChar_SeeWchartypes_h and failed to compile.
+#include "valve_on.h"
 
 #endif  // !SE_PUBLIC_TIER0_COMMONMACROS_H_
