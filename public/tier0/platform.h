@@ -527,7 +527,8 @@ template <typename R, typename T>
 #endif
 
 // Force a function call site -not- to inlined. (useful for profiling)
-#define DONT_INLINE(a) (((int)(a)+1)?(a):(a))
+// dimhotepus: intp, not int: casting a 64-bit pointer to int is ill-formed.
+#define DONT_INLINE(a) (((intp)(a)+1)?(a):(a))
 
 // Pass hints to the compiler to prevent it from generating unnessecary / stupid code
 // in certain situations.  Several compilers other than MSVC also have an equivilent
