@@ -418,7 +418,8 @@ template <typename R, typename T>
 
 // Linux had a few areas where it didn't construct objects in the same order that Windows does.
 // So when CVProfile::CVProfile() would access g_pMemAlloc, it would crash because the allocator wasn't initalized yet.
-#ifdef POSIX
+// dimhotepus: init_priority isn't supported by the Mach-O / Darwin toolchain.
+#if defined(POSIX) && !defined(__APPLE__)
 	#define CONSTRUCT_EARLY __attribute__((init_priority(101)))
 #else
 	#define CONSTRUCT_EARLY
@@ -433,7 +434,7 @@ template <typename R, typename T>
 	// dimhotepus: Allow compiler optimize allocated pointer access.
 	#define ALLOC_CALL RESTRICT_FUNC __declspec(allocator)
 	#define FREE_CALL
-#elif defined(GNUC)
+#elif defined(__GNUC__) || defined(__clang__)
 	#define SELECTANY __attribute__((weak))
 	#if defined(LINUX) && !defined(DEDICATED)
 		#define RESTRICT
