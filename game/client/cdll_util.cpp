@@ -721,13 +721,6 @@ CEntitySphereQuery::CEntitySphereQuery( const Vector &center, float radius, int 
 	m_listCount = UTIL_EntitiesInSphere( m_pList, SE_ARRAYSIZE(m_pList), center, radius, flagMask, partitionMask );
 }
 
-CBaseEntity *CEntitySphereQuery::GetCurrentEntity()
-{
-	if ( m_listIndex < m_listCount )
-		return m_pList[m_listIndex];
-	return NULL;
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : font - 
