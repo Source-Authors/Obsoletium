@@ -1141,17 +1141,8 @@ PLATFORM_INTERFACE struct tm *		Plat_gmtime( const time_t *timep, struct tm *res
 PLATFORM_INTERFACE time_t			Plat_timegm( struct tm *timeptr );
 PLATFORM_INTERFACE struct tm *		Plat_localtime( const time_t *timep, struct tm *result );
 
-#if defined( _WIN32 )
-	extern "C" unsigned __int64 __rdtsc();
-	extern "C" unsigned __int64 __rdtscp(unsigned *aux);
-
-// dimhotepus: Clang does not have __rdtscp intrinsic for now.
-#if defined(_MSC_VER) && !defined(__clang__) 
-	#pragma intrinsic(__rdtscp)
-#endif  // _MSC_VER) && !defined(__clang__) 
-
-	#pragma intrinsic(__rdtsc)
-#endif
+// dimhotepus: Rely on <intrin.h> / <x86intrin.h> for the declarations.
+#if defined( PLATFORM_INTEL )
 
 [[nodiscard]] FORCEINLINE uint64_t Plat_Rdtsc()
 	{
