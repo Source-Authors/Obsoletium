@@ -43,11 +43,12 @@ CFontManager::CFontManager()
 	m_pFontDataHelper = NULL;
 #endif
 
+	// dimhotepus: Use locale set when app starts (en_US.UTF-8). TF2 backport.
 	// setup our text locale
-	setlocale( LC_CTYPE, "" );
-	setlocale( LC_TIME, "" );
-	setlocale( LC_COLLATE, "" );
-	setlocale( LC_MONETARY, "" );
+	// setlocale( LC_CTYPE, "" );
+	// setlocale( LC_TIME, "" );
+	// setlocale( LC_COLLATE, "" );
+	// setlocale( LC_MONETARY, "" );
 
 	m_pFileSystem = NULL;
 	m_pMaterialSystem = NULL;
