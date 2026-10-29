@@ -59,8 +59,11 @@
 #include <cstring>  // std::memset
 #include <cstddef>  // std::size
 
-#if defined(__GCC__) && (defined(__i386__) || defined(__x86_64__))
-#include <x86intrin.h>  // __rdtsc, __rdtscp
+// dimhotepus: __GCC__ doesn't exist, so x86intrin.h was never included.
+#if defined(_WIN32)
+#include <intrin.h>  // __rdtsc, __rdtscp, _mm_lfence, __debugbreak, _byteswap_*
+#elif defined(PLATFORM_INTEL)
+#include <x86intrin.h>  // __rdtsc, __rdtscp, _mm_lfence
 #endif
 
 #include "valve_minmax_on.h"	// GCC 4.2.2 headers screw up our min/max defs.
