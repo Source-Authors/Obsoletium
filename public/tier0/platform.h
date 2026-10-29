@@ -800,255 +800,116 @@ inline float SafeSwapFloat( float *pOut, const float *pIn )
 	return *pOut;
 }
 
-#if defined(VALVE_LITTLE_ENDIAN)
-
-#define BigShort( val )				WordSwap( val )
-#define BigWord( val )				WordSwap( val )
-#define BigLong( val )				DWordSwap( val )
-#define BigDWord( val )				DWordSwap( val )
-#define LittleShort( val )			( val )
-#define LittleWord( val )			( val )
-#define LittleLong( val )			( val )
-#define LittleDWord( val )			( val )
-#define LittleQWord( val )			( val )
-#define SwapShort( val )			BigShort( val )
-#define SwapWord( val )				BigWord( val )
-#define SwapLong( val )				BigLong( val )
-#define SwapDWord( val )			BigDWord( val )
-
-// Pass floats by pointer for swapping to avoid truncation in the fpu
-#define BigFloat( pOut, pIn )		SafeSwapFloat( pOut, pIn )
-#define LittleFloat( pOut, pIn )	( *pOut = *pIn )
-#define SwapFloat( pOut, pIn )		BigFloat( pOut, pIn )
-
-#elif defined(VALVE_BIG_ENDIAN)
-
-#define BigShort( val )				( val )
-#define BigWord( val )				( val )
-#define BigLong( val )				( val )
-#define BigDWord( val )				( val )
-#define LittleShort( val )			WordSwap( val )
-#define LittleWord( val )			WordSwap( val )
-#define LittleLong( val )			DWordSwap( val )
-#define LittleDWord( val )			DWordSwap( val )
-#define LittleQWord( val )			QWordSwap( val )
-#define SwapShort( val )			LittleShort( val )
-#define SwapWord( val )				LittleWord( val )
-#define SwapLong( val )				LittleLong( val )
-#define SwapDWord( val )			LittleDWord( val )
-
-// Pass floats by pointer for swapping to avoid truncation in the fpu
-#define BigFloat( pOut, pIn )		( *pOut = *pIn )
-#define LittleFloat( pOut, pIn )	SafeSwapFloat( pOut, pIn )
-#define SwapFloat( pOut, pIn )		LittleFloat( pOut, pIn )
-
-#else
-
+// dimhotepus: One implementation for every target.  The old i386-only macro
+// path behaved differently from the template path, and the template path:
+//  * used `long` for *Long, which is 64-bit on Linux / macOS (LP64), so
+//    SwapLong / BigLong / LittleLong failed to compile there;
+//  * took uint32 in LittleSize_t, so it could never swap 8 bytes.
+// *Long are 32-bit, matching every on-disk / on-wire format that uses them.
 template <bool isLittleEndian = endian::native == endian::little>
 [[nodiscard]] inline int16 BigShort( int16 val )
 {
-	if constexpr (isLittleEndian)
-	{
-		return WordSwap( val );
-	}
-	else
-	{
-		return val;
-	}
+	if constexpr (isLittleEndian) return WordSwap( val );
+	else return val;
 }
 template <bool isLittleEndian = endian::native == endian::little>
 [[nodiscard]] inline uint16 BigWord( uint16 val )
 {
-	if constexpr (isLittleEndian)
-	{
-		return WordSwap( val );
+	if constexpr (isLittleEndian) return WordSwap( val );
+	else return val;
 	}
-	else
-	{
-		return val;
-	}
-}
 template <bool isLittleEndian = endian::native == endian::little>
-[[nodiscard]] inline long BigLong( long val )
-{
-	if constexpr (isLittleEndian)
+[[nodiscard]] inline int32 BigLong( int32 val )
 	{
-		// dimhotepus: Honor size ex for LP64.
-		if constexpr (sizeof(val) <= 4) //-V112
-			return DWordSwap( val );
-		else
-			return QWordSwap( val );
-	}
-	else
-	{
-		return val;
-	}
+	if constexpr (isLittleEndian) return DWordSwap( val );
+	else return val;
 }
 template <bool isLittleEndian = endian::native == endian::little>
 [[nodiscard]] inline uint32 BigDWord( uint32 val )
 {
-	if constexpr (isLittleEndian)
-	{
-		return DWordSwap( val );
-	}
-	else
-	{
-		return val;
-	}
+	if constexpr (isLittleEndian) return DWordSwap( val );
+	else return val;
 }
 template <bool isLittleEndian = endian::native == endian::little>
-[[nodiscard]] inline size_t BigSize_t( size_t val )
-{
-	if constexpr (isLittleEndian)
-	{
-		if constexpr (sizeof(val) == 8)
+[[nodiscard]] inline uint64 BigQWord( uint64 val )
 		{
-			return QWordSwap( val );
+	if constexpr (isLittleEndian) return QWordSwap( val );
+	else return val;
 		}
-		else if constexpr (sizeof(val) == 4)
+
+[[nodiscard]] inline size_t SwapSize_t( size_t val )
 		{
-			return DWordSwap( val );
-		}
+	static_assert( sizeof(size_t) == 4 || sizeof(size_t) == 8, "Unsupported size_t width" );
+	if constexpr ( sizeof(size_t) == 8 )
+		return static_cast<size_t>( QWordSwap( static_cast<uint64>( val ) ) );
 		else
-		{
-			unreachable();
-		}
+		return static_cast<size_t>( DWordSwap( static_cast<uint32>( val ) ) );
 	}
-	else
+
+template <bool isLittleEndian = endian::native == endian::little>
+[[nodiscard]] inline size_t BigSize_t( size_t val )
 	{
-		return val;
-	}
+	if constexpr (isLittleEndian) return SwapSize_t( val );
+	else return val;
 }
 template <bool isLittleEndian = endian::native == endian::little>
 [[nodiscard]] inline int16 LittleShort( int16 val )
 {
-	if constexpr (isLittleEndian)
-	{
-		return val;
-	}
-	else
-	{
-		return WordSwap( val );
-	}
+	if constexpr (isLittleEndian) return val;
+	else return WordSwap( val );
 }
 template <bool isLittleEndian = endian::native == endian::little>
 [[nodiscard]] inline uint16 LittleWord( uint16 val )
 {
-	if constexpr (isLittleEndian)
-	{
-		return val;
-	}
-	else
-	{
-		return WordSwap( val );
-	}
+	if constexpr (isLittleEndian) return val;
+	else return WordSwap( val );
 }
 template <bool isLittleEndian = endian::native == endian::little>
-[[nodiscard]] inline long LittleLong( long val )
+[[nodiscard]] inline int32 LittleLong( int32 val )
 {
-	if constexpr (isLittleEndian)
-		return val;
-	// dimhotepus: Honor size ex for LP64.
-	else if constexpr (sizeof(val) <= 4) //-V112
-		return DWordSwap( val );
-	else
-		return QWordSwap( val );
+	if constexpr (isLittleEndian) return val;
+	else return DWordSwap( val );
 }
 template <bool isLittleEndian = endian::native == endian::little>
 [[nodiscard]] inline uint32 LittleDWord( uint32 val )
 {
-	if constexpr (isLittleEndian)
-	{
-		return val;
-	}
-	else
-	{
-		return DWordSwap(val);
-	}
-}
-template< bool isLittleEndian = endian::native == endian::little >
-[[nodiscard]] inline size_t LittleSize_t( uint32 val )
-{
-	if constexpr (isLittleEndian)
-	{
-		return val;
-	}
-	else
-	{
-		if constexpr (sizeof(val) == 8)
-		{
-			return QWordSwap( val );
+	if constexpr (isLittleEndian) return val;
+	else return DWordSwap( val );
 		}
-		else if constexpr (sizeof(val) == 4)
+template <bool isLittleEndian = endian::native == endian::little>
+[[nodiscard]] inline size_t LittleSize_t( size_t val )
 		{
-			return DWordSwap( val );
-		}
-		else
-		{
-			unreachable();
-		}
-	}
+	if constexpr (isLittleEndian) return val;
+	else return SwapSize_t( val );
 }
 template <bool isLittleEndian = endian::native == endian::little>
 [[nodiscard]] inline uint64 LittleQWord( uint64 val )
 {
-	if constexpr (isLittleEndian)
-	{
-		return val;
-	}
-	else
-	{
-		return QWordSwap( val );
-	}
+	if constexpr (isLittleEndian) return val;
+	else return QWordSwap( val );
 }
-[[nodiscard]] inline int16 SwapShort( int16 val )					{ return WordSwap( val ); }
-[[nodiscard]] inline uint16 SwapWord( uint16 val )				{ return WordSwap( val ); }
-[[nodiscard]] inline long SwapLong( long val )					{ return DWordSwap( val ); }
-[[nodiscard]] inline uint32 SwapDWord( uint32 val )				{ return DWordSwap( val ); }
-[[nodiscard]] inline size_t SwapSize_t( size_t val )
-{
-	if constexpr ( sizeof( val ) == 8 )
-	{
-		return QWordSwap( val );
-	}
-	else if constexpr ( sizeof( val ) == 4 )
-	{
-		return DWordSwap( static_cast<unsigned>( val ) );
-	}
-	else
-	{
-		unreachable();
-	}
-}
+[[nodiscard]] inline int16 SwapShort( int16 val )		{ return WordSwap( val ); }
+[[nodiscard]] inline uint16 SwapWord( uint16 val )		{ return WordSwap( val ); }
+[[nodiscard]] inline int32 SwapLong( int32 val )		{ return DWordSwap( val ); }
+[[nodiscard]] inline uint32 SwapDWord( uint32 val )		{ return DWordSwap( val ); }
+[[nodiscard]] inline uint64 SwapQWord( uint64 val )		{ return QWordSwap( val ); }
 
 // Pass floats by pointer for swapping to avoid truncation in the fpu
 template <bool isLittleEndian = endian::native == endian::little>
 inline void BigFloat( float *pOut, const float *pIn )
 {
-	if constexpr (isLittleEndian)
-	{
-		SafeSwapFloat( pOut, pIn );
-	}
-	else
-	{
-		*pOut = *pIn;
-	}
+	if constexpr (isLittleEndian) SafeSwapFloat( pOut, pIn );
+	else *pOut = *pIn;
 }
 template <bool isLittleEndian = endian::native == endian::little>
 inline void LittleFloat( float *pOut, const float *pIn )
 {
-	if constexpr (isLittleEndian)
-	{
-		*pOut = *pIn;
-	}
-	else
-	{
-		SafeSwapFloat( pOut, pIn );
-	}
+	if constexpr (isLittleEndian) *pOut = *pIn;
+	else SafeSwapFloat( pOut, pIn );
 }
 inline void SwapFloat( float *pOut, const float *pIn )		{ SafeSwapFloat( pOut, pIn ); }
 
-#endif
+
 
 [[nodiscard]] FORCEINLINE unsigned int LoadLittleDWord( const unsigned int *base, size_t dwordIndex )
 {
