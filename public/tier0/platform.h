@@ -238,7 +238,7 @@ using uint = unsigned int;
 #define __i386__	1
 #endif
 
-#elif POSIX
+#elif defined(POSIX)
 #if defined( OSX ) && defined( CARBON_WORKAROUND )
 #define DWORD unsigned int
 #else
@@ -246,10 +246,20 @@ typedef unsigned int DWORD;
 #endif
 typedef unsigned short WORD;
 typedef void * HINSTANCE;
+// dimhotepus: PATH_MAX comes from <climits>; don't clobber an existing MAX_PATH.
+#if !defined(MAX_PATH) && defined(PATH_MAX)
 #define MAX_PATH PATH_MAX
+#endif
+#ifndef __cdecl
 #define __cdecl
+#endif
+#ifndef __stdcall
 #define __stdcall
-#define __declspec
+#endif
+// dimhotepus: Must be function-like, otherwise __declspec(x) leaves "(x)" behind.
+#ifndef __declspec
+#define __declspec(...)
+#endif
 
 #endif // defined(_WIN32) && !defined(WINDED)
 
@@ -493,6 +503,10 @@ template <typename R, typename T>
 	// this macro lets us not force inlining in that case
 	#define  FORCEINLINE_TEMPLATE		__forceinline
 #else
+		// dimhotepus: Calling conventions are meaningless outside Windows, but
+		// must still exist (TEMPLATE_FUNCTION_TABLE uses FASTCALL).
+		#define  STDCALL
+		#define  FASTCALL
 	#define FORCEINLINE inline __attribute__((always_inline))
 	// dimhotepus: TF2 backport. Drop workaround for old GCC.
 	#define FORCEINLINE_TEMPLATE		FORCEINLINE
