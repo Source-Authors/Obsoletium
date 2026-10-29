@@ -1634,9 +1634,10 @@ inline void Destruct( T* pMemory )
 template <class T, size_t N>
 inline void Destruct( T (*pMemory)[N] )
 {
-	for ( size_t i = 0; i < N; i++ )
+	// dimhotepus: Destruct in reverse order to construct.
+	for ( size_t i = N; i-- > 0; )
 	{
-		(pMemory[i])->~T();
+		(*pMemory)[i].~T();
 	}
 
 #ifndef NDEBUG
