@@ -341,7 +341,7 @@ typedef void * HINSTANCE;
 #define ALIGN16_POST
 #define ALIGN32_POST
 #define ALIGN128_POST
-#elif defined( GNUC )
+#elif defined(__GNUC__) || defined(__clang__)
 // gnuc has the align decoration at the end
 #define ALIGN4
 #define ALIGN8 
@@ -557,7 +557,7 @@ template <typename R, typename T>
 // as little code as possible, and throw an assertion in debug.
 #define NO_DEFAULT default: { Assert(0); unreachable(); }
 
-#if defined( LINUX ) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
+#if defined( __GNUC__ ) && !defined( __clang__ )
   // based on some Jonathan Wakely macros on the net...
   #define GCC_DIAG_STR(s) #s
   #define GCC_DIAG_JOINSTR(x,y) GCC_DIAG_STR(x ## y)
