@@ -500,7 +500,12 @@ template <typename R, typename T>
 
 // dimhotepus: TF2 backport.
 #if defined( PLATFORM_HAS_ASAN )
+	// dimhotepus: MSVC /fsanitize=address defines __SANITIZE_ADDRESS__ too.
+	#if defined( _MSC_VER ) && !defined( __clang__ )
+		#define NO_ASAN __declspec(no_sanitize_address)
+	#else
 	#define NO_ASAN __attribute__((no_sanitize("address")))
+	#endif
 	#define NO_ASAN_FORCEINLINE NO_ASAN inline
 #else
 	#define NO_ASAN
