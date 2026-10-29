@@ -767,12 +767,25 @@ template <typename T>
 // The typically used methods.
 //-------------------------------------
 
-#if defined(__i386__) && !defined(VALVE_LITTLE_ENDIAN)
+// dimhotepus: Detect byte order on every target.
+#if !defined( VALVE_LITTLE_ENDIAN ) && !defined( VALVE_BIG_ENDIAN )
+#if defined( _WIN32 ) || ( defined( __BYTE_ORDER__ ) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ )
 #define VALVE_LITTLE_ENDIAN 1
+#elif defined( __BYTE_ORDER__ ) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define VALVE_BIG_ENDIAN 1
+#else
+#error "Please define VALVE_LITTLE_ENDIAN or VALVE_BIG_ENDIAN for your platform"
+#endif
 #endif
 
-#if defined( _SGI_SOURCE )
-#define	VALVE_BIG_ENDIAN 1
+#if defined( VALVE_LITTLE_ENDIAN ) && defined( VALVE_BIG_ENDIAN )
+#error "VALVE_LITTLE_ENDIAN and VALVE_BIG_ENDIAN are both defined"
+#endif
+
+#ifdef VALVE_LITTLE_ENDIAN
+static_assert( endian::native == endian::little, "VALVE_LITTLE_ENDIAN set on a big endian target" );
+#else
+static_assert( endian::native == endian::big, "VALVE_BIG_ENDIAN set on a little endian target" );
 #endif
 
 // If a swapped float passes through the fpu, the bytes may get changed.
