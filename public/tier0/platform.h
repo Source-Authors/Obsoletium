@@ -515,7 +515,8 @@ template <typename R, typename T>
 
 // Marks the codepath from here until the next branch entry point as unreachable,
 // and asserts if any attempt is made to execute it.
-#define UNREACHABLE() { Assert(0); unreachable(); }
+// dimhotepus: do/while so "if (x) UNREACHABLE(); else ..." compiles.
+#define UNREACHABLE() do { Assert(0); unreachable(); } while (0)
 
 // In cases where no default is present or appropriate, this causes MSVC to generate
 // as little code as possible, and throw an assertion in debug.
