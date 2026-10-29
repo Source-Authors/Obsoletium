@@ -1866,8 +1866,6 @@ PLATFORM_INTERFACE void Plat_SetWatchdogHandlerFunction( Plat_WatchDogHandlerFun
 
 //-----------------------------------------------------------------------------
 
-#include "valve_on.h"
-
 #if defined(TIER0_DLL_EXPORT)
 extern "C" [[nodiscard]] int V_tier0_stricmp( IN_Z const char *s1, IN_Z const char *s2 );
 #undef stricmp
@@ -1876,5 +1874,10 @@ extern "C" [[nodiscard]] int V_tier0_stricmp( IN_Z const char *s1, IN_Z const ch
 #define strcmpi(s1,s2) V_tier0_stricmp( s1, s2 )
 #endif
 
+// dimhotepus: Turn Valve defines back on only after the last declaration.
+// With STEAM + ENFORCE_WCHAR, valve_on.h #defines char (see wchartypes.h), so
+// V_tier0_stricmp's "const char *" parameters failed to compile when they
+// came after it.
+#include "valve_on.h"
 
 #endif  // !SE_PUBLIC_TIER0_PLATFORM_H_
