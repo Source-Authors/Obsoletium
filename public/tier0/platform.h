@@ -1109,15 +1109,15 @@ template <typename Tdst, typename Tsrc>
 // It should not be changed after startup unless you really know what you're doing. The only place
 // that should do this is the benchmark code itself so it can output a legit duration.
 PLATFORM_INTERFACE void				Plat_SetBenchmarkMode( bool bBenchmarkMode );	
-PLATFORM_INTERFACE [[nodiscard]] bool				Plat_IsInBenchmarkMode();
+PLATFORM_INTERFACE MUST_CHECK_RETURN bool				Plat_IsInBenchmarkMode();
 
 
-PLATFORM_INTERFACE [[nodiscard]] double			Plat_FloatTime();		// Returns time in seconds since the module was loaded.
-PLATFORM_INTERFACE [[nodiscard]] uint32			Plat_MSTime();			// Time in milliseconds.
-PLATFORM_INTERFACE [[nodiscard]] uint64			Plat_USTime();			// Time in microseconds.
+PLATFORM_INTERFACE MUST_CHECK_RETURN double		Plat_FloatTime();		// Returns time in seconds since the module was loaded.
+PLATFORM_INTERFACE MUST_CHECK_RETURN uint32		Plat_MSTime();			// Time in milliseconds.
+PLATFORM_INTERFACE MUST_CHECK_RETURN uint64		Plat_USTime();			// Time in microseconds.
 PLATFORM_INTERFACE char *						Plat_ctime( const time_t *timep, char *buf, size_t bufsize );
 // dimhotepus: true on success, false on failure.
-PLATFORM_INTERFACE [[nodiscard]] bool	Plat_GetModuleFilename( char *pOut, int nMaxBytes );
+PLATFORM_INTERFACE MUST_CHECK_RETURN bool	Plat_GetModuleFilename( char *pOut, int nMaxBytes );
 
 // dimhotepus: Abrupts process, no graceful shutdown.  Use with care.
 // dimhotepus: Use extern "C" [[noreturn]] PLATFORM_CLASS hack for [[noreturn]] application.
@@ -1334,7 +1334,7 @@ struct CPUInformation
 
 // Have to return a pointer, not a reference, because references are not compatible with the
 // extern "C" implied by PLATFORM_INTERFACE.
-PLATFORM_INTERFACE [[nodiscard]] const CPUInformation *GetCPUInformation();
+PLATFORM_INTERFACE MUST_CHECK_RETURN const CPUInformation *GetCPUInformation();
 
 #define MEMORY_INFORMATION_VERSION 0
 
@@ -1360,11 +1360,11 @@ struct MemoryInformation
 };
 
 // Returns true if the passed in MemoryInformation structure was filled out, otherwise false.
-PLATFORM_INTERFACE [[nodiscard]] bool GetMemoryInformation( MemoryInformation *pOutMemoryInfo );
+PLATFORM_INTERFACE MUST_CHECK_RETURN bool GetMemoryInformation( MemoryInformation *pOutMemoryInfo );
 
 // Return the system-wide CPU usage as a value from 0.0 to 1.0, measured
 // between the previous call and this one.
-PLATFORM_INTERFACE [[nodiscard]] float GetCPUUsage();
+PLATFORM_INTERFACE MUST_CHECK_RETURN float GetCPUUsage();
 
 PLATFORM_INTERFACE void GetCurrentDate( int *pDay, int *pMonth, int *pYear );
 
@@ -1388,33 +1388,33 @@ PLATFORM_INTERFACE void	Plat_ApplyHardwareDataBreakpointsToNewThread( unsigned l
 //-----------------------------------------------------------------------------
 // Process related functions
 //-----------------------------------------------------------------------------
-PLATFORM_INTERFACE [[nodiscard]] const tchar *Plat_GetCommandLine();
+PLATFORM_INTERFACE MUST_CHECK_RETURN const tchar *Plat_GetCommandLine();
 #ifndef _WIN32
 // helper function for OS's that don't have a ::GetCommandLine() call
 PLATFORM_INTERFACE void Plat_SetCommandLine( const char *cmdLine );
 #endif
-PLATFORM_INTERFACE [[nodiscard]] const char *Plat_GetCommandLineA();
+PLATFORM_INTERFACE MUST_CHECK_RETURN const char *Plat_GetCommandLineA();
 
 //-----------------------------------------------------------------------------
 // Security related functions
 //-----------------------------------------------------------------------------
 // Ensure that the hardware key's drivers have been installed.
-PLATFORM_INTERFACE [[nodiscard]] bool Plat_VerifyHardwareKeyDriver();
+PLATFORM_INTERFACE MUST_CHECK_RETURN bool Plat_VerifyHardwareKeyDriver();
 
 // Ok, so this isn't a very secure way to verify the hardware key for now.  It
 // is primarially depending on the fact that all the binaries have been wrapped
 // with the secure wrapper provided by the hardware keys vendor.
-PLATFORM_INTERFACE [[nodiscard]] bool Plat_VerifyHardwareKey();
+PLATFORM_INTERFACE MUST_CHECK_RETURN bool Plat_VerifyHardwareKey();
 
 // The same as above, but notifies user with a message box when the key isn't in
 // and gives him an opportunity to correct the situation.
-PLATFORM_INTERFACE [[nodiscard]] bool Plat_VerifyHardwareKeyPrompt();
+PLATFORM_INTERFACE MUST_CHECK_RETURN bool Plat_VerifyHardwareKeyPrompt();
 
 // Can be called in real time, doesn't perform the verify every frame.  Mainly just
 // here to allow the game to drop out quickly when the key is removed, rather than
 // allowing the wrapper to pop up it's own blocking dialog, which the engine doesn't
 // like much.
-PLATFORM_INTERFACE [[nodiscard]] bool Plat_FastVerifyHardwareKey();
+PLATFORM_INTERFACE MUST_CHECK_RETURN bool Plat_FastVerifyHardwareKey();
 
 //-----------------------------------------------------------------------------
 // Just logs file and line to simple.log
@@ -1428,7 +1428,7 @@ PLATFORM_INTERFACE void* Plat_SimpleLog( const tchar* file, int line );
 // Returns true if debugger attached, false otherwise
 //-----------------------------------------------------------------------------
 #if defined(_WIN32) || defined(LINUX) || defined(OSX)
-PLATFORM_INTERFACE [[nodiscard]] bool Plat_IsInDebugSession();
+PLATFORM_INTERFACE MUST_CHECK_RETURN bool Plat_IsInDebugSession();
 PLATFORM_INTERFACE void Plat_DebugString( const char * );
 #else
 [[nodiscard]] inline bool Plat_IsInDebugSession( bool bForceRecheck = false ) { return false; }
@@ -1436,7 +1436,7 @@ PLATFORM_INTERFACE void Plat_DebugString( const char * );
 #endif
 
 // dimhotepus: Check user is admin or priviledged one.
-PLATFORM_INTERFACE [[nodiscard]] bool Plat_IsUserAnAdmin();
+PLATFORM_INTERFACE MUST_CHECK_RETURN bool Plat_IsUserAnAdmin();
 
 #ifdef _WIN32
 enum class SystemBackdropType
@@ -1456,7 +1456,7 @@ PLATFORM_INTERFACE bool Plat_ApplySystemTitleBarTheme( void *window, SystemBackd
 //-----------------------------------------------------------------------------
 // Returns true if running on a 64 bit (windows) OS
 //-----------------------------------------------------------------------------
-PLATFORM_INTERFACE [[nodiscard]] bool Is64BitOS();
+PLATFORM_INTERFACE MUST_CHECK_RETURN bool Is64BitOS();
 
 
 //-----------------------------------------------------------------------------
@@ -1800,7 +1800,7 @@ template <typename LambdaType>
 	};
 */
 
-PLATFORM_INTERFACE [[nodiscard]] bool vtune( bool resume );
+PLATFORM_INTERFACE MUST_CHECK_RETURN bool vtune( bool resume );
 
 
 #define TEMPLATE_FUNCTION_TABLE(RETURN_TYPE, NAME, ARGS, COUNT)			\
@@ -1858,7 +1858,7 @@ RETURN_TYPE FASTCALL __Function_##NAME<nArgument>::Run ARGS
 // thread, if desired.
 PLATFORM_INTERFACE void Plat_BeginWatchdogTimer( int nSecs );
 PLATFORM_INTERFACE void Plat_EndWatchdogTimer();
-PLATFORM_INTERFACE [[nodiscard]] int Plat_GetWatchdogTime();
+PLATFORM_INTERFACE MUST_CHECK_RETURN int Plat_GetWatchdogTime();
 
 using Plat_WatchDogHandlerFunction_t = void (*)();
 PLATFORM_INTERFACE void Plat_SetWatchdogHandlerFunction( Plat_WatchDogHandlerFunction_t function );
