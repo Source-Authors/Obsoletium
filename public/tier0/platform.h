@@ -276,14 +276,15 @@ typedef void * HINSTANCE;
 // Used to step into the debugger
 #if defined( _WIN32 )
 #define DebuggerBreak()  __debugbreak()
-#else
+#elif defined( __clang__ )
 	// On OSX, SIGTRAP doesn't really stop the thread cold when debugging.
-	// So if being debugged, use INT3 which is precise.
-#ifdef OSX
-#define DebuggerBreak()  if ( Plat_IsInDebugSession() ) { __asm ( "int $3" ); } else { raise(SIGTRAP); }
+		// dimhotepus: Use the precise trap instruction for the target CPU
+		// (int3 on x86, brk on ARM64).  Without a debugger it raises SIGTRAP
+		// just like raise(SIGTRAP).  Old code used x86-only "int $3" asm and
+		// an unbraced if/else (dangling-else hazard).
+#define DebuggerBreak()  __builtin_debugtrap()
 #else
 #define DebuggerBreak()  raise(SIGTRAP)
-#endif
 #endif
 #define	DebuggerBreakIfDebugging() if ( !Plat_IsInDebugSession() ) ; else DebuggerBreak()
 
