@@ -54,12 +54,8 @@ using wchar = wchar_t;
 #include <tchar.h>
 #else
 #define _tcsstr strstr
-#if defined(_WIN32)
-#define _tcsicmp stricmp
-#else
 // dimhotepus: stricmp -> strcasecmp for POSIX.
 #define _tcsicmp strcasecmp  // POSIX, <strings.h>
-#endif
 #define _tcscmp strcmp
 #define _tcscpy strcpy
 #define _tcsncpy strncpy
