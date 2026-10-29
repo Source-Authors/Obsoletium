@@ -372,12 +372,16 @@ template<typename T>
 	return reinterpret_cast<void*>(static_cast<intp>(i));
 }
 }
+// Truncates the pointer to a 32-bit int / uint by design (handles, cookies and
+// ids stashed in pointer-sized slots); R only selects signed vs unsigned.
 template <typename R, typename T>
-[[nodiscard]] constexpr inline std::enable_if_t<std::is_pointer_v<T>, R> POINTER_TO_INT(T p) noexcept {
+[[nodiscard]] inline std::enable_if_t<std::is_pointer_v<T>, R> POINTER_TO_INT(T p) noexcept {
+	static_assert(std::is_integral_v<R>, "POINTER_TO_INT result must be integral");
 	if constexpr (std::is_unsigned_v<R>) {
 		return static_cast<uint>(reinterpret_cast<uintp>(p));
+	} else {
+		return static_cast<int>(reinterpret_cast<intp>(p));
 	}
-	return static_cast<int>(reinterpret_cast<intp>(p));
 }
 
 
@@ -595,8 +599,8 @@ template <typename R, typename T>
 #define _unlink unlink
 #define _access access
 #define _mkdir(dir) mkdir( dir, S_IRWXU | S_IRWXG | S_IRWXO )
-#define _wtoi(arg) wcstol(arg, NULL, 10)
-#define _wtoi64(arg) wcstoll(arg, NULL, 10)
+#define _wtoi(arg) static_cast<int>(wcstol(arg, nullptr, 10))
+#define _wtoi64(arg) wcstoll(arg, nullptr, 10)
 
 // dimhotepus: dlopen() returns void*; uint32 truncated it on 64-bit.
 typedef void *HMODULE;
