@@ -1032,6 +1032,50 @@ PLATFORM_INTERFACE struct tm *		Plat_localtime( const time_t *timep, struct tm *
 	return tsc;
 }
 
+#elif defined( PLATFORM_ARM_64 )
+
+// ARM64 has no TSC; the generic timer's virtual count (CNTVCT_EL0) is the
+// equivalent constant-rate, user-readable counter.  ISB keeps the read from
+// being reordered with surrounding instructions.
+[[nodiscard]] FORCEINLINE uint64_t Plat_Rdtsc()
+{
+#if defined( _MSC_VER ) && !defined( __clang__ )
+	// ARM64_SYSREG(3, 3, 14, 0, 2) == CNTVCT_EL0, as ARM64_CNTVCT in winnt.h.
+	__isb( _ARM64_BARRIER_SY );
+	const uint64_t ticks{ static_cast<uint64_t>( _ReadStatusReg( 0x5F02 ) ) };
+	__isb( _ARM64_BARRIER_SY );
+#else
+	uint64_t ticks;
+	__asm__ __volatile__( "isb\n\tmrs %0, cntvct_el0\n\tisb" : "=r"( ticks ) : : "memory" );
+#endif
+	return ticks;
+}
+
+// The counter is system-wide on ARM64, so there's no per-core id to report.
+[[nodiscard]] FORCEINLINE uint64_t Plat_Rdtscp( uint32_t &coreId )
+{
+	coreId = 0;
+	return Plat_Rdtsc();
+}
+
+#else
+
+// Generic fallback (32-bit ARM, others): monotonic clock ticks.
+[[nodiscard]] inline uint64_t Plat_Rdtsc()
+{
+	return static_cast<uint64_t>(
+		std::chrono::steady_clock::now().time_since_epoch().count() );
+}
+
+[[nodiscard]] inline uint64_t Plat_Rdtscp( uint32_t &coreId )
+{
+	coreId = 0;
+	return Plat_Rdtsc();
+}
+
+#endif
+
+
 [[nodiscard]] inline uint64_t Plat_MeasureRtscpOverhead()
 {
 	uint32_t coreIdStart, coreIdEnd;
