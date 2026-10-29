@@ -42,8 +42,12 @@
 #define NEW_SOFTWARE_LIGHTING
 
 #ifdef POSIX
-// need this for _alloca
+// dimhotepus: Need this for alloca
+#if __has_include(<alloca.h>)
 #include <alloca.h>
+#else
+#include <cstdlib>
+#endif
 #include <unistd.h>
 #include <signal.h>
 #include <ctime>
