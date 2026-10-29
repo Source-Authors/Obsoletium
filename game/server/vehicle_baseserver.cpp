@@ -135,6 +135,7 @@ CBaseServerVehicle::CBaseServerVehicle( void )
 	m_pStateSound = NULL;
 	m_pStateSoundFade = NULL;
 	m_soundState = SS_NONE;
+	m_soundStateStartTime = 0.0f;
 	m_flSpeedPercentage = 0;
 	m_bUseLegacyExitChecks = false;
 
