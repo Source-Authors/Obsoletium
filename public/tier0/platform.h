@@ -1660,6 +1660,7 @@ class CScopeGuardLambdaImpl
 {
 public:
 	explicit CScopeGuardLambdaImpl( LambdaType&& lambda ) : m_lambda( std::move( lambda ) ) { }
+	explicit CScopeGuardLambdaImpl( const LambdaType& lambda ) : m_lambda( lambda ) { }
 	~CScopeGuardLambdaImpl() { m_lambda(); }
 
 	// dimhotepus: A copy would run the lambda twice.  C++17 guaranteed copy
@@ -1683,6 +1684,8 @@ class CScopeGuardLambdaImplOpt
 public:
 	CScopeGuardLambdaImplOpt( bool do_invoke, LambdaType&& lambda )
 		: m_lambda( std::move( lambda ) ), m_do_invoke( do_invoke ) { }
+	CScopeGuardLambdaImplOpt( bool do_invoke, const LambdaType& lambda )
+		: m_lambda( lambda ), m_do_invoke( do_invoke ) { }
 	~CScopeGuardLambdaImplOpt() { if ( m_do_invoke ) { m_lambda(); } }
 
 	// dimhotepus: A copy would run the lambda twice.  C++17 guaranteed copy
@@ -1696,15 +1699,15 @@ private:
 
 //--------------------------------------------------------------------------------------------------
 template <typename LambdaType>
-[[nodiscard]] CScopeGuardLambdaImpl< LambdaType > MakeScopeGuardLambda( LambdaType &&lambda )
+[[nodiscard]] CScopeGuardLambdaImpl< std::decay_t<LambdaType> > MakeScopeGuardLambda( LambdaType &&lambda )
 {
-	return CScopeGuardLambdaImpl< LambdaType >( std::move( lambda ) );
+	return CScopeGuardLambdaImpl< std::decay_t<LambdaType> >( std::forward<LambdaType>( lambda ) );
 }
 
 template <typename LambdaType>
-[[nodiscard]] CScopeGuardLambdaImplOpt< LambdaType > MakeScopeGuardLambdaOpt( bool do_invoke, LambdaType &&lambda )
+[[nodiscard]] CScopeGuardLambdaImplOpt< std::decay_t<LambdaType> > MakeScopeGuardLambdaOpt( bool do_invoke, LambdaType &&lambda )
 {
-	return CScopeGuardLambdaImplOpt< LambdaType >( do_invoke, std::move( lambda ) );
+	return CScopeGuardLambdaImplOpt< std::decay_t<LambdaType> >( do_invoke, std::forward<LambdaType>( lambda ) );
 }
 
 //--------------------------------------------------------------------------------------------------
