@@ -147,7 +147,7 @@ public:
 	// UNDONE: make an iterative query of ISpatialPartition so we could
 	// make queries like this optimal
 	CEntitySphereQuery( const Vector &center, float radius, int flagMask=0, int partitionMask = PARTITION_CLIENT_NON_STATIC_EDICTS );
-	C_BaseEntity *GetCurrentEntity();
+	[[nodiscard]] C_BaseEntity *GetCurrentEntity();
 	inline void NextEntity() { m_listIndex++; }
 
 private:
