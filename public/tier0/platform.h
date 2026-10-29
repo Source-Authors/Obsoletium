@@ -3,7 +3,31 @@
 #ifndef SE_PUBLIC_TIER0_PLATFORM_H_
 #define SE_PUBLIC_TIER0_PLATFORM_H_
 
+// dimhotepus: Derive Valve platform macros from compiler-defined ones when the
+// build system didn't pass them, so the header works with any build setup.
+#if !defined(_WIN32)
+#if !defined(POSIX) && (defined(__unix__) || defined(__unix) || defined(__APPLE__))
+#define POSIX 1
+#endif
+#if defined(__linux__)
+#ifndef LINUX
+#define LINUX 1
+#endif
+#ifndef _LINUX
+#define _LINUX 1
+#endif
+#endif
+#if defined(__APPLE__) && !defined(OSX)
+#define OSX 1
+#endif
+#if !defined(GNUC) && (defined(__GNUC__) || defined(__clang__))
+#define GNUC 1
+#endif
+#endif  // !_WIN32
+
+#ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
+#endif
 #include <cstdint>
 
 #include "wchartypes.h"
