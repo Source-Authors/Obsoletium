@@ -562,7 +562,8 @@ template <typename R, typename T>
 #define _wtoi(arg) wcstol(arg, NULL, 10)
 #define _wtoi64(arg) wcstoll(arg, NULL, 10)
 
-typedef uint32 HMODULE;
+// dimhotepus: dlopen() returns void*; uint32 truncated it on 64-bit.
+typedef void *HMODULE;
 typedef void *HANDLE;
 #endif
 
