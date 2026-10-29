@@ -1431,7 +1431,7 @@ PLATFORM_INTERFACE void* Plat_SimpleLog( const tchar* file, int line );
 PLATFORM_INTERFACE MUST_CHECK_RETURN bool Plat_IsInDebugSession();
 PLATFORM_INTERFACE void Plat_DebugString( const char * );
 #else
-[[nodiscard]] inline bool Plat_IsInDebugSession( bool bForceRecheck = false ) { return false; }
+[[nodiscard]] inline bool Plat_IsInDebugSession( [[maybe_unused]] bool bForceRecheck = false ) { return false; }
 #define Plat_DebugString(s) ((void)0)
 #endif
 
