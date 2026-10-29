@@ -355,11 +355,12 @@ typedef void * HINSTANCE;
 // Convert int<-->pointer, avoiding 32/64-bit compiler warnings:
 //-----------------------------------------------------------------------------
 template<typename T>
-[[nodiscard]] constexpr inline std::enable_if_t<std::is_integral_v<T>, void*> INT_TO_POINTER(T i) noexcept {
+[[nodiscard]] inline std::enable_if_t<std::is_integral_v<T>, void*> INT_TO_POINTER(T i) noexcept {
 	if constexpr (std::is_unsigned_v<T>) {
 		return reinterpret_cast<void*>(static_cast<uintp>(i));
-	}
+	} else {
 	return reinterpret_cast<void*>(static_cast<intp>(i));
+}
 }
 template <typename R, typename T>
 [[nodiscard]] constexpr inline std::enable_if_t<std::is_pointer_v<T>, R> POINTER_TO_INT(T p) noexcept {
