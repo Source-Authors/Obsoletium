@@ -374,20 +374,31 @@ template <typename R, typename T>
 //-----------------------------------------------------------------------------
 // Stack-based allocation related helpers
 //-----------------------------------------------------------------------------
-#if defined( GNUC )
 	// dimhotepus: Align at 16 bytes boundary for performance and SIMD.
-	#define stackalloc( _size )		AlignValue( alloca( AlignValue( _size, 16 ) ), 16 )
-#ifdef _LINUX
-	#define mallocsize( _p )	( malloc_usable_size( _p ) )
-#elif defined(OSX)
-	#define mallocsize( _p )	( malloc_size( _p ) )
+// The block is over-allocated by 15 bytes and the pointer shifted up to the
+// next 16-byte boundary, so the result is 16-byte aligned on every compiler and
+// CPU and [result, result + _size) always lies inside the allocation.
+#if defined( _MSC_VER )
+	#define SE_STACKALLOC_RAW( _bytes )		_alloca( _bytes )
+#elif defined( __GNUC__ ) || defined( __clang__ )
+	#define SE_STACKALLOC_RAW( _bytes )		__builtin_alloca( _bytes )
 #else
-#error "Please define your platform"
+	#error "Please define stackalloc for your compiler"
 #endif
-#elif defined ( _WIN32 )
-	// dimhotepus: Align at 16 bytes boundary for performance and SIMD. 
-	#define stackalloc( _size )		AlignValue( _alloca( AlignValue( _size, 16 ) ), 16 )
+
+#define stackalloc( _size ) \
+	reinterpret_cast<void *>( \
+		( reinterpret_cast<uintp>( SE_STACKALLOC_RAW( AlignValue( static_cast<uintp>( _size ), 16 ) + 15 ) ) + 15 ) \
+		& ~static_cast<uintp>( 15 ) )
+
+#if defined( _WIN32 )
 	#define mallocsize( _p )		( _msize( _p ) )
+#elif defined( __APPLE__ )
+		#define mallocsize( _p )		( malloc_size( _p ) )
+#elif defined( __linux__ ) || defined( __FreeBSD__ )
+		#define mallocsize( _p )		( malloc_usable_size( _p ) )
+#else
+#error "Please define mallocsize for your platform"
 #endif
 
 // dimhotepus: Add type-safe interface.
