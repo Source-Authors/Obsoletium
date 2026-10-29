@@ -509,8 +509,11 @@ template <typename R, typename T>
 // removed.
 #ifdef _MSC_VER
 	#define HINT(THE_HINT)	__assume((THE_HINT))
+#elif defined(__clang__)
+		#define HINT(THE_HINT)	__builtin_assume((THE_HINT))
 #else
-	#define HINT(THE_HINT)	0
+		// dimhotepus: ((void)0), not 0, so "HINT(x);" isn't an unused-value warning.
+		#define HINT(THE_HINT)	((void)0)
 #endif
 
 // Marks the codepath from here until the next branch entry point as unreachable,
