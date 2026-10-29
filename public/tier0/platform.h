@@ -652,74 +652,63 @@ typedef void *HANDLE;
 // Basic swaps
 //-------------------------------------
 
-#ifdef _MSC_VER
-
-#include <intrin.h>
-#define bswap_16(x) _byteswap_ushort(x)
-#define bswap_32(x) _byteswap_ulong(x)
-#define bswap_64(x) _byteswap_uint64(x)
-
-#elif defined(__APPLE__)
-
-// Mac OS X / Darwin features
-#include <libkern/OSByteOrder.h>
-#define bswap_16(x) OSSwapInt16(x)
-#define bswap_32(x) OSSwapInt32(x)
-#define bswap_64(x) OSSwapInt64(x)
-
-#elif defined(__sun) || defined(sun)
-
-#include <sys/byteorder.h>
-#define bswap_16(x) BSWAP_16(x)
-#define bswap_32(x) BSWAP_32(x)
-#define bswap_64(x) BSWAP_64(x)
-
-#elif defined(__FreeBSD__)
-
-#include <sys/endian.h>
-#define bswap_16(x) bswap16(x)
-#define bswap_32(x) bswap32(x)
-#define bswap_64(x) bswap64(x)
-
-#elif defined(__OpenBSD__)
-
-#include <sys/types.h>
-#define bswap_16(x) swap16(x)
-#define bswap_32(x) swap32(x)
-#define bswap_64(x) swap64(x)
-
-#elif defined(__NetBSD__)
-
-#include <sys/types.h>
-#include <machine/bswap.h>
-#if defined(__BSWAP_RENAME) && !defined(__bswap_32)
-#define bswap_16(x) bswap16(x)
-#define bswap_32(x) bswap32(x)
-#define bswap_64(x) bswap64(x)
-#endif
-
+// dimhotepus: One implementation on top of compiler builtins instead of a
+// per-OS header zoo (which also left bswap_* undefined on some BSDs).
+#if defined( _MSC_VER ) && !defined( __clang__ )
+[[nodiscard]] FORCEINLINE uint16 Plat_ByteSwap16( uint16 v ) { return _byteswap_ushort( v ); }
+[[nodiscard]] FORCEINLINE uint32 Plat_ByteSwap32( uint32 v ) { return _byteswap_ulong( v ); }
+[[nodiscard]] FORCEINLINE uint64 Plat_ByteSwap64( uint64 v ) { return _byteswap_uint64( v ); }
 #else
-
-#include <byteswap.h>
-
+[[nodiscard]] FORCEINLINE uint16 Plat_ByteSwap16( uint16 v ) { return __builtin_bswap16( v ); }
+[[nodiscard]] FORCEINLINE uint32 Plat_ByteSwap32( uint32 v ) { return __builtin_bswap32( v ); }
+[[nodiscard]] FORCEINLINE uint64 Plat_ByteSwap64( uint64 v ) { return __builtin_bswap64( v ); }
 #endif
 
+// Keep the bswap_* names available for existing callers.  Where the system
+// provides <byteswap.h> use it, so a later include of it can't clash.
+#if !defined( _WIN32 ) && __has_include( <byteswap.h> )
+#include <byteswap.h>
+#else
+#ifndef bswap_16
+#define bswap_16(x) Plat_ByteSwap16(x)
+#endif
+#ifndef bswap_32
+#define bswap_32(x) Plat_ByteSwap32(x)
+#endif
+#ifndef bswap_64
+#define bswap_64(x) Plat_ByteSwap64(x)
+#endif
+#endif
+
+// dimhotepus: Swap the object representation.
 template <typename T>
-[[nodiscard]] inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 2 && alignof(T) == alignof(unsigned short), T> WordSwapC( T w )
+[[nodiscard]] inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 2, T> WordSwapC( T w )
 {
-   return static_cast<T>( bswap_16( w ) );
+	uint16 bits;
+	std::memcpy( &bits, &w, sizeof(bits) );
+	bits = Plat_ByteSwap16( bits );
+	std::memcpy( &w, &bits, sizeof(bits) );
+	return w;
 }
 
 template <typename T>
-[[nodiscard]] inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 4 && alignof(T) == alignof(unsigned int), T> DWordSwapC( T dw )
+[[nodiscard]] inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 4, T> DWordSwapC( T dw )
 {
-   return static_cast<T>( bswap_32( dw ) );
+	uint32 bits;
+	std::memcpy( &bits, &dw, sizeof(bits) );
+	bits = Plat_ByteSwap32( bits );
+	std::memcpy( &dw, &bits, sizeof(bits) );
+	return dw;
 }
 
 template <typename T>
-[[nodiscard]] inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 8 && alignof(T) == alignof(unsigned long long), T> QWordSwapC( T qdw )
+[[nodiscard]] inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 8, T> QWordSwapC( T qdw )
 {
-   return static_cast<T>( bswap_64( qdw ) );
+	uint64 bits;
+	std::memcpy( &bits, &qdw, sizeof(bits) );
+	bits = Plat_ByteSwap64( bits );
+	std::memcpy( &qdw, &bits, sizeof(bits) );
+	return qdw;
 }
 
 //-------------------------------------
