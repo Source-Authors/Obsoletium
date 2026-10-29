@@ -268,13 +268,7 @@ typedef void * HINSTANCE;
 
 #define MAX_UNICODE_PATH_IN_UTF8 (MAX_UNICODE_PATH*4)
 
-#if !defined( offsetof )
-	#ifdef __GNUC__
-		#define offsetof( type, var ) __builtin_offsetof( type, var )
-	#else
-		#define offsetof(s,m)	(size_t)&(((s *)0)->m)
-	#endif
-#endif // !defined( offsetof )
+// offsetof is provided by <cstddef>.
 
 // dimhotepus: Deprecated, use AlignValue
 #define ALIGN_VALUE( val, alignment ) AlignValue(val, alignment) //  need macro for constant expression
