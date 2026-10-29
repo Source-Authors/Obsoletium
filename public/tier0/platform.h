@@ -1661,6 +1661,11 @@ class CScopeGuardLambdaImpl
 public:
 	explicit CScopeGuardLambdaImpl( LambdaType&& lambda ) : m_lambda( std::move( lambda ) ) { }
 	~CScopeGuardLambdaImpl() { m_lambda(); }
+
+	// dimhotepus: A copy would run the lambda twice.  C++17 guaranteed copy
+	// elision means MakeScopeGuardLambda doesn't need these.
+	CScopeGuardLambdaImpl( const CScopeGuardLambdaImpl& ) = delete;
+	CScopeGuardLambdaImpl& operator=( const CScopeGuardLambdaImpl& ) = delete;
 private:
 	LambdaType m_lambda;
 };
@@ -1679,6 +1684,11 @@ public:
 	CScopeGuardLambdaImplOpt( bool do_invoke, LambdaType&& lambda )
 		: m_lambda( std::move( lambda ) ), m_do_invoke( do_invoke ) { }
 	~CScopeGuardLambdaImplOpt() { if ( m_do_invoke ) { m_lambda(); } }
+
+	// dimhotepus: A copy would run the lambda twice.  C++17 guaranteed copy
+	// elision means MakeScopeGuardLambda doesn't need these.
+	CScopeGuardLambdaImplOpt( const CScopeGuardLambdaImplOpt& ) = delete;
+	CScopeGuardLambdaImplOpt& operator=( const CScopeGuardLambdaImplOpt& ) = delete;
 private:
 	LambdaType m_lambda;
 	const bool m_do_invoke;
