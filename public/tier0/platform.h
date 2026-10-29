@@ -582,14 +582,9 @@ typedef void *HANDLE;
 //-----------------------------------------------------------------------------
 //#define CHECK_FLOAT_EXCEPTIONS		1
 
-#if !defined( _X360 )
-#if defined( _MSC_VER )
+// dimhotepus: x87 control word only exists on x86.
+#if defined( _MSC_VER ) && defined( _M_IX86 )
 
-	#if defined( PLATFORM_WINDOWS_PC64 )
-		inline void SetupFPUControlWord()
-		{
-		}
-	#else
 		inline void SetupFPUControlWordForceExceptions()
 		{
 			// use local to get and store control word
@@ -627,9 +622,8 @@ typedef void *HANDLE;
 			}
 
 		#endif
-	#endif
 
-#else
+#elif ( defined( __GNUC__ ) || defined( __clang__ ) ) && ( defined( __i386__ ) || defined( __x86_64__ ) )
 
 	inline void SetupFPUControlWord()
 	{
@@ -640,41 +634,15 @@ typedef void *HANDLE;
 		__asm __volatile ("fldcw %0" : : "m" (__cw));
 	}
 
-#endif // _MSC_VER
-
 #else
 
-	#ifndef NDEBUG
-		[[nodiscard]] FORCEINLINE bool IsFPUControlWordSet()
-		{
-			float f = 0.996f;
-			union
+	// x64 MSVC, ARM, etc: SSE / NEON float math, nothing to set up.
+	inline void SetupFPUControlWord()
 			{
-				double flResult;
-				int pResult[2];
-			};
-			flResult = __fctiw( f );
-			return ( pResult[1] == 1 );
 		}
+
 	#endif
 
-	inline void SetupFPUControlWord()
-	{
-		// Set round-to-nearest in FPSCR
-		// (cannot assemble, must use op-code form)
-		__emit( 0xFF80010C );	// mtfsfi  7,0
-
-		// Favour compatibility over speed (make sure the VPU set to Java-compliant mode)
-		// NOTE: the VPU *always* uses round-to-nearest
-			__vector4  a = { 0.0f, 0.0f, 0.0f, 0.0f };
-			a;				//	Avoid compiler warning
-			__asm
-		{
-			mtvscr a;	// Clear the Vector Status & Control Register to zero
-		}
-	}
-
-#endif // _X360
 
 //-----------------------------------------------------------------------------
 // Purpose: Standard functions for handling endian-ness
