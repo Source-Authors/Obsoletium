@@ -296,9 +296,9 @@ typedef void * HINSTANCE;
 // C functions for external declarations that call the appropriate C++ methods
 #ifndef EXPORT
 	#ifdef _WIN32
-		#define EXPORT	_declspec(dllexport)
+			#define EXPORT	__declspec(dllexport)
 	#else
-		#define EXPORT	/* */
+			#define EXPORT	__attribute__ ((visibility("default")))
 	#endif
 #endif
 
@@ -454,7 +454,7 @@ template <typename R, typename T>
 
 	#define DLL_LOCAL
 
-#elif defined GNUC
+#elif defined(__GNUC__) || defined(__clang__)
 // Used for dll exporting and importing
 #define  DLL_EXPORT   extern "C" __attribute__ ((visibility("default")))
 #define  DLL_IMPORT   extern "C"
@@ -464,7 +464,7 @@ template <typename R, typename T>
 #define  DLL_CLASS_IMPORT
 
 // Can't use extern "C" when DLL exporting a global
-#define  DLL_GLOBAL_EXPORT   extern __attribute ((visibility("default")))
+#define  DLL_GLOBAL_EXPORT   extern __attribute__ ((visibility("default")))
 #define  DLL_GLOBAL_IMPORT   extern
 
 #define  DLL_LOCAL __attribute__ ((visibility("hidden")))
