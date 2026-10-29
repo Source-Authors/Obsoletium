@@ -309,13 +309,13 @@ typedef void * HINSTANCE;
 #endif  // __i386__
 
 // decls for aligning data
-#ifdef _WIN32
+// dimhotepus: Key on the compiler, not the OS (MinGW is _WIN32 but GCC).
+#if defined(_MSC_VER)
         #define DECL_ALIGN(x) __declspec(align(x))
-
-#elif GNUC
+#elif defined(__GNUC__) || defined(__clang__)
 	#define DECL_ALIGN(x) __attribute__((aligned(x)))
 #else
-        #define DECL_ALIGN(x) /* */
+	#define DECL_ALIGN(x) alignas(x)
 #endif
 
 #ifdef _MSC_VER
