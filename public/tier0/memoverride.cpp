@@ -1088,7 +1088,7 @@ void VInvalidParameterHandler( const wchar_t* expression,
 		mb_function,
 		mb_expression );
 
-	// dimhtepus: Better prefix for invalid parameter handler.
+	// dimhotepus: Better prefix for invalid parameter handler.
 	WriteMiniDumpOrBreak( 1, buffer );
 }
 
