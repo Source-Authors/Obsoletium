@@ -685,7 +685,14 @@ CThreadEvent::CThreadEvent( bool bManualReset )
     pthread_mutexattr_init( &Attr );
     pthread_mutex_init( &m_Mutex, &Attr );
     pthread_mutexattr_destroy( &Attr );
-    pthread_cond_init( &m_Condition, NULL );
+    // dimhotepus: Use monotonic clock for timeouts on Linux, wall clock jumps must not break waits.
+    pthread_condattr_t condAttr;
+    pthread_condattr_init( &condAttr );
+#ifdef LINUX
+    pthread_condattr_setclock( &condAttr, CLOCK_MONOTONIC );
+#endif
+    pthread_cond_init( &m_Condition, &condAttr );
+    pthread_condattr_destroy( &condAttr );
     m_bInitalized = true;
     m_cSet = 0;
 	m_bWakeForEvent = false;
