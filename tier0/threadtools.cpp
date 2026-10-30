@@ -2045,7 +2045,8 @@ unsigned int CThread::Resume()
 #ifdef _WIN32
 	return ( ResumeThread(m_hThread) != 0 );
 #elif defined(OSX)
-	int susCount = m_nSuspendCount++;
+	// dimhotepus: Resume must decrement suspend count (was incremented).
+	int susCount = m_nSuspendCount--;
 	while ( thread_resume( pthread_mach_thread_np(m_threadId) )  != KERN_SUCCESS )
 	{
 	};	
