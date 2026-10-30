@@ -684,125 +684,376 @@ MUST_CHECK_RETURN bool Plat_IsUserAnAdmin()
 
 void Plat_DebugString( const char * psz )
 {
-	fprintf( stderr, "%s", psz );
-}
-
-static char g_CmdLine[ 2048 ];
-PLATFORM_INTERFACE void Plat_SetCommandLine( const char *cmdLine )
-{
-	strncpy( g_CmdLine, cmdLine, std::size(g_CmdLine) );
-	g_CmdLine[ std::size(g_CmdLine) -1 ] = '\0';
-}
-
-PLATFORM_INTERFACE const tchar *Plat_GetCommandLine()
-{
-#ifdef LINUX
-	if( !g_CmdLine[ 0 ] )
+	// dimhotepus: Null check; fprintf( "%s" ) -> fputs.
+	if ( psz )
 	{
-		FILE *fp = fopen( "/proc/self/cmdline", "rb" );
+		std::fputs( psz, stderr );
+	}
+}
 
-		if( fp )
+namespace {
+
+// dimhotepus: Command line state behind a mutex.  Lazy loading in
+// Plat_GetCommandLine and Plat_SetCommandLine both wrote g_CmdLine
+// unsynchronized.
+std::mutex g_CmdLineMutex;
+bool g_bCmdLineLoaded{ false };
+char g_CmdLine[ 2048 ];
+#ifdef TCHAR_IS_WCHAR
+// dimhotepus: tchar is wchar_t when _UNICODE is set (e.g. by STEAM in
+// wchartypes.h); the old code returned char * as const tchar * there, which
+// didn't compile.  Keep a wide copy.
+wchar_t g_CmdLineW[ 2048 ];
+
+// UTF-8 -> UTF-32 (POSIX wchar_t), invalid bytes become U+FFFD.
+void Utf8ToWide( const char *utf8, wchar_t *out, std::size_t capacity ) noexcept
+{
+	std::size_t used{ 0 };
+	const auto *p = reinterpret_cast<const unsigned char *>( utf8 );
+	while ( *p && used + 1 < capacity )
+	{
+		const unsigned c{ *p };
+		const unsigned extra{ c < 0x80 ? 0u : ( c >> 5 ) == 6 ? 1u : ( c >> 4 ) == 14 ? 2u :
+			( c >> 3 ) == 30 ? 3u : 4u };
+		unsigned codePoint{ extra == 0 ? c : c & ( 0x3Fu >> extra ) };
+		bool valid{ extra < 4 };
+		for ( unsigned i = 1; valid && i <= extra; ++i )
 		{
-			size_t nCharRead = 0;
+			valid = ( p[i] & 0xC0 ) == 0x80;
+			codePoint = ( codePoint << 6 ) | ( p[i] & 0x3F );
+		}
+		if ( valid )
+		{
+			out[used++] = static_cast<wchar_t>( codePoint );
+			p += extra + 1;
+		}
+		else
+		{
+			out[used++] = static_cast<wchar_t>( 0xFFFD );
+			++p;
+		}
+	}
+	out[used] = L'\0';
+}
+#endif
 
-			// -1 to leave room for the '\0'
-			nCharRead = fread( g_CmdLine, sizeof( g_CmdLine[0] ), std::size( g_CmdLine ) - 1, fp );
-			if ( feof( fp ) && !ferror( fp ) ) // Should have read the whole command line without error
+// Copy text into g_CmdLine, truncated at a UTF-8 boundary.  Lock held.
+void StoreCommandLine( const char *text ) noexcept
+{
+	std::snprintf( g_CmdLine, std::size( g_CmdLine ), "%s", text ? text : "" );
+	TrimIncompleteUtf8( g_CmdLine );
+#ifdef TCHAR_IS_WCHAR
+	Utf8ToWide( g_CmdLine, g_CmdLineW, std::size( g_CmdLineW ) );
+#endif
+	g_bCmdLineLoaded = true;
+}
+
+// dimhotepus: Join argv like GetCommandLine on Windows: separated by spaces,
+// arguments containing whitespace (or empty) quoted so the command line parser
+// splits them back the same way.  The old code turned every NUL in
+// /proc/self/cmdline into a space, losing argument boundaries and leaving a
+// trailing space.
+void AppendArgument( std::string &commandLine, const char *argument )
+{
+	if ( !commandLine.empty() )
+{
+		commandLine += ' ';
+}
+
+	const bool needsQuotes{ !*argument || std::strpbrk( argument, " \t" ) != nullptr };
+	if ( needsQuotes )
+{
+		commandLine += '"';
+	}
+	commandLine += argument;
+	if ( needsQuotes )
+	{
+		commandLine += '"';
+	}
+}
+
+// Build the command line from the process arguments.  Lock held.
+void LoadCommandLine()
+		{
+	std::string commandLine;
+
+#if defined( OSX )
+	// dimhotepus: OSX had no implementation: the command line stayed empty
+	// unless Plat_SetCommandLine was called.
+	const int argc{ *_NSGetArgc() };
+	char **argv{ *_NSGetArgv() };
+	for ( int i = 0; i < argc && argv[i]; ++i )
+	{
+		AppendArgument( commandLine, argv[i] );
+	}
+#elif defined( LINUX )
+	// dimhotepus: Read the whole file.  The old code only converted when
+	// everything fit in 2047 bytes; for longer command lines it returned just
+	// argv[0].
+	const int fd{ open( "/proc/self/cmdline", O_RDONLY | O_CLOEXEC ) };
+	if ( fd >= 0 )
+	{
+		std::string raw;
+		char chunk[4096];
+		for ( ;; )
+		{
+			const ssize_t got{ read( fd, chunk, sizeof( chunk ) ) };
+			if ( got > 0 )
 			{
-				Assert ( nCharRead < std::size( g_CmdLine ) );
+				raw.append( chunk, static_cast<size_t>( got ) );
+			}
+			else if ( got < 0 && errno == EINTR )
+			{
+				continue;
+			}
+			else
+			{
+				break;
+			}
+		}
+		close( fd );
 
-				for( int i = 0; i < nCharRead; i++ )
+		// Arguments are NUL-terminated, one after another.
+		for ( std::size_t begin = 0; begin < raw.size(); )
+		{
+			const std::size_t end{ raw.find( '\0', begin ) };
+			const std::string argument{ raw.substr( begin,
+				end == std::string::npos ? std::string::npos : end - begin ) };
+			AppendArgument( commandLine, argument.c_str() );
+			if ( end == std::string::npos )
 				{
-					if( g_CmdLine[ i ] == '\0' )
-						g_CmdLine[ i ] = ' ';
+				break;
+			}
+			begin = end + 1;
+		}
+	}
+#endif
+
+	Assert( !commandLine.empty() );
+	StoreCommandLine( commandLine.c_str() );
 				}
 				
-				g_CmdLine[ nCharRead ] = '\0';
+}  // namespace
 
+PLATFORM_INTERFACE void Plat_SetCommandLine( const char *cmdLine )
+{
+	// dimhotepus: Locked, null-safe, truncates at a UTF-8 boundary.
+	std::scoped_lock lock( g_CmdLineMutex );
+	StoreCommandLine( cmdLine );
+}
+
+PLATFORM_INTERFACE MUST_CHECK_RETURN const tchar *Plat_GetCommandLine()
+{
+	// dimhotepus: Thread-safe lazy load, on every POSIX platform.
+	std::scoped_lock lock( g_CmdLineMutex );
+	if ( !g_bCmdLineLoaded )
+	{
+		LoadCommandLine();
 			}
-			fclose( fp );
+
+#ifdef TCHAR_IS_WCHAR
+	return g_CmdLineW;
+#else
+	return g_CmdLine;
+#endif
 		}
 
-		Assert( g_CmdLine[ 0 ] );
+PLATFORM_INTERFACE MUST_CHECK_RETURN const char *Plat_GetCommandLineA()
+{
+	// dimhotepus: Return the narrow buffer directly.  Plat_GetCommandLine()
+	// returns const wchar_t * when tchar is wide.
+	std::scoped_lock lock( g_CmdLineMutex );
+	if ( !g_bCmdLineLoaded )
+	{
+		LoadCommandLine();
 	}
-#endif // LINUX
 
 	return g_CmdLine;
 }
 
-PLATFORM_INTERFACE const char *Plat_GetCommandLineA()
+namespace {
+
+constexpr uint64 cOneMib{ 1024 * 1024 };
+
+// dimhotepus: Bytes -> MiB, clamped to the uint fields of MemoryInformation.
+[[nodiscard]] constexpr uint BytesToMib( uint64 bytes ) noexcept
 {
-	return Plat_GetCommandLine();
+	const uint64 mib{ bytes / cOneMib };
+	return mib > UINT_MAX ? UINT_MAX : static_cast<uint>( mib );
 }
 
-PLATFORM_INTERFACE bool GetMemoryInformation( MemoryInformation *pOutMemoryInfo )
+// dimhotepus: Size of the process's user address space, the POSIX counterpart
+// of MEMORYSTATUSEX::ullTotalVirtual: RLIMIT_AS if limited, else the usual
+// user address space for the architecture.
+[[nodiscard]] uint64 AddressSpaceBytes() noexcept
+{
+	rlimit limit{};
+	if ( getrlimit( RLIMIT_AS, &limit ) == 0 && limit.rlim_cur != RLIM_INFINITY )
+	{
+		return static_cast<uint64>( limit.rlim_cur );
+	}
+
+#if defined( __x86_64__ )
+	return 1ull << 47;  // 128 TiB, 4-level paging.
+#elif defined( __aarch64__ )
+	return 1ull << 48;  // 256 TiB, 48-bit VA.
+#elif defined( PLATFORM_64BITS )
+	return 1ull << 47;
+#else
+	return 1ull << 32;  // 32-bit process.
+#endif
+}
+
+#ifdef LINUX
+// dimhotepus: Read a small /proc file fully, retrying on EINTR.
+[[nodiscard]] bool ReadProcFile( const char *path, std::string &out )
+{
+	const int fd{ open( path, O_RDONLY | O_CLOEXEC ) };
+	if ( fd < 0 )
+	{
+		return false;
+	}
+
+	char chunk[4096];
+	for ( ;; )
+	{
+		const ssize_t got{ read( fd, chunk, sizeof( chunk ) ) };
+		if ( got > 0 )
+		{
+			out.append( chunk, static_cast<size_t>( got ) );
+		}
+		else if ( got < 0 && errno == EINTR )
+		{
+			continue;
+		}
+		else
+{
+			close( fd );
+			return got == 0;
+		}
+	}
+}
+#endif
+
+}  // namespace
+
+PLATFORM_INTERFACE MUST_CHECK_RETURN bool GetMemoryInformation( MemoryInformation *pOutMemoryInfo )
 {
 	if ( !pOutMemoryInfo )
 		return false;
 	
-	constexpr uint32_t cOneMib{1024 * 1024};
+	// dimhotepus: Check the struct version like Windows does; unknown
+	// versions are rejected instead of written to.
+	if ( pOutMemoryInfo->m_nStructVersion != 0 )
+		return false;
+
+	// dimhotepus: Fill all four fields.  Virtual memory was never set and
+	// available physical memory only on OSX.
+	const uint64 addressSpace{ AddressSpaceBytes() };
 
 #ifdef OSX
-	uint64_t val = 0;
-	size_t len = sizeof( val );
-	// The bytes of physical memory.
-	int mib[] = { CTL_HW, HW_PHYSMEM };
-
-	if ( sysctl( mib, std::size( mib ), &val, &len, NULL, 0 ) == 0 )
+	// dimhotepus: HW_PHYSMEM / HW_USERMEM -> HW_MEMSIZE.  HW_PHYSMEM and
+	// HW_USERMEM are 32-bit ints (wrong past 2 GiB); reading them into a uint64
+	// left the high half stale, and len wasn't reset between calls.
+	uint64_t physicalBytes{ 0 };
+	size_t len{ sizeof( physicalBytes ) };
+	int mib[]{ CTL_HW, HW_MEMSIZE };
+	if ( sysctl( mib, std::size( mib ), &physicalBytes, &len, nullptr, 0 ) != 0 )
 	{
-		pOutMemoryInfo->m_nPhysicalRamMbTotal = val / cOneMib;
+		return false;
 	}
 
-	// The bytes of non-kernel memory.
-	mib[1] = HW_USERMEM;
-
-	if ( sysctl( mib, std::size( mib ), &val, &len, NULL, 0 ) == 0 )
+	// dimhotepus: Available = free + inactive + speculative pages, roughly
+	// what Activity Monitor reports as available.
+	uint64 availableBytes{ 0 };
+	const mach_port_t host{ mach_host_self() };
+	vm_size_t pageSize{ 0 };
+	vm_statistics64_data_t vmStats{};
+	mach_msg_type_number_t count{ HOST_VM_INFO64_COUNT };
+	if ( host_page_size( host, &pageSize ) == KERN_SUCCESS &&
+		 host_statistics64( host, HOST_VM_INFO64,
+			reinterpret_cast<host_info64_t>( &vmStats ), &count ) == KERN_SUCCESS )
 	{
-		pOutMemoryInfo->m_nPhysicalRamMbAvailable = val / cOneMib;
+		availableBytes = ( static_cast<uint64>( vmStats.free_count ) +
+			vmStats.inactive_count + vmStats.speculative_count ) * pageSize;
 	}
+	mach_port_deallocate( mach_task_self(), host );
 
-	return true;
+	uint64 usedVirtual{ 0 };
+	task_vm_info_data_t taskInfo{};
+	mach_msg_type_number_t taskCount{ TASK_VM_INFO_COUNT };
+	if ( task_info( mach_task_self(), TASK_VM_INFO,
+			reinterpret_cast<task_info_t>( &taskInfo ), &taskCount ) == KERN_SUCCESS )
+	{
+		usedVirtual = taskInfo.virtual_size;
+	}
 #elif defined(LINUX)
-	const int fd = open("/proc/meminfo", O_RDONLY);
-	if (fd < 0)
+	// dimhotepus: Rewritten parser.  The old one:
+	//  * called Sys_Error (not a tier0 function) and so killed the process
+	//    when /proc/meminfo couldn't be read;
+	//  * wrote buf[br] one past the end when the read filled the buffer;
+	//  * set "line = ptr" instead of ptr + 1, so after the first line every
+	//    line began with the replaced '\0' and never matched.  MemTotal only
+	//    worked because it is the first line.
+	std::string meminfo;
+	if ( !ReadProcFile( "/proc/meminfo", meminfo ) )
 	{
-		Sys_Error( "Can't open /proc/meminfo (%s)!\n", strerror(errno) );
+		Warning( "Unable to read /proc/meminfo: %s.\n", std::strerror( errno ) );
+		return false;
 	}
 
-	char buf[1024 * 16];
-	const ssize_t br = read(fd, buf, sizeof (buf));
-	close(fd);
-	if (br < 0)
+	uint64 memTotalKib{ 0 }, memAvailableKib{ 0 }, memFreeKib{ 0 }, buffersKib{ 0 }, cachedKib{ 0 };
+	bool hasTotal{ false }, hasAvailable{ false };
+	for ( std::size_t begin = 0; begin < meminfo.size(); )
 	{
-		Sys_Error( "Can't read /proc/meminfo (%s)!\n", strerror(errno) );
-	}
-	buf[br] = '\0';
+		std::size_t end{ meminfo.find( '\n', begin ) };
+		if ( end == std::string::npos ) end = meminfo.size();
+		const std::string line{ meminfo.substr( begin, end - begin ) };
+		begin = end + 1;
 
-	uint64_t memsize = 0;
-	// Split up the buffer by lines...
-	char *line = buf;
-	for (char *ptr = buf; *ptr; ptr++)
-	{
-		if (*ptr == '\n')
-		{
-			// we've got a complete line.
-			*ptr = '\0';
-			unsigned long long ull = 0;
-			if (sscanf(line, "MemTotal: %llu KiB", &ull) == 1)
+		char key[64];
+		unsigned long long value{ 0 };
+		if ( std::sscanf( line.c_str(), "%63[^:]: %llu", key, &value ) != 2 )
 			{
-				// found it!
-				memsize = ((uint64_t) ull) * 1024;
-				break;
+			continue;
 			}
-			line = ptr;
+
+		if ( !std::strcmp( key, "MemTotal" ) ) { memTotalKib = value; hasTotal = true; }
+		else if ( !std::strcmp( key, "MemAvailable" ) ) { memAvailableKib = value; hasAvailable = true; }
+		else if ( !std::strcmp( key, "MemFree" ) ) memFreeKib = value;
+		else if ( !std::strcmp( key, "Buffers" ) ) buffersKib = value;
+		else if ( !std::strcmp( key, "Cached" ) ) cachedKib = value;
 		}
+
+	if ( !hasTotal )
+	{
+		Warning( "Unable to find MemTotal in /proc/meminfo.\n" );
+		return false;
 	}
 
-	pOutMemoryInfo->m_nPhysicalRamMbTotal = memsize / cOneMib;
-	return true;
+	const uint64 physicalBytes{ memTotalKib * 1024 };
+	// MemAvailable exists since Linux 3.14; estimate it on older kernels.
+	const uint64 availableBytes{ ( hasAvailable ? memAvailableKib
+		: memFreeKib + buffersKib + cachedKib ) * 1024 };
+
+	// Process virtual size, first field of /proc/self/statm, in pages.
+	uint64 usedVirtual{ 0 };
+	std::string statm;
+	if ( ReadProcFile( "/proc/self/statm", statm ) )
+	{
+		usedVirtual = std::strtoull( statm.c_str(), nullptr, 10 ) *
+			static_cast<uint64>( sysconf( _SC_PAGESIZE ) );
+	}
 #else
 	#error "Need to fill out GetMemoryInformation or at least return false for this platform"
 #endif
+
+	pOutMemoryInfo->m_nPhysicalRamMbTotal = BytesToMib( physicalBytes );
+	pOutMemoryInfo->m_nPhysicalRamMbAvailable = BytesToMib( availableBytes );
+	pOutMemoryInfo->m_nVirtualRamMbTotal = BytesToMib( addressSpace );
+	pOutMemoryInfo->m_nVirtualRamMbAvailable =
+		BytesToMib( addressSpace > usedVirtual ? addressSpace - usedVirtual : 0 );
+	return true;
 }
 
 
