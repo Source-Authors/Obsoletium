@@ -492,13 +492,22 @@ uint64 Plat_USTime()
 // Wraps the thread-safe versions of ctime. buf must be at least 26 bytes 
 char *Plat_ctime( const time_t *timep, char *buf, size_t bufsize )
 {
+	// dimhotepus: Check bufsize.  ctime_r writes up to 26 bytes and ignores
+	// any size, so a smaller buffer overflowed.  Fail like ctime_s on Windows.
+	if ( !timep || !buf || bufsize < 26 )
+	{
+		return nullptr;
+	}
+
 	return ctime_r( timep, buf );
 }
 
 // Wraps the thread-safe versions of gmtime
 struct tm *Plat_gmtime( const time_t *timep, struct tm *result )
 {
-	return gmtime_r( timep, result );
+	// dimhotepus: Null checks, return nullptr like gmtime_s on Windows instead
+	// of crashing.
+	return timep && result ? gmtime_r( timep, result ) : nullptr;
 }
 
 time_t Plat_timegm( struct tm *timeptr )
@@ -509,7 +518,8 @@ time_t Plat_timegm( struct tm *timeptr )
 // Wraps the thread-safe versions of localtime
 struct tm *Plat_localtime( const time_t *timep, struct tm *result )
 {
-	return localtime_r( timep, result );
+	// dimhotepus: Null checks, as Plat_gmtime.
+	return timep && result ? localtime_r( timep, result ) : nullptr;
 }
 
 bool vtune( bool resume )
