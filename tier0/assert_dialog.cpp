@@ -165,7 +165,8 @@ BOOL WINAPI DllMain( HINSTANCE module, DWORD fdwReason, LPVOID lpvReserved )
 						// Remove this one from the list.
 						*pPrev = pNext;
 						delete it;
-						continue;
+						// dimhotepus: This assert should be ignored this time, but not next one.
+						return false;
 					}
 				}
 				
