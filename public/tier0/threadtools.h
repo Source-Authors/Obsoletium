@@ -1645,6 +1645,8 @@ public:
 	// check for a message. not 100% reliable - someone could grab the message first
 	bool MessageWaiting( ) 
 	{
+		// dimhotepus: Head is written under the mutex, read under it too (was data race).
+		AUTO_LOCK(QueueAccessMutex);
 		return ( Head != nullptr );
 	}
 
