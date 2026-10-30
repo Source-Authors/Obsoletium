@@ -190,7 +190,7 @@ static CAssertDisable* CreateNewAssertDisable( const tchar *pFilename )
 	
 	// dimhotepus: Use passed file name to create assert disable.
 	_tcsncpy( pDisable->m_Filename, pFilename, sizeof( pDisable->m_Filename ) - 1 );
-	pDisable->m_Filename[ sizeof( pDisable->m_Filename ) - 1 ] = 0;
+	pDisable->m_Filename[ sizeof( pDisable->m_Filename ) - 1 ] = _T('\0');
 	
 	return pDisable;
 }
@@ -471,9 +471,8 @@ static void SpewBacktrace()
 
 				fprintf( stderr, "  %s\n", module );
 			}
-
-			free( strings );
 		}
+		RunCodeAtScopeExit( free( strings ) );
 	}
 }
 
