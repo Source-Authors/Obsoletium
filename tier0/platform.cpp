@@ -426,12 +426,10 @@ void Plat_ExitProcessWithError( int nCode, bool bGenerateMinidump )
 }
 
 // Wraps the thread-safe versions of gmtime
+// dimhotepus: Check for any error, not only EINVAL.
 struct tm *Plat_gmtime( const time_t *timep, struct tm *result )
 {
-	if ( EINVAL == gmtime_s( result, timep ) )
-		return nullptr;
-	else
-		return result;
+	return gmtime_s( result, timep ) == 0 ? result : nullptr;
 }
 
 
@@ -442,12 +440,10 @@ time_t Plat_timegm( struct tm *timeptr )
 
 
 // Wraps the thread-safe versions of localtime
+// dimhotepus: Check for any error, not only EINVAL.
 struct tm *Plat_localtime( const time_t *timep, struct tm *result )
 {
-	if ( EINVAL == localtime_s( result, timep ) )
-		return nullptr;
-	else
-		return result;
+	return localtime_s( result, timep ) == 0 ? result : nullptr;
 }
 
 
