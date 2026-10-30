@@ -108,6 +108,8 @@ unsigned STDCALL ThreadProcX86_64SetDataBreakpoints( void* pvParam )
 	if ( pvParam )
 	{
 		X86_64ApplyBreakpointsToThread( *static_cast<unsigned long*>(pvParam) );
+		// dimhotepus: Clean up allocated parameter to prevent memory leak
+		delete static_cast<unsigned long*>(pvParam);
 		return 0;
 	}
 
@@ -228,8 +230,11 @@ void Plat_ApplyHardwareDataBreakpointsToNewThread( unsigned long dwThreadID )
 	}
 	else
 	{
+		// dimhotepus: Allocate copy of thread ID for worker thread to safely use.
+		auto* pThreadID = new unsigned long(dwThreadID);
+
 		HANDLE hWorkThread = (HANDLE)_beginthreadex( nullptr, 0,
-			&ThreadProcX86_64SetDataBreakpoints, &dwThreadID, 0, nullptr );
+			&ThreadProcX86_64SetDataBreakpoints, pThreadID, 0, nullptr );
 		if ( hWorkThread )
 		{
 			RunCodeAtScopeExit( CloseHandle( hWorkThread ) );
