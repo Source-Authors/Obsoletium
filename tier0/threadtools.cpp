@@ -288,6 +288,17 @@ int ThreadGetPriority( ThreadHandle_t hThread )
 
 #ifdef _WIN32
 	return ::GetThreadPriority( (HANDLE)hThread );
+#elif defined( LINUX )
+	// dimhotepus: SCHED_OTHER priority is always 0 on Linux. TP_PRIORITY_* are nice values here, and nice is per OS thread,
+	// so we can query current thread only.
+	if ( pthread_equal( (pthread_t)hThread, pthread_self() ) )
+	{
+		errno = 0;
+		const int nice = getpriority( PRIO_PROCESS, static_cast<id_t>( syscall( SYS_gettid ) ) );
+		if ( errno == 0 )
+			return nice;
+	}
+	return TP_PRIORITY_DEFAULT;
 #else
 	struct sched_param thread_param;
 	int policy;
@@ -307,6 +318,11 @@ bool ThreadSetPriority( ThreadHandle_t hThread, int priority )
 
 #ifdef _WIN32
 	return ( SetThreadPriority(hThread, priority) != 0 );
+#elif defined( LINUX )
+	// dimhotepus: Was SCHED_OTHER + pthread_setschedparam: always failed for non-zero priority but returned true.
+	// Use nice for current thread.  Lowering nice (raising priority) needs privileges, so report real result.
+	return pthread_equal( (pthread_t)hThread, pthread_self() ) &&
+		setpriority( PRIO_PROCESS, static_cast<id_t>( syscall( SYS_gettid ) ), priority ) == 0;
 #elif defined(POSIX)
 	struct sched_param thread_param; 
 	thread_param.sched_priority = priority; 
