@@ -529,38 +529,43 @@ MUST_CHECK_RETURN bool Plat_IsUserAnAdmin()
   return ::IsUserAdmin() ? true : false;
 }
 
-[[nodiscard]] static bool ShouldAppUseLightTheme() {
-	HKEY personalizeKey;
-	// Light mode by default if not supported.
-	DWORD value = 1;
-	if (::RegOpenKeyExW(HKEY_CURRENT_USER,
-		L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
-		0, KEY_READ, &personalizeKey) == ERROR_SUCCESS) {
-		RunCodeAtScopeExit(::RegCloseKey(personalizeKey));
-
-		DWORD valueType, valueSize = sizeof(value);
-
-		const LSTATUS ok{::RegQueryValueExW(personalizeKey,
-			L"AppsUseLightTheme",
-			nullptr,
-			&valueType,
-			reinterpret_cast<byte*>(&value),
-			&valueSize)};
-
-		// Light mode by default if not supported.
-		value = ok == ERROR_SUCCESS && valueType == REG_DWORD ? value : 1;
-	}
-
-	return value > 0;
-}
-
+// dimhotepus: Forward declarations kept for binary / source compatibility.
 PLATFORM_INTERFACE MUST_CHECK_RETURN void *Plat_Alloc( unsigned long size );
 PLATFORM_INTERFACE void Plat_Free( void *ptr );
 
+#if defined(WDK_NTDDI_VERSION) && defined(NTDDI_WIN11_ZN) && \
+	(WDK_NTDDI_VERSION >= NTDDI_WIN11_ZN)
+#define SE_PLATFORM_HAS_DWM_SYSTEM_BACKDROP 1
+#endif
+
+#ifdef SE_PLATFORM_HAS_DWM_SYSTEM_BACKDROP
+
+[[nodiscard]] static bool ShouldAppUseLightTheme() {
+	DWORD value{0}, valueSize{sizeof(value)};
+	const LSTATUS rc{::RegGetValueW(HKEY_CURRENT_USER,
+		L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+		L"AppsUseLightTheme", RRF_RT_REG_DWORD, nullptr, &value, &valueSize)};
+
+		// Light mode by default if not supported.
+	return rc != ERROR_SUCCESS || value != 0;
+	}
+
+template <std::size_t size>
+[[nodiscard]] static const char *GetWindowTitleForLog(HWND window, char (&buffer)[size]) {
+	static_assert(size > 1 && size <= INT_MAX);
+
+	buffer[0] = '\0';
+	return ::GetWindowTextA(window, buffer, static_cast<int>(size)) > 0
+		? buffer : "N/A";
+}
+
+#endif  // SE_PLATFORM_HAS_DWM_SYSTEM_BACKDROP
+
 // dimhotepus: Apply system Mica materials to window.
 // See https://learn.microsoft.com/en-us/windows/apps/design/style/mica
-bool Plat_ApplySystemTitleBarTheme(void *window,
-                                   SystemBackdropType backDropType) {
+bool Plat_ApplySystemTitleBarTheme([[maybe_unused]] void *window,
+                                   [[maybe_unused]] SystemBackdropType backDropType) {
+#ifdef SE_PLATFORM_HAS_DWM_SYSTEM_BACKDROP
 	static_assert(to_underlying(SystemBackdropType::Auto) == DWMSBT_AUTO);
 	static_assert(to_underlying(SystemBackdropType::None) == DWMSBT_NONE);
 	static_assert(to_underlying(SystemBackdropType::MainWindow) ==
@@ -574,29 +579,19 @@ bool Plat_ApplySystemTitleBarTheme(void *window,
 	const auto lastErrorCode = GetLastError();
 	RunCodeAtScopeExit(SetLastError(lastErrorCode));
 
+	const HWND hwnd{static_cast<HWND>(window)};
 	bool ok = true;
 	
-	// dimhotepus: Since Windows 11 21H1 (22000) SDK
-	// DWM has DWMWA_USE_IMMERSIVE_DARK_MODE & DWMWA_SYSTEMBACKDROP_TYPE.
-#if defined(WDK_NTDDI_VERSION) && (WDK_NTDDI_VERSION >= NTDDI_WIN11_ZN)
 	// Detect current app window text is light or dark and apply Dark mode.
 	const BOOL enableDarkMode{ShouldAppUseLightTheme() ? FALSE : TRUE};
-	HRESULT hr{::DwmSetWindowAttribute(static_cast<HWND>(window),
+	HRESULT hr{::DwmSetWindowAttribute(hwnd,
 		DWMWA_USE_IMMERSIVE_DARK_MODE, &enableDarkMode, sizeof(enableDarkMode))};
 	if (FAILED(hr)) {
-		const int windowTextSize =
-			GetWindowTextLengthA(static_cast<HWND>(window)) + 1;
-		char *windowText = static_cast<char*>(Plat_Alloc(windowTextSize));
-		RunCodeAtScopeExit(Plat_Free(windowText));
-
-		if (windowText)
-		{
-			GetWindowTextA(static_cast<HWND>(window), windowText, windowTextSize);
-		}
-
+		// dimhotepus: truncated if longer, never fails.
+		char windowText[256];
 		Warning(
 			"Unable to apply user Color Mode preferences to window 0x%p (%s): %s\n",
-			window, windowText ? windowText : "N/A",
+			window, GetWindowTitleForLog(hwnd, windowText),
 			s1::win::com::com_error_category().message(hr).c_str());
 
 		ok = false;
@@ -611,31 +606,23 @@ bool Plat_ApplySystemTitleBarTheme(void *window,
 	const DWM_SYSTEMBACKDROP_TYPE dwm_backdrop_type =
 		static_cast<DWM_SYSTEMBACKDROP_TYPE>(to_underlying(backDropType));
 	hr = ::DwmSetWindowAttribute(
-		static_cast<HWND>(window), DWMWA_SYSTEMBACKDROP_TYPE,
+		hwnd, DWMWA_SYSTEMBACKDROP_TYPE,
 		&dwm_backdrop_type, sizeof(dwm_backdrop_type));
 	if (FAILED(hr)) {
-		const int windowTextSize =
-			GetWindowTextLengthA(static_cast<HWND>(window)) + 1;
-		char *windowText = static_cast<char*>(Plat_Alloc(windowTextSize));
-		RunCodeAtScopeExit(Plat_Free(windowText));
-
-		if (windowText)
-		{
-			GetWindowTextA(static_cast<HWND>(window), windowText, windowTextSize);
-		}
-
+		// dimhotepus: truncated if longer, never fails.
+		char windowText[256];
 		Warning(
 			"Unable to apply backdrop material effect to window 0x%p (%s): %s\n",
-			window, windowText ? windowText : "N/A",
+			window, GetWindowTitleForLog(hwnd, windowText),
 			s1::win::com::com_error_category().message(hr).c_str());
 
 		ok = false;
 	}
-#else
-	ok = false;
-#endif
 
 	return ok;
+#else
+	return false;
+#endif
 }
 
 
