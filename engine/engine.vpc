@@ -1125,7 +1125,7 @@ $Project "engine"
 
 		$ImpLibexternal steam_api   [!$NO_STEAM]
 
-		$ImpLib	"$LIBCOMMON\curl"	  [$OSXALL]
+		$ImpLib	"$LIBCOMMON/curl"	  [$OSXALL]
 		
 		$Libexternal	"$LIBBZOUTDIR/libbz2"
 		$Libexternal	"$LIBJPEGOUTDIR/jpeg-static" [!$DEDICATED]
@@ -1134,7 +1134,7 @@ $Project "engine"
 		$Libexternal	"$ZIPUTILSOUTDIRRELEASE/zip-utils" [!$WINDOWS]
 		$Libexternal	"$MPAHEADERINFOOUTDIRRELEASE/mpaheaderinfo" [!$WINDOWS&&!$DEDICATED]
 		$Libexternal	"$ZLIBOUTDIR/zs"
-		$Libexternal 	"$SRCDIR\lib\common\$(CRYPTOPPDIR)\libcrypto" [$LINUXALL&&!$DEDICATED]
+		$Libexternal 	"$SRCDIR/lib/common/$(CRYPTOPPDIR)/libcrypto" [$LINUXALL&&!$DEDICATED]
 
 		// Link with the google profiler.
 		// https://github.com/gperftools/gperftools
