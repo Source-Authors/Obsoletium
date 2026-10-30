@@ -519,12 +519,14 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 
 	// Now create the dialog. Just return true for old-style debug break upon failure.
 	// dimhotepus: Copy as we can change from different thread.
+	// Truncation is ok here.
 	_tcsncpy( g_Info.m_pFilename, pFilename, std::size( g_Info.m_pFilename ) - 1 );
 	g_Info.m_pFilename[std::size( g_Info.m_pFilename ) - 1] = _T('\0');
 
 	g_Info.m_iLine = line;
 
 	// dimhotepus: Copy as we can change from different thread.
+	// Truncation is ok here.
 	_tcsncpy( g_Info.m_pExpression, pExpression, std::size( g_Info.m_pExpression ) - 1 );
 	g_Info.m_pExpression[std::size( g_Info.m_pExpression ) - 1] = _T( '\0' );
 
