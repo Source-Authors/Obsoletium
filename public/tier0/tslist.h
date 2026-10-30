@@ -88,14 +88,19 @@ union TSLIST_HEAD_ALIGN TSLHead_t
 #endif
 };
 
-// Basic lock free stack.
-class TSLIST_HEAD_ALIGN CTSListBase : public CAlignedNewDelete<TSLIST_HEAD_ALIGNMENT> {
+// Lock-free only if std::atomic<TSLHead_t> is lock-free on the target platform.
+//
+// NOTE: Nodes must not be freed or reused while any concurrent operation could
+// still access them.  Use hazard pointers, epoch-based reclamation, or an
+// equivalent scheme if nodes need to be reclaimed concurrently.
+class TSLIST_HEAD_ALIGN CTSListBase
+    : public CAlignedNewDelete<TSLIST_HEAD_ALIGNMENT> {
  public:
   CTSListBase() : head_{TSLHead_t{{nullptr, 0, 0
 #ifdef PLATFORM_64BITS
-	  , 0
+                         , 0
 #endif
-  }}} {
+      }}} {
     if ((reinterpret_cast<size_t>(&head_)) % TSLIST_HEAD_ALIGNMENT != 0) {
       Error("CTSListBase: Misaligned list head.\n");
     }
@@ -104,52 +109,66 @@ class TSLIST_HEAD_ALIGN CTSListBase : public CAlignedNewDelete<TSLIST_HEAD_ALIGN
   ~CTSListBase() { Detach(); }
 
   TSLNodeBase_t *Push(TSLNodeBase_t *node) {
-    TSLHead_t next = {}, orig = head_.load(std::memory_order::memory_order_relaxed);
+    TSLHead_t orig = head_.load(std::memory_order_acquire);
 
-    do {
+    for (;;) {
       node->Next = orig.value.Next;
 
+      TSLHead_t next = orig;
       next.value.Next = node;
       next.value.Depth = orig.value.Depth + 1;
-	  // Solve ABA problem.
       next.value.Sequence = orig.value.Sequence + 1;
-    } while (!head_.compare_exchange_weak(
-        orig, next, std::memory_order::memory_order_acq_rel,
-        std::memory_order::memory_order_relaxed));
 
-    return orig.value.Next;
+      if (head_.compare_exchange_weak(
+              orig, next,
+              std::memory_order_acq_rel,
+              std::memory_order_acquire)) {
+        return orig.value.Next;
+      }
+    }
   }
 
   TSLNodeBase_t *Pop() {
-    TSLHead_t next = {}, orig = head_.load(std::memory_order::memory_order_relaxed);
+    TSLHead_t orig = head_.load(std::memory_order_acquire);
 
-    do {
-      if (orig.value.Next == nullptr) return nullptr;
+    for (;;) {
+      TSLNodeBase_t* node = orig.value.Next;
+      if (node == nullptr) {
+        return nullptr;
+      }
 
-	  // dimhotepus: Same bug as in original code.
-	  // Here is data race, if old head was deleted between nullptr check and
-	  // ->Next it accesses stall data!
-      next.value.Next = orig.value.Next->Next;
+      // dimhotepus: This dereference is safe only if node reclamation is appropriately
+      // deferred while concurrent operations may still access it.
+      TSLHead_t next = orig;
+      next.value.Next = node->Next;
       next.value.Depth = orig.value.Depth - 1;
-	  // No need to solve ABA problem, solved in Push.
-    } while (!head_.compare_exchange_weak(
-        orig, next, std::memory_order::memory_order_acq_rel,
-        std::memory_order::memory_order_relaxed));
+      next.value.Sequence = orig.value.Sequence + 1;
 
-    return orig.value.Next;
+      if (head_.compare_exchange_weak(
+              orig, next,
+              std::memory_order_acq_rel,
+              std::memory_order_acquire)) {
+        return node;
+      }
+    }
   }
 
   TSLNodeBase_t *Detach() {
-    TSLHead_t next = {}, orig = head_.load(std::memory_order::memory_order_relaxed);
+    TSLHead_t orig = head_.load(std::memory_order_acquire);
 
-    do {
+    for (;;) {
+      TSLHead_t next = orig;
       next.value.Next = nullptr;
       next.value.Depth = 0;
-    } while (!head_.compare_exchange_weak(
-        orig, next, std::memory_order::memory_order_acq_rel,
-        std::memory_order::memory_order_relaxed));
+      next.value.Sequence = orig.value.Sequence + 1;
 
-    return orig.value.Next;
+      if (head_.compare_exchange_weak(
+              orig, next,
+              std::memory_order_acq_rel,
+              std::memory_order_acquire)) {
+        return orig.value.Next;
+      }
+    }
   }
 
   [[nodiscard]] [[deprecated("Unprotected access is unsafe and should not be used")]]
@@ -158,7 +177,7 @@ class TSLIST_HEAD_ALIGN CTSListBase : public CAlignedNewDelete<TSLIST_HEAD_ALIGN
   }
 
   [[nodiscard]] int Count() const {
-    TSLHead_t orig = head_.load(std::memory_order::memory_order_relaxed);
+    TSLHead_t orig = head_.load(std::memory_order_relaxed);
     return orig.value.Depth;
   }
 
