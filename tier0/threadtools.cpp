@@ -427,6 +427,20 @@ bool ThreadJoin( ThreadHandle_t hThread, unsigned timeout )
 		Assert( 0 );
 		return false;
 	}
+#elif defined(LINUX)
+	if ( timeout != TT_INFINITE )
+	{
+		// dimhotepus: Respect timeout on Linux.
+		timespec ts;
+		clock_gettime( CLOCK_REALTIME, &ts );
+		const uint64 nNs = static_cast<uint64>( ts.tv_nsec ) + static_cast<uint64>( timeout ) * 1000000ull;
+		ts.tv_sec += static_cast<time_t>( nNs / 1000000000ull );
+		ts.tv_nsec = static_cast<long>( nNs % 1000000000ull );
+		if ( pthread_timedjoin_np( (pthread_t)hThread, NULL, &ts ) != 0 )
+			return false;
+	}
+	else if ( pthread_join( (pthread_t)hThread, NULL ) != 0 )
+		return false;
 #elif defined(POSIX)
 	if ( pthread_join( (pthread_t)hThread, NULL ) != 0 )
 		return false;
