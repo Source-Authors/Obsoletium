@@ -1757,6 +1757,7 @@ template <typename LambdaType>
 	};
 */
 
+// Use Intel VTune profiler.
 PLATFORM_INTERFACE MUST_CHECK_RETURN bool vtune( bool resume );
 
 
