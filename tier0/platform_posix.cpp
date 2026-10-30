@@ -41,6 +41,8 @@
 #include "tier0/vcrmode.h"
 #include "tier0/memalloc.h"
 #include "tier0/dbg.h"
+// dimhotepus: Cross-platform minidump for Plat_ExitProcessWithError, as on Windows.
+#include "tier0/scoped_breakpad_handler.h"
 
 #ifndef NO_HOOK_MALLOC
 // dimhotepus: Explicit include for CThreadFastMutex / AUTO_LOCK used by the
@@ -848,6 +850,27 @@ bool Plat_GetModuleFilename( char *pOut, int nMaxBytes )
 PLATFORM_INTERFACE void Plat_ExitProcess( int nCode )
 {
 	_exit( nCode );
+}
+
+// dimhotepus: Was missing on POSIX (declared in platform.h, implemented on
+// Windows), so callers failed to link.  Same behavior as Windows.
+PLATFORM_INTERFACE void Plat_ExitProcessWithError( int nCode, bool bGenerateMinidump )
+{
+	//handle default behavior
+	if ( bGenerateMinidump )
+	{
+		//don't generate mini dumps in the debugger
+		if ( !Plat_IsInDebugSession() )
+		{
+			if ( !s1::breakpad::ScopedBreakpadHandler::Instance().WriteMinidump() )
+			{
+				Plat_DebugString( "Unable to write minidump on exit process by error.\n" );
+			}
+		}
+	}
+
+	//and exit our process
+	Plat_ExitProcess( nCode );
 }
 
 
