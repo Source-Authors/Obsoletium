@@ -2046,7 +2046,8 @@ void CThread::Yield()
 	// Context switch.
 	Sleep( 0 );
 #elif defined(POSIX)
-	pthread_yield();
+	// dimhotepus: pthread_yield is deprecated (removed from some libcs). Use sched_yield.
+	sched_yield();
 #endif
 }
 
