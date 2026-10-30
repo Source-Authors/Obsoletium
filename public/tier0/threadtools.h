@@ -1806,6 +1806,8 @@ inline CThreadMutex::CThreadMutex()
 	pthread_mutexattr_init( &m_Attr );
 	pthread_mutexattr_settype( &m_Attr, PTHREAD_MUTEX_RECURSIVE );
 	pthread_mutex_init( &m_Mutex, &m_Attr );
+	// dimhotepus: Attr is copied by init, destroy it to not leak on non-glibc.
+	pthread_mutexattr_destroy( &m_Attr );
 }
 
 // dimhotepus: Ctor with spin count.
