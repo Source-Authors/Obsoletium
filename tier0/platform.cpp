@@ -173,6 +173,13 @@ wchar_t* Utf8ToWide( IN_Z const char* utf8, OUT_Z_ARRAY wchar_t ( &buffer )[size
 	return buffer;
 }
 
+// dimhotepus: nullptr for an empty string, so TaskDialog / MessageBoxW show
+// their default caption instead of a blank title bar.
+[[nodiscard]] constexpr const wchar_t* NullIfEmpty( const wchar_t* text ) noexcept
+{
+	return text && *text ? text : nullptr;
+}
+
 [[nodiscard]] constexpr TASKDIALOG_COMMON_BUTTON_FLAGS GetTaskDialogButtons(
 	Plat_MessageBoxButton buttons ) noexcept
 {
@@ -264,7 +271,7 @@ Plat_MessageBoxButton Plat_MessageBox( IN_Z const char* title,
 	const HRESULT hr{ ::TaskDialog(
 		nullptr,
 		nullptr,
-		Utf8ToWide( title, wideTitle ),
+		NullIfEmpty( Utf8ToWide( title, wideTitle ) ),
 		Utf8ToWide( mainInstruction, wideMainInstruction ),
 		Utf8ToWide( content, wideContent ),
 		GetTaskDialogButtons( buttons ),
@@ -289,7 +296,7 @@ Plat_MessageBoxButton Plat_MessageBox( IN_Z const char* title,
 	}
 	wcscat_s( combined, wideContent );
  
-	pressed = ::MessageBoxW( nullptr, combined, wideTitle,
+	pressed = ::MessageBoxW( nullptr, combined, NullIfEmpty( wideTitle ),
 		MB_SYSTEMMODAL | MB_SETFOREGROUND |
 		GetMessageBoxIcon( icon ) | GetMessageBoxButtons( buttons ) );
 	return GetPressedButton( pressed );
