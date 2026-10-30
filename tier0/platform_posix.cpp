@@ -587,14 +587,15 @@ MUST_CHECK_RETURN bool Plat_IsInDebugSession()
 	// watchdog SIGALRM handler calls this via DebuggerBreakIfDebugging.
 	// errno is preserved for the same reason.
 	const int savedErrno{ errno };
+	RunCodeAtScopeExit( errno = savedErrno );
 
 	// dimhotepus: O_CLOEXEC, and dropped the meaningless S_IRUSR mode.
 	const int fd{ open( "/proc/self/status", O_RDONLY | O_CLOEXEC ) };
 	if ( fd < 0 )
 	{
-		errno = savedErrno;
 		return false;
 	}
+	RunCodeAtScopeExit( close( fd ) );
 
 	// dimhotepus: Read until EOF / full, retrying on EINTR.  A single read()
 	// may return a partial buffer.
@@ -616,7 +617,6 @@ MUST_CHECK_RETURN bool Plat_IsInDebugSession()
 			break;
 		}
 	}
-	close( fd );
 	buf[used] = '\0';
 
 	// dimhotepus: Parse right after the "TracerPid:" key.  The old code
@@ -626,7 +626,6 @@ MUST_CHECK_RETURN bool Plat_IsInDebugSession()
 	const char *str{ std::strstr( buf, s_TracerPid ) };
 	const long tracerpid{ str ? std::strtol( str + sizeof( s_TracerPid ) - 1, nullptr, 10 ) : 0 };
 
-	errno = savedErrno;
 	return tracerpid > 0;
 }
 
@@ -753,6 +752,8 @@ void LoadCommandLine()
 	const int fd{ open( "/proc/self/cmdline", O_RDONLY | O_CLOEXEC ) };
 	if ( fd >= 0 )
 	{
+		RunCodeAtScopeExit( close( fd ) );
+
 		std::string raw;
 		char chunk[4096];
 		for ( ;; )
@@ -771,7 +772,6 @@ void LoadCommandLine()
 				break;
 			}
 		}
-		close( fd );
 
 		// Arguments are NUL-terminated, one after another.
 		for ( std::size_t begin = 0; begin < raw.size(); )
@@ -873,6 +873,7 @@ constexpr uint64 cOneMib{ 1024 * 1024 };
 	{
 		return false;
 	}
+	RunCodeAtScopeExit( close( fd ) );
 
 	char chunk[4096];
 	for ( ;; )
@@ -888,7 +889,6 @@ constexpr uint64 cOneMib{ 1024 * 1024 };
 		}
 		else
 		{
-			close( fd );
 			return got == 0;
 		}
 	}
@@ -927,6 +927,9 @@ PLATFORM_INTERFACE MUST_CHECK_RETURN bool GetMemoryInformation( MemoryInformatio
 	// what Activity Monitor reports as available.
 	uint64 availableBytes{ 0 };
 	const mach_port_t host{ mach_host_self() };
+	// dimhotepus: mach_host_self() returns a send right; released by a scope
+	// guard instead of an explicit call after use.
+	RunCodeAtScopeExit( mach_port_deallocate( mach_task_self(), host ) );
 	vm_size_t pageSize{ 0 };
 	vm_statistics64_data_t vmStats{};
 	mach_msg_type_number_t count{ HOST_VM_INFO64_COUNT };
@@ -937,7 +940,6 @@ PLATFORM_INTERFACE MUST_CHECK_RETURN bool GetMemoryInformation( MemoryInformatio
 		availableBytes = ( static_cast<uint64>( vmStats.free_count ) +
 			vmStats.inactive_count + vmStats.speculative_count ) * pageSize;
 	}
-	mach_port_deallocate( mach_task_self(), host );
 
 	uint64 usedVirtual{ 0 };
 	task_vm_info_data_t taskInfo{};
@@ -1169,6 +1171,7 @@ bool s_bAlarmHandlerInstalled{ false };
 void WatchDogHandler( int )
 {
 	const int savedErrno{ errno };
+	RunCodeAtScopeExit( errno = savedErrno );
 
 	// dimhotepus: write() instead of Plat_DebugString( fprintf ): stdio isn't
 	// async-signal-safe and can deadlock if the alarm interrupts a stdio call.
@@ -1186,8 +1189,6 @@ void WatchDogHandler( int )
 		// force a crash
 		abort();
 	}
-
-	errno = savedErrno;
 }
 
 }  // namespace
@@ -1476,6 +1477,9 @@ static CThreadFastMutex s_MemoryMutex;
 {
 	AUTO_LOCK( s_MemoryMutex );
 	RemoveHooks();
+	// dimhotepus: Hooks reinstalled by a scope guard.  Declared after
+	// AUTO_LOCK, so they are reinstalled before the mutex is released.
+	RunCodeAtScopeExit( InstallHooks() );
 	const ptrint_t nOldAddress{ reinterpret_cast<ptrint_t>( ptr ) };
 	void *nResult = (realloc)( ptr, size );
 
@@ -1506,7 +1510,6 @@ static CThreadFastMutex s_MemoryMutex;
 		AddMemoryAllocation( nResult, size );
 	}
 
-	InstallHooks();
 	return nResult;
 }
 
@@ -1516,14 +1519,14 @@ static CThreadFastMutex s_MemoryMutex;
 	// turn off hooking so we won't recurse
 	AUTO_LOCK( s_MemoryMutex );
 	RemoveHooks();
-
+	// dimhotepus: Hooks reinstalled by a scope guard.  Declared after
+	// AUTO_LOCK, so they are reinstalled before the mutex is released.
+	RunCodeAtScopeExit( InstallHooks() );
 
 	void *pResult = (malloc)( size );
 
 	// now, add this memory chunk to our list
 	AddMemoryAllocation( pResult, size );
-
-	InstallHooks();
 
 	return pResult;
 }
@@ -1532,6 +1535,9 @@ static CThreadFastMutex s_MemoryMutex;
 {
 	AUTO_LOCK( s_MemoryMutex );
 	RemoveHooks();
+	// dimhotepus: Hooks reinstalled by a scope guard.  Declared after
+	// AUTO_LOCK, so they are reinstalled before the mutex is released.
+	RunCodeAtScopeExit( InstallHooks() );
 
 	// dimhotepus: Address captured before free, looked up as an integer
 	// (see FindAddress); unused caller marked [[maybe_unused]].
@@ -1555,7 +1561,6 @@ static CThreadFastMutex s_MemoryMutex;
 			ForgetAllocation( pFound, nHash );
 		}
 	}
-	InstallHooks();
 }
      
 void EnableMemoryLogging( bool bOnOff )
@@ -1584,7 +1589,6 @@ static void PrintContextStack( CLinuxMallocContext *p )
 {
 	char **strings = backtrace_symbols( p->pStackTraceBack, MAX_STACK_TRACEBACK );
 	RunCodeAtScopeExit( (free)( strings ) );
-
 	Msg( "  stack\n" );
 	for ( int n = 0; n < MAX_STACK_TRACEBACK; n++ )
 	{
@@ -1601,6 +1605,9 @@ void DumpMemoryLog( int nThresh )
 	// dimhotepus: EndWatchdogTimer -> Plat_EndWatchdogTimer.
 	Plat_EndWatchdogTimer();
 	RemoveHooks();
+	// dimhotepus: Hooks reinstalled by a scope guard.  Declared after
+	// AUTO_LOCK, so they are reinstalled before the mutex is released.
+	RunCodeAtScopeExit( InstallHooks() );
 	std::vector<CLinuxMallocContext *> memList;
 	
 	for( int i =0 ; i < MEMALLOC_HASHSIZE; i++ )
@@ -1624,7 +1631,6 @@ void DumpMemoryLog( int nThresh )
 		PrintContextStack( p );
 	}
 	Msg("End of memory list\n" );
-	InstallHooks();
 }
 
 void DumpChangedMemory( int nThresh )
@@ -1633,6 +1639,9 @@ void DumpChangedMemory( int nThresh )
 	// dimhotepus: EndWatchdogTimer -> Plat_EndWatchdogTimer.
 	Plat_EndWatchdogTimer();
 	RemoveHooks();
+	// dimhotepus: Hooks reinstalled by a scope guard.  Declared after
+	// AUTO_LOCK, so they are reinstalled before the mutex is released.
+	RunCodeAtScopeExit( InstallHooks() );
 	std::vector<CLinuxMallocContext *> memList;
 	
 	for( int i =0 ; i < MEMALLOC_HASHSIZE; i++ )
@@ -1656,7 +1665,6 @@ void DumpChangedMemory( int nThresh )
 		PrintContextStack( p );
 	}
 	Msg("End of memory list\n" );
-	InstallHooks();
 }
 
 void SetMemoryMark( )
