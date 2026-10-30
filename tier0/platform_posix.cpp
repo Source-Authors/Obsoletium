@@ -76,35 +76,101 @@
 
 extern VCRMode_t g_VCRMode;
 
-static bool g_bBenchmarkMode = false;
-static double g_FakeBenchmarkTime = 0;
-static double g_FakeBenchmarkTimeInc = 1.0 / 66.0;
+// dimhotepus: bool -> std::atomic_bool, as on Windows.  Read / written from
+// several threads.
+static std::atomic_bool g_bBenchmarkMode = false;
+// dimhotepus: double accumulator -> atomic tick counter, as on Windows.
+// "g_FakeBenchmarkTime += inc" on a plain double was a data race (lost or torn
+// updates), and summing 1/66 on every call drifted.
+static std::atomic<uint64> g_FakeBenchmarkTicks = 0;
+// dimhotepus: static double -> constexpr, it never changes.
+constexpr double g_FakeBenchmarkTimeInc = 1.0 / 66.0;
 
-#ifdef USE_RDTSC_FOR_FLOATTIME
+namespace {
 
-static bool s_bTimeInitted;
-static bool s_bUseRDTSC;
-static uint64 s_nRDTSCBase;
-static float s_flRDTSCToMicroSeconds;
-static double s_flRDTSCScale;
-
-#endif // USE_RDTSC_FOR_FLOATTIME
-
-bool Plat_IsInBenchmarkMode()
+// dimhotepus: Advance benchmark time by one tick and return it in seconds.
+[[nodiscard]] double NextFakeBenchmarkTime() noexcept
 {
-	return g_bBenchmarkMode;
+	const uint64 ticks{ g_FakeBenchmarkTicks.fetch_add( 1, std::memory_order_relaxed ) + 1 };
+	return static_cast<double>( ticks ) * g_FakeBenchmarkTimeInc;
+}
+
+// dimhotepus: Convert non-negative double to uint32 with wraparound (like
+// GetTickCount).  A plain cast is undefined behavior past UINT32_MAX.
+[[nodiscard]] constexpr uint32 WrapToUint32( double value ) noexcept
+{
+	return static_cast<uint32>( static_cast<uint64>( value ) );
+}
+
+// dimhotepus: Monotonic clock started when the module is loaded.  Replaces
+// the lazily initialized statics in Plat_FloatTime, whose "if ( !initialized )"
+// check was a data race, and fixes the Linux math, which subtracted the start
+// seconds but not the start nanoseconds (time started anywhere in [0, 1) s).
+// Integer nanoseconds avoid double rounding in Plat_MSTime / Plat_USTime.
+class MonotonicClock
+{
+public:
+	MonotonicClock() noexcept
+	{
+#ifdef OSX
+		mach_timebase_info_data_t timebase{};
+		mach_timebase_info( &timebase );
+		m_numer = timebase.numer;
+		m_denom = timebase.denom ? timebase.denom : 1;
+		m_start = mach_absolute_time();
+#else
+		clock_gettime( CLOCK_MONOTONIC, &m_start );
+#endif
+	}
+
+	[[nodiscard]] uint64 Nanoseconds() const noexcept
+	{
+#ifdef OSX
+		const uint64 ticks{ mach_absolute_time() - m_start };
+		// ticks * numer / denom without overflowing ticks * numer.
+		return ( ticks / m_denom ) * m_numer + ( ticks % m_denom ) * m_numer / m_denom;
+#else
+		timespec now;
+		clock_gettime( CLOCK_MONOTONIC, &now );
+		return static_cast<uint64>( now.tv_sec - m_start.tv_sec ) * 1000000000ull +
+			static_cast<uint64>( now.tv_nsec ) - static_cast<uint64>( m_start.tv_nsec );
+#endif
+	}
+
+private:
+#ifdef OSX
+	uint64 m_start;
+	uint64 m_numer;
+	uint64 m_denom;
+#else
+	timespec m_start;
+#endif
+};
+
+[[nodiscard]] const MonotonicClock &Clock() noexcept
+{
+	// C++11 guarantees thread-safe one-time initialization.
+	static const MonotonicClock clock;
+	return clock;
+}
+
+// dimhotepus: Start the clock at load time: platform.h documents
+// Plat_FloatTime as "time in seconds since the module was loaded".
+[[maybe_unused]] const bool g_bClockStarted{ ( static_cast<void>( Clock() ), true ) };
+
+}  // namespace
+
+MUST_CHECK_RETURN bool Plat_IsInBenchmarkMode()
+{
+	// dimhotepus: Atomic load.
+	return g_bBenchmarkMode.load( std::memory_order_relaxed );
 }
 
 void Plat_SetBenchmarkMode( bool bBenchmark )
 {
-	g_bBenchmarkMode = bBenchmark;
+	// dimhotepus: Atomic store.
+	g_bBenchmarkMode.store( bBenchmark, std::memory_order_relaxed );
 }
-
-
-enum {
-  N_ITERATIONS_OF_RDTSC_TEST_TO_RUN = 5,					// should be odd
-  TEST_RDTSC_FLOATTIME = 0
-};
 
 size_t ApproximateProcessMemoryUsage( )
 {
@@ -172,196 +238,58 @@ From https://man7.org/linux/man-pages/man5/proc.5.html:
 #endif
 }
 
-#ifdef USE_RDTSC_FOR_FLOATTIME
-
-static void InitTimeSystem( void )
+MUST_CHECK_RETURN double Plat_FloatTime()
 {
-	s_bTimeInitted = true;
-
-	// now, see if we can use rdtsc instead.
-	// If this is one of the chips with a separate constant clock for rdtsc, we can
-	auto [file, rc] = s1::posix::posix_file_stream_factory::open("/proc/cpuinfo", "r");
-	if ( !rc )
+	// dimhotepus: Atomic flag, thread-safe fake time.
+	if ( g_bBenchmarkMode.load( std::memory_order_relaxed ) )
 	{
-		bool bAnyBadCores = false;
-		char lbuf[2048];
+		return NextFakeBenchmarkTime();
+	}
 
-		while( std::get<char*>( file.gets( lbuf ) ) )
-		{
-			if ( memcmp( lbuf, "flags", 4 ) == 0 )
-			{
-				if ( ! strstr( lbuf, "constant_tsc" ) )
-				{
-					bAnyBadCores = true;
-					break;
-				}
-			}
-		}
+	// dimhotepus: Shared monotonic clock, see MonotonicClock.
+	return static_cast<double>( Clock().Nanoseconds() ) * 1e-9;
+}
 
-		if ( ! bAnyBadCores )
-		{
-			// this system appears to have the proper cpu setup to use rdtsc from reliable timing. Let's either read the cpu frequency from an
-			// environment variable, or time it ourselves
-			char const *pEnv = getenv( "RDTSC_FREQUENCY" );
-			if ( pEnv )
-			{
-				// the environment variable is allowed to hold either a benchmark result, or a string such as "disable"
-				if ( pEnv && ( ( pEnv[0] > '9' ) || ( pEnv[0] < '0' ) ) )
-					return;									// leave rdtsc disabled
-				// the variable holds the number of ticks per microsecond
-				// dimhotepus: atof -> strtof.
-				s_flRDTSCToMicroSeconds = strtof( pEnv, nullptr );
-				// sanity check
-				if ( s_flRDTSCToMicroSeconds > 1.0 )
-				{
-					s_bUseRDTSC = true;
-					s_flRDTSCScale = 1.0  / ( 1000.0 * 1000.0 * s_flRDTSCToMicroSeconds );
-					s_nRDTSCBase = Plat_Rdtsc();
-					return;
-				}
-			}
-			else
-			{
-				printf( "Running a benchmark to measure system clock frequency...\n" );
-				// run n iterations and use the median
-				double flRDTSCToMicroSeconds[N_ITERATIONS_OF_RDTSC_TEST_TO_RUN];
-				for( int i = 0; i < ssize( flRDTSCToMicroSeconds ) ; i++ )
-				{
-					uint64 stime = Plat_Rdtsc();
-					struct timeval stimeval;
-					gettimeofday( &stimeval, NULL );
-					sleep( 1 );
-					uint64 etime = Plat_Rdtsc() - stime;
-					struct timeval etimeval;
-					gettimeofday( &etimeval, NULL );
-					// subtract timevals to get elapsed microseconds
-					struct timeval elapsedtimeval;
-					timersub( &etimeval, &stimeval, &elapsedtimeval );
-					uint64 nUs = 1000000 * elapsedtimeval.tv_sec + elapsedtimeval.tv_usec;
-					flRDTSCToMicroSeconds[ i ] = ( etime / nUs );
-				}
-				std::make_heap( flRDTSCToMicroSeconds, flRDTSCToMicroSeconds + ssize( flRDTSCToMicroSeconds ) - 1 );
-				std::sort_heap( flRDTSCToMicroSeconds, flRDTSCToMicroSeconds + ssize( flRDTSCToMicroSeconds ) - 1 );
-				s_flRDTSCToMicroSeconds = flRDTSCToMicroSeconds[std::size( flRDTSCToMicroSeconds ) / 2 ];
-				s_flRDTSCScale = 1.0  / ( 1000.0 * 1000.0 * s_flRDTSCToMicroSeconds );
-				printf( "Finished RDTSC test. To prevent the startup delay from this benchmark, set the environment variable RDTSC_FREQUENCY to %f on this system."
-						" This value is dependent upon the CPU clock speed and architecture and should be determined separately for each server. The use of this mechanism"
-						" for timing can be disabled by setting RDTSC_FREQUENCY to 'disabled'.\n",
-						s_flRDTSCToMicroSeconds );
-				s_nRDTSCBase = Plat_Rdtsc();
-				s_bUseRDTSC = true;
-#if TEST_RDTSC_FLOATTIME
-				printf( "RDTSC test results:\n" );
-				for( int i = 0; i < ssize( flRDTSCToMicroSeconds ); i++ )
-					printf(" [%d] = %f\n", i, flRDTSCToMicroSeconds[i] );
-				printf( "scale factor = %f\n", s_flRDTSCScale );
-				uint64 srdtsc_time = Plat_Rdtsc();
-				for( int i = 0; i < 1000 * 1000 * 10; i++ )
-				{
-					float p = Plat_FloatTime();
-				}
-				printf( "slow = %lld\n", Plat_Rdtsc() - srdtsc_time );
-				// now, run a benchmark to see how much this optimization buys us
-				srdtsc_time = Plat_Rdtsc();
-				for( int i = 0; i < 1000 * 1000 * 10; i++ )
-				{
-					float p = Plat_FloatTime();
-				}
-				printf( "sfast = %lld\n", Plat_Rdtsc() - srdtsc_time );
-#endif
-			}
-		}
+namespace {
+
+template <typename TEnum>
+using IsEnum = std::enable_if_t<std::is_enum_v<TEnum>, bool>;
+
+template<typename TEnum>
+[[nodiscard]] constexpr IsEnum<TEnum> HasFlag( TEnum value, TEnum flag )
+{
+	// value == flag to handle 0 == 0.
+	return value == flag || ( value & flag ) == flag;
+}
+
+// dimhotepus: Cut a NUL-terminated string back to a whole UTF-8 sequence.
+// snprintf truncates at a byte, which can leave half a character that SDL
+// shows as garbage or rejects.
+void TrimIncompleteUtf8( char *text ) noexcept
+{
+	std::size_t length{ std::strlen( text ) };
+	std::size_t lead{ length };
+	// Walk back over at most 3 continuation bytes to the lead byte.
+	while ( lead > 0 && length - lead < 4 &&
+			( static_cast<unsigned char>( text[lead - 1] ) & 0xC0 ) == 0x80 )
+	{
+		--lead;
+	}
+	if ( lead == 0 )
+	{
+		return;
+	}
+
+	const auto first = static_cast<unsigned char>( text[lead - 1] );
+	const std::size_t expected{ first < 0x80 ? 1u : ( first >> 5 ) == 6 ? 2u :
+		( first >> 4 ) == 14 ? 3u : ( first >> 3 ) == 30 ? 4u : 1u };
+	if ( length - ( lead - 1 ) < expected )
+	{
+		text[lead - 1] = '\0';
 	}
 }
 
-static FORCEINLINE void TestTimeSystem( void )
-{
-#if TEST_RDTSC_FLOATTIME
-	// now, test that plat_float time actually works
-	for( int t = 0 ; t < 5; t++ )
-	{
-		float flStartT = Plat_FloatTime();
-		struct timeval stime;
-		gettimeofday( &stime, NULL );
-		sleep( 5 );
-		float flElapsedT = Plat_FloatTime() - flStartT;
-		struct timeval etime;
-		gettimeofday( &etime, NULL );
-		struct timeval dtime;
-		timersub( &etime, &stime, &dtime );
-		printf( " plat_float time says %f elapsed. gettimeofday says %f\n",
-				flElapsedT, dtime.tv_sec + dtime.tv_usec / 1000000.0 );
-	}
-#endif
-}
-
-#endif // USE_RDTSC_FOR_FLOATTIME
-
-double Plat_FloatTime()
-{
-	if ( g_bBenchmarkMode )
-	{
-		g_FakeBenchmarkTime += g_FakeBenchmarkTimeInc;
-		return g_FakeBenchmarkTime;
-	}
-	
-#ifdef OSX
-	// OSX
-	static uint64 start_time = 0;
-	static mach_timebase_info_data_t    sTimebaseInfo;
-	static double conversion = 0.0;
-	
-	if ( !start_time )
-	{
-		start_time = mach_absolute_time();
-		mach_timebase_info(&sTimebaseInfo);
-		conversion = 1e-9 * (double) sTimebaseInfo.numer / (double) sTimebaseInfo.denom;
-	}
-	
-	uint64 now = mach_absolute_time();
-	
-	return ( now - start_time ) * conversion;
-#else
-	// Linux
-	static struct timespec start_time = { 0, 0 };
-	static bool bInitialized = false;	
-
-	if ( !bInitialized )
-	{
-		bInitialized = true;
-		clock_gettime( CLOCK_MONOTONIC, &start_time );
-	}
-
-	struct timespec now;
-	clock_gettime( CLOCK_MONOTONIC, &now );
-	
-	return ( now.tv_sec - start_time.tv_sec ) + ( now.tv_nsec * 1e-9 );
-
-#ifdef USE_RDTSC_FOR_FLOATTIME
-	if ( ! s_bTimeInitted )
-	{
-		InitTimeSystem();
-		TestTimeSystem();
-	}
-	if ( s_bUseRDTSC )
-	{
-		uint64 nTicks = Plat_Rdtsc() - s_nRDTSCBase;
-		return ( (double) nTicks) * s_flRDTSCScale;
-	}
-	else
-	{
-		struct timeval  tp;
-	        gettimeofday( &tp, NULL );
-
-		if (VCRGetMode() == VCR_Disabled)
-			return (( tp.tv_sec - s_nSecBase ) + tp.tv_usec / 1000000.0 );
-		
-		return VCRHook_Sys_FloatTime( ( tp.tv_sec - s_nSecBase ) + tp.tv_usec / 1000000.0 );
-	}
-#endif // USE_RDTSC_FOR_FLOATTIME
-
-#endif
-}
+}  // namespace
 
 Plat_MessageBoxButton Plat_MessageBox( IN_Z const char      *title,
                                        IN_Z const char      *mainInstruction,
@@ -439,6 +367,8 @@ Plat_MessageBoxButton Plat_MessageBox( IN_Z const char      *title,
 	               hasMain ? mainInstruction : "",
 	               hasMain && hasContent ? "\n\n" : "",
 	               hasContent ? content : "" );
+	// dimhotepus: Don't hand SDL a half UTF-8 character after truncation.
+	TrimIncompleteUtf8( message );
 
 	const SDL_MessageBoxData data{ flags, nullptr, title ? title : "", message,
 		                           count, sdlButtons, nullptr };
@@ -459,56 +389,52 @@ Plat_MessageBoxButton Plat_MessageBox( IN_Z const char      *title,
 	return buttonId < 0 ? Plat_MessageBoxButton::Cancel : static_cast< Plat_MessageBoxButton >( buttonId );
 }
 
-unsigned int Plat_MSTime()
+MUST_CHECK_RETURN uint32 Plat_MSTime()
 {
-	if ( g_bBenchmarkMode )
+	// dimhotepus: Atomic flag, thread-safe fake time, wrap instead of UB.
+	if ( g_bBenchmarkMode.load( std::memory_order_relaxed ) )
 	{
-		g_FakeBenchmarkTime += g_FakeBenchmarkTimeInc;
-		return (unsigned int)(g_FakeBenchmarkTime * 1000.0);
+		return WrapToUint32( NextFakeBenchmarkTime() * 1000.0 );
 	}
 
-#ifdef USE_RDTSC_FOR_FLOATTIME
-	if ( ! s_bTimeInitted )
-	{
-		InitTimeSystem();
-		TestTimeSystem();
-	}
-	if ( s_bUseRDTSC )
-	{
-		uint64 nTicks = Plat_Rdtsc() - s_nRDTSCBase;
-		return 1000.0 * nTicks * s_flRDTSCScale;
-	}
-	else
-#endif // USE_RDTSC_FOR_FLOATTIME
-	{
-		return ( uint )( Plat_FloatTime() * 1000 );
-	}
+	// dimhotepus: Integer ms from the clock directly.  The old
+	// ( uint )( Plat_FloatTime() * 1000 ) was undefined after ~49.7 days, and
+	// re-checked benchmark mode inside Plat_FloatTime.  Wraps like GetTickCount.
+	return static_cast<uint32>( Clock().Nanoseconds() / 1000000ull );
 }
 
-uint64 Plat_USTime()
+MUST_CHECK_RETURN uint64 Plat_USTime()
 {
-	if ( g_bBenchmarkMode )
+	if ( g_bBenchmarkMode.load( std::memory_order_relaxed ) )
 	{
-		g_FakeBenchmarkTime += g_FakeBenchmarkTimeInc;
-		return (unsigned int)(g_FakeBenchmarkTime * 1000000.0);
+		// dimhotepus: (unsigned int) -> uint64.  Fake microseconds were cut
+		// to 32 bits (wrapped after ~71 minutes of fake time).
+		return static_cast<uint64>( NextFakeBenchmarkTime() * 1e6 );
 	}
 
-#ifdef USE_RDTSC_FOR_FLOATTIME
-	if ( ! s_bTimeInitted )
+	// dimhotepus: Integer us from the clock directly, see Plat_MSTime.
+	return Clock().Nanoseconds() / 1000ull;
+}
+
+// dimhotepus: Was missing on POSIX (declared in platform.h, implemented on
+// Windows), so callers failed to link.  localtime_r is the thread-safe form.
+void GetCurrentDate( int *pDay, int *pMonth, int *pYear )
+{
+	const time_t now{ time( nullptr ) };
+
+	struct tm local = {};
+	if ( !localtime_r( &now, &local ) )
 	{
-		InitTimeSystem();
-		TestTimeSystem();
+		AssertMsg( false, "localtime_r failed for time %lld.", static_cast<long long>( now ) );
+		*pDay = 0;
+		*pMonth = 0;
+		*pYear = 0;
+		return;
 	}
-	if ( s_bUseRDTSC )
-	{
-		uint64 nTicks = Plat_Rdtsc() - s_nRDTSCBase;
-		return 1000000.0 * nTicks * s_flRDTSCScale;
-	}
-	else
-#endif // USE_RDTSC_FOR_FLOATTIME
-	{
-		return ( uint64 )( Plat_FloatTime() * 1000000 );
-	}
+
+	*pDay = local.tm_mday;
+	*pMonth = local.tm_mon + 1;
+	*pYear = local.tm_year + 1900;
 }
 
 // Wraps the thread-safe versions of ctime. buf must be at least 26 bytes 
@@ -589,8 +515,8 @@ PLATFORM_INTERFACE MUST_CHECK_RETURN void* Plat_Alloc( unsigned long size )
 	{
 		g_AllocError( size );
 	}
-		return nullptr;
-	}
+	return nullptr;
+}
 
 
 PLATFORM_INTERFACE MUST_CHECK_RETURN void* Plat_Realloc( void *ptr, unsigned long size )
@@ -611,8 +537,8 @@ PLATFORM_INTERFACE MUST_CHECK_RETURN void* Plat_Realloc( void *ptr, unsigned lon
 	{
 		g_AllocError( size );
 	}
-		return nullptr;
-	}
+	return nullptr;
+}
 
 
 PLATFORM_INTERFACE void Plat_Free( void *ptr )
@@ -648,7 +574,7 @@ MUST_CHECK_RETURN bool Plat_IsInDebugSession()
 		return false;
 	}
 
-		// We're being debugged if the P_TRACED flag is set.
+	// We're being debugged if the P_TRACED flag is set.
 	return ( info.kp_proc.p_flag & P_TRACED ) != 0;
 }
 
@@ -696,7 +622,7 @@ MUST_CHECK_RETURN bool Plat_IsInDebugSession()
 		{
 			break;
 		}
-		}
+	}
 	close( fd );
 	buf[used] = '\0';
 
@@ -797,13 +723,13 @@ void StoreCommandLine( const char *text ) noexcept
 void AppendArgument( std::string &commandLine, const char *argument )
 {
 	if ( !commandLine.empty() )
-{
+	{
 		commandLine += ' ';
-}
+	}
 
 	const bool needsQuotes{ !*argument || std::strpbrk( argument, " \t" ) != nullptr };
 	if ( needsQuotes )
-{
+	{
 		commandLine += '"';
 	}
 	commandLine += argument;
@@ -815,7 +741,7 @@ void AppendArgument( std::string &commandLine, const char *argument )
 
 // Build the command line from the process arguments.  Lock held.
 void LoadCommandLine()
-		{
+{
 	std::string commandLine;
 
 #if defined( OSX )
@@ -862,7 +788,7 @@ void LoadCommandLine()
 				end == std::string::npos ? std::string::npos : end - begin ) };
 			AppendArgument( commandLine, argument.c_str() );
 			if ( end == std::string::npos )
-				{
+			{
 				break;
 			}
 			begin = end + 1;
@@ -872,8 +798,8 @@ void LoadCommandLine()
 
 	Assert( !commandLine.empty() );
 	StoreCommandLine( commandLine.c_str() );
-				}
-				
+}
+
 }  // namespace
 
 PLATFORM_INTERFACE void Plat_SetCommandLine( const char *cmdLine )
@@ -890,14 +816,14 @@ PLATFORM_INTERFACE MUST_CHECK_RETURN const tchar *Plat_GetCommandLine()
 	if ( !g_bCmdLineLoaded )
 	{
 		LoadCommandLine();
-			}
+	}
 
 #ifdef TCHAR_IS_WCHAR
 	return g_CmdLineW;
 #else
 	return g_CmdLine;
 #endif
-		}
+}
 
 PLATFORM_INTERFACE MUST_CHECK_RETURN const char *Plat_GetCommandLineA()
 {
@@ -968,7 +894,7 @@ constexpr uint64 cOneMib{ 1024 * 1024 };
 			continue;
 		}
 		else
-{
+		{
 			close( fd );
 			return got == 0;
 		}
@@ -982,7 +908,7 @@ PLATFORM_INTERFACE MUST_CHECK_RETURN bool GetMemoryInformation( MemoryInformatio
 {
 	if ( !pOutMemoryInfo )
 		return false;
-	
+
 	// dimhotepus: Check the struct version like Windows does; unknown
 	// versions are rejected instead of written to.
 	if ( pOutMemoryInfo->m_nStructVersion != 0 )
@@ -1055,16 +981,16 @@ PLATFORM_INTERFACE MUST_CHECK_RETURN bool GetMemoryInformation( MemoryInformatio
 		char key[64];
 		unsigned long long value{ 0 };
 		if ( std::sscanf( line.c_str(), "%63[^:]: %llu", key, &value ) != 2 )
-			{
+		{
 			continue;
-			}
+		}
 
 		if ( !std::strcmp( key, "MemTotal" ) ) { memTotalKib = value; hasTotal = true; }
 		else if ( !std::strcmp( key, "MemAvailable" ) ) { memAvailableKib = value; hasAvailable = true; }
 		else if ( !std::strcmp( key, "MemFree" ) ) memFreeKib = value;
 		else if ( !std::strcmp( key, "Buffers" ) ) buffersKib = value;
 		else if ( !std::strcmp( key, "Cached" ) ) cachedKib = value;
-		}
+	}
 
 	if ( !hasTotal )
 	{
@@ -1124,9 +1050,9 @@ PLATFORM_INTERFACE MUST_CHECK_RETURN bool Is64BitOS()
 		for ( const char *machine : k64BitMachines )
 		{
 			if ( !strcasecmp( name.machine, machine ) )
-	{
-			return true;
-	}
+			{
+				return true;
+			}
 		}
 		return false;
 	}();
@@ -1141,8 +1067,8 @@ MUST_CHECK_RETURN bool Plat_GetModuleFilename( char *pOut, int nMaxBytes )
 	// nMaxBytes == 0 became a huge size_t and readlink overran pOut.
 	if ( !pOut || nMaxBytes <= 0 )
 	{
-	return false;
-}
+		return false;
+	}
 
 #if defined( LINUX )
 	// dimhotepus: Read up to nMaxBytes.  A result shorter than the buffer is
@@ -1232,9 +1158,9 @@ bool s_bAlarmHandlerInstalled{ false };
 [[nodiscard]] int WatchDogTimerTimeScale()
 {
 	static const int scale = []()
-{
-		if ( std::strstr( Plat_GetCommandLineA(), "-nowatchdog" ) )
 	{
+		if ( std::strstr( Plat_GetCommandLineA(), "-nowatchdog" ) )
+		{
 			return 0;
 		}
 #ifndef NDEBUG
@@ -1303,7 +1229,7 @@ PLATFORM_INTERFACE void Plat_BeginWatchdogTimer( int nSecs )
 		sigemptyset( &action.sa_mask );
 		action.sa_flags = SA_RESTART;
 		if ( sigaction( SIGALRM, &action, &s_PreviousAlarmAction ) != 0 )
-	{
+		{
 			Warning( "Unable to install watchdog SIGALRM handler: %s.\n", std::strerror( errno ) );
 			return;
 		}
@@ -1321,7 +1247,7 @@ PLATFORM_INTERFACE void Plat_EndWatchdogTimer( void )
 	// previous action instead of SIG_DFL.
 	if ( s_bAlarmHandlerInstalled )
 	{
-	alarm( 0 );
+		alarm( 0 );
 		sigaction( SIGALRM, &s_PreviousAlarmAction, nullptr );
 		s_bAlarmHandlerInstalled = false;
 	}
@@ -1351,7 +1277,7 @@ PLATFORM_INTERFACE void Plat_SetWatchdogHandlerFunction( Plat_WatchDogHandlerFun
 	( __GLIBC__ < 2 || ( __GLIBC__ == 2 && __GLIBC_MINOR__ < 34 ) )
 #define SE_HAS_GLIBC_MALLOC_HOOKS 1
 #endif
-     
+
 #define MEMALLOC_HASHSIZE 8193
 // dimhotepus: uint32 -> uintptr_t.  64-bit addresses were cut to 32 bits, so
 // different blocks compared equal and frees matched the wrong allocation.
@@ -1564,27 +1490,27 @@ static CThreadFastMutex s_MemoryMutex;
 	RememberedAlloc_t *pBlock{ nOldAddress ? FindAddress( nOldAddress, &nHash ) : nullptr };
 
 	if ( !nResult && size != 0 )
-		{
+	{
 		// dimhotepus: realloc failed; ptr is still valid and still tracked.
 		// Old code dropped its bookkeeping.
 	}
 	else if ( pBlock && reinterpret_cast<ptrint_t>( nResult ) == nOldAddress )
-			{
-				// it successfully alloced, just need to update size info, etc
+	{
+		// it successfully alloced, just need to update size info, etc
 		// dimhotepus: Update the global total before AdjustSize.  The old code
 		// did it after, when m_nSize already equaled size, so the delta was
 		// always 0.
 		g_LinuxMemStats.nTotalMallocInUse += static_cast<int64>( size ) - static_cast<int64>( pBlock->m_nSize );
-				pBlock->AdjustSize( size );
-			}
-			else
-			{
+		pBlock->AdjustSize( size );
+	}
+	else
+	{
 		// Moved, freed by realloc( ptr, 0 ), or not tracked before.
 		if ( pBlock )
 		{
 			ForgetAllocation( pBlock, nHash );
 		}
-			AddMemoryAllocation( nResult, size );
+		AddMemoryAllocation( nResult, size );
 	}
 
 	InstallHooks();
