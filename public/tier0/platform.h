@@ -534,9 +534,9 @@ template <typename R, typename T>
 	// must still exist (TEMPLATE_FUNCTION_TABLE uses FASTCALL).
 	#define  STDCALL
 	#define  FASTCALL
-	#define FORCEINLINE inline __attribute__((always_inline))
+	#define  FORCEINLINE inline __attribute__((always_inline))
 	// dimhotepus: TF2 backport. Drop workaround for old GCC.
-	#define FORCEINLINE_TEMPLATE		FORCEINLINE
+	#define  FORCEINLINE_TEMPLATE		FORCEINLINE
 #endif
 
 // dimhotepus: TF2 backport.
