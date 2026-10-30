@@ -806,23 +806,43 @@ PLATFORM_INTERFACE bool GetMemoryInformation( MemoryInformation *pOutMemoryInfo 
 }
 
 
-PLATFORM_INTERFACE bool Is64BitOS()
+PLATFORM_INTERFACE MUST_CHECK_RETURN bool Is64BitOS()
 {
 #if defined OSX
 	return true;
-#elif defined LINUX
-	FILE *pp = popen( "uname -m", "r" );
-	if ( pp != NULL )
+#elif defined( PLATFORM_64BITS )
+	// dimhotepus: A 64-bit process implies a 64-bit OS, as on Windows.
+	return true;
+#else
+	// dimhotepus: popen( "uname -m" ) -> uname().  popen started a shell on
+	// every call, ignored fgets failure (reading an uninitialized buffer) and
+	// only recognized x86_64, so 32-bit processes on 64-bit ARM / other
+	// kernels got false.  Cached in a thread-safe function-local static.
+	static const bool is64BitOS = []() noexcept
 	{
-		char rgchArchString[256];
-		fgets( rgchArchString, sizeof( rgchArchString ), pp );
-		pclose( pp );
-		if ( !strncasecmp( rgchArchString, "x86_64", strlen( "x86_64" ) ) )
+		utsname name{};
+		if ( uname( &name ) != 0 )
+		{
+			return false;
+		}
+
+		static constexpr const char *k64BitMachines[]{
+			"x86_64", "amd64", "aarch64", "arm64", "aarch64_be", "ppc64", "ppc64le",
+			"riscv64", "s390x", "mips64", "loongarch64", "sparc64" };
+		for ( const char *machine : k64BitMachines )
+		{
+			if ( !strcasecmp( name.machine, machine ) )
+	{
 			return true;
 	}
-#else
-	AssertMsg( false, "implement Is64BitOS" );
+		}
+		return false;
+	}();
+
+	return is64BitOS;
 #endif
+}
+
 MUST_CHECK_RETURN bool Plat_GetModuleFilename( char *pOut, int nMaxBytes )
 {
 	// dimhotepus: Reject null / non-positive sizes.  nMaxBytes - 1 with
