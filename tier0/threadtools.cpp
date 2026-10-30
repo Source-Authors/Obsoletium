@@ -18,12 +18,13 @@
 	#include <sys/fcntl.h>
 	#include <sys/unistd.h>
 	#define sem_unlink( arg )
-	#define OS_TO_PTHREAD(x) (x)
+	#define OS_TO_PTHREAD(x) ((pthread_t)(x))
 #else
 	#define pthread_yield pthread_yield_np
 	#include <mach/thread_act.h>
 	#include <mach/mach.h>
-	#define OS_TO_PTHREAD(x) pthread_from_mach_thread_np( x )
+	// dimhotepus: ThreadId_t is pthread_t on POSIX (was mach port here).
+	#define OS_TO_PTHREAD(x) ((pthread_t)(x))
 #endif // !OSX
 
 #ifdef LINUX
