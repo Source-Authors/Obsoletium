@@ -23,13 +23,13 @@ std::atomic<ProgressReportHandler_t> g_report_handler_fn;
 
 PLATFORM_INTERFACE void ReportProgress(char const *job_name, int total_units_to_do, int n_units_completed)
 {
-	const auto fn = g_report_handler_fn.load( std::memory_order::memory_order_relaxed );
+	const auto fn = g_report_handler_fn.load( std::memory_order_acquire );
 	if (fn)
 		fn( job_name, total_units_to_do, n_units_completed );
 }
 
 PLATFORM_INTERFACE ProgressReportHandler_t InstallProgressReportHandler( ProgressReportHandler_t pfn)
 {
-	return g_report_handler_fn.exchange( pfn );
+	return g_report_handler_fn.exchange( pfn, std::memory_order_release );
 }
 
