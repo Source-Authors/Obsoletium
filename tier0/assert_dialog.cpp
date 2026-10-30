@@ -10,7 +10,6 @@
 
 // dimhotepus: Launcher icon id.
 #include "../launcher_main/resource.h"
-
 // dimhotepus: Remove launcher definition clashing with tier0 one.
 #undef SE_PRODUCT_FILE_DESCRIPTION_STRING
 #elif defined( POSIX )
@@ -19,6 +18,7 @@
 #endif
 
 #include <atomic>
+#include <new>
 
 #include "tier0/valve_on.h"
 
@@ -35,55 +35,57 @@ using SDL_ShowMessageBoxFn = int ( SDLCALL * )( const SDL_MessageBoxData *messag
 
 struct CDialogInitInfo
 {
-	// dimhotepus: Use fixed buffers with copied data as we access from multiple threads.
-	tchar        m_pFilename[512]; // Fixed buffer
-	int          m_iLine;
-	tchar        m_pExpression[1024]; // Fixed buffer
-};
+	CDialogInitInfo( const tchar *pFilename, const tchar *pExpression, int line )
+		: m_Filename{ pFilename }, m_Expression{ pExpression }, m_iLine{ line }
+	{
+	}
 
+	// dimhotepus: Use fixed buffers with copied data as we access from multiple threads.
+	tstring      m_Filename;
+	int          m_iLine;
+	tstring      m_Expression;
+};
 
 struct CAssertDisable
 {
-	tchar m_Filename[512];
+	CAssertDisable( const tstring &filename,
+		int line_min,
+		int line_max,
+		unsigned ignore_times,
+		CAssertDisable *pNext ) :
+		m_LineMin{ line_min },
+		m_LineMax{ line_max },
+		m_nIgnoreTimes{ ignore_times },
+		m_pNext{ pNext },
+		m_Filename{ filename }
+	{
+	}
+
+	static constexpr inline int kIgnore = -1;
+
+	const tstring m_Filename;
 	
-	// If these are not -1, then this CAssertDisable only disables asserts on lines between
-	// these values (inclusive).
-	int m_LineMin;
-	int m_LineMax;
+	// If these are not kIgnore, then this CAssertDisable only disables asserts
+	// on lines between these values (inclusive).
+	const int m_LineMin;
+	const int m_LineMax;
 	
-	// Decremented each time we hit this assert and ignore it, until it's 0. 
+	// Decremented each time we hit this assert and ignore it, until it's 0.
 	// Then the CAssertDisable is removed.
-	// If this is -1, then we always ignore this assert.
-	int m_nIgnoreTimes;
+	// If this is 0, then we always ignore this assert.
+	unsigned m_nIgnoreTimes;
 
 	CAssertDisable *m_pNext;
 };
 
-#ifdef _WIN32
-static HINSTANCE g_hTier0Instance = nullptr;
-#endif
-
 // dimhotepus: Make all this things thread-safe as may be used from different threads.
 static std::atomic_bool g_bAssertsEnabled = true;
-
-static CAssertDisable *g_pAssertDisables = nullptr;
-
-#if ( defined( _WIN32 ) && !defined( _X360 ) )
-static int g_nLastIgnoreNumTimes = 1;
-#endif
-
-// dimhotepus: Make all this things thread-safe as may be used from different threads.
-// Set to true if they want to break in the debugger.
-static std::atomic_bool g_bBreak = false;
-
-static CDialogInitInfo g_Info;
-
 
 // -------------------------------------------------------------------------------- //
 // Internal functions.
 // -------------------------------------------------------------------------------- //
 
-#if defined(_WIN32) && !defined(STATIC_TIER0)
+#if defined( _WIN32 ) && !defined(STATIC_TIER0)
 extern "C" BOOL APIENTRY MemDbgDllMain( HMODULE hDll, DWORD dwReason, void* );
 
 extern void InitTime();
@@ -92,20 +94,13 @@ BOOL WINAPI DllMain( HINSTANCE module, DWORD fdwReason, LPVOID lpvReserved )
 {
 	if (fdwReason == DLL_PROCESS_ATTACH)
 	{
-		g_hTier0Instance = module;
-
 		InitTime();
 
 		// dimhotepus: Do not notify on thread creation for performance.
 		DisableThreadLibraryCalls(module);
 	}
-	else if (fdwReason == DLL_PROCESS_DETACH)
-	{
-		// dimhotepus: Cleanup instance.
-		g_hTier0Instance = nullptr;
-	}
 
-#ifdef DEBUG
+#ifndef NDEBUG
 	MemDbgDllMain( module, fdwReason, lpvReserved );
 #endif
 
@@ -115,37 +110,36 @@ BOOL WINAPI DllMain( HINSTANCE module, DWORD fdwReason, LPVOID lpvReserved )
 
 static bool IsDebugBreakEnabled()
 {
-	static bool bResult = ( _tcsstr( Plat_GetCommandLine(), _T("-debugbreak") )    != nullptr ) || \
-	                      ( _tcsstr( Plat_GetCommandLine(), _T("-raiseonassert") ) != nullptr ) || \
+	static bool bResult = !!_tcsstr( Plat_GetCommandLine(), _T("-debugbreak") ) ||
+	                      !!_tcsstr( Plat_GetCommandLine(), _T("-raiseonassert") ) ||
 	                      getenv( "RAISE_ON_ASSERT" );
 	return bResult;
 }
 
 static bool AreAssertsDisabled()
 {
-	static bool bResult = ( _tcsstr( Plat_GetCommandLine(), _T("-noassert") ) != nullptr );
+	static bool bResult = !!_tcsstr( Plat_GetCommandLine(), _T("-noassert") );
 	return bResult;
 }
 
-static bool AreAssertsEnabledInFileLine( const tchar *pFilename, int iLine )
+static bool AreAssertsEnabledInFileLine( CAssertDisable *&pAssertDisables, const tchar *pFilename, int iLine )
 {
-	CAssertDisable **pPrev = &g_pAssertDisables;
-	CAssertDisable *pNext = nullptr;
-	for ( CAssertDisable *pCur=g_pAssertDisables; pCur; pCur=pNext )
+	CAssertDisable **pPrev{ &pAssertDisables };
+	for ( CAssertDisable *it{ pAssertDisables }, *pNext = nullptr; it; it = pNext )
 	{
-		pNext = pCur->m_pNext;
+		pNext = it->m_pNext;
 
-		if ( _tcsicmp( pFilename, pCur->m_Filename ) == 0 )
+		if ( _tcsicmp( pFilename, it->m_Filename.c_str() ) == 0 )
 		{
 			bool bAssertsEnabled = true;
 
 			// dimhotepus: Use else to check line case.
-			if ( pCur->m_LineMin == -1 && pCur->m_LineMax == -1 )
+			if ( it->m_LineMin == CAssertDisable::kIgnore && it->m_LineMax == CAssertDisable::kIgnore )
 			{
 				// Are asserts disabled in the whole file?
 				bAssertsEnabled = false;
 			}
-			else if ( iLine >= pCur->m_LineMin && iLine <= pCur->m_LineMax )
+			else if ( iLine >= it->m_LineMin && iLine <= it->m_LineMax )
 			{
 				// Are asserts disabled on the specified line?
 				bAssertsEnabled = false;
@@ -154,14 +148,14 @@ static bool AreAssertsEnabledInFileLine( const tchar *pFilename, int iLine )
 			if ( !bAssertsEnabled )
 			{
 				// If this assert is only disabled for the next N times, then countdown..
-				if ( pCur->m_nIgnoreTimes > 0 )
+				if ( it->m_nIgnoreTimes > 0 )
 				{
-					--pCur->m_nIgnoreTimes;
-					if ( pCur->m_nIgnoreTimes == 0 )
+					--it->m_nIgnoreTimes;
+					if ( it->m_nIgnoreTimes == 0 )
 					{
 						// Remove this one from the list.
 						*pPrev = pNext;
-						delete pCur;
+						delete it;
 						continue;
 					}
 				}
@@ -170,46 +164,48 @@ static bool AreAssertsEnabledInFileLine( const tchar *pFilename, int iLine )
 			}
 		}
 
-		pPrev = &pCur->m_pNext;
+		pPrev = &it->m_pNext;
 	}
 
 	return true;
 }
 
-
-static CAssertDisable* CreateNewAssertDisable( const tchar *pFilename )
+static CAssertDisable *CreateNewAssertDisable( CAssertDisable *&pAssertDisables,
+	const tstring &filename,
+	int lineMin,
+	int lineMax )
 {
-	auto *pDisable = new CAssertDisable;
-	pDisable->m_pNext = g_pAssertDisables;
-	g_pAssertDisables = pDisable;
-
-	pDisable->m_LineMin = pDisable->m_LineMax = -1;
-	pDisable->m_nIgnoreTimes = -1;
-	
 	// dimhotepus: Use passed file name to create assert disable.
-	_tcsncpy( pDisable->m_Filename, pFilename, sizeof( pDisable->m_Filename ) - 1 );
-	pDisable->m_Filename[ sizeof( pDisable->m_Filename ) - 1 ] = _T('\0');
-	
+	auto *pDisable = new ( std::nothrow ) CAssertDisable{
+		filename, lineMin, lineMax, 0, pAssertDisables };
+	if ( !pDisable ) return nullptr;
+
+	pAssertDisables = pDisable;
+
 	return pDisable;
 }
 
-
-static void IgnoreAssertsInCurrentFile()
+static void IgnoreAssertsInCurrentFile( CAssertDisable *&pAssertDisables, const CDialogInitInfo &info )
 {
-	CreateNewAssertDisable( g_Info.m_pFilename );
+	CreateNewAssertDisable( pAssertDisables, info.m_Filename, CAssertDisable::kIgnore, CAssertDisable::kIgnore );
 }
 
-
-static CAssertDisable* IgnoreAssertsNearby( int nRange )
+static CAssertDisable *IgnoreAssertsNearby( CAssertDisable *&pAssertDisables, const CDialogInitInfo &info, int nRange )
 {
-	CAssertDisable *pDisable = CreateNewAssertDisable( g_Info.m_pFilename );
-	pDisable->m_LineMin = g_Info.m_iLine - nRange;
-	pDisable->m_LineMax = g_Info.m_iLine + nRange;
-	return pDisable;
+	return CreateNewAssertDisable(
+		pAssertDisables, info.m_Filename, info.m_iLine - nRange, info.m_iLine + nRange );
 }
 
 #if defined( _WIN32 )
-static s1::win::ui::CDpiWindowBehavior g_dpi_window_behavior{false};
+struct AssertDialogData
+{
+	unsigned                       &last_ignore_num_times;
+	CDialogInitInfo                 init_info;
+	CAssertDisable                *&assert_disables;
+	bool                            &should_break;
+	std::atomic_bool                &are_asserts_enabled;
+	s1::win::ui::CDpiWindowBehavior dpi_window_behavior{ false };
+};
 
 static INT_PTR CALLBACK AssertDialogProc(
   HWND hDlg,                      // handle to dialog box
@@ -218,27 +214,33 @@ static INT_PTR CALLBACK AssertDialogProc(
   LPARAM lParam                   // second message parameter
 )
 {
+	AssertDialogData *pDialogData = nullptr;
+
 	switch( uMsg )
 	{
 		case WM_INITDIALOG:
 		{
-#ifdef TCHAR_IS_WCHAR
-			SetDlgItemTextW( hDlg, IDC_ASSERT_MSG_CTRL, g_Info.m_pExpression );
-			SetDlgItemTextW( hDlg, IDC_FILENAME_CONTROL, g_Info.m_pFilename );
-#else
-			SetDlgItemText( hDlg, IDC_ASSERT_MSG_CTRL, g_Info.m_pExpression );
-			SetDlgItemText( hDlg, IDC_FILENAME_CONTROL, g_Info.m_pFilename );
-#endif
-			SetDlgItemInt( hDlg, IDC_LINE_CONTROL, g_Info.m_iLine, false );
-			SetDlgItemInt( hDlg, IDC_IGNORE_NUMLINES, 5, false );
-			SetDlgItemInt( hDlg, IDC_IGNORE_NUMTIMES, g_nLastIgnoreNumTimes, false );
+			pDialogData = reinterpret_cast<AssertDialogData *>( lParam );
+			assert( pDialogData );
+
+			// Store it for later use
+			SetWindowLongPtr( hDlg, GWLP_USERDATA, reinterpret_cast<LONG_PTR>( pDialogData ) );
+
+			SetDlgItemText( hDlg, IDC_ASSERT_MSG_CTRL, pDialogData->init_info.m_Expression.c_str() );
+			SetDlgItemText( hDlg, IDC_FILENAME_CONTROL, pDialogData->init_info.m_Filename.c_str() );
+			SetDlgItemInt( hDlg, IDC_LINE_CONTROL, pDialogData->init_info.m_iLine, FALSE );
+			SetDlgItemInt( hDlg, IDC_IGNORE_NUMLINES, 5, FALSE );
+			SetDlgItemInt( hDlg, IDC_IGNORE_NUMTIMES, pDialogData->last_ignore_num_times, FALSE );
 
 			// dimhotepus: Honor per monitor V2 DPI.
 			// It is DialogBoxParam (uses CreateWindowEx), so need scaling.
-			g_dpi_window_behavior.OnCreateWindow(hDlg);
+			pDialogData->dpi_window_behavior.OnCreateWindow( hDlg );
 
 			// dimhotepus: Add launcher icon for Assert dialog.
-			HANDLE hExeIcon = LoadImageW( GetModuleHandleW( nullptr ), MAKEINTRESOURCEW( SE_IDI_APP_MAIN ), IMAGE_ICON, 0, 0, LR_SHARED );
+			HANDLE hExeIcon = LoadImageW(
+				GetModuleHandleW( nullptr ),
+				MAKEINTRESOURCEW( SE_IDI_APP_MAIN ),
+				IMAGE_ICON, 0, 0, LR_SHARED );
 			SendMessage( hDlg, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>( hExeIcon ) );
 		
 			// Center the dialog.
@@ -258,11 +260,14 @@ static INT_PTR CALLBACK AssertDialogProc(
 
 		case WM_COMMAND:
 		{
+			pDialogData = reinterpret_cast<AssertDialogData *>( GetWindowLongPtr( hDlg, GWLP_USERDATA ) );
+			assert( pDialogData );
+
 			switch( LOWORD( wParam ) )
 			{
 				case IDC_IGNORE_FILE:
 				{
-					IgnoreAssertsInCurrentFile();
+					IgnoreAssertsInCurrentFile( pDialogData->assert_disables, pDialogData->init_info );
 					EndDialog( hDlg, 0 );
 					return TRUE;
 				}
@@ -274,9 +279,13 @@ static INT_PTR CALLBACK AssertDialogProc(
 					UINT value = GetDlgItemInt( hDlg, IDC_IGNORE_NUMTIMES, &bTranslated, FALSE );
 					if ( bTranslated && value > 1 )
 					{
-						CAssertDisable *pDisable = IgnoreAssertsNearby( 0 );
-						pDisable->m_nIgnoreTimes = value - 1;
-						g_nLastIgnoreNumTimes = value;
+						CAssertDisable *pDisable = IgnoreAssertsNearby(
+							pDialogData->assert_disables, pDialogData->init_info, 0 );
+						if ( pDisable )
+						{
+							pDisable->m_nIgnoreTimes = value - 1;
+						}
+						pDialogData->last_ignore_num_times = value;
 					}
 
 					EndDialog( hDlg, 0 );
@@ -286,7 +295,7 @@ static INT_PTR CALLBACK AssertDialogProc(
 				// Always ignore this assert.
 				case IDC_IGNORE_ALWAYS:
 				{
-					IgnoreAssertsNearby( 0 );
+					IgnoreAssertsNearby( pDialogData->assert_disables, pDialogData->init_info, 0 );
 					EndDialog( hDlg, 0 );
 					return TRUE;
 				}
@@ -298,21 +307,21 @@ static INT_PTR CALLBACK AssertDialogProc(
 					if ( !bTranslated || value < 1 )
 						return TRUE;
 
-					IgnoreAssertsNearby( value );
+					IgnoreAssertsNearby( pDialogData->assert_disables, pDialogData->init_info, value );
 					EndDialog( hDlg, 0 );
 					return TRUE;
 				}
 
 				case IDC_IGNORE_ALL:
 				{
-					g_bAssertsEnabled.store(false, std::memory_order_release);
+					pDialogData->are_asserts_enabled.store(false, std::memory_order_release);
 					EndDialog( hDlg, 0 );
 					return TRUE;
 				}
 
 				case IDC_BREAK:
 				{
-					g_bBreak.store(true, std::memory_order_release);
+					pDialogData->should_break = true;
 					EndDialog( hDlg, 0 );
 					return TRUE;
 				}
@@ -321,7 +330,7 @@ static INT_PTR CALLBACK AssertDialogProc(
 				case IDC_IGNORE_NUMLINES:
 				case IDC_IGNORE_NUMTIMES:
 					return TRUE;
-					
+
 				// dimhotepus: Explicitly handle ESC.
 				case IDC_ESCAPE_DIALOG:
 				{
@@ -341,7 +350,10 @@ static INT_PTR CALLBACK AssertDialogProc(
 
 		case WM_DPICHANGED:
 		{
-			return !g_dpi_window_behavior.OnWindowDpiChanged(wParam, lParam)
+			pDialogData = reinterpret_cast<AssertDialogData *>( GetWindowLongPtr( hDlg, GWLP_USERDATA ) );
+			assert( pDialogData );
+
+			return !pDialogData->dpi_window_behavior.OnWindowDpiChanged(wParam, lParam)
 				? TRUE : FALSE;
 		}
 
@@ -360,7 +372,10 @@ static INT_PTR CALLBACK AssertDialogProc(
 
 		case WM_DESTROY:
 		{
-			g_dpi_window_behavior.OnDestroyWindow();
+			pDialogData = reinterpret_cast<AssertDialogData *>( GetWindowLongPtr( hDlg, GWLP_USERDATA ) );
+			assert( pDialogData );
+
+			pDialogData->dpi_window_behavior.OnDestroyWindow();
 			return TRUE;
 		}
 
@@ -372,37 +387,57 @@ static INT_PTR CALLBACK AssertDialogProc(
 	return FALSE;
 }
 
+struct EnumerateWindowData
+{
+	EnumerateWindowData( DWORD process_id, HWND &best_parent_window ) :
+		process_id{process_id},
+		best_parent_window{best_parent_window}
+	{
+	}
 
-static HWND g_hBestParentWindow;
-
+	DWORD process_id;
+	HWND  &best_parent_window;
+};
 
 static BOOL CALLBACK ParentWindowEnumProc(
   HWND hWnd,      // handle to parent window
   LPARAM lParam   // application-defined value
 )
 {
-	if ( IsWindowVisible( hWnd ) )
+	if ( ::IsWindowVisible( hWnd ) )
 	{
-		DWORD procID;
-		GetWindowThreadProcessId( hWnd, &procID );
-		if ( procID == static_cast<DWORD>(lParam) )
+		DWORD process_id{0};
+		const DWORD thread_id{ ::GetWindowThreadProcessId( hWnd, &process_id ) };
+		if ( thread_id == 0 )
 		{
-			g_hBestParentWindow = hWnd;
-			return FALSE; // don't iterate any more.
+			return TRUE;
+		}
+
+		auto *window_data = reinterpret_cast< EnumerateWindowData * >( lParam );
+		assert( window_data );
+
+		if ( process_id == window_data->process_id )
+		{
+			window_data->best_parent_window = hWnd;
+			// Don't iterate any more.
+			return FALSE;
 		}
 	}
+
 	return TRUE;
 }
 
-
 static HWND FindLikelyParentWindow()
 {
+	HWND                best_parent_window{ nullptr };
+	EnumerateWindowData window_data{ ::GetCurrentProcessId(), best_parent_window };
+
 	// Enumerate top-level windows and take the first visible one with our processID.
-	g_hBestParentWindow = nullptr;
-	EnumWindows( ParentWindowEnumProc, GetCurrentProcessId() );
-	return g_hBestParentWindow;
+	::EnumWindows( ParentWindowEnumProc, reinterpret_cast<LPARAM>( &window_data ) );
+
+	return best_parent_window;
 }
-#endif // ( defined( _WIN32 ) && !defined( _X360 ) )
+#endif // defined( _WIN32 )
 
 // -------------------------------------------------------------------------------- //
 // Interface functions.
@@ -411,7 +446,7 @@ static HWND FindLikelyParentWindow()
 // provides access to the global that turns asserts on and off
 DBG_INTERFACE bool AreAllAssertsDisabled()
 {
-	return !g_bAssertsEnabled.load(std::memory_order_acquire);
+	return !g_bAssertsEnabled.load( std::memory_order_acquire );
 }
 
 DBG_INTERFACE void SetAllAssertsDisabled( bool bAssertsDisabled )
@@ -419,23 +454,24 @@ DBG_INTERFACE void SetAllAssertsDisabled( bool bAssertsDisabled )
 	g_bAssertsEnabled.store(!bAssertsDisabled, std::memory_order_release);
 }
 
-#if defined( LINUX ) || defined( USE_SDL )
-SDL_Window *g_SDLWindow = NULL;
+#if defined( USE_SDL )
+// dimhotepus: Make thread-safe.
+std::atomic<SDL_Window *> g_SDLWindow = nullptr;
 
 DBG_INTERFACE void SetAssertDialogParent( struct SDL_Window *window )
 {
-	g_SDLWindow = window;
+	g_SDLWindow.store( window, std::memory_order_release );
 }
 
-DBG_INTERFACE struct SDL_Window * GetAssertDialogParent()
+DBG_INTERFACE SDL_Window* GetAssertDialogParent()
 {
-	return g_SDLWindow;
+	return g_SDLWindow.load( std::memory_order_acquire );
 }
 #endif
 
 DBG_INTERFACE bool ShouldUseNewAssertDialog()
 {
-	static bool bMPIWorker = ( _tcsstr( Plat_GetCommandLine(), _T("-mpi_worker") ) != nullptr );
+	static bool bMPIWorker = !!_tcsstr( Plat_GetCommandLine(), _T("-mpi_worker") );
 	if ( bMPIWorker )
 	{
 		return false;
@@ -487,8 +523,11 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 	if ( !g_bAssertsEnabled.load(std::memory_order_acquire) )
 		return false;
 
+	// Linked list of disabled asserts.
+	static CAssertDisable *assert_disables{ nullptr };
+
 	// Has this specific Assert been disabled?
-	if ( !AreAssertsEnabledInFileLine( pFilename, line ) )
+	if ( !AreAssertsEnabledInFileLine( assert_disables, pFilename, line ) )
 		return false;
 
 	// Assert not suppressed. Spew it, and optionally a backtrace.
@@ -499,8 +538,11 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 		#define COLOR_GREEN 	"\033[1;32m"
 		#define COLOR_RED 		"\033[1;31m"
 		#define COLOR_END		"\033[0m"
-		fprintf(stderr, COLOR_YELLOW "ASSERT:" COLOR_END " " COLOR_RED "%s" COLOR_GREEN ":%i:" COLOR_END " " COLOR_RED "%s" COLOR_END "\n",
-		        pFilename, line, pExpression);
+		fprintf(stderr,
+			COLOR_YELLOW "ASSERT:" COLOR_END "
+			" COLOR_RED "%s" COLOR_GREEN ":%i:" COLOR_END
+			" " COLOR_RED "%s" COLOR_END "\n",
+			pFilename, line, pExpression);
 		if ( getenv( "POSIX_ASSERT_BACKTRACE" ) )
 		{
 			SpewBacktrace();
@@ -517,22 +559,50 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 	if ( IsDebugBreakEnabled() )
 		return true;
 
+	CDialogInitInfo init_info{ pFilename, pExpression, line };
+
 	// Now create the dialog. Just return true for old-style debug break upon failure.
-	// dimhotepus: Copy as we can change from different thread.
-	// Truncation is ok here.
-	_tcsncpy( g_Info.m_pFilename, pFilename, std::size( g_Info.m_pFilename ) - 1 );
-	g_Info.m_pFilename[std::size( g_Info.m_pFilename ) - 1] = _T('\0');
 
-	g_Info.m_iLine = line;
+	// Set to true if they want to break in the debugger.
+	bool should_break{ false };
 
-	// dimhotepus: Copy as we can change from different thread.
-	// Truncation is ok here.
-	_tcsncpy( g_Info.m_pExpression, pExpression, std::size( g_Info.m_pExpression ) - 1 );
-	g_Info.m_pExpression[std::size( g_Info.m_pExpression ) - 1] = _T( '\0' );
+	const auto consoleAssertFallback = [&]() {
+		// dimhotepus: Use console fallback if no SDL or not POSIX.
+		fprintf( stderr, "\n=== ASSERTION FAILED ===\n" );
+		fprintf( stderr, "File: %s\nLine: %i\nExpr: %s\n\n", pFilename, line, pExpression );
+		fprintf( stderr, "Options:\n" );
+		fprintf( stderr, "  [b] Break/Continue\n" );
+		fprintf( stderr, "  [o] Ignore this once\n" );
+		fprintf( stderr, "  [i] Ignore this always\n" );
+		fprintf( stderr, "  [a] Ignore all\n" );
+		fprintf( stderr, "  [f] Ignore file\n" );
+		fprintf( stderr, "> " );
 
-	g_bBreak.store(false, std::memory_order_release);
+		const int ch{ getchar() };
+		switch ( tolower( ch ) )
+		{
+		case 'b':
+			should_break = true;
+			break;
+		case 'o':
+			// Ignore this Assert once
+			break;
+		case 'i':
+			IgnoreAssertsNearby( assert_disables, init_info, 0 );
+			break;
+		case 'a':
+			g_bAssertsEnabled.store( false, std::memory_order_release );
+			break;
+		case 'f':
+			IgnoreAssertsInCurrentFile( assert_disables, init_info );
+			break;
+		}
+
+		return should_break;
+	};
 
 #if defined( _WIN32 )
+	static unsigned last_ignore_num_times{ 1 };
 
 	if ( !ThreadInMainThread() )
 	{
@@ -545,20 +615,30 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 
 		if ( Plat_MessageBoxButton::Retry == buttonPressed )
 		{
-			g_bBreak.store(true, std::memory_order_release);
+			should_break = true;
 		}
 		else if ( Plat_MessageBoxButton::Cancel == buttonPressed )
 		{
-			IgnoreAssertsNearby( 0 );
+			IgnoreAssertsNearby( assert_disables, init_info, 0 );
 		}
+
+		assert(false);
 	}
 	else
 	{
-		HWND hParentWindow = FindLikelyParentWindow();
+		HMODULE          hModule{ GetModuleHandle( V_STRINGIFY( DLLNAME ) DLL_EXT_STRING ) };
+		HWND             hParentWindow{ FindLikelyParentWindow() };
+		AssertDialogData dialogData = { last_ignore_num_times, init_info, assert_disables, should_break, g_bAssertsEnabled };
 
-		DialogBox( g_hTier0Instance, MAKEINTRESOURCE( IDD_ASSERT_DIALOG ), hParentWindow, AssertDialogProc );
+		DialogBoxParam(
+			hModule,
+			MAKEINTRESOURCE( IDD_ASSERT_DIALOG ),
+			hParentWindow,
+			AssertDialogProc,
+			reinterpret_cast< LPARAM >( &dialogData ) );
 	}
 
+	return should_break;
 #elif defined( POSIX )
 #ifdef OSX
 	static void *pSdlModule = dlopen( "libSDL3.dylib", RTLD_LAZY );
@@ -588,7 +668,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 		text[ std::size( text ) - 1 ] = '\0';
 
 		SDL_MessageBoxData messageboxdata = { 0 };
-		messageboxdata.window = g_SDLWindow;
+		messageboxdata.window = GetAssertDialogParent();
 		messageboxdata.title = "Assertion Failed";
 		messageboxdata.message = text;
 		messageboxdata.numbuttons = ssize( buttondata );
@@ -606,64 +686,31 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 		default:
 		case IDC_BREAK:
 			// Break on this Assert
-			g_bBreak.store(true, std::memory_order_release);
+			should_break = true;
 			break;
 		case IDC_IGNORE_THIS:
 			// Ignore this Assert once
 			break;
 		case IDC_IGNORE_FILE:
-			IgnoreAssertsInCurrentFile();
+			IgnoreAssertsInCurrentFile( assert_disables, init_info );
 			break;
 		case IDC_IGNORE_ALWAYS:
 			// Ignore this Assert from now on
-			IgnoreAssertsNearby( 0 );
+			IgnoreAssertsNearby( assert_disables, init_info, 0 );
 			break;
 		case IDC_IGNORE_ALL:
 			// Ignore all Asserts from now on
 			g_bAssertsEnabled.store(false, std::memory_order_release);
 			break;
 		}
-	}
-	else
-	{
-		// Couldn't SDL it up
-		// dimhotepus: Use console fallback if no SDL.
-		fprintf( stderr, "\n=== ASSERTION FAILED ===\n" );
-		fprintf( stderr, "File: %s\nLine: %i\nExpr: %s\n\n", pFilename, line, pExpression );
-		fprintf( stderr, "Options:\n" );
-		fprintf( stderr, "  [b] Break/Continue\n" );
-		fprintf( stderr, "  [o] Ignore this once\n" );
-		fprintf( stderr, "  [i] Ignore this always\n" );
-		fprintf( stderr, "  [a] Ignore all\n" );
-		fprintf( stderr, "  [f] Ignore file\n" );
-		fprintf( stderr, "> " );
 
-		const char ch = getchar();
-		switch ( tolower( ch ) )
-		{
-		case 'b':
-			g_bBreak.store( true, std::memory_order_release );
-			break;
-		case 'o':
-			// Ignore this Assert once
-			break;
-		case 'i':
-			IgnoreAssertsNearby( 0 );
-			break;
-		case 'a':
-			g_bAssertsEnabled.store( false, std::memory_order_release );
-			break;
-		case 'f':
-			IgnoreAssertsInCurrentFile();
-			break;
-		}
+		return should_break;
 	}
 
+	// No SDL3, use console.
+	return consoleAssertFallback();
 #else
-	// No dialog mode on this platform
-	g_bBreak.store(true, std::memory_order_release);
+	// Not POSIX, use console.
+	return consoleAssertFallback();
 #endif
-
-	return g_bBreak.load(std::memory_order_acquire);
 }
-
