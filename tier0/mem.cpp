@@ -29,7 +29,7 @@ static std::atomic_bool s_oomerror_called = false;
 void MemAllocOOMError( size_t nSize )
 {
 	bool expected = false;
-	if ( !s_oomerror_called.compare_exchange_strong(expected, true, std::memory_order_acq_rel, std::memory_order_relaxed) )
+	if ( s_oomerror_called.compare_exchange_strong(expected, true, std::memory_order_acq_rel, std::memory_order_relaxed) )
 	{
 		MinidumpUserStreamInfoAppend( "MemAllocOOMError: %zu bytes\n", nSize );
 
