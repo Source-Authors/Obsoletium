@@ -560,18 +560,15 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 	}
 
 #elif defined( POSIX )
-	static FUNC_SDL_ShowMessageBox *pfnSDLShowMessageBox = NULL;
-	if( !pfnSDLShowMessageBox )
-	{
-		// dimhotepus: Use SDL3.
 #ifdef OSX
-		void *ret = dlopen( "libSDL3.dylib", RTLD_LAZY );
+	static void *pSdlModule = dlopen( "libSDL3.dylib", RTLD_LAZY );
 #else
-		void *ret = dlopen( "libSDL3.so.0", RTLD_LAZY );
+	static void *pSdlModule = dlopen( "libSDL3.so.0", RTLD_LAZY );
 #endif
-		if ( ret )
-			{ pfnSDLShowMessageBox = ( FUNC_SDL_ShowMessageBox * )dlsym( ret, "SDL_ShowMessageBox" ); }
-	}
+
+	static auto *pfnSDLShowMessageBox = pSdlModule
+		? (FUNC_SDL_ShowMessageBox *)dlsym( pSdlModule, "SDL_ShowMessageBox" )
+		: nullptr;
 
 	if( pfnSDLShowMessageBox )
 	{
