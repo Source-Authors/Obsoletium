@@ -10,58 +10,7 @@
 #include "datamap.h"	// Needed for typedescription_t.  Note datamap.h is tier1 as well.
 #include "tier0/basetypes.h"
 #include "tier0/dbg.h"
-
-#ifdef _MSC_VER
-
-#include <intrin.h>
-#define bswap_16(x) _byteswap_ushort(x)
-#define bswap_32(x) _byteswap_ulong(x)
-#define bswap_64(x) _byteswap_uint64(x)
-
-#elif defined(__APPLE__)
-
-// Mac OS X / Darwin features
-#include <libkern/OSByteOrder.h>
-#define bswap_16(x) OSSwapInt16(x)
-#define bswap_32(x) OSSwapInt32(x)
-#define bswap_64(x) OSSwapInt64(x)
-
-#elif defined(__sun) || defined(sun)
-
-#include <sys/byteorder.h>
-#define bswap_16(x) BSWAP_16(x)
-#define bswap_32(x) BSWAP_32(x)
-#define bswap_64(x) BSWAP_64(x)
-
-#elif defined(__FreeBSD__)
-
-#include <sys/endian.h>
-#define bswap_16(x) bswap16(x)
-#define bswap_32(x) bswap32(x)
-#define bswap_64(x) bswap64(x)
-
-#elif defined(__OpenBSD__)
-
-#include <sys/types.h>
-#define bswap_16(x) swap16(x)
-#define bswap_32(x) swap32(x)
-#define bswap_64(x) swap64(x)
-
-#elif defined(__NetBSD__)
-
-#include <sys/types.h>
-#include <machine/bswap.h>
-#if defined(__BSWAP_RENAME) && !defined(__bswap_32)
-#define bswap_16(x) bswap16(x)
-#define bswap_32(x) bswap32(x)
-#define bswap_64(x) bswap64(x)
-#endif
-
-#else
-
-#include <byteswap.h>
-
-#endif
+#include "tier0/platform.h"
 
 #ifdef CByteswap
 #undef CByteswap
@@ -265,14 +214,14 @@ private:
 		{
 			if constexpr (std::is_same_v<T, unsigned short>)
 			{
-				output = bswap_16(input);
+				output = Plat_ByteSwap16(input);
 			}
 			else
 			{
 				uint16 v;
 				memcpy(&v, &input, sizeof(T));
 
-				v = bswap_16(v);
+				v = Plat_ByteSwap16(v);
 
 				memcpy(&output, &v, sizeof(T));
 			}
@@ -281,14 +230,14 @@ private:
 		{
 			if constexpr (std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned long>)
 			{
-				output = bswap_32(input);
+				output = Plat_ByteSwap32(input);
 			}
 			else
 			{
 				uint32 v;
 				memcpy(&v, &input, sizeof(T));
 
-				v = bswap_32(v);
+				v = Plat_ByteSwap32(v);
 
 				memcpy(&output, &v, sizeof(T));
 			}
@@ -297,14 +246,14 @@ private:
 		{
 			if constexpr (std::is_same_v<T, uint64>)
 			{
-				output = bswap_64(input);
+				output = Plat_ByteSwap64( input );
 			}
 			else
 			{
 				uint64 v;
 				memcpy(&v, &input, sizeof(T));
 
-				v = bswap_64(v);
+				v = Plat_ByteSwap64(v);
 
 				memcpy(&output, &v, sizeof(T));
 			}
