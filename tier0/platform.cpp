@@ -699,16 +699,32 @@ MUST_CHECK_RETURN bool Is64BitOS()
 #ifdef _WIN64
   return true;
 #else
-	static BOOL bIs64bit = FALSE;
-	static bool bInitialized = false;
-	if ( bInitialized )
-		return bIs64bit != FALSE;
-	else
+	// dimhotepus: Prefer IsWow64Process2 (Windows 10 1511+).  IsWow64Process
+	// reports FALSE for x86 processes on Windows on ARM64, so the old code
+	// called a 64-bit ARM OS 32-bit.
+	static const bool is64BitOS = []() noexcept
 	{
-		bInitialized = true;
-		// NOTE: If the process is a 32-bit application running under 64-bit Windows 10 on ARM, the value is set to FALSE
-		return ::IsWow64Process(::GetCurrentProcess(), &bIs64bit) && bIs64bit;
+		using IsWow64Process2Fn = BOOL ( WINAPI * )( HANDLE, USHORT *, USHORT * );
+
+		const auto isWow64Process2 = GetProcAddressAs<IsWow64Process2Fn>(
+			::GetModuleHandleW( L"kernel32.dll" ), "IsWow64Process2" );
+		if ( isWow64Process2 )
+		{
+			USHORT processMachine{ IMAGE_FILE_MACHINE_UNKNOWN };
+			USHORT nativeMachine{ IMAGE_FILE_MACHINE_UNKNOWN };
+			if ( isWow64Process2( ::GetCurrentProcess(), &processMachine, &nativeMachine ) )
+	{
+				return nativeMachine == IMAGE_FILE_MACHINE_AMD64 ||
+					   nativeMachine == IMAGE_FILE_MACHINE_ARM64 ||
+					   nativeMachine == IMAGE_FILE_MACHINE_IA64;
+			}
 	}
+
+		BOOL isWow64{ FALSE };
+		return ::IsWow64Process( ::GetCurrentProcess(), &isWow64 ) && isWow64;
+	}();
+
+	return is64BitOS;
 #endif
 }
 
