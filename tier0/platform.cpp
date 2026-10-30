@@ -62,7 +62,8 @@ namespace {
 
 void InitTime()
 {
-	QueryPerformanceFrequency(&g_PerformanceFrequency);
+	// Always succeeds since Windows Vista.
+	(void)QueryPerformanceFrequency(&g_PerformanceFrequency);
 
 	// Common case, frequency is 10000000.
 	const long long frequency{ g_PerformanceFrequency.QuadPart };
