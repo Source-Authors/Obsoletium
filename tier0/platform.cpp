@@ -258,6 +258,19 @@ wchar_t* Utf8ToWide( IN_Z const char* utf8, OUT_Z_ARRAY wchar_t ( &buffer )[size
 	return 0;
 }
 
+// dimhotepus: Type-checked GetProcAddress.  Casting through void (*)() is the
+// form compilers accept without cast-function-type warnings.
+template <typename TFunction>
+[[nodiscard]] TFunction GetProcAddressAs( HMODULE module, const char* name ) noexcept
+{
+	static_assert( std::is_pointer_v<TFunction> &&
+		std::is_function_v<std::remove_pointer_t<TFunction>> );
+
+	return module
+		? reinterpret_cast<TFunction>( reinterpret_cast<void ( * )()>( ::GetProcAddress( module, name ) ) )
+		: nullptr;
+}
+
 }  // namespace
 
 Plat_MessageBoxButton Plat_MessageBox( IN_Z const char* title,
@@ -449,34 +462,35 @@ struct tm *Plat_localtime( const time_t *timep, struct tm *result )
 
 MUST_CHECK_RETURN bool vtune( bool resume )
 {
-	static bool bInitialized = false;
-	static void (__cdecl *VTResume)(void) = nullptr;
-	static void (__cdecl *VTPause) (void) = nullptr;
-
-	// Grab the Pause and Resume function pointers from the VTune DLL the first time through:
-	if( !bInitialized )
+	// dimhotepus: Two static bools -> one function-local static initialized by
+	// a lambda.  C++11 guarantees that runs exactly once even when called from
+	// several threads; the old "if ( !bInitialized )" check was a data race.
+	// The DLL is intentionally never freed: the pointers are used for the
+	// process lifetime.
+	struct VTuneApi
 	{
-		bInitialized = true;
-
-		HINSTANCE pVTuneDLL = LoadLibrary( "vtuneapi.dll" );
-
-		if( pVTuneDLL )
+		void ( __cdecl *resume )();
+		void ( __cdecl *pause )();
+	};
+	static const VTuneApi api = []() noexcept
 		{
-			VTResume = (void(__cdecl *)())GetProcAddress( pVTuneDLL, "VTResume" );
-			VTPause  = (void(__cdecl *)())GetProcAddress( pVTuneDLL, "VTPause" );
-		}
-	}
+		const HMODULE vtuneDll{ ::LoadLibraryA( "vtuneapi.dll" ) };
+		return VTuneApi{
+			GetProcAddressAs<void ( __cdecl * )()>( vtuneDll, "VTResume" ),
+			GetProcAddressAs<void ( __cdecl * )()>( vtuneDll, "VTPause" ) };
+	}();
 
 	// Call the appropriate function, as indicated by the argument:
-	if( resume && VTResume )
+	// dimhotepus: VTResume / VTPause statics -> api.resume / api.pause.
+	if( resume && api.resume )
 	{
-		VTResume();
+		api.resume();
 		return true;
 	}
 
-	if( !resume && VTPause )
+	if( !resume && api.pause )
 	{
-		VTPause();
+		api.pause();
 		return true;
 	}
 
