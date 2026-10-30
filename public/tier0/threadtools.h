@@ -1805,7 +1805,7 @@ inline CThreadMutex::CThreadMutex()
 }
 
 // dimhotepus: Ctor with spin count.
-inline CThreadMutex::CThreadMutex(unsigned int spinCount) : CThreadMutex{}
+inline CThreadMutex::CThreadMutex([[maybe_unused]] unsigned int spinCount) : CThreadMutex{}
 {
 }
 
