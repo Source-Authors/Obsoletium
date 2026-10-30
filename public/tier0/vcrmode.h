@@ -65,11 +65,13 @@ enum VCRMode_t
 };
 
 // dimhotepus: Backport from TF2. Was unsigned long.
-//#ifdef PLATFORM_64BITS
-//using VCRThreadId_t = uint64;
-//#else
+#if defined( _WIN32 )
+// On windows thread ids are 4 bytes.
 using VCRThreadId_t = uint32;
-//#endif
+#else
+// dimhotepus: POSIX pthread_t is pointer, so must be sizeof(void*)
+using VCRThreadId_t = uintp;
+#endif
 
 //-----------------------------------------------------------------------------
 // Functions.

@@ -90,11 +90,13 @@ constexpr unsigned TT_INFINITE = 0xffffffff; //-V112
 #endif // NO_THREAD_LOCAL
 
 // dimhotepus: Backport from TF2. Was unsigned long.
-//#ifdef PLATFORM_64BITS
-//using ThreadId_t = uint64;
-//#else
+#if defined( _WIN32 )
+// On windows thread ids are 4 bytes.
 using ThreadId_t = uint32;
-//#endif
+#else
+// dimhotepus: POSIX pthread_t is pointer, so must be sizeof(void*)
+using ThreadId_t = uintp;
+#endif
 
 constexpr inline ThreadId_t INVALID_THREAD_ID{~static_cast<ThreadId_t>(0)};
 

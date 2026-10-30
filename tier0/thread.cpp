@@ -240,8 +240,11 @@ void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool
 	}
 }
 
-void Plat_ApplyHardwareDataBreakpointsToNewThread( unsigned long dwThreadID )
+void Plat_ApplyHardwareDataBreakpointsToNewThread( ThreadId_t dwThreadID )
 {
+	// dimhotepus: On Windows we have 4-byte thread ids.
+	static_assert( sizeof( ThreadId_t ) == sizeof( DWORD ) );
+
 	AUTO_LOCK(s_BreakpointStateMutex);
 
 	if ( dwThreadID != GetCurrentThreadId() )
@@ -278,7 +281,7 @@ void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool
 	// no impl on this platform yet
 }
 
-void Plat_ApplyHardwareDataBreakpointsToNewThread( unsigned long dwThreadID )
+void Plat_ApplyHardwareDataBreakpointsToNewThread( ThreadId_t dwThreadID )
 {
 	// no impl on this platform yet
 }

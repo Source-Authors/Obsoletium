@@ -1313,8 +1313,17 @@ PLATFORM_INTERFACE void ShutdownPME();
 // Specify 1, 2, or 4 bytes for nWatchBytes; pass 0 to unregister the address.
 PLATFORM_INTERFACE void	Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool bBreakOnRead );
 
+// dimhotepus: Backport from TF2. Was unsigned long.
+#if defined( _WIN32 )
+// On windows thread ids are 4 bytes.
+using ThreadId_t = uint32;
+#else
+// dimhotepus: POSIX pthread_t is pointer, so must be sizeof(void*)
+using ThreadId_t = uintp;
+#endif
+
 // Apply current hardware data breakpoints to a newly created thread.
-PLATFORM_INTERFACE void	Plat_ApplyHardwareDataBreakpointsToNewThread( unsigned long dwThreadID );
+PLATFORM_INTERFACE void	Plat_ApplyHardwareDataBreakpointsToNewThread( ThreadId_t dwThreadID );
 
 //-----------------------------------------------------------------------------
 // Process related functions
