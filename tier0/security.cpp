@@ -24,7 +24,7 @@
 	#pragma comment(lib, "DESKey/dk2win32.lib" )
 #endif
 
-bool Plat_VerifyHardwareKey()
+MUST_CHECK_RETURN bool Plat_VerifyHardwareKey()
 {
 #ifdef REQUIRE_HARDWARE_KEY
 		
@@ -38,7 +38,7 @@ bool Plat_VerifyHardwareKey()
 #endif
 }
 
-bool Plat_VerifyHardwareKeyDriver()
+MUST_CHECK_RETURN bool Plat_VerifyHardwareKeyDriver()
 {
 #ifdef REQUIRE_HARDWARE_KEY
 	// Ensure that the driver is at least installed:
@@ -48,7 +48,7 @@ bool Plat_VerifyHardwareKeyDriver()
 #endif
 }
 
-bool Plat_VerifyHardwareKeyPrompt()
+MUST_CHECK_RETURN bool Plat_VerifyHardwareKeyPrompt()
 {
 #ifdef REQUIRE_HARDWARE_KEY
 	if ( !DK2DriverInstalled() )
@@ -93,7 +93,7 @@ bool Plat_VerifyHardwareKeyPrompt()
 #endif
 }
 
-bool Plat_FastVerifyHardwareKey()
+MUST_CHECK_RETURN bool Plat_FastVerifyHardwareKey()
 {
 #ifdef REQUIRE_HARDWARE_KEY
 	static int nIterations = 0;

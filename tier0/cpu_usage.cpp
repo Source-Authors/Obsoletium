@@ -149,7 +149,7 @@ struct CpuTimes
 
 }  // namespace
 
-float GetCPUUsage()
+MUST_CHECK_RETURN float GetCPUUsage()
 {
 	static std::mutex mutex;
 	static CpuTimes previous{};

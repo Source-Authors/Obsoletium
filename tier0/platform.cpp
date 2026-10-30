@@ -61,7 +61,7 @@ void InitTime()
 	s_bTimeInitted = true;
 }
 
-bool Plat_IsInBenchmarkMode()
+MUST_CHECK_RETURN bool Plat_IsInBenchmarkMode()
 {
 	return g_bBenchmarkMode.load(std::memory_order::memory_order_relaxed);
 }
@@ -81,7 +81,7 @@ static long long Plat_CycleTime()
 	return now.QuadPart - g_ClockStart.QuadPart;
 }
 
-double Plat_FloatTime()
+MUST_CHECK_RETURN double Plat_FloatTime()
 {
 	if ( !g_bBenchmarkMode.load(std::memory_order::memory_order_relaxed) )
 	{
@@ -269,7 +269,7 @@ Plat_MessageBoxButton Plat_MessageBox( IN_Z const char* title,
 	return GetPressedButton( pressed );
 }
 
-uint32 Plat_MSTime()
+MUST_CHECK_RETURN uint32 Plat_MSTime()
 {
 	if ( !g_bBenchmarkMode.load(std::memory_order::memory_order_relaxed) )
 	{
@@ -283,7 +283,7 @@ uint32 Plat_MSTime()
 	return (uint32)(g_FakeBenchmarkTime * 1000.0);
 }
 
-uint64 Plat_USTime()
+MUST_CHECK_RETURN uint64 Plat_USTime()
 {
 	if ( !g_bBenchmarkMode.load(std::memory_order::memory_order_relaxed) )
 	{
@@ -320,7 +320,7 @@ char *Plat_ctime( const time_t *timep, char *buf, size_t bufsize )
 		return buf;
 }
 
-bool Plat_GetModuleFilename( char *pOut, int nMaxBytes )
+MUST_CHECK_RETURN bool Plat_GetModuleFilename( char *pOut, int nMaxBytes )
 {
 	HMODULE module{nullptr};
 	if (!::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
@@ -393,9 +393,8 @@ struct tm *Plat_localtime( const time_t *timep, struct tm *result )
 }
 
 
-bool vtune( bool resume )
+MUST_CHECK_RETURN bool vtune( bool resume )
 {
-#ifndef _X360
 	static bool bInitialized = false;
 	static void (__cdecl *VTResume)(void) = nullptr;
 	static void (__cdecl *VTPause) (void) = nullptr;
@@ -419,25 +418,26 @@ bool vtune( bool resume )
 	{
 		VTResume();
 		return true;
+	}
 
-	} 
-	else if( !resume && VTPause )
+	if( !resume && VTPause )
 	{
 		VTPause();
 		return true;
 	}
-#endif
+
 	return false;
 }
 
-bool Plat_IsInDebugSession()
+MUST_CHECK_RETURN bool Plat_IsInDebugSession()
 {
 	return IsDebuggerPresent() != 0;
 }
 
 // dimhotepus: Additional bug info.
 // See https://docs.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-checktokenmembership
-static BOOL IsUserAdmin() {
+MUST_CHECK_RETURN static BOOL IsUserAdmin()
+{
   SID_IDENTIFIER_AUTHORITY ntAuthority{SECURITY_NT_AUTHORITY};
   PSID administratorsGroup;
   BOOL ok = AllocateAndInitializeSid(
@@ -456,7 +456,8 @@ static BOOL IsUserAdmin() {
 }
 
 // dimhotepus: Additional bug info.
-bool Plat_IsUserAnAdmin() {
+MUST_CHECK_RETURN bool Plat_IsUserAnAdmin()
+{
   return ::IsUserAdmin() ? true : false;
 }
 
@@ -485,7 +486,7 @@ bool Plat_IsUserAnAdmin() {
 	return value > 0;
 }
 
-PLATFORM_INTERFACE void* Plat_Alloc( unsigned long size );
+PLATFORM_INTERFACE MUST_CHECK_RETURN void *Plat_Alloc( unsigned long size );
 PLATFORM_INTERFACE void Plat_Free( void *ptr );
 
 // dimhotepus: Apply system Mica materials to window.
@@ -576,7 +577,7 @@ void Plat_DebugString( const char * psz )
 }
 
 
-const tchar *Plat_GetCommandLine()
+MUST_CHECK_RETURN const tchar *Plat_GetCommandLine()
 {
 #ifdef TCHAR_IS_WCHAR
 	return GetCommandLineW();
@@ -585,7 +586,7 @@ const tchar *Plat_GetCommandLine()
 #endif
 }
 
-bool GetMemoryInformation( MemoryInformation *pOutMemoryInfo )
+MUST_CHECK_RETURN bool GetMemoryInformation( MemoryInformation *pOutMemoryInfo )
 {
 	if ( !pOutMemoryInfo ) 
 		return false;
@@ -613,7 +614,7 @@ bool GetMemoryInformation( MemoryInformation *pOutMemoryInfo )
 }
 
 
-const char *Plat_GetCommandLineA()
+MUST_CHECK_RETURN const char *Plat_GetCommandLineA()
 {
 	return GetCommandLineA();
 }
@@ -627,7 +628,7 @@ void Plat_BeginWatchdogTimer( [[maybe_unused]] int nSecs )
 void Plat_EndWatchdogTimer( void )
 {
 }
-int Plat_GetWatchdogTime( void )
+MUST_CHECK_RETURN int Plat_GetWatchdogTime( void )
 {
 	return 0;
 }
@@ -635,7 +636,7 @@ void Plat_SetWatchdogHandlerFunction( [[maybe_unused]] Plat_WatchDogHandlerFunct
 {
 }
 
-bool Is64BitOS()
+MUST_CHECK_RETURN bool Is64BitOS()
 {
 	// dimhotepus: Cleanup x86-64 process detection.
 #ifdef _WIN64
@@ -672,7 +673,7 @@ void Plat_DefaultAllocErrorFn( [[maybe_unused]] unsigned long size )
 Plat_AllocErrorFn g_AllocError = Plat_DefaultAllocErrorFn;
 #endif
 
-PLATFORM_INTERFACE void* Plat_Alloc( unsigned long size )
+PLATFORM_INTERFACE MUST_CHECK_RETURN void *Plat_Alloc( unsigned long size )
 {
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 	void *pRet = g_pMemAlloc->Alloc( size );
@@ -691,7 +692,7 @@ PLATFORM_INTERFACE void* Plat_Alloc( unsigned long size )
 	return nullptr;
 }
 
-PLATFORM_INTERFACE void* Plat_Realloc( void *ptr, unsigned long size )
+PLATFORM_INTERFACE MUST_CHECK_RETURN void *Plat_Realloc( void *ptr, unsigned long size )
 {
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 	void *pRet = g_pMemAlloc->Realloc( ptr, size );

@@ -583,7 +583,7 @@ CPUInformation ComputeCPUInformation()
 
 }  // namespace
 
-const CPUInformation* GetCPUInformation()
+MUST_CHECK_RETURN const CPUInformation *GetCPUInformation()
 {
 	// Thread-safe one-time initialization.
 	static const CPUInformation pi{ ComputeCPUInformation() };
