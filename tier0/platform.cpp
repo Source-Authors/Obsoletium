@@ -362,16 +362,28 @@ char *Plat_ctime( const time_t *timep, char *buf, size_t bufsize )
 
 MUST_CHECK_RETURN bool Plat_GetModuleFilename( char *pOut, int nMaxBytes )
 {
-	HMODULE module{nullptr};
-	if (!::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-			nullptr, &module)) {
+	// dimhotepus: Reject null / non-positive sizes.  A negative nMaxBytes was
+	// cast to a huge DWORD and let GetModuleFileName overrun pOut.
+	if ( !pOut || nMaxBytes <= 0 )
+	{
+		return false;
+	}
+
+	// dimhotepus: GetModuleFileName -> GetModuleFileNameA.
+	const DWORD size{ static_cast<DWORD>( nMaxBytes ) };
+	const DWORD length{ ::GetModuleFileNameA( nullptr, pOut, size ) };
+
+	if ( length == 0 )
+	{
+		// dimhotepus: Don't leave pOut unterminated on failure.
+		pOut[0] = '\0';
 		return false;
 	}
 
 	// A truncated path is reported as success with length == size.
-	const DWORD length{
-		::GetModuleFileName(module, pOut, static_cast<DWORD>(nMaxBytes))};
-	return length > 0 && length < static_cast<DWORD>(nMaxBytes);
+	// dimhotepus: length > 0 is already handled above; compare against the
+	// validated DWORD size.
+	return length < size;
 }
 
 void Plat_ExitProcess( int nCode )
