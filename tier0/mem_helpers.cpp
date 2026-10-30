@@ -5,6 +5,7 @@
 
 #include <cstdint>
 #include <limits>
+#include <atomic>
 
 #ifdef POSIX
 void DoApplyMemoryInitializations( void *pMem, size_t nSize )
@@ -40,9 +41,8 @@ static unsigned char g_RandomValues[256] = {
 	240, 104, 209, 81, 177, 123, 189, 175, 212, 101, 219, 114, 243, 44, 91, 51,
 	139, 91, 57, 120, 41, 98, 119 };
 
-// dimhotepus: x86-64 ready memory offset.
-static size_t g_iCurRandomValueOffset = 0;
-
+// dimhotepus: x86-64 ready memory offset with atomic thread safety (lock-free)
+static std::atomic<size_t> g_iCurRandomValueOffset{0};
 
 static void InitializeToFeeFee( void *pMem, size_t nSize )
 {
@@ -52,7 +52,6 @@ static void InitializeToFeeFee( void *pMem, size_t nSize )
 	while ( nQWords )
 	{
 		*pCurQWord = 0xffeeffeeffeeffeeULL;
-
 		++pCurQWord;
 		--nQWords;
 	}
@@ -67,7 +66,6 @@ static void InitializeToFeeFee( void *pMem, size_t nSize )
 	while ( nDWords )
 	{
 		*pCurDWord = 0xffeeffeeU;
-
 		++pCurDWord;
 		--nDWords;
 	}
@@ -85,14 +83,15 @@ static void InitializeToFeeFee( void *pMem, size_t nSize )
 	}
 }
 
-
 static void InitializeToRandom( void *pMem, size_t nSize )
 {
 	auto *pOut = static_cast<unsigned char *>(pMem);
-	for ( size_t i=0; i < nSize; i++ )
+	
+	for ( size_t i = 0; i < nSize; i++ )
 	{
-		pOut[i] = g_RandomValues[(g_iCurRandomValueOffset & 255)];
-		++g_iCurRandomValueOffset;
+		// dimhotepus: Lock-free atomic fetch_add for thread safety
+		size_t offset = g_iCurRandomValueOffset.fetch_add(1, std::memory_order_relaxed);
+		pOut[i] = g_RandomValues[(offset & 255)];
 	}
 }
 
