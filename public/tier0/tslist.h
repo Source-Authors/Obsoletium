@@ -459,8 +459,8 @@ public:
 
 		T elem;
 
-		Node_t *GetNextNode() { return static_cast<Node_t*>(Next); }
-		Node_t **GetNextNodePtr() { return reinterpret_cast<Node_t**>(&Next); }
+		[[nodiscard]] Node_t *GetNextNode() { return static_cast<Node_t*>(Next); }
+		[[nodiscard]] Node_t **GetNextNodePtr() { return reinterpret_cast<Node_t**>(&Next); }
 		void SetNextNode(Node_t* next) { Next = next; }
 	};
 
@@ -561,7 +561,7 @@ public:
 		}
 	}
 
-	bool ValidateQueue()
+	[[nodiscard]] bool ValidateQueue()
 	{
 #ifndef NDEBUG
 		{
@@ -738,7 +738,7 @@ public:
 		Push( pNode );
 	}
 
-	bool PopItem( T *pResult )
+	[[nodiscard]] bool PopItem( T *pResult )
 	{
 		// dimhotepus: Documents intent at API boundary.
 		static_assert(!std::is_reference_v<T>, "T must not be a reference type");
@@ -752,7 +752,7 @@ public:
 		return true;
 	}
 
-	int Count() const
+	[[nodiscard]] int Count() const
 	{
 		return m_Count.load(std::memory_order::memory_order_relaxed);
 	}
