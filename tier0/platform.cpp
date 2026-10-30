@@ -743,7 +743,7 @@ void Plat_DefaultAllocErrorFn( [[maybe_unused]] unsigned long size )
 {
 }
 
-Plat_AllocErrorFn g_AllocError = Plat_DefaultAllocErrorFn;
+static std::atomic<Plat_AllocErrorFn> g_AllocError = Plat_DefaultAllocErrorFn;
 #endif
 
 // dimhotepus: Under STEAM, valve_on.h (re-enabled at the end of platform.h)
@@ -769,7 +769,11 @@ PLATFORM_INTERFACE MUST_CHECK_RETURN void *Plat_Alloc( unsigned long size )
 	// dimhotepus: nullptr for a 0-byte request is not an allocation failure.
 	if ( size != 0 )
 	{
-		g_AllocError( size );
+		const auto allocErrorFn = g_AllocError.load( std::memory_order_acquire );
+		if ( allocErrorFn )
+		{
+			allocErrorFn( size );
+		}
 	}
 #endif
 	return nullptr;
@@ -794,7 +798,11 @@ PLATFORM_INTERFACE MUST_CHECK_RETURN void *Plat_Realloc( void *ptr, unsigned lon
 	// not an allocation failure.
 	if ( size != 0 )
 	{
-		g_AllocError( size );
+		const auto allocErrorFn = g_AllocError.load( std::memory_order_acquire );
+		if ( allocErrorFn )
+		{
+			allocErrorFn( size );
+		}
 	}
 #endif
 	return nullptr;
@@ -813,6 +821,6 @@ PLATFORM_INTERFACE void Plat_Free( void *ptr )
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 PLATFORM_INTERFACE void Plat_SetAllocErrorFn( Plat_AllocErrorFn fn )
 {
-	g_AllocError = fn;
+	g_AllocError.store( fn, std::memory_order_relaxed );
 }
 #endif
