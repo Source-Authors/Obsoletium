@@ -111,14 +111,23 @@ BOOL WINAPI DllMain( HINSTANCE module, DWORD fdwReason, LPVOID lpvReserved )
 static bool IsDebugBreakEnabled()
 {
 	static bool bResult = !!_tcsstr( Plat_GetCommandLine(), _T("-debugbreak") ) ||
-	                      !!_tcsstr( Plat_GetCommandLine(), _T("-raiseonassert") ) ||
-	                      getenv( "RAISE_ON_ASSERT" );
+		!!_tcsstr( Plat_GetCommandLine(), _T("-raiseonassert") ) ||
+		getenv( "RAISE_ON_ASSERT" );
 	return bResult;
 }
 
 static bool AreAssertsDisabled()
 {
 	static bool bResult = !!_tcsstr( Plat_GetCommandLine(), _T("-noassert") );
+	return bResult;
+}
+
+static bool IsConsoleMode()
+{
+	// No graphics and sound in launcher.
+	static bool bResult = !!_tcsstr( Plat_GetCommandLine(), _T("-textmode") ) ||
+	// Console mode for dedicated server.
+		!!_tcsstr( Plat_GetCommandLine(), _T("-console") );
 	return bResult;
 }
 
@@ -600,6 +609,12 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 
 		return should_break;
 	};
+
+	// dimhotepus: No GUI in console mode, assert to console.
+	if ( IsConsoleMode() )
+	{
+		return consoleAssertFallback();
+	}
 
 #if defined( _WIN32 )
 	static unsigned last_ignore_num_times{ 1 };
