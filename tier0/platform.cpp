@@ -353,12 +353,11 @@ void GetCurrentDate( int *pDay, int *pMonth, int *pYear )
 
 
 // Wraps the thread-safe versions of ctime. buf must be at least 26 bytes 
+// dimhotepus: Check for any error, not only EINVAL.  ctime_s returns ERANGE
+// when buf is shorter than 26 bytes, and the old code returned buf anyway.
 char *Plat_ctime( const time_t *timep, char *buf, size_t bufsize )
 {
-	if ( EINVAL == ctime_s( buf, bufsize, timep ) )
-		return nullptr;
-	else
-		return buf;
+	return ctime_s( buf, bufsize, timep ) == 0 ? buf : nullptr;
 }
 
 MUST_CHECK_RETURN bool Plat_GetModuleFilename( char *pOut, int nMaxBytes )
