@@ -601,7 +601,8 @@ class CInterlockedIntT
 public:
 	CInterlockedIntT() noexcept : m_value{0}
 	{
-		COMPILE_TIME_ASSERT( sizeof(T) == sizeof(long) );
+		// dimhotepus: long is 8 bytes on LP64, so sizeof(int) == sizeof(long) never holds there. std::atomic<T> works for 4 and 8.
+		COMPILE_TIME_ASSERT( sizeof(T) == 4 || sizeof(T) == 8 );
 	}
 	CInterlockedIntT( T value ) noexcept : m_value{value} {}
 	CInterlockedIntT( const CInterlockedIntT &c ) noexcept
