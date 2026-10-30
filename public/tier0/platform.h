@@ -515,10 +515,9 @@ template <typename R, typename T>
 	// Can't use extern "C" when DLL exporting a global
 	#define  DLL_GLOBAL_EXPORT   extern __attribute__ ((visibility("default")))
 	#define  DLL_GLOBAL_IMPORT   extern
-#define  DLL_LOCAL __attribute__ ((visibility("hidden")))
-
+	#define  DLL_LOCAL __attribute__ ((visibility("hidden")))
 #else
-#error "Please define your platform"
+	#error "Please define your platform"
 #endif
 
 // Used for standard calling conventions
