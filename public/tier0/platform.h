@@ -164,30 +164,30 @@
 #endif
 
 // dimhotepus: TF2 backport.
-#if PLATFORM_WINDOWS_PC
+#if defined(PLATFORM_WINDOWS_PC)
 
-# if PLATFORM_64BITS
+# if defined(PLATFORM_64BITS)
 #  define PLATFORM_DIR "\\x64"
 # else
 #  define PLATFORM_DIR ""
 # endif
 
 //#elif PLATFORM_LINUX
-#elif LINUX
+#elif defined(LINUX)
 
-# if PLATFORM_64BITS
+# if defined(PLATFORM_64BITS)
 #  define PLATFORM_DIR "/linux64"
 # else
 #  define PLATFORM_DIR ""
 # endif
 
 //#elif PLATFORM_OSX
-#elif OSX
+#elif defined(OSX)
 
-#if PLATFORM_ARM
+#if defined(PLATFORM_ARM)
 #  define PLATFORM_DIR "/osxarm64"
 #else
-# if PLATFORM_64BITS
+# if defined(PLATFORM_64BITS)
 #  define PLATFORM_DIR "/osx64"
 # else
 #  define PLATFORM_DIR ""
