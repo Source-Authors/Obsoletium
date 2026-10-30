@@ -473,7 +473,7 @@ MUST_CHECK_RETURN bool vtune( bool resume )
 		void ( __cdecl *pause )();
 	};
 	static const VTuneApi api = []() noexcept
-		{
+	{
 		const HMODULE vtuneDll{ ::LoadLibraryA( "vtuneapi.dll" ) };
 		return VTuneApi{
 			GetProcAddressAs<void ( __cdecl * )()>( vtuneDll, "VTResume" ),
@@ -546,9 +546,9 @@ PLATFORM_INTERFACE void Plat_Free( void *ptr );
 		L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
 		L"AppsUseLightTheme", RRF_RT_REG_DWORD, nullptr, &value, &valueSize)};
 
-		// Light mode by default if not supported.
+	// Light mode by default if not supported.
 	return rc != ERROR_SUCCESS || value != 0;
-	}
+}
 
 template <std::size_t size>
 [[nodiscard]] static const char *GetWindowTitleForLog(HWND window, char (&buffer)[size]) {
@@ -581,7 +581,7 @@ bool Plat_ApplySystemTitleBarTheme([[maybe_unused]] void *window,
 
 	const HWND hwnd{static_cast<HWND>(window)};
 	bool ok = true;
-	
+
 	// Detect current app window text is light or dark and apply Dark mode.
 	const BOOL enableDarkMode{ShouldAppUseLightTheme() ? FALSE : TRUE};
 	HRESULT hr{::DwmSetWindowAttribute(hwnd,
@@ -713,12 +713,12 @@ MUST_CHECK_RETURN bool Is64BitOS()
 			USHORT processMachine{ IMAGE_FILE_MACHINE_UNKNOWN };
 			USHORT nativeMachine{ IMAGE_FILE_MACHINE_UNKNOWN };
 			if ( isWow64Process2( ::GetCurrentProcess(), &processMachine, &nativeMachine ) )
-	{
+			{
 				return nativeMachine == IMAGE_FILE_MACHINE_AMD64 ||
 					   nativeMachine == IMAGE_FILE_MACHINE_ARM64 ||
 					   nativeMachine == IMAGE_FILE_MACHINE_IA64;
 			}
-	}
+		}
 
 		BOOL isWow64{ FALSE };
 		return ::IsWow64Process( ::GetCurrentProcess(), &isWow64 ) && isWow64;
@@ -766,7 +766,11 @@ PLATFORM_INTERFACE MUST_CHECK_RETURN void *Plat_Alloc( unsigned long size )
 	}
 
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
-	g_AllocError( size );
+	// dimhotepus: nullptr for a 0-byte request is not an allocation failure.
+	if ( size != 0 )
+	{
+		g_AllocError( size );
+	}
 #endif
 	return nullptr;
 }
@@ -786,7 +790,12 @@ PLATFORM_INTERFACE MUST_CHECK_RETURN void *Plat_Realloc( void *ptr, unsigned lon
 	}
 
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
-	g_AllocError( size );
+	// dimhotepus: realloc( ptr, 0 ) frees ptr and may return nullptr; that is
+	// not an allocation failure.
+	if ( size != 0 )
+	{
+		g_AllocError( size );
+	}
 #endif
 	return nullptr;
 }
