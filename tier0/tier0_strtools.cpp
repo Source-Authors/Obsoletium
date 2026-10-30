@@ -15,6 +15,8 @@ extern "C"
 
 	auto const *pS1 = ( uint8 const * ) s1;
 	auto const *pS2 = ( uint8 const * ) s2;
+	
+	// dimhotepus: 2x loop unrolling optimization for hot path performance
 	for(;;)
 	{
 		{
