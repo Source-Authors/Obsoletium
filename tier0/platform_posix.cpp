@@ -7,18 +7,32 @@
 #include "tier0/valve_off.h"
 
 #include <sys/resource.h>
+#include <sys/stat.h>
 #include <sys/time.h>
+#include <sys/types.h>
+#include <sys/utsname.h>  // uname for Is64BitOS.
+#include <fcntl.h>        // was LINUX-only, open() is used on OSX too.
 #include <unistd.h>
 
 #include <algorithm>
+#include <atomic>
+#include <cerrno>
+#include <climits>
+#include <csignal>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <mutex>
+#include <string>
 #include <vector>
 
 #ifdef OSX
+#include <crt_externs.h>  // _NSGetArgc, _NSGetArgv for Plat_GetCommandLine.
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 #include <mach-o/dyld.h> // _NSGetExecutablePath
-#include <stdbool.h>
-#include <sys/types.h>
 #include <sys/sysctl.h>
 #endif
 
