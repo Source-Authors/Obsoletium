@@ -600,45 +600,28 @@ PLATFORM_INTERFACE void Plat_SetAllocErrorFn( Plat_AllocErrorFn fn )
 #if defined( OSX )
 
 // From the Apple tech note: https://developer.apple.com/library/archive/qa/qa1361/_index.html
-bool Plat_IsInDebugSession()
+MUST_CHECK_RETURN bool Plat_IsInDebugSession()
 {
-	int                 junk;
-	int                 mib[4];
-	struct kinfo_proc   info;
-	size_t              size;
-	static int s_IsInDebugSession = -1;
+	// dimhotepus: Check every call instead of caching the first answer
+	// forever, so a debugger attached later is detected (as IsDebuggerPresent
+	// on Windows).  The old cache was also an unsynchronized static.
+	struct kinfo_proc info = {};
+	int mib[4]{ CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid() };
+	size_t size{ sizeof( info ) };
 
-	if ( s_IsInDebugSession == -1 )
+	// dimhotepus: Check the sysctl result instead of ignoring it.
+	if ( sysctl( mib, std::size( mib ), &info, &size, nullptr, 0 ) != 0 )
 	{
-		// Initialize the flags so that, if sysctl fails for some bizarre 
-		// reason, we get a predictable result.
-
-		info.kp_proc.p_flag = 0;
-
-		// Initialize mib, which tells sysctl the info we want, in this case
-		// we're looking for information about a specific process ID.
-
-		mib[0] = CTL_KERN;
-		mib[1] = KERN_PROC;
-		mib[2] = KERN_PROC_PID;
-		mib[3] = getpid();
-
-		// Call sysctl.
-
-		size = sizeof(info);
-		junk = sysctl(mib, sizeof(mib) / sizeof(*mib), &info, &size, NULL, 0);
-
-		// We're being debugged if the P_TRACED flag is set.
-
-		s_IsInDebugSession = ( (info.kp_proc.p_flag & P_TRACED) != 0 );
+		return false;
 	}
 
-	return !!s_IsInDebugSession;
+		// We're being debugged if the P_TRACED flag is set.
+	return ( info.kp_proc.p_flag & P_TRACED ) != 0;
 }
 
 #elif defined( LINUX )
 
-bool Plat_IsInDebugSession()
+MUST_CHECK_RETURN bool Plat_IsInDebugSession()
 {
 	// For linux: https://stackoverflow.com/questions/3596781/how-to-detect-if-the-current-process-is-being-run-by-gdb
 	// Don't use "if (ptrace(PTRACE_TRACEME, 0, NULL, 0) == -1)" as it means debuggers can't attach.
@@ -647,27 +630,52 @@ bool Plat_IsInDebugSession()
 	// Good solution from Pierre-Loup: Check TracerPid in /proc/self/status.
 	// from "man proc"
 	//     TracerPid: PID of process tracing this process (0 if not being traced).
-	int tracerpid = -1;
+	//
+	// dimhotepus: Only async-signal-safe calls (open / read / close), since the
+	// watchdog SIGALRM handler calls this via DebuggerBreakIfDebugging.
+	// errno is preserved for the same reason.
+	const int savedErrno{ errno };
 
-	int fd = open( "/proc/self/status", O_RDONLY, S_IRUSR );
-	if( fd >= 0 )
+	// dimhotepus: O_CLOEXEC, and dropped the meaningless S_IRUSR mode.
+	const int fd{ open( "/proc/self/status", O_RDONLY | O_CLOEXEC ) };
+	if ( fd < 0 )
 	{
-		char buf[ 1024 ];
-		static const char s_TracerPid[] = "TracerPid:";
-
-		int len = read( fd, buf, sizeof( buf ) - 1 );
-		if ( len > 0 )
-		{
-			buf[ len ] = 0;
-
-			const char *str = strstr( buf, s_TracerPid );
-			tracerpid = str ? atoi( str + sizeof( s_TracerPid ) ) : -1;
-		}
-
-		close( fd );
+		errno = savedErrno;
+		return false;
 	}
 
-	return ( tracerpid > 0 );
+	// dimhotepus: Read until EOF / full, retrying on EINTR.  A single read()
+	// may return a partial buffer.
+	char buf[4096];
+	size_t used{ 0 };
+	while ( used < sizeof( buf ) - 1 )
+	{
+		const ssize_t got{ read( fd, buf + used, sizeof( buf ) - 1 - used ) };
+		if ( got > 0 )
+		{
+			used += static_cast<size_t>( got );
+		}
+		else if ( got < 0 && errno == EINTR )
+		{
+			continue;
+		}
+		else
+		{
+			break;
+		}
+		}
+	close( fd );
+	buf[used] = '\0';
+
+	// dimhotepus: Parse right after the "TracerPid:" key.  The old code
+	// skipped sizeof( key ) bytes, one past the colon, and relied on the
+	// separator being exactly one character; strtol skips any whitespace.
+	static const char s_TracerPid[] = "TracerPid:";
+	const char *str{ std::strstr( buf, s_TracerPid ) };
+	const long tracerpid{ str ? std::strtol( str + sizeof( s_TracerPid ) - 1, nullptr, 10 ) : 0 };
+
+	errno = savedErrno;
+	return tracerpid > 0;
 }
 
 
