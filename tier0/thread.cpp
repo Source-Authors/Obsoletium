@@ -37,8 +37,11 @@ struct X86_64HardwareBreakpointState_t
 };
 X86_64HardwareBreakpointState_t s_BreakpointState = { {0,0,0,0}, {0,0,0,0}, {false,false,false,false} };
 
+// dimhotepus: Fix race condition - protect global state read with mutex lock.
 void X86_64ApplyBreakpointsToThread( DWORD dwThreadId )
 {
+	// dimhotepus: Acquire lock to prevent data corruption when reading breakpoint state.
+	AUTO_LOCK(s_BreakpointStateMutex);
 	X86_64HardwareBreakpointState_t *pState = &s_BreakpointState;
 
 	CONTEXT ctx = {};
