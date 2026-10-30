@@ -746,12 +746,18 @@ void Plat_DefaultAllocErrorFn( [[maybe_unused]] unsigned long size )
 Plat_AllocErrorFn g_AllocError = Plat_DefaultAllocErrorFn;
 #endif
 
+// dimhotepus: Under STEAM, valve_on.h (re-enabled at the end of platform.h)
+// #defines malloc / realloc / free as function-like macros that expand to
+// HEY_DONT_USE_* errors.  Parenthesizing the name, "(malloc)( size )",
+// suppresses function-like macro expansion and calls the real CRT function.
+
 PLATFORM_INTERFACE MUST_CHECK_RETURN void *Plat_Alloc( unsigned long size )
 {
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 	void *pRet = g_pMemAlloc->Alloc( size );
 #else
-	void *pRet = malloc( size );
+	// dimhotepus: (malloc) bypasses valve_on.h's malloc() macro under STEAM.
+	void *pRet = (malloc)( size );
 #endif
 
 	if ( pRet )
@@ -770,7 +776,8 @@ PLATFORM_INTERFACE MUST_CHECK_RETURN void *Plat_Realloc( void *ptr, unsigned lon
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 	void *pRet = g_pMemAlloc->Realloc( ptr, size );
 #else
-	void *pRet = realloc( ptr, size );
+	// dimhotepus: (realloc) bypasses valve_on.h's realloc() macro under STEAM.
+	void *pRet = (realloc)( ptr, size );
 #endif
 
 	if ( pRet )
@@ -789,7 +796,8 @@ PLATFORM_INTERFACE void Plat_Free( void *ptr )
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 	g_pMemAlloc->Free( ptr );
 #else
-	free( ptr );
+	// dimhotepus: (free) bypasses valve_on.h's free() macro under STEAM.
+	(free)( ptr );
 #endif
 }
 
