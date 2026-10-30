@@ -1205,10 +1205,27 @@ static inline bool SortLessFunc( CLinuxMallocContext * const &left, CLinuxMalloc
 	return left->m_nCurrentAllocSize > right->m_nCurrentAllocSize;
 }
 
+// dimhotepus: Shared printing for DumpMemoryLog / DumpChangedMemory.
+static void PrintContextStack( CLinuxMallocContext *p )
+{
+	char **strings = backtrace_symbols( p->pStackTraceBack, MAX_STACK_TRACEBACK );
+	RunCodeAtScopeExit( (free)( strings ) );
+
+	Msg( "  stack\n" );
+	for ( int n = 0; n < MAX_STACK_TRACEBACK; n++ )
+	{
+		if ( p->pStackTraceBack[n] )
+		{
+			Msg( "  %p %s\n", p->pStackTraceBack[n], strings ? strings[n] : "?" );
+		}
+	}
+}
+
 void DumpMemoryLog( int nThresh )
 {
 	AUTO_LOCK( s_MemoryMutex );
-	EndWatchdogTimer();
+	// dimhotepus: EndWatchdogTimer -> Plat_EndWatchdogTimer.
+	Plat_EndWatchdogTimer();
 	RemoveHooks();
 	std::vector<CLinuxMallocContext *> memList;
 	
@@ -1227,13 +1244,10 @@ void DumpMemoryLog( int nThresh )
 	
 	for( auto *p : memList )
 	{
-		char **strings = backtrace_symbols( p->pStackTraceBack, MAX_STACK_TRACEBACK );
-		Msg( "Context cursize=%d nallocs=%d maxsize=%d total_allocs=%d\n", p->m_nCurrentAllocSize, p->m_nNumAllocsInUse, p->m_nMaximumSize, p->m_TotalNumAllocs );
-		Msg("  stack\n" );
-		for( int n = 0 ; n < MAX_STACK_TRACEBACK; n++ )
-			if ( p->pStackTraceBack[n] )
-				Msg("  %p %s\n", p->pStackTraceBack[n], strings[n] );
-		free( strings );
+		Msg( "Context cursize=%lld nallocs=%lld maxsize=%lld total_allocs=%lld\n",
+			static_cast<long long>( p->m_nCurrentAllocSize ), static_cast<long long>( p->m_nNumAllocsInUse ),
+			static_cast<long long>( p->m_nMaximumSize ), static_cast<long long>( p->m_TotalNumAllocs ) );
+		PrintContextStack( p );
 	}
 	Msg("End of memory list\n" );
 	InstallHooks();
@@ -1242,7 +1256,8 @@ void DumpMemoryLog( int nThresh )
 void DumpChangedMemory( int nThresh )
 {
 	AUTO_LOCK( s_MemoryMutex );
-	EndWatchdogTimer();
+	// dimhotepus: EndWatchdogTimer -> Plat_EndWatchdogTimer.
+	Plat_EndWatchdogTimer();
 	RemoveHooks();
 	std::vector<CLinuxMallocContext *> memList;
 	
@@ -1260,13 +1275,11 @@ void DumpChangedMemory( int nThresh )
 	std::sort( memList.begin(), memList.end(), SortLessFunc );
 	for( auto *p : memList )
 	{
-		char **strings = backtrace_symbols( p->pStackTraceBack, MAX_STACK_TRACEBACK );
-		Msg( "Context cursize=%d lastsize=%d nallocs=%d maxsize=%d total_allocs=%d\n", p->m_nCurrentAllocSize, p->m_nLastAllocSize, p->m_nNumAllocsInUse, p->m_nMaximumSize, p->m_TotalNumAllocs );
-		Msg("  stack\n" );
-		for( int n = 0 ; n < MAX_STACK_TRACEBACK; n++ )
-			if ( p->pStackTraceBack[n] )
-				Msg("  %p %s\n", p->pStackTraceBack[n], strings[n] );
-		free( strings );
+		Msg( "Context cursize=%lld lastsize=%lld nallocs=%lld maxsize=%lld total_allocs=%lld\n",
+			static_cast<long long>( p->m_nCurrentAllocSize ), static_cast<long long>( p->m_nLastAllocSize ),
+			static_cast<long long>( p->m_nNumAllocsInUse ), static_cast<long long>( p->m_nMaximumSize ),
+			static_cast<long long>( p->m_TotalNumAllocs ) );
+		PrintContextStack( p );
 	}
 	Msg("End of memory list\n" );
 	InstallHooks();
