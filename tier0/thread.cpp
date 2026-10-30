@@ -158,44 +158,48 @@ void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool
 	Assert( pAddress );
 	Assert( nWatchBytes == 0 || nWatchBytes == 1 || nWatchBytes == 2 || nWatchBytes == 4 || nWatchBytes == 8 );
 
-	AUTO_LOCK(s_BreakpointStateMutex);
+	X86_64HardwareBreakpointState_t stateCopy;
 
-	if ( nWatchBytes == 0 )
+	// dimhotepus: Lock scope - modify state and create thread-safe copy
 	{
-			// dimhotepus: Removal - find and remove breakpoint at this address
-		for ( int i = 0; i < 4; ++i )
+		AUTO_LOCK(s_BreakpointStateMutex);
+
+		if ( nWatchBytes == 0 )
 		{
-			if ( pAddress == s_BreakpointState.pAddress[i] )
+			// dimhotepus: Removal - find and remove breakpoint at this address
+			for ( int i = 0; i < 4; ++i )
 			{
+				if ( pAddress == s_BreakpointState.pAddress[i] )
+				{
 					// Shift remaining entries down
 					for ( int j = i; j < 3; ++j )
-				{
+					{
 						s_BreakpointState.pAddress[j] = s_BreakpointState.pAddress[j+1];
 						s_BreakpointState.nWatchBytes[j] = s_BreakpointState.nWatchBytes[j+1];
 						s_BreakpointState.bBreakOnRead[j] = s_BreakpointState.bBreakOnRead[j+1];
+					}
+					s_BreakpointState.pAddress[3] = nullptr;
+					s_BreakpointState.nWatchBytes[3] = 0;
+					s_BreakpointState.bBreakOnRead[3] = false;
+					break;
 				}
-				s_BreakpointState.pAddress[3] = nullptr;
-				s_BreakpointState.nWatchBytes[3] = 0;
-				s_BreakpointState.bBreakOnRead[3] = false;
-				break;
 			}
 		}
-	}
-	else
-	{
+		else
+		{
 			// dimhotepus: Insertion - clearer slot-finding logic to prevent misuse
 			int iSlot = -1;
 
 			// Look for existing entry at this address or first empty slot
-		for ( int i = 0; i < 4; ++i )
-		{
+			for ( int i = 0; i < 4; ++i )
+			{
 				if ( !s_BreakpointState.pAddress[i] || s_BreakpointState.pAddress[i] == pAddress )
 				{
 					iSlot = i;
 					break;
 				}
 			}
-		
+
 			// If no empty slot and address is different, evict oldest (slot 0)
 			if ( iSlot == -1 )
 			{
@@ -213,9 +217,13 @@ void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool
 			s_BreakpointState.pAddress[iSlot] = pAddress;
 			s_BreakpointState.nWatchBytes[iSlot] = static_cast<char>(nWatchBytes);
 			s_BreakpointState.bBreakOnRead[iSlot] = bBreakOnRead;
-	}
-	
+		}
 
+		// dimhotepus: Create thread-safe copy under lock to prevent race with worker thread reading global state
+		stateCopy = s_BreakpointState;
+	} // Lock released here
+
+	// Spawn worker thread with copied state (not global state)
 	HANDLE hWorkThread = (HANDLE)_beginthreadex( nullptr, 0,
 		&ThreadProcX86_64SetDataBreakpoints, nullptr, 0, nullptr );
 	if ( hWorkThread )
