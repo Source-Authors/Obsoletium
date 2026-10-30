@@ -29,12 +29,35 @@ static double g_PerformanceCounterToS;
 static double g_PerformanceCounterToMS;
 static double g_PerformanceCounterToUS;
 static LARGE_INTEGER g_ClockStart;
-static bool s_bTimeInitted;
+// dimhotepus: bool -> std::atomic_bool.  Read by the Asserts on any thread
+// while InitTime writes it, which was a data race.
+static std::atomic_bool s_bTimeInitted = false;
 
 // Benchmark mode uses this heavy-handed method 
 static std::atomic_bool g_bBenchmarkMode = false;
-static double g_FakeBenchmarkTime = 0;
+// dimhotepus: double accumulator -> atomic tick counter.  Timer functions are
+// called from many threads.
+static std::atomic<uint64> g_FakeBenchmarkTicks = 0;
 constexpr double g_FakeBenchmarkTimeInc = 1.0 / 66.0;
+
+namespace {
+
+// dimhotepus: Advance benchmark time by one tick and return it in seconds.
+[[nodiscard]] double NextFakeBenchmarkTime() noexcept
+{
+	const uint64 ticks{ g_FakeBenchmarkTicks.fetch_add( 1, std::memory_order_relaxed ) + 1 };
+	return static_cast<double>( ticks ) * g_FakeBenchmarkTimeInc;
+}
+
+// dimhotepus: Convert non-negative double to uint32 with wraparound (like
+// GetTickCount).  static_cast<uint32>( double ) is undefined behavior once the
+// value exceeds UINT32_MAX, which Plat_MSTime hits after ~49.7 days.
+[[nodiscard]] constexpr uint32 WrapToUint32( double value ) noexcept
+{
+	return static_cast<uint32>( static_cast<uint64>( value ) );
+}
+
+}  // namespace
 
 void InitTime()
 {
@@ -50,30 +73,32 @@ void InitTime()
 	}
 	else
 	{
-		g_PerformanceCounterToS = 1.0 / frequency;
-		g_PerformanceCounterToMS = 1e3 / frequency;
-		g_PerformanceCounterToUS = 1e6 / frequency;
+		const double frequencyD{ static_cast<double>( frequency ) };
+		g_PerformanceCounterToS = 1.0 / frequencyD;
+		g_PerformanceCounterToMS = 1e3 / frequencyD;
+		g_PerformanceCounterToUS = 1e6 / frequencyD;
 	}
 
 	QueryPerformanceCounter(&g_ClockStart);
 
 	// dimhotepus: Race, set to initted only when time set.
-	s_bTimeInitted = true;
+	// dimhotepus: Release, so a thread seeing true also sees the values above.
+	s_bTimeInitted.store( true, std::memory_order_release );
 }
 
 MUST_CHECK_RETURN bool Plat_IsInBenchmarkMode()
 {
-	return g_bBenchmarkMode.load(std::memory_order::memory_order_relaxed);
+	return g_bBenchmarkMode.load(std::memory_order_relaxed);
 }
 
 void Plat_SetBenchmarkMode( bool bBenchmark )
 {
-	g_bBenchmarkMode.store(bBenchmark, std::memory_order::memory_order_relaxed);
+	g_bBenchmarkMode.store(bBenchmark, std::memory_order_relaxed);
 }
 
 static long long Plat_CycleTime()
 {
-	Assert( s_bTimeInitted );
+	Assert( s_bTimeInitted.load( std::memory_order_acquire ) );
 
 	LARGE_INTEGER now;
 	QueryPerformanceCounter( &now );
@@ -83,16 +108,16 @@ static long long Plat_CycleTime()
 
 MUST_CHECK_RETURN double Plat_FloatTime()
 {
-	if ( !g_bBenchmarkMode.load(std::memory_order::memory_order_relaxed) )
+	if ( !g_bBenchmarkMode.load(std::memory_order_relaxed) )
 	{
-		Assert( s_bTimeInitted );
+		Assert( s_bTimeInitted.load( std::memory_order_acquire ) );
 
 		double seconds = static_cast<double>( Plat_CycleTime() ) * g_PerformanceCounterToS;
 		return seconds;
 	}
 
-	g_FakeBenchmarkTime += g_FakeBenchmarkTimeInc;
-	return g_FakeBenchmarkTime;
+	// dimhotepus: Thread-safe fake time.
+	return NextFakeBenchmarkTime();
 }
 
 namespace {
@@ -271,30 +296,31 @@ Plat_MessageBoxButton Plat_MessageBox( IN_Z const char* title,
 
 MUST_CHECK_RETURN uint32 Plat_MSTime()
 {
-	if ( !g_bBenchmarkMode.load(std::memory_order::memory_order_relaxed) )
+	if ( !g_bBenchmarkMode.load(std::memory_order_relaxed) )
 	{
-		Assert( s_bTimeInitted );
+		Assert( s_bTimeInitted.load( std::memory_order_acquire ) );
 
 		double ms = static_cast<double>( Plat_CycleTime() ) * g_PerformanceCounterToMS;
-		return static_cast<uint32>( ms );
+		// dimhotepus: Wrap instead of UB after ~49.7 days.
+		return WrapToUint32( ms );
 	}
 
-	g_FakeBenchmarkTime += g_FakeBenchmarkTimeInc;
-	return (uint32)(g_FakeBenchmarkTime * 1000.0);
+	// dimhotepus: Thread-safe fake time, wrap instead of UB.
+	return WrapToUint32( NextFakeBenchmarkTime() * 1000.0 );
 }
 
 MUST_CHECK_RETURN uint64 Plat_USTime()
 {
-	if ( !g_bBenchmarkMode.load(std::memory_order::memory_order_relaxed) )
+	if ( !g_bBenchmarkMode.load(std::memory_order_relaxed) )
 	{
-		Assert ( s_bTimeInitted );
+		Assert( s_bTimeInitted.load( std::memory_order_acquire ) );
 
 		double us = static_cast<double>( Plat_CycleTime() ) * g_PerformanceCounterToUS;
 		return static_cast<uint64>( us );
 	}
 
-	g_FakeBenchmarkTime += g_FakeBenchmarkTimeInc;
-	return (uint64)(g_FakeBenchmarkTime * 1e6);
+	// dimhotepus: Thread-safe fake time.
+	return static_cast<uint64>( NextFakeBenchmarkTime() * 1e6 );
 }
 
 void GetCurrentDate( int *pDay, int *pMonth, int *pYear )
