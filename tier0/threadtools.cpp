@@ -635,50 +635,63 @@ bool CThreadSyncObject::Wait( uint32 dwTimeout )
     bool bRet = false;
     if ( m_cSet > 0 )
     {
-		bRet = true;
-		m_bWakeForEvent = false;
+        bRet = true;
+        m_bWakeForEvent = false;
     }
     else
     {
-		volatile int ret = 0;
+        int ret = 0;
 
-		while ( !m_bWakeForEvent && ret != ETIMEDOUT )
-		{
-			struct timeval tv;
-			gettimeofday( &tv, NULL );
-			volatile struct timespec tm;
-			
-			uint64 actualTimeout = dwTimeout;
-			
-			if ( dwTimeout == TT_INFINITE && m_bManualReset )
-				actualTimeout = 10; // just wait 10 msec at most for manual reset events and loop instead
-				
-			volatile uint64 nNanoSec = (uint64)tv.tv_usec*1000 + (uint64)actualTimeout*1000000;
-			tm.tv_sec = tv.tv_sec + nNanoSec /1000000000;
-			tm.tv_nsec = nNanoSec % 1000000000;
+        // dimhotepus: Compute deadline once. Was recomputed after every spurious wakeup, so timeouts could stretch.
+        timespec deadline;
+        const auto armDeadline = [&]()
+        {
+            timespec now;
+#ifdef LINUX
+            clock_gettime( CLOCK_MONOTONIC, &now );
+#else
+            timeval tv;
+            gettimeofday( &tv, NULL );
+            now.tv_sec = tv.tv_sec;
+            now.tv_nsec = static_cast<long>( tv.tv_usec ) * 1000L;
+#endif
+            const uint64 nNs = (uint64)now.tv_nsec + (uint64)dwTimeout * 1000000ull;
+            deadline.tv_sec = now.tv_sec + static_cast<time_t>( nNs / 1000000000ull );
+            deadline.tv_nsec = static_cast<long>( nNs % 1000000000ull );
+        };
+        armDeadline();
 
-			do
-			{   
-				ret = pthread_cond_timedwait( &m_Condition, &m_Mutex, (const timespec *)&tm );
-			} 
-			while( ret == EINTR );
+        while ( !m_bWakeForEvent && ret != ETIMEDOUT )
+        {
+            do
+            {
+                ret = pthread_cond_timedwait( &m_Condition, &m_Mutex, &deadline );
+            }
+            while( ret == EINTR );
 
-			bRet = ( ret == 0 );
-			
-			if ( m_bManualReset )
-			{
-				if ( m_cSet )
-					break;
-				if ( dwTimeout == TT_INFINITE && ret == ETIMEDOUT )
-					ret = 0; // force the loop to spin back around
-			}
-		}
-		
-		if ( bRet )
-			m_bWakeForEvent = false;
+            bRet = ( ret == 0 );
+
+            if ( m_bManualReset )
+            {
+                if ( m_cSet )
+                {
+                    bRet = true;
+                    break;
+                }
+                // dimhotepus: No 10 ms polling anymore (Set broadcasts). "Infinite" is ~49 days, re-arm when it ends.
+                if ( dwTimeout == TT_INFINITE && ret == ETIMEDOUT )
+                {
+                    ret = 0; // force the loop to spin back around
+                    armDeadline();
+                }
+            }
+        }
+
+        if ( bRet )
+            m_bWakeForEvent = false;
     }
     if ( !m_bManualReset && bRet )
-		m_cSet = 0;
+        m_cSet = 0;
     pthread_mutex_unlock( &m_Mutex );
     return bRet;
 #endif
@@ -742,7 +755,8 @@ bool CThreadEvent::Set()
     pthread_mutex_lock( &m_Mutex );
     m_cSet = 1;
 	m_bWakeForEvent = true;
-    int ret = pthread_cond_signal( &m_Condition );
+    // dimhotepus: Manual reset event releases ALL waiters. Signal woke one, others relied on 10 ms polling.
+    int ret = m_bManualReset ? pthread_cond_broadcast( &m_Condition ) : pthread_cond_signal( &m_Condition );
     pthread_mutex_unlock( &m_Mutex );
     return ret == 0;
 #endif
