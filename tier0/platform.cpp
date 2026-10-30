@@ -137,7 +137,8 @@ template<typename TEnum>
 template <std::size_t size>
 wchar_t* Utf8ToWide( IN_Z const char* utf8, OUT_Z_ARRAY wchar_t ( &buffer )[size] ) noexcept
 {
-	static_assert( size > 1 && size <= INT_MAX );
+	// dimhotepus: The failure path copies L"N/A" (4).
+	static_assert( size >= 4 && size <= INT_MAX );
  
 	buffer[0] = L'\0';
 	if ( !utf8 || !*utf8 )
