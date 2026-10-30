@@ -431,13 +431,13 @@ template <typename R, typename T>
 		& ~static_cast<uintp>( 15 ) )
 
 #if defined( _WIN32 )
-		#define mallocsize( _p )		( _msize( _p ) )
+	#define mallocsize( _p )		( _msize( _p ) )
 #elif defined( __APPLE__ )
-		#define mallocsize( _p )		( malloc_size( _p ) )
+	#define mallocsize( _p )		( malloc_size( _p ) )
 #elif defined( __linux__ ) || defined( __FreeBSD__ )
-		#define mallocsize( _p )		( malloc_usable_size( _p ) )
+	#define mallocsize( _p )		( malloc_usable_size( _p ) )
 #else
-#error "Please define mallocsize for your platform"
+	#error "Please define mallocsize for your platform"
 #endif
 
 // dimhotepus: Add type-safe interface.
