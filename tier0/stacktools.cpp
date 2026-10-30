@@ -1192,10 +1192,10 @@ intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestB
 	}
 
 	intp iDecodedSize = 0;
-	iDecodedSize |= (pDecodeRead[0] & 0x7F) << 21;
-	iDecodedSize |= (pDecodeRead[1] & 0x7F) << 14;
-	iDecodedSize |= (pDecodeRead[2] & 0x7F) << 7;
-	iDecodedSize |= (pDecodeRead[3] & 0x7F) << 0;
+	iDecodedSize |= static_cast<intp>(pDecodeRead[0] & 0x7F) << 21;
+	iDecodedSize |= static_cast<intp>(pDecodeRead[1] & 0x7F) << 14;
+	iDecodedSize |= static_cast<intp>(pDecodeRead[2] & 0x7F) << 7;
+	iDecodedSize |= static_cast<intp>(pDecodeRead[3] & 0x7F) << 0;
 	pDecodeRead += 4;
 
 	intp iTextLength = iDecodedSize;
