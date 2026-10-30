@@ -851,77 +851,131 @@ PLATFORM_INTERFACE void Plat_ExitProcess( int nCode )
 }
 
 
-static int s_nWatchDogTimerTimeScale = 0;
-static bool s_bInittedWD = false;
-static int s_WatchdogTime = 0;
-static Plat_WatchDogHandlerFunction_t s_pWatchDogHandlerFunction;
+namespace {
 
-static void InitWatchDogTimer( )
+// dimhotepus: Watchdog state shared with the SIGALRM handler is atomic.
+// Signal handlers may only touch lock-free atomics.
+std::atomic<int> s_WatchdogTime{ 0 };
+std::atomic<Plat_WatchDogHandlerFunction_t> s_pWatchDogHandlerFunction{ nullptr };
+static_assert( std::atomic<Plat_WatchDogHandlerFunction_t>::is_always_lock_free );
+static_assert( std::atomic<int>::is_always_lock_free );
+
+// dimhotepus: The previous SIGALRM action, restored by Plat_EndWatchdogTimer
+// instead of forcing SIG_DFL (which clobbered handlers installed by others).
+std::mutex s_WatchdogMutex;
+struct sigaction s_PreviousAlarmAction;
+bool s_bAlarmHandlerInstalled{ false };
+
+// dimhotepus: Two plain statics -> one thread-safe function-local static.
+// Uses Plat_GetCommandLineA() instead of reading g_CmdLine directly, which was
+// still empty on Linux unless loaded earlier, so -nowatchdog was ignored.
+[[nodiscard]] int WatchDogTimerTimeScale()
 {
-	if( !strstr( g_CmdLine, "-nowatchdog" ) )
+	static const int scale = []()
+{
+		if ( std::strstr( Plat_GetCommandLineA(), "-nowatchdog" ) )
 	{
+			return 0;
+		}
 #ifndef NDEBUG
-		s_nWatchDogTimerTimeScale = 10;						// debug is slow
+		return 10;						// debug is slow
 #else
-		s_nWatchDogTimerTimeScale = 1;
+		return 1;
 #endif
-
-	}
-
+	}();
+	return scale;
 }
 
 // SIGALRM handler. Used by Watchdog timer code.
-static void WatchDogHandler( int s )
+void WatchDogHandler( int )
 {
-	Plat_DebugString( "WatchDog! Server took too long to process (probably infinite loop).\n" );
+	const int savedErrno{ errno };
+
+	// dimhotepus: write() instead of Plat_DebugString( fprintf ): stdio isn't
+	// async-signal-safe and can deadlock if the alarm interrupts a stdio call.
+	static const char message[] = "WatchDog! Server took too long to process (probably infinite loop).\n";
+	[[maybe_unused]] const ssize_t written{ write( STDERR_FILENO, message, sizeof( message ) - 1 ) };
 
 	DebuggerBreakIfDebugging();
 
-	if ( s_pWatchDogHandlerFunction )
+	if ( const auto handler = s_pWatchDogHandlerFunction.load() )
 	{
-		s_pWatchDogHandlerFunction();
+		handler();
 	}
 	else
 	{
 		// force a crash
 		abort();
 	}
+
+	errno = savedErrno;
 }
+
+}  // namespace
 
 // watchdog timer support
 PLATFORM_INTERFACE void Plat_BeginWatchdogTimer( int nSecs )
 {
-	if ( !s_bInittedWD )
+	// dimhotepus: Ignore non-positive times.  A negative value passed through
+	// MIN and became a huge unsigned alarm().
+	if ( nSecs <= 0 )
 	{
-		s_bInittedWD = true;
-		InitWatchDogTimer();
+		return;
 	}
 
-	nSecs *= s_nWatchDogTimerTimeScale;
-	nSecs = MIN( nSecs, 5 * 60 );							// no more than 5 minutes no matter what
-	if ( nSecs )
+	const int scale{ WatchDogTimerTimeScale() };
+	if ( scale == 0 )
 	{
-		s_WatchdogTime = nSecs;
-		signal( SIGALRM, WatchDogHandler );
-		alarm( nSecs );
+		return;
 	}
+
+	// dimhotepus: Multiply in 64 bits so huge nSecs can't overflow int.
+	// no more than 5 minutes no matter what
+	const int secs{ static_cast<int>( std::min<long long>(
+		static_cast<long long>( nSecs ) * scale, 5 * 60 ) ) };
+
+	std::scoped_lock lock( s_WatchdogMutex );
+	// dimhotepus: signal() -> sigaction(), installed once, previous action saved.
+	if ( !s_bAlarmHandlerInstalled )
+	{
+		struct sigaction action = {};
+		action.sa_handler = WatchDogHandler;
+		sigemptyset( &action.sa_mask );
+		action.sa_flags = SA_RESTART;
+		if ( sigaction( SIGALRM, &action, &s_PreviousAlarmAction ) != 0 )
+	{
+			Warning( "Unable to install watchdog SIGALRM handler: %s.\n", std::strerror( errno ) );
+			return;
+		}
+		s_bAlarmHandlerInstalled = true;
+	}
+
+	s_WatchdogTime.store( secs );
+	alarm( static_cast<unsigned>( secs ) );
 }
 
 PLATFORM_INTERFACE void Plat_EndWatchdogTimer( void )
 {
+	std::scoped_lock lock( s_WatchdogMutex );
+	// dimhotepus: Only touch SIGALRM if the watchdog owns it, and restore the
+	// previous action instead of SIG_DFL.
+	if ( s_bAlarmHandlerInstalled )
+	{
 	alarm( 0 );
-	signal( SIGALRM, SIG_DFL );
-	s_WatchdogTime = 0;
+		sigaction( SIGALRM, &s_PreviousAlarmAction, nullptr );
+		s_bAlarmHandlerInstalled = false;
+	}
+	s_WatchdogTime.store( 0 );
 }
 
-PLATFORM_INTERFACE int Plat_GetWatchdogTime( void )
+PLATFORM_INTERFACE MUST_CHECK_RETURN int Plat_GetWatchdogTime( void )
 {
-	return s_WatchdogTime;
+	return s_WatchdogTime.load();
 }
 
 PLATFORM_INTERFACE void Plat_SetWatchdogHandlerFunction( Plat_WatchDogHandlerFunction_t function )
 {
-	s_pWatchDogHandlerFunction = function;
+	s_pWatchDogHandlerFunction.store( function );
 }
 
 #ifndef NO_HOOK_MALLOC
