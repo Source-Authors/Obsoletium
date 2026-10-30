@@ -5,9 +5,10 @@
 #include "tier0/platform.h"
 
 #include <atomic>
-#include <system_error>
+#include <cstdint>
+#include <cstdlib>  // std::_Exit
 #include <ctime>
-#include <cerrno>
+#include <system_error>
 
 #include "winlite.h"
 #include <dwmapi.h>
@@ -396,7 +397,12 @@ void Plat_ExitProcess( int nCode )
 	// {
 	// 	int *x = nullptr; *x = 1; // cause a hard crash, GC is not allowed to exit voluntarily from gc.dll //-V522
 	// }
-	TerminateProcess( GetCurrentProcess(), nCode );
+	::TerminateProcess( ::GetCurrentProcess(), static_cast<UINT>( nCode ) );
+
+	// dimhotepus: Plat_ExitProcess is [[noreturn]], so returning when
+	// TerminateProcess fails is undefined behavior.  Fall back to _Exit, which
+	// at least skips our module's destructors and atexit handlers.
+	std::_Exit( nCode );
 }
 
 void Plat_ExitProcessWithError( int nCode, bool bGenerateMinidump )
