@@ -115,17 +115,22 @@ static void *ThreadProcConvert( void *pParam )
 
 ThreadHandle_t CreateSimpleThread( ThreadFunc_t pfnThread, void *pParam, ThreadId_t *pID, unsigned stackSize )
 {
+	// dimhotepus: Allocate once so we can free it if thread creation fails (was leaked).
+	auto *info = new ThreadProcInfo_t( pfnThread, pParam );
 #ifdef _WIN32
 	ThreadId_t idIgnored;
 	if ( !pID )
 		pID = &idIgnored;
-	HANDLE h = VCRHook_CreateThread(nullptr, stackSize, reinterpret_cast<void*>(ThreadProcConvert), new ThreadProcInfo_t( pfnThread, pParam ), CREATE_SUSPENDED, pID);
-	if ( h != INVALID_HANDLE_VALUE )
+	HANDLE h = VCRHook_CreateThread(nullptr, stackSize, reinterpret_cast<void*>(ThreadProcConvert), info, CREATE_SUSPENDED, pID);
+	// dimhotepus: VCRHook_CreateThread returns nullptr on failure.
+	if ( h != nullptr )
 	{
 		Plat_ApplyHardwareDataBreakpointsToNewThread( *pID );
 		ResumeThread( h );
+		return (ThreadHandle_t)h;
 	}
-	return (ThreadHandle_t)h;
+	delete info;
+	return nullptr;
 #elif defined(POSIX)
 	pthread_t tid;
 
@@ -137,11 +142,13 @@ ThreadHandle_t CreateSimpleThread( ThreadFunc_t pfnThread, void *pParam, ThreadI
 	//   rc = pthread_attr_destroy(&attr);
 	//   ... pthread_join will now fail
 
-	int ret = pthread_create( &tid, NULL, ThreadProcConvert, new ThreadProcInfo_t( pfnThread, pParam ) );
+	int ret = pthread_create( &tid, NULL, ThreadProcConvert, info );
 	if ( ret )
 	{
+		delete info;
 		// There are only PTHREAD_THREADS_MAX number of threads, and we're probably leaking handles if ret == EAGAIN here?
 		Error( "CreateSimpleThread: pthread_create failed. Someone not calling pthread_detach() or pthread_join. Ret:%d\n", ret );
+		return nullptr;
 	}
 	if ( pID )
 		*pID = (ThreadId_t)tid;
