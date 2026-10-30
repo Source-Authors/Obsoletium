@@ -260,7 +260,7 @@ using uint = unsigned int;
 // portability / compiler settings
 #if defined(_WIN32) && !defined(WINDED)
 
-#if defined(_M_IX86)
+#if defined(_M_IX86) && !defined(__i386__)
 #define __i386__	1
 #endif
 
