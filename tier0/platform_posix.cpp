@@ -67,13 +67,6 @@
 
 #include "tier0/memdbgon.h"
 
-// Benchmark mode uses this heavy-handed method 
-
-// *** WARNING ***. On Linux gettimeofday returns the system's best guess at
-// actual wall clock time and this can go backwards. You need to use
-// clock_gettime( CLOCK_MONOTONIC ... ) if this isn't what you want.
-
-
 extern VCRMode_t g_VCRMode;
 
 // dimhotepus: bool -> std::atomic_bool, as on Windows.  Read / written from
