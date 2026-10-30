@@ -48,16 +48,34 @@
 #else
 #include <cstdlib>
 #endif
+#include <climits>     // PATH_MAX
+#include <csignal>     // raise, SIGTRAP
+// dimhotepus: Headers declaring the targets of the POSIX CRT shims below and of
+// wchartypes.h's _tcs* shims (_tcsicmp -> strcasecmp, _stprintf -> sprintf,
+// _wcsicmp -> wcscasecmp, GetProcAddress -> dlsym, ...), so the shims work
+// without every caller knowing which POSIX header to pull in.
+#include <cstdio>      // snprintf, vsnprintf, tempnam
+#include <cwchar>      // wcscasecmp, wcstol, wcstoll, swprintf
+#include <dlfcn.h>     // dlsym
+#include <strings.h>   // strcasecmp, strncasecmp
+#include <sys/stat.h>  // mkdir
+#include <sys/types.h>
 #include <unistd.h>
-#include <signal.h>
-#include <ctime>
 #endif
 
 #include <malloc.h>
 #include <new>
 
-#include <cstring>  // std::memset
-#include <cstddef>  // std::size
+#include <algorithm>    // std::nth_element
+#include <chrono>       // std::chrono::steady_clock
+#include <cmath>        // std::isfinite
+#include <cstddef>      // offsetof, std::size_t
+#include <cstring>      // std::memset, std::memcpy
+#include <ctime>        // time_t, struct tm
+#include <iterator>     // std::size, std::begin, std::end
+#include <new>          // placement new
+#include <type_traits>
+#include <utility>      // std::forward, std::move
 
 // dimhotepus: __GCC__ doesn't exist, so x86intrin.h was never included.
 #if defined(_WIN32)
