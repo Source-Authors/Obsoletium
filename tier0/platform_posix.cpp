@@ -140,7 +140,6 @@ From https://man7.org/linux/man-pages/man5/proc.5.html:
                   dt         (7) dirty pages (unused in Linux 2.6)
 */
 
-	// This returns the resident memory size (RES column in 'top') in bytes.
 	size_t nRet = 0;
 
 	constexpr char kStatsFilePath[] = "/proc/self/statm";
@@ -153,7 +152,9 @@ From https://man7.org/linux/man-pages/man5/proc.5.html:
 				&nSize, &nResident, &nShare, &nText, &nLib_Unused, &nDataPlusStack, &nDt_Unused );
 			 !rc2 && read >= 2 )
 		{
-			nRet = 4096 * nResident;
+			// dimhotepus: 4096 -> real page size.  Pages are 16 / 64 KiB on
+			// some ARM64 kernels.
+			nRet = static_cast<size_t>( sysconf( _SC_PAGESIZE ) ) * nResident;
 		}
 		else
 		{
