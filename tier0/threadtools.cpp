@@ -195,7 +195,19 @@ void ThreadSleep(unsigned nMilliseconds)
 #ifdef _WIN32
 	Sleep(nMilliseconds);
 #else
-	usleep(nMilliseconds * 1000);
+	// dimhotepus: usleep(ms * 1000) overflowed unsigned after ~71 min, and usleep(0) does not yield. Use nanosleep / sched_yield.
+	if ( nMilliseconds == 0 )
+	{
+		sched_yield();
+		return;
+	}
+	timespec ts;
+	ts.tv_sec = static_cast<time_t>( nMilliseconds / 1000 );
+	ts.tv_nsec = static_cast<long>( nMilliseconds % 1000 ) * 1000000L;
+	while ( nanosleep( &ts, &ts ) == -1 && errno == EINTR )
+	{
+		// do nothing.
+	}
 #endif
 }
 
