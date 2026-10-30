@@ -1119,7 +1119,8 @@ long ThreadInterlockedDecrement( long volatile *pDest )
 
 long ThreadInterlockedExchange( long volatile *pDest, long value )
 {
-	return __sync_lock_test_and_set( pDest, value );
+	// dimhotepus: __sync_lock_test_and_set is acquire-only barrier. Windows Interlocked* are full barriers.
+	return __atomic_exchange_n( pDest, value, __ATOMIC_SEQ_CST );
 }
 
 long ThreadInterlockedExchangeAdd( long volatile *pDest, long value )
@@ -1139,7 +1140,8 @@ bool ThreadInterlockedAssignIf( long volatile *pDest, long value, long comperand
 
 void *ThreadInterlockedExchangePointer( void * volatile *pDest, void *value )
 {
-	return __sync_lock_test_and_set( pDest, value );
+	// dimhotepus: __sync_lock_test_and_set is acquire-only barrier. Windows Interlocked* are full barriers.
+	return __atomic_exchange_n( pDest, value, __ATOMIC_SEQ_CST );
 }
 
 void *ThreadInterlockedCompareExchangePointer( void *volatile *pDest, void *value, void *comperand )
