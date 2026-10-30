@@ -359,6 +359,16 @@ inline __int64 ThreadInterlockedCompareExchange( __int64 volatile *p, __int64 va
 inline bool ThreadInterlockedAssignIf( __int64 volatile *p, __int64 value, __int64 comperand )            { return ThreadInterlockedAssignIf64(p, value, comperand); }
 #endif
 
+#if defined(__GNUC__)
+// dimhotepus: reinterpret_cast<long*> is 8 bytes on LP64 (Linux/macOS): corrupted neighbours and broke CAS. Operate on the real 32-bit width.
+inline unsigned ThreadInterlockedExchangeSubtract( unsigned volatile *p, unsigned value )	{ return __atomic_fetch_sub( p, value, __ATOMIC_SEQ_CST ); }
+inline unsigned ThreadInterlockedIncrement( unsigned volatile *p )	{ return __atomic_add_fetch( p, 1u, __ATOMIC_SEQ_CST ); }
+inline unsigned ThreadInterlockedDecrement( unsigned volatile *p )	{ return __atomic_sub_fetch( p, 1u, __ATOMIC_SEQ_CST ); }
+inline unsigned ThreadInterlockedExchange( unsigned volatile *p, unsigned value )	{ return __atomic_exchange_n( p, value, __ATOMIC_SEQ_CST ); }
+inline unsigned ThreadInterlockedExchangeAdd( unsigned volatile *p, unsigned value )	{ return __atomic_fetch_add( p, value, __ATOMIC_SEQ_CST ); }
+inline unsigned ThreadInterlockedCompareExchange( unsigned volatile *p, unsigned value, unsigned comperand )	{ __atomic_compare_exchange_n( p, &comperand, value, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST ); return comperand; }
+inline bool ThreadInterlockedAssignIf( unsigned volatile *p, unsigned value, unsigned comperand )	{ return __atomic_compare_exchange_n( p, &comperand, value, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST ); }
+#else
 inline unsigned ThreadInterlockedExchangeSubtract( unsigned volatile *p, unsigned value )	{ return ThreadInterlockedExchangeAdd( reinterpret_cast<long volatile *>(p), -static_cast<long>(value) ); }
 inline unsigned ThreadInterlockedIncrement( unsigned volatile *p )	{ return ThreadInterlockedIncrement( reinterpret_cast<long volatile *>(p) ); }
 inline unsigned ThreadInterlockedDecrement( unsigned volatile *p )	{ return ThreadInterlockedDecrement( reinterpret_cast<long volatile *>(p) ); }
@@ -366,6 +376,7 @@ inline unsigned ThreadInterlockedExchange( unsigned volatile *p, unsigned value 
 inline unsigned ThreadInterlockedExchangeAdd( unsigned volatile *p, unsigned value )	{ return ThreadInterlockedExchangeAdd( reinterpret_cast<long volatile *>(p), value ); }
 inline unsigned ThreadInterlockedCompareExchange( unsigned volatile *p, unsigned value, unsigned comperand )	{ return ThreadInterlockedCompareExchange( reinterpret_cast<long volatile *>(p), value, comperand ); }
 inline bool ThreadInterlockedAssignIf( unsigned volatile *p, unsigned value, unsigned comperand )	{ return ThreadInterlockedAssignIf( reinterpret_cast<long volatile *>(p), value, comperand ); }
+#endif
 
 #ifdef PLATFORM_64BITS
 inline unsigned __int64 ThreadInterlockedIncrement( unsigned __int64 volatile *p )	{ return ThreadInterlockedIncrement( reinterpret_cast<__int64 volatile *>(p) ); }
@@ -376,6 +387,16 @@ inline unsigned __int64 ThreadInterlockedCompareExchange( unsigned __int64 volat
 inline bool ThreadInterlockedAssignIf( unsigned __int64 volatile *p, unsigned __int64 value, unsigned __int64 comperand )	{ return ThreadInterlockedAssignIf( reinterpret_cast<__int64 volatile *>(p), value, comperand ); }
 #endif
 
+#if defined(__GNUC__)
+// dimhotepus: Same as unsigned overloads above: do not go through 8-byte long on LP64.
+inline int ThreadInterlockedExchangeSubtract( int volatile *p, int value )	{ return __atomic_fetch_sub( p, value, __ATOMIC_SEQ_CST ); }
+inline int ThreadInterlockedIncrement( int volatile *p )	{ return __atomic_add_fetch( p, 1, __ATOMIC_SEQ_CST ); }
+inline int ThreadInterlockedDecrement( int volatile *p )	{ return __atomic_sub_fetch( p, 1, __ATOMIC_SEQ_CST ); }
+inline int ThreadInterlockedExchange( int volatile *p, int value )	{ return __atomic_exchange_n( p, value, __ATOMIC_SEQ_CST ); }
+inline int ThreadInterlockedExchangeAdd( int volatile *p, int value )	{ return __atomic_fetch_add( p, value, __ATOMIC_SEQ_CST ); }
+inline int ThreadInterlockedCompareExchange( int volatile *p, int value, int comperand )	{ __atomic_compare_exchange_n( p, &comperand, value, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST ); return comperand; }
+inline bool ThreadInterlockedAssignIf( int volatile *p, int value, int comperand )	{ return __atomic_compare_exchange_n( p, &comperand, value, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST ); }
+#else
 inline int ThreadInterlockedExchangeSubtract( int volatile *p, int value )	{ return ThreadInterlockedExchangeAdd( reinterpret_cast<long volatile *>(p), -static_cast<long>(value) ); }
 inline int ThreadInterlockedIncrement( int volatile *p )	{ return ThreadInterlockedIncrement( reinterpret_cast<long volatile *>(p) ); }
 inline int ThreadInterlockedDecrement( int volatile *p )	{ return ThreadInterlockedDecrement( reinterpret_cast<long volatile *>(p) ); }
@@ -383,6 +404,7 @@ inline int ThreadInterlockedExchange( int volatile *p, int value )	{ return Thre
 inline int ThreadInterlockedExchangeAdd( int volatile *p, int value )	{ return ThreadInterlockedExchangeAdd( reinterpret_cast<long volatile *>(p), value ); }
 inline int ThreadInterlockedCompareExchange( int volatile *p, int value, int comperand )	{ return ThreadInterlockedCompareExchange( reinterpret_cast<long volatile *>(p), value, comperand ); }
 inline bool ThreadInterlockedAssignIf( int volatile *p, int value, int comperand )	{ return ThreadInterlockedAssignIf( reinterpret_cast<long volatile *>(p), value, comperand ); }
+#endif
 
 //-----------------------------------------------------------------------------
 // Access to VTune thread profiling
