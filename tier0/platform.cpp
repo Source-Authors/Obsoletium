@@ -637,7 +637,9 @@ MUST_CHECK_RETURN const tchar *Plat_GetCommandLine()
 #ifdef TCHAR_IS_WCHAR
 	return GetCommandLineW();
 #else
-	return GetCommandLine();
+	// dimhotepus: GetCommandLine -> GetCommandLineA.  The TCHAR macro returns
+	// LPWSTR when UNICODE is defined, which doesn't convert to const char *.
+	return GetCommandLineA();
 #endif
 }
 
