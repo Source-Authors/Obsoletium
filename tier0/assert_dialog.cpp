@@ -48,13 +48,13 @@ struct CAssertDisable
 	
 	// If these are not -1, then this CAssertDisable only disables asserts on lines between
 	// these values (inclusive).
-	int m_LineMin;		
+	int m_LineMin;
 	int m_LineMax;
 	
 	// Decremented each time we hit this assert and ignore it, until it's 0. 
 	// Then the CAssertDisable is removed.
 	// If this is -1, then we always ignore this assert.
-	int m_nIgnoreTimes;	
+	int m_nIgnoreTimes;
 
 	CAssertDisable *m_pNext;
 };
@@ -95,7 +95,7 @@ BOOL WINAPI DllMain( HINSTANCE module, DWORD fdwReason, LPVOID lpvReserved )
 		g_hTier0Instance = module;
 
 		InitTime();
-		
+
 		// dimhotepus: Do not notify on thread creation for performance.
 		DisableThreadLibraryCalls(module);
 	}
@@ -357,7 +357,6 @@ static INT_PTR CALLBACK AssertDialogProc(
 			}
 		}
 		break;
-
 
 		case WM_DESTROY:
 		{
