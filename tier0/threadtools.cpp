@@ -389,7 +389,8 @@ ThreadId_t InitMainThread()
 #ifdef _WIN32
 	return ThreadGetCurrentId();
 #elif defined(POSIX)
-	return (ThreadId_t)pthread_self();
+	// dimhotepus: Keep ids consistent with ThreadGetCurrentId.
+	return ThreadGetCurrentId();
 #endif
 }
 
