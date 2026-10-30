@@ -1968,10 +1968,8 @@ int CThread::GetPriority() const
 #ifdef _WIN32
 	return GetThreadPriority(m_hThread);
 #elif defined(POSIX)
-	struct sched_param thread_param;
-	int policy;
-	pthread_getschedparam( m_threadId, &policy, &thread_param );
-	return thread_param.sched_priority;
+	// dimhotepus: Same path as ThreadGetPriority (nice on Linux).
+	return ThreadGetPriority( (ThreadHandle_t)m_threadId );
 #endif
 }
 
