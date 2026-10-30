@@ -3,6 +3,8 @@
 #ifndef TIER0_MEM_HELPERS_H_
 #define TIER0_MEM_HELPERS_H_
 
+#include <atomic>
+
 // Normally, the runtime libraries like to mess with the memory returned by malloc(), 
 // which can create problems trying to repro bugs in debug builds or in the debugger.
 //
@@ -16,11 +18,22 @@
 //
 // In here, we make sure the memory is either random garbage, or it's set to
 // 0xffeeffee, which casts to a NAN.
-extern bool g_bInitMemory;
-#define ApplyMemoryInitializations( pMem, nSize ) do { if ( !g_bInitMemory ) ; else { DoApplyMemoryInitializations( pMem, nSize ); } } while (false)
+
+// dimhotepus: Thread-safe init.
+extern std::atomic<bool> g_bInitMemory;
+#define ApplyMemoryInitializations( pMem, nSize )        \
+	do                                                   \
+	{                                                    \
+		if ( !g_bInitMemory.load() )                     \
+			;                                            \
+		else                                             \
+		{                                                \
+			DoApplyMemoryInitializations( pMem, nSize ); \
+		}                                                \
+	} while ( false )
 void DoApplyMemoryInitializations( void *pMem, size_t nSize );
 
-size_t CalcHeapUsed();
+[[nodiscard]] size_t CalcHeapUsed();
 
 // Call this to reserve the bottom 4 GiB of memory in order to ensure that we will
 // get crashes if we put pointers in DWORDs or ints. This will be a NOP on some
