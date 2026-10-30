@@ -45,13 +45,6 @@
 // actual wall clock time and this can go backwards. You need to use
 // clock_gettime( CLOCK_MONOTONIC ... ) if this isn't what you want.
 
-// If you want to try using rdtsc for Plat_FloatTime(), enable USE_RDTSC_FOR_FLOATTIME:
-// 
-// Make sure you know what you're doing. This was disabled due to the long startup time, and
-//  in our testing, even though constant_tsc was set, we couldn't rely on the
-//  max frequency result returned from CalculateCPUFreq() (ie /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq).
-// 
-// #define USE_RDTSC_FOR_FLOATTIME
 
 extern VCRMode_t g_VCRMode;
 
@@ -1302,5 +1295,3 @@ void DumpMemorySummary( )
 
 // Turn off memdbg macros (turned on up top) since this is included like a header
 #include "tier0/memdbgoff.h"
-
-
