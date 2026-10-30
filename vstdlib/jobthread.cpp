@@ -1074,7 +1074,7 @@ void CThreadPool::Distribute( bool bDistribute, int *pAffinityTable )
 						}
 					}
 #ifdef WIN32
-					ThreadSetAffinity( (ThreadHandle_t)m_Threads[i]->GetThreadHandle(), 1 << iProc );
+					ThreadSetAffinity( (ThreadHandle_t)m_Threads[i]->GetThreadHandle(), static_cast<intp>( 1 ) << iProc );
 #endif
 				}
 #endif
