@@ -313,7 +313,8 @@ static INT_PTR CALLBACK AssertDialogProc(
 				{
 					BOOL bTranslated = false;
 					UINT value = GetDlgItemInt( hDlg, IDC_IGNORE_NUMLINES, &bTranslated, FALSE );
-					if ( !bTranslated || value < 1 )
+					// dimhotepus: Check nearby value is in int range.
+					if ( !bTranslated || value < 1 || value > static_cast<unsigned>( std::numeric_limits<int>::max() ) )
 						return TRUE;
 
 					IgnoreAssertsNearby( pDialogData->assert_disables, pDialogData->init_info, value );
