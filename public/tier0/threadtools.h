@@ -904,10 +904,12 @@ public:
 	bool AssertOwnedByCurrentThread()	{ return true; }
 	void SetTrace( bool )				{}
 
-	uint32 GetOwnerId() const			{ return m_ownerID;	}
+	// dimhotepus: uint32 -> ThreadId_t
+	ThreadId_t GetOwnerId() const		{ return m_ownerID;	}
 	int	GetDepth() const				{ return m_depth; }
 private:
-	CInterlockedUInt m_ownerID;
+	// dimhotepus: Owner is ThreadId_t (pointer sized on POSIX), not 32-bit.
+	CInterlockedIntT<ThreadId_t> m_ownerID;
 	int				m_depth{ 0 };
 };
 
