@@ -108,6 +108,21 @@ enum {
 
 size_t ApproximateProcessMemoryUsage( )
 {
+	// This returns the resident memory size (RES column in 'top') in bytes.
+#ifdef OSX
+	// dimhotepus: OSX has no /proc, so the old code warned and returned 0 on
+	// every call.  Ask the kernel for the resident size instead.
+	mach_task_basic_info_data_t info{};
+	mach_msg_type_number_t count{ MACH_TASK_BASIC_INFO_COUNT };
+	if ( task_info( mach_task_self(), MACH_TASK_BASIC_INFO,
+			reinterpret_cast<task_info_t>( &info ), &count ) == KERN_SUCCESS )
+	{
+		return static_cast<size_t>( info.resident_size );
+	}
+
+	Warning( "Unable to read resident memory size: task_info failed.\n" );
+	return 0;
+#else
 /*
 From https://man7.org/linux/man-pages/man5/proc.5.html:
        /proc/[pid]/statm
@@ -153,6 +168,7 @@ From https://man7.org/linux/man-pages/man5/proc.5.html:
 	}
 
 	return nRet;
+#endif
 }
 
 #ifdef USE_RDTSC_FOR_FLOATTIME
