@@ -2,8 +2,12 @@
 
 #include "tier0/platform.h"
 
-#include <sys/time.h>
+// dimhotepus: platform.h ends with valve_on.h; turn Valve defines off around
+// system and standard headers so STEAM's malloc / free macros can't break them.
+#include "tier0/valve_off.h"
+
 #include <sys/resource.h>
+#include <sys/time.h>
 #include <unistd.h>
 
 #include <algorithm>
@@ -22,6 +26,8 @@
 #include <fcntl.h>
 #include <ctime>
 #endif
+
+#include "tier0/valve_on.h"
 
 #include "include/SDL3/SDL.h"
 
