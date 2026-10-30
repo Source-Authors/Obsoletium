@@ -210,6 +210,12 @@ void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool
 
 		WaitForSingleObject( hWorkThread, INFINITE );
 	}
+	else
+	{
+		// dimhotepus: Added error handling for thread spawn failure
+		Warning( "Failed to spawn hardware breakpoint worker thread: %s\n",
+			std::system_category().message(::GetLastError()).c_str() );
+	}
 }
 
 void Plat_ApplyHardwareDataBreakpointsToNewThread( unsigned long dwThreadID )
@@ -229,6 +235,13 @@ void Plat_ApplyHardwareDataBreakpointsToNewThread( unsigned long dwThreadID )
 			RunCodeAtScopeExit( CloseHandle( hWorkThread ) );
 
 			WaitForSingleObject( hWorkThread, INFINITE );
+		}
+		else
+		{
+			// dimhotepus: Added error handling and cleanup for thread spawn failure
+			delete pThreadID;
+			Warning( "Failed to spawn hardware breakpoint worker thread: %s\n",
+				std::system_category().message(::GetLastError()).c_str() );
 		}
 	}
 }
