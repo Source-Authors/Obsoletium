@@ -227,12 +227,24 @@ inline unsigned ThreadWaitForObject( HANDLE handle, bool bWaitAll = true, unsign
 	// Prevent compiler reordering across this barrier. This is
 	// sufficient for most purposes on x86/x64.
 
-	#define ThreadMemoryBarrier() _ReadWriteBarrier()
+	#if defined(_M_ARM64)
+		// dimhotepus: ARM64 is weakly ordered, compiler-only barrier is not enough there.
+		#define ThreadMemoryBarrier() __dmb(_ARM64_BARRIER_SY)
+	#else
+		// dimhotepus: Compiler-only barrier is enough there.
+		#define ThreadMemoryBarrier() _ReadWriteBarrier()
+	#endif
 #elif defined(GNUC)
 	// Prevent compiler reordering across this barrier. This is
 	// sufficient for most purposes on x86/x64.
 	// https://preshing.com/20120625/memory-ordering-at-compile-time/
-	#define ThreadMemoryBarrier() asm volatile("" ::: "memory")
+	#if defined(__x86_64__) || defined(__i386__)
+		// dimhotepus: Compiler-only barrier is enough on x86.
+		#define ThreadMemoryBarrier() asm volatile("" ::: "memory")
+	#else
+		// dimhotepus: ARM and others need a real fence.
+		#define ThreadMemoryBarrier() __atomic_thread_fence(__ATOMIC_SEQ_CST)
+	#endif
 #else
 #error \
     "Every platform needs to define ThreadMemoryBarrier to at least prevent compiler reordering"
