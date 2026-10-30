@@ -934,7 +934,8 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 			// The 12th Gen Intel Core processors performance hybrid architecture combines high-performance
 			// P-cores with highly efficient E-cores in one silicon chip.  So physical != logical / 2 (HT).
 			// See https://www.intel.com/content/www/us/en/developer/articles/guide/12th-gen-intel-core-processor-gamedev-guide.html
-			nThreads = ci.m_nPhysicalProcessors - 1;
+			// dimhotepus: At least one thread even on 1 core CPU as we expect thread pool to work.
+			nThreads = max( 1, ci.m_nPhysicalProcessors - 1 );
 			// dimhotepus: Max 6 cores instead of old 4. Handle 6 good enough (+need to optimise).
 			if ( nThreads > 5 )
 			{
