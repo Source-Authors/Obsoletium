@@ -461,7 +461,9 @@ static void SpewBacktrace()
 	int nptrs = backtrace( buffer, std::size( buffer ) );
 	if ( nptrs )
 	{
-		char **strings = backtrace_symbols(buffer, nptrs);
+		char **strings = backtrace_symbols( buffer, nptrs );
+		RunCodeAtScopeExitOpt( strings, free( strings ) );
+
 		if ( strings )
 		{
 			for ( int i = 0; i < nptrs; i++)
@@ -472,7 +474,6 @@ static void SpewBacktrace()
 				fprintf( stderr, "  %s\n", module );
 			}
 		}
-		RunCodeAtScopeExit( free( strings ) );
 	}
 }
 
