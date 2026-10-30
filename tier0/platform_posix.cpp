@@ -522,7 +522,8 @@ struct tm *Plat_localtime( const time_t *timep, struct tm *result )
 	return timep && result ? localtime_r( timep, result ) : nullptr;
 }
 
-bool vtune( bool resume )
+// vtuneapi.dll API is Windows-only.
+MUST_CHECK_RETURN bool vtune( [[maybe_unused]] bool resume )
 {
   return false;
 }
