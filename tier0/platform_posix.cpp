@@ -823,37 +823,48 @@ PLATFORM_INTERFACE bool Is64BitOS()
 #else
 	AssertMsg( false, "implement Is64BitOS" );
 #endif
+MUST_CHECK_RETURN bool Plat_GetModuleFilename( char *pOut, int nMaxBytes )
+{
+	// dimhotepus: Reject null / non-positive sizes.  nMaxBytes - 1 with
+	// nMaxBytes == 0 became a huge size_t and readlink overran pOut.
+	if ( !pOut || nMaxBytes <= 0 )
+	{
 	return false;
 }
 
-bool Plat_GetModuleFilename( char *pOut, int nMaxBytes )
-{
-#if defined( _LINUX )
-	// readlink does not null-terminate; length == size - 1 may be truncated.
-	const ssize_t length{ readlink( "/proc/self/exe", pOut, nMaxBytes - 1 ) };
-	if ( length <= 0 || length >= nMaxBytes - 1 )
+#if defined( LINUX )
+	// dimhotepus: Read up to nMaxBytes.  A result shorter than the buffer is
+	// complete and leaves room for the terminator; the old code passed
+	// nMaxBytes - 1 and treated an exact fit as truncated.
+	const ssize_t length{ readlink( "/proc/self/exe", pOut, static_cast<size_t>( nMaxBytes ) ) };
+	if ( length <= 0 || length >= nMaxBytes )
 	{
+		pOut[0] = '\0';
 		return false;
 	}
 
 	pOut[length] = '\0';
 	return true;
 #elif defined( OSX )
-	char     path[PATH_MAX];
-	uint32_t size{ sizeof( path ) };
-	if ( _NSGetExecutablePath( path, &size ) != 0 )
+	uint32_t size{ 0 };
+	_NSGetExecutablePath( nullptr, &size );
+	std::vector<char> path( size + 1 );
+	if ( _NSGetExecutablePath( path.data(), &size ) != 0 )
 	{
+		pOut[0] = '\0';
 		return false;
 	}
 
 	// May contain symlinks and "..".
 	char resolved[PATH_MAX];
-	if ( !realpath( path, resolved ) || strlen( resolved ) >= nMaxBytes )
+	if ( !realpath( path.data(), resolved ) ||
+		 std::strlen( resolved ) >= static_cast<size_t>( nMaxBytes ) )
 	{
+		pOut[0] = '\0';
 		return false;
 	}
 
-	strcpy( pOut, resolved );
+	std::strcpy( pOut, resolved );
 	return true;
 #else
 	pOut[0] = '\0';
