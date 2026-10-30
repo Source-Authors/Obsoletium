@@ -108,7 +108,7 @@ BOOL WINAPI DllMain( HINSTANCE module, DWORD fdwReason, LPVOID lpvReserved )
 }
 #endif
 
-static bool IsDebugBreakEnabled()
+[[nodiscard]] static bool IsDebugBreakEnabled()
 {
 	static bool bResult = !!_tcsstr( Plat_GetCommandLine(), _T("-debugbreak") ) ||
 		!!_tcsstr( Plat_GetCommandLine(), _T("-raiseonassert") ) ||
@@ -116,13 +116,13 @@ static bool IsDebugBreakEnabled()
 	return bResult;
 }
 
-static bool AreAssertsDisabled()
+[[nodiscard]] static bool AreAssertsDisabled()
 {
 	static bool bResult = !!_tcsstr( Plat_GetCommandLine(), _T("-noassert") );
 	return bResult;
 }
 
-static bool IsConsoleMode()
+[[nodiscard]] static bool IsConsoleMode()
 {
 	// No graphics and sound in launcher.
 	static bool bResult = !!_tcsstr( Plat_GetCommandLine(), _T("-textmode") ) ||
@@ -131,7 +131,7 @@ static bool IsConsoleMode()
 	return bResult;
 }
 
-static bool AreAssertsEnabledInFileLine( CAssertDisable *&pAssertDisables, const tchar *pFilename, int iLine )
+[[nodiscard]] static bool AreAssertsEnabledInFileLine( CAssertDisable *&pAssertDisables, const tchar *pFilename, int iLine )
 {
 	CAssertDisable **pPrev{ &pAssertDisables };
 	for ( CAssertDisable *it{ pAssertDisables }, *pNext = nullptr; it; it = pNext )
@@ -409,8 +409,8 @@ struct EnumerateWindowData
 };
 
 static BOOL CALLBACK ParentWindowEnumProc(
-  HWND hWnd,      // handle to parent window
-  LPARAM lParam   // application-defined value
+	HWND hWnd,      // handle to parent window
+	LPARAM lParam   // application-defined value
 )
 {
 	if ( ::IsWindowVisible( hWnd ) )
@@ -436,7 +436,7 @@ static BOOL CALLBACK ParentWindowEnumProc(
 	return TRUE;
 }
 
-static HWND FindLikelyParentWindow()
+[[nodiscard]] static HWND FindLikelyParentWindow()
 {
 	HWND                best_parent_window{ nullptr };
 	EnumerateWindowData window_data{ ::GetCurrentProcessId(), best_parent_window };
