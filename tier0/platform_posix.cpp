@@ -429,12 +429,17 @@ Plat_MessageBoxButton Plat_MessageBox( IN_Z const char      *title,
 	int buttonId{ -1 };
 	if ( !SDL_ShowMessageBox( &data, &buttonId ) )
 	{
+		// dimhotepus: SDL can't show a box without a display (e.g. headless
+		// dedicated server).  Windows falls back to MessageBoxW; here write
+		// the text to stderr so it isn't lost.
+		std::fprintf( stderr, "%s%s%s\n(message box failed: %s)\n",
+			title && *title ? title : "", title && *title ? ": " : "",
+			message, SDL_GetError() );
 		return Plat_MessageBoxButton::None;
 	}
 
 	// -1 means the window was closed without pressing a button.
 	return buttonId < 0 ? Plat_MessageBoxButton::Cancel : static_cast< Plat_MessageBoxButton >( buttonId );
-#endif
 }
 
 unsigned int Plat_MSTime()
