@@ -2,34 +2,19 @@
 
 #include "stdafx.h"
 
-#include <ctime>
+#include "tier0/platform.h"
 
-#if defined(_WIN32)
+#include <atomic>
+#include <system_error>
+#include <ctime>
 #include <cerrno>
 
 #include "winlite.h"
 #include <dwmapi.h>
-
-// dimhotepus: COM errors.
 #include "windows/com_error_category.h"
-#else
-#include "include/SDL3/SDL.h"
-#endif
 
-#if defined(POSIX)
-#include <unistd.h>  // chdir, readlink
-#ifdef __APPLE__
-#include <mach-o/dyld.h>  // _NSGetExecutablePath
-#endif
-#endif
-
-#include <system_error>
-
-#include "tier0/platform.h"
 #include "tier0/vcrmode.h"
 #include "tier0/scoped_breakpad_handler.h"
-
-#include <atomic>
 
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 #include "tier0/memalloc.h"
@@ -121,12 +106,6 @@ template<typename TEnum>
 	// value == flag to handle 0 == 0.
 	return value == flag || ( value & flag ) == flag;
 }
-
-}  // namespace
-
-#ifdef _WIN32
-
-namespace {
 
 // Converts UTF-8 to UTF-16, truncating (at a code point boundary) instead of
 // failing when the text is too long for the buffer.
@@ -246,7 +225,6 @@ wchar_t* Utf8ToWide( IN_Z const char* utf8, OUT_Z_ARRAY wchar_t ( &buffer )[size
 }
 
 }  // namespace
-#endif  // _WIN32
 
 Plat_MessageBoxButton Plat_MessageBox( IN_Z const char* title,
 									   IN_Z const char* mainInstruction,
@@ -254,7 +232,6 @@ Plat_MessageBoxButton Plat_MessageBox( IN_Z const char* title,
 									   Plat_MessageBoxButton buttons,
 									   Plat_MessageBoxIcon icon )
 {
-#ifdef _WIN32
 	wchar_t wideTitle[512], wideMainInstruction[512], wideContent[512];
 	int pressed{ 0 };
 
@@ -290,84 +267,6 @@ Plat_MessageBoxButton Plat_MessageBox( IN_Z const char* title,
 		MB_SYSTEMMODAL | MB_SETFOREGROUND |
 		GetMessageBoxIcon( icon ) | GetMessageBoxButtons( buttons ) );
 	return GetPressedButton( pressed );
-#else
-	SDL_MessageBoxButtonData sdlButtons[5];
-	int count{ 0 };
- 
-	const bool hasCancel{ HasFlag( buttons, Plat_MessageBoxButton::Cancel ) };
-	const bool hasNo{ HasFlag( buttons, Plat_MessageBoxButton::No ) };
-	bool returnKeyAssigned{ false };
- 
-	const auto add = [&]( Plat_MessageBoxButton button, const char* text )
-	{
-		if ( !HasFlag( buttons, button ) )
-		{
-			return;
-		}
- 
-		SDL_MessageBoxButtonFlags flags{ 0 };
-		const bool affirmative{ button == Plat_MessageBoxButton::Ok ||
-			button == Plat_MessageBoxButton::Yes ||
-			button == Plat_MessageBoxButton::Retry };
-		if ( affirmative && !returnKeyAssigned )
-		{
-			flags |= SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
-			returnKeyAssigned = true;
-		}
-		if ( button == Plat_MessageBoxButton::Cancel ||
-			 ( !hasCancel && button == Plat_MessageBoxButton::No ) ||
-			 ( !hasCancel && !hasNo && button == Plat_MessageBoxButton::Ok ) )
-		{
-			flags |= SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT;
-		}
- 
-		sdlButtons[count++] = { flags, static_cast<int>( to_underlying( button ) ), text };
-	};
- 
-	add( Plat_MessageBoxButton::Yes, "Yes" );
-	add( Plat_MessageBoxButton::No, "No" );
-	add( Plat_MessageBoxButton::Ok, "OK" );
-	add( Plat_MessageBoxButton::Retry, "Retry" );
-	add( Plat_MessageBoxButton::Cancel, "Cancel" );
- 
-	if ( count == 0 )
-	{
-		sdlButtons[count++] = {
-			SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT | SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT,
-			static_cast<int>( to_underlying( Plat_MessageBoxButton::Ok ) ), "OK" };
-	}
- 
-	SDL_MessageBoxFlags flags{ SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT };
-	switch ( icon )
-	{
-		case Plat_MessageBoxIcon::Information: flags |= SDL_MESSAGEBOX_INFORMATION; break;
-		case Plat_MessageBoxIcon::Warning:     flags |= SDL_MESSAGEBOX_WARNING; break;
-		case Plat_MessageBoxIcon::Error:       flags |= SDL_MESSAGEBOX_ERROR; break;
-		case Plat_MessageBoxIcon::None:        break;
-	}
- 
-	char message[2048];
-	const bool hasMain{ mainInstruction && *mainInstruction };
-	const bool hasContent{ content && *content };
-	std::snprintf( message, sizeof( message ), "%s%s%s",
-		hasMain ? mainInstruction : "",
-		hasMain && hasContent ? "\n\n" : "",
-		hasContent ? content : "" );
- 
-	const SDL_MessageBoxData data{ flags, nullptr, title ? title : "", message,
-		count, sdlButtons, nullptr };
- 
-	int buttonId{ -1 };
-	if ( !SDL_ShowMessageBox( &data, &buttonId ) )
-	{
-		return Plat_MessageBoxButton::None;
-	}
- 
-	// -1 means the window was closed without pressing a button.
-	return buttonId < 0
-		? Plat_MessageBoxButton::Cancel
-		: static_cast<Plat_MessageBoxButton>( buttonId );
-#endif
 }
 
 uint32 Plat_MSTime()
@@ -423,7 +322,6 @@ char *Plat_ctime( const time_t *timep, char *buf, size_t bufsize )
 
 bool Plat_GetModuleFilename( char *pOut, int nMaxBytes )
 {
-#ifdef _WIN32
 	HMODULE module{nullptr};
 	if (!::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
 			nullptr, &module)) {
@@ -434,39 +332,10 @@ bool Plat_GetModuleFilename( char *pOut, int nMaxBytes )
 	const DWORD length{
 		::GetModuleFileName(module, pOut, static_cast<DWORD>(nMaxBytes))};
 	return length > 0 && length < static_cast<DWORD>(nMaxBytes);
-#elif defined(_LINUX)
-	// readlink does not null-terminate; length == size - 1 may be truncated.
-	const ssize_t length{readlink("/proc/self/exe", pOut, nMaxBytes - 1)};
-	if (length <= 0 || length >= nMaxBytes - 1) {
-		return false;
-	}
-
-	pOut[length] = '\0';
-	return true;
-#elif defined(OSX)
-	char path[PATH_MAX];
-	uint32_t size{sizeof(path)};
-	if (_NSGetExecutablePath(path, &size) != 0) {
-		return false;
-	}
-
-	// May contain symlinks and "..".
-	char resolved[PATH_MAX];
-	if (!realpath(path, resolved) || strlen(resolved) >= nMaxBytes) {
-		return false;
-	}
-
-	strcpy(pOut, resolved);
-	return true;
-#else
-	pOut[0] = '\0';
-	return false;
-#endif
 }
 
 void Plat_ExitProcess( int nCode )
 {
-#if defined( _WIN32 )
 	// We don't want global destructors in our process OR in any DLL to get executed.
 	// _exit() avoids calling global destructors in our module, but not in other DLLs.
 	// dimhotepus: Drop UB on gc.
@@ -476,9 +345,6 @@ void Plat_ExitProcess( int nCode )
 	// 	int *x = nullptr; *x = 1; // cause a hard crash, GC is not allowed to exit voluntarily from gc.dll //-V522
 	// }
 	TerminateProcess( GetCurrentProcess(), nCode );
-#else	
-	_exit( nCode );
-#endif
 }
 
 void Plat_ExitProcessWithError( int nCode, bool bGenerateMinidump )
@@ -566,19 +432,11 @@ bool vtune( bool resume )
 
 bool Plat_IsInDebugSession()
 {
-#if defined( _WIN32 )
-	return (IsDebuggerPresent() != 0);
-#elif defined( LINUX )
-	#error This code is implemented in platform_posix.cpp
-#else
-	return false;
-#endif
+	return IsDebuggerPresent() != 0;
 }
 
 // dimhotepus: Additional bug info.
-#if defined(_WIN32) && !defined(_X360)
-// See
-// https://docs.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-checktokenmembership
+// See https://docs.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-checktokenmembership
 static BOOL IsUserAdmin() {
   SID_IDENTIFIER_AUTHORITY ntAuthority{SECURITY_NT_AUTHORITY};
   PSID administratorsGroup;
@@ -596,19 +454,10 @@ static BOOL IsUserAdmin() {
 
   return ok;
 }
-#endif
 
 // dimhotepus: Additional bug info.
 bool Plat_IsUserAnAdmin() {
-#if defined(_WIN32)
   return ::IsUserAdmin() ? true : false;
-#else
-  const uid_t uid{getuid()}, euid{geteuid()};
-
-  // We might have elevated privileges beyond that of the user who invoked the
-  // program, due to suid bit.
-  return uid < 0 || euid == 0 || uid != euid;
-#endif
 }
 
 [[nodiscard]] static bool ShouldAppUseLightTheme() {
@@ -723,9 +572,7 @@ bool Plat_ApplySystemTitleBarTheme(void *window,
 
 void Plat_DebugString( const char * psz )
 {
-#if defined( _WIN32 )
 	::OutputDebugStringA( psz );
-#endif
 }
 
 

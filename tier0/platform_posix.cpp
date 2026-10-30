@@ -1,32 +1,38 @@
 // Copyright Valve Corporation, All rights reserved.
 
 #include "tier0/platform.h"
-#include "tier0/vcrmode.h"
-#include "tier0/memalloc.h"
-#include "tier0/dbg.h"
-#include <algorithm>
-#include <vector>
 
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <unistd.h>
 
+#include <algorithm>
+#include <vector>
+
 #ifdef OSX
 #include <mach/mach.h>
 #include <mach/mach_time.h>
+#include <mach-o/dyld.h> // _NSGetExecutablePath
 #include <stdbool.h>
 #include <sys/types.h>
-#include <unistd.h>
 #include <sys/sysctl.h>
 #endif
+
 #ifdef LINUX
-#include <time.h>
 #include <fcntl.h>
+#include <ctime>
 #endif
+
+#include "include/SDL3/SDL.h"
 
 #include "posix_file_stream.h"
 
+#include "tier0/vcrmode.h"
+#include "tier0/memalloc.h"
+#include "tier0/dbg.h"
+
 #include "tier0/memdbgon.h"
+
 // Benchmark mode uses this heavy-handed method 
 
 // *** WARNING ***. On Linux gettimeofday returns the system's best guess at
@@ -313,6 +319,97 @@ double Plat_FloatTime()
 #endif
 }
 
+Plat_MessageBoxButton Plat_MessageBox( IN_Z const char      *title,
+                                       IN_Z const char      *mainInstruction,
+                                       IN_Z const char      *content,
+                                       Plat_MessageBoxButton buttons,
+                                       Plat_MessageBoxIcon   icon )
+{
+	SDL_MessageBoxButtonData sdlButtons[5];
+	int                      count{ 0 };
+
+	const bool hasCancel{ HasFlag( buttons, Plat_MessageBoxButton::Cancel ) };
+	const bool hasNo{ HasFlag( buttons, Plat_MessageBoxButton::No ) };
+	bool       returnKeyAssigned{ false };
+
+	const auto add = [&]( Plat_MessageBoxButton button, const char *text )
+	{
+		if ( !HasFlag( buttons, button ) )
+		{
+			return;
+		}
+
+		SDL_MessageBoxButtonFlags flags{ 0 };
+		const bool                affirmative{ button == Plat_MessageBoxButton::Ok ||
+			                                   button == Plat_MessageBoxButton::Yes ||
+			                                   button == Plat_MessageBoxButton::Retry };
+		if ( affirmative && !returnKeyAssigned )
+		{
+			flags |= SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT;
+			returnKeyAssigned = true;
+		}
+		if ( button == Plat_MessageBoxButton::Cancel ||
+		     ( !hasCancel && button == Plat_MessageBoxButton::No ) ||
+		     ( !hasCancel && !hasNo && button == Plat_MessageBoxButton::Ok ) )
+		{
+			flags |= SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT;
+		}
+
+		sdlButtons[count++] = { flags, static_cast< int >( to_underlying( button ) ), text };
+	};
+
+	add( Plat_MessageBoxButton::Yes, "Yes" );
+	add( Plat_MessageBoxButton::No, "No" );
+	add( Plat_MessageBoxButton::Ok, "OK" );
+	add( Plat_MessageBoxButton::Retry, "Retry" );
+	add( Plat_MessageBoxButton::Cancel, "Cancel" );
+
+	if ( count == 0 )
+	{
+		sdlButtons[count++] = {
+			SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT | SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT,
+			static_cast< int >( to_underlying( Plat_MessageBoxButton::Ok ) ), "OK"
+		};
+	}
+
+	SDL_MessageBoxFlags flags{ SDL_MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT };
+	switch ( icon )
+	{
+	case Plat_MessageBoxIcon::Information:
+		flags |= SDL_MESSAGEBOX_INFORMATION;
+		break;
+	case Plat_MessageBoxIcon::Warning:
+		flags |= SDL_MESSAGEBOX_WARNING;
+		break;
+	case Plat_MessageBoxIcon::Error:
+		flags |= SDL_MESSAGEBOX_ERROR;
+		break;
+	case Plat_MessageBoxIcon::None:
+		break;
+	}
+
+	char       message[2048];
+	const bool hasMain{ mainInstruction && *mainInstruction };
+	const bool hasContent{ content && *content };
+	std::snprintf( message, sizeof( message ), "%s%s%s",
+	               hasMain ? mainInstruction : "",
+	               hasMain && hasContent ? "\n\n" : "",
+	               hasContent ? content : "" );
+
+	const SDL_MessageBoxData data{ flags, nullptr, title ? title : "", message,
+		                           count, sdlButtons, nullptr };
+
+	int buttonId{ -1 };
+	if ( !SDL_ShowMessageBox( &data, &buttonId ) )
+	{
+		return Plat_MessageBoxButton::None;
+	}
+
+	// -1 means the window was closed without pressing a button.
+	return buttonId < 0 ? Plat_MessageBoxButton::Cancel : static_cast< Plat_MessageBoxButton >( buttonId );
+#endif
+}
+
 unsigned int Plat_MSTime()
 {
 	if ( g_bBenchmarkMode )
@@ -526,6 +623,15 @@ bool Plat_IsInDebugSession()
 
 #endif // defined( LINUX )
 
+MUST_CHECK_RETURN bool Plat_IsUserAnAdmin()
+{
+	const uid_t uid{ getuid() }, euid{ geteuid() };
+
+	// We might have elevated privileges beyond that of the user who invoked the
+	// program, due to suid bit.
+	return uid < 0 || euid == 0 || uid != euid;
+}
+
 void Plat_DebugString( const char * psz )
 {
 	fprintf( stderr, "%s", psz );
@@ -668,6 +774,41 @@ PLATFORM_INTERFACE bool Is64BitOS()
 	AssertMsg( false, "implement Is64BitOS" );
 #endif
 	return false;
+}
+
+bool Plat_GetModuleFilename( char *pOut, int nMaxBytes )
+{
+#if defined( _LINUX )
+	// readlink does not null-terminate; length == size - 1 may be truncated.
+	const ssize_t length{ readlink( "/proc/self/exe", pOut, nMaxBytes - 1 ) };
+	if ( length <= 0 || length >= nMaxBytes - 1 )
+	{
+		return false;
+	}
+
+	pOut[length] = '\0';
+	return true;
+#elif defined( OSX )
+	char     path[PATH_MAX];
+	uint32_t size{ sizeof( path ) };
+	if ( _NSGetExecutablePath( path, &size ) != 0 )
+	{
+		return false;
+	}
+
+	// May contain symlinks and "..".
+	char resolved[PATH_MAX];
+	if ( !realpath( path, resolved ) || strlen( resolved ) >= nMaxBytes )
+	{
+		return false;
+	}
+
+	strcpy( pOut, resolved );
+	return true;
+#else
+	pOut[0] = '\0';
+	return false;
+#endif
 }
 
 PLATFORM_INTERFACE void Plat_ExitProcess( int nCode )
