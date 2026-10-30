@@ -217,7 +217,6 @@ using HWND = void *;
 //-----------------------------------------------------------------------------
 // Set up platform type defines.
 //-----------------------------------------------------------------------------
-#define IsPC()			true
 #define IsGameConsole()	false
 
 #ifdef PLATFORM_64BITS
