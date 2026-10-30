@@ -37,9 +37,10 @@ typedef int ( SDLCALL FUNC_SDL_ShowMessageBox )( const SDL_MessageBoxData *messa
 
 struct CDialogInitInfo
 {
-	const tchar *m_pFilename;
-	int m_iLine;
-	const tchar *m_pExpression;
+	// dimhotepus: Use fixed buffers with copied data as we access from multiple threads.
+	tchar        m_pFilename[512]; // Fixed buffer
+	int          m_iLine;
+	tchar        m_pExpression[1024]; // Fixed buffer
 };
 
 
@@ -520,9 +521,15 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 		return true;
 
 	// Now create the dialog. Just return true for old-style debug break upon failure.
-	g_Info.m_pFilename = pFilename;
+	// dimhotepus: Copy as we can change from different thread.
+	_tcsncpy( g_Info.m_pFilename, pFilename, std::size( g_Info.m_pFilename ) - 1 );
+	g_Info.m_pFilename[std::size( g_Info.m_pFilename ) - 1] = _T('\0');
+
 	g_Info.m_iLine = line;
-	g_Info.m_pExpression = pExpression;
+
+	// dimhotepus: Copy as we can change from different thread.
+	_tcsncpy( g_Info.m_pExpression, pExpression, std::size( g_Info.m_pExpression ) - 1 );
+	g_Info.m_pExpression[std::size( g_Info.m_pExpression ) - 1] = _T( '\0' );
 
 	g_bBreak.store(false, std::memory_order_relaxed);
 
