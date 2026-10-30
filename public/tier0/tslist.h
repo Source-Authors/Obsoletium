@@ -436,6 +436,19 @@ template <typename T, bool bTestOptimizer = false>
 class TSLIST_NODE_ALIGN CTSQueue : public CAlignedNewDelete<TSLIST_NODE_ALIGNMENT>
 {
 public:
+	// dimhotepus: CTSQueue has strict requirements due to lock-free dereference of freed nodes
+	static_assert(std::is_trivially_copyable_v<T>,
+		"CTSQueue requires trivially copyable types. "
+		"The queue dereferences freed nodes to read element values, which is only safe for simple types. "
+		"Use: fundamental types, enums, pointers, trivial aggregates of these.");
+	static_assert(std::is_trivially_destructible_v<T>,
+		"CTSQueue requires trivially destructible types. "
+		"Destructors are never called on queue elements. "
+		"Use: types with no user-defined, deleted, or virtual destructors.");
+	static_assert(std::is_standard_layout_v<T>,
+		"CTSQueue requires standard-layout types. "
+		"Memory layout assumptions depend on consistent field ordering.");
+
 	struct TSLIST_NODE_ALIGN Node_t : public TSLNodeBase_t
 	{
 		Node_t() = default;
@@ -710,6 +723,9 @@ public:
 
 	void PushItem( const T &init )
 	{
+		// dimhotepus: Documents intent at API boundary.
+		static_assert( std::is_copy_constructible_v< T >, "T must be copy constructible for PushItem" );
+
 		auto *pNode = static_cast<Node_t *>(m_FreeNodes.Pop());
 		if ( pNode )
 		{
@@ -724,6 +740,9 @@ public:
 
 	bool PopItem( T *pResult )
 	{
+		// dimhotepus: Documents intent at API boundary.
+		static_assert(!std::is_reference_v<T>, "T must not be a reference type");
+
 		Node_t *pNode = Pop();
 		if ( !pNode )
 			return false;
