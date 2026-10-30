@@ -618,9 +618,11 @@ template <typename R, typename T>
 #define _getcwd getcwd
 #define _snwprintf swprintf
 #define swprintf_s swprintf
-#define wcsicmp _wcsicmp
-#define _wcsicmp wcscmp
-#define _finite finite
+// dimhotepus: wcscmp is case-sensitive; wcscasecmp is the POSIX equivalent.
+#define wcsicmp wcscasecmp
+#define _wcsicmp wcscasecmp
+// dimhotepus: finite() is deprecated in glibc and gone from the macOS SDK.
+#define _finite(x) std::isfinite(x)
 #define _tempnam tempnam
 #define _unlink unlink
 #define _access access
