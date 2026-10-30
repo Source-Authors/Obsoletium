@@ -1164,6 +1164,48 @@ int64 ThreadInterlockedExchange64( int64 volatile *pDest, int64 value )
 }
 
 
+// dimhotepus: Declared in header, but were missing for GNUC -> link errors for any user
+// (and for 64-bit ThreadInterlockedIncrement(__int64*) wrappers).
+int64 ThreadInterlockedIncrement64( int64 volatile *pDest )
+{
+	Assert( (size_t)pDest % 8 == 0 );
+	return __atomic_add_fetch( pDest, 1, __ATOMIC_SEQ_CST );
+}
+
+int64 ThreadInterlockedDecrement64( int64 volatile *pDest )
+{
+	Assert( (size_t)pDest % 8 == 0 );
+	return __atomic_sub_fetch( pDest, 1, __ATOMIC_SEQ_CST );
+}
+
+int64 ThreadInterlockedExchangeAdd64( int64 volatile *pDest, int64 value )
+{
+	Assert( (size_t)pDest % 8 == 0 );
+	// Returns old value, same as Windows version above.
+	return __atomic_fetch_add( pDest, value, __ATOMIC_SEQ_CST );
+}
+
+#if defined( PLATFORM_64BITS )
+bool ThreadInterlockedAssignIf128( volatile int128 *pDest, const int128 &value, const int128 &comperand )
+{
+	Assert( ( (size_t)pDest % 16 ) == 0 );
+#if defined( __GCC_HAVE_SYNC_COMPARE_AND_SWAP_16 )
+	return __sync_bool_compare_and_swap( pDest, comperand, value );
+#else
+	// No native cmpxchg16b (build without -mcx16) and we do not want to require libatomic.
+	// Serialize through spinlock: atomic only against other callers of this function.
+	static std::atomic_flag s_lock = ATOMIC_FLAG_INIT;
+	while ( s_lock.test_and_set( std::memory_order_acquire ) )
+		ThreadPause();
+	const bool bSuccess = ( *pDest == comperand );
+	if ( bSuccess )
+		*pDest = value;
+	s_lock.clear( std::memory_order_release );
+	return bSuccess;
+#endif
+}
+#endif
+
 #else
 // This will perform horribly,
 #error "Falling back to mutexed interlocked operations, you really don't have intrinsics you can use?"ß
