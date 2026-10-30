@@ -1472,11 +1472,28 @@ inline T* Construct( T* pMemory, ARG1 a1, ARG2 a2, ARG3 a3, ARG4 a4, ARG5 a5 )
 	return reinterpret_cast<T*>(::new( pMemory ) T( a1, a2, a3, a4, a5 )); //-V572
 }
 
+namespace s1_platform_detail
+{
+	// Placement-constructs T: uses T(args...) when such a constructor exists
+	// (so initializer_list constructors can't hijack copies), otherwise falls
+	// back to T{args...} for aggregates.
+	template <typename T, typename... Args>
+	[[nodiscard]] inline T* ConstructAt( T *pMemory, Args &&... args )
+	{
+		void *pRaw = const_cast<void *>( static_cast<const volatile void *>( pMemory ) );
+		if constexpr ( std::is_constructible_v<T, Args &&...> )
+			return ::new ( pRaw ) T( std::forward<Args>( args )... );
+		else
+			return ::new ( pRaw ) T{ std::forward<Args>( args )... };
+	}
+}
+
+// dimhotepus: Returns T*.
 template <typename T, typename... Args>
-inline void Construct( T *memory, Args &&... args )
+inline T* Construct( T *pMemory, Args &&... args )
 {
 	HINT( pMemory != nullptr );
-	::new (memory) T{std::forward<Args>(args)...};
+	return s1_platform_detail::ConstructAt( pMemory, std::forward<Args>( args )... );
 }
 
 template <class T, class P>
@@ -1497,32 +1514,36 @@ template <class T, class P1, class P2, class P3 >
 	::new( pMemory ) T(arg1, arg2, arg3);
 }
 
+// dimhotepus: Copies use T(src), never T{src}: brace-init prefers an
+// initializer_list constructor over the copy constructor.
 template <class T>
 inline T* CopyConstruct( T* pMemory, T const& src )
 {
 	HINT( pMemory != nullptr );
-	return ::new( pMemory ) T{src};
+	return s1_platform_detail::ConstructAt( pMemory, src );
 }
 
+// dimhotepus: Returns T*.
 template <class T>
-inline void CopyConstruct( T* pMemory, T&& src )
+inline T* CopyConstruct( T* pMemory, T&& src )
 {
 	HINT( pMemory != nullptr );
-  ::new (pMemory) T{std::forward<T>(src)};
+	return s1_platform_detail::ConstructAt( pMemory, std::move( src ) );
 }
 
+// dimhotepus: Returns T*.
 template <class T, typename... Args>
-inline void CopyConstruct( T* pMemory, Args&&... src )
+inline T* CopyConstruct( T* pMemory, Args&&... src )
 {
 	HINT( pMemory != nullptr );
-	::new( pMemory ) T{std::forward<Args...>( src )...};
+	return s1_platform_detail::ConstructAt( pMemory, std::forward<Args>( src )... );
 }
 
 template <class T>
 inline T* MoveConstruct( T* pMemory, T&& src )
 {
 	HINT( pMemory != nullptr );
-	return ::new( pMemory ) T{std::forward<T>( src )};
+	return s1_platform_detail::ConstructAt( pMemory, std::move( src ) );
 }
 
 template <class T>
