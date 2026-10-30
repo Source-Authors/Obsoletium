@@ -52,7 +52,38 @@ using wchar = wchar_t;
 
 #ifdef _WIN32
 #include <tchar.h>
+#elif defined(_UNICODE)
+// dimhotepus: Wide mappings for POSIX _UNICODE builds (e.g. STEAM forces
+// _UNICODE above).  Old code always used the narrow ones, so tchar was wchar_t
+// while _T("x") was a char literal and _tcslen & co. took char *: any tchar
+// string code failed to compile.
+// dimhotepus: Include the headers declaring the targets, so the shims work
+// without every caller knowing which POSIX header to pull in.
+#include <cstdio>  // fwprintf, wprintf, swprintf, vswprintf
+#include <cwchar>  // wcs*, wcscasecmp
+#define _tcsstr wcsstr
+#define _tcsicmp wcscasecmp  // POSIX 2008
+#define _tcscmp wcscmp
+#define _tcscpy wcscpy
+#define _tcsncpy wcsncpy
+#define _tcsrchr wcsrchr
+#define _tcslen wcslen
+// dimhotepus: No _tfopen / _stprintf: POSIX has no wide fopen, and swprintf
+// needs a buffer size that _stprintf doesn't pass.  Leaving them undefined
+// gives a compile error instead of a silently wrong call.
+#define _ftprintf fwprintf
+// vswprintf / swprintf take (buffer, count, format, ...) like _vsnwprintf /
+// _snwprintf.
+#define _vsntprintf vswprintf
+#define _tprintf wprintf
+#define _sntprintf swprintf
+#define _T(s) L##s
 #else
+// dimhotepus: Include the headers declaring the targets, so the shims work
+// without every caller knowing which POSIX header to pull in.
+#include <cstdio>     // fopen, sprintf, fprintf, printf, snprintf, vsnprintf
+#include <cstring>    // strstr, strcmp, strcpy, strncpy, strrchr, strlen
+#include <strings.h>  // strcasecmp
 #define _tcsstr strstr
 // dimhotepus: stricmp -> strcasecmp for POSIX.
 #define _tcsicmp strcasecmp  // POSIX, <strings.h>
