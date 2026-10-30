@@ -2004,7 +2004,8 @@ public:
 	}
 
 private:
-	std::atomic<T *> m_instance;
+	// dimhotepus: Value-initialize, std::atomic has indeterminate value before C++20 for non-static objects.
+	std::atomic<T *> m_instance{ nullptr };
 	CThreadFastMutex m_mutex;
 };
 
