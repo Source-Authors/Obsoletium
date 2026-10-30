@@ -627,7 +627,36 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 	else
 	{
 		// Couldn't SDL it up
-		g_bBreak.store(true, std::memory_order_release);
+		// dimhotepus: Use console fallback if no SDL.
+		fprintf( stderr, "\n=== ASSERTION FAILED ===\n" );
+		fprintf( stderr, "File: %s\nLine: %i\nExpr: %s\n\n", pFilename, line, pExpression );
+		fprintf( stderr, "Options:\n" );
+		fprintf( stderr, "  [b] Break/Continue\n" );
+		fprintf( stderr, "  [o] Ignore this once\n" );
+		fprintf( stderr, "  [i] Ignore this always\n" );
+		fprintf( stderr, "  [a] Ignore all\n" );
+		fprintf( stderr, "  [f] Ignore file\n" );
+		fprintf( stderr, "> " );
+
+		const char ch = getchar();
+		switch ( tolower( ch ) )
+		{
+		case 'b':
+			g_bBreak.store( true, std::memory_order_release );
+			break;
+		case 'o':
+			// Ignore this Assert once
+			break;
+		case 'i':
+			IgnoreAssertsNearby( 0 );
+			break;
+		case 'a':
+			g_bAssertsEnabled.store( false, std::memory_order_release );
+			break;
+		case 'f':
+			IgnoreAssertsInCurrentFile();
+			break;
+		}
 	}
 
 #else
