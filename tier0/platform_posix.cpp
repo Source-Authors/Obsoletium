@@ -22,9 +22,14 @@
 #include <sys/sysctl.h>
 #endif
 
+#ifndef NO_HOOK_MALLOC
+// dimhotepus: Memory logging includes moved here from the middle of the file,
+// so they are seen before memdbgon.h (which may #define malloc / free).
+#include <execinfo.h>
+// dimhotepus: <malloc.h> only on Linux; it doesn't exist on macOS.
 #ifdef LINUX
-#include <fcntl.h>
-#include <ctime>
+#include <malloc.h>
+#endif
 #endif
 
 #include "tier0/valve_on.h"
@@ -36,6 +41,13 @@
 #include "tier0/vcrmode.h"
 #include "tier0/memalloc.h"
 #include "tier0/dbg.h"
+
+#ifndef NO_HOOK_MALLOC
+// dimhotepus: Explicit include for CThreadFastMutex / AUTO_LOCK used by the
+// memory logging code (previously relied on transitively).
+#include "tier0/threadtools.h"
+#include "tier1/utlintrusivelist.h"
+#endif
 
 #include "tier0/memdbgon.h"
 
@@ -494,48 +506,73 @@ bool vtune( bool resume )
 // Memory stuff.
 // -------------------------------------------------------------------------------------------------- //
 
-#ifndef NO_HOOK_MALLOC
+// dimhotepus: Plat_Alloc & co. no longer depend on NO_HOOK_MALLOC.  That
+// macro only controls the malloc logging below; with it defined the exported
+// allocator functions disappeared and callers failed to link.  Selected like on
+// Windows: tier0 allocator unless STEAM / NO_MALLOC_OVERRIDE.
 
-PLATFORM_INTERFACE void Plat_DefaultAllocErrorFn( unsigned long size )
+PLATFORM_INTERFACE void Plat_DefaultAllocErrorFn( [[maybe_unused]] unsigned long size )
 {
 }
 
 using Plat_AllocErrorFn = void (*)(unsigned long);
 Plat_AllocErrorFn g_AllocError = Plat_DefaultAllocErrorFn;
 
-PLATFORM_INTERFACE void* Plat_Alloc( unsigned long size )
+// dimhotepus: Under STEAM, valve_on.h #defines malloc / realloc / free as
+// function-like macros; "(malloc)( size )" calls the real CRT function.
+
+PLATFORM_INTERFACE MUST_CHECK_RETURN void* Plat_Alloc( unsigned long size )
 {
-	void *pRet = MemAlloc_Alloc( size );
+#if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
+	// dimhotepus: MemAlloc_Alloc -> g_pMemAlloc->Alloc, same as the other
+	// functions here.
+	void *pRet = g_pMemAlloc->Alloc( size );
+#else
+	void *pRet = (malloc)( size );
+#endif
 	if ( pRet )
 	{
 		return pRet;
 	}
-	else
+
+	// dimhotepus: nullptr for a 0-byte request is not an allocation failure.
+	if ( size != 0 )
 	{
 		g_AllocError( size );
+	}
 		return nullptr;
 	}
-}
 
 
-PLATFORM_INTERFACE void* Plat_Realloc( void *ptr, unsigned long size )
+PLATFORM_INTERFACE MUST_CHECK_RETURN void* Plat_Realloc( void *ptr, unsigned long size )
 {
+#if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 	void *pRet = g_pMemAlloc->Realloc( ptr, size );
+#else
+	void *pRet = (realloc)( ptr, size );
+#endif
 	if ( pRet )
 	{
 		return pRet;
 	}
-	else
+
+	// dimhotepus: realloc( ptr, 0 ) frees ptr and may return nullptr; that is
+	// not an allocation failure.
+	if ( size != 0 )
 	{
 		g_AllocError( size );
+	}
 		return nullptr;
 	}
-}
 
 
 PLATFORM_INTERFACE void Plat_Free( void *ptr )
 {
+#if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 	g_pMemAlloc->Free( ptr );
+#else
+	(free)( ptr );
+#endif
 }
 
 
@@ -543,8 +580,6 @@ PLATFORM_INTERFACE void Plat_SetAllocErrorFn( Plat_AllocErrorFn fn )
 {
 	g_AllocError = fn;
 }
-
-#endif // !NO_HOOK_MALLOC
 
 #if defined( OSX )
 
@@ -893,23 +928,31 @@ PLATFORM_INTERFACE void Plat_SetWatchdogHandlerFunction( Plat_WatchDogHandlerFun
 
 // memory logging this functionality is portable code, except for the way in which it hooks
 // malloc/free. glibc contains the ability for the app to install hooks into malloc/free.
-
-#include <malloc.h>
-#include <tier1/utlintrusivelist.h>
-#include <execinfo.h>
-#include <tier1/utlvector.h>
+//
+// dimhotepus: glibc removed __malloc_hook / __free_hook / __realloc_hook in
+// 2.34 (2021), so this file didn't compile on any current distribution.  Use
+// the hooks only where they exist; elsewhere memory logging is unavailable
+// and EnableMemoryLogging says so.
+#if defined( LINUX ) && defined( __GLIBC__ ) && \
+	( __GLIBC__ < 2 || ( __GLIBC__ == 2 && __GLIBC_MINOR__ < 34 ) )
+#define SE_HAS_GLIBC_MALLOC_HOOKS 1
+#endif
      
 #define MEMALLOC_HASHSIZE 8193
-using ptrint_t = uint32;
+// dimhotepus: uint32 -> uintptr_t.  64-bit addresses were cut to 32 bits, so
+// different blocks compared equal and frees matched the wrong allocation.
+using ptrint_t = uintptr_t;
 
 
 
+// dimhotepus: int -> int64 counters.  The byte totals overflowed (UB) past
+// 2 GiB in use.
 struct CLinuxMemStats
 {
-	int nNumMallocs;										// total every
-	int nNumFrees;											// total
-	int nNumMallocsInUse;
-	int nTotalMallocInUse;
+	int64 nNumMallocs;										// total every
+	int64 nNumFrees;										// total
+	int64 nNumMallocsInUse;
+	int64 nTotalMallocInUse;
 
 };
 
@@ -921,16 +964,18 @@ struct CLinuxMallocContext
 
 	void *pStackTraceBack[MAX_STACK_TRACEBACK];
 
-	int m_nCurrentAllocSize;
-	int m_nNumAllocsInUse;
-	int m_nMaximumSize;
-	int m_TotalNumAllocs;
-	int m_nLastAllocSize;
+	// dimhotepus: int -> int64 sizes, see CLinuxMemStats.
+	int64 m_nCurrentAllocSize;
+	int64 m_nNumAllocsInUse;
+	int64 m_nMaximumSize;
+	int64 m_TotalNumAllocs;
+	int64 m_nLastAllocSize;
 
 
 	CLinuxMallocContext( )
 	{
-		memset( this, 0, sizeof( *this ) );
+		// dimhotepus: std::memset through void * (no -Wclass-memaccess).
+		std::memset( static_cast<void *>( this ), 0, sizeof( *this ) );
 	}
 
 };
@@ -951,7 +996,8 @@ struct RememberedAlloc_t
 
 	void AdjustSize( size_t nsize )
 	{
-		int nDelta = nsize - m_nSize;
+		// dimhotepus: Signed 64-bit delta (was int from size_t subtraction).
+		const int64 nDelta{ static_cast<int64>( nsize ) - static_cast<int64>( m_nSize ) };
 		m_nSize = nsize;
 		m_pAllocContext->m_nCurrentAllocSize += nDelta;
 		m_pAllocContext->m_nMaximumSize = MAX( m_pAllocContext->m_nMaximumSize, m_pAllocContext->m_nCurrentAllocSize );
@@ -961,14 +1007,16 @@ struct RememberedAlloc_t
 
 static inline int AddressHash( ptrint_t nAdr )
 {
-	return ( nAdr % MEMALLOC_HASHSIZE );
+	return static_cast<int>( nAdr % MEMALLOC_HASHSIZE );
 }
 
 static CUtlIntrusiveDList<RememberedAlloc_t> s_AddressData[MEMALLOC_HASHSIZE];
 
-static struct RememberedAlloc_t *FindAddress( void *pAdr, int *pHash = nullptr )
+// dimhotepus: Takes the address as an integer.  The hooks compute it before
+// calling realloc / free, so a freed pointer value is never used afterwards
+// (-Wuse-after-free).
+static struct RememberedAlloc_t *FindAddress( ptrint_t nAdr, int *pHash = nullptr )
 {
-	auto nAdr = ( ptrint_t ) pAdr;
 	int nHash = AddressHash( nAdr );
 	if ( pHash )
 		*pHash = nHash;
@@ -980,7 +1028,9 @@ static struct RememberedAlloc_t *FindAddress( void *pAdr, int *pHash = nullptr )
 	return nullptr;
 }
 
-#ifdef LINUX
+// dimhotepus: #ifdef LINUX -> SE_HAS_GLIBC_MALLOC_HOOKS (hooks exist only in
+// glibc < 2.34).
+#ifdef SE_HAS_GLIBC_MALLOC_HOOKS
 static void *MallocHook( size_t, const void * );
 static void FreeHook( void*, const void * );
 static void *ReallocHook( void *ptr, size_t size, const void *caller );
@@ -1000,9 +1050,10 @@ static void InstallHooks( void )
 	__realloc_hook = ReallocHook;
 
 }
-#elif OSX
+#else
 
-
+// dimhotepus: No malloc hooks on this platform / C library: no-ops (was
+// OSX-only; other platforms hit #error).
 static void RemoveHooks( void )
 {
 }
@@ -1012,9 +1063,6 @@ static void InstallHooks( void )
 {	
 }
 
-
-#else
-#error "Please define your platform"
 #endif
 
 
@@ -1024,10 +1072,12 @@ static void AddMemoryAllocation( void *pResult, size_t size )
 	{
 		g_LinuxMemStats.nNumMallocs++;
 		g_LinuxMemStats.nNumMallocsInUse++;
-		g_LinuxMemStats.nTotalMallocInUse += size;
+		// dimhotepus: Explicit size_t -> int64 and pointer -> uintptr_t casts
+		// (C-style ( ptrint_t ) cast didn't compile on 64-bit with uint32).
+		g_LinuxMemStats.nTotalMallocInUse += static_cast<int64>( size );
 
 		auto *pNew = new RememberedAlloc_t;
-		pNew->m_nAddress = ( ptrint_t ) pResult;
+		pNew->m_nAddress = reinterpret_cast<ptrint_t>( pResult );
 		pNew->m_nSize = size;
 		s_AddressData[AddressHash( pNew->m_nAddress )].AddToHead( pNew );
 
@@ -1041,7 +1091,8 @@ static void AddMemoryAllocation( void *pResult, size_t size )
 		uint32 nHash = 0;
 		for(auto & i : pTraceBack)
 		{
-			nHash = ( nHash * 3 ) + ( ( ptrint_t ) i );
+			// dimhotepus: Explicit pointer -> integer -> uint32 conversion.
+			nHash = ( nHash * 3 ) + static_cast<uint32>( reinterpret_cast<ptrint_t>( i ) );
 		}
 		nHash %= MEMALLOC_HASHSIZE;
 
@@ -1062,64 +1113,79 @@ static void AddMemoryAllocation( void *pResult, size_t size )
 			s_ContextHash[nHash].AddToHead( pFoundCtx );
 		}
 		pNew->m_pAllocContext = pFoundCtx;
-		pFoundCtx->m_nCurrentAllocSize += size;
+		pFoundCtx->m_nCurrentAllocSize += static_cast<int64>( size );
 		pFoundCtx->m_nNumAllocsInUse++;
 		pFoundCtx->m_nMaximumSize = MAX( pFoundCtx->m_nCurrentAllocSize, pFoundCtx->m_nMaximumSize );
 		pFoundCtx->m_TotalNumAllocs++;
 	}
 }
 
-
-static CThreadFastMutex s_MemoryMutex;
-
-static void *ReallocHook( void *ptr, size_t size, const void *caller )
+// dimhotepus: Shared bookkeeping for a block that went away (free or a moving
+// realloc).  The realloc path used to leak the node and left the global
+// in-use counters too high.
+static void ForgetAllocation( RememberedAlloc_t *pBlock, int nHash )
 {
-	AUTO_LOCK( s_MemoryMutex );
-	RemoveHooks();
-	void *nResult = realloc( ptr, size );
-
-	if ( ptr )												// did we have this memory before
-	{
-		int nHash;
-		RememberedAlloc_t *pBlock = FindAddress( ptr, &nHash );
-		if ( pBlock )
-		{
-			if ( ptr == nResult )
-			{
-				// it successfully alloced, just need to update size info, etc
-				pBlock->AdjustSize( size );
-				g_LinuxMemStats.nTotalMallocInUse += ( size - pBlock->m_nSize );
-				
-			}
-			else
-			{
-				pBlock->m_pAllocContext->m_nCurrentAllocSize -= pBlock->m_nSize;
-				pBlock->m_pAllocContext->m_nNumAllocsInUse--;
-				s_AddressData[nHash].RemoveNode( pBlock );	// throw away this node
-				AddMemoryAllocation( nResult, size );
-			}
-		}
-		else
-			AddMemoryAllocation( nResult, size );
-	}
-	else
-		AddMemoryAllocation( nResult, size );
-	InstallHooks();
-	return nResult;
-
-
-
+	pBlock->m_pAllocContext->m_nCurrentAllocSize -= static_cast<int64>( pBlock->m_nSize );
+	pBlock->m_pAllocContext->m_nNumAllocsInUse--;
+	g_LinuxMemStats.nTotalMallocInUse -= static_cast<int64>( pBlock->m_nSize );
+	g_LinuxMemStats.nNumFrees++;
+	g_LinuxMemStats.nNumMallocsInUse--;
+	s_AddressData[nHash].RemoveNode( pBlock );
+	delete pBlock;
 }
 
 
-static void *MallocHook(size_t size, const void *caller)
+static CThreadFastMutex s_MemoryMutex;
+
+// dimhotepus: Hooks call the real functions as (realloc) / (malloc) / (free)
+// so memdbgon.h / valve_on.h macros can't redirect them.
+[[maybe_unused]] static void *ReallocHook( void *ptr, size_t size, [[maybe_unused]] const void *caller )
+{
+	AUTO_LOCK( s_MemoryMutex );
+	RemoveHooks();
+	const ptrint_t nOldAddress{ reinterpret_cast<ptrint_t>( ptr ) };
+	void *nResult = (realloc)( ptr, size );
+
+	int nHash{ 0 };
+	RememberedAlloc_t *pBlock{ nOldAddress ? FindAddress( nOldAddress, &nHash ) : nullptr };
+
+	if ( !nResult && size != 0 )
+		{
+		// dimhotepus: realloc failed; ptr is still valid and still tracked.
+		// Old code dropped its bookkeeping.
+	}
+	else if ( pBlock && reinterpret_cast<ptrint_t>( nResult ) == nOldAddress )
+			{
+				// it successfully alloced, just need to update size info, etc
+		// dimhotepus: Update the global total before AdjustSize.  The old code
+		// did it after, when m_nSize already equaled size, so the delta was
+		// always 0.
+		g_LinuxMemStats.nTotalMallocInUse += static_cast<int64>( size ) - static_cast<int64>( pBlock->m_nSize );
+				pBlock->AdjustSize( size );
+			}
+			else
+			{
+		// Moved, freed by realloc( ptr, 0 ), or not tracked before.
+		if ( pBlock )
+		{
+			ForgetAllocation( pBlock, nHash );
+		}
+			AddMemoryAllocation( nResult, size );
+	}
+
+	InstallHooks();
+	return nResult;
+}
+
+
+[[maybe_unused]] static void *MallocHook(size_t size, [[maybe_unused]] const void *caller)
 {
 	// turn off hooking so we won't recurse
 	AUTO_LOCK( s_MemoryMutex );
 	RemoveHooks();
 
 
-	void *pResult = malloc (size);
+	void *pResult = (malloc)( size );
 
 	// now, add this memory chunk to our list
 	AddMemoryAllocation( pResult, size );
@@ -1129,32 +1195,31 @@ static void *MallocHook(size_t size, const void *caller)
 	return pResult;
 }
      
-static void FreeHook(void *ptr, const void *caller )
+[[maybe_unused]] static void FreeHook(void *ptr, [[maybe_unused]] const void *caller )
 {
 	AUTO_LOCK( s_MemoryMutex );
 	RemoveHooks();
 
+	// dimhotepus: Address captured before free, looked up as an integer
+	// (see FindAddress); unused caller marked [[maybe_unused]].
+	const ptrint_t nAddress{ reinterpret_cast<ptrint_t>( ptr ) };
+
 	// call real free
-	free (ptr);
+	(free)( ptr );
 
 	// look in our list
-	if ( ptr )
+	if ( nAddress )
 	{
 		int nHash;
-		RememberedAlloc_t *pFound = FindAddress( ptr, &nHash );
+		RememberedAlloc_t *pFound = FindAddress( nAddress, &nHash );
 		if ( !pFound )
 		{
 			//printf(" free of unallocated adr %p (maybe)\n", ptr );
 		}
 		else
 		{
-			pFound->m_pAllocContext->m_nCurrentAllocSize -= pFound->m_nSize;
-			pFound->m_pAllocContext->m_nNumAllocsInUse--;
-			g_LinuxMemStats.nTotalMallocInUse -= pFound->m_nSize;
-			g_LinuxMemStats.nNumFrees++;
-			g_LinuxMemStats.nNumMallocsInUse--;
-			s_AddressData[nHash].RemoveNode( pFound );
-			delete pFound;
+			// dimhotepus: Shared bookkeeping, see ForgetAllocation.
+			ForgetAllocation( pFound, nHash );
 		}
 	}
 	InstallHooks();
@@ -1164,35 +1229,11 @@ void EnableMemoryLogging( bool bOnOff )
 {
 	if ( bOnOff )
 	{
-		InstallHooks();
-#if 0
-		// simple test
-		char *p[10];
-		for( int i =0; i < 10; i++ )
-			p[i] = new char[10];
-		printf( "log with memory\n" );
-		DumpMemoryLog();
-		for( int i = 0; i < 10; i++ )
-			delete[] p[i];
-		printf( "after free,\n" );
-		DumpMemoryLog();
-
-		// now, try som realloc action
-		int *p1 = NULL;
-		int *p2;
-		for( int i =1 ; i < 10; i++ )
-		{
-			p1 = (int * ) realloc( p1, i * 100 );
-			if ( i == 3 )
-				p2 = new int[300];
-		}
-		printf(" after realloc loop\n" );
-		DumpMemoryLog();
-		delete[] p2;
-		free( p1 );
-		printf(" after realloc frees\n" );
-		DumpMemoryLog();
+#ifndef SE_HAS_GLIBC_MALLOC_HOOKS
+		// dimhotepus: Tell the caller instead of silently logging nothing.
+		Warning( "Memory logging is not supported on this platform (no malloc hooks).\n" );
 #endif
+		InstallHooks();
 	}
 
 	else
