@@ -63,8 +63,16 @@
 #include <unistd.h>
 #endif
 
-#include <malloc.h>
-#include <new>
+// dimhotepus: <malloc.h> doesn't exist on macOS and is an #error on FreeBSD.
+#if defined(_WIN32)
+#include <malloc.h>  // _alloca, _msize
+#elif defined(__APPLE__)
+#include <malloc/malloc.h>  // malloc_size
+#elif defined(__FreeBSD__)
+#include <malloc_np.h>  // malloc_usable_size
+#else
+#include <malloc.h>  // malloc_usable_size
+#endif
 
 #include <algorithm>    // std::nth_element
 #include <chrono>       // std::chrono::steady_clock
