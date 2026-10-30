@@ -2011,7 +2011,8 @@ bool CThread::Terminate(int exitCode)
 	m_hThread = nullptr;
 	Cleanup();
 #elif defined(POSIX)
-	pthread_kill( m_threadId, SIGKILL );
+	// dimhotepus: SIGKILL sent to a thread kills the whole process. Cancel the thread instead.
+	pthread_cancel( m_threadId );
 	Cleanup();
 #endif
 
