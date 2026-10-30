@@ -3,9 +3,7 @@
 #ifndef SE_PUBLIC_TIER0_SYSTEMINFORMATION_H_
 #define SE_PUBLIC_TIER0_SYSTEMINFORMATION_H_
 
-#ifndef PLATFORM_INTERFACE
-	#define PLATFORM_INTERFACE
-#endif
+#include "platform.h"
 
 //
 //	Defines a possible outcome of a system call
