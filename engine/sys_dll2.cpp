@@ -1411,7 +1411,8 @@ CON_COMMAND( gprofilerstart, "Starts the gperftools profiler recording to the sp
 	const char* profname = buffer;
 	if ( args.ArgC() < 2 )
 	{
-		static const char *s_pszHomeDir = getenv("HOME");
+		// dimhotepus: Do not store getenv result. it can be changed any time. 
+		const char *s_pszHomeDir = getenv("HOME");
 		if ( !s_pszHomeDir )
 		{
 			Msg( "Syntax: gprofile <outputfilename>\n" );

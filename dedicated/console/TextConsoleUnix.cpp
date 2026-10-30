@@ -153,7 +153,8 @@ static unsigned char editline_complete( EditLine *el,
 static const char *editline_prompt( EditLine *e )
 {
 	// Something like: "\1\033[7m\1Srcds$\1\033[0m\1 "
-	static const char *szPrompt = getenv( "SRCDS_PROMPT" );
+	// dimhotepus: Do not store getenv result. it can be changed any time. 
+	const char *szPrompt = getenv( "SRCDS_PROMPT" );
 	return szPrompt ? szPrompt : "";
 }
 

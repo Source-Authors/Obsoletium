@@ -480,11 +480,13 @@ PathMod_t pathmatch( const char *pszIn, char **ppszOut, bool bAllowBasenameMisma
 	// depends on how many files are in directories on a user's machine. Therefore
 	// it should be disabled whenever possible, and only enabled in environments (such
 	// as running with loose files such as out of Perforce) where it is needed.
-	static const char *s_pszPathMatchEnabled = getenv("ENABLE_PATHMATCH");
+	// dimhotepus: Drop static as getenv can't be cached - it is shared buffer.
+	const char *s_pszPathMatchEnabled = getenv("ENABLE_PATHMATCH");
 	if ( !s_pszPathMatchEnabled )
 		return kPathUnchanged;
 
-	static const char *s_pszDbgPathMatch = getenv("DBG_PATHMATCH");
+	// dimhotepus: Drop static as getenv can't be cached - it is shared buffer.
+	const char *s_pszDbgPathMatch = getenv("DBG_PATHMATCH");
 
 	s_bShowDiag = ( s_pszDbgPathMatch != NULL );
 
