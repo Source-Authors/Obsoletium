@@ -1793,7 +1793,7 @@ inline void CThreadMutex::Unlock()
 
 //---------------------------------------------------------
 
-inline bool CThreadMutex::AssertOwnedByCurrentThread()
+inline bool CThreadMutex::AssertOwnedByCurrentThread() const
 {
 	return true;
 }
