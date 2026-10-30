@@ -1036,7 +1036,7 @@ void CThreadPool::Distribute( bool bDistribute, int *pAffinityTable )
 	{
 		const CPUInformation &ci = *GetCPUInformation();
 		// dimhotepus: Need to rethink as 12th Gen Intel Core has >2 HT per core.
-		int nHwThreadsPer = ci.m_nPhysicalProcessors != ci.m_nLogicalProcessors ? 2 : 1;
+		DWORD nHwThreadsPer = ci.m_nPhysicalProcessors != ci.m_nLogicalProcessors ? 2 : 1;
 		if ( ci.m_nLogicalProcessors > 1 )
 		{
 			if ( !pAffinityTable )
@@ -1045,7 +1045,7 @@ void CThreadPool::Distribute( bool bDistribute, int *pAffinityTable )
 				ThreadHandle_t hMainThread = ThreadGetCurrentHandle();
 				SetThreadIdealProcessor( hMainThread, 0 );
 
-				int iProc = 0;
+				DWORD iProc = 0;
 				for ( auto &&t : m_Threads )
 				{
 					iProc += nHwThreadsPer;
