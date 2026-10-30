@@ -333,15 +333,22 @@ MUST_CHECK_RETURN uint64 Plat_USTime()
 
 void GetCurrentDate( int *pDay, int *pMonth, int *pYear )
 {
-	struct tm *pNewTime;
-	time_t long_time;
+	// dimhotepus: localtime -> localtime_s.
+	const time_t now{ time( nullptr ) };
 
-	time( &long_time );                /* Get time as long integer. */
-	pNewTime = localtime( &long_time ); /* Convert to local time. */
+	struct tm local = {};
+	if ( localtime_s( &local, &now ) != 0 )
+	{
+		AssertMsg( false, "localtime_s failed for time %lld.", static_cast<long long>( now ) );
+		*pDay = 0;
+		*pMonth = 0;
+		*pYear = 0;
+		return;
+	}
 
-	*pDay = pNewTime->tm_mday;
-	*pMonth = pNewTime->tm_mon + 1;
-	*pYear = pNewTime->tm_year + 1900;
+	*pDay = local.tm_mday;
+	*pMonth = local.tm_mon + 1;
+	*pYear = local.tm_year + 1900;
 }
 
 
