@@ -888,7 +888,7 @@ CShaderDeviceBase::CShaderDeviceBase()
 	m_hWndCookie = nullptr;
 	m_nWindowWidth = 0;
 	m_nWindowHeight = 0;
-	m_dwThreadId.store( ThreadGetCurrentId(), std::memory_order::memory_order_relaxed );
+	m_dwThreadId.store( ThreadGetCurrentId(), std::memory_order::memory_order_release );
 }
 
 CShaderDeviceBase::~CShaderDeviceBase()
@@ -897,17 +897,17 @@ CShaderDeviceBase::~CShaderDeviceBase()
 
 void CShaderDeviceBase::SetCurrentThreadAsOwner()
 {
-	m_dwThreadId.store( ThreadGetCurrentId(), std::memory_order::memory_order_relaxed );
+	m_dwThreadId.store( ThreadGetCurrentId(), std::memory_order::memory_order_release );
 }
 
 void CShaderDeviceBase::RemoveThreadOwner()
 {
-	m_dwThreadId.store( INVALID_THREAD_ID, std::memory_order::memory_order_relaxed );
+	m_dwThreadId.store( INVALID_THREAD_ID, std::memory_order::memory_order_release );
 }
 
 bool CShaderDeviceBase::ThreadOwnsDevice() const
 {
-	return ThreadGetCurrentId() == m_dwThreadId.load( std::memory_order::memory_order_relaxed );
+	return ThreadGetCurrentId() == m_dwThreadId.load( std::memory_order::memory_order_acquire );
 }
 
 

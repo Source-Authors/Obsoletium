@@ -2958,12 +2958,12 @@ void CTextureManager::ReleaseAsyncScratchVTF( IVTFTexture *pScratchVTF )
 
 bool CTextureManager::ThreadInAsyncLoadThread() const
 {
-	return ThreadGetCurrentId() == m_nAsyncLoadThread.load(std::memory_order::memory_order_relaxed);
+	return ThreadGetCurrentId() == m_nAsyncLoadThread.load(std::memory_order::memory_order_acquire);
 }
 
 bool CTextureManager::ThreadInAsyncReadThread() const
 {
-	return ThreadGetCurrentId() == m_nAsyncReadThread.load(std::memory_order::memory_order_relaxed);
+	return ThreadGetCurrentId() == m_nAsyncReadThread.load(std::memory_order::memory_order_acquire);
 }
 
 bool CTextureManager::AddTextureCompositorTemplate( const char* pName, KeyValues* pTmplDesc )

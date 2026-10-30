@@ -185,7 +185,7 @@ protected:
 
 	int	m_nWindowWidth;
 	int m_nWindowHeight;
-	// dimhotepus: Make atomic as mutlithreaded access.
+	// dimhotepus: Make atomic as multithreaded access.
 	std::atomic<ThreadId_t> m_dwThreadId;
 
 	constexpr static inline wchar_t kShaderApiWindowClassName[]{L"shaderdx8"};
