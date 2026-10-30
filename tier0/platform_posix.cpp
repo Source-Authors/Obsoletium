@@ -687,7 +687,7 @@ MUST_CHECK_RETURN bool Plat_IsUserAnAdmin()
 
 	// We might have elevated privileges beyond that of the user who invoked the
 	// program, due to suid bit.
-	return uid < 0 || euid == 0 || uid != euid;
+	return euid == 0 || uid != euid;
 }
 
 void Plat_DebugString( const char * psz )
