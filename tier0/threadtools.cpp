@@ -342,6 +342,16 @@ void ThreadSetAffinity( ThreadHandle_t hThread, intp nAffinityMask )
 
 #ifdef _WIN32
 	SetThreadAffinityMask( hThread, nAffinityMask );
+#elif defined(LINUX)
+	// dimhotepus: Implement affinity on Linux (was no-op).
+	cpu_set_t cpuSet;
+	CPU_ZERO( &cpuSet );
+	for ( int i = 0; i < 64 && i < CPU_SETSIZE; i++ )
+	{
+		if ( ( static_cast<uint64>( nAffinityMask ) >> i ) & 1 )
+			CPU_SET( i, &cpuSet );
+	}
+	pthread_setaffinity_np( (pthread_t)hThread, sizeof( cpuSet ), &cpuSet );
 #elif defined(POSIX)
 // 	cpu_set_t cpuSet;
 // 	CPU_ZERO( cpuSet );
