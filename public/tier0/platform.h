@@ -1265,7 +1265,7 @@ struct CPUInformation
 
 	const char *m_szProcessorBrand;
 
-	CPUInformation() { memset(this, 0, sizeof(*this)); }
+	CPUInformation() { std::memset(static_cast<void *>(this), 0, sizeof(*this)); }
 };
 
 // Have to return a pointer, not a reference, because references are not compatible with the
@@ -1290,7 +1290,7 @@ struct MemoryInformation
 
 	inline MemoryInformation()
 	{
-		memset( this, 0, sizeof( *this ) );
+		std::memset( static_cast<void *>( this ), 0, sizeof( *this ) );
 		m_nStructVersion = MEMORY_INFORMATION_VERSION;
 	}
 };
