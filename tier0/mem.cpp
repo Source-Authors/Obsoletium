@@ -69,13 +69,13 @@ void *MemAllocScratch( size_t nMemSize )
 		}
 	}
 
-	size_t nBase = std::exchange(s_nBufCurSize, s_nBufCurSize + nMemSize);
-
 	++s_nBufDepth;
 	Assert( s_nBufDepth < ssize(s_pBufStackDepth) );
 	if ( s_nBufDepth >= ssize(s_pBufStackDepth) )
 		Error("Stack overflow during scratch memory allocation. Only %zd allocations allowed.", ssize(s_pBufStackDepth));
 
+	// dimhotepus: Ensure on stack overflow we do not corrupt buffer size above.
+	size_t nBase = std::exchange( s_nBufCurSize, s_nBufCurSize + nMemSize );
 	s_pBufStackDepth[s_nBufDepth] = nMemSize;
 
 	return &s_pBuf[nBase];
