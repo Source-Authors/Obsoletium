@@ -312,7 +312,7 @@ typedef void * HINSTANCE;
 #if defined( _WIN32 )
 #define DebuggerBreak()  __debugbreak()
 #elif defined( __clang__ )
-	// On OSX, SIGTRAP doesn't really stop the thread cold when debugging.
+		// On OSX, SIGTRAP doesn't really stop the thread cold when debugging.
 		// dimhotepus: Use the precise trap instruction for the target CPU
 		// (int3 on x86, brk on ARM64).  Without a debugger it raises SIGTRAP
 		// just like raise(SIGTRAP).  Old code used x86-only "int $3" asm and
@@ -330,11 +330,11 @@ typedef void * HINSTANCE;
 
 // C functions for external declarations that call the appropriate C++ methods
 #ifndef EXPORT
-	#ifdef _WIN32
+		#ifdef _WIN32
 			#define EXPORT	__declspec(dllexport)
-	#else
+		#else
 			#define EXPORT	__attribute__ ((visibility("default")))
-	#endif
+		#endif
 #endif
 
 #if defined __i386__ && !defined __linux__
@@ -346,7 +346,7 @@ typedef void * HINSTANCE;
 // decls for aligning data
 // dimhotepus: Key on the compiler, not the OS (MinGW is _WIN32 but GCC).
 #if defined(_MSC_VER)
-        #define DECL_ALIGN(x) __declspec(align(x))
+	#define DECL_ALIGN(x) __declspec(align(x))
 #elif defined(__GNUC__) || defined(__clang__)
 	#define DECL_ALIGN(x) __attribute__((aligned(x)))
 #else
@@ -394,8 +394,8 @@ template<typename T>
 	if constexpr (std::is_unsigned_v<T>) {
 		return reinterpret_cast<void*>(static_cast<uintp>(i));
 	} else {
-	return reinterpret_cast<void*>(static_cast<intp>(i));
-}
+		return reinterpret_cast<void*>(static_cast<intp>(i));
+	}
 }
 // Truncates the pointer to a 32-bit int / uint by design (handles, cookies and
 // ids stashed in pointer-sized slots); R only selects signed vs unsigned.
@@ -413,7 +413,7 @@ template <typename R, typename T>
 //-----------------------------------------------------------------------------
 // Stack-based allocation related helpers
 //-----------------------------------------------------------------------------
-	// dimhotepus: Align at 16 bytes boundary for performance and SIMD.
+// dimhotepus: Align at 16 bytes boundary for performance and SIMD.
 // The block is over-allocated by 15 bytes and the pointer shifted up to the
 // next 16-byte boundary, so the result is 16-byte aligned on every compiler and
 // CPU and [result, result + _size) always lies inside the allocation.
@@ -431,7 +431,7 @@ template <typename R, typename T>
 		& ~static_cast<uintp>( 15 ) )
 
 #if defined( _WIN32 )
-	#define mallocsize( _p )		( _msize( _p ) )
+		#define mallocsize( _p )		( _msize( _p ) )
 #elif defined( __APPLE__ )
 		#define mallocsize( _p )		( malloc_size( _p ) )
 #elif defined( __linux__ ) || defined( __FreeBSD__ )
@@ -449,10 +449,10 @@ template <typename R, typename T>
 // So when CVProfile::CVProfile() would access g_pMemAlloc, it would crash because the allocator wasn't initalized yet.
 // dimhotepus: init_priority isn't supported by the Mach-O / Darwin toolchain.
 #if defined(POSIX) && !defined(__APPLE__)
-	#define CONSTRUCT_EARLY __attribute__((init_priority(101)))
+		#define CONSTRUCT_EARLY __attribute__((init_priority(101)))
 #else
-	#define CONSTRUCT_EARLY
-	#endif
+		#define CONSTRUCT_EARLY
+#endif
 
 #if defined(_MSC_VER)
 	#define SELECTANY __declspec(selectany)
@@ -464,7 +464,7 @@ template <typename R, typename T>
 	#define ALLOC_CALL RESTRICT_FUNC __declspec(allocator)
 	#define FREE_CALL
 #elif defined(__GNUC__) || defined(__clang__)
-	#define SELECTANY __attribute__((weak))
+		#define SELECTANY __attribute__((weak))
 	#if defined(LINUX) && !defined(DEDICATED)
 		#define RESTRICT
 	#else
@@ -490,7 +490,6 @@ template <typename R, typename T>
 #endif
 
 #if defined( _WIN32 )
-
 	// Used for dll exporting and importing
 	#define DLL_EXPORT				extern "C" __declspec( dllexport )
 	#define DLL_IMPORT				extern "C" __declspec( dllimport )
@@ -504,20 +503,18 @@ template <typename R, typename T>
 	#define DLL_GLOBAL_IMPORT		extern __declspec( dllimport )
 
 	#define DLL_LOCAL
-
 #elif defined(__GNUC__) || defined(__clang__)
-// Used for dll exporting and importing
-#define  DLL_EXPORT   extern "C" __attribute__ ((visibility("default")))
-#define  DLL_IMPORT   extern "C"
+	// Used for dll exporting and importing
+	#define  DLL_EXPORT   extern "C" __attribute__ ((visibility("default")))
+	#define  DLL_IMPORT   extern "C"
 
-// Can't use extern "C" when DLL exporting a class
-#define  DLL_CLASS_EXPORT __attribute__ ((visibility("default")))
-#define  DLL_CLASS_IMPORT
+	// Can't use extern "C" when DLL exporting a class
+	#define  DLL_CLASS_EXPORT __attribute__ ((visibility("default")))
+	#define  DLL_CLASS_IMPORT
 
-// Can't use extern "C" when DLL exporting a global
-#define  DLL_GLOBAL_EXPORT   extern __attribute__ ((visibility("default")))
-#define  DLL_GLOBAL_IMPORT   extern
-
+	// Can't use extern "C" when DLL exporting a global
+	#define  DLL_GLOBAL_EXPORT   extern __attribute__ ((visibility("default")))
+	#define  DLL_GLOBAL_IMPORT   extern
 #define  DLL_LOCAL __attribute__ ((visibility("hidden")))
 
 #else
@@ -533,10 +530,10 @@ template <typename R, typename T>
 	// this macro lets us not force inlining in that case
 	#define  FORCEINLINE_TEMPLATE		__forceinline
 #else
-		// dimhotepus: Calling conventions are meaningless outside Windows, but
-		// must still exist (TEMPLATE_FUNCTION_TABLE uses FASTCALL).
-		#define  STDCALL
-		#define  FASTCALL
+	// dimhotepus: Calling conventions are meaningless outside Windows, but
+	// must still exist (TEMPLATE_FUNCTION_TABLE uses FASTCALL).
+	#define  STDCALL
+	#define  FASTCALL
 	#define FORCEINLINE inline __attribute__((always_inline))
 	// dimhotepus: TF2 backport. Drop workaround for old GCC.
 	#define FORCEINLINE_TEMPLATE		FORCEINLINE
@@ -548,7 +545,7 @@ template <typename R, typename T>
 	#if defined( _MSC_VER ) && !defined( __clang__ )
 		#define NO_ASAN __declspec(no_sanitize_address)
 	#else
-	#define NO_ASAN __attribute__((no_sanitize("address")))
+		#define NO_ASAN __attribute__((no_sanitize("address")))
 	#endif
 	#define NO_ASAN_FORCEINLINE NO_ASAN inline
 #else
@@ -571,10 +568,10 @@ template <typename R, typename T>
 #ifdef _MSC_VER
 	#define HINT(THE_HINT)	__assume((THE_HINT))
 #elif defined(__clang__)
-		#define HINT(THE_HINT)	__builtin_assume((THE_HINT))
+	#define HINT(THE_HINT)	__builtin_assume((THE_HINT))
 #else
-		// dimhotepus: ((void)0), not 0, so "HINT(x);" isn't an unused-value warning.
-		#define HINT(THE_HINT)	((void)0)
+	// dimhotepus: ((void)0), not 0, so "HINT(x);" isn't an unused-value warning.
+	#define HINT(THE_HINT)	((void)0)
 #endif
 
 // Marks the codepath from here until the next branch entry point as unreachable,
@@ -654,43 +651,43 @@ typedef void *HANDLE;
 // dimhotepus: x87 control word only exists on x86.
 #if defined( _MSC_VER ) && defined( _M_IX86 )
 
-		inline void SetupFPUControlWordForceExceptions()
+	inline void SetupFPUControlWordForceExceptions()
+	{
+		// use local to get and store control word
+		uint16 tmpCtrlW;
+		__asm
+		{
+			fnclex						/* clear all current exceptions */
+			fnstcw word ptr [tmpCtrlW]	/* get current control word */
+			and [tmpCtrlW], 0FCC0h		/* Keep infinity control + rounding control */
+			or [tmpCtrlW], 0230h		/* set to 53-bit, mask only inexact, underflow */
+			fldcw word ptr [tmpCtrlW]	/* put new control word in FPU */
+		}
+	}
+
+	#ifdef CHECK_FLOAT_EXCEPTIONS
+
+		inline void SetupFPUControlWord()
+		{
+			SetupFPUControlWordForceExceptions();
+		}
+
+	#else
+
+		inline void SetupFPUControlWord()
 		{
 			// use local to get and store control word
 			uint16 tmpCtrlW;
 			__asm
 			{
-				fnclex						/* clear all current exceptions */
 				fnstcw word ptr [tmpCtrlW]	/* get current control word */
 				and [tmpCtrlW], 0FCC0h		/* Keep infinity control + rounding control */
-				or [tmpCtrlW], 0230h		/* set to 53-bit, mask only inexact, underflow */
+				or [tmpCtrlW], 023Fh		/* set to 53-bit, mask only inexact, underflow */
 				fldcw word ptr [tmpCtrlW]	/* put new control word in FPU */
 			}
 		}
 
-		#ifdef CHECK_FLOAT_EXCEPTIONS
-
-			inline void SetupFPUControlWord()
-			{
-				SetupFPUControlWordForceExceptions();
-			}
-
-		#else
-
-			inline void SetupFPUControlWord()
-			{
-				// use local to get and store control word
-				uint16 tmpCtrlW;
-				__asm
-				{
-					fnstcw word ptr [tmpCtrlW]	/* get current control word */
-					and [tmpCtrlW], 0FCC0h		/* Keep infinity control + rounding control */
-					or [tmpCtrlW], 023Fh		/* set to 53-bit, mask only inexact, underflow */
-					fldcw word ptr [tmpCtrlW]	/* put new control word in FPU */
-				}
-			}
-
-		#endif
+	#endif
 
 #elif ( defined( __GNUC__ ) || defined( __clang__ ) ) && ( defined( __i386__ ) || defined( __x86_64__ ) )
 
@@ -707,10 +704,10 @@ typedef void *HANDLE;
 
 	// x64 MSVC, ARM, etc: SSE / NEON float math, nothing to set up.
 	inline void SetupFPUControlWord()
-			{
-		}
+	{
+	}
 
-	#endif
+#endif
 
 
 //-----------------------------------------------------------------------------
@@ -843,10 +840,10 @@ template <bool isLittleEndian = endian::native == endian::little>
 {
 	if constexpr (isLittleEndian) return WordSwap( val );
 	else return val;
-	}
+}
 template <bool isLittleEndian = endian::native == endian::little>
 [[nodiscard]] inline int32 BigLong( int32 val )
-	{
+{
 	if constexpr (isLittleEndian) return DWordSwap( val );
 	else return val;
 }
@@ -858,23 +855,23 @@ template <bool isLittleEndian = endian::native == endian::little>
 }
 template <bool isLittleEndian = endian::native == endian::little>
 [[nodiscard]] inline uint64 BigQWord( uint64 val )
-		{
+{
 	if constexpr (isLittleEndian) return QWordSwap( val );
 	else return val;
-		}
+}
 
 [[nodiscard]] inline size_t SwapSize_t( size_t val )
-		{
+{
 	static_assert( sizeof(size_t) == 4 || sizeof(size_t) == 8, "Unsupported size_t width" );
 	if constexpr ( sizeof(size_t) == 8 )
 		return static_cast<size_t>( QWordSwap( static_cast<uint64>( val ) ) );
-		else
+	else
 		return static_cast<size_t>( DWordSwap( static_cast<uint32>( val ) ) );
-	}
+}
 
 template <bool isLittleEndian = endian::native == endian::little>
 [[nodiscard]] inline size_t BigSize_t( size_t val )
-	{
+{
 	if constexpr (isLittleEndian) return SwapSize_t( val );
 	else return val;
 }
@@ -901,10 +898,10 @@ template <bool isLittleEndian = endian::native == endian::little>
 {
 	if constexpr (isLittleEndian) return val;
 	else return DWordSwap( val );
-		}
+}
 template <bool isLittleEndian = endian::native == endian::little>
 [[nodiscard]] inline size_t LittleSize_t( size_t val )
-		{
+{
 	if constexpr (isLittleEndian) return val;
 	else return SwapSize_t( val );
 }
@@ -1045,9 +1042,9 @@ PLATFORM_INTERFACE struct tm *		Plat_localtime( const time_t *timep, struct tm *
 #if defined( PLATFORM_INTEL )
 
 [[nodiscard]] FORCEINLINE uint64_t Plat_Rdtsc()
-	{
+{
 	// See https://www.felixcloutier.com/x86/rdtsc
-	// 
+	//
 	// The RDTSC instruction is not a serializing instruction.  It does not
 	// necessarily wait until all previous instructions have been executed
 	// before reading the counter.  Similarly, subsequent instructions may begin
@@ -1077,7 +1074,7 @@ PLATFORM_INTERFACE struct tm *		Plat_localtime( const time_t *timep, struct tm *
 [[nodiscard]] FORCEINLINE uint64_t Plat_Rdtscp( uint32_t &coreId )
 {
 	// See https://www.felixcloutier.com/x86/rdtscp
-	// 
+	//
 	// The RDTSCP instruction is not a serializing instruction, but it does wait
 	// until all previous instructions have executed and all previous loads are
 	// globally visible.  But it does not wait for previous stores to be
@@ -1092,7 +1089,7 @@ PLATFORM_INTERFACE struct tm *		Plat_localtime( const time_t *timep, struct tm *
 	// LFENCE immediately after RDTSCP.
 	//
 	// We do not mfence before as for timing only ordering matters, not finished
-	// memory stores are ok. 
+	// memory stores are ok.
 	const uint64_t tsc{__rdtscp(&coreId)};
 	// Ensure no reordering aka acquire barrier.
 	_mm_lfence();
