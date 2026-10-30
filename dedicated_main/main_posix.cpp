@@ -86,9 +86,6 @@ void WaitForDebuggerConnect( int argc, char *argv[], int time )
 
 int main( int argc, char *argv[] )
 {
-	// Must add 'bin' to the path....
-	const char *path_env{ ::getenv( "LD_LIBRARY_PATH" ) };
-
 	char cwd[PATH_MAX];
 	if ( !::getcwd( cwd, sizeof( cwd ) ) )
 	{
@@ -97,6 +94,8 @@ int main( int argc, char *argv[] )
 		return rc;
 	}
 
+	// Must add 'bin' to the path....
+	const char *path_env{ ::getenv( "LD_LIBRARY_PATH" ) };
 	char new_path_env[4096];
 	snprintf( new_path_env, sizeof( new_path_env ) - 1,
 	          "LD_LIBRARY_PATH=%s/" PLATFORM_BIN_DIR ":%s", cwd, path_env );
