@@ -2171,9 +2171,9 @@ unsigned CWorkerThread::GetCallParam( CFunctor **ppParamFunctor ) const
 int CWorkerThread::BoostPriority()
 {
 	int iInitialPriority = GetPriority();
-	const int iNewPriority = ThreadGetPriority( (ThreadHandle_t)GetThreadID() );
+	const int iNewPriority = ThreadGetPriority( GetThreadID() );
 	if (iNewPriority > iInitialPriority)
-		ThreadSetPriority( (ThreadHandle_t)GetThreadID(), iNewPriority);
+		ThreadSetPriority( GetThreadID(), iNewPriority);
 	return iInitialPriority;
 }
 

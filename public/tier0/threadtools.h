@@ -1467,7 +1467,8 @@ protected:
 #ifdef WIN32
 	ThreadHandle_t GetThreadID() const { return static_cast<ThreadHandle_t>(m_hThread); }
 #else
-	ThreadId_t GetThreadID() const { return (ThreadId_t)m_threadId; }
+	// dimhotepus: ThreadId_t -> ThreadHandle_t. Return full pthread_t as handle.
+	ThreadHandle_t GetThreadID() const { return reinterpret_cast<ThreadHandle_t>(m_threadId); }
 #endif
 
 private:
