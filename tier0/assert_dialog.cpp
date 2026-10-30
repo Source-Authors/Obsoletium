@@ -138,14 +138,19 @@ static bool AreAssertsEnabledInFileLine( const tchar *pFilename, int iLine )
 
 		if ( _tcsicmp( pFilename, pCur->m_Filename ) == 0 )
 		{
-			// Are asserts disabled in the whole file?
 			bool bAssertsEnabled = true;
+
+			// dimhotepus: Use else to check line case.
 			if ( pCur->m_LineMin == -1 && pCur->m_LineMax == -1 )
+			{
+				// Are asserts disabled in the whole file?
 				bAssertsEnabled = false;
-			
-			// Are asserts disabled on the specified line?
-			if ( iLine >= pCur->m_LineMin && iLine <= pCur->m_LineMax )
+			}
+			else if ( iLine >= pCur->m_LineMin && iLine <= pCur->m_LineMax )
+			{
+				// Are asserts disabled on the specified line?
 				bAssertsEnabled = false;
+			}
 
 			if ( !bAssertsEnabled )
 			{
