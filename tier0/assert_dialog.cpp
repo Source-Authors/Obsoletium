@@ -16,6 +16,7 @@
 #elif defined( POSIX )
 #include <cstdlib>
 #endif
+
 #include "resource.h"
 #include "tier0/valve_on.h"
 #include "tier0/threadtools.h"
@@ -573,9 +574,6 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 
 	if( pfnSDLShowMessageBox )
 	{
-		int buttonid;
-		char text[ 4096 ];
-		SDL_MessageBoxData messageboxdata = { 0 };
 		const char *DefaultAction = Plat_IsInDebugSession() ? "Break" : "Corefile";
 		SDL_MessageBoxButtonData buttondata[] =
 		{
@@ -586,15 +584,19 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 			{ 0,										IDC_IGNORE_ALL,		"Ignore All Asserts"	},
 		};
 
+		char text[4096];
+		// Truncation is ok, just for assert.
 		_snprintf( text, std::size( text ), "File: %s\nLine: %i\nExpr: %s\n", pFilename, line, pExpression );
 		text[ std::size( text ) - 1 ] = '\0';
 
+		SDL_MessageBoxData messageboxdata = { 0 };
 		messageboxdata.window = g_SDLWindow;
 		messageboxdata.title = "Assertion Failed";
 		messageboxdata.message = text;
 		messageboxdata.numbuttons = ssize( buttondata );
 		messageboxdata.buttons = buttondata;
 
+		int buttonid;
 		int Ret = ( *pfnSDLShowMessageBox )( &messageboxdata, &buttonid );
 		if( Ret == -1 )
 		{
