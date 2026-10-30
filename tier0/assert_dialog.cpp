@@ -14,18 +14,16 @@
 // dimhotepus: Remove launcher definition clashing with tier0 one.
 #undef SE_PRODUCT_FILE_DESCRIPTION_STRING
 #elif defined( POSIX )
+#include <dlfcn.h>
 #include <cstdlib>
 #endif
 
-#include "resource.h"
-#include "tier0/valve_on.h"
-#include "tier0/threadtools.h"
-
-#if defined( POSIX )
-#include <dlfcn.h>
-#endif
-
 #include <atomic>
+
+#include "tier0/valve_on.h"
+
+#include "resource.h"
+#include "tier0/threadtools.h"
 
 #if defined( LINUX ) || defined( USE_SDL )
 
