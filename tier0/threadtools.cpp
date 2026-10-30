@@ -433,6 +433,32 @@ bool ThreadJoin( ThreadHandle_t hThread, unsigned timeout )
 	return true;
 }
 
+#ifdef POSIX
+// dimhotepus: Set name by pthread_t (not by ThreadId_t, which is OS thread id and can not be converted to pthread_t).
+static void SetPthreadDebugName( [[maybe_unused]] pthread_t thread, [[maybe_unused]] const char *pszName )
+{
+#if defined( LINUX )
+	// The thread name is a meaningful C language string, whose length is
+	// restricted to 16 characters, including the terminating null byte ('\0').
+	char szThreadName[ 16 ];
+	strncpy( szThreadName, pszName, std::size( szThreadName ) );
+	szThreadName[ std::size( szThreadName ) - 1 ] = 0;
+
+	pthread_setname_np( thread, szThreadName );
+#elif defined( OSX )
+	// MacOS only supports set name for current thread.
+	if ( pthread_equal( thread, pthread_self() ) )
+	{
+		char szThreadName[ 64 ];
+		strncpy( szThreadName, pszName, std::size( szThreadName ) );
+		szThreadName[ std::size( szThreadName ) - 1 ] = 0;
+
+		pthread_setname_np( szThreadName );
+	}
+#endif
+}
+#endif
+
 #ifdef RAD_TELEMETRY_ENABLED
 void TelemetryThreadSetDebugName( ThreadId_t id, const char *pszName );
 #endif
@@ -459,10 +485,13 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 			RunCodeAtScopeExit( ::CloseHandle( handle ) );
 
 			const size_t wcharsNeeded = mbstowcs( nullptr, pszName, INT_MAX );
+			// dimhotepus: (size_t)-1 on invalid multibyte sequence made descriptionSize 0 and index -1 below.
+			if ( wcharsNeeded == static_cast<size_t>( -1 ) )
+				return;
 			const size_t descriptionSize = (wcharsNeeded + 1) * sizeof(wchar_t);
 			auto *description = static_cast<wchar_t*>( stackalloc( descriptionSize ) );
 
-			[[maybe_unused]] const size_t wcharsConverted = mbstowcs( description, pszName, descriptionSize );
+			[[maybe_unused]] const size_t wcharsConverted = mbstowcs( description, pszName, wcharsNeeded + 1 );
 			Assert( wcharsNeeded == wcharsConverted );
 			description[descriptionSize / sizeof(wchar_t) - 1] = L'\0';
 
@@ -470,17 +499,8 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 		}
 	}
 #elif defined( _LINUX )
-	// As of glibc v2.12, we can use pthread_setname_np.
-	if ( id == INVALID_THREAD_ID )
-		id = pthread_self();
-
-	// The thread name is a meaningful C language string, whose length is
-	// restricted to 16 characters, including the terminating null byte ('\0').
-	char szThreadName[ 16 ];
-	strncpy( szThreadName, pszName, std::size( szThreadName ) );
-	szThreadName[ std::size( szThreadName ) - 1 ] = 0;
-
-	pthread_setname_np( id, szThreadName );
+	// dimhotepus: ThreadId_t is pthread_t on POSIX.
+	SetPthreadDebugName( id == INVALID_THREAD_ID ? pthread_self() : (pthread_t)id, pszName );
 #elif defined( OSX )
 	// dimhotepus: MacOS only supports set name for current thread.
 	if ( id == ThreadGetCurrentId() || id == INVALID_THREAD_ID )
@@ -1800,9 +1820,8 @@ bool CThread::Start( unsigned nBytesStack )
 	bInitSuccess = true;
 #endif
 
-#if !defined( OSX )
+	// dimhotepus: Always set thread name.
 	ThreadSetDebugName( m_threadId, m_szName );
-#endif
 
 	if ( !WaitForCreateComplete( &createComplete ) )
 	{
