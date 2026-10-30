@@ -57,7 +57,7 @@ public:
 			dbgdynfn("CDynamicFunction: Closing library '%s' (%p)\n", m_name, static_cast<void *>(m_handle));
 			CloseLibraryHandle(m_handle);
 			delete[] m_name;
-			delete m_next;
+			// dimhotepus: Don't delete m_next here - let the cache handle it
 		}
 
 		char *m_name;
@@ -104,7 +104,17 @@ public:
 	void CloseAllLibraries()
 	{
 		std::lock_guard< std::mutex > lock( m_mutex );
-		delete m_pList;
+
+		// dimhotepus: Ensure no stack overflow on recursive deletion.
+		CSharedLibraryItem *item = m_pList;
+		while ( item )
+		{
+			// Break the chain
+			CSharedLibraryItem *next = std::exchange( item->m_next, nullptr );
+			delete item;
+			item = next;
+		}
+		m_pList = nullptr;
 	}
 
 private:
