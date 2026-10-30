@@ -162,15 +162,17 @@ void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool
 
 	if ( nWatchBytes == 0 )
 	{
+			// dimhotepus: Removal - find and remove breakpoint at this address
 		for ( int i = 0; i < 4; ++i )
 		{
 			if ( pAddress == s_BreakpointState.pAddress[i] )
 			{
-				for ( ; i < 3; ++i )
+					// Shift remaining entries down
+					for ( int j = i; j < 3; ++j )
 				{
-					s_BreakpointState.pAddress[i] = s_BreakpointState.pAddress[i+1];
-					s_BreakpointState.nWatchBytes[i] = s_BreakpointState.nWatchBytes[i+1];
-					s_BreakpointState.bBreakOnRead[i] = s_BreakpointState.bBreakOnRead[i+1];
+						s_BreakpointState.pAddress[j] = s_BreakpointState.pAddress[j+1];
+						s_BreakpointState.nWatchBytes[j] = s_BreakpointState.nWatchBytes[j+1];
+						s_BreakpointState.bBreakOnRead[j] = s_BreakpointState.bBreakOnRead[j+1];
 				}
 				s_BreakpointState.pAddress[3] = nullptr;
 				s_BreakpointState.nWatchBytes[3] = 0;
@@ -181,15 +183,21 @@ void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool
 	}
 	else
 	{
-		// Replace first null entry or first existing entry at this address, or bump all entries down
+			// dimhotepus: Insertion - clearer slot-finding logic to prevent misuse
+			int iSlot = -1;
+
+			// Look for existing entry at this address or first empty slot
 		for ( int i = 0; i < 4; ++i )
 		{
-			if ( s_BreakpointState.pAddress[i] && s_BreakpointState.pAddress[i] != pAddress && i < 3 )
-				continue;
+				if ( !s_BreakpointState.pAddress[i] || s_BreakpointState.pAddress[i] == pAddress )
+				{
+					iSlot = i;
+					break;
+				}
+			}
 		
-			// Last iteration.
-
-			if ( s_BreakpointState.pAddress[i] && s_BreakpointState.pAddress[i] != pAddress )
+			// If no empty slot and address is different, evict oldest (slot 0)
+			if ( iSlot == -1 )
 			{
 				// Full up. Shift table down, drop least recently set
 				for ( int j = 0; j < 3; ++j )
@@ -198,12 +206,13 @@ void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool
 					s_BreakpointState.nWatchBytes[j] = s_BreakpointState.nWatchBytes[j+1];
 					s_BreakpointState.bBreakOnRead[j] = s_BreakpointState.bBreakOnRead[j+1];
 				}
+				iSlot = 3;
 			}
-			s_BreakpointState.pAddress[i] = pAddress;
-			s_BreakpointState.nWatchBytes[i] = static_cast<char>(nWatchBytes);
-			s_BreakpointState.bBreakOnRead[i] = bBreakOnRead;
-			break;
-		}
+
+			// Set breakpoint in selected slot
+			s_BreakpointState.pAddress[iSlot] = pAddress;
+			s_BreakpointState.nWatchBytes[iSlot] = static_cast<char>(nWatchBytes);
+			s_BreakpointState.bBreakOnRead[iSlot] = bBreakOnRead;
 	}
 	
 
