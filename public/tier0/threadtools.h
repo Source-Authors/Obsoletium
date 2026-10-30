@@ -1594,7 +1594,8 @@ public:
 	int BoostPriority();
 
 protected:
-#ifndef _WIN32
+// dimhotepus: Do not redefine __stdcall if platform headers already provide it.
+#if !defined(_WIN32) && !defined(__stdcall)
 #define __stdcall
 #endif
 	using WaitFunc_t = uint32 (__stdcall *)(int, CThreadEvent *const *, int, uint32);
