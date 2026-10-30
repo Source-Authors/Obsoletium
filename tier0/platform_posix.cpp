@@ -1287,8 +1287,11 @@ void SetMemoryMark( )
 
 void DumpMemorySummary( )
 {
-	Msg( "Total memory in use = %d, NumMallocs=%d, Num Frees=%d approx process usage=%ul\n", g_LinuxMemStats.nTotalMallocInUse, g_LinuxMemStats.nNumMallocs, g_LinuxMemStats.nNumFrees,
-		 (unsigned int)ApproximateProcessMemoryUsage() );
+	Msg( "Total memory in use = %lld, NumMallocs=%lld, Num Frees=%lld approx process usage=%zu\n",
+		static_cast<long long>( g_LinuxMemStats.nTotalMallocInUse ),
+		static_cast<long long>( g_LinuxMemStats.nNumMallocs ),
+		static_cast<long long>( g_LinuxMemStats.nNumFrees ),
+		ApproximateProcessMemoryUsage() );
 }
 
 #endif // !NO_HOOK_MALLOC
