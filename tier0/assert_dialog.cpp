@@ -301,14 +301,14 @@ static INT_PTR CALLBACK AssertDialogProc(
 
 				case IDC_IGNORE_ALL:
 				{
-					g_bAssertsEnabled.store(false, std::memory_order::memory_order_relaxed);
+					g_bAssertsEnabled.store(false, std::memory_order_relaxed);
 					EndDialog( hDlg, 0 );
 					return TRUE;
 				}
 
 				case IDC_BREAK:
 				{
-					g_bBreak.store(true, std::memory_order::memory_order_relaxed);
+					g_bBreak.store(true, std::memory_order_relaxed);
 					EndDialog( hDlg, 0 );
 					return TRUE;
 				}
@@ -408,12 +408,12 @@ static HWND FindLikelyParentWindow()
 // provides access to the global that turns asserts on and off
 DBG_INTERFACE bool AreAllAssertsDisabled()
 {
-	return !g_bAssertsEnabled.load(std::memory_order::memory_order_relaxed);
+	return !g_bAssertsEnabled.load(std::memory_order_relaxed);
 }
 
 DBG_INTERFACE void SetAllAssertsDisabled( bool bAssertsDisabled )
 {
-	g_bAssertsEnabled.store(!bAssertsDisabled, std::memory_order::memory_order_relaxed);
+	g_bAssertsEnabled.store(!bAssertsDisabled, std::memory_order_relaxed);
 }
 
 #if defined( LINUX ) || defined( USE_SDL )
@@ -481,7 +481,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 		return false;
 
 	// Have ALL Asserts been disabled?
-	if ( !g_bAssertsEnabled.load(std::memory_order::memory_order_relaxed) )
+	if ( !g_bAssertsEnabled.load(std::memory_order_relaxed) )
 		return false;
 
 	// Has this specific Assert been disabled?
@@ -519,7 +519,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 	g_Info.m_iLine = line;
 	g_Info.m_pExpression = pExpression;
 
-	g_bBreak.store(false, std::memory_order::memory_order_relaxed);
+	g_bBreak.store(false, std::memory_order_relaxed);
 
 #if defined( _WIN32 )
 
@@ -534,7 +534,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 
 		if ( Plat_MessageBoxButton::Retry == buttonPressed )
 		{
-			g_bBreak.store(true, std::memory_order::memory_order_relaxed);
+			g_bBreak.store(true, std::memory_order_relaxed);
 		}
 		else if ( Plat_MessageBoxButton::Cancel == buttonPressed )
 		{
@@ -597,7 +597,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 		default:
 		case IDC_BREAK:
 			// Break on this Assert
-			g_bBreak.store(true, std::memory_order::memory_order_relaxed);
+			g_bBreak.store(true, std::memory_order_relaxed);
 			break;
 		case IDC_IGNORE_THIS:
 			// Ignore this Assert once
@@ -611,21 +611,21 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 			break;
 		case IDC_IGNORE_ALL:
 			// Ignore all Asserts from now on
-			g_bAssertsEnabled.store(false, std::memory_order::memory_order_relaxed);
+			g_bAssertsEnabled.store(false, std::memory_order_relaxed);
 			break;
 		}
 	}
 	else
 	{
 		// Couldn't SDL it up
-		g_bBreak.store(true, std::memory_order::memory_order_relaxed);
+		g_bBreak.store(true, std::memory_order_relaxed);
 	}
 
 #else
 	// No dialog mode on this platform
-	g_bBreak.store(true, std::memory_order::memory_order_relaxed);
+	g_bBreak.store(true, std::memory_order_relaxed);
 #endif
 
-	return g_bBreak.load(std::memory_order::memory_order_relaxed);
+	return g_bBreak.load(std::memory_order_relaxed);
 }
 
