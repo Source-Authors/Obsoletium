@@ -50,35 +50,58 @@
 bool SetupWin32ConsoleIO()
 {
 #if defined( _WIN32 )
-	// Only useful on Windows platforms
-
-	bool newConsole( false );
+	bool newConsole = false;
 
 	if ( GetFileType( GetStdHandle( STD_OUTPUT_HANDLE ) ) == FILE_TYPE_UNKNOWN )
 	{
-		if ( !( AttachConsole( static_cast<DWORD>(-1) ) ) )
+		if ( !AttachConsole( static_cast< DWORD >( -1 ) ) )
 		{
 			newConsole = true;
 			AllocConsole();
 		}
 
-		*stdout = *_fdopen( _open_osfhandle( reinterpret_cast< intptr_t >( GetStdHandle( STD_OUTPUT_HANDLE ) ), _O_TEXT ), "w" );
-		setvbuf( stdout, nullptr, _IONBF, 0 );
+		// Setup stdout
+		int stdoutHandle = _open_osfhandle( reinterpret_cast< intptr_t >( GetStdHandle( STD_OUTPUT_HANDLE ) ), _O_TEXT );
+		if ( stdoutHandle != -1 )
+		{
+			FILE *stdoutFile = _fdopen( stdoutHandle, "w" );
+			if ( stdoutFile )
+			{
+				*stdout = *stdoutFile;
+				setvbuf( stdout, nullptr, _IONBF, 0 );
+			}
+		}
 
-		*stdin = *_fdopen( _open_osfhandle( reinterpret_cast< intptr_t >( GetStdHandle( STD_INPUT_HANDLE ) ), _O_TEXT ), "r" );
-		setvbuf( stdin, nullptr, _IONBF, 0 );
+		// Setup stdin
+		int stdinHandle = _open_osfhandle( reinterpret_cast< intptr_t >( GetStdHandle( STD_INPUT_HANDLE ) ), _O_TEXT );
+		if ( stdinHandle != -1 )
+		{
+			FILE *stdinFile = _fdopen( stdinHandle, "r" );
+			if ( stdinFile )
+			{
+				*stdin = *stdinFile;
+				setvbuf( stdin, nullptr, _IONBF, 0 );
+			}
+		}
 
-		*stderr = *_fdopen( _open_osfhandle( reinterpret_cast< intptr_t >( GetStdHandle( STD_ERROR_HANDLE ) ), _O_TEXT ), "w" );
-		setvbuf( stdout, nullptr, _IONBF, 0 );
+		// Setup stderr
+		int stderrHandle = _open_osfhandle( reinterpret_cast< intptr_t >( GetStdHandle( STD_ERROR_HANDLE ) ), _O_TEXT );
+		if ( stderrHandle != -1 )
+		{
+			FILE *stderrFile = _fdopen( stderrHandle, "w" );
+			if ( stderrFile )
+			{
+				*stderr = *stderrFile;
+				// dimhotepus: stdout -> stderr. Original Source 1 bug.
+				setvbuf( stderr, nullptr, _IONBF, 0 );
+			}
+		}
 
 		std::ios_base::sync_with_stdio();
 	}
 
 	return newConsole;
-
-#else // defined( _WIN32 )
-
+#else
 	return false;
-
-#endif // defined( _WIN32 )
+#endif
 }
