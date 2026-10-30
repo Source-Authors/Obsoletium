@@ -25,13 +25,12 @@
 #include "resource.h"
 #include "tier0/threadtools.h"
 
-#if defined( LINUX ) || defined( USE_SDL )
-
+#if defined( USE_SDL )
 // We lazily load the SDL shared object, and only reference functions if it's
 // available, so this can be included on the dedicated server too.
 #include "include/SDL3/SDL.h"
 
-typedef int ( SDLCALL FUNC_SDL_ShowMessageBox )( const SDL_MessageBoxData *messageboxdata, int *buttonid );
+using SDL_ShowMessageBoxFn = int ( SDLCALL * )( const SDL_MessageBoxData *messageboxdata, int *buttonid );
 #endif
 
 struct CDialogInitInfo
@@ -73,8 +72,8 @@ static CAssertDisable *g_pAssertDisables = nullptr;
 static int g_nLastIgnoreNumTimes = 1;
 #endif
 
-// dimhotepus: Make all this things thread-safe as may be used from different
-// threads.// Set to true if they want to break in the debugger.
+// dimhotepus: Make all this things thread-safe as may be used from different threads.
+// Set to true if they want to break in the debugger.
 static std::atomic_bool g_bBreak = false;
 
 static CDialogInitInfo g_Info;
@@ -567,7 +566,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 #endif
 
 	static auto *pfnSDLShowMessageBox = pSdlModule
-		? (FUNC_SDL_ShowMessageBox *)dlsym( pSdlModule, "SDL_ShowMessageBox" )
+		? (SDL_ShowMessageBoxFn *)dlsym( pSdlModule, "SDL_ShowMessageBox" )
 		: nullptr;
 
 	if( pfnSDLShowMessageBox )
