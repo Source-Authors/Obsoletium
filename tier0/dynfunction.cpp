@@ -5,21 +5,23 @@
 #include "stdafx.h"
 #include "tier0/dynfunction.h"
 
+#include <mutex>
+
 #if defined(WIN32)
 #include "winlite.h"
 
 using LibraryHandle = HMODULE;
-#define LoadLibraryHandle(libname) LoadLibrary(libname)
-#define CloseLibraryHandle(handle) FreeLibrary(handle)
-#define LookupInLibraryHandle(handle, fn) GetProcAddress(handle, fn)
+	#define LoadLibraryHandle(libname) LoadLibrary(libname)
+	#define CloseLibraryHandle(handle) FreeLibrary(handle)
+	#define LookupInLibraryHandle(handle, fn) GetProcAddress(handle, fn)
 #elif defined(POSIX)
-#include <dlfcn.h>
-typedef void *LibraryHandle;
-#define LoadLibraryHandle(libname) dlopen(libname, RTLD_NOW)
-#define CloseLibraryHandle(handle) dlclose(handle)
-#define LookupInLibraryHandle(handle, fn) dlsym(handle, fn)
+	#include <dlfcn.h>
+	using LibraryHandle = void *;
+	#define LoadLibraryHandle(libname) dlopen(libname, RTLD_NOW)
+	#define CloseLibraryHandle(handle) dlclose(handle)
+	#define LookupInLibraryHandle(handle, fn) dlsym(handle, fn)
 #else
-#error "Please define your platform."
+	#error "Please define your platform."
 #endif
 
 #if 1
@@ -66,8 +68,10 @@ public:
 	CSharedLibraryCache()  = default;
 	~CSharedLibraryCache() { CloseAllLibraries(); }
 
-	LibraryHandle GetHandle(const char *name)
+	[[nodiscard]] LibraryHandle GetHandle( const char *name )
 	{
+		std::lock_guard< std::mutex > lock( m_mutex );
+
 		CSharedLibraryItem *item = GetCacheItem(name);
 		if (item == nullptr)
 		{
@@ -85,6 +89,8 @@ public:
 
 	void CloseLibrary(const char *name)
 	{
+		std::lock_guard< std::mutex > lock( m_mutex );
+
 		CSharedLibraryItem *item = GetCacheItem(name);
 		if (item)
 		{
@@ -97,11 +103,15 @@ public:
 
 	void CloseAllLibraries()
 	{
+		std::lock_guard< std::mutex > lock( m_mutex );
 		delete m_pList;
 	}
 
 private:
-	CSharedLibraryItem *GetCacheItem(const char *name)
+	// dimhotepus: Cache should be thread-safe
+	mutable std::mutex m_mutex;
+
+	[[nodiscard]] CSharedLibraryItem *GetCacheItem(const char *name)
 	{
 		CSharedLibraryItem *prev = nullptr;
 		CSharedLibraryItem *item = m_pList;
