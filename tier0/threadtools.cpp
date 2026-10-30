@@ -1238,7 +1238,7 @@ bool ThreadInterlockedAssignIf128( volatile int128 *pDest, const int128 &value, 
 
 #else
 // This will perform horribly,
-#error "Falling back to mutexed interlocked operations, you really don't have intrinsics you can use?"ß
+#error "Falling back to mutexed interlocked operations, you really don't have intrinsics you can use?"
 CThreadMutex g_InterlockedMutex;
 
 long ThreadInterlockedIncrement( long volatile *pDest )
