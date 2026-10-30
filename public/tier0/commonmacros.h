@@ -20,7 +20,7 @@
 #endif
 
 // dimhotepus: Add SAL annotations.
-#include "tier0/annotations.h"
+#include "annotations.h"
 
 // dimhotepus: Backport from TF2. Detect the architecture we are running on
 #if defined(__aarch64__) || defined(_M_ARM64)
