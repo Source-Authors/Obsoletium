@@ -68,10 +68,13 @@ union TSLIST_HEAD_ALIGN TSLHead_t
 	{
 		TSLNodeBase_t *Next;
 		int16   Depth;
-		int16	Sequence;
 
 #ifdef PLATFORM_64BITS
-		int32   Padding;
+		int16	Padding;
+		// dimhotepus: 64 bit has better ABA prevention.
+		int32   Sequence;
+#else
+		int16	Sequence;
 #endif
 	} value;
 
