@@ -41,6 +41,11 @@ typedef PTHREAD_START_ROUTINE LPTHREAD_START_ROUTINE;
 #include <signal.h>
 #include <pthread.h>
 #include <sys/time.h>
+#include <time.h>
+#include <sys/resource.h>
+#ifdef LINUX
+#include <sys/syscall.h> // dimhotepus: gettid / tgkill.
+#endif
 #define GetLastError() errno
 typedef void *LPVOID;
 #endif
