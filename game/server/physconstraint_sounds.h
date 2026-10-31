@@ -12,7 +12,7 @@
 #endif
 
 
-#include <mathlib/ssemath.h>
+#include "mathlib/ssemath.h"
 #include "soundenvelope.h"
 
 

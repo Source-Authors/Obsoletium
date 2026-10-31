@@ -1,7 +1,7 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 // $Id$
 #include "raytrace.h"
-#include <mathlib/halton.h>
+#include "mathlib/halton.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"

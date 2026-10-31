@@ -6,10 +6,10 @@
 
 #include "tier0/platform.h"
 #include "tier1/utlvector.h"
-#include <mathlib/vector.h>
-#include <mathlib/ssemath.h>
-#include <mathlib/lightdesc.h>
-#include <mathlib/mathlib.h>
+#include "mathlib/vector.h"
+#include "mathlib/ssemath.h"
+#include "mathlib/lightdesc.h"
+#include "mathlib/mathlib.h"
 #include <bspfile.h>
 
 // fast SSE-ONLY ray tracing module. Based upon various "real time ray tracing" research.
