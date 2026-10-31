@@ -45,7 +45,7 @@
 #include "snd_audio_source.h"
 #include "iregistry.h"
 #include "sys.h"
-#include <vstdlib/random.h>
+#include "vstdlib/random.h"
 #include "tier0/etwprof.h"
 #include "tier0/vcrmode.h"
 #include "sys_dll.h"

@@ -12,7 +12,7 @@
 #include "vgui/ISurface.h"
 #include "vgui/IPanel.h"
 #include "vgui/ISystem.h"
-#include <vstdlib/IKeyValuesSystem.h>
+#include "vstdlib/IKeyValuesSystem.h"
 #include "vgui/IVGui.h"
 
 #include "tier1/utlvector.h"

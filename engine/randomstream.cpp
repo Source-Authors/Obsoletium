@@ -5,7 +5,7 @@
 //===========================================================================//
 
 #include "tier0/dbg.h"
-#include <vstdlib/random.h>
+#include "vstdlib/random.h"
 #include "cdll_int.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

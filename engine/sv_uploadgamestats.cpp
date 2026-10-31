@@ -19,7 +19,7 @@
 #include "utlbuffer.h"
 #include "eiface.h"
 #include "FindSteamServers.h"
-#include <vstdlib/random.h>
+#include "vstdlib/random.h"
 #include "iregistry.h"
 #include "filesystem_engine.h"
 #include "checksum_md5.h"

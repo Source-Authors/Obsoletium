@@ -11,7 +11,7 @@
 #include "vgui/ILocalize.h"
 #include "vgui/IPanel.h"
 #include "filesystem.h"
-#include <vstdlib/IKeyValuesSystem.h>
+#include "vstdlib/IKeyValuesSystem.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

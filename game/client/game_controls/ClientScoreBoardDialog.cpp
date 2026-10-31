@@ -21,7 +21,7 @@
 #include "vgui/ILocalize.h"
 #include "vgui/ISurface.h"
 #include "vgui/IVGui.h"
-#include <vstdlib/IKeyValuesSystem.h>
+#include "vstdlib/IKeyValuesSystem.h"
 
 #include <KeyValues.h>
 #include "vgui_controls/ImageList.h"
