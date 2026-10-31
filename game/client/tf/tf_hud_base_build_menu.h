@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include "hudelement.h"
 #include "c_tf_player.h"
 #include "tf_weaponbase.h"

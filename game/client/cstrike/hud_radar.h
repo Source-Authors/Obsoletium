@@ -11,8 +11,8 @@
 #endif
 
 #include "hudelement.h"
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/Label.h"
 
 class C_CSPlayer;
 void Radar_FlashPlayer( int iPlayer );

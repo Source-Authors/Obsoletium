@@ -11,7 +11,7 @@
 #include "panelmetaclassmgr.h"
 #include "tier1/KeyValues.h"
 #include "tier1/utldict.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include "filesystem.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

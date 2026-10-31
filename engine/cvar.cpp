@@ -24,7 +24,7 @@
 #endif
 
 #ifndef SWDS
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/ILocalize.h>
 #endif
 

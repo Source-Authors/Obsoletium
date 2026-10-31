@@ -109,7 +109,7 @@
 #include "debugoverlay_shared.h"
 #include "tf_hud_chat.h"
 #include "tf_item_powerup_bottle.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 
 #ifdef STAGING_ONLY
 #include "tf_matchmaking_shared.h"

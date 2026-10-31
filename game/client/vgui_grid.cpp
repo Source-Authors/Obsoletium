@@ -6,7 +6,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include "vgui_grid.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/ISurface.h>
 
 // memdbgon must be the last include file in a .cpp file!!!

@@ -24,9 +24,9 @@
 #include <vstdlib/IKeyValuesSystem.h>
 
 #include <KeyValues.h>
-#include <vgui_controls/ImageList.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/SectionedListPanel.h>
+#include "vgui_controls/ImageList.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/SectionedListPanel.h"
 
 #include <game/client/iviewport.h>
 #include <igameresources.h>

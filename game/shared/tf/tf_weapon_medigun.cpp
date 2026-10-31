@@ -15,7 +15,7 @@
 #include "entity_capture_flag.h"
 
 #if defined( CLIENT_DLL )
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include <vgui/ISurface.h>
 #include "particles_simple.h"
 #include "c_tf_player.h"

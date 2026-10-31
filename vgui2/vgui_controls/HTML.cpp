@@ -8,16 +8,16 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui_controls/HTML.h>
+#include "vgui_controls/HTML.h"
 
 #include "OfflineMode.h"
 #include "filesystem.h"
 #include "qlimits.h"
 
 #include "vgui_controls/pch_vgui_controls.h"
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/Menu.h>
-#include <vgui_controls/MessageBox.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/Menu.h"
+#include "vgui_controls/MessageBox.h"
 
 #include "../vgui2/src/vgui_key_translation.h"
 

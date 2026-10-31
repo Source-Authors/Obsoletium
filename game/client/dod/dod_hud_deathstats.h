@@ -11,10 +11,10 @@
 #pragma once
 #endif
 
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include <game/client/iviewport.h>
 #include <vgui/IScheme.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Label.h"
 #include "hud.h"
 #include "hudelement.h"
 #include "dod_shareddefs.h"

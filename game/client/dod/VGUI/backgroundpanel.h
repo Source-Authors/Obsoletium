@@ -8,8 +8,8 @@
 #ifndef DODBACKGROUND_H
 #define DODBACKGROUND_H
 
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/EditablePanel.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Creates background image panels

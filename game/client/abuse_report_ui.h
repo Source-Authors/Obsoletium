@@ -12,7 +12,7 @@
 #endif
 
 #include "abuse_report.h"
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 
 class CAvatarImagePanel;
 class CCustomTextureImagePanel;

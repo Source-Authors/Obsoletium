@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Frame.h>
+#include "vgui_controls/Frame.h"
 #include "tier1/utlvector.h"
 #include "tier1/utlsymbol.h"
 

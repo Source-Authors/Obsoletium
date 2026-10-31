@@ -9,7 +9,7 @@
 #ifndef COMMANDMENU_H
 #define COMMANDMENU_H
 
-#include <vgui_controls/Menu.h>
+#include "vgui_controls/Menu.h"
 #include <game/client/iviewport.h>
 #include <filesystem.h>
 #include "utlstack.h"

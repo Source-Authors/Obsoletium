@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include <game/client/iviewport.h>
 #include <vgui/IScheme.h>
 #include "hud.h"

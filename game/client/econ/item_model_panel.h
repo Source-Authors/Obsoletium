@@ -11,9 +11,9 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/Tooltip.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/Tooltip.h"
 #include "basemodel_panel.h"
 #include "basemodelpanel.h"
 #include "econ_controls.h"

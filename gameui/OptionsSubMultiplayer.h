@@ -11,8 +11,8 @@
 #pragma once
 #endif
 
-#include <vgui_controls/PropertyPage.h>
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/PropertyPage.h"
+#include "vgui_controls/ImagePanel.h"
 #include "imageutils.h"
 
 class CLabeledCommandComboBox;

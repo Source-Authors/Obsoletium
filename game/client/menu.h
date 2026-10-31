@@ -13,7 +13,7 @@
 
 #include "utlvector.h"
 #include "hudelement.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 
 #define MENU_SELECTION_TIMEOUT	5.0f
 

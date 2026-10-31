@@ -5,9 +5,9 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui_controls/PropertyPage.h>
+#include "vgui_controls/PropertyPage.h"
 #include "filesystem.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 
 #include <VGUI/IVGui.h> // for dprinf statements
 

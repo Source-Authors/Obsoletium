@@ -10,7 +10,7 @@
 
 #include "interface.h"
 #include "AddOnTypes.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 
 class CUtlMsgBuffer;
 

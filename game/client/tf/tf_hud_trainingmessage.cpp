@@ -15,8 +15,8 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/Label.h"
+#include "vgui_controls/EditablePanel.h"
 #include "tf_hud_training.h"
 #include "tf_hud_objectivestatus.h"
 

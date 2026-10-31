@@ -13,7 +13,7 @@
 
 #include <game/client/iviewport.h>
 #include "vgui_controls/PropertyPage.h"
-#include <vgui_controls/Button.h>
+#include "vgui_controls/Button.h"
 #include "tf_controls.h"
 #include "tf_shareddefs.h"
 #include "item_pickup_panel.h"

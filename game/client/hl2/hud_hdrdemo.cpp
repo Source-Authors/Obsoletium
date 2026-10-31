@@ -10,11 +10,11 @@
 #include "hud.h"
 #include "hudelement.h"
 #include "clientmode.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

@@ -13,9 +13,9 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/ProgressBar.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ImagePanel.h"
+#include "vgui_controls/ProgressBar.h"
 #include "c_monster_resource.h"
 #include "tf_hud_boss_health.h"
 

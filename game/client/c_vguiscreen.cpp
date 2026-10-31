@@ -9,7 +9,7 @@
 #include "networkstringtable_clientdll.h"
 #include <KeyValues.h>
 #include "panelmetaclassmgr.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include "mathlib/vmatrix.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include "view.h"

@@ -11,8 +11,8 @@
 //#include "clientmode_hl2mpnormal.h"
 #include "iclientmode.h"
 #include "hl1_clientmode.h"
-#include <vgui_controls/Controls.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Controls.h"
+#include "vgui_controls/Panel.h"
 #include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
 #include <KeyValues.h>

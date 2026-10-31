@@ -12,16 +12,16 @@
 #include <vgui/IVGui.h>
 #include <vgui/ILocalize.h>
 
-#include <vgui_controls/Label.h>
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/RichText.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/ToggleButton.h>
-#include <vgui_controls/RadioButton.h>
-#include <vgui_controls/ListPanel.h>
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/PHandle.h>
-#include <vgui_controls/PropertySheet.h>
+#include "vgui_controls/Label.h"
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/RichText.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/ToggleButton.h"
+#include "vgui_controls/RadioButton.h"
+#include "vgui_controls/ListPanel.h"
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/PHandle.h"
+#include "vgui_controls/PropertySheet.h"
 #include "vgui_controls/ConsoleDialog.h"
 
 #include "tier1/KeyValues.h"

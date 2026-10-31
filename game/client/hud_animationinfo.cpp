@@ -13,8 +13,8 @@
 #include <vgui/ISurface.h>
 #include <vgui/IScheme.h>
 #include <vgui/ILocalize.h>
-#include <vgui_controls/AnimationController.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/AnimationController.h"
+#include "vgui_controls/Panel.h"
 #include <vgui/IPanel.h>
 #include "vgui_int.h"
 

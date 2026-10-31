@@ -6,7 +6,7 @@
 
 #include "cbase.h"
 #include "hudelement.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include <vgui/ISurface.h>
 #include "clientmode_csnormal.h"
 #include "cs_gamerules.h"
@@ -14,7 +14,7 @@
 #include "hud_bitmapnumericdisplay.h"
 #include "c_plantedc4.h"
 
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 
 class CHudRoundTimer : public CHudElement, public vgui::Panel
 {

@@ -13,8 +13,8 @@
 #include "materialsystem/imaterialvar.h"
 #include "hl1_hud_numbers.h"
 
-#include <vgui_controls/Controls.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Controls.h"
+#include "vgui_controls/Panel.h"
 #include <vgui/ISurface.h>
 
 using namespace vgui;

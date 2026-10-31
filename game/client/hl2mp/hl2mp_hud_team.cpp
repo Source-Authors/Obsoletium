@@ -14,7 +14,7 @@
 #include "vgui/ILocalize.h"
 #include "hl2mp_gamerules.h"
 #include "c_team.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 

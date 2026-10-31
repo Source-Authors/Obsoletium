@@ -13,9 +13,9 @@
 #endif
 
 #include <vgui/IScheme.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ScalableImagePanel.h>
-#include <vgui_controls/Tooltip.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ScalableImagePanel.h"
+#include "vgui_controls/Tooltip.h"
 #include "item_model_panel.h"
 
 class CTFLayeredMapPanel;

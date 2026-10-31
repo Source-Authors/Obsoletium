@@ -14,7 +14,7 @@
 #include "vguitextwindow.h"
 #include "dodmenubackground.h"
 
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 
 using namespace vgui;
 

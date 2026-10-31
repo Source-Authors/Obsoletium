@@ -9,11 +9,11 @@
 
 #include <vgui/ISurface.h>
 
-#include <vgui_controls/Button.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/CheckButton.h>
-#include <vgui_controls/MessageBox.h>
+#include "vgui_controls/Button.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/CheckButton.h"
+#include "vgui_controls/MessageBox.h"
 
 #include "tier1/KeyValues.h"
 

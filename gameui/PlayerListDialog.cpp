@@ -9,12 +9,12 @@
 
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
-#include <vgui_controls/ListPanel.h>
+#include "vgui_controls/ListPanel.h"
 #include <KeyValues.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/MessageBox.h>
-#include <vgui_controls/ComboBox.h>
+#include "vgui_controls/Label.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/MessageBox.h"
+#include "vgui_controls/ComboBox.h"
 
 #include "EngineInterface.h"
 #include "game/client/IGameClientExports.h"

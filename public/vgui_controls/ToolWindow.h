@@ -11,7 +11,7 @@
 #endif
 
 #include <vgui/VGUI.h>
-#include <vgui_controls/Frame.h>
+#include "vgui_controls/Frame.h"
 
 namespace vgui
 {

@@ -11,7 +11,7 @@
 #include "ivrenderview.h"
 #include "iinput.h"
 #include "usercmd.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/ISurface.h>
 #include <vgui/IScheme.h>
 #include "hud.h"

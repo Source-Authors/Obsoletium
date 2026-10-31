@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui_controls/PropertySheet.h>
+#include "vgui_controls/PropertySheet.h"
 
 #include "tier1/KeyValues.h"
 
@@ -19,15 +19,15 @@
 #include <vgui/MouseCode.h>
 #include <vgui/ISurface.h>
 
-#include <vgui_controls/Button.h>
-#include <vgui_controls/Controls.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/ToolWindow.h>
-#include <vgui_controls/TextImage.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/PropertyPage.h>
+#include "vgui_controls/Button.h"
+#include "vgui_controls/Controls.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/ToolWindow.h"
+#include "vgui_controls/TextImage.h"
+#include "vgui_controls/ImagePanel.h"
+#include "vgui_controls/PropertyPage.h"
 #include "vgui_controls/AnimationController.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

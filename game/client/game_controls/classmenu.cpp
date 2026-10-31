@@ -17,12 +17,12 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <KeyValues.h>
-#include <vgui_controls/ImageList.h>
+#include "vgui_controls/ImageList.h"
 #include <filesystem.h>
 
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/Panel.h"
 #include "inputsystem/iinputsystem.h"
 
 #include "cdll_util.h"

@@ -6,7 +6,7 @@
 // and implement another button here.
 //=============================================================================//
 
-#include <vgui_controls/Tooltip.h>
+#include "vgui_controls/Tooltip.h"
 
 #include <vgui/IInput.h>
 #include <vgui/ISystem.h>
@@ -15,8 +15,8 @@
 #include <vgui/IVGui.h>
 #include <vgui/IPanel.h>
 
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/Controls.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

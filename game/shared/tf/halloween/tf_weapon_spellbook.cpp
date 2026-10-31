@@ -18,7 +18,7 @@
 	#include "bone_setup.h"
 	#include "c_tf_gamestats.h"
 	#include "iclientmode.h"
-	#include <vgui_controls/AnimationController.h>
+	#include "vgui_controls/AnimationController.h"
 	#include "econ_notifications.h"
 	#include "gc_clientsystem.h"
 	#include "tf_logic_halloween_2014.h"

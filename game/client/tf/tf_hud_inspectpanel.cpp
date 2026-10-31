@@ -14,8 +14,8 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ProgressBar.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ProgressBar.h"
 #include "tf_spectatorgui.h"
 #include "hud_macros.h"
 #include "c_playerresource.h"

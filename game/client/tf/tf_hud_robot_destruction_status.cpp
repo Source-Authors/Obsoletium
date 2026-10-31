@@ -6,7 +6,7 @@
 
 
 #include "cbase.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 
 #include "tf_hud_freezepanel.h"
 #include "clientmode_shared.h"

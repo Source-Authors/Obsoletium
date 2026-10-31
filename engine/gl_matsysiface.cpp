@@ -31,7 +31,7 @@
 #include "toolframework/itoolsystem.h"
 #include "tier2/p4helpers.h"
 #include "vgui/ISystem.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 
 
 extern ConVar developer;

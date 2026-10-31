@@ -6,11 +6,11 @@
 
 #include "cbase.h"
 #include "hudelement.h"
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/Label.h"
 #include <vgui/ISurface.h>
 #include "c_baseplayer.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include "dod_gamerules.h"
 #include "iclientmode.h"
 #include "c_dod_objective_resource.h"

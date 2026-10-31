@@ -13,7 +13,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Frame.h>
+#include "vgui_controls/Frame.h"
 #include <utlvector.h>
 
 namespace vgui

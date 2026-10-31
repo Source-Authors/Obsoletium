@@ -10,11 +10,11 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/ImageList.h>
-#include <vgui_controls/SectionedListPanel.h>
-#include <vgui_controls/PHandle.h>
-#include <vgui_controls/BitmapImagePanel.h>
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/ImageList.h"
+#include "vgui_controls/SectionedListPanel.h"
+#include "vgui_controls/PHandle.h"
+#include "vgui_controls/BitmapImagePanel.h"
 #include <filesystem.h>
 #include "vgui/MouseCode.h"
 #include "vgui/IScheme.h"

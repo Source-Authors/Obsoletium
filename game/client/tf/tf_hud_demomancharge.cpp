@@ -14,8 +14,8 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ProgressBar.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ProgressBar.h"
 #include "tf_weaponbase.h"
 #include "tf_gamerules.h"
 #include "tf_logic_halloween_2014.h"

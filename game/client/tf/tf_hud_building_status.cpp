@@ -13,8 +13,8 @@
 #include "vgui/ILocalize.h"
 #include "vgui/ISurface.h"
 #include <vgui/IVGui.h>
-#include <vgui_controls/ProgressBar.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/ProgressBar.h"
+#include "vgui_controls/AnimationController.h"
 #include "game_controls/IconPanel.h"
 #include "teamplay_round_timer.h"
 

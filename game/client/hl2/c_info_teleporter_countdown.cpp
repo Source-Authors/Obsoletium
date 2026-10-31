@@ -8,8 +8,8 @@
 
 #include "c_vguiscreen.h"
 #include <vgui/IVGui.h>
-#include <vgui_controls/Controls.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Controls.h"
+#include "vgui_controls/Label.h"
 #include "clientmode_hlnormal.h"
 #include "tier1/utllinkedlist.h"
 

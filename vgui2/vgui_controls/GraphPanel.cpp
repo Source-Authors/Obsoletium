@@ -4,7 +4,7 @@
 //
 //=============================================================================//
 
-#include <vgui_controls/GraphPanel.h>
+#include "vgui_controls/GraphPanel.h"
 
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>

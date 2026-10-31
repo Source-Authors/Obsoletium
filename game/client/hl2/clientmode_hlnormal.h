@@ -13,7 +13,7 @@
 #endif
 
 #include "clientmode_shared.h"
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include <vgui/Cursor.h>
 
 class CHudViewport;

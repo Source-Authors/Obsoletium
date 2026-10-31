@@ -11,9 +11,9 @@
 #endif
 
 
-#include <vgui_controls/WizardSubPanel.h>
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/WizardSubPanel.h"
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/Label.h"
 #include "configs.h"
 
 enum numOptions_e

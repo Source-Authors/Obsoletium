@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#include <vgui_controls/PerforceFileExplorer.h>
+#include "vgui_controls/PerforceFileExplorer.h"
 
 #include "tier1/KeyValues.h"
 #include "vgui/ISystem.h"
@@ -14,10 +14,10 @@
 // #include "p4lib/ip4.h"
 #include "tier2/tier2.h"
 
-#include <vgui_controls/PerforceFileList.h>
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/Tooltip.h>
+#include "vgui_controls/PerforceFileList.h"
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/Tooltip.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

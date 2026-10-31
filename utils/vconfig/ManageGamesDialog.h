@@ -10,9 +10,9 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/PHandle.h>
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/PHandle.h"
 
 using namespace vgui;
 

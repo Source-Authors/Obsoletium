@@ -11,7 +11,7 @@
 #endif
 
 #include "matsys_controls/QCGenerator.h"
-#include <vgui_controls/Frame.h>
+#include "vgui_controls/Frame.h"
 #include <FileSystem.h>
 #include "vgui/IScheme.h"
 

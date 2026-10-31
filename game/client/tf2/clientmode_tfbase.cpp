@@ -10,7 +10,7 @@
 #include "c_tf_basecombatweapon.h"
 #include "keydefs.h"
 #include "c_tf_hintmanager.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/IScheme.h>
 #include "filesystem.h"
 

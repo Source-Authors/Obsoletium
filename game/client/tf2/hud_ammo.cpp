@@ -10,7 +10,7 @@
 #include "hud_ammo.h"
 #include "hud.h"
 #include "iclientmode.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include <KeyValues.h>
 
 //-----------------------------------------------------------------------------

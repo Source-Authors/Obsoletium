@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui_controls/ScrollBarSlider.h>
+#include "vgui_controls/ScrollBarSlider.h"
 
 #include "tier1/KeyValues.h"
 
@@ -16,7 +16,7 @@
 #include <vgui/ISurface.h>
 #include <vgui/MouseCode.h>
 
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 
 #include <math.h>
 

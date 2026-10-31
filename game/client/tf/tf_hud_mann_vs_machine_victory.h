@@ -16,11 +16,11 @@
 #include "tf_controls.h"
 #include "hud.h"
 #include <vgui/IScheme.h>
-#include <vgui_controls/ProgressBar.h>
-#include <vgui_controls/ScalableImagePanel.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/ProgressBar.h"
+#include "vgui_controls/ScalableImagePanel.h"
+#include "vgui_controls/EditablePanel.h"
 #include <vgui/ISurface.h>
-#include <vgui_controls/ImageList.h>
+#include "vgui_controls/ImageList.h"
 #include <vgui/KeyCode.h>
 #include "vgui_controls/SectionedListPanel.h"
 #include "c_tf_objective_resource.h"

@@ -11,8 +11,8 @@
 #include <vgui/IVGui.h>
 #include "engine/ivdebugoverlay.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/Controls.h"
 #include <vgui/IScheme.h>
 #include "ienginevgui.h"
 

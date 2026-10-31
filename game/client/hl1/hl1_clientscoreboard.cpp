@@ -19,7 +19,7 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/SectionedListPanel.h>
+#include "vgui_controls/SectionedListPanel.h"
 
 #include "voice_status.h"
 

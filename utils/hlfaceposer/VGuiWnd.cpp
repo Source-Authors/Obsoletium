@@ -1,7 +1,7 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 #include "cbase.h"
 #include "vguiwnd.h"
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include "vgui/ISurface.h"
 #include "vgui/IVGui.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"

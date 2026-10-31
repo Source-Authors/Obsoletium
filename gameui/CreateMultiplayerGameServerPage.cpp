@@ -9,9 +9,9 @@
 
 using namespace vgui;
 
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/RadioButton.h>
-#include <vgui_controls/CheckButton.h>
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/RadioButton.h"
+#include "vgui_controls/CheckButton.h"
 #include "filesystem.h"
 #include "tier1/convar.h"
 #include "tier1/KeyValues.h"

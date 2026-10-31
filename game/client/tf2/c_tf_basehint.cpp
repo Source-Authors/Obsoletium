@@ -8,10 +8,10 @@
 #include "c_tf_basehint.h"
 #include "tf_hints.h"
 #include "itfhintitem.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/IVGui.h>
 #include <vgui/Cursor.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Label.h"
 #include <vgui/ISurface.h>
 #include <vgui/IScheme.h>
 #include "vgui_int.h"

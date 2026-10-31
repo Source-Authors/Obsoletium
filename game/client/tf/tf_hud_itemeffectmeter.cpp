@@ -35,7 +35,7 @@
 #include "tf_weapon_pda.h"
 #endif // STAGING_ONLY
 
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/ImagePanel.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

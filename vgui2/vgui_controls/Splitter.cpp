@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#include <vgui_controls/Splitter.h>
+#include "vgui_controls/Splitter.h"
 
 #include "tier1/KeyValues.h"
 

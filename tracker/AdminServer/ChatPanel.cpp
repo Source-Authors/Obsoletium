@@ -10,10 +10,10 @@
 
 #include <vgui/IVGui.h>
 
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/RichText.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/PHandle.h>
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/RichText.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/PHandle.h"
 
 #include "tier1/KeyValues.h"
 

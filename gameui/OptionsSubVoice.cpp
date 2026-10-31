@@ -8,9 +8,9 @@
 #include "OptionsSubVoice.h"
 #include "cvarslider.h"
 #include <vgui/IVGui.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/CheckButton.h>
-#include <vgui_controls/Slider.h>
+#include "vgui_controls/ImagePanel.h"
+#include "vgui_controls/CheckButton.h"
+#include "vgui_controls/Slider.h"
 #include "EngineInterface.h"
 #include "ivoicetweak.h"
 #include "CvarToggleCheckButton.h"

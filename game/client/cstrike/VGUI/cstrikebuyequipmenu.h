@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/WizardPanel.h>
+#include "vgui_controls/WizardPanel.h"
 
 #include <buymenu.h>
 

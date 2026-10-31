@@ -8,13 +8,13 @@
 #include "DemoPage.h"
 
 #include <VGUI/IVGui.h>
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 
-#include <vgui_controls/Menu.h> 
-#include <vgui_controls/MenuItem.h>
-#include <vgui_controls/MenuButton.h>
+#include "vgui_controls/Menu.h" 
+#include "vgui_controls/MenuItem.h"
+#include "vgui_controls/MenuButton.h"
 #include <Keyvalues.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Label.h"
 
 using namespace vgui;
 

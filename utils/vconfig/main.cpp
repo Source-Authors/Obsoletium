@@ -11,7 +11,7 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 
 #include "tier0/icommandline.h"
 #include "inputsystem/iinputsystem.h"

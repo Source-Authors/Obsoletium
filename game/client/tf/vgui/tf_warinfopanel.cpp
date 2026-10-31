@@ -4,14 +4,14 @@
 #include "econ_item_inventory.h"
 #include "vgui_avatarimage.h"
 #include "vgui_controls/ProgressBar.h"
-#include <vgui_controls/HTML.h>
+#include "vgui_controls/HTML.h"
 #include "c_tf_player.h"
 #include "econ_ui.h"
 #include "tf_asyncpanel.h"
 #include "item_model_panel.h"
 #include "tf_wardata.h"
 #include "iclientmode.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "vgui/ISystem.h"
 
 #ifdef STAGING_ONLY

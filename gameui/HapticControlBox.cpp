@@ -1,7 +1,7 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 #include "HapticControlBox.h"
-#include <vgui_controls/Controls.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Controls.h"
+#include "vgui_controls/Panel.h"
 #include "cvarslider.h"
 #include "mathlib/vmatrix.h"
 #include <vgui/ISurface.h>

@@ -13,10 +13,10 @@
 #include "IconPanel.h"
 #include "vgui_controls/ScrollBar.h"
 #include "vgui_controls/ScrollBarSlider.h"
-#include <vgui_controls/Label.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/Tooltip.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/Label.h"
+#include "vgui_controls/ImagePanel.h"
+#include "vgui_controls/Tooltip.h"
+#include "vgui_controls/AnimationController.h"
 #include "clientmode_tf.h"
 
 using namespace vgui;

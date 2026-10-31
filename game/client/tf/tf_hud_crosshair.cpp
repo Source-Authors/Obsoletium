@@ -6,7 +6,7 @@
 
 #include "cbase.h"
 #include "hudelement.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include <vgui/ISurface.h>
 #include "clientmode.h"
 #include "c_tf_player.h"

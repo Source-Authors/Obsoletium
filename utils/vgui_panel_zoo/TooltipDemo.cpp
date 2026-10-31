@@ -8,8 +8,8 @@
 
 #include <VGUI/IVGui.h>
 #include <KeyValues.h>
-#include <vgui_controls/ToggleButton.h>
-#include <vgui_controls/Tooltip.h>
+#include "vgui_controls/ToggleButton.h"
+#include "vgui_controls/Tooltip.h"
 
 using namespace vgui;
 

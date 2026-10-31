@@ -9,7 +9,7 @@
 
 #include <vgui/Cursor.h>
 #include "clientmode_tfbase.h"
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 
 namespace vgui
 {

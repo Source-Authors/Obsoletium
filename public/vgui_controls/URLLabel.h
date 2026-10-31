@@ -13,7 +13,7 @@
 #endif
 
 #include <vgui/VGUI.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Label.h"
 
 namespace vgui
 {

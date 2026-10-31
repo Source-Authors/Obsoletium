@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Label.h"
 
 class KeyValues;
 class CHudPlayerOverlay;

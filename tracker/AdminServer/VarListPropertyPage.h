@@ -14,7 +14,7 @@
 #include "tier1/KeyValues.h"
 #include "tier1/utlvector.h"
 
-#include <vgui_controls/PropertyPage.h>
+#include "vgui_controls/PropertyPage.h"
 #include "RemoteServer.h"
 
 //-----------------------------------------------------------------------------

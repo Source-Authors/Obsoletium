@@ -8,9 +8,9 @@
 
 #include <VGUI/IVGui.h>
 #include <Keyvalues.h>
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 
-#include <vgui_controls/ToggleButton.h>
+#include "vgui_controls/ToggleButton.h"
 
 
 using namespace vgui;

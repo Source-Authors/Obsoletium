@@ -11,11 +11,11 @@
 #endif
 
 #include <vgui/VGUI.h>
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/Controls.h>
-#include <vgui_controls/BitmapImagePanel.h>
-#include <vgui_controls/PanelListPanel.h>
-#include <vgui_controls/Button.h>
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/Controls.h"
+#include "vgui_controls/BitmapImagePanel.h"
+#include "vgui_controls/PanelListPanel.h"
+#include "vgui_controls/Button.h"
 #include <vgui/KeyCode.h>
 
 //--------------------------------------------------------------------------------------------------------------

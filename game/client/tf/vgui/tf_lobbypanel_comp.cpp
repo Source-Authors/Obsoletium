@@ -26,7 +26,7 @@ ConVar tf_mm_ladder_ui_last_rating_time( "tf_mm_ladder_ui_last_rating_time", "-1
 class CLobbyPanel_Comp;
 
 #include "iclientmode.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 
 class CMatchHistoryEntryPanel : public CExpandablePanel
 {

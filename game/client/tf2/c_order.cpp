@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "hud_orders.h"
 #include "c_order.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/ISurface.h>
 #include "minimap_trace.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"

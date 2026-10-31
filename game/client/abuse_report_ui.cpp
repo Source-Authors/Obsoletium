@@ -10,9 +10,9 @@
 #include "econ/econ_controls.h"
 #include "ienginevgui.h"
 #include "vgui/ISurface.h"
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/RadioButton.h>
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/RadioButton.h"
 #include "vgui_bitmappanel.h"
 #include "vgui_avatarimage.h"
 #include "gc_clientsystem.h"

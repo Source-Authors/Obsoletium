@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Slider.h>
+#include "vgui_controls/Slider.h"
 
 class CCvarSlider : public vgui::Slider
 {

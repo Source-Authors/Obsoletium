@@ -11,7 +11,7 @@
 #endif
 
 #include "tier2/vconfig.h"
-#include <vgui_controls/Frame.h>
+#include "vgui_controls/Frame.h"
 
 
 // This points at the root sourcesdk directory.

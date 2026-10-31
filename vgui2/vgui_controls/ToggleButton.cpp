@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui_controls/ToggleButton.h>
+#include "vgui_controls/ToggleButton.h"
 
 #include <vgui/KeyCode.h>
 #include "tier1/KeyValues.h"

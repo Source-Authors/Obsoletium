@@ -11,7 +11,7 @@
 //-----------------------------------------------------------------------------
 #include "cbase.h"
 #include <vgui/VGUI.h>
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/IVGui.h>
 #include <vgui/IInput.h>
 #include <vgui/ISurface.h>

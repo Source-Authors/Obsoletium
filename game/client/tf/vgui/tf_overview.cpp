@@ -15,7 +15,7 @@
 #include "usermessages.h"
 #include "coordsize.h"
 #include "clientmode.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "voice_status.h"
 #include "spectatorgui.h"
 #include "c_team_objectiveresource.h"

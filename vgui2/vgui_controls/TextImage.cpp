@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui_controls/TextImage.h>
+#include "vgui_controls/TextImage.h"
 
 #include "tier0/dbg.h"
 #include "tier1/KeyValues.h"
@@ -16,7 +16,7 @@
 #include <vgui/IInput.h>
 #include <vgui/ILocalize.h>
 
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 
 #include "posix_file_stream.h"
 

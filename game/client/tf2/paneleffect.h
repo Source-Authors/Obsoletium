@@ -18,7 +18,7 @@ namespace vgui
 
 class ITFHintItem;
 
-#include <vgui_controls/PHandle.h>
+#include "vgui_controls/PHandle.h"
 
 // Serial under of effect, for safe lookup
 typedef unsigned int EFFECT_HANDLE;

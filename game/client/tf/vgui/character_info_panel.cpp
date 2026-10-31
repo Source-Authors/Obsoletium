@@ -20,7 +20,7 @@
 #include "tf_item_inventory.h"
 #include "econ_notifications.h"
 #include <vgui/ILocalize.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "econ_ui.h"
 #include "c_tf_gamestats.h"
 #include "tf_item_pickup_panel.h"

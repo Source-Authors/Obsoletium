@@ -7,7 +7,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: the plugin message handler
 //-----------------------------------------------------------------------------
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include "engine/iserverplugin.h"
 #include "netmessages.h"
 

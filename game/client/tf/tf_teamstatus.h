@@ -11,8 +11,8 @@
 #pragma once
 #endif
 
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ProgressBar.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ProgressBar.h"
 #include "tf_playerpanel.h"
 
 //-----------------------------------------------------------------------------

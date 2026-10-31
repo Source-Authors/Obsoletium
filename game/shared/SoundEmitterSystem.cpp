@@ -28,7 +28,7 @@
 #include "envmicrophone.h"
 #include "sceneentity.h"
 #else
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/IVGui.h>
 #include "hud_closecaption.h"
 #define CRecipientFilter C_RecipientFilter

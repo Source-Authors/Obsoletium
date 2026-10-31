@@ -9,7 +9,7 @@
 #include "vgui/IVGui.h"
 #include "vgui_controls/Controls.h"
 #include "tier1/KeyValues.h"
-#include <vgui_controls/ListPanel.h>
+#include "vgui_controls/ListPanel.h"
 
 
 using namespace vgui;

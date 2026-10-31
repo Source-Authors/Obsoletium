@@ -12,8 +12,8 @@
 #endif
 
 #include "hudelement.h"
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/SectionedListPanel.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/SectionedListPanel.h"
 #include "tf_imagepanel.h"
 #include "econ_controls.h"
 #include "drawing_panel.h"

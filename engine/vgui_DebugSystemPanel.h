@@ -11,8 +11,8 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/PHandle.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/PHandle.h"
 
 class CDebugMenuButton;
 class CDebugOptionsPanel;

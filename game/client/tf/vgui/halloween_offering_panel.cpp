@@ -10,7 +10,7 @@
 #include "ienginevgui.h"
 #include "econ_item_tools.h"
 #include "econ_ui.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "clientmode_tf.h"
 #include "softline.h"
 #include "drawing_panel.h"

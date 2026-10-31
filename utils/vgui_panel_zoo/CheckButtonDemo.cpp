@@ -9,9 +9,9 @@
 
 #include <VGUI/IVGui.h>
 #include <Keyvalues.h>
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 
-#include <vgui_controls/CheckButton.h>
+#include "vgui_controls/CheckButton.h"
 
 
 using namespace vgui;

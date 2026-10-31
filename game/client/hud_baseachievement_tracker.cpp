@@ -8,10 +8,10 @@
 #include "hudelement.h"
 #include "hud_macros.h"
 #include <game_controls/baseviewport.h>
-#include <vgui_controls/Controls.h>
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/TextImage.h>
+#include "vgui_controls/Controls.h"
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/ImagePanel.h"
+#include "vgui_controls/TextImage.h"
 #include "vgui/ILocalize.h"
 #include "hud_baseachievement_tracker.h"
 #include "iachievementmgr.h"
@@ -19,7 +19,7 @@
 #include "iclientmode.h"
 #include "cdll_int.h"
 #include <vgui/ISurface.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "fmtstr.h"
 #include "engine/IEngineSound.h"
 

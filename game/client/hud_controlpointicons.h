@@ -12,9 +12,9 @@
 
 #include "cbase.h"
 #include "hudelement.h"
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/ImagePanel.h"
 #include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/AnimationController.h"
 #include "vgui_controls/CircularProgressBar.h"

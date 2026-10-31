@@ -11,8 +11,8 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Label.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Label.h"
+#include "vgui_controls/Panel.h"
 #include "CommanderOverlay.h"
 #include "hud_minimap.h"
 

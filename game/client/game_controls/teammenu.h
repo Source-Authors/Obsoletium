@@ -11,8 +11,8 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/Button.h>
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/Button.h"
 
 #include <game/client/iviewport.h>
 

@@ -15,8 +15,8 @@
 #include "econ_gcmessages.h"
 #include "gc_clientsystem.h"
 #include "vgui/IInput.h"
-#include <vgui_controls/PanelListPanel.h>
-#include <vgui_controls/ScrollBarSlider.h>
+#include "vgui_controls/PanelListPanel.h"
+#include "vgui_controls/ScrollBarSlider.h"
 #include "tf_gamerules.h"
 #include "engine/IEngineSound.h"
 #include "inputsystem/iinputsystem.h"

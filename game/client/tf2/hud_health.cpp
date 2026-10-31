@@ -9,7 +9,7 @@
 #include "hud_numeric.h"
 #include "c_basetfplayer.h"
 #include "basetfvehicle.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include <KeyValues.h>
 #include "iclientmode.h"
 

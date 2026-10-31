@@ -12,7 +12,7 @@
 #endif
 
 #include <classmenu.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include <filesystem.h>
 #include <dod_shareddefs.h>
 #include "cbase.h"
@@ -21,7 +21,7 @@
 #include "dodbutton.h"
 #include "imagemouseoverbutton.h"
 #include "IconPanel.h"
-#include <vgui_controls/CheckButton.h>
+#include "vgui_controls/CheckButton.h"
 
 using namespace vgui;
 

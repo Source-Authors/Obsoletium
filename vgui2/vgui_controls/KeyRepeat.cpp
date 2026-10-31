@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui_controls/KeyRepeat.h>
+#include "vgui_controls/KeyRepeat.h"
 
 #include "vgui_controls/pch_vgui_controls.h"
 

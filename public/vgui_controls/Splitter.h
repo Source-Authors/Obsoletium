@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 
 namespace vgui
 {

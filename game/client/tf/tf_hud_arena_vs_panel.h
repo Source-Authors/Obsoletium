@@ -11,7 +11,7 @@
 #endif
 
 #include "hudelement.h"
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 
 using namespace vgui;
 

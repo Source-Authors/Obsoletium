@@ -10,7 +10,7 @@
 #include "dod_hud_deathstats.h"
 #include "vgui_controls/AnimationController.h"
 #include "iclientmode.h"
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Label.h"
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include "hud_macros.h"

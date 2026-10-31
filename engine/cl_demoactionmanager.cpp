@@ -7,7 +7,7 @@
 
 #include "client_pch.h"
 #include <vgui/VGUI.h>
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include "cl_demoaction.h"
 #include "cl_demoactionmanager.h"
 #include "cl_demouipanel.h"

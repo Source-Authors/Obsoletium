@@ -5,11 +5,11 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui_controls/ProgressBar.h>
+#include "vgui_controls/ProgressBar.h"
 
 #include "tier1/KeyValues.h"
 
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 
 #include <vgui/ILocalize.h>
 #include <vgui/IScheme.h>

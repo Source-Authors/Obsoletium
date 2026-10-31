@@ -13,16 +13,16 @@
 
 #include "tier1/KeyValues.h"
 
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/PHandle.h>
-#include <vgui_controls/ListPanel.h>
-#include <vgui_controls/AnimatingImagePanel.h>
-#include <vgui_controls/Image.h>
-#include <vgui_controls/PropertyPage.h>
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/PHandle.h"
+#include "vgui_controls/ListPanel.h"
+#include "vgui_controls/AnimatingImagePanel.h"
+#include "vgui_controls/Image.h"
+#include "vgui_controls/PropertyPage.h"
 
 #undef PropertySheet
 
-#include <vgui_controls/PropertySheet.h>
+#include "vgui_controls/PropertySheet.h"
 
 #include "BanContextMenu.h"
 #include "chatpanel.h"

@@ -15,9 +15,9 @@
 #include "tier1/utlvector.h"
 #include "tier1/utllinkedlist.h"
 #include <vgui/VGUI.h>
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/PHandle.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/PHandle.h"
+#include "vgui_controls/Label.h"
 
 namespace vgui
 {

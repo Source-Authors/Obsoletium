@@ -13,7 +13,7 @@
 #include "hl1_c_player.h"
 
 #include <vgui/ISurface.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 
 
 #define MIN_ALPHA	 100	

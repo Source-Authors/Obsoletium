@@ -11,9 +11,9 @@
 #include "tf_logic_player_destruction.h"
 
 #ifdef CLIENT_DLL
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/ImagePanel.h"
+#include "vgui_controls/EditablePanel.h"
 #include <vgui/IScheme.h>
 #include "hudelement.h"
 #include "iclientmode.h"

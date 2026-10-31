@@ -13,7 +13,7 @@
 #include <vgui/IInput.h>
 #include <vgui/IPanel.h>
 #include <vgui/ISurface.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "iinput.h"
 #include "hl2mpclientscoreboard.h"
 #include "hl2mptextwindow.h"

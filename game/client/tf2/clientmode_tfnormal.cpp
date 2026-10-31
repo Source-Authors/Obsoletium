@@ -20,7 +20,7 @@
 #include "engine/IEngineSound.h"
 #include <vgui/IInput.h>
 #include <vgui/IPanel.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

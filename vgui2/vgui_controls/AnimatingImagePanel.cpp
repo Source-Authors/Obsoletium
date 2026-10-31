@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui_controls/AnimatingImagePanel.h>
+#include "vgui_controls/AnimatingImagePanel.h"
 
 #include "tier1/KeyValues.h"
 

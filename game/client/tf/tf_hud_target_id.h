@@ -12,7 +12,7 @@
 
 #include "hud.h"
 #include "hudelement.h"
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include "tf_imagepanel.h"
 #include "tf_spectatorgui.h"
 #include "c_tf_player.h"

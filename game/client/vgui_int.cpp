@@ -19,7 +19,7 @@
 #include <vgui/IInput.h>
 #include "tier0/vprof.h"
 #include "iclientmode.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include <KeyValues.h>
 #include "filesystem.h"
 #include "matsys_controls/matsyscontrols.h"
@@ -40,7 +40,7 @@ void MP3Player_Destroy();
 #include <vgui/IInputInternal.h>
 vgui::IInputInternal *g_InputInternal = NULL;
 
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

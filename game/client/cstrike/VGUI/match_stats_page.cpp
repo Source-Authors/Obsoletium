@@ -5,7 +5,7 @@
 
 #include "cbase.h"
 #include "match_stats_page.h"
-#include <vgui_controls/SectionedListPanel.h>
+#include "vgui_controls/SectionedListPanel.h"
 #include "c_team.h"
 #include "cs_client_gamestats.h"
 

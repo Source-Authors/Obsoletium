@@ -12,7 +12,7 @@
 #include "tf_hud_mainmenuoverride.h"
 #include "vgui_int.h"
 #include "IGameUIFuncs.h" // for key bindings
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "vgui/IInput.h"
 #include "tf_gc_client.h"
 #include "tf_party.h"

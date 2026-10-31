@@ -11,9 +11,9 @@
 #endif
 
 
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/Label.h"
 
 #include <game/client/iviewport.h>
 

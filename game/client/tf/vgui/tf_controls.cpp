@@ -8,7 +8,7 @@
 #include "cbase.h"
 
 #include "ienginevgui.h"
-#include <vgui_controls/ScrollBarSlider.h>
+#include "vgui_controls/ScrollBarSlider.h"
 #include "vgui/ILocalize.h"
 #include "vgui/ISurface.h"
 #include "vgui/IInput.h"
@@ -17,14 +17,14 @@
 #include "vgui_controls/PropertyPage.h"
 #include "econ_item_system.h"
 #include "iachievementmgr.h"
-#include <vgui_controls/ListPanel.h>
-#include <vgui_controls/PanelListPanel.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/MessageBox.h>
-#include <vgui_controls/CheckButton.h>
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/TextEntry.h>
+#include "vgui_controls/ListPanel.h"
+#include "vgui_controls/PanelListPanel.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/MessageBox.h"
+#include "vgui_controls/CheckButton.h"
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/TextEntry.h"
 #include <../common/GameUI/cvarslider.h>
 #include "filesystem.h"
 

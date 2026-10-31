@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include "hudelement.h"
 
 class CAchievementNotificationPanel : public CHudElement, public vgui::EditablePanel

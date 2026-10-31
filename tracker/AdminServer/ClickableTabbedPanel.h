@@ -13,9 +13,9 @@
 
 #include <vgui/MouseCode.h>
 
-#include <vgui_controls/PropertySheet.h>
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/PropertySheet.h"
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/Panel.h"
 
 namespace vgui
 {

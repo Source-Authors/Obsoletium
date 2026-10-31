@@ -16,9 +16,9 @@
 #include "tf_controls.h"
 #include "hud.h"
 #include <vgui/IScheme.h>
-#include <vgui_controls/ProgressBar.h>
-#include <vgui_controls/ScalableImagePanel.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/ProgressBar.h"
+#include "vgui_controls/ScalableImagePanel.h"
+#include "vgui_controls/EditablePanel.h"
 #include <vgui/ISurface.h>
 #include "tf_hud_objectivestatus.h"
 #include "tf_hud_mann_vs_machine_victory.h"

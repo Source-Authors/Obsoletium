@@ -12,7 +12,7 @@
 #include "hudelement.h"
 #include "ehandle.h"
 
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 
 enum 
 {

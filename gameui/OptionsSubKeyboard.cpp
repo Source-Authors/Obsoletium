@@ -9,10 +9,10 @@
 #include "EngineInterface.h"
 #include "vcontrolslistpanel.h"
 
-#include <vgui_controls/Button.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/ListPanel.h>
-#include <vgui_controls/QueryBox.h>
+#include "vgui_controls/Button.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/ListPanel.h"
+#include "vgui_controls/QueryBox.h"
 
 #include <vgui/Cursor.h>
 #include <vgui/IVGui.h>

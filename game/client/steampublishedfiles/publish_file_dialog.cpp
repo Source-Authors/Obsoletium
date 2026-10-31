@@ -9,11 +9,11 @@
 #include <vgui/IInput.h>
 #include <vgui/ISystem.h>
 #include <vgui/ISurface.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/MessageBox.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/FileOpenDialog.h>
+#include "vgui_controls/Button.h"
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/MessageBox.h"
+#include "vgui_controls/ImagePanel.h"
+#include "vgui_controls/FileOpenDialog.h"
 #include "vgui_bitmappanel.h"
 #include <KeyValues.h>
 #include "imageutils.h"

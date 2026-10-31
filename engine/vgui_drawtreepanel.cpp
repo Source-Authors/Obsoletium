@@ -7,11 +7,11 @@
 #include "client_pch.h"
 
 #include <vgui/IClientPanel.h>
-#include <vgui_controls/TreeView.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/CheckButton.h>
-#include <vgui_controls/Button.h>
+#include "vgui_controls/TreeView.h"
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/CheckButton.h"
+#include "vgui_controls/Button.h"
 #include <vgui/IInput.h>
 #include "../vgui2/src/VPanel.h"
 #include "tier1/convar.h"

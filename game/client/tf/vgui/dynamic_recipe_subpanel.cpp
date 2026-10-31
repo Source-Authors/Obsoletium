@@ -19,7 +19,7 @@
 #include "vgui_controls/TextImage.h"
 #include "vgui_controls/CheckButton.h"
 #include "vgui_controls/ComboBox.h"
-#include <vgui_controls/TextEntry.h>
+#include "vgui_controls/TextEntry.h"
 #include "vgui/IInput.h"
 #include "gcsdk/gcclient.h"
 #include "gcsdk/gcclientjob.h"

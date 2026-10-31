@@ -13,8 +13,8 @@
 #endif
 
 #include <vgui/VGUI.h>
-#include <vgui_controls/ToggleButton.h>
-#include <vgui_controls/TextImage.h>
+#include "vgui_controls/ToggleButton.h"
+#include "vgui_controls/TextImage.h"
 
 namespace vgui
 {

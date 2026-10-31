@@ -7,7 +7,7 @@
 //
 //=============================================================================
 
-#include <vgui_controls/BuildGroup.h>
+#include "vgui_controls/BuildGroup.h"
 
 #include "filesystem.h"
 #include "const.h"
@@ -24,11 +24,11 @@
 #include <vgui/IVGui.h>
 #include <vgui/ISurface.h>
 
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/PHandle.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/MessageBox.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/PHandle.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/MessageBox.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

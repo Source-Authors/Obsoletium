@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Button.h>
+#include "vgui_controls/Button.h"
 #include "vgui_controls/Menu.h"
 
 namespace vgui

@@ -19,14 +19,14 @@
 #include <vgui/Cursor.h>
 #include <vgui/ILocalize.h>
 
-#include <vgui_controls/Label.h>
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/PHandle.h>
-#include <vgui_controls/MessageBox.h>
-#include <vgui_controls/QueryBox.h>
-#include <vgui_controls/Image.h>
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/Label.h"
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/PHandle.h"
+#include "vgui_controls/MessageBox.h"
+#include "vgui_controls/QueryBox.h"
+#include "vgui_controls/Image.h"
+#include "vgui_controls/ImagePanel.h"
 
 #include "tier0/icommandline.h"
 

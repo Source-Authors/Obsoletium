@@ -10,7 +10,7 @@
 
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 
 #include "dod_hud_playerstatus_ammo.h"
 #include "ihudlcd.h"

@@ -22,11 +22,11 @@
 #include "tier1/KeyValues.h"
 #include "tier1/convar.h"
 
-#include <vgui_controls/Button.h>
-#include <vgui_controls/CheckButton.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/RadioButton.h>
-#include <vgui_controls/TextEntry.h>
+#include "vgui_controls/Button.h"
+#include "vgui_controls/CheckButton.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/RadioButton.h"
+#include "vgui_controls/TextEntry.h"
 #include "tier0/vcrmode.h"
 
 #if defined( _X360 )

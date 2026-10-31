@@ -14,9 +14,9 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/ImagePanel.h"
 #include "achievement_notification_panel.h"
 #include "steam/steam_api.h"
 #include "iachievementmgr.h"

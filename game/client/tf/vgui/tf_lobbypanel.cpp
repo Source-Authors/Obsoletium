@@ -11,7 +11,7 @@
 #include "vgui_controls/PropertySheet.h"
 #include "vgui_controls/SectionedListPanel.h"
 #include "vgui/IInput.h"
-#include <vgui_controls/ImageList.h>
+#include "vgui_controls/ImageList.h"
 #include "vgui_avatarimage.h"
 #include "tf_ladder_data.h"
 #include "vgui_controls/Menu.h"

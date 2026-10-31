@@ -6,7 +6,7 @@
 #endif
 
 #include "hudelement.h"
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 
 class IAchievement;
 namespace vgui

@@ -17,10 +17,10 @@
 #include <filesystem.h>
 #include <KeyValues.h>
 #include <convar.h>
-#include <vgui_controls/ImageList.h>
+#include "vgui_controls/ImageList.h"
 
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/Button.h>
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/Button.h"
 
 #include <game/client/iviewport.h>
 

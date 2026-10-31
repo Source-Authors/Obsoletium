@@ -15,7 +15,7 @@
 #include <vgui/KeyCode.h>
 #include <KeyValues.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Label.h"
 
 class CSCHintIcon : public vgui::Label
 {

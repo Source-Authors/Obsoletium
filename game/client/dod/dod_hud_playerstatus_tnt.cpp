@@ -9,8 +9,8 @@
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ImagePanel.h"
 
 #include <vgui/ISurface.h>
 

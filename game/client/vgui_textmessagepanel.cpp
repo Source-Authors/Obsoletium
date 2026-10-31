@@ -8,11 +8,11 @@
 //=============================================================================//
 #include "cbase.h"
 #include "itextmessage.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include <vgui/IVGui.h>
 #include <vgui/ILocalize.h>
 #include "VGuiMatSurface/IMatSystemSurface.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/ISurface.h>
 #include "hud.h"
 

@@ -6,8 +6,8 @@
 //=============================================================================//
 #include "DemoPage.h"
 
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/Label.h"
 
 using namespace vgui;
 

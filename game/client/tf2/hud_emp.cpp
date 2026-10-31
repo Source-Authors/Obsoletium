@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "hud.h"
 #include "hudelement.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include "c_basetfplayer.h"
 #include "tf_shareddefs.h"
 #include "iclientmode.h"
@@ -15,7 +15,7 @@
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imesh.h"
 #include "materialsystem/imaterialvar.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/ISurface.h>
 #include "clienteffectprecachesystem.h"
 

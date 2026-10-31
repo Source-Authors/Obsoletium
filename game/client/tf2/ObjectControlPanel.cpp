@@ -6,15 +6,15 @@
 //=============================================================================//
 #include "cbase.h"
 #include "ObjectControlPanel.h"
-#include <vgui_controls/Controls.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Controls.h"
+#include "vgui_controls/Label.h"
 #include "vgui_bitmapbutton.h"
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
 #include "C_BaseTFPlayer.h"
 #include "clientmode_tfbase.h"
 #include <vgui/IScheme.h>
-#include <vgui_controls/Slider.h>
+#include "vgui_controls/Slider.h"
 #include "vgui_rotation_slider.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

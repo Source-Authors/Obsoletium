@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "history_resource.h"
 #include "hud_macros.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/ISurface.h>
 #include "iclientmode.h"
 

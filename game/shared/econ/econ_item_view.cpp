@@ -21,7 +21,7 @@
 #include "isaverestore.h"
 #include "dt_utlvector_send.h"
 #include "dt_utlvector_recv.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 
 #ifdef CLIENT_DLL
 #ifndef DEDICATED

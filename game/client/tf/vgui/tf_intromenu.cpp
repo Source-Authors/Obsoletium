@@ -10,7 +10,7 @@
 #include <vgui/IVGui.h>
 #include <vgui/ISurface.h>
 #include <filesystem.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "iclientmode.h"
 #include "clientmode_shared.h"
 #include "shareddefs.h"

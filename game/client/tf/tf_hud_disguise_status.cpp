@@ -21,8 +21,8 @@
 #include "vgui/IInput.h"
 #include <vgui/IVGui.h>
 #include <vgui/IScheme.h>
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/Frame.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/Frame.h"
 #include "vgui_controls/TextImage.h"
 #include "vgui_controls/Label.h"
 #include "vgui_controls/Button.h"

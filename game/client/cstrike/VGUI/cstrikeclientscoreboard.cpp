@@ -21,8 +21,8 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/SectionedListPanel.h>
-#include <vgui_controls/ScalableImagePanel.h>
+#include "vgui_controls/SectionedListPanel.h"
+#include "vgui_controls/ScalableImagePanel.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"
 
 #include "voice_status.h"

@@ -19,13 +19,13 @@
 #include <filesystem.h>
 #include <KeyValues.h>
 #include <convar.h>
-#include <vgui_controls/ImageList.h>
+#include "vgui_controls/ImageList.h"
 
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/BuildGroup.h>
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/BuildGroup.h"
+#include "vgui_controls/ImagePanel.h"
 
 #include "tf_controls.h"
 #include "tf_shareddefs.h"

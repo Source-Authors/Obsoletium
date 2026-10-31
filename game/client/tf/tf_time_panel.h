@@ -13,7 +13,7 @@
 
 #include "GameEventListener.h"
 #include "hudelement.h"
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/ImagePanel.h"
 
 using namespace vgui;
 

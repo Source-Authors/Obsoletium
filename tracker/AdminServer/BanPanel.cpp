@@ -16,11 +16,11 @@
 #include <vgui/IVGui.h>
 #include "tier1/KeyValues.h"
 
-#include <vgui_controls/Label.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/QueryBox.h>
-#include <vgui_controls/ListPanel.h>
-#include <vgui_controls/FileOpenDialog.h>
+#include "vgui_controls/Label.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/QueryBox.h"
+#include "vgui_controls/ListPanel.h"
+#include "vgui_controls/FileOpenDialog.h"
 
 #include "filesystem.h"
 #include "posix_file_stream.h"

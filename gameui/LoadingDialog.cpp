@@ -15,11 +15,11 @@
 #include <vgui/ILocalize.h>
 #include <vgui/IScheme.h>
 #include <vgui/ISystem.h>
-#include <vgui_controls/ProgressBar.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/HTML.h>
-#include <vgui_controls/RichText.h>
+#include "vgui_controls/ProgressBar.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/HTML.h"
+#include "vgui_controls/RichText.h"
 #include "tier0/icommandline.h"
 
 #include "GameUI_Interface.h"

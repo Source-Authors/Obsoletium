@@ -15,7 +15,7 @@
 #include "tier1/utlvector.h"
 #include <vgui/VGUI.h>
 #include <vgui/IScheme.h>
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 
 namespace vgui
 {

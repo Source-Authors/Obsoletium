@@ -7,10 +7,10 @@
 #include "cbase.h"
 #include "hudelement.h"
 #include "iclientmode.h"
-#include <vgui_controls/AnimationController.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/SectionedListPanel.h>
-#include <vgui_controls/ImageList.h>
+#include "vgui_controls/AnimationController.h"
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/SectionedListPanel.h"
+#include "vgui_controls/ImageList.h"
 
 #include "vgui_avatarimage.h"
 #include "tf_hud_match_status.h"

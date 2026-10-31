@@ -20,7 +20,7 @@
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 #include <KeyValues.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 
 //for screenfade
 #include "ivieweffects.h"

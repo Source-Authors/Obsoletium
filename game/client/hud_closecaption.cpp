@@ -11,7 +11,7 @@
 #include "sentence.h"
 #include "tier1/strtools.h"
 #include "tier1/checksum_crc.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/IVGui.h>
 #include <vgui/ISurface.h>
 #include <vgui/IScheme.h>

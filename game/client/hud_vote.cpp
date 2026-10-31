@@ -24,11 +24,11 @@
 #include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
 #include <KeyValues.h>
-#include <vgui_controls/AnimationController.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/ImageList.h>
+#include "vgui_controls/AnimationController.h"
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/ImageList.h"
 #include "vgui_avatarimage.h"
 
 #ifdef TF_CLIENT_DLL

@@ -11,9 +11,9 @@
 #include "vgui_controls/Controls.h"
 
 #include "tier1/KeyValues.h"
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/ComboBox.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/ComboBox.h"
 
 using namespace vgui;
 

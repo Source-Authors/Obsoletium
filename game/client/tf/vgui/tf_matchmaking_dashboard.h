@@ -12,9 +12,9 @@
 #endif
 
 #include "tf_match_join_handlers.h"
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include "tf_controls.h"
-#include <vgui_controls/PHandle.h>
+#include "vgui_controls/PHandle.h"
 #include "local_steam_shared_object_listener.h"
 
 CUtlVector< class CTFMatchmakingPopup* >& CreateMMPopupPanels( bool bRecreate = false );

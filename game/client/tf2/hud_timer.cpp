@@ -13,7 +13,7 @@
 #include "c_basetfplayer.h"
 #include "hud_timer.h"
 #include "iclientmode.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 
 #define MIN_TIMER_ALPHA		192
 

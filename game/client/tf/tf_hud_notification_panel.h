@@ -12,7 +12,7 @@
 
 #include "hudelement.h"
 #include "IconPanel.h"
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/ImagePanel.h"
 
 using namespace vgui;
 

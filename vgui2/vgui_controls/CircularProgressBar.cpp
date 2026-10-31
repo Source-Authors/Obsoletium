@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui_controls/CircularProgressBar.h>
+#include "vgui_controls/CircularProgressBar.h"
 
 #include "mathlib/mathlib.h"
 #include "tier1/KeyValues.h"
@@ -14,7 +14,7 @@
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

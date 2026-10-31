@@ -8,8 +8,8 @@
 #ifndef TFBACKGROUND_H
 #define TFBACKGROUND_H
 
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/EditablePanel.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Creates background image panels

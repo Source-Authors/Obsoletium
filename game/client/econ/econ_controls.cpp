@@ -6,7 +6,7 @@
 #include "cbase.h"
 
 #include "ienginevgui.h"
-#include <vgui_controls/ScrollBarSlider.h>
+#include "vgui_controls/ScrollBarSlider.h"
 #include "vgui/ILocalize.h"
 #include "vgui/ISurface.h"
 #include "vgui/IInput.h"

@@ -11,8 +11,8 @@
 #pragma once
 #endif
 
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/Label.h"
 #include <game_controls/IconPanel.h>
 #include <vgui/tf_controls.h>
 #include "base_loadout_panel.h"

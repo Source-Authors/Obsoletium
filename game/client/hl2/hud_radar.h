@@ -10,8 +10,8 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/Label.h"
 #include "hl2_vehicle_radar.h"
 #include "c_vguiscreen.h"
 

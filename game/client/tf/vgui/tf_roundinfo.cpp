@@ -7,11 +7,11 @@
 
 #include "cbase.h"
 
-#include <vgui_controls/Label.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/RichText.h>
-#include <vgui_controls/Frame.h>
+#include "vgui_controls/Label.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/ImagePanel.h"
+#include "vgui_controls/RichText.h"
+#include "vgui_controls/Frame.h"
 #include <game/client/iviewport.h>
 #include <KeyValues.h>
 #include <filesystem.h>

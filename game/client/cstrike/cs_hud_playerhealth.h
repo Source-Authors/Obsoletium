@@ -17,8 +17,8 @@
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
-#include <vgui_controls/AnimationController.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/AnimationController.h"
+#include "vgui_controls/EditablePanel.h"
 #include "vgui/ILocalize.h"
 #include "hud.h"
 #include "hudelement.h"

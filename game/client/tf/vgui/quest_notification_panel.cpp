@@ -15,7 +15,7 @@
 #include "quest_log_panel.h"
 #include "econ_controls.h"
 #include "c_tf_player.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "engine/IEngineSound.h"
 #include "econ_item_system.h"
 #include "tf_hud_item_progress_tracker.h"

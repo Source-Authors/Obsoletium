@@ -12,7 +12,7 @@
 #include "iinput.h"
 #include "vgui/ISurface.h"
 #include "vgui/IPanel.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "ivmodemanager.h"
 #include "buymenu.h"
 #include "filesystem.h"

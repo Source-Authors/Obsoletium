@@ -17,10 +17,10 @@
 #include "tf_controls.h"
 #include "c_tf_player.h"
 #include "tf_weapon_invis.h"
-#include <vgui_controls/RadioButton.h>
+#include "vgui_controls/RadioButton.h"
 #include "clientmode.h"
-#include <vgui_controls/ProgressBar.h>
-#include <vgui_controls/CircularProgressBar.h>
+#include "vgui_controls/ProgressBar.h"
+#include "vgui_controls/CircularProgressBar.h"
 
 using namespace vgui;
 

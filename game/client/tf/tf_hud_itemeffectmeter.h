@@ -15,9 +15,9 @@
 #include "hudelement.h"
 #include "iclientmode.h"
 #include "tf_weapon_invis.h"
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ProgressBar.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ProgressBar.h"
+#include "vgui_controls/Label.h"
 
 using namespace vgui;
 

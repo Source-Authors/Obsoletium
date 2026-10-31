@@ -16,7 +16,7 @@
 #pragma warning( disable : 4800  )  // disable forcing int to bool performance warning
 
 // VGUI panel includes
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include <vgui/ISurface.h>
 #include <KeyValues.h>
 #include <vgui/Cursor.h>

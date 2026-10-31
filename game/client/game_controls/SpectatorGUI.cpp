@@ -19,9 +19,9 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IPanel.h>
-#include <vgui_controls/ImageList.h>
-#include <vgui_controls/MenuItem.h>
-#include <vgui_controls/TextImage.h>
+#include "vgui_controls/ImageList.h"
+#include "vgui_controls/MenuItem.h"
+#include "vgui_controls/TextImage.h"
 
 #include <game/client/iviewport.h>
 #include "commandmenu.h"
@@ -30,10 +30,10 @@
 #include "replay/replaycamera.h"
 #endif
 
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/Menu.h>
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/ImagePanel.h"
+#include "vgui_controls/Menu.h"
 #include "IGameUIFuncs.h" // for key bindings
 #include <imapoverview.h>
 #include <shareddefs.h>

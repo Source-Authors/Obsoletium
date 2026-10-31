@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui_controls/BuildModeDialog.h>
+#include "vgui_controls/BuildModeDialog.h"
 
 #include "tier1/utlvector.h"
 #include "tier1/KeyValues.h"
@@ -17,18 +17,18 @@
 #include <vgui/KeyCode.h>
 #include <vgui/MouseCode.h>
 
-#include <vgui_controls/Label.h>
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/CheckButton.h>
-#include <vgui_controls/RadioButton.h>
-#include <vgui_controls/MenuButton.h>
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/BuildGroup.h>
-#include <vgui_controls/MessageBox.h>
-#include <vgui_controls/Menu.h>
-#include <vgui_controls/Divider.h>
-#include <vgui_controls/PanelListPanel.h>
+#include "vgui_controls/Label.h"
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/CheckButton.h"
+#include "vgui_controls/RadioButton.h"
+#include "vgui_controls/MenuButton.h"
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/BuildGroup.h"
+#include "vgui_controls/MessageBox.h"
+#include "vgui_controls/Menu.h"
+#include "vgui_controls/Divider.h"
+#include "vgui_controls/PanelListPanel.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

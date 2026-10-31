@@ -8,7 +8,7 @@
 #include "c_basefourwheelvehicle.h"
 #include "tf_movedata.h"
 #include "ObjectControlPanel.h"
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Label.h"
 #include "vgui_bitmapbutton.h"
 
 

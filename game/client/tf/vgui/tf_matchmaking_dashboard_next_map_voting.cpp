@@ -10,8 +10,8 @@
 #include "tf_gamerules.h"
 #include "tf_gc_client.h"
 #include "clientmode_tf.h"
-#include <vgui_controls/AnimationController.h>
-#include <vgui_controls/CircularProgressBar.h>
+#include "vgui_controls/AnimationController.h"
+#include "vgui_controls/CircularProgressBar.h"
 
 using namespace vgui;
 using namespace GCSDK;

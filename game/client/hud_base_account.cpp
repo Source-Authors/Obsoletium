@@ -5,9 +5,9 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include <vgui/ISurface.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "hud_base_account.h"
 
 using namespace vgui;

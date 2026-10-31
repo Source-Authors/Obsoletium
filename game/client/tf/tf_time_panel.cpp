@@ -5,8 +5,8 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include <vgui_controls/AnimationController.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/AnimationController.h"
+#include "vgui_controls/EditablePanel.h"
 
 #include "iclientmode.h"
 #include "tf_time_panel.h"

@@ -18,7 +18,7 @@
 #include "econ_item_view.h"
 
 #ifdef CLIENT_DLL
-	#include <vgui_controls/EditablePanel.h>
+	#include "vgui_controls/EditablePanel.h"
 	#include "hudelement.h"
 	#include "econ_controls.h"
 	#include "c_tf_projectile_rocket.h"

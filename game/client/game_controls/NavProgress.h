@@ -10,8 +10,8 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/ProgressBar.h>
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/ProgressBar.h"
 
 #include <game/client/iviewport.h>
 

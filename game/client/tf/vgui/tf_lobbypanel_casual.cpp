@@ -10,7 +10,7 @@
 #include "vgui_controls/ScrollableEditablePanel.h"
 
 #include "iclientmode.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 
 #include "tf_lobbypanel_casual.h"
 #include "tf_lobby_container_frame_casual.h"

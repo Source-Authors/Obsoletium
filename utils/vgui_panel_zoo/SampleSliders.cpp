@@ -8,8 +8,8 @@
 
 #include <VGUI/IVGui.h>
 #include <Keyvalues.h>
-#include <vgui_controls/Slider.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Slider.h"
+#include "vgui_controls/Label.h"
 
 
 using namespace vgui;

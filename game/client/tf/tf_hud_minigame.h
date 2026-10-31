@@ -12,7 +12,7 @@
 
 #include "hud.h"
 #include "hudelement.h"
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include "tf_logic_halloween_2014.h"
 
 

@@ -11,7 +11,7 @@
 #include "vgui_controls/ProgressBar.h"
 #include "tf_ladder_data.h"
 #include "iclientmode.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "tf_controls.h"
 #include "vgui/ISurface.h"
 #include "animation.h"

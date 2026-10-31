@@ -10,7 +10,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Frame.h>
+#include "vgui_controls/Frame.h"
 #include <KeyValues.h>
 
 #include "tier2/vconfig.h"

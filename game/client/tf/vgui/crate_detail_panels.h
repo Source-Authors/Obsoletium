@@ -14,8 +14,8 @@
 #include "tf_controls.h"
 #include "item_model_panel.h"
 #include "econ_item_view.h"
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/ProgressBar.h>
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/ProgressBar.h"
 
 class CInputStringForItemBackpackOverlayDialog : public vgui::EditablePanel, public CGameEventListener
 {

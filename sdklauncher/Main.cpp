@@ -11,9 +11,9 @@
 #include <vgui/IInput.h>
 #include <vgui/isystem.h>
 
-#include <vgui_controls/MessageBox.h>
-#include <vgui_controls/Controls.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/MessageBox.h"
+#include "vgui_controls/Controls.h"
+#include "vgui_controls/Panel.h"
 
 #include "SDKLauncherDialog.h"
 #include "appframework/tier3app.h"

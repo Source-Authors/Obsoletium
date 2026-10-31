@@ -8,9 +8,9 @@
 #include "hud.h"
 #include "hudelement.h"
 #include "iclientmode.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/ISurface.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include "hud_crosshair.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

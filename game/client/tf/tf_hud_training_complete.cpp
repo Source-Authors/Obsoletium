@@ -8,7 +8,7 @@
 
 #include "cbase.h"
 
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include <game/client/iviewport.h>
 #include <vgui/IScheme.h>
 #include "hud.h"
@@ -21,8 +21,8 @@
 #include "c_tf_playerresource.h"
 #include "c_team.h"
 #include "tf_clientscoreboard.h"
-#include <vgui_controls/Label.h>
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/Label.h"
+#include "vgui_controls/ImagePanel.h"
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include "vgui/IInput.h"

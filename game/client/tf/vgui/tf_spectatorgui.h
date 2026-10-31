@@ -15,7 +15,7 @@
 #include "tf_hud_playerstatus.h"
 #include "item_model_panel.h"
 #include "tf_gamerules.h"
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 
 extern ConVar cl_use_tournament_specgui;
 class CAvatarImagePanel;

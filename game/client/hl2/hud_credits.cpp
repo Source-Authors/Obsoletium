@@ -11,8 +11,8 @@
 #include "hud_suitpower.h"
 #include "hud_macros.h"
 #include "iclientmode.h"
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/AnimationController.h"
 #include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
 #include "tier1/KeyValues.h"

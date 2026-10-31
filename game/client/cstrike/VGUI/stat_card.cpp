@@ -10,7 +10,7 @@
 #include "vgui_controls/AnimationController.h"
 #include "iclientmode.h"
 #include "c_playerresource.h"
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Label.h"
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include "fmtstr.h"

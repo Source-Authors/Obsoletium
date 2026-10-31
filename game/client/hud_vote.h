@@ -12,10 +12,10 @@
 #endif
 
 #include "hudelement.h"
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/SectionedListPanel.h>
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/Button.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/SectionedListPanel.h"
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/Button.h"
 #include <networkstringtabledefs.h>
 #include "vgui_avatarimage.h"
 

@@ -5,8 +5,8 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ImagePanel.h"
 #include <vgui/ISurface.h>
 #include <KeyValues.h>
 #include "dodcornercutpanel.h"

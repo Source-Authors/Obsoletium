@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "tf_hud_mann_vs_machine_status.h"
 
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "iclientmode.h"
 #include "c_tf_objective_resource.h"
 #include "tf_gamerules.h"

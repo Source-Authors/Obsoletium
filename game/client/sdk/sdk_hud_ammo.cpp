@@ -11,7 +11,7 @@
 #include "hud_numericdisplay.h"
 #include "iclientmode.h"
 #include "iclientvehicle.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include <vgui/ILocalize.h>
 #include "ihudlcd.h"
 

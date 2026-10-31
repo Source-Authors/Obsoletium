@@ -8,14 +8,14 @@
 #include "SDKLauncherDialog.h"
 #include "configs.h"
 
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/ListPanel.h>
-#include <vgui_controls/ProgressBox.h>
-#include <vgui_controls/MessageBox.h>
-#include <vgui_controls/HTML.h>
-#include <vgui_controls/CheckButton.h>
-#include <vgui_controls/Divider.h>
-#include <vgui_controls/menu.h>
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/ListPanel.h"
+#include "vgui_controls/ProgressBox.h"
+#include "vgui_controls/MessageBox.h"
+#include "vgui_controls/HTML.h"
+#include "vgui_controls/CheckButton.h"
+#include "vgui_controls/Divider.h"
+#include "vgui_controls/Menu.h"
 #include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
 #include "vgui_controls/button.h"

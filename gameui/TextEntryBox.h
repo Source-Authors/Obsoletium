@@ -14,7 +14,7 @@
 #endif
 
 #include "KeyValues.h"
-#include <vgui_controls/QueryBox.h>
+#include "vgui_controls/QueryBox.h"
 
 class CCvarTextEntry;
 

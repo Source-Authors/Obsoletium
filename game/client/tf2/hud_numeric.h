@@ -12,7 +12,7 @@
 #endif
 
 #include "hudelement.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 
 class CHudNumeric : public CHudElement, public vgui::Panel
 {

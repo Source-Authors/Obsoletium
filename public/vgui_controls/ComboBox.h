@@ -12,9 +12,9 @@
 #pragma once
 #endif
 
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/Menu.h>
-#include <vgui_controls/Button.h>
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/Menu.h"
+#include "vgui_controls/Button.h"
 
 namespace vgui
 {

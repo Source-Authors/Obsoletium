@@ -8,7 +8,7 @@
 
 #include "vgui/IVGui.h"
 #include "tier1/KeyValues.h"
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Label.h"
 
 
 using namespace vgui;

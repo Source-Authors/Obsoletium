@@ -12,7 +12,7 @@
 #endif
 
 #include <classmenu.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include <filesystem.h>
 #include <cs_shareddefs.h>
 #include "cbase.h"

@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include "econ_controls.h"
 #include "store_page.h"
 

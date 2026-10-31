@@ -16,7 +16,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Base Panel for engine vgui panels ( can handle some drawing stuff )

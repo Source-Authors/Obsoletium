@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include "voice_status.h"
 #include "r_efx.h"
-#include <vgui_controls/TextImage.h>
+#include "vgui_controls/TextImage.h"
 #include <vgui/MouseCode.h>
 #include "cdll_client_int.h"
 #include "hud_macros.h"
@@ -21,7 +21,7 @@
 #include "materialsystem/imesh.h"
 #include "view.h"
 #include "convar.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 #include "vgui_bitmapimage.h"

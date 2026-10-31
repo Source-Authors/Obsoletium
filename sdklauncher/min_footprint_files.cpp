@@ -14,9 +14,9 @@
 #include "sdklauncher_main.h"
 #include "ModConfigsHelper.h"
 #include "vgui_controls/Frame.h"
-#include <vgui_controls/Label.h>
-#include <vgui_controls/MessageBox.h>
-#include <vgui_controls/ProgressBar.h>
+#include "vgui_controls/Label.h"
+#include "vgui_controls/MessageBox.h"
+#include "vgui_controls/ProgressBar.h"
 #include <vgui/iinput.h>
 #include <vgui/ivgui.h>
 #include "SourceAppInfo.h"

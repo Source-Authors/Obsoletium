@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#include <vgui_controls/FileOpenDialog.h>
+#include "vgui_controls/FileOpenDialog.h"
 
 #if defined( WIN32 )
 #include "winlite.h"
@@ -33,16 +33,16 @@
 #include <vgui/ILocalize.h>
 #include <vgui/IInput.h>
 
-#include <vgui_controls/Button.h>
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/InputDialog.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/ListPanel.h>
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/ImageList.h>
-#include <vgui_controls/MenuItem.h>
-#include <vgui_controls/Tooltip.h>
+#include "vgui_controls/Button.h"
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/ImagePanel.h"
+#include "vgui_controls/InputDialog.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/ListPanel.h"
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/ImageList.h"
+#include "vgui_controls/MenuItem.h"
+#include "vgui_controls/Tooltip.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

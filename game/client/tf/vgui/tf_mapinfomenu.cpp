@@ -7,8 +7,8 @@
 
 #include "cbase.h"
 
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/RichText.h>
+#include "vgui_controls/ImagePanel.h"
+#include "vgui_controls/RichText.h"
 #include <game/client/iviewport.h>
 #include <vgui/ILocalize.h>
 #include <KeyValues.h>

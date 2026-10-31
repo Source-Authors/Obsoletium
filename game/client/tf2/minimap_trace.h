@@ -15,7 +15,7 @@
 #include "hud_minimap.h"
 #include "TeamBitmapImage.h"
 #include "vgui_bitmapimage.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 
 
 // FIXME: Need to put the team color somewhere...

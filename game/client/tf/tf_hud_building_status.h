@@ -13,9 +13,9 @@
 
 #include "hudelement.h"
 #include "tf_controls.h"
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include <vgui/IScheme.h>
-#include <vgui_controls/ProgressBar.h>
+#include "vgui_controls/ProgressBar.h"
 #include "utlpriorityqueue.h"
 
 class C_BaseObject;

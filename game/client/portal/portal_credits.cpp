@@ -7,12 +7,12 @@
 #include "cbase.h"
 #include "hudelement.h"
 #include "hud_numericdisplay.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include "hud.h"
 #include "hud_suitpower.h"
 #include "hud_macros.h"
 #include "iclientmode.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
 #include "KeyValues.h"

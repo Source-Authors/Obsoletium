@@ -11,8 +11,8 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/Frame.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/Frame.h"
 #include "GameEventListener.h"
 #include "basemodel_panel.h"
 #include "basemodelpanel.h"

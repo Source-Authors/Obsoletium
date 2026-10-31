@@ -12,8 +12,8 @@
 #pragma once
 #endif
 
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/PHandle.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/PHandle.h"
 
 namespace vgui
 {

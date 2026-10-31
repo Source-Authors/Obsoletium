@@ -12,7 +12,7 @@
 #include "hl1_hud_numbers.h"
 
 #include <vgui/ISurface.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include "ihudlcd.h"
 
 #define MIN_ALPHA	100	

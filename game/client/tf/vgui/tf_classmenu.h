@@ -12,7 +12,7 @@
 #endif
 
 #include <classmenu.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/KeyRepeat.h"
 #include <filesystem.h>
 #include <tf_shareddefs.h>
@@ -21,7 +21,7 @@
 #include "tf_gamerules.h"
 #include "basemodelpanel.h"
 #include "IconPanel.h"
-#include <vgui_controls/CheckButton.h>
+#include "vgui_controls/CheckButton.h"
 #include "GameEventListener.h"
 #include "c_tf_playerresource.h"
 #include "tf_playermodelpanel.h"

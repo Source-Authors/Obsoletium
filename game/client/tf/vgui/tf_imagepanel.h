@@ -13,7 +13,7 @@
 
 #include "tf_shareddefs.h"
 #include <vgui/IScheme.h>
-#include <vgui_controls/ScalableImagePanel.h>
+#include "vgui_controls/ScalableImagePanel.h"
 #include "GameEventListener.h"
 
 #define MAX_BG_LENGTH		128

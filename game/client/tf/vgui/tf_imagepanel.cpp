@@ -10,11 +10,11 @@
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
-#include <vgui_controls/AnimationController.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/AnimationController.h"
+#include "vgui_controls/EditablePanel.h"
 #include <vgui/ISurface.h>
 #include <vgui/IImage.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Label.h"
 
 #include "tf_imagepanel.h"
 #include "c_tf_player.h"

@@ -10,8 +10,8 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/EditablePanel.h"
 
 //#define QUICKTIME_VIDEO
 //#define BINK_VIDEO

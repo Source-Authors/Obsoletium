@@ -20,7 +20,7 @@
 #include "c_cs_hostage.h"
 #include "vtf/vtf.h"
 #include "clientmode.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "voice_status.h"
 #include "hud_radar.h"
 

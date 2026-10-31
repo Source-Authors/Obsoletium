@@ -14,10 +14,10 @@
 
 #include <vgui/VGUI.h>
 #include <vgui/IImage.h>
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/PHandle.h>
-#include <vgui_controls/FileOpenDialog.h>
-#include <vgui_controls/TextEntry.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/PHandle.h"
+#include "vgui_controls/FileOpenDialog.h"
+#include "vgui_controls/TextEntry.h"
 #include "tier1/utlmap.h"
 #ifndef VERSION_SAFE_STEAM_API_INTERFACES
 #define VERSION_SAFE_STEAM_API_INTERFACES

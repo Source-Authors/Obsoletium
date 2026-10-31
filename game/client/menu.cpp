@@ -20,7 +20,7 @@
 #include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
 #include <KeyValues.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 
 #define MAX_MENU_STRING	512
 wchar_t g_szMenuString[MAX_MENU_STRING];

@@ -2,8 +2,8 @@
 #ifndef HAPTICCONTROLBOX_H
 #define HAPTICCONTROLBOX_H
 
-#include <vgui_controls/Controls.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Controls.h"
+#include "vgui_controls/Panel.h"
 #include "cvarslider.h"
 
 class ControlBoxVisual : public vgui::Panel

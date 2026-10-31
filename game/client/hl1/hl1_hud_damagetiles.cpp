@@ -13,7 +13,7 @@
 #include "view.h"
 #include <KeyValues.h>
 #include <vgui/ISurface.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imesh.h"

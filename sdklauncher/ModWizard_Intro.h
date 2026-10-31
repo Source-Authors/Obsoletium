@@ -11,8 +11,8 @@
 #endif
 
 
-#include <vgui_controls/WizardSubPanel.h>
-#include <vgui_controls/RadioButton.h>
+#include "vgui_controls/WizardSubPanel.h"
+#include "vgui_controls/RadioButton.h"
 
 #include "configs.h"
 

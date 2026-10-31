@@ -11,7 +11,7 @@
 #include "c_tf_player.h"
 #include "econ_item_description.h"
 #include "clientmode_tf.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "quest_objective_manager.h"
 #include "econ_quests.h"
 #include "confirm_dialog.h"

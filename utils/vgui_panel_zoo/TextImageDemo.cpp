@@ -8,7 +8,7 @@
 
 #include <VGUI/IVGui.h>
 
-#include <vgui_controls/TextImage.h>
+#include "vgui_controls/TextImage.h"
 
 
 using namespace vgui;

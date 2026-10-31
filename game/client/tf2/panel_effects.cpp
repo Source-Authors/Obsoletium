@@ -9,7 +9,7 @@
 #include "hud.h"
 #include "c_tf2rootpanel.h"
 #include "paneleffect.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/ISurface.h>
 
 #define EFFECT_FLASH_TIME 0.7f

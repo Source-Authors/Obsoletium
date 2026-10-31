@@ -13,8 +13,8 @@
 
 #include <game/client/iviewport.h>
 #include "vgui_controls/PropertyPage.h"
-#include <vgui_controls/Button.h>
-#include <vgui_controls/ComboBox.h>
+#include "vgui_controls/Button.h"
+#include "vgui_controls/ComboBox.h"
 #include "tf_controls.h"
 #include "tf_shareddefs.h"
 #include "backpack_panel.h"

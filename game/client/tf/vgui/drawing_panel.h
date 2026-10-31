@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 
 #define DRAWN_LINE_SOLID_TIME 15.0f
 #define DRAWN_LINE_FADE_TIME 3.0f

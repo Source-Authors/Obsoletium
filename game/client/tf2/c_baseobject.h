@@ -12,8 +12,8 @@
 #endif
 
 #include "baseobject_shared.h"
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/Label.h"
 #include "vgui_healthbar.h"
 #include "commanderoverlay.h"
 #include "hud_minimap.h"

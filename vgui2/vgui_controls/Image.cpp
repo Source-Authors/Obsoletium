@@ -5,14 +5,14 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui_controls/Image.h>
+#include "vgui_controls/Image.h"
 
 #include <Color.h>
 
 #include <vgui/IPanel.h>
 #include <vgui/ISurface.h>
 
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

@@ -13,14 +13,14 @@
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "iclientmode.h"
 #include "tf_shareddefs.h"
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ImagePanel.h"
 #include <vgui/ISurface.h>
 #include <vgui/IImage.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Label.h"
 
 #include "tf_controls.h"
 #include "in_buttons.h"

@@ -6,9 +6,9 @@
 
 #include "cbase.h"
 #include "iclientmode.h"
-#include <vgui_controls/AnimationController.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ProgressBar.h>
+#include "vgui_controls/AnimationController.h"
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ProgressBar.h"
 
 #include "tf_gamerules.h"
 #include "tf_logic_halloween_2014.h"

@@ -13,7 +13,7 @@
 #endif
 
 
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include "c_baseentity.h"
 #include "panelmetaclassmgr.h"
 

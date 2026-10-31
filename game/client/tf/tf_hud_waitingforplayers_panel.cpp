@@ -11,8 +11,8 @@
 #include "hud.h"
 #include "hudelement.h"
 #include <vgui/IScheme.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/Label.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

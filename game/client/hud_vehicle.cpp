@@ -10,7 +10,7 @@
 #include "hud_vehicle.h"
 #include "iclientmode.h"
 #include "view.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/ISurface.h>
 #include "iclientvehicle.h"
 #include "c_prop_vehicle.h"

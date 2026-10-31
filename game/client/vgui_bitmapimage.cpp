@@ -6,9 +6,9 @@
 //=============================================================================//
 #include "cbase.h"
 #include "vgui_bitmapimage.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/ISurface.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include "panelmetaclassmgr.h"
 #include <KeyValues.h>
 #include <vgui/IPanel.h>

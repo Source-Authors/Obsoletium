@@ -11,9 +11,9 @@
 
 #include <vgui/IInput.h>
 
-#include <vgui_controls/Button.h>
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/TextEntry.h>
+#include "vgui_controls/Button.h"
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/TextEntry.h"
 
 #include "tier1/KeyValues.h"
 

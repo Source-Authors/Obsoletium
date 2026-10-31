@@ -7,9 +7,9 @@
 #include "DemoPage.h"
 
 #include <VGUI/IVGui.h>
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <Keyvalues.h>
-#include <vgui_controls/FileOpenDialog.h>
+#include "vgui_controls/FileOpenDialog.h"
 
 using namespace vgui;
 

@@ -10,7 +10,7 @@
 #include "iclientmode.h"
 #include "view.h"
 #include <KeyValues.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include <vgui/ISurface.h>
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include "materialsystem/imaterial.h"

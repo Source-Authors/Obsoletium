@@ -13,16 +13,16 @@
 #include <vgui/ISystem.h>
 #include "career_button.h"
 
-#include <vgui_controls/Label.h>
-#include <vgui_controls/URLLabel.h>
-#include <vgui_controls/ComboBox.h>
+#include "vgui_controls/Label.h"
+#include "vgui_controls/URLLabel.h"
+#include "vgui_controls/ComboBox.h"
 #include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
-#include <vgui_controls/ScrollBar.h>
-#include <vgui_controls/BuildGroup.h>
-#include <vgui_controls/ImageList.h>
-#include <vgui_controls/TextImage.h>
-#include <vgui_controls/Button.h>
+#include "vgui_controls/ScrollBar.h"
+#include "vgui_controls/BuildGroup.h"
+#include "vgui_controls/ImageList.h"
+#include "vgui_controls/TextImage.h"
+#include "vgui_controls/Button.h"
 
 #include "KeyValues.h"
 

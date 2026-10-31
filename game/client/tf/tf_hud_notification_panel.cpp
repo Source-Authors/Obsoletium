@@ -14,8 +14,8 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/Label.h"
 #include "tf_shareddefs.h"
 #include "tf_hud_notification_panel.h"
 #include "tf_hud_freezepanel.h"

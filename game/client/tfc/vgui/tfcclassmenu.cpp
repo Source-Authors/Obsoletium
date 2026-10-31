@@ -10,7 +10,7 @@
 
 #include <KeyValues.h>
 #include <filesystem.h>
-#include <vgui_controls/Button.h>
+#include "vgui_controls/Button.h"
 #include <vgui/IVGui.h>
 
 #include "hud.h" // for gEngfuncs

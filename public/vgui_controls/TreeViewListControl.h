@@ -14,7 +14,7 @@
 #include "tier1/utllinkedlist.h"
 #include "tier1/utlvector.h"
 #include <vgui/VGUI.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include "tier1/utlsymbol.h"
 
 

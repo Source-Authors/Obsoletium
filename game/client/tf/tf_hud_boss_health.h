@@ -4,8 +4,8 @@
 
 #include "hud.h"
 #include "hudelement.h"
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ProgressBar.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ProgressBar.h"
 
 
 class CHudBossHealthMeter : public CHudElement, public vgui::EditablePanel

@@ -8,7 +8,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include "game_controls/basemodel_panel.h"
 
 using namespace vgui;

@@ -24,10 +24,10 @@
 #include "gcsdk/gcclient.h"
 #include "gcsdk/gcclientjob.h"
 #include "econ_item_system.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "store/store_panel.h"
 #include "gc_clientsystem.h"
-#include <vgui_controls/ScrollBarSlider.h>
+#include "vgui_controls/ScrollBarSlider.h"
 #include "filesystem.h"
 #include "tf_hud_disconnect_prompt.h"
 #include "tf_gc_client.h"

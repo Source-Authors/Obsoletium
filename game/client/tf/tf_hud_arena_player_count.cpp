@@ -17,7 +17,7 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include "c_tf_playerresource.h"
 #include "tf_hud_arena_player_count.h"
 

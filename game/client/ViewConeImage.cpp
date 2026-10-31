@@ -8,7 +8,7 @@
 #include "cbase.h"
 #include "ViewConeImage.h"
 #include <KeyValues.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

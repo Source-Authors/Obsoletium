@@ -14,7 +14,7 @@
 #include "utlvector.h"
 #include "utlsymbol.h"
 
-#include <vgui_controls/PropertyPage.h>
+#include "vgui_controls/PropertyPage.h"
 class VControlsListPanel;
 
 //-----------------------------------------------------------------------------

@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include "store/store_preview_item.h"
 #include "store/v1/tf_store_page.h"
 #include "tf_shareddefs.h"

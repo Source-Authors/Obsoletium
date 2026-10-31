@@ -12,8 +12,8 @@
 #endif
 
 #include <vgui/IScheme.h>
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/ImagePanel.h"
+#include "vgui_controls/EditablePanel.h"
 #include "GameEventListener.h"
 #include "KeyValues.h"
 

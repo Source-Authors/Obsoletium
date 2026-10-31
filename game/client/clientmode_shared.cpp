@@ -21,7 +21,7 @@
 #include <vgui/IInput.h>
 #include "engine/IEngineSound.h"
 #include <KeyValues.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "vgui_int.h"
 #include "hud_macros.h"
 #include "hltvcamera.h"

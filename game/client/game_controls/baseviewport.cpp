@@ -17,15 +17,15 @@
 #include <globalvars_base.h>
 
 // VGUI panel includes
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/AnimationController.h"
 #include <vgui/ISurface.h>
 #include <KeyValues.h>
 #include <vgui/IScheme.h>
 #include <vgui/IVGui.h>
 #include <vgui/ILocalize.h>
 #include <vgui/IPanel.h>
-#include <vgui_controls/Button.h>
+#include "vgui_controls/Button.h"
 
 #include <igameresources.h>
 

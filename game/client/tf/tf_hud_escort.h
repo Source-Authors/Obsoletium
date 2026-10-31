@@ -11,8 +11,8 @@
 #pragma once
 #endif
 
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ImagePanel.h"
 #include "tf_controls.h"
 #include "GameEventListener.h"
 #include "c_tf_objective_resource.h"

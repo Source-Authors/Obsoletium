@@ -13,7 +13,7 @@
 #include "hudelement.h"
 #include "tf_imagepanel.h"
 #include "tf_controls.h"
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 
 using namespace vgui;
 

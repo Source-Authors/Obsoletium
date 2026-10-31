@@ -6,7 +6,7 @@
 //
 //=============================================================================//
 
-#include <vgui_controls/TreeViewListControl.h>
+#include "vgui_controls/TreeViewListControl.h"
 
 #include <vgui/Cursor.h>
 #include <vgui/IScheme.h>
@@ -17,14 +17,14 @@
 #include <vgui/MouseCode.h>
 #include <vgui/IBorder.h>
 
-#include <vgui_controls/ScrollBar.h>
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/TreeView.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/TextImage.h>
-#include <vgui_controls/ImageList.h>
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/ScrollBar.h"
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/TreeView.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/TextImage.h"
+#include "vgui_controls/ImageList.h"
+#include "vgui_controls/ImagePanel.h"
 
 #include "tier1/KeyValues.h"
 

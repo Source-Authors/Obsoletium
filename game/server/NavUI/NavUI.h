@@ -7,17 +7,17 @@
 #ifdef SERVER_USES_VGUI
 
 #include "KeyValues.h"
-#include <vgui_controls/ImagePanel.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/TextEntry.h>
-#include <vgui_controls/CheckButton.h>
+#include "vgui_controls/ImagePanel.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/CheckButton.h"
 #include <vgui/ILocalize.h>
 #include "vgui/ISurface.h"
 #include "vgui/IVGui.h"
 #include "fmtstr.h"
-#include <vgui_controls/CheckButton.h>
+#include "vgui_controls/CheckButton.h"
 
 
 //--------------------------------------------------------------------------------------------------------

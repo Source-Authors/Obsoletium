@@ -6,7 +6,7 @@
 
 #include "ModWizard_Finished.h"
 #include "CreateModWizard.h"
-#include <vgui_controls/WizardPanel.h>
+#include "vgui_controls/WizardPanel.h"
 #include <vgui/ILocalize.h>
 #include <vgui/ISystem.h>
 

@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui_controls/Divider.h>
+#include "vgui_controls/Divider.h"
 
 #include <vgui/IScheme.h>
 

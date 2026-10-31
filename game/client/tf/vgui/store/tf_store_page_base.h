@@ -13,9 +13,9 @@
 
 #include <game/client/iviewport.h>
 #include "vgui_controls/PropertyPage.h"
-#include <vgui_controls/Button.h>
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/Button.h"
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/ImagePanel.h"
 #include "econ_controls.h"
 #include "econ_ui.h"
 #include "econ_store.h"

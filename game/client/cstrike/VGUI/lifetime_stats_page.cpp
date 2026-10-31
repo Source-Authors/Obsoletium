@@ -5,7 +5,7 @@
 
 #include "cbase.h"
 #include "lifetime_stats_page.h"
-#include <vgui_controls/SectionedListPanel.h>
+#include "vgui_controls/SectionedListPanel.h"
 #include "cs_client_gamestats.h"
 
 using namespace vgui;

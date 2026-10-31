@@ -8,7 +8,7 @@
 
 #include <VGUI/IVGui.h>
 
-#include <vgui_controls/HTML.h>
+#include "vgui_controls/HTML.h"
 
 
 using namespace vgui;

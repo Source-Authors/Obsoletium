@@ -11,7 +11,7 @@
 #include "tf_fx_muzzleflash.h"
 #include "eventlist.h"
 #include "hintsystem.h"
-#include <vgui_controls/ProgressBar.h>
+#include "vgui_controls/ProgressBar.h"
 #include "igameevents.h"
 
 #include "c_obj_sentrygun.h"

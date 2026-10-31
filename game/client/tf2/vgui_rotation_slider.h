@@ -12,7 +12,7 @@
 #endif
 
 
-#include <vgui_controls/Slider.h>
+#include "vgui_controls/Slider.h"
 #include "c_baseobject.h"
 
 

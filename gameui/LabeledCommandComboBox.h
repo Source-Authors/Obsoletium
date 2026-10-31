@@ -11,9 +11,9 @@
 #pragma once
 #endif
 
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/Panel.h"
 #include "utlvector.h"
 
 class CLabeledCommandComboBox : public vgui::ComboBox

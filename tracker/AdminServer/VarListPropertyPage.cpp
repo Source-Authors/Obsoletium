@@ -12,8 +12,8 @@
 
 #include <vgui/KeyCode.h>
 
-#include <vgui_controls/ListPanel.h>
-#include <vgui_controls/Button.h>
+#include "vgui_controls/ListPanel.h"
+#include "vgui_controls/Button.h"
 
 #include "filesystem.h"
 #include "tier1/KeyValues.h"

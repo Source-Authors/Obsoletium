@@ -8,7 +8,7 @@
 #include "cbase.h"
 #include "PanelEffect.h"
 #include "vgui_int.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include <vgui/IPanel.h>
 
 void PanelToPanelRectangle( int& x, int& y, int& w, int& h, vgui::Panel *output, vgui::Panel *input );

@@ -14,7 +14,7 @@
 #include "ihudlcd.h"
 
 #include <vgui/ISurface.h>
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Displays current ammunition level

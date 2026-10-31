@@ -12,7 +12,7 @@
 #endif
 
 #include "hudelement.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include "captioncompiler.h"
 #include "tier1/UtlSortVector.h"
 #include "tier1/utlsymbol.h"

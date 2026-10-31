@@ -11,8 +11,8 @@
 #endif
 
 
-#include <vgui_controls/TreeView.h>
-#include <vgui_controls/CheckButton.h>
+#include "vgui_controls/TreeView.h"
+#include "vgui_controls/CheckButton.h"
 
 
 class KeyValues;

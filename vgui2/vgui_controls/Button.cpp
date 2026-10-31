@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui_controls/Button.h>
+#include "vgui_controls/Button.h"
 
 #include "tier1/KeyValues.h"
 
@@ -18,7 +18,7 @@
 #include <vgui/MouseCode.h>
 #include <vgui/KeyCode.h>
 
-#include <vgui_controls/FocusNavGroup.h>
+#include "vgui_controls/FocusNavGroup.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

@@ -16,7 +16,7 @@
 #include "vgui_controls/AnimationController.h"
 #include "iclientmode.h"
 #include "c_tf_playerresource.h"
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Label.h"
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include "tf/c_tf_player.h"
@@ -33,7 +33,7 @@
 #include "tf_hud_freezepanel.h"
 #include "tf_gamerules.h"
 #include "tf_mapinfo.h"
-#include <vgui_controls/MessageBox.h>
+#include "vgui_controls/MessageBox.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

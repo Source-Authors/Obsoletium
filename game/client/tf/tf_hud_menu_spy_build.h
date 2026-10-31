@@ -12,8 +12,8 @@
 #endif
 
 #ifdef STAGING_ONLY
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/Label.h"
 #include "IconPanel.h"
 #include "tf_controls.h"
 #include "tf_hud_base_build_menu.h"

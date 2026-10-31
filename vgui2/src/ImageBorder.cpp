@@ -7,7 +7,7 @@
 
 #include "ImageBorder.h"
 
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include "vgui/IPanel.h"
 #include "vgui/IScheme.h"
 #include "vgui/ISurface.h"

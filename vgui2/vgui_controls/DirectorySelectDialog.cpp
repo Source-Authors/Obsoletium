@@ -4,7 +4,7 @@
 //
 //=============================================================================//
 
-#include <vgui_controls/DirectorySelectDialog.h>
+#include "vgui_controls/DirectorySelectDialog.h"
 
 #include "tier1/KeyValues.h"
 #include <filesystem.h>
@@ -23,11 +23,11 @@
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
 
-#include <vgui_controls/Button.h>
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/TreeView.h>
-#include <vgui_controls/ImageList.h>
-#include <vgui_controls/MessageBox.h>
+#include "vgui_controls/Button.h"
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/TreeView.h"
+#include "vgui_controls/ImageList.h"
+#include "vgui_controls/MessageBox.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

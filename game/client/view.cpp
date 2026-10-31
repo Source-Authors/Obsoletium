@@ -40,7 +40,7 @@
 #include "toolframework_client.h"
 #include "tier0/icommandline.h"
 #include "ienginevgui.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/ISurface.h>
 #include "ScreenSpaceEffects.h"
 #include "sourcevr/isourcevirtualreality.h"

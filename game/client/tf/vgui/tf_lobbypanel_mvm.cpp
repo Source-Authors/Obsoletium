@@ -14,7 +14,7 @@
 #include "vgui_avatarimage.h"
 #include "store/store_panel.h"
 #include <VGuiMatSurface/IMatSystemSurface.h>
-#include <vgui_controls/ImageList.h>
+#include "vgui_controls/ImageList.h"
 
 #include "tf_lobbypanel_mvm.h"
 #include "tf_lobby_container_frame_mvm.h"

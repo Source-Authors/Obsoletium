@@ -14,7 +14,7 @@
 #include "ienginevgui.h"
 #include "clientmode_tf.h"
 #include "tf_hud_disconnect_prompt.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "vgui_int.h"
 #include "tf_gc_client.h"
 #include "tf_party.h"

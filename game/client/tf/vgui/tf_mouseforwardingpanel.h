@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Invisible panel that forwards up mouse movement

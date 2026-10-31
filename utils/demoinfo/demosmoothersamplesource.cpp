@@ -10,22 +10,22 @@
 #include "cl_demosmootherpanel.h"
 //#include "vid.h"
 #include "../engine/demo.h"
-#include <vgui_controls/Button.h>
-#include <vgui_controls/CheckButton.h>
+#include "vgui_controls/Button.h"
+#include "vgui_controls/CheckButton.h"
 #include <KeyValues.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Label.h"
 
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/ISystem.h>
 #include <vgui/ISurface.h>
-#include <vgui_controls/PropertySheet.h>
+#include "vgui_controls/PropertySheet.h"
 #include <vgui/IVgui.h>
-#include <vgui_controls/FileOpenDialog.h>
-#include <vgui_controls/ProgressBar.h>
-#include <vgui_controls/ListPanel.h>
-#include <vgui_controls/MenuButton.h>
-#include <vgui_controls/Menu.h>
-#include <vgui_controls/TextEntry.h>
+#include "vgui_controls/FileOpenDialog.h"
+#include "vgui_controls/ProgressBar.h"
+#include "vgui_controls/ListPanel.h"
+#include "vgui_controls/MenuButton.h"
+#include "vgui_controls/Menu.h"
+#include "vgui_controls/TextEntry.h"
 #include <vgui/IInput.h>
 
 #include "filesystem.h"

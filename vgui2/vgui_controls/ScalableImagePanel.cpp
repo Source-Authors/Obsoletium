@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui_controls/ScalableImagePanel.h>
+#include "vgui_controls/ScalableImagePanel.h"
 
 #include "tier1/KeyValues.h"
 

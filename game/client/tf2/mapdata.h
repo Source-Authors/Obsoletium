@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include <vgui/IImage.h>
 #include "mathlib/vector.h"
 #include "mapdata_shared.h"

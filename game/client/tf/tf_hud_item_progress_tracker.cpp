@@ -8,8 +8,8 @@
 #include "cbase.h"
 #include "tf_hud_item_progress_tracker.h"
 #include "iclientmode.h"
-#include <vgui_controls/Label.h>
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/Label.h"
+#include "vgui_controls/ImagePanel.h"
 #include "gc_clientsystem.h"
 #include "engine/IEngineSound.h"
 #include "quest_log_panel.h"

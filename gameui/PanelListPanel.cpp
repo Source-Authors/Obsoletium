@@ -4,9 +4,9 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <vgui_controls/ScrollBar.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/Button.h>
+#include "vgui_controls/ScrollBar.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/Button.h"
 
 #include <KeyValues.h>
 #include <vgui/MouseCode.h>

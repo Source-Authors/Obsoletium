@@ -15,15 +15,15 @@
 #include <vgui/KeyCode.h>
 #include <KeyValues.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/ScrollBar.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/RichText.h>
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/ScrollBar.h"
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/RichText.h"
+#include "vgui_controls/ImagePanel.h"
 #include "utlvector.h"
 #include "vgui_controls/PHandle.h"
-#include <vgui_controls/Tooltip.h>
+#include "vgui_controls/Tooltip.h"
 #include "GameEventListener.h"
 
 //-----------------------------------------------------------------------------

@@ -11,12 +11,12 @@
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 #include <vgui/ISystem.h>
-#include <vgui_controls/AnimationController.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/AnimationController.h"
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ImagePanel.h"
 #include <vgui/ISurface.h>
 #include <vgui/IImage.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Label.h"
 
 #include "c_playerresource.h"
 #include "teamplay_round_timer.h"

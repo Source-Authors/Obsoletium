@@ -11,10 +11,10 @@
 using namespace vgui;
 
 #include <KeyValues.h>
-#include <vgui_controls/ComboBox.h>
-#include <vgui_controls/CheckButton.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/TextEntry.h>
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/CheckButton.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/TextEntry.h"
 
 #include "filesystem.h"
 #include "PanelListPanel.h"

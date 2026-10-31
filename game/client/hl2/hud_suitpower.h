@@ -12,7 +12,7 @@
 
 #include "hudelement.h"
 #include "hud_numericdisplay.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Shows the sprint power bar

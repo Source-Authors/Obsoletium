@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui_controls/RadioButton.h>
+#include "vgui_controls/RadioButton.h"
 
 #include "tier1/KeyValues.h"
 
@@ -16,10 +16,10 @@
 #include <vgui/IVGui.h>
 #include <vgui/KeyCode.h>
 
-#include <vgui_controls/FocusNavGroup.h>
-#include <vgui_controls/Image.h>
-#include <vgui_controls/TextImage.h>
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/FocusNavGroup.h"
+#include "vgui_controls/Image.h"
+#include "vgui_controls/TextImage.h"
+#include "vgui_controls/Controls.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

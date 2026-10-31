@@ -12,7 +12,7 @@
 #endif
 
 #include "cbase.h"
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include <vgui/ISurface.h>
 
 #include "dod_shareddefs.h"

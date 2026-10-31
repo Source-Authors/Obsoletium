@@ -15,7 +15,7 @@
 	#include "tf_gc_client.h"
 	#include "vgui_controls/RadioButton.h"
 	#include "iclientmode.h"
-	#include <vgui_controls/AnimationController.h>
+	#include "vgui_controls/AnimationController.h"
 	#include "game/client/iviewport.h"
 	#include "tf_hud_mainmenuoverride.h"
 	#include "tf_gamerules.h"

@@ -9,7 +9,7 @@
 #include "buysubmenu.h"
 
 #include <KeyValues.h>
-#include <vgui_controls/WizardPanel.h>
+#include "vgui_controls/WizardPanel.h"
 #include <filesystem.h>
 #include <game/client/iviewport.h>
 #include <cdll_client_int.h>

@@ -13,7 +13,7 @@
 #include "filesystem_tools.h"
 #include "sdklauncher_main.h"
 #include "SDKLauncherDialog.h"
-#include <vgui_controls/WizardPanel.h>
+#include "vgui_controls/WizardPanel.h"
 #include <vgui/ivgui.h>
 #include "SourceAppInfo.h"
 

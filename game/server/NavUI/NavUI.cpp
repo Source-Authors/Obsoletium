@@ -13,7 +13,7 @@
 #include "IGameUIFuncs.h"
 #include "fmtstr.h"
 #include "NavMenu.h"
-#include <vgui_controls/MenuButton.h>
+#include "vgui_controls/MenuButton.h"
 
 #include "SelectionTool.h"
 #include "MeshTool.h"

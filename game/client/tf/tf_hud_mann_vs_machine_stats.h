@@ -15,7 +15,7 @@
 #include "tf_controls.h"
 #include "hud.h"
 #include <vgui/IScheme.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 
 //=========================================================
 class CCreditDisplayPanel : public vgui::EditablePanel

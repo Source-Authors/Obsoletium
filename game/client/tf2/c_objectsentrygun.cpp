@@ -12,7 +12,7 @@
 #include "tf_shareddefs.h"
 #include "c_basetfplayer.h"
 #include "ObjectControlPanel.h"
-#include <vgui_controls/Button.h>
+#include "vgui_controls/Button.h"
 
 inline float UTIL_AngleMod(float a)
 {

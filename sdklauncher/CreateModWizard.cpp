@@ -10,8 +10,8 @@
 #include "filesystem_tools.h"
 #include "sdklauncherdialog.h"
 #include "configs.h"
-#include <vgui_controls/WizardSubPanel.h>
-#include <vgui_controls/DirectorySelectDialog.h>
+#include "vgui_controls/WizardSubPanel.h"
+#include "vgui_controls/DirectorySelectDialog.h"
 #include <vgui/ivgui.h>
 #include <vgui/iinput.h>
 #include <ctype.h>

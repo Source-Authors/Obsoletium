@@ -6,7 +6,7 @@
 
 #include "cbase.h"
 #include "c_tf_gamestats.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include "vgui/ISystem.h"
 #include "steam/steam_api.h"
 #include "steamworks_gamestats.h"

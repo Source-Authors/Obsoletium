@@ -4,14 +4,14 @@
 // Desc: 		
 // Author: 		Peter Freese <peter@hiddenpath.com>
 // Date: 		2009/05/20
-// Copyright:	© 2009 Hidden Path Entertainment
+// Copyright:	ï¿½ 2009 Hidden Path Entertainment
 //-------------------------------------------------------------
 
 #ifndef INCLUDED_BorderedPanel
 #define INCLUDED_BorderedPanel
 #pragma once
 
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 
 using namespace vgui;
 

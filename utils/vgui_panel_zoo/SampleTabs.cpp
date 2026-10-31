@@ -8,7 +8,7 @@
 
 #include <VGUI/IVGui.h>
 #include <Keyvalues.h>
-#include <vgui_controls/PropertySheet.h>
+#include "vgui_controls/PropertySheet.h"
 
 using namespace vgui;
 

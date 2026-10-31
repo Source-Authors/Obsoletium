@@ -14,14 +14,14 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/ProgressBar.h>
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/ProgressBar.h"
 #include "view_scene.h"
 #include "view.h"
 #include "tf_gamerules.h"
 #include "tf_logic_halloween_2014.h"
 #include "tf_weapon_invis.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 
 #include "c_tf_objective_resource.h"
 

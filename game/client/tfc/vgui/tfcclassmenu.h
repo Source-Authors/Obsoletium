@@ -13,7 +13,7 @@
 
 #include <classmenu.h>
 #include <commandpanel.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include <filesystem.h>
 #include "tfc_shareddefs.h"
 #include "cbase.h"

@@ -17,9 +17,9 @@
 
 #include <vgui/VGUI.h>
 #include <Color.h>
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/ListPanel.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/ListPanel.h"
 
 #include "tier1/utlvector.h"
 

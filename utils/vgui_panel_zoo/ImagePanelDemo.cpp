@@ -10,7 +10,7 @@
 
 #include "vgui_controls/Controls.h"
 #include <vgui/IScheme.h>
-#include <vgui_controls/ImagePanel.h>
+#include "vgui_controls/ImagePanel.h"
 #include <vgui/IImage.h>
 
 using namespace vgui;

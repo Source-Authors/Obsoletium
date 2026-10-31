@@ -19,7 +19,7 @@
 #include "tmessage.h"
 #include "console.h"
 #include "snd_audio_source.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/IInput.h>
 #include "iengine.h"
 #include "keys.h"

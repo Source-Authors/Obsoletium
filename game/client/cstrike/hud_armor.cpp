@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //
 //=============================================================================//
- //====== Copyright © 1996-2003, Valve Corporation, All rights reserved. =======
+ //====== Copyright ï¿½ 1996-2003, Valve Corporation, All rights reserved. =======
 //
 // Purpose: 
 //
@@ -13,7 +13,7 @@
 
 #include "cbase.h"
 #include "hudelement.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include <vgui/ISurface.h>
 #include "clientmode_csnormal.h"
 #include "cs_gamerules.h"

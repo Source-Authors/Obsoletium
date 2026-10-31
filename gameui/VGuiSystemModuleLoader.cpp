@@ -17,8 +17,8 @@
 #include <vgui/ILocalize.h>
 #include "tier1/KeyValues.h"
 
-#include <vgui_controls/Controls.h>
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Controls.h"
+#include "vgui_controls/Panel.h"
 
 #include "filesystem.h"
 

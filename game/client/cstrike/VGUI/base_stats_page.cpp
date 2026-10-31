@@ -7,7 +7,7 @@
 #include "tier3/tier3.h"
 #include "vgui/ILocalize.h"
 #include "lifetime_stats_page.h"
-#include <vgui_controls/SectionedListPanel.h>
+#include "vgui_controls/SectionedListPanel.h"
 #include "cs_client_gamestats.h" 
 #include "filesystem.h"
 #include "cs_weapon_parse.h"

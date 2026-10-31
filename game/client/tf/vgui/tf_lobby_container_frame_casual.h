@@ -29,7 +29,7 @@
 #include "vgui_controls/ScrollableEditablePanel.h"
 #include "vgui_bitmapimage.h"
 #include "vgui/IInput.h"
-#include <vgui_controls/ImageList.h>
+#include "vgui_controls/ImageList.h"
 #include <vgui/IVGui.h>
 #include "GameEventListener.h"
 #include "vgui_avatarimage.h"

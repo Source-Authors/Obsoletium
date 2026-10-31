@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 
 #include <clocale>
 

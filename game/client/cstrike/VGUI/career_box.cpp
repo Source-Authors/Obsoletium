@@ -12,9 +12,9 @@
 #include "career_box.h"
 #include "career_button.h"
 #include "buypreset_listbox.h"
-#include <vgui_controls/TextImage.h>
-#include <vgui_controls/CheckButton.h>
-#include <vgui_controls/ComboBox.h>
+#include "vgui_controls/TextImage.h"
+#include "vgui_controls/CheckButton.h"
+#include "vgui_controls/ComboBox.h"
 #include "cs_ammodef.h"
 #include "weapon_csbase.h"
 #include "backgroundpanel.h"
@@ -22,7 +22,7 @@
 
 #include <vgui/IInput.h>
 #include "bot/shared_util.h"
-#include <vgui_controls/BitmapImagePanel.h>
+#include "vgui_controls/BitmapImagePanel.h"
 #include <vgui/ISurface.h>
 #include <vgui/ILocalize.h>
 

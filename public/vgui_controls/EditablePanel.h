@@ -12,8 +12,8 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/FocusNavGroup.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/FocusNavGroup.h"
 
 namespace vgui
 {

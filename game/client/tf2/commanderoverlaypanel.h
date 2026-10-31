@@ -12,7 +12,7 @@
 #endif
 
 #include "CommanderOverlay.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 
 #define TACTICAL_ZOFFSET	100	
 #define TACTICAL_MIN_VIEWABLE_SIZE 1000

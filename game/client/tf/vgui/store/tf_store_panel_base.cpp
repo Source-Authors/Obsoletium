@@ -12,7 +12,7 @@
 #include "econ_item_system.h"
 #include "econ_notifications.h"
 #include "c_tf_freeaccount.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "charinfo_armory_subpanel.h"
 #include "backpack_panel.h"
 

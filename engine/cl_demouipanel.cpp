@@ -12,17 +12,17 @@
 #include <vgui/IVGui.h>
 #include <KeyValues.h>
 
-#include <vgui_controls/BuildGroup.h>
-#include <vgui_controls/Tooltip.h>
-#include <vgui_controls/TextImage.h>
-#include <vgui_controls/CheckButton.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/PropertySheet.h>
-#include <vgui_controls/FileOpenDialog.h>
-#include <vgui_controls/ProgressBar.h>
-#include <vgui_controls/Slider.h>
-#include <vgui_controls/Controls.h>
-#include <vgui_controls/TextEntry.h>
+#include "vgui_controls/BuildGroup.h"
+#include "vgui_controls/Tooltip.h"
+#include "vgui_controls/TextImage.h"
+#include "vgui_controls/CheckButton.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/PropertySheet.h"
+#include "vgui_controls/FileOpenDialog.h"
+#include "vgui_controls/ProgressBar.h"
+#include "vgui_controls/Slider.h"
+#include "vgui_controls/Controls.h"
+#include "vgui_controls/TextEntry.h"
 #include <vgui/IInput.h>
 
 #include "cl_demoactionmanager.h"

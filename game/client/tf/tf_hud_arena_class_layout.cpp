@@ -17,7 +17,7 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include "tf_hud_arena_class_layout.h"
 #include "tf_hud_menu_spy_disguise.h"
 

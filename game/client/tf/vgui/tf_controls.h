@@ -15,25 +15,25 @@
 #include <vgui/KeyCode.h>
 #include <KeyValues.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/ScrollBar.h>
-#include <vgui_controls/EditablePanel.h>
-#include <vgui_controls/Button.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/RichText.h>
+#include "vgui_controls/ScrollBar.h"
+#include "vgui_controls/EditablePanel.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/Label.h"
+#include "vgui_controls/RichText.h"
 #include "utlvector.h"
 #include "vgui_controls/PHandle.h"
-#include <vgui_controls/Tooltip.h>
+#include "vgui_controls/Tooltip.h"
 #include "econ_controls.h"
 #include "sc_hinticon.h"
 #if defined( TF_CLIENT_DLL )
 #include "tf_shareddefs.h"
 #include "tf_imagepanel.h"
 #endif
-#include <vgui_controls/Frame.h>
+#include "vgui_controls/Frame.h"
 #include <../common/GameUI/scriptobject.h>
 #include <vgui/KeyCode.h>
-#include <vgui_controls/Tooltip.h>
-#include <vgui_controls/CheckButton.h>
+#include "vgui_controls/Tooltip.h"
+#include "vgui_controls/CheckButton.h"
 
 wchar_t* LocalizeNumberWithToken( const char* pszLocToken, int nValue );
 

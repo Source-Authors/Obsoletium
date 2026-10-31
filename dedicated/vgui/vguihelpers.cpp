@@ -5,8 +5,8 @@
 #include <direct.h>
 
 // includes for the VGUI version
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/Controls.h"
 #include <vgui/ISystem.h>
 #include <vgui/IVGui.h>
 #include <vgui/IPanel.h>

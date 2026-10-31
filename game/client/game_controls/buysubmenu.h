@@ -11,8 +11,8 @@
 #pragma once
 #endif
 
-#include <vgui_controls/WizardSubPanel.h>
-#include <vgui_controls/Button.h>
+#include "vgui_controls/WizardSubPanel.h"
+#include "vgui_controls/Button.h"
 #include <utlvector.h>
 #include "mouseoverpanelbutton.h"
 

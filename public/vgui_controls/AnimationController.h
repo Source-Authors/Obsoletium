@@ -10,8 +10,8 @@
 #pragma once
 #endif
 
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/PHandle.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/PHandle.h"
 
 #include "tier1/utlsymbol.h"
 #include "tier1/utlvector.h"

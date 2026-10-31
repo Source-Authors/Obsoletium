@@ -16,7 +16,7 @@
 #include "vgui/ISurface.h"
 #include "vgui/ISystem.h"
 #include "vgui_bitmappanel.h"
-#include <vgui_controls/FileOpenDialog.h>
+#include "vgui_controls/FileOpenDialog.h"
 
 #ifdef WORKSHOP_IMPORT_ENABLED
 #include "itemtest/itemtest.h"

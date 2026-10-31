@@ -18,7 +18,7 @@
 #include "store_page_new.h"
 #include "store_viewcart.h"
 #include "confirm_dialog.h"
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "econ_ui.h"
 #include "gc_clientsystem.h"
 #include "steamworks_gamestats.h"

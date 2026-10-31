@@ -10,7 +10,7 @@
 #pragma once
 #endif
 
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/EditablePanel.h"
 #include "tier1/utlvector.h"
 
 namespace vgui

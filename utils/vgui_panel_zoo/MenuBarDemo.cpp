@@ -8,9 +8,9 @@
 
 #include <VGUI/IVGui.h>
 #include <Keyvalues.h>
-#include <vgui_controls/MenuBar.h>
-#include <vgui_controls/MenuButton.h>
-#include <vgui_controls/Menu.h> 
+#include "vgui_controls/MenuBar.h"
+#include "vgui_controls/MenuButton.h"
+#include "vgui_controls/Menu.h" 
 #include "vgui/ISurface.h"
 
 using namespace vgui;

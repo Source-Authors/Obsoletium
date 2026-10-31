@@ -14,13 +14,13 @@
 #include <vgui/ILocalize.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <vgui_controls/Label.h>
-#include <vgui_controls/EditablePanel.h>
+#include "vgui_controls/Label.h"
+#include "vgui_controls/EditablePanel.h"
 #include "tf_imagepanel.h"
 #include "tf_gamerules.h"
 #include "c_tf_team.h"
 #include "vgui/tf_controls.h"
-#include <vgui_controls/TextEntry.h>
+#include "vgui_controls/TextEntry.h"
 #include "vgui_controls/AnimationController.h"
 #include "hud_basechat.h"
 #include "clientmode_shared.h"

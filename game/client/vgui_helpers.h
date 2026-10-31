@@ -12,8 +12,8 @@
 #endif
 
 
-#include <vgui_controls/Panel.h>
-#include <vgui_controls/Label.h>
+#include "vgui_controls/Panel.h"
+#include "vgui_controls/Label.h"
 
 
 inline int PanelTop(vgui::Panel *pPanel)	{int x,y,w,h; pPanel->GetBounds(x,y,w,h); return y;}

@@ -29,12 +29,12 @@
 #include <vgui/ISystem.h>
 #include "vgui/ILocalize.h"
 
-#include <vgui_controls/Controls.h>
-#include <vgui_controls/Frame.h>
-#include <vgui_controls/TreeView.h>
-#include <vgui_controls/ListPanel.h>
-#include <vgui_controls/ListViewPanel.h>
-#include <vgui_controls/TreeViewListControl.h>
+#include "vgui_controls/Controls.h"
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/TreeView.h"
+#include "vgui_controls/ListPanel.h"
+#include "vgui_controls/ListViewPanel.h"
+#include "vgui_controls/TreeViewListControl.h"
 
 #include "tier0/vprof.h"
 #include "tier1/KeyValues.h"

@@ -14,7 +14,7 @@
 #include "tf_hud_mainmenuoverride.h"
 #include "vgui_int.h"
 #include "IGameUIFuncs.h" // for key bindings
-#include <vgui_controls/AnimationController.h>
+#include "vgui_controls/AnimationController.h"
 #include "tf_item_inventory.h"
 #include "vgui/IInput.h"
 #include "item_ad_panel.h"

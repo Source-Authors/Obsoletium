@@ -12,7 +12,7 @@
 #endif
 
 
-#include <vgui_controls/Frame.h>
+#include "vgui_controls/Frame.h"
 #include <vgui/IScheme.h>
 #include "vgui_budgethistorypanel.h"
 #include "vgui_budgetbargraphpanel.h"

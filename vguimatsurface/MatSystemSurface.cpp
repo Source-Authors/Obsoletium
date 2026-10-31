@@ -29,7 +29,7 @@ ILauncherMgr *g_pLauncherMgr = NULL;
 #include "tier1/utlbuffer.h"
 #include "tier1/utlvector.h"
 #include "Clip2D.h"
-#include <vgui_controls/Panel.h>
+#include "vgui_controls/Panel.h"
 #include <vgui/IInput.h>
 #include <vgui/Point.h>
 #include "bitmap/imageformat.h"
@@ -42,7 +42,7 @@ ILauncherMgr *g_pLauncherMgr = NULL;
 #include "FontTextureCache.h"
 #include "MatSystemSurface.h"
 #include "inputsystem/iinputsystem.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_controls/Controls.h"
 #include <vgui/ISystem.h>
 #include "icvar.h"
 #include "mathlib/mathlib.h"
