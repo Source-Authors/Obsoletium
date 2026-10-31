@@ -2077,7 +2077,12 @@ bool CThread::SetPriority(int priority)
 
 void CThread::SuspendCooperative()
 {
+#ifdef POSIX
+	// dimhotepus: ThreadId_t (OS tid) is not comparable with pthread_t.
+	if ( pthread_equal( pthread_self(), m_threadId ) )
+#else
 	if ( ThreadGetCurrentId() == m_threadId )
+#endif
 	{
 		// dimhotepus: Fix resume suspend count assert.
 		// dimhotepus: Must follow sync protocol and set suspend count first.
