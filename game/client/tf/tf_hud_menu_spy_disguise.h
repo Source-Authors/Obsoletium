@@ -14,7 +14,7 @@
 #include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/Label.h"
 #include <game_controls/IconPanel.h>
-#include <vgui/tf_controls.h>
+#include "vgui/tf_controls.h"
 #include "tf_hud_base_build_menu.h"
 
 using namespace vgui;

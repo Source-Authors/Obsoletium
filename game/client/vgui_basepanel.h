@@ -15,7 +15,7 @@
 #include "vgui_controls/Panel.h"
 #include "vgui_controls/Label.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 
 //-----------------------------------------------------------------------------
 // Global interface allowing various rendering

@@ -7,9 +7,9 @@
 #include <math.h>
 
 #include "dme_controls/ChannelGraphPanel.h"
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
+#include "vgui/IScheme.h"
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
 #include "vgui/IInput.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

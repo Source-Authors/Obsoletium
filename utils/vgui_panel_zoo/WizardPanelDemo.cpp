@@ -7,7 +7,7 @@
 //=============================================================================//
 #include "DemoPage.h"
 
-#include <VGUI/IVGui.h>
+#include "vgui/IVGui.h"
 //#include "vgui_controls/Controls.h"
 
 #include "vgui_controls/WizardPanel.h"
@@ -16,7 +16,7 @@
 
 #include "vgui_controls/RadioButton.h"
 #include "vgui_controls/TextEntry.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 
 using namespace vgui;
 

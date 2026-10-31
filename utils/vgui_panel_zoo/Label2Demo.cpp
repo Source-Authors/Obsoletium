@@ -11,8 +11,8 @@
 #include "vgui_controls/Label.h"
 
 #include "vgui_controls/Controls.h"
-#include <vgui/IScheme.h>
-#include <vgui/IImage.h>
+#include "vgui/IScheme.h"
+#include "vgui/IImage.h"
 #include "vgui_controls/TextImage.h"
 
 

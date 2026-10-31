@@ -14,7 +14,7 @@
 #endif
 
 #include "VGuiMatSurface/IMatSystemSurface.h"
-#include <vgui/Cursor.h>
+#include "vgui/Cursor.h"
 
 //-----------------------------------------------------------------------------
 // Initializes cursors

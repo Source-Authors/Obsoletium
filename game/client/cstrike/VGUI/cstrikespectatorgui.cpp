@@ -10,8 +10,8 @@
 #include "hud.h"
 #include "cs_shareddefs.h"
 
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
 #include <filesystem.h>
 #include "cs_gamerules.h"
 #include "c_team.h"

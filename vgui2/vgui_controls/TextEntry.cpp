@@ -10,14 +10,14 @@
 #include "tier1/KeyValues.h"
 #include "tier1/utlvector.h"
 
-#include <vgui/Cursor.h>
-#include <vgui/IInput.h>
-#include <vgui/IScheme.h>
-#include <vgui/ISystem.h>
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
-#include <vgui/IPanel.h>
-#include <vgui/MouseCode.h>
+#include "vgui/Cursor.h"
+#include "vgui/IInput.h"
+#include "vgui/IScheme.h"
+#include "vgui/ISystem.h"
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
+#include "vgui/IPanel.h"
+#include "vgui/MouseCode.h"
 
 #include "vgui_controls/Menu.h"
 #include "vgui_controls/ScrollBar.h"

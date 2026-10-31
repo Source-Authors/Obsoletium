@@ -20,7 +20,7 @@
 #include "console.h"
 #include "snd_audio_source.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/IInput.h>
+#include "vgui/IInput.h"
 #include "iengine.h"
 #include "keys.h"
 #include "con_nprint.h"
@@ -54,7 +54,7 @@
 #include "ivguicenterprint.h"
 #include "engine/IClientLeafSystem.h"
 #include "dt_recv_eng.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "sys_dll.h"
 #include "vphysics_interface.h"
 #include "materialsystem/imesh.h"

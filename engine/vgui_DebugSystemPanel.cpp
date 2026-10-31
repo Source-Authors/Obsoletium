@@ -9,10 +9,10 @@
 #include "ivideomode.h"
 #include "tier1/CommandBuffer.h"
 #include "tier1/tier1.h"
-#include <vgui/ISurface.h>
-#include <vgui/Cursor.h>
-#include <vgui/IScheme.h>
-#include <vgui/IVGui.h>
+#include "vgui/ISurface.h"
+#include "vgui/Cursor.h"
+#include "vgui/IScheme.h"
+#include "vgui/IVGui.h"
 #include "vgui_controls/Controls.h"
 #include "vgui_controls/MenuButton.h"
 #include "vgui_controls/Menu.h"

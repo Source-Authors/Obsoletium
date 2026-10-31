@@ -10,7 +10,7 @@
 #include "RemoteServer.h"
 #include "VarEditDialog.h"
 
-#include <vgui/KeyCode.h>
+#include "vgui/KeyCode.h"
 
 #include "vgui_controls/ListPanel.h"
 #include "vgui_controls/Button.h"

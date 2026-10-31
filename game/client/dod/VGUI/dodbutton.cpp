@@ -8,7 +8,7 @@
 #include "cbase.h"
 #include "dodbutton.h"
 
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "vgui_controls/EditablePanel.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

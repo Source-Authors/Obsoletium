@@ -7,7 +7,7 @@
 
 #include "cbase.h"
 #include "sc_hinticon.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "inputsystem/iinputsystem.h"
 
 using namespace vgui;

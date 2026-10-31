@@ -12,7 +12,7 @@
 #include "iclientmode.h"
 #include "ienginevgui.h"
 #include "econ_item_inventory.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "econ_item_system.h"
 #include "item_model_panel.h"
 #include "vgui_controls/ScrollBarSlider.h"

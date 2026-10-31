@@ -17,8 +17,8 @@
 #include "c_baseobject.h"
 #include "tf_hud_spectator_extras.h"
 
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
 
 using namespace vgui;
 

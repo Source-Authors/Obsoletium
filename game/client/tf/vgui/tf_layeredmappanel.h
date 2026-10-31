@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include <vgui/IScheme.h>
+#include "vgui/IScheme.h"
 #include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/ScalableImagePanel.h"
 #include "vgui_controls/Tooltip.h"

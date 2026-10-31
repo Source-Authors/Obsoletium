@@ -16,7 +16,7 @@
 #include "iclientmode.h"
 #include "tf_item_inventory.h"
 #include "ienginevgui.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "vgui_controls/TextImage.h"
 #include "vgui_controls/ComboBox.h"
 #include "vgui/IInput.h"

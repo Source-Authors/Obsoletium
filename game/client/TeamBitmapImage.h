@@ -15,7 +15,7 @@
 
 //#include "tf_shareddefs.h"
 
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 
 namespace vgui
 {

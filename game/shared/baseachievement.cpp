@@ -20,7 +20,7 @@
 // [dwenger] Necessary for sorting achievements by award time
 //=============================================================================
 
-#include <vgui/ISystem.h>
+#include "vgui/ISystem.h"
 #include "vgui_controls/Controls.h"
 
 //=============================================================================

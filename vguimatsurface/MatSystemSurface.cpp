@@ -24,35 +24,35 @@ ILauncherMgr *g_pLauncherMgr = NULL;
 #include "tier0/icommandline.h"
 #include "tier0/dbg.h"
 #include "filesystem.h"
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 #include <Color.h>
 #include "tier1/utlbuffer.h"
 #include "tier1/utlvector.h"
 #include "Clip2D.h"
 #include "vgui_controls/Panel.h"
-#include <vgui/IInput.h>
-#include <vgui/Point.h>
+#include "vgui/IInput.h"
+#include "vgui/Point.h"
 #include "bitmap/imageformat.h"
 #include "TextureDictionary.h"
 #include "Cursor.h"
 #include "Input.h"
-#include <vgui/IHTML.h>
-#include <vgui/IVGui.h>
+#include "vgui/IHTML.h"
+#include "vgui/IVGui.h"
 #include "vgui_surfacelib/FontManager.h"
 #include "FontTextureCache.h"
 #include "MatSystemSurface.h"
 #include "inputsystem/iinputsystem.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/ISystem.h>
+#include "vgui/ISystem.h"
 #include "icvar.h"
 #include "mathlib/mathlib.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "mathlib/vmatrix.h"
 #include "tier0/vprof.h"
 #include "materialsystem/itexture.h"
 #include <malloc.h>
 #include "../vgui2/src/VPanel.h"
-#include <vgui/IInputInternal.h>
+#include "vgui/IInputInternal.h"
 #if defined( _X360 )
 #include "xbox/xbox_win32stubs.h"
 #endif
@@ -60,8 +60,8 @@ ILauncherMgr *g_pLauncherMgr = NULL;
 #include "../vgui2/src/Memorybitmap.h"
 
 
-#include <vgui/IVguiMatInfo.h>
-#include <vgui/IVguiMatInfoVar.h>
+#include "vgui/IVguiMatInfo.h"
+#include "vgui/IVguiMatInfoVar.h"
 #include "materialsystem/imaterialvar.h"
 
 

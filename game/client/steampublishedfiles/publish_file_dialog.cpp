@@ -5,10 +5,10 @@
 //=====================================================================================//
 #include "cbase.h"
 
-#include <vgui/IVGui.h>
-#include <vgui/IInput.h>
-#include <vgui/ISystem.h>
-#include <vgui/ISurface.h>
+#include "vgui/IVGui.h"
+#include "vgui/IInput.h"
+#include "vgui/ISystem.h"
+#include "vgui/ISurface.h"
 #include "vgui_controls/Button.h"
 #include "vgui_controls/TextEntry.h"
 #include "vgui_controls/MessageBox.h"

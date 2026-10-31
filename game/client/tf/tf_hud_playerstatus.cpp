@@ -8,13 +8,13 @@
 #include "hudelement.h"
 #include "iclientmode.h"
 #include <KeyValues.h>
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
+#include "vgui/IScheme.h"
+#include "vgui/ISurface.h"
+#include "vgui/ISystem.h"
 #include "vgui_controls/AnimationController.h"
 #include "vgui_controls/EditablePanel.h"
-#include <vgui/ISurface.h>
-#include <vgui/IImage.h>
+#include "vgui/ISurface.h"
+#include "vgui/IImage.h"
 #include "vgui_controls/Label.h"
 
 #include "c_tf_playerresource.h"

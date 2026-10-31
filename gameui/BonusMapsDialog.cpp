@@ -11,7 +11,7 @@
 #include "vgui/ISystem.h"
 #include "vgui/ISurface.h"
 #include "vgui/IVGui.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "filesystem.h"
 
 #include "vgui_controls/Button.h"

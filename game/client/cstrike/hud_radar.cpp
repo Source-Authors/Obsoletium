@@ -5,7 +5,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "clientmode_csnormal.h"
 #include "cs_gamerules.h"
 #include "hud_numericdisplay.h"

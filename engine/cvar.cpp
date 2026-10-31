@@ -25,7 +25,7 @@
 
 #ifndef SWDS
 #include "vgui_controls/Controls.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

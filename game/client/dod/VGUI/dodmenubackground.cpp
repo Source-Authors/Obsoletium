@@ -6,7 +6,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "dodmenubackground.h"
 
 using namespace vgui;

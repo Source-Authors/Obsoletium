@@ -7,7 +7,7 @@
 //=============================================================================//
 #include "CvarNegateCheckButton.h"
 #include "EngineInterface.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "IGameUIFuncs.h"
 #include "tier1/KeyValues.h"
 #include "tier1/convar.h"

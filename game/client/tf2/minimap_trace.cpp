@@ -11,7 +11,7 @@
 #include "mapdata.h"
 #include "model_types.h"
 #include "clientmode_tfnormal.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "vgui_bitmapimage.h"
 #include <KeyValues.h>
 #include "VGuiMatSurface/IMatSystemSurface.h"

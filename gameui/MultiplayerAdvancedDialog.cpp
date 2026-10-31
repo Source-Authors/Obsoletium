@@ -9,8 +9,8 @@
 
 #include "MultiplayerAdvancedDialog.h"
 
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
 #include "vgui_controls/ListPanel.h"
 #include <KeyValues.h>
 #include "vgui_controls/Label.h"
@@ -21,7 +21,7 @@
 #include "vgui_controls/TextEntry.h"
 #include "cvarslider.h"
 #include "PanelListPanel.h"
-#include <vgui/IInput.h>
+#include "vgui/IInput.h"
 #include <steam/steam_api.h>
 #include "EngineInterface.h"
 #include "fmtstr.h"

@@ -14,9 +14,9 @@
 #include "vgui_controls/RichText.h"
 #include "vgui_controls/Frame.h"
 #include "vgui_controls/QueryBox.h"
-#include <vgui/IScheme.h>
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
+#include "vgui/IScheme.h"
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
 #include "ienginevgui.h"
 #include <game/client/iviewport.h>
 #include "tf_tips.h"

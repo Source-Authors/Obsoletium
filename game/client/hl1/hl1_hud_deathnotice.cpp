@@ -13,8 +13,8 @@
 #include "hl1_clientmode.h"
 #include "vgui_controls/Controls.h"
 #include "vgui_controls/Panel.h"
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
 #include <KeyValues.h>
 #include "c_baseplayer.h"
 #include "c_team.h"

@@ -9,7 +9,7 @@
 #include "vgui_entityimagepanel.h"
 #include <KeyValues.h>
 #include "c_BaseTFPlayer.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "vgui_bitmapimage.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

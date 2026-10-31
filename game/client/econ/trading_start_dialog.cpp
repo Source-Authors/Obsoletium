@@ -6,7 +6,7 @@
 
 
 #include "cbase.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "vgui_controls/TextEntry.h"
 #include "trading_start_dialog.h"
 #include "econ_controls.h"

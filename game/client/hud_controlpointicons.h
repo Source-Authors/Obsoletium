@@ -18,7 +18,7 @@
 #include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/AnimationController.h"
 #include "vgui_controls/CircularProgressBar.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "tf_controls.h"
 #include "IconPanel.h"
 

@@ -7,8 +7,8 @@
 #include "cbase.h"
 #include "drawing_panel.h"
 #include "softline.h"
-#include <vgui/IScheme.h>
-#include <vgui/IVGui.h>
+#include "vgui/IScheme.h"
+#include "vgui/IVGui.h"
 #include "voice_status.h"
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

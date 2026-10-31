@@ -7,14 +7,14 @@
 
 #include "cbase.h"
 #include "cs_hud_achievement_announce.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "vgui_controls/AnimationController.h"
 #include "iclientmode.h"
 #include "c_cs_player.h"
 #include "c_cs_playerresource.h"
 #include "vgui_controls/Label.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
 #include "fmtstr.h"
 #include "cs_gamerules.h"
 #include "view.h"

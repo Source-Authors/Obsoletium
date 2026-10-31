@@ -13,7 +13,7 @@
 
 #include "vgui_surfacelib/FontManager.h"
 #include "tier1/utlrbtree.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "tier1/utlmap.h"
 
 class ITexture;

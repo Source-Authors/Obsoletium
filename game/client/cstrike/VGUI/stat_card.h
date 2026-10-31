@@ -10,7 +10,7 @@
 #pragma once
 #endif
 
-#include <vgui/IScheme.h>
+#include "vgui/IScheme.h"
 #include "hud.h"
 #include "hudelement.h"
 #include "vgui_avatarimage.h"

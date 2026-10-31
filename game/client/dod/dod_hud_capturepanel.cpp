@@ -9,7 +9,7 @@
 #include "vgui_controls/Panel.h"
 #include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/ImagePanel.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "c_dod_player.h"
 #include "clientmode_dod.h"
 

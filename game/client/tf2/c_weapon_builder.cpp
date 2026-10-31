@@ -15,7 +15,7 @@
 #include "c_weapon__stubs.h"
 #include "iinput.h"
 #include "ObjectControlPanel.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 
 #define BUILD_ICON_SCALE			0.75
 

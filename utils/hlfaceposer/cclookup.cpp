@@ -10,7 +10,7 @@
 #include "resource.h"
 #include "mdlviewer.h"
 #include "addsoundentry.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 
 #include <commctrl.h>
 

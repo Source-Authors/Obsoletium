@@ -47,7 +47,7 @@
 #include "AudioWaveOutput.h"
 #include "isoundcombiner.h"
 #include "tier0/icommandline.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "vgui/ivgui.h"
 #include "soundchars.h"
 #include "sentence.h"

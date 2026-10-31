@@ -7,8 +7,8 @@
 
 #include "cbase.h"
 #include "mapoverview.h"
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
 #include <filesystem.h>
 #include <KeyValues.h>
 #include <convar.h>

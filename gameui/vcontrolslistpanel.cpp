@@ -9,11 +9,11 @@
 #include "GameUI_Interface.h"
 #include "EngineInterface.h"
 
-#include <vgui/IInput.h>
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
-#include <vgui/Cursor.h>
+#include "vgui/IInput.h"
+#include "vgui/IScheme.h"
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
+#include "vgui/Cursor.h"
 #include <KeyValues.h>
 
 // NVNT including for input system access

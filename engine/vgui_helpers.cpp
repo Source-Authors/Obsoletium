@@ -9,8 +9,8 @@
 #include "vgui_helpers.h"
 #include "vgui_controls/TreeView.h"
 #include "vgui_controls/ListPanel.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISystem.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISystem.h"
 #include "KeyValues.h"
 #include "convar.h"
 

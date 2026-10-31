@@ -9,11 +9,11 @@
 #include "vgui_controls/Button.h"
 
 #include <KeyValues.h>
-#include <vgui/MouseCode.h>
-#include <vgui/KeyCode.h>
-#include <vgui/IInput.h>
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
+#include "vgui/MouseCode.h"
+#include "vgui/KeyCode.h"
+#include "vgui/IInput.h"
+#include "vgui/IScheme.h"
+#include "vgui/ISurface.h"
 #include "PanelListPanel.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

@@ -15,10 +15,10 @@
 #include "iviewrender.h"
 #include "hud_basechat.h"
 #include "weapon_selection.h"
-#include <vgui/IVGui.h>
-#include <vgui/Cursor.h>
-#include <vgui/IPanel.h>
-#include <vgui/IInput.h>
+#include "vgui/IVGui.h"
+#include "vgui/Cursor.h"
+#include "vgui/IPanel.h"
+#include "vgui/IInput.h"
 #include "engine/IEngineSound.h"
 #include <KeyValues.h>
 #include "vgui_controls/AnimationController.h"
@@ -33,7 +33,7 @@
 #include "achievementmgr.h"
 #include "c_playerresource.h"
 #include "cam_thirdperson.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "hud_vote.h"
 #include "ienginevgui.h"
 #include "sourcevr/isourcevirtualreality.h"

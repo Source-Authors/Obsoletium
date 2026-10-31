@@ -13,7 +13,7 @@
 #endif
 
 #include "clientmode_tfbase.h"
-#include <vgui/Cursor.h>
+#include "vgui/Cursor.h"
 #include "hud_minimap.h"
 #include "vgui_controls/Panel.h"
 

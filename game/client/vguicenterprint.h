@@ -13,7 +13,7 @@
 #endif
 
 #include "ivguicenterprint.h"
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: 

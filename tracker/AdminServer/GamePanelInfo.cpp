@@ -13,11 +13,11 @@
 #include "DialogAddBan.h"
 #include "BudgetPanelContainer.h"
 
-#include <vgui/ISystem.h>
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
-#include <vgui/Cursor.h>
-#include <vgui/ILocalize.h>
+#include "vgui/ISystem.h"
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
+#include "vgui/Cursor.h"
+#include "vgui/ILocalize.h"
 
 #include "vgui_controls/Label.h"
 #include "vgui_controls/TextEntry.h"

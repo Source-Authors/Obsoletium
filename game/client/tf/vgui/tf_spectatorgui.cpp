@@ -36,8 +36,8 @@
 #include "replay/ireplaymanager.h"
 #endif // REPLAY_ENABLED
 
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
 #include "vgui_avatarimage.h"
 
 using namespace vgui;

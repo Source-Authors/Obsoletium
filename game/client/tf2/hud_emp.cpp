@@ -16,7 +16,7 @@
 #include "materialsystem/imesh.h"
 #include "materialsystem/imaterialvar.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "clienteffectprecachesystem.h"
 
 // EMP level positions

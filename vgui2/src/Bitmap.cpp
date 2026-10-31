@@ -7,7 +7,7 @@
 
 #include "bitmap.h"
 
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "vgui_internal.h"
 #include "filesystem.h"
 #include "tier1/utlbuffer.h"

@@ -12,10 +12,10 @@
 #include "GamePanelInfo.h"
 #include "ivprofexport.h"
 
-#include <vgui/ISystem.h>
-#include <vgui/IPanel.h>
-#include <vgui/IVGui.h>
-#include <vgui/ILocalize.h>
+#include "vgui/ISystem.h"
+#include "vgui/IPanel.h"
+#include "vgui/IVGui.h"
+#include "vgui/ILocalize.h"
 
 #include "filesystem.h"
 #include "tier1/KeyValues.h"

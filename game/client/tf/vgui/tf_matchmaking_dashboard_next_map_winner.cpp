@@ -9,7 +9,7 @@
 #include "tf_matchmaking_dashboard.h"
 #include "tf_gamerules.h"
 #include "tf_gc_client.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 
 using namespace vgui;
 using namespace GCSDK;

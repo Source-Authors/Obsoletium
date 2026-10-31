@@ -8,7 +8,7 @@
 #include "cbase.h"
 #include "hudelement.h"
 #include "vgui_controls/Panel.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "hud_basetimer.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

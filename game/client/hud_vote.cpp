@@ -20,9 +20,9 @@
 #include "hud_vote.h"
 #include "menu.h"
 
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
+#include "vgui/IScheme.h"
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
 #include <KeyValues.h>
 #include "vgui_controls/AnimationController.h"
 #include "vgui_controls/EditablePanel.h"

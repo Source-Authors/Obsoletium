@@ -11,7 +11,7 @@
 #include "weapon_csbase.h"
 #include "game/client/iviewport.h"
 #include "filesystem.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "vgui_controls/Controls.h"
 #include "c_cs_player.h"
 

@@ -13,7 +13,7 @@
 #include "vgui_controls/ComboBox.h"
 #include "vgui_controls/TextEntry.h"
 #include "vgui_controls/CheckButton.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "vgui/ISurface.h"
 #include "vgui/IVGui.h"
 #include "fmtstr.h"

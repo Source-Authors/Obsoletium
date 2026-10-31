@@ -13,8 +13,8 @@
 #include "iclientmode.h"
 #include "vgui_controls/Panel.h"
 #include "vgui_controls/AnimationController.h"
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
 #include "tier1/KeyValues.h"
 #include "filesystem.h"
 

@@ -13,7 +13,7 @@
 
 #include "VGUI/bordered_panel.h"
 #include <game/client/iviewport.h>
-#include <vgui/IScheme.h>
+#include "vgui/IScheme.h"
 #include "hud.h"
 #include "hudelement.h"
 #include "c_cs_player.h"

@@ -4,7 +4,7 @@
 //
 //=============================================================================//
 
-#include <vgui/ISystem.h>
+#include "vgui/ISystem.h"
 #include "vgui_controls/Controls.h"
 
 #define STEAM_OFFLINE_MODE "HKEY_CURRENT_USER\\Software\\Valve\\Steam\\Offline"

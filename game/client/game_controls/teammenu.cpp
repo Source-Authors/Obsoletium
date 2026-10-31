@@ -10,9 +10,9 @@
 
 #include "teammenu.h"
 
-#include <vgui/IScheme.h>
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
+#include "vgui/IScheme.h"
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
 #include <KeyValues.h>
 #include "vgui_controls/ImageList.h"
 #include <filesystem.h>

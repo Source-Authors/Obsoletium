@@ -26,12 +26,12 @@
 #include "tier1/utlstring.h"
 #include "tier1/KeyValues.h"
 
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
-#include <vgui/IVGui.h>
-#include <vgui/ILocalize.h>
-#include <vgui/IInput.h>
+#include "vgui/IScheme.h"
+#include "vgui/ISurface.h"
+#include "vgui/ISystem.h"
+#include "vgui/IVGui.h"
+#include "vgui/ILocalize.h"
+#include "vgui/IInput.h"
 
 #include "vgui_controls/Button.h"
 #include "vgui_controls/ComboBox.h"

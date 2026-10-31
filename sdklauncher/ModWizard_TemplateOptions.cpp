@@ -6,7 +6,7 @@
 
 #include "ModWizard_TemplateOptions.h"
 #include "vgui_controls/DirectorySelectDialog.h"
-#include <vgui/IInput.h>
+#include "vgui/IInput.h"
 #include "vgui_controls/Button.h"
 #include "vgui_controls/WizardPanel.h"
 #include "vgui_controls/CheckButton.h"

@@ -23,8 +23,8 @@
 #include "engine/ivmodelinfo.h"
 #include "c_te_effect_dispatch.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
 #include "view.h"
 #include "ixboxsystem.h"
 #include "inputsystem/iinputsystem.h"

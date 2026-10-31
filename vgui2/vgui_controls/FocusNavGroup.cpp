@@ -10,10 +10,10 @@
 #include "tier0/dbg.h"
 #include "tier1/KeyValues.h"
 
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
-#include <vgui/IPanel.h>
-#include <vgui/VGUI.h>
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
+#include "vgui/IPanel.h"
+#include "vgui/VGUI.h"
 
 #include "vgui_controls/Controls.h"
 #include "vgui_controls/Panel.h"

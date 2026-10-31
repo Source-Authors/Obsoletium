@@ -11,7 +11,7 @@
 #if defined( CLIENT_DLL )
 #include "hud.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #endif
 
 #include "weapon_objectselection.h"

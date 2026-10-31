@@ -6,10 +6,10 @@
 //=============================================================================//
 #include "DemoPage.h"
 
-#include <VGUI/IVGui.h>
+#include "vgui/IVGui.h"
 
 #include "vgui_controls/TextEntry.h"
-#include <vgui/KeyCode.h>
+#include "vgui/KeyCode.h"
 
 using namespace vgui;
 

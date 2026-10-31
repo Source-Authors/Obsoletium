@@ -7,10 +7,10 @@
 #include "cbase.h"
 
 #include <KeyValues.h>
-#include <vgui/MouseCode.h>
-#include <vgui/IInput.h>
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
+#include "vgui/MouseCode.h"
+#include "vgui/IInput.h"
+#include "vgui/IScheme.h"
+#include "vgui/ISurface.h"
 
 #include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/ScrollBar.h"

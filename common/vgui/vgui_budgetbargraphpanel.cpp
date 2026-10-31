@@ -7,7 +7,7 @@
 #include "vgui_budgetbargraphpanel.h"
 
 #include "vgui_basebudgetpanel.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "vgui_controls/Label.h"
 #include "tier1/convar.h"
 

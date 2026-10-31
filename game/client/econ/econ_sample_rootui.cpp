@@ -8,7 +8,7 @@
 #include "cbase.h"
 #include "econ_sample_rootui.h"
 #include "vgui/IInput.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "ienginevgui.h"
 #include "econ_item_inventory.h"
 #include "backpack_panel.h"

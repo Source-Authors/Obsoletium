@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 #include "tier1/interface.h"
 #include "tier3/tier3.h"
 #include "xbox/xboxstubs.h"
@@ -22,22 +22,22 @@ namespace vgui
 
 bool VGui_InternalLoadInterfaces( CreateInterfaceFn *factoryList, int numFactories );
 
-// <vgui/IInputInternal.h> header
+// "vgui/IInputInternal.h" header
 extern class IInputInternal *g_pInput;
 
-// <vgui/IScheme.h> header
+// "vgui/IScheme.h" header
 extern class ISchemeManager *g_pScheme;
 
-// <vgui/ISurface.h> header
+// "vgui/ISurface.h" header
 extern class ISurface *g_pSurface;
 
-// <vgui/ISystem.h> header
+// "vgui/ISystem.h" header
 extern class ISystem *g_pSystem;
 
-// <vgui/IVGui.h> header
+// "vgui/IVGui.h" header
 extern class IVGui *g_pIVgui;
 
-// <vgui/IPanel.h> header
+// "vgui/IPanel.h" header
 extern class IPanel *g_pIPanel;
 
 // methods

@@ -8,9 +8,9 @@
 #include "cbase.h"
 #include "hud_minimap.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
-#include <vgui/IInput.h>
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
+#include "vgui/IInput.h"
 #include "vgui_controls/AnimationController.h"
 #include "vgui_bitmapimage.h"
 #include "clientmode_tfbase.h"

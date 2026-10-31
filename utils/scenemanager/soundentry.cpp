@@ -16,7 +16,7 @@
 #include "workspacebrowser.h"
 #include "wavefile.h"
 #include "wavebrowser.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "tier3/tier3.h"
 
 //-----------------------------------------------------------------------------

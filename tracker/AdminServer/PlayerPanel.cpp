@@ -11,11 +11,11 @@
 #include "PlayerListCompare.h"
 #include "DialogAddBan.h"
 
-#include <vgui/ISystem.h>
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
-#include <vgui/IVGui.h>
-#include <vgui/KeyCode.h>
+#include "vgui/ISystem.h"
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
+#include "vgui/IVGui.h"
+#include "vgui/KeyCode.h"
 
 #include "vgui_controls/Button.h"
 #include "vgui_controls/ListPanel.h"

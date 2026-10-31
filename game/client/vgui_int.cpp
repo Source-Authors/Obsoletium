@@ -14,9 +14,9 @@
 #include "imessagechars.h"
 #include "inetgraphpanel.h"
 #include "idebugoverlaypanel.h"
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
-#include <vgui/IInput.h>
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
+#include "vgui/IInput.h"
 #include "tier0/vprof.h"
 #include "iclientmode.h"
 #include "vgui_controls/Panel.h"
@@ -37,7 +37,7 @@ using namespace vgui;
 void MP3Player_Create( vgui::VPANEL parent );
 void MP3Player_Destroy();
 
-#include <vgui/IInputInternal.h>
+#include "vgui/IInputInternal.h"
 vgui::IInputInternal *g_InputInternal = NULL;
 
 #include "vgui_controls/Controls.h"

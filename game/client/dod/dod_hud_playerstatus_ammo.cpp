@@ -8,8 +8,8 @@
 #include "iclientmode.h"
 #include "c_dod_player.h"
 
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
+#include "vgui/IScheme.h"
+#include "vgui/ISurface.h"
 #include "vgui_controls/AnimationController.h"
 
 #include "dod_hud_playerstatus_ammo.h"

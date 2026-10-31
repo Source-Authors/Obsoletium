@@ -11,10 +11,10 @@
 #include "c_tf_player.h"
 #include "iclientmode.h"
 #include "ienginevgui.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
-#include <vgui/IInput.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
+#include "vgui/IInput.h"
 #include "c_baseobject.h"
 #include "tf_gamerules.h"
 #include "tf_item_inventory.h"

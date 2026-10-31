@@ -17,7 +17,7 @@
 #include "clientmode.h"
 #include "in_buttons.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "itextmessage.h"
 #include "tier1/mempool.h"
 #include "tier1/KeyValues.h"

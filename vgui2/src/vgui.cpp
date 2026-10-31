@@ -5,17 +5,17 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 
 #include "VGuiMatSurface/IMatSystemSurface.h"
-#include <vgui/VGUI.h>
-#include <vgui/Dar.h>
-#include <vgui/IInputInternal.h>
-#include <vgui/IPanel.h>
-#include <vgui/ISystem.h>
-#include <vgui/ISurface.h>
-#include <vgui/IClientPanel.h>
-#include <vgui/IScheme.h>
+#include "vgui/VGUI.h"
+#include "vgui/Dar.h"
+#include "vgui/IInputInternal.h"
+#include "vgui/IPanel.h"
+#include "vgui/ISystem.h"
+#include "vgui/ISurface.h"
+#include "vgui/IClientPanel.h"
+#include "vgui/IScheme.h"
 #include "tier1/KeyValues.h"
 #include "tier0/dbg.h"
 #include "tier1/utlhandletable.h"

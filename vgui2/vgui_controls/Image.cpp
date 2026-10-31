@@ -9,8 +9,8 @@
 
 #include <Color.h>
 
-#include <vgui/IPanel.h>
-#include <vgui/ISurface.h>
+#include "vgui/IPanel.h"
+#include "vgui/ISurface.h"
 
 #include "vgui_controls/Controls.h"
 

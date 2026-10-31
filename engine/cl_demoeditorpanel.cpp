@@ -13,10 +13,10 @@
 #include "vgui_controls/Label.h"
 
 #include "vgui_controls/Controls.h"
-#include <vgui/ISystem.h>
-#include <vgui/ISurface.h>
+#include "vgui/ISystem.h"
+#include "vgui/ISurface.h"
 #include "vgui_controls/PropertySheet.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "vgui_controls/FileOpenDialog.h"
 #include "vgui_controls/ProgressBar.h"
 #include "vgui_controls/ListPanel.h"

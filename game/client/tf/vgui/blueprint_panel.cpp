@@ -6,8 +6,8 @@
 
 #include "cbase.h"
 #include "vgui/IInput.h"
-#include <vgui/IVGui.h>
-#include <vgui/IScheme.h>
+#include "vgui/IVGui.h"
+#include "vgui/IScheme.h"
 #include "blueprint_panel.h"
 #include "vgui_controls/TextImage.h"
 #include "vgui_controls/Label.h"

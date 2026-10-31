@@ -10,8 +10,8 @@
 #include "hud_numeric.h"
 #include "iclientmode.h"
 #include <KeyValues.h>
-#include <vgui/ISurface.h>
-#include <vgui/IScheme.h>
+#include "vgui/ISurface.h"
+#include "vgui/IScheme.h"
 #include "vgui_controls/AnimationController.h"
 #include "ctype.h"
 

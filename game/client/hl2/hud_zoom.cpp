@@ -17,8 +17,8 @@
 #include "materialsystem/imaterialvar.h"
 #include "../hud_crosshair.h"
 
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
+#include "vgui/IScheme.h"
+#include "vgui/ISurface.h"
 #include <KeyValues.h>
 #include "vgui_controls/AnimationController.h"
 

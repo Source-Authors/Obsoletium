@@ -11,7 +11,7 @@
 #include "tf_viewport.h"
 #include "clientmode_tf.h"
 #include "confirm_dialog.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "tf_controls.h"
 #include "tf_gamerules.h"
 #include "tf_statsummary.h"

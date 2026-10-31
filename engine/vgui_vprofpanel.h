@@ -14,7 +14,7 @@
 
 #include "vgui_controls/TreeViewListControl.h"
 #include "vgui_controls/Frame.h"
-#include <vgui/IScheme.h>
+#include "vgui/IScheme.h"
 
 
 //-----------------------------------------------------------------------------

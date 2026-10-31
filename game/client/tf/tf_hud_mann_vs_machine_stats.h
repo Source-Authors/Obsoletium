@@ -14,7 +14,7 @@
 #include "hudelement.h"
 #include "tf_controls.h"
 #include "hud.h"
-#include <vgui/IScheme.h>
+#include "vgui/IScheme.h"
 #include "vgui_controls/EditablePanel.h"
 
 //=========================================================

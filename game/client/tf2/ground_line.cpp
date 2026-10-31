@@ -11,7 +11,7 @@
 #include "bitvec.h"
 #include "clientmode_commander.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "clienteffectprecachesystem.h"
 #include "tier0/vprof.h"
 

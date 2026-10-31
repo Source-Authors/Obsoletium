@@ -16,7 +16,7 @@
 #ifdef CLIENT_DLL
 #include "c_tf_player.h"
 #include "vgui_controls/Panel.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "prediction.h"
 #include "c_tf_gamestats.h"
 // Server specific.

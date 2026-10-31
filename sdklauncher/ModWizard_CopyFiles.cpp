@@ -14,7 +14,7 @@
 #include "sdklauncher_main.h"
 #include "SDKLauncherDialog.h"
 #include "vgui_controls/WizardPanel.h"
-#include <vgui/ivgui.h>
+#include "vgui/IVGui.h"
 #include "SourceAppInfo.h"
 
 using namespace vgui;

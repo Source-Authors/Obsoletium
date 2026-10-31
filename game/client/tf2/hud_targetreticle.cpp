@@ -16,9 +16,9 @@
 #include "model_types.h"
 #include "view_scene.h"
 #include "view.h"
-#include <vgui/Cursor.h>
+#include "vgui/Cursor.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: 

@@ -23,10 +23,10 @@
 // dimhotepus: Exclude perforce
 // #include "p4lib/ip4.h"
 
-#include <vgui/ISurface.h>
-#include <vgui/IScheme.h>
-#include <vgui/IVGui.h>
-#include <vgui/ISystem.h>
+#include "vgui/ISurface.h"
+#include "vgui/IScheme.h"
+#include "vgui/IVGui.h"
+#include "vgui/ISystem.h"
 #include "vgui/ILocalize.h"
 
 #include "vgui_controls/Controls.h"

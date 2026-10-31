@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 #include "vgui_controls/Frame.h"
 
 // prevent windows macros from messing with the class

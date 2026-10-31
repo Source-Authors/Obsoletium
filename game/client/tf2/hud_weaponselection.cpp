@@ -10,14 +10,14 @@
 #include "basetfcombatweapon_shared.h"
 #include "weapon_objectselection.h"
 #include <KeyValues.h>
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
+#include "vgui/IScheme.h"
+#include "vgui/ISurface.h"
+#include "vgui/ISystem.h"
 #include "vgui_controls/AnimationController.h"
 #include "vgui_controls/Panel.h"
 #include "keydefs.h"
 
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 
 #include "weapon_twohandedcontainer.h"
 #ifdef CLIENT_DLL

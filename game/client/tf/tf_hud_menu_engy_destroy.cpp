@@ -12,9 +12,9 @@
 #include "iclientmode.h"
 #include "ienginevgui.h"
 #include "tf_gamerules.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
 #include "c_baseobject.h"
 
 #include "tf_hud_menu_engy_destroy.h"

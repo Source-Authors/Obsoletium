@@ -9,7 +9,7 @@
 
 #include "tier1/KeyValues.h"
 
-#include <vgui/KeyCode.h>
+#include "vgui/KeyCode.h"
 #include "vgui/IInput.h"
 #include "vgui/MouseCode.h"
 #include "vgui/ISurface.h"

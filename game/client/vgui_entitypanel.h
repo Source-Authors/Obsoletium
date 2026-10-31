@@ -14,7 +14,7 @@
 #endif
 
 #include "c_baseentity.h"
-#include <vgui/MouseCode.h>
+#include "vgui/MouseCode.h"
 #include "vgui_basepanel.h"
 
 // forward declarations

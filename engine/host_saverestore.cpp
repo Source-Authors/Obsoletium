@@ -44,7 +44,7 @@
 #include "cl_main.h"
 #include "pr_edict.h"
 #include "tier0/vprof.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "vgui_controls/Controls.h"
 #include "tier0/icommandline.h"
 #include "testscriptmgr.h"

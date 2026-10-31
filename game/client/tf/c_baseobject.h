@@ -18,7 +18,7 @@
 #include "particle_util.h"
 #include "c_basecombatcharacter.h"
 #include "ihasbuildpoints.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 
 class C_TFPlayer;
 

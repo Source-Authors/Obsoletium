@@ -13,7 +13,7 @@
 #include "clienteffectprecachesystem.h"
 #include "weapon_combat_usedwithshieldbase.h"
 #include "c_weapon__stubs.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 
 #define BALL_GROW_TIME	1.5
 

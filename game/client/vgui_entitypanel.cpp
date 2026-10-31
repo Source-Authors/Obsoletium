@@ -13,7 +13,7 @@
 #include "hud_commander_statuspanel.h"
 #include <KeyValues.h>
 #include "commanderoverlaypanel.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "cdll_util.h"
 #include "view.h"
 

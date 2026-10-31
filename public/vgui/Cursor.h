@@ -13,7 +13,7 @@
 #endif
 
 #include "tier0/basetypes.h"
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 
 namespace vgui
 {

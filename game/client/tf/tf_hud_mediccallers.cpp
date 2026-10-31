@@ -8,9 +8,9 @@
 #include "cbase.h"
 #include "tf_hud_mediccallers.h"
 #include "iclientmode.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
 #include "view.h"
 #include "ivieweffects.h"
 #include "viewrender.h"

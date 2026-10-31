@@ -12,7 +12,7 @@
 #endif
 
 #include "tf_shareddefs.h"
-#include <vgui/IScheme.h>
+#include "vgui/IScheme.h"
 #include "vgui_controls/ScalableImagePanel.h"
 #include "GameEventListener.h"
 

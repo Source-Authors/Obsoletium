@@ -6,7 +6,7 @@
 
 
 #include "cbase.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "vgui_controls/TextEntry.h"
 #include "select_player_dialog.h"
 #include "tf_controls.h"

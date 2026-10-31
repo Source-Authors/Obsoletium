@@ -9,7 +9,7 @@
 
 #include "RemoteServer.h"
 
-#include <vgui/IInput.h>
+#include "vgui/IInput.h"
 
 #include "vgui_controls/Button.h"
 #include "vgui_controls/ComboBox.h"

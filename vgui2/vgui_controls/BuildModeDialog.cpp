@@ -10,12 +10,12 @@
 #include "tier1/utlvector.h"
 #include "tier1/KeyValues.h"
 
-#include <vgui/IInput.h>
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
-#include <vgui/KeyCode.h>
-#include <vgui/MouseCode.h>
+#include "vgui/IInput.h"
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
+#include "vgui/ISystem.h"
+#include "vgui/KeyCode.h"
+#include "vgui/MouseCode.h"
 
 #include "vgui_controls/Label.h"
 #include "vgui_controls/TextEntry.h"

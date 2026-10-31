@@ -12,9 +12,9 @@
 #include "c_tf_player.h"
 #include "c_tf_playerresource.h"
 #include "vgui_controls/Label.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include <vgui/IInput.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
+#include "vgui/IInput.h"
 #include "c_baseobject.h"
 #include "fmtstr.h"
 #include "tf_gamerules.h"

@@ -11,7 +11,7 @@
 #include "keydefs.h"
 #include "c_tf_hintmanager.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/IScheme.h>
+#include "vgui/IScheme.h"
 #include "filesystem.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

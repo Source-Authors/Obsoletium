@@ -18,10 +18,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <vgui/Cursor.h>
-#include <vgui/IInput.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
+#include "vgui/Cursor.h"
+#include "vgui/IInput.h"
+#include "vgui/ISurface.h"
+#include "vgui/ISystem.h"
 
 #include "vgui_controls/Button.h"
 #include "vgui_controls/ComboBox.h"

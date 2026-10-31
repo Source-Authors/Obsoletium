@@ -35,8 +35,8 @@
 #include "tf_gc_client.h"
 #include "tf_lobby_server.h"
 
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
 #include <VGuiMatSurface/IMatSystemSurface.h>
 #include "vgui_avatarimage.h"
 

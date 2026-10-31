@@ -12,8 +12,8 @@
 #include "configs.h"
 #include "vgui_controls/WizardSubPanel.h"
 #include "vgui_controls/DirectorySelectDialog.h"
-#include <vgui/ivgui.h>
-#include <vgui/iinput.h>
+#include "vgui/IVGui.h"
+#include "vgui/IInput.h"
 #include <ctype.h>
 #include <io.h>
 #include <direct.h>

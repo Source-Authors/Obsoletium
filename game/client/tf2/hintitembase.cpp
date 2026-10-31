@@ -8,10 +8,10 @@
 #include "hintitembase.h"
 #include "vgui_controls/Controls.h"
 #include "vgui_controls/Label.h"
-#include <vgui/IVGui.h>
-#include <vgui/ISurface.h>
-#include <vgui/IScheme.h>
-#include <vgui/ILocalize.h>
+#include "vgui/IVGui.h"
+#include "vgui/ISurface.h"
+#include "vgui/IScheme.h"
+#include "vgui/ILocalize.h"
 #include <KeyValues.h>
 #include "PanelEffect.h"
 

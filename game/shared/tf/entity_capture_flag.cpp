@@ -14,7 +14,7 @@
 #include "vgui_controls/Panel.h"
 #include "vgui_controls/ImagePanel.h"
 #include "vgui_controls/EditablePanel.h"
-#include <vgui/IScheme.h>
+#include "vgui/IScheme.h"
 #include "hudelement.h"
 #include "iclientmode.h"
 #include "hud_numericdisplay.h"

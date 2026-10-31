@@ -12,7 +12,7 @@
 
 #include "vgui_controls/Frame.h"
 #include "utlvector.h"
-#include <vgui/KeyCode.h>
+#include "vgui/KeyCode.h"
 
 class CGameChapterPanel;
 

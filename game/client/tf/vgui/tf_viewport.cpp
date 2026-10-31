@@ -17,13 +17,13 @@
 
 // VGUI panel includes
 #include "vgui_controls/Panel.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include <KeyValues.h>
-#include <vgui/Cursor.h>
-#include <vgui/IScheme.h>
-#include <vgui/IVGui.h>
-#include <vgui/ILocalize.h>
-#include <vgui/VGUI.h>
+#include "vgui/Cursor.h"
+#include "vgui/IScheme.h"
+#include "vgui/IVGui.h"
+#include "vgui/ILocalize.h"
+#include "vgui/VGUI.h"
 #include "tier0/icommandline.h"
 
 // client dll/engine defines

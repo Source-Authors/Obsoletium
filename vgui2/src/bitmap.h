@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include <vgui/IImage.h>
+#include "vgui/IImage.h"
 #include <Color.h>
 
 namespace vgui

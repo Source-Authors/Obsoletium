@@ -13,7 +13,7 @@
 #include "iclientmode.h"
 #include "ienginevgui.h"
 #include "econ_item_inventory.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "econ_item_system.h"
 #include "store_page_new.h"
 #include "store_viewcart.h"

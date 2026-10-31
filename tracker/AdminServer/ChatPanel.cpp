@@ -8,7 +8,7 @@
 #include "ChatPanel.h"
 #include "RemoteServer.h"
 
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 
 #include "vgui_controls/TextEntry.h"
 #include "vgui_controls/RichText.h"

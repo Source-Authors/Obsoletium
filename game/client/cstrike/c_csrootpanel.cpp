@@ -8,7 +8,7 @@
 #include "cbase.h"
 #include "c_csrootpanel.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "clientmode_csnormal.h"
 
 

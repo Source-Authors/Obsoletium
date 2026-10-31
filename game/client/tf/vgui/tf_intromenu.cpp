@@ -7,8 +7,8 @@
 
 #include "cbase.h"
 #include <KeyValues.h>
-#include <vgui/IVGui.h>
-#include <vgui/ISurface.h>
+#include "vgui/IVGui.h"
+#include "vgui/ISurface.h"
 #include <filesystem.h>
 #include "vgui_controls/AnimationController.h"
 #include "iclientmode.h"

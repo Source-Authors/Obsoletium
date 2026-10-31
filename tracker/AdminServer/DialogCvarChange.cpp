@@ -7,8 +7,8 @@
 
 #include "DialogCvarChange.h"
 
-#include <vgui/IInput.h>
-#include <vgui/ISurface.h>
+#include "vgui/IInput.h"
+#include "vgui/ISurface.h"
 
 #include "vgui_controls/Button.h"
 #include "vgui_controls/Panel.h"

@@ -7,9 +7,9 @@
 #include "clientmode_hlnormal.h"
 #include "vgui_int.h"
 #include "hud.h"
-#include <vgui/IInput.h>
-#include <vgui/IPanel.h>
-#include <vgui/ISurface.h>
+#include "vgui/IInput.h"
+#include "vgui/IPanel.h"
+#include "vgui/ISurface.h"
 #include "vgui_controls/AnimationController.h"
 #include "iinput.h"
 #include "ienginevgui.h"

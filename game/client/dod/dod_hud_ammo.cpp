@@ -13,7 +13,7 @@
 #include "c_dod_player.h"
 #include "ihudlcd.h"
 
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "vgui_controls/AnimationController.h"
 
 //-----------------------------------------------------------------------------

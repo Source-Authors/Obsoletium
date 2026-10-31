@@ -15,8 +15,8 @@
 #include "vgui_controls/Button.h"
 #include "vgui_controls/HTML.h"
 #include <utlvector.h>
-#include <vgui/ILocalize.h>
-#include <vgui/KeyCode.h>
+#include "vgui/ILocalize.h"
+#include "vgui/KeyCode.h"
 #include <game/client/iviewport.h>
 
 #include "mouseoverpanelbutton.h"

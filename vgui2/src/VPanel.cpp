@@ -5,11 +5,11 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui/IPanel.h>
-#include <vgui/IClientPanel.h>
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
-#include <vgui/Cursor.h>
+#include "vgui/IPanel.h"
+#include "vgui/IClientPanel.h"
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
+#include "vgui/Cursor.h"
 
 #include "vgui_internal.h"
 #include "VPanel.h"

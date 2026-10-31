@@ -7,9 +7,9 @@
 
 #include "vgui_internal.h"
 
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
-#include <vgui/IPanel.h>
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
+#include "vgui/IPanel.h"
 #include "filesystem.h"
 #include <vstdlib/IKeyValuesSystem.h>
 

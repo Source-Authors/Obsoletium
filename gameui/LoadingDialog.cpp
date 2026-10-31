@@ -10,11 +10,11 @@
 #include "EngineInterface.h"
 #include "IGameUIFuncs.h"
 
-#include <vgui/IInput.h>
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
-#include <vgui/IScheme.h>
-#include <vgui/ISystem.h>
+#include "vgui/IInput.h"
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
+#include "vgui/IScheme.h"
+#include "vgui/ISystem.h"
 #include "vgui_controls/ProgressBar.h"
 #include "vgui_controls/Label.h"
 #include "vgui_controls/Button.h"

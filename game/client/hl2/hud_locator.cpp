@@ -13,7 +13,7 @@
 #include "hud_macros.h"
 #include "iclientmode.h"
 #include "vgui_controls/AnimationController.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "c_basehlplayer.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

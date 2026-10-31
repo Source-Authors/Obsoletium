@@ -6,7 +6,7 @@
 
 #include "vgui_BudgetFPSPanel.H"
 #include "vgui_BudgetPanel.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "tier0/vprof.h"
 #include "materialsystem/imaterialsystem.h"
 

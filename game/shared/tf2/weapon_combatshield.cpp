@@ -25,7 +25,7 @@ extern ConVar tf_knockdowntime;
 #include "hudelement.h"
 #include "bone_setup.h"
 #include "beamdraw.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 
 #endif
 

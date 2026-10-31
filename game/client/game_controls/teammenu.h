@@ -16,7 +16,7 @@
 
 #include <game/client/iviewport.h>
 
-#include <vgui/KeyCode.h>
+#include "vgui/KeyCode.h"
 #include <utlvector.h>
 
 namespace vgui

@@ -12,8 +12,8 @@
 #include "iinput.h"
 #include "usercmd.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/ISurface.h>
-#include <vgui/IScheme.h>
+#include "vgui/ISurface.h"
+#include "vgui/IScheme.h"
 #include "hud.h"
 #include "iclientvehicle.h"
 #include "in_buttons.h"

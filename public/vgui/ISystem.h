@@ -13,8 +13,8 @@
 #endif
 
 #include "tier1/interface.h"
-#include <vgui/VGUI.h>
-#include <vgui/KeyCode.h>
+#include "vgui/VGUI.h"
+#include "vgui/KeyCode.h"
 
 #ifdef PlaySound
 #undef PlaySound

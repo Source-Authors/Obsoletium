@@ -17,7 +17,7 @@
 #include "fmtstr.h"
 #include "c_cs_playerresource.h"
 #include "stat_card.h"
-#include <vgui/IInput.h>
+#include "vgui/IInput.h"
 
 #include "../../../public/steam/steam_api.h"
 #include "achievementmgr.h"

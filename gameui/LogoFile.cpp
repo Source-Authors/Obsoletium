@@ -11,7 +11,7 @@
 #endif
 #include <stdio.h>
 #include "tier1/utlbuffer.h"
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 #include "vgui_controls/Controls.h"
 #include "filesystem.h"
 

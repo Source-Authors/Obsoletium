@@ -51,7 +51,7 @@
 #include "iclosecaptionmanager.h"
 #include "AddSoundEntry.h"
 #include "isoundcombiner.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "scriplib.h"
 #include "WaveBrowser.h"
 #include "filesystem_init.h"

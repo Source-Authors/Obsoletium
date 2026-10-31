@@ -9,7 +9,7 @@
 #ifndef ICLIENTMODE_H
 #define ICLIENTMODE_H
 
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 #include "client_virtualreality.h"
 
 class CViewSetup;

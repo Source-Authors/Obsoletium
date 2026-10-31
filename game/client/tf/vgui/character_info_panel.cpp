@@ -19,7 +19,7 @@
 #include "c_tf_player.h"
 #include "tf_item_inventory.h"
 #include "econ_notifications.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "vgui_controls/AnimationController.h"
 #include "econ_ui.h"
 #include "c_tf_gamestats.h"

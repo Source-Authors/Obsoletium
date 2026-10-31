@@ -14,7 +14,7 @@
 #include "vgui/ISurface.h"
 #include "vgui/IInput.h"
 #include "vgui/ILocalize.h"
-#include <vgui/ISystem.h>
+#include "vgui/ISystem.h"
 #include "vgui_controls/RadioButton.h"
 #include "vgui_controls/ComboBox.h"
 #include "vgui_controls/ImagePanel.h"

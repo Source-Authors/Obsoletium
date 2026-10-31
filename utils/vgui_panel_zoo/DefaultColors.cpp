@@ -6,11 +6,11 @@
 //=============================================================================//
 #include "DemoPage.h"
 
-#include <VGUI/IVGui.h>
+#include "vgui/IVGui.h"
 #include <Keyvalues.h>
 #include "vgui_controls/Controls.h"
 #include "vgui_controls/Panel.h"
-#include <vgui/IScheme.h>
+#include "vgui/IScheme.h"
 #include <Color.h>
 #include <stdio.h>
 

@@ -15,7 +15,7 @@
 #include "hudelement.h"
 #include "tf_controls.h"
 #include "hud.h"
-#include <vgui/IScheme.h>
+#include "vgui/IScheme.h"
 #include "tf_mann_vs_machine_stats.h"
 #include "c_tf_objective_resource.h"
 #include "tf_gamerules.h"

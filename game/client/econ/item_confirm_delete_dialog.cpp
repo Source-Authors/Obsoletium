@@ -7,7 +7,7 @@
 
 #include "cbase.h"
 #include "item_confirm_delete_dialog.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

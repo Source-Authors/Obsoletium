@@ -1,9 +1,9 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 #include "cbase.h"
 #include "faceposer_vgui.h"
-#include <vgui/IVGui.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
+#include "vgui/IVGui.h"
+#include "vgui/ISurface.h"
+#include "vgui/ISystem.h"
 #include "vgui/IInput.h"
 #include <VGuiMatSurface/IMatSystemSurface.h>
 #include "matsys_controls/matsyscontrols.h"

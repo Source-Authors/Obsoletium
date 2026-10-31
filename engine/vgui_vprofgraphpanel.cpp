@@ -13,8 +13,8 @@
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include "vgui_controls/Panel.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/ISurface.h>
-#include <vgui/IScheme.h>
+#include "vgui/ISurface.h"
+#include "vgui/IScheme.h"
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/imesh.h"
 #include "materialsystem/imaterial.h"

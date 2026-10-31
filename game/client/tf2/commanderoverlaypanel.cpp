@@ -10,11 +10,11 @@
 // The panel responsible for rendering the 3D view in orthographic mode
 //-----------------------------------------------------------------------------
 #include "cbase.h"
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/IVGui.h>
-#include <vgui/IInput.h>
-#include <vgui/ISurface.h>
+#include "vgui/IVGui.h"
+#include "vgui/IInput.h"
+#include "vgui/ISurface.h"
 #include "clientmode_commander.h"
 #include "vgui_int.h"
 #include "iinput.h"
@@ -27,9 +27,9 @@
 #include "view_shared.h"
 #include "CommanderOverlay.h"
 #include "C_TfTeam.h"
-#include <vgui/MouseCode.h>
-#include <vgui/KeyCode.h>
-#include <vgui/IPanel.h>
+#include "vgui/MouseCode.h"
+#include "vgui/KeyCode.h"
+#include "vgui/IPanel.h"
 #include "commanderoverlaypanel.h"
 #include "PixelWriter.h"
 #include "materialsystem/imaterialvar.h"

@@ -9,13 +9,13 @@
 
 #include "tier1/KeyValues.h"
 
-#include <vgui/MouseCode.h>
-#include <vgui/KeyCode.h>
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
-#include <vgui/IInput.h>
-#include <vgui/IPanel.h>
-#include <vgui/ILocalize.h>
+#include "vgui/MouseCode.h"
+#include "vgui/KeyCode.h"
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
+#include "vgui/IInput.h"
+#include "vgui/IPanel.h"
+#include "vgui/ILocalize.h"
 
 #include "vgui_controls/Controls.h"
 #include "vgui_controls/ScrollBar.h"

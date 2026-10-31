@@ -10,7 +10,7 @@
 
 #include "vgui_controls/EditablePanel.h"
 #include <game/client/iviewport.h>
-#include <vgui/IScheme.h>
+#include "vgui/IScheme.h"
 #include "hud.h"
 #include "hudelement.h"
 #include "tf_hud_statpanel.h"
@@ -23,8 +23,8 @@
 #include "tf_clientscoreboard.h"
 #include "vgui_controls/Label.h"
 #include "vgui_controls/ImagePanel.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
 #include "vgui/IInput.h"
 #include "vgui_avatarimage.h"
 #include "fmtstr.h"

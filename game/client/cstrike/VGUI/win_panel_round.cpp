@@ -11,9 +11,9 @@
 #include "iclientmode.h"
 #include "c_playerresource.h"
 #include "vgui_controls/Label.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
+#include "vgui/ISystem.h"
 #include "fmtstr.h"
 #include "cs_gamestats_shared.h"
 

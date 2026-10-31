@@ -14,7 +14,7 @@
 
 #include "tier1/utllinkedlist.h"
 #include "tier1/utlvector.h"
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 #include "vgui_controls/Panel.h"
 
 class KeyValues;

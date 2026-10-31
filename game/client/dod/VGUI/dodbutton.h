@@ -10,7 +10,7 @@
 
 #include "mouseoverpanelbutton.h"
 #include "KeyValues.h"
-#include <vgui/IScheme.h>
+#include "vgui/IScheme.h"
 #include "vgui_controls/ProgressBar.h"
 #include "vgui_controls/EditablePanel.h"
 

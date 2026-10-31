@@ -7,7 +7,7 @@
 
 #include "vgui_controls/ToggleButton.h"
 
-#include <vgui/KeyCode.h>
+#include "vgui/KeyCode.h"
 #include "tier1/KeyValues.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

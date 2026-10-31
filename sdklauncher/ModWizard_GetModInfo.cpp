@@ -6,7 +6,7 @@
 
 #include "ModWizard_GetModInfo.h"
 #include "vgui_controls/DirectorySelectDialog.h"
-#include <vgui/IInput.h>
+#include "vgui/IInput.h"
 #include "vgui_controls/Button.h"
 #include "vgui_controls/WizardPanel.h"
 #include "sdklauncher_main.h"

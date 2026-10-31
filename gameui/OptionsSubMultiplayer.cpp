@@ -14,17 +14,17 @@
 #include "vgui_controls/CheckButton.h"
 #include "tier1/KeyValues.h"
 #include "vgui_controls/Label.h"
-#include <vgui/ISystem.h>
-#include <vgui/ISurface.h>
-#include <vgui/Cursor.h>
+#include "vgui/ISystem.h"
+#include "vgui/ISurface.h"
+#include "vgui/Cursor.h"
 #include "vgui_controls/RadioButton.h"
 #include "vgui_controls/ComboBox.h"
 #include "vgui_controls/ImagePanel.h"
 #include "vgui_controls/FileOpenDialog.h"
 #include "vgui_controls/MessageBox.h"
-#include <vgui/IVGui.h>
-#include <vgui/ILocalize.h>
-#include <vgui/IPanel.h>
+#include "vgui/IVGui.h"
+#include "vgui/ILocalize.h"
+#include "vgui/IPanel.h"
 #include "vgui_controls/MessageBox.h"
 
 #include "CvarTextEntry.h"

@@ -16,13 +16,13 @@
 #include "tier1/utldict.h"
 #include "tier1/KeyValues.h"
 
-#include <vgui/KeyCode.h>
-#include <vgui/Cursor.h>
-#include <vgui/MouseCode.h>
-#include <vgui/IInput.h>
-#include <vgui/ISystem.h>
-#include <vgui/IVGui.h>
-#include <vgui/ISurface.h>
+#include "vgui/KeyCode.h"
+#include "vgui/Cursor.h"
+#include "vgui/MouseCode.h"
+#include "vgui/IInput.h"
+#include "vgui/ISystem.h"
+#include "vgui/IVGui.h"
+#include "vgui/ISurface.h"
 
 #include "vgui_controls/Panel.h"
 #include "vgui_controls/PHandle.h"

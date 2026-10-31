@@ -5,8 +5,8 @@
 //=============================================================================
 
 #include "cbase.h"
-#include <vgui/IVGui.h>
-#include <vgui/ISurface.h>
+#include "vgui/IVGui.h"
+#include "vgui/ISurface.h"
 #include <KeyValues.h>
 #include "vgui_video.h"
 #include "tf_vgui_video.h"

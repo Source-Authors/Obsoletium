@@ -12,7 +12,7 @@
 #include "iclientmode.h"
 #include "iclientvehicle.h"
 #include "vgui_controls/AnimationController.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "ihudlcd.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

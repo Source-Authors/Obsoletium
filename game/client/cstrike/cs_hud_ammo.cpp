@@ -13,7 +13,7 @@
 #include "ihudlcd.h"
 #include "vgui/ILocalize.h"
 
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "vgui_controls/AnimationController.h"
 
 //-----------------------------------------------------------------------------

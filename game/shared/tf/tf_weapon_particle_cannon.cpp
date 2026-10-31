@@ -12,7 +12,7 @@
 #ifdef CLIENT_DLL
 #include "c_tf_player.h"
 #include "vgui_controls/Panel.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "soundenvelope.h"
 #include "particle_property.h"
 #include "c_tf_gamestats.h"

@@ -10,7 +10,7 @@
 #ifndef VGUIMATSURFACE_H
 #define VGUIMATSURFACE_H
 
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 #include "tier3/tier3.h"
 
 

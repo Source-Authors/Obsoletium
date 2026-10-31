@@ -2,9 +2,9 @@
 #include "stdafx.h"
 #include "hammer.h"
 #include "hammervgui.h"
-#include <vgui/IVGui.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
+#include "vgui/IVGui.h"
+#include "vgui/ISurface.h"
+#include "vgui/ISystem.h"
 #include "vgui/IInput.h"
 #include <VGuiMatSurface/IMatSystemSurface.h>
 #include "matsys_controls/matsyscontrols.h"

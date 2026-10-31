@@ -15,13 +15,13 @@
 #include "hudelement.h"
 #include "tf_controls.h"
 #include "hud.h"
-#include <vgui/IScheme.h>
+#include "vgui/IScheme.h"
 #include "vgui_controls/ProgressBar.h"
 #include "vgui_controls/ScalableImagePanel.h"
 #include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/ImageList.h"
 #include "vgui_controls/SectionedListPanel.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "c_tf_objective_resource.h"
 #include "tf_gamerules.h"
 #include "c_tf_playerresource.h"

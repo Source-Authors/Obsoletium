@@ -12,13 +12,13 @@
 #endif
 #include "tf_hud_statpanel.h"
 #include "tf_hud_winpanel.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "vgui_controls/AnimationController.h"
 #include "iclientmode.h"
 #include "c_tf_playerresource.h"
 #include "vgui_controls/Label.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
 #include "tf/c_tf_player.h"
 #include "tf/c_tf_team.h"
 #include "tf/tf_steamstats.h"

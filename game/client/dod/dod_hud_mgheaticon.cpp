@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "hudelement.h"
 #include "vgui_controls/Panel.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "c_dod_player.h"
 #include "iclientmode.h"
 #include "c_dod_playerresource.h"

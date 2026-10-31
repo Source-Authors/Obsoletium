@@ -14,9 +14,9 @@ using namespace vgui;
 
 #include "vgui_controls/Panel.h"
 #include "vgui_controls/Frame.h"
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
+#include "vgui/IScheme.h"
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
 
 class CHudGameMessage : public CHudElement, public vgui::Panel
 {

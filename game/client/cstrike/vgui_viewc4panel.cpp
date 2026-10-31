@@ -8,7 +8,7 @@
 #include "cbase.h"
 #include "c_vguiscreen.h"
 #include "vgui_controls/Label.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "weapon_c4.h"
 #include "ienginevgui.h"
 

@@ -5,9 +5,9 @@
 //=============================================================================
 
 #include "cbase.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "vgui/IInput.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "ienginevgui.h"
 #include "iclientmode.h"
 #include "vgui_video.h"

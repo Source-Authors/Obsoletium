@@ -31,7 +31,7 @@
 #include "wavefile.h"
 #include "ifileloader.h"
 #include "MultipleRequest.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "tier3/tier3.h"
 
 char g_appTitle[] = "Source Engine SceneManager";

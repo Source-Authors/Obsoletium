@@ -17,8 +17,8 @@
 #include <KeyValues.h>
 #include "commanderoverlay.h"
 #include "hud_commander_statuspanel.h"
-#include <vgui/IVGui.h>
-#include <vgui/IScheme.h>
+#include "vgui/IVGui.h"
+#include "vgui/IScheme.h"
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *name - 

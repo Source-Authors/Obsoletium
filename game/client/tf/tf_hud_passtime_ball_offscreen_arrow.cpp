@@ -9,9 +9,9 @@
 #include "c_tf_passtime_logic.h"
 #include "tf_hud_passtime_ball_offscreen_arrow.h"
 #include "iclientmode.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
 #include "tf_controls.h"
 #include "view.h"
 #include "ivieweffects.h"

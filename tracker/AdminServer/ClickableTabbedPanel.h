@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui/MouseCode.h>
+#include "vgui/MouseCode.h"
 
 #include "vgui_controls/PropertySheet.h"
 #include "vgui_controls/Frame.h"

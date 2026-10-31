@@ -18,8 +18,8 @@
 #include "in_main.h"
 #include "commanderoverlaypanel.h"
 #include "iviewrender.h"
-#include <vgui/IInput.h>
-#include <vgui/IPanel.h>
+#include "vgui/IInput.h"
+#include "vgui/IPanel.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!

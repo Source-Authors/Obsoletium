@@ -10,15 +10,15 @@
 #include "tier1/KeyValues.h"
 #include "tier1/utlstring.h"
 
-#include <vgui/Cursor.h>
-#include <vgui/IScheme.h>
-#include <vgui/IInput.h>
-#include <vgui/IPanel.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
-#include <vgui/IVGui.h>
-#include <vgui/KeyCode.h>
-#include <vgui/MouseCode.h>
+#include "vgui/Cursor.h"
+#include "vgui/IScheme.h"
+#include "vgui/IInput.h"
+#include "vgui/IPanel.h"
+#include "vgui/ISurface.h"
+#include "vgui/ISystem.h"
+#include "vgui/IVGui.h"
+#include "vgui/KeyCode.h"
+#include "vgui/MouseCode.h"
 
 #include "vgui_controls/ScrollBar.h"
 #include "vgui_controls/TextEntry.h"

@@ -5,7 +5,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "hud_numericdisplay.h"
 #include "iclientmode.h"
 #include <coordsize.h>

@@ -6,7 +6,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include <vgui/MouseCode.h>
+#include "vgui/MouseCode.h"
 #include "vgui_rotation_slider.h"
 
 

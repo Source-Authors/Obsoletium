@@ -5,9 +5,9 @@
 #pragma once
 #endif
 
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 #include "vgui_controls/Panel.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 
 // this is a vgui panel that draws a line between opposite corners
 // the line is softened with translucent lines around it

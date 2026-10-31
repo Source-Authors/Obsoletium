@@ -13,10 +13,10 @@
 #include "vgui_controls/ImagePanel.h"
 #include "vgui_controls/RichText.h"
 #include "vgui_controls/Frame.h"
-#include <vgui/IScheme.h>
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
+#include "vgui/IScheme.h"
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
 #include "vgui_controls/SectionedListPanel.h"
 #include "vgui_controls/ImageList.h"
 #include <game/client/iviewport.h>

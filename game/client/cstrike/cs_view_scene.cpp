@@ -36,7 +36,7 @@
 #include "cs_gamerules.h"
 #include "shake.h"
 #include "clienteffectprecachesystem.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 
 CLIENTEFFECT_REGISTER_BEGIN( PrecacheCSViewScene )
 CLIENTEFFECT_MATERIAL( "effects/flashbang" )

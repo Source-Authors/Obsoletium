@@ -10,9 +10,9 @@
 #include "hudelement.h"
 #include "c_tf_player.h"
 #include "iclientmode.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
 #include "c_baseobject.h"
 #include "inputsystem/iinputsystem.h"
 

@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "hudelement.h"
 #include "vgui_controls/Panel.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "c_cs_player.h"
 #include "clientmode_csnormal.h"
 #include "weapon_c4.h"

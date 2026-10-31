@@ -43,8 +43,8 @@
 #include "wavebrowser.h"
 #include "vcdbrowser.h"
 #include "ifilesystemopendialog.h"
-#include <vgui/ILocalize.h>
-#include <vgui/IVGui.h>
+#include "vgui/ILocalize.h"
+#include "vgui/IVGui.h"
 #include "appframework/appframework.h"
 #include "icvar.h"
 #include "vstdlib/cvar.h"

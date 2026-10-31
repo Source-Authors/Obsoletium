@@ -7,7 +7,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui/Cursor.h>
+#include "vgui/Cursor.h"
 #include "clientmode_tfbase.h"
 #include "vgui_controls/EditablePanel.h"
 

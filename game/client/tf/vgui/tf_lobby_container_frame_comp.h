@@ -30,10 +30,10 @@
 #include "vgui_bitmapimage.h"
 #include "vgui/IInput.h"
 #include "vgui_controls/ImageList.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "GameEventListener.h"
 #include "vgui_avatarimage.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include <VGuiMatSurface/IMatSystemSurface.h>
 #include "rtime.h"
 #include "econ_game_account_client.h"

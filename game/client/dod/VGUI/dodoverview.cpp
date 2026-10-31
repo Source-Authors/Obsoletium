@@ -6,8 +6,8 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
 #include "dod_shareddefs.h"
 #include "dodoverview.h"
 #include "c_playerresource.h"	

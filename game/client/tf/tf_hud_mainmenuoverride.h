@@ -14,8 +14,8 @@
 #include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/ScrollableEditablePanel.h"
 #include <game/client/iviewport.h>
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
+#include "vgui/IScheme.h"
+#include "vgui/ISurface.h"
 #include "hud.h"
 #include "hudelement.h"
 #include "tf_shareddefs.h"

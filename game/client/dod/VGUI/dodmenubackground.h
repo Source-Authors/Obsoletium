@@ -12,7 +12,7 @@
 #endif
 
 #include "vgui_controls/EditablePanel.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "vgui_controls/BitmapImagePanel.h"
 
 using namespace vgui;

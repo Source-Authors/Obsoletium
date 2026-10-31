@@ -9,11 +9,11 @@
 #include "tf_hints.h"
 #include "itfhintitem.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/IVGui.h>
-#include <vgui/Cursor.h>
+#include "vgui/IVGui.h"
+#include "vgui/Cursor.h"
 #include "vgui_controls/Label.h"
-#include <vgui/ISurface.h>
-#include <vgui/IScheme.h>
+#include "vgui/ISurface.h"
+#include "vgui/IScheme.h"
 #include "vgui_int.h"
 #include "hintitembase.h"
 #include <KeyValues.h>

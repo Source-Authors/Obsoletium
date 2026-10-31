@@ -15,7 +15,7 @@
 #include "tf_item_inventory.h"
 #include "tf_player_info.h"
 
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "confirm_dialog.h"
 #include "econ/econ_notifications.h"
 #include "select_player_dialog.h"

@@ -11,7 +11,7 @@
 #endif
 
 
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 #include "vgui/isurfacev30.h"
 
 

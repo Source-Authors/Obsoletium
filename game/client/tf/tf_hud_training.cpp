@@ -6,13 +6,13 @@
 
 #include "cbase.h"
 #include "tf_hud_escort.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "tf_hud_freezepanel.h"
 #include "teamplayroundbased_gamerules.h"
 #include "iclientmode.h"
 #include "tf_gamerules.h"
 #include "tf_hud_training.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 
 using namespace vgui;
 

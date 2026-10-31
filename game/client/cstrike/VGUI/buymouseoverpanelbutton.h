@@ -18,8 +18,8 @@
 #include "c_cs_player.h"
 #include "cs_gamerules.h"
 #include "cstrike/bot/shared_util.h"
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
 #include "vgui_controls/ImagePanel.h"
 
 using namespace vgui;

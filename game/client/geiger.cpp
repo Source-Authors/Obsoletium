@@ -18,7 +18,7 @@
 #include "iclientmode.h"
 #include "vgui_controls/Controls.h"
 #include "vgui_controls/Panel.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 
 using namespace vgui;
 

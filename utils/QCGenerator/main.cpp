@@ -8,9 +8,9 @@
 #include <io.h>
 #include <stdio.h>
 
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
 #include "vgui_controls/Panel.h"
 
 #include "appframework/tier3app.h"

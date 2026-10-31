@@ -13,11 +13,11 @@
 #include <sys/stat.h>
 #include <sys/param.h>
 
-#include <vgui/VGUI.h>
-#include <vgui/ISystem.h>
+#include "vgui/VGUI.h"
+#include "vgui/ISystem.h"
 #include "tier1/KeyValues.h"
-#include <vgui/IInputInternal.h>
-#include <vgui/ISurface.h>
+#include "vgui/IInputInternal.h"
+#include "vgui/ISurface.h"
 #include "tier0/vcrmode.h"
 #include "tier1/fmtstr.h"
 #include "filesystem.h"

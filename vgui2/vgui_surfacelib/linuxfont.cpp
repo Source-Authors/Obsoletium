@@ -13,7 +13,7 @@
 #include <math.h>
 #include <malloc.h>
 #include "tier0/dbg.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include <utlbuffer.h>
 #include <fontconfig/fontconfig.h>
 #include <freetype/ftbitmap.h>

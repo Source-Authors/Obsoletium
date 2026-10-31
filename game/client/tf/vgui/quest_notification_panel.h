@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 #include "hudelement.h"
 #include "vgui_controls/EditablePanel.h"
 #include <../common/GameUI/cvarslider.h>

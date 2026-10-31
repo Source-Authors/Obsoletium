@@ -7,7 +7,7 @@
 #include <windows.h>
 #include <io.h>
 #include <sys/stat.h>
-#include <vgui/isystem.h>
+#include "vgui/ISystem.h"
 #include "min_footprint_files.h"
 #include "filesystem_tools.h"
 #include "KeyValues.h"
@@ -17,8 +17,8 @@
 #include "vgui_controls/Label.h"
 #include "vgui_controls/MessageBox.h"
 #include "vgui_controls/ProgressBar.h"
-#include <vgui/iinput.h>
-#include <vgui/ivgui.h>
+#include "vgui/IInput.h"
+#include "vgui/IVGui.h"
 #include "SourceAppInfo.h"
 
 extern void OpenLocalizedURL( const char *lpszLocalName );

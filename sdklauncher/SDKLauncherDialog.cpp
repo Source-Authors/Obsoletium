@@ -16,12 +16,12 @@
 #include "vgui_controls/CheckButton.h"
 #include "vgui_controls/Divider.h"
 #include "vgui_controls/Menu.h"
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
 #include "vgui_controls/button.h"
-#include <vgui/ISystem.h>
-#include <vgui/IVGui.h>
-#include <vgui/iinput.h>
+#include "vgui/ISystem.h"
+#include "vgui/IVGui.h"
+#include "vgui/IInput.h"
 #include <KeyValues.h>
 #include <FileSystem.h>
 #include <io.h>

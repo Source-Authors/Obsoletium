@@ -14,12 +14,12 @@
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include "view.h"
 #include "collisionutils.h"
-#include <vgui/IInput.h>
-#include <vgui/IPanel.h>
-#include <vgui/IVGui.h>
+#include "vgui/IInput.h"
+#include "vgui/IPanel.h"
+#include "vgui/IVGui.h"
 #include "ienginevgui.h"
 #include "in_buttons.h"
-#include <vgui/MouseCode.h>
+#include "vgui/MouseCode.h"
 #include "materialsystem/imesh.h"
 #include "clienteffectprecachesystem.h"
 #include "c_vguiscreen.h"
@@ -29,7 +29,7 @@
 #include "filesystem.h"
 #include "iinput.h"
 
-#include <vgui/IInputInternal.h>
+#include "vgui/IInputInternal.h"
 extern vgui::IInputInternal *g_InputInternal;
 
 // memdbgon must be the last include file in a .cpp file!!!

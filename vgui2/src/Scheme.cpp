@@ -5,15 +5,15 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui/IScheme.h>
+#include "vgui/IScheme.h"
 
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 #include "tier1/KeyValues.h"
-#include <vgui/ISurface.h>
-#include <vgui/IPanel.h>
-#include <vgui/ISystem.h>
+#include "vgui/ISurface.h"
+#include "vgui/IPanel.h"
+#include "vgui/ISystem.h"
 #include <vstdlib/IKeyValuesSystem.h>
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 
 #include "tier1/utlvector.h"
 #include "tier1/utlrbtree.h"

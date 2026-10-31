@@ -14,7 +14,7 @@
 #include "itextmessage.h"
 #include "vgui_basepanel.h"
 #include "hud_crosshair.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 
 #if defined( REPLAY_ENABLED )
 #include "replay/ienginereplay.h"

@@ -12,8 +12,8 @@
 #include "c_dod_player.h"
 #include "c_dod_playerresource.h"
 #include "vgui_controls/Label.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
 #include "fmtstr.h"
 #include "dod_gamerules.h"
 #include "view.h"

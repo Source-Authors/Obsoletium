@@ -7,7 +7,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include "c_vguiscreen.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "ienginevgui.h"
 #include "vgui_bitmapimage.h"
 #include "vgui_bitmappanel.h"

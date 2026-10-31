@@ -10,7 +10,7 @@
 
 #include "Memorybitmap.h"
 
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "vgui_internal.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

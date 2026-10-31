@@ -12,8 +12,8 @@
 #include "c_basehlplayer.h"
 #include "iclientmode.h"
 #include "vgui_controls/AnimationController.h"
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
 
 using namespace vgui;
 

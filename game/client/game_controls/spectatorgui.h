@@ -11,8 +11,8 @@
 #pragma once
 #endif
 
-#include <vgui/IScheme.h>
-#include <vgui/KeyCode.h>
+#include "vgui/IScheme.h"
+#include "vgui/KeyCode.h"
 #include "vgui_controls/Frame.h"
 #include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/Button.h"

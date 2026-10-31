@@ -35,7 +35,7 @@
 
 // NVNT Include
 #include "haptics/haptic_utils.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 
 extern ConVar in_joystick;
 extern ConVar cam_idealpitch;

@@ -6,9 +6,9 @@
 
 #include "cbase.h"
 #include "vgui/IInput.h"
-#include <vgui/IVGui.h>
-#include <vgui/IScheme.h>
-#include <vgui/ILocalize.h>
+#include "vgui/IVGui.h"
+#include "vgui/IScheme.h"
+#include "vgui/ILocalize.h"
 #include "vgui_controls/TextImage.h"
 #include "ienginevgui.h"
 #include "iclientmode.h"

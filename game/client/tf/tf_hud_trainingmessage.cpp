@@ -12,9 +12,9 @@
 #include "c_tf_player.h"
 #include "iclientmode.h"
 #include "ienginevgui.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
 #include "vgui_controls/Label.h"
 #include "vgui_controls/EditablePanel.h"
 #include "tf_hud_training.h"

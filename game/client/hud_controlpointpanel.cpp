@@ -10,7 +10,7 @@
 #include "vgui_controls/Label.h"
 #include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/ImagePanel.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "c_baseplayer.h"
 #include "iclientmode.h"
 #include "c_team_objectiveresource.h"

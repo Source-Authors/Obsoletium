@@ -14,15 +14,15 @@
 #include "vgui_controls/ListPanel.h"
 #include "vgui_controls/QueryBox.h"
 
-#include <vgui/Cursor.h>
-#include <vgui/IVGui.h>
-#include <vgui/ISurface.h>
+#include "vgui/Cursor.h"
+#include "vgui/IVGui.h"
+#include "vgui/ISurface.h"
 #include "tier1/KeyValues.h"
 #include "tier1/convar.h"
-#include <vgui/KeyCode.h>
-#include <vgui/MouseCode.h>
-#include <vgui/ISystem.h>
-#include <vgui/IInput.h>
+#include "vgui/KeyCode.h"
+#include "vgui/MouseCode.h"
+#include "vgui/ISystem.h"
+#include "vgui/IInput.h"
 
 #include "filesystem.h"
 #include "tier1/utlbuffer.h"

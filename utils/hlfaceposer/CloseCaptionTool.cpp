@@ -11,7 +11,7 @@
 #include "hlfaceposer.h"
 #include "CloseCaptionTool.h"
 #include "choreowidgetdrawhelper.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 
 extern vgui::ILocalize *g_pLocalize;
 

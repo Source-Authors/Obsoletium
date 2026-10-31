@@ -9,9 +9,9 @@
 
 #include "tier1/KeyValues.h"
 
-#include <vgui/IBorder.h>
-#include <vgui/ISurface.h>
-#include <vgui/IScheme.h>
+#include "vgui/IBorder.h"
+#include "vgui/ISurface.h"
+#include "vgui/IScheme.h"
 
 #include "vgui_controls/Image.h"
 #include "vgui_controls/Controls.h"

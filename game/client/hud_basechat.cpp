@@ -8,13 +8,13 @@
 #include "cbase.h"
 #include "hud_basechat.h"
 
-#include <vgui/IScheme.h>
-#include <vgui/IVGui.h>
+#include "vgui/IScheme.h"
+#include "vgui/IVGui.h"
 #include "iclientmode.h"
 #include "hud_macros.h"
 #include "engine/IEngineSound.h"
 #include "text_message.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "vguicenterprint.h"
 #include "vgui/KeyCode.h"
 #include "tier1/KeyValues.h"

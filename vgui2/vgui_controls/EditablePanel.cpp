@@ -11,10 +11,10 @@
 #include "tier1/fmtstr.h"
 #include "tier1/KeyValues.h"
 
-#include <vgui/IPanel.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
-#include <vgui/ILocalize.h>
+#include "vgui/IPanel.h"
+#include "vgui/ISurface.h"
+#include "vgui/ISystem.h"
+#include "vgui/ILocalize.h"
 #include "vgui/IVGui.h"
 
 #include "vgui_controls/BuildGroup.h"

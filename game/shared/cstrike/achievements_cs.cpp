@@ -25,7 +25,7 @@
 #include "cs_achievements_and_stats_interface.h"
 
 // [dwenger] Necessary for sorting achievements by award time
-#include <vgui/ISystem.h>
+#include "vgui/ISystem.h"
 #include "../../src/public/vgui_controls/Controls.h"
 
 

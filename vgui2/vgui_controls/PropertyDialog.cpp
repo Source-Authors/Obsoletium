@@ -9,7 +9,7 @@
 
 #include "tier1/KeyValues.h"
 
-#include <vgui/KeyCode.h>
+#include "vgui/KeyCode.h"
 
 #include "vgui_controls/Button.h"
 #include "vgui_controls/PropertySheet.h"

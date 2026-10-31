@@ -12,8 +12,8 @@
 #pragma once
 #endif
 
-#include <vgui/VGUI.h>
-#include <vgui/ILocalize.h>
+#include "vgui/VGUI.h"
+#include "vgui/ILocalize.h"
 #include "vgui_controls/Image.h"
 
 #include "tier1/utlvector.h"

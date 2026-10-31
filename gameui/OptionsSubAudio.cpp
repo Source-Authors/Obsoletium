@@ -14,7 +14,7 @@
 #include "CvarToggleCheckButton.h"
 #include "tier1/KeyValues.h"
 #include "tier1/convar.h"
-#include <vgui/IInput.h>
+#include "vgui/IInput.h"
 #include <steam/steam_api.h>
 #include "tier1/strtools.h"
 

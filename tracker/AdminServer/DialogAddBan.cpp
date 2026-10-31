@@ -7,7 +7,7 @@
 
 #include "DialogAddBan.h"
 
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 
 #include "vgui_controls/Button.h"
 #include "vgui_controls/Label.h"

@@ -7,7 +7,7 @@
 #include <locale.h>
 #include "vgui_surfacelib/BitmapFont.h"
 #include "vgui_surfacelib/FontManager.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "tier0/dbg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

@@ -9,11 +9,11 @@
 
 #include "tier1/KeyValues.h"
 
-#include <vgui/IInput.h>
-#include <vgui/ILocalize.h>
-#include <vgui/IPanel.h>
-#include <vgui/ISurface.h>
-#include <vgui/IScheme.h>
+#include "vgui/IInput.h"
+#include "vgui/ILocalize.h"
+#include "vgui/IPanel.h"
+#include "vgui/ISurface.h"
+#include "vgui/IScheme.h"
 
 #include "vgui_controls/Image.h"
 #include "vgui_controls/TextImage.h"

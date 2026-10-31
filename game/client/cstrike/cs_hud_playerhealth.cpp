@@ -13,8 +13,8 @@
 #include "c_cs_player.h"
 #include "c_cs_playerresource.h"
 #include "vgui_controls/Label.h"
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
 #include "cs_gamerules.h"
 
 DECLARE_BUILD_FACTORY( CCSHudPlayerHealth );

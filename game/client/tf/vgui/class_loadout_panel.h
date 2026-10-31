@@ -15,7 +15,7 @@
 #include "tf_playermodelpanel.h"
 #include "item_selection_panel.h"
 #include <../common/GameUI/cvarslider.h>
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 #include "vgui_controls/CheckButton.h"
 
 #define NUM_ITEM_PANELS_IN_LOADOUT		CLASS_LOADOUT_POSITION_COUNT

@@ -7,7 +7,7 @@
 
 #include "KeyToggleCheckButton.h"
 #include "EngineInterface.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "IGameUIFuncs.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

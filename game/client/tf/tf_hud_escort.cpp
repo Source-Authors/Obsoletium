@@ -6,7 +6,7 @@
 
 #include "cbase.h"
 #include "tf_hud_escort.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "tf_hud_freezepanel.h"
 #include "hud_controlpointicons.h"
 #include "teamplayroundbased_gamerules.h"

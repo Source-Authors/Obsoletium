@@ -9,7 +9,7 @@
 #include "iclientmode.h"
 #include "tf_gamerules.h"
 #include <filesystem.h>
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

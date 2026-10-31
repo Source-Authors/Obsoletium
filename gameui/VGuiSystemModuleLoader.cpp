@@ -11,10 +11,10 @@
 #include "BasePanel.h"
 #include "ServerBrowser/IServerBrowser.h"
 
-#include <vgui/IPanel.h>
-#include <vgui/ISystem.h>
-#include <vgui/IVGui.h>
-#include <vgui/ILocalize.h>
+#include "vgui/IPanel.h"
+#include "vgui/ISystem.h"
+#include "vgui/IVGui.h"
+#include "vgui/ILocalize.h"
 #include "tier1/KeyValues.h"
 
 #include "vgui_controls/Controls.h"

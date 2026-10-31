@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "memorybitmap.h"
 #include <string.h>
 #include <stdlib.h>

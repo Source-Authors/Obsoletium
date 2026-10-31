@@ -7,8 +7,8 @@
 #include "client_pch.h"
 
 #include "vgui_controls/Frame.h"
-#include <vgui/ISystem.h>
-#include <vgui/ISurface.h>
+#include "vgui/ISystem.h"
+#include "vgui/ISurface.h"
 #include "vgui_controls/BuildGroup.h"
 #include "vgui_controls/Tooltip.h"
 #include "vgui_controls/TextImage.h"
@@ -21,7 +21,7 @@
 #include "vgui_controls/ComboBox.h"
 #include "vgui_controls/Controls.h"
 #include "vgui_controls/TextEntry.h"
-#include <vgui/IInput.h>
+#include "vgui/IInput.h"
 #include "engineperftools.h"
 #include "vgui_baseui_interface.h"
 #include "ivideomode.h"

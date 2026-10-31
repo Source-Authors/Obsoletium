@@ -17,21 +17,21 @@
 #include <mmsystem.h>
 #include <oleidl.h>
 
-#include <vgui/VGUI.h>
-#include <vgui/Dar.h>
-#include <vgui/IClientPanel.h>
-#include <vgui/ISurface.h>
-#include <vgui/IInputInternal.h>
-#include <vgui/IPanel.h>
-#include <vgui/ISystem.h>
-#include <vgui/ILocalize.h>
-#include <vgui/IHTML.h>
-#include <vgui/IVGui.h>
-#include <vgui/IScheme.h>
+#include "vgui/VGUI.h"
+#include "vgui/Dar.h"
+#include "vgui/IClientPanel.h"
+#include "vgui/ISurface.h"
+#include "vgui/IInputInternal.h"
+#include "vgui/IPanel.h"
+#include "vgui/ISystem.h"
+#include "vgui/ILocalize.h"
+#include "vgui/IHTML.h"
+#include "vgui/IVGui.h"
+#include "vgui/IScheme.h"
 
-#include <vgui/Cursor.h>
-#include <vgui/KeyCode.h>
-#include <vgui/MouseCode.h>
+#include "vgui/Cursor.h"
+#include "vgui/KeyCode.h"
+#include "vgui/MouseCode.h"
 
 #include "vgui_internal.h"
 #include "bitmap.h"

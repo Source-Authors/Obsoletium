@@ -18,7 +18,7 @@
 #include "baseachievement.h"
 #include "iclientmode.h"
 #include "cdll_int.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "vgui_controls/AnimationController.h"
 #include "fmtstr.h"
 #include "engine/IEngineSound.h"

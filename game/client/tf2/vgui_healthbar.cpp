@@ -10,7 +10,7 @@
 #include "vgui_HealthBar.h"
 #include "CommanderOverlay.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: 

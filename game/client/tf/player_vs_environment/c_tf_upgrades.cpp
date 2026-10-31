@@ -10,7 +10,7 @@
 #include "c_tf_upgrades.h"
 #include "tf_upgrades_shared.h"
 #include "dt_utlvector_recv.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include <iinput.h>
 #include "iclientmode.h"
 #include "item_model_panel.h"

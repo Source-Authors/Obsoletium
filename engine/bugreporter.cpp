@@ -34,10 +34,10 @@
 
 #include "client.h"
 #include "vgui_controls/Frame.h"
-#include <vgui/ISystem.h>
-#include <vgui/ISurface.h>
-#include <vgui/IInput.h>
-#include <vgui/IVGui.h>
+#include "vgui/ISystem.h"
+#include "vgui/ISurface.h"
+#include "vgui/IInput.h"
+#include "vgui/IVGui.h"
 #include "vgui_controls/BuildGroup.h"
 #include "vgui_controls/Tooltip.h"
 #include "vgui_controls/TextImage.h"

@@ -6,8 +6,8 @@
 
 #include "cbase.h"
 #include "vgui/IInput.h"
-#include <vgui/IVGui.h>
-#include <vgui/IScheme.h>
+#include "vgui/IVGui.h"
+#include "vgui/IScheme.h"
 #include "tf_item_pickup_panel.h"
 #include "iclientmode.h"
 #include "baseviewport.h"

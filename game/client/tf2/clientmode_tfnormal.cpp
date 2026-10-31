@@ -18,8 +18,8 @@
 #include "in_buttons.h"
 #include "c_tf_playerclass.h"
 #include "engine/IEngineSound.h"
-#include <vgui/IInput.h>
-#include <vgui/IPanel.h>
+#include "vgui/IInput.h"
+#include "vgui/IPanel.h"
 #include "vgui_controls/AnimationController.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

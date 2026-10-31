@@ -8,7 +8,7 @@
 
 #include "cbase.h"
 
-#include <vgui/KeyCode.h>
+#include "vgui/KeyCode.h"
 #include "career_box.h"
 #include "career_button.h"
 #include "buypreset_listbox.h"
@@ -20,11 +20,11 @@
 #include "backgroundpanel.h"
 #include "cs_gamerules.h"
 
-#include <vgui/IInput.h>
+#include "vgui/IInput.h"
 #include "bot/shared_util.h"
 #include "vgui_controls/BitmapImagePanel.h"
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

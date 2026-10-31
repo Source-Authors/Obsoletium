@@ -13,7 +13,7 @@
 
 #include "vgui_controls/Frame.h"
 #include "scriptobject.h"
-#include <vgui/KeyCode.h>
+#include "vgui/KeyCode.h"
 
 class CPanelListPanel;
 

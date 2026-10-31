@@ -7,7 +7,7 @@
 
 // Author: Matthew D. Campbell (matt@turtlerockstudios.com), 2003
 
-#include <vgui/KeyCode.h>
+#include "vgui/KeyCode.h"
 
 #include "CvarTextEntry.h"
 #include "TextEntryBox.h"

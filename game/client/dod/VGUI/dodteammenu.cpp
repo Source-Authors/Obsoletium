@@ -11,8 +11,8 @@
 #include "hud.h" // for gEngfuncs
 #include "c_dod_player.h"
 #include "dod_gamerules.h"
-#include <vgui/ILocalize.h>
-#include <vgui/IVGui.h>
+#include "vgui/ILocalize.h"
+#include "vgui/IVGui.h"
 #include "vgui_controls/RichText.h"
 #include "c_dod_team.h"
 #include "IGameUIFuncs.h" // for key bindings

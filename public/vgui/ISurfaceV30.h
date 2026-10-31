@@ -17,8 +17,8 @@
 #pragma once
 #endif
 
-#include <vgui/VGUI.h>
-#include <vgui/IHTML.h> // CreateHTML, PaintHTML 
+#include "vgui/VGUI.h"
+#include "vgui/IHTML.h" // CreateHTML, PaintHTML 
 #include "interface.h"
 #include "IVguiMatInfo.h"
 

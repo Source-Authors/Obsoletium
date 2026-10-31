@@ -26,7 +26,7 @@
 #include "soundchars.h"
 #include "sentence.h"
 #include "PhonemeEditor.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "filesystem_init.h"
 #include "tier2/p4helpers.h"
 

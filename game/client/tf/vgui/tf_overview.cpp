@@ -6,8 +6,8 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
 #include "tf_shareddefs.h"
 #include "tf_overview.h"
 #include "c_playerresource.h"	

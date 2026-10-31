@@ -8,7 +8,7 @@
 #include "hud_orders.h"
 #include "c_order.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "minimap_trace.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include "c_func_resource.h"

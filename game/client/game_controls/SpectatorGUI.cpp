@@ -15,10 +15,10 @@
 
 #include "spectatorgui.h"
 
-#include <vgui/IScheme.h>
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
-#include <vgui/IPanel.h>
+#include "vgui/IScheme.h"
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
+#include "vgui/IPanel.h"
 #include "vgui_controls/ImageList.h"
 #include "vgui_controls/MenuItem.h"
 #include "vgui_controls/TextImage.h"

@@ -14,7 +14,7 @@
 #endif
 
 
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 #include "vgui/ISurface.h"
 
 

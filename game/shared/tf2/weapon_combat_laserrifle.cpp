@@ -21,7 +21,7 @@ ConVar	weapon_combat_laserrifle_ducking_mod( "weapon_combat_laserrifle_ducking_m
 #include "fx.h"
 #include "hud.h"
 #include "c_te_effect_dispatch.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 
 #define CWeaponCombatLaserRifle C_WeaponCombatLaserRifle
 

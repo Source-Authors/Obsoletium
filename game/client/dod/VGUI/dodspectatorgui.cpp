@@ -10,8 +10,8 @@
 #include "hud.h"
 #include "dod_shareddefs.h"
 
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
 #include <imapoverview.h>
 #include "dod_gamerules.h"
 #include "c_team.h"

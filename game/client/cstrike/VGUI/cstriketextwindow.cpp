@@ -10,9 +10,9 @@
 #include "backgroundpanel.h"
 #include <cdll_client_int.h>
 
-#include <vgui/IScheme.h>
-#include <vgui/ILocalize.h>
-#include <vgui/ISurface.h>
+#include "vgui/IScheme.h"
+#include "vgui/ILocalize.h"
+#include "vgui/ISurface.h"
 #include <filesystem.h>
 #include <KeyValues.h>
 #include <convar.h>

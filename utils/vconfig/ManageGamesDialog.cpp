@@ -5,9 +5,9 @@
 //=============================================================================
 
 #include <windows.h>
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "vgui_controls/DirectorySelectDialog.h"
-#include <vgui/IInput.h>
+#include "vgui/IInput.h"
 #include <KeyValues.h>
 
 #include "vconfig_main.h"

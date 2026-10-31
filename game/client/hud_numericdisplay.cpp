@@ -10,9 +10,9 @@
 
 #include <Color.h>
 #include <KeyValues.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
-#include <vgui/IVGui.h>
+#include "vgui/ISurface.h"
+#include "vgui/ISystem.h"
+#include "vgui/IVGui.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

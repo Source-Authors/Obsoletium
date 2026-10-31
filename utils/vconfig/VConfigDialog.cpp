@@ -6,9 +6,9 @@
 
 #include <windows.h>
 
-#include <vgui/IVGui.h>
-#include <vgui/IInput.h>
-#include <vgui/ISystem.h>
+#include "vgui/IVGui.h"
+#include "vgui/IInput.h"
+#include "vgui/ISystem.h"
 #include "vgui_controls/ComboBox.h"
 #include "vgui_controls/MessageBox.h"
 #include <KeyValues.h>

@@ -11,9 +11,9 @@
 #pragma once
 #endif
 
-#include <vgui/IScheme.h>
+#include "vgui/IScheme.h"
 #include "vgui_controls/Button.h"
-#include <vgui/KeyCode.h>
+#include "vgui/KeyCode.h"
 #include <filesystem.h>
 
 extern vgui::Panel *g_lastPanel;

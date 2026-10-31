@@ -16,7 +16,7 @@
 #include "hud_ammo.h"
 #include "c_weapon__stubs.h"
 #include "c_tf_class_sapper.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

@@ -19,7 +19,7 @@
 #include "c_team.h"
 #include "commanderoverlay.h"
 #include <KeyValues.h>
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

@@ -9,7 +9,7 @@
 #include "filesystem.h"
 #include "vgui_controls/Panel.h"
 
-#include <VGUI/IVGui.h> // for dprinf statements
+#include "vgui/IVGui.h" // for dprinf statements
 
 using namespace vgui;
 

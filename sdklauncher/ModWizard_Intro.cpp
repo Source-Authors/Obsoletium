@@ -6,7 +6,7 @@
 
 #include "ModWizard_Intro.h"
 #include "vgui_controls/WizardPanel.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "ModWizard_GetModInfo.h"
 #include "filesystem_tools.h"
 #include "SourceAppInfo.h"

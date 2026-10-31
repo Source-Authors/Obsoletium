@@ -62,14 +62,14 @@
 // note that GameUI project uses ..\vgui2\include, not ..\utils\vgui\include
 #include "BasePanel.h"
 
-#include <vgui/Cursor.h>
+#include "vgui/Cursor.h"
 #include <KeyValues.h>
-#include <vgui/ILocalize.h>
-#include <vgui/IPanel.h>
-#include <vgui/IScheme.h>
-#include <vgui/IVGui.h>
-#include <vgui/ISystem.h>
-#include <vgui/ISurface.h>
+#include "vgui/ILocalize.h"
+#include "vgui/IPanel.h"
+#include "vgui/IScheme.h"
+#include "vgui/IVGui.h"
+#include "vgui/ISystem.h"
+#include "vgui/ISurface.h"
 #include "vgui_controls/Menu.h"
 #include "vgui_controls/PHandle.h"
 #include "tier3/tier3.h"

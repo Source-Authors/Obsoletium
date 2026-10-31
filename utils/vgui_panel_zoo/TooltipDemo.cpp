@@ -6,7 +6,7 @@
 //=============================================================================//
 #include "DemoPage.h"
 
-#include <VGUI/IVGui.h>
+#include "vgui/IVGui.h"
 #include <KeyValues.h>
 #include "vgui_controls/ToggleButton.h"
 #include "vgui_controls/Tooltip.h"

@@ -19,7 +19,7 @@
 using namespace vgui;
 
 #include "vgui_controls/ComboBox.h"
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 
 #include "filesystem.h"
 #include <KeyValues.h>

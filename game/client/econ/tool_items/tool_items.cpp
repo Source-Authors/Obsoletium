@@ -20,7 +20,7 @@
 #else
 	#include "econ_item_tools.h"
 #endif
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "gc_clientsystem.h"
 #include "item_style_select_dialog.h"			// for CComboBoxBackpackOverlayDialogBase
 #include "backpack_panel.h"

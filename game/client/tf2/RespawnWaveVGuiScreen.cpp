@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "c_vguiscreen.h"
 #include "clientmode_tfbase.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "vgui_controls/Controls.h"
 #include "vgui_controls/Label.h"
 #include "c_info_act.h"

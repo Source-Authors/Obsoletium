@@ -9,14 +9,14 @@
 
 #include "tier1/KeyValues.h"
 
-#include <vgui/IBorder.h>
-#include <vgui/IInput.h>
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
-#include <vgui/IVGui.h>
-#include <vgui/MouseCode.h>
-#include <vgui/KeyCode.h>
+#include "vgui/IBorder.h"
+#include "vgui/IInput.h"
+#include "vgui/IScheme.h"
+#include "vgui/ISurface.h"
+#include "vgui/ISystem.h"
+#include "vgui/IVGui.h"
+#include "vgui/MouseCode.h"
+#include "vgui/KeyCode.h"
 
 #include "vgui_controls/FocusNavGroup.h"
 

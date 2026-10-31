@@ -10,7 +10,7 @@
 #include "hud_minimap.h"
 #include "vgui_bitmapimage.h"
 #include "c_vehicle_teleport_station.h"
-#include <vgui/MouseCode.h>
+#include "vgui/MouseCode.h"
 
 
 class C_ObjMCVSelectionPanel;

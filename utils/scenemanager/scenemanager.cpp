@@ -17,8 +17,8 @@
 #include "vstdlib/random.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "iscenemanagersound.h"
-#include <vgui/ILocalize.h>
-#include <vgui/IVGui.h>
+#include "vgui/ILocalize.h"
+#include "vgui/IVGui.h"
 #include "tier0/icommandline.h"
 #include "icvar.h"
 #include "vstdlib/cvar.h"

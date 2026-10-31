@@ -20,7 +20,7 @@
 #include "vgui_controls/PropertyPage.h"
 #include "vgui_controls/Image.h"
 #include "vgui_controls/ImagePanel.h"
-#include <vgui/IScheme.h>
+#include "vgui/IScheme.h"
 
 #include "RemoteServer.h"
 

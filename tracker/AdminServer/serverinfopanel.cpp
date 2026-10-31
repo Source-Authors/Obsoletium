@@ -11,7 +11,7 @@
 
 #include <cctype>
 
-#include <vgui/ISystem.h>
+#include "vgui/ISystem.h"
 
 using namespace vgui;
 

@@ -8,7 +8,7 @@
 #include "hud_vehicle_role.h"
 #include "iclientmode.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include <KeyValues.h>
 
 // memdbgon must be the last include file in a .cpp file!!!

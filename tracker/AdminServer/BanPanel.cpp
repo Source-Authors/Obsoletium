@@ -9,11 +9,11 @@
 #include "PlayerContextMenu.h"
 #include "DialogAddBan.h"
 
-#include <vgui/Cursor.h>
-#include <vgui/ISystem.h>
-#include <vgui/ISurface.h>
-#include <vgui/ILocalize.h>
-#include <vgui/IVGui.h>
+#include "vgui/Cursor.h"
+#include "vgui/ISystem.h"
+#include "vgui/ISurface.h"
+#include "vgui/ILocalize.h"
+#include "vgui/IVGui.h"
 #include "tier1/KeyValues.h"
 
 #include "vgui_controls/Label.h"

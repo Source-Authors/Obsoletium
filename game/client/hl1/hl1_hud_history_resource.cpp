@@ -8,7 +8,7 @@
 #include "history_resource.h"
 #include "hud_macros.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "iclientmode.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

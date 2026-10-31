@@ -9,7 +9,7 @@
 
 #include "tier1/interface.h"
 
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 
 // Every tool must expose this back to us
 extern char const *GetVGuiControlsModuleName();

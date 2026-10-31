@@ -9,12 +9,12 @@
 #include "cbase.h"
 #include <stdarg.h>
 #include "imessagechars.h"
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include "vgui_controls/Panel.h"
 #include "vgui_controls/Controls.h"
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
+#include "vgui/IScheme.h"
+#include "vgui/ISurface.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

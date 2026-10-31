@@ -7,7 +7,7 @@
 #include "vgui_budgethistorypanel.h"
 
 #include "vgui_basebudgetpanel.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "tier0/vprof.h"
 #include "tier1/convar.h"
 

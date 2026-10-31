@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 #include "vgui_surfacelib/FontAmalgam.h"
 #include "materialsystem/imaterialsystem.h"
 #include "filesystem.h"

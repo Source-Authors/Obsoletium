@@ -10,7 +10,7 @@
 
 #include "vgui_controls/QueryBox.h"
 
-#include <vgui/KeyCode.h>
+#include "vgui/KeyCode.h"
 
 #include "vgui_controls/TextImage.h"
 

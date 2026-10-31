@@ -16,7 +16,7 @@
 
 using namespace vgui;
 
-#include <vgui/ILocalize.h>
+#include "vgui/ILocalize.h"
 #include "vgui/ISurface.h"
 
 #include "filesystem.h"

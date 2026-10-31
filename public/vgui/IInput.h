@@ -15,7 +15,7 @@
 #include "tier0/basetypes.h"
 #include "tier1/interface.h"
 
-#include <vgui/VGUI.h>
+#include "vgui/VGUI.h"
 #include "vgui/MouseCode.h"
 #include "vgui/KeyCode.h"
 

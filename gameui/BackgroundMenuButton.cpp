@@ -8,8 +8,8 @@
 #include "BackgroundMenuButton.h"
 
 #include <KeyValues.h>
-#include <vgui/IImage.h>
-#include <vgui/IScheme.h>
+#include "vgui/IImage.h"
+#include "vgui/IScheme.h"
 #include "vgui_controls/Menu.h"
 #include "vgui_controls/MenuItem.h"
 

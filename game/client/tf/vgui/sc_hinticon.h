@@ -11,10 +11,10 @@
 #pragma once
 #endif
 
-#include <vgui/IScheme.h>
-#include <vgui/KeyCode.h>
+#include "vgui/IScheme.h"
+#include "vgui/KeyCode.h"
 #include <KeyValues.h>
-#include <vgui/IVGui.h>
+#include "vgui/IVGui.h"
 #include "vgui_controls/Label.h"
 
 class CSCHintIcon : public vgui::Label

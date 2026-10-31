@@ -11,7 +11,7 @@
 #include "econ_gcmessages.h"
 #include "gc_clientsystem.h"
 #include "econ_ui.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "econ_item_inventory.h"
 #include "econ/tool_items/tool_items.h"
 

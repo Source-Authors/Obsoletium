@@ -7,9 +7,9 @@
 
 #include "client_pch.h"
 
-#include <vgui/ISystem.h>
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
+#include "vgui/ISystem.h"
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
 #include <KeyValues.h>
 
 #include "vgui_controls/BuildGroup.h"
@@ -22,7 +22,7 @@
 #include "vgui_controls/Slider.h"
 #include "vgui_controls/Controls.h"
 #include "vgui_controls/TextEntry.h"
-#include <vgui/IInput.h>
+#include "vgui/IInput.h"
 
 #include "cl_foguipanel.h"
 

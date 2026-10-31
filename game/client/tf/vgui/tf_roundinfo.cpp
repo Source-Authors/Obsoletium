@@ -29,8 +29,8 @@
 
 
 #include "vgui/ISurface.h"
-#include <vgui/ILocalize.h>
-#include <vgui/IVGui.h>
+#include "vgui/ILocalize.h"
+#include "vgui/IVGui.h"
 #include "engine/IEngineSound.h"
 
 using namespace vgui;

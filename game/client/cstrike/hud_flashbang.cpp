@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "hudelement.h"
 #include "vgui_controls/Panel.h"
-#include <vgui/ISurface.h>
+#include "vgui/ISurface.h"
 #include "clientmode_csnormal.h"
 #include "c_cs_player.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
