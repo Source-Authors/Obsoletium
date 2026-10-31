@@ -7,7 +7,6 @@
 
 #include "Sys_Utils.h"
 
-#include "EngineInterface.h"
 #include "tier0/vcrmode.h"
 
 #if defined( _WIN32 )
