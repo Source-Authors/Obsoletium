@@ -118,6 +118,7 @@ class TSLIST_HEAD_ALIGN CTSListBase
       next.value.Next = node;
       next.value.Depth = orig.value.Depth + 1;
       next.value.Sequence = orig.value.Sequence + 1;
+	  AssertMsg( next.value.Sequence != 0, "Sequence overflows in Push, lock free stack can't detect ABA problem." );
 
       if (head_.compare_exchange_weak(
               orig, next,
@@ -142,7 +143,8 @@ class TSLIST_HEAD_ALIGN CTSListBase
       TSLHead_t next = orig;
       next.value.Next = node->Next;
       next.value.Depth = orig.value.Depth - 1;
-      next.value.Sequence = orig.value.Sequence + 1;
+	  next.value.Sequence = orig.value.Sequence + 1;
+	  AssertMsg( next.value.Sequence != 0, "Sequence overflows in Pop, lock free stack can't detect ABA problem." );
 
       if (head_.compare_exchange_weak(
               orig, next,
@@ -160,7 +162,8 @@ class TSLIST_HEAD_ALIGN CTSListBase
       TSLHead_t next = orig;
       next.value.Next = nullptr;
       next.value.Depth = 0;
-      next.value.Sequence = orig.value.Sequence + 1;
+	  next.value.Sequence = orig.value.Sequence + 1;
+	  AssertMsg( next.value.Sequence != 0, "Sequence overflows in Detach, lock free stack can't detect ABA problem." );
 
       if (head_.compare_exchange_weak(
               orig, next,
