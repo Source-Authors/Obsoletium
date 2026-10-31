@@ -638,8 +638,6 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 		{
 			IgnoreAssertsNearby( assert_disables, init_info, 0 );
 		}
-
-		assert(false);
 	}
 	else
 	{
