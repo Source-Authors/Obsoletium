@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 //
-// Purpose: 
+// Purpose:
 //
 // $NoKeywords: $
 //=============================================================================//
@@ -22,9 +22,9 @@
 const unsigned int SYS_NO_ERROR{ NO_ERROR };
 const unsigned int SYS_ERROR_INVALID_HANDLE{ ERROR_INVALID_HANDLE };
 
-void Sys_SetLastError(unsigned long error)
+void Sys_SetLastError( unsigned long error )
 {
-	::SetLastError(error);
+	::SetLastError( error );
 }
 
 unsigned long Sys_GetLastError()
@@ -33,50 +33,48 @@ unsigned long Sys_GetLastError()
 }
 
 
-WHANDLE Sys_CreateMutex(const char *mutexName)
+WHANDLE Sys_CreateMutex( const char *mutexName )
 {
-	return (WHANDLE)::CreateMutex(NULL, FALSE, TEXT(mutexName));
+	return reinterpret_cast< WHANDLE >( ::CreateMutexA( nullptr, FALSE, mutexName ) );
 }
 
-void Sys_ReleaseMutex(WHANDLE mutexHandle)
+void Sys_ReleaseMutex( WHANDLE mutexHandle )
 {
-	::ReleaseMutex((HANDLE)mutexHandle);
+	::ReleaseMutex( reinterpret_cast< HANDLE >( mutexHandle ) );
 }
 
 
-const unsigned int SYS_WAIT_OBJECT_0 = WAIT_OBJECT_0;
-const unsigned int SYS_WAIT_ABANDONED = WAIT_ABANDONED;
+const unsigned int SYS_WAIT_OBJECT_0{ WAIT_OBJECT_0 };
+const unsigned int SYS_WAIT_ABANDONED{ WAIT_ABANDONED };
 
-unsigned int Sys_WaitForSingleObject(WHANDLE mutexHandle, int milliseconds)
+unsigned int Sys_WaitForSingleObject( WHANDLE mutexHandle, int milliseconds )
 {
-	return VCRHook_WaitForSingleObject((HANDLE)mutexHandle, milliseconds);
+	return VCRHook_WaitForSingleObject( reinterpret_cast< void * >( mutexHandle ), milliseconds );
 }
 
-unsigned int Sys_RegisterWindowMessage(const char *msgName)
+unsigned int Sys_RegisterWindowMessage( const char *msgName )
 {
-	return ::RegisterWindowMessage(msgName);
+	return ::RegisterWindowMessageA( msgName );
 }
 
-WHANDLE Sys_FindWindow(const char *className, const char *windowName)
+WHANDLE Sys_FindWindow( const char *className, const char *windowName )
 {
-	return (WHANDLE)::FindWindow(className, windowName);
+	return reinterpret_cast< WHANDLE >( ::FindWindowA( className, windowName ) );
 }
 
-void Sys_EnumWindows(void *callbackFunction, int lparam)
+void Sys_EnumWindows( void *callbackFunction, int lparam )
 {
-	::EnumWindows((WNDENUMPROC)callbackFunction, lparam);
+	::EnumWindows( reinterpret_cast< WNDENUMPROC >( reinterpret_cast< uintp >( callbackFunction ) ), lparam );
 }
 
-#ifndef _XBOX
-void Sys_GetWindowText(WHANDLE wnd, char *buffer, int bufferSize)
+void Sys_GetWindowText( WHANDLE wnd, char *buffer, int bufferSize )
 {
-	::GetWindowText((HWND)wnd, buffer, bufferSize - 1);
+	::GetWindowTextA( reinterpret_cast< HWND >( wnd ), buffer, bufferSize - 1 );
 }
-#endif
 
-void Sys_PostMessage(WHANDLE wnd, unsigned int msg, unsigned int wParam, unsigned int lParam)
+void Sys_PostMessage( WHANDLE wnd, unsigned int msg, unsigned int wParam, unsigned int lParam )
 {
-	::PostMessageA((HWND)wnd, msg, wParam, lParam);
+	::PostMessageA( reinterpret_cast< HWND >( wnd ), msg, wParam, lParam );
 }
 
 void Sys_SetCursorPos( int x, int y )
@@ -85,13 +83,13 @@ void Sys_SetCursorPos( int x, int y )
 }
 
 #elif defined( POSIX )
-const unsigned int SYS_NO_ERROR = 0;
-const unsigned int SYS_ERROR_INVALID_HANDLE = 0;
-const unsigned int SYS_WAIT_OBJECT_0 = 0;
-const unsigned int SYS_WAIT_ABANDONED = 0;
 
+const unsigned int SYS_NO_ERROR{ 0 };
+const unsigned int SYS_ERROR_INVALID_HANDLE{ 0 };
+const unsigned int SYS_WAIT_OBJECT_0{ 0 };
+const unsigned int SYS_WAIT_ABANDONED{ 0 };
 
-void Sys_SetLastError(unsigned long error)
+void Sys_SetLastError( unsigned long error )
 {
 	errno = error;
 }
@@ -102,40 +100,38 @@ unsigned long Sys_GetLastError()
 }
 
 
-WHANDLE Sys_CreateMutex(const char *mutexName)
+WHANDLE Sys_CreateMutex( const char *mutexName )
 {
 	AssertMsg( false, "Implement me" );
 	return 0;
 }
 
-void Sys_ReleaseMutex(WHANDLE mutexHandle)
+void Sys_ReleaseMutex( WHANDLE mutexHandle )
 {
 	AssertMsg( false, "Implement me" );
 }
 
-void Sys_PostMessage(WHANDLE wnd, unsigned int msg, unsigned int wParam, unsigned int lParam)
+void Sys_PostMessage( WHANDLE wnd, unsigned int msg, unsigned int wParam, unsigned int lParam )
 {
 	AssertMsg( false, "Implement me" );
 }
 
-unsigned int Sys_RegisterWindowMessage(const char *msgName)
+unsigned int Sys_RegisterWindowMessage( const char *msgName )
 {
 	AssertMsg( false, "Implement me" );
 	return 0;
 }
 
-unsigned int Sys_WaitForSingleObject(WHANDLE mutexHandle, int milliseconds)
+unsigned int Sys_WaitForSingleObject( WHANDLE mutexHandle, int milliseconds )
 {
 	return SYS_WAIT_ABANDONED;
 }
 
-void Sys_EnumWindows(void *callbackFunction, int lparam)
+void Sys_EnumWindows( void *callbackFunction, int lparam )
 {
 	AssertMsg( false, "Implement me" );
 }
 
-
 #else
 #error "Please define your platform"
 #endif
-
