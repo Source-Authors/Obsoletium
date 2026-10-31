@@ -31,7 +31,7 @@
 #include "Manifest.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 //
 // Layout types for remembering the last layout of the dialog. We could

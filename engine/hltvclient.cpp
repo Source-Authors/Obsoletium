@@ -6,7 +6,7 @@
 //
 //===========================================================================//
 
-#include <tier0/vprof.h>
+#include "tier0/vprof.h"
 #include "hltvclient.h"
 #include "netmessages.h"
 #include "hltvserver.h"

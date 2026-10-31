@@ -25,7 +25,7 @@
 #include "econ_item_tools.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 extern const char *g_TeamVisualSections[TEAM_VISUAL_SECTIONS];
 

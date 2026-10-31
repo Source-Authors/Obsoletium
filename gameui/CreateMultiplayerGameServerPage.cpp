@@ -24,7 +24,7 @@ using namespace vgui;
 #include "vstdlib/random.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 constexpr inline char RANDOM_MAP[]{"#GameUI_RandomMap"};
 

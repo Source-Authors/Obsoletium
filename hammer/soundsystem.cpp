@@ -18,7 +18,7 @@
 #include <mmsystem.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 
 // FIXME: Put gamesounds parsing into shared code somewhere
@@ -363,7 +363,7 @@ void CSoundSystem::AddGameSoundToList( const char *pGameSound, char const *pFile
 }
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgoff.h>
+#include "tier0/memdbgoff.h"
 
 //-----------------------------------------------------------------------------
 // Load all game sounds from a particular file 

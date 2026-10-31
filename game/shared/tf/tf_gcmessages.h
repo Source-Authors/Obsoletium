@@ -18,14 +18,14 @@
 
 // Protobuf headers interfere with the valve min/max/malloc overrides. so we need to do all
 // this funky wrapping to make the include happy.
-#include <tier0/valve_minmax_off.h>
+#include "tier0/valve_minmax_off.h"
 
 #include "tf_gcmessages.pb.h"
 #ifdef GC
 #include "tf_gcmessages_interserver.pb.h" // These should not be exposed to clients/servers
 #endif // #ifdef GC
 
-#include <tier0/valve_minmax_on.h>
+#include "tier0/valve_minmax_on.h"
 
 #pragma pack( push, 1 )
 

@@ -23,7 +23,7 @@
 #include "econ_quests.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 ConVar tf_quest_notification_line_delay( "tf_quest_notification_line_delay", "1.2", FCVAR_ARCHIVE );
 

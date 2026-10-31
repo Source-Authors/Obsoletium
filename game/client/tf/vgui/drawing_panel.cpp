@@ -11,7 +11,7 @@
 #include <vgui/IVGui.h>
 #include "voice_status.h"
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 extern ConVar cl_mute_all_comms;
 

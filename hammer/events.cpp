@@ -10,7 +10,7 @@
 #include "hammer.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 static std::atomic_int g_EventTimeCounters[100];
 static double g_EventTimes[ssize(g_EventTimeCounters)];

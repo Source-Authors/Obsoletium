@@ -23,7 +23,7 @@
 #endif // CLIENT_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 #ifdef CLIENT_DLL
 ConVar tf_duck_upload_rate( "tf_duck_upload_rate", "2400", FCVAR_DEVELOPMENTONLY );		// Make this DevOnly At ship and 60 seconds

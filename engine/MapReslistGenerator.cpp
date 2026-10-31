@@ -18,7 +18,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <tier0/dbg.h>
+#include "tier0/dbg.h"
 #include "host.h"
 #include "host_state.h"
 #include "utlbuffer.h"

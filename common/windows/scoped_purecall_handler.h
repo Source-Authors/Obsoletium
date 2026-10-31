@@ -4,7 +4,7 @@
 #define SE_COMMON_SCOPED_PURECALL_HANDLER_H_
 
 #include <cstdlib>
-#include <tier0/dbg.h>
+#include "tier0/dbg.h"
 
 namespace s1::win
 {

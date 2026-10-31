@@ -23,7 +23,7 @@
 #include "tf_lobby_container_frame.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 ConVar tf_matchmaking_join_in_progress( "tf_matchmaking_join_in_progress", "0", FCVAR_DONTRECORD | FCVAR_ARCHIVE, "Saved preference for if the player wants to join games in progress." );
 

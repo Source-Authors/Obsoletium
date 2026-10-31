@@ -7,7 +7,7 @@
 #include "fgdlib/wckeyvalues.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 
 //-----------------------------------------------------------------------------

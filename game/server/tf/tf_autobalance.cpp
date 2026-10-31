@@ -15,7 +15,7 @@
 #include "tf_player_resource.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 extern ConVar mp_developer;
 extern ConVar mp_teams_unbalance_limit;

@@ -11,7 +11,7 @@
 #include "radial.h"
 #include "CollisionUtils.h"
 #include "bspflags.h"
-#include "tier0\dbg.h"
+#include "tier0/dbg.h"
 
 #define SAMPLE_BBOX_SLOP		5.0f
 #define TRIEDGE_EPSILON			0.001f

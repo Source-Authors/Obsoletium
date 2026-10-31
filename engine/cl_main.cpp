@@ -26,7 +26,7 @@
 #include "dt_recv_eng.h"
 #include "vgui_baseui_interface.h"
 #include "testscriptmgr.h"
-#include <tier0/vprof.h>
+#include "tier0/vprof.h"
 #include <proto_oob.h>
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "gl_matsysiface.h"
@@ -35,7 +35,7 @@
 #include "cbenchmark.h"
 #include "vox.h"
 #include "LocalNetworkBackdoor.h"
-#include <tier0/icommandline.h>
+#include "tier0/icommandline.h"
 #include "GameEventManager.h"
 #include "host_saverestore.h"
 #include "ivideomode.h"

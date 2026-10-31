@@ -269,7 +269,7 @@ const char *DetailObjects::FindDetailVBSPName( void )
 	return "detail.vbsp";
 }
 
-#include "tier0\memdbgoff.h"
+#include "tier0/memdbgoff.h"
 
 //-----------------------------------------------------------------------------
 // Loads up the detail object dictionary

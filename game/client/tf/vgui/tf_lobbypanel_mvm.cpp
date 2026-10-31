@@ -20,7 +20,7 @@
 #include "tf_lobby_container_frame_mvm.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 extern ConVar tf_matchmaking_join_in_progress;
 ConVar tf_matchmaking_ticket_help( "tf_matchmaking_ticket_help", "0", FCVAR_CLIENTDLL | FCVAR_DONTRECORD | FCVAR_ARCHIVE | FCVAR_HIDDEN, "Saved if the player has see the ticket help screen." );

@@ -3,7 +3,7 @@
 #include <KeyValues.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 
 SoftLine::SoftLine(vgui::Panel *parent, const char *panelName, Color col) :

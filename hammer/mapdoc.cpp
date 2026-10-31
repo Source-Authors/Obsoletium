@@ -75,7 +75,7 @@
 #include "mapdoc.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 #define KeyInt( key, dest ) \
 	if (stricmp(szKey, key) != 0) \
@@ -12199,4 +12199,4 @@ void CMapDoc::OnQuickHide_Unhide( void )
 //}
 
 
-#include <tier0/memdbgoff.h>
+#include "tier0/memdbgoff.h"

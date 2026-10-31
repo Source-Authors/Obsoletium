@@ -26,7 +26,7 @@
 #include "vgui_controls/Slider.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 ConVar tf_testitem_recent( "tf_testitem_recent", "", FCVAR_ARCHIVE );
 

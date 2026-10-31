@@ -32,7 +32,7 @@
 #include "TextureSystem.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 
 extern CToolDisplace* GetDisplacementTool();
@@ -3933,4 +3933,4 @@ BOOL CSculptProjectOptions::OnInitDialog()
 // +control = st adjust
 
 
-#include <tier0/memdbgoff.h>
+#include "tier0/memdbgoff.h"

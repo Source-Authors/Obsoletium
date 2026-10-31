@@ -8,7 +8,7 @@
 #include "ai_basenpc.h"
 
 // Must be the last file included
-#include "memdbgon.h"
+#include "tier0/memdbgon.h"
 
 class CNPC_Puppet : public CAI_BaseNPC
 {

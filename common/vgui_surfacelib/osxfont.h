@@ -12,10 +12,10 @@
 #include "utlsymbol.h"
 #include "tier1/strtools.h"
 #include "tier1/utlstring.h"
-#include <tier0/memdbgoff.h>
+#include "tier0/memdbgoff.h"
 #include <ApplicationServices/ApplicationServices.h>
 #include <Carbon/Carbon.h>
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: encapsulates a OSX font

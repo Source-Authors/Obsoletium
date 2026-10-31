@@ -19,10 +19,10 @@ using namespace vgui;
 #include "filesystem.h"
 #include "PanelListPanel.h"
 #include "scriptobject.h"
-#include <tier0/vcrmode.h>
+#include "tier0/vcrmode.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 #define OPTIONS_DIR "cfg"
 #define DEFAULT_OPTIONS_FILE OPTIONS_DIR "/settings_default.scr"

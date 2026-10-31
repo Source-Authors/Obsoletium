@@ -11,7 +11,7 @@
 
 #include "cbase.h"
 
-#include <tier0/platform.h>
+#include "tier0/platform.h"
 #include "cs_gamerules.h"
 #include "cs_gamestats.h"
 #include "weapon_csbase.h"

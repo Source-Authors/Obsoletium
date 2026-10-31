@@ -10,9 +10,9 @@
 #include <malloc.h>
 #include "vgui_surfacelib/BitmapFont.h"
 #include "vgui_surfacelib/FontManager.h"
-#include <tier0/dbg.h>
+#include "tier0/dbg.h"
 #include <vgui/ISurface.h>
-#include <tier0/mem.h>
+#include "tier0/mem.h"
 #include <utlbuffer.h>
 #include "filesystem.h"
 #include "materialsystem/itexture.h"

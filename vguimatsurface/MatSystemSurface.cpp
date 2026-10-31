@@ -48,7 +48,7 @@ ILauncherMgr *g_pLauncherMgr = NULL;
 #include "mathlib/mathlib.h"
 #include <vgui/ILocalize.h>
 #include "mathlib/vmatrix.h"
-#include <tier0/vprof.h>
+#include "tier0/vprof.h"
 #include "materialsystem/itexture.h"
 #include <malloc.h>
 #include "../vgui2/src/VPanel.h"

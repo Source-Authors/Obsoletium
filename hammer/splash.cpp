@@ -11,7 +11,7 @@
 #include "resource.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 constexpr inline int SPLASH_MIN_SHOW_TIME_MS{500};
 

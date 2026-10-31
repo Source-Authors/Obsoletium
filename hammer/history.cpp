@@ -14,7 +14,7 @@
 #include "GlobalFunctions.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 
 static CHistory *pCurHistory;	// The Undo/Redo history associated with the active doc.

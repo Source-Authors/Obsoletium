@@ -52,7 +52,7 @@
 #include "../public/zip_utils.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 
 static const char *kClassFolders[TF_LAST_NORMAL_CLASS] = {

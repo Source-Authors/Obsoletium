@@ -15,7 +15,7 @@
 	#include "weapon_dodbase.h"
 #endif
 
-#include <tier0/platform.h>
+#include "tier0/platform.h"
 #include "dod_gamestats.h"
 
 int iDistanceStatWeapons[DOD_NUM_DISTANCE_STAT_WEAPONS] = 

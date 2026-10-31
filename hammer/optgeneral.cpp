@@ -13,7 +13,7 @@
 
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 void EditorUtil_ConvertPath(CString &str, bool bSave);
 

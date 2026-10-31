@@ -18,7 +18,7 @@
 #include "SculptOptions.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 
 #define DISPPAINT_DISTANCE_MIN			0

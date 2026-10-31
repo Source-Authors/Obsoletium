@@ -19,13 +19,13 @@ using namespace vgui;
 #include "filesystem.h"
 #include "PanelListPanel.h"
 #include "scriptobject.h"
-#include <tier0/vcrmode.h>
+#include "tier0/vcrmode.h"
 #include "tier1/convar.h"
 #include "EngineInterface.h"
 #include "CvarToggleCheckButton.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 // for join team combo box
 enum BotGUITeamType

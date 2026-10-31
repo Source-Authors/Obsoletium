@@ -40,7 +40,7 @@
 #include "econ_dynamic_recipe.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 static CDynamicRecipePanel* g_DynamicRecipePanel = NULL;
 extern const char *g_szItemBorders[AE_MAX_TYPES][5];

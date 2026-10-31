@@ -30,7 +30,7 @@
 #include "tf_streams.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 // GC hello information
 //extern CMsgGCCStrike15_v2_MatchmakingGC2ClientHello g_GC2ClientHello;

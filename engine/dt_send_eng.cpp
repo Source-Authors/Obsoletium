@@ -5,9 +5,9 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <tier0/dbg.h>
-#include <tier0/vprof.h>
-#include <tier0/icommandline.h>
+#include "tier0/dbg.h"
+#include "tier0/vprof.h"
+#include "tier0/icommandline.h"
 #include <commonmacros.h>
 #include <checksum_crc.h>
 
@@ -19,7 +19,7 @@
 #include "packed_entity.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 extern int host_framecount;
 CRC32_t SendTable_ComputeCRC();

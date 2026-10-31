@@ -19,9 +19,9 @@
 #undef TYPE_BOOL
 #endif
 
-#include <tier0/valve_minmax_off.h>
+#include "tier0/valve_minmax_off.h"
 #include "steammessages.pb.h"
-#include <tier0/valve_minmax_on.h>
+#include "tier0/valve_minmax_on.h"
 
 
 namespace GCSDK

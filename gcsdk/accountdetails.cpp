@@ -9,7 +9,7 @@
 #include "rtime.h"
 #include "gcsdk_gcmessages.pb.h"
 
-#include "memdbgon.h" // needs to be the last include in the file
+#include "tier0/memdbgon.h" // needs to be the last include in the file
 
 namespace GCSDK
 {

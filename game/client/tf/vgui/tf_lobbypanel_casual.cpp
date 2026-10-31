@@ -19,7 +19,7 @@
 #include "tf_hud_mainmenuoverride.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 extern Color s_colorChallengeForegroundEnabled;
 extern Color s_colorChallengeForegroundDisabled;

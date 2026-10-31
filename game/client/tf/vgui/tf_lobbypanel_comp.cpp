@@ -18,7 +18,7 @@
 #include "tf_badge_panel.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 ConVar tf_mm_ladder_ui_last_rating_change( "tf_mm_ladder_ui_last_rating_change", "0", FCVAR_HIDDEN | FCVAR_ARCHIVE, "Track last match skillrating change for UI." );
 ConVar tf_mm_ladder_ui_last_rating_time( "tf_mm_ladder_ui_last_rating_time", "-1", FCVAR_HIDDEN | FCVAR_ARCHIVE, "Track last match skillrating change time for UI." );

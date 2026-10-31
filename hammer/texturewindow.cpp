@@ -20,7 +20,7 @@
 #include "materialsystem/imaterialsystem.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 
 constexpr inline DWORD NO_FILE_FILTER = 0xFFFFFFF0L;

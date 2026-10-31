@@ -21,7 +21,7 @@
 #include "econ_ui.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 #ifdef STAGING_ONLY
 ConVar tf_use_card_tooltips( "tf_use_card_tooltips", "0", FCVAR_ARCHIVE );

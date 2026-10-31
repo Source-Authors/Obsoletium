@@ -17,7 +17,7 @@
 #include <process.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 
 const char GAMECFG_SIG[] = "Game Configurations File\r\n\x1a";

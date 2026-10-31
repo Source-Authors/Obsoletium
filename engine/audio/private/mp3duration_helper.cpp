@@ -12,7 +12,7 @@
 #include "tier1/utlsymbol.h"
 #include "tier1/utlrbtree.h"
 
-#include "memdbgon.h"
+#include "tier0/memdbgon.h"
 
 extern IFileSystem* g_pFullFileSystem;
 

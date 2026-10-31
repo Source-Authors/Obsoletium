@@ -45,7 +45,7 @@
 #include "tf_lobby_container_frame.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 class CBaseLobbyPanel;
 

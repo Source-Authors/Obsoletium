@@ -42,7 +42,7 @@
 
 //#include "init_nut.h"
 
-#include "memdbgon.h"
+#include "tier0/memdbgon.h"
 
 #ifdef VLUA_DEBUG_SERIALIZATION
 static int lastType;

@@ -31,7 +31,7 @@
 #include <vgui_controls/MessageBox.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 ConVar vgui_cache_res_files( "vgui_cache_res_files", "1" );
 

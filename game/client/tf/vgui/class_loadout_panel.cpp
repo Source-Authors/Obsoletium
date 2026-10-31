@@ -19,7 +19,7 @@
 #include "vgui_controls/PanelListPanel.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 extern ConVar tf_respawn_on_loadoutchanges;
 

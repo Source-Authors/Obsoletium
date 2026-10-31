@@ -18,7 +18,7 @@
 #include "tf_party.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 															 
 void AddSubKeyNamed( KeyValues *pKeys, const char *pszName );
 extern void ShowEconRequirementDialog( const char *pTitle, const char *pText, const char *pItemDefName );

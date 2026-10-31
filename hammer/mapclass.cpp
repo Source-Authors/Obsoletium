@@ -22,7 +22,7 @@ int CMapAtom::s_nObjectIDCtr = 1;
 static CUtlVector<MCMSTRUCT> s_Classes;
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 
 bool CMapClass::s_bLoadingVMF = false;

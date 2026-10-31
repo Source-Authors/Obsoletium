@@ -12,7 +12,7 @@
 #include "Prefab3d.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: One function - gets all the .rmf and .map files in the current dir,

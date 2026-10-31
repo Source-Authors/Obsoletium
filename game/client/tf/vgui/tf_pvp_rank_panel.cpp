@@ -24,7 +24,7 @@
 using namespace vgui;
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 #ifdef STAGING_ONLY
 	extern ConVar tf_test_pvp_rank_xp_change;

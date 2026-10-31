@@ -17,7 +17,7 @@
 #include <vgui/IClientPanel.h>
 #include <vgui/IScheme.h>
 #include <tier1/KeyValues.h>
-#include <tier0/dbg.h>
+#include "tier0/dbg.h"
 #include <tier1/utlhandletable.h>
 #include "vgui_internal.h"
 #include "VPanel.h"
@@ -32,7 +32,7 @@
 #undef GetCursorPos // protected_things.h defines this, and it makes it so we can't access g_pInput->GetCursorPos.
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 
 using namespace vgui;

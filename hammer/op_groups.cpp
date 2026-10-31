@@ -16,7 +16,7 @@
 #include "VisGroup.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 const char *NO_GROUP_STRING = "(no group)";
 const DWORD NO_GROUP_ID = 0xffff;

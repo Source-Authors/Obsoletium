@@ -11,7 +11,7 @@
 #include "hammer.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 
 static const unsigned int g_uSelChangeMsg = ::RegisterWindowMessage(GROUPLIST_MSG_SEL_CHANGE);

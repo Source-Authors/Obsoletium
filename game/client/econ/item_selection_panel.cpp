@@ -24,7 +24,7 @@
 #include "econ_item_description.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 ConVar tf_item_selection_panel_sort_type( "tf_item_selection_panel_sort_type", 0, FCVAR_NONE, "0 - Sort is off, 1 - Sort is Alphabet (Pub)" );
 

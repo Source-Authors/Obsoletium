@@ -22,7 +22,7 @@
 #endif // TF_CLIENT_DLL
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 static const wchar_t* GetSCGlyph( const char* action )
 {

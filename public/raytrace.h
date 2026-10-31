@@ -4,7 +4,7 @@
 #ifndef RAYTRACE_H
 #define RAYTRACE_H
 
-#include <tier0/platform.h>
+#include "tier0/platform.h"
 #include <tier1/utlvector.h>
 #include <mathlib/vector.h>
 #include <mathlib/ssemath.h>

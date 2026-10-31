@@ -12,7 +12,7 @@
 #include "tier0/dbg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 template <class T, short nBlockSize, short nMaxBlocks>
 class BlockArray
@@ -97,6 +97,6 @@ T& BlockArray<T,nBlockSize,nMaxBlocks>::operator[] (short iIndex)
 	return Blocks[iIndex / nBlockSize][iIndex % nBlockSize];
 }
 
-#include <tier0/memdbgoff.h>
+#include "tier0/memdbgoff.h"
 
 #endif // _BLOCKARRAY_H

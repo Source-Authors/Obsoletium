@@ -12,9 +12,9 @@
 
 // Protobuf headers interfere with the valve min/max/malloc overrides. so we need to do all
 // this funky wrapping to make the include happy.
-#include <tier0/valve_minmax_off.h>
+#include "tier0/valve_minmax_off.h"
 #include "google/protobuf/descriptor.h"
-#include <tier0/valve_minmax_on.h>
+#include "tier0/valve_minmax_on.h"
 #include "gcsdk/jobtime.h"
 
 namespace GCSDK

@@ -46,7 +46,7 @@
 #include "item_ad_panel.h"
 #include "client_community_market.h"
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 
 #ifdef STAGING_ONLY

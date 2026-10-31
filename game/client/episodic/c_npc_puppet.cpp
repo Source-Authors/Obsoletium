@@ -9,7 +9,7 @@
 #include "bone_setup.h"
 
 // Must be the last file included
-#include "memdbgon.h"
+#include "tier0/memdbgon.h"
 
 
 extern ConVar r_sequence_debug;

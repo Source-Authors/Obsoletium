@@ -12,7 +12,7 @@
 #include "animation.h"
 #include <vcollide_parse.h>
 #include <bone_setup.h>
-#include <tier0/vprof.h>
+#include "tier0/vprof.h"
 
 #ifdef CLIENT_DLL
 #include "gamestringpool.h"

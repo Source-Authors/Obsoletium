@@ -24,7 +24,7 @@
 // #include "p4lib/ip4.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 IMPLEMENT_DYNCREATE(CManifest, CMapDoc)
 
@@ -1641,4 +1641,4 @@ void CManifest::DeleteContents( void )
 	__super::DeleteContents();
 }
 
-#include <tier0/memdbgoff.h>
+#include "tier0/memdbgoff.h"

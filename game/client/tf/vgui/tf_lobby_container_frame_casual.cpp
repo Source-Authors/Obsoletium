@@ -18,7 +18,7 @@
 #include "tf_lobby_container_frame_casual.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 extern ConVar tf_matchmaking_join_in_progress;
 

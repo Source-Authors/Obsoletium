@@ -1476,7 +1476,7 @@ extern void Sys_InitFloatTime( void ); //garymcthack
 	LoadModels();
 
 #if USE_VTUNE
-	VTResume();
+	vtune(true);
 #endif
 #ifdef USE_VPROF
 	g_VProfCurrentProfile.Start();
@@ -1501,7 +1501,7 @@ extern void Sys_InitFloatTime( void ); //garymcthack
 	SpewOutputFunc( IHVTestSpewFunc );
 #endif
 #if USE_VTUNE
-	VTPause();
+	vtune(false);
 #endif
 
     return 0;

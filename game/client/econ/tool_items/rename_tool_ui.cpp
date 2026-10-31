@@ -21,7 +21,7 @@
 #include "gc_clientsystem.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 CNameToolUsageDialog::CNameToolUsageDialog( vgui::Panel *pParent, const char* pszName, CEconItemView *pTool, CEconItemView *pToolSubject, bool bDescription )
 : 	CBaseToolUsageDialog( pParent, pszName, pTool, pToolSubject )

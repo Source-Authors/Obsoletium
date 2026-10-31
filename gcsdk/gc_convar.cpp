@@ -8,7 +8,7 @@
 #include "stdafx.h"
 #include "gcsdk/gclogger.h"
 
-#include "memdbgon.h" // needs to be the last include in the file
+#include "tier0/memdbgon.h" // needs to be the last include in the file
 
 using namespace GCSDK;
 

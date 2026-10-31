@@ -16,12 +16,12 @@
 #include <basetypes.h>
 #include <mempool.h>
 #include <utlvector.h>
-#include <tier0/dbg.h>
+#include "tier0/dbg.h"
 
 #include "common.h"
 
 // Matched with the memdbgoff at end of header
-#include "memdbgon.h"
+#include "tier0/memdbgon.h"
 
 // This is extra spew to the files cltrace.txt + svtrace.txt
 // #define DEBUG_NETWORKING 1
@@ -206,7 +206,7 @@ inline bool PackedEntity::ShouldCheckCreationTick() const
 	return m_nShouldCheckCreationTick == 1 ? true : false;
 }
 
-#include "memdbgoff.h"
+#include "tier0/memdbgoff.h"
 
 #endif // PACKED_ENTITY_H
 

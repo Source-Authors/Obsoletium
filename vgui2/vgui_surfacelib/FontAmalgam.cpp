@@ -6,7 +6,7 @@
 //=============================================================================//
 
 #include "vgui_surfacelib/FontAmalgam.h"
-#include <tier0/dbg.h>
+#include "tier0/dbg.h"
 #include <vgui/VGUI.h>
 #include <vgui/ISurface.h>
 

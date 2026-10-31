@@ -19,7 +19,7 @@
 #include "econ_item_description.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 static const int kNumSortTypes = 5;
 ItemSortTypeData_t g_StoreSortTypes[ kNumSortTypes ] =

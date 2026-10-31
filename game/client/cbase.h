@@ -16,8 +16,8 @@ struct studiohdr_t;
 #include <cstdio>
 #include <cstdlib>
 
-#include <tier0/platform.h>
-#include <tier0/dbg.h>
+#include "tier0/platform.h"
+#include "tier0/dbg.h"
 #include <tier1/strtools.h>
 #include <tier1/utlvector.h>
 #include <vstdlib/random.h>

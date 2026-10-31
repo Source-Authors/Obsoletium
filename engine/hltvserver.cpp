@@ -11,8 +11,8 @@
 
 #include <server_class.h>
 #include <inetmessage.h>
-#include <tier0/vprof.h>
-#include <tier0/vcrmode.h>
+#include "tier0/vprof.h"
+#include "tier0/vcrmode.h"
 #include <KeyValues.h>
 #include <edict.h>
 #include <eiface.h>

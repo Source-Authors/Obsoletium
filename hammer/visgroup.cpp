@@ -11,7 +11,7 @@
 #include "MapDoc.h"		// dvs: FIXME: I'd rather not have this class know about the doc
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 
 bool CVisGroup::s_bShowAll = false;

@@ -14,7 +14,7 @@
 	#pragma once
 #endif
 
-#include <tier0/dbg.h>
+#include "tier0/dbg.h"
 
 // ------------------------------------------------------------------------
 // MACROS

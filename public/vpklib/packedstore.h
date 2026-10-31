@@ -11,9 +11,9 @@
 #endif
 
 
-#include <tier0/platform.h>
-#include <tier0/threadtools.h>
-#include <tier0/tslist.h>
+#include "tier0/platform.h"
+#include "tier0/threadtools.h"
+#include "tier0/tslist.h"
 #include <tier2/tier2.h>
 
 #include "filesystem.h"
