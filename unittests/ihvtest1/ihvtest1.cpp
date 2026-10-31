@@ -56,7 +56,7 @@ IMDLCache						*g_pMDLCache = NULL;
 //#define USE_VPROF
 
 #if USE_VTUNE
-#include "vtuneapi.h"
+#include "tier0/platform.h"
 #endif
 
 static bool g_WindowMode = false;
