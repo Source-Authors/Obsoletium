@@ -15,7 +15,7 @@
 #endif
 
 #if defined( USE_SDL )
-#include <appframework/ilaunchermgr.h>
+#include "appframework/ilaunchermgr.h"
 ILauncherMgr *g_pLauncherMgr = NULL;
 #endif
 

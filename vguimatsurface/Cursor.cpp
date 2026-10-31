@@ -10,7 +10,7 @@
 	#define OEMRESOURCE //for OCR_* cursor junk
 	#include "winlite.h"
 #endif
-#include <appframework/ilaunchermgr.h>
+#include "appframework/ilaunchermgr.h"
 
 #if defined( USE_SDL )
 #undef M_PI
