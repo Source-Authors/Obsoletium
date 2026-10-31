@@ -159,7 +159,8 @@ ThreadHandle_t CreateSimpleThread( ThreadFunc_t pfnThread, void *pParam, ThreadI
 	}
 	if ( pID )
 		*pID = (ThreadId_t)tid;
-	Plat_ApplyHardwareDataBreakpointsToNewThread( (long unsigned int)tid );
+	// dimhotepus: Cast to ThreadId_t.
+	Plat_ApplyHardwareDataBreakpointsToNewThread( (ThreadId_t)tid );
 	return (ThreadHandle_t)tid;
 #endif
 }
@@ -1757,7 +1758,7 @@ CThread::~CThread()
 #ifdef _WIN32
 	if (m_hThread)
 #elif defined(POSIX)
-	if ( m_threadId )
+	if ( m_bJoinable )
 #endif
 	{
 		if ( IsAlive() )
@@ -1783,6 +1784,14 @@ CThread::~CThread()
 		// on the thread handle for it to exit) we can finally close the thread handle. We
 		// cannot do this any earlier, and certainly not in CThread::ThreadProc().
 		CloseHandle( m_hThread );
+#elif defined(POSIX)
+		// dimhotepus: Reclaim pthread resources, thread object is going away. Was leaked.
+		if ( IsAlive() )
+			ThreadDetach( (ThreadHandle_t)m_threadId );
+		else
+			ThreadJoin( (ThreadHandle_t)m_threadId );
+		m_bJoinable = false;
+		m_threadId = 0;
 #endif
 	}
 }
@@ -1826,9 +1835,19 @@ bool CThread::Start( unsigned nBytesStack )
 		return false;
 	}
 
+#ifdef POSIX
+	// dimhotepus: Reclaim previous run of this object if nobody joined it.
+	if ( m_bJoinable )
+	{
+		ThreadJoin( (ThreadHandle_t)m_threadId );
+		m_bJoinable = false;
+		m_threadId = 0;
+	}
+#endif
+
 	bool  bInitSuccess = false;
 	CThreadEvent createComplete;
-	ThreadInit_t init = { this, &createComplete, &bInitSuccess };
+	ThreadInit_t init = { this, &createComplete, &bInitSuccess, GetThreadProc() };
 
 #ifdef _WIN32
 	HANDLE       hThread;
@@ -1848,19 +1867,30 @@ bool CThread::Start( unsigned nBytesStack )
 	ResumeThread( hThread );
 
 #elif defined(POSIX)
+	m_bRunning.store( true, std::memory_order_release );
+
 	pthread_attr_t attr;
 	pthread_attr_init( &attr );
 	// From https://man7.org/linux/man-pages/man3/pthread_attr_setstacksize.3.html
 	//  A thread's stack size is fixed at the time of thread creation. Only the main thread can dynamically grow its stack.
 	pthread_attr_setstacksize( &attr, MAX( nBytesStack, 1024u*1024 ) );
-	if ( pthread_create( &m_threadId, &attr, (void *(*)(void *))GetThreadProc(), new ThreadInit_t( init ) ) != 0 )
+	auto *pInit = new ThreadInit_t( init );
+	// dimhotepus: Use trampoline instead of casting unsigned(*)(void*) to void*(*)(void*) (UB).
+	const int createResult = pthread_create( &m_threadId, &attr, &CThread::PosixThreadMain, pInit );
+	pthread_attr_destroy( &attr );
+	if ( createResult != 0 )
 	{
-		AssertMsg1( 0, "Failed to create thread: %s",
-			std::system_category().message(errno).c_str() );
+		delete pInit;
+		m_bRunning.store( false, std::memory_order_release );
+		m_threadId = 0;
+		AssertMsg( false, "Failed to create thread: %s",
+			std::system_category().message(createResult).c_str() );
 		return false;
 	}
-	Plat_ApplyHardwareDataBreakpointsToNewThread( (long unsigned int)m_threadId );
-	bInitSuccess = true;
+	m_bJoinable = true;
+	// dimhotepus: Cast to ThreadId_t.
+	Plat_ApplyHardwareDataBreakpointsToNewThread( (ThreadId_t)m_threadId );
+	// dimhotepus: Do not write bInitSuccess here: it raced with the new thread which stores real Init() result.
 #endif
 
 	// dimhotepus: Always set thread name.
@@ -1874,7 +1904,11 @@ bool CThread::Start( unsigned nBytesStack )
 		m_hThread = nullptr;
 		m_threadId = 0;
 #elif defined(POSIX)
+		// dimhotepus: Detach so pthread resources are reclaimed.
+		ThreadDetach( (ThreadHandle_t)m_threadId );
+		m_bJoinable = false;
 		m_threadId = 0;
+		m_bRunning.store( false, std::memory_order_release );
 #endif
 		return false;
 	}
@@ -1887,7 +1921,11 @@ bool CThread::Start( unsigned nBytesStack )
 		m_hThread = nullptr;
 		m_threadId = 0;
 #elif defined(POSIX)
+		// dimhotepus: Detach so pthread resources are reclaimed.
+		ThreadDetach( (ThreadHandle_t)m_threadId );
+		m_bJoinable = false;
 		m_threadId = 0;
+		m_bRunning.store( false, std::memory_order_release );
 #endif
 		return false;
 	}
@@ -1920,7 +1958,8 @@ bool CThread::IsAlive() const
 		GetExitCodeThread( m_hThread, &dwExitCode ) &&
 		dwExitCode == STILL_ACTIVE );
 #elif defined(POSIX)
-	return m_threadId;
+	// dimhotepus: Was m_threadId, which Cleanup zeroed.
+	return m_bRunning.load( std::memory_order_acquire );
 #endif
 }
 
@@ -1931,7 +1970,8 @@ bool CThread::Join( unsigned timeout )
 #ifdef _WIN32
 	if ( m_hThread )
 #elif defined(POSIX)
-	if ( m_threadId )
+	// dimhotepus: Was m_threadId, which thread zeroed on exit, so finished threads were never pthread_join-ed (leak).
+	if ( m_bJoinable )
 #endif
 	{
 		AssertMsg(GetCurrentCThread() != this, _T("Thread cannot be joined with self"));
@@ -1942,6 +1982,8 @@ bool CThread::Join( unsigned timeout )
 #elif defined(POSIX)
 		if ( !ThreadJoin( (ThreadHandle_t)m_threadId, timeout ) )
 			return false;
+		m_bJoinable = false;
+		m_threadId = 0;
 		return true;
 #endif
 	}
@@ -2187,7 +2229,12 @@ void CThread::OnExit()
 
 void CThread::Cleanup()
 {
+#ifdef POSIX
+	// dimhotepus: Keep pthread_t for Join / Detach. Only mark as not running.
+	m_bRunning.store( false, std::memory_order_release );
+#else
 	m_threadId = 0;
+#endif
 }
 
 //---------------------------------------------------------
@@ -2210,7 +2257,12 @@ bool CThread::IsThreadRunning()
     // ThreadIsThreadIdRunning() doesn't work on PS3 if the thread is in a zombie state
     return m_eventTheadExit.Check();
 #else
+#ifdef POSIX
+    // dimhotepus: ThreadId_t is not pthread_t, use own state.
+    return IsAlive();
+#else
     return ThreadIsThreadIdRunning( (ThreadId_t)m_threadId );
+#endif
 #endif
 }
 
@@ -2220,6 +2272,16 @@ CThread::ThreadProc_t CThread::GetThreadProc()
 {
 	return ThreadProc;
 }
+
+//---------------------------------------------------------
+
+#ifdef POSIX
+void *CThread::PosixThreadMain( void *pv )
+{
+	const ThreadProc_t pfnProc = static_cast<ThreadInit_t *>( pv )->pfnProc;
+	return reinterpret_cast<void *>( static_cast<uintptr_t>( pfnProc( pv ) ) );
+}
+#endif
 
 //---------------------------------------------------------
 
@@ -2250,6 +2312,11 @@ unsigned __stdcall CThread::ThreadProc(LPVOID pv)
 	
 	if ( pInit->pfInitSuccess )
 		*(pInit->pfInitSuccess) = bInitSuccess;
+#ifdef POSIX
+	// dimhotepus: Before signaling: after Set() owner may destroy the thread object.
+	if ( !bInitSuccess )
+		pThread->m_bRunning.store( false, std::memory_order_release );
+#endif
 	pInit->pInitCompleteEvent->Set();
 	if (!bInitSuccess)
 		return 0;
@@ -2272,9 +2339,11 @@ unsigned __stdcall CThread::ThreadProc(LPVOID pv)
 	
 	pThread->OnExit();
 	g_pCurThread = nullptr;
+	// dimhotepus: Read result first. After Cleanup owner may see thread as finished and destroy it.
+	const int result = pThread->m_result;
 	pThread->Cleanup();
 	
-	return pThread->m_result;
+	return result;
 }
 
 

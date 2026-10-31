@@ -1497,9 +1497,15 @@ private:
 		CThread *     pThread;
 		CThreadEvent *pInitCompleteEvent;
 		bool *        pfInitSuccess;
+		// dimhotepus: Real thread proc to call from POSIX trampoline (no function pointer type punning).
+		ThreadProc_t  pfnProc;
 	};
 
 	static unsigned __stdcall ThreadProc( void * pv );
+#ifdef POSIX
+	// dimhotepus: pthread_create compatible entry point, calls virtual GetThreadProc().
+	static void *PosixThreadMain( void *pv );
+#endif
 
 	// make copy constructor and assignment operator inaccessible
 	CThread( const CThread & ) = delete;
@@ -1510,6 +1516,11 @@ private:
 	ThreadId_t m_threadId;
 #elif defined(POSIX)
 	pthread_t m_threadId;
+	// dimhotepus: Thread running state (was derived from m_threadId,
+	// which Cleanup zeroed, so Join skipped pthread_join and leaked).
+	std::atomic<bool> m_bRunning{ false };
+	// dimhotepus: pthread_t is valid and must be joined / detached.
+	bool m_bJoinable{ false };
 #endif
 	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
   // DLL export looks safe.
