@@ -8,20 +8,7 @@
 #include "GameUI_Interface.h"
 
 #ifdef WIN32
-#if !defined( _X360 )
 #include "winlite.h"
-#endif
-#include <io.h>
-#include <direct.h>
-#elif defined( POSIX )
-#include <sys/time.h>
-#else
-#error "Please define your platform"
-#endif
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdio.h>
-#include <tier0/dbg.h>
 
 #ifdef SendMessage
 #undef SendMessage
@@ -30,27 +17,39 @@
 #ifdef MessageBox
 #undef MessageBox
 #endif
+#include <io.h>
+#include <direct.h>
+#elif defined( POSIX )
+#include <sys/time.h>
+#else
+#error "Please define your platform"
+#endif
 
-#include "filesystem.h"
-#include "Sys_Utils.h"
-#include "tier0/icommandline.h"
+#include <sys/types.h>
+#include <sys/stat.h>
 
-// interface to engine
-#include "EngineInterface.h"
+#include <cstdio>
 
+#include "bitmap/tgaloader.h"
 #include "replay/ienginereplay.h"
 #include "replay/ireplaysystem.h"
 
-#include "VGuiSystemModuleLoader.h"
-#include "bitmap/tgaloader.h"
+#include "tier0/icommandline.h"
+#include "tier0/dbg.h"
 
+#include "engine/imatchmaking.h"
+#include "game/client/IGameClientExports.h"
+#include "materialsystem/imaterialsystem.h"
+
+#include "filesystem.h"
+#include "Sys_Utils.h"
+// interface to engine
+#include "EngineInterface.h"
+#include "VGuiSystemModuleLoader.h"
 #include "GameConsole.h"
 #include "LoadingDialog.h"
 #include "CDKeyEntryDialog.h"
 #include "ModInfo.h"
-#include "game/client/IGameClientExports.h"
-#include "materialsystem/imaterialsystem.h"
-#include "engine/imatchmaking.h"
 #include "ixboxsystem.h"
 #include "iachievementmgr.h"
 #include "IGameUIFuncs.h"
