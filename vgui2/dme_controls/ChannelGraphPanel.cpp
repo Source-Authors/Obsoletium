@@ -6,7 +6,7 @@
 
 #include <math.h>
 
-#include <dme_controls/ChannelGraphPanel.h>
+#include "dme_controls/ChannelGraphPanel.h"
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
