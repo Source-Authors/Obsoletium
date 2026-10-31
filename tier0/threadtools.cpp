@@ -105,7 +105,8 @@ static void *ThreadProcConvert( void *pParam )
 #ifdef _WIN32
 	return (*info.pfnThread)(info.pParam);
 #elif defined(POSIX)
-	return (void *)(*info.pfnThread)(info.pParam);
+	// dimhotepus: Go through uintptr_t, direct unsigned -> void* cast is ill-formed on 64-bit.
+	return reinterpret_cast<void *>( static_cast<uintptr_t>( (*info.pfnThread)(info.pParam) ) );
 #else
 #error "Please define your platform"
 #endif
