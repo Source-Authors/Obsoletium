@@ -431,7 +431,7 @@ bool ThreadJoin( ThreadHandle_t hThread, unsigned timeout )
 		return false;
 	if ( dwWait != WAIT_OBJECT_0 && ( dwWait != WAIT_FAILED && GetLastError() != 0 ) )
 	{
-		Assert( 0 );
+		AssertMsg( false, "WaitForSingleObject(0x%p, %u) failed with %lu.", hThread, timeout, dwWait );
 		return false;
 	}
 #elif defined(LINUX)
@@ -590,7 +590,14 @@ CThreadSyncObject::~CThreadSyncObject()
    {
       if ( !CloseHandle(m_hSyncObject) )
 	  {
-		  Assert( 0 );
+		  AssertMsg(
+			  false,
+			  "Failed to close handle 0x%p: %s.",
+			  m_hSyncObject,
+			  std::system_category().message( ::GetLastError() ).c_str() );
+		  Warning( "CloseHandle(0x%p) failed: %s.\n",
+			  m_hSyncObject,
+			  std::system_category().message( ::GetLastError() ).c_str() );
 	  }
    }
 #elif defined(POSIX)
