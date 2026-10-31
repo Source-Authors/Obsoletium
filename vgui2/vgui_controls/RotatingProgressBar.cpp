@@ -7,7 +7,7 @@
 
 #include <vgui_controls/RotatingProgressBar.h>
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 #include "mathlib/mathlib.h"
 
 #include <vgui/IVGui.h>

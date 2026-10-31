@@ -7,7 +7,7 @@
 
 #include <vgui_controls/PropertySheet.h>
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui/IBorder.h>
 #include <vgui/IInput.h>

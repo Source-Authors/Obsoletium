@@ -9,7 +9,7 @@
 
 #include "filesystem.h"
 #include "tier1/fmtstr.h"
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui/IPanel.h>
 #include <vgui/ISurface.h>

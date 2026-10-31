@@ -7,7 +7,7 @@
 
 #include <vgui_controls/Label.h>
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui/IInput.h>
 #include <vgui/ILocalize.h>

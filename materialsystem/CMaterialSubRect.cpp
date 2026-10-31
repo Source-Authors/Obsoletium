@@ -17,7 +17,7 @@
 #include "IHardwareConfigInternal.h"
 #include "tier1/utlsymbol.h"
 #include "filesystem.h"
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 #include "tier1/mempool.h"
 #include "shaderapi/ishaderutil.h"
 #include "vtf/vtf.h"

@@ -6,9 +6,9 @@
 #define SE_ENGINE_BASESERVER_H_
 
 #include <iserver.h>
-#include <tier1/netadr.h>
-#include <tier1/bitbuf.h>
-#include <tier1/utlvector.h>
+#include "tier1/netadr.h"
+#include "tier1/bitbuf.h"
+#include "tier1/utlvector.h"
 #include "baseclient.h"
 #include "netmessages.h"
 #include "net.h"

@@ -12,7 +12,7 @@
 
 #include <bitvec.h>
 #include <const.h>
-#include <tier1/mempool.h>
+#include "tier1/mempool.h"
 
 class CFrameSnapshot;
 

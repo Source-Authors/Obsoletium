@@ -7,7 +7,7 @@
 
 #include <vgui_controls/ToolWindow.h>
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui/KeyCode.h>
 #include "vgui/IInput.h"

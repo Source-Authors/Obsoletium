@@ -13,7 +13,7 @@
 #endif
 
 #include "tier1/utllinkedlist.h"
-#include <tier1/utlvector.h>
+#include "tier1/utlvector.h"
 #include <vgui/VGUI.h>
 #include <vgui_controls/EditablePanel.h>
 

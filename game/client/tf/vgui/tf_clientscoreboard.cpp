@@ -7,7 +7,7 @@
 
 #include "cbase.h"
 
-#include <tier1/fmtstr.h>
+#include "tier1/fmtstr.h"
 #include <vgui_controls/Label.h>
 #include <vgui_controls/Button.h>
 #include <vgui_controls/ImagePanel.h>

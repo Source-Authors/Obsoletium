@@ -7,7 +7,7 @@
 
 #include <vgui_controls/MenuButton.h>
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui/IPanel.h>
 #include <vgui/IInput.h>

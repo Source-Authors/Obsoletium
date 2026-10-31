@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include <tier1/utlvector.h>
+#include "tier1/utlvector.h"
 #include <vgui_controls/Panel.h>
 
 namespace vgui

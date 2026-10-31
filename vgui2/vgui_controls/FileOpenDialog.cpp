@@ -24,7 +24,7 @@
 
 #include "tier1/utldict.h"
 #include "tier1/utlstring.h"
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui/IScheme.h>
 #include <vgui/ISurface.h>

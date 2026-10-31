@@ -6,7 +6,7 @@
 
 #include <vgui_controls/AnalogBar.h>
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui/ILocalize.h>
 #include <vgui/IScheme.h>

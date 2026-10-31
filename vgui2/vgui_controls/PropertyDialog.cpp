@@ -7,7 +7,7 @@
 
 #include <vgui_controls/PropertyDialog.h>
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui/KeyCode.h>
 

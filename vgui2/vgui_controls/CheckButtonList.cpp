@@ -6,7 +6,7 @@
 
 #include <vgui_controls/CheckButtonList.h>
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui_controls/CheckButton.h>
 #include <vgui_controls/ScrollBar.h>

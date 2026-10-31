@@ -16,9 +16,9 @@
 #include <vgui/ISurface.h>
 #include <vgui/IClientPanel.h>
 #include <vgui/IScheme.h>
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 #include "tier0/dbg.h"
-#include <tier1/utlhandletable.h>
+#include "tier1/utlhandletable.h"
 #include "vgui_internal.h"
 #include "VPanel.h"
 #include "IMessageListener.h"

@@ -7,7 +7,7 @@
 
 #include <vgui_controls/ScrollBar.h>
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui/IScheme.h>
 #include <vgui/ISystem.h>

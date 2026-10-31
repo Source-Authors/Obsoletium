@@ -7,7 +7,7 @@
 
 #include <vgui_controls/SectionedListPanel.h>
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 #include "tier1/utlvector.h"
 
 #include <vgui/IInput.h>

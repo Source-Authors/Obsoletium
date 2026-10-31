@@ -6,7 +6,7 @@
 
 #if defined( REPLAY_ENABLED )
 
-#include <tier1/strtools.h>
+#include "tier1/strtools.h"
 #include <eiface.h>
 #include <bitbuf.h>
 #include <time.h>

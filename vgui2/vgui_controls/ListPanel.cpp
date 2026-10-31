@@ -7,7 +7,7 @@
 
 #include <vgui_controls/ListPanel.h>
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui/Cursor.h>
 #include <vgui/IInput.h>

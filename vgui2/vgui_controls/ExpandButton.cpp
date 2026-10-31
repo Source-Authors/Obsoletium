@@ -7,7 +7,7 @@
 
 #include <vgui_controls/ExpandButton.h>
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui/ISurface.h>
 #include <vgui/IScheme.h>

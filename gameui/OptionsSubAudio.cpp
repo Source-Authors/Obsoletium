@@ -16,7 +16,7 @@
 #include "tier1/convar.h"
 #include <vgui/IInput.h>
 #include <steam/steam_api.h>
-#include <tier1/strtools.h>
+#include "tier1/strtools.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!

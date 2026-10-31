@@ -7,7 +7,7 @@
 
 #include <vgui_controls/ListViewPanel.h>
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui/MouseCode.h>
 #include <vgui/KeyCode.h>
