@@ -54,7 +54,6 @@
 #include "iachievementmgr.h"
 #include "IGameUIFuncs.h"
 #include <ienginevgui.h>
-#include "steam/steam_api.h"
 #include "BonusMapsDatabase.h"
 #include "BonusMapsDialog.h"
 #include "sourcevr/isourcevirtualreality.h"
@@ -78,6 +77,10 @@
 #include "matsys_controls/matsyscontrols.h"
 
 #include "engine/IEngineSound.h"
+
+#ifndef NO_STEAM
+#include "steam/steam_api.h"
+#endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
