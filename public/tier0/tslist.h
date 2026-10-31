@@ -67,21 +67,21 @@ union TSLIST_HEAD_ALIGN TSLHead_t
 	struct Value_t
 	{
 		TSLNodeBase_t *Next;
-		int16   Depth;
+		uint16   Depth;
 
 #ifdef PLATFORM_64BITS
-		int16	Padding;
+		uint16	Padding;
 		// dimhotepus: 64 bit has better ABA prevention.
-		int32   Sequence;
+		uint32	Sequence;
 #else
-		int16	Sequence;
+		uint16	Sequence;
 #endif
 	} value;
 
 	struct Value32_t
 	{
 		TSLNodeBase_t *Next_do_not_use_me;
-		int32   DepthAndSequence;
+		uint32   DepthAndSequence;
 	} value32;
 
 #ifdef PLATFORM_64BITS
