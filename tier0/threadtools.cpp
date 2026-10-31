@@ -496,10 +496,9 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 		HANDLE handle = OpenThread( STANDARD_RIGHTS_READ | THREAD_SET_INFORMATION,
 			FALSE,
 			id != INVALID_THREAD_ID ? id : GetThreadId( GetCurrentThread() ) );
+		RunCodeAtScopeExitOpt( handle, ::CloseHandle( handle ) );
 		if ( handle )
 		{
-			RunCodeAtScopeExit( ::CloseHandle( handle ) );
-
 			const size_t wcharsNeeded = mbstowcs( nullptr, pszName, INT_MAX );
 			// dimhotepus: (size_t)-1 on invalid multibyte sequence made descriptionSize 0 and index -1 below.
 			if ( wcharsNeeded == static_cast<size_t>( -1 ) )
