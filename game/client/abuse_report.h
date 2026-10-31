@@ -13,7 +13,7 @@
 
 #include <igamesystem.h>
 #include <GameEventListener.h>
-#include <bitmap/bitmap.h>
+#include "bitmap/bitmap.h"
 #include <netadr.h>
 
 /// Different content types that can be reported as abusive.

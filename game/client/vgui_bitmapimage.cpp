@@ -12,7 +12,7 @@
 #include "panelmetaclassmgr.h"
 #include <KeyValues.h>
 #include <vgui/IPanel.h>
-#include <bitmap/bitmap.h>
+#include "bitmap/bitmap.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
