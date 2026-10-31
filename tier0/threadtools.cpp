@@ -1807,7 +1807,7 @@ const char *CThread::GetName()
 #ifdef _WIN32
 		_snprintf( m_szName, std::size(m_szName) - 1, "Thread(%p/%p)", this, m_hThread );
 #elif defined(POSIX)
-		_snprintf( m_szName, std::size(m_szName) - 1, "Thread(%p/0x%p)", this, (uintp)m_threadId );
+		_snprintf( m_szName, std::size(m_szName) - 1, "Thread(%p/0x%p)", this, reinterpret_cast<void*>((uintp)m_threadId) );
 #endif
 		m_szName[std::size(m_szName) - 1] = '\0';
 	}
