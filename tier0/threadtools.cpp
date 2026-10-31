@@ -1921,7 +1921,7 @@ bool CThread::IsAlive() const
 
 //---------------------------------------------------------
 
-bool CThread::Join([[maybe_unused]] unsigned timeout)
+bool CThread::Join( unsigned timeout )
 {
 #ifdef _WIN32
 	if ( m_hThread )
@@ -1932,9 +1932,12 @@ bool CThread::Join([[maybe_unused]] unsigned timeout)
 		AssertMsg(GetCurrentCThread() != this, _T("Thread cannot be joined with self"));
 
 #ifdef _WIN32
-		return ThreadJoin( (ThreadHandle_t)m_hThread );
+		// dimhotepus: Respect timeout (was ignored).
+		return ThreadJoin( (ThreadHandle_t)m_hThread, timeout );
 #elif defined(POSIX)
-		return ThreadJoin( (ThreadHandle_t)m_threadId );
+		if ( !ThreadJoin( (ThreadHandle_t)m_threadId, timeout ) )
+			return false;
+		return true;
 #endif
 	}
 	return true;
