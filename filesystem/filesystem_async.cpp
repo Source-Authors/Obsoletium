@@ -27,12 +27,6 @@
 #include "vstdlib/random.h"
 #include "basefilesystem.h"
 
-// VCR mode for now is handled by not running async.  This is primarily for
-// performance reasons. VCR mode would preclude the use of a lock-free job
-// retrieval. Can change if need in future, but it's best to do so if needed,
-// and to make it a deliberate compile time choice to keep the fast path.
-#undef WaitForSingleObject
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
