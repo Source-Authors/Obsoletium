@@ -5,22 +5,22 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "winlite.h"
 #include "Sys_Utils.h"
+
 #include "EngineInterface.h"
 #include "tier0/vcrmode.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
+#if defined( _WIN32 )
+#include "winlite.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+#if defined( _WIN32 )
 
-#ifdef WIN32
-const unsigned int SYS_NO_ERROR = NO_ERROR;
-const unsigned int SYS_ERROR_INVALID_HANDLE = ERROR_INVALID_HANDLE;
+const unsigned int SYS_NO_ERROR{ NO_ERROR };
+const unsigned int SYS_ERROR_INVALID_HANDLE{ ERROR_INVALID_HANDLE };
 
 void Sys_SetLastError(unsigned long error)
 {
@@ -79,27 +79,9 @@ void Sys_PostMessage(WHANDLE wnd, unsigned int msg, unsigned int wParam, unsigne
 	::PostMessageA((HWND)wnd, msg, wParam, lParam);
 }
 
-#ifndef _XBOX
-void Sys_SetCursorPos(int x, int y)
+void Sys_SetCursorPos( int x, int y )
 {
-	::SetCursorPos(x, y);
-//	engine->SetCursorPos(x,y); // SRC version
-}
-#endif
-
-#ifndef _XBOX
-static ATOM staticWndclassAtom = 0;
-static WNDCLASS staticWndclass = {};
-#endif
-
-WHANDLE Sys_CreateWindowEx(const char *windowName)
-{
-	return (WHANDLE)1;
-}
-
-void Sys_DestroyWindow(WHANDLE wnd)
-{
-	//::DestroyWindow((HWND)wnd);
+	::SetCursorPos( x, y );
 }
 
 #elif defined( POSIX )

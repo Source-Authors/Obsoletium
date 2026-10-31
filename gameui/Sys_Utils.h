@@ -7,14 +7,11 @@
 
 #ifndef SYS_UTILS_H
 #define SYS_UTILS_H
-#ifdef _WIN32
-#pragma once
-#endif
 
-#include "tier0/platform.h"
+#include "tier0/basetypes.h"
 
 // dimhotepus: x86-64 port. int -> intp
-typedef intp WHANDLE;
+using WHANDLE = intp;
 
 // ERROR HANDLING
 extern const unsigned int SYS_NO_ERROR;
@@ -38,15 +35,8 @@ WHANDLE Sys_FindWindow(const char *className, const char *windowName);
 void Sys_EnumWindows(void *callbackFunction, int lparam);
 void Sys_GetWindowText(WHANDLE wnd, char *buffer, int bufferSize);
 void Sys_PostMessage(WHANDLE wnd, unsigned int msg, unsigned int wParam, unsigned int lParam);
-WHANDLE Sys_CreateWindowEx(const char *windowName);
-void Sys_DestroyWindow(WHANDLE wnd);
 
 // mouse
 void Sys_SetCursorPos(int x, int y);
 
-
-
-
-
-
-#endif // SYS_UTILS_H
+#endif  // !SYS_UTILS_H
