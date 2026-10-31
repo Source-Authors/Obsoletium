@@ -2415,7 +2415,14 @@ int CWorkerThread::WaitForReply( unsigned timeout, WaitFunc_t pfnWait )
 
 	} while ( bInDebugger && ( timeout == TT_INFINITE && result == WAIT_TIMEOUT ) );
 
-	if ( result != WAIT_OBJECT_0 + 1 )
+	// dimhotepus: On POSIX waits[] has only completion event (index 0).
+	// Comparing with +1 made every successful call look like failure.
+#ifdef WIN32
+	constexpr unsigned kCompleteResult = WAIT_OBJECT_0 + 1;
+#else
+	constexpr unsigned kCompleteResult = WAIT_OBJECT_0;
+#endif
+	if ( result != kCompleteResult )
 	{
 		if (result == WAIT_TIMEOUT)
 			m_ReturnVal = WTCR_TIMEOUT;
