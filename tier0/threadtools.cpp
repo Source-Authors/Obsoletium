@@ -1956,7 +1956,7 @@ HANDLE CThread::GetThreadHandle()
 
 //---------------------------------------------------------
 
-uint CThread::GetThreadId()
+ThreadId_t CThread::GetThreadId()
 {
 	return m_threadId;
 }

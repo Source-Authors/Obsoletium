@@ -1385,9 +1385,11 @@ public:
 #ifdef _WIN32
 	// Access the thread handle directly
 	HANDLE GetThreadHandle();
-	uint GetThreadId();
+	// dimhotepus: uint -> ThreadId_t.
+	ThreadId_t GetThreadId();
 #elif defined( LINUX )
-	uint GetThreadId();
+	// dimhotepus: ThreadId_t is pthread_t sized on POSIX, so no truncation.
+	ThreadId_t GetThreadId();
 #endif
 
 	//-----------------------------------------------------
