@@ -6,7 +6,7 @@
 //===========================================================================//
 
 #include "cbase.h"
-#include <tier2/tier2.h>
+#include "tier2/tier2.h"
 #include "filesystem.h"
 #include "bsp_utils.h"
 #include "utlbuffer.h"

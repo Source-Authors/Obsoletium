@@ -4,7 +4,7 @@
 //
 //===================================================================================-=//
 
-#include <tier2/tier2.h>
+#include "tier2/tier2.h"
 #include "tier0/platform.h"
 #include <mathlib/mathlib.h>
 #include "tier0/icommandline.h"

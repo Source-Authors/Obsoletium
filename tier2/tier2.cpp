@@ -4,7 +4,7 @@
 //
 //===========================================================================//
 
-#include <tier2/tier2.h>
+#include "tier2/tier2.h"
 #include "tier0/dbg.h"
 #include "filesystem.h"
 #include "materialsystem/imaterialsystem.h"
