@@ -1296,6 +1296,15 @@ private:
 //
 //-----------------------------------------------------------------------------
 
+// dimhotepus: ThreadId_t is pointer sized on POSIX, but spin RW lock packs writer id and reader count into
+// 8 bytes to keep CAS lock-free (16 bytes would need cmpxchg16b / libatomic).
+// So fold id to 32 bits. 0 stays reserved for "no writer".
+[[nodiscard]] inline uint32 ThreadIdToLockOwnerId( ThreadId_t id )
+{
+	const uint32 folded = static_cast<uint32>( static_cast<uint64>( id ) ^ ( static_cast<uint64>( id ) >> 32 ) );
+	return folded ? folded : 1u;
+}
+
 class ALIGN8 PLATFORM_CLASS CThreadSpinRWLock : public CAlignedNewDelete<8>
 {
 public:
@@ -1323,7 +1332,7 @@ public:
 private:
 	struct LockInfo_t
 	{
-		ThreadId_t	m_writerId;
+		uint32		m_writerId; // dimhotepus: Folded ThreadId_t, see ThreadIdToLockOwnerId.
 		int		m_nReaders;
 	};
 
@@ -1896,15 +1905,16 @@ inline bool CThreadSpinRWLock::AssignIf( const LockInfo_t &newValue, LockInfo_t 
 
 inline bool CThreadSpinRWLock::TryLockForWrite( const ThreadId_t threadId )
 {
+	const uint32 writerId = ThreadIdToLockOwnerId( threadId );
 	const auto lockInfo = m_lockInfo.load();
 	// In order to grab a write lock, there can be no readers and no owners of the write lock
-	if ( lockInfo.m_nReaders > 0 || ( lockInfo.m_writerId && lockInfo.m_writerId != threadId ) )
+	if ( lockInfo.m_nReaders > 0 || ( lockInfo.m_writerId && lockInfo.m_writerId != writerId ) )
 	{
 		return false;
 	}
 
 	LockInfo_t oldValue{0UL, 0};
-	LockInfo_t newValue{threadId, 0};
+	LockInfo_t newValue{writerId, 0};
 
 	const bool bSuccess = AssignIf( newValue, oldValue );
 	return bSuccess;

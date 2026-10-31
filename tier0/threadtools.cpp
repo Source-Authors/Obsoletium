@@ -1714,7 +1714,7 @@ void CThreadSpinRWLock::UnlockWrite()
 {
 	const auto lockInfo = m_lockInfo.load();
 
-	Assert( lockInfo.m_writerId == ThreadGetCurrentId() );
+	Assert( lockInfo.m_writerId == ThreadIdToLockOwnerId( ThreadGetCurrentId() ) );
 	Assert( lockInfo.m_nReaders == 0 );
 
 	m_lockInfo.exchange(LockInfo_t{0, 0});
