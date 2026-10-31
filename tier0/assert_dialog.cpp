@@ -23,6 +23,7 @@
 #include "tier0/valve_on.h"
 
 #include "resource.h"
+#include "tier0/icommandline.h"
 #include "tier0/threadtools.h"
 
 #if defined( USE_SDL )
@@ -110,24 +111,24 @@ BOOL WINAPI DllMain( HINSTANCE module, DWORD fdwReason, LPVOID lpvReserved )
 
 [[nodiscard]] static bool IsDebugBreakEnabled()
 {
-	static bool bResult = !!_tcsstr( Plat_GetCommandLine(), _T("-debugbreak") ) ||
-		!!_tcsstr( Plat_GetCommandLine(), _T("-raiseonassert") ) ||
+	static bool bResult = CommandLine()->HasParm( _T("-debugbreak") ) ||
+		CommandLine()->HasParm( _T("-raiseonassert") ) ||
 		getenv( "RAISE_ON_ASSERT" );
 	return bResult;
 }
 
 [[nodiscard]] static bool AreAssertsDisabled()
 {
-	static bool bResult = !!_tcsstr( Plat_GetCommandLine(), _T("-noassert") );
+	static bool bResult = CommandLine()->HasParm( _T("-noassert") );
 	return bResult;
 }
 
 [[nodiscard]] static bool IsConsoleMode()
 {
 	// No graphics and sound in launcher.
-	static bool bResult = !!_tcsstr( Plat_GetCommandLine(), _T("-textmode") ) ||
-	// Console mode for dedicated server.
-		!!_tcsstr( Plat_GetCommandLine(), _T("-console") );
+	static bool bResult = CommandLine()->HasParm( _T("-textmode") ) ||
+		// Console mode for dedicated server.
+		CommandLine()->HasParm( _T("-console") );
 	return bResult;
 }
 
@@ -482,7 +483,7 @@ DBG_INTERFACE SDL_Window* GetAssertDialogParent()
 
 DBG_INTERFACE bool ShouldUseNewAssertDialog()
 {
-	static bool bMPIWorker = !!_tcsstr( Plat_GetCommandLine(), _T("-mpi_worker") );
+	static bool bMPIWorker = CommandLine()->HasParm( _T("-mpi_worker") );
 	if ( bMPIWorker )
 	{
 		return false;
