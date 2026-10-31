@@ -260,6 +260,35 @@ char ( &out_base_directory )[buffer_size] )
 }
 
 /**
+ * @brief Check command line has arg. Expects no spaces or quotes.
+ * @tparam size Arg size.
+ * @param command_line Command line.
+ * @param arg Arg.
+ * @return true if has, false otherwise.
+ */
+template< std::size_t size >
+[[nodiscard]] static bool HasArg( const char *command_line,
+                                  const char ( &arg )[size] )
+{
+	constexpr std::size_t len{ size - 1 };
+	if ( !command_line || len == 0 )
+		return false;
+
+	for ( const char *p{ command_line }; ( p = strstr( p, arg ) ) != nullptr; ++p )
+	{
+		const bool at_start{ p == command_line };
+		const bool has_left_boundary{ at_start || isspace( p[-1] ) };
+		const char after{ p[len] };
+		const bool has_right_boundary{ after == '\0' || isspace( after ) };
+
+		if ( has_left_boundary && has_right_boundary )
+			return true;
+	}
+
+	return false;
+}
+
+/**
  * @brief Check app started in console mode.
  * @param command_line Command line.
  * @return true if app in console mode, false otherwise.
@@ -267,14 +296,7 @@ char ( &out_base_directory )[buffer_size] )
 bool IsConsoleMode( const char *command_line )
 {
 	constexpr char kConsoleArgName[]{ "-console" };
-
-	const char *console_arg{ strstr( command_line, kConsoleArgName ) };
-	if ( !console_arg )
-		return false;
-
-	const char *next_arg{ console_arg + std::size( kConsoleArgName ) - 1 };
-
-	return isspace( *next_arg ) != 0;
+	return HasArg( command_line, kConsoleArgName );
 }
 
 int Run( _In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
