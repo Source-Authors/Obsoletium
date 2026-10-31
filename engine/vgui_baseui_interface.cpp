@@ -14,7 +14,7 @@
 #include "winlite.h"
 #endif
 #include "appframework/ilaunchermgr.h"
-#include <matsys_controls/matsyscontrols.h>
+#include "matsys_controls/matsyscontrols.h"
 #include "keys.h"
 #include "console.h"
 #include "gl_matsysiface.h"

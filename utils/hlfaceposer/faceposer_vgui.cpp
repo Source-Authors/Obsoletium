@@ -6,7 +6,7 @@
 #include <vgui/ISystem.h>
 #include "vgui/IInput.h"
 #include <VGuiMatSurface/IMatSystemSurface.h>
-#include <matsys_controls/matsyscontrols.h>
+#include "matsys_controls/matsyscontrols.h"
 #include "dme_controls/dmecontrols.h"
 #include "vgui_controls/AnimationController.h"
 #include "inputsystem/iinputsystem.h"
