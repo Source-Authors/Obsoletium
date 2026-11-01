@@ -10,7 +10,7 @@
 #pragma once
 
 #ifndef _INC_SETJMP
-#include <setjmp.h>
+#include <csetjmp>
 #endif
 
 extern jmp_buf 		host_abortserver;

@@ -73,7 +73,7 @@ Coroutine_Launch_ASM ENDP
 
 
 
-; Needs to match definition found in setjmp.h
+; Needs to match definition found in csetjmp
 _JUMP_BUFFER STRUCT
 	m_Frame QWORD ?
 	m_Rbx QWORD ?

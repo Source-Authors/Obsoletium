@@ -20,7 +20,7 @@
 #endif
 
 #if defined( POSIX )
-#include <setjmp.h>
+#include <csetjmp>
 #include <signal.h>
 #endif
 

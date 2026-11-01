@@ -2,7 +2,7 @@
 #define UNITTEST_SIGNALTRANSLATOR_H
 
 
-#include <setjmp.h>
+#include <csetjmp>
 #include <signal.h>
 
 

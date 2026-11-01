@@ -49,7 +49,7 @@
 #include "libjpeg-turbo/src/jpeglib.h"
 #undef JPEGLIB_USE_STDIO
 
-#include <setjmp.h>
+#include <csetjmp>
 
 #include "bitmap/tgawriter.h"
 #include "ivtex.h"
