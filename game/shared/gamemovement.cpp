@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "gamemovement.h"
 #include "in_buttons.h"
-#include <stdarg.h>
+#include <cstdarg>
 #include "movevars_shared.h"
 #include "engine/IEngineTrace.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
@@ -26,7 +26,7 @@
 #define	MAX_CLIP_PLANES		5
 
 #include "filesystem.h"
-#include <stdarg.h>
+#include <cstdarg>
 
 extern IFileSystem *filesystem;
 

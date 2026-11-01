@@ -14,7 +14,7 @@
 //-----------------------------------------------------------------------------
 
 #include <stdio.h>
-#include <stdarg.h>
+#include <cstdarg>
 #include <algorithm>
 #include <list>
 #include <vector>

@@ -17,7 +17,7 @@
 //=============================================================================
 #include <stdio.h>
 #include <string.h>
-#include <stdarg.h>
+#include <cstdarg>
 
 // base vgui interfaces
 #include <VGUI_Controls.h>

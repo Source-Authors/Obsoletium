@@ -7,7 +7,7 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include <stdarg.h>
+#include <cstdarg>
 #include "vguicenterprint.h"
 #include "ivrenderview.h"
 #include "vgui/IVGui.h"

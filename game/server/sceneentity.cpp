@@ -5,7 +5,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include <stdarg.h>
+#include <cstdarg>
 #include "baseflex.h"
 #include "entitylist.h"
 #include "choreoevent.h"

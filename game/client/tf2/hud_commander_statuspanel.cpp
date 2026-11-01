@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include <stdarg.h>
+#include <cstdarg>
 #include "hud_commander_statuspanel.h"
 #include "techtree.h"
 #include "vgui/IVGui.h"

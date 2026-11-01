@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stdarg.h>
+#include <cstdarg>
 #include <cassert>
 
 #define _DEBUG_DUMP

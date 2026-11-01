@@ -5,7 +5,7 @@
 // Free for any use.
 
 #include <stdio.h>
-#include <stdarg.h>
+#include <cstdarg>
 #include "sqplus.h"
 
 using namespace SqPlus;

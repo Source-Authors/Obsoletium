@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include <stdarg.h>
+#include <cstdarg>
 #include "engine/IEngineSound.h"
 #include "filesystem.h"
 #include "igamemovement.h"

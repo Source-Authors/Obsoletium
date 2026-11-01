@@ -9,7 +9,7 @@
 #include <climits>
 #include "isaverestore.h"
 #include "saverestore.h"
-#include <stdarg.h>
+#include <cstdarg>
 #include "shake.h"
 #include "decals.h"
 #include "gamerules.h"

@@ -8,7 +8,7 @@
 #include "cbase.h"
 #include "voice_gamemgr.h"
 #include <string.h>
-#include <stdarg.h>
+#include <cstdarg>
 #include "player.h"
 #include "ivoiceserver.h"
 #include "usermessages.h"

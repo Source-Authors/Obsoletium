@@ -6,7 +6,7 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include <stdarg.h>
+#include <cstdarg>
 #include "hud.h"
 #include "itextmessage.h"
 #include "materialsystem/imaterial.h"

@@ -11,7 +11,7 @@
 #include <sys/stat.h>
 #include <io.h>
 #include <direct.h>
-#include <stdarg.h>
+#include <cstdarg>
 
 #include "tier1/strtools.h"
 #include "goldsrc_standin.h"

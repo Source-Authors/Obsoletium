@@ -8,7 +8,7 @@
 
 #include <windows.h>
 #include <stdio.h>
-#include <stdarg.h>
+#include <cstdarg>
 #include <string.h>
 
 #define MAX_SYSTOKENCHARS	1024

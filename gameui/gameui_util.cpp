@@ -6,7 +6,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdarg.h>
+#include <cstdarg>
 #include "gameui_util.h"
 #include "strtools.h"
 

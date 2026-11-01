@@ -6,7 +6,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include <stdarg.h>
+#include <cstdarg>
 #include "player.h"
 #include "tf_player.h"
 #include "gamerules.h"

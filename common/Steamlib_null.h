@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h> // for strlen()
-#include <stdarg.h>
+#include <cstdarg>
 #include <dlfcn.h>
 #if !defined ( _WIN32 )
 #include <string.h>

@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "c_basetfplayer.h"
 #include "beamdraw.h"
-#include <stdarg.h>
+#include <cstdarg>
 #include "ivmodemanager.h"
 #include "shake.h"
 #include "ivieweffects.h"

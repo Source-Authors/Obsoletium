@@ -26,7 +26,7 @@
 
 #include "tier0/platform.h"
 #if defined( OSX )
-#include <stdarg.h>
+#include <cstdarg>
 #endif
 
 // include this anywhere you need to be able to compile-out code related specifically to GLM debugging.

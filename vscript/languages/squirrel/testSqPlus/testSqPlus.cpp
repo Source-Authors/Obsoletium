@@ -2,7 +2,7 @@
 // Created by John Schultz 9/5/2005
 // Free for any use.
 
-#include <stdarg.h> 
+#include <cstdarg> 
 #include <stdio.h>
 #include "sqplus.h"
 

@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <stdarg.h>
+#include <cstdarg>
 #include "vgui_controls/Panel.h"
 #include "vgui_controls/Label.h"
 #include "vgui_controls/Controls.h"

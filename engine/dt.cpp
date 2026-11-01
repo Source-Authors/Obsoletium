@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
  
-#include <stdarg.h>
+#include <cstdarg>
 #include "dt_send.h"
 #include "dt.h"
 #include "dt_recv.h"

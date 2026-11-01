@@ -7,7 +7,7 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include <stdarg.h>
+#include <cstdarg>
 #include "imessagechars.h"
 #include "vgui/IVGui.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"

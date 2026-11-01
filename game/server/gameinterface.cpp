@@ -24,7 +24,7 @@
 #include "ai_networkmanager.h"
 #include "ndebugoverlay.h"
 #include "ivoiceserver.h"
-#include <stdarg.h>
+#include <cstdarg>
 #include "movehelper_server.h"
 #include "networkstringtable_gamedll.h"
 #include "filesystem.h"

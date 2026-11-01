@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-//========= Copyright © 1996-2001, Valve LLC, All rights reserved. ============
+//========= Copyright ï¿½ 1996-2001, Valve LLC, All rights reserved. ============
 //
 // Purpose: 
 //
@@ -14,7 +14,7 @@
 #include "cbase.h"
 #include "gamemovement.h"
 #include "in_buttons.h"
-#include <stdarg.h>
+#include <cstdarg>
 #include "movevars_shared.h"
 #include "engine/IEngineTrace.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"

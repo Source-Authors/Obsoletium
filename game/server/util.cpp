@@ -8,7 +8,7 @@
 #include "cbase.h"
 #include "saverestore.h"
 #include "globalstate.h"
-#include <stdarg.h>
+#include <cstdarg>
 #include "shake.h"
 #include "decals.h"
 #include "player.h"

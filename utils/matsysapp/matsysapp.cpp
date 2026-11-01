@@ -21,7 +21,7 @@
 
 #include <windows.h>
 #include <cmath>
-#include <stdarg.h>
+#include <cstdarg>
 #include <stdio.h>
 #include <stdlib.h>
 #include <mmsystem.h>
