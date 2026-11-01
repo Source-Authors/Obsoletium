@@ -5,7 +5,7 @@
 //=============================================================================
 
 #include "stdafx.h"
-#include <time.h>
+#include <ctime>
 #include "gcsdk_gcmessages.pb.h"
 
 #include "tier0/memdbgoff.h"

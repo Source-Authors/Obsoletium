@@ -14,7 +14,7 @@
 #include <malloc.h>
 #include <richedit.h>
 #include <cassert>
-#include <time.h>
+#include <ctime>
 #include "resource.h"
 #include <sys/stat.h>
 #include "sys_utils.h"

@@ -19,7 +19,7 @@
 #include "replay_dbg.h"
 #include "inetchannel.h"
 #include "cl_replaycontext.h"
-#include <time.h>
+#include <ctime>
 #include "vprof.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

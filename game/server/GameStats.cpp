@@ -130,7 +130,7 @@ bool CBaseGameStats::StatTrackingAllowed( void )
 #undef asctime
 #undef time
 
-#include <time.h>
+#include <ctime>
 
 void CBaseGameStats::StatsLog( char const *fmt, ... )
 {

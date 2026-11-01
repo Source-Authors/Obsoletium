@@ -53,7 +53,7 @@
 #include <utime.h>
 #include <map>
 #include <string>
-#include <time.h>
+#include <ctime>
 #include "tier1/strtools.h"
 
 // Enable to do pathmatch caching. Beware: this code isn't threadsafe.

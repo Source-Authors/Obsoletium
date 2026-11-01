@@ -15,7 +15,7 @@
 #include "replay/ireplayfactory.h"
 #include "replay/ireplayscreenshotmanager.h"
 #include "replay/screenshot.h"
-#include <time.h>
+#include <ctime>
 
 //----------------------------------------------------------------------------------------
 

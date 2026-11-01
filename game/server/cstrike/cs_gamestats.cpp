@@ -19,7 +19,7 @@
 #include "cs_achievement_constants.h"
 #include "../../shared/cstrike/weapon_c4.h"
 
-#include <time.h>
+#include <ctime>
 #include "filesystem.h"
 #include "bot_util.h"
 #include "cdll_int.h"

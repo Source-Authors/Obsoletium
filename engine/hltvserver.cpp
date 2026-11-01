@@ -18,7 +18,7 @@
 #include <eiface.h>
 #include <PlayerState.h>
 #include <ihltvdirector.h>
-#include <time.h>
+#include <ctime>
 
 #include "hltvserver.h"
 #include "sv_client.h"

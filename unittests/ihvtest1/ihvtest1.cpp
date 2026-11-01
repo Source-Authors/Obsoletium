@@ -15,7 +15,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
-#include <time.h>
+#include <ctime>
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/IMaterialSystemHardwareConfig.h"
 #include "materialsystem/imaterialproxyfactory.h"

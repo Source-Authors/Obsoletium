@@ -13,7 +13,7 @@
 #include "replay/ireplayscreenshotmanager.h"
 #include "replay/screenshot.h"
 #include "replay/gamedefs.h"
-#include <time.h>
+#include <ctime>
 
 //----------------------------------------------------------------------------------------
 

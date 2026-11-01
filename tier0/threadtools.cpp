@@ -41,7 +41,7 @@ typedef PTHREAD_START_ROUTINE LPTHREAD_START_ROUTINE;
 #include <csignal>
 #include <pthread.h>
 #include <sys/time.h>
-#include <time.h>
+#include <ctime>
 #include <sys/resource.h>
 #ifdef LINUX
 #include <sys/syscall.h> // dimhotepus: gettid / tgkill.

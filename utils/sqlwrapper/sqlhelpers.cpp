@@ -7,7 +7,7 @@
 
 //#include "misc.h"
 #include "isqlwrapper.h"
-#include "time.h"
+#include <ctime>
 #include "sqlhelpers.h"
 
 #include "tier0/memdbgon.h"

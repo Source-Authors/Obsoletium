@@ -18,7 +18,7 @@
 #endif
 #include "particle_parse.h"
 #include "KeyValues.h"
-#include "time.h"
+#include <ctime>
 
 #ifdef USES_ECON_ITEMS
 	#include "econ_item_constants.h"

@@ -20,7 +20,7 @@
 #include "vgui/IVGui.h"
 #include "vgui_controls/Controls.h"
 #include "tier0/vprof_telemetry.h"
-#include <time.h>
+#include <ctime>
 #include "steam/steam_api.h"
 
 const char *COM_GetModDirectory(); // return the mod dir (rather than the complete -game param, which can be a path)

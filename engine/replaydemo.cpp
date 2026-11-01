@@ -9,7 +9,7 @@
 #include "tier1/strtools.h"
 #include <eiface.h>
 #include <bitbuf.h>
-#include <time.h>
+#include <ctime>
 #include "replaydemo.h"
 #include "replayserver.h"
 #include "demo.h"

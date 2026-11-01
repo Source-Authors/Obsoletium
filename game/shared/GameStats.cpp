@@ -18,7 +18,7 @@
 
 #include "tier1/utldict.h"
 #include "tier0/icommandline.h"
-#include <time.h>
+#include <ctime>
 #ifdef GAME_DLL
 #include "vehicle_base.h"
 #endif 
@@ -171,7 +171,7 @@ bool CBaseGameStats::StatTrackingAllowed( void )
 #undef localtime
 #undef asctime
 
-#include <time.h>
+#include <ctime>
 
 void CBaseGameStats::StatsLog( char const *fmt, ... )
 {

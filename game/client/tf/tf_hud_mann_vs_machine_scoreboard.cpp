@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "tf_hud_mann_vs_machine_scoreboard.h"
 #include <filesystem.h>
-#include <time.h>
+#include <ctime>
 #include "tf_lobby_server.h"
 
 using namespace vgui;

@@ -5,7 +5,7 @@
 //=============================================================================
 
 #include "cbase.h"
-#include <time.h>
+#include <ctime>
 
 #ifdef CLIENT_DLL
 

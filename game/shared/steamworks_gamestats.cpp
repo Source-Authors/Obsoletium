@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "cdll_int.h"
 #include "tier2/tier2.h"
-#include <time.h>
+#include <ctime>
 
 #ifdef	GAME_DLL
 #include "gameinterface.h"

@@ -12,7 +12,7 @@
 #include <edict.h>
 #include <eiface.h>
 #include <PlayerState.h>
-#include <time.h>
+#include <ctime>
 
 #include "replayserver.h"
 #include "sv_client.h"

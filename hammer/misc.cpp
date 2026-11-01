@@ -9,7 +9,7 @@
 #include "globalfunctions.h"
 
 #include <direct.h>
-#include <time.h>
+#include <ctime>
 
 #include "MapSolid.h"
 #include "mapworld.h"

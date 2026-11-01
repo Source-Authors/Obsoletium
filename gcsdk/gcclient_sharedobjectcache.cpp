@@ -5,7 +5,7 @@
 //=============================================================================
 
 #include "stdafx.h"
-#include <time.h>
+#include <ctime>
 #include "gcsdk/gcclient_sharedobjectcache.h"
 #include "gcsdk_gcmessages.pb.h"
 #include <typeinfo>

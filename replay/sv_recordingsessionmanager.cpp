@@ -12,7 +12,7 @@
 #include "filesystem.h"
 #include "iserver.h"
 #include "sv_filepublish.h"
-#include <time.h>
+#include <ctime>
 #include "vprof.h"
 #include "sv_fileservercleanup.h"
 #include "sv_sessionrecorder.h"

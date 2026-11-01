@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 #include <cassert>
-#include <time.h>
+#include <ctime>
 #include "stdafx.h"
 #include <cstdio>
 #include <windows.h>

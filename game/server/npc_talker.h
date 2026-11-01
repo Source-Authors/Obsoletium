@@ -12,7 +12,7 @@
 
 #ifdef POSIX
 #undef time
-#include <time.h>
+#include <ctime>
 #endif
 
 #include <set>

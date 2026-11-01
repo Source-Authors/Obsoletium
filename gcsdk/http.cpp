@@ -5,7 +5,7 @@
 //=============================================================================
 
 #include "stdafx.h"
-#include <time.h>
+#include <ctime>
 
 #include "msgprotobuf.h"
 #include "rtime.h"
