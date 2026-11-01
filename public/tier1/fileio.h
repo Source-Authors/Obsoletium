@@ -14,7 +14,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #if !defined( _PS3 )
-#include <signal.h>
+#include <csignal>
 #endif // _PS3
 #endif
 

@@ -38,7 +38,7 @@ typedef PTHREAD_START_ROUTINE LPTHREAD_START_ROUTINE;
 #include <sched.h>
 #include <exception>
 #include <cerrno>
-#include <signal.h>
+#include <csignal>
 #include <pthread.h>
 #include <sys/time.h>
 #include <time.h>

@@ -13,7 +13,7 @@
 #include "appframework/IAppSystemGroup.h"
 #include "filesystem.h"
 #include "vstdlib/cvar.h"
-#include "signal.h"
+#include <csignal>
 
 #include "gcsdk/steamextra/rtime.h"
 #include "gcsdk/directory.h"

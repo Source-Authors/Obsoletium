@@ -3,7 +3,7 @@
 
 
 #include <csetjmp>
-#include <signal.h>
+#include <csignal>
 
 
 namespace UnitTest {

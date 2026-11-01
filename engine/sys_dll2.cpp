@@ -21,7 +21,7 @@
 
 #if defined( POSIX )
 #include <csetjmp>
-#include <signal.h>
+#include <csignal>
 #endif
 
 #include "quakedef.h"

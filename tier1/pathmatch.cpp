@@ -42,7 +42,7 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <cerrno>
-#include <signal.h>
+#include <csignal>
 #include <cctype>
 #include <dirent.h>
 #include <sys/types.h>

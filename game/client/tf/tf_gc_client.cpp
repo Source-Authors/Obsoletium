@@ -3737,7 +3737,7 @@ GC_REG_JOB( GCSDK::CGCClient, CGCClientSurveyRequest, "CGCClientSurveyRequest", 
 //#elif POSIX
 //#include <sys/syscall.h>
 //#include <sys/wait.h>
-//#include <signal.h>
+//#include <csignal>
 //#endif
 //
 //void CTFGCClientSystem::CreateSourceTVProxy( uint32 source_tv_public_addr, uint32 source_tv_private_addr, uint32 source_tv_port )
