@@ -154,7 +154,7 @@ public:
 	// ModifyObjectL() is a helper macro designed to behave like a function. It takes as parameters the original
 	// object you want to modify and the code you want to run on it, expressed as a lambda.
 	#define ModifyObjectL( obj_, modifyfunc_ ) \
-		ModifyObject( obj_, [=] ( CSQLAccess& sqlAccess, CSharedObjectDirtyList& SODirtyList, decltype( obj_ ) pWritableObject ) -> bool { modifyfunc_ } )
+		ModifyObject( obj_, [=, this] ( CSQLAccess& sqlAccess, CSharedObjectDirtyList& SODirtyList, decltype( obj_ ) pWritableObject ) -> bool { modifyfunc_ } )
 
 	// ModifyObjectSch() is a helper macro designed to behave like a function. It takes as parameters the original
 	// object you want to modify, an identifier for the field you want to change, and the new value you want to

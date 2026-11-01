@@ -1461,7 +1461,7 @@ bool CEconLootListDefinition::BGenerateSingleRollRandomItems( const CEconGameAcc
 	//
 	// Wrap the whole thing in a smart pointer so we clean up whenever/however we
 	// leave.
-	std::unique_ptr<IUniformRandomStream> pRandomStream( [=]() -> IUniformRandomStream *
+	std::unique_ptr<IUniformRandomStream> pRandomStream( [=, this]() -> IUniformRandomStream *
 	{
 		if ( !BIsInternalNoDupesLootList() || !pGameAccount )
 			return new CDefaultUniformRandomStream;
