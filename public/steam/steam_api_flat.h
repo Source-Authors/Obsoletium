@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include <stdint.h>
+#include <cstdint>
 
 
 S_API HSteamPipe SteamAPI_ISteamClient_CreateSteamPipe(intptr_t instancePtr);

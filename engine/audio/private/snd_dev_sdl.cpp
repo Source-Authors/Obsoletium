@@ -14,7 +14,7 @@
 
 // prevent some conflicts in SDL headers...
 #undef M_PI
-#include <stdint.h>
+#include <cstdint>
 #ifndef _STDINT_H_
 #define _STDINT_H_ 1
 #endif
