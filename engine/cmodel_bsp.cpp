@@ -307,8 +307,15 @@ void CollisionBSPData_LoadTextures( CCollisionBSPData *pBSPData )
 
 	CMapLoadHelper lhStringData( LUMP_TEXDATA_STRING_DATA );
 	const char *pStringData = lhStringData.LumpBase<const char>();
+	const int stringDataCount = lhStringData.LumpSize() / sizeof( const char );	// Yes, it's div by 1. This is the correct pattern to copy for other db-like chunks, though.
+
+	// dimhotepus: Check string data bounds. CS:GO backport.
+	if ( stringDataCount > 0 && pStringData[ stringDataCount - 1 ] != '\0' )
+		Sys_Error( "Map '%s' textures string table doesn't terminate with zero byte.", lh.GetLoadName() );
 
 	CMapLoadHelper lhStringTable( LUMP_TEXDATA_STRING_TABLE );
+	const int stringTableCount = lhStringData.LumpSize() / sizeof( int );
+
 	if( lhStringTable.LumpSize() % sizeof( int ) )
 	{
 		Sys_Error( "Map '%s' textures string table size %d is not multiple of sizeof(int) %zu.",
@@ -343,10 +350,27 @@ void CollisionBSPData_LoadTextures( CCollisionBSPData *pBSPData )
  
 	for ( int i=0 ; i<count ; i++, in++ )
 	{
-		Assert( in->nameStringTableID >= 0 );
+		Assert( in->nameStringTableID >= 0 && in->nameStringTableID < stringTableCount );
 		Assert( pStringTable[in->nameStringTableID] >= 0 );
 
-		const char *pInName = &pStringData[pStringTable[in->nameStringTableID]];
+		// dimhotepus: Check name string table id. CS:GO backport.
+		if ( in->nameStringTableID < 0 || in->nameStringTableID >= stringTableCount )
+			Sys_Error( "Map '%s' has out of bounds string table id %d. Bounds are [0, %d).",
+				lh.GetLoadName(),
+				in->nameStringTableID,
+				stringTableCount );
+
+
+		const int stringByteStart = pStringTable[in->nameStringTableID];
+		Assert( stringByteStart >= 0 && stringByteStart < stringDataCount );
+		// dimhotepus: Check string data index. CS:GO backport.
+		if ( stringByteStart < 0 || stringByteStart >= stringDataCount )
+			Sys_Error( "Map '%s' has out of bounds string table start index %d. Bounds are [0, %d).",
+				lh.GetLoadName(),
+				stringByteStart,
+				stringDataCount );
+
+		const char *pInName = &pStringData[stringByteStart];
 		intp index = pInName - pStringData;
 		
 		csurface_t *out = &pBSPData->map_surfaces[i];
