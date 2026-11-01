@@ -4,7 +4,7 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <assert.h>
+#include <cassert>
 #include <time.h>
 #include "stdafx.h"
 #include <stdio.h>

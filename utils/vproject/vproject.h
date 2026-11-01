@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <richedit.h>
-#include <assert.h>
+#include <cassert>
 #include <time.h>
 #include "resource.h"
 #include <sys/stat.h>

@@ -12,7 +12,7 @@
 #endif
 
 
-#include <assert.h>
+#include <cassert>
 #include "nvector.h"
 
 

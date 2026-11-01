@@ -12,7 +12,7 @@
 #endif
 
 #ifndef assert
-	#include <assert.h>
+	#include <cassert>
 #endif
 
 #include "steamnetworkingtypes.h"

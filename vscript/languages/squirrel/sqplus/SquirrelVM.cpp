@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdarg.h>
-#include <assert.h>
+#include <cassert>
 
 #define _DEBUG_DUMP
 

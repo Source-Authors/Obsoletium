@@ -4,8 +4,8 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <assert.h>
 #include "stdafx.h"
+#include <cassert>
 #include <stdio.h>
 #include <windows.h>
 #include "classcheck_util.h"

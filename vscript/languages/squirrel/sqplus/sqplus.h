@@ -11,7 +11,7 @@
 #define _SQ_PLUS_H_
 
 #include <stdlib.h>
-#include <assert.h>
+#include <cassert>
 
 #ifdef __APPLE__
   #include <malloc/malloc.h>

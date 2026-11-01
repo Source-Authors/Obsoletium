@@ -19,7 +19,7 @@
 #include <list>
 #include <vector>
 
-#include <assert.h>
+#include <cassert>
 #ifndef NDEBUG
 #include <crtdbg.h>
 #endif
