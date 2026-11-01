@@ -4,7 +4,7 @@
 //
 //=====================================================================================//
 
-#include <locale.h>
+#include <clocale>
 #include "vgui_surfacelib/BitmapFont.h"
 #include "vgui_surfacelib/FontManager.h"
 #include "vgui/ISurface.h"

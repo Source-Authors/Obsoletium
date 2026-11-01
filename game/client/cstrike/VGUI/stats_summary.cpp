@@ -39,7 +39,7 @@ using namespace vgui;
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-#include <locale.h>
+#include <clocale>
 
 extern CAchievementMgr g_AchievementMgrCS;
 
