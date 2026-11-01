@@ -25,7 +25,7 @@
 #include "tier0/icommandline.h"
 #include "inputsystem/iinputsystem.h"
 #include "inputsystem/ButtonCode.h"
-#include "math.h"
+#include <cmath>
 #include "tier1/convar_serverbounded.h"
 #include "cam_thirdperson.h"
 

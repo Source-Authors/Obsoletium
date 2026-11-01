@@ -12,7 +12,7 @@
 #endif
 
 
-#include <math.h>
+#include <cmath>
 
 
 #define NVectorN	NVector<N>

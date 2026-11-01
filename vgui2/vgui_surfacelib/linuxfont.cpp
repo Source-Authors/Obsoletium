@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
+#include <cmath>
 #include <malloc.h>
 #include "tier0/dbg.h"
 #include "vgui/ISurface.h"

@@ -10,7 +10,7 @@
 #include <mmsystem.h>
 
 #include <stdio.h>
-#include <math.h>
+#include <cmath>
 #include "snd_audio_source.h"
 #include "AudioWaveOutput.h"
 #include "ifaceposersound.h"

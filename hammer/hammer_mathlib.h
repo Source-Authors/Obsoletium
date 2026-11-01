@@ -15,7 +15,7 @@ typedef unsigned char byte;
 
 #include "mathlib/mathlib.h"
 #include "mathlib/vmatrix.h"
-#include <math.h>
+#include <cmath>
 
 
 typedef vec_t vec5_t[5];

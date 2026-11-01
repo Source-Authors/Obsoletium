@@ -926,7 +926,7 @@ void SpewDeactivate()
 	}
 }
 
-// If we don't have a function from math.h, then it doesn't link certain floating-point
+// If we don't have a function from cmath, then it doesn't link certain floating-point
 // functions in and printfs with %f cause runtime errors in the C libraries.
 DBG_INTERFACE float CrackSmokingCompiler( float a )
 {

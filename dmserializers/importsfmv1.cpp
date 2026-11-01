@@ -10,7 +10,7 @@
 #include "datamodel/dmattribute.h"
 #include "datamodel/dmelement.h"
 
-#include <math.h>
+#include <cmath>
 
 //-----------------------------------------------------------------------------
 // Format converter

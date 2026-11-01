@@ -293,7 +293,7 @@ struct matrix3x4_t
 
 // dimhotepus: tier0/basetypes.h already has these.
 //#ifndef M_PI
-//constexpr inline double M_PI{3.14159265358979323846};	// matches value in gcc v2 math.h
+//constexpr inline double M_PI{3.14159265358979323846};	// matches value in gcc v2 cmath
 //#endif
 //
 //#ifndef M_PI_F

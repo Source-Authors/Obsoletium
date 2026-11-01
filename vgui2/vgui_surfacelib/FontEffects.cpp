@@ -6,7 +6,7 @@
 
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
-#include <math.h>
+#include <cmath>
 #include "FontEffects.h"
 
 // NOTE: This has to be the last file included!

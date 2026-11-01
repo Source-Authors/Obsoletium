@@ -4,7 +4,7 @@
 //
 //=============================================================================//
 
-#include <math.h>
+#include <cmath>
 
 #include "dme_controls/ChannelGraphPanel.h"
 #include "vgui/IScheme.h"

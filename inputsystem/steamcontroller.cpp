@@ -10,7 +10,7 @@
 #include "key_translation.h"
 #include "filesystem.h"
 #include "steam/isteamcontroller.h"
-#include "math.h"
+#include <cmath>
 
 #ifndef UINT64_MAX
 const uint64 UINT64_MAX = 0xffffffffffffffff;

@@ -6,7 +6,7 @@
 //=============================================================================//
 
 #include <stdafx.h>
-#include <math.h>
+#include <cmath>
 
 #define OCTAVE_COUNT				4
 #define OCTAVE_COUNT_MINUS_ONE		(OCTAVE_COUNT - 1)

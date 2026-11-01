@@ -269,10 +269,6 @@ SOURCE=.\math.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\math.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\math.inl
 # End Source File
 # Begin Source File

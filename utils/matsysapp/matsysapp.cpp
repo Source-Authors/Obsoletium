@@ -20,7 +20,7 @@
 #include "stdafx.h"
 
 #include <windows.h>
-#include <math.h>
+#include <cmath>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,7 +42,7 @@ static int g_nCapture = 0;
 
 
 #define OSR2_BUILD_NUMBER 1111
-#define M_PI		3.14159265358979323846	// matches value in gcc v2 math.h
+#define M_PI		3.14159265358979323846	// matches value in gcc v2 cmath
 
 
 SpewRetval_t MatSysAppSpewFunc( SpewType_t type, char const *pMsg )

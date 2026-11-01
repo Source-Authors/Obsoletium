@@ -15,7 +15,7 @@
 #endif
 
 // Misc C-runtime library headers
-#include <math.h>
+#include <cmath>
 #include <stdio.h>
 #include "minmax.h"
 

@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <math.h>
+#include <cmath>
 #include "tier0/dbg.h"
 #include "vgui/ISurface.h"
 #include "tier0/mem.h"

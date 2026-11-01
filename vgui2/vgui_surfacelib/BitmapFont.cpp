@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
+#include <cmath>
 #include <malloc.h>
 #include "vgui_surfacelib/BitmapFont.h"
 #include "vgui_surfacelib/FontManager.h"

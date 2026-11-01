@@ -10,7 +10,7 @@
 #include "linear_solver.h"
 #include <stdio.h>
 #include <string.h>
-#include <math.h>
+#include <cmath>
 
 // BUGBUG: Remove/tune this number somehow!!!
 #define DET_EPSILON		1e-6f

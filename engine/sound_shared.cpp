@@ -5,7 +5,7 @@
 //=============================================================================//
 
 
-#include <math.h>
+#include <cmath>
 
 #include "convar.h"
 #include "sound.h"

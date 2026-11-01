@@ -1,5 +1,5 @@
 #ifndef _INC_MATH
-#include HFX_NO_MERGE(math.h)
+#include HFX_NO_MERGE(cmath)
 #endif
 #define HFXVEC3(other,oper)return HFXVEC3T(x##oper##other.x,y##oper##other.y,z##oper##other.z)
 #define HFXVEC3F(other,oper) return HFXVEC3T(x##oper##other,y##oper##other,z##oper##other)
