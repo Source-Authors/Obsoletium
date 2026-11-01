@@ -8,12 +8,12 @@
 // =============================================================================
 // Interface to the LIPSinc TalkBack 1.1 library (TalkBack_*.lib).
 //
-// Copyright © 1998-2002 LIPSinc. All rights reserved.
+// Copyright ï¿½ 1998-2002 LIPSinc. All rights reserved.
 
 #if !defined(TalkBack_h)
 #define TalkBack_h
 
-#include <stddef.h> // size_t.
+#include <cstddef> // size_t.
 
 // Enforce a C API.
 #if defined(__cplusplus)

@@ -16,7 +16,7 @@
 #include "basetypes.h"
 #include "tier0/dbg.h"
 #include "tier1/strtools.h"
-#include <stddef.h>
+#include <cstddef>
 
 // Max number of properties in a datatable and its children.
 #define MAX_DATATABLES		1024	// must be a power of 2.

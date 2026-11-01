@@ -11,7 +11,7 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "quakedef.h"
-#include <stddef.h>
+#include <cstddef>
 #include "vengineserver_impl.h"
 #include "server.h"
 #include "pr_edict.h"

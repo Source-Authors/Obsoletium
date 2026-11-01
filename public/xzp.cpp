@@ -13,7 +13,7 @@
 #include <process.h>
 #include <io.h>
 #endif
-#include <stddef.h>
+#include <cstddef>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>

@@ -21,7 +21,7 @@
 #include "physdll.h"
 #include "physmesh.h"
 #include "mathlib/mathlib.h"
-#include <stddef.h>
+#include <cstddef>
 #include "utlvector.h"
 #include "commonmacros.h"
 #include "studiomodel.h"
