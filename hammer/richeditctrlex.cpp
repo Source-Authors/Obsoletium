@@ -34,14 +34,14 @@ void CRichEditCtrlEx::PreSubclassWindow()
 }
 
 
-CRTFBuilder &doWrite(CRTFBuilder &r, CRichEditCtrl &c) throw()
+CRTFBuilder &doWrite(CRTFBuilder &r, CRichEditCtrl &c) noexcept
 {
 	r.write(c);
 	return r;
 }
 
 
-CRTFBuilder &doSize(CRTFBuilder &r, int n) throw()
+CRTFBuilder &doSize(CRTFBuilder &r, int n) noexcept
 {
 	r.size(n);
 	return r;

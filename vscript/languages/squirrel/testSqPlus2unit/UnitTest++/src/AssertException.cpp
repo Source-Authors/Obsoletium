@@ -10,11 +10,11 @@ AssertException::AssertException(char const* description, char const* filename, 
     std::strcpy(m_filename, filename);
 }
 
-AssertException::~AssertException() throw()
+AssertException::~AssertException() noexcept
 {
 }
 
-char const* AssertException::what() const throw()
+char const* AssertException::what() const noexcept
 {
     return m_description;
 }

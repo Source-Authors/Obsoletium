@@ -611,11 +611,7 @@ void *__cdecl operator new[]
 	return g_pMemAlloc->Alloc(nSize, pFileName, nLine);
 }
 
-#ifdef OSX
-void __cdecl operator delete( void *pMem ) throw()
-#else
 void __cdecl operator delete( void *pMem ) noexcept
-#endif
 {
 	g_pMemAlloc->Free( pMem );
 }
@@ -634,11 +630,7 @@ void operator delete( void *pMem, std::size_t ) noexcept
 	g_pMemAlloc->Free( pMem );
 }
 
-#ifdef OSX
-void __cdecl operator delete[]( void *pMem ) throw()
-#else
 void __cdecl operator delete[]( void *pMem ) noexcept
-#endif
 {
 	g_pMemAlloc->Free( pMem );
 }
