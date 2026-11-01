@@ -6,7 +6,6 @@
 //
 //=============================================================================//
 #include <string.h>
-#include <assert.h>
 
 #include "ViewerSettings.h"
 #include "StudioModel.h"

@@ -72,7 +72,6 @@ SquirrelObject & SquirrelObject::operator =(SQInteger n)
 	return *this;
 }
 
-#include <assert.h>
 #include "../squirrel/sqstate.h"
 #include "../squirrel/sqvm.h"
 SquirrelObject & SquirrelObject::operator =(HSQUIRRELVM v)

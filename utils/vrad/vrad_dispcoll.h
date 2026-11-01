@@ -9,7 +9,6 @@
 #define VRAD_DISPCOLL_H
 #pragma once
 
-#include <assert.h>
 #include "DispColl_Common.h"
 
 //=============================================================================

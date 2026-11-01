@@ -18,7 +18,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
-#include <assert.h>
 
 // base vgui interfaces
 #include <VGUI_Controls.h>

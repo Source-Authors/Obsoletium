@@ -5,7 +5,6 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "stdafx.h"
-#include <assert.h>
 #include <io.h>
 #include <stdio.h>
 #include <malloc.h>

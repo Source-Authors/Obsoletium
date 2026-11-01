@@ -9,7 +9,6 @@
 //
 
 #include "stdafx.h"
-#include <assert.h>
 #include <stdlib.h>
 #include "tcpsocket.h"
 #include "tier0/fasttimer.h"
