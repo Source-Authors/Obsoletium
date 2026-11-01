@@ -44,17 +44,17 @@ int			g_bVCREnabled = 0;
 // These wrappers exist because for some reason thread-blocking functions nuke the
 // last function on the call stack, so it's very hard to debug without these wrappers.
 // ------------------------------------------------------------------------------------------ //
-inline unsigned long Wrap_WaitForSingleObject( HANDLE hObj, DWORD duration )
+static inline unsigned long Wrap_WaitForSingleObject( HANDLE hObj, DWORD duration )
 {
 	return WaitForSingleObject( hObj, duration );
 }
 
-inline unsigned long Wrap_WaitForMultipleObjects( uint32 nHandles, const void **pHandles, int bWaitAll, uint32 timeout )
+static inline unsigned long Wrap_WaitForMultipleObjects( uint32 nHandles, const void **pHandles, int bWaitAll, uint32 timeout )
 {
 	return WaitForMultipleObjects( nHandles, (const HANDLE *)pHandles, bWaitAll, timeout );
 }
 
-inline void Wrap_EnterCriticalSection( CRITICAL_SECTION *pSection )
+static inline void Wrap_EnterCriticalSection( CRITICAL_SECTION *pSection )
 {
 	EnterCriticalSection( pSection );
 }
