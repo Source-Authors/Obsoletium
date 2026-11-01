@@ -8,7 +8,7 @@
 #include <cctype>
 #include "tier1/utlbuffer.h"
 #include "tier1/utlbufferutil.h"
-#include <limits.h>
+#include <climits>
 #include "dmxserializationdictionary.h"
 
 

@@ -10,7 +10,7 @@
 
 #include "tier0/dbg.h"
 
-#include <limits.h>
+#include <climits>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

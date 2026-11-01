@@ -8,7 +8,7 @@
 #ifndef BASECOMBATCHARACTER_H
 #define BASECOMBATCHARACTER_H
 
-#include <limits.h>
+#include <climits>
 #include "weapon_proficiency.h"
 
 #ifdef _WIN32

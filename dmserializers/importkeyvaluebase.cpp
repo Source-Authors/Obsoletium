@@ -10,7 +10,7 @@
 #include "datamodel/dmelement.h"
 #include "tier1/KeyValues.h"
 #include "tier1/utlbuffer.h"
-#include <limits.h>
+#include <climits>
 
 
 //-----------------------------------------------------------------------------

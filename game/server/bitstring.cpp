@@ -16,7 +16,7 @@
 
 #include "cbase.h"
 
-#include <limits.h>
+#include <climits>
 
 #include "bitstring.h"
 #include "utlbuffer.h"

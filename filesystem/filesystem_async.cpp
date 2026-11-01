@@ -14,7 +14,7 @@
 //
 //=============================================================================
 
-#include <limits.h>
+#include <climits>
 #if defined( _WIN32 ) && !defined( _X360 )
 #include "winlite.h"
 #endif

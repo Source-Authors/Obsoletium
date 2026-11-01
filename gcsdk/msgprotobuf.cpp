@@ -6,7 +6,7 @@
 
 
 #include "stdafx.h"
-#include <limits.h>
+#include <climits>
 #include "msgprotobuf.h"
 
 #include "tier0/memdbgoff.h"

@@ -6,7 +6,7 @@
 //
 //=============================================================================//
 
-#include <limits.h>
+#include <climits>
 #include "studio.h"
 #include "tier1/utlmap.h"
 #include "tier1/utldict.h"

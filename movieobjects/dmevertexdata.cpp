@@ -6,7 +6,7 @@
 
 #include "movieobjects/dmevertexdata.h"
 #include "movieobjects_interfaces.h"
-#include <limits.h>
+#include <climits>
 #include "tier3/tier3.h"
 #include "tier0/dbg.h"
 #include "datamodel/dmelementfactoryhelper.h"

@@ -11,7 +11,7 @@
 #include "ai_basehumanoid.h"
 #include "ai_speech.h"
 #include "AI_Interest_Target.h"
-#include <limits.h>
+#include <climits>
 
 
 #if defined( _WIN32 )

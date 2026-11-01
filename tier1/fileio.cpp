@@ -35,7 +35,7 @@
 #include <utime.h>
 #include <dirent.h>
 #include <unistd.h> // for unlink
-#include <limits.h> // defines PATH_MAX
+#include <climits> // defines PATH_MAX
 #include <alloca.h> // 'cause we like smashing the stack
 #if defined( _PS3 )
 #include <fcntl.h>

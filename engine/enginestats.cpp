@@ -9,7 +9,7 @@
 #include "enginestats.h"
 #include "basetypes.h"
 #include "clientstats.h"
-#include "limits.h"
+#include "climits"
 #include "sysexternal.h"
 #include "gl_matsysiface.h"
 #include "filesystem_engine.h"

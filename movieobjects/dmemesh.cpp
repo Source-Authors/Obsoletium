@@ -5,7 +5,7 @@
 //=============================================================================
 
 // Standard includes
-#include <limits.h>
+#include <climits>
 
 // Valve includes
 #include "movieobjects/dmemesh.h"

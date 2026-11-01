@@ -13,7 +13,7 @@
 #include "tier1/KeyValues.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/utlvector.h"
-#include <limits.h>
+#include <climits>
 #include "DmElementFramework.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

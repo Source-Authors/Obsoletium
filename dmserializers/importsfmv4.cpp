@@ -11,7 +11,7 @@
 #include "tier1/KeyValues.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/utlmap.h"
-#include <limits.h>
+#include <climits>
 
 
 //-----------------------------------------------------------------------------

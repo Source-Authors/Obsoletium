@@ -20,7 +20,7 @@
 #endif
 #include <memory.h>
 #include <memory>
-#include <limits.h>  // For INT_MAX on GCC
+#include <climits>  // For INT_MAX on GCC
 
 #include "squirrel.h"   // Include to get SQUNICODE setting from here
 #ifndef _SC

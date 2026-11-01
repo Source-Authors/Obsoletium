@@ -13,7 +13,7 @@
 #endif
 
 #include "interface.h"
-#include <limits.h>
+#include <climits>
 #include "tier0/dbg.h"
 
 #define INTERFACEVERSION_CLIENTSTATS "ClientStats004"

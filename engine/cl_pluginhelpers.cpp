@@ -5,7 +5,7 @@
 //===========================================================================//
 
 #include "client_pch.h"
-#include "limits.h"
+#include "climits"
 #include "cl_pluginhelpers.h"
 
 #include <inetchannel.h>
