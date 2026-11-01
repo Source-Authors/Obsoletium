@@ -14,7 +14,7 @@
 #include "tier0/platform.h"
 #include "bitbuf.h"
 #include <conio.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 
 const char *FindArg( int argc, char **argv, const char *pName, const char *pDefault = "" )

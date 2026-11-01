@@ -4,7 +4,7 @@
 //
 //===========================================================================//
 
-#include <stdlib.h>
+#include <cstdlib>
 #include "tier0/platform.h"
 #include "studiorendercontext.h"
 #include "optimize.h"

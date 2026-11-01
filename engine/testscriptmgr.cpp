@@ -15,7 +15,7 @@
 #include "cmd.h"
 #include "convar.h"
 #include "vstdlib/random.h"
-#include <stdlib.h>
+#include <cstdlib>
 #if defined( _X360 )
 #include "xbox/xbox_win32stubs.h"
 #endif

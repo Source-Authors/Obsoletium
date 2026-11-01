@@ -21,7 +21,7 @@
 
 #include <windows.h>
 #include <cstdio>
-#include <stdlib.h>
+#include <cstdlib>
 #include <conio.h>
 
 // TODO: reference additional headers your program requires here

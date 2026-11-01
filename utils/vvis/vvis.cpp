@@ -9,7 +9,7 @@
 
 #include "vis.h"
 #include "threads.h"
-#include "stdlib.h"
+#include <cstdlib>
 #include "pacifier.h"
 #include "vmpi.h"
 #include "mpivis.h"

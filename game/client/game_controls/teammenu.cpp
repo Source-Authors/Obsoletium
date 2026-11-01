@@ -25,7 +25,7 @@
 #include "IGameUIFuncs.h" // for key bindings
 #include <igameresources.h>
 #include <game/client/iviewport.h>
-#include <stdlib.h> // MAX_PATH define
+#include <cstdlib> // MAX_PATH define
 #include <cstdio>
 #include "byteswap.h"
 

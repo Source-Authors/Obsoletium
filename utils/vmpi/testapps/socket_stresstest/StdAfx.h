@@ -23,7 +23,7 @@
 #include <cstdio>
 #include "tcpsocket.h"
 #include <conio.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 // TODO: reference additional headers your program requires here
 

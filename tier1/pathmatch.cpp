@@ -35,7 +35,7 @@
 #ifdef LINUX
 
 #include <cstdio>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string.h>
 #include <cstdint>
 #include <strings.h>

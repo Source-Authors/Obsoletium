@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <cstdio>
 #include <string.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <cerrno>
 #include <conio.h>
 #include <cctype>

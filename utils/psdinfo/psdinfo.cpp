@@ -7,7 +7,7 @@
 //=============================================================================//
 
 #include <cstdio>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string.h>
 
 #include "tier0/platform.h"

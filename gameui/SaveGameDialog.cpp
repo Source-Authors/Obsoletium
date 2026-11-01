@@ -21,7 +21,7 @@
 #include "filesystem.h"
 
 #include <cstdio>
-#include <stdlib.h>
+#include <cstdlib>
 
 using namespace vgui;
 

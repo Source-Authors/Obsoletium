@@ -6,7 +6,7 @@
 //
 //=============================================================================//
 // mem.c
-#include <stdlib.h>
+#include <cstdlib>
 #include <memory.h>
 #include <string.h>
 #include "mem.h"

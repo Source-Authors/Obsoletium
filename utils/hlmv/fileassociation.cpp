@@ -24,7 +24,7 @@
 //
 #include "FileAssociation.h"
 #include <cstdio>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string.h>
 #include <mxtk/mx.h>
 

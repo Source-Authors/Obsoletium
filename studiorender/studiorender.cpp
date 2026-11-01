@@ -4,7 +4,7 @@
 //
 //===========================================================================//
 
-#include <stdlib.h>
+#include <cstdlib>
 #include "studiorender.h"
 #include "studiorendercontext.h"
 #include "materialsystem/imaterialsystem.h"

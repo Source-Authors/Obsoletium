@@ -16,7 +16,7 @@
 #elif defined(OSX)
 #include <malloc/malloc.h>
 #include <mach/mach.h>
-#include <stdlib.h>
+#include <cstdlib>
 #endif
 
 #include <atomic>

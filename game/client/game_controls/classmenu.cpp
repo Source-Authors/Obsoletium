@@ -32,7 +32,7 @@ extern IGameUIFuncs *gameuifuncs; // for key binding details
 #endif
 #include <game/client/iviewport.h>
 
-#include <stdlib.h> // MAX_PATH define
+#include <cstdlib> // MAX_PATH define
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

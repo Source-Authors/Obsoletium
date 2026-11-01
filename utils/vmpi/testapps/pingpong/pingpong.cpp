@@ -9,7 +9,7 @@
 //
 
 #include "stdafx.h"
-#include <stdlib.h>
+#include <cstdlib>
 #include "tcpsocket.h"
 #include "tier0/fasttimer.h"
 #include "vmpi.h"

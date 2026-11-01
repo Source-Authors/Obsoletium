@@ -11,7 +11,7 @@
 #include "stdafx.h"
 #include "chunkfile.h"
 #include "utllinkedlist.h"
-#include <stdlib.h>
+#include <cstdlib>
 #include "tier1/strtools.h"
 #include "tier0/icommandline.h"
 #include "tier1/utlrbtree.h"

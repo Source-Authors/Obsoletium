@@ -11,7 +11,7 @@
 #include "MatSysWin.h"
 #include "ControlPanel.h"
 #include <cstdio>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string.h>
 #include <mxtk/mx.h>
 #include <mxtk/mxBmp.h>

@@ -44,7 +44,7 @@
 // #include "gl.h"
 // #include <GL/glu.h>
 #include <cstdio>
-#include <stdlib.h>
+#include <cstdlib>
 #include <time.h>
 #include <string.h>
 #include "MatSysWin.h"

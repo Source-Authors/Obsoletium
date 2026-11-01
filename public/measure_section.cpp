@@ -11,7 +11,7 @@
 // $NoKeywords: $
 //=============================================================================//
 #include <string.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include "basetypes.h"
 #include "measure_section.h"
 #include "convar.h"

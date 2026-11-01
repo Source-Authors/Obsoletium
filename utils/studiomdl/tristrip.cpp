@@ -9,7 +9,7 @@
 // tristrip - convert triangle list into tristrips and fans
 
 #include <cstdio>
-#include <stdlib.h>
+#include <cstdlib>
 #include <sys/stat.h>
 
 #include "cmdlib.h"

@@ -8,7 +8,7 @@
 //=============================================================================//
 
 //#include <stdafx.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <malloc.h>
 #include "builddisp.h"
 #include "collisionutils.h"

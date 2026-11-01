@@ -5,7 +5,7 @@
 //===========================================================================//
 
 #include "shadersystem.h"
-#include <stdlib.h>
+#include <cstdlib>
 #include "materialsystem_global.h"
 #include "filesystem.h"
 #include "tier1/utldict.h"

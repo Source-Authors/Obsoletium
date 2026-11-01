@@ -6,7 +6,7 @@
 //===========================================================================//
 
 #include "quakedef.h" // for MAX_OSPATH
-#include <stdlib.h>
+#include <cstdlib>
 #include <malloc.h>
 #include "filesystem.h"
 #include "bitmap/tgawriter.h"

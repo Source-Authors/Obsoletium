@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <malloc.h>
 #include <string.h>
 #include "materialsystem/imaterialproxy.h"

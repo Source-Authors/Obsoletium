@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include <cstdio>
 #include <string.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <windows.h>
 #include "tier2/riff.h"
 #include "snd_wave_source.h"

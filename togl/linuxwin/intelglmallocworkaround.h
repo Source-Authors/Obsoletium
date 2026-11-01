@@ -39,7 +39,7 @@
 #ifndef INTELGLMALLOCWORKAROUND_H
 #define	INTELGLMALLOCWORKAROUND_H
 
-#include <stdlib.h>
+#include <cstdlib>
 
 class IntelGLMallocWorkaround
 {

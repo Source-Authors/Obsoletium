@@ -17,7 +17,7 @@
 #include "tier0/icommandline.h"
 #include <cctype>
 #include <cstdio>
-#include <stdlib.h>
+#include <cstdlib>
 #include "tier0/dbg.h"
 #include "host.h"
 #include "host_state.h"

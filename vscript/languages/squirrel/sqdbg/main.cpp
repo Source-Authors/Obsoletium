@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <winsock.h>
 #include <squirrel.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <cstdio>
 #include <sqstdblob.h>
 #include <sqstdio.h>

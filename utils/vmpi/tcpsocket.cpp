@@ -9,7 +9,7 @@
 //#define PARANOID
 
 #if defined( PARANOID )
-#include <stdlib.h>
+#include <cstdlib>
 #include <crtdbg.h>
 #endif
 

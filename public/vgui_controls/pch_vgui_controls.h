@@ -14,7 +14,7 @@
 
 // general includes
 #include <cctype>
-#include <stdlib.h>
+#include <cstdlib>
 #include "tier0/dbg.h"
 #include "tier0/valve_off.h"
 #include "tier1/KeyValues.h"

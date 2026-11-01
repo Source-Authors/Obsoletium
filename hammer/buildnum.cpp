@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //
 //===========================================================================//
-#include <stdlib.h>
+#include <cstdlib>
 #include <string.h>
 #include "tier1/strtools.h"
 

@@ -22,7 +22,7 @@
 #include "vgui_controls/QueryBox.h"
 
 #include <cstdio>
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "BasePanel.h"
 

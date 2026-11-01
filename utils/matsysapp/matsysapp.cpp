@@ -23,7 +23,7 @@
 #include <cmath>
 #include <cstdarg>
 #include <cstdio>
-#include <stdlib.h>
+#include <cstdlib>
 #include <mmsystem.h>
 #include "matsysapp.h"
 #include "cmdlib.h"

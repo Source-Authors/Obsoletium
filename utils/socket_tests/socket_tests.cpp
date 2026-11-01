@@ -9,7 +9,7 @@
 //
 
 #include "stdafx.h"
-#include <stdlib.h>
+#include <cstdlib>
 #include "iphelpers.h"
 #include "tcpsocket.h"
 #include "utlvector.h"

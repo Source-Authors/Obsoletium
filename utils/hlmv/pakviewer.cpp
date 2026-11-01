@@ -23,7 +23,7 @@
 // web:            https://chumba.ch/chumbalum-soft/hlmv/index.html
 //
 #include <cstdio>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string.h>
 #include <mxtk/mx.h>
 #include "pakviewer.h"

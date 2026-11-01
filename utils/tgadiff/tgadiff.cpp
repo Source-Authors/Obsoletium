@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //
 //===========================================================================//
-#include <stdlib.h>
+#include <cstdlib>
 #include <cstdio>
 #include <direct.h>
 #include "bitmap/tgaloader.h"

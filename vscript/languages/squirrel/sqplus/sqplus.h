@@ -10,7 +10,7 @@
 #ifndef _SQ_PLUS_H_
 #define _SQ_PLUS_H_
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <cassert>
 
 #ifdef __APPLE__

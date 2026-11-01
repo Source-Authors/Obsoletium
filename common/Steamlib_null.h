@@ -11,7 +11,7 @@
 #define STEAMLIB_NULL_H
 
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <cstdio>
 #include <string.h> // for strlen()
 #include <cstdarg>

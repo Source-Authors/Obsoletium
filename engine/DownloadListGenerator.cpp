@@ -18,7 +18,7 @@
 #include "checksum_engine.h"
 #include <cctype>
 #include <cstdio>
-#include <stdlib.h>
+#include <cstdlib>
 #include "tier0/dbg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

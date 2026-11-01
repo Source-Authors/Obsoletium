@@ -11,7 +11,7 @@
 #include <conio.h>
 
 #include "threads.h"
-#include "stdlib.h"
+#include <cstdlib>
 #include "pacifier.h"
 #include "mpi_stats.h"
 #include "vmpi.h"

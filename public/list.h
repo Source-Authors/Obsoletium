@@ -12,7 +12,7 @@
 // GetPositionAtIndex needs to keep a cache of the previous call so 
 // that it doesn't do a linear search every time.
 
-#include <stdlib.h>
+#include <cstdlib>
 
 // FIXME: change the name of this to something more specific.
 typedef struct

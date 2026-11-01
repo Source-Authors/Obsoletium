@@ -12,7 +12,7 @@
 
 #include "quakedef.h"
 #include <string.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include "mathlib/mathlib.h"
 #include "common.h"
 #include "sysexternal.h"

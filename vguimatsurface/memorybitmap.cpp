@@ -8,7 +8,7 @@
 #include "vgui/ISurface.h"
 #include "memorybitmap.h"
 #include <string.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include "MatSystemSurface.h"
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/itexture.h"
