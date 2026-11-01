@@ -5,7 +5,7 @@
 //=============================================================================
 
 #include "dmxloader/dmxelement.h"
-#include <ctype.h>
+#include <cctype>
 #include "tier1/utlbuffer.h"
 #include "tier1/utlbufferutil.h"
 #include <limits.h>

@@ -22,7 +22,7 @@
 #if defined( REPLAY_ENABLED )
 #include "replay/replaycamera.h"
 #endif
-#include <ctype.h> // isalnum()
+#include <cctype> // isalnum()
 #include <voice_status.h>
 #include "cam_thirdperson.h"
 

@@ -43,7 +43,7 @@
 #include <getopt.h>
 #include <errno.h>
 #include <signal.h>
-#include <ctype.h>
+#include <cctype>
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>

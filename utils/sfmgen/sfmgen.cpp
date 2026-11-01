@@ -48,7 +48,7 @@
 #include "tier2/riff.h"
 #include "tier2/soundutils.h"
 #include "soundchars.h"
-#include <ctype.h>
+#include <cctype>
 
 #ifndef NDEBUG
 #include <windows.h>

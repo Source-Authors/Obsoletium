@@ -27,7 +27,7 @@
 	#include "items.h"
 	#include "entitylist.h"
 	#include "in_buttons.h" 
-	#include <ctype.h>
+	#include <cctype>
 	#include "voice_gamemgr.h"
 	#include "iscorer.h"
 	#include "hltvdirector.h"

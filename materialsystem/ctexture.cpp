@@ -49,7 +49,7 @@
 #include "tier2/tier2.h"
 // dimhotepus: Exclude ip4.
 //#include "p4lib/ip4.h"
-#include "ctype.h"
+#include <cctype>
 #include "ifilelist.h"
 #include "tier0/icommandline.h"
 #include "tier0/vprof.h"

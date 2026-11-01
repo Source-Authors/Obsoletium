@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
+#include <cctype>
 #include <malloc.h>
 #ifdef _WIN32
 #include <process.h>

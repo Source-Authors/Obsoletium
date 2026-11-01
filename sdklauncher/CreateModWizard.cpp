@@ -14,7 +14,7 @@
 #include "vgui_controls/DirectorySelectDialog.h"
 #include "vgui/IVGui.h"
 #include "vgui/IInput.h"
-#include <ctype.h>
+#include <cctype>
 #include <io.h>
 #include <direct.h>
 #include "ModWizard_Intro.h"

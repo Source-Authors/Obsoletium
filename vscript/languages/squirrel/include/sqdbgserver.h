@@ -5,7 +5,7 @@ constexpr inline int MAX_BP_PATH{512};
 constexpr inline int MAX_MSG_LEN{2049};
 
 #if defined(POSIX)
-#include <ctype.h>
+#include <cctype>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

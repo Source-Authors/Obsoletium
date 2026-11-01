@@ -18,7 +18,7 @@
 #include "stringregistry.h"
 #include "gamerules.h"
 #include "game.h"
-#include <ctype.h>
+#include <cctype>
 #include "entitylist.h"
 #include "vstdlib/random.h"
 #include "engine/IEngineSound.h"

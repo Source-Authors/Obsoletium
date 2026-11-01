@@ -10,7 +10,7 @@
 #include "vgui_controls/Button.h"
 #include "vgui_controls/WizardPanel.h"
 #include "sdklauncher_main.h"
-#include <ctype.h>
+#include <cctype>
 #include "CreateModWizard.h"
 #include "ModWizard_CopyFiles.h"
 

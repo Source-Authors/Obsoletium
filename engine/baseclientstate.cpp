@@ -10,7 +10,7 @@
 #include <inetchannel.h>
 #include <netmessages.h>
 #include <proto_oob.h>
-#include <ctype.h>
+#include <cctype>
 #include "cl_main.h"
 #include "net.h"
 #include "dt_recv_eng.h"

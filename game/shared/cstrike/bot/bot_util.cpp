@@ -17,7 +17,7 @@
 #include "bot_profile.h"
 
 #include "cs_bot.h"
-#include <ctype.h>
+#include <cctype>
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 

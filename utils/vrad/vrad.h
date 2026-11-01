@@ -37,7 +37,7 @@
 #include <io.h>
 #include <fcntl.h>
 #include <direct.h>
-#include <ctype.h>
+#include <cctype>
 
 
 // Can remove these options if they don't generate problems.

@@ -15,7 +15,7 @@
 #include "vengineserver_impl.h"
 #include "tier1/strtools.h"
 #include "tier0/icommandline.h"
-#include <ctype.h>
+#include <cctype>
 #include <stdio.h>
 #include <stdlib.h>
 #include "tier0/dbg.h"

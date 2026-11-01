@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <conio.h>
-#include <ctype.h>
+#include <cctype>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <io.h>

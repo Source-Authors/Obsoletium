@@ -12,7 +12,7 @@
 #include "datamodel/dmattribute.h"
 #include "mathlib/noise.h"
 #include "mathlib/vector.h"
-#include <ctype.h>
+#include <cctype>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

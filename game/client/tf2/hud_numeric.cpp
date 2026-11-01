@@ -13,7 +13,7 @@
 #include "vgui/ISurface.h"
 #include "vgui/IScheme.h"
 #include "vgui_controls/AnimationController.h"
-#include "ctype.h"
+#include <cctype>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

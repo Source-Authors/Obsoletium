@@ -15,7 +15,7 @@
 #include "utldict.h"
 #include "ai_speech.h"
 #include "tier0/icommandline.h"
-#include <ctype.h>
+#include <cctype>
 #include "sceneentity.h"
 #include "isaverestore.h"
 #include "utlbuffer.h"

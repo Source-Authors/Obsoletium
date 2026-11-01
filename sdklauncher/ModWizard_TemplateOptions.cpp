@@ -11,7 +11,7 @@
 #include "vgui_controls/WizardPanel.h"
 #include "vgui_controls/CheckButton.h"
 #include "sdklauncher_main.h"
-#include <ctype.h>
+#include <cctype>
 #include "CreateModWizard.h"
 #include "ModWizard_GetModInfo.h"
 #include "ModWizard_CopyFiles.h"

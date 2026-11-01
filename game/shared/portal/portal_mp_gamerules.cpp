@@ -25,7 +25,7 @@
 #include "entitylist.h"
 #include "mapentities.h"
 #include "in_buttons.h"
-#include <ctype.h>
+#include <cctype>
 #include "voice_gamemgr.h"
 #include "iscorer.h"
 #include "portal_player.h"

@@ -56,7 +56,7 @@
 #include "movetype_push.h"
 #include "tier0/icommandline.h"
 #include "vphysics/friction.h"
-#include <ctype.h>
+#include <cctype>
 #include "datacache/imdlcache.h"
 #include "ModelSoundsCache.h"
 #include "env_debughistory.h"

@@ -18,7 +18,7 @@
 #include "netmessages.h"
 #include "sv_main.h"
 #include "demo.h"
-#include <ctype.h>
+#include <cctype>
 #ifdef POSIX
 #include <wctype.h>
 #endif

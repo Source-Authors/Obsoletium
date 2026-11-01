@@ -15,7 +15,7 @@ char* strptime(const char *s, const char *format, struct tm *tm);
 #endif
 
 #include <time.h>
-#include <ctype.h>
+#include <cctype>
 #include <string.h>
 
 

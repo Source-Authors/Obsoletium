@@ -36,7 +36,7 @@
 #include "choreoactor.h"
 #include "choreochannel.h"
 #include "choreoevent.h"
-#include <ctype.h>
+#include <cctype>
 
 #ifndef NDEBUG
 #include <windows.h>

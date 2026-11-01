@@ -16,7 +16,7 @@
 #include "tier1/strtools.h"
 #include "tier0/icommandline.h"
 #include "checksum_engine.h"
-#include <ctype.h>
+#include <cctype>
 #include <stdio.h>
 #include <stdlib.h>
 #include "tier0/dbg.h"

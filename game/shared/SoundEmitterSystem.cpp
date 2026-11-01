@@ -5,7 +5,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include <ctype.h>
+#include <cctype>
 #include <KeyValues.h>
 #include "engine/IEngineSound.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"

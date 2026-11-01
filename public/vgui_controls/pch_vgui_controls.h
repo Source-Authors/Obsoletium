@@ -13,7 +13,7 @@
 #endif
 
 // general includes
-#include <ctype.h>
+#include <cctype>
 #include <stdlib.h>
 #include "tier0/dbg.h"
 #include "tier0/valve_off.h"

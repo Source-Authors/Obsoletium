@@ -5,7 +5,7 @@
 //=====================================================================================//
 
 #include "cbase.h"
-#include <ctype.h>
+#include <cctype>
 #include "tf_autorp.h"
 #include "filesystem.h"
 

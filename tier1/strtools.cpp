@@ -53,7 +53,7 @@
 
 #ifdef POSIX
 #include <iconv.h>
-#include <ctype.h>
+#include <cctype>
 #include <unistd.h>
 #define _getcwd getcwd
 #elif _WIN32

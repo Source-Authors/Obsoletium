@@ -9,7 +9,7 @@
 
 #include "cbase.h"
 
-#include <ctype.h>
+#include <cctype>
 #include "shared_util.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

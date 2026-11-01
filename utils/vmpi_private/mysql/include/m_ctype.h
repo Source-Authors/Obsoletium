@@ -62,7 +62,7 @@ extern CHARSET_INFO  compiled_charsets[];
 #define MY_CHARSET_CURRENT (default_charset_info->number)
 
 #ifdef __WIN__
-#include <ctype.h>
+#include <cctype>
 #endif
 /* Don't include std ctype.h when this is included */
 #define _CTYPE_H

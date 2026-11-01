@@ -6,7 +6,7 @@
 // $NoKeywords: $
 //=============================================================================
 
-#include <ctype.h> // isspace() define
+#include <cctype> // isspace() define
 #include <string.h>
 
 #include "CMDList.h"

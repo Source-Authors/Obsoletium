@@ -5,7 +5,7 @@
 //==========================================================================
 
 #if defined( POSIX )
-#include <ctype.h>
+#include <cctype>
 #include <wctype.h>
 #endif
 
