@@ -55,7 +55,7 @@ typedef int socklen_t;
 #include <sys/param.h>
 #include <sys/ioctl.h>
 #include <sys/uio.h>
-#include <errno.h>
+#include <cerrno>
 #include <string.h>
 #include <stdlib.h>
 

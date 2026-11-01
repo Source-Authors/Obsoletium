@@ -13,7 +13,7 @@
 
 #include "quakedef.h"
 #include "igame.h"
-#include "errno.h"
+#include "cerrno"
 #include "host.h"
 #include "profiling.h"
 #include "server.h"

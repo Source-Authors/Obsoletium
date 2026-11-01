@@ -11,7 +11,7 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-#include <errno.h>
+#include <cerrno>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #define closesocket close

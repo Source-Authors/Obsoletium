@@ -25,7 +25,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-#include <errno.h>
+#include <cerrno>
 #include <sys/ioctl.h>
 #define closesocket close
 #define WSAGetLastError() errno

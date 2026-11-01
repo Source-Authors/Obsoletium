@@ -20,7 +20,7 @@
 #ifndef _my_pthread_h
 #define _my_pthread_h
 
-#include <errno.h>
+#include <cerrno>
 #ifndef ETIME
 #define ETIME ETIMEDOUT				/* For FreeBSD */
 #endif
