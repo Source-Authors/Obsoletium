@@ -18,13 +18,8 @@ namespace std{
 	class _Ax > class vector;
 };
 
-#if _MSC_VER < 1400
-#define VECTOR_TYPE(type) std::vector<type>
-#endif
-
-#if _MSC_VER >= 1400
-#define VECTOR_TYPE(type) ::std::vector<type, ::std::allocator<type> >
-#endif
+// dimhotepus: Drop unneeded allocator param as it is default.
+#define VECTOR_TYPE(type) ::std::vector<type>
 
 #pragma warning( disable : 4251 )
 class EffectTag;
