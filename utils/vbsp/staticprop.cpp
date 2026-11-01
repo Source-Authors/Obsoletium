@@ -16,7 +16,7 @@
 #include "byteswap.h"
 #include "UtlBuffer.h"
 #include "CollisionUtils.h"
-#include <float.h>
+#include <cfloat>
 #include "CModel.h"
 #include "PhysDll.h"
 #include "utlsymbol.h"

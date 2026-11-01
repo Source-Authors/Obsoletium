@@ -7,7 +7,7 @@
 
 #include "cbase.h"
 
-#include <float.h> // for FLT_MAX
+#include <cfloat> // for FLT_MAX
 
 #include "ai_planesolver.h"
 #include "ai_moveprobe.h"

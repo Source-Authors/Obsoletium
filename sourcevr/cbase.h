@@ -2,7 +2,7 @@
 
 #include "platform.h"
 
-#include <float.h>
+#include <cfloat>
 #include <vector>
 #include <cmath>
 

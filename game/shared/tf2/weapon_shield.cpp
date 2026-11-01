@@ -9,7 +9,7 @@
 #include "cbase.h"
 #include "weapon_shield.h"
 #include "in_buttons.h"
-#include <float.h>
+#include <cfloat>
 #include "mathlib/mathlib.h"
 #include "engine/IEngineSound.h"
 

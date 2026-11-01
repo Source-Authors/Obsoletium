@@ -19,7 +19,7 @@
 #endif
 
 #include "mathlib/vector.h"
-#include <float.h>
+#include <cfloat>
 #include "tier0/dbg.h"
 #include "materialsystem/imaterial.h"
 

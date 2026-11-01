@@ -4121,7 +4121,7 @@ float XM_CALLCONV RandomVectorInUnitCircle( Vector2D *pVector )
 	return flRadius;
 }
 #ifdef FP_EXCEPTIONS_ENABLED
-#include <float.h> // For _clearfp and _controlfp_s
+#include <cfloat> // For _clearfp and _controlfp_s
 #endif
 
 // FPExceptionDisable and FPExceptionEnabler taken from my blog post

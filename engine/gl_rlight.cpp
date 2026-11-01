@@ -11,7 +11,7 @@
 #include "client.h"
 #include "bitmap/imageformat.h"
 #include "bitmap/tgawriter.h"
-#include <float.h>
+#include <cfloat>
 #include "collisionutils.h"
 #include "cl_main.h"
 #include "tier0/vprof.h"

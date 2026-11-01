@@ -8,7 +8,7 @@
 
 #include "cbase.h"
 
-#include <float.h> // for FLT_MAX
+#include <cfloat> // for FLT_MAX
 
 #include "animation.h"		// for NOMOTION
 #include "collisionutils.h"

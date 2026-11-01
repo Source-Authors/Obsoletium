@@ -12,7 +12,7 @@
 #include "cdll_int.h"
 #include "istudiorender.h"
 #include "client_class.h"
-#include "float.h"
+#include "cfloat"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "materialsystem/ivballoctracker.h"
 #include "modelloader.h"

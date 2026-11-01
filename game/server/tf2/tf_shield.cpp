@@ -10,7 +10,7 @@
 #include "tf_shield.h"
 #include "tf_shareddefs.h"
 #include "collisionutils.h"
-#include <float.h>
+#include <cfloat>
 #include "sendproxy.h"
 #include "mathlib/mathlib.h"
 

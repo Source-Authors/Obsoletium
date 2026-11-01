@@ -28,7 +28,7 @@
 
 
 #ifdef FP_EXCEPTIONS_ENABLED
-#include <float.h> // For _clearfp and _controlfp_s
+#include <cfloat> // For _clearfp and _controlfp_s
 #endif
 
 // FPExceptionDisabler and FPExceptionEnabler taken from my blog post

@@ -3,7 +3,7 @@
 #ifndef SE_COMMON_WINDOWS_SCOPED_FLOATING_EXCEPTION_POINT_MODE_H_
 #define SE_COMMON_WINDOWS_SCOPED_FLOATING_EXCEPTION_POINT_MODE_H_
 
-#include <float.h>
+#include <cfloat>
 
 #include <cfenv>
 #include <cerrno>  // errno codes

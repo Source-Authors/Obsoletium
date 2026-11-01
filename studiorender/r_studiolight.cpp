@@ -14,7 +14,7 @@
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "mathlib/vector.h"
 #include "mathlib/mathlib.h"
-#include <float.h>
+#include <cfloat>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

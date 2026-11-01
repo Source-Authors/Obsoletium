@@ -18,7 +18,7 @@
 #include "mathlib/vmatrix.h"
 #include "mathlib/mathlib.h"
 
-#include <float.h>
+#include <cfloat>
 
 using namespace vgui;
 

@@ -17,7 +17,7 @@
 #include "gl_model_private.h"
 #include "mathlib/bumpvects.h"
 #include "gl_matsysiface.h"
-#include <float.h>
+#include <cfloat>
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "materialsystem/imesh.h"
 #include "tier0/dbg.h"

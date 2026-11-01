@@ -12,7 +12,7 @@
 #include "render_pch.h"
 #include "view.h"
 #include "zone.h"
-#include <float.h>
+#include <cfloat>
 #include "sys_dll.h"
 #include "materialsystem/imesh.h"
 #include "gl_water.h"
