@@ -425,7 +425,7 @@ void GLMgr::NewGLMgr( void )
 
 GLMgr *GLMgr::aGLMgr( void )
 {
-	assert( g_glmgr != NULL);
+	Assert( g_glmgr != NULL);
 	return g_glmgr;
 }
 

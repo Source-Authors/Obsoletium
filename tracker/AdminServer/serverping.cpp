@@ -39,7 +39,7 @@ CServerPing::~CServerPing() {
 void CServerPing::Query()
 {
 	CMsgBuffer *buffer = m_pQuery->GetSendBuffer();
-	assert( buffer );
+	Assert( buffer );
 	
 	if ( !buffer ) 
 	{

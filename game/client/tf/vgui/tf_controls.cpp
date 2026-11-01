@@ -544,7 +544,7 @@ void CTFAdvancedOptionsDialog::GatherCurrentValues()
 				}
 				else  // Couln't find index
 				{
-					//assert(!("Couldn't find string in list, using default value"));
+					//Assert(!("Couldn't find string in list, using default value"));
 					V_sprintf_safe( szValue, "%s", pObj->defValue );
 				}
 				break;

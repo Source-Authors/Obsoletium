@@ -56,7 +56,7 @@ CPlayerList::~CPlayerList() {
 void CPlayerList::SendQuery()
 {
 	CMsgBuffer *buffer = m_pQuery->GetSendBuffer();
-	assert( buffer );
+	Assert( buffer );
 	
 	if ( !buffer ) 
 	{

@@ -160,13 +160,13 @@ struct CacheOptimizedKDNode
 
 	inline int32 TriangleIndexStart(void) const
 	{
-		assert(NodeType()==KDNODE_STATE_LEAF);
+		Assert(NodeType()==KDNODE_STATE_LEAF);
 		return Children>>2;
 	}
 
 	inline int LeftChild(void) const
 	{
-		assert(NodeType()!=KDNODE_STATE_LEAF);
+		Assert(NodeType()!=KDNODE_STATE_LEAF);
 		return Children>>2;
 	}
 
@@ -177,7 +177,7 @@ struct CacheOptimizedKDNode
 
 	inline int NumberOfTrianglesInLeaf(void) const
 	{
-		assert(NodeType()==KDNODE_STATE_LEAF);
+		Assert(NodeType()==KDNODE_STATE_LEAF);
 		return *((int32 *) &SplittingPlaneValue);
 	}
 

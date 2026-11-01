@@ -46,7 +46,7 @@ void DoClientConnect( const char *pIP )
 	char **argv = testargv;
 	if ( MPI_Init( &argc, &argv ) )
 	{
-		assert( false );
+		Assert( false );
 	}
 	MPI_Comm_rank( MPI_COMM_WORLD, &myProcId );
 
@@ -54,27 +54,27 @@ void DoClientConnect( const char *pIP )
 	MPI_Comm_size( MPI_COMM_WORLD, &nProcs );
 	if ( nProcs != 2 )
 	{
-		assert( false );
+		Assert( false );
 	}
 #else
 	// Try to connect, or listen.
 	ITCPSocket *pTCPSocket = CreateTCPSocket();
 	if ( !pTCPSocket->BindToAny( 0 ) )
 	{
-		assert( false );
+		Assert( false );
 	}
 
 	CIPAddr addr;
 	if ( !ConvertStringToIPAddr( pIP, &addr ) )
 	{
-		assert( false );
+		Assert( false );
 	}
 
 	addr.port = g_iPortNum;
 	printf( "Client connecting to %d.%d.%d.%d:%d\n", addr.ip[0], addr.ip[1], addr.ip[2], addr.ip[3], addr.port );
 	if ( !TCPSocket_Connect( pTCPSocket, &addr, 50000 ) )
 	{
-		assert( false );
+		Assert( false );
 	}
 
 	printf( "Client connected...\n " );
@@ -90,13 +90,13 @@ void DoServerConnect()
 	if ( !pSocket )
 	{
 		printf( "Error creating a socket.\n" );
-		assert( false );
+		Assert( false );
 		return;
 	}
 	else if ( !pSocket->BindToAny( VMPI_SERVICE_PORT ) )
 	{
 		printf( "Error binding a socket to port %d.\n", VMPI_SERVICE_PORT );
-		assert( false );
+		Assert( false );
 		return;
 	}
 
@@ -129,7 +129,7 @@ void DoServerConnect()
 					char **argv = testargv;
 					if ( MPI_Init( &argc, &argv ) )
 					{
-						assert( false );
+						Assert( false );
 					}
 					MPI_Comm_rank( MPI_COMM_WORLD, &myProcId );
 
@@ -137,7 +137,7 @@ void DoServerConnect()
 					MPI_Comm_size( MPI_COMM_WORLD, &nProcs );
 					if ( nProcs != 2 )
 					{
-						assert( false );
+						Assert( false );
 					}
 					break;
 				}
@@ -153,7 +153,7 @@ void DoServerConnect()
 	ITCPListenSocket *pListen = CreateTCPListenSocket( g_iPortNum );
 	if ( !pListen )
 	{
-		assert( false );
+		Assert( false );
 	}
 
 	printf( "Server listening...\n" );
@@ -162,7 +162,7 @@ void DoServerConnect()
 	ITCPSocket *pTCPSocket = TCPSocket_ListenForOneConnection( pListen, &addr, 50000 );
 	if ( !pTCPSocket )
 	{
-		assert( false );
+		Assert( false );
 	}
 	pListen->Release();
 
@@ -254,10 +254,10 @@ int main( int argc, char *argv[] )
 
 
 				// Make sure we got the same data back.
-				assert( recvBuf.Count() == buf.Count() );
+				Assert( recvBuf.Count() == buf.Count() );
 				for ( z = 0; z < size; z++ )
 				{
-					assert( recvBuf[z] == buf[z] );
+					Assert( recvBuf[z] == buf[z] );
 				}
 
 
@@ -296,7 +296,7 @@ int main( int argc, char *argv[] )
 
 			if ( recvBuf.Count() < 4 )
 			{
-				assert( false );
+				Assert( false );
 			}
 
 			SendData( recvBuf.Base(), recvBuf.Count() );

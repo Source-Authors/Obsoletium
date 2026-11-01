@@ -845,7 +845,7 @@ void CTFHudDeathNotice::OnGameEvent( IGameEvent *event, int iDeathNoticeMsg )
 							break;
 						}
 						default:
-							assert( !"Unknown pyro item hack type! Something has gone horribly, horribly worse." );
+							Assert( !"Unknown pyro item hack type! Something has gone horribly, horribly worse." );
 					}
 				}
 			}

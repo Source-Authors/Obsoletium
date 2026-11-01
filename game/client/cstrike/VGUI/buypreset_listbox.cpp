@@ -137,7 +137,7 @@ int	BuyPresetListBox::computeVPixelsNeeded( void )
  */
 int BuyPresetListBox::AddItem( vgui::Panel *panel, void * userData )
 {
-	assert(panel);
+	Assert(panel);
 
 	DataItem item = { panel, userData };
 

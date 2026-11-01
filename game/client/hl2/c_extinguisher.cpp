@@ -319,7 +319,7 @@ void C_ExtinguisherJet::Update( float fTimeDelta )
 
 				pParticle = (SimpleParticle *) m_pEmberEmitter->AddParticle( sizeof(SimpleParticle), g_Mat_DustPuff[0], GetAbsOrigin() );
 				
-				assert(pParticle);
+				Assert(pParticle);
 
 				if ( pParticle )
 				{

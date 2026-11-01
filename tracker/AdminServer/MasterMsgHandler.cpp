@@ -37,7 +37,7 @@ bool CMasterMsgHandler::Process( netadr_t *from, CMsgBuffer *msg )
 
 	// Remainder of message length is 6 byte IP addresses
 	int nNumAddresses =  msg->GetCurSize() - msg->GetReadCount();
-	assert( !( nNumAddresses % 6 ) );
+	Assert( !( nNumAddresses % 6 ) );
 	// Each address is 6 bytes long
 	nNumAddresses /= 6;
 

@@ -684,7 +684,7 @@ void CGLMTexLayoutTable::DelLayoutRef( GLMTexLayout *layout )
 		// drop ref count
 		layout->m_refCount --;
 		
-		//assert( layout->m_refCount >= 0 );
+		//Assert( layout->m_refCount >= 0 );
 	}
 	else
 	{

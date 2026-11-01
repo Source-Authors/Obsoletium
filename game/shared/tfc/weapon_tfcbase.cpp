@@ -167,7 +167,7 @@ void CWeaponTFCBase::Precache( void )
 	{
 		CBasePlayer *pPlayer = GetPlayerOwner();
 
-		assert( pPlayer );
+		Assert( pPlayer );
 
 		if ( !pPlayer )
 			return;

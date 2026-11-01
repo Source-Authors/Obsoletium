@@ -539,7 +539,7 @@ bool CNPC_Assassin::CanFlip( int flipType, Activity &activity, const Vector *avo
 		break;
 
 	default:
-		assert(0); //NOTENOTE: Invalid flip type
+		Assert(0); //NOTENOTE: Invalid flip type
 		activity = ACT_INVALID;
 		return false;
 		break;
@@ -681,7 +681,7 @@ void CNPC_Assassin::StartTask( const Task_t *pTask )
 
 	case TASK_ASSASSIN_GET_PATH_TO_VANTAGE_POINT:
 		{
-			assert( GetEnemy() != NULL );
+			Assert( GetEnemy() != NULL );
 			if ( GetEnemy() == NULL )
 				break;
 

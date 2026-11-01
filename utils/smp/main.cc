@@ -693,7 +693,7 @@ int WINAPI WinMain( _In_ HINSTANCE instance, _In_opt_ HINSTANCE,
 	GetCursorPos( &pt );
 
 	HMONITOR monitor = MonitorFromPoint( pt, MONITOR_DEFAULTTONEAREST );
-	assert( monitor );
+	Assert( monitor );
 
 	if ( !CreateDesktopBitmaps( monitor ) )
 	{

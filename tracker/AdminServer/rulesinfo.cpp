@@ -41,7 +41,7 @@ CRulesInfo::~CRulesInfo() {
 void CRulesInfo::Query()
 {
 	CMsgBuffer *buffer = m_pQuery->GetSendBuffer();
-	assert( buffer );
+	Assert( buffer );
 	
 	if ( !buffer ) 
 	{

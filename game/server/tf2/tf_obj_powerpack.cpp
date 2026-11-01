@@ -192,7 +192,7 @@ void CObjectPowerPack::PowerNearbyObjects( CBaseObject *pObjectToTarget, bool bP
 		for ( int i = 0; i < GetTFTeam()->GetNumObjects(); i++ )
 		{
 			CBaseObject *pObject = GetTFTeam()->GetObject(i);
-			assert(pObject);
+			Assert(pObject);
 			if ( pObject == this || !pObject->CanPowerupNow(POWERUP_POWER) )
 				continue;
 			// We might be rechecking our power because one of our own objects is dying.

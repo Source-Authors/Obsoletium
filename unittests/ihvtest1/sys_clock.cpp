@@ -130,7 +130,7 @@ void CSysClock::Init( void )
 	m_dCurrentTime			= 0.0;
 
 	success = QueryPerformanceFrequency( &PerformanceFreq );
-	assert( success );
+	Assert( success );
 
 	// get 32 out of the 64 time bits such that we have around
 	// 1 microsecond resolution

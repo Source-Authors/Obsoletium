@@ -68,7 +68,7 @@ int __cdecl GameCompare(vgui::ListPanel *pPanel, const vgui::ListPanelItem &item
 	serveritem_t &s2 = CServerPage::GetInstance()->GetServer(item2.userData);
 
 	// make sure we haven't added the same server to the list twice
-	assert(p1->userData != p2->userData);
+	Assert(p1->userData != p2->userData);
 
 	return stricmp(s1.gameDescription, s2.gameDescription);
 }

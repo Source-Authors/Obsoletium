@@ -64,7 +64,7 @@ int MapLanguageStringID( int idEnglish )
 			return g_StringIDs[i][g_CurrentLanguage];
 	}
 
-	assert( !"MapLanguageStringID: unknown string ID" );
+	Assert( !"MapLanguageStringID: unknown string ID" );
 	return 0;
 }
 

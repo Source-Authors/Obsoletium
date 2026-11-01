@@ -79,10 +79,10 @@ protected:
 	//
 
 	// Return true if the panel is active 
-	virtual bool IsPanelActive( int x, int y )		{ assert(0); return false; }
+	virtual bool IsPanelActive( int x, int y )		{ Assert(0); return false; }
 
 	// Gets at the control point data; who knows how it was made?
-	virtual void GetShieldData( Vector const** ppVerts, float* pOpacity, float* pBlend )	{ assert(0); }
+	virtual void GetShieldData( Vector const** ppVerts, float* pOpacity, float* pBlend )	{ Assert(0); }
 
 private:
 	void	DrawWireframeModel( Vector const** pPositions );

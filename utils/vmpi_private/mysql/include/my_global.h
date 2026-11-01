@@ -347,7 +347,7 @@ typedef unsigned short ushort;
 
 #include <dbug.h>
 #ifndef DBUG_OFF
-#define dbug_assert(A) assert(A)
+#define dbug_assert(A) Assert(A)
 #else
 #define dbug_assert(A)
 #endif

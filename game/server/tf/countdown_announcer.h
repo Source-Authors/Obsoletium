@@ -52,7 +52,7 @@ public:
 	// returns true once when time expires
 	bool Tick( float delta ) 
 	{
-		assert( delta >= 0 );
+		Assert( delta >= 0 );
 		switch ( m_state )
 		{
 		case Disabled:

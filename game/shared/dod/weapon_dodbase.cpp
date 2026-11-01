@@ -236,7 +236,7 @@ void CWeaponDODBase::ItemPostFrame()
 	CDODGameRules *mp = DODGameRules();
 #endif
 
-	assert( mp );
+	Assert( mp );
 
 	if ((m_bInReload) && (pPlayer->m_flNextAttack <= gpGlobals->curtime))
 	{

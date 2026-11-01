@@ -283,7 +283,7 @@ void SampleMenus::InitMenus()
 	m_pOuterMenu->AddMenuItem("Disabled Menuitem", "Disabled", this);
 
 	Panel *menuItem = m_pOuterMenu->FindChildByName("Disabled Menuitem");
-	assert(menuItem);
+	Assert(menuItem);
 	menuItem->SetEnabled(false);
 
 	m_pOuterMenu->AddMenuItem("Normal Menuitem", "junk", this);
@@ -344,7 +344,7 @@ void SampleMenus::InitMenus()
 	m_pOuterMenu2->AddCheckableMenuItem("Disabled Menuitem", "Disabled", this);
 
 	menuItem = m_pOuterMenu2->FindChildByName("Disabled Menuitem");
-	assert(menuItem);
+	Assert(menuItem);
 	menuItem->SetEnabled(false);
 
 	m_pOuterMenu2->AddMenuItem("Normal Menuitem", "junk", this);

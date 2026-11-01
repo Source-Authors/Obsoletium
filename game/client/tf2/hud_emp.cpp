@@ -113,7 +113,7 @@ void CHudEMP::Init( void )
 	if ( !m_pEMPIcon )
 	{
 		m_pEMPIcon = materials->FindMaterial( "Hud/emp/emp_damage", TEXTURE_GROUP_VGUI );
-		assert( m_pEMPIcon );
+		Assert( m_pEMPIcon );
 		m_pEMPIcon->IncrementReferenceCount();
 
 		m_pFrameVar = m_pEMPIcon->FindVar( "$frame", NULL, false );

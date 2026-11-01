@@ -248,7 +248,7 @@ unsigned char *COM_LoadFile( const char *name, int *len)
 	buffer[ *len ] = 0;
 
 	size_t nsize = _msize( buffer );
-	assert( nsize <= 5000000 );
+	Assert( nsize <= 5000000 );
 	allocated += nsize;
 
 
@@ -262,7 +262,7 @@ unsigned char *COM_LoadFile( const char *name, int *len)
 void COM_FreeFile( unsigned char *buffer )
 {
 	size_t nsize = _msize( buffer );
-	assert( nsize <= 5000000 );
+	Assert( nsize <= 5000000 );
 
 	allocated -= nsize;
 

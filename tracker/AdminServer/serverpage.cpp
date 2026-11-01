@@ -827,7 +827,7 @@ CNetAddress VInternetDlg::GetServerAddress()
 //-----------------------------------------------------------------------------
 void VInternetDlg::SendInitialLogin()
 {
-//	assert(m_iLoginState == LOGINSTATE_WAITINGTORECONNECT || m_iLoginState == LOGINSTATE_DISCONNECTED);
+//	Assert(m_iLoginState == LOGINSTATE_WAITINGTORECONNECT || m_iLoginState == LOGINSTATE_DISCONNECTED);
 
 	m_iSessionID = 0;
 

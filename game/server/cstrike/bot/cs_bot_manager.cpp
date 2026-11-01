@@ -1560,7 +1560,7 @@ CNavArea *CCSBotManager::GetRandomAreaInZone( const Zone *zone ) const
 	int areaCount = zone->m_areaCount;
 	if( areaCount == 0 )
 	{
-		assert( false && "CCSBotManager::GetRandomAreaInZone: No areas for this zone" );
+		AssertMsg( false, "CCSBotManager::GetRandomAreaInZone: No areas for this zone" );
 		return NULL;
 	}
 
@@ -1580,7 +1580,7 @@ CNavArea *CCSBotManager::GetRandomAreaInZone( const Zone *zone ) const
 
 	if( totalWeight == 0 )
 	{
-		assert( false && "CCSBotManager::GetRandomAreaInZone: No real areas for this zone" );
+		AssertMsg( false, "CCSBotManager::GetRandomAreaInZone: No real areas for this zone" );
 		return NULL;
 	}
 

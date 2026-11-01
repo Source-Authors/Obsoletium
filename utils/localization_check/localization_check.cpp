@@ -2772,7 +2772,7 @@ void BuildOrderedCaptionList( CUtlVector< OrderedCaption_t >& list )
 	FileHandle_t file = g_pFullFileSystem->Open( "resource/closecaption_english.txt", "rb");
 	if ( !file )
 	{
-		// assert(!("CLocalizedStringTable::AddFile() failed to load file"));
+		// Assert(!("CLocalizedStringTable::AddFile() failed to load file"));
 		return;
 	}
 	RunCodeAtScopeExit(g_pFullFileSystem->Close(file));
@@ -2901,7 +2901,7 @@ void LoadImportData( char const *filename, CUtlDict< LookupData_t, int >& lookup
 	FileHandle_t file = g_pFullFileSystem->Open( filename, "rb");
 	if ( !file )
 	{
-		// assert(!("CLocalizedStringTable::AddFile() failed to load file"));
+		// Assert(!("CLocalizedStringTable::AddFile() failed to load file"));
 		return;
 	}
 	RunCodeAtScopeExit(g_pFullFileSystem->Close(file));

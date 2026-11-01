@@ -1372,7 +1372,7 @@ void CTFTeam::UpdatePowerpacks( CObjectPowerPack *pPackToIgnore, CBaseObject *pO
 	for ( int i = 0; i < GetNumObjects(); i++ )
 	{
 		CBaseObject *pObject = GetObject(i);
-		assert(pObject);
+		Assert(pObject);
 		if ( pObject == pPackToIgnore || pObject->GetType() != OBJ_POWERPACK )
 			continue;
 
@@ -1395,7 +1395,7 @@ void CTFTeam::UpdateBuffStations( CObjectBuffStation *pBuffStationToIgnore, CBas
 	for ( int iObject = 0; iObject < GetNumObjects(); ++iObject )
 	{
 		CBaseObject *pObject = GetObject( iObject );
-		assert( pObject );
+		Assert( pObject );
 	
 		if ( pObject->GetType() != OBJ_BUFF_STATION )
 			continue;
