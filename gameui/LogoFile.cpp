@@ -9,7 +9,7 @@
 #if !defined( _X360 )
 #include "winlite.h"
 #endif
-#include <stdio.h>
+#include <cstdio>
 #include "tier1/utlbuffer.h"
 #include "vgui/VGUI.h"
 #include "vgui_controls/Controls.h"

@@ -12,7 +12,7 @@
 #include "vgui/ISurface.h"
 #include "vgui/IInput.h"
 #include "ModInfo.h"
-#include <stdio.h>
+#include <cstdio>
 
 using namespace vgui;
 

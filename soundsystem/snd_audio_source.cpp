@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#include <stdio.h>
+#include <cstdio>
 #include "soundsystem/snd_audio_source.h"
 #include "soundsystem/isoundsystem.h"
 #include "soundsystem.h"

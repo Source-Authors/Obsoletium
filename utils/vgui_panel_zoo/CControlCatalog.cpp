@@ -8,7 +8,7 @@
 
 
 #include "CControlCatalog.h"
-#include "stdio.h"
+#include <cstdio>
 
 #include "vgui/ISurface.h"
 #include "vgui_controls/Controls.h"

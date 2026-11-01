@@ -8,7 +8,7 @@
 
 #include "tier0/platform.h"
 #include "linear_solver.h"
-#include <stdio.h>
+#include <cstdio>
 #include <string.h>
 #include <cmath>
 

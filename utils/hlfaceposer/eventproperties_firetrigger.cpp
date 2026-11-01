@@ -8,7 +8,7 @@
 #include "eventproperties_firetrigger.h"
 #include "EventProperties.h"
 #include <mxtk/mx.h>
-#include <stdio.h>
+#include <cstdio>
 #include "resource.h"
 #include "mdlviewer.h"
 

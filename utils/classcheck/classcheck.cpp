@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "stdafx.h"
-#include <stdio.h>
+#include <cstdio>
 #include <windows.h>
 #include "classcheck_util.h"
 #include "icodeprocessor.h"

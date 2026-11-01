@@ -14,7 +14,7 @@
 
 #ifndef _WIN32
 
-#include <stdio.h>
+#include <cstdio>
 #include "textconsole.h"
 
 class CTextConsoleUnix : public CTextConsole

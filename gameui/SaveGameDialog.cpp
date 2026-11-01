@@ -20,7 +20,7 @@
 #include "KeyValues.h"
 #include "filesystem.h"
 
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 
 using namespace vgui;

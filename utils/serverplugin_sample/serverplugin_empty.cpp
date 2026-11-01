@@ -6,14 +6,14 @@
 //
 //===========================================================================//
 
-#include <stdio.h>
+#include <cstdio>
 
 //#define GAME_DLL
 #ifdef GAME_DLL
 #include "cbase.h"
 #endif
 
-#include <stdio.h>
+#include <cstdio>
 #include "interface.h"
 #include "filesystem.h"
 #include "engine/iserverplugin.h"

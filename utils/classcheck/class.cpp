@@ -6,7 +6,7 @@
 //=============================================================================//
 #include "stdafx.h"
 #include <cassert>
-#include <stdio.h>
+#include <cstdio>
 #include <windows.h>
 #include "classcheck_util.h"
 #include "class.h"

@@ -11,7 +11,7 @@
 #include <io.h>
 #include <conio.h>
 #include <sys/stat.h>
-#include <stdio.h>
+#include <cstdio>
 #include <direct.h>
 #include <system_error>
 

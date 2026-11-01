@@ -13,7 +13,7 @@
 #include "KeyValues.h"
 
 #include <io.h>
-#include <stdio.h>
+#include <cstdio>
 
 #include "configs.h"
 

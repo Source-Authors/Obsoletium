@@ -9,7 +9,7 @@
 #include "appframework/IAppSystemGroup.h"
 #include "appframework/appframework.h"
 #include "tier0/dbg.h"
-#include <stdio.h>
+#include <cstdio>
 #include <windows.h>
 #include "vstdlib/iprocessutils.h"
 #include "tier1/interface.h"

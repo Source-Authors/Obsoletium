@@ -12,7 +12,7 @@
 #include "vgui_controls/Panel.h"
 #include "vgui/IScheme.h"
 #include <Color.h>
-#include <stdio.h>
+#include <cstdio>
 
 using namespace vgui;
 

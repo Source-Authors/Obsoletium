@@ -172,7 +172,7 @@ double my_ulonglong2double(unsigned long long A);
 #endif
 
 #ifndef stdin
-#include <stdio.h>
+#include <cstdio>
 #endif
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>

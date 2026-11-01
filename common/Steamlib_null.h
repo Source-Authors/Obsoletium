@@ -12,7 +12,7 @@
 
 
 #include <stdlib.h>
-#include <stdio.h>
+#include <cstdio>
 #include <string.h> // for strlen()
 #include <cstdarg>
 #include <dlfcn.h>

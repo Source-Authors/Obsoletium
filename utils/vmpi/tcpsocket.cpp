@@ -17,7 +17,7 @@
 #include <mswsock.h>
 #include "tcpsocket.h"
 #include "tier1/utllinkedlist.h"
-#include <stdio.h>
+#include <cstdio>
 #include "threadhelpers.h"
 #include "tier0/dbg.h"
 

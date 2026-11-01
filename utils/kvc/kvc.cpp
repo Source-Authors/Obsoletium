@@ -3,7 +3,7 @@
 // Purpose: vcd_sound_check.cpp : Defines the entry point for the console application.
 //
 //=============================================================================//
-#include <stdio.h>
+#include <cstdio>
 #include <windows.h>
 #include "tier0/dbg.h"
 #include "tier1/utldict.h"

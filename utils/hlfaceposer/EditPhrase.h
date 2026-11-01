@@ -11,9 +11,9 @@
 #pragma once
 #endif
 
-#include <stdio.h>
+#include <cstdio>
 
-//========= Copyright © 1996-2001, Valve LLC, All rights reserved. ============
+//========= Copyright ï¿½ 1996-2001, Valve LLC, All rights reserved. ============
 //
 // Purpose: 
 //

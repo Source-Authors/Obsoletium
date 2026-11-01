@@ -12,7 +12,7 @@
 #pragma once
 #endif
 
-#include <stdio.h>
+#include <cstdio>
 
 typedef void *FileHandle_t;
 

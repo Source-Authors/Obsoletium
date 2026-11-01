@@ -1,5 +1,5 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
-#include <stdio.h>
+#include <cstdio>
 #include "ims_helper.h"
 
 #include "TalkBack.h"

@@ -7,7 +7,7 @@
 
 #include "ContentControlDialog.h"
 
-#include <stdio.h>
+#include <cstdio>
 #include <memory.h>
 #if defined( WIN32 ) && !defined( _X360 )
 #include "winlite.h"

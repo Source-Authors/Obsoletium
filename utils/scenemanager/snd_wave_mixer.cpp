@@ -5,7 +5,7 @@
 //=============================================================================//
 
 #include "cbase.h"
-#include <stdio.h>
+#include <cstdio>
 #include <windows.h>
 #include "snd_audio_source.h"
 #include "snd_wave_source.h"

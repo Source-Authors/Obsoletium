@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "stdafx.h"
-#include <stdio.h>
+#include <cstdio>
 #include <windows.h>
 #include "mdlcheck_util.h"
 #include "tier0/dbg.h"

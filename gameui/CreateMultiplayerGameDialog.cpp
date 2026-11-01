@@ -14,7 +14,7 @@
 #include "ModInfo.h"
 #include "GameUI_Interface.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 using namespace vgui;
 

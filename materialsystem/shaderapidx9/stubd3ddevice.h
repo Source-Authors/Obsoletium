@@ -17,7 +17,7 @@
 #include "filesystem.h"
 
 #ifdef USE_FOPEN
-#include <stdio.h>
+#include <cstdio>
 #define FPRINTF fprintf
 #else
 #define FPRINTF s_pFileSystem->FPrintf

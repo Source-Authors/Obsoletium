@@ -6,7 +6,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include <string.h>
-#include <stdio.h>
+#include <cstdio>
 #include "voice_status.h"
 #include "radio_status.h"
 #include "c_playerresource.h"

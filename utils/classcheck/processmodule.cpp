@@ -7,7 +7,7 @@
 #include <cassert>
 #include <time.h>
 #include "stdafx.h"
-#include <stdio.h>
+#include <cstdio>
 #include <windows.h>
 #include "classcheck_util.h"
 #include "codeprocessor.h"

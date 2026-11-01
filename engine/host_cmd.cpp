@@ -70,7 +70,7 @@
 extern IXboxSystem *g_pXboxSystem;
 
 #include <sys/stat.h>
-#include <stdio.h>
+#include <cstdio>
 #include <csignal>
 #ifdef POSIX
 // sigh, microsoft put _ in front of its type defines for stat

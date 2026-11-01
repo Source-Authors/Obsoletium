@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
 #include <windows.h>
-#include <stdio.h>
+#include <cstdio>
 #include <string.h>
 #include <stdlib.h>
 #include <cerrno>

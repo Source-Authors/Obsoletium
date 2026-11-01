@@ -21,7 +21,7 @@
 #include "vgui_controls/MessageBox.h"
 #include "vgui_controls/FileOpenDialog.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 using namespace vgui;
 

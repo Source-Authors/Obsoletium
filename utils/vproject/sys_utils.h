@@ -7,7 +7,7 @@
 #pragma once
 
 #include <windows.h>
-#include <stdio.h>
+#include <cstdio>
 #include <cstdarg>
 #include <string.h>
 

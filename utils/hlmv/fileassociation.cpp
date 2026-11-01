@@ -23,7 +23,7 @@
 // web:            https://chumba.ch/chumbalum-soft/hlmv/index.html
 //
 #include "FileAssociation.h"
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 #include <string.h>
 #include <mxtk/mx.h>

@@ -43,7 +43,7 @@
 #include <mxtk/mxMatSysWindow.h>
 // #include "gl.h"
 // #include <GL/glu.h>
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>

@@ -4,7 +4,7 @@
 //
 //=============================================================================//
 
-#include <stdio.h>
+#include <cstdio>
 #include <string.h>
 #include <io.h>
 #include <malloc.h>

@@ -17,7 +17,7 @@
 #include "tier0/icommandline.h"
 #include "checksum_engine.h"
 #include <cctype>
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 #include "tier0/dbg.h"
 

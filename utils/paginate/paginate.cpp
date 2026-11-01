@@ -4,7 +4,7 @@
 //
 //=============================================================================//
 #include "cbase.h"
-#include <stdio.h>
+#include <cstdio>
 #include <windows.h>
 #include <direct.h>
 #include "tier0/dbg.h"

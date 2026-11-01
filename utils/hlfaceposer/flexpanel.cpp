@@ -10,7 +10,7 @@
 #include "StudioModel.h"
 #include "MatSysWin.h"
 #include "ControlPanel.h"
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 #include <string.h>
 #include <mxtk/mx.h>

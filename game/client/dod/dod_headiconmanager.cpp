@@ -6,7 +6,7 @@
 //=============================================================================
 #include "cbase.h"
 #include <string.h>
-#include <stdio.h>
+#include <cstdio>
 #include "dod_headiconmanager.h"
 #include "c_playerresource.h"
 #include "cliententitylist.h"

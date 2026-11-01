@@ -26,7 +26,7 @@
 #include "inputsystem/iinputsystem.h"
 
 #include <io.h>
-#include <stdio.h>
+#include <cstdio>
 
 // Since windows redefines MessageBox.
 typedef vgui::MessageBox vguiMessageBox;

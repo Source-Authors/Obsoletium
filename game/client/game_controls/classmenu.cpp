@@ -7,7 +7,7 @@
 
 
 #include "cbase.h"
-#include <stdio.h>
+#include <cstdio>
 
 #include <cdll_client_int.h>
 

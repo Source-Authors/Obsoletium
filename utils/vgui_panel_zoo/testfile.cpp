@@ -23,7 +23,7 @@
 #include "inputsystem/iinputsystem.h"
 #include "CControlCatalog.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 //-----------------------------------------------------------------------------
 // Purpose: Warning/Msg call back through this API

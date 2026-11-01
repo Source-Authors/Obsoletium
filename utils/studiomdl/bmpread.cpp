@@ -8,7 +8,7 @@
 
 
 #include <windows.h>
-#include <STDIO.H>
+#include <cstdio>
 
 
 int

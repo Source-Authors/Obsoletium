@@ -77,10 +77,10 @@
   #ifdef SQUNICODE
     #define SCSNPRINTF _snwprintf
     #define SCPUTS _putws
-    #include <stdio.h> // for snprintf
+    #include <cstdio> // for snprintf
   #else
     #define SCSNPRINTF snprintf
-    #include <stdio.h> // for snprintf
+    #include <cstdio> // for snprintf
     #define SCPUTS puts
   #endif
 #endif

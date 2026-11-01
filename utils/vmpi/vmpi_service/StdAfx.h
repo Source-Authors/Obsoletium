@@ -24,7 +24,7 @@
 #include <shellapi.h>
 #include <winuser.h>
 #include "basetypes.h"
-#include <stdio.h>
+#include <cstdio>
 #include "iphelpers.h"
 
 // TODO: reference additional headers your program requires here

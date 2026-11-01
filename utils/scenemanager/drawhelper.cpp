@@ -6,7 +6,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include "tier0/dbg.h"
-#include <stdio.h>
+#include <cstdio>
 #include "drawhelper.h"
 
 // #define COLOR_BACKGROUND RGB( 120, 120, 150 )

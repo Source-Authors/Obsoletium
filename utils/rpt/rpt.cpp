@@ -15,7 +15,7 @@
 // because this is expected to be run on a customer's machine and we
 // don't want to have to deal with any strange path stuff
 #include <windows.h>
-#include <stdio.h>
+#include <cstdio>
 
 
 //-----------------------------------------------------------------------------

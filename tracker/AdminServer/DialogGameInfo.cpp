@@ -25,7 +25,7 @@
 #include <VGUI_ToggleButton.h>
 #include <VGUI_RadioButton.h>
 
-#include <stdio.h>
+#include <cstdio>
 
 using namespace vgui;
 

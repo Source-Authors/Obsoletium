@@ -5,7 +5,7 @@
 //=============================================================================//
 #include "winlite.h"
 #include "tier1/strtools.h"
-#include <stdio.h>
+#include <cstdio>
 
 char *va( const char *fmt, ... )
 {

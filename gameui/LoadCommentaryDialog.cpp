@@ -21,7 +21,7 @@
 #include "vgui_controls/Button.h"
 #include "vgui_controls/QueryBox.h"
 
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 
 #include "BasePanel.h"

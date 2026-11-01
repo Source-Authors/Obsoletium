@@ -4,7 +4,7 @@
 // Created 10/08/05, John Schultz
 // Free for any use.
 
-#include <stdio.h>
+#include <cstdio>
 #include <cstdarg>
 #include "sqplus.h"
 

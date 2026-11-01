@@ -18,7 +18,7 @@
 // Misc C-runtime library headers
 #include <cmath>
 
-#include <stdio.h>
+#include <cstdio>
 
 // tier 0
 #include "tier0/dbg.h"

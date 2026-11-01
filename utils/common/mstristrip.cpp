@@ -13,7 +13,7 @@
 // Copyright (c) 1999-2000 Microsoft Corporation. All rights reserved.
 //-----------------------------------------------------------------------------
 
-#include <stdio.h>
+#include <cstdio>
 #include <cstdarg>
 #include <algorithm>
 #include <list>

@@ -11,7 +11,7 @@
 #include "vgui/IScheme.h"
 #include "vgui_controls/ScrollBar.h"
 #include "vgui_controls/Label.h"
-#include <stdio.h>
+#include <cstdio>
 
 using namespace vgui;
 

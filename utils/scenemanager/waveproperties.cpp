@@ -5,7 +5,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include <mxtk/mx.h>
-#include <stdio.h>
+#include <cstdio>
 #include "resource.h"
 #include "WaveProperties.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"

@@ -12,7 +12,7 @@
 //=============================================================================//
 
 
-#include <stdio.h>
+#include <cstdio>
 #include <string.h>
 #include "stringregistry.h"
 #include "utldict.h"

@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================
 
-#include <stdio.h>
+#include <cstdio>
 
 #include "MOTDPanel.h"
 

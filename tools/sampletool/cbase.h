@@ -16,7 +16,7 @@
 
 // Misc C-runtime library headers
 #include <cmath>
-#include <stdio.h>
+#include <cstdio>
 #include "minmax.h"
 
 // tier 0

@@ -8,7 +8,7 @@
 #include "StudioModel.h"
 #include "IStudioRender.h"
 #include "MatSysWin.h"
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 #include <string.h>
 #include <mxtk/mx.h>

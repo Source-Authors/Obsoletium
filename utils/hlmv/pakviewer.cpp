@@ -22,7 +22,7 @@
 // email:          mete@swissquake.ch
 // web:            https://chumba.ch/chumbalum-soft/hlmv/index.html
 //
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 #include <string.h>
 #include <mxtk/mx.h>

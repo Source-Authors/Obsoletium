@@ -1,5 +1,5 @@
 #include "sqplus.h"
-#include <stdio.h>
+#include <cstdio>
 
 #ifdef SQPLUS_SMARTPOINTER_OPT
 #define SQPLUS_SMARTPOINTER_CPP_DECLARATION

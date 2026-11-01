@@ -11,7 +11,7 @@
 #include "vgui_controls/TextEntry.h"
 #include "vgui/ISystem.h"
 #include "vgui_controls/Controls.h"
-#include <stdio.h>
+#include <cstdio>
 
 using namespace vgui;
 

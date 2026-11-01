@@ -6,7 +6,7 @@
 #endif
 
 #include <sqplus.h>
-#include <stdio.h>
+#include <cstdio>
 #include <UnitTest++.h>
 
 struct TestEnv {

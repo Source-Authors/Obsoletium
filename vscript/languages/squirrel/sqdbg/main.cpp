@@ -5,7 +5,7 @@
 #include <winsock.h>
 #include <squirrel.h>
 #include <stdlib.h>
-#include <stdio.h>
+#include <cstdio>
 #include <sqstdblob.h>
 #include <sqstdio.h>
 #include <sqstdaux.h>

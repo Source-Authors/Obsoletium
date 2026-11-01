@@ -9,7 +9,7 @@
 #include "winlite.h"
 extern HMODULE win32DLLHandle;
 #elif defined(POSIX)
-#include <stdio.h>
+#include <cstdio>
 #include "tier0/dbg.h"
 #endif
 

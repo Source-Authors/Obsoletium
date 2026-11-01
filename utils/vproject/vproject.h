@@ -10,7 +10,7 @@
 #include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
-#include <stdio.h>
+#include <cstdio>
 #include <malloc.h>
 #include <richedit.h>
 #include <cassert>

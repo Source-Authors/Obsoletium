@@ -6,7 +6,7 @@
 //
 //===========================================================================//
 #include <stdlib.h>
-#include <stdio.h>
+#include <cstdio>
 #include <direct.h>
 #include "bitmap/tgaloader.h"
 #include "mathlib/mathlib.h"

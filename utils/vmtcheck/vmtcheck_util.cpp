@@ -6,7 +6,7 @@
 //=============================================================================//
 #include "stdafx.h"
 #include <io.h>
-#include <stdio.h>
+#include <cstdio>
 #include <windows.h>
 #include "vmtcheck_util.h"
 #include "tier0/dbg.h"

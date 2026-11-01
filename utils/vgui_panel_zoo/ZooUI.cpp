@@ -7,7 +7,7 @@
 //=============================================================================//
 
 #include "ZooUI.h"
-#include "stdio.h"
+#include <cstdio>
 
 #include <VGUI_ISurface.h>
 #include <VGUI_Controls.h>

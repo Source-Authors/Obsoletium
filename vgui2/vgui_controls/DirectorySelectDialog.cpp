@@ -11,7 +11,7 @@
 
 #ifdef WIN32
 #include <direct.h>
-#include <stdio.h>
+#include <cstdio>
 #include <io.h>
 #endif
 

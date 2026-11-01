@@ -12,7 +12,7 @@
 #endif
 
 
-#include <stdio.h>
+#include <cstdio>
 #include "iscratchpad3d.h"
 #include "mathlib/vmatrix.h"
 #include "filesystem.h"

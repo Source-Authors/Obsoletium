@@ -4,7 +4,7 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <stdio.h>
+#include <cstdio>
 #include <windows.h>
 #include "depcheck_util.h"
 #include "icodeprocessor.h"

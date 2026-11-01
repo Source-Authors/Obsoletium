@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================
 
-#include <stdio.h>
+#include <cstdio>
 #include "DialogKickPlayer.h"
 
 #include <VGUI_Button.h>

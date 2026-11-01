@@ -13,7 +13,7 @@
 #include "tier1/strtools.h"
 #include "tier0/icommandline.h"
 #include "ilaunchabledll.h"
-#include <stdio.h>
+#include <cstdio>
 #include <conio.h>
 
 char* GetLastErrorString()

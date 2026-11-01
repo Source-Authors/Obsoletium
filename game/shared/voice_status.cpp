@@ -8,7 +8,7 @@
 #include "basetypes.h"
 #include "hud.h"
 #include <string.h>
-#include <stdio.h>
+#include <cstdio>
 #include "voice_status.h"
 #include "r_efx.h"
 #include "vgui_controls/TextImage.h"

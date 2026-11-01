@@ -6,7 +6,7 @@
 
 #include <windows.h>
 #include <io.h>
-#include <stdio.h>
+#include <cstdio>
 
 #include "vgui/ILocalize.h"
 #include "vgui/ISurface.h"

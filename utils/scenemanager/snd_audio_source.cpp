@@ -6,7 +6,7 @@
 //
 //=============================================================================//
 #include "cbase.h"
-#include <stdio.h>
+#include <cstdio>
 #include "snd_audio_source.h"
 #include "iscenemanagersound.h"
 

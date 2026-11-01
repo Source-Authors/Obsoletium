@@ -26,7 +26,7 @@
 #include "tier0/basetypes.h"
 
 // C RunTime Header Files
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 #include <malloc.h>
 #include <memory.h>

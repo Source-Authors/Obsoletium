@@ -6,7 +6,7 @@
 //=============================================================================//
 #include "stdafx.h"
 #include <io.h>
-#include <stdio.h>
+#include <cstdio>
 #include <malloc.h>
 #include <windows.h>
 #include "depcheck_util.h"

@@ -6,7 +6,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include <string.h>
-#include <stdio.h>
+#include <cstdio>
 #include "voice_banmgr.h"
 #include "filesystem.h"
 #include "cdll_client_int.h"

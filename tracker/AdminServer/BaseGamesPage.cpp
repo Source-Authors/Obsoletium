@@ -22,7 +22,7 @@
 #include <VGUI_KeyValues.h>
 #include <VGUI_MouseCode.h>
 
-#include <stdio.h>
+#include <cstdio>
 
 using namespace vgui;
 

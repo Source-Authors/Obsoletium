@@ -6,7 +6,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include <mxtk/mx.h>
-#include <stdio.h>
+#include <cstdio>
 #include "resource.h"
 #include "VSSProperties.h"
 #include "workspacemanager.h"

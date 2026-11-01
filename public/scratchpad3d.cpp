@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdio.h>
+#include <cstdio>
 #include "scratchpad3d.h"
 #include "tier0/dbg.h"
 

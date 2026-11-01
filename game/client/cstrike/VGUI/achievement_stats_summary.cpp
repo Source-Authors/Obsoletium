@@ -12,7 +12,7 @@
 #include "match_stats_page.h"
 #include "stats_summary.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 using namespace vgui;
 

@@ -6,7 +6,7 @@
 //=============================================================================
 
 
-#include <stdio.h>
+#include <cstdio>
 
 #include <VGUI_Controls.h>
 #include "filesystem.h"
