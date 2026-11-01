@@ -216,7 +216,7 @@ public:
 
 	static CSprite *SpriteCreate( const char *pSpriteName, const Vector &origin, bool animate );
 #endif
-	static CSprite *SpriteCreatePredictable( const char *module, int line, const char *pSpriteName, const Vector &origin, bool animate );
+	static CSprite *SpriteCreatePredictable( const char *m, int line, const char *pSpriteName, const Vector &origin, bool animate );
 
 #if defined( CLIENT_DLL )
 	virtual float	GetRenderScale( void );

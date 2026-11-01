@@ -1466,7 +1466,7 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 	s1::ScopedDll vtexmod{"vtex_dll" DLL_EXT_STRING, 0};
 	if (vtexmod.error_code())
 	{
-		Warning( "Failed to open TGA conversion module vtex_dll %s: %s.\n",
+		Warning( "Failed to open TGA conversion vtex_dll %s: %s.\n",
 			tgaPath, vtexmod.error_code().message().c_str() );
 		return CE_ERROR_LOADING_DLL;
 	}
@@ -1474,7 +1474,7 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 	auto [factory, rc] = vtexmod.GetFunction<CreateInterfaceFnT<IVTex>>(CREATEINTERFACE_PROCNAME);
 	if (rc)
 	{
-		Warning( "Failed to open TGA conversion module vtex_dll Factory %s: %s.\n",
+		Warning( "Failed to open TGA conversion vtex_dll Factory %s: %s.\n",
 			tgaPath, rc.message().c_str() );
 		return CE_ERROR_LOADING_DLL;
 	}
@@ -1482,7 +1482,7 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 	IVTex *vtex = factory(IVTEX_VERSION_STRING, NULL);
 	if (!vtex)
 	{
-		Warning( "Failed to open TGA conversion module vtex_dll Factory (is null): %s\n", tgaPath);
+		Warning( "Failed to open TGA conversion vtex_dll Factory (is null): %s\n", tgaPath);
 		return CE_ERROR_LOADING_DLL;
 	}
 

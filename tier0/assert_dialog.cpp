@@ -91,18 +91,18 @@ extern "C" BOOL APIENTRY MemDbgDllMain( HMODULE hDll, DWORD dwReason, void* );
 
 extern void InitTime();
 
-BOOL WINAPI DllMain( HINSTANCE module, DWORD fdwReason, LPVOID lpvReserved )
+BOOL WINAPI DllMain( HINSTANCE m, DWORD fdwReason, LPVOID lpvReserved )
 {
 	if (fdwReason == DLL_PROCESS_ATTACH)
 	{
 		InitTime();
 
 		// dimhotepus: Do not notify on thread creation for performance.
-		DisableThreadLibraryCalls(module);
+		DisableThreadLibraryCalls(m);
 	}
 
 #ifndef NDEBUG
-	MemDbgDllMain( module, fdwReason, lpvReserved );
+	MemDbgDllMain( m, fdwReason, lpvReserved );
 #endif
 
 	return TRUE;
@@ -513,10 +513,10 @@ static void SpewBacktrace()
 		{
 			for ( int i = 0; i < nptrs; i++)
 			{
-				const char *module = strrchr( strings[ i ], '/' );
-				module = module ? ( module + 1 ) : strings[ i ];
+				const char *m = strrchr( strings[ i ], '/' );
+				m = m ? ( m + 1 ) : strings[ i ];
 
-				fprintf( stderr, "  %s\n", module );
+				fprintf( stderr, "  %s\n", m );
 			}
 		}
 	}

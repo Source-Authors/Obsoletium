@@ -277,8 +277,8 @@ static bool IsSourceModLoaded()
 	{
 		// GetModuleHandle function returns a handle to a mapped module
 		//  without incrementing its reference count.
-		HMODULE module{nullptr};
-		if ( ::GetModuleHandleEx( GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, n, &module ) )
+		HMODULE m{nullptr};
+		if ( ::GetModuleHandleEx( GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, n, &m ) )
 			return true;
 	}
 #else

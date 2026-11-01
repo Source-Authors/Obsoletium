@@ -562,10 +562,10 @@ CBeam *CBeam::BeamCreate( const char *pSpriteName, float width )
 //			animate - 
 // Output : CSprite
 //-----------------------------------------------------------------------------
-CBeam *CBeam::BeamCreatePredictable( const char *module, int line, bool persist, const char *pSpriteName, float width, CBasePlayer *pOwner )
+CBeam *CBeam::BeamCreatePredictable( const char *m, int line, bool persist, const char *pSpriteName, float width, CBasePlayer *pOwner )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	CBeam *pBeam = ( CBeam * )CBaseEntity::CreatePredictedEntityByName( "beam", module, line, persist );
+	CBeam *pBeam = ( CBeam * )CBaseEntity::CreatePredictedEntityByName( "beam", m, line, persist );
 	if ( pBeam )
 	{
 		pBeam->BeamInit( pSpriteName, width );

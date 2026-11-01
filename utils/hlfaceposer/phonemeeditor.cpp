@@ -116,7 +116,8 @@ static PhonemeEditorColor g_PEColors[ NUM_COLORS ] =
 struct Extractor
 {
 	PE_APITYPE			apitype;
-	CSysModule			*module;
+	// dimhotepus: module -> mod as module is reserved keyword in C++20.
+	CSysModule			*mod;
 	IPhonemeExtractor	*extractor;
 };
 
@@ -7924,14 +7925,14 @@ void PhonemeEditor::LoadPhonemeConverters()
 		Con_Printf( "Loading extractor from %s\n", fullpath );
 
 		Extractor e;
-		e.module = Sys_LoadModule( fullpath );
-		if ( !e.module )
+		e.mod = Sys_LoadModule( fullpath );
+		if ( !e.mod )
 		{
 			pFilename = filesystem->FindNext( findHandle );
 			continue;
 		}
 
-		CreateInterfaceFn factory = Sys_GetFactory( e.module );
+		CreateInterfaceFn factory = Sys_GetFactory( e.mod );
 		if ( !factory )
 		{
 			pFilename = filesystem->FindNext( findHandle );
@@ -7968,7 +7969,7 @@ void PhonemeEditor::UnloadPhonemeConverters()
 	for ( intp i = c - 1; i >= 0; i-- )
 	{
 		Extractor *e = &g_Extractors[ i ];
-		Sys_UnloadModule( e->module );
+		Sys_UnloadModule( e->mod );
 	}
 
 	g_Extractors.RemoveAll();

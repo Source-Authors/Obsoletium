@@ -313,9 +313,9 @@ static KeyValuesAD ReadKeyValuesFile( const char *pFilename )
 static bool Sys_GetExecutableName( char *out, unsigned len )
 {
 #if defined(_WIN32)
-	if ( HMODULE module{nullptr};
-		 !::GetModuleHandleEx( GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, nullptr, &module ) ||
-		 !::GetModuleFileName( module, out, len ) )
+	if ( HMODULE m{nullptr};
+		 !::GetModuleHandleEx( GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, nullptr, &m ) ||
+		 !::GetModuleFileName( m, out, len ) )
 	{
 		return false;
 	}

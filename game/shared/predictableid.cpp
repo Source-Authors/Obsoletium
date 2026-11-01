@@ -164,11 +164,11 @@ bool CPredictableId::IsCommandNumberEqual( int testNumber ) const
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *classname - 
-//			*module - 
+//			*m - 
 //			line - 
 // Output : static int
 //-----------------------------------------------------------------------------
-static int ClassFileLineHash( const char *classname, const char *module, int line )
+static int ClassFileLineHash( const char *classname, const char *m, int line )
 {
 	CRC32_t retval;
 
@@ -182,7 +182,7 @@ static int ClassFileLineHash( const char *classname, const char *module, int lin
 	Q_strlower( tempbuffer );
 	CRC32_ProcessBuffer( &retval, tempbuffer, Q_strlen( tempbuffer ) );
 	
-	Q_strncpy( tempbuffer, module, sizeof( tempbuffer ) );
+	Q_strncpy( tempbuffer, m, sizeof( tempbuffer ) );
 	Q_strlower( tempbuffer );
 	CRC32_ProcessBuffer( &retval, tempbuffer, Q_strlen( tempbuffer ) );
 	
@@ -198,15 +198,15 @@ static int ClassFileLineHash( const char *classname, const char *module, int lin
 // Input  : player - 
 //			command - 
 //			*classname - 
-//			*module - 
+//			*m - 
 //			line - 
 //-----------------------------------------------------------------------------
-void CPredictableId::Init( int player, int command, const char *classname, const char *module, int line )
+void CPredictableId::Init( int player, int command, const char *classname, const char *m, int line )
 {
 	SetPlayer( player );
 	SetCommandNumber( command );
 
-	m_PredictableID.hash = ClassFileLineHash( classname, module, line );
+	m_PredictableID.hash = ClassFileLineHash( classname, m, line );
 
 	// Use helper to determine instance number this command
 	int instance = g_Helper.AddEntry( command, m_PredictableID.hash );

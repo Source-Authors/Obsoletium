@@ -473,12 +473,12 @@ void Sys_Sleep( int msec )
 #if defined(_WIN32) && !defined( _X360 )
 int prevCRTMemDebugState = -1;
 
-BOOL WINAPI DllMain(HMODULE module, ULONG ulInit, LPVOID)
+BOOL WINAPI DllMain(HMODULE m, ULONG ulInit, LPVOID)
 {
 	if (ulInit == DLL_PROCESS_ATTACH)
 	{
 		// dimhotepus: Do not notify on thread creation for performance.
-		::DisableThreadLibraryCalls(module);
+		::DisableThreadLibraryCalls(m);
 		prevCRTMemDebugState = InitCRTMemDebug();
 	} 
 	else if (ulInit == DLL_PROCESS_DETACH)

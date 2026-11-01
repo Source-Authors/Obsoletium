@@ -191,7 +191,7 @@ public:
 									C_BaseEntity();
 	virtual							~C_BaseEntity();
 
-	static C_BaseEntity				*CreatePredictedEntityByName( const char *classname, const char *module, int line, bool persist = false );
+	static C_BaseEntity				*CreatePredictedEntityByName( const char *classname, const char *m, int line, bool persist = false );
 	
 	// FireBullets uses shared code for prediction.
 	virtual void					FireBullets( const FireBulletsInfo_t &info );

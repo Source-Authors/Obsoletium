@@ -405,9 +405,9 @@ CSprite *CSprite::SpriteCreate( const char *pSpriteName, const Vector &origin, b
 //			animate - 
 // Output : CSprite
 //-----------------------------------------------------------------------------
-CSprite *CSprite::SpriteCreatePredictable( const char *module, int line, const char *pSpriteName, const Vector &origin, bool animate )
+CSprite *CSprite::SpriteCreatePredictable( const char *m, int line, const char *pSpriteName, const Vector &origin, bool animate )
 {
-	CSprite *pSprite = ( CSprite * )CBaseEntity::CreatePredictedEntityByName( "env_sprite", module, line );
+	CSprite *pSprite = ( CSprite * )CBaseEntity::CreatePredictedEntityByName( "env_sprite", m, line );
 	if ( pSprite )
 	{
 		pSprite->SpriteInit( pSpriteName, origin );

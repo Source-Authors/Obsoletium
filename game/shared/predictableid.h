@@ -27,7 +27,7 @@ public:
 	bool			IsActive( void ) const;
 
 	// Call this to set from data
-	void			Init( int player, int command, const char *classname, const char *module, int line );
+	void			Init( int player, int command, const char *classname, const char *m, int line );
 
 	// Get player index
 	int				GetPlayer( void ) const;

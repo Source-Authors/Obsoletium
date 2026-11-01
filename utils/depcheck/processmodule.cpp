@@ -176,7 +176,7 @@ bool CCodeProcessor::TryBuild( const char *rootdir, const char *filename, unsign
 	return false;
 }
 
-void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, int& numheaders, int& skippedfiles, const char *baseroot, const char *root, const char *module )
+void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, int& numheaders, int& skippedfiles, const char *baseroot, const char *root, const char *m )
 {
 	char filename[ 256 ];
 
@@ -188,7 +188,7 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 	}
 
 	// Load the base module
-	V_sprintf_safe( filename, "%s\\%s", root, module );
+	V_sprintf_safe( filename, "%s\\%s", root, m );
 	V_strlower( filename );
 
 	bool firstheader = true;
@@ -224,7 +224,7 @@ retry:
 		{
 			checkroot = true;
 			// Load the base module
-			V_sprintf_safe( filename, "%s\\%s", baseroot, module );
+			V_sprintf_safe( filename, "%s\\%s", baseroot, m );
 			goto retry;
 		}
 		m_Modules[ m_nModuleCount ].skipped = true;

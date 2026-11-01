@@ -262,13 +262,13 @@ wchar_t* Utf8ToWide( IN_Z const char* utf8, OUT_Z_ARRAY wchar_t ( &buffer )[size
 // dimhotepus: Type-checked GetProcAddress.  Casting through void (*)() is the
 // form compilers accept without cast-function-type warnings.
 template <typename TFunction>
-[[nodiscard]] TFunction GetProcAddressAs( HMODULE module, const char* name ) noexcept
+[[nodiscard]] TFunction GetProcAddressAs( HMODULE m, const char* name ) noexcept
 {
 	static_assert( std::is_pointer_v<TFunction> &&
 		std::is_function_v<std::remove_pointer_t<TFunction>> );
 
-	return module
-		? reinterpret_cast<TFunction>( reinterpret_cast<void ( * )()>( ::GetProcAddress( module, name ) ) )
+	return m
+		? reinterpret_cast<TFunction>( reinterpret_cast<void ( * )()>( ::GetProcAddress( m, name ) ) )
 		: nullptr;
 }
 

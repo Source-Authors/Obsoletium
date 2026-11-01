@@ -20,18 +20,16 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifdef _WIN32
-BOOL WINAPI DllMain(HMODULE module, DWORD call_reason, LPVOID) {
+#if defined( _WIN32 )
+BOOL WINAPI DllMain(HMODULE m, DWORD call_reason, LPVOID) {
   if (call_reason == DLL_PROCESS_ATTACH) {
-    ::DisableThreadLibraryCalls(module);
+    ::DisableThreadLibraryCalls(m);
     MathLib_Init(GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT, false, false, false, false);
   }
   return TRUE;
 }
 
-#endif  // _WIN32
-
-#ifdef POSIX
+#elif defined( POSIX )
 void __attribute__((constructor)) vphysics_init();
 
 void vphysics_init() {

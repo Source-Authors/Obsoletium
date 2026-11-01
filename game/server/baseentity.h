@@ -388,7 +388,7 @@ public:
 	void operator delete( void *pMem, int, const char *, int ) { operator delete(pMem); }
 
 	// Class factory
-	static CBaseEntity				*CreatePredictedEntityByName( const char *classname, const char *module, int line, bool persist = false );
+	static CBaseEntity				*CreatePredictedEntityByName( const char *classname, const char *m, int line, bool persist = false );
 
 // IHandleEntity overrides.
 public:

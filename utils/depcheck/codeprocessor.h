@@ -27,7 +27,7 @@ public:
 	bool		GetLogFile( void ) const;
 
 private:
-	void		ProcessModule( bool forcequiet, int depth, int& maxdepth, int& numheaders, int& skippedfiles, const char *baseroot, const char *root, const char *module );
+	void		ProcessModule( bool forcequiet, int depth, int& maxdepth, int& numheaders, int& skippedfiles, const char *baseroot, const char *root, const char *m );
 	void		ProcessModules( const char *root, const char *rootmodule );
 	void		PrintResults( void );
 	void		ConstructModuleList_R( int level, const char *gamespecific, const char *root );

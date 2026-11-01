@@ -151,7 +151,7 @@ public:
 	// Input handlers
 
 	static CBeam *BeamCreate( const char *pSpriteName, float width );
-	static CBeam *BeamCreatePredictable( const char *module, int line, bool persist, const char *pSpriteName, float width, CBasePlayer *pOwner );
+	static CBeam *BeamCreatePredictable( const char *m, int line, bool persist, const char *pSpriteName, float width, CBasePlayer *pOwner );
 
 	void LiveForTime( float time );
 	void BeamDamageInstant( trace_t *ptr, float damage );

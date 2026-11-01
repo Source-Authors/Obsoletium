@@ -259,28 +259,28 @@ bool CShaderAPITestApp::Create()
 		pShaderDLL = "shaderapidx9.dll";
 	}
 
-	AppModule_t module = LoadModule( pShaderDLL );
-	if ( module == APP_MODULE_INVALID )
+	AppModule_t m = LoadModule( pShaderDLL );
+	if ( m == APP_MODULE_INVALID )
 	{
-		if ( module == APP_MODULE_INVALID )
+		if ( m == APP_MODULE_INVALID )
 		{
 			pShaderDLL = "shaderapidx9.dll";
-			module = LoadModule( pShaderDLL );
-			if ( module == APP_MODULE_INVALID )
+			m = LoadModule( pShaderDLL );
+			if ( m == APP_MODULE_INVALID )
 			{
 				pShaderDLL = "shaderapiempty.dll";
-				module = LoadModule( pShaderDLL );
-				if ( module == APP_MODULE_INVALID )
+				m = LoadModule( pShaderDLL );
+				if ( m == APP_MODULE_INVALID )
 					return false;
 			}
 		}
 	}
 	
-	g_pShaderDeviceMgr = (IShaderDeviceMgr*)AddSystem( module, SHADER_DEVICE_MGR_INTERFACE_VERSION );
+	g_pShaderDeviceMgr = (IShaderDeviceMgr*)AddSystem( m, SHADER_DEVICE_MGR_INTERFACE_VERSION );
 
 	// So that shaderapi can get ahold of our bogus IShaderUtil
-	module = LoadModule( Sys_GetFactoryThis() );
-	AddSystem( module, SHADER_UTIL_INTERFACE_VERSION );
+	m = LoadModule( Sys_GetFactoryThis() );
+	AddSystem( m, SHADER_UTIL_INTERFACE_VERSION );
 
 	return ( g_pShaderDeviceMgr != NULL );
 }

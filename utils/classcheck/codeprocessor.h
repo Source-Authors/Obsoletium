@@ -70,7 +70,7 @@ private:
 	char		*ParseReceiveTable( char *current );
 
 	void		ProcessModule( bool forcequiet, int depth, int& maxdepth, int& numheaders, int& skippedfiles, 
-		const char *srcroot, const char *baseroot, const char *root, const char *module );
+		const char *srcroot, const char *baseroot, const char *root, const char *m );
 	void		ProcessModules( const char *srcroot, const char *root, const char *rootmodule );
 	void		PrintResults( const char *baseentityclass );
 	void		ConstructModuleList_R( int level, const char *baseentityclass, const char *gamespecific, const char *root, char const *srcroot );
@@ -78,7 +78,7 @@ private:
 	void		AddHeader( int depth, const char *filename, const char *rootmodule );
 
 	bool		CheckShouldSkip( bool forcequiet, int depth, char const *filename, int& numheaders, int& skippedfiles);
-	bool		LoadFile( char **buffer, char *filename, char const *module, bool forcequiet, 
+	bool		LoadFile( char **buffer, char *filename, char const *m, bool forcequiet, 
 					int depth, int& filelength, int& numheaders, int& skippedfiles,
 					char const *srcroot, char const *root, char const *baseroot );
 

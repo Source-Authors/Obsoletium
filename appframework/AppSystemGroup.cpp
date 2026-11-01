@@ -10,6 +10,7 @@
 #include "appframework/IAppSystemGroup.h"
 #include "appframework/IAppSystem.h"
 #include "tier1/interface.h"
+#include "tier1/strtools.h"
 #include "filesystem.h"
 #include "filesystem_init.h"
 
@@ -49,11 +50,11 @@ AppModule_t CAppSystemGroup::LoadModule( const char *pDLLName )
 	// See if we already loaded it...
 	for ( auto i = m_Modules.Count(); --i >= 0; ) 
 	{
-		const auto &module = m_Modules[i];
+		const auto &m = m_Modules[i];
 
-		if ( module.m_pModuleName )
+		if ( m.m_pModuleName )
 		{
-			if ( V_strieq( pModuleName, module.m_pModuleName ) )
+			if ( V_strieq( pModuleName, m.m_pModuleName ) )
 				return i;
 		}
 	}
@@ -85,11 +86,11 @@ AppModule_t CAppSystemGroup::LoadModule( CreateInterfaceFn factory )
 	// See if we already loaded it...
 	for ( auto i = m_Modules.Count(); --i >= 0; ) 
 	{
-		const auto &module = m_Modules[i];
+		const auto &m = m_Modules[i];
 
-		if ( module.m_Factory )
+		if ( m.m_Factory )
 		{
-			if ( module.m_Factory == factory )
+			if ( m.m_Factory == factory )
 				return i;
 		}
 	}
@@ -107,15 +108,15 @@ void CAppSystemGroup::UnloadAllModules()
 	// from loading
 	for ( auto i = m_Modules.Count(); --i >= 0; )
 	{
-		const auto &module = m_Modules[i];
+		const auto &m = m_Modules[i];
 
-		if ( module.m_pModule )
+		if ( m.m_pModule )
 		{
-			Sys_UnloadModule( module.m_pModule );
+			Sys_UnloadModule( m.m_pModule );
 		}
-		if ( module.m_pModuleName )
+		if ( m.m_pModuleName )
 		{
-			free( module.m_pModuleName );
+			free( m.m_pModuleName );
 		}
 	}
 	m_Modules.RemoveAll();
@@ -125,15 +126,15 @@ void CAppSystemGroup::UnloadAllModules()
 //-----------------------------------------------------------------------------
 // Methods to add/remove various global singleton systems 
 //-----------------------------------------------------------------------------
-IAppSystem *CAppSystemGroup::AddSystem( AppModule_t module, const char *pInterfaceName )
+IAppSystem *CAppSystemGroup::AddSystem( AppModule_t m, const char *pInterfaceName )
 {
-	if (module == APP_MODULE_INVALID)
+	if (m == APP_MODULE_INVALID)
 		return nullptr;
 
-	Assert( (module >= 0) && (module < m_Modules.Count()) );
-	CreateInterfaceFn pFactory = m_Modules[module].m_pModule
-		? Sys_GetFactory( m_Modules[module].m_pModule )
-		: m_Modules[module].m_Factory;
+	Assert( (m >= 0) && (m < m_Modules.Count()) );
+	CreateInterfaceFn pFactory = m_Modules[m].m_pModule
+		? Sys_GetFactory( m_Modules[m].m_pModule )
+		: m_Modules[m].m_Factory;
 
 	int retval;
 	void *pSystem = pFactory( pInterfaceName, &retval );
@@ -217,8 +218,8 @@ bool CAppSystemGroup::AddSystems( AppSystemInfo_t *pSystemList )
 {
 	while ( pSystemList->m_pModuleName[0] )
 	{
-		AppModule_t module = LoadModule( pSystemList->m_pModuleName );
-		IAppSystem *pSystem = AddSystem( module, pSystemList->m_pInterfaceName );
+		AppModule_t m = LoadModule( pSystemList->m_pModuleName );
+		IAppSystem *pSystem = AddSystem( m, pSystemList->m_pInterfaceName );
 		if ( !pSystem )
 		{
 			Warning( "Unable to load interface %s from %s\n", pSystemList->m_pInterfaceName, pSystemList->m_pModuleName );

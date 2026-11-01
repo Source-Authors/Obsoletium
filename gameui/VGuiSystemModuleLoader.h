@@ -83,7 +83,8 @@ private:
 
 	struct module_t
 	{
-		CSysModule *module;
+		// dimhotepus: module -> mod as former is reserved keyword in C++20.
+		CSysModule *mod;
 		IVGuiModule *moduleInterface;
 		KeyValues *data;
 	};

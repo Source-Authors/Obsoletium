@@ -91,7 +91,7 @@ int main( int argc, char *argv[] )
 	V_sprintf_safe( redirect_path, "%s" CORRECT_PATH_SEPARATOR_S "%s", full_path,
 	                kRedirectFileName );
 
-	s1::ScopedDll module{ nullptr, 0 };
+	s1::ScopedDll mod{ nullptr, 0 };
 	char          module_name[MAX_FILEPATH];
 
 	// First, look for vvis.redirect and load the dll specified in there if
@@ -107,12 +107,12 @@ int main( int argc, char *argv[] )
 			if ( end )
 				*end = '\0';
 
-			module = s1::ScopedDll{ name, 0 };
-			if ( !module )
+			mod = s1::ScopedDll{ name, 0 };
+			if ( !mod )
 			{
 				fprintf( stderr, "vvis warn: Can't find '%s' specified in '%s'.\n", name,
 				         kRedirectFileName );
-				return module.error_code().value();
+				return mod.error_code().value();
 			}
 			else
 			{
@@ -123,17 +123,17 @@ int main( int argc, char *argv[] )
 	}
 
 	// If it didn't load the module above, then use the
-	if ( !module )
+	if ( !mod )
 	{
 		V_strcpy_safe( module_name, kModuleName );
 
-		module = s1::ScopedDll{ module_name, 0 };
+		mod = s1::ScopedDll{ module_name, 0 };
 	}
 
-	if ( !module )
+	if ( !mod )
 	{
 		fprintf( stderr, "vvis error: Can't load '%s'.\n%s", module_name,
-		         module.error_code().message().c_str() );
+		         mod.error_code().message().c_str() );
 		return ENOENT;
 	}
 
@@ -141,7 +141,7 @@ int main( int argc, char *argv[] )
 	CreateInterfaceFnT< ILaunchableDLL > factory{ nullptr };
 
 	std::tie( factory, err ) =
-	module.GetFunction< CreateInterfaceFnT< ILaunchableDLL > >( kFactoryName );
+	mod.GetFunction< CreateInterfaceFnT< ILaunchableDLL > >( kFactoryName );
 	if ( !factory )
 	{
 		fprintf( stderr, "vvis error: Can't get '%s' factory from '%s'.\n",

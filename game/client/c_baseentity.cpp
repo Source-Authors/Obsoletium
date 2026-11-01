@@ -4876,11 +4876,11 @@ bool C_BaseEntity::IsClientCreated( void ) const
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *classname - 
-//			*module - 
+//			*m - 
 //			line - 
 // Output : C_BaseEntity
 //-----------------------------------------------------------------------------
-C_BaseEntity *C_BaseEntity::CreatePredictedEntityByName( const char *classname, const char *module, int line, bool persist /*= false */ )
+C_BaseEntity *C_BaseEntity::CreatePredictedEntityByName( const char *classname, const char *m, int line, bool persist /*= false */ )
 {
 #if !defined( NO_ENTITY_PREDICTION )
 	C_BasePlayer *player = C_BaseEntity::GetPredictionPlayer();
@@ -4898,7 +4898,7 @@ C_BaseEntity *C_BaseEntity::CreatePredictedEntityByName( const char *classname, 
 
 	// Create id/context
 	CPredictableId testId;
-	testId.Init( player_index, command_number, classname, module, line );
+	testId.Init( player_index, command_number, classname, m, line );
 
 	// If repredicting, should be able to find the entity in the previously created list
 	if ( !prediction->IsFirstTimePredicted() )
@@ -4934,7 +4934,7 @@ C_BaseEntity *C_BaseEntity::CreatePredictedEntityByName( const char *classname, 
 	context->m_bActive					= true;
 	context->m_nCreationCommandNumber	= command_number;
 	context->m_nCreationLineNumber		= line;
-	context->m_pszCreationModule		= module;
+	context->m_pszCreationModule		= m;
 
 	// Attach to entity
 	ent->m_pPredictionContext = context;

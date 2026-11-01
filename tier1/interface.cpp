@@ -350,8 +350,7 @@ void Sys_UnloadModule( CSysModule *pModule )
 
 //-----------------------------------------------------------------------------
 // Purpose: returns a pointer to a function, given a module
-// Input  : module - windows HMODULE from Sys_LoadModule() 
-//			*pName - proc name
+// Input  : pModule - windows HMODULE from Sys_LoadModule() 
 // Output : factory for this module
 //-----------------------------------------------------------------------------
 CreateInterfaceFn Sys_GetFactory( CSysModule *pModule )

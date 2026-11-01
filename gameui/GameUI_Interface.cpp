@@ -603,9 +603,9 @@ bool CGameUI::FindPlatformDirectory(char *platformDir, int bufferSize)
 	{
 		// we're not under steam, so setup using path relative to game
 #ifdef WIN32
-		if ( HMODULE module{nullptr};
-			::GetModuleHandleEx( GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, nullptr, &module ) &&
-			::GetModuleFileName( module, platformDir, bufferSize ) )
+		if ( HMODULE m{nullptr};
+			::GetModuleHandleEx( GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, nullptr, &m ) &&
+			::GetModuleFileName( m, platformDir, bufferSize ) )
 		{
 			char *lastslash = strrchr(platformDir, '\\'); // this should be just before the filename
 			if ( lastslash )

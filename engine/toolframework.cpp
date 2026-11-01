@@ -471,17 +471,17 @@ void CToolFrameworkInternal::LoadToolsFromLibrary( const char *dllname )
 		}
 	}
 
-	CSysModule *module = Sys_LoadModule( dllname );
-	if ( !module )
+	CSysModule *m = Sys_LoadModule( dllname );
+	if ( !m )
 	{
 		Warning( "CToolFrameworkInternal::LoadToolsFromLibrary:  Unable to load '%s'\n", dllname );
 		return;
 	}
 
-	CreateInterfaceFnT<IToolDictionary> factory = Sys_GetFactory<IToolDictionary>( module );
+	CreateInterfaceFnT<IToolDictionary> factory = Sys_GetFactory<IToolDictionary>( m );
 	if ( !factory )
 	{
-		Sys_UnloadModule( module );
+		Sys_UnloadModule( m );
 		Warning( "CToolFrameworkInternal::LoadToolsFromLibrary:  Dll '%s' has no factory\n", dllname );
 		return;
 	}
@@ -489,21 +489,21 @@ void CToolFrameworkInternal::LoadToolsFromLibrary( const char *dllname )
 	IToolDictionary *dictionary = factory( VTOOLDICTIONARY_INTERFACE_VERSION, NULL );
 	if ( !dictionary )
 	{
-		Sys_UnloadModule( module );
+		Sys_UnloadModule( m );
 		Warning( "CToolFrameworkInternal::LoadToolsFromLibrary:  Dll '%s' doesn't support '%s'\n", dllname, VTOOLDICTIONARY_INTERFACE_VERSION );
 		return;
 	}
 
 	if ( !dictionary->Connect( g_AppSystemFactory ) )
 	{
-		Sys_UnloadModule( module );
+		Sys_UnloadModule( m );
 		Warning( "CToolFrameworkInternal::LoadToolsFromLibrary:  Dll '%s' connection phase failed.\n", dllname );
 		return;
 	}
 
 	if ( dictionary->Init( ) != INIT_OK )
 	{
-		Sys_UnloadModule( module );
+		Sys_UnloadModule( m );
 		Warning( "CToolFrameworkInternal::LoadToolsFromLibrary:  Dll '%s' initialization phase failed.\n", dllname );
 		return;
 	}
@@ -522,7 +522,7 @@ void CToolFrameworkInternal::LoadToolsFromLibrary( const char *dllname )
 	}
 
 	m_Dictionaries.AddToTail( dictionary );
-	m_Modules.AddToTail( module );
+	m_Modules.AddToTail( m );
 }
 
 

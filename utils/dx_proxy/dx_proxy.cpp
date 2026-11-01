@@ -67,13 +67,13 @@ static BOOL ExtractDependencies()
 }
 
 // DLL entry point: DllMain
-BOOL WINAPI DllMain( HMODULE module, DWORD reason, void * )
+BOOL WINAPI DllMain( HMODULE m, DWORD reason, void * )
 {
 	switch ( reason )
 	{
 	case DLL_PROCESS_ATTACH:
 		// dimhotepus: No need to notify on thread creation.
-		::DisableThreadLibraryCalls( module );
+		::DisableThreadLibraryCalls( m );
 		// Process is attaching - make sure it can find the dependencies
 		return ExtractDependencies();
 	}

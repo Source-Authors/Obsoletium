@@ -1153,10 +1153,10 @@ void CCodeProcessor::AddHeader( int depth, const char *filename, const char *roo
 		return;
 	}
 
-	CODE_MODULE module;
-	module.skipped = false;
+	CODE_MODULE core_module;
+	core_module.skipped = false;
 
-	m_Headers.Insert( filename, module );
+	m_Headers.Insert( filename, core_module );
 }
 
 bool CCodeProcessor::CheckShouldSkip( bool forcequiet, int depth, char const *filename, int& numheaders, int& skippedfiles)
@@ -1165,14 +1165,14 @@ bool CCodeProcessor::CheckShouldSkip( bool forcequiet, int depth, char const *fi
 	if ( idx == m_Modules.InvalidIndex() )
 		return false;
 
-	CODE_MODULE *module = &m_Modules[ idx ];
+	CODE_MODULE *core_module = &m_Modules[ idx ];
 
 	if ( forcequiet )
 	{
 		m_nHeadersProcessed++;
 		numheaders++;
 
-		if ( module->skipped )
+		if ( core_module->skipped )
 		{
 			skippedfiles++;
 		}
@@ -1182,14 +1182,14 @@ bool CCodeProcessor::CheckShouldSkip( bool forcequiet, int depth, char const *fi
 	return true;
 }
 
-bool CCodeProcessor::LoadFile( char **buffer, char *filename, char const *module, bool forcequiet, 
+bool CCodeProcessor::LoadFile( char **buffer, char *filename, char const *m, bool forcequiet, 
 	int depth, int& filelength, int& numheaders, int& skippedfiles,
 	char const *srcroot, char const *root, char const *baseroot )
 {
 	for ( int i = 0; i < m_IncludePath.Count(); ++i )
 	{
 		// Load the base module
-		sprintf( filename, "%s\\%s", m_IncludePath[i], module );
+		sprintf( filename, "%s\\%s", m_IncludePath[i], m );
 		strlwr( filename );
 
 		if ( CheckShouldSkip( forcequiet, depth, filename, numheaders, skippedfiles ) )
@@ -1205,26 +1205,26 @@ bool CCodeProcessor::LoadFile( char **buffer, char *filename, char const *module
 	return false;
 }
 
-static bool SkipFile( char const *module )
+static bool SkipFile( char const *m )
 {
-	if ( V_strieq( module, "predictable_entity.h" ) )
+	if ( V_strieq( m, "predictable_entity.h" ) )
 		return true;
-	if ( V_strieq( module, "baseentity_shared.h" ) )
+	if ( V_strieq( m, "baseentity_shared.h" ) )
 		return true;
-	if ( V_strieq( module, "baseplayer_shared.h" ) )
+	if ( V_strieq( m, "baseplayer_shared.h" ) )
 		return true;
-	if ( V_strieq( module, "tf_tacticalmap.cpp" ) )
+	if ( V_strieq( m, "tf_tacticalmap.cpp" ) )
 		return true;
-	if ( V_strieq( module, "techtree.cpp" ) )
+	if ( V_strieq( m, "techtree.cpp" ) )
 		return true;
-	if ( V_strieq( module, "techtree_parse.cpp" ) )
+	if ( V_strieq( m, "techtree_parse.cpp" ) )
 		return true;
 
 	return false;
 }
 
 void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, int& numheaders, int& skippedfiles, 
-	const char *srcroot, const char *baseroot, const char *root, const char *module )
+	const char *srcroot, const char *baseroot, const char *root, const char *m )
 {
 	char filename[ 256 ];
 
@@ -1236,23 +1236,23 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 	char *buffer = NULL;
 		
 	// Always skip these particular modules/headers
-	if ( SkipFile( module ) )
+	if ( SkipFile( m ) )
 	{
-		CODE_MODULE module;
-		module.skipped = true;
+		CODE_MODULE core_module;
+		core_module.skipped = true;
 
-		m_Modules.Insert( filename, module );
+		m_Modules.Insert( filename, core_module );
 
 		skippedfiles++;
 		return;
 	}
 
-	if ( !LoadFile( &buffer, filename, module, forcequiet, depth, filelength, numheaders, skippedfiles,
+	if ( !LoadFile( &buffer, filename, m, forcequiet, depth, filelength, numheaders, skippedfiles,
 		srcroot, root, baseroot ) )
 	{
-		CODE_MODULE module;
-		module.skipped = true;
-		m_Modules.Insert( filename, module );
+		CODE_MODULE core_module;
+		core_module.skipped = true;
+		m_Modules.Insert( filename, core_module );
 		skippedfiles++;
 		return;
 	}
@@ -1261,9 +1261,9 @@ void CCodeProcessor::ProcessModule( bool forcequiet, int depth, int& maxdepth, i
 
 	m_nBytesProcessed += filelength;
 
-	CODE_MODULE m;
-	m.skipped = false;
-	m_Modules.Insert( filename, m );
+	CODE_MODULE core_module;
+	core_module.skipped = false;
+	m_Modules.Insert( filename, core_module );
 
 	if ( !forcequiet )
 	{

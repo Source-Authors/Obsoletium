@@ -90,7 +90,7 @@ bool CVGuiSystemModuleLoader::InitializeAllModules(CreateInterfaceFn *factorylis
 	CreateInterfaceFn *moduleFactories = stackallocT( CreateInterfaceFn, m_Modules.Count());
 	for ( intp i = 0; i < m_Modules.Count(); i++ )
 	{
-		moduleFactories[i] = Sys_GetFactory(m_Modules[i].module);
+		moduleFactories[i] = Sys_GetFactory(m_Modules[i].mod);
 	}
 
 	// give the modules a chance to link themselves together
@@ -178,7 +178,7 @@ bool CVGuiSystemModuleLoader::LoadPlatformModules(CreateInterfaceFn *factorylist
 
 		// store off the module
 		intp newIndex = m_Modules.AddToTail();
-		m_Modules[newIndex].module = mod;
+		m_Modules[newIndex].mod = mod;
 		m_Modules[newIndex].moduleInterface = moduleInterface;
 		m_Modules[newIndex].data = it;
 	}
@@ -249,7 +249,7 @@ void CVGuiSystemModuleLoader::UnloadPlatformModules()
 {
 	for ( auto &m : m_Modules )
 	{
-		g_pFullFileSystem->UnloadModule(m.module);
+		g_pFullFileSystem->UnloadModule(m.mod);
 	}
 
 	m_Modules.RemoveAll();
@@ -335,7 +335,7 @@ bool CVGuiSystemModuleLoader::ActivateModule(const char *moduleName)
 //-----------------------------------------------------------------------------
 CreateInterfaceFn CVGuiSystemModuleLoader::GetModuleFactory(int moduleIndex)
 {
-	return Sys_GetFactory(m_Modules[moduleIndex].module);
+	return Sys_GetFactory(m_Modules[moduleIndex].mod);
 }
 
 

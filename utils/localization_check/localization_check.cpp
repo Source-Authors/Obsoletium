@@ -2485,7 +2485,8 @@ void ExtractPhonemesForWave( IPhonemeExtractor *extractor, char const *wavname )
 struct Extractor
 {
 	PE_APITYPE			apitype;
-	CSysModule			*module;
+	// dimhotepus: module -> mod as module is reserved keyword in C++20.
+	CSysModule			*mod;
 	IPhonemeExtractor	*extractor;
 };
 
@@ -2497,7 +2498,7 @@ void UnloadPhonemeConverters()
 	for ( int i = c - 1; i >= 0; i-- )
 	{
 		Extractor *e = &g_Extractors[ i ];
-		g_pFullFileSystem->UnloadModule( e->module );
+		g_pFullFileSystem->UnloadModule( e->mod );
 	}
 
 	g_Extractors.RemoveAll();
@@ -2520,14 +2521,14 @@ int LoadPhonemeExtractors()
 		Con_Printf( "Loading extractor from %s\n", fullpath );
 
 		Extractor e;
-		e.module = Sys_LoadModule( fullpath );
-		if ( !e.module )
+		e.mod = Sys_LoadModule( fullpath );
+		if ( !e.mod )
 		{
 			Warning( "Unable to Sys_LoadModule %s\n", fullpath );
 			continue;
 		}
 
-		CreateInterfaceFn factory = Sys_GetFactory( e.module );
+		CreateInterfaceFn factory = Sys_GetFactory( e.mod );
 		if ( !factory )
 		{
 			Warning( "Unable to get factory from %s\n", fullpath );

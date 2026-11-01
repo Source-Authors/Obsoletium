@@ -100,8 +100,8 @@ bool CUnitTestApp::Create()
 			CreateInterfaceFn factory = Sys_GetFactory( hLib );
 			if ( factory && factory( UNITTEST_INTERFACE_VERSION, NULL ) )
 			{
-				AppModule_t module = LoadModule( factory );
-				AddSystem( module, UNITTEST_INTERFACE_VERSION );
+				AppModule_t m = LoadModule( factory );
+				AddSystem( m, UNITTEST_INTERFACE_VERSION );
 			}
 			else
 			{

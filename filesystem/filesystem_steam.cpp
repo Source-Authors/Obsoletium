@@ -1362,12 +1362,12 @@ void CFileSystem_Steam::GetLocalCopy( const char *pFileName )
 			//	made to the file after the mmap() call are visible in the mapped region." Testing
 			//	and lots of debugging (thanks Pierre-Loup!) has shown that they are, in fact,
 			//	blasted right over your nicely loaded and fixed up object.
-			CSysModule *module = Sys_LoadModule( pFileName, SYS_NOLOAD );
+			CSysModule *m = Sys_LoadModule( pFileName, SYS_NOLOAD );
 
-			if( module )
+			if( m )
 			{
 				// Sys_LoadModule( SYS_NOLOAD ) increments the refcount, so bump that back down.
-				Sys_UnloadModule( module );
+				Sys_UnloadModule( m );
 				return;
 			}
 		}
@@ -1434,8 +1434,8 @@ CSysModule * CFileSystem_Steam::LoadModule( const char *pFileName, const char *p
 			if ( bGetLocalCopy )
 				GetLocalCopy( newPathName );
 
-			CSysModule *module = Sys_LoadModule( newPathName );
-			if ( module ) // we found the binary in one of our search paths
+			CSysModule *m = Sys_LoadModule( newPathName );
+			if ( m ) // we found the binary in one of our search paths
 			{
 				if ( bValidatedDllOnly && !IsFileInSteamCache2(newPathName) )
 				{
@@ -1443,7 +1443,7 @@ CSysModule * CFileSystem_Steam::LoadModule( const char *pFileName, const char *p
 				}
 				else
 				{
-					return module;
+					return m;
 				}
 			}
 		}

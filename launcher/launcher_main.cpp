@@ -234,8 +234,8 @@ void TryToLoadSteamOverlayDLL()
 
 	// First, check if the module is already loaded, perhaps because we were run
 	// from Steam directly
-	HMODULE module{ GetModuleHandle( kOverlayDll ) };
-	if ( module )
+	HMODULE m{ GetModuleHandle( kOverlayDll ) };
+	if ( m )
 		return;
 
 	if ( 0 == GetEnvironmentVariableW( L"SteamGameId", nullptr, 0 ) )

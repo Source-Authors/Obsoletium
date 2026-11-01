@@ -45,7 +45,8 @@ static const char *s_pDefaultAttributeValueNames[LOG_PREVIEW_FLEX_CHANNEL_COUNT]
 struct Extractor
 {
 	PE_APITYPE			apitype;
-	CSysModule			*module;
+	// dimhotepus: module -> mod as former is reserved keyword in C++20.
+	CSysModule			*mod;
 	IPhonemeExtractor	*extractor;
 };
 
@@ -119,14 +120,14 @@ bool CSFMPhonemeExtractor::Init()
 		// Msg( "Loading extractor from %s\n", fullpath );
 
 		Extractor e;
-		e.module = g_pFullFileSystem->LoadModule( fullpath );
-		if ( !e.module )
+		e.mod = g_pFullFileSystem->LoadModule( fullpath );
+		if ( !e.mod )
 		{
 			pFilename = g_pFullFileSystem->FindNext( findHandle );
 			continue;
 		}
 
-		CreateInterfaceFnT<IPhonemeExtractor> factory = Sys_GetFactory<IPhonemeExtractor>( e.module );
+		CreateInterfaceFnT<IPhonemeExtractor> factory = Sys_GetFactory<IPhonemeExtractor>( e.mod );
 		if ( !factory )
 		{
 			pFilename = g_pFullFileSystem->FindNext( findHandle );
@@ -156,7 +157,7 @@ void CSFMPhonemeExtractor::Shutdown()
 	for ( intp i = c - 1; i >= 0; i-- )
 	{
 		Extractor *e = &m_Extractors[ i ];
-		g_pFullFileSystem->UnloadModule( e->module );
+		g_pFullFileSystem->UnloadModule( e->mod );
 	}
 
 	m_Extractors.RemoveAll();

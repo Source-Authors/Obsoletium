@@ -127,13 +127,13 @@ protected:
 	AppModule_t LoadModule( CreateInterfaceFn factory );
 
 	// Method to add various global singleton systems 
-	IAppSystem *AddSystem( AppModule_t module, const char *pInterfaceName );
+	IAppSystem *AddSystem( AppModule_t m, const char *pInterfaceName );
 
 	template<typename TAppSystem>
 	std::enable_if_t<std::is_base_of_v<IAppSystem, TAppSystem>, TAppSystem *>
-	AddSystem( AppModule_t module, const char *pInterfaceName )
+	AddSystem( AppModule_t m, const char *pInterfaceName )
 	{
-		return static_cast<TAppSystem *>( AddSystem( module, pInterfaceName ) );
+		return static_cast<TAppSystem *>( AddSystem( m, pInterfaceName ) );
 	}
 
 	void AddSystem( IAppSystem *pAppSystem, const char *pInterfaceName );

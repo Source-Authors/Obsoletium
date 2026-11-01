@@ -6303,12 +6303,12 @@ bool CBaseEntity::IsFloating()
 //-----------------------------------------------------------------------------
 // Purpose: Created predictable and sets up Id.  Note that persist is ignored on the server.
 // Input  : *classname - 
-//			*module - 
+//			*m - 
 //			line - 
 //			persist - 
 // Output : CBaseEntity
 //-----------------------------------------------------------------------------
-CBaseEntity *CBaseEntity::CreatePredictedEntityByName( const char *classname, const char *module, int line, bool persist /* = false */ )
+CBaseEntity *CBaseEntity::CreatePredictedEntityByName( const char *classname, const char *m, int line, bool persist /* = false */ )
 {
 #if !defined( NO_ENTITY_PREDICTION )
 	CBasePlayer *player = CBaseEntity::GetPredictionPlayer();
@@ -6320,7 +6320,7 @@ CBaseEntity *CBaseEntity::CreatePredictedEntityByName( const char *classname, co
 	int player_index = player->entindex() - 1;
 
 	CPredictableId testId;
-	testId.Init( player_index, command_number, classname, module, line );
+	testId.Init( player_index, command_number, classname, m, line );
 
 	ent = CreateEntityByName( classname );
 	// No factory???

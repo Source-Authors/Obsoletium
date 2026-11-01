@@ -148,10 +148,10 @@ template< int size >
 bool GetExecutableName( char ( &out )[size] )
 {
 #ifdef _WIN32
-	if ( HMODULE module{ nullptr };
+	if ( HMODULE m{ nullptr };
 	     !::GetModuleHandleEx( GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-	                           nullptr, &module ) ||
-	     !::GetModuleFileName( module, out, size ) )
+	                           nullptr, &m ) ||
+	     !::GetModuleFileName( m, out, size ) )
 	{
 		return false;
 	}
