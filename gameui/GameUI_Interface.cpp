@@ -511,23 +511,20 @@ void CGameUI::Start()
 	if ( !FindPlatformDirectory( m_szPlatformDir, sizeof( m_szPlatformDir ) ) )
 		return;
 
-	if ( IsPC() )
-	{
-		// setup config file directory
-		char szConfigDir[512];
-		V_strcpy_safe( szConfigDir, m_szPlatformDir );
-		V_strcat_safe( szConfigDir, "config" );
+	// setup config file directory
+	char szConfigDir[512];
+	V_strcpy_safe( szConfigDir, m_szPlatformDir );
+	V_strcat_safe( szConfigDir, "config" );
 
-		Msg( "Steam config directory: %s\n", szConfigDir );
+	Msg( "Steam config directory: %s\n", szConfigDir );
 
-		g_pFullFileSystem->AddSearchPath(szConfigDir, "CONFIG");
-		g_pFullFileSystem->CreateDirHierarchy("", "CONFIG");
+	g_pFullFileSystem->AddSearchPath(szConfigDir, "CONFIG");
+	g_pFullFileSystem->CreateDirHierarchy("", "CONFIG");
 
-		// user dialog configuration
-		vgui::system()->SetUserConfigFile("InGameDialogConfig.vdf", "CONFIG");
+	// user dialog configuration
+	vgui::system()->SetUserConfigFile("InGameDialogConfig.vdf", "CONFIG");
 
-		g_pFullFileSystem->AddSearchPath( "platform", "PLATFORM" );
-	}
+	g_pFullFileSystem->AddSearchPath( "platform", "PLATFORM" );
 
 	// localization
 	g_pVGuiLocalize->AddFile( "Resource/platform_%language%.txt");
@@ -535,54 +532,50 @@ void CGameUI::Start()
 
 	Sys_SetLastError( SYS_NO_ERROR );
 
-	if ( IsPC() )
+	if constexpr ( !IsPosix() )
 	{
-		if ( !IsPosix() )
+		// Alfred says this is really, really old code that does some wacky crap that only
+		// happened in the first version of HL and it's the only game that does this and
+		// it was a steam testing type thing and we don't need to do it on Posix, etc.
+		g_hMutex = Sys_CreateMutex( "ValvePlatformUIMutex" );
+		g_hWaitMutex = Sys_CreateMutex( "ValvePlatformWaitMutex" );
+		if ( g_hMutex == 0 || g_hWaitMutex == 0 || Sys_GetLastError() == SYS_ERROR_INVALID_HANDLE )
 		{
-			// Alfred says this is really, really old code that does some wacky crap that only
-			//  happened in the first version of HL and it's the only game that does this and
-			//  it was a steam testing type thing and we don't need to do it on Posix, etc.
-
-			g_hMutex = Sys_CreateMutex( "ValvePlatformUIMutex" );
-			g_hWaitMutex = Sys_CreateMutex( "ValvePlatformWaitMutex" );
-			if ( g_hMutex == 0 || g_hWaitMutex == 0 || Sys_GetLastError() == SYS_ERROR_INVALID_HANDLE )
+			// error, can't get handle to mutex
+			if (g_hMutex)
 			{
-				// error, can't get handle to mutex
-				if (g_hMutex)
-				{
-					Sys_ReleaseMutex(g_hMutex);
-				}
-				if (g_hWaitMutex)
-				{
-					Sys_ReleaseMutex(g_hWaitMutex);
-				}
-				g_hMutex = NULL;
-				g_hWaitMutex = NULL;
-				Error("Steam Error: Could not access Steam, bad mutex\n");
-				return;
+				Sys_ReleaseMutex(g_hMutex);
 			}
-			unsigned int waitResult = Sys_WaitForSingleObject(g_hMutex, 0);
-			if (!(waitResult == SYS_WAIT_OBJECT_0 || waitResult == SYS_WAIT_ABANDONED))
+			if (g_hWaitMutex)
 			{
-				// mutex locked, need to deactivate Steam (so we have the Friends/ServerBrowser data files)
-				// get the wait mutex, so that Steam.exe knows that we're trying to acquire ValveTrackerMutex
-				waitResult = Sys_WaitForSingleObject(g_hWaitMutex, 0);
-#ifdef WIN32
-				if (waitResult == SYS_WAIT_OBJECT_0 || waitResult == SYS_WAIT_ABANDONED)
-				{
-					Sys_EnumWindows(reinterpret_cast<void*>(SendShutdownMsgFunc), 1);
-				}
-#endif
+				Sys_ReleaseMutex(g_hWaitMutex);
 			}
+			g_hMutex = NULL;
+			g_hWaitMutex = NULL;
+			Error("Steam Error: Could not access Steam, bad mutex\n");
+			return;
 		}
-			
-		// Delay playing the startup music until the first frame
-		m_bPlayGameStartupSound = true;
-
-		// now we are set up to check every frame to see if we can friends/server browser
-		m_bTryingToLoadFriends = true;
-		m_iFriendsLoadPauseFrames = 1;
+		unsigned int waitResult = Sys_WaitForSingleObject(g_hMutex, 0);
+		if (!(waitResult == SYS_WAIT_OBJECT_0 || waitResult == SYS_WAIT_ABANDONED))
+		{
+			// mutex locked, need to deactivate Steam (so we have the Friends/ServerBrowser data files)
+			// get the wait mutex, so that Steam.exe knows that we're trying to acquire ValveTrackerMutex
+			waitResult = Sys_WaitForSingleObject(g_hWaitMutex, 0);
+#ifdef WIN32
+			if (waitResult == SYS_WAIT_OBJECT_0 || waitResult == SYS_WAIT_ABANDONED)
+			{
+				Sys_EnumWindows(reinterpret_cast<void*>(SendShutdownMsgFunc), 1);
+			}
+#endif
+		}
 	}
+			
+	// Delay playing the startup music until the first frame
+	m_bPlayGameStartupSound = true;
+
+	// now we are set up to check every frame to see if we can friends/server browser
+	m_bTryingToLoadFriends = true;
+	m_iFriendsLoadPauseFrames = 1;
 }
 
 //-----------------------------------------------------------------------------
