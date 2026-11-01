@@ -13,11 +13,11 @@
 
 #include <cstdlib>
 #include <cstdio>
-#include <string.h> // for strlen()
+#include <cstring> // for strlen()
 #include <cstdarg>
 #include <dlfcn.h>
 #if !defined ( _WIN32 )
-#include <string.h>
+#include <cstring>
 #endif
 
 

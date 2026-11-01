@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#include <string.h>
+#include <cstring>
 
 #include "ViewerSettings.h"
 #include "StudioModel.h"

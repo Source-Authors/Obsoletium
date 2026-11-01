@@ -8,7 +8,7 @@
 	   
 #include "unitlib/unitlib.h"
 #include "tier0/dbg.h"
-#include <string.h>
+#include <cstring>
 
 
 

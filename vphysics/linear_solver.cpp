@@ -9,7 +9,7 @@
 #include "tier0/platform.h"
 #include "linear_solver.h"
 #include <cstdio>
-#include <string.h>
+#include <cstring>
 #include <cmath>
 
 // BUGBUG: Remove/tune this number somehow!!!

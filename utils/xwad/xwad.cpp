@@ -2,7 +2,7 @@
 
 #include <windows.h>
 #include <cstdio>
-#include <string.h>
+#include <cstring>
 #include <cstdlib>
 #include <cerrno>
 #include <conio.h>

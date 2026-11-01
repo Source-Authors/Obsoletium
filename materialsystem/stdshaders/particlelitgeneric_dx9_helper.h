@@ -8,7 +8,7 @@
 #ifndef PARTICLELITGENERIC_DX9_HELPER_H
 #define PARTICLELITGENERIC_DX9_HELPER_H
 
-#include <string.h>
+#include <cstring>
 
 
 //-----------------------------------------------------------------------------

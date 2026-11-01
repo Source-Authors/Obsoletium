@@ -5,7 +5,7 @@
 //=============================================================================//
 
 #include <cstdio>
-#include <string.h>
+#include <cstring>
 #include <io.h>
 #include <malloc.h>
 

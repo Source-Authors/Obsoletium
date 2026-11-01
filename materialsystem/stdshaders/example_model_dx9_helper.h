@@ -7,7 +7,7 @@
 #ifndef EXAMPLE_MODEL_DX9_HELPER_H
 #define EXAMPLE_MODEL_DX9_HELPER_H
 
-#include <string.h>
+#include <cstring>
 
 //-----------------------------------------------------------------------------
 // Forward declarations

@@ -5,7 +5,7 @@
 //=============================================================================//
 
 #include <cstdio>
-#include <string.h>
+#include <cstring>
 #include <cmath>
 #include <malloc.h>
 #include "vgui_surfacelib/BitmapFont.h"

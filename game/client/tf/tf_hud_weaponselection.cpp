@@ -22,7 +22,7 @@
 
 #include "vgui/ILocalize.h"
 
-#include <string.h>
+#include <cstring>
 #include "baseobject_shared.h"
 #include "tf_imagepanel.h"
 #include "item_model_panel.h"

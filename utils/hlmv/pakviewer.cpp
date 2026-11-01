@@ -24,7 +24,7 @@
 //
 #include <cstdio>
 #include <cstdlib>
-#include <string.h>
+#include <cstring>
 #include <mxtk/mx.h>
 #include "pakviewer.h"
 #include "mdlviewer.h"

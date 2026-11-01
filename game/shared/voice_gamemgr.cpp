@@ -7,7 +7,7 @@
 
 #include "cbase.h"
 #include "voice_gamemgr.h"
-#include <string.h>
+#include <cstring>
 #include <cstdarg>
 #include "player.h"
 #include "ivoiceserver.h"

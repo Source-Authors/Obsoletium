@@ -36,7 +36,7 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <string.h>
+#include <cstring>
 #include <cstdint>
 #include <strings.h>
 #include <unistd.h>

@@ -9,7 +9,7 @@
 #include "colorspace.h"
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/itexture.h"
-#include <string.h>
+#include <cstring>
 #include "materialsystem_global.h"
 #include "shaderapi/ishaderapi.h"
 #include "materialsystem/imaterialproxy.h"							   

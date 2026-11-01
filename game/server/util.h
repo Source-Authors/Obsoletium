@@ -25,7 +25,7 @@
 #include "shake.h"
 
 #include "vstdlib/random.h"
-#include <string.h>
+#include <cstring>
 
 #include "utlvector.h"
 #include "util_shared.h"

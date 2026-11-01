@@ -18,7 +18,7 @@
 
 #include "vgui/ILocalize.h"
 
-#include <string.h>
+#include <cstring>
 
 //-----------------------------------------------------------------------------
 // Purpose: cstrike weapon selection hud element

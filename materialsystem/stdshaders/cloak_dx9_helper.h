@@ -10,7 +10,7 @@
 #pragma once
 #endif
 
-#include <string.h>
+#include <cstring>
 
 //-----------------------------------------------------------------------------
 // Forward declarations

@@ -46,7 +46,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <time.h>
-#include <string.h>
+#include <cstring>
 #include "MatSysWin.h"
 #include "MDLViewer.h"
 #include "StudioModel.h"

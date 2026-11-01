@@ -11,7 +11,7 @@
 #include "coordsize.h"
 
 #include "quakedef.h"
-#include <string.h>
+#include <cstring>
 #include <cstdlib>
 #include "mathlib/mathlib.h"
 #include "common.h"

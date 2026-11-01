@@ -8,7 +8,7 @@
 //=============================================================================//
 
 #include "shaderlib/cshader.h"
-#include <string.h>
+#include <cstring>
 #include "const.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

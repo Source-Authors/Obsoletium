@@ -12,7 +12,7 @@
 #include "ControlPanel.h"
 #include <cstdio>
 #include <cstdlib>
-#include <string.h>
+#include <cstring>
 #include <mxtk/mx.h>
 #include <mxtk/mxBmp.h>
 

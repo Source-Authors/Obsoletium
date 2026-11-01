@@ -7,7 +7,7 @@
 #include "cbase.h"
 #include "basetypes.h"
 #include "hud.h"
-#include <string.h>
+#include <cstring>
 #include <cstdio>
 #include "voice_status.h"
 #include "r_efx.h"

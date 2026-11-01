@@ -8,7 +8,7 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <string.h>
+#include <cstring>
 
 #include "tier0/platform.h"
 #include "tier1/utlbuffer.h"

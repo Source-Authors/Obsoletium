@@ -8,7 +8,7 @@
 #ifndef VERTEXLITGENERIC_DX95_HELPER_H
 #define VERTEXLITGENERIC_DX95_HELPER_H
 
-#include <string.h>
+#include <cstring>
 
 
 //-----------------------------------------------------------------------------

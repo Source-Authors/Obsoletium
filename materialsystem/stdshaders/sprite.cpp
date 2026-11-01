@@ -8,7 +8,7 @@
 //=============================================================================//
 
 #include "BaseVSShader.h"
-#include <string.h>
+#include <cstring>
 #include "const.h"
 #include "sprite_vs11.inc"
 

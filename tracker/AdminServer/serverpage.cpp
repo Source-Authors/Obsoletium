@@ -16,7 +16,7 @@
 // $NoKeywords: $
 //=============================================================================
 #include <cstdio>
-#include <string.h>
+#include <cstring>
 #include <cstdarg>
 
 // base vgui interfaces

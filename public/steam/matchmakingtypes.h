@@ -19,7 +19,7 @@
 #endif
 
 #include <cstdio>
-#include <string.h>
+#include <cstring>
 
 //
 // Max size (in bytes of UTF-8 data, not in characters) of server fields, including null terminator.

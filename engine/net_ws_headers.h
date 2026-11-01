@@ -56,7 +56,7 @@ typedef int socklen_t;
 #include <sys/ioctl.h>
 #include <sys/uio.h>
 #include <cerrno>
-#include <string.h>
+#include <cstring>
 #include <cstdlib>
 
 #define WSAEWOULDBLOCK		EWOULDBLOCK

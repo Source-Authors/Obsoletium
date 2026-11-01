@@ -10,7 +10,7 @@
 #include <cstdio>
 #include <memory.h>
 #include <cmath>
-#include <string.h>
+#include <cstring>
 
 typedef unsigned char byte;
 

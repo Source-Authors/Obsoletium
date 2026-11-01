@@ -10,7 +10,7 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <string.h>
+#include <cstring>
 #include <cstdlib>
 #include "basetypes.h"
 #include "measure_section.h"

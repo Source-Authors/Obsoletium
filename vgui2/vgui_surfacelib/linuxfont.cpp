@@ -9,7 +9,7 @@
 #include "vgui_surfacelib/linuxfont.h"
 
 #include <cstdio>
-#include <string.h>
+#include <cstring>
 #include <cmath>
 #include <malloc.h>
 #include "tier0/dbg.h"

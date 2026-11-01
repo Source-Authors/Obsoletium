@@ -9,7 +9,7 @@
 #include <windows.h>
 #include <cstdio>
 #include <cstdarg>
-#include <string.h>
+#include <cstring>
 
 #define MAX_SYSTOKENCHARS	1024
 

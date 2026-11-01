@@ -25,7 +25,7 @@
 #include "FileAssociation.h"
 #include <cstdio>
 #include <cstdlib>
-#include <string.h>
+#include <cstring>
 #include <mxtk/mx.h>
 
 #include "tier1/strtools.h"

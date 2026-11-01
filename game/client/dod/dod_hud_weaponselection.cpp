@@ -16,7 +16,7 @@
 #include "vgui_controls/AnimationController.h"
 #include "vgui_controls/Panel.h"
 
-#include <string.h>
+#include <cstring>
 #include "weapon_dodbase.h"
 
 float GetScale( int nIconWidth, int nIconHeight, int nWidth, int nHeight );

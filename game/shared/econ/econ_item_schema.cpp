@@ -18,7 +18,7 @@
 #include "checksum_sha1.h"
 
 #include <google/protobuf/text_format.h>
-#include <string.h>
+#include <cstring>
 
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/itexture.h"

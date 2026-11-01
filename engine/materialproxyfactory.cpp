@@ -7,7 +7,7 @@
 
 #include <cstdlib>
 #include <malloc.h>
-#include <string.h>
+#include <cstring>
 #include "materialsystem/imaterialproxy.h"
 #include "materialproxyfactory.h"
 #include "toolframework/itoolframework.h"

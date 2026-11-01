@@ -8,7 +8,7 @@
 #ifndef LIGHTMAPPEDGENERIC_DX9_HELPER_H
 #define LIGHTMAPPEDGENERIC_DX9_HELPER_H
 
-#include <string.h>
+#include <cstring>
 #include "BaseVSShader.h"
 
 

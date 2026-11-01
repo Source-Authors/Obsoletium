@@ -8,7 +8,7 @@
 #ifndef SKIN_DX9_HELPER_H
 #define SKIN_DX9_HELPER_H
 
-#include <string.h>
+#include <cstring>
 
 #include "vertexlitgeneric_dx9_helper.h"
 

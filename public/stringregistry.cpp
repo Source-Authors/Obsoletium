@@ -13,7 +13,7 @@
 
 
 #include <cstdio>
-#include <string.h>
+#include <cstring>
 #include "stringregistry.h"
 #include "utldict.h"
 

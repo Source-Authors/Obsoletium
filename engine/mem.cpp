@@ -8,7 +8,7 @@
 // mem.c
 #include <cstdlib>
 #include <memory.h>
-#include <string.h>
+#include <cstring>
 #include "mem.h"
 
 

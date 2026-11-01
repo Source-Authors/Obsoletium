@@ -7,7 +7,7 @@
 
 #include "UtlMsgBuffer.h"
 
-#include <string.h>
+#include <cstring>
 
 //-----------------------------------------------------------------------------
 // Purpose: bitfields for use in variable descriptors

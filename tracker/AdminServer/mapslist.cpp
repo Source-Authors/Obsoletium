@@ -14,7 +14,7 @@
 #include "inetapi.h"
 #include "TokenLine.h"
 #include "dialogkickplayer.h"
-#include <string.h>
+#include <cstring>
 
 extern void v_strncpy(char *dest, const char *src, int bufsize);
 

@@ -6,7 +6,7 @@
 //
 //===========================================================================//
 #include <cstdlib>
-#include <string.h>
+#include <cstring>
 #include "tier1/strtools.h"
 
 // char *date = "Oct 24 1996";

@@ -16,7 +16,7 @@
 #include "vgui/ISystem.h"
 #include "vgui_controls/Panel.h"
 
-#include <string.h>
+#include <cstring>
 
 
 #define HL1_MAX_WEAPON_SLOTS	5

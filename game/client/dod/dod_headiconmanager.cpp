@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================
 #include "cbase.h"
-#include <string.h>
+#include <cstring>
 #include <cstdio>
 #include "dod_headiconmanager.h"
 #include "c_playerresource.h"

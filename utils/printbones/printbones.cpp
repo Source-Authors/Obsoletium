@@ -6,7 +6,7 @@
 //=============================================================================//
 
 #include <cstdio>
-#include <string.h>
+#include <cstring>
 #include "studio.h"
 
 int g_NumBonesInLOD[MAX_NUM_LODS];

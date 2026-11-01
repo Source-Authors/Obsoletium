@@ -8,7 +8,7 @@
 #ifndef WORLDVERTEXTRANSITION_DX8_HELPER_H
 #define WORLDVERTEXTRANSITION_DX8_HELPER_H
 
-#include <string.h>
+#include <cstring>
 
 
 //-----------------------------------------------------------------------------

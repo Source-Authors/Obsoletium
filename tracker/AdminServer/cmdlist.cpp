@@ -7,7 +7,7 @@
 //=============================================================================
 
 #include <cctype> // isspace() define
-#include <string.h>
+#include <cstring>
 
 #include "CMDList.h"
 #include "Iresponse.h"

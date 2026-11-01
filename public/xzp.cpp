@@ -6,7 +6,7 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <string.h>
+#include <cstring>
 #include <cctype>
 #include <malloc.h>
 #ifdef _WIN32

@@ -6,7 +6,7 @@
 //=============================================================================
 
 #include "util.h"
-#include <string.h>
+#include <cstring>
 
 #define NUM_BUFFERS 4
 #define MAX_INFO_TOKEN_LENGTH 512
