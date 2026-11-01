@@ -12,8 +12,6 @@
 
 #include "tier0/memdbgon.h"
 
-#pragma warning( disable : 4706 ) // Warning C4706: assignment within conditional expression
-
 //-----------------------------------------------------------------------------
 // Purpose: converts between a MySQL field type and our column types
 //-----------------------------------------------------------------------------

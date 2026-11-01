@@ -10,8 +10,6 @@
 #ifndef CS_BOT_CHATTER_H
 #define CS_BOT_CHATTER_H
 
-#pragma warning( disable : 4786 )	// long STL names get truncated in browse info.
-
 #include "nav_mesh.h"
 #include "cs_gamestate.h"
 

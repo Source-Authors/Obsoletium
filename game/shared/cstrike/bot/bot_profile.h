@@ -10,8 +10,6 @@
 #ifndef _BOT_PROFILE_H_
 #define _BOT_PROFILE_H_
 
-#pragma warning( disable : 4786 )	// long STL names get truncated in browse info.
-
 #include "bot_constants.h"
 #include "bot_util.h"
 #include "cs_weapon_parse.h"

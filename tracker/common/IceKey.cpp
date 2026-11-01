@@ -8,8 +8,6 @@
 
 #include "mathlib/IceKey.H"
 
-#pragma warning(disable: 4244)
-
 
 	/* Structure of a single round subkey */
 class IceSubkey {

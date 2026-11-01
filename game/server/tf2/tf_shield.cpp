@@ -318,8 +318,6 @@ void CShield::SetEMPed( bool isEmped )
 //-----------------------------------------------------------------------------
 // Helper method for collision testing
 //-----------------------------------------------------------------------------
-#pragma warning ( disable : 4701 )
-
 bool CShield::TestCollision( const Ray_t& ray, unsigned int mask, trace_t& trace )
 {
 	// Can't block anything if we're EMPed, or we've got no power left to block
@@ -426,7 +424,3 @@ bool CShield::TestCollision( const Ray_t& ray, unsigned int mask, trace_t& trace
 
 	return true;
 }
-
-#pragma warning ( default : 4701 )
-
-

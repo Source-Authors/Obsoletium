@@ -754,13 +754,10 @@ bool CQuickTimeVideoSubSystem::SetupQuickTime()
 	m_AvailableFeatures = DEFAULT_FEATURE_SET;
 
 	// if the Library load didn't hook up the compression functions, remove them from our feature list
-#pragma warning ( disable : 4551 )
-	
     if ( !CompressImage )
     {
 		m_AvailableFeatures = m_AvailableFeatures & ~( VideoSystemFeature::ENCODE_VIDEO_TO_FILE | VideoSystemFeature::ENCODE_AUDIO_TO_FILE );
     }
-#pragma warning ( default : 4551 )
 
 	// Note that we are now open for business....	
 	m_bQuickTimeInitialized = true;

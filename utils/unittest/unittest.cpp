@@ -15,8 +15,6 @@
 #include "tier1/interface.h"
 #include "vstdlib/cvar.h"
 
-#pragma warning (disable:4100)
-
 SpewRetval_t UnitTestSpew( SpewType_t type, char const *pMsg )
 {
 	switch( type )

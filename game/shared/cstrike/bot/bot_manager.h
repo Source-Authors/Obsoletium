@@ -10,8 +10,6 @@
 #ifndef BASE_CONTROL_H
 #define BASE_CONTROL_H
 
-#pragma warning( disable : 4530 )					// STL uses exceptions, but we are not compiling with them - ignore warning
-
 extern float g_BotUpkeepInterval;					///< duration between bot upkeeps
 extern float g_BotUpdateInterval;					///< duration between bot updates
 const int g_BotUpdateSkipCount = 2;					///< number of upkeep periods to skip update

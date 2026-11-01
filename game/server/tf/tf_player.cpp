@@ -137,8 +137,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#pragma warning( disable: 4355 ) // disables ' 'this' : used in base member initializer list'
-
 ConVar sv_motd_unload_on_dismissal( "sv_motd_unload_on_dismissal", "0", 0, "If enabled, the MOTD contents will be unloaded when the player closes the MOTD." );
 
 #define DAMAGE_FORCE_SCALE_SELF				9

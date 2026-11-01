@@ -7,10 +7,7 @@
 //=============================================================================//
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-
-#pragma warning( disable: 4201 )
 #include <mmsystem.h>
-#pragma warning( default: 4201 )
 
 #include <stdio.h>
 #include <math.h>

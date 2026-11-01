@@ -7,8 +7,6 @@
 
 // Author: Michael S. Booth (mike@turtlerockstudios.com), 2003
 
-#pragma warning( disable : 4530 )					// STL uses exceptions, but we are not compiling with them - ignore warning
-
 #include "cbase.h"
 
 #include "cs_bot.h"
@@ -20,10 +18,6 @@
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
-#ifdef _WIN32
-#pragma warning (disable:4701)				// disable warning that variable *may* not be initialized 
-#endif
 
 CBotManager *TheBots = NULL;
 

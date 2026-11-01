@@ -80,12 +80,6 @@
 // many vendors fraudulently define Microsoft's identifiers.
 #if defined(_MSC_VER) && !defined(__MWERKS__) && !defined(__VECTOR_C) && !defined(__ICL) && !defined(__BORLANDC__)
 #define FASTDLGT_ISMSVC
-
-#if (_MSC_VER <1300) // Many workarounds are required for VC6.
-#define FASTDLGT_VC6
-#pragma warning(disable:4786) // disable this ridiculous warning
-#endif
-
 #endif
 
 // Does the compiler uses Microsoft's member function pointer structure?

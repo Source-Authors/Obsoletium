@@ -21,7 +21,6 @@ namespace std{
 // dimhotepus: Drop unneeded allocator param as it is default.
 #define VECTOR_TYPE(type) ::std::vector<type>
 
-#pragma warning( disable : 4251 )
 class EffectTag;
 
 //ensure these are not int he NovintHFX namespace.
@@ -31,7 +30,6 @@ class EffectTag;
 using LinkHFX_Fn = int (*)(const char *, const char *, void **, void **);
 //temporarily disable warning regarding to data classes
 // needing external classes
-#pragma warning(disable:4661)
 //forward decl.
 class IDevice;
 class IStack;
@@ -511,8 +509,6 @@ using HFX_VarType = char;
 #define HFX_Pointer 'p'
 #define HFX_Null 0
 
-
-#pragma warning( default : 4251 )
 
 #ifdef HFX_MODULE_LAYER
 #include HFX_MODULE_LAYER

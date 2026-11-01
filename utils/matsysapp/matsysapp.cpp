@@ -19,8 +19,6 @@
 
 #include "stdafx.h"
 
-#pragma warning(disable:4305)
-#pragma warning(disable:4244)
 #include <windows.h>
 #include <math.h>
 #include <stdarg.h>

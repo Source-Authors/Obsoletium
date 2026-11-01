@@ -78,8 +78,6 @@
 
 #pragma optimize( "", off )
 
-#pragma warning( disable : 4355 )
-
 // Minimum interval between rate-limited commands that players can run.
 #define CS_COMMAND_MAX_RATE 0.3
 

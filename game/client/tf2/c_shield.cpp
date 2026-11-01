@@ -162,8 +162,6 @@ void C_Shield::ActivateShields( bool activate, int team )
 //-----------------------------------------------------------------------------
 // Helper method for collision testing
 //-----------------------------------------------------------------------------
-#pragma warning ( disable : 4701 )
-
 bool C_Shield::TestCollision( const Ray_t& ray, unsigned int mask, trace_t& trace )
 {
 	// Can't block anything if we're EMPed, or we've got no power left to block
@@ -267,8 +265,6 @@ bool C_Shield::TestCollision( const Ray_t& ray, unsigned int mask, trace_t& trac
 	UTIL_SetTrace( trace, ray, this, mint, hitgroup, CONTENTS_SOLID, normal, intercept );
 	return true;
 }
-
-#pragma warning ( default : 4701 )
 
 //-----------------------------------------------------------------------------
 // Called when we hit something that we deflect...

@@ -10,16 +10,6 @@
 #pragma once
 #endif
 
-#ifdef _WIN32
-// Silence certain warnings
-#pragma warning(disable : 4244)		// int or float down-conversion
-#pragma warning(disable : 4305)		// int or float data truncation
-#pragma warning(disable : 4201)		// nameless struct/union
-#pragma warning(disable : 4511)     // copy constructor could not be generated
-#pragma warning(disable : 4675)     // resolved overload was found by argument dependent lookup
-#pragma warning(disable : 4706)     // assignment within conditional expression
-#endif
-
 #ifndef NDEBUG
 #define DEBUG 1
 #endif

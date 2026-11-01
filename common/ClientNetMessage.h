@@ -8,8 +8,6 @@
 #define CLIENTNETMESSAGE_H
 #ifdef _WIN32
 #pragma once
-#pragma warning(disable : 4100)	// unreferenced formal parameter
-#pragma warning(disable : 4514) // unreferenced inline function has been removed
 #endif
 
 #include "inetmessage.h"

@@ -13,10 +13,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifdef _WIN32
-#pragma warning (disable:4701)				// disable warning that variable *may* not be initialized 
-#endif
-
 
 //--------------------------------------------------------------------------------------------------------------
 /**

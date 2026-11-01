@@ -94,8 +94,6 @@ const char *g_ppszRandomCombineModels[] =
 
 #define HL2MPPLAYER_PHYSDAMAGE_SCALE 4.0f
 
-#pragma warning( disable : 4355 )
-
 CHL2MP_Player::CHL2MP_Player() : m_PlayerAnimState( this )
 {
 	m_angEyeAngles.Init();

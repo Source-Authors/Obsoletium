@@ -55,12 +55,10 @@ ConVar	fourwheelvehicle_hit_damage_player( "fourwheelvehicle_hit_damage_player",
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-#pragma warning( disable: 4355 )
 CBaseTFFourWheelVehicle::CBaseTFFourWheelVehicle() : m_VehiclePhysics(this)
 {
 	m_flDeployFinishTime = -1;
 }
-#pragma warning( default: 4355 )
 
 //-----------------------------------------------------------------------------
 // Destructor

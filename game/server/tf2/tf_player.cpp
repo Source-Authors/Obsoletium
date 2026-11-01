@@ -150,8 +150,6 @@ void StatusPrintf( bool clear, int destination, char *pFormat, ... )
 	*/
 }
 
-#pragma warning( disable : 4355 )
-
 //=====================================================================
 // PLAYER HANDLING
 //=====================================================================

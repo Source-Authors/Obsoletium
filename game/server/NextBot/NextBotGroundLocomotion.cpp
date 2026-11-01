@@ -23,9 +23,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#pragma warning( disable : 4355 )			// warning 'this' used in base member initializer list - we're using it safely
-
-
 //----------------------------------------------------------------------------------------------------------
 NextBotGroundLocomotion::NextBotGroundLocomotion( INextBot *bot ) : ILocomotion( bot )
 {

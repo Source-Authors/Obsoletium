@@ -236,9 +236,6 @@ extern ConVar sv_turbophysics;
 
 extern float IntervalDistance( float x, float x0, float x1 );
 
-//disable 'this' : used in base member initializer list
-#pragma warning( disable : 4355 )
-
 CPortal_Player::CPortal_Player()
 {
 

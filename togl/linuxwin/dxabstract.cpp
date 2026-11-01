@@ -6595,10 +6595,6 @@ const char* D3DXGetPixelShaderProfile( IDirect3DDevice9 *pDevice )
 	return "";
 }
 
-#ifdef _MSC_VER
-#pragma warning (push)
-#pragma warning (disable:4701) // potentially uninitialized local variable 'temp' used
-#endif
 D3DXMATRIX* D3DXMatrixMultiply( D3DXMATRIX *pOut, CONST D3DXMATRIX *pM1, CONST D3DXMATRIX *pM2 )
 {
 	D3DXMATRIX temp;
@@ -6616,9 +6612,6 @@ D3DXMATRIX* D3DXMatrixMultiply( D3DXMATRIX *pOut, CONST D3DXMATRIX *pM1, CONST D
 	*pOut = temp;
 	return pOut;
 }
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
 
 // Transform a 3D vector by a given matrix, projecting the result back into w = 1
 // http://msdn.microsoft.com/en-us/library/ee417622(VS.85).aspx

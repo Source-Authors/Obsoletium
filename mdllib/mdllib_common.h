@@ -14,9 +14,6 @@
 #include "mdllib/mdllib.h"
 
 #include "platform.h"
-#pragma warning( disable : 4018 )
-#pragma warning( disable : 4389 )
-
 
 
 //-----------------------------------------------------------------------------

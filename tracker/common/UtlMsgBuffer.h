@@ -12,8 +12,6 @@
 
 #include "UtlMemory.h"
 
-#pragma warning(disable: 4244) // warning C4244: '=' : conversion from 'int' to 'short', possible loss of data
-
 //-----------------------------------------------------------------------------
 // Purpose: Generic named data buffer
 //-----------------------------------------------------------------------------

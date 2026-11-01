@@ -10,8 +10,6 @@
 #pragma once
 #endif
 
-#pragma warning( disable : 4127 )
-
 class CClass;
 
 class ICodeProcessor

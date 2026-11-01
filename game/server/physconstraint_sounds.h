@@ -240,8 +240,6 @@ void VelocitySampler::AddSample(const Vector &relativeVelocity)
 
 
 /* // abandoned -- too complicated, no way to set from keyfields
-#pragma warning(push)
-#pragma warning( disable:4201 ) // C4201: nonstandard extension used: nameless struct/union
 /// Stores information used for playing sounds based on 
 /// constraint movement
 class ConstraintSoundProfile
@@ -284,7 +282,6 @@ ConstraintSoundProfile::SoundInfoTuple(12,0,0,0,0),
 ConstraintSoundProfile::SoundInfoTuple(24,0,0,0,0),
 
 };
-#pragma warning(pop)
 */
 
 

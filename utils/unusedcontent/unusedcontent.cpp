@@ -194,8 +194,6 @@ private:
 // $NoKeywords: $
 //=============================================================================
 
-#pragma warning (disable:4514)
-
 #define INVALID_STRING_INDEX CStringPoolIndex( 0xFFFF, 0xFFFF )
 
 #define MIN_STRING_POOL_SIZE	2048

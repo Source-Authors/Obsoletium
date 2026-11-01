@@ -22,12 +22,10 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-#pragma warning (disable:4355)
 CParticleSystemPropertiesContainer::CParticleSystemPropertiesContainer( CPetDoc *pDoc, vgui::Panel* pParent ) :
 	BaseClass( this, pParent ), m_pDoc( pDoc )
 {
 }
-#pragma warning (default:4355)
 
 
 //-----------------------------------------------------------------------------

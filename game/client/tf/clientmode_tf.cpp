@@ -2281,10 +2281,7 @@ float PlaySoundEntry( const char* pszSoundEntryName )
 #ifdef _WIN32
 
 #include "winlite.h"
-#pragma warning (push)
-#pragma warning(disable:4201)	// nameless struct/union
 #include <mmsystem.h>
-#pragma warning (pop) 
 #endif
 //
 void PlayOutOfGameSound( const char *pszSound )

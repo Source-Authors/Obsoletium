@@ -71,9 +71,6 @@ BOOL CreateClass(HSQUIRRELVM v,SquirrelClassDecl *cd)
 		return FALSE;
 	}
 //  sq_settypetag(v,-1,(unsigned int)cd);
-#ifdef _WIN32
-#pragma warning(disable : 4311)
-#endif
 	sq_settypetag(v,-1,reinterpret_cast<SQUserPointer>(cd));
 	const ScriptClassMemberDecl *members = cd->members;
 	const ScriptClassMemberDecl *m = NULL;

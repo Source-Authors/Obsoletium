@@ -670,10 +670,7 @@ bool BInitializeStoreEntryPricePoints( econ_store_entry_t& out_entry, const Curr
 		// especially overflow (!).
 		const item_price_t unPrice = mapCurrencyPricePoints[unIdx];
 		out_entry.SetBasePrice( eCurrency, unPrice );
-#pragma warning(push)
-#pragma warning(disable : 4389)
 		Assert( out_entry.GetBasePrice( eCurrency ) == unPrice );	// NOTE: DO NOT CAST unPrice - CHECKING FOR OVERFLOW
-#pragma warning(pop)
 
 		if ( ( nSalePercent > 0 ) && ( nSalePercent < 100 ) )
 		{
