@@ -22,7 +22,7 @@
 //===========================================================================//
 #include "cbase.h"
 #include <conio.h>
-#include <wctype.h>  // iswspace.
+#include <cwctype>  // iswspace.
 #include <windows.h>
 #include <mmreg.h>
 #include <direct.h>

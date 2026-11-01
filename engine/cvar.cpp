@@ -20,7 +20,7 @@
 #include "demo.h"
 #include <cctype>
 #ifdef POSIX
-#include <wctype.h>
+#include <cwctype>
 #endif
 
 #ifndef SWDS

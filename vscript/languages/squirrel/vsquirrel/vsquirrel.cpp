@@ -6,7 +6,7 @@
 
 #if defined( POSIX )
 #include <cctype>
-#include <wctype.h>
+#include <cwctype>
 #endif
 
 // dimhotepus: Allow exceptions.

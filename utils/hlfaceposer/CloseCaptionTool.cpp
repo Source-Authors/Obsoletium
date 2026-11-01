@@ -6,7 +6,7 @@
 //
 //=============================================================================//
 #include "cbase.h"
-#include <wctype.h>  // for iswspace.
+#include <cwctype>  // for iswspace.
 #include <cstdio>
 #include "hlfaceposer.h"
 #include "CloseCaptionTool.h"

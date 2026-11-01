@@ -27,7 +27,7 @@
 #endif
 
 #ifdef POSIX
-#include <wctype.h>
+#include <cwctype>
 #include <cwchar>
 #endif
 
