@@ -23,7 +23,7 @@
 #ifdef _WIN32
 #include <tchar.h>
 #else
-#include <wchar.h>
+#include <cwchar>
 #endif
 #include <cstring>
 #include <malloc.h>

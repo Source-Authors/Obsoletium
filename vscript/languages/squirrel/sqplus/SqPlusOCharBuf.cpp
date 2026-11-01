@@ -2,7 +2,7 @@
 #include "sqplus.h"
 #include "SqPlusOCharBuf.h" 
 
-#include <wchar.h>
+#include <cwchar>
 
 // Conversion functions, between char* string and wchar_t* strings.
 

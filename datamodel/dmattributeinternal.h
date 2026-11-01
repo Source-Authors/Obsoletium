@@ -11,7 +11,7 @@
 #endif
 
 #include "datamodel/dmattribute.h"
-#include "wchar.h"
+#include <cwchar>
 
 
 //-----------------------------------------------------------------------------

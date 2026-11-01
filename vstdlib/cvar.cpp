@@ -28,7 +28,7 @@
 
 #ifdef POSIX
 #include <wctype.h>
-#include <wchar.h>
+#include <cwchar>
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!

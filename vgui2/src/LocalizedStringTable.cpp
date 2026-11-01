@@ -11,7 +11,7 @@
 #include <iconv.h>
 #endif
 
-#include <wchar.h>
+#include <cwchar>
 
 #include "filesystem.h"
 

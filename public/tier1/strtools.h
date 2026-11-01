@@ -22,7 +22,7 @@
 #include <type_traits>
 
 #ifdef POSIX
-#include <wchar.h>
+#include <cwchar>
 #include <cmath>
 #include <wctype.h>
 #endif
