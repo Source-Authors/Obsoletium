@@ -898,8 +898,10 @@ void CThreadPool::AddJob( CJob *pJob )
 
 	pJob->m_pThreadPool = this;
 	pJob->m_status = JOB_STATUS_PENDING;
-	InsertJobInQueue( pJob );
+	// dimhotepus: Count job before it becomes visible to workers. Worker could pop, run
+	// and decrement first, making unsigned GetJobCount() transiently return ~4 billion.
 	++m_nJobs;
+	InsertJobInQueue( pJob );
 }
 
 //---------------------------------------------------------
