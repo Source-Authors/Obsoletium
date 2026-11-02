@@ -407,6 +407,8 @@ $Project "engine"
 
 	$Folder "Self Tests"
 	{
+		$File	"bench_thread_pool.h"
+		$File	"bench_thread_pool.cpp"
 		$File	"tests_thread_pool.h"
 		$File	"tests_thread_pool.cpp"
 		$File	"tests_ts_collections.h"

@@ -2,6 +2,7 @@
 //
 // Self-tests commands.
 
+#include "bench_thread_pool.h"
 #include "tests_thread_pool.h"
 #include "tests_ts_collections.h"
 
@@ -101,4 +102,9 @@ CON_COMMAND(threadpool_run_tests,
   for (int i = 0; i < tests_num; i++) {
     s1::engine::tests::thread_pool::RunThreadPoolTests();
   }
+}
+
+CON_COMMAND( threadpool_bench, "Benchmark the job thread pool" )
+{
+	s1::engine::tests::thread_pool::RunThreadPoolBenchmark();
 }
