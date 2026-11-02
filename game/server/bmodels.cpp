@@ -535,8 +535,10 @@ void SendProxy_FuncRotatingAngles( const SendProp *pProp, const void *pStruct, c
 */
 void SendProxy_FuncRotatingAngle( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID)
 {
+#ifndef NDEBUG
 	CFuncRotating *entity = (CFuncRotating*)pStruct;
 	Assert( entity );
+#endif
 
 	vec_t const *qa = (vec_t *)pData;
 
@@ -548,6 +550,10 @@ void SendProxy_FuncRotatingAngle( const SendProp *pProp, const void *pStruct, co
 #endif
 
 #ifdef TF_DLL
+#ifdef NDEBUG
+	CFuncRotating *entity = (CFuncRotating *)pStruct;
+#endif
+
 	if ( entity->HasSpawnFlags(SF_BRUSH_ROTATE_CLIENTSIDE) )
 	{
 		const QAngle *a = &entity->m_vecClientAngles;
