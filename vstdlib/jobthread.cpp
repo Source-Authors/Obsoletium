@@ -962,11 +962,31 @@ void CThreadPool::AddFunctorInternal( CFunctor *pFunctor, CJob **ppJob, const ch
 
 void CThreadPool::ChangePriority( CJob *pJob, JobPriority_t priority )
 {
+	if ( !pJob )
+	{
+		return;
+	}
+
 	// Right now, only support upping the priority
 	if ( pJob->GetPriority() < priority )
 	{
 		pJob->SetPriority( priority );
-		m_SharedQueue.Push( pJob );
+
+		// dimhotepus: Only re-queue jobs that are actually pending in *this* pool's shared
+		// queue. Re-pushing finished/foreign jobs, or serial/thread-bound jobs (which live in
+		// a worker's direct queue and must keep their order) is wrong.
+		const bool bInSharedQueue = pJob->m_pThreadPool == this &&
+			pJob->GetStatus() == JOB_STATUS_PENDING &&
+			!( pJob->GetFlags() & JF_SERIAL ) &&
+			!m_Threads.IsValidIndex( pJob->GetServiceThread() );
+
+		if ( bInSharedQueue )
+		{
+			// The job is now in the queue twice (the stale entry is skipped when popped since
+			// it's finished by then). Count the extra entry, as every popped entry is uncounted.
+			++m_nJobs;
+			m_nJobs -= m_SharedQueue.Push( pJob );
+	}
 	}
 	else
 	{
