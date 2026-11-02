@@ -119,9 +119,9 @@ public:
 		m_pQueues[ClampPriority( pJob->GetPriority() )]->PushItem( pJob );
 
 		if ( m_nItems.fetch_add( 1, std::memory_order_relaxed ) == 0 )
-			{
-				m_JobAvailableEvent.Set();
-			}
+		{
+			m_JobAvailableEvent.Set();
+		}
 
 		return nOverflow;
 	}
@@ -132,9 +132,9 @@ public:
 
 		if ( m_nItems.load( std::memory_order_relaxed ) == 0 )
 		{
-				*ppJob = nullptr;
-				return false;
-			}
+			*ppJob = nullptr;
+			return false;
+		}
 
 		for ( int i = JP_HIGH; i >= JP_LOW; --i )
 		{
@@ -168,18 +168,18 @@ public:
 
 			jobs.EnsureCapacity( m_nItems.load( std::memory_order_relaxed ) );
 
-		CJob *pJob;
+			CJob *pJob;
 			for ( int i = JP_HIGH; i >= JP_LOW; --i )
-		{
-			while ( m_pQueues[i]->PopItem( &pJob ) )
 			{
+				while ( m_pQueues[i]->PopItem( &pJob ) )
+				{
 					jobs.AddToTail( pJob );
+				}
 			}
-		}
 
 			m_nItems.store( 0, std::memory_order_relaxed );
 			m_JobAvailableEvent.Reset();
-	}
+		}
 
 		// dimhotepus: Abort/Release outside of the queue lock. Release may run arbitrary
 		// destructors (functor payloads) which must not execute while holding the lock.
@@ -706,12 +706,12 @@ private:
 bool CThreadPool::ServiceOneSharedJob()
 {
 	CJob *pJob;
-		if ( !m_bExecOnThreadPoolThreadsOnly && m_SharedQueue.Pop( &pJob ) )
-		{
-			ServiceJobAndRelease( pJob );
-			--m_nJobs;
+	if ( !m_bExecOnThreadPoolThreadsOnly && m_SharedQueue.Pop( &pJob ) )
+	{
+		ServiceJobAndRelease( pJob );
+		--m_nJobs;
 		return true;
-		}
+	}
 	return false;
 }
 
@@ -784,8 +784,8 @@ unsigned CThreadPool::YieldWait( CThreadEvent **pEvents, int nEvents, bool bWait
 			const int nChunk = (std::min)( kMaxEventsPerWait, nEvents - iBase );
 			const unsigned result = YieldWaitImpl( pEvents + iBase, nChunk, true, deadline );
 			if ( result == TW_TIMEOUT || result == TW_FAILED )
-	return result;
-}
+				return result;
+		}
 		return WAIT_OBJECT_0;
 	}
 
@@ -828,7 +828,7 @@ unsigned CThreadPool::YieldWait( CJob **ppJobs, int nJobs, bool bWaitAll, unsign
 	{
 		handles.AddToTail( ppJobs[i]->AccessEvent() );
 	}
-	
+
 	return YieldWait( handles.Base(), nJobs, bWaitAll, timeout );
 }
 
@@ -837,8 +837,8 @@ unsigned CThreadPool::YieldWait( CJob **ppJobs, int nJobs, bool bWaitAll, unsign
 void CThreadPool::Yield( unsigned timeout )
 {
 	// @MULTICORE (toml 10/24/2006): not implemented
-		ThreadSleep( timeout );
-	}
+	ThreadSleep( timeout );
+}
 
 //---------------------------------------------------------
 // Add a job to the queue
@@ -986,7 +986,7 @@ void CThreadPool::ChangePriority( CJob *pJob, JobPriority_t priority )
 			// it's finished by then). Count the extra entry, as every popped entry is uncounted.
 			++m_nJobs;
 			m_nJobs -= m_SharedQueue.Push( pJob );
-	}
+		}
 	}
 	else
 	{
@@ -1018,25 +1018,25 @@ int CThreadPool::ExecuteToPriority( JobPriority_t iToPriority, JobFilter_t pfnFi
 		int nToDrain = queue.Count( priority );
 		while ( nToDrain-- > 0 && queue.Pop( &pJob ) )
 		{
-				if ( pfnFilter && !(*pfnFilter)( pJob ) )
+			if ( pfnFilter && !(*pfnFilter)( pJob ) )
+			{
+				if ( pJob->CanExecute() )
 				{
-					if ( pJob->CanExecute() )
-					{
-						jobsToPutBack.EnsureCapacity( nJobsTotal );
-						jobsToPutBack.AddToTail( pJob );
-					}
-					else
-					{
-						--m_nJobs;
-						pJob->Release(); // an already serviced job in queue, may as well ditch it (as in, main thread probably force executed)
-					}
-					continue;
+					jobsToPutBack.EnsureCapacity( nJobsTotal );
+					jobsToPutBack.AddToTail( pJob );
 				}
-
-				ServiceJobAndRelease( pJob );
-				--m_nJobs;
-				nExecuted++;
+				else
+				{
+					--m_nJobs;
+					pJob->Release(); // an already serviced job in queue, may as well ditch it (as in, main thread probably force executed)
+				}
+				continue;
 			}
+
+			ServiceJobAndRelease( pJob );
+			--m_nJobs;
+			nExecuted++;
+		}
 	};
 
 	for ( int iCurPriority = JP_HIGH; iCurPriority >= iToPriority; --iCurPriority )
@@ -1046,10 +1046,10 @@ int CThreadPool::ExecuteToPriority( JobPriority_t iToPriority, JobFilter_t pfnFi
 		for ( auto &&t : m_Threads )
 		{
 			drainQueue( t->AccessDirectQueue(), priority );
-				}
+		}
 
 		drainQueue( m_SharedQueue, priority );
-		}
+	}
 
 	// Jobs keep their m_nJobs slot while re-queued.
 	for ( auto &&j : jobsToPutBack )
@@ -1075,7 +1075,7 @@ int CThreadPool::AbortAll()
 	for ( auto &&t : m_Threads )
 	{
 		iAborted += t->AccessDirectQueue().Flush();
-		}
+	}
 
 	// dimhotepus: Subtract instead of zeroing. Jobs concurrently being serviced via
 	// YieldWait on other threads still decrement the counter when they finish, so zeroing
@@ -1330,13 +1330,13 @@ bool CThreadPool::Stop( [[maybe_unused]] int timeout )
 			m_nSuspend = 0;
 		}
 
-	for ( auto &&t : m_Threads )
-	{
+		for ( auto &&t : m_Threads )
+		{
 			// dimhotepus: Thread may be already gone (e.g. killed at process shutdown).
 			if ( t->IsAlive() )
 			{
-		t->CallWorker( TPM_EXIT );
-	}
+				t->CallWorker( TPM_EXIT );
+			}
 		}
 	}
 
@@ -1344,13 +1344,22 @@ bool CThreadPool::Stop( [[maybe_unused]] int timeout )
 	{
 		while( t->IsAlive() )
 		{
-			ThreadSleep( 0 );
+			ThreadSleep( 1 );
 		}
+
+		// dimhotepus: Abort jobs left in the direct queue before it is destroyed together with
+		// the thread. They leaked and never signaled completion, so waiters hung forever.
+		t->AccessDirectQueue().Flush();
+	}
+
+	m_SharedQueue.Flush();
+
+	for ( auto &&t : m_Threads )
+	{
 		delete t;
 	}
 
 	m_nJobs = 0;
-	m_SharedQueue.Flush();
 	m_nIdleThreads = 0;
 	m_Threads.RemoveAll();
 	m_IdleEvents.RemoveAll();
@@ -1362,7 +1371,7 @@ bool CThreadPool::Stop( [[maybe_unused]] int timeout )
 
 CJob *CThreadPool::GetDummyJob()
 {
-	class CDummyJob : public CJob
+	class CDummyJob final : public CJob
 	{
 	public:
 		CDummyJob()
