@@ -14,16 +14,12 @@
 #include "tier0/threadtools.h"
 #include "tier1/interface.h"
 
-constexpr inline int NTAB{32}; //-V112
-
 //-----------------------------------------------------------------------------
 // A generator of uniformly distributed random numbers
 //-----------------------------------------------------------------------------
 class VSTDLIB_CLASS IUniformRandomStream
 {
 public:
-	//virtual ~IUniformRandomStream() { }
-
 	// Sets the seed of the random number generator
 	virtual void	SetSeed( int iSeed ) = 0;
 
@@ -43,18 +39,29 @@ public:
 #ifdef PLATFORM_64BITS
 		return this->RandomInt64( minVal, maxVal );
 #else
-		return static_cast<int>( this->RandomInt( static_cast<int>( minVal ), static_cast<int>( maxVal ) ) );
+		return this->RandomInt( static_cast<int>( minVal ), static_cast<int>( maxVal ) );
 #endif
 	}
+
+protected:
+	// dimhotepus: Non-virtual to keep the vtable layout unchanged, protected so that
+	// deleting a stream through an interface pointer (UB) fails to compile.
+	~IUniformRandomStream() = default;
 };
 
 
 //-----------------------------------------------------------------------------
-// The standard generator of uniformly distributed random numbers
+// The standard generator of uniformly distributed random numbers.
+// dimhotepus: Park-Miller minimal standard LCG with Bays-Durham shuffle (ran1).
+// Thread-safe. Seeded sequences are only reproducible when one thread uses
+// the stream.
 //-----------------------------------------------------------------------------
 class VSTDLIB_CLASS CUniformRandomStream : public IUniformRandomStream
 {
 public:
+	// dimhotepus: Size of the shuffle table. Must be a power of two.
+	enum : int { SHUFFLE_TABLE_SIZE = 32 };
+
 	CUniformRandomStream();
 	virtual ~CUniformRandomStream() = default;
 
@@ -72,23 +79,21 @@ public:
 #endif
 
 private:
+	// dimhotepus: All Generate* helpers require m_mutex to be held by the caller.
+
+	// dimhotepus: Returns a value in [1, 2^31 - 2].
 	int		GenerateRandomNumber();
+	// dimhotepus: Returns a uniform value in [0, uRange), 2 <= uRange <= 2^31.
+	uint32	GenerateRandomBelow( uint32 uRange );
 
 #ifdef PLATFORM_64BITS
-	// dimhotepus: int64 support.
-	int64	GenerateRandomNumber64();
+	// dimhotepus: int64 support. Returns a uniform value in [0, 2^63).
+	uint64	GenerateRandom63Bits();
 #endif
 
 	int m_idum;
 	int m_iy;
-	int m_iv[NTAB];
-
-#ifdef PLATFORM_64BITS
-	// dimhotepus: int64 support.
-	int64 m_idum64;
-	int64 m_iy64;
-	int64 m_iv64[NTAB];
-#endif
+	int m_iv[SHUFFLE_TABLE_SIZE];
 
 MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
 // DLL export looks safe.
@@ -120,7 +125,7 @@ private:
 	float	m_flRandomValue;
 
 MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
-// DLL export looks safe. 
+// DLL export looks safe.
 MSVC_DISABLE_WARNING(4251)
 	CThreadFastMutex m_mutex;
 MSVC_END_WARNING_OVERRIDE_SCOPE()
@@ -140,12 +145,13 @@ VSTDLIB_INTERFACE int64	RandomInt64( int64 iMinVal, int64 iMaxVal );
 #endif
 
 // dimhotepus: CPU arch word support.
+// dimhotepus: For ranges that fit in int, returns the same values on 32 and 64 bit builds.
 inline intp RandomIntp( intp minVal, intp maxVal )
 {
 #ifdef PLATFORM_64BITS
 	return RandomInt64( minVal, maxVal );
 #else
-	return static_cast<int>( RandomInt( static_cast<int>( minVal ), static_cast<int>( maxVal ) ) );
+	return RandomInt( static_cast<int>( minVal ), static_cast<int>( maxVal ) );
 #endif
 }
 
@@ -170,7 +176,8 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-// Installs a global random number generator, which will affect the Random functions above
+// Installs a global random number generator, which will affect the Random functions above.
+// dimhotepus: Thread-safe. The installed stream must outlive every call that may still use it.
 //-----------------------------------------------------------------------------
 VSTDLIB_INTERFACE void	InstallUniformRandomStream( IUniformRandomStream *pStream );
 
