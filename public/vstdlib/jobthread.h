@@ -253,16 +253,11 @@ public:
 			CJob*
 		>
 	{
+		// dimhotepus: Always go through AddJob(). It runs the job inline on the caller when no
+		// thread is idle (same as the old header fast path), but unlike the header it knows
+		// whether the pool only allows execution on its own threads.
 		CJob* pJob;
-		if ( !NumIdleThreads() )
-		{
-			pJob = GetDummyJob();
-			FunctorDirectCall( pfnProxied, std::forward<Args>( args )... );
-		}
-		else
-		{
-			AddFunctorInternal( CreateFunctor( pfnProxied, std::forward<Args>( args )... ), &pJob );
-		}
+		AddFunctorInternal( CreateFunctor( pfnProxied, std::forward<Args>( args )... ), &pJob );
 
 		return pJob;
 	}
@@ -290,16 +285,11 @@ public:
 			CJob*
 		>
 	{
+		// dimhotepus: Always go through AddJob(). It runs the job inline on the caller when no
+		// thread is idle (same as the old header fast path), but unlike the header it knows
+		// whether the pool only allows execution on its own threads.
 		CJob* pJob;
-		if ( !NumIdleThreads() )
-		{
-			pJob = GetDummyJob();
-			FunctorDirectCall( pObject, pfnProxied, std::forward<Args>( args )... );
-		}
-		else
-		{
-			AddFunctorInternal( CreateFunctor( pObject, pfnProxied, std::forward<Args>( args )... ), &pJob );
-		}
+		AddFunctorInternal( CreateFunctor( pObject, pfnProxied, std::forward<Args>( args )... ), &pJob );
 		return pJob;
 	}
 
@@ -327,16 +317,11 @@ public:
 			CJob*
 		>
 	{
+		// dimhotepus: Always go through AddJob(). It runs the job inline on the caller when no
+		// thread is idle (same as the old header fast path), but unlike the header it knows
+		// whether the pool only allows execution on its own threads.
 		CJob* pJob;
-		if ( !NumIdleThreads() )
-		{
-			pJob = GetDummyJob();
-			FunctorDirectCall( pObject, pfnProxied, std::forward<Args>( args )... );
-		}
-		else
-		{
-			AddFunctorInternal( CreateFunctor( pObject, pfnProxied, std::forward<Args>( args )... ), &pJob );
-		}
+		AddFunctorInternal( CreateFunctor( pObject, pfnProxied, std::forward<Args>( args )... ), &pJob );
 		return pJob;
 	}
 
@@ -364,16 +349,11 @@ public:
 			CJob*
 		>
 	{
+		// dimhotepus: Always go through AddJob(). It runs the job inline on the caller when no
+		// thread is idle (same as the old header fast path), but unlike the header it knows
+		// whether the pool only allows execution on its own threads.
 		CJob* pJob;
-		if ( !NumIdleThreads() )
-		{
-			pJob = GetDummyJob();
-			FunctorDirectCall( pObject, pfnProxied, std::forward<Args>( args )... );
-		}
-		else
-		{
-			AddFunctorInternal( CreateRefCountingFunctor( pObject, pfnProxied, std::forward<Args>( args )... ), &pJob );
-		}
+		AddFunctorInternal( CreateRefCountingFunctor( pObject, pfnProxied, std::forward<Args>( args )... ), &pJob );
 		return pJob;
 	}
 
@@ -401,16 +381,11 @@ public:
 			CJob*
 		>
 	{
+		// dimhotepus: Always go through AddJob(). It runs the job inline on the caller when no
+		// thread is idle (same as the old header fast path), but unlike the header it knows
+		// whether the pool only allows execution on its own threads.
 		CJob* pJob;
-		if ( !NumIdleThreads() )
-		{
-			pJob = GetDummyJob();
-			FunctorDirectCall( pObject, pfnProxied, std::forward<Args>( args )... );
-		}
-		else
-		{
-			AddFunctorInternal( CreateRefCountingFunctor( pObject, pfnProxied, std::forward<Args>( args )... ), &pJob );
-		}
+		AddFunctorInternal( CreateRefCountingFunctor( pObject, pfnProxied, std::forward<Args>( args )... ), &pJob );
 		return pJob;
 	}
 
