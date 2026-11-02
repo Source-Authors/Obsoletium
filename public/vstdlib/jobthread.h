@@ -64,6 +64,9 @@
 
 // Max upper bound of threads to process in parallel.
 constexpr inline int MAX_THREADS = 64;
+// dimhotepus: Single source for pool size, CJobSet capacity and parallel helper fan-out.
+// CJob stores servicing thread index in a (possibly signed) char.
+static_assert( MAX_THREADS > 0 && MAX_THREADS <= 127, "MAX_THREADS must fit CJob servicing thread index" );
 
 //-----------------------------------------------------------------------------
 // 
@@ -101,7 +104,8 @@ enum JobPriority_t
 	JP_HIGH
 };
 
-constexpr inline int TP_MAX_POOL_THREADS{64u};
+// dimhotepus: Same bound as MAX_THREADS, one source of truth.
+constexpr inline int TP_MAX_POOL_THREADS{MAX_THREADS};
 struct ThreadPoolStartParams_t
 {
 	ThreadPoolStartParams_t( bool bIOThreads_ = false, unsigned nThreads_ = -1, int *pAffinities = nullptr, ThreeState_t fDistribute_ = TRS_NONE, unsigned nStackSize_ = -1, int iThreadPriority_ = SHRT_MIN )
@@ -587,7 +591,8 @@ public:
 	//-----------------------------------------------------
 	// Fast queries
 	//-----------------------------------------------------
-	// dimhotepus: Read once per query so concurrent transitions can't produce inconsistent answers.
+	// dimhotepus: Status is read without lock by other threads, so it is atomic. Read once
+	// per query so concurrent transitions can't produce inconsistent answers.
 	bool Executed() const							{ return ( GetStatus() == JOB_OK );	}
 	bool CanExecute() const							{ const JobStatus_t s = GetStatus(); return ( s == JOB_STATUS_PENDING || s == JOB_STATUS_UNSERVICED ); }
 	bool IsFinished() const							{ const JobStatus_t s = GetStatus(); return ( s != JOB_STATUS_PENDING && s != JOB_STATUS_INPROGRESS && s != JOB_STATUS_UNSERVICED ); }
@@ -726,7 +731,7 @@ public:
 			{
 				if ( ppJobs[i] )
 					Add( ppJobs[i] );
-	}
+			}
 		}
 	}
 
@@ -739,9 +744,9 @@ public:
 	}
 
 	CJobSet( CJobSet &&other ) noexcept
-		{
+	{
 		MoveFrom( other );
-		}
+	}
 
 	CJobSet &operator=( const CJobSet &other )
 	{
@@ -751,7 +756,7 @@ public:
 			CJobSet copy( other );
 			ReleaseAll();
 			MoveFrom( copy );
-	}
+		}
 		return *this;
 	}
 
@@ -1030,6 +1035,41 @@ auto IterRangeParallel(
 // Work splitting: competitive, best when cost per item varies a lot
 //-----------------------------------------------------------------------------
 
+namespace jobthread_detail
+{
+	// dimhotepus: Claims next batch [begin, end) from shared index, end <= limit.
+	// Per-item atomic increments made all threads fight over one cache line, so loops of
+	// small items ran at ~2x their ideal time. Batches shrink as work runs out (guided
+	// scheduling): remaining / divisor, at least 1. Large batches early keep atomics rare,
+	// small ones at the end keep threads finishing together even with uneven item costs.
+	// Returns false when nothing is left.
+	inline bool ClaimBatch( std::atomic<intp> &index, intp limit, intp divisor, intp &begin, intp &end )
+	{
+		intp cur = index.load( std::memory_order_relaxed );
+		for (;;)
+		{
+			if ( cur >= limit )
+				return false;
+
+			const intp remaining = limit - cur;
+			const intp n = divisor > 1 && remaining > divisor ? remaining / divisor : 1;
+
+			if ( index.compare_exchange_weak( cur, cur + n, std::memory_order_relaxed, std::memory_order_relaxed ) )
+			{
+				begin = cur;
+				end = cur + n;
+				return true;
+			}
+		}
+	}
+
+	// Two batches per participant on average up front.
+	[[nodiscard]] constexpr intp BatchDivisor( intp nParticipants )
+	{
+		return nParticipants > 0 ? nParticipants * 2 : 1;
+	}
+}
+
 template <typename T>
 class CJobItemProcessor
 {
@@ -1090,7 +1130,10 @@ class CParallelProcessor
 public:
 	CParallelProcessor( const char *pszDescription )
 	{
-		m_pItems = m_pLimit = nullptr;
+		m_pItems = nullptr;
+		m_nItems = 0;
+		m_nBatchDivisor = 1;
+		m_nNext.store( 0, std::memory_order_relaxed );
 		m_szDescription = pszDescription;
 	}
 
@@ -1105,7 +1148,9 @@ public:
 			pThreadPool = g_pThreadPool;
 
 		m_pItems = pItems;
-		m_pLimit = pItems + nItems;
+		m_nItems = static_cast<intp>( nItems );
+		m_nNext.store( 0, std::memory_order_relaxed );
+		m_nBatchDivisor = 1;
 
 		intp nJobs = nItems - 1;
 
@@ -1122,8 +1167,14 @@ public:
 		if ( nJobs > nThreads )
 			nJobs = nThreads;
 
+		if ( nJobs > MAX_THREADS )
+			nJobs = MAX_THREADS;
+
 		if ( nJobs > 1 )
 		{
+			// Set before jobs are queued, queueing publishes it to workers.
+			m_nBatchDivisor = jobthread_detail::BatchDivisor( nJobs + 1 );
+
 			CJob **jobs = stackallocT( CJob*, nJobs );
 			intp i = nJobs;
 
@@ -1152,27 +1203,28 @@ private:
 	{
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "DoExecute %s", m_szDescription );
 
-		if ( m_pItems < m_pLimit )
+		intp iBegin, iEnd;
+		if ( jobthread_detail::ClaimBatch( m_nNext, m_nItems, m_nBatchDivisor, iBegin, iEnd ) )
 		{
 			m_ItemProcessor.Begin();
 
-			ITEM_TYPE *pLimit = m_pLimit;
-
-			for (;;)
+			do
 			{
-				ITEM_TYPE *pCurrent = m_pItems++;
-				if ( pCurrent < pLimit )
-					m_ItemProcessor.Process( *pCurrent );
-				else
-					break;
+				for ( intp i = iBegin; i < iEnd; ++i )
+					m_ItemProcessor.Process( m_pItems[i] );
 			}
+			while ( jobthread_detail::ClaimBatch( m_nNext, m_nItems, m_nBatchDivisor, iBegin, iEnd ) );
 
 			m_ItemProcessor.End();
 		}
 	}
-	CInterlockedPtr<ITEM_TYPE>	m_pItems;
-	ITEM_TYPE *					m_pLimit;
-	const char *				m_szDescription;
+	ITEM_TYPE *					m_pItems;
+	intp						m_nItems;
+	intp						m_nBatchDivisor;
+	// dimhotepus: Own cache line, it is the only member written by all threads.
+	alignas( 64 ) std::atomic<intp>	m_nNext;
+	// Next cache line: keep read-only member off the hot counter line.
+	alignas( 64 ) const char *	m_szDescription;
 };
 
 template <typename ITEM_TYPE> 
@@ -1210,6 +1262,7 @@ public:
 	{
 		m_lIndex.store( 0, std::memory_order::memory_order_relaxed );
 		m_lLimit = 0;
+		m_nBatchDivisor = 1;
 		m_nActive.store( 0, std::memory_order::memory_order_relaxed );
 
 		m_szDescription = pszDescription;
@@ -1233,6 +1286,9 @@ public:
 				nJobs = MAX_THREADS;
 			if ( nJobs < 0 )
 				nJobs = 0;
+
+			// Set before jobs are queued, queueing publishes it to workers.
+			m_nBatchDivisor = jobthread_detail::BatchDivisor( nJobs + 1 );
 
 			// dimhotepus: Keep job handles and Abort() them after own pass instead of busy
 			// spinning on a counter:
@@ -1273,14 +1329,11 @@ private:
 
 		const intp lLimit = m_lLimit;
 
-		for (;;)
+		intp lBegin, lEnd;
+		while ( jobthread_detail::ClaimBatch( m_lIndex, lLimit, m_nBatchDivisor, lBegin, lEnd ) )
 		{
-			intp lIndex = m_lIndex.fetch_add(1, std::memory_order::memory_order_relaxed);
-
-			if ( lIndex < lLimit )
+			for ( intp lIndex = lBegin; lIndex < lEnd; ++lIndex )
 				m_ItemProcessor.Process( lIndex );
-			else
-				break;
 		}
 
 		m_ItemProcessor.End();
@@ -1288,18 +1341,17 @@ private:
 		m_nActive.fetch_sub( 1, std::memory_order::memory_order_release );
 	}
 	
-#ifdef PLATFORM_64BITS
-	std::atomic_int64_t			m_lIndex;
-#else
-	std::atomic_int32_t			m_lIndex;
-#endif
-
 	intp						m_lLimit;
+	intp						m_nBatchDivisor;
 
+	// dimhotepus: Own cache line, it is the only member written by all threads.
+	alignas( 64 ) std::atomic<intp>	m_lIndex;
+
+	// Next cache line: keep rarely written members off the hot counter line.
 #ifdef PLATFORM_64BITS
-	std::atomic_int64_t			m_nActive;
+	alignas( 64 ) std::atomic_int64_t	m_nActive;
 #else
-	std::atomic_int32_t			m_nActive;
+	alignas( 64 ) std::atomic_int32_t	m_nActive;
 #endif
 
 	const char *				m_szDescription;
