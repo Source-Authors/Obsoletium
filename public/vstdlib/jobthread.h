@@ -28,6 +28,7 @@
 //=============================================================================
 
 #include <atomic>
+#include <new>
 #include <type_traits>
 #include <utility>
 
@@ -565,10 +566,19 @@ class CJob : public CRefCounted1<IRefCounted, CRefCountServiceMT>
 public:
 	CJob( JobPriority_t priority = JP_NORMAL )
 	  : m_priority( priority ),
-		m_ThreadPoolData( JOB_NO_DATA ),
-		m_CompleteEvent( true )
+		m_ThreadPoolData( JOB_NO_DATA )
 	{
 		m_szDescription[ 0 ] = 0;
+	}
+
+	virtual ~CJob()
+	{
+		// dimhotepus: Accessor holds a reference while creating, so creation can't be in progress here.
+		Assert( m_eventState.load( std::memory_order_relaxed ) != EVENT_CREATING );
+		if ( m_eventState.load( std::memory_order_acquire ) == EVENT_READY )
+		{
+			CompleteEvent().~CThreadEvent();
+		}
 	}
 
 	//-----------------------------------------------------
@@ -616,7 +626,36 @@ public:
 	// dimhotepus: Yield to the pool job was added to (helps it make progress), not always global one.
 	bool WaitForFinish( uint32 dwTimeout = TT_INFINITE ) { return ( !IsFinished() ) ? ( m_pThreadPool ? m_pThreadPool : g_pThreadPool )->YieldWait( this, dwTimeout ) : true; }
 	bool WaitForFinishAndRelease( uint32 dwTimeout = TT_INFINITE ) { bool bResult = WaitForFinish( dwTimeout); Release(); return bResult; }
-	CThreadEvent *AccessEvent()						{ return &m_CompleteEvent; }
+	// dimhotepus: Completion event is created on first access. Creating + closing a kernel
+	// event per job (~0.9us on Windows) plus Set() on completion (~0.3us) was ~85% of a
+	// job's cost, while most jobs are fire-and-forget or already finished when waited on.
+	// Event created after completion starts signaled.
+	CThreadEvent *AccessEvent()
+	{
+		if ( m_eventState.load( std::memory_order_acquire ) != EVENT_READY )
+		{
+			short expected = EVENT_NONE;
+			if ( m_eventState.compare_exchange_strong( expected, EVENT_CREATING, std::memory_order_acq_rel ) )
+			{
+				::new ( static_cast<void *>( m_CompleteEventStorage ) ) CThreadEvent( true );
+
+				// Pairs with RMW in SignalComplete(). Both are read-modify-writes of
+				// m_eventState, so one is ordered after the other: either completer reads
+				// EVENT_READY and sets event, or this exchange reads after completer's RMW and
+				// so sees final status below. Double Set() is harmless.
+				m_eventState.exchange( EVENT_READY, std::memory_order_acq_rel );
+				if ( IsFinished() )
+					CompleteEvent().Set();
+			}
+			else
+			{
+				// Other thread is creating it, takes about a microsecond.
+				while ( m_eventState.load( std::memory_order_acquire ) != EVENT_READY )
+					ThreadPause();
+			}
+		}
+		return &CompleteEvent();
+	}
 
 	//-----------------------------------------------------
 	// Perform the job
@@ -652,11 +691,31 @@ private:
 	CThreadMutex		m_mutex;
 	unsigned char		m_flags{ 0 };
 	char				m_iServicingThread{ -1 };
-	[[maybe_unused]] short				m_reserved;  //-V730_NOINIT
+	// dimhotepus: Was unused 'short m_reserved', now lazy completion event state.
+	// Same size and alignment, member offsets of CJob are unchanged.
+	enum : short { EVENT_NONE = 0, EVENT_CREATING = 1, EVENT_READY = 2 };
+	std::atomic<short>	m_eventState{ EVENT_NONE };
+	static_assert( sizeof( std::atomic<short> ) == sizeof( short ) && alignof( std::atomic<short> ) == alignof( short ),
+		"CJob layout must not change" );
 	ThreadPoolData_t	m_ThreadPoolData;
 	IThreadPool *		m_pThreadPool{ nullptr };
-	CThreadEvent		m_CompleteEvent;
+	// dimhotepus: Was 'CThreadEvent m_CompleteEvent', now raw storage of the same size and
+	// alignment, constructed lazily in AccessEvent().
+	alignas( CThreadEvent ) unsigned char	m_CompleteEventStorage[sizeof( CThreadEvent )];
 	char				m_szDescription[ 32 ];
+
+	CThreadEvent &CompleteEvent()
+	{
+		return *std::launder( reinterpret_cast<CThreadEvent *>( m_CompleteEventStorage ) );
+	}
+
+	// Called after status became final.
+	void SignalComplete()
+	{
+		// RMW (not plain load) to read latest state, pairs with exchange in AccessEvent().
+		if ( m_eventState.fetch_add( 0, std::memory_order_acq_rel ) == EVENT_READY )
+			CompleteEvent().Set();
+	}
 
 	//-----------------------------------------------------
 	CJob( const CJob &fromRequest ) = delete;
@@ -1562,7 +1621,7 @@ inline JobStatus_t CJob::Execute()
 				result = DoExecute();
 				SlamStatus( result );
 				DoCleanup();
-				m_CompleteEvent.Set();
+				SignalComplete();
 				break;
 			}
 
@@ -1635,7 +1694,7 @@ inline JobStatus_t CJob::Abort( bool bDiscard )
 				SlamStatus( result );
 				if ( bDiscard )
 					DoCleanup();
-				m_CompleteEvent.Set();
+				SignalComplete();
 			}
 			break;
 

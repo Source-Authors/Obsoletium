@@ -50,40 +50,75 @@ inline void ServiceJobAndRelease( CJob *pJob, intp iThread = -1 )
 }
 
 //-----------------------------------------------------------------------------
-// dimhotepus: Wakes idle worker threads on POSIX.
+// dimhotepus: Wakes idle worker threads, all platforms.
 //
-// POSIX workers used to poll the shared queue (100ms), direct queue (10ms) and call event
-// in turn, so a direct-queue job, CallWorker() message (suspend, run functor, exit) could
-// wait ~100ms per worker to be noticed. Now worker sleeps on one condition variable and
-// re-checks its "has work" predicate under this mutex. Producers change state first, then
-// Notify(), which takes the same mutex, so wakeup can't be lost between check and sleep.
-// Windows waits on all handles at once via WaitForMultipleObjects and doesn't need this.
+// Workers used to wait on kernel events: on Windows via WaitForMultipleObjects, where the
+// shared queue event was Set/Reset (a syscall each, ~300ns) whenever the queue flipped
+// between empty and non-empty, which with fast workers is nearly every job, and every Set
+// woke *all* idle workers for a single job. On POSIX they polled with ~100ms latency.
+//
+// Now an idle worker sleeps on one condition variable and re-checks its "has work"
+// predicate under this mutex. Producers change state first, then Notify(). Notify() is a
+// fence plus one load when nobody sleeps (no syscall), and a job any worker can take wakes
+// only one sleeper.
+//
+// No lost wakeups: sleeper registers (RMW on m_nSleepers) under the mutex and then re-checks
+// for work; producer publishes work, then reads sleeper count with an RMW on the same
+// variable. RMWs on one variable are totally ordered, so either producer's RMW comes later
+// and sees the sleeper (then takes the mutex, which sleeper only releases inside wait, and
+// notifies it), or sleeper's RMW comes later, synchronizes with producer's and sees the work.
 //-----------------------------------------------------------------------------
 class CWorkerWake final
 {
 public:
-	void Notify()
+	// Work any worker can take (shared queue job).
+	void NotifyOne()
 	{
-		{
-			std::lock_guard<std::mutex> lock( m_mutex );
-		}
-		m_cv.notify_all();
+		Notify( false );
+	}
+
+	// Work for a specific worker (direct queue job, message), wake all, others go back to sleep.
+	void NotifyAll()
+	{
+		Notify( true );
 	}
 
 	template <typename Predicate>
 	void WaitUntil( Predicate &&hasWork )
 	{
 		std::unique_lock<std::mutex> lock( m_mutex );
+
+		m_nSleepers.fetch_add( 1, std::memory_order_acq_rel );
+
 		while ( !hasWork() )
 		{
 			// Timeout is only a safety net, every state change notifies.
 			m_cv.wait_for( lock, std::chrono::milliseconds( 500 ) );
 		}
+
+		m_nSleepers.fetch_sub( 1, std::memory_order_relaxed );
 	}
 
 private:
+	void Notify( bool bAll )
+	{
+		// RMW (not plain load) to read latest count, see class comment.
+		if ( m_nSleepers.fetch_add( 0, std::memory_order_acq_rel ) == 0 )
+			return;
+
+		{
+			std::lock_guard<std::mutex> lock( m_mutex );
+		}
+
+		if ( bAll )
+			m_cv.notify_all();
+		else
+			m_cv.notify_one();
+	}
+
 	std::mutex				m_mutex;
 	std::condition_variable	m_cv;
+	std::atomic_int			m_nSleepers{ 0 };
 };
 
 //-----------------------------------------------------------------------------
@@ -154,18 +189,27 @@ public:
 		// count first and then scanned priority sub-queues one by one, so a concurrent
 		// Pop() could take "its" item from another priority, find nothing, and leave a job
 		// stranded in the queue with m_nItems == 0 (never executed, waiters hang forever).
-		AUTO_LOCK( m_mutex );
-
-		m_pQueues[ClampPriority( pJob->GetPriority() )]->PushItem( pJob );
-
-		if ( m_nItems.fetch_add( 1, std::memory_order_relaxed ) == 0 )
+		bool bWasEmpty;
 		{
-			m_JobAvailableEvent.Set();
+			AUTO_LOCK( m_mutex );
 
-			// Workers only sleep when queue is empty, so waking on empty -> non-empty is enough.
-			if ( m_pWake )
+			m_pQueues[ClampPriority( pJob->GetPriority() )]->PushItem( pJob );
+			bWasEmpty = m_nItems.fetch_add( 1, std::memory_order_relaxed ) == 0;
+		}
+
+		// Notify outside the queue lock, so woken worker doesn't block on it.
+		if ( m_pWake )
+		{
+			if ( m_bWakeAll )
 			{
-				m_pWake->Notify();
+				// Only owner thread consumes, it only sleeps when queue is empty.
+				if ( bWasEmpty )
+					m_pWake->NotifyAll();
+			}
+			else
+			{
+				// Every job may need its own worker, wake one per job (free when none sleep).
+				m_pWake->NotifyOne();
 			}
 		}
 
@@ -186,10 +230,7 @@ public:
 		{
 			if ( m_pQueues[i]->PopItem( ppJob ) )
 			{
-				if ( m_nItems.fetch_sub( 1, std::memory_order_relaxed ) == 1 )
-				{
-					m_JobAvailableEvent.Reset();
-				}
+				m_nItems.fetch_sub( 1, std::memory_order_relaxed );
 				return true;
 			}
 		}
@@ -199,15 +240,12 @@ public:
 		return false;
 	}
 
-	CThreadEvent &GetEventHandle()
-	{
-		return m_JobAvailableEvent;
-	}
-
-	// Who to wake when job becomes available.
-	void SetWake( CWorkerWake *pWake )
+	// Who to wake when job becomes available. bWakeAll for queues consumed by a single
+	// specific worker (direct queues), otherwise one worker is woken per job.
+	void SetWake( CWorkerWake *pWake, bool bWakeAll )
 	{
 		m_pWake = pWake;
+		m_bWakeAll = bWakeAll;
 	}
 
 	// Aborts and releases all queued jobs. Returns number of jobs removed.
@@ -230,7 +268,6 @@ public:
 			}
 
 			m_nItems.store( 0, std::memory_order_relaxed );
-			m_JobAvailableEvent.Reset();
 		}
 
 		// dimhotepus: Abort/Release outside of the queue lock. Release may run arbitrary
@@ -252,12 +289,11 @@ private:
 	}
 
 	CTSQueue<CJob *>	*m_pQueues[JP_HIGH + 1];
-	// dimhotepus: m_nItems is atomic because it is read without lock by other threads to check for work.
 	std::atomic_int		m_nItems{ 0 };
 	int					m_nMaxItems{ INT_MAX };
 	CWorkerWake			*m_pWake{ nullptr };
+	bool				m_bWakeAll{ false };
 	CThreadMutex		m_mutex;
-	CThreadManualEvent	m_JobAvailableEvent;
 
 };
 
@@ -348,7 +384,6 @@ private:
 	CJob *PeekJob();
 	CJob *GetDummyJob() override;
 
-	// dimhotepus: New functions.
 	class CYieldDeadline;
 	unsigned YieldWaitImpl( CThreadEvent **pEvents, int nEvents, bool bWaitAll, const CYieldDeadline &deadline );
 	[[nodiscard]] bool ServiceOneSharedJob();
@@ -431,12 +466,23 @@ public:
 		m_pOwner( pOwner ),
 		m_iThread( iThread )
 	{
-		m_DirectQueue.SetWake( &pOwner->m_WorkerWake );
+		m_DirectQueue.SetWake( &pOwner->m_WorkerWake, true );
+	}
+
+	// Called by pool right after posting a message via CallWorker().
+	void SignalCall()
+	{
+		m_bCallPending.store( true, std::memory_order_release );
 	}
 
 	CThreadEvent &GetIdleEvent()
 	{
 		return m_IdleEvent;
+	}
+
+	[[nodiscard]] bool IsIdle() const
+	{
+		return m_bIdle.load( std::memory_order_acquire );
 	}
 
 	CJobQueue &AccessDirectQueue()
@@ -445,46 +491,31 @@ public:
 	}
 
 private:
+	// dimhotepus: Message check is an atomic flag. PeekCall() is a kernel wait call on
+	// Windows, and worker checked it after every job.
+	[[nodiscard]] bool HasCall() const
+	{
+		return m_bCallPending.load( std::memory_order_acquire );
+	}
+
+	[[nodiscard]] bool TakeCall()
+	{
+		// Pool serializes messages and waits for reply before next one, so clearing here,
+		// before Reply(), can't drop a newer message.
+		return m_bCallPending.exchange( false, std::memory_order_acq_rel );
+	}
+
 	unsigned Wait()
 	{
-		unsigned waitResult;
 		tmZone( TELEMETRY_LEVEL0, TMZF_IDLE, "%s", __FUNCTION__ );
-#ifdef WIN32
-		enum Event_t
-		{
-			CALL_FROM_MASTER,
-			SHARED_QUEUE,
-			DIRECT_QUEUE,
 
-			NUM_EVENTS
-		};
-
-		HANDLE	 waitHandles[NUM_EVENTS];
-		
-		waitHandles[CALL_FROM_MASTER]	= GetCallHandle().GetHandle();
-		waitHandles[SHARED_QUEUE]		= m_SharedQueue.GetEventHandle().GetHandle();
-		waitHandles[DIRECT_QUEUE] 		= m_DirectQueue.GetEventHandle().GetHandle();
-		
-#ifndef NDEBUG
-		static_assert(NUM_EVENTS <= std::numeric_limits<DWORD>::max());
-
-		while ( ( waitResult = WaitForMultipleObjects( static_cast<DWORD>(ssize(waitHandles)), waitHandles, FALSE, 10 ) ) == WAIT_TIMEOUT )
-		{
-			(void) waitResult; // break here
-		}
-#else
-		waitResult = WaitForMultipleObjects( static_cast<DWORD>(ssize(waitHandles)), waitHandles, FALSE, INFINITE );
-#endif
-#else // !win32
-		// dimhotepus: Block until there is a call or a job, no polling.
+		// dimhotepus: Block until there is a message or a job, no polling, no kernel events.
 		m_pOwner->m_WorkerWake.WaitUntil( [this]()
 		{
-			return PeekCall() || m_DirectQueue.Count() > 0 || m_SharedQueue.Count() > 0;
+			return HasCall() || m_DirectQueue.Count() > 0 || m_SharedQueue.Count() > 0;
 		} );
 
-		waitResult = WAIT_OBJECT_0;
-#endif
-		return waitResult;
+		return WAIT_OBJECT_0;
 	}
 
 	int Run() override
@@ -498,11 +529,14 @@ private:
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
 		++m_pOwner->m_nIdleThreads;
+		m_bIdle.store( true, std::memory_order_release );
+		// Startup handshake for CThreadPool::Start(), set once.
 		m_IdleEvent.Set();
 		while (!bExit && ( ( waitResult = Wait() ) != WAIT_FAILED ) )
 		{
-			if ( PeekCall() )
+			if ( TakeCall() )
 			{
+				Assert( PeekCall() );
 				CFunctor *pFunctor = nullptr;
 				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s PeekCall():%d", __FUNCTION__, GetCallParam() );
 
@@ -555,30 +589,34 @@ private:
 					}
 					if ( !bTookJob )
 					{
-						m_IdleEvent.Reset();
+						// dimhotepus: Atomic flag instead of m_IdleEvent Reset()/Set(), which were
+						// two kernel calls per job when workers drain queue job by job.
+						m_bIdle.store( false, std::memory_order_relaxed );
 						--m_pOwner->m_nIdleThreads;
 						bTookJob = true;
 					}
 					ServiceJobAndRelease( pJob, m_iThread );
 					--m_pOwner->m_nJobs;
-				} while ( !PeekCall() );
+				} while ( !HasCall() );
 
 				if ( bTookJob )
 				{
 					++m_pOwner->m_nIdleThreads;
-					m_IdleEvent.Set();
+					m_bIdle.store( true, std::memory_order_release );
 				}
 			}
 		}
 		--m_pOwner->m_nIdleThreads;
-		m_IdleEvent.Reset();
+		m_bIdle.store( false, std::memory_order_release );
 		return 0;
 	}
 
 	CJobQueue			m_DirectQueue;
 	CJobQueue &			m_SharedQueue;
+	std::atomic_bool	m_bCallPending{ false };
 	CThreadPool *		m_pOwner;
 	CThreadManualEvent	m_IdleEvent;
+	std::atomic_bool	m_bIdle{ false };
 	intp				m_iThread;
 };
 
@@ -597,7 +635,7 @@ CThreadPool::CThreadPool() :
 	m_nIdleThreads( 0 ),
 	m_nJobs( 0 )
 {
-	m_SharedQueue.SetWake( &m_WorkerWake );
+	m_SharedQueue.SetWake( &m_WorkerWake, false );
 }
 
 //---------------------------------------------------------
@@ -607,7 +645,8 @@ void CThreadPool::CallWorkerAsync( CJobThread *pThread, unsigned message, CFunct
 	// Timeout 0: post and return, caller waits for reply. Waking after the post (not before)
 	// guarantees worker sees the message when it re-checks.
 	pThread->CallWorker( message, 0, false, pFunctor );
-	m_WorkerWake.Notify();
+	pThread->SignalCall();
+	m_WorkerWake.NotifyAll();
 }
 
 //---------------------------------------------------------
@@ -713,8 +752,25 @@ int CThreadPool::ResumeExecution()
 
 void CThreadPool::WaitForIdle( bool bAll )
 {
-	Assert(m_IdleEvents.Count() <= INT_MAX);
-	ThreadWaitForEvents( static_cast<int>(m_IdleEvents.Count()), m_IdleEvents.Base(), bAll, 60000 );
+	// dimhotepus: Idle state is an atomic flag now (idle events were toggled per job).
+	// Rarely used, so polling is fine. Same 60s limit as before.
+	const double flEnd = Plat_FloatTime() + 60.0;
+	for (;;)
+	{
+		intp nIdle = 0;
+		for ( auto &&t : m_Threads )
+		{
+			if ( t->IsIdle() )
+				++nIdle;
+		}
+
+		if ( bAll ? nIdle == m_Threads.Count() : nIdle > 0 || m_Threads.Count() == 0 )
+			return;
+		if ( Plat_FloatTime() >= flEnd )
+			return;
+
+		ThreadSleep( 1 );
+	}
 }
 
 //---------------------------------------------------------
@@ -881,15 +937,31 @@ unsigned CThreadPool::YieldWait( CJob **ppJobs, int nJobs, bool bWaitAll, unsign
 	}
 
 	// Inline storage covers MAX_THREADS jobs (largest CJobSet), larger arrays spill to heap.
+	// dimhotepus: Don't wait on (and so don't create completion events for) finished jobs.
+	// Completion events are created lazily on first access, which costs a syscall.
+	if ( !bWaitAll )
+	{
+		for ( int i = 0; i < nJobs; i++ )
+		{
+			if ( ppJobs[i]->IsFinished() )
+				return WAIT_OBJECT_0 + static_cast<unsigned>( i );
+		}
+	}
+
 	CUtlVectorFixedGrowable<CThreadEvent *, MAX_THREADS> handles;
 	handles.EnsureCapacity( nJobs );
 
 	for ( int i = 0; i < nJobs; i++ )
 	{
-		handles.AddToTail( ppJobs[i]->AccessEvent() );
+		// Wait-any must keep indices, so all jobs are included there.
+		if ( !bWaitAll || !ppJobs[i]->IsFinished() )
+			handles.AddToTail( ppJobs[i]->AccessEvent() );
 	}
 
-	return YieldWait( handles.Base(), nJobs, bWaitAll, timeout );
+	if ( handles.Count() == 0 )
+		return WAIT_OBJECT_0;
+
+	return YieldWait( handles.Base(), static_cast<int>( handles.Count() ), bWaitAll, timeout );
 }
 
 //---------------------------------------------------------
