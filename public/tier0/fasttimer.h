@@ -268,8 +268,10 @@ inline void CCycleCount::Sample()
 {
 	// dimhotepus: Adjust by half of measurement overhead as we measure between
 	// 2 points.
-	uint32 coreId;
-	m_Int64 = Plat_Rdtscp(coreId) - (g_ClockRtscpOverhead / 2);
+	uint32          coreId;
+	// dimhotepus: Marked volatile to prevent optimizer from caching RDTSCP result
+	volatile uint64 timestamp = Plat_Rdtscp( coreId );
+	m_Int64 = timestamp - ( g_ClockRtscpOverhead / 2 );
 }
 
 inline CCycleCount& CCycleCount::operator+=( CCycleCount const &other )
