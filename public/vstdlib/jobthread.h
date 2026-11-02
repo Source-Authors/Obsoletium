@@ -822,7 +822,8 @@ private:
 #define EndExecuteParallel()	jobSet.WaitForFinish( g_pThreadPool ); } while (0)
 
 #define ExecuteParallel			jobSet += g_pThreadPool->QueueCall
-#define ExecuteRefParallel		jobSet += g_pThreadPool->QueueCallRef
+// dimhotepus: QueueCallRef -> QueueRefCall. Macro referenced a non-existent method.
+#define ExecuteRefParallel		jobSet += g_pThreadPool->QueueRefCall
 
 
 //-----------------------------------------------------------------------------
