@@ -64,6 +64,9 @@ public:
 		}
 	}
 
+	CJobQueue( const CJobQueue & ) = delete;
+	CJobQueue &operator=( const CJobQueue & ) = delete;
+
 	[[nodiscard]] int Count() const
 	{
 		return m_nItems;
