@@ -1048,13 +1048,19 @@ void CThreadPool::Distribute( bool bDistribute, int *pAffinityTable )
 				ThreadHandle_t hMainThread = ThreadGetCurrentHandle();
 				SetThreadIdealProcessor( hMainThread, 0 );
 
+				// dimhotepus: Ideal processor must be < MAXIMUM_PROCESSORS (processor group size),
+				// otherwise SetThreadIdealProcessor fails on >64 logical CPU systems.
+				const DWORD nLogicalProcs = std::min(
+					static_cast<DWORD>( ci.m_nLogicalProcessors ),
+					static_cast<DWORD>( MAXIMUM_PROCESSORS ) );
+
 				DWORD iProc = 0;
 				for ( auto &&t : m_Threads )
 				{
 					iProc += nHwThreadsPer;
-					if ( iProc >= ci.m_nLogicalProcessors )
+					if ( iProc >= nLogicalProcs )
 					{
-						iProc %= ci.m_nLogicalProcessors;
+						iProc %= nLogicalProcs;
 						if ( nHwThreadsPer > 1 )
 						{
 							iProc = ( iProc + 1 ) % nHwThreadsPer;
