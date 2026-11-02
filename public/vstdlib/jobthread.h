@@ -1362,6 +1362,12 @@ inline ThreadHandle_t ThreadExecuteSoloImpl( CFunctor *pFunctor, const char *psz
 {
 	ThreadId_t threadId;
 	ThreadHandle_t hThread = CreateSimpleThread( FunctorExecuteThread, pFunctor, &threadId );
+	if ( !hThread )
+	{
+		// dimhotepus: Thread never ran, so it never released the functor.
+		pFunctor->Release();
+		return hThread;
+	}
 	if ( pszName )
 		ThreadSetDebugName( threadId, pszName );
 	return hThread;
