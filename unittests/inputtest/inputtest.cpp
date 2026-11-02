@@ -11,7 +11,7 @@
 // Material editor
 //=============================================================================
 
-#include <windows.h>
+#include "winlite.h"
 #include "appframework/tier2app.h"
 #include "inputsystem/iinputsystem.h"
 #include "filesystem.h"

@@ -4,7 +4,7 @@
 //
 //=============================================================================//
 #include <cstdio>
-#include <windows.h>
+#include "winlite.h"
 #include "tier0/dbg.h"
 #include "tier1/utldict.h"
 #include "filesystem.h"

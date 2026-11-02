@@ -6,7 +6,7 @@
 //=============================================================================//
 #include "stdafx.h"
 #include <cstdio>
-#include <windows.h>
+#include "winlite.h"
 #include "vmtcheck_util.h"
 #include "tier0/dbg.h"
 #include "utldict.h"

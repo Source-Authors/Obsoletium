@@ -34,7 +34,7 @@
 #include "istudiorender.h"
 
 #ifndef NDEBUG
-#include <windows.h>
+#include "winlite.h"
 #endif
 
 class CDmElement;

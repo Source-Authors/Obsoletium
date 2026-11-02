@@ -7,8 +7,6 @@
 //===========================================================================//
 #include "interface.h"
 
-#include <windows.h>
-//#include "..\..\tracker\common\winlite.h"
 #include "vgui_controls/Controls.h"
 #include "vgui/vgui.h"
 #include "VGUI/IPanel.h"

@@ -7,7 +7,6 @@
 // texturecompile_launcher.cpp : Defines the entry point for the console application.
 //
 
-#include <windows.h>
 #include "tier1/interface.h"
 #include <direct.h>
 #include "tier1/strtools.h"
@@ -15,6 +14,7 @@
 #include "ilaunchabledll.h"
 #include <cstdio>
 #include <conio.h>
+#include "winlite.h"
 
 char* GetLastErrorString()
 {

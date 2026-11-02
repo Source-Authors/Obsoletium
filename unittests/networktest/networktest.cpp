@@ -11,7 +11,7 @@
 // Material editor
 //=============================================================================
 
-#include <windows.h>
+#include "winlite.h"
 #include "appframework/appframework.h"
 #include "networksystem/inetworksystem.h"
 #include "networksystem/inetworkmessage.h"

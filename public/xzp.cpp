@@ -22,7 +22,7 @@
 #include "tier2/riff.h"
 
 #if defined( _WIN32 ) && !defined( _X360 )
-#include <windows.h>
+#include "winlite.h"
 #endif
 
 #ifdef MAKE_GAMEDATA_TOOL

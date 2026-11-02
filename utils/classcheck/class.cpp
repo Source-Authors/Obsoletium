@@ -7,7 +7,7 @@
 #include "stdafx.h"
 #include <cassert>
 #include <cstdio>
-#include <windows.h>
+#include "winlite.h"
 #include "classcheck_util.h"
 #include "class.h"
 #include "icodeprocessor.h"

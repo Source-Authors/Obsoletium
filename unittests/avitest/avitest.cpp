@@ -10,7 +10,7 @@
 //
 // Material editor
 //=============================================================================
-#include <windows.h>
+#include "winlite.h"
 #include "appframework/vguimatsysapp.h"
 #include "filesystem.h"
 #include "materialsystem/imaterialsystem.h"

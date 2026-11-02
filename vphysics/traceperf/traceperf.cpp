@@ -345,7 +345,7 @@ Benchmark models\props_combine\combineinnerwall001a.phy!
 
 #define IMPROVEMENT_FACTOR(x,baseline) (baseline/(x))
 #define IMPROVEMENT_PERCENT(x,baseline) (((baseline-(x)) / baseline) * 100.0f)
-#include <windows.h>
+#include "winlite.h"
 //-----------------------------------------------------------------------------
 // The application object
 //-----------------------------------------------------------------------------

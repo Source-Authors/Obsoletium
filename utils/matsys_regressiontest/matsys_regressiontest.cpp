@@ -5,8 +5,8 @@
 //===========================================================================//
 
 #define PROTECTED_THINGS_DISABLE
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+
+#include "winlite.h"
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/IMaterialSystemHardwareConfig.h"
 #include "materialsystem/imaterialproxyfactory.h"

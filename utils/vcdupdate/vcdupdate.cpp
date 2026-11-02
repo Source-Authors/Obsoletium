@@ -39,7 +39,7 @@
 #include <cctype>
 
 #ifndef NDEBUG
-#include <windows.h>
+#include "winlite.h"
 #undef GetCurrentDirectory
 #endif
 

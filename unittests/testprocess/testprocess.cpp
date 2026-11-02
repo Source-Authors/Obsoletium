@@ -6,7 +6,7 @@
 //
 //===========================================================================//
 
-#include <windows.h>
+#include "winlite.h"
 #include "tier0/icommandline.h"
 #include <cstdio>
 #include "tier0/dbg.h"

@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <windows.h>
+#include "winlite.h"
 #include "messagemgr.h"
 #include "tcpsocket.h"
 #include "iphelpers.h"

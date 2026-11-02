@@ -5,7 +5,7 @@
 //=============================================================================//
 #include "cbase.h"
 #include <cstdio>
-#include <windows.h>
+#include "winlite.h"
 #include <direct.h>
 #include "tier0/dbg.h"
 #include "utldict.h"

@@ -11,10 +11,7 @@
 //=============================================================================
 
 #define PROTECTED_THINGS_DISABLE
-#if !defined( _X360 )
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#endif
+#include "winlite.h"
 #include <ctime>
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/IMaterialSystemHardwareConfig.h"

@@ -14,7 +14,7 @@
 #include "vstdlib/random.h"
 #include "sharedInterface.h"
 
-#include <windows.h>
+#include "winlite.h"
 extern class ISoundEmitterSystemBase *soundemitter;
 
 #endif // CBASE_H

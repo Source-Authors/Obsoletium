@@ -6,8 +6,8 @@
 //=====================================================================================//
 #pragma once
 
+#include "winlite.h"
 #include <winsock2.h>
-#include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
 #include <cstdio>

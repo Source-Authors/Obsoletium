@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <windows.h>
+#include "winlite.h"
 #include "consolewnd.h"
 
 

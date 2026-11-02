@@ -4,7 +4,6 @@
 //
 //===========================================================================//
 
-#include <windows.h>
 #include <io.h>
 #include <cstdio>
 
@@ -21,6 +20,8 @@
 #include "ConfigManager.h"
 #include "steam/steam_api.h"
 #include <iregistry.h>
+
+#include "winlite.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

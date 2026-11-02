@@ -25,7 +25,7 @@
 #include "datamodel/dmelement.h"
 
 #ifndef NDEBUG
-#include <windows.h>
+#include "winlite.h"
 #endif
 
 

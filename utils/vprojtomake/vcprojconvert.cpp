@@ -10,7 +10,7 @@
 #include <sys/stat.h>
 
 #ifdef _WIN32
-#include <windows.h>
+#include "winlite.h"
 #include <comutil.h> // _variant_t
 #include <atlbase.h> // CComPtr
 #elif _LINUX

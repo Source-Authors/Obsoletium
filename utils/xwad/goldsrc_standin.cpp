@@ -2,7 +2,7 @@
 
 #include "goldsrc_standin.h"
 
-#include <Windows.h>
+#include "winlite.h"
 #include <cstdio>
 #include <cerrno>
 #include <cstring>

@@ -19,7 +19,7 @@
 
 #include "stdafx.h"
 
-#include <windows.h>
+#include "winlite.h"
 #include <cmath>
 #include <cstdarg>
 #include <cstdio>

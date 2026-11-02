@@ -4,7 +4,7 @@
 //
 //=====================================================================================//
 
-#include <windows.h>
+#include "winlite.h"
 
 #include "vgui/IVGui.h"
 #include "vgui/IInput.h"

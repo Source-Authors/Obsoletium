@@ -3,7 +3,7 @@
 #include "lbmlib.h"
 
 #include <cstdio>
-#include <Windows.h>
+#include "winlite.h"
 
 #include "goldsrc_standin.h"
 

@@ -1,7 +1,7 @@
 /*
 	see copyright notice in sqrdbg.h
 */
-#include <windows.h>
+#include "winlite.h"
 #include <winsock.h>
 #include <squirrel.h>
 #include <cstdlib>

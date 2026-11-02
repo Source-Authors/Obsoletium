@@ -5,7 +5,6 @@
 //=============================================================================//
 #include "cbase.h"
 #include <cstdio>
-#include <windows.h>
 #include <io.h>
 #include <sys/stat.h>
 
@@ -21,6 +20,7 @@
 #include "tier1/utlrbtree.h"
 #include "tier1/utlvector.h"
 #include "tier1/utldict.h"
+#include "winlite.h"
 
 bool uselogfile = false;
 bool spewdeletions = false;

@@ -8,7 +8,7 @@
 #include <io.h>
 #include <cstdio>
 #include <malloc.h>
-#include <windows.h>
+#include "winlite.h"
 #include "depcheck_util.h"
 #include "icodeprocessor.h"
 

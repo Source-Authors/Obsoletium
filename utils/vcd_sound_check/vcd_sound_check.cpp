@@ -5,7 +5,6 @@
 //=============================================================================//
 #include "cbase.h"
 #include <cstdio>
-#include <windows.h>
 #include "tier0/dbg.h"
 #include "utldict.h"
 #include "tier1/UtlLinkedList.h"
@@ -22,6 +21,7 @@
 #include "choreoactor.h"
 #include "choreochannel.h"
 #include "iscenetokenprocessor.h"
+#include "winlite.h"
 
 bool uselogfile = false;
 

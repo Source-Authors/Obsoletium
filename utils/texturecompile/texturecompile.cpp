@@ -8,7 +8,7 @@
 // vmpi_bareshell.cpp : Defines the entry point for the console application.
 //
 
-#include <windows.h>
+#include "winlite.h"
 #include <conio.h>
 #include <process.h>
 #include "vmpi.h"

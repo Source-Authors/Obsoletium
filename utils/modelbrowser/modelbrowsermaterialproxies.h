@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 
-#include <windows.h>
+#include "winlite.h"
 #include "materialsystem/imaterialproxyfactory.h"
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/imaterialproxy.h"

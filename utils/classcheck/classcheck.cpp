@@ -6,7 +6,7 @@
 //=============================================================================//
 #include "stdafx.h"
 #include <cstdio>
-#include <windows.h>
+#include "winlite.h"
 #include "classcheck_util.h"
 #include "icodeprocessor.h"
 #include "tier1/strtools.h"

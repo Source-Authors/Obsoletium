@@ -3,7 +3,7 @@
 //=============================================================================
 
 
-#include <windows.h>
+#include "winlite.h"
 
 // Valve includes
 #include "itemtest/itemtest.h"

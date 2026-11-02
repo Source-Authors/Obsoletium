@@ -2,9 +2,7 @@
 //
 // Some junk to isolate <windows.h> from polluting everything.
 
-#ifdef WIN32
 #include "winlite.h"
-#endif // #ifdef WIN32
 
 namespace s1::dmxedit {
 

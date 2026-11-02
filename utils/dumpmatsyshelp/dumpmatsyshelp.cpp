@@ -8,7 +8,7 @@
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/MaterialSystem_Config.h"
 #include "tier0/dbg.h"
-#include <windows.h>
+#include "winlite.h"
 #include "filesystem.h"
 #include "FileSystem_Tools.h"
 #include "../materialsystem/ishadersystem.h"

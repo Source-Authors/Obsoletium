@@ -8,7 +8,7 @@
 #include "workspacebrowser.h"
 #include "workspace.h"
 #include "project.h"
-#include <windows.h>
+#include "winlite.h"
 #include "resource.h"
 #include "project.h"
 #include "vcdfile.h"

@@ -5,7 +5,6 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <windows.h>
 #include "Render3D.h"
 #include "Render3DMS.h"
 

@@ -14,9 +14,6 @@
 #include "tier0/icommandline.h"
 #include "inputsystem/iinputsystem.h"
 #include "appframework/tier3app.h"
-#include <windows.h>
-
-//#include "..\..\tracker\common\winlite.h"
 
 #include "LocalizationDialog.h"
 

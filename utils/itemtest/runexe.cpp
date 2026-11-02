@@ -3,7 +3,7 @@
 //=============================================================================
 
 
-#include <Windows.h>	// GetModuleFileName, ShellExecute
+#include "winlite.h"	// GetModuleFileName, ShellExecute
 
 
 // Valve includes

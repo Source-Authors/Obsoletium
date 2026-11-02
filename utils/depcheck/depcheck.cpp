@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 #include <cstdio>
-#include <windows.h>
+#include "winlite.h"
 #include "depcheck_util.h"
 #include "icodeprocessor.h"
 #include "tier1/strtools.h"

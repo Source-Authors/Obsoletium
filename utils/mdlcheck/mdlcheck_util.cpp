@@ -7,7 +7,7 @@
 #include "stdafx.h"
 #include <io.h>
 #include <cstdio>
-#include <windows.h>
+#include "winlite.h"
 #include "mdlcheck_util.h"
 #include "tier0/dbg.h"
 #include "utlvector.h"

@@ -4,7 +4,7 @@
 //
 //=============================================================================
 
-#include <windows.h>
+#include "winlite.h"
 #include "vmpi.h"
 #include "vmpi_transfer.h"
 #include "cmdlib.h"

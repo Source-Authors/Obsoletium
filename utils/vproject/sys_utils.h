@@ -6,7 +6,7 @@
 //=====================================================================================//
 #pragma once
 
-#include <windows.h>
+#include "winlite.h"
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>

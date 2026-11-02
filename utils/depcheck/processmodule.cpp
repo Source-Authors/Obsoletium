@@ -8,7 +8,7 @@
 #include <cassert>
 #include <ctime>
 #include <cstdio>
-#include <windows.h>
+#include "winlite.h"
 
 #include "tier0/platform.h"
 #include "tier1/strtools.h"

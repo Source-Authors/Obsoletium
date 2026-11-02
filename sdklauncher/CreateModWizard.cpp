@@ -4,7 +4,7 @@
 //
 //=============================================================================//
 
-#include <windows.h>
+#include "winlite.h"
 #include "CreateModWizard.h"
 #include "sdklauncher_main.h"
 #include "filesystem_tools.h"

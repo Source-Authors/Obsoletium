@@ -2,8 +2,7 @@
 //
 //=============================================================================
 
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>			// HINSTANCE
+#include "winlite.h"			// HINSTANCE
 
 
 // Valve includes

@@ -6,7 +6,7 @@
 
 
 // Windows includes
-#include <windows.h>
+#include "winlite.h"
 #include <direct.h>
 
 

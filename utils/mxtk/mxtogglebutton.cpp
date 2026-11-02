@@ -12,7 +12,7 @@
 //                 implied.
 //
 #include <mx/mxToggleButton.h>
-#include <windows.h>
+#include "winlite.h"
 
 
 

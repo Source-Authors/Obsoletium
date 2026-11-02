@@ -4,7 +4,7 @@
 //
 //=============================================================================//
 
-#include <windows.h>
+#include "winlite.h"
 #include "tcpsocket_helpers.h"
 
 

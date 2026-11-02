@@ -15,7 +15,7 @@
  *
  */
 #include "ModConfigsHelper.h"
-#include <windows.h>
+#include "winlite.h"
 
 ModConfigsHelper::ModConfigsHelper()
 {

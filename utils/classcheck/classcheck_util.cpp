@@ -7,7 +7,7 @@
 #include "stdafx.h"
 #include <io.h>
 #include <cstdio>
-#include <windows.h>
+#include "winlite.h"
 #include "classcheck_util.h"
 #include "icodeprocessor.h"
 #include "tier0/dbg.h"

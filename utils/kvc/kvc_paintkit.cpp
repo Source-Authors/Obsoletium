@@ -4,7 +4,7 @@
 
 
 #if defined( WIN32 ) && !defined( _X360 )
-#include <windows.h> // SRC only!!
+#include "winlite.h" // SRC only!!
 #endif // 
 
 #include "filesystem.h"

@@ -4,7 +4,6 @@
 //
 //=============================================================================
 
-#include <windows.h>
 #include "vgui/IVGui.h"
 #include "vgui_controls/DirectorySelectDialog.h"
 #include "vgui/IInput.h"
@@ -12,6 +11,8 @@
 
 #include "vconfig_main.h"
 #include "ManageGamesDialog.h"
+
+#include "winlite.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

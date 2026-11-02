@@ -1,6 +1,6 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#include <windows.h>
+#include "winlite.h"
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>

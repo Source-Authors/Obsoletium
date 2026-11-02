@@ -6,7 +6,6 @@
 //
 //=============================================================================//
 
-#include <windows.h>
 #include <cstdio>
 #include "tier1/strtools.h"
 

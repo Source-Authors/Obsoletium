@@ -6,7 +6,7 @@
 
 #include "cbase.h"
 #include <cstdio>
-#include <windows.h>
+#include "winlite.h"
 #include "snd_audio_source.h"
 #include "snd_wave_source.h"
 #include "snd_wave_mixer_private.h"

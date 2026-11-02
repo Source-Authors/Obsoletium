@@ -13,7 +13,7 @@
 #include <conio.h>
 #include <direct.h>
 #include <io.h>
-#include <windows.h>
+#include "winlite.h"
 
 #include <cstdlib>
 #include <cstdio>
