@@ -296,6 +296,11 @@ private:
 	CJob *PeekJob();
 	CJob *GetDummyJob() override;
 
+	// dimhotepus: New functions.
+	class CYieldDeadline;
+	unsigned YieldWaitImpl( CThreadEvent **pEvents, int nEvents, bool bWaitAll, const CYieldDeadline &deadline );
+	[[nodiscard]] bool ServiceOneSharedJob();
+
 	//-----------------------------------------------------
 	// Thread functions
 	//-----------------------------------------------------
@@ -656,26 +661,86 @@ void CThreadPool::WaitForIdle( bool bAll )
 
 //---------------------------------------------------------
 
-unsigned CThreadPool::YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll, unsigned timeout )
+// dimhotepus: Max events per single OS wait (WaitForMultipleObjects is limited to
+// MAXIMUM_WAIT_OBJECTS == 64). Larger sets are waited on in chunks.
+static constexpr int kMaxEventsPerWait = 62;
+
+class CThreadPool::CYieldDeadline
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_IDLE, "%s(%d) SPINNING %t", __FUNCTION__, timeout, tmSendCallStack( TELEMETRY_LEVEL0, 0 ) );
-
-	Assert( timeout == TT_INFINITE ); // unimplemented
-
-	unsigned result;
-	CJob *pJob;
-	// Always wait for zero milliseconds initially, to let us process jobs on this thread.
-	timeout = 0;
-	while ( ( result = ThreadWaitForEvents( nEvents, pEvents, bWaitAll, timeout ) ) == WAIT_TIMEOUT )
+public:
+	explicit CYieldDeadline( unsigned timeout )
+		: m_bInfinite( timeout == TT_INFINITE ),
+		  m_flEnd( m_bInfinite ? 0.0 : Plat_FloatTime() + timeout / 1000.0 )
 	{
+	}
+
+	[[nodiscard]] bool Expired() const
+	{
+		return !m_bInfinite && Plat_FloatTime() >= m_flEnd;
+	}
+
+	// Milliseconds to block in OS wait.
+	[[nodiscard]] unsigned Remaining() const
+	{
+		if ( m_bInfinite )
+			return TT_INFINITE;
+
+		const double flLeftMs = ( m_flEnd - Plat_FloatTime() ) * 1000.0;
+		if ( flLeftMs <= 0.0 )
+			return 0;
+
+		constexpr double kMaxFiniteMs = static_cast<double>( TT_INFINITE - 1 );
+		return flLeftMs >= kMaxFiniteMs
+			? static_cast<unsigned>( TT_INFINITE - 1 )
+			// Round up so we never spin with a 0ms wait before the deadline.
+			: static_cast<unsigned>( flLeftMs ) + 1;
+	}
+
+private:
+	const bool m_bInfinite;
+	const double m_flEnd;
+};
+
+//---------------------------------------------------------
+
+bool CThreadPool::ServiceOneSharedJob()
+{
+	CJob *pJob;
 		if ( !m_bExecOnThreadPoolThreadsOnly && m_SharedQueue.Pop( &pJob ) )
 		{
 			ServiceJobAndRelease( pJob );
 			--m_nJobs;
+		return true;
+		}
+	return false;
+}
+
+//---------------------------------------------------------
+
+unsigned CThreadPool::YieldWaitImpl( CThreadEvent **pEvents, int nEvents, bool bWaitAll, const CYieldDeadline &deadline )
+{
+	Assert( nEvents > 0 && nEvents <= kMaxEventsPerWait );
+
+	// Always wait for zero milliseconds initially, to let us process jobs on this thread.
+	unsigned waitMs = 0;
+	for (;;)
+	{
+		const unsigned result = ThreadWaitForEvents( nEvents, pEvents, bWaitAll, waitMs );
+		if ( result != TW_TIMEOUT )
+			return result;
+
+		// dimhotepus: Honor caller timeout. It was silently replaced by an infinite wait,
+		// so CJob::WaitForFinish( 10 ) could block forever.
+		if ( deadline.Expired() )
+			return TW_TIMEOUT;
+
+		if ( ServiceOneSharedJob() )
+		{
+			waitMs = 0;
 		}
 		else
 		{
-			// Since there are no jobs for the main thread set the timeout to infinite.
+			// Since there are no jobs for the main thread block until the events signal.
 			// The only disadvantage to this is that if a job thread creates a new job
 			// then the main thread will not be available to pick it up, but if that
 			// is a problem you can just create more worker threads. Debugging test runs
@@ -686,29 +751,85 @@ unsigned CThreadPool::YieldWait( CThreadEvent **pEvents, int nEvents, bool bWait
 			// when the main thread is idle versus busy, and it allows ready thread analysis
 			// in xperf to find out what woke up a waiting thread.
 			// It also avoids unnecessary CPU starvation -- seen on customer traces of TF2.
-			timeout = TT_INFINITE;
+			waitMs = deadline.Remaining();
 		}
 	}
+}
+
+//---------------------------------------------------------
+
+unsigned CThreadPool::YieldWait( CThreadEvent **pEvents, int nEvents, bool bWaitAll, unsigned timeout )
+{
+	tmZone( TELEMETRY_LEVEL0, TMZF_IDLE, "%s(%u) SPINNING %t", __FUNCTION__, timeout, tmSendCallStack( TELEMETRY_LEVEL0, 0 ) );
+
+	if ( nEvents <= 0 || !pEvents )
+	{
+		// Waiting for all of nothing is trivially satisfied, waiting for any of nothing is not.
+		return bWaitAll ? WAIT_OBJECT_0 : TW_FAILED;
+	}
+
+	const CYieldDeadline deadline( timeout );
+
+	if ( nEvents <= kMaxEventsPerWait )
+	{
+		return YieldWaitImpl( pEvents, nEvents, bWaitAll, deadline );
+	}
+
+	// dimhotepus: Large sets. Previously > 62 jobs failed immediately with TW_FAILED, and
+	// callers like CJobSet::WaitForFinish ignored that and released still running jobs.
+	if ( bWaitAll )
+	{
+		for ( int iBase = 0; iBase < nEvents; iBase += kMaxEventsPerWait )
+		{
+			const int nChunk = (std::min)( kMaxEventsPerWait, nEvents - iBase );
+			const unsigned result = YieldWaitImpl( pEvents + iBase, nChunk, true, deadline );
+			if ( result == TW_TIMEOUT || result == TW_FAILED )
 	return result;
+}
+		return WAIT_OBJECT_0;
+	}
+
+	// Wait for any of a large set: poll chunks, help with jobs in between.
+	for (;;)
+	{
+		for ( int iBase = 0; iBase < nEvents; iBase += kMaxEventsPerWait )
+		{
+			const int nChunk = (std::min)( kMaxEventsPerWait, nEvents - iBase );
+			const unsigned result = ThreadWaitForEvents( nChunk, pEvents + iBase, false, 0 );
+			if ( result == TW_FAILED )
+				return result;
+			if ( result != TW_TIMEOUT )
+				return result + static_cast<unsigned>( iBase );
+		}
+
+		if ( deadline.Expired() )
+			return TW_TIMEOUT;
+
+		if ( !ServiceOneSharedJob() )
+		{
+			ThreadSleep( 1 );
+		}
+	}
 }
 
 //---------------------------------------------------------
 
 unsigned CThreadPool::YieldWait( CJob **ppJobs, int nJobs, bool bWaitAll, unsigned timeout )
 {
-	CUtlVectorFixed<CThreadEvent *, 64> handles;
-	if ( nJobs > handles.NumAllocated() - 2 )
+	if ( nJobs <= 0 || !ppJobs )
 	{
-		return TW_FAILED;
+		return YieldWait( static_cast<CThreadEvent **>( nullptr ), 0, bWaitAll, timeout );
 	}
+
+	CUtlVectorFixedGrowable<CThreadEvent *, kMaxEventsPerWait> handles;
+	handles.EnsureCapacity( nJobs );
 
 	for ( int i = 0; i < nJobs; i++ )
 	{
 		handles.AddToTail( ppJobs[i]->AccessEvent() );
 	}
 	
-	Assert(handles.Count() <= INT_MAX);
-	return YieldWait( handles.Base(), static_cast<int>(handles.Count()), bWaitAll, timeout);
+	return YieldWait( handles.Base(), nJobs, bWaitAll, timeout );
 }
 
 //---------------------------------------------------------
@@ -716,14 +837,8 @@ unsigned CThreadPool::YieldWait( CJob **ppJobs, int nJobs, bool bWaitAll, unsign
 void CThreadPool::Yield( unsigned timeout )
 {
 	// @MULTICORE (toml 10/24/2006): not implemented
-	Assert( ThreadInMainThread() );
-	if ( !ThreadInMainThread() )
-	{
 		ThreadSleep( timeout );
-		return;
 	}
-	ThreadSleep( timeout );
-}
 
 //---------------------------------------------------------
 // Add a job to the queue
