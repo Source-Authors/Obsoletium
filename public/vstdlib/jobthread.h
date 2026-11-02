@@ -27,6 +27,10 @@
 //
 //=============================================================================
 
+#include <atomic>
+#include <type_traits>
+#include <utility>
+
 #include "tier0/threadtools.h"
 #include "tier1/refcount.h"
 #include "tier1/utllinkedlist.h"
@@ -608,15 +612,15 @@ public:
 	//-----------------------------------------------------
 	// Fast queries
 	//-----------------------------------------------------
-	bool Executed() const							{ return ( m_status == JOB_OK );	}
-	bool CanExecute() const							{ return ( m_status == JOB_STATUS_PENDING || m_status == JOB_STATUS_UNSERVICED ); }
-	bool IsFinished() const							{ return ( m_status != JOB_STATUS_PENDING && m_status != JOB_STATUS_INPROGRESS && m_status != JOB_STATUS_UNSERVICED ); }
-	JobStatus_t GetStatus() const					{ return m_status; }
+	bool Executed() const							{ return ( GetStatus() == JOB_OK );	}
+	bool CanExecute() const							{ const JobStatus_t s = GetStatus(); return ( s == JOB_STATUS_PENDING || s == JOB_STATUS_UNSERVICED ); }
+	bool IsFinished() const							{ const JobStatus_t s = GetStatus(); return ( s != JOB_STATUS_PENDING && s != JOB_STATUS_INPROGRESS && s != JOB_STATUS_UNSERVICED ); }
+	JobStatus_t GetStatus() const					{ return m_status.load( std::memory_order_acquire ); }
 
 	/// Slam the status to a particular value.  This is named "slam" instead of "set,"
 	/// to warn you that it should only be used in unusual situations.  Otherwise, the
 	/// job manager really should manage the status for you, and you should not manhandle it.
-	void SlamStatus(JobStatus_t s) { m_status = s; }
+	void SlamStatus(JobStatus_t s) { m_status.store( s, std::memory_order_release ); }
 	
 	//-----------------------------------------------------
 	// Try to acquire ownership (to satisfy). If you take the lock, you must either execute or abort.
@@ -658,7 +662,10 @@ private:
 	//-----------------------------------------------------
 	friend class CThreadPool;
 
-	JobStatus_t			m_status{ JOB_STATUS_UNSERVICED };
+	// dimhotepus: Status is read without lock by other threads, so it is atomic. Read once
+	// per query so concurrent transitions can't produce inconsistent answers.
+	std::atomic<JobStatus_t>	m_status{ JOB_STATUS_UNSERVICED };
+	static_assert( sizeof( std::atomic<JobStatus_t> ) == sizeof( JobStatus_t ), "CJob layout must not change" );
 	JobPriority_t		m_priority;
 	CThreadMutex		m_mutex;
 	unsigned char		m_flags{ 0 };
@@ -1332,23 +1339,29 @@ inline bool IThreadPool::YieldWait( CJob *pJob, unsigned timeout )
 inline JobStatus_t CJob::Execute()
 {
 	if ( IsFinished() )
-		return m_status;
+		return GetStatus();
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %s %d", __FUNCTION__, Describe(), m_status );
+	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %s %d", __FUNCTION__, Describe(), GetStatus() );
 
-	AUTO_LOCK( m_mutex );
+	// dimhotepus: Self reference must outlive the lock. Previously Release() ran before
+	// AUTO_LOCK destructor, so if DoExecute() dropped the last outside reference the
+	// mutex was unlocked after the job was deleted (use-after-free).
 	AddRef();
 
 	JobStatus_t result;
 
-	switch ( m_status )
+	{
+		AUTO_LOCK( m_mutex );
+
+		switch ( GetStatus() )
 	{
 	case JOB_STATUS_UNSERVICED:
 	case JOB_STATUS_PENDING:
 		{
 			// Service it
-			m_status = JOB_STATUS_INPROGRESS;
-			result = m_status = DoExecute();
+				SlamStatus( JOB_STATUS_INPROGRESS );
+				result = DoExecute();
+				SlamStatus( result );
 			DoCleanup();
 			m_CompleteEvent.Set();
 			break;
@@ -1361,12 +1374,13 @@ inline JobStatus_t CJob::Execute()
 	case JOB_OK:
 		[[fallthrough]];
 	case JOB_STATUS_ABORTED:
-		result = m_status;
+			result = GetStatus();
 		break;
 
 	default:
-		AssertMsg( m_status < JOB_OK, "Unknown job state");
-		result = m_status;
+			result = GetStatus();
+			AssertMsg( result < JOB_OK, "Unknown job state");
+		}
 	}
 
 	Release();
@@ -1379,7 +1393,7 @@ inline JobStatus_t CJob::Execute()
 
 inline JobStatus_t CJob::TryExecute()
 {
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %s %d", __FUNCTION__, Describe(), m_status );
+	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %s %d", __FUNCTION__, Describe(), GetStatus() );
 
 	// TryLock() would only fail if another thread has entered
 	// Execute() or Abort()
@@ -1389,7 +1403,7 @@ inline JobStatus_t CJob::TryExecute()
 		Execute();
 		Unlock();
 	}
-	return m_status;
+	return GetStatus();
 }
 
 //---------------------------------------------------------
@@ -1397,23 +1411,27 @@ inline JobStatus_t CJob::TryExecute()
 inline JobStatus_t CJob::Abort( bool bDiscard )
 {
 	if ( IsFinished() )
-		return m_status;
+		return GetStatus();
 
-	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %s %d", __FUNCTION__, Describe(), m_status );
+	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %s %d", __FUNCTION__, Describe(), GetStatus() );
 
-	AUTO_LOCK( m_mutex );
+	// dimhotepus: Self reference must outlive the lock, see Execute().
 	AddRef();
 
 	JobStatus_t result;
 
-	switch ( m_status )
+	{
+		AUTO_LOCK( m_mutex );
+
+		switch ( GetStatus() )
 	{
 	case JOB_STATUS_UNSERVICED:
 	case JOB_STATUS_PENDING:
 		{
 			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "CJob::DoAbort" );
 
-			result = m_status = DoAbort( bDiscard );
+				result = DoAbort( bDiscard );
+				SlamStatus( result );
 			if ( bDiscard )
 				DoCleanup();
 			m_CompleteEvent.Set();
@@ -1423,12 +1441,13 @@ inline JobStatus_t CJob::Abort( bool bDiscard )
 	case JOB_STATUS_ABORTED:
 	case JOB_STATUS_INPROGRESS:
 	case JOB_OK:
-		result = m_status;
+			result = GetStatus();
 		break;
 
 	default:
-		AssertMsg( m_status < JOB_OK, "Unknown job state");
-		result = m_status;
+			result = GetStatus();
+			AssertMsg( result < JOB_OK, "Unknown job state");
+		}
 	}
 
 	Release();
