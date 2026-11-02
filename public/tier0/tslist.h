@@ -533,7 +533,8 @@ public:
 	void Purge()
 	{
 #ifndef NDEBUG
-		ValidateQueue();
+		[[maybe_unused]] const bool bValid{ ValidateQueue() };
+		AssertMsg( bValid, "Corrupt CTSQueue detected." );
 #endif
 
 		Node_t *pNode;
