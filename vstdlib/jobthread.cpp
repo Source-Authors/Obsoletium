@@ -857,6 +857,14 @@ void CThreadPool::AddJob( CJob *pJob )
 		return;
 	}
 
+	// dimhotepus: Detect job still pending in other pool. m_ThreadPoolData is never assigned,
+	// so check above never fires.
+	if ( pJob->m_pThreadPool && pJob->m_pThreadPool != this && pJob->GetStatus() == JOB_STATUS_PENDING )
+	{
+		Warning( "Cannot add a thread job '%s' still pending in another thread pool\n", pJob->Describe() );
+		return;
+	}
+
 	if ( m_Threads.Count() == 0 )
 	{
 		// So only threadpool jobs are supposed to execute the jobs, but there are no threadpool threads?
