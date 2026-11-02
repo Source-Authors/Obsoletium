@@ -106,6 +106,11 @@ static float QPCToMS( int64 nDelta )
 
 int64 ETWMark( const char *pMessage )
 {
+	// dimhotepus: Add null pointer validation for safety
+	if ( !pMessage )
+	{
+		return 0;
+	}
 	int64 nTime = GetQPCTime();
 	EventWriteMark( pMessage );
 	return nTime;
@@ -124,62 +129,123 @@ void ETWMarkPrintf( PRINTF_FORMAT_STRING const char *pMessage, ... ) FMTFUNCTION
 		return;
 	}
 
+	// dimhotepus: Validate format string and prevent potential null pointer dereference
+	if ( !pMessage )
+	{
+		return;
+	}
+
 	char buffer[1000];
 	va_list args;
 	va_start( args, pMessage ); //-V2018 //-V2019
-	vsprintf_s( buffer, pMessage, args );
+	// dimhotepus: Prevent buffer overflow by ensuring vsprintf_s doesn't exceed buffer
+	int nWritten = vsprintf_s( buffer, sizeof(buffer), pMessage, args );
 	va_end( args );
 
-	EventWriteMark( buffer );
+	// dimhotepus: Only emit event if formatting succeeded
+	if ( nWritten > 0 )
+	{
+		EventWriteMark( buffer );
+	}
 }
 
 void ETWMark1F( const char *pMessage, float data1 )
 {
+	// dimhotepus: Add null pointer validation for safety
+	if ( !pMessage )
+	{
+		return;
+	}
 	EventWriteMark1F( pMessage, data1 );
 }
 
 void ETWMark2F( const char *pMessage, float data1, float data2 )
 {
+	// dimhotepus: Add null pointer validation for safety
+	if ( !pMessage )
+	{
+		return;
+	}
 	EventWriteMark2F( pMessage, data1, data2 );
 }
 
 void ETWMark3F( const char *pMessage, float data1, float data2, float data3 )
 {
+	// dimhotepus: Add null pointer validation for safety
+	if ( !pMessage )
+	{
+		return;
+	}
 	EventWriteMark3F( pMessage, data1, data2, data3 );
 }
 
 void ETWMark4F( const char *pMessage, float data1, float data2, float data3, float data4 )
 {
+	// dimhotepus: Add null pointer validation for safety
+	if ( !pMessage )
+	{
+		return;
+	}
 	EventWriteMark4F( pMessage, data1, data2, data3, data4 );
 }
 
 void ETWMark1I( const char *pMessage, int data1 )
 {
+	// dimhotepus: Add null pointer validation for safety
+	if ( !pMessage )
+	{
+		return;
+	}
 	EventWriteMark1I( pMessage, data1 );
 }
 
 void ETWMark2I( const char *pMessage, int data1, int data2 )
 {
+	// dimhotepus: Add null pointer validation for safety
+	if ( !pMessage )
+	{
+		return;
+	}
 	EventWriteMark2I( pMessage, data1, data2 );
 }
 
 void ETWMark3I( const char *pMessage, int data1, int data2, int data3 )
 {
+	// dimhotepus: Add null pointer validation for safety
+	if ( !pMessage )
+	{
+		return;
+	}
 	EventWriteMark3I( pMessage, data1, data2, data3 );
 }
 
 void ETWMark4I( const char *pMessage, int data1, int data2, int data3, int data4 )
 {
+	// dimhotepus: Add null pointer validation for safety
+	if ( !pMessage )
+	{
+		return;
+	}
 	EventWriteMark4I( pMessage, data1, data2, data3, data4 );
 }
 
 void ETWMark1S( const char *pMessage, const char* data1 )
 {
+	// dimhotepus: Add null pointer validation for safety
+	if ( !pMessage || !data1 )
+	{
+		return;
+	}
 	EventWriteMark1S( pMessage, data1 );
 }
 
 void ETWMark2S( const char *pMessage, const char* data1, const char* data2 )
 {
+	// dimhotepus: Add null pointer validation for safety
+	if ( !pMessage || !data1 || !data2 )
+	{
+		return;
+	}
 	EventWriteMark2S( pMessage, data1, data2 );
 }
 
@@ -204,6 +270,12 @@ int64 ETWBegin( const char *pMessage )
 		return 0;
 	}
 
+	// dimhotepus: Add null pointer validation for safety
+	if ( !pMessage )
+	{
+		return 0;
+	}
+
 	int64 nTime = GetQPCTime();
 	EventWriteStart( pMessage, s_nDepth++ );
 	return nTime;
@@ -220,6 +292,12 @@ int64 ETWEnd( const char *pMessage, int64 nStartTime )
 	// In this case we also avoid the potentially unreliable TLS implementation
 	// (for dynamically loaded DLLs) on Windows XP.
 	if ( !VALVE_MAIN_Context.IsEnabled )
+	{
+		return 0;
+	}
+
+	// dimhotepus: Add null pointer validation for safety
+	if ( !pMessage )
 	{
 		return 0;
 	}
@@ -333,11 +411,21 @@ void ETWMouseWheel( int nWheelDelta, int nX, int nY )
 
 void ETWKeyDown( int nScanCode, int nVirtualCode, const char *pChar )
 {
+	// dimhotepus: Add null pointer validation for safety
+	if ( !pChar )
+	{
+		return;
+	}
 	EventWriteKey_down( pChar, nScanCode, nVirtualCode );
 }
 
 void ETWSendPacket( const char *pTo, int nWireSize, int nOutSequenceNR, int nOutSequenceNrAck )
 {
+	// dimhotepus: Add null pointer validation for safety
+	if ( !pTo )
+	{
+		return;
+	}
 	static int s_nCumulativeWireSize;
 	s_nCumulativeWireSize += nWireSize;
 
@@ -351,6 +439,11 @@ void ETWThrottled()
 
 void ETWReadPacket( const char *pFrom, int nWireSize, int nInSequenceNR, int nOutSequenceNRAck )
 {
+	// dimhotepus: Add null pointer validation for safety
+	if ( !pFrom )
+	{
+		return;
+	}
 	static int s_nCumulativeWireSize;
 	s_nCumulativeWireSize += nWireSize;
 
