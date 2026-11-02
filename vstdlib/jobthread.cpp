@@ -572,6 +572,20 @@ intp CThreadPool::NumIdleThreads() const
 
 void CThreadPool::ExecuteHighPriorityFunctor( CFunctor *pFunctor )
 {
+	// dimhotepus: Serialize with SuspendExecution/ResumeExecution/Stop. All of them talk to
+	// workers through the single CallWorker() slot, so interleaving two callers could
+	// overwrite each other's message before the worker reads it.
+	AUTO_LOCK( m_SuspendMutex );
+
+	// dimhotepus: Suspended workers cannot reply, and the caller holds the suspension
+	// (e.g. functor issued from a job run by ExecuteToPriority), so waiting would deadlock.
+	if ( m_nSuspend > 0 )
+	{
+		AssertMsg( false, "ExecuteHighPriorityFunctor called while thread pool is suspended" );
+		Warning( "ExecuteHighPriorityFunctor ignored: thread pool is suspended.\n" );
+		return;
+	}
+
 	for ( auto &&t : m_Threads )
 	{
 		t->CallWorker( TPM_RUNFUNCTOR, 0, false, pFunctor );
@@ -1152,9 +1166,28 @@ void CThreadPool::Distribute( bool bDistribute, int *pAffinityTable )
 
 bool CThreadPool::Stop( [[maybe_unused]] int timeout )
 {
+	{
+		AUTO_LOCK( m_SuspendMutex );
+
+		// dimhotepus: Cooperatively suspended workers never see TPM_EXIT, so Stop() on a
+		// suspended pool hung forever. Resume them first.
+		if ( m_nSuspend > 0 )
+		{
+			for ( auto &&t : m_Threads )
+			{
+				t->ResumeCooperative();
+			}
+			m_nSuspend = 0;
+		}
+
 	for ( auto &&t : m_Threads )
 	{
+			// dimhotepus: Thread may be already gone (e.g. killed at process shutdown).
+			if ( t->IsAlive() )
+			{
 		t->CallWorker( TPM_EXIT );
+	}
+		}
 	}
 
 	for ( auto &&t : m_Threads )
