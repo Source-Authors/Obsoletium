@@ -1461,8 +1461,10 @@ inline JobStatus_t CJob::TryExecute()
 	if ( !IsFinished() && TryLock() )
 	{
 		// ...service the request
-		Execute();
+		const JobStatus_t result = Execute();
 		Unlock();
+		// dimhotepus: Do not touch members after Unlock(), job may be already gone.
+		return result;
 	}
 	return GetStatus();
 }
