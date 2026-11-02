@@ -6970,7 +6970,7 @@ s1::win::com::com_ptr<IDirect3DSurface9> CShaderAPIDx8::GetTextureSurface( Shade
 	}
 
 	s1::win::com::com_ptr<IDirect3DSurface9> pSurface;
-	HRESULT hr = pTex->GetSurfaceLevel( 0, &pSurface );
+	[[maybe_unused]] HRESULT hr = pTex->GetSurfaceLevel( 0, &pSurface );
 	Assert( SUCCEEDED( hr ) );
 
 	return pSurface;
@@ -10708,9 +10708,9 @@ s1::win::com::com_ptr<IDirect3DSurface> CShaderAPIDx8::GetFrontBufferImage( Imag
 	
 	POINT pnt{ 0, 0 };
 #ifdef _WIN32
-	BOOL result = ClientToScreen( ( HWND )m_hWnd, &pnt );
+	[[maybe_unused]] BOOL result = ClientToScreen( (HWND)m_hWnd, &pnt );
 #else
-	BOOL result = ClientToScreen( (VD3DHWND)m_hWnd, &pnt );
+	[[maybe_unused]] BOOL result = ClientToScreen( (VD3DHWND)m_hWnd, &pnt );
 #endif
 	Assert( result );
 
@@ -11529,7 +11529,7 @@ void CShaderAPIDx8::BeginOcclusionQueryDrawing( ShaderAPIOcclusionQuery_t handle
 {
 	IDirect3DQuery9 *pQuery = (IDirect3DQuery9 *)handle;
 
-	HRESULT hr = pQuery->Issue( D3DISSUE_BEGIN );
+	[[maybe_unused]] HRESULT hr = pQuery->Issue( D3DISSUE_BEGIN );
 	Assert( SUCCEEDED( hr ) );
 }
 
@@ -11537,7 +11537,7 @@ void CShaderAPIDx8::EndOcclusionQueryDrawing( ShaderAPIOcclusionQuery_t handle )
 {
 	IDirect3DQuery9 *pQuery = (IDirect3DQuery9 *)handle;
 
-	HRESULT hr = pQuery->Issue( D3DISSUE_END );
+	[[maybe_unused]] HRESULT hr = pQuery->Issue( D3DISSUE_END );
 	Assert( SUCCEEDED( hr ) );
 }
 
