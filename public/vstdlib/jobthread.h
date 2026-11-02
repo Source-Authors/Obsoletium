@@ -844,6 +844,8 @@ auto IterRangeParallel(
 		std::is_invocable_r_v<
 			FUNCTION_RETTYPE,
 			decltype(pfnProxied),
+			ITERTYPE1,
+			ITERTYPE2,
 			Args...
 		>
 	>
@@ -898,9 +900,9 @@ auto IterRangeParallel(
 		>
 	>
 {
-	int nIdle = g_pThreadPool->NumIdleThreads();
+	intp nIdle = g_pThreadPool->NumIdleThreads();
 	ITERTYPE1 range = to - from;
-	int nThreads = MIN( nIdle + 1, range );
+	intp nThreads = MIN( nIdle + 1, range );
 	if ( nThreads > MAX_THREADS )
 		nThreads = MAX_THREADS;
 	if ( nThreads < 2 )
