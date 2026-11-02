@@ -109,6 +109,10 @@ struct ThreadPoolStartParams_t
 	{
 		bExecOnThreadPoolThreadsOnly = false;
 
+		// dimhotepus: Ensure all affinities are used if smb breaks pool affinities logic.
+		// Done unconditionally so table tail is never left uninitialized.
+		BitwiseSet(iAffinityTable, 0xFF);
+
 		bUseAffinityTable = ( pAffinities != nullptr ) && ( fDistribute == TRS_TRUE ) && ( nThreads != -1 );
 		if ( bUseAffinityTable )
 		{
@@ -119,12 +123,7 @@ struct ThreadPoolStartParams_t
 				iAffinityTable[i] = pAffinities[i];
 			}
 		}
-		else
-		{
-			// dimhotepus: Ensure all affinities are used if smb breaks pool affinities logic.
-			BitwiseSet(iAffinityTable, 0xFF);
 		}
-	}
 
 	int				nThreads;
 	int				nThreadsMax{ -1 };
