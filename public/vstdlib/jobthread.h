@@ -1135,31 +1135,46 @@ public:
 
 	void Run( intp lBegin, intp nItems, intp nMaxParallel = PTRDIFF_MAX )
 	{
-		if ( nItems )
+		if ( nItems > 0 )
 		{
-			m_lIndex.exchange( lBegin );
+			m_lIndex.store( lBegin, std::memory_order::memory_order_relaxed );
 			m_lLimit = lBegin + nItems;
 
-			intp i = g_pThreadPool->NumIdleThreads();
+			intp nJobs = g_pThreadPool->NumIdleThreads();
 
-			if ( nMaxParallel < i)
-			{
-				i = nMaxParallel;
-			}
+			if ( nMaxParallel < nJobs )
+				nJobs = nMaxParallel;
+			// Calling thread processes items too, no need in more helpers than items left.
+			if ( nJobs > nItems - 1 )
+				nJobs = nItems - 1;
+			if ( nJobs > MAX_THREADS )
+				nJobs = MAX_THREADS;
+			if ( nJobs < 0 )
+				nJobs = 0;
 
-			while( i-- )
+			// dimhotepus: Keep job handles and Abort() them after own pass instead of busy
+			// spinning on a counter:
+			// * Abort() cancels helpers which never started (items are all taken by now), so
+			//   nested use from a pool thread no longer deadlocks waiting for queued jobs no
+			//   free thread can pick up;
+			// * Abort() blocks on job lock while helper is running, which also gives proper
+			//   happens-before for item results (spin used relaxed loads, no ordering).
+			CJob **ppJobs = stackallocT( CJob *, nJobs + 1 );
+
+			for ( intp i = 0; i < nJobs; ++i )
 			{
-				m_nActive.fetch_add(1, std::memory_order::memory_order_relaxed);
-				ThreadExecute( this, &CParallelLoopProcessor<ITEM_PROCESSOR_TYPE>::DoExecute )->Release();
+				ppJobs[i] = ThreadExecute( this, &CParallelLoopProcessor<ITEM_PROCESSOR_TYPE>::DoExecute );
 			}
 			
-			m_nActive.fetch_add(1, std::memory_order::memory_order_relaxed);
 			DoExecute();
 
-			while ( m_nActive.load( std::memory_order::memory_order_relaxed) )
+			for ( intp i = 0; i < nJobs; ++i )
 			{
-				ThreadPause();
+				ppJobs[i]->Abort(); // will either abort ones that never got a thread, or wait on ones that did
+				ppJobs[i]->Release();
 			}
+
+			Assert( m_nActive.load( std::memory_order::memory_order_acquire ) == 0 );
 		}
 	}
 
@@ -1170,9 +1185,11 @@ private:
 	{
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "DoExecute %s", m_szDescription );
 
+		m_nActive.fetch_add( 1, std::memory_order::memory_order_relaxed );
+
 		m_ItemProcessor.Begin();
 
-		intp lLimit = m_lLimit;
+		const intp lLimit = m_lLimit;
 
 		for (;;)
 		{
@@ -1186,7 +1203,7 @@ private:
 
 		m_ItemProcessor.End();
 
-		m_nActive.fetch_sub(1, std::memory_order::memory_order_relaxed);
+		m_nActive.fetch_sub( 1, std::memory_order::memory_order_release );
 	}
 	
 #ifdef PLATFORM_64BITS
@@ -1250,26 +1267,47 @@ protected:
 
 		if ( nMaxParallel < i)
 			i = nMaxParallel;
+		if ( i > MAX_THREADS )
+			i = MAX_THREADS;
+
+		CJob **ppJobs = stackallocT( CJob *, ( i > 0 ? i : 0 ) + 1 );
+		intp nJobs = 0;
 
 		while( i -- > 0 )
 		{
 			if ( threadOverride == -1 || i == threadOverride - 1 )
 			{
-				m_nActive.fetch_add( 1, std::memory_order::memory_order_acquire );
-				m_pThreadPool->QueueCall( this, &ThisParallelProcessorBase_t::DoExecute )->Release();
+				ppJobs[nJobs++] = m_pThreadPool->QueueCall( this, &ThisParallelProcessorBase_t::DoExecute );
 			}
 		}
 
-		if ( threadOverride == -1 || threadOverride == 0 )
-		{
-			m_nActive.fetch_add( 1, std::memory_order::memory_order_acquire );
-			DoExecute();
-		}
+		// dimhotepus: If requested override thread does not exist nothing was executed at all.
+		// Run on calling thread in such case.
+		const bool bRunOnCaller = threadOverride == -1 || threadOverride == 0 || nJobs == 0;
 
-		while ( m_nActive.load( std::memory_order::memory_order_relaxed ) )
+		if ( bRunOnCaller )
 		{
-			ThreadPause();
+			DoExecute();
+
+			// dimhotepus: Abort() cancels helpers which never started (work is drained by now)
+			// and blocks until running ones finish. Replaces relaxed busy spin which deadlocked
+			// when used from pool threads and had no happens-before with helper results.
+			for ( intp j = 0; j < nJobs; ++j )
+			{
+				ppJobs[j]->Abort();
+				ppJobs[j]->Release();
 		}
+		}
+		else
+		{
+			// Only helper(s) do the work, must wait for them, not cancel.
+			for ( intp j = 0; j < nJobs; ++j )
+			{
+				ppJobs[j]->WaitForFinishAndRelease();
+		}
+	}
+
+		Assert( m_nActive.load( std::memory_order::memory_order_acquire ) == 0 );
 	}
 
 protected:
@@ -1284,6 +1322,8 @@ private:
 	void DoExecute()
 	{
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "DoExecute %s", m_szDescription );
+
+		m_nActive.fetch_add( 1, std::memory_order::memory_order_relaxed );
 
 		static_cast<Derived *>( this )->OnBegin();
 
