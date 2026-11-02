@@ -1070,29 +1070,17 @@ int CThreadPool::AbortAll()
 	SuspendExecution();
 	RunCodeAtScopeExit(ResumeExecution());
 
-	CJob *pJob;
-
-	int iAborted = 0;
-	while ( m_SharedQueue.Pop( &pJob ) )
-	{
-		pJob->Abort();
-		pJob->Release();
-		iAborted++;
-	}
+	int iAborted = m_SharedQueue.Flush();
 
 	for ( auto &&t : m_Threads )
 	{
-		CJobQueue &queue = t->AccessDirectQueue();
-		while ( queue.Pop( &pJob ) )
-		{
-			pJob->Abort();
-			pJob->Release();
-			iAborted++;
+		iAborted += t->AccessDirectQueue().Flush();
 		}
 
-	}
-
-	m_nJobs = 0;
+	// dimhotepus: Subtract instead of zeroing. Jobs concurrently being serviced via
+	// YieldWait on other threads still decrement the counter when they finish, so zeroing
+	// made the counter underflow.
+	m_nJobs -= iAborted;
 
 	return iAborted;
 }
