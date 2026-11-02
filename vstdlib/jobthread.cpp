@@ -411,7 +411,7 @@ private:
 			(void) waitResult; // break here
 		}
 #else
-		waitResult = WaitForMultipleObjects( ssize(waitHandles), waitHandles, FALSE, INFINITE );
+		waitResult = WaitForMultipleObjects( static_cast<DWORD>(ssize(waitHandles)), waitHandles, FALSE, INFINITE );
 #endif
 #else // !win32
 		bool bSet = false;
