@@ -206,7 +206,7 @@ MKDIR thirdparty\SDL\out
 PUSHD thirdparty\SDL\out 
 REM Use Ninja generator to overcome Github CI issues
 REM https://github.com/actions/runner-images/issues/10980
-cmake -G Ninja ..
+cmake -G Ninja .. -DSDL_TESTS=OFF
 if ERRORLEVEL 1 (
   ECHO cmake generation for thirdparty\SDL failed.
   EXIT /B 1
