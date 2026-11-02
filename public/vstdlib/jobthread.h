@@ -587,6 +587,7 @@ public:
 	//-----------------------------------------------------
 	// Fast queries
 	//-----------------------------------------------------
+	// dimhotepus: Read once per query so concurrent transitions can't produce inconsistent answers.
 	bool Executed() const							{ return ( GetStatus() == JOB_OK );	}
 	bool CanExecute() const							{ const JobStatus_t s = GetStatus(); return ( s == JOB_STATUS_PENDING || s == JOB_STATUS_UNSERVICED ); }
 	bool IsFinished() const							{ const JobStatus_t s = GetStatus(); return ( s != JOB_STATUS_PENDING && s != JOB_STATUS_INPROGRESS && s != JOB_STATUS_UNSERVICED ); }
@@ -714,26 +715,65 @@ public:
 	CJobSet( CJob *pJob = nullptr )
 	{
 		if ( pJob )
-			m_jobs.AddToTail( pJob );
+			Add( pJob );
 	}
 
 	CJobSet( CJob **ppJobs, int nJobs )
 	{
 		if ( ppJobs )
-			m_jobs.AddMultipleToTail( nJobs, ppJobs );
+		{
+			for ( int i = 0; i < nJobs; ++i )
+			{
+				if ( ppJobs[i] )
+					Add( ppJobs[i] );
+	}
+		}
+	}
+
+	// dimhotepus: CJobSet owns one reference per job. Implicit copy assignment copied raw
+	// pointers: the target's previous jobs leaked and copied jobs were released twice.
+	// Copies now add a reference, moves transfer ownership.
+	CJobSet( const CJobSet &other )
+	{
+		CopyFrom( other );
+	}
+
+	CJobSet( CJobSet &&other ) noexcept
+		{
+		MoveFrom( other );
+		}
+
+	CJobSet &operator=( const CJobSet &other )
+	{
+		if ( this != &other )
+		{
+			// Take new references before dropping old ones, sets may share jobs.
+			CJobSet copy( other );
+			ReleaseAll();
+			MoveFrom( copy );
+	}
+		return *this;
+	}
+
+	CJobSet &operator=( CJobSet &&other ) noexcept
+	{
+		if ( this != &other )
+		{
+			ReleaseAll();
+			MoveFrom( other );
+		}
+		return *this;
 	}
 
 	~CJobSet()
 	{
-		for ( auto *j : m_jobs )
-		{
-			j->Release();
-		}
+		ReleaseAll();
 	}
 
 	void operator+=( CJob *pJob )
 	{
-		m_jobs.AddToTail( pJob );
+		if ( pJob )
+			Add( pJob );
 	}
 
 	void operator-=( CJob *pJob )
@@ -802,8 +842,74 @@ public:
 		}
 	}
 
+	// Max jobs set holds. Jobs above that are executed synchronously on add.
+	[[nodiscard]] static constexpr intp MaxJobs() { return MAX_THREADS; }
+
 private:
-	CUtlVectorFixed<CJob *, 16> m_jobs;
+	// dimhotepus: Storage is fixed, CUtlMemoryFixed can't grow and only asserts, so adding
+	// past capacity overran the inline buffer. Instead finish overflow job right away, so it
+	// is still complete when set is waited on.
+	void Add( CJob *pJob )
+	{
+		if ( m_jobs.Count() < MaxJobs() )
+		{
+			m_jobs.AddToTail( pJob );
+			return;
+		}
+
+		AssertMsg( false, "CJobSet is full (%zd jobs), finishing job '%s' synchronously",
+			static_cast<intp>( MaxJobs() ), pJob->Describe() );
+
+		if ( pJob->GetStatus() == JOB_STATUS_UNSERVICED )
+		{
+			// Not queued anywhere, nobody else would ever run it.
+			pJob->Execute();
+		}
+		else
+		{
+			// Queued or running: wait for its turn instead of executing it here. Executing a
+			// queued job on the caller would let it jump ahead of older JF_SERIAL jobs.
+			pJob->WaitForFinish();
+		}
+		pJob->Release();
+	}
+
+	void ReleaseAll()
+	{
+		for ( auto *j : m_jobs )
+		{
+			j->Release();
+		}
+		m_jobs.RemoveAll();
+	}
+
+	void CopyFrom( const CJobSet &other )
+	{
+		const intp nJobs = other.m_jobs.Count();
+		if ( nJobs )
+		{
+			m_jobs.AddMultipleToTail( nJobs, other.m_jobs.Base() );
+			for ( auto *j : m_jobs )
+			{
+				j->AddRef();
+			}
+		}
+	}
+
+	// Leaves 'other' empty, its references now belong to us. Element-wise so it works for
+	// inline (fixed) storage too.
+	void MoveFrom( CJobSet &other ) noexcept
+	{
+		const intp nJobs = other.m_jobs.Count();
+		if ( nJobs )
+		{
+			m_jobs.AddMultipleToTail( nJobs, other.m_jobs.Base() );
+			other.m_jobs.RemoveAll();
+		}
+	}
+
+	// dimhotepus: 16 -> MAX_THREADS. Parallel helpers queue up to MAX_THREADS - 1 jobs.
+	CUtlVectorFixed<CJob *, MAX_THREADS> m_jobs;
 };
 
 //-----------------------------------------------------------------------------

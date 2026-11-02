@@ -662,7 +662,8 @@ void CThreadPool::WaitForIdle( bool bAll )
 //---------------------------------------------------------
 
 // dimhotepus: Max events per single OS wait (WaitForMultipleObjects is limited to
-// MAXIMUM_WAIT_OBJECTS == 64). Larger sets are waited on in chunks.
+// MAXIMUM_WAIT_OBJECTS == 64). Larger sets are waited on in chunks. Intentionally not
+// derived from MAX_THREADS: it is an OS limit and must not grow with thread count.
 static constexpr int kMaxEventsPerWait = 62;
 
 class CThreadPool::CYieldDeadline
@@ -821,7 +822,8 @@ unsigned CThreadPool::YieldWait( CJob **ppJobs, int nJobs, bool bWaitAll, unsign
 		return YieldWait( static_cast<CThreadEvent **>( nullptr ), 0, bWaitAll, timeout );
 	}
 
-	CUtlVectorFixedGrowable<CThreadEvent *, kMaxEventsPerWait> handles;
+	// Inline storage covers MAX_THREADS jobs (largest CJobSet), larger arrays spill to heap.
+	CUtlVectorFixedGrowable<CThreadEvent *, MAX_THREADS> handles;
 	handles.EnsureCapacity( nJobs );
 
 	for ( int i = 0; i < nJobs; i++ )
@@ -1131,8 +1133,8 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 		return false;
 	}
 
-	// dimhotepus: Bound thread count. Affinity table has TP_MAX_POOL_THREADS entries,
-	// CJob stores servicing thread index in a char and OS multi-wait is limited to 64.
+	// dimhotepus: Bound thread count. Affinity table has TP_MAX_POOL_THREADS entries
+	// and CJob stores servicing thread index in a char.
 	if ( nThreads > TP_MAX_POOL_THREADS )
 	{
 		Warning( "Thread pool '%s': clamping %d requested threads to %d.\n",
