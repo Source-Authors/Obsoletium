@@ -24,6 +24,9 @@
 
 #include <algorithm>
 #include <atomic>
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
 
 #include "tier0/memdbgon.h"
 
@@ -45,6 +48,43 @@ inline void ServiceJobAndRelease( CJob *pJob, intp iThread = -1 )
 	}
 	pJob->Release();
 }
+
+//-----------------------------------------------------------------------------
+// dimhotepus: Wakes idle worker threads on POSIX.
+//
+// POSIX workers used to poll the shared queue (100ms), direct queue (10ms) and call event
+// in turn, so a direct-queue job, CallWorker() message (suspend, run functor, exit) could
+// wait ~100ms per worker to be noticed. Now worker sleeps on one condition variable and
+// re-checks its "has work" predicate under this mutex. Producers change state first, then
+// Notify(), which takes the same mutex, so wakeup can't be lost between check and sleep.
+// Windows waits on all handles at once via WaitForMultipleObjects and doesn't need this.
+//-----------------------------------------------------------------------------
+class CWorkerWake final
+{
+public:
+	void Notify()
+	{
+		{
+			std::lock_guard<std::mutex> lock( m_mutex );
+		}
+		m_cv.notify_all();
+	}
+
+	template <typename Predicate>
+	void WaitUntil( Predicate &&hasWork )
+	{
+		std::unique_lock<std::mutex> lock( m_mutex );
+		while ( !hasWork() )
+		{
+			// Timeout is only a safety net, every state change notifies.
+			m_cv.wait_for( lock, std::chrono::milliseconds( 500 ) );
+		}
+	}
+
+private:
+	std::mutex				m_mutex;
+	std::condition_variable	m_cv;
+};
 
 //-----------------------------------------------------------------------------
 
@@ -121,6 +161,12 @@ public:
 		if ( m_nItems.fetch_add( 1, std::memory_order_relaxed ) == 0 )
 		{
 			m_JobAvailableEvent.Set();
+
+			// Workers only sleep when queue is empty, so waking on empty -> non-empty is enough.
+			if ( m_pWake )
+			{
+				m_pWake->Notify();
+			}
 		}
 
 		return nOverflow;
@@ -158,7 +204,13 @@ public:
 		return m_JobAvailableEvent;
 	}
 
-	// dimhotepus: Aborts and releases all queued jobs. Returns number of jobs removed.
+	// Who to wake when job becomes available.
+	void SetWake( CWorkerWake *pWake )
+	{
+		m_pWake = pWake;
+	}
+
+	// Aborts and releases all queued jobs. Returns number of jobs removed.
 	int Flush()
 	{
 		CUtlVector<CJob *> jobs;
@@ -193,7 +245,6 @@ public:
 	}
 
 private:
-	// dimhotepus: Clamps the priority to the valid range.
 	[[nodiscard]] static int ClampPriority( int priority )
 	{
 		AssertMsg( priority >= JP_LOW && priority <= JP_HIGH, "Invalid job priority %d", priority );
@@ -204,6 +255,7 @@ private:
 	// dimhotepus: m_nItems is atomic because it is read without lock by other threads to check for work.
 	std::atomic_int		m_nItems{ 0 };
 	int					m_nMaxItems{ INT_MAX };
+	CWorkerWake			*m_pWake{ nullptr };
 	CThreadMutex		m_mutex;
 	CThreadManualEvent	m_JobAvailableEvent;
 
@@ -300,6 +352,8 @@ private:
 	class CYieldDeadline;
 	unsigned YieldWaitImpl( CThreadEvent **pEvents, int nEvents, bool bWaitAll, const CYieldDeadline &deadline );
 	[[nodiscard]] bool ServiceOneSharedJob();
+	// Posts message to worker without waiting for reply and wakes it.
+	void CallWorkerAsync( CJobThread *pThread, unsigned message, CFunctor *pFunctor = nullptr );
 
 	//-----------------------------------------------------
 	// Thread functions
@@ -309,6 +363,8 @@ private:
 private:
 	friend class CJobThread;
 
+	// Declared before queues which point to it.
+	CWorkerWake				m_WorkerWake;
 	CJobQueue				m_SharedQueue;
 	CInterlockedInt			m_nIdleThreads;
 	CUtlVector<CJobThread *> m_Threads;
@@ -375,6 +431,7 @@ public:
 		m_pOwner( pOwner ),
 		m_iThread( iThread )
 	{
+		m_DirectQueue.SetWake( &pOwner->m_WorkerWake );
 	}
 
 	CThreadEvent &GetIdleEvent()
@@ -419,23 +476,13 @@ private:
 		waitResult = WaitForMultipleObjects( static_cast<DWORD>(ssize(waitHandles)), waitHandles, FALSE, INFINITE );
 #endif
 #else // !win32
-		bool bSet = false;
-		int nWaitTime = 100;
-
-		while( !bSet )
+		// dimhotepus: Block until there is a call or a job, no polling.
+		m_pOwner->m_WorkerWake.WaitUntil( [this]()
 		{
-			// Jobs are typically enqueued to the shared job queue so wait on it first.
-			bSet = m_SharedQueue.GetEventHandle().Wait( nWaitTime );
-			if( !bSet )
-				bSet = m_DirectQueue.GetEventHandle().Wait( 10 );
-			if ( !bSet )
-				bSet = GetCallHandle().Wait( 0 );
-		}
+			return PeekCall() || m_DirectQueue.Count() > 0 || m_SharedQueue.Count() > 0;
+		} );
 
-		if ( !bSet )
-			waitResult = WAIT_TIMEOUT;
-		else
-			waitResult = WAIT_OBJECT_0;
+		waitResult = WAIT_OBJECT_0;
 #endif
 		return waitResult;
 	}
@@ -550,6 +597,17 @@ CThreadPool::CThreadPool() :
 	m_nIdleThreads( 0 ),
 	m_nJobs( 0 )
 {
+	m_SharedQueue.SetWake( &m_WorkerWake );
+}
+
+//---------------------------------------------------------
+
+void CThreadPool::CallWorkerAsync( CJobThread *pThread, unsigned message, CFunctor *pFunctor )
+{
+	// Timeout 0: post and return, caller waits for reply. Waking after the post (not before)
+	// guarantees worker sees the message when it re-checks.
+	pThread->CallWorker( message, 0, false, pFunctor );
+	m_WorkerWake.Notify();
 }
 
 //---------------------------------------------------------
@@ -593,7 +651,7 @@ void CThreadPool::ExecuteHighPriorityFunctor( CFunctor *pFunctor )
 
 	for ( auto &&t : m_Threads )
 	{
-		t->CallWorker( TPM_RUNFUNCTOR, 0, false, pFunctor );
+		CallWorkerAsync( t, TPM_RUNFUNCTOR, pFunctor );
 	}
 
 	for ( auto &&t : m_Threads )
@@ -615,7 +673,7 @@ int CThreadPool::SuspendExecution()
 		// Make sure state is correct
 		for ( auto &&t : m_Threads )
 		{
-			t->CallWorker( TPM_SUSPEND, 0 );
+			CallWorkerAsync( t, TPM_SUSPEND );
 		}
 
 		for ( auto &&t : m_Threads )
@@ -1332,13 +1390,22 @@ bool CThreadPool::Stop( [[maybe_unused]] int timeout )
 			m_nSuspend = 0;
 		}
 
+		// dimhotepus: Post exit to all workers first, then wait for replies, so they shut down
+		// in parallel instead of one after another.
+		CUtlVectorFixed<CJobThread *, MAX_THREADS> exiting;
 		for ( auto &&t : m_Threads )
 		{
 			// dimhotepus: Thread may be already gone (e.g. killed at process shutdown).
 			if ( t->IsAlive() )
 			{
-				t->CallWorker( TPM_EXIT );
+				CallWorkerAsync( t, TPM_EXIT );
+				exiting.AddToTail( t );
 			}
+		}
+
+		for ( auto &&t : exiting )
+		{
+			t->WaitForReply();
 		}
 	}
 
