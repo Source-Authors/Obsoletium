@@ -884,7 +884,8 @@ auto IterRangeParallel(
 		while ( --nThreads )
 		{
 			ITERTYPE2 thisTo = from + nIncrement;
-			jobSet += g_pThreadPool->AddCall( pfnProxied, from, thisTo, std::forward<Args>( args )... );
+			// dimhotepus: Do not std::forward in a loop, rvalue args were moved-from after 1st job.
+			jobSet += g_pThreadPool->AddCall( pfnProxied, from, thisTo, args... );
 			from = thisTo;
 		}
 		FunctorDirectCall( pfnProxied, from, to, std::forward<Args>( args )... );
@@ -934,7 +935,8 @@ auto IterRangeParallel(
 		while ( --nThreads )
 		{
 			ITERTYPE2 thisTo = from + nIncrement;
-			jobSet += g_pThreadPool->AddCall( pObject, pfnProxied, from, thisTo, std::forward<Args>( args )... );
+			// dimhotepus: Do not std::forward in a loop, rvalue args were moved-from after 1st job.
+			jobSet += g_pThreadPool->AddCall( pObject, pfnProxied, from, thisTo, args... );
 			from = thisTo;
 		}
 		FunctorDirectCall( pObject, pfnProxied, from, to, std::forward<Args>( args )... );
