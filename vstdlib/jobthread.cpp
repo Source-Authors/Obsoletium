@@ -874,9 +874,11 @@ void CThreadPool::AddJob( CJob *pJob )
 		return;
 	}
 
-	unsigned char flags = pJob->GetFlags();
+	const unsigned char flags = pJob->GetFlags();
 
-	if ( !m_bExecOnThreadPoolThreadsOnly && ( ( flags & ( JF_IO | JF_QUEUE ) ) == 0 ) /* @TBD && !m_queue.Count() */ )
+	// dimhotepus: JF_SERIAL jobs must always be queued. Running one inline (or bumping
+	// its priority) while older serial jobs are still queued breaks serial ordering.
+	if ( !m_bExecOnThreadPoolThreadsOnly && ( ( flags & ( JF_IO | JF_QUEUE | JF_SERIAL ) ) == 0 ) /* @TBD && !m_queue.Count() */ )
 	{
 		if ( !NumIdleThreads() )
 		{
