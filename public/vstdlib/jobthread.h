@@ -1387,12 +1387,16 @@ inline ThreadHandle_t ThreadExecuteSoloRef( const char *pszName, Args&& ... args
 inline bool IThreadPool::YieldWait( CThreadEvent &event, unsigned timeout )
 {
 	CThreadEvent *pEvent = &event;
-	return ( YieldWait( &pEvent, 1, true, timeout ) != TW_TIMEOUT );
+	// dimhotepus: Failure is not success.
+	const unsigned result = YieldWait( &pEvent, 1, true, timeout );
+	return result != TW_TIMEOUT && result != TW_FAILED;
 }
 
 inline bool IThreadPool::YieldWait( CJob *pJob, unsigned timeout )
 {
-	return ( YieldWait( &pJob, 1, true, timeout ) != TW_TIMEOUT );
+	// dimhotepus: Failure is not success.
+	const unsigned result = YieldWait( &pJob, 1, true, timeout );
+	return result != TW_TIMEOUT && result != TW_FAILED;
 }
 
 //-----------------------------------------------------------------------------
