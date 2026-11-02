@@ -11,376 +11,284 @@
 #include "tier1/strtools.h"
 #include "tier0/dbg.h"
 
-#ifdef OSX
-#include <CoreServices/CoreServices.h>
+#include <cstdio>
+#include <cstring>
+
+#if defined(OSX)
+#include <sys/types.h>
+#include <sys/sysctl.h>
 #endif
 
-//-----------------------------------------------------------------------------
-// Purpose: return the OS type for this machine
-//-----------------------------------------------------------------------------
+#if defined(LINUX)
+#include <sys/utsname.h>
+#endif
+
+namespace
+{
+
+bool IsMacOSType(EOSType type)
+{
+	return type >= k_eMacOSUnknown && type < k_eOSUnknown;
+}
+
+bool IsLinuxType(EOSType type)
+{
+	return type >= k_eLinuxUnknown && type < k_eMacOSUnknown;
+}
+
+bool IsWindowsType(EOSType type)
+{
+	return type >= k_eWinUnknown;
+}
+
+#if defined(OSX)
+bool GetMacOSVersion(unsigned &major, unsigned &minor, unsigned &patch)
+{
+	char version[64] = {};
+	size_t size = sizeof(version);
+
+	if (sysctlbyname("kern.osproductversion", version, &size, nullptr, 0) != 0)
+		return false;
+
+	return sscanf(version, "%u.%u.%u", &major, &minor, &patch) >= 2;
+}
+#endif
+
+#if defined(_WIN32)
+DWORD GetWindowsBuildNumber()
+{
+	OSVERSIONINFOEXW version = {};
+	version.dwOSVersionInfoSize = sizeof(version);
+
+	using RtlGetVersionFn = LONG(WINAPI *)(OSVERSIONINFOW *);
+	HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
+	if (!ntdll)
+		return 0;
+
+	RtlGetVersionFn rtlGetVersion =
+		reinterpret_cast<RtlGetVersionFn>(GetProcAddress(ntdll, "RtlGetVersion"));
+
+	if (!rtlGetVersion ||
+		rtlGetVersion(reinterpret_cast<OSVERSIONINFOW *>(&version)) != 0)
+	{
+		return 0;
+	}
+
+	return version.dwBuildNumber;
+}
+#endif
+}
+
 EOSType GetOSType()
 {
-	static EOSType eOSVersion = k_eOSUnknown;
+	static EOSType cachedType = k_eOSUnknown;
 
-#if defined( _WIN32 ) && !defined( _X360 )
-	if ( eOSVersion == k_eOSUnknown || eOSVersion == k_eWinUnknown )
-	{
-		eOSVersion = k_eWinUnknown;
+	if (cachedType != k_eOSUnknown)
+		return cachedType;
 
-		if ( IsWindows10OrGreater() )
-		{
-			eOSVersion = k_eWindows10;
-		}
-		else if ( IsWindows8Point1OrGreater() )
-		{
-			eOSVersion = k_eWindows8_1;
-		}
-		else if ( IsWindows8OrGreater() )
-		{
-			eOSVersion = k_eWindows8;
-		}
-		else if ( IsWindows7OrGreater() )
-		{
-			eOSVersion = k_eWindows7;
-		}
-		else if ( IsWindowsVistaOrGreater() )
-		{
-			eOSVersion = k_eWinVista;
-		}
-		else if ( IsWindowsXPOrGreater() )
-		{
-			eOSVersion = k_eWinXP;
-		}
-	}
+#if defined(_WIN32)
+	cachedType = k_eWinUnknown;
+
+	if (IsWindows10OrGreater())
+		cachedType = GetWindowsBuildNumber() >= 22000
+			? k_eWindows11
+			: k_eWindows10;
+	else if (IsWindows8Point1OrGreater())
+		cachedType = k_eWindows8_1;
+	else if (IsWindows8OrGreater())
+		cachedType = k_eWindows8;
+	else if (IsWindows7OrGreater())
+		cachedType = k_eWindows7;
+	else if (IsWindowsVistaOrGreater())
+		cachedType = k_eWinVista;
+	else if (IsWindowsXPOrGreater())
+		cachedType = k_eWinXP;
+
 #elif defined(OSX)
-	if ( eOSVersion == k_eOSUnknown )
+	unsigned major = 0;
+	unsigned minor = 0;
+	unsigned patch = 0;
+
+	if (!GetMacOSVersion(major, minor, patch))
+		return k_eMacOSUnknown;
+
+	if (major == 10)
 	{
-		SInt32 MajorVer = 0;
-		SInt32 MinorVer = 0;
-		SInt32 PatchVer = 0;
-		OSErr err = noErr;
-		err = Gestalt( gestaltSystemVersionMajor, &MajorVer );
-		if ( err != noErr )
-			return k_eOSUnknown;
-		err = Gestalt( gestaltSystemVersionMinor, &MinorVer );
-		if ( err != noErr )
-			return k_eOSUnknown;
-		err = Gestalt( gestaltSystemVersionBugFix, &PatchVer );
-		if ( err != noErr )
-			return k_eOSUnknown;
-		
-		switch ( MajorVer )
+		switch (minor)
 		{
-			case 10:
-			{
-				switch( MinorVer )
-				{
-					case 4:
-						eOSVersion = k_eMacOS104;
-						break;
-					case 5:
-						eOSVersion = k_eMacOS105;						
-						switch ( PatchVer )
-						{
-							case 8:
-								eOSVersion = k_eMacOS1058;								
-							default:
-								break;
-						}
-						break;
-					case 6:
-						eOSVersion = k_eMacOS106;
-						switch ( PatchVer )
-						{
-							case 1:
-							case 2:
-								break;
-							case 3:
-							default:
-								// note the default here - 10.6.4 (5,6...) >= 10.6.3, so we want to 
-								// identify as 10.6.3 for sysreqs purposes
-								eOSVersion = k_eMacOS1063;
-								break;
-						}
-						break;
-					case 7:
-						eOSVersion = k_eMacOS107;							
-						break;
-					default:
-						break;
-				}
-			}
-			default:
-				break;
+		case 4:  cachedType = k_eMacOS104; break;
+		case 5:  cachedType = patch >= 8 ? k_eMacOS1058 : k_eMacOS105; break;
+		case 6:  cachedType = patch >= 3 ? k_eMacOS1063 : k_eMacOS106; break;
+		case 7:  cachedType = k_eMacOS107; break;
+		case 8:  cachedType = k_eMacOS108; break;
+		case 9:  cachedType = k_eMacOS109; break;
+		case 10: cachedType = k_eMacOS1010; break;
+		case 11: cachedType = k_eMacOS1011; break;
+		case 12: cachedType = k_eMacOS1012; break;
+		case 13: cachedType = k_eMacOS1013; break;
+		case 14: cachedType = k_eMacOS1014; break;
+		case 15: cachedType = k_eMacOS1015; break;
+		default: cachedType = k_eMacOSUnknown; break;
 		}
 	}
-#elif defined(LINUX)
-	if ( eOSVersion == k_eOSUnknown )
+	else if (major >= 11)
 	{
-		
-		FILE *fpKernelVer = fopen( "/proc/version", "r" );
-		
-		if ( !fpKernelVer )
-			return k_eLinuxUnknown;
-		
-		char rgchVersionLine[1024];
-		char *pchRet = fgets( rgchVersionLine, sizeof(rgchVersionLine), fpKernelVer );
-		fclose( fpKernelVer );
-		
-		eOSVersion = k_eLinuxUnknown;
-		
-		// move past "Linux version "
-		const char *pchVersion = rgchVersionLine + ssize( "Linux version " ) - 1;
-		if ( pchRet && *pchVersion == '2' && *(pchVersion+1) == '.' )
+		switch (major)
 		{
-			pchVersion += 2; // move past "2."
-			if ( *pchVersion == '2' && *(pchVersion+1) == '.' )
-				eOSVersion = k_eLinux22;
-			else if ( *pchVersion == '4' && *(pchVersion+1) == '.' )
-				eOSVersion = k_eLinux24;
-			else if ( *pchVersion == '6' && *(pchVersion+1) == '.' )
-				eOSVersion = k_eLinux26;
+		case 11: cachedType = k_eMacOS11; break;
+		case 12: cachedType = k_eMacOS12; break;
+		case 13: cachedType = k_eMacOS13; break;
+		case 14: cachedType = k_eMacOS14; break;
+		default: cachedType = k_eMacOS15; break;
+		}
+	}
+	else
+	{
+		cachedType = k_eMacOSUnknown;
+	}
+
+#elif defined(LINUX)
+	cachedType = k_eLinuxUnknown;
+
+	struct utsname info;
+	if (uname(&info) == 0)
+	{
+		unsigned major = 0;
+		unsigned minor = 0;
+
+		if (sscanf(info.release, "%u.%u", &major, &minor) == 2)
+		{
+			if (major == 2 && minor == 2)
+				cachedType = k_eLinux22;
+			else if (major == 2 && minor == 4)
+				cachedType = k_eLinux24;
+			else if (major == 2 && minor >= 6)
+				cachedType = k_eLinux26;
+			else if (major >= 3)
+				cachedType = k_eLinux3OrGreater;
 		}
 	}
 #endif
-	return eOSVersion;
+
+	return cachedType;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: get platform-specific OS details (distro, on linux)
-// returns a pointer to the input buffer on success (for convenience), 
-// NULL on failure.
-//-----------------------------------------------------------------------------
-const char *GetOSDetailString( char *pchOutBuf, int cchOutBuf )
+const char *GetOSDetailString(char *outBuf, int outBufSize)
 {
-#if defined WIN32 
-	(void)( pchOutBuf );
-	(void)( cchOutBuf );
-	// no interesting details
+	if (!outBuf || outBufSize <= 0)
+		return nullptr;
+
+#if defined(_WIN32)
+	(void)outBuf;
+	(void)outBufSize;
 	return nullptr;
 #else
-#if defined LINUX
-	// we're about to go poking around to see if we can figure out distribution
-	// looking @ any /etc file is fragile (people can change 'em), 
-	// but since this is just hardware survey data, we're not super concerned.  
-	// a bunch of OS-specific issue files
-	const char *pszIssueFile[] =
+#if defined(LINUX)
+	FILE *file = fopen("/etc/os-release", "r");
+	if (file)
 	{
-		"/etc/redhat-release",
-		"/etc/fedora-release",
-		"/etc/slackware-release",
-		"/etc/debian_release",
-		"/etc/mandrake-release",
-		"/etc/yellowdog-release",
-		"/etc/gentoo-release",
-		"/etc/lsb-release",
-		"/etc/SUSE-release",
-	};
-	if ( !pchOutBuf )
-		return NULL;
+		size_t bytesRead =
+			fread(outBuf, 1, static_cast<size_t>(outBufSize - 1), file);
+		fclose(file);
 
-	for (size_t i = 0; i < std::size( pszIssueFile ); i++ )
-	{
-		FILE *fdInfo = fopen( pszIssueFile[i], "r" );
-		if ( !fdInfo  )
-			continue;
-		
-		// prepend the buffer with the name of the file we found for easier grouping
-		snprintf( pchOutBuf, cchOutBuf, "%s\n", pszIssueFile[i] );
-		intp cchIssueFile = strlen( pszIssueFile[i] ) + 1;
-		ssize_t cubRead = fread( (void*) (pchOutBuf + cchIssueFile) , sizeof(char), cchOutBuf - cchIssueFile, fdInfo );
-		fclose( fdInfo );
-
-		if ( cubRead < 0 )
-			return NULL;
-
-		// null terminate
-		pchOutBuf[ MIN( cubRead, cchOutBuf-1 ) ] = '\0';
-		return pchOutBuf;
+		outBuf[bytesRead] = '\0';
+		if (bytesRead > 0)
+			return outBuf;
 	}
 #endif
-	// if all else fails, just send back uname -a
-	if ( !pchOutBuf )
-		return NULL;
-	FILE *fpUname = popen( "uname -mrsv", "r" );
-	if ( !fpUname )
-		return NULL;
-	size_t cchRead = fread( pchOutBuf, sizeof(char), cchOutBuf, fpUname );
-	pclose( fpUname );
 
-	pchOutBuf[ MIN( cchRead, (size_t)cchOutBuf-1 ) ] = '\0';
-	return pchOutBuf;
+	struct utsname info;
+	if (uname(&info) != 0)
+		return nullptr;
+
+	snprintf(outBuf, static_cast<size_t>(outBufSize), "%s %s %s",
+		info.sysname, info.release, info.machine);
+	return outBuf;
 #endif
 }
 
-
-//-----------------------------------------------------------------------------
-// Purpose: get a friendly name for an OS type
-//-----------------------------------------------------------------------------
-const char *GetNameFromOSType( EOSType eOSType )
+const char *GetNameFromOSType(EOSType type)
 {
-	switch ( eOSType )
+	switch (type)
 	{
-	case k_eWinUnknown:
-		return "Windows";
-	case k_eWin311:
-		return "Windows 3.11";
-	case k_eWin95:
-		return "Windows 95";
-	case k_eWin98:
-		return "Windows 98";
-	case k_eWinME:
-		return "Windows ME";
-	case k_eWinNT:
-		return "Windows NT";
-	case k_eWin2000:
-		return "Windows 2000";
-	case k_eWinXP:
-		return "Windows XP";
-	case k_eWin2003:
-		return "Windows 2003";
-	case k_eWinVista:
-		return "Windows Vista";
-	case k_eWindows7:
-		return "Windows 7";
-	case k_eWin2008:
-		return "Windows 2008";
-	case k_eWindows8:
-		return "Windows 8";
-	case k_eWindows8_1:
-		return "Windows 8.1";
-	case k_eWindows10:
-		return "Windows 10";
-#ifdef POSIX
-	case k_eMacOSUnknown:
-		return "Mac OS";
-	case k_eMacOS104:
-		return "MacOS 10.4";
-	case k_eMacOS105:
-		return "MacOS 10.5";
-	case k_eMacOS1058:
-		return "MacOS 10.5.8";
-	case k_eMacOS106:
-		return "MacOS 10.6";
-	case k_eMacOS1063:
-		return "MacOS 10.6.3";
-	case k_eMacOS107:
-		return "MacOS 10.7";
-	case k_eLinuxUnknown:
-		return "Linux";
-	case k_eLinux22:
-		return "Linux 2.2";
-	case k_eLinux24:
-		return "Linux 2.4";
-	case k_eLinux26:
-		return "Linux 2.6";
-#endif
-	default:
-	case k_eOSUnknown:
-		return "Unknown";
+	case k_eWinUnknown: return "Windows";
+	case k_eWin311: return "Windows 3.11";
+	case k_eWin95: return "Windows 95";
+	case k_eWin98: return "Windows 98";
+	case k_eWinME: return "Windows ME";
+	case k_eWinNT: return "Windows NT";
+	case k_eWin2000: return "Windows 2000";
+	case k_eWinXP: return "Windows XP";
+	case k_eWin2003: return "Windows 2003";
+	case k_eWinVista: return "Windows Vista";
+	case k_eWindows7: return "Windows 7";
+	case k_eWin2008: return "Windows 2008";
+	case k_eWindows8: return "Windows 8";
+	case k_eWindows8_1: return "Windows 8.1";
+	case k_eWindows10: return "Windows 10";
+	case k_eWindows11: return "Windows 11";
+
+	case k_eMacOSUnknown: return "Mac OS";
+	case k_eMacOS104: return "macOS 10.4";
+	case k_eMacOS105: return "macOS 10.5";
+	case k_eMacOS1058: return "macOS 10.5.8";
+	case k_eMacOS106: return "macOS 10.6";
+	case k_eMacOS1063: return "macOS 10.6.3 or later";
+	case k_eMacOS107: return "macOS 10.7";
+	case k_eMacOS108: return "macOS 10.8";
+	case k_eMacOS109: return "macOS 10.9";
+	case k_eMacOS1010: return "macOS 10.10";
+	case k_eMacOS1011: return "macOS 10.11";
+	case k_eMacOS1012: return "macOS 10.12";
+	case k_eMacOS1013: return "macOS 10.13";
+	case k_eMacOS1014: return "macOS 10.14";
+	case k_eMacOS1015: return "macOS 10.15";
+	case k_eMacOS11: return "macOS 11";
+	case k_eMacOS12: return "macOS 12";
+	case k_eMacOS13: return "macOS 13";
+	case k_eMacOS14: return "macOS 14";
+	case k_eMacOS15: return "macOS 15 or later";
+
+	case k_eLinuxUnknown: return "Linux";
+	case k_eLinux22: return "Linux 2.2";
+	case k_eLinux24: return "Linux 2.4";
+	case k_eLinux26: return "Linux 2.6";
+	case k_eLinux3OrGreater: return "Linux 3 or later";
+
+	default: return "Unknown";
 	}
 }
 
-
-// friendly name to OS type, MUST be same size as EOSType enum
-struct OSTypeNameTuple
+bool OSTypesAreCompatible(EOSType detected, EOSType required)
 {
-	EOSType m_OSType;
-	const char *m_pchOSName;
-
-};
-
-const OSTypeNameTuple k_rgOSTypeToName[] = 
-{
-	{ k_eOSUnknown, "unknown" },
-	{ k_eMacOSUnknown, "macos" },
-	{ k_eMacOS104, "macos104" },
-	{ k_eMacOS105, "macos105" },
-	{ k_eMacOS1058, "macos1058" },
-	{ k_eMacOS106, "macos106" },
-	{ k_eMacOS1063, "macos1063" },
-	{ k_eMacOS107, "macos107" },
-	{ k_eLinuxUnknown, "linux" },
-	{ k_eLinux22, "linux22" },
-	{ k_eLinux24, "linux24" },
-	{ k_eLinux26, "linux26" },
-	{ k_eWinUnknown, "windows" },
-	{ k_eWin311, "win311" },
-	{ k_eWin95, "win95" },
-	{ k_eWin98, "win98" },
-	{ k_eWinME, "winME" },
-	{ k_eWinNT, "winNT" },
-	{ k_eWin2000, "win200" },
-	{ k_eWinXP, "winXP" },
-	{ k_eWin2003, "win2003" },
-	{ k_eWinVista, "winVista" },
-	{ k_eWindows7, "win7" },
-	{ k_eWin2008, "win2008" },
-	{ k_eWindows8, "win8" },
-	{ k_eWindows8_1, "win8.1" },
-	{ k_eWindows10, "win10" },
-};
-
-//-----------------------------------------------------------------------------
-// Purpose: convert a friendly OS name to a eostype
-//-----------------------------------------------------------------------------
-EOSType GetOSTypeFromString_Deprecated( const char *pchName )
-{
-	EOSType eOSType;
-#ifdef WIN32
-	eOSType = k_eWinUnknown;
-#else
-	eOSType = k_eOSUnknown;
-#endif
-
-	// if this fires, make sure all OS types are in the map
-	static_assert( ssize( k_rgOSTypeToName ) == k_eOSTypeMax ); 
-	if ( !pchName || Q_isempty( pchName ) )
-		return eOSType;
-
-	for ( auto &m : k_rgOSTypeToName )
-	{
-		if ( V_strieq( m.m_pchOSName, pchName ) ) 
-			return m.m_OSType;
-	}
-	return eOSType;
-}
-
-bool OSTypesAreCompatible( EOSType eOSTypeDetected, EOSType eOSTypeRequired )
-{
-	// check windows (on the positive side of the number line)
-	if ( eOSTypeRequired >= k_eWinUnknown )
-		return ( eOSTypeDetected >= eOSTypeRequired );
-
-	if ( eOSTypeRequired == k_eOSUnknown )
+	if (required == k_eOSUnknown)
 		return true;
 
-	// osx
-	if ( eOSTypeRequired >= k_eMacOSUnknown && eOSTypeRequired < k_eOSUnknown )
-		return ( eOSTypeDetected >= eOSTypeRequired && eOSTypeDetected < k_eOSUnknown );
+	if (IsWindowsType(required))
+		return IsWindowsType(detected) && detected >= required;
 
-	// and linux
-	if ( eOSTypeRequired >= k_eLinuxUnknown && eOSTypeRequired < k_eMacOSUnknown )
-		return ( eOSTypeDetected >= eOSTypeRequired && eOSTypeDetected < k_eMacOSUnknown );
+	if (IsMacOSType(required))
+		return IsMacOSType(detected) && detected >= required;
+
+	if (IsLinuxType(required))
+		return IsLinuxType(detected) && detected >= required;
 
 	return false;
 }
 
-// these strings "windows", "macos", "linux" are part of the
-// interface, which is why they're hard-coded here, rather than using
-// the strings in k_rgOSTypeToName
-const char *GetPlatformName( bool *pbIs64Bit )
+const char *GetPlatformName(bool *is64Bit)
 {
-	if ( pbIs64Bit )
-		*pbIs64Bit = Is64BitOS();
-	
-	EOSType eType = GetOSType(); 
-	if ( OSTypesAreCompatible( eType, k_eWinUnknown ) )
+	if (is64Bit)
+		*is64Bit = Is64BitOS();
+
+	const EOSType type = GetOSType();
+
+	if (IsWindowsType(type))
 		return "windows";
-	if ( OSTypesAreCompatible( eType, k_eMacOSUnknown ) )
+	if (IsMacOSType(type))
 		return "macos";
-	if ( OSTypesAreCompatible( eType, k_eLinuxUnknown ) )
+	if (IsLinuxType(type))
 		return "linux";
+
 	return "unknown";
 }
-
