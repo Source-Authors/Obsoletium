@@ -198,10 +198,10 @@ uint32 CProtoBufMsgMemoryPoolBase::GetEstimatedSize()
 	// Should be "while (pObject != NULL)" because if we were actually using threads depending on count
 	// would be bad. Unfortunately that gives me an infinite loop. See if this can be changed when this
 	// is updated
-	while ( m_pTSQueueFreeObjects->Count() > 0 )
-	{	
-		::google::protobuf::Message *pObject = NULL;
-		m_pTSQueueFreeObjects->PopItem( &pObject );
+	// dimhotepus: Pop till popped.
+	::google::protobuf::Message *pObject = NULL;
+	while ( m_pTSQueueFreeObjects->PopItem( &pObject ) )
+	{
 		vecTemp.AddToTail( pObject );
 	}
 
