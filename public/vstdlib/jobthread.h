@@ -1327,7 +1327,8 @@ inline ThreadHandle_t ThreadExecuteSoloImpl( CFunctor *pFunctor, const char *psz
 	return hThread;
 }
 
-inline ThreadHandle_t ThreadExecuteSolo( CJob *pJob ) { return ThreadExecuteSoloImpl( CreateFunctor( pJob, &CJob::Execute ), pJob->Describe() ); }
+// dimhotepus: Keep job alive while solo thread executes it, caller may release job right away.
+inline ThreadHandle_t ThreadExecuteSolo( CJob *pJob ) { return ThreadExecuteSoloImpl( CreateRefCountingFunctor( pJob, &CJob::Execute ), pJob->Describe() ); }
 
 template <typename... Args>
 inline ThreadHandle_t ThreadExecuteSolo( const char *pszName, Args&& ... args ) { return ThreadExecuteSoloImpl( CreateFunctor( std::forward<Args>( args )... ), pszName ); }
