@@ -1131,6 +1131,17 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 		return false;
 	}
 
+	// dimhotepus: Bound thread count. Affinity table has TP_MAX_POOL_THREADS entries,
+	// CJob stores servicing thread index in a char and OS multi-wait is limited to 64.
+	if ( nThreads > TP_MAX_POOL_THREADS )
+	{
+		Warning( "Thread pool '%s': clamping %d requested threads to %d.\n",
+			pszName ? pszName : "", nThreads, TP_MAX_POOL_THREADS );
+		nThreads = TP_MAX_POOL_THREADS;
+	}
+
+	AssertMsg( m_Threads.Count() == 0, "Thread pool started twice without Stop()" );
+
 	int nStackSize = startParams.nStackSize;
 
 	if ( nStackSize < 0 )
@@ -1189,12 +1200,26 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 		m_Threads[iThread] = jobThread;
 		m_IdleEvents[iThread] = &jobThread->GetIdleEvent();
 		jobThread->SetName( CFmtStr( "%s%zd", pszName, iThread ) );
-		jobThread->Start( nStackSize );
+		// dimhotepus: If thread failed to start, waiting on its idle event hangs forever.
+		if ( !jobThread->Start( nStackSize ) )
+		{
+			Warning( "Thread pool: failed to start worker thread %s%zd.\n", pszName, iThread );
+
+			m_Threads.Remove( iThread );
+			m_IdleEvents.Remove( iThread );
+			delete jobThread;
+			break;
+		}
 		jobThread->GetIdleEvent().Wait();
 
 #ifdef WIN32
 		ThreadSetPriority( (ThreadHandle_t)jobThread->GetThreadHandle(), priority );
 #endif
+	}
+
+	if ( m_Threads.Count() == 0 )
+	{
+		return false;
 	}
 
 	Distribute( bDistribute, startParams.bUseAffinityTable ? (int *)startParams.iAffinityTable : nullptr );
