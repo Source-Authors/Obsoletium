@@ -1004,19 +1004,20 @@ int CThreadPool::ExecuteToPriority( JobPriority_t iToPriority, JobFilter_t pfnFi
 	SuspendExecution();
 	RunCodeAtScopeExit(ResumeExecution());
 
-	CJob *pJob;
 	int nExecuted = 0;
-	int nJobsTotal = GetJobCount();
+	const int nJobsTotal = static_cast<int>( GetJobCount() );
 	CUtlVector<CJob *> jobsToPutBack;
 
-	for ( int iCurPriority = JP_HIGH; iCurPriority >= iToPriority; --iCurPriority )
+	const auto drainQueue = [&]( CJobQueue &queue, JobPriority_t priority )
 	{
-		for ( auto &&t : m_Threads )
+		CJob *pJob;
+		// dimhotepus: Drain only jobs present on entry. Other threads may keep adding jobs
+		// while we run them one by one, so draining until empty could never return.
+		// Also check Pop() result. Workers are suspended, but other threads can still
+		// pop (YieldWait), so Count() > 0 does not guarantee Pop() succeeds (was nullptr deref).
+		int nToDrain = queue.Count( priority );
+		while ( nToDrain-- > 0 && queue.Pop( &pJob ) )
 		{
-			CJobQueue &queue = t->AccessDirectQueue();
-			while ( queue.Count( (JobPriority_t)iCurPriority ) )
-			{
-				queue.Pop( &pJob );
 				if ( pfnFilter && !(*pfnFilter)( pJob ) )
 				{
 					if ( pJob->CanExecute() )
@@ -1031,37 +1032,26 @@ int CThreadPool::ExecuteToPriority( JobPriority_t iToPriority, JobFilter_t pfnFi
 					}
 					continue;
 				}
+
 				ServiceJobAndRelease( pJob );
 				--m_nJobs;
 				nExecuted++;
 			}
+	};
 
-		}
+	for ( int iCurPriority = JP_HIGH; iCurPriority >= iToPriority; --iCurPriority )
+	{
+		const auto priority = static_cast<JobPriority_t>( iCurPriority );
 
-		while ( m_SharedQueue.Count( (JobPriority_t)iCurPriority ) )
+		for ( auto &&t : m_Threads )
 		{
-			m_SharedQueue.Pop( &pJob );
-			if ( pfnFilter && !(*pfnFilter)( pJob ) )
-			{
-				if ( pJob->CanExecute() )
-				{
-					jobsToPutBack.EnsureCapacity( nJobsTotal );
-					jobsToPutBack.AddToTail( pJob );
+			drainQueue( t->AccessDirectQueue(), priority );
 				}
-				else
-				{
-					--m_nJobs;
-					pJob->Release(); // see above
-				}
-				continue;
-			}
 
-			ServiceJobAndRelease( pJob );
-			--m_nJobs;
-			nExecuted++;
+		drainQueue( m_SharedQueue, priority );
 		}
-	}
 
+	// Jobs keep their m_nJobs slot while re-queued.
 	for ( auto &&j : jobsToPutBack )
 	{
 		InsertJobInQueue( j );
