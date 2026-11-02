@@ -7,6 +7,8 @@
 #include <intrin.h>
 #endif
 
+#include <atomic>
+
 #include "platform.h"
 #include "dbg.h"
 
@@ -356,7 +358,11 @@ inline double CCycleCount::GetSeconds() const
 // -------------------------------------------------------------------------- // 
 inline void CFastTimer::Start()
 {
+	// dimhotepus: Added compiler barrier to prevent reordering of timed code
+	std::atomic_thread_fence( std::memory_order_acquire );
 	m_Duration.Sample();
+	std::atomic_thread_fence( std::memory_order_acquire );
+
 #ifdef DEBUG_FASTTIMER
 	m_bRunning = true;
 #endif
@@ -365,8 +371,11 @@ inline void CFastTimer::Start()
 
 inline void CFastTimer::End()
 {
+	// dimhotepus: Added acquire barrier before sampling to prevent hoisting
+	std::atomic_thread_fence( std::memory_order_acquire );
 	CCycleCount cnt;
 	cnt.Sample();
+	std::atomic_thread_fence( std::memory_order_release );
 
 	m_Duration.m_Int64 = cnt.m_Int64 - m_Duration.m_Int64;
 
