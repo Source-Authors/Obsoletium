@@ -127,7 +127,7 @@ struct ThreadPoolStartParams_t
 				iAffinityTable[i] = pAffinities[i];
 			}
 		}
-		}
+	}
 
 	int				nThreads;
 	int				nThreadsMax{ -1 };
@@ -632,7 +632,8 @@ public:
 	//-----------------------------------------------------
 	// Thread event support (safe for NULL this to simplify code )
 	//-----------------------------------------------------
-	bool WaitForFinish( uint32 dwTimeout = TT_INFINITE ) { return ( !IsFinished() ) ? g_pThreadPool->YieldWait( this, dwTimeout ) : true; }
+	// dimhotepus: Yield to the pool job was added to (helps it make progress), not always global one.
+	bool WaitForFinish( uint32 dwTimeout = TT_INFINITE ) { return ( !IsFinished() ) ? ( m_pThreadPool ? m_pThreadPool : g_pThreadPool )->YieldWait( this, dwTimeout ) : true; }
 	bool WaitForFinishAndRelease( uint32 dwTimeout = TT_INFINITE ) { bool bResult = WaitForFinish( dwTimeout); Release(); return bResult; }
 	CThreadEvent *AccessEvent()						{ return &m_CompleteEvent; }
 
@@ -1165,7 +1166,7 @@ public:
 			{
 				ppJobs[i] = ThreadExecute( this, &CParallelLoopProcessor<ITEM_PROCESSOR_TYPE>::DoExecute );
 			}
-			
+
 			DoExecute();
 
 			for ( intp i = 0; i < nJobs; ++i )
@@ -1296,7 +1297,7 @@ protected:
 			{
 				ppJobs[j]->Abort();
 				ppJobs[j]->Release();
-		}
+			}
 		}
 		else
 		{
@@ -1304,8 +1305,8 @@ protected:
 			for ( intp j = 0; j < nJobs; ++j )
 			{
 				ppJobs[j]->WaitForFinishAndRelease();
+			}
 		}
-	}
 
 		Assert( m_nActive.load( std::memory_order::memory_order_acquire ) == 0 );
 	}
@@ -1419,30 +1420,30 @@ inline JobStatus_t CJob::Execute()
 		AUTO_LOCK( m_mutex );
 
 		switch ( GetStatus() )
-	{
-	case JOB_STATUS_UNSERVICED:
-	case JOB_STATUS_PENDING:
 		{
-			// Service it
+		case JOB_STATUS_UNSERVICED:
+		case JOB_STATUS_PENDING:
+			{
+				// Service it
 				SlamStatus( JOB_STATUS_INPROGRESS );
 				result = DoExecute();
 				SlamStatus( result );
-			DoCleanup();
-			m_CompleteEvent.Set();
-			break;
-		}
+				DoCleanup();
+				m_CompleteEvent.Set();
+				break;
+			}
 
-	case JOB_STATUS_INPROGRESS:
-		AssertMsg(0, "Mutex Should have protected use while processing");
-		[[fallthrough]];
+		case JOB_STATUS_INPROGRESS:
+			AssertMsg(0, "Mutex Should have protected use while processing");
+			[[fallthrough]];
 
-	case JOB_OK:
-		[[fallthrough]];
-	case JOB_STATUS_ABORTED:
+		case JOB_OK:
+			[[fallthrough]];
+		case JOB_STATUS_ABORTED:
 			result = GetStatus();
-		break;
+			break;
 
-	default:
+		default:
 			result = GetStatus();
 			AssertMsg( result < JOB_OK, "Unknown job state");
 		}
@@ -1491,27 +1492,27 @@ inline JobStatus_t CJob::Abort( bool bDiscard )
 		AUTO_LOCK( m_mutex );
 
 		switch ( GetStatus() )
-	{
-	case JOB_STATUS_UNSERVICED:
-	case JOB_STATUS_PENDING:
 		{
-			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "CJob::DoAbort" );
+		case JOB_STATUS_UNSERVICED:
+		case JOB_STATUS_PENDING:
+			{
+				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "CJob::DoAbort" );
 
 				result = DoAbort( bDiscard );
 				SlamStatus( result );
-			if ( bDiscard )
-				DoCleanup();
-			m_CompleteEvent.Set();
-		}
-		break;
+				if ( bDiscard )
+					DoCleanup();
+				m_CompleteEvent.Set();
+			}
+			break;
 
-	case JOB_STATUS_ABORTED:
-	case JOB_STATUS_INPROGRESS:
-	case JOB_OK:
+		case JOB_STATUS_ABORTED:
+		case JOB_STATUS_INPROGRESS:
+		case JOB_OK:
 			result = GetStatus();
-		break;
+			break;
 
-	default:
+		default:
 			result = GetStatus();
 			AssertMsg( result < JOB_OK, "Unknown job state");
 		}
