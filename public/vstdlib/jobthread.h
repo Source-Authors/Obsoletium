@@ -710,6 +710,18 @@ public:
 		return m_szDescription;
 	}
 
+	// dimhotepus: CFunctorJob shadows base description buffer, so base SetDescription()
+	// wrote buffer nobody read (e.g. CParallelProcessor job names were lost).
+	void SetDescription( const char *pszDescription ) override
+	{
+		CJob::SetDescription( pszDescription );
+
+		if ( pszDescription )
+			V_strcpy_safe( m_szDescription, pszDescription );
+		else
+			m_szDescription[0] = '\0';
+	}
+
 private:
 	CRefPtr<CFunctor> m_pFunctor;
 	// dimhotepus: 16 -> 32
