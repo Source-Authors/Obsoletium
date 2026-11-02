@@ -387,6 +387,10 @@ private:
 	class CYieldDeadline;
 	unsigned YieldWaitImpl( CThreadEvent **pEvents, int nEvents, bool bWaitAll, const CYieldDeadline &deadline );
 	[[nodiscard]] bool ServiceOneSharedJob();
+	// Spins up to m_nSpinUs or until done() is true. Returns done().
+	template <typename Done>
+	[[nodiscard]] bool SpinUntil( Done &&done ) const;
+
 	// Posts message to worker without waiting for reply and wakes it.
 	void CallWorkerAsync( CJobThread *pThread, unsigned message, CFunctor *pFunctor = nullptr );
 
@@ -413,6 +417,11 @@ private:
 	//	and the main thread coming in and "helping" with jobs breaks that pretty nicely. This flag states that
 	//	only the threadpool threads should execute these jobs.
 	bool					m_bExecOnThreadPoolThreadsOnly{ 0 };
+
+	// dimhotepus: How long idle workers and job waiters spin before sleeping, microseconds.
+	// Waking a sleeping thread costs ~10us on Windows plus a kernel call by whoever wakes
+	// it, which dominated short fork-join bursts. -threadpool_spin_us N overrides, 0 disables.
+	std::atomic_uint		m_nSpinUs{ 20 };
 };
 
 //-----------------------------------------------------------------------------
@@ -509,11 +518,19 @@ private:
 	{
 		tmZone( TELEMETRY_LEVEL0, TMZF_IDLE, "%s", __FUNCTION__ );
 
-		// dimhotepus: Block until there is a message or a job, no polling, no kernel events.
-		m_pOwner->m_WorkerWake.WaitUntil( [this]()
+		const auto hasWork = [this]()
 		{
 			return HasCall() || m_DirectQueue.Count() > 0 || m_SharedQueue.Count() > 0;
-		} );
+		};
+
+		// dimhotepus: Spin briefly first. Next job in a burst usually arrives within a few us;
+		// a spinning worker isn't a registered sleeper, so producers need no kernel call to
+		// hand it work and it skips ~10us wake latency.
+		if ( m_pOwner->SpinUntil( hasWork ) )
+			return WAIT_OBJECT_0;
+
+		// dimhotepus: Block until there is a message or a job, no polling, no kernel events.
+		m_pOwner->m_WorkerWake.WaitUntil( hasWork );
 
 		return WAIT_OBJECT_0;
 	}
@@ -636,6 +653,33 @@ CThreadPool::CThreadPool() :
 	m_nJobs( 0 )
 {
 	m_SharedQueue.SetWake( &m_WorkerWake, false );
+}
+
+//---------------------------------------------------------
+
+template <typename Done>
+bool CThreadPool::SpinUntil( Done &&done ) const
+{
+	if ( done() )
+		return true;
+
+	const unsigned nSpinUs = m_nSpinUs.load( std::memory_order_relaxed );
+	if ( nSpinUs == 0 )
+		return false;
+
+	const double flEnd = Plat_FloatTime() + nSpinUs * 1e-6;
+	for ( unsigned i = 1;; ++i )
+	{
+		// PAUSE: cheap on the bus and yields the core to SMT sibling.
+		ThreadPause();
+
+		if ( done() )
+			return true;
+
+		// Timer read is ~20ns, check it only every few iterations.
+		if ( ( i & 15 ) == 0 && Plat_FloatTime() >= flEnd )
+			return false;
+	}
 }
 
 //---------------------------------------------------------
@@ -936,6 +980,51 @@ unsigned CThreadPool::YieldWait( CJob **ppJobs, int nJobs, bool bWaitAll, unsign
 		return YieldWait( static_cast<CThreadEvent **>( nullptr ), 0, bWaitAll, timeout );
 	}
 
+	// dimhotepus: Before sleeping on kernel events, help with queued jobs and poll job
+	// status for a short time. Waiter is usually on the critical path (main thread waiting
+	// for a burst); sleeping costs a completion event per unfinished job (~0.8us each on
+	// Windows) plus ~10us to wake up after the last job finishes.
+	int iFinished = -1;
+	const auto done = [&]()
+	{
+		if ( bWaitAll )
+		{
+			for ( int i = 0; i < nJobs; i++ )
+			{
+				if ( !ppJobs[i]->IsFinished() )
+					return false;
+			}
+			return true;
+		}
+
+		for ( int i = 0; i < nJobs; i++ )
+		{
+			if ( ppJobs[i]->IsFinished() )
+			{
+				iFinished = i;
+				return true;
+			}
+		}
+		return false;
+	};
+
+	const CYieldDeadline deadline( timeout );
+	{
+		for (;;)
+		{
+			if ( done() )
+				return bWaitAll ? WAIT_OBJECT_0 : WAIT_OBJECT_0 + static_cast<unsigned>( iFinished );
+			if ( deadline.Expired() )
+				return TW_TIMEOUT;
+			// Helping is real progress, keep going without spending spin budget.
+			if ( ServiceOneSharedJob() )
+				continue;
+			// Nothing to help with, wait for running jobs a bit before going to sleep.
+			if ( !SpinUntil( done ) )
+				break;
+		}
+	}
+
 	// Inline storage covers MAX_THREADS jobs (largest CJobSet), larger arrays spill to heap.
 	// dimhotepus: Don't wait on (and so don't create completion events for) finished jobs.
 	// Completion events are created lazily on first access, which costs a syscall.
@@ -961,7 +1050,8 @@ unsigned CThreadPool::YieldWait( CJob **ppJobs, int nJobs, bool bWaitAll, unsign
 	if ( handles.Count() == 0 )
 		return WAIT_OBJECT_0;
 
-	return YieldWait( handles.Base(), static_cast<int>( handles.Count() ), bWaitAll, timeout );
+	// Spin phase used part of the timeout.
+	return YieldWait( handles.Base(), static_cast<int>( handles.Count() ), bWaitAll, deadline.Remaining() );
 }
 
 //---------------------------------------------------------
@@ -1226,6 +1316,12 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 	int nThreads = startParams.nThreads;
 
 	m_bExecOnThreadPoolThreadsOnly = startParams.bExecOnThreadPoolThreadsOnly;
+
+	{
+		// Bounded: spinning burns CPU/power, beyond ~1ms it only wastes it.
+		const int nSpinUs = CommandLine()->ParmValue( "-threadpool_spin_us", static_cast<int>( m_nSpinUs.load() ) );
+		m_nSpinUs.store( static_cast<unsigned>( std::clamp( nSpinUs, 0, 1000 ) ) );
+	}
 
 	if ( nThreads < 0 )
 	{
