@@ -22,6 +22,9 @@
 #include "xbox/xbox_win32stubs.h"
 #endif
 
+#include <algorithm>
+#include <atomic>
+
 #include "tier0/memdbgon.h"
 
 
@@ -69,18 +72,18 @@ public:
 
 	[[nodiscard]] int Count() const
 	{
-		return m_nItems;
+		return m_nItems.load( std::memory_order_relaxed );
 	}
 
 	[[nodiscard]] int Count( JobPriority_t priority ) const
 	{
-		return m_pQueues[priority]->Count();
+		return m_pQueues[ClampPriority( priority )]->Count();
 	}
 
 
 	CJob *PrePush()
 	{
-		if ( m_nItems >= m_nMaxItems )
+		if ( Count() >= m_nMaxItems )
 		{
 			CJob *pOverflowJob;
 			if ( Pop( &pOverflowJob ) )
@@ -99,47 +102,51 @@ public:
 		int nOverflow = 0;
 		while ( ( pOverflowJob = PrePush() ) != nullptr )
 		{
-			ServiceJobAndRelease( pJob );
+			// dimhotepus: Service the job popped off the full queue, not the one being pushed.
+			// Servicing pJob here executed the new job early and leaked a reference to the
+			// overflow job (which was then never executed and never released).
+			ServiceJobAndRelease( pOverflowJob );
 			nOverflow++;
 		}
 
-		m_pQueues[pJob->GetPriority()]->PushItem( pJob );
+		// dimhotepus: Push and count update are done atomically under the queue lock.
+		// Previously the item was pushed outside the lock while Pop() reserved an item by
+		// count first and then scanned priority sub-queues one by one, so a concurrent
+		// Pop() could take "its" item from another priority, find nothing, and leave a job
+		// stranded in the queue with m_nItems == 0 (never executed, waiters hang forever).
+		AUTO_LOCK( m_mutex );
 
-		{
-			AUTO_LOCK(m_mutex);
+		m_pQueues[ClampPriority( pJob->GetPriority() )]->PushItem( pJob );
 
-			if ( ++m_nItems == 1 )
+		if ( m_nItems.fetch_add( 1, std::memory_order_relaxed ) == 0 )
 			{
 				m_JobAvailableEvent.Set();
 			}
-		}
 
 		return nOverflow;
 	}
 
 	bool Pop( CJob **ppJob )
 	{
+		AUTO_LOCK( m_mutex );
+
+		if ( m_nItems.load( std::memory_order_relaxed ) == 0 )
 		{
-			AUTO_LOCK(m_mutex);
-			if ( !m_nItems )
-			{
 				*ppJob = nullptr;
 				return false;
 			}
-			if ( --m_nItems == 0 )
-			{
-				m_JobAvailableEvent.Reset();
-			}
-		}
 
-		for ( int i = JP_HIGH; i >= 0; --i )
+		for ( int i = JP_HIGH; i >= JP_LOW; --i )
 		{
 			if ( m_pQueues[i]->PopItem( ppJob ) )
 			{
+				if ( m_nItems.fetch_sub( 1, std::memory_order_relaxed ) == 1 )
+				{
+					m_JobAvailableEvent.Reset();
+				}
 				return true;
 			}
 		}
-
 
 		AssertMsg( 0, "Expected at least one queue item" );
 		*ppJob = nullptr;
@@ -151,26 +158,51 @@ public:
 		return m_JobAvailableEvent;
 	}
 
-	void Flush()
+	// dimhotepus: Aborts and releases all queued jobs. Returns number of jobs removed.
+	int Flush()
 	{
-		// Only safe to call when system is suspended
-		AUTO_LOCK(m_mutex);
-		m_nItems = 0;
-		m_JobAvailableEvent.Reset();
+		CUtlVector<CJob *> jobs;
+
+		{
+			AUTO_LOCK( m_mutex );
+
+			jobs.EnsureCapacity( m_nItems.load( std::memory_order_relaxed ) );
+
 		CJob *pJob;
-		for ( int i = JP_HIGH; i >= 0; --i )
+			for ( int i = JP_HIGH; i >= JP_LOW; --i )
 		{
 			while ( m_pQueues[i]->PopItem( &pJob ) )
 			{
-				pJob->Abort();
-				pJob->Release();
+					jobs.AddToTail( pJob );
 			}
 		}
+
+			m_nItems.store( 0, std::memory_order_relaxed );
+			m_JobAvailableEvent.Reset();
+	}
+
+		// dimhotepus: Abort/Release outside of the queue lock. Release may run arbitrary
+		// destructors (functor payloads) which must not execute while holding the lock.
+		for ( auto *j : jobs )
+		{
+			j->Abort();
+			j->Release();
+		}
+
+		return static_cast<int>( jobs.Count() );
 	}
 
 private:
+	// dimhotepus: Clamps the priority to the valid range.
+	[[nodiscard]] static int ClampPriority( int priority )
+	{
+		AssertMsg( priority >= JP_LOW && priority <= JP_HIGH, "Invalid job priority %d", priority );
+		return std::clamp( priority, static_cast<int>( JP_LOW ), static_cast<int>( JP_HIGH ) );
+	}
+
 	CTSQueue<CJob *>	*m_pQueues[JP_HIGH + 1];
-	int					m_nItems{ 0 };
+	// dimhotepus: m_nItems is atomic because it is read without lock by other threads to check for work.
+	std::atomic_int		m_nItems{ 0 };
 	int					m_nMaxItems{ INT_MAX };
 	CThreadMutex		m_mutex;
 	CThreadManualEvent	m_JobAvailableEvent;
