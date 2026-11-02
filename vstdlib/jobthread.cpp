@@ -458,7 +458,7 @@ private:
 				{
 				case TPM_EXIT:
 					Reply( true );
-					bExit = TRUE;
+					bExit = true;
 					break;
 
 				case TPM_SUSPEND:
