@@ -20,9 +20,12 @@
 
 #ifdef OSX
 #include <copyfile.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
 #elif defined(LINUX)
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/utsname.h>
 #include <fcntl.h>
 #endif
 #define GetLastError() errno
@@ -138,177 +141,143 @@ unsigned GetRam()
 	return 0;
 }
 
-void DisplaySystemVersion( char *osversion, int maxlen )
+#if defined(WIN32)
+static bool GetWindowsBuildInfo( OSVERSIONINFOEXW &version )
 {
-#ifdef WIN32
-	osversion[ 0 ] = '\0';
+	version = {};
+	version.dwOSVersionInfoSize = sizeof(version);
 
-	OSVERSIONINFOEX osvi = {sizeof(osvi), 0, 0, 0, 0, {L'\0'}, 0, 0, 0, 0, 0};
+	using RtlGetVersionFn = LONG(WINAPI *)(OSVERSIONINFOW *);
+	const HMODULE ntdll{ GetModuleHandleW(L"ntdll.dll") };
+	if (!ntdll)
+		return false;
 
-// dimhotepus: Directly get os version as have os manifest.
-MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
-MSVC_DISABLE_WARNING(4996)
+	const auto rtlGetVersion =
+		reinterpret_cast<RtlGetVersionFn>(
+			GetProcAddress(ntdll, "RtlGetVersion"));
 
-	BOOL bOsVersionInfoEx = GetVersionEx( (OSVERSIONINFO *)&osvi );
+	return rtlGetVersion && rtlGetVersion(reinterpret_cast<OSVERSIONINFOW*>(&version)) == 0;
+}
+#endif
 
-MSVC_END_WARNING_OVERRIDE_SCOPE()
-	if ( !bOsVersionInfoEx )
+static const char *GetArchitectureName()
+{
+#if defined(PLATFORM_ARM_64)
+	return "AArch64";
+#elif defined(PLATFORM_ARM_32)
+	return "ARM32";
+#elif defined(PLATFORM_X86) && (PLATFORM_X86 == 64)
+	return "x86-64";
+#elif defined(PLATFORM_X86) && (PLATFORM_X86 == 32)
+	return "x86";
+#elif defined(PLATFORM_64BITS)
+	return "64-bit";
+#else
+	return "N/A";
+#endif
+}
+
+void DisplaySystemVersion(char *osversion, int maxlen)
+{
+	if (!osversion || maxlen <= 0)
+		return;
+
+	osversion[0] = '\0';
+
+#if defined(WIN32)
+	OSVERSIONINFOEXW osvi = {};
+	if (!GetWindowsBuildInfo(osvi))
 	{
-		// dimhotepus: Well, some too old or new OS version.
-		Q_strncat( osversion, osvi.wProductType == VER_NT_WORKSTATION ? "Windows N/A" : "Windows Server N/A", maxlen, COPY_ALL_CHARACTERS );
+		Q_snprintf(osversion, maxlen, "Windows N/A");
 		return;
 	}
-	
-	switch (osvi.dwPlatformId)
+
+	const char *name = "Windows";
+	if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT)
 	{
-	case VER_PLATFORM_WIN32_NT:
-		
-		// Test for the product.
-		// dimhotepus: <= Vista - out of support.
-
-		if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1 )
-		{
-			Q_strncat( osversion, osvi.wProductType == VER_NT_WORKSTATION ? "Windows 7" : "Windows Server 2008 R2", maxlen, COPY_ALL_CHARACTERS );
-			bOsVersionInfoEx = TRUE;
-		}
-
-		if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 2 )
-		{
-			Q_strncat( osversion, osvi.wProductType == VER_NT_WORKSTATION ? "Windows 8" : "Windows Server 2012", maxlen, COPY_ALL_CHARACTERS );
-			bOsVersionInfoEx = TRUE;
-		}
-
-		if ( osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 3 )
-		{
-			Q_strncat( osversion, osvi.wProductType == VER_NT_WORKSTATION ? "Windows 8.1" : "Windows Server 2012 R2", maxlen, COPY_ALL_CHARACTERS );
-			bOsVersionInfoEx = TRUE;
-		}
-
-		if ( osvi.dwMajorVersion == 10 && osvi.dwMinorVersion == 0 )
-		{
-			// dimhotepus: Windows 11 has dwBuildNumber >= 22000U
-			if ( osvi.dwBuildNumber < 22000U )
-			{
-				Q_strncat( osversion, osvi.wProductType == VER_NT_WORKSTATION ? "Windows 10" : "Windows Server 2016", maxlen, COPY_ALL_CHARACTERS );
-			}
-			else
-			{
-				Q_strncat( osversion, osvi.wProductType == VER_NT_WORKSTATION ? "Windows 11+" : "Windows Server 2022+", maxlen, COPY_ALL_CHARACTERS );
-			}
-
-			bOsVersionInfoEx = TRUE;
-		}
-
-		// Display version, service pack (if any), and build number.
-		
-		char build[256];
-		Q_snprintf (build, sizeof( build ), "%s (Build %lu) version %lu.%lu (%s) (admin: %s)",
-			osvi.szCSDVersion,
-			osvi.dwBuildNumber & 0xFFFF,
-			osvi.dwMajorVersion,
-			osvi.dwMinorVersion,
-#ifdef PLATFORM_ARM_64
-			"AArch64",
-#elif defined(PLATFORM_ARM_32)
-			"ARM32",
-#elif defined(PLATFORM_X86) && (PLATFORM_X86 == 64)
-			"x86-64",
-#elif defined(PLATFORM_X86) && (PLATFORM_X86 == 32)
-			"x86",
-#else
-			"N/A",
-#endif
-			Plat_IsUserAnAdmin() ? "yes" : "no" );
-		Q_strncat ( osversion, build, maxlen, COPY_ALL_CHARACTERS );
-		break;
-	
-	// dimhotepus: Out of support.
-	case VER_PLATFORM_WIN32_WINDOWS:
-	case VER_PLATFORM_WIN32s:
-		Q_strncat ( osversion, "Out of support ", maxlen, COPY_ALL_CHARACTERS );
-		break;
+		if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1)
+			name = osvi.wProductType == VER_NT_WORKSTATION ? "Windows 7" : "Windows Server 2008 R2 ";
+		else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 2)
+			name = osvi.wProductType == VER_NT_WORKSTATION ? "Windows 8" : "Windows Server 2012";
+		else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 3)
+			name = osvi.wProductType == VER_NT_WORKSTATION ? "Windows 8.1" : "Windows Server 2012 R2";
+		else if (osvi.dwMajorVersion == 10 && osvi.dwMinorVersion == 0)
+			name = osvi.dwBuildNumber >= 22000
+				? (osvi.wProductType == VER_NT_WORKSTATION ? "Windows 11+" : "Windows Server 2022+")
+				: (osvi.wProductType == VER_NT_WORKSTATION ? "Windows 10" : "Windows Server 2016+");
+		else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0)
+			name = osvi.wProductType == VER_NT_WORKSTATION ? "Windows Vista" : "Windows Server 2008";
+		else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1)
+			name = "Windows XP";
+		else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
+			name = "Windows Server 2003";
 	}
+	else
+	{
+		name = "Windows (legacy)";
+	}
+
+	char servicePack[128] = {};
+	if (osvi.szCSDVersion[0] != L'\0')
+	{
+		// Convert the service pack string for the narrow output buffer.
+		WideCharToMultiByte(
+			CP_UTF8, 0, osvi.szCSDVersion, -1,
+			servicePack, sizeof(servicePack), nullptr, nullptr);
+	}
+
+	Q_snprintf(
+		osversion,
+		maxlen,
+		"%s (Build %lu, version %lu.%lu%s%s) (%s) (admin: %s)",
+		name,
+		static_cast<unsigned long>(osvi.dwBuildNumber),
+		static_cast<unsigned long>(osvi.dwMajorVersion),
+		static_cast<unsigned long>(osvi.dwMinorVersion),
+		servicePack[0] ? ", " : "",
+		servicePack,
+		GetArchitectureName(),
+		Plat_IsUserAnAdmin() ? "yes" : "no");
+
 #elif defined(OSX)
-	auto [fpVersionInfo, rc] = s1::posix::posix_file_stream_factory::open( "/usr/bin/sw_vers", "r" );
-	constexpr char pszSearchString[]{"ProductVersion:\t"};
-	constexpr intp cchSearchString = ssize( pszSearchString ) - 1;
-	char rgchVersionLine[1024];
-		
-	if ( rc )
-		Q_strncpy ( osversion, "OSXU ", maxlen );
-	else
+	char version[64] = {};
+	size_t versionSize = sizeof(version);
+
+	if (sysctlbyname("kern.osproductversion",
+	                 version, &versionSize, nullptr, 0) != 0)
 	{
-		Q_strncpy ( osversion, "OSX ", maxlen );
-
-		while ( !std::get<std::error_code>( fpVersionInfo.gets( rgchVersionLine ) ) )
-		{
-			if ( !Q_strnicmp( rgchVersionLine, pszSearchString, cchSearchString ) )
-			{
-				// dimhotepus: Just get MacOS version.
-				const char *pchVersion = rgchVersionLine + cchSearchString;
-				intp ccVersion = Q_strlen(pchVersion); // trim the \n
-				Q_strncpy ( osversion, pchVersion, ccVersion );
-				osversion[ ccVersion ] = 0;
-
-				Q_strncat ( osversion,
-#ifdef PLATFORM_ARM_64
-					" AArch64",
-#elif defined(PLATFORM_ARM_32)
-					" ARM32",
-#elif defined(PLATFORM_64BITS)
-					" x86-64",
-#elif defined(PLATFORM_X86)
-					" x86",
-#else
-					" N/A",
-#endif
-					maxlen
-				);
-				Q_strncat ( osversion, " (super user: ", maxlen );
-				Q_strncat ( osversion, Plat_IsUserAnAdmin() ? "yes)" : "no)", maxlen );
-				break;
-			}
-		}
+		Q_snprintf(osversion, maxlen, "OSX version unavailable (%s)",
+			GetArchitectureName());
+		return;
 	}
+
+	Q_snprintf(
+		osversion,
+		maxlen,
+		"OSX %s (%s) (super user: %s)",
+		version,
+		GetArchitectureName(),
+		Plat_IsUserAnAdmin() ? "yes" : "no");
+
 #elif defined(LINUX)
-	auto [fpKernelVer, rc] = s1::posix::posix_file_stream_factory::open( "/proc/version_signature", "r" );
-
-	if ( rc )
+	struct utsname info = {};
+	if (uname(&info) != 0)
 	{
-		Q_strncat ( osversion, "Linux ", maxlen, COPY_ALL_CHARACTERS );
+		Q_snprintf(osversion, maxlen, "Linux version unavailable (%s)",
+			GetArchitectureName());
+		return;
 	}
-	else
-	{
-		char rgchVersionLine[1024];
-		std::tie(std::ignore, rc) = fpKernelVer.gets( rgchVersionLine );
 
-		if ( !rc )
-		{
-			Q_strncat ( osversion, rgchVersionLine, maxlen, COPY_ALL_CHARACTERS );
-		}
-
-		Q_strncat ( osversion,
-#ifdef PLATFORM_ARM_64
-			" AArch64",
-#elif defined(PLATFORM_ARM_32)
-			" ARM32",
-#elif defined(PLATFORM_X86) && (PLATFORM_X86 == 64)
-			" x86-64",
-#elif defined(PLATFORM_X86) && (PLATFORM_X86 == 32)
-			" x86",
+	Q_snprintf(
+		osversion,
+		maxlen,
+		"%s %s (%s) (super user: %s)",
+		info.sysname,
+		info.release,
+		GetArchitectureName(),
+		Plat_IsUserAnAdmin() ? "yes" : "no");
 #else
-			" N/A",
-#endif
-			maxlen
-		);
-
-		Q_strncat ( osversion, " (super user: ", maxlen );
-		Q_strncat ( osversion, Plat_IsUserAnAdmin() ? "yes)" : "no)", maxlen );
-
-		char *szlf = Q_strrchr( osversion, '\n' );
-		if( szlf )
-			*szlf = '\0';
-	}
+	Q_snprintf(osversion, maxlen, "Unknown OS");
 #endif
 }
 
