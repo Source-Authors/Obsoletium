@@ -583,8 +583,7 @@ inline auto FunctorDirectCall( FUNCTION_RETTYPE( *pfnProxied )( FuncArgs... ), A
 			FUNCTION_RETTYPE,
 			decltype(pfnProxied),
 			Args...
-		>,
-		CFunctor*
+		>
 	>
 {
 	( *pfnProxied )( std::forward<Args>( args )... );
