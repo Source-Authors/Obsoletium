@@ -349,8 +349,10 @@ public:
 
 	void Shutdown() override
 	{
+#ifndef NDEBUG
 		const auto oldPanicFunc = lua_atpanic( m_LuaState, m_OldPanicFunc );
 		Assert( oldPanicFunc == FatalErrorHandler );
+#endif
 
 		if ( m_LuaState )
 		{

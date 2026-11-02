@@ -648,8 +648,10 @@ void SQDbgServer::BeginElement(const SQChar *name) {
 }
 
 void SQDbgServer::Attribute(const SQChar *name, const SQChar *value) {
+#ifndef NDEBUG
   XMLElementState *self = &xmlstate[_xmlcurrentement];
   Assert(!self->haschildren);  // cannot have attributes if already has children
+#endif
 
   const SQChar *escval = escape_xml(value);
 

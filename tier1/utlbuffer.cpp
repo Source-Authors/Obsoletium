@@ -850,7 +850,7 @@ bool CUtlBuffer::CheckArbitraryPeekGet( intp nOffset, intp &nIncrement )
 	// dimhotepus: Check peek get succeeds.
 	if ( !CheckPeekGet( nOffset, nIncrement ) )
 	{
-		const intp nOldIncrement = std::exchange( nIncrement, 0 );
+		[[maybe_unused]] const intp nOldIncrement = std::exchange( nIncrement, 0 );
 		AssertMsg( false, "Unable to peek %zd bytes at offset %zd.", nOldIncrement, nOffset );
 		return false;
 	}

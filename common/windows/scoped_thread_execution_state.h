@@ -88,14 +88,16 @@ public:
 	{
 		if ( old_state_ != ThreadExecutionState::Error )
 		{
+#ifndef NDEBUG
 			const auto expected_old_state =
-			to_underlying( ThreadExecutionState::Continuous | new_state_ );
+				to_underlying( ThreadExecutionState::Continuous | new_state_ );
 			const auto actual_old_state = ::SetThreadExecutionState(
-			to_underlying( ThreadExecutionState::Continuous | old_state_ ) );
+				to_underlying( ThreadExecutionState::Continuous | old_state_ ) );
 			AssertMsg( actual_old_state == expected_old_state,
 			           "Unbalanced SetThreadExecutionState, smth changed it from "
 			           "expected 0x%lu to actual 0x%lu.",
 			           expected_old_state, actual_old_state );
+#endif
 		}
 	}
 
