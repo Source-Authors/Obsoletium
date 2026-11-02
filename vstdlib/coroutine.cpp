@@ -981,7 +981,8 @@ static void CoroutineTestFunc( void *pvRelaunch )
 	Coroutine_YieldToMain();
 
 	// ensure the string is still valid
-	DbgVerify( V_streq( rgchT, g_pchTestString ) );
+	[[maybe_unused]] const bool isSame = V_streq( rgchT, g_pchTestString );
+	AssertMsg( isSame, "Coroutine corrupted stack." );
 
 	if ( !pvRelaunch )
 	{
