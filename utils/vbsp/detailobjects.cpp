@@ -830,7 +830,7 @@ static void SetLumpData( )
 //-----------------------------------------------------------------------------
 void EmitDetailModels()
 {
-	StartPacifier( "Placing detail props: " );
+	StartPacifier( "\nPlacing detail props: " );
 	RunCodeAtScopeExit( EndPacifier( true ) );
 
 	// Place stuff on each face
