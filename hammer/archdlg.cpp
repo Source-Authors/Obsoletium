@@ -13,7 +13,7 @@
 #include "tier0/memdbgon.h"
 
 
-constexpr inline TCHAR pszSection[]{TEXT("Arch")};
+static constexpr inline TCHAR pszSection[]{TEXT("Arch")};
 
 extern void MakeArc(float x1, float y1, float x2, float y2, int npoints, 
 					 float start_ang, float fArc, float points[][2]);

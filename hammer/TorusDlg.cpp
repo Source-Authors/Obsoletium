@@ -17,7 +17,7 @@
 
 constexpr inline size_t ARC_MAX_POINTS{4096};
 
-constexpr inline TCHAR pszSection[]{TEXT("Torus")};
+static constexpr inline TCHAR pszSection[]{TEXT("Torus")};
 
 void MakeArcCenterRadius(float xCenter, float yCenter, float xrad, float yrad, int npoints, float start_ang, float fArc, float points[][2]);
 void MakeArc(float x1, float y1, float x2, float y2, int npoints, float start_ang, float fArc, float points[][2]);
