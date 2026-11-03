@@ -19,7 +19,6 @@
 
 #define NOGDICAPMASKS    // - CC_*, LC_*, PC_*, CP_*, TC_*, RC_
 #define NOMEMMGR         // - GMEM_*, LMEM_*, GHND, LHND, associated routines
-#define NOMETAFILE       // - typedef METAFILEPICT
 #define NOMINMAX         // - Macros min(a, b) and max(a, b)
 #define NOOPENFILE       // - OpenFile(), OemToAnsi, AnsiToOem, and OF_*
 #define NOSERVICE        // - All Service Controller routines, SERVICE_ equates, etc.
@@ -38,7 +37,7 @@
 // Access to Windows 10 features.
 #define _WIN32_WINNT 0x0A00
 
-#include "winlite.h"
+#include <Windows.h>
 
 #include <afxwin.h>   // MFC core and standard components
 #include <afxext.h>   // MFC extensions
