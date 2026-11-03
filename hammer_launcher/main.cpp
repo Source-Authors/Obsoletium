@@ -127,9 +127,9 @@ public:
 		},
 		scoped_spew_output_{ HammerSpewFunc },
 		scoped_app_locale_{ kEnUsUtf8Locale },
-		scoped_com_{ static_cast< COINIT >( COINIT_APARTMENTTHREADED |
-		                                    COINIT_DISABLE_OLE1DDE |
-		                                    COINIT_SPEED_OVER_MEMORY ) },
+		scoped_com_initializer_{ static_cast< COINIT >( COINIT_APARTMENTTHREADED |
+			COINIT_DISABLE_OLE1DDE |
+			COINIT_SPEED_OVER_MEMORY ) },
 		scoped_timer_resolution_{ kSystemTimerResolution },
 		scoped_winsock_{ WINSOCK_VERSION }
 	{
