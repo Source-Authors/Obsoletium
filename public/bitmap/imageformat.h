@@ -62,14 +62,20 @@ enum ImageFormat : int
 	// Depth-stencil texture formats for shadow depth mapping
 	IMAGE_FORMAT_NV_DST16,		// 
 	IMAGE_FORMAT_NV_DST24,		//
+	// Depth-as-texture format (modern DX10+ hardware from NVIDIA, AMD, and Intel)
 	IMAGE_FORMAT_NV_INTZ,		// Vendor-specific depth-stencil texture
+	// Raw depth buffer format for GeForce 6 & 7 series. Depth is specially encoded into four channels.
 	IMAGE_FORMAT_NV_RAWZ,		// formats for shadow depth mapping 
+	// 16-bit depth format (AMD, Intel older cards, non-INTZ compatible)
 	IMAGE_FORMAT_ATI_DST16,		// 
+	// 24-bit depth format (AMD, Intel older cards, non-INTZ compatible)
 	IMAGE_FORMAT_ATI_DST24,		//
 	IMAGE_FORMAT_NV_NULL,		// Dummy format which takes no video memory
 
 	// Compressed normal map formats
+	// AMD (also 3Dc) — Two-channel compression (note: R/G channels swapped vs. BC5)
 	IMAGE_FORMAT_ATI2N,			// One-surface ATI2N / DXN format
+	// AMD (also 3Dc+ or BC4) — Single-channel compression
 	IMAGE_FORMAT_ATI1N,			// Two-surface ATI1N format
 
 	IMAGE_FORMAT_DXT1_RUNTIME,

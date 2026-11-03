@@ -321,8 +321,10 @@ ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 	// dimhotepus: D3DFORMAT expected to contain vendor-specific.
 	MSVC_DISABLE_WARNING(4063)
 	// DST and FOURCC formats mapped back to ImageFormat (for vendor-dependent shadow depth textures)
+	// Raw depth buffer format for GeForce 6 & 7 series. Depth is specially encoded into four channels.
 	case (D3DFORMAT)(MAKEFOURCC('R','A','W','Z')):
 		return IMAGE_FORMAT_NV_RAWZ;
+	// Depth-as-texture format (modern DX10+ hardware from NVIDIA, AMD, and Intel)
 	case (D3DFORMAT)(MAKEFOURCC('I','N','T','Z')):
 		return IMAGE_FORMAT_NV_INTZ;
 	case (D3DFORMAT)(MAKEFOURCC('N','U','L','L')):
@@ -339,14 +341,18 @@ ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 	SE_GCC_DISABLE_SWITCH_WARNING()
 	// dimhotepus: D3DFORMAT expected to contain vendor-specific.
 	MSVC_DISABLE_WARNING(4063)
+	// 16-bit depth format (AMD, Intel older cards, non-INTZ compatible)
 	case (D3DFORMAT)(MAKEFOURCC('D','F','1','6')):
 		return IMAGE_FORMAT_ATI_DST16;
+	// 24-bit depth format (AMD, Intel older cards, non-INTZ compatible)
 	case (D3DFORMAT)(MAKEFOURCC('D','F','2','4')):
 		return IMAGE_FORMAT_ATI_DST24;
 
 	// ATIxN FOURCC formats mapped back to ImageFormat
+	// AMD (also 3Dc+ or BC4) — Single-channel compression
 	case (D3DFORMAT)(MAKEFOURCC('A','T','I','1')):
 		return IMAGE_FORMAT_ATI1N;
+	// AMD (also 3Dc) — Two-channel compression (note: R/G channels swapped vs. BC5)
 	case (D3DFORMAT)(MAKEFOURCC('A','T','I','2')):
 		return IMAGE_FORMAT_ATI2N;
 	MSVC_END_WARNING_OVERRIDE_SCOPE()
@@ -423,8 +429,10 @@ ImageFormat DxgiFormatToImageFormat( DXGI_FORMAT format )
 	// dimhotepus: DXGI_FORMAT expected to contain vendor-specific.
 	MSVC_DISABLE_WARNING(4063)
 	// DST and FOURCC formats mapped back to ImageFormat (for vendor-dependent shadow depth textures)
+	// Raw depth buffer format for GeForce 6 & 7 series. Depth is specially encoded into four channels.
 	case (DXGI_FORMAT)(MAKEFOURCC('R','A','W','Z')):
 		return IMAGE_FORMAT_NV_RAWZ;
+	// Depth-as-texture format (modern DX10+ hardware from NVIDIA, AMD, and Intel)
 	case (DXGI_FORMAT)(MAKEFOURCC('I','N','T','Z')):
 		return IMAGE_FORMAT_NV_INTZ;
 	case (DXGI_FORMAT)(MAKEFOURCC('N','U','L','L')):
@@ -439,14 +447,18 @@ ImageFormat DxgiFormatToImageFormat( DXGI_FORMAT format )
 	SE_GCC_DISABLE_SWITCH_WARNING()
 	// dimhotepus: DXGI_FORMAT expected to contain vendor-specific.
 	MSVC_DISABLE_WARNING(4063)
+	// 16-bit depth format (AMD, Intel older cards, non-INTZ compatible)
 	case (DXGI_FORMAT)(MAKEFOURCC('D','F','1','6')):
 		return IMAGE_FORMAT_ATI_DST16;
+	// 24-bit depth format (AMD, Intel older cards, non-INTZ compatible)
 	case (DXGI_FORMAT)(MAKEFOURCC('D','F','2','4')):
 		return IMAGE_FORMAT_ATI_DST24;
 
 	// ATIxN FOURCC formats mapped back to ImageFormat
+	// AMD (also 3Dc+ or BC4) — Single-channel compression
 	case (DXGI_FORMAT)(MAKEFOURCC('A','T','I','1')):
 		return IMAGE_FORMAT_ATI1N;
+	// AMD (also 3Dc) — Two-channel compression (note: R/G channels swapped vs. BC5)
 	case (DXGI_FORMAT)(MAKEFOURCC('A','T','I','2')):
 		return IMAGE_FORMAT_ATI2N;
 	MSVC_END_WARNING_OVERRIDE_SCOPE()
@@ -514,20 +526,26 @@ D3DFORMAT ImageFormatToD3DFormat( ImageFormat format )
 
 	// ImageFormat mapped to vendor-dependent FOURCC formats (for shadow depth textures)
 	case IMAGE_FORMAT_NV_INTZ:
+		// Depth-as-texture format (modern DX10+ hardware from NVIDIA, AMD, and Intel)
 		return (D3DFORMAT)(MAKEFOURCC('I','N','T','Z'));
 	case IMAGE_FORMAT_NV_RAWZ:
+		// Raw depth buffer format for GeForce 6 & 7 series. Depth is specially encoded into four channels.
 		return (D3DFORMAT)(MAKEFOURCC('R','A','W','Z'));
 	case IMAGE_FORMAT_ATI_DST16:
+		// 16-bit depth format (AMD, Intel older cards, non-INTZ compatible)
 		return (D3DFORMAT)(MAKEFOURCC('D','F','1','6'));
 	case IMAGE_FORMAT_ATI_DST24:
+		// 24-bit depth format (AMD, Intel older cards, non-INTZ compatible)
 		return (D3DFORMAT)(MAKEFOURCC('D','F','2','4'));
 	case IMAGE_FORMAT_NV_NULL:
 		return (D3DFORMAT)(MAKEFOURCC('N','U','L','L'));
 	
 	// ImageFormats mapped to ATIxN FOURCC
 	case IMAGE_FORMAT_ATI2N:
+		// AMD (also 3Dc) — Two-channel compression (note: R/G channels swapped vs. BC5)
 		return (D3DFORMAT)(MAKEFOURCC('A','T','I','2'));
 	case IMAGE_FORMAT_ATI1N:
+		// AMD (also 3Dc+ or BC4) — Single-channel compression
 		return (D3DFORMAT)(MAKEFOURCC('A','T','I','1'));
 
 	case IMAGE_FORMAT_DXT1_RUNTIME:
@@ -603,22 +621,28 @@ DXGI_FORMAT ImageFormatToDxgiFormat( ImageFormat format )
 	case IMAGE_FORMAT_NV_DST16:
 		return DXGI_FORMAT_D16_UNORM;
 	case IMAGE_FORMAT_NV_INTZ:
+		// Depth-as-texture format (modern DX10+ hardware from NVIDIA, AMD, and Intel)
 		return (DXGI_FORMAT)(MAKEFOURCC('I','N','T','Z'));
 	case IMAGE_FORMAT_NV_RAWZ:
+		// Raw depth buffer format for GeForce 6 & 7 series. Depth is specially encoded into four channels.
 		return (DXGI_FORMAT)(MAKEFOURCC('R','A','W','Z'));
 	//case IMAGE_FORMAT_NV_DST24:
 	//	return D3DFMT_D24S8;
 	case IMAGE_FORMAT_ATI_DST16:
+		// 16-bit depth format (AMD, Intel older cards, non-INTZ compatible)
 		return (DXGI_FORMAT)(MAKEFOURCC('D','F','1','6'));
 	case IMAGE_FORMAT_ATI_DST24:
+		// 24-bit depth format (AMD, Intel older cards, non-INTZ compatible)
 		return (DXGI_FORMAT)(MAKEFOURCC('D','F','2','4'));
 	case IMAGE_FORMAT_NV_NULL:
 		return (DXGI_FORMAT)(MAKEFOURCC('N','U','L','L'));
 
 	// ImageFormats mapped to ATIxN FOURCC
 	case IMAGE_FORMAT_ATI2N:
+		// AMD (also 3Dc) — Two-channel compression (note: R/G channels swapped vs. BC5)
 		return (DXGI_FORMAT)(MAKEFOURCC('A','T','I','2'));
 	case IMAGE_FORMAT_ATI1N:
+		// AMD (also 3Dc+ or BC4) — Single-channel compression
 		return (DXGI_FORMAT)(MAKEFOURCC('A','T','I','1'));
 
 	case IMAGE_FORMAT_DXT1_RUNTIME:
