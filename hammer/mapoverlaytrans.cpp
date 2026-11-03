@@ -371,6 +371,11 @@ ChunkFileResult_t CMapOverlayTransition::LoadVMF( CChunkFile *pFile )
 ChunkFileResult_t CMapOverlayTransition::SaveVMF( CChunkFile *pFile, CSaveInfo *pSaveInfo )
 {
 	ChunkFileResult_t eResult = pFile->BeginChunk("overlaytransition");
+	if ( eResult != ChunkFile_Ok )
+	{
+		// dimhotepus: Immediately report failure.
+		return eResult;
+	}
 
 	m_nShorelineId = ( intp )GetParent();
 	Shoreline_t *pShoreline = GetShoreManager()->GetShoreline( m_nShorelineId );
@@ -382,15 +387,18 @@ ChunkFileResult_t CMapOverlayTransition::SaveVMF( CChunkFile *pFile, CSaveInfo *
 			CMapOverlay *pOverlay = &pShoreline->m_aOverlays[iOverlay];
 			if ( pOverlay )
 			{
-				pOverlay->SaveDataToVMF( pFile, pSaveInfo );
+				eResult = pOverlay->SaveDataToVMF( pFile, pSaveInfo );
+				if ( eResult != ChunkFile_Ok )
+				{
+					break;
+				}
 			}
 		}
-	} 
-
-	if ( eResult == ChunkFile_Ok )
-	{
-		eResult = pFile->EndChunk();
 	}
 
-	return eResult;
+	// dimhotepus: Always end chunk.
+	const auto eResult2 = pFile->EndChunk();
+
+	// dimhotepus: Signal write result.
+	return eResult == ChunkFile_Ok ? eResult2 : eResult;
 }
