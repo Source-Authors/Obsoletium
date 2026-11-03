@@ -44,46 +44,6 @@ constexpr inline char kDefaultSharedPort[]{ "20000" };
 	return std::error_code{ errc, std::system_category() };
 }
 
-class ScopedWinsockInitializer
-{
-public:
-	ScopedWinsockInitializer( unsigned char major, unsigned char minor ) noexcept
-		:
-		rc_{ GetSystemError( WSAStartup( MAKEWORD( major, minor ), &wsa_data_ ) ) },
-		is_started_{ !rc_.value() }
-	{
-		if ( !is_started_ )
-			return;
-
-		if ( LOBYTE( wsa_data_.wVersion ) != major ||
-		     HIBYTE( wsa_data_.wVersion ) != minor )
-		{
-			rc_ = GetSystemError( WSAVERNOTSUPPORTED );
-		}
-	}
-	~ScopedWinsockInitializer() noexcept
-	{
-		if ( is_started_ && WSACleanup() == SOCKET_ERROR )
-		{
-			rc_ = GetSystemError( WSAGetLastError() );
-
-			AssertMsg( false, "WSACleanup failed: %s\n", rc_.message().c_str() );
-		}
-	}
-
-	ScopedWinsockInitializer( ScopedWinsockInitializer & ) = delete;
-	ScopedWinsockInitializer( ScopedWinsockInitializer && ) = delete;
-	ScopedWinsockInitializer &operator=( ScopedWinsockInitializer & ) = delete;
-	ScopedWinsockInitializer &operator=( ScopedWinsockInitializer && ) = delete;
-
-	[[nodiscard]] std::error_code error_code() const noexcept { return rc_; }
-
-private:
-	WSADATA         wsa_data_;
-	std::error_code rc_;
-	const bool      is_started_;
-};
-
 class ScopedAcceptSocket
 {
 public:
