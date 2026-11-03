@@ -41,7 +41,7 @@
 #include "tier2/p4helpers.h"
 // dimhotepus: Drop Perforce support.
 // #include "p4lib/ip4.h"
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 #include "posix_file_stream.h"
 
 #include "tier1/checksum_crc.h"
@@ -2664,7 +2664,8 @@ public:
 	int main( int argc, char **argv ) override
 	{
 		// dimhotepus: Install an exception handler only when running as standalone executable.
-		const s1::utils::common::ScopedDefaultMinidumpHandler scoped_default_minidumps;
+		[[maybe_unused]] const auto &scoped_breakpad_handler =
+			s1::breakpad::ScopedBreakpadHandler::Instance();
 
 		// dimhotepus: Store old spew to restore later.
 		const ScopedSpewOutputFunc scoped_spew_output{VTexOutputFunc};

@@ -20,7 +20,7 @@
 #include "vpklib/packedstore.h"
 #include "mathlib/mathlib.h"
 
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 
 #ifdef VPK_ENABLE_SIGNING
 #include "crypto.h"
@@ -2126,8 +2126,8 @@ static void DroppedDirectory( const char *pszDirectoryArg )
 int main( int argc, char **argv )
 {
 	// Install an exception handler.
-	const s1::utils::common::ScopedDefaultMinidumpHandler
-								   scoped_default_minidumps;
+	[[maybe_unused]] const auto &scoped_breakpad_handler =
+		s1::breakpad::ScopedBreakpadHandler::Instance();
 	const ScopedCommandLineProgram scoped_command_line_program( argc, argv );
 
 	int nCurArg = 1;

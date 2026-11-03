@@ -14,7 +14,7 @@
 #include "tier0/icommandline.h"
 #include "materialsystem/imaterialsystem.h"
 #include "map.h"
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 #include "materialsub.h"
 #include "loadcmdline.h"
 #include "byteswap.h"
@@ -1189,11 +1189,12 @@ int RunVBSP( int argc, char **argv )
 			Msg( "--no-draw-triggers: true\n" );
 			g_NodrawTriggers = true;
 		}
-		else if ( V_strieq( argv[i], "-FullMinidumps" ) )
-		{
-			Msg( "--full-minidumps: true\n" );
-			s1::utils::common::EnableFullMinidumps( true );
-		}
+		// dimhotepus: Not supported anymore.
+		// else if ( V_strieq( argv[i], "-FullMinidumps" ) )
+		// {
+		// 	Msg( "--full-minidumps: true\n" );
+		// 	s1::utils::common::EnableFullMinidumps( true );
+		// }
 		// dimhotepus: Check arg is in bounds first.
 		else if ( i < argc - 1 && V_strieq( argv[i], "-embed" ) )
 		{
@@ -1296,7 +1297,8 @@ int RunVBSP( int argc, char **argv )
 				"  -x360		   : Generate Xbox360 version of vsp\n"
 				"  -nox360		   : Disable generation Xbox360 version of vsp (default)\n"
 				"  -replacematerials : Substitute materials according to materialsub.txt in content\\maps\n"
-				"  -FullMinidumps  : Write large minidumps on crash.\n"
+				// dimhotepus: Not supported anymore.
+				// "  -FullMinidumps  : Write large minidumps on crash.\n"
 				);
 			}
 
@@ -1491,6 +1493,7 @@ int RunVBSP( int argc, char **argv )
 
 int main (int argc, char **argv)
 {
-	const s1::utils::common::ScopedDefaultMinidumpHandler minidump;
+	[[maybe_unused]] const auto &scoped_breakpad_handler =
+		s1::breakpad::ScopedBreakpadHandler::Instance();
 	return RunVBSP( argc, argv );
 }

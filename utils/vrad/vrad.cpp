@@ -16,7 +16,7 @@
 #include "macro_texture.h"
 #include "vmpi_tools_shared.h"
 #include "leaf_ambient_lighting.h"
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 #include "loadcmdline.h"
 #include "byteswap.h"
 #include "bspflags.h"
@@ -2706,11 +2706,12 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 		{
 			++i;
 		}
-		else if ( V_strieq( argv[i], "-FullMinidumps" ) )
-		{
-			Msg( "--full-minidumps: true\n" );
-			s1::utils::common::EnableFullMinidumps( true );
-		}
+		// dimhotepus: Not supported anymore.
+		// else if ( V_strieq( argv[i], "-FullMinidumps" ) )
+		// {
+		// 	Msg( "--full-minidumps: true\n" );
+		// 	s1::utils::common::EnableFullMinidumps( true );
+		// }
 		else if ( V_strieq( argv[i], "-hdr" ) )
 		{
 			Msg( "--hdr: true\n" );
@@ -3099,6 +3100,8 @@ int VRAD_Main(int argc, char **argv)
 	}
 #endif
 
-	const s1::utils::common::ScopedDefaultMinidumpHandler minidump;
+	[[maybe_unused]] const auto &scoped_breakpad_handler =
+		s1::breakpad::ScopedBreakpadHandler::Instance();
+
 	return RunVRAD( argc, argv );
 }

@@ -29,7 +29,7 @@
 #include "vstdlib/iprocessutils.h"
 #include "dmserializers/idmserializers.h"
 #include "dme_controls/dmecontrols.h"
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 // dimhotepus: Disable Perforce.
 // #include "p4lib/ip4.h"
 #include "tier3/tier3.h"
@@ -74,7 +74,11 @@ class CElementViewerApp : public CVguiMatSysApp
 	typedef CVguiMatSysApp BaseClass;
 
 public:
-	CElementViewerApp() : scoped_spew_output_{SpewToODS} {}
+	CElementViewerApp() :
+		scoped_breakpad_handler_{ s1::breakpad::ScopedBreakpadHandler::Instance() },
+		scoped_spew_output_{ SpewToODS }
+	{
+	}
 
 	// Methods of IApplication
 	bool Create() override;
@@ -86,7 +90,7 @@ private:
 	const char *GetAppName() override { return "ElementViewer"; }
 
 	// Install an exception handler.
-	const s1::utils::common::ScopedDefaultMinidumpHandler scoped_default_minidumps_;
+	const s1::breakpad::ScopedBreakpadHandler &scoped_breakpad_handler_;
 	const ScopedSpewOutputFunc scoped_spew_output_;
 };
 

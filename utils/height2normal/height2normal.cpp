@@ -12,7 +12,7 @@
 #include "tier1/utlbuffer.h"
 #include "tier2/tier2.h"
 #include "filesystem.h"
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 
 #include <direct.h>
 #include <conio.h>
@@ -293,8 +293,8 @@ void ProcessFiles( const char *normalFileNameWithoutExtension, int startFrame,
 int main( int argc, char **argv )
 {
 	// Install an exception handler.
-	const s1::utils::common::ScopedDefaultMinidumpHandler
-	scoped_default_minidumps;
+	[[maybe_unused]] const auto &scoped_breakpad_handler =
+		s1::breakpad::ScopedBreakpadHandler::Instance();
 
 #ifdef PLATFORM_64BITS
 	Msg( "\nValve Software - height2normal [64 bit] (%s)\n", __DATE__ );

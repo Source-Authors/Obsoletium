@@ -18,7 +18,7 @@
 #include "tier0/icommandline.h"
 #include "vmpi_tools_shared.h"
 #include "ilaunchabledll.h"
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 #include "loadcmdline.h"
 #include "byteswap.h"
 #include "bspflags.h"
@@ -998,11 +998,12 @@ int ParseCommandLine( int argc, char **argv )
 			Msg( "--low: Run worker threads with low priority\n" );
 			g_bLowPriority = true;
 		}
-		else if ( V_strieq( argv[i], "-FullMinidumps" ) )
-		{
-			Msg( "--full-minidumps: true\n" );
-			s1::utils::common::EnableFullMinidumps( true );
-		}
+		// dimhotepus: Not supported anymore.
+		// else if ( V_strieq( argv[i], "-FullMinidumps" ) )
+		// {
+		// 	Msg( "--full-minidumps: true\n" );
+		// 	s1::utils::common::EnableFullMinidumps( true );
+		// }
 		else if ( V_strieq( argv[i], CMDLINEOPTION_NOVCONFIG ) )
 		{
 			Msg( "--no-vconfig: true\n" );
@@ -1089,7 +1090,8 @@ void PrintUsage( int argc, char **argv )
 		"  -tmpin          : Make portals come from \\tmp\\<mapname>.\n"
 		"  -tmpout         : Make portals come from \\tmp\\<mapname>.\n"
 		"  -trace <start cluster> <end cluster> : Writes a linefile that traces the vis from one cluster to another for debugging map vis.\n"
-		"  -FullMinidumps  : Write large minidumps on crash.\n"
+		// dimhotepus: Not supported anymore.
+		// "  -FullMinidumps  : Write large minidumps on crash.\n"
 		"\n"
 #if 1 // Disabled for the initial SDK release with VMPI so we can get feedback from selected users.
 		);
@@ -1308,7 +1310,9 @@ int main (int argc, char **argv)
 		return RunVVis( argc, argv );
 	}
 #endif
-	const s1::utils::common::ScopedDefaultMinidumpHandler minidump;
+	[[maybe_unused]] const auto &scoped_breakpad_handler =
+		s1::breakpad::ScopedBreakpadHandler::Instance();
+
 	return RunVVis( argc, argv );
 }
 

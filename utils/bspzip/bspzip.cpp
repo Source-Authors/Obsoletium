@@ -10,7 +10,7 @@
 #include "cmdlib.h"
 #include "tier0/icommandline.h"
 #include "tier1/utlbuffer.h"
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 
 namespace
 {
@@ -103,8 +103,8 @@ bool RepackBSP( const char *pszMapFile, bool bCompress )
 int main( int argc, char **argv )
 {
 	// Install an exception handler.
-	const s1::utils::common::ScopedDefaultMinidumpHandler
-	scoped_default_minidumps;
+	[[maybe_unused]] const auto &scoped_breakpad_handler =
+		s1::breakpad::ScopedBreakpadHandler::Instance();
 
 	const ScopedHDRMode scoped_hdr_mode{ false };
 

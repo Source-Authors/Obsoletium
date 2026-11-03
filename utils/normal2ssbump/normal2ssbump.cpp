@@ -14,7 +14,7 @@
 #include "mathlib/vector.h"
 #include "mathlib/bumpvects.h"
 
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 
 #include "tier0/memdbgon.h"
 
@@ -43,8 +43,8 @@ const Vector g_bump_basis[]{
 int main( int argc, char **argv )
 {
 	// Install an exception handler.
-	const s1::utils::common::ScopedDefaultMinidumpHandler
-	scoped_default_minidumps;
+	[[maybe_unused]] const auto &scoped_breakpad_handler =
+		s1::breakpad::ScopedBreakpadHandler::Instance();
 
 	const ScopedCommandLineProgram scoped_command_line_program( argc, argv );
 

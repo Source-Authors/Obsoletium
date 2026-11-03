@@ -8,7 +8,7 @@
 #include "tier0/platform.h"
 #include "tier2/tier2.h"
 
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 
 #include "tier0/memdbgon.h"
 
@@ -26,8 +26,8 @@ namespace
 int main( int argc, char **argv )
 {
 	// Install an exception handler.
-	const s1::utils::common::ScopedDefaultMinidumpHandler
-	scoped_default_minidumps;
+	[[maybe_unused]] const auto &scoped_breakpad_handler =
+		s1::breakpad::ScopedBreakpadHandler::Instance();
 
 	constexpr size_t kOutTexturesCount{ 3 };
 	constexpr float  kTexture2TextureScale{ 8.0f };

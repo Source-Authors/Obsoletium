@@ -9,7 +9,7 @@
 #include "tier2/tier2.h"
 #include "bitmap/float_bm.h"
 #include "mathlib/mathlib.h"
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 
 #include "tier0/memdbgon.h"
 
@@ -35,8 +35,8 @@ void PrintArgSummaryAndExit()
 int main( int argc, char **argv )
 {
 	// Install an exception handler.
-	const s1::utils::common::ScopedDefaultMinidumpHandler
-	scoped_default_minidumps;
+	[[maybe_unused]] const auto &scoped_breakpad_handler =
+		s1::breakpad::ScopedBreakpadHandler::Instance();
 
 	const ScopedCommandLineProgram scoped_command_line_program( argc, argv );
 

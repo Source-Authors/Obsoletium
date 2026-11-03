@@ -25,7 +25,7 @@
 #include "tier1/utlbuffer.h"
 #include "tier1/utlsymbol.h"
 
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 #include "scoped_app_locale.h"
 
 #include "tier0/memdbgon.h"
@@ -3153,8 +3153,8 @@ int SortAndBalanceBones( int iCount, int iMaxCount, int bones[],
 int main( int argc, char **argv )
 {
 	// Install an exception handler.
-	const s1::utils::common::ScopedDefaultMinidumpHandler
-	scoped_default_minidumps;
+	[[maybe_unused]] const auto &scoped_breakpad_handler =
+		s1::breakpad::ScopedBreakpadHandler::Instance();
 
 	// Header
 	PrintHeader();

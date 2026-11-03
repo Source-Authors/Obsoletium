@@ -57,7 +57,7 @@
 #include "vphysics_interface.h"
 #include "filesystem_init.h"
 #include "valve_ipc_win32.h"
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 
 #include "../out/build/app_version_config.h"
 
@@ -1590,7 +1590,8 @@ static bool CHLModelViewerApp_SuggestGameInfoDirFn( CFSSteamSetupInfo const *pFs
 int main (int argc, char *argv[])
 {
 	// Install an exception handler.
-	const s1::utils::common::ScopedDefaultMinidumpHandler scoped_default_minidumps;
+	[[maybe_unused]] const auto &scoped_breakpad_handler =
+		s1::breakpad::ScopedBreakpadHandler::Instance();
 
 	CommandLine()->CreateCmdLine( argc, argv );
 

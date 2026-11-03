@@ -22,7 +22,7 @@
 #include "vmpi/messbuf.h"
 #include "vstdlib/jobthread.h"
 
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 #include "utlnodehash.h"
 #include "cmdlib.h"
 #include "cmdsink.h"
@@ -1944,8 +1944,9 @@ int ShaderCompileMain( int argc, char *argv[] )
 	const double compile_start_time{ Plat_FloatTime() };
 
 	// Setting up the minidump handler.
-	const s1::utils::common::ScopedDefaultMinidumpHandler scoped_minidump_handler;
-	const s1::win::ScopedConsoleCtrlHandler               scoped_ctrl_handler{ OnCtrlBreak };
+	[[maybe_unused]] const auto &scoped_breakpad_handler =
+		s1::breakpad::ScopedBreakpadHandler::Instance();
+	const s1::win::ScopedConsoleCtrlHandler scoped_ctrl_handler{ OnCtrlBreak };
 
 	EnableCrashingOnCrashes();
 

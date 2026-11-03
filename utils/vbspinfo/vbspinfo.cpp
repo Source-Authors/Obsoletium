@@ -18,7 +18,7 @@
 #include "iscratchpad3d.h"
 #include "filesystem_tools.h"
 #include "gamebspfile.h"
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 #include "cmdlib.h"
 
 #include "posix_file_stream.h"
@@ -323,8 +323,8 @@ void PrintCommandLine( int argc, char **argv )
 int main( int argc, char **argv )
 {
 	// Install an exception handler.
-	const s1::utils::common::ScopedDefaultMinidumpHandler
-	scoped_default_minidumps;
+	[[maybe_unused]] const auto &scoped_breakpad_handler =
+		s1::breakpad::ScopedBreakpadHandler::Instance();
 
 #ifdef PLATFORM_64BITS
 	Msg( "\nValve Software - vbspinfo [64 bit] (%s)\n", __DATE__ );

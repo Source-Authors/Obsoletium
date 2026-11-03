@@ -32,7 +32,7 @@
 #include "filesystem.h"
 #include "cmdlib.h"
 
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 #include "scoped_app_locale.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -151,6 +151,7 @@ class CompileCaptionsApp : public CTier3SteamApp
 
 public:
 	CompileCaptionsApp() :
+		scoped_breakpad_handler_{ s1::breakpad::ScopedBreakpadHandler::Instance() },
 		scoped_spew_output_{ SpewFunc },
 		m_UseLogFile{ false }
 	{
@@ -171,8 +172,8 @@ private:
 	void DescribeCaptions( char const *file ) const;
 
 	// Install an exception handler.
-	const s1::utils::common::ScopedDefaultMinidumpHandler
-							   scoped_default_minidumps_;
+	const s1::breakpad::ScopedBreakpadHandler
+							  &scoped_breakpad_handler_;
 	const ScopedSpewOutputFunc scoped_spew_output_;
 
 	// dimhotepus: Apply en_US UTF8 locale for printf/scanf.

@@ -40,7 +40,7 @@
 #include "physdll.h"
 #include "phyfile.h"
 #include "vphysics_interface.h"
-#include "tools_minidump.h"
+#include "tier0/scoped_breakpad_handler.h"
 
 #include "glos.h"
 #include "resource.h"
@@ -1324,8 +1324,8 @@ int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance,
                     _In_ LPSTR lpCmdLine, _In_ int nCmdShow )
 {
 	// Install an exception handler.
-	const s1::utils::common::ScopedDefaultMinidumpHandler
-	scoped_default_minidumps;
+	[[maybe_unused]] const auto &scoped_breakpad_handler =
+		s1::breakpad::ScopedBreakpadHandler::Instance();
 
 	CommandLine()->CreateCmdLine( Plat_GetCommandLine() );
 
