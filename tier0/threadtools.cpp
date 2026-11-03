@@ -429,9 +429,21 @@ bool ThreadJoin( ThreadHandle_t hThread, unsigned timeout )
 	DWORD dwWait = VCRHook_WaitForSingleObject((HANDLE)hThread, timeout);
 	if ( dwWait == WAIT_TIMEOUT)
 		return false;
-	if ( dwWait != WAIT_OBJECT_0 && ( dwWait != WAIT_FAILED && GetLastError() != 0 ) )
+	// dimhotepus: Old condition treated WAIT_FAILED as success.
+	if ( dwWait != WAIT_OBJECT_0 )
 	{
-		AssertMsg( false, "WaitForSingleObject(0x%p, %u) failed with %lu.", hThread, timeout, dwWait );
+		// WAIT_TIMEOUT
+		// WAIT_ABANDONED
+		// WAIT_FAILED
+		std::string error = dwWait == WAIT_FAILED
+			? std::system_category().message( ::GetLastError() )
+			: "N/A";
+		AssertMsg( false,
+			"WaitForSingleObject(0x%p, %u) failed with %lu: %s.",
+			hThread,
+			timeout,
+			dwWait,
+			error.c_str() );
 		return false;
 	}
 #elif defined(LINUX)
