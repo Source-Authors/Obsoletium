@@ -33,7 +33,6 @@ public:
 // Dialog Data
 	//{{AFX_DATA(CRunMapExpertDlg)
 	enum { IDD = IDD_RUNMAPEXPERT };
-	CButton	m_cUseProcessWnd;
 	CComboBox	m_cCmdSequences;
 	CButton	m_cMoveUp;
 	CButton	m_cMoveDown;
@@ -42,6 +41,8 @@ public:
 	CButton	m_cLongFilenames;
 	CEdit	m_cParameters;
 	CEdit	m_cCommand;
+	// dimhotepus: CS:GO backport. Add wait for key press.
+	BOOL	m_bWaitForKeypress;
 	//}}AFX_DATA
 
 	// dimhotepus: Add map name.

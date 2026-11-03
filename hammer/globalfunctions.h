@@ -44,7 +44,6 @@ void WriteDebug(char *pszStr);
 LPCTSTR GetDefaultTextureName();
 void SetDefaultTextureName( const char *szTexName );
 LPCTSTR GetNullTextureName();
-int mychdir(LPCTSTR pszDir);
 
 //
 // Message window interface.

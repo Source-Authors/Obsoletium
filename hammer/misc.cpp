@@ -69,29 +69,6 @@ void NotifyDuplicates(const CMapObjectList *pList)
 }
 
 
-int mychdir(LPCTSTR pszDir)
-{
-	int curdrive = _getdrive();
-
-	// changes to drive/directory
-	// dimhotepus: toupper -> V_toupper.
-	if(pszDir[1] == ':' && _chdrive(V_toupper(pszDir[0]) - 'A' + 1) == -1)
-		return -1;
-	if(_chdir(pszDir) == -1)
-	{
-		// change back to original disk
-		if (_chdrive(curdrive) == -1)
-		{
-			Warning( "Unable to change back drive %d.\n", curdrive );
-		}
-
-		return -1;
-	}
-
-	return 0;
-}
-
-
 void WriteDebug(char *pszStr)
 {
 #if 0

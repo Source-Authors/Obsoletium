@@ -474,6 +474,8 @@
 #define IDC_BSP0                        1137
 #define IDC_NOQUAKE                     1138
 #define IDC_NOGAME                      1138
+// dimhotepus: CS:GO backport.
+#define IDC_WAITFORKEYPRESS             1139
 #define IDC_CLASSPROMPT                 1140
 #define IDC_LIGHT2                      1140
 #define IDC_RAD1                        1140

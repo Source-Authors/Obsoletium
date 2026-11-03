@@ -23,6 +23,8 @@ public:
 	int		m_iLight;
 	int		m_iQBSP;
 	BOOL	m_bHDRLight;
+	// dimhotepus: CS:GO backport. Add wait for key press.
+	BOOL	m_bWaitForKeypress;
 	//}}AFX_DATA
 
 	// dimhotepus: Add map name.

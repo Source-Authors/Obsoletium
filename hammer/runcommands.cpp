@@ -11,10 +11,10 @@
 #include <direct.h>
 #include <process.h>
 #include <afxtempl.h>
+#include <system_error>
 
 #include "GameConfig.h"
 #include "Options.h"
-#include "ProcessWnd.h"
 #include "GlobalFunctions.h"
 #include "hammer.h"
 
@@ -26,6 +26,137 @@ static bool s_bRunsCommands = false;
 bool IsRunningCommands() { return s_bRunsCommands; }
 
 static char *pszDocPath, *pszDocName, *pszDocExt;
+
+// --------------------------------------------------------------------------------------------------------------- //
+// This class queues the list of commands to execute, then sends them to hammer_run_map_launcher.exe
+// --------------------------------------------------------------------------------------------------------------- //
+// dimhotepus: CS:GO backport.
+class CCommandExecuter
+{
+public:
+	CCommandExecuter( bool bWaitForKeypress );
+	~CCommandExecuter();
+
+	void AddCommandVA( const char *pStr, ... );
+	void AddCommandWithArgList( char **ppParms );
+
+	CString EncodeCommand( const char *pCommand ) const;
+
+	std::error_code Launch() const;
+
+private:
+	// Each command is the full command line with each argument in quotes.
+	CUtlVector< CString * > m_Commands;
+	bool                    m_bWaitForKeypress;
+};
+
+CCommandExecuter::CCommandExecuter( bool bWaitForKeypress )
+{
+	m_bWaitForKeypress = bWaitForKeypress;
+}
+
+CCommandExecuter::~CCommandExecuter()
+{
+	m_Commands.PurgeAndDeleteElements();
+}
+
+void CCommandExecuter::AddCommandVA( const char *pStr, ... )
+{
+	char fullStr[8192];
+
+	va_list marker;
+	va_start( marker, pStr );
+	V_vsprintf_safe( fullStr, pStr, marker );
+	va_end( marker );
+
+	CString *pFullStr = new CString{ fullStr };
+	m_Commands.AddToTail( pFullStr );
+}
+
+void CCommandExecuter::AddCommandWithArgList( char **ppParms )
+{
+	CString *pFullStr = new CString;
+	CString &str = *pFullStr;
+
+	while ( *ppParms )
+	{
+		str += *ppParms;
+		str += " ";
+		++ppParms;
+	}
+
+	m_Commands.AddToTail( pFullStr );
+}
+
+CString CCommandExecuter::EncodeCommand( const char *pCommand ) const
+{
+	// 'a' - 'p'
+	intp  len = V_strlen( pCommand );
+	char *pTempStr = new char[len * 2 + 1];
+	RunCodeAtScopeExit( pTempStr );
+	for ( int i = 0; i < len; i++ )
+	{
+		pTempStr[i * 2 + 0] = 'a' + ( ( (unsigned char)pCommand[i] >> 0 ) & 0xF );
+		pTempStr[i * 2 + 1] = 'a' + ( ( (unsigned char)pCommand[i] >> 4 ) & 0xF );
+	}
+	pTempStr[len * 2] = '\0';
+
+	return CString{ pTempStr };
+}
+
+std::error_code CCommandExecuter::Launch() const
+{
+	char szFilename[MAX_PATH];
+	if ( !Plat_GetModuleFilename( szFilename, static_cast< int >( sizeof( szFilename ) ) ) )
+	{
+		return std::error_code{
+			static_cast< int >( ::GetLastError() ), std::system_category()
+		};
+	}
+
+	V_StripLastDir( szFilename );
+	V_AppendSlash( szFilename );
+
+	// Make a master string of all the args.
+	CString fullCommand = szFilename;
+	fullCommand += "hammer_run_map_launcher.exe ";
+
+	if ( m_bWaitForKeypress )
+		fullCommand += "-WaitForKeypress ";
+
+	for ( auto *command : m_Commands )
+	{
+		// We encode the commands here into a string without spaces and quotes so hammer_run_map_launcher can pick it up
+		// exactly as we have it here.
+		fullCommand += EncodeCommand( *command );
+		fullCommand += " ";
+	}
+
+	PROCESS_INFORMATION pi = {};
+	STARTUPINFO         si = {};
+	si.cb = sizeof( si );
+
+	const auto rc = CreateProcessA(
+		nullptr,
+		fullCommand.GetBuffer(),
+		nullptr,
+		nullptr,
+		FALSE,
+		CREATE_NEW_CONSOLE,
+		nullptr,
+		nullptr,
+		&si,
+		&pi ) ?	std::error_code{} : std::error_code{ static_cast< int >( ::GetLastError() ), std::system_category() };
+
+	if ( !rc )
+	{
+		// dimhotepus: Do not leak handles.
+		CloseHandle( pi.hProcess );
+		CloseHandle( pi.hThread );
+	}
+
+	return rc;
+}
 
 void FixGameVars(char *pszSrc, OUT_Z_CAP(dstSize) char *pszDst, intp dstSize, BOOL bUseQuotes)
 {
@@ -218,8 +349,6 @@ LPCTSTR GetErrorString()
 	return szBuf;
 }
 
-CProcessWnd procWnd;
-
 template<intp nameSize, intp extensionSize>
 void SplitFileNameFromPath(char* szDocLongPath,
 	char (&name)[nameSize],
@@ -245,7 +374,8 @@ void SplitFileNameFromPath(char* szDocLongPath,
 	}
 }
 
-bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
+// dimhotepus: CS:GO backport. Add wait for key press.
+bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent, bool bWaitForKeypress)
 {
 	s_bRunsCommands = true;
 
@@ -256,8 +386,6 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 		Warning( "Unable to get current directory: %s\n",
 			std::generic_category().message(errno).c_str() );
 	}
-
-	procWnd.GetReady(pszOrigDocName, parent);
 
 	// cut up document name into file and extension components.
 	//  create two sets of buffers - one set with the long filename
@@ -277,6 +405,9 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 	SplitFileNameFromPath(szDocLongPath, szDocLongName, szDocLongExt);
 	SplitFileNameFromPath(szDocShortPath, szDocShortName, szDocShortExt);
 
+	// dimhotepus: CS:GO backport. Out of process compilation window to not freeze process.
+	CCommandExecuter commandExecuter( bWaitForKeypress );
+
 	char *ppParms[32];
 	BitwiseClear(ppParms);
 	INT_PTR iSize = Commands.GetSize(), i = 0;
@@ -294,202 +425,129 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 		pszDocPath = szDocLongPath;
 		
 		// dimhotepus: x5 -> x4
-		static char szNewParms[MAX_PATH*4], szNewRun[MAX_PATH*4];
+		char szNewParms[MAX_PATH*4], szNewRun[MAX_PATH*4];
 		szNewParms[0] = szNewRun[0] = '\0';
-
-		// HACK: force the spawnv call for launching the game
-		if (V_strieq(cmd.szRun, "$game_exe"))
-		{
-			cmd.bUseProcessWnd = FALSE;
-		}
 
 		FixGameVars(cmd.szRun, szNewRun, TRUE);
 		FixGameVars(cmd.szParms, szNewParms, TRUE);
 
-		CString strTmp;
-		strTmp.Format("\r\n"
-			"** Executing...\r\n"
-			"** Command: %s\r\n"
-			"** Parameters: %s\r\n\r\n", szNewRun, szNewParms);
-		procWnd.Append(strTmp);
-		
 		// create a parameter list (not always required)
-		if(!cmd.bUseProcessWnd || cmd.iSpecialCmd)
+		char *p = szNewParms;
+		ppParms[0] = szNewRun;
+		int iArg = 1;
+		BOOL bDone = FALSE;
+		while(p[0])
 		{
-			char *p = szNewParms;
-			ppParms[0] = szNewRun;
-			int iArg = 1;
-			BOOL bDone = FALSE;
+			ppParms[iArg++] = p;
 			while(p[0])
 			{
-				ppParms[iArg++] = p;
-				while(p[0])
+				if(p[0] == ' ')
 				{
-					if(p[0] == ' ')
-					{
-						// found a space-separator
-						p[0] = '\0';
+					// found a space-separator
+					p[0] = '\0';
 
+					p++;
+
+					// skip remaining white space
+					while (*p == ' ')
 						p++;
 
-						// skip remaining white space
-						while (*p == ' ')
-							p++;
+					break;
+				}
 
-						break;
-					}
-
-					// found the beginning of a quoted parameters
-					if(p[0] == '\"')
+				// found the beginning of a quoted parameters
+				if(p[0] == '\"')
+				{
+					while(1)
 					{
-						while(1)
+						p++;
+						if(p[0] == '\"')
 						{
-							p++;
-							if(p[0] == '\"')
-							{
-								// found the end
-								if(p[1] == '\0')
-									bDone = TRUE;
-								p[1] = 0;	// kick its ass
-								p += 2;
+							// found the end
+							if(p[1] == '\0')
+								bDone = TRUE;
+							p[1] = 0;	// kick its ass
+							p += 2;
 
-								// skip remaining white space
-								while (*p == ' ')
-									p++;
+							// skip remaining white space
+							while (*p == ' ')
+								p++;
 
-								break;
-							}
+							break;
 						}
-						break;
 					}
-
-					// else advance p
-					++p;
+					break;
 				}
 
-				if(!p[0] || bDone)
-					break;	// done.
+				// else advance p
+				++p;
 			}
 
-			ppParms[iArg] = NULL;
+			if(!p[0] || bDone)
+				break;	// done.
+		}
 
-			if(cmd.iSpecialCmd)
+		ppParms[iArg] = NULL;
+
+		if(cmd.iSpecialCmd)
+		{
+			if(cmd.iSpecialCmd == CCCopyFile && iArg == 3)
 			{
-				BOOL bError = FALSE;
-				CString error = "";
-
-				if(cmd.iSpecialCmd == CCCopyFile && iArg == 3)
-				{
-					RemoveQuotes(ppParms[1], V_strlen(ppParms[1]));
-					RemoveQuotes(ppParms[2], V_strlen(ppParms[2]));
+				RemoveQuotes(ppParms[1], V_strlen(ppParms[1]));
+				RemoveQuotes(ppParms[2], V_strlen(ppParms[2]));
 					
-					// dimhotepus: stricmp -> V_stricmp for performance.
-					// don't copy if we're already there
-					if (!V_strieq(ppParms[1], ppParms[2]) && 
-							(!CopyFile(ppParms[1], ppParms[2], FALSE)))
-					{
-						bError = TRUE;
-						error = std::system_category().message(::GetLastError()).c_str();
-					}
-				}
-				else if(cmd.iSpecialCmd == CCDelFile && iArg == 2)
+				// dimhotepus: stricmp -> V_stricmp for performance.
+				// don't copy if we're already there
+				if (!V_strieq(ppParms[1], ppParms[2]))
 				{
-					RemoveQuotes(ppParms[1], V_strlen(ppParms[1]));
-					if(!DeleteFile(ppParms[1]))
-					{
-						bError = TRUE;
-						error = std::system_category().message(::GetLastError()).c_str();
-					}
-				}
-				else if(cmd.iSpecialCmd == CCRenameFile && iArg == 3)
-				{
-					RemoveQuotes(ppParms[1], V_strlen(ppParms[1]));
-					RemoveQuotes(ppParms[2], V_strlen(ppParms[2]));
-					if(rename(ppParms[1], ppParms[2]))
-					{
-						bError = TRUE;
-						error = strerror(errno);
-					}
-				}
-				else if(cmd.iSpecialCmd == CCChangeDir && iArg == 2)
-				{
-					RemoveQuotes(ppParms[1], V_strlen(ppParms[1]));
-					if(mychdir(ppParms[1]) == -1)
-					{
-						bError = TRUE;
-						error = strerror(errno);
-					}
-				}
-
-				if(bError)
-				{
-					CString str;
-					str.Format("The command failed:\r\n  \"%s\"\r\n", error.GetString());
-					procWnd.Append(str);
-					procWnd.SetForegroundWindow();
-					str += "\r\nDo you want to continue?";
-					if(AfxMessageBox(str, MB_YESNO | MB_ICONQUESTION) == IDNO)
-						break;
+					commandExecuter.AddCommandVA( "copy \"%s\" \"%s\"", ppParms[1], ppParms[2] );
 				}
 			}
-			else
+			else if(cmd.iSpecialCmd == CCDelFile && iArg == 2)
 			{
-				// Change to the game exe folder before spawning the engine.
-				// This is necessary for Steam to find the correct Steam DLL (it
-				// uses the current working directory to search).
-				char szDir[MAX_PATH];
-				V_strcpy_safe(szDir, szNewRun);
-				// dimhotepus: Strip quotes around dir.
-				RemoveQuotes(szDir, V_strlen(szDir));
-				V_StripFilename(szDir);
-
-				mychdir(szDir);
-
-				// YWB Force asynchronous operation so that engine doesn't hang on
-				//  exit???  Seems to work.
-				// spawnv doesn't like quotes
-				RemoveQuotes(szNewRun, V_strlen(szNewRun));
-				intptr_t rc = _spawnv(/*cmd.bNoWait ?*/ _P_NOWAIT /*: P_WAIT*/, szNewRun, ppParms);
-				if (rc == -1)
-				{
-					const int err = errno;
-					CString str;
-					str.Format("The command failed:\r\n  \"%s\"\r\n", std::generic_category().message(err).c_str());
-					procWnd.Append(str);
-					procWnd.SetForegroundWindow();
-				}
+				RemoveQuotes( ppParms[1], V_strlen( ppParms[1] ) );
+				commandExecuter.AddCommandVA( "del \"%s\"", ppParms[1] );
+			}
+			else if(cmd.iSpecialCmd == CCRenameFile && iArg == 3)
+			{
+				RemoveQuotes( ppParms[1], V_strlen(ppParms[1] ) );
+				RemoveQuotes( ppParms[2], V_strlen( ppParms[2] ) );
+				commandExecuter.AddCommandVA( "ren \"%s\" \"%s\"", ppParms[1], ppParms[2] );
+			}
+			else if(cmd.iSpecialCmd == CCChangeDir && iArg == 2)
+			{
+				RemoveQuotes( ppParms[1], V_strlen( ppParms[1] ) );
+				commandExecuter.AddCommandVA( "cd \"%s\"", ppParms[1] );
 			}
 		}
 		else
 		{
-			procWnd.Execute(szNewRun, szNewParms);
-		}
+			// Change to the game exe folder before spawning the engine.
+			// This is necessary for Steam to find the correct Steam DLL (it
+			// uses the current working directory to search).
+			char szDir[MAX_PATH];
+			V_strcpy_safe(szDir, szNewRun);
+			// dimhotepus: Strip quotes around dir.
+			RemoveQuotes(szDir, V_strlen(szDir));
+			V_StripFilename(szDir);
 
-		// check for existence?
-		if(cmd.bEnsureCheck)
-		{
-			char szFile[MAX_PATH];
-			FixGameVars(cmd.szEnsureFn, szFile, FALSE);
-			if(GetFileAttributes(szFile) == INVALID_FILE_ATTRIBUTES)
-			{
-				// not there!
-				CString str;
-				// dimhotepus: Enchance error details.
-				str.Format("The file \"%s\" was not built by %s.\n\n"
-					"Do you want to continue?",
-					Q_isempty(szFile) ? pszOrigDocName : szFile,
-					szNewRun);
-				procWnd.SetForegroundWindow();
-				if(AfxMessageBox(str, MB_YESNO | MB_ICONQUESTION) == IDNO)
-					break;	// outta here
-			}
+			commandExecuter.AddCommandVA( "cd \"%s\"", szDir );
+
+			commandExecuter.AddCommandWithArgList( ppParms );
 		}
 	}
 
-	mychdir(szCurDir);
+	const auto rc = commandExecuter.Launch();
+	if ( rc )
+	{
+		CString str;
+		str.Format( "Failed to run map \"%s\": %s.\n\n", pszOrigDocName, rc.message().c_str() );
+		AfxMessageBox( str, MB_ICONERROR );
+
+		return false;  // outta here
+	}
 
 	s_bRunsCommands = false;
 
-	return TRUE;
+	return true;
 }
-

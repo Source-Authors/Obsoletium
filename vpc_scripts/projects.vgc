@@ -325,6 +325,12 @@ $Project "hammer_launcher"
 	"hammer_launcher\hammer_launcher.vpc" [$WINDOWS]
 }
 
+// dimhotepus: CS:GO backport. Nonblocking Hammer compiler.
+$Project "hammer_run_map_launcher"
+{
+	"utils\hammer_run_map_launcher\hammer_run_map_launcher.vpc" [$WINDOWS]
+}
+
 $Project "haptics"
 {
 	"haptics\haptics.vpc" [$WINDOWS]

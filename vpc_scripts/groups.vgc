@@ -234,6 +234,8 @@ $Group "hammer"
 	"glview"
 	"hammer_dll"
 	"hammer_launcher"
+	// dimhotepus: CS:GO backport. Nonblocking Hammer compiler.
+	"hammer_run_map_launcher"
 	"havana_constraints"
 	"hlmv"
 	"height2normal"

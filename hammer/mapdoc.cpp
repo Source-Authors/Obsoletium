@@ -39,7 +39,6 @@
 #include "ObjectProperties.h"
 #include "OptionProperties.h"
 #include "Options.h"
-#include "ProcessWnd.h"
 #include "PasteSpecialDlg.h"
 #include "Prefabs.h"
 #include "Prefab3D.h"
@@ -5798,6 +5797,8 @@ void CMapDoc::OnFileRunmap(void)
 	CRunMap dlg{strMapTitle};
 	// dimhotepus: Add Map name to title.
 	CRunMapExpertDlg dlgExpert{strMapTitle};
+	// dimhotepus: CS:GO backport.
+	dlg.m_bWaitForKeypress = dlgExpert.m_bWaitForKeypress = (AfxGetApp()->GetProfileInt("Run Map", "WaitForKeypress", 0) != 0);
 
 	bool bWasModified = (IsModified() == TRUE);
 
@@ -5855,6 +5856,8 @@ void CMapDoc::OnFileRunmap(void)
 			{
 				dlg.m_bSwitchMode = FALSE;
 				AfxGetApp()->WriteProfileInt("Run Map", "Mode", 1);
+				// dimhotepus: CS:GO backport.
+				dlgExpert.m_bWaitForKeypress = dlg.m_bWaitForKeypress;
 			}
 			else 
 			{
@@ -5873,11 +5876,16 @@ void CMapDoc::OnFileRunmap(void)
 			{
 				AfxGetApp()->WriteProfileInt("Run Map", "Mode", 0);
 				dlgExpert.m_bSwitchMode = FALSE;
+				// dimhotepus: CS:GO backport.
+				dlg.m_bWaitForKeypress = dlgExpert.m_bWaitForKeypress;
 			}
 			else if (dlgExpert.m_pActiveSequence) // clicked ok
 			{
 				// run the commands in the active sequence
-				RunCommands(dlgExpert.m_pActiveSequence->m_Commands, strFile, AfxGetApp()->GetMainWnd());
+				// dimhotepus: CS:GO backport.
+				RunCommands( dlgExpert.m_pActiveSequence->m_Commands, strFile, AfxGetApp()->GetMainWnd(), dlgExpert.m_bWaitForKeypress == TRUE );
+				// dimhotepus: CS:GO backport.
+				AfxGetApp()->WriteProfileInt( "Run Map", "WaitForKeypress", dlgExpert.m_bWaitForKeypress );
 				return;
 			}
 			else
@@ -5898,7 +5906,6 @@ void CMapDoc::OnFileRunmap(void)
 	CCOMMAND cmd;
 	memset(&cmd, 0, sizeof cmd);
 	cmd.bEnable = TRUE;
-	cmd.bUseProcessWnd = TRUE;
 	cmd.bLongFilenames = TRUE;
 
 	CCommandArray cmds;
@@ -5956,7 +5963,6 @@ void CMapDoc::OnFileRunmap(void)
 	// Run the game.
 	if (dlg.m_bNoQuake == FALSE)
 	{
-		cmd.bUseProcessWnd = FALSE;
 		cmd.bNoWait = TRUE;
 
 		//When running under steam, use applaunch always because if a user forgets to run the game they're trying to launch, it will fail
@@ -5968,8 +5974,11 @@ void CMapDoc::OnFileRunmap(void)
 
 		cmds.Add(cmd);
 	}
-
-	RunCommands(cmds, GetPathName(), AfxGetApp()->GetMainWnd());
+	
+	// dimhotepus: CS:GO backport.
+	AfxGetApp()->WriteProfileInt( "Run Map", "WaitForKeypress", dlg.m_bWaitForKeypress );
+	// dimhotepus: CS:GO backport.
+	RunCommands( cmds, GetPathName(), AfxGetApp()->GetMainWnd(), dlg.m_bWaitForKeypress == TRUE );
 }
 
 
