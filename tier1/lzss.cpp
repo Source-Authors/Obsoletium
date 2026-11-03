@@ -202,7 +202,7 @@ unsigned char *CLZSS::CompressNoAlloc(
 
 	if ( pOutputSize )
 	{
-		*pOutputSize = pOutput - pStart;
+		*pOutputSize = size_cast<unsigned>( pOutput - pStart );
 	}
 
 	return pStart;
