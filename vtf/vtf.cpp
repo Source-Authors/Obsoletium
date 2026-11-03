@@ -257,12 +257,6 @@ CVTFTexture::~CVTFTexture()
 //-----------------------------------------------------------------------------
 int CVTFTexture::ComputeMipCount() const
 {
-	if ( IsX360() && ( m_nVersion[0] == VTF_X360_MAJOR_VERSION ) && ( m_nFlags & TEXTUREFLAGS_NOMIP ) )
-	{
-		// 360 vtf format culled unused mips at conversion time
-		return 1;
-	}
-
 	// NOTE: No matter what, all mip levels should be created because
 	// we have to worry about various fallbacks
 	return ImageLoader::GetNumMipMapLevels( m_nWidth, m_nHeight, m_nDepth );
