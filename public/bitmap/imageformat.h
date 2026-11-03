@@ -540,6 +540,15 @@ namespace ImageLoader
 		return ( info.m_NumRedBits > 8 || info.m_NumGreeBits > 8 || info.m_NumBlueBits > 8 || info.m_NumAlphaBits > 8 );
 	}
 
+	// dimhotepus: CS:GO backport.
+	[[nodiscard]] inline bool IsFloatFormat( ImageFormat fmt )
+	{
+		return ( fmt == IMAGE_FORMAT_RGBA16161616F ) ||
+				( fmt == IMAGE_FORMAT_R32F ) ||
+				( fmt == IMAGE_FORMAT_RGB323232F ) ||
+				( fmt == IMAGE_FORMAT_RGBA32323232F );
+	}
+
 	[[nodiscard]] inline bool IsRuntimeCompressed( ImageFormat fmt )
 	{
 		return ( fmt == IMAGE_FORMAT_DXT1_RUNTIME ) || ( fmt == IMAGE_FORMAT_DXT5_RUNTIME );

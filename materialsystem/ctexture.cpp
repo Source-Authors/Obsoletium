@@ -2041,7 +2041,11 @@ ImageFormat CTexture::ComputeActualFormat( ImageFormat srcFormat )
 	// for all white, etc.
 	if( ( srcFormat == IMAGE_FORMAT_UVWQ8888 ) || ( srcFormat == IMAGE_FORMAT_UV88 ) || 
 		( srcFormat == IMAGE_FORMAT_UVLX8888 ) || ( srcFormat == IMAGE_FORMAT_RGBA16161616 ) ||
-		( srcFormat == IMAGE_FORMAT_RGBA16161616F ) )
+		( srcFormat == IMAGE_FORMAT_RGBA16161616F ) ||
+		// dimhotepus: CS:GO backport.
+		( srcFormat == IMAGE_FORMAT_RGBA32323232F ) ||
+	     // dimhotepus: CS:GO backport.
+		( srcFormat == IMAGE_FORMAT_R32F ) )
 	{
 #ifdef DX_TO_GL_ABSTRACTION		
 		dstFormat = g_pShaderAPI->GetNearestSupportedFormat( srcFormat, false );  // Stupid HACK!

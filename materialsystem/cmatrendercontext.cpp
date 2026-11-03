@@ -1749,7 +1749,11 @@ void CMatRenderContext::CommitRenderTargetAndViewport( void )
 			{
 				if ( IsPC() )
 				{
-					if( element.m_pRenderTargets[rt]->GetImageFormat() == IMAGE_FORMAT_RGBA16161616F )
+					if ( ( element.m_pRenderTargets[rt]->GetImageFormat() == IMAGE_FORMAT_RGBA16161616F ) ||
+					     // dimhotepus: CS:GO backport.
+					     ( element.m_pRenderTargets[rt]->GetImageFormat() == IMAGE_FORMAT_RGBA32323232F ) ||
+					     // dimhotepus: CS:GO backport.
+					     ( element.m_pRenderTargets[rt]->GetImageFormat() == IMAGE_FORMAT_R32F ) )
 					{
 						g_pShaderAPI->EnableLinearColorSpaceFrameBuffer( true );
 					}
@@ -1906,7 +1910,18 @@ void CMatRenderContext::SetRenderTargetEx( int nRenderTargetID, ITexture *pNewTa
 				}
 			}
 
-			g_pShaderAPI->EnableLinearColorSpaceFrameBuffer( pNewTarget->GetImageFormat() == IMAGE_FORMAT_RGBA16161616F );
+			if ( ( ( pNewTarget->GetImageFormat() == IMAGE_FORMAT_RGBA16161616F ) || 
+					// dimhotepus: CS:GO backport.
+				   ( pNewTarget->GetImageFormat() == IMAGE_FORMAT_RGBA32323232F ) ) ||
+					// dimhotepus: CS:GO backport.
+				   ( pNewTarget->GetImageFormat() == IMAGE_FORMAT_R32F ) )
+			{
+				g_pShaderAPI->EnableLinearColorSpaceFrameBuffer( true );
+			}
+			else
+			{
+				g_pShaderAPI->EnableLinearColorSpaceFrameBuffer( false );
+			}
 		}
 	}
 	CommitRenderTargetAndViewport();

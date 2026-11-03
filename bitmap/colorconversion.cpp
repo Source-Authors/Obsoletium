@@ -52,6 +52,10 @@ namespace ImageLoader
 {
 
 // Color Conversion functions
+// dimhotepus: CS:GO backport.
+static void RGBA8888ToRGBA32323232F( const uint8 *src, uint8 *dst, int numPixels );
+static void RGBA8888ToRGB323232F( const uint8 *src, uint8 *dst, int numPixels );
+static void RGBA8888ToR32F( const uint8 *src, uint8 *dst, int numPixels );
 static void RGBA8888ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels );
 static void RGBA8888ToABGR8888( const uint8 *src, uint8 *dst, int numPixels );
 static void RGBA8888ToRGB888( const uint8 *src, uint8 *dst, int numPixels );
@@ -153,6 +157,15 @@ static RGBA8888ToUserFormatFunc_t GetRGBA8888ToUserFormatFunc_t( ImageFormat dst
 {
 	switch( dstImageFormat )
 	{
+		// dimhotepus: CS:GO backport.
+	case IMAGE_FORMAT_RGBA32323232F:
+		return RGBA8888ToRGBA32323232F;
+		// dimhotepus: CS:GO backport.
+	case IMAGE_FORMAT_RGB323232F:
+		return RGBA8888ToRGB323232F;
+		// dimhotepus: CS:GO backport.
+	case IMAGE_FORMAT_R32F:
+		return RGBA8888ToR32F;
 	case IMAGE_FORMAT_RGBA8888:
 		return RGBA8888ToRGBA8888;
 	case IMAGE_FORMAT_ABGR8888:
@@ -1476,7 +1489,14 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 		if( ( srcImageFormat == dstImageFormat ) || 
 			((srcImageFormat == IMAGE_FORMAT_BGRA8888) && (dstImageFormat == IMAGE_FORMAT_BGRX8888)) )
 		{
-			if ( IsX360() && ( srcStride == dstStride ) && ( width*srcPixelSize == srcStride ) )
+			if ( ( IsX360() ||
+				// dimhotepus: CS:GO backport. IMAGE_FORMAT_RGBA32323232F -> IMAGE_FORMAT_RGBA32323232F
+				   srcImageFormat == IMAGE_FORMAT_RGBA32323232F ||
+				// dimhotepus: CS:GO backport. IMAGE_FORMAT_RGBA8888 -> IMAGE_FORMAT_RGBA8888
+				   srcImageFormat == IMAGE_FORMAT_RGBA8888 ||
+				// dimhotepus: CS:GO backport. IMAGE_FORMAT_BGRA8888 -> IMAGE_FORMAT_BGRX8888
+				   srcImageFormat == IMAGE_FORMAT_BGRA8888 ) &&
+				 srcStride == dstStride && width * srcPixelSize == srcStride )
 			{
 				// fastest path
 				memcpy( dst, src, height*srcStride ); 
@@ -1824,9 +1844,50 @@ bool SwapAxes( uint8 *src, int widthHeight, ImageFormat imageFormat )
 	return true;
 }
 
+// dimhotepus: CS:GO backport.
+void RGBA8888ToRGBA32323232F( const uint8 *src, uint8 *dst, int numPixels )
+{
+	constexpr float flOO255 = 1.0f / 255.0f;
+	float32 *pDest = (float32*)dst;
+	const uint8 *endSrc = src + numPixels * 4;
+	for ( ; src < endSrc; src += 4, pDest += 4 )
+	{
+		pDest[0] = src[0] * flOO255;
+		pDest[1] = src[1] * flOO255;
+		pDest[2] = src[2] * flOO255;
+		pDest[3] = src[3] * flOO255;
+	}
+}
+
+// dimhotepus: CS:GO backport.
+void RGBA8888ToRGB323232F( const uint8 *src, uint8 *dst, int numPixels )
+{
+	constexpr float flOO255 = 1.0f / 255.0f;
+	float32 *pDest = (float32*)dst;
+	const uint8 *endSrc = src + numPixels * 4;
+	for ( ; src < endSrc; src += 4, pDest += 3 )
+	{
+		pDest[0] = src[0] * flOO255;
+		pDest[1] = src[1] * flOO255;
+		pDest[2] = src[2] * flOO255;
+	}
+}
+
+// dimhotepus: CS:GO backport.
+void RGBA8888ToR32F( const uint8 *src, uint8 *dst, int numPixels )
+{
+	constexpr float flOO255 = 1.0f / 255.0f;
+	float32 *pDest = (float32*)dst;
+	const uint8 *endSrc = src + numPixels * 4;
+	for ( ; src < endSrc; src += 4 )
+	{
+		*pDest++ = src[0] * flOO255;
+	}
+}
+
 void RGBA8888ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 {
-	memcpy( dst, src, 4 * numPixels );
+	memcpy( dst, src, static_cast<size_t>( 4 ) * numPixels );
 }
 
 void RGBA8888ToABGR8888( const uint8 *src, uint8 *dst, int numPixels )
