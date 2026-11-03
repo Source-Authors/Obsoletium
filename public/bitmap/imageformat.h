@@ -366,6 +366,8 @@ namespace ImageLoader
 	void ByteSwapImageData( unsigned char *pImageData, intp nImageSize, ImageFormat imageFormat, int width = 0, int stride = 0 );
 	[[nodiscard]] bool IsFormatValidForConversion( ImageFormat fmt );
 
+	// dimhotepus: Windows only, DirectX shader API backends.
+#ifdef _WIN32
 	//-----------------------------------------------------------------------------
 	// convert back and forth from D3D format to ImageFormat, regardless of
 	// whether it's supported or not
@@ -374,6 +376,7 @@ namespace ImageLoader
 	[[nodiscard]] ImageFormat DxgiFormatToImageFormat( DXGI_FORMAT format );
 	[[nodiscard]] D3DFORMAT ImageFormatToD3DFormat( ImageFormat format );
 	[[nodiscard]] DXGI_FORMAT ImageFormatToDxgiFormat( ImageFormat format );
+#endif
 
 	// Flags for ResampleRGBA8888
 	enum

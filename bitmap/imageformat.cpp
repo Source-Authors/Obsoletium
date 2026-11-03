@@ -265,8 +265,10 @@ int GetNumMipMapLevels( int width, int height, int depth )
 #endif	
 //-----------------------------------------------------------------------------
 // convert back and forth from D3D format to ImageFormat, regardless of
-// whether it's supported or not
+// whether it's supported or not.
 //-----------------------------------------------------------------------------
+// dimhotepus: Windows only, DirectX shader API backends.
+#ifdef _WIN32
 ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 {
 	switch ( format )
@@ -655,6 +657,7 @@ DXGI_FORMAT ImageFormatToDxgiFormat( ImageFormat format )
 		return DXGI_FORMAT_UNKNOWN;
 	}
 }
+#endif // _WIN32
 
 } // ImageLoader namespace ends
 
