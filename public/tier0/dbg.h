@@ -196,8 +196,8 @@ public:
 	  SpewOutputFunc2(m_old_spew);
   }
 
-  ScopedSpewOutputFunc(ScopedSpewOutputFunc &) = delete;
-  ScopedSpewOutputFunc& operator=(ScopedSpewOutputFunc &) = delete;
+  ScopedSpewOutputFunc(const ScopedSpewOutputFunc &) = delete;
+  ScopedSpewOutputFunc& operator=(const ScopedSpewOutputFunc &) = delete;
   ScopedSpewOutputFunc(ScopedSpewOutputFunc &&) = delete;
   ScopedSpewOutputFunc& operator=(ScopedSpewOutputFunc &&) = delete;
 
