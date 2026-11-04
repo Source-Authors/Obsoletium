@@ -1081,5 +1081,3 @@ void CallAssertFailedNotifyFunc( const char *pchFile, int nLine, const char *pch
 	const auto assertFn = s_AssertFailedNotifyFunc.load( std::memory_order_acquire );
 	if (assertFn) assertFn( pchFile, nLine, pchMessage );
 }
-
-
