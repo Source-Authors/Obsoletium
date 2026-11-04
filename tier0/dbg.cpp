@@ -7,11 +7,26 @@
 #include "tier0/valve_off.h"
 #endif
 
-#ifdef POSIX
-#include <csignal>
-#endif
-
+// dimhotepus: Include what we use instead of relying on transitive includes.
+#include <algorithm>     // std::lower_bound, std::min
+#include <atomic>
 #include <cassert>
+#include <cerrno>
+#include <chrono>
+#include <climits>       // INT_MIN
+#include <cmath>         // std::fabs
+#include <csignal>       // SIGABRT
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <iterator>      // std::size
+#include <mutex>
+#include <shared_mutex>
+#include <system_error>  // std::generic_category
+#include <thread>
+#include <tuple>         // std::tie
+#include <utility>
+
 #include "Color.h"
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
