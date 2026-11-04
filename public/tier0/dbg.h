@@ -334,7 +334,8 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 
 #define  AssertFatal( _exp )									((void)0)
 #define  AssertFatalOnce( _exp )								((void)0)
-#define  AssertFatalMsg( _exp, _msg )							((void)0)
+// dimhotepus: Variadic like the enabled version, otherwise AssertFatalMsg( e, "%d", x ) fails to compile.
+#define  AssertFatalMsg( _exp, _msg, ... )						((void)0)
 #define  AssertFatalMsgOnce( _exp, _msg )						((void)0)
 #define  AssertFatalFunc( _exp, _f )							((void)0)
 #define  AssertFatalEquals( _exp, _expectedValue )				((void)0)
