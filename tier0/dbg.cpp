@@ -482,7 +482,8 @@ static bool FindSpewGroup( const tchar* pGroupName, size_t* pInd )
 bool HushAsserts()
 {
 #ifdef DBGFLAG_ASSERT
-	static bool s_bHushAsserts = CommandLine()->HasParm( "-hushasserts" );
+	// dimhotepus: const. Thread-safe one-time initialization (magic static).
+	static const bool s_bHushAsserts = CommandLine()->HasParm( "-hushasserts" );
 	return s_bHushAsserts;
 #else
 	return true;
