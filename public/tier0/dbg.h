@@ -471,15 +471,15 @@ DBG_INTERFACE void ErrorV [[noreturn]] ( PRINTF_FORMAT_STRING const tchar *pMsg,
 
 inline void Msg( ... ) {}
 inline void DMsg( ... ) {}
-inline void MsgV( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist ) {}
-inline void Warning( PRINTF_FORMAT_STRING const tchar *pMsg, ... ) {}
-inline void WarningV( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist ) {}
+inline void MsgV( PRINTF_FORMAT_STRING const tchar *, va_list ) {}
+inline void Warning( PRINTF_FORMAT_STRING const tchar *, ... ) {}
+inline void WarningV( PRINTF_FORMAT_STRING const tchar *, va_list ) {}
 inline void DWarning( ... ) {}
 inline void Log( ... ) {}
 inline void DLog( ... ) {}
-inline void LogV( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist ) {}
+inline void LogV( PRINTF_FORMAT_STRING const tchar *, va_list ) {}
 inline void Error( ... ) {}
-inline void ErrorV( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist ) {}
+inline void ErrorV( PRINTF_FORMAT_STRING const tchar *, va_list ) {}
 
 #endif
 
