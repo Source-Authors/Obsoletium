@@ -132,12 +132,16 @@ DBG_INTERFACE SpewRetval_t DefaultSpewFuncAbortOnAsserts( SpewType_t type, const
 //-----------------------------------------------------------------------------
 
 // dimhotepus: Make all this things thread-safe as may be used from different threads.
-static std::atomic<SpewOutputFunc_t>   s_SpewOutputFunc = DefaultSpewFunc;
-static std::atomic<AssertFailedNotifyFunc_t>	s_AssertFailedNotifyFunc = nullptr;
+// All atomics below are constant-initialized, so they are safe to use during
+// static initialization of other translation units.
+// dimhotepus: Brace initialization (constant initialization guaranteed).
+static std::atomic<SpewOutputFunc_t>			s_SpewOutputFunc{ DefaultSpewFunc };
+static std::atomic<AssertFailedNotifyFunc_t>	s_AssertFailedNotifyFunc{ nullptr };
 
-static thread_local const tchar*	s_pFileName;
-static thread_local int				s_Line;
-static thread_local SpewType_t		s_SpewType;
+// Per thread, set by _SpewInfo right before an assert spews.
+static thread_local const tchar*	s_pFileName = nullptr;
+static thread_local int				s_Line = 0;
+static thread_local SpewType_t		s_SpewType = SPEW_MESSAGE;
 
 static CThreadMutex		s_SpewGroupsMutex;
 static SpewGroup_t*		s_pSpewGroups = nullptr;
