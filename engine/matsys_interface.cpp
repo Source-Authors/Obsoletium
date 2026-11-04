@@ -1100,15 +1100,10 @@ static ITexture *CreateFullFrameDepthTexture( void )
 
 static ITexture *CreateResolvedFullFrameDepthTexture( void )
 {
-	if ( IsPC() )
-	{
-		return materials->CreateNamedRenderTargetTextureEx2( "_rt_ResolvedFullFrameDepth", 1, 1, 
-			RT_SIZE_FULL_FRAME_BUFFER, IMAGE_FORMAT_RGBA8888, MATERIAL_RT_DEPTH_SEPARATE,
-			TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_POINTSAMPLE,
-			CREATERENDERTARGETFLAGS_NOEDRAM );
-	}
-
-	return NULL;
+	return materials->CreateNamedRenderTargetTextureEx2( "_rt_ResolvedFullFrameDepth", 1, 1, 
+		RT_SIZE_FULL_FRAME_BUFFER, IMAGE_FORMAT_RGBA8888, MATERIAL_RT_DEPTH_SEPARATE,
+		TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT | TEXTUREFLAGS_POINTSAMPLE,
+		CREATERENDERTARGETFLAGS_NOEDRAM );
 }
 
 
