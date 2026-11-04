@@ -278,28 +278,37 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 	#define DBGFLAG_ASSERTFATAL
 	#define DBGFLAG_ASSERTDEBUG
 #else
-	#define  _AssertMsg( _exp, _msg, _executeExp, _bFatal )	\
-		do {																\
-			if (!!(_exp)) { 													\
-			} else {																\
-				_SpewInfo( SPEW_ASSERT, TFILE, __LINE__ );				\
-				const auto _movedMsg = std::move(_msg);				\
-				const tchar *_message = static_cast<const tchar *>( _movedMsg );				\
-				SpewRetval_t retAssert = _SpewMessage("%s", static_cast<const char*>( _message ));	\
-				CallAssertFailedNotifyFunc( TFILE, __LINE__, _message );					\
-				_executeExp; 												\
-				if ( retAssert == SPEW_DEBUGGER)									\
-				{															\
-					if ( !ShouldUseNewAssertDialog() || DoNewAssertDialog( TFILE, __LINE__, _message ) ) \
-					{														\
-						DebuggerBreak();									\
-					}														\
-					if ( _bFatal )											\
-					{														\
-						_ExitOnFatalAssert( TFILE, __LINE__ );			\
-					}														\
-				}															\
-			}																\
+	// dimhotepus: Fatal asserts now terminate regardless of what the spew
+	// function returned. Previously the exit was nested under SPEW_DEBUGGER, so
+	// with the default release spew (SPEW_CONTINUE) an AssertFatal silently
+	// continued, contradicting its contract.
+	// dimhotepus: _msg is evaluated exactly once. A string literal decays to const tchar*,
+	// a CDbgFmtMsg temporary is materialized in place (C++17 guaranteed elision),
+	// so std::move (and <utility>) is not needed.
+	// dimhotepus: Format string is _T("%s") to match tchar, the old "%s" broke _UNICODE.
+	// dimhotepus: if constexpr for _bFatal, avoids MSVC C4127 "conditional expression is constant".
+	// dimhotepus: Locals prefixed _dbg to not shadow user variables.
+	#define  _AssertMsg( _exp, _msg, _executeExp, _bFatal )									\
+		do {																				\
+			if ( !!(_exp) ) {																\
+			} else {																		\
+				_SpewInfo( SPEW_ASSERT, TFILE, __LINE__ );									\
+				const auto _dbgHeldMsg = ( _msg );											\
+				const tchar *_dbgMessage = static_cast<const tchar *>( _dbgHeldMsg );		\
+				const SpewRetval_t _dbgRetAssert = _SpewMessage( _T("%s"), _dbgMessage );	\
+				CallAssertFailedNotifyFunc( TFILE, __LINE__, _dbgMessage );					\
+				_executeExp;																\
+				if ( _dbgRetAssert == SPEW_DEBUGGER &&										\
+					 ( !ShouldUseNewAssertDialog() ||										\
+					   DoNewAssertDialog( TFILE, __LINE__, _dbgMessage ) ) )				\
+				{																			\
+					DebuggerBreak();														\
+				}																			\
+				if constexpr ( _bFatal )													\
+				{																			\
+					_ExitOnFatalAssert( TFILE, __LINE__ );									\
+				}																			\
+			}																				\
 		} while (0)
 
 	// dimhotepus: Thread-safe "once". The flag is atomic and claimed with an
