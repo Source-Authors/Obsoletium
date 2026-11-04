@@ -84,6 +84,12 @@ union NeverDestroyed
 	T m_value;
 };
 
+
+// dimhotepus: static const -> static constexpr. Color has a constexpr ctor and a
+// trivial destructor, so this is constant-initialized (no static init order
+// fiasco) and never destroyed at exit; safe to use at any time from any thread.
+constexpr Color s_DefaultOutputColor( 255, 255, 255, 255 );
+
 }
 // Skip forward past the directory
 static const char *SkipToFname( const tchar* pFile )
@@ -193,10 +199,9 @@ static thread_local int				s_Line = 0;
 static thread_local SpewType_t		s_SpewType = SPEW_MESSAGE;
 
 static CThreadMutex		s_SpewGroupsMutex;
-static SpewGroup_t*		s_pSpewGroups = nullptr;
-static size_t			s_GroupCount = 0;
-static std::atomic_int	s_DefaultLevel = 0;
-static const Color		s_DefaultOutputColor( 255, 255, 255, 255 );
+static SpewGroup_t*			s_pSpewGroups = nullptr;	// guarded by SpewGroupsMutex(), sorted case-insensitively
+static size_t				s_GroupCount = 0;			// guarded by SpewGroupsMutex()
+static std::atomic_int		s_DefaultLevel{ 0 };
 
 // Only useable from within a spew function
 struct SpewInfo_t
@@ -206,7 +211,7 @@ struct SpewInfo_t
 	int				m_nSpewOutputLevel;
 };
 
-static thread_local SpewInfo_t *g_pSpewInfo;
+static thread_local SpewInfo_t *g_pSpewInfo = nullptr;
 
 
 // Standard groups
