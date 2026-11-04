@@ -60,7 +60,7 @@ class Color;
 //     To use an assertion, use
 //
 //     Assert( (f == 5) );
-//     AssertMsg( (f == 5), ("F needs to be %d here!\n", 5) );
+//     AssertMsg( (f == 5), "F needs to be %d here!\n", 5 );
 //     AssertFunc( (f == 5), BadFunc() );
 //     AssertEquals( f, 5 );
 //     AssertFloatEquals( f, 5.0f, 1e-3 );
@@ -76,11 +76,8 @@ class Color;
 //      
 //     Warning("Oh I feel so %s all over\n", "yummy");
 //
-//     Warning will do its magic in only Debug builds. To perform spew in *all*
-//     builds, use RelWarning.
-//
-//	   Three other spew types, Msg, Log, and Error, are compiled into all builds.
-//	   These error types do *not* need two sets of parenthesis.
+//	   dimhotepus: Doc said Warning is debug-only and RelWarning exists; neither is true.
+//	   Msg, Warning, Log, and Error are compiled into all builds.
 //
 //	   Msg( "Isn't this exciting %d?", 5 );
 //	   Error( "I'm just thrilled" );
