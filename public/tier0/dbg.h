@@ -247,6 +247,10 @@ DBG_INTERFACE void SetAssertDialogParent( struct SDL_Window *window );
 DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 #endif
 
+// Token pasting helpers (expand arguments before pasting, so __LINE__ works).
+#define SE_DBG_INTERNAL_CONCAT_IMPL( a, b )	a##b
+#define SE_DBG_INTERNAL_CONCAT( a, b )			SE_DBG_INTERNAL_CONCAT_IMPL( a, b )
+
 /* Used to define macros, never use these directly. */
 
 #ifdef _PREFAST_
@@ -646,31 +650,45 @@ FORCEINLINE void AssertValidReadWritePtr( const void*, [[maybe_unused]] intp cou
 #define AssertValidThis() AssertValidReadWritePtr(this,sizeof(*this))
 
 //-----------------------------------------------------------------------------
-// Macro to protect functions that are not reentrant
+// Macro to protect functions that are not reentrant.
+//
+// dimhotepus: CReentryGuard is explicit and non-copyable now.
+// dimhotepus: The counter is now atomic and checked with the same RMW that
+// increments it, so concurrent entry from two threads is detected without a
+// data race. The old "fSemaphore##__LINE__" never expanded __LINE__, so two
+// guards in one scope collided.
 
 #ifndef NDEBUG
 class CReentryGuard
 {
 public:
-	CReentryGuard(int *pSemaphore)
-	 : m_pSemaphore(pSemaphore)
+	explicit CReentryGuard( std::atomic<int> *pSemaphore )
+	 : m_pSemaphore( pSemaphore ),
+	   m_nPrevious( pSemaphore->fetch_add( 1, std::memory_order_acq_rel ) )
 	{
-		++(*m_pSemaphore);
 	}
 	
 	~CReentryGuard()
 	{
-		--(*m_pSemaphore);
+		m_pSemaphore->fetch_sub( 1, std::memory_order_acq_rel );
 	}
 	
+	// Count of other holders at the moment this guard was taken.
+	[[nodiscard]] int Previous() const { return m_nPrevious; }
+
+	CReentryGuard( const CReentryGuard & ) = delete;
+	CReentryGuard &operator=( const CReentryGuard & ) = delete;
+	
 private:
-	int *m_pSemaphore;
+	std::atomic<int> *m_pSemaphore;
+	const int m_nPrevious;
 };
 
-#define ASSERT_NO_REENTRY() \
-	static int fSemaphore##__LINE__; \
-	Assert( !fSemaphore##__LINE__ ); \
-	CReentryGuard ReentryGuard##__LINE__( &fSemaphore##__LINE__ )
+#define ASSERT_NO_REENTRY_IMPL( _id ) \
+	static std::atomic<int> SE_DBG_INTERNAL_CONCAT( fSemaphore, _id ){ 0 }; \
+	const CReentryGuard SE_DBG_INTERNAL_CONCAT( ReentryGuard, _id )( &SE_DBG_INTERNAL_CONCAT( fSemaphore, _id ) ); \
+	Assert( SE_DBG_INTERNAL_CONCAT( ReentryGuard, _id ).Previous() == 0 )
+#define ASSERT_NO_REENTRY()	ASSERT_NO_REENTRY_IMPL( SE_DBG_INTERNAL_UNIQUE_ID )
 #else
 #define ASSERT_NO_REENTRY()
 #endif
