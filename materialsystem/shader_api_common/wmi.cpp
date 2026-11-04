@@ -24,16 +24,16 @@
 
 size_t GetVidMemBytes( unsigned nAdapter )
 {
-  static unsigned nBeenAdapter = UINT_MAX;
-  static size_t nBytes = 0;
+	static unsigned nBeenAdapter = UINT_MAX;
+	static size_t nBytes = 0;
 
 	if ( nBeenAdapter != UINT_MAX ) return nBytes;
 
 	nBeenAdapter = nAdapter;
 
-	s1::win::ScopedComInitializer scoped_com_initializer{
+	const s1::win::ScopedComInitializer scoped_com_initializer{
 		static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE | COINIT_SPEED_OVER_MEMORY)};
-	if ( auto rc = scoped_com_initializer.error_code(); rc )
+	if ( auto rc = scoped_com_initializer.error_code(); FAILED( rc.value() ) )
 	{
 		Warning( "Unable to get GPU VRAM size. COM initialize failed (0x%ulx): %s.\n",
     		static_cast<unsigned long>(rc.value()), rc.message().c_str() );
