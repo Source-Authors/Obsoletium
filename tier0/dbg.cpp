@@ -192,15 +192,18 @@ void SpewOutputFunc( SpewOutputFunc_t func )
 }
 
 // dimhotepus: Add ^ which returns old spew.
+// NOTE: another thread may still be running the old function after this
+// returns, so a spew function must stay valid until the module is unloaded.
 SpewOutputFunc_t SpewOutputFunc2( SpewOutputFunc_t func )
 {
-	return s_SpewOutputFunc.exchange( func ? func : DefaultSpewFunc, std::memory_order::memory_order_acq_rel );
+	return s_SpewOutputFunc.exchange( func ? func : DefaultSpewFunc, std::memory_order_acq_rel );
 }
 
 SpewOutputFunc_t GetSpewOutputFunc( void )
 {
 	// dimhotepus: Should always be set now.
-	return s_SpewOutputFunc.load( std::memory_order::memory_order_relaxed );
+	// dimhotepus: relaxed -> acquire, pairs with the acq_rel exchange in SpewOutputFunc2.
+	return s_SpewOutputFunc.load( std::memory_order_acquire );
 }
 
 [[noreturn]] void _ExitOnFatalAssert( const tchar* pFile, int line )
@@ -1064,7 +1067,8 @@ void SetAssertFailedNotifyFunc( AssertFailedNotifyFunc_t func )
 //-----------------------------------------------------------------------------
 AssertFailedNotifyFunc_t SetAssertFailedNotifyFunc2( AssertFailedNotifyFunc_t func )
 {
-	return s_AssertFailedNotifyFunc.exchange( func, std::memory_order::memory_order_relaxed );
+	// dimhotepus: relaxed -> acq_rel, publish the handler to other threads.
+	return s_AssertFailedNotifyFunc.exchange( func, std::memory_order_acq_rel );
 }
 
 
@@ -1073,7 +1077,8 @@ AssertFailedNotifyFunc_t SetAssertFailedNotifyFunc2( AssertFailedNotifyFunc_t fu
 //-----------------------------------------------------------------------------
 void CallAssertFailedNotifyFunc( const char *pchFile, int nLine, const char *pchMessage )
 {
-	const auto assertFn = s_AssertFailedNotifyFunc.load( std::memory_order_relaxed );
+	// dimhotepus: relaxed -> acquire, pairs with SetAssertFailedNotifyFunc2.
+	const auto assertFn = s_AssertFailedNotifyFunc.load( std::memory_order_acquire );
 	if (assertFn) assertFn( pchFile, nLine, pchMessage );
 }
 
