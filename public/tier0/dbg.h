@@ -695,7 +695,8 @@ private:
 //
 // Purpose: Embed debug info in each file.
 //
-#if defined( _WIN32 ) && !defined( _X360 )
+// dimhotepus: #pragma comment is MSVC-only; MinGW defines _WIN32 too.
+#if defined( _MSC_VER ) && !defined( _X360 )
 
 	#ifndef NDEBUG
 		#pragma comment(compiler)
