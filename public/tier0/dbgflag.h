@@ -27,11 +27,11 @@
 //-----------------------------------------------------------------------------
 // Default flags for debug builds
 //-----------------------------------------------------------------------------
-#if (!defined(NDEBUG) || defined( RELEASEASSERTS ) )
+#if ( !defined( NDEBUG ) || defined( RELEASEASSERTS ) )
 
 #define DBGFLAG_MEMORY
-#ifdef _SERVER	// only enable new & delete tracking for server; on client it conflicts with CRT mem leak tracking
-#define DBGFLAG_MEMORY_NEWDEL	
+#ifdef _SERVER // only enable new & delete tracking for server; on client it conflicts with CRT mem leak tracking
+#define DBGFLAG_MEMORY_NEWDEL
 #endif
 #ifdef STEAM
 #define DBGFLAG_VALIDATE
@@ -45,14 +45,14 @@
 //-----------------------------------------------------------------------------
 // Default flags for release builds
 //-----------------------------------------------------------------------------
-#else  // !NDEBUG
+#else // !NDEBUG
 
 #ifdef STEAM
 #define DBGFLAG_ASSERT
 #endif
-#define DBGFLAG_ASSERTFATAL		// note: fatal asserts are enabled in release builds
+#define DBGFLAG_ASSERTFATAL // note: fatal asserts are enabled in release builds
 #define DBGFLAG_ASSERTDLG
 
-#endif  // !NDEBUG
+#endif // !NDEBUG
 
-#endif  // !SE_PUBLIC_TIER0_DBGFLAG_H_
+#endif // !SE_PUBLIC_TIER0_DBGFLAG_H_
