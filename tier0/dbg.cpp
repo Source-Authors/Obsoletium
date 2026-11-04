@@ -117,24 +117,64 @@ constexpr Color s_DefaultOutputColor( 255, 255, 255, 255 );
   }
   return true;
 }
+
+// dimhotepus: Bounded vsnprintf with identical semantics everywhere.
+// C99 vsnprintf returns the would-be length on truncation, MSVC _vsnprintf
+// returns -1 and does not terminate. The old code added the raw return value
+// to the write offset, so a long message overflowed the stack buffer on POSIX.
+// Always terminates, returns the number of characters actually stored.
+size_t SafeVFormat( tchar *out, size_t capacity, const tchar *format, va_list args )
+{
+	if ( !out || capacity == 0 )
+		return 0;
+
+	if ( !format )
+	{
+		out[0] = _T('\0');
+		return 0;
 }
 
-template <size_t out_size>
-const char *PrefixMessageGroup(OUT_Z_ARRAY char (&out)[out_size], const char *group,
-                               const char *message) {
-  const char *out_group{GetSpewOutputGroup()};
+	const int rc = _vsntprintf( out, capacity, format, args );
+	out[capacity - 1] = _T('\0');
 
-  out_group = out_group && out_group[0] ? out_group : group;
+	if ( rc < 0 )
+	{
+		// MSVC truncation or encoding error, keep whatever was written.
+		return _tcslen( out );
+	}
 
-  const size_t length{strlen(message)};
-  if (length > 1 && message[length - 1] == '\n' && !V_isuniform(message, '\n')) {
-    snprintf(out, std::size(out) - 1, "[%.3f][%s] %s", Plat_FloatTime(), out_group, message);
-  } else {
-    snprintf(out, std::size(out) - 1, "%s", message);
+	return std::min( static_cast<size_t>( rc ), capacity - 1 );
   }
 
-  out[std::size(out) - 1] = '\0';
+// dimhotepus: Variadic wrapper over SafeVFormat.
+size_t SafeFormat( tchar *out, size_t capacity, PRINTF_FORMAT_STRING const tchar *format, ... )
+{
+	va_list args;
+	va_start( args, format ); //-V2018 //-V2019
+	const size_t written = SafeVFormat( out, capacity, format, args );
+	va_end( args );
+	return written;
+}
 
+
+template< size_t out_size >
+const char *PrefixMessageGroup( OUT_Z_ARRAY char ( &out )[out_size], const char *group,
+                                const char *message )
+{
+	const char *out_group{ GetSpewOutputGroup() };
+
+	out_group = out_group && out_group[0] ? out_group : group;
+	const size_t length{ strlen( message ) };
+	if ( length > 1 && message[length - 1] == '\n' && !V_isuniform( message, '\n' ) )
+	{
+		snprintf( out, std::size( out ) - 1, "[%.3f][%s] %s", Plat_FloatTime(), out_group, message );
+	}
+	else
+	{
+		snprintf( out, std::size( out ) - 1, "%s", message );
+	}
+
+	out[std::size( out ) - 1] = '\0';
   return out;
 }
 
