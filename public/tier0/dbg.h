@@ -11,6 +11,7 @@
 #include <cmath>        // std::fabs (Assert*FloatEquals)
 #include <cstdarg>
 #include <cstdlib>      // EXIT_FAILURE (Plat_FatalError)
+#include <type_traits>  // std::enable_if_t, std::is_pointer_v (assert_cast)
 
 // dimhotepus: platform.h already provides an empty __cdecl on POSIX.
 #if defined( POSIX ) && !defined( __cdecl )
