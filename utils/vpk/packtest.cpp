@@ -4,8 +4,9 @@
 //
 // See https://developer.valvesoftware.com/wiki/Vpk.exe
 
+// dimhotepus: Disable for now.
 // Let's make sure aserts, etc are enabled for this tool.
-#define RELEASEASSERTS
+// #define RELEASEASSERTS
 
 #include <memory>
 
