@@ -367,7 +367,7 @@ struct CatchAndWriteContext_t
 		m_pargv = pargv;
 		m_ppv = ppv;
 
-		ErrorIfNot( m_pfn, ( "CatchAndWriteContext_t::Set w/o a function pointer!" ) )
+		ErrorIfNot( m_pfn, ( "CatchAndWriteContext_t::Set w/o a function pointer!" ) );
 	}
 
 	[[nodiscard]] int							Invoke() const
@@ -377,14 +377,14 @@ struct CatchAndWriteContext_t
 		case k_eSCatchAndWriteFunctionTypeInvalid:
 			break;
 		case k_eSCatchAndWriteFunctionTypeWMain:
-			ErrorIfNot( m_pargc && m_pargv, ( "CatchAndWriteContext_t::Invoke with bogus argc/argv" ) )
+			ErrorIfNot( m_pargc && m_pargv, ( "CatchAndWriteContext_t::Invoke with bogus argc/argv" ) );
 			reinterpret_cast<FnWMain>(m_pfn)( *m_pargc, *m_pargv );
 			break;
 		case k_eSCatchAndWriteFunctionTypeWMainIntReg:
-			ErrorIfNot( m_pargc && m_pargv, ( "CatchAndWriteContext_t::Invoke with bogus argc/argv" ) )
+			ErrorIfNot( m_pargc && m_pargv, ( "CatchAndWriteContext_t::Invoke with bogus argc/argv" ) );
 			return reinterpret_cast<FnWMainIntRet>(m_pfn)( *m_pargc, *m_pargv );
 		case k_eSCatchAndWriteFunctionTypeVoidPtr:
-			ErrorIfNot( m_ppv, ( "CatchAndWriteContext_t::Invoke with bogus void *ptr" ) )
+			ErrorIfNot( m_ppv, ( "CatchAndWriteContext_t::Invoke with bogus void *ptr" ) );
 			reinterpret_cast<FnVoidPtrFn>(m_pfn)( *m_ppv );
 			break;
 		default:

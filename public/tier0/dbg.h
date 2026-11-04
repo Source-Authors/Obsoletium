@@ -488,13 +488,17 @@ inline void ErrorV( PRINTF_FORMAT_STRING const tchar *, va_list ) {}
 // like AssertMsg, where msg must be enclosed in parenthesis:
 //
 // ErrorIfNot( bCondition, ("a b c %d %d %d", 1, 2, 3) );
+//
+// dimhotepus: Wrapped in do/while so it is a single statement (was a dangling-else hazard).
 #define ErrorIfNot( condition, msg ) \
+	do {						\
 	if ( condition )		\
 		;					\
-	else 					\
+		else					\
 	{						\
 		Error msg;			\
-	}
+		}						\
+	} while (0)
 
 #if !defined( _X360 ) || !defined( _RETAIL )
 
