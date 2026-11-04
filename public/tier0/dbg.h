@@ -823,7 +823,8 @@ public:
 		return (*this += 1);
 	}
 	
-	Type operator--()
+	// dimhotepus: Prefix -- now mirrors prefix ++ (returned a copy before).
+	const Type& operator--()
 	{
 		return (*this -= 1);
 	}
