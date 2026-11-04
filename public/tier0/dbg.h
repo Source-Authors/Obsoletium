@@ -424,9 +424,17 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 #define V_STRINGIFY(x) V_STRINGIFY_INTERNAL(x)
 
 // Macros to help decorate warnings or errors with the location in code
-#define FILE_LINE_FUNCTION_STRING __FILE__ "(" V_STRINGIFY(__LINE__) "):" __FUNCTION__ ":"
 #define FILE_LINE_STRING __FILE__ "(" V_STRINGIFY(__LINE__) "):"
+// dimhotepus: Only MSVC treats __FUNCTION__ as a string literal that can be
+// concatenated. On GCC / Clang it is a variable, so these were compile errors.
+// There they degrade to file / line only.
+#if defined( _MSC_VER )
+#define FILE_LINE_FUNCTION_STRING __FILE__ "(" V_STRINGIFY(__LINE__) "):" __FUNCTION__ ":"
 #define FUNCTION_LINE_STRING __FUNCTION__ "(" V_STRINGIFY(__LINE__) "): "
+#else
+#define FILE_LINE_FUNCTION_STRING FILE_LINE_STRING
+#define FUNCTION_LINE_STRING "(" V_STRINGIFY(__LINE__) "): "
+#endif
 
 // Handy define for inserting clickable messages into the build output.
 // Use like this:
