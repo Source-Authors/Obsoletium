@@ -7,7 +7,8 @@
 #include "dbgflag.h"
 #include "platform.h"
 
-#include <cstdio>
+#include <atomic>       // std::atomic (thread-safe *Once asserts, reentry guard)
+#include <cmath>        // std::fabs (Assert*FloatEquals)
 #include <cstdarg>
 #include <cstdlib>      // EXIT_FAILURE (Plat_FatalError)
 
@@ -286,13 +287,17 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 			}																\
 		} while (0)
 
-	#define  _AssertMsgOnce( _exp, _msg, _bFatal ) \
-		do {																\
-			static bool fAsserted;											\
-			if (!fAsserted)													\
-			{ 																\
-				_AssertMsg( _exp, _msg, (fAsserted = true), _bFatal );		\
-			}																\
+	// dimhotepus: Thread-safe "once". The flag is atomic and claimed with an
+	// exchange only when the expression actually fails, so exactly one thread
+	// reports, and _exp is no longer evaluated after the first failure.
+	#define  _AssertMsgOnce( _exp, _msg, _bFatal )											\
+		do {																				\
+			static std::atomic<bool> _dbgAsserted{ false };									\
+			if ( !_dbgAsserted.load( std::memory_order_relaxed ) )							\
+			{																				\
+				_AssertMsg( (_exp) || _dbgAsserted.exchange( true, std::memory_order_relaxed ), \
+							_msg, ((void)0), _bFatal );										\
+			}																				\
 		} while (0)
 #endif
 
@@ -311,7 +316,7 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 #define  AssertFatalMsgOnce( _exp, _msg )						_AssertMsgOnce( _exp, _msg, true )
 #define  AssertFatalFunc( _exp, _f )							_AssertMsg( _exp, _T("Assertion Failed: " _T(#_exp), _f, true )
 #define  AssertFatalEquals( _exp, _expectedValue )				AssertFatalMsg2( (_exp) == (_expectedValue), _T("Expected %d but got %d!"), (_expectedValue), (_exp) ) 
-#define  AssertFatalFloatEquals( _exp, _expectedValue, _tol )   AssertFatalMsg2( fabs((_exp) - (_expectedValue)) <= (_tol), _T("Expected %f but got %f!"), (_expectedValue), (_exp) )
+#define  AssertFatalFloatEquals( _exp, _expectedValue, _tol )   AssertFatalMsg2( std::fabs((_exp) - (_expectedValue)) <= (_tol), _T("Expected %f but got %f!"), (_expectedValue), (_exp) )
 #define  VerifyFatal( _exp )									AssertFatal( _exp )
 #define  VerifyEqualsFatal( _exp, _expectedValue )				AssertFatalEquals( _exp, _expectedValue )
 
@@ -361,7 +366,7 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 #define  AssertMsgOnce( _exp, _msg )  						_AssertMsgOnce( _exp, _msg, false )
 #define  AssertFunc( _exp, _f )   							_AssertMsg( _exp, _T("Assertion Failed: ") _T(#_exp), _f, false )
 #define  AssertEquals( _exp, _expectedValue )              	AssertMsg2( (_exp) == (_expectedValue), _T("Expected %d but got %d!"), (_expectedValue), (_exp) ) 
-#define  AssertFloatEquals( _exp, _expectedValue, _tol )  	AssertMsg2( fabsf((_exp) - (_expectedValue)) <= (_tol), _T("Expected %f but got %f!"), (_expectedValue), (_exp) )
+#define  AssertFloatEquals( _exp, _expectedValue, _tol )  	AssertMsg2( std::fabs((_exp) - (_expectedValue)) <= (_tol), _T("Expected %f but got %f!"), (_expectedValue), (_exp) )
 #define  Verify( _exp )           							Assert( _exp )
 #define  VerifyMsg1( _exp, _msg, a1 )						AssertMsg1( _exp, _msg, a1 )
 #define	 VerifyMsg2( _exp, _msg, a1, a2 )					AssertMsg2( _exp, _msg, a1, a2 )
