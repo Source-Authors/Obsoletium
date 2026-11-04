@@ -119,6 +119,13 @@ class Color;
 //     whether the program should continue running, or whether the program 
 //     should abort. 
 //
+//   Threading
+//
+//     dimhotepus: Documented the threading contract.
+//     All functions in this header may be called from any thread. A spew
+//     output function may be invoked concurrently from several threads, so it
+//     must be thread-safe itself. Spew functions may spew recursively.
+//
 // 2. Code activation
 //
 //   To cause code to be run only in debug builds, use DBG_CODE:
@@ -187,6 +194,10 @@ DBG_INTERFACE SpewRetval_t DefaultSpewFunc( SpewType_t type, const tchar *pMsg )
 /* Same as the default spew func, but returns SPEW_ABORT for asserts */
 DBG_INTERFACE SpewRetval_t DefaultSpewFuncAbortOnAsserts( SpewType_t type, const tchar *pMsg );
 
+// dimhotepus: Documented that scopes must nest, copy ops take const& (idiomatic).
+// Installs a spew function for the lifetime of the scope, then restores the
+// previous one. The spew function is process-wide, so scopes must nest (LIFO);
+// overlapping scopes on different threads restore in arbitrary order.
 class ScopedSpewOutputFunc
 {
 public:
@@ -516,11 +527,11 @@ inline void ErrorV( PRINTF_FORMAT_STRING const tchar *, va_list ) {}
 // dimhotepus: Wrapped in do/while so it is a single statement (was a dangling-else hazard).
 #define ErrorIfNot( condition, msg ) \
 	do {						\
-	if ( condition )		\
-		;					\
+		if ( condition )		\
+			;					\
 		else					\
-	{						\
-		Error msg;			\
+		{						\
+			Error msg;			\
 		}						\
 	} while (0)
 
@@ -697,7 +708,7 @@ public:
 	{
 		m_pSemaphore->fetch_sub( 1, std::memory_order_acq_rel );
 	}
-	
+
 	// Count of other holders at the moment this guard was taken.
 	[[nodiscard]] int Previous() const { return m_nPrevious; }
 
@@ -790,7 +801,7 @@ public:
 	{ 
 		return Set( val.m_Value ); 
 	}
-
+	
 	const Type& Set( const Type &val )
 	{
 		// Put your breakpoint here
