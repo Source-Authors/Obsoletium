@@ -317,7 +317,7 @@ DBG_INTERFACE void AssertValidStringPtr( const tchar* ptr, intp /* = 0xFFFFFF */
 //-----------------------------------------------------------------------------
 const tchar* GetSpewOutputGroup( void )
 {
-	SpewInfo_t *pSpewInfo = g_pSpewInfo;
+	const SpewInfo_t *pSpewInfo = g_pSpewInfo;
 	assert( pSpewInfo );
 	if ( pSpewInfo )
 		return pSpewInfo->m_pSpewOutputGroup;
@@ -326,7 +326,7 @@ const tchar* GetSpewOutputGroup( void )
 
 int GetSpewOutputLevel( void )
 {
-	SpewInfo_t *pSpewInfo = g_pSpewInfo;
+	const SpewInfo_t *pSpewInfo = g_pSpewInfo;
 	assert( pSpewInfo );
 	if ( pSpewInfo )
 		return pSpewInfo->m_nSpewOutputLevel;
@@ -335,7 +335,7 @@ int GetSpewOutputLevel( void )
 
 const Color* GetSpewOutputColor( void )
 {
-	SpewInfo_t *pSpewInfo = g_pSpewInfo;
+	const SpewInfo_t *pSpewInfo = g_pSpewInfo;
 	assert( pSpewInfo );
 	if ( pSpewInfo )
 		return pSpewInfo->m_pSpewOutputColor;
