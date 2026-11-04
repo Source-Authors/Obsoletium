@@ -59,6 +59,32 @@ struct SpewGroup_t
 	int		m_Level;
 };
 
+// dimhotepus: Internal helpers moved into an anonymous namespace (internal linkage).
+namespace
+{
+
+// dimhotepus: Storage for an object that is constructed on first use and never destroyed.
+// Spew can be emitted during static initialization of other translation units
+// (before our globals are constructed) and from other threads during static
+// destruction (after they are destroyed); both are UB with plain globals.
+// Uses no operator new, so it is unaffected by memdbgon.h.
+template< typename T >
+union NeverDestroyed
+{
+	template< typename... Args >
+	explicit NeverDestroyed( Args &&...args ) :
+		m_value( std::forward< Args >( args )... )
+	{
+	}
+	~NeverDestroyed() {}
+
+	NeverDestroyed( const NeverDestroyed & ) = delete;
+	NeverDestroyed &operator=( const NeverDestroyed & ) = delete;
+
+	T m_value;
+};
+
+}
 // Skip forward past the directory
 static const char *SkipToFname( const tchar* pFile )
 {
@@ -141,6 +167,14 @@ DBG_INTERFACE SpewRetval_t DefaultSpewFuncAbortOnAsserts( SpewType_t type, const
 	return r;
 }
 
+// dimhotepus: Thread-safe "warn only once per call site", replaces ExecuteOnce
+// whose thread-safety is not guaranteed.
+#define DBG_WARNING_ONCE( ... )												\
+	do {																	\
+		static std::atomic<bool> s_bWarned{ false };						\
+		if ( !s_bWarned.exchange( true, std::memory_order_relaxed ) )		\
+			Warning( __VA_ARGS__ );											\
+	} while ( 0 )
 
 //-----------------------------------------------------------------------------
 // Globals
@@ -952,28 +986,45 @@ void SpewDeactivate()
 // functions in and printfs with %f cause runtime errors in the C libraries.
 DBG_INTERFACE float CrackSmokingCompiler( float a )
 {
-	return static_cast<float>( fabs( a ) );
+	// dimhotepus: static_cast<float>( fabs( a ) ) -> std::fabs( a ), float overload.
+	return std::fabs( a );
+}
+
+// dimhotepus: Serializes appends to the small helper log files below.
+static std::mutex &LogFilesMutex()
+{
+	static NeverDestroyed<std::mutex> s_mutex;
+	return s_mutex.m_value;
 }
 
 void* Plat_SimpleLog( const tchar* file, int line )
 {
 	constexpr char kLogFileName[] = "simple.log";
 
+	// dimhotepus: Serialize appends, warn (once, thread-safe) outside the lock.
+	bool bOpenFailed = false, bWriteFailed = false;
+	{
+		std::lock_guard lock( LogFilesMutex() );
+
 	auto [f, rc] = s1::posix::posix_file_stream_factory::open( kLogFileName, "at+" );
-	if (!rc)
+		if ( !rc )
 	{
 		size_t size;
 		std::tie(size, rc) = f.print( "%s:%i\n", file, line );
 
-		if (!rc)
-		{
-			ExecuteOnce( Warning("Write to '%s' failed.\n", kLogFileName) )
-		}
+			// dimhotepus: Was "if (!rc)", i.e. warned on every *successful* write.
+			bWriteFailed = static_cast<bool>( rc );
 	}
 	else
 	{
-		ExecuteOnce( Warning("Unable to open '%s' as 'at+'.\n", kLogFileName) )
+			bOpenFailed = true;
+		}
 	}
+
+	if ( bWriteFailed )
+		DBG_WARNING_ONCE( "Write to '%s' failed.\n", kLogFileName );
+	if ( bOpenFailed )
+		DBG_WARNING_ONCE( "Unable to open '%s' as 'at+'.\n", kLogFileName );
 
 	return nullptr;
 }
@@ -1000,21 +1051,21 @@ void ValidateSpew( CValidator &validator )
 //-----------------------------------------------------------------------------
 void COM_TimestampedLog( PRINTF_FORMAT_STRING char const *fmt, ... )
 {
-	// dimhotepus: Store time as double
-	static double last_time_stamp = 0.0;
-	static bool should_log = false;
-	static bool should_log_2_etw = false;
-	static bool is_log_checked = false;
-	static bool	is_first_write = false;
-
-	if ( !is_log_checked )
+	// dimhotepus: The function-local statics used to be plain bools / double
+	// written from any thread. Settings are now a magic static, mutable state
+	// lives under a mutex.
+	struct LogSettings
 	{
-		should_log_2_etw = CommandLine()->HasParm( "-etwprofile" );
-		should_log = should_log_2_etw || CommandLine()->HasParm( "-profile" );
-		is_log_checked = true;
-	}
+		bool should_log;
+		bool should_log_2_etw;
+	};
+	static const LogSettings settings = []
+	{
+		const bool etw = CommandLine()->HasParm( "-etwprofile" );
+		return LogSettings{ etw || CommandLine()->HasParm( "-profile" ), etw };
+	}();
 
-	if ( !should_log )
+	if ( !settings.should_log )
 	{
 		return;
 	}
@@ -1024,49 +1075,74 @@ void COM_TimestampedLog( PRINTF_FORMAT_STRING char const *fmt, ... )
 	va_start( argptr, fmt ); //-V2018 //-V2019
 	vsnprintf( message, sizeof( message ), fmt, argptr );
 	va_end( argptr );
+	// dimhotepus: Explicit termination for pre-C99 CRTs.
+	message[ std::size( message ) - 1 ] = '\0';
+
+	constexpr char kLogFileName[] = "timestamped.log";
+
+	// dimhotepus: Save errno at the failure point, report outside the lock.
+	int removeErrno = 0;
+	bool bOpenFailed = false, bWriteFailed = false;
+	{
+		std::lock_guard lock( LogFilesMutex() );
+
+		// dimhotepus: Store time as double
+		static double last_time_stamp = 0.0;
+		// dimhotepus: Renamed from is_first_write, which meant the opposite.
+		static bool is_log_file_reset = false;
 
 	const double now_stamp{Plat_FloatTime()};
 
 	// If ETW profiling is enabled then do it only.
-	if ( should_log_2_etw )
+		if ( settings.should_log_2_etw )
 	{
 		ETWMark( message );
 	}
 	else
 	{
-		constexpr char kLogFileName[] = "timestamped.log";
-
-		if ( !is_first_write )
+			if ( !is_log_file_reset )
 		{
-			if ( unlink( kLogFileName ) )
+				// dimhotepus: std::remove is standard on every platform
+				// (unlink is POSIX-only / deprecated on MSVC). A missing file
+				// on first run is not an error.
+				if ( std::remove( kLogFileName ) != 0 && errno != ENOENT )
 			{
-				Warning( "Unable to remove timestamp log file '%s': %s.\n",
-					kLogFileName,
-					std::generic_category().message(errno).c_str() );
+					removeErrno = errno;
 			}
 
-			is_first_write = true;
+				is_log_file_reset = true;
 		}
 
 		auto [file, rc] = s1::posix::posix_file_stream_factory::open( kLogFileName, "at+" );
-		if (!rc)
+			if ( !rc )
 		{
 			size_t size;
 			std::tie(size, rc) =
 				file.print( "[%8.4f | %8.4f]:  %s\n", now_stamp, now_stamp - last_time_stamp, message );
 
-			if (!rc)
-			{
-				ExecuteOnce( Warning("Write to '%s' failed.\n", kLogFileName) )
-			}
+				// dimhotepus: Was "if (!rc)", i.e. warned on every *successful* write.
+				bWriteFailed = static_cast<bool>( rc );
 		}
 		else
 		{
-			ExecuteOnce( Warning("Unable to open '%s' as 'at+'.\n", kLogFileName) )
+				bOpenFailed = true;
 		}
 	}
 
 	last_time_stamp = now_stamp;
+}
+
+	// dimhotepus: Never spew under the lock.
+	if ( removeErrno )
+	{
+		Warning( "Unable to remove timestamp log file '%s': %s.\n",
+			kLogFileName,
+			std::generic_category().message( removeErrno ).c_str() );
+	}
+	if ( bWriteFailed )
+		DBG_WARNING_ONCE( "Write to '%s' failed.\n", kLogFileName );
+	if ( bOpenFailed )
+		DBG_WARNING_ONCE( "Unable to open '%s' as 'at+'.\n", kLogFileName );
 }
 
 //-----------------------------------------------------------------------------
