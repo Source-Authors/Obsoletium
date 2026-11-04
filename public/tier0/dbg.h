@@ -247,9 +247,16 @@ DBG_INTERFACE void SetAssertDialogParent( struct SDL_Window *window );
 DBG_INTERFACE struct SDL_Window * GetAssertDialogParent();
 #endif
 
-// Token pasting helpers (expand arguments before pasting, so __LINE__ works).
+// dimhotepus: Token pasting helpers (expand arguments before pasting, so __LINE__ works).
 #define SE_DBG_INTERNAL_CONCAT_IMPL( a, b )	a##b
 #define SE_DBG_INTERNAL_CONCAT( a, b )			SE_DBG_INTERNAL_CONCAT_IMPL( a, b )
+// dimhotepus: Unique id per expansion, so two guards on one line do not collide.
+// __COUNTER__ is supported by MSVC, GCC and Clang; fall back to __LINE__.
+#if defined( __COUNTER__ )
+#define SE_DBG_INTERNAL_UNIQUE_ID				__COUNTER__
+#else
+#define SE_DBG_INTERNAL_UNIQUE_ID				__LINE__
+#endif
 
 /* Used to define macros, never use these directly. */
 
@@ -578,21 +585,26 @@ DBG_INTERFACE void COM_TimestampedLog( PRINTF_FORMAT_STRING char const *fmt, ...
 //-----------------------------------------------------------------------------
 
 #ifndef _RETAIL
+// dimhotepus: explicit ctor, non-copyable, SCOPE_MSG uses unique name so it can be used twice in one scope.
 class CScopeMsg
 {
 public:
-	CScopeMsg( const char *pszScope )
+	explicit CScopeMsg( const char *pszScope )
+		: m_pszScope{ pszScope }
 	{
-		m_pszScope = pszScope;
 		Msg( "%s { ", pszScope );
 	}
 	~CScopeMsg()
 	{
 		Msg( "} %s", m_pszScope );
 	}
+
+	CScopeMsg( const CScopeMsg & ) = delete;
+	CScopeMsg &operator=( const CScopeMsg & ) = delete;
+
 	const char *m_pszScope;
 };
-#define SCOPE_MSG( msg ) CScopeMsg scopeMsg( msg )
+#define SCOPE_MSG( msg ) CScopeMsg SE_DBG_INTERNAL_CONCAT( scopeMsg, SE_DBG_INTERNAL_UNIQUE_ID )( msg )
 #else
 #define SCOPE_MSG( msg )
 #endif
