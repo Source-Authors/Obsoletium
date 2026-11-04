@@ -90,20 +90,24 @@ union NeverDestroyed
 // fiasco) and never destroyed at exit; safe to use at any time from any thread.
 constexpr Color s_DefaultOutputColor( 255, 255, 255, 255 );
 
-}
 // Skip forward past the directory
-static const char *SkipToFname( const tchar* pFile )
+// dimhotepus: Returns const tchar* (was const char*) to match the parameter type.
+[[nodiscard]] const tchar *SkipToFname( const tchar* pFile )
 {
 	if ( pFile == nullptr )
-		return "unknown";
-	const tchar* pSlash = _tcsrchr( pFile, '\\' );
-	const tchar* pSlash2 = _tcsrchr( pFile, '/' );
-	if (pSlash < pSlash2) pSlash = pSlash2;
-	return pSlash ? pSlash + 1: pFile;
+		return _T("unknown");
+
+	const tchar* pSlash = _tcsrchr( pFile, _T('\\') );
+	const tchar* pSlash2 = _tcsrchr( pFile, _T('/') );
+	// dimhotepus: Relational comparison against nullptr is unspecified, handle explicitly.
+	if ( !pSlash || ( pSlash2 && pSlash2 > pSlash ) )
+		pSlash = pSlash2;
+
+	return pSlash ? pSlash + 1 : pFile;
 }
 
 // dimhotepus: Is string uniform?
-[[nodiscard]] static inline bool V_isuniform(IN_Z const char* string, char value) {
+[[nodiscard]] inline bool V_isuniform(IN_Z const char* string, char value) {
   if (!string || !*string) return false;
   while (*string) {
     if (*string != value) {
@@ -112,6 +116,7 @@ static const char *SkipToFname( const tchar* pFile )
     ++string;
   }
   return true;
+}
 }
 
 template <size_t out_size>
