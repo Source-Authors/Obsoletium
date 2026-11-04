@@ -714,18 +714,22 @@ template< class Type >
 class CDataWatcher
 {
 public:
+	// dimhotepus: The deleted copy ctor suppressed the implicit default ctor,
+	// so "CDataWatcher<int> w;" did not compile.
+	CDataWatcher() = default;
+	// dimhotepus: "CDataWatcher<Type>(...)" as ctor name is ill-formed in C++20.
+	CDataWatcher( const CDataWatcher &val ) = delete;
+
 	const Type& operator=( const Type &val ) 
 	{ 
 		return Set( val ); 
 	}
 	
-	const Type& operator=( const CDataWatcher<Type> &val ) 
+	const Type& operator=( const CDataWatcher &val ) 
 	{ 
 		return Set( val.m_Value ); 
 	}
 
-	CDataWatcher<Type>( const CDataWatcher<Type> &val ) = delete;
-	
 	const Type& Set( const Type &val )
 	{
 		// Put your breakpoint here
@@ -816,7 +820,7 @@ public:
 		return &m_Value; 
 	}
 	
-	Type m_Value;
+	Type m_Value{};
 	
 };
 
