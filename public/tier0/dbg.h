@@ -10,7 +10,8 @@
 #include <cstdio>
 #include <cstdarg>
 
-#ifdef POSIX
+// dimhotepus: platform.h already provides an empty __cdecl on POSIX.
+#if defined( POSIX ) && !defined( __cdecl )
 #define __cdecl
 #endif
 
