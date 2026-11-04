@@ -7,10 +7,13 @@
 #include "dbgflag.h"
 #include "platform.h"
 
+// dimhotepus: Include what we use instead of relying on transitive includes.
 #include <atomic>       // std::atomic (thread-safe *Once asserts, reentry guard)
 #include <cmath>        // std::fabs (Assert*FloatEquals)
 #include <cstdarg>
+#include <cstdio>
 #include <cstdlib>      // EXIT_FAILURE (Plat_FatalError)
+#include <iterator>     // std::size (CDbgFmtMsg)
 #include <type_traits>  // std::enable_if_t, std::is_pointer_v (assert_cast)
 
 // dimhotepus: platform.h already provides an empty __cdecl on POSIX.
@@ -720,10 +723,12 @@ public:
 		va_list arg_ptr;
 
 		va_start(arg_ptr, pszFormat); //-V2019 //-V2018
-		_vsntprintf(m_szBuf, sizeof(m_szBuf)-1, pszFormat, arg_ptr);
+		// dimhotepus: Size in characters, not bytes (tchar may be wchar_t).
+		// MSVC's _vsnprintf does not terminate on truncation, hence the explicit 0.
+		_vsntprintf(m_szBuf, std::size(m_szBuf) - 1, pszFormat, arg_ptr);
 		va_end(arg_ptr);
 
-		m_szBuf[sizeof(m_szBuf)-1] = 0;
+		m_szBuf[std::size(m_szBuf) - 1] = 0;
 	}
 
 	operator const tchar *() const
@@ -771,6 +776,7 @@ public:
 		return Set( val ); 
 	}
 	
+	// dimhotepus: Use injected class name instead of CDataWatcher<Type>.
 	const Type& operator=( const CDataWatcher &val ) 
 	{ 
 		return Set( val.m_Value ); 
@@ -867,6 +873,7 @@ public:
 		return &m_Value; 
 	}
 	
+	// dimhotepus: Value-initialize, was indeterminate for scalar types.
 	Type m_Value{};
 	
 };
