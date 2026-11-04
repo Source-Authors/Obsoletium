@@ -9,6 +9,7 @@
 
 #include <cstdio>
 #include <cstdarg>
+#include <cstdlib>      // EXIT_FAILURE (Plat_FatalError)
 
 // dimhotepus: platform.h already provides an empty __cdecl on POSIX.
 #if defined( POSIX ) && !defined( __cdecl )
@@ -834,12 +835,14 @@ private:
 
 
 // This is horrible, but we don't want to integrate CS:GO new logging system atm.
-#define Log_Warning( ignore, ... )	::Msg( __VA_ARGS__ ); ::Log( __VA_ARGS__ );
-#define Log_Msg( ignore, ... )		::Warning( __VA_ARGS__ ); ::Log( __VA_ARGS__ );
-#define Log_Error( ignore, ... )		::Error( __VA_ARGS__ );
-// dimhotepus: TF2 backport.
-#define DECLARE_LOGGING_CHANNEL(...);
-#define DEFINE_LOGGING_CHANNEL_NO_TAGS( ... );
+// dimhotepus: Log_Warning / Log_Msg were swapped (Warning went to Msg and vice
+// versa). All three are now single statements, safe inside if/else.
+#define Log_Warning( ignore, ... )	do { ::Warning( __VA_ARGS__ ); ::Log( __VA_ARGS__ ); } while ( 0 )
+#define Log_Msg( ignore, ... )		do { ::Msg( __VA_ARGS__ ); ::Log( __VA_ARGS__ ); } while ( 0 )
+#define Log_Error( ignore, ... )	::Error( __VA_ARGS__ )
+// dimhotepus: TF2 backport. Expand to a declaration so the caller's ';' is not an extra semicolon.
+#define DECLARE_LOGGING_CHANNEL( ... )			static_assert( true, "" )
+#define DEFINE_LOGGING_CHANNEL_NO_TAGS( ... )	static_assert( true, "" )
 #define Plat_FatalError( ... ) do { Log_Error( LOG_GENERAL, __VA_ARGS__ ); Plat_ExitProcess( EXIT_FAILURE ); } while( 0 )
 
 #endif  // !SE_PUBLIC_TIER0_DBG_H_
