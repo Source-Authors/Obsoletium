@@ -1264,7 +1264,8 @@ void CMaterialSystem::RestoreShaderObjects( CreateInterfaceFn shaderFactory, int
 //-----------------------------------------------------------------------------
 void CMaterialSystem::SpewDriverInfo() const
 {
-	Warning( "ShaderAPI: %s\n", m_pShaderDLL );
+	// dimhotepus: ShaderAPI -> Shader API.
+	Warning( "Shader API: %s\n", m_pShaderDLL );
 	g_pShaderDevice->SpewDriverInfo();
 }
 

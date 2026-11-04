@@ -3307,6 +3307,7 @@ static void Host_InitRam()
 static void Host_InitGpu()
 {
 	Cbuf_AddText("star_gpu");
+	Cbuf_AddText("mat_info");
 }
 
 static void Host_InitAudio()

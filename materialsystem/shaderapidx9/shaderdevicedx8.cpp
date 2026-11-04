@@ -1814,156 +1814,157 @@ void CShaderDeviceDx8::SpewDriverInfo() const
 	}
 
 	// dimhotepus: Dump version in high.low format.
-	Warning("Shader API Driver Info:\n\nDriver : %s Version : %lu.%lu\n",
+	Msg("GPU Driver Info:\nDriver: %s (v. %lu.%lu)\n",
 		ident.Driver, ident.DriverVersion.HighPart, ident.DriverVersion.LowPart );
-	Warning("Driver Description :  %s\n", ident.Description );
+	Msg("GPU Driver Description: %s\n", ident.Description );
 	// dimhotepus: Dump version with dots.
-	Warning("GPU version %lu.%lu.%lu.%lu\n\n", 
+	Msg("GPU version %lu.%lu.%lu.%lu\n", 
 		ident.VendorId, ident.DeviceId, ident.SubSysId, ident.Revision );
 
 	ShaderDisplayMode_t mode;
 	g_pShaderDeviceMgr->GetCurrentModeInfo( &mode, m_nAdapter );
-	Warning("Display mode : %d x %d (%s)\n", 
+	Msg("Display mode: %d x %d (%s)\n", 
 		mode.m_nWidth, mode.m_nHeight, ImageLoader::GetName( mode.m_Format ) );
-	Warning("Vertex Shader Version : %d.%d Pixel Shader Version : %d.%d\n",
+	Msg("Vertex Shader Version: %d.%d Pixel Shader Version: %d.%d\n",
 		(caps.VertexShaderVersion >> 8) & 0xFF, caps.VertexShaderVersion & 0xFF,
 		(caps.PixelShaderVersion >> 8) & 0xFF, caps.PixelShaderVersion & 0xFF);
-	Warning("\nDevice Caps :\n");
-	Warning("CANBLTSYSTONONLOCAL %s CANRENDERAFTERFLIP %s HWRASTERIZATION %s\n",
+
+	Msg("Device Caps:\n");
+	Msg("CANBLTSYSTONONLOCAL %s CANRENDERAFTERFLIP %s HWRASTERIZATION %s\n",
 		(caps.DevCaps & D3DDEVCAPS_CANBLTSYSTONONLOCAL) ? " Y " : " N ",
 		(caps.DevCaps & D3DDEVCAPS_CANRENDERAFTERFLIP) ? " Y " : " N ",
 		(caps.DevCaps & D3DDEVCAPS_HWRASTERIZATION) ? " Y " : "*N*" );
-	Warning("HWTRANSFORMANDLIGHT %s NPATCHES %s PUREDEVICE %s\n",
+	Msg("HWTRANSFORMANDLIGHT %s NPATCHES %s PUREDEVICE %s\n",
 		(caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT) ? " Y " : " N ",
 		(caps.DevCaps & D3DDEVCAPS_NPATCHES) ? " Y " : " N ",
 		(caps.DevCaps & D3DDEVCAPS_PUREDEVICE) ? " Y " : " N " );
-	Warning("SEPARATETEXTUREMEMORIES %s TEXTURENONLOCALVIDMEM %s TEXTURESYSTEMMEMORY %s\n",
+	Msg("SEPARATETEXTUREMEMORIES %s TEXTURENONLOCALVIDMEM %s TEXTURESYSTEMMEMORY %s\n",
 		(caps.DevCaps & D3DDEVCAPS_SEPARATETEXTUREMEMORIES) ? "*Y*" : " N ",
 		(caps.DevCaps & D3DDEVCAPS_TEXTURENONLOCALVIDMEM) ? " Y " : " N ",
 		(caps.DevCaps & D3DDEVCAPS_TEXTURESYSTEMMEMORY) ? " Y " : " N " );
-	Warning("TEXTUREVIDEOMEMORY %s TLVERTEXSYSTEMMEMORY %s TLVERTEXVIDEOMEMORY %s\n",
+	Msg("TEXTUREVIDEOMEMORY %s TLVERTEXSYSTEMMEMORY %s TLVERTEXVIDEOMEMORY %s\n",
 		(caps.DevCaps & D3DDEVCAPS_TEXTUREVIDEOMEMORY) ? " Y " : "*N*",
 		(caps.DevCaps & D3DDEVCAPS_TLVERTEXSYSTEMMEMORY) ? " Y " : "*N*",
 		(caps.DevCaps & D3DDEVCAPS_TLVERTEXVIDEOMEMORY) ? " Y " : " N " );
 
-	Warning("\nPrimitive Caps :\n");
-	Warning("BLENDOP %s CLIPPLANESCALEDPOINTS %s CLIPTLVERTS %s\n",
+	Msg("Primitive Caps:\n");
+	Msg("BLENDOP %s CLIPPLANESCALEDPOINTS %s CLIPTLVERTS %s\n",
 		(caps.PrimitiveMiscCaps & D3DPMISCCAPS_BLENDOP) ? " Y " : " N ",
 		(caps.PrimitiveMiscCaps & D3DPMISCCAPS_CLIPPLANESCALEDPOINTS) ? " Y " : " N ",
 		(caps.PrimitiveMiscCaps & D3DPMISCCAPS_CLIPTLVERTS) ? " Y " : " N " );
-	Warning("COLORWRITEENABLE %s MASKZ %s TSSARGTEMP %s\n",
+	Msg("COLORWRITEENABLE %s MASKZ %s TSSARGTEMP %s\n",
 		(caps.PrimitiveMiscCaps & D3DPMISCCAPS_COLORWRITEENABLE) ? " Y " : " N ",
 		(caps.PrimitiveMiscCaps & D3DPMISCCAPS_MASKZ) ? " Y " : "*N*",
 		(caps.PrimitiveMiscCaps & D3DPMISCCAPS_TSSARGTEMP) ? " Y " : " N " );
 
-	Warning("\nRaster Caps :\n");
-	Warning("FOGRANGE %s FOGTABLE %s FOGVERTEX %s ZFOG %s WFOG %s\n",
+	Msg("Raster Caps:\n");
+	Msg("FOGRANGE %s FOGTABLE %s FOGVERTEX %s ZFOG %s WFOG %s\n",
 		(caps.RasterCaps & D3DPRASTERCAPS_FOGRANGE) ? " Y " : " N ",
 		(caps.RasterCaps & D3DPRASTERCAPS_FOGTABLE) ? " Y " : " N ",
 		(caps.RasterCaps & D3DPRASTERCAPS_FOGVERTEX) ? " Y " : " N ",
 		(caps.RasterCaps & D3DPRASTERCAPS_ZFOG) ? " Y " : " N ",
 		(caps.RasterCaps & D3DPRASTERCAPS_WFOG) ? " Y " : " N " );
-	Warning("MIPMAPLODBIAS %s WBUFFER %s ZBIAS %s ZTEST %s\n",
+	Msg("MIPMAPLODBIAS %s WBUFFER %s ZBIAS %s ZTEST %s\n",
 		(caps.RasterCaps & D3DPRASTERCAPS_MIPMAPLODBIAS) ? " Y " : " N ",
 		(caps.RasterCaps & D3DPRASTERCAPS_WBUFFER) ? " Y " : " N ",
 		(caps.RasterCaps & D3DPRASTERCAPS_DEPTHBIAS) ? " Y " : " N ",
 		(caps.RasterCaps & D3DPRASTERCAPS_ZTEST) ? " Y " : "*N*" );
 
-	Warning("Size of Texture Memory : %zu KiB\n", g_pHardwareConfig->Caps().m_TextureMemorySize / 1024 );
-	Warning("Max Texture Dimensions : %d x %d\n", 
+	Msg("Size of Texture Memory: %zu KiB\n", g_pHardwareConfig->Caps().m_TextureMemorySize / 1024 );
+	Msg("Max Texture Dimensions: %d x %d\n", 
 		caps.MaxTextureWidth, caps.MaxTextureHeight );
 	if (caps.MaxTextureAspectRatio != 0)
-		Warning("Max Texture Aspect Ratio : *%d*\n", caps.MaxTextureAspectRatio );
-	Warning("Max Textures : %d Max Stages : %d\n", 
+		Msg("Max Texture Aspect Ratio : *%d*\n", caps.MaxTextureAspectRatio );
+	Msg("Max Textures: %d Max Stages : %d\n", 
 		caps.MaxSimultaneousTextures, caps.MaxTextureBlendStages );
 
-	Warning("\nTexture Caps :\n");
-	Warning("ALPHA %s CUBEMAP %s MIPCUBEMAP %s SQUAREONLY %s\n",
+	Msg("Texture Caps:\n");
+	Msg("ALPHA %s CUBEMAP %s MIPCUBEMAP %s SQUAREONLY %s\n",
 		(caps.TextureCaps & D3DPTEXTURECAPS_ALPHA) ? " Y " : " N ",
 		(caps.TextureCaps & D3DPTEXTURECAPS_CUBEMAP) ? " Y " : " N ",
 		(caps.TextureCaps & D3DPTEXTURECAPS_MIPCUBEMAP) ? " Y " : " N ",
 		(caps.TextureCaps & D3DPTEXTURECAPS_SQUAREONLY) ? "*Y*" : " N " );
 
-	Warning( "vendor id: 0x%x\n", g_pHardwareConfig->ActualCaps().m_VendorID );
-	Warning( "device id: 0x%x\n", g_pHardwareConfig->ActualCaps().m_DeviceID );
+	Msg( "vendor id: 0x%x\n", g_pHardwareConfig->ActualCaps().m_VendorID );
+	Msg( "device id: 0x%x\n", g_pHardwareConfig->ActualCaps().m_DeviceID );
 
-	Warning( "SHADERAPI CAPS:\n" );
-	Warning( "m_NumSamplers: %d\n", g_pHardwareConfig->Caps().m_NumSamplers );
-	Warning( "m_NumTextureStages: %d\n", g_pHardwareConfig->Caps().m_NumTextureStages );
-	Warning( "m_HasSetDeviceGammaRamp: %s\n", g_pHardwareConfig->Caps().m_HasSetDeviceGammaRamp ? "yes" : "no" );
-	Warning( "m_SupportsVertexShaders (1.1): %s\n", g_pHardwareConfig->Caps().m_SupportsVertexShaders ? "yes" : "no" );
-	Warning( "m_SupportsVertexShaders_2_0: %s\n", g_pHardwareConfig->Caps().m_SupportsVertexShaders_2_0 ? "yes" : "no" );
-	Warning( "m_SupportsPixelShaders (1.1): %s\n", g_pHardwareConfig->Caps().m_SupportsPixelShaders ? "yes" : "no" );
-	Warning( "m_SupportsPixelShaders_1_4: %s\n", g_pHardwareConfig->Caps().m_SupportsPixelShaders_1_4 ? "yes" : "no" );
-	Warning( "m_SupportsPixelShaders_2_0: %s\n", g_pHardwareConfig->Caps().m_SupportsPixelShaders_2_0 ? "yes" : "no" );
-	Warning( "m_SupportsPixelShaders_2_b: %s\n", g_pHardwareConfig->Caps().m_SupportsPixelShaders_2_b ? "yes" : "no" );
-	Warning( "m_SupportsShaderModel_3_0: %s\n", g_pHardwareConfig->Caps().m_SupportsShaderModel_3_0 ? "yes" : "no" );
+	Msg( "SHADERAPI CAPS:\n" );
+	Msg( "m_NumSamplers: %d\n", g_pHardwareConfig->Caps().m_NumSamplers );
+	Msg( "m_NumTextureStages: %d\n", g_pHardwareConfig->Caps().m_NumTextureStages );
+	Msg( "m_HasSetDeviceGammaRamp: %s\n", g_pHardwareConfig->Caps().m_HasSetDeviceGammaRamp ? "yes" : "no" );
+	Msg( "m_SupportsVertexShaders (1.1): %s\n", g_pHardwareConfig->Caps().m_SupportsVertexShaders ? "yes" : "no" );
+	Msg( "m_SupportsVertexShaders_2_0: %s\n", g_pHardwareConfig->Caps().m_SupportsVertexShaders_2_0 ? "yes" : "no" );
+	Msg( "m_SupportsPixelShaders (1.1): %s\n", g_pHardwareConfig->Caps().m_SupportsPixelShaders ? "yes" : "no" );
+	Msg( "m_SupportsPixelShaders_1_4: %s\n", g_pHardwareConfig->Caps().m_SupportsPixelShaders_1_4 ? "yes" : "no" );
+	Msg( "m_SupportsPixelShaders_2_0: %s\n", g_pHardwareConfig->Caps().m_SupportsPixelShaders_2_0 ? "yes" : "no" );
+	Msg( "m_SupportsPixelShaders_2_b: %s\n", g_pHardwareConfig->Caps().m_SupportsPixelShaders_2_b ? "yes" : "no" );
+	Msg( "m_SupportsShaderModel_3_0: %s\n", g_pHardwareConfig->Caps().m_SupportsShaderModel_3_0 ? "yes" : "no" );
 	
 	switch( g_pHardwareConfig->Caps().m_SupportsCompressedTextures )
 	{
 	case COMPRESSED_TEXTURES_ON:
-		Warning( "m_SupportsCompressedTextures: COMPRESSED_TEXTURES_ON\n" );
+		Msg( "m_SupportsCompressedTextures: COMPRESSED_TEXTURES_ON\n" );
 		break;
 	case COMPRESSED_TEXTURES_OFF:
-		Warning( "m_SupportsCompressedTextures: COMPRESSED_TEXTURES_OFF\n" );
+		Msg( "m_SupportsCompressedTextures: COMPRESSED_TEXTURES_OFF\n" );
 		break;
 	case COMPRESSED_TEXTURES_NOT_INITIALIZED:
-		Warning( "m_SupportsCompressedTextures: COMPRESSED_TEXTURES_NOT_INITIALIZED\n" );
+		Msg( "m_SupportsCompressedTextures: COMPRESSED_TEXTURES_NOT_INITIALIZED\n" );
 		break;
 	default:
 		Assert( 0 );
 		break;
 	}
-	Warning( "m_SupportsCompressedVertices: %d\n", g_pHardwareConfig->Caps().m_SupportsCompressedVertices );
-	Warning( "m_bSupportsAnisotropicFiltering: %s\n", g_pHardwareConfig->Caps().m_bSupportsAnisotropicFiltering ? "yes" : "no" );
-	Warning( "m_nMaxAnisotropy: %d\n", g_pHardwareConfig->Caps().m_nMaxAnisotropy );
-	Warning( "m_MaxTextureWidth: %d\n", g_pHardwareConfig->Caps().m_MaxTextureWidth );
-	Warning( "m_MaxTextureHeight: %d\n", g_pHardwareConfig->Caps().m_MaxTextureHeight );
-	Warning( "m_MaxTextureAspectRatio: %d\n", g_pHardwareConfig->Caps().m_MaxTextureAspectRatio );
-	Warning( "m_MaxPrimitiveCount: %u\n", g_pHardwareConfig->Caps().m_MaxPrimitiveCount );
-	Warning( "m_ZBiasAndSlopeScaledDepthBiasSupported: %s\n", g_pHardwareConfig->Caps().m_ZBiasAndSlopeScaledDepthBiasSupported ? "yes" : "no" );
-	Warning( "m_SupportsMipmapping: %s\n", g_pHardwareConfig->Caps().m_SupportsMipmapping ? "yes" : "no" );
-	Warning( "m_SupportsOverbright: %s\n", g_pHardwareConfig->Caps().m_SupportsOverbright ? "yes" : "no" );
-	Warning( "m_SupportsCubeMaps: %s\n", g_pHardwareConfig->Caps().m_SupportsCubeMaps ? "yes" : "no" );
-	Warning( "m_NumPixelShaderConstants: %d\n", g_pHardwareConfig->Caps().m_NumPixelShaderConstants );
-	Warning( "m_NumVertexShaderConstants: %d\n", g_pHardwareConfig->Caps().m_NumVertexShaderConstants );
-	Warning( "m_NumBooleanVertexShaderConstants: %d\n", g_pHardwareConfig->Caps().m_NumBooleanVertexShaderConstants );
-	Warning( "m_NumIntegerVertexShaderConstants: %d\n", g_pHardwareConfig->Caps().m_NumIntegerVertexShaderConstants );
-	Warning( "m_TextureMemorySize: %zu\n", g_pHardwareConfig->Caps().m_TextureMemorySize );
-	Warning( "m_MaxNumLights: %d\n", g_pHardwareConfig->Caps().m_MaxNumLights );
-	Warning( "m_SupportsHardwareLighting: %s\n", g_pHardwareConfig->Caps().m_SupportsHardwareLighting ? "yes" : "no" );
-	Warning( "m_MaxBlendMatrices: %d\n", g_pHardwareConfig->Caps().m_MaxBlendMatrices );
-	Warning( "m_MaxBlendMatrixIndices: %d\n", g_pHardwareConfig->Caps().m_MaxBlendMatrixIndices );
-	Warning( "m_MaxVertexShaderBlendMatrices: %d\n", g_pHardwareConfig->Caps().m_MaxVertexShaderBlendMatrices );
-	Warning( "m_SupportsMipmappedCubemaps: %s\n", g_pHardwareConfig->Caps().m_SupportsMipmappedCubemaps ? "yes" : "no" );
-	Warning( "m_SupportsNonPow2Textures: %s\n", g_pHardwareConfig->Caps().m_SupportsNonPow2Textures ? "yes" : "no" );
-	Warning( "m_nDXSupportLevel: %d\n", g_pHardwareConfig->Caps().m_nDXSupportLevel );
-	Warning( "m_PreferDynamicTextures: %s\n", g_pHardwareConfig->Caps().m_PreferDynamicTextures ? "yes" : "no" );
-	Warning( "m_HasProjectedBumpEnv: %s\n", g_pHardwareConfig->Caps().m_HasProjectedBumpEnv ? "yes" : "no" );
-	Warning( "m_MaxUserClipPlanes: %d\n", g_pHardwareConfig->Caps().m_MaxUserClipPlanes );
-	Warning( "m_SupportsSRGB: %s\n", g_pHardwareConfig->Caps().m_SupportsSRGB ? "yes" : "no" );
+	Msg( "m_SupportsCompressedVertices: %d\n", g_pHardwareConfig->Caps().m_SupportsCompressedVertices );
+	Msg( "m_bSupportsAnisotropicFiltering: %s\n", g_pHardwareConfig->Caps().m_bSupportsAnisotropicFiltering ? "yes" : "no" );
+	Msg( "m_nMaxAnisotropy: %d\n", g_pHardwareConfig->Caps().m_nMaxAnisotropy );
+	Msg( "m_MaxTextureWidth: %d\n", g_pHardwareConfig->Caps().m_MaxTextureWidth );
+	Msg( "m_MaxTextureHeight: %d\n", g_pHardwareConfig->Caps().m_MaxTextureHeight );
+	Msg( "m_MaxTextureAspectRatio: %d\n", g_pHardwareConfig->Caps().m_MaxTextureAspectRatio );
+	Msg( "m_MaxPrimitiveCount: %u\n", g_pHardwareConfig->Caps().m_MaxPrimitiveCount );
+	Msg( "m_ZBiasAndSlopeScaledDepthBiasSupported: %s\n", g_pHardwareConfig->Caps().m_ZBiasAndSlopeScaledDepthBiasSupported ? "yes" : "no" );
+	Msg( "m_SupportsMipmapping: %s\n", g_pHardwareConfig->Caps().m_SupportsMipmapping ? "yes" : "no" );
+	Msg( "m_SupportsOverbright: %s\n", g_pHardwareConfig->Caps().m_SupportsOverbright ? "yes" : "no" );
+	Msg( "m_SupportsCubeMaps: %s\n", g_pHardwareConfig->Caps().m_SupportsCubeMaps ? "yes" : "no" );
+	Msg( "m_NumPixelShaderConstants: %d\n", g_pHardwareConfig->Caps().m_NumPixelShaderConstants );
+	Msg( "m_NumVertexShaderConstants: %d\n", g_pHardwareConfig->Caps().m_NumVertexShaderConstants );
+	Msg( "m_NumBooleanVertexShaderConstants: %d\n", g_pHardwareConfig->Caps().m_NumBooleanVertexShaderConstants );
+	Msg( "m_NumIntegerVertexShaderConstants: %d\n", g_pHardwareConfig->Caps().m_NumIntegerVertexShaderConstants );
+	Msg( "m_TextureMemorySize: %zu\n", g_pHardwareConfig->Caps().m_TextureMemorySize );
+	Msg( "m_MaxNumLights: %d\n", g_pHardwareConfig->Caps().m_MaxNumLights );
+	Msg( "m_SupportsHardwareLighting: %s\n", g_pHardwareConfig->Caps().m_SupportsHardwareLighting ? "yes" : "no" );
+	Msg( "m_MaxBlendMatrices: %d\n", g_pHardwareConfig->Caps().m_MaxBlendMatrices );
+	Msg( "m_MaxBlendMatrixIndices: %d\n", g_pHardwareConfig->Caps().m_MaxBlendMatrixIndices );
+	Msg( "m_MaxVertexShaderBlendMatrices: %d\n", g_pHardwareConfig->Caps().m_MaxVertexShaderBlendMatrices );
+	Msg( "m_SupportsMipmappedCubemaps: %s\n", g_pHardwareConfig->Caps().m_SupportsMipmappedCubemaps ? "yes" : "no" );
+	Msg( "m_SupportsNonPow2Textures: %s\n", g_pHardwareConfig->Caps().m_SupportsNonPow2Textures ? "yes" : "no" );
+	Msg( "m_nDXSupportLevel: %d\n", g_pHardwareConfig->Caps().m_nDXSupportLevel );
+	Msg( "m_PreferDynamicTextures: %s\n", g_pHardwareConfig->Caps().m_PreferDynamicTextures ? "yes" : "no" );
+	Msg( "m_HasProjectedBumpEnv: %s\n", g_pHardwareConfig->Caps().m_HasProjectedBumpEnv ? "yes" : "no" );
+	Msg( "m_MaxUserClipPlanes: %d\n", g_pHardwareConfig->Caps().m_MaxUserClipPlanes );
+	Msg( "m_SupportsSRGB: %s\n", g_pHardwareConfig->Caps().m_SupportsSRGB ? "yes" : "no" );
 	switch( g_pHardwareConfig->Caps().m_HDRType )
 	{
 	case HDR_TYPE_NONE:
-		Warning( "m_HDRType: HDR_TYPE_NONE\n" );
+		Msg( "m_HDRType: HDR_TYPE_NONE\n" );
 		break;
 	case HDR_TYPE_INTEGER:
-		Warning( "m_HDRType: HDR_TYPE_INTEGER\n" );
+		Msg( "m_HDRType: HDR_TYPE_INTEGER\n" );
 		break;
 	case HDR_TYPE_FLOAT:
-		Warning( "m_HDRType: HDR_TYPE_FLOAT\n" );
+		Msg( "m_HDRType: HDR_TYPE_FLOAT\n" );
 		break;
 	default:
 		Assert( 0 );
 		break;
 	}
-	Warning( "m_bSupportsSpheremapping: %s\n", g_pHardwareConfig->Caps().m_bSupportsSpheremapping ? "yes" : "no" );
-	Warning( "m_UseFastClipping: %s\n", g_pHardwareConfig->Caps().m_UseFastClipping ? "yes" : "no" );
-	Warning( "m_pShaderDLL: %s\n", g_pHardwareConfig->Caps().m_pShaderDLL );
-	Warning( "m_bNeedsATICentroidHack: %s\n", g_pHardwareConfig->Caps().m_bNeedsATICentroidHack ? "yes" : "no" );
-	Warning( "m_bDisableShaderOptimizations: %s\n", g_pHardwareConfig->Caps().m_bDisableShaderOptimizations ? "yes" : "no" );
-	Warning( "m_bColorOnSecondStream: %s\n", g_pHardwareConfig->Caps().m_bColorOnSecondStream ? "yes" : "no" );
-	Warning( "m_MaxSimultaneousRenderTargets: %d\n", g_pHardwareConfig->Caps().m_MaxSimultaneousRenderTargets );
+	Msg( "m_bSupportsSpheremapping: %s\n", g_pHardwareConfig->Caps().m_bSupportsSpheremapping ? "yes" : "no" );
+	Msg( "m_UseFastClipping: %s\n", g_pHardwareConfig->Caps().m_UseFastClipping ? "yes" : "no" );
+	Msg( "m_pShaderDLL: %s\n", g_pHardwareConfig->Caps().m_pShaderDLL );
+	Msg( "m_bNeedsATICentroidHack: %s\n", g_pHardwareConfig->Caps().m_bNeedsATICentroidHack ? "yes" : "no" );
+	Msg( "m_bDisableShaderOptimizations: %s\n", g_pHardwareConfig->Caps().m_bDisableShaderOptimizations ? "yes" : "no" );
+	Msg( "m_bColorOnSecondStream: %s\n", g_pHardwareConfig->Caps().m_bColorOnSecondStream ? "yes" : "no" );
+	Msg( "m_MaxSimultaneousRenderTargets: %d\n", g_pHardwareConfig->Caps().m_MaxSimultaneousRenderTargets );
 }
 
 
