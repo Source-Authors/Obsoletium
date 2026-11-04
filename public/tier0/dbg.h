@@ -646,7 +646,7 @@ DBG_INTERFACE void AssertValidStringPtr( const tchar* ptr, intp maxchar = 0xFFFF
 
 #ifdef DBGFLAG_ASSERT
 
-FORCEINLINE void AssertValidReadPtr(const void *ptr, intp count = 1) { Assert(!count || ptr); }
+FORCEINLINE void AssertValidReadPtr( const void* ptr, intp count = 1 )		{ Assert( !count || ptr ); }
 FORCEINLINE void AssertValidWritePtr( const void* ptr, intp count = 1 )		{ Assert( !count || ptr ); }
 FORCEINLINE void AssertValidReadWritePtr( const void* ptr, intp count = 1 )	{ Assert( !count || ptr ); }
 
