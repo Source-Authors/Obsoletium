@@ -53,7 +53,7 @@ static std::atomic<BitBufErrorHandler> g_BitBufErrorHandler{nullptr};
 
 void InternalBitBufErrorHandler( BitBufErrorType errorType, const char *pDebugName )
 {
-	const auto copy = g_BitBufErrorHandler.load(std::memory_order::memory_order_relaxed);
+	const auto copy = g_BitBufErrorHandler.load(std::memory_order_acquire);
 	if ( copy )
 		copy( errorType, pDebugName );
 }
@@ -61,7 +61,7 @@ void InternalBitBufErrorHandler( BitBufErrorType errorType, const char *pDebugNa
 
 BitBufErrorHandler SetBitBufErrorHandler( BitBufErrorHandler fn )
 {
-  return g_BitBufErrorHandler.exchange(fn);
+  return g_BitBufErrorHandler.exchange(fn, std::memory_order_acq_rel);
 }
 
 
