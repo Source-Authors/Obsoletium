@@ -120,7 +120,7 @@ public:
 
 	void HandleError( const char *pszErrorText ) const
 	{
-		if ( const auto err = m_ErrorFunc.load( std::memory_order::memory_order_relaxed ); err )
+		if ( const auto err = m_ErrorFunc.load( std::memory_order::memory_order_acquire ); err )
 		{
 			err( SCRIPT_LEVEL_WARNING, pszErrorText );
 		}
@@ -141,7 +141,7 @@ public:
 
 	void FatalError( const char *pszError ) const
 	{
-		if ( const auto err = m_ErrorFunc.load( std::memory_order::memory_order_relaxed ); err )
+		if ( const auto err = m_ErrorFunc.load( std::memory_order::memory_order_acquire ); err )
 		{
 			err( SCRIPT_LEVEL_ERROR, pszError );
 		}
@@ -1323,7 +1323,7 @@ public:
 			return;
 		}
 		
-		m_OutputFunc.store( pFunc, std::memory_order::memory_order_seq_cst );
+		m_OutputFunc.store( pFunc, std::memory_order::memory_order_acq_rel );
 		*pOutputCallback = pFunc;
 
 		lua_pushcclosure( m_LuaState, PrintFunc, 1 );
@@ -1332,7 +1332,7 @@ public:
 
 	void SetErrorCallback( ScriptErrorFunc_t pFunc ) override
 	{
-		m_ErrorFunc.store( pFunc, std::memory_order::memory_order_relaxed );
+		m_ErrorFunc.store( pFunc, std::memory_order::memory_order_acq_rel );
 	}
 };
 
