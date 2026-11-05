@@ -1573,6 +1573,75 @@ bool Selection3D::OnLMouseDblClkLogical(CMapViewLogical *pView, UINT nFlags, con
 }
 
 
+// dimhotepus: CS:GO backport.
+bool Selection3D::OnMouseWheel3D( CMapView3D *pView, UINT nFlags, short zDelta, const Vector2D &vPoint )
+{
+	// check if the shift key is down
+	bool bShift = ((GetKeyState( VK_SHIFT ) & 0x8000) != 0);
+	bool bCtrl = ((GetKeyState( VK_CONTROL ) & 0x8000) != 0);
+
+	if ( !bShift || m_pSelection->IsEmpty() )
+		return false;
+
+	bool bScaled = false;
+
+	// get list of selected objects
+	const CMapObjectList *pSelList = m_pSelection->GetList();
+
+	GetHistory()->MarkUndoPosition( pSelList, "Uniform Scale" );
+	GetHistory()->Keep( pSelList );
+
+	for ( int i = 0; i < pSelList->Count(); i++ )
+	{
+		CMapClass *pObject = pSelList->Element(i);;
+		CMapEntity *pEntity = dynamic_cast <CMapEntity *> (pObject);
+		if ( pEntity != NULL )
+		{
+			// check if each object has the uniformscale keyvalue, and adjust it if so
+			const char *pszUniformScale = NULL;
+			pszUniformScale = pEntity->GetKeyValue( "uniformscale" );
+			if ( pszUniformScale != NULL )
+			{				
+				float flCurrentScale = atof( pszUniformScale );
+				
+				if ( bCtrl )
+				{
+					if ( zDelta > 0 )
+					{
+						flCurrentScale += 0.01f; // TODO: make user-configurable?
+					}
+					else
+					{
+						flCurrentScale -= 0.01f;
+					}
+				}
+				else
+				{
+					if ( zDelta > 0 )
+					{
+						flCurrentScale *= 1.05f; // TODO: make user-configurable?
+					}
+					else
+					{
+						flCurrentScale /= 1.05f;
+					}
+				}
+				
+				char buf[32];
+				sprintf( buf, "%.2f", MAX( flCurrentScale, 0.01f ) );
+				pEntity->SetKeyValue( "uniformscale", buf ); // re-apply keyvalue
+
+				pEntity->PostUpdate( Notify_Changed );
+
+				bScaled = true;
+			}
+		}
+	}
+
+	return bScaled;
+}
+
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : pView - 

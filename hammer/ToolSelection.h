@@ -75,7 +75,9 @@ public:
 	virtual bool OnLMouseDownLogical(CMapViewLogical *pView, UINT nFlags, const Vector2D &vPoint);
 	virtual bool OnLMouseUpLogical(CMapViewLogical *pView, UINT nFlags, const Vector2D &vPoint);
 	virtual bool OnMouseMoveLogical(CMapViewLogical *pView, UINT nFlags, const Vector2D &vPoint);
-	virtual bool OnLMouseDblClkLogical(CMapViewLogical *pView, UINT nFlags, const Vector2D &vPoint);
+	virtual bool OnLMouseDblClkLogical( CMapViewLogical *pView, UINT nFlags, const Vector2D &vPoint );
+	// dimhotepus: CS:GO backport.
+	virtual bool OnMouseWheel3D( CMapView3D *pView, UINT nFlags, short zDelta, const Vector2D &vPoint );
 
 	void UpdateSelectionBounds();
 
