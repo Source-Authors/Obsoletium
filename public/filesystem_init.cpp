@@ -46,7 +46,7 @@ static std::atomic<FSErrorMode_t> g_FileSystemErrorMode = FS_ERRORMODE_VCONFIG;
 // Call this to use a bin directory relative to VPROJECT
 bool FileSystem_UseVProjectBinDir( bool bEnable )
 {
-	return s_bUseVProjectBinDir.exchange(bEnable, std::memory_order::memory_order_relaxed);
+	return s_bUseVProjectBinDir.exchange(bEnable, std::memory_order::memory_order_acq_rel);
 }
 
 namespace {
@@ -337,7 +337,7 @@ bool FileSystem_GetExecutableDir( OUT_Z_CAP(exeDirLen) char *exedir, unsigned ex
 	if ( exeDirLen )
 		exedir[0] = '\0';
 
-	if ( s_bUseVProjectBinDir.load(std::memory_order::memory_order_relaxed) )
+	if ( s_bUseVProjectBinDir.load(std::memory_order::memory_order_acquire) )
 	{
 		const char *pProject = GetVProjectCmdLineValue();
 		if ( !pProject )
@@ -429,7 +429,7 @@ static FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t ret
 	// Run vconfig?
 	// Don't do it if they specifically asked for it not to, or if they manually specified a vconfig with -game or -vproject.
 	if ( bRunVConfig &&
-		 g_FileSystemErrorMode.load(std::memory_order::memory_order_relaxed) == FS_ERRORMODE_VCONFIG &&
+		 g_FileSystemErrorMode.load(std::memory_order::memory_order_acquire) == FS_ERRORMODE_VCONFIG &&
 		 !CommandLine()->HasParm( CMDLINEOPTION_NOVCONFIG ) && !GetVProjectCmdLineValue() )
 	{
 		char vconfigExe[MAX_PATH];
@@ -784,14 +784,14 @@ static std::atomic<SuggestGameInfoDirFn_t> g_pfnSuggestGameInfoDir = nullptr;
 
 SuggestGameInfoDirFn_t GetSuggestGameInfoDirFn()
 {
-	return g_pfnSuggestGameInfoDir.load(std::memory_order::memory_order_relaxed);
+	return g_pfnSuggestGameInfoDir.load(std::memory_order::memory_order_acquire);
 }
 
 };  // namespace
 
 SuggestGameInfoDirFn_t SetSuggestGameInfoDirFn( SuggestGameInfoDirFn_t pfnNewFn )
 {
-	return g_pfnSuggestGameInfoDir.exchange(pfnNewFn, std::memory_order::memory_order_relaxed);
+	return g_pfnSuggestGameInfoDir.exchange(pfnNewFn, std::memory_order::memory_order_acq_rel);
 }
 
 template<int outDirLen>
@@ -1087,7 +1087,7 @@ FSReturnCode_t FileSystem_MountContent( CFSMountContentInfo &mountContentInfo )
 
 FSErrorMode_t FileSystem_SetErrorMode( FSErrorMode_t errorMode )
 {
-	return g_FileSystemErrorMode.exchange(errorMode, std::memory_order::memory_order_relaxed);
+	return g_FileSystemErrorMode.exchange(errorMode, std::memory_order::memory_order_acq_rel);
 }
 
 void FileSystem_ClearSteamEnvVars()
