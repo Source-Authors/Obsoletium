@@ -242,7 +242,7 @@ static std::atomic<FnMiniDump> g_pfnWriteMiniDump = InternalWriteMiniDumpUsingEx
 //-----------------------------------------------------------------------------
 FnMiniDump SetMiniDumpFunction( FnMiniDump pfn )
 {
-	return g_pfnWriteMiniDump.exchange( pfn, std::memory_order::memory_order_relaxed );
+	return g_pfnWriteMiniDump.exchange( pfn, std::memory_order::memory_order_acq_rel );
 }
 
 
@@ -253,7 +253,7 @@ static std::atomic<FnMiniDump> g_UnhandledExceptionFunction;
 static LONG STDCALL ValveUnhandledExceptionFilter( _EXCEPTION_POINTERS* pExceptionInfo )
 {
 	uint uStructuredExceptionCode = pExceptionInfo->ExceptionRecord->ExceptionCode;
-	const auto handler = g_UnhandledExceptionFunction.load( std::memory_order::memory_order_relaxed );
+	const auto handler = g_UnhandledExceptionFunction.load( std::memory_order::memory_order_acquire );
 	if ( handler )
 	{
 		// dimhotepus: Check and execute handler, and proceed with 
@@ -269,13 +269,13 @@ static LONG STDCALL ValveUnhandledExceptionFilter( _EXCEPTION_POINTERS* pExcepti
 
 void MinidumpSetUnhandledExceptionFunction( FnMiniDump pfn )
 {
-	g_UnhandledExceptionFunction.store( pfn, std::memory_order::memory_order_relaxed );
+	g_UnhandledExceptionFunction.store( pfn, std::memory_order::memory_order_acq_rel );
 	::SetUnhandledExceptionFilter( ValveUnhandledExceptionFilter );
 }
 
 FnMiniDump MinidumpSetUnhandledExceptionFunction2( FnMiniDump pfn )
 {
-	const auto old = g_UnhandledExceptionFunction.exchange( pfn, std::memory_order::memory_order_relaxed );
+	const auto old = g_UnhandledExceptionFunction.exchange( pfn, std::memory_order::memory_order_acq_rel );
 	::SetUnhandledExceptionFilter( ValveUnhandledExceptionFilter );
 	return old;
 }
@@ -325,7 +325,7 @@ void WriteMiniDump( const char *pszFilenameSuffix )
 	}
 	// Write the minidump from inside the filter (GetExceptionInformation() is only 
 	// valid in the filter)
-	__except ( g_pfnWriteMiniDump.load( std::memory_order::memory_order_relaxed )( EXCEPTION_BREAKPOINT, GetExceptionInformation(), pszFilenameSuffix ), EXCEPTION_EXECUTE_HANDLER )
+	__except ( g_pfnWriteMiniDump.load( std::memory_order::memory_order_acquire )( EXCEPTION_BREAKPOINT, GetExceptionInformation(), pszFilenameSuffix ), EXCEPTION_EXECUTE_HANDLER )
 	{
 	}
 }
@@ -455,7 +455,7 @@ static int CatchAndWriteMiniDump_Impl( CatchAndWriteContext_t &ctx )
 	{
 		return ctx.Invoke();
 	}
-	__except ( g_pfnWriteMiniDump.load( std::memory_order::memory_order_relaxed )( GetExceptionCode(), GetExceptionInformation(), GetExceptionCodeName( GetExceptionCode() ) ), EXCEPTION_EXECUTE_HANDLER )
+	__except ( g_pfnWriteMiniDump.load( std::memory_order::memory_order_acquire )( GetExceptionCode(), GetExceptionInformation(), GetExceptionCodeName( GetExceptionCode() ) ), EXCEPTION_EXECUTE_HANDLER )
 	{
 		// dimhotepus: EXIT_FAILURE -> EOTHER
 		TerminateProcess( GetCurrentProcess(), EOTHER ); // die, die RIGHT NOW! (don't call exit() so destructors will not get run)
