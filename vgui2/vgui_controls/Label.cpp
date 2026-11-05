@@ -564,7 +564,7 @@ void Label::Paint()
 			if (it < (ty1 - ty0))
 			{
 				imageYPos = ((ty1 - ty0) - it) / 2 + y;
-				image->SetPos(x, ((ty1 - ty0) - it) / 2 + y);
+				image->SetPos(x, imageYPos);
 			}
 		}
 
