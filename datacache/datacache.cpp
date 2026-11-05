@@ -224,7 +224,7 @@ bool CDataCacheSection::AddEx( DataCacheClientID_t clientId, const void *pItemDa
 
 	OnAdd( clientId, hMem );
 
-	g_iDontForceFlush.fetch_add(1, std::memory_order::memory_order_relaxed);
+	g_iDontForceFlush.fetch_add(1, std::memory_order_acquire);
 
 	if ( flags & DCAF_LOCK )
 	{
@@ -233,7 +233,7 @@ bool CDataCacheSection::AddEx( DataCacheClientID_t clientId, const void *pItemDa
 	// Add implies a frame lock. A no-op if not in frame lock
 	FrameLock( hMem );
 
-	g_iDontForceFlush.fetch_sub(1, std::memory_order::memory_order_relaxed);
+	g_iDontForceFlush.fetch_sub(1, std::memory_order_release);
 
 	// dimhotepus: unlock locked resource if needed and update status.
 	Unlock( hMem );
@@ -349,7 +349,7 @@ void *CDataCacheSection::Lock( DataCacheHandle_t handle )
 {
 	VPROF( "CDataCacheSection::Lock" );
 
-	if ( mem_force_flush.GetBool() && !g_iDontForceFlush.load(std::memory_order::memory_order_relaxed))
+	if ( mem_force_flush.GetBool() && !g_iDontForceFlush.load(std::memory_order_acquire))
 		Flush();
 
 	if ( handle != DC_INVALID_HANDLE )
@@ -407,7 +407,7 @@ int CDataCacheSection::Unlock( DataCacheHandle_t handle )
 void CDataCacheSection::LockMutex()
 {
 	m_mutex.Lock();
-	g_iDontForceFlush.fetch_add(1, std::memory_order::memory_order_relaxed);
+	g_iDontForceFlush.fetch_add(1, std::memory_order_acquire);
 }
 
 
@@ -416,7 +416,7 @@ void CDataCacheSection::LockMutex()
 //-----------------------------------------------------------------------------
 void CDataCacheSection::UnlockMutex()
 {
-	g_iDontForceFlush.fetch_sub(1, std::memory_order::memory_order_relaxed);
+	g_iDontForceFlush.fetch_sub(1, std::memory_order_release);
 	m_mutex.Unlock();
 }
 
@@ -427,7 +427,7 @@ void *CDataCacheSection::Get( DataCacheHandle_t handle, bool bFrameLock )
 {
 	VPROF( "CDataCacheSection::Get" );
 
-	if ( mem_force_flush.GetBool() && !g_iDontForceFlush.load(std::memory_order::memory_order_relaxed))
+	if ( mem_force_flush.GetBool() && !g_iDontForceFlush.load(std::memory_order_acquire))
 		Flush();
 
 	if ( handle != DC_INVALID_HANDLE )
@@ -514,7 +514,7 @@ void *CDataCacheSection::FrameLock( DataCacheHandle_t handle )
 {
 	VPROF( "CDataCacheSection::FrameLock" );
 
-	if ( mem_force_flush.GetBool() && !g_iDontForceFlush.load(std::memory_order::memory_order_relaxed))
+	if ( mem_force_flush.GetBool() && !g_iDontForceFlush.load(std::memory_order_acquire))
 		Flush();
 
 	void *pResult = NULL;
