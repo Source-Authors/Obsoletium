@@ -182,7 +182,7 @@ CAchievementsDialog::CAchievementsDialog(vgui::Panel *parent) : BaseClass(parent
 	m_pSelectionHighlight->SetZPos( 100 );
 
 	m_pAchievementPackCombo = new ComboBox(this, "achievement_pack_combo", NUM_COMBO_BOX_LINES_DEFAULT, false);
-	m_pHideAchievedCheck = new vgui::CheckButton( this, "HideAchieved", "" );
+	m_pHideAchievedCheck = new vgui::CheckButton( this, "HideAchieved", "#GameUI_Achievement_Hide_Achieved" );
 
 	// int that holds the highest number achievement id we've found
 	int iHighestAchievementIDSeen = -1;
