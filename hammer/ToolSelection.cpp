@@ -189,7 +189,7 @@ bool Selection3D::HitTestLogical( CMapView *pView, const Vector2D &ptClient )
 	rect.NormalizeRect();
 
 	// See if the point lies within the main rect.
-	return rect.PtInRect( CPoint( ptClient.x, ptClient.y ) );
+	return !!rect.PtInRect( CPoint( ptClient.x, ptClient.y ) );
 }
 
 
@@ -991,7 +991,7 @@ bool Selection3D::OnMouseMove2D(CMapView2D *pView, UINT nFlags, const Vector2D &
 
 	vgui::HCursor hCursor = vgui::dc_arrow;
 
-	bool bCtrl = (GetAsyncKeyState(VK_CONTROL) & 0x8000);
+	bool bCtrl = !!(GetAsyncKeyState(VK_CONTROL) & 0x8000);
 	unsigned int uConstraints = GetConstraints( nFlags);
 			
 	// Convert to world coords.
@@ -1167,7 +1167,7 @@ void Selection3D::StartTranslation(CMapView *pView, const Vector2D &vPoint, cons
 //-----------------------------------------------------------------------------
 bool Selection3D::OnLMouseUp2D(CMapView2D *pView, UINT nFlags, const Vector2D &vPoint) 
 {
-	bool bShift = nFlags & MK_SHIFT;
+	bool bShift = !!( nFlags & MK_SHIFT );
 
 	Tool3D::OnLMouseUp2D(pView, nFlags, vPoint);
 
@@ -1828,7 +1828,7 @@ bool Selection3D::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2D 
 //-----------------------------------------------------------------------------
 bool Selection3D::OnLMouseUp3D(CMapView3D *pView, UINT nFlags, const Vector2D &vPoint) 
 {
-	bool bShift = nFlags & MK_SHIFT;
+	bool bShift = !!( nFlags & MK_SHIFT );
 
 	Tool3D::OnLMouseUp3D(pView, nFlags, vPoint) ;
 
