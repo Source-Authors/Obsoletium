@@ -2801,17 +2801,17 @@ void C_BaseAnimating::ShutdownBoneSetupThreadPool()
 
 void C_BaseAnimating::ThreadedBoneSetup()
 {
-	g_bDoThreadedBoneSetup.store( cl_threaded_bone_setup.GetBool() );
-	if ( g_bDoThreadedBoneSetup.load( std::memory_order_relaxed ) )
+	g_bDoThreadedBoneSetup.store( cl_threaded_bone_setup.GetBool(), std::memory_order_release );
+	if ( g_bDoThreadedBoneSetup.load( std::memory_order_acquire ) )
 	{
 		intp nCount = g_PreviousBoneSetups.Count();
 		if ( nCount > 1 )
 		{
-			g_bInThreadedBoneSetup.store( true, std::memory_order::memory_order_relaxed );
+			g_bInThreadedBoneSetup.store( true, std::memory_order_release );
 
 			ParallelProcess( "C_BaseAnimating::ThreadedBoneSetup", g_PreviousBoneSetups.Base(), nCount, &SetupBonesOnBaseAnimating, &PreThreadedBoneSetup, &PostThreadedBoneSetup );
 
-			g_bInThreadedBoneSetup.store( false, std::memory_order::memory_order_relaxed );
+			g_bInThreadedBoneSetup.store( false, std::memory_order_release );
 		}
 	}
 	g_iPreviousBoneCounter++;
@@ -2867,7 +2867,7 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 		boneMask |= BONE_USED_BY_ANYTHING;
 	}
 
-	if ( g_bInThreadedBoneSetup.load( std::memory_order::memory_order_relaxed ) )
+	if ( g_bInThreadedBoneSetup.load( std::memory_order_acquire ) )
 	{
 		if ( !m_BoneSetupLock.TryLock() )
 		{
@@ -2891,7 +2891,7 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 
 	AUTO_LOCK( m_BoneSetupLock );
 
-	if ( g_bInThreadedBoneSetup.load( std::memory_order::memory_order_relaxed ) )
+	if ( g_bInThreadedBoneSetup.load( std::memory_order_acquire ) )
 	{
 		m_BoneSetupLock.Unlock();
 	}
@@ -2919,8 +2919,8 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 	}
 
 	intp nBoneCount = m_CachedBoneData.Count();
-	if ( g_bDoThreadedBoneSetup.load( std::memory_order::memory_order_relaxed ) &&
-		!g_bInThreadedBoneSetup.load( std::memory_order::memory_order_relaxed ) &&
+	if ( g_bDoThreadedBoneSetup.load( std::memory_order_acquire ) &&
+	     !g_bInThreadedBoneSetup.load( std::memory_order_acquire ) &&
 		( nBoneCount >= 16 ) &&
 		!GetMoveParent() &&
 		m_iMostRecentBoneSetupRequest != g_iPreviousBoneCounter )
