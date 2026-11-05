@@ -73,7 +73,7 @@ class CountJob : public CJob {
         should_do_work_{should_do_work} {}
 
   JobStatus_t DoExecute() override {
-    executions_num_.fetch_add(1, std::memory_order::memory_order_relaxed);
+    executions_num_.fetch_add(1, std::memory_order_relaxed);
 
     ThreadPause();
 
@@ -85,7 +85,7 @@ class CountJob : public CJob {
 
     // Count when job is done, not when it starts: last finished job signals,
     // exactly once.
-    if (m_nCount.fetch_add(1, std::memory_order::memory_order_acq_rel) + 1 ==
+    if (m_nCount.fetch_add(1, std::memory_order_acq_rel) + 1 ==
         total_count_) {
       done_event_.Set();
     }
@@ -94,7 +94,7 @@ class CountJob : public CJob {
   }
 
   [[nodiscard]] int GetExecutionsNum() const {
-    return executions_num_.load(std::memory_order::memory_order_relaxed);
+    return executions_num_.load(std::memory_order_relaxed);
   }
 
   static std::atomic_int m_nCount;
@@ -123,7 +123,7 @@ void Test(IThreadPool *pool, bool should_distribute, bool should_sleep = true,
           test_num, sleep_ms, interleave ? "true" : "false", max_threads_num);
 
       for (int i{1}; i <= max_threads_num; i += 2) {
-        CountJob::m_nCount.store(0, std::memory_order::memory_order_relaxed);
+        CountJob::m_nCount.store(0, std::memory_order_relaxed);
 
         ThreadPoolStartParams_t params;
         params.nThreads = i;
@@ -166,7 +166,7 @@ void Test(IThreadPool *pool, bool should_distribute, bool should_sleep = true,
         }
 
         const int total_jobs_at_finish_num{
-            CountJob::m_nCount.load(std::memory_order::memory_order_relaxed)};
+            CountJob::m_nCount.load(std::memory_order_relaxed)};
         timer.End();
 
         {
@@ -220,7 +220,7 @@ void Test(IThreadPool *pool, bool should_distribute, bool should_sleep = true,
         }
 
         const int total_jobs_executed_num{
-            CountJob::m_nCount.load(std::memory_order::memory_order_relaxed)};
+            CountJob::m_nCount.load(std::memory_order_relaxed)};
 
         TP_TEST_EXPECT(executed_num + aborted_num == kJobsNum,
                        "Test #%d. %d executed + %d aborted != %d jobs.\n",
@@ -274,7 +274,7 @@ class ExecuteTestJob : public CJob {
       : has_execute_error_{has_execute_error} {}
 
   JobStatus_t DoExecute() override {
-    executions_num_.fetch_add(1, std::memory_order::memory_order_relaxed);
+    executions_num_.fetch_add(1, std::memory_order_relaxed);
 
     const double acc{DoSomeWork(SeedFrom(this))};
 
@@ -284,8 +284,8 @@ class ExecuteTestJob : public CJob {
       bool expected{false};
 
       if (has_execute_error_.compare_exchange_strong(
-              expected, true, std::memory_order::memory_order_release,
-              std::memory_order::memory_order_relaxed)) {
+              expected, true, std::memory_order_release,
+              std::memory_order_relaxed)) {
         Msg("Forced execution test failed!\n");
 
         DebuggerBreakIfDebugging();
@@ -296,7 +296,7 @@ class ExecuteTestJob : public CJob {
   }
 
   [[nodiscard]] int GetExecutionsNum() const {
-    return executions_num_.load(std::memory_order::memory_order_relaxed);
+    return executions_num_.load(std::memory_order_relaxed);
   }
 
  private:
@@ -314,15 +314,15 @@ class ExecuteTestExecuteJob : public CJob {
         is_ready_2_execute_{is_ready_2_execute} {}
 
   JobStatus_t DoExecute() override {
-    ready_jobs_num_.fetch_add(1, std::memory_order::memory_order_acq_rel);
+    ready_jobs_num_.fetch_add(1, std::memory_order_acq_rel);
 
-    while (!is_ready_2_execute_.load(std::memory_order::memory_order_acquire))
+    while (!is_ready_2_execute_.load(std::memory_order_acquire))
       ThreadPause();
 
     // Exactly 1-in-10 aborts. Not derived from addresses: allocations with a
     // fixed stride could make it always or never abort.
     const bool should_abort{
-        abort_counter_.fetch_add(1, std::memory_order::memory_order_relaxed) %
+        abort_counter_.fetch_add(1, std::memory_order_relaxed) %
             10 ==
         0};
     if (!should_abort)
@@ -332,10 +332,10 @@ class ExecuteTestExecuteJob : public CJob {
 
     // Racing waiter: must see completion right away.
     if (!job_->WaitForFinish(0) || !job_->AccessEvent()->Check()) {
-      failed_.store(true, std::memory_order::memory_order_relaxed);
+      failed_.store(true, std::memory_order_relaxed);
     }
 
-    ready_jobs_num_.fetch_sub(1, std::memory_order::memory_order_acq_rel);
+    ready_jobs_num_.fetch_sub(1, std::memory_order_acq_rel);
 
     return JOB_OK;
   }
@@ -396,12 +396,12 @@ void TestForcedExecute(IThreadPool *pool) {
           pJob->Release();
         }
 
-        while (ready_jobs_num.load(std::memory_order::memory_order_acquire) <
+        while (ready_jobs_num.load(std::memory_order_acquire) <
                threads_num) {
           ThreadPause();
         }
 
-        is_ready_2_execute.store(true, std::memory_order::memory_order_release);
+        is_ready_2_execute.store(true, std::memory_order_release);
 
         ThreadSleep(0);
 
@@ -411,7 +411,7 @@ void TestForcedExecute(IThreadPool *pool) {
         TP_TEST_EXPECT(job->WaitForFinish(0),
                        "Forced execution: job not finished after Execute().\n");
 
-        while (ready_jobs_num.load(std::memory_order::memory_order_acquire) >
+        while (ready_jobs_num.load(std::memory_order_acquire) >
                0) {
           ThreadPause();
         }

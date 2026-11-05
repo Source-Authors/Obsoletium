@@ -6359,7 +6359,7 @@ static void S_Update_Thread()
 	float frameTimeSeconds = THREADED_MIX_TIME_MS * 0.001f;
 	double lastFrameTimeSeconds = Plat_FloatTime();
 
-	while ( !g_bMixThreadExit.load(std::memory_order::memory_order_relaxed) )
+	while ( !g_bMixThreadExit.load(std::memory_order_relaxed) )
 	{
 		const double t0 = Plat_FloatTime();
 
@@ -6389,7 +6389,7 @@ void S_ShutdownMixThread()
 {
 	if ( g_hMixThread )
 	{
-		g_bMixThreadExit.store(true, std::memory_order::memory_order_relaxed);
+		g_bMixThreadExit.store(true, std::memory_order_relaxed);
 		ThreadJoin( g_hMixThread );
 		ReleaseThreadHandle( g_hMixThread );
 		g_hMixThread = NULL;
@@ -6408,7 +6408,7 @@ void S_Update_( float mixAheadTime )
 	{
 		if ( !g_hMixThread )
 		{
-			g_bMixThreadExit.store(false, std::memory_order::memory_order_relaxed);
+			g_bMixThreadExit.store(false, std::memory_order_relaxed);
 			g_hMixThread = ThreadExecuteSolo( "SoundMixer", S_Update_Thread );
 		}
 	}
