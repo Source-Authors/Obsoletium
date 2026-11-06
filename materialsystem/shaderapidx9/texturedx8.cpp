@@ -37,7 +37,7 @@ static std::atomic_uint s_TextureCount = 0;
 
 unsigned TextureCount()
 {
-	return s_TextureCount.load(std::memory_order::memory_order_relaxed);
+	return s_TextureCount.load(std::memory_order_relaxed);
 }
 
 static bool IsVolumeTexture( IDirect3DBaseTexture* pBaseTexture )
@@ -381,7 +381,7 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 	VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
 #endif
 
-	s_TextureCount.fetch_add(1, std::memory_order::memory_order_relaxed);
+	s_TextureCount.fetch_add(1, std::memory_order_relaxed);
 
 	return pBaseTexture;
 }
@@ -423,7 +423,7 @@ void DestroyD3DTexture( IDirect3DBaseTexture* pD3DTex )
 			ReleaseD3DTexture( pD3DTex );
 		}
 
-		s_TextureCount.fetch_sub(1, std::memory_order::memory_order_relaxed);
+		s_TextureCount.fetch_sub(1, std::memory_order_relaxed);
 	}
 }
 

@@ -197,7 +197,7 @@ bool CVRadDLL::DoIncrementalLight( char const *pVMFFile )
 	// set up sky cameras
 	ProcessSkyCameras();
 		
-	g_bInterrupt.store(false, std::memory_order::memory_order_relaxed);
+	g_bInterrupt.store(false, std::memory_order_relaxed);
 	if( RadWorld_Go() )
 	{
 		// Save off the last finished lighting results for the BSP.
@@ -209,7 +209,7 @@ bool CVRadDLL::DoIncrementalLight( char const *pVMFFile )
 	}
 	else
 	{
-		g_iCurFace.store(0, std::memory_order::memory_order_relaxed);
+		g_iCurFace.store(0, std::memory_order_relaxed);
 		return false;
 	}
 }
@@ -238,13 +238,13 @@ bool CVRadDLL::Serialize()
 
 float CVRadDLL::GetPercentComplete()
 {
-	return static_cast<float>(g_iCurFace.load(std::memory_order::memory_order_relaxed) / numfaces);
+	return static_cast<float>(g_iCurFace.load(std::memory_order_relaxed) / numfaces);
 }
 
 
 void CVRadDLL::Interrupt()
 {
-	g_bInterrupt.store(true, std::memory_order::memory_order_relaxed);
+	g_bInterrupt.store(true, std::memory_order_relaxed);
 }
 
 

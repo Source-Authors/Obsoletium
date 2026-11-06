@@ -19,13 +19,13 @@ void SignalUpdate(int ev)
 {
 	Assert(ev >= 0 && ev < ssize(g_EventTimes));
 	g_EventTimes[ev]=Plat_FloatTime();
-	g_EventTimeCounters[ev].fetch_add(1, std::memory_order::memory_order_relaxed);
+	g_EventTimeCounters[ev].fetch_add(1, std::memory_order_relaxed);
 }
 
 int GetUpdateCounter(int ev)
 {
 	Assert(ev >= 0 && ev < ssize(g_EventTimes));
-	return g_EventTimeCounters[ev].load(std::memory_order::memory_order_relaxed);
+	return g_EventTimeCounters[ev].load(std::memory_order_relaxed);
 }
 
 double GetUpdateTime(int ev)
@@ -40,6 +40,6 @@ void SignalGlobalUpdate()
 	for(intp i=0;i<ssize(g_EventTimes);i++)
 	{
 		g_EventTimes[i] = stamp;
-		g_EventTimeCounters[i].fetch_add(1, std::memory_order::memory_order_relaxed);
+		g_EventTimeCounters[i].fetch_add(1, std::memory_order_relaxed);
 	}
 }

@@ -324,7 +324,7 @@ void VMPI_ExceptionFilter(unsigned long code, void *exception_info) {
 void HandleMPIDisconnect(int procID, const char *pReason) {
   int nLiveWorkers =
       VMPI_GetCurrentNumberOfConnections() -
-      g_nDisconnects.load(std::memory_order::memory_order_relaxed) - 1;
+      g_nDisconnects.load(std::memory_order_relaxed) - 1;
 
   // We ran into the size limit before and it wasn't readily apparent that the
   // size limit had been breached, so make sure to show errors about invalid
@@ -338,7 +338,7 @@ void HandleMPIDisconnect(int procID, const char *pReason) {
   if (g_bMPIMaster) {
     Warning("%d workers remain.\n\n", nLiveWorkers);
 
-    g_nDisconnects.fetch_add(std::memory_order::memory_order_relaxed);
+    g_nDisconnects.fetch_add(std::memory_order_relaxed);
     /*
     if ( VMPI_GetCurrentNumberOfConnections() - g_nDisconnects <= 1 )
     {

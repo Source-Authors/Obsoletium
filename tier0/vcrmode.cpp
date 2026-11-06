@@ -338,7 +338,7 @@ static void VCR_WriteEvent( VCREvent event )
 
 static void VCR_IncrementEvent()
 {
-	g_iCurEvent.fetch_add(1, std::memory_order::memory_order_relaxed);
+	g_iCurEvent.fetch_add(1, std::memory_order_relaxed);
 }
 
 static void VCR_Event(VCREvent type)

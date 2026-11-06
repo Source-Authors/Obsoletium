@@ -128,10 +128,10 @@ public:
 		void* pMem = HeapAlloc( m_heap, m_HeapFlags, nSize );
 		if ( pMem )
 		{
-			m_nOutstandingBytes.fetch_add( nSize, std::memory_order::memory_order_relaxed );
-			m_nOutstandingPageHeapBytes.fetch_add( RoundUpToPage( nSize ), std::memory_order::memory_order_relaxed );
-			m_nOutstandingAllocations.fetch_add( 1, std::memory_order::memory_order_relaxed );
-			m_nLifetimeAllocations.fetch_add( 1, std::memory_order::memory_order_relaxed );
+			m_nOutstandingBytes.fetch_add( nSize, std::memory_order_relaxed );
+			m_nOutstandingPageHeapBytes.fetch_add( RoundUpToPage( nSize ), std::memory_order_relaxed );
+			m_nOutstandingAllocations.fetch_add( 1, std::memory_order_relaxed );
+			m_nLifetimeAllocations.fetch_add( 1, std::memory_order_relaxed );
 		}
 		else if ( nSize )
 		{
@@ -139,7 +139,7 @@ public:
 			// then lead to crashes. In order to avoid confusion about the cause of
 			// these crashes, halt immediately on allocation failures.
 			__debugbreak();
-			m_nAllocFailures.fetch_add( 1, std::memory_order::memory_order_relaxed );
+			m_nAllocFailures.fetch_add( 1, std::memory_order_relaxed );
 		}
 
 		return pMem;
@@ -168,18 +168,18 @@ public:
 			{
 				if ( nSize >= nOldSize )
 				{
-					m_nOutstandingBytes.fetch_add( nSize - nOldSize, std::memory_order::memory_order_relaxed );
-					m_nOutstandingPageHeapBytes.fetch_add( RoundUpToPage( nSize ) - RoundUpToPage( nOldSize ), std::memory_order::memory_order_relaxed );
+					m_nOutstandingBytes.fetch_add( nSize - nOldSize, std::memory_order_relaxed );
+					m_nOutstandingPageHeapBytes.fetch_add( RoundUpToPage( nSize ) - RoundUpToPage( nOldSize ), std::memory_order_relaxed );
 				}
 				else
 				{
-					m_nOutstandingBytes.fetch_sub( nOldSize - nSize, std::memory_order::memory_order_relaxed );
-					m_nOutstandingPageHeapBytes.fetch_sub( RoundUpToPage( nOldSize ) - RoundUpToPage( nSize ), std::memory_order::memory_order_relaxed );
+					m_nOutstandingBytes.fetch_sub( nOldSize - nSize, std::memory_order_relaxed );
+					m_nOutstandingPageHeapBytes.fetch_sub( RoundUpToPage( nOldSize ) - RoundUpToPage( nSize ), std::memory_order_relaxed );
 				}
 
 				// Outstanding allocation count isn't affected by Realloc, but
 				// lifetime allocation count is.
-				m_nLifetimeAllocations.fetch_add( 1, std::memory_order::memory_order_relaxed );
+				m_nLifetimeAllocations.fetch_add( 1, std::memory_order_relaxed );
 			}
 			else
 			{
@@ -187,7 +187,7 @@ public:
 				// then lead to crashes. In order to avoid confusion about the cause of
 				// these crashes, halt immediately on allocation failures.
 				__debugbreak();
-				m_nAllocFailures.fetch_add( 1, std::memory_order::memory_order_relaxed );
+				m_nAllocFailures.fetch_add( 1, std::memory_order_relaxed );
 			}
 
 			return pNewMem;
@@ -202,9 +202,9 @@ public:
 		if ( pMem )
 		{
 			const size_t nOldSize = HeapSize( m_heap, 0, pMem );
-			m_nOutstandingBytes.fetch_sub( nOldSize, std::memory_order::memory_order_relaxed );
-			m_nOutstandingPageHeapBytes.fetch_sub( RoundUpToPage( nOldSize ), std::memory_order::memory_order_relaxed );
-			m_nOutstandingAllocations.fetch_sub( 1, std::memory_order::memory_order_relaxed );
+			m_nOutstandingBytes.fetch_sub( nOldSize, std::memory_order_relaxed );
+			m_nOutstandingPageHeapBytes.fetch_sub( RoundUpToPage( nOldSize ), std::memory_order_relaxed );
+			m_nOutstandingAllocations.fetch_sub( 1, std::memory_order_relaxed );
 			HeapFree( m_heap, 0, pMem );
 		}
 	}
@@ -266,17 +266,17 @@ public:
 		const size_t pageHeapBytes = m_nOutstandingPageHeapBytes + m_nOutstandingAllocations * 4096;
 		Msg( "%zu MiB address space used assuming maximum PageHeap overhead.\n", pageHeapBytes / MiB );
 		Msg( "%zu outstanding allocations (%zd delta).\n",
-			m_nOutstandingAllocations.load(std::memory_order::memory_order_relaxed),
-			(intp)m_nOutstandingAllocations.load(std::memory_order::memory_order_relaxed) - (intp)m_nOldOutstandingAllocations );
+			m_nOutstandingAllocations.load(std::memory_order_relaxed),
+			(intp)m_nOutstandingAllocations.load(std::memory_order_relaxed) - (intp)m_nOldOutstandingAllocations );
 		Msg( "%zu lifetime allocations (%u delta).\n",
-			m_nLifetimeAllocations.load(std::memory_order::memory_order_relaxed),
-			(intp)m_nLifetimeAllocations.load(std::memory_order::memory_order_relaxed) - (intp)m_nOldLifetimeAllocations );
-		Msg( "%zu allocation failures.\n", m_nAllocFailures.load(std::memory_order::memory_order_relaxed) );
+			m_nLifetimeAllocations.load(std::memory_order_relaxed),
+			(intp)m_nLifetimeAllocations.load(std::memory_order_relaxed) - (intp)m_nOldLifetimeAllocations );
+		Msg( "%zu allocation failures.\n", m_nAllocFailures.load(std::memory_order_relaxed) );
 
 		// Update the numbers on outstanding and lifetime allocation counts so
 		// that we can print out deltas.
-		m_nOldOutstandingAllocations = m_nOutstandingAllocations.load(std::memory_order::memory_order_relaxed);
-		m_nOldLifetimeAllocations = m_nLifetimeAllocations.load(std::memory_order::memory_order_relaxed);
+		m_nOldOutstandingAllocations = m_nOutstandingAllocations.load(std::memory_order_relaxed);
+		m_nOldLifetimeAllocations = m_nLifetimeAllocations.load(std::memory_order_relaxed);
 	}
 	virtual void DumpStatsFileBase( char const *pchFileBase ) {}
 	virtual size_t ComputeMemoryUsedBy( char const *pchSubStr ) { return 0; }

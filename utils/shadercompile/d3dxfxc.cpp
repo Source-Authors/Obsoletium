@@ -56,13 +56,13 @@ public:
 	STDMETHODIMP_( ULONG )
 	AddRef() override
 	{
-		return m_ref_counter.fetch_add( 1, std::memory_order::memory_order_relaxed );
+		return m_ref_counter.fetch_add( 1, std::memory_order_relaxed );
 	}
 	STDMETHODIMP_( ULONG )
 	Release() override
 	{
 		const ULONG rc =
-		m_ref_counter.fetch_sub( 1, std::memory_order::memory_order_acq_rel );
+		m_ref_counter.fetch_sub( 1, std::memory_order_acq_rel );
 		if ( rc == 0 )
 			delete this;
 		return rc;

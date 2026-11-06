@@ -180,9 +180,9 @@ public:
 	// dimhotepus: Mark explicit.
 	explicit CRefMT(int initial) : m_Ref{initial} {}
 
-	int Increment() { return m_Ref.fetch_add(1, std::memory_order::memory_order_relaxed) + 1; }
+	int Increment() { return m_Ref.fetch_add(1, std::memory_order_relaxed) + 1; }
 	// Acquire-release because destructor in some smart pointer impl depends on it.
-	int Decrement() { return m_Ref.fetch_sub(1, std::memory_order::memory_order_acq_rel) - 1; }
+	int Decrement() { return m_Ref.fetch_sub(1, std::memory_order_acq_rel) - 1; }
 	
 	// Acquire-release because destructor in some smart pointer impl depends on it.
 	[[nodiscard]] int Counter() const { return m_Ref.load(std::memory_order_acq_rel); }

@@ -49,12 +49,12 @@ class TSQueueContainer final : public ITestContainer<T> {
 
   void Push(T item) override {
     queue_.PushItem(item);
-    g_nPushes.fetch_add(1, std::memory_order::memory_order_relaxed);
+    g_nPushes.fetch_add(1, std::memory_order_relaxed);
   }
 
   bool Pop(T *pResult) override {
     if (queue_.PopItem(pResult)) {
-      g_nPops.fetch_add(1, std::memory_order::memory_order_relaxed);
+      g_nPops.fetch_add(1, std::memory_order_relaxed);
       return true;
     }
     return false;
@@ -80,12 +80,12 @@ class TSListContainer final : public ITestContainer<T> {
 
   void Push(T item) override {
     list_.PushItem(item);
-    g_nPushes.fetch_add(1, std::memory_order::memory_order_relaxed);
+    g_nPushes.fetch_add(1, std::memory_order_relaxed);
   }
 
   bool Pop(T *pResult) override {
     if (list_.PopItem(pResult)) {
-      g_nPops.fetch_add(1, std::memory_order::memory_order_relaxed);
+      g_nPops.fetch_add(1, std::memory_order_relaxed);
       return true;
     }
 
@@ -104,28 +104,28 @@ class TSListContainer final : public ITestContainer<T> {
 
 void ClearBuckets() {
   for (intp i{0}; i < NUM_TEST; ++i) {
-    g_pTestBuckets[i].store(0, std::memory_order::memory_order_relaxed);
+    g_pTestBuckets[i].store(0, std::memory_order_relaxed);
   }
 }
 
 void IncBucket(int i) {
   // tests can slop over a bit
   if (i < NUM_TEST) {
-    g_pTestBuckets[i].fetch_add(1, std::memory_order::memory_order_acquire);
+    g_pTestBuckets[i].fetch_add(1, std::memory_order_acquire);
   }
 }
 
 void DecBucket(int i) {
   // tests can slop over a bit
   if (i < NUM_TEST) {
-    g_pTestBuckets[i].fetch_sub(1, std::memory_order::memory_order_release);
+    g_pTestBuckets[i].fetch_sub(1, std::memory_order_release);
   }
 }
 
 void ValidateBuckets() {
   for (int i = 0; i < NUM_TEST; i++) {
     const int bucket =
-        g_pTestBuckets[i].load(std::memory_order::memory_order_relaxed);
+        g_pTestBuckets[i].load(std::memory_order_relaxed);
 
     if (bucket != 0) {
       Msg("Test bucket %d has an invalid value %d.\n", i, bucket);
@@ -143,10 +143,10 @@ unsigned PopThreadFunc(void *ctx) {
 
   auto *container = static_cast<ITestContainer<T> *>(ctx);
 
-  g_nPopThreads.fetch_add(1, std::memory_order::memory_order_acquire);
-  g_nThreads.fetch_add(1, std::memory_order::memory_order_acquire);
+  g_nPopThreads.fetch_add(1, std::memory_order_acquire);
+  g_nThreads.fetch_add(1, std::memory_order_acquire);
 
-  while (!g_bStart.load(std::memory_order::memory_order_relaxed)) {
+  while (!g_bStart.load(std::memory_order_relaxed)) {
     ThreadSleep(0);
   }
 
@@ -154,7 +154,7 @@ unsigned PopThreadFunc(void *ctx) {
 
   for (;;) {
     if (!container->Pop(&ignored)) {
-      if (g_nPushThreads.load(std::memory_order::memory_order_relaxed) == 0) {
+      if (g_nPushThreads.load(std::memory_order_relaxed) == 0) {
         // Pop the rest
         while (container->Pop(&ignored)) {
           ThreadSleep(0);
@@ -165,8 +165,8 @@ unsigned PopThreadFunc(void *ctx) {
     }
   }
 
-  g_nThreads.fetch_sub(1, std::memory_order::memory_order_release);
-  g_nPopThreads.fetch_sub(1, std::memory_order::memory_order_release);
+  g_nThreads.fetch_sub(1, std::memory_order_release);
+  g_nPopThreads.fetch_sub(1, std::memory_order_release);
 
   return 0;
 }
@@ -178,47 +178,47 @@ unsigned PushThreadFunc(void *ctx) {
 
   auto *container = static_cast<ITestContainer<T> *>(ctx);
 
-  g_nPushThreads.fetch_add(1, std::memory_order::memory_order_acquire);
-  g_nThreads.fetch_add(1, std::memory_order::memory_order_acquire);
+  g_nPushThreads.fetch_add(1, std::memory_order_acquire);
+  g_nThreads.fetch_add(1, std::memory_order_acquire);
 
-  while (!g_bStart.load(std::memory_order::memory_order_relaxed))
+  while (!g_bStart.load(std::memory_order_relaxed))
     ThreadSleep(0);
 
   int v;
-  while ((v = g_nTested.load(std::memory_order::memory_order_acquire)) <
+  while ((v = g_nTested.load(std::memory_order_acquire)) <
          NUM_TEST) {
     container->Push(v);
 
-    g_nTested.fetch_add(1, std::memory_order::memory_order_release);
+    g_nTested.fetch_add(1, std::memory_order_release);
   }
 
-  g_nThreads.fetch_sub(1, std::memory_order::memory_order_release);
-  g_nPushThreads.fetch_sub(1, std::memory_order::memory_order_release);
+  g_nThreads.fetch_sub(1, std::memory_order_release);
+  g_nPushThreads.fetch_sub(1, std::memory_order_release);
 
   return 0;
 }
 
 void TestStart() {
-  g_nTested.store(0, std::memory_order::memory_order_relaxed);
-  g_nThreads.store(0, std::memory_order::memory_order_relaxed);
-  g_nPushThreads.store(0, std::memory_order::memory_order_relaxed);
-  g_nPopThreads.store(0, std::memory_order::memory_order_relaxed);
-  g_nPops.store(0, std::memory_order::memory_order_relaxed);
-  g_nPushes.store(0, std::memory_order::memory_order_relaxed);
-  g_bStart.store(false, std::memory_order::memory_order_release);
+  g_nTested.store(0, std::memory_order_relaxed);
+  g_nThreads.store(0, std::memory_order_relaxed);
+  g_nPushThreads.store(0, std::memory_order_relaxed);
+  g_nPopThreads.store(0, std::memory_order_relaxed);
+  g_nPops.store(0, std::memory_order_relaxed);
+  g_nPushes.store(0, std::memory_order_relaxed);
+  g_bStart.store(false, std::memory_order_release);
 
   ClearBuckets();
 }
 
 void TestWait() {
-  while (g_nThreads.load(std::memory_order::memory_order_seq_cst) <
+  while (g_nThreads.load(std::memory_order_seq_cst) <
          NUM_THREADS) {
     ThreadSleep(0);
   }
 
-  g_bStart.store(true, std::memory_order::memory_order_release);
+  g_bStart.store(true, std::memory_order_release);
 
-  while (g_nThreads.load(std::memory_order::memory_order_seq_cst) > 0) {
+  while (g_nThreads.load(std::memory_order_seq_cst) > 0) {
     ThreadSleep(50);
   }
 }
@@ -259,11 +259,11 @@ void PushPopTest(ITestContainer<T> &container) {
   Msg("%s test: single thread push/pop, in order...\n", container.GetType());
   ClearBuckets();
 
-  g_nTested.store(0, std::memory_order::memory_order_relaxed);
+  g_nTested.store(0, std::memory_order_relaxed);
   int value;
 
   while ((value = g_nTested.fetch_add(
-              1, std::memory_order::memory_order_acquire)) < NUM_TEST) {
+              1, std::memory_order_acquire)) < NUM_TEST) {
     container.Push(value);
 
     IncBucket(value);
@@ -287,14 +287,14 @@ void PushPopInterleavedTestGuts(ITestContainer<T> &container) {
 
     if (do_push &&
         (value = g_nTested.fetch_add(
-             1, std::memory_order::memory_order_acq_rel)) < NUM_TEST) {
+             1, std::memory_order_acq_rel)) < NUM_TEST) {
       container.Push(value);
       IncBucket(value);
     } else if (container.Pop(&value)) {
       DecBucket(value);
     } else {
       if (do_push ||
-          g_nTested.load(std::memory_order::memory_order_seq_cst) >= NUM_TEST) {
+          g_nTested.load(std::memory_order_seq_cst) >= NUM_TEST) {
         break;
       }
     }
@@ -308,7 +308,7 @@ void PushPopInterleavedTest(ITestContainer<T> &container) {
   // dimhotepus: ms -> mcs to not overflow in 49.7 days.
   srand(static_cast<unsigned>(Plat_USTime() % std::numeric_limits<unsigned>::max()));
 
-  g_nTested.store(0, std::memory_order::memory_order_relaxed);
+  g_nTested.store(0, std::memory_order_relaxed);
 
   ClearBuckets();
   PushPopInterleavedTestGuts(container);
@@ -322,14 +322,14 @@ unsigned PushPopInterleavedTestThreadFunc(void *ctx) {
 
   auto *container = static_cast<ITestContainer<T> *>(ctx);
 
-  g_nThreads.fetch_add(1, std::memory_order::memory_order_acquire);
+  g_nThreads.fetch_add(1, std::memory_order_acquire);
 
-  while (!g_bStart.load(std::memory_order::memory_order_relaxed))
+  while (!g_bStart.load(std::memory_order_relaxed))
     ThreadSleep(0);
 
   PushPopInterleavedTestGuts<T>(*container);
 
-  g_nThreads.fetch_sub(1, std::memory_order::memory_order_release);
+  g_nThreads.fetch_sub(1, std::memory_order_release);
 
   return 0;
 }
@@ -467,7 +467,7 @@ void SeqPushMTPop(ITestContainer<T> &container, bool bDistribute) {
   TestStart();
 
   int v;
-  while ((v = g_nTested.fetch_add(1, std::memory_order::memory_order_acquire)) <
+  while ((v = g_nTested.fetch_add(1, std::memory_order_acquire)) <
          NUM_TEST) {
     container.Push(v + 1);
   }

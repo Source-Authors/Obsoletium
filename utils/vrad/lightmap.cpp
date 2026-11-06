@@ -3071,7 +3071,7 @@ void BuildFacelights (int iThread, int facenum)
 	directlight_t *dl;
 	Vector v[4], n[4];
 
-	if( g_bInterrupt.load(std::memory_order::memory_order_relaxed) )
+	if( g_bInterrupt.load(std::memory_order_relaxed) )
 		return;
 
 	// FIXME: Is there a better way to do this? Like, in RunThreadsOn, for instance?
@@ -3081,7 +3081,7 @@ void BuildFacelights (int iThread, int facenum)
 		// Both threads will be accessing this so it needs to be protected/atomic or else thread A
 		// will load it in and thread B will increment it but its increment will be
 		// overwritten by thread A when thread A writes it back.
-		g_iCurFace.fetch_add(1, std::memory_order::memory_order_relaxed);
+		g_iCurFace.fetch_add(1, std::memory_order_relaxed);
 	}
 
 	// some surfaces don't need lightmaps

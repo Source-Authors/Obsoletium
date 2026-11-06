@@ -1096,9 +1096,9 @@ private:
 		// dimhotepus: Add thread name to aid debugging.
 		ThreadSetDebugName( "TextureLoader" );
 
-		s_TextureManager.m_nAsyncLoadThread.store( ThreadGetCurrentId(), std::memory_order::memory_order_seq_cst );
+		s_TextureManager.m_nAsyncLoadThread.store( ThreadGetCurrentId(), std::memory_order_seq_cst );
 		( ( AsyncLoader* )_this )->ThreadLoader_Main();
-		s_TextureManager.m_nAsyncLoadThread.store( INVALID_THREAD_ID, std::memory_order::memory_order_release );
+		s_TextureManager.m_nAsyncLoadThread.store( INVALID_THREAD_ID, std::memory_order_release );
 		return 0;
 	}
 
@@ -1401,9 +1401,9 @@ private:
 		// dimhotepus: Add thread name to aid debugging.
 		ThreadSetDebugName( "TextureReader" );
 
-		s_TextureManager.m_nAsyncReadThread.store( ThreadGetCurrentId(), std::memory_order::memory_order_seq_cst );
+		s_TextureManager.m_nAsyncReadThread.store( ThreadGetCurrentId(), std::memory_order_seq_cst );
 		( ( AsyncReader* ) _this )->ThreadReader_Main();
-		s_TextureManager.m_nAsyncReadThread.store( INVALID_THREAD_ID, std::memory_order::memory_order_release );
+		s_TextureManager.m_nAsyncReadThread.store( INVALID_THREAD_ID, std::memory_order_release );
 		return 0;
 	}
 
@@ -2958,12 +2958,12 @@ void CTextureManager::ReleaseAsyncScratchVTF( IVTFTexture *pScratchVTF )
 
 bool CTextureManager::ThreadInAsyncLoadThread() const
 {
-	return ThreadGetCurrentId() == m_nAsyncLoadThread.load(std::memory_order::memory_order_acquire);
+	return ThreadGetCurrentId() == m_nAsyncLoadThread.load(std::memory_order_acquire);
 }
 
 bool CTextureManager::ThreadInAsyncReadThread() const
 {
-	return ThreadGetCurrentId() == m_nAsyncReadThread.load(std::memory_order::memory_order_acquire);
+	return ThreadGetCurrentId() == m_nAsyncReadThread.load(std::memory_order_acquire);
 }
 
 bool CTextureManager::AddTextureCompositorTemplate( const char* pName, KeyValues* pTmplDesc )

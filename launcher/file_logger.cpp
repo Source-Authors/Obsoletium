@@ -57,7 +57,7 @@ void FileLogger::Init()
 		return;
 	}
 
-	is_active_.store( true, std::memory_order::memory_order_relaxed );
+	is_active_.store( true, std::memory_order_relaxed );
 
 	const char *resource_listing_dir{ nullptr };
 	if ( command_line_->CheckParm( "-reslistdir", &resource_listing_dir ) &&
@@ -133,10 +133,10 @@ void FileLogger::Init()
 
 void FileLogger::Shutdown()
 {
-	if ( !is_active_.load( std::memory_order::memory_order_acquire ) )
+	if ( !is_active_.load( std::memory_order_acquire ) )
 		return;
 
-	is_active_.store( false, std::memory_order::memory_order_release );
+	is_active_.store( false, std::memory_order_release );
 
 	// Now load and sort all.lst
 	SortResourceListing(
@@ -178,7 +178,7 @@ void FileLogger::LogAllResources( const char *line )
 
 void FileLogger::LogAccess( const char *file_path, const char *options )
 {
-	if ( !is_active_.load( std::memory_order::memory_order_acquire ) )
+	if ( !is_active_.load( std::memory_order_acquire ) )
 		return;
 
 	{

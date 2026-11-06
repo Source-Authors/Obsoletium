@@ -1319,10 +1319,10 @@ class CParallelLoopProcessor
 public:
 	explicit CParallelLoopProcessor( const char *pszDescription ) : m_ItemProcessor{}
 	{
-		m_lIndex.store( 0, std::memory_order::memory_order_relaxed );
+		m_lIndex.store( 0, std::memory_order_relaxed );
 		m_lLimit = 0;
 		m_nBatchDivisor = 1;
-		m_nActive.store( 0, std::memory_order::memory_order_relaxed );
+		m_nActive.store( 0, std::memory_order_relaxed );
 
 		m_szDescription = pszDescription;
 	}
@@ -1331,7 +1331,7 @@ public:
 	{
 		if ( nItems > 0 )
 		{
-			m_lIndex.store( lBegin, std::memory_order::memory_order_relaxed );
+			m_lIndex.store( lBegin, std::memory_order_relaxed );
 			m_lLimit = lBegin + nItems;
 
 			intp nJobs = g_pThreadPool->NumIdleThreads();
@@ -1371,7 +1371,7 @@ public:
 				ppJobs[i]->Release();
 			}
 
-			Assert( m_nActive.load( std::memory_order::memory_order_acquire ) == 0 );
+			Assert( m_nActive.load( std::memory_order_acquire ) == 0 );
 		}
 	}
 
@@ -1382,7 +1382,7 @@ private:
 	{
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "DoExecute %s", m_szDescription );
 
-		m_nActive.fetch_add( 1, std::memory_order::memory_order_relaxed );
+		m_nActive.fetch_add( 1, std::memory_order_relaxed );
 
 		m_ItemProcessor.Begin();
 
@@ -1397,7 +1397,7 @@ private:
 
 		m_ItemProcessor.End();
 
-		m_nActive.fetch_sub( 1, std::memory_order::memory_order_release );
+		m_nActive.fetch_sub( 1, std::memory_order_release );
 	}
 	
 	intp						m_lLimit;
@@ -1444,7 +1444,7 @@ public:
 	// dimhotepus: Allow to choose thread pool to run on.
 	explicit CParallelProcessorBase(IThreadPool *pPool = nullptr)
 	{
-		m_nActive.store( 0, std::memory_order::memory_order_relaxed );
+		m_nActive.store( 0, std::memory_order_relaxed );
 		m_pThreadPool = pPool ? pPool : g_pThreadPool;
 		m_szDescription = nullptr;
 	}
@@ -1500,7 +1500,7 @@ protected:
 			}
 		}
 
-		Assert( m_nActive.load( std::memory_order::memory_order_acquire ) == 0 );
+		Assert( m_nActive.load( std::memory_order_acquire ) == 0 );
 	}
 
 protected:
@@ -1516,7 +1516,7 @@ private:
 	{
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "DoExecute %s", m_szDescription );
 
-		m_nActive.fetch_add( 1, std::memory_order::memory_order_relaxed );
+		m_nActive.fetch_add( 1, std::memory_order_relaxed );
 
 		static_cast<Derived *>( this )->OnBegin();
 
@@ -1525,7 +1525,7 @@ private:
 
 		static_cast<Derived *>( this )->OnEnd();
 
-		m_nActive.fetch_sub(1, std::memory_order::memory_order_release);
+		m_nActive.fetch_sub(1, std::memory_order_release);
 	}
 
 	const char *				m_szDescription;

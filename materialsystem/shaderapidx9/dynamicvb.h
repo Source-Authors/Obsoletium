@@ -61,7 +61,7 @@ public:
 	static int BufferCount()
 	{
 #ifndef NDEBUG
-		return s_BufferCount.load(std::memory_order::memory_order_relaxed);
+		return s_BufferCount.load(std::memory_order_relaxed);
 #else
 		return 0;
 #endif
@@ -210,7 +210,7 @@ inline CVertexBuffer::CVertexBuffer(IDirect3DDevice9Ex * pD3D, VertexFormat_t fm
 #endif
 
 #ifndef NDEBUG
-	s_BufferCount.fetch_add(1, std::memory_order::memory_order_relaxed);
+	s_BufferCount.fetch_add(1, std::memory_order_relaxed);
 #endif
 
 #ifdef VPROF_ENABLED
@@ -392,7 +392,7 @@ inline CVertexBuffer::~CVertexBuffer()
 #endif
 
 #ifndef NDEBUG
-		s_BufferCount.fetch_sub(1, std::memory_order::memory_order_relaxed);
+		s_BufferCount.fetch_sub(1, std::memory_order_relaxed);
 #endif
 	}
 

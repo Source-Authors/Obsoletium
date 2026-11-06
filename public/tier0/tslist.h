@@ -510,7 +510,7 @@ public:
 			Error( "CTSQueue: Misaligned queue tail %p.\n", &m_Tail );
 		}
 
-		m_Count.store(0, std::memory_order::memory_order_relaxed );
+		m_Count.store(0, std::memory_order_relaxed );
 		
 		// list always contains a dummy node
 		m_Head.value.pNode = m_Tail.value.pNode = new Node_t;
@@ -522,7 +522,7 @@ public:
 	{
 		Purge();
 
-		Assert( m_Count.load( std::memory_order::memory_order_relaxed ) == 0 );
+		Assert( m_Count.load( std::memory_order_relaxed ) == 0 );
 		Assert( m_Head.value.pNode == m_Tail.value.pNode );
 		Assert( m_Head.value.pNode->GetNextNode() == End() ); //-V2002
 
@@ -580,7 +580,7 @@ public:
 				bResult = false;
 			}
 
-			if ( m_Count.load( std::memory_order::memory_order_relaxed ) == 0 )
+			if ( m_Count.load( std::memory_order_relaxed ) == 0 )
 			{
 				if ( m_Head.value.pNode != m_Tail.value.pNode )
 				{
@@ -598,7 +598,7 @@ public:
 
 			nNodes--;// skip dummy node
 
-			if ( nNodes != m_Count.load( std::memory_order::memory_order_relaxed) )
+			if ( nNodes != m_Count.load( std::memory_order_relaxed) )
 			{
 				DebuggerBreakIfDebugging();
 				bResult = false;
@@ -647,7 +647,7 @@ public:
 		// This can fail if another thread pushed between the sequence and node grabs above. Later pushes or pops corrects
 		FinishPush( pNode, oldTail ); 
 
-		m_Count.fetch_add(1, std::memory_order::memory_order_relaxed);
+		m_Count.fetch_add(1, std::memory_order_relaxed);
 
 		return oldTail.value.pNode;
 	}
@@ -723,7 +723,7 @@ public:
 			}
 		}
 
-		m_Count.fetch_sub(1, std::memory_order::memory_order_relaxed);
+		m_Count.fetch_sub(1, std::memory_order_relaxed);
 		head.value.pNode->elem = elem;
 		return head.value.pNode;
 	}
@@ -761,7 +761,7 @@ public:
 
 	[[nodiscard]] int Count() const
 	{
-		return m_Count.load(std::memory_order::memory_order_relaxed);
+		return m_Count.load(std::memory_order_relaxed);
 	}
 
 private:

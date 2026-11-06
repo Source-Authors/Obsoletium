@@ -1966,7 +1966,7 @@ void MakeAllScales (void)
 
 bool RadWorld_Go()
 {
-	g_iCurFace.store(0, std::memory_order::memory_order_relaxed);
+	g_iCurFace.store(0, std::memory_order_relaxed);
 
 	InitMacroTexture( source );
 
@@ -1998,7 +1998,7 @@ bool RadWorld_Go()
 	}
 
 	// Was the process interrupted?
-	if( g_pIncremental && (g_iCurFace.load(std::memory_order::memory_order_relaxed) != numfaces) )
+	if( g_pIncremental && (g_iCurFace.load(std::memory_order_relaxed) != numfaces) )
 		return false;
 
 	// Figure out the offset into lightmap data for each face.
