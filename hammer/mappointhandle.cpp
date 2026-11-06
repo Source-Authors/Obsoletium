@@ -356,7 +356,7 @@ void CMapPointHandle::UpdateParentKey(void)
 	// Snap to prevent error creep.
 	for (int i = 0; i < 3; i++)
 	{
-		m_Origin[i] = V_rint(m_Origin[i] / 0.01f) * 0.01f;
+		m_Origin[i] = rint(m_Origin[i] / 0.01f) * 0.01f;
 	}
 
 	if (m_szKeyName[0])

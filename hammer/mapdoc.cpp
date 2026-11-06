@@ -1062,9 +1062,9 @@ BOOL CMapDoc::FindEntityCallback(CMapEntity *pEntity, FindEntity_t *pFindInfo)
 		// HACK: Round to origin integers since entity origins are rounded when
 		//       saving to MAP file. This makes finding entities from the engine
 		//       in the editor work.
-		Pos[0] = V_rint(Pos[0]);
-		Pos[1] = V_rint(Pos[1]);
-		Pos[2] = V_rint(Pos[2]);
+		Pos[0] = rint(Pos[0]);
+		Pos[1] = rint(Pos[1]);
+		Pos[2] = rint(Pos[2]);
 
 		if (VectorCompare(Pos, pFindInfo->Pos))
 		{
@@ -1100,9 +1100,9 @@ CMapEntity *CMapDoc::FindEntity(const char *pszClassName, float x, float y, floa
 
 		// dvs: HACK - only find by integer coordinates because the editor rounds
 		//		entity origins when saving the MAP file.
-		FindInfo.Pos[0] = V_rint(x);
-		FindInfo.Pos[1] = V_rint(y);
-		FindInfo.Pos[2] = V_rint(z);
+		FindInfo.Pos[0] = rint(x);
+		FindInfo.Pos[1] = rint(y);
+		FindInfo.Pos[2] = rint(z);
 
 		m_pWorld->EnumChildren(&CMapDoc::FindEntityCallback, &FindInfo);
 
@@ -8543,7 +8543,7 @@ void CMapDoc::Snap(Vector &pt, int nFlags)
 	{
 		for (int i = 0; i < 3; i++)
 		{
-			pt[i] = V_rint(pt[i]);
+			pt[i] = rint(pt[i]);
 		}
 	}
 	else if (nFlags & constrainSnap )
@@ -8555,7 +8555,7 @@ void CMapDoc::Snap(Vector &pt, int nFlags)
 
 		for (int i = 0; i < 3; i++)
 		{
-			pt[i] = V_rint(pt[i] / flGridSpacing) * flGridSpacing;
+			pt[i] = rint(pt[i] / flGridSpacing) * flGridSpacing;
 		}
 	}
 

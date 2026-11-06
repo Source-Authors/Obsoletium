@@ -383,9 +383,9 @@ int CMapFace::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 		//
 		for (int nPlane = 0; nPlane < 3; nPlane++)
 		{
-			plane.planepts[nPlane][0] = V_rint(plane.planepts[nPlane][0]);
-			plane.planepts[nPlane][1] = V_rint(plane.planepts[nPlane][1]);
-			plane.planepts[nPlane][2] = V_rint(plane.planepts[nPlane][2]);
+			plane.planepts[nPlane][0] = rint(plane.planepts[nPlane][0]);
+			plane.planepts[nPlane][1] = rint(plane.planepts[nPlane][1]);
+			plane.planepts[nPlane][2] = rint(plane.planepts[nPlane][2]);
 		}
 
 		//

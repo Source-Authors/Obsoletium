@@ -334,8 +334,8 @@ void MakeArcCenterRadius(float xCenter, float yCenter, float xrad, float yrad, i
 		float fSin, fCos;
 		DirectX::XMScalarSinCos(&fSin, &fCos, DEG2RAD(angle));
 
-        points[point][0] = V_rint(xCenter + fCos * xrad);
-        points[point][1] = V_rint(yCenter + fSin * yrad);
+        points[point][0] = rint(xCenter + fCos * xrad);
+        points[point][1] = rint(yCenter + fSin * yrad);
 
 		angle += angle_delta;
     }

@@ -906,7 +906,7 @@ int CMapSolid::CreateFromPlanes( DWORD dwFlags )
 				for (int k = 0; k < 3; k++)
 				{
 					float v = w->p[j][k];
-					float v1 = V_rint(v);
+					float v1 = rint(v);
 					if ((v != v1) && (fabs(v - v1) < ROUND_VERTEX_EPSILON))
 					{
 					   w->p[j][k] = v1;

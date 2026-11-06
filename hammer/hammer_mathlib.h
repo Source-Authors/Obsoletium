@@ -37,7 +37,6 @@ void AxisAngleMatrix(VMatrix& Matrix, const Vector &Axis, float fAngle);
 float fixang(float a);
 float lineangle(float x1, float y1, float x2, float y2);
 void polyMake( float x1, float  y1, float x2, float y2, int npoints, float start_ang, Vector *pmPoints );
-float V_rint(float);
 
 inline int fsign( float x) { if(x==0) return 0; else if (x>0) return 1; else return -1; }
 inline bool fequal( float value, float target, float delta) { return ( (value<(target+delta))&&(value>(target-delta)) ); }

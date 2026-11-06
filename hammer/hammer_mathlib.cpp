@@ -17,19 +17,6 @@ extern "C" void Sys_Error( char *error, ... )
 	Error( "%s", error );
 }
 
-float V_rint(float f)
-{
-	if (f > 0.0f) {
-		return floor(f + 0.5f);
-	}
-
-	if (f < 0.0f) {
-		return ceil(f - 0.5f);
-	}
-
-	return 0.0f;
-}
-
 static int s_BoxFaces[6][3] =
 {
 	{ 0, 4, 2 },
@@ -58,8 +45,8 @@ void polyMake( float x1, float  y1, float x2, float y2, int npoints, float start
         float sin, cos;
         DirectX::XMScalarSinCos(&sin, &cos, DEG2RAD(angle));
 
-        pmPoints[point][0] = V_rint(xCenter + (sin * (float)xrad));
-        pmPoints[point][1] = V_rint(yCenter + (cos * (float)yrad));
+        pmPoints[point][0] = rint(xCenter + (sin * (float)xrad));
+        pmPoints[point][1] = rint(yCenter + (cos * (float)yrad));
     }
 
     pmPoints[point][0] = pmPoints[0][0];

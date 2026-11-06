@@ -207,8 +207,8 @@ void Tool3D::ProjectOnTranslationPlane( const Vector &vWorld, Vector &vTransform
 			if ( nFlags & constrainIntSnap )
 			{
 				// just snap to next integer
-				vOut.x = V_rint(vOut.x);
-				vOut.y = V_rint(vOut.y);
+				vOut.x = rint(vOut.x);
+				vOut.y = rint(vOut.y);
 			}
 			else 
 			{
@@ -220,8 +220,8 @@ void Tool3D::ProjectOnTranslationPlane( const Vector &vWorld, Vector &vTransform
 					flGridSpacing *= 0.5f;
 				}
 				
-				vOut.y = V_rint(vOut.y / flGridSpacing) * flGridSpacing;
-				vOut.x = V_rint(vOut.x / flGridSpacing) * flGridSpacing;
+				vOut.y = rint(vOut.y / flGridSpacing) * flGridSpacing;
+				vOut.x = rint(vOut.x / flGridSpacing) * flGridSpacing;
 			}
 		}
 
@@ -278,8 +278,8 @@ void Tool3D::ProjectTranslation( CMapView *pView, const Vector2D &vPoint, Vector
 		if ( nFlags & constrainIntSnap )
 		{
 			// just snap to next integer
-			vOut.x = V_rint(vOut.x);
-			vOut.y = V_rint(vOut.y);
+			vOut.x = rint(vOut.x);
+			vOut.y = rint(vOut.y);
 		}
 		else 
 		{
@@ -291,8 +291,8 @@ void Tool3D::ProjectTranslation( CMapView *pView, const Vector2D &vPoint, Vector
 				flGridSpacing *= 0.5f;
 			}
 
-			vOut.y = V_rint(vOut.y / flGridSpacing) * flGridSpacing;
-			vOut.x = V_rint(vOut.x / flGridSpacing) * flGridSpacing;
+			vOut.y = rint(vOut.y / flGridSpacing) * flGridSpacing;
+			vOut.x = rint(vOut.x / flGridSpacing) * flGridSpacing;
 		}
 	}
 	

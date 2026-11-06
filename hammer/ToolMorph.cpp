@@ -1277,7 +1277,7 @@ void Morph3D::UpdateScale()
 		{
 			float delta = pOrigPos[d] - m_ScaleOrg[d];
 			// YWB rounding
-			newpos[d] = /*V_rint*/(m_ScaleOrg[d] + (delta * fScale));
+			newpos[d] = /*rint*/(m_ScaleOrg[d] + (delta * fScale));
 		}
 
 		hnd.pStrucSolid->SetVertexPosition(hi.iIndex, newpos[0], 
@@ -1990,9 +1990,9 @@ void Morph3D::SnapSelectedToGrid( int nGridSpacing )
 		vCurPos = hi.pos;
 
 		// Get snapped position
-		Vector vSnappedPos( V_rint(vCurPos[0] / nGridSpacing) * nGridSpacing,
-							V_rint(vCurPos[1] / nGridSpacing) * nGridSpacing,
-							V_rint(vCurPos[2] / nGridSpacing) * nGridSpacing );
+		Vector vSnappedPos( rint(vCurPos[0] / nGridSpacing) * nGridSpacing,
+							rint(vCurPos[1] / nGridSpacing) * nGridSpacing,
+							rint(vCurPos[2] / nGridSpacing) * nGridSpacing );
 
 		// Get delta to move original position into snapped position
 		Vector vDelta = vSnappedPos - vCurPos;

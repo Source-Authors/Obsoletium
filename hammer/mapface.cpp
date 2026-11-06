@@ -670,13 +670,13 @@ void CMapFace::NormalizeTextureShifts(void)
 	//
 	for (int nDim = 0; nDim < 4; nDim++)
 	{
-		int nValue = V_rint(texture.UAxis[nDim]);
+		int nValue = rint(texture.UAxis[nDim]);
 		if (fabs(texture.UAxis[nDim] - nValue) < TEXTURE_AXIS_ROUND_EPSILON)
 		{
 			texture.UAxis[nDim] = nValue;
 		}
 
-		nValue = V_rint(texture.VAxis[nDim]);
+		nValue = rint(texture.VAxis[nDim]);
 		if (fabs(texture.VAxis[nDim] - nValue) < TEXTURE_AXIS_ROUND_EPSILON)
 		{
 			texture.VAxis[nDim] = nValue;
