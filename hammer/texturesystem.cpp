@@ -72,8 +72,8 @@ void CMaterialFileChangeWatcher::Init( CTextureSystem *pSystem, intp context )
 	char searchPaths[1024 * 16];
 	if ( g_pFullFileSystem->GetSearchPath_safe( "GAME", false, searchPaths ) > 0 )
 	{
-		CUtlVector<char*> searchPathList;
-		V_SplitString( searchPaths, ";", searchPathList );
+		// dimhoptepus: RAII for string list. CS:GO backport.
+		CSplitString searchPathList( searchPaths, ";" );
 
 		for ( auto *searchPath : searchPathList )
 		{
@@ -83,8 +83,6 @@ void CMaterialFileChangeWatcher::Init( CTextureSystem *pSystem, intp context )
 				m_Watcher.AddDirectory( searchPath, "materials", true );
 			}
 		}
-		
-		searchPathList.PurgeAndDeleteElements();
 	}
 	else
 	{

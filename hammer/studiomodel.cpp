@@ -268,8 +268,8 @@ void CStudioFileChangeWatcher::Init()
 	char searchPaths[1024 * 16];
 	if ( g_pFullFileSystem->GetSearchPath_safe( "GAME", false, searchPaths ) > 0 )
 	{
-		CUtlVector<char*> searchPathList;
-		V_SplitString( searchPaths, ";", searchPathList );
+		// dimhoptepus: RAII for string list. CS:GO backport.
+		CSplitString searchPathList( searchPaths, ";" );
 
 		for ( auto *searchPath : searchPathList )
 		{
@@ -279,8 +279,6 @@ void CStudioFileChangeWatcher::Init()
 				m_Watcher.AddDirectory( searchPath, "models", true );
 			}
 		}
-		
-		searchPathList.PurgeAndDeleteElements();
 	}
 	else
 	{
