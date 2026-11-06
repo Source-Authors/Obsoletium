@@ -29,13 +29,13 @@ public:
 
 	unsigned AddRef()
 	{
-		return m_ref_count.fetch_add( 1, std::memory_order::memory_order_relaxed ) +
+		return m_ref_count.fetch_add( 1, std::memory_order_relaxed ) +
 		1;
 	}
 	unsigned Release()
 	{
 		unsigned counter{
-			m_ref_count.fetch_sub( 1, std::memory_order::memory_order_relaxed ) - 1
+			m_ref_count.fetch_sub( 1, std::memory_order_acq_rel ) - 1
 		};
 		if ( counter == 0 )
 		{
