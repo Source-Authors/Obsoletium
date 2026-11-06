@@ -93,8 +93,8 @@ class CCamera
 
 protected:
 
-		void BuildViewMatrix();
-		void BuildProjMatrix();
+		void BuildViewMatrix( bool buildViewProjection = true );
+		void BuildProjMatrix( bool buildViewProjection = true );
 		void CameraIdentityMatrix(VMatrix& Matrix);
 
 		VMatrix		m_ViewMatrix;	// Camera view matrix, based on current yaw, pitch, and roll.

@@ -62,7 +62,9 @@ CCamera::CCamera(void)
 	m_fScaleHorz = m_fScaleVert = 1;
 	m_nViewWidth = m_nViewHeight = 100;
 
-	BuildViewMatrix();
+	// dimhotepus: DO not build view projection matrix as projection one is not ready.
+	BuildViewMatrix( false );
+	// dimhotepus: Build view projection matrix here as all requirements are set up.
 	BuildProjMatrix();
 }
 
@@ -331,7 +333,7 @@ bool CCamera::IsOrthographic()
 	return m_bIsOrthographic;
 }
 
-void CCamera::BuildProjMatrix()
+void CCamera::BuildProjMatrix( bool buildViewProjection )
 {
 	memset( &m_ProjMatrix,0,sizeof(m_ProjMatrix) );
 	VMatrix &m = m_ProjMatrix;
@@ -365,8 +367,12 @@ void CCamera::BuildProjMatrix()
 		m[3][2] = -1;
 	}
 
-	m_ViewProjMatrix = m_ProjMatrix * m_ViewMatrix;
-	m_ViewProjMatrix.InverseGeneral( m_InvViewProjMatrix );
+	// dimhotepus: Optional.
+	if ( buildViewProjection )
+	{
+		m_ViewProjMatrix = m_ProjMatrix * m_ViewMatrix;
+		m_ViewProjMatrix.InverseGeneral( m_InvViewProjMatrix );
+	}
 }
 
 
@@ -585,7 +591,7 @@ void CCamera::CameraIdentityMatrix(VMatrix& Matrix)
 // Purpose: Generates a view matrix based on our current yaw, pitch, and roll.
 //			The view matrix does not consider FOV or clip plane distances.
 //-----------------------------------------------------------------------------
-void CCamera::BuildViewMatrix()
+void CCamera::BuildViewMatrix( bool buildViewProjection )
 {
 	// The camera transformation is produced by multiplying roll * yaw * pitch.
 	// This will transform a point from world space into quake camera space, 
@@ -607,8 +613,12 @@ void CCamera::BuildViewMatrix()
 
 	m_ViewMatrix = m_ViewMatrix * TempMatrix;
 
-	m_ViewProjMatrix = m_ProjMatrix * m_ViewMatrix;
-	m_ViewProjMatrix.InverseGeneral( m_InvViewProjMatrix );
+	// dimhotepus: Optional.
+	if ( buildViewProjection )
+	{
+		m_ViewProjMatrix = m_ProjMatrix * m_ViewMatrix;
+		m_ViewProjMatrix.InverseGeneral( m_InvViewProjMatrix );
+	}
 }
 
 
