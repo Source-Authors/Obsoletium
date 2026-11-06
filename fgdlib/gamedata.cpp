@@ -29,7 +29,7 @@ static std::atomic<GameDataMessageFunc_t> g_pMsgFunc = nullptr;
 //-----------------------------------------------------------------------------
 GameDataMessageFunc_t GDSetMessageFunc(GameDataMessageFunc_t pFunc)
 {
-	return g_pMsgFunc.exchange( pFunc, std::memory_order::memory_order_relaxed );
+	return g_pMsgFunc.exchange( pFunc, std::memory_order_acq_rel );
 }
 
 
@@ -147,7 +147,7 @@ bool GDError(TokenReader &tr, PRINTF_FORMAT_STRING const char *error, ...)
 	V_vsprintf_safe(szBuf, error, vl);
 	va_end(vl);
 
-	const auto msgFunc = g_pMsgFunc.load(std::memory_order::memory_order_relaxed);
+	const auto msgFunc = g_pMsgFunc.load(std::memory_order_acquire);
 	if (msgFunc)
 	{
 		msgFunc(MWMSGTYPE::mwError, tr.Error(szBuf));
