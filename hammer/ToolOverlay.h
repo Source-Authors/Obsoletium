@@ -13,6 +13,7 @@
 #include "Box3D.h"
 #include "ToolInterface.h"
 #include "MapOverlay.h"
+#include "ToolManager.h"
 
 class CMapDoc;
 struct Shoreline_t;
@@ -32,17 +33,21 @@ public:
 	//
 	// CBaseTool virtual implementations
 	//
-	ToolID_t	GetToolID( void ) { return TOOL_OVERLAY; }
+	ToolID_t	GetToolID( void ) override { return TOOL_OVERLAY; }
 	
-    void		OnActivate();
-    void		OnDeactivate();
+    void		OnActivate() override;
+    void		OnDeactivate() override;
 
-	bool		OnLMouseUp3D( CMapView3D *pView, UINT nFlags, const Vector2D &vPoint );
-    bool		OnLMouseDown3D( CMapView3D *pView, UINT nFlags, const Vector2D &vPoint );
-	bool		OnMouseMove3D( CMapView3D *pView, UINT nFlags, const Vector2D &vPoint );
-	bool		OnContextMenu2D( CMapView2D *pView, UINT nFlags, const Vector2D &vPoint );
+	// dimhotepus: Set pointer tool on escape. CS:GO backport.
+	bool		OnKeyDown2D( CMapView2D *pView, UINT nChar, UINT nRepCnt, UINT nFlags ) override;
+	// dimhotepus: Set pointer tool on escape. CS:GO backport.
+	bool        OnKeyDown3D( CMapView3D *pView, UINT nChar, UINT nRepCnt, UINT nFlags ) override;
+	bool        OnLMouseUp3D( CMapView3D *pView, UINT nFlags, const Vector2D &vPoint ) override;
+	bool        OnLMouseDown3D( CMapView3D *pView, UINT nFlags, const Vector2D &vPoint ) override;
+	bool        OnMouseMove3D( CMapView3D *pView, UINT nFlags, const Vector2D &vPoint ) override;
+	bool        OnContextMenu2D( CMapView2D *pView, UINT nFlags, const Vector2D &vPoint ) override;
 
-	void		RenderTool3D(CRender3D *pRender);
+	void		RenderTool3D(CRender3D *pRender) override;
 
 protected:
 

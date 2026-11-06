@@ -59,6 +59,46 @@ void CToolOverlay::OnDeactivate()
 {
 }
 
+
+//-----------------------------------------------------------------------------
+// Purpose: Handles key down events in the 2D view.
+// Input  : Per CWnd::OnKeyDown.
+// Output : Returns true if the message was handled, false if not.
+//-----------------------------------------------------------------------------
+bool CToolOverlay::OnKeyDown2D( CMapView2D *pView, UINT nChar, UINT nRepCnt, UINT nFlags )
+{
+	switch ( nChar )
+	{
+	case VK_ESCAPE:
+		{
+			ToolManager()->SetTool( TOOL_POINTER );
+			return true;
+		}
+	}
+
+	return false;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Handles key down events in the 3D view.
+// Input  : Per CWnd::OnKeyDown.
+// Output : Returns true if the message was handled, false if not.
+//-----------------------------------------------------------------------------
+bool CToolOverlay::OnKeyDown3D( CMapView3D *pView, UINT nChar, UINT nRepCnt, UINT nFlags )
+{
+	switch ( nChar )
+	{
+	case VK_ESCAPE:
+		{
+			ToolManager()->SetTool( TOOL_POINTER );
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 bool CToolOverlay::OnLMouseUp3D( CMapView3D *pView, UINT nFlags, const Vector2D &vPoint )
