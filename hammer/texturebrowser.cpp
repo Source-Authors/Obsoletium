@@ -124,6 +124,8 @@ void CTextureBrowser::OnSize(UINT nType, int cx, int cy)
 		IDC_FILTER_SELFILLUM,
 		IDC_SHOW_ERROR,
 		IDC_TEXTURES_OPEN_SOURCE,
+		// dimhotepus: CS:GO port.
+		IDC_TEXTURES_EXPLORE_SOURCE,
 		-1
 	};
 
