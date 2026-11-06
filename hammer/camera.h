@@ -118,6 +118,8 @@ protected:
 
 		VMatrix		m_ViewProjMatrix;		// view and projection matrix
 		VMatrix		m_InvViewProjMatrix;	// inverse view and projection matrix
+		// dimhotepus: Need to store view projection matrix validity to prevent nans in computations.
+		bool		m_bViewProjMatrixValid;
 };
 
 

@@ -338,40 +338,46 @@ void CCamera::BuildProjMatrix( bool buildViewProjection )
 	memset( &m_ProjMatrix,0,sizeof(m_ProjMatrix) );
 	VMatrix &m = m_ProjMatrix;
 
-	if ( m_bIsOrthographic )
+	// dimhotepus: Fix divide by zero when view minimized.
+	if ( m_nViewHeight != 0 && m_nViewWidth != 0 )
 	{
-		// same as D3DXMatrixOrthoRH
-		float w = (float)m_nViewWidth / m_fZoom;
-		float h = (float)m_nViewHeight / m_fZoom;
-	
-		m[0][0] = 2/w;
-		m[1][1] = 2/h;
+		if ( m_bIsOrthographic )
+		{
+			// same as D3DXMatrixOrthoRH
+			float w = (float)m_nViewWidth / m_fZoom;
+			float h = (float)m_nViewHeight / m_fZoom;
 
-		m[2][2] = 1/(m_fNearClip-m_fFarClip);
-		m[2][3] = m_fNearClip/(m_fNearClip-m_fFarClip);
+			m[0][0] = 2/w;
+			m[1][1] = 2/h;
 
-		m[3][3] = 1;
-	}
-	else
-	{
-		// same as D3DXMatrixPerspectiveRH
-		float w = 2 * m_fNearClip * tan( m_fHorizontalFOV * M_PI_F / 360.0f );
-		float h = ( w * float(m_nViewHeight) ) / float(m_nViewWidth);
+			m[2][2] = 1/(m_fNearClip-m_fFarClip);
+			m[2][3] = m_fNearClip/(m_fNearClip-m_fFarClip);
 
-		m[0][0] = 2*m_fNearClip/w;
-		m[1][1] = 2*m_fNearClip/h;
+			m[3][3] = 1;
+		}
+		else
+		{
+			// same as D3DXMatrixPerspectiveRH
+			float w = 2 * m_fNearClip * tan( m_fHorizontalFOV * M_PI_F / 360.0f );
+			float h = ( w * float(m_nViewHeight) ) / float(m_nViewWidth);
 
-		m[2][2] = m_fFarClip/(m_fNearClip-m_fFarClip);
-		m[2][3] = (m_fNearClip*m_fFarClip)/(m_fNearClip-m_fFarClip);
+			m[0][0] = 2*m_fNearClip/w;
+			m[1][1] = 2*m_fNearClip/h;
 
-		m[3][2] = -1;
+			m[2][2] = m_fFarClip/(m_fNearClip-m_fFarClip);
+			m[2][3] = (m_fNearClip*m_fFarClip)/(m_fNearClip-m_fFarClip);
+
+			m[3][2] = -1;
+		}
 	}
 
 	// dimhotepus: Optional.
 	if ( buildViewProjection )
 	{
 		m_ViewProjMatrix = m_ProjMatrix * m_ViewMatrix;
-		m_ViewProjMatrix.InverseGeneral( m_InvViewProjMatrix );
+		// dimhotepus: Reset to identity always so if m_bViewProjMatrixValid becomes false we have smth valid.
+		MatrixSetIdentity( m_InvViewProjMatrix );
+		m_bViewProjMatrixValid = m_ViewProjMatrix.InverseGeneral( m_InvViewProjMatrix );
 	}
 }
 
@@ -617,7 +623,9 @@ void CCamera::BuildViewMatrix( bool buildViewProjection )
 	if ( buildViewProjection )
 	{
 		m_ViewProjMatrix = m_ProjMatrix * m_ViewMatrix;
-		m_ViewProjMatrix.InverseGeneral( m_InvViewProjMatrix );
+		// dimhotepus: Reset to identity always so if m_bViewProjMatrixValid becomes false we have smth valid.
+		MatrixSetIdentity( m_InvViewProjMatrix );
+		m_bViewProjMatrixValid = m_ViewProjMatrix.InverseGeneral( m_InvViewProjMatrix );
 	}
 }
 
@@ -644,6 +652,7 @@ void CCamera::GetProjMatrix(VMatrix& Matrix)
 //-----------------------------------------------------------------------------
 void CCamera::GetViewProjMatrix( VMatrix &Matrix )
 {
+	Assert( m_bViewProjMatrixValid );
 	Matrix = m_ViewProjMatrix;
 }
 
@@ -687,25 +696,39 @@ float CCamera::GetZoom( void )
 
 void CCamera::WorldToView( const Vector& vWorld, Vector2D &vView )
 {
-	Vector vView3D;
+	if ( m_bViewProjMatrixValid )
+	{
+		Vector vView3D;
 
-	Vector3DMultiplyPositionProjective( m_ViewProjMatrix, vWorld, vView3D );
+		Vector3DMultiplyPositionProjective( m_ViewProjMatrix, vWorld, vView3D );
 
-	// NOTE: The negative sign on y is because wc wants to think about screen
-	// coordinates in a different way than the material system
-	vView.x = 0.5f * (vView3D.x + 1.0f) * m_nViewWidth;
-	vView.y = 0.5f * (-vView3D.y + 1.0f) * m_nViewHeight;
+		// NOTE: The negative sign on y is because wc wants to think about screen
+		// coordinates in a different way than the material system
+		vView.x = 0.5f * (vView3D.x + 1.0f) * m_nViewWidth;
+		vView.y = 0.5f * (-vView3D.y + 1.0f) * m_nViewHeight;
+	}
+	else
+	{
+		vView.Init();
+	}
 }
 
 void CCamera::ViewToWorld( const Vector2D &vView, Vector& vWorld)
-{	
-	Vector vView3D;
+{
+	if ( m_bViewProjMatrixValid )
+	{
+		Vector vView3D{
+			2.0f * vView.x / m_nViewWidth - 1,
+			-2.0f * vView.y / m_nViewHeight + 1,
+			0
+		};
 
-	vView3D.x = 2.0f * vView.x / m_nViewWidth - 1;
-	vView3D.y = -2.0f * vView.y / m_nViewHeight + 1;
-	vView3D.z = 0;
-
-	Vector3DMultiplyPositionProjective( m_InvViewProjMatrix, vView3D, vWorld );
+		Vector3DMultiplyPositionProjective( m_InvViewProjMatrix, vView3D, vWorld );
+	}
+	else
+	{
+		vWorld.Init();
+	}
 }
 
 void CCamera::BuildRay( const Vector2D &vView, Vector& vStart, Vector& vEnd )
