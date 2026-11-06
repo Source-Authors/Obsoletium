@@ -168,25 +168,25 @@ DWORD CBSPLightingThread::ThreadMainLoop()
 
 int CBSPLightingThread::GetThreadCmd()
 {
-	return m_ThreadCmd.exchange(THREADCMD_NONE);
+	return m_ThreadCmd.exchange(THREADCMD_NONE, std::memory_order_acq_rel);
 }
 
 
 void CBSPLightingThread::SetThreadCmd( int cmd )
 {
-	m_ThreadCmd.store(cmd, std::memory_order::memory_order_relaxed);
+	m_ThreadCmd.store(cmd, std::memory_order_release);
 }
 
 
 int CBSPLightingThread::GetThreadState() const
 {
-	return m_ThreadState.load(std::memory_order::memory_order_relaxed);
+	return m_ThreadState.load(std::memory_order_acquire);
 }
 
 
 void CBSPLightingThread::SetThreadState( int state )
 {
-	m_ThreadState.store(state, std::memory_order::memory_order_relaxed);
+	m_ThreadState.store(state, std::memory_order_release);
 }
 
 
