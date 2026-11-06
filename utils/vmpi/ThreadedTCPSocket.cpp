@@ -154,7 +154,7 @@ private:
 		m_bWaitingForSendCompletion = false;
 		m_nBytesToReceive = -1;
 		m_bWaitingForSize = false;
-		m_bErrorSignal.store( false, std::memory_order::memory_order_relaxed );
+		m_bErrorSignal.store( false, std::memory_order_relaxed );
 		m_pRecvBuffer = NULL;
 	}
 
@@ -679,7 +679,7 @@ private:
 		m_hExitThreadsEvent.SetEvent();
 
 		// Notify the main thread so it can call Term() when it gets a chance.
-		m_bErrorSignal.store( true, std::memory_order::memory_order_acq_rel );
+		m_bErrorSignal.store( true, std::memory_order_release );
 	}
 
 
