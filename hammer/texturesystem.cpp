@@ -736,6 +736,8 @@ void CTextureSystem::ReloadMaterialsUsingTexture( ITexture *pTestTexture )
 			if ( pTex == pTestTexture )
 			{
 				pEditorTex->Reload( true );
+				// dimhotepus: Add missed break to speedup reload. CS:GO backport.
+				break;
 			}
 		}
 	}
