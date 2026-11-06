@@ -160,6 +160,9 @@ void CMapCylinder::Initialize(void)
 
 	m_pStartEntity = NULL;
 	m_pEndEntity = NULL;
+
+	m_flStartRadius = 0.0f;
+	m_flEndRadius = 0.0f;
 }
 
 
