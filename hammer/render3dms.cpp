@@ -1388,7 +1388,8 @@ void CRender3D::EndRenderFrame(void)
 					{
 						// model point as a spot with infinite inner radius
 						SetNamedMaterialVar(src_mat, "$C0_W", 0.5f );
-						SetNamedMaterialVar(src_mat, "$C1_W", 1.0e10f );
+						// dimhotepus: 1.0e10f -> 2147483520.0f, as it is casted to int internally.
+						SetNamedMaterialVar( src_mat, "$C1_W", 2147483520.0f );
 					}
 					else
 					{
