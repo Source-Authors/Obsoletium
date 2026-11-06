@@ -196,6 +196,10 @@ public:
 	// Opens the source file associated with a material.
 	void OpenSource( const char *pMaterialName );
 
+	// dimhotepus: CS:GO backport.
+	// Opens explorer dialog and selects the source file
+	void ExploreToSource( const char *pMaterialName );
+
 	// Reload individual textures.
 	void ReloadTextures( const char *pFilterName );
 

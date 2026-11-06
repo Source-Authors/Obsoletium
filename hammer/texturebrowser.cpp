@@ -52,6 +52,8 @@ BEGIN_MESSAGE_MAP(CTextureBrowser, CBaseDlg)
 	ON_BN_CLICKED(IDC_MARK, OnMark)
 	ON_BN_CLICKED(IDC_REPLACE, OnReplace)
 	ON_BN_CLICKED(IDC_TEXTURES_OPEN_SOURCE, OnOpenSource)
+	// dimhotepus: CS:GO backport.
+	ON_BN_CLICKED(IDC_TEXTURES_EXPLORE_SOURCE, OnExploreToSource)
 	ON_BN_CLICKED(IDC_TEXTURES_RELOAD, OnReload)
 	ON_MESSAGE(TWN_SELCHANGED, OnTexturewindowSelchange)
 	ON_MESSAGE(TWN_LBUTTONDBLCLK, OnTextureWindowDblClk)
@@ -646,6 +648,20 @@ void CTextureBrowser::OnOpenSource()
 		g_Textures.OpenSource( m_cTextureWindow.szCurTexture );
 	}
 }
+
+
+// dimhotepus: CS:GO backport.
+//-----------------------------------------------------------------------------
+// Explores to the source file: 
+//-----------------------------------------------------------------------------
+void CTextureBrowser::OnExploreToSource()
+{
+	if ( m_cTextureWindow.szCurTexture[0] )
+	{
+		g_Textures.ExploreToSource( m_cTextureWindow.szCurTexture );
+	}
+}
+
 
 void CTextureBrowser::OnReload()
 {

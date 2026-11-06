@@ -1234,7 +1234,7 @@ void CTextureSystem::OpenSource( const char *pMaterialName )
 		return;
 
 	char pRelativePath[MAX_PATH];
-	Q_snprintf( pRelativePath, MAX_PATH, "materials/%s.vmt", pMaterialName );
+	V_sprintf_safe( pRelativePath, "materials/%s.vmt", pMaterialName );
 
 	char pFullPath[MAX_PATH];
 	if ( g_pFullFileSystem->GetLocalPath_safe( pRelativePath, pFullPath ) )
@@ -1245,6 +1245,35 @@ void CTextureSystem::OpenSource( const char *pMaterialName )
 			format.Format("The texture '%s' couldn't be opened. Looks like it is inside VPK file.", pFullPath);
 
 			AfxMessageBox(format, MB_ICONEXCLAMATION);
+		}
+	}
+}
+
+
+// dimhotepus: CS:GO backport.
+//-----------------------------------------------------------------------------
+// Opens explorer dialog and selects the source file
+//-----------------------------------------------------------------------------
+void CTextureSystem::ExploreToSource( const char *pMaterialName )
+{
+	if ( !pMaterialName )
+		return;
+
+	char pRelativePath[MAX_PATH];
+	V_sprintf_safe( pRelativePath, "materials/%s.vmt", pMaterialName );
+
+	char pFullPath[MAX_PATH];
+	if ( g_pFullFileSystem->GetLocalPath_safe( pRelativePath, pFullPath ) )
+	{
+		CString strSel = "/select, ";
+		strSel += pFullPath;
+
+		if ( HINSTANCE( 32 ) > ShellExecute( NULL, "open", "explorer", strSel, NULL, SW_SHOWNORMAL ) )
+		{
+			CString format;
+			format.Format( "The texture '%s' couldn't be opened. Looks like it is inside VPK file.", pFullPath );
+
+			AfxMessageBox( format, MB_ICONEXCLAMATION );
 		}
 	}
 }
