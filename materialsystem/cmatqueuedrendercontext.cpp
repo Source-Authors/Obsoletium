@@ -63,7 +63,8 @@ public:
 		m_VertexSize( 0 ),
 		m_Type(MATERIAL_TRIANGLES),
 		m_pVertexOverride( NULL ),
-		m_pIndexOverride ( NULL )
+		m_pIndexOverride( NULL ),
+		m_bBuildQueued( false )
 	{
 	}
 
@@ -112,6 +113,7 @@ public:
 			}
 		}
 		FreeBuffers();
+        m_bBuildQueued = false;
 
 		m_pVertexOverride = pVertexOverride;
 		m_pIndexOverride = pIndexOverride;
@@ -461,8 +463,19 @@ public:
 			bDetachBuffers = false;
 		}
 
-		QueueBuild( bDetachBuffers );
-		m_pCallQueue->QueueCall( m_pLateBoundMesh, pfnDraw, firstIndex, numIndices );
+		if ( !m_bBuildQueued ) 
+		{
+			QueueBuild( false );
+			m_bBuildQueued = true;
+        }
+        m_pCallQueue->QueueCall( m_pLateBoundMesh, pfnDraw, firstIndex, numIndices );
+
+        if ( bDetachBuffers )
+		{
+			DetachBuffers();
+			m_Type = MATERIAL_TRIANGLES;
+			m_bBuildQueued = false;
+        }
 	}
 
 	void MarkAsDrawn()
@@ -614,6 +627,8 @@ private:
 
 	int m_nVerts;
 	int m_nIndices;
+
+	bool m_bBuildQueued;
 
 	unsigned short m_VertexSize;
 	MaterialPrimitiveType_t m_Type;
