@@ -7,9 +7,12 @@
 #include <WinSock2.h>
 
 #include "windows/scoped_com_initializer.h"
+#include "windows/scoped_floating_point_exception_mode.h"
 #include "windows/scoped_timer_resolution.h"
 #include "windows/scoped_winsock_initializer.h"
 #endif
+
+#include <memory>
 
 #include "appframework/AppFramework.h"
 #include "inputsystem/iinputsystem.h"
@@ -111,6 +114,34 @@ SpewRetval_t HammerSpewFunc( SpewType_t type, char const *raw )
 	return SPEW_CONTINUE;
 }
 
+[[nodiscard]] s1::win::FloatingPointExceptionMode GetFloatingPointExceptionMode(
+	ICommandLine *command_line )
+{
+	s1::win::FloatingPointExceptionMode mode{ s1::win::FloatingPointExceptionMode::None };
+
+	if ( command_line->HasParm( "-check-float-underflow" ) )
+	{
+		mode = mode | s1::win::FloatingPointExceptionMode::Underflow;
+	}
+
+	if ( command_line->HasParm( "-check-float-overflow" ) )
+	{
+		mode = mode | s1::win::FloatingPointExceptionMode::Overflow;
+	}
+
+	if ( command_line->HasParm( "-check-float-zerodivide" ) )
+	{
+		mode = mode | s1::win::FloatingPointExceptionMode::ZeroDivide;
+	}
+
+	if ( command_line->HasParm( "-check-float-invalid" ) )
+	{
+		mode = mode | s1::win::FloatingPointExceptionMode::Invalid;
+	}
+
+	return mode;
+}
+
 // The application object
 class HammerAppSystemGroup final : public CAppSystemGroup
 {
@@ -128,8 +159,8 @@ public:
 		scoped_spew_output_{ HammerSpewFunc },
 		scoped_app_locale_{ kEnUsUtf8Locale },
 		scoped_com_initializer_{ static_cast< COINIT >( COINIT_APARTMENTTHREADED |
-			COINIT_DISABLE_OLE1DDE |
-			COINIT_SPEED_OVER_MEMORY ) },
+		                                                COINIT_DISABLE_OLE1DDE |
+		                                                COINIT_SPEED_OVER_MEMORY ) },
 		scoped_timer_resolution_{ kSystemTimerResolution },
 		scoped_winsock_{ WINSOCK_VERSION }
 	{
@@ -158,6 +189,9 @@ private:
 	const s1::win::ScopedComInitializer        scoped_com_initializer_;
 	const s1::win::ScopedTimerResolution       scoped_timer_resolution_;
 	const s1::win::ScopedWinsockInitializer    scoped_winsock_;
+	// dimhotepus: Allow to catch floating point exceptions which are usually bugs
+	// in code.
+	std::unique_ptr<s1::win::ScopedFloatingPointExceptionMode> scoped_floating_point_exception_mode_;
 };
 
 // Create all singleton systems
@@ -171,6 +205,14 @@ bool HammerAppSystemGroup::Create()
 
 	// Save some memory so engine/hammer isn't so painful
 	CommandLine()->AppendParm( "-disallowhwmorph", nullptr );
+
+#ifdef _WIN32
+	// dimhotepus: Allow to catch floating point exceptions which are usually bugs
+	// in code.
+	scoped_floating_point_exception_mode_ = std::move(
+		std::make_unique< s1::win::ScopedFloatingPointExceptionMode >(
+		GetFloatingPointExceptionMode( CommandLine() ) ) );
+#endif
 
 	// Game and hammer require theses.
 	const CPUInformation *cpu_info{ GetCPUInformation() };
@@ -280,6 +322,8 @@ bool HammerAppSystemGroup::Create()
 
 void HammerAppSystemGroup::Destroy()
 {
+	scoped_floating_point_exception_mode_.reset();
+
 	hammer_ = nullptr;
 	material_system_ = nullptr;
 	input_system_ = nullptr;
