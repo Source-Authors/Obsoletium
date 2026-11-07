@@ -1441,7 +1441,11 @@ private:
 					}
 					// dimhotepus: Add missed break.
 					break;
-				case FIELD_INTEGER:		params[i] = sa.GetInt( i + 2 ); break;
+				// dimhotepus: Stop if cast fails to prevent unexpected truncation.
+				case FIELD_INTEGER:		params[i] = size_cast<int>( sa.GetInt( i + 2 ) ); break;
+				// dimhotepus: Support int64 / uint64.
+				case FIELD_INT64:		params[i] = static_cast<int64>( sa.GetInt( i + 2 ) ); break;
+				case FIELD_UINT64:		params[i] = static_cast<uint64>( sa.GetInt( i + 2 ) ); break;
 				case FIELD_BOOLEAN:		params[i] = sa.GetBool( i + 2 ); break;
 				case FIELD_CHARACTER:	params[i] = sa.GetString( i + 2 )[0]; break;
 				case FIELD_HSCRIPT:
@@ -1527,7 +1531,11 @@ private:
 					sq_remove( hVM, -2 );
 					break;
 				}
-			case FIELD_INTEGER:		sa.Return( (SQ_INT)returnValue ); break;
+			// dimhotepus: Stop if cast fails to prevent unexpected truncation.
+			case FIELD_INTEGER:		sa.Return( static_cast<SQ_INT>( size_cast<int>( returnValue ) ) ); break;
+			// dimhotepus: Support int64 / uint64.
+			case FIELD_INT64:		sa.Return( static_cast<SQ_INT>( static_cast<int64>( returnValue ) ) ); break;
+			case FIELD_UINT64:		sa.Return( static_cast<SQ_INT>( static_cast<uint64>( returnValue ) ) ); break;
 			case FIELD_BOOLEAN:		sa.Return( (bool)returnValue ); break;
 			case FIELD_CHARACTER:	Assert( 0 ); sq_pushnull( hVM ); break;
 			case FIELD_HSCRIPT:
@@ -1661,6 +1669,9 @@ private:
 				break;
 			case FIELD_FLOAT:
 			case FIELD_INTEGER:
+			// dimhotepus: Support int64 / uint64
+			case FIELD_INT64:
+			case FIELD_UINT64:
 				*pCurrent = 'n';
 				break;
 			case FIELD_BOOLEAN:
@@ -1788,6 +1799,9 @@ private:
 				break;
 			}
 		case FIELD_INTEGER:		sq_pushinteger( m_hVM, value.m_int ); break;
+		// dimhotepus: Support int64 / uint64.
+		case FIELD_INT64:		sq_pushinteger( m_hVM, value.m_int64 ); break;
+		case FIELD_UINT64:		sq_pushinteger( m_hVM, value.m_uint64 ); break;
 		case FIELD_BOOLEAN:		sq_pushbool( m_hVM, value.m_bool ); break;
 		case FIELD_CHARACTER:	{ char sz[2]; sz[0] = value.m_char; sz[1] = 0; sq_pushstring( m_hVM, sz, 1 ); break; }
 		case FIELD_HSCRIPT:		if ( value.m_hScript ) sq_pushobject( m_hVM, *((HSQOBJECT *)value.m_hScript) ); else sq_pushnull( m_hVM ); break;

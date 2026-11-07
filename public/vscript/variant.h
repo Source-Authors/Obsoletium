@@ -121,7 +121,43 @@ public:
 	[[nodiscard]] bool IsNull() const						{ return (m_type == FIELD_VOID ); }
 
 	operator int() const					{ Assert( m_type == FIELD_INTEGER || m_type == FIELD_FLOAT );	return ( m_type == FIELD_INTEGER ) ? m_int : (int)m_float; }
+	// dimhotepus: long support. Mostly for LP64.
+	operator long() const					
+	{
+		Assert( m_type == FIELD_INTEGER || m_type == FIELD_FLOAT );
+		if ( m_type == FIELD_INTEGER )
+		{
+			if constexpr ( sizeof( long ) == 4 )
+			{
+				return static_cast< long >( m_int );
+			}
+			else
+			{
+				return static_cast< long >( m_int64 );
+			}
+		}
+
+		return static_cast< long >( m_float );
+	}
 	operator uint() const					{ Assert( m_type == FIELD_UINT );		return m_uint; }
+	// dimhotepus: unsigned long support. Mostly for LP64.
+	operator unsigned long() const
+	{
+		Assert( m_type == FIELD_INTEGER || m_type == FIELD_FLOAT );
+		if ( m_type == FIELD_INTEGER )
+		{
+			if constexpr ( sizeof( unsigned long ) == 4 )
+			{
+				return static_cast< unsigned long >( m_uint );
+			}
+			else
+			{
+				return static_cast< unsigned long >( m_uint64 );
+			}
+		}
+
+		return static_cast< unsigned long >( m_float );
+	}
 	// dimhotepus: Uncomment int64 support.
 	operator int64() const					{ Assert( m_type == FIELD_INT64 );		return m_int64; }
 	operator uint64() const					{ Assert( m_type == FIELD_UINT64 );		return m_uint64; }
@@ -142,7 +178,37 @@ public:
 //	operator CUtlStringToken() const		{ Assert( m_type == FIELD_UTLSTRINGTOKEN );	CUtlStringToken t; t.m_nHashCode = m_utlStringToken; return t; }
 
 	void operator=( int i ) 				{ Free(); m_type = FIELD_INTEGER; m_int = i; }
+	// dimhotepus: long support. Mostly for LP64.
+	void operator=( long i )
+	{
+		Free();
+		if constexpr ( sizeof( long ) == 4 )
+		{
+			m_type = FIELD_INTEGER;
+			m_int = static_cast<int>( i );
+		}
+		else
+		{
+			m_type = FIELD_INT64;
+			m_int64 = static_cast<int64>( i );
+		}
+	}
 	void operator=( uint i ) 				{ Free(); m_type = FIELD_UINT; m_uint = i; }
+	// dimhotepus: unsigned long support. Mostly for LP64.
+	void operator=( unsigned long i )
+	{
+		Free();
+		if constexpr ( sizeof( unsigned long ) == 4 )
+		{
+			m_type = FIELD_INTEGER;
+			m_uint = static_cast< unsigned >( i );
+		}
+		else
+		{
+			m_type = FIELD_UINT64;
+			m_uint64 = static_cast< uint64 >( i );
+		}
+	}
 	// dimhotepus: Uncomment int64 support.
 	void operator=( int64 i ) 				{ Free(); m_type = FIELD_INT64; m_int64 = i; }
 	void operator=( uint64 i ) 				{ Free(); m_type = FIELD_UINT64; m_uint64 = i; }
