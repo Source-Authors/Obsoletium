@@ -517,10 +517,15 @@ void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeigh
 			m_nVROverrideX = vrBounds.nX;
 			m_nVROverrideY = vrBounds.nY;
 #elif defined( USE_SDL )
-			for ( int i = 0; i < SDL_GetNumVideoDisplays(); i++ )
+            // dimhotepus: SDL3 port.
+			int nDisplays = 0;
+			SDL_DisplayID *pDisplays = SDL_GetDisplays( &nDisplays );
+			RunCodeAtScopeExit( SDL_free( pDisplays ) );
+
+			for ( int i = 0; i < nDisplays; i++ )
 			{
 				SDL_Rect sdlRect;
-				SDL_GetDisplayBounds( i, &sdlRect );
+				SDL_GetDisplayBounds( pDisplays[i], &sdlRect );
 
 				if( sdlRect.x == vrBounds.nX && sdlRect.y == vrBounds.nY 
 					&& sdlRect.w == vrBounds.nWidth && sdlRect.h == vrBounds.nHeight )
@@ -963,9 +968,8 @@ void CVideoMode_Common::InvalidateWindow()
 #if defined( USE_SDL )
 		SDL_Event fake;
 		memset(&fake, '\0', sizeof (SDL_Event));
-		fake.type = SDL_WINDOWEVENT;
+		fake.type = SDL_EVENT_WINDOW_EXPOSED;
 		fake.window.windowID = SDL_GetWindowID( (SDL_Window *) g_pLauncherMgr->GetWindowRef() );
-		fake.window.event = SDL_WINDOWEVENT_EXPOSED;
 		SDL_PushEvent(&fake);
 #else
 		InvalidateRect( (HWND)game->GetMainWindow(), NULL, FALSE );
@@ -1091,14 +1095,13 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 	// Use Change Display Settings to go full screen
 	ChangeDisplaySettingsToFullscreen( nWidth, nHeight, nBPP );
 
+#ifndef USE_SDL
 	RECT WindowRect;
 	WindowRect.top      = 0;
 	WindowRect.left     = 0;
 	WindowRect.right    = nWidth;
 	WindowRect.bottom   = nHeight;
 
-#ifndef USE_SDL
-	// Get window style
 	DWORD style = GetWindowLong( (HWND)game->GetMainWindow(), GWL_STYLE ); //-V303 //-V2002
 	DWORD exStyle = GetWindowLong( (HWND)game->GetMainWindow(), GWL_EXSTYLE ); //-V303 //-V2002
 
@@ -1131,6 +1134,9 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 	// dimhotepus: Honor DPI.
 	AdjustWindowRectExForDpi( &WindowRect, style, FALSE, exStyle, ::GetDpiForWindow((HWND)game->GetMainWindow()) );
 
+	nWidth = WindowRect.right - WindowRect.left;
+	nHeight = WindowRect.bottom - WindowRect.top;
+
 	// Prepare to set window pos, which is required when toggling between topmost and not window flags
 	HWND hWndAfter = NULL;
 	DWORD dwSwpFlags = 0;
@@ -1149,31 +1155,27 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 	// Move the window to 0, 0 and the new true size
 	SetWindowPos( (HWND)game->GetMainWindow(),
 		hWndAfter,
-		0, 0, WindowRect.right - WindowRect.left,
-		WindowRect.bottom - WindowRect.top,
+		0, 0, nWidth, nHeight,
 		SWP_NOREDRAW | dwSwpFlags );
 #endif // !USE_SDL
 
-	// Now center
-	CenterEngineWindow(
-		WindowRect.right - WindowRect.left,
-		WindowRect.bottom - WindowRect.top );
+	// Now center. WindowRect is always {0,0,nWidth,nHeight}, so the Win32 and
+	// SDL paths below are simply nWidth x nHeight.
+	CenterEngineWindow( nWidth, nHeight );
 #if defined( USE_SDL )
-	g_pLauncherMgr->SetWindowFullScreen( !bWindowed, WindowRect.right - WindowRect.left, WindowRect.bottom - WindowRect.top );
+	g_pLauncherMgr->SetWindowFullScreen( !bWindowed, nWidth, nHeight );
 
-	CenterEngineWindow(
-		WindowRect.right - WindowRect.left,
-		WindowRect.bottom - WindowRect.top );
+	CenterEngineWindow( nWidth, nHeight );
 
-	g_pLauncherMgr->SizeWindow( WindowRect.right - WindowRect.left, WindowRect.bottom - WindowRect.top );
+	g_pLauncherMgr->SizeWindow( nWidth, nHeight );
 
 	if( bWindowed )
 	{
 		SDL_Window* win = (SDL_Window*)g_pLauncherMgr->GetWindowRef();
 		if ( m_bVROverride || bBorderless )
-			SDL_SetWindowBordered( win, SDL_FALSE );
+			SDL_SetWindowBordered( win, false );
 		else
-			SDL_SetWindowBordered( win, SDL_TRUE );
+			SDL_SetWindowBordered( win, true );
 			
 	}
 #endif
@@ -1267,11 +1269,24 @@ void CVideoMode_Common::CenterEngineWindow( int width, int height)
 	static ConVarRef sdl_displayindex( "sdl_displayindex" );
 	int displayindex = sdl_displayindex.IsValid() ? sdl_displayindex.GetInt() : 0;
 
-	SDL_DisplayMode mode;
-	SDL_GetCurrentDisplayMode( displayindex, &mode );
+	// dimhotepus: SDL3 port.
+	int            nDisplays = 0;
+	SDL_DisplayID *pDisplays = SDL_GetDisplays( &nDisplays );
+	RunCodeAtScopeExit( SDL_free( pDisplays ) );
 
-	const int wide = mode.w;
-	const int tall = mode.h;
+	if ( !pDisplays || nDisplays <= 0 )
+	{
+		CenterX = 0;
+		CenterY = 0;
+		return;
+	}
+
+	if ( displayindex < 0 || displayindex >= nDisplays )
+		displayindex = 0;
+
+	const SDL_DisplayMode *pMode = SDL_GetCurrentDisplayMode( pDisplays[displayindex] );
+	const int wide = pMode ? pMode->w : width;
+	const int tall = pMode ? pMode->h : height;
 
 	CenterX = (wide - width) / 2;
 	CenterY = (tall - height) / 2;
