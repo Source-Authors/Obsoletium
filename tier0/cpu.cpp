@@ -371,14 +371,14 @@ CpuCoreInfo GetProcessorCoresInfo()
 
 #endif  // _WIN32
 
+}  // namespace
+
 #if defined(POSIX)
 // Move this declaration out of the QueryCurrentCpuFrequency() function because
 // otherwise clang warns that it is non-obvious whether it is a variable
 // or a function declaration: [-Wvexing-parse]
-uint64 CalculateCPUFreq(); // from cpu_linux.cpp
+uint64 CalculateCPUFreq(); // from cpu_posix.cpp
 #endif
-
-}  // namespace
 
 int64 QueryCurrentCpuFrequency();
 
