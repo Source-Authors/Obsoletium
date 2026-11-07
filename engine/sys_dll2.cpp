@@ -24,6 +24,9 @@
 #include <csignal>
 #endif
 
+#include <chrono>
+#include <thread>
+
 #include "quakedef.h"
 #include "idedicatedexports.h"
 #include "engine_launcher_api.h"
