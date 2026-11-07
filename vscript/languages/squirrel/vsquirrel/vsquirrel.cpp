@@ -86,6 +86,8 @@ static constexpr const char *FieldTypeToString( int type )
 		case FIELD_CSTRING:		return "string";
 		case FIELD_VECTOR:		return "Vector";
 		case FIELD_INTEGER:		return "int";
+		case FIELD_INT64:		return "int64";
+		case FIELD_UINT64:		return "uint64";
 		case FIELD_BOOLEAN:		return "bool";
 		case FIELD_CHARACTER:	return "char";
 		case FIELD_HSCRIPT:		return "handle";
