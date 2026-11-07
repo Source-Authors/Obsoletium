@@ -23,8 +23,8 @@ bool IsDebuggerPresent( int time )
 {
 	// Need to get around the __wrap_open() stuff. Just find the open symbol
 	// directly and use it...
-	using open_func_t = int()( const char *pathname, int flags, mode_t mode );
-	open_func_t *open_func = (open_func_t *)dlsym( RTLD_NEXT, "open" );
+	using open_func_t = int ( * )( const char *pathname, int flags, mode_t mode );
+	open_func_t open_func = (open_func_t)dlsym( RTLD_NEXT, "open" );
 
 	if ( open_func )
 	{
@@ -84,22 +84,22 @@ void WaitForDebuggerConnect( int argc, char *argv[], int time )
 
 int main( int argc, char *argv[] )
 {
-	const char          kLauncherPath[] = PLATFORM_BIN_DIR "/launcher" DLL_EXT_STRING;
+	constexpr char      kLauncherPath[] = PLATFORM_BIN_DIR "/launcher" DLL_EXT_STRING;
 	const s1::ScopedDll launcher_dll{
 		kLauncherPath, RTLD_NOW
 	};
 	if ( !launcher_dll )
 	{
-		fprintf( stderr, "dlopen %s failed: %s.\n",
+		fprintf( stderr, "dlopen(%s) failed: %s.\n",
 		         kLauncherPath, ::dlerror() );
 		return 1;
 	}
 
 	using LauncherMainFunction = int ( * )( int argc, char **argv );
 
-	const auto main =
+	const auto [launcher_main, launcher_main_rc] =
 	launcher_dll.GetFunction< LauncherMainFunction >( "LauncherMain" );
-	if ( !main )
+	if ( !launcher_main )
 	{
 		fprintf( stderr, "dlsym(%s, LauncherMain) entry proc failed: %s.\n",
 		         kLauncherPath, ::dlerror() );
@@ -147,7 +147,7 @@ int main( int argc, char *argv[] )
 	WaitForDebuggerConnect( argc, argv, 30 );
 #endif
 
-	const auto rc = main( argc, argv );
+	const auto rc = launcher_main( argc, argv );
 
 	// Prevent tail call optimization and incorrect stack traces.
 	exit( rc );
