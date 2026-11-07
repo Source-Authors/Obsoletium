@@ -25,8 +25,8 @@ bool IsDebuggerPresent( int time )
 {
 	// Need to get around the __wrap_open() stuff. Just find the open symbol
 	// directly and use it...
-	using open_func_t = int()( const char *pathname, int flags, mode_t mode );
-	open_func_t *open_func = (open_func_t *)dlsym( RTLD_NEXT, "open" );
+	using open_func_t = int ( * )( const char *pathname, int flags, mode_t mode );
+	open_func_t open_func = (open_func_t)dlsym( RTLD_NEXT, "open" );
 
 	if ( open_func )
 	{
@@ -96,13 +96,13 @@ int main( int argc, char *argv[] )
 
 	// Must add 'bin' to the path....
 	const char *path_env{ ::getenv( "LD_LIBRARY_PATH" ) };
-	char new_path_env[4096];
+	char        new_path_env[4096];
 	snprintf( new_path_env, sizeof( new_path_env ) - 1,
 	          "LD_LIBRARY_PATH=%s/" PLATFORM_BIN_DIR ":%s", cwd, path_env );
 	if ( putenv( new_path_env ) )
 	{
 		const auto rc = errno;
-		fprintf( stderr, "putenv (%s) failed: %s\n", new_path_env, strerror( rc ) );
+		fprintf( stderr, "putenv(%s) failed: %s\n", new_path_env, strerror( rc ) );
 		return rc;
 	}
 
@@ -126,17 +126,17 @@ int main( int argc, char *argv[] )
 	const s1::ScopedDll dedicated{ dedicated_name, RTLD_NOW };
 	if ( !dedicated )
 	{
-		fprintf( stderr, "open %s failed: %s\n", dedicated_name, ::dlerror() );
+		fprintf( stderr, "dlopen(%s) failed: %s\n", dedicated_name, ::dlerror() );
 		return 3;
 	}
 
 	using DedicatedMainFunction = int ( * )( int argc, char *argv[] );
-	const auto dedicated_main =
+	const auto [dedicated_main, dedicated_main_rc] =
 	dedicated.GetFunction< DedicatedMainFunction >( "DedicatedMain" );
 	if ( !dedicated_main )
 	{
-		fprintf( stderr, "Failed to find dedicated server entry point: %s\n",
-		         ::dlerror() );
+		fprintf( stderr, "dlsym(%s, DedicatedMain) failed: %s\n",
+		         dedicated_name, ::dlerror() );
 		return 4;
 	}
 
@@ -144,7 +144,7 @@ int main( int argc, char *argv[] )
 	WaitForDebuggerConnect( argc, argv, 30 );
 #endif
 
-	const int rc{ dedicated_main( argc, argv ) };
+	const auto rc = dedicated_main( argc, argv );
 
 	// Prevent tail call optimization and incorrect stack traces.
 	exit( rc );
