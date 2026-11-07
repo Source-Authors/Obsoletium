@@ -19,6 +19,7 @@ struct SpatializationInfo_t;
 typedef void *FileNameHandle_t;
 struct StartSoundParams_t;
 
+#include "soundflags.h" // SoundSource
 #include "tier1/utlrbtree.h"
 
 //-----------------------------------------------------------------------------
@@ -76,7 +77,7 @@ public:
 
 	//---------------------------------
 	//---------------------------------
-	virtual bool IsPlayer( enum SoundSource source ) = 0;
+	virtual bool IsPlayer( SoundSource source ) = 0;
 
 	//---------------------------------
 	//---------------------------------
