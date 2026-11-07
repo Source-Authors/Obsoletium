@@ -21,6 +21,7 @@
 
 #include <atomic>
 #include <algorithm>
+#include <vector>  // std::vector, used by DumpMemMapStatSorted
 #include <unordered_map>
 #include <unordered_set>
 #include <climits>
@@ -325,7 +326,8 @@ static inline void *InternalMalloc( size_t nSize, const char *pFileName, int nLi
 	}
 	pInternalMem->m_pFileName = pFileName;
 	pInternalMem->m_nLineNumber = nLine;
-	*((int*)pInternalMem->m_Reserved) = 0xf00df00d;
+	// dimhotepus: DbgMemHeader_t m_Reserved -> reserved.
+	*((int*)pInternalMem->reserved) = 0xf00df00d;
 #else
 	pInternalMem = (DbgMemHeader_t *)_malloc_dbg( nSize + sizeof(DbgMemHeader_t), _NORMAL_BLOCK, pFileName, nLine );
 #endif // defined( POSIX ) || defined(NDEBUG)
@@ -537,7 +539,7 @@ public:
 
 	void CompactHeap() override
 	{
-#if !defined(NDEBUG)
+#if !defined(NDEBUG) && defined( _WIN32 )
 		// dimhotepus: Cleanup caches and decommit if possible.
 		// If HeapSetInformation is called with HeapHandle set to NULL, then all heaps
 		// in the process with a low-fragmentation heap (LFH) will have their caches
@@ -721,8 +723,9 @@ struct DbgInfoStack_t
 	int m_nLine;
 };
 
-static thread_local DbgInfoStack_t* g_DbgInfoStack CONSTRUCT_EARLY;
-static thread_local int				g_nDbgInfoStackDepth CONSTRUCT_EARLY;
+// dimhotepus: Dropped CONSTRUCT_EARLY on thread_locals.
+static thread_local DbgInfoStack_t* g_DbgInfoStack;
+static thread_local int				g_nDbgInfoStackDepth;
 
 //-----------------------------------------------------------------------------
 // Singleton...
