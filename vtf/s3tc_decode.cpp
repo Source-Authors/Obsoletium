@@ -47,7 +47,7 @@ struct S3TCBlock_DXT5
 // ------------------------------------------------------------------------------------------ //
 
 template<typename T>
-static [[nodiscard]] T ReadBitInt( const char *pBits, T iBaseBit, T nBits )
+[[nodiscard]] static T ReadBitInt( const char *pBits, T iBaseBit, T nBits )
 {
 	T ret = 0;
 	for ( T i=0; i < nBits; i++ )
