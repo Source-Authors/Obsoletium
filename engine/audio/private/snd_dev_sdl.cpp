@@ -87,9 +87,11 @@ public:
 
 private:
 	SDL_AudioDeviceID m_devId;
+	SDL_AudioStream *m_stream;
+	SDL_AudioSpec m_spec;
 
-	static void SDLCALL AudioCallbackEntry(void *userdata, Uint8 * stream, int len);
-	void AudioCallback(Uint8 *stream, int len);
+	static void SDLCALL AudioCallbackEntry(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount);
+	void AudioCallback(SDL_AudioStream *stream, int numFrames);
 
 	void	OpenWaveOut( void );
 	void	CloseWaveOut( void );
@@ -106,6 +108,10 @@ private:
 
 	// Memory for the wave data
 	uint8_t		*m_pBuffer;
+
+	// dimhotepus: SDL3 has no acquire/flush buffer API, so the callback
+	// stages its slice here before handing it to SDL_PutAudioStreamData().
+	uint8_t		*m_pScratch;
 };
 
 static CAudioDeviceSDLAudio *g_wave = NULL;
@@ -116,6 +122,9 @@ static CAudioDeviceSDLAudio *g_wave = NULL;
 CAudioDeviceSDLAudio::CAudioDeviceSDLAudio()
 {
 	m_devId = 0;
+	m_stream = nullptr;
+	m_pBuffer = nullptr;
+	m_pScratch = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -164,6 +173,7 @@ bool CAudioDeviceSDLAudio::Init( void )
 	m_buffersSent = 0;
 	m_pauseCount = 0;
 	m_pBuffer = NULL;
+	m_pScratch = NULL;
 	m_readPos = 0;
 	m_partialWrite = 0;
 	m_devId = 0;
@@ -232,33 +242,29 @@ void CAudioDeviceSDLAudio::OpenWaveOut( void )
 	// Open an audio device...
 	//  !!! FIXME: let user specify a device?
 	// !!! FIXME: we can handle quad, 5.1, 7.1, etc here.
-	SDL_AudioSpec desired, obtained;
-	BitwiseClear(desired);
-	desired.freq = SOUND_DMA_SPEED;
-	desired.format = AUDIO_S16SYS;
-	desired.channels = 2;
-	desired.samples = 2048;
-	desired.callback = &CAudioDeviceSDLAudio::AudioCallbackEntry;
-	desired.userdata = this;
-	m_devId = SDL_OpenAudioDevice(NULL, 0, &desired, &obtained, SDL_AUDIO_ALLOW_ANY_CHANGE);
+	// dimhotepus: SDL3 port.
+	SDL_zero(m_spec);
+	m_spec.freq = SOUND_DMA_SPEED;
+	m_spec.format = SDL_AUDIO_S16;
+	m_spec.channels = 2;
 
+	m_stream = SDL_OpenAudioDeviceStream( SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &m_spec,
+		&CAudioDeviceSDLAudio::AudioCallbackEntry, this );
+
+	if (!m_stream)
+		SDLAUDIO_FAIL("SDL_OpenAudioDeviceStream()");
+
+	m_devId = SDL_GetAudioStreamDevice( m_stream );
 	if (!m_devId)
-		SDLAUDIO_FAIL("SDL_OpenAudioDevice()");
+		SDLAUDIO_FAIL("SDL_GetAudioStreamDevice()");
 
 	#undef SDLAUDIO_FAIL
 
 	// We're now ready to feed audio data to SDL!
 	AllocateOutputBuffers();
-	SDL_PauseAudioDevice(m_devId, 0);
+	SDL_ResumeAudioStreamDevice( m_stream );
 
-#if defined( BINK_VIDEO ) && defined( LINUX )
-	// Tells Bink to use SDL for its audio decoding
-	if ( g_pVideo != NULL) 
-	{
-		g_pVideo->SoundDeviceCommand( VideoSoundDeviceOperation::SET_SDL_PARAMS, NULL, (void *)&obtained );
-	
-	}
-#endif
+	// dimhotepus: Dropped VideoSoundDeviceOperation::SET_SDL_PARAMS as not used.
 }
 
 //-----------------------------------------------------------------------------
@@ -267,11 +273,12 @@ void CAudioDeviceSDLAudio::OpenWaveOut( void )
 void CAudioDeviceSDLAudio::CloseWaveOut( void ) 
 { 
 	// none of these SDL_* functions are available to call if this is false.
-	if (m_devId)
+	if (m_stream)
 	{
-		SDL_CloseAudioDevice(m_devId);
-		m_devId = 0;
+		SDL_DestroyAudioStream(m_stream);
+		m_stream = nullptr;
 	}
+	m_devId = 0;
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 	FreeOutputBuffers();
 }
@@ -285,6 +292,8 @@ void CAudioDeviceSDLAudio::AllocateOutputBuffers()
 	constexpr int nBufferSize = WAV_BUFFER_SIZE * WAV_BUFFERS;
 	m_pBuffer = new uint8_t[nBufferSize];
 	memset(m_pBuffer, '\0', nBufferSize);
+	m_pScratch = new uint8_t[nBufferSize];
+	memset(m_pScratch, '\0', nBufferSize);
 	m_readPos = 0;
 	m_partialWrite = 0;
 	m_deviceSampleCount = nBufferSize / DeviceSampleBytes();
@@ -298,6 +307,8 @@ void CAudioDeviceSDLAudio::FreeOutputBuffers()
 {
 	delete[] m_pBuffer;
 	m_pBuffer = NULL;
+	delete[] m_pScratch;
+	m_pScratch = NULL;
 }
 
 
@@ -326,27 +337,37 @@ int CAudioDeviceSDLAudio::PaintBegin( float mixAheadTime, int soundtime, int pai
 	return endtime;
 }
 
-void CAudioDeviceSDLAudio::AudioCallbackEntry(void *userdata, Uint8 *stream, int len)
+void CAudioDeviceSDLAudio::AudioCallbackEntry(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount)
 {
-	((CAudioDeviceSDLAudio *) userdata)->AudioCallback(stream, len);
+	((CAudioDeviceSDLAudio *) userdata)->AudioCallback(stream, additional_amount);
 }
 
-void CAudioDeviceSDLAudio::AudioCallback(Uint8 *stream, int len)
+void CAudioDeviceSDLAudio::AudioCallback(SDL_AudioStream *pStream, int numFrames)
 {
-	if (!m_devId)
+	if (!m_stream)
 	{
 		debugsdl("SDLAUDIO: uhoh, no audio device!\n");
 		return;  // can this even happen?
 	}
 
+	// SDL3 asks for data in sample frames, not bytes.
+	int len = numFrames * SDL_AUDIO_FRAMESIZE( m_spec );
+	if (len <= 0)
+		return;
+
+	// This SDL3 version has no acquire/flush buffer API, so the only way to feed
+	// the stream is SDL_PutAudioStreamData(). Stage the slice in m_pScratch: the
+	// ring drain below and the optional Bink mix both write into it, and it goes
+	// to SDL in a single call.
 	const int totalWriteable = len;
 #if defined( BINK_VIDEO ) && defined( LINUX )
-	Uint8 *stream_orig = stream;
+	Uint8 *stream_orig = m_pScratch;
 #endif
 	debugsdl("SDLAUDIO: writable size is %d.\n", totalWriteable);
 
 	Assert(len <= (WAV_BUFFERS * WAV_BUFFER_SIZE));
 
+	int nStaged = 0;
 	while (len > 0)
 	{
 		// spaceAvailable == bytes before we overrun the end of the ring buffer.
@@ -358,8 +379,8 @@ void CAudioDeviceSDLAudio::AudioCallback(Uint8 *stream, int len)
 			const uint8_t *buf = m_pBuffer + m_readPos;
 			debugsdl("SDLAUDIO: Writing %d bytes...\n", writeLen);
 
-			memcpy(stream, buf, writeLen);
-			stream += writeLen;
+			memcpy( m_pScratch + nStaged, buf, writeLen );
+			nStaged += writeLen;
 			len -= writeLen;
 			Assert(len >= 0);
 		}
@@ -374,6 +395,9 @@ void CAudioDeviceSDLAudio::AudioCallback(Uint8 *stream, int len)
 		g_pVideo->SoundDeviceCommand( VideoSoundDeviceOperation::SDLMIXER_CALLBACK, (void *)stream_orig, (void *)&totalWriteable );
 	}
 #endif
+
+	if ( nStaged > 0 && !SDL_PutAudioStreamData( pStream, m_pScratch, nStaged ) )
+		debugsdl("SDLAUDIO: SDL_PutAudioStreamData() failed: %s\n", SDL_GetError());
 
 	// Translate between bytes written and buffers written.
 	m_partialWrite += totalWriteable;
@@ -413,7 +437,7 @@ void CAudioDeviceSDLAudio::Pause( void )
 	if (m_pauseCount == 1)
 	{
 		debugsdl("SDLAUDIO: PAUSE\n");
-		SDL_PauseAudioDevice(m_devId, 1);
+		SDL_PauseAudioStreamDevice(m_stream);
 	}
 }
 
@@ -426,7 +450,7 @@ void CAudioDeviceSDLAudio::UnPause( void )
 		if (m_pauseCount == 0)
 		{
 			debugsdl("SDLAUDIO: UNPAUSE\n");
-			SDL_PauseAudioDevice(m_devId, 0);
+			SDL_ResumeAudioStreamDevice(m_stream);
 		}
 	}
 }
