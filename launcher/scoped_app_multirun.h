@@ -44,6 +44,11 @@ constexpr inline unsigned long kWaitAbandoned{ 0x00000080L };
 #include "tier0/icommandline.h"
 #include "tier1/strtools.h"
 
+// dimhotepus: Define used fallback game dir used when no -game (ex. Portal -game portal).
+#ifndef DEFAULT_HL2_GAMEDIR
+#define DEFAULT_HL2_GAMEDIR "hl2"
+#endif
+
 namespace s1::launcher
 {
 
