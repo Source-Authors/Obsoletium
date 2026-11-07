@@ -5385,7 +5385,7 @@ int CMemoryFileHandle::Seek( int64 nOffset64, int nWhence )
 {
 	if ( nWhence == SEEK_SET )
 	{
-		m_nPosition = (int) clamp( nOffset64, 0ll, m_nLength );
+		m_nPosition = (int) clamp( nOffset64, (int64)0, m_nLength );
 	}
 	else if ( nWhence == SEEK_CUR )
 	{
@@ -5393,7 +5393,7 @@ int CMemoryFileHandle::Seek( int64 nOffset64, int nWhence )
 	}
 	else if ( nWhence == SEEK_END )
 	{
-		m_nPosition = (int) m_nLength + (int) clamp( nOffset64, -m_nLength, 0LL );
+		m_nPosition = (int) m_nLength + (int) clamp( nOffset64, -m_nLength, (int64)0 );
 	}
 	return m_nPosition;
 }
