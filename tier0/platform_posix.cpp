@@ -52,6 +52,7 @@
 
 #include "posix_file_stream.h"
 
+#include "tier0/icommandline.h"
 #include "tier0/vcrmode.h"
 #include "tier0/memalloc.h"
 #include "tier0/dbg.h"
@@ -282,6 +283,15 @@ void TrimIncompleteUtf8( char *text ) noexcept
 	}
 }
 
+[[nodiscard]] static bool IsConsoleMode()
+{
+	// No graphics and sound in launcher.
+	static bool bResult = CommandLine()->HasParm( _T("-textmode") ) ||
+		// Console mode for dedicated server.
+		CommandLine()->HasParm( _T("-console") );
+	return bResult;
+}
+
 }  // namespace
 
 Plat_MessageBoxButton Plat_MessageBox( IN_Z const char      *title,
@@ -290,6 +300,14 @@ Plat_MessageBoxButton Plat_MessageBox( IN_Z const char      *title,
                                        Plat_MessageBoxButton buttons,
                                        Plat_MessageBoxIcon   icon )
 {
+	// dimhotepus: Running in console mode should not issue GUI dialogs.
+	if ( IsConsoleMode() )
+	{
+		Warning( "%s:%s - %s\n", title, mainInstruction, content );
+		// Don't know what to choose, let's use none.
+		return Plat_MessageBoxButton::None;
+	}
+
 	SDL_MessageBoxButtonData sdlButtons[5];
 	int                      count{ 0 };
 
