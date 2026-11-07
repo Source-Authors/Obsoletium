@@ -940,7 +940,7 @@ public:
 			sq_pushobject( m_hVM, *((HSQOBJECT *)hScope) );
 		}
 
-		intp nReturnValue;
+		SQInteger nReturnValue;
 
 		sq_pushinteger(m_hVM, nIterator);
 
