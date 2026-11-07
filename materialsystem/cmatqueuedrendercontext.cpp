@@ -353,7 +353,8 @@ public:
 			{
 				#define FindMin( desc, pCurrent, tag )	( ( desc.m_VertexSize_##tag != 0 ) ? min( pCurrent, (void *)desc.m_p##tag )  : pCurrent )
 
-				pDest = (void *)MAXSIZE_T;
+				constexpr size_t maxSizeT{ static_cast<size_t>( ~( (size_t)0 ) ) };
+				pDest = (void *)maxSizeT;
 
 				pDest = FindMin( desc, pDest, BoneWeight );
 				pDest = FindMin( desc, pDest, BoneMatrixIndex );
