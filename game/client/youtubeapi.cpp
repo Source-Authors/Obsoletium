@@ -500,11 +500,11 @@ private:
 			strAPIRequest.Access(), m_strMimeType.Get()
 		);
 
-		CUtlBuffer postDataRaw( 0, 0, 0 );
+		CUtlBuffer postDataRaw;
 
 		postDataRaw.Put( fmtstrBody.Access(), fmtstrBody.Length() );
 
-		CUtlBuffer fileData( 0, 0, 0 );
+		CUtlBuffer fileData;
 		bool bReadFileOK = g_pFullFileSystem->ReadFile( m_strFilePath, nullptr, fileData );
 
 		if ( bReadFileOK )
