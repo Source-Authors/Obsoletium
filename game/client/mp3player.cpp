@@ -1304,10 +1304,51 @@ void CMP3Player::PopulateTree()
 }
 
 // Instead of including windows.h
+#ifdef POSIX
+#include <cstdio>
+// dimhotepus: Native POSIX file copy.
+extern "C" int __attribute__((visibility("hidden")))
+CopyFileA(char *pszSource, char *pszDest, int bFailIfExists) {
+  if (!pszSource || !pszDest) {
+    return 0;
+  }
+  if (bFailIfExists) {
+    FILE *probe = fopen(pszDest, "rb");
+    if (probe) {
+      fclose(probe);
+      return 0;
+    }
+  }
+  FILE *src = fopen(pszSource, "rb");
+  if (!src) {
+    return 0;
+  }
+  RunCodeAtScopeExit(fclose(src));
+  FILE *dst = fopen(pszDest, "wb");
+  if (!dst) {
+    return 0;
+  }
+  RunCodeAtScopeExit(fclose(dst));
+  char buf[65536];
+  size_t n;
+  bool ok = true;
+  while ((n = fread(buf, 1, sizeof(buf), src)) > 0) {
+    if (fwrite(buf, 1, n, dst) != n) {
+      ok = false;
+      break;
+    }
+  }
+  if (ferror(src)) {
+    ok = false;
+  }
+  return ok ? 1 : 0;
+}
+#else
 extern "C"
 {
 	extern int __stdcall CopyFileA( char *pszSource, char *pszDest, int bFailIfExists );
 };
+#endif
 
 void CMP3Player::GetLocalCopyOfSong( const MP3File_t &f, OUT_Z_CAP(outlen) char *outsong, size_t outlen )
 {
