@@ -37,19 +37,10 @@ misrepresented as being the original software.
 #endif
 #endif
 
-#ifdef _SQ64
-#ifdef _MSC_VER
-using SQInteger = __int64;
-#else
-using SQInteger = long long;
-#endif
-#else
-using SQInteger = int;
-#endif
+// dimhotepus: Use SQInteger, SQRESULT, SQBool from config.
+#include <sqconfig.h>
 
 using HSQUIRRELVM = struct SQVM*;
-using SQRESULT = SQInteger;
-using SQBool = std::size_t;
 
 namespace sq::dbg {
 
