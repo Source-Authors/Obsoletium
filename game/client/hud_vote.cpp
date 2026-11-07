@@ -31,6 +31,8 @@
 #include "vgui_controls/ImageList.h"
 #include "vgui_avatarimage.h"
 
+using namespace vgui;
+
 #ifdef TF_CLIENT_DLL
 #include "ienginevgui.h"
 #include "tf_gcmessages.h"
