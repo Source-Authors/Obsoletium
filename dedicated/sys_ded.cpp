@@ -188,8 +188,8 @@ const char *GetBaseDirectory( char ( &base_dir )[size],
 		}
 	}
 
-	const char *override_dir{ command_line->CheckParm( "-basedir" ) };
-	if ( override_dir )
+	const char *override_dir{ command_line->ParmValue("-basedir", "") };
+	if ( !Q_isempty( override_dir ) )
 		V_strcpy_safe( base_dir, override_dir );
 
 	Q_strlower( base_dir );
