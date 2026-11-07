@@ -88,7 +88,7 @@ $Project "tier0"
 {
 	$Folder	"Source Files"
 	{
-		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.cpp"
+		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.cpp" [$WINDOWS]
 		$File	"assert_dialog.cpp"
 		$File	"assert_dialog.rc"		[$WINDOWS]
 		$File	"commandline.cpp"
@@ -147,7 +147,7 @@ $Project "tier0"
 
 	$Folder	"Public Header Files"
 	{
-		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.h"
+		$File	"$SRCDIR\common\windows\dpi_wnd_behavior.h" [$WINDOWS]
 		$File	"$SRCDIR\public\tier0\basetypes.h"
 		$File	"$SRCDIR\public\tier0\commonmacros.h"
 		$File	"$SRCDIR\public\tier0\cpumonitoring.h"
