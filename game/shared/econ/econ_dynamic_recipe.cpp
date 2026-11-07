@@ -151,7 +151,7 @@ bool DecodeAttributeStringIntoAttributes( const CAttribute_DynamicRecipeComponen
 		if ( !pAttrDef )
 		{
 #ifdef GC
-			EmitError( SPEW_GC, __FUNCTION__ ": Unable to find attribute definition '%s' (index %d)!\n", vecAttributeStrings[j], j );
+			EmitError( SPEW_GC, "%s: Unable to find attribute definition '%s' (index %d)!\n", __FUNCTION__, vecAttributeStrings[j], j );
 #endif
 			return false;
 		}
@@ -168,7 +168,7 @@ bool DecodeAttributeStringIntoAttributes( const CAttribute_DynamicRecipeComponen
 		if ( !pAttrType->BConvertStringToEconAttributeValue( pAttrDef, pszAttribValue, &attrib.m_value ) )
 		{
 #ifdef GC
-			EmitError( SPEW_GC, __FUNCTION__ ": Unable to parse attribute value '%s' for attribute '%s'!\n", pszAttribValue, pAttrDef->GetDefinitionName() );
+			EmitError( SPEW_GC, "%s: Unable to parse attribute value '%s' for attribute '%s'!\n", __FUNCTION__, pszAttribValue, pAttrDef->GetDefinitionName() );
 #endif
 			return false;
 		}

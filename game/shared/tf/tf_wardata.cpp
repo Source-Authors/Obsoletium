@@ -338,14 +338,14 @@ void CTFWarGlobalDataHelper::Init()
 	CSQLAccess sqlAccess;
 	if( !sqlAccess.BYieldingExecute( "CTFWarGlobalDataHelper::Init", sLoadQuery ) )
 	{
-		EmitError( SPEW_GC, __FUNCTION__": Failed to run load query!\n" );
+		EmitError( SPEW_GC, "%s: Failed to run load query!\n", __FUNCTION__ );
 		return;
 	}
 
 	CUtlVector< CSchWarData > vecRecords;
 	if ( !sqlAccess.BYieldingReadRecordsWithQuery< CSchWarData >( &vecRecords, sStatement, csCountsCount ) )
 	{
-		EmitError( SPEW_GC, __FUNCTION__": Failed to read spy vs engy points!\n" );
+		EmitError( SPEW_GC, "%s: Failed to read spy vs engy points!\n", __FUNCTION__ );
 		return;
 	}
 

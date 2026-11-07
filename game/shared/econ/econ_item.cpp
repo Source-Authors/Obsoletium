@@ -1714,14 +1714,14 @@ bool CEconItem::BYieldingSerializeFromDatabase( itemid_t ulItemID )
 	sqlAccess.AddBindParam( ulItemID );
 	if ( !sqlAccess.BYieldingExecute( "CEconItem::BYieldingSerializeFromDatabase", sLoadQuery.Get() ) )
 	{
-		EmitError( SPEW_GC, __FUNCTION__ ": failed to execute SQL load for item ID %llu\n", ulItemID );
+		EmitError( SPEW_GC, "%s: failed to execute SQL load for item ID %llu\n", __FUNCTION__, ulItemID );
 		return false;
 	}
 
 	// ...
 	if ( sqlAccess.GetResultSetCount() < sExpectedResults )
 	{
-		EmitError( SPEW_GC, __FUNCTION__ ": unable to interior item ID %llu. Got %d results back, but expected %d!\n", ulItemID, sqlAccess.GetResultSetCount(), sExpectedResults );
+		EmitError( SPEW_GC, "%s: unable to interior item ID %llu. Got %d results back, but expected %d!\n", __FUNCTION__, ulItemID, sqlAccess.GetResultSetCount(), sExpectedResults );
 		return false;
 	}
 
@@ -1729,7 +1729,7 @@ bool CEconItem::BYieldingSerializeFromDatabase( itemid_t ulItemID )
 	const uint32 nRowCount = sqlAccess.GetResultSetRowCount( kQueryResultSet_SingleItem_Item );
 	if ( nRowCount != 1 )
 	{
-		EmitError( SPEW_GC, __FUNCTION__ ": invalid number of rows returned from SQL loading item ID %llu: %d\n", ulItemID, nRowCount );
+		EmitError( SPEW_GC, "%s: invalid number of rows returned from SQL loading item ID %llu: %d\n", __FUNCTION__, ulItemID, nRowCount );
 		return false;
 	}
 
@@ -1740,7 +1740,7 @@ bool CEconItem::BYieldingSerializeFromDatabase( itemid_t ulItemID )
 	const CEconItemDefinition *pItemDef = GetItemSchema()->GetItemDefinition( schItem.m_unDefIndex );
 	if ( !pItemDef )
 	{
-		EmitError( SPEW_GC,	__FUNCTION__ ": unable to find item definition %d for item %llu!\n", schItem.m_unDefIndex, schItem.m_ulID );
+		EmitError( SPEW_GC,	"%s: unable to find item definition %d for item %llu!\n", __FUNCTION__, schItem.m_unDefIndex, schItem.m_ulID );
 		return false;
 	}
 
