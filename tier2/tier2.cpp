@@ -19,6 +19,7 @@
 #include "mdllib/mdllib.h"
 #include "filesystem/IQueuedLoader.h"
 
+#include <atomic>
 
 //-----------------------------------------------------------------------------
 // These tier2 libraries must be set by any users of this library.
@@ -64,7 +65,13 @@ T* ConnectLibrary( T **library,
 void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, intp nFactoryCount )
 {
 	// Don't connect twice..
-	Assert( !g_pFullFileSystem && 
+	// dimhotepus: Check only once.
+	static std::atomic< bool > s_bTier2LibrariesConnected{ false };
+	if ( !s_bTier2LibrariesConnected.load( std::memory_order_relaxed ) )
+	{
+		s_bTier2LibrariesConnected.exchange( true, std::memory_order_relaxed );
+		Assert(
+			!g_pFullFileSystem &&
 		!g_pMaterialSystem && !materials &&
 		!g_pInputSystem &&
 		!g_pNetworkSystem && 
@@ -75,6 +82,7 @@ void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, intp nFactoryCount 
 		!colorcorrection && 
 		!mdllib && 
 		!g_pQueuedLoader );
+	}
 
 	for ( intp i = 0; i < nFactoryCount; ++i )
 	{
