@@ -132,6 +132,8 @@ ConVar mat_depthbias_normal( "mat_depthbias_normal", "0.0", FCVAR_CHEAT );
 // This is here so that the client and the materialsystem can both see this.
 ConVar mat_show_ab_hdr( "mat_show_ab_hdr", "0" );
 
+// dimhotepus: Define in !$DEDICATED builds.
+#ifndef SWDS
 static void NukeModeSwitchSaveGames( void )
 {
 	char modeswitch[MAX_OSPATH];
@@ -151,6 +153,7 @@ static void NukeModeSwitchSaveGames( void )
 		g_pFileSystem->RemoveFile( modeswitch, "MOD" );
 	}
 }
+#endif // !SWDS
 
 void mat_hdr_level_Callback( IConVar *var, const char *pOldString, float flOldValue )
 {
