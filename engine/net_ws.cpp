@@ -1645,7 +1645,7 @@ static void NET_ProcessListen(netsocket_t &netsock, intp sock)
 		return;
 
 	sockaddr sa;
-	int nLengthAddr = sizeof(sa);
+	socklen_t nLengthAddr = sizeof(sa);
 		
 	socket_handle newSocket;
 
