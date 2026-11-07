@@ -17,6 +17,8 @@
 #include <cstdio>
 #include "textconsole.h"
 
+namespace se::dedicated {
+
 class CTextConsoleUnix : public CTextConsole
 {
 public:
@@ -25,10 +27,10 @@ public:
 	// CTextConsole
 	bool Init();
 	void ShutDown();
-	void Print( char *pszMsg );
+	void Print( const char *pszMsg );
 
-	void SetTitle( char *pszTitle );
-	void SetStatusLine( char *pszStatus );
+	void SetTitle( const char *pszTitle );
+	void SetStatusLine( const char *pszStatus );
 	void UpdateStatus();
 
 	char *GetLine( int index, char *buf, size_t buflen );
@@ -38,6 +40,8 @@ private:
 	bool  m_bConDebug;
 	FILE *m_tty;
 };
+
+}  // namespace se::dedicated
 
 #endif // _ndef WIN32
 

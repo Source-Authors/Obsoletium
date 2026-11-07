@@ -37,10 +37,9 @@
 
 #include "scoped_app_locale.h"
 
-extern CTextConsoleUnix console;
+namespace s1::dedicated {
 
-namespace s1::dedicated
-{
+extern CTextConsoleUnix console;
 
 // Loose implementation for operating system specific layer.
 class UnixSystem : public ISystem
@@ -65,11 +64,9 @@ public:
 
 UnixSystem::~UnixSystem() = default;
 
-void UnixSystem::ErrorMessage( int level, const char *msg )
-{
-	Error( "%s\n", msg );
-	// dimhotepus: 1 -> EOTHER.
-	exit( EOTHER );
+void UnixSystem::ErrorMessage(int level, const char *msg) {
+	Error("%s\n", msg);
+	exit(EXIT_FAILURE);
 }
 
 void UnixSystem::UpdateStatus( int force ) {}
@@ -175,5 +172,5 @@ DLL_EXPORT int DedicatedMain( int argc, char *argv[] )
 	}
 
 	s1::dedicated::UnixSystem system;
-	return s1::dedicated::BootMain( argc, argv, &system );
+	return s1::dedicated::BootMain( argc, argv, true, &system );
 }
