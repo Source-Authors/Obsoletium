@@ -23,6 +23,7 @@
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "ivtex.h"
 
+#include <atomic>
 
 //-----------------------------------------------------------------------------
 // These tier3 libraries must be set by any users of this library.
@@ -74,22 +75,28 @@ T* ConnectLibrary( T **library,
 void ConnectTier3Libraries( CreateInterfaceFn *pFactoryList, intp nFactoryCount )
 {
 	// Don't connect twice..
-	Assert(!g_pStudioRender && !studiorender &&
-		!g_pVGui &&
-		!g_pVGuiInput &&
-		!g_pVGuiPanel &&
-		!g_pVGuiSurface &&
-		!g_pVGuiSchemeManager &&
-		!g_pVGuiSystem &&
-		!g_pVGuiLocalize && 
-		!g_pMatSystemSurface &&
-		!g_pDataCache &&
-		!g_pMDLCache && !mdlcache &&
-		!g_pVideo &&
-		!g_pDmeMakefileUtils &&
-		!g_pPhysicsCollision &&
-		!g_pSoundEmitterSystem &&
-		!g_pVTex);
+	// dimhotepus: Check only once.
+	static std::atomic< bool > s_bTier3LibrariesConnected{ false };
+	if ( !s_bTier3LibrariesConnected.load( std::memory_order_relaxed ) )
+	{
+		s_bTier3LibrariesConnected.exchange( true, std::memory_order_relaxed );
+		Assert(!g_pStudioRender && !studiorender &&
+			!g_pVGui &&
+			!g_pVGuiInput &&
+			!g_pVGuiPanel &&
+			!g_pVGuiSurface &&
+			!g_pVGuiSchemeManager &&
+			!g_pVGuiSystem &&
+			!g_pVGuiLocalize && 
+			!g_pMatSystemSurface &&
+			!g_pDataCache &&
+			!g_pMDLCache && !mdlcache &&
+			!g_pVideo &&
+			!g_pDmeMakefileUtils &&
+			!g_pPhysicsCollision &&
+			!g_pSoundEmitterSystem &&
+			!g_pVTex);
+	}
 
 	for ( intp i = 0; i < nFactoryCount; ++i )
 	{
