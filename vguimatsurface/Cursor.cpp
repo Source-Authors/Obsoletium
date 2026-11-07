@@ -490,7 +490,11 @@ void CursorGetPos(void *hwnd, int &x, int &y)
 #if defined ( USE_SDL ) && !defined( PLATFORM_WINDOWS )
 	if ( s_bCursorVisible )
 	{
-		SDL_GetMouseState( &x, &y );
+		// dimhotepus: Need to use floats for precise movement?
+		float fx{ 0.0f }, fy{ 0.0f };
+		SDL_GetMouseState( &fx, &fy );
+		x = (int)fx;
+		y = (int)fy;
 
 		int windowHeight = 0;
 		int windowWidth = 0;
