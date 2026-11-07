@@ -24,6 +24,12 @@ $Configuration
 
 $Project "tier1"
 {
+	$Folder	"Link libraries"
+	{
+		// dimhotepus: We use this.
+		$Lib	uuid	[!$WINDOWS]
+	}
+
 	$Folder	"Source Files"
 	{
 		$File	"bitbuf.cpp"
