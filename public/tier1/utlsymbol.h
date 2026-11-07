@@ -272,6 +272,9 @@ class CUtlFilenameSymbolTable
 public:
 	CUtlFilenameSymbolTable();
 	~CUtlFilenameSymbolTable();
+	// dimhotepus: Forbid as noncopyable.
+	CUtlFilenameSymbolTable( const CUtlFilenameSymbolTable & ) = delete;
+	CUtlFilenameSymbolTable &operator=( const CUtlFilenameSymbolTable & ) = delete;
 	FileNameHandle_t	FindOrAddFileName( const char *pFileName );
 	[[nodiscard]] FileNameHandle_t FindFileName( const char *pFileName );
 	intp				PathIndex(const FileNameHandle_t &handle) { return (( const FileNameHandleInternal_t * )&handle)->path; }
