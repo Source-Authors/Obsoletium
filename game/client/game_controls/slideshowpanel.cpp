@@ -3,6 +3,7 @@
 //=======================================================================================//
 
 #include "cbase.h"
+#include "fmtstr.h"
 #include "game_controls/slideshowpanel.h"
 #include "vgui/IVGui.h"
 #include "filesystem.h"
