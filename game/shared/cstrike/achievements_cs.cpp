@@ -26,7 +26,7 @@
 
 // [dwenger] Necessary for sorting achievements by award time
 #include "vgui/ISystem.h"
-#include "../../src/public/vgui_controls/Controls.h"
+#include "vgui_controls/Controls.h"
 
 
 ConVar achievements_easymode( "achievement_easymode", "0", FCVAR_CLIENTDLL | FCVAR_DEVELOPMENTONLY,
@@ -98,8 +98,10 @@ void CCSBaseAchievement::ApplySettings( /* const */ KeyValues* pNodeIn )
 /**
 * Meta Achievement base class methods
 */
-CAchievement_Meta::CAchievement_Meta() :
-	m_CallbackUserAchievement( this, &CAchievement_Meta::Steam_OnUserAchievementStored )
+CAchievement_Meta::CAchievement_Meta()
+#if !defined(NO_STEAM)
+	: m_CallbackUserAchievement( this, &CAchievement_Meta::Steam_OnUserAchievementStored )
+#endif
 {
 }
 
@@ -109,6 +111,7 @@ void CAchievement_Meta::Init()
 	SetGoal( 1 );
 }
 
+#if !defined(NO_STEAM)
 void CAchievement_Meta::Steam_OnUserAchievementStored( UserAchievementStored_t *pUserAchievementStored )
 {
 	if ( IsAchieved() )
@@ -132,6 +135,7 @@ void CAchievement_Meta::Steam_OnUserAchievementStored( UserAchievementStored_t *
 		AwardAchievement();
 	}
 }
+#endif // !defined(NO_STEAM)
 
 void CAchievement_Meta::AddRequirement( int nAchievementId )
 {

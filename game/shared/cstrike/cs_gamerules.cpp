@@ -4825,7 +4825,7 @@ void CCSGameRules::UploadGameStats( void )
 
 		stats.header.serverid = 0;
 
-		stats.iMinutesPlayed = clamp( (short)( gpGlobals->curtime / 60 ), 0, MY_USHRT_MAX ); 
+		stats.iMinutesPlayed = clamp<int>( (short)( gpGlobals->curtime / 60 ), 0, MY_USHRT_MAX ); 
 
 		memcpy( stats.iTerroristVictories, g_iTerroristVictories, sizeof( g_iTerroristVictories) );
 		memcpy( stats.iCounterTVictories, g_iCounterTVictories, sizeof( g_iCounterTVictories) );
@@ -5585,7 +5585,7 @@ const weeklyprice_t *CCSGameRules::GetBlackMarketPriceList( void )
 
 	if ( m_pPrices == NULL )
 	{
-		int iSize = 0;
+		intp iSize = 0;
 		INetworkStringTable *pTable = m_StringTableBlackMarket;
 		if ( pTable && pTable->GetNumStrings() > 0 )
 		{
@@ -5642,7 +5642,7 @@ void TestTable( void )
 		return;
 
 	int iIndex = CSGameRules()->m_StringTableBlackMarket->FindStringIndex( "blackmarket_prices" );
-	int iSize = 0;
+	intp iSize = 0;
 
 	const weeklyprice_t *pPrices = NULL;
 	
@@ -5765,17 +5765,17 @@ public:
 			delete (*GetConvarList())[i];
 		}
 		delete s_pCompetitiveConvars; 
-		s_pCompetitiveConvars = null;
+		s_pCompetitiveConvars = nullptr;
 		s_pConVarBackups->deleteThis(); 
-		s_pConVarBackups = null;
+		s_pConVarBackups = nullptr;
 	}
 private:
 	static CompetitiveConvarList_t* s_pCompetitiveConvars;
 	static KeyValues* s_pConVarBackups;
 };
 static CCompetitiveCvarManager *s_pCompetitiveCvarManager = new CCompetitiveCvarManager();
-CCompetitiveCvarManager::CompetitiveConvarList_t* CCompetitiveCvarManager::s_pCompetitiveConvars = null;
-KeyValues* CCompetitiveCvarManager::s_pConVarBackups = null;
+CCompetitiveCvarManager::CompetitiveConvarList_t* CCompetitiveCvarManager::s_pCompetitiveConvars = nullptr;
+KeyValues* CCompetitiveCvarManager::s_pConVarBackups = nullptr;
 
 //-----------------------------------------------------------------------------
 // Macro to define restrictions on convars with "sv_competitive_minspec 1"

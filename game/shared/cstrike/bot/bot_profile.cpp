@@ -32,7 +32,8 @@ BotProfileManager *TheBotProfiles = NULL;
  */
 static const char * GetDecoratedSkinName( const char *name, const char *filename )
 {
-	const int BufLen = _MAX_PATH + 64;
+	// dimhotepus: _MAX_PATH -> MAX_PATH.
+	constexpr int BufLen = MAX_PATH + 64;
 	static char buf[BufLen];
 	Q_snprintf( buf, sizeof( buf ), "%s/%s", filename, name );
 	return buf;
