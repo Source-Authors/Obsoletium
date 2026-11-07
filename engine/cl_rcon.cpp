@@ -21,6 +21,7 @@
 #include "net_ws_headers.h"
 #define WSAGetLastError() errno
 #else
+#include "winlite.h"
 #include <winsock.h>
 #endif
 
@@ -123,9 +124,9 @@ void CRConVProfExport::GetBudgetGroupInfos( CExportedBudgetGroupInfo *pInfos )
 
 void CRConVProfExport::GetBudgetGroupTimes( float times[IVProfExport::MAX_BUDGETGROUP_TIMES] )
 {
-	intp nGroups = min( m_Times.Count(), (intp)IVProfExport::MAX_BUDGETGROUP_TIMES );
+	intp nGroups = min( (intp)m_Times.Count(), (intp)IVProfExport::MAX_BUDGETGROUP_TIMES );
 	memset( times, 0, nGroups * sizeof(float) );
-	nGroups = min( GetNumBudgetGroups(), nGroups );
+	nGroups = min( (intp)GetNumBudgetGroups(), nGroups );
 	memcpy( times, m_Times.Base(), nGroups * sizeof(float) );
 }
 
