@@ -460,7 +460,7 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 	BitwiseClear( s_MapHeader );
 	BitwiseClear( s_MapLumpFiles );
 
-	V_strcpy_safe( s_szMapName, !pMapModel ? loadname : pMapModel->strName );
+	V_strcpy_safe( s_szMapName, !pMapModel ? loadname : pMapModel->strName.Get() );
 
 	s_MapFileHandle = g_pFileSystem->OpenEx( s_szMapName, "rb", 0, NULL );
 	if ( !s_MapFileHandle )
