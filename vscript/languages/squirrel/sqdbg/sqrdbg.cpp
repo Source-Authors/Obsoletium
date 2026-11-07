@@ -145,7 +145,7 @@ SQRESULT sq_rdbg_update(HSQREMOTEDBG rdbg) {
 }
 
 SQInteger debug_hook(HSQUIRRELVM v) {
-  intp event_type, line;
+  SQInteger event_type, line;
   const SQChar *src, *func;
 
   sq_getinteger(v, 2, &event_type);
