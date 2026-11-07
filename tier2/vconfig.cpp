@@ -160,4 +160,12 @@ bool ConvertObsoleteVConfigRegistrySetting( const char *pValueName )
 
 	return false;
 }
+#else
+// dimhotepus: POSIX port.
+bool GetVConfigRegistrySetting( [[maybe_unused]] const char *pName, char *pReturn, unsigned long size )
+{
+	if ( size )
+		pReturn[0] = '\0';
+	return false;
+}
 #endif
