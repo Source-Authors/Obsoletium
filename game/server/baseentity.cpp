@@ -5544,7 +5544,8 @@ public:
 			Q_strncpy( buf, name, sizeof( buf ) );
 			Q_strlower( buf );
 
-			CUtlString command = CFmtStr( "%s %s", cmdname, buf );
+			// dimhotepus: Fix compilation on GCC.
+			CUtlString command( CFmtStr( "%s %s", cmdname, buf ) );
 			commands.AddToTail( command );
 		}
 
@@ -5638,7 +5639,8 @@ private:
 			V_strcpy_safe( buf, name );
 			Q_strlower( buf );
 
-			CUtlString command = CFmtStr( "%s %s %s", cmdname, targetEntity, buf );
+			// dimhotepus: Fix compilation on GCC.
+			CUtlString command( CFmtStr( "%s %s %s", cmdname, targetEntity, buf ) );
 			commands.AddToTail( command );
 		}
 

@@ -19,6 +19,10 @@
 #include "world.h"
 #include "toolframework/iserverenginetools.h"
 
+// std::once_flag / std::call_once for the spawn-hierarchy registry below.
+// MSVC drags <mutex> in transitively; GCC does not, so name it explicitly.
+#include <mutex>
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 

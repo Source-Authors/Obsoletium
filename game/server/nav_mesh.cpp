@@ -1117,7 +1117,7 @@ void CNavMesh::LoadPlaceDatabase( void )
 	populationData->deleteThis();
 #endif
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, (intp)0, CUtlBuffer::TEXT_BUFFER );
 	filesystem->ReadFile("NavPlace.db", "GAME", buf);
 
 	if (!buf.Size())

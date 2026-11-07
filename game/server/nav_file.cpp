@@ -1403,7 +1403,8 @@ NavErrorType CNavMesh::GetNavDataFromFile( CUtlBuffer &outBuffer, bool *pNavData
 		{
 			int originalSize = CLZMA::GetActualSize( (unsigned char *)outBuffer.Base() );
 			unsigned char *pOriginalData = new unsigned char[originalSize];
-			CLZMA::Uncompress( (unsigned char *)outBuffer.Base(), pOriginalData );
+			// dimhotepus: Add missed original size.
+			CLZMA::Uncompress( (unsigned char *)outBuffer.Base(), pOriginalData, originalSize );
 			outBuffer.AssumeMemory( pOriginalData, originalSize, originalSize, CUtlBuffer::READ_ONLY );
 		}
 	}
