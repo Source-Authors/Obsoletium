@@ -8,6 +8,7 @@
 #define SE_FILESYSTEM_LINUX_SUPPORT_H_
 
 #include <climits> // PATH_MAX define 
+#include <dirent.h> // dirent, for FIND_DATA::namelist
 
 #include "tier0/annotations.h"
 #include "tier0/platform.h"
