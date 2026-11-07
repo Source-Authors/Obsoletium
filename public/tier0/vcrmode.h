@@ -22,7 +22,7 @@
 using socket_handle = uintp;
 constexpr inline socket_handle kInvalidSocketHandle = static_cast<socket_handle>(~0);
 #else
-usign socket_handle = int;
+using socket_handle = int;
 constexpr inline socket_handle kInvalidSocketHandle = -1;
 #endif
 
