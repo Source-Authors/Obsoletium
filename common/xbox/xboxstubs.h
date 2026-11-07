@@ -89,6 +89,17 @@ using ULONGLONG = unsigned long long; //-V677
 
 #ifdef POSIX
 typedef DWORD COLORREF;
+
+// dimhotepus: Define for POSIX as Session uses it.
+#ifndef INVALID_HANDLE_VALUE
+#define INVALID_HANDLE_VALUE nullptr
+#endif
+
+// dimhotepus: Define for POSIX as Session uses it.
+static inline int CloseHandle( HANDLE )
+{
+	return 1;
+}
 #endif
 
 // typedef struct {
@@ -102,11 +113,15 @@ typedef DWORD COLORREF;
 using XNADDR = int;
 using XUID = uint64;
 
-using XNKID = struct {
+// dimhotepus: Add missed struct tag as anonymous structs have no linkage.
+using XNKID = struct _XNKID
+{
 	BYTE        ab[8];                          // xbox to xbox key identifier
 };
 
-using XNKEY = struct {
+// dimhotepus: Add missed struct tag as anonymous structs have no linkage.
+using XNKEY = struct _XNKEY
+{
 	BYTE        ab[16];                         // xbox to xbox key exchange key
 };
 
