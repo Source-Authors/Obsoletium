@@ -74,13 +74,13 @@ _PS_CONST(sincos_p2, 0.7969262624561800806e-1f);
 _PS_CONST(sincos_p3, -0.468175413106023168e-2f);
 
 #ifdef POSIX
-#define _PS_CONST_TYPE(Name, Type, Val) static const alignas(16) Type _ps_##Name[4] = { Val, Val, Val, Val }
+#define _PS_CONST_TYPE(Name, Type, Val) alignas(16) static const Type _ps_##Name[4] = { Val, Val, Val, Val }
 
 _PS_CONST_TYPE(sign_mask, int, (int)0x80000000);
 _PS_CONST_TYPE(inv_sign_mask, int, ~0x80000000);
 
 
-#define _PI32_CONST(Name, Val)  static const alignas(16) int _pi32_##Name[4] = { Val, Val, Val, Val }
+#define _PI32_CONST(Name, Val)  alignas(16) static const int _pi32_##Name[4] = { Val, Val, Val, Val }
 
 _PI32_CONST(1, 1);
 _PI32_CONST(inv1, ~1);
