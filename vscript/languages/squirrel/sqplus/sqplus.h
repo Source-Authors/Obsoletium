@@ -83,6 +83,10 @@
     #include <cstdio> // for snprintf
     #define SCPUTS puts
   #endif
+  // dimhotepus: Must define SCFPUTS on POSIX.
+  #ifndef SCFPUTS
+    #define SCFPUTS fputs
+  #endif
 #endif
 
 
@@ -208,7 +212,8 @@ struct ScriptStringVar : ScriptStringVarBase {
     return safeStringCopy(s,_s.s,MaxLength);
   }
   bool operator == (const ScriptStringVar & _s) {
-    return _strcmp(s,_s.s) == 0;
+    // dimhotepus: _strcmp -> strcmp (portable).
+    return strcmp(s, _s.s) == 0;
   }
   bool compareCaseInsensitive(const ScriptStringVar & _s) {
     return _stricmp(s,_s.s) == 0;
