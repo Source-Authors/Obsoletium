@@ -738,6 +738,9 @@ CStdioFile *CStdioFile::FS_fopen( const char *filenameT, const char *options, in
 			*p = '\0';
 	}
 
+	// dimhotepus: stat buffer.
+	struct STAT_TYPE buf;
+
 	FILE *pFile = fopen( filename, options );
 
 #ifdef LINUX
@@ -760,7 +763,6 @@ CStdioFile *CStdioFile::FS_fopen( const char *filenameT, const char *options, in
 	if (pFile && size)
 	{
 		// todo: replace with filelength()? 
-		struct _stat buf;
 		int rt = _stat( filename, &buf );
 		if (rt == 0)
 		{
@@ -845,7 +847,7 @@ void CStdioFile::FS_fclose()
 	{
 		AUTO_LOCK( m_MutexLockedFD );
 
-		struct _stat buf;
+		struct STAT_TYPE buf;
 		int fd = fileno_unlocked( m_pFile );
 		fstat( fd, &buf );
 
