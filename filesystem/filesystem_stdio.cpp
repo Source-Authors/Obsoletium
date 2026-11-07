@@ -561,7 +561,7 @@ int CFileSystem_Stdio::FS_chmod( const char *pathT, int pmode )
 	char path[ MAX_PATH ];
 	CBaseFileSystem::FixUpPath ( pathT, path );
 
-	const int rt = _chmod( path, pmode );
+	int rt = _chmod( path, pmode );
 #if defined(LINUX)
 	if ( rt == -1 )
 	{
