@@ -10,6 +10,9 @@
 #include <string>
 
 #ifdef POSIX
+// dimhotepus: Add missed used global.
+std::atomic< bool > g_bInitMemory{ false };
+
 void DoApplyMemoryInitializations( void *pMem, size_t nSize )
 {
 }
