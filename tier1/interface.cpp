@@ -86,7 +86,8 @@ static void* CreateInterfaceInternal( const char *pName, int *pReturnCode )
 	return nullptr;
 }
 
-void* CreateInterface( const char *pName, int *pReturnCode )
+// dimhotepus: Match declaration. Handle when -fvisibility=hidden used.
+DLL_EXPORT void* CreateInterface( const char *pName, int *pReturnCode )
 {
     return CreateInterfaceInternal( pName, pReturnCode );
 }
