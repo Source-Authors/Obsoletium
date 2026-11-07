@@ -298,6 +298,8 @@ CUtlFilenameSymbolTable::CUtlFilenameSymbolTable()
 CUtlFilenameSymbolTable::~CUtlFilenameSymbolTable()
 {
 	delete m_Strings;
+	// dimhotepus: Fix nasty bug with double destruction.
+	m_Strings = nullptr;
 }
 
 
