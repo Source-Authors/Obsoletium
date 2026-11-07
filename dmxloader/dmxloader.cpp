@@ -589,8 +589,8 @@ bool ReadDMXHeader( CUtlBuffer &buf, char *pEncodingName, int nEncodingNameLen, 
 		char pTmpEncodingName[ sizeof( header ) ] = { 0 };
 		char pTmpFormatName  [ sizeof( header ) ] = { 0 };
 		int nAssigned = sscanf( header, "encoding %167s %d format %167s %d\n", pTmpEncodingName, &nEncodingVersion, pTmpFormatName, &nFormatVersion );
-		pTmpEncodingName[sssize(header) - 1] = '\0';
-		pTmpFormatName[sssize(header) - 1] = '\0';
+		pTmpEncodingName[ssize(pTmpEncodingName) - 1] = '\0';
+		pTmpFormatName[ssize(pTmpFormatName) - 1] = '\0';
 		bOk = ( V_strlen( pTmpEncodingName ) < nEncodingNameLen ) && ( V_strlen( pTmpFormatName ) < nFormatNameLen );
 		V_strncpy( pEncodingName, pTmpEncodingName, nEncodingNameLen );
 		V_strncpy( pFormatName, pTmpFormatName, nFormatNameLen );
