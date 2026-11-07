@@ -595,7 +595,7 @@ void CInputSystem::PollInputState_Windows()
 
 #if defined( USE_SDL )
 
-static BYTE        scantokey[SDL_NUM_SCANCODES];
+static BYTE        scantokey[SDL_SCANCODE_COUNT];
 
 static void initKeymap(void)
 {
