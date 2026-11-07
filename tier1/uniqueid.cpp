@@ -15,9 +15,7 @@
 #include "winlite.h" // UUIDCreate
 #include <rpc.h>
 #else
-#ifdef LINUX
-#include <uuid.h>
-#elif defined(OSX)
+#if defined(LINUX) || defined(OSX)
 #include <uuid/uuid.h>
 #endif
 #endif
