@@ -636,8 +636,8 @@ FileHandle_t SafeOpenRead(const char *filename) {
 
     char tmp[MAX_PATH];
     for (intp i = 0; i < g_NumBasePaths; i++) {
-      strcpy_s(tmp, g_pBasePaths[i]);
-      strcat_s(tmp, filename);
+      V_strcpy_safe(tmp, g_pBasePaths[i]);
+      V_strcat_safe(tmp, filename);
 
       f = g_pFileSystem->Open(tmp, "rb");
       if (f) return f;
