@@ -1082,7 +1082,7 @@ bool CGame::CreateGameWindow()
 #if PIX_ENABLE || defined( PIX_INSTRUMENTATION )
 	// PIX_ENABLE/PIX_INSTRUMENTATION is a big slowdown (that should never be
 	// checked in, but sometimes is by accident), so add this to the Window title too.
-	V_strcat_safe( windowName, " - PIX_ENABLE" );
+	V_strcat_safe( utf8_window_name, " - PIX_ENABLE" );
 #endif
 
 #ifdef PLATFORM_64BITS
@@ -1192,7 +1192,7 @@ bool CGame::CreateGameWindow()
 #elif defined( USE_SDL )
 	bool windowed = videomode->IsWindowedMode();
 
-	if ( !g_pLauncherMgr->CreateGameWindow( windowName, windowed, 0, 0 ) )
+	if ( !g_pLauncherMgr->CreateGameWindow( utf8_window_name, windowed, 0, 0 ) )
 	{
 		Error( "Fatal Error:  Unable to create game window!" );
 		return false;
@@ -1648,8 +1648,10 @@ CGame::CGame()
 	m_iDesktopWidth = 0;
 	m_iDesktopHeight = 0;
 	m_iDesktopRefreshRate = 0;
+#if defined( WIN32 )
 	m_rcLastRestoredClientRect.left = m_rcLastRestoredClientRect.right =
 	m_rcLastRestoredClientRect.top = m_rcLastRestoredClientRect.bottom = 0;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1687,8 +1689,10 @@ void *CGame::GetMainDeviceWindow()
 {
 #if defined( DX_TO_GL_ABSTRACTION ) && defined( USE_SDL )
 	return m_pSDLWindow;
-#else
+#elif defined( WIN32 )
 	return m_hWindow;
+#else
+	return nullptr;
 #endif
 }
 
@@ -1737,11 +1741,16 @@ void CGame::GetDesktopInfo( int &width, int &height, int &refreshrate )
 	refreshrate = 0;
 
 	// Go through all the displays and return the size of the largest.
-	for( int i = 0; i < SDL_GetNumVideoDisplays(); i++ )
+	// dimhotepus: SDL3 port.
+	int nDisplays = 0;
+	SDL_DisplayID *pDisplays = SDL_GetDisplays( &nDisplays );
+	RunCodeAtScopeExit( SDL_free( pDisplays ) );
+
+	for( int i = 0; i < nDisplays; i++ )
 	{
 		SDL_Rect rect;
 
-		if ( !SDL_GetDisplayBounds( i, &rect ) )
+		if ( !SDL_GetDisplayBounds( pDisplays[i], &rect ) )
 		{
 			if ( ( rect.w > width ) || ( ( rect.w == width ) && ( rect.h > height ) ) )
 			{
@@ -1777,12 +1786,25 @@ void CGame::UpdateDesktopInformation( )
 	static ConVarRef sdl_displayindex( "sdl_displayindex" );
 	int displayIndex = sdl_displayindex.IsValid() ? sdl_displayindex.GetInt() : 0;
 
-	SDL_DisplayMode mode;
-	SDL_GetDesktopDisplayMode( displayIndex, &mode );
+	// dimhotepus: SDL3 port.
+	int nDisplays = 0;
+	SDL_DisplayID *pDisplays = SDL_GetDisplays( &nDisplays );
+	RunCodeAtScopeExit( SDL_free( pDisplays ) );
 
-	m_iDesktopWidth = mode.w;
-	m_iDesktopHeight = mode.h;
-	m_iDesktopRefreshRate = mode.refresh_rate;
+	if ( !pDisplays || nDisplays <= 0 )
+		return;
+
+	if ( displayIndex < 0 || displayIndex >= nDisplays )
+		displayIndex = 0;
+
+	// dimhotepus: SDL3 port.
+	const SDL_DisplayMode *pMode = SDL_GetDesktopDisplayMode( pDisplays[displayIndex] );
+	if ( !pMode )
+		return;
+
+	m_iDesktopWidth = pMode->w;
+	m_iDesktopHeight = pMode->h;
+	m_iDesktopRefreshRate = pMode->refresh_rate;
 #else
 	HDC dc = ::GetDC( m_hWindow );
 	RunCodeAtScopeExit( ReleaseDC( m_hWindow, dc ) );
