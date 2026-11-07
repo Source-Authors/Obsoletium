@@ -485,8 +485,8 @@ void CPropJeep::AimGunAt( Vector *endPos, float flInterval )
 	float targetPitch = m_aimPitch + localEnemyAngles.x;
 	
 	// Constrain our angles
-	float newTargetYaw	= clamp( targetYaw, -CANNON_MAX_LEFT_YAW, CANNON_MAX_RIGHT_YAW );
-	float newTargetPitch = clamp( targetPitch, -CANNON_MAX_DOWN_PITCH, CANNON_MAX_UP_PITCH );
+	float newTargetYaw	= clamp<float>( targetYaw, -CANNON_MAX_LEFT_YAW, CANNON_MAX_RIGHT_YAW );
+	float newTargetPitch = clamp<float>( targetPitch, -CANNON_MAX_DOWN_PITCH, CANNON_MAX_UP_PITCH );
 
 	// If the angles have been clamped, we're looking outside of our valid range
 	if ( fabs(newTargetYaw-targetYaw) > 1e-4 || fabs(newTargetPitch-targetPitch) > 1e-4 )

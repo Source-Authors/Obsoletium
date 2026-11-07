@@ -1179,12 +1179,18 @@ void CCSGameStats::Event_MoneySpent( CCSPlayer* pPlayer, int moneySpent, const c
 	if ( pPlayer && moneySpent > 0)
 	{
 		IncrementStat(pPlayer, CSSTAT_MONEY_SPENT, moneySpent);
+#if !defined(NO_STEAM)
+		// The market purchase log is keyed by Steam ID, and CBasePlayer::GetSteamID
+		// only exists when NO_STEAM is not set. Recording an entry needs both, so
+		// the whole block goes with it; the CSSTAT_MONEY_SPENT count above is
+		// still tracked without Steam.
 		if ( pItemName && !pPlayer->IsBot() )
 		{
 			CSteamID steamIDForBuyer;
 			pPlayer->GetSteamID( &steamIDForBuyer );
 			m_MarketPurchases.AddToTail( new SMarketPurchases( steamIDForBuyer.ConvertToUint64(), moneySpent, pItemName ) );
 		}
+#endif
 	}
 }
 

@@ -4906,10 +4906,10 @@ bool CCSPlayer::HandleCommand_JoinClass( int iClass )
 	switch ( GetTeamNumber() )
 	{
 		case TEAM_TERRORIST:
-			iClass = clamp( iClass, FIRST_T_CLASS, LAST_T_CLASS );
+			iClass = clamp<int>( iClass, FIRST_T_CLASS, LAST_T_CLASS );
 			break;
 		case TEAM_CT:
-			iClass = clamp( iClass, FIRST_CT_CLASS, LAST_CT_CLASS );
+			iClass = clamp<int>( iClass, FIRST_CT_CLASS, LAST_CT_CLASS );
 			break;
 		default:
 			iClass = CS_CLASS_NONE;
@@ -6138,7 +6138,7 @@ void CCSPlayer::PrioritizeAutoBuyString(char *autobuyString, const char *priorit
 	// terminate the string.  Trailing spaces shouldn't matter.
 	newString[newStringPos] = 0;
 
-	V_strcpy_safe(autobuyString, newString);
+	V_strncpy( autobuyString, newString, sizeof( newString ) );
 }
 
 
