@@ -224,7 +224,8 @@ static HMODULE Sys_LoadLibrary( const char *pLibraryName, Sys_Flags flags )
 	return context.m_hLibrary;
 
 #elif POSIX
-	int dlopen_mode = RTLD_NOW;
+	// dimhotepus: Add RTLD_GLOBAL as we use crossmodule globals.
+	int dlopen_mode = RTLD_NOW | RTLD_GLOBAL;
 
 	if ( flags & SYS_NOLOAD )
 		dlopen_mode |= RTLD_NOLOAD;
