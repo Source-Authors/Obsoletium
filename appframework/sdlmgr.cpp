@@ -12,6 +12,7 @@
 
 #include "togl/rendermechanism.h"
 
+#include "tier0/platform.h"  // RunCodeAtScopeExit
 #include "tier0/vprof_telemetry.h"
 #include "tier0/icommandline.h"
 
@@ -176,7 +177,8 @@ void *VoidFnPtrLookup_GlMgr(const char *fn, bool &okay, const bool bRequired, vo
 	// The SDL path would work on all these platforms, if we were using SDL there, too...
 #if defined( USE_SDL )
 	// SDL does the right thing, so we never need to use tier0 in this case.
-	retval = SDL_GL_GetProcAddress(fn);
+	// dimhotepus: Fix function -> void* cast.
+	retval = (void *)(uintptr_t)SDL_GL_GetProcAddress(fn);
 	//printf("CDynamicFunctionOpenGL: SDL_GL_GetProcAddress(\"%s\") returned %p\n", fn, retval);
 	if ((retval == NULL) && (fallback != NULL))
 	{
@@ -377,11 +379,36 @@ ConVar sdl_displayindex_fullscreen( "sdl_displayindex_fullscreen", "-1", FCVAR_H
 
 // Display index to show window on.
 static bool g_bSDLDisplayindexSet = false;
+// dimhotepus: SDL3 port.
+[[nodiscard]] static int GetNumDisplays()
+{
+	int nDisplays = 0;
+	SDL_GetDisplays( &nDisplays );
+	return nDisplays;
+}
+
+// dimhotepus: SDL3 port.
+// Convert a 0-based index into an SDL_DisplayID.
+[[nodiscard]] static SDL_DisplayID GetDisplayIDForIndex( int iIndex )
+{
+	int nDisplays = 0;
+	SDL_DisplayID *pDisplays = SDL_GetDisplays( &nDisplays );
+	if ( !pDisplays )
+		return SDL_GetPrimaryDisplay();
+	RunCodeAtScopeExit( SDL_free( pDisplays ) );
+
+	SDL_DisplayID displayID = SDL_GetPrimaryDisplay();
+	if ( iIndex >= 0 && iIndex < nDisplays )
+		displayID = pDisplays[ iIndex ];
+
+	return displayID;
+}
+
 static void sdl_displayindex_changed( IConVar *pConVar, const char *pOldString, float flOldValue );
 ConVar sdl_displayindex( "sdl_displayindex", "0", FCVAR_HIDDEN, "SDL fullscreen display index.", sdl_displayindex_changed );
 static void sdl_displayindex_changed( IConVar *pConVar, const char *pOldString, float flOldValue )
 {
-	int NumVideoDisplays = SDL_GetNumVideoDisplays();
+	int NumVideoDisplays = GetNumDisplays();
 
 	if ( ( sdl_displayindex.GetInt() < 0 ) || ( sdl_displayindex.GetInt() >= NumVideoDisplays ) )
 	{
@@ -400,11 +427,11 @@ static int GetLargestDisplaySize( int& Width, int& Height )
 	Width = BASE_WIDTH;
 	Height = BASE_HEIGHT;
 
-	for ( int i = 0; i < SDL_GetNumVideoDisplays(); i++ )
+	for ( int i = 0; i < GetNumDisplays(); i++ )
 	{
 		SDL_Rect rect = { 0, 0, 0, 0 };
 
-		SDL_GetDisplayBounds( i, &rect );
+		SDL_GetDisplayBounds( GetDisplayIDForIndex( i ), &rect );
 
 		if ( ( rect.w > Width ) || ( ( rect.w == Width ) && ( rect.h > Height ) ) )
 		{
@@ -422,24 +449,24 @@ CON_COMMAND( grab_window, "grab/ungrab window." )
 {
 	if ( g_pLauncherMgr && g_pLauncherMgr->GetWindowRef() )
 	{
-		SDL_bool bGrab;
 		SDL_Window *pWindow = ( SDL_Window * )g_pLauncherMgr->GetWindowRef();
 
+		bool        bGrab;
 		if ( args.ArgC() >= 2 )
 		{
-			bGrab = ( args[ 1 ][ 0 ] == '1' ) ? SDL_TRUE : SDL_FALSE;
+			bGrab = ( args[ 1 ][ 0 ] == '1' );
 		}
 		else
 		{
-			bGrab = SDL_GetWindowGrab( pWindow ) ? SDL_FALSE : SDL_TRUE;
+			bGrab = !SDL_GetWindowMouseGrab( pWindow );
 		}
 
 		g_pLauncherMgr->SetForbidMouseGrab( !bGrab );
 
-		if ( bGrab != SDL_GetWindowGrab( pWindow ) )
+		if ( bGrab != SDL_GetWindowMouseGrab( pWindow ) )
 		{
-			Msg( "SetWindowGrab( %s )\n", bGrab ? "true" : "false" );
-			SDL_SetWindowGrab( pWindow, bGrab );
+			Msg( "SetWindowMouseGrab( %s )\n", bGrab ? "true" : "false" );
+			SDL_SetWindowMouseGrab( pWindow, bGrab );
 
 			// force non-fullscreen windows to the foreground if grabbed, so you can't
 			//  get your mouse locked to something in the background.
@@ -600,9 +627,12 @@ void CSDLMgr::Shutdown()
 {
 	SDLAPP_FUNC;
 
+	// dimhotepus: Only on togl.
+#if defined( DX_TO_GL_ABSTRACTION )
 	if (gGL && m_readFBO)
 		gGL->glDeleteFramebuffersEXT(1, &m_readFBO);
 	m_readFBO = 0;
+#endif
 
 	if ( m_Window )
 	{
@@ -695,19 +725,18 @@ bool CSDLMgr::CreateHiddenGameWindow( const char *pTitle, int width, int height 
 	// Set up GL context...
 	const int *attrib = m_pixelFormatAttribs;
 	for (int i = 0; i < m_pixelFormatAttribCount; i++, attrib += 2)
-		SDL_GL_SetAttribute((SDL_GLattr) attrib[0], attrib[1]);
+		SDL_GL_SetAttribute((SDL_GLAttr) attrib[0], attrib[1]);
 #endif
 
 	// no window yet? Create one now!
 	m_nWindowRefCount = 1;
 
-	int x = SDL_WINDOWPOS_CENTERED;
-	int y = SDL_WINDOWPOS_CENTERED;
 	int flags = SDL_WINDOW_HIDDEN;
 #if defined( DX_TO_GL_ABSTRACTION )
 	flags |= SDL_WINDOW_OPENGL;
 #endif
-	m_Window = SDL_CreateWindow( pTitle, x, y, width, height,  flags );
+	// dimhotepus: SDL3 backport: x,y are ignored.
+	m_Window = SDL_CreateWindow( pTitle, width, height, flags );
 
 	if (m_Window == NULL)
 		Error( "Failed to create SDL window: %s", SDL_GetError() );
@@ -826,7 +855,7 @@ PseudoGLContextPtr CSDLMgr::CreateExtraContext()
 
 	const int *attrib = m_pixelFormatAttribs;
 	for (int i = 0; i < m_pixelFormatAttribCount; i++, attrib += 2)
-		SDL_GL_SetAttribute((SDL_GLattr) attrib[0], attrib[1]);
+		SDL_GL_SetAttribute((SDL_GLAttr) attrib[0], attrib[1]);
 
 	return (PseudoGLContextPtr) SDL_GL_CreateContext(m_Window);
 }
@@ -841,9 +870,9 @@ void CSDLMgr::DeleteContext( PseudoGLContextPtr hContext )
 	{
 		if ( m_Window )
 		{
-			SDL_GL_MakeCurrent(m_Window, hContext);
+			SDL_GL_MakeCurrent(m_Window, (SDL_GLContext)hContext);
 		}
-		SDL_GL_DeleteContext((SDL_GLContext) hContext);
+		SDL_GL_DestroyContext((SDL_GLContext) hContext);
 	}
 }
 
@@ -852,7 +881,9 @@ bool CSDLMgr::MakeContextCurrent( PseudoGLContextPtr hContext )
 	SDLAPP_FUNC;
 
 	// We only ever have one GL context on Linux at the moment, so don't spam these calls.
-	return SDL_GL_MakeCurrent(m_Window, (SDL_GLContext)hContext ) == 0;
+	// Port: SDL3 SDL_GL_MakeCurrent returns bool (true = success); SDL2
+	// returned 0 on success.
+	return SDL_GL_MakeCurrent(m_Window, (SDL_GLContext)hContext );
 }
 
 #endif // DX_TO_GL_ABSTRACTION
@@ -1026,21 +1057,21 @@ void CSDLMgr::OnFrameRendered()
 
 		m_bRawInput = !m_bCursorVisible && rawinput.IsValid() && rawinput.GetBool();
 
-		SDL_bool bWindowGrab = !m_bCursorVisible ? SDL_TRUE : SDL_FALSE;
-		SDL_bool bRelativeMouseMode = bWindowGrab;
+		bool bWindowGrab = !m_bCursorVisible;
+		bool bRelativeMouseMode = bWindowGrab;
 
 		if ( !m_bRawInput )
 		{
 			if ( m_bForbidMouseGrab )
-				bWindowGrab = SDL_FALSE;
+				bWindowGrab = false;
 
-			bRelativeMouseMode = SDL_FALSE;
+			bRelativeMouseMode = false;
 		}
 
-		SDL_SetWindowGrab( m_Window, bWindowGrab );
-		SDL_SetRelativeMouseMode( bRelativeMouseMode );
+		SDL_SetWindowMouseGrab( m_Window, bWindowGrab );
+		SDL_SetWindowRelativeMouseMode( m_Window, bRelativeMouseMode );
 
-		SDL_ShowCursor( m_bCursorVisible ? 1 : 0 );
+		if ( m_bCursorVisible ) SDL_ShowCursor(); else SDL_HideCursor();
 
 		// force non-fullscreen windows to the foreground if grabbed, so you can't get your mouse locked to something in the background.
 		if ( bWindowGrab && !m_bFullScreen )
@@ -1294,24 +1325,29 @@ void CSDLMgr::SetWindowFullScreen( bool bFullScreen, int nWidth, int nHeight )
 
 	if ( bFullScreen )
 	{
-		if ( SDL_GetDesktopDisplayMode( displayIndex, &mode ) != 0 )
+		const SDL_DisplayMode *pMode = SDL_GetDesktopDisplayMode( GetDisplayIDForIndex( displayIndex ) );
+		if ( !pMode )
 		{
 			Assert( 0 );
-			SDL_GetDesktopDisplayMode( 0, &mode );
+			pMode = SDL_GetDesktopDisplayMode( SDL_GetPrimaryDisplay() );
+		}
+		if ( pMode )
+		{
+			mode = *pMode;
 		}
 
-		mode.format = (Uint32)SDL_PIXELFORMAT_RGBX8888;
+		mode.format = SDL_PIXELFORMAT_RGBX8888;
 	}
 	else
 	{
-		mode.format = ( Uint32 )SDL_PIXELFORMAT_RGBX8888;
+		mode.format = SDL_PIXELFORMAT_RGBX8888;
 		mode.refresh_rate = 0;
 		mode.w = nWidth;
 		mode.h = nHeight;
-		mode.driverdata = 0;
+		mode.internal = nullptr;
 	}
 
-	SDL_SetWindowDisplayMode( m_Window, &mode );
+	SDL_SetWindowFullscreenMode( m_Window, &mode );
 
 	if ( ( m_bFullScreen != bFullScreen ) ||
 		 ( bFullScreen && ( sdl_displayindex_fullscreen.GetInt() != displayIndex ) ) )
@@ -1322,11 +1358,11 @@ void CSDLMgr::SetWindowFullScreen( bool bFullScreen, int nWidth, int nHeight )
 			int y = 0;
 
 			// If we have more than one display, center the window in the one we've been assigned to.
-			if ( SDL_GetNumVideoDisplays() > 1 )
+			if ( GetNumDisplays() > 1 )
 			{
 				SDL_Rect rect = { 0, 0, 0, 0 };
 
-				SDL_GetDisplayBounds( displayIndex, &rect );
+				SDL_GetDisplayBounds( GetDisplayIDForIndex( displayIndex ), &rect );
 
 				x = rect.x;
 				y = rect.y;
@@ -1336,7 +1372,7 @@ void CSDLMgr::SetWindowFullScreen( bool bFullScreen, int nWidth, int nHeight )
 			{
 				// TODO: Temporary workaround. SDL doesn't support going fullscreen on one monitor to fullscreen
 				// on another. So we switch to windowed here, move our window, then go back fullscreen.
-				SDL_SetWindowFullscreen( m_Window, SDL_FALSE );
+				SDL_SetWindowFullscreen( m_Window, false );
 				ThreadSleep( 15 );
 			}
 
@@ -1351,7 +1387,7 @@ void CSDLMgr::SetWindowFullScreen( bool bFullScreen, int nWidth, int nHeight )
 			sdl_displayindex_fullscreen.SetValue( -1 );
 		}
 
-		SDL_SetWindowFullscreen( m_Window, bFullScreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0 );
+		SDL_SetWindowFullscreen( m_Window, bFullScreen );
 
 		m_bFullScreen = bFullScreen;
 	}
@@ -1360,7 +1396,7 @@ void CSDLMgr::SetWindowFullScreen( bool bFullScreen, int nWidth, int nHeight )
 	if (bFullScreen)
 	{
 		int drawableW, drawableH;
-		SDL_GL_GetDrawableSize(m_Window, &drawableW, &drawableH);
+		SDL_GetWindowSizeInPixels(m_Window, &drawableW, &drawableH);
 
 		if ( drawableW > 0 && drawableH > 0 )
 		{
@@ -1442,10 +1478,10 @@ void CSDLMgr::handleKeyInput( const SDL_Event &event )
 {
 	SDLAPP_FUNC;
 
-	Assert( ( event.type == SDL_KEYDOWN ) || ( event.type == SDL_KEYUP ) );
+	Assert( ( event.type == SDL_EVENT_KEY_DOWN ) || ( event.type == SDL_EVENT_KEY_UP ) );
 
 #ifdef OSX
-	if ( event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_TAB &&
+	if ( event.type == SDL_EVENT_KEY_DOWN && event.key.key == SDLK_TAB &&
 	     SDL_GetModState()&KMOD_GUI && CommandLine()->HasParm( "-exclusivefs" ) )
 	{
 		// If we're in exclusive fullscreen mode, and they command-tab, handle
@@ -1454,12 +1490,12 @@ void CSDLMgr::handleKeyInput( const SDL_Event &event )
 	}
 #endif
 
-	const bool bPressed = ( event.type == SDL_KEYDOWN );
+	const bool bPressed = ( event.type == SDL_EVENT_KEY_DOWN );
 
 	// !!! FIXME: we should be getting text input from a different event...
 	CCocoaEvent theEvent;
 	theEvent.m_EventType = ( bPressed ) ? CocoaEvent_KeyDown : CocoaEvent_KeyUp;
-	theEvent.m_VirtualKeyCode = event.key.keysym.scancode;
+	theEvent.m_VirtualKeyCode = event.key.scancode;
 	theEvent.m_UnicodeKey = 0;
 	theEvent.m_UnicodeKeyUnmodified = 0;
 
@@ -1467,7 +1503,7 @@ void CSDLMgr::handleKeyInput( const SDL_Event &event )
 	// calculate the scancode.
 	if ( CommandLine()->HasParm( "-nonqwerty" ) )
 	{
-		const char* keyname = SDL_GetKeyName( event.key.keysym.sym );
+		const char* keyname = SDL_GetKeyName( event.key.key );
 		if ( keyname != nullptr && V_strlen( keyname ) == 1) {
 			const char c = *keyname;
 			if ( c >= 'A' && c <= 'Z' )
@@ -1512,7 +1548,7 @@ void CSDLMgr::handleKeyInput( const SDL_Event &event )
 	//bool bDropKey = false;
 	if (bPressed)
 	{
-		switch (event.key.keysym.sym)
+		switch (event.key.key)
 		{
 			KEYSYMCASE(CAPSLOCK,,|=,KEY_CAPSLOCK);
 			KEYSYMCASE(SHIFT,R,|=,KEY_RSHIFT);
@@ -1528,7 +1564,7 @@ void CSDLMgr::handleKeyInput( const SDL_Event &event )
 	}
 	else
 	{
-		switch (event.key.keysym.sym)
+		switch (event.key.key)
 		{
 			KEYSYMCASE(CAPSLOCK,,&= ~,KEY_CAPSLOCK);
 			KEYSYMCASE(SHIFT,R,&= ~,KEY_RSHIFT);
@@ -1564,10 +1600,10 @@ void CSDLMgr::handleKeyInput( const SDL_Event &event )
 
 #if GLMDEBUG
 	bool bIsShifted = ( ((theEvent.m_ModifierKeyMask & (1<<eCapsLockKey))!=0) || ((theEvent.m_ModifierKeyMask & (1<<eShiftKey))!=0) );
-	theEvent.m_UnicodeKeyUnmodified = event.key.keysym.sym;
+	theEvent.m_UnicodeKeyUnmodified = event.key.key;
 	if ( bIsShifted )
 	{
-		switch ( event.key.keysym.sym )
+		switch ( event.key.key )
 		{
 			case '[':
 				theEvent.m_UnicodeKeyUnmodified = '{';
@@ -1603,7 +1639,7 @@ void CSDLMgr::PumpWindowsMessageLoop()
 
 		switch ( event.type )
 		{
-			case SDL_MOUSEMOTION:
+			case SDL_EVENT_MOUSE_MOTION:
 			{
 				if ( !m_bHasFocus )
 					break;
@@ -1648,8 +1684,8 @@ void CSDLMgr::PumpWindowsMessageLoop()
 				break;
 			}
 
-			case SDL_MOUSEBUTTONUP:
-			case SDL_MOUSEBUTTONDOWN:
+			case SDL_EVENT_MOUSE_BUTTON_UP:
+			case SDL_EVENT_MOUSE_BUTTON_DOWN:
 			{
 				// SDL buttons:
 				//  1 = Left button
@@ -1686,7 +1722,7 @@ void CSDLMgr::PumpWindowsMessageLoop()
 					break;
 				}
 
-				const bool bPressed = (event.type == SDL_MOUSEBUTTONDOWN);
+				const bool bPressed = (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN);
 				const CocoaMouseButton_t cocoaButton = ( CocoaMouseButton_t )( 1 << (button - 1 ) );
 
 				if (bPressed)
@@ -1727,7 +1763,7 @@ void CSDLMgr::PumpWindowsMessageLoop()
 				break;
 			}
 
-			case SDL_MOUSEWHEEL:
+			case SDL_EVENT_MOUSE_WHEEL:
 			{
 				if ( event.wheel.y )
 				{
@@ -1741,10 +1777,7 @@ void CSDLMgr::PumpWindowsMessageLoop()
 				break;
 			}
 
-			case SDL_WINDOWEVENT:
-				switch (event.window.event)
-				{
-					case SDL_WINDOWEVENT_EXPOSED:
+			case SDL_EVENT_WINDOW_EXPOSED:
 					{
 						/*if ( ev.xexpose.count > 0 )
 							break; // multiple expose events queued
@@ -1755,57 +1788,59 @@ void CSDLMgr::PumpWindowsMessageLoop()
 						m_mapSentInvalidate.RemoveAll();*/
 						break;
 					}
-					case SDL_WINDOWEVENT_FOCUS_GAINED:
-					{
-						m_bHasFocus = true;
-						SDL_ShowCursor( m_bCursorVisible ? 1 : 0 );
-						CCocoaEvent theEvent;
-						theEvent.m_EventType = CocoaEvent_AppActivate;
-						theEvent.m_ModifierKeyMask = 1;
-						PostEvent( theEvent );
-						break;
-					}
-					case SDL_WINDOWEVENT_FOCUS_LOST:
-					{
-						m_bHasFocus = false;
-						SDL_ShowCursor(1);
-						CCocoaEvent theEvent;
-						theEvent.m_EventType = CocoaEvent_AppActivate;
-						theEvent.m_ModifierKeyMask = 0;
-						PostEvent( theEvent );
-						break;
-					}
-					case SDL_WINDOWEVENT_LEAVE:
-					{
-						if ( !IsWindows() && !m_bRawInput && !m_bCursorVisible && m_bHasFocus )
-						{
-							// If the cursor is not visible and the mouse
-							// cursor somehow manages to escape the window
-							// warp it back to the middle of the window.
-							SDL_WarpMouseInWindow( m_Window, m_nMouseTargetX, m_nMouseTargetY );
-							m_bExpectSyntheticMouseMotion = true;
-						}
-						break;
-					}
+				break;
+
+			case SDL_EVENT_WINDOW_FOCUS_GAINED:
+			{
+				m_bHasFocus = true;
+				if ( m_bCursorVisible ) SDL_ShowCursor(); else SDL_HideCursor();
+				CCocoaEvent theEvent;
+				theEvent.m_EventType = CocoaEvent_AppActivate;
+				theEvent.m_ModifierKeyMask = 1;
+				PostEvent( theEvent );
+				break;
+			}
+
+			case SDL_EVENT_WINDOW_FOCUS_LOST:
+			{
+				m_bHasFocus = false;
+				SDL_ShowCursor();
+				CCocoaEvent theEvent;
+				theEvent.m_EventType = CocoaEvent_AppActivate;
+				theEvent.m_ModifierKeyMask = 0;
+				PostEvent( theEvent );
+				break;
+			}
+
+			case SDL_EVENT_WINDOW_MOUSE_LEAVE:
+				if ( !IsWindows() && !m_bRawInput && !m_bCursorVisible && m_bHasFocus )
+				{
+					// If the cursor is not visible and the mouse
+					// cursor somehow manages to escape the window
+					// warp it back to the middle of the window.
+					SDL_WarpMouseInWindow( m_Window, m_nMouseTargetX, m_nMouseTargetY );
+					m_bExpectSyntheticMouseMotion = true;
 				}
 				break;
 
-			case SDL_KEYUP:
-			case SDL_KEYDOWN:
+			case SDL_EVENT_KEY_UP:
+			case SDL_EVENT_KEY_DOWN:
 				handleKeyInput(event);
 				break;
 
-			case SDL_TEXTINPUT:
+			case SDL_EVENT_TEXT_INPUT:
 			{
-				char *text = event.text.text;
+				// dimhotepus: SDL3 backport.
+				const char *text = event.text.text;
+				const int nTextLen = text ? (int)V_strlen( text ) : 0;
 
-				if ( text && text[ 0 ] )
+				if ( nTextLen > 0 )
 				{
-					wchar_t WBuf[ SDL_TEXTINPUTEVENT_TEXT_SIZE + 1 ];
+					wchar_t WBuf[ 256 ];
 					WBuf[ 0 ] = 0;
 					V_UTF8ToUnicode( text, WBuf, sizeof( WBuf ) );
 
-					for ( int i = 0; i < SDL_TEXTINPUTEVENT_TEXT_SIZE; i++ )
+					for ( int i = 0; i < nTextLen; i++ )
 					{
 						wchar_t ch = WBuf[ i ];
 						if ( ch == '\0' )
@@ -1830,7 +1865,7 @@ void CSDLMgr::PumpWindowsMessageLoop()
 				break;
 			}
 
-			case SDL_QUIT:
+			case SDL_EVENT_QUIT:
 			{
 				CCocoaEvent theEvent;
 				theEvent.m_EventType = CocoaEvent_AppQuit;
@@ -1877,7 +1912,7 @@ void CSDLMgr::DecWindowRefCount()
 		}
 		m_readFBO = 0;
 								
-		SDL_GL_DeleteContext( m_GLContext );
+		SDL_GL_DestroyContext( m_GLContext );
 #if !defined( OSX ) && defined( DBGFLAG_ASSERT )
 		// Clear the GL entrypoint pointers, ensuring we crash if someone tries to call GL after we delete the context.
 		Msg( "%s: Calling ClearOpenGLEntryPoints. Should crash if someone calls GL after this.\n", __FUNCTION__ );
@@ -1887,8 +1922,8 @@ void CSDLMgr::DecWindowRefCount()
 		m_GLContext = NULL;
 #endif // DX_TO_GL_ABSTRACTION
 
-		SDL_SetWindowFullscreen(m_Window, SDL_FALSE);  // just in case.
-		SDL_SetWindowGrab(m_Window, SDL_FALSE);  // just in case.
+		SDL_SetWindowFullscreen( m_Window, false );  // just in case.
+		SDL_SetWindowMouseGrab( m_Window, false );  // just in case.
 		SDL_DestroyWindow(m_Window);
 		m_Window = NULL;
 		SetAssertDialogParent( NULL );
@@ -1913,7 +1948,7 @@ void CSDLMgr::SetApplicationIcon( const char *pchAppIconFile )
 	if (icon)
 	{
 		SDL_SetWindowIcon(m_Window, icon);
-		SDL_FreeSurface(icon);
+		SDL_DestroySurface(icon);
 	}
 }
 
@@ -1949,15 +1984,19 @@ void CSDLMgr::GetNativeDisplayInfo( int nDisplay, uint &nWidth, uint &nHeight, u
 		}
 	}
 
-	if ( SDL_GetDesktopDisplayMode( nDisplay, &mode ) != 0 )
+	const SDL_DisplayMode *pMode = SDL_GetDesktopDisplayMode( GetDisplayIDForIndex( nDisplay ) );
+	if ( !pMode )
 	{
 		Assert( 0 );
-		SDL_GetDesktopDisplayMode( 0, &mode );
+		pMode = SDL_GetDesktopDisplayMode( SDL_GetPrimaryDisplay() );
 	}
 
-	nRefreshHz = mode.refresh_rate;
-	nWidth = mode.w;
-	nHeight = mode.h;
+	if ( pMode )
+	{
+		nRefreshHz = pMode->refresh_rate;
+		nWidth = pMode->w;
+		nHeight = pMode->h;
+	}
 }
 
 
@@ -2001,16 +2040,11 @@ void CSDLMgr::WaitUntilUserInput( int msSleepTime )
 
 //===============================================================================
 
-void CSDLMgr::SetGammaRamp( const uint16 *pRed, const uint16 *pGreen, const uint16 *pBlue )
+void CSDLMgr::SetGammaRamp( [[maybe_unused]] const uint16 *pRed, [[maybe_unused]] const uint16 *pGreen, [[maybe_unused]] const uint16 *pBlue )
 {
 	if ( m_Window )
 	{
-		int nResult = SDL_SetWindowGammaRamp( m_Window, pRed, pGreen, pBlue );
-		
-		if ( nResult != 0 )
-		{
-			ConMsg( "SDL_SetWindowGammaRamp failed: %d\n", nResult );
-		}
+		// dimhotepus: SDL3 removed SDL_SetWindowGammaRamp.
 	}
 }
 
