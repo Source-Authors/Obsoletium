@@ -1264,7 +1264,14 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 	// which is an operation we don't support as it currently stands. The user can 
 	// pass -adapter N to use a different device.
 #if defined( USE_SDL ) && defined( DX_TO_GL_ABSTRACTION )
-	int numVideoDisplays = SDL_GetNumVideoDisplays();
+	// dimhotepus: SDL3 support.
+	int numVideoDisplays = 0;
+	{
+		int displayCount = 0;
+		SDL_DisplayID *sdlDisplays = SDL_GetDisplays( &displayCount );
+		numVideoDisplays = sdlDisplays ? displayCount : 0;
+		RunCodeAtScopeExit( SDL_free( sdlDisplays ) );
+	}
 
 	m_pWindowed = new vgui::ComboBox( this, "DisplayModeCombo", 5 + numVideoDisplays, false );
 
@@ -1501,8 +1508,12 @@ void COptionsSubVideo::PrepareResolutionList()
 	gameuifuncs->GetDesktopResolution( desktopWidth, desktopHeight );
 
 #if defined( USE_SDL )
-	bool bFullScreenWithMultipleDisplays = ( !bWindowed && !bBorderless && ( SDL_GetNumVideoDisplays() > 1 ) );
-	if ( bFullScreenWithMultipleDisplays )
+	// dimhotepus: SDL3 support.
+	int sdlDisplayCount = 0;
+	SDL_DisplayID *sdlDisplays = SDL_GetDisplays( &sdlDisplayCount );
+	RunCodeAtScopeExit( SDL_free( sdlDisplays ) );
+	bool bFullScreenWithMultipleDisplays = ( !bWindowed && !bBorderless && ( sdlDisplayCount > 1 ) );
+	if ( bFullScreenWithMultipleDisplays && sdlDisplays )
 	{
 		SDL_Rect rect;
 #if defined( DX_TO_GL_ABSTRACTION )
@@ -1510,8 +1521,12 @@ void COptionsSubVideo::PrepareResolutionList()
 #else
 		unsigned displayIndex = materials->GetCurrentAdapter();
 #endif
+		// dimhotepus: SDL3 support.
+		SDL_DisplayID displayID = ( displayIndex < (unsigned)sdlDisplayCount )
+			? sdlDisplays[displayIndex]
+			: sdlDisplays[0];
 
-		if ( !SDL_GetDisplayBounds( displayIndex, &rect ) )
+		if ( SDL_GetDisplayBounds( displayID, &rect ) )
 		{
 			desktopWidth = rect.w;
 			desktopHeight = rect.h;
