@@ -294,6 +294,29 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 	{
 		// full path failed, let LoadLibrary() try to search the PATH now
 		hDLL = Sys_LoadLibrary( pModuleName, flags );
+
+#if defined( _LINUX ) || defined( __linux__ ) || defined( __APPLE__ )
+		// dimhotepus: On POSIX convention is libXXX, but we use XXX in loader, so adjust.
+		if ( !hDLL && !( flags & SYS_NOLOAD ) )
+		{
+			// dimhotepus: Add lib prefix to file name.
+			char szPrefixedModuleName[ 1024 ];
+			const char *pFileName = strrchr( pModuleName, '/' );
+			if ( pFileName )
+			{
+				const intp nDirectoryLength = pFileName - pModuleName + 1;
+				V_strncpy( szPrefixedModuleName, pModuleName, nDirectoryLength + 1 );
+				V_strcat_safe( szPrefixedModuleName, "lib" );
+				V_strcat_safe( szPrefixedModuleName, pFileName + 1 );
+			}
+			else
+			{
+				V_strcpy_safe( szPrefixedModuleName, "lib" );
+				V_strcat_safe( szPrefixedModuleName, pModuleName );
+			}
+			hDLL = Sys_LoadLibrary( szPrefixedModuleName, flags );
+		}
+#endif
 #if !defined(NDEBUG)
 		if ( !hDLL )
 		{
