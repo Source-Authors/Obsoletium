@@ -223,6 +223,7 @@ public:
 	virtual void	SwitchMode( bool commander, bool force ) {}
 	virtual void	LevelInit( const char *newmap );
 	virtual void	LevelShutdown( void );
+	virtual void	Shutdown( void ) {}
 	virtual void	ActivateMouse( bool isactive ) {}
 };
 

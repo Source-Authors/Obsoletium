@@ -50,7 +50,7 @@ public:
 		m_available = available;
 	}
 
-	virtual int AddImage( vgui::IImage *image, int offset )
+	virtual intp AddImage( vgui::IImage *image, int offset )
 	{
 		if ( image )
 		{
