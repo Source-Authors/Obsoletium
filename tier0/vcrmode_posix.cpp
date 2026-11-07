@@ -19,10 +19,6 @@
 // FIXME: We totally have a bad tier dependency here
 #include "inputsystem/InputEnums.h"
 
-enum {
-  VCRFILE_VERSION =		2
-};
-
 #define VCR_RuntimeAssert(x)	VCR_RuntimeAssertFn(x, #x)
 #define PvAlloc malloc
 
