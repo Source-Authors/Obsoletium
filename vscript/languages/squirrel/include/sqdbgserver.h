@@ -15,6 +15,10 @@ constexpr inline int MAX_MSG_LEN{2049};
 using SOCKET = int;
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1
+#else
+#include <cstddef>
+
+using SOCKET = std::size_t;
 #endif
 
 #include "squirrel.h"
@@ -23,7 +27,6 @@ using SOCKET = int;
 #include <string>
 #include <vector>
 
-using SOCKET = std::size_t;
 using SQDBGString = std::basic_string<SQChar>;
 
 inline bool dbg_less(const SQChar *x, const SQChar *y) {
