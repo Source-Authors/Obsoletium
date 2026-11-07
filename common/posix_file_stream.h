@@ -5,7 +5,14 @@
 
 #include <sys/stat.h>
 
+// dimhotepus: Try to be portable.
+#ifndef _LARGEFILE64_SOURCE
+#define _LARGEFILE64_SOURCE
+#endif
+#ifndef _FILE_OFFSET_BITS
 #define _FILE_OFFSET_BITS 64
+#endif
+
 #include <cerrno>
 #include <cstdarg>
 #include <cstdio>
@@ -262,8 +269,12 @@ class posix_file_stream {
                                      const int origin) const noexcept {
 #ifdef _WIN32
     const int errno_code{_fseeki64(fd_, offset, origin)};
-#else
+#elif defined( __APPLE__)
     const int errno_code{fseeko(fd_, offset, origin)};
+#elif defined(__linux__)
+    const int errno_code{fseeko64(fd_, offset, origin)};
+#else
+#error "Please define your platform."
 #endif
     return {errno_code == 0,
             errno_code == 0 ? posix_error_ok : internal::posix_error_last()};
@@ -302,8 +313,12 @@ class posix_file_stream {
   [[nodiscard]] io_result<int64_t> tell() const noexcept {
 #ifdef _WIN32
     const int64_t file_pos{_ftelli64(fd_)};
-#else
+#elif defined( __APPLE__ )
     const int64_t file_pos{ftello(fd_)};
+#elif defined( __linux__ )
+    const int errno_code{ftello64(fd_, offset, origin)};
+#else
+#error "Please define your platform."
 #endif
     return {file_pos,
             file_pos != -1L ? posix_error_ok : internal::posix_error_last()};
