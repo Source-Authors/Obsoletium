@@ -238,7 +238,9 @@ private:
             SquirrelObject v = names.GetValue(n);
             if (v.IsNull()) {
                 i = names.Len();
-                names.SetValue(n, i);
+                // Explicit SQ_INT: an int argument is ambiguous between the
+                // bool, SQ_INT and FLOAT SetValue() overloads.
+                names.SetValue(n, static_cast<SQ_INT>(i));
             } else {
                 i = v.ToInteger();
             }
