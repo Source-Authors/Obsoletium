@@ -4421,9 +4421,7 @@ bool CCSPlayer::ClientCommand( const CCommand &args )
 		punchAngle.y = flDamage * random->RandomFloat ( -0.15, 0.15 );
 		punchAngle.z = flDamage * random->RandomFloat ( -0.15, 0.15 );
 
-		clamp( punchAngle.x, -4, punchAngle.x );
-		clamp( punchAngle.y, -5, 5 );
-		clamp( punchAngle.z, -5, 5 );
+		// dimhotepus: Dropped noop punch angle clamping.
 
 		// +y == down
 		// +x == left
