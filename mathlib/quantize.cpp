@@ -567,7 +567,7 @@ FHeap TheQueue;
  } while (false)
 
 QuantizedValue *FindMatch(uint8 const *sample, int ndims,
-								 const uint8 *weights, QuantizedValue *q)
+								 uint8 *weights, QuantizedValue *q)
 {
 	InitHeap(&TheQueue);
 	QuantizedValue *bestmatch=0;
