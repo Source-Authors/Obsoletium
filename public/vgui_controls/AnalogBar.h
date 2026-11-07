@@ -53,7 +53,7 @@ public:
 	{
 		return ConstructTimeRemainingString( output, size,
 			startTime, currentTime,
-			currentProgress, lastProgressUpdateTime,
+			currentAnalogValue, lastAnalogValueUpdateTime,
 			addRemainingSuffix );
 	}
 
