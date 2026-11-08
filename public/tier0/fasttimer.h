@@ -592,13 +592,13 @@ inline CAverageTimeMarker::~CAverageTimeMarker()
 class CLimitTimer
 {
 public:
-	CLimitTimer() = default;
-	explicit CLimitTimer( uint64 cMicroSecDuration ) { SetLimit( cMicroSecDuration ); }
-	void SetLimit( uint64 m_cMicroSecDuration );
-	[[nodiscard]] bool BLimitReached() const;
+	CLimitTimer() noexcept = default;
+	explicit CLimitTimer( uint64 cMicroSecDuration ) noexcept { SetLimit( cMicroSecDuration ); }
+	void SetLimit( uint64 cMicroSecDuration ) noexcept;
+	[[nodiscard]] bool BLimitReached() const noexcept;
 
-	[[nodiscard]] int CMicroSecOverage() const;
-	[[nodiscard]] uint64 CMicroSecLeft() const; 
+	[[nodiscard]] int CMicroSecOverage() const noexcept;
+	[[nodiscard]] uint64 CMicroSecLeft() const noexcept;
 
 private:
 	// dimhotepus: Initialize, was read uninitialized by a default-constructed timer.
@@ -611,7 +611,7 @@ private:
 // Input  : cMicroSecDuration -		How long a time period to measure.
 //									Huge values (e.g. UINT64_MAX) mean "never".
 //-----------------------------------------------------------------------------
-inline void CLimitTimer::SetLimit( uint64 cMicroSecDuration )
+inline void CLimitTimer::SetLimit( uint64 cMicroSecDuration ) noexcept
 {
 	using namespace s1::tier0::fasttimer_detail;
 
@@ -627,7 +627,7 @@ inline void CLimitTimer::SetLimit( uint64 cMicroSecDuration )
 // Purpose: Determines whether our specified time period has passed
 // Output:	true if at least the specified time period has passed
 //-----------------------------------------------------------------------------
-inline bool CLimitTimer::BLimitReached() const
+inline bool CLimitTimer::BLimitReached() const noexcept
 {
 	return CCycleCount::GetTimestamp() >= m_lCycleLimit;
 }
@@ -637,7 +637,7 @@ inline bool CLimitTimer::BLimitReached() const
 // Purpose: If we're over our specified time period, return the amount of the overage.
 // Output:	# of microseconds since we reached our specified time period (saturates at INT_MAX).
 //-----------------------------------------------------------------------------
-inline int CLimitTimer::CMicroSecOverage() const
+inline int CLimitTimer::CMicroSecOverage() const noexcept
 {
 	const uint64 lcCycles{ CCycleCount::GetTimestamp() };
 
@@ -655,7 +655,7 @@ inline int CLimitTimer::CMicroSecOverage() const
 // Purpose: If we're under our specified time period, return the amount under.
 // Output:	# of microseconds until we reached our specified time period, 0 if we've passed it
 //-----------------------------------------------------------------------------
-inline uint64 CLimitTimer::CMicroSecLeft() const
+inline uint64 CLimitTimer::CMicroSecLeft() const noexcept
 {
 	const uint64 lcCycles{ CCycleCount::GetTimestamp() };
 
