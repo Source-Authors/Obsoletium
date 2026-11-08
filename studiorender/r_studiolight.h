@@ -40,7 +40,17 @@ float FASTCALL R_WorldLightDistanceFalloff( const LightDesc_t *wl, const Vector&
 // Copies lighting state into a buffer, returns number of lights copied
 int CopyLocalLightingState( int nMaxLights, LightDesc_t *pDest, int nLightCount, const LightDesc_t *pSrc );
 
-#if defined( _WIN32 ) && !defined( _X360 )
+// dimhotepus: Define on linux too as needed.
+#if !defined( STUDIO_SSE_LIGHTING )
+#if ( defined( _WIN32 ) && !defined( _X360 ) ) || \
+    ( defined( __x86_64__ ) && ( defined( _LINUX ) || defined( __linux__ ) ) )
+#define STUDIO_SSE_LIGHTING 1
+#else
+#define STUDIO_SSE_LIGHTING 0
+#endif
+#endif
+
+#if STUDIO_SSE_LIGHTING
 // SSE optimized versions
 void R_LightAmbient_4D( const FourVectors& normal, Vector4D* pLightBoxColor, FourVectors &lv );
 __m128 FASTCALL R_WorldLightDistanceFalloff( const LightDesc_t *wl, const FourVectors& delta );
