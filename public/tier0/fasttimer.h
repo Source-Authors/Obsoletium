@@ -201,7 +201,7 @@ inline CTimeScope::~CTimeScope()
 class CTimeAdder
 {
 public:
-	explicit CTimeAdder( CCycleCount *pTotal );
+	explicit CTimeAdder( CCycleCount *pTotal ) noexcept;
 	~CTimeAdder();
 
 	// dimhotepus: Non-copyable, copy would add the duration twice.
@@ -215,9 +215,9 @@ private:
 	CFastTimer	m_Timer{};
 };
 
-inline CTimeAdder::CTimeAdder( CCycleCount *pTotal )
+inline CTimeAdder::CTimeAdder( CCycleCount *pTotal ) noexcept
+	: m_pTotal{ pTotal }
 {
-	m_pTotal = pTotal;
 	m_Timer.Start();
 }
 
