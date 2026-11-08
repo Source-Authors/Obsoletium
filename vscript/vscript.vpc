@@ -24,7 +24,7 @@ $Macro SQUIRRELOUTBINDIRRELEASE	"$SQUIRRELBASEDIR\out\bin\Release"
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
 
-$Configuration	"Debug"
+$Configuration
 {
 	$Compiler
 	{
@@ -42,7 +42,6 @@ $Configuration	"Debug"
 
 	$Linker
 	{
-		$AdditionalLibraryDirectories	"$BASE;$LUAOUTDIRDEBUG;$SQUIRRELOUTLIBDIRDEBUG"
 		$AdditionalDependencies			"$BASE lua_shared.lib squirrel3.lib sqstdlib3.lib"
 		$SystemLibraries				"iconv" [$OSXALL]
 	}
@@ -66,45 +65,19 @@ $Configuration	"Debug"
 	}
 }
 
+$Configuration	"Debug"
+{
+	$Linker
+	{
+		$AdditionalLibraryDirectories	"$BASE;$LUAOUTDIRDEBUG;$SQUIRRELOUTLIBDIRDEBUG"
+	}
+}
+
 $Configuration	"Release"
 {
-	$Compiler
-	{
-		$PreprocessorDefinitions		"$BASE;VSCRIPT_DLL_EXPORT" 
-		$PreprocessorDefinitions		"$BASE;LUA_MOD_CASE_INSENSITIVE" 
-		// LUA_BUILD_AS_DLL only selects __declspec(dllexport/dllimport) for
-		// LUA_API in luaconf.h. On GCC there is no __declspec, and it causes build errors.
-		$PreprocessorDefinitions		"LUA_BUILD_AS_DLL=1" [$WINDOWS]
-		$AdditionalIncludeDirectories	"$BASE;$LUASRCDIR"
-		$AdditionalIncludeDirectories	"$BASE;$SQUIRRELSRCDIR;.\languages\squirrel\include;.\languages\squirrel\sqplus"
-
-		// dimhotepus: Enable exceptions as we use them in a single place
-		$EnableC++Exceptions			"Yes (/EHsc)"
-	}
-
 	$Linker
 	{
 		$AdditionalLibraryDirectories	"$BASE;$LUAOUTDIRRELEASE;$SQUIRRELOUTLIBDIRRELEASE"
-		$AdditionalDependencies			"$BASE lua_shared.lib squirrel3.lib sqstdlib3.lib"
-		$SystemLibraries				"iconv" [$OSXALL]
-	}
-
-	$PostBuildEvent
-	{
-		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n" \
-							"COPY $QUOTE$LUAOUTDIRRELEASE\lua_shared.dll$QUOTE $QUOTE$OUTBINDIR\lua_shared.dll$QUOTE" "\n"					\
-							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-							"IF EXIST $QUOTE$LUAOUTDIRRELEASE\lua_shared.pdb$QUOTE COPY $QUOTE$LUAOUTDIRRELEASE\lua_shared.pdb$QUOTE $QUOTE$OUTBINDIR\lua_shared.pdb$QUOTE" "\n"					\
-							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-							"COPY $QUOTE$SQUIRRELOUTBINDIRRELEASE\squirrel3.dll$QUOTE $QUOTE$OUTBINDIR\squirrel3.dll$QUOTE" "\n"					\
-							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-							"IF EXIST $QUOTE$SQUIRRELOUTBINDIRRELEASE\squirrel3.pdb$QUOTE COPY $QUOTE$SQUIRRELOUTBINDIRRELEASE\squirrel3.pdb$QUOTE $QUOTE$OUTBINDIR\squirrel3.pdb$QUOTE" "\n"					\
-							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-							"COPY $QUOTE$SQUIRRELOUTBINDIRRELEASE\sqstdlib3.dll$QUOTE $QUOTE$OUTBINDIR\sqstdlib3.dll$QUOTE" "\n"					\
-							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-							"IF EXIST $QUOTE$SQUIRRELOUTBINDIRRELEASE\sqstdlib3.pdb$QUOTE COPY $QUOTE$SQUIRRELOUTBINDIRRELEASE\sqstdlib3.pdb$QUOTE $QUOTE$OUTBINDIR\sqstdlib3.pdb$QUOTE" "\n"					\
-							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-							"$BASE"
 	}
 }
 
