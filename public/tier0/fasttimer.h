@@ -3,22 +3,94 @@
 #ifndef SE_PUBLIC_TIER0_FASTTIMER_H_
 #define SE_PUBLIC_TIER0_FASTTIMER_H_
 
-#ifdef _WIN32
-#include <intrin.h>
-#endif
+#include <atomic>   // std::atomic, std::atomic_signal_fence
+#include <climits>  // INT_MAX, ULONG_MAX
+#include <cstdint>  // UINT64_MAX
 
-#include <atomic>
-
-#include "platform.h"
+#include "platform.h"  // Plat_Rdtscp + <intrin.h> / <x86intrin.h>
 #include "dbg.h"
 
+// dimhotepus: Document what the clock globals hold and when they are valid.
+// Counter ticks per second of the counter read by Plat_Rdtscp() (TSC on x86,
+// CNTVCT_EL0 on ARM64, steady_clock elsewhere).
+//
+// All of these are written exactly once by CClockSpeedInit::Init() during
+// tier0 static initialization, before any other thread can exist, and are
+// read-only afterwards.  Until then they are zero; every conversion below
+// tolerates zero instead of dividing by it.
 PLATFORM_INTERFACE uint64 g_ClockSpeed;
 
 PLATFORM_INTERFACE double g_ClockSpeedMicrosecondsMultiplier;
 PLATFORM_INTERFACE double g_ClockSpeedMillisecondsMultiplier;
 PLATFORM_INTERFACE double g_ClockSpeedSecondsMultiplier;
 
+// Median cost, in ticks, of two back-to-back Plat_Rdtscp() calls.  Subtracted
+// from every measured duration so an empty timed block reads ~0.
 PLATFORM_INTERFACE uint64 g_ClockRtscpOverhead;
+
+// dimhotepus: Helpers for overflow-safe, sanitizer-clean conversions.
+namespace s1::tier0::fasttimer_detail
+{
+
+inline constexpr uint64 kUint64Max{ UINT64_MAX };
+
+// dimhotepus: Replaces a * b / d which overflowed uint64 for long durations
+// (~1.7 hours at 3 GHz for microseconds) and divided by zero before init.
+//
+// floor( a * b / d ) without the a * b intermediate overflowing.
+//
+// Exact as long as b * d fits in 64 bits, which holds for every caller here
+// (one side is a clock rate ~1e10, the other is 1e3 or 1e6).  Saturates at
+// UINT64_MAX when the true result does not fit.  Returns 0 for d == 0, so
+// conversions done before clock initialization yield 0 instead of SIGFPE.
+[[nodiscard]] constexpr uint64 MulDivU64( uint64 a, uint64 b, uint64 d ) noexcept
+{
+	if ( d == 0 )
+		return 0;
+
+	const uint64 q{ a / d };
+	const uint64 r{ a % d };
+
+	if ( b != 0 && q > kUint64Max / b )
+		return kUint64Max;
+
+	const uint64 hi{ q * b };
+	const uint64 lo{ r * b / d };  // r < d, so r * b < d * b: no overflow.
+
+	return hi > kUint64Max - lo ? kUint64Max : hi + lo;
+}
+
+// dimhotepus: Saturating narrowing for the legacy unsigned long getters
+// (32-bit on Windows), instead of silently wrapping.
+[[nodiscard]] constexpr unsigned long SaturateToULong( uint64 v ) noexcept
+{
+	if constexpr ( sizeof( unsigned long ) < sizeof( uint64 ) )
+	{
+		if ( v > static_cast<uint64>( ULONG_MAX ) )
+			return ULONG_MAX;
+	}
+	return static_cast<unsigned long>( v );
+}
+
+// dimhotepus: Compiler-only barrier, keeps the compiler from moving memory accesses
+// across a timestamp read.  Emits no instruction on any target.  CPU-side ordering is
+// already provided by the LFENCE / ISB in Plat_Rdtscp().
+FORCEINLINE void CompilerBarrier() noexcept
+{
+	std::atomic_signal_fence( std::memory_order_seq_cst );
+}
+
+[[nodiscard]] FORCEINLINE uint64 ElapsedTicks( uint64 start, uint64 end ) noexcept
+{
+	if ( end <= start )
+		return 0;
+
+	const uint64 elapsed{ end - start };
+	const uint64 overhead{ g_ClockRtscpOverhead };
+	return elapsed > overhead ? elapsed - overhead : 0;
+}
+
+}  // namespace s1::tier0::fasttimer_detail
 
 class CCycleCount
 {
@@ -306,7 +378,8 @@ inline bool CCycleCount::IsLessThan(CCycleCount const &other) const
 
 inline unsigned long CCycleCount::GetCycles() const
 {
-	return static_cast<unsigned long>(m_Int64);
+	// dimhotepus: Saturate instead of truncate.
+	return s1::tier0::fasttimer_detail::SaturateToULong( m_Int64 );
 }
 
 inline uint64 CCycleCount::GetLongCycles() const
@@ -316,12 +389,14 @@ inline uint64 CCycleCount::GetLongCycles() const
 
 inline unsigned long CCycleCount::GetMicroseconds() const
 {
-  return static_cast<unsigned long>(m_Int64 * 1000000 / g_ClockSpeed);
+	// dimhotepus: Overflow-safe and saturating.
+	return s1::tier0::fasttimer_detail::SaturateToULong( GetUlMicroseconds() );
 }
 
 inline uint64 CCycleCount::GetUlMicroseconds() const
 {
-	return m_Int64 * 1000000 / g_ClockSpeed;
+	// dimhotepus: m_Int64 * 1000000 overflowed, division by zero before init.
+	return s1::tier0::fasttimer_detail::MulDivU64( m_Int64, 1000000, g_ClockSpeed );
 }
 
 
@@ -333,13 +408,16 @@ inline double CCycleCount::GetMicrosecondsF() const
 
 inline void	CCycleCount::SetMicroseconds( unsigned long nMicroseconds )
 {
-	m_Int64 = static_cast<uint64>(nMicroseconds) * g_ClockSpeed / 1000000;
+	// dimhotepus: nMicroseconds * g_ClockSpeed overflowed with 64-bit unsigned long.
+	m_Int64 = s1::tier0::fasttimer_detail::MulDivU64( nMicroseconds, g_ClockSpeed, 1000000 );
 }
 
 
 inline unsigned long CCycleCount::GetMilliseconds() const
 {
-	return static_cast<unsigned long>(m_Int64 * 1000 / g_ClockSpeed);
+	// dimhotepus: Overflow-safe and saturating, no division by zero before init.
+	return s1::tier0::fasttimer_detail::SaturateToULong(
+		s1::tier0::fasttimer_detail::MulDivU64( m_Int64, 1000, g_ClockSpeed ) );
 }
 
 
@@ -492,14 +570,18 @@ private:
 
 //-----------------------------------------------------------------------------
 // Purpose: Initializes the limit timer with a period of time to measure.
-// Input  : cMicroSecDuration -		How long a time period to measure
+// Input  : cMicroSecDuration -		How long a time period to measure.
+//									Huge values (e.g. UINT64_MAX) mean "never".
 //-----------------------------------------------------------------------------
 inline void CLimitTimer::SetLimit( uint64 cMicroSecDuration )
 {
-	uint64 dlCycles = static_cast<uint64>( cMicroSecDuration ) * g_ClockSpeed / 1000000ULL;
-	CCycleCount cycleCount;
-	cycleCount.Sample( );
-	m_lCycleLimit = cycleCount.GetLongCycles( ) + dlCycles;
+	using namespace s1::tier0::fasttimer_detail;
+
+	// dimhotepus: cMicroSecDuration * g_ClockSpeed overflowed.
+	const uint64 dlCycles{ MulDivU64( cMicroSecDuration, g_ClockSpeed, 1000000 ) };
+	const uint64 now{ CCycleCount::GetTimestamp() };
+	// dimhotepus: Saturate, a wrapped limit gave an arbitrary deadline.
+	m_lCycleLimit = dlCycles > kUint64Max - now ? kUint64Max : now + dlCycles;
 }
 
 
@@ -509,26 +591,25 @@ inline void CLimitTimer::SetLimit( uint64 cMicroSecDuration )
 //-----------------------------------------------------------------------------
 inline bool CLimitTimer::BLimitReached() const
 {
-	CCycleCount cycleCount;
-	cycleCount.Sample( );
-	return ( cycleCount.GetLongCycles( ) >= m_lCycleLimit );
+	return CCycleCount::GetTimestamp() >= m_lCycleLimit;
 }
 
 
 //-----------------------------------------------------------------------------
 // Purpose: If we're over our specified time period, return the amount of the overage.
-// Output:	# of microseconds since we reached our specified time period.
+// Output:	# of microseconds since we reached our specified time period (saturates at INT_MAX).
 //-----------------------------------------------------------------------------
 inline int CLimitTimer::CMicroSecOverage() const
 {
-	CCycleCount cycleCount;
-	cycleCount.Sample();
-	uint64 lcCycles = cycleCount.GetLongCycles();
+	const uint64 lcCycles{ CCycleCount::GetTimestamp() };
 
 	if ( lcCycles < m_lCycleLimit )
 		return 0;
 
-	return static_cast<int>( ( lcCycles - m_lCycleLimit ) * 1000000ULL / g_ClockSpeed );
+	// dimhotepus: Overflow-safe conversion, saturate to INT_MAX instead of
+	// wrapping to a negative int.
+	const uint64 us{ s1::tier0::fasttimer_detail::MulDivU64( lcCycles - m_lCycleLimit, 1000000, g_ClockSpeed ) };
+	return us > static_cast<uint64>( INT_MAX ) ? INT_MAX : static_cast<int>( us );
 }
 
 
@@ -538,14 +619,13 @@ inline int CLimitTimer::CMicroSecOverage() const
 //-----------------------------------------------------------------------------
 inline uint64 CLimitTimer::CMicroSecLeft() const
 {
-	CCycleCount cycleCount;
-	cycleCount.Sample();
-	uint64 lcCycles = cycleCount.GetLongCycles();
+	const uint64 lcCycles{ CCycleCount::GetTimestamp() };
 
 	if ( lcCycles >= m_lCycleLimit )
 		return 0;
 
-	return static_cast<uint64>( ( m_lCycleLimit - lcCycles ) * 1000000ULL / g_ClockSpeed );
+	// dimhotepus: Overflow-safe conversion, no division by zero before init.
+	return s1::tier0::fasttimer_detail::MulDivU64( m_lCycleLimit - lcCycles, 1000000, g_ClockSpeed );
 }
 
 
