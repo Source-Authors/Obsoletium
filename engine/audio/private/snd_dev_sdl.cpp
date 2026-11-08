@@ -468,14 +468,10 @@ bool CAudioDeviceSDLAudio::Should3DMix()
 
 void CAudioDeviceSDLAudio::ClearBuffer()
 {
-	int		clear;
-
 	if ( !m_pBuffer )
 		return;
 
-	clear = 0;
-
-	Q_memset(m_pBuffer, clear, DeviceSampleCount() * DeviceSampleBytes() );
+	Q_memset(m_pBuffer, 0, DeviceSampleCount() * DeviceSampleBytes() );
 }
 
 
