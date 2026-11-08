@@ -303,7 +303,7 @@ private:
 class CAverageTimeMarker
 {
 public:
-	explicit CAverageTimeMarker( CAverageCycleCounter *pCounter );
+	explicit CAverageTimeMarker( CAverageCycleCounter *pCounter ) noexcept;
 	~CAverageTimeMarker();
 
 	// dimhotepus: Non-copyable, copy would mark the iteration twice.
@@ -550,9 +550,11 @@ inline double CAverageCycleCounter::GetPeakMilliseconds() const
 
 // -------------------------------------------------------------------------- // 
 
-inline CAverageTimeMarker::CAverageTimeMarker( CAverageCycleCounter *pCounter )
+inline CAverageTimeMarker::CAverageTimeMarker( CAverageCycleCounter *pCounter ) noexcept
+	: m_pCounter{ pCounter }
 {
-	m_pCounter = pCounter;
+	// dimhotepus: Catch null counter early instead of crashing in destructor.
+	Assert( m_pCounter );
 	m_Timer.Start();
 }
 
