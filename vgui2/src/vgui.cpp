@@ -29,7 +29,7 @@
 #include "tier0/vprof.h"
 #include "tier0/icommandline.h"
 
-#undef GetCursorPos // protected_things.h defines this, and it makes it so we can't access g_pInput->GetCursorPos.
+#undef GetCursorPos // protected_things.h defines this, and it makes it so we can't access g_pWin32Input->GetCursorPos.
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -320,7 +320,7 @@ void CVGui::SpewAllActivePanelNames()
 HContext CVGui::CreateContext()
 {
 	auto i = m_Contexts.AddToTail();
-	m_Contexts[i].m_hInputContext = g_pInput->CreateInputContext();
+	m_Contexts[i].m_hInputContext = g_pWin32Input->CreateInputContext();
 	return i;
 }
 
@@ -333,7 +333,7 @@ void CVGui::DestroyContext( HContext context )
 		ActivateContext( DEFAULT_VGUI_CONTEXT );
 	}
 
-	g_pInput->DestroyInputContext( GetContext(context)->m_hInputContext );
+	g_pWin32Input->DestroyInputContext( GetContext(context)->m_hInputContext );
 	m_Contexts.Remove(context);
 }
 
@@ -367,7 +367,7 @@ CVGui::Context_t *CVGui::GetContext( HContext context )
 void CVGui::AssociatePanelWithContext( HContext context, VPANEL pRoot )
 {
 	Assert( context != DEFAULT_VGUI_CONTEXT );
-	g_pInput->AssociatePanelWithInputContext( GetContext(context)->m_hInputContext, pRoot );
+	g_pWin32Input->AssociatePanelWithInputContext( GetContext(context)->m_hInputContext, pRoot );
 }
 
 
@@ -388,11 +388,11 @@ void CVGui::ActivateContext( HContext context )
 		}
 
 		m_hContext = context;
-		g_pInput->ActivateInputContext( GetContext(m_hContext)->m_hInputContext ); 
+		g_pWin32Input->ActivateInputContext( GetContext(m_hContext)->m_hInputContext ); 
 
 		if ( context != DEFAULT_VGUI_CONTEXT && !IsReentrant() )
 		{
-			g_pInput->RunFrame( );
+			g_pWin32Input->RunFrame( );
 		}
 	}
 }
@@ -432,17 +432,17 @@ void CVGui::RunFrame()
 	{
 		VPROF( "update cursor positions" );
 		int cursorX, cursorY;
-		g_pInput->GetCursorPosition(cursorX, cursorY);
+		g_pWin32Input->GetCursorPosition(cursorX, cursorY);
 
 		// this does the actual work given a x,y and a surface
-		g_pInput->UpdateMouseFocus(cursorX, cursorY);
+		g_pWin32Input->UpdateMouseFocus(cursorX, cursorY);
 
 	}
 
 	if ( !bIsReentrant )
 	{
 		VPROF( "input()->RunFrame()" );
-		g_pInput->RunFrame();
+		g_pWin32Input->RunFrame();
 	}
 
 	// messenging
@@ -622,7 +622,7 @@ void CVGui::PanelDeleted(VPanel *focus)
 {
 	Assert( focus );
 	g_pSurface->ReleasePanel((VPANEL)focus);
-	g_pInput->PanelDeleted((VPANEL)focus);
+	g_pWin32Input->PanelDeleted((VPANEL)focus);
 
 	// remove from safe handle list
 	UtlHandle_t h = ((VPanel *)focus)->GetHPanel();
@@ -830,7 +830,7 @@ bool CVGui::DispatchMessages()
 				{
 					int nXPos = params->GetInt( "xpos", 0 );
 					int nYPos = params->GetInt( "ypos", 0 );
-					g_pInput->UpdateCursorPosInternal( nXPos, nYPos );
+					g_pWin32Input->UpdateCursorPosInternal( nXPos, nYPos );
 				}
 			}
 			else
@@ -869,14 +869,14 @@ bool CVGui::DispatchMessages()
 		if ( nPassCount == 1 )
 		{
 			// Specifically post the current mouse position as a message
-			g_pInput->PostCursorMessage();
+			g_pWin32Input->PostCursorMessage();
 		}
 	}
 
 	// Make sure the windows cursor is in the right place after processing input 
 	// Needs to be done here because a message provoked by the cursor moved
 	// message may move the cursor also
-	g_pInput->HandleExplicitSetCursor( );
+	g_pWin32Input->HandleExplicitSetCursor( );
 
 	m_InDispatcher = false;
 	return doneWork;

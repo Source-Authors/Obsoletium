@@ -554,7 +554,7 @@ private:
 			return S_OK;
 
 		// get the panel the mouse is over
-		VPANEL mouseOver = g_pInput->GetMouseOver();
+		VPANEL mouseOver = g_pWin32Input->GetMouseOver();
 		if (mouseOver)
 		{
 			// check to see if the panel will accept this message
@@ -3043,10 +3043,10 @@ void CWin32Surface::setFocus(VPANEL panel)
 		if (focus && ((VPanel *)focus)->HasParent((VPanel *)panel))
 		{
 			// Must be a child of the modal surface, if set
-			if ( g_pInput->GetAppModalSurface() && !((VPanel *)focus)->HasParent((VPanel *)g_pInput->GetAppModalSurface()) )
+			if ( g_pWin32Input->GetAppModalSurface() && !((VPanel *)focus)->HasParent((VPanel *)g_pWin32Input->GetAppModalSurface()) )
 			{
 				// trying to set focus to something that's not the modal panel, set it back
-				SetForegroundWindow(g_pInput->GetAppModalSurface());
+				SetForegroundWindow(g_pWin32Input->GetAppModalSurface());
 			}
 			else
 			{
@@ -3697,7 +3697,7 @@ static void PostCursorMoved( HWND hwnd, LPARAM lparam )
 	pt.x = (short)LOWORD(lparam);
 	pt.y = (short)HIWORD(lparam);
 	::ClientToScreen( hwnd, &pt);
-	g_pInput->InternalCursorMoved(pt.x, pt.y);
+	g_pWin32Input->InternalCursorMoved(pt.x, pt.y);
 
 }
 
@@ -3758,16 +3758,16 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 		{
 			PostCursorMoved( hwnd, lparam );
 			MouseCode code = ( GET_XBUTTON_WPARAM( wparam ) == XBUTTON1 ) ? MOUSE_4 : MOUSE_5;
-			g_pInput->SetMouseCodeState( code, BUTTON_PRESSED );
-			g_pInput->InternalMousePressed( code );
+			g_pWin32Input->SetMouseCodeState( code, BUTTON_PRESSED );
+			g_pWin32Input->InternalMousePressed( code );
 			break;
 		}
 		case WM_XBUTTONUP:
 		{
 			PostCursorMoved( hwnd, lparam );
 			MouseCode code = ( GET_XBUTTON_WPARAM( wparam ) == XBUTTON1 ) ? MOUSE_4 : MOUSE_5;
-			g_pInput->SetMouseCodeState( code, BUTTON_RELEASED );
-			g_pInput->InternalMouseReleased( code );
+			g_pWin32Input->SetMouseCodeState( code, BUTTON_RELEASED );
+			g_pWin32Input->InternalMouseReleased( code );
 			break;
 		}
 
@@ -3775,8 +3775,8 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 		{
 			PostCursorMoved( hwnd, lparam );
 			MouseCode code = ( GET_XBUTTON_WPARAM( wparam ) == XBUTTON1 ) ? MOUSE_4 : MOUSE_5;
-			g_pInput->SetMouseCodeState( code, BUTTON_DOUBLECLICKED );
-			g_pInput->InternalMouseDoublePressed( code );
+			g_pWin32Input->SetMouseCodeState( code, BUTTON_DOUBLECLICKED );
+			g_pWin32Input->InternalMouseDoublePressed( code );
 			break;
 		}
 
@@ -3831,92 +3831,92 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 			bool bLMButtonDown = wparam & MK_LBUTTON;
 			bool bRMButtonDown = wparam & MK_RBUTTON;
 			bool bMMButtonDown = wparam & MK_MBUTTON;
-			if ( !bLMButtonDown && g_pInput->IsMouseDown( MOUSE_LEFT ) )
+			if ( !bLMButtonDown && g_pWin32Input->IsMouseDown( MOUSE_LEFT ) )
 			{
-				g_pInput->SetMouseCodeState( MOUSE_LEFT, BUTTON_RELEASED );
-				g_pInput->InternalMouseReleased(MOUSE_LEFT);
+				g_pWin32Input->SetMouseCodeState( MOUSE_LEFT, BUTTON_RELEASED );
+				g_pWin32Input->InternalMouseReleased(MOUSE_LEFT);
 			}
-			if ( !bRMButtonDown && g_pInput->IsMouseDown( MOUSE_RIGHT ) )
+			if ( !bRMButtonDown && g_pWin32Input->IsMouseDown( MOUSE_RIGHT ) )
 			{
-				g_pInput->SetMouseCodeState( MOUSE_LEFT, BUTTON_RELEASED );
-				g_pInput->InternalMouseReleased(MOUSE_LEFT);
+				g_pWin32Input->SetMouseCodeState( MOUSE_LEFT, BUTTON_RELEASED );
+				g_pWin32Input->InternalMouseReleased(MOUSE_LEFT);
 			}
-			if ( !bMMButtonDown && g_pInput->IsMouseDown( MOUSE_MIDDLE ) )
+			if ( !bMMButtonDown && g_pWin32Input->IsMouseDown( MOUSE_MIDDLE ) )
 			{
-				g_pInput->SetMouseCodeState( MOUSE_MIDDLE, BUTTON_RELEASED );
-				g_pInput->InternalMouseReleased(MOUSE_MIDDLE);
+				g_pWin32Input->SetMouseCodeState( MOUSE_MIDDLE, BUTTON_RELEASED );
+				g_pWin32Input->InternalMouseReleased(MOUSE_MIDDLE);
 			}
 			
 			::ClientToScreen((HWND)hwnd, &pt);
-			g_pInput->InternalCursorMoved(pt.x, pt.y);
+			g_pWin32Input->InternalCursorMoved(pt.x, pt.y);
 			break;
 		}
 		case WM_LBUTTONDOWN:
 		{
 			PostCursorMoved( hwnd, lparam );
-			g_pInput->SetMouseCodeState( MOUSE_LEFT, BUTTON_PRESSED );
-			g_pInput->InternalMousePressed(MOUSE_LEFT);
+			g_pWin32Input->SetMouseCodeState( MOUSE_LEFT, BUTTON_PRESSED );
+			g_pWin32Input->InternalMousePressed(MOUSE_LEFT);
 			break;
 		}
 		case WM_RBUTTONDOWN:
 		{
 			PostCursorMoved( hwnd, lparam );
-			g_pInput->SetMouseCodeState( MOUSE_RIGHT, BUTTON_PRESSED );
-			g_pInput->InternalMousePressed(MOUSE_RIGHT);
+			g_pWin32Input->SetMouseCodeState( MOUSE_RIGHT, BUTTON_PRESSED );
+			g_pWin32Input->InternalMousePressed(MOUSE_RIGHT);
 			break;
 		}
 		case WM_MBUTTONDOWN:
 		{
 			PostCursorMoved( hwnd, lparam );
-			g_pInput->SetMouseCodeState( MOUSE_MIDDLE, BUTTON_PRESSED );
-			g_pInput->InternalMousePressed(MOUSE_MIDDLE);
+			g_pWin32Input->SetMouseCodeState( MOUSE_MIDDLE, BUTTON_PRESSED );
+			g_pWin32Input->InternalMousePressed(MOUSE_MIDDLE);
 			break;
 		}
 		case WM_LBUTTONDBLCLK:
 		{
 			PostCursorMoved( hwnd, lparam );
-			g_pInput->SetMouseCodeState( MOUSE_LEFT, BUTTON_DOUBLECLICKED );
-			g_pInput->InternalMouseDoublePressed( MOUSE_LEFT );
+			g_pWin32Input->SetMouseCodeState( MOUSE_LEFT, BUTTON_DOUBLECLICKED );
+			g_pWin32Input->InternalMouseDoublePressed( MOUSE_LEFT );
 			break;
 		}
 		case WM_RBUTTONDBLCLK:
 		{
 			PostCursorMoved( hwnd, lparam );
-			g_pInput->SetMouseCodeState( MOUSE_RIGHT, BUTTON_DOUBLECLICKED );
-			g_pInput->InternalMouseDoublePressed( MOUSE_RIGHT );
+			g_pWin32Input->SetMouseCodeState( MOUSE_RIGHT, BUTTON_DOUBLECLICKED );
+			g_pWin32Input->InternalMouseDoublePressed( MOUSE_RIGHT );
 			break;
 		}
 		case WM_MBUTTONDBLCLK:
 		{
 			PostCursorMoved( hwnd, lparam );
-			g_pInput->SetMouseCodeState( MOUSE_MIDDLE, BUTTON_DOUBLECLICKED );
-			g_pInput->InternalMouseDoublePressed( MOUSE_MIDDLE );
+			g_pWin32Input->SetMouseCodeState( MOUSE_MIDDLE, BUTTON_DOUBLECLICKED );
+			g_pWin32Input->InternalMouseDoublePressed( MOUSE_MIDDLE );
 			break;
 		}
 		case WM_LBUTTONUP:
 		{
 			PostCursorMoved( hwnd, lparam );
-			g_pInput->SetMouseCodeState( MOUSE_LEFT, BUTTON_RELEASED );
-			g_pInput->InternalMouseReleased( MOUSE_LEFT );
+			g_pWin32Input->SetMouseCodeState( MOUSE_LEFT, BUTTON_RELEASED );
+			g_pWin32Input->InternalMouseReleased( MOUSE_LEFT );
 			break;
 		}
 		case WM_RBUTTONUP:
 		{
 			PostCursorMoved( hwnd, lparam );
-			g_pInput->SetMouseCodeState( MOUSE_RIGHT, BUTTON_RELEASED );
-			g_pInput->InternalMouseReleased( MOUSE_RIGHT );
+			g_pWin32Input->SetMouseCodeState( MOUSE_RIGHT, BUTTON_RELEASED );
+			g_pWin32Input->InternalMouseReleased( MOUSE_RIGHT );
 			break;
 		}
 		case WM_MBUTTONUP:
 		{
 			PostCursorMoved( hwnd, lparam );
-			g_pInput->SetMouseCodeState( MOUSE_MIDDLE, BUTTON_RELEASED );
-			g_pInput->InternalMouseReleased( MOUSE_MIDDLE );
+			g_pWin32Input->SetMouseCodeState( MOUSE_MIDDLE, BUTTON_RELEASED );
+			g_pWin32Input->InternalMouseReleased( MOUSE_MIDDLE );
 			break;
 		}
 		case WM_MOUSEWHEEL:
 		{
-			g_pInput->InternalMouseWheeled(GET_WHEEL_DELTA_WPARAM( wparam )/WHEEL_DELTA);
+			g_pWin32Input->InternalMouseWheeled(GET_WHEEL_DELTA_WPARAM( wparam )/WHEEL_DELTA);
 			break;
 		}
 		case WM_KEYDOWN:
@@ -3927,10 +3927,10 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 			bool bRepeating = ( lparam & ( 1<<30 ) ) != 0;
 			if ( !bRepeating )
 			{
-				g_pInput->SetKeyCodeState( g_iPreviousKeyCode, BUTTON_PRESSED );
-				g_pInput->InternalKeyCodePressed( g_iPreviousKeyCode );
+				g_pWin32Input->SetKeyCodeState( g_iPreviousKeyCode, BUTTON_PRESSED );
+				g_pWin32Input->InternalKeyCodePressed( g_iPreviousKeyCode );
 			}
-			g_pInput->InternalKeyCodeTyped( g_iPreviousKeyCode );
+			g_pWin32Input->InternalKeyCodeTyped( g_iPreviousKeyCode );
 
 			// Deal with toggles
 			if ( !bRepeating )
@@ -3949,13 +3949,13 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 					bool bToggleState = ( wState & 0x1 ) != 0;
 					if ( bToggleState )
 					{
-						g_pInput->SetKeyCodeState( toggleCode, BUTTON_PRESSED );
-						g_pInput->InternalKeyCodePressed( toggleCode );
+						g_pWin32Input->SetKeyCodeState( toggleCode, BUTTON_PRESSED );
+						g_pWin32Input->InternalKeyCodePressed( toggleCode );
 					}
 					else
 					{
-						g_pInput->SetKeyCodeState( toggleCode, BUTTON_RELEASED );
-						g_pInput->InternalKeyCodeReleased( toggleCode );
+						g_pWin32Input->SetKeyCodeState( toggleCode, BUTTON_RELEASED );
+						g_pWin32Input->InternalKeyCodeReleased( toggleCode );
 					}
 				}
 			}
@@ -3966,15 +3966,15 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 		case WM_CHAR:
 		{
 			wchar_t unichar = static_cast<wchar_t>(static_cast<int>(wparam));
-			g_pInput->InternalKeyTyped(unichar);
+			g_pWin32Input->InternalKeyTyped(unichar);
 			break;
 		}
 		case WM_KEYUP:
 		case WM_SYSKEYUP:
 		{
 			KeyCode code = KeyCode_VirtualKeyToVGUI( static_cast<int>(wparam) );
-			g_pInput->SetKeyCodeState( code, BUTTON_RELEASED );
-			g_pInput->InternalKeyCodeReleased( code );
+			g_pWin32Input->SetKeyCodeState( code, BUTTON_RELEASED );
+			g_pWin32Input->InternalKeyCodeReleased( code );
 			break;
 		}
 		case WM_ERASEBKGND:
@@ -4005,7 +4005,7 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 
 			// post a message to Paint the window
 //			vgui::g_pIVgui->DPrintf( "WM_PAINT(%X)\n", panel );
-//			g_pInput->PostMessage( panel, new KeyValues("Paint"), NULL );
+//			g_pWin32Input->PostMessage( panel, new KeyValues("Paint"), NULL );
 
 			// this relies on platTick() being called BEFORE dispatchMessages(), so that painting occurs
 

@@ -260,7 +260,7 @@ void CSystem::RunFrame()
 	{
 		// check for mouse movement
 		int x, y;
-		g_pInput->GetCursorPos(x, y);
+		g_pWin32Input->GetCursorPos(x, y);
 		// allow a little slack for jittery mice, don't reset until it's moved more than fifty pixels
 		if (abs((x + y) - (m_iStaticMouseOldX + m_iStaticMouseOldY)) > 50)
 		{

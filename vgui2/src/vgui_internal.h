@@ -23,7 +23,7 @@ namespace vgui
 bool VGui_InternalLoadInterfaces( CreateInterfaceFn *factoryList, int numFactories );
 
 // "vgui/IInputInternal.h" header
-extern class IInputInternal *g_pInput;
+extern class IInputInternal *g_pWin32Input;
 
 // "vgui/IScheme.h" header
 extern class ISchemeManager *g_pScheme;
