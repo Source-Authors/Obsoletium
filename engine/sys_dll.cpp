@@ -936,6 +936,24 @@ void Sys_ShutdownGame( void )
 
 CreateInterfaceFn g_ServerFactory;
 
+// dimhotepus: Unloader to match loader order.
+static void UnloadThisDll( CSysModule *&pDLL )
+{
+	if ( pDLL != nullptr )
+	{
+		// dimhotepus: Cleanup all and in reverse order.
+		serverGameTags = nullptr;
+		serverGameDirector = nullptr;
+		g_iServerGameClientsVersion = 0;
+		serverGameClients = nullptr;
+		serverGameEnts = nullptr;
+		serverGameDLL = nullptr;
+		g_iServerGameDLLVersion = 0;
+		g_ServerFactory = nullptr;
+		g_pFileSystem->UnloadModule( pDLL );
+		pDLL = nullptr;
+	}
+}
 
 static bool LoadThisDll( const char *szDllFilename, bool bIsServerOnly )
 {
@@ -1029,19 +1047,8 @@ static bool LoadThisDll( const char *szDllFilename, bool bIsServerOnly )
 	return true;
 
 IgnoreThisDLL:
-	if (pDLL != nullptr)
-	{
-		// dimhotepus: Cleanup all and in reverse order.
-		serverGameTags = nullptr;
-		serverGameDirector = nullptr;
-		g_iServerGameClientsVersion = 0;
-		serverGameClients = nullptr;
-		serverGameEnts = nullptr;
-		serverGameDLL = nullptr;
-		g_iServerGameDLLVersion = 0;
-		g_ServerFactory = nullptr;
-		g_pFileSystem->UnloadModule(pDLL);
-	}
+	// dimhotepus: Cleanup all and in reverse order.
+	UnloadThisDll( pDLL );
 	return false;
 }
 
@@ -1340,16 +1347,13 @@ void Sys_OutputDebugString(const char *msg)
 //-----------------------------------------------------------------------------
 void UnloadEntityDLLs( void )
 {
-	if ( !g_GameDLL )
-		return;
+	// dimhotepus: Cleanup all and in reverse order.
+	UnloadThisDll( g_GameDLL );
 
-	// Unlink the cvars associated with game DLL
-	FileSystem_UnloadModule( g_GameDLL );
-	g_GameDLL = NULL;
-	serverGameDLL = NULL;
-	serverGameEnts = NULL;
-	serverGameClients = NULL;
 	sv_noclipduringpause = NULL;
+
+	// dimhotepus: Clean game mod info.
+	memset( &gmodinfo, 0, sizeof( modinfo_t ) );
 }
 
 
