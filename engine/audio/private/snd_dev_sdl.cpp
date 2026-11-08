@@ -26,9 +26,8 @@ extern void S_SpatializeChannel( int pVolume[CCHANVOLUMES/2], int master_vol, co
 
 // 64K is about 1/3 second at 16-bit, stereo, 44100 Hz
 // 44k: UNDONE - need to double buffers now that we're playing back at 44100?
-#define	WAV_BUFFERS             64
-#define	WAV_MASK				(WAV_BUFFERS - 1)
-#define	WAV_BUFFER_SIZE			0x0400
+constexpr inline int WAV_BUFFERS{ 64 };
+constexpr inline int WAV_BUFFER_SIZE{ 0x0400 };
 
 #if 0
 #define debugsdl printf
