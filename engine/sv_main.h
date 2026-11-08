@@ -31,6 +31,8 @@ void SV_Frame( bool send_client_updates );
 void SV_FrameExecuteThreadDeferred();
 
 void SV_InitGameDLL( void );
+// dimhotepus: Declared to be used.
+void SV_ShutdownGameDLL( void );
 
 void SV_ReplicateConVarChange( ConVar const *var, char const *newValue );
 void SV_ExecuteRemoteCommand( const char *pCommand, int nClientSlot = -1 );

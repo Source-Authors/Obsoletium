@@ -4280,6 +4280,12 @@ void Host_Shutdown(void)
 		TRACESHUTDOWN( ShutdownMaterialSystem() );
 	}
 
+	// dimhotepus: Either demand loaded game .dll if running with -nogamedll flag or regular one.
+	if ( serverGameClients || !CommandLine()->HasParm( "-nogamedll" ) )
+	{
+		SV_ShutdownGameDLL();
+	}
+
 #if defined( REPLAY_ENABLED )
 	if ( Replay_IsSupportedModAndPlatform() )
 	{

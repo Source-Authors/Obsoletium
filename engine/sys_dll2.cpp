@@ -1976,7 +1976,6 @@ bool CModAppSystemGroup::PreInit()
 	return true;
 }
 
-void SV_ShutdownGameDLL();
 int CModAppSystemGroup::Main()
 {
 	// dimhotepus: Always set locale to utf8 one.
@@ -2002,8 +2001,6 @@ int CModAppSystemGroup::Main()
 				// Dedicated server drives frame loop manually
 				dedicated->RunServer();
 			}
-
-			SV_ShutdownGameDLL();
 		}
 	}
 	else
@@ -2037,8 +2034,6 @@ int CModAppSystemGroup::Main()
 				}
 #endif
 			}
-
-			SV_ShutdownGameDLL();
 		}
 	}
 	
