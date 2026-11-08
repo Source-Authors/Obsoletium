@@ -488,7 +488,7 @@ $Project "engine"
 			}
 		}
 		
-		$File	"audio\private\snd_dev_xaudio.cpp"
+		$File	"audio\private\snd_dev_xaudio.cpp"		[$WINDOWS]
 		{
 			$Configuration
 			{
@@ -530,7 +530,7 @@ $Project "engine"
 			$File	"audio\private\snd_convars.h"
 			$File	"audio\private\snd_dev_common.h"
 			$File	"audio\private\snd_dev_direct.h"					[$WINDOWS]
-			$File	"audio\private\snd_dev_xaudio.h"
+			$File	"audio\private\snd_dev_xaudio.h"			[$WINDOWS]
 			$File	"audio\private\snd_dma.h"
 			$File	"audio\private\snd_env_fx.h"
 			$File	"audio\private\snd_fixedint.h"
