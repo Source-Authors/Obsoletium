@@ -763,10 +763,11 @@ void SV_InitGameDLL( void )
 	{
 		bool bVerifiedMod = false;
 
-        // find the game dir we're running
+		// find the game dir we're running
+		const char *pszModDir = COM_GetModDirectory();
 		for ( const auto &p : g_ModDirPermissions )
 		{
-			if ( V_strieq( COM_GetModDirectory(), p.m_pchGameDir ) )
+			if ( V_strieq( pszModDir, p.m_pchGameDir ) )
 			{
 				// we've found the mod, make sure we own the app
 				if ( Steam3Client().SteamApps()->BIsSubscribedApp( p.m_iAppID ) )
@@ -775,8 +776,8 @@ void SV_InitGameDLL( void )
 				}
 				else
 				{
-					Error( "No permissions to run '%s'\n", COM_GetModDirectory() );
-					return;			
+					Error( "No permissions to run '%s'\n", pszModDir );
+					return;
 				}
 
 				break;
