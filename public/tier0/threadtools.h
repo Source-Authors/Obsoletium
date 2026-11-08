@@ -552,12 +552,17 @@ public:
 	operator T *()											{ return static_cast<T *>(Get()); }
 
 	int			operator=( int i )							{ AssertMsg( i == 0, "Only nullptr allowed on integer assign" ); Set( nullptr ); return 0; }
+	// dimhotepus: nullptr assignment.
 	nullptr_t	operator=( std::nullptr_t i )				{ Set( nullptr ); return nullptr; }
 	T *			operator=( T *p )							{ Set( p ); return p; }
 
-	bool        operator !() const							{ return (!Get()); }
-	bool        operator!=( int i ) const					{ AssertMsg( i == 0, "Only nullptr allowed on integer compare" ); return (Get() != nullptr); }
-	bool        operator==( int i ) const					{ AssertMsg( i == 0, "Only nullptr allowed on integer compare" ); return (Get() == nullptr); }
+	bool		operator !() const							{ return (!Get()); }
+	bool		operator!=( int i ) const					{ AssertMsg( i == 0, "Only nullptr allowed on integer compare" ); return (Get() != nullptr); }
+	// dimhotepus: nullptr not equals.
+	bool		operator!=( std::nullptr_t i ) const		{ return (Get() != nullptr); }
+	bool		operator==( int i ) const					{ AssertMsg( i == 0, "Only nullptr allowed on integer compare" ); return (Get() == nullptr); }
+	// dimhotepus: nullptr equals.
+	bool		operator==( std::nullptr_t i ) const		{ return (Get() == nullptr); }
 	bool		operator==( const void *p ) const			{ return (Get() == p); }
 	bool		operator!=( const void *p ) const			{ return (Get() != p); }
 	bool		operator==( const T *p ) const				{ return operator==(static_cast<const void*>(p)); }

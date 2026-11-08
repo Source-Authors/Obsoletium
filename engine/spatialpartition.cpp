@@ -1748,7 +1748,7 @@ void CVoxelTree::Init( CSpatialPartition *pOwner, int iTree, const Vector &world
 	m_TreeId = iTree;
 
 	// Reset the enumeration id.
-	m_pVisits = NULL;
+	m_pVisits = nullptr;
 
 	for ( int i = 0; i < m_nLevelCount; ++i )
 	{
@@ -1779,7 +1779,7 @@ void CVoxelTree::Shutdown( void )
 //-----------------------------------------------------------------------------
 void CVoxelTree::InsertIntoTree( SpatialPartitionHandle_t hPartition, const Vector& mins, const Vector& maxs )
 {
-	bool bWasReading = ( m_pVisits != NULL );
+	bool bWasReading = ( m_pVisits != nullptr );
 	if ( bWasReading )
 	{
 		// If we're recursing in this thread, need to release our read lock to allow ourselves to write
@@ -1839,7 +1839,7 @@ void CVoxelTree::RemoveFromTree( SpatialPartitionHandle_t hPartition )
 	int nLevel = info.m_nLevel[GetTreeId()];
 	if ( nLevel >= 0 )
 	{
-		bool bWasReading = ( m_pVisits != NULL );
+		bool bWasReading = ( m_pVisits != nullptr );
 		if ( bWasReading )
 		{
 			// If we're recursing in this thread, need to release our read lock to allow ourselves to write
