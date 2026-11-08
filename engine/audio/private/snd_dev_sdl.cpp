@@ -69,7 +69,7 @@ public:
 	void		Mix16Stereo( channel_t *pChannel, short *pData, int outputOffset, int inputOffset, fixedint rateScaleFix, int outCount, int timecompress );
 
 	void		TransferSamples( int end );
-	void		SpatializeChannel( int nSlot, int volume[CCHANVOLUMES/2], int master_vol, const Vector& sourceDir, float gain, float mono);
+	void		SpatializeChannel( int volume[CCHANVOLUMES/2], int master_vol, const Vector& sourceDir, float gain, float mono ) override;
 	void		ApplyDSPEffects( int idsp, portable_samplepair_t *pbuffront, portable_samplepair_t *pbufrear, portable_samplepair_t *pbufcenter, int samplecount );
 
 	const char *DeviceName( void )			{ return "SDL"; }
@@ -563,7 +563,7 @@ void CAudioDeviceSDLAudio::TransferSamples( int end )
 	}
 }
 
-void CAudioDeviceSDLAudio::SpatializeChannel( int nSlot, int volume[CCHANVOLUMES/2], int master_vol, const Vector& sourceDir, float gain, float mono )
+void CAudioDeviceSDLAudio::SpatializeChannel( int volume[CCHANVOLUMES/2], int master_vol, const Vector& sourceDir, float gain, float mono )
 {
 	VPROF("CAudioDeviceSDLAudio::SpatializeChannel");
 	S_SpatializeChannel( volume, master_vol, &sourceDir, gain, mono );
