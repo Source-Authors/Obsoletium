@@ -12,12 +12,7 @@
 #include "video//ivideoservices.h"
 #include "../../sys_dll.h"
 
-// prevent some conflicts in SDL headers...
-#undef M_PI
 #include <cstdint>
-#ifndef _STDINT_H_
-#define _STDINT_H_ 1
-#endif
 
 #include "include/SDL3/SDL.h"
 
