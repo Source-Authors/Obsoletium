@@ -363,9 +363,9 @@ inline void CCycleCount::Sub( CCycleCount const &rSrc1, CCycleCount const &rSrc2
 
 inline uint64 CCycleCount::GetTimestamp()
 {
-	CCycleCount c;
-	c.Sample();
-	return c.GetLongCycles();
+	// dimhotepus: Read counter directly, no temporary CCycleCount.
+	uint32 coreId{ 0 };
+	return Plat_Rdtscp( coreId );
 }
 
 inline bool CCycleCount::IsLessThan(CCycleCount const &other) const
