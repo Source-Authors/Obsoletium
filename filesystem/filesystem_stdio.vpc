@@ -26,6 +26,8 @@ $Configuration
 
 		// Add VPK support
 		$PreprocessorDefinitions	"$BASE;SUPPORT_PACKED_STORE" [$WINDOWS]
+		// dimhotepus: POSIX must support vpks, too.
+		$PreprocessorDefinitions	"$BASE;SUPPORT_PACKED_STORE" [$POSIX]
 		$EnableC++Exceptions		"Yes (/EHsc)"
 	}
 	$Linker
