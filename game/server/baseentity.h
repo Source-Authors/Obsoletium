@@ -1094,7 +1094,7 @@ public:
 #ifndef NDEBUG
 
 #ifdef GNUC
-// dimhotepus: Correct member function pointer sizeon POSIX.
+// dimhotepus: Correct member function pointer size on POSIX.
 #if defined( __x86_64__ ) || defined( _M_X64 ) || defined( __LP64__ )
 #define ENTITYFUNCPTR_SIZE	16
 #else

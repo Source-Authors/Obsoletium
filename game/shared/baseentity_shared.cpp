@@ -756,7 +756,8 @@ BASEPTR	CBaseEntity::ThinkSet( BASEPTR func, float thinkTime, const char *szCont
 #if !defined( CLIENT_DLL )
 #ifndef NDEBUG
 #ifdef GNUC
-	COMPILE_TIME_ASSERT( sizeof(func) == 8 );
+	// dimhotepus: GCC uses pointer + adjustment.
+	COMPILE_TIME_ASSERT( sizeof(func) == 2 * sizeof(void*) );
 #else
 	COMPILE_TIME_ASSERT( sizeof(func) == sizeof(void*) );
 #endif
