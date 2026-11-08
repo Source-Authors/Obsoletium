@@ -72,16 +72,16 @@ void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, intp nFactoryCount 
 		s_bTier2LibrariesConnected.exchange( true, std::memory_order_relaxed );
 		Assert(
 			!g_pFullFileSystem &&
-		!g_pMaterialSystem && !materials &&
-		!g_pInputSystem &&
-		!g_pNetworkSystem && 
-		!g_pMaterialSystemHardwareConfig &&
-		!g_pMaterialSystemDebugTextureInfo && 
-		!g_VBAllocTracker &&
-		!p4 &&
-		!colorcorrection && 
-		!mdllib && 
-		!g_pQueuedLoader );
+			!g_pMaterialSystem && !materials &&
+			!g_pInputSystem &&
+			!g_pNetworkSystem && 
+			!g_pMaterialSystemHardwareConfig &&
+			!g_pMaterialSystemDebugTextureInfo && 
+			!g_VBAllocTracker &&
+			!p4 &&
+			!colorcorrection && 
+			!mdllib && 
+			!g_pQueuedLoader );
 	}
 
 	for ( intp i = 0; i < nFactoryCount; ++i )
