@@ -97,41 +97,45 @@ class CCycleCount
 friend class CFastTimer;
 
 public:
-					CCycleCount();
-					CCycleCount( uint64 cycles );
+	// dimhotepus: constexpr / noexcept where possible.
+	constexpr		CCycleCount() noexcept = default;
+	constexpr		CCycleCount( uint64 cycles ) noexcept : m_Int64{ cycles } {}
 
-	void			Sample();	// Sample the clock. This takes about 34 clocks to execute (or 26,000 calls per millisecond on a P900).
+	void			Sample() noexcept;	// Sample the counter.
 
-	void			Init();		// Set to zero.
-	void			Init( float initTimeMsec );
-	void			Init( double initTimeMsec )		{ Init( static_cast<float>( initTimeMsec ) ); }
-	void			Init( uint64 cycles );
-	[[nodiscard]] bool			IsLessThan( CCycleCount const &other ) const;					// Compare two counts.
+	constexpr void	Init() noexcept { m_Int64 = 0; }		// Set to zero.
+	// dimhotepus: float overload forwards to double, not vice versa, to keep
+	// precision.
+	void			Init( float initTimeMsec ) noexcept		{ Init( static_cast<double>( initTimeMsec ) ); }
+	void			Init( double initTimeMsec ) noexcept;
+	constexpr void	Init( uint64 cycles ) noexcept { m_Int64 = cycles; }
+	[[nodiscard]] constexpr bool	IsLessThan( CCycleCount const &other ) const noexcept;	// Compare two counts.
 
 	// Convert to other time representations. These functions are slow, so it's preferable to call them
 	// during display rather than inside a timing block.
-	[[nodiscard]] unsigned long	GetCycles()  const;
-	[[nodiscard]] uint64			GetLongCycles() const;
+	// dimhotepus: The unsigned long variants saturate instead of wrapping when the value does not fit.
+	[[nodiscard]] unsigned long		GetCycles()  const noexcept;
+	[[nodiscard]] constexpr uint64	GetLongCycles() const noexcept;
 
-	[[nodiscard]] unsigned long	GetMicroseconds() const;
-	[[nodiscard]] uint64			GetUlMicroseconds() const;
-	[[nodiscard]] double			GetMicrosecondsF() const; 	
-	void			SetMicroseconds( unsigned long nMicroseconds );
+	[[nodiscard]] unsigned long		GetMicroseconds() const noexcept;
+	[[nodiscard]] uint64			GetUlMicroseconds() const noexcept;
+	[[nodiscard]] double			GetMicrosecondsF() const noexcept;
+	void							SetMicroseconds( unsigned long nMicroseconds ) noexcept;
 
-	[[nodiscard]] unsigned long	GetMilliseconds() const;
-	[[nodiscard]] double			GetMillisecondsF() const;
+	[[nodiscard]] unsigned long		GetMilliseconds() const noexcept;
+	[[nodiscard]] double			GetMillisecondsF() const noexcept;
 
-	[[nodiscard]] double			GetSeconds() const;
+	[[nodiscard]] double			GetSeconds() const noexcept;
 
-	CCycleCount&	operator+=( CCycleCount const &other );
+	constexpr CCycleCount&	operator+=( CCycleCount const &other ) noexcept;
 
 	// dest = rSrc1 + rSrc2
-	static void		Add( CCycleCount const &rSrc1, CCycleCount const &rSrc2, CCycleCount &dest );	// Add two samples together.
-	
-	// dest = rSrc1 - rSrc2
-	static void		Sub( CCycleCount const &rSrc1, CCycleCount const &rSrc2, CCycleCount &dest );	// Add two samples together.
+	static constexpr void	Add( CCycleCount const &rSrc1, CCycleCount const &rSrc2, CCycleCount &dest ) noexcept;
 
-	static uint64	GetTimestamp();
+	// dest = rSrc1 - rSrc2
+	static constexpr void	Sub( CCycleCount const &rSrc1, CCycleCount const &rSrc2, CCycleCount &dest ) noexcept;
+
+	[[nodiscard]] static uint64	GetTimestamp() noexcept;
 
 	uint64			m_Int64{ 0 };
 };
@@ -328,39 +332,28 @@ private:
 };
 
 
-// -------------------------------------------------------------------------- // 
+// -------------------------------------------------------------------------- //
 // CCycleCount inlines.
-// -------------------------------------------------------------------------- // 
+// -------------------------------------------------------------------------- //
 
-inline CCycleCount::CCycleCount()
+inline void CCycleCount::Init( double initTimeMsec ) noexcept
 {
-	Init( static_cast<uint64>(0) );
+	const double msecPerTick{ g_ClockSpeedMillisecondsMultiplier };
+
+	// dimhotepus: Negative, NaN or out-of-range values must not reach the
+	// double -> uint64 cast: that conversion is undefined behavior.
+	if ( !( msecPerTick > 0.0 ) || !( initTimeMsec > 0.0 ) )
+	{
+		m_Int64 = 0;
+		return;
+	}
+
+	const double ticks{ initTimeMsec / msecPerTick };
+	constexpr double kTwoPow64{ 18446744073709551616.0 };  // Exactly representable.
+	m_Int64 = ticks < kTwoPow64 ? static_cast<uint64>( ticks ) : s1::tier0::fasttimer_detail::kUint64Max;
 }
 
-inline CCycleCount::CCycleCount( uint64 cycles )
-{
-	Init( cycles );
-}
-
-inline void CCycleCount::Init()
-{
-	Init( static_cast<uint64>(0) );
-}
-
-inline void CCycleCount::Init( float initTimeMsec )
-{
-	if ( g_ClockSpeedMillisecondsMultiplier > 0.0 )
-		Init( static_cast<uint64>( static_cast<double>( initTimeMsec ) / g_ClockSpeedMillisecondsMultiplier) ); //-V2004
-	else
-		Init( static_cast<uint64>(0) );
-}
-
-inline void CCycleCount::Init( uint64 cycles )
-{
-	m_Int64 = cycles;
-}
-
-inline void CCycleCount::Sample()
+inline void CCycleCount::Sample() noexcept
 {
 	// dimhotepus: Plat_Rdtscp is not cached by the optimizer.
 	// dimhotepus: Overhead is now subtracted in ElapsedTicks.
@@ -368,74 +361,74 @@ inline void CCycleCount::Sample()
 	m_Int64 = Plat_Rdtscp( coreId );
 }
 
-inline CCycleCount& CCycleCount::operator+=( CCycleCount const &other )
+constexpr CCycleCount& CCycleCount::operator+=( CCycleCount const &other ) noexcept
 {
 	m_Int64 += other.m_Int64;
 	return *this;
 }
 
 
-inline void CCycleCount::Add( CCycleCount const &rSrc1, CCycleCount const &rSrc2, CCycleCount &dest )
+constexpr void CCycleCount::Add( CCycleCount const &rSrc1, CCycleCount const &rSrc2, CCycleCount &dest ) noexcept
 {
 	dest.m_Int64 = rSrc1.m_Int64 + rSrc2.m_Int64;
 }
 
-inline void CCycleCount::Sub( CCycleCount const &rSrc1, CCycleCount const &rSrc2, CCycleCount &dest )
+constexpr void CCycleCount::Sub( CCycleCount const &rSrc1, CCycleCount const &rSrc2, CCycleCount &dest ) noexcept
 {
 	dest.m_Int64 = rSrc1.m_Int64 - rSrc2.m_Int64;
 }
 
-inline uint64 CCycleCount::GetTimestamp()
+inline uint64 CCycleCount::GetTimestamp() noexcept
 {
 	// dimhotepus: Read counter directly, no temporary CCycleCount.
 	uint32 coreId{ 0 };
 	return Plat_Rdtscp( coreId );
 }
 
-inline bool CCycleCount::IsLessThan(CCycleCount const &other) const
+constexpr bool CCycleCount::IsLessThan( CCycleCount const &other ) const noexcept
 {
 	return m_Int64 < other.m_Int64;
 }
 
 
-inline unsigned long CCycleCount::GetCycles() const
+inline unsigned long CCycleCount::GetCycles() const noexcept
 {
 	// dimhotepus: Saturate instead of truncate.
 	return s1::tier0::fasttimer_detail::SaturateToULong( m_Int64 );
 }
 
-inline uint64 CCycleCount::GetLongCycles() const
+constexpr uint64 CCycleCount::GetLongCycles() const noexcept
 {
 	return m_Int64;
 }
 
-inline unsigned long CCycleCount::GetMicroseconds() const
+inline unsigned long CCycleCount::GetMicroseconds() const noexcept
 {
 	// dimhotepus: Overflow-safe and saturating.
 	return s1::tier0::fasttimer_detail::SaturateToULong( GetUlMicroseconds() );
 }
 
-inline uint64 CCycleCount::GetUlMicroseconds() const
+inline uint64 CCycleCount::GetUlMicroseconds() const noexcept
 {
 	// dimhotepus: m_Int64 * 1000000 overflowed, division by zero before init.
 	return s1::tier0::fasttimer_detail::MulDivU64( m_Int64, 1000000, g_ClockSpeed );
 }
 
 
-inline double CCycleCount::GetMicrosecondsF() const
+inline double CCycleCount::GetMicrosecondsF() const noexcept
 {
 	return static_cast<double>( m_Int64 ) * g_ClockSpeedMicrosecondsMultiplier;
 }
 
 
-inline void	CCycleCount::SetMicroseconds( unsigned long nMicroseconds )
+inline void	CCycleCount::SetMicroseconds( unsigned long nMicroseconds ) noexcept
 {
 	// dimhotepus: nMicroseconds * g_ClockSpeed overflowed with 64-bit unsigned long.
 	m_Int64 = s1::tier0::fasttimer_detail::MulDivU64( nMicroseconds, g_ClockSpeed, 1000000 );
 }
 
 
-inline unsigned long CCycleCount::GetMilliseconds() const
+inline unsigned long CCycleCount::GetMilliseconds() const noexcept
 {
 	// dimhotepus: Overflow-safe and saturating, no division by zero before init.
 	return s1::tier0::fasttimer_detail::SaturateToULong(
@@ -443,13 +436,13 @@ inline unsigned long CCycleCount::GetMilliseconds() const
 }
 
 
-inline double CCycleCount::GetMillisecondsF() const
+inline double CCycleCount::GetMillisecondsF() const noexcept
 {
 	return static_cast<double>( m_Int64 ) * g_ClockSpeedMillisecondsMultiplier;
 }
 
 
-inline double CCycleCount::GetSeconds() const
+inline double CCycleCount::GetSeconds() const noexcept
 {
 	return static_cast<double>( m_Int64 ) * g_ClockSpeedSecondsMultiplier;
 }
