@@ -173,7 +173,8 @@ private:
 class CTimeScope
 {
 public:
-				CTimeScope( CFastTimer *pTimer );
+	// dimhotepus: explicit, no implicit conversion from timer pointer.
+	explicit	CTimeScope( CFastTimer *pTimer ) noexcept;
 				~CTimeScope();
 
 	// dimhotepus: Non-copyable, copy would End() the timer twice.
@@ -184,9 +185,9 @@ private:
 	CFastTimer	*m_pTimer{ nullptr };
 };
 
-inline CTimeScope::CTimeScope( CFastTimer *pTotal )
+inline CTimeScope::CTimeScope( CFastTimer *pTotal ) noexcept
+	: m_pTimer{ pTotal }
 {
-	m_pTimer = pTotal;
 	m_pTimer->Start();
 }
 
