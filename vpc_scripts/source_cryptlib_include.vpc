@@ -25,9 +25,8 @@ $Project
 	$Folder	"Link Libraries" 
 	{
 		$Lib	vpklib
-		$Libexternal $SRCDIR\thirdparty\libcrypto [$OSXALL]
 		$Libexternal $SRCDIR\thirdparty\libcryptopp [$OSXALL]
-		$Libexternal "$SRCDIR\thirdparty\$(CRYPTOPPDIR)\libcrypto" [$LINUXALL]
+
 		$Libexternal "$SRCDIR\thirdparty\$(CRYPTOPPDIR)\libcryptopp" [$LINUXALL]
 	}
 
