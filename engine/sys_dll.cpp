@@ -939,7 +939,7 @@ CreateInterfaceFn g_ServerFactory;
 
 static bool LoadThisDll( const char *szDllFilename, bool bIsServerOnly )
 {
-	CSysModule *pDLL = NULL;
+	CSysModule *pDLL = nullptr;
 
 	// check signature, don't let users with modified binaries connect to secure servers, they will get VAC banned
 	if ( !Host_AllowLoadModule( szDllFilename, "GAMEBIN", true, bIsServerOnly ) )
@@ -1029,12 +1029,18 @@ static bool LoadThisDll( const char *szDllFilename, bool bIsServerOnly )
 	return true;
 
 IgnoreThisDLL:
-	if (pDLL != NULL)
+	if (pDLL != nullptr)
 	{
+		// dimhotepus: Cleanup all and in reverse order.
+		serverGameTags = nullptr;
+		serverGameDirector = nullptr;
+		g_iServerGameClientsVersion = 0;
+		serverGameClients = nullptr;
+		serverGameEnts = nullptr;
+		serverGameDLL = nullptr;
+		g_iServerGameDLLVersion = 0;
+		g_ServerFactory = nullptr;
 		g_pFileSystem->UnloadModule(pDLL);
-		serverGameDLL = NULL;
-		serverGameEnts = NULL;
-		serverGameClients = NULL;
 	}
 	return false;
 }
