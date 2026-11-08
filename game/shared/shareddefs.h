@@ -13,6 +13,15 @@
 
 #include <type_traits>
 
+// dimhotepus: GCC requires declaration to be used in templates.
+#if defined( CLIENT_DLL )
+class CGlobalVarsBase;
+extern CGlobalVarsBase *gpGlobals;
+#else
+class CGlobalVars;
+extern CGlobalVars *gpGlobals;
+#endif
+
 #define TICK_INTERVAL			(gpGlobals->interval_per_tick)
 
 template<typename TDelta, typename TValue>
