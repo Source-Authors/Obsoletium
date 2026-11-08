@@ -201,28 +201,8 @@ static HMODULE Sys_LoadLibrary( const char *pLibraryName, Sys_Flags flags )
 	Q_FixSlashes( str );
 
 #ifdef _WIN32
-	ThreadedLoadLibraryFunc_t threadFunc = GetThreadedLoadLibraryFunc();
-	if ( !threadFunc )
-		return InternalLoadLibrary( str, flags );
-
-	// We shouldn't be passing noload while threaded.
-	Assert( !( flags & SYS_NOLOAD ) );
-
-	ThreadedLoadLibaryContext_t context;
-	context.m_pLibraryName = str;
-	context.m_hLibrary = nullptr;
-
-	ThreadHandle_t h = CreateSimpleThread( ThreadedLoadLibraryFunc, &context );
-
-	unsigned int nTimeout = 0;
-	while( ThreadWaitForObject( h, true, nTimeout ) == TW_TIMEOUT )
-	{
-		nTimeout = threadFunc();
-	}
-
-	ReleaseThreadHandle( h );
-	return context.m_hLibrary;
-
+	// dimhotepus: Dropped threaded load as it is not used anywhere.
+	return InternalLoadLibrary( str, flags );
 #elif POSIX
 	// dimhotepus: Add RTLD_GLOBAL as we use crossmodule globals.
 	int dlopen_mode = RTLD_NOW | RTLD_GLOBAL;
