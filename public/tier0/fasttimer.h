@@ -176,8 +176,12 @@ public:
 				CTimeScope( CFastTimer *pTimer );
 				~CTimeScope();
 
-private:	
-	CFastTimer	*m_pTimer;
+	// dimhotepus: Non-copyable, copy would End() the timer twice.
+	CTimeScope( const CTimeScope & ) = delete;
+	CTimeScope &operator=( const CTimeScope & ) = delete;
+
+private:
+	CFastTimer	*m_pTimer{ nullptr };
 };
 
 inline CTimeScope::CTimeScope( CFastTimer *pTotal )
@@ -199,7 +203,11 @@ public:
 	explicit CTimeAdder( CCycleCount *pTotal );
 	~CTimeAdder();
 
-	void		End();
+	// dimhotepus: Non-copyable, copy would add the duration twice.
+	CTimeAdder( const CTimeAdder & ) = delete;
+	CTimeAdder &operator=( const CTimeAdder & ) = delete;
+
+	void		End() noexcept;
 
 private:
 	CCycleCount	*m_pTotal{ nullptr };
@@ -217,7 +225,7 @@ inline CTimeAdder::~CTimeAdder()
 	End();
 }
 
-inline void CTimeAdder::End()
+inline void CTimeAdder::End() noexcept
 {
 	if( m_pTotal )
 	{
@@ -297,7 +305,11 @@ class CAverageTimeMarker
 public:
 	explicit CAverageTimeMarker( CAverageCycleCounter *pCounter );
 	~CAverageTimeMarker();
-	
+
+	// dimhotepus: Non-copyable, copy would mark the iteration twice.
+	CAverageTimeMarker( const CAverageTimeMarker & ) = delete;
+	CAverageTimeMarker &operator=( const CAverageTimeMarker & ) = delete;
+
 private:
 	CAverageCycleCounter *m_pCounter{ nullptr };
 	CFastTimer	m_Timer{};
