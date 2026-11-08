@@ -22,7 +22,7 @@
 extern bool snd_firsttime;
 // dimhotepus: Bounds-safe volumes.
 extern bool MIX_ScaleChannelVolume( paintbuffer_t *ppaint, channel_t *pChannel, int (&volume)[CCHANVOLUMES], int mixchans );
-extern void S_SpatializeChannel( /*int nSlot,*/ int volume[6], int master_vol, const Vector *psourceDir, float gain, float mono );
+extern void S_SpatializeChannel( int pVolume[CCHANVOLUMES/2], int master_vol, const Vector *psourceDir, float gain, float mono );
 
 // 64K is about 1/3 second at 16-bit, stereo, 44100 Hz
 // 44k: UNDONE - need to double buffers now that we're playing back at 44100?
@@ -567,7 +567,7 @@ void CAudioDeviceSDLAudio::TransferSamples( int end )
 void CAudioDeviceSDLAudio::SpatializeChannel( int nSlot, int volume[CCHANVOLUMES/2], int master_vol, const Vector& sourceDir, float gain, float mono )
 {
 	VPROF("CAudioDeviceSDLAudio::SpatializeChannel");
-	S_SpatializeChannel( /*nSlot,*/ volume, master_vol, &sourceDir, gain, mono );
+	S_SpatializeChannel( volume, master_vol, &sourceDir, gain, mono );
 }
 
 void CAudioDeviceSDLAudio::StopAllSounds( void )
