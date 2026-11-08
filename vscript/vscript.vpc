@@ -29,7 +29,10 @@ $Configuration	"Debug"
 	$Compiler
 	{
 		$PreprocessorDefinitions		"$BASE;VSCRIPT_DLL_EXPORT" 
-		$PreprocessorDefinitions		"$BASE;LUA_BUILD_AS_DLL=1;LUA_MOD_CASE_INSENSITIVE" 
+		$PreprocessorDefinitions		"$BASE;LUA_MOD_CASE_INSENSITIVE" 
+		// LUA_BUILD_AS_DLL only selects __declspec(dllexport/dllimport) for
+		// LUA_API in luaconf.h. On GCC there is no __declspec, and it causes build errors.
+		$PreprocessorDefinitions		"$BASE;LUA_BUILD_AS_DLL=1" [$WINDOWS]
 		$AdditionalIncludeDirectories	"$BASE;$LUASRCDIR"
 		$AdditionalIncludeDirectories	"$BASE;$SQUIRRELSRCDIR;.\languages\squirrel\include;.\languages\squirrel\sqplus"
 
@@ -68,7 +71,10 @@ $Configuration	"Release"
 	$Compiler
 	{
 		$PreprocessorDefinitions		"$BASE;VSCRIPT_DLL_EXPORT" 
-		$PreprocessorDefinitions		"$BASE;LUA_BUILD_AS_DLL=1;LUA_MOD_CASE_INSENSITIVE" 
+		$PreprocessorDefinitions		"$BASE;LUA_MOD_CASE_INSENSITIVE" 
+		// LUA_BUILD_AS_DLL only selects __declspec(dllexport/dllimport) for
+		// LUA_API in luaconf.h. On GCC there is no __declspec, and it causes build errors.
+		$PreprocessorDefinitions		"LUA_BUILD_AS_DLL=1" [$WINDOWS]
 		$AdditionalIncludeDirectories	"$BASE;$LUASRCDIR"
 		$AdditionalIncludeDirectories	"$BASE;$SQUIRRELSRCDIR;.\languages\squirrel\include;.\languages\squirrel\sqplus"
 
