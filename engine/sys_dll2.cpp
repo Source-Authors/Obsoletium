@@ -1994,9 +1994,14 @@ int CModAppSystemGroup::Main()
 		// Start up the game engine
 		if ( eng->Load( true, host_parms.basedir ) )
 		{
-			// If we're using STEAM, pass the map cycle list as resource hints...
-			// Dedicated server drives frame loop manually
-			dedicated->RunServer();
+			{
+				// dimhotepus: Unload engine when done.
+				RunCodeAtScopeExit( eng->Unload() );
+
+				// If we're using STEAM, pass the map cycle list as resource hints...
+				// Dedicated server drives frame loop manually
+				dedicated->RunServer();
+			}
 
 			SV_ShutdownGameDLL();
 		}
@@ -2380,9 +2385,6 @@ void CDedicatedServerAPI::ModShutdown( void )
 	}
 
 	g_AppSystemFactory = NULL;
-
-	// Unload GL, Sound, etc.
-	eng->Unload();
 
 	// Shut down memory, etc.
 	game->Shutdown();
