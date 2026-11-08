@@ -17,7 +17,8 @@ $Configuration
 {
 	$Compiler
 	{
-		$PreprocessorDefinitions			"$BASE;fopen=dont_use_fopen;UNITLIB_DLL_EXPORT"
+		$PreprocessorDefinitions			"$BASE;UNITLIB_DLL_EXPORT"
+		$PreprocessorDefinitions			"$BASE;fopen=dont_use_fopen" [$WINDOWS]
 	}
 
 	$PreLinkEvent [$WIN32]
