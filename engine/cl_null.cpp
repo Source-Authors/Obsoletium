@@ -11,10 +11,17 @@
 #include "enginestats.h"
 #include "bspfile.h" // dworldlight_t
 #include "audio/public/soundservice.h"
+#include "audio/public/snd_device.h"
+#include "ivideomode.h"
 #include "tier0/systeminformation.h"
 
 ISoundServices *g_pSoundServices = NULL;
 Vector		listener_origin;
+
+// dimhotepus: Dedicated server has no display and audio, but engine still uses globals.
+// Just set to nullptr so it is here and engine builds.
+IVideoMode *videomode = nullptr;
+IAudioDevice *g_AudioDevice = nullptr;
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
