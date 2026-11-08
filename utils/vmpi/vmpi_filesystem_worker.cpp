@@ -5,6 +5,7 @@
 #include "winlite.h"
 #include <system_error>
 
+#include "tier0/fasttimer.h"
 #include "vmpi_filesystem_internal.h"
 #include "threadhelpers.h"
 #include "zlib.h"

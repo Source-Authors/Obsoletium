@@ -10,6 +10,7 @@
 #include <ws2tcpip.h>
 
 #include "tier0/basetypes.h"
+#include "tier0/fasttimer.h"
 #include "tier1/utllinkedlist.h"
 #include "tier1/utlvector.h"
 #include "tier1/strtools.h"

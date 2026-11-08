@@ -7,6 +7,8 @@
 #include <cstdio>
 #include <system_error>
 
+#include "tier0/dbg.h"
+
 #include "tier0/memdbgon.h"
 
 // For narrow band.

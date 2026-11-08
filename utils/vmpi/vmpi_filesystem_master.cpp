@@ -10,6 +10,7 @@
 #include <system_error>
 
 #include "zlib.h"
+#include "tier0/fasttimer.h"
 #include "vstdlib/random.h"
 
 #define MINIMUM_SLEEP_MS 1

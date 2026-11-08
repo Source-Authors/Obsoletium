@@ -7,6 +7,7 @@
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 
 #include "tier0/dbg.h"
+#include "tier0/fasttimer.h"
 #include "tier0/memalloc.h"
 #include "mem_helpers.h"
 

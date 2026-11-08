@@ -14,6 +14,7 @@
 #include <algorithm>
 
 #include "tier0/dbg.h"
+#include "tier0/fasttimer.h"
 #include "tier0/memalloc.h"
 #include "tier0/threadtools.h"
 #include "mem_helpers.h"

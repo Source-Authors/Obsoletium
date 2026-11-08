@@ -1457,7 +1457,8 @@ PLATFORM_INTERFACE MUST_CHECK_RETURN bool Is64BitOS();
 //-----------------------------------------------------------------------------
 // Include additional dependant header components.
 //-----------------------------------------------------------------------------
-#include "fasttimer.h"
+// dimhotepus: Drop fast timer, it depends on platform itself.
+// #include "fasttimer.h"
 
 //-----------------------------------------------------------------------------
 // Methods to invoke the constructor, copy constructor, and destructor

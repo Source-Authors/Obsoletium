@@ -15,6 +15,7 @@
 #include <direct.h>
 #include <system_error>
 
+#include "tier0/fasttimer.h"
 #include "tier0/tslist.h"
 #include "tier0/icommandline.h"
 #include "tier1/utlvector.h"

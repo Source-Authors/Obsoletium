@@ -14,6 +14,7 @@
 #include "tier1/interface.h"
 #include "mathlib/vector.h"
 #include "mathlib/vector4d.h"
+#include "tier0/fasttimer.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/utlvector.h"
 #include "materialsystem/imaterial.h"
