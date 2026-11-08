@@ -5,10 +5,10 @@
 //===========================================================================//
 
 #include "networkclient.h"
-#include "UDP_Socket.h"
-#include "NetChannel.h"
-#include "UDP_Process.h"
-#include <winsock.h>
+#include "udp_socket.h"
+#include "netchannel.h"
+#include "udp_process.h"
+#include "socketapi.h"
 #include "tier1/bitbuf.h"
 #include "networksystem.h"
 #include "sm_protocol.h"

@@ -4,8 +4,8 @@
 //
 //===========================================================================//
 
-#include "NetChannel.h"
-#include "UDP_Socket.h"
+#include "netchannel.h"
+#include "udp_socket.h"
 #include "tier1/utlbuffer.h"
 #include "networksystem/inetworkmessage.h"
 #include "networksystem.h"

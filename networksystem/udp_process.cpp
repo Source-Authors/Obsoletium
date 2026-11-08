@@ -5,8 +5,8 @@
 //===========================================================================//
 
 #include "tier1/utlbuffer.h"
-#include "UDP_Socket.h"
-#include "NetChannel.h"
+#include "udp_socket.h"
+#include "netchannel.h"
 #include "sm_protocol.h"
 #include "networksystem.h"
 

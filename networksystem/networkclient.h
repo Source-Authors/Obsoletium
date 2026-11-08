@@ -10,7 +10,7 @@
 #pragma once
 #endif
 
-#include "NetChannel.h"
+#include "netchannel.h"
 
 class CNetworkClient : public IConnectionlessPacketHandler, public INetworkMessageHandler, public ILookupChannel
 {
