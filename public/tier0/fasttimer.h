@@ -155,15 +155,15 @@ class CFastTimer
 {
 public:
 	// These functions are fast to call and should be called from your sampling code.
-	void				Start();
-	void				End();
+	void				Start() noexcept;
+	void				End() noexcept;
 
-	[[nodiscard]] const CCycleCount &	GetDuration() const;	// Get the elapsed time between Start and End calls.
-	[[nodiscard]] CCycleCount 		GetDurationInProgress() const; // Call without ending. Not that cheap.
+	[[nodiscard]] const CCycleCount &	GetDuration() const noexcept;	// Get the elapsed time between Start and End calls.
+	[[nodiscard]] CCycleCount 		GetDurationInProgress() const noexcept; // Call without ending. Not that cheap.
 
 	// Return number of counter ticks per second.
 	// dimhotepus: int64 -> uint64.
-	[[nodiscard]] static inline uint64 GetClockSpeed();
+	[[nodiscard]] static inline uint64 GetClockSpeed() noexcept;
 
 private:
 	CCycleCount	m_Duration{};	// Holds the start stamp while running, the duration after End().
@@ -451,8 +451,8 @@ inline double CCycleCount::GetSeconds() const noexcept
 
 // -------------------------------------------------------------------------- //
 // CFastTimer inlines.
-// -------------------------------------------------------------------------- // 
-inline void CFastTimer::Start()
+// -------------------------------------------------------------------------- //
+inline void CFastTimer::Start() noexcept
 {
 #ifdef DEBUG_FASTTIMER
 	m_bRunning = true;
@@ -467,7 +467,7 @@ inline void CFastTimer::Start()
 }
 
 
-inline void CFastTimer::End()
+inline void CFastTimer::End() noexcept
 {
 	// dimhotepus: Compiler barriers instead of std::atomic_thread_fence.
 	s1::tier0::fasttimer_detail::CompilerBarrier();
@@ -484,7 +484,7 @@ inline void CFastTimer::End()
 #endif
 }
 
-inline CCycleCount CFastTimer::GetDurationInProgress() const
+inline CCycleCount CFastTimer::GetDurationInProgress() const noexcept
 {
 #ifdef DEBUG_FASTTIMER
 	// dimhotepus: Catch call on a stopped timer.
@@ -496,13 +496,13 @@ inline CCycleCount CFastTimer::GetDurationInProgress() const
 }
 
 
-inline uint64 CFastTimer::GetClockSpeed()
+inline uint64 CFastTimer::GetClockSpeed() noexcept
 {
 	return g_ClockSpeed;
 }
 
 
-inline CCycleCount const& CFastTimer::GetDuration() const
+inline CCycleCount const& CFastTimer::GetDuration() const noexcept
 {
 #ifdef DEBUG_FASTTIMER
 	Assert( !m_bRunning );
@@ -562,7 +562,7 @@ inline double CAverageCycleCounter::GetPeakMilliseconds() const noexcept
 	return CCycleCount{ m_Peak.load( std::memory_order_relaxed ) }.GetMillisecondsF();
 }
 
-// -------------------------------------------------------------------------- // 
+// -------------------------------------------------------------------------- //
 
 inline CAverageTimeMarker::CAverageTimeMarker( CAverageCycleCounter *pCounter ) noexcept
 	: m_pCounter{ pCounter }
