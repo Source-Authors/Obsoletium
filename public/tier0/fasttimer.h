@@ -133,7 +133,7 @@ public:
 
 	static uint64	GetTimestamp();
 
-	uint64			m_Int64;
+	uint64			m_Int64{ 0 };
 };
 
 class PLATFORM_CLASS CClockSpeedInit
@@ -162,9 +162,9 @@ public:
 	[[nodiscard]] static inline uint64 GetClockSpeed();
 
 private:
-	CCycleCount	m_Duration;
+	CCycleCount	m_Duration{};	// Holds the start stamp while running, the duration after End().
 #ifdef DEBUG_FASTTIMER
-	bool m_bRunning;		// Are we currently running?
+	bool m_bRunning{ false };		// Are we currently running?
 #endif
 };
 
@@ -201,9 +201,9 @@ public:
 
 	void		End();
 
-private:	
-	CCycleCount	*m_pTotal;
-	CFastTimer	m_Timer;
+private:
+	CCycleCount	*m_pTotal{ nullptr };
+	CFastTimer	m_Timer{};
 };
 
 inline CTimeAdder::CTimeAdder( CCycleCount *pTotal )
@@ -250,8 +250,8 @@ inline void CTimeAdder::End()
 				GetIters() ); \
 		} \
 	}; \
-	static C##name##ACC name##_ACC; \
-	CAverageTimeMarker name##_ATM( &name##_ACC )
+	static C##name##ACC name##_ACC{}; \
+	CAverageTimeMarker name##_ATM{ &name##_ACC }
 
 #define TIME_SCOPE(name) \
 	class CTimeScopeMsg_##name \
@@ -264,8 +264,8 @@ inline void CTimeAdder::End()
 			Msg( #name "time: %.4fms\n", m_Timer.GetDuration().GetMillisecondsF() ); \
 		} \
 	private:	\
-		CFastTimer	m_Timer; \
-	} name##_TSM;
+		CFastTimer	m_Timer{}; \
+	} name##_TSM{};
 
 
 // -------------------------------------------------------------------------- // 
@@ -299,8 +299,8 @@ public:
 	~CAverageTimeMarker();
 	
 private:
-	CAverageCycleCounter *m_pCounter;
-	CFastTimer	m_Timer;
+	CAverageCycleCounter *m_pCounter{ nullptr };
+	CFastTimer	m_Timer{};
 };
 
 
@@ -554,6 +554,7 @@ inline CAverageTimeMarker::~CAverageTimeMarker()
 // CLimitTimer
 // Use this to time whether a desired interval of time has passed.  It's extremely fast
 // to check while running.  NOTE: CMicroSecOverage() and CMicroSecLeft() are not as fast to check.
+// dimhotepus: A default-constructed timer reports its limit as already reached.
 class CLimitTimer
 {
 public:
@@ -566,7 +567,8 @@ public:
 	[[nodiscard]] uint64 CMicroSecLeft() const; 
 
 private:
-	uint64 m_lCycleLimit;
+	// dimhotepus: Initialize, was read uninitialized by a default-constructed timer.
+	uint64 m_lCycleLimit{ 0 };
 };
 
 
