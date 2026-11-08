@@ -176,7 +176,7 @@ bool CAudioDeviceSDLAudio::Init()
 
 	if ( snd_firsttime )
 	{
-		DevMsg( "Wave sound initialized\n" );
+		DevMsg( "SDL sound initialized\n" );
 	}
 
 	return ValidWaveOut();

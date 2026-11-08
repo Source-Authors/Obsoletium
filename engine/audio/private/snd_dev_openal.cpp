@@ -137,7 +137,7 @@ bool CAudioDeviceOpenAL::Init( void )
 
 	if ( snd_firsttime )
 	{
-		DevMsg( "Wave sound initialized\n" );
+		DevMsg( "OpenAL sound initialized\n" );
 	}
 	return ValidWaveOut();
 }

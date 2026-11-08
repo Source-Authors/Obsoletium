@@ -151,7 +151,7 @@ bool CAudioDeviceAudioQueue::Init( void )
 
 	if ( snd_firsttime )
 	{
-		DevMsg( "Wave sound initialized\n" );
+		DevMsg( "Mac audio queue sound initialized\n" );
 	}
 	return ValidWaveOut() && !m_bFailed;
 }
