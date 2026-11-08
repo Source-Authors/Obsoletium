@@ -212,9 +212,9 @@ $Project "replay"
 		$Libexternal	"$ZLIBOUTDIR/zs" [!$DEDICATED]
 
 		$Libexternal	"$LIBCOMMON/libcrypto" [$OSXALL]
-		$Libexternal 	"$SRCDIR/lib/common/$(CRYPTOPPDIR)/libcrypto" [$LINUXALL]
+		$Libexternal	"$SRCDIR/lib/common/$(CRYPTOPPDIR)/libcrypto" [$LINUXALL]
 
-		$ImpLib	"$LIBCOMMON/curl"	  [$OSXALL]
+		$ImpLib	"$LIBCOMMON/curl" [$OSXALL]
 	}
 	
 }
