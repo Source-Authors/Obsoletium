@@ -268,6 +268,7 @@ inline void CTimeAdder::End() noexcept
 	static C##name##ACC name##_ACC{}; \
 	CAverageTimeMarker name##_ATM{ &name##_ACC }
 
+// dimhotepus: Add missing space, printed "nametime:".
 #define TIME_SCOPE(name) \
 	class CTimeScopeMsg_##name \
 	{ \
@@ -276,7 +277,7 @@ inline void CTimeAdder::End() noexcept
 		~CTimeScopeMsg_##name() \
 		{ \
 			m_Timer.End(); \
-			Msg( #name "time: %.4fms\n", m_Timer.GetDuration().GetMillisecondsF() ); \
+			Msg( #name " time: %.4fms\n", m_Timer.GetDuration().GetMillisecondsF() ); \
 		} \
 	private:	\
 		CFastTimer	m_Timer{}; \
