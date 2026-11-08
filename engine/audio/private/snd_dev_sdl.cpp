@@ -223,7 +223,7 @@ void CAudioDeviceSDLAudio::OpenWaveOut()
 
 	//#define SDLAUDIO_FAIL(fnstr) do { DevWarning(fnstr " failed"); CloseWaveOut(); return; } while (false)
 	//#define SDLAUDIO_FAIL(fnstr) do { printf("SDLAUDIO: " fnstr " failed: %s\n", SDL_GetError ? SDL_GetError() : "???"); CloseWaveOut(); return; } while (false)
-	#define SDLAUDIO_FAIL(fnstr) do { const char *err = SDL_GetError(); printf("SDLAUDIO: " fnstr " failed: %s\n", err ? err : "???"); CloseWaveOut(); return; } while (false)
+	#define SDLAUDIO_FAIL(fnstr) do { const char *err = SDL_GetError(); Warning("SDLAUDIO: " fnstr " failed: %s\n", err ? err : "???"); CloseWaveOut(); return; } while (false)
 
 	if (!SDL_WasInit(SDL_INIT_AUDIO))
 	{
