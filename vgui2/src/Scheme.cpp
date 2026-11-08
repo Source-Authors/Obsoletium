@@ -927,12 +927,17 @@ void CScheme::ReloadFontGlyphs()
 				tall = minimumFontHeight;
 			}
 			
+			// dimhotepus: Some font blocks have no "name". Ex. the CS:S schemes.
+			// Fall back to the family the scheme uses everywhere else.
+			const char *fontname = fontdata->GetString( "name", "" );
+			if ( Q_isempty( fontname ) )
+				fontname = "Verdana";
 			if ( flags & ISurface::FONTFLAG_BITMAP )
 			{
 				// add the new set
 				g_pSurface->SetBitmapFontGlyphSet(
 					m_FontAliases[i]._font,
-					g_pSurface->GetBitmapFontName( fontdata->GetString( "name" ) ), 
+					g_pSurface->GetBitmapFontName( fontname ),
 					scalex,
 					scaley,
 					flags);
@@ -941,28 +946,28 @@ void CScheme::ReloadFontGlyphs()
 			{
 				int nRangeMin, nRangeMax;
 
-				if ( GetFontRange( fontdata->GetString( "name" ), nRangeMin, nRangeMax ) )
+				if ( GetFontRange( fontname, nRangeMin, nRangeMax ) )
 				{
 					// add the new set
 					g_pSurface->SetFontGlyphSet(
 						m_FontAliases[i]._font,
-						fontdata->GetString( "name" ), 
-						tall, 
-						fontdata->GetInt( "weight" ), 
+						fontname,
+						tall,
+						fontdata->GetInt( "weight" ),
 						blur,
 						scanlines,
 						flags,
 						nRangeMin,
-						nRangeMax);					
+						nRangeMax);
 				}
 				else
 				{
 					// add the new set
 					g_pSurface->SetFontGlyphSet(
 						m_FontAliases[i]._font,
-						fontdata->GetString( "name" ), 
-						tall, 
-						fontdata->GetInt( "weight" ), 
+						fontname,
+						tall,
+						fontdata->GetInt( "weight" ),
 						blur,
 						scanlines,
 						flags);
