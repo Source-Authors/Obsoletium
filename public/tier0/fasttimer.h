@@ -237,20 +237,22 @@ inline void CTimeAdder::End() noexcept
 
 
 
-// -------------------------------------------------------------------------- // 
+// -------------------------------------------------------------------------- //
 // Simple tool to support timing a block of code, and reporting the results on
-// program exit or at each iteration
+// program exit or at each iteration.
 //
-//	Macros used because dbg.h uses this header, thus Msg() is unavailable
-// -------------------------------------------------------------------------- // 
-
+// dimhotepus: PROFILE_SCOPE may be hit from several threads at once: the
+// counter is atomic.  Its report runs from a static destructor at process
+// exit, so do not use it in code that may still run after tier0 logging has
+// shut down.
+// -------------------------------------------------------------------------- //
 #define PROFILE_SCOPE(name) \
 	class C##name##ACC : public CAverageCycleCounter \
 	{ \
 	public: \
 		~C##name##ACC() \
 		{ \
-			Msg("%-48s: %6.3f avg (%8.1f total, %7.3f peak, %5d iters)\n",  \
+			Msg("%-48s: %6.3f avg (%8.1f total, %7.3f peak, %5u iters)\n",  \
 				#name, \
 				GetAverageMilliseconds(), \
 				GetTotalMilliseconds(), \
@@ -276,29 +278,38 @@ inline void CTimeAdder::End() noexcept
 	} name##_TSM{};
 
 
-// -------------------------------------------------------------------------- // 
+// -------------------------------------------------------------------------- //
 
+// dimhotepus: Thread-safe accumulator.  MarkIter() may be called
+// concurrently.  Init() must not race with MarkIter().  Getters may run
+// concurrently with MarkIter(); the average is then computed from two
+// independently loaded values.
 class CAverageCycleCounter
 {
 public:
-	CAverageCycleCounter();
-	
-	void Init();
-	void MarkIter( const CCycleCount &duration );
-	
-	[[nodiscard]] unsigned GetIters() const;
-	
-	[[nodiscard]] double GetAverageMilliseconds() const;
-	[[nodiscard]] double GetTotalMilliseconds() const;
-	[[nodiscard]] double GetPeakMilliseconds() const;
+	CAverageCycleCounter() noexcept = default;
+
+	// dimhotepus: Non-copyable (atomic members).
+	CAverageCycleCounter( const CAverageCycleCounter & ) = delete;
+	CAverageCycleCounter &operator=( const CAverageCycleCounter & ) = delete;
+
+	void Init() noexcept;
+	void MarkIter( const CCycleCount &duration ) noexcept;
+
+	[[nodiscard]] unsigned GetIters() const noexcept;
+
+	[[nodiscard]] double GetAverageMilliseconds() const noexcept;
+	[[nodiscard]] double GetTotalMilliseconds() const noexcept;
+	[[nodiscard]] double GetPeakMilliseconds() const noexcept;
 
 private:
-	unsigned	m_nIters{ 0 };
-	CCycleCount m_Total;
-	CCycleCount	m_Peak;
+	// dimhotepus: unsigned / CCycleCount -> std::atomic.
+	std::atomic<unsigned>	m_nIters{ 0 };
+	std::atomic<uint64>		m_Total{ 0 };
+	std::atomic<uint64>		m_Peak{ 0 };
 };
 
-// -------------------------------------------------------------------------- // 
+// -------------------------------------------------------------------------- //
 
 class CAverageTimeMarker
 {
@@ -505,47 +516,55 @@ inline CCycleCount const& CFastTimer::GetDuration() const
 }
 
 
-// -------------------------------------------------------------------------- // 
+// -------------------------------------------------------------------------- //
 // CAverageCycleCounter inlines
 
-inline CAverageCycleCounter::CAverageCycleCounter() = default;
-
-inline void CAverageCycleCounter::Init()
+inline void CAverageCycleCounter::Init() noexcept
 {
-	m_Total.Init();
-	m_Peak.Init();
-	m_nIters = 0;
+	// dimhotepus: Atomic stores.
+	m_Total.store( 0, std::memory_order_relaxed );
+	m_Peak.store( 0, std::memory_order_relaxed );
+	m_nIters.store( 0, std::memory_order_relaxed );
 }
 
-inline void CAverageCycleCounter::MarkIter( const CCycleCount &duration )
+inline void CAverageCycleCounter::MarkIter( const CCycleCount &duration ) noexcept
 {
-	++m_nIters;
-	m_Total += duration;
-	if ( m_Peak.IsLessThan( duration ) )
-		m_Peak = duration;
+	// dimhotepus: Atomic RMW instead of racy read-modify-write.
+	const uint64 ticks{ duration.GetLongCycles() };
+
+	m_nIters.fetch_add( 1, std::memory_order_relaxed );
+	m_Total.fetch_add( ticks, std::memory_order_relaxed );
+
+	// dimhotepus: Atomic max.  Usually a single load: the CAS only runs on a
+	// new peak.
+	uint64 peak{ m_Peak.load( std::memory_order_relaxed ) };
+	while ( peak < ticks &&
+			!m_Peak.compare_exchange_weak( peak, ticks, std::memory_order_relaxed, std::memory_order_relaxed ) )
+	{
+		// do nothing.
+	}
 }
 
-inline unsigned CAverageCycleCounter::GetIters() const
+inline unsigned CAverageCycleCounter::GetIters() const noexcept
 {
-	return m_nIters;
+	return m_nIters.load( std::memory_order_relaxed );
 }
 
-inline double CAverageCycleCounter::GetAverageMilliseconds() const
+inline double CAverageCycleCounter::GetAverageMilliseconds() const noexcept
 {
-	if ( m_nIters )
-		return (m_Total.GetMillisecondsF() / static_cast<double>(m_nIters));
-	else
-		return 0;
+	// dimhotepus: Load iteration count once.
+	const unsigned iters{ GetIters() };
+	return iters ? GetTotalMilliseconds() / static_cast<double>( iters ) : 0.0;
 }
 
-inline double CAverageCycleCounter::GetTotalMilliseconds() const
+inline double CAverageCycleCounter::GetTotalMilliseconds() const noexcept
 {
-	return m_Total.GetMillisecondsF();
+	return CCycleCount{ m_Total.load( std::memory_order_relaxed ) }.GetMillisecondsF();
 }
 
-inline double CAverageCycleCounter::GetPeakMilliseconds() const
+inline double CAverageCycleCounter::GetPeakMilliseconds() const noexcept
 {
-	return m_Peak.GetMillisecondsF();
+	return CCycleCount{ m_Peak.load( std::memory_order_relaxed ) }.GetMillisecondsF();
 }
 
 // -------------------------------------------------------------------------- // 
