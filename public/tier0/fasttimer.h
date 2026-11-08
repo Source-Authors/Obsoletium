@@ -157,7 +157,7 @@ public:
 	[[nodiscard]] const CCycleCount &	GetDuration() const;	// Get the elapsed time between Start and End calls.
 	[[nodiscard]] CCycleCount 		GetDurationInProgress() const; // Call without ending. Not that cheap.
 
-	// Return number of cycles per second on this processor.
+	// Return number of counter ticks per second.
 	// dimhotepus: int64 -> uint64.
 	[[nodiscard]] static inline uint64 GetClockSpeed();
 
@@ -338,12 +338,10 @@ inline void CCycleCount::Init( uint64 cycles )
 
 inline void CCycleCount::Sample()
 {
-	// dimhotepus: Adjust by half of measurement overhead as we measure between
-	// 2 points.
-	uint32          coreId;
-	// dimhotepus: Marked volatile to prevent optimizer from caching RDTSCP result
-	volatile uint64 timestamp = Plat_Rdtscp( coreId );
-	m_Int64 = timestamp - ( g_ClockRtscpOverhead / 2 );
+	// dimhotepus: Plat_Rdtscp is not cached by the optimizer.
+	// dimhotepus: Overhead is now subtracted in ElapsedTicks.
+	uint32 coreId{ 0 };
+	m_Int64 = Plat_Rdtscp( coreId );
 }
 
 inline CCycleCount& CCycleCount::operator+=( CCycleCount const &other )
@@ -433,46 +431,50 @@ inline double CCycleCount::GetSeconds() const
 }
 
 
-// -------------------------------------------------------------------------- // 
+// -------------------------------------------------------------------------- //
 // CFastTimer inlines.
 // -------------------------------------------------------------------------- // 
 inline void CFastTimer::Start()
 {
-	// dimhotepus: Added compiler barrier to prevent reordering of timed code
-	std::atomic_thread_fence( std::memory_order_release );
-	m_Duration.Sample();
-	std::atomic_thread_fence( std::memory_order_acquire );
-
 #ifdef DEBUG_FASTTIMER
 	m_bRunning = true;
 #endif
+
+	// dimhotepus: Compiler barriers keep the timed code from being moved
+	// across the sample.  They cost nothing at runtime and are TSan-clean,
+	// unlike the former std::atomic_thread_fence.
+	s1::tier0::fasttimer_detail::CompilerBarrier();
+	m_Duration.Sample();
+	s1::tier0::fasttimer_detail::CompilerBarrier();
 }
 
 
 inline void CFastTimer::End()
 {
-	// dimhotepus: Added acquire barrier before sampling to prevent hoisting
-	std::atomic_thread_fence( std::memory_order_release );
-	CCycleCount cnt;
-	cnt.Sample();
-	std::atomic_thread_fence( std::memory_order_acquire );
+	// dimhotepus: Compiler barriers instead of std::atomic_thread_fence.
+	s1::tier0::fasttimer_detail::CompilerBarrier();
+	const uint64 end{ CCycleCount::GetTimestamp() };
+	s1::tier0::fasttimer_detail::CompilerBarrier();
 
-	m_Duration.m_Int64 = cnt.m_Int64 - m_Duration.m_Int64;
+	// dimhotepus: Subtract sampling overhead, clamp backwards steps to 0.
+	m_Duration.m_Int64 = s1::tier0::fasttimer_detail::ElapsedTicks( m_Duration.m_Int64, end );
 
 #ifdef DEBUG_FASTTIMER
+	// dimhotepus: Catch End() without Start().
+	Assert( m_bRunning );
 	m_bRunning = false;
 #endif
 }
 
 inline CCycleCount CFastTimer::GetDurationInProgress() const
 {
-	CCycleCount cnt;
-	cnt.Sample();
-
-	CCycleCount result;
-	result.m_Int64 = cnt.m_Int64 - m_Duration.m_Int64;
-	
-	return result;
+#ifdef DEBUG_FASTTIMER
+	// dimhotepus: Catch call on a stopped timer.
+	Assert( m_bRunning );
+#endif
+	// dimhotepus: Subtract sampling overhead, clamp backwards steps to 0.
+	return CCycleCount{ s1::tier0::fasttimer_detail::ElapsedTicks(
+		m_Duration.m_Int64, CCycleCount::GetTimestamp() ) };
 }
 
 
