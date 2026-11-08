@@ -445,15 +445,19 @@ extern "C"
 #ifdef OSX
 void *__cdecl operator new( size_t nSize ) throw (std::bad_alloc)
 #else
-[[nodiscard]] _Ret_notnull_ _Post_writable_byte_size_(nSize) __declspec(allocator)
+#ifdef _WIN32
+[[nodiscard]] _Ret_notnull_ _Post_writable_byte_size_( nSize ) __declspec( allocator )
+#endif
 void *__cdecl operator new( size_t nSize )
 #endif
 {
 	return AllocUnattributed( nSize );
 }
 
+#ifdef _WIN32
 [[nodiscard]] _Ret_maybenull_ _Success_(return != NULL)
-_Post_writable_byte_size_(nSize) __declspec(allocator)
+_Post_writable_byte_size_( nSize ) __declspec( allocator )
+#endif
 void *__cdecl operator new( size_t nSize, ::std::nothrow_t const & ) noexcept //-V835
 {
 	return AllocUnattributed( nSize );
@@ -462,14 +466,18 @@ void *__cdecl operator new( size_t nSize, ::std::nothrow_t const & ) noexcept //
 #ifdef OSX
 void *__cdecl operator new[]( size_t nSize ) throw (std::bad_alloc)
 #else
-[[nodiscard]] _Ret_notnull_ _Post_writable_byte_size_(nSize) __declspec(allocator)
+#ifdef _WIN32
+[[nodiscard]] _Ret_notnull_ _Post_writable_byte_size_( nSize ) __declspec( allocator )
+#endif
 void *__cdecl operator new[]( size_t nSize )
 #endif
 {
 	return AllocUnattributed( nSize );
 }
 
-[[nodiscard]] _Ret_maybenull_ _Success_(return != NULL) _Post_writable_byte_size_(nSize) __declspec(allocator)
+#ifdef _WIN32
+[[nodiscard]] _Ret_maybenull_ _Success_( return != NULL ) _Post_writable_byte_size_( nSize ) __declspec( allocator )
+#endif
 void *__cdecl operator new[]( size_t nSize, std::nothrow_t const& ) noexcept //-V835
 {
 	return AllocUnattributed( nSize );
@@ -477,25 +485,33 @@ void *__cdecl operator new[]( size_t nSize, std::nothrow_t const& ) noexcept //-
 
 #ifdef __cpp_aligned_new
 
-[[nodiscard]] _Ret_notnull_ _Post_writable_byte_size_(nSize) __declspec(allocator)
+#ifdef _WIN32
+[[nodiscard]] _Ret_notnull_ _Post_writable_byte_size_( nSize ) __declspec( allocator )
+#endif
 void* __cdecl operator new( std::size_t nSize, std::align_val_t align )
 {
 	return MemAlloc_AllocAligned( nSize, static_cast<size_t>(align) );
 }
 
-[[nodiscard]] _Ret_maybenull_ _Success_(return != NULL) _Post_writable_byte_size_(nSize) __declspec(allocator)
+#ifdef _WIN32
+[[nodiscard]] _Ret_maybenull_ _Success_( return != NULL ) _Post_writable_byte_size_( nSize ) __declspec( allocator )
+#endif
 void* __cdecl operator new( std::size_t nSize, std::align_val_t align, std::nothrow_t const& ) noexcept //-V835
 {
 	return MemAlloc_AllocAligned( nSize, static_cast<size_t>(align) );
 }
 
-[[nodiscard]] _Ret_notnull_ _Post_writable_byte_size_(nSize) __declspec(allocator)
+#ifdef _WIN32
+[[nodiscard]] _Ret_notnull_ _Post_writable_byte_size_( nSize ) __declspec( allocator )
+#endif
 void* __cdecl operator new[]( std::size_t nSize, std::align_val_t align )
 {
 	return MemAlloc_AllocAligned( nSize, static_cast<size_t>(align) );
 }
 
-[[nodiscard]] _Ret_maybenull_ _Success_(return != NULL) _Post_writable_byte_size_(nSize) __declspec(allocator)
+#ifdef _WIN32
+[[nodiscard]] _Ret_maybenull_ _Success_( return != NULL ) _Post_writable_byte_size_( nSize ) __declspec( allocator )
+#endif
 void* __cdecl operator new[]( std::size_t nSize, std::align_val_t align, std::nothrow_t const& ) noexcept //-V835
 {
 	return MemAlloc_AllocAligned( nSize, static_cast<size_t>(align) );
@@ -587,25 +603,29 @@ void __cdecl operator delete[]( void *ptr, [[maybe_unused]] size_t size, std::al
 
 #endif
 
-[[nodiscard]] _Check_return_ _Ret_notnull_ _Post_writable_byte_size_(nSize) __declspec(allocator)
+#ifdef _WIN32
+[[nodiscard]] _Check_return_ _Ret_notnull_ _Post_writable_byte_size_( nSize ) __declspec( allocator )
+#endif
 void *__cdecl operator new
 (
-	_In_ size_t nSize,
-	_In_ int ,
-	_In_z_ const char *pFileName,
-	_In_ int nLine
+	IN_P size_t nSize,
+	IN_P int ,
+	IN_Z const char *pFileName,
+	IN_P int nLine
 )
 {
 	return g_pMemAlloc->Alloc(nSize, pFileName, nLine);
 }
 
-[[nodiscard]] _Check_return_ _Ret_notnull_ _Post_writable_byte_size_(nSize) __declspec(allocator)
+#ifdef _WIN32
+[[nodiscard]] _Check_return_ _Ret_notnull_ _Post_writable_byte_size_( nSize ) __declspec( allocator )
+#endif
 void *__cdecl operator new[]
 (
-	_In_ size_t nSize,
-	_In_ int,
-	_In_z_ const char *pFileName,
-	_In_ int nLine
+	IN_P size_t nSize,
+	IN_P int,
+	IN_Z const char *pFileName,
+	IN_P int nLine
 )
 {
 	return g_pMemAlloc->Alloc(nSize, pFileName, nLine);
