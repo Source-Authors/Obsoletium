@@ -47,37 +47,37 @@ public:
 	CAudioDeviceSDLAudio();
 	virtual ~CAudioDeviceSDLAudio();
 
-	bool		IsActive( void );
-	bool		Init( void );
-	void		Shutdown( void );
-	void		PaintEnd( void );
-	int			GetOutputPosition( void );
-	void		ChannelReset( int entnum, int channelIndex, float distanceMod );
-	void		Pause( void );
-	void		UnPause( void );
-	float		MixDryVolume( void );
-	bool		Should3DMix( void );
-	void		StopAllSounds( void );
+	bool        IsActive() override;
+	bool        Init() override;
+	void        Shutdown() override;
+	void        PaintEnd() override;
+	int         GetOutputPosition() override;
+	void        ChannelReset( int entnum, int channelIndex, float distanceMod ) override;
+	void        Pause() override;
+	void        UnPause() override;
+	float       MixDryVolume() override;
+	bool        Should3DMix() override;
+	void        StopAllSounds() override;
 
-	int			PaintBegin( float mixAheadTime, int soundtime, int paintedtime );
-	void		ClearBuffer( void );
-	void		MixBegin( int sampleCount );
-	void		MixUpsample( int sampleCount, int filtertype );
-	void		Mix8Mono( channel_t *pChannel, char *pData, int outputOffset, int inputOffset, fixedint rateScaleFix, int outCount, int timecompress );
-	void		Mix8Stereo( channel_t *pChannel, char *pData, int outputOffset, int inputOffset, fixedint rateScaleFix, int outCount, int timecompress );
-	void		Mix16Mono( channel_t *pChannel, short *pData, int outputOffset, int inputOffset, fixedint rateScaleFix, int outCount, int timecompress );
-	void		Mix16Stereo( channel_t *pChannel, short *pData, int outputOffset, int inputOffset, fixedint rateScaleFix, int outCount, int timecompress );
+	int         PaintBegin( float mixAheadTime, int soundtime, int paintedtime ) override;
+	void        ClearBuffer() override;
+	void        MixBegin( int sampleCount ) override;
+	void        MixUpsample( int sampleCount, int filtertype ) override;
+	void        Mix8Mono( channel_t *pChannel, char *pData, int outputOffset, int inputOffset, fixedint rateScaleFix, int outCount, int timecompress ) override;
+	void        Mix8Stereo( channel_t *pChannel, char *pData, int outputOffset, int inputOffset, fixedint rateScaleFix, int outCount, int timecompress ) override;
+	void        Mix16Mono( channel_t *pChannel, short *pData, int outputOffset, int inputOffset, fixedint rateScaleFix, int outCount, int timecompress ) override;
+	void        Mix16Stereo( channel_t *pChannel, short *pData, int outputOffset, int inputOffset, fixedint rateScaleFix, int outCount, int timecompress ) override;
 
-	void		TransferSamples( int end );
-	void		SpatializeChannel( int volume[CCHANVOLUMES/2], int master_vol, const Vector& sourceDir, float gain, float mono ) override;
-	void		ApplyDSPEffects( int idsp, portable_samplepair_t *pbuffront, portable_samplepair_t *pbufrear, portable_samplepair_t *pbufcenter, int samplecount );
+	void        TransferSamples( int end ) override;
+	void        SpatializeChannel( int volume[CCHANVOLUMES/2], int master_vol, const Vector& sourceDir, float gain, float mono ) override;
+	void        ApplyDSPEffects( int idsp, portable_samplepair_t *pbuffront, portable_samplepair_t *pbufrear, portable_samplepair_t *pbufcenter, int samplecount ) override;
 
-	const char *DeviceName( void )			{ return "SDL"; }
-	int			DeviceChannels( void )		{ return 2; }
-	int			DeviceSampleBits( void )	{ return 16; }
-	int			DeviceSampleBytes( void )	{ return 2; }
-	int			DeviceDmaSpeed( void )		{ return SOUND_DMA_SPEED; }
-	int			DeviceSampleCount( void )	{ return m_deviceSampleCount; }
+	const char *DeviceName() override { return "SDL"; }
+	int         DeviceChannels() override { return 2; }
+	int         DeviceSampleBits() override { return 16; }
+	int         DeviceSampleBytes() override { return 2; }
+	int         DeviceDmaSpeed() override { return SOUND_DMA_SPEED; }
+	int         DeviceSampleCount() override { return m_deviceSampleCount; }
 
 private:
 	SDL_AudioDeviceID m_devId;
@@ -87,11 +87,11 @@ private:
 	static void SDLCALL AudioCallbackEntry(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount);
 	void AudioCallback(SDL_AudioStream *stream, int numFrames);
 
-	void	OpenWaveOut( void );
-	void	CloseWaveOut( void );
+	void	OpenWaveOut();
+	void	CloseWaveOut();
 	void	AllocateOutputBuffers();
 	void	FreeOutputBuffers();
-	bool	ValidWaveOut( void ) const;
+	bool	ValidWaveOut() const;
 
 	int			m_deviceSampleCount;
 
@@ -132,7 +132,7 @@ CAudioDeviceSDLAudio::~CAudioDeviceSDLAudio()
 //-----------------------------------------------------------------------------
 // Class factory
 //-----------------------------------------------------------------------------
-IAudioDevice *Audio_CreateSDLAudioDevice( void )
+IAudioDevice *Audio_CreateSDLAudioDevice()
 {
 	if ( !g_wave )
 	{
@@ -153,7 +153,7 @@ IAudioDevice *Audio_CreateSDLAudioDevice( void )
 //-----------------------------------------------------------------------------
 // Init, shutdown
 //-----------------------------------------------------------------------------
-bool CAudioDeviceSDLAudio::Init( void )
+bool CAudioDeviceSDLAudio::Init()
 {
 	// If we've already got a device open, then return. This allows folks to call
 	//	Audio_CreateSDLAudioDevice() multiple times. CloseWaveOut() will free the
@@ -182,7 +182,7 @@ bool CAudioDeviceSDLAudio::Init( void )
 	return ValidWaveOut();
 }
 
-void CAudioDeviceSDLAudio::Shutdown( void )
+void CAudioDeviceSDLAudio::Shutdown()
 {
 	CloseWaveOut();
 }
@@ -191,7 +191,7 @@ void CAudioDeviceSDLAudio::Shutdown( void )
 //-----------------------------------------------------------------------------
 // WAV out device
 //-----------------------------------------------------------------------------
-inline bool CAudioDeviceSDLAudio::ValidWaveOut( void ) const 
+inline bool CAudioDeviceSDLAudio::ValidWaveOut() const 
 { 
 	return m_devId != 0;
 }
@@ -200,7 +200,7 @@ inline bool CAudioDeviceSDLAudio::ValidWaveOut( void ) const
 //-----------------------------------------------------------------------------
 // Opens the windows wave out device
 //-----------------------------------------------------------------------------
-void CAudioDeviceSDLAudio::OpenWaveOut( void )
+void CAudioDeviceSDLAudio::OpenWaveOut()
 {
 	debugsdl("SDLAUDIO: OpenWaveOut...\n");
 
@@ -264,7 +264,7 @@ void CAudioDeviceSDLAudio::OpenWaveOut( void )
 //-----------------------------------------------------------------------------
 // Closes the windows wave out device
 //-----------------------------------------------------------------------------
-void CAudioDeviceSDLAudio::CloseWaveOut( void ) 
+void CAudioDeviceSDLAudio::CloseWaveOut() 
 { 
 	// none of these SDL_* functions are available to call if this is false.
 	if (m_stream)
@@ -403,7 +403,7 @@ void CAudioDeviceSDLAudio::AudioCallback(SDL_AudioStream *pStream, int numFrames
 //-----------------------------------------------------------------------------
 // Actually performs the mixing
 //-----------------------------------------------------------------------------
-void CAudioDeviceSDLAudio::PaintEnd( void )
+void CAudioDeviceSDLAudio::PaintEnd()
 {
 	debugsdl("SDLAUDIO: PaintEnd...\n");
 
@@ -416,7 +416,7 @@ void CAudioDeviceSDLAudio::PaintEnd( void )
 #endif
 }
 
-int CAudioDeviceSDLAudio::GetOutputPosition( void )
+int CAudioDeviceSDLAudio::GetOutputPosition()
 {
 	return (m_readPos >> SAMPLE_16BIT_SHIFT)/DeviceChannels();
 }
@@ -425,7 +425,7 @@ int CAudioDeviceSDLAudio::GetOutputPosition( void )
 //-----------------------------------------------------------------------------
 // Pausing
 //-----------------------------------------------------------------------------
-void CAudioDeviceSDLAudio::Pause( void )
+void CAudioDeviceSDLAudio::Pause()
 {
 	m_pauseCount++;
 	if (m_pauseCount == 1)
@@ -436,7 +436,7 @@ void CAudioDeviceSDLAudio::Pause( void )
 }
 
 
-void CAudioDeviceSDLAudio::UnPause( void )
+void CAudioDeviceSDLAudio::UnPause()
 {
 	if ( m_pauseCount > 0 )
 	{
@@ -449,24 +449,24 @@ void CAudioDeviceSDLAudio::UnPause( void )
 	}
 }
 
-bool CAudioDeviceSDLAudio::IsActive( void )
+bool CAudioDeviceSDLAudio::IsActive()
 {
 	return ( m_pauseCount == 0 );
 }
 
-float CAudioDeviceSDLAudio::MixDryVolume( void )
+float CAudioDeviceSDLAudio::MixDryVolume()
 {
 	return 0;
 }
 
 
-bool CAudioDeviceSDLAudio::Should3DMix( void )
+bool CAudioDeviceSDLAudio::Should3DMix()
 {
 	return false;
 }
 
 
-void CAudioDeviceSDLAudio::ClearBuffer( void )
+void CAudioDeviceSDLAudio::ClearBuffer()
 {
 	int		clear;
 
@@ -569,7 +569,7 @@ void CAudioDeviceSDLAudio::SpatializeChannel( int volume[CCHANVOLUMES/2], int ma
 	S_SpatializeChannel( volume, master_vol, &sourceDir, gain, mono );
 }
 
-void CAudioDeviceSDLAudio::StopAllSounds( void )
+void CAudioDeviceSDLAudio::StopAllSounds()
 {
 }
 
