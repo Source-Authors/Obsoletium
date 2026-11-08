@@ -1393,15 +1393,8 @@ channel_t *SND_PickStaticChannel(int soundsource, CSfxTable *pSfx)
 
 void S_SpatializeChannel( int pVolume[CCHANVOLUMES/2], int master_vol, const Vector *psourceDir, float gain, float mono )
 {
-	float lscale, rscale, scale;
-	vec_t dotRight;
-	Vector sourceDir = *psourceDir;
-
-	dotRight = DotProduct(listener_right, sourceDir);
-
-	// clear volumes
-	for (int i = 0; i < CCHANVOLUMES/2; i++)
-		pVolume[i] = 0;
+	// dimhotepus: Optimized version.
+	vec_t dotRight = DotProduct( listener_right, *psourceDir );
 
 	if (mono > 0.0F)
 	{
@@ -1412,22 +1405,27 @@ void S_SpatializeChannel( int pVolume[CCHANVOLUMES/2], int master_vol, const Vec
 		// at radius * 0.5, dotRight is 0 (ie: sound centered left/right)
 		// at radius * 1.0, dotRight == dotRight
 
-		dotRight   *= (1.0F - mono);
+		dotRight *= (1.0F - mono);
 	}
 
-	rscale = 1.0F + dotRight;
-	lscale = 1.0F - dotRight;
+	const float lscale = 1.0F - dotRight;
+	const float rscale = 1.0F + dotRight;
 
  // add in distance effect
-	scale = gain * rscale / 2;
-	pVolume[IFRONT_RIGHT] = (int) (master_vol * scale);
+	const float masterHalfGain = master_vol * gain / 2;
 
-	scale = gain * lscale / 2;
-	pVolume[IFRONT_LEFT] = (int) (master_vol * scale);
+	const int lVolume = (int)( masterHalfGain * lscale );
+	const int rVolume = (int)( masterHalfGain * rscale );
 
-	pVolume[IFRONT_RIGHT] = clamp( pVolume[IFRONT_RIGHT], 0, 255 );
-	pVolume[IFRONT_LEFT] = clamp( pVolume[IFRONT_LEFT], 0, 255 );
+	pVolume[IFRONT_LEFT] = clamp( lVolume, 0, 255 );
+	pVolume[IFRONT_RIGHT] = clamp( rVolume, 0, 255 );
 
+	static_assert( IFRONT_LEFT == 0 );
+	static_assert( IFRONT_RIGHT == 1 );
+
+	// clear remaining volumes
+	for ( int i = IFRONT_RIGHT + 1; i < CCHANVOLUMES / 2; i++ )
+		pVolume[i] = 0;
 }
 
 bool S_IsMusic( channel_t *pChannel )
