@@ -18,7 +18,8 @@ $Configuration
 	$Compiler
 	{
 		$AdditionalIncludeDirectories	".\;$BASE;$SRCDIR\game\shared"
-		$PreprocessorDefinitions		"$BASE;SOUNDEMITTERSYSTEM_EXPORTS;_WINDOWS;PROTECTED_THINGS_ENABLE"
+		$PreprocessorDefinitions		"$BASE;SOUNDEMITTERSYSTEM_EXPORTS;PROTECTED_THINGS_ENABLE"
+		$PreprocessorDefinitions		"$BASE;_WINDOWS" [$WINDOWS]
 		$PreprocessorDefinitions		"$BASE;fopen=dont_use_fopen" [$WINDOWS]
 	}
 }
