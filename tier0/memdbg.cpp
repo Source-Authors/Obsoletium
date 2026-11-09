@@ -6,10 +6,7 @@
 
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 
-#include "tier0/dbg.h"
-#include "tier0/fasttimer.h"
 #include "tier0/memalloc.h"
-#include "mem_helpers.h"
 
 #if defined(_WIN32)
 #include "winlite.h"
@@ -22,11 +19,21 @@
 
 #include <atomic>
 #include <algorithm>
+#include <cstdint>
+#include <cstdio>
+#include <cstring>
+#include <new>          // std::bad_alloc
+#include <string_view>
 #include <vector>  // std::vector, used by DumpMemMapStatSorted
 #include <unordered_map>
 #include <unordered_set>
 #include <climits>
+
+#include "tier0/dbg.h"
+#include "tier0/fasttimer.h"
 #include "tier0/threadtools.h"
+
+#include "mem_helpers.h"
 
 #if ( defined(NDEBUG) && defined(USE_MEM_DEBUG) )
 #pragma message ("USE_MEM_DEBUG is enabled in a release build. Don't commit this!")
@@ -274,7 +281,16 @@ struct CrtDbgMemHeader_t
     // unsigned char    m_AnotherGap[no_mans_land_size];
 };
 
-struct DbgMemHeader_t
+#if defined( _WIN32 ) && !defined( NDEBUG )
+// dimhotepus: Must match UCRT _CrtMemBlockHeader exactly (x86: 32, x64/arm64: 48 bytes).
+static_assert( sizeof( CrtDbgMemHeader_t ) == ( sizeof( void * ) == 8 ? 48 : 32 ),
+	"CrtDbgMemHeader_t no longer mirrors the CRT debug block header" );
+#endif
+
+// dimhotepus: alignas(16): on LP64 POSIX (Linux/macOS x86-64 and arm64) 'long' is 8 bytes,
+// which made this header 72 bytes and every user pointer only 8-byte aligned, breaking
+// code that relies on 16-byte aligned allocations (SSE/NEON aligned loads).
+struct alignas( 16 ) DbgMemHeader_t
 #if defined(NDEBUG) || defined( POSIX )
 	: CrtDbgMemHeader_t
 #endif
@@ -282,6 +298,22 @@ struct DbgMemHeader_t
 	size_t nLogicalSize;
 	byte reserved[16 - sizeof(size_t)];	// MS allocator always returns mem aligned on 16 bytes, which some of our code depends on
 };
+static_assert( sizeof( DbgMemHeader_t ) % 16 == 0, "User pointers must stay 16-byte aligned" );
+
+// Marker written into DbgMemHeader_t::reserved by the POSIX allocation paths.
+static constexpr inline std::uint32_t g_nDbgHeaderMagic{ 0xf00df00dU };
+
+[[maybe_unused]] static inline void SetDbgHeaderMagic( DbgMemHeader_t *pHeader )
+{
+	// memcpy: reserved is a byte array, an int* store into it breaks strict aliasing.
+	memcpy( pHeader->reserved, &g_nDbgHeaderMagic, sizeof( g_nDbgHeaderMagic ) );
+}
+
+// Size of the underlying CRT block, or 0 when nSize + header would overflow size_t.
+[[nodiscard]] static constexpr size_t DbgBlockSize( size_t nSize )
+{
+	return nSize > SIZE_MAX - sizeof( DbgMemHeader_t ) ? 0 : nSize + sizeof( DbgMemHeader_t );
+}
 
 //-----------------------------------------------------------------------------
 
@@ -296,41 +328,82 @@ DbgMemHeader_t *GetCrtDbgMemHeader( void *pMem );
 #ifdef OSX
 DbgMemHeader_t *GetCrtDbgMemHeader( void *pMem )
 {
+	// The header lives at the END of the block on macOS; malloc_size() is a multiple of 16.
 	size_t msize = malloc_size( pMem );
 	return (DbgMemHeader_t *)( (char *)pMem + msize - sizeof(DbgMemHeader_t) );
+}
+
+// dimhotepus: Original default-zone entry points, captured once before the hooks are
+// installed (single-threaded static initialization) and read-only afterwards.
+// Calling them directly replaces the old scheme of swapping the zone's function pointers
+// back and forth on every call, which raced between threads (allocations from other
+// threads bypassed or double-entered the hooks) and cost two vm_protect() syscalls
+// per malloc/free.
+struct OsxZoneFunctions_t
+{
+	void *( *pfnMalloc )( malloc_zone_t *, size_t );
+	void *( *pfnRealloc )( malloc_zone_t *, void *, size_t );
+	void ( *pfnFree )( malloc_zone_t *, void * );
+};
+static OsxZoneFunctions_t g_OsxOriginalZone{};
+
+static inline void *OsxRawMalloc( size_t nSize )
+{
+	malloc_zone_t *pZone = malloc_default_zone();
+	return g_OsxOriginalZone.pfnMalloc ? g_OsxOriginalZone.pfnMalloc( pZone, nSize ) : malloc_zone_malloc( pZone, nSize );
+}
+
+static inline void *OsxRawRealloc( void *pMem, size_t nSize )
+{
+	malloc_zone_t *pZone = malloc_default_zone();
+	return g_OsxOriginalZone.pfnRealloc ? g_OsxOriginalZone.pfnRealloc( pZone, pMem, nSize ) : malloc_zone_realloc( pZone, pMem, nSize );
+}
+
+static inline void OsxRawFree( void *pMem )
+{
+	malloc_zone_t *pZone = malloc_default_zone();
+	if ( g_OsxOriginalZone.pfnFree )
+		g_OsxOriginalZone.pfnFree( pZone, pMem );
+	else
+		malloc_zone_free( pZone, pMem );
 }
 #endif
 
 static inline void *InternalMalloc( size_t nSize, const char *pFileName, int nLine )
 {
+	// dimhotepus: nSize + header used to wrap for huge requests -> tiny block, heap overflow.
+	const size_t nBlockSize = DbgBlockSize( nSize );
+	if ( !nBlockSize )
+		return nullptr;
+
 #ifdef OSX
-	void *pAllocedMem = malloc_zone_malloc( malloc_default_zone(), nSize + sizeof(DbgMemHeader_t) );
+	void *pAllocedMem = OsxRawMalloc( nBlockSize );
 	if (!pAllocedMem)
 	{
-		return NULL;
+		return nullptr;
 	}
 	DbgMemHeader_t *pInternalMem = GetCrtDbgMemHeader( pAllocedMem );
 
 	pInternalMem->m_pFileName = pFileName;
 	pInternalMem->m_nLineNumber = nLine;
 	pInternalMem->nLogicalSize = nSize;
-	*((int*)pInternalMem->m_Reserved) = 0xf00df00d;
+	// dimhotepus: Was m_Reserved, a member that does not exist -> macOS did not compile.
+	SetDbgHeaderMagic( pInternalMem );
 
 	return pAllocedMem;
 #else // LINUX || WIN32
 	DbgMemHeader_t *pInternalMem;
 #if defined( POSIX ) || defined(NDEBUG)
-	pInternalMem = (DbgMemHeader_t *)malloc( nSize + sizeof(DbgMemHeader_t) );
+	pInternalMem = (DbgMemHeader_t *)malloc( nBlockSize );
 	if (!pInternalMem)
 	{
-		return NULL;
+		return nullptr;
 	}
 	pInternalMem->m_pFileName = pFileName;
 	pInternalMem->m_nLineNumber = nLine;
-	// dimhotepus: DbgMemHeader_t m_Reserved -> reserved.
-	*((int*)pInternalMem->reserved) = 0xf00df00d;
+	SetDbgHeaderMagic( pInternalMem );
 #else
-	pInternalMem = (DbgMemHeader_t *)_malloc_dbg( nSize + sizeof(DbgMemHeader_t), _NORMAL_BLOCK, pFileName, nLine );
+	pInternalMem = (DbgMemHeader_t *)_malloc_dbg( nBlockSize, _NORMAL_BLOCK, pFileName, nLine );
 #endif // defined( POSIX ) || defined(NDEBUG)
 
 	if ( pInternalMem )
@@ -348,26 +421,37 @@ static inline void *InternalRealloc( void *pMem, size_t nNewSize, const char *pF
 	if ( !pMem )
 		return InternalMalloc( nNewSize, pFileName, nLine );
 
-#ifdef OSX
-	void *pNewAllocedMem = NULL;
+	// On failure the original block is left untouched (realloc semantics) and nullptr returned.
+	const size_t nBlockSize = DbgBlockSize( nNewSize );
+	if ( !nBlockSize )
+		return nullptr;
 
-	pNewAllocedMem = (void *)malloc_zone_realloc( malloc_default_zone(), pMem, nNewSize + sizeof(DbgMemHeader_t) );
+#ifdef OSX
+	void *pNewAllocedMem = OsxRawRealloc( pMem, nBlockSize );
+	// dimhotepus: Was dereferenced unconditionally.
+	if ( !pNewAllocedMem )
+		return nullptr;
+
 	DbgMemHeader_t *pInternalMem = GetCrtDbgMemHeader( pNewAllocedMem );
 
 	pInternalMem->m_pFileName = pFileName;
 	pInternalMem->m_nLineNumber = nLine;
-	pInternalMem->nLogicalSize = static_cast<unsigned int>( nNewSize );
-	*((int*)pInternalMem->m_Reserved) = 0xf00df00d;
+	// dimhotepus: Was truncated to unsigned int.
+	pInternalMem->nLogicalSize = nNewSize;
+	SetDbgHeaderMagic( pInternalMem );
 
 	return pNewAllocedMem;
 #else // LINUX || WIN32
 	DbgMemHeader_t *pInternalMem = (DbgMemHeader_t *)pMem - 1;
 #if defined( POSIX ) || defined(NDEBUG)
-	pInternalMem = (DbgMemHeader_t *)realloc( pInternalMem, nNewSize + sizeof(DbgMemHeader_t) );
+	pInternalMem = (DbgMemHeader_t *)realloc( pInternalMem, nBlockSize );
+	// dimhotepus: Was dereferenced unconditionally.
+	if ( !pInternalMem )
+		return nullptr;
 	pInternalMem->m_pFileName = pFileName;
 	pInternalMem->m_nLineNumber = nLine;
 #else
-	pInternalMem = (DbgMemHeader_t *)_realloc_dbg( pInternalMem, nNewSize + sizeof(DbgMemHeader_t), _NORMAL_BLOCK, pFileName, nLine );
+	pInternalMem = (DbgMemHeader_t *)_realloc_dbg( pInternalMem, nBlockSize, _NORMAL_BLOCK, pFileName, nLine );
 #endif
 
 	if ( pInternalMem )
@@ -385,15 +469,15 @@ static inline void InternalFree( void *pMem )
 	if ( !pMem )
 		return;
 
-	DbgMemHeader_t *pInternalMem = (DbgMemHeader_t *)pMem - 1;
 #if defined(NDEBUG) || defined( POSIX )
 #ifdef OSX
-	malloc_zone_free( malloc_default_zone(), pMem );
+	// Header is at the end of the block on macOS; pMem is the block itself.
+	OsxRawFree( pMem );
 #else
-	free( pInternalMem );
+	free( (DbgMemHeader_t *)pMem - 1 );
 #endif
 #else
-	_free_dbg( pInternalMem, _NORMAL_BLOCK );
+	_free_dbg( (DbgMemHeader_t *)pMem - 1, _NORMAL_BLOCK );
 #endif
 }
 
@@ -433,37 +517,41 @@ static inline size_t InternalLogicalSize( void *pMem )
 
 
 // Custom allocator protects this module from recursing on operator new
+// dimhotepus: Minimal C++17 allocator (the C++03 members are deprecated/removed in C++20).
+// Standard containers require allocate() to throw or never return nullptr; it used to
+// return nullptr on failure, and num * sizeof(T) could overflow.
 template <class T>
 class CNoRecurseAllocator
 {
 public:
-	// type definitions
 	using value_type = T;
-	using pointer = T *;
-	using const_pointer = const T *;
-	using reference = T &;
-	using const_reference = const T &;
-	using size_type = std::size_t;
-	using difference_type = std::ptrdiff_t;
 
-	CNoRecurseAllocator() = default;
-	CNoRecurseAllocator(const CNoRecurseAllocator&) {}
-	template <class U> CNoRecurseAllocator(const CNoRecurseAllocator<U>&) {}
-	~CNoRecurseAllocator() = default;
+	CNoRecurseAllocator() noexcept = default;
+	template <class U> CNoRecurseAllocator( const CNoRecurseAllocator<U> & ) noexcept {}
 
-	// rebind allocator to type U
-	template <class U > struct rebind { using other = CNoRecurseAllocator<U>; };
+	[[nodiscard]] T *allocate( std::size_t num )
+	{
+		if ( num > SIZE_MAX / sizeof( T ) )
+			FailAllocation();
 
-	// return address of values
-	pointer address (reference value) const { return &value; }
+		void *p = DebugAlloc( num * sizeof( T ) );
+		if ( !p )
+			FailAllocation();
 
-	[[nodiscard]] const_pointer address (const_reference value) const { return &value;}
-	[[nodiscard]] size_type max_size() const { return INT_MAX; }
+		return static_cast<T *>( p );
+	}
 
-	pointer allocate(size_type num, const void* = nullptr)  { return static_cast<pointer>(DebugAlloc(num * sizeof(T))); }
-	void deallocate (pointer p, size_type num) { DebugFree(p); }
-	void construct(pointer p, const T& value) {	new(static_cast<void*>(p))T(value); }
-	void destroy (pointer p) { p->~T(); }
+	void deallocate( T *p, std::size_t ) noexcept { DebugFree( p ); }
+
+private:
+	[[noreturn]] static void FailAllocation()
+	{
+#if defined( __cpp_exceptions ) || defined( _CPPUNWIND )
+		throw std::bad_alloc();
+#else
+		abort();
+#endif
+	}
 };
 
 template <class T1, class T2>
@@ -480,8 +568,10 @@ bool operator!=(const CNoRecurseAllocator<T1>&, const CNoRecurseAllocator<T2>&)
 
 //-----------------------------------------------------------------------------
 
+#ifdef _MSC_VER
 #pragma warning( disable:4074 ) // warning C4074: initializers put in compiler reserved initialization area
 #pragma init_seg( compiler )
+#endif
 
 //-----------------------------------------------------------------------------
 // NOTE! This should never be called directly from leaf code
@@ -592,28 +682,23 @@ public:
 private:
 	struct MemInfo_t
 	{
-		MemInfo_t()
-		{
-			memset( this, 0, sizeof(*this) );
-		}
-
 		// Size in bytes
-		size_t m_nCurrentSize;
-		size_t m_nPeakSize;
-		size_t m_nTotalSize;
-		size_t m_nOverheadSize;
-		size_t m_nPeakOverheadSize;
+		size_t m_nCurrentSize{0};
+		size_t m_nPeakSize{0};
+		size_t m_nTotalSize{0};
+		size_t m_nOverheadSize{0};
+		size_t m_nPeakOverheadSize{0};
 
 		// Count in terms of # of allocations
-		size_t m_nCurrentCount;
-		size_t m_nPeakCount;
-		size_t m_nTotalCount;
+		size_t m_nCurrentCount{0};
+		size_t m_nPeakCount{0};
+		size_t m_nTotalCount{0};
 
 		// Count in terms of # of allocations of a particular size
-		size_t m_pCount[NUM_BYTE_COUNT_BUCKETS];
+		size_t m_pCount[NUM_BYTE_COUNT_BUCKETS]{};
 
 		// Time spent allocating + deallocating	(microseconds)
-		int64 m_nTime;
+		int64 m_nTime{0};
 	};
 
 	struct MemInfoKey_t
@@ -632,10 +717,13 @@ private:
 
 	struct MemInfoKeyHasher 
 	{
-		std::size_t operator()( const MemInfoKey_t &key ) const
+		std::size_t operator()( const MemInfoKey_t &key ) const noexcept
 		{
-			std::size_t h1 = std::hash<const char*>{}( key.m_pFileName );
-			return h1 ^ (static_cast<size_t>(key.m_nLine) << 1);
+			// dimhotepus: libstdc++/libc++ hash pointers as identity, so the low bits are
+			// alignment zeros; mix the line in boost::hash_combine style, not a plain xor.
+			std::size_t h = std::hash<const char*>{}( key.m_pFileName );
+			h ^= std::hash<int>{}( key.m_nLine ) + static_cast<std::size_t>( 0x9e3779b97f4a7c15ULL ) + ( h << 6 ) + ( h >> 2 );
+			return h;
 		}
 	};
 
@@ -662,7 +750,19 @@ private:
 	// Maps file name to info
 	// dimhotepus: Speed up debug allocation tracking.
 	using StatMap_t = std::unordered_map<MemInfoKey_t, MemInfo_t, MemInfoKeyHasher, std::equal_to<>, CNoRecurseAllocator<std::pair<const MemInfoKey_t, MemInfo_t>>>;
-	using Filenames_t = std::unordered_set<const char *, std::hash<const char *>, std::equal_to<const char *>, CNoRecurseAllocator<const char *>>;
+	// dimhotepus: Interned by CONTENT. It used to be a set of pointers, so "interning"
+	// returned the caller's pointer unchanged: names living in an unloaded DLL, in a
+	// stack buffer (caller module name) or in a reused static buffer (stack walk)
+	// dangled in the stats, and equal names from different modules were split.
+	struct FilenameHash
+	{
+		std::size_t operator()( const char *psz ) const noexcept { return std::hash<std::string_view>{}( psz ); }
+	};
+	struct FilenameEqual
+	{
+		bool operator()( const char *a, const char *b ) const noexcept { return a == b || strcmp( a, b ) == 0; }
+	};
+	using Filenames_t = std::unordered_set<const char *, FilenameHash, FilenameEqual, CNoRecurseAllocator<const char *>>;
 
 	// Heap reporting method
 	using HeapReportFunc_t = void (*)(const char *, ...);
@@ -700,8 +800,10 @@ private:
 private:
 	StatMap_t *m_pStatMap{nullptr};
 	MemInfo_t m_GlobalInfo;
-	CFastTimer m_Timer;
-	bool		m_bInitialized;
+	// dimhotepus: Shared CFastTimer member removed: allocations are timed with a local timer
+	// so the CRT call no longer has to run under the global heap lock.
+	// Written under the heap lock, read lock-free on the allocation fast path.
+	std::atomic<bool>	m_bInitialized{false};
 	Filenames_t *m_pFilenames{nullptr};
 
 	HeapReportFunc_t m_OutputFunc;
@@ -709,7 +811,8 @@ private:
 	static size_t s_pCountSizes[NUM_BYTE_COUNT_BUCKETS];
 	static const char *s_pCountHeader[NUM_BYTE_COUNT_BUCKETS];
 
-	size_t				m_sMemoryAllocFailed{0};
+	// dimhotepus: Read by MemoryAllocFailed() from any thread without the lock.
+	std::atomic<size_t>	m_sMemoryAllocFailed{0};
 };
 
 static constexpr inline char g_pszUnknown[]{"unknown"};
@@ -725,8 +828,20 @@ struct DbgInfoStack_t
 };
 
 // dimhotepus: Dropped CONSTRUCT_EARLY on thread_locals.
-static thread_local DbgInfoStack_t* g_DbgInfoStack;
-static thread_local int				g_nDbgInfoStackDepth;
+// dimhotepus: Fixed-size per-thread array instead of a lazily DebugAlloc()ed one: constant
+// initialized (no TLS constructor/destructor, works before CRT init), never null, and no
+// longer leaked when a thread exits. 32 * 16 bytes of TLS per thread.
+static thread_local DbgInfoStack_t	g_DbgInfoStack[DBG_INFO_STACK_DEPTH];
+static thread_local int				g_nDbgInfoStackDepth{-1};
+
+//-----------------------------------------------------------------------------
+// dimhotepus: Defined BEFORE the singleton: objects in one translation unit are
+// constructed in definition order and destroyed in reverse, so the heap mutex now
+// exists before the first allocation and outlives ~CDbgMemAlloc().
+//-----------------------------------------------------------------------------
+static CThreadMutex g_DbgMemMutex CONSTRUCT_EARLY;
+
+#define HEAP_LOCK() AUTO_LOCK( g_DbgMemMutex )
 
 //-----------------------------------------------------------------------------
 // Singleton...
@@ -739,11 +854,6 @@ IMemAlloc *g_pMemAlloc = &s_DbgMemAlloc;
 IMemAlloc *g_pActualAlloc = &s_DbgMemAlloc;
 #endif
 
-//-----------------------------------------------------------------------------
-
-static CThreadMutex g_DbgMemMutex CONSTRUCT_EARLY;
-
-#define HEAP_LOCK() AUTO_LOCK( g_DbgMemMutex )
 
 
 //-----------------------------------------------------------------------------
@@ -799,9 +909,10 @@ CDbgMemAlloc::~CDbgMemAlloc()
 }
 
 
+// Must be called with the heap lock held.
 void CDbgMemAlloc::Initialize()
 {
-	if ( !m_bInitialized )
+	if ( !m_bInitialized.load( std::memory_order_relaxed ) )
 	{
 		m_pFilenames = new Filenames_t;
 		// dimhotepus: Allocate reasonable amount.
@@ -809,7 +920,8 @@ void CDbgMemAlloc::Initialize()
 		m_pStatMap = new StatMap_t;
 		// dimhotepus: Allocate reasonable amount.
 		m_pStatMap->reserve( 2048 + 1024 );
-		m_bInitialized = true;
+		// Publish only once both maps exist (pairs with acquire loads on the fast path).
+		m_bInitialized.store( true, std::memory_order_release );
 
 		// Enable application termination (breakpoint) on heap corruption. This is
 		// better than trying to patch it up and continue, both from a security and
@@ -827,7 +939,12 @@ void CDbgMemAlloc::Initialize()
 //-----------------------------------------------------------------------------
 void CDbgMemAlloc::Shutdown()
 {
-	if ( m_bInitialized )
+	// Not locked: also runs from DLL_PROCESS_DETACH, where other threads may already have
+	// been terminated while holding the heap lock.
+	// dimhotepus: Flip the flag first so the lock-free fast paths stop using the maps.
+	// Interned file name strings are intentionally leaked: allocation headers and the
+	// per-thread caches still point at them.
+	if ( m_bInitialized.exchange( false, std::memory_order_acq_rel ) )
 	{
 		delete m_pFilenames;
 		m_pFilenames = nullptr;
@@ -835,8 +952,6 @@ void CDbgMemAlloc::Shutdown()
 		delete m_pStatMap;
 		m_pStatMap = nullptr;
 	}
-
-	m_bInitialized = false;
 }
 
 
@@ -913,45 +1028,41 @@ void *CDbgMemAlloc::Expand_NoLongerSupported( void *, size_t )
 	return nullptr;
 }
 
-static void SetupDebugInfoStack(DbgInfoStack_t *&stack, int &stack_depth)
-{
-	stack = (DbgInfoStack_t *)DebugAlloc( sizeof(DbgInfoStack_t) * DBG_INFO_STACK_DEPTH );
-	stack_depth = -1;
-}
-
 //-----------------------------------------------------------------------------
 // Force file + line information for an allocation
 //-----------------------------------------------------------------------------
 void CDbgMemAlloc::PushAllocDbgInfo( const char *pFileName, int nLine )
 {
-	if ( g_DbgInfoStack == nullptr )
-	{
-		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
-	}
-
 	const int newStackDepth{++g_nDbgInfoStackDepth};
-	Assert( newStackDepth < DBG_INFO_STACK_DEPTH );
+	AssertMsg( newStackDepth < DBG_INFO_STACK_DEPTH, "Alloc debug info stack overflow (%d)", newStackDepth );
 
-	DbgInfoStack_t &info{g_DbgInfoStack[newStackDepth]};
+	// dimhotepus: The assert alone used to let deeper pushes write past the array.
+	// Overflowed levels are counted (so push/pop stay balanced) but not recorded;
+	// attribution uses the bottom entry anyway.
+	if ( newStackDepth >= 0 && newStackDepth < DBG_INFO_STACK_DEPTH )
+	{
+		DbgInfoStack_t &info{g_DbgInfoStack[newStackDepth]};
 
-	info.m_pFileName = FindOrCreateFilename( pFileName );
-	info.m_nLine = nLine;
+		info.m_pFileName = FindOrCreateFilename( pFileName );
+		info.m_nLine = nLine;
+	}
 }
 
 void CDbgMemAlloc::PopAllocDbgInfo()
 {
-	if ( g_DbgInfoStack == nullptr )
-	{
-		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
-	}
+	AssertMsg( g_nDbgInfoStackDepth >= 0, "Alloc debug info stack underflow" );
 
-	[[maybe_unused]] const int newStackDepth{--g_nDbgInfoStackDepth};
-	Assert( newStackDepth >= -1 );
+	// dimhotepus: Clamp so one unbalanced pop doesn't disable attribution for the thread.
+	if ( g_nDbgInfoStackDepth >= 0 )
+		--g_nDbgInfoStackDepth;
 }
 
 
 //-----------------------------------------------------------------------------
 // handles storing allocation info for coroutines
+// dimhotepus: Layout is [int32 depth][DbgInfoStack_t x DBG_INFO_STACK_DEPTH] with the
+// array at offset 4, i.e. misaligned for 8-byte pointers on 64-bit targets. Accesses go
+// through memcpy instead of typed pointers (UB / alignment faults otherwise).
 //-----------------------------------------------------------------------------
 uint32 CDbgMemAlloc::GetDebugInfoSize()
 {
@@ -960,46 +1071,38 @@ uint32 CDbgMemAlloc::GetDebugInfoSize()
 
 void CDbgMemAlloc::SaveDebugInfo( void *pvDebugInfo )
 {
-	if ( g_DbgInfoStack == nullptr )
-	{
-		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
-	}
-
-	auto *pnStackDepth = (int32*) pvDebugInfo;
-	*pnStackDepth = g_nDbgInfoStackDepth;
-	memcpy( pnStackDepth+1, &g_DbgInfoStack[0], sizeof( DbgInfoStack_t ) * DBG_INFO_STACK_DEPTH );
+	auto *pBytes = static_cast<unsigned char *>( pvDebugInfo );
+	const int32 nStackDepth{ g_nDbgInfoStackDepth };
+	memcpy( pBytes, &nStackDepth, sizeof( nStackDepth ) );
+	memcpy( pBytes + sizeof( int32 ), &g_DbgInfoStack[0], sizeof( DbgInfoStack_t ) * DBG_INFO_STACK_DEPTH );
 }
 
 void CDbgMemAlloc::RestoreDebugInfo( const void *pvDebugInfo )
 {
-	if ( g_DbgInfoStack == nullptr )
-	{
-		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
-	}
-
-	const auto *pnStackDepth = (const int32*) pvDebugInfo;
-	g_nDbgInfoStackDepth = *pnStackDepth;
-	memcpy( &g_DbgInfoStack[0], pnStackDepth+1, sizeof( DbgInfoStack_t ) * DBG_INFO_STACK_DEPTH );
-
+	const auto *pBytes = static_cast<const unsigned char *>( pvDebugInfo );
+	int32 nStackDepth;
+	memcpy( &nStackDepth, pBytes, sizeof( nStackDepth ) );
+	g_nDbgInfoStackDepth = nStackDepth;
+	memcpy( &g_DbgInfoStack[0], pBytes + sizeof( int32 ), sizeof( DbgInfoStack_t ) * DBG_INFO_STACK_DEPTH );
 }
 
 void CDbgMemAlloc::InitDebugInfo( void *pvDebugInfo, const char *pchRootFileName, int nLine )
 {
-	auto *pnStackDepth = (int32*) pvDebugInfo;
+	auto *pBytes = static_cast<unsigned char *>( pvDebugInfo );
 
+	// dimhotepus: Zero everything, RestoreDebugInfo copies the whole array back.
+	memset( pBytes, 0, GetDebugInfoSize() );
+
+	int32 nStackDepth{ -1 };
 	if( pchRootFileName )
 	{
-		*pnStackDepth = 0;
+		nStackDepth = 0;
 
-		auto *pStackRoot = (DbgInfoStack_t *)(pnStackDepth + 1);
-		pStackRoot->m_pFileName = FindOrCreateFilename( pchRootFileName );
-		pStackRoot->m_nLine = nLine;
-	}
-	else
-	{
-		*pnStackDepth = -1;
+		const DbgInfoStack_t root{ FindOrCreateFilename( pchRootFileName ), nLine };
+		memcpy( pBytes + sizeof( int32 ), &root, sizeof( root ) );
 	}
 
+	memcpy( pBytes, &nStackDepth, sizeof( nStackDepth ) );
 }
 
 
@@ -1012,35 +1115,65 @@ void CDbgMemAlloc::GetActualDbgInfo( const char *&pFileName, int &nLine )
 	return;
 #endif
 
-	if ( g_DbgInfoStack == nullptr )
-	{
-		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
-	}
+	// The outermost credit (bottom of the stack) wins, as before.
+	const DbgInfoStack_t &bottom{g_DbgInfoStack[0]};
 
-	const DbgInfoStack_t &top{g_DbgInfoStack[0]};
-
-	if (g_nDbgInfoStackDepth >= 0 && top.m_pFileName)
+	if (g_nDbgInfoStackDepth >= 0 && bottom.m_pFileName)
 	{
-		pFileName = top.m_pFileName;
-		nLine = top.m_nLine;
+		pFileName = bottom.m_pFileName;
+		nLine = bottom.m_nLine;
 	}
 }
 
+
+//-----------------------------------------------------------------------------
+// dimhotepus: Per-thread cache in front of the interned name set. Allocation sites pass
+// the same few pointers (__FILE__, class names) over and over, so most lookups end here
+// without taking the heap lock. Entries are verified by content, which keeps reused
+// buffers (module name on the stack, stack-walk text) correct. Interned strings are never
+// freed, so cached pointers cannot dangle.
+//-----------------------------------------------------------------------------
+struct FilenameCacheEntry_t
+{
+	const char *m_pRaw;
+	const char *m_pInterned;
+};
+
+static constexpr inline int FILENAME_CACHE_SIZE = 64;	// power of two
+static thread_local FilenameCacheEntry_t g_FilenameCache[FILENAME_CACHE_SIZE];
+
+static inline FilenameCacheEntry_t &FilenameCacheSlot( const char *p )
+{
+	auto v = reinterpret_cast<std::uintptr_t>( p );
+	v ^= v >> 7;
+	v ^= v >> 17;
+	return g_FilenameCache[v & ( FILENAME_CACHE_SIZE - 1 )];
+}
 
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
 const char *CDbgMemAlloc::FindOrCreateFilename( const char *pFileName )
 {
-	Initialize();
-
 	if ( !pFileName )
 	{
 		pFileName = g_pszUnknown;
 	}
 
+#if !defined( USE_STACK_WALK_DETAILED )
+	if ( const FilenameCacheEntry_t &cached = FilenameCacheSlot( pFileName );
+		cached.m_pRaw == pFileName &&
+		( pFileName == cached.m_pInterned || strcmp( pFileName, cached.m_pInterned ) == 0 ) )
+	{
+		return cached.m_pInterned;
+	}
+#endif
+
 	// If we created it for the first time, actually *allocate* the filename memory
+	// dimhotepus: Lock BEFORE Initialize(): two threads could both create the maps.
 	HEAP_LOCK();
+	Initialize();
+
 	// This is necessary for shutdown conditions: the file name is stored
 	// in some piece of memory in a DLL; if that DLL becomes unloaded,
 	// we'll have a pointer to crap memory
@@ -1058,13 +1191,36 @@ const char *CDbgMemAlloc::FindOrCreateFilename( const char *pFileName )
 }
 #endif // #if defined( USE_STACK_WALK_DETAILED )
 
-	// dimhotepus: Insert if not found.
-	return *m_pFilenames->emplace(pFileName).first;
+	const char *pInterned;
+	if ( const auto it = m_pFilenames->find( pFileName ); it != m_pFilenames->end() )
+	{
+		pInterned = *it;
+	}
+	else
+	{
+		// dimhotepus: Really copy the name now (see Filenames_t).
+		const size_t nSize = strlen( pFileName ) + 1;
+		auto *pCopy = static_cast<char *>( DebugAlloc( nSize ) );
+		if ( !pCopy )
+			return pFileName;	// Out of memory: degrade to the caller's pointer, don't cache.
+
+		memcpy( pCopy, pFileName, nSize );
+		pInterned = *m_pFilenames->insert( pCopy ).first;
+	}
+
+#if !defined( USE_STACK_WALK_DETAILED )
+	FilenameCacheSlot( pFileName ) = { pFileName, pInterned };
+	// Interned pointers come back on every free/realloc; make them an identity hit.
+	FilenameCacheSlot( pInterned ) = { pInterned, pInterned };
+#endif
+
+	return pInterned;
 }
 
 //-----------------------------------------------------------------------------
 // Finds the file in our map
 //-----------------------------------------------------------------------------
+// Must be called with the heap lock held.
 CDbgMemAlloc::MemInfo_t &CDbgMemAlloc::FindOrCreateEntry( const char *pFileName, int line )
 {
 	Initialize();
@@ -1208,12 +1364,16 @@ int CDbgMemAlloc::GetAllocatonLineNumber( void *pMem )
 
 //-----------------------------------------------------------------------------
 // Debug versions of the main allocation methods
+//
+// dimhotepus: The global heap lock now only guards the shared bookkeeping (name set,
+// stat map, totals). The CRT call, the block header and the fill pattern touch memory
+// the calling thread owns exclusively, so threads no longer serialize on malloc/free.
+// Each call times itself with a local CFastTimer (the shared member was a data race
+// once the lock no longer covered it).
 //-----------------------------------------------------------------------------
 void *CDbgMemAlloc::Alloc( size_t nSize, const char *pFileName, int nLine )
 {
-	HEAP_LOCK();
-
-	if ( !m_bInitialized )
+	if ( !m_bInitialized.load( std::memory_order_acquire ) )
 		return InternalMalloc( nSize, pFileName, nLine );
 
 	if ( pFileName != g_pszUnknown )
@@ -1228,7 +1388,8 @@ void *CDbgMemAlloc::Alloc( size_t nSize, const char *pFileName, int nLine )
 	}
 	*/
 
-	m_Timer.Start();
+	CFastTimer timer;
+	timer.Start();
 	void *pMem = InternalMalloc( nSize, pFileName, nLine );
 	if ( !pMem )
 	{
@@ -1237,56 +1398,77 @@ void *CDbgMemAlloc::Alloc( size_t nSize, const char *pFileName, int nLine )
 		
 		pMem = InternalMalloc( nSize, pFileName, nLine );
 	}
-	m_Timer.End();
+	timer.End();
 
-	if ( pMem )
-	{
-		ApplyMemoryInitializations( pMem, nSize );
-		RegisterAllocation( pFileName, nLine, nSize, InternalMSize( pMem ), m_Timer.GetDuration().GetMicroseconds() );
-	}
-	else
+	if ( !pMem )
 	{
 		SetCRTAllocFailed( nSize );
+		return nullptr;
 	}
+
+	ApplyMemoryInitializations( pMem, nSize );
+	RegisterAllocation( pFileName, nLine, nSize, InternalMSize( pMem ), timer.GetDuration().GetMicroseconds() );
 	return pMem;
 }
 
 void *CDbgMemAlloc::Realloc( void *pMem, size_t nSize, const char *pFileName, int nLine )
 {
-	HEAP_LOCK();
-
 	pFileName = FindOrCreateFilename( pFileName );
 
-	if ( !m_bInitialized )
+	if ( !m_bInitialized.load( std::memory_order_acquire ) )
 		return InternalRealloc( pMem, nSize, pFileName, nLine );
 
+	// Capture the old block's bookkeeping while it is still valid.
+	const char *pOldFileName = nullptr;
+	int nOldLine = 0;
+	size_t nOldLogicalSize = 0;
+	size_t nOldSize = 0;
 	if ( pMem != nullptr )
 	{
-		RegisterDeallocation( GetAllocatonFileName( pMem ), GetAllocatonLineNumber( pMem ), InternalLogicalSize( pMem ), InternalMSize( pMem ), 0 );
+		pOldFileName = GetAllocatonFileName( pMem );
+		nOldLine = GetAllocatonLineNumber( pMem );
+		nOldLogicalSize = InternalLogicalSize( pMem );
+		nOldSize = InternalMSize( pMem );
 	}
 
 	GetActualDbgInfo( pFileName, nLine );
 
-	m_Timer.Start();
-	pMem = InternalRealloc( pMem, nSize, pFileName, nLine );
-	if ( !pMem )
+	CFastTimer timer;
+	timer.Start();
+	void *pNewMem = InternalRealloc( pMem, nSize, pFileName, nLine );
+	if ( !pNewMem )
 	{
 		// dimhotepus: Try to free some space and allocate again.
 		CompactHeap();
 
-		pMem = InternalRealloc( pMem, nSize, pFileName, nLine );
+		// dimhotepus: Retry with the ORIGINAL block. This used to pass the nullptr from
+		// the failed call, i.e. malloc a fresh block, leak the old one, lose its contents
+		// and report success.
+		pNewMem = InternalRealloc( pMem, nSize, pFileName, nLine );
 	}
-	m_Timer.End();
+	timer.End();
 
-	if ( pMem )
+	if ( !pNewMem )
 	{
-		RegisterAllocation( pFileName, nLine, nSize, InternalMSize( pMem ), m_Timer.GetDuration().GetMicroseconds() );
-	}
-	else
-	{
+		// The original block is still valid and still registered.
 		SetCRTAllocFailed( nSize );
+		return nullptr;
 	}
-	return pMem;
+
+	// dimhotepus: Deregister only after success, otherwise a failed realloc unbalanced the stats.
+	if ( pMem != nullptr )
+	{
+		RegisterDeallocation( pOldFileName, nOldLine, nOldLogicalSize, nOldSize, 0 );
+	}
+
+	// dimhotepus: Initialize the grown tail like a fresh allocation (was left as-is).
+	if ( nSize > nOldLogicalSize )
+	{
+		ApplyMemoryInitializations( static_cast<unsigned char *>( pNewMem ) + nOldLogicalSize, nSize - nOldLogicalSize );
+	}
+
+	RegisterAllocation( pFileName, nLine, nSize, InternalMSize( pNewMem ), timer.GetDuration().GetMicroseconds() );
+	return pNewMem;
 }
 
 void  CDbgMemAlloc::Free( void *pMem, const char * /*pFileName*/, int )
@@ -1294,9 +1476,7 @@ void  CDbgMemAlloc::Free( void *pMem, const char * /*pFileName*/, int )
 	if ( !pMem )
 		return;
 
-	HEAP_LOCK();
-
-	if ( !m_bInitialized )
+	if ( !m_bInitialized.load( std::memory_order_acquire ) )
 	{
 		InternalFree( pMem );
 		return;
@@ -1307,11 +1487,12 @@ void  CDbgMemAlloc::Free( void *pMem, const char * /*pFileName*/, int )
 	const char *pOldFileName = GetAllocatonFileName( pMem );
 	int oldLine = GetAllocatonLineNumber( pMem );
 
-	m_Timer.Start();
+	CFastTimer timer;
+	timer.Start();
 	InternalFree( pMem );
- 	m_Timer.End();
+	timer.End();
 
-	RegisterDeallocation( pOldFileName, oldLine, nOldLogicalSize, nOldSize, m_Timer.GetDuration().GetMicroseconds() );
+	RegisterDeallocation( pOldFileName, oldLine, nOldLogicalSize, nOldSize, timer.GetDuration().GetMicroseconds() );
 }
 
 void *CDbgMemAlloc::Expand_NoLongerSupported( void *, size_t, const char *, int )
@@ -1325,11 +1506,13 @@ void *CDbgMemAlloc::Expand_NoLongerSupported( void *, size_t, const char *, int 
 //-----------------------------------------------------------------------------
 size_t CDbgMemAlloc::GetSize( void *pMem )
 {
-	HEAP_LOCK();
-
 	if ( !pMem )
+	{
+		HEAP_LOCK();
 		return CalcHeapUsed();
+	}
 
+	// The block belongs to the caller; reading its header needs no lock.
 	return InternalMSize( pMem );
 }
 
@@ -1337,7 +1520,7 @@ size_t CDbgMemAlloc::GetSize( void *pMem )
 //-----------------------------------------------------------------------------
 // FIXME: Remove when we make our own heap! Crt stuff we're currently using
 //-----------------------------------------------------------------------------
-long CDbgMemAlloc::CrtSetBreakAlloc( long lNewBreakAlloc )
+long CDbgMemAlloc::CrtSetBreakAlloc( [[maybe_unused]] long lNewBreakAlloc )
 {
 #ifdef POSIX
 	return 0;
@@ -1346,7 +1529,7 @@ long CDbgMemAlloc::CrtSetBreakAlloc( long lNewBreakAlloc )
 #endif
 }
 
-int CDbgMemAlloc::CrtSetReportMode( int nReportType, int nReportMode )
+int CDbgMemAlloc::CrtSetReportMode( [[maybe_unused]] int nReportType, [[maybe_unused]] int nReportMode )
 {
 #ifdef POSIX
 	return 0;
@@ -1355,7 +1538,7 @@ int CDbgMemAlloc::CrtSetReportMode( int nReportType, int nReportMode )
 #endif
 }
 
-int CDbgMemAlloc::CrtIsValidHeapPointer( const void *pMem )
+int CDbgMemAlloc::CrtIsValidHeapPointer( [[maybe_unused]] const void *pMem )
 {
 #ifdef POSIX
 	return 0;
@@ -1364,7 +1547,7 @@ int CDbgMemAlloc::CrtIsValidHeapPointer( const void *pMem )
 #endif
 }
 
-int CDbgMemAlloc::CrtIsValidPointer( const void *pMem, unsigned int size, int access )
+int CDbgMemAlloc::CrtIsValidPointer( [[maybe_unused]] const void *pMem, [[maybe_unused]] unsigned int size, [[maybe_unused]] int access )
 {
 #ifdef POSIX
 	return 0;
@@ -1389,7 +1572,7 @@ int CDbgMemAlloc::CrtCheckMemory( )
 #endif
 }
 
-int CDbgMemAlloc::CrtSetDbgFlag( int nNewFlag )
+int CDbgMemAlloc::CrtSetDbgFlag( [[maybe_unused]] int nNewFlag )
 {
 #ifdef POSIX
 	return 0;
@@ -1398,7 +1581,7 @@ int CDbgMemAlloc::CrtSetDbgFlag( int nNewFlag )
 #endif
 }
 
-void CDbgMemAlloc::CrtMemCheckpoint( _CrtMemState *pState )
+void CDbgMemAlloc::CrtMemCheckpoint( [[maybe_unused]] _CrtMemState *pState )
 {
 #ifndef POSIX
 	_CrtMemCheckpoint( pState );
@@ -1406,7 +1589,7 @@ void CDbgMemAlloc::CrtMemCheckpoint( _CrtMemState *pState )
 }
 
 // FIXME: Remove when we have our own allocator
-void* CDbgMemAlloc::CrtSetReportFile( int nRptType, void* hFile )
+void* CDbgMemAlloc::CrtSetReportFile( [[maybe_unused]] int nRptType, [[maybe_unused]] void* hFile )
 {
 #ifdef POSIX
 	return 0;
@@ -1415,7 +1598,7 @@ void* CDbgMemAlloc::CrtSetReportFile( int nRptType, void* hFile )
 #endif
 }
 
-void* CDbgMemAlloc::CrtSetReportHook( void* pfnNewHook )
+void* CDbgMemAlloc::CrtSetReportHook( [[maybe_unused]] void* pfnNewHook )
 {
 #ifdef POSIX
 	return 0;
@@ -1424,8 +1607,8 @@ void* CDbgMemAlloc::CrtSetReportHook( void* pfnNewHook )
 #endif
 }
 
-int CDbgMemAlloc::CrtDbgReport( int nRptType, const char * szFile,
-		int nLine, const char * szModule, const char * pMsg )
+int CDbgMemAlloc::CrtDbgReport( [[maybe_unused]] int nRptType, [[maybe_unused]] const char * szFile,
+		[[maybe_unused]] int nLine, [[maybe_unused]] const char * szModule, [[maybe_unused]] const char * pMsg )
 {
 #ifdef POSIX
 	return 0;
@@ -1445,11 +1628,18 @@ int CDbgMemAlloc::heapchk()
 
 void CDbgMemAlloc::DumpBlockStats( void *p )
 {
+	if ( !p )
+		return;
+
+#ifndef POSIX
+	// dimhotepus: POSIX has no validator (CrtIsValidHeapPointer() returns 0 there), which
+	// made this report every pointer as invalid.
 	if ( auto *pBlock = static_cast<DbgMemHeader_t *>( p ) - 1; !CrtIsValidHeapPointer( pBlock ) )
 	{
 		Msg( "0x%p is not valid heap pointer\n", p );
 		return;
 	}
+#endif
 
 	const char *pFileName = GetAllocatonFileName( p );
 	int line = GetAllocatonLineNumber( p );
@@ -1462,7 +1652,8 @@ void CDbgMemAlloc::DumpBlockStats( void *p )
 //-----------------------------------------------------------------------------
 void CDbgMemAlloc::DumpMemInfo( const char *pAllocationName, int line, const MemInfo_t &info ) const
 {
-	m_OutputFunc("%s, line %i\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%d\t%d\t%d\t%d",
+	// dimhotepus: Counts are size_t: %zu, not %d (UB, wrong on LP64).
+	m_OutputFunc("%s, line %i\t%.1f\t%.1f\t%.1f\t%.1f\t%.1f\t%d\t%zu\t%zu\t%zu",
 		pAllocationName,
 		line,
 		info.m_nCurrentSize / 1024.0,
@@ -1478,7 +1669,7 @@ void CDbgMemAlloc::DumpMemInfo( const char *pAllocationName, int line, const Mem
 
 	for (const auto &b : info.m_pCount)
 	{
-		m_OutputFunc( "\t%d", b );
+		m_OutputFunc( "\t%zu", b );
 	}
 
 	m_OutputFunc("\n");
@@ -1494,7 +1685,9 @@ void CDbgMemAlloc::DumpFileStats() const
 		return;
 
 	// dimhotepus: Need to preserve sorted order as it was before.
-	std::vector<std::pair<MemInfoKey_t, MemInfo_t>> elems( m_pStatMap->begin(), m_pStatMap->end() );
+	// Snapshot through CNoRecurseAllocator like the maps themselves, so building it can
+	// never re-enter the allocator (and the stat map) while it is being iterated.
+	std::vector<std::pair<MemInfoKey_t, MemInfo_t>, CNoRecurseAllocator<std::pair<MemInfoKey_t, MemInfo_t>>> elems( m_pStatMap->begin(), m_pStatMap->end() );
 	std::sort( elems.begin(), elems.end(), MemInfoKeySorter{} );
 
 	for ( const auto &e : elems )
@@ -1511,12 +1704,13 @@ void CDbgMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 	static unsigned s_FileCount = 0;
 	if (m_OutputFunc == DefaultHeapReportFunc)
 	{
-		_snprintf( szFileName, std::size( szFileName ), "%s%u.txt", pchFileBase, s_FileCount );
-		szFileName[ std::size(szFileName) - 1 ] = '\0';
+		// dimhotepus: Standard snprintf (always terminates) instead of MSVC _snprintf,
+		// and "w" instead of the MSVC-only "wt" (text mode is the default).
+		snprintf( szFileName, std::size( szFileName ), "%s%u.txt", pchFileBase, s_FileCount );
 
 		++s_FileCount;
 
-		s_DbgFile = fopen(szFileName, "wt");
+		s_DbgFile = fopen(szFileName, "w");
 		if (!s_DbgFile)
 			return;
 	}
@@ -1537,6 +1731,7 @@ void CDbgMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 	if (m_OutputFunc == DefaultHeapReportFunc)
 	{
 		fclose(s_DbgFile);
+		s_DbgFile = nullptr;
 	}
 }
 
@@ -1560,19 +1755,29 @@ void CDbgMemAlloc::DumpStats()
 
 void CDbgMemAlloc::SetCRTAllocFailed( size_t nSize )
 {
-	m_sMemoryAllocFailed = nSize;
+	m_sMemoryAllocFailed.store( nSize, std::memory_order_relaxed );
 
 	MemAllocOOMError( nSize );
 }
 
 size_t CDbgMemAlloc::MemoryAllocFailed()
 {
-	return m_sMemoryAllocFailed;
+	return m_sMemoryAllocFailed.load( std::memory_order_relaxed );
 }
 
 
 
-#if defined( LINUX ) && !defined( NO_HOOK_MALLOC )
+// dimhotepus: glibc removed __malloc_initialize_hook in 2.24 and every __*_hook variable
+// in 2.34, so this block no longer compiled on any current distribution (and the
+// hooks are not thread-safe by design). It is kept only for glibc < 2.24. On newer glibc
+// memory is tracked through g_pMemAlloc (memoverride.cpp) as on the other platforms.
+#if defined( LINUX ) && !defined( NO_HOOK_MALLOC ) && defined( __GLIBC__ )
+#if !__GLIBC_PREREQ( 2, 24 )
+#define MEMDBG_USE_LEGACY_GLIBC_HOOKS 1
+#endif
+#endif
+
+#if defined( MEMDBG_USE_LEGACY_GLIBC_HOOKS )
 //
 // Under linux we can ask GLIBC to override malloc for us
 //   Base on code from Ryan, https://github.com/icculus/mallocmonitor/blob/fc7c207fb18f61977ba4e46a995f1b9f349246b1/monitor_client/malloc_hook_glibc.c
@@ -1629,7 +1834,11 @@ static void *override_memalign_hook(size_t a, size_t s, const void *caller)
     AUTO_LOCK( g_HookMutex );
 
     set_glibc_hooks();  /* put glibc back in control. */
-    retval = memalign(a, s);  /* call glibc version. */
+    // dimhotepus: The free hook strips a DbgMemHeader_t from every block, so blocks from
+    // here must carry one too (a raw memalign() block was freed at ptr - header:
+    // heap corruption). InternalMalloc() blocks are aligned to 16; larger alignments
+    // cannot get a prefix header and still be freed at its start: refuse them.
+    retval = a <= alignof( DbgMemHeader_t ) ? InternalMalloc( s, NULL, 0 ) : NULL;
     save_glibc_hooks();  /* update in case glibc changed them. */
 
     set_override_hooks(); /* only restore hooks if daemon is listening */
@@ -1727,66 +1936,41 @@ static void __attribute__((constructor)) override_init_hook(void)
  */
 void (*__MALLOC_HOOK_VOLATILE __malloc_initialize_hook)(void) __attribute__((visibility("default")))= override_init_hook;
 
-#endif // LINUX
+#endif // MEMDBG_USE_LEGACY_GLIBC_HOOKS
 
 
 #if defined( OSX ) && !defined( NO_HOOK_MALLOC )
 //
-// pointers to the osx versions of these functions
-static void *osx_malloc_hook = NULL;
-static void *osx_realloc_hook = NULL;
-static void *osx_free_hook = NULL;
-
-// convenience functions for setting the hooks... 
-static inline void save_osx_hooks(void);
-static inline void set_osx_hooks(void);
-static inline void set_override_hooks(void);
-
-CThreadMutex g_HookMutex;
-//
-// Our overriding hooks...they call through to the original C runtime
-//  implementations and report to the monitoring daemon.
+// dimhotepus: The hooks are installed ONCE and call the saved original zone functions
+// (see OsxRawMalloc & co.) instead of swapping the zone's function pointers back and
+// forth around every call. The old scheme was unsynchronized (no lock in the hooks):
+// while one thread had the originals swapped in, other threads' allocations bypassed
+// tracking, and a free of a block without the magic marker was silently dropped (leak).
+// It also made two vm_protect() syscalls per malloc/realloc/free.
 //
 
-static void *override_malloc_hook(struct _malloc_zone_t *zone, size_t s)
+static void *override_malloc_hook( [[maybe_unused]] struct _malloc_zone_t *zone, size_t s )
 {
-    void *retval;
-    set_osx_hooks(); 
-    retval = InternalMalloc( s, NULL, 0 );
-    set_override_hooks(); 
-	
-    return(retval);
-} 
+	return InternalMalloc( s, nullptr, 0 );
+}
 
-
-static void *override_realloc_hook(struct _malloc_zone_t *zone, void *ptr, size_t s)
+static void *override_realloc_hook( [[maybe_unused]] struct _malloc_zone_t *zone, void *ptr, size_t s )
 {
-    void *retval;
-	
-    set_osx_hooks();  
-    retval = InternalRealloc(ptr, s, NULL, 0);	
-    set_override_hooks(); 
-	
-    return(retval);
-} 
+	// Works for blocks without our trailing header too (calloc, pre-hook allocations):
+	// the header is (re)written at the end of the resized block.
+	return InternalRealloc( ptr, s, nullptr, 0 );
+}
 
-
-static void override_free_hook(struct _malloc_zone_t *zone, void *ptr)
+static void override_free_hook( struct _malloc_zone_t *zone, void *ptr )
 {
 	// sometime they pass in a null pointer from higher level calls, just ignore it
 	if ( !ptr )
 		return;
-	
-    set_osx_hooks(); 
-	
-	DbgMemHeader_t *pInternalMem = GetCrtDbgMemHeader( ptr );
-	if ( *((int*)pInternalMem->m_Reserved) == 0xf00df00d )
-	{
-		InternalFree( ptr );
-	}
-    
-    set_override_hooks(); 
-} 
+
+	// Our header is at the END of the block, so every block - ours or not - is freed
+	// at its own address by the original implementation.
+	g_OsxOriginalZone.pfnFree( zone, ptr );
+}
 
 static inline void unprotect_malloc_zone( malloc_zone_t *malloc_zone )
 {
@@ -1807,105 +1991,41 @@ static inline void protect_malloc_zone( malloc_zone_t *malloc_zone )
 }
 
 //
-//  Save a copy of the original allocation hooks, so we can call into them
-//   from our overriding functions. It's possible that osx might change
-//   these hooks under various conditions (so the manual's examples seem
-//   to suggest), so we update them whenever we finish calling into the
-//   the originals.
+// The Hook Of All Hooks...how we get in there in the first place.
 //
-static inline void save_osx_hooks(void)
-{
-	malloc_zone_t *malloc_zone = malloc_default_zone();
-
-	osx_malloc_hook = (void *)malloc_zone->malloc;
-	osx_realloc_hook = (void *)malloc_zone->realloc;
-	osx_free_hook = (void *)malloc_zone->free;
-
-	// These are func's we could optionally override right now on OSX but don't need to
-	// osx_size_hook = (void *)malloc_zone->size;
-	// osx_calloc_hook = (void *)malloc_zone->calloc;
-	// osx_valloc_hook = (void *)malloc_zone->valloc;
-	// osx_destroy_hook = (void *)malloc_zone->destroy;
-}
-
+// Runs during static initialization, before other threads exist.
 //
-//  Restore the hooks to the osx versions. This is needed since, say,
-//   their realloc() might call malloc() or free() under the hood, etc, so
-//   it's safer to let them have complete control over the subsystem, which
-//   also makes our logging saner, too.
-//
-static inline void set_osx_hooks(void)
-{
-	malloc_zone_t *malloc_zone = malloc_default_zone();
-
-	unprotect_malloc_zone( malloc_zone );
-	malloc_zone->malloc = (void* (*)(_malloc_zone_t*, size_t))osx_malloc_hook;
-	malloc_zone->realloc = (void* (*)(_malloc_zone_t*, void*, size_t))osx_realloc_hook;
-	malloc_zone->free = (void (*)(_malloc_zone_t*, void*))osx_free_hook;
-	protect_malloc_zone( malloc_zone );
-
-	// These are func's we could optionally override right now on OSX but don't need to
-
-	//malloc_zone->size = (size_t (*)(_malloc_zone_t*, const void *))osx_size_hook;
-	//malloc_zone->calloc = (void* (*)(_malloc_zone_t*, size_t, size_t))osx_calloc_hook;
-	//malloc_zone->valloc = (void* (*)(_malloc_zone_t*, size_t))osx_valloc_hook;
-	//malloc_zone->destroy = (void (*)(_malloc_zone_t*))osx_destroy_hook;
-}
-
-
-/*
- * Put our hooks back in place. This should be done after the original
- *  osx version has been called and we've finished any logging (which
- *  may call osx functions, too). This sets us up for the next calls from
- *  the application.
- */
-static inline void set_override_hooks(void)
+void __attribute__ ((constructor)) mem_init(void)
 {
 	malloc_zone_t *malloc_zone = malloc_default_zone();
 	AssertMsg( malloc_zone, "No malloc zone returned by malloc_default_zone" );
+	if ( !malloc_zone || g_OsxOriginalZone.pfnMalloc )
+		return;
+
+	// Save the originals first: from the moment the hooks are visible they call them.
+	g_OsxOriginalZone.pfnMalloc = malloc_zone->malloc;
+	g_OsxOriginalZone.pfnRealloc = malloc_zone->realloc;
+	g_OsxOriginalZone.pfnFree = malloc_zone->free;
+
+	// These are func's we could optionally override right now on OSX but don't need to:
+	// size, calloc, valloc, destroy.
 
 	unprotect_malloc_zone( malloc_zone );
 	malloc_zone->malloc = override_malloc_hook;
 	malloc_zone->realloc = override_realloc_hook;
 	malloc_zone->free = override_free_hook;
 	protect_malloc_zone( malloc_zone );
-
-	// These are func's we could optionally override right now on OSX but don't need to
-	//malloc_zone->size = override_size_hook;
-	//malloc_zone->calloc = override_calloc_hook;
-	// malloc_zone->valloc = override_valloc_hook;
-	//malloc_zone->destroy = override_destroy_hook;
 }
 
-
-//
-// The Hook Of All Hooks...how we get in there in the first place.
-//
-// osx will call this when the malloc subsystem is initializing, giving
-// us a chance to install hooks that override the functions.
-//
-
-void __attribute__ ((constructor)) mem_init(void)
+void *operator new( size_t nSize, [[maybe_unused]] int nBlockUse, const char *pFileName, int nLine )
 {
-    AUTO_LOCK( g_HookMutex );
-	save_osx_hooks();
-    set_override_hooks();
+	// No hook juggling needed any more: the allocator calls the original zone directly.
+	return g_pMemAlloc->Alloc( nSize, pFileName, nLine );
 }
 
-void *operator new( size_t nSize, int nBlockUse, const char *pFileName, int nLine )
+void *operator new[] ( size_t nSize, [[maybe_unused]] int nBlockUse, const char *pFileName, int nLine )
 {
-	set_osx_hooks(); 
-	void *pMem = g_pMemAlloc->Alloc(nSize, pFileName, nLine);
-	set_override_hooks(); 
-	return pMem;
-}
-
-void *operator new[] ( size_t nSize, int nBlockUse, const char *pFileName, int nLine )
-{
-	set_osx_hooks(); 
-	void *pMem = g_pMemAlloc->Alloc(nSize, pFileName, nLine);
-	set_override_hooks(); 
-	return pMem;
+	return g_pMemAlloc->Alloc( nSize, pFileName, nLine );
 }
 
 
