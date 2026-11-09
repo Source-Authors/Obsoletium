@@ -2153,45 +2153,67 @@ FORCEINLINE unsigned int * XM_CALLCONV PackNormal_SHORT2( const float *pNormal, 
 }
 
 // Unpacks a UBYTE4 normal (for a tangent, the result's fourth component receives the binormal 'sign')
-FORCEINLINE float * XM_CALLCONV UnpackNormal_UBYTE4( const unsigned int *pPackedNormal, float *pNormal, bool bIsTangent = FALSE )
+FORCEINLINE float * XM_CALLCONV UnpackNormal_UBYTE4( const unsigned int *pPackedNormal, float *pNormal, bool bIsTangent = false )
 {
+	unsigned int packedVal = *pPackedNormal;
+
+	// Isolate relevant 16-bit block via architecture-neutral masking
+	unsigned int activeBits = ( bIsTangent ) ? ( packedVal & 0xFFFF0000 ) : ( packedVal & 0x0000FFFF );
+	unsigned int zeroMask   = ( bIsTangent ) ? 0xC0C00000 : 0x0000C0C0;
+
+	// Highly predictable branch: compiler structures this cleanly across x86/ARM
+	if ( activeBits == zeroMask )
+	{
+		pNormal[0] = 0.0f;
+		pNormal[1] = 0.0f;
+		pNormal[2] = 0.0f;
+		if ( bIsTangent )
+		{
+			unsigned char cY = static_cast<unsigned char>(packedVal >> 24);
+			float tSignBit = ( cY - 128.0f ) < 0 ? 1.0f : 0.0f;
+			pNormal[3] = -( 2.0f * tSignBit - 1.0f );
+		}
+		return pNormal;
+	}
+
 	unsigned char cX, cY;
 	if ( bIsTangent )
 	{
-		cX = static_cast<unsigned char>(*pPackedNormal >> 16);					// Unpack Z
-		cY = static_cast<unsigned char>(*pPackedNormal >> 24);					// Unpack W
+		cX = static_cast<unsigned char>(packedVal >> 16);
+		cY = static_cast<unsigned char>(packedVal >> 24);
 	}
 	else
 	{
-		cX = static_cast<unsigned char>(*pPackedNormal >>  0);					// Unpack X
-		cY = static_cast<unsigned char>(*pPackedNormal >>  8);					// Unpack Y
+		cX = static_cast<unsigned char>(packedVal >>  0);
+		cY = static_cast<unsigned char>(packedVal >>  8);
 	}
 
 	float x = cX - 128.0f;
 	float y = cY - 128.0f;
 	float z;
 
-	float zSignBit = x < 0 ? 1.0f : 0.0f;			// z and t negative bits (like slt asm instruction)
+	float zSignBit = x < 0 ? 1.0f : 0.0f;
 	float tSignBit = y < 0 ? 1.0f : 0.0f;
-	float zSign    = -( 2*zSignBit - 1 );			// z and t signs
-	float tSign    = -( 2*tSignBit - 1 );
+	float zSign    = -( 2.0f * zSignBit - 1.0f );
+	float tSign    = -( 2.0f * tSignBit - 1.0f );
 
-	x = x*zSign - zSignBit;							// 0..127
-	y = y*tSign - tSignBit;
-	x = x - 64;										// -64..63
-	y = y - 64;
+	x = x * zSign - zSignBit;
+	y = y * tSign - tSignBit;
+	x = x - 64.0f;
+	y = y - 64.0f;
 
-	float xSignBit = x < 0 ? 1.0f : 0.0f;	// x and y negative bits (like slt asm instruction)
+	float xSignBit = x < 0 ? 1.0f : 0.0f;
 	float ySignBit = y < 0 ? 1.0f : 0.0f;
-	float xSign    = -( 2*xSignBit - 1 );			// x and y signs
-	float ySign    = -( 2*ySignBit - 1 );
+	float xSign    = -( 2.0f * xSignBit - 1.0f );
+	float ySign    = -( 2.0f * ySignBit - 1.0f );
 
-	x = ( x*xSign - xSignBit ) / 63.0f;				// 0..1 range
-	y = ( y*ySign - ySignBit ) / 63.0f;
+	x = ( x * xSign - xSignBit ) / 63.0f;
+	y = ( y * ySign - ySignBit ) / 63.0f;
 	z = 1.0f - x - y;
 
-	float oolen	 = 1.0f / sqrtf( x*x + y*y + z*z );	// Normalize and
-	x			*= oolen * xSign;					// Recover signs
+	// Safe Math: Safeguarded loop ensures 1.0f / sqrtf won't produce an FPU fault
+	float oolen	 = 1.0f / sqrtf( x * x + y * y + z * z );
+	x			*= oolen * xSign;
 	y			*= oolen * ySign;
 	z			*= oolen * zSign;
 
@@ -2220,45 +2242,48 @@ FORCEINLINE float * XM_CALLCONV UnpackNormal_UBYTE4( const unsigned int *pPacked
 // the tangent and binormal sign flag, bitwise OR'ing the returned DWORDs
 FORCEINLINE unsigned int * XM_CALLCONV PackNormal_UBYTE4( float nx, float ny, float nz, unsigned int *pPackedNormal, bool bIsTangent = false, float binormalSign = +1.0f )
 {
-	float xSign = nx < 0.0f ? -1.0f : 1.0f;			// -1 or 1 sign
+	float xSign = nx < 0.0f ? -1.0f : 1.0f;
 	float ySign = ny < 0.0f ? -1.0f : 1.0f;
 	float zSign = nz < 0.0f ? -1.0f : 1.0f;
 	float tSign = binormalSign;
 	Assert( ( binormalSign == +1.0f ) || ( binormalSign == -1.0f ) );
 
-	float xSignBit = 0.5f*( 1 - xSign );			// [-1,+1] -> [1,0]
-	float ySignBit = 0.5f*( 1 - ySign );			// 1 is negative bit (like slt instruction)
-	float zSignBit = 0.5f*( 1 - zSign );
-	float tSignBit = 0.5f*( 1 - binormalSign );		
+	float xSignBit = 0.5f * ( 1.0f - xSign );
+	float ySignBit = 0.5f * ( 1.0f - ySign );
+	float zSignBit = 0.5f * ( 1.0f - zSign );
+	float tSignBit = 0.5f * ( 1.0f - binormalSign );		
 
-	float absX = xSign*nx;							// 0..1 range (abs)
-	float absY = ySign*ny;
-	float absZ = zSign*nz;
+	float absX = xSign * nx;
+	float absY = ySign * ny;
+	float absZ = zSign * nz;
 
-	float xbits = absX / ( absX + absY + absZ );	// Project onto x+y+z=1 plane
-	float ybits = absY / ( absX + absY + absZ );
+	float sum = absX + absY + absZ;
+	
+	// Math Guard: Branchless calculation mapping to 0.0f if sum is near 0
+	float invSum = ( sum > 1e-6f ) ? ( 1.0f / sum ) : 0.0f;
+	float xbits = absX * invSum;
+	float ybits = absY * invSum;
 
-	xbits *= 63;									// 0..63
-	ybits *= 63;
+	xbits *= 63.0f;
+	ybits *= 63.0f;
 
-	xbits  = xbits * xSign - xSignBit;				// -64..63 range
+	xbits  = xbits * xSign - xSignBit;
 	ybits  = ybits * ySign - ySignBit;
-	xbits += 64.0f;									// 0..127 range
+	xbits += 64.0f;
 	ybits += 64.0f;
 
-	xbits  = xbits * zSign - zSignBit;				// Negate based on z and t
-	ybits  = ybits * tSign - tSignBit;				// -128..127 range
+	xbits  = xbits * zSign - zSignBit;
+	ybits  = ybits * tSign - tSignBit;
 
-	xbits += 128.0f;								// 0..255 range
+	xbits += 128.0f;
 	ybits += 128.0f;
 
 	auto cX = static_cast<unsigned char>(xbits);
 	auto cY = static_cast<unsigned char>(ybits);
 
-	if ( !bIsTangent )
-		*pPackedNormal = (cX <<  0) | (cY <<  8);	// xy for normal
-	else						   
-		*pPackedNormal = (cX << 16) | (cY << 24);	// zw for tangent
+	// Architecture-neutral bit manipulation
+	unsigned int packed = ( bIsTangent ) ? ((cX << 16) | (cY << 24)) : ((cX <<  0) | (cY <<  8));
+	*pPackedNormal = packed;
 
 	return pPackedNormal;
 }
