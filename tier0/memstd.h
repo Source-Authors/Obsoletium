@@ -1,8 +1,12 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+//========= Copyright Valve Corporation, All rights reserved. =================
 //-----------------------------------------------------------------------------
 // NOTE! This should never be called directly from leaf code
 // Just use new,delete,malloc,free etc. They will call into this eventually
 //-----------------------------------------------------------------------------
+// dimhotepus: Include guard (the header had none).
+#ifndef SE_TIER0_MEMSTD_H_
+#define SE_TIER0_MEMSTD_H_
+
 #include "stdafx.h"
 
 #if defined(_WIN32)
@@ -10,6 +14,8 @@
 #endif
 
 #include <algorithm>
+#include <atomic>
+#include <cstdio>
 
 #include "tier0/dbg.h"
 #include "tier0/memalloc.h"
@@ -18,9 +24,11 @@
 
 #include "mem_helpers.h"
 
-// dimhotepus: Apply alignment only here.
-#pragma pack(push)
-#pragma pack(4)
+// dimhotepus: The old #pragma pack(4) around these classes is gone. With 4-byte packing
+// every 8-byte member that follows a 4-byte one lands on a 4-byte boundary on 64-bit
+// targets, e.g. CSmallBlockPool::m_pNextAlloc (an interlocked pointer) at offset 20.
+// Misaligned interlocked operations are split locks on x86-64 (very slow, and a fault
+// with split-lock detection enabled) and an alignment fault on ARM64.
 
 
 // #define NO_SBH	1
@@ -35,7 +43,10 @@ enum {
 };
 #define COMMIT_SIZE		(16*SBH_PAGE_SIZE)
 
-#ifdef _M_X64
+// dimhotepus: Keyed on pointer size, not _M_X64. Windows ARM64 used to get the 32-bit
+// layout (8-byte granularity pools), i.e. small blocks only 8-byte aligned although
+// MSVC's malloc and alignof(max_align_t) promise 16 on every 64-bit target.
+#if defined( PLATFORM_64BITS )
 #define NUM_POOLS		34
 #else
 #define NUM_POOLS		42
@@ -52,8 +63,10 @@ enum {
 // 	gated on other performance issues, and the SBH doesn't give us any win, so I've disabled it for now.
 // Once those perf issues are worked out, it might make sense to do perf tests with SBH, libc, and tcmalloc.
 //
+// dimhotepus: The SBH code itself is now portable (mmap on POSIX), so it can be enabled
+// elsewhere by defining MEM_SBH_ENABLED; the default is unchanged.
 //$ #if defined( _WIN32 ) || defined( _PS3 ) || defined( LINUX )
-#if defined( _WIN32 ) || defined( _PS3 )
+#if ( defined( _WIN32 ) || defined( _PS3 ) ) && !defined( MEM_SBH_ENABLED )
 #define MEM_SBH_ENABLED 1
 #endif
 
@@ -84,8 +97,11 @@ private:
 
 	unsigned		m_nBlockSize;
 
-	CInterlockedPtr<byte> m_pNextAlloc;
-	byte *			m_pCommitLimit;
+	// dimhotepus: Bump pointer and commit limit only change under m_CommitMutex (see
+	// CSmallBlockPool::Alloc / Compact); atomics so the statistics can read them
+	// without the lock and without a data race.
+	std::atomic<byte *>	m_pNextAlloc;
+	std::atomic<byte *>	m_pCommitLimit;
 	byte *			m_pAllocLimit;
 	byte *			m_pBase;
 
@@ -111,10 +127,12 @@ private:
 	CSmallBlockPool *FindPool( void *p );
 	const CSmallBlockPool *FindPool( void *p ) const;
 
-	CSmallBlockPool *m_PoolLookup[MAX_SBH_BLOCK >> 2];
+	CSmallBlockPool *m_PoolLookup[MAX_SBH_BLOCK >> 2]{};
 	CSmallBlockPool m_Pools[NUM_POOLS];
-	byte *m_pBase;
-	byte *m_pLimit;
+	// nullptr when the address space reservation failed: the SBH is then disabled
+	// instead of claiming ownership of the low addresses [0, NUM_POOLS * 4 MiB).
+	byte *m_pBase{nullptr};
+	byte *m_pLimit{nullptr};
 } ALIGN16_POST;
 
 
@@ -177,7 +195,7 @@ public:
 	void CompactHeap() override;
 
 	MemAllocFailHandler_t SetAllocFailHandler( MemAllocFailHandler_t pfnMemAllocFailHandler ) override;
-	size_t CallAllocFailHandler( size_t nBytes ) { return (*m_pfnFailHandler)( nBytes); }
+	size_t CallAllocFailHandler( size_t nBytes ) { return ( *m_pfnFailHandler.load( std::memory_order_acquire ) )( nBytes ); }
 
 	uint32 GetDebugInfoSize() override { return 0; }
 	void SaveDebugInfo( void * ) override { }
@@ -198,9 +216,10 @@ public:
 
 	void SetCRTAllocFailed( size_t nMemSize );
 
-	MemAllocFailHandler_t m_pfnFailHandler;
-	size_t				m_sMemoryAllocFailed;
+	// dimhotepus: Atomic: the handler can be swapped while other threads call it, and
+	// allocation failures are recorded from any thread.
+	std::atomic<MemAllocFailHandler_t> m_pfnFailHandler;
+	std::atomic<size_t>				m_sMemoryAllocFailed;
 } ALIGN16_POST;
 
-// dimhotepus: Apply alignment only here.
-#pragma pack(pop)
+#endif  // SE_TIER0_MEMSTD_H_
