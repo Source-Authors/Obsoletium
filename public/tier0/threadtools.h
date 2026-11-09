@@ -1023,7 +1023,9 @@ public:
 		tmSetLockStateEx( TELEMETRY_LEVEL0, pFilename, nLineNum, &m_lock, TMLS_LOCKED, pMutexName );
 	}
 
-	FORCEINLINE CAutoLockT<MUTEX_TYPE>( CAutoLockT<MUTEX_TYPE> && rhs )
+	// dimhotepus: Injected-class-name, not CAutoLockT<MUTEX_TYPE>: a template-id as a
+	// constructor name is ill-formed since C++20 (GCC 11+ rejects it).
+	FORCEINLINE CAutoLockT( CAutoLockT && rhs )
 	: m_lock( const_cast< typename V_remove_const< MUTEX_TYPE >::type &>( rhs.m_lock ) )
 	{
 		m_pMutexName = rhs.m_pMutexName;
@@ -1057,7 +1059,7 @@ private:
 #endif
 
 	// Disallow copying
-	CAutoLockT<MUTEX_TYPE>( const CAutoLockT<MUTEX_TYPE> & ) = delete;
+	CAutoLockT( const CAutoLockT & ) = delete;
 	CAutoLockT<MUTEX_TYPE> &operator=( const CAutoLockT<MUTEX_TYPE> & ) = delete;
 
 	// No move assignment because no default construction.
