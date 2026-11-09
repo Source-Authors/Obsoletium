@@ -778,6 +778,9 @@ void CSmallBlockPool::Free( void *p )
 }
 
 // Count the free blocks.  
+// dimhotepus: Statistics only. CTSListBase::Count() is a uint16 depth and wraps at 65536,
+// so this (and CountAllocatedBlocks) is approximate for huge free lists. Nothing that
+// affects allocation relies on it any more (Compact drains the list instead).
 int CSmallBlockPool::CountFreeBlocks() const
 {
 	return m_FreeList.Count();
@@ -814,40 +817,60 @@ intp CSmallBlockPool::Compact()
 	// Compact() of the same pool.
 	AUTO_LOCK( m_CommitMutex );
 
-	const int nFree = CountFreeBlocks();
-	if ( nFree <= 0 )
+	byte *const pOldNextAlloc = m_pNextAlloc.load( std::memory_order_relaxed );
+	const size_t nCarved = static_cast<size_t>( pOldNextAlloc - m_pBase ) / m_nBlockSize;
+	if ( !nCarved )
 		return 0;
 
-	FreeBlock_t **pSortArray = (FreeBlock_t **)malloc( nFree * sizeof(FreeBlock_t *) ); // can't use new because will reenter
-	if ( !pSortArray )
+	// dimhotepus: Drain the free list completely instead of popping CountFreeBlocks()
+	// blocks. CTSListBase keeps its depth in a uint16, so Count() wraps at 65536: a pool
+	// with 65536 or 262144 free blocks reported 0 and was never compacted. (Other threads
+	// popping concurrently also made the old count stale.)
+	// Free blocks are marked in a bitmap over the carved range: 1 bit per block, at most
+	// 32 KiB (64 KiB on 32-bit) per pool, versus up to 2 MiB for the old pointer array.
+	// It also replaces the O(n log n) sort with an O(n) scan.
+	const size_t nWords = ( nCarved + 63 ) / 64;
+	auto *pFreeBits = static_cast<uint64 *>( calloc( nWords, sizeof( uint64 ) ) ); // can't use new because will reenter
+	if ( !pFreeBits )
 	{
 		return 0;
 	}
 
-	// dimhotepus: Other threads keep popping concurrently, so the list may run dry
-	// before nFree blocks. The old code stored those nullptrs, sorted them first and then
-	// skipped pushing back ALL blocks ("if ( pSortArray[0] )"): every free block leaked.
-	int nPopped = 0;
-	while ( nPopped < nFree )
+	// The popped blocks are linked through their own Next field; no extra memory.
+	TSLNodeBase_t *pDrained = nullptr;
+	while ( TSLNodeBase_t *pBlock = m_FreeList.Pop() )
 	{
-		FreeBlock_t *pBlock = static_cast<FreeBlock_t *>( m_FreeList.Pop() );
-		if ( !pBlock )
-			break;
-		pSortArray[nPopped++] = pBlock;
-	}
+		const size_t iBlock = static_cast<size_t>( reinterpret_cast<byte *>( pBlock ) - m_pBase ) / m_nBlockSize;
+		Assert( iBlock < nCarved );
+		pFreeBits[iBlock / 64] |= uint64{ 1 } << ( iBlock % 64 );
 
-	std::sort( pSortArray, pSortArray + nPopped );
+		pBlock->Next = pDrained;
+		pDrained = pBlock;
+	}
 
 	// Rewind the bump pointer over the free blocks at the top of the carved range.
-	// Every block in [pNextAlloc, oldNextAlloc) is in pSortArray (owned by us), and
-	// nobody can carve meanwhile, so nothing live is affected.
-	byte *const pOldNextAlloc = m_pNextAlloc.load( std::memory_order_relaxed );
-	byte *pNextAlloc = pOldNextAlloc;
-	int nKeep = nPopped;
-	while ( nKeep > 0 && reinterpret_cast<byte *>( pSortArray[nKeep - 1] ) == pNextAlloc - m_nBlockSize )
+	// Every block in [newTop, oldTop) is free and drained by us, and nobody can carve
+	// meanwhile, so nothing live is affected.
+	size_t nTop = nCarved;
+	while ( nTop > 0 && ( pFreeBits[( nTop - 1 ) / 64] & ( uint64{ 1 } << ( ( nTop - 1 ) % 64 ) ) ) )
 	{
-		pNextAlloc -= m_nBlockSize;
-		--nKeep;
+		--nTop;
+	}
+	free( pFreeBits );
+
+	byte *const pNextAlloc = m_pBase + nTop * m_nBlockSize;
+
+	// Blocks below the new top go back to the free list. This walk must come BEFORE the
+	// decommit below: it reads Next from every drained block, including those above the
+	// new top whose pages are about to be released. (Next is read before Push rewrites it.)
+	while ( pDrained )
+	{
+		TSLNodeBase_t *pNext = pDrained->Next;
+		if ( reinterpret_cast<byte *>( pDrained ) < pNextAlloc )
+		{
+			m_FreeList.Push( pDrained );
+		}
+		pDrained = pNext;
 	}
 
 	intp nBytesFreed = 0;
@@ -864,14 +887,6 @@ intp CSmallBlockPool::Compact()
 			SbhDecommit( pNewCommitLimit, static_cast<size_t>( nBytesFreed ) );
 		}
 	}
-
-	// Blocks below the new top go back to the free list.
-	for ( int i = 0; i < nKeep; i++ )
-	{
-		m_FreeList.Push( pSortArray[i] );
-	}
-
-	free( pSortArray );
 
 	return nBytesFreed;
 }
