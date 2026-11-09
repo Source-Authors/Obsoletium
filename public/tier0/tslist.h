@@ -28,18 +28,24 @@ using int128 = __int128_t;
 #define TSLIST_HEAD_ALIGNMENT 16
 #define TSLIST_NODE_ALIGNMENT 16
 
-#ifdef POSIX
-inline bool ThreadInterlockedAssignIf128( int128 volatile * pDest, const int128 &value, const int128 &comparand ) 
+// dimhotepus: Drop duplicated ThreadInterlockedAssignIf128.
+namespace tslist_detail
 {
-	// We do not want the original comparand modified by the swap
-	// so operate on a local copy.
-	int128 local_comparand = comparand;
-	return __sync_bool_compare_and_swap( pDest, local_comparand, value );
-}
+#if defined( __GCC_HAVE_SYNC_COMPARE_AND_SWAP_16 )
+	inline bool AssignIf128( int128 volatile *pDest, const int128 &value, const int128 &comparand )
+	{
+		return __sync_bool_compare_and_swap( pDest, comparand, value );
+	}
+#else
+	inline bool AssignIf128( int128 volatile *pDest, const int128 &value, const int128 &comparand )
+	{
+		return ThreadInterlockedAssignIf128( pDest, value, comparand );
+	}
 #endif
+}  // namespace tslist_detail
 
 inline bool ThreadInterlockedAssignIf64x128( volatile int128 *pDest, const int128 &value, const int128 &comperand )
-	{ return ThreadInterlockedAssignIf128( pDest, value, comperand ); }
+	{ return tslist_detail::AssignIf128( pDest, value, comperand ); }
 #else
 
 #define TSLIST_HEAD_ALIGNMENT 8
