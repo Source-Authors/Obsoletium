@@ -19,6 +19,7 @@
 
 #include <atomic>
 #include <algorithm>
+#include <cstdarg>      // va_list, va_start, va_end (DefaultHeapReportFunc)
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
