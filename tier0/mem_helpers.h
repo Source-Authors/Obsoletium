@@ -4,6 +4,7 @@
 #define TIER0_MEM_HELPERS_H_
 
 #include <atomic>
+#include <cstddef>  // size_t
 
 // Normally, the runtime libraries like to mess with the memory returned by malloc(), 
 // which can create problems trying to repro bugs in debug builds or in the debugger.
@@ -18,21 +19,33 @@
 //
 // In here, we make sure the memory is either random garbage, or it's set to
 // 0xffeeffee, which casts to a NAN.
+//
+// Command line switches (case-insensitive, read once on first allocation):
+//   -noinitmemory     never touch new allocations
+//   -randomizememory  fill new allocations with a repeating pseudo-random pattern
+//
+// dimhotepus: Same behavior on Windows, Linux and macOS (x86, x86-64, arm64).
 
-// dimhotepus: Thread-safe init.
+// dimhotepus: Thread-safe init. Master on/off switch; it publishes no other data,
+// so relaxed loads/stores are sufficient.
 extern std::atomic<bool> g_bInitMemory;
-#define ApplyMemoryInitializations( pMem, nSize )        \
-	do                                                   \
-	{                                                    \
-		if ( !g_bInitMemory.load() )                     \
-			;                                            \
-		else                                             \
-		{                                                \
-			DoApplyMemoryInitializations( pMem, nSize ); \
-		}                                                \
-	} while ( false )
+
+// Fills pMem[0, nSize) according to the mode above. Thread-safe, lock-free,
+// never allocates (safe to call from inside the allocator while it holds its lock).
+// Caller must own pMem exclusively for the duration of the call.
 void DoApplyMemoryInitializations( void *pMem, size_t nSize );
 
+// dimhotepus: Inline function instead of a macro: arguments are evaluated once and
+// type-checked; call sites are unchanged ( ApplyMemoryInitializations( p, n ); ).
+inline void ApplyMemoryInitializations( void *pMem, size_t nSize )
+{
+	if ( g_bInitMemory.load( std::memory_order_relaxed ) )
+		DoApplyMemoryInitializations( pMem, nSize );
+}
+
+// Bytes currently in use by the C runtime heap. Returns SIZE_MAX if the heap is
+// found corrupted (Windows) and 0 where the platform cannot report it.
+// Thread-safe, never allocates.
 [[nodiscard]] size_t CalcHeapUsed();
 
 // Call this to reserve the bottom 4 GiB of memory in order to ensure that we will
