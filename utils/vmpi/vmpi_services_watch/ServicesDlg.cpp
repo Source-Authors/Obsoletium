@@ -841,7 +841,8 @@ int CheckServiceVersion( const char *pPatchDir, char *pServiceVersion, int maxSe
 	V_ComposeFileName( pPatchDir, "vmpi_service.exe", filename, sizeof( filename ) );
 
 	int       ret = IDCANCEL;
-	HINSTANCE hInst = LoadLibrary( filename );
+	// dimhotepus: Load as image resource, no need to execute code here.
+	HINSTANCE hInst = LoadLibraryExA( filename, nullptr, LOAD_LIBRARY_AS_IMAGE_RESOURCE | LOAD_LIBRARY_AS_DATAFILE_EXCLUSIVE );
 	if ( hInst )
 	{
 		bool bFound = FindStringResourceEx( hInst, VMPI_SERVICE_IDS_VERSION_STRING, MAKELANGID( LANG_NEUTRAL, SUBLANG_NEUTRAL ), pServiceVersion, maxServiceVersionLen );

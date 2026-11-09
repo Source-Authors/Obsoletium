@@ -449,7 +449,7 @@ bool StopRunningApp()
 		Sleep( 2000 );
 
 		// This is the overkill method. If it didn't shutdown gracefully, kill it.
-		HMODULE hInst = LoadLibrary( "psapi.dll" );
+		HMODULE hInst = LoadLibraryExA( "psapi.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 );
 		if ( !hInst )
 		{
 			return true;

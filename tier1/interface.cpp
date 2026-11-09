@@ -165,7 +165,6 @@ struct ThreadedLoadLibaryContext_t
 
 #ifdef _WIN32
 
-// wraps LoadLibraryEx() since 360 doesn't support that
 static HMODULE InternalLoadLibrary( const char *pName, Sys_Flags flags )
 {
 	if ( flags & SYS_NOLOAD )

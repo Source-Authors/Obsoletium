@@ -788,7 +788,7 @@ SE_GCC_DISABLE_CAST_FUNCTION_TYPE_STRICT_WARNING()
 
 
 #if defined( USE_CAPTURESTACKBACKTRACE )
-		m_hNTDllDll = ::LoadLibrary( "ntdll.dll" );
+		m_hNTDllDll = ::LoadLibraryExA( "ntdll.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32 );
 
 		m_pCaptureStackBackTrace = (PFN_CaptureStackBackTrace) ::GetProcAddress( m_hNTDllDll, "RtlCaptureStackBackTrace" );
 		if( m_pCaptureStackBackTrace == NULL )		m_pCaptureStackBackTrace = CaptureStackBackTrace_DummyFn;

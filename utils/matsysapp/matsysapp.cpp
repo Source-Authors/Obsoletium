@@ -578,7 +578,7 @@ bool MaterialSystemApp::InitMaterialSystem()
 	
 	// Load the material system DLL and get its interface.
 	char *pDLLName = "MaterialSystem.dll";
-	m_hMaterialSystemInst = LoadLibrary( pDLLName );
+	m_hMaterialSystemInst = LoadLibraryExA( pDLLName, nullptr, 0 );
 	if( !m_hMaterialSystemInst )
 	{
 		return Sys_Error( "Can't load MaterialSystem.dll\n" );

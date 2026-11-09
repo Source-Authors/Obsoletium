@@ -173,12 +173,12 @@ InitReturnVal_t CInputSystem::Init()
 		HMODULE hdl = LoadLibraryExA( "hdl.dll", NULL, LOAD_LIBRARY_AS_DATAFILE );
 		if ( hdl )
 		{
+			FreeLibrary( hdl );
 			m_pNovintDLL = Sys_LoadModule( "haptics.dll" );
 			if ( m_pNovintDLL )
 			{
 				InitializeNovintDevices();
 			}
-			FreeLibrary( hdl );
 		}
 #endif
 	}
