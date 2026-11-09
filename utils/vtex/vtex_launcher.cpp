@@ -137,7 +137,7 @@ int main( int argc, char *argv[] )
 	{
 		fprintf( stderr, "vtex error: Can't load '%s'.\n%s", module_name,
 		         mod.error_code().message().c_str() );
-		return ENOENT;
+		return mod.error_code().value;
 	}
 
 	const auto                           kFactoryName = CREATEINTERFACE_PROCNAME;

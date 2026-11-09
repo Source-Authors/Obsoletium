@@ -91,7 +91,7 @@ int main( int argc, char *argv[] )
 	if ( !launcher_dll )
 	{
 		fprintf( stderr, "dlopen(%s) failed: %s.\n",
-		         kLauncherPath, ::dlerror() );
+		         kLauncherPath, launcher_dll.error_code().message().c_str() );
 		return 1;
 	}
 

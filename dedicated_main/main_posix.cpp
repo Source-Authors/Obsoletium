@@ -110,7 +110,7 @@ int main( int argc, char *argv[] )
 	if ( !tier0 )
 	{
 		fprintf( stderr, "open %s failed: %s\n", "libtier0" DLL_EXT_STRING,
-		         ::dlerror() );
+		         tier0.error_code().message().c_str() );
 		return 1;
 	}
 
@@ -118,7 +118,7 @@ int main( int argc, char *argv[] )
 	if ( !vstdlib )
 	{
 		fprintf( stderr, "open %s failed: %s\n", "libvstdlib" DLL_EXT_STRING,
-		         ::dlerror() );
+		         vstdlib.error_code().message().c_str() );
 		return 2;
 	}
 
@@ -126,7 +126,7 @@ int main( int argc, char *argv[] )
 	const s1::ScopedDll dedicated{ dedicated_name, RTLD_NOW };
 	if ( !dedicated )
 	{
-		fprintf( stderr, "dlopen(%s) failed: %s\n", dedicated_name, ::dlerror() );
+		fprintf( stderr, "dlopen(%s) failed: %s\n", dedicated_name, dedicated.error_code().message().c_str() );
 		return 3;
 	}
 
