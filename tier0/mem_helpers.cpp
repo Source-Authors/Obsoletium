@@ -21,7 +21,8 @@
 #include <cerrno>
 #include <fcntl.h>           // open
 #include <malloc.h>          // mallinfo2 / mallinfo
-#include <unistd.h>          // read, close
+#include <sys/mman.h>        // mmap
+#include <unistd.h>          // read, close, sysconf
 #endif
 
 // dimhotepus: Everything here runs inside the allocator, possibly under its lock and
@@ -276,7 +277,7 @@ void ForEachCommandLinePiece( Callback &&callback ) noexcept
 #endif
 }
 
-[[nodiscard]] bool IsDebuggerAttached() noexcept
+[[nodiscard, maybe_unused]] bool IsDebuggerAttached() noexcept
 {
 #if defined( _WIN32 ) || defined( __APPLE__ )
 	return Plat_IsInDebugSession();
@@ -323,6 +324,73 @@ void ForEachCommandLinePiece( Callback &&callback ) noexcept
 }
 
 //-----------------------------------------------------------------------------
+// Fill-pattern address reservation
+//-----------------------------------------------------------------------------
+
+#if defined( _WIN32 ) || defined( __linux__ )
+// Zero-extended 32-bit fill values: what a pointer becomes when it went through a
+// DWORD/int (truncation bug) or was loaded from a fill-patterned 32-bit field.
+// On 64-bit the full-width patterns (0xFFEEFFEEFFEEFFEE, 0xCDCDCDCDCDCDCDCD, ...) need
+// nothing: they are non-canonical on x64 and kernel addresses on ARM64, so the CPU
+// faults on them already. Sign-extended values (0xFFFFFFFFFFEEFFEE) likewise.
+constexpr std::uintptr_t kFillPatternAddresses[]{
+	0xFFEEFFEEU,	// our fill (InitializeToFeeFee)
+	0xEEFFEEFFU,	// same, read at a 2-byte offset
+#if defined( _WIN32 ) && defined( _DEBUG )
+	0xCDCDCDCDU,	// debug CRT: uninitialized heap
+	0xDDDDDDDDU,	// debug CRT: freed heap
+	0xFDFDFDFDU,	// debug CRT: no man's land
+#endif
+#if defined( _WIN32 )
+	0xBAADF00DU,	// HeapAlloc under a debugger / page heap
+	0xFEEEFEEEU,	// HeapFree under a debugger
+#endif
+};
+
+// The 64 KiB granule containing the address and the next one are reserved, so member
+// accesses up to ~64 KiB past the bad pointer fault too. (The old x86 code reserved
+// only the first granule: 0xFFEEFFEE sits 0x12 bytes before its end, so any member at
+// offset >= 0x12 escaped into the next, unreserved granule.) Each granule is reserved
+// separately: one already in use must not prevent reserving the other.
+// 64 KiB is the Windows allocation granularity and a multiple of every Linux page size.
+constexpr std::uintptr_t kReserveGranularity{ 64 * 1024 };
+constexpr int kReserveGranules{ 2 };
+
+#if defined( _WIN32 )
+void ReserveNoAccess( std::uintptr_t address ) noexcept
+{
+	// Best effort: fails harmlessly when the range is in use or not user address space
+	// (e.g. >= 2 GiB in a 32-bit process without /LARGEADDRESSAWARE).
+	const std::uintptr_t base{ address & ~( kReserveGranularity - 1 ) };
+	for ( int i = 0; i < kReserveGranules; ++i )
+	{
+		void *pGranule = reinterpret_cast<void *>( base + i * kReserveGranularity );
+		(void)VirtualAlloc( pGranule, kReserveGranularity, MEM_RESERVE, PAGE_NOACCESS );
+	}
+}
+#elif defined( __linux__ )
+#ifndef MAP_FIXED_NOREPLACE
+#define MAP_FIXED_NOREPLACE 0x100000
+#endif
+void ReserveNoAccess( std::uintptr_t address ) noexcept
+{
+	const std::uintptr_t base{ address & ~( kReserveGranularity - 1 ) };
+	for ( int i = 0; i < kReserveGranules; ++i )
+	{
+		void *pGranule = reinterpret_cast<void *>( base + i * kReserveGranularity );
+		// Never MAP_FIXED: that would silently replace whatever is mapped there.
+		// Kernels before 4.17 ignore MAP_FIXED_NOREPLACE and treat the address as a
+		// hint, so a mapping placed elsewhere is undone.
+		void *p = mmap( pGranule, kReserveGranularity, PROT_NONE,
+			MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE | MAP_FIXED_NOREPLACE, -1, 0 );
+		if ( p != MAP_FAILED && p != pGranule )
+			munmap( p, kReserveGranularity );
+	}
+}
+#endif
+#endif  // _WIN32 || __linux__
+
+//-----------------------------------------------------------------------------
 // One-time, lock-free mode resolution
 //-----------------------------------------------------------------------------
 
@@ -359,10 +427,18 @@ static_assert( std::atomic<InitMode>::is_always_lock_free );
 
 #ifndef NDEBUG
 	// Debug builds always fill, debugger or not; skip the debugger probe.
-	return InitMode::FeeFee;
+	const InitMode eMode{ InitMode::FeeFee };
 #else
-	return IsDebuggerAttached() ? InitMode::FeeFee : InitMode::None;
+	const InitMode eMode{ IsDebuggerAttached() ? InitMode::FeeFee : InitMode::None };
 #endif
+
+	// dimhotepus: Debug builds (memdbg) fill every allocation with 0xFFEEFFEE but never
+	// reserved the pattern's page; only the release allocator did, and only on x86.
+	// No heap allocation, so this is safe inside the allocator.
+	if ( eMode == InitMode::FeeFee )
+		ReserveFillPatternAddresses();
+
+	return eMode;
 }
 
 [[nodiscard]] inline InitMode GetInitMode() noexcept
@@ -377,6 +453,20 @@ static_assert( std::atomic<InitMode>::is_always_lock_free );
 }
 
 }  // namespace
+
+void ReserveFillPatternAddresses()
+{
+#if defined( _WIN32 ) || defined( __linux__ )
+	static std::atomic<bool> s_bReserved{ false };
+	if ( s_bReserved.exchange( true, std::memory_order_acq_rel ) )
+		return;
+
+	for ( const std::uintptr_t address : kFillPatternAddresses )
+		ReserveNoAccess( address );
+#endif
+	// macOS: nothing to do. 64-bit executables map __PAGEZERO over the whole low 4 GiB,
+	// so every zero-extended 32-bit value already faults.
+}
 
 void DoApplyMemoryInitializations( void *pMem, size_t nSize )
 {

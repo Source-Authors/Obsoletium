@@ -894,6 +894,12 @@ CDbgMemAlloc::CDbgMemAlloc()
 	// Make sure that we return 64-bit addresses in 64-bit builds.
 	ReserveBottomMemory();
 
+	// dimhotepus: Reserve the addresses fill patterns turn into when used as pointers
+	// (e.g. 0x00000000FFEEFFEE, 0xCDCDCDCD, 0xDDDDDDDD) at startup, like memstd does.
+	// Independent of -noinitmemory / -randomizememory: the debug CRT fills new and freed
+	// blocks either way. Best effort, idempotent, no heap allocation. See mem_helpers.h.
+	ReserveFillPatternAddresses();
+
 	m_OutputFunc = DefaultHeapReportFunc;
 	m_bInitialized = false;
 

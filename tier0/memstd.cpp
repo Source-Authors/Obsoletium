@@ -554,13 +554,11 @@ static bool CheckWindowsAllocSettings( const char* pszCommandLine )
 	// We don't really care whether this allocation succeeds, but it's
 	// worth trying. Note that we do this in all cases -- whether we are using
 	// -processheap or not.
-#ifdef PLATFORM_64BITS
-	// dimhotepus: Nothing to do on 64-bit: the fill pattern 0xFFEEFFEEFFEEFFEE is a
-	// non-canonical address on x64 and outside the user VA range on ARM64, so it faults
-	// anyway (the VirtualAlloc that used to be here always failed).
-#else
-	VirtualAlloc( (void*)0xFFEEFFEE, 1, MEM_RESERVE, PAGE_NOACCESS );
-#endif
+	// dimhotepus: Now on x64/ARM64 too, where it catches 0x00000000FFEEFFEE (a pointer that
+	// went through a DWORD, or a fill-patterned 32-bit field used as a pointer) - the
+	// full-width 0xFFEEFFEEFFEEFFEE faults by itself. Also covers the Windows heap/CRT
+	// patterns and the next 64 KiB for member offsets. See mem_helpers.h.
+	ReserveFillPatternAddresses();
 
 	// Enable application termination (breakpoint) on heap corruption. This is
 	// better than trying to patch it up and continue, both from a security and

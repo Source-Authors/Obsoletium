@@ -43,6 +43,14 @@ inline void ApplyMemoryInitializations( void *pMem, size_t nSize )
 		DoApplyMemoryInitializations( pMem, nSize );
 }
 
+// Reserves (no access) the low addresses that 32-bit fill patterns turn into when they
+// are used as pointers, e.g. 0x00000000FFEEFFEE after a truncated or 32-bit-loaded pointer,
+// so dereferences crash right away instead of reading whatever is mapped there.
+// Windows (x86, x64, ARM64) and Linux; macOS needs nothing (__PAGEZERO covers 0-4 GiB).
+// Best effort, idempotent, thread-safe, never allocates. Called automatically the first
+// time the 0xFFEEFFEE fill is used.
+void ReserveFillPatternAddresses();
+
 // Bytes currently in use by the C runtime heap. Returns SIZE_MAX if the heap is
 // found corrupted (Windows) and 0 where the platform cannot report it.
 // Thread-safe, never allocates.
