@@ -686,6 +686,23 @@ static size_t SbhPageSize()
 #endif
 
 static_assert( COMMIT_SIZE >= MAX_SBH_BLOCK, "One commit must always fit a block" );
+
+// dimhotepus: Free blocks are linked into a CTSListBase in place: every block must be able
+// to hold a list node, at the node's alignment. Pool block sizes are multiples of the
+// smallest pool granularity and pool regions are page aligned, so it is enough to check
+// the granularity of the first pools (see the table in CSmallBlockHeap's constructor).
+#if defined( PLATFORM_64BITS )
+constexpr unsigned kSbhSmallestBlock = 16;	// 64-bit: pools grow in 16-byte steps first
+#else
+constexpr unsigned kSbhSmallestBlock = 8;	// 32-bit: pools grow in 8-byte steps first
+#endif
+
+static_assert( is_tslist_node_v<TSLNodeBase_t>, "Free blocks are linked as TSLNodeBase_t" );
+static_assert( kSbhSmallestBlock >= sizeof( TSLNodeBase_t ), "Smallest SBH block must hold a free-list node" );
+static_assert( kSbhSmallestBlock % TSLIST_NODE_ALIGNMENT == 0, "SBH blocks must keep free-list nodes aligned" );
+static_assert( kSbhSmallestBlock % MIN_SBH_ALIGN == 0 && kSbhSmallestBlock >= MIN_SBH_BLOCK, "Smallest SBH block vs. MIN_SBH_*" );
+static_assert( SBH_PAGE_SIZE % TSLIST_NODE_ALIGNMENT == 0 && MAX_POOL_REGION % SBH_PAGE_SIZE == 0,
+	"Pool regions start on page (hence node) aligned addresses" );
 static_assert( MAX_POOL_REGION % COMMIT_SIZE == 0, "Commits must tile the pool region" );
 
 [[nodiscard]] static inline byte *AlignPointerUp( byte *p, size_t nAlign )
@@ -778,9 +795,10 @@ void CSmallBlockPool::Free( void *p )
 }
 
 // Count the free blocks.  
-// dimhotepus: Statistics only. CTSListBase::Count() is a uint16 depth and wraps at 65536,
-// so this (and CountAllocatedBlocks) is approximate for huge free lists. Nothing that
-// affects allocation relies on it any more (Compact drains the list instead).
+// dimhotepus: Statistics only (a snapshot while other threads allocate). Exact on 64-bit,
+// where CTSListBase keeps a 32-bit depth; on 32-bit the depth is 16-bit and wraps at 65536,
+// so this (and CountAllocatedBlocks) is approximate for huge free lists there. Nothing that
+// affects allocation relies on it (Compact drains the list instead).
 int CSmallBlockPool::CountFreeBlocks() const
 {
 	return m_FreeList.Count();
@@ -823,9 +841,8 @@ intp CSmallBlockPool::Compact()
 		return 0;
 
 	// dimhotepus: Drain the free list completely instead of popping CountFreeBlocks()
-	// blocks. CTSListBase keeps its depth in a uint16, so Count() wraps at 65536: a pool
-	// with 65536 or 262144 free blocks reported 0 and was never compacted. (Other threads
-	// popping concurrently also made the old count stale.)
+	// blocks: other threads pop concurrently, so any count is stale, and on 32-bit the list
+	// depth is 16-bit and wraps at 65536 (a pool with 65536 free blocks would report 0).
 	// Free blocks are marked in a bitmap over the carved range: 1 bit per block, at most
 	// 32 KiB (64 KiB on 32-bit) per pool, versus up to 2 MiB for the old pointer array.
 	// It also replaces the O(n log n) sort with an O(n) scan.
@@ -844,7 +861,9 @@ intp CSmallBlockPool::Compact()
 		Assert( iBlock < nCarved );
 		pFreeBits[iBlock / 64] |= uint64{ 1 } << ( iBlock % 64 );
 
-		pBlock->Next = pDrained;
+		// Relaxed atomic store: a stale Pop() in another thread may still be reading this
+		// block's Next (it then fails its CAS); a plain store would be a data race.
+		tslist_detail::StoreRelaxed( &pBlock->Next, pDrained );
 		pDrained = pBlock;
 	}
 
@@ -865,7 +884,7 @@ intp CSmallBlockPool::Compact()
 	// new top whose pages are about to be released. (Next is read before Push rewrites it.)
 	while ( pDrained )
 	{
-		TSLNodeBase_t *pNext = pDrained->Next;
+		TSLNodeBase_t *pNext = tslist_detail::LoadRelaxed( &pDrained->Next );
 		if ( reinterpret_cast<byte *>( pDrained ) < pNextAlloc )
 		{
 			m_FreeList.Push( pDrained );
@@ -950,10 +969,10 @@ CSmallBlockHeap::CSmallBlockHeap()
 #if defined( PLATFORM_64BITS )
 	// Blocks sized 0 - 256 are in pools in increments of 16
 	// dimhotepus: All 64-bit targets (was _M_X64 only, ARM64 got 8-byte granularity).
-	addPools( 64, 16 );
+	addPools( 64, kSbhSmallestBlock );
 #else
 	// Blocks sized 0 - 128 are in pools in increments of 8
-	addPools( 32, 8 );
+	addPools( 32, kSbhSmallestBlock );
 	// Blocks sized 129 - 256 are in pools in increments of 16
 	addPools( 64, 16 );
 #endif

@@ -10,6 +10,11 @@
 
 #include <atomic>
 #include <cstddef>      // offsetof
+#include <cstdint>      // uintptr_t
+#ifndef NDEBUG
+#include <mutex>          // debug misuse checks (live-list registry)
+#include <unordered_set>
+#endif
 #include <new>          // placement new
 #include <type_traits>
 
@@ -138,6 +143,47 @@ namespace tslist_detail
 // Exported trait for users.
 template <typename T>
 inline constexpr bool is_tslist_node_v = tslist_detail::is_tslist_node_v<T>;
+
+// dimhotepus: Ownership tags for misuse checks. A node handed out to a caller is in no
+// list, so its Next field is free: it then holds the owning container's address with
+// bit 0 set. Real links never have bit 0 set (nodes are TSLIST_NODE_ALIGNMENT aligned),
+// so tagged, linked and fresh (nullptr) nodes are distinguishable.
+namespace tslist_detail
+{
+	static_assert( TSLIST_NODE_ALIGNMENT >= 2 && TSLIST_HEAD_ALIGNMENT >= 2, "bit 0 of node/container addresses must be free for tags" );
+
+	[[nodiscard]] inline TSLNodeBase_t *MakeOwnerTag( const void *pOwner )
+	{
+		return reinterpret_cast<TSLNodeBase_t *>( reinterpret_cast<uintptr_t>( pOwner ) | uintptr_t{ 1 } );
+	}
+
+	[[nodiscard]] inline bool IsOwnerTag( const TSLNodeBase_t *pNext )
+	{
+		return ( reinterpret_cast<uintptr_t>( pNext ) & uintptr_t{ 1 } ) != 0;
+	}
+
+	[[nodiscard]] inline const void *OwnerFromTag( const TSLNodeBase_t *pTag )
+	{
+		return reinterpret_cast<const void *>( reinterpret_cast<uintptr_t>( pTag ) & ~uintptr_t{ 1 } );
+	}
+
+#ifndef NDEBUG
+	// Live CTSList objects, so a debug check never reads a list that was already
+	// destroyed. Per module (each DLL has its own): across modules a check is skipped,
+	// never wrong. Intentionally leaked: it must outlive static lists at exit.
+	struct CDebugListRegistry
+	{
+		std::mutex mutex;
+		std::unordered_set<const void *> alive;
+	};
+
+	[[nodiscard]] inline CDebugListRegistry &DebugListRegistry()
+	{
+		static auto *s_pRegistry = new CDebugListRegistry;
+		return *s_pRegistry;
+	}
+#endif
+}  // namespace tslist_detail
 
 // Lock free stack head.
 union TSLIST_HEAD_ALIGN TSLHead_t
@@ -358,7 +404,10 @@ static_assert( sizeof( std::atomic<TSLHead_t> ) >= sizeof( TSLHead_t ), "std::at
 template <typename T>
 class TSLIST_HEAD_ALIGN CTSSimpleList : public CTSListBase
 {
-	using tls_node_concept = std::enable_if_t<std::is_base_of_v<TSLNodeBase_t, T>>;
+	// dimhotepus: Was an unused enable_if_t alias (obscure error, easy to lose). T is linked
+	// directly, so it must derive from TSLNodeBase_t.
+	static_assert( tslist_detail::is_tslist_node_v<T>, "CTSSimpleList<T>: T must derive from TSLNodeBase_t" );
+	static_assert( alignof( T ) >= TSLIST_NODE_ALIGNMENT, "CTSSimpleList<T>: T must keep the node alignment" );
 
 public:
 	void Push( T *pNode )
@@ -387,6 +436,12 @@ class TSLIST_HEAD_ALIGN CTSPool : public CTSListBase
 		T elem;
 	};
 
+	static_assert( tslist_detail::fits_node_alignment_v<T>,
+		"CTSPool<T>: alignof(T) exceeds TSLIST_NODE_ALIGNMENT, pool nodes would misalign T" );
+	static_assert( std::is_default_constructible_v<T>, "CTSPool<T>: GetObject() default-constructs T" );
+	static_assert( std::is_destructible_v<T>, "CTSPool<T>: Purge() destroys T" );
+	static_assert( alignof( TSPoolNode_t ) == TSLIST_NODE_ALIGNMENT, "CTSPool<T>: node alignment" );
+
 public:
 	~CTSPool()
 	{
@@ -405,11 +460,53 @@ public:
 		}
 	}
 
+	// pInfo must come from GetObject()/Get() of this pool (as in Valve's original), and be
+	// returned once.
 	void PutObject( T *pInfo )
 	{
-		// dimhotepus: Fix put object.
-		auto *pNode = new TSPoolNode_t;
-		pNode->elem = *pInfo;
+#ifndef NDEBUG
+		// Every pool node is TSLIST_NODE_ALIGNMENT aligned: if the node computed from pInfo is
+		// not, pInfo cannot come from a pool - reject without touching that memory.
+		if ( ( reinterpret_cast<uintptr_t>( pInfo ) - ElemOffset() ) % alignof( TSPoolNode_t ) != 0 )
+		{
+			AssertMsg( false, "CTSPool::PutObject( %p ): object was not obtained from GetObject() of pool %p (misaligned for a pool node).",
+				static_cast<void *>( pInfo ), static_cast<void *>( this ) );
+			return;
+		}
+#endif
+
+		// dimhotepus: Return the object's own node to the pool. The previous version
+		// allocated a new node and copied *pInfo into it, so the node handed out by
+		// GetObject() leaked on every Get/Put cycle (and T had to be copyable).
+		TSPoolNode_t *pNode = NodeFromElem( pInfo );
+
+#ifndef NDEBUG
+		// dimhotepus: Debug check of the contract. GetObject() tagged the node with this
+		// pool; claim the tag atomically, so that even two threads returning the same
+		// object at once are caught (exactly one wins). A rejected object is NOT pushed:
+		// pushing a foreign or already-pooled node would corrupt the pool.
+		// Note: for a foreign object this reads the word(s) just before it - harmless for
+		// heap objects inside bigger allocations, reported by ASan for others; either way
+		// the call is a bug.
+		TSLNodeBase_t *const pTag = tslist_detail::MakeOwnerTag( this );
+		auto *const pSeen = static_cast<TSLNodeBase_t *>( ThreadInterlockedCompareExchangePointer(
+			reinterpret_cast<void * volatile *>( &pNode->Next ), nullptr, pTag ) );
+		if ( pSeen != pTag )
+		{
+			if ( tslist_detail::IsOwnerTag( pSeen ) )
+			{
+				AssertMsg( false, "CTSPool::PutObject( %p ): object belongs to another pool (%p), not to %p.",
+					static_cast<void *>( pInfo ), tslist_detail::OwnerFromTag( pSeen ), static_cast<void *>( this ) );
+			}
+			else
+			{
+				AssertMsg( false, "CTSPool::PutObject( %p ): object was not obtained from GetObject() of pool %p, or was already returned (double PutObject).",
+					static_cast<void *>( pInfo ), static_cast<void *>( this ) );
+			}
+			return;
+		}
+#endif
+
 		CTSListBase::Push( pNode );
 	}
 
@@ -420,6 +517,9 @@ public:
 		{
 			pNode = new TSPoolNode_t;
 		}
+		// dimhotepus: Mark the node as handed out by this pool (checked by PutObject in debug
+		// builds). Written in release too, so that debug and release code can share a pool.
+		tslist_detail::StoreRelaxed( &pNode->Next, tslist_detail::MakeOwnerTag( this ) );
 		return &pNode->elem;
 	}
 
@@ -428,37 +528,105 @@ public:
 	{
 		return GetObject();
 	}
+
+private:
+	// TSPoolNode_t derives from TSLNodeBase_t, so it is not standard-layout and offsetof
+	// is "conditionally-supported". MSVC, GCC and Clang all support it for non-virtual
+	// inheritance (the node has no virtual bases); GCC/Clang only warn.
+	[[nodiscard]] static constexpr size_t ElemOffset()
+	{
+#if defined( __GNUC__ ) || defined( __clang__ )
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winvalid-offsetof"
+#endif
+		return offsetof( TSPoolNode_t, elem );
+#if defined( __GNUC__ ) || defined( __clang__ )
+#pragma GCC diagnostic pop
+#endif
+	}
+
+	[[nodiscard]] static TSPoolNode_t *NodeFromElem( T *pElem )
+	{
+		constexpr size_t nElemOffset = ElemOffset();
+		// Not >= sizeof(TSLNodeBase_t): the Itanium ABI (GCC/Clang) places elem in the base's
+		// tail padding (offset 8 on 64-bit), MSVC after it (offset 16). Both are fine as long
+		// as elem does not overlap Next.
+		static_assert( nElemOffset >= offsetof( TSLNodeBase_t, Next ) + sizeof( TSLNodeBase_t * ),
+			"CTSPool<T>: elem must not overlap the Next link" );
+		static_assert( nElemOffset + sizeof( T ) <= sizeof( TSPoolNode_t ), "CTSPool<T>: elem must lie inside the node" );
+		return reinterpret_cast<TSPoolNode_t *>( reinterpret_cast<char *>( pElem ) - nElemOffset );
+	}
 };
 
 // Lock free typed list.
+//
+// dimhotepus: PopItem() used to delete the popped node while other threads could still be
+// inside Pop() reading that node's Next (heap-use-after-free; with the small block heap the
+// page can even be decommitted -> access violation). PopItem() now recycles nodes through
+// an internal free list that PushItem() reuses; they are deleted by Purge()/the destructor,
+// which must not run concurrently with other operations. T must be copy-assignable.
+// If you Pop() nodes yourself with other threads still popping, do not delete them: give
+// them back with FreeNode().
 template <typename T>
 class TSLIST_HEAD_ALIGN CTSList : public CTSListBase
 {
 public:
 	struct TSLIST_NODE_ALIGN Node_t : public CAlignedNewDelete<TSLIST_NODE_ALIGNMENT, TSLNodeBase_t>
 	{
-		Node_t() = default;
-		Node_t( const T &init ) : elem( init ) {}
+		// dimhotepus: Next starts as nullptr (never "tagged"); elem() keeps the value
+		// initialization the old defaulted constructor gave for new Node_t().
+		Node_t() : elem() { Next = nullptr; }
+		Node_t( const T &init ) : elem( init ) { Next = nullptr; }
+
+		~Node_t()
+		{
+#ifndef NDEBUG
+			CTSList::DebugCheckNodeDelete( this );
+#endif
+		}
 
 		T elem;
 	};
 
+	static_assert( tslist_detail::fits_node_alignment_v<T>,
+		"CTSList<T>: alignof(T) exceeds TSLIST_NODE_ALIGNMENT, list nodes would misalign T" );
+	static_assert( alignof( Node_t ) == TSLIST_NODE_ALIGNMENT, "CTSList<T>: node alignment" );
+
+	CTSList()
+	{
+#ifndef NDEBUG
+		auto &registry = tslist_detail::DebugListRegistry();
+		std::lock_guard<std::mutex> lock( registry.mutex );
+		registry.alive.insert( this );
+#endif
+	}
+
+	CTSList( const CTSList & ) = delete;
+	CTSList &operator=( const CTSList & ) = delete;
+
 	~CTSList()
 	{
 		Purge();
+
+#ifndef NDEBUG
+		auto &registry = tslist_detail::DebugListRegistry();
+		std::lock_guard<std::mutex> lock( registry.mutex );
+		registry.alive.erase( this );
+#endif
 	}
 
+	// Not thread-safe.
 	void Purge()
 	{
-		Node_t *pCurrent = Detach();
-		while ( pCurrent )
-		{
-			Node_t *pNext = (Node_t *)pCurrent->Next;
-			delete pCurrent;
-			pCurrent = pNext;
-		}
+		AssertMsg( m_nDebugActivePops.load( std::memory_order_acquire ) == 0,
+			"CTSList::Purge(): called while another thread is inside Pop() on list %p (Purge is not thread-safe).",
+			static_cast<void *>( this ) );
+
+		DeleteChain( Detach() );
+		DeleteChain( static_cast<Node_t *>( m_FreeNodes.Detach() ) );
 	}
 
+	// Not thread-safe.
 	void RemoveAll()
 	{
 		Purge();
@@ -469,31 +637,123 @@ public:
 		return static_cast<Node_t *>(CTSListBase::Push( pNode ));
 	}
 
+	// The returned node may still be read by other threads inside Pop(): do not delete it
+	// while any thread may be popping - give it back with FreeNode() or Push() instead.
+	// Debug builds assert on such a delete.
 	Node_t *Pop()
 	{
+#ifndef NDEBUG
+		m_nDebugActivePops.fetch_add( 1, std::memory_order_acq_rel );
+		auto *pNode = static_cast<Node_t *>( CTSListBase::Pop() );
+		if ( pNode )
+		{
+			// Tag the node as "handed out by this list" (see DebugCheckNodeDelete).
+			tslist_detail::StoreRelaxed( &pNode->Next, tslist_detail::MakeOwnerTag( this ) );
+		}
+		m_nDebugActivePops.fetch_sub( 1, std::memory_order_acq_rel );
+		return pNode;
+#else
 		return static_cast<Node_t *>(CTSListBase::Pop());
+#endif
 	}
 
 	void PushItem( const T &init )
 	{
-		Push( new Node_t( init ) );
+		static_assert( std::is_copy_constructible_v<T>, "CTSList<T>::PushItem: T must be copy-constructible (new node)" );
+		static_assert( std::is_copy_assignable_v<T>, "CTSList<T>::PushItem: T must be copy-assignable (recycled node)" );
+
+		auto *pNode = static_cast<Node_t *>( m_FreeNodes.Pop() );
+		if ( pNode )
+		{
+			pNode->elem = init;
+		}
+		else
+		{
+			pNode = new Node_t( init );
+		}
+		Push( pNode );
 	}
 
 	bool PopItem( T *pResult)
 	{
+		static_assert( std::is_copy_assignable_v<T>, "CTSList<T>::PopItem: T must be copy-assignable" );
+
 		Node_t *pNode = Pop();
 		if ( !pNode )
 			return false;
 
 		*pResult = pNode->elem;
-		delete pNode;
+		m_FreeNodes.Push( pNode );
 		return true;
+	}
+
+	// Recycle a node obtained from Pop() of this list, or a fresh node (instead of
+	// deleting it).
+	void FreeNode( Node_t *pNode )
+	{
+#ifndef NDEBUG
+		// A rejected node is NOT pushed: it still belongs to the other list, and keeping it in
+		// two lists would delete it twice.
+		const TSLNodeBase_t *const pNext = tslist_detail::LoadRelaxed( &pNode->Next );
+		if ( tslist_detail::IsOwnerTag( pNext ) && tslist_detail::OwnerFromTag( pNext ) != this )
+		{
+			AssertMsg( false, "CTSList::FreeNode( %p ): node was popped from another list (%p), not from %p.",
+				static_cast<void *>( pNode ), tslist_detail::OwnerFromTag( pNext ), static_cast<void *>( this ) );
+			return;
+		}
+#endif
+		m_FreeNodes.Push( pNode );
 	}
 
 	Node_t *Detach()
 	{
 		return static_cast<Node_t *>(CTSListBase::Detach());
 	}
+
+private:
+	static void DeleteChain( Node_t *pCurrent )
+	{
+		while ( pCurrent )
+		{
+			auto *pNext = static_cast<Node_t *>( pCurrent->Next );
+			delete pCurrent;
+			pCurrent = pNext;
+		}
+	}
+
+#ifndef NDEBUG
+	// dimhotepus: Debug check for deleting a node handed out by Pop() while another thread
+	// is inside Pop() on the same list - that thread may read the node's Next after the
+	// delete (use-after-free; an access violation if its page gets decommitted).
+	// Deleting with no concurrent Pop() is fine and not reported.
+	static void DebugCheckNodeDelete( Node_t *pNode )
+	{
+		const TSLNodeBase_t *const pNext = tslist_detail::LoadRelaxed( &pNode->Next );
+		if ( !tslist_detail::IsOwnerTag( pNext ) )
+			return;  // never handed out by Pop() (fresh, linked, or recycled node)
+
+		const auto *pOwner = static_cast<const CTSList *>( tslist_detail::OwnerFromTag( pNext ) );
+
+		// Only look at the owner if it is still alive (it may have been destroyed before
+		// this node is deleted, which is legal). Holding the registry lock also keeps it
+		// alive during the check: ~CTSList unregisters under the same lock.
+		auto &registry = tslist_detail::DebugListRegistry();
+		std::lock_guard<std::mutex> lock( registry.mutex );
+		if ( registry.alive.count( pOwner ) &&
+			 pOwner->m_nDebugActivePops.load( std::memory_order_acquire ) > 0 )
+		{
+			AssertMsg( false, "CTSList: node %p from Pop() deleted while another thread is inside Pop() on list %p. "
+				"Give it back with FreeNode() (or Push()), or delete only when no thread can be popping.",
+				static_cast<void *>( pNode ), static_cast<const void *>( pOwner ) );
+		}
+	}
+#endif
+
+	CTSListBase m_FreeNodes;
+
+	// Threads currently inside Pop(); maintained in debug builds only. Present in release
+	// too, so that debug and release code agree on the class layout.
+	std::atomic<int> m_nDebugActivePops{ 0 };
 };
 
 // Lock free list with list for free nodes.
@@ -508,6 +768,10 @@ public:
 
 		T elem;
 	};
+
+	static_assert( tslist_detail::fits_node_alignment_v<T>,
+		"CTSListWithFreeList<T>: alignof(T) exceeds TSLIST_NODE_ALIGNMENT, list nodes would misalign T" );
+	static_assert( alignof( Node_t ) == TSLIST_NODE_ALIGNMENT, "CTSListWithFreeList<T>: node alignment" );
 
 	~CTSListWithFreeList()
 	{
@@ -555,6 +819,9 @@ public:
 
 	void PushItem( const T &init )
 	{
+		static_assert( std::is_default_constructible_v<T>, "CTSListWithFreeList<T>::PushItem: T must be default-constructible (new node)" );
+		static_assert( std::is_copy_assignable_v<T>, "CTSListWithFreeList<T>::PushItem: T must be copy-assignable" );
+
 		auto *pNode = static_cast<Node_t *>(m_FreeList.Pop());
 		if ( !pNode )
 		{
@@ -566,6 +833,8 @@ public:
 
 	bool PopItem( T *pResult)
 	{
+		static_assert( std::is_copy_assignable_v<T>, "CTSListWithFreeList<T>::PopItem: T must be copy-assignable" );
+
 		Node_t *pNode = Pop();
 		if ( !pNode )
 			return false;
@@ -617,6 +886,8 @@ public:
 	static_assert(std::is_standard_layout_v<T>,
 		"CTSQueue requires standard-layout types. "
 		"Memory layout assumptions depend on consistent field ordering.");
+	static_assert(tslist_detail::fits_node_alignment_v<T>,
+		"CTSQueue<T>: alignof(T) exceeds TSLIST_NODE_ALIGNMENT, queue nodes would misalign T");
 
 	struct TSLIST_NODE_ALIGN Node_t : public TSLNodeBase_t
 	{
@@ -628,9 +899,10 @@ public:
 
 		T elem;
 
-		[[nodiscard]] Node_t *GetNextNode() { return static_cast<Node_t*>(Next); }
+		// dimhotepus: Relaxed atomic access; Next is read by other threads while pushes link it.
+		[[nodiscard]] Node_t *GetNextNode() { return static_cast<Node_t*>( tslist_detail::LoadRelaxed( &Next ) ); }
 		[[nodiscard]] Node_t **GetNextNodePtr() { return reinterpret_cast<Node_t**>(&Next); }
-		void SetNextNode(Node_t* next) { Next = next; }
+		void SetNextNode(Node_t* next) { tslist_detail::StoreRelaxed( &Next, static_cast<TSLNodeBase_t *>( next ) ); }
 	};
 
 	union TSLIST_HEAD_ALIGN NodeLink_t
@@ -659,6 +931,16 @@ public:
 		int64 value64x128;
 #endif
 	};
+
+	// dimhotepus: Same contract as TSLHead_t: one CAS of value64x128 swaps the whole link and
+	// compares raw bytes, so the struct view must cover it exactly, without padding.
+	static_assert( sizeof( NodeLink_t ) == 2 * sizeof( void * ), "CTSQueue: link is a pointer plus a sequence" );
+	static_assert( alignof( NodeLink_t ) == TSLIST_HEAD_ALIGNMENT, "CTSQueue: link must be CAS-aligned" );
+	static_assert( sizeof( typename NodeLink_t::Value_t ) == sizeof( NodeLink_t ), "CTSQueue: value must cover the link" );
+	static_assert( sizeof( NodeLink_t{}.value64x128 ) == sizeof( NodeLink_t ), "CTSQueue: value64x128 must cover the link" );
+	static_assert( std::has_unique_object_representations_v<typename NodeLink_t::Value_t>,
+		"CTSQueue: link must have no padding bits (byte-wise CAS)" );
+	static_assert( alignof( Node_t ) == TSLIST_NODE_ALIGNMENT, "CTSQueue: node alignment" );
 
 	CTSQueue()
 	{
@@ -794,8 +1076,10 @@ public:
 
 		for (;;)
 		{
-			oldTail.value.sequence = m_Tail.value.sequence;
-			oldTail.value.pNode = m_Tail.value.pNode;
+			// dimhotepus: Snapshot via atomic loads (the tail is CASed concurrently); a torn
+			// snapshot only makes FinishPush's CAS fail.
+			oldTail.value.sequence = tslist_detail::LoadAcquire( &m_Tail.value.sequence );
+			oldTail.value.pNode = tslist_detail::LoadAcquire( &m_Tail.value.pNode );
 			if ( InterlockedCompareExchangeNode( oldTail.value.pNode->GetNextNodePtr(), pNode, End() ) ) //-V1051
 			{
 				break;
@@ -823,11 +1107,9 @@ public:
 #else
 		Node_t * TSQUEUE_BAD_NODE_LINK = static_cast<Node_t *>(reinterpret_cast<void *>(static_cast<size_t>(0xdeadbeef)));
 #endif
-		NodeLink_t * volatile		pHead = &m_Head;
-		NodeLink_t * volatile		pTail = &m_Tail;
-		Node_t * volatile *			pHeadNode = &m_Head.value.pNode;
-		volatile intp * volatile	pHeadSequence = &m_Head.value.sequence;
-		Node_t * volatile * 		pTailNode = &pTail->value.pNode;
+		// dimhotepus: The volatile pointers below were how this forced re-reads; head/tail
+		// fields are now read with atomic loads instead (concurrently CASed, by design).
+		NodeLink_t *pHead = &m_Head;
 
 		NodeLink_t head;
 		NodeLink_t newHead;
@@ -837,15 +1119,16 @@ public:
 
 		for (;;)
 		{
-			head.value.sequence = *pHeadSequence; // must grab sequence first, which allows condition below to ensure pNext is valid
+			head.value.sequence = tslist_detail::LoadAcquire( &m_Head.value.sequence ); // must grab sequence first, which allows condition below to ensure pNext is valid
 			ThreadMemoryBarrier(); // need a barrier to prevent reordering of these assignments
-			head.value.pNode	= *pHeadNode;
-			tailSequence		= pTail->value.sequence;
+			head.value.pNode	= tslist_detail::LoadAcquire( &m_Head.value.pNode );
+			tailSequence		= tslist_detail::LoadAcquire( &m_Tail.value.sequence );
 			pNext				= head.value.pNode->GetNextNode(); //-V2002
 
 			// Checking pNext only to force optimizer to not reorder the assignment
 			// to pNext and the compare of the sequence
-			if ( !pNext || head.value.sequence != *pHeadSequence ) 
+			ThreadMemoryBarrier();
+			if ( !pNext || head.value.sequence != tslist_detail::LoadAcquire( &m_Head.value.sequence ) ) 
 				continue;
 
 			if ( bTestOptimizer )
@@ -857,7 +1140,7 @@ public:
 				}
 			}
 
-			if ( head.value.pNode == *pTailNode )
+			if ( head.value.pNode == tslist_detail::LoadAcquire( &m_Tail.value.pNode ) )
 			{
 				if ( pNext == End() )
 					return nullptr;
