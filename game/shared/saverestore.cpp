@@ -203,10 +203,17 @@ CSave::CSave( CSaveRestoreData *pdata )
 
 inline int CSave::DataEmpty( const char *pdata, int size )
 {
-	if ( size != 4 )
+	// dimhotepus: Speedup DataEmpty checks.
+	if ( size == 4 )
 	{
-		const char *pLimit = pdata + size;
-		while ( pdata < pLimit )
+		int value;
+		memcpy( &value, pdata, sizeof( value ) );
+		return value == 0;
+	}
+
+	if ( size < (int)sizeof( uintp ) )
+	{
+		while ( size-- > 0 )
 		{
 			if ( *pdata++ )
 				return 0;
@@ -214,7 +221,19 @@ inline int CSave::DataEmpty( const char *pdata, int size )
 		return 1;
 	}
 
-	return ( *((const int *)pdata) == 0 );
+	// Last word may overlap words already checked; that's harmless for a zero test
+	const char *pLast{ pdata + size - sizeof( uintp ) };
+	uintp       acc{ 0 };
+	uintp       word;
+	for ( ; pdata < pLast; pdata += sizeof( uintp ) )
+	{
+		memcpy( &word, pdata, sizeof( word ) );
+		acc |= word;
+	}
+	memcpy( &word, pLast, sizeof( word ) );
+	acc |= word;
+
+	return acc == 0;
 }
 
 //-----------------------------------------------------------------------------
