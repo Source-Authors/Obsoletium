@@ -478,6 +478,17 @@ inline bool CSaveRestoreSegment::DefineSymbol( const char *pszToken, intp token 
 
 inline unsigned short CSaveRestoreSegment::FindCreateSymbol( const char *pszToken )
 {
+	// dimhotepus: Fast cache for field names (static) to speedup their lookup.
+	static const char    *pCachedToken[256];
+	static unsigned short nCachedIndex[ssize( pCachedToken )];
+	const uintp           nCacheSlot{ ( reinterpret_cast<uintp>( pszToken ) >> 2 ) & ( ssize( pCachedToken ) - 1 ) };
+	if ( pCachedToken[nCacheSlot] == pszToken )
+	{
+		const unsigned short nIndex{ nCachedIndex[nCacheSlot] };
+		if ( nIndex < static_cast<uintp>( tokenCount ) && pTokens[nIndex] == pszToken )
+			return nIndex;
+	}
+
 	// dimhotepus: unsigned short -> uintp.
 	uintp hash = HashString( pszToken ) % (uintp)tokenCount;
 	
@@ -502,6 +513,8 @@ inline unsigned short CSaveRestoreSegment::FindCreateSymbol( const char *pszToke
 		if ( !pTokens[index] || V_streq( pszToken, pTokens[index] ) )
 		{
 			pTokens[index] = (char *)pszToken;
+			pCachedToken[nCacheSlot] = pszToken;
+			nCachedIndex[nCacheSlot] = index;
 			Assert( index <= USHRT_MAX );
 			return static_cast<unsigned short>(index);
 		}
