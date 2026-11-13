@@ -1469,7 +1469,13 @@ void Panel::OnChildAdded(VPANEL child)
 	Panel *pChild = ipanel()->GetPanel(child, GetControlsModuleName());
 	if ( pChild )
 	{
-		auto idx = m_dictChidlren.Insert( pChild->GetName() );
+		// dimhotepus: CEngineVGui::Paint detached the client's root
+		// panels and attached again every frame by ipanel()->SetParent,
+		// and we get a duplicate (leak) per frame.
+		const char *pszName = pChild->GetName();
+		auto        idx = m_dictChidlren.Find( pszName );
+		if ( idx == m_dictChidlren.InvalidIndex() )
+			idx = m_dictChidlren.Insert( pszName );
 		m_dictChidlren[ idx ].Set( child );
 	}
 }
