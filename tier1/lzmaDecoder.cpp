@@ -142,22 +142,13 @@ size_t CLZMA::Uncompress( void *pInput, OUT_BYTECAP(outSize) void *pOutput, size
 		return 0;
 	}
 
-	CLzmaDec state;
-	LzmaDec_Construct(&state);
-
-	if ( LzmaDec_Allocate(&state, pHeader->properties, LZMA_PROPS_SIZE, &g_Alloc) != SZ_OK )
-	{
-		Assert( false );
-		return 0;
-	}
+	// dimhotepus: Dropped LZMA decoder state alloc / dealloc as not used.
+	// LzmaDecode uses its output buffer as a dictionary.
 
 	SizeT inProcessed = pHeader->lzmaSize;
 	ELzmaStatus status;
 	SRes result = LzmaDecode( static_cast<unsigned char*>(pOutput), &outProcessed, static_cast<unsigned char*>(pInput) + sizeof( lzma_header_t ),
 	                          &inProcessed, pHeader->properties, LZMA_PROPS_SIZE, LZMA_FINISH_END, &status, &g_Alloc );
-
-
-	LzmaDec_Free(&state, &g_Alloc);
 
 	if ( result != SZ_OK || pHeader->actualSize != outProcessed )
 	{
