@@ -382,7 +382,26 @@ inline bool CSaveRestoreSegment::Write( const void *pData, intp nBytes )
 		return false;
 	}
 
-	memcpy( pCurrentData, pData, nBytes );
+	// dimhotepus: In release builds these are inlined as many writes are 4-8 bytes.
+	switch ( nBytes )
+	{
+	case 8:
+		memcpy( pCurrentData, pData, 8 );
+		break;
+	case 4:
+		memcpy( pCurrentData, pData, 4 );
+		break;
+	case 2:
+		memcpy( pCurrentData, pData, 2 );
+		break;
+	case 1:
+		*pCurrentData = *(const char *)pData;
+		break;
+	default:
+		memcpy( pCurrentData, pData, nBytes );
+		break;
+	}
+
 	MoveCurPos( nBytes );
 
 	return true;
