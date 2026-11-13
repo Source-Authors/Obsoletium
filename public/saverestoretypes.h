@@ -473,14 +473,8 @@ inline unsigned short CSaveRestoreSegment::FindCreateSymbol( const char *pszToke
 
 	for ( intp i=0; i<tokenCount; i++ )
 	{
-#ifndef NDEBUG
-		static bool beentheredonethat = false;
-		if ( i > 50 && !beentheredonethat )
-		{
-			beentheredonethat = true;
-			AssertMsg( 0, ("CSaveRestoreBuffer::TokenHash() is getting too full!" ) );
-		}
-#endif
+		// dimhotepus: Thread-safe assert once.
+		AssertOnce( i <= 50, "CSaveRestoreBuffer::TokenHash() is getting too full!" );
 
 		intp index = hash + i;
 		if ( index >= tokenCount )
