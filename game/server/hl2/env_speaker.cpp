@@ -65,8 +65,8 @@ void CSpeaker::Spawn( void )
 		return;
 	}
 
-//	const char *concept = (const char *)STRING( m_iszConcept );
-//	if ( Q_strlen( concept ) < 1 )
+//	const char *concept = STRING( m_iszConcept );
+//	if ( Q_isempty( concept ) )
 //	{
 //		Warning( "'speaker' entity using rule set %s with empty concept string\n", soundfile );
 //	}
