@@ -4760,7 +4760,7 @@ static CModelSoundsCacheSaver g_ModelSoundsCacheSaver( "CModelSoundsCacheSaver" 
 
 static bool g_bWatching = true;
 
-void ModelLogFunc( const char *fileName, const char *accessType )
+static void ModelLogFunc( const char *fileName, const char *accessType )
 {
 	if ( g_bWatching && !CBaseEntity::IsPrecacheAllowed() )
 	{
