@@ -4702,20 +4702,20 @@ void ModelSoundsCacheShutdown()
 }
 
 static CUtlSymbolTable g_ModelSoundsSymbolHelper( 0, 32, true );
-class CModelSoundsCacheSaver: public CAutoGameSystem
+class CModelSoundsCacheSaver final : public CAutoGameSystem
 {
 public:
 	CModelSoundsCacheSaver( const char *name ) : CAutoGameSystem( name )
 	{
 	}
-	virtual void LevelInitPostEntity()
+	void LevelInitPostEntity() override
 	{
 		if ( g_ModelSoundsCache.IsDirty() )
 		{
 			g_ModelSoundsCache.Save();
 		}
 	}
-	virtual void LevelShutdownPostEntity()
+	void LevelShutdownPostEntity() override
 	{
 		if ( g_ModelSoundsCache.IsDirty() )
 		{
@@ -4742,7 +4742,7 @@ static void ModelLogFunc( const char *fileName, const char *accessType )
 	}
 }
 
-class CWatchForModelAccess: public CAutoGameSystem
+class CWatchForModelAccess final : public CAutoGameSystem
 {
 public:
 	bool Init() override
