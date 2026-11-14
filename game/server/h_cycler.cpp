@@ -52,7 +52,7 @@ LINK_ENTITY_TO_CLASS( model_studio, CGenericCycler ); // For now model_studios b
 
 void CCycler::GenericCyclerSpawn(char *szModel, Vector vecMin, Vector vecMax)
 {
-	if (!szModel || !*szModel)
+	if ( Q_isempty( szModel ) )
 	{
 		Warning( "cycler at %.0f %.0f %0.f missing modelname\n", GetAbsOrigin().x, GetAbsOrigin().y, GetAbsOrigin().z );
 		UTIL_Remove( this );
@@ -73,7 +73,7 @@ void CCycler::GenericCyclerSpawn(char *szModel, Vector vecMin, Vector vecMax)
 
 void CCycler::Precache()
 {
-	PrecacheModel( (const char *)STRING( GetModelName() ) );
+	PrecacheModel( STRING( GetModelName() ) );
 }
 
 
