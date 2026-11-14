@@ -66,6 +66,9 @@ static const char *VORT_POK = "VORT_POK";
 static const char *VORT_EXTRACT_START = "VORT_EXTRACT_START";
 static const char *VORT_EXTRACT_FINISH = "VORT_EXTRACT_FINISH";
 
+// dimhotepus: Reuse.
+constexpr inline char kVortDefaultModelName[]{ "models/vortigaunt.mdl" };
+
 // Target must be within this range to heal
 #define	HEAL_RANGE			(40*12) //ft
 #define	HEAL_SEARCH_RANGE	(40*12) //ft
@@ -1086,10 +1089,10 @@ void CNPC_Vortigaunt::Spawn( void )
 #endif // HL2_EPISODIC
 
 	// Allow multiple models (for slaves), but default to vortigaunt.mdl
-	const char *szModel = (const char *)STRING( GetModelName() );
-	if (!szModel || !*szModel)
+	const char *szModel = STRING( GetModelName() );
+	if ( Q_isempty( szModel ) )
 	{
-		szModel = "models/vortigaunt.mdl";
+		szModel = kVortDefaultModelName;
 		SetModelName( AllocPooledString(szModel) );
 	}
 
@@ -1137,6 +1140,9 @@ void CNPC_Vortigaunt::Precache()
 {
 	UTIL_PrecacheOther( "vort_charge_token" );
 
+	// dimhotepus: Default model before Spawn: dynamic load causes FPS drop.
+	if ( GetModelName() == NULL_STRING )
+		SetModelName( AllocPooledString( kVortDefaultModelName ) );
 	PrecacheModel( STRING( GetModelName() ) );
 
 	m_nLightningSprite = PrecacheModel("sprites/lgtning.vmt");

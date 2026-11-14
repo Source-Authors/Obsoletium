@@ -20,6 +20,9 @@
 // Spawnflags
 #define SF_BREEN_BACKGROUND_TALK		( 1 << 16 )		// 65536 
 
+// dimhotepus: Reuse.
+constexpr inline char kBreenModelName[]{ "models/breen.mdl" };
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -79,10 +82,10 @@ void CNPC_Breen::Spawn()
 {
 	// Breen is allowed to use multiple models, because he has a torso version for monitors.
 	// He defaults to his normal model.
-	const char *szModel = (const char *)STRING( GetModelName() );
-	if (!szModel || !*szModel)
+	const char *szModel = STRING( GetModelName() );
+	if ( Q_isempty( szModel ) )
 	{
-		szModel = "models/breen.mdl";
+		szModel = kBreenModelName;
 		SetModelName( AllocPooledString(szModel) );
 	}
 
@@ -114,9 +117,12 @@ void CNPC_Breen::Spawn()
 //-----------------------------------------------------------------------------
 void CNPC_Breen::Precache()
 {
+	// dimhotepus: Default model before Spawn: dynamic load causes FPS drop.
+	if ( GetModelName() == NULL_STRING )
+		SetModelName( AllocPooledString( kBreenModelName ) );
 	PrecacheModel( STRING( GetModelName() ) );
 	BaseClass::Precache();
-}	
+}
 
 bool CNPC_Breen::UseSemaphore( void )	
 { 

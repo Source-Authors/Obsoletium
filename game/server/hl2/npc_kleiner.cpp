@@ -18,6 +18,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+// dimhotepus: Reuse.
+constexpr inline char kKleinerModelName[]{ "models/kleiner.mdl" };
+
 //-----------------------------------------------------------------------------
 // NPC's Anim Events Go Here
 //-----------------------------------------------------------------------------
@@ -79,10 +82,10 @@ int CNPC_Kleiner::GetSoundInterests ( void )
 void CNPC_Kleiner::Spawn()
 {
 	// Allow custom model usage (mostly for monitors)
-	const char *szModel = (const char *)STRING( GetModelName() );
-	if (!szModel || !*szModel)
+	const char *szModel = STRING( GetModelName() );
+	if ( Q_isempty( szModel ) )
 	{
-		szModel = "models/kleiner.mdl";
+		szModel = kKleinerModelName;
 		SetModelName( AllocPooledString(szModel) );
 	}
 
@@ -115,10 +118,13 @@ void CNPC_Kleiner::Spawn()
 //-----------------------------------------------------------------------------
 void CNPC_Kleiner::Precache()
 {
+	// dimhotepus: Default model before Spawn: dynamic load causes FPS drop.
+	if ( GetModelName() == NULL_STRING )
+		SetModelName( AllocPooledString( kKleinerModelName ) );
 	PrecacheModel( STRING( GetModelName() ) );
 	
 	BaseClass::Precache();
-}	
+}
 
 //-----------------------------------------------------------------------------
 // AI Schedules Specific to this NPC

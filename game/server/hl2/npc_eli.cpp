@@ -18,6 +18,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+// dimhotepus: Reuse.
+constexpr inline char kEliModelName[]{ "models/eli.mdl" };
+
 //-----------------------------------------------------------------------------
 // NPC's Anim Events Go Here
 //-----------------------------------------------------------------------------
@@ -82,10 +85,10 @@ void CNPC_Eli::Spawn()
 {
 	// Eli is allowed to use multiple models, because he appears in the pod.
 	// He defaults to his normal model.
-	const char *szModel = (const char *)STRING( GetModelName() );
-	if (!szModel || !*szModel)
+	const char *szModel = STRING( GetModelName() );
+	if ( Q_isempty( szModel ) )
 	{
-		szModel = "models/eli.mdl";
+		szModel = kEliModelName;
 		SetModelName( AllocPooledString(szModel) );
 	}
 
@@ -126,9 +129,12 @@ void CNPC_Eli::Spawn()
 //-----------------------------------------------------------------------------
 void CNPC_Eli::Precache()
 {
+	// dimhotepus: Default model before Spawn: dynamic load causes FPS drop.
+	if ( GetModelName() == NULL_STRING )
+		SetModelName( AllocPooledString( kEliModelName ) );
 	PrecacheModel( STRING( GetModelName() ) );
 	BaseClass::Precache();
-}	
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 

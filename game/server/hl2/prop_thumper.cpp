@@ -88,8 +88,8 @@ END_DATADESC()
 
 void CPropThumper::Spawn( void )
 {
-	const char *szModel = (const char *)STRING( GetModelName() );
-	if (!szModel || !*szModel)
+	const char *szModel = STRING( GetModelName() );
+	if ( Q_isempty( szModel ) )
 	{
 		szModel = THUMPER_MODEL_NAME;
 		SetModelName( AllocPooledString(szModel) );
@@ -147,6 +147,9 @@ void CPropThumper::Precache( void )
 {
 	BaseClass::Precache();
 
+	// dimhotepus: Default model before Spawn: dynamic load causes FPS drop.
+	if ( GetModelName() == NULL_STRING )
+		SetModelName( AllocPooledString( THUMPER_MODEL_NAME ) );
 	PrecacheModel( STRING( GetModelName() ) );
 	PrecacheScriptSound( "coast.thumper_hit" );
 	PrecacheScriptSound( "coast.thumper_ambient" );

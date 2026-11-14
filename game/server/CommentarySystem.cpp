@@ -31,6 +31,9 @@ static const char *s_pCommentaryUpdateViewThink = "CommentaryUpdateViewThink";
 
 #define COMMENTARY_SPAWNED_SEMAPHORE		"commentary_semaphore"
 
+// dimhotepus: Reuse.
+constexpr inline char kInfoSpeechModelName[]{ "models/extras/info_speech.mdl" };
+
 extern ConVar commentary;
 ConVar commentary_available("commentary_available", "0", FCVAR_NONE, "Automatically set by the game when a commentary file is available for the current map." );
 
@@ -886,10 +889,10 @@ bool IsListeningToCommentary( void )
 void CPointCommentaryNode::Spawn( void )
 {
 	// No model specified?
-	const char *szModel = (const char *)STRING( GetModelName() );
-	if (!szModel || !*szModel)
+	const char *szModel = STRING( GetModelName() );
+	if ( Q_isempty( szModel ) )
 	{
-		szModel = "models/extras/info_speech.mdl";
+		szModel = kInfoSpeechModelName;
 		SetModelName( AllocPooledString(szModel) );
 	}
 
@@ -944,6 +947,9 @@ void CPointCommentaryNode::Activate( void )
 //-----------------------------------------------------------------------------
 void CPointCommentaryNode::Precache()
 {
+	// dimhotepus: Default model before Spawn: dynamic load causes FPS drop.
+	if ( GetModelName() == NULL_STRING )
+		SetModelName( AllocPooledString( kInfoSpeechModelName ) );
 	PrecacheModel( STRING( GetModelName() ) );
 
 	if ( m_iszCommentaryFile.Get() != NULL_STRING )
