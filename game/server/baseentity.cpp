@@ -4774,17 +4774,16 @@ static void ModelLogFunc( const char *fileName, const char *accessType )
 class CWatchForModelAccess: public CAutoGameSystem
 {
 public:
-	virtual bool Init()
+	bool Init() override
 	{
 		filesystem->AddLoggingFunc(&ModelLogFunc);
 		return true;
 	}
 
-	virtual void Shutdown()
+	void Shutdown() override
 	{
 		filesystem->RemoveLoggingFunc(&ModelLogFunc);
 	}
-
 };
 
 static CWatchForModelAccess g_WatchForModels;
