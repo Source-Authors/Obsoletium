@@ -4843,7 +4843,7 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 		if ( !g_ModelSoundsCache.EntryExists( name ) )
 		{
 			char extension[ 8 ];
-			Q_ExtractFileExtension( name, extension, sizeof( extension ) );
+			Q_ExtractFileExtension( name, extension );
 
 			if ( Q_stristr( extension, "mdl" ) )
 			{
@@ -4851,7 +4851,7 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 			}
 			else
 			{
-				if ( !extension[ 0 ] )
+				if ( Q_isempty( extension ) )
 				{
 					Warning( "Precache of %s ambigious (no extension specified)\n", name );
 				}
@@ -4999,7 +4999,7 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 //-----------------------------------------------------------------------------
 int CBaseEntity::PrecacheModel( const char *name, bool bPreload )
 {
-	if ( !name || !*name )
+	if ( Q_isempty( name ) )
 	{
 #ifdef STAGING_ONLY
 		Msg( "Attempting to precache model, but model name is NULL\n");
