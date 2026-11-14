@@ -4774,8 +4774,8 @@ static CWatchForModelAccess g_WatchForModels;
 //-----------------------------------------------------------------------------
 void CBaseEntity::PrecacheSoundHelper( const char *pName )
 {
-		// 360 only
-		Assert( 0 );
+	// 360 only
+	Assert( 0 );
 }
 
 //-----------------------------------------------------------------------------
@@ -4832,7 +4832,7 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 		{
 			KeyValues *pParticleEffects = pModelKeyValues->FindKey("Particles");
 			if ( pParticleEffects )
-			{						   
+			{
 				// Start grabbing the sounds and slotting them in
 				for ( KeyValues *pSingleEffect = pParticleEffects->GetFirstSubKey(); pSingleEffect; pSingleEffect = pSingleEffect->GetNextKey() )
 				{
@@ -4874,7 +4874,7 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 							}
 							continue;
 						}
-								}
+					}
 				}
 			}
 		}
