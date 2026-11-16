@@ -230,14 +230,14 @@ public:
 	void Init( const char *pBuffer, unsigned int size );
 
 	// IPhysCollide
-	virtual int GetVCollideIndex() const { return 0; }
-	virtual IVP_SurfaceManager *CreateSurfaceManager( short & ) const;
-	virtual void GetAllLedges( IVP_U_BigVector<IVP_Compact_Ledge> &ledges ) const;
-	virtual size_t GetSerializationSize() const;
-	virtual Vector GetMassCenter() const;
-	virtual void SetMassCenter( const Vector &massCenter );
-	virtual size_t SerializeToBuffer( char *pDest, bool bSwap = false ) const;
-	virtual void OutputDebugInfo() const;
+	int GetVCollideIndex() const override { return 0; }
+	IVP_SurfaceManager *CreateSurfaceManager( short & ) const override;
+	void GetAllLedges( IVP_U_BigVector<IVP_Compact_Ledge> &ledges ) const override;
+	size_t GetSerializationSize() const override;
+	Vector GetMassCenter() const override;
+	void SetMassCenter( const Vector &massCenter ) override;
+	size_t SerializeToBuffer( char *pDest, bool bSwap = false ) const override;
+	void OutputDebugInfo() const override;
 
 private:
 	IVP_Compact_Mopp		*m_pMopp;
