@@ -10,6 +10,9 @@
 #include <dxgiformat.h>
 #endif
 
+// dimhotepus: For std::size.
+#include <iterator>
+
 #include "bitmap/imageformat.h"
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
@@ -68,8 +71,9 @@ static const ImageFormatInfo_t g_ImageFormatInfo[] =
 	{ "NV_NULL",					4,  8, 8, 8, 8, false },		// IMAGE_FORMAT_NV_NULL
 
 	// Vendor-dependent compressed formats typically used for normal map compression
-	{ "ATI1N",						0, 0, 0, 0, 0, true },			// IMAGE_FORMAT_ATI1N
+	// dimhotepus: Order must match ImageFormat enum, where ATI2N goes before ATI1N.  Names were swapped.
 	{ "ATI2N",						0, 0, 0, 0, 0, true },			// IMAGE_FORMAT_ATI2N
+	{ "ATI1N",						0, 0, 0, 0, 0, true },			// IMAGE_FORMAT_ATI1N
 
 	{ "DXT1_RUNTIME",				0, 0, 0, 0, 0, true, },			// IMAGE_FORMAT_DXT1_RUNTIME
 	{ "DXT5_RUNTIME",				0, 0, 0, 0, 8, true, },			// IMAGE_FORMAT_DXT5_RUNTIME
@@ -84,13 +88,25 @@ namespace ImageLoader
 //-----------------------------------------------------------------------------
 const ImageFormatInfo_t& ImageFormatInfo( ImageFormat fmt )
 {
-	static_assert( ( NUM_IMAGE_FORMATS + 1 ) == std::size( g_ImageFormatInfo ) );
-	Assert( unsigned( fmt + 1 ) <= ( NUM_IMAGE_FORMATS ) );
-	return g_ImageFormatInfo[ fmt + 1 ];
+	// dimhotepus: Compare as size_t to avoid signed / unsigned mismatch.
+	static_assert( static_cast<size_t>( NUM_IMAGE_FORMATS + 1 ) == std::size( g_ImageFormatInfo ) );
+
+	// dimhotepus: Bad format was only asserted, so release builds read out of bounds.  Return UNKNOWN info instead.
+	// Unsigned math is well-defined for any value: IMAGE_FORMAT_UNKNOWN (-1) => 0.
+	const unsigned index = static_cast<unsigned>( fmt ) + 1u;
+	Assert( index < std::size( g_ImageFormatInfo ) );
+	return g_ImageFormatInfo[index < std::size( g_ImageFormatInfo ) ? index : 0];
 }
 
 intp GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, bool mipmap )
 {
+	// dimhotepus: Empty image needs no memory (was negative / garbage for negative sizes, and
+	// mipmap chain of an empty image was counted as 1x1).  Consistent with GetNumMipMapLevels.
+	if ( width <= 0 || height <= 0 )
+	{
+		return 0;
+	}
+
 	if ( depth <= 0 )
 	{
 		depth = 1;
@@ -102,22 +118,14 @@ intp GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, 
 		
 		if ( IsCompressed( imageFormat ) )
 		{
-			Assert( ( width < 4 ) || !( width % 4 ) );
-			Assert( ( height < 4 ) || !( height % 4 ) );
 			Assert( ( depth < 4 ) || !( depth % 4 ) );
-			if ( width < 4 && width > 0 )
-			{
-				width = 4;
-			}
-			if ( height < 4 && height > 0 )
-			{
-				height = 4;
-			}
 			if ( depth < 4 && depth > 1 )
 			{
 				depth = 4;
 			}
-			intp numBlocks = ( static_cast<intp>(width) * height ) >> 4;
+			// dimhotepus: Round up to whole 4x4 blocks.  Old code truncated non multiple of 4 sizes
+			// (e.g. 6x6 => 2 blocks instead of 4) in release builds, under-allocating memory.
+			intp numBlocks = ( ( static_cast<intp>(width) + 3 ) >> 2 ) * ( ( static_cast<intp>(height) + 3 ) >> 2 );
 			numBlocks *= depth;
 			switch ( imageFormat )
 			{
@@ -133,7 +141,7 @@ intp GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, 
 				return numBlocks * 16;
 
 			default:
-				AssertMsg(false, "Unsupported image format %d", imageFormat);
+				AssertMsg(false, "Unsupported image format %d", static_cast<int>( imageFormat ));
 				break;
 			}
 
@@ -178,7 +186,8 @@ intp GetMipMapLevelByteOffset( int width, int height, ImageFormat imageFormat, i
 
 	while( skipMipLevels > 0 )
 	{
-		offset += static_cast<intp>(width) * height * SizeInBytes(imageFormat);
+		// dimhotepus: Use GetMemRequired, as SizeInBytes is 0 for block compressed formats => offset was always 0.
+		offset += GetMemRequired( width, height, 1, imageFormat, false );
 		if( width == 1 && height == 1 )
 		{
 			break;
@@ -200,6 +209,13 @@ intp GetMipMapLevelByteOffset( int width, int height, ImageFormat imageFormat, i
 
 void GetMipMapLevelDimensions( int *width, int *height, int skipMipLevels )
 {
+	// dimhotepus: Don't crash on null.
+	Assert( width && height );
+	if ( !width || !height )
+	{
+		return;
+	}
+
 	while( skipMipLevels > 0 )
 	{
 		if( *width == 1 && *height == 1 )
@@ -256,19 +272,15 @@ int GetNumMipMapLevels( int width, int height, int depth )
 	return numMipLevels;
 }
 
-#ifdef DX_TO_GL_ABSTRACTION
-#ifndef MAKEFOURCC
-#define MAKEFOURCC(ch0, ch1, ch2, ch3)                              \
-	((DWORD)(byte)(ch0) | ((DWORD)(byte)(ch1) << 8) |   \
-	((DWORD)(byte)(ch2) << 16) | ((DWORD)(byte)(ch3) << 24 ))
-#endif //defined(MAKEFOURCC)
-#endif	
+// dimhotepus: Conversions need real D3D9 / DXGI headers, which are included only on Windows without
+// DX_TO_GL_ABSTRACTION.  MAKEFOURCC comes from d3d9types.h there; DX_TO_GL_ABSTRACTION (Linux, macOS)
+// does not have D3D, so the fallback define (and DWORD / byte dependency) is removed.
 //-----------------------------------------------------------------------------
 // convert back and forth from D3D format to ImageFormat, regardless of
 // whether it's supported or not.
 //-----------------------------------------------------------------------------
 // dimhotepus: Windows only, DirectX shader API backends.
-#ifdef _WIN32
+#if defined( _WIN32 ) && !defined( DX_TO_GL_ABSTRACTION )
 ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 {
 	switch ( format )
@@ -361,7 +373,7 @@ ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 	SE_GCC_END_WARNING_OVERRIDE_SCOPE()
 
 	default:
-		AssertMsg( false, "Unknown D3DFORMAT 0x%x.", format );
+		AssertMsg( false, "Unknown D3DFORMAT 0x%x.", static_cast<unsigned>( format ) );
 		return IMAGE_FORMAT_UNKNOWN;
 	}
 }
@@ -467,7 +479,7 @@ ImageFormat DxgiFormatToImageFormat( DXGI_FORMAT format )
 	SE_GCC_END_WARNING_OVERRIDE_SCOPE()
 
 	default:
-		AssertMsg( false, "Unknown DXGI_FORMAT 0x%x.", format );
+		AssertMsg( false, "Unknown DXGI_FORMAT 0x%x.", static_cast<unsigned>( format ) );
 		return IMAGE_FORMAT_UNKNOWN;
 	}
 }
@@ -556,7 +568,7 @@ D3DFORMAT ImageFormatToD3DFormat( ImageFormat format )
 		return D3DFMT_DXT5;
 
 	default:
-		AssertMsg( false, "Unknown ImageFormat 0x%x.", format );
+		AssertMsg( false, "Unknown ImageFormat 0x%x.", static_cast<unsigned>( format ) );
 		return D3DFMT_UNKNOWN;
 	}
 }
@@ -653,11 +665,10 @@ DXGI_FORMAT ImageFormatToDxgiFormat( ImageFormat format )
 		return DXGI_FORMAT_BC3_UNORM;
 
 	default:
-		AssertMsg( false, "Unknown ImageFormat 0x%x.", format );
+		AssertMsg( false, "Unknown ImageFormat 0x%x.", static_cast<unsigned>( format ) );
 		return DXGI_FORMAT_UNKNOWN;
 	}
 }
-#endif // _WIN32
+#endif // _WIN32 && !DX_TO_GL_ABSTRACTION
 
 } // ImageLoader namespace ends
-

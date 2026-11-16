@@ -9,6 +9,9 @@
 #ifndef BITMAP_H
 #define BITMAP_H
 
+// dimhotepus: Include for ptrdiff_t used in pixel address math.
+#include <cstddef>
+
 #include "imageformat.h"
 #include "Color.h"
 #include "tier0/dbg.h"
@@ -22,6 +25,27 @@ struct Bitmap_t
 {
 	Bitmap_t() { Reset(); }
 	~Bitmap_t() { Clear(); }
+
+	// dimhotepus: Bitmap_t owns a raw malloc'ed buffer, so implicit copy would
+	// double-free.  Forbid copy, allow move (use MakeLogicalCopyOf for sharing).
+	Bitmap_t( const Bitmap_t & ) = delete;
+	Bitmap_t &operator=( const Bitmap_t & ) = delete;
+
+	Bitmap_t( Bitmap_t &&src ) noexcept
+	{
+		Reset();
+		MoveFrom( src );
+	}
+
+	Bitmap_t &operator=( Bitmap_t &&src ) noexcept
+	{
+		if ( this != &src )
+		{
+			Clear();
+			MoveFrom( src );
+		}
+		return *this;
+	}
 
 	//
 	// Accessors
@@ -85,6 +109,21 @@ struct Bitmap_t
 private:
 	void Reset();
 
+	// dimhotepus: Steal all state (including buffer ownership) from src, leaving src empty.
+	// Expects this to be already cleared.
+	void MoveFrom( Bitmap_t &src ) noexcept
+	{
+		m_nWidth = src.m_nWidth;
+		m_nHeight = src.m_nHeight;
+		m_nPixelSize = src.m_nPixelSize;
+		m_nStride = src.m_nStride;
+		m_bOwnsBuffer = src.m_bOwnsBuffer;
+		m_ImageFormat = src.m_ImageFormat;
+		m_pBits = src.m_pBits;
+
+		src.Reset();
+	}
+
 	/// Dimensions
 	int m_nWidth;
 	int m_nHeight;
@@ -122,7 +161,9 @@ inline unsigned char *Bitmap_t::GetPixel( int x, int y )
 	if ( !m_pBits )
 		return nullptr;
 
-	return m_pBits + (y*m_nStride) + x* m_nPixelSize;
+	// dimhotepus: Do address math in ptrdiff_t to avoid 32-bit int overflow on
+	// big images (x86-64 / arm64).
+	return m_pBits + static_cast<ptrdiff_t>(y) * m_nStride + static_cast<ptrdiff_t>(x) * m_nPixelSize;
 }
 
 inline const unsigned char *Bitmap_t::GetPixel( int x, int y ) const
@@ -130,7 +171,8 @@ inline const unsigned char *Bitmap_t::GetPixel( int x, int y ) const
 	if ( !m_pBits )
 		return nullptr;
 
-	return m_pBits + y * m_nStride + x * m_nPixelSize;
+	// dimhotepus: Do address math in ptrdiff_t to avoid 32-bit int overflow.
+	return m_pBits + static_cast<ptrdiff_t>(y) * m_nStride + static_cast<ptrdiff_t>(x) * m_nPixelSize;
 }
 
 
