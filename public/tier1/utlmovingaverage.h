@@ -4,94 +4,104 @@
 //
 // $NoKeywords: $
 //
-// 
 //=============================================================================//
 #ifndef MOVING_AVERAGE_H
 #define MOVING_AVERAGE_H
 
+#include <cfloat>
+#include <cmath>
 #include "tier0/platform.h"
 #include "tier0/basetypes.h"
 
 template<uint32 TBufferSize> class CUtlMovingAverage
 {
+	static_assert( TBufferSize > 0, "CUtlMovingAverage requires a non-zero buffer size" );
+
 public:
 	CUtlMovingAverage() :
 		m_nValuesPushed( 0 ),
-		m_flTotal( 0.0f )
+		m_nNextIndex( 0 ),
+		m_flTotal( 0.0 )
 	{
+		// dimhotepus: Ensure init.
+		for ( uint32 i = 0; i < TBufferSize; ++i )
+			m_Buffer[i] = 0.0f;
 	}
 
 	void Reset()
 	{
 		m_nValuesPushed = 0;
-		m_flTotal = 0.0f;
+		// dimhotepus: Ensure reset.
+		m_nNextIndex = 0;
+		m_flTotal = 0.0;
 	}
 
-	[[nodiscard]] uint32 GetTotalValuesPushed() const 
-	{ 
-		return m_nValuesPushed; 
-	}
-
-	float GetAverage( )
+	[[nodiscard]] uint32 GetTotalValuesPushed() const
 	{
-		uint n = MIN( TBufferSize, m_nValuesPushed );
-		return n ? ( m_flTotal / static_cast<double>( n ) ) : 0.0f;
+		return m_nValuesPushed;
 	}
 
-	void GetAverageAndAbsRange( float *pflOutAverage, float *pflOutAbsRange, float *pflMinTime, float *pflMaxTime )
+	[[nodiscard]] float GetAverage() const
+	{
+		const uint32 n = MIN( TBufferSize, m_nValuesPushed );
+		return n ? static_cast<float>( m_flTotal / static_cast<double>( n ) ) : 0.0f;
+	}
+
+	void GetAverageAndAbsRange( float *pflOutAverage, float *pflOutAbsRange, float *pflMinTime, float *pflMaxTime ) const
 	{
 		if ( m_nValuesPushed == 0 )
 		{
-			*pflOutAverage = 0;
-			*pflOutAbsRange = 0;
-			*pflMinTime = 0;
-			*pflMaxTime = 0;
+			*pflOutAverage = 0.0f;
+			*pflOutAbsRange = 0.0f;
+			*pflMinTime = 0.0f;
+			*pflMaxTime = 0.0f;
 			return;
 		}
 
-		*pflOutAverage = GetAverage();
+		const float flAverage = GetAverage();
+		const uint32 nNumValues = MIN( TBufferSize, m_nValuesPushed );
 
-		const int nNumValues = MIN( m_nValuesPushed, TBufferSize );
+		float flAbsRange = 0.0f;
+		float flMinValue = FLT_MAX;
+		float flMaxValue = -FLT_MAX;
 
-		float flAbsRange = 0;
-		float flMinTime = 9e+9;
-		float flMaxTime = 0;
-
-		for ( int i = 0; i < nNumValues; ++i )
+		for ( uint32 i = 0; i < nNumValues; ++i )
 		{
-			float flDif = ( m_Buffer[i] - *pflOutAverage );
-			flAbsRange = MAX( flAbsRange, abs( flDif ) );
-			flMinTime = MIN( flMinTime, m_Buffer[i] );
-			flMaxTime = MAX( flMaxTime, m_Buffer[i] );
+			const float v = m_Buffer[i];
+			flAbsRange = MAX( flAbsRange, fabsf( v - flAverage ) );
+			flMinValue = MIN( flMinValue, v );
+			flMaxValue = MAX( flMaxValue, v );
 		}
 
+		*pflOutAverage = flAverage;
 		*pflOutAbsRange = flAbsRange;
-		*pflMinTime = flMinTime;
-		*pflMaxTime = flMaxTime;
+		*pflMinTime = flMinValue;
+		*pflMaxTime = flMaxValue;
 	}
 
 	void PushValue( float v )
 	{
-		uint nIndex = m_nValuesPushed % TBufferSize;
-		
+		// dimhotepus: Once the window is full, the slot being overwritten holds the oldest value
 		if ( m_nValuesPushed >= TBufferSize )
 		{
-			m_flTotal = MAX( m_flTotal - m_Buffer[nIndex], 0.0f );
+			m_flTotal -= m_Buffer[m_nNextIndex];
 		}
 		m_flTotal += v;
 
-		m_Buffer[nIndex] = v;
-		m_nValuesPushed++;
+		m_Buffer[m_nNextIndex] = v;
+		m_nNextIndex = ( m_nNextIndex + 1 ) % TBufferSize;
 
-		if ( UINT_MAX == m_nValuesPushed )
+		// Saturate the count instead of resetting, so the window stays valid
+		if ( m_nValuesPushed != ~uint32( 0 ) )
 		{
-			Reset();
+			++m_nValuesPushed;
 		}
 	}
-		
+
 private:
 	float m_Buffer[TBufferSize];
 	uint32 m_nValuesPushed;
+	uint32 m_nNextIndex;
 
 	double m_flTotal;
 };
