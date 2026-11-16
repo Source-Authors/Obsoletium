@@ -1036,11 +1036,12 @@ void ConvertImageFormat_RGBA16161616_To_RGB323232F( unsigned short *pSrcImage, f
 	unsigned short *pSrcEnd = pSrcImage + srcSize;
 	unsigned short *pSrcScan = pSrcImage;
 	float *pDstScan = pDstImage;
+	constexpr float kInverse{1.0f / ( float )( 1 << 12 )};
 	for ( ; pSrcScan < pSrcEnd; pSrcScan += 4, pDstScan += 3 )
 	{
-		pDstScan[0] = ( ( float )pSrcScan[0] ) * ( 1.0f / ( ( float )( 1 << 12 ) ) );
-		pDstScan[1] = ( ( float )pSrcScan[1] ) * ( 1.0f / ( ( float )( 1 << 12 ) ) );
-		pDstScan[2] = ( ( float )pSrcScan[2] ) * ( 1.0f / ( ( float )( 1 << 12 ) ) );
+		pDstScan[0] = ( float )pSrcScan[0] * kInverse;
+		pDstScan[1] = ( float )pSrcScan[1] * kInverse;
+		pDstScan[2] = ( float )pSrcScan[2] * kInverse;
 	}
 }
 
@@ -1051,12 +1052,13 @@ void ConvertImageFormat_RGB323232F_To_RGBA16161616( float *pSrcImage, unsigned s
 	float *pSrcEnd = pSrcImage + srcSize;
 	float *pSrcScan = pSrcImage;
 	unsigned short *pDstScan = pDstImage;
+	constexpr float kCoefficient{ (float)( 1 << 12 ) };
 	for ( ; pSrcScan < pSrcEnd; pSrcScan += 3, pDstScan += 4 )
 	{
 
-		pDstScan[0] = ( unsigned short )min( 65535.0f, ( pSrcScan[0] * ( ( ( float )( 1 << 12 ) ) ) ) );
-		pDstScan[1] = ( unsigned short )min( 65535.0f, ( pSrcScan[1] * ( ( ( float )( 1 << 12 ) ) ) ) );
-		pDstScan[2] = ( unsigned short )min( 65535.0f, ( pSrcScan[2] * ( ( ( float )( 1 << 12 ) ) ) ) );
+		pDstScan[0] = ( unsigned short )min( 65535.0f, pSrcScan[0] * kCoefficient );
+		pDstScan[1] = ( unsigned short )min( 65535.0f, pSrcScan[1] * kCoefficient );
+		pDstScan[2] = ( unsigned short )min( 65535.0f, pSrcScan[2] * kCoefficient );
 		pDstScan[3] = 65535;
 	}
 }
@@ -1202,12 +1204,13 @@ void ConvertImageFormat_RGBA16161616_To_RGBA16161616F( unsigned short *pSrcImage
 	unsigned short *pSrcEnd = pSrcImage + srcSize;
 	unsigned short *pSrcScan = pSrcImage;
 	auto *pDstScan = ( float16 * )pDstImage;
+	constexpr float kInverse{ 1.0f / (float)( 1 << 16 ) };
 	for( ; pSrcScan < pSrcEnd; pSrcScan += 4, pDstScan += 4 )
 	{
-		pDstScan[0].SetFloat( pSrcScan[0] * ( 1.0f / ( float )( 1 << 16 ) ) );
-		pDstScan[1].SetFloat( pSrcScan[1] * ( 1.0f / ( float )( 1 << 16 ) ) );
-		pDstScan[2].SetFloat( pSrcScan[2] * ( 1.0f / ( float )( 1 << 16 ) ) );
-		pDstScan[3].SetFloat( pSrcScan[3] * ( 1.0f / ( float )( 1 << 16 ) ) );
+		pDstScan[0].SetFloat( pSrcScan[0] * kInverse );
+		pDstScan[1].SetFloat( pSrcScan[1] * kInverse );
+		pDstScan[2].SetFloat( pSrcScan[2] * kInverse );
+		pDstScan[3].SetFloat( pSrcScan[3] * kInverse );
 	}
 }
 
@@ -1217,14 +1220,13 @@ void ConvertImageFormat_RGBA16161616F_To_RGBA16161616( float16 *pSrcImage, unsig
 	float16 *pSrcEnd = pSrcImage + srcSize;
 	float16 *pSrcScan = pSrcImage;
 	unsigned short *pDstScan = pDstImage;
+	constexpr float kScale{ 1 << 12 };
 	for( ; pSrcScan < pSrcEnd; pSrcScan += 4, pDstScan += 4 )
 	{
-		int i;
-		for( i = 0; i < 4; i++ )
+		for( int i = 0; i < 4; i++ )
 		{
-			float val;
-			val = pSrcScan[i].GetFloat();
-			val *= ( float )( 1 << 12 );
+			float val = pSrcScan[i].GetFloat();
+			val *= kScale;
 			val = max( val, 0.f );
 			val = min( val, 65535.0f );
 			pDstScan[i] = ( unsigned short )val;
