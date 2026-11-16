@@ -30,14 +30,14 @@ using SDL_Cursor = struct SDL_Cursor;
 abstract_class ILauncherMgr : public IAppSystem
 {
 public:
-	virtual bool Connect( CreateInterfaceFn factory ) = 0;
-	virtual void Disconnect() = 0;
+	virtual bool Connect( CreateInterfaceFn factory ) override = 0;
+	virtual void Disconnect() override = 0;
 	
-	virtual void *QueryInterface( const char *pInterfaceName ) = 0;
+	virtual void *QueryInterface( const char *pInterfaceName ) override = 0;
 	
 	// Init, shutdown
-	virtual InitReturnVal_t Init() = 0;
-	virtual void Shutdown() = 0;
+	virtual InitReturnVal_t Init() override = 0;
+	virtual void Shutdown() override = 0;
 	
 	// Create the window.
 	virtual bool CreateGameWindow( const char *pTitle, bool bWindowed, int width, int height ) = 0;
@@ -76,7 +76,7 @@ public:
 	virtual PseudoGLContextPtr CreateExtraContext() = 0;
 	virtual void DeleteContext( PseudoGLContextPtr hContext ) = 0;
 	virtual bool MakeContextCurrent( PseudoGLContextPtr hContext ) = 0;
-	virtual GLMDisplayDB *GetDisplayDB( void ) = 0;
+	virtual GLMDisplayDB *GetDisplayDB() = 0;
 	virtual void GetDesiredPixelFormatAttribsAndRendererInfo( uint **ptrOut, uint *countOut, GLMRendererInfoFields *rendInfoOut ) = 0;
 	virtual void ShowPixels( CShowPixelsParams *params ) = 0;
 #endif
@@ -135,15 +135,18 @@ enum ECocoaKeyModifier
 class CCocoaEvent
 {
 public:
-	CocoaEventType_t m_EventType;
-	int m_VirtualKeyCode;
-	wchar_t m_UnicodeKey;
-	wchar_t m_UnicodeKeyUnmodified;
-	uint m_ModifierKeyMask;		// 
-	int m_MousePos[2];
-	int m_MouseButtonFlags;	// Current state of the mouse buttons. See COCOABUTTON_xxxx.
-	uint m_nMouseClickCount;
-	int m_MouseButton; // which of the CocoaMouseButton_t buttons this is for from above
+	// dimhotepus: Default initialize all fields. Events are filled partially depending on
+	// type, so reading unset fields (e.g. mouse pos of a key event) was reading garbage.
+	// NOTE: wchar_t is 2 bytes on Windows and 4 on Linux/macOS, never serialize this struct.
+	CocoaEventType_t m_EventType{ CocoaEvent_Deleted };
+	int m_VirtualKeyCode{};
+	wchar_t m_UnicodeKey{};
+	wchar_t m_UnicodeKeyUnmodified{};
+	uint m_ModifierKeyMask{};	// Bit mask of 1 << ECocoaKeyModifier values.
+	int m_MousePos[2]{};
+	int m_MouseButtonFlags{};	// Current state of the mouse buttons. See COCOABUTTON_xxxx.
+	uint m_nMouseClickCount{};
+	int m_MouseButton{}; // which of the CocoaMouseButton_t buttons this is for from above
 };
 
 #endif // defined( USE_SDL )

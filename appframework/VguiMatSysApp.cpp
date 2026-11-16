@@ -6,9 +6,14 @@
 // the agreement/contract under which the contents have been supplied.
 //
 //=============================================================================
+// dimhotepus: Was Windows-only, so Create/PreInit/etc. were missing on other platforms.
+// Only the native window handling is platform specific now.
 #ifdef _WIN32
-
 #include "winlite.h"
+
+#include <algorithm>
+#include <system_error>
+#endif
 
 #include "appframework/AppFramework.h"
 #include "appframework/VguiMatSysApp.h"
@@ -26,6 +31,10 @@
 #include "VGuiMatSurface/IMatSystemSurface.h"
 #include "inputsystem/iinputsystem.h"
 #include "tier3/tier3.h"
+
+#if !defined( _WIN32 ) && defined( USE_SDL )
+#include "appframework/ilaunchermgr.h"
+#endif
 
 
 //-----------------------------------------------------------------------------
@@ -78,19 +87,22 @@ void CVguiMatSysApp::Destroy()
 
 
 
+#ifdef _WIN32
 //-----------------------------------------------------------------------------
 // Window management
 //-----------------------------------------------------------------------------
 void* CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w, int h )
 {
-	WNDCLASSEX  wc   = {sizeof( wc ), 0, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+	// dimhotepus: Use explicit ANSI structure, as we call ANSI RegisterClassExA/CreateWindowExA.
+	WNDCLASSEXA wc   = {sizeof( wc ), 0, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 	wc.style         = CS_OWNDC | CS_DBLCLKS;
 	wc.lpfnWndProc   = DefWindowProc;
 	wc.hInstance     = static_cast<HINSTANCE>(GetAppInstance());
 	wc.lpszClassName = "Valve001";
 	wc.hIconSm       = wc.hIcon;
 
-	if (!RegisterClassExA( &wc ))
+	// dimhotepus: The class stays registered after first window, so second call is not an error.
+	if (!RegisterClassExA( &wc ) && ::GetLastError() != ERROR_CLASS_ALREADY_EXISTS)
 	{
 		Warning("Unable to register window '%s' class: %s.\n",
 			pTitle, std::system_category().message(::GetLastError()).c_str());
@@ -130,20 +142,76 @@ void* CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w
 	Plat_ApplySystemTitleBarTheme( hWnd, SystemBackdropType::MainWindow );
 
 	const unsigned window_dpi{::GetDpiForWindow(hWnd)};
+	// dimhotepus: Recompute from the client size. Adjusting the already adjusted rect
+	// added non-client area twice, so client area was bigger than requested.
+	windowRect = {0, 0, w, h};
 	// Compute rect needed for DPI + that size client area based on window style
 	::AdjustWindowRectExForDpi(&windowRect, style, FALSE, 0, window_dpi);
 
-	const int CenterX{std::max(0, (GetSystemMetricsForDpi(SM_CXSCREEN, window_dpi) - w) / 2)};
-	const int CenterY{std::max(0, (GetSystemMetricsForDpi(SM_CYSCREEN, window_dpi) - h) / 2)};
+	// dimhotepus: Center whole window (with frame), not only the client size.
+	const int windowWidth{windowRect.right - windowRect.left};
+	const int windowHeight{windowRect.bottom - windowRect.top};
+	const int CenterX{std::max(0, (GetSystemMetricsForDpi(SM_CXSCREEN, window_dpi) - windowWidth) / 2)};
+	const int CenterY{std::max(0, (GetSystemMetricsForDpi(SM_CYSCREEN, window_dpi) - windowHeight) / 2)};
 
 	// In VCR modes, keep it in the upper left so mouse coordinates are always
 	// relative to the window.
-	::SetWindowPos( hWnd, nullptr, CenterX, CenterY,
-		windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
+	::SetWindowPos( hWnd, nullptr, CenterX, CenterY, windowWidth, windowHeight,
 		SWP_NOZORDER | SWP_SHOWWINDOW | SWP_DRAWFRAME);
 
 	return hWnd;
 }
+
+//-----------------------------------------------------------------------------
+// dimhotepus: Destroys the window, it was leaked before.
+//-----------------------------------------------------------------------------
+void CVguiMatSysApp::DestroyAppWindow()
+{
+	if ( !m_HWnd )
+		return;
+
+	::DestroyWindow( static_cast<HWND>( m_HWnd ) );
+	::UnregisterClassA( "Valve001", static_cast<HINSTANCE>( GetAppInstance() ) );
+	m_HWnd = nullptr;
+}
+
+
+#else
+//-----------------------------------------------------------------------------
+// Window management
+//-----------------------------------------------------------------------------
+// dimhotepus: Non-Windows platforms use launcher manager (SDL) to own the window.
+void* CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w, int h )
+{
+#if defined( USE_SDL )
+	auto *pLauncherMgr = FindSystem<ILauncherMgr>( SDLMGR_INTERFACE_VERSION );
+	if ( !pLauncherMgr )
+	{
+		Warning( "Unable to create window '%s': no '%s' interface.\n", pTitle, SDLMGR_INTERFACE_VERSION );
+		return nullptr;
+	}
+
+	if ( !pLauncherMgr->CreateGameWindow( pTitle, bWindowed, w, h ) )
+	{
+		Warning( "Unable to create window '%s'.\n", pTitle );
+		return nullptr;
+	}
+
+	return pLauncherMgr->GetWindowRef();
+#else
+	Warning( "Unable to create window '%s' (%dx%d, windowed: %d): platform has no window support.\n",
+		pTitle, w, h, static_cast<int>( bWindowed ) );
+	return nullptr;
+#endif
+}
+
+// The launcher manager owns the window and destroys it on shutdown.
+void CVguiMatSysApp::DestroyAppWindow()
+{
+	m_HWnd = nullptr;
+}
+
+#endif // _WIN32
 
 
 //-----------------------------------------------------------------------------
@@ -176,25 +244,32 @@ bool CVguiMatSysApp::PreInit( )
 	if ( !BaseClass::PreInit() )
 		return false;
 
+	// dimhotepus: PostShutdown is not called when PreInit fails, so roll back base class
+	// state (tier libraries, vgui) on every failure path below.
 	if ( !g_pFullFileSystem || !g_pMaterialSystem || !g_pInputSystem || !g_pMatSystemSurface )
 	{
 		Warning( "CVguiMatSysApp::PreInit: Unable to connect to necessary interfaces!\n" );
+		BaseClass::PostShutdown();
 		return false;
 	}
 
 	// Add paths...
 	if ( !SetupSearchPaths( nullptr, false, true ) )
+	{
+		BaseClass::PostShutdown();
 		return false;
+	}
 
 	const char *pArg;
 	int iWidth = 1024;
 	int iHeight = 768;
 	bool bWindowed = !CommandLine()->HasParm( "-fullscreen" );
-	if (CommandLine()->CheckParm( "-width", &pArg ))
+	// dimhotepus: Ignore invalid sizes (atoi gives 0 on garbage), zero-sized window is useless.
+	if (CommandLine()->CheckParm( "-width", &pArg ) && atoi( pArg ) > 0)
 	{
 		iWidth = atoi( pArg );
 	}
-	if (CommandLine()->CheckParm( "-height", &pArg ))
+	if (CommandLine()->CheckParm( "-height", &pArg ) && atoi( pArg ) > 0)
 	{
 		iHeight = atoi( pArg );
 	}
@@ -203,7 +278,10 @@ bool CVguiMatSysApp::PreInit( )
 	m_nHeight = iHeight;
 	m_HWnd = CreateAppWindow( GetAppName(), bWindowed, iWidth, iHeight );
 	if ( !m_HWnd )
+	{
+		BaseClass::PostShutdown();
 		return false;
+	}
 
 	g_pInputSystem->AttachToWindow( m_HWnd );
 	g_pMatSystemSurface->AttachToWindow( m_HWnd );
@@ -241,6 +319,9 @@ void CVguiMatSysApp::PostShutdown()
 		g_pMatSystemSurface->AttachToWindow( nullptr );
 		g_pInputSystem->DetachFromWindow( );
 	}
+
+	// dimhotepus: Window was leaked on Windows.
+	DestroyAppWindow();
 
 	BaseClass::PostShutdown();
 }
@@ -299,7 +380,7 @@ bool CVguiMatSysApp::SetVideoMode( )
 	bool modeSet = g_pMaterialSystem->SetMode( m_HWnd, config );
 	if (!modeSet)
 	{
-		Error( "Unable to set mode %d x %d, %d Hz, format BGRX88888.\n",
+		Error( "Unable to set mode %d x %d, %d Hz, format BGRX8888.\n",
 			config.m_VideoMode.m_Width,
 			config.m_VideoMode.m_Height,
 			config.m_VideoMode.m_RefreshRate );
@@ -308,6 +389,3 @@ bool CVguiMatSysApp::SetVideoMode( )
 	g_pMaterialSystem->OverrideConfig( config, false );
 	return true;
 }
-
-#endif // _WIN32
-

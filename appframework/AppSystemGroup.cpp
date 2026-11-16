@@ -136,7 +136,15 @@ IAppSystem *CAppSystemGroup::AddSystem( AppModule_t m, const char *pInterfaceNam
 		? Sys_GetFactory( m_Modules[m].m_pModule )
 		: m_Modules[m].m_Factory;
 
-	int retval;
+	// dimhotepus: Module may not export CreateInterface, factory is null then.
+	if ( !pFactory )
+	{
+		Warning("AppFramework: Module has no factory to create system %s!\n", pInterfaceName);
+		return nullptr;
+	}
+
+	// dimhotepus: Initialize, factory may not set return code on failure.
+	int retval{ to_underlying( IFACE_FAILED ) };
 	void *pSystem = pFactory( pInterfaceName, &retval );
 	if ((retval != IFACE_OK) || (!pSystem))
 	{
@@ -185,7 +193,7 @@ void CAppSystemGroup::ReportStartupFailure( int nErrorStage, intp nSysIndex )
 	}
 
 	// Walk the dictionary
-	Warning( "System (%s) failed during stage %s\n", pszSystemName, pszStageDesc );
+	Warning( "AppFramework: System (%s) failed during stage %s\n", pszSystemName, pszStageDesc );
 }
 
 void CAppSystemGroup::AddSystem( IAppSystem *pAppSystem, const char *pInterfaceName )
@@ -216,13 +224,14 @@ void CAppSystemGroup::RemoveAllSystems()
 //-----------------------------------------------------------------------------
 bool CAppSystemGroup::AddSystems( AppSystemInfo_t *pSystemList )
 {
-	while ( pSystemList->m_pModuleName[0] )
+	// dimhotepus: Header documents NULL terminator, accept both NULL and empty module name.
+	while ( !Q_isempty( pSystemList->m_pModuleName ) )
 	{
 		AppModule_t m = LoadModule( pSystemList->m_pModuleName );
 		IAppSystem *pSystem = AddSystem( m, pSystemList->m_pInterfaceName );
 		if ( !pSystem )
 		{
-			Warning( "Unable to load interface %s from %s\n", pSystemList->m_pInterfaceName, pSystemList->m_pModuleName );
+			Warning( "AppFramework: Unable to load interface %s from %s\n", pSystemList->m_pInterfaceName, pSystemList->m_pModuleName );
 			return false;
 		}
 		++pSystemList;
@@ -286,6 +295,13 @@ bool CAppSystemGroup::ConnectSystems()
 		if (!sys->Connect( GetFactory() ))
 		{
 			ReportStartupFailure( CONNECTION, i );
+
+			// dimhotepus: OnShutdown skips DisconnectSystems on connection failure,
+			// so disconnect already connected systems here in reverse order.
+			while ( --i >= 0 )
+			{
+				m_Systems[i]->Disconnect();
+			}
 			return false;
 		}
 
@@ -316,6 +332,13 @@ InitReturnVal_t CAppSystemGroup::InitSystems()
 		if ( nRetVal != INIT_OK )
 		{
 			ReportStartupFailure( INITIALIZATION, i );
+
+			// dimhotepus: Shutdown already initialized systems in reverse order, they
+			// are not shut down by OnShutdown on initialization failure.
+			while ( --i >= 0 )
+			{
+				m_Systems[i]->Shutdown();
+			}
 			return nRetVal;
 		}
 
@@ -351,7 +374,8 @@ CAppSystemGroup::AppSystemGroupStage_t CAppSystemGroup::GetErrorStage() const
 static CAppSystemGroup *s_pCurrentAppSystem;
 void *AppSystemCreateInterfaceFn(const char *pName, int *pReturnCode)
 {
-	void *pInterface = s_pCurrentAppSystem->FindSystem( pName );
+	// dimhotepus: No current group when called outside of Run/Startup..Shutdown.
+	void *pInterface = s_pCurrentAppSystem ? s_pCurrentAppSystem->FindSystem( pName ) : nullptr;
 	if ( pReturnCode )
 	{
 		*pReturnCode = pInterface ? to_underlying(IFACE_OK) : to_underlying(IFACE_FAILED);
@@ -380,16 +404,19 @@ int CAppSystemGroup::Run()
 	// Load, connect, init
 	int nRetVal = OnStartup();
  	if ( m_nErrorStage != NONE )
+	{
+		// dimhotepus: Clean up what was created before the failure (OnShutdown handles
+		// every error stage) instead of leaking modules/systems and dangling the factory.
+		OnShutdown();
 		return nRetVal;
+	}
 
 	// Main loop implemented by the application
 	nRetVal = Main();
 
 	// Shutdown, disconnect, unload
+	// NOTE: OnShutdown restores the parent's app system group as the factory.
 	OnShutdown();
-
-	// The factory now uses the parent's app system group
-	s_pCurrentAppSystem	= GetParent();
 
 	return nRetVal;
 }
@@ -463,7 +490,14 @@ void CAppSystemGroup::OnShutdown()
 		break;
 
 	case PREINITIALIZATION:
+		// PreInit failed, so it has to roll back by itself and PostShutdown is not called.
+		goto disconnect;
+
 	case INITIALIZATION:
+		// dimhotepus: PreInit succeeded, so the application must get its PostShutdown
+		// to release what it acquired there (tier libraries, convars, etc.).
+		// Systems initialized before the failure were already shut down by InitSystems.
+		PostShutdown();
 		goto disconnect;
 	
 	case CREATION:
@@ -493,6 +527,9 @@ destroy:
 
 	// Call an installed application destroy function
 	Destroy();
+
+	// dimhotepus: The factory now uses the parent's app system group.
+	s_pCurrentAppSystem	= GetParent();
 }
 
 
@@ -531,6 +568,11 @@ void CSteamAppSystemGroup::Setup( IFileSystem *pFileSystem, CAppSystemGroup *pPa
 //-----------------------------------------------------------------------------
 CSysModule *CSteamAppSystemGroup::LoadModuleDLL( const char *pDLLName )
 {
+	// dimhotepus: Setup() must be called first if the file system was not passed to the constructor.
+	Assert( m_pFileSystem );
+	if ( !m_pFileSystem )
+		return nullptr;
+
 	return m_pFileSystem->LoadModule( pDLLName );
 }
 
@@ -554,6 +596,11 @@ bool CSteamAppSystemGroup::SetupSearchPaths( const char *pStartingDir, bool bOnl
 	steamInfo.m_bOnlyUseDirectoryName = bOnlyUseStartingDir;
 	steamInfo.m_bToolsMode = bIsTool;
 	steamInfo.m_bSetSteamDLLPath = true;
+	// dimhotepus: Setup() must be called first if the file system was not passed to the constructor.
+	Assert( m_pFileSystem );
+	if ( !m_pFileSystem )
+		return false;
+
 	steamInfo.m_bSteam = m_pFileSystem->IsSteam();
 	if ( FileSystem_SetupSteamEnvironment( steamInfo ) != FS_OK )
 		return false;

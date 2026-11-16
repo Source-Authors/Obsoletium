@@ -8,7 +8,7 @@
 #include "appframework/AppFramework.h"
 #include "tier0/dbg.h"
 #include "tier0/icommandline.h"
-#include "interface.h"
+#include "tier1/interface.h"
 #include "filesystem.h"
 #include "appframework/IAppSystemGroup.h"
 #include "filesystem_init.h"
@@ -22,7 +22,8 @@
 //-----------------------------------------------------------------------------
 // Globals...
 //-----------------------------------------------------------------------------
-HINSTANCE s_HInstance;
+// dimhotepus: Internal linkage, same as on Windows (was exported global).
+static HINSTANCE s_HInstance;
 
 //-----------------------------------------------------------------------------
 // HACK: Since I don't want to refit vgui yet...
@@ -46,8 +47,9 @@ void SetAppInstance( void* hInstance )
 // Version of AppMain used by windows applications
 //-----------------------------------------------------------------------------
 
-int AppMain( void* hInstance, void* hPrevInstance, const char* lpCmdLine, int nCmdShow, CAppSystemGroup *pAppSystemGroup )
+int AppMain( void*, void*, const char*, int, CAppSystemGroup * )
 {
+	// Windowed WinMain-style entry point does not exist on POSIX.
 	Assert( 0 );
 	return -1;
 }
@@ -65,6 +67,32 @@ int AppMain( int argc, char **argv, CAppSystemGroup *pAppSystemGroup )
 	return pAppSystemGroup->Run( );
 }
 
+//-----------------------------------------------------------------------------
+// Used to startup/shutdown the application
+//-----------------------------------------------------------------------------
+// dimhotepus: Declared in AppFramework.h but were missing on POSIX (link errors for users).
+int AppStartup( void*, void*, const char*, int, CAppSystemGroup * )
+{
+	// Windowed WinMain-style entry point does not exist on POSIX.
+	Assert( 0 );
+	return -1;
+}
+
+int AppStartup( int argc, char **argv, CAppSystemGroup *pAppSystemGroup )
+{
+	Assert( pAppSystemGroup );
+
+	s_HInstance = nullptr;
+	CommandLine()->CreateCmdLine( argc, argv );
+
+	return pAppSystemGroup->Startup();
+}
+
+void AppShutdown( CAppSystemGroup *pAppSystemGroup )
+{
+	Assert( pAppSystemGroup );
+	pAppSystemGroup->Shutdown();
+}
 
 
 //-----------------------------------------------------------------------------
@@ -78,9 +106,9 @@ int AppMain( int argc, char **argv, CAppSystemGroup *pAppSystemGroup )
 // Constructor
 //-----------------------------------------------------------------------------
 CSteamApplication::CSteamApplication( CSteamAppSystemGroup *pAppSystemGroup )
+	: m_pChildAppSystemGroup{ pAppSystemGroup }
 {
-	m_pChildAppSystemGroup = pAppSystemGroup;
-	m_pFileSystem = nullptr;
+	Assert( pAppSystemGroup );
 }
 
 
@@ -138,6 +166,11 @@ void CSteamApplication::PostShutdown( )
 //-----------------------------------------------------------------------------
 int CSteamApplication::Main( )
 {
+	// dimhotepus: Same as Windows version, set base paths first. Return failure code
+	// instead of 0 (success exit code).
+	if ( FileSystem_SetBasePaths( m_pFileSystem ) != FS_OK )
+		return -1;
+
 	// Now that Steam is loaded, we can load up main libraries through steam
 	m_pChildAppSystemGroup->Setup( m_pFileSystem, this );
 	return m_pChildAppSystemGroup->Run( );
@@ -150,8 +183,9 @@ int CSteamApplication::Startup()
 	if ( GetErrorStage() != NONE )
 		return nRetVal;
 	
+	// dimhotepus: Return failure code instead of 0 (success).
 	if ( FileSystem_SetBasePaths( m_pFileSystem ) != FS_OK )
-		return 0;
+		return -1;
 	
 	// Now that Steam is loaded, we can load up main libraries through steam
 	m_pChildAppSystemGroup->Setup( m_pFileSystem, this );
@@ -167,4 +201,3 @@ void CSteamApplication::Shutdown()
 
 // Turn off memdbg macros (turned on up top) since this is included like a header
 #include "tier0/memdbgoff.h"
-

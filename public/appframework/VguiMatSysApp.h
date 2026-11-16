@@ -25,7 +25,7 @@ class CVguiMatSysApp : public CVguiSteamApp
 	using BaseClass = CVguiSteamApp;
 
 public:
-	CVguiMatSysApp() : m_HWnd{nullptr}, m_nWidth{-1}, m_nHeight{-1} {}
+	CVguiMatSysApp() = default;
 
 	// Methods of IApplication
 	bool Create() override;
@@ -33,8 +33,8 @@ public:
 	void PostShutdown() override;
 	void Destroy() override;
 
-	// Returns the window handle (HWND in Win32)
-	void* GetAppWindow();
+	// Returns the window handle (HWND in Win32, SDL_Window* on SDL platforms)
+	[[nodiscard]] void* GetAppWindow();
 
 	// Gets the window size
 	[[nodiscard]] int GetWindowWidth() const;
@@ -47,6 +47,7 @@ protected:
 	bool SetVideoMode( );
 
 	// Sets up the game path
+	// NOTE: Intentionally hides CSteamAppSystemGroup::SetupSearchPaths (non-virtual).
 	bool SetupSearchPaths( const char *pStartingDir, bool bOnlyUseStartingDir, bool bIsTool );
 
 private:
@@ -57,9 +58,12 @@ private:
 	// Creates the app window
 	virtual void *CreateAppWindow( char const *pTitle, bool bWindowed, int w, int h );
 
-	void *m_HWnd;
-	int m_nWidth;
-	int m_nHeight;
+	// dimhotepus: Destroys the window created by CreateAppWindow (no-op when launcher manager owns it).
+	void DestroyAppWindow();
+
+	void *m_HWnd{nullptr};
+	int m_nWidth{-1};
+	int m_nHeight{-1};
 };
 
 

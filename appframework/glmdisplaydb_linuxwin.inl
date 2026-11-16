@@ -1,7 +1,6 @@
 //========= Copyright  1996-2009, Valve Corporation, All rights reserved. ============//
 //
-// Purpose: Defines a group of app systems that all have the same lifetime
-// that need to be connected/initialized, etc. in a well-defined order
+// Purpose: GL renderer / display information database for the SDL (Linux) path.
 //
 // $Revision: $
 // $NoKeywords: $
@@ -27,7 +26,7 @@ GLMRendererInfo::~GLMRendererInfo()
 }
 
 // !!! FIXME: sync this function with the Mac version in case anything important has changed.
-void GLMRendererInfo::Init( GLMRendererInfoFields *info )
+void GLMRendererInfo::Init( const GLMRendererInfoFields *info )
 {
         SDLAPP_FUNC;
 
@@ -44,6 +43,8 @@ void GLMRendererInfo::Init( GLMRendererInfoFields *info )
         m_info.m_hasGammaWrites = true;
 
         // If you haven't created a GL context by now (and initialized gGL), you're about to crash.
+        // dimhotepus: Fail loudly in debug builds instead of null dereference below.
+        Assert( gGL );
 
         m_info.m_hasMixedAttachmentSizes = gGL->m_bHave_GL_ARB_framebuffer_object;
         m_info.m_hasBGRA = gGL->m_bHave_GL_EXT_vertex_array_bgra;
@@ -83,7 +84,8 @@ void GLMRendererInfo::Init( GLMRendererInfoFields *info )
                 gGL->glGetIntegerv(GL_MAX_VERTEX_BINDABLE_UNIFORMS_EXT, &m_info.m_maxVertexBindableUniforms);
                 gGL->glGetIntegerv(GL_MAX_FRAGMENT_BINDABLE_UNIFORMS_EXT, &m_info.m_maxFragmentBindableUniforms);
                 gGL->glGetIntegerv(GL_MAX_BINDABLE_UNIFORM_SIZE_EXT, &m_info.m_maxBindableUniformSize);
-                if ( ( m_info.m_maxVertexBindableUniforms < 1 ) || ( m_info.m_maxFragmentBindableUniforms < 1 ) || ( m_info.m_maxBindableUniformSize < ( sizeof( float ) * 4 * 256 ) ) )
+				// dimhotepus: signed/unsigned compare treated negative sizes as huge.
+                if ( ( m_info.m_maxVertexBindableUniforms < 1 ) || ( m_info.m_maxFragmentBindableUniforms < 1 ) || ( m_info.m_maxBindableUniformSize < static_cast<GLint>( sizeof( float ) * 4 * 256 ) ) )
                 {
                         m_info.m_hasBindableUniforms = false;
                 }
@@ -165,7 +167,11 @@ void    GLMRendererInfo::Dump( int which )
                 m_info.m_pciModelString
         ));
 
-        m_display->Dump( which );
+        // dimhotepus: Displays may be not populated yet.
+        if ( m_display )
+        {
+                m_display->Dump( which );
+        }
 }
 
 
@@ -175,18 +181,14 @@ GLMDisplayDB::GLMDisplayDB ()
 {
         SDLAPP_FUNC;
 
-        m_renderer.m_display = nullptr;    
+        // dimhotepus: m_renderer.m_display is initialized by GLMRendererInfo itself.
 }
 
-GLMDisplayDB::~GLMDisplayDB     ( void )
+GLMDisplayDB::~GLMDisplayDB ( void )
 {
         SDLAPP_FUNC;
 
-        if ( m_renderer.m_display )
-        {
-                delete m_renderer.m_display;
-                m_renderer.m_display = nullptr;
-        }
+        // dimhotepus: Nothing to free, m_renderer owns and deletes its display (was freed here and there).
 }
 
 #ifndef GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX
@@ -243,7 +245,7 @@ void GLMDisplayDB::PopulateRenderers( void )
                 }
                 else
                 {
-                        DebugPrintf( "GL_NVX_gpu_memory_info: Total Dedicated: %u, Total Avail: %u, Current Avail: %u\n", nTotalDedicated, nTotalAvail, nCurrentAvail );
+                        DebugPrintf( "GL_NVX_gpu_memory_info: Total Dedicated: %d, Total Avail: %d, Current Avail: %d\n", nTotalDedicated, nTotalAvail, nCurrentAvail );
 
                         // Try to do something reasonable. Should we report dedicated or total available to the engine here?
                         // For now, just take the MAX of both.
@@ -278,7 +280,8 @@ void GLMDisplayDB::PopulateRenderers( void )
                 }
         }
 
-        // Clamp the min amount of video memory to 256MB in case a query returned something bogus, or we interpreted it badly.
+        // dimhotepus: Comment said 256MB, code clamps to 128MB.
+        // Clamp the min amount of video memory to 128MB in case a query returned something bogus, or we interpreted it badly.
         fields.m_vidMemory = MAX( fields.m_vidMemory, 128 * 1024 * 1024 );
         fields.m_texMemory = fields.m_vidMemory;
 
@@ -347,11 +350,14 @@ bool    GLMDisplayDB::GetFakeAdapterInfo( int fakeAdapterIndex, int *rendererOut
 {
         SDLAPP_FUNC;
 
-        if (fakeAdapterIndex >= GetFakeAdapterCount() )
+        if ( fakeAdapterIndex < 0 || fakeAdapterIndex >= GetFakeAdapterCount() )
         {
+                // dimhotepus: Do not leave caller's output structures uninitialized on failure.
+                BitwiseClear( *rendererInfoOut );
+                BitwiseClear( *displayInfoOut );
                 *rendererOut = 0;
                 *displayOut = 0;
-                return true;            // fail
+                return true;        // fail
         }
 
         *rendererOut = 0;
@@ -377,9 +383,10 @@ bool    GLMDisplayDB::GetRendererInfo( int rendererIndex, GLMRendererInfoFields 
 
         BitwiseClear( *infoOut );
 
-        if (rendererIndex >= GetRendererCount())
+        // dimhotepus: Negative index is invalid too.
+        if (rendererIndex < 0 || rendererIndex >= GetRendererCount())
                 return true; // fail
-        
+
         *infoOut = m_renderer.m_info;
 
         return false;
@@ -389,7 +396,8 @@ int             GLMDisplayDB::GetDisplayCount( int rendererIndex )
 {
         SDLAPP_FUNC;
 
-        if (rendererIndex >= GetRendererCount())
+        // dimhotepus: Negative index is invalid too.
+        if (rendererIndex < 0 || rendererIndex >= GetRendererCount())
         {
                 Assert( 0 );
                 return 0; // fail
@@ -404,10 +412,15 @@ bool    GLMDisplayDB::GetDisplayInfo( int rendererIndex, int displayIndex, GLMDi
 
         BitwiseClear( *infoOut );
         
-        if (rendererIndex >= GetRendererCount())
+        if (rendererIndex < 0 || rendererIndex >= GetRendererCount())
                 return true; // fail
         
-        if (displayIndex >= GetDisplayCount(rendererIndex))
+        // dimhotepus: Negative index is invalid too.
+        if (displayIndex < 0 || displayIndex >= GetDisplayCount(rendererIndex))
+                return true; // fail
+
+        // dimhotepus: Displays are populated lazily, avoid null dereference.
+        if (!m_renderer.m_display)
                 return true; // fail
         
         *infoOut = m_renderer.m_display->m_info;
@@ -418,11 +431,17 @@ bool    GLMDisplayDB::GetDisplayInfo( int rendererIndex, int displayIndex, GLMDi
 int             GLMDisplayDB::GetModeCount( int rendererIndex, int displayIndex )
 {
         SDLAPP_FUNC;
-
-        if (rendererIndex >= GetRendererCount())
+        
+        // dimhotepus: Negative index is invalid too.
+        if (rendererIndex < 0 || rendererIndex >= GetRendererCount())
                 return 0; // fail
         
-        if (displayIndex >= GetDisplayCount(rendererIndex))
+        // dimhotepus: Negative index is invalid too.
+        if (displayIndex < 0 || displayIndex >= GetDisplayCount(rendererIndex))
+                return 0; // fail
+
+        // dimhotepus: Displays and modes are populated lazily, avoid null dereference.
+        if (!m_renderer.m_display || !m_renderer.m_display->m_modes)
                 return 0; // fail
                 
         return m_renderer.m_display->m_modes->Count();
@@ -434,10 +453,15 @@ bool    GLMDisplayDB::GetModeInfo( int rendererIndex, int displayIndex, int mode
 
         BitwiseClear( *infoOut );
         
-        if ( rendererIndex >= GetRendererCount())
+        // dimhotepus: Negative renderer / display index is invalid (negative mode index means "current mode").
+        if ( rendererIndex < 0 || rendererIndex >= GetRendererCount())
                 return true; // fail
         
-        if (displayIndex >= GetDisplayCount( rendererIndex ) )
+        // dimhotepus: Negative index is invalid too.
+        if ( displayIndex < 0 || displayIndex >= GetDisplayCount( rendererIndex ) )
+                return true; // fail
+
+        if ( !m_renderer.m_display )
                 return true; // fail
         
         if ( modeIndex >= GetModeCount( rendererIndex, displayIndex ) )
@@ -479,9 +503,13 @@ GLMDisplayInfo::GLMDisplayInfo()
 {
         SDLAPP_FUNC;
 
+        // dimhotepus: Zero the info, only the size fields were initialized before.
+        BitwiseClear( m_info );
+
         m_modes = nullptr;
 
-        int Width, Height;
+        // dimhotepus: Initialize, GetLargestDisplaySize may fail without setting them.
+        int Width = 0, Height = 0;
         GetLargestDisplaySize( Width, Height );
 
         m_info.m_displayPixelWidth = ( uint )Width;
@@ -491,6 +519,14 @@ GLMDisplayInfo::GLMDisplayInfo()
 GLMDisplayInfo::~GLMDisplayInfo( void )
 {
         SDLAPP_FUNC;
+
+        // dimhotepus: Display modes (and the vector) were leaked, delete them like the Mac version does.
+        if ( m_modes )
+        {
+                m_modes->PurgeAndDeleteElements();
+                delete m_modes;
+                m_modes = nullptr;
+        }
 }
 
 extern "C" int DisplayModeSortFunction( GLMDisplayMode * const *A, GLMDisplayMode * const *B )
@@ -522,6 +558,26 @@ extern "C" int DisplayModeSortFunction( GLMDisplayMode * const *A, GLMDisplayMod
         {
                 return smaller;
         }
+
+        // dimhotepus: Make ordering total (width, then height), otherwise equal-area modes of
+        // different size interleave and duplicates are not adjacent for the dupe removal.
+        if ( (*A)->m_info.m_modePixelWidth > (*B)->m_info.m_modePixelWidth )
+        {
+                return bigger;
+        }
+        else if ( (*A)->m_info.m_modePixelWidth < (*B)->m_info.m_modePixelWidth )
+        {
+                return smaller;
+        }
+
+        if ( (*A)->m_info.m_modePixelHeight > (*B)->m_info.m_modePixelHeight )
+        {
+                return bigger;
+        }
+        else if ( (*A)->m_info.m_modePixelHeight < (*B)->m_info.m_modePixelHeight )
+        {
+                return smaller;
+        }
         
         return 0;       // equal rank
 }
@@ -544,7 +600,7 @@ void    GLMDisplayInfo::PopulateModes( void )
 
                 if ( SDL_GetDisplayBounds( displays[i], &rect ) && rect.w && rect.h )
                 {
-                        m_modes->AddToTail( new GLMDisplayMode( rect.w, rect.h, 0 ) );
+                        m_modes->AddToTail( new GLMDisplayMode( static_cast<uint>( rect.w ), static_cast<uint>( rect.h ), 0 ) );
                 }
         }
         SDL_free( displays );
@@ -576,7 +632,7 @@ void    GLMDisplayInfo::PopulateModes( void )
                 { 1920, 1200 },
                 { 2560, 1600 },
                 
-                // dimhotepus: Add Mac Pro resolutions.
+                // dimhotepus: Add MacBook Pro resolutions.
 
                 // 14 inch.
                 { 1800, 1169 }, // More space
@@ -589,16 +645,18 @@ void    GLMDisplayInfo::PopulateModes( void )
                 { 3456, 2234 }, // Native
         };
 
-        for ( int i = 0; i < SE_ARRAYSIZE( s_Resolutions ); i++ )
+        // dimhotepus: Range for, no signed/unsigned loop index vs array size mix.
+        for ( const auto &resolution : s_Resolutions )
         {
-                uint w = s_Resolutions[ i ].w;
-                uint h = s_Resolutions[ i ].h;
+                uint w = resolution.w;
+                uint h = resolution.h;
 
                 if ( ( w <= m_info.m_displayPixelWidth ) && ( h <= m_info.m_displayPixelHeight ) )
                 {
                         m_modes->AddToTail( new GLMDisplayMode( w, h, 0 ) );
 
-                        if ( ( w * 2 <= m_info.m_displayPixelWidth ) && ( h * 2 < m_info.m_displayPixelHeight ) )
+                        // dimhotepus: was '<', asymmetric with width check.
+                        if ( ( w * 2 <= m_info.m_displayPixelWidth ) && ( h * 2 <= m_info.m_displayPixelHeight ) )
                         {
                                 // Add double of everything also - Retina proofing hopefully.
                                 m_modes->AddToTail( new GLMDisplayMode( w * 2, h * 2, 0 ) );
@@ -620,6 +678,8 @@ void    GLMDisplayInfo::PopulateModes( void )
                      ( info0.m_modePixelHeight == info1.m_modePixelHeight ) &&
                      ( info0.m_modeRefreshHz == info1.m_modeRefreshHz ) )
                 {
+                        // dimhotepus: Delete the removed mode, it was leaked.
+                        delete m_modes->Element( i );
                         m_modes->Remove(i);
                         nummodes--;
                 }
@@ -635,11 +695,15 @@ void    GLMDisplayInfo::Dump( int which )
 {
         SDLAPP_FUNC;
 
-        GLMPRINTF(("\n         #%d: GLMDisplayInfo @ %p, pixwidth=%d  pixheight=%d",
+        GLMPRINTF(("\n         #%d: GLMDisplayInfo @ %p, pixwidth=%u  pixheight=%u",
                            which, this,  m_info.m_displayPixelWidth,  m_info.m_displayPixelHeight ));
 
-        FOR_EACH_VEC( *m_modes, i )
+        // dimhotepus: Modes may be not populated yet.
+        if ( m_modes )
         {
-                ( *m_modes )[i]->Dump(i);
+                FOR_EACH_VEC( *m_modes, i )
+                {
+                        ( *m_modes )[i]->Dump(i);
+                }
         }
 }

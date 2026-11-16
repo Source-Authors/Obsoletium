@@ -67,10 +67,23 @@ public:
 
 		CreateInterfaceFn factory = GetFactory();
 		if ( !ConnectDataModel( factory ) )
+		{
+			// dimhotepus: PostShutdown is not called by app system group when PreInit
+			// fails, so roll back tier1/tier2 connections here to not leak them.
+			BaseClass::PostShutdown();
 			return false;
+		}
 
 		InitReturnVal_t nRetVal = InitDataModel();
-		return ( nRetVal == INIT_OK );
+		if ( nRetVal != INIT_OK )
+		{
+			// dimhotepus: Same rollback as above, in reverse order of initialization.
+			DisconnectDataModel();
+			BaseClass::PostShutdown();
+			return false;
+		}
+
+		return true;
 	}
 
 	void PostShutdown() override

@@ -210,63 +210,64 @@ public:
 
 // ILauncherMgr impls.
 public:
-	virtual bool Connect( CreateInterfaceFn factory );
-	virtual void Disconnect();
+	// dimhotepus: Mark ILauncherMgr overrides as override.
+	virtual bool Connect( CreateInterfaceFn factory ) override;
+	virtual void Disconnect() override;
 	
-	virtual void *QueryInterface( const char *pInterfaceName );
+	virtual void *QueryInterface( const char *pInterfaceName ) override;
 	
 	// Init, shutdown
-	virtual InitReturnVal_t Init();
-	virtual void Shutdown();
+	virtual InitReturnVal_t Init() override;
+	virtual void Shutdown() override;
 
-	virtual bool CreateGameWindow( const char *pTitle, bool bWindowed, int width, int height );
+	virtual bool CreateGameWindow( const char *pTitle, bool bWindowed, int width, int height ) override;
 	
-	virtual void IncWindowRefCount();
-	virtual void DecWindowRefCount();
+	virtual void IncWindowRefCount() override;
+	virtual void DecWindowRefCount() override;
 				
 	// Get the next N events. The function returns the number of events that were filled into your array.
-	virtual int GetEvents( CCocoaEvent *pEvents, int nMaxEventsToReturn, bool debugEvents = false );
+	virtual int GetEvents( CCocoaEvent *pEvents, int nMaxEventsToReturn, bool debugEvents = false ) override;
 #ifdef LINUX
-	virtual int PeekAndRemoveKeyboardEvents( bool *pbEsc, bool *pbReturn, bool *pbSpace, bool debugEvent = false );
+	virtual int PeekAndRemoveKeyboardEvents( bool *pbEsc, bool *pbReturn, bool *pbSpace, bool debugEvent = false ) override;
 #endif
 
 	// Set the mouse cursor position.
-	virtual void SetCursorPosition( int x, int y );
+	virtual void SetCursorPosition( int x, int y ) override;
 	
-	virtual void *GetWindowRef() { return (void *)m_Window; }
+	virtual void *GetWindowRef() override { return (void *)m_Window; }
 
-	virtual void SetWindowFullScreen( bool bFullScreen, int nWidth, int nHeight );
-	virtual bool IsWindowFullScreen() { return m_bFullScreen; }
-	virtual void MoveWindow( int x, int y );
-	virtual void SizeWindow( int width, int tall );
-	virtual void PumpWindowsMessageLoop();
+	virtual void SetWindowFullScreen( bool bFullScreen, int nWidth, int nHeight ) override;
+	virtual bool IsWindowFullScreen() override { return m_bFullScreen; }
+	virtual void MoveWindow( int x, int y ) override;
+	virtual void SizeWindow( int width, int tall ) override;
+	virtual void PumpWindowsMessageLoop() override;
 		
-	virtual void DestroyGameWindow();
-	virtual void SetApplicationIcon( const char *pchAppIconFile );
+	virtual void DestroyGameWindow() override;
+	virtual void SetApplicationIcon( const char *pchAppIconFile ) override;
 	
-	virtual void GetMouseDelta( int &x, int &y, bool bIgnoreNextMouseDelta = false );
+	virtual void GetMouseDelta( int &x, int &y, bool bIgnoreNextMouseDelta = false ) override;
 
-	virtual void GetNativeDisplayInfo( int nDisplay, uint &nWidth, uint &nHeight, uint &nRefreshHz ); // Retrieve the size of the monitor (desktop)
-	virtual void RenderedSize( uint &width, uint &height, bool set );	// either set or retrieve rendered size value (from dxabstract)
-	virtual void DisplayedSize( uint &width, uint &height );			// query backbuffer size (window size whether FS or windowed)
+	virtual void GetNativeDisplayInfo( int nDisplay, uint &nWidth, uint &nHeight, uint &nRefreshHz ) override; // Retrieve the size of the monitor (desktop)
+	virtual void RenderedSize( uint &width, uint &height, bool set ) override;	// either set or retrieve rendered size value (from dxabstract)
+	virtual void DisplayedSize( uint &width, uint &height ) override;			// query backbuffer size (window size whether FS or windowed)
 
 #if defined( DX_TO_GL_ABSTRACTION )
-	virtual void GetDesiredPixelFormatAttribsAndRendererInfo( uint **ptrOut, uint *countOut, GLMRendererInfoFields *rendInfoOut );
+	virtual void GetDesiredPixelFormatAttribsAndRendererInfo( uint **ptrOut, uint *countOut, GLMRendererInfoFields *rendInfoOut ) override;
 
-	virtual PseudoGLContextPtr	GetMainContext();
+	virtual PseudoGLContextPtr	GetMainContext() override;
 	// Get the NSGLContext for a window's main view - note this is the carbon windowref as an argument
-	virtual PseudoGLContextPtr GetGLContextForWindow( void* windowref ) { return (PseudoGLContextPtr)m_GLContext; }
-	virtual PseudoGLContextPtr CreateExtraContext();
-	virtual void DeleteContext( PseudoGLContextPtr hContext );
-	virtual bool MakeContextCurrent( PseudoGLContextPtr hContext );
-	virtual GLMDisplayDB *GetDisplayDB( void );
+	virtual PseudoGLContextPtr GetGLContextForWindow( void* windowref ) override { return (PseudoGLContextPtr)m_GLContext; }
+	virtual PseudoGLContextPtr CreateExtraContext() override;
+	virtual void DeleteContext( PseudoGLContextPtr hContext ) override;
+	virtual bool MakeContextCurrent( PseudoGLContextPtr hContext ) override;
+	virtual GLMDisplayDB *GetDisplayDB() override;
 
-	virtual void ShowPixels( CShowPixelsParams *params );
+	virtual void ShowPixels( CShowPixelsParams *params ) override;
 #endif
 
-	virtual void GetStackCrawl( CStackCrawlParams *params );
+	virtual void GetStackCrawl( CStackCrawlParams *params ) override;
 
-	virtual void WaitUntilUserInput( int msSleepTime );
+	virtual void WaitUntilUserInput( int msSleepTime ) override;
 
 	// Post an event to the input event queue.
 	// if debugEvent is true, post it to the debug event queue.
@@ -275,15 +276,15 @@ public:
 	// ask if an event is debug flavor or not.
 	bool IsDebugEvent( CCocoaEvent& event );
 
-	virtual void SetMouseVisible( bool bState );
-	virtual void SetMouseCursor( SDL_Cursor *hCursor );
-	virtual void SetForbidMouseGrab( bool bForbidMouseGrab ) { m_bForbidMouseGrab = bForbidMouseGrab; }
+	virtual void SetMouseVisible( bool bState ) override;
+	virtual void SetMouseCursor( SDL_Cursor *hCursor ) override;
+	virtual void SetForbidMouseGrab( bool bForbidMouseGrab ) override { m_bForbidMouseGrab = bForbidMouseGrab; }
 
-	virtual void OnFrameRendered();
+	virtual void OnFrameRendered() override;
 
-	virtual void SetGammaRamp( const uint16 *pRed, const uint16 *pGreen, const uint16 *pBlue );
+	virtual void SetGammaRamp( const uint16 *pRed, const uint16 *pGreen, const uint16 *pBlue ) override;
 			
-	virtual double GetPrevGLSwapWindowTime() { return m_flPrevGLSwapWindowTime; }
+	virtual double GetPrevGLSwapWindowTime() override { return m_flPrevGLSwapWindowTime; }
 
 	// Called to create a game window that will be hidden, designed for
 	// getting an OpenGL context going so we can begin initializing things.
@@ -904,7 +905,8 @@ int CSDLMgr::GetEvents( CCocoaEvent *pEvents, int nMaxEventsToReturn, bool debug
 	for ( int i=0; i < nToWrite; i++ )
 	{
 		int iHead = queue.Head();
-		memcpy( pCurEvent, &queue[iHead], sizeof( CCocoaEvent ) );
+		// dimhotepus: Copy by value, CCocoaEvent has default member initializers now.
+		*pCurEvent = queue[iHead];
 		queue.Remove( iHead );
 		++pCurEvent;
 	}
@@ -922,9 +924,10 @@ int CSDLMgr::PeekAndRemoveKeyboardEvents( bool *pbEsc, bool *pbReturn, bool *pbS
 
 	int nRead = 0;
 	CUtlLinkedList<CCocoaEvent,int> &queue = debugEvent ? m_CocoaEvents : m_DebugEvents;
-	int nEvents = queue.Count();
 
-	for ( int iEvent=0; iEvent < nEvents; iEvent++ )
+	// dimhotepus: CUtlLinkedList indices are not 0..Count()-1 after removals (free list gaps),
+	// so iterate by links instead of by position to not touch invalid elements.
+	for ( auto iEvent = queue.Head(); iEvent != queue.InvalidIndex(); iEvent = queue.Next( iEvent ) )
 	{
 		CCocoaEvent *pEvent = &queue[ iEvent ];
 
@@ -2102,7 +2105,7 @@ void GLMDisplayMode::Dump( int which )
 			   which, m_info.m_modePixelWidth, m_info.m_modePixelHeight, m_info.m_modeRefreshHz ));
 }
 
-GLMDisplayDB *CSDLMgr::GetDisplayDB( void )
+GLMDisplayDB *CSDLMgr::GetDisplayDB()
 {
 	SDLAPP_FUNC;
 
@@ -2133,4 +2136,3 @@ GLMDisplayDB *CSDLMgr::GetDisplayDB( void )
 #endif // DX_TO_GL_ABSTRACTION
 
 #endif  // !DEDICATED
-

@@ -36,7 +36,7 @@ class IFileSystem;
 //-----------------------------------------------------------------------------
 using AppModule_t = intp;
 
-constexpr inline AppModule_t APP_MODULE_INVALID{static_cast<AppModule_t>(~0)};
+constexpr inline AppModule_t APP_MODULE_INVALID{ static_cast<AppModule_t>(-1) };
 
 
 //-----------------------------------------------------------------------------
@@ -46,6 +46,10 @@ constexpr inline AppModule_t APP_MODULE_INVALID{static_cast<AppModule_t>(~0)};
 abstract_class IAppSystemGroup
 {
 public:
+	// dimhotepus: Polymorphic interface needs virtual dtor, otherwise deleting
+	// via IAppSystemGroup* is UB (and -Wdelete-non-virtual-dtor on GCC/Clang).
+	virtual ~IAppSystemGroup() = default;
+
 	// An installed application creation function, you should tell the group
 	// the DLLs and the singleton interfaces you want to instantiate.
 	// Return false if there's any problems and the app will abort
@@ -102,8 +106,14 @@ public:
 
 public:
 	// constructor
-	CAppSystemGroup( CAppSystemGroup *pParentAppSystem = nullptr );
-	virtual ~CAppSystemGroup() = default;
+	// dimhotepus: explicit, no implicit CAppSystemGroup <- CAppSystemGroup* conversion.
+	explicit CAppSystemGroup( CAppSystemGroup *pParentAppSystem = nullptr );
+	~CAppSystemGroup() override = default;
+
+	// dimhotepus: Group owns modules/systems and raw pointers to them, copying would
+	// cause double unload/disconnect.
+	CAppSystemGroup( const CAppSystemGroup & ) = delete;
+	CAppSystemGroup &operator=( const CAppSystemGroup & ) = delete;
 
 	// Runs the app system group.
 	// First, modules are loaded, next they are connected, followed by initialization
@@ -139,7 +149,7 @@ protected:
 	void AddSystem( IAppSystem *pAppSystem, const char *pInterfaceName );
 
 	// Simpler method of doing the LoadModule/AddSystem thing.
-	// Make sure the last AppSystemInfo has a NULL module name
+	// dimhotepus: Make sure the last AppSystemInfo has a NULL or empty module name
 	bool AddSystems( AppSystemInfo_t *pSystems );
 
 	// Method to look up a particular named system...
@@ -217,7 +227,9 @@ private:
 	CSysModule *LoadModuleDLL( const char *pDLLName ) override;
 
 	IFileSystem *m_pFileSystem;
-	char m_pGameInfoPath[ MAX_PATH ];
+	// dimhotepus: Zero-init, GetGameInfoPath() must be a valid empty string before
+	// SetupSearchPaths is called. MAX_PATH is 260 on all platforms here (not PATH_MAX).
+	char m_pGameInfoPath[ MAX_PATH ]{};
 };
 
 
@@ -273,19 +285,21 @@ SuggestGameInfoDirFn_t SetSuggestGameInfoDirFn( SuggestGameInfoDirFn_t pfnNewFn 
 class ScopedSuggestGameInfoDir
 {
 public:
-  explicit ScopedSuggestGameInfoDir(SuggestGameInfoDirFn_t new_suggest_fn)
-     : old_suggest_fn_{SetSuggestGameInfoDirFn(new_suggest_fn)} {}
+	explicit ScopedSuggestGameInfoDir( SuggestGameInfoDirFn_t new_suggest_fn )
+		: old_suggest_fn_{ SetSuggestGameInfoDirFn( new_suggest_fn ) } {}
 
-  ~ScopedSuggestGameInfoDir()
-  {
-	SetSuggestGameInfoDirFn(old_suggest_fn_);
-  }
+	~ScopedSuggestGameInfoDir()
+	{
+		SetSuggestGameInfoDirFn( old_suggest_fn_ );
+	}
+
+	// dimhotepus: Copy would restore the old function twice, scope guard must be non-copyable.
+	ScopedSuggestGameInfoDir( const ScopedSuggestGameInfoDir & ) = delete;
+	ScopedSuggestGameInfoDir &operator=( const ScopedSuggestGameInfoDir & ) = delete;
 
 private:
-  const SuggestGameInfoDirFn_t old_suggest_fn_;
+	const SuggestGameInfoDirFn_t old_suggest_fn_;
 };
 
 
-#endif // APPSYSTEMGROUP_H
-
-
+#endif // IAPPSYSTEMGROUP_H

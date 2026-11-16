@@ -112,10 +112,9 @@ void AppShutdown( CAppSystemGroup *pAppSystemGroup )
 // Constructor
 //-----------------------------------------------------------------------------
 CSteamApplication::CSteamApplication( CSteamAppSystemGroup *pAppSystemGroup )
+	: m_pChildAppSystemGroup{ pAppSystemGroup }
 {
-	m_pChildAppSystemGroup = pAppSystemGroup;
-	m_pFileSystem = nullptr;
-	m_bSteam = false;
+	Assert( pAppSystemGroup );
 }
 
 //-----------------------------------------------------------------------------
@@ -169,8 +168,9 @@ void CSteamApplication::PostShutdown()
 int CSteamApplication::Main()
 {
 	// Now that Steam is loaded, we can load up main libraries through steam
+	// dimhotepus: Return failure code instead of 0 (success).
 	if ( FileSystem_SetBasePaths( m_pFileSystem ) != FS_OK )
-		return 0;
+		return -1;
 
 	m_pChildAppSystemGroup->Setup( m_pFileSystem, this );
 	return m_pChildAppSystemGroup->Run();
@@ -186,8 +186,9 @@ int CSteamApplication::Startup()
 	if ( GetErrorStage() != NONE )
 		return nRetVal;
 
+	// dimhotepus: Return failure code instead of 0 (success).
 	if ( FileSystem_SetBasePaths( m_pFileSystem ) != FS_OK )
-		return 0;
+		return -1;
 
 	// Now that Steam is loaded, we can load up main libraries through steam
 	m_pChildAppSystemGroup->Setup( m_pFileSystem, this );

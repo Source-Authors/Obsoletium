@@ -24,7 +24,10 @@
 #ifndef GLMDISPLAYDB_H
 #define	GLMDISPLAYDB_H
 
+#include "tier0/platform.h"
 #include "tier1/utlvector.h"
+
+// dimhotepus: NOTE: glmdisplay.h (GLM*InfoFields) must be included before this header.
 
 //===============================================================================
 // modes, displays, and renderers
@@ -38,7 +41,8 @@ public:
 	GLMDisplayModeInfoFields	m_info;
 	
 	GLMDisplayMode( uint width, uint height, uint refreshHz );
-	GLMDisplayMode() { };
+	// dimhotepus: Zero the fields, they were left uninitialized.
+	GLMDisplayMode() : m_info{} { }
 	~GLMDisplayMode( void );
 
 	void	Init( uint width, uint height, uint refreshHz );
@@ -52,8 +56,9 @@ public:
 class GLMDisplayInfo
 {
 public:
-	GLMDisplayInfoFields			m_info;
-	CUtlVector< GLMDisplayMode* >	*m_modes;				// starts out NULL, set by PopulateModes
+	// dimhotepus: Default member initializers, so no constructor can leave them uninitialized.
+	GLMDisplayInfoFields			m_info{};
+	CUtlVector< GLMDisplayMode* >	*m_modes{nullptr};		// starts out NULL, set by PopulateModes
 	GLMDisplayMode					m_DesktopMode;
 
 #ifdef OSX
@@ -63,6 +68,10 @@ public:
 #endif
 
 	~GLMDisplayInfo( void );
+
+	// dimhotepus: Owns m_modes (deleted in destructor), copying would double delete.
+	GLMDisplayInfo( const GLMDisplayInfo & ) = delete;
+	GLMDisplayInfo &operator=( const GLMDisplayInfo & ) = delete;
 	
 	void	PopulateModes( void );
 
@@ -70,7 +79,7 @@ public:
 
 #ifdef OSX
 private:
-	int m_display;
+	int m_display{0};
 #endif
 };
 
@@ -81,22 +90,28 @@ private:
 class GLMRendererInfo
 {
 public:
-	GLMRendererInfoFields			m_info;
+	// dimhotepus: Default member initializers, so no constructor can leave them uninitialized.
+	GLMRendererInfoFields			m_info{};
 #ifdef OSX
-	CUtlVector< GLMDisplayInfo* >	*m_displays;			// starts out NULL, set by PopulateDisplays
+	CUtlVector< GLMDisplayInfo* >	*m_displays{nullptr};	// starts out NULL, set by PopulateDisplays
 #else
-	GLMDisplayInfo					*m_display;
+	GLMDisplayInfo					*m_display{nullptr};
 #endif
 
 #ifdef OSX
-	GLMRendererInfo			( GLMRendererInfoFields *info );
+	// dimhotepus: explicit, and const info, it is only read.
+	explicit GLMRendererInfo( const GLMRendererInfoFields *info );
 #else
 	GLMRendererInfo			();
 #endif
 	~GLMRendererInfo		( void );
 
+	// dimhotepus: Owns displays (deleted in destructor), copying would double delete.
+	GLMRendererInfo( const GLMRendererInfo & ) = delete;
+	GLMRendererInfo &operator=( const GLMRendererInfo & ) = delete;
+
 #ifndef OSX
-	void	Init( GLMRendererInfoFields *info );
+	void	Init( const GLMRendererInfoFields *info );
 #endif
 	void	PopulateDisplays();
 	void	Dump( int which );
@@ -116,8 +131,8 @@ public:
 
 struct GLMFakeAdapter
 {
-	int		m_rendererIndex;
-	int		m_displayIndex;
+	int		m_rendererIndex{0};
+	int		m_displayIndex{0};
 };
 #endif
 
@@ -125,14 +140,19 @@ class GLMDisplayDB
 {
 public:
 #ifdef OSX
-	CUtlVector< GLMRendererInfo* >		*m_renderers;			// starts out NULL, set by PopulateRenderers
+	CUtlVector< GLMRendererInfo* >		*m_renderers{nullptr};	// starts out NULL, set by PopulateRenderers
 	CUtlVector< GLMFakeAdapter >		m_fakeAdapters;
 #else
 	GLMRendererInfo	m_renderer;
 #endif
 
 	GLMDisplayDB	( void );
-	~GLMDisplayDB	( void );	
+	// dimhotepus: Class is polymorphic (virtual methods), so destructor must be virtual.
+	virtual ~GLMDisplayDB	( void );
+
+	// dimhotepus: Owns renderers, copying would double delete.
+	GLMDisplayDB( const GLMDisplayDB & ) = delete;
+	GLMDisplayDB &operator=( const GLMDisplayDB & ) = delete;	
 
 	virtual void	PopulateRenderers( void );
 	virtual void	PopulateFakeAdapters( uint realRendererIndex );		// fake adapters = one real adapter times however many displays are on it

@@ -49,7 +49,7 @@ public:
 
 
 //-----------------------------------------------------------------------------
-// The application object for apps that use tier3
+// The application object for apps that use tier3 and datamodel
 //-----------------------------------------------------------------------------
 class CTier3DmSteamApp : public CTier2DmSteamApp
 {
@@ -90,7 +90,15 @@ public:
 			return false;
 
 		CreateInterfaceFn factory = GetFactory();
-		return vgui::VGui_InitInterfacesList( "CVguiSteamApp", &factory, 1 );
+		if ( !vgui::VGui_InitInterfacesList( "CVguiSteamApp", &factory, 1 ) )
+		{
+			// dimhotepus: PostShutdown is not called when PreInit fails, so roll back
+			// everything connected by base classes to not leak tier1/2/3 connections.
+			BaseClass::PostShutdown();
+			return false;
+		}
+
+		return true;
 	}
 
 	void PostShutdown() override
@@ -103,7 +111,7 @@ public:
 
 
 //-----------------------------------------------------------------------------
-// The application object for apps that use vgui
+// The application object for apps that use vgui and datamodel
 //-----------------------------------------------------------------------------
 class CVguiDmSteamApp : public CTier3DmSteamApp
 {
@@ -117,12 +125,23 @@ public:
 			return false;
 
 		CreateInterfaceFn factory = GetFactory();
-		return vgui::VGui_InitInterfacesList( "CVguiSteamApp", &factory, 1 );
+		// dimhotepus: Use own module name (was copy-pasted "CVguiSteamApp"), so
+		// vgui diagnostics point at the right application object.
+		if ( !vgui::VGui_InitInterfacesList( "CVguiDmSteamApp", &factory, 1 ) )
+		{
+			// dimhotepus: Roll back base class state, see CVguiSteamApp::PreInit.
+			BaseClass::PostShutdown();
+			return false;
+		}
+
+		return true;
 	}
 	
 	void PostShutdown() override
 	{
-		vgui::VGui_ShutdownInterfacesList( "CVguiSteamApp" );
+		// dimhotepus: Use own module name (was copy-pasted "CVguiSteamApp"), so
+		// vgui diagnostics point at the right application object.
+		vgui::VGui_ShutdownInterfacesList( "CVguiDmSteamApp" );
 
 		BaseClass::PostShutdown();
 	}

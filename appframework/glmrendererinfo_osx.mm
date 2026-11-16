@@ -1,7 +1,6 @@
 //========= Copyright  1996-2009, Valve Corporation, All rights reserved. ============//
 //
-// Purpose: Defines a group of app systems that all have the same lifetime
-// that need to be connected/initialized, etc. in a well-defined order
+// Purpose: GL renderer / display information database for Mac OS X (CGL / IOKit).
 //
 // $Revision: $
 // $NoKeywords: $
@@ -12,6 +11,9 @@
 #include <OpenGL/gl.h>
 #include <OpenGL/glext.h>
 #include <IOKit/IOKitLib.h>
+// dimhotepus: kDisplayModeStretchedFlag, IO32BitDirectPixels.
+#include <IOKit/graphics/IOGraphicsTypes.h>
+#include <string.h>
 
 
 #undef MIN
@@ -104,7 +106,8 @@ bool	GLMDetectScaledResolveMode( uint osComboVersion, bool hasSLGU )
 		return false;
 	
 	// in 10.6.6 and later, just check for the ext string.
-	char *gl_ext_string = (char*)glGetString(GL_EXTENSIONS);
+	// dimhotepus: const char*, string literals are assigned below.
+	const char *gl_ext_string = (const char*)glGetString(GL_EXTENSIONS);
 	// avoid crashing due to strstr'ing NULL pointer returned from glGetString
 	if (!gl_ext_string)
 		gl_ext_string = "";
@@ -192,7 +195,7 @@ bool	GLMDetectScaledResolveMode( uint osComboVersion, bool hasSLGU )
 
 //===============================================================================
 
-GLMRendererInfo::GLMRendererInfo( GLMRendererInfoFields *info )
+GLMRendererInfo::GLMRendererInfo( const GLMRendererInfoFields *info )
 {
 	NSAutoreleasePool	*tempPool = [[NSAutoreleasePool alloc] init ];
 
@@ -213,10 +216,18 @@ GLMRendererInfo::GLMRendererInfo( GLMRendererInfoFields *info )
 	NSOpenGLPixelFormat	*pixFmt		=	[[NSOpenGLPixelFormat alloc] initWithAttributes:(NSOpenGLPixelFormatAttribute*)attribs]; 
 	NSOpenGLContext		*nsglCtx	=	[[NSOpenGLContext alloc] initWithFormat: pixFmt shareContext: NULL ];
 
-	[nsglCtx makeCurrentContext];
+	// dimhotepus: Remember caller's current context, releasing the temporary one below leaves no current context.
+	NSOpenGLContext		*prevNsglCtx	=	[NSOpenGLContext currentContext];
+
+	if ( nsglCtx )
+	{
+		[nsglCtx makeCurrentContext];
+	}
+
 		
 	// run queries.
-	char *gl_ext_string = (char*)glGetString(GL_EXTENSIONS);
+	// dimhotepus: const char*, string literals are assigned below.
+	const char *gl_ext_string = (const char*)glGetString(GL_EXTENSIONS);
 
 	uint vers = m_info.m_osComboVersion;
 	// avoid crashing due to strstr'ing NULL pointer returned from glGetString
@@ -465,6 +476,17 @@ GLMRendererInfo::GLMRendererInfo( GLMRendererInfoFields *info )
 
 	[nsglCtx release];
 	[pixFmt release];
+
+	// dimhotepus: Restore the caller's GL context.
+	if ( prevNsglCtx )
+	{
+		[prevNsglCtx makeCurrentContext];
+	}
+	else
+	{
+		[NSOpenGLContext clearCurrentContext];
+	}
+
 	
 	[tempPool release];
 }
@@ -530,7 +552,7 @@ void	GLMRendererInfo::PopulateDisplays( void )
 	for( int i=0; i<32; i++)
 	{
 		// check mask to see if the selected display intersects this renderer
-		CGOpenGLDisplayMask dspMask = (CGOpenGLDisplayMask)(1<<i);
+		CGOpenGLDisplayMask dspMask = (CGOpenGLDisplayMask)(1u<<i);
 		
 		if ( m_info.m_displayMask & dspMask )
 		{
@@ -588,7 +610,7 @@ extern const char *GLMDecode( GLMThing_t thingtype, unsigned long value );
 
 void	GLMRendererInfo::Dump( int which )
 {
-	GLMPRINTF(("\n     #%d: GLMRendererInfo @ %08x, renderer-id=%s(%08x)  display-mask=%08x  vram=%dMB",
+	GLMPRINTF(("\n     #%d: GLMRendererInfo @ %p, renderer-id=%s(%08x)  display-mask=%08x  vram=%dMB",
 		which, this,
 		CheesyRendererDecode( m_info.m_rendererID & 0x00FFFF00 ), m_info.m_rendererID,
 		m_info.m_displayMask,
@@ -600,9 +622,13 @@ void	GLMRendererInfo::Dump( int which )
 		m_info.m_pciModelString
 	));
 
-	FOR_EACH_VEC( *m_displays, i )
+	// dimhotepus: Displays may be not populated yet.
+	if ( m_displays )
 	{
-		(*m_displays)[i]->Dump(i);
+		FOR_EACH_VEC( *m_displays, i )
+		{
+			(*m_displays)[i]->Dump(i);
+		}
 	}
 }
 
@@ -774,6 +800,20 @@ extern "C" int RendererInfoSortFunction( GLMRendererInfo * const *A, GLMRenderer
 		}
 **/
 
+// dimhotepus: Reads PCI id (little endian) from IORegistry data safely: length checked, no unaligned read.
+static uint ReadPciId( CFDataRef data )
+{
+	UInt32 value = 0;
+
+	const size_t length = static_cast<size_t>( CFDataGetLength( data ) );
+	if ( length > 0 )
+	{
+		memcpy( &value, CFDataGetBytePtr( data ), ( length < sizeof( value ) ) ? length : sizeof( value ) );
+	}
+
+	return value;
+}
+
 void	GLMDisplayDB::PopulateRenderers( void )
 {
 	Assert( !m_renderers );
@@ -796,7 +836,7 @@ void	GLMDisplayDB::PopulateRenderers( void )
 		CGLRendererInfoObj	cgl_rend	= NULL;
 		GLint				nrend;
 	
-		CGOpenGLDisplayMask	dspMask		= (CGOpenGLDisplayMask)(1<<i);	
+		CGOpenGLDisplayMask	dspMask		= (CGOpenGLDisplayMask)(1u<<i);	
 		CGDirectDisplayID	cgid		= CGOpenGLDisplayMaskToDisplayID( dspMask );
 
 		bool selected = true;	// assume the best		
@@ -859,20 +899,13 @@ void	GLMDisplayDB::PopulateRenderers( void )
 					{
 						// grab the OS version
 
-						SInt32 vMajor = 0;	SInt32 vMinor = 0;	SInt32 vMinorMinor = 0;
-						
-						OSStatus gestalt_err = 0;
-						gestalt_err = Gestalt(gestaltSystemVersionMajor, &vMajor);
-						Assert(!gestalt_err);
-						
-						gestalt_err = Gestalt(gestaltSystemVersionMinor, &vMinor);
-						Assert(!gestalt_err);
-
-						gestalt_err = Gestalt(gestaltSystemVersionBugFix, &vMinorMinor);
-						Assert(!gestalt_err);
+						// dimhotepus: Gestalt system version selectors are deprecated (and gone in recent SDKs), use NSProcessInfo.
+						NSOperatingSystemVersion osVersion = [[NSProcessInfo processInfo] operatingSystemVersion];
 
 						//encode into one quantity - 10.6.3 becomes 0x000A0603
-						fields.m_osComboVersion = (vMajor << 16) | (vMinor << 8) | (vMinorMinor);
+						fields.m_osComboVersion = ( static_cast<uint>( osVersion.majorVersion ) << 16 ) |
+							( static_cast<uint>( osVersion.minorVersion ) << 8 ) |
+							static_cast<uint>( osVersion.patchVersion );
 
 						if (CommandLine()->HasParm("-fakeleopard"))
 						{
@@ -898,6 +931,7 @@ void	GLMDisplayDB::PopulateRenderers( void )
 						io_registry_entry_t dspPort;
 							
 						// Get the I/O Kit service port for the display
+						// dimhotepus: Deprecated, returns MACH_PORT_NULL on Apple Silicon, so ids are 0 (and handled) there.
 						dspPort = CGDisplayIOServicePort( cgid );
 
 						// Get the information for the device
@@ -907,10 +941,15 @@ void	GLMDisplayDB::PopulateRenderers( void )
 						deviceID	= (CFDataRef)IORegistryEntrySearchCFProperty(dspPort,kIOServicePlane,CFSTR("device-id"),	kCFAllocatorDefault,kIORegistryIterateRecursively | kIORegistryIterateParents);
 						model		= (CFDataRef)IORegistryEntrySearchCFProperty(dspPort,kIOServicePlane,CFSTR("model"),		kCFAllocatorDefault,kIORegistryIterateRecursively | kIORegistryIterateParents);
 						
+						// dimhotepus: Registry values are untyped, make sure we really got CFData before using CFData* functions.
+						if ( vendorID && CFGetTypeID( vendorID ) != CFDataGetTypeID() ) { CFRelease( vendorID ); vendorID = NULL; }
+						if ( deviceID && CFGetTypeID( deviceID ) != CFDataGetTypeID() ) { CFRelease( deviceID ); deviceID = NULL; }
+						if ( model && CFGetTypeID( model ) != CFDataGetTypeID() ) { CFRelease( model ); model = NULL; }
+
 						// Send the appropriate data to the outputs checking to validate the data
 						if(vendorID)
 						{
-							fields.m_pciVendorID = *((UInt32*)CFDataGetBytePtr(vendorID));
+							fields.m_pciVendorID = ReadPciId( vendorID );
 						}
 						else
 						{
@@ -919,7 +958,7 @@ void	GLMDisplayDB::PopulateRenderers( void )
 						
 						if(deviceID)
 						{
-							fields.m_pciDeviceID = *((UInt32*)CFDataGetBytePtr(deviceID));
+							fields.m_pciDeviceID = ReadPciId( deviceID );
 						}
 						else
 						{
@@ -928,9 +967,12 @@ void	GLMDisplayDB::PopulateRenderers( void )
 						
 						if(model)
 						{
-							int length = CFDataGetLength(model);
-							char *data = (char*)CFDataGetBytePtr(model);
-							V_strcpy_safe( fields.m_pciModelString, data );
+							// dimhotepus: Model data is not guaranteed to be NUL terminated, copy by length (was overread).
+							const size_t length = static_cast<size_t>( CFDataGetLength( model ) );
+							const size_t maxLength = sizeof( fields.m_pciModelString ) - 1;
+							const size_t copyLength = ( length < maxLength ) ? length : maxLength;
+							memcpy( fields.m_pciModelString, CFDataGetBytePtr( model ), copyLength );
+							fields.m_pciModelString[copyLength] = '\0';
 						}
 						else
 						{
@@ -943,88 +985,70 @@ void	GLMDisplayDB::PopulateRenderers( void )
 						// first example to date - forcing vsync on 10.6.4 + NV
 						
 						{
+							// dimhotepus: Rewritten, the old loop leaked CFData of every non matching accelerator,
+							// the parent device and all but the last accelerator service, and CFRelease'd a NULL bundle name.
 							io_iterator_t	ioIterator		= (io_iterator_t)0;
-							io_service_t	ioAccelerator;
-							kern_return_t	ioResult		= 0;
+							io_service_t	ioAccelerator	= 0;
 							bool			ioDone			= false;
-														
-							ioResult = IOServiceGetMatchingServices( kIOMasterPortDefault, IOServiceMatching("IOAccelerator"), &ioIterator );
-							if( ioResult == KERN_SUCCESS )
+
+							if ( IOServiceGetMatchingServices( kIOMasterPortDefault, IOServiceMatching("IOAccelerator"), &ioIterator ) == KERN_SUCCESS )
 							{
-								ioAccelerator = 0;
-
-								while( ( !ioDone ) && ( ioAccelerator = IOIteratorNext( ioIterator ) )  )
+								while( ( !ioDone ) && ( ( ioAccelerator = IOIteratorNext( ioIterator ) ) != 0 ) )
 								{
-									io_service_t ioDevice;
-									
-									ioDevice = 0;
-									ioResult = IORegistryEntryGetParentEntry( ioAccelerator, kIOServicePlane, &ioDevice);
-									
-									CFDataRef this_vendorID, this_deviceID;
+									io_service_t ioDevice = 0;
 
-									if(ioResult == KERN_SUCCESS)
+									if ( IORegistryEntryGetParentEntry( ioAccelerator, kIOServicePlane, &ioDevice ) == KERN_SUCCESS )
 									{
-										this_vendorID	=	(CFDataRef)IORegistryEntryCreateCFProperty(ioDevice, CFSTR("vendor-id"), kCFAllocatorDefault, kNilOptions );
-										this_deviceID	=	(CFDataRef)IORegistryEntryCreateCFProperty(ioDevice, CFSTR("device-id"), kCFAllocatorDefault, kNilOptions );
-										
-										if (this_vendorID && this_deviceID)	// null check..
+										CFDataRef this_vendorID = (CFDataRef)IORegistryEntryCreateCFProperty( ioDevice, CFSTR("vendor-id"), kCFAllocatorDefault, kNilOptions );
+										CFDataRef this_deviceID = (CFDataRef)IORegistryEntryCreateCFProperty( ioDevice, CFSTR("device-id"), kCFAllocatorDefault, kNilOptions );
+
+										// see if it matches. if so, do our business (get the extended version string), set ioDone, call it a day
+										if ( this_vendorID && this_deviceID &&
+											 ( CFGetTypeID( this_vendorID ) == CFDataGetTypeID() ) && ( CFGetTypeID( this_deviceID ) == CFDataGetTypeID() ) &&
+											 ( fields.m_pciVendorID == ReadPciId( this_vendorID ) ) && ( fields.m_pciDeviceID == ReadPciId( this_deviceID ) ) )
 										{
-											// see if it matches. if so, do our business (get the extended version string), set ioDone, call it a day
-											unsigned short this_vendorIDValue = *(unsigned short*)CFDataGetBytePtr(this_vendorID);
-											unsigned short this_deviceIDValue = *(unsigned short*)CFDataGetBytePtr(this_deviceID);
-											
-											if ( (fields.m_pciVendorID == this_vendorIDValue) && (fields.m_pciDeviceID == this_deviceIDValue) )
+											// match, stop looking
+											ioDone = true;
+
+											// get extended info
+											CFStringRef this_ioglName = (CFStringRef)IORegistryEntryCreateCFProperty( ioAccelerator, CFSTR("IOGLBundleName"), kCFAllocatorDefault, kNilOptions );
+											if ( this_ioglName )
 											{
-												// see if it matches. if so, do our business (get the extended version string), set ioDone, call it a day
-												unsigned short* this_vendorIDBytes = (unsigned short*)CFDataGetBytePtr( this_vendorID );
-												unsigned short* this_deviceIDBytes = (unsigned short*)CFDataGetBytePtr( this_deviceID );
-												
-												if (this_vendorIDBytes && this_deviceIDBytes)	// null check...
+												// dimhotepus: Autoreleased Cocoa objects below need a pool, caller may not have one.
+												NSAutoreleasePool *bundlePool = [[NSAutoreleasePool alloc] init];
+
+												NSString *bundlePath = [ NSString stringWithFormat:@"/System/Library/Extensions/%@.bundle", (NSString *)this_ioglName ];
+												NSDictionary *this_driverDict = [ [NSBundle bundleWithPath: bundlePath] infoDictionary ];
+												NSString *this_driverInfo = this_driverDict ? [ this_driverDict objectForKey:@"CFBundleGetInfoString" ] : nil;
+												const char *theString = this_driverInfo ? [ this_driverInfo UTF8String ] : NULL;
+
+												if ( theString )
 												{
-													unsigned short this_vendorIDValue = *this_vendorIDBytes;
-													unsigned short this_deviceIDValue = *this_deviceIDBytes;
-													
-													if ( (fields.m_pciVendorID == this_vendorIDValue) && (fields.m_pciDeviceID == this_deviceIDValue) )
-													{
-														// match, stop looking
-														ioDone = true;
-														
-														// get extended info
-														CFStringRef this_ioglName = (CFStringRef)IORegistryEntryCreateCFProperty( ioAccelerator, CFSTR("IOGLBundleName"), kCFAllocatorDefault, kNilOptions );
-	
-														NSString *bundlePath = [ NSString stringWithFormat:@"/System/Library/Extensions/%@.bundle", this_ioglName ];
-														
-														NSDictionary* this_driverDict = [ [NSBundle bundleWithPath: bundlePath] infoDictionary ];
-														if (this_driverDict)
-														{
-															NSString* this_driverInfo = [ this_driverDict objectForKey:@"CFBundleGetInfoString" ];
-															if ( this_driverInfo )
-															{
-																const char* theString = [ this_driverInfo UTF8String ];
-																
-																V_strcpy_safe(fields.m_driverInfoString, theString );
-															}												
-														}
-														
-														// [bundlePath release];
-														
-														CFRelease(this_ioglName);
-													}
+													V_strcpy_safe( fields.m_driverInfoString, theString );
 												}
-	
-												CFRelease(this_vendorID);
-												CFRelease(this_deviceID);
+
+												[bundlePool release];
+
+												CFRelease( this_ioglName );
 											}
 										}
+
+										if ( this_vendorID )
+											CFRelease( this_vendorID );
+										if ( this_deviceID )
+											CFRelease( this_deviceID );
+
+										IOObjectRelease( ioDevice );
 									}
+
+									IOObjectRelease( ioAccelerator );
 								}
+
+								IOObjectRelease( ioIterator );
+							}
 							}
 
-							IOObjectRelease(ioAccelerator);
-							IOObjectRelease(ioIterator);
-						}
-
-						// Release vendorID, deviceID, and model as appropriate
+							// Release vendorID, deviceID, and model as appropriate
 						if(vendorID)
 							CFRelease(vendorID);
 						if(deviceID)
@@ -1247,7 +1271,8 @@ void	GLMDisplayDB::Populate(void)
 		realRendererIndex = 0;
 	}
 	
-	this->PopulateFakeAdapters( 0 );
+	// dimhotepus: Pass the selected renderer (-glmrendererN), the computed index was ignored.
+	this->PopulateFakeAdapters( static_cast<uint>( realRendererIndex ) );
 
 	#if GLMDEBUG
 		this->Dump();
@@ -1263,11 +1288,14 @@ int		GLMDisplayDB::GetFakeAdapterCount( void )
 
 bool	GLMDisplayDB::GetFakeAdapterInfo( int fakeAdapterIndex, int *rendererOut, int *displayOut, GLMRendererInfoFields *rendererInfoOut, GLMDisplayInfoFields *displayInfoOut )
 {
-	if (fakeAdapterIndex >= GetFakeAdapterCount() )
+	if ( fakeAdapterIndex < 0 || fakeAdapterIndex >= GetFakeAdapterCount() )
 	{
+		// dimhotepus: Do not leave caller's output structures uninitialized on failure.
+		BitwiseClear( *rendererInfoOut );
+		BitwiseClear( *displayInfoOut );
 		*rendererOut = 0;
 		*displayOut = 0;
-		return true;		// fail
+		return true;	// fail
 	}
 
 	*rendererOut = m_fakeAdapters[fakeAdapterIndex].m_rendererIndex;
@@ -1282,14 +1310,16 @@ bool	GLMDisplayDB::GetFakeAdapterInfo( int fakeAdapterIndex, int *rendererOut, i
 
 int		GLMDisplayDB::GetRendererCount( void )
 {
-	return	m_renderers->Count();
+	// dimhotepus: Renderers may be not populated yet.
+	return m_renderers ? m_renderers->Count() : 0;
 }
 
 bool	GLMDisplayDB::GetRendererInfo( int rendererIndex, GLMRendererInfoFields *infoOut )
 {
 	BitwiseClear( *infoOut );
 
-	if (rendererIndex >= GetRendererCount())
+	// dimhotepus: Negative index is invalid too.
+	if (rendererIndex < 0 || rendererIndex >= GetRendererCount())
 		return true; // fail
 	
 	GLMRendererInfo *rendInfo = (*m_renderers)[rendererIndex];		
@@ -1300,22 +1330,23 @@ bool	GLMDisplayDB::GetRendererInfo( int rendererIndex, GLMRendererInfoFields *in
 
 int		GLMDisplayDB::GetDisplayCount( int rendererIndex )
 {
-	if (rendererIndex >= GetRendererCount())
+	if (rendererIndex < 0 || rendererIndex >= GetRendererCount())
 		return 0; // fail
 	
 	GLMRendererInfo *rendInfo = (*m_renderers)[rendererIndex];
-		
-	return	rendInfo->m_displays->Count();
+	
+	// dimhotepus: Displays may be not populated yet.
+	return	rendInfo->m_displays ? rendInfo->m_displays->Count() : 0;
 }
 
 bool	GLMDisplayDB::GetDisplayInfo( int rendererIndex, int displayIndex, GLMDisplayInfoFields *infoOut )
 {
 	BitwiseClear( *infoOut );
 	
-	if (rendererIndex >= GetRendererCount())
+	if (rendererIndex < 0 || rendererIndex >= GetRendererCount())
 		return true; // fail
 	
-	if (displayIndex >= GetDisplayCount(rendererIndex))
+	if (displayIndex < 0 || displayIndex >= GetDisplayCount(rendererIndex))
 		return true; // fail
 	
 	GLMDisplayInfo *displayInfo = (*(*m_renderers)[rendererIndex]->m_displays)[displayIndex];
@@ -1326,25 +1357,27 @@ bool	GLMDisplayDB::GetDisplayInfo( int rendererIndex, int displayIndex, GLMDispl
 
 int		GLMDisplayDB::GetModeCount( int rendererIndex, int displayIndex )
 {
-	if (rendererIndex >= GetRendererCount())
+	if (rendererIndex < 0 || rendererIndex >= GetRendererCount())
 		return 0; // fail
 	
-	if (displayIndex >= GetDisplayCount(rendererIndex))
+	if (displayIndex < 0 || displayIndex >= GetDisplayCount(rendererIndex))
 		return 0; // fail
 		
 	GLMDisplayInfo *displayInfo = (*(*m_renderers)[rendererIndex]->m_displays)[displayIndex];
 
-	return displayInfo->m_modes->Count();
+	// dimhotepus: Modes may be not populated yet.
+	return displayInfo->m_modes ? displayInfo->m_modes->Count() : 0;
 }
 
 bool	GLMDisplayDB::GetModeInfo( int rendererIndex, int displayIndex, int modeIndex, GLMDisplayModeInfoFields *infoOut )
 {
 	BitwiseClear( *infoOut );
 	
-	if (rendererIndex >= GetRendererCount())
+	// dimhotepus: Negative renderer / display index is invalid (negative mode index means "current mode").
+	if (rendererIndex < 0 || rendererIndex >= GetRendererCount())
 		return true; // fail
 	
-	if (displayIndex >= GetDisplayCount(rendererIndex))
+	if (displayIndex < 0 || displayIndex >= GetDisplayCount(rendererIndex))
 		return true; // fail
 	
 	if (modeIndex >= GetModeCount(rendererIndex,displayIndex))
@@ -1363,33 +1396,21 @@ bool	GLMDisplayDB::GetModeInfo( int rendererIndex, int displayIndex, int modeInd
 		GLMDisplayInfo		*dispinfo = (*rendInfo ->m_displays)[displayIndex];	
 		CGDirectDisplayID	cgid = dispinfo->m_info.m_cgDisplayID;
 		
-		CFDictionaryRef		curModeDict = CGDisplayCurrentMode( cgid );
-		CFNumberRef			number;
-		CFBooleanRef		boolean;
-		CFArrayRef			modeList;
-		CGDisplayErr		cgderr;
+		// dimhotepus: CGDisplayCurrentMode and its CFDictionary keys are deprecated (and unavailable on arm64),
+		// use CGDisplayCopyDisplayMode. Also no more NULL CFNumber dereferences.
+		CGDisplayModeRef	curMode = CGDisplayCopyDisplayMode( cgid );
 		
-		// get the mode number from the mode dict (using system mode numbering, not our sorted numbering)
-		if (curModeDict)
+		if ( curMode && dispinfo->m_modes )
 		{
-			int modeIndex=0;
-			number = (CFNumberRef)CFDictionaryGetValue(curModeDict, kCGDisplayMode);
-			CFNumberGetValue(number, kCFNumberIntType, &modeIndex);
-
 			// grab the width and height, I am unclear on whether this is the displayed FB width or the display device width.
-			int screenWidth=0;
-			int screenHeight=0;
-			int refreshHz=0;
+			const int screenWidth = static_cast<int>( CGDisplayModeGetWidth( curMode ) );
+			const int screenHeight = static_cast<int>( CGDisplayModeGetHeight( curMode ) );
+			const int refreshHz = static_cast<int>( CGDisplayModeGetRefreshRate( curMode ) );
 			
-			number = (CFNumberRef)CFDictionaryGetValue(curModeDict, kCGDisplayWidth);
-			CFNumberGetValue(number, kCFNumberIntType, &screenWidth);
-			number = (CFNumberRef)CFDictionaryGetValue(curModeDict, kCGDisplayHeight);
-			CFNumberGetValue(number, kCFNumberIntType, &screenHeight);
-			number = (CFNumberRef)CFDictionaryGetValue(curModeDict, kCGDisplayRefreshRate);
-			CFNumberGetValue(number, kCFNumberIntType, &refreshHz);
+			CGDisplayModeRelease( curMode );
+			curMode = NULL;
 			
-			GLMPRINTF(( "-D- GLMDisplayDB::GetModeInfo sees mode-index=%d, width=%d, height=%d on CGID %08x (display index %d on rendererindex %d)", 
-				modeIndex,
+			GLMPRINTF(( "-D- GLMDisplayDB::GetModeInfo sees width=%d, height=%d on CGID %08x (display index %d on rendererindex %d)", 
 				screenWidth,
 				screenHeight,
 				cgid,
@@ -1397,24 +1418,23 @@ bool	GLMDisplayDB::GetModeInfo( int rendererIndex, int displayIndex, int modeInd
 				rendererIndex ));
 
 			// now match
-			int foundIndex = -1;
 			FOR_EACH_VEC( (*dispinfo->m_modes), i )
 			{
 				GLMDisplayMode *mode = (*dispinfo->m_modes)[i];
 				
-				if (mode->m_info.m_modePixelWidth == screenWidth)
+				if ( ( static_cast<int>( mode->m_info.m_modePixelWidth ) == screenWidth ) &&
+					 ( static_cast<int>( mode->m_info.m_modePixelHeight ) == screenHeight ) &&
+					 ( static_cast<int>( mode->m_info.m_modeRefreshHz ) == refreshHz ) )
 				{
-					if (mode->m_info.m_modePixelHeight == screenHeight)
-					{
-						if (mode->m_info.m_modeRefreshHz == refreshHz)
-						{
-							foundIndex = i;
-							*infoOut = mode->m_info;
-							return false;
-						}
-					}
+					*infoOut = mode->m_info;
+					return false;
 				}
 			}
+		}
+		
+		if ( curMode )
+		{
+			CGDisplayModeRelease( curMode );
 		}
 
 		// if we get here, we could not find the mode
@@ -1427,11 +1447,15 @@ bool	GLMDisplayDB::GetModeInfo( int rendererIndex, int displayIndex, int modeInd
 
 void	GLMDisplayDB::Dump( void )
 {
-	GLMPRINTF(("\n GLMDisplayDB @ %08x ",this ));
+	GLMPRINTF(("\n GLMDisplayDB @ %p ",this ));
 
-	FOR_EACH_VEC( *m_renderers, i )
+	// dimhotepus: Renderers may be not populated yet.
+	if ( m_renderers )
 	{
-		(*m_renderers)[i]->Dump(i);
+		FOR_EACH_VEC( *m_renderers, i )
+		{
+			(*m_renderers)[i]->Dump(i);
+		}
 	}
 }
 
@@ -1439,6 +1463,9 @@ void	GLMDisplayDB::Dump( void )
 
 GLMDisplayInfo::GLMDisplayInfo( CGDirectDisplayID displayID, CGOpenGLDisplayMask displayMask )
 {	
+	// dimhotepus: Zero the info, only some fields were initialized before.
+	BitwiseClear( m_info );
+
 	m_info.m_cgDisplayID			= displayID;
 	m_info.m_glDisplayMask			= displayMask;
 	
@@ -1491,6 +1518,26 @@ extern "C" int DisplayModeSortFunction( GLMDisplayMode * const *A, GLMDisplayMod
 	{
 		return smaller;
 	}
+
+	// dimhotepus: Make ordering total (width, then height), otherwise equal-area modes of
+	// different size interleave and duplicates are not adjacent for the dupe removal.
+	if ( (*A)->m_info.m_modePixelWidth > (*B)->m_info.m_modePixelWidth )
+	{
+		return bigger;
+	}
+	else if ( (*A)->m_info.m_modePixelWidth < (*B)->m_info.m_modePixelWidth )
+	{
+		return smaller;
+	}
+
+	if ( (*A)->m_info.m_modePixelHeight > (*B)->m_info.m_modePixelHeight )
+	{
+		return bigger;
+	}
+	else if ( (*A)->m_info.m_modePixelHeight < (*B)->m_info.m_modePixelHeight )
+	{
+		return smaller;
+	}
 	
 	return 0;	// equal rank
 }
@@ -1501,83 +1548,90 @@ void	GLMDisplayInfo::PopulateModes( void )
 	Assert( !m_modes );
 	m_modes = new CUtlVector< GLMDisplayMode* >;
 	
-	CFArrayRef		modeList;
-//	CGDisplayErr	cgderr;
-	CFDictionaryRef cgvidmode;
-	CFNumberRef		number;
-	CFBooleanRef	boolean;
-	
-	modeList = CGDisplayAvailableModes( m_info.m_cgDisplayID );
+	// dimhotepus: CGDisplayAvailableModes (and the CFDictionary keys it needs) are deprecated and
+	// unavailable on arm64, use CGDisplayCopyAllDisplayModes. The list is owned by us now (released below).
+	CFArrayRef modeList = CGDisplayCopyAllDisplayModes( m_info.m_cgDisplayID, NULL );
 	if ( modeList != NULL )
 	{
 		//  examine each mode
-		CFIndex count = CFArrayGetCount( modeList );
+		const CFIndex count = CFArrayGetCount( modeList );
 		
 		for (CFIndex i = 0; i < count; i++) 
 		{
-			long modeHeight = 0, modeWidth = 0;
-			long depth = 0;
-			long refreshrate = 0;
-			Boolean usable, stretched = false;
+			CGDisplayModeRef mode = (CGDisplayModeRef)CFArrayGetValueAtIndex( modeList, i );
 			
-			// grab the mode dictionary
-			cgvidmode = (CFDictionaryRef)CFArrayGetValueAtIndex( modeList, i);
+			const bool usable = CGDisplayModeIsUsableForDesktopGUI( mode );
+			const bool stretched = ( CGDisplayModeGetIOFlags( mode ) & kDisplayModeStretchedFlag ) != 0;
 			
-			// grab mode params we need
-			number = (CFNumberRef)CFDictionaryGetValue(cgvidmode, kCGDisplayBitsPerPixel);
-			CFNumberGetValue(number, kCFNumberLongType, &depth);
-			
-			boolean = (CFBooleanRef)CFDictionaryGetValue(cgvidmode, kCGDisplayModeUsableForDesktopGUI) ;
-			usable = CFBooleanGetValue(boolean);
-			
-			boolean = (CFBooleanRef)CFDictionaryGetValue(cgvidmode, kCGDisplayModeIsStretched);
-			if (NULL != boolean) 
+			// only 32 bit modes are interesting
+			bool is32Bit = false;
+			CFStringRef pixelEncoding = CGDisplayModeCopyPixelEncoding( mode );
+			if ( pixelEncoding )
 			{
-				stretched = CFBooleanGetValue(boolean);
+				is32Bit = ( CFStringCompare( pixelEncoding, CFSTR( IO32BitDirectPixels ), 0 ) == kCFCompareEqualTo );
+				CFRelease( pixelEncoding );
 			}
 			
-			if ( usable && (!stretched) && (depth==32) )
+			if ( usable && (!stretched) && is32Bit )
 			{
 				// we're going to log this mode to the mode table.
+				const long modeHeight = static_cast<long>( CGDisplayModeGetHeight( mode ) );
+				const long modeWidth = static_cast<long>( CGDisplayModeGetWidth( mode ) );
+				const long refreshrate = static_cast<long>( CGDisplayModeGetRefreshRate( mode ) );
 				
-				// get height of mode
-				number = (CFNumberRef)CFDictionaryGetValue( cgvidmode, kCGDisplayHeight );
-				CFNumberGetValue(number, kCFNumberLongType, &modeHeight);
-				
-				// get width of mode
-				number = (CFNumberRef)CFDictionaryGetValue( cgvidmode, kCGDisplayWidth );
-				CFNumberGetValue(number, kCFNumberLongType, &modeWidth);
-				
-				// get refresh rate of mode
-				number = (CFNumberRef)CFDictionaryGetValue( cgvidmode, kCGDisplayRefreshRate ); 
-				double flrefreshrate = 0.0f;
-				CFNumberGetValue( number, kCFNumberDoubleType, &flrefreshrate );
-				refreshrate = (int)flrefreshrate;
-
 				// exclude silly small modes
 				if ( (modeHeight >= 384) && (modeWidth >= 512) )
 				{
-					GLMDisplayMode *newmode = new GLMDisplayMode( modeWidth, modeHeight, refreshrate );
+					GLMDisplayMode *newmode = new GLMDisplayMode( static_cast<uint>( modeWidth ), static_cast<uint>( modeHeight ), static_cast<uint>( refreshrate ) );
 					m_modes->AddToTail( newmode );
 				}
 			}
 		}
+		
+		CFRelease( modeList );
 	}
-	
+		
 	// now sort the modes
 	// primary key is refresh rate
 	// secondary key is area
 
 	m_modes->Sort( DisplayModeSortFunction );
+
+	// dimhotepus: HiDPI displays report several modes with the same size and refresh rate, remove dupes
+	// (like the Linux version does). Sort above makes them adjacent.
+	int nummodes = m_modes->Count();
+	int i = 1;  // not zero!
+	while (i < nummodes)
+	{
+		GLMDisplayModeInfoFields& info0 = m_modes->Element( i - 1 )->m_info;
+		GLMDisplayModeInfoFields& info1 = m_modes->Element( i )->m_info;
+		
+		if ( ( info0.m_modePixelWidth == info1.m_modePixelWidth ) &&
+			 ( info0.m_modePixelHeight == info1.m_modePixelHeight ) &&
+			 ( info0.m_modeRefreshHz == info1.m_modeRefreshHz ) )
+		{
+			delete m_modes->Element( i );
+			m_modes->Remove(i);
+			nummodes--;
+		}
+		else
+		{
+			i++;
+		}
+	}
 }
 
 
 void	GLMDisplayInfo::Dump( int which )
 {
-	GLMPRINTF(("\n         #%d: GLMDisplayInfo @ %p, cg-id=%16x  display-mask=%08x  pixwidth=%d  pixheight=%d", which, this, m_info.m_cgDisplayID, m_info.m_glDisplayMask, m_info.m_displayPixelWidth,  m_info.m_displayPixelHeight ));
+	GLMPRINTF(("\n         #%d: GLMDisplayInfo @ %p, cg-id=%16x  display-mask=%08x  pixwidth=%u  pixheight=%u", which, this, m_info.m_cgDisplayID, m_info.m_glDisplayMask, m_info.m_displayPixelWidth,  m_info.m_displayPixelHeight ));
 
-	FOR_EACH_VEC( *m_modes, i )
+	// dimhotepus: Modes may be not populated yet.
+	if ( m_modes )
 	{
-		(*m_modes)[i]->Dump(i);
+		FOR_EACH_VEC( *m_modes, i )
+		{
+			(*m_modes)[i]->Dump(i);
+		}
 	}
 }

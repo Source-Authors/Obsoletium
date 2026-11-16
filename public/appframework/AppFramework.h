@@ -16,7 +16,7 @@
 //-----------------------------------------------------------------------------
 // Gets the application instance..
 //-----------------------------------------------------------------------------
-void *GetAppInstance();
+[[nodiscard]] void *GetAppInstance();
 
 
 //-----------------------------------------------------------------------------
@@ -43,20 +43,20 @@ void AppShutdown( CAppSystemGroup *pAppSystemGroup );
 //-----------------------------------------------------------------------------
 // Macros to create singleton application objects for windowed + console apps
 //-----------------------------------------------------------------------------
-#ifdef WIN32
+#if defined( _WIN32 ) || defined( WIN32 )
 #define DEFINE_WINDOWED_APPLICATION_OBJECT_GLOBALVAR( _globalVarName ) \
 	int __stdcall WinMain( IN_P HINSTANCE hInstance, IN_OPT HINSTANCE hPrevInstance, IN_P char *lpCmdLine, IN_P int nCmdShow )	\
 	{																							\
 		return AppMain( hInstance, hPrevInstance, lpCmdLine, nCmdShow, &_globalVarName );		\
 	}
-#elif defined( OSX )
+#elif defined( OSX ) || defined( __APPLE__ )
 #define DEFINE_WINDOWED_APPLICATION_OBJECT_GLOBALVAR( _globalVarName ) \
 	int main( int argc, char **argv )										\
 	{																							\
 		extern int ValveCocoaMain( int argc, char **argv, CAppSystemGroup *pAppSystemGroup ); \
 		return ValveCocoaMain( argc, argv, &_globalVarName ); \
 	}
-#elif defined( LINUX )
+#elif defined( LINUX ) || defined( __linux__ )
 #define DEFINE_WINDOWED_APPLICATION_OBJECT_GLOBALVAR( _globalVarName ) \
 	int main( int argc, char **argv )										\
 	{																							\
@@ -73,13 +73,15 @@ void AppShutdown( CAppSystemGroup *pAppSystemGroup );
 		return AppMain( argc, argv, &_globalVarName );	\
 	}
 
+// dimhotepus: Identifiers containing double underscore are reserved for the
+// implementation in C++ (UB to define them). Renamed __s_* -> s_*.
 #define DEFINE_WINDOWED_APPLICATION_OBJECT( _className )	\
-	static _className __s_ApplicationObject;				\
-	DEFINE_WINDOWED_APPLICATION_OBJECT_GLOBALVAR( __s_ApplicationObject )
+	static _className s_ApplicationObject;					\
+	DEFINE_WINDOWED_APPLICATION_OBJECT_GLOBALVAR( s_ApplicationObject )
 
 #define DEFINE_CONSOLE_APPLICATION_OBJECT( _className )	\
-	static _className __s_ApplicationObject;			\
-	DEFINE_CONSOLE_APPLICATION_OBJECT_GLOBALVAR( __s_ApplicationObject )
+	static _className s_ApplicationObject;				\
+	DEFINE_CONSOLE_APPLICATION_OBJECT_GLOBALVAR( s_ApplicationObject )
 
 
 //-----------------------------------------------------------------------------
@@ -92,7 +94,12 @@ class CSteamApplication : public CAppSystemGroup
 	using BaseClass = CAppSystemGroup;
 
 public:
-	CSteamApplication( CSteamAppSystemGroup *pAppSystemGroup );
+	// dimhotepus: explicit to prevent accidental implicit conversion from pointer.
+	explicit CSteamApplication( CSteamAppSystemGroup *pAppSystemGroup );
+
+	// dimhotepus: Application owns system state, copying is never valid.
+	CSteamApplication( const CSteamApplication & ) = delete;
+	CSteamApplication &operator=( const CSteamApplication & ) = delete;
 
 	// Implementation of IAppSystemGroup
 	bool Create( ) override;
@@ -107,9 +114,10 @@ public:
 	void Shutdown() override;
 
 protected:
-	IFileSystem *m_pFileSystem;
-	CSteamAppSystemGroup *m_pChildAppSystemGroup;
-	bool m_bSteam;
+	// dimhotepus: Default initialize to avoid garbage on early failure paths.
+	IFileSystem *m_pFileSystem{nullptr};
+	CSteamAppSystemGroup *m_pChildAppSystemGroup{nullptr};
+	bool m_bSteam{false};
 };
 
 
@@ -117,21 +125,21 @@ protected:
 // Macros to help create singleton application objects for windowed + console steam apps
 //-----------------------------------------------------------------------------
 #define DEFINE_WINDOWED_STEAM_APPLICATION_OBJECT_GLOBALVAR( _className, _varName )	\
-	static CSteamApplication __s_SteamApplicationObject( &_varName );	\
-	DEFINE_WINDOWED_APPLICATION_OBJECT_GLOBALVAR( __s_SteamApplicationObject )
+	static CSteamApplication s_SteamApplicationObject( &_varName );	\
+	DEFINE_WINDOWED_APPLICATION_OBJECT_GLOBALVAR( s_SteamApplicationObject )
 
 #define DEFINE_WINDOWED_STEAM_APPLICATION_OBJECT( _className )	\
-	static _className __s_ApplicationObject;				\
-	static CSteamApplication __s_SteamApplicationObject( &__s_ApplicationObject );	\
-	DEFINE_WINDOWED_APPLICATION_OBJECT_GLOBALVAR( __s_SteamApplicationObject )
+	static _className s_ApplicationObject;				\
+	static CSteamApplication s_SteamApplicationObject( &s_ApplicationObject );	\
+	DEFINE_WINDOWED_APPLICATION_OBJECT_GLOBALVAR( s_SteamApplicationObject )
 
 #define DEFINE_CONSOLE_STEAM_APPLICATION_OBJECT_GLOBALVAR( _className, _varName )	\
-	static CSteamApplication __s_SteamApplicationObject( &_varName );	\
-	DEFINE_CONSOLE_APPLICATION_OBJECT_GLOBALVAR( __s_SteamApplicationObject )
+	static CSteamApplication s_SteamApplicationObject( &_varName );	\
+	DEFINE_CONSOLE_APPLICATION_OBJECT_GLOBALVAR( s_SteamApplicationObject )
 
 #define DEFINE_CONSOLE_STEAM_APPLICATION_OBJECT( _className )	\
-	static _className __s_ApplicationObject;			\
-	static CSteamApplication __s_SteamApplicationObject( &__s_ApplicationObject );	\
-	DEFINE_CONSOLE_APPLICATION_OBJECT_GLOBALVAR( __s_SteamApplicationObject )
+	static _className s_ApplicationObject;			\
+	static CSteamApplication s_SteamApplicationObject( &s_ApplicationObject );	\
+	DEFINE_CONSOLE_APPLICATION_OBJECT_GLOBALVAR( s_SteamApplicationObject )
 
 #endif // APPFRAMEWORK_H
