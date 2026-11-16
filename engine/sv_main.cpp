@@ -1664,7 +1664,7 @@ void CGameServer::FinishRestore()
 	// Build the adjacent map list
 	serverGameDLL->BuildAdjacentMapList();
 
-	Q_snprintf( name, sizeof( name ), "%s/%s.HL2", saverestore->GetSaveDir(), m_szMapname );
+	V_sprintf_safe( name, "%s" CORRECT_PATH_SEPARATOR_S "%s.HL2", saverestore->GetSaveDir(), m_szMapname );
 	Q_FixSlashes( name );
 
 	saverestore->RestoreClientState( name, false );

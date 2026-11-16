@@ -206,7 +206,7 @@ public:
 		char szName[MAX_PATH];
 		for ( intp i = 0; i < list.Count(); i++ )
 		{
-			Q_snprintf( szName, sizeof( szName ), "%s/%s", saverestore->GetSaveDir(), list[i].szFileName );
+			V_sprintf_safe( szName, "%s" CORRECT_PATH_SEPARATOR_S "%s", saverestore->GetSaveDir(), list[i].szFileName );
 			Q_FixSlashes( szName );
 
 			// dimhotepus: Correctly check file size.
@@ -247,7 +247,7 @@ public:
 			if ( !fileSize )
 				return false;
 
-			V_sprintf_safe( szName, "%s/%s", saverestore->GetSaveDir(), fileName );
+			V_sprintf_safe( szName, "%s" CORRECT_PATH_SEPARATOR_S "%s", saverestore->GetSaveDir(), fileName );
 			Q_FixSlashes( szName );
 
 			FileHandle_t pCopy = g_pSaveRestoreFileSystem->Open( szName, "wb", "MOD" );
@@ -291,7 +291,7 @@ public:
 		RunCodeAtScopeExit(Sys_FindClose());
 		while ( findfn != NULL )
 		{
-			Q_snprintf( szPath, sizeof( szPath ), "%s/%s", saverestore->GetSaveDir(), findfn );
+			V_sprintf_safe( szPath, "%s" CORRECT_PATH_SEPARATOR_S "%s", saverestore->GetSaveDir(), findfn );
 
 			// Delete the temporary save file
 			g_pFileSystem->RemoveFile( szPath, "MOD" );

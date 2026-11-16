@@ -532,14 +532,14 @@ void CSaveRestore::AgeSaveFile( const char *pName, const char *ext, int count )
 
 	if ( count == 1 )
 	{
-		V_sprintf_safe( oldName, "%s/%s.%s", GetSaveDir(), pName, ext );	// quick.sav.
+		V_sprintf_safe( oldName, "%s" CORRECT_PATH_SEPARATOR_S "%s.%s", GetSaveDir(), pName, ext );	// quick.sav.
 	}
 	else
 	{
-		V_sprintf_safe( oldName, "%s/%s%02d.%s", GetSaveDir(), pName, count-1, ext );	// quick04.sav, etc.
+		V_sprintf_safe( oldName, "%s" CORRECT_PATH_SEPARATOR_S "%s%02d.%s", GetSaveDir(), pName, count - 1, ext ); // quick04.sav, etc.
 	}
 	
-	V_sprintf_safe( newName, "%s/%s%02d.%s", GetSaveDir(), pName, count, ext );
+	V_sprintf_safe( newName, "%s" CORRECT_PATH_SEPARATOR_S "%s%02d.%s", GetSaveDir(), pName, count, ext );
 	
 	// dimhotepus: Use MOD for fs.
 	// Scroll the name list down (rename quick04.sav to quick05.sav)
@@ -665,11 +665,11 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 	
 	if ( onlyThisLevel )
 	{
-		V_sprintf_safe( hlPath, "%s/%s*.HL?", GetSaveDir(), sv.GetMapName() );
+		V_sprintf_safe( hlPath, "%s" CORRECT_PATH_SEPARATOR_S "%s*.HL?", GetSaveDir(), sv.GetMapName() );
 	}
 	else
 	{
-		V_sprintf_safe( hlPath, "%s/*.HL?", GetSaveDir() );
+		V_sprintf_safe( hlPath, "%s" CORRECT_PATH_SEPARATOR_S "*.HL?", GetSaveDir() );
 	}
 
 	// Output to disk
@@ -808,7 +808,7 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 	{
 		if ( !( bIsAutosave || bIsAutosaveDangerous ) || save_screenshot.GetInt() == 2 )
 		{
-			V_sprintf_safe( m_szSaveGameScreenshotFile, "%s/%s%s.tga", GetSaveDir(), pSaveName, GetPlatformExt() );
+			V_sprintf_safe( m_szSaveGameScreenshotFile, "%s" CORRECT_PATH_SEPARATOR_S "%s%s.tga", GetSaveDir(), pSaveName, GetPlatformExt() );
 		}
 	}
 
@@ -970,7 +970,7 @@ bool CSaveRestore::CalcSaveGameName( const char *pName, char *output, int output
 	if (!pName || !pName[0])
 		return false;
 
-	Q_snprintf( output, outputStringLength, "%s/%s", GetSaveDir(), pName );
+	Q_snprintf( output, outputStringLength, "%s" CORRECT_PATH_SEPARATOR_S "%s", GetSaveDir(), pName );
 	Q_DefaultExtension( output, ".sav", outputStringLength );
 	Q_FixSlashes( output );
 
@@ -1815,7 +1815,7 @@ void CSaveRestore::RestoreClientState( char const *fileName, bool adjacent )
 void CSaveRestore::RestoreAdjacenClientState( char const *map )
 {
 	char name[256];
-	Q_snprintf( name, sizeof( name ), "%s/%s.HL2", GetSaveDir(), GetSaveGameMapName( map ) );
+	V_sprintf_safe( name, "%s" CORRECT_PATH_SEPARATOR_S "%s.HL2", GetSaveDir(), GetSaveGameMapName( map ) );
 	// dimhotepus: Fix file name.
 	V_FixSlashes( name );
 	COM_CreatePath( name );
@@ -2066,7 +2066,7 @@ CSaveRestoreData *CSaveRestore::LoadSaveData( const char *level )
 
 	{
 		char name[MAX_OSPATH];
-		V_sprintf_safe( name, "%s/%s.HL1", GetSaveDir(), level);// DON'T FixSlashes on this, it needs to be //MOD
+		V_sprintf_safe( name, "%s" CORRECT_PATH_SEPARATOR_S "%s.HL1", GetSaveDir(), level);// DON'T FixSlashes on this, it needs to be //MOD
 
 		ConMsg ("Loading game from %s...\n", name);
 
@@ -2257,7 +2257,7 @@ void CSaveRestore::EntityPatchWrite( CSaveRestoreData *pSaveData, const char *le
 void CSaveRestore::EntityPatchRead( CSaveRestoreData *pSaveData, const char *level )
 {
 	char name[MAX_OSPATH];
-	V_sprintf_safe(name, "%s/%s.HL3", GetSaveDir(), GetSaveGameMapName( level ) );// DON'T FixSlashes on this, it needs to be //MOD
+	V_sprintf_safe( name, "%s" CORRECT_PATH_SEPARATOR_S "%s.HL3", GetSaveDir(), GetSaveGameMapName( level ) ); // DON'T FixSlashes on this, it needs to be //MOD
 
 	FileHandle_t pFile = g_pSaveRestoreFileSystem->Open( name, "rb", MOD_DIR );
 	if ( pFile )
@@ -2648,8 +2648,8 @@ void CSaveRestore::AutoSaveDangerousIsSafe()
 		AgeSaveList( "autosave", save_history_count.GetInt() );
 	}
 
-	Q_snprintf( szOldName, sizeof( szOldName ), "%s/autosavedangerous%s.tga", GetSaveDir(), GetPlatformExt() );
-	Q_snprintf( szNewName, sizeof( szNewName ), "%s/autosave%s.tga", GetSaveDir(), GetPlatformExt() );
+	Q_snprintf( szOldName, sizeof( szOldName ), "%s" CORRECT_PATH_SEPARATOR_S "autosavedangerous%s.tga", GetSaveDir(), GetPlatformExt() );
+	Q_snprintf( szNewName, sizeof( szNewName ), "%s" CORRECT_PATH_SEPARATOR_S "autosave%s.tga", GetSaveDir(), GetPlatformExt() );
 
 	// there could be an old version, remove it
 	if ( g_pFileSystem->FileExists( szNewName, MOD_DIR ) )
@@ -2667,8 +2667,8 @@ void CSaveRestore::AutoSaveDangerousIsSafe()
 	}
 
 	// Rename the dangerous auto save as a normal auto save
-	Q_snprintf( szOldName, sizeof( szOldName ), "%s/autosavedangerous%s.sav", GetSaveDir(), GetPlatformExt() );
-	Q_snprintf( szNewName, sizeof( szNewName ), "%s/autosave%s.sav", GetSaveDir(), GetPlatformExt() );
+	Q_snprintf( szOldName, sizeof( szOldName ), "%s" CORRECT_PATH_SEPARATOR_S "autosavedangerous%s.sav", GetSaveDir(), GetPlatformExt() );
+	Q_snprintf( szNewName, sizeof( szNewName ), "%s" CORRECT_PATH_SEPARATOR_S "autosave%s.sav", GetSaveDir(), GetPlatformExt() );
 
 	// there could be an old version, remove it
 	if ( g_pFileSystem->FileExists( szNewName, MOD_DIR ) )

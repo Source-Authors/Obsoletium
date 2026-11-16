@@ -139,14 +139,14 @@ static void NukeModeSwitchSaveGames( void )
 	char modeswitch[MAX_OSPATH];
 	const char* saveDir = saverestore->GetSaveDir();
 
-	V_sprintf_safe( modeswitch, "%s/modeswitchsave.sav", saveDir );
+	V_sprintf_safe( modeswitch, "%s" CORRECT_PATH_SEPARATOR_S "modeswitchsave.sav", saveDir );
 
 	if (g_pFileSystem->FileExists(modeswitch, "MOD" ))
 	{
 		g_pFileSystem->RemoveFile( modeswitch, "MOD" );
 	}
 
-	V_sprintf_safe( modeswitch, "%s/modeswitchsave.tga", saveDir );
+	V_sprintf_safe( modeswitch, "%s" CORRECT_PATH_SEPARATOR_S "modeswitchsave.tga", saveDir );
 
 	if (g_pFileSystem->FileExists(modeswitch, "MOD" ))
 	{
