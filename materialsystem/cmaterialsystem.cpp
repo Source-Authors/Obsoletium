@@ -844,7 +844,9 @@ bool CMaterialSystem::AllowThreading( bool bAllow, int nServiceThread )
 
 	bool bOldAllow = m_bAllowQueuedRendering;
 
-	if ( GetCPUInformation()->m_nPhysicalProcessors >= 2 )
+	// dimhotepus: We can benefit from logical processors, too.
+	// For low-power machines with 1 core and 2 logical CPUs it gives a boost.
+	if ( GetCPUInformation()->m_nLogicalProcessors >= 2 )
 	{
 		m_bAllowQueuedRendering = bAllow;
 		bool bQueued = m_IdealThreadMode != MATERIAL_SINGLE_THREADED;
