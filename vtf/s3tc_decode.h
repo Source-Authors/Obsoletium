@@ -27,14 +27,14 @@ struct S3PaletteIndex
 constexpr int MAX_S3TC_BLOCK_BYTES{16};
 
 
-S3PaletteIndex S3TC_GetPixelPaletteIndex( ImageFormat format, const char *pS3Block, int x, int y );
+[[nodiscard]] S3PaletteIndex S3TC_GetPixelPaletteIndex( ImageFormat format, const char *pS3Block, int x, int y );
 
 void S3TC_SetPixelPaletteIndex( ImageFormat format, char *pS3Block, int x, int y, S3PaletteIndex iPaletteIndex );
 
 
 
 // Note: width, x, and y are in texels, not S3 blocks.
-S3PaletteIndex S3TC_GetPaletteIndex( 
+[[nodiscard]] S3PaletteIndex S3TC_GetPaletteIndex( 
 	unsigned char *pFaceData,
 	ImageFormat format,
 	int imageWidth,
@@ -52,18 +52,18 @@ void S3TC_SetPaletteIndex(
 	S3PaletteIndex paletteIndex );
 
 
-const char* S3TC_GetBlock( 
+[[nodiscard]] const char* S3TC_GetBlock( 
 	const void *pCompressed, 
 	ImageFormat format, 
-	int nBlocksWide, // How many blocks wide is the image (pixels wide / 4).
+	int nBlocksWide, // How many blocks wide is the image (pixels wide / 4, rounded up).
 	int xBlock,
 	int yBlock );
 
 
-char* S3TC_GetBlock( 
+[[nodiscard]] char* S3TC_GetBlock( 
 	void *pCompressed, 
 	ImageFormat format, 
-	int nBlocksWide, // How many blocks wide is the image (pixels wide / 4).
+	int nBlocksWide, // How many blocks wide is the image (pixels wide / 4, rounded up).
 	int xBlock,
 	int yBlock );
 
@@ -79,7 +79,7 @@ void S3TC_MergeBlocks(
 
 
 // Convert an RGB565 color to RGBA8888.
-inline S3RGBA S3TC_RGBAFrom565( unsigned short color, unsigned char alphaValue=255 )
+[[nodiscard]] inline S3RGBA S3TC_RGBAFrom565( unsigned short color, unsigned char alphaValue=255 )
 {
 	S3RGBA ret;
 	ret.b = (unsigned char)( (color & 0x1F) << 3 );
@@ -90,7 +90,7 @@ inline S3RGBA S3TC_RGBAFrom565( unsigned short color, unsigned char alphaValue=2
 }
 
 // Blend from one color to another..
-inline S3RGBA S3TC_RGBABlend( const S3RGBA &a, const S3RGBA &b, int aMul, int bMul, int div )
+[[nodiscard]] inline S3RGBA S3TC_RGBABlend( const S3RGBA &a, const S3RGBA &b, int aMul, int bMul, int div )
 {
 	S3RGBA ret;
 	ret.b = (unsigned char)(( (int)a.b * aMul + (int)b.b * bMul ) / div );

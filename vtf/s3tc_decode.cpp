@@ -6,21 +6,14 @@
 
 #include "s3tc_decode.h"
 
+#include <cstring>
+
 #include "bitmap/imageformat.h"
 #include "tier0/basetypes.h"
 #include "tier0/dbg.h"
 
-// dimhotepus: Exclude nvtc as proprietary.
-#ifndef NO_NVTC
-#include "nvtc.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
-
-// This is in s3tc.lib. Nvidia added it specially for us. It can be set to 4, 8, or 12.
-// When set to 8 or 12, it generates a palette given an 8x4 or 12x4 texture.
-extern int S3TC_BLOCK_WIDTH;
 
 struct S3TCBlock_DXT1
 {
@@ -40,20 +33,27 @@ struct S3TCBlock_DXT5
 	unsigned int m_PixelBits;
 };
 
+// dimhotepus: Blocks are a disk / GPU format, make sure no compiler on any platform adds padding.
+static_assert( sizeof( S3TCBlock_DXT1 ) == 8, "DXT1 block must be 8 bytes" );
+static_assert( sizeof( S3TCBlock_DXT5 ) == 16, "DXT5 block must be 16 bytes" );
+static_assert( sizeof( S3TCBlock_DXT5 ) <= MAX_S3TC_BLOCK_BYTES, "Update MAX_S3TC_BLOCK_BYTES" );
 
 
 // ------------------------------------------------------------------------------------------ //
 // S3TCBlock
 // ------------------------------------------------------------------------------------------ //
 
-template<typename T>
-[[nodiscard]] static T ReadBitInt( const char *pBits, T iBaseBit, T nBits )
+// dimhotepus: Was a template with signed char reads; use unsigned char so result does not depend on
+// platform 'char' signedness (signed on x86, unsigned on arm64 Linux / Windows ARM64 differs by ABI).
+[[nodiscard]] static unsigned ReadBitInt( const char *pBits, unsigned iBaseBit, unsigned nBits )
 {
-	T ret = 0;
-	for ( T i=0; i < nBits; i++ )
+	const unsigned char *pBytes = reinterpret_cast<const unsigned char *>( pBits );
+
+	unsigned ret = 0;
+	for ( unsigned i = 0; i < nBits; i++ )
 	{
-		T iBit = iBaseBit + i;
-		T val = ((pBits[iBit>>3] >> (iBit&7)) & 1) << i;
+		const unsigned iBit = iBaseBit + i;
+		const unsigned val = ( ( pBytes[iBit >> 3] >> ( iBit & 7 ) ) & 1u ) << i;
 
 		ret |= val;
 	}
@@ -62,16 +62,20 @@ template<typename T>
 
 static void WriteBitInt( char *pBits, int iBaseBit, int nBits, int val )
 {
+	unsigned char *pBytes = reinterpret_cast<unsigned char *>( pBits );
+
 	for ( int i=0; i < nBits; i++ )
 	{
-		int iBit = iBaseBit + i;
-		pBits[iBit>>3] &= ~(1 << (iBit & 7));
+		const int iBit = iBaseBit + i;
+		const unsigned char mask = static_cast<unsigned char>( 1u << ( iBit & 7 ) );
+
+		pBytes[iBit>>3] = static_cast<unsigned char>( pBytes[iBit>>3] & ~mask );
 		if ( (val >> i) & 1 )
-			pBits[iBit>>3] |= (1 << (iBit & 7));
+			pBytes[iBit>>3] = static_cast<unsigned char>( pBytes[iBit>>3] | mask );
 	}
 }
 
-static int S3TC_BytesPerBlock( ImageFormat format )
+[[nodiscard]] static int S3TC_BytesPerBlock( ImageFormat format )
 {
 	if ( format == IMAGE_FORMAT_DXT1 || format == IMAGE_FORMAT_ATI1N )
 	{
@@ -131,7 +135,7 @@ S3PaletteIndex S3TC_GetPixelPaletteIndex( ImageFormat format, const char *pS3Blo
 	if ( format == IMAGE_FORMAT_DXT1 )
 	{
 		const S3TCBlock_DXT1 *pBlock = reinterpret_cast<const S3TCBlock_DXT1 *>( pS3Block );
-		ret.m_ColorIndex = (pBlock->m_PixelBits >> (iQuadPixel << 1)) & 3;
+		ret.m_ColorIndex = static_cast<unsigned char>( (pBlock->m_PixelBits >> (iQuadPixel << 1)) & 3 );
 		ret.m_AlphaIndex = 0;
 	}
 	else
@@ -140,9 +144,12 @@ S3PaletteIndex S3TC_GetPixelPaletteIndex( ImageFormat format, const char *pS3Blo
 
 		const S3TCBlock_DXT5 *pBlock = reinterpret_cast<const S3TCBlock_DXT5 *>( pS3Block );
 		
-		int64 &alphaBits = *((int64*)pBlock->m_AlphaBits);
-		ret.m_ColorIndex = (unsigned char)((pBlock->m_PixelBits >> (iQuadPixel << 1)) & 3);
-		ret.m_AlphaIndex = (unsigned char)((alphaBits >> (iQuadPixel * 3)) & 7);
+		// dimhotepus: Was '*((int64*)pBlock->m_AlphaBits)'. That cast dropped const, did a misaligned 8 byte
+		// load (m_AlphaBits sits at offset 2), violated strict aliasing and read 2 bytes past the 6 alpha bytes.
+		// Read only the 3 bits we need, bit by bit (little-endian bit order, as in the file format).
+		ret.m_ColorIndex = static_cast<unsigned char>( (pBlock->m_PixelBits >> (iQuadPixel << 1)) & 3 );
+		ret.m_AlphaIndex = static_cast<unsigned char>( ReadBitInt( reinterpret_cast<const char *>( pBlock->m_AlphaBits ),
+			static_cast<unsigned>( iQuadPixel * 3 ), 3 ) );
 	}
 
 	return ret;
@@ -153,8 +160,8 @@ void S3TC_SetPixelPaletteIndex( ImageFormat format, char *pS3Block, int x, int y
 {
 	Assert( x >= 0 && x < 4 ); //-V112
 	Assert( y >= 0 && y < 4 ); //-V112
-	Assert( iPaletteIndex.m_ColorIndex >= 0 && iPaletteIndex.m_ColorIndex < 4 );
-	Assert( iPaletteIndex.m_AlphaIndex >= 0 && iPaletteIndex.m_AlphaIndex < 8 );
+	Assert( iPaletteIndex.m_ColorIndex < 4 );
+	Assert( iPaletteIndex.m_AlphaIndex < 8 );
 
 	int iQuadPixel = y*4 + x;
 	int iColorBit = iQuadPixel * 2;
@@ -163,7 +170,8 @@ void S3TC_SetPixelPaletteIndex( ImageFormat format, char *pS3Block, int x, int y
 	{
 		S3TCBlock_DXT1 *pBlock = reinterpret_cast<S3TCBlock_DXT1 *>( pS3Block );
 
-		pBlock->m_PixelBits &= ~( 3 << iColorBit );
+		// dimhotepus: '3 << 30' overflows signed int (UB), use unsigned.
+		pBlock->m_PixelBits &= ~( 3u << iColorBit );
 		pBlock->m_PixelBits |= (unsigned int)iPaletteIndex.m_ColorIndex << iColorBit;
 	}
 	else
@@ -173,7 +181,7 @@ void S3TC_SetPixelPaletteIndex( ImageFormat format, char *pS3Block, int x, int y
 		S3TCBlock_DXT5 *pBlock = reinterpret_cast<S3TCBlock_DXT5 *>( pS3Block );
 
 		// Copy the color portion in.
-		pBlock->m_PixelBits &= ~( 3 << iColorBit );
+		pBlock->m_PixelBits &= ~( 3u << iColorBit );
 		pBlock->m_PixelBits |= (unsigned int)iPaletteIndex.m_ColorIndex << iColorBit;
 		 
 		 // Copy the alpha portion in.
@@ -189,8 +197,12 @@ const char* S3TC_GetBlock(
 	int xBlock,
 	int yBlock )
 {
-	int nBytesPerBlock = S3TC_BytesPerBlock( format );
-	return &((const char*)pCompressed)[ ((yBlock * nBlocksWidth) + xBlock) * nBytesPerBlock ];
+	// dimhotepus: Do math in intp, ((yBlock * nBlocksWidth) + xBlock) * nBytesPerBlock overflowed int
+	// for large textures (16384 blocks wide DXT5 is already 4 GiB).
+	const intp nBytesPerBlock = S3TC_BytesPerBlock( format );
+	const intp iBlock = static_cast<intp>( yBlock ) * nBlocksWidth + xBlock;
+
+	return static_cast<const char*>( pCompressed ) + iBlock * nBytesPerBlock;
 }
 
 
@@ -201,10 +213,12 @@ char* S3TC_GetBlock(
 	int xBlock,
 	int yBlock )
 {
-	return (char*)S3TC_GetBlock( const_cast<const void*>(pCompressed), format, nBlocksWidth, xBlock, yBlock );
+	return const_cast<char*>( S3TC_GetBlock( static_cast<const void*>( pCompressed ), format, nBlocksWidth, xBlock, yBlock ) );
 }
 
 
+// dimhotepus: Was [[maybe_unused]] everywhere plus ~50 lines of code under '#if 0' which depended on nvtc / DirectDraw
+// structures (DDSURFACEDESC, S3TCencode) which are not available. Removed dead code, kept the failure.
 static void GenerateRepresentativePalette(
 	[[maybe_unused]] ImageFormat format,
 	[[maybe_unused]] S3RGBA **pOriginals,	// Original RGBA colors in the texture. This allows it to avoid doubly compressing.
@@ -214,59 +228,6 @@ static void GenerateRepresentativePalette(
 	)
 {
 	Error( "GenerateRepresentativePalette: not implemented" );
-#if 0														// this code was ifdefed out. no idea under what circumstances it was meant to be called.
-
-	Assert( nBlocks == 2 || nBlocks == 3 );
-
-	S3RGBA values[12*4];
-	BitwiseSet( values, 0xFF );
-	int width = nBlocks * 4;
-	for ( int i=0; i < nBlocks; i++ )
-	{
-		for ( int y=0; y < 4; y++ )
-		{
-			for ( int x=0; x < 4; x++ )
-			{
-				int outIndex = y*width+(i*4+x);
-				values[outIndex] = pOriginals[i][y * (lPitch/4) + x];
-			}
-		}
-	}
-	
-	DDSURFACEDESC descIn;
-	BitwiseClear( descIn );
-	DDSURFACEDESC descOut;
-	BitwiseClear( descOut );
-
-	descIn.dwSize = sizeof(descIn);
-	descIn.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_LPSURFACE | DDSD_PIXELFORMAT;
-	descIn.dwWidth = width;
-	descIn.dwHeight = 4;
-	descIn.lPitch = width * 4;
-	descIn.lpSurface = values;
-	descIn.ddpfPixelFormat.dwSize = sizeof( DDPIXELFORMAT );
-
-	descIn.ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
-	descIn.ddpfPixelFormat.dwRGBBitCount = 32;
-	descIn.ddpfPixelFormat.dwRBitMask = 0xff0000;
-	descIn.ddpfPixelFormat.dwGBitMask = 0x00ff00;
-	descIn.ddpfPixelFormat.dwBBitMask = 0x0000ff;
-	descIn.ddpfPixelFormat.dwRGBAlphaBitMask = 0xff000000;
-
-	descOut.dwSize = sizeof( descOut );
-	
-	float weight[3] = {0.3086f, 0.6094f, 0.0820f};
-	
-	S3TC_BLOCK_WIDTH = nBlocks * 4;
-	
-	DWORD encodeFlags = S3TC_ENCODE_RGB_FULL;
-	if ( format == IMAGE_FORMAT_DXT5 )
-		encodeFlags |= S3TC_ENCODE_ALPHA_INTERPOLATED;
-
-	S3TCencode( &descIn, NULL, &descOut, mergedBlocks, encodeFlags, weight );
-
-	S3TC_BLOCK_WIDTH = 4;
-#endif
 }
 
 void S3TC_MergeBlocks( 
@@ -277,8 +238,15 @@ void S3TC_MergeBlocks(
 	ImageFormat format
 	)
 {
+	// dimhotepus: Merged buffer holds at most 3 blocks wide x 4 rows, bit reads below would overflow it otherwise.
+	Assert( nBlocks == 2 || nBlocks == 3 );
+	if ( nBlocks < 1 || nBlocks > 3 )
+		return;
+
 	// Figure out a good palette to represent all of these blocks.
-	alignas(S3TCBlock_DXT1*) char mergedBlocks[16 * MAX_S3TC_BLOCK_BYTES]; 
+	// dimhotepus: Was 'alignas(S3TCBlock_DXT1*)' (align of a pointer, not of the block) and left uninitialized
+	// if Error() returns. Align to the block and zero it.
+	alignas(S3TCBlock_DXT1) char mergedBlocks[16 * MAX_S3TC_BLOCK_BYTES] = {};
 	GenerateRepresentativePalette( format, pOriginals, nBlocks, lPitch, mergedBlocks );
 
 	// Build a remap table to remap block 2's colors to block 1's colors.
@@ -287,6 +255,10 @@ void S3TC_MergeBlocks(
 		// Grab the palette indices that s3tc.lib made for us.
 		const char *pBase = (const char*)mergedBlocks;
 		pBase += 4;
+
+		unsigned short mergedRef1, mergedRef2;
+		std::memcpy( &mergedRef1, mergedBlocks, sizeof( mergedRef1 ) );
+		std::memcpy( &mergedRef2, mergedBlocks + sizeof( mergedRef1 ), sizeof( mergedRef2 ) );
 
 		for ( int iBlock=0; iBlock < nBlocks; iBlock++ )
 		{
@@ -297,18 +269,18 @@ void S3TC_MergeBlocks(
 			{
 				for ( int y=0; y < 4; y++ )
 				{
-					int iBaseBit = (y*nBlocks*4 + x + iBlock*4) * 2; //-V112
+					const unsigned iBaseBit = static_cast<unsigned>( (y*nBlocks*4 + x + iBlock*4) * 2 ); //-V112
 					
 					S3PaletteIndex index = {0, 0};
-					index.m_ColorIndex = ReadBitInt<unsigned>( pBase, iBaseBit, 2 );
+					index.m_ColorIndex = static_cast<unsigned char>( ReadBitInt( pBase, iBaseBit, 2 ) );
 					
 					S3TC_SetPixelPaletteIndex( format, (char*)pBlock, x, y, index );
 				}
 			}
 
 			// Copy block 1's palette to block 2.
-			pBlock->m_Ref1 = ((S3TCBlock_DXT1*)mergedBlocks)->m_Ref1;
-			pBlock->m_Ref2 = ((S3TCBlock_DXT1*)mergedBlocks)->m_Ref2;
+			pBlock->m_Ref1 = mergedRef1;
+			pBlock->m_Ref2 = mergedRef2;
 		}
 	}
 	else
@@ -320,8 +292,14 @@ void S3TC_MergeBlocks(
 		const char *pAlphaBits = mergedBlocks + 2;
 		
 		// Skip past the alpha pixel bits and past the color palette.
-		alignas(unsigned short*) const char *pColorPalette = pAlphaBits + 6*nBlocks;
+		// dimhotepus: Was 'alignas(unsigned short*) const char *pColorPalette', alignas on a pointer variable
+		// does not align the pointee. Load the 16 bit values with memcpy, no alignment / aliasing assumptions.
+		const char *pColorPalette = pAlphaBits + 6*nBlocks;
 		const char *pColorBits = pColorPalette + 4;
+
+		unsigned short mergedRef1, mergedRef2;
+		std::memcpy( &mergedRef1, pColorPalette, sizeof( mergedRef1 ) );
+		std::memcpy( &mergedRef2, pColorPalette + sizeof( mergedRef1 ), sizeof( mergedRef2 ) );
 
 		for ( int iBlock=0; iBlock < nBlocks; iBlock++ )
 		{
@@ -332,21 +310,21 @@ void S3TC_MergeBlocks(
 			{
 				for ( int y=0; y < 4; y++ )
 				{
-					int iBasePixel = (y*nBlocks*4 + x + iBlock*4); //-V112
+					const unsigned iBasePixel = static_cast<unsigned>( y*nBlocks*4 + x + iBlock*4 ); //-V112
 					
 					S3PaletteIndex index;
-					index.m_AlphaIndex = ReadBitInt<unsigned>( pAlphaBits, iBasePixel * 3, 3 );
-					index.m_ColorIndex = ReadBitInt<unsigned>( pColorBits, iBasePixel * 2, 2 );
+					index.m_AlphaIndex = static_cast<unsigned char>( ReadBitInt( pAlphaBits, iBasePixel * 3, 3 ) );
+					index.m_ColorIndex = static_cast<unsigned char>( ReadBitInt( pColorBits, iBasePixel * 2, 2 ) );
 					
 					S3TC_SetPixelPaletteIndex( format, (char*)pBlock, x, y, index );
 				}
 			}
 
 			// Copy block 1's palette to block 2.
-			pBlock->m_AlphaRef[0] = pAlphaPalette[0];
-			pBlock->m_AlphaRef[1] = pAlphaPalette[1];
-			pBlock->m_Ref1 = *((unsigned short*)pColorPalette);
-			pBlock->m_Ref2 = *((unsigned short*)(pColorPalette + 2));
+			pBlock->m_AlphaRef[0] = static_cast<unsigned char>( pAlphaPalette[0] );
+			pBlock->m_AlphaRef[1] = static_cast<unsigned char>( pAlphaPalette[1] );
+			pBlock->m_Ref1 = mergedRef1;
+			pBlock->m_Ref2 = mergedRef2;
 		}
 	}
 }
@@ -359,7 +337,8 @@ S3PaletteIndex S3TC_GetPaletteIndex(
 	int x,
 	int y )
 {
-	char *pBlock = S3TC_GetBlock( pFaceData, format, imageWidth>>2, x>>2, y>>2 );
+	// dimhotepus: Round blocks up, (imageWidth>>2) is 0 for 1x1 and 2x2 mips and wrong for widths not multiple of 4.
+	char *pBlock = S3TC_GetBlock( pFaceData, format, (imageWidth+3)>>2, x>>2, y>>2 );
 	return S3TC_GetPixelPaletteIndex( format, pBlock, x&3, y&3 );
 }
 
@@ -372,10 +351,7 @@ void S3TC_SetPaletteIndex(
 	int y,
 	S3PaletteIndex paletteIndex )
 {
-	char *pBlock = S3TC_GetBlock( pFaceData, format, imageWidth>>2, x>>2, y>>2 );
+	// dimhotepus: Round blocks up, see S3TC_GetPaletteIndex.
+	char *pBlock = S3TC_GetBlock( pFaceData, format, (imageWidth+3)>>2, x>>2, y>>2 );
 	S3TC_SetPixelPaletteIndex( format, pBlock, x&3, y&3, paletteIndex );
 }
-
-
-
-
