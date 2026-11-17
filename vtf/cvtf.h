@@ -9,8 +9,6 @@
 #ifndef CVTF_H
 #define CVTF_H
 
-#include <cstring>
-
 #include "s3tc_decode.h"
 #include "vtf/vtf.h"
 #include "tier1/byteswap.h"
@@ -18,62 +16,63 @@
 #include "tier1/utlvector.h"
 #include "bitmap/imageformat.h"
 #include "tier0/basetypes.h"
-#include "tier0/platform.h"
 #include "mathlib/vector.h"
 
 class CEdgePos
 {
 public:
-	CEdgePos() = default;
-	CEdgePos( int ix, int iy )
+	// dimhotepus: Zero-initialize, x / y were left indeterminate by the defaulted constructor.
+	constexpr CEdgePos() = default;
+	constexpr CEdgePos( int ix, int iy )
 	{
 		x = ix;
 		y = iy;
 	}
 
-	void operator +=( const CEdgePos &other ) 
+	constexpr void operator +=( const CEdgePos &other ) 
 	{ 
 		x += other.x;
 		y += other.y;
 	}
 
-	void operator /=( int val )
+	constexpr void operator /=( int val )
 	{ 
 		x /= val;
 		y /= val;
 	}
 
-	CEdgePos operator >>( int shift )
-	{ 
+	// dimhotepus: Binary operators and comparisons do not modify *this, make them const so they work on const objects.
+	[[nodiscard]] constexpr CEdgePos operator >>( int shift ) const
+	{
 		return CEdgePos( x >> shift, y >> shift );
 	}
 
-	CEdgePos operator *( int shift )
-	{ 
+	[[nodiscard]] constexpr CEdgePos operator *( int shift ) const
+	{
 		return CEdgePos( x * shift, y * shift );
 	}
 
-	CEdgePos operator -( const CEdgePos &other ) 
-	{ 
+	[[nodiscard]] constexpr CEdgePos operator -( const CEdgePos &other ) const
+	{
 		return CEdgePos( x - other.x, y - other.y );
 	}
 
-	CEdgePos operator +( const CEdgePos &other ) 
-	{ 
+	[[nodiscard]] constexpr CEdgePos operator +( const CEdgePos &other ) const
+	{
 		return CEdgePos( x + other.x, y + other.y );
 	}
 
-	bool operator!=( const CEdgePos &other )
+	[[nodiscard]] constexpr bool operator!=( const CEdgePos &other ) const
 	{
 		return !( *this == other );
 	}
 
-	bool operator==( const CEdgePos &other )
+	[[nodiscard]] constexpr bool operator==( const CEdgePos &other ) const
 	{
 		return x==other.x && y==other.y;
 	}
 
-	int x, y;
+	int x{0}, y{0};
 };
 
 
@@ -120,7 +119,11 @@ class CVTFTexture final : public IVTFTexture
 {
 public:
 	CVTFTexture();
-	virtual ~CVTFTexture();
+	~CVTFTexture() override;
+
+	// dimhotepus: Texture owns raw image / resource buffers (shallow copy would double delete[]), forbid copying.
+	CVTFTexture( const CVTFTexture & ) = delete;
+	CVTFTexture &operator=( const CVTFTexture & ) = delete;
 
 	bool Init( int nWidth, int nHeight, int nDepth, ImageFormat fmt, int iFlags, int iFrameCount, int nForceMipCount ) override;
 
@@ -336,8 +339,8 @@ private:
 	// Computes the location of a particular face, frame, and mip level
 	intp GetImageOffset( int iFrame, int iFace, int iMipLevel, ImageFormat fmt ) const;
 
-	// Determines if the vtf or vtfx file needs to be swapped to the current platform
-	bool SetupByteSwap( CUtlBuffer &buf );
+	// dimhotepus: Removed SetupByteSwap, it was never called (byte swapping was never activated).
+	// All supported targets (x86, x86-64, arm64) are little-endian like VTF files.
 
 	// Locates the resource entry info if it's present
 	ResourceEntryInfo *FindResourceEntryInfo( unsigned int eType );

@@ -14,7 +14,7 @@
 
 #include "bitmap/imageformat.h"
 #include "tier0/platform.h"
-#include "tier0/wchartypes.h"
+#include "mathlib/vector.h"
 
 // #define VTF_FILE_FORMAT_ONLY to just include the vtf header and none of the code declaration
 #ifndef VTF_FILE_FORMAT_ONLY
@@ -23,9 +23,7 @@
 // Forward declarations
 //-----------------------------------------------------------------------------
 class CUtlBuffer;
-class Vector;
 struct Rect_t;
-class IFileSystem;
 
 //-----------------------------------------------------------------------------
 // Texture flags
@@ -361,8 +359,6 @@ void DestroyVTFTexture( IVTFTexture *pTexture );
 //-----------------------------------------------------------------------------
 using CompressFunc_t = bool (*)( CUtlBuffer &inputBuffer, CUtlBuffer &outputBuffer );
 
-#include "mathlib/vector.h"
-
 #endif // VTF_FILE_FORMAT_ONLY
 
 //-----------------------------------------------------------------------------
@@ -411,7 +407,7 @@ using CompressFunc_t = bool (*)( CUtlBuffer &inputBuffer, CUtlBuffer &outputBuff
 
 #include "datamap.h"
 
-#pragma pack(1)
+#pragma pack(push, 1)
 
 // version number for the disk texture cache
 constexpr int VTF_MAJOR_VERSION{7};
@@ -541,6 +537,18 @@ struct VTFFileHeader_t : public VTFFileHeaderV7_3_t
 	DECLARE_BYTESWAP_DATADESC();
 };
 
+// dimhotepus: Sizes of the headers *in the file*. sizeof() of the 7.0-7.2 structs differs between compilers
+// (MSVC pads the final struct holding VectorAligned to 16 bytes, GCC / Clang use manual pads which do not),
+// but the file layout is the same on all platforms: 7.0 / 7.1 header is 64 bytes, 7.2 is 80 bytes.
+constexpr unsigned short VTF_V7_1_DISK_HEADER_SIZE{64};
+constexpr unsigned short VTF_V7_2_DISK_HEADER_SIZE{80};
+
+static_assert( sizeof( VTFFileHeaderV7_1_t ) <= VTF_V7_1_DISK_HEADER_SIZE, "VTF 7.0 / 7.1 header does not fit the on-disk size" );
+static_assert( sizeof( VTFFileHeaderV7_2_t ) <= VTF_V7_2_DISK_HEADER_SIZE, "VTF 7.2 header does not fit the on-disk size" );
+// 7.3+ headers have the same size on every platform (MSVC implicit padding == manual POSIX padding).
+static_assert( sizeof( VTFFileHeaderV7_3_t ) == 80, "VTF 7.3 header layout differs between platforms" );
+static_assert( sizeof( VTFFileHeader_t ) == 80, "VTF header layout differs between platforms" );
+
 constexpr int VTF_X360_MAJOR_VERSION{0x0360};
 constexpr int VTF_X360_MINOR_VERSION{8};
 
@@ -609,7 +617,7 @@ struct TextureStreamSettings_t
 	uint8 m_reserved1;
 };
 
-#pragma pack()
+#pragma pack(pop)
 
 
 #ifndef VTF_FILE_FORMAT_ONLY
@@ -635,20 +643,21 @@ struct TextureStreamSettings_t
 	case VTF_MAJOR_VERSION:
 		switch ( nMinorVersion )
 		{
+		// dimhotepus: Was sizeof( VTFFileHeaderV7_x_t ), which is 1 / 15 bytes less than the real header on POSIX
+		// so a caller reading exactly that many bytes got "invalid header" while loading 7.0 - 7.2 files there.
 		case 0: // fall through
 		case 1:
-			return sizeof( VTFFileHeaderV7_1_t );
+			return VTF_V7_1_DISK_HEADER_SIZE;
 		case 2:
-			return sizeof( VTFFileHeaderV7_2_t );
+			return VTF_V7_2_DISK_HEADER_SIZE;
 		case 3:
 			return sizeof( VTFFileHeaderV7_3_t ) + sizeof( ResourceEntryInfo ) * MAX_RSRC_DICTIONARY_ENTRIES; //-V119
 		case VTF_MINOR_VERSION:
 		// dimhotepus: CS-GO backport.
 		case 5:
-			constexpr size_t size1 = sizeof( VTFFileHeader_t );
-			constexpr size_t size2 = sizeof( ResourceEntryInfo ) * MAX_RSRC_DICTIONARY_ENTRIES;
-			constexpr size_t result = size1 + size2;
-			return static_cast<unsigned int>(result);
+			// dimhotepus: Was a constexpr local declared inside the case without braces and narrowed through unsigned int.
+			constexpr auto size = static_cast<unsigned short>( sizeof( VTFFileHeader_t ) + sizeof( ResourceEntryInfo ) * MAX_RSRC_DICTIONARY_ENTRIES );
+			return size;
 		}
 		break;
 	

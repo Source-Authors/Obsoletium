@@ -4,12 +4,21 @@
 //
 //=====================================================================================//
 
-#undef fopen
+// dimhotepus: Drop '#undef fopen', nothing included before it defines fopen macro.
 #include "cvtf.h"
+
+// dimhotepus: Include what we use directly (memcpy / memset, ceilf / sqrtf / powf, numeric_limits, std::min,
+// std::unique_ptr).
+#include <algorithm>
+#include <cmath>
+#include <cstring>
+#include <limits>
+#include <memory>
 
 #include "bitmap/imageformat.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/strtools.h"
+#include "tier1/utlmemory.h"
 #include "tier1/utlvector.h"
 #include "tier0/dbg.h"
 #include "mathlib/vector.h"
@@ -69,74 +78,22 @@ BEGIN_BYTESWAP_DATADESC_( VTFFileHeaderX360_t, VTFFileBaseHeader_t )
 	DEFINE_FIELD( compressedSize, FIELD_INTEGER ),
 END_DATADESC()
 
-#if defined( POSIX ) || defined( _X360 )
-// stub functions
-const char* S3TC_GetBlock(
-        const void *pCompressed,
-        ImageFormat format,
-        int nBlocksWide, // How many blocks wide is the image (pixels wide / 4).
-        int xBlock,
-        int yBlock )
-{
-	return NULL;
-}
-
-char* S3TC_GetBlock(
-        void *pCompressed,
-        ImageFormat format,
-        int nBlocksWide, // How many blocks wide is the image (pixels wide / 4).
-        int xBlock,
-        int yBlock )
-{
-	return NULL;
-}
-
-S3PaletteIndex S3TC_GetPaletteIndex(
-        unsigned char *pFaceData,
-        ImageFormat format,
-        int imageWidth,
-        int x,
-        int y )
-{
-	S3PaletteIndex nullPalette;
-	BitwiseClear(nullPalette);
-	return nullPalette;
-}
-
-// Merge the two palettes and copy the colors
-void S3TC_MergeBlocks(
-        char **blocks,
-        S3RGBA **pOriginals, 
-        int nBlocks,
-        int lPitch,     // (in BYTES)
-        ImageFormat format
-        )
-{
-}
-
-// Note: width, x, and y are in texels, not S3 blocks.
-void S3TC_SetPaletteIndex(
-        unsigned char *pFaceData,
-        ImageFormat format,
-        int imageWidth,
-        int x,
-        int y,
-        S3PaletteIndex paletteIndex )
-{
-}
-#endif
+// dimhotepus: Removed '#if defined( POSIX ) || defined( _X360 )' S3TC_* stubs returning NULL / doing nothing.
+// s3tc_decode.cpp has the real implementation for all platforms; the stubs duplicated the symbols
+// (link errors or silently picking the stub) and crashed on NULL blocks on Linux / macOS.
 
 // This gives a vertex number to each of the 4 verts on each face.
 // We use this to match the verts and determine which edges need to be blended together.
 // The vert ordering is lower-left, top-left, top-right, bottom-right.
-int g_leftFaceVerts[4] = { 2, 6, 7, 3 };
-int g_frontFaceVerts[4] = { 2, 3, 5, 4 };
-int g_downFaceVerts[4] = { 4, 0, 6, 2 };
-int g_rightFaceVerts[4] = { 5, 1, 0, 4 };
-int g_backFaceVerts[4] = { 7, 6, 0, 1 };
-int g_upFaceVerts[4] = { 3, 7, 1, 5 };
+static constexpr int g_leftFaceVerts[4] = { 2, 6, 7, 3 };
+static constexpr int g_frontFaceVerts[4] = { 2, 3, 5, 4 };
+static constexpr int g_downFaceVerts[4] = { 4, 0, 6, 2 };
+static constexpr int g_rightFaceVerts[4] = { 5, 1, 0, 4 };
+static constexpr int g_backFaceVerts[4] = { 7, 6, 0, 1 };
+static constexpr int g_upFaceVerts[4] = { 3, 7, 1, 5 };
 
-int *g_FaceVerts[6] =
+// dimhotepus: Tables are read-only and used only in this file, give them internal linkage and make them const.
+static constexpr const int *g_FaceVerts[6] =
 {
 	g_rightFaceVerts,
 	g_leftFaceVerts,
@@ -163,14 +120,14 @@ int *g_FaceVerts[6] =
 //		   /			   /
 //		 3 ------------- 0
 //
-int g_skybox_rightFaceVerts[4] = { 7, 6, 5, 4 };
-int g_skybox_leftFaceVerts[4] = { 0, 1, 2, 3 };
-int g_skybox_backFaceVerts[4] = { 3, 2, 6, 7 };
-int g_skybox_frontFaceVerts[4] = { 4, 5, 1, 0 };
-int g_skybox_upFaceVerts[4] = { 6, 2, 1, 5 };
-int g_skybox_downFaceVerts[4] = { 3, 7, 4, 0 };
+static constexpr int g_skybox_rightFaceVerts[4] = { 7, 6, 5, 4 };
+static constexpr int g_skybox_leftFaceVerts[4] = { 0, 1, 2, 3 };
+static constexpr int g_skybox_backFaceVerts[4] = { 3, 2, 6, 7 };
+static constexpr int g_skybox_frontFaceVerts[4] = { 4, 5, 1, 0 };
+static constexpr int g_skybox_upFaceVerts[4] = { 6, 2, 1, 5 };
+static constexpr int g_skybox_downFaceVerts[4] = { 3, 7, 4, 0 };
 
-int *g_skybox_FaceVerts[6] =
+static constexpr const int *g_skybox_FaceVerts[6] =
 {
 	g_skybox_rightFaceVerts,
 	g_skybox_leftFaceVerts,
@@ -231,11 +188,6 @@ CVTFTexture::CVTFTexture()
 	m_pLowResImageData = NULL;
 	m_nLowResImageAllocSize = 0;
 
-#if defined( _X360 )
-	m_nMipSkipCount = 0;
-	*(unsigned int *)m_LowResImageSample = 0;
-#endif
-
 	Assert( m_arrResourcesInfo.Count() == 0 );
 	Assert( m_arrResourcesData.Count() == 0 );
 	Assert( m_arrResourcesData_ForReuse.Count() == 0 );
@@ -269,6 +221,12 @@ int CVTFTexture::ComputeMipCount() const
 
 static bool GenericAllocateReusableData( unsigned char **ppData, intp *pNumAllocated, intp numRequested )
 {
+	// dimhotepus: Negative size can never be valid (and would throw from new[]).
+	if ( numRequested < 0 )
+	{
+		return false;
+	}
+
 	// If we're asking for memory and we have way more than we expect, free some.
 	if ( *pNumAllocated < numRequested || ( numRequested > 0 && *pNumAllocated > 16 * numRequested ) )
 	{
@@ -315,6 +273,71 @@ static constexpr inline bool IsMultipleOf4( int value )
 	return ( value <= 2 ) || ( (value & 0x3) == 0 );
 }
 
+// dimhotepus: VTF header stores width / height / depth / frame count in 16 bits and mip count in 8 bits.
+constexpr int VTF_MAX_DIMENSION{ 0xFFFF };
+constexpr int VTF_MAX_MIP_COUNT{ 0xFF };
+
+// dimhotepus: a * b for non-negative values, false on overflow (sizes come from untrusted files, 32-bit intp wraps quickly).
+[[nodiscard]]
+static bool CheckedMul( intp a, intp b, intp *pResult )
+{
+	if ( a < 0 || b < 0 )
+		return false;
+
+	if ( a != 0 && b > std::numeric_limits<intp>::max() / a )
+		return false;
+
+	*pResult = a * b;
+	return true;
+}
+
+// dimhotepus: Size of all faces / frames / mips has to be addressable with 32-bit file offsets (and int based
+// CUtlBuffer), so reject everything bigger than INT_MAX bytes instead of trying to allocate it.
+[[nodiscard]]
+static bool ComputeImageBytes( intp nFaceBytes, int nFaces, int nFrames, intp *pResult )
+{
+	intp nBytes = 0;
+	if ( !CheckedMul( nFaceBytes, static_cast<intp>( nFaces ) * nFrames, &nBytes ) )
+		return false;
+
+	if ( nBytes > std::numeric_limits<int>::max() )
+		return false;
+
+	*pResult = nBytes;
+	return true;
+}
+
+// dimhotepus: Guards ComputeFaceSize() / GetMemRequired() against overflow on intp before sizes are computed.
+// Every texel takes at most 16 bytes (IMAGE_FORMAT_RGBA32323232F).
+[[nodiscard]]
+static bool IsTextureSizeSane( int nWidth, int nHeight, int nDepth )
+{
+	if ( nWidth <= 0 || nHeight <= 0 || nDepth <= 0 )
+		return false;
+
+	const uint64 nTexels = static_cast<uint64>( nWidth ) * static_cast<uint64>( nHeight ) * static_cast<uint64>( nDepth );
+	const uint64 nMaxTexels = min( static_cast<uint64>( std::numeric_limits<int>::max() ),
+		static_cast<uint64>( std::numeric_limits<intp>::max() ) / 16 );
+
+	return nTexels <= nMaxTexels;
+}
+
+// dimhotepus: x >> n is undefined for n >= bit width or n < 0, and x86 (masks the count) and arm64 (does not)
+// give different results. Mip chains never exceed 17 levels for 16 bit dimensions, so clamp to a safe range.
+[[nodiscard]]
+static constexpr inline int ClampMipShift( int iMipLevel )
+{
+	return iMipLevel < 0 ? 0 : ( iMipLevel > 30 ? 30 : iMipLevel );
+}
+
+// Returns dimension of the mip level, never less than 1.
+[[nodiscard]]
+static constexpr inline int MipDimension( int nTopLevelSize, int iMipLevel )
+{
+	const int nSize = nTopLevelSize >> ClampMipShift( iMipLevel );
+	return nSize < 1 ? 1 : nSize;
+}
+
 
 //-----------------------------------------------------------------------------
 // Initialization
@@ -326,6 +349,28 @@ bool CVTFTexture::Init( int nWidth, int nHeight, int nDepth, ImageFormat fmt, in
 		nDepth = 1;
 	}
 
+	// dimhotepus: Validate sizes in release too, negative / zero / too big values led to bogus allocations and
+	// truncated (16 bit) values in Serialize().
+	if ( nWidth <= 0 || nHeight <= 0 || nDepth < 0 ||
+		nWidth > VTF_MAX_DIMENSION || nHeight > VTF_MAX_DIMENSION || nDepth > VTF_MAX_DIMENSION ||
+		!IsTextureSizeSane( nWidth, nHeight, nDepth ) )
+	{
+		Warning( "Invalid image dimensions %d x %d x %d!\n", nWidth, nHeight, nDepth );
+		return false;
+	}
+
+	if ( iFrameCount <= 0 || iFrameCount > VTF_MAX_DIMENSION )
+	{
+		Warning( "Invalid frame count %d!\n", iFrameCount );
+		return false;
+	}
+
+	if ( nForceMipCount != -1 && ( nForceMipCount < 1 || nForceMipCount > VTF_MAX_MIP_COUNT ) )
+	{
+		Warning( "Invalid forced mip count %d!\n", nForceMipCount );
+		return false;
+	}
+
 	if (iFlags & TEXTUREFLAGS_ENVMAP)
 	{
 		if (nWidth != nHeight)
@@ -335,16 +380,16 @@ bool CVTFTexture::Init( int nWidth, int nHeight, int nDepth, ImageFormat fmt, in
 		}
 		if (nDepth != 1)
 		{
-			Warning( "Depth must be 1 for cubemaps!\n" );
+			Warning( "Depth %d must be 1 for cubemaps!\n", nDepth );
 			return false;
 		}
 	}
 
-		if ( !IsMultipleOf4( nWidth ) || !IsMultipleOf4( nHeight ) || !IsMultipleOf4( nDepth ) )
-		{
-			Warning( "Image dimensions must be multiple of 4!\n" );
-			return false;
-		}
+	if ( !IsMultipleOf4( nWidth ) || !IsMultipleOf4( nHeight ) || !IsMultipleOf4( nDepth ) )
+	{
+		Warning( "Image dimensions %d x %d x %d must be multiple of 4!\n", nWidth, nHeight, nDepth );
+		return false;
+	}
 
 	if ( fmt == IMAGE_FORMAT_DEFAULT )
 	{
@@ -376,21 +421,22 @@ bool CVTFTexture::Init( int nWidth, int nHeight, int nDepth, ImageFormat fmt, in
 	m_nFrameCount = iFrameCount;
 
 	m_nFaceCount = (iFlags & TEXTUREFLAGS_ENVMAP) ? CUBEMAP_FACE_COUNT : 1;
-	if ( IsX360() && ( iFlags & TEXTUREFLAGS_ENVMAP ) )
-	{
-		// 360 has no reason to support sphere map
-		m_nFaceCount = CUBEMAP_FACE_COUNT-1;
-	}
-
-#if defined( _X360 )
-	m_nMipSkipCount = 0;
-#endif
 
 	// Need to do this because Shutdown deallocates the low-res image
 	m_nLowResImageWidth = m_nLowResImageHeight = 0;
+	// dimhotepus: Resource entry for the low-res image would stay behind and Serialize() would write it
+	// with zero size while the width / height say there is no low-res image.
+	RemoveResourceEntryInfo( VTF_LEGACY_RSRC_LOW_RES_IMAGE );
 
 	// Allocate me some bits!
-	intp iMemorySize = ComputeTotalSize();
+	// dimhotepus: Check size for overflow, ComputeTotalSize() multiplies faces * frames * face size unchecked.
+	intp iMemorySize = 0;
+	if ( !ComputeImageBytes( ComputeFaceSize( 0, m_Format ), m_nFaceCount, m_nFrameCount, &iMemorySize ) )
+	{
+		Warning( "Image %d x %d x %d is too large!\n", m_nWidth, m_nHeight, m_nDepth );
+		return false;
+	}
+
 	if ( !AllocateImageData( iMemorySize ) )
 		return false;
 
@@ -474,11 +520,6 @@ void CVTFTexture::ReleaseResources()
 //-----------------------------------------------------------------------------
 void CVTFTexture::Shutdown()
 {
-#if defined( _X360 )
-	// must be first to ensure X360 aliased pointers are unhooked, otherwise memory corruption
-	ReleaseImageMemory();
-#endif
-
 	delete[] m_pImageData;
 	m_pImageData = NULL;
 	m_nImageAllocSize = 0;
@@ -597,7 +638,12 @@ bool CVTFTexture::LoadLowResData( CUtlBuffer &buf )
 	InitLowResImage( m_nLowResImageWidth, m_nLowResImageHeight, m_LowResImageFormat );
 	intp nLowResImageSize = ImageLoader::GetMemRequired( m_nLowResImageWidth, 
 		m_nLowResImageHeight, 1, m_LowResImageFormat, false );
-	buf.Get( m_pLowResImageData, nLowResImageSize );
+
+	// dimhotepus: InitLowResImage() silently returns when allocation fails, do not read into nullptr.
+	if ( nLowResImageSize > 0 && !m_pLowResImageData )
+		return false;
+
+	buf.Get( m_pLowResImageData, static_cast<int>( nLowResImageSize ) );
 
 	bool bValid = buf.IsValid();
 
@@ -609,10 +655,21 @@ bool CVTFTexture::LoadLowResData( CUtlBuffer &buf )
 //-----------------------------------------------------------------------------
 bool CVTFTexture::LoadImageData( CUtlBuffer &buf, const VTFFileHeader_t &header, int nSkipMipLevels )
 {
+	// dimhotepus: Negative skip would make 'header.numMipLevels - nSkipMipLevels' below grow.
+	if ( nSkipMipLevels < 0 )
+	{
+		nSkipMipLevels = 0;
+	}
+
 	// Fix up the mip count + size based on how many mip levels we skip...
 	if (nSkipMipLevels > 0)
 	{
-		Assert( m_nMipCount > nSkipMipLevels );
+		// dimhotepus: Was Assert only. In release skipping all mips made m_nMipCount <= 0 and shifted by bogus counts.
+		if ( nSkipMipLevels >= m_nMipCount )
+		{
+			Warning( "Unable to skip %d mip levels of VTF with %d mip levels!\n", nSkipMipLevels, m_nMipCount );
+			return false;
+		}
 		if (header.numMipLevels < nSkipMipLevels)
 		{
 			// NOTE: This can only happen with older format .vtf files
@@ -625,8 +682,13 @@ bool CVTFTexture::LoadImageData( CUtlBuffer &buf, const VTFFileHeader_t &header,
 	}
 
 	// read the texture image (including mipmaps if they are there and needed.)
-	intp iImageSize = ComputeFaceSize();
-	iImageSize *= m_nFaceCount * m_nFrameCount;
+	// dimhotepus: Reject sizes overflowing intp / 32-bit file offsets (malformed VTF), especially on 32-bit.
+	intp iImageSize = 0;
+	if ( !ComputeImageBytes( ComputeFaceSize(), m_nFaceCount, m_nFrameCount, &iImageSize ) )
+	{
+		Warning( "*** Encountered VTF with too large image data!\n" );
+		return false;
+	}
 
 	// For backwards compatibility, we don't read in the spheremap fallback on
 	// older format .VTF files...
@@ -648,7 +710,11 @@ bool CVTFTexture::LoadImageData( CUtlBuffer &buf, const VTFFileHeader_t &header,
 	bool bMipDataPresent = true;
 	int nFirstAvailableMip = 0;
 	int nLastAvailableMip = m_nMipCount - 1;
-	TextureStreamSettings_t const *pStreamSettings = ( TextureStreamSettings_t const * ) GetResourceData( VTF_RSRC_TEXTURE_STREAM_SETTINGS, NULL );
+	// dimhotepus: Resource payload comes from the file and may be shorter than the struct, check size before reading it.
+	size_t nStreamSettingsSize = 0;
+	const void *pStreamSettingsData = GetResourceData( VTF_RSRC_TEXTURE_STREAM_SETTINGS, &nStreamSettingsSize );
+	TextureStreamSettings_t const *pStreamSettings = ( pStreamSettingsData && nStreamSettingsSize >= sizeof( TextureStreamSettings_t ) )
+		? static_cast<TextureStreamSettings_t const *>( pStreamSettingsData ) : nullptr;
 	if ( pStreamSettings ) 
 	{
 		nFirstAvailableMip = Max( 0, pStreamSettings->m_firstAvailableMip - nSkipMipLevels );
@@ -670,11 +736,27 @@ bool CVTFTexture::LoadImageData( CUtlBuffer &buf, const VTFFileHeader_t &header,
 	}
 
 	// Valid settings? 
-	Assert( nFirstAvailableMip >= 0 && nFirstAvailableMip <= nLastAvailableMip && nLastAvailableMip < m_nMipCount );
+	// dimhotepus: Ranges come from the file, validate them in release too (was Assert only).
+	nLastAvailableMip = Min( nLastAvailableMip, m_nMipCount - 1 );
+	if ( nFirstAvailableMip < 0 || nFirstAvailableMip > nLastAvailableMip )
+	{
+		Warning( "*** Encountered VTF with invalid available mip range [%d, %d]!\n", nFirstAvailableMip, nLastAvailableMip );
+		return false;
+	}
 
 	// Store the clamp settings
 	m_nFinestMipmapLevel = nFirstAvailableMip;
 	m_nCoarsestMipmapLevel = nLastAvailableMip;
+
+	// dimhotepus: Image memory is allocated uninitialized. If some mips / faces are not read from the file
+	// (streaming, old format files without sphere map face) clear it, so stale heap data never ends in the texture.
+	const bool bEverythingPresent = nFacesToRead == m_nFaceCount &&
+		nFirstAvailableMip == 0 && nLastAvailableMip == m_nMipCount - 1 &&
+		( int( header.numMipLevels ) - nSkipMipLevels ) >= m_nMipCount;
+	if ( !bEverythingPresent )
+	{
+		memset( m_pImageData, 0, iImageSize );
+	}
 
 	// NOTE: The mip levels are stored ascending from smallest (1x1) to largest (NxN)
 	// in order to allow for truncated reads of the minimal required data
@@ -731,12 +813,17 @@ void *CVTFTexture::SetResourceData( uint32 eType, void const *pData, size_t nNum
 		{
 			// store 4 bytes directly
 			pInfo->eType |= RSRCF_HAS_NO_DATA_CHUNK;
+			// dimhotepus: pData may be unaligned for unsigned and is not an unsigned object, use memcpy (UB otherwise).
 			if ( pData )
-				pInfo->resData = reinterpret_cast< const unsigned * >( pData )[0];
+				memcpy( &pInfo->resData, pData, sizeof( pInfo->resData ) );
 			return &pInfo->resData;
 		}
 		else
 		{
+			// dimhotepus: Resource may have been a 4 byte inline one before, it has a data chunk now.
+			// Otherwise GetResourceData() returned resData and Serialize() skipped the data.
+			pInfo->eType &= ~RSRCF_HAS_NO_DATA_CHUNK;
+
 			if ( !rms.AllocateData( nNumBytes ) )
 			{
 				RemoveResourceEntryInfo( eType );
@@ -792,16 +879,19 @@ bool CVTFTexture::HasResourceEntry( uint32 eType ) const
 	return ( FindResourceEntryInfo( eType ) != NULL );
 }
 
-size_t CVTFTexture::GetResourceTypes( unsigned int *arrTypesBuffer, size_t numTypesBufferElems ) const
+size_t CVTFTexture::GetResourceTypes( uint32 *arrTypesBuffer, size_t numTypesBufferElems ) const
 {
-	for ( ResourceEntryInfo const *pInfo = m_arrResourcesInfo.Base(),
-		  *pInfoEnd = pInfo + m_arrResourcesInfo.Count();
-		  numTypesBufferElems-- > 0 && pInfo < pInfoEnd; )
+	// dimhotepus: Simplify loop, 'numTypesBufferElems-- > 0' wrapped around the size_t counter, dereferenced
+	// the buffer even when null / empty and Count() was returned through intp -> size_t conversion implicitly.
+	const size_t nTypes = static_cast<size_t>( m_arrResourcesInfo.Count() );
+	const size_t nCopy = arrTypesBuffer ? min( nTypes, numTypesBufferElems ) : 0;
+
+	for ( size_t i = 0; i < nCopy; ++i )
 	{
-		*( arrTypesBuffer++ ) = ( ( pInfo++ )->eType & ~RSRCF_MASK );
+		arrTypesBuffer[i] = ( m_arrResourcesInfo[ static_cast<intp>( i ) ].eType & ~RSRCF_MASK );
 	}
 
-	return m_arrResourcesInfo.Count();
+	return nTypes;
 }
 
 
@@ -814,6 +904,11 @@ bool CVTFTexture::ResourceMemorySection::LoadData( CUtlBuffer &buf, CByteswap &b
 	int iDataSize = 0;
 	buf.Get( iDataSize );
 	byteSwap.SwapBufferToTargetEndian( &iDataSize );
+
+	// dimhotepus: Size comes from the file. Negative or bigger than what is left in the buffer values are bogus
+	// and made us allocate up to 2 GiB (or fail in new[]) before buf.Get() noticed there is no such data.
+	if ( !buf.IsValid() || iDataSize < 0 || iDataSize > ( buf.TellMaxPut() - buf.TellGet() ) )
+		return false;
 
 	// Read the actual data
 	if ( !AllocateData( iDataSize ) )
@@ -839,25 +934,27 @@ bool CVTFTexture::ResourceMemorySection::WriteData( CUtlBuffer &buf ) const
 	return buf.IsValid();
 }
 
-
-//-----------------------------------------------------------------------------
-// Checks if the file data needs to be swapped
-//-----------------------------------------------------------------------------
-bool CVTFTexture::SetupByteSwap( CUtlBuffer &buf )
-{
-	const VTFFileBaseHeader_t *header = (const VTFFileBaseHeader_t*)buf.PeekGet();
-
-	if ( header->version[0] == SwapLong( VTF_MAJOR_VERSION ) )
-	{
-		m_Swap.ActivateByteSwapping( true );
-		return true;
-	}
-	return false;
-}
+// dimhotepus: Removed CVTFTexture::SetupByteSwap(), it was never called.
 
 //-----------------------------------------------------------------------------
 // Unserialization
 //-----------------------------------------------------------------------------
+// dimhotepus: Skips bytes which are in the file header, but not in our header struct on this platform.
+[[nodiscard]]
+static bool SkipHeaderPadding( CUtlBuffer &buf, size_t nDiskHeaderSize, size_t nStructSize )
+{
+	if ( nDiskHeaderSize > nStructSize )
+	{
+		unsigned char dummy[VTF_V7_2_DISK_HEADER_SIZE];
+		const size_t nPadding = nDiskHeaderSize - nStructSize;
+		Assert( nPadding <= sizeof( dummy ) );
+
+		buf.Get( dummy, static_cast<int>( nPadding ) );
+	}
+
+	return buf.IsValid();
+}
+
 static bool ReadHeaderFromBufferPastBaseHeader( CUtlBuffer &buf, VTFFileHeader_t &header )
 {
 	unsigned char *pBuf = (unsigned char*)(&header) + sizeof(VTFFileBaseHeader_t);
@@ -874,26 +971,23 @@ static bool ReadHeaderFromBufferPastBaseHeader( CUtlBuffer &buf, VTFFileHeader_t
 	{
 		buf.Get( pBuf, sizeof(VTFFileHeaderV7_2_t) - sizeof(VTFFileBaseHeader_t) );
 
-		#if defined( _X360 ) || defined (POSIX)
-			// read 15 dummy bytes to be properly positioned with 7.2 PC data
-			byte dummy[15];
-			buf.Get( dummy );
-		#endif
+		// dimhotepus: Was '#if defined( _X360 ) || defined (POSIX)' reading 15 dummy bytes. Compare to the real file
+		// header size instead, so it is right with any compiler / ABI (PC compiler pads, POSIX one does not).
+		if ( !SkipHeaderPadding( buf, VTF_V7_2_DISK_HEADER_SIZE, sizeof(VTFFileHeaderV7_2_t) ) )
+			return false;
 	}
 	else if ( header.version[1] == 1 || header.version[1] == 0 )
 	{
 		// previous version 7.0 or 7.1
 		buf.Get( pBuf, sizeof(VTFFileHeaderV7_1_t) - sizeof(VTFFileBaseHeader_t) );
 
-		#if defined( _X360 ) || defined (POSIX)
-			// read a dummy byte to be properly positioned with 7.0/1 PC data
-			byte dummy;
-			buf.Get( dummy );
-		#endif
+		// dimhotepus: Was '#if defined( _X360 ) || defined (POSIX)' reading a dummy byte, see above.
+		if ( !SkipHeaderPadding( buf, VTF_V7_1_DISK_HEADER_SIZE, sizeof(VTFFileHeaderV7_1_t) ) )
+			return false;
 	}
 	else
 	{
-		Warning( "*** Encountered VTF file with an invalid minor version!\n" );
+		Warning( "*** Encountered VTF file with an invalid minor version %d!\n", header.version[1] );
 		return false;
 	}
 
@@ -919,7 +1013,7 @@ bool CVTFTexture::ReadHeader( CUtlBuffer &buf, VTFFileHeader_t &header )
 
 	if ( header.version[0] != VTF_MAJOR_VERSION )
 	{
-		Warning( "*** Encountered VTF file with an invalid version!\n" );
+		Warning( "*** Encountered VTF file with an invalid major version %d!\n", header.version[0] );
 		return false;
 	}
 
@@ -975,29 +1069,35 @@ bool CVTFTexture::UnserializeEx( CUtlBuffer &buf, bool bHeaderOnly, int nForceFl
 
 	if ( (header.flags & TEXTUREFLAGS_ENVMAP) && (header.width != header.height) )
 	{
-		Warning( "*** Encountered VTF non-square cubemap!\n" );
+		Warning( "*** Encountered VTF non-square cubemap %d x %d!\n", header.width, header.height );
 		return false;
 	}
 	if ( (header.flags & TEXTUREFLAGS_ENVMAP) && (header.depth != 1) )
 	{
-		Warning( "*** Encountered VTF volume texture cubemap!\n" );
+		Warning( "*** Encountered VTF volume texture cubemap (depth %d)!\n", header.depth );
 		return false;
 	}
-	if ( header.width <= 0 || header.height <= 0 || header.depth <= 0 )
+	// dimhotepus: width / height / depth / numFrames are unsigned short, '<= 0' meant '== 0'. Zero frames
+	// gave zero sized image data which later code indexes. Also reject sizes overflowing intp.
+	if ( header.width == 0 || header.height == 0 || header.depth == 0 || header.numFrames == 0 ||
+		!IsTextureSizeSane( header.width, header.height, header.depth ) )
 	{
-		Warning( "*** Encountered VTF invalid texture size!\n" );
+		Warning( "*** Encountered VTF invalid texture size %d x %d x %d or frames # %d!\n",
+			header.width, header.height, header.depth, header.numFrames );
 		return false;
 	}
 	if ( ( header.imageFormat < IMAGE_FORMAT_UNKNOWN ) || ( header.imageFormat >= NUM_IMAGE_FORMATS ) )
 	{
-		Warning( "*** Encountered VTF invalid image format!\n" );
+		Warning( "*** Encountered VTF invalid image format %d!\n", static_cast< int >( header.imageFormat ) );
 		return false;
 	}
 	
 	// If the header says we should be doing a large texture allocation, just tell the caller we failed.
+	// dimhotepus: Message talked about large texture but this is the resource dictionary limit; also report it
+	// in all builds (STAGING_ONLY_EXEC silently returned false in release).
 	if ( ( header.numResources > MAX_RSRC_DICTIONARY_ENTRIES ) )
 	{
-		STAGING_ONLY_EXEC( DevWarning( "Asked for a large texture to be created (%d h x %d w x %d d x %d f). Nope.\n", header.width, header.height, header.depth, header.numFrames ) );
+		Warning( "*** Encountered VTF with too many resources (%u > %d)!\n", header.numResources, static_cast<int>( MAX_RSRC_DICTIONARY_ENTRIES ) );
 		return false;
 	}
 
@@ -1167,27 +1267,28 @@ ResourceEntryInfo const *CVTFTexture::FindResourceEntryInfo( uint32 eType ) cons
 	Assert( ( eType & RSRCF_MASK ) == 0 );
 
 	// dimhotepus: Ensure range is initialized.
-	const auto *base = m_arrResourcesInfo.Base(); 
-	ResourceEntryInfo const* pRange[2]
-	{
-		base,
-		base + m_arrResourcesInfo.Count()
-	};
-
+	// dimhotepus: Replace goto based loop with a plain binary search (same algorithm).
 	// Quick-search in a sorted array
-find_routine:
-	if ( pRange[0] != pRange[1] )
+	ResourceEntryInfo const *pLow = m_arrResourcesInfo.Base();
+	ResourceEntryInfo const *pHigh = pLow + m_arrResourcesInfo.Count();
+
+	while ( pLow < pHigh )
 	{
-		ResourceEntryInfo const *pMid = pRange[0] + ( pRange[1] - pRange[0] ) / 2;
-		if ( int diff = int( pMid->eType & ~RSRCF_MASK ) - int( eType ) )
+		ResourceEntryInfo const *pMid = pLow + ( pHigh - pLow ) / 2;
+		const uint32 nMidType = pMid->eType & ~RSRCF_MASK;
+
+		if ( nMidType == eType )
 		{
-			int off = !( diff > 0 );
-			pRange[ !off ] = pMid + off;
-			goto find_routine;
+			return pMid;
+		}
+
+		if ( nMidType < eType )
+		{
+			pLow = pMid + 1;
 		}
 		else
 		{
-			return pMid;
+			pHigh = pMid;
 		}
 	}
 
@@ -1214,12 +1315,10 @@ ResourceEntryInfo * CVTFTexture::FindOrCreateResourceEntryInfo( uint32 eType )
 			return &m_arrResourcesInfo[ k ];
 		}
 
-		// sort for PC only, 360 uses linear sort for compatibility with PC endian
-		if ( IsPC() )
-		{
-			if ( rsrcType > eType )
-				break;
-		}
+		// dimhotepus: Always keep the dictionary sorted (X360 is not supported),
+		// FindResourceEntryInfo() does binary search.
+		if ( rsrcType > eType )
+			break;
 	}
 
 	ResourceEntryInfo rei;
@@ -1298,13 +1397,6 @@ bool CVTFTexture::WriteImageData( CUtlBuffer &buf )
 //-----------------------------------------------------------------------------
 bool CVTFTexture::Serialize( CUtlBuffer &buf )
 {
-	if ( IsX360() )
-	{
-		// Unsupported path, 360 has no reason and cannot serialize
-		Assert( 0 );
-		return false;
-	}
-
 	if ( !m_pImageData )
 	{
 		Warning("*** Unable to serialize... have no image data!\n");
@@ -1319,12 +1411,13 @@ bool CVTFTexture::Serialize( CUtlBuffer &buf )
 	const size_t headerSize = sizeof(VTFFileHeader_t) + m_arrResourcesInfo.Count() * sizeof( ResourceEntryInfo ); //-V119
 	header.headerSize = size_cast<unsigned>(headerSize);
 
-	header.width = m_nWidth;
-	header.height = m_nHeight;
-	header.depth = m_nDepth;
-	header.flags = m_nFlags;
-	header.numFrames = m_nFrameCount;
-	header.numMipLevels = m_nMipCount;
+	// dimhotepus: Explicit narrowing, Init() / Unserialize() guarantee the values fit (16 / 8 bits).
+	header.width = static_cast<unsigned short>( m_nWidth );
+	header.height = static_cast<unsigned short>( m_nHeight );
+	header.depth = static_cast<unsigned short>( m_nDepth );
+	header.flags = static_cast<unsigned int>( m_nFlags );
+	header.numFrames = static_cast<unsigned short>( m_nFrameCount );
+	header.numMipLevels = static_cast<unsigned char>( m_nMipCount );
 	header.imageFormat = m_Format;
 	VectorCopy( m_vecReflectivity, header.reflectivity );
 	header.bumpScale = m_flBumpScale;
@@ -1352,7 +1445,8 @@ bool CVTFTexture::Serialize( CUtlBuffer &buf )
 	// Write the low res image first
 	if ( ResourceEntryInfo *pRei = FindResourceEntryInfo( VTF_LEGACY_RSRC_LOW_RES_IMAGE ) )
 	{
-		pRei->resData = buf.TellPut();
+		// dimhotepus: resData is 32-bit offset (file format), make narrowing explicit.
+		pRei->resData = static_cast<unsigned>( buf.TellPut() );
 
 		Assert( m_pLowResImageData );
 		intp iLowResImageSize = ImageLoader::GetMemRequired( m_nLowResImageWidth, 
@@ -1378,7 +1472,7 @@ bool CVTFTexture::Serialize( CUtlBuffer &buf )
 			{
 				if ( rei.eType & RSRCF_HAS_NO_DATA_CHUNK )
 					continue;
-				rei.resData = buf.TellPut();
+				rei.resData = static_cast<unsigned>( buf.TellPut() );
 				ResourceMemorySection &rms = m_arrResourcesData[ iRsrc ];
 				if ( !rms.WriteData( buf ) )
 					return false;
@@ -1389,8 +1483,10 @@ bool CVTFTexture::Serialize( CUtlBuffer &buf )
 	// Write image data last
 	if ( ResourceEntryInfo *pRei = FindResourceEntryInfo( VTF_LEGACY_RSRC_IMAGE ) )
 	{
-		pRei->resData = buf.TellPut();
-		WriteImageData( buf );
+		pRei->resData = static_cast<unsigned>( buf.TellPut() );
+		// dimhotepus: Result was ignored, a failed write produced a "successful" truncated VTF.
+		if ( !WriteImageData( buf ) )
+			return false;
 	}
 	else
 		return false;
@@ -1500,11 +1596,8 @@ unsigned char *CVTFTexture::LowResImageData()
 
 intp CVTFTexture::RowSizeInBytes( int nMipLevel ) const
 {
-	intp nWidth = (m_nWidth >> nMipLevel);
-	if (nWidth < 1)
-	{
-		nWidth = 1;
-	}
+	// dimhotepus: Shifting by mip level >= 32 is undefined, differs between x86 and arm64. Use clamped helper.
+	const intp nWidth = MipDimension( m_nWidth, nMipLevel );
 	return ImageLoader::SizeInBytes( m_Format ) * nWidth;
 }
 
@@ -1514,16 +1607,8 @@ intp CVTFTexture::RowSizeInBytes( int nMipLevel ) const
 //-----------------------------------------------------------------------------
 intp CVTFTexture::FaceSizeInBytes( int nMipLevel ) const
 {
-	intp nWidth = (m_nWidth >> nMipLevel);
-	if (nWidth < 1)
-	{
-		nWidth = 1;
-	}
-	intp nHeight = (m_nHeight >> nMipLevel);
-	if (nHeight < 1)
-	{
-		nHeight = 1;
-	}
+	const intp nWidth = MipDimension( m_nWidth, nMipLevel );
+	const intp nHeight = MipDimension( m_nHeight, nMipLevel );
 	return ImageLoader::SizeInBytes( m_Format ) * nWidth * nHeight;
 }
 
@@ -1562,7 +1647,9 @@ unsigned char *CVTFTexture::ImageData( int iFrame, int iFace, int iMipLevel, int
 //-----------------------------------------------------------------------------
 // Computes the size (in bytes) of a single mipmap of a single face of a single frame 
 //-----------------------------------------------------------------------------
-inline intp CVTFTexture::ComputeMipSize( int iMipLevel, ImageFormat fmt ) const
+// dimhotepus: Drop 'inline' from the three private overloads below, they are declared non-inline in the class and
+// are not performance critical; avoids "inline function used before its inline declaration" pitfalls.
+intp CVTFTexture::ComputeMipSize( int iMipLevel, ImageFormat fmt ) const
 {
 	Assert( iMipLevel < m_nMipCount );
 	int w, h, d;
@@ -1581,7 +1668,7 @@ intp CVTFTexture::ComputeMipSize( int iMipLevel ) const
 // Computes the size of a single face of a single frame 
 // All mip levels starting at the specified mip level are included
 //-----------------------------------------------------------------------------
-inline intp CVTFTexture::ComputeFaceSize( int iStartingMipLevel, ImageFormat fmt ) const
+intp CVTFTexture::ComputeFaceSize( int iStartingMipLevel, ImageFormat fmt ) const
 {
 	intp iSize = 0;
 	int w = m_nWidth ? m_nWidth : 1;
@@ -1618,7 +1705,7 @@ intp CVTFTexture::ComputeFaceSize( int iStartingMipLevel ) const
 //-----------------------------------------------------------------------------
 // Computes the total size of all faces, all frames
 //-----------------------------------------------------------------------------
-inline intp CVTFTexture::ComputeTotalSize( ImageFormat fmt ) const
+intp CVTFTexture::ComputeTotalSize( ImageFormat fmt ) const
 {
 	// Compute the number of bytes required to store a single face/frame
 	intp iMemRequired = ComputeFaceSize( 0, fmt );
@@ -1667,26 +1754,10 @@ void CVTFTexture::ComputeMipLevelDimensions( int iMipLevel, int *pMipWidth, int 
 {
 	Assert( iMipLevel < m_nMipCount );
 
-	int width = m_nWidth >> iMipLevel;
-	int height = m_nHeight >> iMipLevel;
-	int depth = m_nDepth >> iMipLevel;
-
-	if ( width < 1 )
-	{
-		width = 1;
-	}
-	if ( height < 1 )
-	{
-		height = 1;
-	}
-	if ( depth < 1 )
-	{
-		depth = 1;
-	}
-
-	*pMipWidth = width;
-	*pMipHeight = height;
-	*pMipDepth = depth;
+	// dimhotepus: Shift counts >= 32 are undefined behavior (differs between x86 and arm64), use clamped helper.
+	*pMipWidth = MipDimension( m_nWidth, iMipLevel );
+	*pMipHeight = MipDimension( m_nHeight, iMipLevel );
+	*pMipDepth = MipDimension( m_nDepth, iMipLevel );
 }
 
 
@@ -1705,7 +1776,8 @@ void CVTFTexture::ComputeMipLevelSubRect( Rect_t *pSrcRect, int nMipLevel, Rect_
 		return;
 	}
 
-	float flInvShrink = 1.0f / (float)(1 << nMipLevel);
+	// dimhotepus: 1 << nMipLevel is undefined for mip levels >= 31.
+	float flInvShrink = 1.0f / (float)(1 << ClampMipShift( nMipLevel ));
 	pSubRect->x = static_cast<int>(pSrcRect->x * flInvShrink);
 	pSubRect->y = static_cast<int>(pSrcRect->y * flInvShrink);
 	pSubRect->width = (int)ceilf( (pSrcRect->x + pSrcRect->width) * flInvShrink ) - pSubRect->x;
@@ -1744,9 +1816,7 @@ void CVTFTexture::ConvertImageFormat( ImageFormat fmt, bool bNormalToDUDV )
 	// FIXME: Should this be re-written to not do an allocation?
 	const intp iConvertedSize = ComputeTotalSize( fmt );
 	std::unique_ptr<byte[]> pConvertedImage = std::make_unique<byte[]>( iConvertedSize );
-	// This can happen for large, bogus textures.
-	if ( !pConvertedImage )
-		return;
+	// dimhotepus: Removed 'if ( !pConvertedImage ) return;', make_unique never returns nullptr (throws).
 
 	for (int iMip = 0; iMip < m_nMipCount; ++iMip)
 	{
@@ -2009,14 +2079,18 @@ static void CalcColor( SphereCalc_t *pCalc, int iFace, const Vector &normal, uns
 	x = (x * w) + hw - 0.5F;
 	y = (y * w) + hw - 0.5F;
 
-	int u = (int)(x+0.5F);
-	int v = (int)(y+0.5F);
+	// dimhotepus: w = hw / normal[i] is +-inf / NaN when the normal component is 0. Converting inf / NaN to int is
+	// undefined and gives INT_MIN on x86 but 0 / INT_MAX on arm64 (different spheremaps per platform).
+	// Clamp as float first (NaN fails the comparison and goes to 0), same result as before for finite values.
+	const float flMaxCoord = static_cast<float>( size - 1 );
+	float flU = x + 0.5F;
+	float flV = y + 0.5F;
 
-	if ( u < 0 ) u = 0;
-	else if ( u > (size-1) ) u = (size-1);
+	flU = ( flU > 0.0F ) ? ( flU < flMaxCoord ? flU : flMaxCoord ) : 0.0F;
+	flV = ( flV > 0.0F ) ? ( flV < flMaxCoord ? flV : flMaxCoord ) : 0.0F;
 
-	if ( v < 0 ) v = 0;
-	else if ( v > (size-1) ) v = (size-1);
+	int u = (int)flU;
+	int v = (int)flV;
 
 	int offset = (v * size + u) * 4;
 
@@ -2375,6 +2449,14 @@ void CVTFTexture::GenerateMipmaps()
 	// dimhotepus: IMAGE_FORMAT_RGBA32323232F CS:GO backport
 	Assert( m_Format == IMAGE_FORMAT_RGBA8888 || m_Format == IMAGE_FORMAT_RGB323232F || m_Format == IMAGE_FORMAT_RGBA32323232F );
 
+	// dimhotepus: Resamplers below treat mips as uncompressed texels. Compressed mips are much smaller, so with
+	// Assert compiled out that read / wrote past the end of image data.
+	if ( ImageLoader::IsCompressed( m_Format ) )
+	{
+		Warning( "Unable to generate mipmaps for compressed image format %d.\n", static_cast<int>( m_Format ) );
+		return;
+	}
+
 	// FIXME: Should we be doing anything special for normalmaps other than a final normalization pass?
 	ImageLoader::ResampleInfo_t info;
 	info.m_nSrcWidth = m_nWidth;
@@ -2421,10 +2503,16 @@ void CVTFTexture::GenerateMipmaps()
 
 	// Compute how many mips are above "visible mip0"
 	int numMipsClampedLod = 0;
-	if ( TextureLODControlSettings_t const *pLodSettings = ( TextureLODControlSettings_t const * ) GetResourceData( VTF_RSRC_TEXTURE_LOD_SETTINGS, NULL ) )
+	// dimhotepus: Resource payload can be shorter than the struct (it is read from the file), check size before use.
+	size_t nLodSettingsSize = 0;
+	const void *pLodSettingsData = GetResourceData( VTF_RSRC_TEXTURE_LOD_SETTINGS, &nLodSettingsSize );
+	if ( pLodSettingsData && nLodSettingsSize >= sizeof( TextureLODControlSettings_t ) )
 	{
-		int iClampX = 1 << min( pLodSettings->m_ResolutionClampX, pLodSettings->m_ResolutionClampX_360 );
-		int iClampY = 1 << min( pLodSettings->m_ResolutionClampY, pLodSettings->m_ResolutionClampY_360 );
+		TextureLODControlSettings_t const *pLodSettings = static_cast<TextureLODControlSettings_t const *>( pLodSettingsData );
+
+		// dimhotepus: Was '1 << value' with value up to 255 (undefined). Clamp the shift and use 64-bit to stay overflow free while doubling below.
+		int64 iClampX = int64( 1 ) << min( { static_cast<int>( pLodSettings->m_ResolutionClampX ), static_cast<int>( pLodSettings->m_ResolutionClampX_360 ), 30 } );
+		int64 iClampY = int64( 1 ) << min( { static_cast<int>( pLodSettings->m_ResolutionClampY ), static_cast<int>( pLodSettings->m_ResolutionClampY_360 ), 30 } );
 
 		while ( iClampX < m_nWidth || iClampY < m_nHeight )
 		{
@@ -2548,7 +2636,8 @@ void CVTFTexture::PutOneOverMipLevelInAlpha()
 	{
 		int nMipWidth, nMipHeight, nMipDepth;
 		ComputeMipLevelDimensions( iMipLevel, &nMipWidth, &nMipHeight, &nMipDepth );
-		int size = nMipWidth * nMipHeight * nMipDepth;
+		// dimhotepus: Texel count overflowed int for huge textures.
+		const intp size = static_cast<intp>( nMipWidth ) * nMipHeight * nMipDepth;
 		unsigned char ooMipLevel = ( unsigned char )( 255.0f * ( 1.0f / ( float )( 1 << iMipLevel ) ) );
 
 		for (int iFrame = 0; iFrame < m_nFrameCount; ++iFrame)
@@ -2586,10 +2675,11 @@ void CVTFTexture::ComputeReflectivity( )
 		{
 			Vector vecFaceReflect;
 			unsigned char* pSrc = ImageData( iFrame, iFace, 0 );
-			int nNumPixels = m_nWidth * m_nHeight * m_nDepth;
+			// dimhotepus: Pixel count overflowed int for big textures (65535 x 65535).
+			const intp nNumPixels = static_cast<intp>( m_nWidth ) * m_nHeight * m_nDepth;
 
 			VectorClear( vecFaceReflect );
-			for (int i = 0; i < nNumPixels; ++i, pSrc += 4 ) //-V112
+			for (intp i = 0; i < nNumPixels; ++i, pSrc += 4 ) //-V112
 			{
 				vecFaceReflect[0] += TextureToLinear( pSrc[0] );
 				vecFaceReflect[1] += TextureToLinear( pSrc[1] );
@@ -2602,7 +2692,11 @@ void CVTFTexture::ComputeReflectivity( )
 			++divisor;
 		}
 	}
-	m_vecReflectivity /= static_cast<float>(divisor);
+	// dimhotepus: No frames / faces gave 0 / 0 = NaN reflectivity.
+	if ( divisor > 0 )
+	{
+		m_vecReflectivity /= static_cast<float>(divisor);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -2640,7 +2734,8 @@ void CVTFTexture::ComputeAlphaFlags()
 
 				int nMipWidth, nMipHeight, nMipDepth;
 				ComputeMipLevelDimensions( iMipLevel, &nMipWidth, &nMipHeight, &nMipDepth );
-				int nNumPixels = nMipWidth * nMipHeight * nMipDepth;
+				// dimhotepus: Texel count overflowed int for huge textures.
+				intp nNumPixels = static_cast<intp>( nMipWidth ) * nMipHeight * nMipDepth;
 
 				while ( --nNumPixels >= 0 )
 				{
@@ -2720,6 +2815,11 @@ void CVTFTexture::PostProcess( bool bGenerateSpheremap, LookDir_t lookDir, bool 
 
 void CVTFTexture::SetPostProcessingSettings( VtfProcessingOptions const *pOptions )
 {
+	// dimhotepus: Null settings crashed
+	Assert( pOptions );
+	if ( !pOptions )
+		return;
+
 	BitwiseClear( m_Options );
 	memcpy( &m_Options, pOptions, min( (uint32)sizeof( m_Options ), pOptions->cbSize ) );
 	m_Options.cbSize = sizeof( m_Options );
@@ -2738,7 +2838,18 @@ bool CVTFTexture::ConstructLowResImage()
 		return true;
 	}
 
+	// dimhotepus: Without a low-res image there is nothing to construct; with one but
+	// no memory release build wrote through nullptr (Assert only).
+	if ( m_nLowResImageWidth <= 0 || m_nLowResImageHeight <= 0 )
+	{
+		return true;
+	}
+
 	Assert( m_pLowResImageData );
+	if ( !m_pLowResImageData )
+	{
+		return false;
+	}
 
 	CUtlMemory<unsigned char> lowResSizeImage;
 	lowResSizeImage.EnsureCapacity( m_nLowResImageWidth * m_nLowResImageHeight * 4 ); //-V112
@@ -2894,8 +3005,9 @@ void CVTFTexture::BlendCubeMapFaceEdges(
 				// Now we know the 2 pixels. Average them and copy the averaged value to both pixels.
 				unsigned char *texels[2] = 
 				{
-					pFace1Data + ((iFace1Cur.y * nMipWidth) + iFace1Cur.x) * 4,
-					pFace2Data + ((iFace2Cur.y * nMipWidth) + iFace2Cur.x) * 4
+					// dimhotepus: Do the offset math in intp, int overflows for large cubemaps.
+					pFace1Data + ((static_cast<intp>( iFace1Cur.y ) * nMipWidth) + iFace1Cur.x) * 4,
+					pFace2Data + ((static_cast<intp>( iFace2Cur.y ) * nMipWidth) + iFace2Cur.x) * 4
 				};
 
 				BlendTexels( texels, 2 );
@@ -2950,7 +3062,7 @@ void CVTFTexture::BlendCubeMapFaceCorners(
 			SetupFaceVert( iMipLevel, pMatch->m_iFaceEdges[iEdge], facePos );
 		
 			texels[iEdge] = pImageData[iEdge];
-			texels[iEdge] += (facePos.y * nMipWidth + facePos.x) * 4;
+			texels[iEdge] += (static_cast<intp>( facePos.y ) * nMipWidth + facePos.x) * 4;
 		}
 
 		// Now blend the texels.
@@ -2968,7 +3080,7 @@ void CVTFTexture::BuildCubeMapMatchLists(
 	bool bSkybox )
 {
 
-	int **faceVertsList = bSkybox ? g_skybox_FaceVerts : g_FaceVerts;
+	const int *const *faceVertsList = bSkybox ? g_skybox_FaceVerts : g_FaceVerts;
 
 	// For each face, look for matching edges on other faces.
 	int nTotalEdgesMatched = 0;
@@ -3064,8 +3176,9 @@ void CVTFTexture::BlendCubeMapEdgePalettes(
 		// Merge the palette of these two blocks.
 		char *blocks[2] = 
 		{
-			S3TC_GetBlock( pFace1Data, m_Format, nMipWidth>>2, iFace1Cur.x, iFace1Cur.y ),
-			S3TC_GetBlock( pFace2Data, m_Format, nMipWidth>>2, iFace2Cur.x, iFace2Cur.y )
+			// dimhotepus: Blocks per row round up (see S3TC_GetPaletteIndex), 'nMipWidth>>2' is 0 for 1x1 / 2x2 mips.
+			S3TC_GetBlock( pFace1Data, m_Format, (nMipWidth+3)>>2, iFace1Cur.x, iFace1Cur.y ),
+			S3TC_GetBlock( pFace2Data, m_Format, (nMipWidth+3)>>2, iFace2Cur.x, iFace2Cur.y )
 		};
 
 		S3RGBA *originals[2] =
@@ -3111,7 +3224,8 @@ void CVTFTexture::BlendCubeMapCornerPalettes(
 		unsigned char *pFaceData = ImageData( iFrame, iFaceIndex, iMipLevel );
 		S3RGBA *pFaceOriginal = &m_OriginalData[ GetImageOffset( iFrame, iFaceIndex, iMipLevel, IMAGE_FORMAT_RGBA8888 ) / 4 ];
 
-		blocks[iEdge] = S3TC_GetBlock( pFaceData, m_Format, nMipWidth>>2, facePos.x, facePos.y );
+		// dimhotepus: Round blocks per row up, see above.
+		blocks[iEdge] = S3TC_GetBlock( pFaceData, m_Format, (nMipWidth+3)>>2, facePos.x, facePos.y );
 		originals[iEdge] = &pFaceOriginal[ (facePos.y * 4 * nMipWidth) + facePos.x * 4 ];
 	}
 
@@ -3343,4 +3457,3 @@ it was once.
 		pPad->Flush();
 	}
 */
-
