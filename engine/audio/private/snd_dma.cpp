@@ -38,6 +38,8 @@
 #include "filesystem/IQueuedLoader.h"
 #include "voice.h"
 
+#include <tuple>
+
 #include "replay/iclientreplaycontext.h"
 #include "replay/ireplaymovierenderer.h"
 
@@ -862,13 +864,42 @@ CAudioSource *S_LoadSound( CSfxTable *pSfx, channel_t *ch )
 	{
 		double st = Plat_FloatTime();
 
-		bool bUserVox = false;
-
 		// sound chars can explicitly categorize usage
 		bool bStream = TestSoundChar( pSfx->getname(), CHAR_STREAM );
-		if ( !bStream )
+		const bool bUserVox = !bStream && TestSoundChar( pSfx->getname(), CHAR_USERVOX );
+
+		// dimhotepus: Override streaming like xbox does.
+		// Loading huge wavs (like ambient) causes slutters a few words in
+		// a speech as mixer started on 0.125s from audio cache and then
+		// block engine thread for the rest. When streaming, wav read in
+		// pieces ahead of the mix position
 		{
-			bUserVox = TestSoundChar( pSfx->getname(), CHAR_USERVOX );
+			// stream everything but critical sounds
+			bStream = !bUserVox;
+			if ( bStream )
+			{
+				constexpr std::tuple< const char *, std::ptrdiff_t > criticalSounds[] = {
+					{ "common", ssize( "common" ) - 1 },
+					{ "items", ssize( "items" ) - 1 },
+					{ "physics", ssize( "physics" ) - 1 },
+					{ "player", ssize( "player" ) - 1 },
+					{ "ui", ssize( "ui" ) - 1 },
+					{ "weapons", ssize( "weapons" ) - 1 }
+				};
+				const char *pFileName{ pSfx->GetFileName() };
+
+				for ( const auto &sound : criticalSounds )
+				{
+					const ptrdiff_t len{ std::get< std::ptrdiff_t >( sound ) };
+					if ( !Q_strnicmp( pFileName, std::get< const char * >( sound ), len ) &&
+					     ( pFileName[len] == CORRECT_PATH_SEPARATOR || pFileName[len] == INCORRECT_PATH_SEPARATOR ) )
+					{
+						// never stream these, regardless of sound chars
+						bStream = false;
+						break;
+					}
+				}
+			}
 		}
 
 		if ( bStream )
