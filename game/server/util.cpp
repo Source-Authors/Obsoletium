@@ -2301,6 +2301,12 @@ CBaseEntity *UTIL_EntitiesInPVS( CBaseEntity *pPVSEntity, CBaseEntity *pStarting
 		org = pPVSEntity->EyePosition();
 		int clusterIndex = engine->GetClusterForOrigin( org );
 		Assert( clusterIndex >= 0 );
+		// dimhotepus: Add explicit warning about invalid cluster to catch it even in Release.
+		if ( clusterIndex < 0 )
+		{
+			Warning( "UTIL_EntitiesInPVS: %s '%s' is not in a valid cluster, PVS is empty\n",
+			         pPVSEntity->GetClassname(), STRING( pPVSEntity->GetEntityName() ) );
+		}
 		engine->GetPVSForCluster( clusterIndex, sizeof(pvs), pvs );
 	}
 

@@ -572,7 +572,7 @@ public:
 		{
 			return 0;
 		}
-		
+
 		// dimhotepus: Correct bounds check >= max.
 		int index = (int) ( pEdict - sv.edicts );
 		if ( index < 0 || index >= sv.max_edicts )
