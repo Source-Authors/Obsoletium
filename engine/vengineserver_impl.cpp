@@ -1702,7 +1702,9 @@ IVEngineServer *g_pVEngineServer = &g_VEngineServer;
 //-----------------------------------------------------------------------------
 // Used to allocate pvs infos
 //-----------------------------------------------------------------------------
-static CUtlMemoryPool s_PVSInfoAllocator( 128, 128 * 64, CUtlMemoryPool::GROW_SLOW, "pvsinfopool", 128 );
+// dimhotepus: Correctly bound PVS block size.
+constexpr inline int  kPvsBlockSize{ MAX_ENT_CLUSTERS * sizeof( unsigned short ) };
+static CUtlMemoryPool s_PVSInfoAllocator( kPvsBlockSize, kPvsBlockSize * 64, CUtlMemoryPool::GROW_SLOW, "pvsinfopool", kPvsBlockSize );
 
 
 //-----------------------------------------------------------------------------
