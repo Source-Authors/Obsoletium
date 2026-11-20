@@ -107,6 +107,8 @@ class CFastPointLeafNum
 public:
 	CFastPointLeafNum();
 	int GetLeaf( const Vector &vPos );
+	// dimhotepus: Reset cached leaf on map unload or we will have artifacts.
+	void ResetLeaf();
 
 private:
 	int m_iCachedLeaf;

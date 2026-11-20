@@ -302,6 +302,20 @@ void CM_FreeMap(void)
 
 	// free the collision bsp data
 	CollisionBSPData_Destroy( pBSPData );
+
+	// dimhotepus: Reset cached leafs on map unload.
+	extern CFastPointLeafNum g_DLightLeafAccessors[32];
+	for (auto &a : g_DLightLeafAccessors)
+	{
+		a.ResetLeaf();
+	}
+
+	// dimhotepus:Reset cached leafs on map unload.
+	extern CFastPointLeafNum g_ELightLeafAccessors[32];
+	for ( auto &a : g_ELightLeafAccessors )
+	{
+		a.ResetLeaf();
+	}
 }
 
 
@@ -2678,6 +2692,14 @@ int CFastPointLeafNum::GetLeaf( const Vector &vPos )
 	}
 
 	return m_iCachedLeaf;
+}
+
+
+void CFastPointLeafNum::ResetLeaf()
+{
+	m_iCachedLeaf = -1;
+	m_flDistToExitLeafSqr = -1;
+	m_vCachedPos.Init();
 }
 
 
