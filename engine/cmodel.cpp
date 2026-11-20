@@ -1991,7 +1991,7 @@ void CM_BoxTraceAgainstLeafList( const Ray_t &ray, int *pLeafList, intp nLeafCou
 							     bool bComputeEndpoint, trace_t &trace )
 {
 	// For multi-check avoidance.
-	TraceInfo_t *pTraceInfo = BeginTrace();		
+	TraceInfo_t *pTraceInfo = BeginTrace();
 
 	// Setup trace data.
 	CM_ClearTrace( &pTraceInfo->m_trace );
@@ -2023,9 +2023,6 @@ void CM_BoxTraceAgainstLeafList( const Ray_t &ray, int *pLeafList, intp nLeafCou
 
 	if ( !ray.m_IsSwept )
 	{
-		Vector vecBoxMin( ( ray.m_Start.x - ray.m_Extents.x - 1 ), ( ray.m_Start.y - ray.m_Extents.y - 1 ), ( ray.m_Start.z - ray.m_Extents.z - 1 ) );
-		Vector vecBoxMax( ( ray.m_Start.x + ray.m_Extents.x + 1 ), ( ray.m_Start.y + ray.m_Extents.y + 1 ), ( ray.m_Start.z + ray.m_Extents.z + 1 ) );
-
 		bool bFoundNonSolidLeaf = false;
 		for ( intp iLeaf = 0; iLeaf < nLeafCount; ++iLeaf )
 		{
