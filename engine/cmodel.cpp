@@ -2547,22 +2547,30 @@ int	CM_BoxVisible( const Vector& mins, const Vector& maxs, const byte *visbits, 
 
 	// FIXME: Could save a loop here by traversing the tree in this routine like the code above
 	int count = CM_BoxLeafnums( mins, maxs, leafList, MAX_BOX_LEAVES, &topnode );
+	// dimhotepus: The leaf list was truncated, so we can't prove the box is invisible.
+	// Assume it is visible to be safe.
+	if ( count >= MAX_BOX_LEAVES )
+		return true;
+
 	for ( int i = 0; i < count; i++ )
 	{
-		int cluster = CM_LeafCluster( leafList[i] );
-		int offset = cluster>>3;
+		const int cluster = CM_LeafCluster( leafList[i] );
 
-		if ( offset == -1 )
-		{
-			return false;
-		}
+		// dimhotepus: Solid leaves (and anything else outside the vis data) have cluster -1.
+		// They are not visible themselves, but must not end the search: the box
+		// may overlap visible leaves later in the list.
+		//
+		// Fixes transition on airboat between water levels d1_canals_06 -> d1_canals_07.
+		if ( cluster < 0 )
+			continue;
 
-		if ( offset > vissize || offset < 0 )
+		const int offset = cluster >> 3;
+		if ( offset >= vissize )
 		{
 			Sys_Error( "CM_BoxVisible: Cluster %d, offset %d out of bounds %d!", cluster, offset, vissize );
 		}
 
-		if (visbits[cluster>>3] & (1<<(cluster&7)))
+		if ( visbits[offset] & (1 << (cluster & 7)) )
 		{
 			return true;
 		}
