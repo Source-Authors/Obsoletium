@@ -1388,7 +1388,7 @@ public:
 	{
 		int clientnum = NUM_FOR_EDICT( pEntity );
 		if (clientnum < 1 || clientnum > sv.GetClientCount() )
-			Host_Error ("DLL_SetView: not a client");
+			Host_Error ("SetFakeClientConVarValue: not a client");
 
 		CGameClient *client = sv.Client(clientnum-1);
 		if ( client->IsFakeClient() )
