@@ -154,13 +154,13 @@ public:
 
 	// STL compatible member functions. These allow easier use of std::sort
 	// and they are forward compatible with the C++ 11 range-based for loops.
-	std::conditional_t<IsContiguous, iterator, void*>
-	[[nodiscard]] begin()					{ return Base(); }
+	[[nodiscard]] std::conditional_t< IsContiguous, iterator, void * >
+	begin()					{ return Base(); }
 	[[nodiscard]] std::conditional_t<IsContiguous, const_iterator, const void*>
 	begin() const			{ return Base(); }
 
-	std::conditional_t<IsContiguous, iterator, void*>
-	[[nodiscard]] end()					{ return Base() + Count(); }
+	[[nodiscard]] std::conditional_t< IsContiguous, iterator, void * >
+	end()					{ return Base() + Count(); }
 	[[nodiscard]] std::conditional_t<IsContiguous, const_iterator, const void*>
 	end() const				{ return Base() + Count(); }
 
