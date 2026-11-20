@@ -2219,7 +2219,8 @@ CBaseEntity *UTIL_FindClientInPVS( const Vector &vecBoxMins, const Vector &vecBo
 //-----------------------------------------------------------------------------
 ConVar sv_strict_notarget( "sv_strict_notarget", "0", 0, "If set, notarget will cause entities to never think they are in the pvs" );
 
-static edict_t *UTIL_FindClientInPVSGuts(edict_t *pEdict, unsigned char *pvs, unsigned pvssize )
+template<unsigned pvssize>
+static edict_t *UTIL_FindClientInPVSGuts(edict_t *pEdict, unsigned char (&pvs)[pvssize] )
 {
 	Vector	view;
 
@@ -2258,7 +2259,7 @@ static edict_t *UTIL_FindClientInPVSGuts(edict_t *pEdict, unsigned char *pvs, un
 
 edict_t *UTIL_FindClientInPVS(edict_t *pEdict)
 {
-	return UTIL_FindClientInPVSGuts( pEdict, g_CheckClient.m_checkPVS, sizeof( g_CheckClient.m_checkPVS ) );
+	return UTIL_FindClientInPVSGuts( pEdict, g_CheckClient.m_checkPVS );
 }
 
 //-----------------------------------------------------------------------------
@@ -2266,7 +2267,7 @@ edict_t *UTIL_FindClientInPVS(edict_t *pEdict)
 //-----------------------------------------------------------------------------
 edict_t *UTIL_FindClientInVisibilityPVS( edict_t *pEdict )
 {
-	return UTIL_FindClientInPVSGuts( pEdict, g_CheckClient.m_checkVisibilityPVS, sizeof( g_CheckClient.m_checkVisibilityPVS ) );
+	return UTIL_FindClientInPVSGuts( pEdict, g_CheckClient.m_checkVisibilityPVS );
 }
 
 
