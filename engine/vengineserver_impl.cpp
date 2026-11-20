@@ -409,7 +409,8 @@ public:
 			return false;
 		
 		int offset = clusterIndex>>3;
-		if ( offset > checkpvssize )
+		// dimhotepus: Correct bounds check >= max.
+		if ( offset >= checkpvssize )
 		{
 			Sys_Error( "CheckOriginInPVS: Cluster offset (%d) would read past end of pvs data (%d).",
 				offset, checkpvssize );
@@ -572,8 +573,9 @@ public:
 			return 0;
 		}
 		
+		// dimhotepus: Correct bounds check >= max.
 		int index = (int) ( pEdict - sv.edicts );
-		if ( index < 0 || index > sv.max_edicts )
+		if ( index < 0 || index >= sv.max_edicts )
 		{
 			Sys_Error( "Bad entity in IndexOfEdict() index %d pEdict %p sv.edicts %p.",
 				index, pEdict, sv.edicts );

@@ -176,7 +176,8 @@ cmodel_t *CM_InlineModelNumber( int index )
 {
 	CCollisionBSPData *pBSPDataData = GetCollisionBSPData();
 
-	if( ( index < 0 ) || ( index > pBSPDataData->numcmodels ) )
+	// dimhotepus: Correct bounds check >= max.
+	if( ( index < 0 ) || ( index >= pBSPDataData->numcmodels ) )
 		return NULL;
 
 	return ( &pBSPDataData->map_cmodels[ index ] );
@@ -2204,7 +2205,8 @@ void CM_DecompressVis( CCollisionBSPData *pBSPData, int cluster, int visType, by
 	byte	*out_p;
 	int		numClusterBytes;
 
-	if ( cluster > pBSPData->numclusters || cluster < 0 )
+	// dimhotepus: Correct bounds check >= max.
+	if ( cluster >= pBSPData->numclusters || cluster < 0 )
 	{
 		// This can happen if this is called while the level is loading. See Map_VisCurrentCluster.
 		CM_NullVis( pBSPData, out );
