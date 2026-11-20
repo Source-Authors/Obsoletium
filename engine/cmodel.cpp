@@ -2441,18 +2441,19 @@ int CM_WriteAreaBits ( byte *buffer, int buflen, int area )
 
 	bytes = (pBSPData->numareas+7)>>3;
 
+	// dimhotepus: Move this check above as map_noareas now fills 32 areas.
+	if ( buflen < 32 )
+	{
+		Sys_Error( "CM_WriteAreaBits with buffer size (%d) < 32.", buflen );
+	}
+
 	if ( map_noareas.GetInt() )
 	{	
 		// for debugging, send everything
-		Q_memset( buffer, 255, 3 );
+		Q_memset( buffer, 255, 32 );
 	}
 	else
 	{
-		if ( buflen < 32 )
-		{
-			Sys_Error( "CM_WriteAreaBits with buffer size (%d) < 32.", buflen );
-		}
-
 		Q_memset( buffer, 0, 32 );
 
 		floodnum = pBSPData->map_areas[area].floodnum;
