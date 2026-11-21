@@ -324,6 +324,11 @@ IPhysicsObject *PhysModelCreate( CBaseEntity *pEntity, int modelIndex, const Vec
 	{
 		surfaceProp = physprops->GetSurfaceIndex( pSolid->surfaceprop );
 	}
+
+	// dimhotepus: Check solid index is in range.
+	if ( pSolid->index < 0 || pSolid->index >= pCollide->solidCount )
+		return nullptr;
+
 	IPhysicsObject *pObject = physenv->CreatePolyObject( pCollide->solids[pSolid->index], surfaceProp, origin, angles, &pSolid->params );
 	//PhysCheckAdd( pObject, STRING(pEntity->m_iClassname) );
 
