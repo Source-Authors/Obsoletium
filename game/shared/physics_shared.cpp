@@ -581,6 +581,12 @@ void PhysCreateVirtualTerrain( CBaseEntity *pWorld, const objectparams_t &defaul
 			intp surfaceData = physprops->GetSurfaceIndex( "default" );
 			// create this as part of the world
 			IPhysicsObject *pObject = physenv->CreatePolyObjectStatic( pCollide, surfaceData, vec3_origin, vec3_angle, &solid.params );
+			if ( !pObject )
+			{
+				// dimhotepus: Exit on creation failure.
+				Warning( "Unable to create virtual terrain physics object %s.\n", nameBuf );
+				continue;
+			}
 			pObject->SetCallbackFlags( pObject->GetCallbackFlags() | CALLBACK_NEVER_DELETED );
 		}
 	}
@@ -595,7 +601,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 	if ( !physenv || !pWorldCollide || pWorldCollide->solidCount < 1 )
 	{
 		AssertMsg( false, "Missed essential env to create world." );
-		return NULL;
+		return nullptr;
 	}
 
 	intp surfaceData = physprops->GetSurfaceIndex( "default" );
@@ -606,6 +612,11 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 
 	IPhysicsObject *pWorldPhysics = physenv->CreatePolyObjectStatic( 
 		pWorldCollide->solids[0], surfaceData, vec3_origin, vec3_angle, &params );
+	if (!pWorldPhysics)
+	{
+		// dimhotepus: Exit on creation failure.
+		return nullptr;
+	}
 
 	// hint - saves vphysics some work
 	pWorldPhysics->SetCallbackFlags( pWorldPhysics->GetCallbackFlags() | CALLBACK_NEVER_DELETED );
@@ -673,6 +684,12 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 				// create this as part of the world
 				IPhysicsObject *pWater = physenv->CreatePolyObjectStatic( pWorldCollide->solids[fluid.index], 
 					surfaceData, vec3_origin, vec3_angle, &solid.params );
+				if (!pWater)
+				{
+					// dimhotepus: Detect fluid creation failure.
+					Warning( "Unable to create fluid physics object %d.\n", fluid.index );
+					continue;
+				}
 
 				pWater->SetCallbackFlags( pWater->GetCallbackFlags() | CALLBACK_NEVER_DELETED );
 				physenv->CreateFluidController( pWater, &fluid.params );
