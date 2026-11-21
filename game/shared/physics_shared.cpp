@@ -222,7 +222,7 @@ bool PhysModelParseSolidByIndex( solid_t &solid, CBaseEntity *pEntity, int model
 	}
 	physcollision->VPhysicsKeyParserDestroy( pParse );
 
-	// collisions are off by default
+	// collisions are off by default, so need to enable.
 	solid.params.enableCollisions = true;
 
 	solid.params.pGameData = pEntity;
