@@ -15,6 +15,7 @@
 #include "vphysics/object_hash.h"
 #include "vphysics/friction.h"
 #include "coordsize.h"
+#include "tier1/utlbuffer.h"
 #include "tier1/KeyValues.h"
 #include "decals.h"
 #include "IEffects.h"
@@ -516,14 +517,19 @@ static void AddSurfacepropFile( const char *pFileName, IPhysicsSurfaceProps *pPr
 
 		int len = pFileSystem->Size( file );
 
-		// read the file
-		int nBufSize = len+1;
-		char *buffer = stackallocT( char, nBufSize );
-		pFileSystem->ReadEx( buffer, nBufSize, len, file );
-		buffer[len] = 0;
+		// dimhotepus: Read the file to dynamic memory to prevent stack overflow.
+		CUtlBuffer buf( (intp)0, len + 1, CUtlBuffer::TEXT_BUFFER );
+		buf.EnsureCapacity( len + 1 );
+		const int read{ pFileSystem->ReadEx( buf.Base(), len + 1, len, file ) };
+		if ( read != len )
+		{
+			Error( "Unable to read surface prop file '%s' (referenced by manifest file '%s')\n",
+			       pFileName, SURFACEPROP_MANIFEST_FILE );
+		}
+		static_cast< char * >( buf.Base() )[len] = '\0';
 
 		// dimhotepus: Dump warning if no props in file.
-		const intp parsedPropsCount = pProps->ParseSurfaceData( pFileName, buffer );
+		const intp parsedPropsCount = pProps->ParseSurfaceData( pFileName, buf.Base<const char>() );
 		if ( parsedPropsCount == 0 )
 		{
 			DevWarning( "No props in '%s', skipping...\n", pFileName );
