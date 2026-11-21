@@ -1093,8 +1093,9 @@ void CCollisionEvent::FluidStartTouch( IPhysicsObject *pObject, IPhysicsFluidCon
 
 	// UNDONE: Figure out how much of the surface area has crossed the water surface and scale angScale by that
 	// For now assume 25%
-	Vector rotAxis = angVel;
-	VectorNormalize(rotAxis);
+	// dimhotepus: Comment unused rotAxis.
+	// Vector rotAxis = angVel;
+	// VectorNormalize(rotAxis);
 	float angScale = 0.25f * pObject->CalculateAngularDrag( angVel ) * dragScale;
 	angScale = clamp( angScale, 0.0f, 1.0f );
 	angVel *= -angScale;
