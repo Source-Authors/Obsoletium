@@ -641,6 +641,8 @@ bool FindMaxContact( IPhysicsObject *pObject, float minForce, IPhysicsObject **p
 			float force = pSnapshot->GetNormalForce();
 			if ( force > maxForce )
 			{
+				// dimhotepus: Correctly compute max force instead of last greater than min one.
+				maxForce = force;
 				*pOtherObject = pOther;
 				pSnapshot->GetContactPoint( *contactPos );
 				pSnapshot->GetSurfaceNormal( *pForce );
