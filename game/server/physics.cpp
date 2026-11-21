@@ -1554,7 +1554,8 @@ CON_COMMAND(physics_debug_entity, "Dumps debug info for an entity")
 	PhysicsCommand( args, OutputVPhysicsDebugInfo );
 }
 
-CON_COMMAND(physics_select, "Dumps debug info for an entity")
+// dimhotepus: Adjust help text.
+CON_COMMAND(physics_select, "Dumps debug info for an callback in physics_debug_entity")
 {
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )
 		return;
