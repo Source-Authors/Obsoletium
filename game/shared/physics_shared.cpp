@@ -106,32 +106,8 @@ CPhysCollide *PhysCreateBbox( const Vector &minsIn, const Vector &maxsIn )
 //-----------------------------------------------------------------------------
 IPhysicsObject *PhysModelCreateBox( CBaseEntity *pEntity, const Vector &mins, const Vector &maxs, const Vector &origin, bool isStatic )
 {
-	int modelIndex = pEntity->GetModelIndex();
-	const char *pSurfaceProps = "flesh";
-	solid_t solid;
-	PhysGetDefaultAABBSolid( solid );
-	Vector dims = maxs - mins;
-	solid.params.volume = dims.x * dims.y * dims.z;
-
-	if ( modelIndex )
-	{
-		const model_t *model = modelinfo->GetModel( modelIndex );
-		if ( model )
-		{
-			CStudioHdr studioHdr( modelinfo->GetStudiomodel( model ), mdlcache );
-			if ( studioHdr.IsValid() )
-			{
-				pSurfaceProps = Studio_GetDefaultSurfaceProps( &studioHdr );
-			}
-		}
-	}
-	V_strcpy_safe( solid.surfaceprop, pSurfaceProps );
-
-	CPhysCollide *pCollide = PhysCreateBbox( mins, maxs );
-	if ( !pCollide )
-		return NULL;
-	
-	return PhysModelCreateCustom( pEntity, pCollide, origin, vec3_angle, STRING(pEntity->GetModelName()), isStatic, &solid );
+	// dimhotepus: Reuse existing PhysModelCreateOBB instead of copy-paste.
+	return PhysModelCreateOBB( pEntity, mins, maxs, origin, vec3_angle, isStatic );
 }
 
 
