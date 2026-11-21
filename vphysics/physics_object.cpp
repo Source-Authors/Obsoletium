@@ -301,13 +301,13 @@ void CPhysicsObject::EnableCollisions( bool enable )
 		{
 			// Delete all contact points with this physics object because it's collision is becoming disabled
 			IPhysicsFrictionSnapshot *pSnapshot = CreateFrictionSnapshot();
+			RunCodeAtScopeExit( DestroyFrictionSnapshot( pSnapshot ) );
 			while ( pSnapshot->IsValid() )
 			{
 				pSnapshot->MarkContactForDelete();
 				pSnapshot->NextFrictionData();
 			}
 			pSnapshot->DeleteAllMarkedContacts( true );
-			DestroyFrictionSnapshot( pSnapshot );
 		}
 
 		m_pObject->enable_collision_detection( IVP_FALSE );
@@ -332,6 +332,7 @@ void CPhysicsObject::RecheckContactPoints()
 	IVP_Environment *pEnv = m_pObject->get_environment();
 	IVP_Collision_Filter *coll_filter = pEnv->get_collision_filter();
 	IPhysicsFrictionSnapshot *pSnapshot = CreateFrictionSnapshot();
+	RunCodeAtScopeExit( DestroyFrictionSnapshot( pSnapshot ) );
 	while ( pSnapshot->IsValid() )
 	{
 		CPhysicsObject *pOther = static_cast<CPhysicsObject *>(pSnapshot->GetObject(1));
@@ -342,7 +343,6 @@ void CPhysicsObject::RecheckContactPoints()
 		pSnapshot->NextFrictionData();
 	}
 	pSnapshot->DeleteAllMarkedContacts( true );
-	DestroyFrictionSnapshot( pSnapshot );
 }
 
 CPhysicsEnvironment	*CPhysicsObject::GetVPhysicsEnvironment()

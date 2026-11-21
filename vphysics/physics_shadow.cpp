@@ -124,6 +124,7 @@ void ComputeController( IVP_U_Float_Point &currentSpeed, const IVP_U_Float_Point
 static bool IsOnGround( IVP_Real_Object *pivp )
 {
 	IPhysicsFrictionSnapshot *pSnapshot = CreateFrictionSnapshot( pivp );
+	RunCodeAtScopeExit( DestroyFrictionSnapshot( pSnapshot ) );
 	bool bGround = false;
 	while (pSnapshot->IsValid())
 	{
@@ -137,7 +138,6 @@ static bool IsOnGround( IVP_Real_Object *pivp )
 		
 		pSnapshot->NextFrictionData();
 	}
-	DestroyFrictionSnapshot( pSnapshot );
 	return bGround;
 }
 

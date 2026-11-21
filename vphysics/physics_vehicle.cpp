@@ -451,6 +451,7 @@ bool CVehicleController::GetWheelContactPoint( int index, Vector *pContactPoint,
 	if ( index < m_wheelCount )
 	{
 		IPhysicsFrictionSnapshot *pSnapshot = m_pWheels[index]->CreateFrictionSnapshot();
+		RunCodeAtScopeExit( m_pWheels[index]->DestroyFrictionSnapshot( pSnapshot ) );
 		float forceMax = -1.0f;
 		m_pWheels[index]->GetPosition( pContactPoint, NULL );
 		while ( pSnapshot->IsValid() )
@@ -471,7 +472,6 @@ bool CVehicleController::GetWheelContactPoint( int index, Vector *pContactPoint,
 			}
 			pSnapshot->NextFrictionData();
 		}
-		m_pWheels[index]->DestroyFrictionSnapshot(pSnapshot);
 	}
 	else
 	{
