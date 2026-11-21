@@ -2485,9 +2485,10 @@ void CCollisionEvent::EndTouch( IPhysicsObject *pObject1, IPhysicsObject *pObjec
 	// should have exactly one contact point (the one getting deleted here)
 	//Assert( contactCount == 1 );
 
-	Vector endPoint, normal;
-	pTouchData->GetContactPoint( endPoint );
-	pTouchData->GetSurfaceNormal( normal );
+	// dimhotepus: Comment unused code. Ignored in touch event processing for touch end.
+	// Vector endPoint, normal;
+	// pTouchData->GetContactPoint( endPoint );
+	// pTouchData->GetSurfaceNormal( normal );
 
 	if ( !m_bBufferTouchEvents )
 	{
