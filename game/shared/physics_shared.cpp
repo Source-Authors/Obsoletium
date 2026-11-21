@@ -672,11 +672,6 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 			pObject->SetCallbackFlags( pObject->GetCallbackFlags() | CALLBACK_NEVER_DELETED );
 			Assert( g_SolidSetup.GetContentsMask() != 0 );
 			pObject->SetContents( g_SolidSetup.GetContentsMask() );
-
-			if ( !pWorldPhysics )
-			{
-				pWorldPhysics = pObject;
-			}
 		}
 		else if ( V_strieq( pBlock, "fluid" ) )
 		{
