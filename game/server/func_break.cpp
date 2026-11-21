@@ -433,7 +433,7 @@ void CBreakable::Precache( void )
 		break;
 #endif
 
-#if HL2_EPISODIC 
+#if defined(HL2_EPISODIC) 
 	case matNone:
 		pGibName = "";
 		break;

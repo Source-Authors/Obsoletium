@@ -230,7 +230,7 @@ BEGIN_DATADESC( CNPC_Antlion )
 	DEFINE_FIELD( m_flNextJumpPushTime,		FIELD_TIME ),
 	DEFINE_FIELD( m_bForcedStuckJump,		FIELD_BOOLEAN ),
 	DEFINE_FIELD( m_flZapDuration,			FIELD_TIME ),
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	DEFINE_FIELD( m_bHasDoneAirAttack,		FIELD_BOOLEAN ),
 #endif	
 	// DEFINE_FIELD( m_bLoopingStarted, FIELD_BOOLEAN ),
@@ -296,7 +296,7 @@ void CNPC_Antlion::Spawn( void )
 
 	m_NPCState	= NPC_STATE_NONE;
 
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	m_iHealth = ( IsWorker() ) ? sk_antlion_worker_health.GetFloat() : sk_antlion_health.GetFloat();
 #else
 	m_iHealth	= sk_antlion_health.GetFloat();
@@ -1009,7 +1009,7 @@ Vector VecCheckThrowTolerance( CBaseEntity *pEdict, const Vector &vecSpot1, Vect
 bool CNPC_Antlion::GetSpitVector( const Vector &vecStartPos, const Vector &vecTarget, Vector *vecOut )
 {
 	// antlion workers exist only in episodic.
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	// Try the most direct route
 	Vector vecToss = VecCheckThrowTolerance( this, vecStartPos, vecTarget, sk_antlion_worker_spit_speed.GetFloat(), (10.0f*12.0f) );
 
@@ -1272,7 +1272,7 @@ void CNPC_Antlion::HandleAnimEvent( animevent_t *pEvent )
 	}
 
 	// antlion worker events
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	if ( pEvent->event == AE_ANTLION_WORKER_EXPLODE_SCREAM )
 	{
 		if ( GetWaterLevel() < WaterLevel::WL_Waist )
@@ -1724,7 +1724,7 @@ void CNPC_Antlion::StartTask( const Task_t *pTask )
 void CNPC_Antlion::RunTask( const Task_t *pTask )
 {
 	// some state that needs be set each frame
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	if ( GetFlags() & FL_ONGROUND )
 	{
 		m_bHasDoneAirAttack = false;
@@ -3048,7 +3048,7 @@ void CNPC_Antlion::StartJump( void )
 	SetAbsVelocity( m_vecSavedJump );
 
 	m_bForcedStuckJump = false;
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	m_bHasDoneAirAttack = false;
 #endif
 
@@ -4345,7 +4345,7 @@ void CNPC_Antlion::InputJumpAtTarget( inputdata_t &inputdata )
 		return;
 	}
 
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 
 	// Try the jump
 	AIMoveTrace_t moveTrace;
@@ -4381,7 +4381,7 @@ void CNPC_Antlion::InputJumpAtTarget( inputdata_t &inputdata )
 	SetCondition( COND_ANTLION_CAN_JUMP_AT_TARGET );
 }
 
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 //-----------------------------------------------------------------------------
 // workers can explode.
 //-----------------------------------------------------------------------------

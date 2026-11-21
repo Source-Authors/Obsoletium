@@ -145,7 +145,7 @@ private:
 
 
 
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	/// Decides whether something should poison the barnacle upon eating
 	static bool IsPoisonous( CBaseEntity *pVictim );
 

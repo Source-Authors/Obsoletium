@@ -230,7 +230,7 @@ private:
 	bool SeenEnemyWithinTime( float flTime );
 	void DelaySquadAttack( float flDuration );
 
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	void DoPoisonBurst();
 #endif
 
@@ -278,7 +278,7 @@ private:
 	bool		m_bDontExplode;			// Suppresses worker poison burst when drowning, failing to unburrow, etc.
 	bool		m_bLoopingStarted;
 	bool		m_bSuppressUnburrowEffects;	// Don't kick up dust when spawning
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	bool		m_bHasDoneAirAttack;  ///< only allowed to apply this damage once per glide
 #endif
 

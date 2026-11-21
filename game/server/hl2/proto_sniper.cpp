@@ -292,7 +292,7 @@ private:
 	void InputStopSweeping( inputdata_t &inputdata );
 	void InputProtectTarget( inputdata_t &inputdata );
 
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	void InputSetPaintInterval( inputdata_t &inputdata );
 	void InputSetPaintIntervalVariance( inputdata_t &inputdata );
 #endif
@@ -451,7 +451,7 @@ BEGIN_DATADESC( CProtoSniper )
 	DEFINE_INPUTFUNC( FIELD_STRING, "StopSweeping", InputStopSweeping ),
 	DEFINE_INPUTFUNC( FIELD_STRING, "ProtectTarget", InputProtectTarget ),
 
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	DEFINE_INPUTFUNC( FIELD_FLOAT, "SetPaintInterval", InputSetPaintInterval ),
 	DEFINE_INPUTFUNC( FIELD_FLOAT, "SetPaintIntervalVariance", InputSetPaintIntervalVariance ),
 #endif
@@ -1121,7 +1121,7 @@ void CProtoSniper::InputProtectTarget( inputdata_t &inputdata )
 
 
 
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void CProtoSniper::InputSetPaintInterval( inputdata_t &inputdata )

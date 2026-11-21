@@ -2906,7 +2906,7 @@ private:
 	int	  m_iAttachmentIndex;
 	bool  m_bSnapToGoal;
 
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	bool  m_bInterpolatePosition;
 
 	// these are interpolation vars used for interpolating the camera over time
@@ -2923,7 +2923,7 @@ private:
 	COutputEvent m_OnEndFollow;
 };
 
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 const float CTriggerCamera::kflPosInterpTime = 2.0f;
 #endif
 
@@ -2948,7 +2948,7 @@ BEGIN_DATADESC( CTriggerCamera )
 	DEFINE_KEYFIELD( m_iszTargetAttachment, FIELD_STRING, "targetattachment" ),
 	DEFINE_FIELD( m_iAttachmentIndex, FIELD_INTEGER ),
 	DEFINE_FIELD( m_bSnapToGoal, FIELD_BOOLEAN ),
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	DEFINE_KEYFIELD( m_bInterpolatePosition, FIELD_BOOLEAN, "interpolatepositiontoplayer" ),
 	DEFINE_FIELD( m_vStartPos, FIELD_VECTOR ),
 	DEFINE_FIELD( m_vEndPos, FIELD_VECTOR ),
@@ -3183,7 +3183,7 @@ void CTriggerCamera::Enable( void )
 
 	// copy over player information. If we're interpolating from
 	// the player position, do something more elaborate.
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	if (m_bInterpolatePosition)
 	{
 		// initialize the values we'll spline between
@@ -3401,7 +3401,7 @@ void CTriggerCamera::Move()
 
 	// In vanilla HL2, the camera is either on a path, or doesn't move. In episodic
 	// we add the capacity for interpolation to the start point. 
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	if (m_pPath)
 #else
 	// Not moving on a path, return
@@ -3444,7 +3444,7 @@ void CTriggerCamera::Move()
 		float fraction = 2 * gpGlobals->frametime;
 		SetAbsVelocity( ((m_vecMoveDir * m_flSpeed) * fraction) + (GetAbsVelocity() * (1-fraction)) );
 	}
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	else if (m_bInterpolatePosition)
 	{
 		// get the interpolation parameter [0..1]

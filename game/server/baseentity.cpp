@@ -2681,7 +2681,7 @@ void CBaseEntity::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 	}
 	PhysCollisionScreenShake( pEvent, index );
 
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	// episodic does something different for when advisor shields are struck
 	if ( phit->game.material == 'Z' || pprops->game.material == 'Z')
 	{

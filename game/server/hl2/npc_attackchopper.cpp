@@ -5322,7 +5322,7 @@ void CGrenadeHelicopter::VPhysicsCollision( int index, gamevcollisionevent_t *pE
 }
 
 
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 //------------------------------------------------------------------------------
 // double launch velocity for ep2_outland_08
 //------------------------------------------------------------------------------
@@ -5339,7 +5339,7 @@ Vector CGrenadeHelicopter::PhysGunLaunchVelocity( const Vector &forward, float f
 //------------------------------------------------------------------------------
 float CGrenadeHelicopter::GetBombLifetime()
 {
-#if HL2_EPISODIC
+#if defined(HL2_EPISODIC)
 	return m_flLifetime;
 #else
 	return BOMB_LIFETIME;
