@@ -174,6 +174,8 @@ IPhysicsObject *PhysModelCreateOBB( CBaseEntity *pEntity, const Vector &mins, co
 	return PhysModelCreateCustom( pEntity, pCollide, origin, angle, STRING(pEntity->GetModelName()), isStatic, &solid );
 }
 
+// parse the parameters for a solid matching a particular index
+bool PhysModelParseSolidByIndex( solid_t &solid, CBaseEntity *pEntity, vcollide_t *pCollide, int solidIndex );
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -189,45 +191,8 @@ bool PhysModelParseSolidByIndex( solid_t &solid, CBaseEntity *pEntity, int model
 	if ( !pCollide )
 		return false;
 
-	bool parsed = false;
-
-	memset( &solid, 0, sizeof(solid) );
-	solid.params = g_PhysDefaultObjectParams;
-
-	IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pCollide->pKeyValues );
-	while ( !pParse->Finished() )
-	{
-		const char *pBlock = pParse->GetCurrentBlockName();
-		if ( V_strieq( pBlock, "solid" ) )
-		{
-			solid_t tmpSolid;
-			memset( &tmpSolid, 0, sizeof(tmpSolid) );
-			tmpSolid.params = g_PhysDefaultObjectParams;
-
-			pParse->ParseSolid( &tmpSolid, &g_SolidSetup );
-
-			if ( solidIndex < 0 || tmpSolid.index == solidIndex )
-			{
-				parsed = true;
-				solid = tmpSolid;
-				// just to be sure we aren't ever getting a non-zero solid by accident
-				Assert( solidIndex >= 0 || solid.index == 0 );
-				break;
-			}
-		}
-		else
-		{
-			pParse->SkipBlock();
-		}
-	}
-	physcollision->VPhysicsKeyParserDestroy( pParse );
-
-	// collisions are off by default, so need to enable.
-	solid.params.enableCollisions = true;
-
-	solid.params.pGameData = pEntity;
-	solid.params.pName = STRING(pEntity->GetModelName());
-	return parsed;
+	// dimhotepus: Reuse existing parser instead of copy-paste.
+	return PhysModelParseSolidByIndex( solid, pEntity, pCollide, solidIndex );
 }
 
 //-----------------------------------------------------------------------------
