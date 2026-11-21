@@ -1327,7 +1327,8 @@ CON_COMMAND_F(surfaceprop, "Reports the surface properties at the cursor", FCVAR
 		float length = vecVelocity.Length();
 
 		Msg("Hit surface \"%s\" (entity %s, model \"%s\" %s), texture \"%s\"\n", physprops->GetPropName( tr.surface.surfaceProps ), tr.m_pEnt->GetClassname(), pModelName, modelStuff.Access(), tr.surface.name);
-		Msg("Distance to surface: %2.f\n", length );
+		// dimhotepus: Print distance to surface with 2 digits after dot.
+		Msg("Distance to surface: %.2f\n", length );
 	}
 }
 
