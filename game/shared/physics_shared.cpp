@@ -633,7 +633,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 				continue;
 
 			// dimhotepus: Ensure solid index is in range.
-			if ( !pWorldCollide->solids[solid.index] || solid.index >= pWorldCollide->solidCount )
+			if ( solid.index < 0 || solid.index >= pWorldCollide->solidCount || !pWorldCollide->solids[solid.index] )
 			{
 				// this implies that the collision model is a mopp and the physics DLL doesn't support that.
 				bCreateVirtualTerrain = true;
