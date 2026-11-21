@@ -243,7 +243,7 @@ void CPhysicsHook::LevelInitPreEntity()
 
 	physenv->SetObjectEventHandler( &g_Collisions );
 	
-	physenv->SetSimulationTimestep( gpGlobals->interval_per_tick ); // 15 ms per tick
+	physenv->SetSimulationTimestep( gpGlobals->interval_per_tick );
 	// HL Game gravity, not real-world gravity
 	physenv->SetGravity( Vector( 0, 0, -GetCurrentGravity() ) );
 	g_PhysAverageSimTime = 0;

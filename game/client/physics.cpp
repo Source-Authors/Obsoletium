@@ -177,7 +177,6 @@ void PhysicsLevelInit( void )
 	// TODO: need to get the right factory function here
 	//physenv->SetDebugOverlay( appSystemFactory );
 	physenv->SetGravity( Vector(0, 0, -GetCurrentGravity() ) );
-	// 15 ms per tick
 	// NOTE: Always run client physics at this rate - helps keep ragdolls stable
 	physenv->SetSimulationTimestep( gpGlobals->interval_per_tick );
 	physenv->SetCollisionEventHandler( &g_Collisions );
