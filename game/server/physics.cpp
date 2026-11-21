@@ -1177,7 +1177,6 @@ void PhysSetMassCenterOverride( masscenteroverride_t &override )
 	}
 }
 
-// NOTE: This will remove the entry from the list as well
 int PhysGetMassCenterOverrideIndex( string_t name )
 {
 	if ( name != NULL_STRING && g_PhysicsHook.m_massCenterOverrides.Count() )
@@ -1193,6 +1192,7 @@ int PhysGetMassCenterOverrideIndex( string_t name )
 	return -1;
 }
 
+// NOTE: This will remove the entry from the list as well
 void PhysGetMassCenterOverride( CBaseEntity *pEntity, vcollide_t *pCollide, solid_t &solidOut )
 {
 	int index = PhysGetMassCenterOverrideIndex( pEntity->GetEntityName() );
