@@ -1318,8 +1318,9 @@ CON_COMMAND_F(surfaceprop, "Reports the surface properties at the cursor", FCVAR
 		CFmtStr modelStuff;
 		if ( pModel )
 		{
-			modelStuff.sprintf("%s.%s ", modelinfo->IsTranslucent( pModel ) ? "Translucent" : "Opaque", 
-				modelinfo->IsTranslucentTwoPass( pModel ) ? "  Two-pass." : "" );
+			// dimhotepus: Drop unneeded spaces.
+			modelStuff.sprintf("%s.%s", modelinfo->IsTranslucent( pModel ) ? "Translucent" : "Opaque", 
+				modelinfo->IsTranslucentTwoPass( pModel ) ? " Two-pass." : "" );
 		}
 		
 		// Calculate distance to surface that was hit
