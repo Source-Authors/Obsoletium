@@ -2194,6 +2194,7 @@ void CBaseEntity::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 static CBaseEntity *FindPhysicsBlocker( IPhysicsObject *pPhysics, physicspushlist_t &list, const Vector &pushVel )
 {
 	IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();
+	RunCodeAtScopeExit( pPhysics->DestroyFrictionSnapshot( pSnapshot ) );
 	CBaseEntity *pBlocker = NULL;
 	float maxForce = 0;
 	while ( pSnapshot->IsValid() )
@@ -2224,7 +2225,6 @@ static CBaseEntity *FindPhysicsBlocker( IPhysicsObject *pPhysics, physicspushlis
 
 		pSnapshot->NextFrictionData();
 	}
-	pPhysics->DestroyFrictionSnapshot( pSnapshot );
 
 	return pBlocker;
 }

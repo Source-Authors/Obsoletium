@@ -1642,6 +1642,7 @@ static CBaseEntity *FindPhysicsBlockerForHierarchy( CBaseEntity *pParentEntity )
 		if ( pPhysics )
 		{
 			IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();
+			RunCodeAtScopeExit( pPhysics->DestroyFrictionSnapshot( pSnapshot ) );
 			while ( pSnapshot->IsValid() )
 			{
 				IPhysicsObject *pOther = pSnapshot->GetObject(1);
@@ -1659,7 +1660,6 @@ static CBaseEntity *FindPhysicsBlockerForHierarchy( CBaseEntity *pParentEntity )
 				}
 				pSnapshot->NextFrictionData();
 			}
-			pPhysics->DestroyFrictionSnapshot( pSnapshot );
 		}
 	}
 	return pPhysicsBlocker;

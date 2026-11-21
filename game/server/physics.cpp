@@ -632,6 +632,7 @@ bool FindMaxContact( IPhysicsObject *pObject, float minForce, IPhysicsObject **p
 	float maxForce = minForce;
 	*pOtherObject = NULL;
 	IPhysicsFrictionSnapshot *pSnapshot = pObject->CreateFrictionSnapshot();
+	RunCodeAtScopeExit( pObject->DestroyFrictionSnapshot( pSnapshot ) );
 	while ( pSnapshot->IsValid() )
 	{
 		IPhysicsObject *pOther = pSnapshot->GetObject(1);
@@ -648,11 +649,7 @@ bool FindMaxContact( IPhysicsObject *pObject, float minForce, IPhysicsObject **p
 		}
 		pSnapshot->NextFrictionData();
 	}
-	pObject->DestroyFrictionSnapshot( pSnapshot );
-	if ( *pOtherObject )
-		return true;
-
-	return false;
+	return *pOtherObject ? true : false;
 }
 
 bool CCollisionEvent::ShouldFreezeObject( IPhysicsObject *pObject )
@@ -2445,6 +2442,7 @@ void CCollisionEvent::StartTouch( IPhysicsObject *pObject1, IPhysicsObject *pObj
 static int CountPhysicsObjectEntityContacts( IPhysicsObject *pObject, CBaseEntity *pEntity )
 {
 	IPhysicsFrictionSnapshot *pSnapshot = pObject->CreateFrictionSnapshot();
+	RunCodeAtScopeExit( pObject->DestroyFrictionSnapshot( pSnapshot ) );
 	int count = 0;
 	while ( pSnapshot->IsValid() )
 	{
@@ -2454,7 +2452,6 @@ static int CountPhysicsObjectEntityContacts( IPhysicsObject *pObject, CBaseEntit
 			count++;
 		pSnapshot->NextFrictionData();
 	}
-	pObject->DestroyFrictionSnapshot( pSnapshot );
 	return count;
 }
 
@@ -2858,6 +2855,7 @@ static ConCommand air_density("air_density", CC_AirDensity, "Changes the density
 void DebugDrawContactPoints(IPhysicsObject *pPhysics)
 {
 	IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();
+	RunCodeAtScopeExit( pPhysics->DestroyFrictionSnapshot( pSnapshot ) );
 
 	while ( pSnapshot->IsValid() )
 	{
@@ -2873,5 +2871,4 @@ void DebugDrawContactPoints(IPhysicsObject *pPhysics)
 		pSnapshot->NextFrictionData();
 	}
 	pSnapshot->DeleteAllMarkedContacts( true );
-	pPhysics->DestroyFrictionSnapshot( pSnapshot );
 }

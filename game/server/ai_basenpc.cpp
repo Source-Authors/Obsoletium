@@ -6602,6 +6602,7 @@ void CAI_BaseNPC::CheckPhysicsContacts()
 	{
 		IPhysicsObject *pPhysics = VPhysicsGetObject();
 		IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();
+		RunCodeAtScopeExit( pPhysics->DestroyFrictionSnapshot( pSnapshot ) );
 		CBaseEntity *pGroundEntity = GetGroundEntity();
 		float heightCheck = GetAbsOrigin().z + GetHullMaxs().z;
 		Vector npcVel;
@@ -6656,7 +6657,6 @@ void CAI_BaseNPC::CheckPhysicsContacts()
 			}
 			pSnapshot->NextFrictionData();
 		}
-		pPhysics->DestroyFrictionSnapshot( pSnapshot );
 		if ( createSolver )
 		{
 			// turn collisions back on once we've been separated for enough time

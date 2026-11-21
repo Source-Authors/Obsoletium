@@ -836,6 +836,7 @@ void PhysComputeSlideDirection( IPhysicsObject *pPhysics, const Vector &inputVel
 	AngularImpulse angVel = inputAngularVelocity;
 
 	IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();
+	RunCodeAtScopeExit( pPhysics->DestroyFrictionSnapshot( pSnapshot ) );
 	while ( pSnapshot->IsValid() )
 	{
 		IPhysicsObject *pOther = pSnapshot->GetObject( 1 );
@@ -860,7 +861,6 @@ void PhysComputeSlideDirection( IPhysicsObject *pPhysics, const Vector &inputVel
 		}
 		pSnapshot->NextFrictionData();
 	}
-	pPhysics->DestroyFrictionSnapshot( pSnapshot );
 
 	//NDebugOverlay::Line( pos, pos + unitVel * 20, 0, 0, 255, true, 0.1 );
 	
@@ -879,6 +879,7 @@ bool PhysHasContactWithOtherInDirection( IPhysicsObject *pPhysics, const Vector 
 	bool hit = false;
 	void *pGameData = pPhysics->GetGameData();
 	IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();
+	RunCodeAtScopeExit( pPhysics->DestroyFrictionSnapshot( pSnapshot ) );
 	while ( pSnapshot->IsValid() )
 	{
 		IPhysicsObject *pOther = pSnapshot->GetObject( 1 );
@@ -894,7 +895,6 @@ bool PhysHasContactWithOtherInDirection( IPhysicsObject *pPhysics, const Vector 
 		}
 		pSnapshot->NextFrictionData();
 	}
-	pPhysics->DestroyFrictionSnapshot( pSnapshot );
 
 	return hit;
 }
@@ -903,6 +903,7 @@ bool PhysHasContactWithOtherInDirection( IPhysicsObject *pPhysics, const Vector 
 void PhysForceClearVelocity( IPhysicsObject *pPhys )
 {
 	IPhysicsFrictionSnapshot *pSnapshot = pPhys->CreateFrictionSnapshot();
+	RunCodeAtScopeExit( pPhys->DestroyFrictionSnapshot( pSnapshot ) );
 	// clear the velocity of the rigid body
 	Vector vel{0.0f, 0.0f, 0.0f};
 	AngularImpulse angVel{0.0f, 0.0f, 0.0f};
@@ -914,7 +915,6 @@ void PhysForceClearVelocity( IPhysicsObject *pPhys )
 		pSnapshot->RecomputeFriction();
 		pSnapshot->NextFrictionData();
 	}
-	pPhys->DestroyFrictionSnapshot( pSnapshot );
 }
 
 

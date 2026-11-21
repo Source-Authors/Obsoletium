@@ -229,6 +229,7 @@ bool CPhysicsNPCSolver::CheckTouching()
 		return false;
 
 	IPhysicsFrictionSnapshot *pSnapshot = pPhysics->CreateFrictionSnapshot();
+	RunCodeAtScopeExit( pPhysics->DestroyFrictionSnapshot( pSnapshot ) );
 	bool found = false;
 	bool penetrate = false;
 
@@ -248,7 +249,6 @@ bool CPhysicsNPCSolver::CheckTouching()
 		pSnapshot->NextFrictionData();
 	}
 	pSnapshot->DeleteAllMarkedContacts( true );
-	pPhysics->DestroyFrictionSnapshot( pSnapshot );
 
 	// if the object is penetrating something, check to see if it's intersecting this NPC
 	// if so, go ahead and switch over to penetration solver mode

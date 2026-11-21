@@ -860,6 +860,7 @@ static bool InContactWithHeavyObject( IPhysicsObject *pObject, float heavyMass )
 {
 	bool contact = false;
 	IPhysicsFrictionSnapshot *pSnapshot = pObject->CreateFrictionSnapshot();
+	RunCodeAtScopeExit( pObject->DestroyFrictionSnapshot( pSnapshot ) );
 	while ( pSnapshot->IsValid() )
 	{
 		IPhysicsObject *pOther = pSnapshot->GetObject( 1 );
@@ -870,7 +871,6 @@ static bool InContactWithHeavyObject( IPhysicsObject *pObject, float heavyMass )
 		}
 		pSnapshot->NextFrictionData();
 	}
-	pObject->DestroyFrictionSnapshot( pSnapshot );
 	return contact;
 }
 
