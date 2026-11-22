@@ -1341,6 +1341,17 @@ void CPhysicsEnvironment::SerializeObjectToBuffer( IPhysicsObject *pObject, unsi
 		vphysics_save_cphysicsobject_t *pTemplate = reinterpret_cast<vphysics_save_cphysicsobject_t *>(pBuffer);
 		pPhysics->WriteToTemplate( *pTemplate );
 	}
+	else
+	{
+		// dimhotepus: Notify buffer size is too small.
+		AssertMsg( false,
+			"Buffer size %u is too small to serialize physical object (%zu).",
+			bufferSize,
+			sizeof( vphysics_save_cphysicsobject_t ) );
+		Warning( "Buffer size %u is too small to serialize physical object (%zu).",
+			bufferSize,
+			sizeof( vphysics_save_cphysicsobject_t ) );
+	}
 }
 
 IPhysicsObject *CPhysicsEnvironment::UnserializeObjectFromBuffer( void *pGameData, unsigned char *pBuffer, unsigned int bufferSize, bool enableCollisions )
