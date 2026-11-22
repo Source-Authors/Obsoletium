@@ -339,6 +339,8 @@ void CMDLPanel::DrawCollisionModel()
 
 			if ( vertCount )
 			{
+				RunCodeAtScopeExit( g_pPhysicsCollision->DestroyDebugMesh( vertCount, outVerts ) );
+
 				CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 				pRenderContext->CullMode( MATERIAL_CULLMODE_CCW );
 				// NOTE: assumes these have been set up already by the model render code
@@ -370,8 +372,6 @@ void CMDLPanel::DrawCollisionModel()
 				meshBuilder.End();
 				pMesh->Draw();
 			}
-
-			g_pPhysicsCollision->DestroyDebugMesh( vertCount, outVerts );
 		}
 		else
 		{
