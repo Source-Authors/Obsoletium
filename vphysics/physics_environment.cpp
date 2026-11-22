@@ -1446,7 +1446,11 @@ IPhysicsSpring *CPhysicsEnvironment::CreateSpring( IPhysicsObject *pObjectStart,
 IPhysicsFluidController *CPhysicsEnvironment::CreateFluidController( IPhysicsObject *pFluidObject, fluidparams_t *pParams )
 {
 	CPhysicsFluidController *pFluid = ::CreateFluidController( m_pPhysEnv, static_cast<CPhysicsObject *>(pFluidObject), pParams );
-	m_fluids.AddToTail( pFluid );
+	// dimhotepus: Add fluid only if created.
+	if ( pFluid )
+	{
+		m_fluids.AddToTail( pFluid );
+	}
 	return pFluid;
 }
 
