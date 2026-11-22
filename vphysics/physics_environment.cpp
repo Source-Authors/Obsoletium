@@ -1685,7 +1685,13 @@ void CPhysicsEnvironment::DestroyFluidController( IPhysicsFluidController *pFlui
 
 void CPhysicsEnvironment::DestroyConstraint( IPhysicsConstraint *pConstraint )
 {
-	if ( !m_deleteQuick && pConstraint )
+	if ( !pConstraint )
+	{
+		// dimhotepus: Early return to prevent nullptr deref.
+		return;
+	}
+
+	if ( !m_deleteQuick )
 	{
 		IPhysicsObject *pObj0 = pConstraint->GetReferenceObject();
 		if ( pObj0 )
