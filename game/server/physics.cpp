@@ -329,6 +329,7 @@ bool CPhysicsHook::FindOrAddVehicleScript( const char *pScriptName, vehicleparam
 			m_vehicleScripts[index].sounds.Init();
 
 			IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( (char *)pFile );
+			RunCodeAtScopeExit( physcollision->VPhysicsKeyParserDestroy( pParse ) );
 			while ( !pParse->Finished() )
 			{
 				const char *pBlock = pParse->GetCurrentBlockName();
@@ -347,7 +348,6 @@ bool CPhysicsHook::FindOrAddVehicleScript( const char *pScriptName, vehicleparam
 					pParse->SkipBlock();
 				}
 			}
-			physcollision->VPhysicsKeyParserDestroy( pParse );
 		}
 	}
 
@@ -1163,9 +1163,9 @@ void PhysSolidOverride( solid_t &solid, string_t overrideScript )
 
 		// parse that sucker
 		IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pTmpString );
+		RunCodeAtScopeExit( physcollision->VPhysicsKeyParserDestroy( pParse ) );
 		CSkipKeys tmp;
 		pParse->ParseSolid( &solid, &tmp );
-		physcollision->VPhysicsKeyParserDestroy( pParse );
 
 		// parser destroys this data
 		solid.params.enableCollisions = collisions;

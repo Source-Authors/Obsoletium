@@ -318,6 +318,7 @@ void CMDLPanel::DrawCollisionModel()
 	static color32 color = {255,0,0,0};
 
 	IVPhysicsKeyParser *pParser = g_pPhysicsCollision->VPhysicsKeyParserCreate( pCollide->pKeyValues );
+	RunCodeAtScopeExit( g_pPhysicsCollision->VPhysicsKeyParserDestroy( pParser ) );
 	CStudioHdr studioHdr( g_pMDLCache->GetStudioHdr( m_RootMDL.m_MDL.GetMDL() ), g_pMDLCache );
 
 	matrix3x4_t pBoneToWorld[MAXSTUDIOBONES];
@@ -378,7 +379,6 @@ void CMDLPanel::DrawCollisionModel()
 			pParser->SkipBlock();
 		}
 	}
-	g_pPhysicsCollision->VPhysicsKeyParserDestroy( pParser );
 }
 
 void CMDLPanel::SetupRenderState( int nDisplayWidth, int nDisplayHeight )

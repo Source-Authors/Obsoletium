@@ -463,6 +463,8 @@ LINK_ENTITY_TO_CLASS( phys_bone_follower, CBoneFollower );
 void CreateBoneFollowersFromRagdoll( CBaseAnimating *pEntity, CBoneFollowerManager *pManager, vcollide_t *pCollide )
 {
 	IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pCollide->pKeyValues );
+	// dimhotepus: Fix parser leak.
+	RunCodeAtScopeExit( physcollision->VPhysicsKeyParserDestroy( pParse ) );
 	while ( !pParse->Finished() )
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();

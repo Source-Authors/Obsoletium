@@ -641,6 +641,7 @@ void BuildPropList( const char *pszBlockName, CUtlVector<breakmodel_t> &list, in
 		return;
 
 	IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pCollide->pKeyValues );
+	RunCodeAtScopeExit( physcollision->VPhysicsKeyParserDestroy( pParse ) );
 	while ( !pParse->Finished() )
 	{
 		CBreakParser breakParser( defBurstScale, defCollisionGroup );
@@ -656,7 +657,6 @@ void BuildPropList( const char *pszBlockName, CUtlVector<breakmodel_t> &list, in
 			pParse->SkipBlock();
 		}
 	}
-	physcollision->VPhysicsKeyParserDestroy( pParse );
 }
 
 void BreakModelList( CUtlVector<breakmodel_t> &list, int modelindex, float defBurstScale, int defCollisionGroup )
@@ -1249,6 +1249,7 @@ void PrecachePropsForModel( int iModel, const char *pszBlockName )
 
 	// Create a parser.
 	IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pCollide->pKeyValues );
+	RunCodeAtScopeExit( physcollision->VPhysicsKeyParserDestroy( pParse ) );
 	while ( !pParse->Finished() )
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();
@@ -1263,9 +1264,6 @@ void PrecachePropsForModel( int iModel, const char *pszBlockName )
 			pParse->SkipBlock();
 		}
 	}
-
-	// Destroy the parser.
-	physcollision->VPhysicsKeyParserDestroy( pParse );
 }
 
 void PrecacheGibsForModel( int iModel )

@@ -787,6 +787,7 @@ bool CPropVehicleChoreoGeneric::ParseViewParams( const char *pScriptName )
 	RunCodeAtScopeExit(UTIL_FreeFile(pFile));
 
 	IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( (char *)pFile );
+	RunCodeAtScopeExit( physcollision->VPhysicsKeyParserDestroy( pParse ) );
 	CVehicleChoreoViewParser viewParser;
 	while ( !pParse->Finished() )
 	{
@@ -800,7 +801,6 @@ bool CPropVehicleChoreoGeneric::ParseViewParams( const char *pScriptName )
 			pParse->SkipBlock();
 		}
 	}
-	physcollision->VPhysicsKeyParserDestroy( pParse );
 
 	Precache();
 

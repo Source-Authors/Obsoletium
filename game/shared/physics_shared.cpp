@@ -199,6 +199,7 @@ bool PhysModelParseSolidByIndex( solid_t &solid, CBaseEntity *pEntity, vcollide_
 	solid.params = g_PhysDefaultObjectParams;
 
 	IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pCollide->pKeyValues );
+	RunCodeAtScopeExit( physcollision->VPhysicsKeyParserDestroy( pParse ) );
 	while ( !pParse->Finished() )
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();
@@ -224,7 +225,6 @@ bool PhysModelParseSolidByIndex( solid_t &solid, CBaseEntity *pEntity, vcollide_
 			pParse->SkipBlock();
 		}
 	}
-	physcollision->VPhysicsKeyParserDestroy( pParse );
 
 	// collisions are off by default
 	solid.params.enableCollisions = true;
@@ -577,6 +577,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 	//PhysCheckAdd( world, "World" );
 	// walk the world keys in case there are some fluid volumes to create
 	IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pWorldCollide->pKeyValues );
+	RunCodeAtScopeExit( physcollision->VPhysicsKeyParserDestroy( pParse ) );
 
 	bool bCreateVirtualTerrain = false;
 	while ( !pParse->Finished() )
@@ -662,7 +663,6 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 			pParse->SkipBlock();
 		}
 	}
-	physcollision->VPhysicsKeyParserDestroy( pParse );
 
 	if ( bCreateVirtualTerrain && physcollision->SupportsVirtualMesh() )
 	{

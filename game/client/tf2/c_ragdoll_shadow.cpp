@@ -101,6 +101,7 @@ IPhysicsObject *PhysModelCreateRagdoll( C_BaseEntity *pEntity, int modelIndex, c
 	solid.params = g_PhysDefaultObjectParams;
 
 	IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pCollide->pKeyValues );
+	RunCodeAtScopeExit( physcollision->VPhysicsKeyParserDestroy( pParse ) );
 	while ( !pParse->Finished() )
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();
@@ -114,7 +115,6 @@ IPhysicsObject *PhysModelCreateRagdoll( C_BaseEntity *pEntity, int modelIndex, c
 			pParse->SkipBlock();
 		}
 	}
-	physcollision->VPhysicsKeyParserDestroy( pParse );
 
 	// collisions are off by default
 	solid.params.enableCollisions = true;

@@ -306,6 +306,7 @@ public:
 void CStudioPhysics::ParseKeydata( void )
 {
 	IVPhysicsKeyParser *pParser = physcollision->VPhysicsKeyParserCreate( GetVCollide()->pKeyValues );
+	RunCodeAtScopeExit( physcollision->VPhysicsKeyParserDestroy( pParse ) );
 
 	while ( !pParser->Finished() )
 	{
@@ -353,7 +354,6 @@ void CStudioPhysics::ParseKeydata( void )
 			pParser->SkipBlock();
 		}
 	}
-	physcollision->VPhysicsKeyParserDestroy( pParser );
 }
 
 

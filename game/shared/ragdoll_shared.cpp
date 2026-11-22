@@ -154,6 +154,7 @@ void RagdollSetupAnimatedFriction( IPhysicsEnvironment *pPhysEnv, ragdoll_t *rag
 	if ( pCollide )
 	{
 		IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pCollide->pKeyValues );
+		RunCodeAtScopeExit( physcollision->VPhysicsKeyParserDestroy( pParse ) );
 
 		while ( !pParse->Finished() )
 		{
@@ -169,8 +170,6 @@ void RagdollSetupAnimatedFriction( IPhysicsEnvironment *pPhysEnv, ragdoll_t *rag
 				pParse->SkipBlock();
 			}
 		}
-
-		physcollision->VPhysicsKeyParserDestroy( pParse );
 	}
 }
 
@@ -277,6 +276,7 @@ static void RagdollCreateObjects( IPhysicsEnvironment *pPhysEnv, ragdoll_t &ragd
 	ragdoll.pGroup = pPhysEnv->CreateConstraintGroup( group );
  
 	IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( params.pCollide->pKeyValues );
+	RunCodeAtScopeExit( physcollision->VPhysicsKeyParserDestroy( pParse ) );
 	while ( !pParse->Finished() )
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();
@@ -309,7 +309,6 @@ static void RagdollCreateObjects( IPhysicsEnvironment *pPhysEnv, ragdoll_t &ragd
 			pParse->SkipBlock();
 		}
 	}
-	physcollision->VPhysicsKeyParserDestroy( pParse );
 }
 
 void RagdollSetupCollisions( ragdoll_t &ragdoll, vcollide_t *pCollide, int modelIndex )
@@ -328,6 +327,7 @@ void RagdollSetupCollisions( ragdoll_t &ragdoll, vcollide_t *pCollide, int model
 		bool bFoundRules = false;
 
 		IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pCollide->pKeyValues );
+		RunCodeAtScopeExit( physcollision->VPhysicsKeyParserDestroy( pParse ) );
 		while ( !pParse->Finished() )
 		{
 			const char *pBlock = pParse->GetCurrentBlockName();
@@ -343,7 +343,6 @@ void RagdollSetupCollisions( ragdoll_t &ragdoll, vcollide_t *pCollide, int model
 				pParse->SkipBlock();
 			}
 		}
-		physcollision->VPhysicsKeyParserDestroy( pParse );
 
 		if ( !bFoundRules )
 		{
@@ -535,6 +534,7 @@ int RagdollExtractBoneIndices( int *boneIndexOut, CStudioHdr *pStudioHdr, vcolli
 	int elementCount = 0;
 
 	IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pCollide->pKeyValues );
+	RunCodeAtScopeExit( physcollision->VPhysicsKeyParserDestroy( pParse ) );
 	while ( !pParse->Finished() )
 	{
 		const char *pBlock = pParse->GetCurrentBlockName();
@@ -553,7 +553,6 @@ int RagdollExtractBoneIndices( int *boneIndexOut, CStudioHdr *pStudioHdr, vcolli
 			pParse->SkipBlock();
 		}
 	}
-	physcollision->VPhysicsKeyParserDestroy( pParse );
 
 	return elementCount;
 }
