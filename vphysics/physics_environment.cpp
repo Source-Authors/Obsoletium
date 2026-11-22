@@ -1296,8 +1296,7 @@ void CPhysicsEnvironment::SetGravity( const Vector& gravityVector )
     IVP_U_Point gravity; 
 
 	ConvertPositionToIVP( gravityVector, gravity );
-    m_pPhysEnv->set_gravity( &gravity );
-	// BUGBUG: global collision tolerance has a constant that depends on gravity.
+	m_pPhysEnv->set_gravity( &gravity );
 	m_pPhysEnv->set_global_collision_tolerance( m_pPhysEnv->get_global_collision_tolerance(), gravity.real_length() );
 	DevMsg(1,"Set Gravity %.1f (%.3f tolerance)\n", gravityVector.Length(), IVP2HL(m_pPhysEnv->get_global_collision_tolerance()) );
 }
