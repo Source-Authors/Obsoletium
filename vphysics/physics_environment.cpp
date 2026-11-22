@@ -1621,7 +1621,16 @@ float CPhysicsEnvironment::GetSimulationTimestep( void ) const
 
 void CPhysicsEnvironment::SetSimulationTimestep( float timestep )
 {
+	// dimhotepus: Angular velocity limit is stored per PSI, so rescale it with the timestep.
+	const double oldDt = m_pPhysEnv->get_delta_PSI_time();
+
 	m_pPhysEnv->set_delta_PSI_time( timestep );
+
+	if ( IVP_Anomaly_Limits *limits = m_pPhysEnv->get_anomaly_limits() )
+	{
+		if ( oldDt > 0.0 )
+			limits->max_angular_velocity_per_psi *= m_pPhysEnv->get_delta_PSI_time() / oldDt;
+	}
 }
 
 float CPhysicsEnvironment::GetSimulationTime( void ) const
