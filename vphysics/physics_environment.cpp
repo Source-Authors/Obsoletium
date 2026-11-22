@@ -941,34 +941,12 @@ public:
 		}
 		return IVP_TRUE;
 	}
-	// return number of additional checks to do this psi
-    int max_collision_checks_exceeded( int totalChecks )
-	{
-		if ( m_pSolver )
-		{
-			return m_pSolver->AdditionalCollisionChecksThisTick( totalChecks );
-		}
-		return 0;
-	}
 	void max_velocity_exceeded(IVP_Anomaly_Limits *al, IVP_Core *pCore, IVP_U_Float_Point *velocity_in_out) override
 	{
 		CPhysicsObject *pObject = static_cast<CPhysicsObject *>(pCore->objects.element_at(0)->client_data);
 		if ( pObject->GetShadowController() != NULL )
 			return;
 		IVP_Anomaly_Manager::max_velocity_exceeded(al, pCore, velocity_in_out);
-	}
-	IVP_BOOL max_contacts_exceeded_check_freezing( IVP_Core **pCoreList, int coreCount )
-	{
-		CUtlVector<IPhysicsObject *> list;
-		list.EnsureCapacity(coreCount);
-		for ( int i = 0; i < coreCount; i++ )
-		{
-			IVP_Core *pCore = pCoreList[i];
-			CPhysicsObject *pObject = static_cast<CPhysicsObject *>(pCore->objects.element_at(0)->client_data);
-			list.AddToTail(pObject);
-		}
-
-		return m_pSolver->ShouldFreezeContacts( list.Base(), list.Count() ) ? IVP_TRUE : IVP_FALSE;
 	}
 
 
