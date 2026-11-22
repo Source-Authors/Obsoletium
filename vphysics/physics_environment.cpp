@@ -1787,6 +1787,7 @@ void CPhysicsEnvironment::DestroyShadowController( IPhysicsShadowController *pCo
 IPhysicsPlayerController *CPhysicsEnvironment::CreatePlayerController( IPhysicsObject *pObject )
 {
 	IPhysicsPlayerController *pController = ::CreatePlayerController( static_cast<CPhysicsObject*>(pObject) );
+	// dimhotepus: Never nullptr, so no check.
 	AddPlayerController( pController );
 	return pController;
 }
@@ -1895,6 +1896,7 @@ void CPhysicsEnvironment::PhantomRemove( CPhysicsObject *pObject )
 IPhysicsObject *CPhysicsEnvironment::CreateSphereObject( float radius, intp materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams, bool isStatic )
 {
 	IPhysicsObject *pObject = ::CreatePhysicsSphere( this, radius, materialIndex, position, angles, pParams, isStatic );
+	// dimhotepus: Never nullptr, so no check.
 	m_objects.AddToTail( pObject );
 	return pObject;
 }
