@@ -2098,6 +2098,10 @@ public:
 		delete m_pObjectHash;
 	}
 
+	// dimhotepus: Delete to be safe.
+	CObjectPairHash( const CObjectPairHash & ) = delete;
+	CObjectPairHash& operator=( const CObjectPairHash & ) = delete;
+
 	// converts the void * stored in the hash to a list in the multilist
 	unsigned short HashToListIndex( void *pHash ) const
 	{
