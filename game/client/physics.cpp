@@ -82,6 +82,9 @@ public:
 	// IPhysicsObjectEvent
 	virtual void ObjectWake( IPhysicsObject *pObject )
 	{
+		// dimhotepus: Entity code is called from here, so PhysIsInCallback() must report true.
+		CallbackContext callback(this);
+
 		C_BaseEntity *pEntity = static_cast<C_BaseEntity *>(pObject->GetGameData());
 		if (pEntity && pEntity->HasDataObjectType(VPHYSICSWATCHER))
 		{
@@ -91,6 +94,9 @@ public:
 
 	virtual void ObjectSleep( IPhysicsObject *pObject )
 	{
+		// dimhotepus: Entity code is called from here, so PhysIsInCallback() must report true.
+		CallbackContext callback(this);
+
 		C_BaseEntity *pEntity = static_cast<C_BaseEntity *>(pObject->GetGameData());
 		if ( pEntity && pEntity->HasDataObjectType( VPHYSICSWATCHER ) )
 		{
