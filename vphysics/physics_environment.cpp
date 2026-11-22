@@ -336,7 +336,9 @@ public:
 				CPhysicsObject *pScrape = (CPhysicsObject *)pobj->client_data;
 
 				// friction callbacks for this object?
-				if ( pScrape->CallbackFlags() & CALLBACK_GLOBAL_FRICTION )
+				// dimhotepus: Checks client data aka scrape is present.
+				Assert( pScrape );
+				if ( pScrape && pScrape->CallbackFlags() & CALLBACK_GLOBAL_FRICTION )
 				{
 					float energy = IVP_Contact_Point_API::get_eliminated_energy( contact );
 					if ( energy ) 
@@ -944,7 +946,9 @@ public:
 	void max_velocity_exceeded(IVP_Anomaly_Limits *al, IVP_Core *pCore, IVP_U_Float_Point *velocity_in_out) override
 	{
 		CPhysicsObject *pObject = static_cast<CPhysicsObject *>(pCore->objects.element_at(0)->client_data);
-		if ( pObject->GetShadowController() != NULL )
+		// dimhotepus: Check client data is set.
+		Assert( pObject );
+		if ( !pObject || pObject->GetShadowController() != NULL )
 			return;
 		IVP_Anomaly_Manager::max_velocity_exceeded(al, pCore, velocity_in_out);
 	}
@@ -1053,6 +1057,13 @@ public:
 
 			IVP_Real_Object *pivp = pCore->objects.element_at(0);
 			CPhysicsObject *pPhys = static_cast<CPhysicsObject *>(pivp->client_data);
+
+			// dimhotepus: Checks client data is present.
+			Assert( pPhys );
+			if ( !pPhys )
+			{
+				return;
+			}
 			
 			float dragForce = -0.5f * pPhys->GetDragInDirection( pCore->speed ) * m_airDensity * event->delta_time;
 			if ( dragForce < -1.0f )
