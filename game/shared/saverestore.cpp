@@ -2302,9 +2302,9 @@ public:
 	void PostSave();
 
 	// Methods of IEntitySaveUtils
-	virtual void AddLevelTransitionSaveDependency( CBaseEntity *pEntity1, CBaseEntity *pEntity2 );
-	virtual int GetEntityDependencyCount( CBaseEntity *pEntity );
-	virtual int GetEntityDependencies( CBaseEntity *pEntity, int nCount, CBaseEntity **ppEntList );
+	void AddLevelTransitionSaveDependency( CBaseEntity *pEntity1, CBaseEntity *pEntity2 ) override;
+	int GetEntityDependencyCount( CBaseEntity *pEntity ) override;
+	int GetEntityDependencies( CBaseEntity *pEntity, int nCount, CBaseEntity **ppEntList ) override;
 
 private:
  	IPhysicsObjectPairHash *m_pLevelAdjacencyDependencyHash;
