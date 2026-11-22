@@ -1085,7 +1085,7 @@ public:
 			Assert( pPhys );
 			if ( !pPhys )
 			{
-				return;
+				continue;
 			}
 			
 			float dragForce = -0.5f * pPhys->GetDragInDirection( pCore->speed ) * m_airDensity * event->delta_time;
