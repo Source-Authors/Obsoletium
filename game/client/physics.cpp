@@ -150,6 +150,10 @@ bool PhysicsDLLInit( CreateInterfaceFn physicsFactory )
 		(physprops = (IPhysicsSurfaceProps *)physicsFactory( VPHYSICS_SURFACEPROPS_INTERFACE_VERSION, NULL )) == NULL ||
 		(physcollision = (IPhysicsCollision *)physicsFactory( VPHYSICS_COLLISION_INTERFACE_VERSION, NULL )) == NULL )
 	{
+		// dimhotepus: Do not leave partially initialized interfaces behind on failure.
+		physcollision = nullptr;
+		physprops = nullptr;
+		physics = nullptr;
 		return false;
 	}
 
