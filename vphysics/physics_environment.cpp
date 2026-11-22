@@ -1350,7 +1350,7 @@ void CPhysicsEnvironment::SerializeObjectToBuffer( IPhysicsObject *pObject, unsi
 			"Buffer size %u is too small to serialize physical object (%zu).",
 			bufferSize,
 			sizeof( vphysics_save_cphysicsobject_t ) );
-		Warning( "Buffer size %u is too small to serialize physical object (%zu).",
+		Warning( "Buffer size %u is too small to serialize physical object (%zu).\n",
 			bufferSize,
 			sizeof( vphysics_save_cphysicsobject_t ) );
 	}
