@@ -742,9 +742,11 @@ private:
 		{
 			auto next = m_pairList.NextInorder( index );
 			corepair_t &test = m_pairList.Element(index);
-			
+
 			// only keep 1 seconds worth of data
-			if ( (currentTime - test.lastImpactTime) > 1.0 )
+			// dimhotepus: Also drop entries newer than now: the clock was reset and they belong to the old timeline.
+			const double age = currentTime - test.lastImpactTime;
+			if ( age > 1.0 || age < 0.0 )
 			{
 				m_pairList.RemoveAt( index );
 			}
