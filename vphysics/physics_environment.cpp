@@ -853,7 +853,7 @@ public:
 		ConvertPositionToHL( position, origin );
 		ConvertPositionToHL( box_extents, extents );
 
-		Vector boxOrigin, boxExtents;
+		Vector boxOrigin;
 		CPhysicsObject *pObject0 = static_cast<CPhysicsObject *>(node_object->client_data);
 		pObject0->LocalToWorld( boxOrigin, origin );
 		QAngle angles;
