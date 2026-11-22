@@ -753,10 +753,11 @@ private:
 CPhysicsListenerCollision::CPhysicsListenerCollision()
 	: IVP_Listener_Collision( ALL_COLLISION_FLAGS ),
 	//m_pairListOldestTime(0.0f),
-	m_pCallback(&g_EmptyCollisionListener) 
+	m_pCallback(&g_EmptyCollisionListener),
+	// dimhotepus: Has shared_ptr now, so brace init instead of memset.
+	m_event{}
 {
 	m_pairList.SetLessFunc( CorePairLessFunc );
-	memset(&m_event, 0, sizeof(m_event));
 }
 
 
