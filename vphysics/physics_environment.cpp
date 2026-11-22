@@ -39,7 +39,7 @@
 #include "tier1/utlmultilist.h"
 
 #include <memory>   // std::make_shared
-#include <climits>  // std::numeric_limits
+#include <limits>   // std::numeric_limits
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -347,7 +347,7 @@ public:
 				// friction callbacks for this object?
 				// dimhotepus: Checks client data aka scrape is present.
 				Assert( pScrape );
-				if ( pScrape && pScrape->CallbackFlags() & CALLBACK_GLOBAL_FRICTION )
+				if ( pScrape && ( pScrape->CallbackFlags() & CALLBACK_GLOBAL_FRICTION ) )
 				{
 					float energy = IVP_Contact_Point_API::get_eliminated_energy( contact );
 					if ( energy ) 
