@@ -507,7 +507,7 @@ public:
 		m_event.pObjects[1] = pObject2;
 		m_event.deltaCollisionTime = pEvent->d_time_since_last_collision;
 		// This timer must have been reset or something (constructor initializes time to -1000)
-		// Fake the time to 50ms (resets happen often in rolling collisions for some reason)
+		// Fake the time (resets happen often in rolling collisions for some reason)
 		if ( m_event.deltaCollisionTime > 999 )
 		{
 			m_event.deltaCollisionTime = 1.0;
