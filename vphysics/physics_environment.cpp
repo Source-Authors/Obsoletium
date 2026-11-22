@@ -2101,43 +2101,42 @@ public:
 	CObjectPairHash( const CObjectPairHash & ) = delete;
 	CObjectPairHash& operator=( const CObjectPairHash & ) = delete;
 
-	// converts the void * stored in the hash to a list in the multilist
-	unsigned short HashToListIndex( void *pHash ) const
+private:
+	// dimhotepus: Increase object hash pairs unsigned int -> int.
+	// converts the void * stored in the hash to a list index
+	int HashToListIndex( void *pHash ) const
 	{
 		if ( !pHash )
 			return m_objectList.InvalidIndex();
 
-        uintp hash = (uintp)pHash;
-		// mask off the extra bit we added to avoid zeros
-		hash &= 0xFFFF;
-		return (unsigned short)hash;
+		// undo the +1 we added to keep zero as "not there"
+		return (int)( (uintp)pHash - 1 );
 	}
 
-	// converts the list in the multilist to a void * we can put in the hash
-	void *ListIndexToHash( unsigned short listIndex )
+	// dimhotepus: Increase object hash pairs unsigned int -> int.
+	// converts a list index to a void * we can put in the hash
+	void *ListIndexToHash( int listIndex )
 	{
-		unsigned int hash = (unsigned int)listIndex;
-
-		// set the high bit, so zero means "not there"
-		hash |= 0x80000000;
-		return (void *)(intp)hash;
+		Assert( listIndex >= 0 );
+		// +1 so a null pointer always means "not there"
+		return (void *)( (uintp)listIndex + 1 );
 	}
 
-	// Lookup this object and get a multilist entry
-	unsigned short GetListForObject( void *pObject )
+	// dimhotepus: Increase object hash pairs unsigned int -> int.
+	int GetListForObject( void *pObject )
 	{
 		return HashToListIndex( m_pObjectHash->find_elem( pObject ) );
 	}
 
-	// new object, set up his list
-	void SetListForObject( void *pObject, unsigned short listIndex )
+	// dimhotepus: Increase object hash pairs unsigned int -> int.
+	void SetListForObject( void *pObject, int listIndex )
 	{
 		Assert( !m_pObjectHash->find_elem( pObject ) );
-		m_pObjectHash->add_elem( pObject, ListIndexToHash(listIndex) );
+		m_pObjectHash->add_elem( pObject, ListIndexToHash( listIndex ) );
 	}
 
-	// last entry is gone, remove the object
-	void DestroyListForObject( void *pObject, unsigned short listIndex )
+	// dimhotepus: Increase object hash pairs unsigned int -> int.
+	void DestroyListForObject( void *pObject, int listIndex )
 	{
 		if ( m_objectList.IsValidList( listIndex ) )
 		{
@@ -2149,7 +2148,7 @@ public:
 	// Add this object to the list of disabled objects
 	void AddToObjectList( void *pObject, void *pAdd )
 	{
-		unsigned short listIndex = GetListForObject( pObject );
+		int listIndex = GetListForObject( pObject );
 		if ( !m_objectList.IsValidList( listIndex ) )
 		{
 			listIndex = m_objectList.CreateList();
@@ -2162,7 +2161,7 @@ public:
 	// Remove one object from a particular object's list (linear time)
 	void RemoveFromObjectList( void *pObject, void *pRemove )
 	{
-		unsigned short listIndex = GetListForObject( pObject );
+		int listIndex = GetListForObject( pObject );
 		if ( !m_objectList.IsValidList( listIndex ) )
 			return;
 
@@ -2183,6 +2182,7 @@ public:
 		}
 	}
 
+public:
 	// add a pair (constant time)
 	void AddObjectPair( void *pObject0, void *pObject1 ) override
 	{
@@ -2213,22 +2213,36 @@ public:
 		return m_pairHash.HasPair( pObject0, pObject1 );
 	}
 
+	// dimhotepus: Fix (a, a) pair removal.
 	void RemoveAllPairsForObject( void *pObject ) override
 	{
-		unsigned short listIndex = GetListForObject( pObject );
+		int listIndex = GetListForObject( pObject );
 		if ( !m_objectList.IsValidList( listIndex ) )
 			return;
 
-		unsigned short item = m_objectList.Head(listIndex);
-		while ( item != m_objectList.InvalidIndex() )
+		// Always pop the head: no cached 'next' that a nested removal could invalidate.
+		for ( auto item = m_objectList.Head( listIndex );
+		      item != m_objectList.InvalidIndex();
+		      item = m_objectList.Head( listIndex ) )
 		{
-			unsigned short next = m_objectList.Next(item);
 			void *pOther = m_objectList[item];
 			m_objectList.Remove( listIndex, item );
-			// remove the matching entry
-			RemoveFromObjectList( pOther, pObject );
-			m_pairHash.RemovePair( pOther, pObject );
-			item = next;
+
+			if ( pOther != pObject )
+			{
+				// remove the matching entry from the other object's list
+				RemoveFromObjectList( pOther, pObject );
+				m_pairHash.RemovePair( pOther, pObject );
+			}
+			else
+			{
+				// Self-pair: both entries live in THIS list (drained by this loop),
+				// and the hash pair exists only once, so remove it on the first pass.
+				if ( m_pairHash.HasPair( pObject, pObject ) )
+				{
+					m_pairHash.RemovePair( pObject, pObject );
+				}
+			}
 		}
 		DestroyListForObject( pObject, listIndex );
 	}
@@ -2236,7 +2250,7 @@ public:
 	// Gets the # of dependencies for a particular entity
 	int GetPairCountForObject( void *pObject0 ) override
 	{
-		unsigned short listIndex = GetListForObject( pObject0 );
+		int listIndex = GetListForObject( pObject0 );
 		if ( !m_objectList.IsValidList( listIndex ) )
 			return 0;
 
@@ -2258,7 +2272,7 @@ public:
 			return 0;
 		}
 
-		unsigned short listIndex = GetListForObject( pObject0 );
+		int listIndex = GetListForObject( pObject0 );
 		if ( !m_objectList.IsValidList( listIndex ) )
 			return 0;
 
@@ -2284,8 +2298,9 @@ private:
 	// this is a hash of pObjects with each element storing an index to the head of its list of disabled collisions
 	IVP_VHash_Store		*m_pObjectHash;
 
+	// dimhotepus: Increase object hash pairs unsigned int -> int.
 	// this is the list of disabled collisions for each object.  Uses multilist
-	CUtlMultiList<void *, unsigned short>	m_objectList;
+	CUtlMultiList<void *, int>	m_objectList;
 };
 
 IPhysicsObjectPairHash *CreateObjectPairHash()
