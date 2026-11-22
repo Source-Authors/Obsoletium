@@ -171,6 +171,14 @@ void PhysicsDLLShutdown()
 
 void PhysicsLevelInit( void )
 {
+	// dimhotepus: Re-entry without shutdown would overwrite and leak physenv / collision hash.
+	Assert( !physenv );
+	if ( physenv )
+	{
+		Warning( "PhysicsLevelInit: physics environment already exists, skipping.\n" );
+		return;
+	}
+
 	physenv = physics->CreateEnvironment();
 	Assert( physenv );
 	// dimhotepus: Assert is compiled out in release, but physenv is dereferenced below.
