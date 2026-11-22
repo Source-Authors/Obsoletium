@@ -2218,6 +2218,12 @@ public:
 	// Gets all dependencies for a particular entity
 	int GetPairListForObject( void *pObject0, int nMaxCount, void **ppObjectList ) override
 	{
+		// dimhotepus: Prevent overlow on 0 or bad max count.
+		if ( nMaxCount <= 0 )
+		{
+			return 0;
+		}
+
 		unsigned short listIndex = GetListForObject( pObject0 );
 		if ( !m_objectList.IsValidList( listIndex ) )
 			return 0;
