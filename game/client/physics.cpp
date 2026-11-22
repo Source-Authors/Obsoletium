@@ -126,11 +126,12 @@ private:
 	void	DispatchStartTouch( C_BaseEntity *pEntity0, C_BaseEntity *pEntity1, const Vector &point, const Vector &normal );
 	void	DispatchEndTouch( C_BaseEntity *pEntity0, C_BaseEntity *pEntity1 );
 
-	friction_t					m_current[8];
+	// dimhotepus: Init members in-class. Defaulted ctor left them indeterminate for non-static instances.
+	friction_t					m_current[8]{};
 	CUtlVector<fluidevent_t>	m_fluidEvents;
 	CUtlVector<touchevent_t>	m_touchEvents;
-	int							m_inCallback;
-	bool						m_bBufferTouchEvents;
+	int							m_inCallback{0};
+	bool						m_bBufferTouchEvents{false};
 };
 
 CCollisionEvent g_Collisions;
