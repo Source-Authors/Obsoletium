@@ -201,6 +201,12 @@ public:
 		m_pCallback = pListener;
 	}
 
+	// dimhotepus: Allow to reset scrape time.
+	void ResetScrapeTime()
+	{
+		m_lastScrapeTime = 0.0f;
+	}
+
 	void Remove( intp index )
 	{
 		// fast remove preserves indices except for the last element (moved into the empty spot)
@@ -1571,6 +1577,8 @@ void CPhysicsEnvironment::ResetSimulationClock()
 	m_pPhysEnv->reset_time();
 	m_pPhysEnv->get_time_manager()->env_set_current_time( m_pPhysEnv, IVP_Time(0) );
 	m_pPhysEnv->reset_time();
+	// dimhotepus: Reset scrape time, so friction/scrape events not silently suppressed until simulation time catches up.
+	m_pSleepEvents->ResetScrapeTime();
 	m_fixedTimestep = true;
 	SeedRandomGenerators();
 }
