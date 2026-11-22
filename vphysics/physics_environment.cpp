@@ -874,7 +874,21 @@ public:
 class CCollisionSolver final : public IVP_Collision_Filter, public IVP_Anomaly_Manager
 {
 public:
-	CCollisionSolver( void ) : IVP_Anomaly_Manager(IVP_FALSE) { m_pSolver = NULL; }
+	CCollisionSolver() : IVP_Anomaly_Manager(IVP_FALSE)
+	{
+		m_pSolver = nullptr;
+		// dimhotepus: Init visualizer.
+#if defined( IVP_ENABLE_VISUALIZER )
+		pVisualizer = nullptr;
+#endif
+	}
+	~CCollisionSolver()
+	{
+		// dimhotepus: Cleanup visualizer.
+#if defined( IVP_ENABLE_VISUALIZER )
+		delete pVisualizer;
+#endif
+	}
 	void SetHandler( IPhysicsCollisionSolver *pSolver ) { m_pSolver = pSolver; }
 
 	// IVP_Collision_Filter
@@ -1258,7 +1272,10 @@ void CPhysicsEnvironment::SetDebugOverlay( CreateInterfaceFn debugOverlayFactory
 	}
 
 #if defined(IVP_ENABLE_VISUALIZER)
+	// dimhotepus: Cleanup old visualizer.
+	delete m_pCollisionSolver->pVisualizer;
 	m_pCollisionSolver->pVisualizer = new CCollisionVisualizer( m_pDebugOverlay );
+
 	INSTALL_SHORTRANGE_CALLBACK(m_pCollisionSolver->pVisualizer);
 	INSTALL_LONGRANGE_CALLBACK(m_pCollisionSolver->pVisualizer);
 #endif
