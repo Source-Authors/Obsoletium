@@ -173,6 +173,12 @@ void PhysicsLevelInit( void )
 {
 	physenv = physics->CreateEnvironment();
 	Assert( physenv );
+	// dimhotepus: Assert is compiled out in release, but physenv is dereferenced below.
+	if ( !physenv )
+	{
+		Warning( "PhysicsLevelInit: failed to create physics environment.\n" );
+		return;
+	}
 #ifdef PORTAL
 	physenv_main = physenv;
 #endif
@@ -189,7 +195,18 @@ void PhysicsLevelInit( void )
 	physenv->SetCollisionEventHandler( &g_Collisions );
 	physenv->SetCollisionSolver( &g_Collisions );
 
-	g_PhysWorldObject = PhysCreateWorld_Shared( GetClientWorldEntity(), modelinfo->GetVCollide(1), g_PhysDefaultObjectParams );
+	// dimhotepus: World entity / vcollide may be missing; PhysCreateWorld_Shared does not check them.
+	C_BaseEntity *pWorld = GetClientWorldEntity();
+	vcollide_t *pWorldVCollide = modelinfo->GetVCollide( 1 );
+	if ( pWorld && pWorldVCollide )
+	{
+		g_PhysWorldObject = PhysCreateWorld_Shared( pWorld, pWorldVCollide, g_PhysDefaultObjectParams );
+	}
+	else
+	{
+		Warning( "PhysicsLevelInit: no world entity or world collision data.\n" );
+		g_PhysWorldObject = nullptr;
+	}
 
 	staticpropmgr->CreateVPhysicsRepresentations( physenv, &g_SolidSetup, NULL );
 }
@@ -313,7 +330,8 @@ int CCollisionEvent::ShouldSolvePenetration( IPhysicsObject *pObj0, IPhysicsObje
 {
 	CallbackContext callback(this);
 	// solve it yourself here and return 0, or have the default implementation do it
-	if ( pGameData0 == pGameData1 )
+	// dimhotepus: pGameData0 == pGameData1 is also true when both are null, which then dereferenced null below.
+	if ( pGameData0 && pGameData0 == pGameData1 )
 	{
 		if ( pObj0->GetGameFlags() & FVPHYSICS_PART_OF_RAGDOLL )
 		{
@@ -1038,11 +1056,19 @@ void PhysCleanupFrictionSounds( CBaseEntity *pEntity )
 
 float PhysGetNextSimTime()
 {
+	// dimhotepus: Entity creation can run before level init / after shutdown when physenv is null.
+	if ( !physenv )
+		return gpGlobals->frametime * cl_phys_timescale.GetFloat();
+
 	return physenv->GetSimulationTime() + gpGlobals->frametime * cl_phys_timescale.GetFloat();
 }
 
 float PhysGetSyncCreateTime()
 {
+	// dimhotepus: Entity creation can run before level init / after shutdown when physenv is null.
+	if ( !physenv )
+		return gpGlobals->curtime;
+
 	float nextTime = physenv->GetNextFrameTime();
 	float simTime = PhysGetNextSimTime();
 	if ( nextTime < simTime )
