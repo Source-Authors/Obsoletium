@@ -29,7 +29,9 @@
 // file system interface
 extern IFileSystem *filesystem;
 
-ConVar	cl_phys_timescale( "cl_phys_timescale", "1.0", FCVAR_CHEAT, "Sets the scale of time for client-side physics (ragdolls)" );
+// dimhotepus: Bound timescale. Negative values made PhysGetNextSimTime run backwards and
+// Simulate silently drops deltas outside (0.0001, 1.0].
+ConVar	cl_phys_timescale( "cl_phys_timescale", "1.0", FCVAR_CHEAT, "Sets the scale of time for client-side physics (ragdolls)", true, 0.0f, true, 10.0f );
 
 void PrecachePhysicsSounds( void );
 
