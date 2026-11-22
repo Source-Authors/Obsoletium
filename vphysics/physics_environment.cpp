@@ -99,12 +99,18 @@ public:
 	}
 	void DeleteAll()
 	{
-		for ( intp i = m_list.Count()-1; i >= 0; --i)
+		// dimhotepus: Reentrant-safe DeleteAll.
+		while ( m_list.Count() )
 		{
-			m_list[i]->Delete();
-			delete m_list[i];
+			CUtlVector< IDeleteQueueItem * > local;
+			local.Swap( m_list );
+
+			for ( intp i = local.Count() - 1; i >= 0; --i )
+			{
+				local[i]->Delete();
+				delete local[i];
+			}
 		}
-		m_list.RemoveAll();
 	}
 
 private:
@@ -1726,16 +1732,19 @@ void CPhysicsEnvironment::SetCollisionSolver( IPhysicsCollisionSolver *pSolver )
 
 void CPhysicsEnvironment::ClearDeadObjects( void )
 {
-	// dimhotepus: Can't use range-for loop here as DeleteObject may recursively
-	// call ClearDeadObjects and m_deadObjects will be modified when iterating.
-	for ( intp i = 0; i < m_deadObjects.Count(); i++ )
+	// dimhotepus: Reentrant-safe clear of dead objects.
+	while ( m_deadObjects.Count() )
 	{
-		auto *pObject = (CPhysicsObject *)m_deadObjects.Element(i);
+		CUtlVector< IPhysicsObject * > local;
+		local.Swap( m_deadObjects ); // member empty; re-entrant calls are safe
 
-		m_pSleepEvents->DeleteObject( pObject );
-		delete pObject;
+		for ( intp i = 0; i < local.Count(); i++ )
+		{
+			auto *pObject = static_cast< CPhysicsObject * >( local[i] );
+			m_pSleepEvents->DeleteObject( pObject );
+			delete pObject;
+		}
 	}
-	m_deadObjects.Purge();
 	m_pDeleteQueue->DeleteAll();
 }
 
