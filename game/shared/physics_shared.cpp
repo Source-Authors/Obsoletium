@@ -529,6 +529,7 @@ void PhysCreateVirtualTerrain( CBaseEntity *pWorld, const objectparams_t &defaul
 			solid.params.enableCollisions = true;
 			solid.params.pGameData = pWorld;
 			V_sprintf_safe(nameBuf, "vdisp_%04d", i );
+			// dimhotepus: Allocated on stack and copied to heap by CreatePolyObjectStatic.
 			solid.params.pName = nameBuf;
 			intp surfaceData = physprops->GetSurfaceIndex( "default" );
 			// create this as part of the world
