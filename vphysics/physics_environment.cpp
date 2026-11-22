@@ -1127,7 +1127,8 @@ static CVPhysicsDebugOverlay s_DefaultDebugOverlay;
 CPhysicsEnvironment::CPhysicsEnvironment( void )
 // assume that these lists will have at least one object
 {
-	m_pDebugOverlay = nullptr;
+	// dimhotepus: Callers expect it to always be set.
+	m_pDebugOverlay = &s_DefaultDebugOverlay;
 	// set this to true to force the 
 	m_deleteQuick = false;
 	m_queueDeleteObject = false;
