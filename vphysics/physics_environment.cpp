@@ -470,7 +470,9 @@ public:
 
 	void SetHandler( IPhysicsCollisionEvent *pCallback )
 	{
-		m_pCallback = pCallback;
+		// dimhotepus: Check and fallback to empty if nullptr.
+		Assert( pCallback );
+		m_pCallback = pCallback ? pCallback : &g_EmptyCollisionListener;
 	}
 	IPhysicsCollisionEvent *GetHandler() { return m_pCallback; }
 
