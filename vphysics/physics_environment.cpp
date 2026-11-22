@@ -971,7 +971,7 @@ public:
 		CPhysicsObject *pObject = static_cast<CPhysicsObject *>(pCore->objects.element_at(0)->client_data);
 		// dimhotepus: Check client data is set.
 		Assert( pObject );
-		if ( !pObject || pObject->GetShadowController() != NULL )
+		if ( pObject && pObject->GetShadowController() != NULL )
 			return;
 		IVP_Anomaly_Manager::max_velocity_exceeded(al, pCore, velocity_in_out);
 	}
