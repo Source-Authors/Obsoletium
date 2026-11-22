@@ -38,8 +38,9 @@
 #include "tier0/threadtools.h"
 #include "tier1/utlmultilist.h"
 
-#include <memory>   // std::make_shared
 #include <limits>   // std::numeric_limits
+#include <memory>   // std::make_shared
+#include <utility>  // std::exchange
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1276,8 +1277,8 @@ void CPhysicsEnvironment::SetDebugOverlay( CreateInterfaceFn debugOverlayFactory
 
 #if defined(IVP_ENABLE_VISUALIZER)
 	// dimhotepus: Cleanup old visualizer.
-	delete m_pCollisionSolver->pVisualizer;
-	m_pCollisionSolver->pVisualizer = new CCollisionVisualizer( m_pDebugOverlay );
+	auto *oldVisualizer = std::exchange( m_pCollisionSolver->pVisualizer, new CCollisionVisualizer( m_pDebugOverlay ) );
+	delete oldVisualizer;
 
 	INSTALL_SHORTRANGE_CALLBACK(m_pCollisionSolver->pVisualizer);
 	INSTALL_LONGRANGE_CALLBACK(m_pCollisionSolver->pVisualizer);
