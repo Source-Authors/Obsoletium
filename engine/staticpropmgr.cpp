@@ -1174,6 +1174,7 @@ void CStaticProp::CreateVPhysics( IPhysicsEnvironment *pPhysEnv, IVPhysicsKeyHan
 		pPhysCollide = pVCollide->solids[0];
 
 		IVPhysicsKeyParser *pParse = physcollision->VPhysicsKeyParserCreate( pVCollide->pKeyValues );
+		RunCodeAtScopeExit( physcollision->VPhysicsKeyParserDestroy( pParse ) );
 		while ( !pParse->Finished() )
 		{
 			const char *pBlock = pParse->GetCurrentBlockName();
@@ -1187,7 +1188,6 @@ void CStaticProp::CreateVPhysics( IPhysicsEnvironment *pPhysEnv, IVPhysicsKeyHan
 				pParse->SkipBlock();
 			}
 		}
-		physcollision->VPhysicsKeyParserDestroy( pParse );
 	}
 	else
 	{
