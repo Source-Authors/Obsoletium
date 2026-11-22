@@ -38,6 +38,9 @@
 #include "tier0/threadtools.h"
 #include "tier1/utlmultilist.h"
 
+#include <memory>   // std::make_shared
+#include <climits>  // std::numeric_limits
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
