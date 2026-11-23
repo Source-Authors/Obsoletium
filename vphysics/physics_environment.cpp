@@ -516,9 +516,6 @@ public:
 		{
 			m_event.deltaCollisionTime = 1.0;
 		}
-			
-
-		m_event.pInternalData = std::make_shared<CPhysicsCollisionData>(contact);
 
 		// clear out any static object collisions unless flagged to keep them
 		if ( contact->objects[0]->get_movement_state() == IVP_MT_STATIC )
@@ -540,6 +537,9 @@ public:
 
 		if ( !m_event.isCollision && !m_event.isShadowCollision )
 			return;
+
+		// dimhotepus: Allocate internal data only when needed.
+		m_event.pInternalData = std::make_shared< CPhysicsCollisionData >( contact );
 
 		// look up surface props
 		for ( int i = 0; i < 2; i++ )
@@ -564,7 +564,7 @@ public:
 
 		float collisionSpeed = contact->speed.dot_product(&contact->surf_normal);
 		m_event.collisionSpeed = ConvertDistanceToHL( fabs(collisionSpeed) );
-		m_event.pInternalData = std::make_shared<CPhysicsCollisionData>(contact);
+		m_event.pInternalData = std::make_shared< CPhysicsCollisionData >( contact );
 
 		m_pCallback->PostCollision( &m_event );
 	}
