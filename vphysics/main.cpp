@@ -12,39 +12,57 @@
 #include "vphysics/collision_set.h"
 #include "ivu_vhash.hxx"
 
+#include <climits>
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-// simple 32x32 bit array
+// dimhotepus: Square bit matrix, N x N where N is the bit width of uintp
+// (32x32 on 32-bit targets, 64x64 on 64-bit).
 class CPhysicsCollisionSet final : public IPhysicsCollisionSet
 {
 public:
-	CPhysicsCollisionSet()
-	{
-		BitwiseClear( m_bits );
-	}
-	virtual ~CPhysicsCollisionSet() = default;
+	// dimhotepus: Zero-initialized by the member initializer, no BitwiseClear.
+	CPhysicsCollisionSet() = default;
+	~CPhysicsCollisionSet() override = default;
 
 	void EnableCollisions( intp index0, intp index1 ) override
 	{
-		Assert(index0<ssize(m_bits)&&index1<ssize(m_bits));
-		m_bits[index0] |= (uintp)(1u)<<index1;
-		m_bits[index1] |= (uintp)(1u)<<index0;
+		Assert( IsValidIndex( index0 ) && IsValidIndex( index1 ) );
+		m_bits[index0] |= Bit( index1 );
+		m_bits[index1] |= Bit( index0 );
 	}
 	void DisableCollisions( intp index0, intp index1 ) override
 	{
-		Assert(index0<ssize(m_bits)&&index1<ssize(m_bits));
-		m_bits[index0] &= ~((uintp)(1u)<<index1);
-		m_bits[index1] &= ~((uintp)(1u)<<index0);
+		Assert( IsValidIndex( index0 ) && IsValidIndex( index1 ) );
+		m_bits[index0] &= ~Bit( index1 );
+		m_bits[index1] &= ~Bit( index0 );
 	}
 
 	bool ShouldCollide( intp index0, intp index1 ) const override
 	{
-		Assert(index0<ssize(m_bits)&&index1<ssize(m_bits));
-		return (m_bits[index0] & ((uintp)(1u)<<index1)) ? true : false;
+		Assert( IsValidIndex( index0 ) && IsValidIndex( index1 ) );
+		return ( m_bits[index0] & Bit( index1 ) ) != 0;
 	}
+
 private:
-	uintp m_bits[CHAR_BIT * sizeof(void*)];
+	static constexpr intp kMaxSets = CHAR_BIT * sizeof( uintp );
+
+	// dimhotepus: Unsigned compare rejects negative indices too. The old
+	// "index < size" check let them through (negative array index and negative
+	// shift, both UB).
+	static constexpr bool IsValidIndex( intp index ) noexcept
+	{
+		return static_cast< uintp >( index ) < static_cast< uintp >( kMaxSets );
+	}
+
+	// dimhotepus: Valid because IsValidIndex keeps index < bit width of uintp.
+	static constexpr uintp Bit( intp index ) noexcept
+	{
+		return uintp{ 1 } << index;
+	}
+
+	uintp m_bits[kMaxSets] = {};
 };
 
 
