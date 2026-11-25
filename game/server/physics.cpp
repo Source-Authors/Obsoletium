@@ -982,12 +982,8 @@ int CCollisionEvent::ShouldSolvePenetration( IPhysicsObject *pObj0, IPhysicsObje
 	if ( pEntity0 > pEntity1 )
 	{
 		// swap sort
-		CBaseEntity *pTmp = pEntity0;
-		pEntity0 = pEntity1;
-		pEntity1 = pTmp;
-		IPhysicsObject *pTmpObj = pObj0;
-		pObj0 = pObj1;
-		pObj1 = pTmpObj;
+		std::swap( pEntity0, pEntity1 );
+		std::swap( pObj0, pObj1 );
 	}
 	if ( pEntity0 == pEntity1 )
 	{
