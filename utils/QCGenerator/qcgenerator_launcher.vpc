@@ -41,11 +41,11 @@ $Project "QCGenerator_Launcher"
 
 	$Folder "Link Libraries"
 	{
-		$DynamicFile	"$SRCDIR\lib\public\appframework.lib"
-		$DynamicFile	"$SRCDIR\lib\public\matsys_controls.lib"
-		$File	"$SRCDIR\lib\common\sqlwrapper.lib"
-		$DynamicFile	"$SRCDIR\lib\public\tier2.lib"
-		$DynamicFile	"$SRCDIR\lib\public\tier3.lib"
-		$DynamicFile	"$SRCDIR\lib\public\vgui_controls.lib"
+		$DynamicFile	"$SRCDIR/lib/public/appframework.lib"
+		$DynamicFile	"$SRCDIR/lib/public/matsys_controls.lib"
+		$File	"$SRCDIR/lib/common/sqlwrapper.lib"
+		$DynamicFile	"$SRCDIR/lib/public/tier2.lib"
+		$DynamicFile	"$SRCDIR/lib/public/tier3.lib"
+		$DynamicFile	"$SRCDIR/lib/public/vgui_controls.lib"
 	}
 }

@@ -18,10 +18,10 @@ $Project "pcffix"
 
 	$Folder	"Link Libraries"
 	{
-		$DynamicFile	"$SRCDIR\lib\public\appframework.lib"
-		$DynamicFile	"$SRCDIR\lib\public\datamodel.lib"
-		$DynamicFile	"$SRCDIR\lib\public\dmserializers.lib"
-		$DynamicFile	"$SRCDIR\lib\public\mathlib.lib"
-		$DynamicFile	"$SRCDIR\lib\public\tier2.lib"
+		$DynamicFile	"$SRCDIR/lib/public/appframework.lib"
+		$DynamicFile	"$SRCDIR/lib/public/datamodel.lib"
+		$DynamicFile	"$SRCDIR/lib/public/dmserializers.lib"
+		$DynamicFile	"$SRCDIR/lib/public/mathlib.lib"
+		$DynamicFile	"$SRCDIR/lib/public/tier2.lib"
 	}
 }

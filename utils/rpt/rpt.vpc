@@ -24,13 +24,13 @@ $Project
 
 	$Folder	"Link Libraries"
 	{
-		-$File	"$SRCDIR\lib\public\tier0.lib" 			[!$WIN64]
-		-$File	"$SRCDIR\lib\public\tier1.lib"			[!$WIN64]
-		-$File	"$SRCDIR\lib\public\vstdlib.lib"		[!$WIN64]
+		-$File	"$SRCDIR/lib/public/tier0.lib" 			[!$WIN64]
+		-$File	"$SRCDIR/lib/public/tier1.lib"			[!$WIN64]
+		-$File	"$SRCDIR/lib/public/vstdlib.lib"		[!$WIN64]
 
-		-$File	"$SRCDIR\lib\public$PLATSUBDIR\tier0.lib" 		[$WIN64]	
-		-$File	"$SRCDIR\lib\public$PLATSUBDIR\tier1.lib"		[$WIN64]
-		-$File	"$SRCDIR\lib\public$PLATSUBDIR\vstdlib.lib"		[$WIN64]
+		-$File	"$SRCDIR/lib/public$PLATSUBDIR/tier0.lib" 		[$WIN64]	
+		-$File	"$SRCDIR/lib/public$PLATSUBDIR/tier1.lib"		[$WIN64]
+		-$File	"$SRCDIR/lib/public$PLATSUBDIR/vstdlib.lib"		[$WIN64]
 	}
 }
 

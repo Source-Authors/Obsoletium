@@ -69,11 +69,11 @@ $Project "vaudio_miles"
 
 	$Folder	"Link Libraries"
 	{
-		$File "$SRCDIR\thirdparty\mss\bin\win32\mss32.lib" [$WIN32]
-		$File "$SRCDIR\thirdparty\mss\bin\win64\mss64.lib" [$WIN64]
-		$File "$SRCDIR\thirdparty\mss\bin\osx32\libMilesX86.dylib" [$OSX32]
-		$File "$SRCDIR\thirdparty\mss\bin\osx64\libMilesX64.dylib" [$OSX64]
-		$File "$SRCDIR\thirdparty\mss\bin\linux32\libMiles.so" [$LINUX32]
+		$File "$SRCDIR/thirdparty/mss/bin/win32/mss32.lib" [$WIN32]
+		$File "$SRCDIR/thirdparty/mss/bin/win64/mss64.lib" [$WIN64]
+		$File "$SRCDIR/thirdparty/mss/bin/osx32/libMilesX86.dylib" [$OSX32]
+		$File "$SRCDIR/thirdparty/mss/bin/osx64/libMilesX64.dylib" [$OSX64]
+		$File "$SRCDIR/thirdparty/mss/bin/linux32/libMiles.so" [$LINUX32]
 		$ImpLibExternal "Miles" [$LINUX64]
 	}
 }

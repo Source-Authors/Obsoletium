@@ -29,7 +29,7 @@ $Project
 {
 	$Folder "Link Libraries"
 	{
-		$Lib								"$QT_ROOT\lib\qtcore4"
-		$Lib								"$QT_ROOT\lib\qtgui4"
+		$Lib								"$QT_ROOT/lib/qtcore4"
+		$Lib								"$QT_ROOT/lib/qtgui4"
 	}
 }

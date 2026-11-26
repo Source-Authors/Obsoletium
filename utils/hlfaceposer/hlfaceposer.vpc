@@ -393,7 +393,7 @@ $Project "hlfaceposer"
 		$Lib bitmap
 		$Lib choreoobjects
 		$Lib mathlib
-		$Lib $LIBCOMMON\mxtoolkitwin32
+		$Lib $LIBCOMMON/mxtoolkitwin32
 		$Lib tier2
 		$Lib tier3
 		$Lib datamodel
@@ -402,6 +402,6 @@ $Project "hlfaceposer"
 		$Lib matsys_controls
 		$Lib movieobjects
 		$Lib vgui_controls
-		$Lib $LIBCOMMON\lzma
+		$Lib $LIBCOMMON/lzma
 	}
 }

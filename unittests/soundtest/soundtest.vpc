@@ -19,6 +19,6 @@ $Project "Soundtest"
 
 	$Folder	"Link Libraries"
 	{
-		$DynamicFile	"$SRCDIR\lib\public\appframework.lib"
+		$DynamicFile	"$SRCDIR/lib/public/appframework.lib"
 	}
 }

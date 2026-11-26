@@ -87,7 +87,7 @@ $Project "dx_proxy ($DX_SDK_VER)"
 
 	$Folder	"Link Libraries"
 	{
-		$Libexternal		"$SRCDIR\dx9sdk\lib\d3dx9"		[$WIN32]
-		$Libexternal		"$SRCDIR\dx9sdk\lib\x64\d3dx9"	[$WIN64]
+		$Libexternal		"$SRCDIR/dx9sdk/lib/d3dx9"		[$WIN32]
+		$Libexternal		"$SRCDIR/dx9sdk/lib/x64/d3dx9"	[$WIN64]
 	}
 }

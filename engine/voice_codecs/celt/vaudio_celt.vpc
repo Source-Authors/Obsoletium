@@ -46,19 +46,19 @@ $Project "vaudio_celt"
 
 	$Folder "Link Libraries"
 	{
-		$File "$LIBCELTSRCDIR\win32\VS2022\libcelt\Release\libcelt.lib" [$WIN32]
+		$File "$LIBCELTSRCDIR/win32/VS2022/libcelt/Release/libcelt.lib" [$WIN32]
 		{
 			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
 		}
-		$File "$LIBCELTSRCDIR\win32\VS2022\libcelt\x64\Release\libcelt.lib" [$WIN64]
+		$File "$LIBCELTSRCDIR/win32/VS2022/libcelt/x64/Release/libcelt.lib" [$WIN64]
 		{
 			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
 		}
-		$File "$LIBCELTSRCDIR\win32\VS2022\libcelt\Debug\libcelt.lib" [$WIN32]
+		$File "$LIBCELTSRCDIR/win32/VS2022/libcelt/Debug/libcelt.lib" [$WIN32]
 		{
 			$Configuration "Release" { $ExcludedFromBuild "Yes" }
 		}
-		$File "$LIBCELTSRCDIR\win32\VS2022\libcelt\x64\Debug\libcelt.lib" [$WIN64]
+		$File "$LIBCELTSRCDIR/win32/VS2022/libcelt/x64/Debug/libcelt.lib" [$WIN64]
 		{
 			$Configuration "Release" { $ExcludedFromBuild "Yes" }
 		}

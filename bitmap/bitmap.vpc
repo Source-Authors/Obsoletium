@@ -53,7 +53,7 @@ $Project "bitmap"
 
 	$Folder "Link Libraries" [$WINDOWS]
 	{
-	  // dimhotepus: Exclude nvtc & ATI compress, as proprietary.
+		// dimhotepus: Exclude nvtc & ATI compress, as proprietary.
 		$Lib nvtc [!$NO_NVTC]
 		$Lib ATI_Compress_MT_VC10 [!$NO_ATI_COMPRESS]
 	}

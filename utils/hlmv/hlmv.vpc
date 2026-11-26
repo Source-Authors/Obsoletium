@@ -198,6 +198,6 @@ $Project "hlmv"
 		$Lib appframework
 		$Lib bitmap
 		$Lib mathlib
-		$Lib $LIBCOMMON\mxtoolkitwin32
+		$Lib $LIBCOMMON/mxtoolkitwin32
 	}
 }

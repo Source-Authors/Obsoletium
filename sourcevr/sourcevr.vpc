@@ -82,7 +82,7 @@ $Project "sourceVR"
 
 	$Folder	"Link Libraries"
 	{
-		$File	"$OPENVRSRCDIR\lib\$OPENVRLIBDIR\openvr_api.lib" [$WINDOWS]
+		$File	"$OPENVRSRCDIR/lib/$OPENVRLIBDIR/openvr_api.lib" [$WINDOWS]
 		$Lib mathlib
 		$Lib tier2
 		$Lib tier3

@@ -72,7 +72,7 @@ $Project "video_bink"
 	{
 		$Lib	tier1
 		$Lib	tier2
-		$File	"$BINKSRCDIR\bin\$BINKLIBDIR\bink2w32.lib" [$WIN32]
-		$File	"$BINKSRCDIR\bin\$BINKLIBDIR\bink2w64.lib" [$WIN64]
+		$File	"$BINKSRCDIR/bin/$BINKLIBDIR/bink2w32.lib" [$WIN32]
+		$File	"$BINKSRCDIR/bin/$BINKLIBDIR/bink2w64.lib" [$WIN64]
 	}
 }

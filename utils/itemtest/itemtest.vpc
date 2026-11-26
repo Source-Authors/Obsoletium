@@ -52,17 +52,17 @@ $Project "itemtest"
 
 	$Folder	"Link Libraries"
 	{
-		$DynamicFile	"$SRCDIR\lib\public\appframework.lib"
-		$DynamicFile	"$SRCDIR\lib\public\bitmap.lib"
-		$DynamicFile	"$SRCDIR\lib\public\mathlib.lib"
-		$DynamicFile	"$SRCDIR\lib\public\tier2.lib"
-		$DynamicFile	"$SRCDIR\lib\public\tier3.lib"
+		$DynamicFile	"$SRCDIR/lib/public/appframework.lib"
+		$DynamicFile	"$SRCDIR/lib/public/bitmap.lib"
+		$DynamicFile	"$SRCDIR/lib/public/mathlib.lib"
+		$DynamicFile	"$SRCDIR/lib/public/tier2.lib"
+		$DynamicFile	"$SRCDIR/lib/public/tier3.lib"
 
-		$DynamicFile	"$SRCDIR\lib\public\steam_api.lib"
-		$DynamicFile	"$SRCDIR\lib\public\vtf.lib"
-		$DynamicFile	"$SRCDIR\lib\public\itemtest_controls.lib"
+		$DynamicFile	"$SRCDIR/lib/public/steam_api.lib"
+		$DynamicFile	"$SRCDIR/lib/public/vtf.lib"
+		$DynamicFile	"$SRCDIR/lib/public/itemtest_controls.lib"
 
-		$DynamicFile	"$SRCDIR\lib\public\vgui_controls.lib"
+		$DynamicFile	"$SRCDIR/lib/public/vgui_controls.lib"
 	}
 
 	$Folder "Resources" [$WIN32]

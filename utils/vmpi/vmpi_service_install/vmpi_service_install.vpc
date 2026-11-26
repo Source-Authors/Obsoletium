@@ -82,6 +82,6 @@ $Project "Vmpi_service_install"
 
 	$Folder	"Link Libraries"
 	{
-		$DynamicFile	"$SRCDIR\lib\public\vmpi.lib"
+		$DynamicFile	"$SRCDIR/lib/public/vmpi.lib"
 	}
 }

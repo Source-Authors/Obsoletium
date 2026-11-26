@@ -11,26 +11,26 @@ $Project
 {
 	$Folder "Link Libraries" [!$WINDOWS]
 	{
-		$Libexternal $PROTOBUFDIR\libprotobuf [$OSX32]
-		$Libexternal $PROTOBUFDIR\libprotobuf [$LINUX32]
+		$Libexternal $PROTOBUFDIR/libprotobuf [$OSX32]
+		$Libexternal $PROTOBUFDIR/libprotobuf [$LINUX32]
 	}
 
 	$Folder "Link Libraries" [$WINDOWS]
 	{
-		$File "$PROTOBUFDIR\vsprojects\Release\libprotobuf.lib" [$WIN32]
+		$File "$PROTOBUFDIR/vsprojects/Release/libprotobuf.lib" [$WIN32]
 		{
 			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
 		}
-		$File "$PROTOBUFDIR\vsprojects\Debug\libprotobuf.lib" [$WIN32]
+		$File "$PROTOBUFDIR/vsprojects/Debug/libprotobuf.lib" [$WIN32]
 		{
 			$Configuration "Release" { $ExcludedFromBuild "Yes" }
 		}
 		
-		$File "$PROTOBUFDIR\vsprojects\x64\Release\libprotobuf.lib" [$WIN64]
+		$File "$PROTOBUFDIR/vsprojects/x64/Release/libprotobuf.lib" [$WIN64]
 		{
 			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
 		}
-		$File "$PROTOBUFDIR\vsprojects\x64\Debug\libprotobuf.lib" [$WIN64]
+		$File "$PROTOBUFDIR/vsprojects/x64/Debug/libprotobuf.lib" [$WIN64]
 		{
 			$Configuration "Release" { $ExcludedFromBuild "Yes" }
 		}

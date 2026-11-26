@@ -51,7 +51,7 @@ $Project "Bugreporter_text"
 
 	$Folder	"Link Libraries"
 	{
-		$File	"$SRCDIR\lib\common\expdlln.lib"
-		$File	"$SRCDIR\lib\common\trktooln.lib"
+		$File	"$SRCDIR/lib/common/expdlln.lib"
+		$File	"$SRCDIR/lib/common/trktooln.lib"
 	}
 }

@@ -34,7 +34,7 @@ $Project "Mysql_wrapper"
 
 	$Folder	"Link Libraries"
 	{
-		$File	"..\mysql\lib\opt\libmySQL.lib"
-		$File	"..\mysql\lib\opt\zlib.lib"
+		$File	"../mysql/lib/opt/libmySQL.lib"
+		$File	"../mysql/lib/opt/zlib.lib"
 	}
 }

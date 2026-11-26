@@ -25,27 +25,27 @@ $Project
 	$Folder	"Link Libraries" 
 	{
 		$Lib	vpklib
-		$Libexternal $SRCDIR\thirdparty\libcryptopp [$OSXALL]
+		$Libexternal $SRCDIR/thirdparty/libcryptopp [$OSXALL]
 
 		$Libexternal "$SRCDIR\thirdparty\$(CRYPTOPPDIR)\libcryptopp" [$LINUXALL]
 	}
 
 	$Folder "Link Libraries" [$WINDOWS]
 	{
-		$File "$SRCDIR\thirdparty\cryptopp\Win32\Output\Release\cryptlib.lib" [$WIN32]
+		$File "$SRCDIR/thirdparty/cryptopp/Win32/Output/Release/cryptlib.lib" [$WIN32]
 		{
 			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
 		}
-		$File "$SRCDIR\thirdparty\cryptopp\Win32\Output\Debug\cryptlib.lib" [$WIN32]
+		$File "$SRCDIR/thirdparty/cryptopp/Win32/Output/Debug/cryptlib.lib" [$WIN32]
 		{
 			$Configuration "Release" { $ExcludedFromBuild "Yes" }
 		}
 		
-		$File "$SRCDIR\thirdparty\cryptopp\x64\Output\Release\cryptlib.lib" [$WIN64]
+		$File "$SRCDIR/thirdparty/cryptopp/x64/Output/Release/cryptlib.lib" [$WIN64]
 		{
 			$Configuration "Debug" 	{ $ExcludedFromBuild "Yes" }
 		}
-		$File "$SRCDIR\thirdparty\cryptopp\x64\Output\Debug\cryptlib.lib" [$WIN64]
+		$File "$SRCDIR/thirdparty/cryptopp/x64/Output/Debug/cryptlib.lib" [$WIN64]
 		{
 			$Configuration "Release" { $ExcludedFromBuild "Yes" }
 		}

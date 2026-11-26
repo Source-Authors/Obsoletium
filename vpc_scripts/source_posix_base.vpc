@@ -68,9 +68,9 @@ $Project
 
 	$Folder	"Link Libraries"
 	{
-		$ImpLib "$LIBPUBLIC\tier0"		[!$IS_LIB_PROJECT]
-		$Lib	"$LIBPUBLIC\tier1"		[!$IS_LIB_PROJECT]
-		$ImpLib "$LIBPUBLIC\vstdlib"	[!$IS_LIB_PROJECT]
+		$ImpLib "$LIBPUBLIC/tier0"		[!$IS_LIB_PROJECT]
+		$Lib	"$LIBPUBLIC/tier1"		[!$IS_LIB_PROJECT]
+		$ImpLib "$LIBPUBLIC/vstdlib"	[!$IS_LIB_PROJECT]
 	}
 }
 	

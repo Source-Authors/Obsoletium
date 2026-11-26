@@ -1244,8 +1244,7 @@ $Project
 		$ImpLib		steam_api  [!$NO_STEAM]
 		
 		$Libexternal $LIBCOMMON/libcrypto [$OSXALL]
-		$Libexternal "$SRCDIR\lib\common\$(CRYPTOPPDIR)\libcrypto" [$LINUXALL]
-		$Libexternal "$ZLIBOUTDIR/zs"
+		$Libexternal "$SRCDIR/lib/common/$(CRYPTOPPDIR)/libcrypto" [$LINUXALL]
+		$Libexternal "$ZLIBOUTDIR/libzs"
  	}
-
 }

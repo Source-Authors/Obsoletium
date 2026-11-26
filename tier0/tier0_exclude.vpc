@@ -9,7 +9,7 @@ $Project
 	$Folder	"Link Libraries"
 	{
 		// Should match the sites that include this
-		-$Lib "$LIBPUBLIC\tier0"	[$POSIX && !$IS_LIB_PROJECT]
+		-$Lib "$LIBPUBLIC/tier0"	[$POSIX && !$IS_LIB_PROJECT]
 	}
 	$Folder	"Source Files"
 	{
