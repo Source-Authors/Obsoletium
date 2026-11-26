@@ -17,6 +17,13 @@ $Project "tier3"
 		$File	"choreoutils.cpp"
 		$File	"scenetokenprocessor.cpp"
 		$File	"studiohdrstub.cpp"
+
+		// dimhotepus: mdlutils.cpp uses IBoneSetup::AccumulatePose.
+		$File	"$SRCDIR\public\bone_setup.cpp"
+		// dimhotepus: CStudioHdr helpers.
+		$File	"$SRCDIR\public\studio.cpp"
+		// dimhotepus: IntersectRayWithBox.
+		$File	"$SRCDIR\public\collisionutils.cpp"
 	}
 
 	$Folder	"Header Files"
