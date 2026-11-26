@@ -25,6 +25,8 @@ $Project "choreoobjects"
 		$File	"$SRCDIR\game\shared\choreoevent.cpp"
 		$File	"$SRCDIR\game\shared\choreoscene.cpp"
 		$File	"$SRCDIR\game\shared\sceneimage.cpp"
+		// dimhotepus: choreoevent.cpp uses Interpolator_CurveInterpolators*
+		$File	"$SRCDIR\public\interpolatortypes.cpp"
 	}
 
 	$Folder	"Header Files"
