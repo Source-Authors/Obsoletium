@@ -173,15 +173,6 @@ static HMODULE InternalLoadLibrary( const char *pName, Sys_Flags flags )
 		return LoadLibraryExA( pName, nullptr, LOAD_WITH_ALTERED_SEARCH_PATH );
 }
 
-static unsigned ThreadedLoadLibraryFunc( void *pParam )
-{
-	// dimhotepus: Add thread name to aid debugging.
-	ThreadSetDebugName("ModuleLoader");
-	auto *pContext = (ThreadedLoadLibaryContext_t*)pParam;
-	pContext->m_hLibrary = InternalLoadLibrary( pContext->m_pLibraryName, SYS_NOFLAGS );
-	return 0;
-}
-
 #endif // _WIN32
 
 static HMODULE Sys_LoadLibrary( const char *pLibraryName, Sys_Flags flags )
